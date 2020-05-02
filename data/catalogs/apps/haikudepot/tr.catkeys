@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-HaikuDepot	3586526058
+1	turkish	x-vnd.Haiku-HaikuDepot	3381858533
 Repository update error	LocalRepositoryUpdateProcess		Depo güncelleme hatası
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Depo güncellenirken bir hata oluştu: %error%
 User Created	UserLoginWindow		Kullanıcı Oluşturuldu
@@ -37,6 +37,7 @@ Switch account…	MainWindow		Hesap değiştir…
 Preferred language:	UserLoginWindow		Tercih edilen dil:
 Server Error	ServerHelper		Sunucu hatası
 Name	PackageListView		Ad
+Authorization or security issue. Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		Kimlik doğrulama veya güvenlik sorunu. Parolanızın doğru olduğunu doğrulama ve güncel kullanım koşullarını kabul ettiğinizi denetlemek için çıkın ve yeniden giriş yapın.
 Local	LocalPkgDataLoadProcess		Yerel
 Rate %Package%	RatePackageWindow		%Package% paketini derecelendir
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Paket yöneticisi başlatılırken bir hata oluştu: %message%
@@ -56,6 +57,7 @@ There was a puzzling response from the web service.	UserLoginWindow		Web servisi
 Not logged in	MainWindow		Giriş yapılmadı
 No, quit HaikuDepot	App		Hayır, Haiku Depo'dan çık
 Featured packages	FeaturedPackagesView		Öne çıkan paketler
+The supplied response to the captcha is incorrect. A new captcha will be generated; try again.	UserLoginWindow		CAPTCHA yanıtı yanlış. Yeni bir CAPTCHA oluşturulacak; yeniden deneyin.
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Yeni bir kullanıcı oluşturma için gerekli olan CAPTCHA görseli için sunucu ile iletişim kurulamadı.
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Derecelendirmeniz başarıyla yüklendi. Haiku Depo sunucusu web sitesinden güncelleyebilir veya silebilirsiniz.
 Network Error	ServerHelper		Ağ hatası
@@ -103,12 +105,14 @@ Close	RatePackageWindow		Kapat
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		'%REPO_NAME%' depo paket bilgisi eşitleniyor
 View the usage conditions	UserLoginWindow		Kullanım koşullarını görüntüle
 Login issue	MainWindow		Giriş sorunu
-Size	PackageListView		Boyut
 Your rating:	RatePackageWindow		Derecelendirmeniz:
+Size	PackageListView		Boyut
+The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		HaikuDepotServer sisteminde %Nickname% kullanıcısı başarıyla oluşturuldu. Kullanıcı bilgilerinizi web arayüzünü kullanarak yönetebilirsiniz. Şu anda bu kullanıcı ile giriş yapmış bulunmaktasınız.
 Your rating was updated.	RatePackageWindow		Derecelendirmeniz güncellendi.
 All categories	FilterView		Tüm kategoriler
 Repositories	MainWindow		Depolar
 n/a	PackageInfoView		yok
+This rating is visible to other users	RatePackageWindow		Bu derecelendirme diğer kullanıcılar tarafından görüntülenebilir
 View agreed usage conditions…	MainWindow		Kabul edilen kullanım koşullarını görüntüle…
 Cancel	MainWindow		İptal
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 tane daha indirilecek)}other{(# tane daha indirilecek)}}
@@ -147,13 +151,16 @@ Email address:	UserLoginWindow		E-posta adresi:
 Screenshot	ScreenshotWindow		Ekran görüntüsü
 HaikuDepot	System name		Haiku Depo
 A reboot is necessary to complete the installation process.	PackageManager		Yükleme işlemini tamamlamak için bilgisayarı yeniden başlatmalısınız.
+{0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{Bir yaşından büyüğüm}other{# yaşından büyüğüm}}
 View latest usage conditions…	MainWindow		Güncel kullanım koşullarını görüntüle…
 Quit	App		Çık
 Search terms:	FilterView		Arama metni:
 Pending…	PackageListView		Bekliyor…
+The nickname is malformed. The nickname may only contain digits and lower case latin characters. The nickname must be between four and sixteen characters in length.	UserLoginWindow		Takma ad hatalı. Takma adınız yalnızca rakamlardan ve İngilizce küçük harflerden oluşabilir. Takma ad uzunluğu dört ve on altı karakter arasında olabilir.
 Category:	FilterView		Kategori:
 Authentication failed	UserLoginWindow		Kimlik doğrulanamadı
 Captcha error	UserLoginWindow		CAPTCHA hatası
+The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		Takma adınız daha önce başkası tarafından alınmış. Başka bir takma ad seçin.
 Manage repositories…	MainWindow		Depoları yönet…
 Fetching remote repository data	LocalRepositoryUpdateProcess		Uzak depo bilgisi alınıyor
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	UserLoginWindow		Yeni bir kullanıcı oluşturma için gerekli olan kullanım koşulları indirilirken bir hata oluştu. Ayrıntılar için günlüğü denetleyin ve yeniden deneyin.\nGünlüklerin görüntülenmesi ile ilgili bilgiye kullanıcı kılavuzunun Haiku Depo bölümünden ulaşılabilir.
@@ -162,6 +169,7 @@ Open %DeskbarLink%	PackageManager		Aç: %DeskbarLink%
 User creation error	UserLoginWindow		Kullanıcı oluşturma hatası
 Install	PackageManager		Yükle
 Input validation	UserLoginWindow		Girdi doğrulaması
+This application is too old to communicate with the HaikuDepot server system. Obtain a newer version of HaikuDepot by updating your Haiku system. The minimum version of HaikuDepot required is \"%s\".	ServerHelper		Bu uygulama HaikuDepotServer sistemi ile iletişim kurabilmek için çok eski. Sisteminizi güncelleyerek Haiku Depo uygulamasının en yeni sürümünü alın. Gereken en düşük Haiku Depo sürümü: \"%s\".
 An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		Haiku Depo sunucusundan beklenmeyen bir hata alındı [%i]
 Log in…	MainWindow		Giriş yap…
 You need to be logged into an account before you can rate packages.	MainWindow		Paketleri derecelendirmek için giriş yapmalısınız.

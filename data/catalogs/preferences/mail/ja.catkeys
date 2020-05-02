@@ -1,7 +1,7 @@
 1	japanese	x-vnd.Haiku-Mail	2750130554
 Account settings	AutoConfigWindow		アカウント設定
 \t\t· Outgoing	Config Window		\t\t· 送信
-An error occurred while creating the config view: %error.	Config Views		config view の作成時にエラーが発生しました: %error.
+An error occurred while creating the config view: %error.	Config Views		config view 作成時にエラーが発生しました: %error.
 E-mail address:	E-Mail		E-mail アドレス:
 Create new account	AutoConfigWindow		新規アカウント作成
 While sending and receiving	Config Window		送受信中に
@@ -25,7 +25,7 @@ Never	Config Window	show status window	表示しない
 Account name:	Config Views		アカウント名:
 \t\t· Incoming	Config Window		\t\t· 受信
 Enter a valid e-mail address.	AutoConfigWindow		有効な E-mail アドレスを入力してください。
-\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\n一般設定を元に戻せませんでした。\n\n読み取り時に次のエラーが発生しました:\n%s\n
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\n一般設定を戻せませんでした。\n\n読み取り時に次のエラーが発生しました:\n%s\n
 Incoming	E-Mail		受信
 Choose Protocol	E-Mail		プロトコルを選択してください
 Return address:	Config Views		返信先アドレス:
@@ -33,7 +33,7 @@ Password:	E-Mail		パスワード:
 Error retrieving general settings: %s\n	Config Window		一般設定の読み取り時に次のエラーが発生しました: %s\n
 The filter could not be moved. Deleting filter.	Config Views		フィルターを移動できませんでした。削除します。
 OK	Config Views		OK
-Revert	Config Window		元に戻す
+Revert	Config Window		戻す
 Incoming	Config Window		受信
 Finish	AutoConfigWindow		完了
 Add filter	Config Views		フィルターを追加

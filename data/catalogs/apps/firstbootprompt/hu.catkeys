@@ -1,8 +1,80 @@
-1	hungarian	x-vnd.Haiku-FirstBootPrompt	2649051796
+1	hungarian	x-vnd.Haiku-FirstBootPrompt	2670843542
+Japanese	KeymapNames		Japán
+US	KeymapNames		Egyesült Államok
+Esperanto	KeymapNames		Eszperantó
+Belarusian	KeymapNames		Belorusz
+Brazilian	KeymapNames		Brazil
+Dvorak	KeymapNames		Dvorak
+Polish	KeymapNames		Lengyel
+Latin-American	KeymapNames		Latin-Amerika
+Ukrainian	KeymapNames		Ukrán
+Russian (Yawert)	KeymapNames		Orosz (Yawert)
+United-Kingdom	KeymapNames		Egyesült Királyság
+Serbian (Cyrillic)	KeymapNames		Szerb (cirill)
+Turkish (Type-F)	KeymapNames		Török (F-típus)
+Bulgarian (Cyrillic)	KeymapNames		Bolgár (cirill)
+Belgian (point)	KeymapNames		Belga (pont)
+Finnish	KeymapNames		Finn
+Swedish	KeymapNames		Svéd
+Svorak	KeymapNames		Svorak
+German	KeymapNames		Német
+Swiss-German	KeymapNames		Svájci-Német
 Keymap	BootPromptWindow		Billentyűzetkiosztás
+Spanish (Dvorak)	KeymapNames		Spanyol (Dvorak)
+US-International	KeymapNames		Egyesül Államok (nemzetközi)
+Czech	KeymapNames		Cseh
+Turkish (Type-Q)	KeymapNames		Török (Q-típus)
+Slovak	KeymapNames		Szlovák
+Russian (Udmurt, Komi, Mari)	KeymapNames		Orosz (Udmurt, Komi, Mari)
+Thai (TIS-820.2538)	KeymapNames		Thai (TIS-820.2538)
+Colemak	KeymapNames		Colemak
+Dvorak (programmer's)	KeymapNames		Dvorak (programozói)
+Russian (Mac)	KeymapNames		Orosz (Mac)
 Thank you for trying out Haiku! We hope you'll like it!\n\nYou can select your preferred language and keyboard layout from the list on the left which will then be used instantly. You can easily change both settings from the Desktop later on on the fly.\n\nDo you wish to run the Installer or continue booting to the Desktop?\n	BootPromptWindow	For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	Köszönjük, hogy kipróbálod a Haiku-t!\n\nA baloldali listából választhatsz nyelvet és billentyűzetkiosztást. Mindkét beállítást könnyen átállíthatod majd később az Asztalról.\n\nA Telepítő vagy az Asztal indduljon most el?\n
+German (Mac)	KeymapNames		Német (Mac)
+Arabic (102)	KeymapNames		Arab (102)
+Belarusian (Latin)	KeymapNames		Belorusz (latin)
+Belarusian (Mac)	KeymapNames		Belorusz (Mac)
+Hebrew	KeymapNames		Héber
+Greek	KeymapNames		Görög
+Croatian	KeymapNames		Horvát
 Run Installer	BootPromptWindow		Telepítő
+Faeroese	KeymapNames		Feröeri
+Polish (Typewriter)	KeymapNames		Lengyel (írógép)
+French (Mac)	KeymapNames		Francia (Mac)
+Spanish	KeymapNames		Spanyol
+Ukrainian (Mac)	KeymapNames		Ukrán (Mac)
+Estonian	KeymapNames		Észt
+French (Bépo)	KeymapNames		Francia (Bépo)
+Serbian (Latin)	KeymapNames		Szerb (latin)
+Russian (Typewriter)	KeymapNames		Orosz (írógép)
+French	KeymapNames		Francia
+Italian	KeymapNames		Olasz
+Portuguese	KeymapNames		Portugál
+Swiss-French	KeymapNames		Svájci-Francia
+Slovene	KeymapNames		Szlovén
+Lithuanian	KeymapNames		Litván
+French (NF Z71-300)	KeymapNames		Francia (NF Z71-300)
+ISO-9995	KeymapNames		ISO-9995
+Kazakh	KeymapNames		Kazah
 Language	BootPromptWindow		Nyelv
+Lithuanian (Standard)	KeymapNames		Litván (hagyományos)
+Belgian (comma)	KeymapNames		Belga (vessző)
 Custom	BootPromptWindow		Egyéni
+Norwegian	KeymapNames		Norvég
+Danish	KeymapNames		Dán
 Boot to Desktop	BootPromptWindow		Az Asztalt
+Bulgarian (Phonetic)	KeymapNames		Belga (fonetikus)
+Canadian-French	KeymapNames		Kanadai-Francia
 Welcome to Haiku!	BootPromptWindow		A Haiku üdvözli Önt!
+Russian	KeymapNames		Orosz
+Hungarian	KeymapNames		Magyar
+Irish	KeymapNames		Ír
+Romanian	KeymapNames		Román
+Macedonian	KeymapNames		Makedón
+Czech (Mac)	KeymapNames		Cseh (Mac)
+Brazilian (ABNT2)	KeymapNames		Brazil (ABNT2)
+Albanian	KeymapNames		Albán
+Dutch	KeymapNames		Holland
+Friulian	KeymapNames		Friuli
+Icelandic	KeymapNames		Izlandi

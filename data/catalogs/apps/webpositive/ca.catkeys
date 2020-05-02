@@ -13,8 +13,8 @@ of	Download Window	...as in '12kB of 256kB'	de
 Bookmarks	WebPositive Window		Marcadors
 Use proxy server to connect to the internet	Settings Window		Useu un servidor intermediari per connectar-vos a Internet.
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url acabat
-Auto-hide interface in full screen mode	Settings Window		Amaga la interfície automàticament en mode de pantalla completa.
-There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	S'ha produït un error en recuperar la carpeta d'adreces d'interès.\n\nError: %error
+Auto-hide interface in full screen mode	Settings Window		Amaga la interfície automàticament en mode de pantalla completa
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Hi ha hagut un error en obtenir la carpeta d'adreces d'interès.\n\nError: %error
 Delete	Cookie Manager		Suprimeix
 (Finish: %date - Over %duration left)	Download Window		(Acabament: %date - Pendent: %duration)
 Open containing folder	Download Window		Obre la carpeta que ho conté
@@ -59,7 +59,7 @@ Expiration	Cookie Manager		Venciment
 Download finished	Download Window		Baixada acabada
 Cookie manager	WebPositive Window		Gestor de galetes
 OK	Authentication Panel		D'acord
-Hide password text	Authentication Panel		Amaga el text de la contrasenya.
+Hide password text	Authentication Panel		Amaga el text de la contrasenya
 Username:	Authentication Panel		Nom d'usuari:
 Name	Cookie Manager		Nom
 Remove finished	Download Window		Supressió acabada
@@ -89,7 +89,7 @@ New windows:	Settings Window		Finestres noves:
 The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	La carpeta de baixades no s'ha pogut obrir.\n\nError: %error
 Cancel	Authentication Panel		Cancel·la
 Style:	Font Selection view		Estil:
-There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	S'ha produït un error en crear el fitxer d'adreces d'interès.\n\nError: %error
+There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	Hi ha hagut un error en crear el fitxer d'adreces d'interès.\n\nError: %error
 OK	Download Window		D'acord
 Proxy username:	Settings Window		Nom d'usuari del servidor intermediari:
 Manage bookmarks	WebPositive Window		Gestioneu els marcadors
@@ -97,7 +97,7 @@ Manage bookmarks	WebPositive Window		Gestioneu els marcadors
 Restart	Download Window		Reinicia
 Serif font:	Settings Window		Lletra Serif:
 Apply	Settings Window		Aplica-ho
-There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	S'ha produït un error en intentar mostrar la carpeta d'adreces d'interès.\n\nError: %error
+There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Hi ha hagut un error en intentar mostrar la carpeta d'adreces d'interès.\n\nError: %error
 Revert	Settings Window		Reverteix
 Copy	WebPositive Window		Copia
 Default standard font size:	Settings Window		Mida de la lletra estàndard per defecte:

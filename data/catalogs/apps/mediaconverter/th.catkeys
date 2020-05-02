@@ -1,0 +1,74 @@
+1	thai	x-vnd.Haiku-MediaConverter	2251404027
+Writing audio track: %d%% complete	MediaConverter		กำลังเขียนแทร็กเสียง: %d%% สมบรูณ์
+Input file not recognized as Audio or Video	MediaConverter		ไฟล์อินพุตไม่รู้จักว่าเป็นเสียงหรือวิดีโอ
+%u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
+Video quality: %3d%%	MediaConverter		คุณภาพวิดีโอ: %3d%%
+Source files	MediaConverter		ไฟล์ต้นฉบับ
+Error writing video frame %ld	MediaConverter		เกิดข้อผิดพลาดในการเขียนเฟรมวิดีโอ %ld
+Error converting '%filename'	MediaConverter		ข้อผิดพลาดในการแปลง '%filename'
+Selected directory not found. Defaulting to /boot/home	MediaConverter		ไม่พบไดเรกทอรีที่เลือก เริ่มต้นที่ /boot/home
+Conversion completed	MediaConverter		การแปลงเสร็จสมบูรณ์
+Audio:	MediaConverter-FileInfo		เสียง:
+MediaConverter+:SaveDirectory	MediaConverter		MediaConverter+:SaveDirectory
+Error creating video.	MediaConverter		เกิดข้อผิดพลาดในการสร้างวิดีโอ
+Cancelling	MediaConverter		กำลังยกเลิก
+None available	Audio codecs		ไม่มี
+No file selected	MediaConverter-FileInfo		ไม่ได้เลือกไฟล์
+High	MediaConverter		สูง
+{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}
+File Error	MediaConverter-FileInfo		ไฟล์ผิดพลาด
+None available	Video codecs		ไม่มี
+Output format	MediaConverter		รูปแบบเอาต์พุต
+%.1f kHz mono	MediaFileInfo		%.1f kHz mono
+%.1f kHz stereo	MediaFileInfo		%.1f kHz stereo
+OK	MediaConverter		ตกลง
+Error creating '%filename'	MediaConverter		เกิดข้อผิดพลาดในการสร้าง '%filename'
+Error loading a file	MediaConverter		เกิดข้อผิดพลาดในการโหลดไฟล์
+Encoder parameters	MediaConverter-EncoderWindow		พารามิเตอร์ตัวเข้ารหัส
+Open…	Menu		เปิด
+Audio encoding:	MediaConverter		การเข้ารหัสเสียง:
+Audio quality: %3d%%	MediaConverter		คุณภาพเสียง: %3d%%
+Cancelling…	MediaConverter		กำลังยกเลิก
+Output file '%filename' created	MediaConverter		สร้างไฟล์ '%filename' แล้ว
+Output folder	MediaConverter		เอาท์พุตโฟลเดอร์
+Error creating track.	MediaConverter		เกิดข้อผิดพลาดในการสร้างแทร็ก
+ seconds	MediaFileInfo		วินาที
+Video using parameters form settings	MediaConverter		วิดีโอที่ใช้การตั้งค่าแบบฟอร์มพารามิเตอร์
+Video:	MediaConverter-FileInfo		วิดีโอ:
+Select	MediaConverter		เลือก
+Conversion cancelled	MediaConverter		ยกเลิกการแปลงแล้ว
+Low	MediaConverter		ต่ำ
+Error loading files	MediaConverter		เกิดข้อผิดพลาดในการโหลดไฟล์
+{0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# bit} other{# bits}}
+End   [ms]: 	MediaConverter		สิ้นสุด [ms]:
+Cancel	MediaConverter		ยกเลิก
+OK	MediaConverter-FileInfo		ตกลง
+Error read audio frame %ld	MediaConverter		เกิดข้อผิดพลาดในการอ่านเฟรมเสียง %ld
+Video encoding:	MediaConverter		การเข้ารหัสวิดีโอ:
+An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		เกิดข้อผิดพลาดในการอ่านข้อมูลไฟล์ \n\nข้อผิดพลาด:
+Error	MediaConverter		ผิดพลาด
+File details	MediaConverter		รายละเอียดไฟล์
+No audio	Audio codecs list		ไม่มีเสียง
+Drop media files onto this window	MediaConverter		วางไฟล์สื่อลงในหน้าต่างนี้
+{0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# frame} other{# frames}}
+Quit	Menu		ออก
+{0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# byte} other{# bytes}}
+Duration:	MediaConverter-FileInfo		ระยะเวลา:
+MediaConverter	System name		MediaConverter
+Error launching: %strError%	MediaConverter		ข้อผิดพลาดในการเปิด: %strError%
+File format:	MediaConverter		รูปแบบไฟล์:
+Error writing audio frame %ld	MediaConverter		เกิดข้อผิดพลาดในการเขียนเฟรมเสียง %ld
+File	Menu		ไฟล์
+Video quality not supported	MediaConverter		คุณภาพวิดีโอไม่รองรับ
+Select this folder	MediaConverter		เลือกโฟลเดอร์นี้
+Error read video frame %ld	MediaConverter		เกิดข้อผิดพลาดในการอ่านเฟรมวิดีโอ %ld
+%.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld channel
+%d bit 	MediaFileInfo		%d bit
+No video	Video codecs list		ไม่มีวีดีโอ
+Continue	MediaConverter		ต่อไป
+Convert	MediaConverter		แปลง
+Audio quality not supported	MediaConverter		คุณภาพเสียงไม่รองรับ
+Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		เกิดข้อผิดพลาดในการเขียนไปยังตำแหน่ง:%strPath% ตั้งค่าเริ่มต้นไปที่ตำแหน่ง: /boot /home
+Writing video track: %d%% complete	MediaConverter		กำลังเขียนแทร็กวิดีโอ: %d%% complete
+Preview	MediaConverter		ตัวอย่าง
+Start [ms]: 	MediaConverter		เริ่ม [ms]:

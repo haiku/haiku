@@ -1,11 +1,11 @@
 1	catalan; valencian	x-vnd.Haiku-SMTP	815985329
 POP3 authentication failed. The server said:\n	smtp		Ha fallat l'autenticació POP3. El servidor ha respost:\n
 Destination:	ConfigView		Destí:
-Error while logging in to %serv	smtp		S'ha produït un error en registrar al %serv
+Error while logging in to %serv	smtp		Error en registrar a %serv.
 Connecting to server…	smtp		Es connecta al servidor...
 Unencrypted	ConfigView		Sense xifrar
 . The server says:\n	smtp		. El servidor diu:\n
-Error while opening connection to %serv	smtp		S'ha produït un error en obrir la connexió al servidor %serv
+Error while opening connection to %serv	smtp		Error en obrir la connexió al servidor %serv
 . The server said:\n	smtp		. El servidor va dir:\n
 None	ConfigView		Cap
 SMTP server:	ConfigView		Servidor SMTP:

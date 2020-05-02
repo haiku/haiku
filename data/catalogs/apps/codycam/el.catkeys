@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-CodyCam	2534662296
+1	greek, modern (1453-)	x-vnd.Haiku-CodyCam	249960869
 destination directory expected	CodyCam		προβλεπόμενος κατάλογος προορισμού
 reply: '%s'\n	SftpClient		επανάληψη: '%s'\n
 JPEG image	CodyCam		Εικόνα JPEG
@@ -39,6 +39,7 @@ File name:	CodyCam		Όνομα αρχείου:
 Directory:	CodyCam		Κατάλογος:
 Error setting type of output file	VideoConsumer.cpp		Σφάλμα ρύθμισης τύπου του εξαγόμενου αρχείου
 Cannot find an available video stream	CodyCam		Αδυναμία εύρεσης διαθέσιμης ροής βίντεο
+Upload…	VideoConsumer.cpp		Μεταφόρτωση...
 password expected	CodyCam		αναμενόμενος κωδικός
 PASS <suppressed>  (real password sent)\n	FtpClient		ΚΩΔΙΚΟΣ <suppressed> (εστάλη ο πραγματικός κωδικός)\n
 SFTP	CodyCam		SFTP
@@ -51,6 +52,7 @@ Every 15 minutes	CodyCam		Κάθε 15 λεπτά
 Every 24 hours	CodyCam		Κάθε 24 ώρες
 Image Format Menu	CodyCam		Μενού μορφοποίησης εικόνας
 Every 5 minutes	CodyCam		κάθε 5 λεπτά
+File upload failed	VideoConsumer.cpp		Αποτυχία μεταφόρτωσης αρχείου
 Format:	CodyCam		Μορφοποίηση:
 Start video	CodyCam		Εκκίνηση βίντεο
 Connected…	VideoConsumer.cpp		Συνδέθηκε...

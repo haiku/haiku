@@ -6,9 +6,9 @@ Set destination…	ExpanderMenu		Scegli la destinazione…
 Use:	ExpanderPreferences		Usa:
 File expanded	ExpanderWindow		File decompresso
 The destination is read only.	ExpanderWindow		La destinazione è in sola lettura.
-Expander: Open	ExpanderWindow		Expander: Apri
+Expander: Open	ExpanderWindow		Estrazione Archivi: Apri
  is not supported	ExpanderWindow		 non è supportato
-Expander settings	ExpanderPreferences		Impostazioni di Expander
+Expander settings	ExpanderPreferences		Impostazioni di Estrazione Archivi
 Select current	DirectoryFilePanel		Seleziona la directory corrente
 Source	ExpanderWindow		Origine
 Error when expanding archive	ExpanderWindow		Errore durante la decompressione dell'archivio
@@ -26,7 +26,7 @@ Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		L
 Same directory as source (archive) file	ExpanderPreferences		Stessa cartella del file (archivio) originario
 Settings	ExpanderMenu		Impostazioni
 Settings…	ExpanderMenu		Impostazioni…
-Expander: Choose destination	DirectoryFilePanel		Expander: Scegli la destinazione
+Expander: Choose destination	DirectoryFilePanel		Estrazione Archivi: Scegli la destinazione
 Select	ExpanderPreferences		Seleziona
 Show contents	ExpanderWindow		Mostra contenuto
 Automatically show contents listing	ExpanderPreferences		Mostra automaticamente listato contenuti
@@ -39,7 +39,7 @@ Create	ExpanderWindow		Crea
 The file doesn't exist	ExpanderWindow		Il file non esiste
 Stop	ExpanderMenu		Arresta
 File	ExpanderMenu		File
-Expander	System name		Expander
+Expander	System name		Estrazione Archivi
 Expand	ExpanderWindow		Estrai
 Close	ExpanderMenu		Chiudi
 The destination is not a folder.	ExpanderWindow		La destinazione non è una cartella.

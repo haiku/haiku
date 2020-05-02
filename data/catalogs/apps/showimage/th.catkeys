@@ -1,0 +1,62 @@
+1	thai	x-vnd.Haiku-ShowImage	3998703664
+Use as background…	Menus		ใช้เป็นพื้นหลัง
+File	Menus		ไฟล์
+Slide delay	Menus		ถ่วงเวลาสไลด์
+Selection mode	Menus		โหมดการเลือก
+Zoom in	Menus		ซูมเข้า
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		เอกสาร '%s' มีการเปลี่ยนแปลง คุณต้องการปิดเอกสารหรือไม่?
+Page setup…	Menus		ตั้งค่าหน้า
+Print…	Menus		พิมพ์
+Get info…	Menus		รับข้อมูล
+OK	SaveToFile		ตกลง
+Previous page	Menus		หน้าก่อนหน้า
+View	Menus		ดู
+Full screen	Menus		เต็มจอ
+Go to page	Menus		ไปที่หน้า
+Zoom out	Menus		ซุมออก
+Quit	Menus		ออก
+Rotate counterclockwise	Menus		หมุนทวนเข็มนาฬิกา
+High-quality zooming	Menus		การซูมคุณภาพสูง
+Browse	Menus		เบราวส์
+Edit	Menus		แก้ไข
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		ไม่สามารถโหลดภาพ! อาจไม่มีไฟล์หรือโปรแกรมแปลรูปภาพสำหรับไฟล์
+First page	Menus		หน้าแรก
+The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		เอกสาร '%s' (หน้า%d) มีการเปลี่ยนแปลง คุณต้องการปิดเอกสารหรือไม่?
+Leave full screen	Menus		ออกจากเต็มหน้าจอ
+Close	Menus		ปิด
+Close	ClosePrompt		ปิด
+Resize to (in 1/72 inches):	PrintOptionsWindow		ลดขนาดลง (ใน 1/72 นิ้ว):
+Rating	Menus		อัตรา
+Flip left to right	Menus		พลิกจากซ้ายไปขวา
+Show caption in full screen mode	Menus		แสดงคำบรรยายในโหมดเต็มหน้าจอ
+DPI:	PrintOptionsWindow		DPI:
+Open…	Menus		เปิด
+Next file	Menus		ไฟล์ถัดไป
+Clear selection	Menus		ลบการเลือก
+Close document	ClosePrompt		ปิดเอกสาร
+Height: 	PrintOptionsWindow		ความสูง
+The file '%s' could not be written.	SaveToFile		ไฟล์ '%s' ไม่สามารถเขียนได้
+Cancel	ClosePrompt		ยกเลิก
+Show tool bar	Menus		แสดงแถบเครื่องมือ
+Fit to window	Menus		พอดีกับหน้าต่าง
+Print options	PrintOptionsWindow		ตัวเลือกการพิมพ์
+Copy	Menus		สำเนา
+Progress monitor	ProgressWindow		ตรวจสอบกระบวนการ
+Last page	Menus		หน้าสุดท้าย
+Stretch to window	Menus		ขยายเต็มหน้าต่าง
+Previous file	Menus		ไฟล์ก่อนหน้า
+ShowImage	System name		แสดงภาพ
+Slide show	Menus		แสดงสไลด์
+Fit image to page	PrintOptionsWindow		ปรับภาพให้พอดีกับหน้า
+Flip top to bottom	Menus		พลิกจากบนลงล่าง
+Select all	Menus		เลือกทั้งหมด
+Zoom factor in %:	PrintOptionsWindow		อัตราการซูมเป็น%:
+Width:	PrintOptionsWindow		ความกว้าง:
+Image	Menus		ภาพ
+Move to Trash	Menus		ย้ายไปถังขยะ
+OK	Alerts		ตกลง
+Rotate clockwise	Menus		หมุนตามเข็มนาฬิกา
+Job setup	PrintOptionsWindow		ตั้งค่างาน
+Original size	Menus		ขนาดเดิม
+Next page	Menus		หน้าถัดไป
+Save as…	Menus		บันทึกเป็น

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-PackageInstaller	3110601390
+1	french	x-vnd.Haiku-PackageInstaller	2472572058
 Package description	UninstallView		Description du paquet
 none	PackageView		aucun
 Continue	PackageInstall		Continuer
@@ -53,6 +53,7 @@ Continue	PackageInfo		Continuer
 No package selected.	PackageInfo		Aucun paquet sélectionné.
 Error! \"%s\" is not a valid path.\n	Packageinstaller main		Erreur ! « %s » n’est pas un chemin valide.\n
 The directory named '%s' already exists in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Le répertoire nommé « %s » existe déjà dans le chemin donné.\nFaut-il remplacer le répertoire par celui de ce paquet ou bien l’ignorer ?
+LegacyPackageInstaller	System name		InstallateurAnciensPaquets
 Ask again	PackageView		Demander à nouveau
 Begin	PackageView		Débuter
 OK	PackageView		OK

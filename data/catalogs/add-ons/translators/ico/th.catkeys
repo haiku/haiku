@@ -1,0 +1,14 @@
+1	thai	x-vnd.Haiku-ICOTranslator	3916328565
+Cursor	ICOTranslator		เคอร์เซอร์
+Version %d.%d.%d, %s	ConfigView		เวอร์ชั่น %d.%d.%d, %s
+Windows %s %ld bit image	ICOTranslator		Windows %s %ld bit image
+Valid icon sizes are 16, 32, or 48	ConfigView		ขนาดไอคอนที่ถูกต้องคือ 16, 32, หรือ 48
+Windows icons	ICOTranslator		ไอคอน Windows
+Enforce valid icon sizes	ConfigView		ใช้ขนาดไอคอนที่ถูกต้อง
+ICO Settings	main		ตั้งค่า ICO
+Windows icon translator	ICOTranslator		ตัวแปลไอคอน Windows
+pixels in either direction.	ConfigView		พิกเซลในทิศทางใดทิศทางหนึ่ง
+Write 32 bit images on true color input	ConfigView		เขียนภาพขนาด 32 บิตที่อินพุตสีจริง
+Icon	ICOTranslator		ไอคอน
+ICOTranslator Settings	ConfigView		ตั้งค่า ICOTranslator
+Windows icon translator	ConfigView		ตัวแปลไอคอน Windows

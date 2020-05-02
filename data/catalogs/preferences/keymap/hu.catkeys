@@ -25,7 +25,7 @@ Switch shortcut keys to Windows/Linux mode	Keymap window		Billentyűkombináció
 Option	Keyboard Layout View	Option key	Opció billentyű
 Spanish (Dvorak)	KeymapNames		Spanyol (Dvorak)
 Scroll lock	Keyboard Layout View		Scroll lock
-US-International	KeymapNames		Egyesült Államok - nemzetközi
+US-International	KeymapNames		Egyesült Államok (nemzetközi)
 Right option	Keyboard Layout View		Jobb opció billentyű
 Turkish (Type-Q)	KeymapNames		Török (Q-típus)
 Revert	Modifier keys window		Visszaállít
@@ -63,12 +63,12 @@ Modifier keys	Modifier keys window		Módosító billentyű
 ThinkPad X1 International	KeyboardLayoutNames		ThinkPad X1 (nemzetközi)
 Kazakh	KeymapNames		Kazah
 Save as…	Keymap window		Mentés másként…
-Lithuanian (Standard)	KeymapNames		Litván (alapértelmezett)
+Lithuanian (Standard)	KeymapNames		Litván (hagyományos)
 Error: duplicate keys	Modifier keys window		Hiba: dupla billentyű
 NUM	Keyboard Layout View	Very short for 'num lock'	NUM
 Bulgarian (Phonetic)	KeymapNames		Belga (fonetikus)
 Kinesis Advantage	KeyboardLayoutNames		Kinesis Advantage
-Canadian-French	KeymapNames		Kanadai-francia
+Canadian-French	KeymapNames		Kanadai-Francia
 Hungarian	KeymapNames		Magyar
 Control	Keyboard Layout View	Control key	Vezérlőbillentyű
 Irish	KeymapNames		Ír
@@ -101,7 +101,7 @@ Role	Modifier keys window	As in the role of a modifier key	Szerep
 Svorak	KeymapNames		Svorak
 ThinkPad X100e (US)	KeyboardLayoutNames		ThinkPad X100e (Egyesült Államok)
 German	KeymapNames		Német
-Swiss-German	KeymapNames		Svájci-német
+Swiss-German	KeymapNames		Svájci-Német
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Ctrl billentyű
 Czech	KeymapNames		Cseh
 Russian (Udmurt, Komi, Mari)	KeymapNames		Orosz (Udmurt, Komi, Mari)
@@ -133,7 +133,7 @@ Estonian	KeymapNames		Észt
 Serbian (Latin)	KeymapNames		Szerb (latin)
 French	KeymapNames		Francia
 Portuguese	KeymapNames		Portugál
-Swiss-French	KeymapNames		Svájci-francia
+Swiss-French	KeymapNames		Svájci-Francia
 Shift:	Modifier keys window	Shift key role name	Váltógomb:
 Keymap	System name		Billentyűzetkiosztás
 Slovene	KeymapNames		Szlovén

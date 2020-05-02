@@ -1,0 +1,9 @@
+1	french	x-vnd.mmu.AutoRaise	4124153811
+Delay	AutoRaiseIcon		Délai
+Active	AutoRaiseIcon		Activé
+Default (all windows)	AutoRaiseIcon		Par défaut (toutes les fenêtres)
+Normal	AutoRaiseIcon		Normal
+Deskbar only (touch)	AutoRaiseIcon		Seulement la Deskbar (touche)
+Deskbar only (over its area)	AutoRaiseIcon		Seulement la Deskbar (sur sa surface)
+Mode	AutoRaiseIcon		Mode
+Remove from tray	AutoRaiseIcon		Supprimer du cartouche

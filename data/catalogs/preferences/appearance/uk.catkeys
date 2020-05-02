@@ -10,7 +10,7 @@ Document background	Colors tab		Фон документа
 List background	Colors tab		Фон списку
 No effect on running applications	DecorSettingsView		Не впливає на запущені програми
 Fixed font:	Font view		Моноширинний шрифт:
-Appearance	System name		Вигляд
+Appearance	System name		Appearance
 Reduce colored edges filter strength:	AntialiasingSettingsView		Фільтрація забарвлення кромок:
 Glyph hinting:	AntialiasingSettingsView		Уточнення:
 Default Haiku ControlLook	DecorSettingsView		Haiku ControlLook за замовчуванням

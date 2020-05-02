@@ -20,7 +20,7 @@ Previous channel	MainWin		Попередній канал
 OK	MainWin		ОК
 TV	MainWin		Телебачення
 Settings	MainWin		Налаштування
-TV	System name		Телебачення
+TV	System name		TV
 Settings…	MainWin		Налаштування…
 None	MainWin		Пусто
 Error, interface is busy:\n\n	MainWin		Помилка, інтерфейс зайнятий:\n\n

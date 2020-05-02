@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x.vnd.OBOS-Inspector	1686702095
+1	greek, modern (1453-)	x.vnd.OBOS-Inspector	577867100
 \nInput Formats:	ImageView		\nΦόρμες Εισόδου:
 Next Page	ImageWindow		Επόμενη Σελίδα
 Previous Page	ImageWindow		Προηγούμενη Σελίδα
@@ -7,6 +7,7 @@ System Translators	ActiveTranslatorsWindow		Μεταφραστές του συσ
 \nType: '%1' (%2)\nGroup: '%3' (%4)\nQuality: %5\nCapability: %6\nMIME Type: %7\nName: %8\n	ImageView		\nΤύπος: '%1' (%2)\nΓκρούπ: '%3' (%4)\nΠοιότητα: %5\nΙκανότητα: %6\nMIME Type: %7\nΌνομα: %8\n
 OK	ImageWindow		ΟΚ
 View	ImageWindow		Προβολή
+Open…	ImageWindow		Άνοιγμα...
 Save feature not implemented yet.	ImageWindow		Η δυνατότητα αποθήκευσης δεν έχει υλοποιηθεί ακόμα.
 Active Translators	ImageWindow		Ενεργοί Μεταφραστές
 Info	ImageWindow		Πληροφορίες
@@ -26,5 +27,6 @@ File	ImageWindow		Αρχείο
 Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Επιλεγμένο έγγραφο: %1\n\nΜεταφραστής σε χρήση:\nΌνομα: %2\nΠληροφορίες: %3\nΈκδοση: %4\n
 Quit	ImageWindow		Έξοδος
 Sorry, unable to write the image file.	ImageView		Συγγνώμη, αδύνατη η εγγραφή της εικόνας
+Save…	ImageWindow		Αποθήκευση...
 Window	ImageWindow		Παράθυρο
 First Page	ImageWindow		Πρώτη Σελίδα

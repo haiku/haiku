@@ -1,0 +1,50 @@
+1	thai	x-vnd.Haiku-ProcessController	168752057
+Error saving file	ProcessController		การบันทึกไฟล์ผิดพลาด
+Display priority	ProcessController		แสดงลำดับความสำคัญ
+That's no Fun!	ProcessController		ไม่สนุกเลย!
+What do you want to do with the team \"%s\"?	ProcessController		คุณต้องการทำอะไรกับทีม \"%s\"?
+Your setting file could not be saved!\n(%s)	ProcessController		ไม่สามารถบันทึกไฟล์การตั้งค่าของคุณได้! \n(%s)
+Processor %d	ProcessController		หน่วยประมวลผล %d
+Live in the Deskbar	ProcessController		ถ่ายทอดสดอยู่ในเดสก์บาร์
+Kill this team!	ProcessController		ปิดทีมนี้!
+OK	ProcessController		ตกลง
+You can run ProcessController in a window or install it in the Deskbar.	ProcessController		คุณสามารถเรียกใช้ตัวควบคุมกระบวนการในหน้าต่างหรือติดตั้งในเดสก์บาร์
+Real-time priority	ProcessController		ลำดับความสำคัญตามเวลาจริง
+Custom priority	ProcessController		ลำดับความสำคัญที่กำหนดเอง
+Debug this thread!	ProcessController		แก้ปัญหาเธรดนี้!
+Low priority	ProcessController		ลำดับความสำคัญต่ำ
+Urgent display priority	ProcessController		ลำดับความสำคัญการแสดงผลด่วน
+Memory usage	ProcessController		การใช้งานหน่วยความจำ
+Ok!	ProcessController		ตกลง
+Normal priority	ProcessController		ลำดับความสำคัญปกติ
+Restart Deskbar	ProcessController		รีสตาร์ทเดสก์บาร์
+About ProcessController…	ProcessController		เกี่ยวกับ Process Controller
+Usage: %s [-deskbar]\n	ProcessController		การใช้งาน: %s [-deskbar]\n
+Please confirm	ProcessController		กรุณายืนยัน
+Urgent priority	ProcessController		ลำดับความสำคัญเร่งด่วน
+What do you want to do with the thread \"%s\"?	ProcessController		คุณต้องการทำอะไรกับเธรด \"%s\"?
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
+Idle priority	ProcessController		ลำดับความสำคัญที่ไม่ได้ใช้งาน
+Real-time display priority	ProcessController		แสดงลำดับความสำคัญตามเวลาจริง
+Threads and CPU usage	ProcessController		เธรดและการใช้งาน CPU
+Quit application	ProcessController		ออกจากแอปพลิเคชัน
+Info	ProcessController		ข้อมูล
+Kill this thread!	ProcessController		ปิดเธรดนี้!
+This team is already gone…	ProcessController		ทีมนี้ไปแล้ว
+Gone teams…	ProcessController		ทีมไปแล้ว
+Quit an application	ProcessController		ออกจากแอปพลิเคชัน
+Cancel	ProcessController		ยกเลิก
+Install in Deskbar	ProcessController		ติดตั้งในเดสก์บาร์
+Debug this team!	ProcessController		แก้ปัญหาทีมนี้!
+Low latency	ProcessController		ความหน่วงต่ำ
+ProcessController	System name		ตัวควบคุมกระบวนการ
+Lowest active priority	ProcessController		ลำดับความสำคัญต่ำสุดที่ใช้งาน
+Restart Tracker	ProcessController		รีสตาร์ท Tracker
+System resources & caches…	ProcessController		ทรัพยากรระบบ & แคช
+Damned!	ProcessController		Damned!
+New Terminal	ProcessController		เทอร์มินัลใหม่
+Power saving	ProcessController		ประหยัดพลังงาน
+ProcessController is already installed in Deskbar.	ProcessController		Process Controller ได้รับการติดตั้งในเดสก์บาร์แล้ว
+This is the last active processor…\nYou can't turn it off!	ProcessController		นี่เป็นโปรเซสเซอร์ที่ใช้งานล่าสุด… \nคุณไม่สามารถปิดได้!
+This thread is already gone…	ProcessController		เธรดนี้หายไปแล้ว
+Run in window	ProcessController		ทำงานในหน้าต่าง

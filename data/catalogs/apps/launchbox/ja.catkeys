@@ -31,6 +31,6 @@ Close	LaunchBox		閉じる
 Remove button	LaunchBox		ボタンを削除
 Quit	LaunchBox		終了
 Horizontal layout	LaunchBox		水平配置
-New	LaunchBox		新規作成
+New	LaunchBox		新規
 Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Tracker への 'open folder' コマンドの送信に失敗しました。\n\nエラー:
 Pad %1	LaunchBox		パッド %1

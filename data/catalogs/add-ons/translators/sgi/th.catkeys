@@ -1,0 +1,13 @@
+1	thai	x-vnd.Haiku-SGITranslator	129108011
+SGI images	SGITranslator		ภาพ SGI
+Use compression:	SGIView		ใช้การบีบอัด:
+SGI image translator	SGIView		ตัวแปลภาพ SGI
+SGI image	SGITranslator		ภาพ SGi
+SGITranslator Settings	SGITranslator		การตั้งค่า SGITranslator
+SGI Settings	SGIMain		การตั้งค่า SGI
+SGI image translator	SGITranslator		ตัวแปลภาพ SGI
+None	SGIView		ไม่มี
+Version %d.%d.%d, %s	SGIView		เวอร์ชั่น %d.%d.%d, %s
+\nbased on GIMP SGI plugin v1.5:\n	SGIView		\nอ้างอิงจากปลั๊กอิน GIMP SGI v1.5: \n
+RLE	SGIView		RLE
+written by:\n	SGIView		เขียนโดย:\n

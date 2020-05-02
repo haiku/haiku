@@ -10,16 +10,16 @@ Warp	SettingsView		Deformazion
 Instant warp	SettingsView		Deformazion istantanie
 Device List	InputWindow		Liste dispositîfs
 Double-click speed	SettingsView		Velocitât dopli-clic
-Typing test area	KeyboardView		Arre di prove batidure
+Typing test area	KeyboardView		Aree di prove batidure
 Mouse type:	SettingsView		Gjenar di mouse:
 Fast	KeyboardView		Svelte
 Off	TouchpadPrefView		Distudât
 Fast	TouchpadPrefView		Svelte
 Please confirm	TouchpadPrefView		Par plasê conferme
-Click to focus	SettingsView		Clic par focalizâ
+Click to focus	SettingsView		Clic par meti a fûc
 Acceleration	TouchpadPrefView		Acelerazion
 Mouse speed	SettingsView		Velocitât dal mouse
-Accept first click	SettingsView		Fâs bon al prin clic
+Accept first click	SettingsView		Acete il prin clic
 OK	TouchpadPrefView		VA BEN
 Horizontal scrolling	TouchpadPrefView		Scoriment orizontâl
 Delay until key repeat	KeyboardView		Ritart pe ripetizion dal tast
@@ -35,10 +35,10 @@ Slow	KeyboardView		Lente
 Revert	InputMouse		Torne indaûr
 Key repeat rate	KeyboardView		Velocitât ripetizion tast
 2-Button	SettingsView		2-Botons
-Click to focus and raise	SettingsView		Clic par focalizâ e tirâ sù
+Click to focus and raise	SettingsView		Clic par meti a fûc e parâ denant
 Vertical	TouchpadPrefView		Verticâl
 Horizontal	TouchpadPrefView		Orizontâl
-Focus mode:	SettingsView		Modalitât focalizazion:
+Focus mode:	SettingsView		Mût par meti a fûc:
 Focus follows mouse	SettingsView		Focalizazion daûr dal mouse
 Double-click test area	SettingsView		Aree di prove dopli-clic
 Sensitivity	TouchpadPrefView		Sensibilitât

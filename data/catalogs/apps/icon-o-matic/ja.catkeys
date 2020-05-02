@@ -28,7 +28,7 @@ Bleep!	Exporter - Continue in error dialog		警告!
 Transform	Icon-O-Matic-PathManipulator		変形する
 Remove Transformer	Icon-O-Matic-RemoveTransformersCmd		Transformerを削除
 META:ICON Attribute	Icon-O-Matic-SavePanel		META:ICON 属性
-Add shape with style	Icon-O-Matic-Menu-Shape		スタイルつきのシェイプを追加
+Add shape with style	Icon-O-Matic-Menu-Shape		スタイル付きのシェイプを追加
 Assign Path	Icon-O-Matic-AddPathsCmd		パスを割り当てる
 Reset Transformation	Icon-O-Matic-ResetTransformationCmd		変形をリセット
 Transformation	Transformation		変形
@@ -56,11 +56,11 @@ Opacity	Icon-O-Matic-PropertyNames		不透明度
 OK	Icon-O-Matic-ColorPicker		OK
 Error: 	Icon-O-Matic-Main		エラー:
 bad news	Icon-O-Matic-Exporter		悪い知らせ
-Saving your document failed!	Icon-O-Matic-Exporter		ドキュメントの保存に失敗しました！
+Saving your document failed!	Icon-O-Matic-Exporter		ドキュメントの保存に失敗しました!
 Snap to grid	Icon-O-Matic-Menu-Settings		グリッドに沿う
 Opening the document failed!	Icon-O-Matic-Main		ドキュメントの読み込みに失敗しました。
 Shape	Icon-O-Matic-Menus		シェイプ
-Add with path & style	Icon-O-Matic-ShapesList		パスとスタイルつきで追加
+Add with path & style	Icon-O-Matic-ShapesList		パスとスタイル付きで追加
 <unavailable>	Icon-O-Matic-StyleTypes		<利用できません>
 Min LOD	Icon-O-Matic-PropertyNames		Min LOD
 Reverse Path	Icon-O-Matic-ReversePathCmd		パスを反転
@@ -148,7 +148,7 @@ Caps	Icon-O-Matic-PropertyNames		頂点
 OK	Icon-O-Matic-SVGImport		OK
 Append…	Icon-O-Matic-Menu-File		追加…
 Scale Y	Icon-O-Matic-PropertyNames		Y軸スケール
-Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		ファイル'%s'をSVGドキュメントとして開けませんでした.\n\nエラー: %s
+Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		ファイル'%s'をSVGドキュメントとして開けませんでした。\n\nエラー: %s
 Export icon	Dialog title		アイコンとしてエクスポート
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		カラー (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		グラデーションを編集
@@ -186,7 +186,7 @@ Pick a color	Icon-O-Matic-ColorPicker		カラーを選択
 Multi Set 	Multi Set (property name)		複数セット
 Settings…	Icon-O-Matic-SavePanel		設定…
 Add with style	Icon-O-Matic-ShapesList		スタイルとともに追加
-New	Icon-O-Matic-Menu-File		新規作成
+New	Icon-O-Matic-Menu-File		新規
 Yes	Icon-O-Matic-StyledTextImport		はい
 Remove Path	Icon-O-Matic-RemovePathsCmd		パスを削除
 Gradient type	Icon-O-Matic-StyleTypes		グラデーションのタイプ

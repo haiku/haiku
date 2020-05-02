@@ -4,10 +4,10 @@ Compression method:	ConfigView		Mètode de compressió:
 WebP image translator	ConfigView		Traductor d'imatges WebP
 Preset	ConfigView		Configuració
 WebP images	WebPTranslator		Imatges WebP
-WebPTranslator Settings	ConfigView		Paràmetres del WebPTranslator
+WebPTranslator Settings	ConfigView		Paràmetres del Traductor Web
 Output quality:	ConfigView		Qualitat de la sortida:
 ©2010-2017 Google Inc.	ConfigView		©2010-2017, Google Inc.
-WebP Settings	main		Paràmetres del WepP
+WebP Settings	main		Paràmetres de WepP
 Text	ConfigView		Text
 Slower but better	ConfigView		Més lent però millor
 WebP image	WebPTranslator		Imatge WebP

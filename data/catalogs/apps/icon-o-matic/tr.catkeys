@@ -99,7 +99,7 @@ Translation X	Icon-O-Matic-PropertyNames		X çevirisi
 Flip Control Points	Icon-O-Matic-FlipPointsCmd		Denetim noktalarını ters çevir
 Add Transformers	Icon-O-Matic-AddTransformersCmd		Dönüştürücüler ekle
 BEOS:ICON Attribute	Icon-O-Matic-SavePanel		BEOS:SİMGE özniteliği
-Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		SimgeMatik SVG dosyasından okuduğu veriyi yorumlayamamış olabilir. Orijinal dosyanın üzerine yazarak bu veriyi tümüyle kaybedebilirsiniz.
+Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Icon-O-Matic SVG dosyasından okuduğu veriyi yorumlayamamış olabilir. Orijinal dosyanın üzerine yazarak bu veriyi tümüyle kaybedebilirsiniz.
 Rotate indices backwards	Icon-O-Matic-PathsList		Belirticileri geriye doğru döndür
 Overwrite	Icon-O-Matic-SVGExport		Üzerine yaz
 Modify Control Point	Icon-O-Matic-ChangePointCmd		Denetim noktasını değiştir
@@ -171,7 +171,7 @@ Save as…	Icon-O-Matic-Menu-File		Farklı kaydet…
 Swatches	Icon-O-Matic-Menus		Örnekler
 <modify path>	Icon-O-Matic-PathCmd		<yol düzenle>
 HVIF Source Code	Icon-O-Matic-SavePanel		HVIF kaynak kodu
-Icon-O-Matic	System name		SimgeMatik
+Icon-O-Matic	System name		Icon-O-Matic
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<geri alınacak bir şey yok>
 Add	Icon-O-Matic-StylesList		Ekle
 Translation Y	Icon-O-Matic-PropertyNames		Y çevirisi

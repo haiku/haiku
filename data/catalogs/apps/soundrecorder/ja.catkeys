@@ -3,7 +3,7 @@ Loop	RecorderWindow		繰り返し
 Cannot find default audio hardware	RecorderWindow		デフォルトのオーディオハードウェアが見つかりません
 Cannot find the temporary file created to hold the new recording	RecorderWindow		新規レコーディングを保存する一時ファイルが見つかりません
 Sample size:	RecorderWindow		ビット深度:
-Nothing to play	RecorderWindow		再生するものがない
+Nothing to play	RecorderWindow		再生するものがありません
 None of the files appear to be audio files.	RecorderWindow		ファイルはすべてオーディオファイルでは無いようです。
 Duration: 	RecorderWindow		再生時間:
 File info	RecorderWindow		ファイル情報

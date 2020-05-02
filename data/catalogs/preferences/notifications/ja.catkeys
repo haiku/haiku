@@ -13,7 +13,7 @@ Notifications preflet sample	PrefletWin		通知サンプル
 Mute notifications from this application	NotificationView		このアプリケーションからの通知をミュートする
 pixels	GeneralView		ピクセル
 seconds	GeneralView		秒
-Revert	PrefletWin		元に戻す
+Revert	PrefletWin		戻す
 Applications	PrefletView		アプリケーション
 Timeout:	GeneralView		タイムアウト:
 Upper right	GeneralView		右上
@@ -30,6 +30,6 @@ Allowed	NotificationView		許可された
 Duration:	GeneralView		継続期間:
 Application	NotificationView		アプリケーション
 Enable notifications	GeneralView		通知を有効にする
-This is a test notification message	PrefletWin		これはテスト用の通知です
+This is a test notification message	PrefletWin		これはテスト通知です
 Remove	NotificationView		除去
 Position:	GeneralView		位置:

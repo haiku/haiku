@@ -50,7 +50,7 @@ UTF-8	Mail	This string is used as a key to set default message compose encoding.
 Quit	Mail		Esci
 Title:	Mail		Titolo:
 Account from mail	Mail		Account del messaggio
-%e - E-mail address	Mail		%e - Indirizzo email
+%e - E-mail address	Mail		%e - Indirizzo e-mail
 Cc:	Mail		Cc:
 No matches	Mail		Nessun risultato
 Queries	Mail		Interrogazioni
@@ -76,7 +76,7 @@ View	Mail		Visualizza
 Signatures	Mail		Firme
 On	Mail		Attivo
 Find	Mail		Cerca
-Sorry, could not find an application that supports the 'Person' data type.	Mail		Spiacente, il tipo di dato 'Persona' non è attualmente supportato da alcuna applicazione.
+Sorry, could not find an application that supports the 'Person' data type.	Mail		Spiacente, il tipo di dato 'Contatto' non è attualmente supportato da alcuna applicazione.
 Date:	Mail		Data:
 Expert	Mail		Esperto
 Automatically mark mail as read:	Mail		Contrassegna automaticamente i messaggi come già letti:

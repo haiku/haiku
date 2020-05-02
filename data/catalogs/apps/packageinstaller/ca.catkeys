@@ -59,6 +59,6 @@ Begin	PackageView		Comença
 OK	PackageView		D'acord
 Abort	PackageInfo		Avorta
 Done	PackageInstall		Fet
-Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Error (%s)! No ha estat possible obrir \"%s\".\n
+Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Error (%s)! No s'ha pogut obrir \"%s\".\n
 Skip	PackageView		Omet
 Image not loaded correctly	PackageImageViewer		La imatge no s'ha carregat correctament.

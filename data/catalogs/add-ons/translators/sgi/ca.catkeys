@@ -3,8 +3,8 @@ SGI images	SGITranslator		Imatges SGI
 Use compression:	SGIView		Usa la compressió:
 SGI image translator	SGIView		Traductor d'imatges SGI
 SGI image	SGITranslator		Imatge SGI
-SGITranslator Settings	SGITranslator		Paràmetres del SGITranslator
-SGI Settings	SGIMain		Paràmetres del SGI
+SGITranslator Settings	SGITranslator		Paràmetres del Traductor SGI
+SGI Settings	SGIMain		Paràmetres d'SGI
 SGI image translator	SGITranslator		Traductor d'imatges SGI
 None	SGIView		Cap
 Version %d.%d.%d, %s	SGIView		Versió %d.%d.%d, %s

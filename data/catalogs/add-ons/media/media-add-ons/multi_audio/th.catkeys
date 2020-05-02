@@ -1,0 +1,34 @@
+1	thai	x-vnd.Haiku-hmulti_audio.media_addon	451057402
+Master	MultiAudio		ข้อมูลหลัก
+SPDIF	MultiAudio		SPDIF
+Gain	MultiAudio		ได้รับ
+Output 3D center	MultiAudio		ศูนย์ข้อมูลออกแบบ 3 มิติ
+Extended Setup	MultiAudio		การติดตั้งเพิ่มเติม
+CD	MultiAudio		CD
+Tone control	MultiAudio		การควบคุมเสียง
+Phone	MultiAudio		โทรศัพท์
+Aux	MultiAudio		สนับสนุน
+Output bass	MultiAudio		เสียงเบสออก
+Headphones	MultiAudio		หูฟัง
+Beep	MultiAudio		เสียง
+Output mono mix	MultiAudio		ผสมข้อมูลออกแบบโมโน
+Output stereo mix	MultiAudio		ผสมข้อมูลออกแบบสเตอริโอ
+Input	MultiAudio		ข้อมูลเข้า
+Output treble	MultiAudio		เสียงแหลมออก
+Mono mix	MultiAudio		ผสมแบบโมโน
+General	MultiAudio		ทั่วไป
+Input & Output	MultiAudio		ข้อมูลเข้า & ข้อมูลออก
+Enhanced Setup	MultiAudio		การติดตั้งเพิ่มขึ้น
+Stereo mix	MultiAudio		ผสมแบบสเตอริโอ
+Output 3D depth	MultiAudio		ข้อมูลออก ความลึก 3 มิติ 
+Volume	MultiAudio		ระดับเสียง
+Output	MultiAudio		ข้อมูลออก
+Video	MultiAudio		ภาพวีดิโอ
+Line	MultiAudio		สาย
+Mic	MultiAudio		ไมโครโฟน
+ frequency:	MultiAudio		ความถี่:
+Enable	MultiAudio		เปิดการใช้งาน
+Mute	MultiAudio		เงียบ
+Wave	MultiAudio		คลื่น
+Setup	MultiAudio		ติดตั้ง
+Level	MultiAudio		ระดับ

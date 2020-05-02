@@ -14,7 +14,7 @@ Oh no	ShortcutsWindow		О ні
 Key	ShortcutsWindow		Клавіша
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*SendMessage application/x-vnd.Be-TRAK 'Tfnd'
 Select	ShortcutsWindow		Вибрати
-Shortcuts	System name		Клавіатурні скорочення
+Shortcuts	System name		Shortcuts
 Quit	ShortcutsWindow		Вийти
 (Choose application with file requester)	ShortcutsWindow		(Виберіть програму з запитом файла)
 Cancel	ShortcutsWindow		Скасувати

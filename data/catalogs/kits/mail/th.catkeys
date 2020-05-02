@@ -1,0 +1,11 @@
+1	thai	x-vnd.Haiku-libmail	3450478295
+Partially download messages larger than	ProtocolConfigView		ดาวน์โหลดข้อความบางส่วนที่มีขนาดใหญ่กว่า
+Password:	ProtocolConfigView		รหัส:
+Remove mail from server when deleted	ProtocolConfigView		ลบจดหมายจากเซิร์ฟเวอร์เมื่อถูกลบ
+Mail server:	ProtocolConfigView		เซิร์ฟเวอร์จดหมาย:
+Select…	MailKit		เลือก
+Connection type:	ProtocolConfigView		ประเภทการเชื่อมต่อ:
+KB	ProtocolConfigView	kilo byte	KB
+Leave mail on server	ProtocolConfigView		ทิ้งอีเมลไว้บนเซิร์ฟเวอร์
+Username:	ProtocolConfigView		ชื่อผู้ใช้:
+Login type:	ProtocolConfigView		ประเภทการเข้าสู่ระบบ:

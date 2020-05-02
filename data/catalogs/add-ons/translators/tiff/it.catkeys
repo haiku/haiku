@@ -4,13 +4,13 @@ RLE (Packbits)	TIFFView		RLE (Packbits)
 ZIP (Deflate)	TIFFView		ZIP (Deflate)
 identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: indice documento non valido\n
 Use compression:	TIFFView		Usa compressione:
-TIFF image translator	TIFFView		Translator immagine TIFF
+TIFF image translator	TIFFView		Traduttore immagine TIFF
 TIFF image	TIFFTranslator		Immagine TIFF
 TIFF Settings	TIFFMain		Impostazioni TIFF
-TIFF image translator	TIFFTranslator		Translator immagine TIFF
+TIFF image translator	TIFFTranslator		Traduttore immagine TIFF
 identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: impossibile impostare la directory\n
 Version %d.%d.%d, %s	TIFFView		Versione %d.%d.%d, %s
-TIFFTranslator Settings	TIFFTranslator		Impostazioni Translator TIFF
+TIFFTranslator Settings	TIFFTranslator		Impostazioni Traduttore immagine TIFF
 LZW	TIFFView		LZW
 TIFF images	TIFFTranslator		Immagini TIFF
 None	TIFFView		Nessuno

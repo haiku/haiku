@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Keymap	1240101105
+1	french	x-vnd.Haiku-Keymap	360044638
 Key	Modifier keys window	As in a computer keyboard key	Touche
 Japanese	KeymapNames		Japonais
 US	KeymapNames		US
@@ -30,6 +30,7 @@ Slovak	KeymapNames		Slovaque
 CAPS LOCK	Keyboard Layout View		Verr. Maj.
 Colemak	KeymapNames		Colemak
 Dvorak (programmer's)	KeymapNames		Dvorak (programmation)
+PRINT	Keyboard Layout View		Imp.Écr.
 German (Mac)	KeymapNames		Allemand (Mac)
 Arabic (102)	KeymapNames		Arabe (102)
 Belarusian (Mac)	KeymapNames		Biélorusse (Mac)
@@ -37,12 +38,15 @@ Croatian	KeymapNames		Croate
 Set modifier keys	Modifier keys window		Régler les touches modificatrices
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Touche Win/Cmd
 Spanish	KeymapNames		Espagnol
+HOME	Keyboard Layout View		Début
+COMMAND	Keyboard Layout View		Commande
 Ukrainian (Mac)	KeymapNames		Ukrainien (Mac)
 Command:	Modifier keys window	Command key role name	Commande :
 French (Bépo)	KeymapNames		Français (Bépo)
 Russian (Typewriter)	KeymapNames		Russe (Machine à écrire)
 Acute trigger	Keymap window		Accent aigu
 Italian	KeymapNames		Italien
+French (NF Z71-300)	KeymapNames		Français (NF Z71-300)
 Modifier keys	Modifier keys window		Touches modificatrices
 Kazakh	KeymapNames		Kazakh
 Save as…	Keymap window		Enregistrer sous…
@@ -56,12 +60,15 @@ Irish	KeymapNames		Irlandais
 Remove	Keyboard Layout View		Supprimer
 Tilde trigger	Keymap window		Tilde
 Shift	Keyboard Layout View	Shift key	Majuscule
+CONTROL	Keyboard Layout View		Contrôle
 Macedonian	KeymapNames		Macédonien
 Czech (Mac)	KeymapNames		Tchèque (Mac)
 Left command	Keyboard Layout View		Commande gauche
 Albanian	KeymapNames		Albanais
 (Current)	Keymap window		(Actif)
+Friulian	KeymapNames		Frioulan
 Left option	Keyboard Layout View		Option gauche
+END	Keyboard Layout View		Fin
 Esperanto	KeymapNames		Espéranto
 Belarusian	KeymapNames		Biélorusse
 Warning: left and right key roles do not match	Modifier keys window		Attention : les rôles des touches gauche et droite ne correspondent pas

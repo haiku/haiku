@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-ChartDemo	3491540808
+1	greek, modern (1453-)	x-vnd.Haiku-ChartDemo	986636897
 Slow rotation	ChartWindow		Αργή περιστροφή
 Pink	ChartWindow		Ρόζ
 Comet	ChartWindow		Κομήτης
@@ -9,6 +9,7 @@ Blue	ChartWindow		Μπλέ
 Colors	ChartWindow		Χρώματα
 Novas	ChartWindow		Novas
 LineArray	ChartWindow		Γραμμή Array
+ 0.6 f/s  (logarythmic scale)	ChartWindow		0.6 f/s (λογαριθμική κλίμακα)
 Free motion	ChartWindow		Ελεύθερη κίνηση
 (high) 100% 	ChartWindow		(ψηλά) 100%
 Green	ChartWindow		Πράσινο

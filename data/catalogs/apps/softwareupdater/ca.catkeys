@@ -35,9 +35,9 @@ Applying changes	UpdateManager		S'apliquen els canvis.
 Full sync	SoftwareUpdaterWindow	Alert button label	Sincronització completa
 Quit	SoftwareUpdaterWindow	Button label	Surt
 Updates have been successfully installed.	UpdateManager		Les actualitzacions s'han instal·lat correctament.
-Exception occurred while updating packages : %s\n	UpdateAction		S'ha produït una excepció durant l'actualització de paquets: %s\n
+Exception occurred while updating packages : %s\n	UpdateAction		Hi ha hagut una excepció durant l'actualització de paquets: %s\n
 A reboot is necessary to complete the update process.	UpdateManager		Cal reiniciar per completar el procés d'actualització.
-Exception occurred while checking for updates: %s\n	CheckAction		S'ha produït una excepció en comprovar les actualitzacions: %s\n
+Exception occurred while checking for updates: %s\n	CheckAction		Hi ha hagut una excepció en comprovar les actualitzacions: %s\n
 Packages are being updated	UpdateManager		S'actualitzen els paquets.
 Cancel	SoftwareUpdaterWindow		Cancel·la
 Don't quit	SoftwareUpdaterWindow		No en surtis

@@ -23,7 +23,7 @@ Cannot open the temporary file created to hold the new recording	RecorderWindow	
 Input:	RecorderWindow		Ingresso:
 Forward	RecorderWindow		Avanti
 Play	RecorderWindow		Riproduci
-SoundRecorder	System name		SoundRecorder
+SoundRecorder	System name		Registratore di Suoni
 Channels:	RecorderWindow		Canali:
  bits	RecorderWindow		 bit
 None	RecorderWindow		Nessuno

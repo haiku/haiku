@@ -1,8 +1,8 @@
 1	italian	x-vnd.Haiku-PCXTranslator	938242683
 PCX Settings	main		Impostazioni PCX
 Version %d.%d.%d, %s	ConfigView		Versione %d.%d.%d, %s
-PCXTranslator Settings	ConfigView		Impostazioni Translator PCX
-PCX image translator	PCXTranslator		Translator immagine PCX
+PCXTranslator Settings	ConfigView		Impostazioni Traduttore PCX
+PCX image translator	PCXTranslator		Traduttore immagine PCX
 PCX %lu bit image	PCXTranslator		PCX %lu bit immagine
 PCX images	PCXTranslator		Immagini PCX
-PCX image translator	ConfigView		Translator immagine PCX
+PCX image translator	ConfigView		Traduttore immagine PCX

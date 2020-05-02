@@ -1,16 +1,16 @@
 1	italian	x-vnd.Haiku-TGATranslator	3075011211
 Save with RLE compression	TGAView		Salva con compressione RLE
-Targa image (%d bits truecolor)	TGATranslator		Targa immagine (%d bits truecolor)
+Targa image (%d bits truecolor)	TGATranslator		Immagine Targa (%d bits truecolor)
 Ignore TGA alpha channel	TGAView		Ignora il canale alfa TGA
 Targa image (%d bits colormap)	TGATranslator		Targa immagine (%d bits colormap)
 TGA image translator	TGAView		Translator immagine TGA
-Targa image (%d bits RLE colormap)	TGATranslator		Targa immagine (%d bits RLE colormap)
-Targa image (%d bits gray)	TGATranslator		Targa immagine (%d bits grigio)
-Written by the Haiku Translation Kit Team	TGAView		Scritto dal Team Translation di Haiku
-Targa image (%d bits RLE truecolor)	TGATranslator		Targa immagine (%d bits RLE truecolor)
+Targa image (%d bits RLE colormap)	TGATranslator		Immagine Targa (%d bit, RLE mappa di colore)
+Targa image (%d bits gray)	TGATranslator		Immagine Targa (%d bit, scalas di grigio)
+Written by the Haiku Translation Kit Team	TGAView		A cura del Team Translation di Haiku
+Targa image (%d bits RLE truecolor)	TGATranslator		Immagine Targa (%d bit, RLE truecolor)
 TGA images	TGATranslator		Immagini TGA
 Version %d.%d.%d, %s	TGAView		Versione %d.%d.%d, %s
-TGATranslator Settings	TGATranslator		Impostazioni Translator TGA
-TGA image translator	TGATranslator		Translator immagine TGA
+TGATranslator Settings	TGATranslator		Impostazioni Traduttore Targa (TGA)
+TGA image translator	TGATranslator		Traduttore immagine Targa (TGA)
 Targa image (%d bits RLE gray)	TGATranslator		Targa immagine (%d bits RLE grigio)
 TGA Settings	TGAMain		Impostazioni TGA

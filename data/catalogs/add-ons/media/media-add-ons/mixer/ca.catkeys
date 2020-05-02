@@ -21,7 +21,7 @@ Input channel destinations	AudioMixer		Destins de canal d'entrada
 To master	AudioMixer		Cap al mestre
 Master output	AudioMixer		Sortida principal
 Setup	AudioMixer		Configuració
-Use non linear gain sliders (like BeOS R5)	AudioMixer		Fes servir controls de guany lliscants no lineals (com al BeOS R5)
+Use non linear gain sliders (like BeOS R5)	AudioMixer		Usa controls de guany lliscants no lineals (com el BeOS R5)
 Gain	AudioMixer		Guany
 Allow output channel remapping	AudioMixer		Permet el remapat del canal de sortida
 Physical input channels	AudioMixer		Canals d'entrada físics

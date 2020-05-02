@@ -2,7 +2,7 @@
 Writing audio track: %d%% complete	MediaConverter		オーディトラックの書込み: %d%% 完了
 Input file not recognized as Audio or Video	MediaConverter		入力ファイルはオーディオまたはビデオとして認識できません。
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
-Video quality: %3d%%	MediaConverter		映像品質: %3d%%
+Video quality: %3d%%	MediaConverter		ビデオ品質: %3d%%
 Source files	MediaConverter		ソースファイル
 Error writing video frame %ld	MediaConverter		ビデオフレーム %ld の書込みに失敗しました
 Error converting '%filename'	MediaConverter		'%filename'の変換中にエラーが発生しました

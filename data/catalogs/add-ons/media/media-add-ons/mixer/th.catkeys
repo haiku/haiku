@@ -1,0 +1,27 @@
+1	thai	x-vnd.Haiku-mixer.media_addon	3450667169
+Input gain controls represent	AudioMixer		แสดงการควบคุมการรับข้อมูล
+Linear interpolation	AudioMixer		การแก้ไขเชิงเส้น
+Virtual output channels	AudioMixer		ช่องสัญญาณออกจำลอง
+Refuse output format changes	AudioMixer		ปฏิเสธการเปลี่ยนแปลงรูปแบบข้อมูลออก
+Output mapping	AudioMixer		แผนที่ข้อมูลออก
+Allow input channel remapping	AudioMixer		อนุญาตให้ทำแผนที่ช่องสัญญาณข้อมูลเข้าใหม่
+Resampling algorithm	AudioMixer		อัลกอริทึมการสุ่มตัวอย่างใหม่
+Attenuate mixer output by 3dB (like BeOS R5)	AudioMixer		ลดทอนการผสมข้อมูลออกโดย 3dB (อย่างเดียวกับ BeOS R5)
+Display balance control for stereo connections	AudioMixer		แสดงการควบคุมยอดสมดุลสำหรับการเชื่อมต่อสเตอริโอ
+To output	AudioMixer		ไปยังข้อมูลออก
+not connected	AudioMixer		ไม่เชื่อมต่อ
+Refuse input format changes	AudioMixer		ปฎิเสธการเปลี่ยนแปลงข้อมูลเข้า
+Drop/repeat samples	AudioMixer		วาง / ทำซ้ำตัวอย่าง
+Output channel sources	AudioMixer		แหล่งช่องสัญญาณออก
+dB	AudioMixer		dB
+Gain controls	AudioMixer		ได้รับการควบคุม
+Input mapping	AudioMixer		การทำแผนที่ข้อมูลเข้า
+Mute	AudioMixer		เงียบ
+Input channel destinations	AudioMixer		ปลายทางช่องข้อมูลเข้า
+To master	AudioMixer		เพื่อข้อมูลหลัก
+Master output	AudioMixer		ข้อมูลออกหลัก
+Setup	AudioMixer		ติดตั้ง
+Use non linear gain sliders (like BeOS R5)	AudioMixer		ใช้แถบเลื่อนที่ไม่ได้รับเชิงเส้น (เช่นเดียวกับ BeOS R5)
+Gain	AudioMixer		ได้รับ
+Allow output channel remapping	AudioMixer		อนุญาตการทำแผนที่ช่องข้อมูลออกใหม่
+Physical input channels	AudioMixer		ช่องสัญญาณทางกายภาพ

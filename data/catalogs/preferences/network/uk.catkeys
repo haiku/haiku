@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Network	115295218
+1	ukrainian	x-vnd.Haiku-Network	2923905377
 Ethernet device	InterfaceListItem		Мережева карта
 Link speed:	IntefaceView		Швидкість з'єднання:
 disconnected	IntefaceView		від'єднати
@@ -47,6 +47,7 @@ Status:	IntefaceView		Стан:
 Disable	IntefaceView		Відключити
 Manage…	NetworkWindow		Управління…
 open	Open network		відкрити
+Network	System name		Network
 Your gateway to the internet	IntefaceAddressView		Ваш інтернет шлюз
 Enable	ServiceView		Старт
 Wireless device	InterfaceListItem		Бездротова карта

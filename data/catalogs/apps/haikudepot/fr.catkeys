@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-HaikuDepot	3586526058
+1	french	x-vnd.Haiku-HaikuDepot	3381858533
 Repository update error	LocalRepositoryUpdateProcess		Erreur à l’actualisation du dépôt
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Une erreur est survenue lors du rafraîchissement : %error%
 User Created	UserLoginWindow		Utilisateur créé
@@ -37,10 +37,11 @@ Switch account…	MainWindow		Changer de compte…
 Preferred language:	UserLoginWindow		Langue préférée :
 Server Error	ServerHelper		Erreur du serveur
 Name	PackageListView		Nom
+Authorization or security issue. Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		Problème d’autorisation ou de sécurité. Déconnectez-vous et reconnectez-vous pour vérifier que votre mot de passe est correct et vérifiez également que vous avez accepté les dernières conditions d’utilisation.
 Local	LocalPkgDataLoadProcess		Local
 Rate %Package%	RatePackageWindow		Évaluer %Package%
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Une erreur est survenue lors de l’initialisation du gestionnaire de paquets : %message%
-Quit HaikuDepot	App		Quitter le DépôtHaiku
+Quit HaikuDepot	App		Quitter DépôtHaiku
 An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		Une erreur inattendue « %Message% » est survenue avec la propriété « %Property% ».
 A response to the captcha question must be provided.	UserLoginWindow		Vous devez fournir une réponse à la question Captcha.
 Category	FilterView		Catégorie
@@ -56,6 +57,7 @@ There was a puzzling response from the web service.	UserLoginWindow		La réponse
 Not logged in	MainWindow		Non connecté
 No, quit HaikuDepot	App		Non, quitter DépôtHaiku
 Featured packages	FeaturedPackagesView		Paquets en vitrine
+The supplied response to the captcha is incorrect. A new captcha will be generated; try again.	UserLoginWindow		La réponse fournie au Captcha est incorrecte. Un nouveau Captcha sera généré ; essayez à nouveau.
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Impossible de communiquer avec le serveur pour obtenir l’image Captcha nécessaire à la création d’un nouvel utilisateur.
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Votre évaluation a été postée avec succès. Vous pouvez la mettre à jour ou la supprimer sur le site Web du Dépôt Haiku.
 Network Error	ServerHelper		Erreur réseau
@@ -103,12 +105,14 @@ Close	RatePackageWindow		Fermer
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synchronisation des données de paquets depuis le dépôt "%REPO_NAME%".
 View the usage conditions	UserLoginWindow		Voir les conditions d’utilisation
 Login issue	MainWindow		Problème d’authentification
-Size	PackageListView		Taille
 Your rating:	RatePackageWindow		Votre évaluation :
+Size	PackageListView		Taille
+The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		L’utilisateur %Nickname% a été créé avec succès dans le système du Serveur de dépôt Haiku. Vous pouvez gérer votre profil utilisateur en utilisant l’interface web. Vous êtes maintenant connecté sous ce nouveau profil utilisateur.
 Your rating was updated.	RatePackageWindow		Votre évaluation a été mise à jour.
 All categories	FilterView		Toutes les catégories
 Repositories	MainWindow		Dépôts
 n/a	PackageInfoView		n/a
+This rating is visible to other users	RatePackageWindow		Cette note est visible par les autres utilisateurs
 View agreed usage conditions…	MainWindow		Voir les conditions d’utilisation acceptées…
 Cancel	MainWindow		Annuler
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 de plus à télécharger)}other{(# de plus à télécharger)}}
@@ -116,7 +120,7 @@ Refresh repositories	MainWindow		Rafraîchir les dépôts
 Tools	MainWindow		Outils
 Continue	App		Continuer
 A password is required.	UserLoginWindow		Un mot de passe est requis
-This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Ce paquet ne semble pas se trouver sur le serveur du Dépôt Haiku, il n’est donc pas possible de créer une nouvelle évaluation ou de modifier une évaluation existante.
+This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Ce paquet ne semble pas se trouver sur le serveur de dépôt Haiku, il n’est donc pas possible de créer une nouvelle évaluation ou de modifier une évaluation existante.
 Language	RatePackageWindow		Langue
 Log out	MainWindow		Déconnexion
 Comment language:	RatePackageWindow		Langue du commentaire :
@@ -147,21 +151,25 @@ Email address:	UserLoginWindow		Adresse e-mail :
 Screenshot	ScreenshotWindow		Capture d’écran
 HaikuDepot	System name		DépôtHaiku
 A reboot is necessary to complete the installation process.	PackageManager		Un redémarrage est nécessaire pour terminer le processus d’installation.
+{0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{Je suis âgé d’au moins un an}other{j’ai plus de # ans}}
 View latest usage conditions…	MainWindow		Voir les dernières conditions d’utilisation…
 Quit	App		Quitter
 Search terms:	FilterView		Termes à rechercher :
 Pending…	PackageListView		En attente…
+The nickname is malformed. The nickname may only contain digits and lower case latin characters. The nickname must be between four and sixteen characters in length.	UserLoginWindow		Le surnom est malformé. Le surnom ne peut contenir que des chiffres et des caractères latins minuscules. Le surnom doit comporter entre quatre et seize caractères.
 Category:	FilterView		Catégorie :
 Authentication failed	UserLoginWindow		L’authentification a échoué
 Captcha error	UserLoginWindow		Erreur de Captcha
+The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		Le surnom doit être unique, mais celui fourni est déjà pris. Veuillez choisir un autre surnom.
 Manage repositories…	MainWindow		Gérer les dépôts…
 Fetching remote repository data	LocalRepositoryUpdateProcess		Récupération des données du dépôt distant
-An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	UserLoginWindow		Une erreur s'est produite lors du téléchargement des conditions d'utilisation requises pour créer un nouvel utilisateur. Vérifiez les détails dans le journal et réessayez.\nDes informations sur la manière de consulter les journaux sont disponibles dans la section DépôtHaiku du guide utilisateur.
+An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	UserLoginWindow		Une erreur s’est produite lors du téléchargement des conditions d’utilisation requises pour créer un nouvel utilisateur. Vérifiez les détails dans le journal et réessayez.\nDes informations sur la manière de consulter les journaux sont disponibles dans la section DépôtHaiku du guide utilisateur.
 Description	PackageListView		Description
 Open %DeskbarLink%	PackageManager		Ouvrir %DeskbarLink%
 User creation error	UserLoginWindow		Erreur à la création de l’utilisateur
 Install	PackageManager		Installer
 Input validation	UserLoginWindow		Validation des entrées
+This application is too old to communicate with the HaikuDepot server system. Obtain a newer version of HaikuDepot by updating your Haiku system. The minimum version of HaikuDepot required is \"%s\".	ServerHelper		Cette application est trop ancienne pour communiquer avec le système du serveur de dépôt Haiku. Obtenez une version plus récente de DépôtHaiku en mettant à jour votre système Haiku. La version minimale requise pour DépôtHaiku est « %s ».
 An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		Le serveur de dépôt Haiku à retouné une erreur inattendue [%i].
 Log in…	MainWindow		Connexion…
 You need to be logged into an account before you can rate packages.	MainWindow		Vous devez vous authentifier pour évaluer les paquets.

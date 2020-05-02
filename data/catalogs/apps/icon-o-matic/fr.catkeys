@@ -1,4 +1,4 @@
-1	french	x-vnd.haiku-icon_o_matic	236353899
+1	french	x-vnd.haiku-icon_o_matic	3554185674
 None	Icon-O-Matic-Properties		Aucun
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Rotation des indices de chemin
 Add empty	Icon-O-Matic-ShapesList		Ajouter une forme vide
@@ -19,12 +19,13 @@ Unassign Path	Icon-O-Matic-UnassignPathCmd		Révoquer le chemin
 The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		Vous essayez d’importer un texte plutôt long, êtes-vous sûr de vous ?
 Paste	Icon-O-Matic-Properties		Coller
 Detect Orient.	Icon-O-Matic-PropertyNames		Détecter l’orientation.
-Click on a shape above	Empty transformers list - 1st line		Cliquer sur une forme ci-dessus
+Click on a shape above	Empty transformers list - 1st line		Cliquez sur une forme ci-dessus
 Close	Icon-O-Matic-Menu-File		Fermer
 Add rect	Icon-O-Matic-PathsList		Ajouter un rectangle
 Rotation	Icon-O-Matic-PropertyNames		Rotation
 Multi Paste Properties	Icon-O-Matic-Properties		Propriétés de collage multiple
 Bleep!	Exporter - Continue in error dialog		Bip !
+Transform	Icon-O-Matic-PathManipulator		Transformer
 Remove Transformer	Icon-O-Matic-RemoveTransformersCmd		Supprimer une transformation
 META:ICON Attribute	Icon-O-Matic-SavePanel		Attribut META:ICON
 Add shape with style	Icon-O-Matic-Menu-Shape		Ajouter une forme avec un style
@@ -108,8 +109,10 @@ Redo	Icon-O-Matic-Main		Rétablir
 Change Color	Icon-O-Matic-SetColorCmd		Changer la couleur
 Remove	Icon-O-Matic-ShapesList		Enlever
 Drop shapes	Icon-O-Matic-ShapesList		Supprimer les formes
+PNG Set	Icon-O-Matic-SavePanel		Ensemble PNG
 to attach transformers.	Empty transformers list - 2nd line		pour attacher des transformations.
 Linear	Icon-O-Matic-StyleTypes		Linéaire
+any of the other lists to	Empty property list - 2nd line		l'une des autres listes pour
 Nudge Control Point	Icon-O-Matic-NudgePointsCommand		Déplacer le point de contrôle
 Flip Control Point	Icon-O-Matic-FlipPointsCmd		Retourner le Point de Contrôle
 Add Paths	Icon-O-Matic-AddPathsCmd		Ajouter les chemins
@@ -151,7 +154,7 @@ Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Couleur (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Éditer le dégadé
 Set 	Set (property name)		Ensemble
 Rotate indices forwards	Icon-O-Matic-PathsList		Permuter les indices vers l’avant
-Click on an object in	Empty property list - 1st line		Cliquez sur un objet
+Click on an object in	Empty property list - 1st line		Cliquez sur un objet dans
 Save	Icon-O-Matic-Menu-File		Enregistrer
 No	Icon-O-Matic-StyledTextImport		Non
 Add circle	Icon-O-Matic-PathsList		Ajouter un cercle

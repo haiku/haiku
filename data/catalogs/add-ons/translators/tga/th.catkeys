@@ -1,0 +1,16 @@
+1	thai	x-vnd.Haiku-TGATranslator	3075011211
+Save with RLE compression	TGAView		บันทึกด้วยการบีบอัด RLE
+Targa image (%d bits truecolor)	TGATranslator		ภาพ Targa (%d bits truecolor)
+Ignore TGA alpha channel	TGAView		ละเว้นช่อง TGA alpha
+Targa image (%d bits colormap)	TGATranslator		ภาพ Targa (%d bits colormap)
+TGA image translator	TGAView		ตัวแปลภาพ TGA
+Targa image (%d bits RLE colormap)	TGATranslator		ภาพ Targa (%d bits RLE colormap)
+Targa image (%d bits gray)	TGATranslator		ภาพ Targa (%d bits gray)
+Written by the Haiku Translation Kit Team	TGAView		เขียนโดย Haiku Translation Kit Team
+Targa image (%d bits RLE truecolor)	TGATranslator		ภาพ Targa (%d bits RLE truecolor) 
+TGA images	TGATranslator		ภาพ TGA
+Version %d.%d.%d, %s	TGAView		เวอร์ชั่น %d.%d.%d, %s
+TGATranslator Settings	TGATranslator		ตั้งค่า TGATranslator 
+TGA image translator	TGATranslator		ตัวแปลภาพ TGA
+Targa image (%d bits RLE gray)	TGATranslator		ภาพ Targa (%d bits RLE gray)
+TGA Settings	TGAMain		ตั้งค่า TGA

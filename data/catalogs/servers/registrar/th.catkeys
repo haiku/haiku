@@ -1,0 +1,23 @@
+1	thai	x-vnd.haiku-registrar	2599857937
+Cancel	ShutdownProcess		ยกเลิก
+OK	ShutdownProcess		ตกลง
+Do you really want to shut down the system?	ShutdownProcess		คุณต้องการปิดระบบหรือไม่?
+Shutdown status	ShutdownProcess		สถานะการปิดเครื่อง
+Shut down	ShutdownProcess		ปิดเครื่อง
+The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		แอปพลิเคชัน \"%appName%\" อาจถูกบล็อกบนแผงควบคุม modal
+System is shut down	ShutdownProcess		ระบบปิดตัวลง
+Restart system	ShutdownProcess		รีสตาร์ทระบบ
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		แอปพลิเคชัน \"%appName%\" ได้ยกเลิกกระบวนการปิดระบบ
+Asking background applications to quit.	ShutdownProcess		การขอแอปพลิเคชันพื้นหลังให้ปิด
+Do you really want to restart the system?	ShutdownProcess		คุณต้องการเริ่มระบบใหม่หรือไม่?
+Restart	ShutdownProcess		รีสตาร์ท
+It's now safe to turn off the computer.	ShutdownProcess		ตอนนี้ปลอดภัยแล้วที่จะปิดคอมพิวเตอร์
+Asking other processes to quit.	ShutdownProcess		การขอให้กระบวนการอื่นเลิก
+Cancel shutdown	ShutdownProcess		ยกเลิกการปิดระบบ
+Restarting…	ShutdownProcess		กำลังรีสตาร์ท
+%action%?	ShutdownProcess		%action%?
+Tidying things up a bit.	ShutdownProcess		จัดเก็บสิ่งต่าง ๆ เล็กน้อย
+Kill application	ShutdownProcess		ปิดแอปพลิเคชัน
+Shutdown aborted	ShutdownProcess		การปิดระบบถูกยกเลิก
+Shutting down…	ShutdownProcess		กำลังปิดตัวลง
+Asking \"%appName%\" to quit.	ShutdownProcess		กำลังขอ \"%appName%\" เพื่อออก

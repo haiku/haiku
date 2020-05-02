@@ -61,7 +61,7 @@ Kinesis Ergo Elan International	KeyboardLayoutNames		Kinesis Ergo Elan міжн�
 French (NF Z71-300)	KeymapNames		Французька (NF Z71-300)
 Modifier keys	Modifier keys window		Клавіші-модифікатори
 ThinkPad X1 International	KeyboardLayoutNames		ThinkPad X1 міжнародна
-Kazakh	KeymapNames		Казаська
+Kazakh	KeymapNames		Казахська
 Save as…	Keymap window		Зберегти як…
 Lithuanian (Standard)	KeymapNames		Литовська (Standard)
 Error: duplicate keys	Modifier keys window		Помилка: дублювання клавіш
@@ -91,7 +91,7 @@ Warning: left and right key roles do not match	Modifier keys window		Увага:
 Circumflex trigger	Keymap window		Ціркумфлекс
 Caps lock	Keyboard Layout View		Caps lock
 Left shift	Keyboard Layout View		Лівий Shift
-Russian (Yawert)	KeymapNames		Російська (Yawert)
+Russian (Yawert)	KeymapNames		Російська (фонетична)
 ThinkPad X100e International	KeyboardLayoutNames		ThinkPad X100e міжнародна
 Bulgarian (Cyrillic)	KeymapNames		Болгарська (Кирилиця)
 Swedish	KeymapNames		Шведська

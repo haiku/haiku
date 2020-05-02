@@ -1,0 +1,3 @@
+1	thai	x-vnd.Haiku-FTPService	4086152171
+FTP server	FTPServiceAddOn		เซร์ฟเวอร์FTP
+The FTP server allows you to remotely access the files on your machine using the FTP protocol.\n\nPlease note that it is an insecure and unencrypted connection.	FTPServiceAddOn		เซิร์ฟเวอร์ FTP อนุญาตให้คุณเข้าถึงไฟล์จากเครื่องของคุณจากระยะไกลโดยใช้โปรโตคอล FTP \n\nโปรดทราบว่ามันเป็นการเชื่อมต่อที่ไม่ปลอดภัยและไม่ได้เข้ารหัส

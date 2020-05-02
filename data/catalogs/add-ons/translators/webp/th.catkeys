@@ -1,0 +1,25 @@
+1	thai	x-vnd.Haiku-WebPTranslator	828165164
+©2010-2017 Haiku Inc.	ConfigView		©2010-2017 Haiku Inc.
+Compression method:	ConfigView		วิธีการบีบอัด:
+WebP image translator	ConfigView		โปรแกรมแปลรูปภาพ WebP
+Preset	ConfigView		ตั้งค่าล่วงหน้า
+WebP images	WebPTranslator		ภาพ WebP
+WebPTranslator Settings	ConfigView		ตั้งค่าตัวแปล WebP
+Output quality:	ConfigView		คุณภาพผลผลิต:
+©2010-2017 Google Inc.	ConfigView		©2010-2017 Google Inc.
+WebP Settings	main		ตั้งค่า WebP
+Text	ConfigView		ข้อความ
+Slower but better	ConfigView		ช้ากว่าแต่ดีกว่า
+WebP image	WebPTranslator		ภาพ WebP
+Output preset:	ConfigView		ตั้งค่าเอาต์พุตไว้ล่วงหน้า:
+Picture	ConfigView		ภาพ
+Low	ConfigView		ต่ำ
+High	ConfigView		สูง
+Drawing	ConfigView		วาดภาพ
+Based on libwebp %version%	ConfigView		ขึ้นอยู่กับ libwebp %version%
+Default	ConfigView		ค่าเริ่มต้น
+Fast	ConfigView		เร็ว
+Photo	ConfigView		ภาพถ่าย
+Preprocessing filter	ConfigView		ตัวกรองก่อนการประมวลผล
+WebP image translator	WebPTranslator		ตัวแปลภาพ WebP
+Icon	ConfigView		ไอคอน

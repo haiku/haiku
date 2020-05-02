@@ -14,9 +14,9 @@ Free motion	ChartWindow		Movimento libero
 (high) 100% 	ChartWindow		(alto) 100% 
 Green	ChartWindow		Verde
 Amas	ChartWindow		Ammassi
-2 threads	ChartWindow		2 thread
+2 threads	ChartWindow		2 processi
 Yellow	ChartWindow		Giallo
-Off	ChartWindow		Off
+Off	ChartWindow		Spento
 Chaos	ChartWindow		Caotico
 Full screen	ChartWindow		Schermo intero
 Spiral	ChartWindow		Spirale
@@ -32,7 +32,7 @@ Space color	ChartWindow		Colore sfondo
 White	ChartWindow		Bianco
 Chart	System name		Chart
 Animation:	ChartWindow		Animazione:
-Frames/s	ChartWindow		Frame/s
+Frames/s	ChartWindow		Fotogrammi
 Auto demo	ChartWindow		Auto demo
 CPU load	ChartWindow		Carico del processore
 DrawBitmap	ChartWindow		DrawBitmap

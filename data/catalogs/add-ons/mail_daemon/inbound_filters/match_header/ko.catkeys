@@ -1,4 +1,4 @@
-1	korean	x-vnd.Haiku-MatchHeader	1349121828
+1	korean	x-vnd.Haiku-MatchHeader	709288665
 Delete message	ConfigView		메세지 지우기
 Set flags to	ConfigView		플래그 설정
 <Choose account>	ConfigView		<계정 선택>
@@ -9,4 +9,5 @@ Reply with	ConfigView		로 회신
 <Choose action>	ConfigView		<할 일 선택>
 Move to	ConfigView		이동
 this field is based on the action	ConfigView		이 필드는 행동을 기반으로 함
+Account	ConfigView		계정
 has	ConfigView		가지고

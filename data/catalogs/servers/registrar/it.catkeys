@@ -9,7 +9,7 @@ System is shut down	ShutdownProcess		Sistema in fase di spegnimento
 Restart system	ShutdownProcess		Riavvia il sistema
 Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		L'applicazione \"%appName%\" ha arrestato il processo di spegnimento.
 Asking background applications to quit.	ShutdownProcess		Chiedi alle applicazioni in background di chiudersi.
-Do you really want to restart the system?	ShutdownProcess		Davvero vuoi riavviare il sistema?
+Do you really want to restart the system?	ShutdownProcess		Vuoi davvero riavviare il sistema?
 Restart	ShutdownProcess		Riavvia
 It's now safe to turn off the computer.	ShutdownProcess		Puoi spegnere il computer, adesso.
 Asking other processes to quit.	ShutdownProcess		In attesa della chiusura degli altri processi

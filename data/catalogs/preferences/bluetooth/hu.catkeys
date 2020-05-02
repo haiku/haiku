@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-BluetoothPrefs	4182847000
+1	hungarian	x-vnd.Haiku-BluetoothPrefs	4276705900
 Laptop	Settings view		Laptop
 Only from trusted devices	Settings view		Csak biztonságos eszközöktől
 15 secs	Settings view		15 mp
@@ -32,6 +32,7 @@ Launch now	main		Indítás
 Remove	Remote devices		Eltávolítás
 Pick device…	Settings view		Eszköz kiválasztása…
 Always ask	Settings view		Mindig kérdezze
+With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped…\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		Fejlesztők:\n- Mika Lindqvist\n- Adrien Destugues\n- Maksym Yevmenkin\n\nKöszönet az önkénteseknek…\n\nEszköz-adományok:\n- Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n- Edwin Erik Amsler\n- Dennis d'Entremont\n- Luroh\n- Pieter Panman\n\nAnyagi segítség:\n- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n- Matt M, Doug F, Hubert H,\n- Sebastian B, Andrew M, Jared E,\n- Frederik H, Tom S, Ferry B,\n- Greg G, David F, Richard S, Martin W:\n\nJavítások:\n- Michael Weirauch\n- Fredrik Ekdahl\n- Raynald Lesieur\n- Andreas Färber\n- Joerg Meyer\nTesztelés:\n- Petter H. Juliussen\nMentor:\n- a yellowTAB csapata
 Help	Window		Segítség
 Pair…	Remote devices		Párosítás…
 Retrieving name of %1	Inquiry panel		%1 nevének fogadása
@@ -50,5 +51,5 @@ Default inquiry time:	Settings view		Alapértelmezett lekérdezési időkorlát:
 Server	Settings view		Kiszolgáló
 Handheld	Settings view		Mobiltelefon
  packets: 	Device View		csomagok:
-About Bluetooth…	Window		A Bluetooth-ról…
+About Bluetooth…	Window		Bluetooth névjegye…
 Starting scan…	Inquiry panel		Keresés indítása…

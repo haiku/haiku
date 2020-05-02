@@ -1,17 +1,20 @@
-1	russian	x-vnd.Haiku-Input	2494436940
+1	russian	x-vnd.Haiku-Input	3910661481
 Scrolling	TouchpadPrefView		Прокрутка
 Defaults	InputMouse		По умолчанию
 Tapping	TouchpadPrefView		Касание
 Long	KeyboardView		Длинная
 Normal	SettingsView		Обычно
 Cancel	TouchpadPrefView		Отмена
+4-Button	SettingsView		Четырехкнопочная
 Slow	TouchpadPrefView		Медленно
 Warp	SettingsView		Перемещение
 Instant warp	SettingsView		Мгновенное перемещение
 Device List	InputWindow		Список устройств
 Double-click speed	SettingsView		Скорость двойного клика
+5-Button	SettingsView		Пятикнопочная
 Typing test area	KeyboardView		Тестовая область
 Mouse type:	SettingsView		Тип мыши:
+Revert	InputKeyboard		Вернуть
 Fast	KeyboardView		Быстро
 Off	TouchpadPrefView		Выключить
 Fast	TouchpadPrefView		Быстро
@@ -30,6 +33,7 @@ The new scroll area is very large and may impede normal mouse operation. Do you 
 High	TouchpadPrefView		Высокая
 Defaults	TouchpadPrefView		По умолчанию
 1-Button	SettingsView		Однокнопочная
+Defaults	InputKeyboard		По умолчанию
 Short	KeyboardView		Короткая
 Slow	KeyboardView		Медленно
 Revert	InputMouse		Вернуть

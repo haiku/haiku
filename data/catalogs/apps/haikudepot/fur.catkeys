@@ -103,8 +103,8 @@ Close	RatePackageWindow		Siere
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Sincronizazion dâts pachet pal dipuesit '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Viôt lis condizions di ûs
 Login issue	MainWindow		Probleme di acès
-Size	PackageListView		Dimension
 Your rating:	RatePackageWindow		La tô valutazion:
+Size	PackageListView		Dimension
 Your rating was updated.	RatePackageWindow		La tô valutazion e je stade inzornade.
 All categories	FilterView		Dutis lis categoriis
 Repositories	MainWindow		Dipuesits

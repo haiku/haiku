@@ -1,0 +1,36 @@
+1	thai	x-vnd.Haiku-LaunchBox	1530497419
+Set description…	LaunchBox		ตั้งคำอธิบาย
+Really close this pad?\n(The pad will not be remembered.)	LaunchBox		ปิด pad นี้จริงเหรอ? \n(pad จะไม่ถูกจดจำ)
+OK	LaunchBox		ตกลง
+Ignore double-click	LaunchBox		ละเว้นการคลิกสองครั้ง
+Show on all workspaces	LaunchBox		แสดงในพื้นที่ทำงานทั้งหมด
+Name Panel	LaunchBox		ตั้งชื่อ Panel
+Autostart	LaunchBox		เริ่มต้นอัตโนมัติ
+Clone	LaunchBox		สำเนา
+Description for '%3'	LaunchBox		รายละเอียดสำหรับ '%3'
+Show window border	LaunchBox		แสดงกรอบหน้าต่าง
+\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nไม่สามารถเปิดแอปพลิเคชันพร้อมลายเซ็น '%2'.\n\nผิดพลาด:
+Failed to launch 'something', error in Pad data.	LaunchBox		ไม่สามารถเปิด 'บางสิ่งบางอย่าง' ข้อผิดพลาดในข้อมูล Pad
+LaunchBox	System name		เปิดตัวกล่อง
+Auto-raise	LaunchBox		เพิ่มอัตโนมัติ
+Icon size	LaunchBox		ขนาดไอคอน
+Open containing folder	LaunchBox		เปิดโฟลเดอร์ที่มี
+Add button here	LaunchBox		เพิ่มปุ่มที่นี่
+Cancel	LaunchBox		ยกเลิก
+launch popup	LaunchBox		เปิดป๊อปอัพ
+Clear button	LaunchBox		ล้างปุ่ม
+Bummer	LaunchBox		Bummer
+last chance	LaunchBox		โอกาสสุดท้าย
+You can drag an icon here.	LaunchBox		คุณสามารถลากไอคอนที่นี่
+Pad 1	LaunchBox		Pad 1
+Failed to launch '%1'.\n\nError:	LaunchBox		ไม่สามารถเปิดตัว '%1'.\n\nผิดพลาด:
+Settings	LaunchBox		ตั้งค่า
+Vertical layout	LaunchBox		เค้าโครงแนวตั้ง
+Pad	LaunchBox		Pad
+Close	LaunchBox		ปิด
+Remove button	LaunchBox		ลบปุ่ม
+Quit	LaunchBox		ปิด
+Horizontal layout	LaunchBox		เค้าโครงแนวนอน
+New	LaunchBox		ใหม่
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		ไม่สามารถส่งคำสั่ง 'เปิดโฟลเดอร์' ไปยัง Tracker \n\nผิดพลาด:
+Pad %1	LaunchBox		Pad %1

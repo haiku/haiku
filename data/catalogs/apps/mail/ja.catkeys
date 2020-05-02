@@ -23,7 +23,7 @@ Save	Mail		保存
 Undo	Mail		元に戻す
 Button bar:	Mail		ボタンバー:
 %e wrote:\\n	Mail		%e は書きました:\\n
-Save changes to this signature?	Mail		署名の変更を確定し保存しますか？
+Save changes to this signature?	Mail		署名の変更を確定し保存しますか?
 Save attachment…	Mail		添付ファイルを保存…
 Paste	Mail		貼り付け
 E-mail draft could not be saved!	Mail		下書きが保存できませんでした。
@@ -63,7 +63,7 @@ Add signature	Mail		署名を追加
 Signature	Mail		署名
 Use default account	Mail		標準アカウントを使う
 draft	B_USER_DIRECTORY/mail/draft		下書き
-Really delete this signature? This cannot be undone.	Mail		署名を削除しますか？削除した書名は復元できませんので、ご注意ください。
+Really delete this signature? This cannot be undone.	Mail		署名を削除しますか?削除した書名は復元できませんので、ご注意ください。
 spam	B_USER_DIRECTORY/mail/spam		スパム
 Reply to all	Mail		全員に返信
 Cancel	Mail		中止
@@ -107,7 +107,7 @@ Previous	Mail		前
 Include file attributes in attachments	Mail		添付ファイルにファイル属性を含む
 Start now	Mail		ただちに起動
 (Name unavailable)	Mail		(名前は利用できません)
-Move to trash	Mail		ごみ箱へ移動
+Move to trash	Mail		ごみ箱に捨てる
 <none>	Mail		<無し>
 %d - Date	Mail		%d - 日付
 Check spelling	Mail		スペルチェック
@@ -163,7 +163,7 @@ Delete	Mail		削除
 Put your favorite e-mail queries and query templates in this folder.	Mail		お気に入りの電子メールクエリとクエリテンプレートをこのフォルダーに入れてください。
 Spam	Mail		スパム
 Couldn't open this signature. Sorry.	Mail		この署名を開くことはできませんでした。
-Revert	Mail		元に戻す
+Revert	Mail		戻す
 Unknown	Mail		不明
 Increase quote level	Mail		引用レベルを上げる
 Add enclosure…	Mail		添付ファイルを追加…

@@ -39,7 +39,7 @@ Finish	AutoConfigWindow		Завершення
 Add filter	Config Views		Додати фільтр
 Account settings	Config Views		Налаштування облікового запису
 minutes	Config Window		хвилин
-E-mail	System name		Пошта
+E-mail	System name		E-mail
 Check every	Config Window		Перевіряти кожний
 Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Створити новий обліковий запис натиснувши 'Додати'.\n\nВилучити вибраний обліковий запис натиснувши 'Вилучити'.\n\nВибрати елемент зі списку для зміни його налаштувань.
 Account name:	E-Mail		Назва облікового запису:

@@ -22,11 +22,11 @@ Last Page	ImageWindow		Darrera pàgina
 \nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\nTraductor usat:\nNom: %1\nInformació: %2\nVersió: %3\n
 Unknown	ImageView		Desconegut
 Info Win	InspectorApp	This is a quite narrow info window and title 'Info Win' is therefore shortened.	Informació de la pàgina
-Sorry, unable to load the image.	ImageView		Perdoneu, no es pot carregar la imatge.
+Sorry, unable to load the image.	ImageView		Disculpeu, no es pot carregar la imatge.
 File	ImageWindow		Fitxer
 Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Document triat: %1\n\nTraductor usat:\nNom: %2\nInformació: %3\nVersió: %4\n
 Quit	ImageWindow		Surt
-Sorry, unable to write the image file.	ImageView		Perdoneu, no es pot escriure el fitxer de la imatge.
+Sorry, unable to write the image file.	ImageView		Disculpeu, no es pot escriure el fitxer d'imatge.
 Save…	ImageWindow		Desa...
 Window	ImageWindow		Finestra
 First Page	ImageWindow		Primera pàgina

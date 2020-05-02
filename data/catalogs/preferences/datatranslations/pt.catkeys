@@ -1,14 +1,14 @@
 1	portuguese	x-vnd.Haiku-DataTranslations	210050587
 Path:	DataTranslations		Caminho:
 Name:	DataTranslations		Nome:
-DataTranslations - Note	DataTranslations		TraduçãoDeDados - Nota
+DataTranslations - Note	DataTranslations		Tradução de Dados - Nota
 Could not install %s:\n%s	DataTranslations		Não foi possível instalar %s:\n%s
 OK	DataTranslations		OK
 Cancel	DataTranslations		Cancelar
 Info:	DataTranslations		Informação:
-DataTranslations - Error	DataTranslations		TraduçãoDeDados - Erro
+DataTranslations - Error	DataTranslations		Tradução de Dados - Erro
 The new translator has been installed successfully.	DataTranslations		O novo tradutor foi instalado com sucesso.
-DataTranslations	System name		TraduçãoDeDados
+DataTranslations	System name		Tradução de Dados
 Info	DataTranslations		Informação
 Overwrite	DataTranslations		Escrever por cima
 Version:	DataTranslations		Versão:

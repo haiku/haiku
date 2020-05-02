@@ -55,8 +55,8 @@ Success	UserLoginWindow		Úspech
 (%Votes%)	PackageInfoView		(%Votes%)
 Close	UserLoginWindow		Zatvoriť
 Close	RatePackageWindow		Zatvoriť
-Size	PackageListView		Veľkosť
 Your rating:	RatePackageWindow		Vaše hodnotenie:
+Size	PackageListView		Veľkosť
 All categories	FilterView		Všetky kategórie
 n/a	PackageInfoView		n/a
 Cancel	MainWindow		Zrušiť

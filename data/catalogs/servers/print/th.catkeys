@@ -1,0 +1,55 @@
+1	thai	x-vnd.Be-PSRV	1222926379
+Undefined	ConfigWindow		ไม่ได้กำหนดไว้
+Return the number of available transports	PrintServerApp Scripting		ส่งคืนจำนวนการส่งที่มี
+Return the number of available printers	PrintServerApp Scripting		ส่งคืนจำนวนเครื่องพิมพ์ที่มี
+Get currently available ports/devices	Transport Scripting		รับพอร์ต/อุปกรณ์ที่มีอยู่ในปัจจุบัน
+Retrieve or select the active printer	PrintServerApp Scripting		ดึงข้อมูลหรือเลือกเครื่องพิมพ์ที่ใช้งานอยู่
+Cancel	PrintServerApp		ยกเลิก
+Retrieve a specific printer	PrintServerApp Scripting		รับเครื่องพิมพ์ที่เลือก
+Page %1 to %2	ConfigWindow		หน้า %1 ถึง %2
+Get name of the printer add-on used for this printer	Printer Scripting		รับชื่อของเครื่องพิมพ์ที่เพิ่มเข้ามาใช้สำหรับเครื่องพิมพ์นี้
+B5 (JIS)	ConfigWindow	JIS P0138 B5, a Japanese paper size	B5 (JIS)
+OK	ConfigWindow		ตกลง
+Cancel	ConfigWindow		ยกเลิก
+Printer server	ConfigWindow		เซิร์ฟเวอร์เครื่องพิมพ์
+Page %1 to %2, %3 copies	ConfigWindow		หน้า %1 ถึง %2,%3 สำเนา  
+A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		มีเครื่องพิมพ์ที่ใช้ชื่อนั้นแล้ว แต่ไม่พบไดรเวอร์! เปลี่ยนใหม่ไหม?
+Yes	PrintServerApp		ใช่
+Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	บัญชีแยกประเภท
+Would you like to set one up now?	PrintServerApp		คุณต้องการตั้งค่าตอนนี้หรือไม่?
+Print job setup:	ConfigWindow		การตั้งค่างานพิมพ์:
+A6	ConfigWindow	ISO 216 paper size	A6
+Portrait	ConfigWindow		แนวตั้ง
+All pages	ConfigWindow		ทุกหน้า
+There is no default printer set up.	PrintServerApp		ไม่มีการตั้งค่าเครื่องพิมพ์เริ่มต้น
+B5	ConfigWindow	ISO 216 paper size	B5
+A0	ConfigWindow	ISO 216 paper size	A0
+Letter	ConfigWindow	ANSI A (letter), a North American paper size	จดหมาย
+Printer:	ConfigWindow		เครื่องพิมพ์:
+A2	ConfigWindow	ISO 216 paper size	A2
+Select a printer	ConfigWindow		เลือกเครื่องพิมพ์
+Show configuration window	PrintServerApp Scripting		แสดงหน้าต่างการกำหนดค่า
+A4	ConfigWindow	ISO 216 paper size	A4
+Get comments about this printer	Printer Scripting		รับรายงานเกี่ยวกับเครื่องพิมพ์นี้
+A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		เครื่องพิมพ์ที่ใช้ชื่อนั้นมีอยู่แล้ว แต่ใช้งานไม่ได้เลย! เปลี่ยนใหม่ไหม?
+No	PrintServerApp		ไม่
+Get the transport configuration for this printer	Printer Scripting		รับการกำหนดค่าส่งสำหรับเครื่องพิมพ์นี้
+Landscape	ConfigWindow		แนวนอน
+Legal	ConfigWindow	A North American paper size (216 x 356 mm, or 8.5 x 14 in)	กฏหมาย
+There are no printers set up.	PrintServerApp		ไม่มีการตั้งค่าเครื่องพิมพ์
+Get name of the transport add-on used for this printer	Printer Scripting		รับชื่อของส่วนเสริมการส่งที่ใช้สำหรับเครื่องพิมพ์นี้
+All pages, %1 copies	ConfigWindow		ทุกหน้า %1 สำเนา
+Delete a specific printer	PrintServerApp Scripting		ลบเครื่องพิมพ์ที่เลือก
+Create a new printer	PrintServerApp Scripting		สร้างเครื่องพิมพ์ใหม่
+OK	PrintServerApp		ตกลง
+Print setup	ConfigWindow		ตั้งค่าเครื่องพิมพ์
+A1	ConfigWindow	ISO 216 paper size	A1
+Retrieve a specific transport	PrintServerApp Scripting		ดึงข้อมูลการส่งที่เลือก
+Get name of printer	Printer Scripting		รับชื่อเครื่องพิมพ์
+A3	ConfigWindow	ISO 216 paper size	A3
+Get name of transport	Transport Scripting		รับชื่อของการส่ง
+A5	ConfigWindow	ISO 216 paper size	A5
+Would you like to make @ the default printer?	PrintServerApp		คุณต้องการสร้าง @ เป็นเครื่องพิมพ์เริ่มต้นหรือไม่?
+Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	Tabloid
+Page setup	ConfigWindow		ตั้งค่าหน้า
+Paper setup:	ConfigWindow		ตั้งค่ากระดาษ

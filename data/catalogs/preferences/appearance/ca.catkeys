@@ -17,7 +17,7 @@ Default Haiku ControlLook	DecorSettingsView		Control d'aparença del Haiku per d
 Menu item text	Colors tab		Text de l'element del menú
 About decorator	DecorSettingsView		Quant al decorador
 Antialiasing menu	AntialiasingSettingsView		Menú del suavitzat
-Success	Colors tab		Èxit
+Success	Colors tab		Correcte
 About	DecorSettingsView		Quant a
 Shine	Colors tab		Llum
 Arrow style	DecorSettingsView		Estil de la fletxa
@@ -64,7 +64,7 @@ Fonts	APRWindow		Tipus de lletra
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	A la taula i al llit, al primer crit.
 Grayscale	AntialiasingSettingsView		Escala de grisos
 Antialiasing type:	AntialiasingSettingsView		Tipus de suavitzat:
-Panel text	Colors tab		Text del tauler
+Panel text	Colors tab		Text del plafó
 Hinting menu	AntialiasingSettingsView		Menú de millora del tipus de lletra
 Scroll bar:	DecorSettingsView		Barra de desplaçament:
 Choose ControlLook	DecorSettingsView		Trieu el Control d'aparença

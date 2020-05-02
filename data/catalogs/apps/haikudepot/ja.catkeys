@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	3586526058
+1	japanese	x-vnd.Haiku-HaikuDepot	3381858533
 Repository update error	LocalRepositoryUpdateProcess		リポジトリアップデートエラー
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		リポジトリの更新中に次のエラーが発生しました: %error%
 User Created	UserLoginWindow		作成されたユーザー
@@ -37,6 +37,7 @@ Switch account…	MainWindow		アカウントの切り替え…
 Preferred language:	UserLoginWindow		優先言語:
 Server Error	ServerHelper		サーバーエラー
 Name	PackageListView		名前
+Authorization or security issue. Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		認証またはセキュリティの問題です。ログアウト後再ログインして、パスワードが正しいこと、また、最新の使用許諾に同意していることを確認してください。
 Local	LocalPkgDataLoadProcess		ローカル
 Rate %Package%	RatePackageWindow		%Package% を評価
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		パッケージマネージャーの初期化中にエラーが発生しました: %message%
@@ -56,6 +57,7 @@ There was a puzzling response from the web service.	UserLoginWindow		ウェブ�
 Not logged in	MainWindow		ログインしていません
 No, quit HaikuDepot	App		いいえ、HaikuDepot を終了します
 Featured packages	FeaturedPackagesView		おすすめパッケージ
+The supplied response to the captcha is incorrect. A new captcha will be generated; try again.	UserLoginWindow		キャプチャへの返答が間違っています。新しいキャプチャが生成されます、もう一度試してください。
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		新規ユーザーを作成するために必要なキャプチャの取得のためのサーバーとの通信ができませんでした。
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		評価が正常に更新されました。HaikuDepot Server のウェブサイトで評価を更新または削除できます。
 Network Error	ServerHelper		ネットワークエラー
@@ -103,12 +105,14 @@ Close	RatePackageWindow		閉じる
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		リポジトリ '%REPO_NAME%' のパッケージデータを同期中
 View the usage conditions	UserLoginWindow		使用条件を見る
 Login issue	MainWindow		ログインに問題
-Size	PackageListView		サイズ
 Your rating:	RatePackageWindow		評価:
+Size	PackageListView		サイズ
+The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		ユーザー %Nickname% が、HaikuDepotServer システム内に正常に作成されました。ユーザーの詳細をウェブインターフェースで管理できます。あなたは現在新規ユーザーとしてログインしています。
 Your rating was updated.	RatePackageWindow		評価が更新されました。
 All categories	FilterView		すべての分類
 Repositories	MainWindow		リポジトリ
 n/a	PackageInfoView		利用不可
+This rating is visible to other users	RatePackageWindow		この評価はほかのユーザーからも見られます
 View agreed usage conditions…	MainWindow		同意した使用条件を見る…
 Cancel	MainWindow		中止
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 個以上のダウンロード)}other{(# 個以上のダウンロード)}}
@@ -147,13 +151,16 @@ Email address:	UserLoginWindow		メールアドレス:
 Screenshot	ScreenshotWindow		スクリーンショット
 HaikuDepot	System name		HaikuDepot
 A reboot is necessary to complete the installation process.	PackageManager		インストールプロセスを完了するには再起動が必要です。
+{0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{私は少なくとも 1 歳です}other{私は # 歳以上です}}
 View latest usage conditions…	MainWindow		最新の使用条件を見る…
 Quit	App		終了
 Search terms:	FilterView		検索:
 Pending…	PackageListView		保留中…
+The nickname is malformed. The nickname may only contain digits and lower case latin characters. The nickname must be between four and sixteen characters in length.	UserLoginWindow		ニックネームが不正な形式です。ニックネームは数字と英小文字しか含みません。また長さは 4 から 16 文字の間である必要があります。
 Category:	FilterView		分類:
 Authentication failed	UserLoginWindow		認証に失敗しました
 Captcha error	UserLoginWindow		キャプチャエラー
+The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		ニックネームはユニークである必要がありますが、入力されたニックネームはすでに取られています。別のニックネームを選んでください。
 Manage repositories…	MainWindow		リポジトリの管理…
 Fetching remote repository data	LocalRepositoryUpdateProcess		リモートリポジトリデータを取得中
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	UserLoginWindow		新規ユーザーを作成するための使用条件のダウンロード中にエラーが発生しました。詳細はログをチェックして、再度試してみてください。\nログの見方は、ユーザーガイドのHaikuDepotの章で得られます。
@@ -162,6 +169,7 @@ Open %DeskbarLink%	PackageManager		%DeskbarLink% を開く
 User creation error	UserLoginWindow		ユーザー作成エラー
 Install	PackageManager		インストール
 Input validation	UserLoginWindow		入力検証
+This application is too old to communicate with the HaikuDepot server system. Obtain a newer version of HaikuDepot by updating your Haiku system. The minimum version of HaikuDepot required is \"%s\".	ServerHelper		このアプリケーションは古いので、HaikuDepot サーバーシステムと対話できません。Haiku システムをアップデートして、より新しいバージョンの HaikuDepot を入手してください。最小限必要な バージョンは \"%s\" です。
 An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		予期しないエラーが次の HaikuDepot サーバーから送信されました [%i]
 Log in…	MainWindow		ログイン…
 You need to be logged into an account before you can rate packages.	MainWindow		パッケージを評価する前にアカウントにログインする必要があります。

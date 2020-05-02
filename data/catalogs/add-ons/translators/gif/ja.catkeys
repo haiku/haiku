@@ -14,6 +14,6 @@ GIF images	GIFTranslator		GIF イメージ
 Version %d.%d.%d, %s	GIFView		バージョン %d.%d.%d, %s
 Use RGB color	GIFView		RGBで指定
 Use dithering	GIFView		ディザリングする
-GIF Settings	GIFTranslator		GIF設定
+GIF Settings	GIFTranslator		GIF 設定
 BeOS system	GIFView		BeOSシステムカラー
 Automatic (from alpha channel)	GIFView		アルファチャンネルより自動設定

@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-HaikuDepot	3586526058
+1	italian	x-vnd.Haiku-HaikuDepot	3381858533
 Repository update error	LocalRepositoryUpdateProcess		Errore nell'aggiornamento del Repository
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Si è verificato un errore nell'aggiornamento del repository: %error%
 User Created	UserLoginWindow		Utente Creato
@@ -37,6 +37,7 @@ Switch account…	MainWindow		Cambia account…
 Preferred language:	UserLoginWindow		Lingua preferita:
 Server Error	ServerHelper		Errore Server
 Name	PackageListView		Nome
+Authorization or security issue. Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		Problema di sicurezza. Effettua la disconnessione e l'accesso nuovamente per verificare che la tua password sia corretta e di aver accettato l'ultima revisione delle condizioni d'uso.
 Local	LocalPkgDataLoadProcess		Locale
 Rate %Package%	RatePackageWindow		Vota %Package%
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Si è verificato un errore durante l'inizializzazione del gestore dei pacchetti: %message%
@@ -56,6 +57,7 @@ There was a puzzling response from the web service.	UserLoginWindow		La risposta
 Not logged in	MainWindow		Non collegato
 No, quit HaikuDepot	App		No, chiudi HaikuDepot
 Featured packages	FeaturedPackagesView		Pacchetti in evidenza
+The supplied response to the captcha is incorrect. A new captcha will be generated; try again.	UserLoginWindow		La risposta fornita alla verifica captcha non è corretta. Una nuova verifica sarà generata; per favore riprova.
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Non è stato possibile comunicare con il server per ottenere l'immagine captcha necessaria per creare un nuovo utente.
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		La tua valutazione è stata caricata con successo. Puoi modificarla o rimuoverla sul sito di HaikuDepot.
 Network Error	ServerHelper		Errore di Rete
@@ -97,18 +99,20 @@ Package daemon problem	App		Problema con il server dei pacchetti
 (%Votes%)	PackageInfoView		(%Votes%)
 Repository	PackageListView		Repository
 %hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (versione %hd.version%)
-The email is malformed.	UserLoginWindow		L'indirizzo email è malformato.
+The email is malformed.	UserLoginWindow		L'indirizzo e-mail è malformato.
 Close	UserLoginWindow		Chiudi
 Close	RatePackageWindow		Chiudi
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Sincronizzazione dei dati dei pacchetti del repository '%REPO_NAME%' in corso
 View the usage conditions	UserLoginWindow		Vedi le condizioni d'uso
 Login issue	MainWindow		Errore di Autenticazione
-Size	PackageListView		Dimensione
 Your rating:	RatePackageWindow		La tua valutazione:
+Size	PackageListView		Dimensione
+The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		L'utente %Nickname% è stato creato correttamente sul server di HaikuDepot. Puoi modificarne i dettagli utilizzando l'interfaccia web. Sei già loggato con questa utenza.
 Your rating was updated.	RatePackageWindow		La tua valutazione è stata aggiornata.
 All categories	FilterView		Tutte le categorie
 Repositories	MainWindow		Repository
 n/a	PackageInfoView		nd
+This rating is visible to other users	RatePackageWindow		Questa valutazione è visibile dagli altri utenti.
 View agreed usage conditions…	MainWindow		Vedi le condizioni d'uso accettate…
 Cancel	MainWindow		Annulla
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 ancora da scaricare)}other{(# ancora da scaricare)}}
@@ -127,8 +131,8 @@ Update	RatePackageWindow		Aggiorna
 OK	ServerHelper		OK
 Language	UserLoginWindow		Linguaggi di programmazione
 OK	UserLoginWindow		OK
-Reading repository data	LocalPkgDataLoadProcess		Lettura dati repository
-Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Sincronizzazione dati di riferimento dal server in corso
+Reading repository data	LocalPkgDataLoadProcess		Lettura dei dati del repository
+Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Sincronizzazione dei dati di riferimento dal server in corso
 Stability:	RatePackageWindow		Stabilità:
 The usage agreement must be agreed to and a confirmation should be made that the person creating the user meets the minimum age requirement.	UserLoginWindow		Le condizioni d'uso devono essere accettate ed è, inoltre, necessario che la persona che sta creando l'utente soddisfi i requisiti minimi d'età.
 A validation error has occurred	ServerHelper		Si è verificato un errore nella validazione
@@ -143,25 +147,29 @@ Unknown	PackageListView		Sconosciuto
 I agree to the usage conditions	UserLoginWindow		Acconsento alle condizioni d'uso
 Log in	UserLoginWindow		Accesso
 Logged in as %User%	MainWindow		Sessione avviata come %User%
-Email address:	UserLoginWindow		Indirizzo email:
+Email address:	UserLoginWindow		Indirizzo e-mail:
 Screenshot	ScreenshotWindow		Istantanea
 HaikuDepot	System name		HaikuDepot
 A reboot is necessary to complete the installation process.	PackageManager		Per completare l'installazione è necessario riavviare.
-View latest usage conditions…	MainWindow		Vedi le condizioni d'uso aggiornate…
+{0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{Ho almeno un anno}other{Ho # anni o oltre}}
+View latest usage conditions…	MainWindow		Vedi l'ultima revisione delle condizioni d'uso…
 Quit	App		Chiudi
 Search terms:	FilterView		Termini di ricerca:
 Pending…	PackageListView		In attesa…
+The nickname is malformed. The nickname may only contain digits and lower case latin characters. The nickname must be between four and sixteen characters in length.	UserLoginWindow		Questo soprannome non è nel formato corretto. Il soprannome può contenere solo numeri o caratteri latini minuscoli. Deve, inoltre, essere di una lunghezza compresa tra i quattro e i sedici caratteri.
 Category:	FilterView		Categoria:
 Authentication failed	UserLoginWindow		Autenticazione non riuscita
 Captcha error	UserLoginWindow		Errore validazione Captcha
+The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		Il soprannome deve essere univoco, mentre questo è già in uso. Per favore, scegline un altro.
 Manage repositories…	MainWindow		Gestisci repository…
-Fetching remote repository data	LocalRepositoryUpdateProcess		Recupero dati repository remoto
+Fetching remote repository data	LocalRepositoryUpdateProcess		Recupero dei dati del repository remoto
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	UserLoginWindow		Si è verificato un errore nel tentativo di scaricare le condizioni d'uso necessarie per creare un nuovo utente. Per favore, verifica nei file di log per maggiori dettagli e riprova.\nUlteriori informazioni su come visualizzare i file di log sono disponibii nella sezione su HaikuDepot della guida utente.
 Description	PackageListView		Descrizione
 Open %DeskbarLink%	PackageManager		Apri %DeskbarLink%
 User creation error	UserLoginWindow		Creazione utente non riuscita
 Install	PackageManager		Installa
-Input validation	UserLoginWindow		Validazione input
+Input validation	UserLoginWindow		Validazione ingresso
+This application is too old to communicate with the HaikuDepot server system. Obtain a newer version of HaikuDepot by updating your Haiku system. The minimum version of HaikuDepot required is \"%s\".	ServerHelper		Questa applicazione è troppo obsoleta per comunicare con il server di HaikuDepot. Per favore, aggiorna l'applicazione aggiornando Haiku. La versione minima di HaikuDepot richiesta è \"%s\".
 An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		Si è verificato un errore inatteso dal server HaikuDepot [%i]
 Log in…	MainWindow		Accesso…
 You need to be logged into an account before you can rate packages.	MainWindow		Per poter valutare i pacchetti è necessario accedere con un account.

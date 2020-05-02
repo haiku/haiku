@@ -16,7 +16,7 @@ HiFi audio device	DeviceClass		HiFi オーディオ機器
 Microphone	DeviceClass		マイク
 Capturing	DeviceClass		キャプチャリングデバイス
 Jacket	DeviceClass		ジャケット
-50-67% utilized	DeviceClass		50-67% 利用
+50-67% utilized	DeviceClass		50-67% 使用
 Headphones	DeviceClass		ヘッドホン
 Imaging	DeviceClass		イメージングデバイス
 Device conforms to the headset profile	DeviceClass		デバイスはヘッドセットプロファイルに適合します
@@ -32,7 +32,7 @@ Wired modem or voice gateway	DeviceClass		有線モデムかボイスゲート�
 #NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError#無効な名前です
 Camcorder	DeviceClass		カムコーダー
 #NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest#無効な名前です
-17-33% utilized	DeviceClass		17-33% 利用
+17-33% utilized	DeviceClass		17-33% 使用
 Desktop workstation	DeviceClass		デスクトップ ワークステーション
 Unspecified	DeviceClass		未分類
 Miscellaneous	DeviceClass		その他
@@ -42,19 +42,19 @@ LAN access	DeviceClass		LAN 接続
 Glasses	DeviceClass		メガネ
 Phone	DeviceClass		電話
 Laptop	DeviceClass		ラップトップ
-67-83% utilized	DeviceClass		67-83% 利用
+67-83% utilized	DeviceClass		67-83% 使用
 Cordless	DeviceClass		コードレス
 Invalid device class!\n	DeviceClass		無効なデバイスクラスです!\n
 Minor class: 	DeviceClass		副クラス:
 Doll/Action figure	DeviceClass		フィギュア
 Not implemented	RemoteDevice		未実装
-33-50% utilized	DeviceClass		33-50% 利用
+33-50% utilized	DeviceClass		33-50% 使用
 Gaming/Toy	DeviceClass		ゲーム/玩具
 Video camera	DeviceClass		ビデオカメラ
 Handheld	DeviceClass		ハンドヘルド
 Service classes: 	DeviceClass		サービスクラス:
 Loudspeaker	DeviceClass		拡声器
-83-99% utilized	DeviceClass		83-99% 利用
+83-99% utilized	DeviceClass		83-99% 使用
 SIM card reader	DeviceClass		SIM カードリーダー
 Computer	DeviceClass		コンピューター
 Scanner	DeviceClass		スキャナー
@@ -80,7 +80,7 @@ Hands-free	DeviceClass		ハンズフリー
 Digitizer tablet	DeviceClass		タブレット
 Portable audio	DeviceClass		ポータブルオーディオ
 Camera	DeviceClass		カメラ
-1-17% utilized	DeviceClass		1-17% 利用
+1-17% utilized	DeviceClass		1-17% 使用
 Combo keyboard/pointing device	DeviceClass		キーボードとポインティングデバイス
 Video conferencing	DeviceClass		ビデオ会議
 Peripheral	DeviceClass		周辺機器

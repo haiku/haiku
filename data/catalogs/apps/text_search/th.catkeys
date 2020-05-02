@@ -1,0 +1,38 @@
+1	thai	x-vnd.Haiku.TextSearch	1867528375
+Please select the files you wish to have selected for you in Tracker.	GrepWindow		โปรดเลือกไฟล์ที่คุณต้องการให้คุณเลือกในตัวติดตาม
+%appname% : %path%	GrepWindow		%appname% : %path%
+Failed to start xargs program!	Grepper		ไม่สามารถเริ่มโปรแกรม xargs ได้!
+Open selection	GrepWindow		เปิดตัวเลือก
+Actions	GrepWindow		ใช้งาน
+New window	GrepWindow		หน้าต่างใหม่
+Encoding	GrepWindow		กำลังเข้ารหัส
+OK	GrepWindow		ตกลง
+%appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
+Close	GrepWindow		ปิด
+Look in sub-folders	GrepWindow		ดูในโฟลเดอร์ย่อย
+%s: Not enough room to escape the filename.	Grepper		%s: มีพื้นที่ไม่เพียงพอที่จะเปลี่ยนรูปแบบชื่อไฟล์
+Follow symbolic links	GrepWindow		ติดตามลิงก์สัญลักษณ์
+Regular expression	GrepWindow		การแสดงออกปกติ
+Text files only	GrepWindow		ไฟล์ข้อความเท่านั้น
+Quit	GrepWindow		ออก
+Show files in Tracker	GrepWindow		แสดงไฟล์ในตัวติดตาม
+Please select the files you wish to keep searching.	GrepWindow		โปรดเลือกไฟล์ที่คุณต้องการค้นหาต่อไป
+Trim to selection	GrepWindow		ปรับแต่งเพื่อการเลือก
+Set target…	GrepWindow		กำหนดเป้าหมาย
+TextSearch	GrepWindow		ค้นหาข้อความ
+Failed to open input pipe!	Grepper		ไม่สามารถเปิดอินพุตเชื่อมโยงสองโปรแกรม!
+Search	GrepWindow		ค้นหา
+Copy text to clipboard	GrepWindow		คัดลอกข้อความไปยังคลิปบอร์ด
+Show lines	GrepWindow		แสดงบรรทัด
+Failed to open errors pipe!	Grepper		ไม่สามารถเปิดเชื่อมโยงสองโปรแกรมมีข้อผิดพลาด!
+The unselected files will be removed from the list.	GrepWindow		ไฟล์ที่ไม่ได้เลือกจะถูกลบออกจากรายการ
+Skip folders starting with a dot	GrepWindow		ข้ามโฟลเดอร์ที่ขึ้นต้นด้วยจุด
+Open files in code editor	GrepWindow		เปิดไฟล์ในโปรแกรมแก้ไขรหัส
+Failed to open output pipe!	Grepper		ไม่สามารถเปิดเอาท์พุธเชื่อมโยงสองโปรแกรม!
+Cancel	GrepWindow		ยกเลิก
+History	GrepWindow		ประวัติ
+File	GrepWindow		ไฟล์
+Case-sensitive	GrepWindow		เป็นกรณี ๆ ไป
+Select all	GrepWindow		เลือกทั้งหมด
+%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME ไม่สามารถเปิดหนึ่งหรือมากกว่าหนึ่งโฟลเดอร์ขึ้นไป
+Settings	GrepWindow		ตั้งค่า

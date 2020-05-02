@@ -2,11 +2,11 @@
 P-faults	DataSource		ページフォルト
 Media nodes	DataSource		メディアノード数
 Threads	DataSource		スレッド数
-Always on top	ActivityWindow		常に前面に
+Always on top	ActivityWindow		常に最前面
 Add graph	ActivityWindow		グラフを追加
 Teams	DataSource		チーム数
 MiB	DataSource		MiB
-Network send	DataSource		ネットワーク送信バイト数
+Network send	DataSource		ネットワーク送信量
 CPU usage (combined)	DataSource		CPU 使用率(合計)
 CPU	DataSource		CPU
 Used memory	DataSource		使用メモリー
@@ -15,11 +15,11 @@ Apps	DataSource		アプリ
 Show legend	ActivityView		説明を表示
 Text clipboard	DataSource		テキストクリップボード
 Settings	ActivityWindow		設定
-Receiving	DataSource		受信バイト数
+Receiving	DataSource		受信量
 Settings…	ActivityWindow		設定…
 Ports	DataSource		ポート数
 Page faults	DataSource		ページフォールト数
-Sending	DataSource		送信バイト数
+Sending	DataSource		送信量
 Cache	DataSource		キャッシュ
 %.1f faults/s	DataSource		%.1f フォールト/s
 Update time interval:	SettingsWindow		更新間隔:
@@ -33,7 +33,7 @@ CPU usage	DataSource		CPU 使用率
 Raw clipboard	DataSource		バイナリクリップボード
 Sems	DataSource		セマフォ
 %.1f MiB	DataSource		%.1f MiB
-ActivityMonitor	System name		利用状況モニター
+ActivityMonitor	System name		アクティビティモニター
 Running applications	DataSource		実行中のアプリケーション数
 Semaphores	DataSource		セマフォ数
 Block cache	DataSource		ブロックキャッシュ
@@ -42,6 +42,6 @@ Swap	DataSource		スワップ
 File	ActivityWindow		ファイル
 usage	DataSource		使用量
 Additional items	ActivityView		追加項目
-Network receive	DataSource		ネットワーク受信バイト数
+Network receive	DataSource		ネットワーク受信量
 Memory	DataSource		メモリー
 RX	DataSource	Shorter version for Receiving.	受信

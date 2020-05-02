@@ -1,0 +1,64 @@
+1	thai	x-vnd.Haiku-PackageInstaller	2472572058
+Package description	UninstallView		คำอธิบายแพ็คเกจ
+none	PackageView		ไม่มี
+Continue	PackageInstall		ต่อไป
+Running post-installation scripts	PackageInstall		เรียกใช้สคริปต์หลังการติดตั้ง
+Package installer	PackageView		แพ็คเกจติดตั้ง
+All existing files will be skipped?	PackageView		ไฟล์ที่มีอยู่ทั้งหมดจะถูกข้าม?
+Replace	PackageView		แทนที่
+All existing files will be replaced?	PackageView		ไฟล์ที่มีอยู่ทั้งหมดจะถูกแทนที่หรือไม่?
+Other…	PackageView		อื่นๆ
+The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		ลิงก์สัญลักษณ์ชื่อ '%s' มีอยู่แล้วในเส้นทางที่กำหนด\nแทนที่ลิงค์ด้วยลิงค์จากแพ็คเกจนี้หรือข้ามมันไป?
+Stop	PackageStatus		หยุด
+Install to:	PackageView		ติดตั้งที่:
+The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		ดูเหมือนจะมีการติดตั้งแพ็คเกจที่ให้ไว้ในระบบของคุณแล้ว คุณต้องการถอนการติดตั้งสิ่งที่มีอยู่แล้วและทำการติดตั้งต่อไปหรือไม่?
+Skip all	PackageView		ข้ามทั้งหมด
+The installation of the package has been aborted.	PackageView		การติดตั้งแพคเกจถูกยกเลิก
+No installation type selected	PackageView		ไม่ได้เลือกประเภทการติดตั้ง
+Do you want to remember this decision for the rest of this installation?\n	PackageView		คุณต้องการจดจำการตัดสินใจนี้สำหรับการติดตั้งที่เหลือหรือไม่? \n
+The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		แพ็คเกจที่เลือกไม่ได้ถูกลบออกจากระบบของคุณ ไฟล์ข้อมูลแพ็กเกจที่ติดตั้งที่ระบุอาจเสียหาย
+Install…	UninstallView		ติดตั้ง
+The item named '%s' already exists in the given path.\nReplace the item with the one from this package or skip it?	PackageView		ไอเท็มชื่อ '%s' มีอยู่แล้วในเส้นทางที่กำหนด\nแทนที่รายการด้วยรายการจากแพ็คเกจนี้หรือข้ามมันได้หรือไม่
+Installing files and folders	PackageInstall		การติดตั้งไฟล์และโฟลเดอร์
+Installed packages	UninstallWindow		แพคเกจที่ติดตั้ง
+Remove	UninstallView		ลบ
+The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		แพ็คเกจที่ร้องขอไม่สามารถติดตั้งบนระบบของคุณ นี่อาจเป็นปัญหากับไฟล์แพ็กเกจเป้าหมาย โปรดปรึกษาปัญหานี้กับผู้จัดจำหน่ายแพคเกจ
+OK	UninstallView		ตกลง
+Accept	PackageTextViewer		ยอมรับ
+Abort	PackageView		ยกเลิก
+Disclaimer	PackageTextViewer		คำปฏิเสธ
+Preparing package	PackageInstall		กำลังเตรียมแพ็คเกจ
+The package you requested has been successfully installed on your system.	PackageView		แพคเกจที่คุณร้องขอได้รับการติดตั้งบนระบบของคุณเรียบร้อยแล้ว
+Installation progress	PackageView		ความคืบหน้าการติดตั้ง
+Decline	PackageTextViewer		ปฎิเสธ
+Continue	PackageTextViewer		ต่อไป
+Installing package	PackageStatus		กำลังติดตั้งแพ็คเกจ
+Install %name%	PackageView		ติดตั้ง %name%
+%index% of %total%	PackageInstall		%index% of %total%
+No package selected.	UninstallView		ไม่ได้เลือกแพ็คเกจ
+%name% (%size% free)	PackageView		%name% (%size% free)
+Error while installing the package\n	PackageView		เกิดข้อผิดพลาดขณะติดตั้งแพ็คเกจ\n
+Finishing installation	PackageInstall		จบการติดตั้ง
+No package available.	PackageInfo		ไม่มีแพ็คเกจใช้งานได้
+The script named '%s' already exists in the given path.\nReplace the script with the one from this package or skip it?	PackageView		สคริปต์ชื่อ '%s' มีอยู่แล้วในเส้นทางที่กำหนด\nแทนที่สคริปต์ด้วยสคริปต์จากแพ็คเกจนี้หรือข้ามมันได้หรือไม่?
+Installation type:	PackageView		ประเภทการติดตั้ง:
+The package you selected has been successfully removed from your system.	UninstallView		แพคเกจที่คุณเลือกได้ถูกลบออกจากระบบของคุณเรียบร้อยแล้ว
+There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		ดูเหมือนจะมีขนาดไฟล์ไม่ตรงกันในไฟล์แพ็กเกจ แพ็คเกจอาจเสียหายหรือถูกแก้ไขหลังจากการสร้าง คุณยังต้องการทำต่อไปหรือไม่?
+%name% (%size%)	PackageView		%name% (%size%)
+Abort	PackageInstall		ยกเลิก
+The file named '%s' already exists in the given path.\nReplace the file with the one from this package or skip it?	PackageView		ไฟล์ชื่อ '%s' มีอยู่แล้วในเส้นทางที่กำหนด\nแทนที่ไฟล์ด้วยไฟล์จากแพ็คเกจนี้หรือข้ามมัน?
+Replace all	PackageView		แทนทีทั้งหมด
+The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		ไม่สามารถอ่านไฟล์แพ็คเกจได้\nสาเหตุหนึ่งที่เป็นไปได้สำหรับสาเหตุนี้อาจเป็นเพราะไฟล์ที่ร้องขอไม่ใช่แพ็คเกจ BeOS.pkg ที่ถูกต้อง
+Continue	PackageInfo		ต่อไป
+No package selected.	PackageInfo		ไม่ได้เลือกแพ็คเกจ
+Error! \"%s\" is not a valid path.\n	Packageinstaller main		ผิดพลาด! \"%s\" ไม่ใช่เส้นทางที่ถูกต้อง\n
+The directory named '%s' already exists in the given path.\nReplace the directory with one from this package or skip it?	PackageView		ไดเรกทอรีชื่อ '%s' มีอยู่แล้วในเส้นทางที่กำหนด\nแทนที่ไดเรกทอรีด้วยหนึ่งจากแพ็คเกจนี้หรือข้ามมันได้หรือไม่?
+LegacyPackageInstaller	System name		แพคเกจติดตั้งรุ่นเก่า
+Ask again	PackageView		ถามอีกครั้ง
+Begin	PackageView		เริ่ม
+OK	PackageView		ตกลง
+Abort	PackageInfo		ยกเลิก
+Done	PackageInstall		เสร็จแล้ว
+Error (%s)! Could not open \"%s\".\n	Packageinstaller main		ผิดพลาด (%s)! ไม่สามารถเปิด \"%s\" ได้\n
+Skip	PackageView		ข้าม
+Image not loaded correctly	PackageImageViewer		โหลดภาพไม่ถูกต้อง

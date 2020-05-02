@@ -62,8 +62,8 @@ Repository	PackageListView		仓库
 %hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp%（版本 %hd.version%）
 Close	UserLoginWindow		关闭
 Close	RatePackageWindow		关闭
-Size	PackageListView		大小
 Your rating:	RatePackageWindow		您的评分:
+Size	PackageListView		大小
 Your rating was updated.	RatePackageWindow		您的评价已被更新。
 All categories	FilterView		所有分类
 Repositories	MainWindow		仓库

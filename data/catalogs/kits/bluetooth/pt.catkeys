@@ -4,7 +4,7 @@ Controller	DeviceClass		Controlador
 Common ISDN access	DeviceClass		Acesso ISDN comum
 Unknown (reserved) minor device class	DeviceClass		Classe de dispositivos menores desconhecida (reservada)
 Uncategorized	DeviceClass		Não categorizado
-Keyboard	DeviceClass		Teclados
+Keyboard	DeviceClass		Teclado
 Smart phone	DeviceClass		Smart phone
 VCR	DeviceClass		VCR
 Cellular	DeviceClass		Telemóvel

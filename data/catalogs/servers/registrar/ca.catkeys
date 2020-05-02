@@ -4,7 +4,7 @@ OK	ShutdownProcess		D'acord
 Do you really want to shut down the system?	ShutdownProcess		Segur que voleu aturar el sistema?
 Shutdown status	ShutdownProcess		Estat de l'aturada
 Shut down	ShutdownProcess		Atura
-The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		L'aplicació \"%appName%\" podria estar bloquejada per un quadre modal.
+The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		L'aplicació \"%appName%\" podria estar blocada per un plafó modal.
 System is shut down	ShutdownProcess		S'atura el sistema.
 Restart system	ShutdownProcess		Reinicia el sistema
 Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		L'aplicació \"%appName%\" ha avortat el procés d'aturada.

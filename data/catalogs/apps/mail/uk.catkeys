@@ -36,7 +36,7 @@ Removing attachments from a forwarded mail is not yet implemented!\nIt will not 
 Same recipient	Mail		Той самий отримувач
 Previous message	Mail		Попередній лист
 (Address unavailable)	Mail		(Адреса недоступна)
-Mail	System name		Пошта
+Mail	System name		Mail
 Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Вкладення: %name% (Тип: %type%)
 Copy link location	Mail		Скопіювати розміщення посилання
 Attachments: 	Mail		Вкладення: 

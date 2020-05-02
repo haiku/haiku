@@ -5,15 +5,15 @@ Return the number of available printers	PrintServerApp Scripting		Torna el nombr
 Get currently available ports/devices	Transport Scripting		Obté els ports i dispositius disponibles en aquest moment
 Retrieve or select the active printer	PrintServerApp Scripting		Recupera o tria la impressora activa
 Cancel	PrintServerApp		Cancel·la
-Retrieve a specific printer	PrintServerApp Scripting		Recupera una impressora determinada
+Retrieve a specific printer	PrintServerApp Scripting		Recupera una impressora específica
 Page %1 to %2	ConfigWindow		Pàgina %1 de %2
-Get name of the printer add-on used for this printer	Printer Scripting		Obté el nom del connector utilitzat amb aquesta impressora
+Get name of the printer add-on used for this printer	Printer Scripting		Obtén el nom del complement usat per a aquesta impressora
 B5 (JIS)	ConfigWindow	JIS P0138 B5, a Japanese paper size	B5 (JIS)
 OK	ConfigWindow		D'acord
 Cancel	ConfigWindow		Anuŀla
 Printer server	ConfigWindow		Servidor d'impressió
 Page %1 to %2, %3 copies	ConfigWindow		Pàgina %1 de %2, %3 còpies
-A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Ja existeix una impressora amb aquest nom, però no ha estat possible trobar el seu connector! El voleu canviar?
+A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Ja existeix una impressora amb aquest nom, però no se n'ha pogut trobar el controlador! La voleu reemplaçar?
 Yes	PrintServerApp		Sí
 Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Llibre major
 Would you like to set one up now?	PrintServerApp		El voleu configurar ara?
@@ -21,7 +21,7 @@ Print job setup:	ConfigWindow		Configuració de la tasca d'impressió:
 A6	ConfigWindow	ISO 216 paper size	A6
 Portrait	ConfigWindow		Vertical
 All pages	ConfigWindow		Totes les pàgines
-There is no default printer set up.	PrintServerApp		No hi ha cap impresora predefinida.
+There is no default printer set up.	PrintServerApp		No hi ha cap impressora establerta.
 B5	ConfigWindow	ISO 216 paper size	B5
 A0	ConfigWindow	ISO 216 paper size	A0
 Letter	ConfigWindow	ANSI A (letter), a North American paper size	Carta (8,5 x 11 polzades)
@@ -31,20 +31,20 @@ Select a printer	ConfigWindow		Selecciona la impressora
 Show configuration window	PrintServerApp Scripting		Mostra la finestra de la configuració
 A4	ConfigWindow	ISO 216 paper size	A4
 Get comments about this printer	Printer Scripting		Aconseguiu comentaris sobre aquesta impressora
-A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		Ja existeix una impressora amb aquest nom, però és inservible! El voleu canviar?
+A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		Ja existeix una impressora amb aquest nom, però no es pot usar gens! La voleu reemplaçar?
 No	PrintServerApp		No
 Get the transport configuration for this printer	Printer Scripting		Aconseguiu la configuració de transport d'aquesta impressora
 Landscape	ConfigWindow		Apaïsat
 Legal	ConfigWindow	A North American paper size (216 x 356 mm, or 8.5 x 14 in)	Legal
-There are no printers set up.	PrintServerApp		No hi ha cap impressora configurada.
-Get name of the transport add-on used for this printer	Printer Scripting		Aconseguiu el connector de transport utilitzar per aquesta impressora
+There are no printers set up.	PrintServerApp		No hi ha cap impressora establerta.
+Get name of the transport add-on used for this printer	Printer Scripting		Obtén el complement de transport usat per a aquesta impressora
 All pages, %1 copies	ConfigWindow		Totes les pàgines, %1 còpies
-Delete a specific printer	PrintServerApp Scripting		Suprimeix una impressora
+Delete a specific printer	PrintServerApp Scripting		Suprimeix una impressora específica
 Create a new printer	PrintServerApp Scripting		Nova impressora
 OK	PrintServerApp		D'acord
-Print setup	ConfigWindow		Paràmetres d'impressió
+Print setup	ConfigWindow		Configuració d'impressió
 A1	ConfigWindow	ISO 216 paper size	A1
-Retrieve a specific transport	PrintServerApp Scripting		Recupera un determinat transport
+Retrieve a specific transport	PrintServerApp Scripting		Recupera un transport específic
 Get name of printer	Printer Scripting		Obté el nom de la impressora
 A3	ConfigWindow	ISO 216 paper size	A3
 Get name of transport	Transport Scripting		Obté el nom del medi de transport

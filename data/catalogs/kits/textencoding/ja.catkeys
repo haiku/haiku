@@ -11,7 +11,7 @@ Windows Central European (CP 1250)	textencodings		中央ヨーロッパ (CP 1250
 Windows Cyrillic (CP 1251)	textencodings		キリル文字 (CP 1251)
 Japanese EUC	textencodings		日本語
 Unicode	textencodings		ユニコード
-Chinese GB18030	textencodings		中国語
+Chinese GB18030	textencodings		中国語 (GB18030)
 ISO North European	textencodings		北欧
 ISO Celtic	textencodings		ケルト語
 Unicode (UCS-2)	textencodings		ユニコード (UCS-2)

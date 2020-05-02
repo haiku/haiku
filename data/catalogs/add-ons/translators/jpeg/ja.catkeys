@@ -1,6 +1,6 @@
 1	japanese	x-vnd.Haiku-JPEGTranslator	3788699631
 Read	JPEGTranslator		読み取り
-Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Be ビットマップフォーマット (JPEGTranslator)
+Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Be ビットマップフォーマット (JPEG トランスレーター)
 Show warning messages	JPEGTranslator		警告メッセージを表示
 Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		インク使用率 100% のために、CMYK コードを 0 で使用
 JPEG Library Error: %s\n	be_jerror		JPEG ライブラリエラー: %s\n

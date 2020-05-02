@@ -18,13 +18,13 @@ Unmount	MainWindow		マウント解除
 Failed to format the partition %s!\n	MainWindow		パーティション %s のフォーマットに失敗しました。\n
 Partition size	CreateParametersPanel		パーティションサイズ
 Validation of the given parameters failed.	MainWindow		指定されたパラメーターの検証に失敗しました。
-The partition %s is currently mounted.	MainWindow		%s パーティションが現在マウントされています。
+The partition %s is currently mounted.	MainWindow		パーティション %s が現在マウントされています。
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		パーティション \"%s\" をフォーマットしますか? 変更をディスクに書き込む直前に再度確認します。
 DriveSetup	System name		DriveSetup
 Mounted at	PartitionList		マウント先
 Create…	MainWindow		新規作成…
 Write changes	MainWindow		変更を書き込む
-Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		%s パーティションの初期化に失敗しました (ディスクに何も書き込まれていません)。
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		パーティション %s の初期化に失敗しました (ディスクに何も書き込まれていません)。
 Validation of the given creation parameters failed.	MainWindow		作成パラメーターの検証に失敗しました。
 Eject	MainWindow		取り出す
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		変更をすぐにディスクに保存しますか?\n\nその場合、ディスク %s のデータがすべて失われます。
@@ -104,7 +104,7 @@ Select a partition from the list below.	DiskView		下記の一覧からパーテ
 Active	PartitionList		アクティブ
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		選択されたパーティションを削除しますか?\n\nその場合、パーティションのすべてのデータが失われます。
 Failed to format the partition. No changes have been written to disk.	MainWindow		パーティションのフォーマットに失敗しました。変更はディスクに書きこまれていません。
-The partition %s has been successfully formatted.\n	MainWindow		%s パーティションは正常にフォーマットされました。\n
+The partition %s has been successfully formatted.\n	MainWindow		パーティション %s は正常にフォーマットされました。\n
 The partition %s is already mounted.	MainWindow		パーティション %s はすでにマウントされています。
 Size	PartitionList		サイズ
 Creation of the partition has failed.	MainWindow		パーティションの作成に失敗しました。

@@ -1,0 +1,159 @@
+1	thai	x-vnd.Haiku-WebPositive	1879106286
+Authentication required	Authentication Panel		ต้องการการรับรองความถูกต้อง
+Previous	WebPositive Window		ก่อนหน้า
+(Finish: %date)	Download Window		(สิ้นสุด: %date)
+Open bookmarks confirmation	WebPositive Window		เปิดการยืนยันบุ๊กมาร์ก
+Download folder:	Settings Window		ดาวน์โหลดโฟลเดอร์:
+Close window	WebPositive Window		ผิดหน้าต่าง
+Find:	WebPositive Window		ค้นหา:
+Script console	WebPositive Window		คอนโซลสคริปต์
+Fonts	Settings Window		ตัวอักษร
+Path	Cookie Manager		พาธ
+of	Download Window	...as in '12kB of 256kB'	ของ
+Bookmarks	WebPositive Window		บุคมาร์ค
+Use proxy server to connect to the internet	Settings Window		ใช้พร็อกซีเซิร์ฟเวอร์เพื่อเชื่อมต่ออินเทอร์เน็ต
+%url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url เสร็จ
+Auto-hide interface in full screen mode	Settings Window		ซ่อนอินเตอร์เฟซอัตโนมัติในโหมดเต็มหน้าจอ
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	มีข้อผิดพลาดในการเรียกโฟลเดอร์บุ๊คมาร์ค\n\nผิดพลาด: %error
+Delete	Cookie Manager		ลบ
+(Finish: %date - Over %duration left)	Download Window		(Finish: %date - Over %duration left)
+Open containing folder	Download Window		เปิดโฟลเดอร์ที่มี
+Find previous	WebPositive Window		ค้าหาก่อนหน้านี้
+Full screen	WebPositive Window		เต็มจอ
+Downloads in progress	WebPositive		กำลังดาวน์โหลดอยู่
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	คุณต้องการเปิด %addedCount คั่นหน้าจำนวนเพิ่มทั้งหมดในครั้งเดียวหรือไม่?
+Copy URL to clipboard	Download Window		คัดลอก URL ไปยังคลิปบอร์ด
+Clone current page	Settings Window		ทำซ้ำหน้าปัจจุบัน
+Start page:	Settings Window		หน้าเริ่มต้น:
+Cancel	Download Window		ยกเลิก
+Settings	Settings Window		ตั้งค่า
+Downloads	WebPositive Window		ดาวน์โหลด
+Browse…	Settings Window		บราวส์
+A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	ที่คั่นหน้าสำหรับหน้านี้ (%bookmarkName) มีอยู่แล้ว
+Resume prior session	Settings Window		สรุปเซสชั่นก่อนหน้า
+Match case	WebPositive Window		กรณีตรงกัน
+Proxy password:	Settings Window		รหัสผ่านพร็อกซี:
+Size:	Font Selection view		ขนาด:
+Page source	WebPositive Window		แหล่งที่มาของหน้า
+Proxy server port:	Settings Window		พอร์ตพร็อกซีเซิร์ฟเวอร์:
+Error opening downloads folder	Download Window		เกิดข้อผิดพลาดในการเปิดโฟลเดอร์ดาวน์โหลด
+Show bookmark bar	WebPositive Window		แสดงแถบคั่นหน้า
+Find	WebPositive Window		ค้นหา
+Standard font:	Settings Window		ตัวอักษรมาตรฐาน:
+Open download error	Download Window		เปิดข้อผิดพลาดในการดาวน์โหลด
+General	Settings Window		ทั่วไป
+New tabs:	Settings Window		แท็ปใหม่:
+%url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url ล้มเหลว
+Open downloads folder	Download Window		เปิดโฟลเดอร์ดาวน์โหลด
+Proxy server	Settings Window		พร็อกซีเซิร์ฟเวอร์
+Decrease size	WebPositive Window		ลดขนาด
+Default fixed font size:	Settings Window		ขนาดตัวอักษรเริ่มต้นคงที่:
+Sans serif font:	Settings Window		ตัวอักษร Sans serif:
+Clear	WebPositive Window		ลบ
+Cookies for %s	Cookie Manager		คุกกี้ %s
+The download could not be opened.	Download Window		ไม่สามารถเปิดการดาวน์โหลด
+Close	Download Window		ปิด
+WebPositive	System name		Web Positive
+Reload	WebPositive Window		โหลดใหม่
+Expiration	Cookie Manager		หมดอายุ
+Download finished	Download Window		การดาวน์โหลดเสร็จสิ้น
+Cookie manager	WebPositive Window		ผู้จัดการคุกกี้
+OK	Authentication Panel		ตกลง
+Hide password text	Authentication Panel		ซ่อนข้อความรหัสผ่าน
+Username:	Authentication Panel		ชื่อผู้ใช้:
+Name	Cookie Manager		ชื่อ
+Remove finished	Download Window		ลบเสร็จแล้ว
+Earlier	WebPositive Window		ก่อนหน้านี้
+Edit	WebPositive Window		แก้ไข
+Back	WebPositive Window		ย้อนกลับ
+Yesterday	WebPositive Window		เมื่อวาน
+Quit	WebPositive		ออก
+Download aborted	Download Window		ดาวน์โหลดยกเลิก
+Number of days to keep links in History menu:	Settings Window		จำนวนวันที่จะเก็บลิงค์ไว้ในเมนูประวัติ:
+Password:	Authentication Panel		รหัสผ่าน:
+Forward	WebPositive Window		ส่งต่อ
+Clear	Console Window		ลบ
+Cut	URL Bar		ตัด
+View	WebPositive Window		ดู
+Paste	URL Bar		วาง
+Find next	WebPositive Window		ค้นหาถัดไป
+Open search page	Settings Window		เปิดหน้าค้นหา
+Increase size	WebPositive Window		เพิ่มขนาด
+New tab	WebPositive Window		แท็ปใหม่
+Today	WebPositive Window		วันนี้
+Open location	WebPositive Window		เปิดสถานที่
+New browser window	Download Window		หน้าต่างเบราว์เซอร์ใหม่
+Open	Download Window		เปิด
+New window	WebPositive Window		หน้าต่างใหม่
+New windows:	Settings Window		หน้าต่างใหม่:
+The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	ไม่สามารถเปิดโฟลเดอร์ดาวน์โหลดได้\n\nผิดพลาด: %error
+Cancel	Authentication Panel		ยกเลิก
+Style:	Font Selection view		สไตล์:
+There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	มีข้อผิดพลาดในการสร้างไฟล์คั่นหน้า\n\nผิดพลาด: %error
+OK	Download Window		ตกลง
+Proxy username:	Settings Window		ชื่อผู้ใช้พร็อกซี:
+Manage bookmarks	WebPositive Window		จัดการคั่นหน้า
+/s)	Download Window	...as in 'per second'	/s)
+Restart	Download Window		เริ่มใหม่
+Serif font:	Settings Window		ตัวอักษร Serif:
+Apply	Settings Window		ใช้
+There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	มีข้อผิดพลาดในการพยายามแสดงโฟลเดอร์ Bookmarks\n\nผิดพลาด: %error
+Revert	Settings Window		เปลี่ยนกลับ
+Copy	WebPositive Window		ัคัดลอก
+Default standard font size:	Settings Window		ขนาดตัวอักษรมาตรฐานเริ่มต้น:
+Bookmark this page	WebPositive Window		คั่นหน้านี้
+Show tabs if only one page is open	Settings Window		แสดงแท็บหากเปิดเพียงหนึ่งหน้า
+Close tab	WebPositive Window		ปิดแท็บ
+Remove	Download Window		ลบ
+About	WebPositive Window		เกี่ยวกับ
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		ยังคงมีการดาวน์โหลดอยู่คุณต้องการออกจาก WebPositive ทันทีหรือไม่?
+Continue downloads	WebPositive		ดาวน์โหลดต่อไป
+Proxy server requires authentication	Settings Window		พร็อกซีเซิร์ฟเวอร์ต้องการการรับรองความถูกต้อง
+Cancel	Settings Window		ยกเลิก
+History	WebPositive Window		ประวัติ
+Reset size	WebPositive Window		ตั้งค่าขนาดใหม่
+Do you really want to clear the browsing history?	WebPositive Window		คุณต้องการล้างประวัติการเข้าชมจริง ๆ หรือไม่?
+Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	ค้นหาคำที่ค้นหาถัดไป
+Fixed font:	Settings Window		ตัวอักษรคงที่:
+Quit	WebPositive Window		ออก
+Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	ค้นหาคำที่ค้นหาก่อนหน้านี้
+Remember username and password for this site	Authentication Panel		จำชื่อผู้ใช้และรหัสผ่านสำหรับเว็บไซต์นี้
+(Finish: %date - %duration left)	Download Window		(เสร็จ: %date - %duration เหลือ)
+Cookie manager	Cookie Manager		จัดการคุกกี้
+Show home button	Settings Window		แสดงปุ่มหน้าหลัก
+Start new session	Settings Window		เริ่มเซสชั่นใหม่
+The cookie jar is empty!	Cookie Manager		ที่เก็บคุกกี้ว่างเหล่า!
+Value	Cookie Manager		ค่า
+Remove missing	Download Window		ลบหายไป
+Paste	WebPositive Window		วาง
+Double-click or middle-click to open new tab.	Tab Manager		ดับเบิลคลิกหรือคลิกกลางเพื่อเปิดแท็บใหม่
+Next	WebPositive Window		ถัดไป
+Bookmark error	WebPositive Window		คั่นหน้าผิดพลาด
+OK	WebPositive Window		ตกลง
+WebPositive	Download Window		WebPositive
+Zoom text only	WebPositive Window		ขยายข้อความอย่างเดียว
+Save page as…	WebPositive Window		บันทึกหน้าเป็น
+Page source error	WebPositive Window		ข้อผิดพลาดของแหล่งหน้า
+Auto-hide mouse pointer	Settings Window		ซ่อนตัวชี้เมาส์โดยอัตโนมัติ
+Requesting %url	WebPositive Window		ค้นหา %url
+Flags	Cookie Manager		ปักธง
+Window	WebPositive Window		หน้าต่าง
+Proxy server address:	Settings Window		ที่อยู่พร็อกซีเซิร์ฟเวอร์:
+Search page:	Settings Window		ค้นหาหน้า:
+Settings	WebPositive Window		ตั้งค่า
+Clear	URL Bar		ลบ
+Loading %url	WebPositive Window		กำลังโหลด %url
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	สุนัขจิ้งจอกสีน้ำตาลอย่างรวดเร็วกระโดดข้ามสุนัขขี้เกียจ
+Start up:	Settings Window		เริ่มต้น:
+Confirmation	WebPositive Window		ยืนยัน
+Session cookie	Cookie Manager		คุกกี้เซสชั่น
+Open all	WebPositive Window		เปิดทั้งหมด
+Cut	WebPositive Window		ตัด
+Downloads	Download Window		ดาวน์โหลด
+Open blank page	Settings Window		เปิดหน้าเปล่า
+Clear history	WebPositive Window		ลบประวัติ
+Cancel	WebPositive Window		ยกเลิก
+Bookmark info	WebPositive Window		ข้อมูลที่คั่นหน้า
+Script console	Console Window		คอนโซลสคริปต์
+Copy	URL Bar		คัดลอก
+Open start page	Settings Window		เปิดหน้าเริ่มต้น

@@ -1,7 +1,7 @@
 1	italian	x-vnd.Be-POST	2949558073
 No new messages	MailDaemon		Nessun nuovo messaggio
 No new messages	DeskbarView		Nessun nuovo messaggio
-Shutdown mail services	DeskbarView		Arresto servizi di posta elettronica
+Shutdown mail services	DeskbarView		Arresto dei servizi di posta elettronica
 Mail status	MailDaemon		Stato posta elettronica
 Fetching mail for %name	Notifier		Recupero della posta elettronica di %name in corso
 {0, plural, one{# new message} other{# new messages}}	DeskbarView		{0, plural, one{# nuovo messaggio} other{# nuovi messaggi}}

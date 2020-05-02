@@ -1,0 +1,17 @@
+1	thai	x-vnd.Haiku-DataTranslations	4156631142
+Path:	DataTranslations		พาธ:
+Name:	DataTranslations		ชื่อ:
+DataTranslations - Note	DataTranslations		การแปลข้อมูล - หมายเหตุ
+The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		รายการ '%name' ไม่ปรากฏในผู้แปลและจะไม่ถูกติดตั้ง
+Could not install %s:\n%s	DataTranslations		ไม่สามารถติดตั้งได้%s:\n%s
+OK	DataTranslations		ตกลง
+Cancel	DataTranslations		ยกเลิก
+Info:	DataTranslations		ข้อมูล:
+DataTranslations - Error	DataTranslations		การแปลข้อมูล - ผิดพลาด
+Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		ใช้แผงควบคุมนี้เพื่อตั้งค่าเริ่มต้นสำหรับผู้แปลที่จะใช้เมื่อแอปพลิเคชันไม่ได้ระบุการตั้งค่าอื่น ๆ
+The new translator has been installed successfully.	DataTranslations		ติดตั้งตัวแปลภาษาใหม่เรียบร้อยแล้ว
+An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		มีรายการชื่อ '%name' อยู่ในโฟลเดอร์แปลภาษาแล้ว! ตัวแปลภาษาที่มีอยู่จะถูกเขียนทับหรือไม่
+DataTranslations	System name		การแปลข้อมูล
+Info	DataTranslations		ข้อมูล
+Overwrite	DataTranslations		เขียนทับ
+Version:	DataTranslations		เวอร์ชั่น:

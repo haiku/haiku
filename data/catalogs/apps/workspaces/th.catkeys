@@ -1,0 +1,13 @@
+1	thai	x-vnd.Be-WORK	3927737357
+Quit	Workspaces		ออก
+Invalid argument: %s\n	Workspaces		อาร์กิวเมนต์ไม่ถูกต้อง: %s\n
+Change workspace count…	Workspaces		เปลี่ยนจำนวนพื้นที่ทำงาน
+Always on top	Workspaces		อยู่ด้านบนเสมอ
+Show window border	Workspaces		แสดงกรอบหน้าต่าง
+Show window tab	Workspaces		แสดงแท็บหน้าต่าง
+Auto-raise	Workspaces		ยกขึ้นอัตโนมัติ
+Remove replicant	Workspaces		ลบแบบจำลอง
+Live in the Deskbar	Workspaces		แสดงอยู่ในเดสก์บาร์
+Usage: %s [options] [workspace]\nwhere \"options\" are:\n  --notitle\t\ttitle bar removed, border and resize kept\n  --noborder\t\ttitle, border, and resize removed\n  --avoidfocus\t\tprevents the window from being the target of keyboard events\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when it's at the screen edge\n  --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n	Workspaces		ใช้งาน: %s [options] [workspace]\nที่ \"options\" :\n--notitle\t\tลบแถบชื่อเรื่องแล้ว, กรอบและปรับขนาดเก็บไว้\n--noborder\t\tลบชื่อเรื่อง, กรอบ, และปรับขนาด\n--avoidfocus\t\tป้องกันไม่ให้หน้าต่างเป็นเป้าหมายของเหตุการณ์แป้นพิมพ์\n--alwaysontop\t\tช่วยให้หน้าต่างอยู่ด้านบนเสมอ\n--notmovable\t\tไม่สามารถย้ายหน้าต่างไปรอบๆ\n--autoraise\t\tยกหน้าต่างพื้นที่ทำงานโดยอัตโนมัติเมื่ออยู่ที่ขอบหน้าจอ\n--help\t\tแสดงความช่วยเหลือและออก\nและ \"workspace\" คือจำนวนของเวิร์กสเปซที่จะเปลี่ยน (0-31)\n
+Switch on mouse wheel	Workspaces		สลับโดยใช้ล้อเลื่อนของเมาส์
+Workspaces	System name		พื้นที่ทำงาน

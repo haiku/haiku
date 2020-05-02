@@ -1,17 +1,20 @@
-1	indonesian	x-vnd.Haiku-Input	2494436940
+1	indonesian	x-vnd.Haiku-Input	3910661481
 Scrolling	TouchpadPrefView		Menggulung
 Defaults	InputMouse		Bawaan
 Tapping	TouchpadPrefView		Penyadapan
 Long	KeyboardView		Panjang
 Normal	SettingsView		Normal
 Cancel	TouchpadPrefView		Batalkan
+4-Button	SettingsView		4-Tombol
 Slow	TouchpadPrefView		Lambat
 Warp	SettingsView		Melengkung
 Instant warp	SettingsView		Lengkungan instan
 Device List	InputWindow		Daftar perangkat
 Double-click speed	SettingsView		Kecepatan klik dua kali
+5-Button	SettingsView		5-Tombol
 Typing test area	KeyboardView		Area tes pengetikan
 Mouse type:	SettingsView		Jenis mouse:
+Revert	InputKeyboard		Pulihkan
 Fast	KeyboardView		Cepat
 Off	TouchpadPrefView		Mati
 Fast	TouchpadPrefView		Cepat
@@ -30,6 +33,7 @@ The new scroll area is very large and may impede normal mouse operation. Do you 
 High	TouchpadPrefView		Tinggi
 Defaults	TouchpadPrefView		Bawaan
 1-Button	SettingsView		1-Tombol
+Defaults	InputKeyboard		Bawaan
 Short	KeyboardView		Cepat
 Slow	KeyboardView		Lambat
 Revert	InputMouse		Pulihkan

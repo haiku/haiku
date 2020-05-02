@@ -30,7 +30,7 @@ Right option	Keyboard Layout View		Option destro
 Turkish (Type-Q)	KeymapNames		Turco (Type-Q)
 Revert	Modifier keys window		Ripristina
 Slovak	KeymapNames		Slovacco
-CAPS LOCK	Keyboard Layout View		BLOCCO MAIUS
+CAPS LOCK	Keyboard Layout View		CAPS LOCK
 Colemak	KeymapNames		Colemak
 Dvorak (programmer's)	KeymapNames		Dvorak (per sviluppatori)
 PRINT	Keyboard Layout View		STAMPA
@@ -74,7 +74,7 @@ Control	Keyboard Layout View	Control key	Control
 Irish	KeymapNames		Irlandese
 Remove	Keyboard Layout View		Rimuovi
 Tilde trigger	Keymap window		Tilde
-Shift	Keyboard Layout View	Shift key	Maiusc
+Shift	Keyboard Layout View	Shift key	Shift
 CONTROL	Keyboard Layout View		CONTROL
 Macedonian	KeymapNames		Macedone
 Czech (Mac)	KeymapNames		Ceco (Mac)
@@ -89,14 +89,14 @@ Esperanto	KeymapNames		Esperanto
 Belarusian	KeymapNames		Bielorusso
 Warning: left and right key roles do not match	Modifier keys window		Attenzione: i tasti sinistro e destro hanno impostazioni diverse
 Circumflex trigger	Keymap window		Circonflesso
-Caps lock	Keyboard Layout View		Bloc Maiusc
-Left shift	Keyboard Layout View		Maiusc sinistro
+Caps lock	Keyboard Layout View		Caps lock
+Left shift	Keyboard Layout View		Shift sinistro
 Russian (Yawert)	KeymapNames		Russo (Yawert)
 ThinkPad X100e International	KeyboardLayoutNames		ThinkPad X100e Internazionale
 Bulgarian (Cyrillic)	KeymapNames		Bulgaro (Cirillico)
 Swedish	KeymapNames		Svedese
 Left control	Keyboard Layout View		Tasto control sinistro
-CAPS	Keyboard Layout View	Very short for 'caps lock'	MAIUS
+CAPS	Keyboard Layout View	Very short for 'caps lock'	CAPS
 Role	Modifier keys window	As in the role of a modifier key	Ruolo
 Svorak	KeymapNames		Svorak
 ThinkPad X100e (US)	KeyboardLayoutNames		ThinkPad X100e (US)
@@ -111,7 +111,7 @@ Generic 105-key International	KeyboardLayoutNames		Tastiera Internazionale gener
 Disabled	Modifier keys window	Do nothing	Disabilitato
 Select dead keys	Keymap window		Tasti attivazione accenti
 Russian (Mac)	KeymapNames		Russo (Mac)
-Right shift	Keyboard Layout View		Maiusc destro
+Right shift	Keyboard Layout View		Shift destro
 ESC	Keyboard Layout View		ESC
 Belarusian (Latin)	KeymapNames		Bielorusso (Latino)
 Hebrew	KeymapNames		Ebraico
@@ -128,7 +128,7 @@ French (Mac)	KeymapNames		Francese (Mac)
 User:	Keymap window		Utente:
 Apple Aluminium Extended International	KeyboardLayoutNames		Apple Aluminium Internazionale Estesa
 Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Tasto Alt/Opt
-SHIFT	Keyboard Layout View		MAIUS
+SHIFT	Keyboard Layout View		SHIFT
 Estonian	KeymapNames		Estone
 Serbian (Latin)	KeymapNames		Serbo (Latino)
 French	KeymapNames		Francese
@@ -154,7 +154,7 @@ Norwegian	KeymapNames		Norvegese
 Font	Keymap window		Carattere
 Danish	KeymapNames		Danese
 Generic 104-key	KeyboardLayoutNames		Tastiera generica a 104 tasti
-Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Tasto Maiusc
+Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Tasto shift
 PAUSE	Keyboard Layout View		PAUSA
 Russian	KeymapNames		Russo
 TypeMatrix 2030	KeyboardLayoutNames		TypeMatrix 2030

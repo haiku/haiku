@@ -1,0 +1,69 @@
+1	thai	x-vnd.Haiku-BootManager	867546001
+Old Master Boot Record backup failure	BootManagerController	Title	การสำรองข้อมูล Old Master Boot Record ล้มเหลว
+At least one partition must be selected!	BootManagerController		ต้องเลือกอย่างน้อยหนึ่งพาร์ติชัน!
+No space available!	DrivesPage	Cannot install	ไม่มีที่ว่าง!
+Boot Manager is unable to read the partition table!	BootManagerController		ตัวจัดการการบูตไม่สามารถอ่านตารางพาร์ติชัน!
+Immediately	DefaultPartitionPage		ทันที
+Uninstall Boot Manager	UninstallPage	Title	ถอนการติดตั้ง Boot Manager
+Unknown	LegacyBootMenu	Text is shown for an unknown partition type	ไม่ทราบ
+Installation of boot menu failed	BootManagerController	Title	การติดตั้งเมนูบูตล้มเหลว
+Backup Master Boot Record	BootManagerController	Title	บันทึกการบูตมาสเตอร์สำรอง
+Cannot access!	DrivesPage	Cannot install	เข้าถึงไม่ได้!
+After one second	DefaultPartitionPage		หลังจากหนึ่งวินาที
+The old Master Boot Record was successfully saved to %s.	BootManagerController		มาสเตอร์บูตเรคคอร์ดบันทึกได้สำเร็จใน %s
+Quit	WizardView	Button	หยุด
+Never	DefaultPartitionPage		ไม่เคย
+Summary	BootManagerController	Title	สรุป
+An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		เกิดข้อผิดพลาดขณะเขียนเมนูบูต Master Boot Record อาจถูกทำลาย คุณควรคืนค่า MBR ทันที!
+After three seconds	DefaultPartitionPage		หลังจากสามวินาที
+Read only!	DrivesPage	Cannot install	อ่านเท่านั้น!
+Write boot menu	BootManagerController	Button	เขียนเมนูบูต
+OK	BootManagerController	Button	ตกลง
+Uninstall boot manager	BootManagerController	Title	ถอนการติดตั้งตัวจัดการการบูต
+About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		กำลังจะเขียนเมนูการบูตต่อไปนี้ไปยังดิสก์สำหรับเริ่มระบบ (%s) โปรดตรวจสอบข้อมูลด้านล่างก่อนดำเนินการต่อ
+The first partition on the disk starts too early and does not leave enough space free for a boot menu.\nBoot Manager needs 2 KiB available space before the first partition.	BootManagerController		พาร์ติชันแรกบนดิสก์เริ่มต้นเร็วเกินไปและไม่มีพื้นที่ว่างเพียงพอสำหรับเมนูบู๊ต \nBoot Manager ต้องการพื้นที่ว่าง 2 KiB ก่อนพาร์ติชั่นแรก
+Uninstall	DrivesPage	Button	ยกเลิกการติดตั้ง
+Update	DrivesPage	Button	อัพเดท
+The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		Master Boot Record (MBR) ของอุปกรณ์สำหรับบู๊ต: \n\t%s \nตอนนี้จะถูกบันทึกไว้ในดิสก์ โปรดเลือกไฟล์ที่จะบันทึก MBR ไว้ใน \n\nหากมีสิ่งผิดปกติเกิดขึ้นกับการติดตั้งหรือหากคุณต้องการลบเมนูการบู๊ตออกในภายหลังให้รันโปรแกรม bootman และเลือกตัวเลือก 'ถอนการติดตั้ง'
+Default Partition	DefaultPartitionPage	Title	พาร์ติชันเริ่มต้น
+Installation of boot menu completed	BootManagerController	Title	การติดตั้งเมนูบูตเสร็จสมบูรณ์
+After one minute	DefaultPartitionPage		หลังจากหนึ่งนาที
+Select	FileSelectionPage	Button	เลือก
+USB Drive	DrivesPage	Default disk name	USB ไดรฟ์
+Restore MBR	BootManagerController	Button	กู้คืน MBR 
+Hard Drive	DrivesPage	Default disk name	ฮาร์ดไดรฟ์
+Drives	DrivesPage	Title	ไดรฟ์
+The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		ตรวจพบพาร์ติชันต่อไปนี้ โปรดทำเครื่องหมายในช่องถัดจากพาร์ติชั่นที่จะรวมไว้ในเมนูบู๊ต คุณยังสามารถตั้งชื่อพาร์ติชั่นได้ตามที่คุณต้องการให้ปรากฏในเมนูบู๊ต
+After five seconds	DefaultPartitionPage		หลังจากห้าวินาที
+Timeout: %s	DefaultPartitionPage		หมดเวลา: %s
+The Master Boot Record could not be restored!	BootManagerController		ไม่สามารถกู้คืน Master Boot Record ได้!
+The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager only works with IBM PC MBR partitions.	BootManagerController		ตารางพาร์ติชันของฮาร์ดดิสก์ตัวแรกไม่สามารถทำงานร่วมกับ Boot Manager ได้ \nBoot Manager ใช้งานได้กับพาร์ติชัน IBM PC MBR เท่านั้น
+Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		โปรดเลือกไดรฟ์ที่คุณต้องการให้ตัวจัดการการบูตติดตั้งหรือถอนการติดตั้ง
+After four seconds	DefaultPartitionPage		หลังจากสี่วินาที
+Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	ไม่ได้ตั้งชื่อ %d
+First partition starts too early	BootManagerController	Title	พาร์ติชันแรกเริ่มเร็วเกินไป
+About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		กำลังจะเขียนเมนูบูตไปยังดิสก์ คุณแน่ใจหรือว่าต้องการดำเนินการต่อ
+Partitions	DefaultPartitionPage	Pop up menu title	พาร์ทิชัน
+Default Partition:	DefaultPartitionPage	Menu field label	พาร์ติชันเริ่มต้น:
+Next	WizardView	Button	ถัดไป
+Previous	WizardView	Button	ก่อนหน้า
+Uninstallation of boot menu failed	BootManagerController	Title	การถอนการติดตั้งเมนูบูตล้มเหลว
+Incompatible format!	DrivesPage	Cannot install	รูปแบบที่เข้ากันไม่ได้!
+Old Master Boot Record saved	BootManagerController	Title	บันทึก Old Master Boot Record แล้ว
+Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		โปรดระบุพาร์ติชั่นเริ่มต้นและหมดเวลา \nเมนูบู๊ตจะโหลดพาร์ติชั่นเริ่มต้นหลังจากหมดเวลาเว้นแต่คุณจะเลือกพาร์ติชั่นอื่น นอกจากนี้คุณยังสามารถให้เมนูการบู๊ตรอเพื่อให้คุณเลือกพาร์ติชันได้อย่างไม่มีกำหนด \nกดปุ่ม 'ALT' ค้างไว้เพื่อปิดใช้งานการหมดเวลาขณะบู๊ต
+Partitions	PartitionsPage	Title	พาร์ทิชัน
+Uninstallation of boot menu completed	BootManagerController	Title	การถอนการติดตั้งเมนูบูตเสร็จสมบูรณ์
+After two seconds	DefaultPartitionPage		หลัวจากสองวินาที
+Partition table not compatible	BootManagerController	Title	ตารางพาร์ติชันไม่เข้ากัน
+The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		Master Boot Record ของอุปกรณ์สำหรับบู๊ต (%DISK) ได้รับการกู้คืนสำเร็จแล้วจาก %FILE
+Done	BootManagerController	Button	เสร็จแล้ว
+BootManager	System name		BootManager
+Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		โปรดค้นหาไฟล์บันทึก Master Boot Record (MBR) ที่จะกู้คืนจาก นี่เป็นไฟล์ที่สร้างขึ้นเมื่อติดตั้งตัวจัดการการบูตครั้งแรก
+Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		โปรดค้นหาไฟล์บันทึก Master Boot Record (MBR) ที่จะกู้คืนจาก นี่เป็นไฟล์ที่สร้างขึ้นเมื่อติดตั้งตัวจัดการการบูตครั้งแรก
+About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	กำลังจะกู้คืน Master Boot Record (MBR) ของ %disk จาก %file คุณต้องการจะทำต่อไปหรือไม่?
+Install	DrivesPage	Button	ติดตั้ง
+File:	FileSelectionPage	Text control label	ไฟล์:
+Error reading partition table	BootManagerController	Title	เกิดข้อผิดพลาดในการอ่านตารางพาร์ติชัน
+Back	BootManagerController	Button	กลับ
+The boot manager has been successfully installed on your system.	BootManagerController		ติดตั้งตัวจัดการการบูตเรียบร้อยแล้วบนระบบของคุณ
+The old Master Boot Record could not be saved to %s. You can continue the installation but there will be no way to uninstall the boot menu.	BootManagerController		ไม่สามารถบันทึก Master Boot Record เก่าเป็น %s คุณสามารถทำการติดตั้งต่อไปได้ แต่จะไม่มีวิธีในการถอนการติดตั้งเมนูการบูต

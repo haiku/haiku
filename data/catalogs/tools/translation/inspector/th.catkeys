@@ -1,0 +1,32 @@
+1	thai	x.vnd.OBOS-Inspector	577867100
+\nInput Formats:	ImageView		\nรูปแบบอินพุต:
+Next Page	ImageWindow		หน้าถัดไป
+Previous Page	ImageWindow		ก่อนหน้า
+Active Translators	InspectorApp		ตัวแปลที่ใช้งานอยู่
+System Translators	ActiveTranslatorsWindow		ผู้แปลระบบ
+\nType: '%1' (%2)\nGroup: '%3' (%4)\nQuality: %5\nCapability: %6\nMIME Type: %7\nName: %8\n	ImageView		\nชนิด: '%1' (%2)\nกลุ่ม: '%3' (%4)\nคุณสมบัติ: %5\nความสามารถ: %6\nชนิด MIME: %7\nชื่อ: %8\n
+OK	ImageWindow		ตกลง
+View	ImageWindow		ดู
+Open…	ImageWindow		เปิด
+Save feature not implemented yet.	ImageWindow		ยังไม่ได้ใช้คุณสมบัติการบันทึก
+Active Translators	ImageWindow		ตัวแปลที่ใช้งาน
+Info	ImageWindow		ข้อมูล
+Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal Bytes: %7\n\nIdentify Info:\nID String: %8\nMIME Type: %9\nType: '%10' (%11)\nTranslator ID: %12\nGroup: '%13' (%14)\nQuality: %15\nCapability: %16\n\nExtension Info:\n	ImageView		ภาพ: %1\nระยะห่างของสี: %2 (%3)\nขนาด: %4 x %5\nจำนวนไบต์ต่อแถว: %6\nจำนวนไบต์ทั้งหมด: %7\n\nระบุข้อมูล:\nสตริง ID: %8\nชนิด MIME: %9\nชนิด: '%10' (%11)\nID ผู้แปล: %12\nกลุ่ม: '%13' (%14)\nคุณภาพ: %15\nความสามารถ: %16\n\nข้อมูลเพิ่มเติม:\n
+No image available to save.	ImageWindow		ไม่มีภาพที่จะบันทึก
+OK	ImageView		ตกลง
+Bummer	ImageWindow		Bummer
+\nOutput Formats:	ImageView		\nรูปแบบเอาท์พุท:
+Number of Documents: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		จำนวนของเอกสาร: %1\n\nตัวแปลที่ใช้:\nชื่อ: %2\nข้อมูล: %3\nเวอร์ชั่น: %4\n
+User Translators	ActiveTranslatorsWindow		ตัวแปลสำหรับผู้ใช้งาน
+Last Page	ImageWindow		หน้าสุดท้าย
+\nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\nตัวแปลที่ใช้:\nชื่อ: %1\nข้อมูล: %2\nเวอร์ชั่น: %3\n
+Unknown	ImageView		ไม่ทราบ
+Info Win	InspectorApp	This is a quite narrow info window and title 'Info Win' is therefore shortened.	ข้อมูล Win
+Sorry, unable to load the image.	ImageView		ขออภัยไม่สามารถโหลดภาพ
+File	ImageWindow		ไฟล์
+Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		เอกสารที่เลือก: %1\n\nตัวแปลที่ใช้:\nชื่อ: %2\nข้อมูล: %3\nเวอร์ชั่น: %4\n
+Quit	ImageWindow		ปิด
+Sorry, unable to write the image file.	ImageView		ขออภัยไม่สามารถเขียนไฟล์ภาพ
+Save…	ImageWindow		บันทึก
+Window	ImageWindow		หน้าต่าง
+First Page	ImageWindow		หน้าแรก

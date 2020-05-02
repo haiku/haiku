@@ -3,16 +3,16 @@ Lab	PSDLoader		Lab
 Uncompressed	PSDConfig		Non compresso
 Indexed	PSDLoader		Indicizzato
 Grayscale	PSDLoader		Scala di grigio
-Photoshop image translator	PSDConfig		Translator immagine Photoshop
-Photoshop image translator	PSDTranslator		Translator immagine Photoshop
+Photoshop image translator	PSDConfig		Traduttore immagine Photoshop
+Photoshop image translator	PSDTranslator		Traduttore immagine Photoshop
 Version %d.%d.%d, %s	PSDConfig		Versione %d.%d.%d, %s
 Photoshop Document (PSD file)	PSDConfig		Documento Photoshop (file PSD)
-Photoshop image	PSDTranslator		immagine Photoshop
+Photoshop image	PSDTranslator		Immagine Photoshop
 RLE	PSDConfig		RLE
 Photoshop Big Document (PSB file)	PSDConfig		Photoshop Big Document (file PSB)
 RGBA	PSDLoader		RGBA
 Photoshop image (%s)	PSDTranslator		Immagine Photoshop (%s)
-PSDTranslator Settings	PSDConfig		Impostazioni Translator PSD
+PSDTranslator Settings	PSDConfig		Impostazioni Traduttore immagine Photoshop
 RGB	PSDLoader		RGB
 Bitmap	PSDLoader		Bitmap
 CMYK	PSDLoader		CMYK

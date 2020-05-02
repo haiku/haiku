@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-HaikuDepot	3586526058
+1	romanian	x-vnd.Haiku-HaikuDepot	3381858533
 Repository update error	LocalRepositoryUpdateProcess		Eroare la actualizarea depozitului
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		A apărut o eroare în timpul reîmprospătării depozitului: %error%
 User Created	UserLoginWindow		Utilizator creat
@@ -37,6 +37,7 @@ Switch account…	MainWindow		Schimbare cont…
 Preferred language:	UserLoginWindow		Limbă preferată:
 Server Error	ServerHelper		Eroare de server
 Name	PackageListView		Nume
+Authorization or security issue. Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		Problemă de autorizație sau securitate. Deautentificați-vă și autentificați-vă din nou pentru a verifica că parola este corectă și de asemenea verifica dacă ați fost de acod cu ultimele condiții de utilizare.
 Local	LocalPkgDataLoadProcess		Local
 Rate %Package%	RatePackageWindow		Evaluează %Package%
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		A apărut o eroare în timpul inițializării administratorului de pachete: %message%
@@ -56,6 +57,7 @@ There was a puzzling response from the web service.	UserLoginWindow		A apărut u
 Not logged in	MainWindow		Nu sunteți autentificat
 No, quit HaikuDepot	App		Nu, închideți HaikuDepot
 Featured packages	FeaturedPackagesView		Pachete recomandate
+The supplied response to the captcha is incorrect. A new captcha will be generated; try again.	UserLoginWindow		Răspunsul furnizat pentru captcha nu este corect. O captcha nouă va fi generată, încercați din nou.
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Nu a fost posibil să comunicați cu serverul pentru a obține imaginea captcha necesară pentru a crea un utilizator nou.
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Evaluarea a fost încărcată cu succes. Puteți să o actualizați sau să o eliminați pe pagina web Server HaikuDepot.
 Network Error	ServerHelper		Eroare de rețea
@@ -103,12 +105,14 @@ Close	RatePackageWindow		Închidere
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Se sincronizează datele pachetelor pentru depozitul „%REPO_NAME%”
 View the usage conditions	UserLoginWindow		Vizualizați condițiile de utilizare
 Login issue	MainWindow		Problemă de autentificare
-Size	PackageListView		Mărime
 Your rating:	RatePackageWindow		Evaluare:
+Size	PackageListView		Mărime
+The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		Utilizatorul %Nickname% a fost creat cu succes în sistemul HaikuDepotServer. Puteți administra detaliile utilizatorului utilizând interfața web. Acum sunteți autentificat ca acest utilizator nou.
 Your rating was updated.	RatePackageWindow		Evaluarea a fost actualizată.
 All categories	FilterView		Toate categoriile
 Repositories	MainWindow		Depozite
 n/a	PackageInfoView		n/a
+This rating is visible to other users	RatePackageWindow		Această clasificare este vizibilă și altora
 View agreed usage conditions…	MainWindow		Vizualizați condițiile de utilizare convenite…
 Cancel	MainWindow		Anulează
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 more to download)}other{(# more to download)}}
@@ -147,13 +151,16 @@ Email address:	UserLoginWindow		Adresă email:
 Screenshot	ScreenshotWindow		Captură ecran
 HaikuDepot	System name		HaikuDepot
 A reboot is necessary to complete the installation process.	PackageManager		O repornire este necesară pentru a completa procesul de instalare.
+{0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{I am at least one year old}other{I am # years of age or older}}
 View latest usage conditions…	MainWindow		Vizualizați ultimele condiții de utilizare…
 Quit	App		Ieșire
 Search terms:	FilterView		Termeni de căutat:
 Pending…	PackageListView		În așteptare…
+The nickname is malformed. The nickname may only contain digits and lower case latin characters. The nickname must be between four and sixteen characters in length.	UserLoginWindow		Pseudonimul este deformat. Pseudonimul poate să conțină doar numere și caractere latine ca litere mici. Pseudonimul trebuie să fie între patru și șaisprezece caractere ca lungime.
 Category:	FilterView		Categorie:
 Authentication failed	UserLoginWindow		Autentificarea a eșuat
 Captcha error	UserLoginWindow		Eroare captcha
+The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		Pseudonimul trebuie să fie unic, dar pseudonimul furnizat este deja luat. Alegeți un pseudonim diferit.
 Manage repositories…	MainWindow		Gestionare depozite...
 Fetching remote repository data	LocalRepositoryUpdateProcess		Se aduc datele depozitului de la distanță
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	UserLoginWindow		O eroare a apărut în timpul descărcării condițiilor de utilizare necesare pentru a crea un utilizator. Verificați istoricul pentru detalii și încercați mai târziu. \nInformații despre cum se poate vizualiza istoricul sunt disponibile în secțiunea HaikuDepot a ghidului de utilizare.
@@ -162,6 +169,7 @@ Open %DeskbarLink%	PackageManager		Deschide %DeskbarLink%
 User creation error	UserLoginWindow		Eroare la crearea utilizatorului
 Install	PackageManager		Instalare
 Input validation	UserLoginWindow		Validare intrare
+This application is too old to communicate with the HaikuDepot server system. Obtain a newer version of HaikuDepot by updating your Haiku system. The minimum version of HaikuDepot required is \"%s\".	ServerHelper		Aceasă aplicație ese prea veche penru a comunica cu sistemul de server HaikuDepot. Obțineți o nouă versiune a HaikuDepot prin actualizarea sistemului Haiku. Versiunea minimă necesară a HaikuDepot este \„%s\”.
 An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		O eroare neașteptată a fost trimisă de la serverul HaikuDepot [%i]
 Log in…	MainWindow		Autentificare…
 You need to be logged into an account before you can rate packages.	MainWindow		Trebuie să fiți autentificat într-un cont înainte de a evalua pachete.

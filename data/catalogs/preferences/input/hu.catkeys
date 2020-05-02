@@ -1,15 +1,18 @@
-1	hungarian	x-vnd.Haiku-Input	2781843343
+1	hungarian	x-vnd.Haiku-Input	3057235606
 Scrolling	TouchpadPrefView		Görgetés
 Defaults	InputMouse		Alapértékek
 Tapping	TouchpadPrefView		Pöccintés
 Long	KeyboardView		Hosszú
 Normal	SettingsView		Normál
 Cancel	TouchpadPrefView		Mégse
+4-Button	SettingsView		4 gombos
 Slow	TouchpadPrefView		Lassú
 Device List	InputWindow		Eszközök
 Double-click speed	SettingsView		Dupla-kattintás sebessége
+5-Button	SettingsView		5 gombos
 Typing test area	KeyboardView		Gépelés próba
 Mouse type:	SettingsView		Egér típusa:
+Revert	InputKeyboard		Visszaállít
 Fast	KeyboardView		Gyors
 Off	TouchpadPrefView		Ki
 Fast	TouchpadPrefView		Gyors
@@ -24,14 +27,16 @@ Delay until key repeat	KeyboardView		Billentyű-ismétlés késleltetése
 Two finger scrolling	TouchpadPrefView		Két ujjas görgetés
 Input	System name		Bemenet
 Mouse acceleration	SettingsView		Egér gyorsítása
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Az új görgető-terület nagyon nagy és akadályozhatja a hagyományos egér-műveleteket. Biztosan megváltoztatod?
 High	TouchpadPrefView		Nagy
 Defaults	TouchpadPrefView		Alapértékek
-1-Button	SettingsView		1. gomb
+1-Button	SettingsView		1 gombos
+Defaults	InputKeyboard		Alapértékek
 Short	KeyboardView		Rövid
 Slow	KeyboardView		Lassú
 Revert	InputMouse		Visszaállít
 Key repeat rate	KeyboardView		Billentyű-ismétlés
-2-Button	SettingsView		2. gomb
+2-Button	SettingsView		2 gombos
 Click to focus and raise	SettingsView		Fókusz és előtérbe hozás kattintásra
 Vertical	TouchpadPrefView		Függőleges
 Horizontal	TouchpadPrefView		Vízszintes
@@ -39,5 +44,5 @@ Focus mode:	SettingsView		Fókusz-mód:
 Focus follows mouse	SettingsView		A fókusz kövesse az egeret
 Double-click test area	SettingsView		Dupla-kattintási terület
 Sensitivity	TouchpadPrefView		Érzékenység
-3-Button	SettingsView		3. gomb
+3-Button	SettingsView		3 gombos
 Revert	TouchpadPrefView		Visszaállít

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Network	115295218
+1	hungarian	x-vnd.Haiku-Network	2923905377
 Ethernet device	InterfaceListItem		Vezetékes eszköz
 Link speed:	IntefaceView		Kapcsolat sebessége:
 disconnected	IntefaceView		leválasztva
@@ -47,6 +47,7 @@ Status:	IntefaceView		Állapot:
 Disable	IntefaceView		Letiltás
 Manage…	NetworkWindow		Kezelés…
 open	Open network		titkosítatlan
+Network	System name		Hálózat
 Your gateway to the internet	IntefaceAddressView		Az átjáró az internetre
 Enable	ServiceView		Engedélyezés
 Wireless device	InterfaceListItem		Vezetéknélküli eszköz

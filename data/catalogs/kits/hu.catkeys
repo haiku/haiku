@@ -10,7 +10,7 @@ OK	PrintJob		Rendben
 Print Server is not responding.	PrintJob		A nyomtatókiszolgáló nem válaszol.
 About %app%	AboutMenuItem		%app% névjegye
 Warning	Dragger		Figyelmeztetés
-Green:	ColorControl		Zöld:
+Green:	ColorControl		Zöld
 Redo	TextView		Újra
 No pages to print!	PrintJob		Nincs nyomtatható oldal!
 beta	AboutWindow		béta
@@ -25,7 +25,7 @@ Special Thanks:	AboutWindow		Külön köszönet:
 %.2f TiB	StringForSize		%.2f TiB
 Remove replicant	Dragger		Replikáns eltávolítása
 Version	AboutWindow		Verzió
-Red:	ColorControl		Vörös:
+Red:	ColorControl		Vörös
 <empty>	Menu		<üres>
 Copy	TextView		Másolás
 Select all	TextView		Összes kijelölése
@@ -37,6 +37,6 @@ About %app…	Dragger		%app névjegye…
 Version history:	AboutWindow		Előző verziók:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Nem található a replikánshoz tartozó program. Nincs megadva programaláírás.\n%error
 %3.2f KiB	StringForSize		%3.2f KiB
-Blue:	ColorControl		Kék:
+Blue:	ColorControl		Kék
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Nem lehet replikánst létrehozni ehhez: %description.\n%error
 Written by:	AboutWindow		Írta:

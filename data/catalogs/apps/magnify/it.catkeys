@@ -15,7 +15,7 @@ usage: magnify [size] (magnify size * size pixels)	Console		uso: magnify [fattor
 Increase window size	Magnify-Main		Aumenta la dimensione della finestra
 Save image	Magnify-Main		Salva immagine
 Show grid	Magnify-Main		Mostra griglia
-Magnify	System name		Magnify
+Magnify	System name		Ingrandimento
 Info	Magnify-Main		Informazioni
 Show info	Magnify-Main		Mostra informazioni
 Make square	Magnify-Main		Rendi la finestra quadrata

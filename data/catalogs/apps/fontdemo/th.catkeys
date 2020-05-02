@@ -1,0 +1,17 @@
+1	thai	x-vnd.Haiku-FontDemo	3449067186
+Stop cycling	ControlView		หยุดหมุน
+Haiku, Inc.	FontDemoView		Haiku, Inc.
+Rotation: %d	ControlView		หมุน: %d
+Shear: %d	ControlView		ตัด: %d
+Spacing: %d	ControlView		ระยะห่าง: %d
+Cycle fonts	ControlView		หมุนเวียนตัวอักษร
+Font:	ControlView		ตัวอักษร:
+Drawing mode:	ControlView		โหมดการวาดภาพ:
+Haiku, Inc.	ControlView		Haiku, Inc.
+Controls	FontDemo		ควบคุม
+FontDemo	System name		ตัวอักษร Demo
+Outline: %d	ControlView		รูปร่าง: %d
+Text:	ControlView		ข้อความ:
+Antialiased text	ControlView		ข้อความที่มีขอบเรียบ
+Bounding boxes	ControlView		Bounding boxes
+Size: %d	ControlView		ขนาด: %d

@@ -1,0 +1,79 @@
+1	thai	x-vnd.Haiku-Appearance	663472720
+Control border	Colors tab		ควบคุมกรอบ
+Control mark	Colors tab		ควบคุมเครื่องหมาย
+Off	AntialiasingSettingsView		ปิด
+Window border	Colors tab		ขอบหน้าต่าง
+Inactive window tab	Colors tab		แท็บหน้าต่างที่ไม่ได้ใช้งาน
+Defaults	APRWindow		ค่าเริ่มต้น
+Shadow	Colors tab		เงา
+Document background	Colors tab		พื้นหลังเอกสาร
+List background	Colors tab		พื้นหลังรายการ
+No effect on running applications	DecorSettingsView		ไม่มีผลกับแอปพลิเคชันที่ทำงานอยู่
+Fixed font:	Font view		ตัวอักษรคงที่:
+Appearance	System name		การแสดง
+Reduce colored edges filter strength:	AntialiasingSettingsView		ลดความเข้มของตัวกรองขอบสี:
+Glyph hinting:	AntialiasingSettingsView		สัญลักษณ์คำใบ้:
+Default Haiku ControlLook	DecorSettingsView		ค่าเริ่มต้นการควบคุม Haiku
+Menu item text	Colors tab		ข้อความรายการ
+About decorator	DecorSettingsView		เกี่ยวกับการตกแต่ง
+Antialiasing menu	AntialiasingSettingsView		เมนูลดรอยขอบ
+Success	Colors tab		สำเร็จ
+About	DecorSettingsView		เกี่ยวกับ
+Shine	Colors tab		สว่าง
+Arrow style	DecorSettingsView		รูปแบบลูกศร
+On	AntialiasingSettingsView		เปิด
+Decorator:	DecorSettingsView		ตกแต่ง:
+Menu background	Colors tab		พื้นหลังของเมนู
+Revert	APRWindow		เปลี่ยนกลับ
+List item text	Colors tab		แสดงรายการข้อความ
+OK	DecorSettingsView		ตกลง
+Control text	Colors tab		ควบคุมข้อความ
+Look and feel	APRWindow		มองและรู้สึก
+Selected menu item background	Colors tab		พื้นหลังรายการเมนูที่เลือก
+Link active	Colors tab		ลิงก์ใช้งานได้
+Antialiasing	APRWindow		รอยขอบ
+Menu font:	Font view		แบบอักษรของเมนู:
+Bold font:	Font view		ตัวอักษรหนา:
+%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nผู้เขียน:\n\t%decorAuthors\n\nURL: %decorURL\nใบอนุญาต: %decorLic\n\n%decorDesc\n
+Choose Decorator	DecorSettingsView		เลือกตัวตกแต่ง
+Strong	AntialiasingSettingsView		หนา
+Failure	Colors tab		ล้มเหลว
+Double:	DecorSettingsView		สองเท่า:
+Selected menu item text	Colors tab		ข้อความรายการเมนูที่เลือก
+Size:	Font Selection view		ขนาด:
+Panel background	Colors tab		พื้นหลังของ Panel
+Plain font:	Font view		ตัวอักษรธรรมดา:
+Window tab text	Colors tab		ข้อความแท็บหน้าต่าง
+Navigation pulse	Colors tab		อัตรา Navigation
+LCD subpixel	AntialiasingSettingsView		LCD subpixel
+Window tab	Colors tab		แท็ปหน้าต่าง
+Link text	Colors tab		ลิงก์ข้อความ
+Tooltip background	Colors tab		พื้นหลังเคล็ดลับเครื่องมือ
+ControlLook:	DecorSettingsView		ควบคุมการดู:
+Scroll bar thumb	Colors tab		ปุ่มแถบเลื่อน
+Default	DecorSettingsView		ค่าเริ่มต้น
+Link visited	Colors tab		ลิงก์เข้าเยี่ยมชม
+Selected menu item border	Colors tab		กรอบรายการเมนูที่เลือก
+Tooltip text	Colors tab		ข้อความคำแนะนำเครื่องมือ
+Control background	Colors tab		พื้นหลังควบคุม
+Selected list item text	Colors tab		ข้อความรายการในรายการที่เลือก
+Selected list item background	Colors tab		พื้นหลังรายการที่เลือก
+Inactive window tab text	Colors tab		ข้อความแท็บหน้าต่างที่ไม่ได้ใช้งาน
+Navigation base	Colors tab		ฐานข้อมูล Navigation
+Fonts	APRWindow		ตัวอักษร
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	สุนัขจิ้งจอกสีน้ำตาลอย่างรวดเร็วกระโดดข้ามสุนัขขี้เกียจ
+Grayscale	AntialiasingSettingsView		ระบบสี Grayscale
+Antialiasing type:	AntialiasingSettingsView		ชนิดขอบ:
+Panel text	Colors tab		Panel ข้อความ 
+Hinting menu	AntialiasingSettingsView		เมนูคำแนะนำ
+Scroll bar:	DecorSettingsView		แถบเลื่อน:
+Choose ControlLook	DecorSettingsView		เลือกลักษณะการควบคุม
+Monospaced fonts only	AntialiasingSettingsView		ตัวอักษรแบบกว้างขนาดเดียวเท่านั้น
+Document text	Colors tab		ข้อความเอกสาร
+Inactive window border	Colors tab		กรอบหน้าต่างที่ไม่ได้ใช้งาน
+Colors	APRWindow		สี
+About control look	DecorSettingsView		เกี่ยวกับรูปลักษณ์การควบคุม
+Control highlight	Colors tab		ไฮไลต์การควบคุม
+Status bar	Colors tab		สถานะบาร์
+Link hover	Colors tab		Link hover
+Single:	DecorSettingsView		เดี่ยว:

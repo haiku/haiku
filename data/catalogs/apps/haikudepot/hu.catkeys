@@ -97,15 +97,15 @@ Close	RatePackageWindow		Bezárás
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Csomagadatok szinkronizálása a tárolóból: '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Felhasználási feltételek
 Login issue	MainWindow		Belépési hiba
-Size	PackageListView		Méret
 Your rating:	RatePackageWindow		Saját értékelés:
+Size	PackageListView		Méret
 Your rating was updated.	RatePackageWindow		Az értékelés módosítása sikerült.
 All categories	FilterView		Minden kategória
 Repositories	MainWindow		Tárolók
 n/a	PackageInfoView		nincs értékelve
 View agreed usage conditions…	MainWindow		Jóváhagyott felhasználási feltételek…
 Cancel	MainWindow		Mégse
-{0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 letötés)}other{(# letöltés)}}
+{0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(még 1 letöltés)}other{(még # letöltés)}}
 Refresh repositories	MainWindow		Tárolók frissítése
 Tools	MainWindow		Eszközök
 Continue	App		Folytatás

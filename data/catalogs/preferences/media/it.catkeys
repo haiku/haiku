@@ -1,12 +1,14 @@
-1	italian	x-vnd.Haiku-Media	1682972002
+1	italian	x-vnd.Haiku-Media	582516163
 Couldn't add volume control in Deskbar: %s\n	Media views		Non è stato possibile aggiungere il controllo del volume nella Deskbar: %s\n
 Restart media services	Media views		Riavvio servizi media
 Quit	Media Window		Esci
 <none>	VideoInputMenu	Used when no video input is available	<nessuno>
 Couldn't remove volume control in Deskbar: %s\n	Media views		Non è stato possibile rimuovere il controllo del volume nella Deskbar: %s\n
 Video output:	Media views		Uscita video:
-Video input:	Media views		Ingresso Video:
+Video input:	Media views		Ingresso video:
 Audio output:	Media views		Uscita audio:
+Please select a SoundFont.	Midi View		Per favore, scegli un SoundFont.
+There are no SoundFonts installed.	Midi View		Non ci sono SoundFont installati.
 Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Chiudendo Media adesso si impedirà ai servizi media di riavviarsi. Ciò comporterà probabilmente funzionalità media peggiorate o del tutto assenti.
 Could not connect to the media server.\nWould you like to start it ?	Media Window		Impossibile connettersi al media server.\nAvviarlo?
 Video settings	Media Window		Impostazioni video
@@ -18,6 +20,7 @@ Quit anyway	Media Window		Esci comunque
 Media	System name		Media
 Warning!	Media Window		Avvertimento!
 MIDI Settings	Media Window		Impostazioni MIDI
+SoundFonts	Midi View		SoundFont
 Audio input:	Media views		Ingresso audio:
 <none>	Media views		<nessuna>
 Channel:	Media views		Canale:

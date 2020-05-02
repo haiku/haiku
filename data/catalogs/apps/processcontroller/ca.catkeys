@@ -3,7 +3,7 @@ Error saving file	ProcessController		Error en desar el fitxer
 Display priority	ProcessController		Mostra'n la prioritat
 That's no Fun!	ProcessController		No té cap gràcia!
 What do you want to do with the team \"%s\"?	ProcessController		Què voleu fer amb l’equip \"%s\"?
-Your setting file could not be saved!\n(%s)	ProcessController		o ha estat possible desar les vostres preferències!\n(%s)
+Your setting file could not be saved!\n(%s)	ProcessController		No s'ha pogut desar la configuració!\n(%s)
 Processor %d	ProcessController		Processador %d
 Live in the Deskbar	ProcessController		Viu a la barra d’escriptori
 Kill this team!	ProcessController		Mata aquest equip!

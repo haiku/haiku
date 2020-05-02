@@ -5,7 +5,7 @@ New person…	People		Νέο έπαφη...
 Address	People		Όδος
 Zip	People		Τ.Κ.
 Select all	People		Επιλογή όλων
-Could not create %s.	People		Δεν ήταν δυνατή η δημιουργεία %S
+Could not create %s.	People		Δεν ήταν δυνατή η δημιουργία του %s.
 Quit	People		Έξοδος
 Company	People		Εταιρεία
 Name	People		Όνομα

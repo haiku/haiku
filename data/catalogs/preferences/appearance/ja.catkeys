@@ -24,7 +24,7 @@ Arrow style	DecorSettingsView		矢印のスタイル
 On	AntialiasingSettingsView		有効
 Decorator:	DecorSettingsView		デコレーター:
 Menu background	Colors tab		メニューの背景
-Revert	APRWindow		元に戻す
+Revert	APRWindow		戻す
 List item text	Colors tab		リスト項目の文字
 OK	DecorSettingsView		OK
 Control text	Colors tab		コントロールの文字

@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Appearance	3342844385
+1	greek, modern (1453-)	x-vnd.Haiku-Appearance	143245608
 Control border	Colors tab		Έλεγχος περιγράμματος
 Off	AntialiasingSettingsView		Κλειστό
 Window border	Colors tab		Περιθώριο Παραθύρου
@@ -21,10 +21,13 @@ OK	DecorSettingsView		Εντάξει
 Control text	Colors tab		Κείμενο ελέγχου
 Selected menu item background	Colors tab		Φόντο επιλεγμένου μενού
 Antialiasing	APRWindow		Εξομάλυνση
+Menu font:	Font view		Γραμματοσειρά μενού:
+%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nΣυγγραφείς:\n\t%decorAuthors\n\nURL: %decorURL\nΆδεια χρήσης: %decorLic\n\n%decorDesc\n
 Choose Decorator	DecorSettingsView		Επιλέξετε Διακοσμητή
 Strong	AntialiasingSettingsView		Ισχυρό
 Failure	Colors tab		Αποτυχία
 Selected menu item text	Colors tab		Επιλεγμένο κείμενο μενού
+Size:	Font Selection view		Μέγεθος:
 Panel background	Colors tab		Φόντο πλαισίου
 Window tab text	Colors tab		Κείμενο καρτέλας παράθυρου
 Navigation pulse	Colors tab		Παλμός πλοήγησης

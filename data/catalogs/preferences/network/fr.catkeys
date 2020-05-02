@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Network	115295218
+1	french	x-vnd.Haiku-Network	2923905377
 Ethernet device	InterfaceListItem		Périphérique Ethernet
 Link speed:	IntefaceView		Vitesse du lien :
 disconnected	IntefaceView		déconnecté
@@ -47,6 +47,7 @@ Status:	IntefaceView		État :
 Disable	IntefaceView		Désactiver
 Manage…	NetworkWindow		Gérer…
 open	Open network		ouvrir
+Network	System name		Réseau
 Your gateway to the internet	IntefaceAddressView		Votre passerelle vers l’internet
 Enable	ServiceView		Activer
 Wireless device	InterfaceListItem		Périphérique sans fil

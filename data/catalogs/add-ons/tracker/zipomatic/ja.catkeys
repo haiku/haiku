@@ -1,7 +1,7 @@
 1	japanese	x-vnd.haiku.zip-o-matic	2032806096
 Drop files here.	file:ZipOMaticWindow.cpp		ここにファイルをドロップしてください。
 Filename: %s	file:ZipOMaticWindow.cpp		ファイル名: %s
-Do you want to stop them?	file:ZipOMatic.cpp		中止しますか？
+Do you want to stop them?	file:ZipOMatic.cpp		中止しますか?
 Error creating archive	file:ZipOMaticWindow.cpp		アーカイブの作成中にエラーが発生しました。
 Stop them	file:ZipOMatic.cpp		これらを中止
 Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		アーカイブの作成を中止しますか?

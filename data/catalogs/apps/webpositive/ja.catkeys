@@ -98,7 +98,7 @@ Restart	Download Window		再開
 Serif font:	Settings Window		セリフフォント:
 Apply	Settings Window		適用
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	ブックマークフォルダーを表示する際にエラーが発生しました。\n\nエラー: %error
-Revert	Settings Window		元に戻す
+Revert	Settings Window		戻す
 Copy	WebPositive Window		コピー
 Default standard font size:	Settings Window		標準フォントサイズ:
 Bookmark this page	WebPositive Window		このページをブックマーク

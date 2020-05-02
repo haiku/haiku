@@ -1,6 +1,6 @@
 1	catalan; valencian	x-vnd.Haiku-ActivityMonitor	1155619009
 P-faults	DataSource		Averies de P
-Media nodes	DataSource		Nodes del media
+Media nodes	DataSource		Nodes de mitjans
 Threads	DataSource		Fils
 Always on top	ActivityWindow		Sempre a primer pla
 Add graph	ActivityWindow		Afegeix un gràfic
@@ -9,7 +9,7 @@ MiB	DataSource		MiB
 Network send	DataSource		Envia amb la xarxa
 CPU usage (combined)	DataSource		Ús de la CPU (combinat)
 CPU	DataSource		CPU
-Used memory	DataSource		Memòria utilitzada
+Used memory	DataSource		Memòria usada
 Cached memory	DataSource		A la memòria cau
 Apps	DataSource		Aplicacions
 Show legend	ActivityView		Mostra la llegenda
@@ -36,7 +36,7 @@ Sems	DataSource		Sems
 ActivityMonitor	System name		Monitor d'Activitat
 Running applications	DataSource		Aplicacions en execució
 Semaphores	DataSource		Semàfors
-Block cache	DataSource		Cau de blocs
+Block cache	DataSource		Bloca la cau
 Swap space	DataSource		Espai d'intercanvi
 Swap	DataSource		Memòria d'intercanvi
 File	ActivityWindow		Fitxer

@@ -9,7 +9,7 @@ Error converting '%filename'	MediaConverter		Errore convertendo '%filename'
 Selected directory not found. Defaulting to /boot/home	MediaConverter		La cartella selezionata non è stata trovata. Impostata come predefinita su /boot/home
 Conversion completed	MediaConverter		Conversione completa
 Audio:	MediaConverter-FileInfo		Audio:
-MediaConverter+:SaveDirectory	MediaConverter		MediaConverter+:SaveDirectory
+MediaConverter+:SaveDirectory	MediaConverter		Convertitore Media+:Salva cartella
 Error creating video.	MediaConverter		Errore nella creazione del video.
 Cancelling	MediaConverter		Cancellando
 None available	Audio codecs		Nessuno disponibile
@@ -18,7 +18,7 @@ High	MediaConverter		Alto
 {0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{Il file non è stato riconosciuto tra i file media supportati:} other{# file non sono stati riconosciuti tra i file media supportati:}}
 File Error	MediaConverter-FileInfo		File errore
 None available	Video codecs		Nessuno disponibile
-Output format	MediaConverter		Formato di output
+Output format	MediaConverter		Formato di uscita
 %.1f kHz mono	MediaFileInfo		%.1f kHz mono
 %.1f kHz stereo	MediaFileInfo		%.1f kHz stereo
 OK	MediaConverter		OK
@@ -29,7 +29,7 @@ Open…	Menu		Apri...
 Audio encoding:	MediaConverter		Codifica Audio:
 Audio quality: %3d%%	MediaConverter		Qualità audio: %3d%%
 Cancelling…	MediaConverter		Annullamento di...
-Output file '%filename' created	MediaConverter		File di output '%filename' creato
+Output file '%filename' created	MediaConverter		File di uscita '%filename' creato
 Output folder	MediaConverter		Cartella di destinazione
 Error creating track.	MediaConverter		Errore nella creazione della traccia.
  seconds	MediaFileInfo		 secondi
@@ -54,7 +54,7 @@ Drop media files onto this window	MediaConverter		Trascina il media file su ques
 Quit	Menu		Esci
 {0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# byte} other{# byte}}
 Duration:	MediaConverter-FileInfo		Durata:
-MediaConverter	System name		MediaConverter
+MediaConverter	System name		Convertitore Media
 Error launching: %strError%	MediaConverter		Errore di lancio: %strError%
 File format:	MediaConverter		Formato file:
 Error writing audio frame %ld	MediaConverter		Errore nella scrittura del frame audio %ld

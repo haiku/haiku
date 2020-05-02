@@ -3,7 +3,7 @@ TIFF Library:	TIFFView		TIFF ライブラリ:
 RLE (Packbits)	TIFFView		RLE (Packbits)
 ZIP (Deflate)	TIFFView		ZIP (Deflate)
 identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: invalid document index\n
-Use compression:	TIFFView		圧縮方法:
+Use compression:	TIFFView		圧縮方式:
 TIFF image translator	TIFFView		TIFF イメージトランスレーター
 TIFF image	TIFFTranslator		TIFF イメージ
 TIFF Settings	TIFFMain		TIFF 設定

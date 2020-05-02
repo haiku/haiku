@@ -9,7 +9,7 @@ Page setup…	Menus		ページ設定…
 Untitled 	StyledEditWindow		無題
 OK	Statistics		OK
 Find	FindandReplaceWindow		検索
-New	Menus		新規作成
+New	Menus		新規
 Document	Menus		ドキュメント
 Search backwards	FindandReplaceWindow		逆方向検索
 Find again	Menus		次を検索
@@ -70,7 +70,7 @@ Case-sensitive	FindandReplaceWindow		大文字小文字を区別
 Find selection	Menus		選択範囲を検索
 Cancel	SaveAlert		中止
 Find…	Menus		検索…
-Revert	RevertToSavedAlert		元に戻す
+Revert	RevertToSavedAlert		戻す
 Decrease size	Menus		縮小
 Size	Menus		サイズ
 Autodetect	Menus		自動判別

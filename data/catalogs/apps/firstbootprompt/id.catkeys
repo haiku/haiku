@@ -1,8 +1,80 @@
-1	indonesian	x-vnd.Haiku-FirstBootPrompt	2649051796
+1	indonesian	x-vnd.Haiku-FirstBootPrompt	2670843542
+Japanese	KeymapNames		Jepang
+US	KeymapNames		AS
+Esperanto	KeymapNames		Esperanto
+Belarusian	KeymapNames		Belarusia
+Brazilian	KeymapNames		Brazil
+Dvorak	KeymapNames		Dvorak
+Polish	KeymapNames		Polandia
+Latin-American	KeymapNames		Amerika-latin
+Ukrainian	KeymapNames		Ukraina
+Russian (Yawert)	KeymapNames		Rusia (Yawert)
+United-Kingdom	KeymapNames		Britania Raya
+Serbian (Cyrillic)	KeymapNames		Serbia (sirilik)
+Turkish (Type-F)	KeymapNames		Turki(Type-F)
+Bulgarian (Cyrillic)	KeymapNames		Bulgaria (Sirilik)
+Belgian (point)	KeymapNames		Belgia (point)
+Finnish	KeymapNames		Finlandia
+Swedish	KeymapNames		Swedia
+Svorak	KeymapNames		Svorak
+German	KeymapNames		German
+Swiss-German	KeymapNames		Swiss-Jerman
 Keymap	BootPromptWindow		Keymap
+Spanish (Dvorak)	KeymapNames		Spanyol (Dvorak)
+US-International	KeymapNames		AS-Internasional
+Czech	KeymapNames		Ceko
+Turkish (Type-Q)	KeymapNames		Turki(Type-Q)
+Slovak	KeymapNames		Slovakia
+Russian (Udmurt, Komi, Mari)	KeymapNames		Rusia (Udmurt, Komi, Mari)
+Thai (TIS-820.2538)	KeymapNames		Thai (TIS-820.2538)
+Colemak	KeymapNames		Colemak
+Dvorak (programmer's)	KeymapNames		Dvorak (programmer)
+Russian (Mac)	KeymapNames		Rusia (Mac)
 Thank you for trying out Haiku! We hope you'll like it!\n\nYou can select your preferred language and keyboard layout from the list on the left which will then be used instantly. You can easily change both settings from the Desktop later on on the fly.\n\nDo you wish to run the Installer or continue booting to the Desktop?\n	BootPromptWindow	For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	Terima kasih sudah mencoba Haiku! Kami harap anda menyukainya!\n\nAnda dapat memilih tata bahasa dan tata letak keyboard pilihan dari daftar di sebelah kiri yang kemudian akan digunakan secara instan. Anda dapat dengan mudah mengubah kedua pengaturan dari Desktop nanti dengan cepat.\n\nApakah Anda ingin menjalankan Installer atau melanjutkan boot ke Desktop?\n
+German (Mac)	KeymapNames		Jerman (Mac)
+Arabic (102)	KeymapNames		Arab (102)
+Belarusian (Latin)	KeymapNames		Belarusia (Latin)
+Belarusian (Mac)	KeymapNames		Belarusia (Mac)
+Hebrew	KeymapNames		Ibrani
+Greek	KeymapNames		Yunani
+Croatian	KeymapNames		Kroasia
 Run Installer	BootPromptWindow		Jalankan Installer
+Faeroese	KeymapNames		Faero
+Polish (Typewriter)	KeymapNames		Polandia (Typewriter)
+French (Mac)	KeymapNames		Perancis (Mac)
+Spanish	KeymapNames		Sepanyol
+Ukrainian (Mac)	KeymapNames		Ukraina (Mac)
+Estonian	KeymapNames		Estonia
+French (Bépo)	KeymapNames		Perancis (Bépo)
+Serbian (Latin)	KeymapNames		Serbia (Latin)
+Russian (Typewriter)	KeymapNames		Rusia (Typewriter)
+French	KeymapNames		Perancis
+Italian	KeymapNames		Itali
+Portuguese	KeymapNames		Portugis
+Swiss-French	KeymapNames		Swis-Perancis
+Slovene	KeymapNames		Slovene
+Lithuanian	KeymapNames		Lithuania
+French (NF Z71-300)	KeymapNames		Perancis (NF Z71-300)
+ISO-9995	KeymapNames		ISO-9995
+Kazakh	KeymapNames		Kazakhtan
 Language	BootPromptWindow		Bahasa
+Lithuanian (Standard)	KeymapNames		Lithuania (Standar)
+Belgian (comma)	KeymapNames		Belgia (koma)
 Custom	BootPromptWindow		Gubahan
+Norwegian	KeymapNames		Norwegia
+Danish	KeymapNames		Denmark
 Boot to Desktop	BootPromptWindow		Boot ke Desktop
+Bulgarian (Phonetic)	KeymapNames		Bulgaria (Fonetik)
+Canadian-French	KeymapNames		Kanada-Perancis
 Welcome to Haiku!	BootPromptWindow		Selamat datang di Haiku!
+Russian	KeymapNames		Rusia
+Hungarian	KeymapNames		Hunggaria
+Irish	KeymapNames		Irlandia
+Romanian	KeymapNames		Rumania
+Macedonian	KeymapNames		Makedonia
+Czech (Mac)	KeymapNames		Ceko (Mac)
+Brazilian (ABNT2)	KeymapNames		Brazil (ABNT2)
+Albanian	KeymapNames		Albania
+Dutch	KeymapNames		Belanda
+Friulian	KeymapNames		Friulian
+Icelandic	KeymapNames		Islandia

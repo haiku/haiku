@@ -29,7 +29,7 @@ Open file…	FileWindow		Obre un fitxer...
 32 bit unsigned pointer:	TypeEditors		Punter de 32 bits sense signe:
 DiskProbe request	DiskProbe		Sol·licitud del Sondeig de discs
 Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hexadecimal
-Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		No ha estat possible escriure al disc:\n%s\n\nSi sortiu es perdran tots els canvis..
+Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		No s'ha pogut escriure al disc:\n%s\n\nSi sortiu es perdran tots els canvis.
 Examine device:	OpenWindow		Navega pel dispositiu:
 Number editor	TypeEditors		Editor de números
 Icon	TypeEditors		Icona
@@ -44,7 +44,7 @@ File: 	ProbeView		Fitxer:
 Swapped: %Ld (0x%0*Lx)	ProbeView		Intercanviat: %Ld (0x%0*Lx)
 Stop	ProbeView		Atura
 Cancel	ProbeView		Cancel·la
-Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	No ha estat possible obrir \"%s\":\n%s
+Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	No s'ha pogut obrir \"%s\":\n%s
 Font size	ProbeView		Mida del tipus de lletra
 Type editor not supported	ProbeView		El tipus de tipus de lletra no és compatible
 Native: 0x%0*Lx	ProbeView		Nadiu: 0x%0*Lx
@@ -57,7 +57,7 @@ DiskProbe request	AttributeWindow		Sol·licitud del Sondeig de discs
 Next	ProbeView		Següent
 64 bit signed offset:	TypeEditors		Desplaçament amb signe de 64 bits:
 32 bit signed value:	TypeEditors		Valor de 32 bits sense signe:
-Could not find search string.	ProbeView		No ha estat possible cercar la cadena.
+Could not find search string.	ProbeView		No s'ha pogut trobar la cadena.
 Close	FileWindow		Tanca
 Unknown type	TypeEditors		Tipus desconegut
 Open device	FileWindow		Obre el dispositiu
@@ -71,7 +71,7 @@ Mode:	FindWindow		Mode:
 32 bit size or status:	TypeEditors		Mida o estat de 32 bits:
 of 	ProbeView		de 
 Contents:	TypeEditors		Contingut:
-Could not open file \"%s\": %s\n	DiskProbe		No ha estat possible obrir el fitxer \"%s\": %s\n
+Could not open file \"%s\": %s\n	DiskProbe		No s'ha pogut obrir el fitxer \"%s\": %s\n
 Probe file…	OpenWindow		Examina el fitxer...
 Block: 	ProbeView		Bloc: 
 Bookmarks	ProbeView		Adreces d'interès
@@ -99,7 +99,7 @@ Save	ProbeView		Desa
 of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	de 0x0
 Attribute type: 	ProbeView		Tipus d'atribut: 
 15 bit	TypeEditors		15 bits
-Page setup…	ProbeView		Arranjament de la pàgina...
+Page setup…	ProbeView		Configuració de la pàgina...
 Boolean	TypeEditors	This is the type of editor	Booleà
 Icon view	TypeEditors		Mostra les icones
 Select all	ProbeView		Selecciona-ho tot

@@ -1,17 +1,20 @@
-1	turkish	x-vnd.Haiku-Input	2494436940
+1	turkish	x-vnd.Haiku-Input	3910661481
 Scrolling	TouchpadPrefView		Kaydırma
 Defaults	InputMouse		Öntanımlılar
 Tapping	TouchpadPrefView		Dokunma
 Long	KeyboardView		Uzun
 Normal	SettingsView		Normal
 Cancel	TouchpadPrefView		İptal
+4-Button	SettingsView		4 düğmeli
 Slow	TouchpadPrefView		Yavaş
 Warp	SettingsView		Büküm
 Instant warp	SettingsView		Anında büküm
 Device List	InputWindow		Aygıt Listesi
 Double-click speed	SettingsView		Çift tıklama hızı
+5-Button	SettingsView		5 düğmeli
 Typing test area	KeyboardView		Yazma sınama alanı
 Mouse type:	SettingsView		Fare türü:
+Revert	InputKeyboard		Eski haline döndür
 Fast	KeyboardView		Hızlı
 Off	TouchpadPrefView		Kapalı
 Fast	TouchpadPrefView		Hızlı
@@ -30,6 +33,7 @@ The new scroll area is very large and may impede normal mouse operation. Do you 
 High	TouchpadPrefView		Yüksek
 Defaults	TouchpadPrefView		Öntanımlılar
 1-Button	SettingsView		1 düğmeli
+Defaults	InputKeyboard		Öntanımlılar
 Short	KeyboardView		Kısa
 Slow	KeyboardView		Yavaş
 Revert	InputMouse		Eski haline döndür
@@ -39,7 +43,7 @@ Click to focus and raise	SettingsView		Odaklayıp öne getirmek için tıkla
 Vertical	TouchpadPrefView		Dikey
 Horizontal	TouchpadPrefView		Yatay
 Focus mode:	SettingsView		Odak kipi:
-Focus follows mouse	SettingsView		Odak fareden sonra gelir
+Focus follows mouse	SettingsView		Odak fareyi izler
 Double-click test area	SettingsView		Çift tıklama sınama alanı
 Sensitivity	TouchpadPrefView		Hassaslık
 3-Button	SettingsView		3 düğmeli

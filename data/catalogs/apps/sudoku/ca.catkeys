@@ -11,7 +11,7 @@ Undo	SudokuWindow		Desfés
 Export as…	SudokuWindow		Exporta com a...
 Quit	SudokuWindow		Surt
 Redo	SudokuWindow		Refés
-Could not open \"%s\":\n%s\n	SudokuWindow		No ha estat possible obrir \"%s\":\n%s\n
+Could not open \"%s\":\n%s\n	SudokuWindow		No s'ha pogut obrir \"%s\":\n%s\n
 Blank	SudokuWindow		En blanc
 Sudoku solved - congratulations!\n	SudokuWindow		Heu resolt el Sudoku - Enhorabona!\n
 Text	SudokuWindow		Text
@@ -22,7 +22,7 @@ Advanced	SudokuWindow		Avançat
 Set all hints	SudokuWindow		Estableix totes les millores
 Searching for removable values	SudokuGenerator		Se cerquen els valors suprimibles.
 Abort	ProgressWindow		Avorta
-Could not set Sudoku:\n%s\n	SudokuWindow		No ha estat possible iniciar el Sudoku:\n%s\n
+Could not set Sudoku:\n%s\n	SudokuWindow		No s'ha pogut establir el Sudoku:\n%s\n
 Help	SudokuWindow		Ajuda
 OK	SudokuWindow		D'acord
 Sudoku	System name		Sudoku

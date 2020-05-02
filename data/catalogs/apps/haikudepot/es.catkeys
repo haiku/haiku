@@ -102,8 +102,8 @@ Close	UserLoginWindow		Cerrar
 Close	RatePackageWindow		Cerrar
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Sincronizando datos de paquetes para el repositorio '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Ver las condiciones de uso
-Size	PackageListView		Tamaño
 Your rating:	RatePackageWindow		Su puntuación:
+Size	PackageListView		Tamaño
 Your rating was updated.	RatePackageWindow		Su evaluación ha sido actualizada.
 All categories	FilterView		Todas las categorías
 Repositories	MainWindow		Repositorios

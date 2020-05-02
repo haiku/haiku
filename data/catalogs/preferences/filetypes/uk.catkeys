@@ -159,7 +159,7 @@ Close	Application Type Window		Закрити
 Integer 16 bit	Attribute ListView		Ціле 16 бітів
 Extension	Extension Window		Розширення
 Rule:	FileTypes Window		Правило:
-FileTypes	System name		Типи файлів
+FileTypes	System name		FileTypes
 Version	Application Types Window		Версія
 Quit	FileTypes Window		Вийти
 File type	FileType Window		Тип файлу

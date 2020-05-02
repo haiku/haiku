@@ -2,7 +2,7 @@
 ACPI bus	DevicesView		Шина ACPI
 Encryption controller	Device		Контроллер шифрування
 Bus Information	Device		Інфо про шину
-Devices	System name		Пристрої
+Devices	System name		Devices
 Graphics Peripheral	DeviceSCSI		Графічна периферія
 Processor	Device		Процесор
 Generate system information	DevicesView		Створення інформації про систему

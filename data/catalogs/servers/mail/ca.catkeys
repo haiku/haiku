@@ -1,7 +1,7 @@
 1	catalan; valencian	x-vnd.Be-POST	2949558073
 No new messages	MailDaemon		No hi ha missatges nous
 No new messages	DeskbarView		No hi ha cap missatge nou
-Shutdown mail services	DeskbarView		Atura els serveis del correu
+Shutdown mail services	DeskbarView		Atura els serveis de correu
 Mail status	MailDaemon		Estat del correu
 Fetching mail for %name	Notifier		S'obté el correu per a %name
 {0, plural, one{# new message} other{# new messages}}	DeskbarView		{0, plural, one{# missatge nou} other{# missatges nous}}

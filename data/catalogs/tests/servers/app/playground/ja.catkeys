@@ -27,6 +27,6 @@ Add	Playground		RGB加算
 Playground	System name		プレイグラウンド
 Erase	Playground		排他領域描画
 File	Playground		ファイル
-Subtract	Playground		RGB減算
+Subtract	Playground		RGB 減算
 <pick>	Playground		<pick>
 Ellipse	Playground		楕円

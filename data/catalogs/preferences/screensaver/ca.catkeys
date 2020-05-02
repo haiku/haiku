@@ -4,7 +4,7 @@ Could not load screen saver	ScreenSaver		No s'ha carregar cap captura de pantall
 Start screensaver	ScreenSaver		Inicia l'estalvi de pantalla
 Password…	ScreenSaver		Contrasenya…
 Password:	ScreenSaver		Contrasenya:
-Password lock	ScreenSaver		Protecció amb contrasenya
+Password lock	ScreenSaver		Bloqueig amb contrasenya
 Screensavers	ScreenSaver		Estalvis de pantalla
 Display Power Management Signaling not available	ScreenSaver		El sistema d'estalvi d'energia de la pantalla (DPMS) no està disponible
 ScreenSaver	System name		Estalvi de pantalla
@@ -21,8 +21,8 @@ Screensaver settings	ScreenSaver		Opcions de l'estalvi de pantalla
 Passwords don't match. Please try again.	ScreenSaver		Les contrasenyes no coincideixen. Si us plau, torneu-ho a provar.
 OK	ScreenSaver		D'acord
 Blackness	ScreenSaver		Foscor
-Use custom password	ScreenSaver		Utilitza una contrasenya personal
+Use custom password	ScreenSaver		Usa una contrasenya personal
 Done	ScreenSaver		Fet
 Confirm password:	ScreenSaver		Confirmeu la contrasenya:
 No preview available	PreviewView		No hi ha vista prèvia disponible.
-Use network password	ScreenSaver		Utilitza la contrasenya de la xarxa
+Use network password	ScreenSaver		Usa la contrasenya de la xarxa

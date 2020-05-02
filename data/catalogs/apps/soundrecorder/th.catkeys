@@ -1,0 +1,46 @@
+1	thai	x-vnd.Haiku-SoundRecorder	24440888
+Loop	RecorderWindow		วน
+Cannot find default audio hardware	RecorderWindow		ไม่พบฮาร์ดแวร์เสียงเริ่มต้น
+Cannot find the temporary file created to hold the new recording	RecorderWindow		ไม่พบไฟล์ชั่วคราวที่สร้างขึ้นเพื่อเก็บการบันทึกใหม่
+Sample size:	RecorderWindow		ขนาดตัวอย่าง:
+Nothing to play	RecorderWindow		ไม่มีอะไรให้เล่น
+None of the files appear to be audio files.	RecorderWindow		ไม่มีไฟล์ใดเป็นไฟล์เสียง
+Duration: 	RecorderWindow		ระยะเวลา:
+File info	RecorderWindow		ข้อมูลไฟล์
+Drop files here	SoundListView		วางไฟล์ที่นี่
+Input	RecorderWindow		อินพุต
+Some of the files don't appear to be audio files.	RecorderWindow		ไฟล์บางไฟล์ดูเหมือนจะไม่เป็นไฟล์เสียง
+Stop	RecorderWindow		หยุด
+Format:	RecorderWindow		รูปแบบ:
+Sound List	RecorderWindow		รายการเสียง
+Compression: 	RecorderWindow		การบีบอัด:
+Rewind	RecorderWindow		ย้อนกลับ
+Sample rate:	RecorderWindow		อัตราตัวอย่าง:
+Invalid audio files	RecorderWindow		ไฟล์เสียงไม่ถูกต้อง
+ seconds	RecorderWindow		วินาที
+OK	RecorderWindow		ตกลง
+Cannot open the temporary file created to hold the new recording	RecorderWindow		ไม่สามารถเปิดไฟล์ชั่วคราวที่สร้างขึ้นเพื่อระงับการบันทึกใหม่
+Input:	RecorderWindow		อินพุต:
+Forward	RecorderWindow		ไปข้างหน้า
+Play	RecorderWindow		เล่น
+SoundRecorder	System name		บันทึกเสียง
+Channels:	RecorderWindow		ช่อง:
+ bits	RecorderWindow		bits
+None	RecorderWindow		ไม่มี
+Record	RecorderWindow		บันทึก
+Sample size: 	RecorderWindow		ขนาดตัวอย่าง:
+Cannot recognize this file as a media file	RecorderWindow		ไม่รู้จักไฟล์นี้เป็นไฟล์สื่อ
+Format: 	RecorderWindow		รูปแบบ:
+File name: 	RecorderWindow		ชื่อไฟล์:
+Cannot connect to the selected sound input	RecorderWindow		ไม่สามารถเชื่อมต่อกับอินพุตเสียงที่เลือก
+Cannot get the file to play	RecorderWindow		ไม่สามารถรับไฟล์ที่จะเล่น
+Cannot record a sound that long	RecorderWindow		เสียงยาวเกินไปไม่สามารถบันทึก
+Duration:	RecorderWindow		ระยะเวลา:
+Compression:	RecorderWindow		บีบอัด:
+Cannot find an unused name to use for the new recording	RecorderWindow		ไม่พบชื่อที่ไม่ได้ใช้สำหรับการบันทึกใหม่
+Channels: 	RecorderWindow		ช่อง:
+Save	RecorderWindow		บันทึก
+Sample rate: 	RecorderWindow		อัตราตัวอย่าง:
+Cannot connect to media server	RecorderWindow		ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์สื่อ
+The file doesn't appear to be an audio file.	RecorderWindow		ไฟล์ดังกล่าวไม่ได้เป็นไฟล์เสียง
+File name:	RecorderWindow		ชื่อไฟล์

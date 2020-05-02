@@ -17,7 +17,7 @@ beta	AboutWindow		beta
 OK	ZombieReplicantView		D'acord
 Cut	TextView		Retalla
 %3.2f GiB	StringForSize		%3.2f GiB
-Can't delete this replicant from its original application. Life goes on.	Dragger		No ha estat possible suprimir aquest replicant de la seva aplicació original. La vida continua.
+Can't delete this replicant from its original application. Life goes on.	Dragger		No s'ha pogut suprimir aquest replicant de la seva aplicació original. La vida continua.
 Error	ZombieReplicantView		Error
 Paste	TextView		Enganxa
 OK	AboutWindow		D'acord
@@ -31,7 +31,7 @@ Copy	TextView		Copia
 Select all	TextView		Selecciona-ho tot
 alpha	AboutWindow		alfa
 %3.2f MiB	StringForSize		%3.2f MiB
-Error	PrintJob		S'ha produït un error
+Error	PrintJob		Error
 About %app%	AboutWindow		Quant a %app%
 About %app…	Dragger		Quan a %app…
 Version history:	AboutWindow		Historial de versions:

@@ -2,16 +2,16 @@
 Path:	DataTranslations		Percorso:
 Name:	DataTranslations		Nome:
 DataTranslations - Note	DataTranslations		DataTranslations - Nota
-The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		L'elemento '%name' non sembra essere un Translator e non verrà installato.
+The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		L'elemento '%name' non sembra essere un traduttore dati e non verrà installato.
 Could not install %s:\n%s	DataTranslations		Impossibile installare %s:\n%s
 OK	DataTranslations		OK
 Cancel	DataTranslations		Cancella
 Info:	DataTranslations		Informazioni:
 DataTranslations - Error	DataTranslations		DataTranslations - Errore
-Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		I valori predefiniti dei translator, utilizzati quando nessun'altra impostazione è stata specificata da un programma, possono essere impostati usando questo pannello di controllo.
-The new translator has been installed successfully.	DataTranslations		Il nuovo translator è stato installato con successo.
-An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Un elemento '%name' esiste già nella cartella dei Translator! Il translator deve essere sovrascritto?
-DataTranslations	System name		Traduzione dati
+Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		I valori predefiniti dei traduttori dati, utilizzati quando nessun'altra impostazione è stata specificata da un programma, possono essere impostati usando questo pannello di controllo.
+The new translator has been installed successfully.	DataTranslations		Il nuovo traduttore dati è stato installato con successo.
+An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Un elemento '%name' esiste già nella cartella dei traduttori dati! Sovrascrivo il traduttore esistente?
+DataTranslations	System name		Traduzione Dati
 Info	DataTranslations		informazioni
 Overwrite	DataTranslations		Sovrascrivi
 Version:	DataTranslations		Versione:

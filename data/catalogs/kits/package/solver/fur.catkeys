@@ -13,7 +13,7 @@ do not install the most recent version of \"%selection%\"	SolverProblemSolution	
 allow replacement of %source% with %target%	SolverProblemSolution		permet la sostituzion di %source% cun %target%
 package %source% obsoletes %dependency% provided by %target%	SolverProblem		il pachet %source% al rint sorpassât %dependency% che al è furnît di %target%
 do not forbid installation of %source%	SolverProblemSolution		no sta dineâ la instalazion di %source%
-allow downgrade of %source% to %target%	SolverProblemSolution		permet di degradâ di %source% a %target%
+allow downgrade of %source% to %target%	SolverProblemSolution		permet di degradâ %source% a %target%
 dependency problem	SolverProblem		probleme di dipendence
 %dependency% is provided by the system	SolverProblem		%dependency% al è za furnît dal sisteme
 keep %source% despite its inferior architecture	SolverProblemSolution		ten %source% ancje se la architeture e je di nivel inferiôr

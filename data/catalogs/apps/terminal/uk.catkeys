@@ -43,7 +43,7 @@ Window title…	Terminal TermWindow		Заголовок вікна…
 Blue	Terminal colors scheme		Синій
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Неможливо виконати \"%command\":\n\t%error
 Open path	Terminal TermView		Відкрити шлях
-Terminal	System name		Термінал
+Terminal	System name		Terminal
 Font size	Terminal TermWindow		Розмір шрифту
 Custom	Terminal colors scheme		Вибір користувача
 Really close?	Terminal TermWindow		Дійсно закрити?

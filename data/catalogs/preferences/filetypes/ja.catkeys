@@ -10,7 +10,7 @@ Removing uninstalled application types	Application Types Window		アンイント
 Width:	Attribute Window	Default column width in Tracker for this attribute.	幅:
 Same as…	FileType Window	The same TYPE as ...	このタイプと同様…
 (from super type)	FileTypes Window		(スーパータイプから)
-Select same preferred application as	FileTypes Window		このタイプと同じ優先アプリケーションを選ぶ
+Select same preferred application as	FileTypes Window		このタイプと同じ優先アプリケーションを選択
 Could not change attributes	Attribute Window		属性を変更できません
 Icon	FileTypes Window		アイコン
 Add…	Application Type Window		追加…
@@ -31,10 +31,10 @@ Description	FileTypes Window		説明
 Signature:	Application Types Window		署名:
 None	FileTypes Window		無し
 Exclusive launch	Application Type Window		排他的起動
-Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		ファイルタイプの削除は撤回できません。\nそれでも削除を実行しますか?
+Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		ファイルタイプの削除は戻せません。\nそれでも削除を実行しますか?
 Integer 64 bit	Attribute ListView		64 ビット整数
 Cancel	New File Type Window		中止
-Select same preferred application as	FileType Window		このタイプと同じ優先アプリケーションを選ぶ
+Select same preferred application as	FileType Window		このタイプと同じ優先アプリケーションを選択
 Cancel	Type List Window		中止
 Don't save	Application Type Window		保存しない
 Center	Attribute Window	Attribute column alignment in Tracker	中央揃え
@@ -53,7 +53,7 @@ Integer 8 bit	Attribute ListView		8 ビット整数
 Extension:	Extension Window		拡張子:
 Time	Attribute ListView		時間
 Extensions:	FileTypes Window		拡張子:
-Select preferred application	FileType Window		優先アプリケーションを選択する
+Select preferred application	FileType Window		優先アプリケーションを選択
 Description:	FileTypes Window		説明:
 Multiple files from \"%s\" file type	FileType Window		\"%s\"というファイルタイプで始まる複数ファイル
 Add new group	New File Type Window		新規グループを追加
@@ -88,7 +88,7 @@ Application type	Application Type Window		アプリケーションタイプ
 Show in Tracker…	Application Types Window		Trackerに表示…
 Type name:	FileTypes Window		タイプ名:
 Visible	Attribute Window		表示する
-Select preferred application	FileTypes Window		優先アプリケーションを選択する
+Select preferred application	FileTypes Window		優先アプリケーションを選択
 Path:	Application Types Window		パス:
 rating	Attribute ListView		評価
 Could not install file type	New File Type Window		ファイルタイプをインストールできませんでした
@@ -100,7 +100,7 @@ no icon	FileTypes Window		アイコン無し
 Single launch	Application Type Window		複数同時起動不可
 %s file type	FileType Window		%sのファイルタイプ
 Default	Attribute ListView		デフォルト
-Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		スーパータイプの削除は取り消せません。\n削除されるスーパータイプに属するファイルタイプはすべて削除されます！\n\nそれでも削除を実行しますか?グループ全体を削除するには、シフトキーを押しながら\"削除\"を押してください。
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		スーパータイプの削除は戻せません。\n削除されるスーパータイプに属するファイルタイプはすべて削除されます!\n\nそれでも削除を実行しますか?グループ全体を削除するには、シフトキーを押しながら\"削除\"を押してください。
 String	Attribute ListView		文字列
 Add type	New File Type Window		タイプの追加
 Remove icon	Icon View		アイコンを削除
@@ -114,8 +114,8 @@ Golden master	Application Types Window		ゴールデンマスター
 Add	Extension Window		追加
 Open…	FileTypes Window		開く…
 checkbox	Attribute ListView		チェックボックス
-Could not change file extensions	Extension Window		ファイル拡張子の変更はできませんでした
-Could not open file	FileType Window		ファイルを開けません
+Could not change file extensions	Extension Window		ファイル拡張子を変更できませんでした
+Could not open file	FileType Window		ファイルを開けませんでした
 Choose type	Type List Window		タイプを選択
 Select…	FileTypes Window		選択…
 File recognition	FileTypes Window		ファイルの認識
@@ -145,7 +145,7 @@ Version info	Application Type Window		バージョン情報
 Final	Application Type Window		リリース版
 Preferred application	FileType Window		優先アプリケーション
 FileTypes	FileTypes		FileTypes
-Set preferred application	Preferred App Menu		優先アプリケーションを設定する
+Set preferred application	Preferred App Menu		優先アプリケーションを設定
 New file type	New File Type Window		新規ファイルタイプ
 Short description:	Application Type Window		簡単な説明:
 Save request	Application Type Window		登録したファイルタイプの保存

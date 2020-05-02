@@ -73,7 +73,7 @@ Sensing device	DeviceClass		Rilevazione del dispositivo
 Pointing device	DeviceClass		Dispositivo di puntamento
 (reserved)	DeviceClass		(riservato)
 Rendering	DeviceClass		Rendering
-Information	DeviceClass		Informazione
+Information	DeviceClass		Informazioni
 Helmet	DeviceClass		Casco
 Pager	DeviceClass	A small radio device to receive short text messages	Cercapersone
 Hands-free	DeviceClass		Mani libere

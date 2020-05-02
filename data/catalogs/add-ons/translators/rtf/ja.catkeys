@@ -6,6 +6,6 @@ Rich Text Format (RTF) translator	ConfigView		リッチテキストフォーマ�
 RTF Settings	main		RTF 設定
 RichTextFormat file	RTFTranslator		リッチテキストフォーマットファイル
 Be style text file	RTFTranslator		BeOS スタイルのテキストファイル
-Plain text file	RTFTranslator		書式なしテキスト
+Plain text file	RTFTranslator		テキストファイル
 Rich Text Format translator	RTFTranslator		リッチテキストフォーマットトランスレーター
 Rich Text Format translator v%d.%d.%d %s	RTFTranslator		リッチテキストフォーマットトランスレーター v%d.%d.%d %s

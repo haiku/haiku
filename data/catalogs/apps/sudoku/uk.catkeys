@@ -25,7 +25,7 @@ Abort	ProgressWindow		Перервати
 Could not set Sudoku:\n%s\n	SudokuWindow		Неможливо встановити Судоку: \n%s\n
 Help	SudokuWindow		Довідка
 OK	SudokuWindow		ОК
-Sudoku	System name		Судоку
+Sudoku	System name		Sudoku
 Progress monitor	ProgressWindow		Монітор ходу
 Creating solvable field	SudokuGenerator		Створити поле для розв'язку
 View	SudokuWindow		Вигляд

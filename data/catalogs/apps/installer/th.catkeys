@@ -1,0 +1,89 @@
+1	thai	x-vnd.Haiku-Installer	116830250
+Performing installation.	InstallProgress		กำลังทำการติดตั้ง
+Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		เลือกดิสก์ต้นทางจากเมนูป๊อปอัป จากนั้นคลิก \ "เริ่มต้น \"
+Please close the DriveSetup window before closing the Installer window.	InstallerWindow		โปรดปิดหน้าต่าง DriveSetup ก่อนที่จะปิดหน้าต่างตัวติดตั้ง
+No optional packages available.	PackagesView		ไม่มีแพ็คเกจเสริม
+Restart system	InstallerWindow		รีสตาร์ทระบบ
+The mount point could not be retrieved.	InstallProgress		ไม่สามารถดึงจุดเชื่อมต่อได้
+<none>	InstallerWindow	No partition available	<none>
+Please choose target	InstallerWindow		กรุณาเลือกเป้าหมาย
+Cancel	InstallProgress		ยกเลิก
+Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		การติดตั้งเสร็จสมบูรณ์ บูตเซกเตอร์ถูกเขียนเป็น '%s' กดรีสตาร์ทเพื่อรีสตาร์ทคอมพิวเตอร์หรือเลือกโวลุ่มเป้าหมายใหม่เพื่อทำการติดตั้งอื่น
+Are you sure you want to to stop the installation?	InstallerWindow		คุณแน่ใจหรือไม่ว่าต้องการหยุดการติดตั้ง?
+Installer	System name		การติดตั้ง
+Unknown Type	InstallProgress	Partition content type	ไม่ทราบชนิด
+Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		กดปุ่มเริ่มต้นเพื่อติดตั้งจาก '%1s' ไปยัง '%2s'
+Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		เลือกดิสก์ที่คุณต้องการติดตั้งจากเมนูป๊อปอัพ จากนั้นคลิก \"เริ่มต้น\"
+Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		การติดตั้งเสร็จสมบูรณ์ บูตเซกเตอร์ถูกเขียนเป็น '%s' กด ปิด เพื่อออกจากตัวติดตั้งหรือเลือกโวลุ่มเป้าหมายใหม่เพื่อทำการติดตั้งอื่น
+README	InstallerApp		อ่าน
+Quit	InstallerWindow		ปิด
+Write boot sector to '%s'	InstallerWindow		เขียนบูตเซกเตอร์ไปที่ '%s'
+Boot sector not written because of an internal error.	InstallProgress		บูตเซกเตอร์ไม่ได้ถูกเขียนเนื่องจากข้อผิดพลาดภายใน
+DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		DriveSetup แอปพลิเคชันเพื่อกำหนดค่าพาร์ติชันดิสก์ไม่สามารถเปิดใช้งานได้
+Welcome to the Haiku Installer!\n\n	InstallerApp		ยินดีต้อนรับสู่ Haiku Installer! \n\n
+?? of ??	InstallerWindow	Unknown progress	?? of ??
+Quit Boot Manager	InstallerWindow		ออกจาก Boot Manager
+Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		กำลังเรียกใช้ตัวจัดการการบูต… \n\nปิด Boot Manager เพื่อทำการติดตั้งต่อไป
+Quit DriveSetup	InstallerWindow		ออกจาก DriveSetup
+Write boot sector	InstallerWindow		เขียนบูตเซกเตอร์
+%1ld of %2ld	InstallerWindow	number of files copied	%1ld of %2ld
+Finishing installation.	InstallProgress		จบการติดตั้ง
+Install from:	InstallerWindow		ติดตั้งจาก:
+Additional disk space required: 0.0 KiB	InstallerWindow		ต้องการพื้นที่ดิสก์เพิ่มเติม: 0.0 KiB
+This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		นี่คือซอฟต์แวร์คุณภาพระดับเบต้า! หมายความว่ามีความเสี่ยงที่จะสูญเสียข้อมูลสำคัญ ทำการสำรองข้อมูลบ่อยๆ! คุณได้รับการเตือน\n\n\n
+3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3) เมื่อคุณบูตเข้าสู่ Haiku เป็นครั้งแรกโปรดอ่าน \"ยินดีต้อนรับ\" และ \"คำแนะนำผู้ใช้\" มีลิงก์บนเดสก์ท็อปและในบุ๊กมาร์กของ WebPositive \n\n
+???	InstallerWindow	Unknown currently copied item	???
+Install anyway	InstallProgress		ติดตั้งต่อไป
+1)   If you are installing Haiku onto real hardware (not inside an emulator), you may want to prepare a hard disk partition from another OS (you could, for example, use a GParted Live-CD, which can also resize existing partitions to make room).\nYou can also set up partitions by launching DriveSetup from Installer, but you won't be able to resize existing partitions with it. While DriveSetup has been quite thoroughly tested over the years, it's recommended to have up-to-date backups of the other partitions on your system. Just in case…	InstallerApp		1) หากคุณกำลังติดตั้ง  Haiku ลงบนฮาร์ดแวร์จริง (ไม่ใช่ภายในอีมูเลเตอร์) คุณอาจต้องการเตรียมพาร์ติชันฮาร์ดดิสก์จากระบบปฏิบัติการอื่น (เช่นคุณสามารถใช้ GParted Live-CD ซึ่งสามารถปรับขนาดพาร์ติชันที่มีอยู่ให้ สร้างห้อง) \nคุณยังสามารถตั้งค่าพาร์ติชันด้วยการเปิดตัว DriveSetup จากตัวติดตั้ง แต่คุณจะไม่สามารถปรับขนาดพาร์ติชันที่มีอยู่ด้วย ในขณะที่ DriveSetup ได้รับการทดสอบอย่างถี่ถ้วนในช่วงหลายปีที่ผ่านมาขอแนะนำให้ทำการสำรองข้อมูลล่าสุดของพาร์ติชั่นอื่น ๆ ในระบบของคุณ หากมี ..
+Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		เลือกดิสก์ต้นทางและปลายทางจากเมนูป๊อปอัป จากนั้นคลิก \"เริ่มต้น\"
+Hide optional packages	InstallerWindow		ซ่อนแพ็คเกจเสริม
+???	InstallerWindow	Unknown partition name	???
+Have fun and thanks for trying out Haiku!	InstallerApp		ขอให้สนุกและขอบคุณสำหรับการลองใช้ Haiku!
+Quit	InstallerApp		ออก
+Starting installation.	InstallProgress		เริ่มการติดตั้ง
+Error writing boot sector.	InstallProgress		เกิดข้อผิดพลาดในการเขียนบูตเซกเตอร์
+OK	InstallerWindow		ตกลง
+Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		โปรดปิดหน้าต่าง Boot Manager และ DriveSetup ก่อนที่จะปิดหน้าต่างตัวติดตั้ง
+Failed to launch Boot Manager	InstallerWindow		ไม่สามารถเปิดตัวจัดการการบูต
+Try installing anyway	InstallProgress		ลองติดตั้งใหม่
+IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		ข้อมูลสำคัญก่อนการติดตั้ง Haiku\n\n
+Additional disk space required: %s	InstallerWindow		ต้องการพื้นที่ดิสก์เพิ่มเติม: %s
+Stop	InstallerWindow	In alert after pressing Stop	หยุด
+Boot sector successfully written.	InstallProgress		บูตเซกเตอร์สำเร็จแล้ว
+An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		พบข้อผิดพลาดและการติดตั้งไม่เสร็จสมบูรณ์: \n\nข้อผิดพลาด:%s
+Restart	InstallerWindow		รีสตารท์
+The disk can't be mounted. Please choose a different disk.	InstallProgress		ไม่สามารถติดตั้งดิสก์ได้ โปรดเลือกดิสก์อื่น
+Begin	InstallerWindow		เริ่ม
+Collecting copy information.	InstallProgress		การรวบรวมข้อมูลการทำสำเนา
+Show optional packages	InstallerWindow		แสดงแพ็คเกจเสริม
+The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		ดิสก์ปลายทางอาจมีพื้นที่ไม่เพียงพอ ลองเลือกดิสก์อื่นหรือเลือกที่จะไม่ติดตั้งรายการเพิ่มเติม
+Installation canceled.	InstallProgress		การติดตั้งถูกยกเลิก
+The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		ปริมาณเป้าหมายไม่ว่างเปล่า คุณแน่ใจว่าต้องการติดตั้งหรือไม่ \n\nหมายเหตุ: โฟลเดอร์ 'system' จะถูกบันทึกข้อมูลจากโวลุ่มต้นฉบับ แต่จะยังคงอยู่ในโฟลเดอร์การตั้งค่าโฟลเดอร์อื่น ๆ ทั้งหมดจะถูกรวมเข้าด้วยกันในขณะที่ไฟล์และลิงก์ที่มีอยู่ในทั้งแหล่งที่มาและปริมาณเป้าหมายจะถูกเขียนทับด้วยโวลุ่มแหล่งข้อมูล รุ่น
+OK	InstallerApp		ตกลง
+Are you sure you want to abort the installation?	InstallerWindow		คุณแน่ใจหรือไม่ว่าต้องการยกเลิกการติดตั้ง?
+Stop	InstallerWindow		หยุด
+Cancel	InstallerWindow		ยกเลิก
+Continue	InstallerWindow	In alert after pressing Stop	ต่อไป
+No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		ไม่พบพาร์ติชันที่เหมาะสำหรับการติดตั้ง โปรดตั้งค่าพาร์ติชันและเริ่มต้นอย่างน้อยหนึ่งพาร์ติชันด้วยระบบไฟล์เป็น
+Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		เรียกใช้ยูทิลิตี้ DriveSetup เพื่อแบ่งพาร์ติชัน \nฮาร์ดไดรฟ์ที่มีอยู่และสื่ออื่น ๆ \nพาร์ติชันสามารถเริ่มต้นได้ด้วย \nไฟล์ ฺBe File System จำเป็นสำหรับการบูต Haiku \n
+Scanning for disks…	InstallerWindow		กำลังสแกนหาดิสก์
+Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		กำลังเรียกใช้งาน DriveSetup … \n\nปิด DriveSetup เพื่อดำเนินการติดตั้งต่อไป
+Abort	InstallerWindow		ยกเลิก
+The partition can't be mounted. Please choose a different partition.	InstallProgress		ไม่สามารถติดตั้งพาร์ติชันได้ โปรดเลือกพาร์ติชันอื่น
+Set up partitions…	InstallerWindow		ตั้งค่าพาร์ติชัน
+Install progress:  	InstallerWindow		ความคืบหน้าการติดตั้ง:
+You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		คุณไม่สามารถติดตั้งเนื้อหาของดิสก์ลงบนตัวเอง โปรดเลือกดิสก์อื่น
+Boot Manager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Boot Manager แอปพลิเคชันเพื่อกำหนดค่าเมนูการบูต Haiku ไม่สามารถเปิดใช้งานได้
+Please close the Boot Manager window before closing the Installer window.	InstallerWindow		โปรดปิดหน้าต่าง Boot Manager ก่อนที่จะปิดหน้าต่างตัวติดตั้ง
+OK	InstallProgress		ตกลง
+Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		กำลังเรียกใช้ Boot Manager และ DriveSetup … \n\nปิดแอปพลิเคชันทั้งสองเพื่อดำเนินการติดตั้งต่อไป
+Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		แน่ใจหรือไม่ว่าคุณต้องการติดตั้งลงในดิสก์สำหรับบูตปัจจุบัน ตัวติดตั้งจะต้องรีบู๊ตเครื่องของคุณหากคุณดำเนินการต่อ
+Onto:	InstallerWindow		บน:
+Quit Boot Manager and DriveSetup	InstallerWindow		ออกจาก Boot Manager และ DriveSetup
+Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		โปรแกรมติดตั้ง \n\t เขียนโดยJérôme Duval และ Stephan Aßmus \n\t ลิขสิทธิ์ 2005-2010, Haiku \n\n
+Tools	InstallerWindow		เครื่องมือ
+scanning…	InstallerWindow		กำลังค้นหา
+2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Userguide's topic on the application \"BootManager\".\n\n\n	InstallerApp		ตัวติดตั้งจะทำให้พาร์ติชัน Haiku สามารถบู๊ตได้เอง แต่ไม่ต้องทำตามขั้นตอนใด ๆ เพื่อรวม Haiku เข้าไปในเมนูบู๊ตที่มีอยู่ หากคุณติดตั้ง GRUB แล้วคุณสามารถเพิ่ม Haiku ได้ \nสำหรับรายละเอียดโปรดอ่านคำแนะนำเกี่ยวกับการบูต Haiku บนเว็บไซต์ของเราที่ https://www.haiku-os.org/guides/booting.\nหรือคุณสามารถตั้งค่าเมนูการบูตจากเมนู\"เครื่องมือ\"ของตัวติดตั้งดูหัวข้อของผู้ใช้งานบนแอปพลิเคชัน\"BootManager\" \n\n\n
+Set up boot menu	InstallerWindow		ตั้งค่าเมนูการเริ่มระบบ
+Continue	InstallerApp		ต่อไป
+Are you sure you want to abort the installation and restart the system?	InstallerWindow		คุณแน่ใจหรือไม่ว่าต้องการยกเลิกการติดตั้งและรีสตาร์ทระบบ?

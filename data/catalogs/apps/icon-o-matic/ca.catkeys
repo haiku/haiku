@@ -2,7 +2,7 @@
 None	Icon-O-Matic-Properties		Cap
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Gira els índexs dels camins
 Add empty	Icon-O-Matic-ShapesList		Afegeix buit
-Opening the icon failed!	Icon-O-Matic-Main		No ha estat possible obrir la icona!
+Opening the icon failed!	Icon-O-Matic-Main		Ha fallat obrir la icona!
 Add with path	Icon-O-Matic-ShapesList		Afegeix amb un camí
 Copy	Icon-O-Matic-Properties		Copia
 Color	Icon-O-Matic-PropertyNames		Color
@@ -99,7 +99,7 @@ Translation X	Icon-O-Matic-PropertyNames		Traducció X
 Flip Control Points	Icon-O-Matic-FlipPointsCmd		Capgira els punt de control
 Add Transformers	Icon-O-Matic-AddTransformersCmd		Afegeix alguns transformadors
 BEOS:ICON Attribute	Icon-O-Matic-SavePanel		Atribut BEOS:ICON
-Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		L’Icon-O-Matic pot no haver interpretat totes les dades de l'SVG quan s'han carregat. En sobreescriure el fitxer original, aquesta informació es perdria.
+Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		L’Icon-O-Matic pot no haver interpretat totes les dades de l'SVG quan s'ha carregat. En sobreescriure el fitxer original, aquesta informació es perdria.
 Rotate indices backwards	Icon-O-Matic-PathsList		Gira els índexs enrere
 Overwrite	Icon-O-Matic-SVGExport		Sobreescriu
 Modify Control Point	Icon-O-Matic-ChangePointCmd		Modifica el punt de control

@@ -27,7 +27,7 @@ ACPI node '%1'	DeviceACPI		Node '%1' ACPI
 Optical Drive	DeviceSCSI		Unitat òptica
 Name	PropertyList		Nom
 Manufacturer	DeviceSCSI		Fabricant
-Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Nom del dispositiu\t\t\t\t: %Name%\nFabricant\t\t\t: %Manufacturer%\nControlador utilitzat\t\t\t\t: %DriverUsed%\nRutes del dispositiu\t: %DevicePaths%
+Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Nom del dispositiu\t\t\t\t: %Name%\nFabricant\t\t\t: %Manufacturer%\nControlador usat\t\t\t\t: %DriverUsed%\nCamins del dispositiu\t: %DevicePaths%
 Device name	Device		Nom del dispositiu
 Satellite communications controller	Device		Controlador de les comunicacions per satèl·lit
 Device class	DeviceSCSI		Classe de dispositiu
@@ -86,7 +86,7 @@ Array	DeviceSCSI		Matriu
 Unclassified device	Device		Dispositiu sense classificar
 ACPI controller	Device		Controlador ACPI
 Network controller	Device		Controlador de xarxa
-Driver used	Device		Controlador utilitzat
+Driver used	Device		Controlador usat
 Communication controller	Device		Controlador de comunicacions
 ACPI bus	Device		Bus ACPI
 unknown	Device		desconegut

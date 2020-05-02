@@ -1,7 +1,10 @@
-1	indonesian	x-vnd.Haiku-libpackage	2012114212
+1	indonesian	x-vnd.Haiku-libpackage	134767648
+Fetching repository-cache from %url	RefreshRepositoryRequest		Mengambil cache repositori dari %url
+Validating checksum for %repositoryName	RefreshRepositoryRequest		Memvalidasi checksum untuk %repositoryName
 Failed to remove transaction directory	PackageManagerKit		Gagal menghapus direktori transaksi
 Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		Gagal mendapatkan konfigurasi untuk repositori \"%s\". lompati.
 Refreshing repository \"%s\" failed	PackageManagerKit		Menyegarkan repositori \"%s\" gagal
+Fetching repository checksum from %url	RefreshRepositoryRequest		Mengambil checksum repositori dari %url
 Failed to get repository names	PackageManagerKit		Gagal mendapatkan nama repositori
 Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		Gagal mendapatkan cache untuk repositori \"%s\". Skipping.
 Package %s-%s doesn't have a matching requires for its base package \"%s\"	PackageManagerKit		Paket %s-%s tidak memiliki pencocokan yang sesuai dengan paket dasarnya \"%s\"

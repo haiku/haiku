@@ -39,7 +39,7 @@ still image filename expected	CodyCam		s'esperava un nom de fitxer d'imatge fixa
 File name:	CodyCam		Nom del fitxer:
 Directory:	CodyCam		Directori:
 Error setting type of output file	VideoConsumer.cpp		Error en establir el tipus de fitxer de sortida
-Locking the window	VideoConsumer.cpp		Es bloqueja la finestra
+Locking the window	VideoConsumer.cpp		Es bloca la finestra
 Cannot find an available video stream	CodyCam		No es pot trobar el flux de vídeo
 Upload…	VideoConsumer.cpp		Carrega...
 password expected	CodyCam		s'espera la contrasenya
@@ -80,9 +80,9 @@ login ID expected	CodyCam		Cal un identificador d'usuari
 Video settings	CodyCam		Paràmetres de vídeo
 Can't find an available connection to the video window	CodyCam		No es pot trobar una connexió a la finestra de vídeo disponible
 FTP	CodyCam		FTP
-Error creating output file	VideoConsumer.cpp		S'ha produït un error en escriure el fitxer de sortida
-Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		No es pot trobar una font de vídeo.\nNecessiteu una càmera web per utilitzar CodyCam.
+Error creating output file	VideoConsumer.cpp		Error en crear el fitxer de sortida.
+Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		No es pot trobar cap font de vídeo.\nCal una càmera web per usar el CodyCam.
 Logging in…	VideoConsumer.cpp		S'entra...
 CodyCam	System name		CodyCam
-Error writing output file	VideoConsumer.cpp		S'ha produït un error en escriure el fitxer de sortida
+Error writing output file	VideoConsumer.cpp		Error en escriure el fitxer de sortida.
 Capture controls	CodyCam		Controls de captura

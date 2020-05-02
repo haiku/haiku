@@ -1,0 +1,17 @@
+1	thai	x-vnd.Haiku-keystore_server	2429996361
+to perform the following action:\n%accessString%\n\n	AppAccessRequestWindow		เพื่อดำเนินการต่อไปนี้:\n%accessString%\n\n
+This application doesn't yet have the required privileges.	AppAccessRequestWindow		แอปพลิเคชันนี้ยังไม่มีสิทธิ์ที่จำเป็น
+Keyring:	KeyRequestWindow		พวงกุญแจ:
+requests access to keyring:\n%keyringName%\n\n	AppAccessRequestWindow		ร้องขอการเข้าถึงพวงกุญแจ:\n%keyringName%\n\n
+Application keyring access	AppAccessRequestWindow		แอปพลิเคชันเข้าถึงพวงกุญแจ
+Disallow	AppAccessRequestWindow		ไม่อนุญาต
+Allow once	AppAccessRequestWindow		อนุญาตหนึ่งครั้ง
+Unlock keyring	KeyRequestWindow		ปลดล็อคพวงกุญแจ
+An application wants to access the keyring below, but it is locked with a passphrase. Please enter the passphrase to unlock the keyring.\nIf you unlock the keyring, it stays unlocked until the system is shut down or the keyring is manually locked again.\nIf you cancel this dialog the keyring will remain locked.	KeyRequestWindow		แอปพลิเคชันต้องการเข้าถึงพวงกุญแจด้านล่าง แต่ถูกล็อคด้วยข้อความรหัสผ่าน โปรดป้อนวลีรหัสผ่านเพื่อปลดล็อคพวงกุญแจ\nหากคุณปลดล็อคพวงกุญแจกุญแจจะยังคงถูกล็อกจนกว่าระบบจะปิดตัวลงหรือพวงกุญแจถูกล็อคด้วยตนเองอีกครั้ง\nหากคุณยกเลิกกล่องโต้ตอบนี้พวงกุญแจจะยังคงล็อคอยู่
+Password:	KeyRequestWindow		รหัส:
+Cancel	KeyRequestWindow		ยกเลิก:
+This application has been updated since it was last granted access.	AppAccessRequestWindow		แอปพลิเคชันนี้ได้รับการอัปเดตนับตั้งแต่ได้รับสิทธิ์การเข้าถึงล่าสุด
+Allow always	AppAccessRequestWindow		อนุญาตเสมอ
+Unlock	KeyRequestWindow		ปลดล็อค
+The application:\n%signature% (%path%)\n\n	AppAccessRequestWindow		แอปพลิเคชั่น:\n%signature% (%path%)\n\n
+This application hasn't been granted access before.	AppAccessRequestWindow		แอปพลิเคชันนี้ยังไม่ได้รับอนุญาตให้เข้าถึงก่อน

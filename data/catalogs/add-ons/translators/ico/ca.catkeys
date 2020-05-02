@@ -5,10 +5,10 @@ Windows %s %ld bit image	ICOTranslator		Imatge del Windows de %s %ld bits
 Valid icon sizes are 16, 32, or 48	ConfigView		Les mides vàlides de les icones són 16, 32 i 48
 Windows icons	ICOTranslator		Icones del Windows
 Enforce valid icon sizes	ConfigView		Força la mida vàlida de les icones
-ICO Settings	main		Paràmetres del ICO
+ICO Settings	main		Paràmetres d'ICO
 Windows icon translator	ICOTranslator		Traductor d'icones del Windows
 pixels in either direction.	ConfigView		píxels a cada direcció.
-Write 32 bit images on true color input	ConfigView		Desa les imatges de 32 bits en entrada de color real
+Write 32 bit images on true color input	ConfigView		Escriu les imatges de 32 bits amb entrada de color real
 Icon	ICOTranslator		Icona
-ICOTranslator Settings	ConfigView		Paràmetres del ICOTranslator
+ICOTranslator Settings	ConfigView		Paràmetres del Traductor ICO
 Windows icon translator	ConfigView		Traductor d'icones del Windows

@@ -1,5 +1,5 @@
 1	romanian	x-vnd.Be-PEPL	2332202134
-Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Lansarea preferinței FileTypes pentru a configura atributele aplicației Person a eșuat.\n\nEroare: 
+Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Lansarea preferinței FileTypes pentru a configura atributele persoanei a eșuat.\n\nEroare: 
 Unnamed person	People		Persoană fără nume
 New person…	People		Persoană nouă…
 Address	People		Adresă
@@ -14,7 +14,7 @@ Contact name	People		Nume de contact
 Cancel	People		Anulează
 Edit	People		Editează
 Save changes before closing?	People		Doriți să salvați modificările înainte de a închide?
-People	System name		Oameni
+People	System name		People
 Error	People		Eroare
 Revert	People		Revenire
 Country	People		Țară

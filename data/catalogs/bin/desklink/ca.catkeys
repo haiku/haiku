@@ -8,9 +8,9 @@ Couldn't launch 	MediaReplicant		No s'ha pogut executar
 Volume	VolumeControl		Volum
 Open MediaPlayer	MediaReplicant		Obre el MediaPlayer
 %d dB	VolumeControl		%d dB
-Media preferences…	MediaReplicant		Preferències dels media...
+Media preferences…	MediaReplicant		Preferències dels mitjans...
 Options	MediaReplicant		Opcions
 Beep	MediaReplicant		Timbre
 Open %name	DeskButton	Don't translate variable %name	Obre %name
 Control physical output	MediaReplicant		Controla la sortida física
-No media server running	VolumeControl		No s'executa cap servidor de media
+No media server running	VolumeControl		No s'executa cap servidor multimèdia.

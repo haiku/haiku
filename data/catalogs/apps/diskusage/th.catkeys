@@ -1,0 +1,23 @@
+1	thai	x-vnd.Haiku-DiskUsage	2951688400
+%size% in {0, plural, one{# file} other{# files}}	Info Window		%size% in {0, plural, one{# file} other{# files}}
+Scanning %refName%	Scanner		ค้นหา %refName%
+%d files	Status View	For UI layouting only, use the longest plural form for your language	%d files
+Size	Info Window		ขนาด
+Rescan	Pie View		ค้นหาใหม่
+Kind	Info Window		ชนิด
+file unavailable	Pie View		ไฟล์ไม่พร้อมใช้งาน
+no supporting apps	Pie View		ไม่มีแอปพลิเคชั่นสนับสนุน
+Path	Info Window		พาธ
+Scan	Status View		ค้นหา
+Rescan	Status View		ค้นหาใหม่
+file unavailable	Status View		ไฟล์ไม่พร้อมใช้งาน
+Get info	Pie View		รับข้อมูล
+DiskUsage	System name		การใช้งานดิสก์
+Created	Info Window		สร้าง
+Modified	Info Window		ปรับแต่ง
+Abort	Status View		ยกเลิก
+Open with	Pie View		เปิดด้วย
+Open	Pie View		เปิด
+{0, plural, one{# file} other{# files}}	Status View		{0, plural, one{# file} other{# files}}
+%a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
+Free on %refName%	Scanner		Free on %refName%

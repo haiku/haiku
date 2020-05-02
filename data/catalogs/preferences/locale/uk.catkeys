@@ -3,10 +3,10 @@ Available languages	Locale Preflet Window		Наявні мови
 Negative:	TimeFormatSettings		Від'ємний:
 already chosen	LanguageListView		вже вибрано
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Не вдалося знайти наявні мови! Ви не можете використовувати цей префлет!
-Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Deskbar і Tracker потребують перезагрузки щоб застосувати зміни. Ви бажаєте зробити це зараз?
+Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Щоб застосувати зміни Deskbar і Tracker потребують перезапуску. Ви бажаєте зробити це зараз?
 Long format:	TimeFormatSettings		Довгий формат:
 Currency	TimeFormatSettings		Валюта
-Locale	System name		Локаль
+Locale	System name		Locale
 Short format:	TimeFormatSettings		Короткий формат:
 Language	Locale Preflet Window		Мова
 Preferred languages	Locale Preflet Window		Мови за вподобанням
@@ -16,7 +16,7 @@ Locale	Locale Preflet Window		Локаль
 Numbers	TimeFormatSettings		Числа
 24 hour	TimeFormatSettings		24 години
 OK	Locale Preflet Window		ОК
-Restart	Locale Preflet Window		Перезагрузка
+Restart	Locale Preflet Window		Перезапустити
 Full format:	TimeFormatSettings		Повний формат:
 Defaults	Locale Preflet Window		За замовчуванням
 Cancel	Locale Preflet Window		Скасувати

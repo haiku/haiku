@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Media	1682972002
+1	ukrainian	x-vnd.Haiku-Media	582516163
 Couldn't add volume control in Deskbar: %s\n	Media views		Неможливо додати регулятор гучності в Deskbar: %s\n
 Restart media services	Media views		Перезапустити медіа-служби
 Quit	Media Window		Вихід
@@ -7,6 +7,8 @@ Couldn't remove volume control in Deskbar: %s\n	Media views		Неможливо 
 Video output:	Media views		Вихід відео:
 Video input:	Media views		Вхід відео:
 Audio output:	Media views		Вихід аудіо:
+Please select a SoundFont.	Midi View		Будь ласка, виберіть SoundFont.
+There are no SoundFonts installed.	Midi View		Жодного SoundFont не встановлено.
 Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Вихід з Медіа зупинить перезапуск медіа-служб. Імовірний результат - нестабільна робота або недоступність медіа.
 Could not connect to the media server.\nWould you like to start it ?	Media Window		Медіа-сервер не запущено\nЗапустити його?
 Video settings	Media Window		Налаштування відео
@@ -15,9 +17,10 @@ Show volume control on Deskbar	Media views		Показати регулятор 
 Start media server	Media Window		Запуск медіа сервера
 Audio settings	Media Window		Налаштування аудіо
 Quit anyway	Media Window		Вийти будь-що
-Media	System name		Mедіа
+Media	System name		Media
 Warning!	Media Window		Попередження!
 MIDI Settings	Media Window		Налаштування MIDI
+SoundFonts	Midi View		SoundFonts
 Audio input:	Media views		Вхід аудіо:
 <none>	Media views		<пусто>
 Channel:	Media views		Канал:

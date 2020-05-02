@@ -1,6 +1,6 @@
 1	italian	x-vnd.Haiku-JPEGTranslator	3788699631
 Read	JPEGTranslator		Lettura
-Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Formato Be Bitmap (Translator JPEG)
+Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Formato bitmap Be (Trasduttore JPEG)
 Show warning messages	JPEGTranslator		Mostra messaggi di avviso
 Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Usa codice CMYK con 0 per 100% di ink coverage
 JPEG Library Error: %s\n	be_jerror		Errore Libreria JPEG: %s\n

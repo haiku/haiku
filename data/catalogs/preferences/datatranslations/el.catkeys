@@ -2,7 +2,7 @@
 Path:	DataTranslations		Διαδρομή:
 Name:	DataTranslations		Όνομα:
 DataTranslations - Note	DataTranslations		DataTranslations - Σημείωση
-The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		Το στοιχείο '%όνομα' δεν φαίνεται να είναι ένας Μεταφραστής και δεν θα εγκατασταθεί.
+The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		Το στοιχείο '%name' δεν φαίνεται να είναι ένας Μεταφραστής και δεν θα εγκατασταθεί.
 Could not install %s:\n%s	DataTranslations		Αδυναμία εγκατάστασης του %s:\n%s
 OK	DataTranslations		Εντάξει
 Cancel	DataTranslations		Ακύρωση

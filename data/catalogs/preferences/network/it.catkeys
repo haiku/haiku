@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Network	115295218
+1	italian	x-vnd.Haiku-Network	2923905377
 Ethernet device	InterfaceListItem		Dispositivo Ethernet
 Link speed:	IntefaceView		Velocità collegamento:
 disconnected	IntefaceView		disconnesso
@@ -17,9 +17,9 @@ DHCP	IntefaceAddressView		DHCP
 Netmask:	IntefaceAddressView		Netmask:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Servizi
-Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Installazione di Stato Rete nella Deskbar fallita: %s
+Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Installazione di Stato rete nella Deskbar fallita: %s
 Revert	NetworkWindow		Ripristina
-off	ServiceListItem		disattivata
+off	ServiceListItem		disattivato
 WEP	WEP protected network		WEP
 <no wireless networks found>	IntefaceView		<nessuna rete senza fili trovata>
 Enable	IntefaceView		Attiva
@@ -47,6 +47,7 @@ Status:	IntefaceView		Stato:
 Disable	IntefaceView		Disabilita
 Manage…	NetworkWindow		Gestisci…
 open	Open network		apri
+Network	System name		Rete
 Your gateway to the internet	IntefaceAddressView		Il tuo gateway su internet
 Enable	ServiceView		Abilita
 Wireless device	InterfaceListItem		Dispositivo Wireless

@@ -1,7 +1,7 @@
 1	japanese	x-vnd.Be-PEPL	2332202134
 Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Person 属性を設定する FileTypes の起動に失敗しました。\n\nエラー:
 Unnamed person	People		名無し
-New person…	People		新規作成…
+New person…	People		新規連絡先…
 Address	People		住所
 Zip	People		郵便番号
 Select all	People		すべて選択
@@ -16,10 +16,10 @@ Edit	People		編集
 Save changes before closing?	People		閉じる前に変更を保存しますか?
 People	System name		People
 Error	People		エラー
-Revert	People		元に戻す
+Revert	People		戻す
 Country	People		国
 Person	Short mimetype description		人物
-New person	People		新規作成
+New person	People		新規連絡先
 Save	People		保存
 Fax	People		ファックス
 URL	People		URL

@@ -21,14 +21,14 @@ Serbian (Cyrillic)	KeymapNames		セルビア語 (Cyrillic)
 Belgian (point)	KeymapNames		ベルギー語 (point)
 Finnish	KeymapNames		フィンランド語
 Num lock	Keyboard Layout View		Num lock
-Switch shortcut keys to Windows/Linux mode	Keymap window		ショートカットキースイッチを Windows/Linux モードにする
+Switch shortcut keys to Windows/Linux mode	Keymap window		ショートカットキーを Windows/Linux モードに切り替え
 Option	Keyboard Layout View	Option key	オプションキー:
 Spanish (Dvorak)	KeymapNames		スペイン語 (Dvorak)
 Scroll lock	Keyboard Layout View		Scroll lock
 US-International	KeymapNames		英語 (US-International)
 Right option	Keyboard Layout View		右 Option キー
 Turkish (Type-Q)	KeymapNames		トルコ語 (Type-Q)
-Revert	Modifier keys window		元に戻す
+Revert	Modifier keys window		戻す
 Slovak	KeymapNames		スロバキア語
 CAPS LOCK	Keyboard Layout View		CAPS LOCK
 Colemak	KeymapNames		Colemak
@@ -117,7 +117,7 @@ Belarusian (Latin)	KeymapNames		ベラルーシ語 (Latin)
 Hebrew	KeymapNames		ヘブライ語
 Layout	Keymap window		レイアウト
 Greek	KeymapNames		ギリシア語
-Revert	Keymap window		元に戻す
+Revert	Keymap window		戻す
 CTRL	Keyboard Layout View	Very short for 'control'	CTRL
 Grave trigger	Keymap window		グレイヴアクセントのトリガー
 Menu	Keyboard Layout View	Menu key	メニューキー
@@ -139,13 +139,13 @@ Keymap	System name		キーマップ
 Slovene	KeymapNames		スロベニア語
 Lithuanian	KeymapNames		リトアニア語
 Set modifier keys…	Keymap window		修飾キーを設定…
-Switch shortcut keys to Haiku mode	Keymap window		ショートカットキースイッチを Haiku モードにする
+Switch shortcut keys to Haiku mode	Keymap window		ショートカットキーを Haiku モードに切り替え
 Defaults	Keymap window		デフォルト
 ISO-9995	KeymapNames		ISO-9995
 System:	Keymap window		システム:
 ThinkPad International	KeyboardLayoutNames		ThinkPad International
 Apple Aluminum Extended (US)	KeyboardLayoutNames		Apple Aluminum Extended (US)
-Switch shortcut keys	Keymap window		ショートカットキーのスイッチ
+Switch shortcut keys	Keymap window		ショートカットキーの切り替え
 Right command	Keyboard Layout View		右 Command キー
 NUM LOCK	Keyboard Layout View		NUM LOCK
 MENU	Keyboard Layout View		MENU

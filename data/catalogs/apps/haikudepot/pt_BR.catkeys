@@ -55,8 +55,8 @@ Success	UserLoginWindow		Sucesso
 (%Votes%)	PackageInfoView		(%Votes%)
 Close	UserLoginWindow		Fechar
 Close	RatePackageWindow		Fechar
-Size	PackageListView		Tamanho
 Your rating:	RatePackageWindow		Sua avaliação:
+Size	PackageListView		Tamanho
 All categories	FilterView		Todas as categorias
 n/a	PackageInfoView		n/a
 Cancel	MainWindow		Cancelar

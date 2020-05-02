@@ -1,8 +1,9 @@
-1	indonesian	x-vnd.Haiku-StyledEdit	727465241
+1	indonesian	x-vnd.Haiku-StyledEdit	2796309255
 Document statistics	Statistics		Statistik dokumen
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Tidak dapat mengembalikan, file tidak ditemukan: \"%s\".
 Cut	Menus		Potong
 Center	Menus		Tengah
+Increase size	Menus		Tambah ukuran
 Wrap-around search	FindandReplaceWindow		Pencarian menyeluruh
 Page setup…	Menus		Pengaturan halaman…
 Untitled 	StyledEditWindow		Tanpa judul 
@@ -70,6 +71,7 @@ Find selection	Menus		Temukan pilihan
 Cancel	SaveAlert		Batal
 Find…	Menus		Cari…
 Revert	RevertToSavedAlert		Pulihkan
+Decrease size	Menus		Kurangi ukuran
 Size	Menus		Ukuran
 Autodetect	Menus		Otodeteksi
 Replace next	Menus		Ganti selanjutnya

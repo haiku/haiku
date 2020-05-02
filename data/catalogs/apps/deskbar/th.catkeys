@@ -1,0 +1,50 @@
+1	thai	x-vnd.Be-TSKB	2656653225
+Power off	DeskbarMenu		ปิด
+Sort applications by name	PreferencesWindow		จัดเรียงแอปพลิเคชันตามชื่อ
+Suspend	DeskbarMenu		หยุด
+Hide clock	TimeView		ซ่อนนาฬิกา
+Applications	PreferencesWindow		แอปพลิเคชั่น
+Time preferences…	TimeView		ตั้งเวลา
+About Haiku	DeskbarMenu		เกี่ยวกับ Haiku
+Edit in Tracker…	PreferencesWindow		แก้ไขในตัวติดตาม
+Recent documents:	PreferencesWindow		เอกสารล่าสุด:
+Recent applications	DeskbarMenu		แอปพลิเคชั่นล่าสุด
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		แอปพลิเคชั่น
+Find…	DeskbarMenu		ค้นหา
+Show clock	Tray		แสดงนาฬิกา
+Window	PreferencesWindow		หน้าต่าง
+Defaults	PreferencesWindow		ค่าเริ่มต้น
+Menu	PreferencesWindow		เมนู
+Recent documents	DeskbarMenu		เอกสารล่าสุด
+Auto-hide	PreferencesWindow		ซ่อน อัตโนมัติ
+Always on top	PreferencesWindow		อยู่บนเสมอ
+<Deskbar folder is empty>	DeskbarMenu		<Deskbar folder is empty>
+Show all	WindowMenu		แสดงทั้งหมด
+No windows	WindowMenu		ไม่มีหน้าต่าง
+Deskbar	System name		เดสก์บาร์
+Restart system	DeskbarMenu		เริ่มระบบใหม่
+Large	PreferencesWindow		ขนาดใหญ่
+Auto-raise	PreferencesWindow		ขยายอัตโนมัติ
+Recent folders:	PreferencesWindow		โฟลเดอร์ล่าสุด
+Show application expander	PreferencesWindow		แสดงตัวขยายแอปพลิเคชัน
+Close all	WindowMenu		ปิดทั้งหมด
+Deskbar preferences	PreferencesWindow		ตั้งค่าเดสก์บาร์
+Mount	DeskbarMenu		เลือก
+Revert	PreferencesWindow		คืนค่า
+Small	PreferencesWindow		ขนาดเล็ก
+Recent applications:	PreferencesWindow		แอปพลิเคชั่นล่าสุด
+Shutdown…	DeskbarMenu		ปิด
+Tracker always first	PreferencesWindow		ติดตามก่อนเสมอ
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		ตั้งค่า
+Recent folders	DeskbarMenu		โฟลเดอร์ล่าสุด
+About this system	DeskbarMenu		เกี่ยวกับระบบ
+Show calendar…	TimeView		แสดงปฎิทิน
+Deskbar preferences…	DeskbarMenu		ตั้งค่าเดสก์บาร์
+Expand new applications	PreferencesWindow		ขยายแอฟพลิเคชั่นใหม่
+Show replicants	DeskbarMenu		แสดงตัวจำลอง
+Hide application names	PreferencesWindow		ซ่อนชื่อแอปพิเคชั่น
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		ตัวอย่าง
+Icon size	PreferencesWindow		ขนาดไอคอน
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		แอพเพล็ตเดสก์ท็อป
+Hide all	WindowMenu		ซ่อนทั้งหมด
+Quit application	WindowMenu		ออกจากแอปพลิเคชั่น

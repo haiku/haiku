@@ -11,7 +11,7 @@ Quit	TeapotWindow		終了
 Filled polygons	TeapotWindow		ポリゴンを塗りつぶす
 Settings	TeapotWindow		設定
 Fog	TeapotWindow		フォグ
-Backface culling	TeapotWindow		バックフェースカリング
+Backface culling	TeapotWindow		ポリゴンの裏面を非表示
 Z-buffered	TeapotWindow		Z バッファーを使用
 File	TeapotWindow		ファイル
 Perspective	TeapotWindow		パースペクティブ

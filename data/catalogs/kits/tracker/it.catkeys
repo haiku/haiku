@@ -38,7 +38,7 @@ Type	AttributesView		Tipo
 Prompt	FSUtils		Richiedi
 Error in regular expression:\n\n'%errstring'	PoseView		Errore nell'espressione regolare:\n\n'%errstring'
 Small bitmap icon	AttributesView		Icona bitmap ridotta
-Would you like to find a suitable application to open the file?	FSUtils		Cercare un'applicazione adatta per aprire il file?
+Would you like to find a suitable application to open the file?	FSUtils		Vuoi cercare un'applicazione adatta per aprire il file?
 64 x 64	ContainerWindow		64 × 64
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Non è possibile sostituire una cartella o un collegamento simbolico con un file.
 Trailing \\.	libtracker		\\ alla fine.
@@ -158,7 +158,7 @@ The target disk does not support creating links.	FSUtils		Il disco non supporta 
 develop	B_SYSTEM_DEVELOP_DIRECTORY		sviluppo
 64-bit integer	AttributesView		Intero a 64 bit
 Cut more	ContainerWindow		Taglia di più
-The Tracker must be running to see Info windows.	PoseView		Il Tracker deve essere aperto per vedere le finestre di Informazione.
+The Tracker must be running to see Info windows.	PoseView		Il Tracker deve essere aperto per vedere le finestre di informazioni.
 Tracker preferences	TrackerSettingsWindow		Preferenze del Tracker
 Read	FilePermissionsView		Lettura
 There was an error writing the attribute.	WidgetAttributeText		Si è presentato un errore nella scrittura dell'attributo.
@@ -207,7 +207,7 @@ Location	ContainerWindow		Posizione
 Warning space color	SettingsView		Colore area di avvertimento
 Skip	FSUtils		Salta
 Text list	AttributesView		Lista di testo
-Used space color	SettingsView		Colore della spazio utilizzato
+Used space color	SettingsView		Colore spazio utilizzato
 Cancel	FSUtils		Annulla
 Original name	ContainerWindow		Nome originale
 Unknown	WidgetAttributeText		Sconosciuto
@@ -320,7 +320,7 @@ starts with	SelectionWindow		incomincia con
 Any	AttributesView		Qualsiasi
 New	DeskWindow		Nuovo
 Invert	SelectionWindow		Inverti
-Would you like to find some other suitable application?	FSUtils		Vuoi cercare qualche altra applicazione adatta?
+Would you like to find some other suitable application?	FSUtils		Vuoi cercare un'applicazione adatta?
 *+? operand may be empty.	libtracker		operando *+? potrebbe essere vuoto.
 (unknown)	AttributesView		(sconosciuto)
 Recent folders	FavoritesMenu		Cartelle recenti
@@ -328,7 +328,7 @@ Signed memory size	AttributesView		Dimemsione memoria con segno
 The specified name is illegal. Please choose another name.	FilePanelPriv		Il nome specificato è illegale. Sceglierne un altro.
 of %items	StatusWindow		di %items
 less than	FindPanel		meno di
-Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Errore durante la copia del file \"%name\":\n\t%error\n\nVolete continuare?
+Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Errore durante la copia del file \"%name\":\n\t%error\n\nVuoi continuare?
 Creating links: 	StatusWindow		Creazione collegamenti: 
 Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Non è stato possibile aprire \"%document\" con l'applicazione \"%app\" (%error). 
 Create %s clipping	PoseView		Crea l'appunto %s
@@ -397,7 +397,7 @@ Edit favorites…	FilePanelPriv		Modifica preferiti…
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		Non è possibile spostare una cartella dentro a se stessa o a qualsiasi altra delle sue sotto-cartelle
 New	ContainerWindow		Nuovo
 Fewer options	FindPanel		Meno opzioni
-You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Trascinare gli elementi su una delle icone dei dischi nella finestra \"Disks\".
+You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Trascinare gli elementi su una delle icone dei dischi nella finestra \"Dischi\".
 If you alter %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Se modifichi %target, %osName potrebbe non fuinzionare correttamente!\n\nSei sicuro di voler procedere?
 Sorry, you can't copy items to the Trash.	FSClipBoard		Non è possibile copiare elementi nel Cestino.
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Alcuni elementi esistono già in questa cartella con gli stessi nomi di quelli che si stanno %verb.\n \nSostituirli con quelli che si stanno %verb o richiedere per ciascuno di essi?
@@ -467,7 +467,7 @@ New folder %ld	FSUtils		Nuova cartella %ld
 64 x 64	DeskWindow		64 × 64
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" usa un formato obsoleto di file eseguibile. Si prega di utilizzare una versione aggiornata dell'applicazione o di compilarla nuovamente.
 Only the boot disk	AutoMounterSettings		Solo il disco di boot
-That name is already taken. Please type another one.	WidgetAttributeText		Quel nome è già utilizzato. Scriverne un altro.
+That name is already taken. Please type another one.	WidgetAttributeText		Quel nome è già utilizzato. Per favore, scegline un altro.
 Message	AttributesView		Messaggio
 Modified	Default Query Columns		Modificato
 Default application	InfoWindow		Applicazione predefinita

@@ -1,17 +1,20 @@
-1	italian	x-vnd.Haiku-Input	2494436940
+1	italian	x-vnd.Haiku-Input	3910661481
 Scrolling	TouchpadPrefView		Scorrimento
 Defaults	InputMouse		Predefiniti
 Tapping	TouchpadPrefView		Tapping
 Long	KeyboardView		Lungo
 Normal	SettingsView		Normale
 Cancel	TouchpadPrefView		Annulla
+4-Button	SettingsView		4 Pulsanti
 Slow	TouchpadPrefView		Lenta
 Warp	SettingsView		Warp
 Instant warp	SettingsView		Warp immediato
 Device List	InputWindow		Lista Dispositivi
 Double-click speed	SettingsView		Velocità doppio click
+5-Button	SettingsView		5 Pulsanti
 Typing test area	KeyboardView		Area di test battitura
 Mouse type:	SettingsView		Tipo Mouse:
+Revert	InputKeyboard		Annulla
 Fast	KeyboardView		Veloce
 Off	TouchpadPrefView		Spento
 Fast	TouchpadPrefView		Veloce
@@ -24,12 +27,13 @@ OK	TouchpadPrefView		OK
 Horizontal scrolling	TouchpadPrefView		Scrolling orizzontale
 Delay until key repeat	KeyboardView		Ritardo dopo ripetizione tasto
 Two finger scrolling	TouchpadPrefView		Scorrimento con due dita
-Input	System name		Input
+Input	System name		Periferiche di ingresso
 Mouse acceleration	SettingsView		Accelerazione del mouse
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		La nuova area di scrolling è molto ampia e potrebbe impedire il normale funzionamento del mouse. Sei sicuro di voler procedere?
 High	TouchpadPrefView		Alto
 Defaults	TouchpadPrefView		Predefiniti
 1-Button	SettingsView		1 Pulsante
+Defaults	InputKeyboard		Predefiniti
 Short	KeyboardView		Corto
 Slow	KeyboardView		Lenta
 Revert	InputMouse		Annulla modifiche

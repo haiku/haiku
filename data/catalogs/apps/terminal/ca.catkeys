@@ -1,7 +1,7 @@
 1	catalan; valencian	x-vnd.Haiku-Terminal	2664488407
 Close other tabs	Terminal TermWindow		Tanca les altres pestanyes
 Insert path	Terminal TermView		Insereix un camí
-Terminal couldn't start the shell. Sorry.	Terminal TermApp		El terminal no ha pogut obrir l'intèrpret de les ordres. Ho sentim.
+Terminal couldn't start the shell. Sorry.	Terminal TermApp		El terminal no ha pogut obrir l'intèrpret d'ordres. Disculpeu.
 Text encoding	Terminal TermWindow		Codificació del text
 OK	Terminal SetTitleWindow		D'acord
 Edit	Terminal TermWindow		Edita
@@ -41,12 +41,12 @@ New tab	Terminal TermWindow		Pestanya nova
 Allow bold text	Terminal AppearancePrefView		Permet text en negreta
 Window title…	Terminal TermWindow		Títol de la finestra...
 Blue	Terminal colors scheme		Blau
-Cannot execute \"%command\":\n\t%error	Terminal Shell		No ha estat possible executar l'ordre \"%command\":\n\t%error
+Cannot execute \"%command\":\n\t%error	Terminal Shell		No s'ha pogut executar l'ordre \"%command\":\n\t%error
 Open path	Terminal TermView		Obre el camí
 Terminal	System name		Terminal
 Font size	Terminal TermWindow		Mida de la lletra
 Custom	Terminal colors scheme		Personalitzat
-Really close?	Terminal TermWindow		Esteu segur que voleu sortir?
+Really close?	Terminal TermWindow		Segur que en voleu sortir?
 OK	Terminal TermApp		D'acord
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		El procés \"%1\" encara s'executa.\nTancar el Terminal matarà el procés.
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Opció no reconeguda \"%s\"\n

@@ -25,7 +25,7 @@ Width:	GeneralView		Ширина:
 General	PrefletView		Загальні
 OK	NotificationView		ОК
 Follow Deskbar	GeneralView		Слідкувати за Deskbar
-Notifications	System name		Оповіщення
+Notifications	System name		Notifications
 Allowed	NotificationView		Дозволити
 Duration:	GeneralView		Тривалість:
 Application	NotificationView		Програма

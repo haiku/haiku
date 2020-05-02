@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Network	115295218
+1	german	x-vnd.Haiku-Network	2923905377
 Ethernet device	InterfaceListItem		Ethernet-Gerät
 Link speed:	IntefaceView		Geschwindigkeit:
 disconnected	IntefaceView		getrennt
@@ -47,6 +47,7 @@ Status:	IntefaceView		Status:
 Disable	IntefaceView		Deaktivieren
 Manage…	NetworkWindow		Verwalten…
 open	Open network		frei
+Network	System name		Netzwerk
 Your gateway to the internet	IntefaceAddressView		Zugangsadresse zum Internet
 Enable	ServiceView		Aktivieren
 Wireless device	InterfaceListItem		Funknetzwerkgerät

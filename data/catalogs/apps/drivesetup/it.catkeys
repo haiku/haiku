@@ -20,7 +20,7 @@ Partition size	CreateParametersPanel		Dimensione della partizione
 Validation of the given parameters failed.	MainWindow		Validazione dei parametri forniti fallita.
 The partition %s is currently mounted.	MainWindow		La partizione %s è stata già montata.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Sei sicuro di voler formattare la partizione \"%s\"? Ti sarà nuovamente chiesta conferma prima di salvare i cambiamenti sul disco.
-DriveSetup	System name		Gestione disco
+DriveSetup	System name		Gestione Disco
 Mounted at	PartitionList		Montato su
 Create…	MainWindow		Crea…
 Write changes	MainWindow		Salva modifiche
@@ -47,7 +47,7 @@ End: %s	Support		Fine: %s
 Partition type	PartitionList		Tipo di partizione
 Unable to find the selected partition by ID.	MainWindow		Impossibile trovare la partizione selezionata mediante l'ID.
 The currently selected partition is not empty.	MainWindow		La partizione attualmente selezionata non è vuota.
-Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Sei sicuro di voler formattare un disco attualmente allo stato grezzo? (Molte persone in izializzano il disco tramite partizionamento, prima) Ti verrà chiesta nuovamente conferma prima della scrittura effettiva dei cambiamenti sul disco.
+Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Sei sicuro di voler formattare un disco attualmente allo stato grezzo? (Molte persone inizializzano il disco tramite partizionamento, prima). Ti verrà chiesta nuovamente conferma prima della scrittura effettiva dei cambiamenti sul disco.
 Wipe (not implemented)	MainWindow		Pulisci (non implementato)
 The currently selected partition does not have a parent partition.	MainWindow		La partizione attualmente selezionata non ha una sopra-partizione.
 Validation of the given initialization parameters failed.	MainWindow		La validazione dei parametri di inizializzazione forniti è fallita.
@@ -67,7 +67,7 @@ Cancel	AbstractParametersPanel		Annulla
 Format	MainWindow		Formatta
 <empty or unknown>	DiskView		<vuoto o sconosciuto>
 OK	MainWindow		OK
-Open with DiskProbe	MainWindow		Apri con DiskProbe
+Open with DiskProbe	MainWindow		Apri con Utility Disco
 Could not delete the selected partition.	MainWindow		Impossibile rimuovere la partizione selezionata.
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Sei sicuro di voler inizializzare il disco selezionato? Tutti i dati saranno perduti. Ti sarà nuovamente chiesta conferma prima della scrittura delle modifiche sul disco.\n
 There was an error preparing the disk for modifications.	MainWindow		Si è verificato un errore nella preparazione delle modifiche al disco.

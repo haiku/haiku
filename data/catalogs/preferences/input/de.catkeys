@@ -1,17 +1,20 @@
-1	german	x-vnd.Haiku-Input	2494436940
+1	german	x-vnd.Haiku-Input	3910661481
 Scrolling	TouchpadPrefView		Scrollen
 Defaults	InputMouse		Standardwerte
 Tapping	TouchpadPrefView		Klicken
 Long	KeyboardView		Lang
 Normal	SettingsView		Normal
 Cancel	TouchpadPrefView		Abbrechen
+4-Button	SettingsView		4-Tasten
 Slow	TouchpadPrefView		Langsam
 Warp	SettingsView		Warp
 Instant warp	SettingsView		Sofortiger Warp
 Device List	InputWindow		Geräteliste
 Double-click speed	SettingsView		Doppelklickgeschwindigkeit
+5-Button	SettingsView		5-Tasten
 Typing test area	KeyboardView		Feld für Testeingaben
 Mouse type:	SettingsView		Mausart:
+Revert	InputKeyboard		Anfangswerte
 Fast	KeyboardView		Schnell
 Off	TouchpadPrefView		Aus
 Fast	TouchpadPrefView		Schnell
@@ -30,6 +33,7 @@ The new scroll area is very large and may impede normal mouse operation. Do you 
 High	TouchpadPrefView		Hoch
 Defaults	TouchpadPrefView		Standardwerte
 1-Button	SettingsView		1-Taste
+Defaults	InputKeyboard		Standardwerte
 Short	KeyboardView		Kurz
 Slow	KeyboardView		Langsam
 Revert	InputMouse		Anfangswerte

@@ -1,7 +1,10 @@
-1	finnish	x-vnd.Haiku-libpackage	2012114212
+1	finnish	x-vnd.Haiku-libpackage	134767648
+Fetching repository-cache from %url	RefreshRepositoryRequest		Noudetaan tietovarastovälimuisti osoitteesta %url
+Validating checksum for %repositoryName	RefreshRepositoryRequest		Vahvistetaan tarkistussumma kohteelle %repositoryName
 Failed to remove transaction directory	PackageManagerKit		Tapahtumahakemiston poistaminen epäonnistui
 Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		Asetusten hakeminen tietovarastosta ”%s” epäonnistui. Ohitetaan.
 Refreshing repository \"%s\" failed	PackageManagerKit		Tietovaraston ”%s” päivittäminen epäonnistui
+Fetching repository checksum from %url	RefreshRepositoryRequest		Noudetaan tietovaraston tarkistussumma osoitteesta %url
 Failed to get repository names	PackageManagerKit		Tietovaraston nimien hakeminen epäonnistui
 Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		Tietovaraston ”%s” välimuistin hakeminen epäonnistui. Ohitetaan.
 Package %s-%s doesn't have a matching requires for its base package \"%s\"	PackageManagerKit		Pakkauksella %s-%s ei ole täsmääviä vaatimuksia peruspakkaukselleen ”%s”

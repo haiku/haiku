@@ -99,7 +99,7 @@ Translation X	Icon-O-Matic-PropertyNames		Traslazione X
 Flip Control Points	Icon-O-Matic-FlipPointsCmd		Capovolgi punti di controllo
 Add Transformers	Icon-O-Matic-AddTransformersCmd		Aggiungi Trasformatori
 BEOS:ICON Attribute	Icon-O-Matic-SavePanel		Attributo BEOS:ICON
-Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Icon-O-Matic potrebbe non aver interpretato tutte le informazioni dall'SVG quando è stato caricato. Sovrascrivendo il file originale, questa informazione verrebbe persa.
+Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Icon-O-Matic potrebbe non aver interpretato correttamente tutte le informazioni dall'SVG quando è stato caricato. Sovrascrivendo il file originale, queste informazioni andranno perse.
 Rotate indices backwards	Icon-O-Matic-PathsList		Ruotare gli indici indietro
 Overwrite	Icon-O-Matic-SVGExport		Sovrascrivi
 Modify Control Point	Icon-O-Matic-ChangePointCmd		Modifica punti di controllo

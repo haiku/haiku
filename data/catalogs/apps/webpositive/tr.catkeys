@@ -3,7 +3,7 @@ Authentication required	Authentication Panel		Kimlik doğrulaması gerekli
 Previous	WebPositive Window		Önceki
 (Finish: %date)	Download Window		(Bitiş: %date)
 Open bookmarks confirmation	WebPositive Window		Yer imi aç onayı
-Download folder:	Settings Window		İndirilenler klasörü
+Download folder:	Settings Window		İndirmeler klasörü
 Close window	WebPositive Window		Pencereyi kapat
 Find:	WebPositive Window		Bul:
 Script console	WebPositive Window		Betik konsolu
@@ -27,7 +27,7 @@ Clone current page	Settings Window		Şu anki sayfadan bir tane daha aç
 Start page:	Settings Window		Başlangıç sayfası:
 Cancel	Download Window		İptal
 Settings	Settings Window		Ayarlar
-Downloads	WebPositive Window		İndirilenler
+Downloads	WebPositive Window		İndirmeler
 Browse…	Settings Window		Göz at…
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Bu sayfa için bir yer imi (%bookmarkName) hâlihazırda mevcut.
 Resume prior session	Settings Window		Bir önceki oturumu sürdür
@@ -149,7 +149,7 @@ Confirmation	WebPositive Window		Onaylama
 Session cookie	Cookie Manager		Oturum çerezi
 Open all	WebPositive Window		Tümünü aç
 Cut	WebPositive Window		Kes
-Downloads	Download Window		İndirilenler
+Downloads	Download Window		İndirmeler
 Open blank page	Settings Window		Boş sayfa aç
 Clear history	WebPositive Window		Geçmişi sil
 Cancel	WebPositive Window		İptal

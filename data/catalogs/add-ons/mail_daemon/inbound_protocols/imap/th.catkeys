@@ -1,0 +1,15 @@
+1	thai	x-vnd.Haiku-IMAP	1343128980
+Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		ไม่สามารถเชื่อมต่อกับเซิฟเวอร์ \"%server%\":\n%error%
+Updating subscriptions to IMAP folders, please be patient…	IMAPFolderConfig		กำลังอัปเดตการสมัครรับข้อมูลไปยังโฟลเดอร์ IMAP โปรดรอ ...
+Failed to fetch available storage.	IMAPFolderConfig		ไม่สามารถดึงที่เก็บข้อมูลที่มีอยู่
+Cancel	IMAPFolderConfig		ยกเลิก
+OK	IMAPFolderConfig		ตกลง
+Server storage: %s / %s used.	IMAPFolderConfig		ที่เก็บข้อมูลเซิฟเวอร์: %s / %s ใช้
+No encryption	imap_config		ไม่มีการเข้ารหัส
+Fetching IMAP folders, please be patient…	IMAPFolderConfig		กำลังเรียกโฟลเดอร์ IMAP โปรดรอ ...
+Configure IMAP Folders	imap_config		กำหนดค่าโฟลเดอร์ IMAP
+SSL	imap_config		SSL
+Apply	IMAPFolderConfig		ใช้
+status	IMAPFolderConfig		สถานะ
+IMAP Folders	IMAPFolderConfig		โฟลเดอร์ IMAP
+Destination:	imap_config		ปลายทาง:

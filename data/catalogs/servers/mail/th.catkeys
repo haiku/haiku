@@ -1,0 +1,19 @@
+1	thai	x-vnd.Be-POST	2949558073
+No new messages	MailDaemon		ไม่มีข้อความใหม่
+No new messages	DeskbarView		ไม่มีข้อความใหม่
+Shutdown mail services	DeskbarView		ปิดบริการอีเมล
+Mail status	MailDaemon		สถานะจดหมาย
+Fetching mail for %name	Notifier		กำลังดึงเมลสำหรับ %name
+{0, plural, one{# new message} other{# new messages}}	DeskbarView		{0, plural, one{# new message} other{# new messages}}
+{0, plural, one{# new message} other{# new messages}} for %name\n	MailDaemon		{0, plural, one{# new message} other{# new messages}} for %name\n
+Create new message…	DeskbarView		สร้างข้อความใหม่
+Send pending mails	DeskbarView		ส่งอีเมลที่รอดำเนินการ
+Settings…	DeskbarView		ตั้งค่า
+{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{One new message} other{# new messages}}
+New Messages	MailDaemon		ข้อความใหม่
+<no accounts>	DeskbarView		<no accounts>
+Mail status	Notifier		สถานะจดหมาย
+Check for mails only	DeskbarView		ตรวจสอบจดหมายเท่านั้น
+Check for mail now	DeskbarView		ตรวจสอบจดหมายตอนนี้
+Sending mail for %name	Notifier		กำลังส่งเมลสำหรับ %name
+Mail daemon status log	MailDaemon		บันทึกสถานะจดหมาย daemon

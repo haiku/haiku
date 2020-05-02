@@ -1,0 +1,8 @@
+1	thai	x-vnd.Haiku-debug_server	3188340596
+The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		แอปพลิเคชัน:\n\n%app\n\nพบข้อผิดพลาดที่ป้องกันไม่ให้ดำเนินการต่อ Haiku จะยกเลิกแอปพลิเคชันและล้างข้อมูล
+Oh yeah!	DebugServer		โอ เย้!
+Debug	DebugServer		การแก้ปัญหา
+Terminate	DebugServer		ยกเลิก
+Save report	DebugServer		บันทึกรายงาน
+Write core file	DebugServer		เขียนไฟล์แกน
+Oh no!	DebugServer		โอ้ ไม่!

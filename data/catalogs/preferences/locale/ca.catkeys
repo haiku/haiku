@@ -2,7 +2,7 @@
 Available languages	Locale Preflet Window		Llengües disponibles
 Negative:	TimeFormatSettings		Negatiu:
 already chosen	LanguageListView		ja s'ha escollit
-Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		No ha estat possible trobar les llengües disponibles! No podeu utilitzar aquesta aplicació de preferències!
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		No s'han pogut trobar les llengües disponibles! No podeu usar aquesta aplicació de preferències!
 Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Cal reiniciar la barra d'escriptori i el Rastrejador perquè aquest canvi tingui efecte. Els voleu reiniciar ara?
 Long format:	TimeFormatSettings		Format llarg:
 Currency	TimeFormatSettings		Moneda

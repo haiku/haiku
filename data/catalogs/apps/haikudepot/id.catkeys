@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-HaikuDepot	3195269648
+1	indonesian	x-vnd.Haiku-HaikuDepot	3381858533
 Repository update error	LocalRepositoryUpdateProcess		Kesalahan pembaruan repositori
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Terjadi kesalahan saat menyegarkan repositori: %error%
 User Created	UserLoginWindow		Pengguna Dibuat
@@ -37,6 +37,7 @@ Switch account…	MainWindow		Beralih akun...
 Preferred language:	UserLoginWindow		Bahasa pilihan:
 Server Error	ServerHelper		server error
 Name	PackageListView		Nama
+Authorization or security issue. Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		Otorisasi atau masalah keamanan. Logout dan masuk kembali lagi untuk memeriksa apakah kata sandi Anda benar dan juga memeriksa apakah Anda telah menyetujui ketentuan penggunaan terbaru.
 Local	LocalPkgDataLoadProcess		Lokal
 Rate %Package%	RatePackageWindow		Nilai %Package%
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Terjadi kesalahan saat menginisialisasi manajer paket:%message%
@@ -56,6 +57,7 @@ There was a puzzling response from the web service.	UserLoginWindow		Ada respon 
 Not logged in	MainWindow		Tidak masuk
 No, quit HaikuDepot	App		Tidak, keluar dari HaikuDepot
 Featured packages	FeaturedPackagesView		Paket unggulan
+The supplied response to the captcha is incorrect. A new captcha will be generated; try again.	UserLoginWindow		Tanggapan yang disediakan untuk captcha salah. Captcha baru akan dihasilkan; coba lagi.
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Tadi tidak dimungkinkan untuk berkomunikasi dengan server untuk mendapatkan gambar captcha yang diperlukan untuk membuat pengguna baru.
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Peringkat Anda berhasil diunggah. Anda dapat memperbarui atau menghapusnya di situs web server HaikuDepot.
 Network Error	ServerHelper		Ada kesalahan Jaringan
@@ -102,12 +104,15 @@ Close	UserLoginWindow		Tutup
 Close	RatePackageWindow		Tutup
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Menyinkronkan data paket untuk repositori '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Lihat kondisi penggunaan
-Size	PackageListView		Ukuran
+Login issue	MainWindow		Masalah masukc
 Your rating:	RatePackageWindow		Penilaianmu:
+Size	PackageListView		Ukuran
+The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		Pengguna %Nickname% telah berhasil dibuat di sistem HaikuDepotServer. Anda dapat mengelola detail pengguna Anda dengan menggunakan antarmuka web. Anda sekarang masuk sebagai pengguna baru ini.
 Your rating was updated.	RatePackageWindow		Peringkat anda telah diperbarui.
 All categories	FilterView		Semua kategori
 Repositories	MainWindow		Repositori
 n/a	PackageInfoView		n/a
+This rating is visible to other users	RatePackageWindow		Peringkat ini terlihat oleh pengguna lain
 View agreed usage conditions…	MainWindow		Lihat ketentuan penggunaan yang disepakati…
 Cancel	MainWindow		Batal
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 more to download)}other{(# more to download)}}
@@ -121,6 +126,7 @@ Log out	MainWindow		Keluar
 Comment language:	RatePackageWindow		Bahasa komentar:
 Status	PackageListView		Status
 The password has been incorrectly repeated.	UserLoginWindow		Kata sandi salah diulang.
+The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		Kata sandi yang sebelumnya disediakan untuk pengguna [%Nickname%] saat ini tidak valid. Pengguna akan keluar dari aplikasi ini dan Anda harus masuk lagi dengan kata sandi Anda yang diperbarui.
 Update	RatePackageWindow		Memperbarui
 OK	ServerHelper		OKE
 Language	UserLoginWindow		Bahasa
@@ -145,13 +151,16 @@ Email address:	UserLoginWindow		Alamat email:
 Screenshot	ScreenshotWindow		Screenshot
 HaikuDepot	System name		HaikuDepot
 A reboot is necessary to complete the installation process.	PackageManager		Boot ulang diperlukan untuk menyelesaikan proses pemasangan.
+{0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{I am at least one year old}other{I am # tahun lebih tua}}
 View latest usage conditions…	MainWindow		Lihat ketentuan penggunaan terbaru…
 Quit	App		Berhenti
 Search terms:	FilterView		Kriteria pencarian:
 Pending…	PackageListView		Menunggu keputusan…
+The nickname is malformed. The nickname may only contain digits and lower case latin characters. The nickname must be between four and sixteen characters in length.	UserLoginWindow		Nama panggilan salah. Nama panggilan hanya boleh berisi digit dan huruf latin kecil. Panjang julukan harus antara empat dan enam belas karakter.
 Category:	FilterView		Kategori:
 Authentication failed	UserLoginWindow		Otentikasi gagal
 Captcha error	UserLoginWindow		Kesalahan captcha
+The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		Nama panggilan harus unik, tetapi nama panggilan yang diberikan sudah diambil. Pilih nama panggilan yang berbeda.
 Manage repositories…	MainWindow		Kelola repositori…
 Fetching remote repository data	LocalRepositoryUpdateProcess		Mengambil data repositori jarak jauh
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	UserLoginWindow		Terjadi kesalahan saat mengunduh kondisi penggunaan yang diperlukan untuk membuat pengguna baru. Periksa log untuk detailnya dan coba lagi.\nInformasi tentang cara melihat log tersedia di bagian HaikuDepot pada panduan pengguna.
@@ -160,6 +169,7 @@ Open %DeskbarLink%	PackageManager		Buka %DeskbarLink%
 User creation error	UserLoginWindow		Kesalahan pembuatan pengguna
 Install	PackageManager		Instalasi
 Input validation	UserLoginWindow		Validasi masukan
+This application is too old to communicate with the HaikuDepot server system. Obtain a newer version of HaikuDepot by updating your Haiku system. The minimum version of HaikuDepot required is \"%s\".	ServerHelper		Aplikasi ini terlalu tua untuk berkomunikasi dengan sistem server HaikuDepot. Dapatkan versi HaikuDepot yang lebih baru dengan memperbarui sistem Haiku Anda. Versi minimum HaikuDepot yang diperlukan adalah \"%s\".
 An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		Kesalahan tak terduga telah dikirim dari server HaikuDepot [%i]
 Log in…	MainWindow		Log masuk…
 You need to be logged into an account before you can rate packages.	MainWindow		Anda harus masuk ke akun sebelum dapat memberi nilai paket.

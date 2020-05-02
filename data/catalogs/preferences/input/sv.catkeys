@@ -1,17 +1,20 @@
-1	swedish	x-vnd.Haiku-Input	2494436940
+1	swedish	x-vnd.Haiku-Input	3910661481
 Scrolling	TouchpadPrefView		Rulla
 Defaults	InputMouse		Förvalt
 Tapping	TouchpadPrefView		Knacka
 Long	KeyboardView		Lång
 Normal	SettingsView		Normal
 Cancel	TouchpadPrefView		Avbryt
+4-Button	SettingsView		4-Knappa
 Slow	TouchpadPrefView		Långsam
 Warp	SettingsView		Varp
 Instant warp	SettingsView		Omedelbar varp
 Device List	InputWindow		Enhetslista
 Double-click speed	SettingsView		Dubbelklicks hastighet
+5-Button	SettingsView		5-Knappar
 Typing test area	KeyboardView		Test skrivnings område
 Mouse type:	SettingsView		Mus typ:
+Revert	InputKeyboard		Återställ
 Fast	KeyboardView		Snabb
 Off	TouchpadPrefView		Av
 Fast	TouchpadPrefView		Snabb
@@ -30,6 +33,7 @@ The new scroll area is very large and may impede normal mouse operation. Do you 
 High	TouchpadPrefView		Hög
 Defaults	TouchpadPrefView		Förvalt
 1-Button	SettingsView		1-Knapp
+Defaults	InputKeyboard		Standard
 Short	KeyboardView		Kort
 Slow	KeyboardView		Långsam
 Revert	InputMouse		Återställ

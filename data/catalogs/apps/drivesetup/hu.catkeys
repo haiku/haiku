@@ -67,7 +67,7 @@ Cancel	AbstractParametersPanel		Mégse
 Format	MainWindow		Formázás
 <empty or unknown>	DiskView		<üres vagy ismeretlen>
 OK	MainWindow		Rendben
-Open with DiskProbe	MainWindow		Megnyitás a Lemez Zsonglőrrel
+Open with DiskProbe	MainWindow		Megnyitás a Lemezfürkésszel
 Could not delete the selected partition.	MainWindow		A kiválasztott partíció nem törölhető.
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Biztosan elő szeretnéd készíteni a megadott lemezt? Az összes adat el fog veszni. Ezt majd még egyszer meg kell erősítened.\n
 There was an error preparing the disk for modifications.	MainWindow		Hiba történt a változtatások lemezre írása közben.

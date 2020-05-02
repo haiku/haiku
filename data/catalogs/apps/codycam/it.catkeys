@@ -38,7 +38,7 @@ Password:	CodyCam		Password:
 still image filename expected	CodyCam		nome file per l'immagine statica non indicato
 File name:	CodyCam		Nome del file:
 Directory:	CodyCam		Cartella:
-Error setting type of output file	VideoConsumer.cpp		Errore durante l'impostazione del tipo di file in output
+Error setting type of output file	VideoConsumer.cpp		Errore durante l'impostazione del tipo di file di uscita
 Locking the window	VideoConsumer.cpp		Blocco della finestra
 Cannot find an available video stream	CodyCam		Impossibile trovare un flusso video disponibile
 Upload…	VideoConsumer.cpp		Carica…
@@ -80,9 +80,9 @@ login ID expected	CodyCam		ID di login atteso
 Video settings	CodyCam		Impostazioni video
 Can't find an available connection to the video window	CodyCam		Impossibile trovare una connessione disponibile per la finestra video
 FTP	CodyCam		FTP
-Error creating output file	VideoConsumer.cpp		Errore nella creazione del file di output
+Error creating output file	VideoConsumer.cpp		Errore nella creazione del file di uscita
 Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Sorgente video non trovata.\nCodyCam richiede l'uso di una webcam.
 Logging in…	VideoConsumer.cpp		Autenticazione…
-CodyCam	System name		CodyCam
-Error writing output file	VideoConsumer.cpp		Errore di scrittura del file di output
+CodyCam	System name		Utility CodyCam
+Error writing output file	VideoConsumer.cpp		Errore di scrittura del file di uscita
 Capture controls	CodyCam		Controlli di cattura

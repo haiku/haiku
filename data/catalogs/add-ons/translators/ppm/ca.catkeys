@@ -1,6 +1,6 @@
 1	catalan; valencian	x-vnd.Haiku-PPMTranslator	292474603
 None	PPMTranslator		Cap
-PPM Settings	PPMMain		Paràmetres del PPM
+PPM Settings	PPMMain		Paràmetres de PPM
 System palette 8 bits	PPMTranslator		Paleta del sistema de 8 bits
 Sample code copyright 1999, Be Incorporated	PPMTranslator		Codi de mostra copyright 1999, Be Incorporated
 Something is wrong with the PPMTranslator!	PPMMain		Alguna cosa falla amb el PPMTranslator!
@@ -10,7 +10,7 @@ RGB 8:8:8 32 bits big-endian	PPMTranslator		RGB 8:8:8 32 bits big-endian
 PPM image translator	PPMTranslator		Traductor d'imatges PPM
 Bitmap 1 bit	PPMTranslator		Mapa de bits de 1 bit
 RGB 5:6:5 16 bits big-endian	PPMTranslator		RGB 5:6:5 16 bits big-endian
-PPMTranslator Settings	PPMTranslator		Paràmetres del PPMTranslator
+PPMTranslator Settings	PPMTranslator		Paràmetres del Traductor PPM
 CMY 8:8:8 32 bits	PPMTranslator		CMY 8:8:8 de 32 bits
 OK	PPMMain		D'acord
 CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 de 32 bits
@@ -18,7 +18,7 @@ PPM image	PPMTranslator		Imatge PPM
 Input color space:	PPMTranslator		Espai del color de l'entrada:
 RGB 5:5:5 16 bits big-endian	PPMTranslator		RGB 5:5:5 16 bits big-endian
 RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RGBA 5:5:5:1 16 bits big-endian
-Write ASCII	PPMTranslator		Desa en ASCII
+Write ASCII	PPMTranslator		Escriu en ASCII
 RGB 5:6:5 16 bits	PPMTranslator		RGB 5:6:5 de 16 bits
 RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8 32 bits big-endian
 RGBA 8:8:8:8 32 bits	PPMTranslator		RGBA 8:8:8:8 de 32 bits

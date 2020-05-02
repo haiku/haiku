@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-MediaPlayer	457442808
+1	indonesian	x-vnd.Haiku-MediaPlayer	1313616492
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Hapus Entri ke Sampah
 Close	MediaPlayer-PlaylistWindow		Tutup
 Volume of background clips	MediaPlayer-SettingsWindow		Volume dari klip latar
@@ -68,6 +68,7 @@ Open…	MediaPlayer-PlaylistWindow		Buka…
 Revert	MediaPlayer-SettingsWindow		Pulihkan
 Low volume	MediaPlayer-SettingsWindow		Volume kecil
 Audio	MediaPlayer-Main		Audio
+{0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Stereo} other{# Kanal}}
 Quit	MediaPlayer-Main		Keluar
 Redo	MediaPlayer-PlaylistWindow		Ulangi
 Move Entry	MediaPlayer-MovePLItemsCmd		Pindah Entri

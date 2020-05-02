@@ -1,0 +1,22 @@
+1	thai	x-vnd.Haiku-PSDTranslator	3654055550
+Lab	PSDLoader		ห้องปฏิบัติการ
+Uncompressed	PSDConfig		ไม่บีบอัด
+Indexed	PSDLoader		การจัดทำดัชนี
+Grayscale	PSDLoader		โทนสีเทา
+Photoshop image translator	PSDConfig		ตัวแปลรูปภาพ Photoshop
+Photoshop image translator	PSDTranslator		ตัวแปลรูปภาพ Photoshop
+Version %d.%d.%d, %s	PSDConfig		เวอร์ชั่น %d.%d.%d, %s
+Photoshop Document (PSD file)	PSDConfig		เอกสาร Photoshop (ไฟล์ PSD)
+Photoshop image	PSDTranslator		ภาพ Photoshop
+RLE	PSDConfig		RLE
+Photoshop Big Document (PSB file)	PSDConfig		Photoshop Big Document (ไฟล์ PSB)
+RGBA	PSDLoader		RGBA
+Photoshop image (%s)	PSDTranslator		รูปภาพ Photoshop (%s)
+PSDTranslator Settings	PSDConfig		การตั้งค่า PSDTranslator
+RGB	PSDLoader		RGB
+Bitmap	PSDLoader		Bitmap
+CMYK	PSDLoader		CMYK
+Compression: 	PSDConfig		บีบอัด:
+Format: 	PSDConfig		รูปแบบ:
+Multichannel	PSDLoader		หลายช่อง
+Duotone	PSDLoader		Duotone

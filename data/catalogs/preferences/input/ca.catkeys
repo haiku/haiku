@@ -1,17 +1,20 @@
-1	catalan; valencian	x-vnd.Haiku-Input	2494436940
+1	catalan; valencian	x-vnd.Haiku-Input	3910661481
 Scrolling	TouchpadPrefView		Desplaçament
 Defaults	InputMouse		Per defecte
 Tapping	TouchpadPrefView		Tocs
 Long	KeyboardView		Llarg
 Normal	SettingsView		Normal
 Cancel	TouchpadPrefView		Cancel·la
+4-Button	SettingsView		Botó 4
 Slow	TouchpadPrefView		Lent
 Warp	SettingsView		Guerxesa
 Instant warp	SettingsView		Guerxesa instantània
 Device List	InputWindow		Llista de dispositius
 Double-click speed	SettingsView		Velocitat del clic doble
+5-Button	SettingsView		Botó 5
 Typing test area	KeyboardView		Àrea de prova per al tecleig
 Mouse type:	SettingsView		Tipus de ratolí:
+Revert	InputKeyboard		Reverteix
 Fast	KeyboardView		Ràpid
 Off	TouchpadPrefView		Desactivat
 Fast	TouchpadPrefView		Ràpid
@@ -30,6 +33,7 @@ The new scroll area is very large and may impede normal mouse operation. Do you 
 High	TouchpadPrefView		Alt
 Defaults	TouchpadPrefView		Per defecte
 1-Button	SettingsView		1 botó
+Defaults	InputKeyboard		Per defecte
 Short	KeyboardView		Curt
 Slow	KeyboardView		Lent
 Revert	InputMouse		Reverteix

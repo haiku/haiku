@@ -1,0 +1,17 @@
+1	thai	x-vnd.haiku.zip-o-matic	2032806096
+Drop files here.	file:ZipOMaticWindow.cpp		วางไฟล์ที่นี่
+Filename: %s	file:ZipOMaticWindow.cpp		ชื่อไฟล์: %s
+Do you want to stop them?	file:ZipOMatic.cpp		คุณต้องการหยุดหรือไม่?
+Error creating archive	file:ZipOMaticWindow.cpp		เกิดข้อผิดพลาดในการสร้างที่เก็บถาวร
+Stop them	file:ZipOMatic.cpp		หยุดการทำงาน
+Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		คุณแน่ใจหรือไม่ว่าต้องการหยุดสร้างที่เก็บถาวรนี้?
+Preparing to archive	file:ZipperThread.cpp		เตรียมที่เก็บถาวร
+Let them continue	file:ZipOMatic.cpp		ทำต่อไป
+Continue	file:ZipOMaticWindow.cpp		ต่อไป
+Archive created OK	file:ZipOMaticWindow.cpp		สร้างที่เก็บถาวร ตกลง
+{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# file added.} other{# files added.}} 
+Stop	file:ZipOMaticWindow.cpp		หยุด
+Stopped	file:ZipOMaticWindow.cpp		หยุด
+Archive	file:ZipperThread.cpp		เก็บ
+Creating archive: %s	file:ZipOMaticWindow.cpp		สร้างที่เก็บ: %s
+You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		คุณมี {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n

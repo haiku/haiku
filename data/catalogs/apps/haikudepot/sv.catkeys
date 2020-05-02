@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	3586526058
+1	swedish	x-vnd.Haiku-HaikuDepot	3381858533
 Repository update error	LocalRepositoryUpdateProcess		Fel vid uppdatering av repositorie
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Ett fel inträffade vid uppdatering av repositoriet: %error%
 User Created	UserLoginWindow		Användare skapad
@@ -37,6 +37,7 @@ Switch account…	MainWindow		Byt konto...
 Preferred language:	UserLoginWindow		Föredraget språk:
 Server Error	ServerHelper		Serverfel
 Name	PackageListView		Namn
+Authorization or security issue. Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		Autoriserings- eller säkerhetsproblem. Logga ut och logga in igen för att kontrollera att ditt lösenord är korrekt och också kontrollera att du har godkänt de senaste användningsvillkoren.
 Local	LocalPkgDataLoadProcess		Lokal
 Rate %Package%	RatePackageWindow		Betyg %Package%
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Ett fel inträffade vid initiering av pakethanteraren: %message%
@@ -56,6 +57,7 @@ There was a puzzling response from the web service.	UserLoginWindow		Det komm et
 Not logged in	MainWindow		Inte inloggad
 No, quit HaikuDepot	App		Nej, avsluta HaikuDepot
 Featured packages	FeaturedPackagesView		Utvalda paket
+The supplied response to the captcha is incorrect. A new captcha will be generated; try again.	UserLoginWindow		Det svaret på captcha är felaktigt. En ny captcha kommer att genereras; försök igen.
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Det var inte möjligt att kommunicera med servern för att få en captcha-bild som krävs för att skapa en ny användare.
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Ditt betyg har laddats upp. Du kan uppdatera eller ta bort det på webbplatsen för HaikuDepot-servern.
 Network Error	ServerHelper		Nätverksfel
@@ -103,12 +105,14 @@ Close	RatePackageWindow		Stäng
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synkroniserar paketdata för repositoriet '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Visa användarvillkor
 Login issue	MainWindow		Inloggnings problem
-Size	PackageListView		Storlek
 Your rating:	RatePackageWindow		Dina betyg:
+Size	PackageListView		Storlek
+The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		Användaren %Nickname% har framgångsrikt skapats i HaikuDepotServer-systemet. Du kan administrera dina användarinformation genom att använda webbgränssnittet. Du är nu inloggad som den här nya användaren.
 Your rating was updated.	RatePackageWindow		Ditt betyg ändrades.
 All categories	FilterView		Alla kategorier
 Repositories	MainWindow		Repositorier
 n/a	PackageInfoView		oviktigt
+This rating is visible to other users	RatePackageWindow		Detta betyg är synligt för andra användare
 View agreed usage conditions…	MainWindow		Visa godkända användarvillkor…
 Cancel	MainWindow		Avbryt
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 kvar att ladda hem)}other{(# kvar att ladda hem)}}
@@ -147,13 +151,16 @@ Email address:	UserLoginWindow		E-postadress:
 Screenshot	ScreenshotWindow		Skärmdump
 HaikuDepot	System name		HaikuDepot
 A reboot is necessary to complete the installation process.	PackageManager		En omstart är nödvändig för att slutföra installationsprocessen.
+{0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{I am at least one year old}other{I am # years of age or older}}
 View latest usage conditions…	MainWindow		Se de senaste användarvillkoren…
 Quit	App		Avsluta
 Search terms:	FilterView		Sökvillkor
 Pending…	PackageListView		Väntar...
+The nickname is malformed. The nickname may only contain digits and lower case latin characters. The nickname must be between four and sixteen characters in length.	UserLoginWindow		Användarnamnet är felformat. Användarnamnet kan endast innehålla siffror och små bokstäver i små bokstäver. Användarnamnet måste vara mellan fyra och sexton tecken i längd.
 Category:	FilterView		Kategori:
 Authentication failed	UserLoginWindow		Autentisering misslyckades
 Captcha error	UserLoginWindow		Captcha-fel
+The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		Användarnamnet måste vara unikt, men det medföljande användarnamnet har redan tagits. Välj ett annat användarnamnet .
 Manage repositories…	MainWindow		Hantera repositorier...
 Fetching remote repository data	LocalRepositoryUpdateProcess		Hämtar fjärrdata från repositorie
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	UserLoginWindow		Ett fel har uppstått vid nedladdning av användningsvillkoren som krävs för att skapa en ny användare. Kontrollera loggen för mer information och försök igen. \nInformation om hur du visar loggarna finns i HaikuDepot-avsnittet i användarhandboken.
@@ -162,6 +169,7 @@ Open %DeskbarLink%	PackageManager		Öppna %DeskbarLink%
 User creation error	UserLoginWindow		Användarskapande-fel
 Install	PackageManager		Installera
 Input validation	UserLoginWindow		Ogiltigt indata
+This application is too old to communicate with the HaikuDepot server system. Obtain a newer version of HaikuDepot by updating your Haiku system. The minimum version of HaikuDepot required is \"%s\".	ServerHelper		Denna applikation är för gammal för att kommunicera med HaikuDepot-serversystemet. Få en nyare version av HaikuDepot genom att uppdatera ditt Haiku-system. Den minsta versionen av HaikuDepot som krävs är \"%s\".
 An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		Ett oväntat fel har skickats från HaikuDepot-servern [%i]
 Log in…	MainWindow		Logga in...
 You need to be logged into an account before you can rate packages.	MainWindow		Du måste logga in för att kunna betygsätta paket.

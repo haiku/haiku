@@ -43,7 +43,7 @@ Track	Audio Track Menu		Linie
 Close	MediaPlayer-Main		Siere
 Save error	MediaPlayer-PlaylistWindow		Erôr di salvament
 Attributes	MediaPlayer-Main		Atributs
-Bottom of screen	MediaPlayer-SettingsWindow		Part basse dal visôr
+Bottom of screen	MediaPlayer-SettingsWindow		Part inferiôr dal visôr
 MediaPlayer settings	MediaPlayer-SettingsWindow		Impostazions di MediaPlayer
 Copyright	MediaPlayer-InfoWin		Copyright
 Invalid URL inserted!	MediaPlayer-NetworkStream		Inserît URL no valit!
@@ -106,10 +106,10 @@ There is no decoder installed to handle the file format, or the decoder has trou
 Lock Peaks	MediaPlayer-PeakView		Bloche pics
 none	Audio track menu		nissun
 Open network stream	MediaPlayer-NetworkStream		Vierç flus di rêt
-Automatically start playing	MediaPlayer-SettingsWindow		Comence la riproduzion in automatic
+Automatically start playing	MediaPlayer-SettingsWindow		Scomence la riproduzion in automatic
 Undo	MediaPlayer-PlaylistWindow		Disfe
 Display mode	MediaPlayer-InfoWin		Modalitât visualizazion
-Bottom of video	MediaPlayer-SettingsWindow		Part inferiôr dal visôr
+Bottom of video	MediaPlayer-SettingsWindow		Part inferiôr dal video
 Small	MediaPlayer-SettingsWindow		Piçui
 Settings…	MediaPlayer-Main		Impostazions…
 min	MediaPlayer-InfoWin	Minutes	min
@@ -147,7 +147,7 @@ Error: 	MediaPlayer-RemovePLItemsCmd		Erôr:
 Open	MediaPlayer-Main		Vierç
 ask every time	MediaPlayer-SettingsWindow		domande ogni volte
 (not supported)	MediaPlayer-InfoWin		(no supuartât)
-Randomize	MediaPlayer-PlaylistWindow		Casuâl
+Randomize	MediaPlayer-PlaylistWindow		Rangje a câs
 %.3f fps	MediaPlayer-InfoWin		%.3f fps
 Off	Subtitles menu		Disativâts
 400% scale	MediaPlayer-Main		Scjale 400%

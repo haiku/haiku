@@ -27,7 +27,7 @@ Shortcuts was unable to save your KeySet file!	ShortcutsWindow		キーセット�
 Remove selected shortcut	ShortcutsWindow		選択部を削除
 Error, NULL state description?	ShortcutsSpec		エラー、記述がありません?\n
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
-Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		キーセットファイルを開けませんでした！
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		キーセットファイルを開けませんでした!
 Save & apply	ShortcutsWindow		保存して適用
 Open	ShortcutsWindow		開く
 Append	ShortcutsWindow		追加
@@ -38,7 +38,7 @@ Append KeySet…	ShortcutsWindow		キーセットの追加…
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"
 Right	ShortcutsSpec		右
 OK	ShortcutsWindow		OK
-Add new shortcut	ShortcutsWindow		新規作成
+Add new shortcut	ShortcutsWindow		新規ショートカット
 (None)	ShortcutsSpec		(無し)
 Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
 Open KeySet…	ShortcutsWindow		キーセットを開く…

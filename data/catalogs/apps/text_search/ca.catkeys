@@ -16,7 +16,7 @@ Regular expression	GrepWindow		Expressió regular
 Text files only	GrepWindow		Només els fitxers de text
 Quit	GrepWindow		Surt
 Show files in Tracker	GrepWindow		Mostra els fitxers al Rastrejador
-Please select the files you wish to keep searching.	GrepWindow		Si us plau, trieu els fitxers que voleu continuar cercant.
+Please select the files you wish to keep searching.	GrepWindow		Si us plau, seleccioneu els fitxers que voleu continuar cercant.
 Trim to selection	GrepWindow		Escapça per la selecció
 Set target…	GrepWindow		Seleccioneu la destinació...
 TextSearch	GrepWindow		Cerca un text

@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-libtracker	2529905996
+1	greek, modern (1453-)	x-vnd.Haiku-libtracker	2292796282
 Created	ContainerWindow		Δημιουργήθηκε
 Open and make preferred	OpenWithWindow		'Ανοιγμα και ορισμός προεπιλεγμένου
 Kind	ContainerWindow		Είδος
@@ -21,8 +21,10 @@ Name	Default Query Columns		Όνομα
 Unmount	ContainerWindow		Αποπροσάρτηση
 Eject when unmounting	AutoMounterSettings		Εξαγωγή κατά την αποπροσάρτηση
 Searching for disks to mount…	StatusWindow		Αναζήτηση δίσκων για προσάρτηση...
+Error emptying Trash	FSUtils		Σφάλμα αδειάσματος Κάδου Απορριμάτων
 Opens with:	InfoWindow		Άνοιγμα με:
 Size	QueryPoseView		Μέγεθος
+128 x 128	ContainerWindow		128 x 128
 Prompt	FSUtils		Προτροπή
 Error in regular expression:\n\n'%errstring'	PoseView		Σφάλμα στην κανονική έκφραση:\n\n'%errstring'
 Would you like to find a suitable application to open the file?	FSUtils		Θα θέλατε να πραγματοποιηθεί η έυρεση μιας κατάλληλης εφαρμογής για το άνοιγμα του αρχείου;
@@ -177,6 +179,7 @@ Show navigator	SettingsView		Εμφάνιση πλοηγού
 Select all	DeskWindow		Επιλογή όλων
 Decrease size	ContainerWindow		Μείωση μεγέθους
 Mount all	MountMenu		Προσάρτηση όλων
+128 x 128	DeskWindow		128 x 128
 Size	Default Query Columns		Μέγεθος
 Favorites	FavoritesMenu		Αγαπημένα
 Delete	FilePanelPriv		Διαγραφή
@@ -337,7 +340,7 @@ Move to Trash	FilePanelPriv		Μεταφορά στον καδο ανακύκλω
 is	FindPanel		είναι
 40 x 40	DeskWindow		40 x 40
 40 x 40	ContainerWindow		40 χ 40
-New folder %ld	FSUtils		Νέος φάκελος
+New folder %ld	FSUtils		Νέος φάκελος %ld
 64 x 64	DeskWindow		64 x 64
 Only the boot disk	AutoMounterSettings		Μόνο ο δίσκος εκκίνησης
 That name is already taken. Please type another one.	WidgetAttributeText		Αυτό το όνομα είναι κατηλειμμένο. Παρακαλώ πληκτρολογήστε κάποιο άλλο.
@@ -365,9 +368,10 @@ Empty folder	NavMenu		Άδειος φάκελος
 Defaults	TrackerSettingsWindow		Προεπιλεγμένα
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Δεν υπάρχει ο απαιτούμενος ελευθερος χώρος στον τόμο για την αποθήκευση.
 Add-ons	FilePanelPriv		Πρόσθετα
+96 x 96	DeskWindow		96 x 96
 Empty folder	SlowContextPopup		Άδειος φάκελος
 Move to Trash	FSUtils		Μεταφορά στο Καλάθι αχρήστων
-Handles %type	OpenWithWindow		Χειρίζεται (%error)
+Handles %type	OpenWithWindow		Χειρίζεται %type
 Cancel	PoseView		Άκυρο
 Delete	PoseView		Διαγραφή
 Sorry, you can't copy items to the Trash.	PoseView		Δεν μπορείτε να αντιγράψετε στοιχεία στον Κάδο.

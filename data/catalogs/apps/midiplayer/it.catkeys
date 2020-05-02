@@ -11,7 +11,7 @@ Scope	Main Window		Oscilloscopio
 Drop MIDI file here	Scope View		Trascina un file MIDI qui
 None	Main Window		Nessuno
 Reverb:	Main Window		Riverbero:
-MidiPlayer	System name		MidiPlayer
+MidiPlayer	System name		Lettore Midi
 OK	Main Window		OK
 Stop	Main Window		Interrompi
 Live input:	Main Window		Ingresso diretto:

@@ -1,0 +1,155 @@
+1	thai	x-vnd.Haiku-MediaPlayer	1313616492
+Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		ย้ายรายการไปถังขยะ
+Close	MediaPlayer-PlaylistWindow		ปิด
+Volume of background clips	MediaPlayer-SettingsWindow		ระดับเสียงของคลิปพื้นหลัง
+Use hardware video overlays if available	MediaPlayer-SettingsWindow		ใช้การซ้อนทับวิดีโอฮาร์ดแวร์ถ้ามี
+Audio	MediaPlayer-InfoWin		เสียง
+Subtitle placement:	MediaPlayer-SettingsWindow		ตำแหน่งคำบรรยาย:
+MediaPlayer	System name		MediaPlayer
+Audio track	MediaPlayer-Main		แทร็กเสียง
+Muted	MediaPlayer-SettingsWindow		เงียบ
+OK	MediaPlayer-RemovePLItemsCmd		ตกลง
+Open Playlist	MediaPlayer-PlaylistWindow		เปิดเพลย์ลิส
+Subtitles	MediaPlayer-Main		บรรยาย
+%app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% พบข้อผิดพลาดภายใน ไม่สามารถเปิดไฟล์ได้
+DrawBitmap	MediaPlayer-InfoWin		DrawBitmap
+File info	MediaPlayer-InfoWin		ข้อมูลไฟล์
+raw audio	MediaPlayer-InfoWin		เสียงเดิม
+Select all	MediaPlayer-PlaylistWindow		เลือกทั้งหมด
+New player…	MediaPlayer-Main		เครื่องเล่นใหม่
+Move Entries	MediaPlayer-MovePLItemsCmd		ย้ายทั้งหมด
+OK	MediaPlayer-Main		ตกลง
+Remove	MediaPlayer-PlaylistWindow		ลบ
+<unknown>	MediaPlayer-InfoWin		<unknown>
+Resume:	MediaPlayer-SettingsWindow		สรุป:
+Duration	MediaPlayer-InfoWin		ระยะเวลา
+Import Entries	MediaPlayer-ImportPLItemsCmd		นำเข้าทั้งหมด
+Open network stream	MediaPlayer-Main		เปิดเครือข่ายสตรีม
+Move file to Trash	MediaPlayer-PlaylistWindow		ย้ายไฟล์ไปถังขยะ
+Open file…	MediaPlayer-Main		เปิดไฟล์
+Scale controls in full screen mode	MediaPlayer-SettingsWindow		ปรับการควบคุมในโหมดเต็มหน้าจอ
+View options	MediaPlayer-SettingsWindow		ตัวเลือกในการดู
+%d kHz	MediaPlayer-InfoWin		%d kHz
+Full volume	MediaPlayer-SettingsWindow		เต็มเสียง
+<untitled>	PlaylistItem-title		<untitled>
+Start media server	MediaPlayer-Main		เริ่มต้นเซิร์ฟเวอร์สื่อ
+It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		ดูเหมือนว่าเซิร์ฟเวอร์สื่อไม่ได้ทำงานอยู่\nคุณต้องการเริ่มหรือไม่?
+Location	MediaPlayer-InfoWin		สถานที่
+Medium	MediaPlayer-SettingsWindow		สื่อ
+Play mode	MediaPlayer-SettingsWindow		โหมดเล่น
+Playlist	MediaPlayer-PlaylistWindow		เพลย์ลิส
+%d Bit	MediaPlayer-InfoWin		%d Bit
+Track	Audio Track Menu		แท็รค
+Close	MediaPlayer-Main		ปิด
+Save error	MediaPlayer-PlaylistWindow		บันทึกผิดพลาด
+Attributes	MediaPlayer-Main		คุณสมบัติ
+Bottom of screen	MediaPlayer-SettingsWindow		ด้านล่างของหน้าจอ
+MediaPlayer settings	MediaPlayer-SettingsWindow		การตั้งค่า MediaPlayer
+Copyright	MediaPlayer-InfoWin		ลิขสิทธิ์
+Invalid URL inserted!	MediaPlayer-NetworkStream		ใส่ URL ไม่ถูกต้อง!
+Aspect ratio	MediaPlayer-Main		อัตราส่วนภาพ
+Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		การบันทึกเพลย์ลิสต์ล้มเหลว\n\nข้อผิดพลาด:
+<no media>	MediaPlayer-InfoWin		<no media>
+Hide interface	MediaPlayer-Main		ซ่อนอินเตอร์เฟซ
+Error: 	MediaPlayer-Main		ผิดพลาด
+Video track	MediaPlayer-Main		แทร็กวิดีโอ
+Playlist…	MediaPlayer-Main		เพลย์ลิส
+<unnamed media>	MediaPlayer-InfoWin		<unnamed media>
+Save	MediaPlayer-PlaylistWindow		บันทึก
+Randomize Entries	MediaPlayer-RandomizePLItemsCmd		สุ่มรายการทั้งหมด
+Cancel	MediaPlayer-NetworkStream		ยกเลิก
+Nothing to Play	MediaPlayer-Main		ไม่มีอะไรให้เล่น
+OK	MediaPlayer-SettingsWindow		ตกลง
+Remove Entries	MediaPlayer-RemovePLItemsCmd		ลบรายการทั้งหมด
+never	MediaPlayer-SettingsWindow		ไม่ต้องเลย
+Loop audio	MediaPlayer-SettingsWindow		เสียงวน
+Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		ข้อผิดพลาดภายใน (ข้อความที่มีรูปแบบไม่ถูกต้อง) การบันทึกเพลย์ลิสต์ล้มเหลว
+Open…	MediaPlayer-PlaylistWindow		เปิด
+Revert	MediaPlayer-SettingsWindow		เปลี่ยนกลับ
+Low volume	MediaPlayer-SettingsWindow		เสียงต้ำ
+Audio	MediaPlayer-Main		เสียง
+{0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Stereo} other{# Channels}}
+Quit	MediaPlayer-Main		ออก
+Redo	MediaPlayer-PlaylistWindow		ทำซ้ำ
+Move Entry	MediaPlayer-MovePLItemsCmd		ย้ายรายการ
+<unknown>	PlaylistItem-author		<unknown>
+Cancel	MediaPlayer-SettingsWindow		ยกเลิก
+Large	MediaPlayer-SettingsWindow		ขนาดใหญ่
+Import Entry	MediaPlayer-ImportPLItemsCmd		นำเข้ารายการ
+unknown format	MediaPlayer-InfoWin		รูปแบบที่ไม่รู้จัก
+Track %d	MediaPlayer-Main		แท็รค %d
+All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		ไม่สามารถย้ายไฟล์ทั้งหมดไปที่ถังขยะ
+Total duration: %s	MediaPlayer-PlaylistWindow		ระยะเวลารวม: %s
+%.3f kHz	MediaPlayer-InfoWin		%.3f kHz
+Move into trash error	MediaPlayer-RemovePLItemsCmd		ย้ายไปที่ถังขยะผิดพลาด
+50% scale	MediaPlayer-Main		มาตราส่วน 50%
+Drop files to play	MediaPlayer-Main		วางไฟล์เพื่อเล่น
+Copy Entry	MediaPlayer-CopyPLItemsCmd		คัดลอกรายการ
+Close window after playing audio	MediaPlayer-SettingsWindow		ปิดหน้าต่างหลังจากเล่นเสียง
+Edit	MediaPlayer-PlaylistWindow		แก้ไข
+Copy Entries	MediaPlayer-CopyPLItemsCmd		คัดลอกรายการทั้งหมด
+Always on top	MediaPlayer-Main		อยู่ด้านบนเสมอ
+Open	MediaPlayer-PlaylistWindow		เปิด
+always	MediaPlayer-SettingsWindow		ตลอด
+Loop video	MediaPlayer-SettingsWindow		วีดิโอวน
+Stream URL:	MediaPlayer-NetworkStream		URL สตรีม:
+<unknown>	PlaylistItem-album		<unknown>
+Stream settings	MediaPlayer-Main		การตั้งค่าการสตรีม
+none	Subtitles menu		ไม่มี
+Save Playlist	MediaPlayer-PlaylistWindow		บันทึกเพลย์ลิสต์
+Overlay	MediaPlayer-InfoWin		วางซ้อน
+2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
+Rating	MediaPlayer-Main		อัตรา
+Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		ข้อผิดพลาดภายใน (หน่วยความจำไม่เพียงพอ) การบันทึกเพลย์ลิสต์ล้มเหลว
+Video	MediaPlayer-Main		วีดิโอ
+There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		ไม่มีตัวถอดรหัสติดตั้งเพื่อจัดการกับรูปแบบไฟล์หรือตัวถอดรหัสมีปัญหากับรูปแบบเฉพาะรุ่น
+Lock Peaks	MediaPlayer-PeakView		Lock Peaks
+none	Audio track menu		ไม่มี
+Open network stream	MediaPlayer-NetworkStream		เปิดเครือข่ายสตรีม
+Automatically start playing	MediaPlayer-SettingsWindow		เริ่มเล่นอัตโนมัติ
+Undo	MediaPlayer-PlaylistWindow		เลิกทำ
+Display mode	MediaPlayer-InfoWin		โหมดการแสดงผล
+Bottom of video	MediaPlayer-SettingsWindow		ด้านล่างของวิดีโอ
+Small	MediaPlayer-SettingsWindow		เล็ก
+Settings…	MediaPlayer-Main		ตั้งค่า
+min	MediaPlayer-InfoWin	Minutes	min
+Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		การบันทึกเพลย์ลิสต์ล้มเหลว:\n\nข้อผิดพลาด:
+Video	MediaPlayer-InfoWin		วีดีโอ
+File info…	MediaPlayer-Main		ข้อมูลไฟล์
+1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (American)
+<unnamed>	PlaylistItem-name		<unnamed>
+Track	Video Track Menu		แท็รค
+Full screen	MediaPlayer-Main		เต็มจอ
+OK	MediaPlayer-NetworkStream		ตกลง
+Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		ข้อผิดพลาดภายใน (การล็อคล้มเหลว) การบันทึกเพลย์ลิสต์ล้มเหลว
+100% scale	MediaPlayer-Main		มาตราส่วน 100%
+<nothing to redo>	MediaPlayer-PlaylistWindow		<nothing to redo>
+Bad URL	MediaPlayer-NetworkStream		URL ไม่ถูกต้อง
+Save	MediaPlayer-Main		บันทึก
+Close window after playing video	MediaPlayer-SettingsWindow		ปิดหน้าต่างหลังจากเล่นวิดีโอ
+Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		ปรับขนาดภาพยนตร์ได้อย่างราบรื่น (โหมดที่ไม่ใช่ภาพซ้อนทับ)
+200% scale	MediaPlayer-Main		มาตราส่วน 200%
+The file '%filename' could not be opened.\n\n	MediaPlayer-Main		ไม่สามารถเปิดไฟล์ '%filename' ได้\n\n
+None of the files you wanted to play appear to be media files.	MediaPlayer-Main		ไม่มีไฟล์ใดที่คุณต้องการเล่นดูเหมือนเป็นไฟล์สื่อ
+Remove Entry	MediaPlayer-RemovePLItemsCmd		ลบรายการ
+Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		ลบรายการทั้งหมดไปที่ถังขยะ
+Subtitle size:	MediaPlayer-SettingsWindow		ขนาดคำบรรยาย
+No aspect correction	MediaPlayer-Main		ไม่มีการแก้ไขมุมมอง
+raw video	MediaPlayer-InfoWin		วีดีโอเดิม
+Container	MediaPlayer-InfoWin		บรรจุ
+none	MediaPlayer-Main		ไม่มี
+Open clips	MediaPlayer-Main		เปิดคลิป
+Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		ไม่สามารถย้ายไฟล์บางไฟล์ไปที่ถังขยะ
+<nothing to undo>	MediaPlayer-PlaylistWindow		<nothing to undo>
+Save as…	MediaPlayer-PlaylistWindow		บันทึกเป็น
+Error: 	MediaPlayer-RemovePLItemsCmd		ผิดพลาด:
+300% scale	MediaPlayer-Main		มาตราส่วน 300%
+Open	MediaPlayer-Main		เปิด
+ask every time	MediaPlayer-SettingsWindow		ถามทุกครั้ง
+(not supported)	MediaPlayer-InfoWin		(ไม่รองรับ)
+Randomize	MediaPlayer-PlaylistWindow		สุ่ม
+%.3f fps	MediaPlayer-InfoWin		%.3f fps
+Off	Subtitles menu		ปิด
+400% scale	MediaPlayer-Main		มาตราส่วน 400%
+h	MediaPlayer-InfoWin	Hours	h
+OK	MediaPlayer-PlaylistWindow		ตกลง

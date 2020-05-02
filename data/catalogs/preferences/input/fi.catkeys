@@ -1,17 +1,20 @@
-1	finnish	x-vnd.Haiku-Input	2494436940
+1	finnish	x-vnd.Haiku-Input	3910661481
 Scrolling	TouchpadPrefView		Vieritettään
 Defaults	InputMouse		Oletukset
 Tapping	TouchpadPrefView		Haaroitus
 Long	KeyboardView		Pitkä
 Normal	SettingsView		Normaali
 Cancel	TouchpadPrefView		Peru
+4-Button	SettingsView		4-painikkeinen
 Slow	TouchpadPrefView		Hidas
 Warp	SettingsView		Vääntäminen
 Instant warp	SettingsView		Pikaväännös
 Device List	InputWindow		Laiteluettelo
 Double-click speed	SettingsView		Kaksoisnapsautusnopeus
+5-Button	SettingsView		5-painikkeinen
 Typing test area	KeyboardView		Kirjoitustestausalue
 Mouse type:	SettingsView		Hiirityyppi:
+Revert	InputKeyboard		Palauta
 Fast	KeyboardView		Nopea
 Off	TouchpadPrefView		Pois käytöstä
 Fast	TouchpadPrefView		Nopea
@@ -30,6 +33,7 @@ The new scroll area is very large and may impede normal mouse operation. Do you 
 High	TouchpadPrefView		Korkea
 Defaults	TouchpadPrefView		Oletukset
 1-Button	SettingsView		1-painikkeinen
+Defaults	InputKeyboard		Oletukset
 Short	KeyboardView		Lyhyt
 Slow	KeyboardView		Hidas
 Revert	InputMouse		Käänteinen

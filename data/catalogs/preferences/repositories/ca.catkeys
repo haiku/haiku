@@ -1,8 +1,8 @@
 1	catalan; valencian	x-vnd.Haiku-Repositories	1220143449
 This is not a valid URL.	AddRepoWindow	Add URL error message	Aquest no és un URL vàlid.
 Repository URL:	AddRepoWindow	Text box label	URL del repositori:
-There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	S'ha produït un error en refrescar la memòria cau del repositori per a %name%.
-There was an error disabling the repository %name%	TaskLooper	Error message, do not translate %name%	S'ha produït un error en inhabilitar el repositori %name%.
+There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Hi ha hagut un error en refrescar la memòria cau del repositori per a %name%.
+There was an error disabling the repository %name%	TaskLooper	Error message, do not translate %name%	Hi ha hagut un error en inhabilitar el repositori %name%.
 Unknown	Constants	Unknown repository name	Desconegut
 Remove all	RepositoriesView	Button label	Suprimeix-ho tot
 Enable repositories to use with package management:	RepositoriesView	Label text	Habiliteu els repositoris per usar-los amb la gestió de paquets:
@@ -12,7 +12,7 @@ Changes completed	RepositoriesView	Status view text	Canvis completats
 Details	TaskLooper	Job log details header	Detalls
 Enabled	RepoRow	Tag in the Status column	Habilitat
 Remove	Constants	Button label	Suprimeix
-There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	S'ha produït un error en habilitar el repositori %url%.
+There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	Hi ha hagut un error en habilitar el repositori %url%.
 Remove this repository?	RepositoriesView	Removal alert confirmation message	Suprimeixo aquest repositori?
 The task for repository %name% is taking a long time to complete.	TaskTimer	Alert message.  Do not translate %name%	La tasca per al repositori %name% està trigant molt a completar-se.
 Completed	TaskLooper	Completed task status message	Completat
@@ -20,7 +20,7 @@ OK	Constants	Button label	D'acord
 Status	RepositoriesView	Column title	Estat
 Name	RepositoriesView	Column title	Nom
 Add	AddRepoWindow	Button label	Afegeix
-Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	Repositoris no ha pogut recuperar els noms dels repositioris habilitats actualment.
+Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	Repositoris no ha pogut obtenir els noms dels repositoris habilitats actualment.
 Enable all	RepositoriesView	Button label	Habilita-ho tot
 Aborted	TaskLooper	Aborted task status message	Avortat
 URL	RepositoriesView	Column title	URL

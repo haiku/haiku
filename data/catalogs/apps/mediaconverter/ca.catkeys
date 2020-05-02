@@ -45,7 +45,7 @@ Cancel	MediaConverter		Cancel·la
 OK	MediaConverter-FileInfo		D'acord
 Error read audio frame %ld	MediaConverter		Error en llegir el marc de l'àudio %ld
 Video encoding:	MediaConverter		Codificació de vídeo:
-An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		S'ha produït un error en llegir la informació del fitxer.\n\nError: 
+An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Hi ha hagut un error en llegir la informació del fitxer.\n\nError: 
 Error	MediaConverter		Error
 File details	MediaConverter		Detalls del fitxer
 No audio	Audio codecs list		Sense àudio

@@ -1,8 +1,9 @@
-1	finnish	x-vnd.Haiku-StyledEdit	727465241
+1	finnish	x-vnd.Haiku-StyledEdit	2796309255
 Document statistics	Statistics		Asiakirjan tilastot
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Palauttaminen epäonnistui, tiedostoa ei löytynyt: ”%s”.
 Cut	Menus		Leikkaa
 Center	Menus		Keskitä
+Increase size	Menus		Kasvata kokoa
 Wrap-around search	FindandReplaceWindow		Kierrätä haku alkuun
 Page setup…	Menus		Sivuasetus...
 Untitled 	StyledEditWindow		Otsikoton 
@@ -70,6 +71,7 @@ Find selection	Menus		Hakuvalinta
 Cancel	SaveAlert		Peru
 Find…	Menus		Hae…
 Revert	RevertToSavedAlert		Palauta
+Decrease size	Menus		Pienennä kokoa
 Size	Menus		Koko
 Autodetect	Menus		Automaattinen tunnistus
 Replace next	Menus		Korvaa seuraava

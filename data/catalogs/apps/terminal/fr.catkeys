@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Terminal	2815667231
+1	french	x-vnd.Haiku-Terminal	2664488407
 Close other tabs	Terminal TermWindow		Fermer les autres onglets
 Insert path	Terminal TermView		Insérer un chemin de recherche
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal ne peut pas démarrer l’interpréteur de commande.
@@ -87,6 +87,7 @@ Use text:	Terminal FindWindow		Utiliser le texte :
 Close active tab	Terminal TermWindow		Fermer l’onglet actif
 Save as default	Terminal TermWindow		Enregistrer comme valeur par défaut
 Nothing is selected.	Terminal TermWindow		Rien n’est sélectionné.
+Use left Option as Meta key	Terminal AppearancePrefView		Utiliser la touche Option gauche comme touche Meta
 Find	Terminal FindWindow		Rechercher
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Le modèle utilisé pour composer le titre de l’onglet actif peut\ncontenir les éléments suivants :\n
 Professional	Terminal colors scheme		Professionnel

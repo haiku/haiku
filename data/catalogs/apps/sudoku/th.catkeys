@@ -1,0 +1,35 @@
+1	thai	x-vnd.Haiku-Sudoku	3382377306
+Restore snapshot	SudokuWindow		คืนค่าภาพ
+File	SudokuWindow		ไฟล์
+Mark invalid values	SudokuWindow		ทำเครื่องหมายค่าที่ไม่ถูกต้อง
+Solve single field	SudokuWindow		แก้ฟิลด์เดียว
+Hard	SudokuWindow		ยาก
+Start again	SudokuWindow		เริ่มใหม่
+New	SudokuWindow		ใหม่
+Easy	SudokuWindow		ง่าย
+Undo	SudokuWindow		ยกเลิก
+Export as…	SudokuWindow		ส่งออกเป็น
+Quit	SudokuWindow		ออก
+Redo	SudokuWindow		ทำซ้ำ
+Could not open \"%s\":\n%s\n	SudokuWindow		ไม่สามารถเปิด \"%s\":\n%s\n
+Blank	SudokuWindow		ว่าง
+Sudoku solved - congratulations!\n	SudokuWindow		แก้ไข Sudoku แล้ว - ขอแสดงความยินดี! \n
+Text	SudokuWindow		ข้อความ
+Copy	SudokuWindow		สำเนา
+Solve	SudokuWindow		แก้ไข
+HTML	SudokuWindow		HTML
+Advanced	SudokuWindow		สูง
+Set all hints	SudokuWindow		ตั้งคำแนะนำทั้งหมด
+Searching for removable values	SudokuGenerator		กำลังค้นหาค่าที่ถอดออกได้
+Abort	ProgressWindow		ยกเลิก
+Could not set Sudoku:\n%s\n	SudokuWindow		ไม่สามารถตั้งค่า Sudoku:\n%s\n
+Help	SudokuWindow		ช่วยเหลือ
+OK	SudokuWindow		ตกลง
+Sudoku	System name		ซูโดกุ
+Progress monitor	ProgressWindow		ติดตามความคืบหน้า
+Creating solvable field	SudokuGenerator		การสร้างฟิลด์ที่แก้ไขได้
+View	SudokuWindow		ดู
+Snapshot current	SudokuWindow		รูปภาพปัจจุบัน
+Mark valid hints	SudokuWindow		ทำเครื่องหมายคำใบ้ที่ถูกต้อง
+Sudoku request	SudokuWindow		คำขอของ Sudoku
+Open file…	SudokuWindow		เปิดไฟล์

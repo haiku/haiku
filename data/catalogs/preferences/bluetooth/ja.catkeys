@@ -18,7 +18,7 @@ Add…	Remote devices		追加…
 As blocked	Remote devices		ブロック状態
 There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		このシステムには Bluetooth ローカルデバイスが登録されていません。
 Policy…	Settings view		ポリシー…
-Revert	Window		元に戻す
+Revert	Window		戻す
 Refresh local devices…	Window		ローカルデバイスを更新…
 Disconnect	Remote devices		切断
 Identify us as…	Settings view		特定…
@@ -43,7 +43,7 @@ Show name	Extended local device view		名前を表示
 Add device to list	Inquiry panel		デバイスを一覧に追加
 Remaining %1 seconds	Inquiry panel		残り %1 秒
 The Bluetooth services are not currently running on this system.	main		Bluetooth サービスは現在システム上で動作していません。
-Discoverable	Extended local device view		発見可能
+Discoverable	Extended local device view		検出可能
 Authenticate	Extended local device view		認証
 Smart phone	Settings view		スマートフォン
 Scanning completed.	Inquiry panel		スキャンが完了しました。
@@ -51,5 +51,5 @@ Default inquiry time:	Settings view		デフォルトの問い合わせ時間:
 Server	Settings view		サーバー
 Handheld	Settings view		ハンドヘルド機器
  packets: 	Device View		 パケット: 
-About Bluetooth…	Window		Bluetoothについて…
+About Bluetooth…	Window		Bluetooth について…
 Starting scan…	Inquiry panel		スキャンを開始中…

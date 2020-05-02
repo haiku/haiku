@@ -1,0 +1,9 @@
+1	thai	x-vnd.Haiku-RAWTranslator	2975919330
+RAWTranslator Settings	ConfigView		ตั้งค่า RAWTranslator 
+Version %d.%d.%d, %s	ConfigView		เวอร์ชั่น %d.%d.%d, %s
+RAW image translator	RAWTranslator		ตัวแปลภาพ RAW
+RAW Settings	RAWTranslator main		ตั้งค่า RAW
+RAW images	RAWTranslator		ภาพ RAW
+RAW image translator	ConfigView		ตัวแปลภาพ RAW
+%s RAW image	RAWTranslator	Parameter (%s) is the name of the manufacturer (like 'Canon')	ภาพ %s RAW
+Based on Dave Coffin's dcraw 8.63	ConfigView		อ้างอิงจาก dcraw 8.63 ของ Dave Coffin 

@@ -3,7 +3,7 @@ Package description	UninstallView		Descrizione del pacchetto
 none	PackageView		nessuno
 Continue	PackageInstall		Prosegui
 Running post-installation scripts	PackageInstall		Esecuzione script post-installazione
-Package installer	PackageView		Installatore pacchetti
+Package installer	PackageView		Programma di installazione pacchetti
 All existing files will be skipped?	PackageView		Vuoi ignorare tutti i file già presenti?
 Replace	PackageView		Sostituisci
 All existing files will be replaced?	PackageView		Vuoi sostituire tutti i file già presenti?
@@ -53,7 +53,7 @@ Continue	PackageInfo		Prosegui
 No package selected.	PackageInfo		Nessun pacchetto selezionato.
 Error! \"%s\" is not a valid path.\n	Packageinstaller main		Errore! \"%s\" non è un percorso valido.\n
 The directory named '%s' already exists in the given path.\nReplace the directory with one from this package or skip it?	PackageView		La cartella chiamata '%s' esiste già nel percorso dato.\nSostituisci con quella presente in questo pacchetto o salta?
-LegacyPackageInstaller	System name		LegacyPackageInstaller
+LegacyPackageInstaller	System name		Gestore pacchetti (vecchio formato)
 Ask again	PackageView		Ripeti richiesta
 Begin	PackageView		Inizia
 OK	PackageView		OK

@@ -1,4 +1,20 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Playground	1392344890
+1	greek, modern (1453-)	x-vnd.Haiku-Playground	3586950463
 Line	Playground		Γραμμή
 Fill	Playground		Γέμισμα
 Quit	Playground		Έξοδος
+Select	Playground		Επιλογή
+Submenu	Playground		Υπομενού
+Copy	Playground		Αντιγραφή
+Cancel	Playground		Άκυρο
+Blend	Playground		Μείξη
+Invert	Playground		Αντιστροφή
+Clear all drawing objects?	Playground		Καθαρισμός όλων των αντικειμένων σχεδίασης;
+Width:	Playground		Πλάτος
+New object	Playground		Νέο αντικείμενο
+Test	Playground		Δοκιμή
+Add	Playground		Προσθήκη
+Erase	Playground		Διαγραφή
+File	Playground		Αρχείο
+Subtract	Playground		Αφαίρεση
+<pick>	Playground		<pick>
+Ellipse	Playground		Έλλειψη

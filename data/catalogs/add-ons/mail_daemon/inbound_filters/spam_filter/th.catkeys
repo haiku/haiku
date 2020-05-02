@@ -1,0 +1,7 @@
+1	thai	x-vnd.Haiku-SpamFilter	468104950
+or empty e-mail	SpamFilterConfig		หรืออีเมลเปล่า
+Genuine below and uncertain above:	SpamFilterConfig		ของจริงข้างล่างและไม่แน่ใจข้างบน
+Spam above:	SpamFilterConfig		สแปมข้างบน:
+Add spam rating to start of subject	SpamFilterConfig		เพิ่มการลำดับสแปมเพื่อเริ่มหัวข้อ
+Bayesian Spam Filter	SpamFilter		ตัวกรองสแปม Bayesian
+Learn from all incoming e-mail	SpamFilterConfig		เรียนรู้จากอีเมลขาเข้าทั้งหมด

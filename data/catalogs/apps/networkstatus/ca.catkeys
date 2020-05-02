@@ -9,7 +9,7 @@ Open network preferences…	NetworkStatusView		Obre les preferències de la xarx
 NetworkStatus	System name		Estat de la xarxa
 OK	NetworkStatusView		D'acord
 No link	NetworkStatusView		Cap enllaç
-Could not join wireless network:\n	NetworkStatusView		No ha estat possible connectar a la xarxa sense fil:\n
+Could not join wireless network:\n	NetworkStatusView		No s'ha pogut connectar a la xarxa sense fil:\n
 Ready	NetworkStatusView		Preparat
 Network Status	NetworkStatusView		Estat de la xarxa
 Address	NetworkStatusView		Adreça

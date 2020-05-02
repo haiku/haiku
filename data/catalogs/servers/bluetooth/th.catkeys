@@ -1,0 +1,7 @@
+1	thai	x-vnd.Haiku-bluetooth_server	3418434903
+Stopping the Bluetooth server failed.	BluetoothReplicant		การหยุดเซิร์ฟเวอร์บลูทูธล้มเหลว
+Bluetooth error	BluetoothReplicant		ข้อผิดพลาดของบลูทูธ
+Settings…	BluetoothReplicant		ตั้งค่า
+OK	BluetoothReplicant		ตกลง
+Error: %status%	BluetoothReplicant		ผิดพลาด: %status%
+Quit	BluetoothReplicant		ปิด

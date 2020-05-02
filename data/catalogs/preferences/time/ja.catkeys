@@ -42,7 +42,7 @@ about	Time		このソフトウェアについて
 Show time zone	Time		タイムゾーンを表示
 Synchronize at boot	Time		起動時に同期
 Indian	Time		インド
-Revert	Time		元に戻す
+Revert	Time		戻す
 Date and time	Time		日付と時刻
 The following error occured while synchronizing:\n%s	Time		時刻の同期中に、次のエラーが発生しました:\n%s
 Synchronize	Time		同期

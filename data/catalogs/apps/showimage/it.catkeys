@@ -19,7 +19,7 @@ Rotate counterclockwise	Menus		Ruota in senso antiorario
 High-quality zooming	Menus		Zoom di alta qualità
 Browse	Menus		Sfoglia
 Edit	Menus		Modifica
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Impossibile caricare l'immagine! Il file immagine, il translator relativo o entrambi non esistono.
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Impossibile caricare l'immagine! Il file, il suo traduttore dati o entrambi non esistono.
 First page	Menus		Prima pagina
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Il documento '%s' (pagina %d) è stato modificato. Vuoi chiudere il documento?
 Leave full screen	Menus		Esci dallo schermo intero

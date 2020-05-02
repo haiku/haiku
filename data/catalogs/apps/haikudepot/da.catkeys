@@ -101,8 +101,8 @@ Close	UserLoginWindow		Luk
 Close	RatePackageWindow		Luk
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synkroniserer pakkedata for softwarekilden '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Vis anvendelsesbetingelserne
-Size	PackageListView		Størrelse
 Your rating:	RatePackageWindow		Din bedømmelse:
+Size	PackageListView		Størrelse
 Your rating was updated.	RatePackageWindow		Din bedømmelse blev opdateret.
 All categories	FilterView		Alle kategorier
 Repositories	MainWindow		Softwarekilder

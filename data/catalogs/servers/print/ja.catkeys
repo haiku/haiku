@@ -16,7 +16,7 @@ Page %1 to %2, %3 copies	ConfigWindow		ページ %1 からページ %2 まで %3
 A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		その名前のプリンターはすでに存在しますが、ドライバーが見付かりません。置き換えますか?
 Yes	PrintServerApp		はい
 Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Ledger (432 x 279 mm)
-Would you like to set one up now?	PrintServerApp		プリンターを追加しますか？
+Would you like to set one up now?	PrintServerApp		プリンターを追加しますか?
 Print job setup:	ConfigWindow		印刷ジョブ設定:
 A6	ConfigWindow	ISO 216 paper size	A6 (105 x 148 mm)
 Portrait	ConfigWindow		縦
@@ -49,7 +49,7 @@ Get name of printer	Printer Scripting		プリンターの名前を取得
 A3	ConfigWindow	ISO 216 paper size	A3 (297 x 420 mm)
 Get name of transport	Transport Scripting		トランスポートの名前を取得
 A5	ConfigWindow	ISO 216 paper size	A5 (148 x 210 mm)
-Would you like to make @ the default printer?	PrintServerApp		@ をデフォルトプリンターに設定しますか？
+Would you like to make @ the default printer?	PrintServerApp		@ をデフォルトプリンターに設定しますか?
 Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	Tabloid (279 x 432 mm)
 Page setup	ConfigWindow		ページ設定
 Paper setup:	ConfigWindow		用紙設定:

@@ -1,0 +1,16 @@
+1	thai	x-vnd.haiku-package_daemon	1440586681
+Package changes	PackageResult	Window title	การเปลี่ยนแปลงแพ็คเกจ
+uninstall package %s\n	PackageResult	Don't change '%s' variable	ถอนการติดตั้งแพ็คเกจ %s\n
+ignore problem for now	PackageProblem		ไม่สนใจปัญหาในตอนนี้
+solution %d:	PackageProblem	Don't change the %d variable	แก้ปัญหา %d:
+The following problems have been encountered. Please select a solution for each:	PackageProblem		พบปัญหาต่อไปนี้ โปรดเลือกวิธีแก้ปัญหาสำหรับแต่ละรายการ:
+Apply changes	PackageResult		ใช้การเปลี่ยนแปลง
+Package daemon	PackageManager		แพคเกจ daemon
+install package %s from repository %s\n	PackageResult	Don't change '%s' variables	ติดตั้งแพ็คเกจ%s จากที่เก็บ %s\n
+The following additional package changes have to be made:	PackageResult		ต้องทำการเปลี่ยนแปลงแพ็คเกจเพิ่มเติมต่อไปนี้:
+Warning	PackageManager		คำเตือน
+Cancel	PackageProblem		ยกเลิก
+don't activate package %source%	PackageProblem	don't change '%source%	ไม่เปิดใช้งานแพ็คเกจ %source%
+Cancel	PackageResult		ยกเลิก
+Retry	PackageProblem		ทำอีกครั้ง
+Package problems	PackageProblem	Window title	แพ็คเกจมีปัญหา

@@ -1,0 +1,90 @@
+1	thai	x-vnd.Haiku-StyledEdit	2796309255
+Document statistics	Statistics		สถิติเอกสาร
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		ไม่สามารถเปลี่ยนกลับ ไม่พบไฟล์: \"%s\".
+Cut	Menus		ตัด
+Center	Menus		ศุนย์กลาง
+Increase size	Menus		เพิ่มขนาด
+Wrap-around search	FindandReplaceWindow		ค้นหาแบบครอบคลุม
+Page setup…	Menus		ตั้งค่าหน้า
+Untitled 	StyledEditWindow		ไม่ได้ตั้งชื่อ
+OK	Statistics		ตกลง
+Find	FindandReplaceWindow		ค้นหา
+New	Menus		ใหม่
+Document	Menus		เอกสาร
+Search backwards	FindandReplaceWindow		ค้นหาย้อนหลัง
+Find again	Menus		ค้นหาอีกครั้ง
+Read-only	StatusView		อ่านอย่างเดียว
+Save	Menus		บันทึก
+Cancel	QuitAlert		ยกเลิก
+Copy	Menus		สำเนา
+Reload	NodeMonitorAlerts		โหลดใหม่
+line %d, column %d	StatusView		บรรทัด %d คอลัมน์ %d
+Words:	Statistics		คำ:
+???	LoadAlert		???
+Recover	NodeMonitorAlerts		กู้คืน
+Error saving \"%s\":\n%s	SaveAlert		บันทึกผิดพลาด  \"%s\":\n%s
+OK	RevertToSavedAlert		ตกลง
+Unlock file	StatusView		ปลดล็อกไฟล์
+Italic	Menus		ตัวเอียง
+Can't undo	Menus		ไม่สามารถเลิกทำ
+Replace…	Menus		แทนที่
+File	Menus		ไฟล์
+Bold	Menus		ตัวหนา
+Paste	Menus		วาง
+File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		ไฟล์ \"%file%\" ถูกแก้ไขโดยแอปพลิเคชันอื่น โหลดใหม่หรือไม่
+File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		ไฟล์ \"%file%\" ถูกลบโดยแอปพลิเคชันอื่น กู้คืนหรือไม่
+Lines:	Statistics		บรรทัด:
+Replace in all windows	FindandReplaceWindow		แทนที่ในหน้าต่างทั้งหมด
+\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" มีการเปลี่ยนแปลงที่ยังไม่ได้บันทึก\nเปลี่ยนกลับเป็นเวอร์ชันที่บันทึกล่าสุดหรือไม่?
+Save	SaveAlert		บันทึก
+Default	Open_and_SaveAsPanel		ค่าเริ่มต้น
+Cancel	RevertToSavedAlert		ยกเลิก
+Cancel	FindandReplaceWindow		ยกเลิก
+Statistics…	Menus		สถิติ
+Encoding	Open_and_SaveAsPanel		กำลังเข้ารหัส
+Replace all	FindandReplaceWindow		แทนที่ทั้งหมด
+Close	Menus		ปิด
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		โหลดผิดพลาด \"%s\":\n\tรูปแบบที่ไม่รองรับ
+Left	Menus		ซ้าย
+Default	Menus		ค่าเริ่มต้น
+OK	SaveAlert		ตกลง
+Color	Menus		ีสี
+Save changes to the document \"%s\"? 	QuitAlert		บันทึกการเปลี่ยนแปลงเอกสาร \"%s\" หรือไม่?
+StyledEdit	System name		แก้ไขสไตล์
+Find:	FindandReplaceWindow		ค้นหา:
+Undo typing	QuitAlert		เลิกทำการพิมพ์
+Error loading \"%s\":\n\t%s	LoadAlert		โหลดผิดพลาด\"%s\":\n\t%s
+Don't save	SaveAlert		ไม่บันทึก
+Reload…	Menus		โหลดใหม่
+Print…	Menus		พิมพ์
+Quit	Menus		ออก
+Redo typing	QuitAlert		ทำซ้ำการพิมพ์
+Ignore	NodeMonitorAlerts		เพิกเฉย
+Wrap lines	Menus		ตัดบรรทัด
+Text encoding	Menus		การเข้ารหัสข้อความ
+Unable to unlock file\n\t%s	QuitAlert		ไม่สามารถปลดล็อกไฟล์\n\t%s
+Modified	StatusView		การแก้ไข
+OK	LoadAlert		ตกลง
+Save	QuitAlert		บันทึก
+Case-sensitive	FindandReplaceWindow		เป็นกรณี ๆ ไป
+Find selection	Menus		ค้นหาตัวเลือก
+Cancel	SaveAlert		ยกเลิก
+Find…	Menus		ค้นหา
+Revert	RevertToSavedAlert		เปลี่ยนกลับ
+Decrease size	Menus		ลดขนาด
+Size	Menus		ขนาด
+Autodetect	Menus		ตรวจจับอัตโนมัติ
+Replace next	Menus		แทนที่ถัดไป
+OK	QuitAlert		ตกลง
+Replace with:	FindandReplaceWindow		แทนที่ด้วย:
+Edit	Menus		แก้ไข:
+Open…	Menus		เปิด
+Save as…	Menus		บันทึกเป็น
+Replace	FindandReplaceWindow		แทนที่
+Characters:	Statistics		ตัวอักษร:
+Don't save	QuitAlert		ไม่บันทึก
+This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		ไฟล์นี้ถูกทำเครื่องหมายว่าอ่านอย่างเดียว บันทึกการเปลี่ยนแปลงเอกสาร \"%s\" หรือไม่?
+Align	Menus		ตําแหน่ง
+Font	Menus		ตัวอักษร
+Select all	Menus		เลือกทั้งหมด
+Right	Menus		ขวา:

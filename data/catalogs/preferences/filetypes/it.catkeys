@@ -1,8 +1,8 @@
 1	italian	x-vnd.Haiku-FileTypes	436017301
 Left	Attribute Window	Attribute column alignment in Tracker	Sinistra
 Float	Attribute ListView		Numero in virgola mobile
-Final	Application Types Window		Finale
-FileTypes request	FileTypes Window		Richiesta di FileTypes
+Final	Application Types Window		Non riassegnabile
+FileTypes request	FileTypes Window		Richiesta di Tipi di File
 This file type already exists	New File Type Window		Questo tipo è già esistente
 Preferred application	FileTypes Window		Applicazione preferita
 Launch	Application Types Window		Avvia
@@ -24,7 +24,7 @@ Gamma	Application Type Window		Gamma
 Cancel	Application Type Window		Annulla
 Attribute	Attribute Window		Attributo
 Multiple launch	Application Type Window		Avvio multiplo
-{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, one{# Tipo di applicazione può essere rimosso} other{# Tipi di Applicazione possono essere rimossi}}
+{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, one{# tipo di applicazione può essere rimosso} other{# tipi di applicazione possono essere rimossi}}
 Edit…	Application Types Window		Modifica…
 Could not set preferred application	FileTypes Window		Impossibile impostare l'applicazione preferita
 Description	FileTypes Window		Descrizione

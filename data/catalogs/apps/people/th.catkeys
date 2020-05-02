@@ -1,0 +1,50 @@
+1	thai	x-vnd.Be-PEPL	2332202134
+Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		การเรียกใช้ preflet ของ FileTypes เพื่อกำหนดค่าแอททริบิวต์บุคคลล้มเหลว\n\nข้อผิดพลาด:
+Unnamed person	People		บุคคลที่ไม่มีชื่อ
+New person…	People		บุคคลใหม่
+Address	People		ที่อยู่
+Zip	People		รหัสไปรษณีย์
+Select all	People		เลือกทั้งหมด
+Could not create %s.	People		ไม่สามารถสร้าง %s
+Quit	People		ออก
+Company	People		บริษัท
+Name	People		ชื่อ
+The file '%name%' could not be written.	People		ไฟล์ '%name%' ไม่สามารถเขียนได้
+Contact name	People		ชื่อที่ติดต่อ
+Cancel	People		ยกเลิก
+Edit	People		แก้ไข
+Save changes before closing?	People		บันทึกการเปลี่ยนแปลงก่อนปิดหรือไม่ ?
+People	System name		ผู้คน
+Error	People		ผิดพลาด
+Revert	People		เปลี่ยนกลับ
+Country	People		ประเทศ
+Person	Short mimetype description		บุคคล
+New person	People		บุคคลใหม่
+Save	People		บันทึก
+Fax	People		โทรสาร
+URL	People		URL
+%name% picture	People		%name% รูปภาพ
+Home phone	People		โทรศัพท์บ้าน
+none	Groups list		ไม่มี
+Save as…	People		บันทึกเป็น
+Cut	People		ตัด
+Contact information for a person.	Long mimetype description		ข้อมูลการติดต่อสำหรับบุคคล
+Remove image	People		ลบภาพ
+City	People		เมือง
+Undo	People		ยกเลิก
+Don't save	People		ไม่บันทึก
+Configure attributes	People		กำหนดค่าคุณสมบัติ
+Work phone	People		โทรศัพท์ที่ทำงาน
+State	People		รัฐ
+Nickname	People		ชื่อเล่น
+OK	People		ตกลง
+File	People		ไหล์
+Redo	People		ทำซ้ำ
+Close	People		ปิด
+Copy	People		สำเนา
+Paste	People		วาง
+E-mail	People		อีเมล์
+Group	People		กลุ่ม
+Drop an image here,\nor use the contextual menu.	People		วางรูปภาพที่นี่\nหรือใช้เมนูตามบริบท
+Load image…	People		โหลดภาพ
+Sorry	People		ขอโทษ

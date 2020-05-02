@@ -1,0 +1,133 @@
+1	thai	x-vnd.Haiku-DiskProbe	2944605311
+Raw editor	AttributeWindow		Raw editor
+Remove	AttributeWindow		ลบ
+Close	ProbeView		ปิด
+Boolean value:	TypeEditors		Boolean value:
+File	ProbeView		ไฟล์
+Block size	ProbeView	Menu item. This is in the same menu window than 'Base' and 'Font size'	ขนาดกล่อง
+MIME type editor	TypeEditors		MIME type editor
+Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	เลขฐานสิบหก
+16 bit unsigned value:	TypeEditors		16 bit unsigned value:
+8 bit signed value:	TypeEditors		8 bit signed value:
+ (native)	ProbeView		(native)
+Attribute offset: 	ProbeView		Attribute offset:
+Text	TypeEditors	This is the type of editor	ข้อความ
+File offset: 	ProbeView		File offset:
+Add	ProbeView		เพิ่ม
+64 bit signed value:	TypeEditors		64 bit signed value:
+Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		คุณต้องการลบคุณลักษณะ \"%s\" ออกจากไฟล์ \"%s\" หรือไม่ \n\nคุณไม่สามารถเลิกทำการกระทำนี้ได้
+No type editor available	AttributeWindow		ไม่มีเครื่องมือแก้ไขประเภท
+Print…	ProbeView		พิมพ์
+New…	FileWindow		ใหม่
+what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	what: '%.4s'\n\n
+OK	DiskProbe		ตกลง
+DiskProbe	System name		DiskProbe
+Back	ProbeView		ย้อน
+Device: 	ProbeView		อุปกรณ์
+Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	เบส
+Open file…	FileWindow		เปิดไฟล์
+32 bit unsigned pointer:	TypeEditors		32 bit unsigned pointer:
+DiskProbe request	DiskProbe		ร้องขอ DiskProbe
+Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hex
+Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		การเขียนไฟล์ล้มเหลว:\n%s\n\nการเปลี่ยนแปลงทั้งหมดจะหายไปเมื่อคุณออกจาก
+Examine device:	OpenWindow		ตรวจสอบอุปกรณ์:
+Number editor	TypeEditors		เครื่องมือแก้ไขตัวเลข
+Icon	TypeEditors		ไอคอน
+Attribute	ProbeView		คุณลักษณะ
+Don't save	ProbeView		ไม่บันทึก
+Undo	ProbeView		ยกเลิก
+Flattened bitmap	TypeEditors		Flattened bitmap
+Block %Ld (0x%Lx)	ProbeView		บล็อก %Ld (0x%Lx)
+Cancel	OpenWindow		ยกเลิก
+Unknown format	TypeEditors		รูปแบบที่ไม่รู้จัก
+File: 	ProbeView		ไฟล์:
+Swapped: %Ld (0x%0*Lx)	ProbeView		สลับ: %Ld (0x%0*Lx)
+Stop	ProbeView		หยุด
+Cancel	ProbeView		ยกเลิก
+Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	ไม่สามารถเปิดได้ \"%s\":\n%s
+Font size	ProbeView		ขนาดตัวอักษร
+Type editor not supported	ProbeView		ชนิดของตัวแก้ไขไม่รองรับ
+Native: 0x%0*Lx	ProbeView		Native: 0x%0*Lx
+Copy	ProbeView		คัดลอก
+Redo	ProbeView		ทำซ้ำ
+Floating-point value:	TypeEditors		Floating-point value:
+Cancel	AttributeWindow		ยกเลิก
+16 bit signed value:	TypeEditors		16 bit signed value:
+DiskProbe request	AttributeWindow		ร้องขอ DiskProbe
+Next	ProbeView		ถัดไป
+64 bit signed offset:	TypeEditors		64 bit signed offset:
+32 bit signed value:	TypeEditors		2 bit signed value:
+Could not find search string.	ProbeView		ไม่พบ string ที่ค้นหา
+Close	FileWindow		ปิด
+Unknown type	TypeEditors		ชนิดที่ไม่รู้จัก
+Open device	FileWindow		เปิดอุปกรณ์
+Number:	TypeEditors		ตัวเลข:
+Quit	FileWindow		ปิด
+Text	FindWindow		ข้อความ
+Block 0x%Lx	ProbeView		บล็อค 0x%Lx
+Attribute	AttributeWindow		คุณสมบัติ
+Mode:	FindWindow		โหมด:
+16 bit	TypeEditors		16 บิท
+32 bit size or status:	TypeEditors		ขนาด หรือ สถานะ 32 บิท
+of 	ProbeView		ของ
+Contents:	TypeEditors		เนื้อหา:
+Could not open file \"%s\": %s\n	DiskProbe		ไม่สามารถเปิดไฟล์ได้  \"%s\": %s\n
+Probe file…	OpenWindow		พิสูจน์ไฟล์
+Block: 	ProbeView		บล็อก:
+Bookmarks	ProbeView		ที่คั่น
+Probe device	OpenWindow		อุปกรณ์พิสูจน์
+none	ProbeView	No attributes	ไม่มี
+Case sensitive	FindWindow		กรณีที่สำคัญ
+32 bit unsigned value:	TypeEditors		32 bit unsigned value:
+Remove from file	AttributeWindow		ลบออกจากไฟล์
+Attributes	ProbeView		คุณสมบัติ
+Message	TypeEditors	This is the type of view	ข้อความ
+Message View	TypeEditors		ดูข้อความ
+Offset: 	ProbeView		Offset:
+Swapped: 0x%0*Lx	ProbeView		สลับ: 0x%0*Lx
+MIME type:	TypeEditors		MIME type:
+Fit	ProbeView	Size of fonts, fits to available room	พอดี
+Type editor	ProbeView		Type editor
+File	FileWindow		ไฟล์
+Grayscale	TypeEditors		โทนสีเทา
+32 bit	TypeEditors		32 บิท
+Native: %Ld (0x%0*Lx)	ProbeView		Native: %Ld (0x%0*Lx)
+Device	ProbeView		อุปกรณ์
+Close	AttributeWindow		ปิด
+Type editor	AttributeWindow		Type editor
+Save	ProbeView		บันทึก
+of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	of 0x0
+Attribute type: 	ProbeView		ชนิดคุณสมบัติ:
+15 bit	TypeEditors		15 บิท
+Page setup…	ProbeView		ตั้งค่าหน้า
+Boolean	TypeEditors	This is the type of editor	Boolean
+Icon view	TypeEditors		ดูไอคอน
+Select all	ProbeView		เลือกทั้งหมด
+64 bit unsigned value:	TypeEditors		64 bit unsigned value:
+OK	ProbeView		ตกลง
+Previous	ProbeView		ก่อนหน้า
+Selection	ProbeView		การเลือก
+Find	FindWindow		ค้นหา
+8 bit unsigned value:	TypeEditors		8 bit unsigned value:
+%ld (native)	ProbeView		%ld (native)
+Attribute: 	ProbeView		คุณสมบัติ:
+Block	ProbeView		บล็อก
+Find again	ProbeView		ค้นหาอีกครั้ง
+View	ProbeView	This is the last menubar item 'File Edit Block View'	ดู
+Could not read image	TypeEditors	Image means here a picture file, not a disk image.	ไม่สามารถอ่านภาพได้
+DiskProbe request	ProbeView		ร้องขอ DiskProbe
+Double precision floating-point value:	TypeEditors		ค่าทศนิยมที่มีความแม่นยำสองเท่า:
+Image	TypeEditors	This is the type of view	ภาพ
+Save changes before closing?	ProbeView		บันทึกการเปลี่ยนแปลงก่อนปิดหรือไม่?
+PNG format	TypeEditors		PNG format
+Number	TypeEditors	This is the type of editor	ตัวเลข
+Edit	ProbeView		แก้ไข
+String editor	TypeEditors		String editor
+Boolean editor	TypeEditors		Boolean editor
+Device offset: 	ProbeView		Device offset:
+Find…	ProbeView		ค้นหา
+8 bit palette	TypeEditors		จานสี 8 บิต
+Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	ทศนิยม
+Image view	TypeEditors	Image means here a picture file, not a disk image.	ดูภาพ
+Paste	ProbeView		วาง
+32 bit unsigned size:	TypeEditors		32 bit unsigned size:

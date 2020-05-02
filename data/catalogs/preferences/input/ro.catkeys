@@ -1,17 +1,20 @@
-1	romanian	x-vnd.Haiku-Input	2494436940
+1	romanian	x-vnd.Haiku-Input	3910661481
 Scrolling	TouchpadPrefView		Se derulează
 Defaults	InputMouse		Implicite
 Tapping	TouchpadPrefView		Apăsare
 Long	KeyboardView		Lung
 Normal	SettingsView		Normal
 Cancel	TouchpadPrefView		Anulează
+4-Button	SettingsView		4-Buton
 Slow	TouchpadPrefView		Încet
 Warp	SettingsView		Deviere
 Instant warp	SettingsView		Deviere instantă
 Device List	InputWindow		Listă de dispozitive
 Double-click speed	SettingsView		Viteză de clic dublu
+5-Button	SettingsView		5-Buton
 Typing test area	KeyboardView		Zonă de testare de tastare
 Mouse type:	SettingsView		Tip de maus:
+Revert	InputKeyboard		Revenire
 Fast	KeyboardView		Rapid
 Off	TouchpadPrefView		Oprit
 Fast	TouchpadPrefView		Rapid
@@ -30,6 +33,7 @@ The new scroll area is very large and may impede normal mouse operation. Do you 
 High	TouchpadPrefView		Înalt
 Defaults	TouchpadPrefView		Implicite
 1-Button	SettingsView		1-Buton
+Defaults	InputKeyboard		Implicite
 Short	KeyboardView		Scund
 Slow	KeyboardView		Încet
 Revert	InputMouse		Revenire

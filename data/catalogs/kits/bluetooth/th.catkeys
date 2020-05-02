@@ -1,0 +1,88 @@
+1	thai	x-vnd.Haiku-Bluetooth	3550394259
+Positioning	DeviceClass		การวางตำแหน่ง
+Controller	DeviceClass		ตัวควบคุม
+Common ISDN access	DeviceClass		การเข้าถึง ISDN ทั่วไป
+Unknown (reserved) minor device class	DeviceClass		คลาสอุปกรณ์รองที่ไม่รู้จัก (สงวนไว้)
+Uncategorized	DeviceClass		ไม่มีหมวดหมู่
+Keyboard	DeviceClass		แป้นพิมพ์
+Smart phone	DeviceClass		สมาร์ทโฟน
+VCR	DeviceClass		VCR
+Cellular	DeviceClass		โทรศัพท์มือถือ
+Audio	DeviceClass		เสียง
+Audio/Video	DeviceClass		เสียง/วิดีโอ
+Car audio	DeviceClass		เครื่องเสียงรถยนต์
+Major class: 	DeviceClass		คลาสหลัก:
+HiFi audio device	DeviceClass		อุปกรณ์เครื่องเสียงไฮไฟ
+Microphone	DeviceClass		ไมโครโฟน
+Capturing	DeviceClass		กำลังจับภาพ
+Jacket	DeviceClass		แจ็คเก็ต
+50-67% utilized	DeviceClass		50-67% utilized
+Headphones	DeviceClass		หูฟัง
+Imaging	DeviceClass		ภาพ
+Device conforms to the headset profile	DeviceClass		อุปกรณ์เป็นไปตามโปรไฟล์ชุดหูฟัง
+Remote control	DeviceClass		การควบคุมระยะไกล
+Fully available	DeviceClass		พร้อมใช้งานอย่างเต็มที่
+#CommandFailed#Not Valid name	RemoteDevice		#CommandFailed# ชื่อไม่ถูกต้อง
+Server	DeviceClass		เซิร์ฟเวอร์
+No service available	DeviceClass		ไม่มีบริการ
+Printer	DeviceClass		เครื่องพิมพ์
+Card reader	DeviceClass		ตัวอ่านการ์ด
+Wired modem or voice gateway	DeviceClass		โมเด็มแบบมีสายหรือเกตเวย์เสียง
+#ServerNotReady#Not Valid name	RemoteDevice		#ServerNotReady#ชื่อไม่ถูกต้อง
+#NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError#ชื่อไม่ถูกต้อง
+Camcorder	DeviceClass		กล้องวีดีโอ
+#NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest#ชื่อไม่ถูกต้อง
+17-33% utilized	DeviceClass		17-33% utilized
+Desktop workstation	DeviceClass		เครื่องคอมพิวเตอร์แบบตั้งโต๊ะ
+Unspecified	DeviceClass		ยังไม่ระบุ
+Miscellaneous	DeviceClass		เบ็ดเตล็ด
+Robot	DeviceClass		หุ่นยนต์
+Vehicle	DeviceClass		ยานพาหนะ
+LAN access	DeviceClass		การเข้าถึง LAN
+Glasses	DeviceClass		แว่นตา
+Phone	DeviceClass		โทรศัพท์
+Laptop	DeviceClass		แล็ปท็อป
+67-83% utilized	DeviceClass		67-83% utilized
+Cordless	DeviceClass		ไร้สาย
+Invalid device class!\n	DeviceClass		คลาสอุปกรณ์ไม่ถูกต้อง!\n
+Minor class: 	DeviceClass		คลาสรอง:
+Doll/Action figure	DeviceClass		Doll/Action figure
+Not implemented	RemoteDevice		ไม่ได้ดำเนินการ
+33-50% utilized	DeviceClass		33-50% utilized
+Gaming/Toy	DeviceClass		เกม/ของเล่น
+Video camera	DeviceClass		กล้องวิดีโอ
+Handheld	DeviceClass		มือถือ
+Service classes: 	DeviceClass		คลาสบริการ:
+Loudspeaker	DeviceClass		ลำโพง
+83-99% utilized	DeviceClass		83-99% utilized
+SIM card reader	DeviceClass		ตัวอ่านซิมการ์ด
+Computer	DeviceClass		คอมพิวเตอร์
+Scanner	DeviceClass		เครื่องสแกน
+Wearable	DeviceClass	A wearable computer	อุปกรณ์สวมใส่
+Display	DeviceClass		แสดงผล
+Gamepad	DeviceClass		Gamepad
+Video monitor	DeviceClass		จอภาพวิดีโอ
+Palm	DeviceClass	A palm-held device	ปาล์ม
+Joystick	DeviceClass		จอยสติ๊ก
+Networking	DeviceClass		ระบบเครือข่าย
+Telephony	DeviceClass		โทรศัพท์
+Game	DeviceClass		เกม
+Video display and loudspeaker	DeviceClass		จอแสดงผลวิดีโอและลำโพง
+Wrist watch	DeviceClass		นาฬิกาข้อมือ
+Sensing device	DeviceClass		อุปกรณ์ตรวจจับ
+Pointing device	DeviceClass		อุปกรณ์ชี้ตำแหน่ง
+(reserved)	DeviceClass		(ที่สงวนไว้)
+Rendering	DeviceClass		กำลังแสดงผล
+Information	DeviceClass		ข้อมูล
+Helmet	DeviceClass		หมวกนิรภัย
+Pager	DeviceClass	A small radio device to receive short text messages	เพจเจอร์
+Hands-free	DeviceClass		แฮนด์ฟรี
+Digitizer tablet	DeviceClass		แท็บเล็ต Digitizer
+Portable audio	DeviceClass		เครื่องเสียงพกพา
+Camera	DeviceClass		กล้อง
+1-17% utilized	DeviceClass		1-17% utilized
+Combo keyboard/pointing device	DeviceClass		แป้นพิมพ์คำสั่งผสม/อุปกรณ์ชี้ตำแหน่ง
+Video conferencing	DeviceClass		การประชุมทางวิดีโอ
+Peripheral	DeviceClass		อุปกรณ์ต่อพ่วง
+Object transfer	DeviceClass		การถ่ายโอนวัตถุ
+Set-top box	DeviceClass		กล่องรับสัญญาณ

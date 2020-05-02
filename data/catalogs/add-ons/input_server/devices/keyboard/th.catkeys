@@ -1,0 +1,10 @@
+1	thai	x-vnd.Haiku-KeyboardInputServerDevice	2536418998
+If the application will not quit you may have to kill it.	Team monitor		หากแอปพลิเคชันไม่หยุดการทำงานคุณอาจต้องสั่งหยุด
+Quit application	Team monitor		ออกจากแอปพลิเคชัน
+Restart the desktop	Team monitor		เริ่มทำงานเดสทอป
+Force reboot	Team monitor		บังคับให้บูตใหม่
+Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		เลือกแอปพลิเคชันจากรายการด้านบนและคลิกปุ่ม 'หยุดแอปพลิเคชัน' และ 'ออกจากแอปพลิเคชัน' ปุ่มใดปุ่มหนึ่งเพื่อปิด\n\nกดปุ่มควบคุม + ALT + DELETE เป็นเวลา%ld วินาทีเพื่อรีบูต
+Team monitor	Team monitor		ทีมตรวจสอบ
+Kill application	Team monitor		ออกจ่ากแอปพริเคชั่น
+Cancel	Team monitor		ยกเลิก
+(This team is a system component)	Team monitor		(ทีมนี้เป็นองค์ประกอบของระบบ)

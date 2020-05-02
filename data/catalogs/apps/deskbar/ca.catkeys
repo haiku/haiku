@@ -16,7 +16,7 @@ Window	PreferencesWindow		Finestra
 Defaults	PreferencesWindow		Predeterminats
 Menu	PreferencesWindow		Menú
 Recent documents	DeskbarMenu		Documents recents
-Auto-hide	PreferencesWindow		Oculta automàticament
+Auto-hide	PreferencesWindow		Amaga-ho automàticament
 Always on top	PreferencesWindow		Sempre en primer pla
 <Deskbar folder is empty>	DeskbarMenu		<La carpeta de la Barra de l'Escriptori és buïda>
 Show all	WindowMenu		Mostra-ho tot

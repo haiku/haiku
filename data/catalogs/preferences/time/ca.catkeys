@@ -1,13 +1,13 @@
 1	catalan; valencian	x-vnd.Haiku-Time	834234238
 OK	Time		D'acord
-Message receiving failed	Time		No ha estat possible rebre el missatge
+Message receiving failed	Time		Ha fallat rebre el missatge.
 Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Di i Hora, escrit per:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
 Australia	Time		Austràlia
 America	Time		Amèrica
 Reset to default server list	Time		Restableix la llista de servidors per defecte
 Could not resolve server address	Time		No s'ha pogut resoldre l'adreça del servidor.
 Set time zone	Time		Tria el fus horari
-Waiting for answer failed	Time		No ha estat possible esperar la resposta
+Waiting for answer failed	Time		Ha fallat esperar la resposta.
 <Other>	Time		<Altre>
 Received invalid time	Time		S'ha rebut una hora no vàlida
 Remove	Time		Suprimeix
@@ -16,11 +16,11 @@ Asia	Time		Àsia
 Try all servers	Time		Prova tots els servidors
 Time	Time		Hora
 Current time:	Time		Hora actual:
-The following error occured while synchronizing:\n%s: %s	Time		S'ha produït l'error següent durant la sincronització:\n%s: %s
+The following error occured while synchronizing:\n%s: %s	Time		Hi ha hagut l'error següent durant la sincronització:\n%s: %s
 Europe	Time		Europa
 Show day of week	Time		Mostra el dia de la setmana
 Local time (Windows compatible)	Time		Hora local (compatible amb el Windows)
-Hardware clock set to:	Time		S'ha ajustat el rellotge del maquinari a:
+Hardware clock set to:	Time		El rellotge del maquinari s'ha establert a:
 Arctic	Time		Àrtic
 Antarctica	Time		Antàrtida
 GMT (UNIX compatible)	Time		GMT (compatible amb l'UNIX)
@@ -29,7 +29,7 @@ Stop	Time		Atura
 Time zone	Time		Fus horari
 Clock	Time		Rellotge
 Network time	Time		Hora de la xarxa
-Sending request failed	Time		No ha estat possible enviar la petició
+Sending request failed	Time		Ha fallat enviar la petició.
 Preview time:	Time		Vista prèvia de l'hora:
 \nNow: 	Time		\nAra: 
 Could not create socket	Time		No s'ha pogut obrir el sòcol
@@ -44,6 +44,6 @@ Synchronize at boot	Time		Sincronitza-ho a l'arrencada
 Indian	Time		Indi
 Revert	Time		Reverteix
 Date and time	Time		Data i hora
-The following error occured while synchronizing:\n%s	Time		S'ha produït l'error següent durant la sincronització:\n%s
+The following error occured while synchronizing:\n%s	Time		Hi ha hagut l'error següent durant la sincronització:\n%s
 Synchronize	Time		Sincronitza
 Add	Time		Afegeix

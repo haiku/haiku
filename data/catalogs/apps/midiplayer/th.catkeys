@@ -1,0 +1,20 @@
+1	thai	x-vnd.Haiku-MidiPlayer	1046133011
+This tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	โปรแกรมเล็กๆ นี้\nรู้วิธีเล่นหลากหลาย\nของเสียงเพลงที่ไพเราะ
+Dungeon	Main Window		Dungeon
+Could not load song	Main Window		ไม่สามารถโหลดเพลง
+Igor's lab	Main Window		Igor's lab
+Off	Main Window		ปิด
+Loading instruments…	Scope View		เครื่องมือในการโหลด
+Volume:	Main Window		ระดับเสียง:
+Closet	Main Window		ตู้
+Scope	Main Window		ขอบเขต
+Drop MIDI file here	Scope View		วางไฟล์ MIDI ที่นี่
+None	Main Window		ไม่มี
+Reverb:	Main Window		เสียงสะท้อน:
+MidiPlayer	System name		MidiPlayer
+OK	Main Window		ตกลง
+Stop	Main Window		หยุด
+Live input:	Main Window		อินพุตสด:
+Garage	Main Window		โรงรถ
+Play	Main Window		เล่น
+Cavern	Main Window		ถ้ำ

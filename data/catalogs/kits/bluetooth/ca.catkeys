@@ -16,7 +16,7 @@ HiFi audio device	DeviceClass		Dispositiu d'àudio d'alta fidelitat
 Microphone	DeviceClass		Micròfon
 Capturing	DeviceClass		Captura
 Jacket	DeviceClass		Jaqueta
-50-67% utilized	DeviceClass		Utilitzat entre el 50 i el 67%
+50-67% utilized	DeviceClass		Usat entre el 50 i el 67%
 Headphones	DeviceClass		Auriculars
 Imaging	DeviceClass		Imatges
 Device conforms to the headset profile	DeviceClass		El dispositiu concorda amb el perfil dels auriculars
@@ -32,7 +32,7 @@ Wired modem or voice gateway	DeviceClass		Mòdem o passarel·la de veu
 #NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError# No és un nom vàlid
 Camcorder	DeviceClass		Gravadora de vídeo
 #NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest# No és un nom vàlid
-17-33% utilized	DeviceClass		Utilitzat entre el 17 i el 33%
+17-33% utilized	DeviceClass		Usat entre el 17 i el 33%
 Desktop workstation	DeviceClass		Estació de treball d'escriptori
 Unspecified	DeviceClass		Sense especificar
 Miscellaneous	DeviceClass		Variat
@@ -42,19 +42,19 @@ LAN access	DeviceClass		Accés LAN
 Glasses	DeviceClass		Ulleres
 Phone	DeviceClass		Telèfon
 Laptop	DeviceClass		Portàtil
-67-83% utilized	DeviceClass		Utilitzat entre el 67 i el 83%
+67-83% utilized	DeviceClass		Usat entre el 67 i el 83%
 Cordless	DeviceClass		Sense fil
 Invalid device class!\n	DeviceClass		La classe del dispositiu no és vàlida!\n
 Minor class: 	DeviceClass		Classe secundària: 
 Doll/Action figure	DeviceClass		Nina o figura amb moviment
 Not implemented	RemoteDevice		No s'ha implementat
-33-50% utilized	DeviceClass		Utilitzat entre el 33 i el 50%
+33-50% utilized	DeviceClass		Usat entre el 33 i el 50%
 Gaming/Toy	DeviceClass		Joc o joguina
 Video camera	DeviceClass		Càmera de vídeo
 Handheld	DeviceClass		Agenda electrònica
 Service classes: 	DeviceClass		Classes de serveis: 
 Loudspeaker	DeviceClass		Altaveu
-83-99% utilized	DeviceClass		Utilitzat entre el 83 i el 99%
+83-99% utilized	DeviceClass		Usat entre el 83 i el 99%
 SIM card reader	DeviceClass		Lector de targetes SIM
 Computer	DeviceClass		Ordinador
 Scanner	DeviceClass		Escànner
@@ -80,7 +80,7 @@ Hands-free	DeviceClass		Mans lliures
 Digitizer tablet	DeviceClass		Taula digitalitzadora
 Portable audio	DeviceClass		Àudio portàtil
 Camera	DeviceClass		Càmera
-1-17% utilized	DeviceClass		Utilitzat entre l'1 i el 17%
+1-17% utilized	DeviceClass		Usat entre l'1 i el 17%
 Combo keyboard/pointing device	DeviceClass		Teclat combinat o dispositiu senyalador
 Video conferencing	DeviceClass		Videoconferència
 Peripheral	DeviceClass		Perifèric

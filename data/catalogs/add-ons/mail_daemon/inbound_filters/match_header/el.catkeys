@@ -1,5 +1,7 @@
-1	greek, modern (1453-)	x-vnd.Haiku-MatchHeader	1349121828
+1	greek, modern (1453-)	x-vnd.Haiku-MatchHeader	3622725118
 Delete message	ConfigView		Διαγραφή μηνύματος
+Match \"%attribute\" against \"%regex\"	RuleFilter		Αναζήτηση στο \"%attribute\" με βάση το \"%regex\"
+Match header	RuleFilter		Ταυτοποίηση της κεφαλίδας
 Set flags to	ConfigView		Θέση σημαιών σε
 <Choose account>	ConfigView		<Επιλέξτε λογαριασμό>
 Then	ConfigView		Τότε
@@ -9,4 +11,5 @@ Reply with	ConfigView		Απάντηση με
 <Choose action>	ConfigView		<Επιλέξτε ενέργεια>
 Move to	ConfigView		Μεταφορά σε
 this field is based on the action	ConfigView		Αυτό το πεδίο βασίζεται σε
+Account	ConfigView		Λογαριασμός
 has	ConfigView		έχει

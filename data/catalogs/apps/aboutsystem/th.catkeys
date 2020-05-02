@@ -1,0 +1,76 @@
+1	thai	x-vnd.Haiku-About	1828471351
+Revision	AboutView		ปรับปรุง
+The Haikuware team and their bounty program\n	AboutView		ทีมไฮกุแวร์และโปรแกรมสนับสนุนของพวกเขา\n
+Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		ลิขสิทธิ์© 1999-2007 Michael C. Ring สงวนลิขสิทธิ์.
+%.2f GHz	AboutView		%.2f GHz
+\n\nSpecial thanks to:\n	AboutView		\n\nขอขอบคุณเป็นพิเศษสำหรับ: \n
+Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (และเคอร์เนล NewOS ของเขา) \n
+Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		ลิขสิทธิ์© 1999-2000 Y.Takagi สงวนลิขสิทธิ์.
+Google and their Google Summer of Code and Google Code In programs\n	AboutView		Google และ Google Summer of Code และ Google Code In programs\n
+Contributors:\n	AboutView		ผู้สนับสนุน:\n
+Kernel:	AboutView		Kernel:
+Copyright © 2006-2012 Kentaro Fukuchi	AboutView		ลิขสิทธิ์ © 2006-2012 Kentaro Fukuchi
+Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		ลิขสิทธิ์ © 1991-2000 Silicon Graphics, Inc.สงวนลิขสิทธิ์
+Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		ลิขสิทธิ์ © 1990-2002 Info-ZIP. สงวนลิขสิทธิ์
+Past website & marketing:\n	AboutView		เว็บไซต์และการตลาดในอดีต: \n
+Copyright © 2003 Peter Hanappe and others.	AboutView		ลิขสิทธิ์  © 2003 Peter Hanappe และเพื่อนๆ
+{0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{Processor:} other{# Processors:}}
+%d MiB total	AboutView		รวม %d MiB
+The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	รหัสที่เป็นเอกลักษณ์ของไฮกุโดยเฉพาะเคอร์เนลและรหัสทั้งหมดที่แอพพลิเคชั่นอาจเชื่อมโยงนั้นได้รับการแจกจ่ายภายใต้เงื่อนไขของ <MIT license> ไลบรารีระบบบางแห่งมีรหัสบุคคลที่สามที่แจกจ่ายภายใต้ <LGPL license> คุณสามารถค้นหาลิขสิทธิ์ของรหัสบุคคลที่สามด้านล่างนี้ \n\n
+Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		ลิขสิทธิ์ © 1996-1997 Jeff Prosise.สงวนลิขสิทธิ์
+Copyright © 1999-2006 Brian Paul. Mesa3D Project. All rights reserved.	AboutView		ลิขสิทธิ์ © 1999-2006 Brian Paul. Mesa3D Project.สงวนลิขสิทธิ์
+Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		ลิขสิทธิ์ © 2010-2011 Google Inc.สงวนลิขสิทธิ์
+Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		ลิขสิทธิ์ © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nสงวนลิขสิทธิ์
+Past maintainers:\n	AboutView		ผู้ดูแลในอดีต: \n
+Unknown	AboutView		ไม่ทราบ
+Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. และทีมนักพัฒนาเพื่อสร้าง BeOS!\n\n
+Copyright © 2002-2014 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.	AboutView		ลิขสิทธิ์ © 2002-2014 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.
+Licenses: 	AboutView		สิทธิ์การใช้งาน:
+The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		ลิขสิทธิ์ของรหัส Haiku เป็นทรัพย์สินของ Haiku Inc. หรือของผู้เขียนที่ระบุไว้อย่างชัดเจนในแหล่งที่มา Haiku®และโลโก้HAIKU®เป็นเครื่องหมายการค้าจดทะเบียนของ Haiku, Inc. \n\n
+Copyright © 2009 Colin Percival	AboutView		ลิขสิทธิ์ © 2009 Colin Percival
+Time running:	AboutView		เวลาทำงาน:
+%ld MHz	AboutView		%ld MHz
+Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		ลิขสิทธิ์ © 1996-2005 Julian R Seward.สงวนลิขสิทธิ์
+GNU LGPL v2	AboutWindow		GNU LGPL v2
+Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		ลิขสิทธิ์ © 1994-2009, Thomas G. Lane, Guido Vollbeding. ซอฟต์แวร์นี้มีพื้นฐานมาจากการทำงานของ the Independent JPEG Group.
+Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (ผู้ก่อตั้งโครงการ)\n\n
+BSD (3-clause)	AboutWindow		BSD (3-clause)
+About this system	AboutWindow		เกี่ยวกับระบบนี้
+%d MiB used (%d%%)	AboutView		%d MiB ใช้ (%d%%)
+Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		ลิขสิทธิ์ © 1999-2010 โดยผู้เขียน Gutenprint สงวนลิขสิทธิ์
+Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		ลิขสิทธิ์ © 1994-1997 Mark Kilgard สงวนลิขสิทธิ์
+AboutSystem	System name		เกี่ยวกับระบบ
+Copyright © 1995-2001 Lars Düning. All rights reserved.	AboutView		ลิขสิทธิ์ © 1995-2001 Lars Düning สงวนลิขสิทธิ์
+Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		ลิขสิทธิ์ © 1998-2000 Thai Open Source Software Center Ltd และ Clark Cooper
+Source Code: 	AboutView		Source Code:
+\nCopyrights\n\n	AboutView		\nลิขสิทธิ์\n\n
+GNU GPL v3	AboutWindow		GNU GPL v3
+The HaikuPorts team\n	AboutView		The HaikuPorts team\n
+Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		มีซอฟต์แวร์จากโครงการ GNU ภายใต้ลิขสิทธิ์ GPL และ LGPL: \nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell \nลิขสิทธิ์ © The Free Software Foundation
+Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		ลิขสิทธิ์ © 1996-2002, 2006 David Turner, Robert Wilhelm และ Werner Lemberg
+Contains software from the FreeBSD Project, released under the BSD license:\nftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		มีซอฟต์แวร์จากโครงการ FreeBSD ภายใต้ลิขสิทธิ์ BSD: \nftpd, ping, telnet, telnetd, traceroute \nลิขสิทธิ์ © 1994-2008 The FreeBSD Project สงวนลิขสิทธิ์
+Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		ลิขสิทธิ์ © 2002-2003 Steve Lhomme สงวนลิขสิทธิ์
+Copyright © 2000-2019 Fabrice Bellard, et al.	AboutView		ลิขสิทธิ์  © 2000-2019 Fabrice Bellard, et al.
+Current maintainers:\n	AboutView		ผู้ดูแลปัจจุบัน:\n
+Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		ลิขสิทธิ์ © 1995, 1998-2001 Jef Poskanzer สงวนลิขสิทธิ์
+Version:	AboutView		เวอร์ชั่น:
+The BeGeistert team\n	AboutView		ทีม BeGeistert\n
+GNU LGPL v2.1	AboutWindow		GNU LGPL v2.1
+License: 	AboutView		ใบอนุญาต:
+GNU GPL v2	AboutWindow		GNU GPL v2
+The University of Auckland and Christof Lutteroth\n\n	AboutView		The University of Auckland และ Christof Lutteroth\n\n
+%total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB total, %inaccessible MiB inaccessible
+Copyright © 2012-2016 Google Internationalization team.	AboutView		ลิขสิทธิ์ © 2012-2016 Google Internationalization team
+Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		ลิขสิทธิ์ © 1994-2008 Xiph.Org สงวนลิขสิทธิ์
+Copyright © 1995-2004 Jean-loup Gailly and Mark Adler.	AboutView		ลิขสิทธิ์ © 1995-2004 Jean-loup Gailly และ Mark Adler
+Copyright © 2001-2003 Expat maintainers.	AboutView		ลิขสิทธิ์ © 2001-2003 Expat maintainers
+Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		ลิขสิทธิ์ © 2002-2006 Maxim Shemanarev (McSeem) 
+Translations:\n	AboutView		แปล:\n
+Memory:	AboutView		หน่วยความจำ:
+\n…and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n…และอาจมีบางอย่างที่เราลืมพูดถึง (ขออภัย!) \n\n
+BSD (2-clause)	AboutWindow		BSD (2-clause)
+Website & marketing:\n	AboutView		เว็บไซต์และการตลาด: \n
+2001 by Andy Ritger based on the Generalized Timing Formula	AboutView		2001 โดย Andy Ritger ตาม Generalized Timing Formula
+…and the many people making donations!\n\n	AboutView		…และผู้คนมากมายบริจาคเงิน! \n\n
+BSD (4-clause)	AboutWindow		BSD (4-clause)
+BITSTREAM CHARTER is a registered trademark of Bitstream Inc.	AboutView		BITSTREAM CHARTER เป็นเครื่องหมายการค้าจดทะเบียนของ Bitstream Inc.

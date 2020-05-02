@@ -31,7 +31,7 @@ Failed	TaskLooper	Failed task status message	Невдало
 Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	Добра новина! Завдання для репозитарія %name% завершене.
 Some tasks are still running. Stop these tasks and quit?	RepositoriesWindow	Application quit alert message	Деякі завдання ще виконуються. Зупинити їх та вийти?
 This repository URL already exists.	RepositoriesView	Error message	URL адреса цього репозитарія вже є.
-Repositories	System name		Репозиторії
+Repositories	System name		Repositories
 Changes pending:	RepositoriesView	Status view text	Очікування змін:
 Remove	RepositoriesView	Button label	Вилучити
 Remove these repositories?	RepositoriesView	Removal alert confirmation message	Вилучити ці репозиторії?

@@ -21,13 +21,13 @@ Print…	ProbeView		Nyomtatás…
 New…	FileWindow		Új…
 what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	melyik: '%.4s'\n\n
 OK	DiskProbe		Rendben
-DiskProbe	System name		LemezFürkész
+DiskProbe	System name		Lemezfürkész
 Back	ProbeView		Vissza
 Device: 	ProbeView		Eszköz:
 Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Számrendszer
 Open file…	FileWindow		Fájl megnyitása…
 32 bit unsigned pointer:	TypeEditors		32-bites aláíratlan mutató:
-DiskProbe request	DiskProbe		LemezFürkész kérés
+DiskProbe request	DiskProbe		Lemezfürkész kérés
 Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hexadecimális
 Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Nem sikerült a fájlba írni:\n%s\n\nKilépéskor minden változtatás el fog veszni.
 Examine device:	OpenWindow		Eszköz vizsgálata:
@@ -53,7 +53,7 @@ Redo	ProbeView		Újra
 Floating-point value:	TypeEditors		Lebegőpontos érték:
 Cancel	AttributeWindow		Mégse
 16 bit signed value:	TypeEditors		16-bites aláírt érték
-DiskProbe request	AttributeWindow		LemezFürkész kérés
+DiskProbe request	AttributeWindow		Lemezfürkész kérés
 Next	ProbeView		Következő
 64 bit signed offset:	TypeEditors		64-bites aláírt lenyomat
 32 bit signed value:	TypeEditors		32-bites aláírt érték
@@ -115,7 +115,7 @@ Block	ProbeView		Blokk
 Find again	ProbeView		Keresés tovább
 View	ProbeView	This is the last menubar item 'File Edit Block View'	Nézet
 Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Nem sikerült beolvasni a képet
-DiskProbe request	ProbeView		LemezFürkész kérés
+DiskProbe request	ProbeView		Lemezfürkész kérés
 Double precision floating-point value:	TypeEditors		Duplapontosságú lebegőpontos érték:
 Image	TypeEditors	This is the type of view	Kép
 Save changes before closing?	ProbeView		Elmentsük a változtatásokat bezárás előtt?

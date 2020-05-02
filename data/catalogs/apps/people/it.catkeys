@@ -1,7 +1,7 @@
 1	italian	x-vnd.Be-PEPL	2332202134
-Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		L'avvio di FileTypes preflet per configurare gli attributi di Person è fallito.\n\nErrore: 
+Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		L'avvio del pennello di preferenze Tipi di file, per configurare gli attributi di Contatti, è fallito.\n\nErrore: 
 Unnamed person	People		Anonimo
-New person…	People		Nuova persona...
+New person…	People		Nuovo contatto...
 Address	People		Indirizzo
 Zip	People		Zip
 Select all	People		Seleziona tutto
@@ -14,12 +14,12 @@ Contact name	People		Nome del contatto
 Cancel	People		Cancella
 Edit	People		Modifica
 Save changes before closing?	People		Salvare le modifiche prima di uscire?
-People	System name		People
+People	System name		Contatti
 Error	People		Errore
 Revert	People		Ripristina
 Country	People		Paese
-Person	Short mimetype description		Persona
-New person	People		Nuova persona
+Person	Short mimetype description		Contatto
+New person	People		Nuovo conatto
 Save	People		Salva
 Fax	People		Fax
 URL	People		URL
@@ -28,7 +28,7 @@ Home phone	People		Telefono di casa
 none	Groups list		nessuno
 Save as…	People		Salva come...
 Cut	People		Taglia
-Contact information for a person.	Long mimetype description		Contatto informazioni per una persona
+Contact information for a person.	Long mimetype description		Dettagli su un contatto
 Remove image	People		Rimuovi immagine
 City	People		Città
 Undo	People		Annulla

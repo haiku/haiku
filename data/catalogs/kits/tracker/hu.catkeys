@@ -260,7 +260,7 @@ The mount server could not be contacted.	AutoMounterSettings		A csatolási közp
 Query template	FindPanel		Keresés
 ends with	SelectionWindow		vége
 Open	OpenWithWindow		Megnyitás
-You must have at least one attribute showing.	PoseView		Legalább egy jellemző meg kell, hogy legyen jelenítve.
+You must have at least one attribute showing.	PoseView		Legalább egy jellemző meg kell hogy legyen jelenítve.
 Cut	FilePanelPriv		Kivágás
 Favorites	FilePanelPriv		Kedvencek
 Point	AttributesView		Pont
@@ -270,7 +270,7 @@ Disk mounting during boot	AutoMounterSettings		Lemezek csatolása bekapcsolásko
 Don't automount	AutoMounterSettings		Ne csatoljon automatikusan
 Could not find application \"%appname\"	OpenWithWindow		A program (%appname) nem található
 Unmatched parenthesis.	libtracker		Páratlan zárójel.
-Extended attribute	AttributesView		Kiegészített attribútum
+Extended attribute	AttributesView		Kiegészített jellemzők
 Unmatched brackets.	libtracker		Páratlan kapcsos-zárójel.
 Error %error loading Add-On %name.	ContainerWindow		Hiba történt a bővítmény (%name) betöltése közben: %error.
 You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		Ezt akarod most felülírni:\n\n\t%name %dest\n\nezzel:\n\n\t%name %src\n\nBiztos ki akarod cserélni azzal amit most akarsz %movemode?
@@ -370,7 +370,7 @@ Subject	Email Query Columns		Tárgy
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Hiba történt a mappa másolása közben: %name\n\t%error\n\nSzeretnéd folytatni?
 You cannot create a link to the root directory.	FSUtils		Nem lehet hivatkozást létrehozni a gyökérmappához.
 Select all	FilePanelPriv		Összes kijelölése
-Other	FilePermissionsView		Egyéb
+Other	FilePermissionsView		Mindenki
 Automatic disk mounting	AutoMounterSettings		Automatikus lemezcsatolás
 parent folder	NavMenu		szülőmappa
 Create link here	ContainerWindow		Hivatkozás készítése ide
@@ -438,7 +438,7 @@ Error %error loading add-On %name.	ContainerWindow		Hiba a bővítmény (%name) 
 Does not handle file	OpenWithWindow		Nem kezeli a fájlt
 E-mail	Person Query Columns		E-mail
 Arrange by	ContainerWindow		Rendezés
-Attributes	AttributesView		Attribútumok
+Attributes	AttributesView		Jellemzők
 Sorry, saving more than one item is not allowed.	FilePanelPriv		Sajnálom, de egyszerre csak egy elemet lehet elmenteni.
 64-bit unsigned integer	AttributesView		64-bites előjel nélküli egész
 Move here	ContainerWindow		Mozgatás ide

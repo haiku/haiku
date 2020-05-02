@@ -1,0 +1,4 @@
+1	thai	x-vnd.Haiku-SystemLogger	57960782
+Syslog Daemon	SyslogDaemon		Syslog Daemon
+OK	SyslogDaemon		ตกลง
+%s\n\nThis daemon is responsible for collecting all system messages and write them to the system-wide log at \"%s\".\n\n	SyslogDaemon		%s\n\ndaemon นี้รับผิดชอบการรวบรวมข้อความของระบบทั้งหมดและเขียนลงในบันทึกทั่วทั้งระบบที่ \"%s\".\n\n

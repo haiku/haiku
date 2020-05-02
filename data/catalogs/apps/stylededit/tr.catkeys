@@ -3,7 +3,7 @@ Document statistics	Statistics		Belge istatistikleri
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Geri alınamıyor, dosya bulunamadı: \"%s\".
 Cut	Menus		Kes
 Center	Menus		Ortala
-Increase size	Menus		Boyutu artır
+Increase size	Menus		Büyüt
 Wrap-around search	FindandReplaceWindow		Tüm dosyada ara
 Page setup…	Menus		Sayfa yapısı…
 Untitled 	StyledEditWindow		Adsız 
@@ -71,7 +71,7 @@ Find selection	Menus		Seçimi bul
 Cancel	SaveAlert		İptal
 Find…	Menus		Bul…
 Revert	RevertToSavedAlert		Eski haline döndür
-Decrease size	Menus		Boyutu azalt
+Decrease size	Menus		Küçült
 Size	Menus		Boyut
 Autodetect	Menus		Kendiliğinden algıla
 Replace next	Menus		Sonrakini değiştir

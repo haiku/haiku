@@ -8,7 +8,7 @@ The mount point could not be retrieved.	InstallProgress		Невозможно о
 <none>	InstallerWindow	No partition available	<нет>
 Please choose target	InstallerWindow		Пожалуйста, выберите раздел для установки
 Cancel	InstallProgress		Отмена
-Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Установка завершена. Загрузочный сектор был записан на раздел '%s'. Нажмите Перезагрузить, чтобы перезагрузить компьютер или выберите другой раздел, если хотите выполнить новую установку.
+Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Установка завершена. Загрузочный сектор был записан на раздел '%s'. Нажмите Перезагрузить, чтобы перезагрузить компьютер или выберите другой раздел, если хотите выполнить еще одну установку.
 Are you sure you want to to stop the installation?	InstallerWindow		Вы уверены, что хотите прервать установку?
 Installer	System name		Установщик
 Unknown Type	InstallProgress	Partition content type	Неизвестный тип

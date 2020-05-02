@@ -1,0 +1,17 @@
+1	thai	x-vnd.Haiku-MatchHeader	1946584206
+Delete message	ConfigView		ลบข้อความ
+Match \"%attribute\" against \"%regex\"	RuleFilter		Match \"%attribute\" against \"%regex\"
+Match header	RuleFilter		จับคู่ส่วนหัว
+Set flags to	ConfigView		ตั้งค่าสถานะเป็น
+Header field (e.g. Subject, From, …)	ConfigView		พื้นที่ส่วนหัว (เช่นหัวเรื่อง, จาก, ... )
+<Choose account>	ConfigView		<เลือกบัญชี>
+Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.
+Then	ConfigView		ต่อจากนั้น
+If	ConfigView		ถ้า
+Set as read	ConfigView		ตั้งเป็นอ่าน
+Reply with	ConfigView		ตอบกลับด้วย
+<Choose action>	ConfigView		<เลือกการกระทำ>
+Move to	ConfigView		ย้ายไป
+this field is based on the action	ConfigView		พื้นที่นี้ขึ้นอยู่กับการกระทำ
+Account	ConfigView		บัญชี
+has	ConfigView		มี

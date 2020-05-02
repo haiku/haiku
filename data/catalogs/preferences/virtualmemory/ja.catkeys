@@ -5,7 +5,7 @@ OK	VirtualMemoryApp		OK
 Use volume:	SettingsWindow		パーティション:
 Turn off	SettingsWindow		無効にする
 Changes will take effect upon reboot.	SettingsWindow		設定の変更は再起動後に有効になります。
-Revert	SettingsWindow		元に戻す
+Revert	SettingsWindow		戻す
 Keep enabled	SettingsWindow		有効のままにする
 The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		設定ファイルに指定された設定が不正です。デフォルト設定を読み込むか、またはプログラムを終了することができます。
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		VirtualMemory\n\tAxel Dörfler 作\n\tCopyright 2005, Haiku.\n

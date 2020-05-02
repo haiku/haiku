@@ -27,7 +27,7 @@ yes	Screen		はい
 Swap displays:	Screen		ディスプレイを交換:
 %sSerial no.: %s	Screen		%sシリアルナンバー: %s
 8 bits/pixel, 256 colors	Screen		8 ビット/ピクセル, 256 色
-Revert	Screen		元に戻す
+Revert	Screen		戻す
 always	Screen		常に
 Confirm changes	Screen		変更の確認
 Warning	Screen		警告

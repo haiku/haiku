@@ -1,0 +1,31 @@
+1	thai	x-vnd.haiku-screenshot	3958461128
+Include window border	ScreenshotWindow		รวมเส้นขอบหน้าต่าง
+Overwrite	ScreenshotWindow		เขียนทับ
+Save in:	ScreenshotWindow		บันทึกเป็น:
+Error saving \"%s\":\n\t%s	ScreenshotWindow		บันทึกผิดพลาด \"%s\":\n\t%s
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		ไฟล์นี้มีอยู่แล้ว\nคุณแน่ใจหรือว่าต้องการจะเขียนทับมัน?
+OK	ScreenshotWindow		ตกลง
+The destination path exists but is not a folder.	ScreenshotWindow		เส้นทางปลายทางมีอยู่ แต่ไม่ใช่โฟลเดอร์
+Select	ScreenshotWindow		เลือก
+Save as:	ScreenshotWindow		บันทึกเป็น:
+seconds	ScreenshotWindow		วินาที
+New screenshot	ScreenshotWindow		บันทึกหน้าจอใหม่
+Screenshot	System name		บันทึกหน้าจอ
+Desktop	ScreenshotWindow		เดสก์ท็อป
+Artwork folder	ScreenshotWindow		โฟลเดอร์งานศิลปะ
+Translator Settings	ScreenshotWindow		การตั้งค่าการแปล
+Include mouse pointer	ScreenshotWindow		รวมถึงตัวชี้เมาส์
+overwrite	ScreenshotWindow		เขียนทับ
+Settings…	ScreenshotWindow		ตั้งค่า
+Choose folder	ScreenshotWindow		เลือกโฟลเดอร์
+Name:	ScreenshotWindow		ชื่อ:
+Choose folder…	ScreenshotWindow		เลือกโฟลเดอร์
+Please select	ScreenshotWindow		โปรดเลือก
+Failed to save screenshot	ScreenshotWindow		ไม่สามารถบันทึกภาพหน้าจอ
+Cancel	ScreenshotWindow		ยกเลิก
+Delay:	ScreenshotWindow		ถ่วงเวลา:
+Copy to clipboard	ScreenshotWindow		คัดลอกไปที่คลิปบอร์ด
+screenshot	Screenshot	Base filename of screenshot files	บันทึกหน้าจอ
+Home folder	ScreenshotWindow		โฮมโฟลเดอร์
+Save	ScreenshotWindow		บันทึก
+Capture active window	ScreenshotWindow		จับภาพหน้าต่างที่ใช้งานอยู่

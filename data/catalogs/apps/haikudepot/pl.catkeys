@@ -61,8 +61,8 @@ Success	UserLoginWindow		Powodzenie
 Repository	PackageListView		Repozytorium
 Close	UserLoginWindow		Zamknij
 Close	RatePackageWindow		Zamknij
-Size	PackageListView		Rozmiar
 Your rating:	RatePackageWindow		Twoja ocena:
+Size	PackageListView		Rozmiar
 All categories	FilterView		Wszystkie kategorie
 Repositories	MainWindow		Repozytoria
 n/a	PackageInfoView		Nie dotyczy

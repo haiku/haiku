@@ -3,14 +3,14 @@ Available languages	Locale Preflet Window		Lingue disponibili
 Negative:	TimeFormatSettings		Negativo:
 already chosen	LanguageListView		già scelto
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		La lista delle lingue disponibili non è stata trovata! La preflet è inutilizabile!
-Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Affinché le modifiche abbiano effetto occorre riavviare la Deskbar e il Tracker. Volete riavviarli ora?
+Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Affinché le modifiche abbiano effetto occorre riavviare la Deskbar e il Tracker. Vuoi riavviarli ora?
 Long format:	TimeFormatSettings		Formato esteso:
 Currency	TimeFormatSettings		Valuta
 Locale	System name		Localizzazione
 Short format:	TimeFormatSettings		Formato sintetico:
 Language	Locale Preflet Window		Lingua
 Preferred languages	Locale Preflet Window		Lingue preferite
-Use month/day-names from preferred language	TimeFormatSettings		Usa nomi-mese/giorno dalla lingua preferita
+Use month/day-names from preferred language	TimeFormatSettings		Usa nomi per mesi e giorni della settimana dalla lingua preferita
 Formatting	Locale Preflet Window		Formattazione
 Locale	Locale Preflet Window		Localizzazione
 Numbers	TimeFormatSettings		Numeri

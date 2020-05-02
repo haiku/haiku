@@ -1,0 +1,5 @@
+1	thai	x-vnd.Haiku-notification_server	2022780929
+Warning	NotificationWindow		คำเตือน
+Notification	NotificationWindow		การแจ้งเตือน
+OK	NotificationWindow		ตกลง
+Couldn't start general settings monitor.\nLive filter changes disabled.	NotificationWindow		ไม่สามารถเริ่มการตรวจสอบการตั้งค่าทั่วไป \nการเปลี่ยนแปลงตัวกรองสดถูกปิดใช้งาน

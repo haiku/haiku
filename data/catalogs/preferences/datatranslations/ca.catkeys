@@ -3,13 +3,13 @@ Path:	DataTranslations		Camí:
 Name:	DataTranslations		Nom:
 DataTranslations - Note	DataTranslations		DataTranslations - Nota
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		L'element '%name' no sembla un Traductor i no serà instal·lat.
-Could not install %s:\n%s	DataTranslations		No ha estat possible instal·lar %s:\n%s
+Could not install %s:\n%s	DataTranslations		No s'ha pogut instal·lar %s:\n%s
 OK	DataTranslations		D'acord
 Cancel	DataTranslations		Cancel·la
 Info:	DataTranslations		Informació:
 DataTranslations - Error	DataTranslations		DataTranslations - Error
-Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Utilitzeu aquest tauler de control per indicar els valors predeterminats dels traductors, que es faran servir quan l'aplicació no n'indiqui cap.
-The new translator has been installed successfully.	DataTranslations		El nou traductor s'ha instal·lat correctament.
+Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Useu aquest tauler de control per establir els valors predeterminats dels traductors, que s'usaran quan l'aplicació no n'indiqui cap.
+The new translator has been installed successfully.	DataTranslations		El traductor nou s'ha instal·lat correctament.
 An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Ja hi ha un elements anomenat %name% a la carpeta dels Traductors! Voleu sobreescriure el traductor actual?
 DataTranslations	System name		DataTranslations
 Info	DataTranslations		Informació

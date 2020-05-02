@@ -1,0 +1,12 @@
+1	thai	x-vnd.Haiku-libmedia	1819860668
+Cleaning up.	MediaDefs		การทำความสะอาด
+Starting media_services.	MediaDefs		การเริ่มต้น media_services
+Stopping media_addon_server.	MediaDefs		การหยุด media_addon_server
+Waiting for media_addon_server to quit.	MediaDefs		กำลังรอ media_addon_server ที่จะหยุด
+Telling media_addon_server to quit.	MediaDefs		บอก media_addon_server ให้เหยุด
+Ready for use.	MediaDefs		พร้อมใช้งาน
+Stopping media server…	MediaDefs		การหยุดเซิร์ฟเวอร์สื่อ
+Waiting for media_server to quit.	MediaDefs		กำลังรอ media_server เพื่อออก
+Done shutting down.	MediaDefs		ปิดการทำงานแล้ว
+Error occurred starting media services.	MediaDefs		เกิดข้อผิดพลาดในการเริ่มบริการสื่อ
+Media Service	MediaDefs		บริการสื่อ

@@ -1,0 +1,20 @@
+1	thai	x-vnd.mmu_man.filepanel	1802971238
+display a load/save file panel\n	FilePanelApp		แสดงพาเนลไฟล์โหลด/บันทึก \n
+short\tlong\tdescription\n	FilePanelApp		สั้นt\tยาว\tคำอธิบาย\n
+%s not a valid option\n	FilePanelApp		%s not a valid option\n
+-s\t--save\tuse a save FilePanel\n	FilePanelApp		-s\t--บันทึก\tใช้ FilePanelที่บันทึก\n
+%s: this option requires a parameter\n	FilePanelApp		%s: ตัวเลือกนี้ต้องการพารามิเตอร์ \n
+-h\t--help\tdisplay usage\n	FilePanelApp		-h\t--ช่วยเหลือ\tแสดงการใช้งาน\n
+-l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--โหลด\tใช้ FilePanelที่โหลด (ค่าเริ่มต้น)\n
+-n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--ชื่อ\tตั้งค่าชื่อเริ่มต้นเพื่อการบันทึก\n
+-k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--ชนิด\tชนิดของรายการที่สามารถเปิดได้(ความชอบ): การรวมกันของ f, d, s (ไฟล์ (ค่าเริ่มต้น), ไดเรกทอรี่, symlink)\n
+%s: UNIMPLEMENTED\n	FilePanelApp		%s: UNIMPLEMENTED\n
+-t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--ไตเติ้ล\tตั้งค่าไตเติ้ลหน้าต่าง FilePanel\n
+-f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--ห้าม\tunimplemented\n
+usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n	FilePanelApp		การใช้งาน: %s [-h] [-d แฟ้มเอกสาร] [-l|-s] [-t ttl] [-1] [-m] [-a รูปแบบ] [-f รูปแบบ]\n
+-1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--เดี่ยว\tอนุญาตให้เลือกได้ 1 ไฟล์\n
+-a\t--allow\tunimplemented\n	FilePanelApp		-a\t--อนุญาต\tunimplemented\n
+-m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\tสร้าง FilePanel modal\n
+options:\n	FilePanelApp		ตัวเลือก:\n
+-d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--ไดเรกทอรี่\tเปิดที่ <folder>\n
+usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		การใช้งาน: %s [--ช่วยเหลือ] [--โฟลเดอร์ ไดเรกทอรี่] [--โหลด|--บันทึก] [--ไตเติ้ล ttl] [--single] [--modal] [--รูปแบบที่อนุญาต] [--รูปแบบไม่อนุญาต]\n

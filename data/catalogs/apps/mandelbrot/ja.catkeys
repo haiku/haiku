@@ -1,13 +1,13 @@
 1	japanese	x-vnd.Haiku-Mandelbrot	3875916167
 Burning Ship	MandelbrotWindow		バーニングシップ
-Grassland	MandelbrotWindow		草原
-Lightning	MandelbrotWindow		稲妻
+Grassland	MandelbrotWindow		グラスランド
+Lightning	MandelbrotWindow		ライトニング
 About	MandelbrotWindow		このソフトウェアについて
 Palette	MandelbrotWindow		パレット
 Set	MandelbrotWindow		集合
 Tricorn	MandelbrotWindow		トリコーン
 Royal	MandelbrotWindow		ロイヤル
-Orbit Trap	MandelbrotWindow		Orbit Trap
+Orbit Trap	MandelbrotWindow		オービットトラップ
 Deepfrost	MandelbrotWindow		ディープフロスト
 Subsampling	MandelbrotWindow		サブサンプリング
 1 (none)	MandelbrotWindow		1 (無し)
@@ -15,11 +15,11 @@ Quit	MandelbrotWindow		終了
 File	MandelbrotWindow		ファイル
 Julia	MandelbrotWindow		ジュリア
 Frost	MandelbrotWindow		フロスト
-Fire	MandelbrotWindow		炎
+Fire	MandelbrotWindow		ファイアー
 Mandelbrot	System name		マンデルブロ
 Iterations	MandelbrotWindow		反復回数
 High contrast	MandelbrotWindow		ハイコントラスト
 Multibrot	MandelbrotWindow		マルチブロ
-Spring	MandelbrotWindow		春
+Spring	MandelbrotWindow		スプリング
 Midnight	MandelbrotWindow		ミッドナイト
 Mandelbrot	MandelbrotWindow		マンデルブロ

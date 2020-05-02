@@ -14,7 +14,7 @@ OK	Login View		OK
 Info	Login App		情報
 Login:	Login View		ログイン:
 Password:	Login View		パスワード:
-Unimplemented	Login App		未実装です。
+Unimplemented	Login App		未実装
 OK	Login App		OK
 Error: %1	Login App		エラー: %1
 error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	エラー %s\n

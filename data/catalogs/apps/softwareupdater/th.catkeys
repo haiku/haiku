@@ -1,0 +1,64 @@
+1	thai	x-vnd.haiku-softwareupdater	369324613
+Updating version	SoftwareUpdaterWindow	List item text	กำลังอัปเดตเวอร์ชัน
+Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		คลิกที่นี่เพื่อติดตั้ง {0, plural, one{# updated package} other{# updated packages}}
+Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	แพ็คเกจที่จะถอนการติดตั้ง
+No active network connection was found	UpdateManager	Error message	ไม่พบการเชื่อมต่อเครือข่ายที่ใช้งานอยู่
+Quit	SoftwareUpdaterWindow	Alert button label	ออก
+There were no updates found.	CheckManager		ไม่พบการอัปเดต
+Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		การอัปเดตยังไม่เสร็จสมบูรณ์ คุณแน่ใจหรือไม่ว่าต้องการออก?
+Updates found	SoftwareUpdaterWindow		พบการอัปเดต
+Update now	SoftwareUpdaterWindow		อัปเดตตอนนี้
+For some reason, we could not reboot your computer.	SoftwareUpdaterWindow		ด้วยเหตุผลบางอย่างเราไม่สามารถรีบูตคอมพิวเตอร์ของคุณ
+OK	UpdateManager		ตกลง
+Unrecognized argument	SoftwareUpdaterApp	Error message	Argument ที่ไม่รู้จัก
+There were no updates found.	CheckAction		ไปพบการอัปเดต
+No updates available	UpdateAction		ไม่มีการอัปเดต
+New packages to be installed	SoftwareUpdaterWindow	List super item label	แพ็คเกจใหม่ที่จะติดตั้ง
+Packages to be updated	SoftwareUpdaterWindow	List super item label	แพ็คเกจที่จะอัพเดท
+to	SoftwareUpdaterWindow	List item text	ที่
+Attempting to cancel the updates…	SoftwareUpdaterWindow		กำลังพยายามยกเลิกการอัพเดต
+Contacting software repositories to check for package updates.	CheckManager		กำลังติดต่อที่เก็บซอฟต์แวร์เพื่อตรวจสอบการอัปเดตแพ็คเกจ
+Available updates found	CheckManager		พบการอัปเดตที่พร้อมใช้งาน
+from repository	SoftwareUpdaterWindow	List item text	จากที่เก็บซอฟต์แวร์
+Contacting software repositories to check for package updates.	SoftwareUpdaterWindow		กำลังติดต่อที่เก็บซอฟต์แวร์เพื่อตรวจสอบการอัปเดตแพ็คเกจ
+Cancelling updates	SoftwareUpdaterWindow		กำลังยกเลิกการอัปเดต
+Cancel	SoftwareUpdaterWindow	Alert button label	ยกเลิก
+There were no updates found.	UpdateAction		ไม่พบการอัปเดต
+OK	SoftwareUpdaterWindow		ตกลง
+Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		โปรดเลือกจากตัวเลือกการอัปเดตเหล่านี้:\n\nอัปเดต:\n\tอัปเดตแพ็คเกจที่ติดตั้งทั้งหมด\nซิงค์เต็มรูปแบบ:\n\tซิงโครไนซ์แพ็คเกจที่ติดตั้งกับที่เก็บ
+The following changes will be made:	SoftwareUpdaterWindow		การเปลี่ยนแปลงต่อไปนี้จะเกิดขึ้น:
+Argument variables are no longer accepted\n	SoftwareUpdaterApp		ตัวแปร Argument ไม่ได้รับการยอมรับอีกต่อไป\n
+Fatal error while checking for updates: %s\n	CheckAction		ข้อผิดพลาดร้ายแรงขณะตรวจสอบการอัปเดต: %s\n
+SoftwareUpdater	System name		ตัวอัปเดตซอฟท์แวร์
+No active network connection was found.\n	CheckManager		ไม่พบการเชื่อมต่อเครือข่ายที่ใช้งานอยู่\n
+Applying changes	UpdateManager		ใช้การเปลี่ยนแปลง
+Full sync	SoftwareUpdaterWindow	Alert button label	ซิงค์เต็มรูปแบบ
+Quit	SoftwareUpdaterWindow	Button label	ออก
+Updates have been successfully installed.	UpdateManager		ติดตั้งการปรับปรุงสำเร็จแล้ว
+Exception occurred while updating packages : %s\n	UpdateAction		เกิดข้อยกเว้นขณะอัปเดตแพ็คเกจ:%s\n
+A reboot is necessary to complete the update process.	UpdateManager		จำเป็นต้องรีบูตเครื่องเพื่อให้กระบวนการอัปเดตเสร็จสมบูรณ์
+Exception occurred while checking for updates: %s\n	CheckAction		มีข้อยกเว้นเกิดขึ้นขณะตรวจสอบการอัปเดต: %s\n
+Packages are being updated	UpdateManager		กำลังอัปเดตแพคเกจ
+Cancel	SoftwareUpdaterWindow		ยกเลิก
+Don't quit	SoftwareUpdaterWindow		ไม่ออก
+Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		คลิกที่นี่เพื่อเรียกใช้ Software Updater การอัปเดตบางอย่างจะต้องเลือกวิธีแก้ไขปัญหา
+Checking for updates	SoftwareUpdaterWindow		ตรวจสอบการอัปเดต
+Updates completed	UpdateManager		การอัปเดตเสร็จสมบูรณ์
+Reboot	SoftwareUpdaterWindow		รีบูธ
+Show more details	SoftwareUpdaterWindow		แสดงรายละเอียดเพิ่มเติม
+Installing version	SoftwareUpdaterWindow	List item text	ติดตั้งเวอร์ชั่น
+Checking for updates	CheckManager		ตรวจสอบการอัปเดต
+No remote repositories are available	UpdateManager	Error message	ไม่มีที่เก็บข้อมูลระยะไกล
+Software {0, plural, one{update} other{updates}} available	CheckManager		ซอฟ์แวร์  {0, plural, one{update} other{updates}} พร้อมใช้งาน
+Reboot	SoftwareUpdaterWindow	Button label	รีบูธ
+Update	SoftwareUpdaterWindow	Alert button label	อัปเดต
+Open Repositories	SoftwareUpdaterWindow	Alert button label	เปิดที่เก็บข้อมูล
+Updates did not complete	UpdateAction		อัปเดตไม่สมบรูณ์
+Invalid update type, cannot continue with updates	UpdateAction		ประเภทการอัปเดตไม่ถูกต้อง ไม่สามารถดำเนินการอัปเดตได้
+Uninstalling version	SoftwareUpdaterWindow	List item text	ยกเลิกการติดตั้งเวอร์ชั่น
+%i of %i	UpdateManager	Do not translate %i	%i of %i
+Quit	SoftwareUpdaterWindow		ออก
+No updates available	CheckManager		ไม่มีการอัปเดต
+Usage:  SoftwareUpdater <command> [ <option> ]\nUpdates installed packages.\n\nCommands:\n  update     - Search repositories for updates on all packages.\n  check      - Check for available updates but only display a notification with results.\n  full-sync  - Synchronize the installed packages with the repositories.\n\nOptions:\n  -h or --help       Print this usage help\n  -v or --verbose    Output verbose information\n	SoftwareUpdaterApp	Command line usage help	การใช้งาน: SoftwareUpdater <command> [<option>]\nอัปเดตแพ็คเกจที่ติดตั้ง\n\nคำสั่ง\nอัปเดต - ค้นหาที่เก็บข้อมูลสำหรับการอัปเดตในแพ็คเกจทั้งหมด\nตรวจสอบ - ตรวจสอบการอัปเดตที่มี แต่แสดงการแจ้งเตือนพร้อมผลลัพธ์เท่านั้น\nซิงค์เต็ม - ซิงโครไนซ์แพ็คเกจที่ติดตั้งไว้กับที่เก็บ\n\nตัวเลือก:\n-h or --ช่วย พิมพ์ช่วยเหลือการใช้งานนี้\n-v หรือ --verbose เอาท์พุทข้อมูล verbose\n
+No remote repositories are available. Please verify that some repositories are enabled using the Repositories preflet or the 'pkgman' command.	SoftwareUpdaterWindow	Error message	ไม่มีที่เก็บข้อมูลระยะไกล โปรดตรวจสอบว่ามีการเปิดใช้งานที่เก็บบางแห่งโดยใช้ที่เก็บ preflet หรือคำสั่ง 'pkgman'
+Downloading packages	UpdateManager		กำลังดาวน์โหลดแพ็คเกจ

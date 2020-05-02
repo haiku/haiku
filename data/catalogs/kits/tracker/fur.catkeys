@@ -486,7 +486,7 @@ Memory corruption.	libtracker		Coruzion de memorie.
 Expression too long.	libtracker		Espression masse lungje.
 Color	AttributesView		Colôr
 Copy layout	ContainerWindow		Copie disposizion
-Duplicate	ContainerWindow		Doplee
+Duplicate	ContainerWindow		Dupliche
 16-bit integer	AttributesView		Intîr a 16 bit
 Untitled clipping	PoseView		Ritai cence non
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Il file \"%name\" al esist za te cartele specificade. Sostituîlu?

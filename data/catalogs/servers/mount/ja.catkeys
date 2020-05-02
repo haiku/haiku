@@ -7,7 +7,7 @@ Unmount error	AutoMounter		マウント解除エラー
 The file system on this volume is not the Be file system. It is recommended to mount it in read-only mode, to prevent unintentional data loss because of bugs in Haiku.	AutoMounter		このボリュームのファイルシステムは、Be file system ではありません。Haiku のバグによる意図的でないデータロスを防ぐために、読み取り専用でマウントすることをお勧めします。
 Mount read/write	AutoMounter		読み書き
 Could not unmount disk \"%s\":\n\t%s	AutoMounter		\"%s\" をマウント解除できませんでした:\n\t%s
-Mounting volume '%s'\n\n	AutoMounter		'%s'パーティションをマウント中\n\n
+Mounting volume '%s'\n\n	AutoMounter		ボリューム'%s'をマウント中\n\n
 Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		\"%s\" をアンマウントできませんでした:\n\t%s\n\n強制的にアンマウントしますか?\n\n警告:アプリケーションがディスクへの書き込み中にアンマウントしますと、データを失う可能性もあるので、ご注意ください。\n
 Force unmount	AutoMounter		強制的にマウント解除
 Mount error	AutoMounter		マウントエラー

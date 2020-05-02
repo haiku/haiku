@@ -12,7 +12,7 @@ Scan	Status View		Сканувати
 Rescan	Status View		Пересканувати
 file unavailable	Status View		файл недоступний
 Get info	Pie View		Дивитись інфо
-DiskUsage	System name		Використання диску
+DiskUsage	System name		DiskUsage
 Created	Info Window		Створено
 Modified	Info Window		Змінено
 Abort	Status View		Перервати

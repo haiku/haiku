@@ -1,5 +1,5 @@
 1	italian	x-vnd.mmu_man.filepanel	1802971238
-display a load/save file panel\n	FilePanelApp		visualizza un pannello di load/save file\n
+display a load/save file panel\n	FilePanelApp		visualizza un pannello per caricare/salvare file\n
 short\tlong\tdescription\n	FilePanelApp		short\tlong\tdescrizione\n
 %s not a valid option\n	FilePanelApp		%s non è un opzione valida\n
 -s\t--save\tuse a save FilePanel\n	FilePanelApp		-s\t--save\tusa un save FilePanel\n

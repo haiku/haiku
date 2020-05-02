@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-FirstBootPrompt	321243395
+1	french	x-vnd.Haiku-FirstBootPrompt	2670843542
 Japanese	KeymapNames		Japonais
 US	KeymapNames		US
 Esperanto	KeymapNames		Esperanto
@@ -6,18 +6,29 @@ Belarusian	KeymapNames		Biélorusse
 Brazilian	KeymapNames		Brésilien
 Dvorak	KeymapNames		Dvorak
 Polish	KeymapNames		Polonais
+Latin-American	KeymapNames		Latino-Américain
 Ukrainian	KeymapNames		Ukrainien
+Russian (Yawert)	KeymapNames		Russe (Yawert)
 United-Kingdom	KeymapNames		Royaume-Uni
 Serbian (Cyrillic)	KeymapNames		Serbe (cyrillique)
+Turkish (Type-F)	KeymapNames		Turc (Type F)
 Bulgarian (Cyrillic)	KeymapNames		Bulgare (cyrillique)
 Belgian (point)	KeymapNames		Belge (point)
 Finnish	KeymapNames		Finnois
 Swedish	KeymapNames		Suédois
+Svorak	KeymapNames		Svorak
 German	KeymapNames		Allemand
 Swiss-German	KeymapNames		Suisse allemand
 Keymap	BootPromptWindow		Disposition du clavier
 Spanish (Dvorak)	KeymapNames		Espagnol (Dvorak)
+US-International	KeymapNames		Qwerty International
 Czech	KeymapNames		Tchèque
+Turkish (Type-Q)	KeymapNames		Turc (Type Q)
+Slovak	KeymapNames		Slovaque
+Russian (Udmurt, Komi, Mari)	KeymapNames		Russe (Udmurt, Komi, Mari)
+Thai (TIS-820.2538)	KeymapNames		Thaï (TIS-820.2538)
+Colemak	KeymapNames		Colemak
+Dvorak (programmer's)	KeymapNames		Dvorak (développeur)
 Russian (Mac)	KeymapNames		Russe (Mac)
 Thank you for trying out Haiku! We hope you'll like it!\n\nYou can select your preferred language and keyboard layout from the list on the left which will then be used instantly. You can easily change both settings from the Desktop later on on the fly.\n\nDo you wish to run the Installer or continue booting to the Desktop?\n	BootPromptWindow	For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	Merci d’essayer Haiku ! Nous espérons que vous l’aimerez !\n\nVeuillez choisir votre clavier et votre langue préférés dans la liste à gauche. Ils seront pris en compte instantanément. Plus tard, vous pourrez facilement modifier à la volée ces deux réglages à partir du bureau.\n\nVoulez-vous exécuter le programme d’installation ou continuer le démarrage du bureau ?\n\nNote : La traduction des applications et des autres parties d’Haiku n’est pas terminée. Vous trouverez souvent des phrases non traduites, mais si vous le souhaitez, vous pouvez apporter votre contribution sur <www.haiku-os.org>.\n
 German (Mac)	KeymapNames		Allemand (Mac)

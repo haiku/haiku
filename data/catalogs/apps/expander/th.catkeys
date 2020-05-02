@@ -1,0 +1,51 @@
+1	thai	x-vnd.Haiku-Expander	3300517306
+Expand	ExpanderMenu		ขยาย
+Expanding '%s'…	ExpanderWindow		กำลังขยาย '%s'
+Close window when done expanding	ExpanderPreferences		ปิดหน้าต่างเมื่อขยายเสร็จแล้ว
+Set destination…	ExpanderMenu		กำหนดปลายทาง
+Use:	ExpanderPreferences		ใช้:
+File expanded	ExpanderWindow		ไฟล์ขยาย
+The destination is read only.	ExpanderWindow		กำหนดปลายทางให้อ่านได้อย่างเดียว
+Expander: Open	ExpanderWindow		ตัวขยาย: เปิด
+ is not supported	ExpanderWindow		ไม่รองรับ
+Expander settings	ExpanderPreferences		ตั้งค่าตัวขยาย
+Select current	DirectoryFilePanel		เลือกค่าปัจจุบัน
+Source	ExpanderWindow		ต้นฉบับ
+Error when expanding archive	ExpanderWindow		เกิดความผิดพลาดขณะเปิดไฟล์
+Hide contents	ExpanderWindow		ซ่อนเนื้อหา
+Cancel	ExpanderWindow		ยกเลิก
+Automatically expand files	ExpanderPreferences		ไฟล์ขยายอัตโนมัติ
+Continue	ExpanderWindow		ต่อไป
+Destination folder	ExpanderPreferences		โฟลเดอร์ปลายทาง
+Other	ExpanderPreferences		อื่นๆ
+Cancel	ExpanderPreferences		ยกเลิก
+Expansion	ExpanderPreferences		ส่วนขยาย
+Select	DirectoryFilePanel		เลือก
+The folder was either moved, renamed or not supported.	ExpanderWindow		โฟลเดอร์ถูกย้ายเปลี่ยนชื่อหรือไม่รองรับ
+Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		ไม่มีโฟลเดอร์ปลายทาง คุณต้องการที่จะสร้างมันขึ้นมา?
+Same directory as source (archive) file	ExpanderPreferences		ไดเร็กทอรีเดียวกันกับไฟล์ซอร์ส (ไฟล์เก็บถาวร)
+Settings	ExpanderMenu		ตั้งค่า
+Settings…	ExpanderMenu		ตั้งค่า
+Expander: Choose destination	DirectoryFilePanel		ตัวขยาย: เลือกปลายทาง
+Select	ExpanderPreferences		เลือก
+Show contents	ExpanderWindow		แสดงเนื้อหา
+Automatically show contents listing	ExpanderPreferences		แสดงรายการเนื้อหาโดยอัตโนมัติ
+OK	ExpanderPreferences		ตกลง
+Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		คุณแน่ใจหรือไม่ว่าต้องการหยุดขยายที่เก็บถาวรนี้ รายการที่ขยายอาจไม่สมบูรณ์
+Leave destination folder path empty	ExpanderPreferences		เว้นเส้นทางโฟลเดอร์ปลายทางว่างไว้
+Failed to create the destination folder.	ExpanderWindow		ไม่สามารถสร้างโฟลเดอร์ปลายทาง
+Select '%s'…	DirectoryFilePanel		เลือก '%s'
+Create	ExpanderWindow		สร้าง
+The file doesn't exist	ExpanderWindow		ไฟล์นี้ไม่มีอยู่
+Stop	ExpanderMenu		หยุด
+File	ExpanderMenu		ไฟล์
+Expander	System name		ตัวขยาย
+Expand	ExpanderWindow		ขยาย
+Close	ExpanderMenu		ปิด
+The destination is not a folder.	ExpanderWindow		ปลายทางไม่ใช่โฟลเดอร์
+Open destination folder after extraction	ExpanderPreferences		เปิดโฟลเดอร์ปลายทางหลังจากคลายข้อมูล
+Creating listing for '%s'…	ExpanderWindow		กำลังสร้างรายชื่อสำหรับ '%s'
+Set source…	ExpanderMenu		ตั้งค่าแหล่งที่มา
+Show contents	ExpanderMenu		แสดงเนื้อหา
+Stop	ExpanderWindow		หยุด
+Destination	ExpanderWindow		ปลายทาง

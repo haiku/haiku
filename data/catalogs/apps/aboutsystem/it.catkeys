@@ -12,7 +12,7 @@ Kernel:	AboutView		Kernel:
 Copyright © 2006-2012 Kentaro Fukuchi	AboutView		Copyright © 2006-2012 Kentaro Fukuchi
 Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Copyright © 1991-2000 Silicon Graphics, Inc. Tutti i diritti riservati.
 Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Copyright © 1990-2002 Info-ZIP. Tutti i diritti riservati.
-Past website & marketing:\n	AboutView		Versione precedente del sito & marketing:\n
+Past website & marketing:\n	AboutView		Versione precedente del sito e promozione:\n
 Copyright © 2003 Peter Hanappe and others.	AboutView		Copyright © 2003 Peter Hanappe e altri.
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{Processore:} other{# Processori:}}
 %d MiB total	AboutView		%d MiB totali
@@ -69,7 +69,7 @@ Translations:\n	AboutView		Traduzioni:\n
 Memory:	AboutView		Memoria:
 \n…and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n…e molti altri che non abbiamo avuto modo di citare (vi preghiamo di perdonarci!)\n\n
 BSD (2-clause)	AboutWindow		BSD (2-clause)
-Website & marketing:\n	AboutView		Sito & marketing:\n
+Website & marketing:\n	AboutView		Sito e promozione:\n
 2001 by Andy Ritger based on the Generalized Timing Formula	AboutView		Copyright © 2001 Andy Ritger, basato sulla Generalized Timing Formula
 …and the many people making donations!\n\n	AboutView		…e le tantissime persone che hanno supportato il progetto con le loro donazioni!\n\n
 BSD (4-clause)	AboutWindow		BSD (4-clause)

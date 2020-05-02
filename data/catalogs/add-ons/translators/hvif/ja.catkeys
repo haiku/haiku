@@ -2,7 +2,7 @@
 Haiku vector icon translator	HVIFTranslator		Haiku ベクターアイコン用トランスレーター
 HVIF icons	HVIFTranslator		HVIF アイコン
 Render size:	HVIFView		描画サイズ:
-HVIFTranslator Settings	HVIFTranslator		HVIFTranslator 設定
+HVIFTranslator Settings	HVIFTranslator		HVIF トランスレーター設定
 Haiku vector icon translator	HVIFView		Haiku ベクターアイコン用トランスレーター
 HVIF Settings	HVIFMain		HVIF 設定
 Version %d.%d.%d, %s	HVIFView		バージョン %d.%d.%d, %s

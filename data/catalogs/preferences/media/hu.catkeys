@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Media	1682972002
+1	hungarian	x-vnd.Haiku-Media	582516163
 Couldn't add volume control in Deskbar: %s\n	Media views		Nem lehetett hangerőszabályzót helyezni az Asztalsávra: %s\n
 Restart media services	Media views		Médiaszolgáltatások újraindítása
 Quit	Media Window		Kilépés
@@ -7,6 +7,8 @@ Couldn't remove volume control in Deskbar: %s\n	Media views		Nem lehetett a hang
 Video output:	Media views		Képkimenet:
 Video input:	Media views		Képbemenet:
 Audio output:	Media views		Hangkimenet:
+Please select a SoundFont.	Midi View		Kérlek válassz SoundFont-ot.
+There are no SoundFonts installed.	Midi View		Nincsen SoundFont telepítve.
 Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Az ablak bezárása esetén megszakad a média-szolgáltatás újraindítása. Részleges vagy hibás működést eredményezhet.
 Could not connect to the media server.\nWould you like to start it ?	Media Window		Nem lehet csatlakozni a Médiakiszolgálóhoz.\nEl szeretnéd indítani most?
 Video settings	Media Window		Videóbeállítások
@@ -18,6 +20,7 @@ Quit anyway	Media Window		Kilépés mindenképp
 Media	System name		Média
 Warning!	Media Window		Figyelem!
 MIDI Settings	Media Window		MIDI beállítások
+SoundFonts	Midi View		SoundFont
 Audio input:	Media views		Hangbemenet:
 <none>	Media views		<nincs>
 Channel:	Media views		Csatorna:

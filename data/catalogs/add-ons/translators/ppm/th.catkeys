@@ -1,0 +1,30 @@
+1	thai	x-vnd.Haiku-PPMTranslator	292474603
+None	PPMTranslator		ไม่มี
+PPM Settings	PPMMain		ตั้งค่า PPM
+System palette 8 bits	PPMTranslator		จานสีระบบ 8 บิต
+Sample code copyright 1999, Be Incorporated	PPMTranslator		ตัวอย่างรหัสลิขสิทธิ์ 1999, Be Incorporated
+Something is wrong with the PPMTranslator!	PPMMain		มีบางอย่างผิดปกติกับ PPMTranslator!
+Grayscale 8 bits	PPMTranslator		โทนสีเทา 8 บิต
+Based on PPMTranslator sample code	PPMTranslator		ขึ้นอยู่กับรหัสตัวอย่าง PPMTranslator
+RGB 8:8:8 32 bits big-endian	PPMTranslator		RGB 8:8:8 32 bits big-endian
+PPM image translator	PPMTranslator		ตัวแปลรูปภาพ PPM
+Bitmap 1 bit	PPMTranslator		Bitmap 1 bit
+RGB 5:6:5 16 bits big-endian	PPMTranslator		RGB 5:6:5 16 bits big-endian
+PPMTranslator Settings	PPMTranslator		การตั้งค่า PPMTranslator
+CMY 8:8:8 32 bits	PPMTranslator		CMY 8:8:8 32 bits
+OK	PPMMain		ตกลง
+CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 bits
+PPM image	PPMTranslator		ภาพ PPM
+Input color space:	PPMTranslator		ป้อนพื้นที่สี:
+RGB 5:5:5 16 bits big-endian	PPMTranslator		RGB 5:5:5 16 bits big-endian
+RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RGBA 5:5:5:1 16 bits big-endian
+Write ASCII	PPMTranslator		เขียน ASCII
+RGB 5:6:5 16 bits	PPMTranslator		RGB 5:6:5 16 bits
+RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8 32 bits big-endian
+RGBA 8:8:8:8 32 bits	PPMTranslator		RGBA 8:8:8:8 32 bits
+Version %d.%d.%d, %s	PPMTranslator		เวอร์ชั่น %d.%d.%d, %s 
+CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8 32 bits
+RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8 32 bits
+RGB 5:5:5 16 bits	PPMTranslator		RGB 5:5:5 16 bits
+RGBA 5:5:5:1 16 bits	PPMTranslator		RGBA 5:5:5:1 16 bits
+Be Bitmap Format (PPMTranslator)	PPMTranslator		เป็นรูปแบบบิตแมป (PPMTranslator)

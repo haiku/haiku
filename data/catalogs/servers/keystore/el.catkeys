@@ -1,0 +1,7 @@
+1	greek, modern (1453-)	x-vnd.Haiku-keystore_server	3098681817
+Keyring:	KeyRequestWindow		Κλειδοθήκη:
+Allow once	AppAccessRequestWindow		Να επιτραπεί μόνο για μια φορά
+Unlock keyring	KeyRequestWindow		Ξεκλείδωμα κλειδοθήκης
+Password:	KeyRequestWindow		Συνθηματικό:
+Cancel	KeyRequestWindow		Άκυρο
+Allow always	AppAccessRequestWindow		Να επιτρέπεται πάντα

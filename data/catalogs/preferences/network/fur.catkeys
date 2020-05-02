@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-Network	115295218
+1	friulian	x-vnd.Haiku-Network	2923905377
 Ethernet device	InterfaceListItem		Dispositîf ethernet
 Link speed:	IntefaceView		Velocitât colegament:
 disconnected	IntefaceView		disconetût
@@ -17,7 +17,7 @@ DHCP	IntefaceAddressView		DHCP
 Netmask:	IntefaceAddressView		Mascare di rêt:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Servizis
-Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Instalazion dal Stât de Rêt tal Deskbar falît: %s
+Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Instalazion di “Stât de Rêt” tal Deskbar falide: %s
 Revert	NetworkWindow		Torne indaûr
 off	ServiceListItem		off
 WEP	WEP protected network		WEP
@@ -31,7 +31,7 @@ Show network status in Deskbar	NetworkWindow		Mostre il stât de rêt tal Deskba
 Mode:	IntefaceAddressView		Modalitât:
 connected	InterfaceListItem		conetût
 OK	NetworkWindow		Va ben
-Static	IntefaceAddressView		Static
+Static	IntefaceAddressView		Statiche
 launch error	NetworkWindow		erôr di inviament
 Renegotiate	IntefaceView		Tornâ a negoziâ
 MAC address:	IntefaceView		Direzion MAC:
@@ -47,6 +47,7 @@ Status:	IntefaceView		Stât:
 Disable	IntefaceView		Disabilite
 Manage…	NetworkWindow		Gjestìs…
 open	Open network		vierç
+Network	System name		Rêt
 Your gateway to the internet	IntefaceAddressView		Il to gateway par internet
 Enable	ServiceView		Abilite
 Wireless device	InterfaceListItem		Dispositîf cence fîi

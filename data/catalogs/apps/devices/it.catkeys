@@ -2,7 +2,7 @@
 ACPI bus	DevicesView		Bus ACPI
 Encryption controller	Device		Controller di cifratura
 Bus Information	Device		Informazioni Bus
-Devices	System name		Devices
+Devices	System name		Dispositivi
 Graphics Peripheral	DeviceSCSI		Periferica Grafica
 Processor	Device		Processore
 Generate system information	DevicesView		Genera informazioni di sistema
@@ -32,7 +32,7 @@ Device name	Device		Nome del dispositivo
 Satellite communications controller	Device		Controller comunicazioni satellitari
 Device class	DeviceSCSI		Classe dispositivo
 Device	Device		Dispositivo
-Input device controller	Device		Controller dispositivi di input
+Input device controller	Device		Controller dispositivi di ingresso
 PCI bus	DevicesView		Bus PCI
 ACPI System Indicator	DeviceACPI		Indicatore di Sistema ACPI
 ACPI System Bus	DeviceACPI		Bus di Sistema ACPI

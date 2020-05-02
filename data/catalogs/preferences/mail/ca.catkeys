@@ -1,13 +1,13 @@
 1	catalan; valencian	x-vnd.Haiku-Mail	2750130554
 Account settings	AutoConfigWindow		Paràmetres del compte
-\t\t· Outgoing	Config Window		\t\t· Sortint
-An error occurred while creating the config view: %error.	Config Views		S'ha produït un error en crear la vista de configuració: %error.
+\t\t· Outgoing	Config Window		\t\t· De sortida
+An error occurred while creating the config view: %error.	Config Views		Hi ha hagut un error en crear la vista de configuració: %error.
 E-mail address:	E-Mail		Adreça de correu:
 Create new account	AutoConfigWindow		Obre un compte nou
 While sending and receiving	Config Window		Mentre s'estigui enviant i rebent
 Error!	Config Views		Error!
 Apply	Config Window		Aplica
-Incoming mail filters	Config Views		Filtres del correu entrant
+Incoming mail filters	Config Views		Filtres del correu d'entrada
 Outgoing mail filters	Config Views		Filtres del correu de sortida
 Server name:	E-Mail		Nom del servidor:
 Add	Config Window		Afegeix
@@ -15,26 +15,26 @@ Back	AutoConfigWindow		Anterior
 Real name:	E-Mail		Nom real:
 Real name:	Config Views		Nom real:
 \t\t· E-mail filters	Config Window		\t\t· Filtres de correu
-Outgoing	E-Mail		Sortint
+Outgoing	E-Mail		De sortida
 Accounts	Config Window		Comptes
-Outgoing	Config Window		Sortint
+Outgoing	Config Window		De sortida
 Remove	Config Views		Suprimeix
 Show notifications:	Config Window		Mostra les notificacions:
 Settings	Config Window		Paràmetres
 Never	Config Window	show status window	Mai
 Account name:	Config Views		Nom del compte:
-\t\t· Incoming	Config Window		\t\t· Entrant
-Enter a valid e-mail address.	AutoConfigWindow		Introduïu una adreça de correu electrònic vàlida.
-\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nNo ha estat possible de recuperar les preferències generals.\n\nS'ha produït un error en recuperar les preferències :\n%s\n
-Incoming	E-Mail		Entrada
+\t\t· Incoming	Config Window		\t\t· D'entrada
+Enter a valid e-mail address.	AutoConfigWindow		Escriviu una adreça de correu electrònic vàlida.
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nNo s'han pogut revertir els paràmetres generals.\n\nError en obtenir les paràmetres generals:\n%s\n
+Incoming	E-Mail		D'entrada
 Choose Protocol	E-Mail		Escolliu un protocol
 Return address:	Config Views		Adreça de retorn:
 Password:	E-Mail		Contrasenya:
-Error retrieving general settings: %s\n	Config Window		S'ha produït un error en recuperar les preferències : %s\n
+Error retrieving general settings: %s\n	Config Window		Error en obtenir els paràmetres generals: %s\n
 The filter could not be moved. Deleting filter.	Config Views		No s'ha pogut moure el filtre. Se suprimeix.
 OK	Config Views		D'acord
 Revert	Config Window		Reverteix
-Incoming	Config Window		Entrada
+Incoming	Config Window		D'entrada
 Finish	AutoConfigWindow		Acaba
 Add filter	Config Views		Afegeix un filtre
 Account settings	Config Views		Configuració del compte

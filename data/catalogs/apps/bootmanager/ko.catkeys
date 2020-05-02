@@ -20,7 +20,7 @@ Uninstall boot manager	BootManagerController	Title	부트관리자 제거
 About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		부팅 디스크 (%s)에 다음과 같은 부팅 메뉴를 작성할 것입니다. 계속하기 전에 아래 정보를 확인하십시오.
 Uninstall	DrivesPage	Button	제거
 Update	DrivesPage	Button	갱신
-The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		부트 장치의 마스터 부트 레코드(MBR):\n\t%s\n는 지금 디스크에 저장될 것입니다. MBR 정보를 저장할 파일을 선택해 주십시오.\n\만약 설치가 잘못되었거나 나중에 부트 메뉴를 지우려면, 간단히 부트맨 프로그램을 실행시키고 '제거'옵션을 선택하면 됩니다.
+The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		부팅 장치의 MBR (마스터 부팅 레코드) : \ n\ t % s \ n이제 디스크에 저장됩니다. MBR을 저장할 파일을 선택하십시오. \ N\ n설치에 문제가 있거나 나중에 부팅 메뉴를 제거하려면 bootman 프로그램을 실행하고 '제거'옵션을 선택하십시오.
 Default Partition	DefaultPartitionPage	Title	기본 파티션
 Installation of boot menu completed	BootManagerController	Title	부트 메뉴 설치 완료
 After one minute	DefaultPartitionPage		1분 후에

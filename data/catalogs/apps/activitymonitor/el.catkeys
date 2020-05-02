@@ -20,7 +20,7 @@ Ports	DataSource		Θύρες
 Page faults	DataSource		Σφάλματα σελίδας
 Sending	DataSource		Αποστολή
 Cache	DataSource		Λανθάνουσα μνήμη
-%.1f faults/s	DataSource		%.1ς λάθοι/s
+%.1f faults/s	DataSource		%.1f σφάλματα/s
 Update time interval:	SettingsWindow		Ενημέρωση χρονικού διαστήματος:
 TX	DataSource	Shorter version for Sending	ΑΠ
 Quit	ActivityWindow		Έξοδος

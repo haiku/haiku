@@ -2,7 +2,7 @@
 The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		L'aplicació:\n\n      %app\n\nha trobat un error que no permet continuar. El Haiku l'aturarà i farà neteja.
 Oh yeah!	DebugServer		I tant que sí!
 Debug	DebugServer		Depuració
-Terminate	DebugServer		Finalitza
+Terminate	DebugServer		Acaba
 Save report	DebugServer		Desa l'informe
 Write core file	DebugServer		Escriu el fitxer de nucli
 Oh no!	DebugServer		Oh, no!

@@ -17,7 +17,7 @@ Input	MultiAudio		Ingresso
 Output treble	MultiAudio		Alti in uscita
 Mono mix	MultiAudio		Missaggio mono
 General	MultiAudio		Generale
-Input & Output	MultiAudio		Ingressi & Uscite
+Input & Output	MultiAudio		Ingressi e Uscite
 Enhanced Setup	MultiAudio		Configurazione Avanzata
 Stereo mix	MultiAudio		Missaggio stereo
 Output 3D depth	MultiAudio		Profondità 3D in uscita

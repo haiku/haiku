@@ -31,7 +31,7 @@ Page setup…	Terminal TermWindow		ページ設定…
 Slate	Terminal colors scheme		スレート
 Defaults	Terminal PrefWindow		デフォルト
 Cancel	Terminal TermView		中止
-Revert	Terminal PrefWindow		元に戻す
+Revert	Terminal PrefWindow		戻す
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	ターミナル
 Use selection	Terminal FindWindow		選択部で検索
 Find next	Terminal TermWindow		次を検索

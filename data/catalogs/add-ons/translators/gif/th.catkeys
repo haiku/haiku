@@ -1,0 +1,19 @@
+1	thai	x-vnd.Haiku-GIFTranslator	2201651797
+Websafe	GIFView		Websafe
+Write interlaced images	GIFView		เขียนภาพแบบอินเทอร์เลซ
+Optimal	GIFView		ดีที่สุด
+Greyscale	GIFView		เฉดสีเทา
+Colors:	GIFView		สี:
+GIF image translator	GIFTranslator		ตัวแปลรูปภาพ GIF
+Be Bitmap Format (GIFTranslator)	GIFTranslator		Be Bitmap Format (GIFTranslator)
+GIF image translator	GIFView		ตัวแปลภาพ GIF
+Palette:	GIFView		จานสี:
+GIF image	GIFTranslator		ภาพ GIF
+Write transparent images	GIFView		เขียนภาพโปร่งใส
+GIF images	GIFTranslator		ภาพ GIF
+Version %d.%d.%d, %s	GIFView		Version %d.%d.%d, %s
+Use RGB color	GIFView		ใช้สี RGB
+Use dithering	GIFView		ใช้ dithering
+GIF Settings	GIFTranslator		ตั้งค่า GIF
+BeOS system	GIFView		ระบบ BeOS
+Automatic (from alpha channel)	GIFView		อัตโนมัติ (จากช่องอัลฟา)

@@ -1,0 +1,10 @@
+1	thai	x-vnd.Haiku-libpackage	134767648
+Fetching repository-cache from %url	RefreshRepositoryRequest		กำลังดึงที่เก็บแคชจาก %url
+Validating checksum for %repositoryName	RefreshRepositoryRequest		กำลังตรวจสอบสำหรับ %repositoryName
+Failed to remove transaction directory	PackageManagerKit		ไม่สามารถลบไดเรกทอรีธุรกรรม
+Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		ไม่สามารถรับการกำหนดค่าสำหรับที่เก็บ \"%s\" กำลังข้าม
+Refreshing repository \"%s\" failed	PackageManagerKit		การรีเฟรชที่เก็บ \"%s\" ล้มเหลว
+Fetching repository checksum from %url	RefreshRepositoryRequest		ดึงการตรวจสอบที่เก็บจาก %url
+Failed to get repository names	PackageManagerKit		ไม่สามารถรับชื่อที่เก็บ
+Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		ไม่สามารถรับแคชสำหรับที่เก็บ \"%s\" กำลังข้าม
+Package %s-%s doesn't have a matching requires for its base package \"%s\"	PackageManagerKit		แพ็คเกจ %s-%s ไม่มีการจับคู่ที่จำเป็นสำหรับแพ็คเกจพื้นฐาน \"%s\"

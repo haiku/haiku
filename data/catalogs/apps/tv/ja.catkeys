@@ -10,7 +10,7 @@ unknown	MainWin		不明
 Next channel	MainWin		次のチャンネル
 Keep aspect ratio	MainWin		アスペクト比を保つ
 DVB - Digital Video Broadcasting TV	MainWin		DVB - デジタルビデオ放送 TV
-Always on top	MainWin		常に最前面へ
+Always on top	MainWin		常に最前面
 Debug	MainWin		Debug
 Interface	MainWin		インターフェイス
 force 720 x 576, display aspect 4:3	MainWin		720 x 576,ディスプレイアスペクト比 4:3

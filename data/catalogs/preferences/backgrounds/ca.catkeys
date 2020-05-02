@@ -5,7 +5,7 @@ Setting the background image failed:	Main View		Ha fallat establir la imatge del
 Resolution: 	Image Filepanel		Resolució: 
 pick one	Main View		trieu-ne un
 Default	Main View		Predeterminat
-Center	Main View		Centra
+Center	Main View		Centrat
 Folder: %path	Main View		Carpeta: %path
 Manual	Main View		Manual
 Set background image error	Main View		Error d'establiment de la imatge de fons

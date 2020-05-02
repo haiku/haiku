@@ -88,8 +88,8 @@ Close	UserLoginWindow		Sluiten
 Close	RatePackageWindow		Sluiten
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synchroniseer pakketdata voor pakketbron '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Bekijk de gebruiksvoorwaarden
-Size	PackageListView		Grootte
 Your rating:	RatePackageWindow		Uw beoordeling:
+Size	PackageListView		Grootte
 Your rating was updated.	RatePackageWindow		Uw beoordeling is bijgewerkt.
 All categories	FilterView		Alle categorieën
 Repositories	MainWindow		Pakketbronnen
