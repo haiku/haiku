@@ -64,7 +64,7 @@ getButtonOffsets(int32 type)
 
 
 static uint32
-getMappingNumber(int32 mapping)
+getMappingNumber(uint32 mapping)
 {
 	if (mapping == 0)
 		return 0;
