@@ -1,31 +1,11 @@
 /*
+ * Copyright 2015, François Revol <revol@free.fr>
+ * Copyright (c) 2002 Marcus Overhagen <marcus@overhagen.de>, OpenBeOS project
+ *
+ * Distributed under the terms of the MIT License.
+ */
 
-mkdos shell tool
 
-Initialize FAT16 or FAT32 partitions, FAT12 floppy disks not supported
-
-Copyright (c) 2015, François Revol <revol@free.fr>
-Copyright (c) 2002 Marcus Overhagen <marcus@overhagen.de>, OpenBeOS project
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
-of the Software, and to permit persons to whom the Software is furnished to do
-so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
-*/
 #include <ByteOrder.h>
 #include <Drivers.h>
 #include <driver_settings.h>
@@ -38,14 +18,18 @@ THE SOFTWARE.
 #include <string.h>
 #include <strings.h>
 #include <unistd.h>
+
 #define MKDOS
 #include "mkdos.h"
 
+
 #define WITH_FLOPPY_SUPPORT
+
 
 void PrintUsage();
 void CreateVolumeLabel(void *sector, const char *label);
-status_t Initialize(int fatbits, const char *device, const char *label, bool noprompt, bool testmode);
+status_t Initialize(int fatbits, const char *device, const char *label,
+	bool noprompt, bool testmode);
 status_t parse_initialize_parameters(const char* parameterString,
 	initialize_parameters& parameters);
 
@@ -126,18 +110,12 @@ dosfs_initialize(int fd, partition_id partitionID, const char* name,
 	int fatbits = parameters.fatBits;
 	const char *label = name;
 
-	// initialize the volume
-//	Volume volume(NULL);
-//	status = volume.Initialize(fd, name, parameters.blockSize,
-//		parameters.flags);
-
 	if (fatbits != 0 && fatbits != 12 && fatbits != 16 && fatbits != 32) {
 		dprintf("dosfs Error: don't know how to create a %d bit fat\n",fatbits);
 		return B_ERROR;
 	}
 
-
-
+	// initialize the volume
 	bool isRawDevice;
 	bool hasBiosGeometry;
 	bool hasDeviceGeometry;
@@ -147,12 +125,17 @@ dosfs_initialize(int fd, partition_id partitionID, const char* name,
 	partition_info 	partitionInfo;
 
 	isRawDevice = 0;//0 != strstr(device, "/raw");
-	hasBiosGeometry = B_OK == ioctl(fd, B_GET_BIOS_GEOMETRY, &biosGeometry, sizeof(biosGeometry));
-	hasDeviceGeometry = B_OK == ioctl(fd, B_GET_GEOMETRY, &deviceGeometry, sizeof(deviceGeometry));
-	hasPartitionInfo = B_OK == ioctl(fd, B_GET_PARTITION_INFO, &partitionInfo, sizeof(partitionInfo));
+	hasBiosGeometry = B_OK == ioctl(fd, B_GET_BIOS_GEOMETRY, &biosGeometry,
+		sizeof(biosGeometry));
+	hasDeviceGeometry = B_OK == ioctl(fd, B_GET_GEOMETRY, &deviceGeometry,
+		sizeof(deviceGeometry));
+	hasPartitionInfo = B_OK == ioctl(fd, B_GET_PARTITION_INFO, &partitionInfo,
+		sizeof(partitionInfo));
 
-	if (!isRawDevice && !hasBiosGeometry && !hasDeviceGeometry && !hasPartitionInfo)
+	if (!isRawDevice && !hasBiosGeometry && !hasDeviceGeometry
+		&& !hasPartitionInfo) {
 		isRawDevice = true;
+	}
 
 	if (hasBiosGeometry) {
 		dprintf("dosfs: bios geometry: %" B_PRIu32 " heads, "
@@ -164,7 +147,7 @@ dosfs_initialize(int fd, partition_id partitionID, const char* name,
 			biosGeometry.sectors_per_track,
 			biosGeometry.bytes_per_sector);
 	}
-	if (hasBiosGeometry) {
+	if (hasDeviceGeometry) {
 		dprintf("dosfs: device geometry: %" B_PRIu32 " heads, "
 			"%" B_PRIu32 " cylinders, "
 			"%" B_PRIu32 " sectors/track, "
@@ -195,9 +178,9 @@ dosfs_initialize(int fd, partition_id partitionID, const char* name,
 			partitionInfo.size / (1024 * 1024 * 1024));
 	}
 
-	if (!isRawDevice && !hasPartitionInfo) {
+	if (!isRawDevice && !hasPartitionInfo)
 		dprintf("dosfs Warning: couldn't get partition information\n");
-	}
+
 	if ((hasBiosGeometry && biosGeometry.bytes_per_sector != 512) 
 		||	(hasDeviceGeometry && deviceGeometry.bytes_per_sector != 512)) {
 		dprintf("dosfs Error: geometry block size not 512 bytes\n");
@@ -221,25 +204,23 @@ dosfs_initialize(int fd, partition_id partitionID, const char* name,
 	if (hasPartitionInfo) {
 		size = partitionInfo.size;
 	} else if (hasDeviceGeometry) {
-		size = uint64(deviceGeometry.bytes_per_sector) * deviceGeometry.sectors_per_track * deviceGeometry.cylinder_count * deviceGeometry.head_count;
+		size = uint64(deviceGeometry.bytes_per_sector)
+			* deviceGeometry.sectors_per_track * deviceGeometry.cylinder_count
+			* deviceGeometry.head_count;
 	} else if (hasBiosGeometry) {
-		size = uint64(biosGeometry.bytes_per_sector) * biosGeometry.sectors_per_track * biosGeometry.cylinder_count * biosGeometry.head_count;
+		size = uint64(biosGeometry.bytes_per_sector)
+			* biosGeometry.sectors_per_track * biosGeometry.cylinder_count
+			* biosGeometry.head_count;
 	} else {
 		// maybe it's just a file
 		struct stat stat;
 		if (fstat(fd, &stat) < 0) {
-			dprintf( "dosfs Error: couldn't get device partition or geometry information, nor size\n");
+			dprintf("dosfs Error: couldn't get device partition or geometry "
+				"information, nor size\n");
 			return B_ERROR;
 		}
 		size = stat.st_size;
 	}
-
-	// TODO still valid on Haiku ?
-	/*if (isRawDevice && size > FLOPPY_MAX_SIZE) {
-		dprintf("Error: device too large for floppy, or raw devices not supported\n");
-		close(fd);
-		return B_ERROR;
-	}*/
 
 	dprintf("dosfs: size = %" B_PRIu64 " bytes "
 		"(%" B_PRIu64 " sectors), "
@@ -254,7 +235,8 @@ dosfs_initialize(int fd, partition_id partitionID, const char* name,
 
 	if (fatbits == 0) {
 		//auto determine fat type
-		if (isRawDevice && size <= FLOPPY_MAX_SIZE && (size / FAT12_CLUSTER_MAX_SIZE) < FAT12_MAX_CLUSTER_COUNT) {
+		if (isRawDevice && size <= FLOPPY_MAX_SIZE
+			&& (size / FAT12_CLUSTER_MAX_SIZE) < FAT12_MAX_CLUSTER_COUNT) {
 			fatbits = 12;
 		} else if ((size / CLUSTER_MAX_SIZE) < FAT16_MAX_CLUSTER_COUNT) {
 			fatbits = 16;
@@ -299,20 +281,31 @@ dosfs_initialize(int fd, partition_id partitionID, const char* name,
 			sectorPerCluster = 0;
 	} else if (fatbits == 32) {
 		sectorPerCluster = 64;				// default is 32k clusters
-		if (size <= (32 * 1024 * 1024 * 1024LL))	// up to 32GB, use 16k clusters
+		if (size <= (32 * 1024 * 1024 * 1024LL)) {
+			// up to 32GB, use 16k clusters
 			sectorPerCluster = 32;
-		if (size <= (16 * 1024 * 1024 * 1024LL))	// up to 16GB, use 8k clusters
+		}
+		if (size <= (16 * 1024 * 1024 * 1024LL)) {
+			// up to 16GB, use 8k clusters
 			sectorPerCluster = 16;
-		if (size <= (8 * 1024 * 1024 * 1024LL))		// up to 8GB, use 4k clusters
+		}
+		if (size <= (8 * 1024 * 1024 * 1024LL)) {
+			// up to 8GB, use 4k clusters
 			sectorPerCluster = 8;
-		if (size <= (532480 * 512LL))				// up to 260 MB, use 0.5k clusters
+		}
+		if (size <= (532480 * 512LL)) {
+			// up to 260 MB, use 0.5k clusters
 			sectorPerCluster = 1;
-		if (size <= (66600 * 512LL))		// smaller than 32.5 MB must fail
+		}
+		if (size <= (66600 * 512LL)) {
+			// smaller than 32.5 MB must fail
 			sectorPerCluster = 0;
+		}
 	}
 
 	if (sectorPerCluster == 0) {
-		dprintf("dosfs Error: failed to determine sector per cluster value, partition too large for %d bit fat\n",fatbits);
+		dprintf("dosfs Error: failed to determine sector per cluster value, "
+			"partition too large for %d bit fat\n",fatbits);
 		return B_ERROR;
 	}
 
@@ -323,7 +316,8 @@ dosfs_initialize(int fd, partition_id partitionID, const char* name,
 	uint8 biosDriveId;
 
 	// get bios drive-id, or use 0x80
-	if (B_OK != ioctl(fd, B_GET_BIOS_DRIVE_ID, &biosDriveId, sizeof(biosDriveId))) {
+	if (B_OK != ioctl(fd, B_GET_BIOS_DRIVE_ID, &biosDriveId,
+		sizeof(biosDriveId))) {
 		biosDriveId = 0x80;
 	} else {
 		dprintf("dosfs: bios drive id: 0x%02x\n", (int)biosDriveId);
@@ -346,16 +340,19 @@ dosfs_initialize(int fd, partition_id partitionID, const char* name,
 	// Determine FATSize
 	// calculation done as MS recommends
 	uint64 dskSize = size / sectorSize;
-	uint32 rootDirSectors = ((rootEntryCount * 32) + (sectorSize - 1)) / sectorSize;
+	uint32 rootDirSectors = ((rootEntryCount * 32) + (sectorSize - 1))
+		/ sectorSize;
 	uint64 tmpVal1 = dskSize - (reservedSectorCount + rootDirSectors);
 	uint64 tmpVal2 = (256 * sectorPerCluster) + numFATs;
 	if (fatbits == 32)
 		tmpVal2 = tmpVal2 / 2;
 	uint32 FATSize = (tmpVal1 + (tmpVal2 - 1)) / tmpVal2;
 	// FATSize should now contain the size of *one* FAT, measured in sectors
-	// RootDirSectors should now contain the size of the fat12/16 root directory, measured in sectors
+	// RootDirSectors should now contain the size of the fat12/16 root
+	// directory, measured in sectors
 
-	dprintf("dosfs: fatbits = %d, clustersize = %d\n", fatbits, sectorPerCluster * 512);
+	dprintf("dosfs: fatbits = %d, clustersize = %d\n", fatbits,
+		sectorPerCluster * 512);
 	dprintf("dosfs: FAT size is %" B_PRIu32 " sectors\n", FATSize);
 	dprintf("dosfs: disk label: %s\n", label);
 
@@ -439,7 +436,8 @@ dosfs_initialize(int fd, partition_id partitionID, const char* name,
 	}
 
 	// Disk layout:
-	// 0) reserved sectors, this includes the bootsector, fsinfosector and bootsector backup
+	// 0) reserved sectors, this includes the bootsector, fsinfosector and
+	//    bootsector backup
 	// 1) FAT
 	// 2) root directory (not on fat32)
 	// 3) file & directory data
@@ -451,7 +449,8 @@ dosfs_initialize(int fd, partition_id partitionID, const char* name,
 	dprintf("dosfs: Writing FAT\n");
 	char * zerobuffer = (char *)malloc(65536);
 	memset(zerobuffer,0,65536);
-	int64 bytes_to_write = 512LL * (reservedSectorCount + (numFATs * FATSize) + rootDirSectors);
+	int64 bytes_to_write = 512LL * (reservedSectorCount + (numFATs * FATSize)
+		+ rootDirSectors);
 	int64 pos = 0;
 	while (bytes_to_write > 0) {
 		ssize_t writesize = min_c(bytes_to_write, 65536);
@@ -478,7 +477,8 @@ dosfs_initialize(int fd, partition_id partitionID, const char* name,
 	if (fatbits == 32) {
 		written = write_pos(fd, BACKUP_SECTOR_NUM * 512, bootsector, 512);
 		if (written != 512) {
-			dprintf("dosfs Error: write error at sector %d\n", BACKUP_SECTOR_NUM);
+			dprintf("dosfs Error: write error at sector %d\n",
+				BACKUP_SECTOR_NUM);
 			return B_ERROR;
 		}
 	}
@@ -537,7 +537,8 @@ dosfs_initialize(int fd, partition_id partitionID, const char* name,
 		//calculate total sector count first
 		uint64 free_count = size / 512;
 		//now account for already by metadata used sectors
-		free_count -= reservedSectorCount + (numFATs * FATSize) + rootDirSectors;
+		free_count -= reservedSectorCount + (numFATs * FATSize)
+			+ rootDirSectors;
 		//convert from sector to clustercount
 		free_count /= sectorPerCluster;
 		//and account for 1 already used cluster of root directory
@@ -546,12 +547,14 @@ dosfs_initialize(int fd, partition_id partitionID, const char* name,
 		memset(&fsinfosector,0x00,512);
 		fsinfosector.FSI_LeadSig 	= B_HOST_TO_LENDIAN_INT32(0x41615252);
 		fsinfosector.FSI_StrucSig 	= B_HOST_TO_LENDIAN_INT32(0x61417272);
-		fsinfosector.FSI_Free_Count = B_HOST_TO_LENDIAN_INT32((uint32)free_count);
+		fsinfosector.FSI_Free_Count
+			= B_HOST_TO_LENDIAN_INT32((uint32)free_count);
 		fsinfosector.FSI_Nxt_Free 	= B_HOST_TO_LENDIAN_INT32(3);
 		fsinfosector.FSI_TrailSig 	= B_HOST_TO_LENDIAN_INT32(0xAA550000);
 		written = write_pos(fd, FSINFO_SECTOR_NUM * 512, &fsinfosector, 512);
 		if (written != 512) {
-			dprintf("dosfs Error: write error at sector %d\n", FSINFO_SECTOR_NUM);
+			dprintf("dosfs Error: write error at sector %d\n",
+				FSINFO_SECTOR_NUM);
 			return B_ERROR;
 		}
 	}
@@ -574,7 +577,8 @@ dosfs_initialize(int fd, partition_id partitionID, const char* name,
 		uint8 *cluster = (uint8*)malloc(size);
 		memset(cluster, 0, size);
 		CreateVolumeLabel(cluster, label);
-		uint32 rootDirSector = reservedSectorCount + (numFATs * FATSize) + rootDirSectors;
+		uint32 rootDirSector = reservedSectorCount + (numFATs * FATSize)
+			+ rootDirSectors;
 		written = write_pos(fd, rootDirSector * 512, cluster, size);
 		free(cluster);
 		if (written != size) {
@@ -643,11 +647,12 @@ dosfs_uninitialize(int fd, partition_id partitionID, off_t partitionSize,
 //	#pragma mark -
 
 
-#if 0
+#if 0 // For testing standalone builds
 int 
 main(int argc, char *argv[])
 {
-	if (sizeof(bootsector1216) != 512 || sizeof(bootsector32) != 512 || sizeof(fsinfosector32) != 512) {
+	if (sizeof(bootsector1216) != 512 || sizeof(bootsector32) != 512
+		|| sizeof(fsinfosector32) != 512) {
 		dprintf("compilation error: struct alignment wrong\n");
 		return 1;
 	}
