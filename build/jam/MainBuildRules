@@ -622,14 +622,6 @@ rule BuildPlatformObjects
 	Objects $(sources) ;
 }
 
-actions Win32ExtensionFix
-{
-	if test -f $(1).exe ; then
-		rm -f $(1)
-		mv $(1).exe $(1)
-	fi
-}
-
 rule BuildPlatformMain
 {
 	# Usage BuildPlatformMain <target> : <sources> : <libraries> ;
@@ -659,15 +651,6 @@ rule BuildPlatformMain
 
 	Main $(target) : $(sources) ;
 	LinkAgainst $(target) : $(libs) ;
-	if $(HOST_PLATFORM) = mingw {
-		# MinGW GCC adds the ".exe" extension. We cannot force
-		# jam to use SUFEXE as haiku target executables are not
-		# supposed to have this extension, thus finding
-		# dependencies will fail for these.
-		# The hack is to remove the extension after a successful
-		# build of the Target.
-		Win32ExtensionFix $(target) ;
-	}
 }
 
 rule BuildPlatformSharedLibrary
