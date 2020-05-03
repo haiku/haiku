@@ -646,10 +646,18 @@ usb_midi_write(driver_cookie* cookie, off_t position,
 
 	DPRINTF_DEBUG((MY_ID "MIDI write (%" B_PRIuSIZE " bytes at %" B_PRIdOFF
 		")\n", *num_bytes, position));
-	if (*num_bytes > 3 && midicode != 0xF0) {
-		DPRINTF_ERR((MY_ID "Non-SysEx packet of %ld bytes"
-			" -- too big to handle\n", *num_bytes));
-		return B_ERROR;
+	// Make sure we always write exactly one MIDI event at a time.
+	// SysEx can be of arbitrary sizes, for all others, we check that the
+	// complete event was passed in and do not use more than that.
+	// TODO add a loop to allow writing multiple events in a single write()
+	// call if desired.
+	if (midicode != 0xF0) {
+		if (*num_bytes < CINbytes[cin]) {
+			DPRINTF_ERR((MY_ID "Expected %d bytes for MIDI command %x but got "
+				"only %d.\n", CINbytes[cin], cin, *num_bytes));
+			return B_BAD_DATA;
+		}
+		*num_bytes = CINbytes[cin];
 	}
 
 	size_t bytes_left = *num_bytes;
