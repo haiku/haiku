@@ -396,15 +396,17 @@ StreamBase::FrameRate() const
 			break;
 		case AVMEDIA_TYPE_VIDEO:
 		{
-			AVRational frame_rate = av_guess_frame_rate(NULL, fStream, NULL);
-			if (frame_rate.den != 0 && frame_rate.num != 0)
-				frameRate = av_q2d(frame_rate);
+			AVRational frameRateFrac = av_guess_frame_rate(NULL, fStream, NULL);
+			if (frameRateFrac.den != 0 && frameRateFrac.num != 0)
+				frameRate = av_q2d(frameRateFrac);
 			else if (fStream->time_base.den != 0 && fStream->time_base.num != 0)
 				frameRate = 1 / av_q2d(fStream->time_base);
 
-			// TODO: Fix up interlaced video for real
-			if (frameRate == 50.0f)
-				frameRate = 25.0f;
+			// Catch the obviously wrong default framerate when ffmpeg cannot
+			// guess anything because there are not two frames to compute a
+			// framerate
+			if (fStream->nb_frames < 2 && frameRate == 90000.0f)
+				return 0.0f;
 			break;
 		}
 		default:

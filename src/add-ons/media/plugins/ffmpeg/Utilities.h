@@ -215,8 +215,12 @@ CalculateBytesPerRowWithColorSpaceAndVideoWidth(color_space colorSpace, int vide
 inline void
 ConvertAVCodecContextToVideoFrameRate(AVCodecContext& contextIn, float& frameRateOut)
 {
-	// assert that av_q2d(contextIn.time_base) > 0 and computable
-	assert(contextIn.time_base.num > 0);
+	// A framerate of 0 is allowed for single-frame "video" (cover art, for
+	// example)
+	if (contextIn.time_base.num == 0)
+		frameRateOut = 0.0f;
+
+	// assert that we can compute something
 	assert(contextIn.time_base.den > 0);
 
 	// The following code is based on private get_fps() function of FFmpeg's

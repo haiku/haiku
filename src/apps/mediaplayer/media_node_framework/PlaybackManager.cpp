@@ -945,7 +945,7 @@ PlaybackManager::PlaylistTimeForFrame(int64 frame) const
 void
 PlaybackManager::SetCurrentAudioTime(bigtime_t time)
 {
-TRACE("PlaybackManager::SetCurrentAudioTime(%lld)\n", time);
+	TRACE("PlaybackManager::SetCurrentAudioTime(%lld)\n", time);
 	bigtime_t lastFrameTime = _TimeForLastFrame();
 	fCurrentAudioTime = time;
 	bigtime_t newLastFrameTime = _TimeForLastFrame();
@@ -972,7 +972,7 @@ PlaybackManager::SetCurrentVideoFrame(int64 frame)
 void
 PlaybackManager::SetCurrentVideoTime(bigtime_t time)
 {
-TRACE("PlaybackManager::SetCurrentVideoTime(%lld)\n", time);
+	TRACE("PlaybackManager::SetCurrentVideoTime(%lld)\n", time);
 	bigtime_t lastFrameTime = _TimeForLastFrame();
 	fCurrentVideoTime = time;
 	bigtime_t newLastFrameTime = _TimeForLastFrame();
@@ -1546,7 +1546,7 @@ frameCount);
 			frame = startFrame + index;
 			break;
 	}
-TRACE("PlaybackManager::_FrameForRangeFrame() done: %ld\n", frame);
+	TRACE("PlaybackManager::_FrameForRangeFrame() done: %" PRId64 "\n", frame);
 	return frame;
 }
 
