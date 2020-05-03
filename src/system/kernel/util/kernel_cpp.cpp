@@ -381,7 +381,8 @@ extern "C"
 void
 abort()
 {
-	panic("abort() called!");
+	while (true)
+		panic("abort() called!");
 }
 
 

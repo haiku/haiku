@@ -52,7 +52,7 @@ extern int		posix_memalign(void **_pointer, size_t alignment, size_t size);
 extern void		*realloc(void *oldPointer, size_t newSize);
 
 /* process termination */
-extern void		abort(void);
+extern void		abort(void) __attribute__((noreturn));
 extern int		atexit(void (*func)(void));
 extern int		atfork(void (*func)(void));
 extern void		exit(int) __attribute__((noreturn));
