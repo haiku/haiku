@@ -535,6 +535,11 @@ VMAnonymousCache::_FreeSwapPageRange(off_t fromOffset, off_t toOffset)
 			sSwapHashTable.RemoveUnchecked(swapBlock);
 			object_cache_free(sSwapBlockCache, swapBlock,
 				CACHE_DONT_WAIT_FOR_MEMORY | CACHE_DONT_LOCK_KERNEL_SPACE);
+
+			// There are no swap pages for possibly remaining pages, skip to the
+			// next block.
+			pageIndex = ROUNDUP(pageIndex + 1, SWAP_BLOCK_PAGES) - 1;
+			swapBlock = NULL;
 		}
 	}
 }
