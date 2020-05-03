@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src kits media ;
 
+AddResources libmedia.so : libmedia.rdef ;
+
 UsePrivateHeaders app media shared ;
 UsePrivateHeaders [ FDirName media experimental ] ;
 
