@@ -644,6 +644,11 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 	VMCacheChainLocker cacheChainLocker(cache);
 	cacheChainLocker.LockAllSourceCaches();
 
+	// If no one else uses the area's cache and it's an anonymous cache, we can
+	// resize or split it, too.
+	bool onlyCacheUser = cache->areas == area && area->cache_next == NULL
+		&& cache->consumers.IsEmpty() && cache->type == CACHE_TYPE_RAM;
+
 	// Cut the end only?
 	if (areaLast <= lastAddress) {
 		size_t oldSize = area->Size();
@@ -657,10 +662,7 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 		// unmap pages
 		unmap_pages(area, address, oldSize - newSize);
 
-		// If no one else uses the area's cache, we can resize it, too.
-		if (cache->areas == area && area->cache_next == NULL
-			&& cache->consumers.IsEmpty()
-			&& cache->type == CACHE_TYPE_RAM) {
+		if (onlyCacheUser) {
 			// Since VMCache::Resize() can temporarily drop the lock, we must
 			// unlock all lower caches to prevent locking order inversion.
 			cacheChainLocker.Unlock(cache);
@@ -687,10 +689,7 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 		if (error != B_OK)
 			return error;
 
-		// If no one else uses the area's cache, we can resize it, too.
-		if (cache->areas == area && area->cache_next == NULL
-			&& cache->consumers.IsEmpty()
-			&& cache->type == CACHE_TYPE_RAM) {
+		if (onlyCacheUser) {
 			// Since VMCache::Rebase() can temporarily drop the lock, we must
 			// unlock all lower caches to prevent locking order inversion.
 			cacheChainLocker.Unlock(cache);
@@ -724,11 +723,7 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 	addressRestrictions.address_specification = B_EXACT_ADDRESS;
 	VMArea* secondArea;
 
-	// If no one else uses the area's cache and it's an anonymous cache, we
-	// can split it.
-	if (cache->areas == area && area->cache_next == NULL
-		&& cache->consumers.IsEmpty()
-		&& cache->type == CACHE_TYPE_RAM) {
+	if (onlyCacheUser) {
 		// Create a new cache for the second area.
 		VMCache* secondCache;
 		error = VMCacheFactory::CreateAnonymousCache(secondCache, false, 0, 0,
