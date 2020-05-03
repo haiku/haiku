@@ -1,22 +1,7 @@
 #ifndef BEOS_BUILD_COMPATIBILITY_H
 #define BEOS_BUILD_COMPATIBILITY_H
 
-// These things have to be done before anything is included
-#if defined(HAIKU_HOST_PLATFORM_MINGW)
-#define _MODE_T_
-#define _POSIX_
-typedef int mode_t;
-
-#include <stdint.h>
-#include <limits.h>
-typedef uint32_t uid_t;
-typedef uint32_t gid_t;
-
-#include <io.h>
-#define mkdir(path, mode) mkdir(path)
-#endif
-
-// DEFFILEMODE is not available on MinGW and on platforms with MUSL
+// DEFFILEMODE is not available on platforms with MUSL
 #ifndef DEFFILEMODE
 #define DEFFILEMODE (S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH)
 #endif
@@ -33,6 +18,10 @@ typedef uint32_t gid_t;
 typedef unsigned long	haiku_build_addr_t;
 #define addr_t			haiku_build_addr_t
 
+#if defined(HAIKU_HOST_PLATFORM_MSYS)
+#define __addr_t_defined
+#endif
+
 #include <Errors.h>
 
 #include <fcntl.h>
@@ -41,10 +30,7 @@ typedef unsigned long	haiku_build_addr_t;
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-
-#if !defined(HAIKU_HOST_PLATFORM_MINGW)
 #include <sys/uio.h>
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -60,11 +46,6 @@ extern size_t	strlcat(char* dest, const char* source, size_t length);
 
 #if defined(HAIKU_HOST_PLATFORM_FREEBSD) || defined(HAIKU_HOST_PLATFORM_DARWIN)
 extern size_t	strnlen(const char* string, size_t length);
-#endif
-
-#if defined(HAIKU_HOST_PLATFORM_MINGW)
-extern char*	stpcpy(char* dest, const char* src);
-extern char*	strcasestr(const char* s, const char* find);
 #endif
 
 // BeOS only

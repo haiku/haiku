@@ -434,7 +434,7 @@ check_native_xattrs()
 			xattr_set="setextattr"; xattr_set_args="user \$NAME \"\$VALUE\""
 			xattr_get="getextattr"; xattr_get_args="user \$NAME"
 			;;
-		linux)
+		linux|msys)
 			xattr_set="setfattr"; xattr_set_args="-n user.\$NAME -v \"\$VALUE\""
 			xattr_get="getfattr"; xattr_get_args="-n user.\$NAME"
 			;;
@@ -585,7 +585,7 @@ case "${platform}" in
 	Haiku)   HOST_PLATFORM=haiku_host ;;
 	Linux)   HOST_PLATFORM=linux ;;
 	OpenBSD) HOST_PLATFORM=openbsd ;;
-	MINGW*)  HOST_PLATFORM=mingw ;;
+	MSYS*)   HOST_PLATFORM=msys ;;
 	*)       echo Unsupported platform: ${platform}
 	         exit 1 ;;
 esac

@@ -686,9 +686,6 @@ rule BuildPlatformSharedLibrary
 	if $(HOST_PLATFORM) = darwin {
 		LINKFLAGS on $(target) = [ on $(target) return $(LINKFLAGS) ]
 			-dynamic -dynamiclib -Xlinker -flat_namespace ;
-	} else if $(HOST_PLATFORM) = mingw {
-		LINKFLAGS on $(target) = [ on $(target) return $(LINKFLAGS) ]
-			-shared -Xlinker --allow-multiple-definition ;
 	} else {
 		LINKFLAGS on $(target) = [ on $(target) return $(LINKFLAGS) ]
 			-shared -Xlinker -soname=\"$(target:G=)\" ;

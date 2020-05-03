@@ -216,7 +216,7 @@ HOST_UNARFLAGS		?= x ;
 
 # check the host platform compatibility
 SetPlatformCompatibilityFlagVariables HOST_PLATFORM : HOST : host
-	: linux openbsd freebsd darwin mingw ;
+	: linux openbsd freebsd darwin msys ;
 HOST_PLATFORM_(host)_COMPATIBLE = 1 ;
 
 if $(HOST_PLATFORM) = linux || $(HOST_PLATFORM) = freebsd
@@ -400,7 +400,7 @@ if $(HOST_PLATFORM_HAIKU_COMPATIBLE) {
 } else {
 	HOST_LINKFLAGS += -lm -ldl ;
 	HOST_LIBSTDC++ = stdc++ ;
-	if $(HOST_PLATFORM) = mingw {
+	if $(HOST_PLATFORM) = msys {
 		HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR
 			= "PATH=$PATH:$(HOST_BUILD_COMPATIBILITY_LIB_DIR)" ;
 	} else if $(HOST_PLATFORM) = darwin {
@@ -635,7 +635,7 @@ switch $(HOST_PLATFORM) {
 	case linux		: HOST_DEFINES	+= HAIKU_HOST_PLATFORM_LINUX ;
 	case freebsd	: HOST_DEFINES	+= HAIKU_HOST_PLATFORM_FREEBSD ;
 	case darwin		: HOST_DEFINES	+= HAIKU_HOST_PLATFORM_DARWIN ;
-	case mingw		: HOST_DEFINES	+= HAIKU_HOST_PLATFORM_MINGW ;
+	case msys		: HOST_DEFINES	+= HAIKU_HOST_PLATFORM_MSYS ;
 }
 
 # define host platform 64 bit macro

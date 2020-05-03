@@ -21,7 +21,7 @@
 // Include the interface to the host platform attributes support, if it shall be
 // used to tag files with unique IDs to identify their attribute directory.
 #if HAIKU_HOST_USE_XATTR_REF
-#	if defined(HAIKU_HOST_PLATFORM_LINUX)
+#	if defined(HAIKU_HOST_PLATFORM_LINUX) || defined(HAIKU_HOST_PLATFORM_MSYS)
 #		include "fs_attr_xattr.h"
 #	elif defined(HAIKU_HOST_PLATFORM_FREEBSD)
 #		include "fs_attr_extattr.h"
