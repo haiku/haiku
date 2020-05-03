@@ -1,6 +1,6 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2018, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -17,8 +17,8 @@
 RatingView::RatingView(const char* name)
 	:
 	BView(name, B_WILL_DRAW),
-	fStarBlueBitmap(RSRC_STAR_BLUE),
-	fStarGrayBitmap(RSRC_STAR_GREY),
+	fStarBlueBitmap(new SharedBitmap(RSRC_STAR_BLUE)),
+	fStarGrayBitmap(new SharedBitmap(RSRC_STAR_GREY)),
 	fRating(RATING_MISSING)
 {
 	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
@@ -46,8 +46,8 @@ const BBitmap*
 RatingView::StarBitmap()
 {
 	if (fRating < RATING_MIN)
-		return fStarGrayBitmap.Bitmap(SharedBitmap::SIZE_16);
-	return fStarBlueBitmap.Bitmap(SharedBitmap::SIZE_16);
+		return fStarGrayBitmap->Bitmap(SharedBitmap::SIZE_16);
+	return fStarBlueBitmap->Bitmap(SharedBitmap::SIZE_16);
 }
 
 

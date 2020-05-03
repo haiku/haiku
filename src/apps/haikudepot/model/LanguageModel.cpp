@@ -1,5 +1,5 @@
 /*
- * Copyright 2019, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2019-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #include "LanguageModel.h"
@@ -33,7 +33,7 @@ LanguagesCompareFn(const LanguageRef& l1, const LanguageRef& l2)
 LanguageModel::LanguageModel()
 	:
 	fSupportedLanguages(LanguagesCompareFn, NULL),
-	fPreferredLanguage(LANGUAGE_DEFAULT)
+	fPreferredLanguage(LanguageRef(new Language(LANGUAGE_DEFAULT)))
 {
 	const Language defaultLanguage = _DeriveDefaultLanguage();
 	fSupportedLanguages.Add(LanguageRef(
@@ -69,7 +69,7 @@ LanguageModel::AddSupportedLanguages(const LanguageList& languages)
 void
 LanguageModel::_SetPreferredLanguage(const Language& language)
 {
-	fPreferredLanguage = language;
+	fPreferredLanguage = LanguageRef(new Language(language));
 	if(Logger::IsDebugEnabled())
 		printf("set preferred language [%s]\n", language.Code());
 }

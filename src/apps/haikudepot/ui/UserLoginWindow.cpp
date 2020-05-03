@@ -147,7 +147,7 @@ UserLoginWindow::UserLoginWindow(BWindow* parent, BRect frame, Model& model)
 
 	{
 		AutoLocker<BLocker> locker(fModel.Lock());
-		fPreferredLanguageCode = fModel.Language().PreferredLanguage().Code();
+		fPreferredLanguageCode = fModel.Language().PreferredLanguage()->Code();
 		// Construct languages popup
 		BPopUpMenu* languagesMenu = new BPopUpMenu(B_TRANSLATE("Language"));
 		fLanguageCodeField = new BMenuField("language",

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2019-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef LANGUAGE_MODEL_H
@@ -28,7 +28,7 @@ public:
 			int32				IndexOfSupportedLanguage(
 									const BString& languageCode) const;
 
-			const Language&		PreferredLanguage() const
+			const LanguageRef	PreferredLanguage() const
 									{ return fPreferredLanguage; }
 
 private:
@@ -40,7 +40,7 @@ private:
 
 private:
 			LanguageList		fSupportedLanguages;
-			Language			fPreferredLanguage;
+			LanguageRef			fPreferredLanguage;
 };
 
 

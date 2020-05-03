@@ -1,6 +1,6 @@
 /*
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2016-2019, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -153,8 +153,8 @@ protected:
 	virtual const BBitmap* StarBitmap()
 	{
 		if (fRatingDeterminate)
-			return fStarBlueBitmap.Bitmap(SharedBitmap::SIZE_16);
-		return fStarGrayBitmap.Bitmap(SharedBitmap::SIZE_16);
+			return fStarBlueBitmap->Bitmap(SharedBitmap::SIZE_16);
+		return fStarGrayBitmap->Bitmap(SharedBitmap::SIZE_16);
 	}
 
 private:
@@ -246,7 +246,7 @@ RatePackageWindow::RatePackageWindow(BWindow* parent, BRect frame,
 
 	{
 		AutoLocker<BLocker> locker(fModel.Lock());
-		fCommentLanguageCode = fModel.Language().PreferredLanguage().Code();
+		fCommentLanguageCode = fModel.Language().PreferredLanguage()->Code();
 
 		// Construct languages popup
 		BPopUpMenu* languagesMenu = new BPopUpMenu(B_TRANSLATE("Language"));

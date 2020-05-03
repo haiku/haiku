@@ -1,5 +1,5 @@
 /*
- * Copyright 2019, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2019-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -66,7 +66,7 @@ ServerReferenceDataUpdateProcess::UrlPathComponent()
 	BString result;
 	AutoLocker<BLocker> locker(fModel->Lock());
 	result.SetToFormat("/__reference/all-%s.json.gz",
-		fModel->Language().PreferredLanguage().Code());
+		fModel->Language().PreferredLanguage()->Code());
 	return result;
 }
 

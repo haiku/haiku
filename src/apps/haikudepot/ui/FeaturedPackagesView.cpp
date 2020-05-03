@@ -1,6 +1,7 @@
 /*
  * Copyright 2013-214, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2017, Julian Harnath <julian.harnath@rwth-aachen.de>.
+ * Copyright 2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -123,7 +124,7 @@ public:
 	virtual ~PackageView()
 	{
 		fPackageListener->SetPackage(PackageInfoRef(NULL));
-		delete fPackageListener;
+		fPackageListener->ReleaseReference();
 	}
 
 	virtual void AllAttached()
