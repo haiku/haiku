@@ -170,10 +170,11 @@ The supported attributes are:
 
   ``name`` is the name of the Unix user, ``real_name``, if specified, the real
   name of the user, ``home_path`` the path to the user's home directory,
-  ``shell_path`` the path to the user's shell, and ``group`` the name of a Unix
-  group the users is a member of. If the respective components are not
-  specified, ``name`` is also used as the user's real name, "/bin/bash" is the
-  path of the user's shell, and the user will belong to the default user group.
+  ``shell_path`` the path to the user's shell, and ``group+`` is a list of the
+  names of Unix groups the user is a member of (first one is their primary
+  group). If the respective components are not specified, ``name`` is also
+  used as the user's real name, "/bin/bash" is the path of the user's shell,
+  and the user will belong to the default user group.
 - ``groups``: A list of names of Unix groups the packaged software requires.
 - ``post-install-scripts``: A list of paths of files included in the package,
   which shall be executed on package activation. Each path must start with
