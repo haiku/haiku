@@ -48,99 +48,78 @@ FakeScrollBar::~FakeScrollBar(void)
 void
 FakeScrollBar::Draw(BRect updateRect)
 {
-	BRect bounds = Bounds();
+	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
 
-	rgb_color normal = ui_color(B_PANEL_BACKGROUND_COLOR);
+	uint32 flags = BControlLook::B_PARTIALLY_ACTIVATED;
 
-	if (IsFocus()) {
-		// draw the focus indicator
-		SetHighColor(ui_color(B_NAVIGATION_BASE_COLOR));
-		StrokeRect(bounds);
-		bounds.InsetBy(1.0, 1.0);
+	if (Value() == B_CONTROL_ON)
+		SetHighColor(ui_color(B_CONTROL_MARK_COLOR));
+	else
+		SetHighColor(base);
 
-		// Draw the selected border (1px)
-		if (Value() == B_CONTROL_ON)
-			SetHighColor(ui_color(B_CONTROL_MARK_COLOR));
-		else
-			SetHighColor(normal);
+	BRect rect(Bounds());
 
-		StrokeRect(bounds);
-		bounds.InsetBy(1.0, 1.0);
-	} else {
-		// Draw the selected border (2px)
-		if (Value() == B_CONTROL_ON)
-			SetHighColor(ui_color(B_CONTROL_MARK_COLOR));
-		else
-			SetHighColor(normal);
+	// draw the selected border (2px)
+	StrokeRect(rect);
+	rect.InsetBy(1, 1);
+	StrokeRect(rect);
+	rect.InsetBy(1, 1);
 
-		StrokeRect(bounds);
-		bounds.InsetBy(1.0, 1.0);
-		StrokeRect(bounds);
-		bounds.InsetBy(1.0, 1.0);
+	// draw a 1px gap
+	SetHighColor(base);
+	StrokeRect(rect);
+	rect.InsetBy(1, 1);
+
+	// draw a 1px border around the entire scroll bar
+	be_control_look->DrawScrollBarBorder(this, rect, updateRect, base, flags,
+		B_HORIZONTAL);
+
+	// inset past border
+	rect.InsetBy(1, 1);
+
+	// draw arrow buttons
+	if (fDrawArrows) {
+		BRect buttonFrame(rect.left, rect.top, rect.left + rect.Height(),
+			rect.bottom);
+		be_control_look->DrawScrollBarButton(this, buttonFrame, updateRect,
+			base, flags, BControlLook::B_LEFT_ARROW, B_HORIZONTAL);
+		if (fDoubleArrows) {
+			buttonFrame.OffsetBy(rect.Height() + 1, 0.0f);
+			be_control_look->DrawScrollBarButton(this, buttonFrame,
+				updateRect, base, flags, BControlLook::B_RIGHT_ARROW,
+				B_HORIZONTAL);
+			buttonFrame.OffsetTo(rect.right - ((rect.Height() * 2) + 1),
+				rect.top);
+			be_control_look->DrawScrollBarButton(this, buttonFrame,
+				updateRect, base, flags, BControlLook::B_LEFT_ARROW,
+				B_HORIZONTAL);
+		}
+		buttonFrame.OffsetTo(rect.right - rect.Height(), rect.top);
+		be_control_look->DrawScrollBarButton(this, buttonFrame, updateRect,
+			base, flags, BControlLook::B_RIGHT_ARROW, B_HORIZONTAL);
 	}
 
-	// draw a gap (1px)
-	SetHighColor(normal);
-	StrokeRect(bounds);
-	bounds.InsetBy(1.0, 1.0);
-
-	// draw a border around control (1px)
-	SetHighColor(tint_color(normal, B_DARKEN_1_TINT));
-	StrokeRect(bounds);
-	bounds.InsetBy(1.0, 1.0);
-
-	BRect thumbBG = bounds;
-	BRect bgRect = bounds;
-
+	// inset rect to make room for arrows
 	if (fDrawArrows) {
-		// draw arrows
-		SetDrawingMode(B_OP_OVER);
+		if (fDoubleArrows)
+			rect.InsetBy((rect.Height() + 1) * 2, 0.0f);
+		else
+			rect.InsetBy(rect.Height() + 1, 0.0f);
+	}
 
-		BRect buttonFrame(bounds.left, bounds.top,
-			bounds.left + bounds.Height(), bounds.bottom);
-
-		_DrawArrowButton(ARROW_LEFT, buttonFrame, updateRect);
-
-		if (fDoubleArrows) {
-			buttonFrame.OffsetBy(bounds.Height() + 1, 0.0);
-			_DrawArrowButton(ARROW_RIGHT, buttonFrame,
-				updateRect);
-
-			buttonFrame.OffsetTo(bounds.right - ((bounds.Height() * 2) + 1),
-				bounds.top);
-			_DrawArrowButton(ARROW_LEFT, buttonFrame,
-				updateRect);
-
-			thumbBG.left += bounds.Height() * 2 + 2;
-			thumbBG.right -= bounds.Height() * 2 + 2;
-		} else {
-			thumbBG.left += bounds.Height() + 1;
-			thumbBG.right -= bounds.Height() + 1;
-		}
-
-		buttonFrame.OffsetTo(bounds.right - bounds.Height(), bounds.top);
-		_DrawArrowButton(ARROW_RIGHT, buttonFrame, updateRect);
-
-		SetDrawingMode(B_OP_COPY);
-
-		bgRect = bounds.InsetByCopy(48, 0);
-	} else
-		bgRect = bounds.InsetByCopy(16, 0);
-
-	// fill background besides the thumb
-	BRect leftOfThumb(thumbBG.left, thumbBG.top, bgRect.left - 1,
-		thumbBG.bottom);
-	BRect rightOfThumb(bgRect.right + 1, thumbBG.top, thumbBG.right,
-		thumbBG.bottom);
+	// draw background and thumb
+	float less = floorf(rect.Width() / 3);
+	BRect thumbRect(rect.left + less, rect.top, rect.right - less,
+		rect.bottom);
+	BRect leftOfThumb(rect.left, thumbRect.top, thumbRect.left - 1,
+		thumbRect.bottom);
+	BRect rightOfThumb(thumbRect.right + 1, thumbRect.top, rect.right,
+		thumbRect.bottom);
 
 	be_control_look->DrawScrollBarBackground(this, leftOfThumb,
-		rightOfThumb, updateRect, normal, 0, B_HORIZONTAL);
-
-	// Draw scroll thumb
-
-	// fill the clickable surface of the thumb
-	be_control_look->DrawButtonBackground(this, bgRect, updateRect,
-		normal, 0, BControlLook::B_ALL_BORDERS, B_HORIZONTAL);
+		rightOfThumb, updateRect, base, flags, B_HORIZONTAL);
+	be_control_look->DrawScrollBarThumb(this, thumbRect, updateRect,
+		ui_color(B_SCROLL_BAR_THUMB_COLOR), flags, B_HORIZONTAL, fKnobStyle);
 }
 
 
