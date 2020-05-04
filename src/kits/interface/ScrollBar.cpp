@@ -411,20 +411,26 @@ BScrollBar::Draw(BRect updateRect)
 			rect.left + rect.Height(), rect.bottom);
 
 		be_control_look->DrawScrollBarButton(this, buttonFrame, updateRect,
-			base, flags, BControlLook::B_LEFT_ARROW, fOrientation,
+			base, flags | (fPrivateData->fButtonDown == ARROW1
+				? BControlLook::B_ACTIVATED : 0),
+			BControlLook::B_LEFT_ARROW, fOrientation,
 			fPrivateData->fButtonDown == ARROW1);
 
 		if (doubleArrows) {
 			buttonFrame.OffsetBy(rect.Height() + 1, 0.0f);
-			be_control_look->DrawScrollBarButton(this, buttonFrame,
-				updateRect, base, flags, BControlLook::B_RIGHT_ARROW,
-				fOrientation, fPrivateData->fButtonDown == ARROW2);
+			be_control_look->DrawScrollBarButton(this, buttonFrame, updateRect,
+				base, flags | (fPrivateData->fButtonDown == ARROW2
+					? BControlLook::B_ACTIVATED : 0),
+				BControlLook::B_RIGHT_ARROW, fOrientation,
+				fPrivateData->fButtonDown == ARROW2);
 
 			buttonFrame.OffsetTo(rect.right - ((rect.Height() * 2) + 1),
 				rect.top);
-			be_control_look->DrawScrollBarButton(this, buttonFrame,
-				updateRect, base, flags, BControlLook::B_LEFT_ARROW,
-				fOrientation, fPrivateData->fButtonDown == ARROW3);
+			be_control_look->DrawScrollBarButton(this, buttonFrame, updateRect,
+				base, flags | (fPrivateData->fButtonDown == ARROW3
+					? BControlLook::B_ACTIVATED : 0),
+				BControlLook::B_LEFT_ARROW, fOrientation,
+				fPrivateData->fButtonDown == ARROW3);
 
 			thumbBG.left += rect.Height() * 2 + 2;
 			thumbBG.right -= rect.Height() * 2 + 2;
@@ -435,27 +441,35 @@ BScrollBar::Draw(BRect updateRect)
 
 		buttonFrame.OffsetTo(rect.right - rect.Height(), rect.top);
 		be_control_look->DrawScrollBarButton(this, buttonFrame, updateRect,
-			base, flags, BControlLook::B_RIGHT_ARROW, fOrientation,
+			base, flags | (fPrivateData->fButtonDown == ARROW4
+				? BControlLook::B_ACTIVATED : 0),
+			BControlLook::B_RIGHT_ARROW, fOrientation,
 			fPrivateData->fButtonDown == ARROW4);
 	} else {
 		BRect buttonFrame(rect.left, rect.top, rect.right,
 			rect.top + rect.Width());
 
 		be_control_look->DrawScrollBarButton(this, buttonFrame, updateRect,
-			base, flags, BControlLook::B_UP_ARROW, fOrientation,
+			base, flags | (fPrivateData->fButtonDown == ARROW1
+				? BControlLook::B_ACTIVATED : 0),
+			BControlLook::B_UP_ARROW, fOrientation,
 			fPrivateData->fButtonDown == ARROW1);
 
 		if (doubleArrows) {
 			buttonFrame.OffsetBy(0, rect.Width() + 1);
 			be_control_look->DrawScrollBarButton(this, buttonFrame,
-				updateRect, base, flags, BControlLook::B_DOWN_ARROW,
-				fOrientation, fPrivateData->fButtonDown == ARROW2);
+				updateRect, base, flags | (fPrivateData->fButtonDown == ARROW2
+					? BControlLook::B_ACTIVATED : 0),
+				BControlLook::B_DOWN_ARROW, fOrientation,
+				fPrivateData->fButtonDown == ARROW2);
 
 			buttonFrame.OffsetTo(rect.left, rect.bottom
 				- ((rect.Width() * 2) + 1));
 			be_control_look->DrawScrollBarButton(this, buttonFrame,
-				updateRect, base, flags, BControlLook::B_UP_ARROW,
-				fOrientation, fPrivateData->fButtonDown == ARROW3);
+				updateRect, base, flags | (fPrivateData->fButtonDown == ARROW3
+					? BControlLook::B_ACTIVATED : 0),
+				BControlLook::B_UP_ARROW, fOrientation,
+				fPrivateData->fButtonDown == ARROW3);
 
 			thumbBG.top += rect.Width() * 2 + 2;
 			thumbBG.bottom -= rect.Width() * 2 + 2;
@@ -466,7 +480,9 @@ BScrollBar::Draw(BRect updateRect)
 
 		buttonFrame.OffsetTo(rect.left, rect.bottom - rect.Width());
 		be_control_look->DrawScrollBarButton(this, buttonFrame, updateRect,
-			base, flags, BControlLook::B_DOWN_ARROW, fOrientation,
+			base, flags | (fPrivateData->fButtonDown == ARROW4
+				? BControlLook::B_ACTIVATED : 0),
+			BControlLook::B_DOWN_ARROW, fOrientation,
 			fPrivateData->fButtonDown == ARROW4);
 	}
 
