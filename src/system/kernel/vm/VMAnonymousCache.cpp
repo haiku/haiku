@@ -444,18 +444,7 @@ private:
 
 VMAnonymousCache::~VMAnonymousCache()
 {
-	// free allocated swap space and swap block
-	for (off_t offset = virtual_base, toFree = fAllocatedSwapSize;
-		offset < virtual_end && toFree > 0; offset += B_PAGE_SIZE) {
-		swap_addr_t slotIndex = _SwapBlockGetAddress(offset >> PAGE_SHIFT);
-		if (slotIndex == SWAP_SLOT_NONE)
-			continue;
-
-		swap_slot_dealloc(slotIndex, 1);
-		_SwapBlockFree(offset >> PAGE_SHIFT, 1);
-		toFree -= B_PAGE_SIZE;
-	}
-
+	_FreeSwapPageRange(virtual_base, virtual_end, false);
 	swap_space_unreserve(fCommittedSwapSize);
 	if (committed_size > fCommittedSwapSize)
 		vm_unreserve_memory(committed_size - fCommittedSwapSize);
@@ -487,7 +476,8 @@ VMAnonymousCache::Init(bool canOvercommit, int32 numPrecommittedPages,
 
 
 void
-VMAnonymousCache::_FreeSwapPageRange(off_t fromOffset, off_t toOffset)
+VMAnonymousCache::_FreeSwapPageRange(off_t fromOffset, off_t toOffset,
+	bool skipBusyPages)
 {
 	swap_block* swapBlock = NULL;
 	off_t toIndex = toOffset >> PAGE_SHIFT;
@@ -512,18 +502,20 @@ VMAnonymousCache::_FreeSwapPageRange(off_t fromOffset, off_t toOffset)
 		if (slotIndex == SWAP_SLOT_NONE)
 			continue;
 
-		vm_page* page = LookupPage(pageIndex * B_PAGE_SIZE);
-		if (page != NULL && page->busy) {
-			// TODO: We skip (i.e. leak) swap space of busy pages, since
-			// there could be I/O going on (paging in/out). Waiting is
-			// not an option as 1. unlocking the cache means that new
-			// swap pages could be added in a range we've already
-			// cleared (since the cache still has the old size) and 2.
-			// we'd risk a deadlock in case we come from the file cache
-			// and the FS holds the node's write-lock. We should mark
-			// the page invalid and let the one responsible clean up.
-			// There's just no such mechanism yet.
-			continue;
+		if (skipBusyPages) {
+			vm_page* page = LookupPage(pageIndex * B_PAGE_SIZE);
+			if (page != NULL && page->busy) {
+				// TODO: We skip (i.e. leak) swap space of busy pages, since
+				// there could be I/O going on (paging in/out). Waiting is
+				// not an option as 1. unlocking the cache means that new
+				// swap pages could be added in a range we've already
+				// cleared (since the cache still has the old size) and 2.
+				// we'd risk a deadlock in case we come from the file cache
+				// and the FS holds the node's write-lock. We should mark
+				// the page invalid and let the one responsible clean up.
+				// There's just no such mechanism yet.
+				continue;
+			}
 		}
 
 		swap_slot_dealloc(slotIndex, 1);

@@ -91,7 +91,7 @@ private:
 			void				_MergeSwapPages(VMAnonymousCache* source);
 
 			void				_FreeSwapPageRange(off_t fromOffset,
-									off_t toOffset);
+									off_t toOffset, bool skipBusyPages = true);
 
 private:
 	friend bool swap_free_page_swap_space(vm_page* page);
