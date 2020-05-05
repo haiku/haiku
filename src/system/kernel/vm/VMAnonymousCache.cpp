@@ -503,7 +503,7 @@ VMAnonymousCache::_FreeSwapPageRange(off_t fromOffset, off_t toOffset)
 			swapBlock = sSwapHashTable.Lookup(key);
 
 			if (swapBlock == NULL) {
-				pageIndex = ROUNDUP(pageIndex + 1, SWAP_BLOCK_PAGES);
+				pageIndex = ROUNDUP(pageIndex + 1, SWAP_BLOCK_PAGES) - 1;
 				continue;
 			}
 		}
