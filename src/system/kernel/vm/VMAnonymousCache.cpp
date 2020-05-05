@@ -562,6 +562,108 @@ VMAnonymousCache::Rebase(off_t newBase, int priority)
 }
 
 
+/*!	Moves the swap pages for the given range from the source cache into this
+	cache. Both caches must be locked.
+*/
+status_t
+VMAnonymousCache::Adopt(VMCache* _source, off_t offset, off_t size,
+	off_t newOffset)
+{
+	VMAnonymousCache* source = dynamic_cast<VMAnonymousCache*>(_source);
+	if (source == NULL) {
+		panic("VMAnonymousCache::Adopt(): adopt from incompatible cache %p "
+			"requested", _source);
+		return B_ERROR;
+	}
+
+	off_t pageIndex = newOffset >> PAGE_SHIFT;
+	off_t sourcePageIndex = offset >> PAGE_SHIFT;
+	off_t sourceEndPageIndex = (offset + size + B_PAGE_SIZE - 1) >> PAGE_SHIFT;
+	swap_block* swapBlock = NULL;
+
+	WriteLocker locker(sSwapHashLock);
+
+	while (sourcePageIndex < sourceEndPageIndex
+			&& source->fAllocatedSwapSize > 0) {
+		swap_addr_t left
+			= SWAP_BLOCK_PAGES - (sourcePageIndex & SWAP_BLOCK_MASK);
+
+		swap_hash_key sourceKey = { source, sourcePageIndex };
+		swap_block* sourceSwapBlock = sSwapHashTable.Lookup(sourceKey);
+		if (sourceSwapBlock == NULL || sourceSwapBlock->used == 0) {
+			sourcePageIndex += left;
+			pageIndex += left;
+			swapBlock = NULL;
+			continue;
+		}
+
+		for (; left > 0 && sourceSwapBlock->used > 0;
+				left--, sourcePageIndex++, pageIndex++) {
+
+			swap_addr_t blockIndex = pageIndex & SWAP_BLOCK_MASK;
+			if (swapBlock == NULL || blockIndex == 0) {
+				swap_hash_key key = { this, pageIndex };
+				swapBlock = sSwapHashTable.Lookup(key);
+
+				if (swapBlock == NULL) {
+					swapBlock = (swap_block*)object_cache_alloc(sSwapBlockCache,
+						CACHE_DONT_WAIT_FOR_MEMORY
+							| CACHE_DONT_LOCK_KERNEL_SPACE);
+					if (swapBlock == NULL)
+						return B_NO_MEMORY;
+
+					swapBlock->key.cache = this;
+					swapBlock->key.page_index
+						= pageIndex & ~(off_t)SWAP_BLOCK_MASK;
+					swapBlock->used = 0;
+					for (uint32 i = 0; i < SWAP_BLOCK_PAGES; i++)
+						swapBlock->swap_slots[i] = SWAP_SLOT_NONE;
+
+					sSwapHashTable.InsertUnchecked(swapBlock);
+				}
+			}
+
+			swap_addr_t sourceBlockIndex = sourcePageIndex & SWAP_BLOCK_MASK;
+			swap_addr_t slotIndex
+				= sourceSwapBlock->swap_slots[sourceBlockIndex];
+			if (slotIndex == SWAP_SLOT_NONE)
+				continue;
+
+			ASSERT(swapBlock->swap_slots[blockIndex] == SWAP_SLOT_NONE);
+
+			swapBlock->swap_slots[blockIndex] = slotIndex;
+			swapBlock->used++;
+			fAllocatedSwapSize += B_PAGE_SIZE;
+
+			sourceSwapBlock->swap_slots[sourceBlockIndex] = SWAP_SLOT_NONE;
+			sourceSwapBlock->used--;
+			source->fAllocatedSwapSize -= B_PAGE_SIZE;
+
+			TRACE("adopted slot %#" B_PRIx32 " from %p at page %" B_PRIdOFF
+				" to %p at page %" B_PRIdOFF "\n", slotIndex, source,
+				sourcePageIndex, this, pageIndex);
+		}
+
+		if (left > 0) {
+			sourcePageIndex += left;
+			pageIndex += left;
+			swapBlock = NULL;
+		}
+
+		if (sourceSwapBlock->used == 0) {
+			// All swap pages have been adopted, we can discard the swap block.
+			sSwapHashTable.RemoveUnchecked(sourceSwapBlock);
+			object_cache_free(sSwapBlockCache, sourceSwapBlock,
+				CACHE_DONT_WAIT_FOR_MEMORY | CACHE_DONT_LOCK_KERNEL_SPACE);
+		}
+	}
+
+	locker.Unlock();
+
+	return VMCache::Adopt(source, offset, size, newOffset);
+}
+
+
 status_t
 VMAnonymousCache::Commit(off_t size, int priority)
 {

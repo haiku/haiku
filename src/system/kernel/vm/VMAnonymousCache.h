@@ -41,6 +41,8 @@ public:
 
 	virtual	status_t			Resize(off_t newSize, int priority);
 	virtual	status_t			Rebase(off_t newBase, int priority);
+	virtual	status_t			Adopt(VMCache* source, off_t offset,
+									off_t size, off_t newOffset);
 
 	virtual	status_t			Commit(off_t size, int priority);
 	virtual	bool				HasPage(off_t offset);

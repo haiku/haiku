@@ -735,31 +735,46 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 
 		secondCache->Lock();
 		secondCache->temporary = cache->temporary;
-
-		// Transfer the concerned pages from the first cache.
-		secondCache->MovePageRange(cache, secondBase - area->Base()
-			+ area->cache_offset, secondSize, area->cache_offset);
 		secondCache->virtual_base = area->cache_offset;
 		secondCache->virtual_end = area->cache_offset + secondSize;
 
-		// Since VMCache::Resize() can temporarily drop the lock, we must
-		// unlock all lower caches to prevent locking order inversion.
-		cacheChainLocker.Unlock(cache);
-		cache->Resize(cache->virtual_base + firstNewSize, priority);
-		// Don't unlock the cache yet because we might have to resize it
-		// back.
+		// Transfer the concerned pages from the first cache.
+		off_t adoptOffset = area->cache_offset + secondBase - area->Base();
+		error = secondCache->Adopt(cache, adoptOffset, secondSize,
+			area->cache_offset);
 
-		// Map the second area.
-		error = map_backing_store(addressSpace, secondCache, area->cache_offset,
-			area->name, secondSize, area->wiring, area->protection,
-			REGION_NO_PRIVATE_MAP, 0, &addressRestrictions, kernel, &secondArea,
-			NULL);
+		if (error == B_OK) {
+			// Since VMCache::Resize() can temporarily drop the lock, we must
+			// unlock all lower caches to prevent locking order inversion.
+			cacheChainLocker.Unlock(cache);
+			cache->Resize(cache->virtual_base + firstNewSize, priority);
+			// Don't unlock the cache yet because we might have to resize it
+			// back.
+
+			// Map the second area.
+			error = map_backing_store(addressSpace, secondCache,
+				area->cache_offset, area->name, secondSize, area->wiring,
+				area->protection, REGION_NO_PRIVATE_MAP, 0,
+				&addressRestrictions, kernel, &secondArea, NULL);
+		}
+
 		if (error != B_OK) {
 			// Restore the original cache.
 			cache->Resize(cache->virtual_base + oldSize, priority);
+
 			// Move the pages back.
-			cache->MovePageRange(secondCache, area->cache_offset, secondSize,
-				secondBase - area->Base() + area->cache_offset);
+			status_t readoptStatus = cache->Adopt(secondCache,
+				area->cache_offset, secondSize, adoptOffset);
+			if (readoptStatus != B_OK) {
+				// Some (swap) pages have not been moved back and will be lost
+				// once the second cache is deleted.
+				panic("failed to restore cache range: %s",
+					strerror(readoptStatus));
+
+				// TODO: Handle out of memory cases by freeing memory and
+				// retrying.
+			}
+
 			cache->ReleaseRefAndUnlock();
 			secondCache->ReleaseRefAndUnlock();
 			addressSpace->ShrinkAreaTail(area, oldSize, allocationFlags);

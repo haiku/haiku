@@ -924,27 +924,6 @@ VMCache::MoveAllPages(VMCache* fromCache)
 }
 
 
-/*!	Moves the given pages from their current cache and inserts them into this
-	cache. Both caches must be locked.
-*/
-void
-VMCache::MovePageRange(VMCache* source, off_t offset, off_t size,
-		off_t newOffset)
-{
-	page_num_t startPage = offset >> PAGE_SHIFT;
-	page_num_t endPage = (offset + size + B_PAGE_SIZE - 1) >> PAGE_SHIFT;
-	int32 offsetChange = (int32)(newOffset - offset);
-
-	VMCachePagesTree::Iterator it = source->pages.GetIterator(startPage, true,
-		true);
-	for (vm_page* page = it.Next();
-				page != NULL && page->cache_offset < endPage;
-				page = it.Next()) {
-		MovePage(page, (page->cache_offset << PAGE_SHIFT) + offsetChange);
-	}
-}
-
-
 /*!	Waits until one or more events happened for a given page which belongs to
 	this cache.
 	The cache must be locked. It will be unlocked by the method. \a relock
@@ -1260,6 +1239,28 @@ VMCache::Rebase(off_t newBase, int priority)
 	}
 
 	virtual_base = newBase;
+	return B_OK;
+}
+
+
+/*!	Moves pages in the given range from the source cache into this cache. Both
+	caches must be locked.
+*/
+status_t
+VMCache::Adopt(VMCache* source, off_t offset, off_t size, off_t newOffset)
+{
+	page_num_t startPage = offset >> PAGE_SHIFT;
+	page_num_t endPage = (offset + size + B_PAGE_SIZE - 1) >> PAGE_SHIFT;
+	off_t offsetChange = newOffset - offset;
+
+	VMCachePagesTree::Iterator it = source->pages.GetIterator(startPage, true,
+		true);
+	for (vm_page* page = it.Next();
+				page != NULL && page->cache_offset < endPage;
+				page = it.Next()) {
+		MovePage(page, (page->cache_offset << PAGE_SHIFT) + offsetChange);
+	}
+
 	return B_OK;
 }
 

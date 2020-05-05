@@ -113,8 +113,6 @@ public:
 			void				MovePage(vm_page* page, off_t offset);
 			void				MovePage(vm_page* page);
 			void				MoveAllPages(VMCache* fromCache);
-			void				MovePageRange(VMCache* source, off_t offset,
-									off_t size, off_t newOffset);
 
 	inline	page_num_t			WiredPagesCount() const;
 	inline	void				IncrementWiredPagesCount();
@@ -134,6 +132,8 @@ public:
 									int priority);
 	virtual	status_t			Resize(off_t newSize, int priority);
 	virtual	status_t			Rebase(off_t newBase, int priority);
+	virtual	status_t			Adopt(VMCache* source, off_t offset, off_t size,
+									off_t newOffset);
 
 			status_t			FlushAndRemoveAllPages();
 
