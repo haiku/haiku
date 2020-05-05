@@ -54,7 +54,7 @@ DesktopSettingsPrivate::_SetDefaults()
 
 	fMouseMode = B_NORMAL_MOUSE;
 	fFocusFollowsMouseMode = B_NORMAL_FOCUS_FOLLOWS_MOUSE;
-	fAcceptFirstClick = false;
+	fAcceptFirstClick = true;
 	fShowAllDraggers = true;
 
 	// init scrollbar info
