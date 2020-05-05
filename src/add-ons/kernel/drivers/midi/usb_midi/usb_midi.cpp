@@ -652,9 +652,10 @@ usb_midi_write(driver_cookie* cookie, off_t position,
 	// TODO add a loop to allow writing multiple events in a single write()
 	// call if desired.
 	if (midicode != 0xF0) {
-		if (*num_bytes < CINbytes[cin]) {
-			DPRINTF_ERR((MY_ID "Expected %d bytes for MIDI command %x but got "
-				"only %d.\n", CINbytes[cin], cin, *num_bytes));
+		if ((int)*num_bytes < CINbytes[cin]) {
+			DPRINTF_ERR((MY_ID "Expected %d bytes for MIDI command %" B_PRIu8
+				" but got only %" B_PRIuSIZE ".\n", CINbytes[cin], cin,
+				*num_bytes));
 			return B_BAD_DATA;
 		}
 		*num_bytes = CINbytes[cin];
