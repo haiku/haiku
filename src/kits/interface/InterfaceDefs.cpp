@@ -1109,7 +1109,7 @@ bool
 accept_first_click()
 {
 	// Gets the accept first click status
-	bool acceptFirstClick = false;
+	bool acceptFirstClick = true;
 
 	BPrivate::AppServerLink link;
 	link.StartMessage(AS_GET_ACCEPT_FIRST_CLICK);
