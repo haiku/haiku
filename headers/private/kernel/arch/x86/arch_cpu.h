@@ -354,8 +354,14 @@
 #define IA32_CR4_GLOBAL_PAGES	(1UL << 7)
 #define CR4_OS_FXSR				(1UL << 9)
 #define CR4_OS_XMM_EXCEPTION	(1UL << 10)
+#define IA32_CR4_OSXSAVE		(1UL << 18)
 #define IA32_CR4_SMEP			(1UL << 20)
 #define IA32_CR4_SMAP			(1UL << 21)
+
+// Extended Control Register XCR0 flags
+#define IA32_XCR0_X87			(1UL << 0)
+#define IA32_XCR0_SSE			(1UL << 1)
+#define IA32_XCR0_AVX			(1UL << 2)
 
 // page fault error codes (http://wiki.osdev.org/Page_Fault)
 #define PGFAULT_P						0x01	// Protection violation
@@ -546,6 +552,16 @@ struct intel_microcode_extended_signature {
 
 #define clear_ac() \
 	__asm__ volatile (ASM_CLAC : : : "memory")
+
+#define xgetbv(reg) ({ \
+	uint32 low, high; \
+	__asm__ volatile ("xgetbv" : "=a" (low), "=d" (high), "c" (reg)); \
+	(low | (uint64)high << 32); \
+})
+
+#define xsetbv(reg, value) { \
+	uint32 low = value; uint32 high = value >> 32; \
+	__asm__ volatile ("xsetbv" : : "a" (low), "d" (high), "c" (reg)); }
 
 #define out8(value,port) \
 	__asm__ ("outb %%al,%%dx" : : "a" (value), "d" (port))

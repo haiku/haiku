@@ -84,6 +84,13 @@ struct set_mtrrs_parameter {
 #ifdef __x86_64__
 extern addr_t _stac;
 extern addr_t _clac;
+extern addr_t _xsave;
+extern addr_t _xsavec;
+extern addr_t _xrstor;
+uint64 gXsaveMask;
+uint64 gFPUSaveLength = 512;
+bool gHasXsave = false;
+bool gHasXsavec = false;
 #endif
 
 extern "C" void x86_reboot(void);
@@ -1406,6 +1413,20 @@ enable_smep(void* dummy, int cpu)
 {
 	x86_write_cr4(x86_read_cr4() | IA32_CR4_SMEP);
 }
+
+
+static void
+enable_osxsave(void* dummy, int cpu)
+{
+	x86_write_cr4(x86_read_cr4() | IA32_CR4_OSXSAVE);
+}
+
+
+static void
+enable_xsavemask(void* dummy, int cpu)
+{
+	xsetbv(0, gXsaveMask);
+}
 #endif
 
 
@@ -1459,6 +1480,31 @@ arch_cpu_init_post_vm(kernel_args* args)
 		} else
 			dprintf("SMAP disabled per safemode setting\n");
 	}
+
+	// if available enable XSAVE (XSAVE and extended states)
+	gHasXsave = x86_check_feature(IA32_FEATURE_EXT_XSAVE, FEATURE_EXT);
+	if (gHasXsave) {
+		gHasXsavec = x86_check_feature(IA32_FEATURE_XSAVEC,
+			FEATURE_D_1_EAX);
+
+		call_all_cpus_sync(&enable_osxsave, NULL);
+		gXsaveMask = IA32_XCR0_X87 | IA32_XCR0_SSE;
+		cpuid_info cpuid;
+		get_current_cpuid(&cpuid, 0xd, 0);
+		gXsaveMask |= (cpuid.regs.eax & IA32_XCR0_AVX);
+		call_all_cpus_sync(&enable_xsavemask, NULL);
+		get_current_cpuid(&cpuid, 0xd, 0);
+		gFPUSaveLength = cpuid.regs.ebx;
+
+		arch_altcodepatch_replace(ALTCODEPATCH_TAG_XSAVE,
+			gHasXsavec ? &_xsavec : &_xsave, 4);
+		arch_altcodepatch_replace(ALTCODEPATCH_TAG_XRSTOR,
+			&_xrstor, 4);
+
+		dprintf("enable %s 0x%" B_PRIx64 " %" B_PRId64 "\n",
+			gHasXsavec ? "XSAVEC" : "XSAVE", gXsaveMask, gFPUSaveLength);
+	}
+
 #endif
 
 	return B_OK;

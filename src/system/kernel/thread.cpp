@@ -2679,9 +2679,9 @@ thread_init(kernel_args *args)
 		panic("thread_init(): failed to init thread hash table!");
 
 	// create the thread structure object cache
-	sThreadCache = create_object_cache("threads", sizeof(Thread), 16, NULL,
+	sThreadCache = create_object_cache("threads", sizeof(Thread), 64, NULL,
 		NULL, NULL);
-		// Note: The x86 port requires 16 byte alignment of thread structures.
+		// Note: The x86 port requires 64 byte alignment of thread structures.
 	if (sThreadCache == NULL)
 		panic("thread_init(): failed to allocate thread object cache!");
 

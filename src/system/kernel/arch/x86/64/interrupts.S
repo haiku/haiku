@@ -221,16 +221,32 @@ STATIC_FUNCTION(int_bottom):
 	// exception.
 	orq		$X86_EFLAGS_RESUME, IFRAME_flags(%rbp)
 
-	subq	$512, %rsp
-	andq	$~15, %rsp
-	fxsaveq	(%rsp)
+	// xsave needs a 64-byte alignment
+	andq	$~63, %rsp
+	movq	(gFPUSaveLength), %rcx
+	subq	%rcx, %rsp
+	leaq	(%rsp), %rdi
+	shrq	$3, %rcx
+	movq	$0, %rax
+	rep stosq
+	movl	(gXsaveMask), %eax
+	movl	(gXsaveMask+4), %edx
+	movq	%rsp, %rdi
+	CODEPATCH_START
+	fxsaveq	(%rdi)
+	CODEPATCH_END(ALTCODEPATCH_TAG_XSAVE)
 
 	// Call the interrupt handler.
 	movq	%rbp, %rdi
 	movq	IFRAME_vector(%rbp), %rax
 	call	*gInterruptHandlerTable(, %rax, 8)
 
-	fxrstorq	(%rsp)
+	movl	(gXsaveMask), %eax
+	movl	(gXsaveMask+4), %edx
+	movq	%rsp, %rdi
+	CODEPATCH_START
+	fxrstorq	(%rdi)
+	CODEPATCH_END(ALTCODEPATCH_TAG_XRSTOR)
 	movq	%rbp, %rsp
 
 	// Restore the saved registers.
@@ -253,9 +269,22 @@ STATIC_FUNCTION(int_bottom_user):
 	// Frame pointer is the iframe.
 	movq	%rsp, %rbp
 
-	subq	$512, %rsp
-	andq	$~15, %rsp
-	fxsaveq	(%rsp)
+	// xsave needs a 64-byte alignment
+	andq	$~63, %rsp
+	movq	(gFPUSaveLength), %rcx
+	subq	%rcx, %rsp
+	leaq	(%rsp), %rdi
+	shrq	$3, %rcx
+	movq	$0, %rax
+	rep stosq
+	movl	(gXsaveMask), %eax
+	movl	(gXsaveMask+4), %edx
+
+	movq	%rsp, %rdi
+	CODEPATCH_START
+	fxsaveq	(%rdi)
+	CODEPATCH_END(ALTCODEPATCH_TAG_XSAVE)
+
 	movq	%rsp, IFRAME_fpu(%rbp)
 
 	// Set the RF (resume flag) in RFLAGS. This prevents an instruction
@@ -286,7 +315,12 @@ STATIC_FUNCTION(int_bottom_user):
 
 	UPDATE_THREAD_KERNEL_TIME()
 
-	fxrstorq	(%rsp)
+	movl	(gXsaveMask), %eax
+	movl	(gXsaveMask+4), %edx
+	movq	%rsp, %rdi
+	CODEPATCH_START
+	fxrstorq	(%rdi)
+	CODEPATCH_END(ALTCODEPATCH_TAG_XRSTOR)
 	movq	%rbp, %rsp
 
 	// Restore the saved registers.
@@ -315,7 +349,12 @@ STATIC_FUNCTION(int_bottom_user):
 	movq	%rbp, %rdi
 	call	x86_init_user_debug_at_kernel_exit
 1:
-	fxrstorq	(%rsp)
+	movl	(gXsaveMask), %eax
+	movl	(gXsaveMask+4), %edx
+	movq	%rsp, %rdi
+	CODEPATCH_START
+	fxrstorq	(%rdi)
+	CODEPATCH_END(ALTCODEPATCH_TAG_XRSTOR)
 	movq	%rbp, %rsp
 
 	// Restore the saved registers.
@@ -522,8 +561,13 @@ FUNCTION(x86_64_syscall_entry):
 	jmp .Liret
 
 .Lrestore_fpu:
-	movq	IFRAME_fpu(%rbp), %rax
-	fxrstorq	(%rax)
+	movq	IFRAME_fpu(%rbp), %rdi
+
+	movl	(gXsaveMask), %eax
+	movl	(gXsaveMask+4), %edx
+	CODEPATCH_START
+	fxrstorq	(%rdi)
+	CODEPATCH_END(ALTCODEPATCH_TAG_XRSTOR)
 .Liret:
 	// Restore the saved registers.
 	RESTORE_IFRAME()

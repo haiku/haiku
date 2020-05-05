@@ -53,8 +53,13 @@ struct arch_thread {
 	struct farcall	interrupt_stack;
 #endif
 
+#ifndef __x86_64__
 	// 512 byte floating point save point - this must be 16 byte aligned
 	uint8			fpu_state[512] _ALIGNED(16);
+#else
+	// floating point save point - this must be 64 byte aligned for xsave
+	uint8			fpu_state[1024] _ALIGNED(64);
+#endif
 
 	addr_t			GetFramePointer() const;
 } _ALIGNED(16);

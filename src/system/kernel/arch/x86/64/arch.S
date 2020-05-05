@@ -119,3 +119,16 @@ FUNCTION_END(_stac)
 FUNCTION(_clac):
 	clac
 FUNCTION_END(_clac)
+
+FUNCTION(_xsave):
+	xsave64		(%rdi)
+FUNCTION_END(_xsave)
+
+FUNCTION(_xsavec):
+	xsavec64	(%rdi)
+FUNCTION_END(_xsavec)
+
+FUNCTION(_xrstor):
+	xrstor64	(%rdi)
+FUNCTION_END(_xrstor)
+

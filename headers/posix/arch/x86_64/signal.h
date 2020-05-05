@@ -89,6 +89,18 @@ struct fpu_state {
 	unsigned char		_reserved_416_511[96];
 };
 
+struct xstate_hdr {
+	unsigned long		bv;
+	unsigned long		xcomp_bv;
+	unsigned char		_reserved[48];
+};
+
+struct savefpu {
+	struct fpu_state	fp_fxsave;
+	struct xstate_hdr	fp_xstate;
+	unsigned long		fp_ymm[16][2];
+};
+
 struct vregs {
 	unsigned long		rax;
 	unsigned long		rbx;
@@ -110,7 +122,7 @@ struct vregs {
 	unsigned long		rip;
 	unsigned long		rflags;
 
-	struct fpu_state	fpu;
+	struct savefpu		fpu;
 };
 
 

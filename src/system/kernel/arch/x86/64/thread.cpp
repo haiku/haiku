@@ -68,7 +68,10 @@ class RestartSyscall : public AbstractTraceEntry {
 extern "C" void x86_64_thread_entry();
 
 // Initial thread saved state.
-static arch_thread sInitialState;
+static arch_thread sInitialState _ALIGNED(64);
+extern uint64 gFPUSaveLength;
+extern bool gHasXsave;
+extern bool gHasXsavec;
 
 
 void
@@ -140,12 +143,36 @@ arch_thread_init(kernel_args* args)
 {
 	// Save one global valid FPU state; it will be copied in the arch dependent
 	// part of each new thread.
-	asm volatile (
-		"clts;"		\
-		"fninit;"	\
-		"fnclex;"	\
-		"fxsave %0;"
-		: "=m" (sInitialState.fpu_state));
+	if (gHasXsave || gHasXsavec) {
+		ASSERT(gFPUSaveLength <= sizeof(sInitialState.fpu_state));
+		memset(sInitialState.fpu_state, 0, gFPUSaveLength);
+		if (gHasXsavec) {
+			asm volatile (
+				"clts;"		\
+				"fninit;"	\
+				"fnclex;"	\
+				"movl $0x7,%%eax;"	\
+				"movl $0x0,%%edx;"	\
+				"xsavec64 %0"
+				:: "m" (sInitialState.fpu_state));
+		} else {
+			asm volatile (
+				"clts;"		\
+				"fninit;"	\
+				"fnclex;"	\
+				"movl $0x7,%%eax;"	\
+				"movl $0x0,%%edx;"	\
+				"xsave64 %0"
+				:: "m" (sInitialState.fpu_state));
+		}
+	} else {
+		asm volatile (
+			"clts;"		\
+			"fninit;"	\
+			"fnclex;"	\
+			"fxsaveq %0"
+			:: "m" (sInitialState.fpu_state));
+	}
 	return B_OK;
 }
 
@@ -309,11 +336,10 @@ arch_setup_signal_frame(Thread* thread, struct sigaction* action,
 
 	if (frame->fpu != nullptr) {
 		memcpy((void*)&signalFrameData->context.uc_mcontext.fpu, frame->fpu,
-			sizeof(signalFrameData->context.uc_mcontext.fpu));
+			gFPUSaveLength);
 	} else {
 		memcpy((void*)&signalFrameData->context.uc_mcontext.fpu,
-			sInitialState.fpu_state,
-			sizeof(signalFrameData->context.uc_mcontext.fpu));
+			sInitialState.fpu_state, gFPUSaveLength);
 	}
 
 	// Fill in signalFrameData->context.uc_stack.
@@ -385,8 +411,7 @@ arch_restore_signal_frame(struct signal_frame_data* signalFrameData)
 	Thread* thread = thread_get_current_thread();
 
 	memcpy(thread->arch_info.fpu_state,
-		(void*)&signalFrameData->context.uc_mcontext.fpu,
-		sizeof(thread->arch_info.fpu_state));
+		(void*)&signalFrameData->context.uc_mcontext.fpu, gFPUSaveLength);
 	frame->fpu = &thread->arch_info.fpu_state;
 
 	// The syscall return code overwrites frame->ax with the return value of
