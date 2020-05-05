@@ -53,7 +53,7 @@ public:
 									{ return fRefCount; }
 
 	inline	void				Get()	{ atomic_add(&fRefCount, 1); }
-	inline	void 				Put();
+	inline	void				Put();
 			void				RemoveAndPut();
 
 			void				IncrementFaultCount()

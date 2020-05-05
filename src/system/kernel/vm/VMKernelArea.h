@@ -30,7 +30,7 @@ public:
 	addr_t											base;
 	size_t											size;
 	union {
-		VMKernelArea* 								area;
+		VMKernelArea*								area;
 		struct {
 			addr_t									base;
 			uint32									flags;

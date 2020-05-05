@@ -19,8 +19,8 @@ public:
 
 			status_t			Init(bool canOvercommit,
 									int32 numPrecommittedPages,
-				   					int32 numGuardPages,
-				   					uint32 allocationFlags);
+									int32 numGuardPages,
+									uint32 allocationFlags);
 
 	virtual	status_t			Commit(off_t size, int priority);
 	virtual	bool				HasPage(off_t offset);
@@ -30,11 +30,11 @@ public:
 									{ fGuardedSize = guardSize; }
 
 	virtual	status_t			Read(off_t offset, const generic_io_vec *vecs,
-									 size_t count,uint32 flags,
-									 generic_size_t *_numBytes);
+									size_t count,uint32 flags,
+									generic_size_t *_numBytes);
 	virtual	status_t			Write(off_t offset, const generic_io_vec *vecs,
-									  size_t count, uint32 flags,
-									  generic_size_t *_numBytes);
+									size_t count, uint32 flags,
+									generic_size_t *_numBytes);
 
 	virtual	status_t			Fault(struct VMAddressSpace* aspace,
 									off_t offset);

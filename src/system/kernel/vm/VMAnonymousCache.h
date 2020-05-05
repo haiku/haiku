@@ -80,7 +80,7 @@ private:
 
 			void				_SwapBlockBuild(off_t pageIndex,
 									swap_addr_t slotIndex, uint32 count);
-			void        		_SwapBlockFree(off_t pageIndex, uint32 count);
+			void				_SwapBlockFree(off_t pageIndex, uint32 count);
 			swap_addr_t			_SwapBlockGetAddress(off_t pageIndex);
 			status_t			_Commit(off_t size, int priority);
 
@@ -100,8 +100,8 @@ private:
 			bool				fHasPrecommitted;
 			uint8				fPrecommittedPages;
 			int32				fGuardedSize;
-			off_t   			fCommittedSwapSize;
-			off_t   			fAllocatedSwapSize;
+			off_t				fCommittedSwapSize;
+			off_t				fAllocatedSwapSize;
 };
 
 #endif	// ENABLE_SWAP_SUPPORT
