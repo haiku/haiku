@@ -8,10 +8,14 @@
 
 #include "SerialApp.h"
 
+#include <Catalog.h>
 #include <String.h>
 
 #include <stdio.h>
 #include <string.h>
+
+
+#define B_TRANSLATION_CONTEXT "XModemStatus"
 
 
 // ASCII control characters used in XMODEM protocol
@@ -33,7 +37,7 @@ XModemSender::XModemSender(BDataIO* source, BSerialPort* sink, BHandler* listene
 	fEotSent(false),
 	fUseCRC(false)
 {
-	fStatus = "Waiting for receiver" B_UTF8_ELLIPSIS;
+	fStatus = B_TRANSLATE("Waiting for receiver" B_UTF8_ELLIPSIS);
 
 	BPositionIO* pos = dynamic_cast<BPositionIO*>(source);
 	if (pos)
@@ -65,7 +69,7 @@ XModemSender::BytesReceived(const uint8_t* data, size_t length)
 				// in place of an 8-bit checksum.
 				// In any other place, it is ignored.
 				if (fBlockNumber <= 1) {
-					fStatus = "CRC requested";
+					fStatus = B_TRANSLATE("CRC requested");
 					fUseCRC = true;
 					SendBlock();
 				} else
@@ -74,7 +78,7 @@ XModemSender::BytesReceived(const uint8_t* data, size_t length)
 				if (fEotSent) {
 					fSink->Write(&kEOT, 1);
 				} else {
-					fStatus = "Checksum error, re-send block";
+					fStatus = B_TRANSLATE("Checksum error, re-send block");
 					SendBlock();
 				}
 				break;
@@ -85,10 +89,11 @@ XModemSender::BytesReceived(const uint8_t* data, size_t length)
 				}
 
 				if (NextBlock() == B_OK) {
-					fStatus = "Sending" B_UTF8_ELLIPSIS;
+					fStatus = B_TRANSLATE("Sending" B_UTF8_ELLIPSIS);
 					SendBlock();
 				} else {
-					fStatus = "Everything sent, waiting for acknowledge";
+					fStatus = B_TRANSLATE("Everything sent, "
+						"waiting for acknowledge");
 					fSink->Write(&kEOT, 1);
 					fEotSent = true;
 				}
@@ -99,7 +104,8 @@ XModemSender::BytesReceived(const uint8_t* data, size_t length)
 				BMessage msg(kMsgProgress);
 				msg.AddInt32("pos", 0);
 				msg.AddInt32("size", 0);
-				msg.AddString("info", "Remote cancelled transfer");
+				msg.AddString("info",
+					B_TRANSLATE("Remote cancelled transfer"));
 				fListener.SendMessage(&msg);
 				return true;
 			}

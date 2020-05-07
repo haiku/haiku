@@ -24,3 +24,10 @@ Application SerialConnect :
 	: SerialConnect.rdef
 ;
 
+DoCatalogs SerialConnect :
+	x-vnd.haiku.SerialConnect
+	:
+	CustomRateWindow.cpp
+	SerialWindow.cpp
+	XModem.cpp
+;

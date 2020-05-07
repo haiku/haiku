@@ -1,6 +1,8 @@
 
 resource app_signature "application/x-vnd.haiku.SerialConnect";
 
+resource app_name_catalog_entry "x-vnd.haiku.SerialConnect:System name:SerialConnect";
+
 resource app_version {
 	major  = 0, 
 	middle = 0,
