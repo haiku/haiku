@@ -139,7 +139,7 @@ InputMouse::MessageReceived(BMessage* message)
 			BHandler *handler;
 			if (message->FindPointer("source",
 				reinterpret_cast<void**>(&handler)) == B_OK) {
-				bool acceptFirstClick = false;
+				bool acceptFirstClick = true;
 				BCheckBox *acceptFirstClickBox =
 					dynamic_cast<BCheckBox*>(handler);
 				if (acceptFirstClickBox)
