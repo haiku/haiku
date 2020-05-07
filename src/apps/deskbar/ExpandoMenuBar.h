@@ -113,9 +113,6 @@ private:
 
 			void			_FinishedDrag(bool invoke = false);
 
-			void			_DoneTracking(BPoint where);
-			void			_Track(BPoint where, uint32);
-
 			bool			CheckForSizeOverrunVertical();
 			bool			CheckForSizeOverrunHorizontal();
 

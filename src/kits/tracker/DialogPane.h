@@ -57,6 +57,8 @@ public:
 
 	virtual	void				Draw(BRect updateRect);
 	virtual	void				MouseDown(BPoint where);
+	virtual	void				MouseMoved(BPoint where, uint32 code, const BMessage*);
+	virtual	void				MouseUp(BPoint where);
 
 	virtual	void				GetPreferredSize(float* _width,
 									float* _height);
@@ -69,9 +71,6 @@ public:
 									const char* labelOff);
 
 protected:
-			void				DoneTracking(BPoint where);
-			void				Track(BPoint where, uint32);
-
 			enum State {
 				kCollapsed,
 				kPressed,

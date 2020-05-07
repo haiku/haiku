@@ -38,7 +38,6 @@ All rights reserved.
 #include <ControlLook.h>
 #include <LayoutUtils.h>
 
-#include "Thread.h"
 #include "Utilities.h"
 #include "Window.h"
 
@@ -139,9 +138,50 @@ PaneSwitch::MouseDown(BPoint)
 		return;
 
 	fPressing = true;
-	MouseDownThread<PaneSwitch>::TrackMouse(this, &PaneSwitch::DoneTracking,
-		&PaneSwitch::Track);
+	SetMouseEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
 	Invalidate();
+}
+
+
+void
+PaneSwitch::MouseMoved(BPoint point, uint32 code, const BMessage* message)
+{
+	int32 buttons;
+	BMessage* currentMessage = Window()->CurrentMessage();
+	if (currentMessage == NULL
+		|| currentMessage->FindInt32("buttons", &buttons) != B_OK) {
+		buttons = 0;
+	}
+
+	if (buttons != 0) {
+		BRect bounds(Bounds());
+		bounds.InsetBy(-3, -3);
+
+		bool newPressing = bounds.Contains(point);
+		if (newPressing != fPressing) {
+			fPressing = newPressing;
+			Invalidate();
+		}
+	}
+
+	BControl::MouseMoved(point, code, message);
+}
+
+
+void
+PaneSwitch::MouseUp(BPoint point)
+{
+	BRect bounds(Bounds());
+	bounds.InsetBy(-3, -3);
+
+	fPressing = false;
+	Invalidate();
+	if (bounds.Contains(point)) {
+		SetValue(!Value());
+		Invoke();
+	}
+
+	BControl::MouseUp(point);
 }
 
 
@@ -210,35 +250,6 @@ PaneSwitch::SetLabels(const char* labelOn, const char* labelOff)
 
 	Invalidate();
 	InvalidateLayout();
-}
-
-
-void
-PaneSwitch::DoneTracking(BPoint point)
-{
-	BRect bounds(Bounds());
-	bounds.InsetBy(-3, -3);
-
-	fPressing = false;
-	Invalidate();
-	if (bounds.Contains(point)) {
-		SetValue(!Value());
-		Invoke();
-	}
-}
-
-
-void
-PaneSwitch::Track(BPoint point, uint32)
-{
-	BRect bounds(Bounds());
-	bounds.InsetBy(-3, -3);
-
-	bool newPressing = bounds.Contains(point);
-	if (newPressing != fPressing) {
-		fPressing = newPressing;
-		Invalidate();
-	}
 }
 
 

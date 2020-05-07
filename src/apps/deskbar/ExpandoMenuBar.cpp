@@ -324,8 +324,8 @@ TExpandoMenuBar::MouseDown(BPoint where)
 		&& item->ExpanderBounds().Contains(where)) {
 		// start the animation here, finish on mouse up
 		fLastClickedItem = item;
-		MouseDownThread<TExpandoMenuBar>::TrackMouse(this,
-			&TExpandoMenuBar::_DoneTracking, &TExpandoMenuBar::_Track);
+		item->SetArrowDirection(BControlLook::B_RIGHT_DOWN_ARROW);
+		SetMouseEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
 		Invalidate(item->ExpanderBounds());
 		return;
 			// absorb the message
@@ -359,6 +359,23 @@ TExpandoMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 	if (message == NULL) {
 		// force a cleanup
 		_FinishedDrag();
+
+		if (buttons != 0) {
+			TTeamMenuItem* lastItem
+				= dynamic_cast<TTeamMenuItem*>(fLastClickedItem);
+			if (lastItem != NULL) {
+				if (lastItem->ExpanderBounds().Contains(where))
+					lastItem->SetArrowDirection(
+						BControlLook::B_RIGHT_DOWN_ARROW);
+				else {
+					lastItem->SetArrowDirection(lastItem->IsExpanded()
+						? BControlLook::B_DOWN_ARROW
+						: BControlLook::B_RIGHT_ARROW);
+				}
+			}
+
+			Invalidate(lastItem->ExpanderBounds());
+		}
 
 		switch (code) {
 			case B_INSIDE_VIEW:
@@ -471,6 +488,15 @@ TExpandoMenuBar::MouseUp(BPoint where)
 			// absorb the message
 	}
 
+	TTeamMenuItem* lastItem = dynamic_cast<TTeamMenuItem*>(fLastClickedItem);
+	if (lastItem != NULL && lastItem->ExpanderBounds().Contains(where)) {
+		lastItem->ToggleExpandState(true);
+		lastItem->SetArrowDirection(lastItem->IsExpanded()
+			? BControlLook::B_DOWN_ARROW
+			: BControlLook::B_RIGHT_ARROW);
+
+		Invalidate(lastItem->ExpanderBounds());
+	}
 	BMenuBar::MouseUp(where);
 }
 
@@ -1100,42 +1126,4 @@ TExpandoMenuBar::_FinishedDrag(bool invoke)
 
 	if (!invoke && fBarView != NULL && fBarView->Dragging())
 		fBarView->DragStop(true);
-}
-
-
-void
-TExpandoMenuBar::_DoneTracking(BPoint where)
-{
-	TTeamMenuItem* lastItem = dynamic_cast<TTeamMenuItem*>(fLastClickedItem);
-	if (lastItem == NULL)
-		return;
-
-	if (!lastItem->ExpanderBounds().Contains(where))
-		return;
-
-	lastItem->ToggleExpandState(true);
-	lastItem->SetArrowDirection(lastItem->IsExpanded()
-		? BControlLook::B_DOWN_ARROW
-		: BControlLook::B_RIGHT_ARROW);
-
-	Invalidate(lastItem->ExpanderBounds());
-}
-
-
-void
-TExpandoMenuBar::_Track(BPoint where, uint32)
-{
-	TTeamMenuItem* lastItem = dynamic_cast<TTeamMenuItem*>(fLastClickedItem);
-	if (lastItem == NULL)
-		return;
-
-	if (lastItem->ExpanderBounds().Contains(where))
-		lastItem->SetArrowDirection(BControlLook::B_RIGHT_DOWN_ARROW);
-	else {
-		lastItem->SetArrowDirection(lastItem->IsExpanded()
-			? BControlLook::B_DOWN_ARROW
-			: BControlLook::B_RIGHT_ARROW);
-	}
-
-	Invalidate(lastItem->ExpanderBounds());
 }

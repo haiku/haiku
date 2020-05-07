@@ -141,9 +141,6 @@ private:
 			float				_MenuBarOffset() const;
 			float				_MenuBarWidth() const;
 
-			void				_DoneTracking(BPoint point);
-			void				_Track(BPoint point, uint32);
-
 private:
 			char*				fLabel;
 			BMenu*				fMenu;

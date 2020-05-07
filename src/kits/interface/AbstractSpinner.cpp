@@ -28,13 +28,12 @@
 #include <LayoutUtils.h>
 #include <Message.h>
 #include <MessageFilter.h>
+#include <MessageRunner.h>
 #include <Point.h>
 #include <PropertyInfo.h>
 #include <TextView.h>
 #include <View.h>
 #include <Window.h>
-
-#include "Thread.h"
 
 
 static const float kFrameMargin			= 2.0f;
@@ -170,20 +169,18 @@ public:
 	virtual	void				MouseUp(BPoint where);
 	virtual	void				MouseMoved(BPoint where, uint32 transit,
 									const BMessage* message);
+	virtual void				MessageReceived(BMessage* message);
 
 			bool				IsEnabled() const { return fIsEnabled; }
 	virtual	void				SetEnabled(bool enable) { fIsEnabled = enable; };
 
 private:
-			void				_DoneTracking(BPoint where);
-			void				_Track(BPoint where, uint32);
-
 			spinner_direction	fSpinnerDirection;
 			BAbstractSpinner*	fParent;
 			bool				fIsEnabled;
 			bool				fIsMouseDown;
 			bool				fIsMouseOver;
-			bigtime_t			fRepeatDelay;
+			BMessageRunner*		fRepeater;
 };
 
 
@@ -309,13 +306,14 @@ SpinnerButton::SpinnerButton(BRect frame, const char* name,
 	fIsEnabled(true),
 	fIsMouseDown(false),
 	fIsMouseOver(false),
-	fRepeatDelay(100000)
+	fRepeater(NULL)
 {
 }
 
 
 SpinnerButton::~SpinnerButton()
 {
+	delete fRepeater;
 }
 
 
@@ -448,10 +446,14 @@ SpinnerButton::MouseDown(BPoint where)
 {
 	if (fIsEnabled) {
 		fIsMouseDown = true;
+		fSpinnerDirection == SPINNER_INCREMENT
+			? fParent->Increment()
+			: fParent->Decrement();
 		Invalidate();
-		fRepeatDelay = 100000;
-		MouseDownThread<SpinnerButton>::TrackMouse(this,
-			&SpinnerButton::_DoneTracking, &SpinnerButton::_Track);
+		BMessage repeatMessage('rept');
+		SetMouseEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
+		fRepeater = new BMessageRunner(BMessenger(this), repeatMessage,
+			200000);
 	}
 
 	BView::MouseDown(where);
@@ -470,8 +472,6 @@ SpinnerButton::MouseMoved(BPoint where, uint32 transit,
 			uint32 buttons;
 			GetMouse(&where, &buttons);
 			fIsMouseOver = Bounds().Contains(where) && buttons == 0;
-			if (!fIsMouseDown)
-				Invalidate();
 
 			break;
 		}
@@ -491,38 +491,32 @@ void
 SpinnerButton::MouseUp(BPoint where)
 {
 	fIsMouseDown = false;
+	delete fRepeater;
+	fRepeater = NULL;
 	Invalidate();
 
 	BView::MouseUp(where);
 }
 
 
-//	#pragma mark  - SpinnerButton private methods
-
-
 void
-SpinnerButton::_DoneTracking(BPoint where)
+SpinnerButton::MessageReceived(BMessage* message)
 {
-	if (fIsMouseDown || !Bounds().Contains(where))
-		fIsMouseDown = false;
-}
+	switch (message->what) {
+		case 'rept':
+		{
+			if (fIsMouseDown && fRepeater != NULL) {
+				fSpinnerDirection == SPINNER_INCREMENT
+					? fParent->Increment()
+					: fParent->Decrement();
+			}
 
+			break;
+		}
 
-void
-SpinnerButton::_Track(BPoint where, uint32)
-{
-	if (fParent == NULL || !Bounds().Contains(where)) {
-		fIsMouseDown = false;
-		return;
+		default:
+			BView::MessageReceived(message);
 	}
-	fIsMouseDown = true;
-
-	fSpinnerDirection == SPINNER_INCREMENT
-		? fParent->Increment()
-		: fParent->Decrement();
-
-	snooze(fRepeatDelay);
-	fRepeatDelay = 10000;
 }
 
 

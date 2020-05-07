@@ -30,7 +30,6 @@
 #include <MenuPrivate.h>
 #include <Message.h>
 #include <MessageFilter.h>
-#include <Thread.h>
 #include <Window.h>
 
 #include <binary_compatibility/Interface.h>
@@ -484,8 +483,7 @@ BMenuField::MouseDown(BPoint where)
 		if (fMouseDownFilter->Looper() == NULL)
 			Window()->AddCommonFilter(fMouseDownFilter);
 
-		MouseDownThread<BMenuField>::TrackMouse(this, &BMenuField::_DoneTracking,
-			&BMenuField::_Track);
+		SetMouseEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
 	}
 }
 
@@ -557,6 +555,7 @@ BMenuField::MouseMoved(BPoint point, uint32 code, const BMessage* message)
 void
 BMenuField::MouseUp(BPoint where)
 {
+	Window()->RemoveCommonFilter(fMouseDownFilter);
 	BView::MouseUp(where);
 }
 
@@ -1400,19 +1399,6 @@ float
 BMenuField::_MenuBarWidth() const
 {
 	return Bounds().Width() - (_MenuBarOffset() + kVMargin);
-}
-
-
-void
-BMenuField::_DoneTracking(BPoint point)
-{
-	Window()->RemoveCommonFilter(fMouseDownFilter);
-}
-
-
-void
-BMenuField::_Track(BPoint point, uint32)
-{
 }
 
 
