@@ -329,6 +329,11 @@ CopyEngine::_Copy(BEntry &source, BEntry &destination,
 	if (cancelSemaphore >= 0)
 		lock.Unlock();
 
+	bool copyAttributesToTarget = copyAttributes;
+		// attributes of the current source to the destination will be copied
+		// when copyAttributes is set to true, but there may be exceptions, so
+		// allow the recursively used copyAttribute parameter to be overridden
+		// for the current target.
 	if (S_ISDIR(sourceInfo.st_mode)) {
 		BDirectory sourceDirectory(&source);
 		ret = sourceDirectory.InitCheck();
@@ -345,7 +350,7 @@ CopyEngine::_Copy(BEntry &source, BEntry &destination,
 					// Do not overwrite attributes on folders that exist.
 					// This should work better when the install target
 					// already contains a Haiku installation.
-					copyAttributes = false;
+					copyAttributesToTarget = false;
 				}
 			} else {
 				ret = destination.Remove();
@@ -431,8 +436,8 @@ CopyEngine::_Copy(BEntry &source, BEntry &destination,
 		}
 	}
 
-	if (copyAttributes) {
-		// copy attributes
+	if (copyAttributesToTarget) {
+		// copy attributes to the current target
 		BNode sourceNode(&source);
 		BNode targetNode(&destination);
 		char attrName[B_ATTR_NAME_LENGTH];
