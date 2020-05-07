@@ -13,6 +13,11 @@ SimpleTest fibo_exec : fibo_exec.cpp ;
 
 SimpleTest fifo_poll_test : fifo_poll_test.cpp ;
 
+SimpleTest hello_avx : hello_avx.c ;
+local avxSource = [ FGristFiles hello_avx.c ] ;
+local avxObject = $(avxSource:S=$(SUFOBJ)) ;
+CCFLAGS on $(avxObject) = -mavx ;
+
 SimpleTest live_query :
 	live_query.cpp
 	: be
