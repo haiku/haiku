@@ -43,7 +43,7 @@ get_deskbar_frame(BRect* frame)
 
 	BMessage request(B_GET_PROPERTY);
 	request.AddSpecifier("Frame");
-	request.AddSpecifier("Window", "Deskbar");
+	request.AddSpecifier("Window", (int32)0);
 
 	BMessage reply;
 	result = deskbar.SendMessage(&request, &reply);
