@@ -793,10 +793,11 @@ TabDecorator::_AddTab(DesktopSettings& settings, int32 index,
 bool
 TabDecorator::_RemoveTab(int32 index, BRegion* updateRegion)
 {
-	BRect oldTitle = fTitleBarRect;
+	BRect oldRect = TabRect(index) | TabRect(CountTabs() - 1);
+		// Get a rect of all the tabs to the right - they will all be moved
 	_DoLayout();
 	if (updateRegion != NULL) {
-		updateRegion->Include(oldTitle);
+		updateRegion->Include(oldRect);
 		updateRegion->Include(fTitleBarRect);
 	}
 	return true;
