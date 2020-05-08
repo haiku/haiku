@@ -80,6 +80,9 @@ public:
 			bool				IndexedDirectories() const
 								{ return (fSuperBlock.CompatibleFeatures()
 									& EXT2_FEATURE_DIRECTORY_INDEX) != 0; }
+			bool				HasJournalFeature() const
+								{ return (fSuperBlock.CompatibleFeatures()
+									& EXT2_FEATURE_HAS_JOURNAL) != 0; }
 			bool				Has64bitFeature() const
 								{ return (fSuperBlock.IncompatibleFeatures()
 									& EXT2_INCOMPATIBLE_FEATURE_64BIT) != 0; }
