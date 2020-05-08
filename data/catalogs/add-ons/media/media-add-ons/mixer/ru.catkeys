@@ -6,7 +6,7 @@ Refuse output format changes	AudioMixer		Отклонять изменения �
 Output mapping	AudioMixer		Переназначение выхода
 Allow input channel remapping	AudioMixer		Разрешить переназначение входного канала
 Resampling algorithm	AudioMixer		Алгоритм передискретизации
-Attenuate mixer output by 3dB (like BeOS R5)	AudioMixer		Ослаблять вывод микшера на 3 дБ (как в BeOS R5)
+Attenuate mixer output by 3dB (like BeOS R5)	AudioMixer		Ослаблять вывод микшера на 3 дБ
 Display balance control for stereo connections	AudioMixer		Показывать регулятор баланса для стерео соединений
 To output	AudioMixer		Выход
 not connected	AudioMixer		не подключен

@@ -30,7 +30,7 @@ Installation of boot menu completed	BootManagerController	Title	การติ�
 After one minute	DefaultPartitionPage		หลังจากหนึ่งนาที
 Select	FileSelectionPage	Button	เลือก
 USB Drive	DrivesPage	Default disk name	USB ไดรฟ์
-Restore MBR	BootManagerController	Button	กู้คืน MBR 
+Restore MBR	BootManagerController	Button	กู้คืน MBR
 Hard Drive	DrivesPage	Default disk name	ฮาร์ดไดรฟ์
 Drives	DrivesPage	Title	ไดรฟ์
 The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		ตรวจพบพาร์ติชันต่อไปนี้ โปรดทำเครื่องหมายในช่องถัดจากพาร์ติชั่นที่จะรวมไว้ในเมนูบู๊ต คุณยังสามารถตั้งชื่อพาร์ติชั่นได้ตามที่คุณต้องการให้ปรากฏในเมนูบู๊ต

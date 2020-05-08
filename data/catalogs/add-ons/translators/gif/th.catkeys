@@ -11,7 +11,7 @@ Palette:	GIFView		จานสี:
 GIF image	GIFTranslator		ภาพ GIF
 Write transparent images	GIFView		เขียนภาพโปร่งใส
 GIF images	GIFTranslator		ภาพ GIF
-Version %d.%d.%d, %s	GIFView		Version %d.%d.%d, %s
+Version %d.%d.%d, %s	GIFView		เวอรชั่น %d.%d.%d, %s
 Use RGB color	GIFView		ใช้สี RGB
 Use dithering	GIFView		ใช้ dithering
 GIF Settings	GIFTranslator		ตั้งค่า GIF

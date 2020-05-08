@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	3381858533
+1	swedish	x-vnd.Haiku-HaikuDepot	1107427137
 Repository update error	LocalRepositoryUpdateProcess		Fel vid uppdatering av repositorie
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Ett fel inträffade vid uppdatering av repositoriet: %error%
 User Created	UserLoginWindow		Användare skapad
@@ -54,6 +54,7 @@ Package action failed	PackageInfoView		Paketåtgärden misslyckades
 No changelog available.	PackageInfoView		Ingen ändringslogg finns.
 Error	App		Fel
 There was a puzzling response from the web service.	UserLoginWindow		Det komm ett konstigt meddelande från webb servicen.
+Version	PackageListView		Version
 Not logged in	MainWindow		Inte inloggad
 No, quit HaikuDepot	App		Nej, avsluta HaikuDepot
 Featured packages	FeaturedPackagesView		Utvalda paket

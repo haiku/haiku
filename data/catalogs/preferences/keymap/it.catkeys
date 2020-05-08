@@ -151,7 +151,7 @@ NUM LOCK	Keyboard Layout View		BLOC NUM
 MENU	Keyboard Layout View		MENU
 Belgian (comma)	KeymapNames		Belga (virgola)
 Norwegian	KeymapNames		Norvegese
-Font	Keymap window		Carattere
+Font	Keymap window		Tipo di Carattere
 Danish	KeymapNames		Danese
 Generic 104-key	KeyboardLayoutNames		Tastiera generica a 104 tasti
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Tasto shift

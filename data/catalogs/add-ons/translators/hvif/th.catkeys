@@ -1,8 +1,8 @@
 1	thai	x-vnd.Haiku-HVIFTranslator	249304797
-Haiku vector icon translator	HVIFTranslator		ตัวแปล Haiku vector icon 
+Haiku vector icon translator	HVIFTranslator		ตัวแปล Haiku ไอคอนเวกเตอร์
 HVIF icons	HVIFTranslator		ไอคอน HVIF
 Render size:	HVIFView		ขนาดการแสดงผล:
 HVIFTranslator Settings	HVIFTranslator		ตั้งค่า HVIFTranslator
-Haiku vector icon translator	HVIFView		ตั้งค่า Haiku vector icon
+Haiku vector icon translator	HVIFView		ตั้งค่า Haiku ไอคอนเวกเตอร์
 HVIF Settings	HVIFMain		ตั้งค่า HVIF
 Version %d.%d.%d, %s	HVIFView		เวอร์ชั่น %d.%d.%d, %s

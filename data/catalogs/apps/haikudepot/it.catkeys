@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-HaikuDepot	3381858533
+1	italian	x-vnd.Haiku-HaikuDepot	1107427137
 Repository update error	LocalRepositoryUpdateProcess		Errore nell'aggiornamento del Repository
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Si è verificato un errore nell'aggiornamento del repository: %error%
 User Created	UserLoginWindow		Utente Creato
@@ -54,6 +54,7 @@ Package action failed	PackageInfoView		Azione sul pacchetto non riuscita
 No changelog available.	PackageInfoView		Nessun registro modifiche disponibile.
 Error	App		Errore
 There was a puzzling response from the web service.	UserLoginWindow		La risposta del servizio web è ambigua.
+Version	PackageListView		Versione
 Not logged in	MainWindow		Non collegato
 No, quit HaikuDepot	App		No, chiudi HaikuDepot
 Featured packages	FeaturedPackagesView		Pacchetti in evidenza

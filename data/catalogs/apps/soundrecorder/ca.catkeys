@@ -1,6 +1,6 @@
 1	catalan; valencian	x-vnd.Haiku-SoundRecorder	24440888
 Loop	RecorderWindow		Bucle
-Cannot find default audio hardware	RecorderWindow		No es pot trobar el maquinari del so predeterminat
+Cannot find default audio hardware	RecorderWindow		No es pot trobar el maquinari de so predeterminat.
 Cannot find the temporary file created to hold the new recording	RecorderWindow		No es pot trobar el fitxer temporal creat per contenir la gravació nova.
 Sample size:	RecorderWindow		Mida d'exemple:
 Nothing to play	RecorderWindow		Res per reproduir

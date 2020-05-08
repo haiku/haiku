@@ -1,0 +1,20 @@
+1	thai	x-vnd.Haiku-VirtualMemory	2090796060
+Requested swap file size:	SettingsWindow		ขอขนาดไฟล์สว็อป:
+VirtualMemory	System name		VirtualMemory
+OK	VirtualMemoryApp		ตกลง
+Use volume:	SettingsWindow		ใช้ระดับเสียง:
+Turn off	SettingsWindow		ปิด
+Changes will take effect upon reboot.	SettingsWindow		การเปลี่ยนแปลงจะมีผลเมื่อรีบูต
+Revert	SettingsWindow		เปลี่ยนกลับ
+Keep enabled	SettingsWindow		เปิดใช้งานต่อไป
+The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		การตั้งค่าที่ระบุในไฟล์การตั้งค่าไม่ถูกต้อง คุณสามารถโหลดค่าเริ่มต้นหรือออกจาก
+VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		VirtualMemory\n\tเขียนโดย Axel Dörfler\n\tลิขสิทธิ์ 2005, Haiku\n
+The volume specified in the settings file could not be found. You can use the boot volume or quit.	SettingsWindow		ไม่พบระดับเสียงที่ระบุในไฟล์การตั้งค่า คุณสามารถใช้การบูตเสียงหรือออก
+Current Swap:	SettingsWindow		การแลกเปลี่ยนปัจจุบัน:
+Load defaults	SettingsWindow		โหลดค่าเริ่มต้น
+Use boot volume	SettingsWindow		ใช้การบูทระดับเสียง
+Automatic swap management	SettingsWindow		การจัดการการแลกเปลี่ยนอัตโนมัติ
+Defaults	SettingsWindow		ค่าเริ่มต้น
+Quit	SettingsWindow		ออก
+Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		การปิดใช้งานหน่วยความจำเสมือนจะมีผลกระทบที่ไม่พึงประสงค์ต่อความเสถียรของระบบเมื่อใช้หน่วยความจำหมดแล้ว\nหน่วยความจำเสมือนไม่มีผลต่อประสิทธิภาพของระบบจนกว่าจะถึงจุดนี้\n\nคุณแน่ใจหรือไม่ว่าต้องการปิด?
+Enable virtual memory	SettingsWindow		เปิดใช้งานหน่วยความจำเสมือน

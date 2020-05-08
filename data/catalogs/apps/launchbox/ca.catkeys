@@ -7,10 +7,10 @@ Show on all workspaces	LaunchBox		Mostra-ho a tots els espais de treball
 Name Panel	LaunchBox		Nom del plafó
 Autostart	LaunchBox		Inici automàtic
 Clone	LaunchBox		Clona
-Description for '%3'	LaunchBox		Descripció de '%3'
+Description for '%3'	LaunchBox		Descripció per a %3
 Show window border	LaunchBox		Mostra la vora de la finestra
 \n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nHa fallat iniciar l'aplicació amb la signatura "%2".\n\nError:
-Failed to launch 'something', error in Pad data.	LaunchBox		Ha fallat executar "quelcom", hi ha hagut un error a les dades de la barra.
+Failed to launch 'something', error in Pad data.	LaunchBox		Ha fallat executar alguna cosa, hi ha hagut un error a les dades de la barra.
 LaunchBox	System name		Executa
 Auto-raise	LaunchBox		Autoelevació
 Icon size	LaunchBox		Mida de la icona
@@ -21,9 +21,9 @@ launch popup	LaunchBox		obre la finestra emergent
 Clear button	LaunchBox		Botó de neteja
 Bummer	LaunchBox		Problema
 last chance	LaunchBox		darrera oportunitat
-You can drag an icon here.	LaunchBox		Podeu deixar anar la icona aquí:
+You can drag an icon here.	LaunchBox		Podeu arrossegar una icona fins aquí.
 Pad 1	LaunchBox		Barra 1
-Failed to launch '%1'.\n\nError:	LaunchBox		Ha fallat executar "%1".\n\nError:
+Failed to launch '%1'.\n\nError:	LaunchBox		Ha fallat executar %1.\n\nError:
 Settings	LaunchBox		Paràmetres
 Vertical layout	LaunchBox		Disposició vertical:
 Pad	LaunchBox		Barra

@@ -1,7 +1,7 @@
 1	japanese	x-vnd.Haiku-SpamFilter	468104950
-or empty e-mail	SpamFilterConfig		または空のメール
-Genuine below and uncertain above:	SpamFilterConfig		正規のを下に、疑わしいものを上に:
-Spam above:	SpamFilterConfig		スパムを上に:
+or empty e-mail	SpamFilterConfig		または空メール
+Genuine below and uncertain above:	SpamFilterConfig		次の値未満は正規メール、それ以外は不明:
+Spam above:	SpamFilterConfig		次の値以上はスパム:
 Add spam rating to start of subject	SpamFilterConfig		件名の最初にスパムの評価を加える
 Bayesian Spam Filter	SpamFilter		ベイジアンスパムフィルター
 Learn from all incoming e-mail	SpamFilterConfig		受信メールすべてから学習する

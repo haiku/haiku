@@ -4,7 +4,7 @@ Media nodes	DataSource		Grops multimediâi
 Threads	DataSource		Thread
 Always on top	ActivityWindow		Simpri denant
 Add graph	ActivityWindow		Zonte grafic
-Teams	DataSource		Complès
+Teams	DataSource		Team
 MiB	DataSource		MiB
 Network send	DataSource		Rêt (inviament)
 CPU usage (combined)	DataSource		CPU doprade (cumbinât)

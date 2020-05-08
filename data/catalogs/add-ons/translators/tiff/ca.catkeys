@@ -2,7 +2,7 @@
 TIFF Library:	TIFFView		Biblioteca de TIFF:
 RLE (Packbits)	TIFFView		RLE (Packbits)
 ZIP (Deflate)	TIFFView		ZIP (Comprimit)
-identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: l'index del document no és vàlid\n
+identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: l'índex del document no és vàlid\n
 Use compression:	TIFFView		Compressió:
 TIFF image translator	TIFFView		Traductor d'imatges TIFF
 TIFF image	TIFFTranslator		Imatge TIFF

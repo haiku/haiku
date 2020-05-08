@@ -3,7 +3,7 @@ Version %d.%d.%d, %s	ConfigView		Versión %d.%d.%d, %s
 EXR image translator	EXRTranslator		Traductor de imagen EXR
 EXR Settings	main		Configuración EXR
 EXR images	EXRTranslator		Imágenes EXR
-a division of Lucasfilm Entertainment Company Ltd	ConfigView		Una división de Lucasfilms Entretainment Company Ltda.
+a division of Lucasfilm Entertainment Company Ltd	ConfigView		una división de Lucasfilms Entretainment Company Ltda.
 EXR image	EXRTranslator		Imagen EXR
 EXR image translator	ConfigView		Traductor de imagen EXR
 Based on OpenEXR %version%	ConfigView		Basado en OpenEXR %version%

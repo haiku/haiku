@@ -34,7 +34,7 @@ Revert	PreferencesWindow		Eski haline döndür
 Small	PreferencesWindow		Küçük
 Recent applications:	PreferencesWindow		Son kullanılan uygulamalar:
 Shutdown…	DeskbarMenu		Bilgisayarı kapat…
-Tracker always first	PreferencesWindow		İzleyici her zaman önde
+Tracker always first	PreferencesWindow		İzleyici her zaman ilk sırada
 Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Tercihler
 Recent folders	DeskbarMenu		Son kullanılan klasörler
 About this system	DeskbarMenu		Bu sistem hakkında

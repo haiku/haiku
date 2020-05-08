@@ -43,7 +43,7 @@ Height	Icon-O-Matic-PropertyNames		Altezza
 Add Shape	Icon-O-Matic-AddShapesCmd		Aggiungi Sagoma
 warning	Icon-O-Matic-SVGExport		avviso
 File	Icon-O-Matic-Menus		File
-Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Pulisci Percorso
+Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Pulisci Tracciato
 Move Style	Icon-O-Matic-MoveStylesCmd		Sposta Stile
 Properties	Icon-O-Matic-Menus		Proprietà
 Path	Icon-O-Matic-PropertyNames		Percorso

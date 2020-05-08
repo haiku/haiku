@@ -18,7 +18,7 @@ Shorten	Icon-O-Matic-PropertyNames		縮める
 Unassign Path	Icon-O-Matic-UnassignPathCmd		パスの割り当て解除
 The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		インポートしようとしているテキストはとても長いですがよろしいですか?
 Paste	Icon-O-Matic-Properties		貼り付け
-Detect Orient.	Icon-O-Matic-PropertyNames		向きを検出する。
+Detect Orient.	Icon-O-Matic-PropertyNames		向きを検出。
 Click on a shape above	Empty transformers list - 1st line		上のシェイプをクリックして
 Close	Icon-O-Matic-Menu-File		閉じる
 Add rect	Icon-O-Matic-PathsList		四角形を追加
@@ -110,7 +110,7 @@ Change Color	Icon-O-Matic-SetColorCmd		カラーを変更
 Remove	Icon-O-Matic-ShapesList		削除
 Drop shapes	Icon-O-Matic-ShapesList		シェイプをドロップ
 PNG Set	Icon-O-Matic-SavePanel		PNG セット
-to attach transformers.	Empty transformers list - 2nd line		Transformerを加えてください。
+to attach transformers.	Empty transformers list - 2nd line		Transformerを追加。
 Linear	Icon-O-Matic-StyleTypes		リニア
 any of the other lists to	Empty property list - 2nd line		他のリストの中の
 Nudge Control Point	Icon-O-Matic-NudgePointsCommand		コントロールポイントを動かす
@@ -149,7 +149,7 @@ OK	Icon-O-Matic-SVGImport		OK
 Append…	Icon-O-Matic-Menu-File		追加…
 Scale Y	Icon-O-Matic-PropertyNames		Y軸スケール
 Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		ファイル'%s'をSVGドキュメントとして開けませんでした。\n\nエラー: %s
-Export icon	Dialog title		アイコンとしてエクスポート
+Export icon	Dialog title		アイコンをエクスポート
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		カラー (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		グラデーションを編集
 Set 	Set (property name)		セット
@@ -168,7 +168,7 @@ Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		閉じ�
 load error	Icon-O-Matic-SVGImport		読み込みエラー
 Transformation	Icon-O-Matic-TransformersList		変形
 Save as…	Icon-O-Matic-Menu-File		名前を付けて保存…
-Swatches	Icon-O-Matic-Menus		見本
+Swatches	Icon-O-Matic-Menus		色見本
 <modify path>	Icon-O-Matic-PathCmd		<パスを修正>
 HVIF Source Code	Icon-O-Matic-SavePanel		HVIF ソースコード
 Icon-O-Matic	System name		Icon-O-Matic

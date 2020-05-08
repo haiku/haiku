@@ -4,7 +4,7 @@ Account settings	AutoConfigWindow		Paràmetres del compte
 An error occurred while creating the config view: %error.	Config Views		Hi ha hagut un error en crear la vista de configuració: %error.
 E-mail address:	E-Mail		Adreça de correu:
 Create new account	AutoConfigWindow		Obre un compte nou
-While sending and receiving	Config Window		Mentre s'estigui enviant i rebent
+While sending and receiving	Config Window		Durant l'enviament i la recepció
 Error!	Config Views		Error!
 Apply	Config Window		Aplica
 Incoming mail filters	Config Views		Filtres del correu d'entrada

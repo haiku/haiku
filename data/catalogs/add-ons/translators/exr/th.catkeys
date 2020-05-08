@@ -1,5 +1,5 @@
 1	thai	x-vnd.Haiku-EXRTranslator	3596882613
-Version %d.%d.%d, %s	ConfigView		Version %d.%d.%d, %s
+Version %d.%d.%d, %s	ConfigView		เวอร์ชั่น %d.%d.%d, %s
 EXR image translator	EXRTranslator		เครื่องแปลรูปภาพ EXR
 EXR Settings	main		การตั้งค่า EXR
 EXR images	EXRTranslator		ภาพ EXR

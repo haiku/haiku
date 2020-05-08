@@ -8,4 +8,4 @@ RichTextFormat file	RTFTranslator		ไฟล์ RichTextFormat
 Be style text file	RTFTranslator		ไฟล์ข้อความสไตล์ Be
 Plain text file	RTFTranslator		ไฟล์ข้อความเปล่า
 Rich Text Format translator	RTFTranslator		ตัวแปลรูปแบบ Rich Text
-Rich Text Format translator v%d.%d.%d %s	RTFTranslator		ตัวแปลรูปแบบ Rich Text  v%d.%d.%d %s
+Rich Text Format translator v%d.%d.%d %s	RTFTranslator		ตัวแปลรูปแบบ RichText v%d.%d.%d %s

@@ -5,7 +5,7 @@ Input file not recognized as Audio or Video	MediaConverter		No es reconeix el fi
 Video quality: %3d%%	MediaConverter		Qualitat del vídeo: %3d%%
 Source files	MediaConverter		Fitxers d'origen
 Error writing video frame %ld	MediaConverter		Error en escriure el fotograma de vídeo %ld
-Error converting '%filename'	MediaConverter		Error en convertir "%filename"
+Error converting '%filename'	MediaConverter		Error en convertir %filename
 Selected directory not found. Defaulting to /boot/home	MediaConverter		No s'ha trobat el directori seleccionat. Es restableix a /boot/home.
 Conversion completed	MediaConverter		Conversió completada
 Audio:	MediaConverter-FileInfo		Àudio:
@@ -22,20 +22,20 @@ Output format	MediaConverter		Format de sortida
 %.1f kHz mono	MediaFileInfo		%.1f kHz mono
 %.1f kHz stereo	MediaFileInfo		%.1f kHz estèreo
 OK	MediaConverter		D'acord
-Error creating '%filename'	MediaConverter		Error en crear "%filename"
+Error creating '%filename'	MediaConverter		Error en crear %filename
 Error loading a file	MediaConverter		Error en carregar un fitxer
 Encoder parameters	MediaConverter-EncoderWindow		Paràmetres del codificador
 Open…	Menu		Obre...
 Audio encoding:	MediaConverter		Codificació de l'àudio:
 Audio quality: %3d%%	MediaConverter		Qualitat de l'àudio: %3d%%
 Cancelling…	MediaConverter		Es cancel·la...
-Output file '%filename' created	MediaConverter		S'ha creat el fitxer de sortida "%filename".
+Output file '%filename' created	MediaConverter		S'ha creat el fitxer de sortida %filename.
 Output folder	MediaConverter		Carpeta de sortida
 Error creating track.	MediaConverter		Error en crear la pista.
  seconds	MediaFileInfo		 segons
 Video using parameters form settings	MediaConverter		Vídeo que usa paràmetres de la configuració
 Video:	MediaConverter-FileInfo		Vídeo:
-Select	MediaConverter		Seleccioneu
+Select	MediaConverter		Selecciona
 Conversion cancelled	MediaConverter		S'ha cancel·lat la conversió
 Low	MediaConverter		Baix
 Error loading files	MediaConverter		Error en carregar fitxers

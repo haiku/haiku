@@ -6,7 +6,7 @@ Unable to find the available languages! You can't use this preflet!	Locale Prefl
 Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		変更を有効にするために、DeskbarとTrackerを再起動する必要があります。今すぐ再起動してよいですか?
 Long format:	TimeFormatSettings		長い形式:
 Currency	TimeFormatSettings		通貨
-Locale	System name		ロケール
+Locale	System name		言語と書式
 Short format:	TimeFormatSettings		短い形式:
 Language	Locale Preflet Window		言語
 Preferred languages	Locale Preflet Window		言語の優先順位

@@ -1,5 +1,173 @@
-1	thai	x-vnd.Haiku-FileTypes	343965974
+1	thai	x-vnd.Haiku-FileTypes	436017301
 Left	Attribute Window	Attribute column alignment in Tracker	ซ้าย
 Float	Attribute ListView		ลอย
 Final	Application Types Window		สุดท้าย
 FileTypes request	FileTypes Window		คำขอประเภทไฟล์
+This file type already exists	New File Type Window		ไฟล์ประเภทนี้มีอยู่แล้ว
+Preferred application	FileTypes Window		แอพพลิเคชั่นที่ต้องการ
+Launch	Application Types Window		ใช้งาน
+Removing uninstalled application types	Application Types Window		การลบประเภทแอปพลิเคชันที่ถอนการติดตั้ง
+Width:	Attribute Window	Default column width in Tracker for this attribute.	ความกว้าง:
+Same as…	FileType Window	The same TYPE as ...	เหมือนกับ
+(from super type)	FileTypes Window		(จากชนิดพิเศษ)
+Select same preferred application as	FileTypes Window		เลือกแอปพลิเคชันที่ต้องการเช่นเดียวกัน
+Could not change attributes	Attribute Window		ไม่สามารถเปลี่ยนคุณสมบัติ
+Icon	FileTypes Window		ไอคอน
+Add…	Application Type Window		เพิ่ม
+Attribute name:	Attribute Window		ชื่อ Attribute:
+Long description:	Application Type Window		คำอธิบายยาว:
+Cancel	Preferred App Menu		ยกเลิก
+Remove	FileTypes Window		ลบ
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		แอปพลิเคชัน \"%s\" ไม่รองรับไฟล์ประเภทนี้\nคุณแน่ใจหรือไม่ว่าต้องการตั้งค่า?
+Remove	Application Type Window		ลบ
+Gamma	Application Type Window		แกมม่า
+Cancel	Application Type Window		ยกเลิก
+Attribute	Attribute Window		Attribute
+Multiple launch	Application Type Window		เปิดหลายรายการ
+{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, one{# Application type could be removed} อื่นๆ{# Application types could be removed}}
+Edit…	Application Types Window		แก้ไข
+Could not set preferred application	FileTypes Window		ไม่สามารถตั้งค่าแอปพลิเคชันที่ต้องการ
+Description	FileTypes Window		ลักษณะ
+Signature:	Application Types Window		ลายมือชื่อ:
+None	FileTypes Window		ไม่มี
+Exclusive launch	Application Type Window		เปิดพิเศษ
+Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		การลบประเภทไฟล์ไม่สามารถเปลี่ยนกลับได้\nคุณแน่ใจหรือไม่ว่าต้องการลบ?
+Integer 64 bit	Attribute ListView		Integer 64 bit
+Cancel	New File Type Window		ยกเลิก
+Select same preferred application as	FileType Window		เลือกแอปพลิเคชันที่ต้องการเช่นเดียวกัน
+Cancel	Type List Window		ยกเลิก
+Don't save	Application Type Window		ไม่บันทึก
+Center	Attribute Window	Attribute column alignment in Tracker	ตรงกลาง
+Done	Extension Window		เสร็จแล้ว
+Development	Application Types Window		พัฒนา
+Same as…	FileType Window	The same APPLICATION as ...	คล้ายกัน
+Abort	Application Types Window		ยกเลิก
+Save	Application Type Window		บันทึก
+%1 application type	Application Type Window		%1 ชนิดแอพลิเคชั่น
+Icon	Application Type Window		ไอคอน
+Duration	Attribute ListView		ระยะเวลา
+Version:	Application Type Window		เวอร์ชั่น:
+Default application	FileType Window		แอพพลิเคชั่น
+Internal name:	New File Type Window		ชื่อภายใน:
+Integer 8 bit	Attribute ListView		Integer 8 bit
+Extension:	Extension Window		ขยาย:
+Time	Attribute ListView		เวลา
+Extensions:	FileTypes Window		ขยาย:
+Select preferred application	FileType Window		เลือกแอปพลิเคชันที่ต้องการ
+Description:	FileTypes Window		รายละเอียด:
+Multiple files from \"%s\" file type	FileType Window		ไฟล์หลายไฟล์จาก \"%s\" ประเภทไฟล์
+Add new group	New File Type Window		เพิ่มกลุ่มใหม่
+Remove uninstalled	Application Types Window		ลบการถอนการติดตั้ง
+File	Application Type Window		ไฟล์
+Progress	Application Types Window		ความคืบหน้า
+Select…	FileType Window		เลือก
+Information	Application Types Window		ข้อมูล
+Settings	FileTypes Window		ตั้งค่า
+Done	Attribute Window		เสร็จ
+FileTypes request	FileTypes		คำขอประเภทไฟล์
+Select same type as	FileType Window		เลือกประเภทเดียวกัน
+Version:	Application Types Window		เวอร์ชั่น:
+(from application)	FileTypes Window		(จากแอปพลิเคชัน)
+Application types	Application Types Window		ชนิดแอพพลิเคชั่น
+Description:	Application Types Window		รายละเอียด:
+Name:	Application Types Window		ชื่อ:
+Rating	Attribute ListView		อัตรา
+duration	Attribute ListView		ระยะเวลา
+File could not be opened	Preferred App Menu		ไฟล์ไม่สามารถเปิดได้
+Args only	Application Type Window		Args เท่านั้น
+Could not open \"%s\":\n%s	FileTypes		ไม่สามารถเปิดได้ \"%s\":\n%s
+Right	Attribute Window	Attribute column alignment in Tracker	ถูกต้อง
+Save changes before closing?	Application Type Window		บันทึกการเปลี่ยนแปลงก่อนปิดหรือไม่?
+Background app	Application Type Window		แอปพื้นหลัง
+Recognition rule is not valid:\n\n	FileTypes Window		กฎการรับรู้ไม่ถูกต้อง:\n\n
+Show icons in list	FileTypes Window		แสดงไอคอนในรายการ
+Editable	Attribute Window	If Tracker allows to edit this attribute.	สามารถแก้ไขได้
+New resource file…	FileTypes Window		ไฟล์ทรัพยากรใหม่
+[Multiple files] file types	FileType Window		[ไฟล์หลายไฟล์] ประเภทไฟล์
+Application type	Application Type Window		ประเภทการใช้งาน
+Show in Tracker…	Application Types Window		แสดงในตัวติดตาม
+Type name:	FileTypes Window		ชื่อประเภท:
+Visible	Attribute Window		มองเห็นได้
+Select preferred application	FileTypes Window		เลือกแอปพลิเคชันที่ต้องการ
+Path:	Application Types Window		พาธ:
+rating	Attribute ListView		อัตรา
+Could not install file type	New File Type Window		ไม่สามารถติดตั้งชนิดไฟล์ได้
+Same as…	FileTypes Window		เหมือนกัน
+Golden master	Application Type Window		Golden master
+Checkbox	Attribute ListView		ช่องทำเครื่องหมาย
+FileTypes request	Preferred App Menu		คำขอประเภทไฟล์
+no icon	FileTypes Window		ไม่มีไอคอน
+Single launch	Application Type Window		ทำงานครั้งเดียว
+%s file type	FileType Window		%s ชนิดไฟล์
+Default	Attribute ListView		ค่าเริ่มต้น
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		การลบประเภทซุปเปอร์ไม่สามารถเปลี่ยนกลับได้\nไฟล์ทุกประเภทที่เป็นของประเภทซูเปอร์นี้จะหายไป!\n\nคุณแน่ใจหรือว่าต้องการทำสิ่งนี้ หากต้องการลบทั้งกลุ่มให้กดปุ่ม Shift ค้างไว้แล้วกด \"ลบ\"
+String	Attribute ListView		สตริง
+Add type	New File Type Window		เพิ่มประเภท
+Remove icon	Icon View		ลบไอคอน
+Boolean	Attribute ListView		Boolean
+Cancel	Extension Window		ยกเลิก
+Alignment:	Attribute Window		การวางแนว:
+Icon	FileType Window		ไอคอน
+Signature:	Application Type Window		ลายมือชื่อ:
+Development	Application Type Window		การพัฒนา
+Golden master	Application Types Window		Golden master
+Add	Extension Window		เพิ่ม
+Open…	FileTypes Window		เปิด
+checkbox	Attribute ListView		ช่องทำเครื่องหมาย
+Could not change file extensions	Extension Window		ไม่สามารถเปลี่ยนนามสกุลไฟล์
+Could not open file	FileType Window		ไม่สามารถเปิดไฟล์
+Choose type	Type List Window		เลือกประเภท
+Select…	FileTypes Window		เลือก
+File recognition	FileTypes Window		ไฟล์รู้จัก
+Application types…	FileTypes Window		ชนิดแอพพลิเคชั่น
+Add icon…	Icon View		เพิ่มไอคอน
+Cancel	FileTypes Window		ยกเลิก
+Save into resource file…	Application Type Window		บันทึกลงในไฟล์ทรัพยากร
+Special:	Attribute Window		พิเศษ:
+Type:	Attribute Window		ชนิด:
+Could not retrieve application signature	Preferred App Menu		ไม่สามารถเรียกลายเซ็นของแอปพลิเคชัน
+Beta	Application Types Window		เบต้า
+Add group	New File Type Window		เพิ่มกลุ่ม
+Cancel	Attribute Window		ยกเลิก
+Gamma	Application Types Window		แกมม่า
+Supported types	Application Type Window		ชนิดที่รองรับ
+Integer 32 bit	Attribute ListView		Integer 32 bit
+Beta	Application Type Window		เบต้า
+Could not retrieve preferred application of this file	Preferred App Menu		ไม่สามารถเรียกแอปพลิเคชันที่ต้องการของไฟล์นี้
+Application flags	Application Type Window		ปักธงแอพพลิชั่น
+OK	FileTypes		ตกลง
+Group name:	New File Type Window		ชื่อกลุ่ม:
+Move up	FileTypes Window		ย้ายขึ้น
+File	FileTypes Window		ไฟล์
+Add	Attribute Window		เพิ่ม
+Open file	FileTypes		เปิดไฟล์
+Version info	Application Type Window		ข้อมูลเวอร์ชั่น
+Final	Application Type Window		สุดท้าย
+Preferred application	FileType Window		แอพพลิเคชั่นที่ต้องการ
+FileTypes	FileTypes		ชนิดไฟล์
+Set preferred application	Preferred App Menu		ตั้งค่าแอปพลิเคชันที่ต้องการ
+New file type	New File Type Window		ชนิดไฟล์ใหม่
+Short description:	Application Type Window		รายละเอียดสั้น:
+Save request	Application Type Window		ร้องขอบันทึก
+Could not remove file type: %s\n	FileTypes Window		ไม่สามารถลบประเภทไฟล์: %s\n
+Display as:	Attribute Window	Tracker offers different display modes for attributes.	แสดงเป็น:
+Done	Type List Window		เสร็จ
+Extra attributes	FileTypes Window		attributes เพิ่มเติม
+Group:	New File Type Window		กลุ่ม:
+Alpha	Application Types Window		อัลฟ่า
+Close	Application Type Window		ปิด
+Integer 16 bit	Attribute ListView		Integer 16 bit
+Extension	Extension Window		ขยาย
+Rule:	FileTypes Window		กฎ:
+FileTypes	System name		ชนิดไฟล์
+Version	Application Types Window		เวอร์ชั่น
+Quit	FileTypes Window		ปิด
+File type	FileType Window		ชนิดไฟล์
+Internal name:	FileTypes Window		ชื่อภายใน:
+Add…	FileTypes Window		เพิ่ม
+Edit icon…	Icon View		แก้ไขไอคอน
+Internal name:	Attribute Window		ชื่อภายใน:
+Show recognition rule	FileTypes Window		แสดงกฏที่รับรู้
+Double	Attribute ListView		สองเท่า
+Move down	FileTypes Window		ย้ายลง
+Alpha	Application Type Window		อัลฟ่า

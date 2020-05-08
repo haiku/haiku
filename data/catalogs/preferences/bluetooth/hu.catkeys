@@ -6,10 +6,10 @@ Quit	main		Kilépés
 Manufacturer: 	Device View		Gyártó:
 Desktop	Settings view		Asztal
 Server	Window		Kiszolgáló
-Identify host as:	Settings view		Gazdagép azonosítása mint:
+Identify host as:	Settings view		Gazdagép azonosítása mint
 Refresh…	Remote devices		Frissítés…
-Local devices found on system:	Settings view		Helyi megtalált eszközök a rendszerben:
-Service classes: 	Device View		Szervizosztályok: 
+Local devices found on system:	Settings view		Helyi megtalált eszközök a rendszerben
+Service classes: 	Device View		Szervizosztályok:
 Remote devices	Window		Távoli eszközök
 Settings	Window		Beállítások
 Stop bluetooth services…	Window		Bluetooth-szolgáltatások leállítása…
@@ -37,7 +37,7 @@ Help	Window		Segítség
 Pair…	Remote devices		Párosítás…
 Retrieving name of %1	Inquiry panel		%1 nevének fogadása
 Inquiry	Inquiry panel		Lekérdezés
-Incoming connections policy:	Settings view		Bejövő kapcsolatokra vonatkozó szabály:
+Incoming connections policy:	Settings view		Bejövő kapcsolatokra vonatkozó szabály
 Retrieving names…	Inquiry panel		Nevek beolvasása…
 Show name	Extended local device view		Név mutatása
 Add device to list	Inquiry panel		Eszköz hozzáadása
@@ -47,7 +47,7 @@ Discoverable	Extended local device view		Felfedezhető
 Authenticate	Extended local device view		Hitelesítés
 Smart phone	Settings view		Okostelefon
 Scanning completed.	Inquiry panel		Keresés befejezve.
-Default inquiry time:	Settings view		Alapértelmezett lekérdezési időkorlát:
+Default inquiry time:	Settings view		Alapértelmezett lekérdezési időkorlát
 Server	Settings view		Kiszolgáló
 Handheld	Settings view		Mobiltelefon
  packets: 	Device View		csomagok:

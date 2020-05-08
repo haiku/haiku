@@ -20,7 +20,7 @@ SCSI Information	DeviceSCSI		SCSI 情報
 Manufacturer	Device		製造元
 Device name:	Device		デバイス名:
 Scanner	DeviceSCSI		スキャナー
-Memory controller	Device		メモリーコントローラー
+Memory controller	Device		メモリコントローラー
 Unknown device	DevicesView		不明なデバイス
 Unknown	DevicePCI		不明
 ACPI node '%1'	DeviceACPI		ACPI ノード '%1'

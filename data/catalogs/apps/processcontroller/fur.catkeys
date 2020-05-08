@@ -2,11 +2,11 @@
 Error saving file	ProcessController		Erôr tal salvâ il file
 Display priority	ProcessController		Prioritât di visualizazion
 That's no Fun!	ProcessController		Nol fâs ridi!
-What do you want to do with the team \"%s\"?	ProcessController		Ce vûstu fâ cul complès \"%s\"?
+What do you want to do with the team \"%s\"?	ProcessController		Ce vûstu fâ cul team \"%s\"?
 Your setting file could not be saved!\n(%s)	ProcessController		Il to file des impostazions nol pues jessi salvât!\n(%s)
 Processor %d	ProcessController		Processôr %d
 Live in the Deskbar	ProcessController		Vîf tal Deskbar
-Kill this team!	ProcessController		Cope chest complès!
+Kill this team!	ProcessController		Cope chest team!
 OK	ProcessController		Va ben
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Si pues eseguî "Controlôr dai procès" intun barcon o instalâlu tal Deskbar.
 Real-time priority	ProcessController		Prioritât in timp reâl
@@ -30,12 +30,12 @@ Threads and CPU usage	ProcessController		Thread e ûs de CPU
 Quit application	ProcessController		Jes de aplicazion
 Info	ProcessController		Informazions
 Kill this thread!	ProcessController		Cope chest thread!
-This team is already gone…	ProcessController		Chest complès al è za lât…
-Gone teams…	ProcessController		Complès lâts…
+This team is already gone…	ProcessController		Chest team al è za lât…
+Gone teams…	ProcessController		Team lâts…
 Quit an application	ProcessController		Siere une aplicazion
 Cancel	ProcessController		Cancele
 Install in Deskbar	ProcessController		Instale tal Deskbar
-Debug this team!	ProcessController		Fâs il debug di chest complès!
+Debug this team!	ProcessController		Fâs il debug di chest team!
 Low latency	ProcessController		Timp di rispueste bas
 ProcessController	System name		Controlôr dai procès
 Lowest active priority	ProcessController		Prioritât ative plui basse

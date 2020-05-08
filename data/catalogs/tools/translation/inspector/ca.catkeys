@@ -4,14 +4,14 @@ Next Page	ImageWindow		Pàgina següent
 Previous Page	ImageWindow		Pàgina anterior
 Active Translators	InspectorApp		Traductors actius
 System Translators	ActiveTranslatorsWindow		Traductors del sistema
-\nType: '%1' (%2)\nGroup: '%3' (%4)\nQuality: %5\nCapability: %6\nMIME Type: %7\nName: %8\n	ImageView		\nTipus: '%1' (%2)\nGrup: '%3' (%4)\nQualitat: %5\nFuncionalitat: %6\nTipus MIME: %7\nNom: %8\n
+\nType: '%1' (%2)\nGroup: '%3' (%4)\nQuality: %5\nCapability: %6\nMIME Type: %7\nName: %8\n	ImageView		\nTipus: %1 (%2)\nGrup: %3 (%4)\nQualitat: %5\nFuncionalitat: %6\nTipus MIME: %7\nNom: %8\n
 OK	ImageWindow		D'acord
 View	ImageWindow		Visualitza
 Open…	ImageWindow		Obre...
 Save feature not implemented yet.	ImageWindow		La funció de desar encara no està disponible.
 Active Translators	ImageWindow		Traductors actius
 Info	ImageWindow		Informació
-Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal Bytes: %7\n\nIdentify Info:\nID String: %8\nMIME Type: %9\nType: '%10' (%11)\nTranslator ID: %12\nGroup: '%13' (%14)\nQuality: %15\nCapability: %16\n\nExtension Info:\n	ImageView		Imatge: %1\nEspai del color: %2 (%3)\nDimensions: %4 x %5\nBytes per fila: %6\nBytes totals: %7\n\nInformació de la identitat:\nCadena: %8\nTipus MIME: %9\nTipus: '%10' (%11)\nTraductor: %12\nGrup: '%13' (%14)\nQualitat: %15\nFuncionalitat: %16\n\nInformació de l'extensió:\n
+Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal Bytes: %7\n\nIdentify Info:\nID String: %8\nMIME Type: %9\nType: '%10' (%11)\nTranslator ID: %12\nGroup: '%13' (%14)\nQuality: %15\nCapability: %16\n\nExtension Info:\n	ImageView		Imatge: %1\nEspai del color: %2 (%3)\nDimensions: %4 x %5\nBytes per fila: %6\nBytes totals: %7\n\nInformació de la identitat:\nID de la cadena: %8\nTipus MIME: %9\nTipus: %10 (%11)\nID del traductor: %12\nGrup: %13 (%14)\nQualitat: %15\nCapacitat: %16\n\nInformació de l'extensió:\n
 No image available to save.	ImageWindow		No hi ha cap imatge per desar.
 OK	ImageView		D'acord
 Bummer	ImageWindow		Problema
@@ -24,7 +24,7 @@ Unknown	ImageView		Desconegut
 Info Win	InspectorApp	This is a quite narrow info window and title 'Info Win' is therefore shortened.	Informació de la pàgina
 Sorry, unable to load the image.	ImageView		Disculpeu, no es pot carregar la imatge.
 File	ImageWindow		Fitxer
-Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Document triat: %1\n\nTraductor usat:\nNom: %2\nInformació: %3\nVersió: %4\n
+Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Document seleccionat: %1\n\nTraductor usat:\nNom: %2\nInformació: %3\nVersió: %4\n
 Quit	ImageWindow		Surt
 Sorry, unable to write the image file.	ImageView		Disculpeu, no es pot escriure el fitxer d'imatge.
 Save…	ImageWindow		Desa...

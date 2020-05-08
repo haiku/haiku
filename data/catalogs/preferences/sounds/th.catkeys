@@ -1,0 +1,15 @@
+1	thai	x-vnd.Haiku-Sounds	1784495232
+Sounds	System name		เสียง
+Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		เสียง\nโดย:\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL\nงานต้นฉบับจาก Atsushi Takamatsu\nลิขสิทธิ์© 2003-2006 Haiku
+No such file or directory	HEventList		ไม่พบไฟล์หรือโฟลเดอร์
+OK	HWindow		ตกลง
+Other…	HWindow		อื่นๆ
+OK	SoundsHApp		ตกลง
+Sound file:	HWindow		ไฟล์เสียง:
+This is not an audio file.	HWindow		นี่ไม่ใช่ไฟล์เสียง
+<none>	HEventList		<none>
+OK	HEventList		ตกลง
+About Sounds	SoundsHApp		เกี่ยวกับเสียง
+Sound	HEventList		เสียง
+Event	HEventList		เหตุการณ์
+<none>	HWindow		<none>

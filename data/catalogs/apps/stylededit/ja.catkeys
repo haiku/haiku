@@ -23,7 +23,7 @@ Words:	Statistics		単語数:
 ???	LoadAlert		???
 Recover	NodeMonitorAlerts		回復
 Error saving \"%s\":\n%s	SaveAlert		\"%s\" を保存中にエラーが発生しました:\n%s
-OK	RevertToSavedAlert		Ok
+OK	RevertToSavedAlert		OK
 Unlock file	StatusView		ロック解除
 Italic	Menus		イタリック
 Can't undo	Menus		元に戻せません
@@ -47,7 +47,7 @@ Close	Menus		閉じる
 Error loading \"%s\":\n\tUnsupported format	LoadAlert		\"%s\" を読み込み中にエラーが発生しました:\n\t サポートされていないフォーマットです。
 Left	Menus		左揃え
 Default	Menus		デフォルト
-OK	SaveAlert		Ok
+OK	SaveAlert		OK
 Color	Menus		色
 Save changes to the document \"%s\"? 	QuitAlert		\"%s\" が変更されましたが、保存されていません。終了前に保存しますか?
 StyledEdit	System name		StyledEdit

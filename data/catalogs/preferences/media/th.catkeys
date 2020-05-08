@@ -1,0 +1,29 @@
+1	thai	x-vnd.Haiku-Media	582516163
+Couldn't add volume control in Deskbar: %s\n	Media views		ไม่สามารถเพิ่มตัวควบคุมระดับเสียงในเดสก์บาร์: %s\n
+Restart media services	Media views		เริ่มบริการสื่อใหม่
+Quit	Media Window		ออก
+<none>	VideoInputMenu	Used when no video input is available	<none>
+Couldn't remove volume control in Deskbar: %s\n	Media views		ไม่สามารถลบตัวควบคุมระดับเสียงในเดสก์บาร์: %s\n
+Video output:	Media views		เอาท์พุทวิดีโอ:
+Video input:	Media views		อินพุตวิดีโอ:
+Audio output:	Media views		เอาต์พุตเสียง:
+Please select a SoundFont.	Midi View		กรุณาเลือก SoundFont.
+There are no SoundFonts installed.	Midi View		ไม่มี SoundFonts ติดตั้ง
+Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		การเลิกใช้สื่อตอนนี้จะหยุดการเริ่มบริการสื่อใหม่ ฟังก์ชันการทำงานของสื่อที่ไม่สม่ำเสมอหรือไม่พร้อมใช้งานเป็นผลลัพธ์ที่เป็นไปได้
+Could not connect to the media server.\nWould you like to start it ?	Media Window		ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์สื่อ\nคุณต้องการเริ่มหรือไม่?
+Video settings	Media Window		ตั้งค่าวีดิโอ
+Audio mixer	Media Window		ผสมสัญญาณเสียง
+Show volume control on Deskbar	Media views		แสดงตัวควบคุมระดับเสียงบนเดสก์บาร์
+Start media server	Media Window		เริ่มต้นเซิร์ฟเวอร์สื่อ
+Audio settings	Media Window		ตั้งค่าเสียง
+Quit anyway	Media Window		ออก
+Media	System name		สื่อ
+Warning!	Media Window		เตือน!
+MIDI Settings	Media Window		ตั้งค่า MIDI
+SoundFonts	Midi View		SoundFonts
+Audio input:	Media views		อินพุตเสียง:
+<none>	Media views		<none>
+Channel:	Media views		ช่อง:
+This hardware has no controls.	Media Window		ฮาร์ดแวร์นี้ไม่มีตัวควบคุม
+Defaults	Media views		ค่าเริ่มต้น
+<none>	VideoOutputMenu	Used when no video output is available	<none>

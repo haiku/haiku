@@ -9,9 +9,9 @@ Preparing to archive	file:ZipperThread.cpp		เตรียมที่เก็
 Let them continue	file:ZipOMatic.cpp		ทำต่อไป
 Continue	file:ZipOMaticWindow.cpp		ต่อไป
 Archive created OK	file:ZipOMaticWindow.cpp		สร้างที่เก็บถาวร ตกลง
-{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# file added.} other{# files added.}} 
+{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# file added.} อื่นๆ{# files added.}}
 Stop	file:ZipOMaticWindow.cpp		หยุด
 Stopped	file:ZipOMaticWindow.cpp		หยุด
 Archive	file:ZipperThread.cpp		เก็บ
 Creating archive: %s	file:ZipOMaticWindow.cpp		สร้างที่เก็บ: %s
-You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		คุณมี {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n
+You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		คุณมี {0, plural, one{# Zip-O-Matic} อื่นๆ{# Zip-O-Matics}} กำลังทำงาน\n\n

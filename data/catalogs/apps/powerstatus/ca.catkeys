@@ -19,7 +19,7 @@ Last full charge: 	PowerStatus		Darrera càrrega completa:
 Battery unused	PowerStatus		Bateria no usada
 Extended battery info	PowerStatus		Informació ampliada de la bateria
  mA	PowerStatus		 mA
-Current rate: 	PowerStatus		Taxa actual:
+Current rate: 	PowerStatus		Freqüència actual: 
 discharging	PowerStatus		es descarrega
 Show text label	PowerStatus		Mostra l'etiqueta de text
 About…	PowerStatus		Quant a...

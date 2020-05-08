@@ -27,9 +27,9 @@ Help	SudokuWindow		Ajuda
 OK	SudokuWindow		D'acord
 Sudoku	System name		Sudoku
 Progress monitor	ProgressWindow		Indicador de progrés
-Creating solvable field	SudokuGenerator		S'esta creant un camp resoluble
+Creating solvable field	SudokuGenerator		Es crea un camp resoluble
 View	SudokuWindow		Visualitza
 Snapshot current	SudokuWindow		Captura actual
 Mark valid hints	SudokuWindow		Marca les millores vàlides
-Sudoku request	SudokuWindow		Demana un Sudoku
+Sudoku request	SudokuWindow		Sol·licitud de Sudoku
 Open file…	SudokuWindow		Obre un fitxer...

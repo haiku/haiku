@@ -3,7 +3,7 @@ Test page	TestPageView		Pàgina de prova
 Remove	PrintersWindow		Suprimeix
 Red	TestPageView		Vermell
 Default Printer	PrinterListView		Impressora predeterminada
-<pick one>	AddPrinterDialog		<trie'n un>
+<pick one>	AddPrinterDialog		<trieu-ne una>
 Connected to:	AddPrinterDialog		Connectat a:
 Make default	PrintersWindow		Fes-la predeterminada
 Cyan	TestPageView		Cian
@@ -25,7 +25,7 @@ Add…	PrintersWindow		Afegeix...
 Magenta	TestPageView		Magenta
 Transport: %transport% %transport_address%	TestPageView		Transport: %transport% %transport_address%
 Add	AddPrinterDialog		Afegeix
-Print jobs: No printer selected	PrintersWindow		Feines d'impressió: No s'ha triat cap impressora
+Print jobs: No printer selected	PrintersWindow		Tasques d'impressió: no s'ha seleccionat cap impressora.
 Printer name:	AddPrinterDialog		Nom de la impressora:
 Yellow	TestPageView		Groc
 Black	TestPageView		Negre
@@ -35,7 +35,7 @@ Printers	System name		Impressores
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Impressora: %printer_name%\nControlador:  %driver%\n
 Green	TestPageView		Verd
 Print test page	PrintersWindow		Imprimeix una pàgina de prova
-Restart job	PrintersWindow		Reinicia la feina
+Restart job	PrintersWindow		Reinicia la tasca
 Driver: %driver%	PrinterListView		Controlador: %driver%
-Cancel job	PrintersWindow		Anuŀla la feina
+Cancel job	PrintersWindow		Cancel·la la tasca
 %.2f KB	JobListView		%.2f KB

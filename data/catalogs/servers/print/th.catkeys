@@ -12,7 +12,7 @@ B5 (JIS)	ConfigWindow	JIS P0138 B5, a Japanese paper size	B5 (JIS)
 OK	ConfigWindow		ตกลง
 Cancel	ConfigWindow		ยกเลิก
 Printer server	ConfigWindow		เซิร์ฟเวอร์เครื่องพิมพ์
-Page %1 to %2, %3 copies	ConfigWindow		หน้า %1 ถึง %2,%3 สำเนา  
+Page %1 to %2, %3 copies	ConfigWindow		หน้า %1 ถึง %2,%3 สำเนา
 A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		มีเครื่องพิมพ์ที่ใช้ชื่อนั้นแล้ว แต่ไม่พบไดรเวอร์! เปลี่ยนใหม่ไหม?
 Yes	PrintServerApp		ใช่
 Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	บัญชีแยกประเภท

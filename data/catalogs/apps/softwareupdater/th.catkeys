@@ -1,6 +1,6 @@
 1	thai	x-vnd.haiku-softwareupdater	369324613
 Updating version	SoftwareUpdaterWindow	List item text	กำลังอัปเดตเวอร์ชัน
-Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		คลิกที่นี่เพื่อติดตั้ง {0, plural, one{# updated package} other{# updated packages}}
+Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		คลิกที่นี่เพื่อติดตั้ง {0, plural, one{# updated package} อื่นๆ{# updated packages}}
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	แพ็คเกจที่จะถอนการติดตั้ง
 No active network connection was found	UpdateManager	Error message	ไม่พบการเชื่อมต่อเครือข่ายที่ใช้งานอยู่
 Quit	SoftwareUpdaterWindow	Alert button label	ออก
@@ -49,14 +49,14 @@ Show more details	SoftwareUpdaterWindow		แสดงรายละเอีย
 Installing version	SoftwareUpdaterWindow	List item text	ติดตั้งเวอร์ชั่น
 Checking for updates	CheckManager		ตรวจสอบการอัปเดต
 No remote repositories are available	UpdateManager	Error message	ไม่มีที่เก็บข้อมูลระยะไกล
-Software {0, plural, one{update} other{updates}} available	CheckManager		ซอฟ์แวร์  {0, plural, one{update} other{updates}} พร้อมใช้งาน
-Reboot	SoftwareUpdaterWindow	Button label	รีบูธ
+Software {0, plural, one{update} other{updates}} available	CheckManager		ซอฟ์แวร์ {0, plural, one{update} อืนๆ{updates}} พร้อมใช้งาน
+Reboot	SoftwareUpdaterWindow	Button label	รีบูท
 Update	SoftwareUpdaterWindow	Alert button label	อัปเดต
 Open Repositories	SoftwareUpdaterWindow	Alert button label	เปิดที่เก็บข้อมูล
 Updates did not complete	UpdateAction		อัปเดตไม่สมบรูณ์
 Invalid update type, cannot continue with updates	UpdateAction		ประเภทการอัปเดตไม่ถูกต้อง ไม่สามารถดำเนินการอัปเดตได้
 Uninstalling version	SoftwareUpdaterWindow	List item text	ยกเลิกการติดตั้งเวอร์ชั่น
-%i of %i	UpdateManager	Do not translate %i	%i of %i
+%i of %i	UpdateManager	Do not translate %i	%i ของ %i
 Quit	SoftwareUpdaterWindow		ออก
 No updates available	CheckManager		ไม่มีการอัปเดต
 Usage:  SoftwareUpdater <command> [ <option> ]\nUpdates installed packages.\n\nCommands:\n  update     - Search repositories for updates on all packages.\n  check      - Check for available updates but only display a notification with results.\n  full-sync  - Synchronize the installed packages with the repositories.\n\nOptions:\n  -h or --help       Print this usage help\n  -v or --verbose    Output verbose information\n	SoftwareUpdaterApp	Command line usage help	การใช้งาน: SoftwareUpdater <command> [<option>]\nอัปเดตแพ็คเกจที่ติดตั้ง\n\nคำสั่ง\nอัปเดต - ค้นหาที่เก็บข้อมูลสำหรับการอัปเดตในแพ็คเกจทั้งหมด\nตรวจสอบ - ตรวจสอบการอัปเดตที่มี แต่แสดงการแจ้งเตือนพร้อมผลลัพธ์เท่านั้น\nซิงค์เต็ม - ซิงโครไนซ์แพ็คเกจที่ติดตั้งไว้กับที่เก็บ\n\nตัวเลือก:\n-h or --ช่วย พิมพ์ช่วยเหลือการใช้งานนี้\n-v หรือ --verbose เอาท์พุทข้อมูล verbose\n

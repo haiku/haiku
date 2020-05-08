@@ -32,4 +32,4 @@ Application	NotificationView		Program
 Enable notifications	GeneralView		Értesítések engedélyezése
 This is a test notification message	PrefletWin		Ez egy próba értesítés
 Remove	NotificationView		Eltávolítás
-Position:	GeneralView		Pozíció:
+Position:	GeneralView		Pozíció

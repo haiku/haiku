@@ -9,7 +9,7 @@ Could not resolve server address	Time		Impussibil risolvi la direzion dal servid
 Set time zone	Time		Stabilìs fûs orari
 Waiting for answer failed	Time		No si è rivâts a spietâ la rispueste
 <Other>	Time		<Altri>
-Received invalid time	Time		Ricevût orari no valit
+Received invalid time	Time		Ricevude ore no valide
 Remove	Time		Gjave
 Synchronize again	Time		Torne sincronize
 Asia	Time		Asie
@@ -37,7 +37,7 @@ Pacific	Time		Pacific
 Atlantic	Time		Atlantic
 Show clock in Deskbar	Time		Mostre orloi tal Deskbar
 Display time with seconds	Time		Mostre ore cui seconts
-Time	System name		Orari
+Time	System name		Ore
 about	Time		informazions
 Show time zone	Time		Mostre fûs orari
 Synchronize at boot	Time		Sincronize al inviament

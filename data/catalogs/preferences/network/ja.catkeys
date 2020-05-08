@@ -1,7 +1,7 @@
 1	japanese	x-vnd.Haiku-Network	2923905377
 Ethernet device	InterfaceListItem		イーサネットデバイス
 Link speed:	IntefaceView		リンクスピード:
-disconnected	IntefaceView		切断済み
+disconnected	IntefaceView		切断済
 IP Address:	IntefaceAddressView		IP アドレス:
 WPA	WPA protected network		WPA
 Network:	IntefaceView		ネットワーク:
@@ -23,13 +23,13 @@ off	ServiceListItem		オフ
 WEP	WEP protected network		WEP
 <no wireless networks found>	IntefaceView		<無線ネットワークが見つかりません>
 Enable	IntefaceView		有効
-connected	IntefaceView		接続済み
+connected	IntefaceView		接続済
 Apply	IntefaceAddressView		適用
 Disable	ServiceView		無効
 WPA2	WPA2 protected network		ネットマスクはローカルネットワークを定義します
 Show network status in Deskbar	NetworkWindow		Deskbar にネットワークの状態を表示
 Mode:	IntefaceAddressView		モード:
-connected	InterfaceListItem		接続済み
+connected	InterfaceListItem		接続済
 OK	NetworkWindow		OK
 Static	IntefaceAddressView		固定 IP
 launch error	NetworkWindow		その他

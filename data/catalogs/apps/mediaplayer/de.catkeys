@@ -144,7 +144,7 @@ Save as…	MediaPlayer-PlaylistWindow		Speichern als…
 Error: 	MediaPlayer-RemovePLItemsCmd		Fehler: 
 300% scale	MediaPlayer-Main		300% Zoom
 Open	MediaPlayer-Main		Öffnen
-ask every time	MediaPlayer-SettingsWindow		immer fragen
+ask every time	MediaPlayer-SettingsWindow		jedesmal fragen
 (not supported)	MediaPlayer-InfoWin		(nicht unterstützt)
 Randomize	MediaPlayer-PlaylistWindow		Zufällige Reihenfolge
 %.3f fps	MediaPlayer-InfoWin		%.3f Bilder/s

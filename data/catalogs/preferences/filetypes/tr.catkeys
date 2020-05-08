@@ -97,7 +97,7 @@ Golden master	Application Type Window		Altın kopya
 Checkbox	Attribute ListView		Denetim kutusu
 FileTypes request	Preferred App Menu		Dosya Türleri isteği
 no icon	FileTypes Window		simge yok
-Single launch	Application Type Window		Tekil çalıştır
+Single launch	Application Type Window		Tek çalıştır
 %s file type	FileType Window		%s dosya türü
 Default	Attribute ListView		Öntanımlı
 Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Bir süper türü kaldırma işlemi geri alınamaz.\nBu süper türe ait olan tüm dosya türleri silinecek!\n\nBunu yapmak istediğinizden emin misiniz? Tüm grubu kaldırmak için Shift düğmesine basılı tutun ve \"Kaldır\"ı tıklayın.

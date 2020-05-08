@@ -7,7 +7,7 @@ Download folder:	Settings Window		Cartella dei file scaricati:
 Close window	WebPositive Window		Chiudi finestra
 Find:	WebPositive Window		Trova:
 Script console	WebPositive Window		Console
-Fonts	Settings Window		Caratteri
+Fonts	Settings Window		Tipi di caratteri
 Path	Cookie Manager		Percorso:
 of	Download Window	...as in '12kB of 256kB'	di
 Bookmarks	WebPositive Window		Segnalibri
@@ -48,7 +48,7 @@ Open downloads folder	Download Window		Apri cartella dei file scaricati
 Proxy server	Settings Window		Server proxy
 Decrease size	WebPositive Window		Diminuisci dimensioni
 Default fixed font size:	Settings Window		Dimensione predefinita caratteri a spaziatura fissa:
-Sans serif font:	Settings Window		Carattere sans serif:
+Sans serif font:	Settings Window		Tipo di carattere senza grazie:
 Clear	WebPositive Window		Pulisci
 Cookies for %s	Cookie Manager		Cookie per %s
 The download could not be opened.	Download Window		La cartella dei file scaricati non può essere aperta.
@@ -95,7 +95,7 @@ Proxy username:	Settings Window		Nome utente server proxy:
 Manage bookmarks	WebPositive Window		Gestisci segnalibri
 /s)	Download Window	...as in 'per second'	/s)
 Restart	Download Window		Riavvia
-Serif font:	Settings Window		Carattere serif:
+Serif font:	Settings Window		Tipo di carattere con grazie:
 Apply	Settings Window		Applica
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	C'è stato un errore nel tentativo di mostrare la cartella dei segnalibri.\n\nErrore: %error
 Revert	Settings Window		Ripristina

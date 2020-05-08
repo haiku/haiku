@@ -83,6 +83,6 @@ FTP	CodyCam		FTP
 Error creating output file	VideoConsumer.cpp		Ошибка при создании файла
 Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Не найден источник видеосигнала.\nПожалуйста, подключите вебкамеру.
 Logging in…	VideoConsumer.cpp		Авторизация…
-CodyCam	System name		Вебкамера
+CodyCam	System name		Веб-камера
 Error writing output file	VideoConsumer.cpp		Ошибка при записи файла
 Capture controls	CodyCam		Настройки захвата

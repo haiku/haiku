@@ -148,7 +148,7 @@ Caps	Icon-O-Matic-PropertyNames		ตัวพิมพ์ใหญ่
 OK	Icon-O-Matic-SVGImport		ตกลง
 Append…	Icon-O-Matic-Menu-File		ผนวก
 Scale Y	Icon-O-Matic-PropertyNames		สเกล Y
-Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		ไม่สามารถเปิดไฟล์  '%s' เป็นเอกสาร SVG ได้ \n\nข้อผิดพลาด: %s
+Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		ไม่สามารถเปิดไฟล์ '%s' เป็นเอกสาร SVG ได้ \n\nข้อผิดพลาด: %s
 Export icon	Dialog title		ส่งออกไอคอน
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		สี (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		แก้ไขการไล่ระดับสี

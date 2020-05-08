@@ -16,7 +16,7 @@ Key	ShortcutsWindow		Clau
 Select	ShortcutsWindow		Seleccioneu
 Shortcuts	System name		Dreceres
 Quit	ShortcutsWindow		Surt
-(Choose application with file requester)	ShortcutsWindow		(Trieu una aplicació que demani un fitxer)
+(Choose application with file requester)	ShortcutsWindow		(Trieu una aplicació amb sol·licitud de fitxer)
 Cancel	ShortcutsWindow		Cancel·la
 *MoveMouse +20 +0	ShortcutsWindow		*Mou el ratolí +20 +0
 Control	ShortcutsSpec	Name for modifier on keyboard	Control
@@ -32,7 +32,7 @@ Save & apply	ShortcutsWindow		Desa i aplica-ho
 Open	ShortcutsWindow		Obre
 Append	ShortcutsWindow		Afegeix
 Both	ShortcutsSpec		Ambdós
-Save KeySet as…	ShortcutsWindow		Anomena i desa el conjunt de claus...
+Save KeySet as…	ShortcutsWindow		Desa el conjunt de claus com a...
 Append KeySet…	ShortcutsWindow		Afegeix un joc de claus...
 *MouseButton 1	ShortcutsWindow		*Botó 1 del ratolí
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Múltiple \"*Mou el ratolí a 100 % 0\" \"*Botó 1 del ratolí\"

@@ -15,7 +15,7 @@ Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Informació de classe:\t\t\t\t: %cl
 Mass storage controller	Device		Controlador d'emmagatzematge massiu
 Connection	DevicesView		Connexió
 Printer	DeviceSCSI		Impressora
-ACPI Processor Namespace '%2'	DeviceACPI		Espai de noms ACPI del Processador '%2'
+ACPI Processor Namespace '%2'	DeviceACPI		Espai de noms de processador ACPI "%2'"
 SCSI Information	DeviceSCSI		Informació de SCSI
 Manufacturer	Device		Fabricant
 Device name:	Device		Nom del dispositiu:
@@ -23,7 +23,7 @@ Scanner	DeviceSCSI		Escànner
 Memory controller	Device		Controlador de la memòria
 Unknown device	DevicesView		El dispositiu és desconegut
 Unknown	DevicePCI		Desconegut
-ACPI node '%1'	DeviceACPI		Node '%1' ACPI
+ACPI node '%1'	DeviceACPI		Node d'ACPI %1
 Optical Drive	DeviceSCSI		Unitat òptica
 Name	PropertyList		Nom
 Manufacturer	DeviceSCSI		Fabricant
@@ -40,7 +40,7 @@ PCI Information	DevicePCI		Informació PCI
 Tape Drive	DeviceSCSI		Unitat de cinta
 Changer	DeviceSCSI		Canviador
 Serial bus controller	Device		Controlador del bus sèrie
-Refresh devices	DevicesView		Refresca la llista dels dispositius
+Refresh devices	DevicesView		Actualitza la llista de dispositius
 Category	DevicesView		Categoria
 RBC	DeviceSCSI		RBC
 None	Device		Cap
@@ -56,10 +56,10 @@ Display controller	Device		Controlador de la pantalla
 Basic information	DevicesView		Informació bàsica
 ACPI Button '%1'	DeviceACPI		Botó d'ACPI %1
 Bus	DevicesView		Bus
-ACPI <unknown>	DeviceACPI		ACPI <unknown>
+ACPI <unknown>	DeviceACPI		ACPI <desconegut>
 Device name	DevicePCI		Nom del dispositiu
 Disk Drive	DeviceSCSI		Unitat de disc
-Other	DeviceSCSI		Altre
+Other	DeviceSCSI		Altres
 Report compatibility	DevicesView		Informe de compatibilitat
 Computer	Device		Ordinador
 PCI bus	Device		Bus PCI

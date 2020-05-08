@@ -100,7 +100,7 @@ Save Playlist	MediaPlayer-PlaylistWindow		プレイリストを保存
 Overlay	MediaPlayer-InfoWin		オーバーレイ
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (シネマスコープ)
 Rating	MediaPlayer-Main		評価
-Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		内部エラー (メモリー不足)。プレイリストの保存に失敗しました。
+Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		内部エラー (メモリ不足)。プレイリストの保存に失敗しました。
 Video	MediaPlayer-Main		ビデオ
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		ファイルフォーマットを扱うデコーダーがインストールされていません。または、デコーダーと特定のバージョンのフォーマットに問題があります。
 Lock Peaks	MediaPlayer-PeakView		ピークを固定

@@ -12,7 +12,7 @@ Asking background applications to quit.	ShutdownProcess		Es demana que s'aturin 
 Do you really want to restart the system?	ShutdownProcess		Segur que voleu reiniciar el sistema?
 Restart	ShutdownProcess		Reinicia
 It's now safe to turn off the computer.	ShutdownProcess		Ara és segur aturar l'ordinador.
-Asking other processes to quit.	ShutdownProcess		S'esta demanant als altres processos que surtin.
+Asking other processes to quit.	ShutdownProcess		Es demana a altres processos que s'aturin.
 Cancel shutdown	ShutdownProcess		Cancel·la l'aturada
 Restarting…	ShutdownProcess		Es reinicia...
 %action%?	ShutdownProcess		%action%?
@@ -20,4 +20,4 @@ Tidying things up a bit.	ShutdownProcess		Es fa una mica de neteja.
 Kill application	ShutdownProcess		Mata l'aplicació
 Shutdown aborted	ShutdownProcess		S'ha avortat el procés d'aturada del sistema.
 Shutting down…	ShutdownProcess		M'aturo...
-Asking \"%appName%\" to quit.	ShutdownProcess		S'esta demanant a \"%appName%\" que surtin.
+Asking \"%appName%\" to quit.	ShutdownProcess		Es demana a \"%appName%\" que s'aturi.

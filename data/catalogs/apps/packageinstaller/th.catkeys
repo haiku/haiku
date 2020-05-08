@@ -15,7 +15,7 @@ The given package seems to be already installed on your system. Would you like t
 Skip all	PackageView		ข้ามทั้งหมด
 The installation of the package has been aborted.	PackageView		การติดตั้งแพคเกจถูกยกเลิก
 No installation type selected	PackageView		ไม่ได้เลือกประเภทการติดตั้ง
-Do you want to remember this decision for the rest of this installation?\n	PackageView		คุณต้องการจดจำการตัดสินใจนี้สำหรับการติดตั้งที่เหลือหรือไม่? \n
+Do you want to remember this decision for the rest of this installation?\n	PackageView		คุณต้องการจดจำการตัดสินใจนี้สำหรับการติดตั้งที่เหลือหรือไม่?\n
 The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		แพ็คเกจที่เลือกไม่ได้ถูกลบออกจากระบบของคุณ ไฟล์ข้อมูลแพ็กเกจที่ติดตั้งที่ระบุอาจเสียหาย
 Install…	UninstallView		ติดตั้ง
 The item named '%s' already exists in the given path.\nReplace the item with the one from this package or skip it?	PackageView		ไอเท็มชื่อ '%s' มีอยู่แล้วในเส้นทางที่กำหนด\nแทนที่รายการด้วยรายการจากแพ็คเกจนี้หรือข้ามมันได้หรือไม่
@@ -34,9 +34,9 @@ Decline	PackageTextViewer		ปฎิเสธ
 Continue	PackageTextViewer		ต่อไป
 Installing package	PackageStatus		กำลังติดตั้งแพ็คเกจ
 Install %name%	PackageView		ติดตั้ง %name%
-%index% of %total%	PackageInstall		%index% of %total%
+%index% of %total%	PackageInstall		%index% ของ %total%
 No package selected.	UninstallView		ไม่ได้เลือกแพ็คเกจ
-%name% (%size% free)	PackageView		%name% (%size% free)
+%name% (%size% free)	PackageView		%name% (%size% ว่าง)
 Error while installing the package\n	PackageView		เกิดข้อผิดพลาดขณะติดตั้งแพ็คเกจ\n
 Finishing installation	PackageInstall		จบการติดตั้ง
 No package available.	PackageInfo		ไม่มีแพ็คเกจใช้งานได้

@@ -1,7 +1,7 @@
 1	japanese	x-vnd.Haiku-libmail	3450478295
-Partially download messages larger than	ProtocolConfigView		より大きいメッセージは部分ダウンロードする
+Partially download messages larger than	ProtocolConfigView		次より大きいメッセージは部分ダウンロード
 Password:	ProtocolConfigView		パスワード:
-Remove mail from server when deleted	ProtocolConfigView		ローカルから削除されたらメールをサーバーから削除
+Remove mail from server when deleted	ProtocolConfigView		ローカルからメールが削除されたらサーバーからも削除
 Mail server:	ProtocolConfigView		サーバー名:
 Select…	MailKit		選択…
 Connection type:	ProtocolConfigView		接続タイプ:

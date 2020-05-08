@@ -13,7 +13,7 @@ short\tlong\tdescription\n	FilePanelApp		สั้นt\tยาว\tคำอธ�
 -f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--ห้าม\tunimplemented\n
 usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n	FilePanelApp		การใช้งาน: %s [-h] [-d แฟ้มเอกสาร] [-l|-s] [-t ttl] [-1] [-m] [-a รูปแบบ] [-f รูปแบบ]\n
 -1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--เดี่ยว\tอนุญาตให้เลือกได้ 1 ไฟล์\n
--a\t--allow\tunimplemented\n	FilePanelApp		-a\t--อนุญาต\tunimplemented\n
+-a\t--allow\tunimplemented\n	FilePanelApp		-a\t--อนุญาต\tทำไม่สำเร็จ\n
 -m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\tสร้าง FilePanel modal\n
 options:\n	FilePanelApp		ตัวเลือก:\n
 -d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--ไดเรกทอรี่\tเปิดที่ <folder>\n

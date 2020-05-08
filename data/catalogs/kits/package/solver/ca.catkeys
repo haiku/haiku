@@ -8,7 +8,7 @@ nothing provides requested %dependency%	SolverProblem		res no proporciona %depen
 do not keep %source% installed	SolverProblemSolution		no mantinguis %source% instal·lat
 do not deinstall \"%selection%\"	SolverProblemSolution		no desinstal·lis \"%selection%\"
 install %source% despite its inferior architecture	SolverProblemSolution		instal·la %source% malgrat l'arquitectura inferior
-conflicting requests	SolverProblem		peticions conflictives
+conflicting requests	SolverProblem		sol·licituds conflictives
 do not install the most recent version of \"%selection%\"	SolverProblemSolution		no instal·lis la versió més recent de \"%selection%\"
 allow replacement of %source% with %target%	SolverProblemSolution		permet reemplaçar %source% per %target%
 package %source% obsoletes %dependency% provided by %target%	SolverProblem		el paquet %source% deixa obsolet %dependency%, proporcionat per %target%

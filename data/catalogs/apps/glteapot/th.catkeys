@@ -6,7 +6,7 @@ Lower left	TeapotWindow		ล่างซ้าย
 White	TeapotWindow		ขาว
 Yellow	TeapotWindow		เหลือง
 Blue	TeapotWindow		น้ำเงิน
-Gouraud shading	TeapotWindow		การระบายวัตถุ 3 มิติ 
+Gouraud shading	TeapotWindow		การระบายวัตถุ 3 มิติ
 Quit	TeapotWindow		ออก
 Filled polygons	TeapotWindow		รูปหลายเลี่ยม
 Settings	TeapotWindow		ตั้งค่า

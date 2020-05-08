@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-HaikuDepot	3381858533
+1	thai	x-vnd.Haiku-HaikuDepot	1107427137
 Repository update error	LocalRepositoryUpdateProcess		ข้อผิดพลาดการอัพเดตที่เก็บ
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		เกิดข้อผิดพลาดขณะรีเฟรชที่เก็บ: %error%
 User Created	UserLoginWindow		ผู้ใช้ถูกสร้างแล้ว
@@ -31,7 +31,7 @@ This application writes and reads some working files on your computer in order t
 Active	PackageListView		เปิดใช้
 Login or Create account	MainWindow		เข้าสู่ระบบหรือสร้างบัญชี
 <Package contents not available for remote packages>	PackageContentsView		<เนื้อหาแพ็คเกจไม่พร้อมใช้งานสำหรับแพ็คเกจแบบรีโมต>
-{0, plural,one{1 package to download}other{# packages to download}}	WorkStatusView		{0, plural,one{1 package to download}other{# packages to download}}
+{0, plural,one{1 package to download}other{# packages to download}}	WorkStatusView		{0, plural,one{1 package to download}อื่นๆ{# packages to download}}
 Ratings	PackageInfoView		อัตรา
 Switch account…	MainWindow		เปลี่ยนบัญชีผู้ใช้งาน
 Preferred language:	UserLoginWindow		ภาษาที่ต้องการ:
@@ -54,6 +54,7 @@ Package action failed	PackageInfoView		การกระทำของแพ�
 No changelog available.	PackageInfoView		ไม่มีการเปลี่ยนแปลง
 Error	App		ผิดพลาด
 There was a puzzling response from the web service.	UserLoginWindow		มีการตอบสนองที่น่าสงสัยจากบริการบนเว็บ
+Version	PackageListView		เวอร์ชั่น
 Not logged in	MainWindow		ไม่ได้เข้าสู่ระบบ
 No, quit HaikuDepot	App		ไม่, ปิด HaikuDepot
 Featured packages	FeaturedPackagesView		แพคเกจเฉพาะ
@@ -90,7 +91,7 @@ Nickname:	UserLoginWindow		ชื่อเล่น:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		การซิงโครไนซ์ข้อมูลเมตาเกี่ยวกับที่เก็บ
 There are problems in the supplied data:	UserLoginWindow		มีปัญหาในข้อมูลที่ให้:
 OK	MainWindow		ตกลง
-{0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# item} other{# items}}
+{0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# item} อื่นๆ{# items}}
 Usage conditions download problem	UserLoginWindow		ปัญหาการดาวน์โหลดเงื่อนไขการใช้งาน
 OK	PackageInfoView		ตกลง
 Downloading:	PackageInfoView		กำลังดาวน์โหลด:
@@ -98,7 +99,7 @@ Success	UserLoginWindow		สำเร็จ
 Package daemon problem	App		ปัญหาแพคเกจ daemon
 (%Votes%)	PackageInfoView		(%Votes%)
 Repository	PackageListView		จัดเก็บ
-%hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (version %hd.version%)
+%hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (เวอรชั่น %hd.version%)
 The email is malformed.	UserLoginWindow		อีเมลผิดรูปแบบ
 Close	UserLoginWindow		ปิด
 Close	RatePackageWindow		ปิด
@@ -115,7 +116,7 @@ n/a	PackageInfoView		n/a
 This rating is visible to other users	RatePackageWindow		การให้คะแนนนี้จะปรากฏให้ผู้ใช้รายอื่นเห็น
 View agreed usage conditions…	MainWindow		ดูเงื่อนไขการใช้งานที่ตกลงกันไว้
 Cancel	MainWindow		ยกเลิก
-{0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 more to download)}other{(# more to download)}}
+{0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 more to download)}อื่นๆ{(# more to download)}}
 Refresh repositories	MainWindow		รีเฟรชการจัดเก็บ
 Tools	MainWindow		เครื่องมือ
 Continue	App		ต่อไป
@@ -151,7 +152,7 @@ Email address:	UserLoginWindow		ที่อยู่อีเมล:
 Screenshot	ScreenshotWindow		ภาพหน้าจอ
 HaikuDepot	System name		HaikuDepot
 A reboot is necessary to complete the installation process.	PackageManager		จำเป็นต้องรีบูตเครื่องเพื่อให้กระบวนการติดตั้งเสร็จสมบูรณ์
-{0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{I am at least one year old}other{I am # years of age or older}}
+{0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{I am at least one year old}อื่นๆ{I am # years of age or older}}
 View latest usage conditions…	MainWindow		ดูเงื่อนไขการใช้งานล่าสุด
 Quit	App		ปิด
 Search terms:	FilterView		คำค้นหา:

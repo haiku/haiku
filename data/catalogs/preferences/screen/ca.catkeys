@@ -5,8 +5,8 @@ bits/pixel	Screen		bits/píxel
 Rows:	Screen		Files:
 %.1f Hz	Screen		%.1f Hz
 The screen mode could not be set:\n\t%s\n	Screen		No s'ha pogut establir el mode de la pantalla:\n\t%s\n
-Keep	Screen		Conserva
-/other…	Screen		/altre…
+Keep	Screen		Mantén-la
+/other…	Screen		/altres…
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Freqüència horitzontal:\t%lu - %lu kHz\nFreqüència vertical:\t%lu - %lu Hz\n\nAmplada màxima de píxels:\t%g MHz
 Refresh rate:	Screen		Freqüència d'actualització:
 Video format:	Screen		Format del vídeo:
@@ -20,7 +20,7 @@ Could not write VESA mode settings file:\n\t	Screen		No s'ha pogut escriure el f
 Display info	Screen		Informació de la pantalla
 Settings will revert in %seconds.	Screen		Els paràmetres es revertiran d'aquí a %seconds.
 Cancel	Screen		Cancel·la
-Other…	Screen		Altre…
+Other…	Screen		Altres…
 Screen	Screen		Pantalla
 Colors:	Screen		Colors:
 yes	Screen		sí
@@ -39,7 +39,7 @@ Brightness:	Screen		Brillantor:
 Done	Screen		Fet
 16 bits/pixel, 65536 colors	Screen		16 bits/píxel, 65536 colors
 Screen preferences by the Haiku team	Screen		Preferències de la pantalla, de l'equip del Haiku
-Refresh rate	Screen		Freqüència de refresc
+Refresh rate	Screen		Freqüència d'actualització
 if needed	Screen		si cal
 Combine displays:	Screen		Visualització combinada:
 Unknown mode	Screen		Mode desconegut
@@ -52,4 +52,4 @@ disable	Screen		inhabilita
 Set background…	Screen		Seleccioneu el fons...
 Type or use the left and right arrow keys.	Screen		Escriviu o useu les fletxes dreta i esquerra.
 Screen	System name		Pantalla
-Do you wish to keep these settings?	Screen		Voleu conservar aquesta configuració?
+Do you wish to keep these settings?	Screen		Voleu mantenir aquesta configuració?

@@ -1,5 +1,5 @@
 1	thai	x-vnd.Haiku-libsolvsolver	3404387783
-allow architecture change of %source% to %target%	SolverProblemSolution		อนุญาตให้เปลี่ยนสถาปัตยกรรม of %source% to %target%
+allow architecture change of %source% to %target%	SolverProblemSolution		อนุญาตให้เปลี่ยนสถาปัตยกรรม of %source% ไปที่ %target%
 install %source% from excluded repository	SolverProblemSolution		ติดตั้ง %source% จากที่เก็บที่ภายนอก
 unspecified problem	SolverProblem		ปัญหาที่ไม่ได้ระบุ
 package %source% requires %dependency%, but none of the providers can be installed	SolverProblem		แพ็คเกจ %source% ต้องการ %dependency% แต่ไม่สามารถติดตั้งตัวให้บริการใด ๆ ได้
@@ -13,13 +13,13 @@ do not install the most recent version of \"%selection%\"	SolverProblemSolution	
 allow replacement of %source% with %target%	SolverProblemSolution		อนุญาตให้เปลี่ยน %source% ด้วย %target%
 package %source% obsoletes %dependency% provided by %target%	SolverProblem		แพคเกจ %source% ล้าสมัย %dependency% ที่ให้ไว้โดย %target%
 do not forbid installation of %source%	SolverProblemSolution		ไม่ห้ามการติดตั้ง %source%
-allow downgrade of %source% to %target%	SolverProblemSolution		อนุญาตให้ปรับลดรุ่น %source% to %target%
+allow downgrade of %source% to %target%	SolverProblemSolution		อนุญาตให้ปรับลดรุ่น %source% ไปที่ %target%
 dependency problem	SolverProblem		ปัญหาการพึ่งพา
 %dependency% is provided by the system	SolverProblem		%dependency% จัดทำโดยระบบ
 keep %source% despite its inferior architecture	SolverProblemSolution		รักษา %source% แม้จะมีสถาปัตยกรรมที่ด้อยกว่า
 %source% does not belong to a distupgrade repository	SolverProblem		%source% ไม่ได้เป็นของที่เก็บการกระจาย
 installed package %source% obsoletes %dependency% provided by %target%	SolverProblem		แพคเกจที่ติดตั้ง %source% ล้าสมัยแล้ว %dependency% โดย %target%
-allow name change of %source% to %target%	SolverProblemSolution		อนุญาตการเปลี่ยนชื่อของ %source% to %target%
+allow name change of %source% to %target%	SolverProblemSolution		อนุญาตการเปลี่ยนชื่อของ %source% ไปที่ %target%
 package %source% conflicts with %dependency% provided by %target%	SolverProblem		แพคเกจ %source% ขัดแย้งกับ %dependency% ที่ได้รับจาก %target%
 do something	SolverProblemSolution		ทำอะไรสักอย่าง
 install %selection% despite its old version	SolverProblemSolution		ติดตั้ง %selection% แม้จะเป็นเวอร์ชั่นเก่า

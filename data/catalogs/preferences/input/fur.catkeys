@@ -1,17 +1,20 @@
-1	friulian	x-vnd.Haiku-Input	2494436940
+1	friulian	x-vnd.Haiku-Input	3910661481
 Scrolling	TouchpadPrefView		Scoriment
 Defaults	InputMouse		Predefinîts
 Tapping	TouchpadPrefView		Batuçâ
 Long	KeyboardView		Lunc
 Normal	SettingsView		Normâl
 Cancel	TouchpadPrefView		Anule
+4-Button	SettingsView		4-Botons
 Slow	TouchpadPrefView		Lente
 Warp	SettingsView		Deformazion
 Instant warp	SettingsView		Deformazion istantanie
 Device List	InputWindow		Liste dispositîfs
 Double-click speed	SettingsView		Velocitât dopli-clic
+5-Button	SettingsView		5-Botons
 Typing test area	KeyboardView		Aree di prove batidure
 Mouse type:	SettingsView		Gjenar di mouse:
+Revert	InputKeyboard		Torne indaûr
 Fast	KeyboardView		Svelte
 Off	TouchpadPrefView		Distudât
 Fast	TouchpadPrefView		Svelte
@@ -30,6 +33,7 @@ The new scroll area is very large and may impede normal mouse operation. Do you 
 High	TouchpadPrefView		Alt
 Defaults	TouchpadPrefView		Predefinîts
 1-Button	SettingsView		1-Boton
+Defaults	InputKeyboard		Predefinîts
 Short	KeyboardView		Curt
 Slow	KeyboardView		Lente
 Revert	InputMouse		Torne indaûr

@@ -1,5 +1,5 @@
 1	thai	x-vnd.Haiku-libbe	3337473349
-{0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# byte} other{# bytes}}
+{0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# byte} อื่นๆ{# bytes}}
 All Rights Reserved.	AboutWindow		สงวนลิขสิทธิ์
 gold master	AboutWindow		gold master
 Undo	TextView		เลิกทำ

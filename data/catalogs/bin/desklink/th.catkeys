@@ -6,7 +6,7 @@ Muted	MediaReplicant		เงียบ
 OK	MediaReplicant		ตกลง
 Couldn't launch 	MediaReplicant		ไม่สามารถเปิดได้
 Volume	VolumeControl		ระดับเสียง
-Open MediaPlayer	MediaReplicant		เปิด MediaPlayer
+Open MediaPlayer	MediaReplicant		เปิดเครื่องเล่นสื่อ
 %d dB	VolumeControl		%d dB
 Media preferences…	MediaReplicant		การตั้งค่าสื่อ
 Options	MediaReplicant		ตัวเลือก

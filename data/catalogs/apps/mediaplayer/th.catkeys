@@ -5,14 +5,14 @@ Volume of background clips	MediaPlayer-SettingsWindow		ระดับเสี�
 Use hardware video overlays if available	MediaPlayer-SettingsWindow		ใช้การซ้อนทับวิดีโอฮาร์ดแวร์ถ้ามี
 Audio	MediaPlayer-InfoWin		เสียง
 Subtitle placement:	MediaPlayer-SettingsWindow		ตำแหน่งคำบรรยาย:
-MediaPlayer	System name		MediaPlayer
+MediaPlayer	System name		เครื่องเล่นสื่อ
 Audio track	MediaPlayer-Main		แทร็กเสียง
 Muted	MediaPlayer-SettingsWindow		เงียบ
 OK	MediaPlayer-RemovePLItemsCmd		ตกลง
 Open Playlist	MediaPlayer-PlaylistWindow		เปิดเพลย์ลิส
 Subtitles	MediaPlayer-Main		บรรยาย
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% พบข้อผิดพลาดภายใน ไม่สามารถเปิดไฟล์ได้
-DrawBitmap	MediaPlayer-InfoWin		DrawBitmap
+DrawBitmap	MediaPlayer-InfoWin		วาด Bitmap
 File info	MediaPlayer-InfoWin		ข้อมูลไฟล์
 raw audio	MediaPlayer-InfoWin		เสียงเดิม
 Select all	MediaPlayer-PlaylistWindow		เลือกทั้งหมด
@@ -44,7 +44,7 @@ Close	MediaPlayer-Main		ปิด
 Save error	MediaPlayer-PlaylistWindow		บันทึกผิดพลาด
 Attributes	MediaPlayer-Main		คุณสมบัติ
 Bottom of screen	MediaPlayer-SettingsWindow		ด้านล่างของหน้าจอ
-MediaPlayer settings	MediaPlayer-SettingsWindow		การตั้งค่า MediaPlayer
+MediaPlayer settings	MediaPlayer-SettingsWindow		การตั้งค่าเครื่องเล่นสื่อ
 Copyright	MediaPlayer-InfoWin		ลิขสิทธิ์
 Invalid URL inserted!	MediaPlayer-NetworkStream		ใส่ URL ไม่ถูกต้อง!
 Aspect ratio	MediaPlayer-Main		อัตราส่วนภาพ
@@ -68,7 +68,7 @@ Open…	MediaPlayer-PlaylistWindow		เปิด
 Revert	MediaPlayer-SettingsWindow		เปลี่ยนกลับ
 Low volume	MediaPlayer-SettingsWindow		เสียงต้ำ
 Audio	MediaPlayer-Main		เสียง
-{0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Stereo} other{# Channels}}
+{0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Stereo} อื่นๆ{# Channels}}
 Quit	MediaPlayer-Main		ออก
 Redo	MediaPlayer-PlaylistWindow		ทำซ้ำ
 Move Entry	MediaPlayer-MovePLItemsCmd		ย้ายรายการ
@@ -116,7 +116,7 @@ min	MediaPlayer-InfoWin	Minutes	min
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		การบันทึกเพลย์ลิสต์ล้มเหลว:\n\nข้อผิดพลาด:
 Video	MediaPlayer-InfoWin		วีดีโอ
 File info…	MediaPlayer-Main		ข้อมูลไฟล์
-1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (American)
+1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (อเมริกัน)
 <unnamed>	PlaylistItem-name		<unnamed>
 Track	Video Track Menu		แท็รค
 Full screen	MediaPlayer-Main		เต็มจอ

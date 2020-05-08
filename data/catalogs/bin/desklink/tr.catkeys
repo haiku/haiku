@@ -6,7 +6,7 @@ Muted	MediaReplicant		Sessiz
 OK	MediaReplicant		Tamam
 Couldn't launch 	MediaReplicant		Çalıştırılamadı: 
 Volume	VolumeControl		Ses düzeyi
-Open MediaPlayer	MediaReplicant		Ortam Oynatıcısı'nı aç
+Open MediaPlayer	MediaReplicant		Ortam Oynatıcı'yı aç
 %d dB	VolumeControl		%d dB
 Media preferences…	MediaReplicant		Ortam tercihleri…
 Options	MediaReplicant		Seçenekler

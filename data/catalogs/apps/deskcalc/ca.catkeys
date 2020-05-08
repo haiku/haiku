@@ -23,7 +23,7 @@ tanh	CalcView		tanh
 cosh	CalcView		cosh
 ln	CalcView		ln
 Compact	CalcView		Compacte
-Calculating	CalcView		Calculant
+Calculating	CalcView		Es calcula
 Enable Num Lock on startup	CalcView		Habilita la tecla de bloqueig numèric a l'inici.
 4	CalcView		4
 Scientific	CalcView		Científic
@@ -41,7 +41,7 @@ exp	CalcView		exp
 atan	CalcView		atan
 9	CalcView		9
 .	CalcView		.
-DeskCalc	System name		Calculadora de l'Escriptori
+DeskCalc	System name		Calculadora de l'escriptori
 Degrees	CalcView		Graus
 7	CalcView		7
 !	CalcView		!

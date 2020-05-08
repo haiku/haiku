@@ -11,7 +11,7 @@ Device List	InputWindow		Eszközök
 Double-click speed	SettingsView		Dupla-kattintás sebessége
 5-Button	SettingsView		5 gombos
 Typing test area	KeyboardView		Gépelés próba
-Mouse type:	SettingsView		Egér típusa:
+Mouse type:	SettingsView		Egér típusa
 Revert	InputKeyboard		Visszaállít
 Fast	KeyboardView		Gyors
 Off	TouchpadPrefView		Ki
@@ -40,7 +40,7 @@ Key repeat rate	KeyboardView		Billentyű-ismétlés
 Click to focus and raise	SettingsView		Fókusz és előtérbe hozás kattintásra
 Vertical	TouchpadPrefView		Függőleges
 Horizontal	TouchpadPrefView		Vízszintes
-Focus mode:	SettingsView		Fókusz-mód:
+Focus mode:	SettingsView		Fókusz-mód
 Focus follows mouse	SettingsView		A fókusz kövesse az egeret
 Double-click test area	SettingsView		Dupla-kattintási terület
 Sensitivity	TouchpadPrefView		Érzékenység

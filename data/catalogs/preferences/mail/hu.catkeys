@@ -40,7 +40,7 @@ Add filter	Config Views		Szűrő hozzáadása
 Account settings	Config Views		Fiókbeállítások
 minutes	Config Window		percenként
 E-mail	System name		E-mail
-Check every	Config Window		Ellenőrzés gyakorisága:
+Check every	Config Window		Ellenőrzés
 Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Új fiók létrehozása a Hozzáadás gombbal.\n\nA kijelölt fiók eltávolítása az Eltávolítás gombbal.\n\nVálassz egy fiókot a listából annak beállításainak módosításához.
 Account name:	E-Mail		Fiók neve:
 Edit mailbox menu…	Config Window		Postafiókmenü szerkesztése…

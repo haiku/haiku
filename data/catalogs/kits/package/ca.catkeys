@@ -1,9 +1,9 @@
 1	catalan; valencian	x-vnd.Haiku-libpackage	134767648
-Fetching repository-cache from %url	RefreshRepositoryRequest		S'obtén la cau del repositori de %url
+Fetching repository-cache from %url	RefreshRepositoryRequest		S'obté la cau del repositori de %url
 Validating checksum for %repositoryName	RefreshRepositoryRequest		Es valida la suma de verificació de %repositoryName
 Failed to remove transaction directory	PackageManagerKit		Ha fallat suprimir el directori de transacció.
 Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		Ha fallat obtenir la configuració per al repositori \"%s\". S'omet.
-Refreshing repository \"%s\" failed	PackageManagerKit		Ha fallat refrescar el repositori \"%s\".
+Refreshing repository \"%s\" failed	PackageManagerKit		Ha fallat actualitzar el repositori \"%s\".
 Fetching repository checksum from %url	RefreshRepositoryRequest		S'obté la suma de verificació del repositori de %url
 Failed to get repository names	PackageManagerKit		Ha fallat obtenir els noms dels repositoris.
 Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		Ha fallat obtenir la cau per al repositori \"%s\". S'omet.

@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-libtracker	1066099065
+1	danish	x-vnd.Haiku-libtracker	659027911
 Created	ContainerWindow		Oprettet
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Åbn og lav foretrukket
@@ -134,7 +134,7 @@ Move to Trash	ContainerWindow		Flyt til papirkurven
 All files and folders	FindPanel		Alle filer og mapper
 Add-ons	ContainerWindow		Tilføjelser
 Too many parenthesis.	libtracker		For mange parenteser.
-Increase size	ContainerWindow		Forøg størrelse
+Increase size	ContainerWindow		Større
 \nShould this be fixed?	FSUtils		\nSkal dette ordnes?
 URL	Bookmark Query Columns		URL
 Move	PoseView		Flyt
@@ -244,7 +244,7 @@ Copying: 	StatusWindow		Kopiere:
 Show navigator	SettingsView		Vis navigatør
 Select all	DeskWindow		Vælg alt
 Double-precision floating point number	AttributesView		Flydende kommatal med dobbelt præcision
-Decrease size	ContainerWindow		Formindsk størrelse
+Decrease size	ContainerWindow		Mindre
 Recent queries	FindPanel		Nylige forespørgsler
 Mount all	MountMenu		Monter alle
 128 x 128	DeskWindow		128 x 128
@@ -286,6 +286,7 @@ Error creating link to \"%name\".	FSUtils		Fejl ved at lave et link til \"%name\
 Unknown	FilePermissionsView		Ukendt
 Paste links	ContainerWindow		Indsæt lænker
 Restoring: 	StatusWindow		Gendanner: 
+The Tracker must be running to set the default printer.	PoseView		Trackeren skal køre for at kunne sætte standardprinteren.
 calculating…	InfoWindow		udregner…
 Preferred for file	OpenWithWindow		Anbefalet til fil
 OK	AutoMounterSettings		OK
@@ -314,7 +315,7 @@ Select…	QueryContainerWindow		Vælg…
 Open	ContainerWindow		Åbn
 Settings…	MountMenu		Indstillinger…
 You cannot put the selected item(s) into the trash.	FSUtils		Du kan ikke lægge de valgte elementer i papirkurven.
-Increase size	DeskWindow		Forøg størrelse
+Increase size	DeskWindow		Større
 starts with	SelectionWindow		starter med
 Any	AttributesView		Enhver
 New	DeskWindow		Ny
@@ -414,7 +415,7 @@ There was a problem trying to replace \"%name\". The item might be open or busy.
 Windows	TrackerSettingsWindow		Vinduer
 Show space bars on volumes	SettingsView		Vis ledig plads på diskområder
 Could not update permissions of file \"%name\". %error	FSUtils		Kunne ikke opdatere tilladelser for filen \"%name\". %error
-Decrease size	DeskWindow		Formindsk størrelse
+Decrease size	DeskWindow		Mindre
 Emptying Trash… 	StatusWindow		Tømmer papirkurven… 
 {0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{for # fil} other{for # filer}}
 KiB	WidgetAttributeText		KiB

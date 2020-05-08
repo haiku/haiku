@@ -25,7 +25,7 @@ Search	GrepWindow		Cerca
 Copy text to clipboard	GrepWindow		Copia el text al porta-retalls
 Show lines	GrepWindow		Mostra les línies
 Failed to open errors pipe!	Grepper		Ha fallat obrir el conducte d'errors.
-The unselected files will be removed from the list.	GrepWindow		Els fitxers que no estan seleccionats es suprimiran de la llista.
+The unselected files will be removed from the list.	GrepWindow		Els fitxers no seleccionats se suprimiran de la llista.
 Skip folders starting with a dot	GrepWindow		Ignora les carpetes que comencen a un punt
 Open files in code editor	GrepWindow		Obre els fitxers a l’editor de codi.
 Failed to open output pipe!	Grepper		Ha fallat obrir el conducte de sortida!

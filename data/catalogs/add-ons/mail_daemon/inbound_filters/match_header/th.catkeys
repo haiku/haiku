@@ -5,7 +5,7 @@ Match header	RuleFilter		จับคู่ส่วนหัว
 Set flags to	ConfigView		ตั้งค่าสถานะเป็น
 Header field (e.g. Subject, From, …)	ConfigView		พื้นที่ส่วนหัว (เช่นหัวเรื่อง, จาก, ... )
 <Choose account>	ConfigView		<เลือกบัญชี>
-Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.
+Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		ค่าสัญลักษณ์แทนเช่น \"*spam*\".\nนำหน้าด้วย \"REGEX:\" เพื่อที่จะใช้การแสดงปกติ.
 Then	ConfigView		ต่อจากนั้น
 If	ConfigView		ถ้า
 Set as read	ConfigView		ตั้งเป็นอ่าน

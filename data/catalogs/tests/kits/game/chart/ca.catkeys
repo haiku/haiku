@@ -4,7 +4,7 @@ Pink	ChartWindow		Rosa
 Comet	ChartWindow		Cometa
 DirectWindow	ChartWindow		FinestraDirecta
 Orange	ChartWindow		Taronja
-Refresh rate	ChartWindow		Freqüència de refresc
+Refresh rate	ChartWindow		Freqüència d'actualització
 Blue	ChartWindow		Blau
 Colors	ChartWindow		Colors
 Novas	ChartWindow		Noves
@@ -35,7 +35,7 @@ Animation:	ChartWindow		Animació:
 Frames/s	ChartWindow		Marc/s
 Auto demo	ChartWindow		Demostració automàtica
 CPU load	ChartWindow		Càrrega de la CPU
-DrawBitmap	ChartWindow		DrawBitmap
+DrawBitmap	ChartWindow		Dibuix de mapa de bits
 Red	ChartWindow		Vermell
 None	ChartWindow		Cap
 Battle	ChartWindow		Batalla

@@ -33,7 +33,7 @@ CPU usage	DataSource		Ús de la CPU
 Raw clipboard	DataSource		Porta-retalls en cru
 Sems	DataSource		Sems
 %.1f MiB	DataSource		%.1f MB
-ActivityMonitor	System name		Monitor d'Activitat
+ActivityMonitor	System name		Monitor d'activitat
 Running applications	DataSource		Aplicacions en execució
 Semaphores	DataSource		Semàfors
 Block cache	DataSource		Bloca la cau

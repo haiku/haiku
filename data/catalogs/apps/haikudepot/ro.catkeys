@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-HaikuDepot	3381858533
+1	romanian	x-vnd.Haiku-HaikuDepot	1107427137
 Repository update error	LocalRepositoryUpdateProcess		Eroare la actualizarea depozitului
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		A apărut o eroare în timpul reîmprospătării depozitului: %error%
 User Created	UserLoginWindow		Utilizator creat
@@ -54,6 +54,7 @@ Package action failed	PackageInfoView		Acțiune pachet eșuată
 No changelog available.	PackageInfoView		Nu există jurnal de modificări disponibil.
 Error	App		Eroare
 There was a puzzling response from the web service.	UserLoginWindow		A apărut un răspuns neobișnuit de la serviciul web.
+Version	PackageListView		Versiune
 Not logged in	MainWindow		Nu sunteți autentificat
 No, quit HaikuDepot	App		Nu, închideți HaikuDepot
 Featured packages	FeaturedPackagesView		Pachete recomandate

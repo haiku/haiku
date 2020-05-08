@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-HaikuDepot	3381858533
+1	catalan; valencian	x-vnd.Haiku-HaikuDepot	1107427137
 Repository update error	LocalRepositoryUpdateProcess		Error d'actualització del repositori
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Hi ha hagut un error en actualitzar el repositori: %error%
 User Created	UserLoginWindow		Usuari creat
@@ -42,7 +42,7 @@ Local	LocalPkgDataLoadProcess		Local
 Rate %Package%	RatePackageWindow		Puntueu %Package%
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Hi ha hagut un error en iniciar el gestor de paquets: %message%
 Quit HaikuDepot	App		Surt de HaikuDepot
-An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		L'error inesperat "%Message%" ha sorgit amb la propietat '%Property%'
+An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		L'error inesperat "%Message%" ha sorgit amb la propietat "%Property%".
 A response to the captcha question must be provided.	UserLoginWindow		Cal proporcionar una resposta a la pregunta de CAPTCHA.
 Category	FilterView		Categoria
 User rating	RatePackageWindow		Puntuació de l'usuari
@@ -54,6 +54,7 @@ Package action failed	PackageInfoView		Ha fallat l'acció del paquet.
 No changelog available.	PackageInfoView		No hi ha cap registre de canvis disponible.
 Error	App		Error
 There was a puzzling response from the web service.	UserLoginWindow		Hi ha hagut una resposta desconcertant del servei web.
+Version	PackageListView		Versió
 Not logged in	MainWindow		No heu entrat.
 No, quit HaikuDepot	App		No, surt del HaikuDepot
 Featured packages	FeaturedPackagesView		Paquets destacats
@@ -116,7 +117,7 @@ This rating is visible to other users	RatePackageWindow		Aquesta puntuació és 
 View agreed usage conditions…	MainWindow		Consulteu les condicions d’ús acordades...
 Cancel	MainWindow		Cancel·la
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 més per baixar)}other{(# més per baixar)}}
-Refresh repositories	MainWindow		Refresca els repositoris
+Refresh repositories	MainWindow		Actualitza els repositoris
 Tools	MainWindow		Eines
 Continue	App		Continua
 A password is required.	UserLoginWindow		Cal una contrasenya.

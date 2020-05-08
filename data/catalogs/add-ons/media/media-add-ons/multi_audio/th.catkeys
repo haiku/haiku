@@ -1,7 +1,7 @@
 1	thai	x-vnd.Haiku-hmulti_audio.media_addon	451057402
 Master	MultiAudio		ข้อมูลหลัก
 SPDIF	MultiAudio		SPDIF
-Gain	MultiAudio		ได้รับ
+Gain	MultiAudio		จำนวน
 Output 3D center	MultiAudio		ศูนย์ข้อมูลออกแบบ 3 มิติ
 Extended Setup	MultiAudio		การติดตั้งเพิ่มเติม
 CD	MultiAudio		CD
@@ -20,7 +20,7 @@ General	MultiAudio		ทั่วไป
 Input & Output	MultiAudio		ข้อมูลเข้า & ข้อมูลออก
 Enhanced Setup	MultiAudio		การติดตั้งเพิ่มขึ้น
 Stereo mix	MultiAudio		ผสมแบบสเตอริโอ
-Output 3D depth	MultiAudio		ข้อมูลออก ความลึก 3 มิติ 
+Output 3D depth	MultiAudio		ข้อมูลออก ความลึก 3 มิติ
 Volume	MultiAudio		ระดับเสียง
 Output	MultiAudio		ข้อมูลออก
 Video	MultiAudio		ภาพวีดิโอ

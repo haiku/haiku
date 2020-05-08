@@ -21,7 +21,7 @@ Extended battery info	PowerStatus		ข้อมูลแบตเตอรี่
  mA	PowerStatus		mA
 Current rate: 	PowerStatus		อัตรากระแสไฟฟ้า:
 discharging	PowerStatus		ถอดออก
-Show text label	PowerStatus		แสดงป้ายข้อความ 
+Show text label	PowerStatus		แสดงป้ายข้อความ
 About…	PowerStatus		เกี่ยวกับ
 Model number: 	PowerStatus		เลขโมเดล:
 Install in Deskbar	PowerStatus		ติดตั้งในเดสก์บาร์

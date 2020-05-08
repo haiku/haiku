@@ -2,7 +2,7 @@
 Left	Attribute Window	Attribute column alignment in Tracker	Esquerra
 Float	Attribute ListView		Flota
 Final	Application Types Window		Acabat
-FileTypes request	FileTypes Window		Sol·licitud de Tipus de fitxer
+FileTypes request	FileTypes Window		Sol·licitud de tipus de fitxer
 This file type already exists	New File Type Window		Aquest tipus de fitxer ja existeix
 Preferred application	FileTypes Window		Aplicació preferida
 Launch	Application Types Window		Executa
@@ -10,7 +10,7 @@ Removing uninstalled application types	Application Types Window		Se suprimeixen 
 Width:	Attribute Window	Default column width in Tracker for this attribute.	Amplada:
 Same as…	FileType Window	The same TYPE as ...	El mateix que...
 (from super type)	FileTypes Window		(basat en un super tipus)
-Select same preferred application as	FileTypes Window		Seleccioneu la mateixa aplicació preferida que
+Select same preferred application as	FileTypes Window		Selecciona la mateixa aplicació preferida que
 Could not change attributes	Attribute Window		No s'ha pogut canviar els atributs
 Icon	FileTypes Window		Icona
 Add…	Application Type Window		Afegeix…
@@ -18,7 +18,7 @@ Attribute name:	Attribute Window		Nom de l'atribut:
 Long description:	Application Type Window		Descripció llarga:
 Cancel	Preferred App Menu		Cancel·la
 Remove	FileTypes Window		Suprimeix
-The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		L'aplicació \"%s\" no admet fitxers d'aquest tipus.\nSegur que el voleu triar tanmateix?
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		L'aplicació \"%s\" no admet fitxers d'aquest tipus.\nSegur que el voleu establir tanmateix?
 Remove	Application Type Window		Suprimeix
 Gamma	Application Type Window		Gama
 Cancel	Application Type Window		Cancel·la
@@ -34,7 +34,7 @@ Exclusive launch	Application Type Window		Només una execució
 Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		No es pot revertir la supressió d'un tipus de fitxer.\nSegur que el voleu suprimir?
 Integer 64 bit	Attribute ListView		Enter de 64 bits
 Cancel	New File Type Window		Cancel·la
-Select same preferred application as	FileType Window		Seleccioneu la mateixa aplicació preferida que
+Select same preferred application as	FileType Window		Selecciona la mateixa aplicació preferida que
 Cancel	Type List Window		Cancel·la
 Don't save	Application Type Window		No ho desis
 Center	Attribute Window	Attribute column alignment in Tracker	Centrada
@@ -64,7 +64,7 @@ Select…	FileType Window		Seleccioneu...
 Information	Application Types Window		Informació
 Settings	FileTypes Window		Paràmetres
 Done	Attribute Window		Fet
-FileTypes request	FileTypes		Petició d'un tipus de fitxer
+FileTypes request	FileTypes		Sol·licitud de tipus de fitxer
 Select same type as	FileType Window		Selecciona el mateix tipus que
 Version:	Application Types Window		Versió:
 (from application)	FileTypes Window		(De l'aplicació)
@@ -95,7 +95,7 @@ Could not install file type	New File Type Window		No s'han pogut instal·lar el 
 Same as…	FileTypes Window		Igual que...
 Golden master	Application Type Window		Candidat
 Checkbox	Attribute ListView		Casella de selecció
-FileTypes request	Preferred App Menu		Demana un tipus de fitxer
+FileTypes request	Preferred App Menu		Sol·licitud de tipus de fitxer
 no icon	FileTypes Window		cap icona
 Single launch	Application Type Window		Només una instància
 %s file type	FileType Window		Tipus de fitxer %s
@@ -145,7 +145,7 @@ Version info	Application Type Window		Informació de la versió
 Final	Application Type Window		Acabat
 Preferred application	FileType Window		Aplicació preferida
 FileTypes	FileTypes		Tipus de fitxers
-Set preferred application	Preferred App Menu		Tria l'aplicació preferida
+Set preferred application	Preferred App Menu		Estableix l'aplicació preferida
 New file type	New File Type Window		Tipus de fitxer nou
 Short description:	Application Type Window		Descripció curta:
 Save request	Application Type Window		Desa la sol·licitud

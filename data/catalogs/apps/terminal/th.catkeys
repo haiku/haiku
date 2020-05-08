@@ -10,7 +10,7 @@ Select all	Terminal TermWindow		เลือกทั้งหมด
 Confirm exit if active programs exist	Terminal AppearancePrefView		ยืนยันการออกหากมีโปรแกรมที่ใช้งานอยู่
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tไดเรกทอรีการทำงานปัจจุบันของกระบวนการที่ใช้งานอยู่ใน\n\t\t\tแท็บปัจจุบัน เลือกจำนวนคอมโพเนนต์พาธสูงสุด\n\t\t\tได้. ตัวอย่าง '%2d' สำหรับส่วนประกอบได้มากที่สุดสองรายการ\n\t%T\t-\tชื่อแอปพลิเคชันเทอร์มินัลสำหรับสถานที่ปัจจุบัน\n\t%e\t-\tการเข้ารหัสของแท็บปัจจุบัน ไม่แสดงสำหรับ UTF-8\n\t%i\t-\tดัชนีของหน้าต่าง\n\t%p\t-\tชื่อของกระบวนการที่ใช้งานอยู่ในแท็บปัจจุบัน\n\t%t\t-\tชื่อของแท็บปัจจุบัน
 Solarized Dark	Terminal colors scheme		สีทึบ
-Copy	Terminal TermWindow		สำเนา
+Copy	Terminal TermWindow		คัดลอก
 Retro	Terminal colors scheme		ย้อนยุค
 Edit tab title…	Terminal TermWindow		แก้ไขชื่อแท็บ
 Print	Terminal TermWindow		พิมพ์
@@ -72,7 +72,7 @@ Cursor	Terminal AppearancePrefView		เคอร์เซอร์
 Full screen	Terminal TermWindow		เต็มจอ
 Shell 	Terminal TermWindow		เชลล์
 Midnight	Terminal colors scheme		เที่ยงคืน
-\t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tตัวอักษร '%'\n\t%<\t-\tเริ่มหัวข้อที่จะปรากฏต่อเมื่อ\n\t\t\tข้อความที่ต้องการให้แสดงนั้นไม่ว่างเปล่า\n\t%>\t-\tเริ่มหัวข้อที่จะปรากฏต่อเมื่อข้อความที่ต้องการให้แสดง\n\t\t\tก่อนหน้านี้ %< section และอันนี้ไม่ว่างเปล่า\n\t%-\t-\tEnds a %< or %> section.\n\nอักขระที่ไม่ใช่ตัวอักษรและตัวเลขใดๆระหว่าง '%' และตัวอักษรรูปแบบจะแทรกเว้นวรรคเท่านั้น\nหากข้อความที่ต้องการให้แสดงไม่ว่างเปล่า มันจะเพิ่มไปยัง %< section.
+\t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tตัวอักษร '%'\n\t%<\t-\tเริ่มหัวข้อที่จะปรากฏต่อเมื่อ\n\t\t\tข้อความที่ต้องการให้แสดงนั้นไม่ว่างเปล่า\n\t%>\t-\tเริ่มหัวข้อที่จะปรากฏต่อเมื่อข้อความที่ต้องการให้แสดง\n\t\t\tก่อนหน้านี้ %< section และอันนี้ไม่ว่างเปล่า\n\t%-\t-\tสิ้นสุด %< or %> section\n\nอักขระที่ไม่ใช่ตัวอักษรและตัวเลขใดๆระหว่าง '%' และตัวอักษรรูปแบบจะแทรกเว้นวรรคเท่านั้น\nหากข้อความที่ต้องการให้แสดงไม่ว่างเปล่า มันจะเพิ่มไปยัง %< section
 Tab title:	Terminal TermWindow		ชื่อแท็ป:
 Window title:	Terminal TermWindow		ชื่อหน้าต่าง:
 Default	Terminal colors scheme		ค่าเริ่มต้น

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Input	3338205449
+1	french	x-vnd.Haiku-Input	944408183
 Scrolling	TouchpadPrefView		Défilement
 Defaults	InputMouse		Par défaut
 Tapping	TouchpadPrefView		Tapotement
@@ -7,6 +7,8 @@ Normal	SettingsView		Normal
 Cancel	TouchpadPrefView		Annuler
 4-Button	SettingsView		4-Bouttons
 Slow	TouchpadPrefView		Lent
+Warp	SettingsView		Téléportation
+Instant warp	SettingsView		Téléportation instantanée
 Device List	InputWindow		Liste des périphériques
 Double-click speed	SettingsView		Vitesse du double clic
 5-Button	SettingsView		5-Bouttons
@@ -15,6 +17,7 @@ Mouse type:	SettingsView		Type de souris :
 Fast	KeyboardView		Rapide
 Off	TouchpadPrefView		Désactivé
 Fast	TouchpadPrefView		Rapide
+Please confirm	TouchpadPrefView		Merci de confirmer
 Click to focus	SettingsView		Cliquer pour activer
 Acceleration	TouchpadPrefView		Accélération
 Mouse speed	SettingsView		Vitesse de la souris

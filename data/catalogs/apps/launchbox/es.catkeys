@@ -9,7 +9,7 @@ Autostart	LaunchBox		Inicio automático
 Clone	LaunchBox		Clonar
 Description for '%3'	LaunchBox		Descripción para: '%3'
 Show window border	LaunchBox		Mostrar borde de ventana
-\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\n Falló al iniciar la aplicación con la firma '%2'.\n\nError:
+\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nFallo al iniciar la aplicación con la firma '%2'.\n\nError:
 Failed to launch 'something', error in Pad data.	LaunchBox		Falló al lanzar 'algo', error en dato Pad
 LaunchBox	System name		LaunchBox
 Auto-raise	LaunchBox		Auto-levantar

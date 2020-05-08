@@ -5,11 +5,11 @@ Rotation: %d	ControlView		Rotazione: %d
 Shear: %d	ControlView		Inclinazione: %d
 Spacing: %d	ControlView		Spaziatura: %d
 Cycle fonts	ControlView		Cambia i caratteri a rotazione
-Font:	ControlView		Carattere:
+Font:	ControlView		Tipo di carattere:
 Drawing mode:	ControlView		Modalità di disegno:
 Haiku, Inc.	ControlView		Haiku, Inc.
 Controls	FontDemo		Controlli
-FontDemo	System name		FontDemo
+FontDemo	System name		Demo Caratteri
 Outline: %d	ControlView		Contorno: %d
 Text:	ControlView		Testo:
 Antialiased text	ControlView		Testo con anti-aliasing

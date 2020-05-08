@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-HaikuDepot	3586526058
+1	friulian	x-vnd.Haiku-HaikuDepot	1107427137
 Repository update error	LocalRepositoryUpdateProcess		Erôr di inzornament dal dipuesit
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Si è verificât un erôr intal inzornâ il dipuesit: %error%
 User Created	UserLoginWindow		Utent creât
@@ -37,6 +37,7 @@ Switch account…	MainWindow		Cambie account…
 Preferred language:	UserLoginWindow		Lenghe preferide:
 Server Error	ServerHelper		Erôr di servidôr
 Name	PackageListView		Non
+Authorization or security issue. Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		Problemis di autorizazion o di sigurece. Jes e torne jentre par controlâ che la tô peraule di ordin e sedi juste e controle ancje di vê acetât lis ultimis condizions di ûs.
 Local	LocalPkgDataLoadProcess		Locâl
 Rate %Package%	RatePackageWindow		Vote %Package%
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Si è verificât un erôr intal inizializâ il gjestôr dal pachet: %message%
@@ -53,9 +54,11 @@ Package action failed	PackageInfoView		Azion pachet falide
 No changelog available.	PackageInfoView		Nissun regjistri des modifichis disponibil.
 Error	App		Erôr
 There was a puzzling response from the web service.	UserLoginWindow		La rispueste dal servizi web e jere ambigue.
+Version	PackageListView		Version
 Not logged in	MainWindow		No jentrât
 No, quit HaikuDepot	App		No, siere HaikuDepot
 Featured packages	FeaturedPackagesView		Pachets in risalt
+The supplied response to the captcha is incorrect. A new captcha will be generated; try again.	UserLoginWindow		La rispueste dade al captcha no je juste. Al vignarà gjenerât un gnûf captcha; torne prove.
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Nol è stât pussibil comunicâ cul servidôr par otignî une imagjin captcha necessarie par creâ un gnûf utent.
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		La tô valutazion e je stade cjariade cun sucès. Tu puedis modificâle o gjavâle sul sît web dal servidôr di HaikuDepot.
 Network Error	ServerHelper		Erôr di rêt
@@ -105,10 +108,12 @@ View the usage conditions	UserLoginWindow		Viôt lis condizions di ûs
 Login issue	MainWindow		Probleme di acès
 Your rating:	RatePackageWindow		La tô valutazion:
 Size	PackageListView		Dimension
+The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		L'utent %Nickname% al è stât creât cun sucès tal sisteme di HaikuDepotServer. Tu puedis gjestî i tiei detais-utent doprant la interface web. Tu sês cumò jentrât come chest utent gnûf.
 Your rating was updated.	RatePackageWindow		La tô valutazion e je stade inzornade.
 All categories	FilterView		Dutis lis categoriis
 Repositories	MainWindow		Dipuesits
 n/a	PackageInfoView		n/d
+This rating is visible to other users	RatePackageWindow		Altris utents a puedin viodi cheste valutazion
 View agreed usage conditions…	MainWindow		Viôt lis cundizions di ûs acetadis…
 Cancel	MainWindow		Anule
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(ancjemò 1 discjariament)}other{(ancjemò # discjariaments)}}
@@ -147,13 +152,16 @@ Email address:	UserLoginWindow		Direzion email:
 Screenshot	ScreenshotWindow		Istantanie
 HaikuDepot	System name		HaikuDepot
 A reboot is necessary to complete the installation process.	PackageManager		Al covente tornâ a inviâ il sisteme par completâ la instalazion.
+{0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{O ai almancul un an}other{O ai # agns di etât o plui}}
 View latest usage conditions…	MainWindow		Viôt lis ultimis condizions di ûs…
 Quit	App		Siere
 Search terms:	FilterView		Tiermins di ricercje:
 Pending…	PackageListView		In spiete…
+The nickname is malformed. The nickname may only contain digits and lower case latin characters. The nickname must be between four and sixteen characters in length.	UserLoginWindow		Il sorenon al è malformât. Il sorenon al pues contignî dome numar e caratars latins minuscui. Il sorenon al scugne jessi lunc tra cuatri e sedis caratars.
 Category:	FilterView		Categorie:
 Authentication failed	UserLoginWindow		Autenticazion falide
 Captcha error	UserLoginWindow		Erôr captcha
+The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		Il sorenon al scugne jessi unic, ma il sorenon indicât al è za doprât. Sielç un sorenon diviers.
 Manage repositories…	MainWindow		Gjestìs dipuesits…
 Fetching remote repository data	LocalRepositoryUpdateProcess		Daûr a recuperâ i dâts dal dipuesit rimot
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	UserLoginWindow		Al è vignût fûr un erôr intant che si discjariave lis condiizons di ûs necessaris par creâ un gnûf utent. Controle il regjistri par vê plui detais e torne prove. \nLis informazions su ce mût visualizâ i regjistris a son disponibilis te sezion di HaikuDepot de vuide pal utent.
@@ -162,6 +170,7 @@ Open %DeskbarLink%	PackageManager		Vierç %DeskbarLink%
 User creation error	UserLoginWindow		Erôr di creazion dal utent
 Install	PackageManager		Instale
 Input validation	UserLoginWindow		Convalide input
+This application is too old to communicate with the HaikuDepot server system. Obtain a newer version of HaikuDepot by updating your Haiku system. The minimum version of HaikuDepot required is \"%s\".	ServerHelper		Cheste aplicazion e je masse vecje par comunicâ cul sisteme-servidôr di HaikuDepot. Oten une version plui gnove di HaikuDepot inzornant il to sisteme Haiku. La version minime necessarie di HaikuDepot e je la  \"%s\".
 An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		Un erôr inspietât al è stât inviât dal servidôr di HaikuDepot [%i]
 Log in…	MainWindow		Acès…
 You need to be logged into an account before you can rate packages.	MainWindow		Si scugne jessi jentrâts intun account prime di podê valutâ i pachets.

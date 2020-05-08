@@ -37,7 +37,7 @@ Defaults	InputKeyboard		Per defecte
 Short	KeyboardView		Curt
 Slow	KeyboardView		Lent
 Revert	InputMouse		Reverteix
-Key repeat rate	KeyboardView		Taxa de repetició de tecla
+Key repeat rate	KeyboardView		Freqüència de repetició de tecla
 2-Button	SettingsView		2 botons
 Click to focus and raise	SettingsView		Clic per al focus i l'alçament
 Vertical	TouchpadPrefView		Vertical

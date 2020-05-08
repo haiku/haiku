@@ -1,6 +1,6 @@
 1	catalan; valencian	x-vnd.Be-MAIL	1477453861
 Set to Saved	Mail		Estableix com a desat
-Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		El vostre text principal conté %ld caràcters no codificables. Potser amb un conjunt de caràcters diferent funcionaria millor? Premeu Envia per enviar-ho tanmateix (se substituiran per altres els caràcters que no es puguin codificar), o bé trieu Cancel·la per tornar i intentar corregir-ho.
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		El vostre text principal conté %ld caràcters no codificables. Potser amb un conjunt de caràcters diferent funcionaria millor? Premeu Envia per enviar-ho tanmateix (se substituiran per altres els caràcters que no es puguin codificar), o bé trieu Cancel·la per tornar enrere i intentar esmenar-ho.
 Text wrapping:	Mail		Ajustament de línia:
 Show icons & labels	Mail		Mostra les icones i les etiquetes
 (Date unavailable)	Mail		(La data no està disponible)
@@ -65,7 +65,7 @@ Use default account	Mail		Usa el compte per defecte
 draft	B_USER_DIRECTORY/mail/draft		esborrany
 Really delete this signature? This cannot be undone.	Mail		Realment voleu suprimir aquesta signatura? No ho podreu desfer.
 spam	B_USER_DIRECTORY/mail/spam		correu brossa
-Reply to all	Mail		Respon a tots
+Reply to all	Mail		Respon a tothom
 Cancel	Mail		Cancel·la
 Off	Mail		Atura
 Set to %s	Mail		Estableix com a %s
@@ -75,7 +75,7 @@ queries	B_USER_DIRECTORY/mail/queries		consultes
 View	Mail		Visualització
 Signatures	Mail		Signatures
 On	Mail		Actiu
-Find	Mail		Cerca
+Find	Mail		Troba
 Sorry, could not find an application that supports the 'Person' data type.	Mail		Disculpeu, no s'ha pogut trobar una aplicació que conegui el tipus de dada "Persona".
 Date:	Mail		Data:
 Expert	Mail		Expert
@@ -112,13 +112,13 @@ Move to trash	Mail		Mou a la paperera
 %d - Date	Mail		%d - Data
 Check spelling	Mail		Revisa l'ortografia
 Redo	Mail		Refés
-Leave as '%s'	Mail		Deixa-ho com a '%s'
+Leave as '%s'	Mail		Deixa-ho com a "%s'"
 Print…	Mail		Imprimeix…
 Settings…	Mail		Paràmetres…
 Warn unencodable:	Mail		Avisa si no es codificable:
 Trash	Mail		Paperera
 Show raw message	Mail		Mostra el missatge en cru
-Find…	Mail		Cerca…
+Find…	Mail		Troba...
 Select all	Mail		Selecciona-ho tot
 Show header	Mail		Mostra la capçalera
 Reply account:	Mail		Compte de resposta:
@@ -132,7 +132,7 @@ None	Mail		Cap
 Resend	Mail		Torna a enviar
 Hide	Mail		Amaga
 From:	Mail		De :
-No file attributes, just plain data	Mail		No hi ha cap atribut del fitxer, només dades simples
+No file attributes, just plain data	Mail		No hi ha cap atribut del fitxer, només dades netes.
 Add	Mail		Afegeix
 out	B_USER_DIRECTORY/mail/out		bústia de sortida
 Send this message before closing?	Mail		Voleu enviar aquest missatge abans de tancar?
@@ -144,7 +144,7 @@ An error occurred trying to save the attachment.	Mail		Hi ha hagut un error en d
 Save address	Mail		Desa l'adreça
 Initial spell check mode:	Mail		Mode de correcció ortogràfica inicial:
 Edit queries…	Mail		Edita les consultes...
-There is no installed handler for URL links.	Mail		No hi ha cap gestor d'enllaços URL instal·lat.
+There is no installed handler for URL links.	Mail		No hi ha instal·lat cap gestor d'enllaços d'URL.
 File	Mail		Fitxer
 Reply preamble:	Mail		Preàmbul de la resposta:
 New mail message	Mail		Missatge de correu nou
@@ -160,7 +160,7 @@ An error occurred trying to save this signature.	Mail		Hi ha hagut un error en i
 Beginner	Mail		Principiant
 Send message	Mail		Envia el missatge
 Delete	Mail		Suprimeix
-Put your favorite e-mail queries and query templates in this folder.	Mail		Poseu les consultes de correu i plantilles de consultes en aquesta carpeta.
+Put your favorite e-mail queries and query templates in this folder.	Mail		Poseu les consultes de correu i plantilles de consultes preferides en aquesta carpeta.
 Spam	Mail		Brossa
 Couldn't open this signature. Sorry.	Mail		No s'ha pogut obrir aquesta signatura. Disculpeu.
 Revert	Mail		Reverteix

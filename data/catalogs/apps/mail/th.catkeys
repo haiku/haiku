@@ -61,9 +61,9 @@ Copy	Mail		สำเนา
 Add signature	Mail		เพิ่มลายเซ็น
 %n - Full name	Mail		%n -ชื่อเต็ม
 Signature	Mail		ลายมือชื่อ
-Use default account	Mail		ใช้บัญชีเริ่มต้น 
+Use default account	Mail		ใช้บัญชีเริ่มต้น
 draft	B_USER_DIRECTORY/mail/draft		ร่าง
-Really delete this signature? This cannot be undone.	Mail		ต้องการลบลายมือชื่อนี้หรือไม่?  สิ่งนี้ไม่สามารถยกเลิกได้
+Really delete this signature? This cannot be undone.	Mail		ต้องการลบลายมือชื่อนี้หรือไม่? สิ่งนี้ไม่สามารถยกเลิกได้
 spam	B_USER_DIRECTORY/mail/spam		สแปม
 Reply to all	Mail		ตอบกลับทั้งหมด
 Cancel	Mail		ยกเลิก
@@ -162,7 +162,7 @@ Send message	Mail		ส่งข้อความ
 Delete	Mail		ลบ
 Put your favorite e-mail queries and query templates in this folder.	Mail		ใส่แบบสอบถามอีเมลที่คุณชื่นชอบและแม่แบบแบบสอบถามในโฟลเดอร์นี้
 Spam	Mail		สแปม
-Couldn't open this signature. Sorry.	Mail		ขอโทษ ไม่สามารถเปิดลายมือชื่อนี้ 
+Couldn't open this signature. Sorry.	Mail		ขอโทษ ไม่สามารถเปิดลายมือชื่อนี้
 Revert	Mail		เปลี่ยนกลับ
 Unknown	Mail		ไม่ทราบ
 Increase quote level	Mail		เพิ่มระดับข้อความอ้างอิง

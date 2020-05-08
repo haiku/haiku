@@ -1,0 +1,55 @@
+1	thai	x-vnd.Haiku-Network	2923905377
+Ethernet device	InterfaceListItem		อุปกรณ์อีเธอร์เน็ต
+Link speed:	IntefaceView		ลิงค์ความเร็ว:
+disconnected	IntefaceView		หยุดการเชื่อมต่อ
+IP Address:	IntefaceAddressView		IP Address:
+WPA	WPA protected network		WPA
+Network:	IntefaceView		เครือข่าย:
+Received:	IntefaceView		รับ:
+New…	NetworkWindow		ใหม่
+no link	InterfaceListItem		ไม่มีลิงค์
+Other	NetworkWindow		อื่นๆ
+Sent:	IntefaceView		ส่ง:
+Gateway:	IntefaceAddressView		Gateway:
+The netmask defines your local network	IntefaceAddressView		netmask จะกำหนดเครือข่ายท้องถิ่นของคุณ
+Your IP address	IntefaceAddressView		IP address ของคุณ
+DHCP	IntefaceAddressView		DHCP
+Netmask:	IntefaceAddressView		Netmask:
+EAP	EAP protected network		EAP
+Services	NetworkWindow		บริการ
+Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		การติดตั้ง NetworkStatus ในเดสก์บาร์ล้มเหลว:%s
+Revert	NetworkWindow		เปลี่ยนกลับ
+off	ServiceListItem		ปิด
+WEP	WEP protected network		WEP
+<no wireless networks found>	IntefaceView		<no wireless networks found>
+Enable	IntefaceView		เปิดการใช้งาน
+connected	IntefaceView		เชื่อมต่อ
+Apply	IntefaceAddressView		ใช้งาน
+Disable	ServiceView		ปิดการใช้งาน
+WPA2	WPA2 protected network		WPA2
+Show network status in Deskbar	NetworkWindow		แสดงสถานะเครือข่ายในเดสก์บาร์
+Mode:	IntefaceAddressView		โหมด:
+connected	InterfaceListItem		เชื่อมต่อ
+OK	NetworkWindow		ตกลง
+Static	IntefaceAddressView		คงที่
+launch error	NetworkWindow		ข้อผิดพลาดในการทำงาน
+Renegotiate	IntefaceView		เริ่มติดต่อใหม่
+MAC address:	IntefaceView		MAC address:
+%name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
+disabled	InterfaceListItem		ปิดการใช้งาน
+Dial-up connection	InterfaceListItem		การเชื่อมต่อผ่านสายโทรศัพท์
+on	ServiceListItem		เปิด
+The method for obtaining an IP address	IntefaceAddressView		วิธีการรับที่อยู่ IP
+disconnected	InterfaceListItem		หยุดการเชื่อมต่อ
+Automatic	IntefaceAddressView		อัตโนมัติ
+Choose automatically	IntefaceView		เลือกอัตโนมัติ
+Status:	IntefaceView		สถานะ:
+Disable	IntefaceView		ปิดการทำงาน
+Manage…	NetworkWindow		จัดการ
+open	Open network		เปิด
+Network	System name		เครือข่าย
+Your gateway to the internet	IntefaceAddressView		ทางออกสู่อินเทอร์เน็ต
+Enable	ServiceView		เปิดการใช้งาน
+Wireless device	InterfaceListItem		อุปกรณ์ไร้สาย
+Disabled	IntefaceAddressView		ปิดการใช้งาน
+VPN connection	InterfaceListItem		VPN connection

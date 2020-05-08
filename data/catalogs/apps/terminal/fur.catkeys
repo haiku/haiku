@@ -2,7 +2,7 @@
 Close other tabs	Terminal TermWindow		Siere altris schedis
 Insert path	Terminal TermView		Inserìs percors
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Scuse, ma Terminâl nol à podût inviâ la shell.
-Text encoding	Terminal TermWindow		codifiche dal test
+Text encoding	Terminal TermWindow		Codifiche dal test
 OK	Terminal SetTitleWindow		Va ben
 Edit	Terminal TermWindow		Modifiche
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory\n	Terminal TermApp		  -h,     --help               mostre chest jutori\n  -t,     --title              stabilìs titul dal barcon\n  -f,     --fullscreen         invie a plen visôr\n  -w,     --working-directory  stabilìs cartele di vore iniziâl\n
@@ -26,7 +26,7 @@ Encoding:	Terminal AppearancePrefView		Codifiche:
 Create link here	Terminal TermView		Cree colegament achì
 Custom	Terminal AppearancePrefView	Window size	Personalizât
 Selected text	Terminal AppearancePrefView		Test selezionât
-Change directory	Terminal TermView		Cambie cartele
+Change directory	Terminal TermView		Va ae cartele
 Page setup…	Terminal TermWindow		Configurazion pagjine…
 Slate	Terminal colors scheme		Ardesie
 Defaults	Terminal PrefWindow		Predefinîts

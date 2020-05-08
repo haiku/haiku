@@ -1,9 +1,24 @@
-1	french	x-vnd.mmu.AutoRaise	4124153811
+1	french	x-vnd.mmu.AutoRaise	1027627942
+AutoRaise, (c) 2002, mmu_man\nEnjoy :-)	AutoRaiseIcon		AutoRelève, ©2002, mmu_man\nProfitez :-)
+2 s	AutoRaiseIcon		2 s
+AutoRaise	System name		AutoRelève
+0.2 s	AutoRaiseIcon		0,2 s
+1 s	AutoRaiseIcon		1 s
 Delay	AutoRaiseIcon		Délai
+5 s	AutoRaiseIcon		5 s
 Active	AutoRaiseIcon		Activé
+0.1 s	AutoRaiseIcon		0,1 s
 Default (all windows)	AutoRaiseIcon		Par défaut (toutes les fenêtres)
+Instant warping (ffm)	AutoRaiseIcon		Téléportation instantanée (ffm)
+About AutoRaise…	AutoRaiseIcon		À propos d'AutoRelève…
 Normal	AutoRaiseIcon		Normal
+0.5 s	AutoRaiseIcon		0,5 s
 Deskbar only (touch)	AutoRaiseIcon		Seulement la Deskbar (touche)
+4 s	AutoRaiseIcon		4 s
+Focus follows mouse	AutoRaiseIcon		Le focus suit la souris
 Deskbar only (over its area)	AutoRaiseIcon		Seulement la Deskbar (sur sa surface)
+Inactive behaviour	AutoRaiseIcon		Comportement inactif
 Mode	AutoRaiseIcon		Mode
+Warping (ffm)	AutoRaiseIcon		Téléportation (ffm)
 Remove from tray	AutoRaiseIcon		Supprimer du cartouche
+3 s	AutoRaiseIcon		3 s

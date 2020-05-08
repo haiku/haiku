@@ -221,7 +221,7 @@ Search	FindPanel		検索
 Modified:	InfoWindow		更新日時:
 Cancel	FilePanelPriv		中止
 Sorry, you cannot edit that attribute.	WidgetAttributeText		この属性は編集できません。
-Memory pointer	AttributesView		メモリーポインター
+Memory pointer	AttributesView		メモリポインター
 Cancel	OpenWithWindow		中止
 Select…	DeskWindow		選択…
 Files cannot be moved or deleted from a read-only volume.	PoseView		読み取り専用パーティションへの移動やファイルの削除はできません。
@@ -233,7 +233,7 @@ Mount server error	AutoMounterSettings		マウントサーバーエラー
 If you rename the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo rename the home folder anyway, hold down the Shift key and click \"Rename\".	FSUtils		ホームフォルダーの名前を変更すると、%osNameは正しく動作しなくなるかもしれません!\n\n名前を変更しますか?\n\nそれでもホームフォルダーの名前を変更するなら、シフトキーを押しながら\"名前の変更\"をクリックしてください。
 Boolean	AttributesView		ブール値
 Invert selection	FilePanelPriv		選択範囲を反転
-Memory size	AttributesView		メモリーサイズ
+Memory size	AttributesView		メモリサイズ
 TiB	WidgetAttributeText		TiB
 New folder	TemplatesMenu		フォルダー
  (broken)	InfoWindow		 (破損)
@@ -324,7 +324,7 @@ Would you like to find some other suitable application?	FSUtils		他に適切な
 *+? operand may be empty.	libtracker		*+? オペランドが空かもしれません。
 (unknown)	AttributesView		(不明)
 Recent folders	FavoritesMenu		最近使ったフォルダー
-Signed memory size	AttributesView		符号付きメモリーサイズ
+Signed memory size	AttributesView		符号付きメモリサイズ
 The specified name is illegal. Please choose another name.	FilePanelPriv		指定された名前は利用できない文字を含んでいます。他の名前を指定してください。
 of %items	StatusWindow		/ %items
 less than	FindPanel		より小さい
@@ -482,7 +482,7 @@ Go to parent	FilePanelPriv		親フォルダーへ移動
 Save	FindPanel		保存
 Name	FindPanel		名前
 Cancel	WidgetAttributeText		中止
-Memory corruption.	libtracker		メモリーが破損しています。
+Memory corruption.	libtracker		メモリが破損しています。
 Expression too long.	libtracker		式が長過ぎます。
 Color	AttributesView		色
 Copy layout	ContainerWindow		レイアウトをコピー

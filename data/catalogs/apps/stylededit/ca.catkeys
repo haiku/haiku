@@ -8,7 +8,7 @@ Wrap-around search	FindandReplaceWindow		Cerca cíclica
 Page setup…	Menus		Configuració de la pàgina...
 Untitled 	StyledEditWindow		Sense títol 
 OK	Statistics		D'acord
-Find	FindandReplaceWindow		Cerca
+Find	FindandReplaceWindow		Troba
 New	Menus		Nou
 Document	Menus		Document
 Search backwards	FindandReplaceWindow		Cerca enrere
@@ -51,7 +51,7 @@ OK	SaveAlert		D'acord
 Color	Menus		Color
 Save changes to the document \"%s\"? 	QuitAlert		Voleu desar els canvis al document \"%s\"? 
 StyledEdit	System name		Editor dels Estils
-Find:	FindandReplaceWindow		Cerca:
+Find:	FindandReplaceWindow		Troba:
 Undo typing	QuitAlert		Desfés el tecleig
 Error loading \"%s\":\n\t%s	LoadAlert		Error en carregar \"%s\":\n\t%s
 Don't save	SaveAlert		No ho desis
@@ -67,9 +67,9 @@ Modified	StatusView		Modificat
 OK	LoadAlert		D'acord
 Save	QuitAlert		Desa
 Case-sensitive	FindandReplaceWindow		Distingeix majúscules
-Find selection	Menus		Cerca la selecció
+Find selection	Menus		Troba la selecció
 Cancel	SaveAlert		Cancel·la
-Find…	Menus		Cerca…
+Find…	Menus		Troba...
 Revert	RevertToSavedAlert		Reverteix
 Decrease size	Menus		Redueix-ne la mida
 Size	Menus		Mida
@@ -79,7 +79,7 @@ OK	QuitAlert		D'acord
 Replace with:	FindandReplaceWindow		Reemplaça-ho per:
 Edit	Menus		Edita
 Open…	Menus		Obre...
-Save as…	Menus		Anomena i desa…
+Save as…	Menus		Desa com a...
 Replace	FindandReplaceWindow		Reemplaça
 Characters:	Statistics		Caràcters:
 Don't save	QuitAlert		No ho desis

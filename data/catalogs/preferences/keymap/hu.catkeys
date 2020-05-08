@@ -7,9 +7,9 @@ Brazilian	KeymapNames		Brazil
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (Egyesült Államok)
 Right control	Keyboard Layout View		Jobb Ctrl
 Dvorak	KeymapNames		Dvorak
-Option:	Modifier keys window	Option key role name	Opció billentyű:
+Option:	Modifier keys window	Option key role name	Opció billentyű
 Cancel	Modifier keys window		Mégse
-Sample and clipboard:	Keymap window		Próba és vágólap:
+Sample and clipboard:	Keymap window		Próba és vágólap
 Polish	KeymapNames		Lengyel
 Latin-American	KeymapNames		Latin-Amerika
 Ukrainian	KeymapNames		Ukrán
@@ -50,7 +50,7 @@ Spanish	KeymapNames		Spanyol
 HOME	Keyboard Layout View		HOME
 COMMAND	Keyboard Layout View		COMMAND
 Ukrainian (Mac)	KeymapNames		Ukrán (Mac)
-Command:	Modifier keys window	Command key role name	Parancsbillentyű:
+Command:	Modifier keys window	Command key role name	Parancsbillentyű
 French (Bépo)	KeymapNames		Francia (Bépo)
 Russian (Typewriter)	KeymapNames		Orosz (írógép)
 Acute trigger	Keymap window		Ékezet kapcsoló
@@ -106,7 +106,7 @@ Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually C
 Czech	KeymapNames		Cseh
 Russian (Udmurt, Komi, Mari)	KeymapNames		Orosz (Udmurt, Komi, Mari)
 Thai (TIS-820.2538)	KeymapNames		Thai (TIS-820.2538)
-Control:	Modifier keys window	Control key role name	Vezérlőbillentyű:
+Control:	Modifier keys window	Control key role name	Vezérlőbillentyű
 Generic 105-key International	KeyboardLayoutNames		Hagyományos 105 billentyűs (nemzetközi)
 Disabled	Modifier keys window	Do nothing	Letiltva
 Select dead keys	Keymap window		„Beragadó” gombok kiválasztása
@@ -134,7 +134,7 @@ Serbian (Latin)	KeymapNames		Szerb (latin)
 French	KeymapNames		Francia
 Portuguese	KeymapNames		Portugál
 Swiss-French	KeymapNames		Svájci-Francia
-Shift:	Modifier keys window	Shift key role name	Váltógomb:
+Shift:	Modifier keys window	Shift key role name	Váltógomb
 Keymap	System name		Billentyűzetkiosztás
 Slovene	KeymapNames		Szlovén
 Lithuanian	KeymapNames		Litván

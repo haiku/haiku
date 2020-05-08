@@ -1,0 +1,42 @@
+1	thai	x-vnd.Haiku-Repositories	1220143449
+This is not a valid URL.	AddRepoWindow	Add URL error message	นี่ไม่ใช่ URL ที่ถูกต้อง
+Repository URL:	AddRepoWindow	Text box label	ที่เก็บ URL:
+There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	มีข้อผิดพลาดในการรีเฟรชแคชที่เก็บข้อมูล %name%
+There was an error disabling the repository %name%	TaskLooper	Error message, do not translate %name%	มีข้อผิดพลาดในการปิดการใช้งานที่เก็บ %name%
+Unknown	Constants	Unknown repository name	ไม่ทราบ
+Remove all	RepositoriesView	Button label	ลบทั้งหมด
+Enable repositories to use with package management:	RepositoriesView	Label text	เปิดใช้งานที่เก็บเพื่อใช้กับการจัดการแพ็กเกจ:
+Disable	RepositoriesView	Button label	ปิดการใช้งาน
+Cancel task	TaskTimer	Button label	ยกเลิกงาน
+Changes completed	RepositoriesView	Status view text	การเปลี่ยนสมบรูณ์
+Details	TaskLooper	Job log details header	รายละเอียด
+Enabled	RepoRow	Tag in the Status column	เปิดการใช้งาน
+Remove	Constants	Button label	ลบ
+There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	มีข้อผิดพลาดในการเปิดใช้งานที่เก็บ %url%
+Remove this repository?	RepositoriesView	Removal alert confirmation message	ลบที่เก็บนี้หรือไม่?
+The task for repository %name% is taking a long time to complete.	TaskTimer	Alert message.  Do not translate %name%	งานสำหรับที่เก็บ %name% ใช้เวลานานในการทำให้เสร็จ
+Completed	TaskLooper	Completed task status message	เสร็จ
+OK	Constants	Button label	ตกลง
+Status	RepositoriesView	Column title	สถานะ
+Name	RepositoriesView	Column title	ชื่อ
+Add	AddRepoWindow	Button label	เพิ่ม
+Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	ที่เก็บไม่สามารถเรียกชื่อของที่เก็บที่เปิดใช้งานในปัจจุบัน
+Enable all	RepositoriesView	Button label	เปิดใช้งานทั้งหมด
+Aborted	TaskLooper	Aborted task status message	ยกเลิก
+URL	RepositoriesView	Column title	URL
+Enable	RepositoriesView	Button label	เปิดใช้งาน
+Error getting repository configuration for %name%.	RepositoriesView	Alert error message, do not translate %name%	เกิดข้อผิดพลาดในการรับการกำหนดค่าที่เก็บข้อมูลสำหรับ %name%.
+Description	TaskLooper	Failed task error description	รายละเอียด
+Failed	TaskLooper	Failed task status message	ล้มเหลว
+Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	ข่าวดี! ภารกิจสำหรับที่เก็บ %name% เสร็จสมบูรณ์
+Some tasks are still running. Stop these tasks and quit?	RepositoriesWindow	Application quit alert message	งานบางอย่างยังคงทำงานอยู่ หยุดภารกิจเหล่านี้และเลิกหรือไม่?
+This repository URL already exists.	RepositoriesView	Error message	URL ที่เก็บนี้มีอยู่แล้ว
+Repositories	System name		ที่เก็บ
+Changes pending:	RepositoriesView	Status view text	รอการเปลี่ยนแปลง:
+Remove	RepositoriesView	Button label	ลบ
+Remove these repositories?	RepositoriesView	Removal alert confirmation message	ลบที่เก็บนี้หรือไม่?
+Keep trying	TaskTimer	Button label	พยายามต่อไป
+Cancel	Constants	Button label	ยกเลิก
+Only one URL for each repository can be enabled. Please change your selections.	RepositoriesView	Error message	สามารถเปิดใช้งาน URL เดียวสำหรับที่เก็บแต่ละรายการเท่านั้น โปรดเปลี่ยนการเลือกของคุณ
+Stop and quit	RepositoriesWindow	Button label	หยุดและออก
+Disable all	RepositoriesView	Button label	หยุดการใช้งานทั้งหมด

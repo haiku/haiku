@@ -18,8 +18,8 @@ Save console as…	PoorMan		บันทึกคอนโซลเป็น
 Edit	PoorMan		แก้ไข
 Cancel	PoorMan		ยกเลิก
 Directory: 	PoorMan		ไดเรกทอรี่
-Hits: %lu	PoorMan		Hits: %lu
-Hits: 0	PoorMan		Hits: 0
+Hits: %lu	PoorMan		พบ: %lu
+Hits: 0	PoorMan		พบ: 0
 Shutting down.\n	PoorMan		กำลังปิด\n
 Select all	PoorMan		เลือกทั้งหมด
 Error Server	PoorMan		เซิฟเวอร์ผิดพลาด
@@ -46,7 +46,7 @@ PoorMan	System name		PoorMan
 Clear console log	PoorMan		ลบบันทึกคอนโซล
 Run server	PoorMan		ทำงาานเซิฟเวอร์
 Create	PoorMan		สร้าง
-{0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# connection} other{# connections}}
+{0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# connection} อื่นๆ{# connections}}
 done.\n	PoorMan		เสร็จ\n
 PoorMan settings	PoorMan		ตั้งค่า PoorMan
 Console Logging	PoorMan		กำลังเข้าสู่คอนโซล

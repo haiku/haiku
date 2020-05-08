@@ -1,0 +1,31 @@
+1	thai	x-vnd.Haiku-Locale	1488345554
+Available languages	Locale Preflet Window		ภาษาที่ใช้ได้
+Negative:	TimeFormatSettings		ปฏิเสธ:
+already chosen	LanguageListView		เลือกแล้ว
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		ไม่พบภาษาที่มี! คุณไม่สามารถใช้ preflet นี้ได้!
+Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		ต้องเริ่มการทำงานของเดสก์บาร์และตัวติดตามใหม่เพื่อให้การเปลี่ยนแปลงนี้มีผล คุณต้องการเริ่มต้นใหม่ตอนนี้หรือไม่?
+Long format:	TimeFormatSettings		รูปแบบยาว:
+Currency	TimeFormatSettings		สกุกลเงิน
+Locale	System name		สถานที่
+Short format:	TimeFormatSettings		รูปแบบสั้น:
+Language	Locale Preflet Window		ภาษา
+Preferred languages	Locale Preflet Window		ภาษาที่ต้องการ
+Use month/day-names from preferred language	TimeFormatSettings		ใช้ชื่อเดือน/วันจากภาษาที่ต้องการ
+Formatting	Locale Preflet Window		รูปแบบ
+Locale	Locale Preflet Window		สถานที่
+Numbers	TimeFormatSettings		ตัวเลข
+24 hour	TimeFormatSettings		24 ชั่วโมง
+OK	Locale Preflet Window		ตกลง
+Restart	Locale Preflet Window		เริ่มใหม่
+Full format:	TimeFormatSettings		รูปแบบเต็ม:
+Defaults	Locale Preflet Window		ค่าเริ่มต้น
+Cancel	Locale Preflet Window		ยกเลิก
+Translate application and folder names in Deskbar and Tracker.	Locale Preflet Window		แปลชื่อแอปพลิเคชันและโฟลเดอร์ในเดสก์บาร์และตัวติดตาม
+Revert	Locale Preflet Window		เปลี่ยนกลับ
+Medium format:	TimeFormatSettings		รูปแบบขนาดกลาง:
+12 hour	TimeFormatSettings		12 ชั่วโมง
+Time	TimeFormatSettings		เวลา
+Date	TimeFormatSettings		วัน
+Positive:	TimeFormatSettings		ยืนยัน:
+Locale	Locale Preflet		สถานที่
+Options	Locale Preflet Window		ตัวเลือก

@@ -1,6 +1,6 @@
 1	catalan; valencian	x-vnd.Haiku-Installer	116830250
 Performing installation.	InstallProgress		S'executa la instal·lació.
-Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Trieu el disc d'origen des del menú emergent. Llavors cliqueu a \"Begin\".
+Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Trieu el disc d'origen des del menú emergent. Llavors cliqueu a \"Comença\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Si us plau, tanqueu la finestra del Gestor de discs abans de tancar la finestra de l'instal·lador.
 No optional packages available.	PackagesView		No hi ha paquets opcionals disponibles.
 Restart system	InstallerWindow		Reinicia el sistema
@@ -8,16 +8,16 @@ The mount point could not be retrieved.	InstallProgress		No se n'ha pogut obteni
 <none>	InstallerWindow	No partition available	<cap>
 Please choose target	InstallerWindow		Si us plau, trieu una destinació.
 Cancel	InstallProgress		Cancel·la
-Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		S'ha acabat la instal·lació. El sector d'arrencada s'ha desat a "%s". Premeu Reinicia per reiniciar l'ordinador o trieu un altre volum per fer una altra instal·lació.
+Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		S'ha acabat la instal·lació. El sector d'arrencada s'ha desat a %s. Premeu Reinicia per reiniciar l'ordinador o trieu un altre volum per fer una altra instal·lació.
 Are you sure you want to to stop the installation?	InstallerWindow		Segur que voleu aturar la instal·lació?
 Installer	System name		Instal·lador
 Unknown Type	InstallProgress	Partition content type	Tipus desconegut
-Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Premeu el botó Comença per instal·lar des de "%1s" a "%2s".
+Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Premeu el botó Comença per instal·lar des de %1s a %2s.
 Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Trieu el disc on voleu fer la instal·lació des del menú emergent. Llavors cliqueu a \"Comença\".
-Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		S'ha acabat la instal·lació. El sector d'arrencada s'ha desat a "%s". Premeu Surt per abandonar l'instal·lador o trieu un altre volum per fer una altra instal·lació.
+Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		S'ha acabat la instal·lació. El sector d'arrencada s'ha desat a %s. Premeu Surt per abandonar l'instal·lador o trieu un altre volum per fer una altra instal·lació.
 README	InstallerApp		LLEGEIX-ME
 Quit	InstallerWindow		Surt
-Write boot sector to '%s'	InstallerWindow		Escriu el sector d'arrencada a "%s"
+Write boot sector to '%s'	InstallerWindow		Escriu el sector d'arrencada a %s
 Boot sector not written because of an internal error.	InstallProgress		No s'ha escrit el sector d'arrencada degut a un error intern.
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		No s'ha pogut executar el Gestor de discs, l'aplicació que configura les particions del disc.
 Welcome to the Haiku Installer!\n\n	InstallerApp		Benvingut/da a l'Instal·lador del Haiku!\n\n
@@ -58,7 +58,7 @@ Collecting copy information.	InstallProgress		Es recopila la informació de còp
 Show optional packages	InstallerWindow		Mostra els paquets opcionals
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Pot ser que el disc de destinació no tingui prou espai lliure. Intenteu triar un altre disc o no instal·leu alguns elements opcionals.
 Installation canceled.	InstallProgress		S'ha cancel·lat la instal·lació.
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		El volum de destinació no està buit. Segur que voleu fer la instal·lació tanmateix?\n\nNota: la carpeta de sistema serà una còpia neta del volum d'origen, però conservarà la carpeta dels paràmetres; totes les altres carpetes es combinaran, mentre que els fitxers i enllaços que existeixen tant al volum d'origen com al volum de destinació se sobreescriuran amb la versió del volum d'origen.
+The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		El volum de destinació no és buit. Segur que voleu fer la instal·lació tanmateix?\n\nNota: la carpeta de sistema serà una còpia neta del volum d'origen, però conservarà la carpeta dels paràmetres; totes les altres carpetes es combinaran, mentre que els fitxers i enllaços que existeixen tant al volum d'origen com al volum de destinació se sobreescriuran per la versió del volum d'origen.
 OK	InstallerApp		D'acord
 Are you sure you want to abort the installation?	InstallerWindow		Segur que voleu avortar la instal·lació?
 Stop	InstallerWindow		Atura

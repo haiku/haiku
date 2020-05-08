@@ -1,6 +1,6 @@
 1	russian	x-vnd.Haiku-libpackage	134767648
 Fetching repository-cache from %url	RefreshRepositoryRequest		Загрузка кеша репозитория из %url
-Validating checksum for %repositoryName	RefreshRepositoryRequest		Проверка контрольной суммы кеша репозитория %repositoryName
+Validating checksum for %repositoryName	RefreshRepositoryRequest		Проверка контрольной суммы репозитория %repositoryName
 Failed to remove transaction directory	PackageManagerKit		Не удалось удалить папку с транзакциями
 Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		Не удалось получить конфигурацию для репозитория \"%s\". Пропускаем.
 Refreshing repository \"%s\" failed	PackageManagerKit		Не удалось обновить репозиторий \"%s\"

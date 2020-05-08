@@ -15,11 +15,11 @@ Text	TypeEditors	This is the type of editor	Text
 File offset: 	ProbeView		Desplaçament del fitxer: 
 Add	ProbeView		Afegeix
 64 bit signed value:	TypeEditors		Valor de 64 bits amb signe:
-Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Segur que voleu suprimir l'atribut \"%s\" del fitxer \"%s\"?\n\nNo es pot desfer aquesta acció.
+Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Segur que voleu suprimir l'atribut \"%s\" del fitxer \"%s\"?\n\nAquesta acció no es pot desfer.
 No type editor available	AttributeWindow		No hi ha cap editor de tipus de lletra disponible
 Print…	ProbeView		Imprimeix...
 New…	FileWindow		Nou...
-what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	què: '%.4s\n\n
+what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	què: %.4s\n\n
 OK	DiskProbe		D'acord
 DiskProbe	System name		Provador del disc
 Back	ProbeView		Torna
@@ -107,12 +107,12 @@ Select all	ProbeView		Selecciona-ho tot
 OK	ProbeView		D'acord
 Previous	ProbeView		Anterior
 Selection	ProbeView		Selecció
-Find	FindWindow		Cerca
+Find	FindWindow		Troba
 8 bit unsigned value:	TypeEditors		Valor de 8 bits sense signe:
 %ld (native)	ProbeView		%ld (nadiu)
 Attribute: 	ProbeView		Atribut: 
 Block	ProbeView		Bloc
-Find again	ProbeView		Cerca de nou
+Find again	ProbeView		Repeteix la cerca
 View	ProbeView	This is the last menubar item 'File Edit Block View'	Visualitza
 Could not read image	TypeEditors	Image means here a picture file, not a disk image.	No s'ha pogut llegir la imatge
 DiskProbe request	ProbeView		Sol·licitud del Sondeig de discs
@@ -125,7 +125,7 @@ Edit	ProbeView		Edita
 String editor	TypeEditors		Editor de cadenes
 Boolean editor	TypeEditors		Editor de boleans
 Device offset: 	ProbeView		Desplaçament del dispositiu: 
-Find…	ProbeView		Cerca...
+Find…	ProbeView		Troba...
 8 bit palette	TypeEditors		paleta de 8 bits
 Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Decimal
 Image view	TypeEditors	Image means here a picture file, not a disk image.	Mostra les imatges

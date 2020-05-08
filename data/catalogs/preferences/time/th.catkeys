@@ -1,0 +1,49 @@
+1	thai	x-vnd.Haiku-Time	834234238
+OK	Time		ตกลง
+Message receiving failed	Time		การรับข้อความล้มเหลว
+Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		เวลาและวันที่เขียนโดย:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nลิขสิทธิ์ 2004-2012, Haiku
+Australia	Time		ออสเตรเลีย
+America	Time		อเมริกา
+Reset to default server list	Time		รีเซ็ตเป็นรายการเซิร์ฟเวอร์เริ่มต้น
+Could not resolve server address	Time		ไม่สามารถแก้ไขที่อยู่เซิร์ฟเวอร์
+Set time zone	Time		กำหนดเขตเวลา
+Waiting for answer failed	Time		การรอคำตอบล้มเหลว
+<Other>	Time		<Other>
+Received invalid time	Time		ได้รับเวลาที่ไม่ถูกต้อง
+Remove	Time		ลบ
+Synchronize again	Time		ซิงโครไนซ์อีกครั้ง
+Asia	Time		เอเชีย
+Try all servers	Time		ลองเวิฟเวอร์อื่น
+Time	Time		เวลา
+Current time:	Time		เวลาปัจจุบัน:
+The following error occured while synchronizing:\n%s: %s	Time		ข้อผิดพลาดต่อไปนี้เกิดขึ้นขณะซิงโครไนซ์:\n%s: %s
+Europe	Time		ยุโรป
+Show day of week	Time		แสดงวันในสัปดาห์
+Local time (Windows compatible)	Time		เวลาท้องถิ่น (รองรับ Windows)
+Hardware clock set to:	Time		ตั้งค่านาฬิกาฮาร์ดแวร์เป็น:
+Arctic	Time		อาร์คติก
+Antarctica	Time		แอนตาร์กติกา
+GMT (UNIX compatible)	Time		GMT (UNIX compatible)
+Africa	Time		แอฟริกา
+Stop	Time		หยุด
+Time zone	Time		เขตเวลา
+Clock	Time		นาฬิกา
+Network time	Time		เวลาเครือข่าย
+Sending request failed	Time		การส่งคำขอล้มเหลว
+Preview time:	Time		ดูเวลา:
+\nNow: 	Time		\nเดี่ยวนี้:
+Could not create socket	Time		ไม่สามารถสร้างซ็อกเก็ต
+Pacific	Time		แปซิฟิก
+Atlantic	Time		แอตแลนติก
+Show clock in Deskbar	Time		แสดงนาฬิกาในเดสก์บาร์
+Display time with seconds	Time		แสดงเวลาแบบมีวินาที
+Time	System name		เวลา
+about	Time		เกี่ยวกับ
+Show time zone	Time		แสดงเขตเวลา
+Synchronize at boot	Time		ซิงโครไนซ์ตอนบูต
+Indian	Time		อินเดีย
+Revert	Time		เปลี่ยนกลับ
+Date and time	Time		วันที่และเวลา
+The following error occured while synchronizing:\n%s	Time		ข้อผิดพลาดต่อไปนี้เกิดขึ้นขณะซิงโครไนซ์:\n%s
+Synchronize	Time		ซิงโครไนซ์
+Add	Time		เพิ่ม

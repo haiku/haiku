@@ -31,7 +31,7 @@ Page setup…	Terminal TermWindow		Sayfa düzeni…
 Slate	Terminal colors scheme		Arduvaz
 Defaults	Terminal PrefWindow		Öntanımlılar
 Cancel	Terminal TermView		İptal
-Revert	Terminal PrefWindow		Eskiye döndür
+Revert	Terminal PrefWindow		Eski haline döndür
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Uçbirim
 Use selection	Terminal FindWindow		Seçimi kullan
 Find next	Terminal TermWindow		Sonrakini bul

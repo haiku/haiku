@@ -15,14 +15,14 @@ Reduce colored edges filter strength:	AntialiasingSettingsView		Redueix el filtr
 Glyph hinting:	AntialiasingSettingsView		Millora de glifs:
 Default Haiku ControlLook	DecorSettingsView		Control d'aparença del Haiku per defecte
 Menu item text	Colors tab		Text de l'element del menú
-About decorator	DecorSettingsView		Quant al decorador
+About decorator	DecorSettingsView		Quant al Decorador
 Antialiasing menu	AntialiasingSettingsView		Menú del suavitzat
 Success	Colors tab		Correcte
 About	DecorSettingsView		Quant a
 Shine	Colors tab		Llum
 Arrow style	DecorSettingsView		Estil de la fletxa
 On	AntialiasingSettingsView		Activat
-Decorator:	DecorSettingsView		Decoració:
+Decorator:	DecorSettingsView		Decorador:
 Menu background	Colors tab		Fons del menú
 Revert	APRWindow		Reverteix
 List item text	Colors tab		Text de l'element de la llista
@@ -35,14 +35,14 @@ Antialiasing	APRWindow		Suavitzat
 Menu font:	Font view		Tipus de lletra del menú:
 Bold font:	Font view		Negreta:
 %decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAutors:\n\t%decorAuthors\n\nURL: %decorURL\nLlicència: %decorLic\n\n%decorDesc\n
-Choose Decorator	DecorSettingsView		Trieu la decoració
+Choose Decorator	DecorSettingsView		Trieu el Decorador
 Strong	AntialiasingSettingsView		Fort
 Failure	Colors tab		Fallada
 Double:	DecorSettingsView		Doble:
 Selected menu item text	Colors tab		Text de l'element seleccionat del menú
 Size:	Font Selection view		Mida:
 Panel background	Colors tab		Fons del plafó
-Plain font:	Font view		Tipus de lletra simple:
+Plain font:	Font view		Lletra neta:
 Window tab text	Colors tab		Text de la pestanya de la finestra
 Navigation pulse	Colors tab		Pols de la navegació
 LCD subpixel	AntialiasingSettingsView		Subpíxel LCD

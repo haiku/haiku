@@ -8,7 +8,7 @@ All existing files will be skipped?	PackageView		Tots els fitxers existents s'om
 Replace	PackageView		Reemplaça
 All existing files will be replaced?	PackageView		Tots els fitxers existents es reemplaçaran?
 Other…	PackageView		Altres...
-The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		L'enllaç simbòlic anomenat "%s" ja existeix al camí indicat.\nVoleu reemplaçar l'enllaç pel d'aquest paquet o el voleu ometre?
+The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		L'enllaç simbòlic anomenat "%s" ja existeix al camí indicat.\nVoleu reemplaçar l'enllaç pel d'aquest paquet o ometre'l?
 Stop	PackageStatus		Atura
 Install to:	PackageView		Instal·la a:
 The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Sembla que el paquet indicat ja està instal·lat al sistema. Voleu desinstal·lar l’existent i continuar la instal·lació?
@@ -40,7 +40,7 @@ No package selected.	UninstallView		No hi ha cap paquet seleccionat.
 Error while installing the package\n	PackageView		Error mentre s'instal·lava el paquet\n
 Finishing installation	PackageInstall		S'acaba la instal·lació.
 No package available.	PackageInfo		No hi ha cap paquet disponible.
-The script named '%s' already exists in the given path.\nReplace the script with the one from this package or skip it?	PackageView		L'script anomenat "%s" ja existeix al camí indicat.\nVoleu reemplaar l'script pel d'aquest paquet o el voleu ometre?
+The script named '%s' already exists in the given path.\nReplace the script with the one from this package or skip it?	PackageView		L'script anomenat "%s" ja existeix al camí indicat.\nVoleu reemplaçar l'script pel d'aquest paquet o ometre'l?
 Installation type:	PackageView		Tipus d'instal·lació:
 The package you selected has been successfully removed from your system.	UninstallView		El paquet que heu seleccionat s'ha suprimit correctament del sistema.
 There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Sembla que no hi ha coincidència de mida de fitxer al fitxer del paquets. El paquet podria estar danyat o s'ha modificat després crear-lo. Encara voleu continuar?
@@ -48,7 +48,7 @@ There seems to be a file size mismatch in the package file. The package might be
 Abort	PackageInstall		Avorta
 The file named '%s' already exists in the given path.\nReplace the file with the one from this package or skip it?	PackageView		El fitxer anomenat "%s" ja existeix al camí indicat.\nVoleu reemplaçar el fitxer pel d'aquest paquet o ometre'l?
 Replace all	PackageView		Reemplaça-ho tot
-The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		El fitxer de paquet no es pot llegir.\nUna de les possibles raons pot ser que el fitxer sol·licitat no sigui un paquet .pkg vàlid de BeOS.
+The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		El fitxer de paquet no es pot llegir.\nUna de les raons possibles pot ser que el fitxer sol·licitat no sigui un paquet .pkg vàlid de BeOS.
 Continue	PackageInfo		Continua
 No package selected.	PackageInfo		No hi ha cap paquet seleccionat.
 Error! \"%s\" is not a valid path.\n	Packageinstaller main		Error! \"%s\" no és un camí vàlid.\n

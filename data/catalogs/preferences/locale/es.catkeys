@@ -6,13 +6,13 @@ Unable to find the available languages! You can't use this preflet!	Locale Prefl
 Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		La barra de escritorio y el Tracker deben reiniciarse para que estos cambios tomen efecto. ¿Desea reiniciarlos ahora?
 Long format:	TimeFormatSettings		Formato largo:
 Currency	TimeFormatSettings		Divisa
-Locale	System name		Traducciones
+Locale	System name		Idioma
 Short format:	TimeFormatSettings		Formato corto:
 Language	Locale Preflet Window		Idioma
 Preferred languages	Locale Preflet Window		Idiomas preferidos
 Use month/day-names from preferred language	TimeFormatSettings		Usar nombres de mes/día del lenguaje preferido
-Formatting	Locale Preflet Window		Formateando
-Locale	Locale Preflet Window		Sitio
+Formatting	Locale Preflet Window		Formato
+Locale	Locale Preflet Window		Idioma
 Numbers	TimeFormatSettings		Números
 24 hour	TimeFormatSettings		24 horas
 OK	Locale Preflet Window		Aceptar

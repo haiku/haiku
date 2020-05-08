@@ -2,7 +2,7 @@
 ©2010-2017 Haiku Inc.	ConfigView		©2010-2017, Haiku Inc.
 Compression method:	ConfigView		Mètode de compressió:
 WebP image translator	ConfigView		Traductor d'imatges WebP
-Preset	ConfigView		Configuració
+Preset	ConfigView		Preconfiguració
 WebP images	WebPTranslator		Imatges WebP
 WebPTranslator Settings	ConfigView		Paràmetres del Traductor Web
 Output quality:	ConfigView		Qualitat de la sortida:
@@ -11,7 +11,7 @@ WebP Settings	main		Paràmetres de WepP
 Text	ConfigView		Text
 Slower but better	ConfigView		Més lent però millor
 WebP image	WebPTranslator		Imatge WebP
-Output preset:	ConfigView		Configuració de la sortida:
+Output preset:	ConfigView		Preconfiguració de la sortida:
 Picture	ConfigView		Imatge
 Low	ConfigView		Baixa
 High	ConfigView		Alta

@@ -4,7 +4,7 @@ Quit	NetworkStatusView		ออก
 Unknown	NetworkStatusView		ไม่รู้จัก
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		การเรียกใช้ preflet เครือข่ายล้มเหลว\n\nข้อผิดพลาด:
 Install in Deskbar	NetworkStatus		ติดตั้งในเดสก์บาร์
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		ตัวเลือก NetworkStatus:\n\t--เดสก์บาร์\t โดยอัตโนมัติเพิ่มตัวจำลองไปยังเดสก์บาร์ \n\t--ช่วย\t\t พิมพ์ข้อมูลนี้และออก
+NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		ตัวเลือก สถานะเครือข่าย:\n\t--เดสก์บาร์\tโดยอัตโนมัติเพิ่มตัวจำลองไปยังเดสก์บาร์\n\t--ช่วย\t\tพิมพ์ข้อมูลนี้และออก
 Open network preferences…	NetworkStatusView		เปิดการตั้งค่าเครือข่าย
 NetworkStatus	System name		สถานะเน็ตเวิร์ค
 OK	NetworkStatusView		ตกลง
@@ -17,7 +17,7 @@ Deskbar is not running, giving up.	NetworkStatus		เดสก์บาร์ไ
 No stateful configuration	NetworkStatusView		ไม่มีการกำหนดค่า stateful
 You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		คุณสามารถเรียกใช้สถานะเครือข่ายในหน้าต่างหรือติดตั้งในเดสก์บาร์
 Broadcast	NetworkStatusView		ออกอากาศ
-%ifaceName information:\n	NetworkStatusView		%ifaceName information:\n
+%ifaceName information:\n	NetworkStatusView		%ifaceName ข้อมูล:\n
 Run in window	NetworkStatus		ทำงานในหน้าต่าง
 <no wireless networks found>	NetworkStatusView		<no wireless networks found>
 Configuring	NetworkStatusView		การกำหนดค่า

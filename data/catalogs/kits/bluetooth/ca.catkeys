@@ -31,7 +31,7 @@ Wired modem or voice gateway	DeviceClass		Mòdem o passarel·la de veu
 #ServerNotReady#Not Valid name	RemoteDevice		#ServerNotReady#No és un nom vàlid
 #NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError# No és un nom vàlid
 Camcorder	DeviceClass		Gravadora de vídeo
-#NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest# No és un nom vàlid
+#NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest# no és un nom vàlid
 17-33% utilized	DeviceClass		Usat entre el 17 i el 33%
 Desktop workstation	DeviceClass		Estació de treball d'escriptori
 Unspecified	DeviceClass		Sense especificar
@@ -58,7 +58,7 @@ Loudspeaker	DeviceClass		Altaveu
 SIM card reader	DeviceClass		Lector de targetes SIM
 Computer	DeviceClass		Ordinador
 Scanner	DeviceClass		Escànner
-Wearable	DeviceClass	A wearable computer	Dispositiu integrat a la indumentària
+Wearable	DeviceClass	A wearable computer	Portable
 Display	DeviceClass		Pantalla
 Gamepad	DeviceClass		Teclat de jocs
 Video monitor	DeviceClass		Monitor de vídeo

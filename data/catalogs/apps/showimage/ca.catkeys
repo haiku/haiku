@@ -4,7 +4,7 @@ File	Menus		Fitxer
 Slide delay	Menus		Retard de la presentació
 Selection mode	Menus		Mode de selecció
 Zoom in	Menus		Amplia
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		El document %s ha canviat. Voleu tancar el document?
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		El document %s ha canviat. Voleu tancar-lo?
 Page setup…	Menus		Configuració de la pàgina...
 Print…	Menus		Imprimeix...
 Get info…	Menus		Obtén informació...
@@ -21,7 +21,7 @@ Browse	Menus		Navega
 Edit	Menus		Edita
 Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		No s'ha pogut carregar la imatge. El fitxer o el traductor d’imatges no existeix.
 First page	Menus		Primera pàgina
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		El document %s (pàgina %d) ha canviat. Voleu tancar el document?
+The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		El document %s (pàgina %d) ha canviat. Voleu tancar-lo?
 Leave full screen	Menus		Surt de la pantalla completa
 Close	Menus		Tanca
 Close	ClosePrompt		Tanca
@@ -59,4 +59,4 @@ Rotate clockwise	Menus		Gira en el sentit del rellotge
 Job setup	PrintOptionsWindow		Configuració de la tasca
 Original size	Menus		Mida original
 Next page	Menus		Pàgina següent
-Save as…	Menus		Anomena i desa…
+Save as…	Menus		Desa com a...

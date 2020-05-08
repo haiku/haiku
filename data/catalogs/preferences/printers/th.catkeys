@@ -1,0 +1,41 @@
+1	thai	x-vnd.Be-PRNT	1465107170
+Test page	TestPageView		หน้าทดสอบ
+Remove	PrintersWindow		ลบ
+Red	TestPageView		สีแดง
+Default Printer	PrinterListView		เครื่องพิมพ์เริ่มต้น
+<pick one>	AddPrinterDialog		<pick one>
+Connected to:	AddPrinterDialog		เชื่อมต่อไปที่:
+Make default	PrintersWindow		ตั้งให้เป็นค่าเริ่มต้น
+Cyan	TestPageView		สีฟ้า
+Completed	JobListView		เสร็จ
+Test page	PrintersWindow		หน้าทดสอบ
+Transport: %transport% %transport_address%	PrinterListView		ส่ง: %transport% %transport_address%
+Failed	JobListView		ล้มเหลว
+Blue	TestPageView		สีน้ำเงิน
+Waiting	JobListView		รอ
+Processing	JobListView		ดำเนินการ
+Cancel	AddPrinterDialog		ยกเลิก
+Unknown status	JobListView		ไ่ม่ทราบสถานะ
+Print jobs for %printer_name%	PrintersWindow		งานพิมพ์สำหรับ %printer_name%
+{0, plural, =-1{??? pages}=1{# page}other{# pages}}	JobListView		{0, plural, =-1{??? pages}=1{# page}อื่นๆ{# pages}}
+Add printer	AddPrinterDialog		เพิ่มเครื่องพิมพ์
+Printers	PrintersWindow		เครื่องพิมพ์
+No printer found!	TransportMenu		ไม่พบเครื่องพิมพ์!
+Add…	PrintersWindow		เพิ่ม
+Magenta	TestPageView		สีม่วง
+Transport: %transport% %transport_address%	TestPageView		ส่ง: %transport% %transport_address%
+Add	AddPrinterDialog		เพิ่ม
+Print jobs: No printer selected	PrintersWindow		งานพิมพ์: ไม่ได้เลือกเครื่องพิมพ์
+Printer name:	AddPrinterDialog		ชื่อเครื่องพิมพ์:
+Yellow	TestPageView		สีเหลือง
+Black	TestPageView		สีดำ
+Printer type:	AddPrinterDialog		ชนิดเครื่องพิมพ์:
+Printers	System name		เครื่องพิมพ์
+{0, plural,=0{No pending jobs}=1{1 pending job}other{# pending jobs}}	PrinterListView		{0, plural,=0{No pending jobs}=1{1 pending job}อื่นๆ{# pending jobs}}
+Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		เครื่องพิมพ์: %printer_name%\nไดรเวอร์: %driver%\n
+Green	TestPageView		สีเขียว
+Print test page	PrintersWindow		หน้าทดสอบเครื่องพิมพ์
+Restart job	PrintersWindow		ทำงานใหม่
+Driver: %driver%	PrinterListView		ไดรเวอร์: %driver%
+Cancel job	PrintersWindow		ยกเลิกงาน
+%.2f KB	JobListView		%.2f KB

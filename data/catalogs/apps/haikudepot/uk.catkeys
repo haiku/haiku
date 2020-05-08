@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-HaikuDepot	3381858533
+1	ukrainian	x-vnd.Haiku-HaikuDepot	1107427137
 Repository update error	LocalRepositoryUpdateProcess		Помилка оновлення репозитарія 
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Під час оновлення репозитарія сталася помилка: %error%
 User Created	UserLoginWindow		Користувача створено
@@ -54,6 +54,7 @@ Package action failed	PackageInfoView		Роботу пакету призупи�
 No changelog available.	PackageInfoView		Історія змін недоступна
 Error	App		Помилка
 There was a puzzling response from the web service.	UserLoginWindow		Отримано загадкову відповідь від мережевого сервісу.
+Version	PackageListView		Версія
 Not logged in	MainWindow		Не авторизований
 No, quit HaikuDepot	App		Ні, вийти з HaikuDepot
 Featured packages	FeaturedPackagesView		Рекомендовані пакети

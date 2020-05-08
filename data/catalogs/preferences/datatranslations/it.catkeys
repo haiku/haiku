@@ -12,6 +12,6 @@ Use this control panel to set default values for translators, to be used when no
 The new translator has been installed successfully.	DataTranslations		Il nuovo traduttore dati è stato installato con successo.
 An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Un elemento '%name' esiste già nella cartella dei traduttori dati! Sovrascrivo il traduttore esistente?
 DataTranslations	System name		Traduzione Dati
-Info	DataTranslations		informazioni
+Info	DataTranslations		Informazioni
 Overwrite	DataTranslations		Sovrascrivi
 Version:	DataTranslations		Versione:

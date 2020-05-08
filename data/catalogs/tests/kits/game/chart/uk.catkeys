@@ -30,7 +30,7 @@ Star density	ChartWindow		Щільність зірок
 Display:	ChartWindow		Показати:
 Space color	ChartWindow		Колір космосу
 White	ChartWindow		Білий
-Chart	System name		Таблиця
+Chart	System name		Chart
 Animation:	ChartWindow		Анімація:
 Frames/s	ChartWindow		Кадрів/с
 Auto demo	ChartWindow		АвтоДемо

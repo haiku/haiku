@@ -22,7 +22,7 @@ line %d, column %d	StatusView		บรรทัด %d คอลัมน์ %d
 Words:	Statistics		คำ:
 ???	LoadAlert		???
 Recover	NodeMonitorAlerts		กู้คืน
-Error saving \"%s\":\n%s	SaveAlert		บันทึกผิดพลาด  \"%s\":\n%s
+Error saving \"%s\":\n%s	SaveAlert		บันทึกผิดพลาด \"%s\":\n%s
 OK	RevertToSavedAlert		ตกลง
 Unlock file	StatusView		ปลดล็อกไฟล์
 Italic	Menus		ตัวเอียง
@@ -48,7 +48,7 @@ Error loading \"%s\":\n\tUnsupported format	LoadAlert		โหลดผิดพ�
 Left	Menus		ซ้าย
 Default	Menus		ค่าเริ่มต้น
 OK	SaveAlert		ตกลง
-Color	Menus		ีสี
+Color	Menus		สี
 Save changes to the document \"%s\"? 	QuitAlert		บันทึกการเปลี่ยนแปลงเอกสาร \"%s\" หรือไม่?
 StyledEdit	System name		แก้ไขสไตล์
 Find:	FindandReplaceWindow		ค้นหา:

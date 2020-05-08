@@ -1,12 +1,12 @@
 1	catalan; valencian	x-vnd.Haiku-VirtualMemory	2090796060
-Requested swap file size:	SettingsWindow		Mida del fitxer d'intercanvi demanat:
+Requested swap file size:	SettingsWindow		Mida del fitxer d'intercanvi sol·licitada:
 VirtualMemory	System name		Memòria Virtual
 OK	VirtualMemoryApp		D'acord
 Use volume:	SettingsWindow		Usa el volum:
 Turn off	SettingsWindow		Desactiva
 Changes will take effect upon reboot.	SettingsWindow		Els canvis s'aplicaran quan es reinicii el sistema.
 Revert	SettingsWindow		Reverteix
-Keep enabled	SettingsWindow		Manté actiu
+Keep enabled	SettingsWindow		Mantén habilitat
 The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		Els valors especificats al fitxer de paràmetres no són vàlids. Podeu carregar els valors predeterminats o bé sortir-ne.
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		VirtualMemory\n\tescrit per Axel Dörfler\n\tCopyright 2005, Haiku.\n
 The volume specified in the settings file could not be found. You can use the boot volume or quit.	SettingsWindow		No s'ha pogut trobar el volum especificat al fitxer de paràmetres. Podeu usar el volum d'arrencada o bé sortir-ne.

@@ -22,7 +22,7 @@ Write ASCII	PPMTranslator		เขียน ASCII
 RGB 5:6:5 16 bits	PPMTranslator		RGB 5:6:5 16 bits
 RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8 32 bits big-endian
 RGBA 8:8:8:8 32 bits	PPMTranslator		RGBA 8:8:8:8 32 bits
-Version %d.%d.%d, %s	PPMTranslator		เวอร์ชั่น %d.%d.%d, %s 
+Version %d.%d.%d, %s	PPMTranslator		เวอร์ชั่น %d.%d.%d, %s
 CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8 32 bits
 RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8 32 bits
 RGB 5:5:5 16 bits	PPMTranslator		RGB 5:5:5 16 bits

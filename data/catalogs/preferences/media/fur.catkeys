@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-Media	1682972002
+1	friulian	x-vnd.Haiku-Media	582516163
 Couldn't add volume control in Deskbar: %s\n	Media views		Impussibil zontâ il control dal volum tal Deskbar: %s\n
 Restart media services	Media views		Torne a inviâ i servizis multimediâls
 Quit	Media Window		Jes
@@ -7,6 +7,8 @@ Couldn't remove volume control in Deskbar: %s\n	Media views		Impussibil gjavâ i
 Video output:	Media views		Jessude video:
 Video input:	Media views		Jentrade video:
 Audio output:	Media views		Jessude audio:
+Please select a SoundFont.	Midi View		Par plasê selezione un SoundFont.
+There are no SoundFonts installed.	Midi View		Nissun SoundFont instalât.
 Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Jessî di Media cumò al fermarà il tornâ a inviâ i servizis multimediâls. Chest al podarès puartâ a scjarsis o adiriture nissune funzionalitât multimediâl.
 Could not connect to the media server.\nWould you like to start it ?	Media Window		Impussibil conetisi al servidôr multimediâl.\nInviâlu?
 Video settings	Media Window		Impostazions video
@@ -18,6 +20,7 @@ Quit anyway	Media Window		Jes distès
 Media	System name		Multimedia
 Warning!	Media Window		Avertiment!
 MIDI Settings	Media Window		Impostazions MIDI
+SoundFonts	Midi View		SoundFont
 Audio input:	Media views		Jentrade audio:
 <none>	Media views		<nissune>
 Channel:	Media views		Canâl:

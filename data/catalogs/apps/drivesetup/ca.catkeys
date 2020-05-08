@@ -1,5 +1,5 @@
 1	catalan; valencian	x-vnd.Haiku-DriveSetup	1934767996
-Could not unmount partition %s.	MainWindow		No s'ha pogut muntar la partició %s.
+Could not unmount partition %s.	MainWindow		No s'ha pogut desmuntar la partició %s.
 Mount all	MainWindow		Munta-ho tot
 Disk	MainWindow		Disc
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Segur que voleu escriure tots els canvis al disc ara?\n\nSi ho feu, es perdran irrecuperablement totes les dades de la partició seleccionada!
@@ -13,15 +13,15 @@ Removable	PartitionList		Extraïble
 Block size	PartitionList		Mida de bloc
 The panel experienced a problem!	MainWindow		El plafó ha tingut un problema!
 Device	DiskView		Dispositiu
-Are you sure you want to format the Intel Extended Partition? Any subpartitions it contains will be overwritten if you continue. You will be asked again before changes are written to the disk.	MainWindow		Segur que voleu formatar la partició ampliada d'Intel? Si continueu, se sobreescriurà  qualsevol subpartició que contingui. Se us demanarà de nou abans d'escriure canvis al disc.
+Are you sure you want to format the Intel Extended Partition? Any subpartitions it contains will be overwritten if you continue. You will be asked again before changes are written to the disk.	MainWindow		Segur que voleu formatar la partició ampliada d'Intel? Si continueu, se sobreescriurà qualsevol subpartició que contingui. Se us preguntarà un cop més abans d'escriure els canvis al disc.
 Unmount	MainWindow		Desmunta
 Failed to format the partition %s!\n	MainWindow		No s'ha pogut formatar la partició %s!\n
 Partition size	CreateParametersPanel		Mida de la partició
 Validation of the given parameters failed.	MainWindow		Ha fallat validar els paràmetres indicats.
-The partition %s is currently mounted.	MainWindow		La partició %s està muntada en aquest moment.
+The partition %s is currently mounted.	MainWindow		La partició %s ara està muntada.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Segur que voleu formatar la partició \"%s\"? Se us preguntarà un cop més abans d'escriure els canvis al disc.
 DriveSetup	System name		Gestor de discs
-Mounted at	PartitionList		Muntat a
+Mounted at	PartitionList		Muntada a
 Create…	MainWindow		Nova...
 Write changes	MainWindow		Escriu els canvis
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		No s'ha pogut iniciar la partició %s. (No s'han desat els canvis al disc.)
@@ -42,19 +42,19 @@ Format	InitializeParametersPanel		Format
 Could not unmount partition	MainWindow		No s'ha pogut desmuntar la partició.
 Create	CreateParametersPanel		Crea
 File system	PartitionList		Sistema de fitxers
-The selected partition does not contain a partitioning system.	MainWindow		La partició triada no conté un sistema de particions.
+The selected partition does not contain a partitioning system.	MainWindow		La partició seleccionada no conté un sistema de particions.
 End: %s	Support		Final: %s
 Partition type	PartitionList		Tipus de partició
 Unable to find the selected partition by ID.	MainWindow		No s'ha pogut trobar la partició seleccionada per l'identificador.
-The currently selected partition is not empty.	MainWindow		La partició triada no està buida.
-Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Segur que voleu formatar un disc en cru? (La majoria de persones primer inicialitzen el disc amb un sistema de particions.) Se us demanarà de nou abans d'escriure canvis al disc.
+The currently selected partition is not empty.	MainWindow		La partició seleccionada no és buida.
+Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Segur que voleu formatar un disc en cru? (La majoria de persones primer inicien el disc amb un sistema de particions.) Se us preguntarà un cop més abans d'escriure els canvis al disc.
 Wipe (not implemented)	MainWindow		Esborra (no implementat)
-The currently selected partition does not have a parent partition.	MainWindow		La partició seleccionada ara no té una partició principal.
+The currently selected partition does not have a parent partition.	MainWindow		La partició seleccionada actualment no té una partició superior.
 Validation of the given initialization parameters failed.	MainWindow		Ha fallat validar els paràmetres d'iniciació indicats.
 Shared	PartitionList		Compartida
 MIMEs	PartitionList		MIMEs
 BitLocker encrypted	Encryption utils		Encriptat amb BitLocker
-You need to select a partition entry from the list.	MainWindow		Cal que trieu una partició de la llista.
+You need to select a partition entry from the list.	MainWindow		Cal que seleccioneu una partició de la llista.
 Offset: %s	Support		Desplaçament: %s
 SafeBoot encrypted	Encryption utils		Encriptat amb SafeBoot
 Volume name	PartitionList		Nom del volum
@@ -65,22 +65,22 @@ LUKS encrypted	Encryption utils		Encriptat amb LUKS
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Segur que voleu escriure tots els canvis al disc ara?\n\nSi ho feu, es perdran irrecuperablement totes les dades de la partició %s!
 Cancel	AbstractParametersPanel		Cancel·la
 Format	MainWindow		Formata
-<empty or unknown>	DiskView		<empty or unknown>
+<empty or unknown>	DiskView		<buit o desconegut>
 OK	MainWindow		D'acord
 Open with DiskProbe	MainWindow		Obre amb DiskProbe
 Could not delete the selected partition.	MainWindow		No s'ha pogut suprimir la partició seleccionada.
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Segur que voleu iniciar el disc seleccionat? Se'n perdran totes les dades. Se us preguntarà un cop més abans d'escriure els canvis al disc.\n
-There was an error preparing the disk for modifications.	MainWindow		Hi hagut un error en preparar el disc per les modificacions.
+There was an error preparing the disk for modifications.	MainWindow		Hi ha hagut un error en preparar el disc per a les modificacions.
 The disk has been successfully initialized.\n	MainWindow		El disc s'ha iniciat correctament.\n
 Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Cal forçar el desmuntatge?\n\nNota: si hi ha alguna aplicació escrivint al volum, desmuntar-lo ara podria comportar una pèrdua de dades.\n
 Cancel	MainWindow		Cancel·la
 Free space	PartitionList		Espai lliure
 Queries	PartitionList		Consultes
-Force unmount	MainWindow		Força el desmuntatge
+Force unmount	MainWindow		Força'n el desmuntatge
 Partition	MainWindow		Partició
 Change parameters	MainWindow		Canvia els paràmetres
 Rescan	MainWindow		Torna a explorar
-There was an error acquiring the partition row.	MainWindow		Hi hagut un error en llegir informació de la partició.
+There was an error acquiring the partition row.	MainWindow		Hi ha hagut un error en obtenir la fila de particions.
 Failed to initialize the disk %s!\n	MainWindow		Ha fallat iniciar el disc %s!\n
 Disk system \"%s\" not found!	MainWindow		No s'ha trobat el disc de sistema \"%s\"!
 Delete	MainWindow		Suprimeix
@@ -91,16 +91,16 @@ Cannot delete the selected partition.	MainWindow		No es pot suprimir la partici�
 Continue	MainWindow		Continua
 Could not mount partition %s.	MainWindow		No s'ha pogut muntar la partició %s.
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Segur que voleu formatar la partició? Se us preguntarà un cop més abans d'escriure els canvis al disc.
-<empty or unknown>	PartitionList		<empty or unknown>
-The selected disk is read-only.	MainWindow		El disc triat és només de lectura.
-The partition %s is already unmounted.	MainWindow		La partició %s ja està muntada.
+<empty or unknown>	PartitionList		<buit o desconegut>
+The selected disk is read-only.	MainWindow		El disc seleccionat és només de lectura.
+The partition %s is already unmounted.	MainWindow		La partició %s ja està desmuntada.
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Segur que voleu canviar els paràmetres de la partició seleccionada?\n\nEls altres sistemes operatius podrien no reconèixer més la partició!
 Boot	PartitionList		Arrencada
 OK	AbstractParametersPanel		D'acord
 Virtual	PartitionList		Virtual
 Virtual	DiskView		Virtual
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Segur que voleu escriure el canvis al disc ara?\n\nSi ho feu, es perdran irrecuperablement totes les dades del disc seleccionat!
-Select a partition from the list below.	DiskView		Seleccioneu una partició de la llista d'aquí sota.
+Select a partition from the list below.	DiskView		Seleccioneu una partició de la llista següent.
 Active	PartitionList		Activa
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Segur que voleu suprimir la partició seleccionada?\n\nSi ho feu, es perdran irrecuperablement totes les dades de la partició!
 Failed to format the partition. No changes have been written to disk.	MainWindow		Ha fallat formatar la partició. No s'ha escrit cap canvi al disc.

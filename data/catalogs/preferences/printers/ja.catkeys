@@ -2,10 +2,10 @@
 Test page	TestPageView		テストページ
 Remove	PrintersWindow		削除
 Red	TestPageView		赤
-Default Printer	PrinterListView		通常使うプリンター
+Default Printer	PrinterListView		デフォルトプリンター
 <pick one>	AddPrinterDialog		<１つ選択>
 Connected to:	AddPrinterDialog		ポート:
-Make default	PrintersWindow		通常使うプリンターに設定
+Make default	PrintersWindow		デフォルトプリンターに設定
 Cyan	TestPageView		シアン
 Completed	JobListView		完了
 Test page	PrintersWindow		テストページ

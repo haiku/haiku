@@ -27,7 +27,7 @@ OK	TouchpadPrefView		OK
 Horizontal scrolling	TouchpadPrefView		Scrolling orizzontale
 Delay until key repeat	KeyboardView		Ritardo dopo ripetizione tasto
 Two finger scrolling	TouchpadPrefView		Scorrimento con due dita
-Input	System name		Periferiche di ingresso
+Input	System name		Periferiche di Ingresso
 Mouse acceleration	SettingsView		Accelerazione del mouse
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		La nuova area di scrolling è molto ampia e potrebbe impedire il normale funzionamento del mouse. Sei sicuro di voler procedere?
 High	TouchpadPrefView		Alto

@@ -9,7 +9,7 @@ The destination is read only.	ExpanderWindow		La destinació és només de lectu
 Expander: Open	ExpanderWindow		Expandidora: obre
  is not supported	ExpanderWindow		 no s'admet.
 Expander settings	ExpanderPreferences		Paràmetres de l'expandidora
-Select current	DirectoryFilePanel		Tria l'actual
+Select current	DirectoryFilePanel		Selecciona l'actual
 Source	ExpanderWindow		Origen
 Error when expanding archive	ExpanderWindow		Error en expandir l'arxiu.
 Hide contents	ExpanderWindow		Amaga els continguts
@@ -17,17 +17,17 @@ Cancel	ExpanderWindow		Cancel·la
 Automatically expand files	ExpanderPreferences		Expandeix automàticament els fitxers.
 Continue	ExpanderWindow		Segueix
 Destination folder	ExpanderPreferences		Carpeta de destinació
-Other	ExpanderPreferences		Altre
+Other	ExpanderPreferences		Altres
 Cancel	ExpanderPreferences		Cancel·la
 Expansion	ExpanderPreferences		Descompressió
-Select	DirectoryFilePanel		Seleccioneu
+Select	DirectoryFilePanel		Selecciona
 The folder was either moved, renamed or not supported.	ExpanderWindow		La carpeta s'ha mogut, se n'ha canviat de nom o no és compatible.
 Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		La carpeta de destinació no existeix. Voleu crear-la?
 Same directory as source (archive) file	ExpanderPreferences		El mateix directori que el fitxer d'origen (arxiu)
 Settings	ExpanderMenu		Paràmetres
 Settings…	ExpanderMenu		Paràmetres…
 Expander: Choose destination	DirectoryFilePanel		Expandidora: trieu la destinació
-Select	ExpanderPreferences		Seleccioneu
+Select	ExpanderPreferences		Selecciona
 Show contents	ExpanderWindow		Mostra el contingut
 Automatically show contents listing	ExpanderPreferences		Mostra automàticament la llista de continguts
 OK	ExpanderPreferences		D'acord

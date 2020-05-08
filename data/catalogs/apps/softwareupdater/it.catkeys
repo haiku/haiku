@@ -29,7 +29,7 @@ Please choose from these update options:\n\nUpdate:\n\tUpdates all installed pac
 The following changes will be made:	SoftwareUpdaterWindow		Saranno apportate le seguenti modifiche:
 Argument variables are no longer accepted\n	SoftwareUpdaterApp		Variabili argomento non sono più accettate\n
 Fatal error while checking for updates: %s\n	CheckAction		Errore critico durante il controllo per gli aggiornamenti: %s\n
-SoftwareUpdater	System name		Installazione aggiornamenti
+SoftwareUpdater	System name		Installazione Aggiornamenti
 No active network connection was found.\n	CheckManager		Non è stata trovata nessuna connessione di rete attiva.\n
 Applying changes	UpdateManager		Applicazione delle modifiche
 Full sync	SoftwareUpdaterWindow	Alert button label	Sincronizzazione completa

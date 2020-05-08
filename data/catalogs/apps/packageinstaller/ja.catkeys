@@ -20,7 +20,7 @@ The selected package was not removed from your system. The given installed packa
 Install…	UninstallView		インストール…
 The item named '%s' already exists in the given path.\nReplace the item with the one from this package or skip it?	PackageView		項目 '%s' がすでにパスに存在します。\n項目をパッケージの物と置換えますか、またはスキップしますか?
 Installing files and folders	PackageInstall		ファイルとフォルダーをインストールしています
-Installed packages	UninstallWindow		インストール済みパッケージ
+Installed packages	UninstallWindow		インストール済パッケージ
 Remove	UninstallView		削除
 The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		要求されたパッケージはシステムにインストールできません。パッケージに問題があるかもしれません。 パッケージの配布元に相談してみてください。
 OK	UninstallView		OK
@@ -53,7 +53,7 @@ Continue	PackageInfo		続ける
 No package selected.	PackageInfo		パッケージが選択されていません。
 Error! \"%s\" is not a valid path.\n	Packageinstaller main		エラー! \"%s\" は正しいパスではありません。\n
 The directory named '%s' already exists in the given path.\nReplace the directory with one from this package or skip it?	PackageView		ディレクトリ '%s' がすでにパスに存在します。\nディレクトリをパッケージの物と置換えますか、またはスキップしますか?
-LegacyPackageInstaller	System name		LegacyPackageInstaller
+LegacyPackageInstaller	System name		パッケージインストーラー
 Ask again	PackageView		次回確認する
 Begin	PackageView		開始
 OK	PackageView		OK

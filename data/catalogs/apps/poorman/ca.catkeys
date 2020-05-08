@@ -1,5 +1,5 @@
 1	catalan; valencian	x-vnd.Haiku-PoorMan	1829050509
-Select web folder	PoorMan		Seleccioneu la carpeta web
+Select web folder	PoorMan		Seleccioneu la carpeta de xarxa
 Console logging	PoorMan		Registre de consola
 Create Log File	PoorMan		Crea un fitxer de registre
 File logging	PoorMan		Registre de fitxer
@@ -8,13 +8,13 @@ Log to file	PoorMan		Registra-ho a fitxer
 Shutting down.	PoorMan		M'aturo.
 Error Dir	PoorMan		Error de directori
 Web folder:	PoorMan		Carpeta web:
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Si us plau, trieu la carpeta que vulgueu publicar al web.\n\nPodeu fer que PoorMan creï un \"public_html\" predeterminat a la carpeta personal.\nO bé seleccioneu una de les vostres carpetes.
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Si us plau, trieu la carpeta que vulgueu publicar a la xarxa.\n\nPodeu fer que PoorMan creï un \"public_html\" predeterminat a la carpeta personal.\nO bé seleccioneu una de les vostres carpetes.
 Log To Console	PoorMan		Registra a la consola
 File Name	PoorMan		Nom del fitxer
 Starting up... 	PoorMan		S'inicia... 
 Select	PoorMan		Selecciona
 Logging view	PoorMan		Vista del registre
-Save console as…	PoorMan		Anomena i desa la consola...
+Save console as…	PoorMan		Desa la consola com a...
 Edit	PoorMan		Edita
 Cancel	PoorMan		Cancel·la
 Directory: 	PoorMan		Directori: 
@@ -51,14 +51,14 @@ done.\n	PoorMan		fet.\n
 PoorMan settings	PoorMan		Paràmetres del PoorMan
 Console Logging	PoorMan		Registre de consola
 Clear log file	PoorMan		Neteja el fitxer de registre
-Save log console selection	PoorMan		Fesa la selecció del registre de la consola
+Save log console selection	PoorMan		Desa la selecció de la consola de registre
 File Logging	PoorMan		Registre de fitxer
 Log file name:	PoorMan		Nom del fitxer de registre:
 Status: Running	PoorMan		Estat: s'executa
 Directory: (none)	PoorMan		Directori: (cap)
-A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		S'ha creat una carpeta web per defecte a \"/ boot/home/public_html.\"\nAssegureu-vos que hi ha un fitxer HTML anomenat \"index.html \" a la carpeta.
+A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		S'ha creat una carpeta de xarxa per defecte a \"/ boot/home/public_html.\"\nAssegureu-vos que hi hagi un fitxer HTML anomenat \"index.html \" a la carpeta.
 Dir Created	PoorMan		Directori creat
-Save console selections as…	PoorMan		Anomena i desa la selecció de la consola...
+Save console selections as…	PoorMan		Desa la selecció de la consola com a...
 Quit	PoorMan		Surt
 Save log console	PoorMan		Desa el registre de la consola
 Start page:	PoorMan		Pàgina d'inici:

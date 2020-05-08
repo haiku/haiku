@@ -5,7 +5,7 @@ Open and make preferred	OpenWithWindow		Vierç e rint preferît
 Kind	ContainerWindow		Gjenar
 Open with…	ContainerWindow		Vierç cun…
 Error moving \"%name\" to Trash. (%error)	FSUtils		Erôr tal spostâ \"%name\" te Scovacere. (%error)
-Or	FindPanel		Opûr
+Or	FindPanel		O
 before	FindPanel		prime
 Volume icons	TrackerSettingsWindow		Iconis volums
 Ignore case	SelectionWindow		Ignore maiusculis/minusculis

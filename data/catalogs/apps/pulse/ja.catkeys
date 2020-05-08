@@ -6,13 +6,13 @@ Info	DeskbarPulseView		情報
 Normal mode	MiniPulseView		ウィンドウモード
 Frame color	ConfigView		フレーム色
 Error	PulseApp		エラー
-Bar colors	ConfigView		配色
+Bar colors	ConfigView		バーの色
 %.2f GHz	NormalPulseView		%.2f GHz
 Defaults	PrefsWindow		デフォルト
 %ld MHz	NormalPulseView		%ld MHz
 Mini mode	PrefsWindow		ミニモード
 CPU progress bar	NormalPulseView		CPU プログレスバー
-Fade colors	ConfigView		フェード色
+Fade colors	ConfigView		バーの色をフェードさせる
 About Pulse…	PulseView		Pulse について…
 Pulse	NormalPulseView		Pulse
 Deskbar mode	NormalPulseView		Deskbar モード
@@ -20,17 +20,17 @@ Remove replicant	CPUButton		レプリカントを削除
 You can't disable the last active CPU.	PulseView		最後の CPU は無効にできません。
 Width of icon:	ConfigView		アイコンの幅:
 Deskbar mode	MiniPulseView		Deskbar モード
-OK	PulseView		Ok
+OK	PulseView		OK
 %s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nDavid Ramsey および Arve Hjønnevåg 作\nDaniel Switkin による修正\n
-OK	PrefsWindow		Ok
+OK	PrefsWindow		OK
 Pulse	PulseApp		Pulse
 Removing from Deskbar failed.\n%s	DeskbarPulseView		Deskbar からの削除に失敗しました。\n%s
-OK	PulseApp		Ok
+OK	PulseApp		OK
 About Pulse…	CPUButton		Pulse について…
 Deskbar mode	PrefsWindow		Deskbar モード
 Mini mode	DeskbarPulseView		ミニモード
 You can't disable the last active CPU.	CPUButton		最後の CPU は無効にできません。
-OK	CPUButton		Ok
+OK	CPUButton		OK
 Deskbar	CPUButton		Deskbar
 Settings…	PulseView		設定…
 Deskbar menu	CPUButton		Deskbar メニュー
@@ -38,7 +38,7 @@ Mini mode	NormalPulseView		ミニモード
 Quit	MiniPulseView		終了
 Info	PulseView		情報
 Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]	PulseApp		Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]
-OK	DeskbarPulseView		Ok
+OK	DeskbarPulseView		OK
 Info	PulseApp		情報
 Pulse	System name		Pulse
 Active color	ConfigView		アクティブ色

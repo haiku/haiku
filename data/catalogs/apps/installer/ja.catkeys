@@ -79,7 +79,7 @@ OK	InstallProgress		OK
 Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		ブートマネージャーと DriveSetup が実行中…\n\nインストールを続けるには、両アプリケーションを閉じてください。
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		使用中の起動ディスクにインストールしますか?この場合、システムを再起動する必要があります。
 Onto:	InstallerWindow		インストール先:
-Quit Boot Manager and DriveSetup	InstallerWindow		ブートマネージャーとDriveSetupを終了
+Quit Boot Manager and DriveSetup	InstallerWindow		ブートマネージャーと DriveSetup を終了
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Haikuインストーラー\n\tJérôme DuvalおよびStephan Aßmus 作\n\tCopyright 2005-2010, Haiku.\n\n
 Tools	InstallerWindow		ツール
 scanning…	InstallerWindow		ディスクを検出しています…

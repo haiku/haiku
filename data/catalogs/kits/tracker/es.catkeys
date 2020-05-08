@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-libtracker	1942691364
+1	spanish; castilian	x-vnd.Haiku-libtracker	1535620210
 Created	ContainerWindow		Creado
 Icon	AttributesView		Icono
 Open and make preferred	OpenWithWindow		Abrir y hacer preferido
@@ -12,7 +12,7 @@ Ignore case	SelectionWindow		Ignorar supuesto
 Current folder	ContainerWindow		Carpeta actual
 Finish: %time - Over %finishtime left	StatusWindow		Terminar: %time - alrededor de %finishtime restante
 Mount all disks now	AutoMounterSettings		Montar todos los discos ahora
-Location:	InfoWindow		Localización
+Location:	InfoWindow		Ubicación:
 Name	PoseView		Nombre
 Kind:	InfoWindow		Tipo:
 {0, plural, one{# byte} other{# bytes}}	WidgetAttributeText		{0, plural, one{# byte} other{# bytes}}
@@ -46,7 +46,7 @@ At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		En %fu
 Handles any file	OpenWithWindow		Manejar cualquier archivo
 save text	FilePanelPriv		Guardar texto
 Raw data	AttributesView		Datos en bruto
-Preparing to move items…	StatusWindow		Preparándose para mover elementos...
+Preparing to move items…	StatusWindow		Preparándose para mover los elementos...
 Size	ContainerWindow		Tamaño
 Select…	ContainerWindow		Seleccionar...
 Show shared volumes on Desktop	SettingsView		Mostrar las carpetas compartidas en el escritorio
@@ -283,6 +283,7 @@ Error creating link to \"%name\".	FSUtils		Error creando un enlace a \"%name\"
 Unknown	FilePermissionsView		Desconocido
 Paste links	ContainerWindow		Pegar enlaces
 Restoring: 	StatusWindow		Restaurando:
+The Tracker must be running to set the default printer.	PoseView		Tracker debe estar en ejecución para configurar la impresora por defecto.
 calculating…	InfoWindow		Calculando...
 Preferred for file	OpenWithWindow		Preferencia para el archivo
 OK	AutoMounterSettings		Aceptar

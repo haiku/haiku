@@ -1,7 +1,7 @@
 1	catalan; valencian	x-vnd.Haiku-libbe	3337473349
 {0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# byte} other{# bytes}}
 All Rights Reserved.	AboutWindow		Tots els drets reservats.
-gold master	AboutWindow		mestre daurat
+gold master	AboutWindow		candidat
 Undo	TextView		Desfés
 gamma	AboutWindow		gamma
 development	AboutWindow		desenvolupament
@@ -35,8 +35,8 @@ Error	PrintJob		Error
 About %app%	AboutWindow		Quant a %app%
 About %app…	Dragger		Quan a %app…
 Version history:	AboutWindow		Historial de versions:
-Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		No es troba l'aplicació del replicant. No s'ha proporcionat cap signatura de l'aplicació.\n%error
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		No es pot trobar l'aplicació del replicant. No s'ha proporcionat cap signatura de l'aplicació.\n%error
 %3.2f KiB	StringForSize		%3.2f KiB
 Blue:	ColorControl		Blau:
-Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		No es possible crear el replicant per a \"%description\".\n%error
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		No es pot crear el replicant per a \"%description\".\n%error
 Written by:	AboutWindow		Escrit per:

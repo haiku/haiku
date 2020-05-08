@@ -1,5 +1,6 @@
-1	french	x-vnd.Haiku-FileTypes	455777172
+1	french	x-vnd.Haiku-FileTypes	436017301
 Left	Attribute Window	Attribute column alignment in Tracker	À gauche
+Float	Attribute ListView		Flottant
 Final	Application Types Window		Finale
 FileTypes request	FileTypes Window		Requête sur les Types de Fichiers
 This file type already exists	New File Type Window		Ce type de fichier existe déjà
@@ -167,5 +168,6 @@ Add…	FileTypes Window		Ajouter…
 Edit icon…	Icon View		Éditer l’icône…
 Internal name:	Attribute Window		Nom interne :
 Show recognition rule	FileTypes Window		Afficher les règles d’identification
+Double	Attribute ListView		Double
 Move down	FileTypes Window		Déplacer vers le bas
 Alpha	Application Type Window		Alpha

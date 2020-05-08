@@ -9,7 +9,7 @@ Shadow	Colors tab		Ombra
 Document background	Colors tab		Sfondo del documento
 List background	Colors tab		Sfondo della lista
 No effect on running applications	DecorSettingsView		Nessun effetto sulle applicazioni in esecuzione
-Fixed font:	Font view		Carattere a spaziatura fissa:
+Fixed font:	Font view		Tipo di carattere a spaziatura fissa:
 Appearance	System name		Aspetto
 Reduce colored edges filter strength:	AntialiasingSettingsView		Intensità del filtro di riduzione del bordi colorati:
 Glyph hinting:	AntialiasingSettingsView		Hinting dei glifi:
@@ -33,7 +33,7 @@ Selected menu item background	Colors tab		Sfondo della voce selezionata nel menu
 Link active	Colors tab		Testo del collegamento attivo
 Antialiasing	APRWindow		Antialiasing
 Menu font:	Font view		Tipo di carattere del menu:
-Bold font:	Font view		Carattere in grassetto:
+Bold font:	Font view		Tipo di carattere in grassetto:
 %decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAutori:\n\t%decorAuthors\n\nURL: %decorURL\nLicenza: %decorLic\n\n%decorDesc\n
 Choose Decorator	DecorSettingsView		Scegli il decoratore
 Strong	AntialiasingSettingsView		Forte
@@ -42,7 +42,7 @@ Double:	DecorSettingsView		Doppio:
 Selected menu item text	Colors tab		Testo della voce selezionata nel menu
 Size:	Font Selection view		Dimensione:
 Panel background	Colors tab		Sfondo del pannello
-Plain font:	Font view		Tipo di carattere:
+Plain font:	Font view		Tipo di carattere base:
 Window tab text	Colors tab		Testo della linguetta sulla finestra
 Navigation pulse	Colors tab		Navigation pulse
 LCD subpixel	AntialiasingSettingsView		Componenti LCD

@@ -5,7 +5,7 @@ Over	Playground		Per sobre
 Quit	Playground		Surt
 Rect	Playground		Rectangle
 Select	Playground		Selecciona
-Click and drag to draw an object	Playground		Per a dibuixar un objecte, feu clic i arrossegueu
+Click and drag to draw an object	Playground		Cliqueu i arrossegueu per dibuixar un objecte
 Controls	Playground		Controls
 Round rect	Playground		Rectangle amb cantonades arrodonides
 Alpha:	Playground		Alfa:
@@ -28,5 +28,5 @@ Playground	System name		Àrea de jocs
 Erase	Playground		Esborra
 File	Playground		Fitxer
 Subtract	Playground		Sostreu
-<pick>	Playground		<tria>
+<pick>	Playground		<trieu>
 Ellipse	Playground		El·lipse

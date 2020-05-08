@@ -1,11 +1,11 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	3381858533
+1	japanese	x-vnd.Haiku-HaikuDepot	1107427137
 Repository update error	LocalRepositoryUpdateProcess		リポジトリアップデートエラー
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		リポジトリの更新中に次のエラーが発生しました: %error%
 User Created	UserLoginWindow		作成されたユーザー
 Check for updates…	MainWindow		更新をチェック…
 Uninstall	PackageManager		アンインストール
 (%Votes%)	FeaturedPackagesView		(%Votes%)
-Uninstalled	PackageListView		アンインストール済み
+Uninstalled	PackageListView		アンインストール済
 It was not possible to create the new user.	UserLoginWindow		新規ユーザーを作成できませんでした。
 Available packages	MainWindow		使用可能なパッケージ
 Create account	UserLoginWindow		アカウントの作成
@@ -46,7 +46,7 @@ An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginW
 A response to the captcha question must be provided.	UserLoginWindow		キャプチャへの回答は提供される必要がある。
 Category	FilterView		分類
 User rating	RatePackageWindow		ユーザーによる評価
-Installed packages	MainWindow		インストール済みパッケージ
+Installed packages	MainWindow		インストール済パッケージ
 A requested object or an object involved in the request was not found on the server.	ServerHelper		要求されたオブジェクトまたはリクエストに関連するオブジェクトがサーバー上に見つかりませんでした。　　
 Stable	RatePackageWindow		安定
 Fatal error	PackageManager		致命的なエラー
@@ -54,6 +54,7 @@ Package action failed	PackageInfoView		パッケージアクションに失敗�
 No changelog available.	PackageInfoView		変更記録はありません。
 Error	App		エラー
 There was a puzzling response from the web service.	UserLoginWindow		ウェブサービスから不可解なレスポンスがあった。
+Version	PackageListView		バージョン
 Not logged in	MainWindow		ログインしていません
 No, quit HaikuDepot	App		いいえ、HaikuDepot を終了します
 Featured packages	FeaturedPackagesView		おすすめパッケージ

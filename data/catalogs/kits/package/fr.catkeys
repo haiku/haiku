@@ -1,4 +1,5 @@
-1	french	x-vnd.Haiku-libpackage	2012114212
+1	french	x-vnd.Haiku-libpackage	123157732
+Fetching repository-cache from %url	RefreshRepositoryRequest		Récupération du cache de dépôt depuis %url
 Failed to remove transaction directory	PackageManagerKit		Impossible de supprimer le répertoire de transaction
 Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		Impossible d’obtenir la configuration pour le dépôt « %s ». Abandon.
 Refreshing repository \"%s\" failed	PackageManagerKit		Impossible de rafraîchir le dépôt « %s »

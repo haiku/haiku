@@ -64,7 +64,7 @@ Fonts	APRWindow		ตัวอักษร
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	สุนัขจิ้งจอกสีน้ำตาลอย่างรวดเร็วกระโดดข้ามสุนัขขี้เกียจ
 Grayscale	AntialiasingSettingsView		ระบบสี Grayscale
 Antialiasing type:	AntialiasingSettingsView		ชนิดขอบ:
-Panel text	Colors tab		Panel ข้อความ 
+Panel text	Colors tab		Panel ข้อความ
 Hinting menu	AntialiasingSettingsView		เมนูคำแนะนำ
 Scroll bar:	DecorSettingsView		แถบเลื่อน:
 Choose ControlLook	DecorSettingsView		เลือกลักษณะการควบคุม

@@ -1,0 +1,47 @@
+1	thai	x-vnd.Haiku-Shortcuts	3834857117
+*MouseUp	ShortcutsWindow		*MouseUp
+Application	ShortcutsWindow		แอพพลิเคชั่น
+Option	ShortcutsSpec	Name for modifier on keyboard	ตัวเลือก
+Save changes before closing?	ShortcutsWindow		บันทึกการเปลี่ยนแปลงก่อนปิดหรือไม่?
+Revert to saved	ShortcutsWindow		เปลี่ยนกลับเพื่อบันทึก
+Don't save	ShortcutsWindow		ไม่บันทึก
+*MouseDown	ShortcutsWindow		*MouseDown
+*Beep	ShortcutsWindow		*Beep
+Shortcuts wasn't able to save your keyset.	ShortcutsWindow		ทางลัดไม่สามารถบันทึกชุดคีย์ของคุณ
+Save	ShortcutsWindow		บันทึก
+Either	ShortcutsSpec		อย่างใดอย่างหนึ่ง
+Oh no	ShortcutsWindow		โอ ไม่
+Key	ShortcutsWindow		คีย์
+*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*SendMessage application/x-vnd.Be-TRAK 'Tfnd'
+Select	ShortcutsWindow		เลือก
+Shortcuts	System name		ทางลัด
+Quit	ShortcutsWindow		ออก
+(Choose application with file requester)	ShortcutsWindow		(เลือกแอปพลิเคชันที่มีผู้ร้องขอไฟล์)
+Cancel	ShortcutsWindow		ยกเลิก
+*MoveMouse +20 +0	ShortcutsWindow		*MoveMouse +20 +0
+Control	ShortcutsSpec	Name for modifier on keyboard	Control
+Left	ShortcutsSpec		Left
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		ทางลัดไม่สามารถแยกวิเคราะห์ไฟล์ KeySet ของคุณ!
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		ทางลัดไม่สามารถบันทึกไฟล์ KeySet ของคุณได้!
+*InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"ข้อความของคุณที่นี้\"
+Remove selected shortcut	ShortcutsWindow		ลบทางลัดที่เลือก
+Error, NULL state description?	ShortcutsSpec		ข้อผิดพลาด ยกเลิกคำอธิบายสถานะหรือไม่?
+Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		ทางลัดไม่สามารถเปิดไฟล์ KeySet ของคุณได้!
+Save & apply	ShortcutsWindow		บันทึกและนำไปใช้
+Open	ShortcutsWindow		เปิด
+Append	ShortcutsWindow		ผนวก
+Both	ShortcutsSpec		ทั้งคู่
+Save KeySet as…	ShortcutsWindow		บันทีก KeySet เป็น
+Append KeySet…	ShortcutsWindow		ผนวก KeySet
+*MouseButton 1	ShortcutsWindow		*MouseButton 1
+*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"
+Right	ShortcutsSpec		Right
+OK	ShortcutsWindow		ตกลง
+Add new shortcut	ShortcutsWindow		เพิ่มทางลัดใหม่
+(None)	ShortcutsSpec		(ไม่มี)
+Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
+Open KeySet…	ShortcutsWindow		เปิด KeySet
+File	ShortcutsWindow		ไฟล์
+*LaunchHandler text/html	ShortcutsWindow		*LaunchHandler text/html
+*MoveMouseTo 50% 50%	ShortcutsWindow		*MoveMouseTo 50% 50%

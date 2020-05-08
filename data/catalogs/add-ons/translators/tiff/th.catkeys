@@ -1,6 +1,6 @@
 1	thai	x-vnd.Haiku-TIFFTranslator	2234713102
 TIFF Library:	TIFFView		ห้องสมุด TIFF:
-RLE (Packbits)	TIFFView		RLE (Packbits)
+RLE (Packbits)	TIFFView		RLE (แพ็คบิต)
 ZIP (Deflate)	TIFFView		ZIP (ยุบ)
 identify_tiff_header: invalid document index\n	TIFFTranslator		ident_tiff_header: ดัชนีเอกสารไม่ถูกต้อง \n
 Use compression:	TIFFView		ใช้การบีบอัด:

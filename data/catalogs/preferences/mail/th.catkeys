@@ -1,0 +1,54 @@
+1	thai	x-vnd.Haiku-Mail	2750130554
+Account settings	AutoConfigWindow		ตั้งค่าบัญชี
+\t\t· Outgoing	Config Window		\t\t·ออก
+An error occurred while creating the config view: %error.	Config Views		เกิดข้อผิดพลาดขณะสร้างมุมมองปรับแต่ง: %error
+E-mail address:	E-Mail		ที่อยู่อีเมล:
+Create new account	AutoConfigWindow		สร้างบัญชีใหม่
+While sending and receiving	Config Window		ในขณะที่ส่งและรับ
+Error!	Config Views		ผิดพลาด!
+Apply	Config Window		ใช้
+Incoming mail filters	Config Views		ตัวกรองจดหมายขาเข้า
+Outgoing mail filters	Config Views		ตัวกรองจดหมายขาออก
+Server name:	E-Mail		ชื่อเซิฟเวอร์:
+Add	Config Window		เพิ่ม
+Back	AutoConfigWindow		ย้อนกลับ
+Real name:	E-Mail		ชื่อจริง:
+Real name:	Config Views		ชื่อจริง:
+\t\t· E-mail filters	Config Window		\t\t·ตัวกรองอีเมล
+Outgoing	E-Mail		ออก
+Accounts	Config Window		บัญชี
+Outgoing	Config Window		ออก
+Remove	Config Views		ลบ
+Show notifications:	Config Window		แสดงคำเตือน:
+Settings	Config Window		ตั้งค่า:
+Never	Config Window	show status window	ไม่ต้อง
+Account name:	Config Views		ชื่อบัญชี:
+\t\t· Incoming	Config Window		\t\t·เข้า
+Enter a valid e-mail address.	AutoConfigWindow		ใส่อีเมล์ที่ถูกต้อง.
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nไม่สามารถเปลี่ยนการตั้งค่าทั่วไปได้\n\nเกิดข้อผิดพลาดในการเรียกการตั้งค่าทั่วไป:\n%s\n
+Incoming	E-Mail		เข้า
+Choose Protocol	E-Mail		เลือกโปรโตคอล
+Return address:	Config Views		ที่อยู่ผู้ส่ง:
+Password:	E-Mail		รหัส:
+Error retrieving general settings: %s\n	Config Window		เกิดข้อผิดพลาดในการเรียกการตั้งค่าทั่วไป: %s\n
+The filter could not be moved. Deleting filter.	Config Views		ไม่สามารถย้ายตัวกรองได้ ลบตัวกรอง
+OK	Config Views		ตกลง
+Revert	Config Window		เปลี่ยนกลับ
+Incoming	Config Window		เข้า
+Finish	AutoConfigWindow		เสร็จ
+Add filter	Config Views		เพิ่มตัวกรอง
+Account settings	Config Views		ตั้งค่าบัญชี
+minutes	Config Window		นาที
+E-mail	System name		อีเมล์
+Check every	Config Window		ตรวจสอบทุกๆ
+Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		สร้างบัญชีใหม่ด้วยปุ่มเพิ่ม\n\nลบบัญชีด้วยปุ่มลบในรายการที่เลือก\n\nเลือกรายการในรายการเพื่อเปลี่ยนการตั้งค่า
+Account name:	E-Mail		ชื่อบัญชี:
+Edit mailbox menu…	Config Window		แก้ไขเมนูกล่องจดหมาย
+Server Name:	E-Mail		ชื่อเซิร์ฟเวอร์:
+Remove	Config Window		ลบ
+Login name:	E-Mail		ชื่อเข้าสู่ระบบ:
+While sending	Config Window		ขณะส่ง
+OK	Config Window		ตกลง
+OK	AutoConfigWindow		ตกลง
+Next	AutoConfigWindow		ถัดไป
+Error	Config Window		ผิดพลาด

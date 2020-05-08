@@ -6,9 +6,9 @@ Australia	Time		Austràlia
 America	Time		Amèrica
 Reset to default server list	Time		Restableix la llista de servidors per defecte
 Could not resolve server address	Time		No s'ha pogut resoldre l'adreça del servidor.
-Set time zone	Time		Tria el fus horari
+Set time zone	Time		Estableix la zona horària
 Waiting for answer failed	Time		Ha fallat esperar la resposta.
-<Other>	Time		<Altre>
+<Other>	Time		<Altres>
 Received invalid time	Time		S'ha rebut una hora no vàlida
 Remove	Time		Suprimeix
 Synchronize again	Time		Sincronitza-ho un altre cop
@@ -26,10 +26,10 @@ Antarctica	Time		Antàrtida
 GMT (UNIX compatible)	Time		GMT (compatible amb l'UNIX)
 Africa	Time		Àfrica
 Stop	Time		Atura
-Time zone	Time		Fus horari
+Time zone	Time		Zona horària
 Clock	Time		Rellotge
 Network time	Time		Hora de la xarxa
-Sending request failed	Time		Ha fallat enviar la petició.
+Sending request failed	Time		Ha fallat enviar la sol·licitud.
 Preview time:	Time		Vista prèvia de l'hora:
 \nNow: 	Time		\nAra: 
 Could not create socket	Time		No s'ha pogut obrir el sòcol
@@ -39,7 +39,7 @@ Show clock in Deskbar	Time		Mostra el rellotge a la barra d'escriptori
 Display time with seconds	Time		Mostra l'hora amb els segons
 Time	System name		Hora
 about	Time		quant a
-Show time zone	Time		Mostra el fus horari
+Show time zone	Time		Mostra la zona horària
 Synchronize at boot	Time		Sincronitza-ho a l'arrencada
 Indian	Time		Indi
 Revert	Time		Reverteix

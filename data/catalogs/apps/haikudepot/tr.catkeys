@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-HaikuDepot	3381858533
+1	turkish	x-vnd.Haiku-HaikuDepot	1107427137
 Repository update error	LocalRepositoryUpdateProcess		Depo güncelleme hatası
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Depo güncellenirken bir hata oluştu: %error%
 User Created	UserLoginWindow		Kullanıcı Oluşturuldu
@@ -54,6 +54,7 @@ Package action failed	PackageInfoView		Paket eylemi başarısız oldu
 No changelog available.	PackageInfoView		Değişiklik günlüğü mevcut değil
 Error	App		Hata
 There was a puzzling response from the web service.	UserLoginWindow		Web servisinden kafa karıştıran bir yanıt alındı.
+Version	PackageListView		Sürüm
 Not logged in	MainWindow		Giriş yapılmadı
 No, quit HaikuDepot	App		Hayır, Haiku Depo'dan çık
 Featured packages	FeaturedPackagesView		Öne çıkan paketler

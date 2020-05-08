@@ -6,7 +6,7 @@ Error saving \"%s\":\n\t%s	ScreenshotWindow		Error en desar \"%s\":\n\t%s
 This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Aquest fitxer ja existeix.\n  Segur que voleu sobreescriure'l?
 OK	ScreenshotWindow		D'acord
 The destination path exists but is not a folder.	ScreenshotWindow		El camí de destinació existeix però no és una carpeta.
-Select	ScreenshotWindow		Seleccioneu
+Select	ScreenshotWindow		Selecciona
 Save as:	ScreenshotWindow		Desa com a:
 seconds	ScreenshotWindow		segons
 New screenshot	ScreenshotWindow		Nova captura

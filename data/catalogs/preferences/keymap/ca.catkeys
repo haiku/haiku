@@ -62,7 +62,7 @@ French (NF Z71-300)	KeymapNames		Francès (NF Z71-300)
 Modifier keys	Modifier keys window		Tecles modificadores
 ThinkPad X1 International	KeyboardLayoutNames		ThinkPad X1 Internacional
 Kazakh	KeymapNames		Kazakh
-Save as…	Keymap window		Anomena i desa…
+Save as…	Keymap window		Desa com a...
 Lithuanian (Standard)	KeymapNames		Lituà (estàndard)
 Error: duplicate keys	Modifier keys window		Error: tecles duplicades
 NUM	Keyboard Layout View	Very short for 'num lock'	NÚM
@@ -109,7 +109,7 @@ Thai (TIS-820.2538)	KeymapNames		Tailandès (TIS-820.2538)
 Control:	Modifier keys window	Control key role name	Control:
 Generic 105-key International	KeyboardLayoutNames		Genèric internacional de 105 tecles
 Disabled	Modifier keys window	Do nothing	Inhabilitat
-Select dead keys	Keymap window		Trieu les tecles inútils
+Select dead keys	Keymap window		Seleccioneu les tecles inútils
 Russian (Mac)	KeymapNames		Rus (Mac)
 Right shift	Keyboard Layout View		Maj. de la dreta
 ESC	Keyboard Layout View		ESC
@@ -138,7 +138,7 @@ Shift:	Modifier keys window	Shift key role name	Tecla de majúscules
 Keymap	System name		Mapa de tecles
 Slovene	KeymapNames		Eslovè
 Lithuanian	KeymapNames		Lituà
-Set modifier keys…	Keymap window		Tria les tecles modificadores...
+Set modifier keys…	Keymap window		Establiu les tecles modificadores...
 Switch shortcut keys to Haiku mode	Keymap window		Canvia les dreceres de teclat en mode Haiku
 Defaults	Keymap window		Valors predeterminats
 ISO-9995	KeymapNames		ISO-9995

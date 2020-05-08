@@ -6,9 +6,9 @@ Set destination…	ExpanderMenu		Hedef belirle…
 Use:	ExpanderPreferences		Şunu kullan:
 File expanded	ExpanderWindow		Dosya genişletildi
 The destination is read only.	ExpanderWindow		Hedef saltokunur.
-Expander: Open	ExpanderWindow		Genişletici: Aç
+Expander: Open	ExpanderWindow		Paketaçar: Aç
  is not supported	ExpanderWindow		 desteklenmiyor
-Expander settings	ExpanderPreferences		Genişletici Ayarları
+Expander settings	ExpanderPreferences		Paketaçar Ayarları
 Select current	DirectoryFilePanel		Olanı seç
 Source	ExpanderWindow		Kaynak
 Error when expanding archive	ExpanderWindow		Arşiv genişletilirken hata
@@ -26,7 +26,7 @@ Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		H
 Same directory as source (archive) file	ExpanderPreferences		Kaynak (arşiv) dosya ile aynı dizin
 Settings	ExpanderMenu		Ayarlar
 Settings…	ExpanderMenu		Ayarlar…
-Expander: Choose destination	DirectoryFilePanel		Genişletici: Hedef seç
+Expander: Choose destination	DirectoryFilePanel		Paketaçar: Hedef seç
 Select	ExpanderPreferences		Seç
 Show contents	ExpanderWindow		İçeriği göster
 Automatically show contents listing	ExpanderPreferences		İçerik listesini kendiliğinden göster
@@ -39,7 +39,7 @@ Create	ExpanderWindow		Oluştur
 The file doesn't exist	ExpanderWindow		Dosya mevcut değil
 Stop	ExpanderMenu		Durdur
 File	ExpanderMenu		Dosya
-Expander	System name		Genişletici
+Expander	System name		Paketaçar
 Expand	ExpanderWindow		Genişlet
 Close	ExpanderMenu		Kapat
 The destination is not a folder.	ExpanderWindow		Hedef bir klasör değil.

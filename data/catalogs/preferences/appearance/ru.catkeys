@@ -18,7 +18,7 @@ Menu item text	Colors tab		Текст пункта меню
 About decorator	DecorSettingsView		Об этом декораторе
 Antialiasing menu	AntialiasingSettingsView		Сглаживание меню
 Success	Colors tab		Успех
-About	DecorSettingsView		О декораторе
+About	DecorSettingsView		Информация
 Shine	Colors tab		Сияние
 Arrow style	DecorSettingsView		Стиль стрелок
 On	AntialiasingSettingsView		Включить

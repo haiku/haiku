@@ -18,7 +18,7 @@ Memory usage	ProcessController		การใช้งานหน่วยคว
 Ok!	ProcessController		ตกลง
 Normal priority	ProcessController		ลำดับความสำคัญปกติ
 Restart Deskbar	ProcessController		รีสตาร์ทเดสก์บาร์
-About ProcessController…	ProcessController		เกี่ยวกับ Process Controller
+About ProcessController…	ProcessController		เกี่ยวกับ ตัวควบคุมการทำงาน
 Usage: %s [-deskbar]\n	ProcessController		การใช้งาน: %s [-deskbar]\n
 Please confirm	ProcessController		กรุณายืนยัน
 Urgent priority	ProcessController		ลำดับความสำคัญเร่งด่วน

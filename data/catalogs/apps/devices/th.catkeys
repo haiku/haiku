@@ -11,11 +11,11 @@ ACPI Information	DeviceACPI		ข้อมูล ACPI
 Detailed	DevicesView		รายละเอียด
 Computer	DevicesView		คอมพิวเตอร์
 Communications	DeviceSCSI		การสื่อสาร
-Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Class Info:\t\t\t\t: %classInfo%
+Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		ข้อมูลคลาส:\t\t\t\t: %classInfo%
 Mass storage controller	Device		อุปกรณ์เก็บข้อมูลขนาดใหญ่
 Connection	DevicesView		การเชื่อมต่อ
 Printer	DeviceSCSI		เครื่องพิมพ์
-ACPI Processor Namespace '%2'	DeviceACPI		ACPI Processor Namespace '%2'
+ACPI Processor Namespace '%2'	DeviceACPI		ACPI พื้นที่ชื่อโปรเซสเซอร์ '%2'
 SCSI Information	DeviceSCSI		ข้อมูล SCSI
 Manufacturer	Device		ผู้ผลิต
 Device name:	Device		ชื่ออุปกรณ์:
@@ -27,10 +27,10 @@ ACPI node '%1'	DeviceACPI		ACPI node '%1'
 Optical Drive	DeviceSCSI		ออปติคัลไดรฟ์
 Name	PropertyList		ชื่อ
 Manufacturer	DeviceSCSI		ผู้ผลิต
-Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		ชื่ออุปกรณ์\t\t\t\t: %Name%\nผู้ผลิต\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%
-Device name	Device		ชื่อปอุปกรณ์
+Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		ชื่ออุปกรณ์\t\t\t\t: %Name%\nผู้ผลิต\t\t\t: %Manufacturer%\nไดรเวอร์ใช้งาน\t\t\t\t: %DriverUsed%\nอุปกรณ์ พาธ\t: %DevicePaths%
+Device name	Device		ชื่ออุปกรณ์
 Satellite communications controller	Device		ตัวควบคุมการสื่อสารผ่านดาวเทียม
-Device class	DeviceSCSI		Device class
+Device class	DeviceSCSI		คลาสอุปกรณ์
 Device	Device		อุปกรณ์
 Input device controller	Device		ตัวควบคุมอุปกรณ์อินพุต
 PCI bus	DevicesView		PCI bus
@@ -63,8 +63,8 @@ Other	DeviceSCSI		อื่นๆ
 Report compatibility	DevicesView		รายงานความเข้ากันได้
 Computer	Device		คอมพิวเตอร์
 PCI bus	Device		PCI bus
-Enclosure	DeviceSCSI		Enclosure
-Order by:	DevicesView		Order by:
+Enclosure	DeviceSCSI		ปิด
+Order by:	DevicesView		สั่งโดย:
 ACPI Thermal Zone	DeviceACPI		ACPI Thermal Zone
 Intelligent controller	Device		ตัวควบคุมอัจฉริยะ
 Multimedia controller	Device		ตัวควบคุมมัลติมีเดีย
@@ -73,7 +73,7 @@ ISA bus	Device		ISA bus
 ISA bus	DevicesView		ISA bus
 Processor	DeviceSCSI		หน่วยประมวลผล
 Manufacturer:	Device		ผู้ผลิต:
-Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Class Info:\t\t\t\t: %classInfo%
+Class Info:\t\t\t\t: %classInfo%	DeviceACPI		ข้อมูลคลาส:\t\t\t\t: %classInfo%
 Bridge	Device		Bridge
 Worm	DeviceSCSI		Worm
 CD-ROM	DeviceSCSI		CD-ROM

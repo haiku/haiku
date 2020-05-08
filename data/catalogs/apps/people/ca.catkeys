@@ -9,7 +9,7 @@ Could not create %s.	People		No s'ha pogut crear %s.
 Quit	People		Surt
 Company	People		Empresa
 Name	People		Nom
-The file '%name%' could not be written.	People		No s'ha pogut escriure el fitxer '%name%'
+The file '%name%' could not be written.	People		No s'ha pogut escriure el fitxer %name%.
 Contact name	People		Nom del contacte
 Cancel	People		Cancel·la
 Edit	People		Edita
@@ -26,7 +26,7 @@ URL	People		URL
 %name% picture	People		Imatge %name%
 Home phone	People		Telèfon de casa
 none	Groups list		cap
-Save as…	People		Anomena i desa…
+Save as…	People		Desa com a...
 Cut	People		Retalla
 Contact information for a person.	Long mimetype description		Informació per contactar la persona.
 Remove image	People		Suprimeix la imatge

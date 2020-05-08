@@ -7,8 +7,8 @@ OK	NotifierFilter		ตกลง
 Central alert	NotifierConfigView		เตือนจากส่วนกลาง
 Beep	NotifierConfigView		เสียง
 Central beep	NotifierConfigView		เสียงจากส่วนกลาง
-{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{One new message} other{# new messages}}
+{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{One new message} อื่นๆ{# new messages}}
 New messages	NotifierFilter		ข้อความใหม่
 Method:	NotifierConfigView		วิธีการ:
 Keyboard LEDs	NotifierConfigView		คีย์บอร์ด LED
-You have {0, plural, one{one new message} other{# new messages}} for %account.	NotifierFilter		คุณมี {0, plural, one{one new message} other{# new messages}} for %account.
+You have {0, plural, one{one new message} other{# new messages}} for %account.	NotifierFilter		คุณมี {0, plural, one{one new message} อื่นๆ{# new messages}} สำหรับ %account.

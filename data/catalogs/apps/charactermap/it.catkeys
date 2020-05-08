@@ -63,7 +63,7 @@ Combining half marks	UnicodeBlocks		Mezzi segni combinabili
 Cyrillic	UnicodeBlocks		Cirillico
 Katakana	UnicodeBlocks		Katakana
 Block elements	UnicodeBlocks		Elementi di blocco
-Clear	CharacterWindow		Pulisci
+Clear	CharacterWindow		Rimuovi
 Sundanese	UnicodeBlocks		Sundanese
 Miscellaneous mathematical symbols A	UnicodeBlocks		Simboli matematici vari - A
 Cyrillic supplement	UnicodeBlocks		Cirillico supplementare
@@ -194,7 +194,7 @@ CJK compatibility	UnicodeBlocks		Compatibilità CJK
 Malayalam	UnicodeBlocks		Malayalam
 N'Ko	UnicodeBlocks		N'Ko
 Kannada	UnicodeBlocks		Kannada
-Copy as escaped byte string	CharacterView		Copia come stringa 'escaped byte'
+Copy as escaped byte string	CharacterView		Copia con carattere di escape
 Phonetic extensions supplement	UnicodeBlocks		Estensioni fonetiche - Supplemento
 Domino tiles	UnicodeBlocks		Tessere del domino
 Bhaiksuki	UnicodeBlocks		Bhaiksuki

@@ -62,7 +62,7 @@ Opening the document failed!	Icon-O-Matic-Main		L’ouverture du document a éch
 Shape	Icon-O-Matic-Menus		Forme
 Add with path & style	Icon-O-Matic-ShapesList		Ajouter avec le chemin & le style
 <unavailable>	Icon-O-Matic-StyleTypes		<indisponible>
-Min LOD	Icon-O-Matic-PropertyNames		Seuil de détail minimal
+Min LOD	Icon-O-Matic-PropertyNames		Seuil min.
 Reverse Path	Icon-O-Matic-ReversePathCmd		Inverser le chemin
 Move Transformers	Icon-O-Matic-MoveTransformersCmd		Déplacer les transformations
 Add	Icon-O-Matic-TransformersList		Ajouter
@@ -162,7 +162,7 @@ Freeze transformation	Icon-O-Matic-ShapesList		Figer la transformation
 Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Figer les formes
 Miter Limit	Icon-O-Matic-PropertyNames		Limite de raccord
 Untitled	Icon-O-Matic-Main		Sans nom
-Max LOD	Icon-O-Matic-PropertyNames		Seuil de détail maximal
+Max LOD	Icon-O-Matic-PropertyNames		Seuil max.
 Add Path	Icon-O-Matic-AddPathsCmd		Ajouter un chemin
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Sauvegarder les changements de l’icône actuelle avant de fermer ?
 load error	Icon-O-Matic-SVGImport		erreur de chargement

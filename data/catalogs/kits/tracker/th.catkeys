@@ -10,12 +10,12 @@ before	FindPanel		่ก่อน
 Volume icons	TrackerSettingsWindow		ไอคอนเสียง
 Ignore case	SelectionWindow		ละเว้นกรณี
 Current folder	ContainerWindow		โฟลเดอร์ปัจจุบัน
-Finish: %time - Over %finishtime left	StatusWindow		เสร็จ:%time - Over %finishtime left
-Mount all disks now	AutoMounterSettings		เมานดิสก์ทั้งหมดตอนนี้
+Finish: %time - Over %finishtime left	StatusWindow		เสร็จ:%time - มากกว่า %finishtime คงเหลือ
+Mount all disks now	AutoMounterSettings		เมาท์ดิสก์ทั้งหมดตอนนี้
 Location:	InfoWindow		สถานที่:
 Name	PoseView		ชื่อ
 Kind:	InfoWindow		ชนิด:
-{0, plural, one{# byte} other{# bytes}}	WidgetAttributeText		{0, plural, one{# byte} other{# bytes}}
+{0, plural, one{# byte} other{# bytes}}	WidgetAttributeText		{0, plural, one{# byte} อื่นๆ{# bytes}}
 contains	FindPanel		มี
 32 x 32	ContainerWindow		32 x 32
 Open	FilePanelPriv		เปิด
@@ -69,7 +69,7 @@ Junk on end.	libtracker		ทิ้งขยะ
 New Query	FindPanel		ถามใหม่
 system	B_SYSTEM_DIRECTORY		ระบบ
 Preparing to delete items…	StatusWindow		กำลังเตรียมที่จะลบรายการ
-Open %name with:	OpenWithWindow		เปิด  %name ด้วย:
+Open %name with:	OpenWithWindow		เปิด %name ด้วย:
 \"%name\" is an unsupported executable.	FSUtils		\"%name\" เป็นไฟล์ปฏิบัติการที่ไม่รองรับ
 You cannot copy or move the root directory.	FSUtils		คุณไม่สามารถคัดลอกหรือย้ายไดเรกทอรีรูธ
 Plain text	AttributesView		ข้อความเปล่า
@@ -108,10 +108,10 @@ Company	Person Query Columns		บริษัท
 Recent documents	FavoritesMenu		เอกสารล่าสุด
 Save as Query template:	FindPanel		บันทึกเป็นแม่แบบ Query:
 Edit templates…	TemplatesMenu		แก้ไขเทมเพลต
-{0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# byte} other{# bytes}}
+{0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# byte} อื่นๆ{# bytes}}
 8-bit integer	AttributesView		8-bit integer
 8-bit unsigned integer	AttributesView		8-bit unsigned integer
-%capacity (%used used -- %free free)	InfoWindow		%capacity (%used used -- %free free)
+%capacity (%used used -- %free free)	InfoWindow		%capacity (%used ใช้งาน-- %free ว่าง)
 Hide dotfiles	SettingsView		ซ่อน dotfiles
 Trash	Model		ขยะ
 Enable type-ahead filtering	SettingsView		เปิดใช้งานการกรองแบบพิมพ์ล่วงหน้า
@@ -151,7 +151,7 @@ Replace other file	WidgetAttributeText		แทนที่ไฟล์อื่�
 OK	Email Query Columns		ตกลง
 Location	QueryPoseView		สถานที่
 Edit query	ContainerWindow		แก้ไข query
-{0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# byte)} other{(# bytes)}}
+{0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# byte)} อื่นๆ{(# bytes)}}
 Previously mounted disks	AutoMounterSettings		ดิสก์ที่ติดตั้งก่อนหน้านี้
 You cannot replace a file with a folder or a symbolic link.	FSUtils		คุณไม่สามารถแทนที่ไฟล์ด้วยโฟลเดอร์หรือลิงก์สัญลักษณ์
 The target disk does not support creating links.	FSUtils		ดิสก์เป้าหมายไม่รองรับการสร้างลิงค์
@@ -167,7 +167,7 @@ If you rename %target, %osName may not behave properly!\n\nAre you sure you want
 Could not open \"%name\" (%error). 	FSUtils		ไม่สามารถเปิด\"%name\" (%error)
 Media parameter group	AttributesView		กลุ่มพารามิเตอร์สื่อ
 %name info	InfoWindow	InfoWindow Title	%name ข้อมูล
-If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		หากคุณย้ายโฮมโฟลเดอร์ %osName อาจทำงานไม่ถูกต้อง!\n\nคุณแน่ใจหรือว่าต้องการทำสิ่งนี้?\n\nหากต้องการย้ายโฟลเดอร์หลักให้กดแป้น Shift ค้างไว้แล้วคลิก \"Move\"
+If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		หากคุณย้ายโฮมโฟลเดอร์ %osName อาจทำงานไม่ถูกต้อง!\n\nคุณแน่ใจหรือว่าต้องการทำสิ่งนี้?\n\nหากต้องการย้ายโฟลเดอร์หลักให้กดแป้น Shift ค้างไว้แล้วคลิก \"ย้าย\"
 Property info	AttributesView		ข้อมูลคุณสมบัติ
 Sorry, you can't create links in the Trash.	PoseView		ขออภัยคุณไม่สามารถสร้างลิงก์ในถังขยะ
 From	Email Query Columns		จาก
@@ -217,7 +217,7 @@ The specified name is already used as the name of a folder. Please choose anothe
 Modified	ContainerWindow		แก้ไข
 Mini icon view	ContainerWindow		ดูไอคอนขนาดเล็ก
 File	FilePanelPriv		ไฟล์
-Search	FindPanel		้ค้นหา
+Search	FindPanel		ค้นหา
 Modified:	InfoWindow		แก้ไข:
 Cancel	FilePanelPriv		ยกเลิก
 Sorry, you cannot edit that attribute.	WidgetAttributeText		ขออภัยคุณไม่สามารถแก้ไขคุณสมบัตินั้นได้
@@ -245,7 +245,7 @@ Show navigator	SettingsView		แสดง navigator
 Select all	DeskWindow		เลือกทั้งหมด
 Double-precision floating point number	AttributesView		ขยายตัวเลขทศนิยมเป็นสองเท่า
 Decrease size	ContainerWindow		ลดขนาด
-Recent queries	FindPanel		queries ล่าสุด 
+Recent queries	FindPanel		queries ล่าสุด
 Mount all	MountMenu		เชื่อมต่อทั้งหมด
 128 x 128	DeskWindow		128 x 128
 Size	Default Query Columns		ขนาด
@@ -256,7 +256,7 @@ Formula %formula	FindPanel	FindResultTitle	สูตร %formula
 Preparing to create links…	StatusWindow		การเตรียมการเพื่อสร้างลิงก์
 Tracker status	StatusWindow		ติดตามสถานะ
 Handles any %type	OpenWithWindow		จัดการใด ๆ %type
-The mount server could not be contacted.	AutoMounterSettings		ม่สามารถติดต่อเซิร์ฟเวอร์เชื่อมต่อ
+The mount server could not be contacted.	AutoMounterSettings		ไม่สามารถติดต่อเซิร์ฟเวอร์เชื่อมต่อ
 Query template	FindPanel		แบบ Query
 ends with	SelectionWindow		ลงท้ายด้วย
 Open	OpenWithWindow		เปิด
@@ -269,8 +269,8 @@ Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		�
 Disk mounting during boot	AutoMounterSettings		การติดตั้งดิสก์ระหว่างการบู๊ต
 Don't automount	AutoMounterSettings		อย่าติดตั้งอัตโนมัติ
 Could not find application \"%appname\"	OpenWithWindow		ไม่พบแอปพลิเคชัน \"%appname\"
-Unmatched parenthesis.	libtracker		เครื่องหมายวงเล็บที่ไม่ตรงกัน 
-Extended attribute	AttributesView		ขยาย  attribute
+Unmatched parenthesis.	libtracker		เครื่องหมายวงเล็บที่ไม่ตรงกัน
+Extended attribute	AttributesView		ขยาย attribute
 Unmatched brackets.	libtracker		วงเล็บเหลี่ยมที่ไม่ตรงกัน
 Error %error loading Add-On %name.	ContainerWindow		ข้อผิดพลาด %error ข้อผิดพลาดในการโหลดชื่อ Add-On %name
 You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		คุณกำลังพยายามแทนที่รายการ:\n\t%name%dest\nกับ:\n\t%name%src\n\nคุณต้องการแทนที่ด้วยโหมดที่คุณเป็น %movemode หรือไม่?
@@ -278,8 +278,8 @@ Empty Trash	ContainerWindow		ถังขยะที่ว่างเปล่
 no supporting apps	OpenWithWindow		ไม่มีแอพที่รองรับ
 32-bit unsigned integer	AttributesView		32-bit unsigned integer
 Preparing to empty Trash…	StatusWindow		กำลังเตรียมที่จะล้างถังขยะ
-Deleting: 	StatusWindow		กำลังลบ: 
-the MIME settings	FSUtils		ตั้งค่า MIME 
+Deleting: 	StatusWindow		กำลังลบ:
+the MIME settings	FSUtils		ตั้งค่า MIME
 You can't move or copy the trash.	FSUtils		คุณไม่สามารถย้ายหรือคัดลอกถังขยะ
 label too long	PoseView		ป้ายกำกับยาวเกินไป
 Error creating link to \"%name\".	FSUtils		เกิดข้อผิดพลาดในการสร้างลิงก์ไปยัง \"%name\"
@@ -326,7 +326,7 @@ Would you like to find some other suitable application?	FSUtils		คุณต้
 Recent folders	FavoritesMenu		โฟลเดอร์ล่าสุด
 Signed memory size	AttributesView		ขนาดหน่วยความจำที่กำหนด
 The specified name is illegal. Please choose another name.	FilePanelPriv		ชื่อที่ระบุนั้นผิดกฎ กรุณาเลือกชื่ออื่น
-of %items	StatusWindow		of %items
+of %items	StatusWindow		ของ %items
 less than	FindPanel		น้อยกว่า
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		เกิดข้อผิดพลาดในการคัดลอกไฟล์ \"%name\":\n\t%error\n\nคุณต้องการที่จะดำเนินการต่อไป?
 Creating links: 	StatusWindow		สร้างลิงค์:
@@ -344,7 +344,7 @@ by attribute	FindPanel		โดย attribute
  info	InfoWindow		ข้อมูล
 Write	FilePermissionsView		เขียน
 <%ld bytes of data>	AttributesView		<%ld bytes of data>
-If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		หากคุณแก้ไขโฟลเดอร์ระบบหรือเนื้อหาในโฟลเดอร์คุณจะไม่สามารถบูต %osName!\n\nคุณแน่ใจหรือว่าต้องการทำสิ่งนี้?\n\nหากต้องการแก้ไขโฟลเดอร์ระบบหรือเนื้อหาในระบบให้กดแป้น Shift ค้างไว้แล้วคลิก \"ฉันรู้ว่าฉันกำลังทำอะไร\"
+If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		หากคุณแก้ไขโฟลเดอร์ระบบหรือเนื้อหาในโฟลเดอร์คุณจะไม่สามารถบูท %osName!\n\nคุณแน่ใจหรือว่าต้องการทำสิ่งนี้?\n\nหากต้องการแก้ไขโฟลเดอร์ระบบหรือเนื้อหาในระบบให้กดแป้น Shift ค้างไว้แล้วคลิก \"ฉันรู้ว่าฉันกำลังทำอะไร\"
 Save	FilePanelPriv		บันทึก
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		ไม่สามารถเปิด \"%document\" พร้อมกับแอปพลิเคชัน \"%app\" (ไม่มีไลบรารี: %library)\n
 Finish: %time	StatusWindow		เสร็จสิ้น: %time
@@ -407,17 +407,17 @@ Paste	FilePanelPriv		วาง
 Paste	ContainerWindow		วาง
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		มีรายการชื่อ \"%name\" อยู่แล้วในโฟลเดอร์นี้และอาจมี \nรายการที่มีชื่อเดียวกัน คุณต้องการแทนที่พวกเขาด้วยที่อยู่ในโฟลเดอร์ที่คุณเป็น %verb หรือไม่?
 Cannot unmount the boot volume \"%name\".	FSUtils		ไม่สามารถยกเลิกการต่อเชื่อมวอลุ่มสำหรับบูต \"%name\"
-Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		ไม่สามารถเปิด \%document\"  ด้วยแอปพบิเคชั่น \"%app\" ได้ (สัญลักษณ์หายไป: %symbol)\n
+Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		ไม่สามารถเปิด \%document\" ด้วยแอพพิลเคชั่น \"%app\" ได้ (สัญลักษณ์หายไป: %symbol)\n
 Reference	AttributesView		ตั้งค่า
 New folder	ContainerWindow		โฟลเดอร์
 Name	OpenWithWindow		ชื่อ
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		มีปัญหาในการพยายามแทนที่ \"%name\" รายการอาจจะเปิดหรือไม่ว่าง
 Windows	TrackerSettingsWindow		หน้าต่าง
 Show space bars on volumes	SettingsView		แสดงแถบพื้นที่บนไดรฟ์
-Could not update permissions of file \"%name\". %error	FSUtils		ไม่สามารถอัปเดตการอนุญาตของไฟล์ \"%name\"  %error
+Could not update permissions of file \"%name\". %error	FSUtils		ไม่สามารถอัปเดตการอนุญาตของไฟล์ \"%name\" %error
 Decrease size	DeskWindow		ลดขนาด
 Emptying Trash… 	StatusWindow		กำลังล้างถังขยะ
-{0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{for # file} other{for # files}}
+{0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{for # file} อื่นๆ{for # files}}
 KiB	WidgetAttributeText		KiB
 Revert	TrackerSettingsWindow		เปลี่ยนกลับ
 trash	B_TRASH_DIRECTORY		ถังขยะ
@@ -426,7 +426,7 @@ Close all in workspace	ContainerWindow		ปิดทั้งหมดในพ�
 Corrupted expression.	libtracker		การแสดงเสียหาย
 32 x 32	DeskWindow		32 x 32
 Network address	AttributesView		ที่อยู่เครือข่าย
-Finish: %time - %finishtime left	StatusWindow		เสร็จ: : %time - %finishtime left
+Finish: %time - %finishtime left	StatusWindow		เสร็จ: : %time - %finishtime คงเหลือ
 Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		ไม่สามารถเปิด \"%document\"ได้ (ไลบารี่หาย: %library)\n
 Create relative link here	ContainerWindow		สร้างลิงค์ที่เกี่ยวข้องที่นี่
 Copy	FilePanelPriv		คัดลอก
@@ -459,7 +459,7 @@ by formula	FindPanel		โดยสูตร
 Resize to fit	VirtualDirectoryWindow		ปรับขนาดให้พอดี
 Move to Trash	FilePanelPriv		ย้ายไปถังขยะ
 is	FindPanel		เป็น
-If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		หากคุณเปลี่ยนชื่อโฟลเดอร์ระบบหรือเนื้อหาในระบบคุณจะไม่สามารถบูต %osName! \n\nคุณแน่ใจหรือว่าต้องการทำสิ่งนี้?\n\nหากต้องการเปลี่ยนชื่อโฟลเดอร์ระบบหรือเนื้อหาในระบบให้กดปุ่ม Shift ค้างไว้แล้วคลิก \"Rename\"
+If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		หากคุณเปลี่ยนชื่อโฟลเดอร์ระบบหรือเนื้อหาในระบบคุณจะไม่สามารถบูต %osName! \n\nคุณแน่ใจหรือว่าต้องการทำสิ่งนี้?\n\nหากต้องการเปลี่ยนชื่อโฟลเดอร์ระบบหรือเนื้อหาในระบบให้กดปุ่ม Shift ค้างไว้แล้วคลิก \"เปลี่ยนชื่อ\"
 40 x 40	DeskWindow		40 x 40
 40 x 40	ContainerWindow		40 x 40
 Permissions	FilePermissionsView		อนุญาต
@@ -489,7 +489,7 @@ Copy layout	ContainerWindow		คัดลอกเลย์เอาท์
 Duplicate	ContainerWindow		ซ้ำ
 16-bit integer	AttributesView		16-bit integer
 Untitled clipping	PoseView		คลิปไม่มีชื่อ
-The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		ไฟล์  \"%name\" มีอยู่แล้วในโฟลเดอร์ที่ระบุ คุณต้องการแทนที่หรือไม่?
+The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		ไฟล์ \"%name\" มีอยู่แล้วในโฟลเดอร์ที่ระบุ คุณต้องการแทนที่หรือไม่?
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		คุณต้องวางรายการในไอคอนดิสก์หนึ่งในหน้าต่าง \"Disks\"
 Version:	InfoWindow		เวอร์ชั่น:
 OK	PoseView		ตกลง
@@ -513,7 +513,7 @@ If you alter the home folder, %osName may not behave properly!\n\nAre you sure y
 Sorry, you can't copy items to the Trash.	PoseView		ขออภัยคุณไม่สามารถคัดลอกรายการไปยังถังขยะ
 Invert selection	VirtualDirectoryWindow		สลับการเลือก
 New folder	FilePanelPriv		โฟลเดอร์
-{0, plural, one{# item} other{# items}}	CountView	Number of selected items: \"1 item\" or \"2 items\"	{0, plural, one{# item} other{# items}}
+{0, plural, one{# item} other{# items}}	CountView	Number of selected items: \"1 item\" or \"2 items\"	{0, plural, one{# item} อื่นๆ{# items}}
 Name	AttributesView		ชื่อ
 Invalid bracket range.	libtracker		ช่วงวงเล็บไม่ถูกต้อง
 the settings folder	FSUtils		โฟลเดอร์การตั้งค่า

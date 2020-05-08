@@ -19,14 +19,14 @@ Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou c
 No type editor available	AttributeWindow		ไม่มีเครื่องมือแก้ไขประเภท
 Print…	ProbeView		พิมพ์
 New…	FileWindow		ใหม่
-what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	what: '%.4s'\n\n
+what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	อะไร: '%.4s'\n\n
 OK	DiskProbe		ตกลง
 DiskProbe	System name		DiskProbe
 Back	ProbeView		ย้อน
 Device: 	ProbeView		อุปกรณ์
 Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	เบส
 Open file…	FileWindow		เปิดไฟล์
-32 bit unsigned pointer:	TypeEditors		32 bit unsigned pointer:
+32 bit unsigned pointer:	TypeEditors		32 bit ตัวชี้ที่ไม่ได้ลงชื่อ:
 DiskProbe request	DiskProbe		ร้องขอ DiskProbe
 Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hex
 Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		การเขียนไฟล์ล้มเหลว:\n%s\n\nการเปลี่ยนแปลงทั้งหมดจะหายไปเมื่อคุณออกจาก
@@ -50,7 +50,7 @@ Type editor not supported	ProbeView		ชนิดของตัวแก้ไ�
 Native: 0x%0*Lx	ProbeView		Native: 0x%0*Lx
 Copy	ProbeView		คัดลอก
 Redo	ProbeView		ทำซ้ำ
-Floating-point value:	TypeEditors		Floating-point value:
+Floating-point value:	TypeEditors		ค่าทศนิยม:
 Cancel	AttributeWindow		ยกเลิก
 16 bit signed value:	TypeEditors		16 bit signed value:
 DiskProbe request	AttributeWindow		ร้องขอ DiskProbe
@@ -71,7 +71,7 @@ Mode:	FindWindow		โหมด:
 32 bit size or status:	TypeEditors		ขนาด หรือ สถานะ 32 บิท
 of 	ProbeView		ของ
 Contents:	TypeEditors		เนื้อหา:
-Could not open file \"%s\": %s\n	DiskProbe		ไม่สามารถเปิดไฟล์ได้  \"%s\": %s\n
+Could not open file \"%s\": %s\n	DiskProbe		ไม่สามารถเปิดไฟล์ได้ \"%s\": %s\n
 Probe file…	OpenWindow		พิสูจน์ไฟล์
 Block: 	ProbeView		บล็อก:
 Bookmarks	ProbeView		ที่คั่น
@@ -94,7 +94,7 @@ Grayscale	TypeEditors		โทนสีเทา
 Native: %Ld (0x%0*Lx)	ProbeView		Native: %Ld (0x%0*Lx)
 Device	ProbeView		อุปกรณ์
 Close	AttributeWindow		ปิด
-Type editor	AttributeWindow		Type editor
+Type editor	AttributeWindow		ตัวแก้ไขชนิด
 Save	ProbeView		บันทึก
 of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	of 0x0
 Attribute type: 	ProbeView		ชนิดคุณสมบัติ:

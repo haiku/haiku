@@ -3,9 +3,9 @@ Undefined	ConfigWindow		No definit
 Return the number of available transports	PrintServerApp Scripting		Torna el nombre de transports disponibles
 Return the number of available printers	PrintServerApp Scripting		Torna el nombre d'impressores disponibles
 Get currently available ports/devices	Transport Scripting		Obté els ports i dispositius disponibles en aquest moment
-Retrieve or select the active printer	PrintServerApp Scripting		Recupera o tria la impressora activa
+Retrieve or select the active printer	PrintServerApp Scripting		Obtingueu o seleccioneu la impressora activa
 Cancel	PrintServerApp		Cancel·la
-Retrieve a specific printer	PrintServerApp Scripting		Recupera una impressora específica
+Retrieve a specific printer	PrintServerApp Scripting		Obtén una impressora específica
 Page %1 to %2	ConfigWindow		Pàgina %1 de %2
 Get name of the printer add-on used for this printer	Printer Scripting		Obtén el nom del complement usat per a aquesta impressora
 B5 (JIS)	ConfigWindow	JIS P0138 B5, a Japanese paper size	B5 (JIS)
@@ -44,7 +44,7 @@ Create a new printer	PrintServerApp Scripting		Nova impressora
 OK	PrintServerApp		D'acord
 Print setup	ConfigWindow		Configuració d'impressió
 A1	ConfigWindow	ISO 216 paper size	A1
-Retrieve a specific transport	PrintServerApp Scripting		Recupera un transport específic
+Retrieve a specific transport	PrintServerApp Scripting		Obtén un transport específic
 Get name of printer	Printer Scripting		Obté el nom de la impressora
 A3	ConfigWindow	ISO 216 paper size	A3
 Get name of transport	Transport Scripting		Obté el nom del medi de transport

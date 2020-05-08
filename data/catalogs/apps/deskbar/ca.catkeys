@@ -10,7 +10,7 @@ Edit in Tracker…	PreferencesWindow		Edita-ho al Rastrejador...
 Recent documents:	PreferencesWindow		Documents recents:
 Recent applications	DeskbarMenu		Aplicacions usades recentment
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Aplicacions
-Find…	DeskbarMenu		Cerca...
+Find…	DeskbarMenu		Troba...
 Show clock	Tray		Mostra el rellotge
 Window	PreferencesWindow		Finestra
 Defaults	PreferencesWindow		Predeterminats
@@ -18,7 +18,7 @@ Menu	PreferencesWindow		Menú
 Recent documents	DeskbarMenu		Documents recents
 Auto-hide	PreferencesWindow		Amaga-ho automàticament
 Always on top	PreferencesWindow		Sempre en primer pla
-<Deskbar folder is empty>	DeskbarMenu		<La carpeta de la Barra de l'Escriptori és buïda>
+<Deskbar folder is empty>	DeskbarMenu		<La carpeta de la Barra d'escriptori és buida>
 Show all	WindowMenu		Mostra-ho tot
 No windows	WindowMenu		Sense finestres
 Deskbar	System name		Barra d'escriptori

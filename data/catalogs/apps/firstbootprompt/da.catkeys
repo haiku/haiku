@@ -1,8 +1,80 @@
-1	danish	x-vnd.Haiku-FirstBootPrompt	2649051796
+1	danish	x-vnd.Haiku-FirstBootPrompt	2670843542
+Japanese	KeymapNames		Japansk
+US	KeymapNames		USA
+Esperanto	KeymapNames		Esperanto
+Belarusian	KeymapNames		Hviderussisk
+Brazilian	KeymapNames		Brasiliansk
+Dvorak	KeymapNames		Dvorak
+Polish	KeymapNames		Polsk
+Latin-American	KeymapNames		Latinamerikansk
+Ukrainian	KeymapNames		Ukrainsk
+Russian (Yawert)	KeymapNames		Russisk (Yawert)
+United-Kingdom	KeymapNames		Storbritannien
+Serbian (Cyrillic)	KeymapNames		Serbisk (kyrillisk)
+Turkish (Type-F)	KeymapNames		Tyrkisk (Type-F)
+Bulgarian (Cyrillic)	KeymapNames		Bulgarsk (kyrillisk)
+Belgian (point)	KeymapNames		Belgisk (point)
+Finnish	KeymapNames		Finsk
+Swedish	KeymapNames		Svensk
+Svorak	KeymapNames		Svorak
+German	KeymapNames		Tysk
+Swiss-German	KeymapNames		Tysk (schweiz)
 Keymap	BootPromptWindow		Tastaturlayout
+Spanish (Dvorak)	KeymapNames		Spansk (Dvorak)
+US-International	KeymapNames		USA-internationalt
+Czech	KeymapNames		Tjekkisk
+Turkish (Type-Q)	KeymapNames		Tyrkisk (Type-Q)
+Slovak	KeymapNames		Slovakisk
+Russian (Udmurt, Komi, Mari)	KeymapNames		Russisk (Udmurt, Komi, Mari)
+Thai (TIS-820.2538)	KeymapNames		Thai (TIS-820.2538)
+Colemak	KeymapNames		Colemak
+Dvorak (programmer's)	KeymapNames		Dvorak (programmørens)
+Russian (Mac)	KeymapNames		Russisk (Mac)
 Thank you for trying out Haiku! We hope you'll like it!\n\nYou can select your preferred language and keyboard layout from the list on the left which will then be used instantly. You can easily change both settings from the Desktop later on on the fly.\n\nDo you wish to run the Installer or continue booting to the Desktop?\n	BootPromptWindow	For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	Tak for du prøver Haiku! Vi håber du kan lide det!\n\nDu kan vælge dit foretrukne sprog og tastaturlayout i listen til venstre som tages i brug med det samme. Du kan let ændre begge indstillinger fra skrivebordet senere.\n\nVil du køre installationsprogrammet eller fortsætte starten af skrivebordet?\n
+German (Mac)	KeymapNames		Tysk (Mac)
+Arabic (102)	KeymapNames		Arabisk (102)
+Belarusian (Latin)	KeymapNames		Hviderussisk (Latin)
+Belarusian (Mac)	KeymapNames		Hviderussisk (Mac)
+Hebrew	KeymapNames		Hebraisk
+Greek	KeymapNames		Græsk
+Croatian	KeymapNames		Kroatisk
 Run Installer	BootPromptWindow		Kør installationsprogrammet
+Faeroese	KeymapNames		Færøsk
+Polish (Typewriter)	KeymapNames		Polsk (skrivemaskine)
+French (Mac)	KeymapNames		Fransk (Mac)
+Spanish	KeymapNames		Spansk
+Ukrainian (Mac)	KeymapNames		Ukrainsk (Mac)
+Estonian	KeymapNames		Estonisk
+French (Bépo)	KeymapNames		Fransk (Bépo)
+Serbian (Latin)	KeymapNames		Serbisk (Latin)
+Russian (Typewriter)	KeymapNames		Russisk (skrivemaskine)
+French	KeymapNames		Fransk
+Italian	KeymapNames		Italiensk
+Portuguese	KeymapNames		Portugesisk
+Swiss-French	KeymapNames		Fransk (schweiz)
+Slovene	KeymapNames		Slovensk
+Lithuanian	KeymapNames		Litauisk
+French (NF Z71-300)	KeymapNames		Fransk (NF Z71-300)
+ISO-9995	KeymapNames		ISO-9995
+Kazakh	KeymapNames		Kasakhisk
 Language	BootPromptWindow		Sprog
+Lithuanian (Standard)	KeymapNames		Litauisk (standard)
+Belgian (comma)	KeymapNames		Belgisk (komma)
 Custom	BootPromptWindow		Tilpasset
+Norwegian	KeymapNames		Norsk
+Danish	KeymapNames		Dansk
 Boot to Desktop	BootPromptWindow		Start skrivebordet
+Bulgarian (Phonetic)	KeymapNames		Bulgarsk (fonetisk)
+Canadian-French	KeymapNames		Fransk (canadisk)
 Welcome to Haiku!	BootPromptWindow		Velkommen til Haiku!
+Russian	KeymapNames		Russisk
+Hungarian	KeymapNames		Ungarsk
+Irish	KeymapNames		Irsk
+Romanian	KeymapNames		Rumænsk
+Macedonian	KeymapNames		Makedonsk
+Czech (Mac)	KeymapNames		Tjekkisk (Mac)
+Brazilian (ABNT2)	KeymapNames		Brasiliansk (ABNT2)
+Albanian	KeymapNames		Albansk
+Dutch	KeymapNames		Nederlandsk
+Friulian	KeymapNames		Friulisk
+Icelandic	KeymapNames		Islandsk

@@ -8,5 +8,5 @@ Ready for use.	MediaDefs		Listo para usar.
 Stopping media server…	MediaDefs		Deteniendo media server…
 Waiting for media_server to quit.	MediaDefs		Esperando que media_server se cierre.
 Done shutting down.	MediaDefs		Apagado finalizado.
-Error occurred starting media services.	MediaDefs		Ha ocurrido un error mientras iniciaba media services.
+Error occurred starting media services.	MediaDefs		Ha ocurrido un error mientras se iniciaba media services.
 Media Service	MediaDefs		Servicio de Medios

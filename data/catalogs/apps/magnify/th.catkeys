@@ -5,13 +5,13 @@ no clip msg	In console, when clipboard is empty after clicking Copy image		ไ�
 Increase pixel size	Magnify-Main		เพิ่มขนาดพิกเซล
 magnify: size must be a multiple of 4	Console		ขยาย: ขนาดต้องเป็นทวีคูณของ 4
 Stick coordinates	Magnify-Main		คงพิกัด
-%width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main		%width x %height @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}
+%width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main		%width x %height @ {0, plural, one{# pixel/pixel} อื่นๆ{# pixels/pixel}}
 Copy image	Magnify-Main		สำเนาภาพ
 Decrease window size	Magnify-Main		ลดขนาดหน้าต่าง
 Remove a crosshair	Magnify-Main		ลบเส้นกากบาท
 Add a crosshair	Magnify-Main		เพิ่มเส้นกากบาท
 Freeze image	Magnify-Main		ตรึงภาพ
-usage: magnify [size] (magnify size * size pixels)	Console		การใช้งาน: ขยาย [size] (magnify size * size pixels)
+usage: magnify [size] (magnify size * size pixels)	Console		การใช้งาน: ขยาย [ขนาด] (magnify size * size pixels)
 Increase window size	Magnify-Main		เพิ่มขนาดหน้าต่าง
 Save image	Magnify-Main		บันทึกภาพ
 Show grid	Magnify-Main		แสดงตาราง

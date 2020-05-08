@@ -11,7 +11,7 @@ Display balance control for stereo connections	AudioMixer		แสดงการ
 To output	AudioMixer		ไปยังข้อมูลออก
 not connected	AudioMixer		ไม่เชื่อมต่อ
 Refuse input format changes	AudioMixer		ปฎิเสธการเปลี่ยนแปลงข้อมูลเข้า
-Drop/repeat samples	AudioMixer		วาง / ทำซ้ำตัวอย่าง
+Drop/repeat samples	AudioMixer		วาง/ทำซ้ำตัวอย่าง
 Output channel sources	AudioMixer		แหล่งช่องสัญญาณออก
 dB	AudioMixer		dB
 Gain controls	AudioMixer		ได้รับการควบคุม

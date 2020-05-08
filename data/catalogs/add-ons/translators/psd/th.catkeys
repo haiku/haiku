@@ -9,7 +9,7 @@ Version %d.%d.%d, %s	PSDConfig		เวอร์ชั่น %d.%d.%d, %s
 Photoshop Document (PSD file)	PSDConfig		เอกสาร Photoshop (ไฟล์ PSD)
 Photoshop image	PSDTranslator		ภาพ Photoshop
 RLE	PSDConfig		RLE
-Photoshop Big Document (PSB file)	PSDConfig		Photoshop Big Document (ไฟล์ PSB)
+Photoshop Big Document (PSB file)	PSDConfig		Photoshop เอกสารขนาดใหญ่ (ไฟล์ PSB)
 RGBA	PSDLoader		RGBA
 Photoshop image (%s)	PSDTranslator		รูปภาพ Photoshop (%s)
 PSDTranslator Settings	PSDConfig		การตั้งค่า PSDTranslator
@@ -19,4 +19,4 @@ CMYK	PSDLoader		CMYK
 Compression: 	PSDConfig		บีบอัด:
 Format: 	PSDConfig		รูปแบบ:
 Multichannel	PSDLoader		หลายช่อง
-Duotone	PSDLoader		Duotone
+Duotone	PSDLoader		ดูโอโทน

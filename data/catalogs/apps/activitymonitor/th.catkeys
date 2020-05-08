@@ -30,10 +30,10 @@ Remove graph	ActivityView		ลบกราฟ
 %lld sec.	SettingsWindow		%lld sec.
 %lld ms	SettingsWindow		%lld ms
 CPU usage	DataSource		การใช้งาน CPU
-Raw clipboard	DataSource		Raw clipboard
+Raw clipboard	DataSource		คลิปบอร์ดต้นฉบับ
 Sems	DataSource		Sems
 %.1f MiB	DataSource		%.1f MiB
-ActivityMonitor	System name		ActivityMonitor
+ActivityMonitor	System name		การตรวจสอบกิจกรรม
 Running applications	DataSource		แอพที่กำลังทำงาน
 Semaphores	DataSource		การให้สัญญาณ
 Block cache	DataSource		บล็อคแคช

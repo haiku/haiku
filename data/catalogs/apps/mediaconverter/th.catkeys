@@ -15,7 +15,7 @@ Cancelling	MediaConverter		กำลังยกเลิก
 None available	Audio codecs		ไม่มี
 No file selected	MediaConverter-FileInfo		ไม่ได้เลือกไฟล์
 High	MediaConverter		สูง
-{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}
+{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{The file was not recognized as a supported media file:} อื่นๆ{# files were not recognized as supported media files:}}
 File Error	MediaConverter-FileInfo		ไฟล์ผิดพลาด
 None available	Video codecs		ไม่มี
 Output format	MediaConverter		รูปแบบเอาต์พุต
@@ -39,7 +39,7 @@ Select	MediaConverter		เลือก
 Conversion cancelled	MediaConverter		ยกเลิกการแปลงแล้ว
 Low	MediaConverter		ต่ำ
 Error loading files	MediaConverter		เกิดข้อผิดพลาดในการโหลดไฟล์
-{0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# bit} other{# bits}}
+{0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# bit} อื่นๆ{# bits}}
 End   [ms]: 	MediaConverter		สิ้นสุด [ms]:
 Cancel	MediaConverter		ยกเลิก
 OK	MediaConverter-FileInfo		ตกลง
@@ -50,11 +50,11 @@ Error	MediaConverter		ผิดพลาด
 File details	MediaConverter		รายละเอียดไฟล์
 No audio	Audio codecs list		ไม่มีเสียง
 Drop media files onto this window	MediaConverter		วางไฟล์สื่อลงในหน้าต่างนี้
-{0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# frame} other{# frames}}
+{0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# frame} อื่นๆ{# frames}}
 Quit	Menu		ออก
-{0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# byte} other{# bytes}}
+{0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# byte} อื่นๆ{# bytes}}
 Duration:	MediaConverter-FileInfo		ระยะเวลา:
-MediaConverter	System name		MediaConverter
+MediaConverter	System name		ตัวแปลงสื่อ
 Error launching: %strError%	MediaConverter		ข้อผิดพลาดในการเปิด: %strError%
 File format:	MediaConverter		รูปแบบไฟล์:
 Error writing audio frame %ld	MediaConverter		เกิดข้อผิดพลาดในการเขียนเฟรมเสียง %ld
@@ -69,6 +69,6 @@ Continue	MediaConverter		ต่อไป
 Convert	MediaConverter		แปลง
 Audio quality not supported	MediaConverter		คุณภาพเสียงไม่รองรับ
 Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		เกิดข้อผิดพลาดในการเขียนไปยังตำแหน่ง:%strPath% ตั้งค่าเริ่มต้นไปที่ตำแหน่ง: /boot /home
-Writing video track: %d%% complete	MediaConverter		กำลังเขียนแทร็กวิดีโอ: %d%% complete
+Writing video track: %d%% complete	MediaConverter		กำลังเขียนแทร็กวิดีโอ: %d%% เสร็จ
 Preview	MediaConverter		ตัวอย่าง
 Start [ms]: 	MediaConverter		เริ่ม [ms]:

@@ -167,7 +167,7 @@ Add Path	Icon-O-Matic-AddPathsCmd		Afegeix un camí
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Voleu desar els canvis a la icona actual abans de tancar?
 load error	Icon-O-Matic-SVGImport		error de càrrega
 Transformation	Icon-O-Matic-TransformersList		Transformació
-Save as…	Icon-O-Matic-Menu-File		Anomena i desa…
+Save as…	Icon-O-Matic-Menu-File		Desa com a...
 Swatches	Icon-O-Matic-Menus		Mostres
 <modify path>	Icon-O-Matic-PathCmd		<modificació del camí>
 HVIF Source Code	Icon-O-Matic-SavePanel		Codi font HVIF
@@ -180,7 +180,7 @@ Scale	Icon-O-Matic-TransformationBoxStates		Escala
 Remove Shape	Icon-O-Matic-RemoveShapesCmd		Suprimeix la forma
 All	Icon-O-Matic-Properties		Tot
 Transformer	Icon-O-Matic-Menus		Transformador
-Invert selection	Icon-O-Matic-Properties		Inverteix la selecció
+Invert selection	Icon-O-Matic-Properties		Selecció inversa
 <unkown property>	Icon-O-Matic-PropertyNames		<propietat desconeguda>
 Pick a color	Icon-O-Matic-ColorPicker		Trieu un color
 Multi Set 	Multi Set (property name)		Establiment múltiple 

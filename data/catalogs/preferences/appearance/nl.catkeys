@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Appearance	583615507
+1	dutch; flemish	x-vnd.Haiku-Appearance	4226716962
 Control border	Colors tab		Keuzerand
 Control mark	Colors tab		Besturingsteken
 Off	AntialiasingSettingsView		Uit
@@ -8,6 +8,7 @@ Defaults	APRWindow		Standaardwaarden
 Shadow	Colors tab		Schaduw
 Document background	Colors tab		Achtergrond document
 List background	Colors tab		Achtergrond van lijst
+No effect on running applications	DecorSettingsView		Geen effect op actieve toepassingen.
 Fixed font:	Font view		Vast lettertype:
 Appearance	System name		Uiterlijk
 Reduce colored edges filter strength:	AntialiasingSettingsView		Reductie filtersterkte gekleurde randen:
