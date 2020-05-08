@@ -624,23 +624,6 @@ printf(const char *format, ...)
 }
 
 
-#ifndef __clang__
-int
-ffs(int value)
-{
-	int i = 1;
-
-	if (value == 0)
-		return 0;
-
-	for (; !(value & 1); i++)
-		value >>= 1;
-
-	return i;
-}
-#endif
-
-
 int
 resource_int_value(const char *name, int unit, const char *resname,
 	int *result)
