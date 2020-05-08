@@ -23,6 +23,7 @@
 #define MAP_FIXED		0x04			/* require mapping to specified addr */
 #define MAP_ANONYMOUS	0x08			/* no underlying object */
 #define MAP_ANON		MAP_ANONYMOUS
+#define MAP_NORESERVE	0x10			/* don't commit memory */
 
 /* mmap() error return code */
 #define MAP_FAILED		((void*)-1)
