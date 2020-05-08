@@ -294,6 +294,13 @@
 #define IA32_FEATURE_ARCH_CAPABILITIES	(1 << 29)	// IA32_ARCH_CAPABILITIES MSR
 #define IA32_FEATURE_SSBD			(1 << 31)	// Speculative Store Bypass Disable
 
+// x86 features from cpuid eax 0xd, ecx 1, eax register
+// reference http://www.intel.com/Assets/en_US/PDF/appnote/241618.pdf (Table 3-8)
+#define IA32_FEATURE_XSAVEOPT		(1 << 0) // XSAVEOPT Instruction
+#define IA32_FEATURE_XSAVEC			(1 << 1) // XSAVEC and compacted XRSTOR
+#define IA32_FEATURE_XGETBV1		(1 << 2) // XGETBV with ECX=1 Instruction
+#define IA32_FEATURE_XSAVES			(1 << 3) // XSAVES and XRSTORS Instruction
+
 // x86 defined features from cpuid eax 0x80000007, edx register
 #define IA32_FEATURE_INVARIANT_TSC		(1 << 8)
 
@@ -402,6 +409,7 @@ enum x86_feature_type {
 	FEATURE_7_EDX,          // cpuid eax=7, edx registers
 	FEATURE_EXT_7_EDX,		// cpuid eax=0x80000007, edx register
 	FEATURE_EXT_8_EBX,		// cpuid eax=0x80000008, ebx register
+	FEATURE_D_1_EAX,		// cpuid eax=0xd, ecx=1, eax register
 
 	FEATURE_NUM
 };

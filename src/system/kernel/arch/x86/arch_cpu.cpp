@@ -560,6 +560,14 @@ dump_feature_string(int currentCPU, cpu_ent* cpu)
 		strlcat(features, "msr_arch ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_7_EDX] & IA32_FEATURE_SSBD)
 		strlcat(features, "ssbd ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_D_1_EAX] & IA32_FEATURE_XSAVEOPT)
+		strlcat(features, "xsaveopt ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_D_1_EAX] & IA32_FEATURE_XSAVEC)
+		strlcat(features, "xsavec ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_D_1_EAX] & IA32_FEATURE_XGETBV1)
+		strlcat(features, "xgetbv1 ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_D_1_EAX] & IA32_FEATURE_XSAVES)
+		strlcat(features, "xsaves ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_EXT_8_EBX] & IA32_FEATURE_CLZERO)
 		strlcat(features, "clzero ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_EXT_8_EBX] & IA32_FEATURE_IBPB)
@@ -1069,6 +1077,7 @@ detect_cpu(int currentCPU)
 	cpu->arch.feature[FEATURE_7_EBX] = 0;
 	cpu->arch.feature[FEATURE_7_ECX] = 0;
 	cpu->arch.feature[FEATURE_7_EDX] = 0;
+	cpu->arch.feature[FEATURE_D_1_EAX] = 0;
 	cpu->arch.model_name[0] = 0;
 
 	// print some fun data
@@ -1183,6 +1192,11 @@ detect_cpu(int currentCPU)
 		cpu->arch.feature[FEATURE_7_EBX] = cpuid.regs.ebx;
 		cpu->arch.feature[FEATURE_7_ECX] = cpuid.regs.ecx;
 		cpu->arch.feature[FEATURE_7_EDX] = cpuid.regs.edx;
+	}
+
+	if (maxBasicLeaf >= 0xd) {
+		get_current_cpuid(&cpuid, 0xd, 1);
+		cpu->arch.feature[FEATURE_D_1_EAX] = cpuid.regs.eax;
 	}
 
 	if (maxExtendedLeaf >= 0x80000007) {
