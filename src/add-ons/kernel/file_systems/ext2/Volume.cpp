@@ -401,8 +401,7 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	TRACE("Volume::Mount(): Initialized block cache: %p\n", fBlockCache);
 
 	// initialize journal if mounted read-write
-	if (!IsReadOnly() &&
-		(fSuperBlock.CompatibleFeatures() & EXT2_FEATURE_HAS_JOURNAL) != 0) {
+	if (!IsReadOnly() && HasJournalFeature()) {
 		// TODO: There should be a mount option to ignore the existent journal
 		if (fSuperBlock.JournalInode() != 0) {
 			fJournalInode = new(std::nothrow) Inode(this,

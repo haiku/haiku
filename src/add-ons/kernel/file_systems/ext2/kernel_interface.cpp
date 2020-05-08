@@ -175,7 +175,12 @@ ext2_read_fs_info(fs_volume* _volume, struct fs_info* info)
 	strlcpy(info->volume_name, volume->Name(), sizeof(info->volume_name));
 
 	// File system name
-	strlcpy(info->fsh_name, "ext2", sizeof(info->fsh_name));
+	if (volume->HasExtentsFeature())
+		strlcpy(info->fsh_name, "ext4", sizeof(info->fsh_name));
+	else if (volume->HasJournalFeature())
+		strlcpy(info->fsh_name, "ext3", sizeof(info->fsh_name));
+	else
+		strlcpy(info->fsh_name, "ext2", sizeof(info->fsh_name));
 
 	return B_OK;
 }
