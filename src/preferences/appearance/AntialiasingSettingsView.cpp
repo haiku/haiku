@@ -104,16 +104,16 @@ AntialiasingSettingsView::AntialiasingSettingsView(const char* name)
 
 	BLayoutBuilder::Grid<>(this, B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 	// controls pane
-		.Add(fHintingMenuField->CreateLabelLayoutItem(), 0, 0)
-		.Add(fHintingMenuField->CreateMenuBarLayoutItem(), 1, 0)
+		.AddMenuField(fHintingMenuField, 0, 0)
+		.AddMenuField(fAntialiasingMenuField, 0, 1)
+		.Add(fAverageWeightControl, 0, 2, 3)
 
-		.Add(fAntialiasingMenuField->CreateLabelLayoutItem(), 0, 1)
-		.Add(fAntialiasingMenuField->CreateMenuBarLayoutItem(), 1, 1)
-
-		.Add(fAverageWeightControl, 0, 2, 2)
-
-		.AddGlue(0, 4)
+		.AddGlue(0, 3)
 		.SetInsets(B_USE_WINDOW_SPACING);
+
+	BGridLayout* layout = dynamic_cast<BGridLayout*>(GetLayout());
+	layout->SetMinColumnWidth(0,
+		StringWidth(B_TRANSLATE("Antialiasing type:")) * 2);
 
 	_SetCurrentAntialiasing();
 	_SetCurrentHinting();
