@@ -28,8 +28,8 @@ load_symbols true
 #emergency_keys false
 	# Disables emergency keys (ie. Alt-SysReq+*), enabled by default.
 
-serial_debug_output false
-	# Disables serial debug output, which is enabled by default
+#serial_debug_output true
+	# Enables serial debug output, which is disabled by default
 
 #serial_debug_port 1
 	# Possible values: <num>|<port>
