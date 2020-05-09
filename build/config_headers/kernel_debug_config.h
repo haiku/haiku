@@ -96,7 +96,7 @@
 #define DEBUG_PAGE_ACCESS				KDEBUG_LEVEL_2
 
 // Enables a global list of all vm_cache structures.
-#define DEBUG_CACHE_LIST				KDEBUG_LEVEL_1
+#define DEBUG_CACHE_LIST				KDEBUG_LEVEL_2
 
 // Enables swap support.
 #define ENABLE_SWAP_SUPPORT				1
