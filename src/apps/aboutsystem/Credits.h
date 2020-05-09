@@ -380,6 +380,7 @@ static const Translation kTranslations[] = {
 #define kNumberOfTranslations (sizeof(kTranslations) / sizeof(Translation))
 
 #define kCurrentMaintainers \
+	"Kyle Ambroff-Kao\n" \
 	"Stephan Aßmus\n" \
 	"Augustin Cavalier\n" \
 	"Stefano Ceccherini\n" \
@@ -459,8 +460,13 @@ static const Translation kTranslations[] = {
 	"Siarzhuk Zharski\n" \
 	"\n"
 
+#define kTestingTeam \
+	"luroh\n" \
+	"Robert Mercer (Vidrep)\n" \
+	"Sergei Reznikov\n" \
+	"\n"
+
 #define kContributors \
-	"Kyle Ambroff-Kao\n" \
 	"Andrea Anzani\n" \
 	"Sean Bartell\n" \
 	"Sambuddha Basu\n" \
@@ -521,13 +527,11 @@ static const Translation kTranslations[] = {
 	"Brian Luft\n" \
 	"Christof Lutteroth\n" \
 	"Graham MacDonald\n" \
-	"Jorge G. Mare (Koki)\n" \
 	"Jan Matějek\n" \
 	"Brian Matzon\n" \
 	"Christopher ML Zumwalt May\n" \
 	"Andrew McCall\n" \
 	"Nathan Mentley\n" \
-	"Robert Mercer (Vidrep)\n" \
 	"Marius Middelthon\n" \
 	"Marco Minutoli\n" \
 	"Misza\n" \
@@ -548,7 +552,6 @@ static const Translation kTranslations[] = {
 	"Jeremy Rand\n" \
 	"Hartmut Reh\n" \
 	"Daniel Reinhold\n" \
-	"Sergei Reznikov\n" \
 	"Chris Roberts\n" \
 	"Samuel Rodríguez Pérez\n" \
 	"Thomas Roell\n" \
@@ -583,6 +586,7 @@ static const Translation kTranslations[] = {
 #define kPastWebsiteTeam  \
 	"Phil Greenway\n" \
 	"Gavin James\n" \
+	"Jorge G. Mare (Koki)\n" \
 	"Urias McCullough\n" \
 	"Richie Nyhus\n" \
 	"Jonathan Yoder\n" \
