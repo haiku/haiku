@@ -256,6 +256,7 @@ TExpandoMenuBar::MouseDown(BPoint where)
 	BMessage* message = Window()->CurrentMessage();
 	BMenuItem* menuItem;
 	TTeamMenuItem* item = TeamItemAtPoint(where, &menuItem);
+	fLastClickedItem = item;
 
 	if (message == NULL || item == NULL || fBarView == NULL
 		|| fBarView->Dragging()) {
@@ -323,7 +324,6 @@ TExpandoMenuBar::MouseDown(BPoint where)
 	if (Vertical() && static_cast<TBarApp*>(be_app)->Settings()->superExpando
 		&& item->ExpanderBounds().Contains(where)) {
 		// start the animation here, finish on mouse up
-		fLastClickedItem = item;
 		item->SetArrowDirection(BControlLook::B_RIGHT_DOWN_ARROW);
 		SetMouseEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
 		Invalidate(item->ExpanderBounds());
@@ -341,7 +341,6 @@ TExpandoMenuBar::MouseDown(BPoint where)
 			// absorb the message
 	}
 
-	fLastClickedItem = item;
 	BMenuBar::MouseDown(where);
 }
 
@@ -372,9 +371,9 @@ TExpandoMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 						? BControlLook::B_DOWN_ARROW
 						: BControlLook::B_RIGHT_ARROW);
 				}
-			}
 
-			Invalidate(lastItem->ExpanderBounds());
+				Invalidate(lastItem->ExpanderBounds());
+			}
 		}
 
 		switch (code) {
@@ -482,13 +481,15 @@ TExpandoMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 void
 TExpandoMenuBar::MouseUp(BPoint where)
 {
+	TTeamMenuItem* lastItem = dynamic_cast<TTeamMenuItem*>(fLastClickedItem);
+	fLastClickedItem = NULL;
+
 	if (fBarView != NULL && fBarView->Dragging()) {
 		_FinishedDrag(true);
 		return;
 			// absorb the message
 	}
 
-	TTeamMenuItem* lastItem = dynamic_cast<TTeamMenuItem*>(fLastClickedItem);
 	if (lastItem != NULL && lastItem->ExpanderBounds().Contains(where)) {
 		lastItem->ToggleExpandState(true);
 		lastItem->SetArrowDirection(lastItem->IsExpanded()
