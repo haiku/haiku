@@ -26,9 +26,9 @@ rule ProcessCommandLineArguments
 					"with one of the build" ;
 				Echo "profile actions. Typical command lines using a build"
 					"profile looks like this:" ;
-				Echo "  jam @image" ;
+				Echo "  jam @nightly-anyboot" ;
 				Echo "  jam @install update libbe.so" ;
-				Echo "  jam @vmware-image mount" ;
+				Echo "  jam @nightly-vmware mount" ;
 				Echo ;
 				Echo "Default build profiles (minimal set of packages and"
 					"configuration):" ;

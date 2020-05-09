@@ -259,11 +259,13 @@ switch $(HAIKU_BUILD_PROFILE) {
 #	-> Enters the bfs_shell mounting the image specified by the "crash" profile.
 #
 # Note, that the build system will automatically define the build profiles
-# "image", "vmware-image", and "install", unless they are already defined in
-# the UserBuildConfig. They correspond to the respective build profile types
-# and use the values of the variables HAIKU[_VMWARE]_IMAGE_NAME,
-# HAIKU_IMAGE_DIR, HAIKU_INSTALL_DIR, respectively their default values.
-# "jam -q @image" will therefore be equivalent to "jam -q haiku-image".
+# for the common combination of release type (nightly, minimal, release) and
+# image type (raw, anyboot, vmware), as well as the "install" profile,
+# unless they are already defined in the UserBuildConfig. They correspond to
+# the respective build profile types and use the values of the variables
+# HAIKU[_VMWARE]_IMAGE_NAME, HAIKU_IMAGE_DIR, HAIKU_INSTALL_DIR, respectively
+# their default values.
+# "jam -q @nightly-raw" will therefore be equivalent to "jam -q haiku-image".
 
 
 # Creating Sourceable Shell Scripts
