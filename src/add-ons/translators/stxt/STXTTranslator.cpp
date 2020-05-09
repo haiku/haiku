@@ -33,7 +33,7 @@ using namespace std;
 #define B_TRANSLATION_CONTEXT "STXTTranslator"
 
 #define READ_BUFFER_SIZE 32768
-#define DATA_BUFFER_SIZE 2048
+#define DATA_BUFFER_SIZE 8192
 
 // The input formats that this translator supports.
 static const translation_format sInputFormats[] = {
