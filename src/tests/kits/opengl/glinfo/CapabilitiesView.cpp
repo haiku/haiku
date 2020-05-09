@@ -53,51 +53,51 @@ CapabilitiesView::CapabilitiesView()
 	// add the rows
 
 	fCapabilitiesList->AddRow(_CreateCapabilitiesRow(GL_AUX_BUFFERS,
-		"Auxiliary buffer(s)"));
+		B_TRANSLATE("Auxiliary buffer(s)")));
 
 	fCapabilitiesList->AddRow(_CreateCapabilitiesRow(
-		GL_MAX_MODELVIEW_STACK_DEPTH, "Model stack size"));
+		GL_MAX_MODELVIEW_STACK_DEPTH, B_TRANSLATE("Model stack size")));
 
 	fCapabilitiesList->AddRow(_CreateCapabilitiesRow(
-		GL_MAX_PROJECTION_STACK_DEPTH, "Projection stack size"));
+		GL_MAX_PROJECTION_STACK_DEPTH, B_TRANSLATE("Projection stack size")));
 
 	fCapabilitiesList->AddRow(_CreateCapabilitiesRow(
-		GL_MAX_TEXTURE_STACK_DEPTH, "Texture stack size"));
+		GL_MAX_TEXTURE_STACK_DEPTH, B_TRANSLATE("Texture stack size")));
 
 	fCapabilitiesList->AddRow(_CreateCapabilitiesRow(
-		GL_MAX_NAME_STACK_DEPTH, "Name stack size"));
+		GL_MAX_NAME_STACK_DEPTH, B_TRANSLATE("Name stack size")));
 
 	fCapabilitiesList->AddRow(_CreateCapabilitiesRow(GL_MAX_LIST_NESTING,
-		"List stack size"));
+		B_TRANSLATE("List stack size")));
 
 	fCapabilitiesList->AddRow(_CreateCapabilitiesRow(
-		GL_MAX_ATTRIB_STACK_DEPTH, "Attributes stack size"));
+		GL_MAX_ATTRIB_STACK_DEPTH, B_TRANSLATE("Attributes stack size")));
 
 	fCapabilitiesList->AddRow(_CreateCapabilitiesRow(GL_MAX_TEXTURE_SIZE,
-		"Maximum 2D texture size"));
+		B_TRANSLATE("Maximum 2D texture size")));
 
 	fCapabilitiesList->AddRow(_CreateCapabilitiesRow(GL_MAX_3D_TEXTURE_SIZE,
-		"Maximum 3D texture size"));
+		B_TRANSLATE("Maximum 3D texture size")));
 
 	fCapabilitiesList->AddRow(_CreateCapabilitiesRow(GL_MAX_TEXTURE_UNITS_ARB,
-		"Maximum texture units"));
+		B_TRANSLATE("Maximum texture units")));
 
 	fCapabilitiesList->AddRow(_CreateCapabilitiesRow(GL_MAX_LIGHTS,
-		"Maximum lights"));
+		B_TRANSLATE("Maximum lights")));
 
 	fCapabilitiesList->AddRow(_CreateCapabilitiesRow(GL_MAX_CLIP_PLANES,
-		"Maximum clipping planes"));
+		B_TRANSLATE("Maximum clipping planes")));
 
 	fCapabilitiesList->AddRow(_CreateCapabilitiesRow(GL_MAX_EVAL_ORDER,
-		"Maximum evaluators equation order"));
+		B_TRANSLATE("Maximum evaluators equation order")));
 
 	fCapabilitiesList->AddRow(_CreateConvolutionCapabilitiesRow());
 
 	fCapabilitiesList->AddRow(_CreateCapabilitiesRow(GL_MAX_ELEMENTS_INDICES,
-		"Maximum recommended index elements"));
+		B_TRANSLATE("Maximum recommended index elements")));
 
 	fCapabilitiesList->AddRow(_CreateCapabilitiesRow(GL_MAX_ELEMENTS_VERTICES,
-		"Maximum recommended vertex elements"));
+		B_TRANSLATE("Maximum recommended vertex elements")));
 
 	// add the list
 
