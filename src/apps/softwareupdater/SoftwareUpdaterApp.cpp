@@ -47,7 +47,7 @@ SoftwareUpdaterApp::SoftwareUpdaterApp()
 	BApplication(kAppSignature),
 	fWorker(NULL),
 	fFinalQuitFlag(false),
-	fActionRequested(UPDATE),
+	fActionRequested(FULLSYNC),
 	fVerbose(false),
 	fArgvsAccepted(true)
 {
@@ -68,7 +68,7 @@ SoftwareUpdaterApp::QuitRequested()
 {
 	if (fFinalQuitFlag)
 		return true;
-	
+
 	// Simulate a cancel request from window- this gives the updater a chance
 	// to quit cleanly
 	if (fWindowMessenger.IsValid())
@@ -82,7 +82,7 @@ SoftwareUpdaterApp::ReadyToRun()
 {
 	// Argvs no longer accepted once the process starts
 	fArgvsAccepted = false;
-	
+
 	fWorker = new WorkingLooper(fActionRequested, fVerbose);
 }
 
@@ -95,7 +95,7 @@ SoftwareUpdaterApp::ArgvReceived(int32 argc, char **argv)
 			stderr);
 		return;
 	}
-	
+
 	int c;
 	while ((c = getopt_long(argc, argv, "hv", kLongOptions, NULL)) != -1) {
 		switch (c) {
@@ -114,7 +114,7 @@ SoftwareUpdaterApp::ArgvReceived(int32 argc, char **argv)
 				break;
 		}
 	}
-	
+
 	const char* command = "";
 	int32 argCount = argc - optind;
 	if (argCount == 0)
@@ -124,7 +124,7 @@ SoftwareUpdaterApp::ArgvReceived(int32 argc, char **argv)
 		exit(1);
 	} else
 		command = argv[optind];
-	
+
 	fActionRequested = USER_SELECTION_NEEDED;
 	if (strcmp("update", command) == 0)
 		fActionRequested = UPDATE;
@@ -148,12 +148,12 @@ SoftwareUpdaterApp::MessageReceived(BMessage* message)
 		case kMsgRegister:
 			message->FindMessenger(kKeyMessenger, &fWindowMessenger);
 			break;
-		
+
 		case kMsgFinalQuit:
 			fFinalQuitFlag = true;
 			PostMessage(B_QUIT_REQUESTED);
 			break;
-		
+
 		default:
 			BApplication::MessageReceived(message);
 	}
