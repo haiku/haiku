@@ -2098,9 +2098,10 @@ Window::DetachFromWindowStack(bool ownStackNeeded)
 	if (fCurrentStack->RemoveWindow(this) == false)
 		return false;
 
+	BRegion invalidatedRegion;
 	::Decorator* decorator = fCurrentStack->Decorator();
 	if (decorator != NULL) {
-		decorator->RemoveTab(index);
+		decorator->RemoveTab(index, &invalidatedRegion);
 		decorator->SetTopTab(fCurrentStack->LayerOrder().CountItems() - 1);
 	}
 
@@ -2120,8 +2121,9 @@ Window::DetachFromWindowStack(bool ownStackNeeded)
 	SetFocus(IsFocus());
 
 	if (remainingTop != NULL) {
+		invalidatedRegion.Include(&remainingTop->VisibleRegion());
 		fDesktop->RebuildAndRedrawAfterWindowChange(remainingTop,
-			remainingTop->VisibleRegion());
+			invalidatedRegion);
 	}
 	return true;
 }
