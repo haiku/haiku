@@ -1,8 +1,0 @@
-1	czech	x-vnd.Haiku-notification_server	906000487
-Couldn't start display settings monitor.\nLive filter changes disabled.	NotificationWindow		Nelze spustit monitor nastavení obrazovky.\nZměny filtrů za běhu jsou vypnuty.
-Couldn't start filter monitor. Live filter changes disabled.	NotificationWindow		Nelze spustit monitor filtrů. Změny filtrů za běhu jsou vypnuty.
-Couldn't start general settings monitor.\nLive filter changes disabled.	NotificationWindow		Nelze spustit monitor hlavních nastavení.\nZměny filtrů za běhu jsou vypnuty.
-Darn.	NotificationWindow		A dopytle.
-Notification	NotificationWindow		Vyrozumění
-OK	NotificationWindow		OK
-Warning	NotificationWindow		Varování

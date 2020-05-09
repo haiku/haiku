@@ -1,7 +1,0 @@
-1	esperanto	x-vnd.Haiku-BFSAddOn	3514982252
-Enable query support	BFS_Initialize_Parameter		Ebligi informmandojn
-2048 (Recommended)	BFS_Initialize_Parameter		2048 (Preferita)
-8192 (Mostly large files)	BFS_Initialize_Parameter		8192 (ملفات كبيرة)
-1024 (Mostly small files)	BFS_Initialize_Parameter		1024 (ملفات صغيرة)
-Blocksize:	BFS_Initialize_Parameter		:حجم كتلة
-Name:	BFS_Initialize_Parameter		:اسم

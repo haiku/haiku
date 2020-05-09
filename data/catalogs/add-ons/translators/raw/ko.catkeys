@@ -1,9 +1,0 @@
-1	korean	x-vnd.Haiku-RAWTranslator	2975919330
-RAWTranslator Settings	ConfigView		RAW변환기 설정
-Version %d.%d.%d, %s	ConfigView		버젼 %d.%d.%d, %s
-RAW image translator	RAWTranslator		RAW 이미지 변환기
-RAW Settings	RAWTranslator main		RAW 설정
-RAW images	RAWTranslator		RAW 이미지들
-RAW image translator	ConfigView		RAW 이미지 변환기
-%s RAW image	RAWTranslator	Parameter (%s) is the name of the manufacturer (like 'Canon')	%s RAW 이미지
-Based on Dave Coffin's dcraw 8.63	ConfigView		Dave Coffin's dcraw 8.63에 기반을 둠

@@ -1,8 +1,0 @@
-1	czech	x-vnd.Haiku-PCXTranslator	1002061545
-PCX %lu bit image	PCXTranslator		PCX %lu bitový obrázek
-PCX Settings	main		Nastavení PCX
-PCX images	ConfigView		PCX obrázky
-PCX images	PCXTranslator		PCX obrázky
-PCX translator	PCXTranslator		Převaděč PCX
-PCXTranslator Settings	ConfigView		Nastavení Převaděče PCX
-Version %d.%d.%d, %s	ConfigView		Verze %d.%d.%d, %s

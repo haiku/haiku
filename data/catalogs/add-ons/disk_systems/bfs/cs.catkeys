@@ -1,8 +1,0 @@
-1	czech	application/x-vnd.Haiku-BFSAddOn	1074880496
-1024 (Mostly small files)	BFS_Initialize_Parameter		1024 (Hlavně malé soubory)
-2048 (Recommended)	BFS_Initialize_Parameter		2048 (Doporučeno)
-8192 (Mostly large files)	BFS_Initialize_Parameter		8192 (Hlavně velké soubory)
-Blocksize:	BFS_Initialize_Parameter		Velikost bloku:
-Disabling query support may speed up certain file system operations, but should only be used if one is absolutely certain that one will not need queries.\nAny volume that is intended for booting Haiku must have query support enabled.	BFS_Initialize_Parameter		Vypnutí podpory dotazování může zrychlit určité operace systému souborů, ale mělo by být použito pouze tehdy, je-li si člověk absolutně jist, že funkci dotazování nepotřebuje.\nKaždý oddíl určený k náběhu HAIKU musí mít podporu dotazování zapnutou.
-Enable query support	BFS_Initialize_Parameter		Zapnout podporu dotazování
-Name:	BFS_Initialize_Parameter		Jméno:
