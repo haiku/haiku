@@ -46,6 +46,7 @@ of their respective holders. All rights reserved.
 #include <Box.h>
 #include <Button.h>
 #include <Catalog.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <String.h>
 #include <TextView.h>
@@ -99,31 +100,30 @@ void FindWindow::DoFind(BWindow* window, const char* text)
 }
 
 
-FindPanel::FindPanel(BRect rect)
+FindPanel::FindPanel()
 	:
-	BBox(rect, "FindPanel", B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW)
+	BGroupView("FindPanel", B_VERTICAL)
 {
-	BRect r = Bounds().InsetByCopy(10, 10);
-
-	fTextControl = new BTextControl(r, "BTextControl", NULL,
-		sPreviousFind.String(), new BMessage(M_FIND_STRING_CHANGED),
-		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
+	fTextControl = new BTextControl("BTextControl", NULL,
+		sPreviousFind.String(), new BMessage(M_FIND_STRING_CHANGED));
 
 	fTextControl->SetModificationMessage(new BMessage(M_FIND_STRING_CHANGED));
 	fTextControl->SetText(sPreviousFind.String());
 	fTextControl->MakeFocus();
-	AddChild(fTextControl);
 
-	fFindButton = new BButton(BRect(0, 0, 90, 20),"FINDBUTTON",
-		B_TRANSLATE("Find"),
-		new BMessage(FINDBUTTON),B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
-	fFindButton->ResizeToPreferred();
-	AddChild(fFindButton);
-	r = fFindButton->Bounds();
+	fFindButton = new BButton("FINDBUTTON", B_TRANSLATE("Find"),
+		new BMessage(FINDBUTTON));
 
-	fFindButton->MoveTo(Bounds().right - r.Width() - 8,
-		Bounds().bottom - r.Height() - 8);
 	fFindButton->SetEnabled(sPreviousFind.Length());
+
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.SetInsets(B_USE_WINDOW_SPACING)
+		.Add(fTextControl)
+		.AddGroup(B_HORIZONTAL)
+			.AddGlue()
+			.Add(fFindButton)
+		.End()
+	.End();
 }
 
 
@@ -218,9 +218,11 @@ void FindPanel::Find()
 FindWindow::FindWindow()
 	: BWindow(FindWindow::fLastPosition, B_TRANSLATE("Find"),
 		B_FLOATING_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE
-			| B_WILL_ACCEPT_FIRST_CLICK | B_CLOSE_ON_ESCAPE)
+			| B_WILL_ACCEPT_FIRST_CLICK | B_CLOSE_ON_ESCAPE
+			| B_AUTO_UPDATE_SIZE_LIMITS)
 {
-	fFindPanel = new FindPanel(Bounds());
+	SetLayout(new BGroupLayout(B_VERTICAL));
+	fFindPanel = new FindPanel();
 	AddChild(fFindPanel);
 	fFindWindow = this;
 	Show();
