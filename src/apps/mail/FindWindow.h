@@ -40,7 +40,7 @@ All rights reserved.
 #define _FINDWINDOW_H
 
 #include <AppDefs.h>
-#include <Box.h>
+#include <GroupView.h>
 #include <TextControl.h>
 #include <Window.h>
 
@@ -73,9 +73,9 @@ protected:
 };
 
 
-class FindPanel : public BBox {
+class FindPanel : public BGroupView {
 public:
-							FindPanel(BRect rect);
+							FindPanel();
 	virtual					~FindPanel();
 	virtual	void			AttachedToWindow();
 	virtual	void			MessageReceived(BMessage* msg);
