@@ -47,13 +47,6 @@ c32rtomb(char *dest, char32_t wc, mbstate_t *mbState)
 }
 
 
-static __inline size_t
-mbrtoc32(char32_t *dest, const char *src, size_t srcLength, mbstate_t *mbState)
-{
-	return mbrtowc((wchar_t*)dest, src, srcLength, mbState);
-}
-
-
 #ifdef __cplusplus
 }
 #endif
