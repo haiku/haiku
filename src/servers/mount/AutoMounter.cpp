@@ -955,12 +955,10 @@ AutoMounter::_SuggestMountFlags(const BPartition* partition, uint32* _flags)
 	uint32 mountFlags = 0;
 
 	bool askReadOnly = true;
-	bool isBFS = false;
 
 	if (partition->ContentType() != NULL
 		&& strcmp(partition->ContentType(), kPartitionTypeBFS) == 0) {
 		askReadOnly = false;
-		isBFS = true;
 	}
 
 	BDiskSystem diskSystem;
