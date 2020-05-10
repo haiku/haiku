@@ -1209,8 +1209,7 @@ class PagesView : public BTabView {
 public:
 	PagesView()
 		:
-		BTabView("pages view", B_WIDTH_FROM_WIDEST),
-		fLayout(new BCardLayout())
+		BTabView("pages view", B_WIDTH_FROM_WIDEST)
 	{
 		SetBorder(B_NO_BORDER);
 
@@ -1256,8 +1255,6 @@ public:
 	}
 
 private:
-	BCardLayout*		fLayout;
-
 	AboutView*			fAboutView;
 	UserRatingsView*	fUserRatingsView;
 	ChangelogView*		fChangelogView;
