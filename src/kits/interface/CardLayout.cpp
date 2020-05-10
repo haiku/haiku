@@ -78,16 +78,20 @@ BCardLayout::SetVisibleItem(BLayoutItem* item)
 		return;
 	}
 
+	// Changing an item's visibility will invalidate its parent's layout (us),
+	// which would normally cause the min-max to be re-computed. But in this
+	// case, that is unnecessary, and so we can skip it.
+	const bool minMaxValid = fMinMaxValid;
+
 	if (fVisibleItem != NULL)
 		fVisibleItem->SetVisible(false);
 
 	fVisibleItem = item;
 
-	if (fVisibleItem != NULL) {
+	if (fVisibleItem != NULL)
 		fVisibleItem->SetVisible(true);
 
-		Relayout();
-	}
+	fMinMaxValid = minMaxValid;
 }
 
 
@@ -274,6 +278,8 @@ BCardLayout::ItemAdded(BLayoutItem* item, int32 atIndex)
 void
 BCardLayout::ItemRemoved(BLayoutItem* item, int32 fromIndex)
 {
+	fMinMaxValid = false;
+
 	if (fVisibleItem == item) {
 		BLayoutItem* newVisibleItem = NULL;
 		SetVisibleItem(newVisibleItem);
