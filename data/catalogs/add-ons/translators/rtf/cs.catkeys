@@ -1,9 +1,0 @@
-1	czech	x-vnd.Haiku-RTFTranslator	526958155
-RTF Settings	main		nastavení RTF
-RTF text files	RTFTranslator		Textové soubory RTF
-RTF-Translator Settings	ConfigView		Nastavení RTF převaděče
-Rich Text Format (RTF) files	ConfigView		Soubory Rich Text Format (RTF)
-Rich Text Format Translator	RTFTranslator		Rich Text Format Převaděč
-Rich Text Format translator v%d.%d.%d %s	RTFTranslator		Rich Text Format Převaděč v%d.%d.%d %s
-RichTextFormat file	RTFTranslator		soubor RichTextFormat
-Version %d.%d.%d, %s	ConfigView		Verze %d.%d.%d, %s
