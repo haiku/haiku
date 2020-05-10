@@ -15,6 +15,7 @@
 #include <Entry.h>
 #include <File.h>
 #include <Locale.h>
+#include <MimeType.h>
 #include <Path.h>
 
 #include "DocumentBuilder.h"
@@ -51,21 +52,11 @@ SVGImporter::Import(Icon* icon, const entry_ref* ref)
 	if (ret < B_OK)
 		return ret;
 
-	// peek into file to see if this could be an SVG file at all
-	BFile file(path.Path(), B_READ_ONLY);
-	ret = file.InitCheck();
-	if (ret < B_OK)
-		return ret;
-
-	ssize_t size = 5;
-	char buffer[size + 1];
-	if (file.Read(buffer, size) != size)
-		return B_ERROR;
-
-	// 0 terminate
-	buffer[size] = 0;
-	if (strcasecmp(buffer, "<?xml") != 0) {
-		// we might be  stretching it a bit, but what the heck
+	// Check that it indeed looks like an SVG file
+	BMimeType type;
+	ret = BMimeType::GuessMimeType(ref, &type);
+	if (ret != B_OK || strcmp(type.Type(), "image/svg+xml") != 0) {
+		printf("not an svg file %s %s\n", strerror(ret), type.Type());
 		return B_ERROR;
 	}
 
