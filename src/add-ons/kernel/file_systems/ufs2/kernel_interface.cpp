@@ -2,6 +2,8 @@
  * Copyright 2020 Suhel Mehta, mehtasuhel@gmail.com
  * All rights reserved. Distributed under the terms of the MIT License.
  */
+
+
 #include "system_dependencies.h"
 #include "ufs2.h"
 #include "Volume.h"
@@ -11,6 +13,7 @@
 #else
 #define TRACE(x...) ;
 #endif
+#define ERROR(x...) dprintf("\33[34mufs2:\33[0m " x)
 
 
 struct identify_cookie
@@ -75,7 +78,21 @@ static status_t
 ufs2_mount(fs_volume *_volume, const char *device, uint32 flags,
 		  const char *args, ino_t *_rootID)
 {
-	return B_NOT_SUPPORTED;
+	TRACE("Tracing mount()");
+	Volume* volume = new(std::nothrow) Volume(_volume);
+	if (volume == NULL)
+		return B_NO_MEMORY;
+
+	_volume->private_volume = volume;
+	//_volume->ops = &gufs2VolumeOps;
+
+	status_t status = volume->Mount(device, flags);
+	if (status != B_OK){
+		ERROR("Failed mounting the volume. Error: %s\n", strerror(status));
+		delete volume;
+		return status;
+	}
+	return B_OK;
 }
 
 

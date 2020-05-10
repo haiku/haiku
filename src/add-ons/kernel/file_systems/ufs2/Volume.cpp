@@ -6,19 +6,19 @@
 
 #include "DeviceOpener.h"
 
-//#define TRACE_UFS2
+#define TRACE_UFS2
 #ifdef TRACE_UFS2
-#	define TRACE(x...) dprintf("\33[34mufs2:\33[0m " x)
+#define TRACE(x...) dprintf("\33[34mufs2:\33[0m " x);
 #else
-#	define TRACE(x...) ;
+#define TRACE(x...) ;
 #endif
-#   define ERROR(x...) dprintf("\33[34mexfat:\33[0m " x)
+#define ERROR(x...) dprintf("\33[34mufs2:\33[0m " x)
 
 
 bool
 ufs2_super_block::IsValid()
 {
-	if (ufs2_magic != UFS2_SUPER_BLOCK_MAGIC)
+	if (fs_magic != FS_UFS2_MAGIC)
 		return false;
 
 	return true;
@@ -33,30 +33,31 @@ Volume::IsValidSuperBlock()
 
 
 Volume::Volume(fs_volume *volume)
-    : fFSVolume(volume)
+	: fFSVolume(volume)
 {
 	fFlags = 0;
 	mutex_init(&fLock, "ufs2 volume");
-	TRACE("Volume::Volume() : Initialising volume");
+	TRACE("Volume::Volume() : Initialising volume\n");
 }
 
 
 Volume::~Volume()
 {
 	mutex_destroy(&fLock);
-	TRACE("Volume::Destructor : Removing Volume");
+	TRACE("Volume::Destructor : Removing Volume\n");
 }
 
 
 status_t
 Volume::Identify(int fd, ufs2_super_block *superBlock)
 {
-	if (read_pos(fd, UFS2_SUPER_BLOCK_OFFSET, superBlock,
+	if (read_pos(fd, SBLOCK_UFS2, superBlock,
 		sizeof(ufs2_super_block)) != sizeof(ufs2_super_block))
 		return B_IO_ERROR;
 
+
 	if (!superBlock->IsValid()) {
-		ERROR("invalid superblock! Identify failed!!\n");
+		ERROR("Invalid superblock! Identify failed!!\n");
 		return B_BAD_VALUE;
 	}
 
@@ -78,7 +79,7 @@ Volume::Mount(const char *deviceName, uint32 flags)
 		TRACE("Volume is read write\n");
 	}
 
-	DeviceOpener opener(deviceName, (flags & B_MOUNT_READ_ONLY) != 0 
+	DeviceOpener opener(deviceName, (flags & B_MOUNT_READ_ONLY) != 0
 									? O_RDONLY:O_RDWR);
 	fDevice = opener.Device();
 	if (fDevice < B_OK) {
