@@ -203,7 +203,7 @@ ControlsView::VolumeTabView::TabFrame(int32 index) const
 				toShave -= margins[i] - newMargin;
 				margins[i] = newMargin;
 			}
-		} while (toShave > 0 && oldToShave != toShave);
+		} while (toShave > 0 && fabs(oldToShave - toShave) >= 1.0f);
 	}
 
 	for (int i = 0; i < index; i++)
