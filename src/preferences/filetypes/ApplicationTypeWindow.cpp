@@ -493,14 +493,12 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position,
 
 	BLayoutBuilder::Grid<>(versionBox, padding / 2, padding / 2)
 		.SetInsets(padding, padding * 2, padding, padding)
-		.Add(fMajorVersionControl->CreateLabelLayoutItem(), 0, 0)
-		.Add(fMajorVersionControl->CreateTextViewLayoutItem(), 1, 0)
+		.AddTextControl(fMajorVersionControl, 0, 0)
 		.Add(fMiddleVersionControl, 2, 0, 2)
 		.Add(fMinorVersionControl, 4, 0, 2)
 		.Add(varietyField, 6, 0, 3)
 		.Add(fInternalVersionControl, 9, 0, 2)
-		.Add(fShortDescriptionControl->CreateLabelLayoutItem(), 0, 1)
-		.Add(fShortDescriptionControl->CreateTextViewLayoutItem(), 1, 1, 10)
+		.AddTextControl(fShortDescriptionControl, 0, 1)
 		.Add(longLabel, 0, 2)
 		.Add(scrollView, 1, 2, 10, 3)
 		.SetRowWeight(3, 3);
