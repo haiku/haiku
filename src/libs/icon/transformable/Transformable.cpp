@@ -319,3 +319,12 @@ Transformable::TransformationChanged()
 	// default implementation doesn't care
 }
 
+
+void
+Transformable::PrintToStream() const
+{
+	double matrix[6];
+	store_to(matrix);
+	printf("Transform:\n%f\t%f\t%f\n%f\t%f\t%f\n",
+		matrix[0], matrix[2], matrix[4], matrix[1], matrix[3], matrix[5]);
+}

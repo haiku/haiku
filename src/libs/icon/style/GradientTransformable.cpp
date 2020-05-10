@@ -601,6 +601,8 @@ Gradient::PrintToStream() const
 			   step->color.blue,
 			   step->color.alpha);
 	}
+
+	Transformable::PrintToStream();
 }
 
 // _MakeEmpty

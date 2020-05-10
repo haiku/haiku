@@ -233,11 +233,8 @@ Application Icon-O-Matic :
 
 	# import_export/svg
 	DocumentBuilder.cpp
-	PathTokenizer.cpp
 	SVGExporter.cpp
-	SVGGradients.cpp
 	SVGImporter.cpp
-	SVGParser.cpp
 
 	# shape
 	PathManipulator.cpp

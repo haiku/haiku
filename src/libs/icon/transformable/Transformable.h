@@ -70,6 +70,8 @@ class Transformable : public agg::trans_affine {
 	virtual	void				TransformationChanged();
 		// hook function that is called when the transformation
 		// is changed for some reason
+	
+	virtual void				PrintToStream() const;
 };
 
 
