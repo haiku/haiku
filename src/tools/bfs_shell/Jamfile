@@ -54,6 +54,7 @@ local bfsSource =
 	Attribute.cpp
 	CheckVisitor.cpp
 	Debug.cpp
+	DeviceOpener.cpp
 	FileSystemVisitor.cpp
 	Index.cpp
 	Inode.cpp
@@ -88,5 +89,5 @@ BuildPlatformMain <build>bfs_fuse
 	$(HOST_STATIC_LIBROOT) $(fsShellCommandLibs) fuse
 ;
 
-SEARCH on [ FGristFiles QueryParserUtils.cpp ]
+SEARCH on [ FGristFiles DeviceOpener.cpp QueryParserUtils.cpp ]
 	+= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems shared ] ;
