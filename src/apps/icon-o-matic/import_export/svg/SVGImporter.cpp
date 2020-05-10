@@ -18,7 +18,7 @@
 #include <Path.h>
 
 #include "DocumentBuilder.h"
-#include "SVGParser.h"
+#include "nanosvg.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -69,23 +69,22 @@ SVGImporter::Import(Icon* icon, const entry_ref* ref)
 		return B_ERROR;
 	}
 
-	try {
-		agg::svg::DocumentBuilder builder;
-		agg::svg::Parser parser(builder);
-		parser.parse(path.Path());
-		ret = builder.GetIcon(icon, this, ref->name);
-	} catch(agg::svg::exception& e) {
+	NSVGimage* svg = nsvgParseFromFile(path.Path(), "px", 96);
+	if (svg == NULL) {
 		char error[1024];
 		sprintf(error, B_TRANSLATE("Failed to open the file '%s' as "
-					   "an SVG document.\n\n"
-					   "Error: %s"), ref->name, e.msg());
+			"an SVG document.\n\n"), ref->name);
 		BAlert* alert = new BAlert(B_TRANSLATE("load error"),
-								   error, B_TRANSLATE("OK"), NULL, NULL,
-								   B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			error, B_TRANSLATE("OK"), NULL, NULL,
+			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go(NULL);
-		ret = B_ERROR;
+		return B_ERROR;
 	}
+
+	DocumentBuilder builder(svg);
+	ret = builder.GetIcon(icon, this, ref->name);
+	nsvgDelete(svg);
 
 	return ret;
 }
