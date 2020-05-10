@@ -6,7 +6,14 @@
 #ifndef DEVICEOPENER_H
 #define DEVICEOPENER_H
 
-#include "system_dependencies.h"
+#ifdef FS_SHELL
+#	include "fssh_api_wrapper.h"
+#else
+#	include <fcntl.h>
+#	include <sys/types.h>
+#	include <SupportDefs.h>
+#endif
+
 
 class DeviceOpener {
 	public:

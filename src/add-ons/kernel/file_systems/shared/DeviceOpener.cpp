@@ -4,8 +4,13 @@
  */
 
 
-#include "system_dependencies.h"
 #include "file_systems/DeviceOpener.h"
+
+#ifndef FS_SHELL
+#	include <errno.h>
+#	include <Drivers.h>
+#	include <fs_cache.h>
+#endif
 
 
 DeviceOpener::DeviceOpener(const char* device, int mode)

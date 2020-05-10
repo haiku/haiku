@@ -8,8 +8,6 @@
 
 #ifdef FS_SHELL
 
-#include <new>
-
 #include "fssh_api_wrapper.h"
 #include "fssh_auto_deleter.h"
 
