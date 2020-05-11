@@ -270,7 +270,10 @@ BCardLayout::Instantiate(BMessage* from)
 bool
 BCardLayout::ItemAdded(BLayoutItem* item, int32 atIndex)
 {
-	item->SetVisible(false);
+	if (CountItems() <= 1)
+		SetVisibleItem(item);
+	else
+		item->SetVisible(false);
 	return true;
 }
 
