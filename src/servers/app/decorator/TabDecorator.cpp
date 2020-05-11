@@ -439,6 +439,8 @@ TabDecorator::_DistributeTabSize(float delta)
 	}
 
 	float minus = ceilf(std::min(maxTabSize - secMaxTabSize, delta));
+	if (minus < 1.0)
+		return;
 	delta -= minus;
 	minus /= nTabsWithMaxSize;
 
