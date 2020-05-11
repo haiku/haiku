@@ -107,6 +107,12 @@ main(int argc, char **argv)
 	time(&t);
 	localtime_r(&t, &tm);
 
+	if (tm.tm_year < (2020 - 1900)) {
+		fprintf(stderr, "%s: not checking because clock is not set.\n",
+			argv[0]);
+		exit(1);
+	}
+
 	char path[B_PATH_NAME_LENGTH];
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, -1, true, path,
 			B_PATH_NAME_LENGTH) != B_OK) {
