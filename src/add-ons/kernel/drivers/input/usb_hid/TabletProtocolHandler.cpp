@@ -37,19 +37,19 @@ TabletProtocolHandler::TabletProtocolHandler(HIDReport &report,
 	fWheel(NULL),
 
 	fPressure(NULL),
-	fRange(NULL),
-	fTip(NULL),
-	fBarrelSwitch(NULL),
-	fEraser(NULL),
+	fInRange(NULL),
 	fXTilt(NULL),
 	fYTilt(NULL),
 
 	fLastButtons(0),
+	fLastSwitches(0),
 	fClickCount(0),
 	fLastClickTime(0),
 	fClickSpeed(250000)
 {
 	uint32 buttonCount = 0;
+	uint32 switchCount = 0;
+
 	for (uint32 i = 0; i < report.CountItems(); i++) {
 		HIDReportItem *item = report.ItemAt(i);
 		if (!item->HasData())
@@ -59,9 +59,16 @@ TabletProtocolHandler::TabletProtocolHandler(HIDReport &report,
 			&& item->UsageID() - 1 < B_MAX_MOUSE_BUTTONS) {
 			fButtons[buttonCount++] = item;
 		}
+
+		if (item->UsagePage() == B_HID_USAGE_PAGE_DIGITIZER
+			&& item->UsageID() >= B_HID_UID_DIG_TIP_SWITCH
+			&& item->UsageID() <= B_HID_UID_DIG_TABLET_PICK) {
+			fSwitches[switchCount++] = item;
+		}
 	}
 
 	fButtons[buttonCount] = NULL;
+	fSwitches[switchCount] = NULL;
 
 	fWheel = report.FindItem(B_HID_USAGE_PAGE_GENERIC_DESKTOP,
 		B_HID_UID_GD_WHEEL);
@@ -69,17 +76,8 @@ TabletProtocolHandler::TabletProtocolHandler(HIDReport &report,
 	fPressure = report.FindItem(B_HID_USAGE_PAGE_DIGITIZER,
 		B_HID_UID_DIG_TIP_PRESSURE);
 
-	fRange = report.FindItem(B_HID_USAGE_PAGE_DIGITIZER,
+	fInRange = report.FindItem(B_HID_USAGE_PAGE_DIGITIZER,
 		B_HID_UID_DIG_IN_RANGE);
-		
-	fTip = report.FindItem(B_HID_USAGE_PAGE_DIGITIZER,
-		B_HID_UID_DIG_TIP_SWITCH);
-
-	fBarrelSwitch = report.FindItem(B_HID_USAGE_PAGE_DIGITIZER,
-		B_HID_UID_DIG_BARREL_SWITCH);
-
-	fEraser = report.FindItem(B_HID_USAGE_PAGE_DIGITIZER,
-		B_HID_UID_DIG_ERASER);
 
 	fXTilt = report.FindItem(B_HID_USAGE_PAGE_DIGITIZER,
 		B_HID_UID_DIG_X_TILT);
@@ -87,11 +85,10 @@ TabletProtocolHandler::TabletProtocolHandler(HIDReport &report,
 	fYTilt = report.FindItem(B_HID_USAGE_PAGE_DIGITIZER,
 		B_HID_UID_DIG_Y_TILT);
 
-	TRACE("tablet device with %" B_PRIu32 " buttons, %stip, %seraser, "
+	TRACE("tablet device with %" B_PRIu32 " buttons, %" B_PRIu32 " switches,"
 		"%spressure, and %stilt\n",
 		buttonCount,
-		fTip == NULL ? "no " : "",
-		fEraser == NULL ? "no " : "",
+		switchCount,
 		fPressure == NULL ? "no " : "",
 		fXTilt == NULL && fYTilt == NULL ? "no " : "");
 
@@ -275,6 +272,17 @@ TabletProtocolHandler::_ReadReport(void *buffer, uint32 *cookie)
 			buttons |= (button->Data() & 1) << (button->UsageID() - 1);
 	}
 
+	uint32 switches = 0;
+	for (uint32 i = 0; i < B_MAX_DIGITIZER_SWITCHES; i++) {
+		HIDReportItem *dswitch = fSwitches[i];
+		if (dswitch == NULL)
+			break;
+
+		if (dswitch->Extract() == B_OK && dswitch->Valid())
+			switches |= (dswitch->Data() & 1) << (dswitch->UsageID()
+				- B_HID_UID_DIG_TIP_SWITCH);
+	}
+
 	float pressure = 1.0f;
 	if (fPressure != NULL && fPressure->Extract() == B_OK
 		&& fPressure->Valid()) {
@@ -290,12 +298,8 @@ TabletProtocolHandler::_ReadReport(void *buffer, uint32 *cookie)
 		yTilt = fYTilt->ScaledFloatData();
 
 	bool inRange = true;
-	if (fRange != NULL && fRange->Extract() == B_OK && fRange->Valid())
-		inRange = ((fRange->Data() & 1) != 0);
-
-	bool eraser = false;
-	if (fEraser != NULL && fEraser->Extract() == B_OK && fEraser->Valid())
-		eraser = ((fEraser->Data() & 1) != 0);
+	if (fInRange != NULL && fInRange->Extract() == B_OK && fInRange->Valid())
+		inRange = ((fInRange->Data() & 1) != 0);
 
 	fReport.DoneProcessing();
 	TRACE("got tablet report\n");
@@ -316,6 +320,17 @@ TabletProtocolHandler::_ReadReport(void *buffer, uint32 *cookie)
 
 	fLastButtons = buttons;
 
+	if (switches != 0) {
+		if (fLastSwitches == 0) {
+			if (fLastClickTime + fClickSpeed > timestamp)
+				fClickCount++;
+			else
+				fClickCount = 1;
+		}
+	}
+
+	fLastSwitches = switches;
+
 	tablet_movement *info = (tablet_movement *)buffer;
 	memset(info, 0, sizeof(tablet_movement));
 
@@ -323,10 +338,10 @@ TabletProtocolHandler::_ReadReport(void *buffer, uint32 *cookie)
 	info->ypos = axisAbsoluteData[1];
 	info->has_contact = inRange;
 	info->pressure = pressure;
-	info->eraser = eraser;
 	info->tilt_x = xTilt;
 	info->tilt_y = yTilt;
 
+	info->switches = switches;
 	info->buttons = buttons;
 	info->clicks = clicks;
 	info->timestamp = timestamp;

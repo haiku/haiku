@@ -21,6 +21,9 @@ class HIDReportItem;
 #	define B_MAX_MOUSE_BUTTONS		8
 #endif
 
+#ifndef B_MAX_DIGITIZER_SWITCHES
+	#define B_MAX_DIGITIZER_SWITCHES	5
+#endif
 
 class TabletProtocolHandler : public ProtocolHandler {
 public:
@@ -44,9 +47,10 @@ private:
 			HIDReportItem &		fYAxis;
 			HIDReportItem *		fWheel;
 			HIDReportItem *		fButtons[B_MAX_MOUSE_BUTTONS];
+			HIDReportItem *		fSwitches[B_MAX_DIGITIZER_SWITCHES];
 
 			HIDReportItem *		fPressure;
-			HIDReportItem *		fRange;
+			HIDReportItem *		fInRange;
 			HIDReportItem *		fTip;
 			HIDReportItem *		fBarrelSwitch;
 			HIDReportItem *		fEraser;
@@ -54,6 +58,7 @@ private:
 			HIDReportItem *		fYTilt;
 
 			uint32				fLastButtons;
+			uint32				fLastSwitches;
 			uint32				fClickCount;
 			bigtime_t			fLastClickTime;
 			bigtime_t			fClickSpeed;
