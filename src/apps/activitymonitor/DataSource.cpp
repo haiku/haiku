@@ -937,12 +937,15 @@ void
 CPUUsageDataSource::_SetCPU(int32 cpu)
 {
 	fCPU = cpu;
-	fLabel = B_TRANSLATE("CPU");
-	if (SystemInfo().CPUCount() > 1)
-		fLabel << " " << cpu + 1;
-	fShortLabel = fLabel;
 
-	fLabel << " " << B_TRANSLATE("usage");
+	if (SystemInfo().CPUCount() > 1) {
+		fLabel.SetToFormat(B_TRANSLATE("CPU %d usage"), cpu + 1);
+		fShortLabel.SetToFormat(B_TRANSLATE("CPU %d"), cpu + 1);
+
+	} else {
+		fLabel = B_TRANSLATE("CPU usage");
+		fShortLabel = B_TRANSLATE("CPU");
+	}
 
 	const rgb_color kColors[] = {
 		// TODO: find some better defaults...
