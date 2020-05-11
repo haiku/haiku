@@ -135,7 +135,7 @@ IconCacheEntry::SetAliasFor(const SharedIconCache* sharedCache,
 	const SharedCacheEntry* entry)
 {
 	sharedCache->SetAliasFor(this, entry);
-	ASSERT(fAliasForIndex >= 0);
+	ASSERT(fAliasTo != NULL);
 }
 
 
@@ -1457,7 +1457,7 @@ SharedIconCache::IconChanged(SharedCacheEntry* entry)
 {
 	// by now there should be no aliases to entry, just remove entry
 	// itself
-	ASSERT(entry->fAliasForIndex == -1);
+	ASSERT(entry->fAliasTo == NULL);
 	entry->RetireIcons(&fRetiredBitmaps);
 	fHashTable.Remove(entry);
 }
