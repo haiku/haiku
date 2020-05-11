@@ -128,10 +128,6 @@ NormalPulseView::DetermineVendorAndProcessor()
 
 	const unsigned char* logo = NULL;
 	size_t logoSize = 0;
-#if __POWERPC__
-	logo = PowerPCLogo;
-	logoSize = sizeof(PowerPCLogo);
-#elif __i386__
 	uint32 topologyNodeCount = 0;
 	cpu_topology_node_info* topology = NULL;
 
@@ -158,6 +154,11 @@ NormalPulseView::DetermineVendorAndProcessor()
 					logoSize = sizeof(kIntelLogo);
 					break;
 
+				case B_CPU_VENDOR_MOTOROLA:
+					logo = PowerPCLogo;
+					logoSize = sizeof(PowerPCLogo);
+					break;
+
 				case B_CPU_VENDOR_VIA:
 					logo = kViaLogo;
 					logoSize = sizeof(kViaLogo);
@@ -172,7 +173,6 @@ NormalPulseView::DetermineVendorAndProcessor()
 	}
 
 	delete[] topology;
-#endif
 
 	if (logo != NULL) {
 		fBrandLogo = new BBitmap(BRect(0, 0, 47, 47), B_RGBA32);
