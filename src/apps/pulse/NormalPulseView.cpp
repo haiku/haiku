@@ -16,6 +16,7 @@
 #include <Catalog.h>
 #include <Bitmap.h>
 #include <Dragger.h>
+#include <IconUtils.h>
 #include <Window.h>
 
 #include <stdlib.h>
@@ -48,7 +49,7 @@ max_font_size(BFont font, const char* text, float maxSize, float maxWidth)
 
 NormalPulseView::NormalPulseView(BRect rect)
 	: PulseView(rect, "NormalPulseView"),
-	fHasBrandLogo(false)
+	fBrandLogo(NULL)
 {
 	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	SetLowUIColor(ViewUIColor());
@@ -95,6 +96,7 @@ NormalPulseView::NormalPulseView(BRect rect)
 NormalPulseView::~NormalPulseView()
 {
 	delete fCpuLogo;
+	delete fBrandLogo;
 	delete[] fCpuButtons;
 	delete[] fProgressBars;
 }
@@ -108,7 +110,7 @@ NormalPulseView::CalculateFontSizes()
 
 	fProcessorFontSize = max_font_size(font, fProcessor, 11.0f, 46.0f);
 
-	if (!fHasBrandLogo)
+	if (fBrandLogo == NULL)
 		fVendorFontSize = max_font_size(font, fVendor, 13.0f, 46.0f);
 }
 
@@ -122,10 +124,13 @@ NormalPulseView::DetermineVendorAndProcessor()
 	// Initialize logo
 
 	fCpuLogo = new BBitmap(BRect(0, 0, 63, 62), B_CMAP8);
-	unsigned char *logo = BlankLogo;
+	fCpuLogo->SetBits(BlankLogo, fCpuLogo->BitsLength(), 0, B_CMAP8);
 
+	const unsigned char* logo = NULL;
+	size_t logoSize = 0;
 #if __POWERPC__
 	logo = PowerPCLogo;
+	logoSize = sizeof(PowerPCLogo);
 #elif __i386__
 	uint32 topologyNodeCount = 0;
 	cpu_topology_node_info* topology = NULL;
@@ -138,12 +143,24 @@ NormalPulseView::DetermineVendorAndProcessor()
 	for (uint32 i = 0; i < topologyNodeCount; i++) {
 		if (topology[i].type == B_TOPOLOGY_PACKAGE) {
 			switch (topology[i].data.package.vendor) {
-				case B_CPU_VENDOR_INTEL:
-					logo = IntelLogo;
+				case B_CPU_VENDOR_AMD:
+					logo = kAmdLogo;
+					logoSize = sizeof(kAmdLogo);
 					break;
 
-				case B_CPU_VENDOR_AMD:
-					logo = AmdLogo;
+				case B_CPU_VENDOR_CYRIX:
+					logo = kCyrixLogo;
+					logoSize = sizeof(kCyrixLogo);
+					break;
+
+				case B_CPU_VENDOR_INTEL:
+					logo = kIntelLogo;
+					logoSize = sizeof(kIntelLogo);
+					break;
+
+				case B_CPU_VENDOR_VIA:
+					logo = kViaLogo;
+					logoSize = sizeof(kViaLogo);
 					break;
 
 				default:
@@ -157,8 +174,14 @@ NormalPulseView::DetermineVendorAndProcessor()
 	delete[] topology;
 #endif
 
-	fCpuLogo->SetBits(logo, fCpuLogo->BitsLength(), 0, B_CMAP8);
-	fHasBrandLogo = (logo != BlankLogo);
+	if (logo != NULL) {
+		fBrandLogo = new BBitmap(BRect(0, 0, 47, 47), B_RGBA32);
+		if (BIconUtils::GetVectorIcon(logo, logoSize, fBrandLogo) != B_OK) {
+			delete fBrandLogo;
+			fBrandLogo = NULL;
+		}
+	} else
+		fBrandLogo = NULL;
 
 	get_cpu_type(fVendor, sizeof(fVendor), fProcessor, sizeof(fProcessor));
 }
@@ -169,11 +192,13 @@ NormalPulseView::Draw(BRect rect)
 {
 	PushState();
 
+	SetDrawingMode(B_OP_OVER);
 	// Processor picture
 	DrawBitmap(fCpuLogo, BPoint(10, 10));
 
-	if (!fHasBrandLogo) {
-		SetDrawingMode(B_OP_OVER);
+	if (fBrandLogo != NULL) {
+		DrawBitmap(fBrandLogo, BPoint(18, 17));
+	} else {
 		SetHighColor(240, 240, 240);
 		SetFontSize(fVendorFontSize);
 
@@ -183,12 +208,11 @@ NormalPulseView::Draw(BRect rect)
 	}
 
 	// Draw processor type and speed
-	SetDrawingMode(B_OP_OVER);
 	SetHighColor(240, 240, 240);
 
 	SetFontSize(fProcessorFontSize);
 	float width = StringWidth(fProcessor);
-	MovePenTo(10 + (32 - width / 2), 48);
+	MovePenTo(10 + (32 - width / 2), 55);
 	DrawString(fProcessor);
 
 	char buffer[64];
@@ -204,7 +228,7 @@ NormalPulseView::Draw(BRect rect)
 	GetFont(&font);
 	SetFontSize(max_font_size(font, buffer, fProcessorFontSize, 46.0f));
 	width = StringWidth(buffer);
-	MovePenTo(10 + (32 - width / 2), 60);
+	MovePenTo(10 + (32 - width / 2), 64);
 	DrawString(buffer);
 
 	PopState();

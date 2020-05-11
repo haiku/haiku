@@ -37,7 +37,7 @@ class NormalPulseView : public PulseView {
 		CPUButton **fCpuButtons;
 		BBitmap *fCpuLogo;
 		int32 fCpuCount;
-		bool fHasBrandLogo;
+		BBitmap* fBrandLogo;
 
 		float	fVendorFontSize, fProcessorFontSize;
 };
