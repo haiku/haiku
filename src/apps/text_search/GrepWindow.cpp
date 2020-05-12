@@ -35,6 +35,9 @@
 #define B_TRANSLATION_CONTEXT "GrepWindow"
 
 
+const char* kAppName = B_TRANSLATE_MARK_SYSTEM_NAME("TextSearch");
+
+
 using std::nothrow;
 
 static const bigtime_t kChangesPulseInterval = 150000;
@@ -385,13 +388,13 @@ GrepWindow::_SetWindowTitle()
 			} else
 				title = B_TRANSLATE("%appname% : %path%");
 
-			title.ReplaceAll("%appname%", B_TRANSLATE(APP_NAME));
+			title.ReplaceAll("%appname%", B_TRANSLATE_NOCOLLECT(kAppName));
 			title.ReplaceAll("%path%", path.Path());
 		}
 	}
 
 	if (!title.Length())
-		title = B_TRANSLATE(APP_NAME);
+		title = B_TRANSLATE_NOCOLLECT(kAppName);
 
 	SetTitle(title.String());
 }
@@ -1383,7 +1386,7 @@ GrepWindow::_OnSelectInTracker()
 	if (!_AreAllFoldersOpenInTracker(&folderList)) {
 		BString str1;
 		str1 << B_TRANSLATE("%APP_NAME couldn't open one or more folders.");
-		str1.ReplaceFirst("%APP_NAME",APP_NAME);
+		str1.ReplaceFirst("%APP_NAME", B_TRANSLATE_NOCOLLECT(kAppName));
 		BAlert* alert = new BAlert(NULL, str1.String(), B_TRANSLATE("OK"),
 			NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);

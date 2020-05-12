@@ -7,7 +7,6 @@
 
 
 #define APP_SIGNATURE "application/x-vnd.Haiku.TextSearch"
-#define APP_NAME "TextSearch"
 
 #define PREFS_FILE			"TextSearch"
 #define HISTORY_LIMIT		20
