@@ -18,7 +18,7 @@ Cancel	AddPrinterDialog		Cancel·la
 Unknown status	JobListView		Es desconeix l'estat
 Print jobs for %printer_name%	PrintersWindow		Tasques d'impressió per a %printer_name%
 {0, plural, =-1{??? pages}=1{# page}other{# pages}}	JobListView		{0, plural, =-1{??? pàgines}=1{# pàgina}other{# pàgines}}
-Add printer	AddPrinterDialog		Afegeix una impressora
+Add printer	AddPrinterDialog		Afegeix-hi la impressora
 Printers	PrintersWindow		Impressores
 No printer found!	TransportMenu		No s'ha trobat cap impressora!
 Add…	PrintersWindow		Afegeix...

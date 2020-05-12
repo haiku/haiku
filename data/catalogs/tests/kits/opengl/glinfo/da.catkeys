@@ -1,9 +1,9 @@
 1	danish	x-vnd.Haiku-GLInfo	3678488342
-Capability	Capabilities		Evne
-Information	InfoView		Information
 GL Info	System name		GL-info
-Capabilities	Capabilities		Evner
+Information	InfoView		Information
 Maximum convolution	Capabilities		Maksimum foldning
+Extensions	Extensions		Udvidelser
 Available extensions	Extensions		Tilgængelige udvidelser
 Value	Capabilities		Værdi
-Extensions	Extensions		Udvidelser
+Capabilities	Capabilities		Evner
+Capability	Capabilities		Evne

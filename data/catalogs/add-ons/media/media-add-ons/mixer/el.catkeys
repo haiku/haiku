@@ -13,7 +13,7 @@ not connected	AudioMixer		μη συνδεδεμένο
 Refuse input format changes	AudioMixer		Απαγόρευση αλλαγών στις μονάδες εισόδου
 Drop/repeat samples	AudioMixer		Ρίψιμο/επανάληψη δειγμάτων
 Output channel sources	AudioMixer		Πηγές καναλιών εξόδου
-dB	AudioMixer		dB 
+dB	AudioMixer		dB
 Gain controls	AudioMixer		Απόκτηση ελέγχων
 Input mapping	AudioMixer		Χαρτογράφηση εισόδου
 Mute	AudioMixer		Σίγαση

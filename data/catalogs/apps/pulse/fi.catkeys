@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Pulse	139895817
+1	finnish	x-vnd.Haiku-Pulse	3610817163
 Normal mode	DeskbarPulseView		Normaalitila
 Info	CPUButton		Tiedot
 Quit	DeskbarPulseView		Lopeta
@@ -45,4 +45,3 @@ Active color	ConfigView		Käytössä oleva väri
 Installing in Deskbar failed\n%s	PulseApp		Asentaminen Työpöytäpalkkiin epäonnistui\n%s
 Idle color	ConfigView		Joutokäyntiväri
 Normal mode	PrefsWindow		Normaalitila
-Pulse settings	PulseWindow		Pulssi-asetukset

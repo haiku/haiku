@@ -9,7 +9,7 @@ The mount point could not be retrieved.	InstallProgress		No se n'ha pogut obteni
 Please choose target	InstallerWindow		Si us plau, trieu una destinació.
 Cancel	InstallProgress		Cancel·la
 Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		S'ha acabat la instal·lació. El sector d'arrencada s'ha desat a %s. Premeu Reinicia per reiniciar l'ordinador o trieu un altre volum per fer una altra instal·lació.
-Are you sure you want to to stop the installation?	InstallerWindow		Segur que voleu aturar la instal·lació?
+Are you sure you want to to stop the installation?	InstallerWindow		Segur que voleu interrompre la instal·lació?
 Installer	System name		Instal·lador
 Unknown Type	InstallProgress	Partition content type	Tipus desconegut
 Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Premeu el botó Comença per instal·lar des de %1s a %2s.
@@ -29,7 +29,7 @@ Write boot sector	InstallerWindow		Escriu el sector d'arrencada
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld de %2ld
 Finishing installation.	InstallProgress		S'acaba la instal·lació.
 Install from:	InstallerWindow		Instal·la des de:
-Additional disk space required: 0.0 KiB	InstallerWindow		L'espai de disc addicional necessari és: 0.0 KiB
+Additional disk space required: 0.0 KiB	InstallerWindow		L'espai de disc addicional necessari és 0.0 KiB.
 This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Aquest és un programari de qualitat beta! Significa que hi ha risc de perdre dades importants. Feu còpies de seguretat freqüents! Us hem avisat.\n\n\n
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Quan entreu al Haiku per primer cop, assegureu-vos de llegir la documentació de \"Benvinguda\" i la \"Guia de l'usuari\". N'hi ha enllaços a l'escriptori i a les adreces d'interès del WebPositive.\n\n
 ???	InstallerWindow	Unknown currently copied item	???
@@ -48,7 +48,7 @@ Failed to launch Boot Manager	InstallerWindow		Ha fallat iniciar el Gestor d'arr
 Try installing anyway	InstallProgress		Intenta la instal·lació tanmateix
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		INFORMACIÓ IMPORTANT ABANS D'INSTAL·LAR EL HAIKU\n\n
 Additional disk space required: %s	InstallerWindow		Espai de disc addicional necessari: %s
-Stop	InstallerWindow	In alert after pressing Stop	Atura
+Stop	InstallerWindow	In alert after pressing Stop	Interromp
 Boot sector successfully written.	InstallProgress		S'ha escrit correctament el sector d'arrencada.
 An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		S'ha trobat un error i la instal·lació no s'ha acabat:\n\nError:  %s
 Restart	InstallerWindow		Reinicia
@@ -61,7 +61,7 @@ Installation canceled.	InstallProgress		S'ha cancel·lat la instal·lació.
 The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		El volum de destinació no és buit. Segur que voleu fer la instal·lació tanmateix?\n\nNota: la carpeta de sistema serà una còpia neta del volum d'origen, però conservarà la carpeta dels paràmetres; totes les altres carpetes es combinaran, mentre que els fitxers i enllaços que existeixen tant al volum d'origen com al volum de destinació se sobreescriuran per la versió del volum d'origen.
 OK	InstallerApp		D'acord
 Are you sure you want to abort the installation?	InstallerWindow		Segur que voleu avortar la instal·lació?
-Stop	InstallerWindow		Atura
+Stop	InstallerWindow		Interromp
 Cancel	InstallerWindow		Cancel·la
 Continue	InstallerWindow	In alert after pressing Stop	Continua
 No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		No s'ha trobat cap partició adequada per a la instal·lació. Si us plau, establiu les particions i inicieu almenys una partició amb el sistema de fitxes Be.
@@ -80,7 +80,7 @@ Running Boot Manager and DriveSetup…\n\nClose both applications to continue wi
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Segur que voleu instal·lar al disc d'arrencada actual? L'Instal·lador haurà de reiniciar la màquina si continueu.
 Onto:	InstallerWindow		Cap a:
 Quit Boot Manager and DriveSetup	InstallerWindow		Surt del Gestor d'arrencada i del Gestor de discs
-Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Instal·lador\n\tAutor: Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
+Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Instal·lador\n\tEscrit per Jérôme Duval i Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 Tools	InstallerWindow		Eines
 scanning…	InstallerWindow		s'escaneja...
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Userguide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2)   L’instal·lador farà que la partició del Haiku sigui arrencable, però no fa cap pas per integrar el Haiku al menú d’arrencada existent. Si ja heu instal·lat el GRUB, podeu afegir-hi el Haiku.\nPer obtenir més informació, consulteu la guia d’arrencada del Haiku al nostre lloc web https://www.haiku-os.org/guides/booting.\nO bé podeu configurar un menú d'arrencada des del menú \"Eines\" de l'instal·lador, consulteu el tema de la guia de l'usuari sobre l'aplicació \"Gestor d'arrencada\".\n\n\n

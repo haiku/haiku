@@ -1,0 +1,54 @@
+1	greek, modern (1453-)	x-vnd.Haiku-MediaPlayer	3704552530
+Volume of background clips	MediaPlayer-SettingsWindow		Ένταση κλιπ υποβάθρου
+Audio	MediaPlayer-InfoWin		Ήχος
+Subtitle placement:	MediaPlayer-SettingsWindow		Τοποθέτηση υποτίτλων:
+Audio track	MediaPlayer-Main		Κομμάτι ήχου
+Muted	MediaPlayer-SettingsWindow		Σε σίγαση
+OK	MediaPlayer-RemovePLItemsCmd		Εντάξει
+Subtitles	MediaPlayer-Main		Υπότιτλοι
+File info	MediaPlayer-InfoWin		Πληροφορίες αρχείου
+OK	MediaPlayer-Main		Εντάξει
+Duration	MediaPlayer-InfoWin		Διάρκεια
+Import Entries	MediaPlayer-ImportPLItemsCmd		Εισαγωγή
+Open network stream	MediaPlayer-Main		Άνοιγμα ροής δικτύου
+Move file to Trash	MediaPlayer-PlaylistWindow		Μετακίνηση αρχείου στον Κάδο Απορριμάτων
+Open file…	MediaPlayer-Main		Άνοιγμα αρχείου...
+View options	MediaPlayer-SettingsWindow		Προβολή ρυθμίσεων
+Full volume	MediaPlayer-SettingsWindow		Μέγιστη ένταση
+Location	MediaPlayer-InfoWin		Τοποθεσία
+Medium	MediaPlayer-SettingsWindow		Μέτριο
+Track	Audio Track Menu		Κομμάτι
+Copyright	MediaPlayer-InfoWin		Πνευματική ιδιοκτησία
+Hide interface	MediaPlayer-Main		Απόκρυψη διεπαφής
+Error: 	MediaPlayer-Main		Σφάλμα: 
+Video track	MediaPlayer-Main		Κομμάτι βίντεο
+Save	MediaPlayer-PlaylistWindow		Αποθήκευση
+Cancel	MediaPlayer-NetworkStream		Ακύρωση
+OK	MediaPlayer-SettingsWindow		Εντάξει
+Open…	MediaPlayer-PlaylistWindow		Άνοιγμα...
+Low volume	MediaPlayer-SettingsWindow		Χαμηλή ένταση
+Audio	MediaPlayer-Main		Ήχος
+Cancel	MediaPlayer-SettingsWindow		Ακύρωση
+Track %d	MediaPlayer-Main		Κομμάτι %d
+All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Κανένα αρχείο δεν μπόρεσε να μετακινηθεί στον Κάδο Απορριμάτων.
+Move into trash error	MediaPlayer-RemovePLItemsCmd		Σφάλμα μετακίνησης στον κάδο απορριμάτων
+Edit	MediaPlayer-PlaylistWindow		Επεξεργασία
+Open	MediaPlayer-PlaylistWindow		Άνοιγμα
+always	MediaPlayer-SettingsWindow		πάντα
+Stream settings	MediaPlayer-Main		Ρυθμίσεις ροής
+Rating	MediaPlayer-Main		Βαθμολογία
+Video	MediaPlayer-Main		Βίντεο
+Automatically start playing	MediaPlayer-SettingsWindow		Αυτόματη αναπαραγωγή
+Undo	MediaPlayer-PlaylistWindow		Αναίρεση
+Settings…	MediaPlayer-Main		Ρυθμίσεις...
+Video	MediaPlayer-InfoWin		Βίντεο
+File info…	MediaPlayer-Main		Πληροφορίες αρχείου...
+Track	Video Track Menu		Κομμάτι
+Full screen	MediaPlayer-Main		Πλήρη οθόνη
+OK	MediaPlayer-NetworkStream		Εντάξει
+Save	MediaPlayer-Main		Αποθήκευση
+Subtitle size:	MediaPlayer-SettingsWindow		Μέγεθος υποτίτλων:
+Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Κάποια αρχεία δεν μπόρεσαν να μετακινηθούν στον Κάδο Απορριμάτων.
+Save as…	MediaPlayer-PlaylistWindow		Αποθήκευση ως...
+Open	MediaPlayer-Main		Άνοιγμα
+OK	MediaPlayer-PlaylistWindow		Εντάξει

@@ -1,8 +1,9 @@
-1	greek, modern (1453-)	x-vnd.Haiku-MatchHeader	3622725118
+1	greek, modern (1453-)	x-vnd.Haiku-MatchHeader	2024597924
 Delete message	ConfigView		Διαγραφή μηνύματος
 Match \"%attribute\" against \"%regex\"	RuleFilter		Αναζήτηση στο \"%attribute\" με βάση το \"%regex\"
 Match header	RuleFilter		Ταυτοποίηση της κεφαλίδας
 Set flags to	ConfigView		Θέση σημαιών σε
+Header field (e.g. Subject, From, …)	ConfigView		Πεδίο επικεφαλίδας (π.χ. Θέμα, Από, ...)
 <Choose account>	ConfigView		<Επιλέξτε λογαριασμό>
 Then	ConfigView		Τότε
 If	ConfigView		Αν

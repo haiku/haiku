@@ -1,8 +1,9 @@
-1	greek, modern (1453-)	x-vnd.Haiku-PackageInstaller	4045079517
+1	greek, modern (1453-)	x-vnd.Haiku-PackageInstaller	1510443851
+Package description	UninstallView		Περίληψη πακέτου
 none	PackageView		κανένα
 Continue	PackageInstall		Συνέχεια
 Running post-installation scripts	PackageInstall		Εκτέλεση script πριν την εγκατάσταση
-Package installer	PackageView		Εγκαταστάτης πακέτων
+Package installer	PackageView		Εγκαταστάτης Πακέτων
 All existing files will be skipped?	PackageView		Όλα τα υπάρχοντα αρχεία θα παραβλεφθούν;
 Replace	PackageView		Αντικατάσταση
 All existing files will be replaced?	PackageView		Όλα τα υπάρχοντα αρχεία θα αντικατασταθούν;
@@ -14,7 +15,10 @@ Skip all	PackageView		Παράβλεψη όλων
 The installation of the package has been aborted.	PackageView		Η εγκατάσταση αυτού του πακέτου ματαιώθηκε.
 No installation type selected	PackageView		Δεν επιλέχθηκε τύπος εγκατάστασης
 Do you want to remember this decision for the rest of this installation?\n	PackageView		Θέλετε να απομνημονευτεί η συγκεκριμένη απόφαση για την υπόλοιπη διαδικασία της εγκατάστασης;\n
+Install…	UninstallView		Εγκατάσταση...
 Installing files and folders	PackageInstall		Εγκατάσταση αρχείων και φακέλων
+Installed packages	UninstallWindow		Εγκατεστημένα πακέτα
+Remove	UninstallView		Αφαίρεση
 The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Το ζητούμενο πακέτο απέτυχε να εγκατασταθεί στο σύστημσ σας. Αυτο μπορεί να είναι ένα πρόβλημα με το αρχείο πακέτου προορισμού. Παρακαλώ συζητήστε για αυτό το πρόβλημα με το διανομέα του πακέτου.
 OK	UninstallView		Εντάξει
 Accept	PackageTextViewer		Αποδοχή
@@ -26,18 +30,24 @@ Installation progress	PackageView		Πρόοδος εγκατάστασης
 Decline	PackageTextViewer		Απόρριψη
 Continue	PackageTextViewer		Συνέχεια
 Installing package	PackageStatus		Εγκατάσταση πακέτου
+Install %name%	PackageView		Εγκατάσταση %name%
+%index% of %total%	PackageInstall		%index% από %total%
 No package selected.	UninstallView		Δεν επιλέχθηκε πακέτο.
+%name% (%size% free)	PackageView		%name% (%size% ελεύθερα)
 Error while installing the package\n	PackageView		Σφάλμα κατά την εγκατάσταση του πακέτου\n
 Finishing installation	PackageInstall		Ολοκλήρωση εγκατάστασης
 No package available.	PackageInfo		Δεν υπάρχει διαθέσιμο πακέτο.
 Installation type:	PackageView		Τύπος εγκατάστασης:
+The package you selected has been successfully removed from your system.	UninstallView		Το πακέτο που επιλέξατε αφαιρέθηκε επιτυχώς από το σύστημά σας.
 There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Φαίνεται  να υπάρχει μια σύγχηση του μεγέθους αρχείου στο αρχείο πακέτου. Το πακέτο μπορεί να είναι καταστραμμένο ή να έχει τροποποιηθεί έπειτα από τη δημιουργία του. Θέλετε οπωσδήποτε να συνεχίσετε;
+%name% (%size%)	PackageView		%name% (%size%)
 Abort	PackageInstall		Ματαίωση
 Replace all	PackageView		Αντικατάσταση όλων
 The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Το αρχείο πακέτου δεν είναι αναγνώσιμο.\nΈνας από τους πιθανούς λόγους για αυτό είναι οτι μπορεί το ζητούμενο πακέτο να μην είναι ένα έγκυρο πακέτο .pkg του BeOS.
 Continue	PackageInfo		Συνέχεια
 No package selected.	PackageInfo		Δεν επιλέχθηκε πακέτο.
 Error! \"%s\" is not a valid path.\n	Packageinstaller main		Σφάλμα! Το \"%s\ δεν είναι μια έγκυρη διαδρομή.\n
+LegacyPackageInstaller	System name		Παλαιωμένος Εγκαταστάτης Πακέτων
 Ask again	PackageView		Ερώτηση ξανά
 OK	PackageView		Εντάξει
 Abort	PackageInfo		Ματαίωση

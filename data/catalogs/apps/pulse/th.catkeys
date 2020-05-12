@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-Pulse	139895817
+1	thai	x-vnd.Haiku-Pulse	3610817163
 Normal mode	DeskbarPulseView		โหมดปกติ
 Info	CPUButton		ข้อมูล
 Quit	DeskbarPulseView		ออก
@@ -45,4 +45,3 @@ Active color	ConfigView		สีที่ใช้งานอยู่
 Installing in Deskbar failed\n%s	PulseApp		การติดตั้งในเดสก์บาร์ล้มเหลว\n%s
 Idle color	ConfigView		สีที่ไม่ใช้งาน
 Normal mode	PrefsWindow		โหมดปกติ
-Pulse settings	PulseWindow		ตั้งค่า Pulse

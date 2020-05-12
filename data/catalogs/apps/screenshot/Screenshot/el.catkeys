@@ -1,6 +1,7 @@
-1	greek, modern (1453-)	x-vnd.haiku-screenshot	4065094687
+1	greek, modern (1453-)	x-vnd.haiku-screenshot	861935570
 Include window border	ScreenshotWindow		Περίληψη συνόρων παραθύρου
 Save in:	ScreenshotWindow		Αποθήκευση στο:
+OK	ScreenshotWindow		Εντάξει
 Select	ScreenshotWindow		Επιλογή
 Save as:	ScreenshotWindow		Αποθήκευση ως:
 seconds	ScreenshotWindow		δευτερόλεπτα
@@ -8,13 +9,15 @@ New screenshot	ScreenshotWindow		Νέο στιγμιότυπο οθόνης
 Screenshot	System name		Screenshot
 Desktop	ScreenshotWindow		Επιφάνεια εργασίας
 Artwork folder	ScreenshotWindow		Φάκελος γραφικών
-Translator Settings	ScreenshotWindow		Ρυθμίσεις μεταφραστή
+Translator Settings	ScreenshotWindow		Ρυθμίσεις μετατροπέα
 Include mouse pointer	ScreenshotWindow		Συμπεριλάβετε το δείκτη του ποντικιού
 overwrite	ScreenshotWindow		αντικατάσταση
 Settings…	ScreenshotWindow		Ρυθμίσεις...
 Choose folder	ScreenshotWindow		Επιλογή καταλόγου
 Name:	ScreenshotWindow		Όνομα:
+Choose folder…	ScreenshotWindow		Επιλογή φακέλου...
 Please select	ScreenshotWindow		Παρακαλώ επιλέξτε
+Failed to save screenshot	ScreenshotWindow		Η αποθήκευση στιγμιότυπου οθόνης απέτυχε 
 Cancel	ScreenshotWindow		Άκυρο
 Delay:	ScreenshotWindow		Καθυστέρηση:
 Copy to clipboard	ScreenshotWindow		Αντιγραφή στο πρόχειρο

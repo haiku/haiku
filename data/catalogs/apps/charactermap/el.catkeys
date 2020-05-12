@@ -1,12 +1,15 @@
-1	greek, modern (1453-)	x-vnd.Haiku-CharacterMap	56063163
+1	greek, modern (1453-)	x-vnd.Haiku-CharacterMap	66071658
 Enclosed alphanumerics	UnicodeBlocks		Κλειστά αλφαριθμητικά
 Basic Latin	UnicodeBlocks		Βασικά Λατινικά
 View	CharacterWindow		Προβολή
+Cherokee supplement	UnicodeBlocks		Υποκατάστατο Cherokee
 Latin-1 supplement	UnicodeBlocks		Λατινικά-1 συμπλήρωμα
 Hebrew	UnicodeBlocks		Εβραϊκά
 Georgian supplement	UnicodeBlocks		Γεωργιανό συμπλήρωμα
+Multani	UnicodeBlocks		Μουλτάνι
 CJK unified ideographs	UnicodeBlocks		Γενικές ιδεογραφίες CJK
 Modifier tone letters	UnicodeBlocks		Modifier tone letters
+Old Hungarian	UnicodeBlocks		Παλαιό Ουγγρικό
 Khmer	UnicodeBlocks		Khmer
 Supplementary private use area A	UnicodeBlocks		Συμπληρωματική ιδιωτική περιοχή χρήσης Α
 Hanunoo	UnicodeBlocks		Hanunoo
@@ -26,6 +29,7 @@ Arabic	UnicodeBlocks		Αραβικά
 Ethiopic extended	UnicodeBlocks		Αιθιοπικά εκτεταμένα
 Arrows	UnicodeBlocks		Βέλη
 Font	CharacterWindow		Φόντο
+Hatran	UnicodeBlocks		Χατράν
 Variation selectors supplement	UnicodeBlocks		Συμπληρωματικές επιλογές διακυμάνσεων
 Gujarati	UnicodeBlocks		Γκουτζαρατικά
 Cuneiform	UnicodeBlocks		Cuneiform
@@ -33,6 +37,7 @@ CJK radicals supplement	UnicodeBlocks		Συμπληρώματα CJK
 Balinese	UnicodeBlocks		Μπαλινέζικα
 Cham	UnicodeBlocks		Cham
 Specials	UnicodeBlocks		Ιδιαίτερα
+Ahom	UnicodeBlocks		Αχόμ
 CJK compatibility ideographs	UnicodeBlocks		Ιδεογράμματα CJK
 Phonetic extensions	UnicodeBlocks		Φωνητικές επεκτάσεις
 Khmer symbols	UnicodeBlocks		Σύμβολα Khmer
@@ -97,9 +102,12 @@ Hangul Jamo	UnicodeBlocks		Hangul Jamo
 Tamil	UnicodeBlocks		Τamil
 Currency symbols	UnicodeBlocks		Σύμβολα νομισμάτων
 Combining diacritical marks	UnicodeBlocks		Συνδυασμένα διακριτικά σημεία
+Anatolian hieroglyphs	UnicodeBlocks		Ανατολικά ιερογλυφικά
 Supplement punctuation	UnicodeBlocks		Συμπληρωματικά σημεία στίξης
 Unified Canadian Aboriginal syllabics	UnicodeBlocks		Ενιαίες καναδικές αυτόχθονες συλλαβές
+Marchen	UnicodeBlocks		Μαρχέν
 Ugaritic	UnicodeBlocks		Ugaritic
+Tangut	UnicodeBlocks		Τανγκούτ
 CJK symbols and punctuation	UnicodeBlocks		Σύμβολα CJK και σημεία στίξης
 File	CharacterWindow		Αρχείο
 Number forms	UnicodeBlocks		Αριθμιτικά έντυπα
@@ -107,6 +115,7 @@ Cherokee	UnicodeBlocks		Τσερόκι
 Tags	UnicodeBlocks		Ετικέτες
 Cypriot syllabary	UnicodeBlocks		Κυπριακός συλλαβισμός
 Counting rod numerals	UnicodeBlocks		Καταμέτρηση αριθμού ράβδων
+Ideographic symbols and punctuation	UnicodeBlocks		Ιδεογραφικά σύμβολα και στίξη
 Latin extended A	UnicodeBlocks		Λατινικά εκτεταμένα Α
 Miscellaneous symbols	UnicodeBlocks		Διάφορα σύμβολα
 Saurashtra	UnicodeBlocks		Saurashtra
@@ -122,7 +131,12 @@ Ancient Greek numbers	UnicodeBlocks		Αρχάιοι ελληνικοί αριθ�
 Vai	UnicodeBlocks		Vai
 Yi Radicals	UnicodeBlocks		Yi Radicals
 Cyrillic extended B	UnicodeBlocks		Κυριλλικά εκτεταμένα Β
-Quit	CharacterWindow		Έξοδος
+Mongolian supplement	UnicodeBlocks		Συμπλήρωμα μογγολιανών
+Supplemental Symbols and Pictographs	UnicodeBlocks		Συμπληρωματικά Σύμβολα και Εικονογράμματα
+Quit	CharacterWindow		Κλείσιμο
+Ancient symbols	UnicodeBlocks		Αρχαία σύμβολα
+Newa	UnicodeBlocks		Νιούα
+Adlam	UnicodeBlocks		Αντλάμ
 Braille patterns	UnicodeBlocks		Πρότυπα Braille
 New Tai Lue	UnicodeBlocks		New Tai Lue
 Runic	UnicodeBlocks		Runic
@@ -160,6 +174,7 @@ Alphabetic presentation forms	UnicodeBlocks		Αλφαβητικές φόρμες
 Halfwidth and fullwidth forms	UnicodeBlocks		Μεσαία και ολόκληρα έντυπα
 Lydian	UnicodeBlocks		Λυδιακά
 Ethiopic supplement	UnicodeBlocks		Συπληρωματικά Αιθιοπικά
+Glagolitic supplement	UnicodeBlocks		Συμπλήρωμα γλαγολιτικών
 Latin extended B	UnicodeBlocks		Λατινικά εκτεταμένα Β
 Box drawing	UnicodeBlocks		Κουτί σχεδιάσης
 Mathematical alphanumeric symbols	UnicodeBlocks		Μαθηματικά αλφαρηθμιτικά σύμβολα

@@ -264,7 +264,7 @@ You must have at least one attribute showing.	PoseView		Ви повинні ма
 Cut	FilePanelPriv		Вирізати
 Favorites	FilePanelPriv		Вибрані
 Point	AttributesView		Вказівник
-home	B_USER_DIRECTORY		home
+home	B_USER_DIRECTORY		Home
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Нові шаблони Tracker
 Disk mounting during boot	AutoMounterSettings		Підключення дисків при завантаженні
 Don't automount	AutoMounterSettings		Не підключати автоматично

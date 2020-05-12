@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Installer	4003974338
+1	polish	x-vnd.Haiku-Installer	2281950717
 Performing installation.	InstallProgress		Wykonywanie instalacji.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Wybierz dysk źródłowy z menu podręcznego i naciśnij „Instaluj”.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Zamknij okno DriveSetup przed zamknięciem okna instalatora.
@@ -40,6 +40,7 @@ Hide optional packages	InstallerWindow		Ukryj pakiety opcjonalne
 Have fun and thanks for trying out Haiku!	InstallerApp		Baw się dobrze i dzięki za wypróbowanie Haiku!
 Quit	InstallerApp		Zakończ
 Starting installation.	InstallProgress		Rozpoczynanie instalacji.
+Error writing boot sector.	InstallProgress		Błąd podczas nadpisywania sektora rozruchowego.
 OK	InstallerWindow		OK
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Zakończ Menedżera Rozruchu i DriveSetup przed zamknięciem okna Instalatora.
 Failed to launch Boot Manager	InstallerWindow		Uruchamianie Boot Managera nie powiodło się

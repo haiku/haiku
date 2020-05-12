@@ -10,14 +10,14 @@ OK	GrepWindow		D'acord
 %appname% : %path% : %searchtext%	GrepWindow		%appname%: %path%: %searchtext%
 Close	GrepWindow		Tanca
 Look in sub-folders	GrepWindow		Cerca a les carpetes inferiors
-%s: Not enough room to escape the filename.	Grepper		%s: No hi ha prou espai per codificar el nom del fitxer.
+%s: Not enough room to escape the filename.	Grepper		%s: no hi ha prou espai per completar el nom del fitxer.
 Follow symbolic links	GrepWindow		Segueix els enllaços simbòlics
 Regular expression	GrepWindow		Expressió regular
 Text files only	GrepWindow		Només els fitxers de text
 Quit	GrepWindow		Surt
 Show files in Tracker	GrepWindow		Mostra els fitxers al Rastrejador
 Please select the files you wish to keep searching.	GrepWindow		Si us plau, seleccioneu els fitxers que voleu continuar cercant.
-Trim to selection	GrepWindow		Escapça per la selecció
+Trim to selection	GrepWindow		Escapça a la selecció
 Set target…	GrepWindow		Seleccioneu la destinació...
 TextSearch	GrepWindow		Cerca un text
 Failed to open input pipe!	Grepper		Ha fallat obrir el conducte d'entrada!

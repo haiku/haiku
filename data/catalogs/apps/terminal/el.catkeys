@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Terminal	2677418285
+1	greek, modern (1453-)	x-vnd.Haiku-Terminal	4257042450
 Close other tabs	Terminal TermWindow		Κλείσιμο άλλων καρτελών
 Insert path	Terminal TermView		Εισάγετε το μονοπάτι
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Το Τερματικό δε μπορεί να ξεκινήσει το κέλυφος. Λυπούμαστε.
@@ -8,6 +8,7 @@ Edit	Terminal TermWindow		Επεξεργασία
 Select all	Terminal TermWindow		Επιλογή όλων
 Confirm exit if active programs exist	Terminal AppearancePrefView		Επιβεβαίωση εξόδου αν υπάρχουν ενεργά προγράμματα
 Copy	Terminal TermWindow		Αντιγραφή
+Retro	Terminal colors scheme		Ρέτρο
 Edit tab title…	Terminal TermWindow		Επεξεργασία τίτλου καρτέλας...
 Print	Terminal TermWindow		Εκτύπωση
 Settings	Terminal TermWindow		Ρυθμίσεις
@@ -18,19 +19,27 @@ Selected background	Terminal AppearancePrefView		Επιλεγμένο παρασ
 Error!	Terminal getString		Σφάλμα!
 Set tab title	Terminal TermWindow		Ορισμός τίτλου καρτέλας
 Appearance	Terminal PrefWindow		Εμφάνιση
+Encoding:	Terminal AppearancePrefView		Κωδικοποίηση:
 Create link here	Terminal TermView		Δημιουργία συνδέσμου εδώ
+Custom	Terminal AppearancePrefView	Window size	Προσαρμοσμένο
 Selected text	Terminal AppearancePrefView		Επιλεγμένο Κείμενο
 Change directory	Terminal TermView		Αλλαγή καταλόγου
 Page setup…	Terminal TermWindow		Διαμόρφωση σελίδας...
+Defaults	Terminal PrefWindow		Προεπιλογές
 Cancel	Terminal TermView		Άκυρο
+Revert	Terminal PrefWindow		Επαναφορά
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
 Use selection	Terminal FindWindow		Χρήση επιλεγμένου
 Find next	Terminal TermWindow		Εύρεση επόμενου
+Copy link location	Terminal TermView		Αντιγραφή υπερσυνδέσμου
 Window title:	Terminal AppearancePrefView		Τίτλος παραθύρου:
 New tab	Terminal TermWindow		Νέα καρτέλα
 Window title…	Terminal TermWindow		Τίτλος παραθύρου...
+Blue	Terminal colors scheme		Μπλε
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Δεν μπορεί να εκτελεστεί \"%command\":\n\t%error
 Terminal	System name		Terminal
+Font size	Terminal TermWindow		Μέγεθος γραμματοσειράς
+Custom	Terminal colors scheme		Προσαρμοσμένο
 Really close?	Terminal TermWindow		Να κλείσει σίγουρα;
 OK	Terminal TermApp		Εντάξει
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Η διεργασία \"%1\" ακόμη εκτελείται.\nΕαν κλείσετε τοτερματικό, η διεργασία θα τερματιστεί.
@@ -46,12 +55,17 @@ Find previous	Terminal TermWindow		Εύρεση προηγούμενου
 Close	Terminal TermWindow		Κλείσιμο
 Save to file…	Terminal PrefWindow		Αποθήκευση στο αρχείο...
 Background	Terminal AppearancePrefView		Παρασκήνιο
+Window size	Terminal TermWindow		Μέγεθος παραθύρου
 Cancel	Terminal TermWindow		Άκυρο
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Η διεργασία \"%1\" ακόμη εκτελείται.\nΕαν κλείσετε την καρτέλα, η διεργασία θα τερματιστεί.
+Cursor	Terminal AppearancePrefView		Κέρσορας
 Full screen	Terminal TermWindow		Πλήρης οθόνη
 Shell 	Terminal TermWindow		Κέλυφος
+Midnight	Terminal colors scheme		Μεσάνυχτα
 Tab title:	Terminal TermWindow		Τίτλος καρτέλας:
 Window title:	Terminal TermWindow		Τίτλος παραθύρου:
+Default	Terminal colors scheme		Προεπιλογή
+Window size:	Terminal AppearancePrefView		Μέγεθος παραθύρου:
 Switch Terminals	Terminal TermWindow		Εναλλαγή Τερματικών
 Decrease	Terminal TermWindow		Μείωση
 Settings…	Terminal TermWindow		Ρυθμίσεις...
@@ -59,14 +73,17 @@ Cancel	Terminal SetTitleWindow		Ακύρωση
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Το σχέδιο που προσδιορίζει τον τρέχοντα τίτλο παραθύρου. Τα παρακάτω σύμβολα \nμπορούν να χρησιμοποιηθούν:\n
 Use text:	Terminal FindWindow		Χρήση κειμένου:
 Close active tab	Terminal TermWindow		Κλείσιμο ενεργής καρτέλας
+Save as default	Terminal TermWindow		Αποθήκευση ως προεπιλογή
 Nothing is selected.	Terminal TermWindow		Τίποτα δεν επιλέχτηκε.
 Find	Terminal FindWindow		Εύρεση
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Το σχέδιο που προσδιορίζει τον τρέχοντα τίτλο καρτέλας. Τα παρακάτω σύμβολα \nμπορούν να χρησιμοποιηθούν:\n
+Professional	Terminal colors scheme		Επαγγελματικό
 Font:	Terminal AppearancePrefView		Γραμματοσειρά:
 Paste	Terminal TermWindow		Επικόλληση
 Copy here	Terminal TermView		Αντιγραφή εδώ
 Use default shell	Terminal Shell		Χρήση προεπιλεγμένου κέλυφους
 Color:	Terminal AppearancePrefView		Χρώμα:
+Open link	Terminal TermView		Άνοιγμα υπερσυνδέσμου
 Text	Terminal AppearancePrefView		Κείμενο
 Not found.	Terminal TermWindow		Δε βρέθηκε.
 Find…	Terminal TermWindow		Εύρεση...
@@ -78,5 +95,6 @@ Set window title	Terminal TermWindow		Ορισμός τίτλου παραθύρ
 Increase	Terminal TermWindow		Άυξηση
 OK	Terminal TermWindow		Εντάξει
 Close window	Terminal TermWindow		Κλείσιμο παραθύρου
+Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nΠνευματική ιδιοκτησία 2001-2019 Haiku, Inc.\nΠνευματική ιδιοκτησία(C) 1999 Kazuho Okui και Takashi Murai\n\nΧρήση: %s [ΕΠΙΛΟΦΗ] [ΚΕΛΥΦΟΣ]\n
 Clear all	Terminal TermWindow		Καθαρισμός όλων
 Search forward	Terminal FindWindow		Αναζήτηση μπροστά

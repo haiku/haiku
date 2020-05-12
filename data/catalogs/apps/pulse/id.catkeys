@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-Pulse	139895817
+1	indonesian	x-vnd.Haiku-Pulse	3610817163
 Normal mode	DeskbarPulseView		Mode normal
 Info	CPUButton		Info
 Quit	DeskbarPulseView		Keluar
@@ -45,4 +45,3 @@ Active color	ConfigView		Warna aktif
 Installing in Deskbar failed\n%s	PulseApp		Pemasangan di Deskbar gagal\n%s
 Idle color	ConfigView		Warna tidak jalan
 Normal mode	PrefsWindow		Moda normal
-Pulse settings	PulseWindow		Pengaturan pulse

@@ -16,7 +16,7 @@ Go to page	Menus		Ves a la pàgina
 Zoom out	Menus		Redueix
 Quit	Menus		Surt
 Rotate counterclockwise	Menus		Gira en sentit antihorari
-High-quality zooming	Menus		Zoom d'alta qualitat
+High-quality zooming	Menus		Ampliació d'alta qualitat
 Browse	Menus		Navega
 Edit	Menus		Edita
 Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		No s'ha pogut carregar la imatge. El fitxer o el traductor d’imatges no existeix.
@@ -50,7 +50,7 @@ Slide show	Menus		Presentació
 Fit image to page	PrintOptionsWindow		Ajusta la imatge a la pàgina
 Flip top to bottom	Menus		Capgira de dalt a baix
 Select all	Menus		Selecciona-ho tot
-Zoom factor in %:	PrintOptionsWindow		Factor de zoom en %:
+Zoom factor in %:	PrintOptionsWindow		Factor d'ampliació en %:
 Width:	PrintOptionsWindow		Amplada:
 Image	Menus		Imatge
 Move to Trash	Menus		Mou a la paperera

@@ -1,5 +1,6 @@
-1	polish	x-vnd.haiku-softwareupdater	1223025094
+1	polish	x-vnd.haiku-softwareupdater	2494296231
 Updating version	SoftwareUpdaterWindow	List item text	Aktualizowanie wersji
+Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Kliknij tutaj aby zainstalować {0, plural, one{# nowszy pakiet} few{# nowsze pakiety} many{# nowszych pakietów} other{# nowszego pakietu}}.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Pakiety do usunięcia
 No active network connection was found	UpdateManager	Error message	Nie znaleziono aktywnego połączenia sieciowego
 Quit	SoftwareUpdaterWindow	Alert button label	Zakończ
@@ -35,6 +36,7 @@ Exception occurred while checking for updates: %s\n	CheckAction		Podczas sprawdz
 Packages are being updated	UpdateManager		Pakiety są aktualizowane
 Cancel	SoftwareUpdaterWindow		Anuluj
 Don't quit	SoftwareUpdaterWindow		Nie zamykaj
+Checking for updates	SoftwareUpdaterWindow		Szukanie aktualizacji
 Reboot	SoftwareUpdaterWindow		Uruchom ponownie
 Show more details	SoftwareUpdaterWindow		Wyświetl więcej szczegółów
 Installing version	SoftwareUpdaterWindow	List item text	Instalowanie wersji

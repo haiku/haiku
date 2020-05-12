@@ -14,7 +14,7 @@ Ready	NetworkStatusView		Preparat
 Network Status	NetworkStatusView		Estat de la xarxa
 Address	NetworkStatusView		Adreça
 Deskbar is not running, giving up.	NetworkStatus		La barra d'escriptori no s'executa. Ho deixo estar.
-No stateful configuration	NetworkStatusView		No hi ha cap configuració dinàmica
+No stateful configuration	NetworkStatusView		No hi ha cap configuració dinàmica.
 You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Podeu executar l'Estat de la xarxa en una finestra o instal·lar-lo a la barra d’escriptori.
 Broadcast	NetworkStatusView		Difusió
 %ifaceName information:\n	NetworkStatusView		Informació de %ifaceName:\n

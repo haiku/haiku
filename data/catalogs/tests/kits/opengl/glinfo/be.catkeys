@@ -1,9 +1,9 @@
 1	belarusian	x-vnd.Haiku-GLInfo	3678488342
-Capability	Capabilities		Магчымасць
-Information	InfoView		Інфармацыя
 GL Info	System name		Инфа пра GL
-Capabilities	Capabilities		Магчымасці
+Information	InfoView		Інфармацыя
 Maximum convolution	Capabilities		Максімальная канвалюцыя
+Extensions	Extensions		Пашырэньні
 Available extensions	Extensions		Наяўныя пашырэнні
 Value	Capabilities		Значэнне
-Extensions	Extensions		Пашырэньні
+Capabilities	Capabilities		Магчымасці
+Capability	Capabilities		Магчымасць

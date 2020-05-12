@@ -2,7 +2,7 @@
 Account settings	AutoConfigWindow		Paràmetres del compte
 \t\t· Outgoing	Config Window		\t\t· De sortida
 An error occurred while creating the config view: %error.	Config Views		Hi ha hagut un error en crear la vista de configuració: %error.
-E-mail address:	E-Mail		Adreça de correu:
+E-mail address:	E-Mail		Adreça electrònica:
 Create new account	AutoConfigWindow		Obre un compte nou
 While sending and receiving	Config Window		Durant l'enviament i la recepció
 Error!	Config Views		Error!
@@ -24,7 +24,7 @@ Settings	Config Window		Paràmetres
 Never	Config Window	show status window	Mai
 Account name:	Config Views		Nom del compte:
 \t\t· Incoming	Config Window		\t\t· D'entrada
-Enter a valid e-mail address.	AutoConfigWindow		Escriviu una adreça de correu electrònic vàlida.
+Enter a valid e-mail address.	AutoConfigWindow		Escriviu una adreça electrònica vàlida.
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nNo s'han pogut revertir els paràmetres generals.\n\nError en obtenir les paràmetres generals:\n%s\n
 Incoming	E-Mail		D'entrada
 Choose Protocol	E-Mail		Escolliu un protocol
@@ -36,10 +36,10 @@ OK	Config Views		D'acord
 Revert	Config Window		Reverteix
 Incoming	Config Window		D'entrada
 Finish	AutoConfigWindow		Acaba
-Add filter	Config Views		Afegeix un filtre
+Add filter	Config Views		Afegeix-hi un filtre
 Account settings	Config Views		Configuració del compte
 minutes	Config Window		minuts
-E-mail	System name		Correu electrònic
+E-mail	System name		Correu
 Check every	Config Window		Comprova cada
 Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Creeu un compte nou amb el botó Afegeix.\n\nSuprimiu un compte amb el botó Suprimeix de l’element seleccionat.\n\nSeleccioneu un element de la llista per canviar-ne la configuració.
 Account name:	E-Mail		Nom del compte:

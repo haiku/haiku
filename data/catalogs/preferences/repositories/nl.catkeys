@@ -1,23 +1,42 @@
-1	dutch; flemish	x-vnd.Haiku-Repositories	3143587292
+1	dutch; flemish	x-vnd.Haiku-Repositories	1220143449
 This is not a valid URL.	AddRepoWindow	Add URL error message	Dit is geen geldige URL.
+Repository URL:	AddRepoWindow	Text box label	Archief-URL:
+There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Er was een fout bij het verversen van de cache van het archief voor %name%
+There was an error disabling the repository %name%	TaskLooper	Error message, do not translate %name%	Er was een fout bij het uitschakelen van het archief %name%
 Unknown	Constants	Unknown repository name	Onbekend
 Remove all	RepositoriesView	Button label	Allen verwijderen
+Enable repositories to use with package management:	RepositoriesView	Label text	Inschakelen van archieven voor gebruik in de pakketbeheerder:
 Disable	RepositoriesView	Button label	Uitschakelen
 Cancel task	TaskTimer	Button label	Taak annuleren
 Changes completed	RepositoriesView	Status view text	Wijzigingen voltooid
+Details	TaskLooper	Job log details header	Details
+Enabled	RepoRow	Tag in the Status column	Ingeschakeld
 Remove	Constants	Button label	Verwijderen
+There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	Er was een fout bij het inschakelen van het archief %url%
+Remove this repository?	RepositoriesView	Removal alert confirmation message	Dit archief verwijderen?
+The task for repository %name% is taking a long time to complete.	TaskTimer	Alert message.  Do not translate %name%	De taak voor archief %name% neemt de tijd om te voltooien.
 Completed	TaskLooper	Completed task status message	Voltooid
+OK	Constants	Button label	Okee
+Status	RepositoriesView	Column title	Status
 Name	RepositoriesView	Column title	Naam
 Add	AddRepoWindow	Button label	Toevoegen
+Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	SoftwareArchieven kan de namen van de ingeschakelde archieven niet ophalen.
 Enable all	RepositoriesView	Button label	Allen inschakelen
 Aborted	TaskLooper	Aborted task status message	Afgebroken
+URL	RepositoriesView	Column title	URL
 Enable	RepositoriesView	Button label	Inschakelen
+Error getting repository configuration for %name%.	RepositoriesView	Alert error message, do not translate %name%	Fout bij het ophalen van de archiefconfiguratie voor %name%
 Description	TaskLooper	Failed task error description	Beschrijving
 Failed	TaskLooper	Failed task status message	Mislukt
+Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	Goed nieuws! De taak voor archief %name% is voltooid.
 Some tasks are still running. Stop these tasks and quit?	RepositoriesWindow	Application quit alert message	Sommige taken zijn nog actief. Deze taken stoppen en afsluiten?
+This repository URL already exists.	RepositoriesView	Error message	Deze archief-URL bestaat reeds.
+Repositories	System name		SoftwareArchieven
 Changes pending:	RepositoriesView	Status view text	Toe te passen wijzigingen:
 Remove	RepositoriesView	Button label	Verwijderen
+Remove these repositories?	RepositoriesView	Removal alert confirmation message	Wilt u deze archieven verwijderen?
 Keep trying	TaskTimer	Button label	Blijven proberen
 Cancel	Constants	Button label	Annuleren
+Only one URL for each repository can be enabled. Please change your selections.	RepositoriesView	Error message	Slechts één URL per archief kan ingeschakeld worden. Wijzig alstublieft uw selectie.
 Stop and quit	RepositoriesWindow	Button label	Stoppen en afsluiten
 Disable all	RepositoriesView	Button label	Allen uitschakelen

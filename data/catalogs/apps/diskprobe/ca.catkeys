@@ -10,9 +10,9 @@ Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if
 16 bit unsigned value:	TypeEditors		Valor de 16 bits sense signe:
 8 bit signed value:	TypeEditors		Valor de 8 bits amb signe:
  (native)	ProbeView		 (nadiu)
-Attribute offset: 	ProbeView		Desplaçament de l'atribut: 
+Attribute offset: 	ProbeView		Compensació de l'atribut: 
 Text	TypeEditors	This is the type of editor	Text
-File offset: 	ProbeView		Desplaçament del fitxer: 
+File offset: 	ProbeView		Compensació del fitxer: 
 Add	ProbeView		Afegeix
 64 bit signed value:	TypeEditors		Valor de 64 bits amb signe:
 Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Segur que voleu suprimir l'atribut \"%s\" del fitxer \"%s\"?\n\nAquesta acció no es pot desfer.
@@ -42,7 +42,7 @@ Cancel	OpenWindow		Cancel·la
 Unknown format	TypeEditors		Format desconegut
 File: 	ProbeView		Fitxer: 
 Swapped: %Ld (0x%0*Lx)	ProbeView		Intercanviat: %Ld (0x%0*Lx)
-Stop	ProbeView		Atura
+Stop	ProbeView		Interromp
 Cancel	ProbeView		Cancel·la
 Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	No s'ha pogut obrir \"%s\":\n%s
 Font size	ProbeView		Mida del tipus de lletra
@@ -55,7 +55,7 @@ Cancel	AttributeWindow		Cancel·la
 16 bit signed value:	TypeEditors		Valor de 16 bits sense signe:
 DiskProbe request	AttributeWindow		Sol·licitud del Sondeig de discs
 Next	ProbeView		Següent
-64 bit signed offset:	TypeEditors		Desplaçament amb signe de 64 bits:
+64 bit signed offset:	TypeEditors		Compensació signada de 64 bits:
 32 bit signed value:	TypeEditors		Valor de 32 bits sense signe:
 Could not find search string.	ProbeView		No s'ha pogut trobar la cadena.
 Close	FileWindow		Tanca
@@ -83,7 +83,7 @@ Remove from file	AttributeWindow		Suprimeix del fitxer
 Attributes	ProbeView		Atributs
 Message	TypeEditors	This is the type of view	Missatge
 Message View	TypeEditors		Mostra el missatge
-Offset: 	ProbeView		Desplaçament: 
+Offset: 	ProbeView		Compensació: 
 Swapped: 0x%0*Lx	ProbeView		Intercanviat: 0x%0*Lx
 MIME type:	TypeEditors		Tipus MIME:
 Fit	ProbeView	Size of fonts, fits to available room	Ajusta
@@ -124,7 +124,7 @@ Number	TypeEditors	This is the type of editor	Número
 Edit	ProbeView		Edita
 String editor	TypeEditors		Editor de cadenes
 Boolean editor	TypeEditors		Editor de boleans
-Device offset: 	ProbeView		Desplaçament del dispositiu: 
+Device offset: 	ProbeView		Compensació de dispositiu: 
 Find…	ProbeView		Troba...
 8 bit palette	TypeEditors		paleta de 8 bits
 Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Decimal

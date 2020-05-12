@@ -40,7 +40,7 @@ Block cache	DataSource		Blok önbelleği
 Swap space	DataSource		Takas alanı
 Swap	DataSource		Takas
 File	ActivityWindow		Dosya
-usage	DataSource		kullanım
+usage	DataSource		kullanımı
 Additional items	ActivityView		Ek ögeler
 Network receive	DataSource		Ağ gelen trafik
 Memory	DataSource		Bellek

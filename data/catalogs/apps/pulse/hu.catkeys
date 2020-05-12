@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Pulse	139895817
+1	hungarian	x-vnd.Haiku-Pulse	3610817163
 Normal mode	DeskbarPulseView		Normál mód
 Info	CPUButton		Infó
 Quit	DeskbarPulseView		Kilépés
@@ -45,4 +45,3 @@ Active color	ConfigView		Aktív szín
 Installing in Deskbar failed\n%s	PulseApp		Nem sikerült telepíteni az Asztalsávra\n%s
 Idle color	ConfigView		Üresjárat színe
 Normal mode	PrefsWindow		Normál mód
-Pulse settings	PulseWindow		Pulzus beállításai

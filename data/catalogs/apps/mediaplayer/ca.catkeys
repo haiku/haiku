@@ -45,7 +45,7 @@ Save error	MediaPlayer-PlaylistWindow		Error de desar
 Attributes	MediaPlayer-Main		Atributs
 Bottom of screen	MediaPlayer-SettingsWindow		Part baixa de la pantalla
 MediaPlayer settings	MediaPlayer-SettingsWindow		Paràmetres del Reproductor multimèdia
-Copyright	MediaPlayer-InfoWin		Dret de còpia
+Copyright	MediaPlayer-InfoWin		Dret de reproducció
 Invalid URL inserted!	MediaPlayer-NetworkStream		URL proporcionat no vàlid!
 Aspect ratio	MediaPlayer-Main		Relació d'aspecte
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Ha fallat desar la llista de reproducció.\n\nError: 
@@ -74,7 +74,7 @@ Redo	MediaPlayer-PlaylistWindow		Refés
 Move Entry	MediaPlayer-MovePLItemsCmd		Mou l'entrada
 <unknown>	PlaylistItem-author		<desconegut>
 Cancel	MediaPlayer-SettingsWindow		Cancel·la
-Large	MediaPlayer-SettingsWindow		Gros
+Large	MediaPlayer-SettingsWindow		Grossa
 Import Entry	MediaPlayer-ImportPLItemsCmd		Importa l'entrada
 unknown format	MediaPlayer-InfoWin		format desconegut
 Track %d	MediaPlayer-Main		Pista %d
@@ -88,7 +88,7 @@ Copy Entry	MediaPlayer-CopyPLItemsCmd		Copia l'entrada
 Close window after playing audio	MediaPlayer-SettingsWindow		Tanca la finestra després de reproduir l'àudio.
 Edit	MediaPlayer-PlaylistWindow		Edita
 Copy Entries	MediaPlayer-CopyPLItemsCmd		Copia les entrades
-Always on top	MediaPlayer-Main		Sempre a dalt
+Always on top	MediaPlayer-Main		Sempre en primer pla
 Open	MediaPlayer-PlaylistWindow		Obre
 always	MediaPlayer-SettingsWindow		sempre
 Loop video	MediaPlayer-SettingsWindow		Bucle de vídeo
@@ -110,7 +110,7 @@ Automatically start playing	MediaPlayer-SettingsWindow		Inicia la reproducció a
 Undo	MediaPlayer-PlaylistWindow		Desfés
 Display mode	MediaPlayer-InfoWin		Mode de pantalla
 Bottom of video	MediaPlayer-SettingsWindow		Part inferior del vídeo
-Small	MediaPlayer-SettingsWindow		Petit
+Small	MediaPlayer-SettingsWindow		Petita
 Settings…	MediaPlayer-Main		Paràmetres...
 min	MediaPlayer-InfoWin	Minutes	min
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Ha fallat desar la llista de reproducció:\n\nError: 

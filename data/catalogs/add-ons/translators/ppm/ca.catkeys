@@ -2,7 +2,7 @@
 None	PPMTranslator		Cap
 PPM Settings	PPMMain		Paràmetres de PPM
 System palette 8 bits	PPMTranslator		Paleta del sistema de 8 bits
-Sample code copyright 1999, Be Incorporated	PPMTranslator		Codi de mostra copyright 1999, Be Incorporated
+Sample code copyright 1999, Be Incorporated	PPMTranslator		Codi d'exemple, copyright 1999, Be Incorporated
 Something is wrong with the PPMTranslator!	PPMMain		Alguna cosa falla amb el PPMTranslator!
 Grayscale 8 bits	PPMTranslator		Escala de grisos de 8 bits
 Based on PPMTranslator sample code	PPMTranslator		Basat en l'exemple de codi del PPMTranslator

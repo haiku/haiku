@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-MediaPlayer	3618681783
+1	portuguese	x-vnd.Haiku-MediaPlayer	1781642486
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Eliminar elemento para o Lixo
 Close	MediaPlayer-PlaylistWindow		Fechar
 Audio	MediaPlayer-InfoWin		Áudio
@@ -9,6 +9,7 @@ Muted	MediaPlayer-SettingsWindow		Mudo
 OK	MediaPlayer-RemovePLItemsCmd		OK
 Open Playlist	MediaPlayer-PlaylistWindow		Abrir Lista de Reprodução
 Subtitles	MediaPlayer-Main		Legendas
+%app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% encontrou um erro interno. Não foi possível abrir o ficheiro.
 File info	MediaPlayer-InfoWin		Informações do ficheiro
 Select all	MediaPlayer-PlaylistWindow		Selecionar tudo
 New player…	MediaPlayer-Main		Novo leitor…
@@ -19,7 +20,10 @@ Resume:	MediaPlayer-SettingsWindow		Retomar:
 Duration	MediaPlayer-InfoWin		Duração
 Move file to Trash	MediaPlayer-PlaylistWindow		Mover ficheiro para o Lixo
 Open file…	MediaPlayer-Main		Abrir ficheiro…
+Scale controls in full screen mode	MediaPlayer-SettingsWindow		Redimensionar controlos no modo de ecrã completo
+View options	MediaPlayer-SettingsWindow		Opções de visualização
 %d kHz	MediaPlayer-InfoWin		%d kHz
+Full volume	MediaPlayer-SettingsWindow		Volume máximo
 <untitled>	PlaylistItem-title		<sem título>
 Start media server	MediaPlayer-Main		Iniciar o servidor de multimédia
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Parece que o servidor de multimédia não está em execução.\nGostaria de o iniciar?
@@ -35,6 +39,7 @@ Bottom of screen	MediaPlayer-SettingsWindow		Fundo do ecrã
 MediaPlayer settings	MediaPlayer-SettingsWindow		Definições do Reprodutor de Multimédia
 Copyright	MediaPlayer-InfoWin		Copyright
 Invalid URL inserted!	MediaPlayer-NetworkStream		URL inválida!
+Aspect ratio	MediaPlayer-Main		Proporção
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Ocorreu uma falha ao guardar a lista de reprodução.\n\nErro: 
 <no media>	MediaPlayer-InfoWin		<sem multimédia >
 Hide interface	MediaPlayer-Main		Ocultar interface
@@ -50,6 +55,7 @@ OK	MediaPlayer-SettingsWindow		OK
 never	MediaPlayer-SettingsWindow		nunca
 Open…	MediaPlayer-PlaylistWindow		Abrir…
 Revert	MediaPlayer-SettingsWindow		Reverter
+Low volume	MediaPlayer-SettingsWindow		Volume baixo
 Audio	MediaPlayer-Main		Áudio
 {0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Estéreo} other{# Canais}}
 Quit	MediaPlayer-Main		Sair
@@ -64,6 +70,7 @@ All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Os fichei
 Total duration: %s	MediaPlayer-PlaylistWindow		Duração total: %s
 %.3f kHz	MediaPlayer-InfoWin		%.3f kHz
 Move into trash error	MediaPlayer-RemovePLItemsCmd		Erro ao mover para o lixo
+50% scale	MediaPlayer-Main		Tamanho a 50%
 Drop files to play	MediaPlayer-Main		Largar ficheiros para reproduzir
 Close window after playing audio	MediaPlayer-SettingsWindow		Fechar a janela depois de reproduzir áudio
 Edit	MediaPlayer-PlaylistWindow		Editar
@@ -85,6 +92,7 @@ Display mode	MediaPlayer-InfoWin		Modo de apresentação
 Bottom of video	MediaPlayer-SettingsWindow		Fundo do vídeo
 Small	MediaPlayer-SettingsWindow		Pequeno
 Settings…	MediaPlayer-Main		Definições…
+min	MediaPlayer-InfoWin	Minutes	min
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Ocorreu uma falha ao guardar a lista de reprodução:\n\nErro: 
 Video	MediaPlayer-InfoWin		Vídeo
 File info…	MediaPlayer-Main		Informações do ficheiro…
@@ -93,10 +101,12 @@ Track	Video Track Menu		Faixa
 Full screen	MediaPlayer-Main		Ecrã completo
 OK	MediaPlayer-NetworkStream		OK
 Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Erro interno (falhou o bloqueio). Ocorreu um erro ao guardar a lista de reprodução.
+100% scale	MediaPlayer-Main		Redimensionar a 100%
 <nothing to redo>	MediaPlayer-PlaylistWindow		<nada para refazer>
 Bad URL	MediaPlayer-NetworkStream		URL inválido
 Save	MediaPlayer-Main		Guardar
 Close window after playing video	MediaPlayer-SettingsWindow		Fechar a janela após a reprodução do vídeo
+200% scale	MediaPlayer-Main		Redimensionar a 200%
 The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Não foi possível abrir o ficheiro '%filename'.\n\n
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Nenhum dos ficheiros que pretendia reproduzir parece ser de multimédia.
 Remove Entry	MediaPlayer-RemovePLItemsCmd		Remover Entrada
@@ -108,6 +118,12 @@ Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Alguns f
 <nothing to undo>	MediaPlayer-PlaylistWindow		<nada para desfazer>
 Save as…	MediaPlayer-PlaylistWindow		Guardar como…
 Error: 	MediaPlayer-RemovePLItemsCmd		Erro: 
+300% scale	MediaPlayer-Main		Redimensionar a 300%
 Open	MediaPlayer-Main		Abrir
+ask every time	MediaPlayer-SettingsWindow		perguntar sempre
 (not supported)	MediaPlayer-InfoWin		(não suportado)
+Randomize	MediaPlayer-PlaylistWindow		Aleatório
+%.3f fps	MediaPlayer-InfoWin		%.3f fps
+400% scale	MediaPlayer-Main		Redimensionar a 400%
+h	MediaPlayer-InfoWin	Hours	h
 OK	MediaPlayer-PlaylistWindow		OK

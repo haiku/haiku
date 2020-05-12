@@ -1,9 +1,9 @@
 1	german	x-vnd.Haiku-GLInfo	3678488342
-Capability	Capabilities		Leistungsdaten
-Information	InfoView		Informationen
 GL Info	System name		GL Info
-Capabilities	Capabilities		Leistungsdaten
+Information	InfoView		Informationen
 Maximum convolution	Capabilities		Max. Faltung
+Extensions	Extensions		Erweiterungen
 Available extensions	Extensions		Verfügbare Erweiterungen
 Value	Capabilities		Wert
-Extensions	Extensions		Erweiterungen
+Capabilities	Capabilities		Leistungsdaten
+Capability	Capabilities		Leistungsdaten

@@ -4,12 +4,12 @@ X:	Main View		X:
 Setting the background image failed:	Main View		Ha fallat establir la imatge del fons:
 Resolution: 	Image Filepanel		Resolució: 
 pick one	Main View		trieu-ne un
-Default	Main View		Predeterminat
+Default	Main View		Per defecte
 Center	Main View		Centrat
 Folder: %path	Main View		Carpeta: %path
 Manual	Main View		Manual
 Set background image error	Main View		Error d'establiment de la imatge de fons
-Default folder	Main View		Carpeta predeterminada
+Default folder	Main View		Carpeta per defecte
 Revert	Main View		Reverteix
 None	Main View		Cap
 All workspaces	Main View		Tots els espais de treball

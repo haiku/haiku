@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.haiku-icon_o_matic	301007613
+1	portuguese	x-vnd.haiku-icon_o_matic	3069316013
 None	Icon-O-Matic-Properties		Nenhum
 Add empty	Icon-O-Matic-ShapesList		Adicionar vazia
 Opening the icon failed!	Icon-O-Matic-Main		Falhou a abertura do ícone!
@@ -9,6 +9,7 @@ Format	Icon-O-Matic-SavePanel		Formato
 Move Shapes	Icon-O-Matic-MoveShapesCommand		Mover Formas
 Color	Icon-O-Matic-StyleTypes		Cor
 Select	Icon-O-Matic-Properties		Selecionar
+Reset transformation	Icon-O-Matic-ShapesList		Repor transformação
 Duplicate	Icon-O-Matic-StylesList		Duplicar
 Rotate	Icon-O-Matic-TransformationBoxStates		Rodar
 Remove Control Points	Icon-O-Matic-RemovePointsCmd		Remover Pontos de Controlo
@@ -22,6 +23,7 @@ Rotation	Icon-O-Matic-PropertyNames		Rotação
 Transform	Icon-O-Matic-PathManipulator		Transformar
 Remove Transformer	Icon-O-Matic-RemoveTransformersCmd		Remover Transformador
 Add shape with style	Icon-O-Matic-Menu-Shape		Adicionar forma com estilo
+Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Repor Transformação
 Transformation	Transformation		Transformação
 Remove	Icon-O-Matic-StylesList		Remover
 Cancel	Icon-O-Matic-Menu-Settings		Cancelar
@@ -81,13 +83,59 @@ Add shape with path	Icon-O-Matic-Menu-Shape		Adicionar forma com caminho
 Translation X	Icon-O-Matic-PropertyNames		Translação X
 Add Transformers	Icon-O-Matic-AddTransformersCmd		Adicionar Transformadores
 Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		O Icon-O-Matic poderá não ter interpretado todos os dados do SVG quando este foi carregado. Ao sobrescrever o ficheiro original, essa informação estaria agora perdida.
+Overwrite	Icon-O-Matic-SVGExport		Sobrescrever
+Modify Control Point	Icon-O-Matic-ChangePointCmd		Modificar Ponto de Controlo
+Cancel	Icon-O-Matic-SVGExport		Cancelar
 Open…	Icon-O-Matic-Menu-File		Abrir…
+Redo	Icon-O-Matic-Main		Refazer
 Change Color	Icon-O-Matic-SetColorCmd		Alterar Cor
+Remove	Icon-O-Matic-ShapesList		Remover
+Linear	Icon-O-Matic-StyleTypes		Linear
+Color (#%02x%02x%02x)	Style name after dropping a color		Cor (#%02x%02x%02x)
+Move	Icon-O-Matic-TransformationBoxStates		Mover
+Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Repor Transformações
+Remove Control Point	Icon-O-Matic-RemovePointsCmd		Remover Ponto de Controlo
+Name	Icon-O-Matic-PropertyNames		Nome
 Multi paste	Icon-O-Matic-Properties		Colagem múltipla
+Add Shapes	Icon-O-Matic-AddShapesCmd		Adicionar Formas
+Reset transformation	Icon-O-Matic-StylesList		Repor transformação
+Add Transformer	Icon-O-Matic-AddTransformersCmd		Adicionar Transformador
+Remove	Icon-O-Matic-PathsList		Remover
+Remove Transformers	Icon-O-Matic-RemoveTransformersCmd		Remover Transformadores
+Style type	Icon-O-Matic-StyleTypes		Tipo de estilo
 Quit	Icon-O-Matic-Menu-File		Sair
+Remove Styles	Icon-O-Matic-RemoveStylesCmd		Remover Estilos
+Gradient	Icon-O-Matic-StyleTypes		Gradiente
+bad news	Title of error alert		más notícias
+Insert Control Point	Icon-O-Matic-InsertPointCmd		Inserir Ponto de Controlo
+Move Shape	Icon-O-Matic-MoveShapesCommand		Mover Forma
+Text too long	Icon-O-Matic-StyledTextImport		Texto demasiado longo
+OK	Icon-O-Matic-SVGImport		OK
 Export icon	Dialog title		Exportar ícone
+Edit Gradient	Icon-O-Matic-SetGradientCmd		Editar Gradiente
 Save	Icon-O-Matic-Menu-File		Guardar
 No	Icon-O-Matic-StyledTextImport		Não
+Add circle	Icon-O-Matic-PathsList		Adicionar círculo
+Untitled	Icon-O-Matic-Main		Sem título
+Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Guardar alterações no ícone atual antes de fechar?
+Transformation	Icon-O-Matic-TransformersList		Transformação
 Save as…	Icon-O-Matic-Menu-File		Guardar como…
+Add	Icon-O-Matic-StylesList		Adicionar
+Translation Y	Icon-O-Matic-PropertyNames		Translação Y
+Remove Shape	Icon-O-Matic-RemoveShapesCmd		Remover Forma
+Transformer	Icon-O-Matic-Menus		Transformador
+Invert selection	Icon-O-Matic-Properties		Inverter seleção
+<unkown property>	Icon-O-Matic-PropertyNames		<propriedade desconhecida>
 Pick a color	Icon-O-Matic-ColorPicker		Escolha uma cor
+Settings…	Icon-O-Matic-SavePanel		Definições…
+Add with style	Icon-O-Matic-ShapesList		Adicionar com estilo
+New	Icon-O-Matic-Menu-File		Novo
 Yes	Icon-O-Matic-StyledTextImport		Sim
+Gradient type	Icon-O-Matic-StyleTypes		Tipo de gradiente
+Move Transformer	Icon-O-Matic-MoveTransformersCmd		Mover Transformador
+Perspective	Transformation		Perspetiva
+Export	Icon-O-Matic-Menu-File		Exportar
+Width	Icon-O-Matic-PropertyNames		Largura
+Style	Icon-O-Matic-Menus		Estilo
+edit it's properties here.	Empty property list - 3rd line		edite as suas propriedades aqui.
+Edit	Icon-O-Matic-Menus		Editar

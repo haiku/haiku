@@ -1,7 +1,8 @@
-1	greek, modern (1453-)	x-vnd.Haiku-ActivityMonitor	4107381384
+1	greek, modern (1453-)	x-vnd.Haiku-ActivityMonitor	1155619009
 P-faults	DataSource		P-σφάλματα
 Media nodes	DataSource		Κόμβοι πολυμέσων
 Threads	DataSource		Θέματα
+Always on top	ActivityWindow		Πάντα στην κορυφή
 Add graph	ActivityWindow		Προσθήκη γραφήματος
 Teams	DataSource		Ομάδες
 MiB	DataSource		MiB
@@ -31,6 +32,7 @@ Remove graph	ActivityView		Αφαίρεση γραφήματος
 CPU usage	DataSource		Χρήση ΚΜΕ
 Raw clipboard	DataSource		Ακατέργαστο πρόχειρο
 Sems	DataSource		Sems
+%.1f MiB	DataSource		%.1f MiB
 ActivityMonitor	System name		ActivityMonitor
 Running applications	DataSource		Ενεργές εφαρμογές
 Semaphores	DataSource		Σηματοφόροι

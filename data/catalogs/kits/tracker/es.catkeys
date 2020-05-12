@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-libtracker	1535620210
+1	spanish; castilian	x-vnd.Haiku-libtracker	659027911
 Created	ContainerWindow		Creado
 Icon	AttributesView		Icono
 Open and make preferred	OpenWithWindow		Abrir y hacer preferido
@@ -100,6 +100,7 @@ Link to:	InfoWindow		Enlazar con:
 Copy here	ContainerWindow		Copiar aquí
 Character	AttributesView		Carácter
 All disks	FindPanel		Todos los discos
+Affine transform	AttributesView		Transformación afine
 Window	ContainerWindow		Ventana
 %BytesPerSecond/s	StatusWindow		%BytesPorSegundo/s
 Remove	FindPanel		Eliminar
@@ -164,6 +165,7 @@ There was an error writing the attribute.	WidgetAttributeText		Ha habido un erro
 Path	Default Query Columns		Ruta
 If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Si renombras %target, es posible que %osName no funcione adecuadamente.\n\n¿Estás seguro de que deseas hacer esto?
 Could not open \"%name\" (%error). 	FSUtils		No se pudo abrir \"%name\" (%error).
+Media parameter group	AttributesView		Medios de parámetros de grupo
 %name info	InfoWindow	InfoWindow Title	%name información
 If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Si mueve la carpeta home, es posible que %osName no funcione adecuadamente!\n\n¿Está seguro de que desea hacer esto?\n\nPara mover la carpeta home, mantenga presionada la tecla Mayúsculas (Shift) y haga clic en \"Mover\".
 Property info	AttributesView		Información de propiedad
@@ -196,6 +198,7 @@ Icon view	DeskWindow		Vista de icono
 <%ld rectangles>	AttributesView		<%ld rectángulos>
 Mount settings…	ContainerWindow		Opciones de montaje
 Keywords	Bookmark Query Columns		Palabras clave
+Media parameter web	AttributesView		Medios de parámetro Web
 Copy more	ContainerWindow		Copiar más
 by name	FindPanel		Por nombre
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Lo siento, no puedes guardar en el directorio root de tu equipo
@@ -305,6 +308,7 @@ Edit name	ContainerWindow		Cambiar nombre
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		No se pudo abrir \"%document\" (Missing symbol: %symbol). \n
 ASCII Text	AttributesView		Texto ASCII
 More options	FindPanel		Más opciones
+Atom reference	AttributesView		Referencia de Atom
 config	B_USER_CONFIG_DIRECTORY		config
 Error moving \"%name\".	FSUtils		Error al mover \"%name\".
 Select…	QueryContainerWindow		Seleccionar
@@ -320,6 +324,7 @@ Would you like to find some other suitable application?	FSUtils		¿Le gustaría 
 *+? operand may be empty.	libtracker		Los operandos *+? pueden estar vacíos.
 (unknown)	AttributesView		(desconocido)
 Recent folders	FavoritesMenu		Carpetas recientes
+Signed memory size	AttributesView		Tamaño de memoria firmado
 The specified name is illegal. Please choose another name.	FilePanelPriv		El nombre especificado es ilegal. Elije otro nombre
 of %items	StatusWindow		de %items
 less than	FindPanel		menos que
@@ -343,6 +348,7 @@ If you alter the system folder or its contents, you won't be able to boot %osNam
 Save	FilePanelPriv		Guardar
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		no se pudo abrir \"%document\" con la aplicación \"%app\" (Librerías faltantes: %library). \n
 Finish: %time	StatusWindow		Terminar: %time
+Messenger	AttributesView		Mensajero
 after	FindPanel		Después
 Version	OpenWithWindow		Versión
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Algunos de los elementos seleccionados no pueden ser movidos a la papelera. ¿Quieres eliminarlos de forma definitiva? (esta operación es irrevertible)
@@ -353,9 +359,12 @@ Size:	InfoWindow		Tamaño:
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		El elemento seleccionado no puede ser movido a la papelera. ¿Quieres borrarlo de forma definitiva? (esta operación es irreversible)
 Copy	ContainerWindow		Copiar
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Lo sentimos, el atributo "Carácter" no puede almacenar un glifo multi-byte
+Open parent	VirtualDirectoryWindow		Abrir predecesor
 And	FindPanel		Y
+Palette-indexed picture	AttributesView		Imagen de paleta indexada
 multiple disks	FindPanel		múltiples discos
 Drawing pattern	AttributesView		Patrón de dibujo
+File offset	AttributesView		Desplazamiento de archivo
 Name = %name	FindPanel	FindResultTitle	Nombre %nombre
 Subject	Email Query Columns		Asunto
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Error copiando la carpeta \"%name\":\n\t%error\n\n¿Deseas continuar?
@@ -447,6 +456,7 @@ ends with	FindPanel		acaba con
 Show Disks icon	SettingsView		Mostrar iconos de los discos
 Outline selection rectangle only	SettingsView		Esquema del rectangulo de selección
 by formula	FindPanel		por formula
+Resize to fit	VirtualDirectoryWindow		Retamañar para ajustarse
 Move to Trash	FilePanelPriv		Mover a la papelera
 is	FindPanel		es
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Si renombras la carpeta de sistema o sus contenidos, es posible que no puedas iniciar %osName.\n\n¿Estás seguro de que deseas hacer esto?\n\nPara renombrar la carpeta de sistema o sus contenidos, mantén presionada la tecla Mayúsculas y haz clic en \"Renombrar\".
@@ -498,6 +508,7 @@ Move to Trash	FSUtils		Mover a la Papelera
 Handles %type	OpenWithWindow		Maneja %type
 Cancel	PoseView		Cancelar
 Delete	PoseView		Eliminar
+Media parameter	AttributesView		Parámetro de medios
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Si modificas la carpeta home, es posible que %osName no funcione adecuadamente.\n\n¿Estás seguro de que deseas hacer esto?\n\nPara modificar la carpeta home, mantén presionada la tecla Mayúsculas y haz clic en \"Sé lo que estoy haciendo\".
 Sorry, you can't copy items to the Trash.	PoseView		Lo sentimos, No puedes copiar elementos a la papelera
 Invert selection	VirtualDirectoryWindow		Invertir selección

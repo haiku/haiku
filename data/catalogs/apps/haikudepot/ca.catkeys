@@ -17,10 +17,10 @@ Rate package…	PackageInfoView		Puntueu el paquet...
 Starting the package daemon failed:\n\n%Error%	App		Ha fallat iniciar el dimoni del paquet:\n\n%Error%
 You have successfully authenticated as user %Nickname%.	UserLoginWindow		Us heu autenticat correctament com a %Nickname%.
 <no info>	PackageInfoView		<cap informació>
-No user ratings available.	PackageInfoView		No hi ha valoracions dels usuaris disponibles.
+No user ratings available.	PackageInfoView		No hi ha puntuacions dels usuaris disponibles.
 Downloading package '%name%'	WorkStatusView		Es baixa el paquet %name%.
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		No s'ha pogut extreure la informació de CAPTCHA necessària de les dades retornades del servidor.
-Rating	PackageListView		Valoració
+Rating	PackageListView		Puntuació
 Synchronizing icons	ServerIconExportUpdateProcess		Sincronització de les icones
 Does not start	RatePackageWindow		No s'inicia.
 Show	MainWindow		Mostra-ho
@@ -32,7 +32,7 @@ Active	PackageListView		Actiu
 Login or Create account	MainWindow		Entreu o creeu-ne un compte
 <Package contents not available for remote packages>	PackageContentsView		<El contingut del paquet no està disponible per als paquets remots>
 {0, plural,one{1 package to download}other{# packages to download}}	WorkStatusView		{0, plural,one{1 paquet per baixar}other{# paquets per baixar}}
-Ratings	PackageInfoView		Valoracions
+Ratings	PackageInfoView		Puntuacions
 Switch account…	MainWindow		Canvia de compte...
 Preferred language:	UserLoginWindow		Llengua preferida:
 Server Error	ServerHelper		Error del servidor
@@ -41,7 +41,7 @@ Authorization or security issue. Logout and log back in again to check that your
 Local	LocalPkgDataLoadProcess		Local
 Rate %Package%	RatePackageWindow		Puntueu %Package%
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Hi ha hagut un error en iniciar el gestor de paquets: %message%
-Quit HaikuDepot	App		Surt de HaikuDepot
+Quit HaikuDepot	App		Surt del Dipòsit del Haiku
 An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		L'error inesperat "%Message%" ha sorgit amb la propietat "%Property%".
 A response to the captcha question must be provided.	UserLoginWindow		Cal proporcionar una resposta a la pregunta de CAPTCHA.
 Category	FilterView		Categoria
@@ -56,20 +56,20 @@ Error	App		Error
 There was a puzzling response from the web service.	UserLoginWindow		Hi ha hagut una resposta desconcertant del servei web.
 Version	PackageListView		Versió
 Not logged in	MainWindow		No heu entrat.
-No, quit HaikuDepot	App		No, surt del HaikuDepot
+No, quit HaikuDepot	App		No, surt del Dipòsit del Haiku
 Featured packages	FeaturedPackagesView		Paquets destacats
 The supplied response to the captcha is incorrect. A new captcha will be generated; try again.	UserLoginWindow		La resposta proporcionada al CAPTCHA és incorrecta. Se'n generarà un de nou; torneu-ho a provar.
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		No ha estat possible comunicar-se amb el servidor per obtenir una imatge de CAPTCHA necessària per crear un usuari nou.
-Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		S'ha carregat correctament la puntuació. Podeu actualitzar-la o suprimir-la al lloc web del servidor de HaikuDepot.
+Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		S'ha carregat correctament la puntuació. Podeu actualitzar-la o suprimir-la al lloc web del servidor del Dipòsit del Haiku.
 Network Error	ServerHelper		Error de xarxa
 Available	PackageListView		Disponible
 Cancel	UserLoginWindow		Cancel·la
-HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		El HaikuDepot necessita que el dimoni del paquet funcioni i sembla que no funciona.\nVoleu inicar-lo ara?
+HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		El Dipòsit del Haiku necessita que el dimoni del paquet funcioni i sembla que no funciona.\nVoleu iniciar-lo ara?
 Click a package to view information	PackageInfoView		Cliqueu sobre un paquet per veure'n la informació
 The password must be at least eight characters long, consist of at least two digits and one upper case character.	UserLoginWindow		La contrasenya ha de tenir com a mínim vuit caràcters, ha de constar d'almenys dos dígits i una majúscula.
 Contents	PackageInfoView		Continguts
 Close	PackageManager		Tanca
-A network transport error has arisen communicating with the HaikuDepot server system: %s	ServerHelper		Ha sorgit un error de transport de xarxa en comunicar-se amb el sistema del servidor de HaikuDepot: %s
+A network transport error has arisen communicating with the HaikuDepot server system: %s	ServerHelper		Ha sorgit un error de transport de xarxa en comunicar-se amb el sistema del servidor del Dipòsit del Haiku: %s
 Changelog	PackageInfoView		Registre de canvis
 Rating not possible	MainWindow		La puntuació no és possible.
 Package update error	MainWindow		Error d'actualització de paquet
@@ -108,7 +108,7 @@ View the usage conditions	UserLoginWindow		Mostra'n les condicions d'ús
 Login issue	MainWindow		Problema d’inici de sessió
 Your rating:	RatePackageWindow		La vostra puntuació:
 Size	PackageListView		Mida
-The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		L'usuari %Nickname% s'ha creat correctament al sistema HaikuDepotServer. Podeu administrar les dades d'usuari mitjançant la interfície web. Ara hi heu entrat com usuari nou.
+The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		L'usuari %Nickname% s'ha creat correctament al sistema del servidor del Dipòsit del Haiku. Podeu administrar les dades de l'usuari mitjançant la interfície web. Ara hi heu entrat com a usuari nou.
 Your rating was updated.	RatePackageWindow		S'ha actualitzat la puntuació.
 All categories	FilterView		Totes les categories
 Repositories	MainWindow		Repositoris
@@ -121,7 +121,7 @@ Refresh repositories	MainWindow		Actualitza els repositoris
 Tools	MainWindow		Eines
 Continue	App		Continua
 A password is required.	UserLoginWindow		Cal una contrasenya.
-This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Sembla que aquest paquet no és al servidor HaikuDepot, per la qual cosa no és possible crear una qualificació nova ni editar una qualificació existent.
+This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Sembla que aquest paquet no és al servidor del Dipòsit del Haiku, per la qual cosa no és possible crear una puntuació nova ni editar-ne una d'existent.
 Language	RatePackageWindow		Llengua
 Log out	MainWindow		Surt
 Comment language:	RatePackageWindow		Llengua del comentari:
@@ -137,7 +137,7 @@ Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Se si
 Stability:	RatePackageWindow		Estabilitat:
 The usage agreement must be agreed to and a confirmation should be made that the person creating the user meets the minimum age requirement.	UserLoginWindow		S’ha d’acceptar l’acord d’ús i s’ha de confirmar que la persona que crea l’usuari compleix els requisits d’edat mínima.
 A validation error has occurred	ServerHelper		Hi ha hagut un error de validació.
-While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	MainWindow		Durant l'actualització de dades de paquets, ha sorgit un problema que pot provocar que les dades quedin obsoletes o que faltin a la pantalla de l'aplicació. Es poden obtenir detalls addicionals sobre aquest problema als registres de l'aplicació.\nLa informació sobre com veure els registres està disponible a la secció del HaikuDepot de la guia de l'usuari.
+While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	MainWindow		Durant l'actualització de dades de paquets, ha sorgit un problema que pot provocar que les dades quedin obsoletes o que faltin a la pantalla de l'aplicació. Es poden obtenir detalls addicionals sobre aquest problema als registres de l'aplicació.\nLa informació sobre com veure els registres està disponible a la secció del Dipòsit del Haiku de la guia de l'usuari.
 The nickname is required.	UserLoginWindow		Cal el sobrenom.
 Source packages	MainWindow		Paquets font
 -	no package size		-
@@ -150,7 +150,7 @@ Log in	UserLoginWindow		Entreu
 Logged in as %User%	MainWindow		Heu entrat com a %User%.
 Email address:	UserLoginWindow		Adreça electrònica:
 Screenshot	ScreenshotWindow		Captura de pantalla
-HaikuDepot	System name		HaikuDepot
+HaikuDepot	System name		Dipòsit del Haiku
 A reboot is necessary to complete the installation process.	PackageManager		Cal reiniciar per completar el procés d’instal·lació.
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{Tinc com a mínim un any.}other{Tinc # anys o més.}}
 View latest usage conditions…	MainWindow		Consulteu les darreres condicions d'ús...
@@ -164,14 +164,14 @@ Captcha error	UserLoginWindow		Error de CAPTCHA
 The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		El sobrenom ha de ser únic, però el sobrenom proporcionat ja està agafat. Trieu-ne un de diferent.
 Manage repositories…	MainWindow		Gestioneu els repositoris...
 Fetching remote repository data	LocalRepositoryUpdateProcess		S'obtenen les dades del repositori remot.
-An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	UserLoginWindow		Hi ha hagut un error en descarregar les condicions d'ús necessàries per crear un usuari nou. Comproveu els detalls del registre i torneu-ho a provar. \nLa informació sobre com veure els registres està disponible a la secció del HaikuDepot de la guia de l'usuari.
+An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	UserLoginWindow		Hi ha hagut un error en descarregar les condicions d'ús necessàries per crear un usuari nou. Comproveu els detalls del registre i torneu-ho a provar. \nLa informació sobre com veure els registres està disponible a la secció del Dipòsit del Haiku de la guia de l'usuari.
 Description	PackageListView		Descripció
 Open %DeskbarLink%	PackageManager		Obre %DeskbarLink%
 User creation error	UserLoginWindow		Error de creació d'usuari
 Install	PackageManager		Instal·la
 Input validation	UserLoginWindow		Validació de l'entrada
-This application is too old to communicate with the HaikuDepot server system. Obtain a newer version of HaikuDepot by updating your Haiku system. The minimum version of HaikuDepot required is \"%s\".	ServerHelper		Aquesta aplicació és massa antiga per comunicar-se amb el sistema de servidor HaikuDepot. Obteniu una versió més recent de HaikuDepot actualitzant el sistema Haiku. La versió mínima de HaikuDepot necessària és \"%s\".
-An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		S'ha enviat un error inesperat des del servidor HaikuDepot [%i]
+This application is too old to communicate with the HaikuDepot server system. Obtain a newer version of HaikuDepot by updating your Haiku system. The minimum version of HaikuDepot required is \"%s\".	ServerHelper		Aquesta aplicació és massa antiga per comunicar-se amb el sistema de servidor HaikuDepot. Obteniu una versió més recent de HaikuDepot actualitzant el sistema Haiku. La versió mínima de Dipòsit del Haiku necessària és \"%s\".
+An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		S'ha enviat un error inesperat des del servidor del Dipòsit del Haiku [%i]
 Log in…	MainWindow		Entrada...
 You need to be logged into an account before you can rate packages.	MainWindow		Per poder valorar els paquets, heu d’iniciar sessió en un compte.
 Client version too old	ServerHelper		Versió del client massa antiga

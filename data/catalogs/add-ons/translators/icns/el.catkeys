@@ -1,2 +1,7 @@
-1	greek, modern (1453-)	x-vnd.Haiku-ICNSTranslator	2751404179
+1	greek, modern (1453-)	x-vnd.Haiku-ICNSTranslator	660278989
+Valid colors: RGB32, RGBA32	ICNSConfig		Έγκυρα χρώματα: RGB32, RGBA32
 Version %d.%d.%d, %s	ICNSConfig		Έκδοση %d.%d.%d, %s
+Apple icons	ICNSTranslator		Εικονίδια Apple
+Apple icon translator	ICNSTranslator		Μετατροπέας εικονιδίου Apple
+Valid sizes: 16, 32, 48, 128, 256, 512, 1024	ICNSConfig		Έγκυρα μεγέθη: 16, 32, 48, 128, 256, 512, 1024
+Apple icon translator	ICNSConfig		Μετατροπέας εικονιδίου Apple

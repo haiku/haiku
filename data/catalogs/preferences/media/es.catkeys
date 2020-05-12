@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Media	2892651343
+1	spanish; castilian	x-vnd.Haiku-Media	582516163
 Couldn't add volume control in Deskbar: %s\n	Media views		No se ha podido agregar el control de volumen en el Deskbar: %s\n
 Restart media services	Media views		Reiniciar los servicios de multimedia
 Quit	Media Window		Salir
@@ -20,6 +20,7 @@ Quit anyway	Media Window		Salir de todos modos
 Media	System name		Multimedia
 Warning!	Media Window		¡Advertencia!
 MIDI Settings	Media Window		Configuración de MIDI
+SoundFonts	Midi View		SoundFonts
 Audio input:	Media views		Entrada de audio:
 <none>	Media views		<ninguno>
 Channel:	Media views		Canal:

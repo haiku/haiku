@@ -31,13 +31,13 @@ Select	ExpanderPreferences		Selecciona
 Show contents	ExpanderWindow		Mostra el contingut
 Automatically show contents listing	ExpanderPreferences		Mostra automàticament la llista de continguts
 OK	ExpanderPreferences		D'acord
-Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Segur que voleu deixar d’expandir aquest arxiu? És possible que els elements ampliats no siguin complets.
+Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Segur que voleu interrompre l'expansió d'aquest arxiu? Pot ser que els elements expandits no siguin complets.
 Leave destination folder path empty	ExpanderPreferences		Deixa buit el camí de la carpeta de destinació.
 Failed to create the destination folder.	ExpanderWindow		Ha fallat crear la carpeta de destinació.
 Select '%s'…	DirectoryFilePanel		Selecciona %s…
 Create	ExpanderWindow		Crea
 The file doesn't exist	ExpanderWindow		No existeix el fitxer
-Stop	ExpanderMenu		Atura
+Stop	ExpanderMenu		Interromp
 File	ExpanderMenu		Fitxer
 Expander	System name		Expandidora
 Expand	ExpanderWindow		Expandeix
@@ -47,5 +47,5 @@ Open destination folder after extraction	ExpanderPreferences		Obre la carpeta de
 Creating listing for '%s'…	ExpanderWindow		Es crea la llista per a %s…
 Set source…	ExpanderMenu		Estableix la font...
 Show contents	ExpanderMenu		Mostra el contingut
-Stop	ExpanderWindow		Atura
+Stop	ExpanderWindow		Interromp
 Destination	ExpanderWindow		Destí

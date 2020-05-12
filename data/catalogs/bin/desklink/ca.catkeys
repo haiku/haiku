@@ -6,7 +6,7 @@ Muted	MediaReplicant		Silenciat
 OK	MediaReplicant		D'acord
 Couldn't launch 	MediaReplicant		No s'ha pogut executar
 Volume	VolumeControl		Volum
-Open MediaPlayer	MediaReplicant		Obre el MediaPlayer
+Open MediaPlayer	MediaReplicant		Obre el Reproductor multimèdia
 %d dB	VolumeControl		%d dB
 Media preferences…	MediaReplicant		Preferències dels mitjans...
 Options	MediaReplicant		Opcions

@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-ProcessController	961343125
+1	greek, modern (1453-)	x-vnd.Haiku-ProcessController	1206374013
 Error saving file	ProcessController		Σφάλμα κατα την αποθήκευση του αρχείου
 Display priority	ProcessController		Προτεραιότητα εμφάνισης
 That's no Fun!	ProcessController		Αυτό δεν έχει πλάκα!
@@ -33,12 +33,15 @@ Gone teams…	ProcessController		Ομάδες που εξαφανίστηκαν.
 Quit an application	ProcessController		Έξοδος από μια εφαρμογή
 Cancel	ProcessController		Άκυρο
 Install in Deskbar	ProcessController		Εγκατάσταση στη Deskbar
+Low latency	ProcessController		Χαμηλή καθυστέρηση
 ProcessController	System name		ProcessController
 Lowest active priority	ProcessController		Χαμηλότερη ενεργή προτεραιότητα
 Restart Tracker	ProcessController		Επανεκκίνηση Ιχνηλάτη
 System resources & caches…	ProcessController		Πόροι & λανθάνουσα μνήμη συστήματος...
 Damned!	ProcessController		Να πάρει!
 New Terminal	ProcessController		Νέο Τερματικό
+Power saving	ProcessController		Εξοικονόμηση ενέργειας
 ProcessController is already installed in Deskbar.	ProcessController		Το ProcessController είναι ήδη εγκατεστημένο στη Deskbar. 
+This is the last active processor…\nYou can't turn it off!	ProcessController		Αυτός είναι ο μόνος ενεργός επεξεργαστής...\nΔεν μπορείτε να τον απενεργοποιήσετε!
 This thread is already gone…	ProcessController		Αυτή η αλλουλουχία έχει ήδη φύγει...
 Run in window	ProcessController		Εκτέλεση σε παράθυρο

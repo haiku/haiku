@@ -13,7 +13,7 @@ Applications	B_USER_DESKBAR_DIRECTORY/Applications		Aplicacions
 Find…	DeskbarMenu		Troba...
 Show clock	Tray		Mostra el rellotge
 Window	PreferencesWindow		Finestra
-Defaults	PreferencesWindow		Predeterminats
+Defaults	PreferencesWindow		Valors predeterminats
 Menu	PreferencesWindow		Menú
 Recent documents	DeskbarMenu		Documents recents
 Auto-hide	PreferencesWindow		Amaga-ho automàticament
@@ -23,8 +23,8 @@ Show all	WindowMenu		Mostra-ho tot
 No windows	WindowMenu		Sense finestres
 Deskbar	System name		Barra d'escriptori
 Restart system	DeskbarMenu		Reinicia el sistema
-Large	PreferencesWindow		Ample
-Auto-raise	PreferencesWindow		Autoelevació
+Large	PreferencesWindow		Grossa
+Auto-raise	PreferencesWindow		Alçament automàtic
 Recent folders:	PreferencesWindow		Carpetes recents:
 Show application expander	PreferencesWindow		Mostra l'expandidora d'aplicacions
 Close all	WindowMenu		Tanca-ho tot
@@ -40,11 +40,11 @@ Recent folders	DeskbarMenu		Carpetes recents
 About this system	DeskbarMenu		Quant al sistema
 Show calendar…	TimeView		Mostra el calendari...
 Deskbar preferences…	DeskbarMenu		Preferències de la barra d'escriptori...
-Expand new applications	PreferencesWindow		Desplega les noves aplicacions
+Expand new applications	PreferencesWindow		Expandeix les aplicacions noves
 Show replicants	DeskbarMenu		Mostra els replicants
 Hide application names	PreferencesWindow		Amaga el nom de les aplicacions
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demostracions
 Icon size	PreferencesWindow		Mida de la icona
-Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Ginys de l'escriptori
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Miniaplicació de l'escriptori
 Hide all	WindowMenu		Amaga-ho tot
 Quit application	WindowMenu		Surt de l'aplicació

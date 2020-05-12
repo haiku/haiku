@@ -1,31 +1,111 @@
-1	greek, modern (1453-)	x-vnd.Be-MAIL	3165492866
+1	greek, modern (1453-)	x-vnd.Be-MAIL	4198339674
 Show icons & labels	Mail		Εμφάνιση εικονιδίων & ετικετών
+(Date unavailable)	Mail		(Μη διαθέσιμη ημερομηνία)
+Reply	Mail		Απάντηση
+Next message	Mail		Επόμενο μήνυμα
+Same sender	Mail		Ίδιος αποστολέας
 Copy to new	Mail		Αντιγραφή σε νέο
+Save as draft	Mail		Αποθήκευση ως πρόχειρο
+Encoding:	Mail		Κωδικοποίηση:
 Print	Mail		Εκτύπωση
+Encoding	Mail		Κωδικοποίηση
+Default account:	Mail		Προεπιλεγμένος λογαριασμός:
 Message	Mail		Μήνυμα
+New	Mail		Νέο
+Save	Mail		Αποθήκευση
+Undo	Mail		Αναίρεση
 Button bar:	Mail		Μπάρα πλήκτρου:
+Save attachment…	Mail		Αποθήκευση επισύναψης…
+Paste	Mail		Επικόλληση
+sent	B_USER_DIRECTORY/mail/sent		εστάλη
+Close	Mail		Κλείσιμο
+Untitled	Mail		Χωρίς τίτλο
+Same recipient	Mail		Ίδιος παραλήπτης
+Previous message	Mail		Προηγούμενο μήνυμα
+(Address unavailable)	Mail		(Μη διαθέσιμη διεύθυνση)
 Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Εισαγωγή: %name% (Tύπος: %type%)
+Copy link location	Mail		Αντιγραφή υπερσυνδέσμου
+Attachments: 	Mail		Επισυνάψεις: 
+Next	Mail		Επόμενο
+Attachments:	Mail		Επισυνάψεις:
+Show icons only	Mail		Εμφάνιση μόνο των εικονιδίων
 Subject:	Mail		Θέμα:
+OK	Mail		Εντάξει
+UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
+Quit	Mail		Έξοδος
+Title:	Mail		Τίτλος:
+%e - E-mail address	Mail		%e - Διεύθυνση ηλεκτρονικού ταχυδρομείου
+Cut	Mail		Αποκοπή
 Reply to sender	Mail		Απάντηση στον αποστολέα
+Copy	Mail		Αντιγραφή
+Add signature	Mail		Προσθήκη υπογραφής
+%n - Full name	Mail		%n - Πλήρες όνομα
 Signature	Mail		Υπογραφή
+Use default account	Mail		Χρήση προεπιλεγμένου λογαριασμού
+draft	B_USER_DIRECTORY/mail/draft		πρόχειρο
 spam	B_USER_DIRECTORY/mail/spam		ανεπιθύμητη αλληλογραφία
 Reply to all	Mail		Απάντηση σε όλους
+Cancel	Mail		Ακύρωση
+Signature:	Mail		Υπογραφή:
+Forward without attachments	Mail		Προώθηση χωρίς επισυνάψεις
 View	Mail		Προβολή
+Signatures	Mail		Υπογραφές
+Find	Mail		Εύρεση
+Date:	Mail		Ημερομηνία:
 Expert	Mail		Έμπειρος
 Automatically mark mail as read:	Mail		Αυτόματο μαρκάρισμα μηνύματος ως αναγνωσμένο:
+Close and 	Mail		Κλείσιμο και 
 Colored quotes:	Mail		Έγχρωμες παραθέσεις:
 Automatic	Mail		Αυτόματο
+Open this link	Mail		Άνοιγμα υπερσυνδέσμου
+Auto signature:	Mail		Αυτόματη υπογραφή:
+Same subject	Mail		Ίδιο θέμα
+Send	Mail		Αποστολή
+Open draft	Mail		Άνοιγμα προχείρου
+Random	Mail		Τυχαίο
 Attach attributes:	Mail		Επισύναψη ιδιοτήτων:
 Find again	Mail		Εύρεση ξανά
+Size:	Mail		Μέγεθος:
 helpful message	Mail		βοηθητικό μήνυμα
+Font:	Mail		Γραμματοσειρά:
+Accounts…	Mail		Λογαριασμοί…
+Previous	Mail		Προηγούμενο
+(Name unavailable)	Mail		(Μη διαθέσιμο όνομα)
+Move to trash	Mail		Μετακίνηση στον κάδο απορριμάτων
 <none>	Mail		<κανένα>
 %d - Date	Mail		%d - Ημερομηνία
+Check spelling	Mail		Ορθογραφικός έλεγχος
+Print…	Mail		Εκτύπωση…
+Settings…	Mail		Ρυθμίσεις…
+Trash	Mail		Κάδος Απορριμάτων
+Find…	Mail		Εύρεση…
+Select all	Mail		Επιλογή όλων
 Reply account:	Mail		Απάντηση λογαριασμού:
+Sorry	Mail		Συγνώμη
+Forward	Mail		Προώθηση
+Open attachment	Mail		Άνοιγμα επισύναψης
+Resend	Mail		Επαναποστολή
+Hide	Mail		Απόκρυψη
+From:	Mail		Από:
+Add	Mail		Προσθήκη
+Open	Mail		Άνοιγμα
 Don't save	Mail		Χωρίς αποθήκευση
 An error occurred trying to save the attachment.	Mail		Παρουσιάστηκε ένα σφάλμα, κατά την αποθήκευση του συνημμένου.
+Save address	Mail		Αποθήκευση διεύθυνσης
 There is no installed handler for URL links.	Mail		Δεν έχει εγκατασταθεί χειριστής για τις συνδέσεις URL.
+File	Mail		Αρχείο
 New mail message	Mail		Νέο μήνυμα ταχυδρομείου
+Edit signatures…	Mail		Επεξεργασία υπογραφών…
+User interface	Mail		Διεπαφή χρήστη
 Inconsistency occurred in the undo/redo buffer.	Mail		Παρουσιάστηκε ασυνέπεια κατά την αναίρεση/ακύρωση αναίρεσης της ενδιάμεσης μνήμης
 Remove attachment	Mail		Διαγραφή συνημμένου
+Set to…	Mail		Ορισμός σε...
 Edit	Mail		Επεξεργασία
+Page setup…	Mail		Ρυθμίσεις σελίδας...
 Beginner	Mail		Αρχάριος
+Send message	Mail		Αποστολή μηνύματος
+Delete	Mail		Διαγραφή
+Spam	Mail		Ανεπιθύμητη αλληλογραφία
+Couldn't open this signature. Sorry.	Mail		Δεν ήταν δυνατό το άνοιγμα της υπογραφής. Συγνώμη.
+Revert	Mail		Επαναφορά
+Unknown	Mail		Άγνωστο

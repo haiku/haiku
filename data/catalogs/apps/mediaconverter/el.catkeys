@@ -1,10 +1,12 @@
-1	greek, modern (1453-)	x-vnd.Haiku-MediaConverter	1991546006
+1	greek, modern (1453-)	x-vnd.Haiku-MediaConverter	2408713367
+%u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Video quality: %3d%%	MediaConverter		Ποιότητα βίντεο: %3d%%
 Source files	MediaConverter		Πηγαία αρχεία
 Error converting '%filename'	MediaConverter		Σφάλμα κατά τη μετατροπή του '%filename'
 Conversion completed	MediaConverter		Η μετατροπή ολοκληρώθηκε
 Audio:	MediaConverter-FileInfo		Ήχος:
 MediaConverter+:SaveDirectory	MediaConverter		ΜετατροπέαςΠολυμέσων+:ΑποθήκευσηΚαταλόγου
+Error creating video.	MediaConverter		Σφάλμα δημιουργίας βίντεο.
 Cancelling	MediaConverter		Ακύρωση
 None available	Audio codecs		Κανένα διαθέσιμο
 No file selected	MediaConverter-FileInfo		Δεν επιλέχτηκε αρχείο
@@ -22,12 +24,14 @@ Audio quality: %3d%%	MediaConverter		Ποιότητα ήχου: %3d%%
 Cancelling…	MediaConverter		Ακύρωση…
 Output file '%filename' created	MediaConverter		Αρχείο εξόδου '%filename' φτιάχτηκε
 Output folder	MediaConverter		Φάκελος εξαγωγής
+ seconds	MediaFileInfo		 δευτερόλεπτα
 Video using parameters form settings	MediaConverter		Βίντεο χρησιμοποιόντας τις ρυθμίσεις
 Video:	MediaConverter-FileInfo		Βίντεο:
 Select	MediaConverter		Επιλογή
 Conversion cancelled	MediaConverter		Η μετατροπή ακυρώθηκε
 Low	MediaConverter		Χαμηλή
 Error loading files	MediaConverter		Σφάλμα κατά τη φόρτωση των αρχείων
+{0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# bit} other{# bits}}
 End   [ms]: 	MediaConverter		Τέλος [ms]:
 Cancel	MediaConverter		Άκυρο
 OK	MediaConverter-FileInfo		Εντάξει
@@ -50,5 +54,6 @@ No video	Video codecs list		Χωρίς βίντεο
 Continue	MediaConverter		Συνέχεια
 Convert	MediaConverter		Μετατροπή
 Audio quality not supported	MediaConverter		Η ποιότητα ήχου δεν υποστηρίζεται
+Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Σφάλμα εγγραφής στην τοποθεσία: %strPath%. Θα χρησιμοποιηθεί η τοποθεσία: /boot/home
 Preview	MediaConverter		Προεπισκόπηση
 Start [ms]: 	MediaConverter		Αρχή [ms]:

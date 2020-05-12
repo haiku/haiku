@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Pulse	3788463253
+1	english	x-vnd.Haiku-Pulse	2964417303
 Normal mode	DeskbarPulseView		正常模式
 Info	CPUButton		信息
 Quit	DeskbarPulseView		退出
@@ -44,4 +44,3 @@ Active color	ConfigView		激活颜色
 Installing in Deskbar failed\n%s	PulseApp		安装到桌面栏失败\n%s
 Idle color	ConfigView		Idle 颜色
 Normal mode	PrefsWindow		正常模式
-Pulse settings	PulseWindow		系统脉搏设置

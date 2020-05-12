@@ -1,0 +1,103 @@
+1	greek, modern (1453-)	x-vnd.Haiku-WebPositive	206853775
+Authentication required	Authentication Panel		Απαιτείται ταυτοποίηση
+Download folder:	Settings Window		Φάκελος λήψεων:
+Close window	WebPositive Window		Κλείσιμο παραθύρου
+Find:	WebPositive Window		Εύρεση:
+Fonts	Settings Window		Γραμματοσειρές
+Bookmarks	WebPositive Window		Σελιδοδείκτες
+Use proxy server to connect to the internet	Settings Window		Χρήση διαμεσολαβητή για την σύνδεση στο διαδίκτυο
+%url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url ολοκληρώθηκε
+Delete	Cookie Manager		Διαγραφή
+Full screen	WebPositive Window		Πλήρη οθόνη
+Copy URL to clipboard	Download Window		Αντιγραφή URL στο πρόχειρο
+Start page:	Settings Window		Αρχική σελίδα:
+Cancel	Download Window		Ακύρωση
+Settings	Settings Window		Ρυθμίσεις
+Downloads	WebPositive Window		Λήψεις
+Browse…	Settings Window		Περιήγηση...
+A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Υπάρχει ήδη σελιδοδείκτης για αυτήν την σελίδα (%bookmarkName).
+Proxy password:	Settings Window		Κωδικός διαμεσολαβητή:
+Size:	Font Selection view		Μέγεθος:
+Page source	WebPositive Window		Πηγαίος κώδικας σελίδας
+Proxy server port:	Settings Window		Θύρα διαμεσολαβητή:
+Show bookmark bar	WebPositive Window		Εμφάνιση μπάρας σελιδοδεικτών
+Find	WebPositive Window		Εύρεση
+Standard font:	Settings Window		Προεπιλεγμένη γραμματοσειρά:
+Open download error	Download Window		Άνοιγμα σφάλματος λήψης
+New tabs:	Settings Window		Νέες καρτέλες:
+%url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url απέτυχε
+Open downloads folder	Download Window		Άνοιγμα φακέλου λήψεων
+Proxy server	Settings Window		Διαμεσολαβητής
+Decrease size	WebPositive Window		Σμίκρυνση
+Sans serif font:	Settings Window		Γραμματοσειρά Sans serif:
+Cookies for %s	Cookie Manager		Cookies για %s
+The download could not be opened.	Download Window		Δεν ήταν δυνατό το άνοιγμα της λήψης.
+Close	Download Window		Κλείσιμο
+WebPositive	System name		WebPositive
+Reload	WebPositive Window		Ανανέωση
+Download finished	Download Window		Η λήψη ολοκληρώθηκε
+Cookie manager	WebPositive Window		Διαχειριστής Cookie
+OK	Authentication Panel		Εντάξει
+Hide password text	Authentication Panel		Απόκρυψη κωδικού
+Username:	Authentication Panel		Όνομα χρήστης:
+Name	Cookie Manager		Όνομα
+Edit	WebPositive Window		Επεξεργασία
+Back	WebPositive Window		Πίσω
+Yesterday	WebPositive Window		Εχτές
+Download aborted	Download Window		Η λήψη ακυρώθηκε
+Password:	Authentication Panel		Κωδικός:
+Forward	WebPositive Window		Προώθηση
+Cut	URL Bar		Αποκοπή
+View	WebPositive Window		Προβολή
+Paste	URL Bar		Επικόλληση
+Open search page	Settings Window		Άνοιγμα σελίδας αναζήτησης
+Increase size	WebPositive Window		Μεγέθυνση 
+New tab	WebPositive Window		Νέα καρτέλα
+Today	WebPositive Window		Σήμερα
+Open location	WebPositive Window		Άνοιγμα τοποθεσίας
+New browser window	Download Window		Νέο παράθυρο περιηγητή
+Open	Download Window		Άνοιγμα
+New window	WebPositive Window		Νέο παράθυρο
+New windows:	Settings Window		Νέα παράθυρα:
+The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Δεν ήταν δυνατό το άνοιγμα του φακέλου λήψεων.\n\nΣφάλμα: %error
+Cancel	Authentication Panel		Ακύρωση
+Style:	Font Selection view		Στυλ:
+OK	Download Window		Εντάξει
+Proxy username:	Settings Window		Όνομα χρήστη διαμεσολαβητή:
+Manage bookmarks	WebPositive Window		Διαχείριση σελιδοδεικτών
+/s)	Download Window	...as in 'per second'	/δ)
+Serif font:	Settings Window		Γραμματοσειρά Serif:
+Apply	Settings Window		Εφαρμογή
+Copy	WebPositive Window		Αντιγραφή
+Close tab	WebPositive Window		Κλείσιμο καρτέλας
+About	WebPositive Window		Σχετικά
+Proxy server requires authentication	Settings Window		Ο διαμεσολαβητής απαιτεί ταυτοποίηση
+Cancel	Settings Window		Ακύρωση
+History	WebPositive Window		Ιστορικό
+Do you really want to clear the browsing history?	WebPositive Window		Είστε σίγουρος ότι θέλετε να διαγράψετε το ιστορικό περιήγησης σας;
+Quit	WebPositive Window		Έξοδος
+Cookie manager	Cookie Manager		Διαχειριστής Cookie
+Start new session	Settings Window		Έναρξη νέας συνεδρίας
+The cookie jar is empty!	Cookie Manager		Το βάζο μπισκότων είναι άδειο!
+Value	Cookie Manager		Τιμή
+Paste	WebPositive Window		Επικόλληση
+Double-click or middle-click to open new tab.	Tab Manager		Κάντε διπλό κλικ ή μεσαίο κλικ για να ανοίξετε νέα καρτέλα.
+Bookmark error	WebPositive Window		Σφάλμα σελιδοδείκτη
+OK	WebPositive Window		Εντάξει
+WebPositive	Download Window		WebPositive
+Save page as…	WebPositive Window		Αποθήκευση σελίδας ως...
+Auto-hide mouse pointer	Settings Window		Αυτόματη απόκρυψη δείκτη ποντικιού
+Window	WebPositive Window		Παράθυρο
+Proxy server address:	Settings Window		Διεύθυνση διαμεσολαβητή:
+Search page:	Settings Window		Σελίδα αναζήτησης:
+Settings	WebPositive Window		Ρυθμίσεις
+Confirmation	WebPositive Window		Επιβεβαίωση
+Open all	WebPositive Window		Άνοιγμα όλων
+Cut	WebPositive Window		Αποκοπή
+Downloads	Download Window		Λήψεις
+Open blank page	Settings Window		Άνοιγμα κενής σελίδας
+Clear history	WebPositive Window		Καθαρισμός ιστορικού
+Cancel	WebPositive Window		Ακύρωση
+Bookmark info	WebPositive Window		Πληροφορίες σελιδοδείκτη
+Copy	URL Bar		Αντιγραφή
+Open start page	Settings Window		Άνοιγμα αρχικής σελίδας

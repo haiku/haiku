@@ -1,9 +1,9 @@
 1	italian	x-vnd.Haiku-GLInfo	3678488342
-Capability	Capabilities		Capacità
-Information	InfoView		Informazioni
 GL Info	System name		Informazioni GL
-Capabilities	Capabilities		Capacità
+Information	InfoView		Informazioni
 Maximum convolution	Capabilities		Convoluzione massima
+Extensions	Extensions		Estensioni
 Available extensions	Extensions		Estensioni disponibili
 Value	Capabilities		Valore
-Extensions	Extensions		Estensioni
+Capabilities	Capabilities		Capacità
+Capability	Capabilities		Capacità

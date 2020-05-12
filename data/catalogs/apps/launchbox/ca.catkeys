@@ -12,7 +12,7 @@ Show window border	LaunchBox		Mostra la vora de la finestra
 \n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nHa fallat iniciar l'aplicació amb la signatura "%2".\n\nError:
 Failed to launch 'something', error in Pad data.	LaunchBox		Ha fallat executar alguna cosa, hi ha hagut un error a les dades de la barra.
 LaunchBox	System name		Executa
-Auto-raise	LaunchBox		Autoelevació
+Auto-raise	LaunchBox		Alçament automàtic
 Icon size	LaunchBox		Mida de la icona
 Open containing folder	LaunchBox		Obre la carpeta que el conté
 Add button here	LaunchBox		Afegeix un botó aquí

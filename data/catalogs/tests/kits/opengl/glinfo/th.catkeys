@@ -1,9 +1,9 @@
 1	thai	x-vnd.Haiku-GLInfo	3678488342
-Capability	Capabilities		ความสามารถ
-Information	InfoView		ข้อมูล
 GL Info	System name		ข้อมูล GL
-Capabilities	Capabilities		ความสามารถ
+Information	InfoView		ข้อมูล
 Maximum convolution	Capabilities		การบิดสูงสุด
+Extensions	Extensions		ขยาย
 Available extensions	Extensions		ส่วนขยายที่มีอยู่
 Value	Capabilities		ค่า
-Extensions	Extensions		ขยาย
+Capabilities	Capabilities		ความสามารถ
+Capability	Capabilities		ความสามารถ

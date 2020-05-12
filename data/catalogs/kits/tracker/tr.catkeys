@@ -9,7 +9,7 @@ Or	FindPanel		veya
 before	FindPanel		önce
 Volume icons	TrackerSettingsWindow		Disk simgeleri
 Ignore case	SelectionWindow		BÜYÜK/küçük harf yoksay
-Current folder	ContainerWindow		Şu anki klasör
+Current folder	ContainerWindow		Geçerli klasör
 Finish: %time - Over %finishtime left	StatusWindow		Bitiş: %time - Yaklaşık %finishtime kaldı
 Mount all disks now	AutoMounterSettings		Tüm diskleri şimdi bağla
 Location:	InfoWindow		Konum:
@@ -447,7 +447,7 @@ Sorry, could not create a new folder.	FSUtils		Üzgünüm, yeni bir klasör olu�
 Select all	VirtualDirectoryWindow		Tümünü seç
 Rename	FSUtils	button label	Yeniden adlandır
 Clean up all	ContainerWindow		Hepsini toparla
-Add current folder	FilePanelPriv		Şu anki klasörü ekle
+Add current folder	FilePanelPriv		Geçerli klasörü ekle
 Description:	InfoWindow		Açıklama:
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Seçili öge/ögeleri silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.
 Grayscale picture	AttributesView		Gri tonlu resim

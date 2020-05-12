@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-FileTypes	3583076725
+1	greek, modern (1453-)	x-vnd.Haiku-FileTypes	2837377891
 Left	Attribute Window	Attribute column alignment in Tracker	Αριστερά
 Final	Application Types Window		Τελικός
 FileTypes request	FileTypes Window		Αίτημα του FileTypes
@@ -30,9 +30,11 @@ Signature:	Application Types Window		Υπογραφή
 None	FileTypes Window		Κανένα
 Exclusive launch	Application Type Window		Αποκλειστή εκκίνηση
 Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		Διαγράφοντας ένα τύπο αρχείου, δεν θα μπορείτε να το επαναφέρετε.\nΕίστε σίγουρος ότι θέλετε να το διαγράψετε;
+Integer 64 bit	Attribute ListView		Ακέραιος αριθμός 64 bit
 Cancel	New File Type Window		Άκυρο
 Select same preferred application as	FileType Window		Επιλογή ίδιας προτεινόμενης εφαρμογής ως
 Cancel	Type List Window		Άκυρο
+Don't save	Application Type Window		Να μην αποθηκευτεί
 Center	Attribute Window	Attribute column alignment in Tracker	Κέντρο
 Done	Extension Window		Ολοκληρώθηκε
 Development	Application Types Window		Ανάπτυξη
@@ -41,10 +43,13 @@ Abort	Application Types Window		Ακύρωση
 Save	Application Type Window		Αποθήκευση
 %1 application type	Application Type Window		τύπος εφαρμογής %1
 Icon	Application Type Window		Εικονίδιο
+Duration	Attribute ListView		Διάρκεια
 Version:	Application Type Window		Έκδοση:
 Default application	FileType Window		Προεπιλεγμένη εφαρμογή
 Internal name:	New File Type Window		Εσωτερικό όνομα:
+Integer 8 bit	Attribute ListView		Ακέραιος αριθμός 8 bit
 Extension:	Extension Window		Επέκταση:
+Time	Attribute ListView		Χρόνος
 Extensions:	FileTypes Window		Επεκτάσεις:
 Select preferred application	FileType Window		Επιλογή προτεινόμενης εφαρμογής
 Description:	FileTypes Window		Περιγραφή:
@@ -64,10 +69,13 @@ Version:	Application Types Window		Έκδοση
 Application types	Application Types Window		Τύποι εφαρμογής
 Description:	Application Types Window		Περιγραφή:
 Name:	Application Types Window		Όνομα:
+Rating	Attribute ListView		Βαθμολογία
+duration	Attribute ListView		διάρκεια
 File could not be opened	Preferred App Menu		Το αρχείο δεν μπoρεί να ανοιχτεί
 Args only	Application Type Window		Μόνο παράμετροι
 Could not open \"%s\":\n%s	FileTypes		Αδυναμία ανοίγματος \"%s\":\n%s
 Right	Attribute Window	Attribute column alignment in Tracker	Δεξιά
+Save changes before closing?	Application Type Window		Να αποθηκευτούν οι αλλαγές πριν το κλείσιμο;
 Background app	Application Type Window		Εφαρμογή παρασκηνίου
 Recognition rule is not valid:\n\n	FileTypes Window		Ο κανόνας αναγνώρισης δεν έγκυρος:\n\n
 Show icons in list	FileTypes Window		Εμφάνιση εικονιδίων σε λίστα
@@ -80,16 +88,21 @@ Type name:	FileTypes Window		Όνομα τύπου:
 Visible	Attribute Window		Ορατό
 Select preferred application	FileTypes Window		Επιλογή προτεινόμενης εφαρμογής
 Path:	Application Types Window		Διαδρομή:
+rating	Attribute ListView		βαθμολογία
 Could not install file type	New File Type Window		Δεν μπορεί να γίνει εγκατάσταση του τύπου αρχείου
 Same as…	FileTypes Window		Ίδιο με...
 Golden master	Application Type Window		Χρυσή έκδοση
+Checkbox	Attribute ListView		Πλαίσιο ελέγχου
 FileTypes request	Preferred App Menu		Αίτηση Τύποι Αρχείων
 no icon	FileTypes Window		χωρίς εικονίδιο
 Single launch	Application Type Window		Απλή εκκίνηση
 %s file type	FileType Window		%s τύπος αρχείου
+Default	Attribute ListView		Προεπιλογή
 Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Διαγράφοντας ένα υπέρ τύπο, δεν θα μπορείτε να το επαναφέρετε.\n Όλοι οι τύποι αρχείων που ανήκουν σε αυτό το υπέρ τύπο θα χαθούν!\n\nΕίστε σίγουρος ότι θέλετε να το κάνετε αυτό; Για να καταργήσετε ολόκληρη την ομάδα, κρατήστε πατημένο το πλήκτρο Shift και πατήστε το \"Διαγραφή\".
+String	Attribute ListView		Γραμματοσειρά
 Add type	New File Type Window		Προσθήκη τύπου
 Remove icon	Icon View		Διαγραφή εικονίδιου
+Boolean	Attribute ListView		Δυαδική τιμή
 Cancel	Extension Window		Άκυρο
 Alignment:	Attribute Window		Ευθυγράμμιση:
 Icon	FileType Window		Εικονίδιο
@@ -98,6 +111,7 @@ Development	Application Type Window		Υπό ανάπτυξη
 Golden master	Application Types Window		Χρυσό προτεύον
 Add	Extension Window		Προσθήκη
 Open…	FileTypes Window		Άνοιγμα...
+checkbox	Attribute ListView		πλαίσιο ελέγχου
 Could not change file extensions	Extension Window		Δεν μπορείτε να αλλάξετε τις επεκτάσεις αρχείων
 Could not open file	FileType Window		Αδυναμία ανοίγματος του αρχείου
 Choose type	Type List Window		Επιλογή τύπου
@@ -115,6 +129,7 @@ Add group	New File Type Window		Προσθήκη ομάδας
 Cancel	Attribute Window		Άκυρο
 Gamma	Application Types Window		Γάμμα
 Supported types	Application Type Window		Υποστηριζόμενοι τύποι
+Integer 32 bit	Attribute ListView		Ακέραιος αριθμός 32 bit
 Beta	Application Type Window		Βήτα
 Could not retrieve preferred application of this file	Preferred App Menu		Αδυναμία ανάκτησης προτεινόμενης εφαρμογής του αρχείου
 Application flags	Application Type Window		Σημαίες εφαρμογής
@@ -128,6 +143,7 @@ Version info	Application Type Window		Πληροφορίες έκδοσης
 Final	Application Type Window		Τελικό
 Preferred application	FileType Window		Προτεινόμενη εφαρμογή
 FileTypes	FileTypes		Τύποι Αρχείων
+Set preferred application	Preferred App Menu		Ορισμός προεπιλεγμένης εφαρμογής
 New file type	New File Type Window		Νέος τύπος αρχείου
 Short description:	Application Type Window		Σύντομη περιγραφή
 Save request	Application Type Window		Αποθήκευση αίτησης
@@ -138,6 +154,7 @@ Extra attributes	FileTypes Window		Επιπλέον ιδιότητες
 Group:	New File Type Window		Ομάδα:
 Alpha	Application Types Window		Άλφα
 Close	Application Type Window		Κλείσιμο
+Integer 16 bit	Attribute ListView		Ακέραιος αριθμός 16 bit
 Extension	Extension Window		Επέκταση
 Rule:	FileTypes Window		Κανόνας:
 FileTypes	System name		Τύποι αρχείων

@@ -1,6 +1,7 @@
-1	dutch; flemish	x-vnd.Haiku-Notifications	4198982834
+1	dutch; flemish	x-vnd.Haiku-Notifications	332239666
 Lower left	GeneralView		Linksonder
 Application does not have a valid signature	NotificationView	Alert message	Toepassing heeft geen geldige handtekening
+Status	NotificationView		Status
 Add…	NotificationView		Toevoegen…
 Lower right	GeneralView		Rechtsonder
 Muted	NotificationView		Gedempt
@@ -8,10 +9,13 @@ Window width:	GeneralView		Vensterbreedte:
  is already listed	NotificationView	Alert message	 is al toegevoegd
 OK	PrefletWin		Oké
 Notifications	PrefletWin		Aankondigingen
+Notifications preflet sample	PrefletWin		Voorbeeld van een melding
 Mute notifications from this application	NotificationView		Meldingen van deze toepassing dempen
+pixels	GeneralView		pixels
 seconds	GeneralView		sconden
 Revert	PrefletWin		Herstellen
 Applications	PrefletView		Toepassingen
+Timeout:	GeneralView		Timeout:
 Upper right	GeneralView		Rechtsboven
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Er is een fout opgetreden bij het opslaan van de voorkeuren.\nMogelijk is er onvoldoende schijfruimte vrij.
 Defaults	PrefletWin		Standaardwaarden

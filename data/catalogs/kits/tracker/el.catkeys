@@ -1,5 +1,6 @@
-1	greek, modern (1453-)	x-vnd.Haiku-libtracker	2292796282
+1	greek, modern (1453-)	x-vnd.Haiku-libtracker	3157834751
 Created	ContainerWindow		Δημιουργήθηκε
+Icon	AttributesView		Εικονίδιο
 Open and make preferred	OpenWithWindow		'Ανοιγμα και ορισμός προεπιλεγμένου
 Kind	ContainerWindow		Είδος
 Open with…	ContainerWindow		Άνοιγμα με...
@@ -16,33 +17,46 @@ Kind:	InfoWindow		Είδος:
 contains	FindPanel		περιέχει
 32 x 32	ContainerWindow		32 χ 32
 Open	FilePanelPriv		Άνοιγμα
+Bitmap icon	AttributesView		Εικονίδιο Bitmap
 You can't replace a folder with one of its sub-folders.	FSUtils		Δεν μπορείτε να αντικαταστήσετε ένα φάκελο με ένα από τους υποφακέλους του.
+<%ld dates>	AttributesView		<%ld dates>
+Select…	VirtualDirectoryWindow		Επιλογή...
 Name	Default Query Columns		Όνομα
 Unmount	ContainerWindow		Αποπροσάρτηση
 Eject when unmounting	AutoMounterSettings		Εξαγωγή κατά την αποπροσάρτηση
 Searching for disks to mount…	StatusWindow		Αναζήτηση δίσκων για προσάρτηση...
+Value	AttributesView		Τιμή
+Information	InfoWindow		Πληροφορίες
 Error emptying Trash	FSUtils		Σφάλμα αδειάσματος Κάδου Απορριμάτων
 Opens with:	InfoWindow		Άνοιγμα με:
 Size	QueryPoseView		Μέγεθος
 128 x 128	ContainerWindow		128 x 128
+Disk mount	TrackerSettingsWindow		Προσάρτηση δίσκου
 Prompt	FSUtils		Προτροπή
 Error in regular expression:\n\n'%errstring'	PoseView		Σφάλμα στην κανονική έκφραση:\n\n'%errstring'
+Small bitmap icon	AttributesView		Μικρό εικονίδιο bitmap
 Would you like to find a suitable application to open the file?	FSUtils		Θα θέλατε να πραγματοποιηθεί η έυρεση μιας κατάλληλης εφαρμογής για το άνοιγμα του αρχείου;
 64 x 64	ContainerWindow		64 x 64
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Δεν μπορείται να αντικαταστήσετε ένα φάκελο ή ένα σύνδεσμο με ένα αρχείο.
+At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Στην %func \nαπέτυχε η find_directory(). \nΑιτία: %error
 Handles any file	OpenWithWindow		Χειρίζεται κάθε αρχείο
 save text	FilePanelPriv		αποθήκευση κειμένου
 Preparing to move items…	StatusWindow		Προετοιμασία για τη μεταφορά στοιχείων...
 Size	ContainerWindow		Μέγεθος
 Select…	ContainerWindow		Επιλογή...
 Show shared volumes on Desktop	SettingsView		Εμφάνιση κοινών τόμων στην επιφάνεια εργασίας
+<%ld values>	AttributesView		<%ld values>
 Size	PoseView		Μέγεθος
+96 x 96	ContainerWindow		96 x 96
+Title	Bookmark Query Columns		Τίτλος
 Identify	ContainerWindow		Αναγνώριση
 You can't move or copy items to read-only volumes.	FSUtils		Δεν μπορείτε να μετακινήσετε ή να αντιγράψετε στοιχεία σε τόμους μόνο ανάγνωσης.
 Create link	ContainerWindow		Δημιουργία σύνδεσμου
 starts with	FindPanel		ξεκινά με
 Replace	FSUtils		Αντικατάσταση
+Rectangle	AttributesView		Παραλληλόγραμμο
 Move to	ContainerWindow		Μετακίνηση στο
+Status	Email Query Columns		Κατάσταση
 New folder	FSUtils		Νέος φάκελος
 New Query	FindPanel		Νέο Ερώτημα
 system	B_SYSTEM_DIRECTORY		σύστημα
@@ -69,13 +83,17 @@ Mount	ContainerWindow		Προσάρτηση
 Desktop	B_DESKTOP_DIRECTORY		Επιφάνεια Εργασίας
 Link to:	InfoWindow		Σύνδεση με:
 Copy here	ContainerWindow		Αντιγραφή εδώ
+Character	AttributesView		Χαρακτήρας
 All disks	FindPanel		Όλοι οι δίσκοι
 Window	ContainerWindow		Παράθυρο
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 Remove	FindPanel		Αφαίρεση
+Company	Person Query Columns		Εταιρία
 Recent documents	FavoritesMenu		Πρόσφατα έγγραφα
 Save as Query template:	FindPanel		Αποθήκευση ως πρότυπο Query: 
 Edit templates…	TemplatesMenu		Επεξεργασία προτύπων...
+8-bit integer	AttributesView		Ακέραια τιμή 8-bit
+8-bit unsigned integer	AttributesView		Ακέραια τιμή χωρίς πρόσημο 8-bit
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used  χρησιμοποιημένα -- %free fελεύθερα)
 Trash	Model		Κάδος ανακύκλωσης
 copy	FSUtils	filename copy	αντιγραφή
@@ -97,7 +115,9 @@ All files and folders	FindPanel		Όλα τα αρχεία και τους φακ
 Add-ons	ContainerWindow		Πρόσθετα
 Increase size	ContainerWindow		Αύξηση μεγέθους
 \nShould this be fixed?	FSUtils		\nΠρέπει αυτό να διορθωθεί;
+URL	Bookmark Query Columns		URL
 Move	PoseView		Μετακίνηση
+Floating point number	AttributesView		Αριθμός με κινητή υποδιαστολή
 Cancel	ContainerWindow		Άκυρο
 Attributes	ContainerWindow		Ιδιότητες
 Error deleting items	FSUtils		Σφάλμα κατα τη διαγραφή στοιχείων
@@ -114,17 +134,22 @@ Previously mounted disks	AutoMounterSettings		Προηγουμένως προσ�
 You cannot replace a file with a folder or a symbolic link.	FSUtils		Δε μπορείτε να αντικαταστήσετε ένα αρχείο με ένα φάκελο ή ένα συμβολικό δεσμό.
 The target disk does not support creating links.	FSUtils		Το δίσκος προορισμού δεν υποστηρίζει τη δημιουργία συνδέσμων.
 develop	B_SYSTEM_DEVELOP_DIRECTORY		ανάπτυξη
+64-bit integer	AttributesView		Ακέραια τιμή 64-bit
 Cut more	ContainerWindow		Αποκοπή περισσότερων
 The Tracker must be running to see Info windows.	PoseView		Ο ανιχνευτής πρέπει να εκτελείται για την εμφάνιση των παραθύρων πληροφοριών.
 Tracker preferences	TrackerSettingsWindow		Προτιμήσεις ανιχνευτή
 Read	FilePermissionsView		Ανάγνωση
 There was an error writing the attribute.	WidgetAttributeText		Υπήρξε ένα σφάλμα κατά την εγγραφή της ιδιότητας
+If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Αν μετονομάσετε το %target, το %osName ενδέχεται να μην λειτουργήσει σωστά!\n\nΕίστε σίγουρος;
 Could not open \"%name\" (%error). 	FSUtils		Αδυναμία ανοίγματος του \"%name\" (%error). 
 %name info	InfoWindow	InfoWindow Title	%name πληροφορίες
 Sorry, you can't create links in the Trash.	PoseView		Συγνώμη, δεν μπορείτε να δημιουργήσετε συνδέσμους στο Κάδο.
+From	Email Query Columns		Από
 Invert selection	QueryContainerWindow		Αντιστροφή επιλεγμένου
 Open selection with:	OpenWithWindow		Άνοιγμα επιλεγμένου με:
+Preferences…	ContainerWindow		Προτιμήσεις...
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Αδυναμία ανοίγματος του \"%document\" επειδή η εφαρμογή \"%app\" είναι στον κάδο απορριμάτων.
+Work Phone	Person Query Columns		Τηλέφωνο εργασίας
 Close	ContainerWindow		Κλείσιμο
 Get info	ContainerWindow		Λήψη πληροφοριών
 Show folder location in title tab	SettingsView		Εμφάνιση 
@@ -136,11 +161,14 @@ Clean up	DeskWindow		Καθαρισμός
 Group	FilePermissionsView		Ομάδα
 Could not find an application to open \"%name\" (%error). 	FSUtils		Αδυναμία εύρεσης εφαρμογής για το άνοιγμα του \"%name\" (%error). 
 Mini icon view	DeskWindow		Προβολή μικρού εικονιδίου
+Geometric size	AttributesView		Γεωμετρικό μέγεθος
 contains	SelectionWindow		περιέχει
 Replace	FilePanelPriv		Αντικατάσταση
 is not	FindPanel		δεν είναι
 Icon view	DeskWindow		Προβολή εικονιδίου
+<%ld rectangles>	AttributesView		<%ld rectangles>
 Mount settings…	ContainerWindow		Ρυθμίσεις προσάρτησης...
+Keywords	Bookmark Query Columns		Λέξεις κλειδιά
 Copy more	ContainerWindow		Αντιγραφή κι άλλων
 by name	FindPanel		κατα όνομα
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Λυπούμαστε, αλλά δεν μπορείτε να αποθηκεύσετε αντικείμενα στη ρίζα του συστήματός σας.
@@ -152,6 +180,7 @@ Used space color	SettingsView		Χρώμα χρησιμοποιημένου χώ�
 Cancel	FSUtils		Άκυρο
 Original name	ContainerWindow		Πρωτότυπο όνομα
 Unknown	WidgetAttributeText		Άγνωστο
+32-bit integer	AttributesView		Ακέραιος αριθμός 32-bit
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		Το προσδιορισμένο όνομα ήδη χρησιμοποιείται ως όνομα φακέλου. Παρακαλώ διαλέξτε άλλο όνομα.
 48 x 48	ContainerWindow		48 χ 48
 Modified	ContainerWindow		Τροποποιήθηκε
@@ -170,6 +199,7 @@ Resize to fit	ContainerWindow		Αλλαγή μεγέθους για να χωρ�
 Link \"%name\" to:	InfoWindow	File dialog title for new sym link	Σύνδεση \"%name\"  με:
 Mount server error	AutoMounterSettings		Σφάλμα διακομιστή προσάρτησης
 Invert selection	FilePanelPriv		Αντιστροφή επιλογής
+Memory size	AttributesView		Μέγεθος μνήμης
 TiB	WidgetAttributeText		TiB
 New folder	TemplatesMenu		Νέος φάκελος
 Replace all	FSUtils		Αντικατάσταση όλων
@@ -203,6 +233,7 @@ Error %error loading Add-On %name.	ContainerWindow		Σφάλμα %error στη �
 You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		Προσπαθείτε να αντικαταστήσετε το στοιχείο:\n\t%name%dest\nwith:\n\t%name%src\n\nΘα θέλατε να το αντικαταστήσετε με αυτό που %movemode;
 Empty Trash	ContainerWindow		Άδειασμα Κάδου
 no supporting apps	OpenWithWindow		καμία υποστηριζόμενη εφαρμογή
+32-bit unsigned integer	AttributesView		Ακέραιος αριθμός χωρίς πρόσημο 32-bit
 Preparing to empty Trash…	StatusWindow		Προετοιμασία καθαρισμού του Κάδου...
 Deleting: 	StatusWindow		Διαγραφή:
 You can't move or copy the trash.	FSUtils		Δεν μπορείτε να μετακινήσετε ή να αντιγράψετε στο καλάθι αχρήστων.
@@ -211,14 +242,17 @@ Error creating link to \"%name\".	FSUtils		Σφάλμα κατά τη δημιο
 Unknown	FilePermissionsView		Άγνωστο
 Paste links	ContainerWindow		Επικόλληση συνδέσμων
 Restoring: 	StatusWindow		Αποκατάσταση:
+The Tracker must be running to set the default printer.	PoseView		Το Tracker πρέπει να εκτελείται για να οριστεί ο προεπιλεγμένος εκτυπωτής.
 calculating…	InfoWindow		υπολογισμός...
 Preferred for file	OpenWithWindow		Προτινόμενο για το αρχείο
 OK	AutoMounterSettings		Εντάξει
 copying	FSUtils		αντιγραφή
 Get info	FilePanelPriv		Λήψη πληροφοριών
+MIME String	AttributesView		Γραμματοσειρά MIME
 Delete	ContainerWindow		Διαγραφή
 Execute	FilePermissionsView		Εκτέλεση
 Show volumes on Desktop	SettingsView		Προβολή τομέων στην επιφάνεια
+no	AttributesView		όχι
 Recent folders	ContainerWindow		Πρόσφατοι φάκελοι
 Desktop	Model		Επιφάνεια εργασίας
 Select all	ContainerWindow		Επιλογή όλων
@@ -228,6 +262,8 @@ MiB	WidgetAttributeText		MB
 Delete	FSUtils		Διαγραφή
 Edit name	ContainerWindow		Επεξεργασία ονόματος
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Αδυναμία ανοίγματος του \"%document\" (Λείπει το σύμβολο: %symbol). \n
+ASCII Text	AttributesView		Κείμενο ASCII
+More options	FindPanel		Περισσότερες ρυθμίσεις
 config	B_USER_CONFIG_DIRECTORY		ρύθμιση
 Error moving \"%name\".	FSUtils		Σφάλμα κατα τη μετακίνηση του \"%name\".
 Select…	QueryContainerWindow		Επιλογή...
@@ -239,6 +275,7 @@ New	DeskWindow		Νέο
 Invert	SelectionWindow		Αντιστροφή
 Would you like to find some other suitable application?	FSUtils		Θα θέλετα να επιλέξετε μια ποιο κατάλληλη εφαρμογή;
 Recent folders	FavoritesMenu		Πρόσφατοι φάκελοι
+Signed memory size	AttributesView		Μέγεθος μνήμης με πρόσημο
 The specified name is illegal. Please choose another name.	FilePanelPriv		Το προσδιορισμένο όνομα είναι μη αποδεκτό. Παρακαλώ διαλέξτε άλλο όνομα.
 of %items	StatusWindow		από %items
 less than	FindPanel		λιγότερο από
@@ -250,6 +287,7 @@ Error moving \"%name\"	FSUtils		Σφάλμα κατά τη μετακίνηση 
 To: %dir	StatusWindow		Στο: %dir
 Paste layout	ContainerWindow		Επικόλληση διάταξης
 Cancel	Tracker		Άκυρο
+yes	AttributesView		ναι
 Make active printer	ContainerWindow		Δημιουργία ενεργού εκτυπωτή
 Copy to	ContainerWindow		Αντιγραφή στο
 Name	SelectionWindow		Όνομα

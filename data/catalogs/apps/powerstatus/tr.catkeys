@@ -19,7 +19,7 @@ Last full charge: 	PowerStatus		Son tam dolum:
 Battery unused	PowerStatus		Pil kullanılmamış
 Extended battery info	PowerStatus		Ek pil bilgisi
  mA	PowerStatus		 mA
-Current rate: 	PowerStatus		Şu anki yüzde: 
+Current rate: 	PowerStatus		Geçerli yüzde: 
 discharging	PowerStatus		boşalıyor
 Show text label	PowerStatus		Metin etiketlerini göster
 About…	PowerStatus		Hakkında…

@@ -1,9 +1,12 @@
-1	greek, modern (1453-)	x-vnd.Be-TSKB	2839057790
+1	greek, modern (1453-)	x-vnd.Be-TSKB	368469040
 Power off	DeskbarMenu		Απενεργοποίηση
+Sort applications by name	PreferencesWindow		Ταξινόμηση εφαρμογών κατά όνομα
+Suspend	DeskbarMenu		Αναστολή
 Hide clock	TimeView		Απόκρυψη ρολογιού
 Applications	PreferencesWindow		Εφαρμογές
 Time preferences…	TimeView		Προτιμήσεις ώρας...
 About Haiku	DeskbarMenu		Σχετικά με το Haiku
+Edit in Tracker…	PreferencesWindow		Επεξεργασία στο Tracker...
 Recent documents:	PreferencesWindow		Πρόσφατα έγγραφα:
 Recent applications	DeskbarMenu		Πρόσφατες εφαρμογές
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Εφαρμογές
@@ -27,6 +30,7 @@ Show application expander	PreferencesWindow		Εμφάνιση της εφαρμ�
 Close all	WindowMenu		Κλείσιμο όλων
 Deskbar preferences	PreferencesWindow		Προτιμήσεις Deskbar
 Mount	DeskbarMenu		Προσάρτηση
+Small	PreferencesWindow		Μικρό
 Recent applications:	PreferencesWindow		Πρόσφατες εφαρμογές:
 Shutdown…	DeskbarMenu		Κλείσιμο…
 Tracker always first	PreferencesWindow		Ο Tracker πάντα πρώτος

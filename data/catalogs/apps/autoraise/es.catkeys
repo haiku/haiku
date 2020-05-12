@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.mmu.AutoRaise	3954724670
+1	spanish; castilian	x-vnd.mmu.AutoRaise	3527604525
 AutoRaise, (c) 2002, mmu_man\nEnjoy :-)	AutoRaiseIcon		AutoRaise, (c) 2002, mmu_man\nDisfrutad :)
 2 s	AutoRaiseIcon		2 segundos
 OK	AutoRaiseIcon		Aceptar
@@ -10,6 +10,7 @@ Delay	AutoRaiseIcon		Retraso
 Active	AutoRaiseIcon		Activo
 0.1 s	AutoRaiseIcon		0.1 s
 Default (all windows)	AutoRaiseIcon		Por defecto (Todas las ventanas)
+Instant warping (ffm)	AutoRaiseIcon		Deformación instantánea (ffm)
 About AutoRaise…	AutoRaiseIcon		Acerca de AutoRaise…
 Normal	AutoRaiseIcon		Normal
 0.5 s	AutoRaiseIcon		0.5 s
@@ -19,5 +20,6 @@ Focus follows mouse	AutoRaiseIcon		El foco sigue al ratón
 Deskbar only (over its area)	AutoRaiseIcon		Solamente barra de escritorio (sobre su área)
 Inactive behaviour	AutoRaiseIcon		Comportamiento inactivo
 Mode	AutoRaiseIcon		Modo
+Warping (ffm)	AutoRaiseIcon		Deformación (ffm)
 Remove from tray	AutoRaiseIcon		Eliminar de la barra
 3 s	AutoRaiseIcon		3 s

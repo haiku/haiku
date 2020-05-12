@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Pulse	139895817
+1	turkish	x-vnd.Haiku-Pulse	3610817163
 Normal mode	DeskbarPulseView		Normal kip
 Info	CPUButton		Bilgi
 Quit	DeskbarPulseView		Çık
@@ -45,4 +45,3 @@ Active color	ConfigView		Etkin renk
 Installing in Deskbar failed\n%s	PulseApp		Masaüstü Çubuğu'na yükleme başarısız oldu\n%s
 Idle color	ConfigView		Boştaki renk
 Normal mode	PrefsWindow		Normal kip
-Pulse settings	PulseWindow		Nabız ayarları

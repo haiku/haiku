@@ -1,7 +1,7 @@
 1	greek, modern (1453-)	x-vnd.Haiku-Login	2683778354
 Invalid login!	Login View		Μη έγκυρη είσοδος!
 Error	Login App		Σφάλμα
---edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tΆνοιγμα της λειτουργίας μορφοποίησης για την παραμετροποίηση της επιφάνειας εργασίας
+--edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tΆνοιγμα της λειτουργίας μορφοποίησης για την παραμετροποίηση της επιφάνειας εργασίας.\n
 Welcome to Haiku	Login Window		Καλώς ορίσατε στο Haiku
 Halt	Login View		Παύση
 Login application for Haiku\nUsage:\n	Login App		Εφαρμογή εισόδου για το Haiku\nΧρήση:\n
@@ -16,4 +16,4 @@ Password:	Login View		Κωδικός:
 Unimplemented	Login App		Μη υλοποιημένο
 OK	Login App		ΟΚ
 Error: %1	Login App		Σφάλμα: %1
-error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	Σφάλμα %s\n Σημείωση:  return message από το fDesktopShelf->Save(). Μπορεί να είναι \"B_OK\"
+error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	Σφάλμα %s\n

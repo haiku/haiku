@@ -1,9 +1,9 @@
 1	french	x-vnd.Haiku-GLInfo	3678488342
-Capability	Capabilities		Aptitude
-Information	InfoView		Information
 GL Info	System name		GL Info
-Capabilities	Capabilities		Aptitudes
+Information	InfoView		Information
 Maximum convolution	Capabilities		Nombre maximum de convolution
+Extensions	Extensions		Extensions
 Available extensions	Extensions		Extensions disponibles
 Value	Capabilities		Valeur
-Extensions	Extensions		Extensions
+Capabilities	Capabilities		Aptitudes
+Capability	Capabilities		Aptitude

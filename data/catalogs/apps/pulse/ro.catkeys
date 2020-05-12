@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Pulse	139895817
+1	romanian	x-vnd.Haiku-Pulse	3610817163
 Normal mode	DeskbarPulseView		Mod normal
 Info	CPUButton		Info
 Quit	DeskbarPulseView		Închidere
@@ -45,4 +45,3 @@ Active color	ConfigView		Culoare activă
 Installing in Deskbar failed\n%s	PulseApp		Instalarea pe Deskbar a eșuat\n%s
 Idle color	ConfigView		Culoare în așteptare
 Normal mode	PrefsWindow		Mod normal
-Pulse settings	PulseWindow		Configurări Pulse

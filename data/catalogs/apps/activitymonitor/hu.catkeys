@@ -21,13 +21,13 @@ Ports	DataSource		Portok
 Page faults	DataSource		Laphibák
 Sending	DataSource		Küldés
 Cache	DataSource		Gyorsítótár
-%.1f faults/s	DataSource		%.1f hiba/s
+%.1f faults/s	DataSource		%.1f hiba/mp
 Update time interval:	SettingsWindow		Frissítési gyakoriság:
 TX	DataSource	Shorter version for Sending	Adás
 Quit	ActivityWindow		Kilépés
 Block cache memory	DataSource		Blokk gyorsítótár
 Remove graph	ActivityView		Grafikon eltávolítása
-%lld sec.	SettingsWindow		%lld s.
+%lld sec.	SettingsWindow		%lld mp.
 %lld ms	SettingsWindow		%lld ms
 CPU usage	DataSource		Processzor használat
 Raw clipboard	DataSource		Nyers vágólap

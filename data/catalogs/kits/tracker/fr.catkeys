@@ -322,7 +322,7 @@ Would you like to find some other suitable application?	FSUtils		Souhaitez-vous 
 *+? operand may be empty.	libtracker		Les opérandes *+? pourraient être vides.
 (unknown)	AttributesView		(inconnu)
 Recent folders	FavoritesMenu		Dossiers récents
-Signed memory size	AttributesView		Taille mémoire signée
+Signed memory size	AttributesView		Taille de mémoire signée
 The specified name is illegal. Please choose another name.	FilePanelPriv		Le nom indiqué n’est pas valide. Veuillez choisir un autre nom.
 of %items	StatusWindow		de %items
 less than	FindPanel		inférieur à

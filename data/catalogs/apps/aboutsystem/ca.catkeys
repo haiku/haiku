@@ -14,7 +14,7 @@ Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Co
 Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Copyright © 1990-2002 Info-ZIP. Tots els drets reservats.
 Past website & marketing:\n	AboutView		Lloc web anterior i màrqueting:\n
 Copyright © 2003 Peter Hanappe and others.	AboutView		Copyright © 2003 Peter Hanappe i altres.
-{0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{Processador:} other{# Processadors:}}
+{0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{processador:} other{# processadors:}}
 %d MiB total	AboutView		%d MiB totals
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	El codi que és únic al Haiku, especialment el nucli i tot el codi amb què les aplicacions es poden enllaçar, es distribueix segons els termes de la llicència <MIT>. Algunes biblioteques del sistema contenen codi de tercers distribuït d'acord amb la llicència <LGPL>. A continuació podeu trobar els drets reservats del codi de tercers.\n\n
 Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Copyright © 1996-1997 Jeff Prosise. Tots els drets reservats.
@@ -26,9 +26,9 @@ Unknown	AboutView		Desconegut
 Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. i el seu equip de desenvolupament, per haver creat BeOS!\n\n
 Copyright © 2002-2014 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.	AboutView		Copyright © 2002-2014, Industrial Light & Magic, una divisió de Lucas Digital Ltd. LLC.
 Licenses: 	AboutView		Llicències: 
-The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		El copyright del codi de Haiku és propietat de Haiku, Inc o dels seus respectius autors si està escrit expresament al codi font. Haiku® i el logo de HAIKU® són marques registrades de Haiku, Inc.\n\n
+The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		El dret de reproducció del codi del Haiku és propietat de Haiku, Inc o dels autors respectius quan s'indiquen expressament al codi font. Haiku® i el logotip de HAIKU® són marques registrades de Haiku, Inc.\n\n
 Copyright © 2009 Colin Percival	AboutView		Copyright © 2009, Colin Percival
-Time running:	AboutView		Temps en execució:
+Time running:	AboutView		Temps d'execució:
 %ld MHz	AboutView		%ld MHz
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Copyright © 1996-2005 Julian R Seward. Tots els drets reservats.
 GNU LGPL v2	AboutWindow		GNU LGPL v2
@@ -39,11 +39,11 @@ About this system	AboutWindow		Quant a aquest sistema
 %d MiB used (%d%%)	AboutView		%d MiB usats (%d%%)
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 dels autors del Gutenprint. Tots els drets reservats.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Copyright © 1994-1997 Mark Kilgard. Tots els drets reservats.
-AboutSystem	System name		AboutSystem
+AboutSystem	System name		Quant al sistema
 Copyright © 1995-2001 Lars Düning. All rights reserved.	AboutView		Copyright © 1995-2001 Lars Düning. Tots els drets reservats.
 Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		Copyright © 1998-2000 Thai Open Source Software Center Ltd i Clark Cooper.
 Source Code: 	AboutView		Codi font: 
-\nCopyrights\n\n	AboutView		\nDrets d'autor\n\n
+\nCopyrights\n\n	AboutView		\nDrets de reproducció\n\n
 GNU GPL v3	AboutWindow		GNU GPL v3
 The HaikuPorts team\n	AboutView		L'equip de HaikuPorts\n
 Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		Conté programari del Projecte GNU, publicat segons les llicències GPL i LGPL:\nBiblioteca C GNU, coretools GNU, difutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © La Free Software Foundation.

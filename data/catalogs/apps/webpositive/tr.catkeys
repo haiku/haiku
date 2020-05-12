@@ -23,7 +23,7 @@ Full screen	WebPositive Window		Tam ekran
 Downloads in progress	WebPositive		Süren indirmeler
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	%addedCount yer imini aynı anda açmak istediğinizden emin misiniz?
 Copy URL to clipboard	Download Window		URL'yi panoya kopyala
-Clone current page	Settings Window		Şu anki sayfadan bir tane daha aç
+Clone current page	Settings Window		Geçerli sayfadan bir tane daha aç
 Start page:	Settings Window		Başlangıç sayfası:
 Cancel	Download Window		İptal
 Settings	Settings Window		Ayarlar
@@ -124,7 +124,7 @@ Show home button	Settings Window		Anasayfa düğmesini göster
 Start new session	Settings Window		Yeni oturum başlat
 The cookie jar is empty!	Cookie Manager		Çerez kavanozu boş!
 Value	Cookie Manager		Değer
-Remove missing	Download Window		Yarım kalanları kaldır
+Remove missing	Download Window		Bulunamayanları kaldır
 Paste	WebPositive Window		Yapıştır
 Double-click or middle-click to open new tab.	Tab Manager		Yeni bir sekme açmak için çift tıklayın veya orta fare düğmesine basın.
 Next	WebPositive Window		Sonraki

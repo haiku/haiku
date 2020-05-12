@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Pulse	3788463253
+1	greek, modern (1453-)	x-vnd.Haiku-Pulse	3610817163
 Normal mode	DeskbarPulseView		Κανονική λειτουργία
 Info	CPUButton		Πληροφορίες
 Quit	DeskbarPulseView		Έξοδος
@@ -37,6 +37,7 @@ Deskbar menu	CPUButton		Μενού μπάρας εργασιών
 Mini mode	NormalPulseView		Μίνι λειτουργία
 Quit	MiniPulseView		Έξοδος
 Info	PulseView		Πληροφορίες
+Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]	PulseApp		Χρήση: Pulse [--mini] [-w πλάτος] [--width=πλάτος]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]
 OK	DeskbarPulseView		Εντάξει
 Info	PulseApp		Πληροφορίες
 Pulse	System name		Παλμός
@@ -44,4 +45,3 @@ Active color	ConfigView		Ενεργό χρώμα
 Installing in Deskbar failed\n%s	PulseApp		Η εγκατάσταση στη Deskbar απέτυχε\n%s
 Idle color	ConfigView		Χρώμα αδράνειας
 Normal mode	PrefsWindow		Κανονική λειτουργία
-Pulse settings	PulseWindow		Παλμός ρυθμίσεις

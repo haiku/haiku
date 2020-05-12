@@ -1,9 +1,9 @@
 1	dutch; flemish	x-vnd.Haiku-GLInfo	3678488342
-Capability	Capabilities		Mogelijkheid
-Information	InfoView		Informatie
 GL Info	System name		GL Info
-Capabilities	Capabilities		Mogelijkheden
+Information	InfoView		Informatie
 Maximum convolution	Capabilities		Maximale kronkeling
+Extensions	Extensions		Extensies
 Available extensions	Extensions		Beschikbare extensies
 Value	Capabilities		Waarde
-Extensions	Extensions		Extensies
+Capabilities	Capabilities		Mogelijkheden
+Capability	Capabilities		Mogelijkheid

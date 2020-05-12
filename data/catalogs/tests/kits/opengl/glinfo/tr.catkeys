@@ -1,9 +1,9 @@
 1	turkish	x-vnd.Haiku-GLInfo	3678488342
-Capability	Capabilities		Kabiliyet
-Information	InfoView		Bilgi
 GL Info	System name		GL Bilgisi
-Capabilities	Capabilities		Yetenekler
+Information	InfoView		Bilgi
 Maximum convolution	Capabilities		Maksimum kıvrılma
+Extensions	Extensions		Uzantılar
 Available extensions	Extensions		Kullanılabilir uzantılar
 Value	Capabilities		Değer
-Extensions	Extensions		Uzantılar
+Capabilities	Capabilities		Yetenekler
+Capability	Capabilities		Kabiliyet

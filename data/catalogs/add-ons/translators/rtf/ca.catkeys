@@ -5,7 +5,7 @@ RTF-Translator Settings	ConfigView		Paràmetres del Traductor RTF
 Rich Text Format (RTF) translator	ConfigView		Format Rich Text (RTF) translator
 RTF Settings	main		Paràmetres d'RTF
 RichTextFormat file	RTFTranslator		Fitxer RichTextFormat
-Be style text file	RTFTranslator		Fitxer de text d'estil millor
+Be style text file	RTFTranslator		Fitxer de text d'estil del Be
 Plain text file	RTFTranslator		Fitxer de text net
 Rich Text Format translator	RTFTranslator		Traductor del RTF
 Rich Text Format translator v%d.%d.%d %s	RTFTranslator		Traductor del Rich Text Format v%d.%d.%d %s

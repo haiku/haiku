@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Be-MAIL	4014103040
+1	portuguese	x-vnd.Be-MAIL	1424596433
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		O seu texto contém %ld caracteres não codificáveis. Talvez funcionasse melhor um conjunto de caracteres diferente? Clique em Enviar para enviar de qualquer modo (será utilizado um caracter de substituição no lugar dos caracteres não codificáveis) ou escolha Cancelar para voltar atrás e tentar corrigir.
 Show icons & labels	Mail		Mostrar ícones e legendas
 (Date unavailable)	Mail		(Data não disponível)
@@ -72,6 +72,8 @@ Automatically mark mail as read:	Mail		Marcar e-mail como lido automaticamente:
 Close and 	Mail		Fechar e 
 Colored quotes:	Mail		Citações coloridas:
 Open this link	Mail		Abrir esta hiperligação
+Auto signature:	Mail		Assinatura automática:
+Same subject	Mail		Mesmo assunto
 Send	Mail		Enviar
 Open draft	Mail		Abrir rascunho
 Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Deixar como 'New'
@@ -81,6 +83,7 @@ Find again	Mail		Procurar seguinte
 Size:	Mail		Tamanho:
 To:	Mail		Para:
 The mail_daemon could not be started:\n\t	Mail		Não foi possível iniciar o mail_daemon:\n\t
+<no account found>	Mail		<nenhuma conta encontrada>
 Mail preferences	Mail		Preferências de correio
 helpful message	Mail		mensagem útil
 Font:	Mail		Tipo de letra:
@@ -101,6 +104,7 @@ Find…	Mail		Procurar…
 Select all	Mail		Selecionar tudo
 Show header	Mail		Mostrar cabeçalho
 Reply account:	Mail		Conta de resposta:
+Sorry	Mail		Desculpe
 Forward	Mail		Reencaminhar
 Open attachment	Mail		Abrir anexo
 mail	B_USER_DIRECTORY/mail		correio
@@ -111,6 +115,7 @@ Resend	Mail		Reenviar
 Hide	Mail		Ocultar
 From:	Mail		De:
 No file attributes, just plain data	Mail		Não há atributos de ficheiro, apenas dados simples
+Add	Mail		Adicionar
 out	B_USER_DIRECTORY/mail/out		saída
 Send this message before closing?	Mail		Enviar esta mensagem antes de fechar?
 Open	Mail		Abrir
@@ -127,6 +132,7 @@ User interface	Mail		Interface de utilizador
 Inconsistency occurred in the undo/redo buffer.	Mail		Ocorreu um erro de inconsistência na memória intermédia do Anular/Refazer.
 Remove attachment	Mail		Remover anexo
 Edit	Mail		Editar
+Page setup…	Mail		Configuração de página…
 An error occurred trying to save this signature.	Mail		Ocorreu um erro ao tentar guardar esta assinatura.
 Beginner	Mail		Principiante
 Send message	Mail		Enviar mensagem

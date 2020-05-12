@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.haiku-icon_o_matic	2885914752
+1	greek, modern (1453-)	x-vnd.haiku-icon_o_matic	499001514
 None	Icon-O-Matic-Properties		Κανένα
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Περιστροφή μονοπατιού
 Add empty	Icon-O-Matic-ShapesList		Προσθήκη άδειου
@@ -16,6 +16,7 @@ Rotate	Icon-O-Matic-TransformationBoxStates		Περιστροφή
 Remove Control Points	Icon-O-Matic-RemovePointsCmd		Αφαίρεση Σημείων Ελέγχου
 Shorten	Icon-O-Matic-PropertyNames		Σμίκρινση
 Unassign Path	Icon-O-Matic-UnassignPathCmd		Αφαίρεση μονοπατιού
+The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		Το κείμενο που προσπαθείτε να εισάγετε είναι αρκετά μεγάλο, είστε σίγουρος;
 Paste	Icon-O-Matic-Properties		Επικόλληση
 Detect Orient.	Icon-O-Matic-PropertyNames		Εντοπισμός Orient. 
 Click on a shape above	Empty transformers list - 1st line		Κλικ σε ένα σχήμα από πάνω
@@ -67,6 +68,7 @@ Move Transformers	Icon-O-Matic-MoveTransformersCmd		Μετακίνηση Μετ�
 Add	Icon-O-Matic-TransformersList		Προσθήκη
 Paste Properties	Icon-O-Matic-Properties		Επικόλληση Ιδιοτήτων
 Undo	Icon-O-Matic-Main		Αναίρεση
+Settings	Icon-O-Matic-Menus		Ρυθμίσεις
 Scale X	Icon-O-Matic-PropertyNames		Κλίμακα Χ
 Add	Icon-O-Matic-PathsList		Προσθήκη
 Add Styles	Icon-O-Matic-AddStylesCmd		Προσθήκη Στυλ
@@ -74,6 +76,7 @@ Remove	Icon-O-Matic-PathManipulator		Αφαίρεση
 Duplicate	Icon-O-Matic-ShapesList		Διπλότυπο
 Contour	Transformation		Περίγραμμα
 Perspective	Icon-O-Matic-TransformersList		Προοπτική
+Save icon	Dialog title		Αποθήκευση εικονιδίου
 Move Paths	Icon-O-Matic-MovePathsCmd		Μετακίνηση Μονοπατιών
 Rounding	Icon-O-Matic-PropertyNames		Στρογγυλοποίηση
 Joins	Icon-O-Matic-PropertyNames		Ενώσεις
@@ -90,6 +93,7 @@ Diamond	Icon-O-Matic-StyleTypes		Διαμάντι
 Add Style	Icon-O-Matic-AddStylesCmd		Προσθήκη Στυλ
 Nudge Control Points	Icon-O-Matic-NudgePointsCommand		Ειδοποίηση σημείων ελέγχου
 Move Styles	Icon-O-Matic-MoveStylesCmd		Μετακίνηση Στυλ
+Don't save	Icon-O-Matic-Menu-Settings		Να μην γίνει αποθήκευση
 Add shape with path	Icon-O-Matic-Menu-Shape		Προσθήκη σχήματος με μονοπάτι
 Translation X	Icon-O-Matic-PropertyNames		Μετάφραση Χ
 Flip Control Points	Icon-O-Matic-FlipPointsCmd		Αλλαγή σημείων ελένχου
@@ -143,6 +147,7 @@ OK	Icon-O-Matic-SVGImport		Εντάξει
 Append…	Icon-O-Matic-Menu-File		Προσάρτηση...
 Scale Y	Icon-O-Matic-PropertyNames		Κλίμακα Υ
 Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Αδύνατο το άνοιγμα του αρχείου '%s' ως SVG.\n\nΣφάλμα: %s
+Export icon	Dialog title		Εξαγωγή εικονιδίου
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Χρώμα (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Επεξεργασία Gradient
 Set 	Set (property name)		Όρισε

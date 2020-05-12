@@ -38,7 +38,7 @@ Append KeySet…	ShortcutsWindow		Afegeix un joc de claus...
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Múltiple \"*Mou el ratolí a 100 % 0\" \"*Botó 1 del ratolí\"
 Right	ShortcutsSpec		Dreta
 OK	ShortcutsWindow		D'acord
-Add new shortcut	ShortcutsWindow		Afegeix una drecera nova
+Add new shortcut	ShortcutsWindow		Afegeix-hi una drecera nova
 (None)	ShortcutsSpec		(Cap)
 Shift	ShortcutsSpec	Name for modifier on keyboard	Majúscules
 Open KeySet…	ShortcutsWindow		Obre un joc de claus...

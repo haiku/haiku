@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Pulse	139895817
+1	french	x-vnd.Haiku-Pulse	3610817163
 Normal mode	DeskbarPulseView		Mode normal
 Info	CPUButton		Informations
 Quit	DeskbarPulseView		Quitter
@@ -45,4 +45,3 @@ Active color	ConfigView		Couleur active
 Installing in Deskbar failed\n%s	PulseApp		Échec de l’installation dans la Deskbar\n%s
 Idle color	ConfigView		Couleur inactive
 Normal mode	PrefsWindow		Mode normal
-Pulse settings	PulseWindow		Réglages de Pulsation

@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Appearance	143245608
+1	greek, modern (1453-)	x-vnd.Haiku-Appearance	618096289
 Control border	Colors tab		Έλεγχος περιγράμματος
 Off	AntialiasingSettingsView		Κλειστό
 Window border	Colors tab		Περιθώριο Παραθύρου
@@ -22,6 +22,7 @@ Control text	Colors tab		Κείμενο ελέγχου
 Selected menu item background	Colors tab		Φόντο επιλεγμένου μενού
 Antialiasing	APRWindow		Εξομάλυνση
 Menu font:	Font view		Γραμματοσειρά μενού:
+Bold font:	Font view		Έντονη γραμματοσειρά:
 %decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nΣυγγραφείς:\n\t%decorAuthors\n\nURL: %decorURL\nΆδεια χρήσης: %decorLic\n\n%decorDesc\n
 Choose Decorator	DecorSettingsView		Επιλέξετε Διακοσμητή
 Strong	AntialiasingSettingsView		Ισχυρό
@@ -29,16 +30,21 @@ Failure	Colors tab		Αποτυχία
 Selected menu item text	Colors tab		Επιλεγμένο κείμενο μενού
 Size:	Font Selection view		Μέγεθος:
 Panel background	Colors tab		Φόντο πλαισίου
+Plain font:	Font view		Απλή γραμματοσειρά:
 Window tab text	Colors tab		Κείμενο καρτέλας παράθυρου
 Navigation pulse	Colors tab		Παλμός πλοήγησης
 LCD subpixel	AntialiasingSettingsView		Υπο-εικονοστοιχείο LCD
 Window tab	Colors tab		Καρτέλα παράθυρου
+Link text	Colors tab		Κείμενο υπερσυνδέσμου
 Tooltip background	Colors tab		Φόντο αναδυόμενης συμβουλής
+ControlLook:	DecorSettingsView		ControlLook:
+Default	DecorSettingsView		Προεπιλογή
 Selected menu item border	Colors tab		Περίγραμμα επιλεγμένου μενού
 Tooltip text	Colors tab		Κείμενο αναδυόμενης συμβουλής
 Control background	Colors tab		Έλεγχος φόντου
 Inactive window tab text	Colors tab		Κείμενο της αδρανής καρτέλας παράθυρου
 Navigation base	Colors tab		Βάση πλοήγησης
+Fonts	APRWindow		Γραμματοσειρές
 Grayscale	AntialiasingSettingsView		Κλίμακα του γκρι
 Antialiasing type:	AntialiasingSettingsView		Τύπος εξομάλυνσης:
 Panel text	Colors tab		Κείμενο πρόσοψης

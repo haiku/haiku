@@ -1,9 +1,9 @@
 1	slovak	x-vnd.Haiku-GLInfo	3678488342
-Capability	Capabilities		Schopnosť
-Information	InfoView		Informácie
 GL Info	System name		Info GL
-Capabilities	Capabilities		Schopnosti
+Information	InfoView		Informácie
 Maximum convolution	Capabilities		Maximálna konvolúcia
+Extensions	Extensions		Rozšírenia
 Available extensions	Extensions		Dostupné rozšírenia
 Value	Capabilities		Hodnota
-Extensions	Extensions		Rozšírenia
+Capabilities	Capabilities		Schopnosti
+Capability	Capabilities		Schopnosť

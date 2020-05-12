@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-Pulse	139895817
+1	danish	x-vnd.Haiku-Pulse	3610817163
 Normal mode	DeskbarPulseView		Normal tilstand
 Info	CPUButton		Info
 Quit	DeskbarPulseView		Afslut
@@ -45,4 +45,3 @@ Active color	ConfigView		Aktiv farve
 Installing in Deskbar failed\n%s	PulseApp		Installation i skrivebordslinje mislykkede\n%s
 Idle color	ConfigView		Stille farve
 Normal mode	PrefsWindow		Normal tilstand
-Pulse settings	PulseWindow		Pulse-indstillinger

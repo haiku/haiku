@@ -1,9 +1,9 @@
 1	finnish	x-vnd.Haiku-GLInfo	3678488342
-Capability	Capabilities		Kyky
-Information	InfoView		Tiedot
 GL Info	System name		GL-tiedot
-Capabilities	Capabilities		Ominaisuudet
+Information	InfoView		Tiedot
 Maximum convolution	Capabilities		Enimmäismonimutkaisuus
+Extensions	Extensions		Laajennukset
 Available extensions	Extensions		Käytettävissä olevat laajennukset
 Value	Capabilities		Arvo
-Extensions	Extensions		Laajennukset
+Capabilities	Capabilities		Ominaisuudet
+Capability	Capabilities		Kyky

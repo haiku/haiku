@@ -1,0 +1,46 @@
+1	greek, modern (1453-)	x-vnd.haiku-softwareupdater	2933880419
+Updating version	SoftwareUpdaterWindow	List item text	Ενημέρωση έκδοσης
+Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Πατήστε εδώ για να εγκαταστήσετε {0, plural, one{# ενημερωμένο πακέτο} other{# ενημερωμένα πακέτα}}.
+Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Πακέτα προς απεγκατάσταση
+No active network connection was found	UpdateManager	Error message	Δεν βρέθηκε καμία ενεργή σύνδεση δικτύου
+Quit	SoftwareUpdaterWindow	Alert button label	Κλείσιμο
+There were no updates found.	CheckManager		Δεν βρέθηκαν ενημερώσεις.
+Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		Οι ενημερώσεις δεν έχουν ολοκληρωθεί, είστε σίγουρος;
+Updates found	SoftwareUpdaterWindow		Βρέθηκαν ενημερώσεις
+Update now	SoftwareUpdaterWindow		Ενημέρωση τώρα
+For some reason, we could not reboot your computer.	SoftwareUpdaterWindow		Για κάποιον λόγο, δεν μπορέσαμε να ενημερώσουμε τον υπολογιστή σας.
+OK	UpdateManager		Εντάξει
+There were no updates found.	CheckAction		Δεν βρέθηκαν ενημερώσεις.
+No updates available	UpdateAction		Δεν υπάρχουν διαθέσιμες ενημερώσεις
+New packages to be installed	SoftwareUpdaterWindow	List super item label	Νέα πακέτα προς εγκατάσταση
+Packages to be updated	SoftwareUpdaterWindow	List super item label	Πακέτα προς εγκατάσταση
+Attempting to cancel the updates…	SoftwareUpdaterWindow		Γίνεται απόπειρα ακύρωσης των ενημερώσεων...
+Contacting software repositories to check for package updates.	CheckManager		Γίνεται επικοινωνία με αποθετήρια λογισμικού για έλεγχο ενημερώσεων πακέτων.
+Available updates found	CheckManager		Υπάρχουν διαθέσιμες ενημερώσεις
+from repository	SoftwareUpdaterWindow	List item text	από το αποθετήριο
+Contacting software repositories to check for package updates.	SoftwareUpdaterWindow		Γίνεται επικοινωνία με αποθετήρια λογισμικού για έλεγχο ενημερωμένων πακέτων.
+Cancelling updates	SoftwareUpdaterWindow		Γίνεται ακύρωση των ενημερώσεων
+Cancel	SoftwareUpdaterWindow	Alert button label	Ακύρωση
+There were no updates found.	UpdateAction		Δεν βρέθηκαν ενημερώσεις.
+OK	SoftwareUpdaterWindow		Εντάξει
+The following changes will be made:	SoftwareUpdaterWindow		Θα γίνουν οι ακόλουθες αλλαγές:
+No active network connection was found.\n	CheckManager		Δεν βρέθηκε καμία ενεργή σύνδεση δικτύου.\n
+Applying changes	UpdateManager		Γίνεται εφαρμογή αλλαγών
+Full sync	SoftwareUpdaterWindow	Alert button label	Πλήρης συγχρονισμός
+Quit	SoftwareUpdaterWindow	Button label	Έξοδος
+Updates have been successfully installed.	UpdateManager		Οι ενημερώσεις εγκαταστάθηκαν με επιτυχία.
+Cancel	SoftwareUpdaterWindow		Ακύρωση
+Don't quit	SoftwareUpdaterWindow		Να μην γίνει έξοδος
+Checking for updates	SoftwareUpdaterWindow		Γίνεται έλεγχος για ενημερώσεις
+Updates completed	UpdateManager		Οι ενημερώσεις ολοκληρώθηκαν
+Reboot	SoftwareUpdaterWindow		Επανεκκίνηση
+Show more details	SoftwareUpdaterWindow		Εμφάνιση περισσότερων λεπτομερειών
+Installing version	SoftwareUpdaterWindow	List item text	Γίνεται εγκατάσταση έκδοσης
+Reboot	SoftwareUpdaterWindow	Button label	Επανεκκίνηση
+Update	SoftwareUpdaterWindow	Alert button label	Ενημέρωση
+Open Repositories	SoftwareUpdaterWindow	Alert button label	Άνοιγμα Αποθετηρίων
+Updates did not complete	UpdateAction		Οι ενημερώσεις δεν ολοκληρώθηκαν
+Uninstalling version	SoftwareUpdaterWindow	List item text	Απεγκατάσταση έκδοσης
+Quit	SoftwareUpdaterWindow		Έξοδος
+No updates available	CheckManager		Δεν υπάρχουν διαθέσιμες ενημερώσεις
+Downloading packages	UpdateManager		Γίνεται λήψη πακέτων

@@ -1,0 +1,130 @@
+1	greek, modern (1453-)	x-vnd.Haiku-HaikuDepot	3749151665
+Repository update error	LocalRepositoryUpdateProcess		Σφάλμα ενημέρωσης αποθετηρίων
+An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Προέκυψε ένα σφάλμα κατά την ανανέωση του αποθετηρίου: %error%
+User Created	UserLoginWindow		Χρήστης Δημιουργήθηκε
+Check for updates…	MainWindow		Έλεγχος για ενημερώσεις…
+Uninstall	PackageManager		Απεγκατάσταση
+Uninstalled	PackageListView		Έγινε απεγκατάσταση
+It was not possible to create the new user.	UserLoginWindow		Δεν ήταν δυνατή η δημιουργία του νέου χρήστη.
+Available packages	MainWindow		Διαθέσιμα πακέτα
+Create account	UserLoginWindow		Δημιουργία λογαριασμού
+Mostly stable	RatePackageWindow		Κυρίως σταθερό
+OK	App		Εντάξει
+Develop packages	MainWindow		Ανάπτυξη πακέτων
+Rate package…	PackageInfoView		Αξιολόγηση πακέτου...
+Starting the package daemon failed:\n\n%Error%	App		Η έναρξη του προγράμματος υποβάθρου πακέτων απέτυχε:\n\n%Error%
+You have successfully authenticated as user %Nickname%.	UserLoginWindow		Έχετε ταυτοποιηθεί επιτυχώς ως ο χρήστης %Nickname%.
+No user ratings available.	PackageInfoView		Δεν υπάρχουν διαθέσιμες αξιολογήσεις χρήστη.
+Downloading package '%name%'	WorkStatusView		Γίνεται λήψη του πακέτου '%name%'
+Rating	PackageListView		Αξιολόγηση
+Synchronizing icons	ServerIconExportUpdateProcess		Γίνεται συγχρονισμός εικονιδίων
+Show	MainWindow		Εμφάνιση
+Unstable but usable	RatePackageWindow		Ασταθές αλλά χρησιμοποιήσιμο
+Not specified	RatePackageWindow		Απροσδιόριστο
+Active	PackageListView		Ενεργό
+Login or Create account	MainWindow		Είσοδος ή Δημιουργία λογαριασμού
+Ratings	PackageInfoView		Αξιολογήσεις
+Switch account…	MainWindow		Αλλαγή λογαριασμού…
+Preferred language:	UserLoginWindow		Προτιμώμενη γλώσσα:
+Server Error	ServerHelper		Σφάλμα διακομιστή
+Name	PackageListView		Όνομα
+Rate %Package%	RatePackageWindow		Αξιολόγηση %Package%
+Quit HaikuDepot	App		Έξοδος από HaikuDepot
+Category	FilterView		Κατηγορία
+User rating	RatePackageWindow		Αξιολόγηση χρήστη
+Installed packages	MainWindow		Εγκατεστημένα πακέτα
+Stable	RatePackageWindow		Σταθερό
+Error	App		Σφάλμα
+Version	PackageListView		Έκδοση
+Not logged in	MainWindow		Δεν είστε συνδεδεμένος
+No, quit HaikuDepot	App		Όχι, να γίνει έξοδος από το HaikuDepot
+Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Η βαθμολογία σας ενημερώθηκε επιτυχώς. Μπορείτε να την ενημερώσετε ή να την αφαιρέσετε στην ιστοσελίδα του διακομιστή HaikuDepot.
+Network Error	ServerHelper		Σφάλμα δικτύου
+Available	PackageListView		Διαθέσιμο
+Cancel	UserLoginWindow		Ακύρωση
+HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		Το HaikuDepot χρειάζεται το πρόγραμμα υποβάθρου διαχείρισης πακέτων, το οποίο δεν εκτελείται, για να λειτουργήσει.\nΘέλετε να το ξεκινήσετε;
+Click a package to view information	PackageInfoView		Κάντε κλικ σε ένα πακέτο για προβολή πληροφοριών
+The password must be at least eight characters long, consist of at least two digits and one upper case character.	UserLoginWindow		Ο κωδικός πρόσβασης πρέπει να έχει τουλάχιστον 8 χαρακτήρες, οι οποίοι θα αποτελούνται από τουλάχιστον δύο ψηφία και έναν κεφαλαίο χαρακτήρα.
+Contents	PackageInfoView		Περιεχόμενο
+Close	PackageManager		Κλείσιμο
+Rating not possible	MainWindow		Δεν είναι δυνατή η αξιολόγηση
+Package update error	MainWindow		Σφάλμα ενημέρωσης πακέτου
+About	PackageInfoView		Σχετικά
+Reboot required	PackageManager		Απαιτείται επανεκκίνηση
+Very unstable	RatePackageWindow		Πολύ ασταθές
+Password:	UserLoginWindow		Κωδικός πρόσβασης:
+All packages	PackageListView		Όλα τα πακέτα
+Stability	RatePackageWindow		Σταθερότητα
+Send	RatePackageWindow		Αποστολή
+Start package daemon	App		Έναρξη προγράμματος υποβάθρου πακέτων
+The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Ο κωδικός πρέπει να επαναληφθεί, έτσι ώστε να είμαστε βέβαιοι ότι ο κωδικός δεν έχει εισαχθεί λανθασμένα.
+Cancel	RatePackageWindow		Ακύρωση
+Inactive	PackageListView		Ανενεργό
+Nickname:	UserLoginWindow		Ψευδώνυμο:
+Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Γίνεται συγχρονισμός μεταδεδομένων των αποθετηρίων
+OK	MainWindow		Εντάξει
+{0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# αντικείμενο} other{# αντικείμενα}}
+Usage conditions download problem	UserLoginWindow		Σφάλμα λήψης όρων χρήσης
+OK	PackageInfoView		Εντάξει
+Downloading:	PackageInfoView		Γίνεται λήψη:
+Success	UserLoginWindow		Επιτυχία
+Package daemon problem	App		Πρόβλημα προγράμματος υποβάθρου πακέτων
+Repository	PackageListView		Αποθετήριο
+%hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (έκδοση %hd.version%)
+Close	UserLoginWindow		Κλείσιμο
+Close	RatePackageWindow		Κλείσιμο
+Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Γίνεται συγχρονισμός πληροφοριών πακέτων για το αποθετήριο '%REPO_NAME%'
+View the usage conditions	UserLoginWindow		Προβολή όρων χρήσης
+Login issue	MainWindow		Σφάλμα εισόδου
+Your rating:	RatePackageWindow		Η αξιολόγησή σας:
+Size	PackageListView		Μέγεθος
+The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		Η δημιουργία του χρήστη %Nickname% στο σύστημα HaikuDepotServer ήταν επιτυχής. Μπορείτε να διαχειριστείτε τα στοιχεία σας μέσω της ιστοσελίδας μας. Έχετε εισέλθει ως ο νέος χρήστης.
+Your rating was updated.	RatePackageWindow		Η αξιολόγησή σας ενημερώθηκε.
+All categories	FilterView		Όλες οι κατηγορίες
+Repositories	MainWindow		Αποθετήρια
+This rating is visible to other users	RatePackageWindow		Η αξιολόγηση είναι ορατή και σε άλλους χρήστες
+Cancel	MainWindow		Ακύρωση
+Refresh repositories	MainWindow		Ανανέωση αποθετηρίων
+Tools	MainWindow		Εργαλεία
+Continue	App		Συνέχεια
+A password is required.	UserLoginWindow		Απαιτείται κωδικός πρόσβασης.
+This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Αυτό το πακέτο δεν φαίνεται να υπάρχει στον διακομιστή του HaikuDepot, άρα δεν μπορείτε να δημιουργήσετε μία νέα ή να επεξεργαστείτε μία προϋπάρχουσα αξιολόγηση.
+Language	RatePackageWindow		Γλώσσα
+Log out	MainWindow		Έξοδος
+Comment language:	RatePackageWindow		Γλώσσα σχολίου:
+Status	PackageListView		Κατάσταση
+The password has been incorrectly repeated.	UserLoginWindow		Ο κωδικός πρόσβασης έχει επαναληφθεί λανθασμένα.
+Update	RatePackageWindow		Ενημέρωση
+OK	ServerHelper		Εντάξει
+Language	UserLoginWindow		Γλώσσα
+OK	UserLoginWindow		Εντάξει
+Reading repository data	LocalPkgDataLoadProcess		Ανάγνωση δεδομένων αποθετηρίου
+Stability:	RatePackageWindow		Σταθερότητα:
+A validation error has occurred	ServerHelper		Προέκυψε σφάλμα επικύρωσης
+The nickname is required.	UserLoginWindow		Απαιτείται ψευδώνυμο
+Rate package	RatePackageWindow		Αξιολόγηση πακέτου
+Unknown	PackageListView		Άγνωστο
+I agree to the usage conditions	UserLoginWindow		Συμφωνώ στους όρους χρήσης
+Log in	UserLoginWindow		Είσοδος
+Logged in as %User%	MainWindow		Έχετε συνδεθεί ως %User%
+Email address:	UserLoginWindow		Διεύθυνση ηλεκτρονικού ταχυδρομείου:
+Screenshot	ScreenshotWindow		Στιγμιότυπο οθόνης
+HaikuDepot	System name		HaikuDepot
+A reboot is necessary to complete the installation process.	PackageManager		Είναι απαραίτητη μία επανεκκίνηση για την ολοκλήρωση της εγκατάστασης.
+{0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{Είμαι τουλάχιστον ενός }other{Είμαι # ετών ή μεγαλύτερος}}
+Quit	App		Έξοδος
+Search terms:	FilterView		Όροι αναζήτησης:
+Category:	FilterView		Κατηγορία:
+Captcha error	UserLoginWindow		Σφάλμα Captcha
+Manage repositories…	MainWindow		Διαχείριση αποθετηρίων…
+Fetching remote repository data	LocalRepositoryUpdateProcess		Γίνεται λήψη απομακρυσμένων δεδομένων αποθετηρίων
+Description	PackageListView		Περιγραφή
+Open %DeskbarLink%	PackageManager		Άνοιγμα %DeskbarLink%
+User creation error	UserLoginWindow		Σφάλμα δημιουργίας χρήστη
+Install	PackageManager		Εγκατάσταση
+Log in…	MainWindow		Είσοδος…
+You need to be logged into an account before you can rate packages.	MainWindow		Πρέπει να εισέλθετε σε έναν λογαριασμό για να μπορέσετε να αξιολογήσετε πακέτα.
+The user does not exist or the wrong password was supplied. Check your credentials and try again.	UserLoginWindow		Ο χρήστης δεν υπάρχει ή ο κωδικός πρόσβασης είναι λανθασμένος. Ελέγξτε τα στοιχεία σας και προσπαθήστε ξανά.
+9999.99 KiB	PackageListView		9999.99 KiB
+Repeat password:	UserLoginWindow		Επανάληψη κωδικού:
+All repositories	MainWindow		Όλα τα αποθετήρια

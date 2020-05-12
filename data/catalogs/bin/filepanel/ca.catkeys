@@ -6,8 +6,8 @@ short\tlong\tdescription\n	FilePanelApp		descripció\t curta\tllarga\n
 %s: this option requires a parameter\n	FilePanelApp		%s: amb aquesta opció cal un paràmetre\n
 -h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\tmostra'n l'ús\n
 -l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tusa un quadre de càrrega del FilePanel (per defecte)\n
--n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tindica el nom per omissió per a desar-ho\n
--k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\ttipus d'entrades que es poden obrir (essència): qualsevol combinació de f, d, s (fitxer (predeterminat), carpeta, enllaç simbòlic)\n
+-n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\testableix el nom per defecte per desar-ho\n
+-k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\ttipus d'entrades que es poden obrir (essència): qualsevol combinació de f, d, s (fitxer (per defecte), carpeta, enllaç simbòlic)\n
 %s: UNIMPLEMENTED\n	FilePanelApp		%s: NO ESTÀ SUPORTAT\n
 -t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\tiestableix el títol de finestra del FilePanel\n
 -f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\tno està suportat\n

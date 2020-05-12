@@ -1,7 +1,10 @@
-1	greek, modern (1453-)	x-vnd.Haiku-PoorMan	3137659009
+1	greek, modern (1453-)	x-vnd.Haiku-PoorMan	1941909940
 Select web folder	PoorMan		Επέλεξε φάκελο παγκόσμιου ιστού
+Console logging	PoorMan		Καταγραφή Κονσόλας
+Create Log File	PoorMan		Δημιουργία Αρχείου Καταγραφής
 File logging	PoorMan		Αρχείο καταγραφής
 Website options	PoorMan		Επιλογές ιστοσελίδας
+Log to file	PoorMan		Καταγραφή σε αρχείο
 Shutting down.	PoorMan		Γίνεται τερματισμός
 Error Dir	PoorMan		Σφάλμα Καταλόγου
 Web folder:	PoorMan		Φάκελος ιστού:
@@ -27,23 +30,28 @@ Done	PoorMan		Εντάξει
 Site	PoorMan		Ιστοσελίδα
 Cannot start the server	PoorMan		Αδυναμία εκκίνησης του εξυπηρετητή
 Create log file	PoorMan		Δημιουργία αρχείου καταγραφής
+Create public_html	PoorMan		Δημιουργία public_html
 Clear hit counter	PoorMan		Καθαρισμός μετρητή επισκέψεων
 Status: Stopped	PoorMan		Κατάσταση: Σταματημένο
 File	PoorMan		Αρχείο
 Settings…	PoorMan		Ρυθμίσεις...
 Log To File	PoorMan		Καταγραφή σε αρχείο
+Connections	PoorMan		Συνδέσεις
 Controls	PoorMan		Έλεγχοι
+Log to console	PoorMan		Καταγραφή σε κονσόλα
 Advanced	PoorMan		Προχωρημένοι
 Copy	PoorMan		Αντιγραφή
 Logging	PoorMan		Καταγραφή
 Clear console log	PoorMan		Καθαρισμός καταγραφής κονσόλας
 Run server	PoorMan		Εκκίνηση εξυπηρετητή
 Create	PoorMan		Δημιουργία
+{0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# σύνδεση} other{# συνδέσεις}}
 done.\n	PoorMan		έγινε.\n
 PoorMan settings	PoorMan		Ρυθμίσεις PoorMan
 Console Logging	PoorMan		Καταγραφή κονσόλας
 Clear log file	PoorMan		Εκκαθάριση αρχείου καταγραφής
 Save log console selection	PoorMan		Αποθήκευση επιλεγμένης καταγραφής κονσόλας
+File Logging	PoorMan		Καταγραφή Αρχείου
 Log file name:	PoorMan		Όνομα αρχείου καταγραφής:
 Status: Running	PoorMan		Κατάσταση: Εκτελείται
 Directory: (none)	PoorMan		Κατάλογος: (κανένα)

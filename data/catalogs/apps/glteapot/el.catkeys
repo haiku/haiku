@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-GLTeapot	3688092856
+1	greek, modern (1453-)	x-vnd.Haiku-GLTeapot	1569683445
 Upper center	TeapotWindow		Πάνω κέντρο
 Lighting	TeapotWindow		Φωτισμός
 Off	TeapotWindow		Κλειστό
@@ -7,8 +7,9 @@ White	TeapotWindow		Άσπρο
 Yellow	TeapotWindow		Κίτρινο
 Blue	TeapotWindow		Μπλε
 Gouraud shading	TeapotWindow		Σκίαση Gouraud
-Quit	TeapotWindow		Έξοδος
+Quit	TeapotWindow		Κλείσιμο
 Filled polygons	TeapotWindow		Γεμισμένα πολύγωνα
+Settings	TeapotWindow		Ρυθμίσεις
 Fog	TeapotWindow		Ομίχλη
 Backface culling	TeapotWindow		Κλείσιμο οπίσθιας όψης
 Z-buffered	TeapotWindow		Z-buffered

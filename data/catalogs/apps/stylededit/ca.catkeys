@@ -50,7 +50,7 @@ Default	Menus		Per defecte
 OK	SaveAlert		D'acord
 Color	Menus		Color
 Save changes to the document \"%s\"? 	QuitAlert		Voleu desar els canvis al document \"%s\"? 
-StyledEdit	System name		Editor dels Estils
+StyledEdit	System name		Editor d'estil
 Find:	FindandReplaceWindow		Troba:
 Undo typing	QuitAlert		Desfés el tecleig
 Error loading \"%s\":\n\t%s	LoadAlert		Error en carregar \"%s\":\n\t%s

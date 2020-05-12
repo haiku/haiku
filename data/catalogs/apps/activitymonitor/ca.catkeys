@@ -2,8 +2,8 @@
 P-faults	DataSource		Averies de P
 Media nodes	DataSource		Nodes de mitjans
 Threads	DataSource		Fils
-Always on top	ActivityWindow		Sempre a primer pla
-Add graph	ActivityWindow		Afegeix un gràfic
+Always on top	ActivityWindow		Sempre en primer pla
+Add graph	ActivityWindow		Afegeix-hi un gràfic
 Teams	DataSource		Equips
 MiB	DataSource		MiB
 Network send	DataSource		Envia amb la xarxa
@@ -41,7 +41,7 @@ Swap space	DataSource		Espai d'intercanvi
 Swap	DataSource		Memòria d'intercanvi
 File	ActivityWindow		Fitxer
 usage	DataSource		ús
-Additional items	ActivityView		Més
+Additional items	ActivityView		Elements addicionals
 Network receive	DataSource		Rep de la xarxa
 Memory	DataSource		Memòria
 RX	DataSource	Shorter version for Receiving.	RX

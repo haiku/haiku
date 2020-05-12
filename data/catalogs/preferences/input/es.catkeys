@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Input	3057235606
+1	spanish; castilian	x-vnd.Haiku-Input	3910661481
 Scrolling	TouchpadPrefView		Desplazamiento
 Defaults	InputMouse		Por defecto
 Tapping	TouchpadPrefView		Pulsación
@@ -7,6 +7,8 @@ Normal	SettingsView		Normal
 Cancel	TouchpadPrefView		Cancelar
 4-Button	SettingsView		4 botones
 Slow	TouchpadPrefView		Lento
+Warp	SettingsView		Deformación
+Instant warp	SettingsView		Deformación instantánea
 Device List	InputWindow		Lista de dispositivos
 Double-click speed	SettingsView		Velocidad de doble clic
 5-Button	SettingsView		5 botones

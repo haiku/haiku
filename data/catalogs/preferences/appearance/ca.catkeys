@@ -1,7 +1,7 @@
 1	catalan; valencian	x-vnd.Haiku-Appearance	663472720
 Control border	Colors tab		Control de la vora
 Control mark	Colors tab		Marca de control
-Off	AntialiasingSettingsView		Apagat
+Off	AntialiasingSettingsView		Desactivat
 Window border	Colors tab		Vora de la finestra
 Inactive window tab	Colors tab		Pestanya de la finestra inactiva
 Defaults	APRWindow		Valors predeterminats
@@ -20,7 +20,7 @@ Antialiasing menu	AntialiasingSettingsView		Menú del suavitzat
 Success	Colors tab		Correcte
 About	DecorSettingsView		Quant a
 Shine	Colors tab		Llum
-Arrow style	DecorSettingsView		Estil de la fletxa
+Arrow style	DecorSettingsView		Estil de fletxa
 On	AntialiasingSettingsView		Activat
 Decorator:	DecorSettingsView		Decorador:
 Menu background	Colors tab		Fons del menú
@@ -72,7 +72,7 @@ Monospaced fonts only	AntialiasingSettingsView		Només tipus de lletra monoespai
 Document text	Colors tab		Text del document
 Inactive window border	Colors tab		Vora de la finestra inactiva
 Colors	APRWindow		Colors
-About control look	DecorSettingsView		Quant al control d'aparença
+About control look	DecorSettingsView		Quant al Control d'aparença
 Control highlight	Colors tab		Control de realçat
 Status bar	Colors tab		Barra d'estat
 Link hover	Colors tab		Pas per l'enllaç

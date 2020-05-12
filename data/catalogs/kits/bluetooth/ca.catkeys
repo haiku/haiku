@@ -72,7 +72,7 @@ Wrist watch	DeviceClass		Rellotge de polsera
 Sensing device	DeviceClass		Sensor
 Pointing device	DeviceClass		Dispositiu senyalador
 (reserved)	DeviceClass		(reservat)
-Rendering	DeviceClass		Renderitzat
+Rendering	DeviceClass		Representació
 Information	DeviceClass		Informació
 Helmet	DeviceClass		Casc
 Pager	DeviceClass	A small radio device to receive short text messages	Buscapersones

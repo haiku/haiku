@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Pulse	139895817
+1	swedish	x-vnd.Haiku-Pulse	3610817163
 Normal mode	DeskbarPulseView		Normalläge
 Info	CPUButton		Information
 Quit	DeskbarPulseView		Avsluta
@@ -45,4 +45,3 @@ Active color	ConfigView		Aktiv färg
 Installing in Deskbar failed\n%s	PulseApp		Misslyckades att installera i Deskbar\n%s
 Idle color	ConfigView		Overksam färg
 Normal mode	PrefsWindow		Normalläge
-Pulse settings	PulseWindow		Pulsinställningar

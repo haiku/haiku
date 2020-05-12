@@ -1,6 +1,6 @@
 1	greek, modern (1453-)	x-vnd.Haiku-JPEGTranslator	3788699631
 Read	JPEGTranslator		Ανάγνωση
-Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Τύπος Be Bitmap(ΜεταφραστήςJPEG)
+Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Τύπος Be Bitmap (Μετατροπέας JPEG)
 Show warning messages	JPEGTranslator		Εμφάνιση μηνυμάτων προειδοποίησης 
 Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Χρησιμοποιήστε κώδικα CMYK με 0 για 100% κάλυψη μελανιού
 JPEG Library Error: %s\n	be_jerror		Σφάλμα Βιβλιοθήκης JPEG: %s\n

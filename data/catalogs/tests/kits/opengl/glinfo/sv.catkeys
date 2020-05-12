@@ -1,9 +1,9 @@
 1	swedish	x-vnd.Haiku-GLInfo	3678488342
-Capability	Capabilities		Kapacitet
-Information	InfoView		Information
 GL Info	System name		GL Info
-Capabilities	Capabilities		Kapaciteter
+Information	InfoView		Information
 Maximum convolution	Capabilities		Maximal convolution
+Extensions	Extensions		Tillägg
 Available extensions	Extensions		Tillgängliga tillägg
 Value	Capabilities		Värde
-Extensions	Extensions		Tillägg
+Capabilities	Capabilities		Kapaciteter
+Capability	Capabilities		Kapacitet

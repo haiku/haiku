@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Pulse	3788463253
+1	lithuanian	x-vnd.Haiku-Pulse	2964417303
 Normal mode	DeskbarPulseView		Įprastinė veiksena
 Info	CPUButton		Informacija
 Quit	DeskbarPulseView		Baigti darbą
@@ -44,4 +44,3 @@ Active color	ConfigView		Aktyvi spalva
 Installing in Deskbar failed\n%s	PulseApp		Nepavyko patalpinti pranešimų srityje\n%s
 Idle color	ConfigView		Ramybės būsenos spalva
 Normal mode	PrefsWindow		Įprastinė veiksena
-Pulse settings	PulseWindow		Pulso nuostatos

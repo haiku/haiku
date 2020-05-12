@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Expander	747083547
+1	greek, modern (1453-)	x-vnd.Haiku-Expander	3632882299
 Expand	ExpanderMenu		Επέκταση
 Close window when done expanding	ExpanderPreferences		Κλείσιμο παραθύρου μετά το πέρας
 Set destination…	ExpanderMenu		Ορισμός προορισμού...
@@ -25,6 +25,8 @@ Show contents	ExpanderWindow		Εμφάνιση περιεχομένων
 Automatically show contents listing	ExpanderPreferences		Αυτόματα εμφάνιση του περιεχομένου
 OK	ExpanderPreferences		Εντάξει
 Leave destination folder path empty	ExpanderPreferences		Αφήσε την διαδρομή του φάκελο προορισμού άδεια
+Select '%s'…	DirectoryFilePanel		Επιλογή '%s'…
+Create	ExpanderWindow		Δημιουργία
 The file doesn't exist	ExpanderWindow		Το αρχείο δεν υπάρχει
 Stop	ExpanderMenu		Σταμάτα
 File	ExpanderMenu		Αρχείο

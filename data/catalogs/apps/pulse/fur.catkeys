@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-Pulse	139895817
+1	friulian	x-vnd.Haiku-Pulse	3610817163
 Normal mode	DeskbarPulseView		Modalitât normâl
 Info	CPUButton		Informazions
 Quit	DeskbarPulseView		Jes
@@ -45,4 +45,3 @@ Active color	ConfigView		Colôr atîf
 Installing in Deskbar failed\n%s	PulseApp		Instalazion tal Deskbar falide.\n%s
 Idle color	ConfigView		Colôr inativitât
 Normal mode	PrefsWindow		Modalitât normâl
-Pulse settings	PulseWindow		Impostazions di Pulse

@@ -1,31 +1,40 @@
-1	greek, modern (1453-)	x-vnd.Haiku-PowerStatus	4055870417
+1	greek, modern (1453-)	x-vnd.Haiku-PowerStatus	3173765686
 Design capacity low warning: 	PowerStatus		Χαμηλή προειδοποίηση χωριτικότητας σχεδίασης:
 Show percent	PowerStatus		Εμφάνιση ποσοστού
 Design capacity: 	PowerStatus		Σχεδιασμένη χωριτικότητα:
+ mW	PowerStatus		 mW
+The battery level is getting low, please plug in the device.	PowerStatus		Το επίπεδο της μπαταρίας είναι χαμηλό, παρακαλώ φορτίστε την συσκευή σας.
+Battery low	PowerStatus		Χαμηλή μπαταρία
 Type: 	PowerStatus		Τύπος:
 non-rechargeable	PowerStatus		μη-επαναφορτιζόμενο
 Empty battery slot	PowerStatus		Κενή υποδοχή μπαταρίας
+ mV	PowerStatus		 mV
 Run in window	PowerStatus		Εκτέλεση σε παράθυρο
 PowerStatus	System name		PowerStatus
+ mWh	PowerStatus		 mWh
 Battery info…	PowerStatus		Πληροφορίες μπαταρίας...
 Damaged battery	PowerStatus		Κατεστραμμένη μπαταρία
 Show time	PowerStatus		Εμφάνιση ώρας
 Last full charge: 	PowerStatus		Τελευταία πλήρης φόρτιση:
 Battery unused	PowerStatus		Αχρησιμοποίητη μπαταρία
 Extended battery info	PowerStatus		Λεπτομερείς πληροφορίες μπαταρίας
+ mA	PowerStatus		 mA
 Current rate: 	PowerStatus		Τρέχων ρυθμός:
 discharging	PowerStatus		αποφόρτιση
 Show text label	PowerStatus		Εμφάνιση κειμένου ετικέτας
 About…	PowerStatus		Περί...
 Model number: 	PowerStatus		Αριθμός μοντέλου:
 Install in Deskbar	PowerStatus		Εγκατάσταση στη Deskbar
+ mAh	PowerStatus		 mAh
 Capacity: 	PowerStatus		Χωρητικότητα:
 Battery discharging	PowerStatus		Η μπαταρία αποφορτίζεται
 Serial number: 	PowerStatus		Σειριακός αριθμός:
+Battery critical	PowerStatus		Πολύ χαμηλή μπαταρία
 Capacity granularity 1: 	PowerStatus		Κατάτμηση χωριτικότητας 1:
 OEM info: 	PowerStatus		Πληροφορίες OEM:
 Design voltage: 	PowerStatus		Σχεδιασμένη τάση:
 Battery charging	PowerStatus		Η μπαταρία φορτίζεται
+The battery level is critical, please plug in the device immediately.	PowerStatus		Το επίπεδο της μπαταρίας είναι πολύ χαμηλό, παρακαλώ φορτίστε την συσκευή σας άμεσα.
 Design capacity warning: 	PowerStatus		Προειδοποίηση σχεδιασμένης τάσης:
 Quit	PowerStatus		Έξοδος
 rechargeable	PowerStatus		επαναφορτιζόμενο

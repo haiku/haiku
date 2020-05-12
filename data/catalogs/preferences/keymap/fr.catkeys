@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Keymap	360044638
+1	french	x-vnd.Haiku-Keymap	3187025310
 Key	Modifier keys window	As in a computer keyboard key	Touche
 Japanese	KeymapNames		Japonais
 US	KeymapNames		US
@@ -11,6 +11,7 @@ Sample and clipboard:	Keymap window		Exemple et presse-papier :
 Polish	KeymapNames		Polonais
 Latin-American	KeymapNames		Latin-Americain
 Ukrainian	KeymapNames		Ukrainien
+PAGE ↓	Keyboard Layout View		Page ↓
 DEL	Keyboard Layout View		Suppr
 United-Kingdom	KeymapNames		Royaume-Uni
 Turkish (Type-F)	KeymapNames		Turc (Type-F)
@@ -35,6 +36,7 @@ German (Mac)	KeymapNames		Allemand (Mac)
 Arabic (102)	KeymapNames		Arabe (102)
 Belarusian (Mac)	KeymapNames		Biélorusse (Mac)
 Croatian	KeymapNames		Croate
+PAGE ↑	Keyboard Layout View		Page ↑
 Set modifier keys	Modifier keys window		Régler les touches modificatrices
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Touche Win/Cmd
 Spanish	KeymapNames		Espagnol
@@ -52,6 +54,7 @@ Kazakh	KeymapNames		Kazakh
 Save as…	Keymap window		Enregistrer sous…
 Lithuanian (Standard)	KeymapNames		Lituanien (Standard)
 Error: duplicate keys	Modifier keys window		Erreur : touches dupliquées
+NUM	Keyboard Layout View	Very short for 'num lock'	Num
 Bulgarian (Phonetic)	KeymapNames		Bulgare (phonétique)
 Canadian-French	KeymapNames		Canadien-Français
 Hungarian	KeymapNames		Hongrois
@@ -66,6 +69,7 @@ Czech (Mac)	KeymapNames		Tchèque (Mac)
 Left command	Keyboard Layout View		Commande gauche
 Albanian	KeymapNames		Albanais
 (Current)	Keymap window		(Actif)
+OPT	Keyboard Layout View	Very short for 'option'	Opt
 Friulian	KeymapNames		Frioulan
 Left option	Keyboard Layout View		Option gauche
 END	Keyboard Layout View		Fin
@@ -88,6 +92,7 @@ Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually C
 Czech	KeymapNames		Tchèque
 Russian (Udmurt, Komi, Mari)	KeymapNames		Russe (Udmurt, Komi, Mari)
 Control:	Modifier keys window	Control key role name	Contrôle :
+Generic 105-key International	KeyboardLayoutNames		105 touches international générique
 Disabled	Modifier keys window	Do nothing	Désactivé
 Select dead keys	Keymap window		Sélection des touches mortes
 Russian (Mac)	KeymapNames		Russe (Mac)
@@ -106,6 +111,7 @@ Quit	Keymap window		Quitter
 Polish (Typewriter)	KeymapNames		Polonais (Machine à écrire)
 French (Mac)	KeymapNames		Français (Mac)
 User:	Keymap window		Utilisateur :
+Apple Aluminium Extended International	KeyboardLayoutNames		Apple Aluminium International Étendu
 Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Touche Alt/Option
 SHIFT	Keyboard Layout View		Maj
 Estonian	KeymapNames		Estonien
@@ -125,18 +131,22 @@ System:	Keymap window		Système :
 Switch shortcut keys	Keymap window		Basculer les touches de raccourcis
 Right command	Keyboard Layout View		Commande droite
 NUM LOCK	Keyboard Layout View		Verr. Num.
+MENU	Keyboard Layout View		Menu
 Belgian (comma)	KeymapNames		Belge (virgule)
 Norwegian	KeymapNames		Norvégien
 Font	Keymap window		Police
 Danish	KeymapNames		Danois
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Touche majuscule
+PAUSE	Keyboard Layout View		Pause
 Russian	KeymapNames		Russe
 Romanian	KeymapNames		Roumain
+CMD	Keyboard Layout View	Very short for 'command'	Cmd
 Command	Keyboard Layout View	Command key	Commande
 SCROLL	Keyboard Layout View		Défil.
 File	Keymap window		Fichier
 Brazilian (ABNT2)	KeymapNames		Brésilien (ABNT2)
 INS	Keyboard Layout View		Inser.
+OPTION	Keyboard Layout View		Option
 Dutch	KeymapNames		Néerlandais
 Diaeresis trigger	Keymap window		Tréma
 Icelandic	KeymapNames		Islandais

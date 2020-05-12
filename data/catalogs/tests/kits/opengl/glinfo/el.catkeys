@@ -1,9 +1,9 @@
 1	greek, modern (1453-)	x-vnd.Haiku-GLInfo	3678488342
-Capability	Capabilities		Δυνατότητα
-Information	InfoView		Πληροφορίες
 GL Info	System name		Πληροφορίες GL
-Capabilities	Capabilities		Δυνατότητες
+Information	InfoView		Πληροφορίες
 Maximum convolution	Capabilities		Μέγιστη συνέλιξη
+Extensions	Extensions		Επεκτάσεις
 Available extensions	Extensions		Διαθέσιμες προεκτάσεις
 Value	Capabilities		ΤΙμή
-Extensions	Extensions		Επεκτάσεις
+Capabilities	Capabilities		Δυνατότητες
+Capability	Capabilities		Δυνατότητα

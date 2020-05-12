@@ -468,7 +468,7 @@ New folder %ld	FSUtils		Új mappa %ld
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" egy régebbi futtatható fájl. Frissítés vagy újra felépítés szükséges.
 Only the boot disk	AutoMounterSettings		Csak a rendszer lemezt
 That name is already taken. Please type another one.	WidgetAttributeText		Ez a név már foglalt. Kérlek válassz egy másikat.
-Message	AttributesView		Message
+Message	AttributesView		Üzenet
 Modified	Default Query Columns		Módosítva
 Default application	InfoWindow		Alapértelmezett program
 Untitled bitmap	PoseView		Névtelen bittérkép

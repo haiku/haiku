@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-FileTypes	267718819
+1	portuguese	x-vnd.Haiku-FileTypes	3999929977
 Left	Attribute Window	Attribute column alignment in Tracker	À esquerda
 Final	Application Types Window		Final
 FileTypes request	FileTypes Window		Pedido de Tipos de Ficheiro
@@ -40,10 +40,12 @@ Same as…	FileType Window	The same APPLICATION as ...	Igual a…
 Abort	Application Types Window		Cancelar
 Save	Application Type Window		Guardar
 Icon	Application Type Window		Ícone
+Duration	Attribute ListView		Duração
 Version:	Application Type Window		Versão:
 Default application	FileType Window		Aplicação predefinida
 Internal name:	New File Type Window		Nome interno:
 Extension:	Extension Window		Extensão:
+Time	Attribute ListView		Hora
 Extensions:	FileTypes Window		Extensões:
 Select preferred application	FileType Window		Seleccionar aplicação preferida
 Description:	FileTypes Window		Descrição:
@@ -60,8 +62,11 @@ FileTypes request	FileTypes		Pedido de Tipos de Ficheiro
 Select same type as	FileType Window		Selecionar o mesmo tipo de
 Version:	Application Types Window		Versão:
 (from application)	FileTypes Window		(a partir da aplicação)
+Application types	Application Types Window		Tipos de aplicações
 Description:	Application Types Window		Descrição:
 Name:	Application Types Window		Nome:
+Rating	Attribute ListView		Classificação
+duration	Attribute ListView		duração
 File could not be opened	Preferred App Menu		Não foi possível abrir o ficheiro
 Args only	Application Type Window		Apenas argumentos
 Could not open \"%s\":\n%s	FileTypes		Não foi possível abrir \"%s\":\n%s
@@ -73,15 +78,19 @@ Editable	Attribute Window	If Tracker allows to edit this attribute.	Editável
 New resource file…	FileTypes Window		Novo ficheiro de recursos…
 Application type	Application Type Window		Tipo de aplicação
 Show in Tracker…	Application Types Window		Mostrar no Tracker…
+Type name:	FileTypes Window		Nome do tipo:
 Visible	Attribute Window		Visível
 Select preferred application	FileTypes Window		Escolher aplicação prédefinida
 Path:	Application Types Window		Caminho:
+rating	Attribute ListView		classificação
 Could not install file type	New File Type Window		Não foi possível instalar o tipo de ficheiro
 Same as…	FileTypes Window		Igual a…
 Golden master	Application Type Window		Mestre dourado
+Checkbox	Attribute ListView		Caixa de verificação
 FileTypes request	Preferred App Menu		Pedido de Tipos de Ficheiro
 no icon	FileTypes Window		sem ícone
 Single launch	Application Type Window		Instância única
+Default	Attribute ListView		Predefinição
 Add type	New File Type Window		Adicionar tipo
 Remove icon	Icon View		Remover ícone
 Cancel	Extension Window		Cancelar
@@ -92,6 +101,7 @@ Development	Application Type Window		Desenvolvimento
 Golden master	Application Types Window		Mestre dourado
 Add	Extension Window		Adicionar
 Open…	FileTypes Window		Abrir…
+checkbox	Attribute ListView		caixa de verificação
 Could not change file extensions	Extension Window		Não foi possível mudar as extensões dos ficheiros
 Could not open file	FileType Window		Não foi possível abrir o ficheiro
 Choose type	Type List Window		Escolher tipo

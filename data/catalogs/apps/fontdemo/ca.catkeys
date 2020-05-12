@@ -1,5 +1,5 @@
 1	catalan; valencian	x-vnd.Haiku-FontDemo	3449067186
-Stop cycling	ControlView		Atura el cicle
+Stop cycling	ControlView		Interromp el cicle
 Haiku, Inc.	FontDemoView		Haiku, Inc.
 Rotation: %d	ControlView		Gir: %d
 Shear: %d	ControlView		Inclinació: %d
@@ -9,7 +9,7 @@ Font:	ControlView		Tipus de lletra:
 Drawing mode:	ControlView		Mode de dibuix:
 Haiku, Inc.	ControlView		Haiku, Inc.
 Controls	FontDemo		Controls
-FontDemo	System name		TipusDeLletraDemo
+FontDemo	System name		Demostració de lletra
 Outline: %d	ControlView		Contorn: %d
 Text:	ControlView		Text:
 Antialiased text	ControlView		Text suavitzat

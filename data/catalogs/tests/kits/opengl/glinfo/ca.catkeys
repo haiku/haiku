@@ -1,9 +1,9 @@
 1	catalan; valencian	x-vnd.Haiku-GLInfo	3678488342
-Capability	Capabilities		Capacitat
-Information	InfoView		Informació
 GL Info	System name		Quant a GL
-Capabilities	Capabilities		Funcionalitats
+Information	InfoView		Informació
 Maximum convolution	Capabilities		Convolució màxima
+Extensions	Extensions		Extensions
 Available extensions	Extensions		Extensions disponibles
 Value	Capabilities		Valor
-Extensions	Extensions		Extensions
+Capabilities	Capabilities		Funcionalitats
+Capability	Capabilities		Capacitat

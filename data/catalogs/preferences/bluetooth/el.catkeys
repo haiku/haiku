@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-BluetoothPrefs	3311328897
+1	greek, modern (1453-)	x-vnd.Haiku-BluetoothPrefs	747033982
 Laptop	Settings view		Φορητός Υπολογιστής
 Only from trusted devices	Settings view		Μόνο από αξιόπιστες συσκευές
 15 secs	Settings view		15 δευτερόλεπτα
@@ -17,7 +17,9 @@ Stop bluetooth services…	Window		Διακοπή υπηρεσιών bluetooth..
 Add…	Remote devices		Προσθήκη…
 As blocked	Remote devices		Ως αποκλεισμένο
 There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Δεν υπάρχει καμία τοπική συσκευή Bluetooth που να έχει καταχωρηθεί στο σύστημα.
+Policy…	Settings view		Πολιτική...
 Revert	Window		Επαναφορά
+Refresh local devices…	Window		Ανανέωση τοπικών συσκευών...
 Disconnect	Remote devices		Αποσύνδεση
 From all devices	Settings view		Από όλες τις συσκευές
 Defaults	Window		Προεπιλογές
@@ -26,7 +28,9 @@ Check that the Bluetooth capabilities of your remote device are activated. Press
 Scanning progress	Inquiry panel		Πρόοδος σάρωσης
 Bluetooth	System name		Bluetooth
 Remove	Remote devices		Αφαίρεσε
+Pick device…	Settings view		Επιλογή συσκευής...
 Always ask	Settings view		Πάντα ρώτα
+With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped…\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		Με την υποστήριξη των:\n- Mika Lindqvist\n- Adrien Destugues\n- Maksym Yevmenkin\n\nΕυχαριστούμε τα άτομα που βοήθησαν…\n\nΜε δωρεές/αποστολές υλισμικού:\n- Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n- Edwin Erik Amsler\n- Dennis d'Entremont\n- Luroh\n- Pieter Panman\n\nΟικονομικά:\n- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n- Matt M, Doug F, Hubert H,\n- Sebastian B, Andrew M, Jared E,\n- Frederik H, Tom S, Ferry B,\n- Greg G, David F, Richard S, Martin W:\n\nΜε συνεισφορές κώδικα:\n- Michael Weirauch\n- Fredrik Ekdahl\n- Raynald Lesieur\n- Andreas Färber\n- Joerg Meyer\nΜε δοκιμές:\n- Petter H. Juliussen\nΜε όλη τους την γνώση:\n- the yellowTAB team
 Help	Window		Βοήθεια
 Pair…	Remote devices		Ζευγάρι...
 Retrieving name of %1	Inquiry panel		Ανάκτηση ονόματος του %1
@@ -35,6 +39,7 @@ Incoming connections policy:	Settings view		Εισερχόμενες συνδέ�
 Show name	Extended local device view		Εμφάνιση ονόματος
 Add device to list	Inquiry panel		Προσθήκη συσκευής στη λίστα
 Remaining %1 seconds	Inquiry panel		Απομένουν %1 δευτερόλεπτα
+The Bluetooth services are not currently running on this system.	main		Οι υπηρεσίες Bluetooth δεν εκτελούνται αυτήν την στιγμή στο σύστημά σας.
 Discoverable	Extended local device view		Ορατό
 Authenticate	Extended local device view		Αναγνώριση
 Smart phone	Settings view		Smart phone
@@ -42,4 +47,5 @@ Scanning completed.	Inquiry panel		Η ανίχνευση ολοκληρώθηκ�
 Default inquiry time:	Settings view		Προκαθορισμένος χρόνος έρευνας:
 Server	Settings view		Εξυπηρετητής
 Handheld	Settings view		Φορητός
+ packets: 	Device View		 πακέτα: 
 About Bluetooth…	Window		Περί Bluetooth...

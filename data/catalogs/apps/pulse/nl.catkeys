@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Pulse	139895817
+1	dutch; flemish	x-vnd.Haiku-Pulse	3610817163
 Normal mode	DeskbarPulseView		Standaardmodus
 Info	CPUButton		Info
 Quit	DeskbarPulseView		Afsluiten
@@ -45,4 +45,3 @@ Active color	ConfigView		Actief-kleur
 Installing in Deskbar failed\n%s	PulseApp		Het installeren in Deskbar is mislukt\n%s
 Idle color	ConfigView		Inactief-kleur
 Normal mode	PrefsWindow		Normale modus
-Pulse settings	PulseWindow		Pulse-instellingen
