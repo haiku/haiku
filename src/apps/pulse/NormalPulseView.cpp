@@ -155,8 +155,8 @@ NormalPulseView::DetermineVendorAndProcessor()
 					break;
 
 				case B_CPU_VENDOR_MOTOROLA:
-					logo = PowerPCLogo;
-					logoSize = sizeof(PowerPCLogo);
+					logo = kPowerPCLogo;
+					logoSize = sizeof(kPowerPCLogo);
 					break;
 
 				case B_CPU_VENDOR_VIA:
