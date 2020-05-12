@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2015, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2020, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2002, Ryan Fleet.
  *
  * Distributed under the terms of the MIT license.
@@ -76,6 +76,7 @@ show_attr_contents(BNode& node, const char* attribute, const attr_info& info)
 			size);
 		return;
 	}
+	buffer[min_c(bytesRead, kLimit - 1)] = '\0';
 
 	switch (info.type) {
 		case B_INT8_TYPE:
