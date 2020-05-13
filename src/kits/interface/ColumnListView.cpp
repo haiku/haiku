@@ -1967,14 +1967,15 @@ BColumnListView::PreferredSize()
 		// Start with the extra width for border and scrollbars etc.
 		size.width = titleRect.left - Bounds().left;
 		size.width += Bounds().right - titleRect.right;
-		// If we want all columns to be visible at their preferred width,
+
+		// If we want all columns to be visible at their current width,
 		// we also need to add the extra margin width that the TitleView
 		// uses to compute its _VirtualWidth() for the horizontal scroll bar.
 		size.width += fTitleView->MarginWidth();
 		for (int32 i = 0; i < count; i++) {
 			BColumn* column = ColumnAt(i);
 			if (column != NULL)
-				size.width += fOutlineView->GetColumnPreferredWidth(column);
+				size.width += column->Width();
 		}
 	}
 
