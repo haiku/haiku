@@ -7,7 +7,7 @@
  *		Jerome Duval, jerome.duval@free.fr
  *		Jonas Sundström, jonas@kirilla.se
  *		John Scipione, jscipione@gmail.com
- *		Brian Hill <supernova@warpmail.net>
+ *		Brian Hill, supernova@warpmail.net
  */
 
 
@@ -411,10 +411,10 @@ BackgroundsView::MessageReceived(BMessage* message)
 			_Save();
 
 			// Notify the server and Screen preflet
-			thread_id notify_thread;
-			notify_thread = spawn_thread(BackgroundsView::_NotifyThread,
+			thread_id notifyThread;
+			notifyThread = spawn_thread(BackgroundsView::_NotifyThread,
 				"notifyThread", B_NORMAL_PRIORITY, this);
-			resume_thread(notify_thread);
+			resume_thread(notifyThread);
 			_UpdateButtons();
 			break;
 		}
@@ -434,9 +434,8 @@ BackgroundsView::_LoadDesktopFolder()
 {
 	BPath path;
 	if (find_directory(B_DESKTOP_DIRECTORY, &path) == B_OK) {
-		status_t err;
-		err = get_ref_for_path(path.Path(), &fCurrentRef);
-		if (err != B_OK)
+		status_t error = get_ref_for_path(path.Path(), &fCurrentRef);
+		if (error != B_OK)
 			printf("error in LoadDesktopSettings\n");
 		_LoadFolder(true);
 	}
@@ -450,9 +449,8 @@ BackgroundsView::_LoadDefaultFolder()
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
 		BString pathString = path.Path();
 		pathString << "/Tracker/DefaultFolderTemplate";
-		status_t err;
-		err = get_ref_for_path(pathString.String(), &fCurrentRef);
-		if (err != B_OK)
+		status_t error = get_ref_for_path(pathString.String(), &fCurrentRef);
+		if (error != B_OK)
 			printf("error in LoadDefaultFolderSettings\n");
 		_LoadFolder(false);
 	}
@@ -462,9 +460,8 @@ BackgroundsView::_LoadDefaultFolder()
 void
 BackgroundsView::_LoadRecentFolder(BPath path)
 {
-	status_t err;
-	err = get_ref_for_path(path.Path(), &fCurrentRef);
-	if (err != B_OK)
+	status_t error = get_ref_for_path(path.Path(), &fCurrentRef);
+	if (error != B_OK)
 		printf("error in LoadRecentFolder\n");
 	_LoadFolder(false);
 }
@@ -574,8 +571,7 @@ BackgroundsView::_UpdateWithCurrent(void)
 void
 BackgroundsView::_Save()
 {
-	bool textWidgetLabelOutline
-		= fIconLabelOutline->Value() == B_CONTROL_ON;
+	bool textWidgetLabelOutline = fIconLabelOutline->Value() == B_CONTROL_ON;
 
 	BackgroundImage::Mode mode = _FindPlacementMode();
 	BPoint offset(atoi(fXPlacementText->Text()), atoi(fYPlacementText->Text()));
@@ -676,36 +672,36 @@ BackgroundsView::_NotifyServer()
 	} else {
 		int32 i = -1;
 		BMessage reply;
-		int32 err;
+		int32 error;
 		BEntry currentEntry(&fCurrentRef);
 		BPath currentPath(&currentEntry);
 		bool isCustomFolder
 			= !fWorkspaceMenu->FindItem(kMsgDefaultFolder)->IsMarked();
 
 		do {
-			BMessage msg(B_GET_PROPERTY);
+			BMessage message(B_GET_PROPERTY);
 			i++;
 
 			// look at the "Poses" in every Tracker window
-			msg.AddSpecifier("Poses");
-			msg.AddSpecifier("Window", i);
+			message.AddSpecifier("Poses");
+			message.AddSpecifier("Window", i);
 
 			reply.MakeEmpty();
-			tracker.SendMessage(&msg, &reply);
+			tracker.SendMessage(&message, &reply);
 
 			// break out of the loop when we're at the end of
 			// the windows
 			if (reply.what == B_MESSAGE_NOT_UNDERSTOOD
-				&& reply.FindInt32("error", &err) == B_OK
-				&& err == B_BAD_INDEX)
+				&& reply.FindInt32("error", &error) == B_OK
+				&& error == B_BAD_INDEX)
 				break;
 
 			// don't stop for windows that don't understand
 			// a request for "Poses"; they're not displaying
 			// folders
 			if (reply.what == B_MESSAGE_NOT_UNDERSTOOD
-				&& reply.FindInt32("error", &err) == B_OK
-				&& err != B_BAD_SCRIPT_SYNTAX)
+				&& reply.FindInt32("error", &error) == B_OK
+				&& error != B_BAD_SCRIPT_SYNTAX)
 				continue;
 
 			BMessenger trackerWindow;
@@ -714,14 +710,14 @@ BackgroundsView::_NotifyServer()
 
 			if (isCustomFolder) {
 				// found a window with poses, ask for its path
-				msg.MakeEmpty();
-				msg.what = B_GET_PROPERTY;
-				msg.AddSpecifier("Path");
-				msg.AddSpecifier("Poses");
-				msg.AddSpecifier("Window", i);
+				message.MakeEmpty();
+				message.what = B_GET_PROPERTY;
+				message.AddSpecifier("Path");
+				message.AddSpecifier("Poses");
+				message.AddSpecifier("Window", i);
 
 				reply.MakeEmpty();
-				tracker.SendMessage(&msg, &reply);
+				tracker.SendMessage(&message, &reply);
 
 				// go on with the next if this din't have a path
 				if (reply.what == B_MESSAGE_NOT_UNDERSTOOD)
@@ -862,6 +858,7 @@ BackgroundsView::_UpdatePreview()
 		&& imageEnabled;
 	if (fXPlacementText->IsEnabled() ^ textEnabled)
 		fXPlacementText->SetEnabled(textEnabled);
+
 	if (fYPlacementText->IsEnabled() ^ textEnabled)
 		fYPlacementText->SetEnabled(textEnabled);
 
@@ -917,10 +914,13 @@ BackgroundsView::_FindPlacementMode()
 
 	if (fPlacementMenu->FindItem(kMsgCenterPlacement)->IsMarked())
 		mode = BackgroundImage::kCentered;
+
 	if (fPlacementMenu->FindItem(kMsgScalePlacement)->IsMarked())
 		mode = BackgroundImage::kScaledToFit;
+
 	if (fPlacementMenu->FindItem(kMsgManualPlacement)->IsMarked())
 		mode = BackgroundImage::kAtOffset;
+
 	if (fPlacementMenu->FindItem(kMsgTilePlacement)->IsMarked())
 		mode = BackgroundImage::kTiled;
 

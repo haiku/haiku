@@ -67,7 +67,7 @@ class FramePart : public BView {
 public:
 								FramePart(int32 part);
 
-			void				Draw(BRect rect);
+	virtual	void				Draw(BRect rect);
 			void				SetDesktop(bool isDesktop);
 
 private:
@@ -86,11 +86,11 @@ public:
 			BRect				fImageBounds;
 
 protected:
-			void				MouseDown(BPoint point);
-			void				MouseUp(BPoint point);
-			void				MouseMoved(BPoint point, uint32 transit,
+	virtual	void				MouseDown(BPoint point);
+	virtual	void				MouseUp(BPoint point);
+	virtual	void				MouseMoved(BPoint point, uint32 transit,
 									const BMessage* message);
-			void				AttachedToWindow();
+	virtual	void				AttachedToWindow();
 
 			BPoint				fOldPoint;
 			float				fXRatio;
