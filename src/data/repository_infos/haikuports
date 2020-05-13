@@ -2,6 +2,6 @@ name HaikuPorts
 vendor "Haiku Project"
 summary "The HaikuPorts repository (for Haiku %HAIKU_VERSION_NO_REVISION%)"
 priority 1
-baseurl https://eu.hpkg.haiku-os.org/haikuports/master/%HAIKU_PACKAGING_ARCH%/current
-url https://hpkg.haiku-os.org/haikuports/master/%HAIKU_PACKAGING_ARCH%/current
+baseurl https://eu.hpkg.haiku-os.org/haikuports/r1beta2/%HAIKU_PACKAGING_ARCH%/current
+url https://hpkg.haiku-os.org/haikuports/r1beta2/%HAIKU_PACKAGING_ARCH%/current
 architecture %HAIKU_PACKAGING_ARCH%
