@@ -154,12 +154,11 @@ extern void mutex_destroy(mutex* lock);
 extern void mutex_transfer_lock(mutex* lock, thread_id thread);
 extern status_t mutex_switch_lock(mutex* from, mutex* to);
 	// Unlocks "from" and locks "to" such that unlocking and starting to wait
-	// for the lock is atomically. I.e. if "from" guards the object "to" belongs
+	// for the lock is atomic. I.e. if "from" guards the object "to" belongs
 	// to, the operation is safe as long as "from" is held while destroying
 	// "to".
 extern status_t mutex_switch_from_read_lock(rw_lock* from, mutex* to);
-	// Like mutex_switch_lock(), just for a switching from a read-locked
-	// rw_lock.
+	// Like mutex_switch_lock(), just for switching from a read-locked rw_lock.
 
 
 // implementation private:

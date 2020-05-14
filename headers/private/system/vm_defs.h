@@ -17,7 +17,7 @@
 	(B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_KERNEL_EXECUTE_AREA \
 	| B_KERNEL_STACK_AREA)
 
-// TODO: These aren't really a protection flags, but since the "protection"
+// TODO: These aren't really protection flags, but since the "protection"
 //	field is the only flag field, we currently use it for this.
 //	A cleaner approach would be appreciated - maybe just an official generic
 //	flags region in the protection field.

@@ -958,7 +958,7 @@ VMAnonymousCache::Merge(VMCache* _source)
 {
 	VMAnonymousCache* source = dynamic_cast<VMAnonymousCache*>(_source);
 	if (source == NULL) {
-		panic("VMAnonymousCache::MergeStore(): merge with incompatible cache "
+		panic("VMAnonymousCache::Merge(): merge with incompatible cache "
 			"%p requested", _source);
 		return;
 	}

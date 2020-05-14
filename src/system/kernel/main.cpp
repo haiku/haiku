@@ -8,7 +8,7 @@
  */
 
 
-/*! This is main - initializes the kernel and launches the Bootscript */
+/*! This is main - initializes the kernel and launches the launch_daemon */
 
 
 #include <string.h>

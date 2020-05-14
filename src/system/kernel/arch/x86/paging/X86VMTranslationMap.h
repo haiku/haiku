@@ -27,7 +27,7 @@ struct X86VMTranslationMap : VMTranslationMap {
 
 			status_t			Init(bool kernel);
 
-	virtual	bool 				Lock() final;
+	virtual	bool				Lock() final;
 	virtual	void				Unlock() final;
 
 	virtual	addr_t				MappedSize() const final;

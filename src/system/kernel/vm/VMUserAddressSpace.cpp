@@ -347,7 +347,7 @@ VMUserAddressSpace::UnreserveAddressRange(addr_t address, size_t size,
 	// check to see if this address space has entered DELETE state
 	if (fDeleting) {
 		// okay, someone is trying to delete this address space now, so we can't
-		// insert the area, so back out
+		// remove the area, so back out
 		return B_BAD_TEAM_ID;
 	}
 
