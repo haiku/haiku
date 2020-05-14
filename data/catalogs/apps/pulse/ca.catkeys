@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Pulse	3610817163
+1	catalan; valencian	x-vnd.Haiku-Pulse	559379362
 Normal mode	DeskbarPulseView		Mode normal
 Info	CPUButton		Informació
 Quit	DeskbarPulseView		Surt
@@ -16,6 +16,7 @@ Fade colors	ConfigView		Colors difuminats
 About Pulse…	PulseView		Quant al Pulse…
 Pulse	NormalPulseView		Pulse
 Deskbar mode	NormalPulseView		Mode de la barra d'escriptori
+Pulse settings	PulseApp		Paràmetres del Pulse
 Remove replicant	CPUButton		Suprimeix el replicant
 You can't disable the last active CPU.	PulseView		No podeu inhabilitar l'última CPU activa.
 Width of icon:	ConfigView		Amplada de la icona:

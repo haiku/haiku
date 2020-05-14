@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Input	2330039872
+1	greek, modern (1453-)	x-vnd.Haiku-Input	1951014091
 Scrolling	TouchpadPrefView		Κύλιση
 Defaults	InputMouse		Προεπιλογές
 Cancel	TouchpadPrefView		Ακύρωση
@@ -7,18 +7,24 @@ Device List	InputWindow		Λίστα Συσκευών
 Double-click speed	SettingsView		Ταχύτητα διπλού κλικ
 5-Button	SettingsView		5 κουμπιών
 Mouse type:	SettingsView		Τύπος ποντικιού:
+Revert	InputKeyboard		Επαναφορά
 Please confirm	TouchpadPrefView		Παρακαλώ επιβεβαιώστε
+Acceleration	TouchpadPrefView		Επιτάχυνση
 Mouse speed	SettingsView		Ταχύτητα δείκτη
 OK	TouchpadPrefView		Εντάξει
 Horizontal scrolling	TouchpadPrefView		Οριζόντια κύλιση
 Two finger scrolling	TouchpadPrefView		Κύλιση δύο δαχτύλων
+Input	System name		Εισαγωγή
 Mouse acceleration	SettingsView		Επιτάχυνση δείκτη
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Η νέα επιφάνεια κύλισης είναι πολύ μεγάλη και ίσως να επηρεάσει την ομαλή λειτουργία του ποντικιού. Είστε σίγουρος πως θέλετε να την αλλάξετε;
 Defaults	TouchpadPrefView		Προεπιλογές
 1-Button	SettingsView		1 κουμπιού
 Defaults	InputKeyboard		Προεπιλογές
+Revert	InputMouse		Επαναφορά
 2-Button	SettingsView		2 κουμπιών
 Vertical	TouchpadPrefView		Κάθετο
 Horizontal	TouchpadPrefView		Οριζόντιο
+Double-click test area	SettingsView		Δοκιμαστική περιοχή διπλού κλικ
 Sensitivity	TouchpadPrefView		Ευαισθησία
 3-Button	SettingsView		3 κουμπιών
+Revert	TouchpadPrefView		Επαναφορά

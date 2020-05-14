@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Appearance	618096289
+1	greek, modern (1453-)	x-vnd.Haiku-Appearance	250620760
 Control border	Colors tab		Έλεγχος περιγράμματος
 Off	AntialiasingSettingsView		Κλειστό
 Window border	Colors tab		Περιθώριο Παραθύρου
@@ -14,22 +14,24 @@ Antialiasing menu	AntialiasingSettingsView		Μενού εξομάλυνσης
 Success	Colors tab		Επιτυχία
 About	DecorSettingsView		Σχετικά
 Shine	Colors tab		Λάμψη
+Arrow style	DecorSettingsView		Στυλ βελών
 On	AntialiasingSettingsView		Ανοικτό
 Menu background	Colors tab		Φόντο μενού
 Revert	APRWindow		Επαναφορά
 OK	DecorSettingsView		Εντάξει
 Control text	Colors tab		Κείμενο ελέγχου
 Selected menu item background	Colors tab		Φόντο επιλεγμένου μενού
+Link active	Colors tab		Ενεργός υπερσύνδεσμος
 Antialiasing	APRWindow		Εξομάλυνση
 Menu font:	Font view		Γραμματοσειρά μενού:
 Bold font:	Font view		Έντονη γραμματοσειρά:
-%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nΣυγγραφείς:\n\t%decorAuthors\n\nURL: %decorURL\nΆδεια χρήσης: %decorLic\n\n%decorDesc\n
+%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nΣυγγραφείς:\n\t%decorAuthors\n\nΙστοσελίδα: %decorURL\nΆδεια χρήσης: %decorLic\n\n%decorDesc\n
 Choose Decorator	DecorSettingsView		Επιλέξετε Διακοσμητή
 Strong	AntialiasingSettingsView		Ισχυρό
 Failure	Colors tab		Αποτυχία
 Selected menu item text	Colors tab		Επιλεγμένο κείμενο μενού
 Size:	Font Selection view		Μέγεθος:
-Panel background	Colors tab		Φόντο πλαισίου
+Panel background	Colors tab		Φόντο πάνελ
 Plain font:	Font view		Απλή γραμματοσειρά:
 Window tab text	Colors tab		Κείμενο καρτέλας παράθυρου
 Navigation pulse	Colors tab		Παλμός πλοήγησης
@@ -39,18 +41,25 @@ Link text	Colors tab		Κείμενο υπερσυνδέσμου
 Tooltip background	Colors tab		Φόντο αναδυόμενης συμβουλής
 ControlLook:	DecorSettingsView		ControlLook:
 Default	DecorSettingsView		Προεπιλογή
+Link visited	Colors tab		Υπερσύνδεσμος με επίσκεψη
 Selected menu item border	Colors tab		Περίγραμμα επιλεγμένου μενού
 Tooltip text	Colors tab		Κείμενο αναδυόμενης συμβουλής
 Control background	Colors tab		Έλεγχος φόντου
+Selected list item text	Colors tab		Επιλεγμένο κείμενο αντικειμένου λίστας
+Selected list item background	Colors tab		Επιλεγμένο κείμενο αντικειμένου φόντου
 Inactive window tab text	Colors tab		Κείμενο της αδρανής καρτέλας παράθυρου
 Navigation base	Colors tab		Βάση πλοήγησης
 Fonts	APRWindow		Γραμματοσειρές
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Ο καλύμνιος σφουγγαράς ψιθύρησε πως θα βουτήξει χωρίς να διστάζει.
 Grayscale	AntialiasingSettingsView		Κλίμακα του γκρι
 Antialiasing type:	AntialiasingSettingsView		Τύπος εξομάλυνσης:
-Panel text	Colors tab		Κείμενο πρόσοψης
+Panel text	Colors tab		Κείμενο πάνελ
 Hinting menu	AntialiasingSettingsView		Μενού υποδείξεων
+Scroll bar:	DecorSettingsView		Γραμμή κύλισης:
 Monospaced fonts only	AntialiasingSettingsView		Μόνο σταθερές γραμματοσειρές
 Document text	Colors tab		Κείμενο εγγράφου
 Inactive window border	Colors tab		Ανενεργό περιθώριο παραθύρου
 Colors	APRWindow		Χρώματα
 Control highlight	Colors tab		Έλεγχος φωτεινότητας
+Status bar	Colors tab		Γραμμή κατάστασης
+Link hover	Colors tab		Πέρασμα υπερσυνδέσμου

@@ -3,9 +3,9 @@ Version %d.%d.%d, %s	ConfigView		Έκδοση %d.%d.%d, %s
 RTF text files	RTFTranslator		Αρχεία κειμένου RTF
 RTF-Translator Settings	ConfigView		Ρυθμίσεις Μετατροπέα RTF
 Rich Text Format (RTF) translator	ConfigView		Μετατροπέας Μορφότυπου Εμπλουτισμένου Κειμένου (RTF)
-RTF Settings	main		Ρυθμίσεις RTF 
+RTF Settings	main		Ρυθμίσεις RTF
 RichTextFormat file	RTFTranslator		Αρχείο Εμπλουτισμένοι Κειμένου
-Be style text file	RTFTranslator		Κείμενο αρχείου μορφής Be
+Be style text file	RTFTranslator		Αρχείο κειμένου Be
 Plain text file	RTFTranslator		Αρχείο απλού κειμένου
 Rich Text Format translator	RTFTranslator		Μετατροπέας Μορφότυπου Εμπλουτισμένου Κειμένου
 Rich Text Format translator v%d.%d.%d %s	RTFTranslator		Μετατροπέας Μορφότυπου Εμπλουτισμένου Κειμένου v%d.%d.%d %s

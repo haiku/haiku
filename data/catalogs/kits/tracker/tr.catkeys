@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-libtracker	2332899407
+1	turkish	x-vnd.Haiku-libtracker	3347779161
 Created	ContainerWindow		Oluşturulma
 Icon	AttributesView		Simge
 Open and make preferred	OpenWithWindow		Aç ve tercih edilen yap
@@ -131,7 +131,7 @@ Owner	FilePermissionsView		Sahibi
 Cancel	FSClipBoard		İptal
 Modified	PoseView		Değiştirilme
 Move to Trash	ContainerWindow		Çöp'e taşı
-All files and folders	FindPanel		Tüm dosyalar ve klasörler
+All files and folders	FindPanel		Tüm dosyalar/klasörler
 Add-ons	ContainerWindow		Eklentiler
 Too many parenthesis.	libtracker		Çok fazla parantez.
 Increase size	ContainerWindow		Büyüt
@@ -191,7 +191,7 @@ Could not find an application to open \"%name\" (%error). 	FSUtils		\"%name\" ö
 Internal error.	libtracker		İç hata.
 Mini icon view	DeskWindow		Ufak simge görünümü
 Geometric size	AttributesView		Geometrik boyut
-contains	SelectionWindow		içerir
+contains	SelectionWindow		şunu içerir:
 Replace	FilePanelPriv		Değiştir
 is not	FindPanel		değil
 Icon view	DeskWindow		Simge görünümü
@@ -262,6 +262,7 @@ ends with	SelectionWindow		ile biter
 Open	OpenWithWindow		Aç
 You must have at least one attribute showing.	PoseView		En azından bir öznitelik görünür olmalı.
 Cut	FilePanelPriv		Kes
+Finish: after several years	StatusWindow		Bitiş: Birkaç yıl içinde
 Favorites	FilePanelPriv		Favoriler
 Point	AttributesView		Nokta
 home	B_USER_DIRECTORY		ev
@@ -384,7 +385,7 @@ Open parent	ContainerWindow		Üst klasörü aç
 Find…	ContainerWindow		Bul…
 moving	FSUtils		taşıdığınız
 Single window navigation	SettingsView		Tek pencereli dolaşım
-greater than	FindPanel		daha büyük
+greater than	FindPanel		şundan büyük:
 Add	FindPanel		Ekle
 Created:	InfoWindow		Oluşturulma:
 Edit Query template	FindPanel		Sorgu şablonunu düzenle

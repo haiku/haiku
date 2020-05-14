@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-libtracker	659027911
+1	catalan; valencian	x-vnd.Haiku-libtracker	1673907665
 Created	ContainerWindow		Creat
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Obre-ho i fes-ho preferit
@@ -262,6 +262,7 @@ ends with	SelectionWindow		acaba amb
 Open	OpenWithWindow		Obre
 You must have at least one attribute showing.	PoseView		Heu de tenir almenys un atribut visible.
 Cut	FilePanelPriv		Retalla
+Finish: after several years	StatusWindow		Acabament: al cap d'uns quants anys
 Favorites	FilePanelPriv		Preferits
 Point	AttributesView		Punt
 home	B_USER_DIRECTORY		inici
@@ -331,7 +332,7 @@ less than	FindPanel		menys que
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Error en copiar el fitxer \"%name\":\n\t%error\n\nVoleu continuar?
 Creating links: 	StatusWindow		Es creen els enllaços: 
 Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		No s'ha pogut obrir \"%document\" amb l'aplicació \"%app\" (%error). 
-Create %s clipping	PoseView		Fes un retall de %s
+Create %s clipping	PoseView		Crea un retall de %s
 Error moving \"%name\"	FSUtils		Error en moure \"%name\"
 To: %dir	StatusWindow		A: %dir
 Paste layout	ContainerWindow		Enganxa la disposició
@@ -488,7 +489,7 @@ Color	AttributesView		Color
 Copy layout	ContainerWindow		Copia la disposició
 Duplicate	ContainerWindow		Duplica
 16-bit integer	AttributesView		Enter de 16 bits
-Untitled clipping	PoseView		Retall sense nom
+Untitled clipping	PoseView		Retall sense títol
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Ja existeix un fitxer amb el nom \"%name\" a la carpeta especificada. El voleu reemplaçar?
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Heu de deixar anar els elements a una de les icones de la finestra \"Discs\".
 Version:	InfoWindow		Versió:

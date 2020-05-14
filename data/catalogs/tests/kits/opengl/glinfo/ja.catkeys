@@ -1,9 +1,24 @@
-1	japanese	x-vnd.Haiku-GLInfo	3678488342
+1	japanese	x-vnd.Haiku-GLInfo	2211760527
+Maximum clipping planes	Capabilities		Maximum clipping planes
+Maximum 2D texture size	Capabilities		Maximum 2D texture size
+Auxiliary buffer(s)	Capabilities		Auxiliary buffer(s)
+Maximum evaluators equation order	Capabilities		Maximum evaluators equation order
+Texture stack size	Capabilities		Texture stack size
 GL Info	System name		GL 情報
 Information	InfoView		情報
-Maximum convolution	Capabilities		最大コンボリュージョン
+Maximum convolution	Capabilities		Maximum convolution
+Attributes stack size	Capabilities		Attributes stack size
+Maximum lights	Capabilities		Maximum lights
+Maximum 3D texture size	Capabilities		Maximum 3D texture size
 Extensions	Extensions		拡張機能
+Maximum recommended index elements	Capabilities		Maximum recommended index elements
 Available extensions	Extensions		利用可能な拡張機能
+Maximum recommended vertex elements	Capabilities		Maximum recommended vertex elements
 Value	Capabilities		値
+Maximum texture units	Capabilities		Maximum texture units
 Capabilities	Capabilities		機能
+Name stack size	Capabilities		Name stack size
+List stack size	Capabilities		List stack size
+Projection stack size	Capabilities		Projection stack size
+Model stack size	Capabilities		Model stack size
 Capability	Capabilities		機能

@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-libtracker	659027911
+1	friulian	x-vnd.Haiku-libtracker	1673907665
 Created	ContainerWindow		Creât
 Icon	AttributesView		Icone
 Open and make preferred	OpenWithWindow		Vierç e rint preferît
@@ -262,6 +262,7 @@ ends with	SelectionWindow		al finìs cun
 Open	OpenWithWindow		Vierç
 You must have at least one attribute showing.	PoseView		Si scugne vê almancul un atribût di mostrâ.
 Cut	FilePanelPriv		Taie
+Finish: after several years	StatusWindow		Finît: dopo tancj agns
 Favorites	FilePanelPriv		Preferîts
 Point	AttributesView		Pont
 home	B_USER_DIRECTORY		home

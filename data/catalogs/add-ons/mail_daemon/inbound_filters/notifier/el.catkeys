@@ -11,4 +11,4 @@ Central beep	NotifierConfigView		Κεντρικό μπίπ
 New messages	NotifierFilter		Νέα μηνύματα
 Method:	NotifierConfigView		Μέθοδος:
 Keyboard LEDs	NotifierConfigView		LED πληκτρολογίου
-You have {0, plural, one{one new message} other{# new messages}} for %account.	NotifierFilter		Έχετε {0, plural, one{ένα νέο μήνυμα} other{# νέα μηνύματα}} για τον %account.
+You have {0, plural, one{one new message} other{# new messages}} for %account.	NotifierFilter		Έχετε {0, plural, one{ένα νέο μήνυμα} other{# νέα μηνύματα}} για τον λογαριασμό %account.

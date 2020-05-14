@@ -11,7 +11,7 @@ Cellular	DeviceClass		Κινητό
 Audio	DeviceClass		Ήχος
 Audio/Video	DeviceClass		Ήχος/Εικόνα
 Car audio	DeviceClass		Ήχος αυτοκινήτου
-Major class: 	DeviceClass		Κύρια ομάδα:
+Major class: 	DeviceClass		Κύρια ομάδα: 
 HiFi audio device	DeviceClass		Συκσκευή ήχου HiFi
 Microphone	DeviceClass		Μικρόφωνο
 Capturing	DeviceClass		Αποκόμιση
@@ -45,14 +45,14 @@ Laptop	DeviceClass		Φορητός υπολογιστής
 67-83% utilized	DeviceClass		67-83% χρησιμοποιείται
 Cordless	DeviceClass		Ασύρματο
 Invalid device class!\n	DeviceClass		Λανθασμένη ομάδα συσκευής!\n
-Minor class: 	DeviceClass		Μικρή ομάδα:
+Minor class: 	DeviceClass		Μικρή ομάδα: 
 Doll/Action figure	DeviceClass		Κούκλα/Φιγούρα δράσης
 Not implemented	RemoteDevice		Δεν εφαρμόζεται
 33-50% utilized	DeviceClass		33-50% χρησιμοποιείται
 Gaming/Toy	DeviceClass		Gaming/Παιχνίδια
 Video camera	DeviceClass		Κάμερα
 Handheld	DeviceClass		Φορητές
-Service classes: 	DeviceClass		Ομάδες υπηρεσιών:
+Service classes: 	DeviceClass		Ομάδες υπηρεσιών: 
 Loudspeaker	DeviceClass		Ηχείο
 83-99% utilized	DeviceClass		83-99% χρησιμοποιείται
 SIM card reader	DeviceClass		Αναγνώστης καρτών SIM
@@ -83,6 +83,6 @@ Camera	DeviceClass		Φωτογραφική μηχανή
 1-17% utilized	DeviceClass		1-17% χρησιμοποιείται
 Combo keyboard/pointing device	DeviceClass		Συνδυασμός πληκτρολογίου/συσκευής κατάδειξης
 Video conferencing	DeviceClass		Τηλε-εικονοδιάσκεψη
-Peripheral	DeviceClass		Περιφερειακό
+Peripheral	DeviceClass		Περιφερειακή συσκευή
 Object transfer	DeviceClass		Μεταφορά αντικειμένου
 Set-top box	DeviceClass		Set-top box

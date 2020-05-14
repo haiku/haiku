@@ -3,7 +3,7 @@ If the application will not quit you may have to kill it.	Team monitor		Αν η 
 Quit application	Team monitor		Κλείσιμο εφαρμογής
 Restart the desktop	Team monitor		Επαννεκίνηση
 Force reboot	Team monitor		Εξαναγκαστική επανεκκίνηση
-Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Επιλέξτε μια εφαρμογή από την παραπάνω λίστα και κάντε κλικ σε ένα από τα πλήκτρα 'Τερματισμός εφαρμογής' και 'Έξοδος εφαρμογής' με σκοπό να την κλείσετε.\n\nΚρατήστε πατημένα τα CONTROL+ALT+DELETE για %ld δευτερόλεπτα για να γίνει επανεκκίνηση.
+Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Επιλέξτε μια εφαρμογή από την παραπάνω λίστα και κάντε κλικ σε ένα από τα πλήκτρα 'Τερματισμός εφαρμογής' και 'Έξοδος εφαρμογής' για να την κλείσετε.\n\nΚρατήστε πατημένα τα πλήκτρα CONTROL+ALT+DELETE για %ld δευτερόλεπτα για να γίνει επανεκκίνηση.
 Team monitor	Team monitor		Οθόνη ομάδας
 Kill application	Team monitor		Σκότωμα διεργασίας
 Cancel	Team monitor		Ακύρωση

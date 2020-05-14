@@ -12,7 +12,7 @@ Filled polygons	TeapotWindow		Polígons plens
 Settings	TeapotWindow		Paràmetres
 Fog	TeapotWindow		Boira
 Backface culling	TeapotWindow		Supressió de cares posteriors
-Z-buffered	TeapotWindow		Z-emmagatzematge intermedi
+Z-buffered	TeapotWindow		Z-memòria intermèdia
 File	TeapotWindow		Fitxer
 Perspective	TeapotWindow		Perspectiva
 GLTeapot	System name		GLTeapot

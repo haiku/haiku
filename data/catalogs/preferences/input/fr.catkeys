@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Input	944408183
+1	french	x-vnd.Haiku-Input	3910661481
 Scrolling	TouchpadPrefView		Défilement
 Defaults	InputMouse		Par défaut
 Tapping	TouchpadPrefView		Tapotement
@@ -14,6 +14,7 @@ Double-click speed	SettingsView		Vitesse du double clic
 5-Button	SettingsView		5-Bouttons
 Typing test area	KeyboardView		Zone de test de frappe
 Mouse type:	SettingsView		Type de souris :
+Revert	InputKeyboard		Rétablir
 Fast	KeyboardView		Rapide
 Off	TouchpadPrefView		Désactivé
 Fast	TouchpadPrefView		Rapide
@@ -26,6 +27,7 @@ OK	TouchpadPrefView		OK
 Horizontal scrolling	TouchpadPrefView		Défilement horizontal
 Delay until key repeat	KeyboardView		Délai avant répétition des touches
 Two finger scrolling	TouchpadPrefView		Défilement à deux doigts
+Input	System name		Entrées
 Mouse acceleration	SettingsView		Accélération de la souris
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Une zone de défilement aussi large pourrait empêcher le fonctionnement normal du pointeur de souris. Est-ce vraiment ce que vous voulez?
 High	TouchpadPrefView		Haut
@@ -37,8 +39,10 @@ Slow	KeyboardView		Lent
 Revert	InputMouse		Rétablir
 Key repeat rate	KeyboardView		Vitesse de répétition
 2-Button	SettingsView		2-Bouttons
+Click to focus and raise	SettingsView		Cliquer pour activer et remonter
 Vertical	TouchpadPrefView		Vertical
 Horizontal	TouchpadPrefView		Horizontal
+Focus mode:	SettingsView		Mode de focus :
 Focus follows mouse	SettingsView		L’activation suit le pointeur
 Double-click test area	SettingsView		Zone de test du double clic
 Sensitivity	TouchpadPrefView		Sensibilité

@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Keymap	3461004711
+1	greek, modern (1453-)	x-vnd.Haiku-Keymap	2062989023
 Key	Modifier keys window	As in a computer keyboard key	Πλήκτρο
 Japanese	KeymapNames		Ιαπωνέζικο
 US	KeymapNames		ΗΠΑ
@@ -6,7 +6,7 @@ PG ↑	Keyboard Layout View	Very short for 'page up'	PG ↑
 Brazilian	KeymapNames		Βραζιλιάνικο
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (ΗΠΑ)
 Right control	Keyboard Layout View		Δεξιό control
-Dvorak	KeymapNames		Ντβόρακ
+Dvorak	KeymapNames		Dvorak
 Cancel	Modifier keys window		Ακύρωση
 Sample and clipboard:	Keymap window		Δείγμα και πρόχειρο:
 Polish	KeymapNames		Πολωνικό
@@ -17,17 +17,19 @@ DEL	Keyboard Layout View		DEL
 United-Kingdom	KeymapNames		Ηνωμένου Βασιλείου
 Turkish (Type-F)	KeymapNames		Τούρκικο (Τύπου-F)
 Serbian (Cyrillic)	KeymapNames		Σέρβικο (Κυριλλικό)
+Belgian (point)	KeymapNames		Βελγικό (point)
 Finnish	KeymapNames		Φινλανδικό
 Num lock	Keyboard Layout View		Num lock
 Switch shortcut keys to Windows/Linux mode	Keymap window		Αλλαγή πλήκτρων συντόμευσης σε λειτουργία Windows/Linux
-Spanish (Dvorak)	KeymapNames		Ισπανικό (Ντβόρακ)
+Spanish (Dvorak)	KeymapNames		Ισπανικό (Dvorak)
 Scroll lock	Keyboard Layout View		Scroll lock
 US-International	KeymapNames		Διεθνές ΗΠΑ
 Turkish (Type-Q)	KeymapNames		Τούρκικο (Τύπου-Q)
 Revert	Modifier keys window		Επαναφορά
 Slovak	KeymapNames		Σλοβακικό
 CAPS LOCK	Keyboard Layout View		CAPS LOCK
-Dvorak (programmer's)	KeymapNames		Ντβόρακ (προγραμματιστή)
+Colemak	KeymapNames		Colemak
+Dvorak (programmer's)	KeymapNames		Dvorak (προγραμματιστή)
 PRINT	Keyboard Layout View		PRINT
 German (Mac)	KeymapNames		Γερμανικό (Mac)
 Arabic (102)	KeymapNames		Αραβικό (102)
@@ -50,17 +52,25 @@ Acute trigger	Keymap window		Οξεία
 Italian	KeymapNames		Ιταλικό
 ThinkPad T400s International	KeyboardLayoutNames		Παγκόσμιο ThinkPad T400s
 Apple Aluminum (US)	KeyboardLayoutNames		Apple Aluminum (ΗΠΑ)
+Kinesis Ergo Elan International	KeyboardLayoutNames		Kinesis Ergo Elan (Παγκόσμιο)
 French (NF Z71-300)	KeymapNames		Γαλλικό (NF Z71-300)
 ThinkPad X1 International	KeyboardLayoutNames		Παγκόσμιο ThinkPad X1
+Kazakh	KeymapNames		Καζακστανικό
 Save as…	Keymap window		Αποθήκευση ως...
 Lithuanian (Standard)	KeymapNames		Λιθουανικό (Standard)
 Bulgarian (Phonetic)	KeymapNames		Βουλγαρικό (Φωνητικό)
+Kinesis Advantage	KeyboardLayoutNames		Kinesis Advantage
 Canadian-French	KeymapNames		Καναδικό-Γαλλικό
-Hungarian	KeymapNames		Ουγγρικό 
+Hungarian	KeymapNames		Ουγγρικό
+Control	Keyboard Layout View	Control key	Control
 Irish	KeymapNames		Ιρλανδικό
+Remove	Keyboard Layout View		Αφαίρεση
 Tilde trigger	Keymap window		Περισπωμένη
-Macedonian	KeymapNames		Μακεδονικό
+Shift	Keyboard Layout View	Shift key	Shift
+CONTROL	Keyboard Layout View		CONTROL
+Macedonian	KeymapNames		Βόρειο Μακεδονικό
 Czech (Mac)	KeymapNames		Τσέχικο (Mac)
+Left command	Keyboard Layout View		Αριστερό command
 Albanian	KeymapNames		Αλβανικό
 (Current)	Keymap window		(Τρέχων)
 OPT	Keyboard Layout View	Very short for 'option'	OPT
@@ -69,11 +79,15 @@ Esperanto	KeymapNames		Εσπεράντο
 Belarusian	KeymapNames		Λευκορώσικο
 Circumflex trigger	Keymap window		Περισπωμένη
 Caps lock	Keyboard Layout View		Caps lock
+Left shift	Keyboard Layout View		Αριστερό shift
 Russian (Yawert)	KeymapNames		Ρώσικο (Yawert)
 ThinkPad X100e International	KeyboardLayoutNames		ThinkPad X100e (Παγκόσμιο)
 Bulgarian (Cyrillic)	KeymapNames		Βουλγαρικό (Κυριλλικό)
 Swedish	KeymapNames		Σουηδικό
+Left control	Keyboard Layout View		Αριστερό control
 CAPS	Keyboard Layout View	Very short for 'caps lock'	CAPS
+Role	Modifier keys window	As in the role of a modifier key	Ρόλος
+Svorak	KeymapNames		Svorak
 ThinkPad X100e (US)	KeyboardLayoutNames		ThinkPad X100e (ΗΠΑ)
 German	KeymapNames		Γερμανικό
 Swiss-German	KeymapNames		Ελβετικό-Γερμανικό
@@ -81,6 +95,7 @@ Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually C
 Czech	KeymapNames		Τσέχικο
 Russian (Udmurt, Komi, Mari)	KeymapNames		Ρώσικο (Ουντμούρτ, Κόμι, Μάρι)
 Thai (TIS-820.2538)	KeymapNames		Ταϊλανδικό (TIS-820.2538)
+Generic 105-key International	KeyboardLayoutNames		Γενικό 105-πλήκτρων (Παγκόσμιο)
 Disabled	Modifier keys window	Do nothing	Απενεργοποιημένο
 Select dead keys	Keymap window		Επιλογή νεκρών πλήκτρων
 Russian (Mac)	KeymapNames		Ρώσικο (Mac)
@@ -118,16 +133,19 @@ System:	Keymap window		Σύστημα:
 ThinkPad International	KeyboardLayoutNames		ThinkPad (Παγκόσμιο)
 Apple Aluminum Extended (US)	KeyboardLayoutNames		Εκτεταμένο Apple Aluminum (ΗΠΑ)
 Switch shortcut keys	Keymap window		Αλλαγή πλήκτρων συντόμευσης
+Right command	Keyboard Layout View		Δεξιό command
 NUM LOCK	Keyboard Layout View		NUM LOCK
 MENU	Keyboard Layout View		MENU
 Belgian (comma)	KeymapNames		Βελγικό (κόμμα)
 Norwegian	KeymapNames		Νορβηγικό
 Font	Keymap window		Γραμματοσειρά
 Danish	KeymapNames		Δανικό
+Generic 104-key	KeyboardLayoutNames		Γενικό 104-πλήκτρων
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Πλήκτρο Shift
 PAUSE	Keyboard Layout View		PAUSE
 Russian	KeymapNames		Ρώσικο
 TypeMatrix 2030	KeyboardLayoutNames		TypeMatrix 2030
+Romanian	KeymapNames		Ρουμανικό
 CMD	Keyboard Layout View	Very short for 'command'	CMD
 Command	Keyboard Layout View	Command key	Command
 SCROLL	Keyboard Layout View		SCROLL

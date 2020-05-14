@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Pulse	3610817163
+1	swedish	x-vnd.Haiku-Pulse	559379362
 Normal mode	DeskbarPulseView		Normalläge
 Info	CPUButton		Information
 Quit	DeskbarPulseView		Avsluta
@@ -16,6 +16,7 @@ Fade colors	ConfigView		Tona färger
 About Pulse…	PulseView		Om Puls...
 Pulse	NormalPulseView		Puls
 Deskbar mode	NormalPulseView		Deskbar-läge
+Pulse settings	PulseApp		Pulse inställningar
 Remove replicant	CPUButton		Ta bort replikant
 You can't disable the last active CPU.	PulseView		Du kan inte inaktivera den sista aktiva CPUn.
 Width of icon:	ConfigView		Ikonbredd:

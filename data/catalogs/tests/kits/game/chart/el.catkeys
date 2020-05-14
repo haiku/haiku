@@ -2,7 +2,7 @@
 Slow rotation	ChartWindow		Αργή περιστροφή
 Pink	ChartWindow		Ρόζ
 Comet	ChartWindow		Κομήτης
-DirectWindow	ChartWindow		Απευθείας Παράθυρο
+DirectWindow	ChartWindow		DirectWindow
 Orange	ChartWindow		Πορτοκαλί
 Refresh rate	ChartWindow		Ρυθμός ανανέωσης
 Blue	ChartWindow		Μπλέ
@@ -11,30 +11,30 @@ Novas	ChartWindow		Novas
 LineArray	ChartWindow		Γραμμή Array
  0.6 f/s  (logarythmic scale)	ChartWindow		0.6 f/s (λογαριθμική κλίμακα)
 Free motion	ChartWindow		Ελεύθερη κίνηση
-(high) 100% 	ChartWindow		(ψηλά) 100%
+(high) 100% 	ChartWindow		(ψηλά) 100% 
 Green	ChartWindow		Πράσινο
 Amas	ChartWindow		Σωρός
-2 threads	ChartWindow		2 τμήματα
+2 threads	ChartWindow		2 νήματα
 Yellow	ChartWindow		Κίτρινο
 Off	ChartWindow		Εκτός
 Chaos	ChartWindow		Χάος
 Full screen	ChartWindow		Πλήρης οθόνη
-Spiral	ChartWindow		Spiral
-Slow motion	ChartWindow		Αργή Κίνηση
+Spiral	ChartWindow		Σπιράλ
+Slow motion	ChartWindow		Αργή κίνηση
  5% (low)	ChartWindow		 5% (χαμηλό)
 Fast motion	ChartWindow		Γρήγορη κίνηση
 Special	ChartWindow		Ειδικό
 Status	ChartWindow		Κατάσταση
-Star density	ChartWindow		Πυκνώτητα αστέρων
+Star density	ChartWindow		Πυκνότητα αστέρων
 600.0 f/s	ChartWindow		600.0 f/s
 Display:	ChartWindow		Οθόνη:
 Space color	ChartWindow		Χρώμα διαστήματος
-White	ChartWindow		Λευκο
+White	ChartWindow		Λευκό
 Chart	System name		Διάγραμμα
 Animation:	ChartWindow		Ζωηρότητα:
-Frames/s	ChartWindow		Frames/s
+Frames/s	ChartWindow		Καρέ/δ
 Auto demo	ChartWindow		Αυτόματη επίδειξη
-CPU load	ChartWindow		Φόρτωση CPU
+CPU load	ChartWindow		Φόρτος επεξεργαστή
 DrawBitmap	ChartWindow		DrawBitmap
 Red	ChartWindow		Κόκκινο
 None	ChartWindow		Κανένα

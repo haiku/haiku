@@ -1,13 +1,29 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Notifications	213548865
+1	greek, modern (1453-)	x-vnd.Haiku-Notifications	2812738601
+Lower left	GeneralView		Κάτω αριστερά
+Application does not have a valid signature	NotificationView	Alert message	Η εφαρμογή δεν έχει έγκυρη υπογραφή
+Status	NotificationView		Κατάσταση
+Add…	NotificationView		Προσθήκη...
+Lower right	GeneralView		Κάτω δεξιά
+Muted	NotificationView		Σε σίγαση
 Window width:	GeneralView		Πλάτος παράθυρου:
 OK	PrefletWin		Εντάξει
 Notifications	PrefletWin		Κοινοποιήσεις
+seconds	GeneralView		δευτερόλεπτα
 Revert	PrefletWin		Επαναφορά
 Applications	PrefletView		Εφαρμογές
+Upper right	GeneralView		Πάνω δεξιά
+An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Προέκυψε ένα σφάλμα κατά την αποθήκευση των προτιμήσεων.\nΕνδεχομένως να μην έχετε αρκετό ελεύθερο χώρο στον δίσκο σας.
+Defaults	PrefletWin		Προεπιλογές
+Upper left	GeneralView		Πάνω αριστερά
 Applications	NotificationView		Εφαρμογές
+Width:	GeneralView		Πλάτος:
 General	PrefletView		Γενικά
 OK	NotificationView		Εντάξει
 Notifications	System name		Notifications
 Allowed	NotificationView		Επιτρεπτό
+Duration:	GeneralView		Διάρκεια:
 Application	NotificationView		Εφαρμογή
 Enable notifications	GeneralView		Ενεργοποίηση κοινοποιήσεων
+This is a test notification message	PrefletWin		Αυτή είναι μία δοκιμαστική ειδοποίηση
+Remove	NotificationView		Αφαίρεση
+Position:	GeneralView		Τοποθεσία:

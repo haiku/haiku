@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-libtracker	659027911
+1	italian	x-vnd.Haiku-libtracker	1673907665
 Created	ContainerWindow		Creato
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Apri e rendi preferito
@@ -262,6 +262,7 @@ ends with	SelectionWindow		finisce con
 Open	OpenWithWindow		Apri
 You must have at least one attribute showing.	PoseView		Non si può avere meno di un attributo visibile.
 Cut	FilePanelPriv		Taglia
+Finish: after several years	StatusWindow		Completato: dopo diversi anni
 Favorites	FilePanelPriv		Preferiti
 Point	AttributesView		Punto
 home	B_USER_DIRECTORY		home

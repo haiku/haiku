@@ -1,4 +1,5 @@
-1	greek, modern (1453-)	x-vnd.Haiku-MediaConverter	2408713367
+1	greek, modern (1453-)	x-vnd.Haiku-MediaConverter	3112740365
+Writing audio track: %d%% complete	MediaConverter		Γίνεται εγγραφή κομματιού ήχου: Ολοκληρώθηκε το %d%%
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Video quality: %3d%%	MediaConverter		Ποιότητα βίντεο: %3d%%
 Source files	MediaConverter		Πηγαία αρχεία
@@ -14,6 +15,7 @@ High	MediaConverter		Υψηλή
 File Error	MediaConverter-FileInfo		Σφάλμα Αρχείου
 None available	Video codecs		Κανένα διαθέσιμο
 Output format	MediaConverter		Τύπος εξαγωγής
+%.1f kHz mono	MediaFileInfo		%.1f kHz μονοφωνικό
 OK	MediaConverter		Εντάξει
 Error creating '%filename'	MediaConverter		Σφάλμα κατά τη δημιουργία του '%filename'
 Error loading a file	MediaConverter		Σφάλμα κατά τη φόρτωση ενός αρχείου
@@ -32,15 +34,16 @@ Conversion cancelled	MediaConverter		Η μετατροπή ακυρώθηκε
 Low	MediaConverter		Χαμηλή
 Error loading files	MediaConverter		Σφάλμα κατά τη φόρτωση των αρχείων
 {0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# bit} other{# bits}}
-End   [ms]: 	MediaConverter		Τέλος [ms]:
+End   [ms]: 	MediaConverter		Τέλος [ms]: 
 Cancel	MediaConverter		Άκυρο
 OK	MediaConverter-FileInfo		Εντάξει
 Video encoding:	MediaConverter		Κωδικοποίηση βίντεο:
-An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Προέκυψε ένα σφάλμα κατά την ανάγνωση των πληροφοριών του αρχείου.\n\nΣφάλμα:
+An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Προέκυψε ένα σφάλμα κατά την ανάγνωση των πληροφοριών του αρχείου.\n\nΣφάλμα: 
 Error	MediaConverter		Σφάλμα
 File details	MediaConverter		Λεπτομέρειες αρχείου
 No audio	Audio codecs list		Χωρίς ήχο
 Drop media files onto this window	MediaConverter		Drop media files onto this window
+{0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# καρέ} other{# καρέ}}
 Quit	Menu		Έξοδος
 Duration:	MediaConverter-FileInfo		Διάρκεια:
 MediaConverter	System name		Μετατροπέας Μέσων
@@ -49,11 +52,12 @@ File format:	MediaConverter		Μορφή αρχείου:
 File	Menu		Αρχείο
 Video quality not supported	MediaConverter		Η ποιότητα βίντεο δεν υποστηρίζεται
 Select this folder	MediaConverter		Επιλέξτε αυτό τον φάκελο
-%d bit 	MediaFileInfo		%d bit
+%d bit 	MediaFileInfo		%d bit 
 No video	Video codecs list		Χωρίς βίντεο
 Continue	MediaConverter		Συνέχεια
 Convert	MediaConverter		Μετατροπή
 Audio quality not supported	MediaConverter		Η ποιότητα ήχου δεν υποστηρίζεται
 Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Σφάλμα εγγραφής στην τοποθεσία: %strPath%. Θα χρησιμοποιηθεί η τοποθεσία: /boot/home
+Writing video track: %d%% complete	MediaConverter		Γίνεται εγγραφή κομματιού βίντεο: Ολοκληρώθηκε το %d%%
 Preview	MediaConverter		Προεπισκόπηση
-Start [ms]: 	MediaConverter		Αρχή [ms]:
+Start [ms]: 	MediaConverter		Αρχή [ms]: 

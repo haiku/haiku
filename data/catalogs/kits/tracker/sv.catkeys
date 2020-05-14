@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	659027911
+1	swedish	x-vnd.Haiku-libtracker	1673907665
 Created	ContainerWindow		Skapad
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Öppna och gör till förval
@@ -262,6 +262,7 @@ ends with	SelectionWindow		slutar med
 Open	OpenWithWindow		Öppna
 You must have at least one attribute showing.	PoseView		Du måste ha minst ett attribut synligt.
 Cut	FilePanelPriv		Klipp ut
+Finish: after several years	StatusWindow		Slutför: efter flera år
 Favorites	FilePanelPriv		Favoriter
 Point	AttributesView		Punkt
 home	B_USER_DIRECTORY		hem

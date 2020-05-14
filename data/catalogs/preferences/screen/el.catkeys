@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Screen	1388881963
+1	greek, modern (1453-)	x-vnd.Haiku-Screen	133788249
 no	Screen		όχι
 bits/pixel	Screen		bits/εικονοστοιχείο
 15 bits/pixel, 32768 colors	Screen		15 bits/εικονοστοιχείο, 32768 χρώματα
@@ -15,8 +15,10 @@ OK	Screen		Εντάξει
 Current workspace	Screen		Τρέχων χώρος εργασίας
 vertically	Screen		κάθετα
 All workspaces	Screen		Όλοι οι χώροι εργασίας
-Use laptop panel:	Screen		Χρήση πανελ φορητού υπολογιστή:
+Use laptop panel:	Screen		Χρήση πάνελ φορητού υπολογιστή:
 Could not write VESA mode settings file:\n\t	Screen		Αδυναμία εγγραφής του αρχείο ρυθμίσεων της λειτουργίας VESA:\n\t
+Display info	Screen		Πληροφορίες οθόνης
+Settings will revert in %seconds.	Screen		Θα γίνει επαναφορά σε %seconds.
 Cancel	Screen		Άκυρο
 Other…	Screen		Άλλο...
 Screen	Screen		Οθόνη
@@ -27,10 +29,12 @@ Swap displays:	Screen		Ανταλαγή οθόνης:
 8 bits/pixel, 256 colors	Screen		8 bits/εικονοστοιχείο, 256 χρώματα
 Revert	Screen		Επαναφορά
 always	Screen		πάντα
+Confirm changes	Screen		Επιβεβαίωση αλλαγών
 Warning	Screen		Προσοχή
 24 bits/pixel, 16 Million colors	Screen		24 bits/εικονοστοιχείο, 16 Εκατομμύρια χρώματα
 Hz	Screen		Hz
 Workspaces	Screen		Χώροι Εργασίας
+Brightness:	Screen		Φωτεινότητα
 32 bits/pixel, 16 Million colors	Screen		32 bits/εικονοστοιχείο, 16 Εκατομμύρια χρώματα
 Done	Screen		Έγινε
 16 bits/pixel, 65536 colors	Screen		16 bits/εικονοστοιχείο, 65536 χρώματα
@@ -39,7 +43,7 @@ Refresh rate	Screen		ρυθμός ανανέωσης
 if needed	Screen		εαν χρειάζεται
 Combine displays:	Screen		συνδιασμός οθόνων:
 Unknown mode	Screen		Άγνωστη λειτουργία
-About	Screen		Περί
+About	Screen		Σχετικά
 Columns:	Screen		Στήλες:
 Resolution:	Screen		Ανάλυση
 Apply	Screen		Εφαρμογή

@@ -1,6 +1,7 @@
-1	greek, modern (1453-)	x-vnd.Haiku-SpamFilter	160316705
+1	greek, modern (1453-)	x-vnd.Haiku-SpamFilter	468104950
 or empty e-mail	SpamFilterConfig		ή κενό e-mail
 Genuine below and uncertain above:	SpamFilterConfig		Γνήσιο κάτω και άγνωστο επάνω:
 Spam above:	SpamFilterConfig		Spam επάνω:
 Add spam rating to start of subject	SpamFilterConfig		Προσθήκη βαθμολογίας spam στην αρχή του θέματος
+Bayesian Spam Filter	SpamFilter		Μπευζιανό Φίλτρο Spam
 Learn from all incoming e-mail	SpamFilterConfig		Ενημέρωση από όλα τα εισερχόμενα e-mail

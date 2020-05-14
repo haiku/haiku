@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.haiku-softwareupdater	2933880419
+1	greek, modern (1453-)	x-vnd.haiku-softwareupdater	2995097143
 Updating version	SoftwareUpdaterWindow	List item text	Ενημέρωση έκδοσης
 Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Πατήστε εδώ για να εγκαταστήσετε {0, plural, one{# ενημερωμένο πακέτο} other{# ενημερωμένα πακέτα}}.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Πακέτα προς απεγκατάσταση
@@ -29,6 +29,8 @@ Applying changes	UpdateManager		Γίνεται εφαρμογή αλλαγών
 Full sync	SoftwareUpdaterWindow	Alert button label	Πλήρης συγχρονισμός
 Quit	SoftwareUpdaterWindow	Button label	Έξοδος
 Updates have been successfully installed.	UpdateManager		Οι ενημερώσεις εγκαταστάθηκαν με επιτυχία.
+Exception occurred while checking for updates: %s\n	CheckAction		Προέκυψε σφάλμα κατά τον έλεγχο για ενημερώσεις: %s\n
+Packages are being updated	UpdateManager		Τα πακέτα ενημερώνονται
 Cancel	SoftwareUpdaterWindow		Ακύρωση
 Don't quit	SoftwareUpdaterWindow		Να μην γίνει έξοδος
 Checking for updates	SoftwareUpdaterWindow		Γίνεται έλεγχος για ενημερώσεις
@@ -36,6 +38,9 @@ Updates completed	UpdateManager		Οι ενημερώσεις ολοκληρώθ�
 Reboot	SoftwareUpdaterWindow		Επανεκκίνηση
 Show more details	SoftwareUpdaterWindow		Εμφάνιση περισσότερων λεπτομερειών
 Installing version	SoftwareUpdaterWindow	List item text	Γίνεται εγκατάσταση έκδοσης
+Checking for updates	CheckManager		Γίνεται έλεγχος για ενημερώσεις
+No remote repositories are available	UpdateManager	Error message	Δεν υπάρχουν διαθέσιμα απομακρυσμένα αποθετήρια
+Software {0, plural, one{update} other{updates}} available	CheckManager		{0, plural, one{Υπάρχει διαθέσιμη ενημέρωση λογισμικού} other{Υπάρχουν διαθέσιμες ενημερώσεις λογισμικού}}
 Reboot	SoftwareUpdaterWindow	Button label	Επανεκκίνηση
 Update	SoftwareUpdaterWindow	Alert button label	Ενημέρωση
 Open Repositories	SoftwareUpdaterWindow	Alert button label	Άνοιγμα Αποθετηρίων
@@ -43,4 +48,5 @@ Updates did not complete	UpdateAction		Οι ενημερώσεις δεν ολο
 Uninstalling version	SoftwareUpdaterWindow	List item text	Απεγκατάσταση έκδοσης
 Quit	SoftwareUpdaterWindow		Έξοδος
 No updates available	CheckManager		Δεν υπάρχουν διαθέσιμες ενημερώσεις
+No remote repositories are available. Please verify that some repositories are enabled using the Repositories preflet or the 'pkgman' command.	SoftwareUpdaterWindow	Error message	Δεν υπάρχουν διαθέσιμα απομακρυσμένα αποθετήρια. Παρακαλώ ελέγξτε ότι υπάρχουν ενεργά αποθετήρια στα Αποθετήρια ή με την εντολή 'pkgman'.
 Downloading packages	UpdateManager		Γίνεται λήψη πακέτων

@@ -1,12 +1,14 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Pairs	3963276988
+1	greek, modern (1453-)	x-vnd.Haiku-Pairs	3509888767
 Pairs	System name		Pairs
 Quit	PairsWindow		Έξοδος
 Game	PairsWindow		Παιχνίδι
 Expert (8x8)	PairsWindow		Προχωρημένος (8x8)
 New	PairsWindow		Νέο
 OK	Pairs		Εντάξει
+Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	Το Pairs δεν βρήκε αρκετά εικονίδια για να ξεκινήσει-- χρειάζονται τουλάχιστον%zu, βρέθηκαν %zu.\n
 You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWindow		Ολοκληρώσατε το παιχνίδι σε {0, plural, one{# κλικ} other{# κλικ}}.\n
 Size	PairsWindow		Μέγεθος
+%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n	PairsWindow		%app%\n\tαναπτύχθηκε από τον Ralf Schülke\n\tΠνευματική ιδιοκτησία 2008-2010, Haiku Inc.\n\n
 Quit game	PairsWindow		Έξοδος παιχνιδιού
 Beginner (4x4)	PairsWindow		Αρχάριος (4x4)
 Intermediate (6x6)	PairsWindow		Ενδιάμεσος (6x6)

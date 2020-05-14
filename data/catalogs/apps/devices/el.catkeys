@@ -1,8 +1,12 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Devices	1806206021
+1	greek, modern (1453-)	x-vnd.Haiku-Devices	2250980951
 ACPI bus	DevicesView		Δίαυλος ACPI
 Encryption controller	Device		Ελεγκτής κρυπτογράφησης
+Bus Information	Device		Πληροφορίες Διαύλου
 Devices	System name		Συσκευές
+Graphics Peripheral	DeviceSCSI		Περιφερειακή Συσκευή Γραφικών
 Processor	Device		Επεξεργαστής
+Generate system information	DevicesView		Πληροφορίες συστήματος
+Class info	DevicePCI		Πληροφορίες κλάσης
 ACPI Information	DeviceACPI		Πληροφορίες για το ACPI
 Detailed	DevicesView		Αναλυτικό
 Computer	DevicesView		Υπολογιστής
@@ -33,6 +37,7 @@ PCI bus	DevicesView		Δίαυλος PCI
 ACPI System Indicator	DeviceACPI		Δείκτης Συστήματος ACPI
 ACPI System Bus	DeviceACPI		Δίαυλος Συστήματος ACPI
 PCI Information	DevicePCI		Πληροφορίες PCI
+Tape Drive	DeviceSCSI		Κασέτα
 Changer	DeviceSCSI		Αλλαγή
 Serial bus controller	Device		Ελεγκτής σειριακού διαύλου
 Refresh devices	DevicesView		Ανανέωση συσκευών
@@ -42,7 +47,7 @@ None	Device		Τίποτα
 Device paths	Device		Διαδρομές συσκευών
 Unknown device	Device		Άγνωστη συσκευή
 Wireless controller	Device		Ελεγκτής ασύρματων τηλεπικοινωνιών
-Generic system peripheral	Device		Γενικά περιφερειακά συστήματος
+Generic system peripheral	Device		Τυπική περιφερειακή συσκευή συστήματος
 Value	PropertyList		Τιμή
 Devices	DevicesView		Συσκευές
 Device name	DeviceACPI		Όνομα συσκευής
@@ -51,7 +56,7 @@ Display controller	Device		Ελεγκτής γραφικών
 Basic information	DevicesView		Βασικές πληροφορίες
 ACPI Button '%1'	DeviceACPI		Κουμπί ACPI '%1'
 Bus	DevicesView		Δίαυλος
-ACPI <unknown>	DeviceACPI		ACPI <unknown>
+ACPI <unknown>	DeviceACPI		ACPI <άγνωστο>
 Device name	DevicePCI		Όνομα συσκευής
 Disk Drive	DeviceSCSI		Οδηγός Δίσκου
 Other	DeviceSCSI		Άλλο
@@ -60,6 +65,7 @@ Computer	Device		Υπολογιστής
 PCI bus	Device		Δίαυλος PCI
 Order by:	DevicesView		Κατανομή κατά:
 ACPI Thermal Zone	DeviceACPI		Θερμική Ζώνη ACPI
+Intelligent controller	Device		Έξυπνος ελεγκτής
 Multimedia controller	Device		Ελεγκτής πολυμέσων
 Quit	DevicesView		Έξοδος
 ISA bus	Device		Δίαυλος ISA
@@ -72,6 +78,7 @@ Worm	DeviceSCSI		Σκώληκας
 CD-ROM	DeviceSCSI		CD-ROM
 Manufacturer	DevicePCI		Κατασκευαστής
 Bridge	DeviceSCSI		Γέφυρα
+Signal processing controller	Device		Ελεγκτής επεξεργασίας σημάτων
 Device name	DeviceSCSI		Όνομα συσκευής
 Docking station	Device		Σταθμός σύνδεσης
 Unclassified device	Device		Απροσδιόριστη συσκευή

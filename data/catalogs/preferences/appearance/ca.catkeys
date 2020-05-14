@@ -73,7 +73,7 @@ Document text	Colors tab		Text del document
 Inactive window border	Colors tab		Vora de la finestra inactiva
 Colors	APRWindow		Colors
 About control look	DecorSettingsView		Quant al Control d'aparença
-Control highlight	Colors tab		Control de realçat
+Control highlight	Colors tab		Control de realçament
 Status bar	Colors tab		Barra d'estat
 Link hover	Colors tab		Pas per l'enllaç
 Single:	DecorSettingsView		Senzill

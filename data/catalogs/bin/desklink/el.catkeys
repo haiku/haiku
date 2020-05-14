@@ -4,7 +4,7 @@ Sound preferences…	MediaReplicant		Προτιμήσεις ήχου...
 Muted	MediaReplicant		Σε σίγαση
 %g dB	MediaReplicant		%g dB
 OK	MediaReplicant		Εντάξει
-Couldn't launch 	MediaReplicant		Δεν μπορεί να γίνει εκκίνηση
+Couldn't launch 	MediaReplicant		Δεν μπορεί να γίνει εκκίνηση 
 Volume	VolumeControl		Ένταση
 Open MediaPlayer	MediaReplicant		Ανοίξετε το MediaPlayer
 %d dB	VolumeControl		%d dB

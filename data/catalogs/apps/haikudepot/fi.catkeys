@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-HaikuDepot	3381858533
+1	finnish	x-vnd.Haiku-HaikuDepot	1107427137
 Repository update error	LocalRepositoryUpdateProcess		Tietovaraston päivitysvirhe
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Tietovaraston päivityksen yhteydessä tapahtui virhe: %error%
 User Created	UserLoginWindow		Käyttäjän luoma
@@ -54,6 +54,7 @@ Package action failed	PackageInfoView		Pakettitoiminta epäonnistui
 No changelog available.	PackageInfoView		Mitään muutoslokia ei ole saatavilla.
 Error	App		Virhe
 There was a puzzling response from the web service.	UserLoginWindow		Webbipalvelun vastaus oli pulmallinen.
+Version	PackageListView		Versio
 Not logged in	MainWindow		Et ole kirjautunut sisään
 No, quit HaikuDepot	App		Ei, poistu HaikuVarastosta
 Featured packages	FeaturedPackagesView		Jakeluversiopakkaukset

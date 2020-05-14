@@ -1,8 +1,10 @@
-1	greek, modern (1453-)	x-vnd.Be-MAIL	4198339674
+1	greek, modern (1453-)	x-vnd.Be-MAIL	729467566
+Text wrapping:	Mail		Αναδίπλωση κειμένου:
 Show icons & labels	Mail		Εμφάνιση εικονιδίων & ετικετών
 (Date unavailable)	Mail		(Μη διαθέσιμη ημερομηνία)
 Reply	Mail		Απάντηση
 Next message	Mail		Επόμενο μήνυμα
+Unread	Mail		Μη αναγνωσμένα
 Same sender	Mail		Ίδιος αποστολέας
 Copy to new	Mail		Αντιγραφή σε νέο
 Save as draft	Mail		Αποθήκευση ως πρόχειρο
@@ -15,8 +17,11 @@ New	Mail		Νέο
 Save	Mail		Αποθήκευση
 Undo	Mail		Αναίρεση
 Button bar:	Mail		Μπάρα πλήκτρου:
+%e wrote:\\n	Mail		Ο/Η %e έγραψε:\\n
+Save changes to this signature?	Mail		Να αποθηκευτούν οι αλλαγές στην υπογραφή;
 Save attachment…	Mail		Αποθήκευση επισύναψης…
 Paste	Mail		Επικόλληση
+E-mail draft could not be saved!	Mail		Δεν ήταν δυνατή η αποθήκευση του προχείρου E-mail!
 sent	B_USER_DIRECTORY/mail/sent		εστάλη
 Close	Mail		Κλείσιμο
 Untitled	Mail		Χωρίς τίτλο
@@ -35,21 +40,29 @@ UTF-8	Mail	This string is used as a key to set default message compose encoding.
 Quit	Mail		Έξοδος
 Title:	Mail		Τίτλος:
 %e - E-mail address	Mail		%e - Διεύθυνση ηλεκτρονικού ταχυδρομείου
+No matches	Mail		Κανένα αποτέλεσμα
+Queries	Mail		Αναζητήσεις
 Cut	Mail		Αποκοπή
 Reply to sender	Mail		Απάντηση στον αποστολέα
+\\n - Newline	Mail		\\n - Νέα γραμμή
 Copy	Mail		Αντιγραφή
 Add signature	Mail		Προσθήκη υπογραφής
 %n - Full name	Mail		%n - Πλήρες όνομα
 Signature	Mail		Υπογραφή
 Use default account	Mail		Χρήση προεπιλεγμένου λογαριασμού
 draft	B_USER_DIRECTORY/mail/draft		πρόχειρο
+Really delete this signature? This cannot be undone.	Mail		Είστε σίγουρος ότι θέλετε να διαγράψετε την υπογραφή αυτή; Αυτό δεν μπορεί να αναιρεθεί.
 spam	B_USER_DIRECTORY/mail/spam		ανεπιθύμητη αλληλογραφία
 Reply to all	Mail		Απάντηση σε όλους
 Cancel	Mail		Ακύρωση
+Off	Mail		Κλειστό
+Set to %s	Mail		Ορισμός σε %s
 Signature:	Mail		Υπογραφή:
 Forward without attachments	Mail		Προώθηση χωρίς επισυνάψεις
+queries	B_USER_DIRECTORY/mail/queries		αναζητήσεις
 View	Mail		Προβολή
 Signatures	Mail		Υπογραφές
+On	Mail		Ανοιχτό
 Find	Mail		Εύρεση
 Date:	Mail		Ημερομηνία:
 Expert	Mail		Έμπειρος
@@ -66,12 +79,17 @@ Random	Mail		Τυχαίο
 Attach attributes:	Mail		Επισύναψη ιδιοτήτων:
 Find again	Mail		Εύρεση ξανά
 Size:	Mail		Μέγεθος:
+To:	Mail		Προς:
+The mail_daemon could not be started:\n\t	Mail		Το mail_daemon δεν μπόρεσε να ξεκινήσει:\n\t
+<no account found>	Mail		<δεν βρέθηκε λογαριασμός>
+Mail preferences	Mail		Προτιμήσεις Mail
 helpful message	Mail		βοηθητικό μήνυμα
 Font:	Mail		Γραμματοσειρά:
 Accounts…	Mail		Λογαριασμοί…
 Previous	Mail		Προηγούμενο
+Include file attributes in attachments	Mail		Να συμπεριληφθούν οι ιδιότητες του αρχείου στις επισυνάψεις
 (Name unavailable)	Mail		(Μη διαθέσιμο όνομα)
-Move to trash	Mail		Μετακίνηση στον κάδο απορριμάτων
+Move to trash	Mail		Μετακίνηση στον Κάδο Απορριμάτων
 <none>	Mail		<κανένα>
 %d - Date	Mail		%d - Ημερομηνία
 Check spelling	Mail		Ορθογραφικός έλεγχος
@@ -80,21 +98,27 @@ Settings…	Mail		Ρυθμίσεις…
 Trash	Mail		Κάδος Απορριμάτων
 Find…	Mail		Εύρεση…
 Select all	Mail		Επιλογή όλων
+Show header	Mail		Εμφάνιση κεφαλίδας
 Reply account:	Mail		Απάντηση λογαριασμού:
 Sorry	Mail		Συγνώμη
 Forward	Mail		Προώθηση
 Open attachment	Mail		Άνοιγμα επισύναψης
+Save this message as a draft before closing?	Mail		Να αποθηκευτεί το μήνυμα αυτό ως πρόχειρο πριν από το κλείσιμο;
+The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Το mail_daemon δεν εκτελείται. Το μήνυμα έχει προστεθεί στην ουρά και θα αποσταλεί όταν ξεκινήσει το mail_daemon.
+None	Mail		Κανένα
 Resend	Mail		Επαναποστολή
 Hide	Mail		Απόκρυψη
 From:	Mail		Από:
+No file attributes, just plain data	Mail		Να μην συμπεριληφθεί καμία ιδιότητα αρχείου, μόνο τα δεδομένα του αρχείου
 Add	Mail		Προσθήκη
 Open	Mail		Άνοιγμα
 Don't save	Mail		Χωρίς αποθήκευση
 An error occurred trying to save the attachment.	Mail		Παρουσιάστηκε ένα σφάλμα, κατά την αποθήκευση του συνημμένου.
 Save address	Mail		Αποθήκευση διεύθυνσης
-There is no installed handler for URL links.	Mail		Δεν έχει εγκατασταθεί χειριστής για τις συνδέσεις URL.
+There is no installed handler for URL links.	Mail		Δεν έχει εγκατασταθεί χειριστής για υπερσυνδέσμους.
 File	Mail		Αρχείο
 New mail message	Mail		Νέο μήνυμα ταχυδρομείου
+An error occurred trying to open this signature.	Mail		Προέκυψε ένα σφάλμα κατά το άνοιγμα της υπογραφής.
 Edit signatures…	Mail		Επεξεργασία υπογραφών…
 User interface	Mail		Διεπαφή χρήστη
 Inconsistency occurred in the undo/redo buffer.	Mail		Παρουσιάστηκε ασυνέπεια κατά την αναίρεση/ακύρωση αναίρεσης της ενδιάμεσης μνήμης
@@ -102,6 +126,7 @@ Remove attachment	Mail		Διαγραφή συνημμένου
 Set to…	Mail		Ορισμός σε...
 Edit	Mail		Επεξεργασία
 Page setup…	Mail		Ρυθμίσεις σελίδας...
+An error occurred trying to save this signature.	Mail		Προέκυψε ένα σφάλμα κατά την αποθήκευση της υπογραφής.
 Beginner	Mail		Αρχάριος
 Send message	Mail		Αποστολή μηνύματος
 Delete	Mail		Διαγραφή

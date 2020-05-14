@@ -1,9 +1,24 @@
-1	finnish	x-vnd.Haiku-GLInfo	3678488342
+1	finnish	x-vnd.Haiku-GLInfo	2211760527
+Maximum clipping planes	Capabilities		Enimmäisleikkaustasot
+Maximum 2D texture size	Capabilities		Enimmäiskoko 2D-tekstuurille
+Auxiliary buffer(s)	Capabilities		Lisäpuskuri(t)
+Maximum evaluators equation order	Capabilities		Arvioijien enimmäismäärän yhtälöjärjestys
+Texture stack size	Capabilities		Tekstuuripinokoko
 GL Info	System name		GL-tiedot
 Information	InfoView		Tiedot
 Maximum convolution	Capabilities		Enimmäismonimutkaisuus
+Attributes stack size	Capabilities		Attribuuttien pinokoko
+Maximum lights	Capabilities		Enimmäisvalot
+Maximum 3D texture size	Capabilities		Enimmäiskoko 3D-tekstuurille
 Extensions	Extensions		Laajennukset
+Maximum recommended index elements	Capabilities		Hakemistoelementtien suositeltu enimmäismäärä
 Available extensions	Extensions		Käytettävissä olevat laajennukset
+Maximum recommended vertex elements	Capabilities		Kärkielementtien suositeltu enimmäismäärä
 Value	Capabilities		Arvo
+Maximum texture units	Capabilities		Tekstuuriyksiköiden enimmäismäärä
 Capabilities	Capabilities		Ominaisuudet
+Name stack size	Capabilities		Nimipinokoko
+List stack size	Capabilities		Luettelopinokoko
+Projection stack size	Capabilities		Projektiopinokoko
+Model stack size	Capabilities		Mallipinokoko
 Capability	Capabilities		Kyky

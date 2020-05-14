@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Pulse	3610817163
+1	finnish	x-vnd.Haiku-Pulse	559379362
 Normal mode	DeskbarPulseView		Normaalitila
 Info	CPUButton		Tiedot
 Quit	DeskbarPulseView		Lopeta
@@ -16,6 +16,7 @@ Fade colors	ConfigView		Haalista värit
 About Pulse…	PulseView		Ohjelmasta Pulssi...
 Pulse	NormalPulseView		Pulssi
 Deskbar mode	NormalPulseView		Työpöytäpalkkitila
+Pulse settings	PulseApp		Pulssiasetukset
 Remove replicant	CPUButton		Poista kopio
 You can't disable the last active CPU.	PulseView		Et voi ottaa pois käytöstä viimeistä käytössä olevaa prosessoria.
 Width of icon:	ConfigView		Kuvakkeen leveys:

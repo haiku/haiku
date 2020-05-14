@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-SoundRecorder	3186219592
+1	greek, modern (1453-)	x-vnd.Haiku-SoundRecorder	24440888
 Loop	RecorderWindow		Βρόχος
 Cannot find default audio hardware	RecorderWindow		Αδυναμία εύρεσης προεπιλεγμένου υλικού ήχου
 Cannot find the temporary file created to hold the new recording	RecorderWindow		Αδυναμία εύρεσης του προσωρινού αρχείου που δημιουργήθηκε για να κρατήσει τη νέα ηχογράφηση
@@ -11,6 +11,7 @@ Drop files here	SoundListView		Σύρετε τα αρχεία εδώ
 Input	RecorderWindow		Είσοδος
 Some of the files don't appear to be audio files.	RecorderWindow		Μερικά από τα αρχεία δεν φαίνονται να είναι αρχεία ήχου.
 Stop	RecorderWindow		Σταμάτα
+Format:	RecorderWindow		Μορφή:
 Sound List	RecorderWindow		Λίστα ήχου
 Compression: 	RecorderWindow		Συμπίεση: 
 Rewind	RecorderWindow		Προς τα πίσω
@@ -27,18 +28,19 @@ Channels:	RecorderWindow		Κανάλια:
  bits	RecorderWindow		 bits
 None	RecorderWindow		Κανένα
 Record	RecorderWindow		Εγγραφή
-Sample size: 	RecorderWindow		Μέγεθος δειγματοληψίας:
+Sample size: 	RecorderWindow		Μέγεθος δειγματοληψίας: 
 Cannot recognize this file as a media file	RecorderWindow		Δεν είναι δυνατή η αναγνώριση αυτού του αρχείου ως αρχείο πολυμέσων
-Format: 	RecorderWindow		Μορφοποίηση:
-File name: 	RecorderWindow		Όνομα αρχείου:
+Format: 	RecorderWindow		Μορφή: 
+File name: 	RecorderWindow		Όνομα αρχείου: 
 Cannot connect to the selected sound input	RecorderWindow		Αδυναμία σύνδεσης με την επιλεγμένη είσοδο ήχου
 Cannot get the file to play	RecorderWindow		Αδυναμία εύρεσης του αρχείου για αναπαραγωγή
 Cannot record a sound that long	RecorderWindow		Αδυναμία εγγραφής ήχου μεγάλης διάρκειας
 Duration:	RecorderWindow		Διάρκεια:
 Compression:	RecorderWindow		Συμπίεση:
 Cannot find an unused name to use for the new recording	RecorderWindow		Αδυναμία εύρεσης αχρησιμοποίητου ονόματος για να χρησιμοποιηθεί στη νέα ηχογράφηση
-Channels: 	RecorderWindow		Κανάλια:
+Channels: 	RecorderWindow		Κανάλια: 
 Save	RecorderWindow		Αποθήκευση
 Sample rate: 	RecorderWindow		Ρυθμός δειγματοληψίας: 
+Cannot connect to media server	RecorderWindow		Δεν ήταν δυνατή η σύνδεση στον διακομιστή πολυμέσων
 The file doesn't appear to be an audio file.	RecorderWindow		Το αρχείο δεν φαίνεται να είναι αρχείο ήχου.
 File name:	RecorderWindow		Όνομα αρχείου:

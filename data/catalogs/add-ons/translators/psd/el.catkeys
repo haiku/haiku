@@ -1,5 +1,7 @@
-1	greek, modern (1453-)	x-vnd.Haiku-PSDTranslator	4287177312
+1	greek, modern (1453-)	x-vnd.Haiku-PSDTranslator	3654055550
+Lab	PSDLoader		Εργαστήριο
 Uncompressed	PSDConfig		Αποσυμπιεσμένο
+Indexed	PSDLoader		Έχει καταλογογραφεί
 Grayscale	PSDLoader		Αποχρώσεις του γκρι
 Photoshop image translator	PSDConfig		Μετατροπέας εικόνας Photoshop
 Photoshop image translator	PSDTranslator		Μετατροπέας εικόνας Photoshop
@@ -14,7 +16,7 @@ PSDTranslator Settings	PSDConfig		Ρυθμίσεις μετατροπέα εικ
 RGB	PSDLoader		RGB
 Bitmap	PSDLoader		Bitmap
 CMYK	PSDLoader		CMYK
-Compression: 	PSDConfig		Συμπίεση:
-Format: 	PSDConfig		Μορφοποίηση:
+Compression: 	PSDConfig		Συμπίεση: 
+Format: 	PSDConfig		Μορφοποίηση: 
 Multichannel	PSDLoader		Πολυκάναλο
 Duotone	PSDLoader		Δυτονικό

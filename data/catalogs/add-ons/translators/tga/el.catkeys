@@ -6,7 +6,7 @@ Targa image (%d bits colormap)	TGATranslator		Εικόνα Targa (%d bits colorm
 TGA image translator	TGAView		Μετατροπέας εικόνας TGA
 Targa image (%d bits RLE colormap)	TGATranslator		Εικόνα Targa (%d bits RLE colormap)
 Targa image (%d bits gray)	TGATranslator		Εικόνα Targa (%d bits gray)
-Written by the Haiku Translation Kit Team	TGAView		Γράφτηκε από την ομάδα του Haiku Translation Kit 
+Written by the Haiku Translation Kit Team	TGAView		Αναπτύχθηκε από την ομάδα του Haiku Translation Kit
 Targa image (%d bits RLE truecolor)	TGATranslator		Εικόνα Targa (%d bits RLE truecolor)
 TGA images	TGATranslator		TGA εικόνες
 Version %d.%d.%d, %s	TGAView		Έκδοση %d.%d.%d, %s

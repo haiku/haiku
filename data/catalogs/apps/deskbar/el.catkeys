@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Be-TSKB	368469040
+1	greek, modern (1453-)	x-vnd.Be-TSKB	2656653225
 Power off	DeskbarMenu		Απενεργοποίηση
 Sort applications by name	PreferencesWindow		Ταξινόμηση εφαρμογών κατά όνομα
 Suspend	DeskbarMenu		Αναστολή
@@ -18,29 +18,30 @@ Menu	PreferencesWindow		Μενού
 Recent documents	DeskbarMenu		Πρόσφατα έγγραφα
 Auto-hide	PreferencesWindow		Αυτόματη Απόκρυψη
 Always on top	PreferencesWindow		Πάντα στην κορυφή
-<Deskbar folder is empty>	DeskbarMenu		<Ο φάκελος Deskbar είναι άδειος>
+<Deskbar folder is empty>	DeskbarMenu		<Ο φάκελος γραμμής εργασιών είναι άδειος>
 Show all	WindowMenu		Εμφάνιση όλων
 No windows	WindowMenu		Χωρίς παράθυρα
-Deskbar	System name		Deskbar
+Deskbar	System name		Γραμμή Εργασιών
 Restart system	DeskbarMenu		Επανεκκίνηση συστήματος
 Large	PreferencesWindow		Μεγάλο
 Auto-raise	PreferencesWindow		Αυτόματη-ανύψωση
 Recent folders:	PreferencesWindow		Πρόσφατοι φάκελοι:
 Show application expander	PreferencesWindow		Εμφάνιση της εφαρμογής Επεκτατής
 Close all	WindowMenu		Κλείσιμο όλων
-Deskbar preferences	PreferencesWindow		Προτιμήσεις Deskbar
+Deskbar preferences	PreferencesWindow		Προτιμήσεις Γραμμής Εργασιών
 Mount	DeskbarMenu		Προσάρτηση
+Revert	PreferencesWindow		Επαναφορά
 Small	PreferencesWindow		Μικρό
 Recent applications:	PreferencesWindow		Πρόσφατες εφαρμογές:
 Shutdown…	DeskbarMenu		Κλείσιμο…
 Tracker always first	PreferencesWindow		Ο Tracker πάντα πρώτος
 Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Προτιμήσεις
 Recent folders	DeskbarMenu		Πρόσφατοι φάκελοι
-About this system	DeskbarMenu		Περί Συστήματος
+About this system	DeskbarMenu		Πληροφορίες συστήματος
 Show calendar…	TimeView		Εμφάνιση ημερολογίου…
-Deskbar preferences…	DeskbarMenu		Προτιμήσεις Deskbar…
+Deskbar preferences…	DeskbarMenu		Προτιμήσεις Γραμμής Εργασιών…
 Expand new applications	PreferencesWindow		Επέκταση νέων εφαρμογών
-Show replicants	DeskbarMenu		Εμφάνιση αντιγράφων
+Show replicants	DeskbarMenu		Εμφάνιση ρέπλικας
 Hide application names	PreferencesWindow		Απόκρυψη ονομάτων εφαρμογών
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Επιδείξεις
 Icon size	PreferencesWindow		Μέγεθος εικονιδίων

@@ -3,7 +3,7 @@ Available languages	Locale Preflet Window		Διαθέσιμες γλώσσες
 Negative:	TimeFormatSettings		Αρνητικό:
 already chosen	LanguageListView		ήδη επιλεγμένο
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Αδύνατο να βρεθούν διαθέσιμες γλώσσες! Δεν μπορείτε να χρησιμοποιήσετε αυτό το βοηθητικό πρόγραμμα!
-Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Χρειάζεται επανεκκίνηση του Deskbar και του Tracker για να εφαρμοστούν οι αλλαγές. Να γίνει;
+Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Για να εφαρμοστούν οι αλλαγές, χρειάζεται η επανεκκίνηση της Γραμμής Εργασιών και του Tracker. Θέλετε να γίνει η επανεκκίνηση τώρα;
 Long format:	TimeFormatSettings		Μεγάλη διάταξη:
 Currency	TimeFormatSettings		Νόμισμα
 Locale	System name		Γλώσσα
@@ -13,17 +13,17 @@ Preferred languages	Locale Preflet Window		Προτεινόμενες γλώσσ
 Use month/day-names from preferred language	TimeFormatSettings		Χρήση ονομάτων μηνών/μερών από την προτιμούμενη γλώσσα
 Formatting	Locale Preflet Window		Μορφοποίηση
 Locale	Locale Preflet Window		Γλώσσα
-Numbers	TimeFormatSettings		Αριθμοί
+Numbers	TimeFormatSettings		Νούμερα
 24 hour	TimeFormatSettings		24 ωρη μορφή
 OK	Locale Preflet Window		Εντάξει
 Restart	Locale Preflet Window		Επανεκκίνηση
 Full format:	TimeFormatSettings		Ολοκληρωτική μορφοποίηση
 Defaults	Locale Preflet Window		Προεπιλογές
 Cancel	Locale Preflet Window		Ακύρωση
-Translate application and folder names in Deskbar and Tracker.	Locale Preflet Window		Μετάφραση ονομάτων εφαρμογών και φακέλων σε Deskbar και Tracker.
+Translate application and folder names in Deskbar and Tracker.	Locale Preflet Window		Μετάφραση ονομάτων εφαρμογών και φακέλων σε Γραμμή Εργασιών και Tracker.
 Revert	Locale Preflet Window		Επαναφορά
 Medium format:	TimeFormatSettings		Μερική μορφοποίηση
-12 hour	TimeFormatSettings		12 ωρη μορφή
+12 hour	TimeFormatSettings		12-ωρη μορφή
 Time	TimeFormatSettings		Ώρα
 Date	TimeFormatSettings		Ημερομηνία
 Positive:	TimeFormatSettings		Θετικό:

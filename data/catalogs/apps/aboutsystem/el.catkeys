@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-About	3301968427
+1	greek, modern (1453-)	x-vnd.Haiku-About	1839294148
 Revision	AboutView		Αναθεώρηση
 The Haikuware team and their bounty program\n	AboutView		Η ομάδα της Haikuware και το πρόγραμμα επιδοτήσεων της\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Πνευματική ιδιοκτησία © 1999-2007 Michael C. Ring. Με επιφύλαξη παντός δικαιώματος.
@@ -12,10 +12,12 @@ Kernel:	AboutView		Πυρήνας:
 Copyright © 2006-2012 Kentaro Fukuchi	AboutView		Πνευματική ιδιοκτησία © 2006-2012 Kentaro Fukuchi
 Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Πνευματική ιδιοκτησία © 1991-2000 Silicon Graphics, Inc. Με επιφύλαξη παντός δικαιώματος.
 Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Πνευματική ιδιοκτησία © 1990-2002 Info-ZIP. Με επιφύλαξη παντός δικαιώματος.
-Copyright © 2003 Peter Hanappe and others.	AboutView		Πνευματική ιδιοκτησία © Peter Hanappe και άλλοι.
+Past website & marketing:\n	AboutView		Πρώην ιστοσελίδα & μάρκετινγκ:\n
+Copyright © 2003 Peter Hanappe and others.	AboutView		Πνευματική ιδιοκτησία © 2003 Peter Hanappe και άλλοι.
+Testing and bug triaging:\n	AboutView		Δοκιμές και αποσφαλμάτωση:\n
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{Επεξεργαστής:} other{# Επεξεργαστές:}}
 %d MiB total	AboutView		%d MiB συνολικά
-The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Ο κώδικας που είναι μοναδικός στο Haiku, και ειδικά ο πυρήνας και όλος ο κώδικας των εφαρμογών που συνδέονται, διανέμονται υπό τους όρους της άδειας <MIT license>. Μερικές βιβλιοθήκες του συστήματος περιέχουν ένα μέρος κώδικα τρίτων, ο οποίος διανέμεται κάτω από την άδεια <LGPL>. Μπορείτε να βρείτε τα δικαιώματα πνευματικής ιδιοκτησίας παρακάτω.\n\n
+The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Ο κώδικας που είναι μοναδικός στο Haiku, και ειδικά ο πυρήνας και όλος ο κώδικας των εφαρμογών που συνδέονται, διανέμονται υπό τους όρους της <Άδειας Χρήσης MIT>. Μερικές βιβλιοθήκες του συστήματος περιέχουν ένα μέρος κώδικα τρίτων, ο οποίος διανέμεται κάτω από την <Άδεια Χρήσης LGPL>. Μπορείτε να βρείτε τα δικαιώματα πνευματικής ιδιοκτησίας παρακάτω.\n\n
 Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Πνευματική ιδιοκτησία © 1996-1997 Jeff Prosise. Με επιφύλαξη παντός δικαιώματος.
 Copyright © 1999-2006 Brian Paul. Mesa3D Project. All rights reserved.	AboutView		Πνευματική ιδιοκτησία © 1999-2006 Brian Paul. Mesa3D Project. Με επιφύλαξη παντός δικαιώματος.
 Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Πνευματική ιδιοκτησία © 2010-2011 Google Inc. Με επιφύλαξη παντός δικαιώματος.
@@ -24,8 +26,8 @@ Past maintainers:\n	AboutView		Παλιοί συντηρητές:\n
 Unknown	AboutView		Άγνωστο
 Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. και η ομάδα προγραμματιστών, για να έχουν δημιουργήσει το BeOs!\n\n
 Copyright © 2002-2014 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.	AboutView		Πνευματική ιδιοκτησία © 2002-2014 Industrial Light & Magic, τμήμα της Lucas Digital Ltd. LLC.
-Licenses: 	AboutView		Άδειες:
-The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Τα πνευματικά δικαιώματα του κώδικα Haiku είναι ιδιοκτησία της Haiku, Inc. η των αντίστοιχων δημιουργών που ρητά αναφέρθηκαν στην πηγή. aiku® και το HAIKU logo® είναι εγγεγραμένα εμπορικά σήματα της Haiku, Inc.\n\n
+Licenses: 	AboutView		Άδειες χρήσης: 
+The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Τα πνευματικά δικαιώματα του κώδικα του Haiku είναι ιδιοκτησία της Haiku, Inc. ή των αντίστοιχων δημιουργών που έχουν ρητά αναφερθεί στον πηγαίο κώδικα. Το Haiku® και το HAIKU logo® είναι εγγεγραμμένα σήματα κατατεθέν της Haiku, Inc.\n\n
 Copyright © 2009 Colin Percival	AboutView		Πνευματική ιδιοκτησία © 2009 Colin Percival
 Time running:	AboutView		Χρόνος λειτουργίας:
 %ld MHz	AboutView		%ld MHz
@@ -33,15 +35,15 @@ Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Πνευ
 GNU LGPL v2	AboutWindow		GNU LGPL v2
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Πνευματική ιδιοκτησία © 1994-2009, Thomas G. Lane, Guido Vollbeding. Αυτό το λογισμικό βασίζεται εν μέρει στην δουλειά της Independent JPEG Group.
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (ιδρυτής του έργου)\n\n
-BSD (3-clause)	AboutWindow		BSD (τριών όρων)
-About this system	AboutWindow		Περί συστήματος
+BSD (3-clause)	AboutWindow		BSD (3-όρων)
+About this system	AboutWindow		Πληροφορίες συστήματος
 %d MiB used (%d%%)	AboutView		%d MiB χρησιμοποιούνται (%d%%)
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Πνευματική ιδιοκτησία © 1999-2010 απο τους συγγραφείς του Gutenprint. Με επιφύλαξη παντός δικαιώματος.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Πνευματική ιδιοκτησία © 1994-1997 Mark Kilgard. Με επιφύλαξη παντός δικαιώματος.
 AboutSystem	System name		AboutSystem
 Copyright © 1995-2001 Lars Düning. All rights reserved.	AboutView		Πνευματική ιδιοκτησία © 1995-2001 Lars Düning. Με επιφύλαξη παντός δικαιώματος.
 Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		Πνευματική ιδιοκτησία © 1998-2000 Thai Open Source Software Center Ltd και Clark Cooper.
-Source Code: 	AboutView		Πηγαίος Κώδικας:
+Source Code: 	AboutView		Πηγαίος Κώδικας: 
 \nCopyrights\n\n	AboutView		\nΠνευματικά δικαιώματα\n\n
 GNU GPL v3	AboutWindow		GNU GPL v3
 The HaikuPorts team\n	AboutView		Η ομάδα HaikuPorts\n
@@ -55,7 +57,7 @@ Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Πν
 Version:	AboutView		Έκδοση:
 The BeGeistert team\n	AboutView		Η ομάδα BeGeistert\n
 GNU LGPL v2.1	AboutWindow		GNU LGPL v2.1
-License: 	AboutView		Άδεια:
+License: 	AboutView		Άδεια Χρήσης: 
 GNU GPL v2	AboutWindow		GNU GPL v2
 The University of Auckland and Christof Lutteroth\n\n	AboutView		Το πανεπιστήμιο του Auckland και ο Christof Lutteroth\n\n
 %total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB συνολικά, %inaccessible MiB μη χρησιμοποιούμενα
@@ -67,9 +69,9 @@ Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Πνευματικ�
 Translations:\n	AboutView		Μεταφράσεις:\n
 Memory:	AboutView		Μνήμη:
 \n…and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n…και μάλλον κάποιους άλλους που ξεχάσαμε να αναφέρουμε (συγνώμη!)\n\n
-BSD (2-clause)	AboutWindow		BSD (δύο όρων)
+BSD (2-clause)	AboutWindow		BSD (2-όρων)
 Website & marketing:\n	AboutView		Ιστοσελίδα & μάρκετινγκ:\n
 2001 by Andy Ritger based on the Generalized Timing Formula	AboutView		2001 απο τον Andy Ritger βασισμένο στο Generalized Timing Formula
 …and the many people making donations!\n\n	AboutView		...και τους πολλούς δωρητές μας!\n\n
-BSD (4-clause)	AboutWindow		BSD (τεσσάρων όρων)
+BSD (4-clause)	AboutWindow		BSD (4-όρων)
 BITSTREAM CHARTER is a registered trademark of Bitstream Inc.	AboutView		Το BITSTREAM CHARTER είναι σήμα κατατεθέν της Bitstream Inc.

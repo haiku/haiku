@@ -1,17 +1,18 @@
-1	greek, modern (1453-)	x-vnd.Haiku-StyledEdit	675010616
+1	greek, modern (1453-)	x-vnd.Haiku-StyledEdit	3213978181
 Document statistics	Statistics		Στατιστικά εγγράφου
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Δεν μπορεί να γίνει επαναφορά, το αρχείο δεν βρέθηκε: \"%s\".
 Cut	Menus		Αποκοπή
 Center	Menus		Κέντρο
 Wrap-around search	FindandReplaceWindow		Κυκλική αναζήτηση
 Page setup…	Menus		Διαμόρφωση σελίδας...
-Untitled 	StyledEditWindow		Χωρίς τίτλο
+Untitled 	StyledEditWindow		Χωρίς τίτλο 
 OK	Statistics		Εντάξει
 Find	FindandReplaceWindow		Εύρεση
 New	Menus		Νέο
 Document	Menus		Έγγραφο
 Search backwards	FindandReplaceWindow		Αναζήτηση προς τα πίσω
 Find again	Menus		Εύρεση ξανά
+Read-only	StatusView		Μόνο για ανάγνωση
 Save	Menus		Αποθήκευση
 Cancel	QuitAlert		Άκυρο
 Copy	Menus		Αντιγραφή
@@ -23,7 +24,7 @@ Error saving \"%s\":\n%s	SaveAlert		Σφάλμα αποθήκευσης \"%s\":\
 OK	RevertToSavedAlert		Εντάξει
 Unlock file	StatusView		Ξεκλείδωμα αρχείου
 Italic	Menus		Πλάγια
-Can't undo	Menus		Αδυναμία Αναίρεσης
+Can't undo	Menus		Αδυναμία αναίρεσης
 Replace…	Menus		Αντικατάσταση...
 File	Menus		Αρχείο
 Bold	Menus		Έντονα
@@ -43,8 +44,8 @@ Left	Menus		Αριστερά
 Default	Menus		Προκαθορισμένο
 OK	SaveAlert		Εντάξει
 Color	Menus		Χρώμα
-Save changes to the document \"%s\"? 	QuitAlert		Να αποθηκευτούν οι αλλαγές στο έγγραφο \"%s\";
-StyledEdit	System name		StyledEdit
+Save changes to the document \"%s\"? 	QuitAlert		Να αποθηκευτούν οι αλλαγές στο έγγραφο \"%s\"; 
+StyledEdit	System name		Επεξεργαστής Κειμένου
 Find:	FindandReplaceWindow		Εύρεση:
 Undo typing	QuitAlert		Αναίρεση πληκτρολόγησης
 Error loading \"%s\":\n\t%s	LoadAlert		Σφάλμα φόρτωσης \"%s\":\n\t%s

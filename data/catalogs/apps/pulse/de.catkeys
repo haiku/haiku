@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Pulse	3258989376
+1	german	x-vnd.Haiku-Pulse	207551575
 Normal mode	DeskbarPulseView		Normal-Modus
 Info	CPUButton		Info
 Quit	DeskbarPulseView		Beenden
@@ -15,6 +15,7 @@ CPU progress bar	NormalPulseView		CPU-Auslastungsbalken
 Fade colors	ConfigView		Verblassende Balken
 About Pulse…	PulseView		Über Pulse…
 Deskbar mode	NormalPulseView		Deskbar-Modus
+Pulse settings	PulseApp		Pulse Einstellungen
 Remove replicant	CPUButton		Replikant entfernen
 You can't disable the last active CPU.	PulseView		Die letzte aktive CPU kann nicht ausgeschaltet werden.
 Width of icon:	ConfigView		Balkenbreite:

@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-libtracker	659027911
+1	dutch; flemish	x-vnd.Haiku-libtracker	1673907665
 Created	ContainerWindow		Gemaakt
 Icon	AttributesView		Icoon
 Open and make preferred	OpenWithWindow		Openen en bevoorkeuren
@@ -262,6 +262,7 @@ ends with	SelectionWindow		eindigt met
 Open	OpenWithWindow		Openen
 You must have at least one attribute showing.	PoseView		Er moet minstens één eigenschap weergegeven worden.
 Cut	FilePanelPriv		Knippen
+Finish: after several years	StatusWindow		Voltooid: na enkele jaren
 Favorites	FilePanelPriv		Favorieten
 Point	AttributesView		Punt
 home	B_USER_DIRECTORY		home

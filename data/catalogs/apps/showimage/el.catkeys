@@ -33,7 +33,7 @@ Open…	Menus		Άνοιγμα...
 Next file	Menus		Επόμενο αρχείο
 Clear selection	Menus		Εκκαθάριση επιλογής
 Close document	ClosePrompt		Κλείσιμο εγγράφου
-Height: 	PrintOptionsWindow		Ύψος:
+Height: 	PrintOptionsWindow		Ύψος: 
 The file '%s' could not be written.	SaveToFile		Το αρχείο '%s' δεν μπορεί να γραφτεί.
 Cancel	ClosePrompt		Άκυρο
 Show tool bar	Menus		Εμφάνιση εργαλειοθήκης

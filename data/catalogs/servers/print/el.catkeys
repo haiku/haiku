@@ -1,22 +1,23 @@
-1	greek, modern (1453-)	x-vnd.Be-PSRV	2930356711
-Undefined	ConfigWindow		Μη ορισμένο
-Return the number of available transports	PrintServerApp Scripting		Επέστρεψε τον αριθμό των διαθέσιμων μεταφορών
-Return the number of available printers	PrintServerApp Scripting		Επέστρεψε τον αριθμό των διαθέσιμων εκτυπωτών
-Get currently available ports/devices	Transport Scripting		Βρες τις διαθέσιμες πόρτες/συσκευές
-Retrieve or select the active printer	PrintServerApp Scripting		Ανάκτηση ή επιλογή ενεργού εκτυπωτή
-Cancel	PrintServerApp		Άκυρο
-Retrieve a specific printer	PrintServerApp Scripting		Ανάκτηση συγκεκριμένου εκτυπωτή
-Page %1 to %2	ConfigWindow		Σελίδα %1 εως %2
-Get name of the printer add-on used for this printer	Printer Scripting		Βρες το όνομα του πρόσθετου που χρησιμοποιείται για αυτόν τον εκτυπωτή
+1	greek, modern (1453-)	x-vnd.Be-PSRV	1222926379
+Undefined	ConfigWindow		Απροσδιόριστο
+Return the number of available transports	PrintServerApp Scripting		Εμφάνιση αριθμού των διαθέσιμων μεταφορών
+Return the number of available printers	PrintServerApp Scripting		Εμφάνιση αριθμού των διαθέσιμων εκτυπωτών
+Get currently available ports/devices	Transport Scripting		Εύρεση διαθέσιμων θυρών/συσκευών
+Retrieve or select the active printer	PrintServerApp Scripting		Εύρεση ή επιλογή ενεργού εκτυπωτή
+Cancel	PrintServerApp		Ακύρωση
+Retrieve a specific printer	PrintServerApp Scripting		Εύρεση συγκεκριμένου εκτυπωτή
+Page %1 to %2	ConfigWindow		Σελίδα %1 έως %2
+Get name of the printer add-on used for this printer	Printer Scripting		Εύρεση ονόματος πρόσθετου που χρησιμοποιείται για αυτόν τον εκτυπωτή
 B5 (JIS)	ConfigWindow	JIS P0138 B5, a Japanese paper size	B5 (JIS)
 OK	ConfigWindow		Εντάξει
-Cancel	ConfigWindow		Άκυρο
+Cancel	ConfigWindow		Ακύρωση
 Printer server	ConfigWindow		Εκτυπωτής διακομιστής
 Page %1 to %2, %3 copies	ConfigWindow		Σελίδα %1 to %2, %3 αντίγραφα
 A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Ένας εκτυπωτής με ίδιο όνομα υπάρχει ήδη, αλλά ο οδηγός δεν μπόρεσε να βρεθεί! Αντικατάσταση;
 Yes	PrintServerApp		Ναι
 Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Λογιστικό βιβλίο
 Would you like to set one up now?	PrintServerApp		Θέλετε να ορίσετε ένα τώρα;
+Print job setup:	ConfigWindow		Ρυθμίσεις εργασιών εκτύπωσης:
 A6	ConfigWindow	ISO 216 paper size	A6
 Portrait	ConfigWindow		Πορτραίτο
 All pages	ConfigWindow		Όλες τις σελίδες

@@ -3,7 +3,7 @@
 Compression method:	ConfigView		Μέθοδος συμπίεσης:
 WebP image translator	ConfigView		Μετατροπέας εικόνας WebP
 Preset	ConfigView		Προεπιλογή
-WebP images	WebPTranslator		Εικόνες WebP 
+WebP images	WebPTranslator		Εικόνες WebP
 WebPTranslator Settings	ConfigView		Ρυθμίσεις μετατροπέα WebP
 Output quality:	ConfigView		Ποιότητα εξόδου:
 ©2010-2017 Google Inc.	ConfigView		©2010-2017 Google Inc.

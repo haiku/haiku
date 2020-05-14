@@ -1,6 +1,6 @@
-1	greek, modern (1453-)	x-vnd.Haiku-PoorMan	1941909940
+1	greek, modern (1453-)	x-vnd.Haiku-PoorMan	1829050509
 Select web folder	PoorMan		Επέλεξε φάκελο παγκόσμιου ιστού
-Console logging	PoorMan		Καταγραφή Κονσόλας
+Console logging	PoorMan		Καταγραφή κονσόλας
 Create Log File	PoorMan		Δημιουργία Αρχείου Καταγραφής
 File logging	PoorMan		Αρχείο καταγραφής
 Website options	PoorMan		Επιλογές ιστοσελίδας
@@ -8,23 +8,23 @@ Log to file	PoorMan		Καταγραφή σε αρχείο
 Shutting down.	PoorMan		Γίνεται τερματισμός
 Error Dir	PoorMan		Σφάλμα Καταλόγου
 Web folder:	PoorMan		Φάκελος ιστού:
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Παρακαλώ επιλέξτε το φάκελο για να δημοσιεύσετε στον παγκόσμιο ιστό.\n\nΜπορείτε στο PoorMan να δημιουργήσετε ένα προεπιλεγμένο \"public_html \" στο προσωπικό σας φάκελο. \n Ή να επιλέξετε έναν από τους δικούς σας φακέλους αντ΄ αυτού.
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Παρακαλώ επιλέξτε το φάκελο που θέλετε δημοσιεύσετε στον παγκόσμιο ιστό.\n\nΟ Εξυπηρετητής Ιστού μπορεί να δημιουργήσει έναν προεπιλεγμένο φάκελο \"public_html \" στον προσωπικό σας φάκελο για εσάς.\nΕναλλακτικά μπορείτε να επιλέξετε έναν από τους δικούς σας φακέλους.
 Log To Console	PoorMan		Καταγραφή στη Κονσόλα
 File Name	PoorMan		Όνομα Αρχείου
-Starting up... 	PoorMan		Γίνεται εκκίνηση...
+Starting up... 	PoorMan		Γίνεται εκκίνηση... 
 Select	PoorMan		Επιλογή
 Logging view	PoorMan		Εμφάνιση καταγραφής
 Save console as…	PoorMan		Αποθήκευση κονσόλας ως...
 Edit	PoorMan		Επεξεργασία
 Cancel	PoorMan		Άκυρο
-Directory: 	PoorMan		Κατάλογος:
+Directory: 	PoorMan		Κατάλογος: 
 Hits: %lu	PoorMan		Επισκέψεις: %lu
 Hits: 0	PoorMan		Επισκέψεις: 0
 Shutting down.\n	PoorMan		Τερματισμός λειτουργίας.\n
 Select all	PoorMan		Επιλογή όλων
 Error Server	PoorMan		Σφάλμα Εξυπηρετητή
 Send file listing if there's no start page	PoorMan		Αποστολή παρουσίασης αρχείων αν δεν υπάρχει αρχική σελίδα.
-Create PoorMan log	PoorMan		Δημιουργία καταγραφής PoorMan
+Create PoorMan log	PoorMan		Δημιουργία καταγραφής Διακομιστή Ιστοσελίδων
 Max. simultaneous connections:	PoorMan		Μεγ. ταυτόχρονες συνδέσεις:
 Done	PoorMan		Εντάξει
 Site	PoorMan		Ιστοσελίδα
@@ -42,12 +42,13 @@ Log to console	PoorMan		Καταγραφή σε κονσόλα
 Advanced	PoorMan		Προχωρημένοι
 Copy	PoorMan		Αντιγραφή
 Logging	PoorMan		Καταγραφή
+PoorMan	System name		Εξυπηρετητής Ιστού
 Clear console log	PoorMan		Καθαρισμός καταγραφής κονσόλας
 Run server	PoorMan		Εκκίνηση εξυπηρετητή
 Create	PoorMan		Δημιουργία
 {0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# σύνδεση} other{# συνδέσεις}}
 done.\n	PoorMan		έγινε.\n
-PoorMan settings	PoorMan		Ρυθμίσεις PoorMan
+PoorMan settings	PoorMan		Ρυθμίσεις Διακομιστή Ιστοσελίδων
 Console Logging	PoorMan		Καταγραφή κονσόλας
 Clear log file	PoorMan		Εκκαθάριση αρχείου καταγραφής
 Save log console selection	PoorMan		Αποθήκευση επιλεγμένης καταγραφής κονσόλας

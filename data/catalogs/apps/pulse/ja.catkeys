@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Pulse	3610817163
+1	japanese	x-vnd.Haiku-Pulse	559379362
 Normal mode	DeskbarPulseView		ウィンドウモード
 Info	CPUButton		情報
 Quit	DeskbarPulseView		終了
@@ -16,6 +16,7 @@ Fade colors	ConfigView		バーの色をフェードさせる
 About Pulse…	PulseView		Pulse について…
 Pulse	NormalPulseView		Pulse
 Deskbar mode	NormalPulseView		Deskbar モード
+Pulse settings	PulseApp		Pulse 設定
 Remove replicant	CPUButton		レプリカントを削除
 You can't disable the last active CPU.	PulseView		最後の CPU は無効にできません。
 Width of icon:	ConfigView		アイコンの幅:

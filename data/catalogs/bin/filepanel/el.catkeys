@@ -1,5 +1,5 @@
 1	greek, modern (1453-)	x-vnd.mmu_man.filepanel	1802971238
-display a load/save file panel\n	FilePanelApp		Εμφάνιση φόρτωσεις/αποθήκευσεις αρχείου πάνελ\n
+display a load/save file panel\n	FilePanelApp		Εμφάνιση πάνελ φόρτωσης/αποθήκευσης αρχείων\n
 short\tlong\tdescription\n	FilePanelApp		σύντομη\tlμεγάλη\tπεριγραφή\n
 %s not a valid option\n	FilePanelApp		%s μη έγκυρη επιλογή\n
 -s\t--save\tuse a save FilePanel\n	FilePanelApp		-s\t--save\tχρήση αποθηκευμένου FilePanel\n
@@ -14,7 +14,7 @@ short\tlong\tdescription\n	FilePanelApp		σύντομη\tlμεγάλη\tπερι
 usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n	FilePanelApp		χρήση: %s [-h] [-d κατάλογος] [-l|-s] [-t ttl] [-1] [-m] [-a 2.υπόδειγμα] [-f υπόδειγμα]\n
 -1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\t επιτρεπεται μόνο 1 προεπιλεγμένο αρχείο\n
 -a\t--allow\tunimplemented\n	FilePanelApp		-a\t--allow\tμή υλοποιημένο\n
--m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\tκάνει τοFilePanel τυπικό\n
+-m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\tκάνει το FilePanel τυπικό\n
 options:\n	FilePanelApp		Επιλογές:\n
 -d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\tάνοιγμα στο <folder>\n
 usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		χρήση: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n

@@ -1,6 +1,6 @@
-1	greek, modern (1453-)	x-vnd.Haiku-PPMTranslator	2181603000
+1	greek, modern (1453-)	x-vnd.Haiku-PPMTranslator	292474603
 None	PPMTranslator		Κανένα
-PPM Settings	PPMMain		Ρυθμίσεις PPM 
+PPM Settings	PPMMain		Ρυθμίσεις PPM
 System palette 8 bits	PPMTranslator		Παλέτα συστήματος 8 bits
 Sample code copyright 1999, Be Incorporated	PPMTranslator		Δείγμα κώδικα copyright 1999, Be Incorporated
 Something is wrong with the PPMTranslator!	PPMMain		Κάτι δεν πάει καλά με τον μετατροπέα PPM!
@@ -15,6 +15,7 @@ CMY 8:8:8 32 bits	PPMTranslator		CMY 8:8:8 32 bits
 OK	PPMMain		Εντάξει
 CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 bits
 PPM image	PPMTranslator		PPM εικόνα
+Input color space:	PPMTranslator		Χρωματικός χώρος:
 RGB 5:5:5 16 bits big-endian	PPMTranslator		RGB 5:5:5 16 bits big-endian
 RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RGBA 5:5:5:1 16 bits big-endian
 Write ASCII	PPMTranslator		Εγγραφή ASCII

@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-About	1828471351
+1	catalan; valencian	x-vnd.Haiku-About	1839294148
 Revision	AboutView		Revisió
 The Haikuware team and their bounty program\n	AboutView		L'equip de Haikuware i el seu programa de recompenses\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. Tots els drets reservats.
@@ -14,6 +14,7 @@ Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Co
 Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Copyright © 1990-2002 Info-ZIP. Tots els drets reservats.
 Past website & marketing:\n	AboutView		Lloc web anterior i màrqueting:\n
 Copyright © 2003 Peter Hanappe and others.	AboutView		Copyright © 2003 Peter Hanappe i altres.
+Testing and bug triaging:\n	AboutView		Proves i triatge d'errors:\n
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{processador:} other{# processadors:}}
 %d MiB total	AboutView		%d MiB totals
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	El codi que és únic al Haiku, especialment el nucli i tot el codi amb què les aplicacions es poden enllaçar, es distribueix segons els termes de la llicència <MIT>. Algunes biblioteques del sistema contenen codi de tercers distribuït d'acord amb la llicència <LGPL>. A continuació podeu trobar els drets reservats del codi de tercers.\n\n

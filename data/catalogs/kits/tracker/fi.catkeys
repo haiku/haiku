@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	659027911
+1	finnish	x-vnd.Haiku-libtracker	1673907665
 Created	ContainerWindow		Luotu
 Icon	AttributesView		Kuvake
 Open and make preferred	OpenWithWindow		Avaa ja tee ensisijaiseksi
@@ -262,6 +262,7 @@ ends with	SelectionWindow		loppuu kohteella
 Open	OpenWithWindow		Avaa
 You must have at least one attribute showing.	PoseView		Sinulla on oltava vähintään yksi attribuutti näytettäväksi.
 Cut	FilePanelPriv		Leikkaa
+Finish: after several years	StatusWindow		Valmis: useiden vuosien jälkeen
 Favorites	FilePanelPriv		Suosikit
 Point	AttributesView		Piste
 home	B_USER_DIRECTORY		koti

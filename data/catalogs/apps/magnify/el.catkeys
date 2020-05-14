@@ -1,6 +1,7 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Magnify	3234403014
+1	greek, modern (1453-)	x-vnd.Haiku-Magnify	1127635801
+  size must be > 4 and a multiple of 4	Console		  μέγεθος πρέπει να είναι > 4 και πολλαπλάσιο του 4
 Decrease pixel size	Magnify-Main		Μείωση μεγέθους εικονοστοιχείου
-Increase pixel size	Magnify-Main		Αύξηση μεγέθους Pixel
+Increase pixel size	Magnify-Main		Αύξηση μεγέθους pixel
 Stick coordinates	Magnify-Main		Συντεταγμένες Στίκ
 Copy image	Magnify-Main		Αντιγραφή εικόνας
 Decrease window size	Magnify-Main		Μείωση μεγέθους του παραθύρου
@@ -9,6 +10,7 @@ Add a crosshair	Magnify-Main		Προσθήκη ενός σταυρονήματο
 Freeze image	Magnify-Main		Πάγωμα εικόνας
 Increase window size	Magnify-Main		Αύξηση μεγέθους του παραθύρου
 Save image	Magnify-Main		Αποθήκευση εικόνας
+Show grid	Magnify-Main		Εμφάνιση πλέγματος
 Magnify	System name		Magnify
 Info	Magnify-Main		Πληροφορίες
 Show info	Magnify-Main		Εμφάνιση πληροφοριών

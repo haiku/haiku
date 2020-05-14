@@ -1,7 +1,8 @@
-1	french	x-vnd.Haiku-Keymap	3187025310
+1	french	x-vnd.Haiku-Keymap	3115415775
 Key	Modifier keys window	As in a computer keyboard key	Touche
 Japanese	KeymapNames		Japonais
 US	KeymapNames		US
+PG ↑	Keyboard Layout View	Very short for 'page up'	PG ↑
 Brazilian	KeymapNames		Brésilien
 Right control	Keyboard Layout View		Contrôle droit
 Dvorak	KeymapNames		Dvorak
@@ -26,7 +27,7 @@ Scroll lock	Keyboard Layout View		Arrêt défilement
 US-International	KeymapNames		US-International
 Right option	Keyboard Layout View		Option droite
 Turkish (Type-Q)	KeymapNames		Turc (Type-Q)
-Revert	Modifier keys window		Défaire
+Revert	Modifier keys window		Rétablir
 Slovak	KeymapNames		Slovaque
 CAPS LOCK	Keyboard Layout View		Verr. Maj.
 Colemak	KeymapNames		Colemak
@@ -39,6 +40,7 @@ Croatian	KeymapNames		Croate
 PAGE ↑	Keyboard Layout View		Page ↑
 Set modifier keys	Modifier keys window		Régler les touches modificatrices
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Touche Win/Cmd
+PG ↓	Keyboard Layout View	Very short for 'page down'	PG ↓
 Spanish	KeymapNames		Espagnol
 HOME	Keyboard Layout View		Début
 COMMAND	Keyboard Layout View		Commande
@@ -102,7 +104,7 @@ Belarusian (Latin)	KeymapNames		Biélorusse (Latin)
 Hebrew	KeymapNames		Hébreu
 Layout	Keymap window		Disposition
 Greek	KeymapNames		Grec
-Revert	Keymap window		Défaire
+Revert	Keymap window		Rétablir
 CTRL	Keyboard Layout View	Very short for 'control'	Ctrl
 Grave trigger	Keymap window		Accent grave
 Menu	Keyboard Layout View	Menu key	Menu

@@ -1,25 +1,27 @@
-1	greek, modern (1453-)	x-vnd.Haiku-WebPositive	206853775
+1	greek, modern (1453-)	x-vnd.Haiku-WebPositive	542208154
 Authentication required	Authentication Panel		Απαιτείται ταυτοποίηση
 Download folder:	Settings Window		Φάκελος λήψεων:
 Close window	WebPositive Window		Κλείσιμο παραθύρου
 Find:	WebPositive Window		Εύρεση:
 Fonts	Settings Window		Γραμματοσειρές
 Bookmarks	WebPositive Window		Σελιδοδείκτες
-Use proxy server to connect to the internet	Settings Window		Χρήση διαμεσολαβητή για την σύνδεση στο διαδίκτυο
+Use proxy server to connect to the internet	Settings Window		Χρήση μεσολαβητή για την σύνδεση στο διαδίκτυο
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url ολοκληρώθηκε
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Προέκυψε ένα σφάλμα κατά την ανάγνωση του φακέλου σελιδοδεικτών.\n\nΣφάλμα: %error
 Delete	Cookie Manager		Διαγραφή
 Full screen	WebPositive Window		Πλήρη οθόνη
-Copy URL to clipboard	Download Window		Αντιγραφή URL στο πρόχειρο
+Downloads in progress	WebPositive		Λήψεις σε εξέλιξη
+Copy URL to clipboard	Download Window		Αντιγραφή υπερσυνδέσμου στο πρόχειρο
 Start page:	Settings Window		Αρχική σελίδα:
 Cancel	Download Window		Ακύρωση
 Settings	Settings Window		Ρυθμίσεις
 Downloads	WebPositive Window		Λήψεις
 Browse…	Settings Window		Περιήγηση...
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Υπάρχει ήδη σελιδοδείκτης για αυτήν την σελίδα (%bookmarkName).
-Proxy password:	Settings Window		Κωδικός διαμεσολαβητή:
+Proxy password:	Settings Window		Κωδικός μεσολαβητή:
 Size:	Font Selection view		Μέγεθος:
 Page source	WebPositive Window		Πηγαίος κώδικας σελίδας
-Proxy server port:	Settings Window		Θύρα διαμεσολαβητή:
+Proxy server port:	Settings Window		Θύρα μεσολαβητή:
 Show bookmark bar	WebPositive Window		Εμφάνιση μπάρας σελιδοδεικτών
 Find	WebPositive Window		Εύρεση
 Standard font:	Settings Window		Προεπιλεγμένη γραμματοσειρά:
@@ -27,7 +29,7 @@ Open download error	Download Window		Άνοιγμα σφάλματος λήψη�
 New tabs:	Settings Window		Νέες καρτέλες:
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url απέτυχε
 Open downloads folder	Download Window		Άνοιγμα φακέλου λήψεων
-Proxy server	Settings Window		Διαμεσολαβητής
+Proxy server	Settings Window		Μεσολαβητής
 Decrease size	WebPositive Window		Σμίκρυνση
 Sans serif font:	Settings Window		Γραμματοσειρά Sans serif:
 Cookies for %s	Cookie Manager		Cookies για %s
@@ -44,14 +46,16 @@ Name	Cookie Manager		Όνομα
 Edit	WebPositive Window		Επεξεργασία
 Back	WebPositive Window		Πίσω
 Yesterday	WebPositive Window		Εχτές
+Quit	WebPositive		Έξοδος
 Download aborted	Download Window		Η λήψη ακυρώθηκε
 Password:	Authentication Panel		Κωδικός:
 Forward	WebPositive Window		Προώθηση
+Clear	Console Window		Εκκαθάριση
 Cut	URL Bar		Αποκοπή
 View	WebPositive Window		Προβολή
 Paste	URL Bar		Επικόλληση
 Open search page	Settings Window		Άνοιγμα σελίδας αναζήτησης
-Increase size	WebPositive Window		Μεγέθυνση 
+Increase size	WebPositive Window		Μεγέθυνση
 New tab	WebPositive Window		Νέα καρτέλα
 Today	WebPositive Window		Σήμερα
 Open location	WebPositive Window		Άνοιγμα τοποθεσίας
@@ -62,16 +66,18 @@ New windows:	Settings Window		Νέα παράθυρα:
 The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Δεν ήταν δυνατό το άνοιγμα του φακέλου λήψεων.\n\nΣφάλμα: %error
 Cancel	Authentication Panel		Ακύρωση
 Style:	Font Selection view		Στυλ:
+There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	Προέκυψε σφάλμα κατά την δημιουργία σελιδοδείκτη.\n\nΣφάλμα: %error
 OK	Download Window		Εντάξει
-Proxy username:	Settings Window		Όνομα χρήστη διαμεσολαβητή:
+Proxy username:	Settings Window		Όνομα χρήστη μεσολαβητή:
 Manage bookmarks	WebPositive Window		Διαχείριση σελιδοδεικτών
 /s)	Download Window	...as in 'per second'	/δ)
 Serif font:	Settings Window		Γραμματοσειρά Serif:
 Apply	Settings Window		Εφαρμογή
+There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Προέκυψε σφάλμα κατά την εμφάνιση του φακέλου σελιδοδεικτών.\n\nΣφάλμα: %error
 Copy	WebPositive Window		Αντιγραφή
 Close tab	WebPositive Window		Κλείσιμο καρτέλας
 About	WebPositive Window		Σχετικά
-Proxy server requires authentication	Settings Window		Ο διαμεσολαβητής απαιτεί ταυτοποίηση
+Proxy server requires authentication	Settings Window		Ο μεσολαβητής απαιτεί ταυτοποίηση
 Cancel	Settings Window		Ακύρωση
 History	WebPositive Window		Ιστορικό
 Do you really want to clear the browsing history?	WebPositive Window		Είστε σίγουρος ότι θέλετε να διαγράψετε το ιστορικό περιήγησης σας;
@@ -87,10 +93,13 @@ OK	WebPositive Window		Εντάξει
 WebPositive	Download Window		WebPositive
 Save page as…	WebPositive Window		Αποθήκευση σελίδας ως...
 Auto-hide mouse pointer	Settings Window		Αυτόματη απόκρυψη δείκτη ποντικιού
+Requesting %url	WebPositive Window		Γίνεται αίτημα για %url
 Window	WebPositive Window		Παράθυρο
-Proxy server address:	Settings Window		Διεύθυνση διαμεσολαβητή:
+Proxy server address:	Settings Window		Διεύθυνση μεσολαβητή:
 Search page:	Settings Window		Σελίδα αναζήτησης:
 Settings	WebPositive Window		Ρυθμίσεις
+Loading %url	WebPositive Window		Γίνεται φόρτωση του %url
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Ο καλύμνιος σφουγγαράς ψιθύρησε πως θα βουτήξει χωρίς να διστάζει.
 Confirmation	WebPositive Window		Επιβεβαίωση
 Open all	WebPositive Window		Άνοιγμα όλων
 Cut	WebPositive Window		Αποκοπή

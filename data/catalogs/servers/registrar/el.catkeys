@@ -4,7 +4,7 @@ OK	ShutdownProcess		Εντάξει
 Do you really want to shut down the system?	ShutdownProcess		Θέλετε πραγματικά να επανεκκινήσετε το σύστημα;
 Shutdown status	ShutdownProcess		Κατάσταση τερματισμού
 Shut down	ShutdownProcess		Τερματισμός
-The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Η εφαρμογή \"%appName%\" μπορεί να αποκλειστεί σε ένα τυπικό πανελ.
+The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Η εφαρμογή \"%appName%\" μπορεί να αποκλειστεί σε ένα τυπικό πάνελ.
 System is shut down	ShutdownProcess		Το σύστημα έχει τερματισει τη λειτουργία του.
 Restart system	ShutdownProcess		Επανεκκίνηση συστήματος
 Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Η εφαρμογή \"%appName%\" ακύρωσε τη διαδικασία τερματισμού.

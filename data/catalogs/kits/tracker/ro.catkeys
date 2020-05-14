@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	659027911
+1	romanian	x-vnd.Haiku-libtracker	1673907665
 Created	ContainerWindow		Creat
 Icon	AttributesView		Iconiță
 Open and make preferred	OpenWithWindow		Deschide sau fixează ca preferat
@@ -262,6 +262,7 @@ ends with	SelectionWindow		se termină cu
 Open	OpenWithWindow		Deschide
 You must have at least one attribute showing.	PoseView		Trebuie să aveți cel puțin un atribut afișat.
 Cut	FilePanelPriv		Taie
+Finish: after several years	StatusWindow		Terminare: după câțiva ani
 Favorites	FilePanelPriv		Favorite
 Point	AttributesView		Punct
 home	B_USER_DIRECTORY		acasă

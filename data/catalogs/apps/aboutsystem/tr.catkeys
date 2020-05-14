@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-About	1828471351
+1	turkish	x-vnd.Haiku-About	1839294148
 Revision	AboutView		Revizyon
 The Haikuware team and their bounty program\n	AboutView		Haikuware takımı ve onların ödül programı\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Telif hakkı © 1999-2007 Michael C. Ring. Tüm hakları saklıdır.
@@ -14,6 +14,7 @@ Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Te
 Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Telif hakkı © 1990-2002 Info-ZIP. Tüm hakları saklıdır.
 Past website & marketing:\n	AboutView		Eski web sitesi ve pazarlama:\n
 Copyright © 2003 Peter Hanappe and others.	AboutView		Telif hakkı © 2003 Peter Hanappe ve diğerleri.
+Testing and bug triaging:\n	AboutView		Sınama ve hata sınıflandırma:\n
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, other{# işlemci:}}
 %d MiB total	AboutView		%d MiB toplam
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Haiku'ya özel olan tüm kodlar, özellikle çekirdek ve uygulamaların bağlı olduğu kodlar <MIT lisansı> koşulları altında dağıtılmaktadır. Bazı sistem kitaplıkları ve üçüncü parti kodlar <LGPL lisansı> koşulları altında dağıtılır. Üçüncü parti kodların telif hakları ile ilgili bilgiyi aşağıda bulabilirsiniz.\n\n

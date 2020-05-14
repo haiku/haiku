@@ -22,7 +22,7 @@ Appearance	Terminal PrefWindow		Εμφάνιση
 Encoding:	Terminal AppearancePrefView		Κωδικοποίηση:
 Create link here	Terminal TermView		Δημιουργία συνδέσμου εδώ
 Custom	Terminal AppearancePrefView	Window size	Προσαρμοσμένο
-Selected text	Terminal AppearancePrefView		Επιλεγμένο Κείμενο
+Selected text	Terminal AppearancePrefView		Επιλεγμένο κείμενο
 Change directory	Terminal TermView		Αλλαγή καταλόγου
 Page setup…	Terminal TermWindow		Διαμόρφωση σελίδας...
 Defaults	Terminal PrefWindow		Προεπιλογές
@@ -60,7 +60,7 @@ Cancel	Terminal TermWindow		Άκυρο
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Η διεργασία \"%1\" ακόμη εκτελείται.\nΕαν κλείσετε την καρτέλα, η διεργασία θα τερματιστεί.
 Cursor	Terminal AppearancePrefView		Κέρσορας
 Full screen	Terminal TermWindow		Πλήρης οθόνη
-Shell 	Terminal TermWindow		Κέλυφος
+Shell 	Terminal TermWindow		Κέλυφος 
 Midnight	Terminal colors scheme		Μεσάνυχτα
 Tab title:	Terminal TermWindow		Τίτλος καρτέλας:
 Window title:	Terminal TermWindow		Τίτλος παραθύρου:
@@ -95,6 +95,6 @@ Set window title	Terminal TermWindow		Ορισμός τίτλου παραθύρ
 Increase	Terminal TermWindow		Άυξηση
 OK	Terminal TermWindow		Εντάξει
 Close window	Terminal TermWindow		Κλείσιμο παραθύρου
-Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nΠνευματική ιδιοκτησία 2001-2019 Haiku, Inc.\nΠνευματική ιδιοκτησία(C) 1999 Kazuho Okui και Takashi Murai\n\nΧρήση: %s [ΕΠΙΛΟΦΗ] [ΚΕΛΥΦΟΣ]\n
+Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nΠνευματική ιδιοκτησία 2001-2019 Haiku, Inc.\nΠνευματική ιδιοκτησία(C) 1999 Kazuho Okui και Takashi Murai.\n\nΧρήση: %s [ΕΠΙΛΟΦΗ] [ΚΕΛΥΦΟΣ]\n
 Clear all	Terminal TermWindow		Καθαρισμός όλων
 Search forward	Terminal FindWindow		Αναζήτηση μπροστά

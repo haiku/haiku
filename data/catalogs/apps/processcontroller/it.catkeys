@@ -8,7 +8,7 @@ Processor %d	ProcessController		Processore %d
 Live in the Deskbar	ProcessController		Integrato nella Deskbar
 Kill this team!	ProcessController		Termina questo team!
 OK	ProcessController		OK
-You can run ProcessController in a window or install it in the Deskbar.	ProcessController		È possibile eseguire Gestione processi in una finestra o installarlo nella Deskbar.
+You can run ProcessController in a window or install it in the Deskbar.	ProcessController		È possibile eseguire Gestione Processi in una finestra o installarlo nella Deskbar.
 Real-time priority	ProcessController		Priorità in tempo reale
 Custom priority	ProcessController		Priorità personalizzata
 Debug this thread!	ProcessController		Esegui il debug di questo thread!
@@ -18,7 +18,7 @@ Memory usage	ProcessController		Uso della memoria
 Ok!	ProcessController		Ok!
 Normal priority	ProcessController		Priorità normale
 Restart Deskbar	ProcessController		Riavvia la Deskbar
-About ProcessController…	ProcessController		Informazioni su Gestione processi…
+About ProcessController…	ProcessController		Informazioni su Gestione Processi…
 Usage: %s [-deskbar]\n	ProcessController		Utilizzo: %s [-deskbar]\n
 Please confirm	ProcessController		Conferma
 Urgent priority	ProcessController		Priorità urgente
@@ -37,14 +37,14 @@ Cancel	ProcessController		Annulla
 Install in Deskbar	ProcessController		Installa nella Deskbar
 Debug this team!	ProcessController		Effettua il debug di questo team!
 Low latency	ProcessController		Bassa latenza
-ProcessController	System name		Gestione processi
+ProcessController	System name		Gestione Processi
 Lowest active priority	ProcessController		Priorità più bassa attiva
 Restart Tracker	ProcessController		Riavvia il Tracker
 System resources & caches…	ProcessController		Risorse di sistema e cache…
 Damned!	ProcessController		Accidenti!
 New Terminal	ProcessController		Nuovo Terminale
 Power saving	ProcessController		Risparmio energetico
-ProcessController is already installed in Deskbar.	ProcessController		Gestione processi è già installato nella Deskbar.
+ProcessController is already installed in Deskbar.	ProcessController		Gestione Processi è già installato nella Deskbar.
 This is the last active processor…\nYou can't turn it off!	ProcessController		Questo è l'ultimo processore attivo…\nNon puoi spegnerlo!
 This thread is already gone…	ProcessController		Questo thread è già terminato…
 Run in window	ProcessController		Esegui in finestra

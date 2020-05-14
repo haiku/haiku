@@ -1,9 +1,24 @@
-1	friulian	x-vnd.Haiku-GLInfo	3678488342
+1	friulian	x-vnd.Haiku-GLInfo	2211760527
+Maximum clipping planes	Capabilities		Plans di ritai massims
+Maximum 2D texture size	Capabilities		Dimension massime de texture 2D
+Auxiliary buffer(s)	Capabilities		Buffer ausiliari(s)
+Maximum evaluators equation order	Capabilities		Ordin di ecuazion dai calcoladôrs massims
+Texture stack size	Capabilities		Dimension dal stack de texture
 GL Info	System name		Informazions GL
 Information	InfoView		Informazion
 Maximum convolution	Capabilities		Convoluzion massime
+Attributes stack size	Capabilities		Dimension dal stack dai atribûts
+Maximum lights	Capabilities		Lûs massimis
+Maximum 3D texture size	Capabilities		Dimension massime de texture 3D
 Extensions	Extensions		Estensions
+Maximum recommended index elements	Capabilities		Numar massim di elements de tabele conseâts
 Available extensions	Extensions		Estensions disponibilis
+Maximum recommended vertex elements	Capabilities		Numar massim di elements vertex conseâts
 Value	Capabilities		Valôr
+Maximum texture units	Capabilities		Unitâts di texture massimis
 Capabilities	Capabilities		Capacitâts
+Name stack size	Capabilities		Dimension dal stack dal non
+List stack size	Capabilities		Dimension dal stack de liste
+Projection stack size	Capabilities		Dimension dal stack de proiezion
+Model stack size	Capabilities		Dimension dal stack dal model
 Capability	Capabilities		Capacitât

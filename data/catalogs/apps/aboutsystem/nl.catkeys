@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-About	1828471351
+1	dutch; flemish	x-vnd.Haiku-About	1839294148
 Revision	AboutView		Revisie
 The Haikuware team and their bounty program\n	AboutView		Het Haikuware-team en hun bountyprogramma\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. Alle rechten voorbehouden.
@@ -14,6 +14,7 @@ Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Co
 Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Copyright © 1990-2002 Info-ZIP. Alle rechten voorbehouden.
 Past website & marketing:\n	AboutView		Website & marketing verleden:\n
 Copyright © 2003 Peter Hanappe and others.	AboutView		Copyright © 2003 Peter Hanappe en anderen.
+Testing and bug triaging:\n	AboutView		Testen en bugs valideren:\n
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{Processor:} other{# Processors:}}
 %d MiB total	AboutView		%d MiB totaal
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	De code die uniek is voor Haiku, vooral de kernel en alle codes die applicaties kunnen linken, wordt gedistribueerd onder de voorwaarden van de <MIT license>. Sommige systeembibliotheken bevatten code van andere partijen gedistribueerd onder de <LGPL license>. Je kan de copyrights van deze partijen hieronder vinden.\n\n

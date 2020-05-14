@@ -1,4 +1,5 @@
-1	greek, modern (1453-)	x-vnd.Haiku-libbe	1541392075
+1	greek, modern (1453-)	x-vnd.Haiku-libbe	286377217
+{0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# byte} other{# bytes}}
 All Rights Reserved.	AboutWindow		Με επιφύλαξη παντός δικαιώματος.
 Undo	TextView		Αναίρεση
 gamma	AboutWindow		gamma
@@ -6,33 +7,35 @@ development	AboutWindow		ανάπτυξη
 OK	Dragger		Εντάξει
 OK	PrintJob		Εντάξει
 Print Server is not responding.	PrintJob		Ο Εξυπηρετητής εκτυπώσεων δεν ανταποκρίνεται.
-About %app%	AboutMenuItem		Περί %app%
+About %app%	AboutMenuItem		Σχετικά με το %app%
 Warning	Dragger		Προειδοποίηση
 Green:	ColorControl		Πράσινο:
 Redo	TextView		Ακύρωση αναίρεσης
+No pages to print!	PrintJob		Δεν υπάρχουν σελίδες προς εκτύπωση!
 beta	AboutWindow		beta
 OK	ZombieReplicantView		Εντάξει
 Cut	TextView		Αποκοπή
 %3.2f GiB	StringForSize		%3.2f GiB
-Can't delete this replicant from its original application. Life goes on.	Dragger		Αδύνατη η διαγραφή της ρέπλικας από την αρχική θέση. Η ζωή συνεχίζεται.
+Can't delete this replicant from its original application. Life goes on.	Dragger		Η διαγραφή της ρέπλικας από την αρχική της θέση απέτυχε. Η ζωή συνεχίζεται.
 Error	ZombieReplicantView		Σφάλμα
 Paste	TextView		Επικόλληση
 OK	AboutWindow		Εντάξει
 Special Thanks:	AboutWindow		Ευχαριστούμε Ιδιαίτερα:
 %.2f TiB	StringForSize		%.2f TiB
-Remove replicant	Dragger		Αφαίρεση αντιγράφου
+Remove replicant	Dragger		Αφαίρεση ρέπλικας
 Version	AboutWindow		Έκδοση
 Red:	ColorControl		Κόκκινο:
-<empty>	Menu		<άδειο>
+<empty>	Menu		<κενό>
 Copy	TextView		Αντιγραφή
+Select all	TextView		Επιλογή όλων
 alpha	AboutWindow		alpha
 %3.2f MiB	StringForSize		%3.2f MiB
 Error	PrintJob		Σφάλμα
-About %app%	AboutWindow		Περί %app%
-About %app…	Dragger		Σχετικά με %app…
+About %app%	AboutWindow		Σχετικά με το %app%
+About %app…	Dragger		Σχετικά με το %app…
 Version history:	AboutWindow		Ιστορικό έκδοσης:
-Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Αδύνατη η εύρεση της εφαρμογής για το αντίγραφο. Δεν δόθηκε η υπογραφή της εφαρμογής.\n%error
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Η εύρεση της εφαρμογής για την ρέπλικα απέτυχε. Δεν έχει δοθεί η υπογραφή της εφαρμογής.\n%error
 %3.2f KiB	StringForSize		%3.2f KiB
 Blue:	ColorControl		Μπλέ:
-Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Αδυναμία δημιουργίας αντιγράφου για το \"%description\".\n%error
-Written by:	AboutWindow		Γράφτηκε από τον:
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Η δημιουργία ρέπλικα για το \"%description\" απέτυχε.\n%error
+Written by:	AboutWindow		Αναπτύχθηκε από τον:

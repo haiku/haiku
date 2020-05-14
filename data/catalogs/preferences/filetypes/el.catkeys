@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-FileTypes	2837377891
+1	greek, modern (1453-)	x-vnd.Haiku-FileTypes	455777172
 Left	Attribute Window	Attribute column alignment in Tracker	Αριστερά
 Final	Application Types Window		Τελικός
 FileTypes request	FileTypes Window		Αίτημα του FileTypes
@@ -17,12 +17,13 @@ Attribute name:	Attribute Window		Όνομα ιδιότητας:
 Long description:	Application Type Window		Εκτεταμένη περιγραφή
 Cancel	Preferred App Menu		Άκυρο
 Remove	FileTypes Window		Διαγραφή
-The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Η εφαρμογή \"%s\" δεν υποστηρίζει αυτό το τύπο αρχείου.\nΕίστε σίγουροι ότι θέλετε να το θέσετε οπωσδήποτε;
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Η εφαρμογή \"%s\" δεν υποστηρίζει αυτόν το τύπο αρχείου.\nΕίστε σίγουρος ότι θέλετε να τον ορίσετε έτσι;
 Remove	Application Type Window		Διαγραφή
 Gamma	Application Type Window		Γάμα
 Cancel	Application Type Window		Άκυρο
 Attribute	Attribute Window		Ιδιότητα
 Multiple launch	Application Type Window		Πολλαπλή εκκίνηση
+{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, one{# τύπος εφαρμογής θα μπορούσε να αφαιρεθεί} other{# τύποι εφαρμογής θα μπορούσαν να αφαιρεθούν}}
 Edit…	Application Types Window		Επεξεργασία
 Could not set preferred application	FileTypes Window		Αδυναμία ορισμού προτεινόμενης εφαρμογής
 Description	FileTypes Window		Περιγραφή
@@ -30,7 +31,7 @@ Signature:	Application Types Window		Υπογραφή
 None	FileTypes Window		Κανένα
 Exclusive launch	Application Type Window		Αποκλειστή εκκίνηση
 Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		Διαγράφοντας ένα τύπο αρχείου, δεν θα μπορείτε να το επαναφέρετε.\nΕίστε σίγουρος ότι θέλετε να το διαγράψετε;
-Integer 64 bit	Attribute ListView		Ακέραιος αριθμός 64 bit
+Integer 64 bit	Attribute ListView		Ακέραιος αριθμός 64-bit
 Cancel	New File Type Window		Άκυρο
 Select same preferred application as	FileType Window		Επιλογή ίδιας προτεινόμενης εφαρμογής ως
 Cancel	Type List Window		Άκυρο
@@ -47,7 +48,7 @@ Duration	Attribute ListView		Διάρκεια
 Version:	Application Type Window		Έκδοση:
 Default application	FileType Window		Προεπιλεγμένη εφαρμογή
 Internal name:	New File Type Window		Εσωτερικό όνομα:
-Integer 8 bit	Attribute ListView		Ακέραιος αριθμός 8 bit
+Integer 8 bit	Attribute ListView		Ακέραιος αριθμός 8-bit
 Extension:	Extension Window		Επέκταση:
 Time	Attribute ListView		Χρόνος
 Extensions:	FileTypes Window		Επεκτάσεις:
@@ -104,7 +105,7 @@ Add type	New File Type Window		Προσθήκη τύπου
 Remove icon	Icon View		Διαγραφή εικονίδιου
 Boolean	Attribute ListView		Δυαδική τιμή
 Cancel	Extension Window		Άκυρο
-Alignment:	Attribute Window		Ευθυγράμμιση:
+Alignment:	Attribute Window		Στοίχιση:
 Icon	FileType Window		Εικονίδιο
 Signature:	Application Type Window		Υπογραφή:
 Development	Application Type Window		Υπό ανάπτυξη
@@ -129,7 +130,7 @@ Add group	New File Type Window		Προσθήκη ομάδας
 Cancel	Attribute Window		Άκυρο
 Gamma	Application Types Window		Γάμμα
 Supported types	Application Type Window		Υποστηριζόμενοι τύποι
-Integer 32 bit	Attribute ListView		Ακέραιος αριθμός 32 bit
+Integer 32 bit	Attribute ListView		Ακέραιος αριθμός 32-bit
 Beta	Application Type Window		Βήτα
 Could not retrieve preferred application of this file	Preferred App Menu		Αδυναμία ανάκτησης προτεινόμενης εφαρμογής του αρχείου
 Application flags	Application Type Window		Σημαίες εφαρμογής
@@ -154,7 +155,7 @@ Extra attributes	FileTypes Window		Επιπλέον ιδιότητες
 Group:	New File Type Window		Ομάδα:
 Alpha	Application Types Window		Άλφα
 Close	Application Type Window		Κλείσιμο
-Integer 16 bit	Attribute ListView		Ακέραιος αριθμός 16 bit
+Integer 16 bit	Attribute ListView		Ακέραιος αριθμός 16-bit
 Extension	Extension Window		Επέκταση
 Rule:	FileTypes Window		Κανόνας:
 FileTypes	System name		Τύποι αρχείων

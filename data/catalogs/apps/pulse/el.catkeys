@@ -13,27 +13,27 @@ Defaults	PrefsWindow		Προεπιλογές
 Mini mode	PrefsWindow		Μίνι λειτουργία
 CPU progress bar	NormalPulseView		Μπάρα προόδου Επεξεργαστή
 Fade colors	ConfigView		Αχνά χρώματα
-About Pulse…	PulseView		Περί Παλμός...
+About Pulse…	PulseView		Σχετικά με το Pulse...
 Pulse	NormalPulseView		Παλμός
-Deskbar mode	NormalPulseView		Λειτουργία Deskbar
-Remove replicant	CPUButton		Διαγραφή αντίγραφου
+Deskbar mode	NormalPulseView		Λειτουργία Γραμμής Εργασιών
+Remove replicant	CPUButton		Διαγραφή ρέπλικας
 You can't disable the last active CPU.	PulseView		Δεν μπορείτε να απενεργοποιήσετε τον τελευταίο ενεργό Επεξεργαστή.
 Width of icon:	ConfigView		Πλάτος εικονιδίου:
-Deskbar mode	MiniPulseView		Λειτουργία Deskbar
+Deskbar mode	MiniPulseView		Λειτουργία Γραμμής Εργασιών
 OK	PulseView		Εντάξει
 %s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nΑπό τους David Ramsey και Arve Hjønnevåg\nΑναθεωρήθηκε από τον Daniel Switkin\n
 OK	PrefsWindow		Εντάξει
 Pulse	PulseApp		Παλμός
-Removing from Deskbar failed.\n%s	DeskbarPulseView		Η κατάργηση από τη Deskbar απέτυχε.\n%s
+Removing from Deskbar failed.\n%s	DeskbarPulseView		Η αφαίρεση από την Γραμμή Εργασιών απέτυχε.\n%s
 OK	PulseApp		Εντάξει
-About Pulse…	CPUButton		Περί Παλμός...
-Deskbar mode	PrefsWindow		Λειτουργία Deskbar
+About Pulse…	CPUButton		Σχετικά με το Pulse...
+Deskbar mode	PrefsWindow		Λειτουργία Γραμμής Εργασιών
 Mini mode	DeskbarPulseView		Μίνι λειτουργία
 You can't disable the last active CPU.	CPUButton		Δεν μπορείτε να απενεργοποιήσετε τον τελευταίο ενεργό Επεξεργαστή.
 OK	CPUButton		Εντάξει
-Deskbar	CPUButton		Μπάρα εργασιών
+Deskbar	CPUButton		Γραμμή Εργασιών
 Settings…	PulseView		Ρυθμίσεις...
-Deskbar menu	CPUButton		Μενού μπάρας εργασιών
+Deskbar menu	CPUButton		Μενού Γραμμής Εργασιών
 Mini mode	NormalPulseView		Μίνι λειτουργία
 Quit	MiniPulseView		Έξοδος
 Info	PulseView		Πληροφορίες
@@ -42,6 +42,6 @@ OK	DeskbarPulseView		Εντάξει
 Info	PulseApp		Πληροφορίες
 Pulse	System name		Παλμός
 Active color	ConfigView		Ενεργό χρώμα
-Installing in Deskbar failed\n%s	PulseApp		Η εγκατάσταση στη Deskbar απέτυχε\n%s
+Installing in Deskbar failed\n%s	PulseApp		Η εγκατάσταση στην Γραμμή Εργασιών απέτυχε\n%s
 Idle color	ConfigView		Χρώμα αδράνειας
 Normal mode	PrefsWindow		Κανονική λειτουργία
