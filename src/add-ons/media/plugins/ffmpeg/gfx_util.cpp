@@ -175,8 +175,6 @@ pixfmt_to_colorspace(int pixFormat)
 		// NOTE: See pixfmt_to_colorspace() for what these are.
 		case AV_PIX_FMT_YUV420P:
 			return B_YUV420;
-		case AV_PIX_FMT_YUYV422:
-			return B_YUV422;
 		case AV_PIX_FMT_RGB24:
 			return B_RGB24_BIG;
 		case AV_PIX_FMT_BGR24:
@@ -207,6 +205,10 @@ pixfmt_to_colorspace(int pixFormat)
 			return B_RGB16;
 		case AV_PIX_FMT_BGR555:
 			return B_RGB15;
+		// TODO: more YCbCr color spaces! These are not the same as YUV!
+		case AV_PIX_FMT_YUYV422:
+			return B_YCbCr422;
+
 	}
 }
 
@@ -237,7 +239,6 @@ colorspace_to_pixfmt(color_space format)
 			return AV_PIX_FMT_YUV410P;
 		case B_YUV12:
 			return AV_PIX_FMT_YUV411P;
-		// TODO: YCbCr color spaces! These are not the same as YUV!
 		case B_RGB16_BIG:
 			return AV_PIX_FMT_RGB565;
 		case B_RGB15_BIG:
@@ -255,6 +256,9 @@ colorspace_to_pixfmt(color_space format)
 			return AV_PIX_FMT_BGR565;
 		case B_RGB15:
 			return AV_PIX_FMT_BGR555;
+		// TODO: more YCbCr color spaces! These are not the same as YUV!
+		case B_YCbCr422:
+			return AV_PIX_FMT_YUYV422;
 	}
 }
 
