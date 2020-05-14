@@ -7,9 +7,14 @@
 
 #include "ufs2.h"
 
+extern fs_volume_ops gUfs2VolumeOps;
+extern fs_vnode_ops gufs2VnodeOps;
+
 enum volume_flags {
 	VOLUME_READ_ONLY	= 0x0001
 };
+
+class Inode;
 
 class Volume {
 	public:
@@ -25,6 +30,8 @@ class Volume {
 				bool					IsValidInodeBlock(off_t block) const;
 				bool					IsReadOnly() const;
 				fs_volume*				FSVolume() const { return fFSVolume; }
+				dev_t					ID() const
+										{ return fFSVolume ? fFSVolume->id : -1; }
 				ufs2_super_block&		SuperBlock() { return fSuperBlock; }
 				status_t				LoadSuperBlock();
 		static	status_t				Identify(int fd, ufs2_super_block* superBlock);
@@ -35,6 +42,7 @@ class Volume {
 				ufs2_super_block		fSuperBlock;
 				mutex					fLock;
 				uint32					fFlags;
+				Inode*					fRootNode;
 };
 
 #endif	// VOLUME_H

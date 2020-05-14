@@ -40,6 +40,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) src tools fs_shell ] ;
 
 local ufs2Source =
 	DeviceOpener.cpp
+	Inode.cpp
 	Volume.cpp
 	kernel_interface.cpp
 ;

@@ -7,6 +7,7 @@
 #include "system_dependencies.h"
 #include "ufs2.h"
 #include "Volume.h"
+#include "Inode.h"
 
 #ifdef TRACE_ufs2
 #define TRACE(x...) dprintf("\33[34mufs2:\33[0m " x)
@@ -78,14 +79,14 @@ static status_t
 ufs2_mount(fs_volume *_volume, const char *device, uint32 flags,
 		  const char *args, ino_t *_rootID)
 {
-	TRACE("Tracing mount()");
+	TRACE("Tracing mount()\n");
 	Volume* volume = new(std::nothrow) Volume(_volume);
 	if (volume == NULL)
 		return B_NO_MEMORY;
 
 	_volume->private_volume = volume;
-	//_volume->ops = &gufs2VolumeOps;
-
+	_volume->ops = &gUfs2VolumeOps;
+	*_rootID = UFS2_ROOT;
 	status_t status = volume->Mount(device, flags);
 	if (status != B_OK){
 		ERROR("Failed mounting the volume. Error: %s\n", strerror(status));
@@ -116,7 +117,25 @@ static status_t
 ufs2_get_vnode(fs_volume *_volume, ino_t id, fs_vnode *_node, int *_type,
 			  uint32 *_flags, bool reenter)
 {
-	return B_NOT_SUPPORTED;
+	Volume* volume = (Volume*)_volume->private_volume;
+
+	Inode* inode = new(std::nothrow) Inode(volume, id);
+	if (inode == NULL)
+		return B_NO_MEMORY;
+
+	status_t status = inode->InitCheck();
+	if (status != B_OK) {
+		delete inode;
+		ERROR("get_vnode: InitCheck() failed. Error: %s\n", strerror(status));
+		return status;
+	}
+	_node->private_node = inode;
+	_node->ops = &gufs2VnodeOps;
+	*_type = inode->Mode();
+	*_flags = 0;
+
+	return B_OK;
+
 }
 
 
@@ -453,10 +472,10 @@ ufs2_std_ops(int32 op, ...)
 	}
 }
 
-fs_volume_ops gufs2VolumeOps = {
+fs_volume_ops gUfs2VolumeOps = {
 	&ufs2_unmount,
 	&ufs2_read_fs_info,
-	NULL, // write_fs_info()
+	NULL, //write_fs_info()
 	NULL, // fs_sync,
 	&ufs2_get_vnode,
 };

@@ -5,6 +5,8 @@
 #include "Volume.h"
 
 #include "DeviceOpener.h"
+#include "Inode.h"
+
 
 #define TRACE_UFS2
 #ifdef TRACE_UFS2
@@ -33,7 +35,8 @@ Volume::IsValidSuperBlock()
 
 
 Volume::Volume(fs_volume *volume)
-	: fFSVolume(volume)
+	: fFSVolume(volume),
+	fRootNode(NULL)
 {
 	fFlags = 0;
 	mutex_init(&fLock, "ufs2 volume");
@@ -98,6 +101,14 @@ Volume::Mount(const char *deviceName, uint32 flags)
 
 	TRACE("Valid super block\n");
 
+	status = get_vnode(fFSVolume, UFS2_ROOT, (void**) &fRootNode);
+	if (status != B_OK) {
+		ERROR("could not create root node: get_vnode() failed! %d\n",status);
+		return status;
+	}
+	fRootNode = new(std::nothrow) Inode(this, UFS2_ROOT);
+	status = publish_vnode(fFSVolume, UFS2_ROOT, (void*)fRootNode,
+			&gufs2VnodeOps, fRootNode->Mode(), 0);
 	opener.Keep();
 	return B_OK;
 

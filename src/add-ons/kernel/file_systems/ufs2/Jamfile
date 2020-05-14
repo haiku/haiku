@@ -19,6 +19,7 @@ DEFINES += DEBUG_APP="\\\"ufs2\\\"" ;
 
 local ufs2Sources =
 	DeviceOpener.cpp
+	Inode.cpp
 	Volume.cpp
 	kernel_interface.cpp
 	;
