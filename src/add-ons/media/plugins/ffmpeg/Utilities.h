@@ -177,13 +177,14 @@ CalculateBytesPerRowWithColorSpaceAndVideoWidth(color_space colorSpace, int vide
 	assert(videoWidth >= 0);
 
 	const uint32 kBytesPerRowUnknown = 0;
-	size_t bytesPerPixel;
+	size_t pixelChunk;
 	size_t rowAlignment;
+	size_t pixelsPerChunk;
 
-	if (get_pixel_size_for(colorSpace, &bytesPerPixel, &rowAlignment, NULL) != B_OK)
+	if (get_pixel_size_for(colorSpace, &pixelChunk, &rowAlignment, &pixelsPerChunk) != B_OK)
 		return kBytesPerRowUnknown;
 
-	uint32 bytesPerRow = bytesPerPixel * videoWidth;
+	uint32 bytesPerRow = pixelChunk * videoWidth / pixelsPerChunk;
 	uint32 numberOfUnalignedBytes = bytesPerRow % rowAlignment;
 
 	if (numberOfUnalignedBytes == 0)
