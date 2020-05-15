@@ -142,6 +142,7 @@ local applicationSources =
 	PackageManager.cpp
 	RatePackageWindow.cpp
 	RatingView.cpp
+	RatingUtils.cpp
 	support.cpp
 	ScreenshotWindow.cpp
 	ScrollableGroupView.cpp

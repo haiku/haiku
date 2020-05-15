@@ -211,9 +211,9 @@ MainWindow::MainWindow(const BMessage& settings)
 	BPackageRoster().StartWatching(this,
 		B_WATCH_PACKAGE_INSTALLATION_LOCATIONS);
 
-	_StartBulkLoad();
-
 	_InitWorkerThreads();
+	_AdoptModel();
+	_StartBulkLoad();
 }
 
 
@@ -222,6 +222,8 @@ MainWindow::MainWindow(const BMessage& settings, const PackageInfoRef& package)
 	BWindow(BRect(50, 50, 650, 350), B_TRANSLATE_SYSTEM_NAME("HaikuDepot"),
 		B_DOCUMENT_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
+	fFeaturedPackagesView(NULL),
+	fPackageListView(NULL),
 	fWorkStatusView(NULL),
 	fScreenshotWindow(NULL),
 	fUserMenu(NULL),
@@ -529,11 +531,14 @@ MainWindow::MessageReceived(BMessage* message)
 
 				if (wasVisible != isVisible) {
 					if (!isVisible) {
-						fPackageListView->RemovePackage(ref);
-						fFeaturedPackagesView->RemovePackage(ref);
+						if (fPackageListView != NULL)
+							fPackageListView->RemovePackage(ref);
+						if (fFeaturedPackagesView != NULL)
+							fFeaturedPackagesView->RemovePackage(ref);
 					} else {
-						fPackageListView->AddPackage(ref);
-						if (ref->IsProminent())
+						if (fPackageListView != NULL)
+							fPackageListView->AddPackage(ref);
+						if (fFeaturedPackagesView != NULL && ref->IsProminent())
 							fFeaturedPackagesView->AddPackage(ref);
 					}
 				}
@@ -611,8 +616,9 @@ MainWindow::MessageReceived(BMessage* message)
 					break;
 				PackageInfoRef package(packageRaw, true);
 
-				fPackageListView->AddPackage(package);
-				if (package->IsProminent())
+				if (fPackageListView != NULL)
+					fPackageListView->AddPackage(package);
+				if (fFeaturedPackagesView != NULL && package->IsProminent())
 					fFeaturedPackagesView->AddPackage(package);
 			}
 			break;
@@ -621,8 +627,10 @@ MainWindow::MessageReceived(BMessage* message)
 		case MSG_UPDATE_SELECTED_PACKAGE:
 		{
 			const PackageInfoRef& selectedPackage = fPackageInfoView->Package();
-			fFeaturedPackagesView->SelectPackage(selectedPackage, true);
-			fPackageListView->SelectPackage(selectedPackage);
+			if (fFeaturedPackagesView != NULL)
+				fFeaturedPackagesView->SelectPackage(selectedPackage, true);
+			if (fPackageListView != NULL)
+				fPackageListView->SelectPackage(selectedPackage);
 
 			AutoLocker<BLocker> modelLocker(fModel.Lock());
 			if (!fVisiblePackages.Contains(fPackageInfoView->Package()))
@@ -675,7 +683,8 @@ MainWindow::StoreSettings(BMessage& settings) const
 		settings.AddRect("window frame", Frame());
 
 		BMessage columnSettings;
-		fPackageListView->SaveState(&columnSettings);
+		if (fPackageListView != NULL)
+			fPackageListView->SaveState(&columnSettings);
 
 		settings.AddMessage("column settings", &columnSettings);
 
@@ -919,6 +928,9 @@ MainWindow::_AdoptModel()
 	if (Logger::IsTraceEnabled())
 		printf("adopting model to main window ui");
 
+	if (fSinglePackageMode)
+		return;
+
 	{
 		AutoLocker<BLocker> modelLocker(fModel.Lock());
 		fVisiblePackages = fModel.CreatePackageList();
@@ -927,8 +939,10 @@ MainWindow::_AdoptModel()
 		atomic_add(&fPackagesToShowListID, 1);
 	}
 
-	fFeaturedPackagesView->Clear();
-	fPackageListView->Clear();
+	if (fFeaturedPackagesView != NULL)
+		fFeaturedPackagesView->Clear();
+	if (fPackageListView != NULL)
+		fPackageListView->Clear();
 
 	release_sem(fNewPackagesToShowSem);
 
@@ -1055,6 +1069,9 @@ MainWindow::_NotifyWorkStatusChange(const BString& text, float progress)
 void
 MainWindow::_HandleWorkStatusChangeMessageReceived(const BMessage* message)
 {
+	if (fWorkStatusView == NULL)
+		return;
+
 	BString text;
 	float progress;
 

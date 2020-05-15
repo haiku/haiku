@@ -12,6 +12,7 @@
 #include <LayoutUtils.h>
 
 #include "HaikuDepotConstants.h"
+#include "RatingUtils.h"
 
 
 RatingView::RatingView(const char* name)
@@ -54,36 +55,7 @@ RatingView::StarBitmap()
 void
 RatingView::Draw(BRect updateRect)
 {
-	FillRect(updateRect, B_SOLID_LOW);
-	const BBitmap* star = StarBitmap();
-
-	if (star == NULL) {
-		fprintf(stderr, "No star icon found in application resources.\n");
-		return;
-	}
-
-	SetDrawingMode(B_OP_OVER);
-
-	float x = 0;
-	for (int i = 0; i < 5; i++) {
-		DrawBitmap(star, BPoint(x, 0));
-		x += 16 + 2;
-	}
-
-	if (fRating >= RATING_MIN && fRating < 5.0f) {
-		SetDrawingMode(B_OP_OVER);
-
-		BRect rect(Bounds());
-		rect.right = x - 2;
-		rect.left = ceilf(rect.left + (fRating / 5.0f) * rect.Width());
-
-		rgb_color color = LowColor();
-		color.alpha = 190;
-		SetHighColor(color);
-
-		SetDrawingMode(B_OP_ALPHA);
-		FillRect(rect, B_SOLID_HIGH);
-	}
+	RatingUtils::Draw(this, BPoint(0, 0), fRating, StarBitmap());
 }
 
 
