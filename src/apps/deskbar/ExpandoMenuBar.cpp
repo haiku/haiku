@@ -359,7 +359,8 @@ TExpandoMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 		// force a cleanup
 		_FinishedDrag();
 
-		if (buttons != 0) {
+		if (Vertical() && buttons != 0
+				&& static_cast<TBarApp*>(be_app)->Settings()->superExpando) {
 			TTeamMenuItem* lastItem
 				= dynamic_cast<TTeamMenuItem*>(fLastClickedItem);
 			if (lastItem != NULL) {
@@ -490,7 +491,8 @@ TExpandoMenuBar::MouseUp(BPoint where)
 			// absorb the message
 	}
 
-	if (lastItem != NULL && lastItem->ExpanderBounds().Contains(where)) {
+	if (Vertical() && static_cast<TBarApp*>(be_app)->Settings()->superExpando
+		&& lastItem != NULL && lastItem->ExpanderBounds().Contains(where)) {
 		lastItem->ToggleExpandState(true);
 		lastItem->SetArrowDirection(lastItem->IsExpanded()
 			? BControlLook::B_DOWN_ARROW
