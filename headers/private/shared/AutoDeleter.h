@@ -80,6 +80,10 @@ public:
 protected:
 	C			*fObject;
 	DeleteFunc	fDelete;
+
+private:
+	AutoDeleter(const AutoDeleter&);
+	AutoDeleter& operator=(const AutoDeleter&);
 };
 
 
