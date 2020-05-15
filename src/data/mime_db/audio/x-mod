@@ -10,4 +10,4 @@ resource(3, "META:EXTENS") message(234) {
 	"type" = "audio/x-mod"
 };
 
-resource(5, "META:SNIFF_RULE") "0.2 [44] (0x0f00 & 0xf0c0) [74] (0x0f00 & 0xf0c0) [104] (0x0f00 & 0xf0c0)";
+resource(5, "META:SNIFF_RULE") "0.2 [44] (0x0f00 & 0xf0c0) [74] (0x0f00 & 0xf0c0) [104] (0x0f00 & 0xf0c0) 1080 (\"M.K.\" | \"M!K!\" | \"6CHN\" | \"8CHN\" | \"CD81\" | \"OKTA\" | \"OCTA\" | \"FLT4\" | \"FLT8\")";
