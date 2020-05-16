@@ -94,6 +94,7 @@ DoCatalogs libbe.so
 	Dragger.cpp
 	Menu.cpp
 	PrintJob.cpp
+	StringForRate.cpp
 	StringForSize.cpp
 	TextView.cpp
 	ZombieReplicantView.cpp
