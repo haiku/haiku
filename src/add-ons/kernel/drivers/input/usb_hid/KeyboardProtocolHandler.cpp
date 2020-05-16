@@ -188,7 +188,13 @@ KeyboardProtocolHandler::AddHandlers(HIDDevice &device,
 			switch (collection.UsageID()) {
 				case B_HID_UID_GD_KEYBOARD:
 				case B_HID_UID_GD_KEYPAD:
+#if 0
+				// This is not specific enough to deserve a keyboard device on
+				// its own (some mice have one such descriptor, for example).
+				// If your keyboard uses this, do a more extensive check of
+				// the descriptor to make sure there actually are keys in it.
 				case B_HID_UID_GD_SYSTEM_CONTROL:
+#endif
 					handled = true;
 			}
 
