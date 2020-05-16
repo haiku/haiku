@@ -1,0 +1,72 @@
+Partitioning system for Sun Sparc machines
+==========================================
+
+Infos extracted from [File System Forensic Analysis, Brian Carrier](urn:isbn:0-134-43954-6)
+and in particular the [online copy here](https://books.google.fr/books?id=Zpm9CgAAQBAJ&lpg=PT159&ots=6LIQ6blJCF&dq=solaris%20vtoc%20structure&hl=fr&pg=PT159#v=onepage&q=solaris%20vtoc%20structure&f=false), tables 6.9 and 6.10.
+
+The format is called VTOC (volume table of contents). It is stored at offset 0
+on-disk. All values are big endian.
+
+Note that the x86 version of Solaris uses a different layout.
+
+Byte offset|Description
+0-127      |ASCII disk label
+128-261    |VTOC *
+262-263    |Sectors to skip when writing
+264-265    |Setors to skip when reading
+266-419    |Reserved
+420-421    |Disk speed
+422-423    |Number of cylinders
+424-425    |Alternates per cylinder
+426-429    |Reserved
+430-431    |Interleave
+432-433    |Number of data cylinders
+434-435    |Number of alternate cylinders
+436-437    |Number of heads
+438-439    |Number of sectors per track
+440-443    |Reserved
+444-451    |Partition 1 disk map
+...        |More partition disk maps
+500-507    |Partition 8 disk map
+508-509    |Signature (0xDABE)
+510-511    |Checksum
+
+The VTOC itself:
+
+0-3   Version
+4-11  Volume name
+12-13 Number of partitions
+14-15 Partition 1 type
+16-17 Partition 1 flags
+...   More partition types and flags
+42-45 Partition 8 type and flags
+46-57 Boot info
+58-59 Reserved
+60-63 Signature 0x600DDEEE
+64-101 Reserved
+102-105 Partition 1 timestamp
+...     More partition timestamps
+130-133 Parittion 8 timestamp
+
+Partition types (informative):
+
+0 unassigned
+1 /boot
+2 /
+3 swap
+4 /usr
+5 entire disk
+6 /stand
+7 /var
+8 /home
+9 alternate sector
+10 cachefs
+
+Partition flags:
+1 Not mountable
+128 read only
+
+Disk maps:
+
+0-3 Starting cylinder
+4-7 Size (in sectors)

@@ -1,0 +1,10 @@
+SubDir HAIKU_TOP src add-ons kernel partitioning_systems sun ;
+
+UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
+UsePrivateHeaders [ FDirName kernel ] ;
+UsePrivateHeaders [ FDirName storage ] ;
+
+KernelAddon sun :
+	sun.cpp
+	;
+

@@ -49,7 +49,7 @@ AddFilesToPackage add-ons kernel generic
 	: ata_adapter bios@x86,x86_64 dpc
 		locked_pool mpu401 scsi_periph smbios@x86,x86_64 <module>tty ;
 AddFilesToPackage add-ons kernel partitioning_systems
-	: amiga_rdb@m68k apple@ppc efi_gpt intel session ;
+	: amiga_rdb@m68k apple@ppc sun@sparc efi_gpt intel session ;
 AddFilesToPackage add-ons kernel interrupt_controllers : openpic@ppc ;
 AddFilesToPackage add-ons kernel power cpufreq : intel_pstates@x86,x86_64 ;
 AddFilesToPackage add-ons kernel power cpuidle : intel_cstates@x86,x86_64 ;

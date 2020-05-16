@@ -6,4 +6,5 @@ HaikuSubInclude atari ;
 HaikuSubInclude gpt ;
 HaikuSubInclude intel ;
 HaikuSubInclude session ;
+HaikuSubInclude sun ;
 HaikuSubInclude vmdk ;
