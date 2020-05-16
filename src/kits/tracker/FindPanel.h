@@ -78,6 +78,8 @@ BMenu* TrackerBuildRecentFindItemsMenu(const char* title);
 
 struct MoreOptionsStruct {
 	bool showMoreOptions;
+		// Some options used to be in a collapsable part of the window, but
+		// this was removed. Now the options are always visible.
 	bool searchTrash;
 	int32 reserved1;
 	bool temporary;
@@ -96,7 +98,7 @@ struct MoreOptionsStruct {
 
 	MoreOptionsStruct()
 		:
-		showMoreOptions(false),
+		showMoreOptions(true),
 		searchTrash(false),
 		reserved1(0),
 		temporary(true),
@@ -283,7 +285,6 @@ private:
 	BCheckBox* fTemporaryCheck;
 	BCheckBox* fSearchTrashCheck;
 
-	PaneSwitch* fLatch;
 	DraggableIcon* fDraggableIcon;
 
 	typedef BView _inherited;
