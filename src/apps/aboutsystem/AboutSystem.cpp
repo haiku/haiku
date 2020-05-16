@@ -912,7 +912,8 @@ AboutView::_CreateCreditsView()
 	if (year < 2008)
 		year = 2008;
 	snprintf(string, sizeof(string),
-		COPYRIGHT_STRING "2001-%" B_PRId32 " The Haiku project. ", year);
+		B_TRANSLATE(COPYRIGHT_STRING "2001-%" B_PRId32 " The Haiku project. "),
+		year);
 
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(string);
