@@ -609,7 +609,6 @@ mutex_init_etc(mutex* lock, const char *name, uint32 flags)
 	lock->holder = -1;
 #else
 	lock->count = 0;
-	lock->ignore_unlock_count = 0;
 #endif
 	lock->flags = flags & MUTEX_FLAG_CLONE_NAME;
 
@@ -642,7 +641,9 @@ mutex_destroy(mutex* lock)
 		lock->waiters = waiter->next;
 
 		// unblock thread
-		thread_unblock(waiter->thread, B_ERROR);
+		Thread* thread = waiter->thread;
+		waiter->thread = NULL;
+		thread_unblock(thread, B_ERROR);
 	}
 
 	lock->name = NULL;
@@ -801,11 +802,6 @@ _mutex_unlock(mutex* lock)
 			thread_get_current_thread_id(), lock, lock->holder);
 		return;
 	}
-#else
-	if (lock->ignore_unlock_count > 0) {
-		lock->ignore_unlock_count--;
-		return;
-	}
 #endif
 
 	mutex_waiter* waiter = lock->waiters;
@@ -826,7 +822,7 @@ _mutex_unlock(mutex* lock)
 		// unblock thread
 		thread_unblock(waiter->thread, B_OK);
 	} else {
-		// Nobody is waiting to acquire this lock. Just mark it as released.
+		// There are no waiters, so mark the lock as released.
 #if KDEBUG
 		lock->holder = -1;
 #else
@@ -907,6 +903,13 @@ _mutex_lock_with_timeout(mutex* lock, uint32 timeoutFlags, bigtime_t timeout)
 		ASSERT(lock->holder == waiter.thread->id);
 #endif
 	} else {
+		// If the lock was destroyed, our "thread" entry will be NULL.
+		if (waiter.thread == NULL)
+			return B_ERROR;
+
+		// TODO: There is still a race condition during mutex destruction,
+		// if we resume due to a timeout before our thread is set to NULL.
+
 		locker.Lock();
 
 		// If the timeout occurred, we must remove our waiter structure from
@@ -931,17 +934,15 @@ _mutex_lock_with_timeout(mutex* lock, uint32 timeoutFlags, bigtime_t timeout)
 
 #if !KDEBUG
 			// we need to fix the lock count
-			if (atomic_add(&lock->count, 1) == -1) {
-				// This means we were the only thread waiting for the lock and
-				// the lock owner has already called atomic_add() in
-				// mutex_unlock(). That is we probably would get the lock very
-				// soon (if the lock holder has a low priority, that might
-				// actually take rather long, though), but the timeout already
-				// occurred, so we don't try to wait. Just increment the ignore
-				// unlock count.
-				lock->ignore_unlock_count++;
-			}
+			atomic_add(&lock->count, 1);
 #endif
+		} else {
+			// the structure is not in the list -- even though the timeout
+			// occurred, this means we own the lock now
+#if KDEBUG
+			ASSERT(lock->holder == waiter.thread->id);
+#endif
+			return B_OK;
 		}
 	}
 
