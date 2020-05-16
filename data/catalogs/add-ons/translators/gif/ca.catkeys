@@ -5,7 +5,7 @@ Optimal	GIFView		Òptim
 Greyscale	GIFView		Escala de grisos
 Colors:	GIFView		Colors:
 GIF image translator	GIFTranslator		Traductor d'imatges GIF
-Be Bitmap Format (GIFTranslator)	GIFTranslator		Format Be Bitmap (GIFTranslator)
+Be Bitmap Format (GIFTranslator)	GIFTranslator		Format mapa de bits de Be (Traductor de GIF)
 GIF image translator	GIFView		Traductor d'imatges GIF
 Palette:	GIFView		Paleta:
 GIF image	GIFTranslator		Imatge GIF

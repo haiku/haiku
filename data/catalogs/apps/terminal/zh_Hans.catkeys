@@ -70,7 +70,7 @@ Cursor	Terminal AppearancePrefView		游标
 Full screen	Terminal TermWindow		全屏
 Shell 	Terminal TermWindow		Shell
 Midnight	Terminal colors scheme		午夜主题
-\t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\t字符 '%' 。\n\t%<\t-\t开始新区块，仅当其后的\n\t\t\t占位符不为空时显示。\n\t%>\t-\t开始新区块，仅当之前的\n\t\t\t %< 和该区块不为空时显示。\n\t%-\t-\t结束一个 %< or %> 区块。\n\n仅当占位符的值不为空时，任何位于 '%' 和格式化字符之间的非字母数字字符都\n将会插入一个空格。它将会添加到 %< 区块。
+\t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\t字符 '%' 。\n\t%<\t-\t开始新区块，仅当其后的\n\t\t\t占位符不为空时显示。\n\t%>\t-\t开始新区块，仅当\n\t\t\t之前的区块%<和该区块不为空时显示。\n\t%-\t-\t结束一个%< or %>区块。\n\n仅当占位符的值不为空时，任何位于 '%' 和格式化字符之间的非字母数字字符都\n将会插入一个空格。它将会添加到 %< 区块。
 Tab title:	Terminal TermWindow		标签标题：
 Window title:	Terminal TermWindow		窗口标题：
 Default	Terminal colors scheme		默认主题

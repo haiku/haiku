@@ -1,8 +1,8 @@
 1	catalan; valencian	x-vnd.Haiku-STXTTranslator	274886668
 Be styled text file	STXTTranslator		Fitxer de text d'estil del Be
 Plain text file	STXTTranslator		Fitxer de text net
-STXTTranslator Settings	STXTTranslator		Paràmetres del Traductor STXT
-StyledEdit file translator	STXTView		Traductor de fitxers Editor d'estil
+STXTTranslator Settings	STXTTranslator		Paràmetres del Traductor d'STXT
+StyledEdit file translator	STXTView		Traductor de fitxers de l'Editor d'estil
 StyledEdit files	STXTTranslator		Fitxers de l'Editor d'estil
 StyledEdit file translator	STXTTranslator		Traductor de fitxers de l'Editor d'estil
 STXT Settings	STXTMain		Paràmetres d'STXT

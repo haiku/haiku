@@ -26,14 +26,14 @@ Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Το Shortcuts δ
 Save & apply	ShortcutsWindow		Αποθήκευση & εφαρμογή
 Open	ShortcutsWindow		Άνοιγμα
 Append	ShortcutsWindow		Προσάρτηση
-Save KeySet as…	ShortcutsWindow		Αποθήκευση σετ πλήκτρων ως...
-Append KeySet…	ShortcutsWindow		Control
+Save KeySet as…	ShortcutsWindow		Αποθήκευση σετ πλήκτρων ως…
+Append KeySet…	ShortcutsWindow		Προσάρτηση σετ πλήκτρων…
 *MouseButton 1	ShortcutsWindow		*Πλήκτρο Ποντικιού 1
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Πολλαπλό \"*Μετακίνηση ποντικιού σε 100% 0\" \"*Πλήκτρο ποντικιού 1\"
 OK	ShortcutsWindow		Εντάξει
 Add new shortcut	ShortcutsWindow		Προσθήκη νέας συντόμευσης
 Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
-Open KeySet…	ShortcutsWindow		Άνοιγμα Σετ Πλήκτρων...
+Open KeySet…	ShortcutsWindow		Άνοιγμα σετ πλήκτρων…
 File	ShortcutsWindow		Αρχείο
 *LaunchHandler text/html	ShortcutsWindow		*LaunchHandler text/html
 *MoveMouseTo 50% 50%	ShortcutsWindow		*Μετακίνηση ποντικιού στο 50% 50%

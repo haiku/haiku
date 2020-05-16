@@ -1,7 +1,7 @@
-1	greek, modern (1453-)	x-vnd.Be-PEPL	3273435274
+1	greek, modern (1453-)	x-vnd.Be-PEPL	3676386979
 Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Η εκκίνηση του FileTypes preflet για τη διαχείριση των ιδιοτήτων του ατόμου απέτυχε.\n\nΣφάλμα: 
 Unnamed person	People		Ανώνυμο άτομο
-New person…	People		Νέο έπαφη...
+New person…	People		Νέα επαφή…
 Address	People		Όδος
 Zip	People		Τ.Κ.
 Select all	People		Επιλογή όλων
@@ -13,7 +13,8 @@ The file '%name%' could not be written.	People		Το αρχείο '%name%' δε 
 Contact name	People		Όνομα της επαφής
 Cancel	People		Άκυρο
 Edit	People		Επεξεργασία
-People	System name		People
+Save changes before closing?	People		Να αποθηκευτούν οι αλλαγές πριν από το κλείσιμο;
+People	System name		Επαφές
 Error	People		Σφάλμα
 Revert	People		Επαναφόρα
 Country	People		Χώρα
@@ -25,7 +26,7 @@ URL	People		Υπερσύνδεσμος
 %name% picture	People		%name% φωτογραφία
 Home phone	People		Τηλέφωνο σπιτιού
 none	Groups list		Ουδείς
-Save as…	People		Αποθήκευση σαν...
+Save as…	People		Αποθήκευση ως…
 Cut	People		Αποκοπή
 Contact information for a person.	Long mimetype description		Πληροφορίες επικοινωνίας επαφής.
 Remove image	People		Αφαίρεση εικόνας
@@ -43,6 +44,6 @@ Copy	People		Αντιγραφή
 Paste	People		Επικόλληση
 E-mail	People		E-mail
 Group	People		Γκρούπ
-Drop an image here,\nor use the contextual menu.	People		Αφήστε μια εικόνα εδώ,\nή χρησιμοποιήστε το σχετικό μενού.
-Load image…	People		Φόρτωση εικόνας...
+Drop an image here,\nor use the contextual menu.	People		Σύρετε μια εικόνα εδώ,\nή χρησιμοποιήστε το σχετικό μενού.
+Load image…	People		Φόρτωση εικόνας…
 Sorry	People		Συγγνώμη

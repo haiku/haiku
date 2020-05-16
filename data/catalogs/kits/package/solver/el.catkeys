@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-libsolvsolver	1770441051
+1	greek, modern (1453-)	x-vnd.Haiku-libsolvsolver	3269781961
 allow architecture change of %source% to %target%	SolverProblemSolution		να επιτραπεί η αλλαγή αρχιτεκτονικής από %source% σε %target%
 install %source% from excluded repository	SolverProblemSolution		να γίνει εγκατάσταση του %source% από απενεργοποιημένο αποθετήριο
 unspecified problem	SolverProblem		απροσδιόριστο πρόβλημα
@@ -16,6 +16,8 @@ do not forbid installation of %source%	SolverProblemSolution		να μην απα
 allow downgrade of %source% to %target%	SolverProblemSolution		να επιτραπεί η υποβάθμιση έκδοσης από %source% σε %target%
 dependency problem	SolverProblem		πρόβλημα εξαρτήσεων
 %dependency% is provided by the system	SolverProblem		το %dependency% παρέχεται από το σύστημα
+keep %source% despite its inferior architecture	SolverProblemSolution		να διατηρηθεί το %source% ανεξάρτητα από την κατώτερη αρχιτεκτονική του
+installed package %source% obsoletes %dependency% provided by %target%	SolverProblem		το εγκατεστημένο πακέτο %source% απαρχαιώνει το %dependency%, το οποίο παρέχεται από το %target%
 allow name change of %source% to %target%	SolverProblemSolution		να επιτραπεί η αλλαγή ονόματος από %source% σε %target%
 package %source% conflicts with %dependency% provided by %target%	SolverProblem		το πακέτο %source% συγχέεται με το %dependency%, το οποίο παρέχεται από το %target%
 do something	SolverProblemSolution		κάνε κάτι
@@ -24,6 +26,7 @@ cannot install both %source% and %target%	SolverProblem		δεν μπορεί ν�
 package %source% is not installable	SolverProblem		το %source% δεν μπορεί να εγκατασταθεί
 problem with installed package %source%	SolverProblem		πρόβλημα με εγκατεστημένο πακέτο %source%
 allow deinstallation of %source%	SolverProblemSolution		να επιτραπεί η απεγκατάσταση του %source%
+package %source% conflicts with %dependency% provided by itself	SolverProblem		το πακέτο %source% συγχέεται με το %dependency%, το οποίο παρέχεται από το ίδιο
 do not lock \"%selection%\"	SolverProblemSolution		να μην κλειδωθεί το \"%selection%\"
 do not install \"%selection%\"	SolverProblemSolution		να μην εγκατασταθεί το \"%selection%\"
 nothing provides %dependency% needed by %source%	SolverProblem		τίποτα δεν παρέχει το %dependency%, το οποίο είναι αναγκαίο για το %source%

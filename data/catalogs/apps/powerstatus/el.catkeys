@@ -12,7 +12,7 @@ Empty battery slot	PowerStatus		Κενή υποδοχή μπαταρίας
 Run in window	PowerStatus		Εκτέλεση σε παράθυρο
 PowerStatus	System name		PowerStatus
  mWh	PowerStatus		 mWh
-Battery info…	PowerStatus		Πληροφορίες μπαταρίας...
+Battery info…	PowerStatus		Πληροφορίες μπαταρίας…
 Damaged battery	PowerStatus		Κατεστραμμένη μπαταρία
 Show time	PowerStatus		Εμφάνιση ώρας
 Last full charge: 	PowerStatus		Τελευταία πλήρης φόρτιση: 
@@ -22,7 +22,7 @@ Extended battery info	PowerStatus		Λεπτομερείς πληροφορίες
 Current rate: 	PowerStatus		Τρέχων ρυθμός: 
 discharging	PowerStatus		αποφόρτιση
 Show text label	PowerStatus		Εμφάνιση κειμένου ετικέτας
-About…	PowerStatus		Σχετικά...
+About…	PowerStatus		Σχετικά…
 Model number: 	PowerStatus		Αριθμός μοντέλου: 
 Install in Deskbar	PowerStatus		Εγκατάσταση στην Γραμμή Εργασιών
  mAh	PowerStatus		 mAh

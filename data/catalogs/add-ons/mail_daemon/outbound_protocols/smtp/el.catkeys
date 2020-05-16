@@ -2,7 +2,7 @@
 POP3 authentication failed. The server said:\n	smtp		Η πιστοποίηση POP3 απέτυχε. Ο εξυπηρετητής αποκρίθηκε:\n
 Destination:	ConfigView		Προορισμός:
 Error while logging in to %serv	smtp		Σφάλμα κατα τη σύνδεση στο %serv
-Connecting to server…	smtp		Σύνδεση στον εξυπηρετητή...
+Connecting to server…	smtp		Γίνεται σύνδεση στον εξυπηρετητή…
 Unencrypted	ConfigView		Μη κρυπτογραφημένο
 . The server says:\n	smtp		. Ο εξυπηρετητής αποκρίθηκε:\n
 Error while opening connection to %serv	smtp		Σφάλμα κατά το άνοιγμα σύνδεσης στο %serv

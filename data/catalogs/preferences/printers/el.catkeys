@@ -16,12 +16,12 @@ Waiting	JobListView		Αναμονή
 Processing	JobListView		Γίνεται επεξεργασία
 Cancel	AddPrinterDialog		Άκυρο
 Unknown status	JobListView		Άγνωστη κατάσταση
-Print jobs for %printer_name%	PrintersWindow		Εργασίες εκτύπωσης για τον %printer_name% 
+Print jobs for %printer_name%	PrintersWindow		Εργασίες εκτύπωσης για τον %printer_name%
 {0, plural, =-1{??? pages}=1{# page}other{# pages}}	JobListView		{0, plural, =-1{??? σελίδες}=1{# σελίδα}other{# σελίδες}}
 Add printer	AddPrinterDialog		Προσθήκη εκτυπωτή
 Printers	PrintersWindow		Εκτυπωτές
 No printer found!	TransportMenu		Δεν βρέθηκε εκτυπωτής!
-Add…	PrintersWindow		Προσθήκη...
+Add…	PrintersWindow		Προσθήκη…
 Magenta	TestPageView		Ματζέντα
 Transport: %transport% %transport_address%	TestPageView		Μεταφορά: %transport% %transport_address%
 Add	AddPrinterDialog		Προσθήκη

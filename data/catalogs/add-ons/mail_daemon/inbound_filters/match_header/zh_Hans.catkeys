@@ -1,8 +1,9 @@
-1	english	x-vnd.Haiku-MatchHeader	3544711400
+1	english	x-vnd.Haiku-MatchHeader	1946584206
 Delete message	ConfigView		删除消息
 Match \"%attribute\" against \"%regex\"	RuleFilter		匹配 \"%attribute\" 根据 \"%regex\" 
 Match header	RuleFilter		头部匹配
 Set flags to	ConfigView		设置标志为
+Header field (e.g. Subject, From, …)	ConfigView		头部字段（例如主题，发件地址等）
 <Choose account>	ConfigView		<选择账户>
 Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		通配符如 \"*spam*\" .\n包含前缀 \"REGEX:\" 用于使用正则表达式.
 Then	ConfigView		然后

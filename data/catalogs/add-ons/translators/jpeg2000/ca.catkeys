@@ -11,4 +11,4 @@ Read greyscale images as RGB32	JPEG2000Translator		Llegeix les imatges d'escala 
 ©2002-2003, Shard\n©2005-2006, Haiku\n\nBased on JasPer library:\n© 1999-2000, Image Power, Inc. and\nthe University of British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nImageMagick's jp2 codec was used as \"tutorial\".\n\thttp://www.imagemagick.org/\n	JPEG2000Translator		©2002-2003, Shard\n©2005-2006, Haiku\n\nBasat en la biblioteca JasPer:\n© 1999-2000, Image Power, Inc. i\nla Universitat de British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nEl còdec jp2 d'ImageMagick s'ha usat com a \"programa d'aprenentatge\".\n\thttp://www.imagemagick.org/\n
 Write	JPEG2000Translator		Escriu
 Output only codestream (.jpc)	JPEG2000Translator		Treu només el codi del flux (.jpg)
-Be Bitmap Format (JPEG2000Translator)	JPEG2000Translator		Format Be Bitmap (JPEG2000Translator)
+Be Bitmap Format (JPEG2000Translator)	JPEG2000Translator		Format de mapa de bits de Be (Traductor de JPEG2000)

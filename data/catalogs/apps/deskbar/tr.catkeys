@@ -41,7 +41,7 @@ About this system	DeskbarMenu		Bu sistem hakkında
 Show calendar…	TimeView		Takvimi göster…
 Deskbar preferences…	DeskbarMenu		Masaüstü Çubuğu tercihleri…
 Expand new applications	PreferencesWindow		Yeni uygulamaları genişlet
-Show replicants	DeskbarMenu		Yinelenmişleri göster
+Show replicants	DeskbarMenu		Yinelenenleri göster
 Hide application names	PreferencesWindow		Uygulama adlarını gizle
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demolar
 Icon size	PreferencesWindow		Simge boyutu

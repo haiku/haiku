@@ -2,4 +2,4 @@
 Error	TranslatorWindow		Σφάλμα
 OK	TranslatorWindow		Εντάξει
 Be Bitmap Format	BaseTranslator		Be Bitmap Διαμόρφωση
-Unable to create the view.	TranslatorWindow		Δεν είναι δυνατή η δημιουργία προβολής
+Unable to create the view.	TranslatorWindow		Δεν είναι δυνατή η δημιουργία του παραθύρου.

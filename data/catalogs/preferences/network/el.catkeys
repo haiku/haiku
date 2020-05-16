@@ -6,7 +6,7 @@ IP Address:	IntefaceAddressView		Διεύθυνση IP:
 WPA	WPA protected network		WPA
 Network:	IntefaceView		Δίκτυο:
 Received:	IntefaceView		Ελήφθη:
-New…	NetworkWindow		Νέο...
+New…	NetworkWindow		Νέο…
 no link	InterfaceListItem		καμία σύνδεση
 Other	NetworkWindow		Άλλο
 Sent:	IntefaceView		Απεστάλη:
@@ -45,7 +45,7 @@ Automatic	IntefaceAddressView		Αυτόματο
 Choose automatically	IntefaceView		Να επιλεγεί αυτόματα
 Status:	IntefaceView		Κατάσταση:
 Disable	IntefaceView		Απενεργοποίηση
-Manage…	NetworkWindow		Διαχείριση...
+Manage…	NetworkWindow		Διαχείριση…
 open	Open network		ανοιχτό
 Network	System name		Δίκτυο
 Your gateway to the internet	IntefaceAddressView		Η πύλη σας για το διαδίκτυο

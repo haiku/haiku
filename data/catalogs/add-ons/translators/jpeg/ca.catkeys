@@ -1,6 +1,6 @@
 1	catalan; valencian	x-vnd.Haiku-JPEGTranslator	3788699631
 Read	JPEGTranslator		Lectura
-Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Format Be Bitmap (JPEGTranslator)
+Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Format de mapa de bits de Be (Traductor de JPEG)
 Show warning messages	JPEGTranslator		Mostra els missatges d'avís
 Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Usa el codi 0 CMYK per cobrir amb tinta el 100 %
 JPEG Library Error: %s\n	be_jerror		Error de la biblioteca de JPEG: %s\n

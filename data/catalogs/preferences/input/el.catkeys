@@ -1,16 +1,19 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Input	1951014091
+1	greek, modern (1453-)	x-vnd.Haiku-Input	4245282949
 Scrolling	TouchpadPrefView		Κύλιση
 Defaults	InputMouse		Προεπιλογές
+Tapping	TouchpadPrefView		Αφή
 Cancel	TouchpadPrefView		Ακύρωση
 4-Button	SettingsView		4 κουμπιών
 Device List	InputWindow		Λίστα Συσκευών
 Double-click speed	SettingsView		Ταχύτητα διπλού κλικ
 5-Button	SettingsView		5 κουμπιών
+Typing test area	KeyboardView		Περιοχή δοκιμής πληκτρολόγησης
 Mouse type:	SettingsView		Τύπος ποντικιού:
 Revert	InputKeyboard		Επαναφορά
 Please confirm	TouchpadPrefView		Παρακαλώ επιβεβαιώστε
 Acceleration	TouchpadPrefView		Επιτάχυνση
 Mouse speed	SettingsView		Ταχύτητα δείκτη
+Accept first click	SettingsView		Αποδοχή πρώτου κλικ
 OK	TouchpadPrefView		Εντάξει
 Horizontal scrolling	TouchpadPrefView		Οριζόντια κύλιση
 Two finger scrolling	TouchpadPrefView		Κύλιση δύο δαχτύλων
@@ -24,7 +27,7 @@ Revert	InputMouse		Επαναφορά
 2-Button	SettingsView		2 κουμπιών
 Vertical	TouchpadPrefView		Κάθετο
 Horizontal	TouchpadPrefView		Οριζόντιο
-Double-click test area	SettingsView		Δοκιμαστική περιοχή διπλού κλικ
+Double-click test area	SettingsView		Περιοχή δοκιμής διπλού κλικ
 Sensitivity	TouchpadPrefView		Ευαισθησία
 3-Button	SettingsView		3 κουμπιών
 Revert	TouchpadPrefView		Επαναφορά

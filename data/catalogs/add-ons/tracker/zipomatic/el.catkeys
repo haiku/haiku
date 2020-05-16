@@ -8,7 +8,7 @@ Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		�
 Preparing to archive	file:ZipperThread.cpp		Προετοιμάζεται το συμπιεσμένο αρχείο
 Let them continue	file:ZipOMatic.cpp		Αφήστε τα να συνεχίσουν
 Continue	file:ZipOMaticWindow.cpp		Συνέχεια
-Archive created OK	file:ZipOMaticWindow.cpp		Το αρχείο δημιουργήθηκε επιτυχώς.
+Archive created OK	file:ZipOMaticWindow.cpp		Το αρχείο δημιουργήθηκε επιτυχώς
 {0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{Προστέθηκε # αρχείο.} other{Προστέθηκαν # αρχεία.}}
 Stop	file:ZipOMaticWindow.cpp		Διακοπή
 Stopped	file:ZipOMaticWindow.cpp		Σταματημένο

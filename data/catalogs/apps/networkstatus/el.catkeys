@@ -4,7 +4,7 @@ Quit	NetworkStatusView		Έξοδος
 Unknown	NetworkStatusView		Άγνωστο
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Η εκκίνηση του δικτύου preflet απέτυχε.\n\nΣφάλμα: 
 Install in Deskbar	NetworkStatus		Εγκατάσταση στην Γραμμή Εργασιών
-Open network preferences…	NetworkStatusView		Άνοιγμα προτιμήσεων δικτύου...
+Open network preferences…	NetworkStatusView		Άνοιγμα προτιμήσεων δικτύου…
 NetworkStatus	System name		NetworkStatus
 OK	NetworkStatusView		Εντάξει
 No link	NetworkStatusView		Χωρίς σύνδεσμο

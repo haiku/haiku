@@ -34,7 +34,7 @@ Chart	System name		Διάγραμμα
 Animation:	ChartWindow		Ζωηρότητα:
 Frames/s	ChartWindow		Καρέ/δ
 Auto demo	ChartWindow		Αυτόματη επίδειξη
-CPU load	ChartWindow		Φόρτος επεξεργαστή
+CPU load	ChartWindow		Φόρτος ΚΜΕ
 DrawBitmap	ChartWindow		DrawBitmap
 Red	ChartWindow		Κόκκινο
 None	ChartWindow		Κανένα

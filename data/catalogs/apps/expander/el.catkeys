@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Expander	2183009801
+1	greek, modern (1453-)	x-vnd.Haiku-Expander	3300517306
 Expand	ExpanderMenu		Επέκταση
 Expanding '%s'…	ExpanderWindow		Γίνεται επέκταση '%s'…
 Close window when done expanding	ExpanderPreferences		Κλείσιμο παραθύρου μετά το πέρας
@@ -6,9 +6,9 @@ Set destination…	ExpanderMenu		Ορισμός προορισμού...
 Use:	ExpanderPreferences		Χρήση:
 File expanded	ExpanderWindow		Το αρχείο επεκτάθηκε
 The destination is read only.	ExpanderWindow		Ο προορισμός είναι μόνο για ανάγνωση.
-Expander: Open	ExpanderWindow		Expander: Άνοιγμα
+Expander: Open	ExpanderWindow		Αποσυμπιεστής: Άνοιγμα
  is not supported	ExpanderWindow		 δεν υποστηρίζεται
-Expander settings	ExpanderPreferences		Ρυθμίσεις του Expander
+Expander settings	ExpanderPreferences		Ρυθμίσεις του Αποσυμπιεστή
 Select current	DirectoryFilePanel		Τρέχουσα επιλογή
 Source	ExpanderWindow		Πηγή
 Error when expanding archive	ExpanderWindow		Σφάλμα κατά την επέκταση του αρχείου
@@ -25,12 +25,13 @@ The folder was either moved, renamed or not supported.	ExpanderWindow		Ο φάκ
 Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Ο φάκελος προορισμού δεν υπάρχει. Θέλετε να τον δημιουργήσετε;
 Same directory as source (archive) file	ExpanderPreferences		Ίδιος κατάλογος με τον αρχείο πηγής
 Settings	ExpanderMenu		Ρυθμίσεις
-Settings…	ExpanderMenu		Ρυθμίσεις...
-Expander: Choose destination	DirectoryFilePanel		Expander: Επιλογή προορισμού
+Settings…	ExpanderMenu		Ρυθμίσεις…
+Expander: Choose destination	DirectoryFilePanel		Αποσυμπιεστής: Επιλογή προορισμού
 Select	ExpanderPreferences		Επίλεξε
 Show contents	ExpanderWindow		Εμφάνιση περιεχομένων
 Automatically show contents listing	ExpanderPreferences		Αυτόματα εμφάνιση του περιεχομένου
 OK	ExpanderPreferences		Εντάξει
+Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Είστε σίγουρος ότι θέλετε να διακόψετε την αποσυμπίεση; Ενδέχεται ότι δεν έχουν αποσυμπιεστεί όλα τα αρχεία ακόμα.
 Leave destination folder path empty	ExpanderPreferences		Αφήσε την διαδρομή του φάκελο προορισμού άδεια
 Failed to create the destination folder.	ExpanderWindow		Η δημιουργία φακέλου προορισμού απέτυχε.
 Select '%s'…	DirectoryFilePanel		Επιλογή '%s'…
@@ -38,12 +39,13 @@ Create	ExpanderWindow		Δημιουργία
 The file doesn't exist	ExpanderWindow		Το αρχείο δεν υπάρχει
 Stop	ExpanderMenu		Σταμάτα
 File	ExpanderMenu		Αρχείο
-Expander	System name		Expander
+Expander	System name		Αποσυμπιεστής
 Expand	ExpanderWindow		Επέκταση
 Close	ExpanderMenu		Κλείσιμο
 The destination is not a folder.	ExpanderWindow		Ο προορισμός δεν είναι φάκελος.
 Open destination folder after extraction	ExpanderPreferences		Ανοιξε τον φάκελο προορισμού μετά την εξαγωγή
-Set source…	ExpanderMenu		Ορισμός πηγής...
+Creating listing for '%s'…	ExpanderWindow		Γίνεται καταχώριση για '%s'…
+Set source…	ExpanderMenu		Ορισμός πηγής…
 Show contents	ExpanderMenu		Εμφάνιση περιεχομένων
 Stop	ExpanderWindow		Σταμάτα
 Destination	ExpanderWindow		Προορισμός

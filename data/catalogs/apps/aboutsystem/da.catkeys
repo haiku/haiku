@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-About	1828471351
+1	danish	x-vnd.Haiku-About	1839294148
 Revision	AboutView		Udgave
 The Haikuware team and their bounty program\n	AboutView		Haikuware-holdet og deres dusørprogram\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Ophavsret © 1999-2007 Michael C. Ring. Alle rettigheder forbeholdes.
@@ -14,6 +14,7 @@ Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Op
 Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Ophavsret © 1990-2002 Info-ZIP. Alle rettigheder forbeholdes.
 Past website & marketing:\n	AboutView		Forhenværende websted og markedsføring:\n
 Copyright © 2003 Peter Hanappe and others.	AboutView		Ophavsret © 2003 Peter Hanappe og andre.
+Testing and bug triaging:\n	AboutView		Testning og fejltriagering:\n
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{Processor:} other{# processorer:}}
 %d MiB total	AboutView		%d MiB i alt
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Kode som er unikt til Haiku, specielt kernen og al kode som programmer kan linke mod, distribueres under vilkårene i <MIT-licensen>. Nogle systembiblioteker indeholder tredjepartskode som distribueres under <LGPL-licensen>. Du kan finde ophavsrettene til tredjepartskode nedenfor.\n\n

@@ -17,7 +17,7 @@ About Pulse…	PulseView		Nabız hakkında…
 Pulse	NormalPulseView		Nabız
 Deskbar mode	NormalPulseView		Masaüstü Çubuğu kipi
 Pulse settings	PulseApp		Nabız ayarları
-Remove replicant	CPUButton		Yinelenmişi kaldır
+Remove replicant	CPUButton		Yineleneni kaldır
 You can't disable the last active CPU.	PulseView		Son etkin CPU'yu devre dışı bırakamazsınız.
 Width of icon:	ConfigView		Simge genişliği:
 Deskbar mode	MiniPulseView		Masaüstü Çubuğu kipi

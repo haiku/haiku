@@ -22,7 +22,7 @@ Remove	Config Views		Αφαίρεση
 Show notifications:	Config Window		Εμφάνιση ειδοποιήσεων:
 Settings	Config Window		Επιλογές
 Never	Config Window	show status window	Ποτέ
-Account name:	Config Views		Όνομα λογαριασμού
+Account name:	Config Views		Όνομα λογαριασμού:
 \t\t· Incoming	Config Window		\t\t· Εισερχόμενα
 Enter a valid e-mail address.	AutoConfigWindow		Εισάγετε μια έγκυρη ηλεκτρονική διεύθυνση.
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nΑδυναμία επαναστροφής των γενικών ρυθμίσεων.\n\nΣφάλμα κατά την επαναστροφή των γενικών ρυθμίσεων:\n%s\n
@@ -43,7 +43,7 @@ E-mail	System name		Ηλεκτρονική Διεύθυνση
 Check every	Config Window		Έλενχος κάθε
 Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Δημιουργήστε έναν νέο λογαριασμό με το κουμπί Προσθήκη.\n\nΑφαιρέστε έναν λογαριασμό με το κουμπί Αφαίρεση πάνω στο επιλεγμένο αντικείμενο.\n\nΕπιλέξτε ένα αντικείμενο στην λίστα για να αλλάξετε τις ρυθμίσεις τους.
 Account name:	E-Mail		Όνομα Λογαριασμού:
-Edit mailbox menu…	Config Window		Επεξεργασία μενού του γραμματοκιβωτίου...
+Edit mailbox menu…	Config Window		Επεξεργασία μενού του γραμματοκιβωτίου…
 Server Name:	E-Mail		Όνομα διακομιστή:
 Remove	Config Window		Αφαίρεση
 Login name:	E-Mail		Όνομα πρόσβασης:

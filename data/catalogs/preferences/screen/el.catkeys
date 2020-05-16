@@ -6,10 +6,10 @@ Rows:	Screen		Γραμμές:
 %.1f Hz	Screen		%.1f Hz
 The screen mode could not be set:\n\t%s\n	Screen		Αυτή η λειτουργία οθόνης δε μπορούσε να οριστεί:\n\t%s\n
 Keep	Screen		Διατήρηση
-/other…	Screen		/άλλο...
+/other…	Screen		/άλλο…
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Οριζόντια συχνότητα:\t%lu - %lu kHz\nΚάθετη συχνότητα:\t%lu - %lu Hz\n\nΜέγιστος μετρητής εικονοστοιχείων:\t%g MHz
 Refresh rate:	Screen		Ρυθμός Ανανέωσης:
-Video format:	Screen		Φόρμα βίντεο
+Video format:	Screen		Μορφή βίντεο:
 Undo	Screen		Αναίρεση
 OK	Screen		Εντάξει
 Current workspace	Screen		Τρέχων χώρος εργασίας
@@ -20,9 +20,9 @@ Could not write VESA mode settings file:\n\t	Screen		Αδυναμία εγγρα
 Display info	Screen		Πληροφορίες οθόνης
 Settings will revert in %seconds.	Screen		Θα γίνει επαναφορά σε %seconds.
 Cancel	Screen		Άκυρο
-Other…	Screen		Άλλο...
+Other…	Screen		Άλλο…
 Screen	Screen		Οθόνη
-Colors:	Screen		Χρώματα
+Colors:	Screen		Χρώματα:
 yes	Screen		ναι
 Swap displays:	Screen		Ανταλαγή οθόνης:
 %sSerial no.: %s	Screen		%sΣειριακός αριθμός.: %s
@@ -34,7 +34,7 @@ Warning	Screen		Προσοχή
 24 bits/pixel, 16 Million colors	Screen		24 bits/εικονοστοιχείο, 16 Εκατομμύρια χρώματα
 Hz	Screen		Hz
 Workspaces	Screen		Χώροι Εργασίας
-Brightness:	Screen		Φωτεινότητα
+Brightness:	Screen		Φωτεινότητα:
 32 bits/pixel, 16 Million colors	Screen		32 bits/εικονοστοιχείο, 16 Εκατομμύρια χρώματα
 Done	Screen		Έγινε
 16 bits/pixel, 65536 colors	Screen		16 bits/εικονοστοιχείο, 65536 χρώματα
@@ -45,11 +45,11 @@ Combine displays:	Screen		συνδιασμός οθόνων:
 Unknown mode	Screen		Άγνωστη λειτουργία
 About	Screen		Σχετικά
 Columns:	Screen		Στήλες:
-Resolution:	Screen		Ανάλυση
+Resolution:	Screen		Ανάλυση:
 Apply	Screen		Εφαρμογή
 horizontally	Screen		οριζόντια
 disable	Screen		απενεργοποίηση
-Set background…	Screen		Ορισμός φόντου...
+Set background…	Screen		Ορισμός φόντου…
 Type or use the left and right arrow keys.	Screen		Πληκτρολογήστε ή χρησιμοποιήστε τα πλήκτρα αριστερού ή δεξιού βέλους.
 Screen	System name		Screen
 Do you wish to keep these settings?	Screen		Θέλετε να διατηρήσετε τις ακόλουθες ρυθμίσεις;

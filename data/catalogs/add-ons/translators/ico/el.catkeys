@@ -7,7 +7,7 @@ Windows icons	ICOTranslator		Εικονίδια Windows
 Enforce valid icon sizes	ConfigView		Εξαναγκασμός έγκυρων μεγεθών
 ICO Settings	main		Ρυθμίσεις ICO
 Windows icon translator	ICOTranslator		Μετατροπέας εικονιδίου Windows
-pixels in either direction.	ConfigView		pixels σε κάθε κατεύθυνσης
+pixels in either direction.	ConfigView		pixels σε οποιαδήποτε κατεύθυνση.
 Write 32 bit images on true color input	ConfigView		Γράψιμο 32 bit εικώνων σε true color input
 Icon	ICOTranslator		Εικονίδιο
 ICOTranslator Settings	ConfigView		Ρυθμίσεις ICOTranslator

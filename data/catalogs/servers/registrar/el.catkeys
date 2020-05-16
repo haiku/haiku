@@ -5,7 +5,7 @@ Do you really want to shut down the system?	ShutdownProcess		Θέλετε πρα
 Shutdown status	ShutdownProcess		Κατάσταση τερματισμού
 Shut down	ShutdownProcess		Τερματισμός
 The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Η εφαρμογή \"%appName%\" μπορεί να αποκλειστεί σε ένα τυπικό πάνελ.
-System is shut down	ShutdownProcess		Το σύστημα έχει τερματισει τη λειτουργία του.
+System is shut down	ShutdownProcess		Το σύστημα έχει τερματιστεί
 Restart system	ShutdownProcess		Επανεκκίνηση συστήματος
 Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Η εφαρμογή \"%appName%\" ακύρωσε τη διαδικασία τερματισμού.
 Asking background applications to quit.	ShutdownProcess		Αίτηση εφαρμογών παρασκηνίου για τερματισμό.
@@ -14,10 +14,10 @@ Restart	ShutdownProcess		Επανεκκίνηση
 It's now safe to turn off the computer.	ShutdownProcess		Μπορείτε τώρα να κλείσετε με ασφάλεια τον υπολογιστή.
 Asking other processes to quit.	ShutdownProcess		Αίτηση άλλων διεργασιών για τερματισμό.
 Cancel shutdown	ShutdownProcess		Ακύρωση τερματισμού
-Restarting…	ShutdownProcess		Επανεκκίνηση...
+Restarting…	ShutdownProcess		Γίνεται επανεκκίνηση…
 %action%?	ShutdownProcess		%action%;
 Tidying things up a bit.	ShutdownProcess		Γίνεται ένα γρήγορο συμμάζεμα.
 Kill application	ShutdownProcess		Τερματισμός εφαρμογής
 Shutdown aborted	ShutdownProcess		Ο τερματισμός ακυρώθηκε
-Shutting down…	ShutdownProcess		Τερματισμός...
+Shutting down…	ShutdownProcess		Γίνεται τερματισμός..
 Asking \"%appName%\" to quit.	ShutdownProcess		Αίτηση \"%appName%\" για τερματισμό.

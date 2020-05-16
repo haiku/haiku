@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.haiku-icon_o_matic	3056807989
+1	greek, modern (1453-)	x-vnd.haiku-icon_o_matic	3554185674
 None	Icon-O-Matic-Properties		Κανένα
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Περιστροφή μονοπατιού
 Add empty	Icon-O-Matic-ShapesList		Προσθήκη άδειου
@@ -84,7 +84,7 @@ Cancel	Icon-O-Matic-ColorPicker		Άκυρο
 Duplicate	Icon-O-Matic-PathsList		Διπλότυπο
 Remove Shapes	Icon-O-Matic-RemoveShapesCmd		Αφαίρεση Σχημάτων
 Save	Icon-O-Matic-Menu-Settings		Αποθήκευση
-Export as…	Icon-O-Matic-Menu-File		Εξαγωγή ως...
+Export as…	Icon-O-Matic-Menu-File		Εξαγωγή ως…
 Error: 	Icon-O-Matic-Exporter		Σφάλμα: 
 Move Path	Icon-O-Matic-MovePathsCmd		Μετακίνηση Μονοπατιού
 Remove Paths	Icon-O-Matic-RemovePathsCmd		Αφαίρεση Μονοπατιών
@@ -104,10 +104,11 @@ Rotate indices backwards	Icon-O-Matic-PathsList		Περιστροφή δεικτ
 Overwrite	Icon-O-Matic-SVGExport		Αντικατάσταση
 Modify Control Point	Icon-O-Matic-ChangePointCmd		Τροποποίηση Σημείου Ελέγχου
 Cancel	Icon-O-Matic-SVGExport		Άκυρο
-Open…	Icon-O-Matic-Menu-File		Άνοιγμα...
+Open…	Icon-O-Matic-Menu-File		Άνοιγμα…
 Redo	Icon-O-Matic-Main		Επανάληψη
 Change Color	Icon-O-Matic-SetColorCmd		Αλλαγή χρώματος
 Remove	Icon-O-Matic-ShapesList		Αφαίρεση
+Drop shapes	Icon-O-Matic-ShapesList		Σύρετε σχήματα
 PNG Set	Icon-O-Matic-SavePanel		Σετ PNG
 to attach transformers.	Empty transformers list - 2nd line		να επισυνάψετε μετασχηματιστές.
 Linear	Icon-O-Matic-StyleTypes		Γραμμική
@@ -145,7 +146,7 @@ Radial	Icon-O-Matic-StyleTypes		Ακτινωτά
 Text too long	Icon-O-Matic-StyledTextImport		Το κείμενο είναι υπερβολικά μεγάλο
 Caps	Icon-O-Matic-PropertyNames		Caps
 OK	Icon-O-Matic-SVGImport		Εντάξει
-Append…	Icon-O-Matic-Menu-File		Προσάρτηση...
+Append…	Icon-O-Matic-Menu-File		Προσάρτηση…
 Scale Y	Icon-O-Matic-PropertyNames		Κλίμακα Υ
 Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Το άνοιγμα του αρχείου '%s' ως SVG απέτυχε.\n\nΣφάλμα: %s
 Export icon	Dialog title		Εξαγωγή εικονιδίου
@@ -166,7 +167,7 @@ Add Path	Icon-O-Matic-AddPathsCmd		Προσθήκη Μονοπατιού
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Να αποθηκευτούν οι αλλαγές στο εικονίδιο πριν από το κλείσιμο;
 load error	Icon-O-Matic-SVGImport		σφάλμα φόρτωσης
 Transformation	Icon-O-Matic-TransformersList		Μετασχηματισμός
-Save as…	Icon-O-Matic-Menu-File		Αποθήκευση ως...
+Save as…	Icon-O-Matic-Menu-File		Αποθήκευση ως…
 Swatches	Icon-O-Matic-Menus		Δείγματα
 <modify path>	Icon-O-Matic-PathCmd		<τροποποίηση μονοπατιού>
 HVIF Source Code	Icon-O-Matic-SavePanel		HVIF Πηγαίος Κώδικας
@@ -182,8 +183,8 @@ Transformer	Icon-O-Matic-Menus		Μεταμορφωτής
 Invert selection	Icon-O-Matic-Properties		Αντιστροφή επιλεγμένου
 <unkown property>	Icon-O-Matic-PropertyNames		<άγνωστη ιδιότητα>
 Pick a color	Icon-O-Matic-ColorPicker		Διάλεξε ένα χρώμα
-Multi Set 	Multi Set (property name)		Πολλαπλό σετάρισμα 
-Settings…	Icon-O-Matic-SavePanel		Ρυθμίσεις...
+Multi Set 	Multi Set (property name)		Πολλαπλός Ορισμός 
+Settings…	Icon-O-Matic-SavePanel		Ρυθμίσεις…
 Add with style	Icon-O-Matic-ShapesList		Προσθήκη με στυλ
 New	Icon-O-Matic-Menu-File		Νέο
 Yes	Icon-O-Matic-StyledTextImport		Ναι
@@ -195,6 +196,6 @@ Export	Icon-O-Matic-Menu-File		Εξαγωγή
 Width	Icon-O-Matic-PropertyNames		Πλάτος
 Bummer	Cancel button - error alert		Κρίμα
 Style	Icon-O-Matic-Menus		Στυλ
-edit it's properties here.	Empty property list - 3rd line		επεξεργασία ιδιοτήτων εδώ
+edit it's properties here.	Empty property list - 3rd line		επεξεργασία ιδιοτήτων εδώ.
 Off	Icon-O-Matic-Menu-Settings		Σβηστό
 Edit	Icon-O-Matic-Menus		Επεξεργασία

@@ -5,7 +5,7 @@ Rotation: %d	ControlView		Κλίση: %d
 Shear: %d	ControlView		Shear: %d
 Spacing: %d	ControlView		Κενό: %d
 Cycle fonts	ControlView		Κυκλικές γραμματοσειρές
-Font:	ControlView		Γραμματοσειρά
+Font:	ControlView		Γραμματοσειρά:
 Drawing mode:	ControlView		Τρόπος σχεδίασης:
 Haiku, Inc.	ControlView		Haiku, Inc.
 Controls	FontDemo		Κουμπιά

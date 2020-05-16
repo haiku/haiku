@@ -5,7 +5,7 @@ Stopping media_addon_server.	MediaDefs		Γίνεται διακοπή του med
 Waiting for media_addon_server to quit.	MediaDefs		Αναμένεται η διακοπή του media_services_server.
 Telling media_addon_server to quit.	MediaDefs		Λέμε στο media_addon_server να διακοπεί.
 Ready for use.	MediaDefs		Έτοιμο για χρήση.
-Stopping media server…	MediaDefs		Διακόπτεται ο διακομιστής πολυμέσων...
+Stopping media server…	MediaDefs		Διακόπτεται ο διακομιστής πολυμέσων…
 Waiting for media_server to quit.	MediaDefs		Αναμένεται η διακοπή του media_server.
 Done shutting down.	MediaDefs		Η απενεργοποίηση ολοκληρώθηκε.
 Error occurred starting media services.	MediaDefs		Προέκυψε σφάλμα κατά την εκκίνηση των υπηρεσιών πολυμέσων.

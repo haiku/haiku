@@ -1,8 +1,8 @@
 1	catalan; valencian	x-vnd.Haiku-HVIFTranslator	249304797
-Haiku vector icon translator	HVIFTranslator		traductor d'icones vectorials del Haiku
+Haiku vector icon translator	HVIFTranslator		Traductor d'icones vectorials del Haiku
 HVIF icons	HVIFTranslator		icones HVIF
 Render size:	HVIFView		Mida de representació:
-HVIFTranslator Settings	HVIFTranslator		Paràmetres del Traductor HVIF
+HVIFTranslator Settings	HVIFTranslator		Paràmetres del Traductor d'HVIF
 Haiku vector icon translator	HVIFView		Traductor d'icones vectorials del Haiku
 HVIF Settings	HVIFMain		Paràmetres d'HVIF
 Version %d.%d.%d, %s	HVIFView		Versió %d.%d.%d, %s

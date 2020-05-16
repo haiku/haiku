@@ -1,33 +1,46 @@
-1	greek, modern (1453-)	x-vnd.Haiku-MediaPlayer	505105187
+1	greek, modern (1453-)	x-vnd.Haiku-MediaPlayer	555820187
+Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Μετακίνηση Αρχείου στον Κάδο Απορριμάτων
 Close	MediaPlayer-PlaylistWindow		Κλείσιμο
 Volume of background clips	MediaPlayer-SettingsWindow		Ένταση κλιπ υποβάθρου
 Audio	MediaPlayer-InfoWin		Ήχος
 Subtitle placement:	MediaPlayer-SettingsWindow		Τοποθέτηση υποτίτλων:
+MediaPlayer	System name		Παίκτης Πολυμέσων
 Audio track	MediaPlayer-Main		Κομμάτι ήχου
 Muted	MediaPlayer-SettingsWindow		Σε σίγαση
 OK	MediaPlayer-RemovePLItemsCmd		Εντάξει
 Open Playlist	MediaPlayer-PlaylistWindow		Άνοιγμα Λίστας Αναπαραγωγής
 Subtitles	MediaPlayer-Main		Υπότιτλοι
+%app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		Προέκυψε ένα εσωτερικό σφάλμα στην εφαρμογή %app%. Δεν ήταν δυνατό το άνοιγμα του αρχείου.
 File info	MediaPlayer-InfoWin		Πληροφορίες αρχείου
+raw audio	MediaPlayer-InfoWin		ανεπεξέργαστος ήχος
 Select all	MediaPlayer-PlaylistWindow		Επιλογή όλων
+New player…	MediaPlayer-Main		Νέος παίκτης…
 OK	MediaPlayer-Main		Εντάξει
 Remove	MediaPlayer-PlaylistWindow		Αφαίρεση
 <unknown>	MediaPlayer-InfoWin		<άγνωστο>
+Resume:	MediaPlayer-SettingsWindow		Συνέχεια:
 Duration	MediaPlayer-InfoWin		Διάρκεια
 Import Entries	MediaPlayer-ImportPLItemsCmd		Εισαγωγή
 Open network stream	MediaPlayer-Main		Άνοιγμα ροής δικτύου
 Move file to Trash	MediaPlayer-PlaylistWindow		Μετακίνηση αρχείου στον Κάδο Απορριμάτων
-Open file…	MediaPlayer-Main		Άνοιγμα αρχείου...
+Open file…	MediaPlayer-Main		Άνοιγμα αρχείου…
 View options	MediaPlayer-SettingsWindow		Προβολή ρυθμίσεων
+%d kHz	MediaPlayer-InfoWin		%d kHz
 Full volume	MediaPlayer-SettingsWindow		Μέγιστη ένταση
 <untitled>	PlaylistItem-title		<χωρίς τίτλο>
+Start media server	MediaPlayer-Main		Εκκίνηση διακομιστή πολυμέσων
+It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Φαίνεται ότι ο διακομιστής πολυμέσων δεν εκτελείται.\nΘέλετε να τον ξεκινήσετε;
 Location	MediaPlayer-InfoWin		Τοποθεσία
 Medium	MediaPlayer-SettingsWindow		Μέτριο
+Play mode	MediaPlayer-SettingsWindow		Λειτουργία αναπαραγωγής
 Playlist	MediaPlayer-PlaylistWindow		Λίστα Αναπαραγωγής
+%d Bit	MediaPlayer-InfoWin		%d Bit
 Track	Audio Track Menu		Κομμάτι
 Close	MediaPlayer-Main		Κλείσιμο
 Save error	MediaPlayer-PlaylistWindow		Αποθήκευση σφάλματος
 Attributes	MediaPlayer-Main		Ιδιότητες
+Bottom of screen	MediaPlayer-SettingsWindow		Κάτω μέρος της οθόνης
+MediaPlayer settings	MediaPlayer-SettingsWindow		Ρυθμίσεις Παίκτη Πολυμέσων
 Copyright	MediaPlayer-InfoWin		Πνευματική ιδιοκτησία
 Invalid URL inserted!	MediaPlayer-NetworkStream		Εισήχθη μη έγκυρος υπερσύνδεσμος!
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Η αποθήκευση λίστας αναπαραγωγής απέτυχε.\n\nΣφάλμα: 
@@ -35,53 +48,71 @@ Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Η αποθή
 Hide interface	MediaPlayer-Main		Απόκρυψη διεπαφής
 Error: 	MediaPlayer-Main		Σφάλμα: 
 Video track	MediaPlayer-Main		Κομμάτι βίντεο
-Playlist…	MediaPlayer-Main		Λίστα Αναπαραγωγής...
+Playlist…	MediaPlayer-Main		Λίστα Αναπαραγωγής…
 <unnamed media>	MediaPlayer-InfoWin		<πολυμέσα χωρίς όνομα>
 Save	MediaPlayer-PlaylistWindow		Αποθήκευση
 Cancel	MediaPlayer-NetworkStream		Ακύρωση
+Nothing to Play	MediaPlayer-Main		Τίποτα προς αναπαραγωγή
 OK	MediaPlayer-SettingsWindow		Εντάξει
-Open…	MediaPlayer-PlaylistWindow		Άνοιγμα...
+Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Εσωτερικό σφάλμα (μη έγκυρο μήνυμα). Η αποθήκευση της λίστας αναπαραγωγής απέτυχε.
+Open…	MediaPlayer-PlaylistWindow		Άνοιγμα…
 Revert	MediaPlayer-SettingsWindow		Επαναφορά
 Low volume	MediaPlayer-SettingsWindow		Χαμηλή ένταση
 Audio	MediaPlayer-Main		Ήχος
 {0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Μονοφωνικό} =2{Στερεοφωνικό} other{# Κανάλια}}
 Quit	MediaPlayer-Main		Έξοδος
+Move Entry	MediaPlayer-MovePLItemsCmd		Μετακίνηση Αρχείων
 <unknown>	PlaylistItem-author		<άγνωστο>
 Cancel	MediaPlayer-SettingsWindow		Ακύρωση
+Import Entry	MediaPlayer-ImportPLItemsCmd		Εισαγωγή Αρχείων
 unknown format	MediaPlayer-InfoWin		άγνωστη μορφή
 Track %d	MediaPlayer-Main		Κομμάτι %d
 All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Κανένα αρχείο δεν μπόρεσε να μετακινηθεί στον Κάδο Απορριμάτων.
 Total duration: %s	MediaPlayer-PlaylistWindow		Συνολική διάρκεια: %s
+%.3f kHz	MediaPlayer-InfoWin		%.3f kHz
 Move into trash error	MediaPlayer-RemovePLItemsCmd		Σφάλμα μετακίνησης στον Κάδο Απορριμάτων
+Drop files to play	MediaPlayer-Main		Σύρετε αρχεία για αναπαραγωγή
+Copy Entry	MediaPlayer-CopyPLItemsCmd		Αντιγραφή Αρχείων
+Close window after playing audio	MediaPlayer-SettingsWindow		Κλείσιμο παραθύρου έπειτα από την αναπαραγωγή ήχου
 Edit	MediaPlayer-PlaylistWindow		Επεξεργασία
 Open	MediaPlayer-PlaylistWindow		Άνοιγμα
 always	MediaPlayer-SettingsWindow		πάντα
 Stream URL:	MediaPlayer-NetworkStream		Υπερσύνδεσμος ροής:
 <unknown>	PlaylistItem-album		<άγνωστο>
 Stream settings	MediaPlayer-Main		Ρυθμίσεις ροής
+Save Playlist	MediaPlayer-PlaylistWindow		Αποθήκευση Λίστας Αναπαραγωγής
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Σινεμασκόπ)
 Rating	MediaPlayer-Main		Βαθμολογία
+Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Εσωτερικό σφάλμα (δεν υπάρχει διαθέσιμη μνήμη). Η αποθήκευση της λίστας αναπαραγωγής απέτυχε.
 Video	MediaPlayer-Main		Βίντεο
+There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Δεν υπάρχει εγκατεστημένος αποκωδικοποιητής που μπορεί να επεξεργαστεί το μορφότυπο του αρχείου ή ο αποκωδικοποιητής αντιμετωπίζει προβλήματα με την συγκεκριμένη έκδοση του μορφότυπου.
 Open network stream	MediaPlayer-NetworkStream		Άνοιγμα ροής δικτύου
 Automatically start playing	MediaPlayer-SettingsWindow		Αυτόματη αναπαραγωγή
 Undo	MediaPlayer-PlaylistWindow		Αναίρεση
-Settings…	MediaPlayer-Main		Ρυθμίσεις...
+Bottom of video	MediaPlayer-SettingsWindow		Κάτω μέρος του βίντεο
+Settings…	MediaPlayer-Main		Ρυθμίσεις…
+min	MediaPlayer-InfoWin	Minutes	λεπτά
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Η αποθήκευση λίστας αναπαραγωγής απέτυχε.\n\nΣφάλμα: 
 Video	MediaPlayer-InfoWin		Βίντεο
-File info…	MediaPlayer-Main		Πληροφορίες αρχείου...
+File info…	MediaPlayer-Main		Πληροφορίες αρχείου…
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Αμερικάνικο)
 <unnamed>	PlaylistItem-name		<χωρίς όνομα>
 Track	Video Track Menu		Κομμάτι
 Full screen	MediaPlayer-Main		Πλήρη οθόνη
 OK	MediaPlayer-NetworkStream		Εντάξει
+Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Εσωτερικό σφάλμα (το κλείδωμα απέτυχε). Η αποθήκευση της λίστας αναπαραγωγής απέτυχε.
 <nothing to redo>	MediaPlayer-PlaylistWindow		<δεν υπάρχει τίποτα προς ακύρωση αναίρεσης>
 Bad URL	MediaPlayer-NetworkStream		Κακός υπερσύνδεσμος
 Save	MediaPlayer-Main		Αποθήκευση
+Close window after playing video	MediaPlayer-SettingsWindow		Κλείσιμο παραθύρου έπειτα από την αναπαραγωγή βίντεο
 The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Δεν ήταν δυνατό το άνογιμα του αρχείου '%filename'.\n\n
+None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Κανένα από τα αρχεία που θέλετε να αναπαράγετε φαίνονται να είναι αρχεία πολυμέσων.
+Remove Entry	MediaPlayer-RemovePLItemsCmd		Αφαίρεση Αρχείων
 Subtitle size:	MediaPlayer-SettingsWindow		Μέγεθος υποτίτλων:
+raw video	MediaPlayer-InfoWin		ανεπεξέργαστο βίντεο
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Κάποια αρχεία δεν μπόρεσαν να μετακινηθούν στον Κάδο Απορριμάτων.
 <nothing to undo>	MediaPlayer-PlaylistWindow		<δεν υπάρχει τίποτα προς αναίρεση>
-Save as…	MediaPlayer-PlaylistWindow		Αποθήκευση ως...
+Save as…	MediaPlayer-PlaylistWindow		Αποθήκευση ως…
 Error: 	MediaPlayer-RemovePLItemsCmd		Σφάλμα: 
 Open	MediaPlayer-Main		Άνοιγμα
 (not supported)	MediaPlayer-InfoWin		(δεν υποστηρίζεται)

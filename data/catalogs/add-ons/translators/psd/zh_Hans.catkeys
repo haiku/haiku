@@ -1,13 +1,13 @@
 1	english	x-vnd.Haiku-PSDTranslator	3654055550
 Lab	PSDLoader		Lab 色彩模式
 Uncompressed	PSDConfig		未压缩
-Indexed	PSDLoader		索引色彩模式
-Grayscale	PSDLoader		灰度色彩模式
+Indexed	PSDLoader		索引(Indexed)色彩模式
+Grayscale	PSDLoader		灰度(Grayscale)色彩模式
 Photoshop image translator	PSDConfig		Photoshop图像转换器
 Photoshop image translator	PSDTranslator		Photoshop图像转换器
 Version %d.%d.%d, %s	PSDConfig		版本 %d.%d.%d, %s
 Photoshop Document (PSD file)	PSDConfig		Photoshop文档 (PSD文件)
-Photoshop image	PSDTranslator		Photoshop图像
+Photoshop image	PSDTranslator		Photoshop 图像
 RLE	PSDConfig		变长度编码(RLE)压缩
 Photoshop Big Document (PSB file)	PSDConfig		Photoshop大文档 (PSB文件)
 RGBA	PSDLoader		RGBA色彩模式
@@ -18,5 +18,5 @@ Bitmap	PSDLoader		位图
 CMYK	PSDLoader		CMYK色彩模式
 Compression: 	PSDConfig		压缩:
 Format: 	PSDConfig		格式:
-Multichannel	PSDLoader		多通道色彩模式
-Duotone	PSDLoader		双色调色彩模式
+Multichannel	PSDLoader		多通道(Multichannel)色彩模式
+Duotone	PSDLoader		双色调(Duotone)色彩模式

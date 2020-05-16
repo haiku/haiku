@@ -21,7 +21,7 @@ OK	MainWin		Εντάξει
 TV	MainWin		Τηλεόραση
 Settings	MainWin		Ρυθμίσεις
 TV	System name		TV
-Settings…	MainWin		Ρυθμίσεις...
+Settings…	MainWin		Ρυθμίσεις…
 None	MainWin		Κανένα
 Error, interface is busy:\n\n	MainWin		Σφάλμα, η διεπαφή είναι απασχολημένη:\n\n
 pixel aspect ratio	MainWin		λόγος πλευρών εικονοστoιχείου

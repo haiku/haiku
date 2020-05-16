@@ -1,5 +1,17 @@
-1	english	x-vnd.Haiku-Repositories	4045599824
+1	english	x-vnd.Haiku-Repositories	3633032012
+This is not a valid URL.	AddRepoWindow	Add URL error message	这是一个无效的 URL。
+Enable repositories to use with package management:	RepositoriesView	Label text	启用需要的仓库：
+Disable	RepositoriesView	Button label	禁用
+Enabled	RepoRow	Tag in the Status column	已启用
+There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	启用仓库 %url% 时遇到错误
 Remove this repository?	RepositoriesView	Removal alert confirmation message	移除该软件库？
+Completed	TaskLooper	Completed task status message	已完成
 Add	AddRepoWindow	Button label	添加
+Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	无法获取当前启用的仓库名字
+Enable all	RepositoriesView	Button label	全部启用
 URL	RepositoriesView	Column title	URL
+Enable	RepositoriesView	Button label	启用
 Description	TaskLooper	Failed task error description	描述
+Some tasks are still running. Stop these tasks and quit?	RepositoriesWindow	Application quit alert message	某些任务仍在运行。是否终止并退出？
+Only one URL for each repository can be enabled. Please change your selections.	RepositoriesView	Error message	每一个仓库只能启用一个 URL。请更改您的选择。
+Disable all	RepositoriesView	Button label	全部禁用

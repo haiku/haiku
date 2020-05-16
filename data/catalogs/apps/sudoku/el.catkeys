@@ -8,7 +8,7 @@ Start again	SudokuWindow		Εκκίνηση ξανά
 New	SudokuWindow		Νέο
 Easy	SudokuWindow		Εύκολο
 Undo	SudokuWindow		Αναίρεση
-Export as…	SudokuWindow		Εξαγωγή ως...
+Export as…	SudokuWindow		Εξαγωγή ως…
 Quit	SudokuWindow		Έξοδος
 Redo	SudokuWindow		Επαναφορά
 Could not open \"%s\":\n%s\n	SudokuWindow		Αδυναμία ανοίγματος του \"%s\":\n%s\n
@@ -31,4 +31,4 @@ View	SudokuWindow		Προβολή
 Snapshot current	SudokuWindow		Τρέχων στιγμιότυπο
 Mark valid hints	SudokuWindow		Σημείωση έγκυρων συμβουλών
 Sudoku request	SudokuWindow		Αίτηση Sudoku
-Open file…	SudokuWindow		Άνοιγμα αρχείου...
+Open file…	SudokuWindow		Άνοιγμα αρχείου…

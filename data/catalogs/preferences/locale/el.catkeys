@@ -17,12 +17,12 @@ Numbers	TimeFormatSettings		Νούμερα
 24 hour	TimeFormatSettings		24 ωρη μορφή
 OK	Locale Preflet Window		Εντάξει
 Restart	Locale Preflet Window		Επανεκκίνηση
-Full format:	TimeFormatSettings		Ολοκληρωτική μορφοποίηση
+Full format:	TimeFormatSettings		Πλήρη μορφή:
 Defaults	Locale Preflet Window		Προεπιλογές
 Cancel	Locale Preflet Window		Ακύρωση
 Translate application and folder names in Deskbar and Tracker.	Locale Preflet Window		Μετάφραση ονομάτων εφαρμογών και φακέλων σε Γραμμή Εργασιών και Tracker.
 Revert	Locale Preflet Window		Επαναφορά
-Medium format:	TimeFormatSettings		Μερική μορφοποίηση
+Medium format:	TimeFormatSettings		Μερική μορφή:
 12 hour	TimeFormatSettings		12-ωρη μορφή
 Time	TimeFormatSettings		Ώρα
 Date	TimeFormatSettings		Ημερομηνία

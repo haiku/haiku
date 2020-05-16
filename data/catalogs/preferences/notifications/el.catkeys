@@ -1,13 +1,15 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Notifications	2812738601
+1	greek, modern (1453-)	x-vnd.Haiku-Notifications	2909046856
 Lower left	GeneralView		Κάτω αριστερά
 Application does not have a valid signature	NotificationView	Alert message	Η εφαρμογή δεν έχει έγκυρη υπογραφή
 Status	NotificationView		Κατάσταση
-Add…	NotificationView		Προσθήκη...
+Add…	NotificationView		Προσθήκη…
 Lower right	GeneralView		Κάτω δεξιά
 Muted	NotificationView		Σε σίγαση
 Window width:	GeneralView		Πλάτος παράθυρου:
 OK	PrefletWin		Εντάξει
 Notifications	PrefletWin		Κοινοποιήσεις
+Mute notifications from this application	NotificationView		Να γίνει σίγαση ειδοποιήσεων από αυτήν την εφαρμογή
+pixels	GeneralView		pixels
 seconds	GeneralView		δευτερόλεπτα
 Revert	PrefletWin		Επαναφορά
 Applications	PrefletView		Εφαρμογές

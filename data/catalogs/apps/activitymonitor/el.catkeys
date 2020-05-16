@@ -16,7 +16,7 @@ Show legend	ActivityView		Εμφάνιση υπομνήματος
 Text clipboard	DataSource		Πρόχειρο κειμένου
 Settings	ActivityWindow		Ρυθμίσεις
 Receiving	DataSource		Λήψη
-Settings…	ActivityWindow		Ρυθμίσεις...
+Settings…	ActivityWindow		Ρυθμίσεις…
 Ports	DataSource		Θύρες
 Page faults	DataSource		Σφάλματα σελίδας
 Sending	DataSource		Αποστολή
@@ -33,7 +33,7 @@ CPU usage	DataSource		Χρήση ΚΜΕ
 Raw clipboard	DataSource		Ακατέργαστο πρόχειρο
 Sems	DataSource		Sems
 %.1f MiB	DataSource		%.1f MiB
-ActivityMonitor	System name		ActivityMonitor
+ActivityMonitor	System name		Διαχείριση Εργασιών
 Running applications	DataSource		Ενεργές εφαρμογές
 Semaphores	DataSource		Σηματοφόροι
 Block cache	DataSource		Αποκλεισμός cache

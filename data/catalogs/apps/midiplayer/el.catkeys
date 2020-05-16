@@ -3,14 +3,14 @@ Dungeon	Main Window		Dungeon
 Could not load song	Main Window		Αδυναμία φόρτωσης της μελωδίας
 Igor's lab	Main Window		Εργαστήριο του Igor
 Off	Main Window		Κλειστό
-Loading instruments…	Scope View		Γίνεται φόρτωση μουσικών οργάνων...
+Loading instruments…	Scope View		Γίνεται φόρτωση μουσικών οργάνων…
 Volume:	Main Window		Ένταση:
 Closet	Main Window		Θάλαμος
 Scope	Main Window		Επισκόπηση
-Drop MIDI file here	Scope View		Αφήστε τα αρχεία MIDI εδώ
+Drop MIDI file here	Scope View		Σύρετε αρχείο MIDI εδώ
 None	Main Window		Κανένα
 Reverb:	Main Window		Αντήχηση:
-MidiPlayer	System name		MidiPlayer
+MidiPlayer	System name		Παίκτης MIDI
 OK	Main Window		Εντάξει
 Stop	Main Window		Διακοπή
 Live input:	Main Window		Live είσοδος:

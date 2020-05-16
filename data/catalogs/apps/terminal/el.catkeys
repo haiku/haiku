@@ -9,7 +9,7 @@ Select all	Terminal TermWindow		Επιλογή όλων
 Confirm exit if active programs exist	Terminal AppearancePrefView		Επιβεβαίωση εξόδου αν υπάρχουν ενεργά προγράμματα
 Copy	Terminal TermWindow		Αντιγραφή
 Retro	Terminal colors scheme		Ρέτρο
-Edit tab title…	Terminal TermWindow		Επεξεργασία τίτλου καρτέλας...
+Edit tab title…	Terminal TermWindow		Επεξεργασία τίτλου καρτέλας…
 Print	Terminal TermWindow		Εκτύπωση
 Settings	Terminal TermWindow		Ρυθμίσεις
 %app% settings	Terminal PrefWindow	window title	Ρυθμίσεις %app%
@@ -24,7 +24,7 @@ Create link here	Terminal TermView		Δημιουργία συνδέσμου εδ
 Custom	Terminal AppearancePrefView	Window size	Προσαρμοσμένο
 Selected text	Terminal AppearancePrefView		Επιλεγμένο κείμενο
 Change directory	Terminal TermView		Αλλαγή καταλόγου
-Page setup…	Terminal TermWindow		Διαμόρφωση σελίδας...
+Page setup…	Terminal TermWindow		Διαμόρφωση σελίδας…
 Defaults	Terminal PrefWindow		Προεπιλογές
 Cancel	Terminal TermView		Άκυρο
 Revert	Terminal PrefWindow		Επαναφορά
@@ -34,7 +34,7 @@ Find next	Terminal TermWindow		Εύρεση επόμενου
 Copy link location	Terminal TermView		Αντιγραφή υπερσυνδέσμου
 Window title:	Terminal AppearancePrefView		Τίτλος παραθύρου:
 New tab	Terminal TermWindow		Νέα καρτέλα
-Window title…	Terminal TermWindow		Τίτλος παραθύρου...
+Window title…	Terminal TermWindow		Τίτλος παραθύρου…
 Blue	Terminal colors scheme		Μπλε
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Δεν μπορεί να εκτελεστεί \"%command\":\n\t%error
 Terminal	System name		Terminal
@@ -44,7 +44,7 @@ Really close?	Terminal TermWindow		Να κλείσει σίγουρα;
 OK	Terminal TermApp		Εντάξει
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Η διεργασία \"%1\" ακόμη εκτελείται.\nΕαν κλείσετε τοτερματικό, η διεργασία θα τερματιστεί.
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Μη αναγνωρισμένη επιλογή \"%s\"\n
-Tab title:	Terminal AppearancePrefView		Τίτλος καρτέλας
+Tab title:	Terminal AppearancePrefView		Τίτλος καρτέλας:
 Text not found.	Terminal TermWindow		Το κείμενο δεν βρέθηκε.
 Find failed	Terminal TermWindow		Η εύρεση απέτυχε
 Match word	Terminal FindWindow		Ταίριασμα λέξης
@@ -53,7 +53,7 @@ Quit	Terminal TermWindow		Έξοδος
 Match case	Terminal FindWindow		Ταίριασμα πεζών/κεφαλαίων
 Find previous	Terminal TermWindow		Εύρεση προηγούμενου
 Close	Terminal TermWindow		Κλείσιμο
-Save to file…	Terminal PrefWindow		Αποθήκευση στο αρχείο...
+Save to file…	Terminal PrefWindow		Αποθήκευση στο αρχείο…
 Background	Terminal AppearancePrefView		Παρασκήνιο
 Window size	Terminal TermWindow		Μέγεθος παραθύρου
 Cancel	Terminal TermWindow		Άκυρο
@@ -68,7 +68,7 @@ Default	Terminal colors scheme		Προεπιλογή
 Window size:	Terminal AppearancePrefView		Μέγεθος παραθύρου:
 Switch Terminals	Terminal TermWindow		Εναλλαγή Τερματικών
 Decrease	Terminal TermWindow		Μείωση
-Settings…	Terminal TermWindow		Ρυθμίσεις...
+Settings…	Terminal TermWindow		Ρυθμίσεις…
 Cancel	Terminal SetTitleWindow		Ακύρωση
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Το σχέδιο που προσδιορίζει τον τρέχοντα τίτλο παραθύρου. Τα παρακάτω σύμβολα \nμπορούν να χρησιμοποιηθούν:\n
 Use text:	Terminal FindWindow		Χρήση κειμένου:
@@ -86,7 +86,7 @@ Color:	Terminal AppearancePrefView		Χρώμα:
 Open link	Terminal TermView		Άνοιγμα υπερσυνδέσμου
 Text	Terminal AppearancePrefView		Κείμενο
 Not found.	Terminal TermWindow		Δε βρέθηκε.
-Find…	Terminal TermWindow		Εύρεση...
+Find…	Terminal TermWindow		Εύρεση…
 No search string was entered.	Terminal TermWindow		Δεν καταχωρήθηκε η συμβολοσειρά για την αναζήτηση.
 Move here	Terminal TermView		Μετακίνηση εδώ
 Abort	Terminal Shell		Ματαίωση

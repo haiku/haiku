@@ -7,7 +7,7 @@ System Translators	ActiveTranslatorsWindow		Μετατροπείς του Συσ
 \nType: '%1' (%2)\nGroup: '%3' (%4)\nQuality: %5\nCapability: %6\nMIME Type: %7\nName: %8\n	ImageView		\nΤύπος: '%1' (%2)\nΟμάδα: '%3' (%4)\nΠοιότητα: %5\nΙκανότητα: %6\nΤύπος MIME: %7\nΌνομα: %8\n
 OK	ImageWindow		ΟΚ
 View	ImageWindow		Προβολή
-Open…	ImageWindow		Άνοιγμα...
+Open…	ImageWindow		Άνοιγμα…
 Save feature not implemented yet.	ImageWindow		Η δυνατότητα αποθήκευσης δεν έχει υλοποιηθεί ακόμα.
 Active Translators	ImageWindow		Ενεργοί Μετατροπείς
 Info	ImageWindow		Πληροφορίες
@@ -15,7 +15,7 @@ Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal B
 No image available to save.	ImageWindow		Δεν υπάρχει διαθέσιμη εικόνα για αποθήκευση.
 OK	ImageView		ΟΚ
 Bummer	ImageWindow		Κρίμα
-\nOutput Formats:	ImageView		\nΦόρμες Εξόδου
+\nOutput Formats:	ImageView		\nΜορφές Εξόδου:
 Number of Documents: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Αριθμός αρχείων: %1\n\nΜετατροπέας σε χρήση:\nΌνομα: %2\nΠληροφορία: %3\nΈκδοση: %4\n
 User Translators	ActiveTranslatorsWindow		Μετατροπείς Χρήστη
 Last Page	ImageWindow		Τελευταία Σελίδα
@@ -27,6 +27,6 @@ File	ImageWindow		Αρχείο
 Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Επιλεγμένο έγγραφο: %1\n\nΜετατροπέας σε χρήση:\nΌνομα: %2\nΠληροφορίες: %3\nΈκδοση: %4\n
 Quit	ImageWindow		Έξοδος
 Sorry, unable to write the image file.	ImageView		Συγνώμη, η εγγραφή της εικόνας απέτυχε.
-Save…	ImageWindow		Αποθήκευση...
+Save…	ImageWindow		Αποθήκευση…
 Window	ImageWindow		Παράθυρο
 First Page	ImageWindow		Πρώτη Σελίδα

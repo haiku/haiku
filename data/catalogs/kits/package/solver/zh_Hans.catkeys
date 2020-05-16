@@ -1,0 +1,11 @@
+1	english	x-vnd.Haiku-libsolvsolver	3757623432
+unspecified problem	SolverProblem		未知问题
+do not deinstall \"%selection%\"	SolverProblemSolution		不要卸载 \"%selection%\"
+conflicting requests	SolverProblem		请求冲突
+do not install the most recent version of \"%selection%\"	SolverProblemSolution		不要安装 \"%selection%\" 的最新版本
+do not forbid installation of %source%	SolverProblemSolution		请不要禁止 %source% 的安装
+allow downgrade of %source% to %target%	SolverProblemSolution		允许降级 %source% 至 %target%
+dependency problem	SolverProblem		依赖问题
+%dependency% is provided by the system	SolverProblem		%dependency% 由系统提供
+package %source% conflicts with %dependency% provided by %target%	SolverProblem		软件包 %source% 与由 %target% 提供的 %dependency% 冲突
+%source% has inferior architecture	SolverProblem		%source% 有下级结构

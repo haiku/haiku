@@ -4,9 +4,9 @@ Sort applications by name	PreferencesWindow		Ταξινόμηση εφαρμογ
 Suspend	DeskbarMenu		Αναστολή
 Hide clock	TimeView		Απόκρυψη ρολογιού
 Applications	PreferencesWindow		Εφαρμογές
-Time preferences…	TimeView		Προτιμήσεις ώρας...
+Time preferences…	TimeView		Προτιμήσεις ώρας…
 About Haiku	DeskbarMenu		Σχετικά με το Haiku
-Edit in Tracker…	PreferencesWindow		Επεξεργασία στο Tracker...
+Edit in Tracker…	PreferencesWindow		Επεξεργασία στο Tracker…
 Recent documents:	PreferencesWindow		Πρόσφατα έγγραφα:
 Recent applications	DeskbarMenu		Πρόσφατες εφαρμογές
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Εφαρμογές
@@ -26,7 +26,7 @@ Restart system	DeskbarMenu		Επανεκκίνηση συστήματος
 Large	PreferencesWindow		Μεγάλο
 Auto-raise	PreferencesWindow		Αυτόματη-ανύψωση
 Recent folders:	PreferencesWindow		Πρόσφατοι φάκελοι:
-Show application expander	PreferencesWindow		Εμφάνιση της εφαρμογής Επεκτατής
+Show application expander	PreferencesWindow		Εμφάνιση της εφαρμογής Αποσυμπιεστής
 Close all	WindowMenu		Κλείσιμο όλων
 Deskbar preferences	PreferencesWindow		Προτιμήσεις Γραμμής Εργασιών
 Mount	DeskbarMenu		Προσάρτηση

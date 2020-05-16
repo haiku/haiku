@@ -5,7 +5,7 @@ Create Log File	PoorMan		Δημιουργία Αρχείου Καταγραφή�
 File logging	PoorMan		Αρχείο καταγραφής
 Website options	PoorMan		Επιλογές ιστοσελίδας
 Log to file	PoorMan		Καταγραφή σε αρχείο
-Shutting down.	PoorMan		Γίνεται τερματισμός
+Shutting down.	PoorMan		Γίνεται τερματισμός.
 Error Dir	PoorMan		Σφάλμα Καταλόγου
 Web folder:	PoorMan		Φάκελος ιστού:
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Παρακαλώ επιλέξτε το φάκελο που θέλετε δημοσιεύσετε στον παγκόσμιο ιστό.\n\nΟ Εξυπηρετητής Ιστού μπορεί να δημιουργήσει έναν προεπιλεγμένο φάκελο \"public_html \" στον προσωπικό σας φάκελο για εσάς.\nΕναλλακτικά μπορείτε να επιλέξετε έναν από τους δικούς σας φακέλους.
@@ -14,7 +14,7 @@ File Name	PoorMan		Όνομα Αρχείου
 Starting up... 	PoorMan		Γίνεται εκκίνηση... 
 Select	PoorMan		Επιλογή
 Logging view	PoorMan		Εμφάνιση καταγραφής
-Save console as…	PoorMan		Αποθήκευση κονσόλας ως...
+Save console as…	PoorMan		Αποθήκευση κονσόλας ως…
 Edit	PoorMan		Επεξεργασία
 Cancel	PoorMan		Άκυρο
 Directory: 	PoorMan		Κατάλογος: 
@@ -23,7 +23,7 @@ Hits: 0	PoorMan		Επισκέψεις: 0
 Shutting down.\n	PoorMan		Τερματισμός λειτουργίας.\n
 Select all	PoorMan		Επιλογή όλων
 Error Server	PoorMan		Σφάλμα Εξυπηρετητή
-Send file listing if there's no start page	PoorMan		Αποστολή παρουσίασης αρχείων αν δεν υπάρχει αρχική σελίδα.
+Send file listing if there's no start page	PoorMan		Αν δεν υπάρχει αρχική σελίδα, να αποσταλεί λίστα αρχείων
 Create PoorMan log	PoorMan		Δημιουργία καταγραφής Διακομιστή Ιστοσελίδων
 Max. simultaneous connections:	PoorMan		Μεγ. ταυτόχρονες συνδέσεις:
 Done	PoorMan		Εντάξει
@@ -34,7 +34,7 @@ Create public_html	PoorMan		Δημιουργία public_html
 Clear hit counter	PoorMan		Καθαρισμός μετρητή επισκέψεων
 Status: Stopped	PoorMan		Κατάσταση: Σταματημένο
 File	PoorMan		Αρχείο
-Settings…	PoorMan		Ρυθμίσεις...
+Settings…	PoorMan		Ρυθμίσεις…
 Log To File	PoorMan		Καταγραφή σε αρχείο
 Connections	PoorMan		Συνδέσεις
 Controls	PoorMan		Έλεγχοι

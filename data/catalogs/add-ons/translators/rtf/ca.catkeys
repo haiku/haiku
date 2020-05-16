@@ -1,11 +1,11 @@
 1	catalan; valencian	x-vnd.Haiku-RTFTranslator	334451110
 Version %d.%d.%d, %s	ConfigView		Versió %d.%d.%d, %s
 RTF text files	RTFTranslator		Fitxers de text RTF
-RTF-Translator Settings	ConfigView		Paràmetres del Traductor RTF
-Rich Text Format (RTF) translator	ConfigView		Format Rich Text (RTF) translator
+RTF-Translator Settings	ConfigView		Paràmetres del Traductor d'RTF
+Rich Text Format (RTF) translator	ConfigView		Traductor de format de text enriquit (RTF)
 RTF Settings	main		Paràmetres d'RTF
-RichTextFormat file	RTFTranslator		Fitxer RichTextFormat
+RichTextFormat file	RTFTranslator		Fitxer de format de text enriquit
 Be style text file	RTFTranslator		Fitxer de text d'estil del Be
 Plain text file	RTFTranslator		Fitxer de text net
-Rich Text Format translator	RTFTranslator		Traductor del RTF
-Rich Text Format translator v%d.%d.%d %s	RTFTranslator		Traductor del Rich Text Format v%d.%d.%d %s
+Rich Text Format translator	RTFTranslator		Traductor de format de text enriquit
+Rich Text Format translator v%d.%d.%d %s	RTFTranslator		Traductor de format de text enriquit v%d.%d.%d %s

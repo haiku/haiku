@@ -1,10 +1,11 @@
-1	english	x-vnd.Haiku-Time	563137575
+1	english	x-vnd.Haiku-Time	752043118
 OK	Time		确定
 Message receiving failed	Time		消息接收失败
 Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		时间日期，编写者：\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\n版权所有 2004-2012, Haiku.
 Australia	Time		澳大利亚
 America	Time		美洲
 Reset to default server list	Time		重置为默认服务器列表
+Could not resolve server address	Time		无法解析服务器地址
 Set time zone	Time		设置时区
 Waiting for answer failed	Time		等待回复失败
 <Other>	Time		<其他>

@@ -10,5 +10,5 @@ Windows icon translator	ICOTranslator		Traductor d'icones del Windows
 pixels in either direction.	ConfigView		píxels a cada direcció.
 Write 32 bit images on true color input	ConfigView		Escriu les imatges de 32 bits amb entrada de color real
 Icon	ICOTranslator		Icona
-ICOTranslator Settings	ConfigView		Paràmetres del Traductor ICO
+ICOTranslator Settings	ConfigView		Paràmetres del Traductor d'ICO
 Windows icon translator	ConfigView		Traductor d'icones del Windows

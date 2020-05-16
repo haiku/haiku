@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-libtracker	659027911
+1	danish	x-vnd.Haiku-libtracker	1673907665
 Created	ContainerWindow		Oprettet
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Åbn og lav foretrukket
@@ -262,6 +262,7 @@ ends with	SelectionWindow		ender med
 Open	OpenWithWindow		Åbn
 You must have at least one attribute showing.	PoseView		Du skal have mindst én egenskab vist.
 Cut	FilePanelPriv		Klip
+Finish: after several years	StatusWindow		Færdig: efter flere år
 Favorites	FilePanelPriv		Favoritter
 Point	AttributesView		Punkt
 home	B_USER_DIRECTORY		hjem

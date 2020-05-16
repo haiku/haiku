@@ -1,10 +1,10 @@
-1	greek, modern (1453-)	x-vnd.Haiku-StyledEdit	3213978181
+1	greek, modern (1453-)	x-vnd.Haiku-StyledEdit	1921198572
 Document statistics	Statistics		Στατιστικά εγγράφου
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Δεν μπορεί να γίνει επαναφορά, το αρχείο δεν βρέθηκε: \"%s\".
 Cut	Menus		Αποκοπή
 Center	Menus		Κέντρο
 Wrap-around search	FindandReplaceWindow		Κυκλική αναζήτηση
-Page setup…	Menus		Διαμόρφωση σελίδας...
+Page setup…	Menus		Διαμόρφωση σελίδας…
 Untitled 	StyledEditWindow		Χωρίς τίτλο 
 OK	Statistics		Εντάξει
 Find	FindandReplaceWindow		Εύρεση
@@ -25,7 +25,7 @@ OK	RevertToSavedAlert		Εντάξει
 Unlock file	StatusView		Ξεκλείδωμα αρχείου
 Italic	Menus		Πλάγια
 Can't undo	Menus		Αδυναμία αναίρεσης
-Replace…	Menus		Αντικατάσταση...
+Replace…	Menus		Αντικατάσταση…
 File	Menus		Αρχείο
 Bold	Menus		Έντονα
 Paste	Menus		Επικόλληση
@@ -50,9 +50,10 @@ Find:	FindandReplaceWindow		Εύρεση:
 Undo typing	QuitAlert		Αναίρεση πληκτρολόγησης
 Error loading \"%s\":\n\t%s	LoadAlert		Σφάλμα φόρτωσης \"%s\":\n\t%s
 Don't save	SaveAlert		Χωρίς αποθήκευση
-Print…	Menus		Εκτύπωση...
+Print…	Menus		Εκτύπωση…
 Quit	Menus		Έξοδος
 Redo typing	QuitAlert		Επανάληψη πληκτρολόγησης
+Ignore	NodeMonitorAlerts		Αγνόηση
 Wrap lines	Menus		Αναδίπλωση γραμμών
 Text encoding	Menus		Κωδικοποίηση κειμένου
 OK	LoadAlert		Εντάξει
@@ -60,17 +61,20 @@ Save	QuitAlert		Αποθήκευση
 Case-sensitive	FindandReplaceWindow		Ταίριασμα πεζών/κεφαλαίων
 Find selection	Menus		Εύρεση επιλεγμένου
 Cancel	SaveAlert		Άκυρο
-Find…	Menus		Εύρεση...
+Find…	Menus		Εύρεση…
+Revert	RevertToSavedAlert		Επαναφορά
 Size	Menus		Μέγεθος
+Autodetect	Menus		Αυτόματος εντοπισμός
 Replace next	Menus		Αντικατάσταση επόμενου
 OK	QuitAlert		Εντάξει
 Replace with:	FindandReplaceWindow		Αντικατάσταση με:
 Edit	Menus		Επεξεργασία
-Open…	Menus		Άνοιγμα...
-Save as…	Menus		Αποθήκευση ως...
+Open…	Menus		Άνοιγμα…
+Save as…	Menus		Αποθήκευση ως…
 Replace	FindandReplaceWindow		Αντικατάσταση
 Characters:	Statistics		Χαρακτήρες:
 Don't save	QuitAlert		Χωρίς αποθήκευση
+This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Αυτό το αρχείο είναι μόνο για ανάγνωση. Θέλετε να αποθηκεύσετε τις αλλαγές σας στο έγγραφο \"%s\"; 
 Align	Menus		Στοίχιση
 Font	Menus		Γραμματοσειρά
 Select all	Menus		Επιλογή όλων

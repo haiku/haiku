@@ -1,14 +1,19 @@
-1	greek, modern (1453-)	x-vnd.Haiku-WebPositive	542208154
+1	greek, modern (1453-)	x-vnd.Haiku-WebPositive	148408648
 Authentication required	Authentication Panel		Απαιτείται ταυτοποίηση
+Previous	WebPositive Window		Προηγούμενο
+(Finish: %date)	Download Window		(Ολοκλήρωση: %date)
 Download folder:	Settings Window		Φάκελος λήψεων:
 Close window	WebPositive Window		Κλείσιμο παραθύρου
 Find:	WebPositive Window		Εύρεση:
+Script console	WebPositive Window		Κονσόλα σεναρίων
 Fonts	Settings Window		Γραμματοσειρές
 Bookmarks	WebPositive Window		Σελιδοδείκτες
 Use proxy server to connect to the internet	Settings Window		Χρήση μεσολαβητή για την σύνδεση στο διαδίκτυο
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url ολοκληρώθηκε
 There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Προέκυψε ένα σφάλμα κατά την ανάγνωση του φακέλου σελιδοδεικτών.\n\nΣφάλμα: %error
 Delete	Cookie Manager		Διαγραφή
+(Finish: %date - Over %duration left)	Download Window		(Ολοκλήρωση: %date - Απομένει παραπάνω από %duration)
+Open containing folder	Download Window		Άνοιγμα εμπεριεχόμενου φακέλου 
 Full screen	WebPositive Window		Πλήρη οθόνη
 Downloads in progress	WebPositive		Λήψεις σε εξέλιξη
 Copy URL to clipboard	Download Window		Αντιγραφή υπερσυνδέσμου στο πρόχειρο
@@ -16,7 +21,7 @@ Start page:	Settings Window		Αρχική σελίδα:
 Cancel	Download Window		Ακύρωση
 Settings	Settings Window		Ρυθμίσεις
 Downloads	WebPositive Window		Λήψεις
-Browse…	Settings Window		Περιήγηση...
+Browse…	Settings Window		Περιήγηση…
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Υπάρχει ήδη σελιδοδείκτης για αυτήν την σελίδα (%bookmarkName).
 Proxy password:	Settings Window		Κωδικός μεσολαβητή:
 Size:	Font Selection view		Μέγεθος:
@@ -26,6 +31,7 @@ Show bookmark bar	WebPositive Window		Εμφάνιση μπάρας σελιδο
 Find	WebPositive Window		Εύρεση
 Standard font:	Settings Window		Προεπιλεγμένη γραμματοσειρά:
 Open download error	Download Window		Άνοιγμα σφάλματος λήψης
+General	Settings Window		Γενικά
 New tabs:	Settings Window		Νέες καρτέλες:
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url απέτυχε
 Open downloads folder	Download Window		Άνοιγμα φακέλου λήψεων
@@ -43,6 +49,7 @@ OK	Authentication Panel		Εντάξει
 Hide password text	Authentication Panel		Απόκρυψη κωδικού
 Username:	Authentication Panel		Όνομα χρήστης:
 Name	Cookie Manager		Όνομα
+Earlier	WebPositive Window		Νωρίτερα
 Edit	WebPositive Window		Επεξεργασία
 Back	WebPositive Window		Πίσω
 Yesterday	WebPositive Window		Εχτές
@@ -71,9 +78,11 @@ OK	Download Window		Εντάξει
 Proxy username:	Settings Window		Όνομα χρήστη μεσολαβητή:
 Manage bookmarks	WebPositive Window		Διαχείριση σελιδοδεικτών
 /s)	Download Window	...as in 'per second'	/δ)
+Restart	Download Window		Επανεκκίνηση
 Serif font:	Settings Window		Γραμματοσειρά Serif:
 Apply	Settings Window		Εφαρμογή
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Προέκυψε σφάλμα κατά την εμφάνιση του φακέλου σελιδοδεικτών.\n\nΣφάλμα: %error
+Revert	Settings Window		Επαναφορά
 Copy	WebPositive Window		Αντιγραφή
 Close tab	WebPositive Window		Κλείσιμο καρτέλας
 About	WebPositive Window		Σχετικά
@@ -83,21 +92,24 @@ History	WebPositive Window		Ιστορικό
 Do you really want to clear the browsing history?	WebPositive Window		Είστε σίγουρος ότι θέλετε να διαγράψετε το ιστορικό περιήγησης σας;
 Quit	WebPositive Window		Έξοδος
 Cookie manager	Cookie Manager		Διαχειριστής Cookie
+Show home button	Settings Window		Εμφάνιση κουμπιού αρχικής σελίδας
 Start new session	Settings Window		Έναρξη νέας συνεδρίας
 The cookie jar is empty!	Cookie Manager		Το βάζο μπισκότων είναι άδειο!
 Value	Cookie Manager		Τιμή
 Paste	WebPositive Window		Επικόλληση
 Double-click or middle-click to open new tab.	Tab Manager		Κάντε διπλό κλικ ή μεσαίο κλικ για να ανοίξετε νέα καρτέλα.
+Next	WebPositive Window		Επόμενο
 Bookmark error	WebPositive Window		Σφάλμα σελιδοδείκτη
 OK	WebPositive Window		Εντάξει
 WebPositive	Download Window		WebPositive
-Save page as…	WebPositive Window		Αποθήκευση σελίδας ως...
+Save page as…	WebPositive Window		Αποθήκευση σελίδας ως…
 Auto-hide mouse pointer	Settings Window		Αυτόματη απόκρυψη δείκτη ποντικιού
 Requesting %url	WebPositive Window		Γίνεται αίτημα για %url
 Window	WebPositive Window		Παράθυρο
 Proxy server address:	Settings Window		Διεύθυνση μεσολαβητή:
 Search page:	Settings Window		Σελίδα αναζήτησης:
 Settings	WebPositive Window		Ρυθμίσεις
+Clear	URL Bar		Καθαρισμός
 Loading %url	WebPositive Window		Γίνεται φόρτωση του %url
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Ο καλύμνιος σφουγγαράς ψιθύρησε πως θα βουτήξει χωρίς να διστάζει.
 Confirmation	WebPositive Window		Επιβεβαίωση
@@ -108,5 +120,6 @@ Open blank page	Settings Window		Άνοιγμα κενής σελίδας
 Clear history	WebPositive Window		Καθαρισμός ιστορικού
 Cancel	WebPositive Window		Ακύρωση
 Bookmark info	WebPositive Window		Πληροφορίες σελιδοδείκτη
+Script console	Console Window		Κονσόλα σεναρίων
 Copy	URL Bar		Αντιγραφή
 Open start page	Settings Window		Άνοιγμα αρχικής σελίδας
