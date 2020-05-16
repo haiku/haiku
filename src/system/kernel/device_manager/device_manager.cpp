@@ -529,7 +529,10 @@ control_device_manager(const char* subsystem, uint32 function, void* buffer,
 
 			device_attr* attr = iterator.Next();
 			attrInfo.cookie = (device_node_cookie)attr;
-			strlcpy(attrInfo.name, attr->name, 254);
+			if (attr->name != NULL)
+				strlcpy(attrInfo.name, attr->name, 254);
+			else
+				attrInfo.name[0] = '\0';
 			attrInfo.type = attr->type;
 			switch (attrInfo.type) {
 				case B_UINT8_TYPE:
@@ -545,7 +548,10 @@ control_device_manager(const char* subsystem, uint32 function, void* buffer,
 					attrInfo.value.ui64 = attr->value.ui64;
 					break;
 				case B_STRING_TYPE:
-					strlcpy(attrInfo.value.string, attr->value.string, 254);
+					if (attr->value.string != NULL)
+						strlcpy(attrInfo.value.string, attr->value.string, 254);
+					else
+						attrInfo.value.string[0] = '\0';
 					break;
 				/*case B_RAW_TYPE:
 					if (attr.value.raw.length > attr_info->attr.value.raw.length)
