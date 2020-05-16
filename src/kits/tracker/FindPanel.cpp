@@ -861,7 +861,7 @@ FindPanel::FindPanel(BFile* node, FindWindow* parent, bool fromTemplate,
 			.AddGroup(B_VERTICAL)
 				.Add(icon)
 				.AddGlue()
-			.End();
+			.End()
 			.Add(fMoreOptions)
 			.AddGlue()
 			.AddGroup(B_VERTICAL)
