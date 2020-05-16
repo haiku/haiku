@@ -52,7 +52,21 @@ MasterServerDevice::MasterServerDevice()
 	get_mouse_acceleration(&fAcceleration);
 	get_click_speed(&fDblClickSpeed);
 	_CalculateAccelerationTable();
-	_SearchDevices();
+
+	if (_LockDevices()) {
+		// do an initial scan of the devfs folder, after that, we should receive
+		// node monitor messages for hotplugging support
+		_SearchDevices();
+	
+		fActive = true;
+	
+		for (int32 i = 0; PointingDevice* device = (PointingDevice*)fDevices.ItemAt(i); i++) {
+			device->Start();
+		}
+		_UnlockDevices();
+	}
+
+	StartMonitoringDevice(kWatchFolder);
 }
 
 // destructor
@@ -96,23 +110,10 @@ MasterServerDevice::SystemShuttingDown()
 status_t
 MasterServerDevice::Start(const char* device, void* cookie)
 {
-	if (_LockDevices()) {
-		// do an initial scan of the devfs folder, after that, we should receive
-		// node monitor messages for hotplugging support
-		_SearchDevices();
-	
-		fActive = true;
-	
-		for (int32 i = 0; PointingDevice* device = (PointingDevice*)fDevices.ItemAt(i); i++) {
-			device->Start();
-		}
-		_UnlockDevices();
-	}
-
 	// TODO: make this configurable
 //	_StartPS2DisablerThread();
 
-	return StartMonitoringDevice(kWatchFolder);
+	return B_OK;
 }
 
 // Stop
@@ -214,7 +215,7 @@ MasterServerDevice::_AddDevice(const char* path)
 			// start device polling only if we're started
 			if (fActive)
 				device->Start();
-			input_device_ref device = { (char *)"Wacom Tablets",
+			input_device_ref device = { (char *)"Wacom Tablet",
 				B_POINTING_DEVICE, (void*)this };
 			input_device_ref* deviceList[2] = { &device, NULL };
 			RegisterDevices(deviceList);
