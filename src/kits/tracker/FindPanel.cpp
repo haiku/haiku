@@ -50,6 +50,7 @@ All rights reserved.
 #include <Catalog.h>
 #include <CheckBox.h>
 #include <ControlLook.h>
+#include <Cursor.h>
 #include <Debug.h>
 #include <Directory.h>
 #include <FindDirectory.h>
@@ -779,6 +780,8 @@ FindPanel::FindPanel(BFile* node, FindWindow* parent, bool fromTemplate,
 		fDraggableIcon->SetExplicitMaxSize(
 			BSize(draggableRect.right - draggableRect.left,
 				draggableRect.bottom - draggableRect.top));
+		BCursor grabCursor(B_CURSOR_ID_GRAB);
+		fDraggableIcon->SetViewCursor(&grabCursor);
 	}
 
 	fQueryName = new BTextControl("query name", B_TRANSLATE("Query name:"),
@@ -804,14 +807,6 @@ FindPanel::FindPanel(BFile* node, FindWindow* parent, bool fromTemplate,
 			.Add(checkboxGroup, 1, 1)
 			.End()
 		.View());
-
-	fLatch = new PaneSwitch("optionsLatch", true, B_WILL_DRAW);
-	fLatch->SetLabels(B_TRANSLATE("Fewer options"), B_TRANSLATE("More options"));
-	fLatch->SetValue(0);
-	fLatch->SetMessage(new BMessage(kLatchChanged));
-	fLatch->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
-		B_ALIGN_VERTICAL_CENTER));
-	fMoreOptions->Hide();
 
 	// add Search button
 	BButton* button;
@@ -864,14 +859,13 @@ FindPanel::FindPanel(BFile* node, FindWindow* parent, bool fromTemplate,
 		.Add(queryBox)
 		.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
 			.AddGroup(B_VERTICAL)
-				.Add(fLatch)
-				.Add(fMoreOptions)
+				.Add(icon)
 				.AddGlue()
-			.End()
+			.End();
+			.Add(fMoreOptions)
 			.AddGlue()
 			.AddGroup(B_VERTICAL)
 				.AddGlue()
-				.Add(icon)
 				.Add(button)
 			.End();
 
@@ -903,7 +897,6 @@ FindPanel::AttachedToWindow()
 	BNode* node = findWindow->QueryNode();
 	fSearchModeMenu->SetTargetForItems(this);
 	fQueryName->SetTarget(this);
-	fLatch->SetTarget(this);
 	RestoreMimeTypeMenuSelection(node);
 		// preselect the mime we used the last time have to do it here
 		// because AddByAttributeItems will build different menus based
@@ -2275,8 +2268,6 @@ FindPanel::SaveWindowState(BNode* node, bool editTemplate)
 		(int32*)&mode, sizeof(int32));
 
 	MoreOptionsStruct saveMoreOptions;
-	saveMoreOptions.showMoreOptions = fLatch->Value() != 0;
-
 	saveMoreOptions.searchTrash = fSearchTrashCheck->Value() != 0;
 	saveMoreOptions.temporary = fTemporaryCheck->Value() != 0;
 
@@ -2385,14 +2376,7 @@ FindPanel::RestoreWindowState(const BNode* node)
 		// need to sanitize to true or false here, could have picked
 		// up garbage from attributes
 
-		saveMoreOptions.showMoreOptions =
-			(saveMoreOptions.showMoreOptions != 0);
-
-		fLatch->SetValue(saveMoreOptions.showMoreOptions);
-		if (saveMoreOptions.showMoreOptions == 1 && fMoreOptions->IsHidden())
-			fMoreOptions->Show();
-		else if (saveMoreOptions.showMoreOptions == 0 && !fMoreOptions->IsHidden())
-			fMoreOptions->Hide();
+		saveMoreOptions.showMoreOptions = true; // Now unused
 
 		fSearchTrashCheck->SetValue(saveMoreOptions.searchTrash);
 		fTemporaryCheck->SetValue(saveMoreOptions.temporary);
