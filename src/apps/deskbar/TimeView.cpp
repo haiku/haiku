@@ -110,8 +110,8 @@ TTimeView::TTimeView(BMessage* data)
 
 TTimeView::~TTimeView()
 {
-	if (fCalendarWindow != NULL)
-		fCalendarWindow->Quit();
+	if (fCalendarWindowMessenger.IsValid())
+		fCalendarWindowMessenger.PostMessage(B_QUIT_REQUESTED);
 
 	delete fTimeFormat;
 	delete fDateFormat;
