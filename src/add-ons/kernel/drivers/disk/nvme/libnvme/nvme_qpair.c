@@ -412,21 +412,29 @@ done:
 
 static void nvme_qpair_submit_queued_requests(struct nvme_qpair *qpair)
 {
+	STAILQ_HEAD(, nvme_request) req_queue;
+	STAILQ_INIT(&req_queue);
+
 	pthread_mutex_lock(&qpair->lock);
+
+	STAILQ_CONCAT(&req_queue, &qpair->queued_req);
 
 	/*
 	 * If the controller is in the middle of a reset, don't
 	 * try to submit queued requests - let the reset logic
 	 * handle that instead.
 	 */
-	while (!STAILQ_EMPTY(&qpair->queued_req) && !qpair->ctrlr->resetting) {
-		struct nvme_request *req = STAILQ_FIRST(&qpair->queued_req);
-		STAILQ_REMOVE_HEAD(&qpair->queued_req, stailq);
+	while (!qpair->ctrlr->resetting && LIST_FIRST(&qpair->free_tr)
+			&& !STAILQ_EMPTY(&req_queue)) {
+		struct nvme_request *req = STAILQ_FIRST(&req_queue);
+		STAILQ_REMOVE_HEAD(&req_queue, stailq);
 
 		pthread_mutex_unlock(&qpair->lock);
 		nvme_qpair_submit_request(qpair, req);
 		pthread_mutex_lock(&qpair->lock);
 	}
+
+	STAILQ_CONCAT(&qpair->queued_req, &req_queue);
 
 	pthread_mutex_unlock(&qpair->lock);
 }
