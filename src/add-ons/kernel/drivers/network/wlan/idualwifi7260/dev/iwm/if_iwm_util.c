@@ -103,7 +103,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/iwm/if_iwm_util.c 321510 2017-07-26 05:51:31Z adrian $");
+__FBSDID("$FreeBSD$");
 
 #include "opt_wlan.h"
 #include "opt_iwm.h"
@@ -169,7 +169,7 @@ __FBSDID("$FreeBSD: releng/12.0/sys/dev/iwm/if_iwm_util.c 321510 2017-07-26 05:5
 int
 iwm_send_cmd(struct iwm_softc *sc, struct iwm_host_cmd *hcmd)
 {
-	struct iwm_tx_ring *ring = &sc->txq[IWM_MVM_CMD_QUEUE];
+	struct iwm_tx_ring *ring = &sc->txq[IWM_CMD_QUEUE];
 	struct iwm_tfd *desc;
 	struct iwm_tx_data *txdata = NULL;
 	struct iwm_device_cmd *cmd;
@@ -225,12 +225,11 @@ iwm_send_cmd(struct iwm_softc *sc, struct iwm_host_cmd *hcmd)
 	}
 
 	if (paylen > datasz) {
-		size_t totlen;
 		IWM_DPRINTF(sc, IWM_DEBUG_CMD,
 		    "large command paylen=%u len0=%u\n",
 			paylen, hcmd->len[0]);
 		/* Command is too large */
-		totlen = hdrlen + paylen;
+		size_t totlen = hdrlen + paylen;
 		if (paylen > IWM_MAX_CMD_PAYLOAD_SIZE) {
 			device_printf(sc->sc_dev,
 			    "firmware command too long (%zd bytes)\n",
@@ -347,7 +346,7 @@ iwm_send_cmd(struct iwm_softc *sc, struct iwm_host_cmd *hcmd)
 
 /* iwlwifi: mvm/utils.c */
 int
-iwm_mvm_send_cmd_pdu(struct iwm_softc *sc, uint32_t id,
+iwm_send_cmd_pdu(struct iwm_softc *sc, uint32_t id,
 	uint32_t flags, uint16_t len, const void *data)
 {
 	struct iwm_host_cmd cmd = {
@@ -362,7 +361,7 @@ iwm_mvm_send_cmd_pdu(struct iwm_softc *sc, uint32_t id,
 
 /* iwlwifi: mvm/utils.c */
 int
-iwm_mvm_send_cmd_status(struct iwm_softc *sc,
+iwm_send_cmd_status(struct iwm_softc *sc,
 	struct iwm_host_cmd *cmd, uint32_t *status)
 {
 	struct iwm_rx_packet *pkt;
@@ -403,7 +402,7 @@ iwm_mvm_send_cmd_status(struct iwm_softc *sc,
 
 /* iwlwifi/mvm/utils.c */
 int
-iwm_mvm_send_cmd_pdu_status(struct iwm_softc *sc, uint32_t id,
+iwm_send_cmd_pdu_status(struct iwm_softc *sc, uint32_t id,
 	uint16_t len, const void *data, uint32_t *status)
 {
 	struct iwm_host_cmd cmd = {
@@ -412,7 +411,7 @@ iwm_mvm_send_cmd_pdu_status(struct iwm_softc *sc, uint32_t id,
 		.data = { data, },
 	};
 
-	return iwm_mvm_send_cmd_status(sc, &cmd, status);
+	return iwm_send_cmd_status(sc, &cmd, status);
 }
 
 void
@@ -491,7 +490,7 @@ iwm_dma_contig_free(struct iwm_dma_info *dma)
 }
 
 /**
- * iwm_mvm_send_lq_cmd() - Send link quality command
+ * iwm_send_lq_cmd() - Send link quality command
  * @init: This command is sent as part of station initialization right
  *        after station has been added.
  *
@@ -501,7 +500,7 @@ iwm_dma_contig_free(struct iwm_dma_info *dma)
  * progress.
  */
 int
-iwm_mvm_send_lq_cmd(struct iwm_softc *sc, struct iwm_lq_cmd *lq, boolean_t init)
+iwm_send_lq_cmd(struct iwm_softc *sc, struct iwm_lq_cmd *lq, boolean_t init)
 {
 	struct iwm_host_cmd cmd = {
 		.id = IWM_LQ_CMD,
@@ -510,16 +509,16 @@ iwm_mvm_send_lq_cmd(struct iwm_softc *sc, struct iwm_lq_cmd *lq, boolean_t init)
 		.data = { lq, },
 	};
 
-	if (lq->sta_id == IWM_MVM_STATION_COUNT)
+	if (lq->sta_id == IWM_STATION_COUNT)
 		return EINVAL;
 
 	return iwm_send_cmd(sc, &cmd);
 }
 
 boolean_t
-iwm_mvm_rx_diversity_allowed(struct iwm_softc *sc)
+iwm_rx_diversity_allowed(struct iwm_softc *sc)
 {
-	if (num_of_ant(iwm_mvm_get_valid_rx_ant(sc)) == 1)
+	if (num_of_ant(iwm_get_valid_rx_ant(sc)) == 1)
 		return FALSE;
 
 	/*

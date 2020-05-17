@@ -1,4 +1,4 @@
-/*	$FreeBSD: releng/12.0/sys/dev/iwm/if_iwm_pcie_trans.h 313415 2017-02-08 06:53:23Z adrian $ */
+/*	$FreeBSD$ */
 /*
  * Copyright (c) 2014 genua mbh <info@genua.de>
  * Copyright (c) 2014 Fixup Software Ltd.
@@ -106,6 +106,10 @@
 
 extern	uint32_t iwm_read_prph(struct iwm_softc *sc, uint32_t addr);
 extern	void iwm_write_prph(struct iwm_softc *sc, uint32_t addr, uint32_t val);
+extern	void iwm_write_prph64(struct iwm_softc *sc, uint64_t addr,
+    uint64_t val);
+extern	int iwm_poll_prph(struct iwm_softc *sc, uint32_t addr, uint32_t bits,
+    uint32_t mask, int timeout);
 extern	int iwm_read_mem(struct iwm_softc *sc, uint32_t addr, void *buf, int dwords);
 extern	int iwm_write_mem(struct iwm_softc *sc, uint32_t addr, const void *buf,
 		int dwords);

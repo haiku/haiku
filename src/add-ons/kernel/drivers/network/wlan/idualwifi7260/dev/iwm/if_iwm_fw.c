@@ -71,7 +71,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/iwm/if_iwm_fw.c 318001 2017-05-09 02:38:23Z adrian $");
+__FBSDID("$FreeBSD$");
 
 #include "opt_wlan.h"
 #include "opt_iwm.h"
@@ -336,7 +336,7 @@ iwm_send_paging_cmd(struct iwm_softc *sc, const struct iwm_fw_img *fw)
 		    BUS_DMASYNC_PREWRITE | BUS_DMASYNC_PREREAD);
 	}
 
-	return iwm_mvm_send_cmd_pdu(sc, iwm_cmd_id(IWM_FW_PAGING_BLOCK_CMD,
+	return iwm_send_cmd_pdu(sc, iwm_cmd_id(IWM_FW_PAGING_BLOCK_CMD,
 						   IWM_ALWAYS_LONG_GROUP, 0),
 				    0, sizeof(fw_paging_cmd), &fw_paging_cmd);
 }

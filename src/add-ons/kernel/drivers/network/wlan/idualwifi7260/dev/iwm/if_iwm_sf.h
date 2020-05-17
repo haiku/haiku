@@ -70,12 +70,12 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $FreeBSD: releng/12.0/sys/dev/iwm/if_iwm_sf.h 319577 2017-06-04 21:05:58Z adrian $
+ * $FreeBSD$
  */
 #ifndef	__IF_IWM_SF_H__
 #define	__IF_IWM_SF_H__
 
-extern	int iwm_mvm_sf_update(struct iwm_softc *sc,
+extern	int iwm_sf_update(struct iwm_softc *sc,
 			      struct ieee80211vap *changed_vif,
 			      boolean_t remove_vif);
 

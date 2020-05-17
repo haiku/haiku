@@ -1,5 +1,5 @@
 /*	$OpenBSD: if_iwm.c,v 1.39 2015/03/23 00:35:19 jsg Exp $	*/
-/*	$FreeBSD: releng/12.0/sys/dev/iwm/if_iwm_phy_ctxt.h 286441 2015-08-08 06:06:48Z rpaulo $ */
+/*	$FreeBSD$ */
 
 /*
  * Copyright (c) 2014 genua mbh <info@genua.de>
@@ -106,12 +106,12 @@
 #ifndef	__IF_IWM_PHY_CTXT_H__
 #define	__IF_IWM_PHY_CTXT_H__
 
-extern	int iwm_mvm_phy_ctxt_add(struct iwm_softc *sc,
-	    struct iwm_mvm_phy_ctxt *ctxt,
+extern	int iwm_phy_ctxt_add(struct iwm_softc *sc,
+	    struct iwm_phy_ctxt *ctxt,
 	    struct ieee80211_channel *chan,
 	    uint8_t chains_static, uint8_t chains_dynamic);
-extern	int iwm_mvm_phy_ctxt_changed(struct iwm_softc *sc,
-	    struct iwm_mvm_phy_ctxt *ctxt, struct ieee80211_channel *chan,
+extern	int iwm_phy_ctxt_changed(struct iwm_softc *sc,
+	    struct iwm_phy_ctxt *ctxt, struct ieee80211_channel *chan,
 	    uint8_t chains_static, uint8_t chains_dynamic);
 
 #endif	/* __IF_IWM_PHY_CTXT_H__ */

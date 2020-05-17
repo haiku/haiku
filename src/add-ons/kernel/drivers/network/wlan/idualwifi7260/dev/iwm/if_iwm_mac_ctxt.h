@@ -1,5 +1,5 @@
 /*	$OpenBSD: if_iwm.c,v 1.39 2015/03/23 00:35:19 jsg Exp $	*/
-/*	$FreeBSD: releng/12.0/sys/dev/iwm/if_iwm_mac_ctxt.h 318219 2017-05-12 05:50:38Z adrian $ */
+/*	$FreeBSD$ */
 
 /*
  * Copyright (c) 2014 genua mbh <info@genua.de>
@@ -106,10 +106,10 @@
 #ifndef	__IF_IWM_MAC_CTXT_H__
 #define	__IF_IWM_MAC_CTXT_H__
 
-extern const uint8_t iwm_mvm_ac_to_tx_fifo[];
+extern const uint8_t iwm_ac_to_tx_fifo[];
 
-extern	int iwm_mvm_mac_ctxt_add(struct iwm_softc *sc, struct ieee80211vap *vap);
-extern	int iwm_mvm_mac_ctxt_changed(struct iwm_softc *sc, struct ieee80211vap *vap);
-extern	int iwm_mvm_mac_ctxt_remove(struct iwm_softc *sc, struct ieee80211vap *vap);
+extern	int iwm_mac_ctxt_add(struct iwm_softc *sc, struct ieee80211vap *vap);
+extern	int iwm_mac_ctxt_changed(struct iwm_softc *sc, struct ieee80211vap *vap);
+extern	int iwm_mac_ctxt_remove(struct iwm_softc *sc, struct ieee80211vap *vap);
 
 #endif	/* __IF_IWM_MAC_CTXT_H__ */

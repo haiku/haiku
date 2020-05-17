@@ -86,13 +86,13 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $FreeBSD: releng/12.0/sys/dev/iwm/if_iwm_led.h 303327 2016-07-26 00:02:17Z sbruno $
+ * $FreeBSD$
  */
 #ifndef	__IF_IWM_LED_H__
 #define	__IF_IWM_LED_H__
 
-extern	void iwm_mvm_led_enable(struct iwm_softc *);
-extern	void iwm_mvm_led_disable(struct iwm_softc *);
+extern	void iwm_led_enable(struct iwm_softc *);
+extern	void iwm_led_disable(struct iwm_softc *);
 extern	void iwm_led_blink_start(struct iwm_softc *);
 extern	void iwm_led_blink_stop(struct iwm_softc *);
 
