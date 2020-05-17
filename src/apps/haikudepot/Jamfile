@@ -6,8 +6,6 @@ SubDirC++Flags -Wno-error ;
 include [ FDirName $(HAIKU_TOP) src apps haikudepot build jam
 	HdsSchemaGenRules ] ;
 
-UseBuildFeatureHeaders icu ;
-
 UsePrivateHeaders interface kernel net package shared storage support locale ;
 
 HAIKUDEPOT_GENERATED_SOURCES_DIRECTORY = $(TARGET_COMMON_DEBUG_LOCATE_TARGET) ;
@@ -240,7 +238,6 @@ Application HaikuDepot
 	:
 	be package bnetapi translation libcolumnlistview.a shared
 	[ TargetLibstdc++ ] [ TargetLibsupc++ ] localestub
-	[ BuildFeatureAttribute icu : libraries ]
 	:
 	HaikuDepot.rdef
 ;
