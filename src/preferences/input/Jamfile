@@ -5,6 +5,7 @@ UsePrivateHeaders input ;
 Preference Input :
 	Input.cpp
 	InputDeviceView.cpp
+	InputIcons.cpp
 	InputKeyboard.cpp
 	InputMouse.cpp
 	InputTouchpadPref.cpp

@@ -57,8 +57,8 @@ public:
 		void				AddDevice(BInputDevice* device);
 private:
 
-	DeviceListView*			fDeviceListView;
-	BCardView*			fCardView;
+	DeviceListView*				fDeviceListView;
+	BCardView*				fCardView;
 };
 
 #endif /* INPUT_WINDOW_H */

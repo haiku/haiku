@@ -29,6 +29,7 @@ public:
 				InputApplication();
 	void		MessageReceived(BMessage* message);
 private:
+	InputIcons	fIcons;
 	InputWindow*	fWindow;
 };
 

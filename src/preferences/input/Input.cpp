@@ -27,10 +27,12 @@ const char* kSignature = "application/x-vnd.Haiku-Input";
 
 InputApplication::InputApplication()
 	:
-	BApplication(kSignature)
+	BApplication(kSignature),
+	fIcons()
 {
 	BRect rect(0, 0, 600, 500);
 	InputWindow* window = new InputWindow(rect);
+	DeviceListItemView::SetIcons(&fIcons);
 	window->Show();
 }
 
