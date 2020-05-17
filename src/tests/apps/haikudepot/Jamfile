@@ -8,13 +8,15 @@ SubDirHdrs [ FDirName $(HAIKU_TOP) src apps haikudepot server ] ;
 SubDirHdrs [ FDirName $(HAIKU_TOP) src apps haikudepot server dumpexportrepository ] ;
 SubDirHdrs [ FDirName $(HAIKU_TOP) src apps haikudepot util ] ;
 
-UsePrivateHeaders shared ;
+UsePrivateHeaders shared interface ;
 
 local sourceDirs =
 	model
 	server
 	server/dumpexportrepository
 	util
+	textview
+	edits_generic
 ;
 
 local sourceDir ;
@@ -48,4 +50,37 @@ UnitTestLib haikudepottest.so :
 	ValidationUtilsTest.cpp
 
 	: be shared bnetapi package [ TargetLibstdc++ ] [ TargetLibsupc++ ]
+;
+
+Application TextDocumentTest :
+	TextDocumentTest.cpp
+
+	# edits_generic
+	CompoundEdit.cpp
+	EditContext.cpp
+	EditManager.cpp
+	EditStack.cpp
+	UndoableEdit.cpp
+
+	# textview
+	Bullet.cpp
+	BulletData.cpp
+	CharacterStyle.cpp
+	CharacterStyleData.cpp
+	MarkupParser.cpp
+	Paragraph.cpp
+	ParagraphLayout.cpp
+	ParagraphStyle.cpp
+	ParagraphStyleData.cpp
+	TextDocument.cpp
+	TextDocumentLayout.cpp
+	TextDocumentView.cpp
+	TextEditor.cpp
+	TextListener.cpp
+	TextSelection.cpp
+	TextSpan.cpp
+	TextView.cpp
+	UndoableEditListener.cpp
+
+	: be translation shared [ TargetLibsupc++ ]
 ;

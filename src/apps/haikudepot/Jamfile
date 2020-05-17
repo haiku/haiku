@@ -269,13 +269,6 @@ DoCatalogs HaikuDepot :
 	WorkStatusView.cpp
 ;
 
-Application TextDocumentTest :
-	TextDocumentTest.cpp
-	$(textDocumentSources)
-
-	: be translation shared [ TargetLibsupc++ ]
-;
-
 # The following use of rules configures the generation of .cpp and .h files from
 # JSON schemas that are defined in the HaikuDepotServer system.  See the
 # included Jam rules and actions for the definitions.
