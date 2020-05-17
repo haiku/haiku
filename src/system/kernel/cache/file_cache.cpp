@@ -109,7 +109,7 @@ static struct cache_module_info* sCacheModule;
 
 static const uint32 kZeroVecCount = 32;
 static const size_t kZeroVecSize = kZeroVecCount * B_PAGE_SIZE;
-static phys_addr_t sZeroPage;	// physical address
+static phys_addr_t sZeroPage;
 static generic_io_vec sZeroVecs[kZeroVecCount];
 
 
@@ -1327,17 +1327,31 @@ file_cache_write(void* _cacheRef, void* cookie, off_t offset,
 		// NULL buffer -- use a dummy buffer to write zeroes
 		size_t size = *_size;
 		while (size > 0) {
-			size_t toWrite = min_c(size, kZeroVecSize);
-			generic_size_t written = toWrite;
+			generic_size_t length = min_c(size, kZeroVecSize);
+			generic_io_vec* vecs = sZeroVecs;
+			generic_io_vec vec;
+			size_t count = kZeroVecCount;
+			if ((length % B_PAGE_SIZE) != 0) {
+				if (length > B_PAGE_SIZE) {
+					length = ROUNDDOWN(length, B_PAGE_SIZE);
+					count = length / B_PAGE_SIZE;
+				} else {
+					vec.base = sZeroPage;
+					vec.length = length;
+					vecs = &vec;
+					count = 1;
+				}
+			}
+
 			status_t error = vfs_write_pages(ref->vnode, cookie, offset,
-				sZeroVecs, kZeroVecCount, B_PHYSICAL_IO_REQUEST, &written);
+				vecs, count, B_PHYSICAL_IO_REQUEST, &length);
 			if (error != B_OK)
 				return error;
-			if (written == 0)
+			if (length == 0)
 				break;
 
-			offset += written;
-			size -= written;
+			offset += length;
+			size -= length;
 		}
 
 		*_size -= size;
