@@ -1,38 +1,17 @@
-/*	$OpenBSD: if_iwm.c,v 1.39 2015/03/23 00:35:19 jsg Exp $	*/
-/*	$FreeBSD$ */
-
-/*
- * Copyright (c) 2014 genua mbh <info@genua.de>
- * Copyright (c) 2014 Fixup Software Ltd.
- *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- */
-
 /*-
  * Based on BSD-licensed source modules in the Linux iwlwifi driver,
  * which were used as the reference documentation for this implementation.
  *
- * Driver version we are currently based off of is
- * Linux 3.14.3 (tag id a2df521e42b1d9a23f620ac79dbfe8655a8391dd)
- *
- ***********************************************************************
+ ******************************************************************************
  *
  * This file is provided under a dual BSD/GPLv2 license.  When using or
  * redistributing this file, you may do so under either license.
  *
  * GPL LICENSE SUMMARY
  *
- * Copyright(c) 2007 - 2013 Intel Corporation. All rights reserved.
+ * Copyright(c) 2014 Intel Corporation. All rights reserved.
+ * Copyright(c) 2014 - 2015 Intel Mobile Communications GmbH
+ * Copyright(c) 2016 Intel Deutschland GmbH
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of version 2 of the GNU General Public License as
@@ -52,13 +31,13 @@
  * in the file called COPYING.
  *
  * Contact Information:
- *  Intel Linux Wireless <ilw@linux.intel.com>
+ *  Intel Linux Wireless <linuxwifi@intel.com>
  * Intel Corporation, 5200 N.E. Elam Young Parkway, Hillsboro, OR 97124-6497
- *
  *
  * BSD LICENSE
  *
- * Copyright(c) 2005 - 2013 Intel Corporation. All rights reserved.
+ * Copyright(c) 2014 Intel Corporation. All rights reserved.
+ * Copyright(c) 2014 - 2015 Intel Mobile Communications GmbH
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -86,15 +65,32 @@
  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-#ifndef	__IF_IWM_POWER_H__
-#define	__IF_IWM_POWER_H__
+ *
+ *****************************************************************************/
 
-extern	int iwm_power_update_device(struct iwm_softc *sc);
-extern	int iwm_power_update_mac(struct iwm_softc *sc);
-extern	int iwm_power_update_ps(struct iwm_softc *sc);
-extern	int iwm_enable_beacon_filter(struct iwm_softc *sc,
-	    struct iwm_vap *ivp);
-extern	int iwm_disable_beacon_filter(struct iwm_softc *sc);
+#include <sys/cdefs.h>
+__FBSDID("$FreeBSD$");
 
-#endif	/* __IF_IWM_POWER_H__ */
+#include "opt_wlan.h"
+#include "opt_iwm.h"
+
+#include <sys/param.h>
+
+#include "if_iwm_config.h"
+
+#define IWM9260_FW	"iwm9260fw"
+
+#define IWM_NVM_HW_SECTION_NUM_FAMILY_9260	10
+
+#define IWM_DEVICE_9260_COMMON						\
+	.device_family = IWM_DEVICE_FAMILY_9000,			\
+	.eeprom_size = IWM_OTP_LOW_IMAGE_SIZE_FAMILY_9000,		\
+	.nvm_hw_section_num = IWM_NVM_HW_SECTION_NUM_FAMILY_9260
+
+const struct iwm_cfg iwm9260_cfg = {
+	.name = "Intel(R) Dual Band Wireless AC 9260",
+	.fw_name = IWM9260_FW,
+	IWM_DEVICE_9260_COMMON,
+	.host_interrupt_operation_mode = 0,
+	.mqrx_supported = 1,
+};

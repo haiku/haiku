@@ -70,7 +70,7 @@
  *****************************************************************************/
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/iwm/if_iwm_7000.c 331665 2018-03-28 07:59:16Z eadler $");
+__FBSDID("$FreeBSD$");
 
 #include "opt_wlan.h"
 #include "opt_iwm.h"
@@ -119,6 +119,7 @@ const struct iwm_cfg iwm3168_cfg = {
 	.fw_name = IWM3168_FW,
 	IWM_DEVICE_7000_COMMON,
 	.host_interrupt_operation_mode = 0,
+	.nvm_type = IWM_NVM_SDP,
 };
 
 const struct iwm_cfg iwm7265_cfg = {

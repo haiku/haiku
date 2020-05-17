@@ -34,6 +34,8 @@ HAIKU_FIRMWARE_NAME_MAP({
 	{"iwm7265Dfw", "iwm-7265D-22.ucode"},
 	{"iwm8000Cfw", "iwm-8000C-22.ucode"},
 	{"iwm8265fw", "iwm-8265-22.ucode"},
+	{"iwm9000fw", "iwm-9000-34.ucode"},
+	{"iwm9260fw", "iwm-9260-34.ucode"},
 });
 
 

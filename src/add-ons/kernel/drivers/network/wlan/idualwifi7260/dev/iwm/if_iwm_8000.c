@@ -69,7 +69,7 @@
  *****************************************************************************/
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/iwm/if_iwm_8000.c 324434 2017-10-09 15:48:56Z gnn $");
+__FBSDID("$FreeBSD$");
 
 #include "opt_wlan.h"
 #include "opt_iwm.h"

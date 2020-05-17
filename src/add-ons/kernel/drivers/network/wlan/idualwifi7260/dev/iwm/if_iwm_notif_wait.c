@@ -67,7 +67,7 @@
  *****************************************************************************/
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/iwm/if_iwm_notif_wait.c 318001 2017-05-09 02:38:23Z adrian $");
+__FBSDID("$FreeBSD$");
 
 #include "opt_wlan.h"
 #include "opt_iwm.h"
@@ -76,9 +76,9 @@ __FBSDID("$FreeBSD: releng/12.0/sys/dev/iwm/if_iwm_notif_wait.c 318001 2017-05-0
 #include <sys/systm.h>
 #include <sys/bus.h>
 #include <sys/kernel.h>
+#include <sys/lock.h>
 #include <sys/malloc.h>
 #include <sys/mutex.h>
-#include <sys/lock.h>
 #include <sys/queue.h>
 
 #include <dev/iwm/if_iwm_notif_wait.h>

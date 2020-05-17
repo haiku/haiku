@@ -66,7 +66,7 @@
  *
  *****************************************************************************/
 
-/* $FreeBSD: releng/12.0/sys/dev/iwm/if_iwm_notif_wait.h 313322 2017-02-06 05:27:07Z adrian $ */
+/* $FreeBSD$ */
 
 #ifndef __IF_IWN_NOTIF_WAIT_H__
 #define __IF_IWN_NOTIF_WAIT_H__
