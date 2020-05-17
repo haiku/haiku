@@ -228,6 +228,7 @@ iwm_send_cmd(struct iwm_softc *sc, struct iwm_host_cmd *hcmd)
 		IWM_DPRINTF(sc, IWM_DEBUG_CMD,
 		    "large command paylen=%u len0=%u\n",
 			paylen, hcmd->len[0]);
+		{
 		/* Command is too large */
 		size_t totlen = hdrlen + paylen;
 		if (paylen > IWM_MAX_CMD_PAYLOAD_SIZE) {
@@ -255,6 +256,7 @@ iwm_send_cmd(struct iwm_softc *sc, struct iwm_host_cmd *hcmd)
 		txdata->m = m; /* mbuf will be freed in iwm_cmd_done() */
 		cmd = mtod(m, struct iwm_device_cmd *);
 		paddr = seg.ds_addr;
+		}
 	} else {
 		cmd = &ring->cmd[ring->cur];
 		paddr = txdata->cmd_paddr;

@@ -906,7 +906,7 @@ struct iwm_fw_cipher_scheme {
  */
 struct iwm_fw_cscheme_list {
 	uint8_t size;
-	struct iwm_fw_cipher_scheme cs[];
+	struct iwm_fw_cipher_scheme cs[0];
 } __packed;
 
 /*
@@ -2161,7 +2161,7 @@ struct iwm_nvm_access_cmd {
 	uint16_t type;
 	uint16_t offset;
 	uint16_t length;
-	uint8_t data[];
+	uint8_t data[0];
 } __packed; /* IWM_NVM_ACCESS_CMD_API_S_VER_2 */
 
 #define IWM_NUM_OF_FW_PAGING_BLOCKS 33 /* 32 for data and 1 block for CSS */
@@ -2215,7 +2215,7 @@ struct iwm_nvm_access_resp {
 	uint16_t length;
 	uint16_t type;
 	uint16_t status;
-	uint8_t data[];
+	uint8_t data[0];
 } __packed; /* IWM_NVM_ACCESS_CMD_RESP_API_S_VER_2 */
 
 /* IWM_ALIVE 0x1 */
@@ -5163,7 +5163,7 @@ struct iwm_scan_req_lmac {
 	uint32_t delay;
 	struct iwm_scan_schedule_lmac schedule[IWM_MAX_SCHED_SCAN_PLANS];
 	struct iwm_scan_channel_opt channel_opt[2];
-	uint8_t data[];
+	uint8_t data[0];
 } __packed;
 
 /**
@@ -5301,7 +5301,7 @@ struct iwm_lmac_scan_complete_notif {
 	uint8_t last_channel;
 	uint32_t tsf_low;
 	uint32_t tsf_high;
-	struct iwm_scan_results_notif results[];
+	struct iwm_scan_results_notif results[0];
 } __packed;
 
 
@@ -5404,7 +5404,7 @@ struct iwm_scan_config {
 	uint8_t mac_addr[IEEE80211_ADDR_LEN];
 	uint8_t bcast_sta_id;
 	uint8_t channel_flags;
-	uint8_t channel_array[];
+	uint8_t channel_array[0];
 } __packed; /* SCAN_CONFIG_DB_CMD_API_S */
 
 /**
@@ -5546,7 +5546,7 @@ struct iwm_scan_req_umac {
 			uint32_t suspend_time;
 			uint32_t scan_priority;
 			struct iwm_scan_umac_chan_param channel;
-			uint8_t data[];
+			uint8_t data[0];
 		} v1;
 		struct {
 			uint8_t active_dwell;
@@ -5560,7 +5560,7 @@ struct iwm_scan_req_umac {
 			uint32_t suspend_time[2];
 			uint32_t scan_priority;
 			struct iwm_scan_umac_chan_param channel;
-			uint8_t data[];
+			uint8_t data[0];
 		} v7;
 	};
 } __packed;
@@ -5662,7 +5662,7 @@ struct iwm_umac_scan_iter_complete_notif {
 	uint8_t last_channel;
 	uint32_t tsf_low;
 	uint32_t tsf_high;
-	struct iwm_scan_results_notif results[];
+	struct iwm_scan_results_notif results[0];
 } __packed; /* SCAN_ITER_COMPLETE_NTF_UMAC_API_S_VER_1 */
 
 /* Please keep this enum *SORTED* by hex value.
@@ -6424,7 +6424,7 @@ struct iwm_rx_packet {
 	 */
 	uint32_t len_n_flags;
 	struct iwm_cmd_header hdr;
-	uint8_t data[];
+	uint8_t data[0];
 } __packed;
 
 #define	IWM_FH_RSCSR_FRAME_SIZE_MSK	0x00003fff

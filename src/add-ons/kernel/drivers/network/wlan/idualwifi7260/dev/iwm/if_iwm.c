@@ -3570,12 +3570,14 @@ iwm_rx_tx_cmd_single(struct iwm_softc *sc, struct iwm_rx_packet *pkt,
 	if (rate_matched) {
 		ieee80211_ratectl_tx_complete(ni, txs);
 
+		{
 		int rix = ieee80211_ratectl_rate(vap->iv_bss, NULL, 0);
 		new_rate = vap->iv_bss->ni_txrate;
 		if (new_rate != 0 && new_rate != cur_rate) {
 			struct iwm_node *in = IWM_NODE(vap->iv_bss);
 			iwm_setrates(sc, in, rix);
 			iwm_send_lq_cmd(sc, &in->in_lq, FALSE);
+		}
 		}
  	}
 
@@ -4647,6 +4649,7 @@ iwm_newstate(struct ieee80211vap *vap, enum ieee80211_state nstate, int arg)
 		iwm_enable_beacon_filter(sc, ivp);
 		iwm_power_update_mac(sc);
 		iwm_update_quotas(sc, ivp);
+		{
 		int rix = ieee80211_ratectl_rate(&in->in_ni, NULL, 0);
 		iwm_setrates(sc, in, rix);
 
@@ -4657,6 +4660,7 @@ iwm_newstate(struct ieee80211vap *vap, enum ieee80211_state nstate, int arg)
 
 		iwm_led_enable(sc);
 		break;
+		}
 
 	default:
 		break;
