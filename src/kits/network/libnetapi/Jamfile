@@ -12,7 +12,6 @@ local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
 		local sslSources ;
-		local md5Sources ;
 
 		UsePrivateSystemHeaders ;
 
@@ -20,7 +19,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			SubDirC++Flags -DOPENSSL_ENABLED ;
 			UseBuildFeatureHeaders openssl ;
 			sslSources = SSL.cpp ;
-			md5Sources = ;
 			Includes [ FGristFiles $(sslSources) SecureSocket.cpp
 					HttpAuthentication.cpp Certificate.cpp ]
 				: [ BuildFeatureAttribute openssl : headers ] ;
@@ -28,8 +26,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 				# before compiling the files.
 			SetupFeatureObjectsDir ssl ;
 		} else {
-			# As we don't have md5 from ssl, use our own
-			md5Sources = md5.c ;
 			SetupFeatureObjectsDir no-ssl ;
 		}
 
@@ -78,8 +74,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			HttpTime.cpp
 
 			notifications.cpp
-
-			$(md5Sources)
 
 			NetworkRequest.cpp
 			UrlContext.cpp

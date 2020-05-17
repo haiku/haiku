@@ -8,8 +8,8 @@
 #include IO_HEADER_FILE
 #include "MACProgressHelper.h"
 #include "GlobalFunctions.h"
-#include "MD5.h"
 #include "CharacterHelper.h"
+#include "MD5.h"
 
 #define UNMAC_DECODER_OUTPUT_NONE       0
 #define UNMAC_DECODER_OUTPUT_WAV        1

@@ -2,6 +2,8 @@ SubDir HAIKU_TOP src add-ons media plugins ape_reader MAClib ;
 
 SubDirHdrs [ FDirName $(SUBDIR) ../LibMonkeysAudio ] ;
 
+UsePrivateHeaders shared ;
+
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
@@ -21,7 +23,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			GlobalFunctions.cpp
 			MACProgressHelper.cpp
 			MACLib.cpp
-			MD5.cpp
 			NewPredictor.cpp
 			NNFilter.cpp
 			Prepare.cpp

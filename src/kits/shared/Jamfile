@@ -50,6 +50,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			Json.cpp
 			Keymap.cpp
 			LongAndDragTrackingFilter.cpp
+			md5.c
 			MessageBuilder.cpp
 			NaturalCompare.cpp
 			PromptWindow.cpp

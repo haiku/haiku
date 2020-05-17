@@ -14,7 +14,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		Addon [ MultiArchDefaultGristFiles ape_reader ] :
 			APEReader.cpp
 			: [ MultiArchDefaultGristFiles libMonkeysAudio.a MAClib.a ]
-			be media [ TargetLibsupc++ ]
+			be media shared [ TargetLibsupc++ ]
 		;
 	}
 }
