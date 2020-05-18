@@ -1,12 +1,14 @@
 /*
- * Copyright 2020, Shubham Bhagat, shubhambhagat111@yahoo.com
- * All rights reserved. Distributed under the terms of the MIT License.
- */
+* Copyright 2020, Shubham Bhagat, shubhambhagat111@yahoo.com
+* All rights reserved. Distributed under the terms of the MIT License.
+*/
 
 /*
-Important:
-All fields in XFS metadata structures are in big-endian byte order
-except for log items which are formatted in host order.
+*Important:
+*All fields in XFS metadata structures are in big-endian byte order
+*except for log items which are formatted in host order.
+*
+*This file contains all global structure definitions.
 */
 
 #ifndef _XFS_SB_H_
@@ -15,10 +17,15 @@ except for log items which are formatted in host order.
 #include "system_dependencies.h"
 #include "xfs_types.h"
 
+
+extern fs_vnode_ops gxfsVnodeOps;
+extern fs_volume_ops gxfsVolumeOps;
+
+
 #define XFS_SB_MAGIC 0x58465342 /* Identifies XFS. "XFSB" */
 #define XFS_SB_MAXSIZE 512
 #define BBLOCKLOG 9		/* Log of block size should be 9 */
-#define BBLOCKSIZE 1<<BBLOCKLOG		/* The size of a basic block should be 512 */
+#define BBLOCKSIZE 1 << BBLOCKLOG		/* The size of a basic block should be 512 */
 
 
 /*	Version 4 superblock definition	*/
@@ -29,12 +36,21 @@ public:
 			bool 			IsValid();
 			char*			Name();
 			uint32			BlockSize();
+			uint8			BlockLog();
+			uint32			DirBlockSize();		// maximum 65536
+			uint8			AgInodeBits();
+			uint8			InodesPerBlkLog();
+			uint8			AgBlocksLog();
 			xfs_rfsblock_t	TotalBlocks();
 			xfs_rfsblock_t	TotalBlocksWithLog();
 			uint64			FreeBlocks();
 			uint64			UsedBlocks();
 			uint32			Size();
+			uint16			InodeSize();
 			void			SwapEndian();
+			xfs_ino_t		Root() const;
+			xfs_agnumber_t	AgCount();
+			xfs_agblock_t	AgBlocks();
 
 private:
 
@@ -85,11 +101,12 @@ private:
 			uint32			sb_features2;
 };
 
-/*
- These flags indicate features introduced over time.
 
- If the lower nibble of sb_versionnum >=4 then the following features are
- checked. If it's equal to 5, it's version 5.
+/*
+*These flags indicate features introduced over time.
+*
+*If the lower nibble of sb_versionnum >=4 then the following features are
+*checked. If it's equal to 5, it's version 5.
 */
 
 #define XFS_SB_VERSION_ATTRBIT 0x0010
@@ -103,6 +120,7 @@ private:
 #define XFS_SB_VERSION_EXTFLGBIT 0x1000
 #define XFS_SB_VERSION_DIRV2BIT 0x2000
 #define XFS_SB_VERSION_MOREBITSBIT 0x4000
+
 
 /*
 Superblock quota flags - sb_qflags
@@ -119,65 +137,24 @@ Superblock quota flags - sb_qflags
 #define XFS_PQUOTA_ENFD 0x0200
 #define XFS_PQUOTA_CHKD 0x0400
 
+
 /*
 	Superblock flags - sb_flags
 */
 #define XFS_SBF_READONLY 0x1
 
+
 /*
 	Extended v4 Superblock flags - sb_features2
 */
 
-#define XFS_SB_VERSION2_LAZYSBCOUNTBIT											\
-	0x0001	/*update global free space											\
-			and inode on clean unmount*/
-#define XFS_SB_VERSION2_ATTR2BIT												\
-	0x0002	/* optimises the inode layout of ext-attr */
+#define XFS_SB_VERSION2_LAZYSBCOUNTBIT	0x0001
+	// update global free space and inode on clean unmount
+#define XFS_SB_VERSION2_ATTR2BIT	0x0002
+	// optimises the inode layout of ext-attr
 #define XFS_SB_VERSION2_PARENTBIT 0x0004	/* Parent pointers */
 #define XFS_SB_VERSION2_PROJID32BIT 0x0008	/* 32-bit project id */
 #define XFS_SB_VERSION2_CRCBIT 0x0010		/* Metadata checksumming */
 #define XFS_SB_VERSION2_FTYPE 0x0020
-
-
-/* AG Free Space Block */
-
-/* 
-index 0 for free space B+Tree indexed by block number
-index 1 for free space B+Tree indexed by extent size
-
-Version 5 has XFS_BT_NUM_AGF defined as 3. This is because the index 2 is
-for reverse-mapped B+Trees. I have spare0/1 defined here instead.
-*/
-
-#define XFS_BTNUM_AGF 2
-#define XFS_AG_MAGICNUM 0x58414746
-class AGFreeSpace{
-	public:
-			//TODO:
-			void			SwapEndian();
-	private:
-			uint32			magicnum;
-			uint32			versionnum;		// should be set to 1
-			uint32			seqno;	// defines the ag number for the sector
-			uint32			length;	// size of ag in fs blocks
-			uint32			roots[XFS_BTNUM_AGF];	// roots of trees
-			uint32			spare0;		//spare
-			uint32			levels[XFS_BTNUM_AGF];	// tree levels
-			uint32			spare1;		//spare
-			uint32			flfirst;	// index to first free list block
-			uint32			fllast;		// index to last free list block
-			uint32			flcount;	// number of blocks in freelist
-			uint32			freeblks;	// current num of free blocks in AG
-			uint32			longest;	// no.of blocks of longest
-											// contiguous free space in the AG
-
-			/*number of blocks used for the free space B+trees.
-			This is only used if the XFS_SB_VERSION2_LAZYSBCOUNTBIT
-			bit is set in sb_features2
-			*/
-
-			uint32			btreeblks;
-};
-
 
 #endif

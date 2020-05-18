@@ -39,10 +39,10 @@ UseHeaders [ FDirName $(HAIKU_TOP) headers private ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) src tools fs_shell ] ;
 
 local xfsSource =
-	DeviceOpener.cpp
-	xfs.cpp
-	Volume.cpp
+	Inode.cpp
 	kernel_interface.cpp
+	Volume.cpp
+	xfs.cpp
 ;
 
 BuildPlatformMergeObject <build>xfs_shell.o : $(xfsSource) ;

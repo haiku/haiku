@@ -1,3 +1,8 @@
+/*
+* Copyright 2020, Shubham Bhagat, shubhambhagat111@yahoo.com
+* All rights reserved. Distributed under the terms of the MIT License.
+*/
+
 #ifndef _BPLUS_TREE_H_
 #define _BPLUS_TREE_H_
 
@@ -11,23 +16,47 @@
 /* Header for Short Format btree */
 #define XFS_BTREE_SBLOCK_SIZE	18
 
+/* Header for Long Format btree */
+#define XFS_BTREE_LBLOCK_SIZE	24
+
+
 /*
 * Headers are the "nodes" really and are called "blocks". The records, keys and
 * pts are calculated using helpers
 */
 
 struct bplustree_short_block {
+			void				SwapEndian();
+
+			uint32				Magic()
+								{ return bb_magic; }
+
+			uint16				Level()
+								{ return bb_level; }
+
+			uint16				NumRecs()
+								{ return bb_numrecs; }
+
+			xfs_alloc_ptr_t		Left()
+								{ return bb_leftsib; }
+
+			xfs_alloc_ptr_t		Right()
+								{ return bb_rightsib;}
+
 			uint32				bb_magic;
 			uint16				bb_level;
 			uint16				bb_numrecs;
 			uint32				bb_leftsib;
 			uint32				bb_rightsib;
+}
 
+
+struct bplustree_long_block {
 			void				SwapEndian();
 
 			uint32				Magic()
 								{ return bb_magic; }
-			
+
 			uint16				Level()
 								{ return bb_level; }
 
@@ -39,43 +68,18 @@ struct bplustree_short_block {
 
 			xfs_alloc_ptr_t		Right()
 								{ return bb_rightsib;}
-}
 
-
-/* Header for Long Format btree */
-#define XFS_BTREE_LBLOCK_SIZE	24
-struct bplustree_long_block {
 			uint32				bb_magic;
 			uint16				bb_level;
 			uint16				bb_numrecs;
 			uint64				bb_leftsib;
 			uint64				bb_rightsib;
-
-			void				SwapEndian();
-
-			uint32				Magic()
-								{ return bb_magic; }
-
-			uint16				Level()
-								{ return bb_level; }
-
-			uint16				NumRecs()
-								{ return bb_numrecs; }
-
-			xfs_alloc_ptr_t		Left()
-								{ return bb_leftsib; }
-
-			xfs_alloc_ptr_t		Right()
-								{ return bb_rightsib;}
 }
 
 
 /* Array of these records in the leaf node along with above headers */
 #define XFS_ALLOC_REC_SIZE	8
 typedef struct xfs_alloc_rec {
-			uint32				ar_startblock;
-			uint32				ar_blockcount;
-
 			void				SwapEndian();
 
 			uint32				StartBlock()
@@ -83,6 +87,9 @@ typedef struct xfs_alloc_rec {
 
 			uint32				BlockCount()
 								{ return ar_blockcount; }
+
+			uint32				ar_startblock;
+			uint32				ar_blockcount;
 
 } xfs_alloc_rec_t, xfs_alloc_key_t;
 
@@ -99,13 +106,16 @@ union btree_ptr {
 	bplustree_short_block fShortBlock;
 }
 
+
 union btree_key {
 	xfs_alloc_key_t fAlloc;
 }
 
+
 union btree_rec {
 	xfs_alloc_rec_t fAlloc;
 }
+
 
 class BPlusTree {
 	public:
@@ -128,4 +138,6 @@ class BPlusTree {
 			int					fPtrType;
 }
 
+
 #endif
+

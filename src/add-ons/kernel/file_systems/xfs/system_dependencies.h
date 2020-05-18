@@ -51,6 +51,7 @@ extern "C"
 #include <NodeMonitor.h>
 #include <SupportDefs.h>
 #include <TypeConstants.h>
+#include <sys/stat.h>
 #endif // !FS_SHELL
 
 #endif // _SYSTEM_DEPENDENCIES

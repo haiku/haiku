@@ -1,14 +1,18 @@
 /*
- * Copyright 2020, Shubham Bhagat, shubhambhagat111@yahoo.com
- * All rights reserved. Distributed under the terms of the MIT License.
- */
+* Copyright 2020, Shubham Bhagat, shubhambhagat111@yahoo.com
+* All rights reserved. Distributed under the terms of the MIT License.
+*/
 
 #ifndef _VOLUME_H_
 #define _VOLUME_H_
 
 #include "xfs.h"
 
-extern fs_volume_ops gxfsVolumeOps;
+
+/* Converting the FS Blocks to Basic Blocks */
+#define FSBSHIFT(fsBlockLog) (fsBlockLog - BBLOCKLOG);
+#define FSB_TO_BB(fsBlockLog, x) x << FSBSHIFT(fsBlockLog);
+
 enum volume_flags {
 	VOLUME_READ_ONLY	= 0x0001
 };
@@ -38,15 +42,35 @@ public:
 			XfsSuperBlock&		SuperBlock() { return fSuperBlock; }
 			int					Device() const { return fDevice; }
 
-	static	status_t			Identify(int fd, XfsSuperBlock *superBlock);
+			static	status_t	Identify(int fd, XfsSuperBlock *superBlock);
+
+			uint32				BlockSize() { return fSuperBlock.BlockSize(); }
+
+			uint8				BlockLog() { return fSuperBlock.BlockLog(); }
+
+			uint32				DirBlockSize()
+									{ return fSuperBlock.DirBlockSize(); }
+
+			uint8				AgInodeBits()
+									{ return fSuperBlock.AgInodeBits(); }
+
+			uint8				AgBlocksLog()
+									{ return fSuperBlock.AgBlocksLog(); }
+
+			uint8				InodesPerBlkLog()
+									{ return fSuperBlock.InodesPerBlkLog(); }
+
+			off_t				Root() const { return fSuperBlock.Root(); }
+
+			uint16				InodeSize() { return fSuperBlock.InodeSize(); }
+
+			xfs_agnumber_t		AgCount() { return fSuperBlock.AgCount(); }
+
+			xfs_agblock_t		AgBlocks() { return fSuperBlock.AgBlocks(); }
 
 	#if 0
 			off_t				NumBlocks() const
 									{ return fSuperBlock.NumBlocks(); }
-
-			off_t				Root() const { return fSuperBlock.rootino; }
-
-	static	status_t			Identify(int fd, SuperBlock *superBlock);
 	#endif
 
 protected:
@@ -54,7 +78,7 @@ protected:
 			int					fDevice;
 			XfsSuperBlock		fSuperBlock;
 			char				fName[32];	/* filesystem name */
-			
+
 			uint32				fDeviceBlockSize;
 			mutex 				fLock;
 
