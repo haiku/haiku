@@ -26,6 +26,7 @@
 #else
 #	define TRACE(x) ;
 #endif
+#define ERROR(x...) dprintf(x)
 
 static struct scan_spots_struct acpi_scan_spots[] = {
 	{ 0x0, 0x400, 0x400 - 0x0 },
@@ -135,18 +136,13 @@ acpi_check_rsdt(acpi_rsdp* rsdp)
 
 	if (rsdt != NULL) {
 		if (acpi_validate_rsdt(rsdt) != B_OK) {
-			TRACE(("acpi: rsdt failed checksum validation\n"));
-			mmu_free(rsdt, length);
-			return B_ERROR;
-		} else {
-			if (usingXsdt)
-				sAcpiXsdt = rsdt;
-			else
-				sAcpiRsdt = rsdt;
-			TRACE(("acpi: found valid %s at %p\n",
-				usingXsdt ? ACPI_XSDT_SIGNATURE : ACPI_RSDT_SIGNATURE,
-				rsdt));
+			ERROR("acpi: %.4s failed checksum validation\n", rsdt->signature);
 		}
+		if (usingXsdt)
+			sAcpiXsdt = rsdt;
+		else
+			sAcpiRsdt = rsdt;
+		TRACE(("acpi: found %.4s at %p\n", rsdt->signature, rsdt));
 	} else
 		return B_ERROR;
 
