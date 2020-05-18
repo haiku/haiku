@@ -31,6 +31,9 @@ public:
 			const char*		Filter() const
 								{ return fFilter.String(); }
 
+			void			SetCharacterFont(const BFont& font);
+			const BFont&	CharacterFont() { return fCharacterFont; }
+
 			void			ShowPrivateBlocks(bool show);
 			bool			IsShowingPrivateBlocks() const
 								{ return fShowPrivateBlocks; }
@@ -51,6 +54,8 @@ private:
 			BString			fFilter;
 			bool			fShowPrivateBlocks;
 			bool			fShowContainedBlocksOnly;
+			BFont			fCharacterFont;
+			unicode_block	fUnicodeBlocks;
 };
 
 #endif	// UNICODE_BLOCK_VIEW_H

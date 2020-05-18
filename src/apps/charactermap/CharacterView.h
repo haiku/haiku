@@ -94,6 +94,7 @@ private:
 			int32			fGap;
 			int32			fTitleGap;
 			int32*			fTitleTops;
+			unicode_block	fUnicodeBlocks;
 };
 
 #endif	// CHARACTER_VIEW_H
