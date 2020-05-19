@@ -11,8 +11,6 @@ enum {
 	MSG_PACKAGE_SELECTED					= 'pkgs',
 	MSG_PACKAGE_WORKER_BUSY					= 'pkwb',
 	MSG_PACKAGE_WORKER_IDLE					= 'pkwi',
-	MSG_ADD_VISIBLE_PACKAGES				= 'avpk',
-	MSG_UPDATE_SELECTED_PACKAGE				= 'uspk',
 	MSG_CLIENT_TOO_OLD						= 'oldc',
 	MSG_NETWORK_TRANSPORT_ERROR				= 'nett',
 	MSG_SERVER_ERROR						= 'svre',

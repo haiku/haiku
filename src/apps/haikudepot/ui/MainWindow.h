@@ -87,7 +87,10 @@ private:
 			void				_RestoreModelSettings(const BMessage& settings);
 
 			void				_InitWorkerThreads();
+			void				_AdoptModelControls();
 			void				_AdoptModel();
+			void				_AddRemovePackageFromLists(
+									const PackageInfoRef& package);
 
 			void				_AdoptPackage(const PackageInfoRef& package);
 			void				_ClearPackage();
@@ -151,7 +154,6 @@ private:
 
 			Model				fModel;
 			ModelListenerRef	fModelListener;
-			PackageList			fVisiblePackages;
 
 			std::queue<ProcessCoordinator*>
 								fCoordinatorQueue;
@@ -171,14 +173,6 @@ private:
 			bool				fForcePopulatePackage;
 			BLocker				fPackageToPopulateLock;
 			sem_id				fPackageToPopulateSem;
-
-			thread_id			fShowPackagesWorker;
-			PackageList			fPackagesToShowList;
-			int32				fPackagesToShowListID;
-				// atomic, counted up whenever fPackagesToShowList is refilled
-			BLocker				fPackagesToShowListLock;
-			sem_id				fNewPackagesToShowSem;
-			sem_id				fShowPackagesAcknowledgeSem;
 };
 
 #endif // MAIN_WINDOW_H
