@@ -86,6 +86,7 @@ typedef struct {
 	struct nvme_ns*			ns;
 	uint64					capacity;
 	uint32					block_size;
+	uint32					max_io_blocks;
 	status_t				media_status;
 
 	struct qpair_info {
@@ -264,6 +265,7 @@ nvme_disk_init_device(void* _info, void** _cookie)
 		// of the block size.
 	restrictions.max_segment_count = (NVME_MAX_SGL_DESCRIPTORS / 2);
 	restrictions.max_transfer_size = cstat.max_xfer_size;
+	info->max_io_blocks = cstat.max_xfer_size / nsstat.sector_size;
 
 	err = info->dma_resource.Init(restrictions, B_PAGE_SIZE, buffers, buffers);
 	if (err != 0) {
@@ -743,14 +745,25 @@ nvme_disk_io(void* cookie, io_request* request)
 		return status;
 	}
 
+	const uint32 max_io_blocks = handle->info->max_io_blocks;
 	int32 remaining = nvme_request.iovec_count;
 	while (remaining > 0) {
 		nvme_request.iovec_count = min_c(remaining,
 			NVME_MAX_SGL_DESCRIPTORS / 2);
 
 		nvme_request.lba_count = 0;
-		for (int i = 0; i < nvme_request.iovec_count; i++)
-			nvme_request.lba_count += (nvme_request.iovecs[i].size / block_size);
+		for (int i = 0; i < nvme_request.iovec_count; i++) {
+			int32 vec_lba_count = (nvme_request.iovecs[i].size / block_size);
+			if (nvme_request.lba_count > 0
+					&& (nvme_request.lba_count + vec_lba_count) > max_io_blocks) {
+				// We already have a nonzero length, and adding this vec would
+				// make us go over (or we already are over.) Stop adding.
+				nvme_request.iovec_count = i;
+				break;
+			}
+
+			nvme_request.lba_count += vec_lba_count;
+		}
 
 		status = do_nvme_io_request(handle->info, &nvme_request);
 		if (status != B_OK)
