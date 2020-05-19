@@ -240,7 +240,7 @@ public:
 		// insertion point by identifying the first item in fPackages that does
 		// not return true from the method '_IsPackageBefore'.
 
-		std::vector<PackageInfoRef>::const_iterator itInsertionPt
+		std::vector<PackageInfoRef>::iterator itInsertionPt
 			= std::lower_bound(fPackages.begin(), fPackages.end(), package,
 				&_IsPackageBefore);
 
