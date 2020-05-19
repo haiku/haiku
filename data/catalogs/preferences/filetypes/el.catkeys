@@ -9,7 +9,7 @@ Launch	Application Types Window		Άνοιγμα
 Removing uninstalled application types	Application Types Window		Αφαίρεση απεγκατεστημένων τύπων εφαρμογών
 Width:	Attribute Window	Default column width in Tracker for this attribute.	Πλάτος:
 Same as…	FileType Window	The same TYPE as ...	Ίδιο με…
-(from super type)	FileTypes Window		(από υπέρ τύπο)
+(from super type)	FileTypes Window		(από υπέρτύπο)
 Select same preferred application as	FileTypes Window		Επιλογή της ίδιας προτεινόμενης εφαρμογής ως
 Could not change attributes	Attribute Window		Δεν ήταν δυνατή η αλλαγή των ιδιοτήτων
 Icon	FileTypes Window		Εικονίδιο
@@ -36,7 +36,7 @@ Integer 64 bit	Attribute ListView		Ακέραιος αριθμός 64-bit
 Cancel	New File Type Window		Άκυρο
 Select same preferred application as	FileType Window		Επιλογή ίδιας προτεινόμενης εφαρμογής ως
 Cancel	Type List Window		Άκυρο
-Don't save	Application Type Window		Να μην αποθηκευτεί
+Don't save	Application Type Window		Χωρίς αποθήκευση
 Center	Attribute Window	Attribute column alignment in Tracker	Κέντρο
 Done	Extension Window		Ολοκληρώθηκε
 Development	Application Types Window		Ανάπτυξη
@@ -77,7 +77,7 @@ File could not be opened	Preferred App Menu		Το αρχείο δεν μπoρε�
 Args only	Application Type Window		Μόνο παράμετροι
 Could not open \"%s\":\n%s	FileTypes		Αδυναμία ανοίγματος \"%s\":\n%s
 Right	Attribute Window	Attribute column alignment in Tracker	Δεξιά
-Save changes before closing?	Application Type Window		Να αποθηκευτούν οι αλλαγές πριν από το κλείσιμο;
+Save changes before closing?	Application Type Window		Να αποθηκευτούν οι αλλαγές πριν το κλείσιμο;
 Background app	Application Type Window		Εφαρμογή παρασκηνίου
 Recognition rule is not valid:\n\n	FileTypes Window		Ο κανόνας αναγνώρισης δεν έγκυρος:\n\n
 Show icons in list	FileTypes Window		Εμφάνιση εικονιδίων σε λίστα
@@ -100,7 +100,7 @@ no icon	FileTypes Window		χωρίς εικονίδιο
 Single launch	Application Type Window		Απλή εκκίνηση
 %s file type	FileType Window		%s τύπος αρχείου
 Default	Attribute ListView		Προεπιλογή
-Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Διαγράφοντας ένα υπέρ τύπο, δεν θα μπορείτε να το επαναφέρετε.\n Όλοι οι τύποι αρχείων που ανήκουν σε αυτό το υπέρ τύπο θα χαθούν!\n\nΕίστε σίγουρος ότι θέλετε να το κάνετε αυτό; Για να καταργήσετε ολόκληρη την ομάδα, κρατήστε πατημένο το πλήκτρο Shift και πατήστε το \"Διαγραφή\".
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Δεν θα μπορείτε να επαναφέρετε έναν υπέρτυπο αφού τον διαγράψετε.\n Όλοι οι τύποι αρχείων που ανήκουν σε αυτόν τον υπέρτυπο θα χαθούν!\n\nΕίστε σίγουρος ότι θέλετε να το κάνετε αυτό; Για να καταργήσετε ολόκληρη την ομάδα, κρατήστε πατημένο το πλήκτρο Shift και μετά πατήστε \"Διαγραφή\".
 String	Attribute ListView		Γραμματοσειρά
 Add type	New File Type Window		Προσθήκη τύπου
 Remove icon	Icon View		Διαγραφή εικονίδιου

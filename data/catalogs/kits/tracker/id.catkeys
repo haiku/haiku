@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-libtracker	659027911
+1	indonesian	x-vnd.Haiku-libtracker	3028659783
 Created	ContainerWindow		Dibuat
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Buka dan buat sebagai yang disukai
@@ -307,7 +307,6 @@ Delete	FSUtils		Hapus
 Edit name	ContainerWindow		Sunting nama
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Tidak bisa buka \"%document\" (Ada simbol hilang: %symbol). \n
 ASCII Text	AttributesView		Teks ASCII
-More options	FindPanel		Opsi lebih lanjut:
 Atom reference	AttributesView		Referensi atom
 config	B_USER_CONFIG_DIRECTORY		konfigurasi
 Error moving \"%name\".	FSUtils		Terjadi kesalahan memindah \"%name\".
@@ -396,7 +395,6 @@ Proceed	FSUtils		Lanjutkan
 Edit favorites…	FilePanelPriv		Sunting favorit…
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		Anda tidak dapat memindahkan folder ke dalam dirinya sendiri atau dari sub-folder sendiri.
 New	ContainerWindow		Baru
-Fewer options	FindPanel		Lebih sedikit pilihan
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Anda harus menjatuhkan item pada salah satu ikon disk pada jendela \"Disks\"
 If you alter %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Jika Anda mengubah %target, %osName mungkin tidak berperilaku benar!\n\nAnda yakin ingin melakukan ini?
 Sorry, you can't copy items to the Trash.	FSClipBoard		Maaf, Anda tidak dapat menyalin item ke tempat sampah.

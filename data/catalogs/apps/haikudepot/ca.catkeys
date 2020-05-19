@@ -1,10 +1,9 @@
-1	catalan; valencian	x-vnd.Haiku-HaikuDepot	1107427137
+1	catalan; valencian	x-vnd.Haiku-HaikuDepot	1335940664
 Repository update error	LocalRepositoryUpdateProcess		Error d'actualització del repositori
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Hi ha hagut un error en actualitzar el repositori: %error%
 User Created	UserLoginWindow		Usuari creat
 Check for updates…	MainWindow		Comprova si hi ha actualitzacions...
 Uninstall	PackageManager		Desinstal·la
-(%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		Desinstal·lat
 It was not possible to create the new user.	UserLoginWindow		No s'ha pogut crear l'usuari nou.
 Available packages	MainWindow		Paquets disponibles
@@ -106,8 +105,8 @@ Close	RatePackageWindow		Tanca
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Se sincronitzen les dades de paquets per al repositori %REPO_NAME%.
 View the usage conditions	UserLoginWindow		Mostra'n les condicions d'ús
 Login issue	MainWindow		Problema d’inici de sessió
-Your rating:	RatePackageWindow		La vostra puntuació:
 Size	PackageListView		Mida
+Your rating:	RatePackageWindow		La vostra puntuació:
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		L'usuari %Nickname% s'ha creat correctament al sistema del servidor del Dipòsit del Haiku. Podeu administrar les dades de l'usuari mitjançant la interfície web. Ara hi heu entrat com a usuari nou.
 Your rating was updated.	RatePackageWindow		S'ha actualitzat la puntuació.
 All categories	FilterView		Totes les categories

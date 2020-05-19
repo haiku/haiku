@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	659027911
+1	hungarian	x-vnd.Haiku-libtracker	4043539537
 Created	ContainerWindow		Létrehozva
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Megnyitás és előnyben részesítés
@@ -262,6 +262,7 @@ ends with	SelectionWindow		vége
 Open	OpenWithWindow		Megnyitás
 You must have at least one attribute showing.	PoseView		Legalább egy jellemző meg kell hogy legyen jelenítve.
 Cut	FilePanelPriv		Kivágás
+Finish: after several years	StatusWindow		Befejezés: néhány év múlva
 Favorites	FilePanelPriv		Kedvencek
 Point	AttributesView		Pont
 home	B_USER_DIRECTORY		Saját mappa
@@ -307,7 +308,6 @@ Delete	FSUtils		Törlés
 Edit name	ContainerWindow		Név szerkesztése
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Nem sikerült megnyitni a dokumentumot (%document).\n\tHiányzik egy szimbólum: %symbol\n
 ASCII Text	AttributesView		ASCII Szöveg
-More options	FindPanel		További opciók
 Atom reference	AttributesView		Atom referencia
 config	B_USER_CONFIG_DIRECTORY		Konfiguráció
 Error moving \"%name\".	FSUtils		Hiba történt a fájl (%name) mozgatása közben.
@@ -396,7 +396,6 @@ Proceed	FSUtils		Folytatás
 Edit favorites…	FilePanelPriv		Kedvencek szerkesztése…
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		Nem lehet egy mappát saját magába vagy egy almappájába mozgatni.
 New	ContainerWindow		Új
-Fewer options	FindPanel		Kevesebb opció
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Húzzon elemeket a „Lemezek” ablakban az egyik lemez ikonjára.
 If you alter %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		%target módosítása esetén a %osName nem fog megfelelően működni!\n\nBiztosan ezt akarod tenni?
 Sorry, you can't copy items to the Trash.	FSClipBoard		Sajnálom, de nem lehet a Szemetesbe másolni.

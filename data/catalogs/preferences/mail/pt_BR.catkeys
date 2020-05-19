@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-Mail	2750130554
+1	portuguese (brazil)	x-vnd.Haiku-Mail	4163271735
 Account settings	AutoConfigWindow		Definições de conta
 \t\t· Outgoing	Config Window		\t \t · Enviado
 An error occurred while creating the config view: %error.	Config Views		Ocorreu um erro durante a criação de visão de configuração: %erro.
@@ -25,7 +25,6 @@ Never	Config Window	show status window	Nunca
 Account name:	Config Views		Nome da conta
 \t\t· Incoming	Config Window		\t \t· Recebido
 Enter a valid e-mail address.	AutoConfigWindow		Digite um endereço de correio válido.
-\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nAs configurações gerais não puderam ser revertidas.\n\Erro ao ler as configurações gerais:\n%s\n
 Incoming	E-Mail		Recebido
 Choose Protocol	E-Mail		Escolher Protocolo
 Return address:	Config Views		Endereço de retorno:

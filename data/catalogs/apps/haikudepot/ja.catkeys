@@ -1,10 +1,9 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	1107427137
+1	japanese	x-vnd.Haiku-HaikuDepot	1335940664
 Repository update error	LocalRepositoryUpdateProcess		リポジトリアップデートエラー
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		リポジトリの更新中に次のエラーが発生しました: %error%
 User Created	UserLoginWindow		作成されたユーザー
 Check for updates…	MainWindow		更新をチェック…
 Uninstall	PackageManager		アンインストール
-(%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		アンインストール済
 It was not possible to create the new user.	UserLoginWindow		新規ユーザーを作成できませんでした。
 Available packages	MainWindow		使用可能なパッケージ
@@ -106,8 +105,8 @@ Close	RatePackageWindow		閉じる
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		リポジトリ '%REPO_NAME%' のパッケージデータを同期中
 View the usage conditions	UserLoginWindow		使用条件を見る
 Login issue	MainWindow		ログインに問題
-Your rating:	RatePackageWindow		評価:
 Size	PackageListView		サイズ
+Your rating:	RatePackageWindow		評価:
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		ユーザー %Nickname% が、HaikuDepotServer システム内に正常に作成されました。ユーザーの詳細をウェブインターフェースで管理できます。あなたは現在新規ユーザーとしてログインしています。
 Your rating was updated.	RatePackageWindow		評価が更新されました。
 All categories	FilterView		すべての分類

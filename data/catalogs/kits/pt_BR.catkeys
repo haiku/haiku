@@ -1,5 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-libbe	3337473349
-{0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, um{# byte} outros{# bytes}}
+1	portuguese (brazil)	x-vnd.Haiku-libbe	1719733060
 All Rights Reserved.	AboutWindow		Todos os direitos reservados.
 gold master	AboutWindow		cópia mestra
 Undo	TextView		Desfazer

@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-libtracker	1673907665
+1	dutch; flemish	x-vnd.Haiku-libtracker	4043539537
 Created	ContainerWindow		Gemaakt
 Icon	AttributesView		Icoon
 Open and make preferred	OpenWithWindow		Openen en bevoorkeuren
@@ -308,7 +308,6 @@ Delete	FSUtils		Verwijderen
 Edit name	ContainerWindow		Naam wijzigen
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		\"%document\" kon niet geopend worden (Ontbrekend symbool %symbol).\n
 ASCII Text	AttributesView		ASCII-tekst
-More options	FindPanel		Meer opties
 Atom reference	AttributesView		Atom-verwijzing
 config	B_USER_CONFIG_DIRECTORY		config
 Error moving \"%name\".	FSUtils		Fout bij verplaatsing van \"%name\".
@@ -397,7 +396,6 @@ Proceed	FSUtils		Verdergaan
 Edit favorites…	FilePanelPriv		Favorieten bewerken...
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		U kunt een map niet naar zichzelf of een van zijn submappen verplaatsen.
 New	ContainerWindow		Nieuw
-Fewer options	FindPanel		Minder opties
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		U moet de items verslepen naar een van de schijf-iconen in het \"Schijven\"-venster.
 If you alter %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Als %target gewijzigd wordt, dan functioneert %osName mogelijk niet goed meer!\n\nWeet u zeker dat u wilt doorgaan?
 Sorry, you can't copy items to the Trash.	FSClipBoard		Sorry, u kunt geen items naar de prullenbak kopiëren.

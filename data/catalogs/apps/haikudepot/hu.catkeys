@@ -1,10 +1,9 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	2908956481
+1	hungarian	x-vnd.Haiku-HaikuDepot	3137470008
 Repository update error	LocalRepositoryUpdateProcess		Tároló frissítési hiba
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Hiba történt a tároló frissítésekor: %error%
 User Created	UserLoginWindow		Felhasználó létrehozva
 Check for updates…	MainWindow		Frissítések keresése…
 Uninstall	PackageManager		Eltávolítás
-(%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		Eltávolítva
 It was not possible to create the new user.	UserLoginWindow		Nem sikerült létrehozni a felhasználót.
 Available packages	MainWindow		Elérhető csomagok
@@ -97,8 +96,8 @@ Close	RatePackageWindow		Bezárás
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Csomagadatok szinkronizálása a tárolóból: '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Felhasználási feltételek
 Login issue	MainWindow		Belépési hiba
-Your rating:	RatePackageWindow		Saját értékelés:
 Size	PackageListView		Méret
+Your rating:	RatePackageWindow		Saját értékelés:
 Your rating was updated.	RatePackageWindow		Az értékelés módosítása sikerült.
 All categories	FilterView		Minden kategória
 Repositories	MainWindow		Tárolók

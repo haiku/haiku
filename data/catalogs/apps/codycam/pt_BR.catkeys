@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-CodyCam	249960869
+1	portuguese (brazil)	x-vnd.Haiku-CodyCam	1992289638
 destination directory expected	CodyCam		diretório de destino esperado
 reply: '%s'\n	SftpClient		resposta: '%s'\n
 JPEG image	CodyCam		Imagem JPEG
@@ -41,7 +41,6 @@ Error setting type of output file	VideoConsumer.cpp		Erro ao configurar o tipo d
 Cannot find an available video stream	CodyCam		Não foi possível encontrar um fluxo de vídeo disponível
 Upload…	VideoConsumer.cpp		Enviar…
 password expected	CodyCam		Senha esperada
-PASS <suppressed>  (real password sent)\n	FtpClient		PASS <suprimida> (senha real enviada)\n
 SFTP	CodyCam		SFTP
 Output	CodyCam		Saída
 server address expected	CodyCam		Endereço do servidor esperado

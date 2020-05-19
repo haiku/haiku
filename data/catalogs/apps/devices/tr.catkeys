@@ -63,7 +63,7 @@ Other	DeviceSCSI		Diğer
 Report compatibility	DevicesView		Uyumluluğu bildir
 Computer	Device		Bilgisayar
 PCI bus	Device		PCI veri yolu
-Enclosure	DeviceSCSI		Kapanma
+Enclosure	DeviceSCSI		Koruncak
 Order by:	DevicesView		Sıralama:
 ACPI Thermal Zone	DeviceACPI		ACPI ısıl bölgesi
 Intelligent controller	Device		Akıllı denetleyici

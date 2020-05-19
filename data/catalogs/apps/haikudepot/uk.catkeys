@@ -1,10 +1,9 @@
-1	ukrainian	x-vnd.Haiku-HaikuDepot	1107427137
+1	ukrainian	x-vnd.Haiku-HaikuDepot	1335940664
 Repository update error	LocalRepositoryUpdateProcess		Помилка оновлення репозитарія 
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Під час оновлення репозитарія сталася помилка: %error%
 User Created	UserLoginWindow		Користувача створено
 Check for updates…	MainWindow		Перевірити на обнови…
 Uninstall	PackageManager		Деінсталяція
-(%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		Деінстальовані
 It was not possible to create the new user.	UserLoginWindow		Не вдалося створити нового користувача.
 Available packages	MainWindow		Доступні пакети
@@ -106,8 +105,8 @@ Close	RatePackageWindow		Закрити
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Синхронізую дані пакета з репозитарієм '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Переглянути Умови користування
 Login issue	MainWindow		Проблема входу в систему
-Your rating:	RatePackageWindow		Ваш рейтинг:
 Size	PackageListView		Розмір
+Your rating:	RatePackageWindow		Ваш рейтинг:
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		Користувач %Nickname% був успішно створений в системі HaikuDepotServer. Ви можете адмініструвати дані цього користувача за допомогою веб-інтерфейсу. Зараз Ви увійшли в систему під його ім'ям, як новий користувач.
 Your rating was updated.	RatePackageWindow		Ваш рейтинг оновлений.
 All categories	FilterView		Всі категорії

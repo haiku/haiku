@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-FileTypes	734679611
+1	portuguese (brazil)	x-vnd.Haiku-FileTypes	3116280330
 Left	Attribute Window	Attribute column alignment in Tracker	Esquerda
 Final	Application Types Window		Final
 FileTypes request	FileTypes Window		Requerimento do Tipos de Arquivo
@@ -23,7 +23,6 @@ Gamma	Application Type Window		Gama
 Cancel	Application Type Window		Cancelar
 Attribute	Attribute Window		Atributo
 Multiple launch	Application Type Window		Lançamento múltiplo
-{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, um{# tipo de Aplicação pode ser removido} outros{# tipos de Aplicação podem ser removidos}}
 Edit…	Application Types Window		Editar…
 Could not set preferred application	FileTypes Window		Não foi possível mudar o aplicativo preferido
 Description	FileTypes Window		Descrição

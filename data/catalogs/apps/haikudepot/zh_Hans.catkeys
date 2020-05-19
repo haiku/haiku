@@ -1,7 +1,6 @@
-1	english	x-vnd.Haiku-HaikuDepot	2622340767
+1	english	x-vnd.Haiku-HaikuDepot	2850854294
 Check for updates…	MainWindow		检查更新…
 Uninstall	PackageManager		卸载
-(%Votes%)	FeaturedPackagesView		（%Votes%）
 Uninstalled	PackageListView		已卸载
 Available packages	MainWindow		可用软件包
 Create account	UserLoginWindow		创建账号
@@ -62,8 +61,8 @@ Repository	PackageListView		仓库
 %hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp%（版本 %hd.version%）
 Close	UserLoginWindow		关闭
 Close	RatePackageWindow		关闭
-Your rating:	RatePackageWindow		您的评分:
 Size	PackageListView		大小
+Your rating:	RatePackageWindow		您的评分:
 Your rating was updated.	RatePackageWindow		您的评价已被更新。
 All categories	FilterView		所有分类
 Repositories	MainWindow		仓库

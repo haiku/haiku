@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	659027911
+1	russian	x-vnd.Haiku-libtracker	4043539537
 Created	ContainerWindow		Создан
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Открыть и сделать предпочтительным
@@ -262,6 +262,7 @@ ends with	SelectionWindow		заканчивается на
 Open	OpenWithWindow		Открыть
 You must have at least one attribute showing.	PoseView		Вы должны оставить хотя бы один атрибут для просмотра.
 Cut	FilePanelPriv		Вырезать
+Finish: after several years	StatusWindow		Окончание: через несколько лет
 Favorites	FilePanelPriv		Закладки
 Point	AttributesView		Указатель
 home	B_USER_DIRECTORY		Домашняя
@@ -307,7 +308,6 @@ Delete	FSUtils		Удалить
 Edit name	ContainerWindow		Переименовать
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Невозможно открыть \"%document\" (Отсутствует символ: %symbol). \n
 ASCII Text	AttributesView		Текст ASCII
-More options	FindPanel		Больше опций
 Atom reference	AttributesView		ссылочный Atom
 config	B_USER_CONFIG_DIRECTORY		Конфигурация
 Error moving \"%name\".	FSUtils		Ошибка при перемещении \"%name\".
@@ -347,7 +347,7 @@ Write	FilePermissionsView		Запись
 If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Если вы измените папку system или её содержимое, вы не сможете больше загрузить %osName!\n\nВы уверены, что изменить ее?\n\nЧтобы изменить папку system или её содержимое, зажмите клавишу Shift и нажмите \"Я знаю, что я делаю\".
 Save	FilePanelPriv		Сохранить
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Невозможно открыть \"%document\" приложением \"%app\" (Отсутствуют библиотеки: %library). \n
-Finish: %time	StatusWindow		Осталось: %time
+Finish: %time	StatusWindow		Окончание: %time
 Messenger	AttributesView		Мессенджер
 after	FindPanel		после
 Version	OpenWithWindow		Версия
@@ -396,8 +396,7 @@ Proceed	FSUtils		Исправить
 Edit favorites…	FilePanelPriv		Изменить закладки…
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		Невозможно переместить папку в саму себя или в собственную подпапку.
 New	ContainerWindow		Создать
-Fewer options	FindPanel		Меньше опций
-You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Вам следует перенести объект(ы) на один из значков диска в окне \"Диски\".
+You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Вам нужно перетащить объект(ы) на один из значков диска в окне \"Диски\".
 If you alter %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Если изменить %target, %osName может вести себя непредсказуемо!\n\nВы уверены, что это хотите это сделать?
 Sorry, you can't copy items to the Trash.	FSClipBoard		Извините, но вы не можете копировать объекты в корзину.
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Некоторые объекты с такими же именами, которые вы %verb, уже существуют в этой папке.\n \nЗаменить их теми, которые вы %verb или спрашивать для каждого объекта?
@@ -490,7 +489,7 @@ Duplicate	ContainerWindow		Дублировать
 16-bit integer	AttributesView		16-битное целое
 Untitled clipping	PoseView		Безымянная выборка
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Файл \"%name\" уже существует в указанной папке. Вы хотите заменить его?
-You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Вам следует перенести объект(ы) на один из значков диска в окне \"Диски\".
+You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Вам нужно перетащить объект(ы) на один из значков диска в окне \"Диски\".
 Version:	InfoWindow		Версия:
 OK	PoseView		ОК
 Add-ons	DeskWindow		Дополнения

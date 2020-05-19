@@ -4,7 +4,7 @@ short\tlong\tdescription\n	FilePanelApp		σύντομη\tlμεγάλη\tπερι
 %s not a valid option\n	FilePanelApp		%s μη έγκυρη επιλογή\n
 -s\t--save\tuse a save FilePanel\n	FilePanelApp		-s\t--save\tχρήση αποθηκευμένου FilePanel\n
 %s: this option requires a parameter\n	FilePanelApp		%s: η επιλογή απαιτεί μια παράμετρο\n
--h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\tεμφάνιση χρήσης\n
+-h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\tεμφάνιση μηνύματος βοήθειας\n
 -l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\t χρήση load FilePanel (προεποιλεγμένο)\n
 -n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tορίστε το προεπιλεγμένο όνομα για αποθήκευση\n
 -k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\tτο είδος των καταχωρήσεων που μπορούν να ανόίξουν (flavour): οποιοσδήποτε συνδυασμός των f, d, s (αρχείο (προεπιλογή), κατάλογος, symlink)\n

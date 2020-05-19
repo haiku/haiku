@@ -48,7 +48,7 @@ Font size	ProbeView		Μέγεθος γραμματοσειράς
 Type editor not supported	ProbeView		Ο επεξεργαστής τύπου δεν υποστηρίζεται
 Native: 0x%0*Lx	ProbeView		Φυσικό: 0x%0*Lx
 Copy	ProbeView		Αντιγραφή
-Redo	ProbeView		Μη αναίρεση
+Redo	ProbeView		Επαναφορά
 Floating-point value:	TypeEditors		Τιμή κινητής-υποδιαστολής:
 Cancel	AttributeWindow		Άκυρο
 16 bit signed value:	TypeEditors		16 bit υπογεγραμμένη τιμή:
@@ -117,7 +117,7 @@ Could not read image	TypeEditors	Image means here a picture file, not a disk ima
 DiskProbe request	ProbeView		Αίτηση Διαχειριστή Δίσκου
 Double precision floating-point value:	TypeEditors		Τιμή κινητής-υποδιαστολής διπλής ακριβείας:
 Image	TypeEditors	This is the type of view	Εικόνα
-Save changes before closing?	ProbeView		Να αποθηκευτούν οι αλλαγές πριν από το κλείσιμο;
+Save changes before closing?	ProbeView		Να αποθηκευτούν οι αλλαγές πριν το κλείσιμο;
 PNG format	TypeEditors		Μορφοποίηση PNG
 Number	TypeEditors	This is the type of editor	Αριθμός
 Edit	ProbeView		Επεξεργασία

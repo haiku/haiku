@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-libtracker	3347779161
+1	turkish	x-vnd.Haiku-libtracker	1422443737
 Created	ContainerWindow		Oluşturulma
 Icon	AttributesView		Simge
 Open and make preferred	OpenWithWindow		Aç ve tercih edilen yap
@@ -308,7 +308,6 @@ Delete	FSUtils		Sil
 Edit name	ContainerWindow		Yeniden adlandır
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		\"%document\" açılamıyor (Eksik sembol: %symbol).\n
 ASCII Text	AttributesView		ASCII metin
-More options	FindPanel		Daha fazla seçenek
 Atom reference	AttributesView		Atom başvurusu
 config	B_USER_CONFIG_DIRECTORY		yapılandırma
 Error moving \"%name\".	FSUtils		\"%name\" taşınırken hata.
@@ -397,7 +396,6 @@ Proceed	FSUtils		Sürdür
 Edit favorites…	FilePanelPriv		Favorileri düzenle…
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		Bir klasörü kendi içine veya herhangi bir alt klasörünün içine taşıyamazsınız.
 New	ContainerWindow		Yeni
-Fewer options	FindPanel		Daha az seçenek
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Ögeleri \"Diskler\" penceresinin içindeki disk simgelerinden birinin üzerine bırakmalısınız.
 If you alter %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		%target ögesini değiştirirseniz %osName düzgün çalışmayabilir!\n\nBunu yapmak istediğinizden emin misiniz?
 Sorry, you can't copy items to the Trash.	FSClipBoard		Üzgünüm, ögeler Çöp'e kopyalanamaz.

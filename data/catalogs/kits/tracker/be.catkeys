@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-libtracker	1103440526
+1	belarusian	x-vnd.Haiku-libtracker	3473072398
 Created	ContainerWindow		Створаны
 Open and make preferred	OpenWithWindow		Адкрыць і зрабіць пажаданай
 Kind	ContainerWindow		Род
@@ -237,7 +237,6 @@ MiB	WidgetAttributeText		МіБ
 Delete	FSUtils		Выдаліць
 Edit name	ContainerWindow		Правіць імя
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Не ўдалося адкрыць \"%document\" (Не хапае сімвала: %symbol). \n
-More options	FindPanel		Больш параметраў
 config	B_USER_CONFIG_DIRECTORY		канфігурацыя
 Error moving \"%name\".	FSUtils		Памылка пры перамяшчэнні \"%name\".
 Select…	QueryContainerWindow		Выбраць…
@@ -309,7 +308,6 @@ Proceed	FSUtils		Далей
 Edit favorites…	FilePanelPriv		Правіць Выбранае…
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		Вы не можаце перамясціць каталог у яго самога ці ў яго падкаталогі.
 New	ContainerWindow		Новы
-Fewer options	FindPanel		Менш наладак
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Трэба перацягнуць элементы на іконку аднаго з дыскаў у вакне \"Дыскі\".
 Sorry, you can't copy items to the Trash.	FSClipBoard		Прабачце, вы не можаце капіяваць элементы ў Сметніцу.
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Некаторыя элементы ужо існуюць у гэтым каталозе з тымі ж імёнамі, як і ў элементаў, якія вы %verb.\n \nЖадаеце замяніць іх тымі, што вы %verb, або вырашыць асобна для кожнага элемента?

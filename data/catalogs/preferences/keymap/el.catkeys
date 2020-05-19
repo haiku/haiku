@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Keymap	2062989023
+1	greek, modern (1453-)	x-vnd.Haiku-Keymap	1075970008
 Key	Modifier keys window	As in a computer keyboard key	Πλήκτρο
 Japanese	KeymapNames		Ιαπωνέζικο
 US	KeymapNames		ΗΠΑ
@@ -7,6 +7,7 @@ Brazilian	KeymapNames		Βραζιλιάνικο
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (ΗΠΑ)
 Right control	Keyboard Layout View		Δεξιό control
 Dvorak	KeymapNames		Dvorak
+Option:	Modifier keys window	Option key role name	Option:
 Cancel	Modifier keys window		Ακύρωση
 Sample and clipboard:	Keymap window		Δείγμα και πρόχειρο:
 Polish	KeymapNames		Πολωνικό
@@ -21,9 +22,11 @@ Belgian (point)	KeymapNames		Βελγικό (point)
 Finnish	KeymapNames		Φινλανδικό
 Num lock	Keyboard Layout View		Num lock
 Switch shortcut keys to Windows/Linux mode	Keymap window		Αλλαγή πλήκτρων συντόμευσης σε λειτουργία Windows/Linux
+Option	Keyboard Layout View	Option key	Option
 Spanish (Dvorak)	KeymapNames		Ισπανικό (Dvorak)
 Scroll lock	Keyboard Layout View		Scroll lock
 US-International	KeymapNames		Διεθνές ΗΠΑ
+Right option	Keyboard Layout View		Δεξιό option
 Turkish (Type-Q)	KeymapNames		Τούρκικο (Τύπου-Q)
 Revert	Modifier keys window		Επαναφορά
 Slovak	KeymapNames		Σλοβακικό
@@ -37,6 +40,7 @@ ThinkPad	KeyboardLayoutNames		ThinkPad
 Belarusian (Mac)	KeymapNames		Λευκορώσικο (Mac)
 Croatian	KeymapNames		Κροατικό
 PAGE ↑	Keyboard Layout View		PAGE ↑
+Set modifier keys	Modifier keys window		Ορισμός πλήκτρων τροποποίησης
 Apple Aluminium International	KeyboardLayoutNames		Παγκόσμιο Apple Aluminium
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Πλήκτρο Win/Cmd
 PG ↓	Keyboard Layout View	Very short for 'page down'	PG ↓
@@ -46,6 +50,7 @@ Spanish	KeymapNames		Ισπανικό
 HOME	Keyboard Layout View		HOME
 COMMAND	Keyboard Layout View		COMMAND
 Ukrainian (Mac)	KeymapNames		Ουκρανικό (Mac)
+Command:	Modifier keys window	Command key role name	Command:
 French (Bépo)	KeymapNames		Γαλλικό (Bépo)
 Russian (Typewriter)	KeymapNames		Ρώσικο (Γραφομηχανής)
 Acute trigger	Keymap window		Οξεία
@@ -54,10 +59,13 @@ ThinkPad T400s International	KeyboardLayoutNames		Παγκόσμιο ThinkPad T4
 Apple Aluminum (US)	KeyboardLayoutNames		Apple Aluminum (ΗΠΑ)
 Kinesis Ergo Elan International	KeyboardLayoutNames		Kinesis Ergo Elan (Παγκόσμιο)
 French (NF Z71-300)	KeymapNames		Γαλλικό (NF Z71-300)
+Modifier keys	Modifier keys window		Πλήκτρα τροποποίησης
 ThinkPad X1 International	KeyboardLayoutNames		Παγκόσμιο ThinkPad X1
 Kazakh	KeymapNames		Καζακστανικό
 Save as…	Keymap window		Αποθήκευση ως…
 Lithuanian (Standard)	KeymapNames		Λιθουανικό (Standard)
+Error: duplicate keys	Modifier keys window		Σφάλμα: έχετε αναθέσει δύο λειτουργίες στο ίδιο πλήκτρο
+NUM	Keyboard Layout View	Very short for 'num lock'	NUM
 Bulgarian (Phonetic)	KeymapNames		Βουλγαρικό (Φωνητικό)
 Kinesis Advantage	KeyboardLayoutNames		Kinesis Advantage
 Canadian-French	KeymapNames		Καναδικό-Γαλλικό
@@ -75,8 +83,11 @@ Albanian	KeymapNames		Αλβανικό
 (Current)	Keymap window		(Τρέχων)
 OPT	Keyboard Layout View	Very short for 'option'	OPT
 Friulian	KeymapNames		Φριουλιανό
+Left option	Keyboard Layout View		Αριστερό option
+END	Keyboard Layout View		END
 Esperanto	KeymapNames		Εσπεράντο
 Belarusian	KeymapNames		Λευκορώσικο
+Warning: left and right key roles do not match	Modifier keys window		Προσοχή: Οι ρόλοι του αριστερού και του δεξιού πλήκτρου δεν αντιστοιχούν
 Circumflex trigger	Keymap window		Περισπωμένη
 Caps lock	Keyboard Layout View		Caps lock
 Left shift	Keyboard Layout View		Αριστερό shift
@@ -95,6 +106,7 @@ Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually C
 Czech	KeymapNames		Τσέχικο
 Russian (Udmurt, Komi, Mari)	KeymapNames		Ρώσικο (Ουντμούρτ, Κόμι, Μάρι)
 Thai (TIS-820.2538)	KeymapNames		Ταϊλανδικό (TIS-820.2538)
+Control:	Modifier keys window	Control key role name	Control:
 Generic 105-key International	KeyboardLayoutNames		Γενικό 105-πλήκτρων (Παγκόσμιο)
 Disabled	Modifier keys window	Do nothing	Απενεργοποιημένο
 Select dead keys	Keymap window		Επιλογή νεκρών πλήκτρων
@@ -126,6 +138,7 @@ Shift:	Modifier keys window	Shift key role name	Shift:
 Keymap	System name		Διάταξη πληκτρολογίου
 Slovene	KeymapNames		Σλοβενικό
 Lithuanian	KeymapNames		Λιθουανικό
+Set modifier keys…	Keymap window		Ορισμός πλήκτρων τροποποίησης…
 Switch shortcut keys to Haiku mode	Keymap window		Αλλαγή πλήκτρων συντόμευσης σε λειτουργία Haiku
 Defaults	Keymap window		Προεπιλογές
 ISO-9995	KeymapNames		ISO-9995

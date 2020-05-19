@@ -1,10 +1,9 @@
-1	thai	x-vnd.Haiku-HaikuDepot	1107427137
+1	thai	x-vnd.Haiku-HaikuDepot	1335940664
 Repository update error	LocalRepositoryUpdateProcess		ข้อผิดพลาดการอัพเดตที่เก็บ
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		เกิดข้อผิดพลาดขณะรีเฟรชที่เก็บ: %error%
 User Created	UserLoginWindow		ผู้ใช้ถูกสร้างแล้ว
 Check for updates…	MainWindow		ตรวจสอบสำหรับการอัพเดท
 Uninstall	PackageManager		ยกเลิกการติดตั้ง
-(%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		ยกเลิกการติดตั้งแล้ว
 It was not possible to create the new user.	UserLoginWindow		ไม่สามารถสร้างผู้ใช้ใหม่ได้
 Available packages	MainWindow		แพ็คเกจที่มี
@@ -106,8 +105,8 @@ Close	RatePackageWindow		ปิด
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		การซิงโครไนซ์ข้อมูลแพ็คเกจสำหรับที่เก็บ '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		ดูเงื่อนไขการใช้งาน
 Login issue	MainWindow		ปัญหาการเข้าสู่ระบบ
-Your rating:	RatePackageWindow		คะแนนของคุณ:
 Size	PackageListView		ขนาด
+Your rating:	RatePackageWindow		คะแนนของคุณ:
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		ผู้ใช้ %Nickname% ถูกสร้างขึ้นสำเร็จในระบบ Haiku Depot Server คุณสามารถจัดการรายละเอียดผู้ใช้ของคุณโดยใช้เว็บอินเตอร์เฟส ตอนนี้คุณเข้าสู่ระบบในฐานะผู้ใช้ใหม่นี้
 Your rating was updated.	RatePackageWindow		คะแนนของคุณได้รับการอัพเดท
 All categories	FilterView		ทุกประเภท

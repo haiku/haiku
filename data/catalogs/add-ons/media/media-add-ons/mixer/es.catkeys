@@ -3,7 +3,7 @@ Input gain controls represent	AudioMixer		Controles de ganancia de entrada repre
 Linear interpolation	AudioMixer		Interpolación lineal
 Virtual output channels	AudioMixer		Canales virtuales de salida
 Refuse output format changes	AudioMixer		Rechazar los cambios de formato de salida
-Output mapping	AudioMixer		Mapeo de salida
+Output mapping	AudioMixer		Asignación de salida
 Allow input channel remapping	AudioMixer		Permitir la entrada del canal de reasignación
 Resampling algorithm	AudioMixer		Algoritmo de remuestreo
 Attenuate mixer output by 3dB (like BeOS R5)	AudioMixer		Atenuar la salida del mezclador en 3 dB (como BeOS R5)
@@ -15,7 +15,7 @@ Drop/repeat samples	AudioMixer		Muestras de soltar/repetir
 Output channel sources	AudioMixer		Fuentes de salida del canal
 dB	AudioMixer		dB
 Gain controls	AudioMixer		Controles de ganancia
-Input mapping	AudioMixer		Mapeo de entrada
+Input mapping	AudioMixer		Asignación de entrada
 Mute	AudioMixer		Silencio
 Input channel destinations	AudioMixer		Destinos del canal de entrada
 To master	AudioMixer		A maestro

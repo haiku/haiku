@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-Installer	1520226307
+1	portuguese (brazil)	x-vnd.Haiku-Installer	3001158282
 Performing installation.	InstallProgress		Fazendo a instalação.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Escolha o disco de origem no menu pop-up. Então clique em \"Iniciar\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Por favor feche o Configurador de Disco antes de fechar o Instalador.
@@ -74,7 +74,6 @@ Running Boot Manager and DriveSetup…\n\nClose both applications to continue wi
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Você tem certeza que deseja instalar no atual disco de inicialização? O Instalador irá reiniciar seu computador se você continuar.
 Onto:	InstallerWindow		Para:
 Quit Boot Manager and DriveSetup	InstallerWindow		Sair do Gerenciador de Inicialização e do Configurador de Drive
-Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Instalador\n\desenvolvido por Jérôme Duval e Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 Tools	InstallerWindow		Ferramentas
 scanning…	InstallerWindow		analisando…
 Set up boot menu	InstallerWindow		Configurar o menu de inicialização

@@ -1,10 +1,9 @@
-1	turkish	x-vnd.Haiku-HaikuDepot	1107427137
+1	turkish	x-vnd.Haiku-HaikuDepot	1335940664
 Repository update error	LocalRepositoryUpdateProcess		Depo güncelleme hatası
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Depo güncellenirken bir hata oluştu: %error%
 User Created	UserLoginWindow		Kullanıcı Oluşturuldu
 Check for updates…	MainWindow		Güncellemeleri denetle…
 Uninstall	PackageManager		Kaldır
-(%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		Kaldırıldı
 It was not possible to create the new user.	UserLoginWindow		Yeni kullanıcı oluşturulamadı.
 Available packages	MainWindow		Kullanılabilir paketler
@@ -106,8 +105,8 @@ Close	RatePackageWindow		Kapat
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		'%REPO_NAME%' depo paket bilgisi eşitleniyor
 View the usage conditions	UserLoginWindow		Kullanım koşullarını görüntüle
 Login issue	MainWindow		Giriş sorunu
-Your rating:	RatePackageWindow		Derecelendirmeniz:
 Size	PackageListView		Boyut
+Your rating:	RatePackageWindow		Derecelendirmeniz:
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		HaikuDepotServer sisteminde %Nickname% kullanıcısı başarıyla oluşturuldu. Kullanıcı bilgilerinizi web arayüzünü kullanarak yönetebilirsiniz. Şu anda bu kullanıcı ile giriş yapmış bulunmaktasınız.
 Your rating was updated.	RatePackageWindow		Derecelendirmeniz güncellendi.
 All categories	FilterView		Tüm kategoriler

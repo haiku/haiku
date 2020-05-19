@@ -12,7 +12,7 @@ Output bass	MultiAudio		Salida de bajos
 Headphones	MultiAudio		Auriculares
 Beep	MultiAudio		Pitido
 Output mono mix	MultiAudio		Mezcla de salida monofónica
-Output stereo mix	MultiAudio		Mezcla de salida estereo
+Output stereo mix	MultiAudio		Mezcla de salida estéreo
 Input	MultiAudio		Entrada
 Output treble	MultiAudio		Salida de agudos
 Mono mix	MultiAudio		Mezcla monofónica

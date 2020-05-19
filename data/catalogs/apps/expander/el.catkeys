@@ -32,7 +32,7 @@ Show contents	ExpanderWindow		Εμφάνιση περιεχομένων
 Automatically show contents listing	ExpanderPreferences		Αυτόματα εμφάνιση του περιεχομένου
 OK	ExpanderPreferences		Εντάξει
 Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Είστε σίγουρος ότι θέλετε να διακόψετε την αποσυμπίεση; Ενδέχεται ότι δεν έχουν αποσυμπιεστεί όλα τα αρχεία ακόμα.
-Leave destination folder path empty	ExpanderPreferences		Αφήσε την διαδρομή του φάκελο προορισμού άδεια
+Leave destination folder path empty	ExpanderPreferences		Να αφεθεί η προορισμένη διαδρομή φακέλου κενή
 Failed to create the destination folder.	ExpanderWindow		Η δημιουργία φακέλου προορισμού απέτυχε.
 Select '%s'…	DirectoryFilePanel		Επιλογή '%s'…
 Create	ExpanderWindow		Δημιουργία

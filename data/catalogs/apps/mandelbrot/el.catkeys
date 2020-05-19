@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Mandelbrot	101106829
+1	greek, modern (1453-)	x-vnd.Haiku-Mandelbrot	3875916167
 Burning Ship	MandelbrotWindow		Φλεγόμενο Πλοίο
 Grassland	MandelbrotWindow		Λιβάδι
 Lightning	MandelbrotWindow		Αστραπή
@@ -17,7 +17,9 @@ Julia	MandelbrotWindow		Τζούλια
 Frost	MandelbrotWindow		Χιονοθύελλα
 Fire	MandelbrotWindow		Φωτιά
 Mandelbrot	System name		Mandelbrot
+Iterations	MandelbrotWindow		Ποιότητα
 High contrast	MandelbrotWindow		Υψηλή αντίθεση
+Multibrot	MandelbrotWindow		Χάμπουργκερ
 Spring	MandelbrotWindow		Άνοιξη
 Midnight	MandelbrotWindow		Μεσάνυχτα
 Mandelbrot	MandelbrotWindow		Mandelbrot

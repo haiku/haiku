@@ -1,7 +1,7 @@
 1	greek, modern (1453-)	x-vnd.Haiku-Installer	116830250
 Performing installation.	InstallProgress		Η εγκατάσταση είναι σε εξέλιξη.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Επιλέξτε το δίσκο προέλευσης από το αναδυόμενο μενού. Στη συνέχεια, κάντε κλικ στην \"Έναρξη\".
-Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Παρακαλώ κλείστε το παράθυρο Διαχειριστή Δίσκου πριν το κλείσιμο του παράθυρου προγράματος εγκατάστασης.
+Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Παρακαλώ κλείστε το παράθυρο Διαχειριστή Δίσκου, πριν κλείσετε το Πρόγραμμα Εγκατάστασης.
 No optional packages available.	PackagesView		Δεν υπάρχουν διαθέσιμα προαιρετικά πακέτα.
 Restart system	InstallerWindow		Επανεκκίνηση συστήματος
 The mount point could not be retrieved.	InstallProgress		Το σημείο προσάρτησης δεν μπορεί να ανακτηθεί.

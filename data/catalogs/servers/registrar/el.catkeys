@@ -8,7 +8,7 @@ The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess
 System is shut down	ShutdownProcess		Το σύστημα έχει τερματιστεί
 Restart system	ShutdownProcess		Επανεκκίνηση συστήματος
 Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Η εφαρμογή \"%appName%\" ακύρωσε τη διαδικασία τερματισμού.
-Asking background applications to quit.	ShutdownProcess		Αίτηση εφαρμογών παρασκηνίου για τερματισμό.
+Asking background applications to quit.	ShutdownProcess		Αίτηση εφαρμογών υποβάθρου για τερματισμό.
 Do you really want to restart the system?	ShutdownProcess		Θέλετε σίγουρα να επανακκινήσετε το σύστημα;
 Restart	ShutdownProcess		Επανεκκίνηση
 It's now safe to turn off the computer.	ShutdownProcess		Μπορείτε τώρα να κλείσετε με ασφάλεια τον υπολογιστή.

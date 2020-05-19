@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Devices	2250980951
+1	greek, modern (1453-)	x-vnd.Haiku-Devices	3345509916
 ACPI bus	DevicesView		Δίαυλος ACPI
 Encryption controller	Device		Ελεγκτής κρυπτογράφησης
 Bus Information	Device		Πληροφορίες Διαύλου
@@ -6,7 +6,7 @@ Devices	System name		Συσκευές
 Graphics Peripheral	DeviceSCSI		Περιφερειακή Συσκευή Γραφικών
 Processor	Device		Επεξεργαστής
 Generate system information	DevicesView		Πληροφορίες συστήματος
-Class info	DevicePCI		Πληροφορίες κλάσης
+Class info	DevicePCI		Πληροφορίες κατηγορίας
 ACPI Information	DeviceACPI		Πληροφορίες για το ACPI
 Detailed	DevicesView		Αναλυτικό
 Computer	DevicesView		Υπολογιστής
@@ -27,7 +27,7 @@ ACPI node '%1'	DeviceACPI		Μονάδα ACPI '%1'
 Optical Drive	DeviceSCSI		Οπτικός Οδηγός
 Name	PropertyList		Όνομα
 Manufacturer	DeviceSCSI		Κατασκευαστής
-Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Όνομα Συσκεής\t\t\t\t: %Name%\nΚατασκευαστής\t\t\t: %Manufacturer%\nΟδηγός που χρησιμοποιήθηκε\t\t\t\t: %DriverUsed%\nΔιαδρομές συσκεής\t: %DevicePaths%
+Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Όνομα Συσκεής\t\t\t\t: %Name%\nΚατασκευαστής\t\t\t: %Manufacturer%\nΟδηγός που χρησιμοποιήθηκε\t\t\t\t: %DriverUsed%\nΔιαδρομές συσκευής\t: %DevicePaths%
 Device name	Device		Όνομα συσκευής
 Satellite communications controller	Device		Ελεγκτής επικοινωνιών δορυφόρου
 Device class	DeviceSCSI		Κατηγορία συσκευής
@@ -63,6 +63,7 @@ Other	DeviceSCSI		Άλλο
 Report compatibility	DevicesView		Αναφορά συμβατότητας
 Computer	Device		Υπολογιστής
 PCI bus	Device		Δίαυλος PCI
+Enclosure	DeviceSCSI		Περίβλημα δίσκου
 Order by:	DevicesView		Κατανομή κατά:
 ACPI Thermal Zone	DeviceACPI		Θερμική Ζώνη ACPI
 Intelligent controller	Device		Έξυπνος ελεγκτής
@@ -81,6 +82,7 @@ Bridge	DeviceSCSI		Γέφυρα
 Signal processing controller	Device		Ελεγκτής επεξεργασίας σημάτων
 Device name	DeviceSCSI		Όνομα συσκευής
 Docking station	Device		Σταθμός σύνδεσης
+Array	DeviceSCSI		Συστοιχία δίσκων
 Unclassified device	Device		Απροσδιόριστη συσκευή
 ACPI controller	Device		Ελεγκτής ACPI
 Network controller	Device		Ελεγκτής δικτύου

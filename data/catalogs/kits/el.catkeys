@@ -1,6 +1,7 @@
-1	greek, modern (1453-)	x-vnd.Haiku-libbe	286377217
+1	greek, modern (1453-)	x-vnd.Haiku-libbe	3337473349
 {0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# byte} other{# bytes}}
 All Rights Reserved.	AboutWindow		Με επιφύλαξη παντός δικαιώματος.
+gold master	AboutWindow		gold master
 Undo	TextView		Αναίρεση
 gamma	AboutWindow		gamma
 development	AboutWindow		ανάπτυξη
@@ -10,7 +11,7 @@ Print Server is not responding.	PrintJob		Ο Εξυπηρετητής εκτυπ
 About %app%	AboutMenuItem		Σχετικά με το %app%
 Warning	Dragger		Προειδοποίηση
 Green:	ColorControl		Πράσινο:
-Redo	TextView		Ακύρωση αναίρεσης
+Redo	TextView		Επαναφορά
 No pages to print!	PrintJob		Δεν υπάρχουν σελίδες προς εκτύπωση!
 beta	AboutWindow		beta
 OK	ZombieReplicantView		Εντάξει
@@ -34,7 +35,7 @@ Error	PrintJob		Σφάλμα
 About %app%	AboutWindow		Σχετικά με το %app%
 About %app…	Dragger		Σχετικά με το %app…
 Version history:	AboutWindow		Ιστορικό έκδοσης:
-Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Η εύρεση της εφαρμογής για την ρέπλικα απέτυχε. Δεν έχει δοθεί η υπογραφή της εφαρμογής.\n%error
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Ο εντοπισμός της εφαρμογής για την ρέπλικα απέτυχε. Δεν έχει δοθεί η υπογραφή της εφαρμογής.\n%error
 %3.2f KiB	StringForSize		%3.2f KiB
 Blue:	ColorControl		Μπλέ:
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Η δημιουργία ρέπλικα για το \"%description\" απέτυχε.\n%error

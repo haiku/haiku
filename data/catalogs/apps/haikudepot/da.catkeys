@@ -1,10 +1,9 @@
-1	danish	x-vnd.Haiku-HaikuDepot	1107427137
+1	danish	x-vnd.Haiku-HaikuDepot	1335940664
 Repository update error	LocalRepositoryUpdateProcess		Fejl ved opdatering af softwarekilde
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Der opstod en fejl under opdatering af softwarekilden: %error%
 User Created	UserLoginWindow		Bruger oprettet
 Check for updates…	MainWindow		Søg efter opdateringer…
 Uninstall	PackageManager		Afinstaller
-(%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		Afinstalleret
 It was not possible to create the new user.	UserLoginWindow		Det var ikke muligt at oprette den nye bruger.
 Available packages	MainWindow		Tilgængelige pakker
@@ -106,8 +105,8 @@ Close	RatePackageWindow		Luk
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synkroniserer pakkedata for softwarekilden '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Vis anvendelsesbetingelserne
 Login issue	MainWindow		Problem med at logge ind
-Your rating:	RatePackageWindow		Din bedømmelse:
 Size	PackageListView		Størrelse
+Your rating:	RatePackageWindow		Din bedømmelse:
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		Brugeren %Nickname% er blevet oprettet i HaikuDepotServer-systemet. Du kan administrere dine brugerdetaljer ved at bruge webgrænsefladen. Du er nu logget ind som den nye bruger.
 Your rating was updated.	RatePackageWindow		Din bedømmelse blev opdateret.
 All categories	FilterView		Alle kategorier

@@ -45,6 +45,6 @@ Show replicants	DeskbarMenu		Mostra els replicants
 Hide application names	PreferencesWindow		Amaga el nom de les aplicacions
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demostracions
 Icon size	PreferencesWindow		Mida de la icona
-Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Miniaplicació de l'escriptori
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Miniaplicacions de l'escriptori
 Hide all	WindowMenu		Amaga-ho tot
 Quit application	WindowMenu		Surt de l'aplicació

@@ -1,5 +1,6 @@
-1	greek, modern (1453-)	x-vnd.Haiku-MediaConverter	1954221691
+1	greek, modern (1453-)	x-vnd.Haiku-MediaConverter	2251404027
 Writing audio track: %d%% complete	MediaConverter		Γίνεται εγγραφή κομματιού ήχου: Έχει ολοκληρωθεί το %d%%
+Input file not recognized as Audio or Video	MediaConverter		Το αρχείο εισόδου δεν αναγνωρίζεται ως ήχο ή βίντεο
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Video quality: %3d%%	MediaConverter		Ποιότητα βίντεο: %3d%%
 Source files	MediaConverter		Πηγαία αρχεία

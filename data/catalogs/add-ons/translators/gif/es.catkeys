@@ -4,9 +4,9 @@ Write interlaced images	GIFView		Guardar imágenes entrelazadas
 Optimal	GIFView		Óptimo
 Greyscale	GIFView		Escala de grises
 Colors:	GIFView		Colores:
-GIF image translator	GIFTranslator		Transformador de imágenes GIF
-Be Bitmap Format (GIFTranslator)	GIFTranslator		Formato Be Bitmap (GIFTranslator)
-GIF image translator	GIFView		Transformador de imágenes GIF
+GIF image translator	GIFTranslator		Intérprete de imágenes GIF
+Be Bitmap Format (GIFTranslator)	GIFTranslator		Formato Be Bitmap (Intérprete GIF)
+GIF image translator	GIFView		Intérprete de imágenes GIF
 Palette:	GIFView		Paleta:
 GIF image	GIFTranslator		Imagen GIF
 Write transparent images	GIFView		Guardar imágenes transparentes

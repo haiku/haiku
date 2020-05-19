@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-ScreenSaver	3955331319
+1	greek, modern (1453-)	x-vnd.Haiku-ScreenSaver	557704281
 Could not load screen saver	ScreenSaver		Δεν ήταν δυνατή η φόρτωση της προφύλαξης οθόνης
 30 seconds	ScreenSaver		30 δευτερόλεπτα
 Start screensaver	ScreenSaver		Εκκίνηση προφύλαξης οθόνης
@@ -10,7 +10,9 @@ Display Power Management Signaling not available	ScreenSaver		Η προβολή 
 ScreenSaver	System name		ScreenSaver
 Test	ScreenSaver		Τέστ
 General	ScreenSaver		Γενικά
+Fade now when mouse is here	ScreenSaver		Να εξαφανιστεί όταν μετακινηθεί το ποντίκι
 Enable screensaver	ScreenSaver		Ενεργοποίηση προφύλαξης οθόνης
+Don't fade when mouse is here	ScreenSaver		Να μην εξαφανιστεί όταν μετακινηθεί το ποντίκι
 Cancel	ScreenSaver		Άκυρο
 Turn off screen	ScreenSaver		Απενεργοποίηση οθόνης
 No options available	ScreenSaver		Μη διαθέσιμες επιλογές

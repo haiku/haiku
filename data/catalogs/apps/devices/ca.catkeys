@@ -46,7 +46,7 @@ RBC	DeviceSCSI		RBC
 None	Device		Cap
 Device paths	Device		Camins als dispositius
 Unknown device	Device		El dispositiu és desconegut
-Wireless controller	Device		Controlador de xarxa sense fils
+Wireless controller	Device		Controlador de xarxa sense fil
 Generic system peripheral	Device		Perifèric genèric del sistema
 Value	PropertyList		Valor
 Devices	DevicesView		Dispositius

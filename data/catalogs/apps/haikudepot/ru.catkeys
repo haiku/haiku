@@ -1,10 +1,9 @@
-1	russian	x-vnd.Haiku-HaikuDepot	1929339528
+1	russian	x-vnd.Haiku-HaikuDepot	3457771294
 Repository update error	LocalRepositoryUpdateProcess		Ошибка обновления репозитория
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Произошла ошибка при обновлении репозитория: %error%
 User Created	UserLoginWindow		Пользователь создан
 Check for updates…	MainWindow		Проверить обновления…
 Uninstall	PackageManager		Удалить
-(%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		Удаленные
 It was not possible to create the new user.	UserLoginWindow		Не удалось создать нового пользователя.
 Available packages	MainWindow		Доступные пакеты
@@ -53,6 +52,7 @@ Package action failed	PackageInfoView		Действие с пакетом не �
 No changelog available.	PackageInfoView		История изменений недоступна.
 Error	App		Ошибка
 There was a puzzling response from the web service.	UserLoginWindow		Был получен странный ответ от веб сервера.
+Version	PackageListView		Версия
 Not logged in	MainWindow		Вход не выполнен
 No, quit HaikuDepot	App		Нет, выйти из HaikuDepot
 Featured packages	FeaturedPackagesView		Выбор редакции
@@ -102,12 +102,14 @@ Close	UserLoginWindow		Закрыть
 Close	RatePackageWindow		Закрыть
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Синхронизация данных пакетов репозитория '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Показать условия использования
-Your rating:	RatePackageWindow		Ваш рейтинг:
+Login issue	MainWindow		Проблема со входом в систему
 Size	PackageListView		Размер
+Your rating:	RatePackageWindow		Ваш рейтинг:
 Your rating was updated.	RatePackageWindow		Ваш рейтинг был обновлен.
 All categories	FilterView		Все категории
 Repositories	MainWindow		Репозитории
 n/a	PackageInfoView		н/д
+This rating is visible to other users	RatePackageWindow		Этот рейтинг виден другим пользователям
 View agreed usage conditions…	MainWindow		Показать согласованные условия использования…
 Cancel	MainWindow		Отмена
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{( осталось скачать 1 пакет)}few{( осталось скачать # пакета)}other{( осталось скачать # пакетов)}}

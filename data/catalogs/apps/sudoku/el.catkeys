@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Sudoku	2463385585
+1	greek, modern (1453-)	x-vnd.Haiku-Sudoku	3382377306
 Restore snapshot	SudokuWindow		Επαναφορά στιγμιότυπου
 File	SudokuWindow		Αρχείο
 Mark invalid values	SudokuWindow		Σημείωση λανθασμένων τιμών
@@ -11,15 +11,16 @@ Undo	SudokuWindow		Αναίρεση
 Export as…	SudokuWindow		Εξαγωγή ως…
 Quit	SudokuWindow		Έξοδος
 Redo	SudokuWindow		Επαναφορά
-Could not open \"%s\":\n%s\n	SudokuWindow		Αδυναμία ανοίγματος του \"%s\":\n%s\n
+Could not open \"%s\":\n%s\n	SudokuWindow		Δεν ήταν δυνατό το άνοιγμα του \"%s\":\n%s\n
 Blank	SudokuWindow		Κενό
-Sudoku solved - congratulations!\n	SudokuWindow		Το Sudoku λύθηκε - συγχαρητήρια!\n
+Sudoku solved - congratulations!\n	SudokuWindow		Λύσατε το Sudoku - συγχαρητήρια!\n
 Text	SudokuWindow		Κείμενο
 Copy	SudokuWindow		Αντιγραφή
 Solve	SudokuWindow		Λύση
 HTML	SudokuWindow		HTML
 Advanced	SudokuWindow		Προχωρημένο
-Searching for removable values	SudokuGenerator		Αναζήτηση για αφαιρούμενες τιμές
+Set all hints	SudokuWindow		Τοποθέτηση όλων των βοηθητικών στοιχείων
+Searching for removable values	SudokuGenerator		Γίνεται αναζήτηση αφαιρούμενων τιμών
 Abort	ProgressWindow		Ματαίωση
 Could not set Sudoku:\n%s\n	SudokuWindow		Αδυναμία ορισμού του Sudoku:\n%s\n
 Help	SudokuWindow		Βοήθεια
@@ -28,7 +29,7 @@ Sudoku	System name		Sudoku
 Progress monitor	ProgressWindow		Ελεγκης προόδου
 Creating solvable field	SudokuGenerator		Δημιουργία επιλύσιμου πεδίου
 View	SudokuWindow		Προβολή
-Snapshot current	SudokuWindow		Τρέχων στιγμιότυπο
+Snapshot current	SudokuWindow		Λήψη στιγμιοτύπου
 Mark valid hints	SudokuWindow		Σημείωση έγκυρων συμβουλών
 Sudoku request	SudokuWindow		Αίτηση Sudoku
 Open file…	SudokuWindow		Άνοιγμα αρχείου…

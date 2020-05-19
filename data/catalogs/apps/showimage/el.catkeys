@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-ShowImage	575555985
+1	greek, modern (1453-)	x-vnd.Haiku-ShowImage	3998703664
 Use as background…	Menus		Ορισμός ως φόντο επιφάνειας εργασίας…
 File	Menus		Αρχείο
 Slide delay	Menus		Καθυστέρηση παρουσίασης
@@ -7,6 +7,7 @@ Zoom in	Menus		Μεγέθυνση
 The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Το έγγραφο '%s' έχει αλλάξει. Θέλετε να κλείσετε το έγγραφο;
 Page setup…	Menus		Διαμόρφωση σελίδας…
 Print…	Menus		Εκτύπωση…
+Get info…	Menus		Πληροφορίες…
 OK	SaveToFile		Εντάξει
 Previous page	Menus		Προηγούμενη σελίδα
 View	Menus		Προβολή
@@ -52,7 +53,7 @@ Select all	Menus		Επιλογή όλων
 Zoom factor in %:	PrintOptionsWindow		Συντελεστής κλίμακας σε %:
 Width:	PrintOptionsWindow		Πλάτος:
 Image	Menus		Εικόνα
-Move to Trash	Menus		Μετακίνηση στον Κάδο Απορριμάτων
+Move to Trash	Menus		Μετακίνηση στον Κάδο
 OK	Alerts		Εντάξει
 Rotate clockwise	Menus		Περιστροφή προς τα δεξιά
 Job setup	PrintOptionsWindow		Διαμόρφωση εργασίας

@@ -16,4 +16,4 @@ Mail status	Notifier		Κατάσταση αλληλογραφίας
 Check for mails only	DeskbarView		Ελεγχος για νέα μηνύματα μόνο
 Check for mail now	DeskbarView		Έλεγχος αλληλογραφίας τώρα
 Sending mail for %name	Notifier		Αποστολή μηνύματος από %name
-Mail daemon status log	MailDaemon		Κατάσταση του δέμονα αλληλογραφίας
+Mail daemon status log	MailDaemon		Καταγραφή προγράμματος παρασκηνίου αλληλογραφίας

@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libtracker	2151874745
+1	english	x-vnd.Haiku-libtracker	226539321
 Created	ContainerWindow		创建
 Icon	AttributesView		图标
 Open and make preferred	OpenWithWindow		打开并创建首选
@@ -253,7 +253,6 @@ MiB	WidgetAttributeText		MiB
 Delete	FSUtils		删除
 Edit name	ContainerWindow		编辑名称
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		无法打开 \"%document\"（缺失符号：%symbol）。\n
-More options	FindPanel		更多选项
 config	B_USER_CONFIG_DIRECTORY		设置
 Error moving \"%name\".	FSUtils		移动 \"%name\" 出错。
 Select…	QueryContainerWindow		选择...
@@ -325,7 +324,6 @@ Proceed	FSUtils		执行
 Edit favorites…	FilePanelPriv		编辑收藏夹...
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		您无法移动目录到其本身及子目录。
 New	ContainerWindow		新建
-Fewer options	FindPanel		简单选项
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		您必须放置项目到 \"Disks\" 窗口中的磁盘图标上。
 Sorry, you can't copy items to the Trash.	FSClipBoard		对不起，您不能够复制项目到垃圾箱。
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		目录中已经存在与您将 %verb 的项目同名的内容。\n\n您希望将其替换为您正在 %verb 的项目并将其应用于所有内容吗？

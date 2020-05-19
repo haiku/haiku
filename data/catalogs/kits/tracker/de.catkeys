@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	612949595
+1	german	x-vnd.Haiku-libtracker	2982581467
 Created	ContainerWindow		Erstellt
 Icon	AttributesView		Icon
 Open and make preferred	OpenWithWindow		Öffnen und zur Bevorzugten machen
@@ -304,7 +304,6 @@ Delete	FSUtils		Löschen
 Edit name	ContainerWindow		Umbenennen
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		\"%document\" konnte nicht geöffnet werden (Fehlendes Symbol: %symbol).\n
 ASCII Text	AttributesView		ASCII Text
-More options	FindPanel		Weitere Optionen
 Atom reference	AttributesView		Atom Referenz
 Error moving \"%name\".	FSUtils		Fehler beim Verschieben von \"%name\".
 Select…	QueryContainerWindow		Auswählen…
@@ -392,7 +391,6 @@ Proceed	FSUtils		Fortfahren
 Edit favorites…	FilePanelPriv		Favoriten bearbeiten…
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		Ein Ordner kann nicht in sich selbst oder in einen seiner Unterordner verschoben werden.
 New	ContainerWindow		Neu
-Fewer options	FindPanel		Weniger Optionen
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Objekte müssen auf eines der Icons im \"Datenträger\" Fenster fallengelassen werden.
 If you alter %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Wird %target geändert, kann es sein dass %osName nicht mehr richtig funktioniert!\n\nTrotzdem ändern?\n
 Sorry, you can't copy items to the Trash.	FSClipBoard		Objekte können leider nicht in den Papierkorb kopiert werden.

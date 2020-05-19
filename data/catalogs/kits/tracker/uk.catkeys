@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libtracker	659027911
+1	ukrainian	x-vnd.Haiku-libtracker	4043539537
 Created	ContainerWindow		Cтворений
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Відкрити і зробити пріоритетним
@@ -262,6 +262,7 @@ ends with	SelectionWindow		закінчити з
 Open	OpenWithWindow		Відкрити
 You must have at least one attribute showing.	PoseView		Ви повинні мати у списку хоча б один атрибут.
 Cut	FilePanelPriv		Вирізати
+Finish: after several years	StatusWindow		Фініш: через кілька років
 Favorites	FilePanelPriv		Вибрані
 Point	AttributesView		Вказівник
 home	B_USER_DIRECTORY		Home
@@ -307,7 +308,6 @@ Delete	FSUtils		Видалити
 Edit name	ContainerWindow		Редагувати ім'я
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Не вдалося відкрити \"%document\" (Очікується символ: %symbol). \n
 ASCII Text	AttributesView		Текст ASCII
-More options	FindPanel		Більше опцій
 Atom reference	AttributesView		посилання Atom
 config	B_USER_CONFIG_DIRECTORY		конфігурація
 Error moving \"%name\".	FSUtils		Помилка переміщення \"%name\".
@@ -396,7 +396,6 @@ Proceed	FSUtils		Продовжити
 Edit favorites…	FilePanelPriv		Редагувати вибране…
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		Ви не можете перемістити папку в саму себе або в будь-яку з її власних підпапок.
 New	ContainerWindow		Новий
-Fewer options	FindPanel		Меньше опцій
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Ви повинні скинути об'єкт на один із значків диску у вікні\"Диски\".
 If you alter %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		При зміні %target, %osName може вести себе неналежним чином!\n\nВи впевнені що бажаєте цього?
 Sorry, you can't copy items to the Trash.	FSClipBoard		Вибачте, ви не можете копіювати елементи у смітник.

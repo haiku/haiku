@@ -38,7 +38,7 @@ Assign Style	Icon-O-Matic-AssignStyleCmd		Αντιστοίχιση Στυλ
 Transformation	Icon-O-Matic-TransformationBoxStates		Μετασχηματισμός
 Closed	Icon-O-Matic-PropertyNames		Κλειστό
 Split Control Point	Icon-O-Matic-SplitPointsCmd		Διαίρεση σημείου ελέγχου
-<nothing to redo>	Icon-O-Matic-Menu-Edit		<τίποτε προς επανάληψη>
+<nothing to redo>	Icon-O-Matic-Menu-Edit		<τίποτε προς επαναφορά>
 Height	Icon-O-Matic-PropertyNames		Ύψος
 Add Shape	Icon-O-Matic-AddShapesCmd		Προσθήκη Σχήματος
 warning	Icon-O-Matic-SVGExport		προειδοποίησης
@@ -93,7 +93,7 @@ Diamond	Icon-O-Matic-StyleTypes		Διαμάντι
 Add Style	Icon-O-Matic-AddStylesCmd		Προσθήκη Στυλ
 Nudge Control Points	Icon-O-Matic-NudgePointsCommand		Ειδοποίηση σημείων ελέγχου
 Move Styles	Icon-O-Matic-MoveStylesCmd		Μετακίνηση Στυλ
-Don't save	Icon-O-Matic-Menu-Settings		Να μην γίνει αποθήκευση
+Don't save	Icon-O-Matic-Menu-Settings		Χωρίς αποθήκευση
 Add shape with path	Icon-O-Matic-Menu-Shape		Προσθήκη σχήματος με μονοπάτι
 Translation X	Icon-O-Matic-PropertyNames		Μετάφραση Χ
 Flip Control Points	Icon-O-Matic-FlipPointsCmd		Αλλαγή σημείων ελένχου
@@ -105,7 +105,7 @@ Overwrite	Icon-O-Matic-SVGExport		Αντικατάσταση
 Modify Control Point	Icon-O-Matic-ChangePointCmd		Τροποποίηση Σημείου Ελέγχου
 Cancel	Icon-O-Matic-SVGExport		Άκυρο
 Open…	Icon-O-Matic-Menu-File		Άνοιγμα…
-Redo	Icon-O-Matic-Main		Επανάληψη
+Redo	Icon-O-Matic-Main		Επαναφορά
 Change Color	Icon-O-Matic-SetColorCmd		Αλλαγή χρώματος
 Remove	Icon-O-Matic-ShapesList		Αφαίρεση
 Drop shapes	Icon-O-Matic-ShapesList		Σύρετε σχήματα
@@ -164,7 +164,7 @@ Miter Limit	Icon-O-Matic-PropertyNames		Όριο miter
 Untitled	Icon-O-Matic-Main		Χωρίς τίτλο
 Max LOD	Icon-O-Matic-PropertyNames		Μέγιστο LOD
 Add Path	Icon-O-Matic-AddPathsCmd		Προσθήκη Μονοπατιού
-Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Να αποθηκευτούν οι αλλαγές στο εικονίδιο πριν από το κλείσιμο;
+Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Να αποθηκευτούν οι αλλαγές στο εικονίδιο πριν το κλείσιμο;
 load error	Icon-O-Matic-SVGImport		σφάλμα φόρτωσης
 Transformation	Icon-O-Matic-TransformersList		Μετασχηματισμός
 Save as…	Icon-O-Matic-Menu-File		Αποθήκευση ως…

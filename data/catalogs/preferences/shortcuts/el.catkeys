@@ -1,13 +1,15 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Shortcuts	889809044
+1	greek, modern (1453-)	x-vnd.Haiku-Shortcuts	3834857117
 *MouseUp	ShortcutsWindow		*Ποντίκι Επάνω
 Application	ShortcutsWindow		Εφαρμογή
-Save changes before closing?	ShortcutsWindow		Να αποθηκευτούν οι αλλαγές πριν από το κλείσιμο;
+Option	ShortcutsSpec	Name for modifier on keyboard	Option
+Save changes before closing?	ShortcutsWindow		Να αποθηκευτούν οι αλλαγές πριν το κλείσιμο;
 Revert to saved	ShortcutsWindow		Επαναφορά στο αποθηκευμένο
 Don't save	ShortcutsWindow		Χωρίς αποθήκευση
 *MouseDown	ShortcutsWindow		*Ποντίκι Κάτω
 *Beep	ShortcutsWindow		*Μπιπ
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Οι συντομέυσεις δεν ήταν δυνατό να αποθηκευτούν στο σετ πλήκτρων.
 Save	ShortcutsWindow		Αποθήκευση
+Either	ShortcutsSpec		Όλα
 Oh no	ShortcutsWindow		Ώχ όχι
 Key	ShortcutsWindow		Κλειδί
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*Αποστολή μηνύματος application/x-vnd.Be-TRAK 'Tfnd'
@@ -18,20 +20,26 @@ Quit	ShortcutsWindow		Έξοδος
 Cancel	ShortcutsWindow		Άκυρο
 *MoveMouse +20 +0	ShortcutsWindow		*Μετακίνηση ποντικιού στο +20 +0
 Control	ShortcutsSpec	Name for modifier on keyboard	Έλεγχος
+Left	ShortcutsSpec		Αριστερό
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Οι συντομέυσεις δεν ήταν δυνατό να αναλυθούν στο αρχείο του σετ πλήκτρων!
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Οι συντομέυσεις δεν ήταν δυνατό να αποθηκευτούν στο αρχείο του σετ πλήκτρων!
 *InsertString \"Your Text Here\"	ShortcutsWindow		*Εισάγετε συμβολοσεια \"Το Κείμενο σας Εδώ\"
 Remove selected shortcut	ShortcutsWindow		Αφαίρεσε την επιλεγμένη συντόμευση
+Error, NULL state description?	ShortcutsSpec		Σφάλμα, φαίνεται ότι το πλαίσιο πληροφοριών έχει την τιμή NULL;
+Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Το Shortcuts δε μπόρεσε να ανοίξει το αρχείο του σετ πλήκτρων!
 Save & apply	ShortcutsWindow		Αποθήκευση & εφαρμογή
 Open	ShortcutsWindow		Άνοιγμα
 Append	ShortcutsWindow		Προσάρτηση
+Both	ShortcutsSpec		Όλα
 Save KeySet as…	ShortcutsWindow		Αποθήκευση σετ πλήκτρων ως…
 Append KeySet…	ShortcutsWindow		Προσάρτηση σετ πλήκτρων…
 *MouseButton 1	ShortcutsWindow		*Πλήκτρο Ποντικιού 1
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Πολλαπλό \"*Μετακίνηση ποντικιού σε 100% 0\" \"*Πλήκτρο ποντικιού 1\"
+Right	ShortcutsSpec		Δεξιό
 OK	ShortcutsWindow		Εντάξει
 Add new shortcut	ShortcutsWindow		Προσθήκη νέας συντόμευσης
+(None)	ShortcutsSpec		(Κανένα)
 Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
 Open KeySet…	ShortcutsWindow		Άνοιγμα σετ πλήκτρων…
 File	ShortcutsWindow		Αρχείο

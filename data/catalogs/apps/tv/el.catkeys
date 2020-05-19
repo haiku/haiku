@@ -8,7 +8,7 @@ Full screen	MainWin		Πλήρης οθόνη
 Scale to native size	MainWin		Κλιμάκωση στο φυσικό μέγεθος
 unknown	MainWin		άγνωστο
 Next channel	MainWin		Επόμενο κανάλι
-Keep aspect ratio	MainWin		Διατήρηση λόγου πλευρών
+Keep aspect ratio	MainWin		Διατήρηση λόγου διαστάσεων
 DVB - Digital Video Broadcasting TV	MainWin		DVB -  Ψηφιακή μετάδοση τηλέορασης βίντεο
 Always on top	MainWin		Πάντα στην κορυφή
 Debug	MainWin		Αποσφαλμάτωση
@@ -24,4 +24,4 @@ TV	System name		TV
 Settings…	MainWin		Ρυθμίσεις…
 None	MainWin		Κανένα
 Error, interface is busy:\n\n	MainWin		Σφάλμα, η διεπαφή είναι απασχολημένη:\n\n
-pixel aspect ratio	MainWin		λόγος πλευρών εικονοστoιχείου
+pixel aspect ratio	MainWin		λόγος διαστάσεων pixel

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	4239072350
+1	french	x-vnd.Haiku-libtracker	2313736926
 Created	ContainerWindow		Créé
 Icon	AttributesView		Icône
 Open and make preferred	OpenWithWindow		Ouvrir et en faire la préférence
@@ -306,7 +306,6 @@ Delete	FSUtils		Supprimer
 Edit name	ContainerWindow		Éditer le nom
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Impossible d’ouvrir « %document » (Il manque le symbole : %symbol).\n
 ASCII Text	AttributesView		Texte ASCII
-More options	FindPanel		Plus d’options
 Atom reference	AttributesView		Référence atomique
 config	B_USER_CONFIG_DIRECTORY		configuration
 Error moving \"%name\".	FSUtils		Erreur au déplacement de « %name ».
@@ -394,7 +393,6 @@ Proceed	FSUtils		Procéder
 Edit favorites…	FilePanelPriv		Éditer les favoris…
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		Vous ne pouvez pas déplacer un dossier dans lui-même ou dans un de ses sous-dossier.
 New	ContainerWindow		Nouveau
-Fewer options	FindPanel		Moins d’options
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Vous devez déplacer des éléments sur une des icônes de disques de la fenêtre « Disques ».
 If you alter %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Si vous altérer %target, %osName pourrait ne plus se comporter correctement!\n\nÊtes vous sûr de vouloir le faire ?
 Sorry, you can't copy items to the Trash.	FSClipBoard		Désolé, vous ne pouvez pas copier des éléments dans la Corbeille.

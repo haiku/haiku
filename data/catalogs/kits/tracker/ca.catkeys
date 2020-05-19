@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-libtracker	1673907665
+1	catalan; valencian	x-vnd.Haiku-libtracker	4043539537
 Created	ContainerWindow		Creat
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Obre-ho i fes-ho preferit
@@ -276,7 +276,7 @@ Unmatched brackets.	libtracker		Claudàtors no coincidents.
 Error %error loading Add-On %name.	ContainerWindow		Hi ha hagut un error (%error) en carregar el complement %name.
 You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		Esteu intentant reemplaçar l'element\n\t%name%dest\nper\n\t%name%src\n\nSegur que el voleu reemplaçar per %movemode?
 Empty Trash	ContainerWindow		Buida la paperera
-no supporting apps	OpenWithWindow		no hi ha cap aplicació no apta
+no supporting apps	OpenWithWindow		aplicacions no compatibles
 32-bit unsigned integer	AttributesView		Enter de 32 bits no signat
 Preparing to empty Trash…	StatusWindow		Es prepara el buidatge de la paperera...
 Deleting: 	StatusWindow		Se suprimeix: 
@@ -308,7 +308,6 @@ Delete	FSUtils		Suprimeix
 Edit name	ContainerWindow		Edita el nom
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		No s'ha pogut obrir \"%document\" (Falta el símbol %symbol). \n
 ASCII Text	AttributesView		Text ASCII
-More options	FindPanel		Més opcions
 Atom reference	AttributesView		Referència d'àtom
 config	B_USER_CONFIG_DIRECTORY		configuració
 Error moving \"%name\".	FSUtils		Error en moure \"%name\".
@@ -397,7 +396,6 @@ Proceed	FSUtils		Continua
 Edit favorites…	FilePanelPriv		Edita els preferits...
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		No podeu moure una carpeta dintre seu o a alguna de les seves subcarpetes.
 New	ContainerWindow		Nou
-Fewer options	FindPanel		Menys opcions
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Heu de deixar anar els elements a una de les icones de la finestra \"Discs\".
 If you alter %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Si altereu %target, el sistema %osName pot no comportar-se correctament!\n\nSegur que voleu fer-ho?
 Sorry, you can't copy items to the Trash.	FSClipBoard		Disculpeu, no podeu copiar elements a la paperera.

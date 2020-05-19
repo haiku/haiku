@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Pulse	3610817163
+1	ukrainian	x-vnd.Haiku-Pulse	559379362
 Normal mode	DeskbarPulseView		Звичайний режим
 Info	CPUButton		Інфо
 Quit	DeskbarPulseView		Вийти
@@ -16,7 +16,8 @@ Fade colors	ConfigView		Згасання кольору
 About Pulse…	PulseView		Про Pulse…
 Pulse	NormalPulseView		Pulse
 Deskbar mode	NormalPulseView		Режим Deskbar
-Remove replicant	CPUButton		Вилучити реплікант
+Pulse settings	PulseApp		Налаштування Pulse
+Remove replicant	CPUButton		Прибрати реплікант
 You can't disable the last active CPU.	PulseView		Неможливо відключити останній активний процесор.
 Width of icon:	ConfigView		Ширина значка:
 Deskbar mode	MiniPulseView		Режим Deskbar

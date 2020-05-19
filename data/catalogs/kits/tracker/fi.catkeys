@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	1673907665
+1	finnish	x-vnd.Haiku-libtracker	4043539537
 Created	ContainerWindow		Luotu
 Icon	AttributesView		Kuvake
 Open and make preferred	OpenWithWindow		Avaa ja tee ensisijaiseksi
@@ -308,7 +308,6 @@ Delete	FSUtils		Poista
 Edit name	ContainerWindow		Muokkaa nimeä
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Asiakirjan ”%document” avaus epäonnistui (Symboli puuttuu: %symbol).\n
 ASCII Text	AttributesView		ASCI-teksti
-More options	FindPanel		Lisää valitsimia
 Atom reference	AttributesView		Atomiviite
 config	B_USER_CONFIG_DIRECTORY		asetukset
 Error moving \"%name\".	FSUtils		Virhe siirrettäessä kohdetta ”%name”.
@@ -397,7 +396,6 @@ Proceed	FSUtils		Jatketaan
 Edit favorites…	FilePanelPriv		Muokkaa suosikkeja...
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		Et voi siirtää kansiota itseensä tai mihinkään sen omista alikansioista.
 New	ContainerWindow		Uusi
-Fewer options	FindPanel		Vähemmän valitsimia
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Sinun on pudotettava kohteet ”Levyt”-ikkunan yhdelle levykuvakkeelle.
 If you alter %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Jos muutat kohdetta %target, %osName ei ehkä toimi oikein!\n\nOletko varma, että haluat tehdä tämän?
 Sorry, you can't copy items to the Trash.	FSClipBoard		Et voi kopioida kohteita roskakoriin.

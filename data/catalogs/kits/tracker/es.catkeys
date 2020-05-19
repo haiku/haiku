@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-libtracker	659027911
+1	spanish; castilian	x-vnd.Haiku-libtracker	4043539537
 Created	ContainerWindow		Creado
 Icon	AttributesView		Icono
 Open and make preferred	OpenWithWindow		Abrir y hacer preferido
@@ -262,6 +262,7 @@ ends with	SelectionWindow		acabar con
 Open	OpenWithWindow		Abrir
 You must have at least one attribute showing.	PoseView		Debes seleccionar por lo menos un atributo de los mostrados
 Cut	FilePanelPriv		Cortar
+Finish: after several years	StatusWindow		Finalización: después de algunos años
 Favorites	FilePanelPriv		Favoritos
 Point	AttributesView		Puntero
 home	B_USER_DIRECTORY		home
@@ -307,7 +308,6 @@ Delete	FSUtils		Eliminar
 Edit name	ContainerWindow		Cambiar nombre
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		No se pudo abrir \"%document\" (Missing symbol: %symbol). \n
 ASCII Text	AttributesView		Texto ASCII
-More options	FindPanel		Más opciones
 Atom reference	AttributesView		Referencia de Atom
 config	B_USER_CONFIG_DIRECTORY		config
 Error moving \"%name\".	FSUtils		Error al mover \"%name\".
@@ -396,7 +396,6 @@ Proceed	FSUtils		Proceder
 Edit favorites…	FilePanelPriv		Editar favoritos
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		No puedes mover una carpeta sobre sí misma o cualquiera de sus subcarpetas
 New	ContainerWindow		Nuevo
-Fewer options	FindPanel		Menos opciones
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Debe arrastrar elementos en uno de los iconos de los discos en el \"Disks\" ventana
 If you alter %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Si modificas %target, es posible que %osName no funcione adecuadamente.\n\n¿Estás seguro de que deseas hacer esto?
 Sorry, you can't copy items to the Trash.	FSClipBoard		Lo sentimos, no puedes copiar elementos a la papelera

@@ -18,7 +18,7 @@ Quit	GrepWindow		Surt
 Show files in Tracker	GrepWindow		Mostra els fitxers al Rastrejador
 Please select the files you wish to keep searching.	GrepWindow		Si us plau, seleccioneu els fitxers que voleu continuar cercant.
 Trim to selection	GrepWindow		Escapça a la selecció
-Set target…	GrepWindow		Seleccioneu la destinació...
+Set target…	GrepWindow		Establiu-ne la destinació...
 TextSearch	GrepWindow		Cerca un text
 Failed to open input pipe!	Grepper		Ha fallat obrir el conducte d'entrada!
 Search	GrepWindow		Cerca

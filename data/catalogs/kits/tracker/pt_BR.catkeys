@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-libtracker	3441960750
+1	portuguese (brazil)	x-vnd.Haiku-libtracker	2785549999
 Created	ContainerWindow		Criado
 Open and make preferred	OpenWithWindow		Abrir e tornar preferido
 Kind	ContainerWindow		Espécie
@@ -85,7 +85,6 @@ Remove	FindPanel		Remover
 Recent documents	FavoritesMenu		Documentos recentes
 Save as Query template:	FindPanel		Salvar como modelo de Consulta
 Edit templates…	TemplatesMenu		Editar modelos...
-{0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, um{# byte} outros{# bytes}}
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used utilizados -- %free livres)
 Hide dotfiles	SettingsView		Esconder arquivos de ponto
 Trash	Model		Lixeira
@@ -122,7 +121,6 @@ Replace other file	WidgetAttributeText		Substituir outro arquivo
 OK	Email Query Columns		OK
 Location	QueryPoseView		Local
 Edit query	ContainerWindow		Editar consulta
-{0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, um{(# byte)} outros{(# bytes)}}
 Previously mounted disks	AutoMounterSettings		Discos montados anteriormente
 You cannot replace a file with a folder or a symbolic link.	FSUtils		Você não pode substituir um arquivo por uma pasta ou um atalho
 The target disk does not support creating links.	FSUtils		O disco de destino não suporta a criação de atalhos
@@ -179,7 +177,6 @@ Cancel	OpenWithWindow		Cancelar
 Select…	DeskWindow		Selecionar...
 Files cannot be moved or deleted from a read-only volume.	PoseView		Arquivos não podem ser movidos ou excluídos de um volume em modo somente leitura.
 Edit name	FilePanelPriv		Editar nome
-There was an error deleting \"%name\":\n\t%error	FSUtils		Ocorreu um erro ao deletar \"%name\":\n/t %error
 Resize to fit	ContainerWindow		Reduzir para caber
 Link \"%name\" to:	InfoWindow	File dialog title for new sym link	Atalho \"%name\" para:
 Mount server error	AutoMounterSettings		Erro do servidor de montagem
@@ -245,7 +242,6 @@ MiB	WidgetAttributeText		MiB
 Delete	FSUtils		Excluir
 Edit name	ContainerWindow		Editar nome
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Não foi possível abrir \"%document\" (Símbolo faltando: %symbol). \n
-More options	FindPanel		Mais opções
 config	B_USER_CONFIG_DIRECTORY		configuração
 Error moving \"%name\".	FSUtils		Erro movendo \"%name\".
 Select…	QueryContainerWindow		Selecionar…
@@ -317,7 +313,6 @@ Proceed	FSUtils		Prosseguir
 Edit favorites…	FilePanelPriv		Editar favoritos...
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		Não é possível mover uma pasta para dentro de si mesma ou para qualquer de suas próprias subpastas.
 New	ContainerWindow		Novo
-Fewer options	FindPanel		Menos opções
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Deve-se soltar itens em um dos ícones de disco na janela \"Discos\".
 Sorry, you can't copy items to the Trash.	FSClipBoard		Desculpe, você não pode copiar itens para a Lixeira.
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Alguns itens já existem nesta pasta com os mesmos nomes dos itens que você quer %verb.\n \nVocê gostaria de substituí-los com aqueles que você vai %verb ou ser perguntado em cada um?
@@ -334,7 +329,6 @@ Show space bars on volumes	SettingsView		Mostrar barras de espaço nos volumes
 Could not update permissions of file \"%name\". %error	FSUtils		Não foi possível atualizar permissões do arquivo \"%name\". %error
 Decrease size	DeskWindow		Diminuir tamanho
 Emptying Trash… 	StatusWindow		Limpando Lixeira...
-{0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, um{para # arquivo} outros{para # arquivos}}
 KiB	WidgetAttributeText		KiB
 Revert	TrackerSettingsWindow		Reverter
 trash	B_TRASH_DIRECTORY		lixeira
@@ -405,7 +399,6 @@ Cancel	PoseView		Cancelar
 Delete	PoseView		Deletar
 Sorry, you can't copy items to the Trash.	PoseView		Desculpe, você não pode copiar itens para a Lixeira.
 New folder	FilePanelPriv		Nova pasta
-{0, plural, one{# item} other{# items}}	CountView	Number of selected items: \"1 item\" or \"2 items\"	{0, plural, um{# item} outros{# itens}}
 Create a Query	FindPanel		Criar uma Consulta
 Close	QueryContainerWindow		Fechar
 Preparing to copy items…	StatusWindow		Preparando para copiar itens...

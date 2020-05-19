@@ -5,7 +5,7 @@ Match header	RuleFilter		Ταυτοποίηση της κεφαλίδας
 Set flags to	ConfigView		Θέση σημαιών σε
 Header field (e.g. Subject, From, …)	ConfigView		Πεδίο επικεφαλίδας (π.χ. Θέμα, Από, ...)
 <Choose account>	ConfigView		<Επιλέξτε λογαριασμό>
-Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Τιμή μπαλαντέρ όπως για παράδειγμα \"*spam*\".\nΓράψτε το πρόθεμα \"REGEX:\" για να χρησιμοποιήσετε κανονικές εκφράσεις.
+Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Τιμή συμβόλου υποκατάστασης όπως για παράδειγμα \"*spam*\".\nΓράψτε το πρόθεμα \"REGEX:\" για να χρησιμοποιήσετε κανονικές εκφράσεις.
 Then	ConfigView		Τότε
 If	ConfigView		Αν
 Set as read	ConfigView		Θέση όπως διαβάζονται

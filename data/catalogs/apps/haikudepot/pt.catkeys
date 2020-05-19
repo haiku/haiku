@@ -1,10 +1,9 @@
-1	portuguese	x-vnd.Haiku-HaikuDepot	1107427137
+1	portuguese	x-vnd.Haiku-HaikuDepot	1335940664
 Repository update error	LocalRepositoryUpdateProcess		Erro na atualização de repositório
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Ocorreu um erro ao atualizar o repositório: %error%
 User Created	UserLoginWindow		Utilizador Criado
 Check for updates…	MainWindow		Verificar atualizações…
 Uninstall	PackageManager		Desinstalar
-(%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		Desinstalado
 It was not possible to create the new user.	UserLoginWindow		Não foi possível criar o novo utilizador.
 Available packages	MainWindow		Pacotes disponíveis
@@ -106,8 +105,8 @@ Close	RatePackageWindow		Fechar
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		A sincronizar dados dos pacotes para o repositório '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Ver as condições de utilização
 Login issue	MainWindow		Problema no início de sessão
-Your rating:	RatePackageWindow		Sua avaliação:
 Size	PackageListView		Tamanho
+Your rating:	RatePackageWindow		Sua avaliação:
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		O utilizador %Nickname% foi criado com sucesso no sistema HaikuDepotServer. Pode gerir os seus detalhes de utilizador utilizando a interface web. Tem neste momento sessão iniciada com este utilizador.
 Your rating was updated.	RatePackageWindow		A sua avaliação foi atualizada.
 All categories	FilterView		Todas as categorias

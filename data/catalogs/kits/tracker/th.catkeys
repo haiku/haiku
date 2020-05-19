@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-libtracker	659027911
+1	thai	x-vnd.Haiku-libtracker	3028659783
 Created	ContainerWindow		สร้างแล้ว
 Icon	AttributesView		ไอคอน
 Open and make preferred	OpenWithWindow		เปิดและทำให้เป็นที่ต้องการ
@@ -307,7 +307,6 @@ Delete	FSUtils		ลบ
 Edit name	ContainerWindow		แก้ไขชื่อ
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		ไม่สามารถเปิด \"%document\" (สัญลักษณ์ที่หายไป: %symbol)\n
 ASCII Text	AttributesView		ข้อความ ASCII
-More options	FindPanel		ตัวเลือกเพิ่มเติม
 Atom reference	AttributesView		ตั้งค่า Atom
 config	B_USER_CONFIG_DIRECTORY		การตั้งค่า
 Error moving \"%name\".	FSUtils		เกิดข้อผิดพลาดในการย้าย \"%name\"
@@ -396,7 +395,6 @@ Proceed	FSUtils		ดำเนินการ
 Edit favorites…	FilePanelPriv		แก้ไขรายการโปรด
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		คุณไม่สามารถย้ายโฟลเดอร์ไปยังตัวเองหรือโฟลเดอร์ย่อยของตนเอง
 New	ContainerWindow		ใหม่
-Fewer options	FindPanel		ตัวเลือกน้อยลง
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		คุณต้องวางรายการในไอคอนดิสก์หนึ่งในหน้าต่าง \"Disks\"
 If you alter %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		หากคุณเปลี่ยน %target%osName อาจทำงานไม่ถูกต้อง! \n\nคุณแน่ใจหรือว่าต้องการทำสิ่งนี้?
 Sorry, you can't copy items to the Trash.	FSClipBoard		ขออภัยคุณไม่สามารถคัดลอกรายการไปยังถังขยะ

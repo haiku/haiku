@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	1673907665
+1	romanian	x-vnd.Haiku-libtracker	4043539537
 Created	ContainerWindow		Creat
 Icon	AttributesView		Iconiță
 Open and make preferred	OpenWithWindow		Deschide sau fixează ca preferat
@@ -308,7 +308,6 @@ Delete	FSUtils		Șterge
 Edit name	ContainerWindow		Editează nume
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Nu s-a putut deschide \"%document\" (Simbol lipsă: %symbol). \n
 ASCII Text	AttributesView		Text ASCII
-More options	FindPanel		Mai multe opțiuni
 Atom reference	AttributesView		Referință Atom
 config	B_USER_CONFIG_DIRECTORY		config
 Error moving \"%name\".	FSUtils		Eroare la mutarea \"%name\".
@@ -397,7 +396,6 @@ Proceed	FSUtils		Continuă
 Edit favorites…	FilePanelPriv		Editează favorite…
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		Nu puteți muta un dosar în el însuși sau în subdosarele acestuia.
 New	ContainerWindow		Nou
-Fewer options	FindPanel		Mai puține opțiuni
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Trebuie să plasați elementele pe una din pictogramele de disc în fereastra \"Discuri\".
 If you alter %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Dacă alterați %target, e posibil ca %osName să nu funcționeze corespunzător!\n\nSigur doriți să faceți asta?
 Sorry, you can't copy items to the Trash.	FSClipBoard		Îmi pare rău, nu puteți copia elementele la gunoi.

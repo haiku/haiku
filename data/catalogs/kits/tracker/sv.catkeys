@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	1673907665
+1	swedish	x-vnd.Haiku-libtracker	4043539537
 Created	ContainerWindow		Skapad
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Öppna och gör till förval
@@ -308,7 +308,6 @@ Delete	FSUtils		Ta bort
 Edit name	ContainerWindow		Ändra namn
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Kunde inte öppna \"%document\" (Saknar symbol: %symbol). \n
 ASCII Text	AttributesView		ASCII-text
-More options	FindPanel		Fler alternativ
 Atom reference	AttributesView		Atomreferens
 config	B_USER_CONFIG_DIRECTORY		inställningar
 Error moving \"%name\".	FSUtils		Fel vid flytt av \"%name\".
@@ -397,7 +396,6 @@ Proceed	FSUtils		Fortsätt
 Edit favorites…	FilePanelPriv		Redigera favoriter...
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		Du kan inte flytta mappen till sig själv eller någon annan av sina undermappar.
 New	ContainerWindow		Ny
-Fewer options	FindPanel		Färre alternativ
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Du måste släppa objektet på en av diskikonerna i fönstret \"Volymer\".
 If you alter %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Om du ändrar %target kommer kanske inte %osName fungera som det ska!\n\nÄr du säker på att du vill göra detta?
 Sorry, you can't copy items to the Trash.	FSClipBoard		Du kan inte kopiera saker till Papperskorgen.

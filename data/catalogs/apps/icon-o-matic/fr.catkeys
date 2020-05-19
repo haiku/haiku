@@ -112,7 +112,7 @@ Drop shapes	Icon-O-Matic-ShapesList		Supprimer les formes
 PNG Set	Icon-O-Matic-SavePanel		Ensemble PNG
 to attach transformers.	Empty transformers list - 2nd line		pour attacher des transformations.
 Linear	Icon-O-Matic-StyleTypes		Linéaire
-any of the other lists to	Empty property list - 2nd line		l'une des autres listes pour
+any of the other lists to	Empty property list - 2nd line		l’une des autres listes pour
 Nudge Control Point	Icon-O-Matic-NudgePointsCommand		Déplacer le point de contrôle
 Flip Control Point	Icon-O-Matic-FlipPointsCmd		Retourner le Point de Contrôle
 Add Paths	Icon-O-Matic-AddPathsCmd		Ajouter les chemins

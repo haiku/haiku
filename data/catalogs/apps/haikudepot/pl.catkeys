@@ -1,8 +1,7 @@
-1	polish	x-vnd.Haiku-HaikuDepot	2852017491
+1	polish	x-vnd.Haiku-HaikuDepot	3080531018
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Wystąpił błąd podczas odświeżania repozytorium: %error%
 Check for updates…	MainWindow		Sprawdź dostępność aktualizacji…
 Uninstall	PackageManager		Usuń
-(%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		Niezainstalowany
 Available packages	MainWindow		Dostępne pakiety
 Create account	UserLoginWindow		Utwórz konto
@@ -68,8 +67,8 @@ Success	UserLoginWindow		Powodzenie
 Repository	PackageListView		Repozytorium
 Close	UserLoginWindow		Zamknij
 Close	RatePackageWindow		Zamknij
-Your rating:	RatePackageWindow		Twoja ocena:
 Size	PackageListView		Rozmiar
+Your rating:	RatePackageWindow		Twoja ocena:
 All categories	FilterView		Wszystkie kategorie
 Repositories	MainWindow		Repozytoria
 n/a	PackageInfoView		Nie dotyczy

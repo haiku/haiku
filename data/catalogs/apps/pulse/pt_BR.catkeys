@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-Pulse	2964417303
+1	portuguese (brazil)	x-vnd.Haiku-Pulse	709430708
 Normal mode	DeskbarPulseView		Modo normal
 Info	CPUButton		Informação
 Quit	DeskbarPulseView		Sair
@@ -24,7 +24,6 @@ OK	PulseView		OK
 %s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nPor David Ramsey e Arve Hjønnevåg\nRevisado por Daniel Switkin\n
 OK	PrefsWindow		OK
 Pulse	PulseApp		Pulso
-Removing from Deskbar failed.\n%s	DeskbarPulseView		Remover da barra da Área de Trabalho falhou.\n
 OK	PulseApp		OK
 About Pulse…	CPUButton		Sobre o Pulso...
 Deskbar mode	PrefsWindow		Modo Deskbar

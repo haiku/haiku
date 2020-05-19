@@ -1,10 +1,9 @@
-1	friulian	x-vnd.Haiku-HaikuDepot	1107427137
+1	friulian	x-vnd.Haiku-HaikuDepot	1335940664
 Repository update error	LocalRepositoryUpdateProcess		Erôr di inzornament dal dipuesit
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Si è verificât un erôr intal inzornâ il dipuesit: %error%
 User Created	UserLoginWindow		Utent creât
 Check for updates…	MainWindow		Controle inzornaments…
 Uninstall	PackageManager		Disinstale
-(%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		Disinstalât
 It was not possible to create the new user.	UserLoginWindow		Nol è stât pussibil creâ il gnûf utent.
 Available packages	MainWindow		Pachets disponibii
@@ -106,8 +105,8 @@ Close	RatePackageWindow		Siere
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Sincronizazion dâts pachet pal dipuesit '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Viôt lis condizions di ûs
 Login issue	MainWindow		Probleme di acès
-Your rating:	RatePackageWindow		La tô valutazion:
 Size	PackageListView		Dimension
+Your rating:	RatePackageWindow		La tô valutazion:
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		L'utent %Nickname% al è stât creât cun sucès tal sisteme di HaikuDepotServer. Tu puedis gjestî i tiei detais-utent doprant la interface web. Tu sês cumò jentrât come chest utent gnûf.
 Your rating was updated.	RatePackageWindow		La tô valutazion e je stade inzornade.
 All categories	FilterView		Dutis lis categoriis

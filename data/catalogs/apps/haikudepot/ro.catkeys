@@ -1,10 +1,9 @@
-1	romanian	x-vnd.Haiku-HaikuDepot	1107427137
+1	romanian	x-vnd.Haiku-HaikuDepot	1335940664
 Repository update error	LocalRepositoryUpdateProcess		Eroare la actualizarea depozitului
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		A apărut o eroare în timpul reîmprospătării depozitului: %error%
 User Created	UserLoginWindow		Utilizator creat
 Check for updates…	MainWindow		Verifică pentru actualizări…
 Uninstall	PackageManager		Dezinstalare
-(%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		Dezinstalat
 It was not possible to create the new user.	UserLoginWindow		Nu a fost posibil să se creeze utilizatorul nou.
 Available packages	MainWindow		Pachete disponibile
@@ -106,8 +105,8 @@ Close	RatePackageWindow		Închidere
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Se sincronizează datele pachetelor pentru depozitul „%REPO_NAME%”
 View the usage conditions	UserLoginWindow		Vizualizați condițiile de utilizare
 Login issue	MainWindow		Problemă de autentificare
-Your rating:	RatePackageWindow		Evaluare:
 Size	PackageListView		Mărime
+Your rating:	RatePackageWindow		Evaluare:
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		Utilizatorul %Nickname% a fost creat cu succes în sistemul HaikuDepotServer. Puteți administra detaliile utilizatorului utilizând interfața web. Acum sunteți autentificat ca acest utilizator nou.
 Your rating was updated.	RatePackageWindow		Evaluarea a fost actualizată.
 All categories	FilterView		Toate categoriile

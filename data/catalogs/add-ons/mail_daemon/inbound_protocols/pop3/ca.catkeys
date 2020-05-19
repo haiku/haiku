@@ -5,7 +5,7 @@ APOP	ConfigView		APOP
 Connecting to POP3 server…	pop3		Es connecta al servidor POP3...
 : The server does not support APOP.	pop3		: El servidor no permet l'ús de l'APOP.
 Error while authenticating user %user	pop3		Error en autenticar l'usuari %user.
-Destination:	ConfigView		Destí:
+Destination:	ConfigView		Destinació:
 . The server said:\n	pop3		. El servidor diu:\n
 Plain text	ConfigView		Text net
 Getting mailbox size…	pop3		S'obté la mida de la bústia...

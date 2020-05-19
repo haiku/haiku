@@ -35,7 +35,7 @@ File \"%file%\" was modified by another application, reload it?	NodeMonitorAlert
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		El fitxer \"%file%\" ha estat suprimit per una altra aplicació. El recupero?
 Lines:	Statistics		Línies:
 Replace in all windows	FindandReplaceWindow		Reemplaça-ho a totes les finestres
-\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" té canvis sense desar.\nVoleu tornar-lo a la darrera versió desada? 
+\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" té canvis sense desar.\nVoleu revertir-lo a la darrera versió desada? 
 Save	SaveAlert		Desa
 Default	Open_and_SaveAsPanel		Per defecte
 Cancel	RevertToSavedAlert		Cancel·la

@@ -1,6 +1,6 @@
 1	spanish; castilian	x-vnd.Haiku-JPEGTranslator	3788699631
 Read	JPEGTranslator		Leer
-Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Formato Be Bitmap (JPEGTranslator)
+Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Formato Be Bitmap (Intérprete JPEG)
 Show warning messages	JPEGTranslator		Mostrar mensajes de advertencia
 Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Usar código CMYK con 0 para cubrir con 100% de tinta
 JPEG Library Error: %s\n	be_jerror		Error de la librería JPEG: %s\n

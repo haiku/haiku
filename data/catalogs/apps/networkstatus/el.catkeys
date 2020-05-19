@@ -1,9 +1,10 @@
-1	greek, modern (1453-)	x-vnd.Haiku-NetworkStatus	3694437303
+1	greek, modern (1453-)	x-vnd.Haiku-NetworkStatus	186344131
 Netmask	NetworkStatusView		Μάσκα Δικτύου
 Quit	NetworkStatusView		Έξοδος
 Unknown	NetworkStatusView		Άγνωστο
-Launching the network preflet failed.\n\nError: 	NetworkStatusView		Η εκκίνηση του δικτύου preflet απέτυχε.\n\nΣφάλμα: 
+Launching the network preflet failed.\n\nError: 	NetworkStatusView		Η εκκίνηση του βοηθητικού προγράμματος δικτύου απέτυχε.\n\nΣφάλμα: 
 Install in Deskbar	NetworkStatus		Εγκατάσταση στην Γραμμή Εργασιών
+NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		Ρυθμίσεις NetworkStatus :\n\t--deskbar\tαυτόματη προσθήκη ρέπλικας στην γραμμή εργασιών\n\t--help\t\tεκτύπωση του μηνύματος αυτού και έξοδος
 Open network preferences…	NetworkStatusView		Άνοιγμα προτιμήσεων δικτύου…
 NetworkStatus	System name		NetworkStatus
 OK	NetworkStatusView		Εντάξει

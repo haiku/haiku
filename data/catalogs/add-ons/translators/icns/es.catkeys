@@ -2,6 +2,6 @@
 Valid colors: RGB32, RGBA32	ICNSConfig		Colores válidos: RGB32, RGBA32
 Version %d.%d.%d, %s	ICNSConfig		Versión %d.%d.%d, %s
 Apple icons	ICNSTranslator		Iconos tipo Apple
-Apple icon translator	ICNSTranslator		Transformador de iconos tipo Apple
+Apple icon translator	ICNSTranslator		Intérprete de iconos tipo Apple
 Valid sizes: 16, 32, 48, 128, 256, 512, 1024	ICNSConfig		Tamaños válidos: 16, 32, 48, 128, 256, 512, 1024
-Apple icon translator	ICNSConfig		Transformador de iconos tipo Apple
+Apple icon translator	ICNSConfig		Intérprete de iconos tipo Apple

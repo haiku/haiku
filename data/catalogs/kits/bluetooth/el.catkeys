@@ -1,7 +1,7 @@
 1	greek, modern (1453-)	x-vnd.Haiku-Bluetooth	3550394259
 Positioning	DeviceClass		Τοποθέτηση
 Controller	DeviceClass		Ελεγκτής
-Common ISDN access	DeviceClass		Κοινή ISDN πρόσβαση
+Common ISDN access	DeviceClass		Κοινή πρόσβαση ISDN
 Unknown (reserved) minor device class	DeviceClass		Άγνωστη (δεσμευμένη) μικρή κατηγορία συσκευών
 Uncategorized	DeviceClass		Χωρίς κατηγορία
 Keyboard	DeviceClass		Πληκτρολόγιο
@@ -11,7 +11,7 @@ Cellular	DeviceClass		Κινητό
 Audio	DeviceClass		Ήχος
 Audio/Video	DeviceClass		Ήχος/Εικόνα
 Car audio	DeviceClass		Ήχος αυτοκινήτου
-Major class: 	DeviceClass		Κύρια ομάδα: 
+Major class: 	DeviceClass		Κύρια κατηγορία: 
 HiFi audio device	DeviceClass		Συκσκευή ήχου HiFi
 Microphone	DeviceClass		Μικρόφωνο
 Capturing	DeviceClass		Αποκόμιση
@@ -44,15 +44,15 @@ Phone	DeviceClass		Τηλέφωνο
 Laptop	DeviceClass		Φορητός υπολογιστής
 67-83% utilized	DeviceClass		67-83% χρησιμοποιείται
 Cordless	DeviceClass		Ασύρματο
-Invalid device class!\n	DeviceClass		Λανθασμένη ομάδα συσκευής!\n
-Minor class: 	DeviceClass		Μικρή ομάδα: 
+Invalid device class!\n	DeviceClass		Μη έγκυρη κατηγορία συσκευής!\n
+Minor class: 	DeviceClass		Μικρή κατηγορία: 
 Doll/Action figure	DeviceClass		Κούκλα/Φιγούρα δράσης
 Not implemented	RemoteDevice		Δεν εφαρμόζεται
 33-50% utilized	DeviceClass		33-50% χρησιμοποιείται
 Gaming/Toy	DeviceClass		Gaming/Παιχνίδια
 Video camera	DeviceClass		Κάμερα
 Handheld	DeviceClass		Φορητές
-Service classes: 	DeviceClass		Ομάδες υπηρεσιών: 
+Service classes: 	DeviceClass		Κατηγορίες υπηρεσιών: 
 Loudspeaker	DeviceClass		Ηχείο
 83-99% utilized	DeviceClass		83-99% χρησιμοποιείται
 SIM card reader	DeviceClass		Αναγνώστης καρτών SIM

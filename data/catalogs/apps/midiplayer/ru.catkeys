@@ -8,7 +8,7 @@ Loading instruments…	Scope View		Загрузка инструментов…
 Volume:	Main Window		Громкость:
 Closet	Main Window		Ванная
 Scope	Main Window		Осцилограф
-Drop MIDI file here	Scope View		Перенесите сюда MIDI файл
+Drop MIDI file here	Scope View		Перетащите сюда MIDI файл
 None	Main Window		Нет
 Reverb:	Main Window		Реверберация:
 MidiPlayer	System name		MIDI плеер

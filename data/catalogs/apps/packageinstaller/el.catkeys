@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-PackageInstaller	3294276106
+1	greek, modern (1453-)	x-vnd.Haiku-PackageInstaller	2472572058
 Package description	UninstallView		Περίληψη πακέτου
 none	PackageView		κανένα
 Continue	PackageInstall		Συνέχεια
@@ -8,6 +8,7 @@ All existing files will be skipped?	PackageView		Όλα τα υπάρχοντα 
 Replace	PackageView		Αντικατάσταση
 All existing files will be replaced?	PackageView		Όλα τα υπάρχοντα αρχεία θα αντικατασταθούν;
 Other…	PackageView		Άλλο…
+The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		Ο συμβολικός δεσμός με όνομα '%s' υπάρχει ήδη σε αυτήν την τοποθεσία.\nΘέλετε να αντικαταστήσετε τον δεσμό αυτό με τον δεσμό στο πακέτο ή να τον παραλείψετε;
 Stop	PackageStatus		Διακοπή
 Install to:	PackageView		Εγκατάσταση στο:
 The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Το ζητούμενο πακέτο φαίνεται να είναι ήδη εγκατεστημένο στο υστημα σας. Θα θέλατε να απεγκαταστήσετε το υπάρχων πακέτο και να συνεχίσετε την εγκατάσταση;
@@ -50,8 +51,8 @@ Replace all	PackageView		Αντικατάσταση όλων
 The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Το αρχείο πακέτου δεν είναι αναγνώσιμο.\nΈνας από τους πιθανούς λόγους για αυτό είναι οτι μπορεί το ζητούμενο πακέτο να μην είναι ένα έγκυρο πακέτο .pkg του BeOS.
 Continue	PackageInfo		Συνέχεια
 No package selected.	PackageInfo		Δεν επιλέχθηκε πακέτο.
-Error! \"%s\" is not a valid path.\n	Packageinstaller main		Σφάλμα! Το \"%s\" δεν αποτελεί έγκυρη τοποθεσία.\n
-The directory named '%s' already exists in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Ο κατάλογος με όνομα '%s' υπάρχει ήδη σε αυτήν την τοποθεσία.\nΘέλετε να αντικαταστήσετε τον κατάλογο αυτό με τον κατάλογο στο πακέτο ή να το παραλείψετε;
+Error! \"%s\" is not a valid path.\n	Packageinstaller main		Σφάλμα! Το \"%s\" δεν αποτελεί έγκυρη διαδρομή.\n
+The directory named '%s' already exists in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Ο κατάλογος με όνομα '%s' υπάρχει ήδη σε αυτήν την τοποθεσία.\nΘέλετε να αντικαταστήσετε τον κατάλογο αυτό με τον κατάλογο στο πακέτο ή να τον παραλείψετε;
 LegacyPackageInstaller	System name		Παλαιωμένος Εγκαταστάτης Πακέτων
 Ask again	PackageView		Ερώτηση ξανά
 Begin	PackageView		Ξεκίνημα

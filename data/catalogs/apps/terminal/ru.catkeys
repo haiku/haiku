@@ -84,7 +84,7 @@ Cancel	Terminal SetTitleWindow		Отмена
 Blinking cursor	Terminal AppearancePrefView		Мигающий курсор
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Этот шаблон описывает заголовок окна.\nВозможно использовать следующие переменные:\n
 Use text:	Terminal FindWindow		Использовать текст:
-Close active tab	Terminal TermWindow		Закрыть активную вкладку
+Close active tab	Terminal TermWindow		Закрыть текущую вкладку
 Save as default	Terminal TermWindow		Сохранить по умолчанию
 Nothing is selected.	Terminal TermWindow		Ничего не выделено
 Use left Option as Meta key	Terminal AppearancePrefView		Использовать левый Option как клавишу Meta

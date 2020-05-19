@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-PoorMan	1829050509
+1	portuguese (brazil)	x-vnd.Haiku-PoorMan	3777995057
 Select web folder	PoorMan		Selecionar pasta web
 Console logging	PoorMan		Registro do console
 Create Log File	PoorMan		Criar Arquivo de Registro
@@ -46,7 +46,6 @@ PoorMan	System name		Pobre Homem
 Clear console log	PoorMan		Limpar registro do console
 Run server	PoorMan		Executar servidor
 Create	PoorMan		Criar
-{0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, um{# conexão} outro{# conexões}}
 done.\n	PoorMan		concluído.\n
 PoorMan settings	PoorMan		Definições do Pobre Homem
 Console Logging	PoorMan		Registrando Console

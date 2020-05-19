@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-libtracker	1418960522
+1	polish	x-vnd.Haiku-libtracker	3788592394
 Created	ContainerWindow		Utworzono
 Open and make preferred	OpenWithWindow		Otwórz i zaznacz jako preferowane
 Kind	ContainerWindow		Rodzaj
@@ -267,7 +267,6 @@ MiB	WidgetAttributeText		MiB
 Delete	FSUtils		Usuń
 Edit name	ContainerWindow		Zmień nazwę
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Nie można otworzyć „%document” (Brakujący symbol: %symbol). \n
-More options	FindPanel		Więcej opcji
 config	B_USER_CONFIG_DIRECTORY		config
 Error moving \"%name\".	FSUtils		Błąd przy przenoszeniu „%name”.
 Select…	QueryContainerWindow		Wybierz…
@@ -342,7 +341,6 @@ Proceed	FSUtils		Kontynuuj
 Edit favorites…	FilePanelPriv		Edytuj ulubione…
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		Nie możesz przenieść katalogu do niego samego ani do jego podkatalogów.
 New	ContainerWindow		Nowy
-Fewer options	FindPanel		Mniej opcji
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Musisz upuścić obiekty na jednej z ikon w oknie „Dyski”.
 If you alter %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Jeśli podmienisz %target, %osName może nie działać poprawnie!\n\nJesteś pewien, że chcesz to zrobić?
 Sorry, you can't copy items to the Trash.	FSClipBoard		Przepraszamy, nie możesz kopiować elementów do kosza.

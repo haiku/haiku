@@ -1,10 +1,9 @@
-1	indonesian	x-vnd.Haiku-HaikuDepot	3381858533
+1	indonesian	x-vnd.Haiku-HaikuDepot	3610372060
 Repository update error	LocalRepositoryUpdateProcess		Kesalahan pembaruan repositori
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Terjadi kesalahan saat menyegarkan repositori: %error%
 User Created	UserLoginWindow		Pengguna Dibuat
 Check for updates…	MainWindow		Memeriksa pembaruan…
 Uninstall	PackageManager		Hapus
-(%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		Telah dilepas
 It was not possible to create the new user.	UserLoginWindow		Tadi tidak mungkin untuk membuat pengguna baru.
 Available packages	MainWindow		Paket yang tersedia
@@ -105,8 +104,8 @@ Close	RatePackageWindow		Tutup
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Menyinkronkan data paket untuk repositori '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Lihat kondisi penggunaan
 Login issue	MainWindow		Masalah masukc
-Your rating:	RatePackageWindow		Penilaianmu:
 Size	PackageListView		Ukuran
+Your rating:	RatePackageWindow		Penilaianmu:
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		Pengguna %Nickname% telah berhasil dibuat di sistem HaikuDepotServer. Anda dapat mengelola detail pengguna Anda dengan menggunakan antarmuka web. Anda sekarang masuk sebagai pengguna baru ini.
 Your rating was updated.	RatePackageWindow		Peringkat anda telah diperbarui.
 All categories	FilterView		Semua kategori

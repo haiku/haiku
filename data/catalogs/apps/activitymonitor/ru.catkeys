@@ -7,8 +7,8 @@ Add graph	ActivityWindow		Добавить график
 Teams	DataSource		Процессы
 MiB	DataSource		МБ
 Network send	DataSource		Исходящий трафик
-CPU usage (combined)	DataSource		Использование ЦПУ (всего)
-CPU	DataSource		ЦПУ
+CPU usage (combined)	DataSource		Использование процессора (всего)
+CPU	DataSource		Процессор
 Used memory	DataSource		Используемая память
 Cached memory	DataSource		Кэшируемая память
 Apps	DataSource		Приложения

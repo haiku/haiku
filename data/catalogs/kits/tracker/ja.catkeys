@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	1673907665
+1	japanese	x-vnd.Haiku-libtracker	4043539537
 Created	ContainerWindow		作成日時
 Icon	AttributesView		アイコン
 Open and make preferred	OpenWithWindow		関連付けて開く
@@ -308,7 +308,6 @@ Delete	FSUtils		削除
 Edit name	ContainerWindow		名前の変更
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		\"%document\" を開けませんでした (シンボル %symbol が見つかりません)。\n
 ASCII Text	AttributesView		ASCIIテキスト
-More options	FindPanel		検索オプションを表示
 Atom reference	AttributesView		Atomリファレンス
 config	B_USER_CONFIG_DIRECTORY		config
 Error moving \"%name\".	FSUtils		\"%name\"を移動中にエラーが発生しました。
@@ -397,7 +396,6 @@ Proceed	FSUtils		続行
 Edit favorites…	FilePanelPriv		お気に入りの編集…
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		フォルダーを同じフォルダーやサブフォルダーに移動できません。
 New	ContainerWindow		新規
-Fewer options	FindPanel		検索オプションを隠す
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		\"Disks\" ウィンドウ内のディスクアイコンの上に項目をドラッグ＆ドロップしてください。
 If you alter %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		%target を変更すると、%osName は正しく動作しないかもしれません!\n\n変更しますか?
 Sorry, you can't copy items to the Trash.	FSClipBoard		ごみ箱にコピーすることはできません。

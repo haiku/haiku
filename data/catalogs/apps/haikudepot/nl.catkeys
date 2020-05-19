@@ -1,10 +1,9 @@
-1	dutch; flemish	x-vnd.Haiku-HaikuDepot	1107427137
+1	dutch; flemish	x-vnd.Haiku-HaikuDepot	1335940664
 Repository update error	LocalRepositoryUpdateProcess		Fout bij updaten softwarebronnen
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Er is een fout opgetreden bij het verversen van de softwarebronnen: %error%
 User Created	UserLoginWindow		Gebruiker Aangemaakt
 Check for updates…	MainWindow		Controleer op updates…
 Uninstall	PackageManager		Verwijderen
-(%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		Verwijderd
 It was not possible to create the new user.	UserLoginWindow		Het was niet mogelijk om een nieuwe gebruiker aan te maken.
 Available packages	MainWindow		Beschikbare pakketten
@@ -106,8 +105,8 @@ Close	RatePackageWindow		Sluiten
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synchroniseer pakketdata voor pakketbron '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Bekijk de gebruiksvoorwaarden
 Login issue	MainWindow		Inlogprobleem
-Your rating:	RatePackageWindow		Uw beoordeling:
 Size	PackageListView		Grootte
+Your rating:	RatePackageWindow		Uw beoordeling:
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		De gebuiker %Nickname% is succesvol aangemaakt op het HaikuDepotServer-systeem. U kan uw gebruikersgegevens beheren in de web-interface. U bent nu ingelogd als de nieuwe gebruiker.
 Your rating was updated.	RatePackageWindow		Uw beoordeling is bijgewerkt.
 All categories	FilterView		Alle categorieën

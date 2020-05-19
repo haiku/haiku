@@ -5,7 +5,7 @@ Save in:	ScreenshotWindow		Αποθήκευση στο:
 Error saving \"%s\":\n\t%s	ScreenshotWindow		Σφάλμα κατά την αποθήκευση του \"%s\":\n\t%s
 This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Το αρχείο αυτό υπάρχει ήδη.\n Είστε σίγουρος ότι θέλετε να το αντικαταστήσετε;
 OK	ScreenshotWindow		Εντάξει
-The destination path exists but is not a folder.	ScreenshotWindow		Η προοριζόμενη τοποθεσία υπάρχει αλλά δεν αποτελεί φάκελο.
+The destination path exists but is not a folder.	ScreenshotWindow		Η διαδρομή προορισμού υπάρχει αλλά δεν αποτελεί φάκελο.
 Select	ScreenshotWindow		Επιλογή
 Save as:	ScreenshotWindow		Αποθήκευση ως:
 seconds	ScreenshotWindow		δευτερόλεπτα

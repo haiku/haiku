@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-MediaPlayer	4248764930
+1	portuguese (brazil)	x-vnd.Haiku-MediaPlayer	3392591246
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Remover Entrada para a Lixeira
 Close	MediaPlayer-PlaylistWindow		Fechar
 Volume of background clips	MediaPlayer-SettingsWindow		Volume dos clipes em segundo plano
@@ -64,7 +64,6 @@ Open…	MediaPlayer-PlaylistWindow		Abrir…
 Revert	MediaPlayer-SettingsWindow		Reverter
 Low volume	MediaPlayer-SettingsWindow		Volume baixo
 Audio	MediaPlayer-Main		Áudio
-{0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Estéreo} outros{# Canais}}
 Quit	MediaPlayer-Main		Sair
 Redo	MediaPlayer-PlaylistWindow		Refazer
 Move Entry	MediaPlayer-MovePLItemsCmd		Mover Entrada
