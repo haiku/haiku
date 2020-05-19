@@ -734,7 +734,7 @@ nvme_disk_io(void* cookie, io_request* request)
 	}
 
 	int32 remaining = nvme_request.iovec_count;
-	while (remaining > 0 && status == B_OK) {
+	while (remaining > 0) {
 		nvme_request.iovec_count = min_c(remaining,
 			NVME_MAX_SGL_DESCRIPTORS / 2);
 
@@ -743,6 +743,8 @@ nvme_disk_io(void* cookie, io_request* request)
 			nvme_request.lba_count += (nvme_request.iovecs[i].size / block_size);
 
 		status = do_nvme_io_request(handle->info, &nvme_request);
+		if (status != B_OK)
+			break;
 
 		nvme_request.iovecs += nvme_request.iovec_count;
 		remaining -= nvme_request.iovec_count;
