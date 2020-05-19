@@ -353,29 +353,19 @@ Model::AddListener(const ModelListenerRef& listener)
 }
 
 
-PackageList
-Model::CreatePackageList() const
+// TODO; part of a wider change; cope with the package being in more than one
+// depot
+PackageInfoRef
+Model::PackageForName(const BString& name)
 {
-	// Iterate all packages from all depots.
-	// If configured, restrict depot, filter by search terms, status, name ...
-	PackageList resultList;
-
-	for (int32 i = 0; i < fDepots.CountItems(); i++) {
-		const DepotInfo& depot = fDepots.ItemAtFast(i);
-
-		if (fDepotFilter.Length() > 0 && fDepotFilter != depot.Name())
-			continue;
-
-		const PackageList& packages = depot.Packages();
-
-		for (int32 j = 0; j < packages.CountItems(); j++) {
-			const PackageInfoRef& package = packages.ItemAtFast(j);
-			if (MatchesFilter(package))
-				resultList.Add(package);
-		}
+	DepotList depots = Depots();
+	for (int32 d = 0; d < depots.CountItems(); d++) {
+		const DepotInfo& depot = depots.ItemAtFast(d);
+		int32 packageIndex = depot.PackageIndexByName(name);
+		if (packageIndex >= 0)
+			return depot.Packages().ItemAtFast(packageIndex);
 	}
-
-	return resultList;
+	return PackageInfoRef();
 }
 
 
@@ -384,6 +374,7 @@ Model::MatchesFilter(const PackageInfoRef& package) const
 {
 	return fCategoryFilter->AcceptsPackage(package)
 			&& fSearchTermsFilter->AcceptsPackage(package)
+			&& (fDepotFilter.IsEmpty() || fDepotFilter == package->DepotName())
 			&& (fShowAvailablePackages || package->State() != NONE)
 			&& (fShowInstalledPackages || package->State() != ACTIVATED)
 			&& (fShowSourcePackages || !is_source_package(package))

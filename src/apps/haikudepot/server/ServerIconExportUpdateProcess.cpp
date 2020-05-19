@@ -147,7 +147,7 @@ ServerIconExportUpdateProcess::PopulateForDepot(const DepotInfo& depot)
 	printf("[%s] will populate icons for depot [%s]\n",
 		Name(), depot.Name().String());
 	status_t result = B_OK;
-	PackageList packages = depot.Packages();
+	const PackageList& packages = depot.Packages();
 	for(int32 j = 0;
 		(j < packages.CountItems()) && !WasStopped() && (result == B_OK);
 		j++) {

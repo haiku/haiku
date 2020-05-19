@@ -200,11 +200,11 @@ PackageFillingPkgListener::Handle(DumpExportPkg* pkg)
 	const DepotInfo* depotInfo = fModel->DepotForName(fDepotName);
 
 	if (depotInfo != NULL) {
-		BString packageName = *(pkg->Name());
+		const BString packageName = *(pkg->Name());
 		int32 packageIndex = depotInfo->PackageIndexByName(packageName);
 
 		if (-1 != packageIndex) {
-			PackageList packages = depotInfo->Packages();
+			const PackageList& packages = depotInfo->Packages();
 			const PackageInfoRef& packageInfoRef =
 				packages.ItemAtFast(packageIndex);
 

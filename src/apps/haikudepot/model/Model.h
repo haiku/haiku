@@ -77,9 +77,7 @@ public:
 
 			bool				AddListener(const ModelListenerRef& listener);
 
-			// !Returns new PackageInfoList from current parameters
-			PackageList			CreatePackageList() const;
-
+			PackageInfoRef		PackageForName(const BString& name);
 			bool				MatchesFilter(
 									const PackageInfoRef& package) const;
 

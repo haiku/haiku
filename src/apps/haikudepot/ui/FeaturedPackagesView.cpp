@@ -199,6 +199,10 @@ public:
 
 	void Clear()
 	{
+		for (std::vector<PackageInfoRef>::iterator it = fPackages.begin();
+				it != fPackages.end(); it++) {
+			(*it)->RemoveListener(fPackageListener);
+		}
 		fPackages.clear();
 		fSelectedIndex = -1;
 		Invalidate();
@@ -254,6 +258,7 @@ public:
 			fPackages.insert(itInsertionPt, package);
 			Invalidate(_RectOfIndex(insertionIndex)
 				| _RectOfIndex(fPackages.size() - 1));
+			package->AddListener(fPackageListener);
 		}
 	}
 
@@ -266,6 +271,7 @@ public:
 				fSelectedIndex = -1;
 			if (fSelectedIndex > index)
 				fSelectedIndex--;
+			fPackages[index]->RemoveListener(fPackageListener);
 			fPackages.erase(fPackages.begin() + index);
 			if (fPackages.empty())
 				Invalidate();
@@ -302,9 +308,12 @@ public:
 
 	int32 _IndexOfPackage(PackageInfoRef package) const
 	{
-		if (package.Get() != NULL)
-			return _IndexOfName(package->Name());
-		return -1;
+		std::vector<PackageInfoRef>::const_iterator it
+			= std::lower_bound(fPackages.begin(), fPackages.end(), package,
+				&_IsPackageBefore);
+
+		return (it == fPackages.end() || (*it)->Name() != package->Name())
+			? -1 : it - fPackages.begin();
 	}
 
 
