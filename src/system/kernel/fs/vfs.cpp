@@ -2249,7 +2249,7 @@ vnode_path_to_vnode(struct vnode* vnode, char* path, bool traverseLeafLink,
 				bufferSize--;
 				status = FS_CALL(nextVnode, read_symlink, buffer, &bufferSize);
 				// null-terminate
-				if (status >= 0)
+				if (status >= 0 && bufferSize < B_PATH_NAME_LENGTH)
 					buffer[bufferSize] = '\0';
 			} else
 				status = B_BAD_VALUE;
@@ -2953,7 +2953,8 @@ normalize_path(char* path, size_t pathSize, bool traverseLink, bool kernel)
 			error = FS_CALL(fileVnode, read_symlink, path, &bufferSize);
 			if (error != B_OK)
 				return error;
-			path[bufferSize] = '\0';
+			if (bufferSize < B_PATH_NAME_LENGTH)
+				path[bufferSize] = '\0';
 		} else
 			return B_BAD_VALUE;
 	}
@@ -9404,17 +9405,19 @@ _user_read_link(int fd, const char* userPath, char* userBuffer,
 			bufferSize = B_PATH_NAME_LENGTH;
 	}
 
+	size_t newBufferSize = bufferSize;
 	status_t status = common_read_link(fd, userPath ? path : NULL, buffer,
-		&bufferSize, false);
+		&newBufferSize, false);
 
 	// we also update the bufferSize in case of errors
 	// (the real length will be returned in case of B_BUFFER_OVERFLOW)
-	if (user_memcpy(userBufferSize, &bufferSize, sizeof(size_t)) != B_OK)
+	if (user_memcpy(userBufferSize, &newBufferSize, sizeof(size_t)) != B_OK)
 		return B_BAD_ADDRESS;
 
 	if (status != B_OK)
 		return status;
 
+	bufferSize = min_c(newBufferSize, bufferSize);
 	if (user_memcpy(userBuffer, buffer, bufferSize) != B_OK)
 		return B_BAD_ADDRESS;
 
