@@ -354,7 +354,6 @@ static struct ieee80211_node *
 static uint8_t	iwm_rate_from_ucode_rate(uint32_t);
 static int	iwm_rate2ridx(struct iwm_softc *, uint8_t);
 static void	iwm_setrates(struct iwm_softc *, struct iwm_node *, int);
-static int	iwm_media_change(struct ifnet *);
 static int	iwm_newstate(struct ieee80211vap *, enum ieee80211_state, int);
 static void	iwm_endscan_cb(void *, int);
 static int	iwm_send_bt_init_conf(struct iwm_softc *);
@@ -4418,27 +4417,6 @@ iwm_setrates(struct iwm_softc *sc, struct iwm_node *in, int rix)
 	}
 }
 
-static int
-iwm_media_change(struct ifnet *ifp)
-{
-	struct ieee80211vap *vap = ifp->if_softc;
-	struct ieee80211com *ic = vap->iv_ic;
-	struct iwm_softc *sc = ic->ic_softc;
-	int error;
-
-	error = ieee80211_media_change(ifp);
-	if (error != ENETRESET)
-		return error;
-
-	IWM_LOCK(sc);
-	if (ic->ic_nrunning > 0) {
-		iwm_stop(sc);
-		iwm_init(sc);
-	}
-	IWM_UNLOCK(sc);
-	return error;
-}
-
 static void
 iwm_bring_down_firmware(struct iwm_softc *sc, struct ieee80211vap *vap)
 {
@@ -5067,18 +5045,46 @@ iwm_parent(struct ieee80211com *ic)
 {
 	struct iwm_softc *sc = ic->ic_softc;
 	int startall = 0;
+	int rfkill = 0;
 
 	IWM_LOCK(sc);
 	if (ic->ic_nrunning > 0) {
 		if (!(sc->sc_flags & IWM_FLAG_HW_INITED)) {
 			iwm_init(sc);
-			startall = 1;
+			rfkill = iwm_check_rfkill(sc);
+			if (!rfkill)
+				startall = 1;
 		}
 	} else if (sc->sc_flags & IWM_FLAG_HW_INITED)
 		iwm_stop(sc);
 	IWM_UNLOCK(sc);
 	if (startall)
 		ieee80211_start_all(ic);
+	else if (rfkill)
+		taskqueue_enqueue(sc->sc_tq, &sc->sc_rftoggle_task);
+}
+
+static void
+iwm_rftoggle_task(void *arg, int npending __unused)
+{
+	struct iwm_softc *sc = arg;
+	struct ieee80211com *ic = &sc->sc_ic;
+	int rfkill;
+
+	IWM_LOCK(sc);
+	rfkill = iwm_check_rfkill(sc);
+	IWM_UNLOCK(sc);
+	if (rfkill) {
+		device_printf(sc->sc_dev,
+		    "%s: rfkill switch, disabling interface\n", __func__);
+		ieee80211_suspend_all(ic);
+		ieee80211_notify_radio(ic, 0);
+	} else {
+		device_printf(sc->sc_dev,
+		    "%s: rfkill cleared, re-enabling interface\n", __func__);
+		ieee80211_resume_all(ic);
+		ieee80211_notify_radio(ic, 1);
+	}
 }
 
 /*
@@ -5822,12 +5828,7 @@ iwm_intr(void *arg)
 
 	if (r1 & IWM_CSR_INT_BIT_RF_KILL) {
 		handled |= IWM_CSR_INT_BIT_RF_KILL;
-		if (iwm_check_rfkill(sc)) {
-			device_printf(sc->sc_dev,
-			    "%s: rfkill switch, disabling interface\n",
-			    __func__);
-			iwm_stop(sc);
-		}
+		taskqueue_enqueue(sc->sc_tq, &sc->sc_rftoggle_task);
 	}
 
 	/*
@@ -5885,6 +5886,7 @@ iwm_intr(void *arg)
 #define	PCI_PRODUCT_INTEL_WL_8265_1	0x24fd
 #define	PCI_PRODUCT_INTEL_WL_9560_1	0x9df0
 #define	PCI_PRODUCT_INTEL_WL_9560_2	0xa370
+#define	PCI_PRODUCT_INTEL_WL_9560_3	0x31dc
 #define	PCI_PRODUCT_INTEL_WL_9260_1	0x2526
 
 static const struct iwm_devices {
@@ -5905,6 +5907,7 @@ static const struct iwm_devices {
 	{ PCI_PRODUCT_INTEL_WL_8265_1, &iwm8265_cfg },
 	{ PCI_PRODUCT_INTEL_WL_9560_1, &iwm9560_cfg },
 	{ PCI_PRODUCT_INTEL_WL_9560_2, &iwm9560_cfg },
+	{ PCI_PRODUCT_INTEL_WL_9560_3, &iwm9560_cfg },
 	{ PCI_PRODUCT_INTEL_WL_9260_1, &iwm9260_cfg },
 };
 
@@ -6032,6 +6035,16 @@ iwm_attach(device_t dev)
 	callout_init_mtx(&sc->sc_watchdog_to, &sc->sc_mtx, 0);
 	callout_init_mtx(&sc->sc_led_blink_to, &sc->sc_mtx, 0);
 	TASK_INIT(&sc->sc_es_task, 0, iwm_endscan_cb, sc);
+	TASK_INIT(&sc->sc_rftoggle_task, 0, iwm_rftoggle_task, sc);
+
+	sc->sc_tq = taskqueue_create("iwm_taskq", M_WAITOK,
+	    taskqueue_thread_enqueue, &sc->sc_tq);
+	error = taskqueue_start_threads(&sc->sc_tq, 1, 0, "iwm_taskq");
+	if (error != 0) {
+		device_printf(dev, "can't start taskq thread, error %d\n",
+		    error);
+		goto fail;
+	}
 
 	error = iwm_dev_check(dev);
 	if (error != 0)
@@ -6409,8 +6422,8 @@ iwm_vap_create(struct ieee80211com *ic, const char name[IFNAMSIZ], int unit,
 
 	ieee80211_ratectl_init(vap);
 	/* Complete setup. */
-	ieee80211_vap_attach(vap, iwm_media_change, ieee80211_media_status,
-	    mac);
+	ieee80211_vap_attach(vap, ieee80211_media_change,
+	    ieee80211_media_status, mac);
 	ic->ic_opmode = opmode;
 
 	return vap;
@@ -6600,6 +6613,8 @@ iwm_detach_local(struct iwm_softc *sc, int do_net80211)
 		ieee80211_draintask(&sc->sc_ic, &sc->sc_es_task);
 	}
 	iwm_stop_device(sc);
+	taskqueue_drain_all(sc->sc_tq);
+	taskqueue_free(sc->sc_tq);
 	if (do_net80211) {
 		IWM_LOCK(sc);
 		iwm_xmit_queue_drain(sc);
