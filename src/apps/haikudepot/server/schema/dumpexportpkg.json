@@ -17,6 +17,9 @@
     "derivedRating": {
       "type": "number"
     },
+    "hasChangelog": {
+      "type": "boolean"
+    },
     "pkgScreenshots": {
       "type": "array",
       "items": {

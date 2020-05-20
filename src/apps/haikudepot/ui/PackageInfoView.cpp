@@ -1,6 +1,6 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2018-2019, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -52,6 +52,14 @@
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "PackageInfoView"
+
+
+enum {
+	TAB_ABOUT		= 0,
+	TAB_RATINGS		= 1,
+	TAB_CHANGELOG	= 2,
+	TAB_CONTENTS	= 3
+};
 
 
 static const float kContentTint = (B_NO_TINT + B_LIGHTEN_1_TINT) / 2.0f;
@@ -1222,12 +1230,12 @@ public:
 		AddTab(fChangelogView);
 		AddTab(fContentsView);
 
-		TabAt(0)->SetLabel(B_TRANSLATE("About"));
-		TabAt(1)->SetLabel(B_TRANSLATE("Ratings"));
-		TabAt(2)->SetLabel(B_TRANSLATE("Changelog"));
-		TabAt(3)->SetLabel(B_TRANSLATE("Contents"));
+		TabAt(TAB_ABOUT)->SetLabel(B_TRANSLATE("About"));
+		TabAt(TAB_RATINGS)->SetLabel(B_TRANSLATE("Ratings"));
+		TabAt(TAB_CHANGELOG)->SetLabel(B_TRANSLATE("Changelog"));
+		TabAt(TAB_CONTENTS)->SetLabel(B_TRANSLATE("Contents"));
 
-		Select(0);
+		Select(TAB_ABOUT);
 	}
 
 	virtual ~PagesView()
@@ -1238,7 +1246,15 @@ public:
 	void SetPackage(const PackageInfoRef& package, bool switchToDefaultTab)
 	{
 		if (switchToDefaultTab)
-			Select(0);
+			Select(TAB_ABOUT);
+
+		TabAt(TAB_CHANGELOG)->SetEnabled(
+			package.Get() != NULL && package->HasChangelog());
+		TabAt(TAB_CONTENTS)->SetEnabled(
+			package.Get() != NULL && package->State() == ACTIVATED);
+		Invalidate(TabFrame(TAB_CHANGELOG));
+		Invalidate(TabFrame(TAB_CONTENTS));
+
 		fAboutView->SetPackage(*package.Get());
 		fUserRatingsView->SetPackage(*package.Get());
 		fChangelogView->SetPackage(*package.Get());

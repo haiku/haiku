@@ -1,5 +1,6 @@
 /*
  * Copyright 2015, TigerKid001.
+ * Copyright 2020, Andrew Lindesay <apl@lindesay.co.nz>
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -293,9 +294,6 @@ PackageContentsView::SetPackage(const PackageInfoRef& package)
 		return;
 	}
 
-//	printf("PackageContentsView::SetPackage(%s)\n",
-//		package.Get() != NULL ? package->Name().String() : "NULL");
-
 	Clear();
 
 	{
@@ -303,7 +301,12 @@ PackageContentsView::SetPackage(const PackageInfoRef& package)
 		fPackage = package;
 		fLastPackageState = package.Get() != NULL ? package->State() : NONE;
 	}
-	release_sem_etc(fContentPopulatorSem, 1, 0);
+
+	// if the package is not installed then there is no point in attempting to
+	// populate data for it.
+
+	if (package.Get() != NULL && package->State() == ACTIVATED)
+		release_sem_etc(fContentPopulatorSem, 1, 0);
 }
 
 
@@ -349,7 +352,7 @@ PackageContentsView::_ContentPopulatorThread(void* arg)
 		}
 
 		if (package.Get() != NULL) {
-			if (!view->_PopuplatePackageContens(*package.Get())) {
+			if (!view->_PopulatePackageContents(*package.Get())) {
 				if (view->LockLooperWithTimeout(1000000) == B_OK) {
 					view->fContentListView->AddItem(
 						new BStringItem(B_TRANSLATE("<Package contents not "
@@ -365,7 +368,7 @@ PackageContentsView::_ContentPopulatorThread(void* arg)
 
 
 bool
-PackageContentsView::_PopuplatePackageContens(const PackageInfo& package)
+PackageContentsView::_PopulatePackageContents(const PackageInfo& package)
 {
 	BPath packagePath;
 
@@ -386,7 +389,7 @@ PackageContentsView::_PopuplatePackageContens(const PackageInfo& package)
 				return false;
 			}
 		} else {
-			printf("PackageContentsView::_PopuplatePackageContens(): "
+			printf("PackageContentsView::_PopulatePackageContents(): "
 				"unknown install location");
 			return false;
 		}
@@ -400,7 +403,7 @@ PackageContentsView::_PopuplatePackageContens(const PackageInfo& package)
 
 	status_t status = reader.Init(packagePath.Path());
 	if (status != B_OK) {
-		printf("PackageContentsView::_PopuplatePackageContens(): "
+		printf("PackageContentsView::_PopulatePackageContents(): "
 			"failed to init BPackageReader(%s): %s\n",
 			packagePath.Path(), strerror(status));
 		return false;
@@ -411,7 +414,7 @@ PackageContentsView::_PopuplatePackageContens(const PackageInfo& package)
 		fPackageLock, fPackage);
 	status = reader.ParseContent(&contentHandler);
 	if (status != B_OK) {
-		printf("PackageContentsView::_PopuplatePackageContens(): "
+		printf("PackageContentsView::_PopulatePackageContents(): "
 			"failed parse package contents: %s\n", strerror(status));
 		// NOTE: Do not return false, since it taken to mean this
 		// is a remote package, but is it not, we simply want to stop
