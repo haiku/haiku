@@ -136,13 +136,13 @@ DeskbarPulseView::MessageReceived(BMessage *message)
 		{
 			message->AddMessenger("settingsListener", this);
 			// Spawn the app and open the window there, not in DeskBar process.
-			be_roster->Launch("applicaiton/x-vnd.Haiku-Pulse", message);
+			be_roster->Launch(APP_SIGNATURE, message);
 			break;
 		}
 		case PV_ABOUT:
 		{
 			BMessage aboutRequest(B_ABOUT_REQUESTED);
-			be_roster->Launch("applicaiton/x-vnd.Haiku-Pulse", &aboutRequest);
+			be_roster->Launch(APP_SIGNATURE, &aboutRequest);
 			break;
 		}
 		case PV_QUIT:
