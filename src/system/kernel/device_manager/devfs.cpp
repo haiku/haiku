@@ -1185,10 +1185,11 @@ devfs_read_link(fs_volume* _volume, fs_vnode* _link, char* buffer,
 	if (!S_ISLNK(link->stream.type))
 		return B_BAD_VALUE;
 
-	if (link->stream.u.symlink.length < *_bufferSize)
-		*_bufferSize = link->stream.u.symlink.length;
+	memcpy(buffer, link->stream.u.symlink.path, min_c(*_bufferSize,
+		link->stream.u.symlink.length));
 
-	memcpy(buffer, link->stream.u.symlink.path, *_bufferSize);
+	*_bufferSize = link->stream.u.symlink.length;
+
 	return B_OK;
 }
 
