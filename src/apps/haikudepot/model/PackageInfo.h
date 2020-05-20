@@ -1,6 +1,6 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2016-2019, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef PACKAGE_INFO_H
@@ -286,6 +286,10 @@ public:
 			void				SetIcon(const BitmapRef& icon);
 			const BitmapRef&	Icon() const
 									{ return fIcon; }
+
+			void				SetHasChangelog(bool value);
+			bool				HasChangelog() const
+									{ return fHasChangelog; }
 			void				SetChangelog(const BString& changelog);
 			const BString&		Changelog() const
 									{ return fChangelog; }
@@ -380,6 +384,7 @@ private:
 			PublisherInfo		fPublisher;
 			BString				fShortDescription;
 			BString				fFullDescription;
+			bool				fHasChangelog;
 			BString				fChangelog;
 			CategoryList		fCategories;
 			UserRatingList		fUserRatings;

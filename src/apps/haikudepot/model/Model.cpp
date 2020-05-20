@@ -605,7 +605,7 @@ Model::PopulatePackage(const PackageInfoRef& package, uint32 flags)
 			fPopulatedPackages.Add(package);
 	}
 
-	if ((flags & POPULATE_CHANGELOG) != 0) {
+	if ((flags & POPULATE_CHANGELOG) != 0 && package->HasChangelog()) {
 		_PopulatePackageChangelog(package);
 	}
 

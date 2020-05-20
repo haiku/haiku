@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -158,6 +158,8 @@ PackageFillingPkgListener::ConsumePackage(const PackageInfoRef& package,
 		summary.averageRating = pkg->DerivedRating();
 
 	package->SetRatingSummary(summary);
+
+	package->SetHasChangelog(pkg->HasChangelog());
 
 	if (!pkg->ProminenceOrderingIsNull())
 		package->SetProminence(pkg->ProminenceOrdering());
