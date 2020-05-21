@@ -91,8 +91,11 @@ UnpackingLeafNode::ModifiedTime() const
 off_t
 UnpackingLeafNode::FileSize() const
 {
-	if (PackageLeafNode* packageNode = _ActivePackageNode())
+	if (PackageLeafNode* packageNode = _ActivePackageNode()) {
+		if (S_ISLNK(packageNode->Mode()))
+			return strlen(packageNode->SymlinkPath());
 		return packageNode->FileSize();
+	}
 	return 0;
 }
 
