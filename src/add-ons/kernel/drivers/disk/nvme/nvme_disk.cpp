@@ -753,16 +753,16 @@ nvme_disk_io(void* cookie, io_request* request)
 
 		nvme_request.lba_count = 0;
 		for (int i = 0; i < nvme_request.iovec_count; i++) {
-			int32 vec_lba_count = (nvme_request.iovecs[i].size / block_size);
-			if (nvme_request.lba_count > 0
-					&& (nvme_request.lba_count + vec_lba_count) > max_io_blocks) {
+			int32 new_lba_count = nvme_request.lba_count
+				+ (nvme_request.iovecs[i].size / block_size);
+			if (nvme_request.lba_count > 0 && new_lba_count > max_io_blocks) {
 				// We already have a nonzero length, and adding this vec would
 				// make us go over (or we already are over.) Stop adding.
 				nvme_request.iovec_count = i;
 				break;
 			}
 
-			nvme_request.lba_count += vec_lba_count;
+			nvme_request.lba_count = new_lba_count;
 		}
 
 		status = do_nvme_io_request(handle->info, &nvme_request);
