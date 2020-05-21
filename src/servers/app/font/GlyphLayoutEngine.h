@@ -82,7 +82,7 @@ public:
 	static	FontCacheEntry*		FontCacheEntryFor(const ServerFont& font,
 									bool forceVector,
 									const FontCacheEntry* disallowedEntry,
-									const char* utf8String, int32 length,
+									uint32 glyphCode,
 									FontCacheReference& cacheReference,
 									bool needsWriteLock);
 
@@ -101,7 +101,7 @@ private:
 									FontCacheReference& cacheReference,
 									FontCacheEntry* entry,
 									const ServerFont& font, bool needsVector,
-									const char* utf8String, int32 length,
+									uint32 glyphCode,
 									FontCacheReference& fallbackCacheReference,
 									FontCacheEntry*& fallbackEntry);
 
@@ -132,7 +132,7 @@ GlyphLayoutEngine::IsWhiteSpace(uint32 charCode)
 
 inline FontCacheEntry*
 GlyphLayoutEngine::FontCacheEntryFor(const ServerFont& font, bool forceVector,
-	const FontCacheEntry* disallowedEntry, const char* utf8String, int32 length,
+	const FontCacheEntry* disallowedEntry, uint32 glyphCode,
 	FontCacheReference& cacheReference, bool needsWriteLock)
 {
 	ASSERT(cacheReference.Entry() == NULL);
@@ -192,8 +192,8 @@ GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 	}
 
 	if (entry == NULL) {
-		entry = FontCacheEntryFor(font, consumer.NeedsVector(), NULL,
-			utf8String, length, cacheReference, false);
+		entry = FontCacheEntryFor(font, consumer.NeedsVector(), NULL, 0,
+			cacheReference, false);
 
 		if (entry == NULL)
 			return false;
@@ -240,7 +240,7 @@ GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 			// we only have to do this switch once for the whole string.
 			if (!writeLocked) {
 				writeLocked = _WriteLockAndAcquireFallbackEntry(cacheReference,
-					entry, font, consumer.NeedsVector(), utf8String, length,
+					entry, font, consumer.NeedsVector(), charCode,
 					fallbackCacheReference, fallbackEntry);
 			}
 
@@ -301,8 +301,8 @@ GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 inline bool
 GlyphLayoutEngine::_WriteLockAndAcquireFallbackEntry(
 	FontCacheReference& cacheReference, FontCacheEntry* entry,
-	const ServerFont& font, bool forceVector, const char* utf8String,
-	int32 length, FontCacheReference& fallbackCacheReference,
+	const ServerFont& font, bool forceVector, uint32 charCode,
+	FontCacheReference& fallbackCacheReference,
 	FontCacheEntry*& fallbackEntry)
 {
 	// We need a fallback font, since potentially, we have to obtain missing
@@ -331,33 +331,39 @@ GlyphLayoutEngine::_WriteLockAndAcquireFallbackEntry(
 	};
 
 	int i = 0;
+	fallbackEntry = NULL;
 
 	// Try to get the glyph from the fallback fonts
-	while (fallbacks[i] != NULL) {
+	for (i = 0; fallbacks[i] != NULL; i++) {
 		if (gFontManager->Lock()) {
-			FontStyle* fallbackStyle = gFontManager->GetStyle(
-				fallbacks[i], font.Style());
+			FontStyle* fallbackStyle = gFontManager->GetStyle(fallbacks[i],
+				font.Style());
 
-			if (fallbackStyle != NULL) {
-				ServerFont fallbackFont(*fallbackStyle, font.Size());
+			if (fallbackStyle == NULL) {
 				gFontManager->Unlock();
+				continue;
+			}
 
-				// Force the write-lock on the fallback entry, since we
-				// don't transfer or copy GlyphCache objects from one cache
-				// to the other, but create new glyphs which are stored in
-				// "entry" in any case, which requires the write cache for
-				// sure (used FontEngine of fallbackEntry).
-				fallbackEntry = FontCacheEntryFor(fallbackFont, forceVector,
-					entry, utf8String, length, fallbackCacheReference, true);
+			ServerFont fallbackFont(*fallbackStyle, font.Size());
+			gFontManager->Unlock();
 
-				if (fallbackEntry != NULL)
-					break;
-			} else
-				gFontManager->Unlock();
+			// Force the write-lock on the fallback entry, since we
+			// don't transfer or copy GlyphCache objects from one cache
+			// to the other, but create new glyphs which are stored in
+			// "entry" in any case, which requires the write cache for
+			// sure (used FontEngine of fallbackEntry).
+			FontCacheEntry* candidateFallbackEntry = FontCacheEntryFor(
+				fallbackFont, forceVector, entry, charCode,
+				fallbackCacheReference, true);
+
+			// Stop when we find a font that indeed has the glyph we need.
+			if (candidateFallbackEntry != NULL) {
+				fallbackEntry = candidateFallbackEntry;
+				break;
+			}
 		}
-
-		i++;
 	}
+
 	// NOTE: We don't care if fallbackEntry is still NULL, fetching
 	// alternate glyphs will simply not work.
 
