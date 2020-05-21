@@ -11,7 +11,7 @@ RUN dnf install -y git nasm texinfo flex bison wget uboot-tools \
 	glibc-headers glibc-devel.x86_64 glibc-devel.i686
 
 # GCC requirements
-RUN dnf install -y python
+RUN dnf install -y python3
 # zlib requirements
 RUN dnf install -y cmake
 # ICU requirements

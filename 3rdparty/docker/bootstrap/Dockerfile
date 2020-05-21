@@ -11,7 +11,7 @@ RUN apt-get install -y git nasm autoconf automake autopoint texinfo \
 	u-boot-tools util-linux device-tree-compiler bc
 
 # GCC requirements
-RUN apt-get install -y python
+RUN apt-get install -y python3
 # zlib requirements
 RUN apt-get install -y cmake
 # ICU requirements

@@ -13,10 +13,10 @@ clean:
 	${ENGINE} ps -a -q --filter=ancestor=docker.io/haiku/bootstrap | xargs -I {} ${ENGINE} rm {}
 	${ENGINE} volume rm bootstrap_work
 prep:
-	${ENGINE} run -v bootstrap_work:/work ${EXTRA} docker.io/haiku/bootstrap prep
+	${ENGINE} run -v bootstrap_work:/work:exec ${EXTRA} docker.io/haiku/bootstrap prep
 crosstools:
-	${ENGINE} run -e TARGET_ARCH=$(TARGET_ARCH) -v bootstrap_work:/work ${EXTRA} docker.io/haiku/bootstrap crosstools
+	${ENGINE} run -e TARGET_ARCH=$(TARGET_ARCH) -v bootstrap_work:/work:exec ${EXTRA} docker.io/haiku/bootstrap crosstools
 bootstrap:
-	${ENGINE} run -e TARGET_ARCH=$(TARGET_ARCH) -v bootstrap_work:/work ${EXTRA} docker.io/haiku/bootstrap bootstrap
+	${ENGINE} run -e TARGET_ARCH=$(TARGET_ARCH) -v bootstrap_work:/work:exec ${EXTRA} docker.io/haiku/bootstrap bootstrap
 enter:
-	${ENGINE} run -it -e TARGET_ARCH=$(TARGET_ARCH) -v bootstrap_work:/work ${EXTRA} docker.io/haiku/bootstrap /bin/bash -l
+	${ENGINE} run -it -e TARGET_ARCH=$(TARGET_ARCH) -v bootstrap_work:/work:exec ${EXTRA} docker.io/haiku/bootstrap /bin/bash -l
