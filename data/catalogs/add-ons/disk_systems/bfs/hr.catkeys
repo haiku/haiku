@@ -1,0 +1,5 @@
+1	croatian	x-vnd.Haiku-BFSAddOn	2325007068
+Name:	BFS_Initialize_Parameter		Ime:
+8192 (Mostly large files)	BFS_Initialize_Parameter		8192 (Uglavnom velike datoteke)
+2048 (Recommended)	BFS_Initialize_Parameter		2048 (Preporučeno)
+1024 (Mostly small files)	BFS_Initialize_Parameter		1024 (Uglavnom male datoteke)

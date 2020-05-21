@@ -1,13 +1,26 @@
-1	polish	x-vnd.Haiku-DeskCalc	2253775996
+1	polish	x-vnd.Haiku-DeskCalc	3178768763
 cos	CalcView		cos
 3	CalcView		3
 (	CalcView		(
+BS	CalcView		BS
 1	CalcView		1
 acos	CalcView		acos
+E	CalcView		E
+/	CalcView		/
+C	CalcView		C
+C	CalcView	Key label, 'C' means clear	C
 8	CalcView		8
+ceil	CalcView		ceil
+-	CalcView		-
+cbrt	CalcView		cbrt
+BS	CalcView	Key label, 'BS' means backspace	BS
+floor	CalcView		floor
+sinh	CalcView		sinh
 6	CalcView		6
 sin	CalcView		sin
+tanh	CalcView		tanh
 +	CalcView		+
+cosh	CalcView		cosh
 ln	CalcView		ln
 Compact	CalcView		Minimalny
 Calculating	CalcView		Obliczanie
@@ -16,6 +29,7 @@ Enable Num Lock on startup	CalcView		Włącz Num Lock przy uruchamianiu
 Scientific	CalcView		Naukowy
 )	CalcView		)
 ^	CalcView		^
+sqrt	CalcView		sqrt
 log	CalcView		log
 asin	CalcView		asin
 =	CalcView		=

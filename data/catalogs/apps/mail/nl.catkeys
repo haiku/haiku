@@ -71,7 +71,7 @@ Off	Mail		Uit
 Set to %s	Mail		Instellen als  %s
 Signature:	Mail		Onderschrift:
 Forward without attachments	Mail		Doorsturen zonder bijlagen
-queries	B_USER_DIRECTORY/mail/queries		queries
+queries	B_USER_DIRECTORY/mail/queries		zoekopdrachten
 View	Mail		Bekijken
 Signatures	Mail		Onderschriften
 On	Mail		Aan
@@ -160,7 +160,7 @@ An error occurred trying to save this signature.	Mail		Er is een fout ontstaan b
 Beginner	Mail		Beginner
 Send message	Mail		Bericht versturen
 Delete	Mail		Verwijderen
-Put your favorite e-mail queries and query templates in this folder.	Mail		Plaats je favoriete e-mailqueries en querysjablonen in deze map.
+Put your favorite e-mail queries and query templates in this folder.	Mail		Plaats je favoriete e-mailqueries en zoekopdrachtsjablonen in deze map.
 Spam	Mail		Spam
 Couldn't open this signature. Sorry.	Mail		Kon dit onderschrift niet openen. Sorry.
 Revert	Mail		Herstellen

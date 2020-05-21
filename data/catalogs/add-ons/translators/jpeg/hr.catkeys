@@ -1,0 +1,17 @@
+1	croatian	x-vnd.Haiku-JPEGTranslator	4277694269
+Read	JPEGTranslator		Čitaj
+Show warning messages	JPEGTranslator		Pokaži poruke upozorenja
+Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Koristi CMYK sa 0 za 100% pokrivenosti tintom
+JPEG Library Error: %s\n	be_jerror		Greška JPEG biblioteke: %s\n
+None	JPEGTranslator		Nijedan
+About	JPEGTranslator		O programu
+Version %d.%d.%d	JPEGTranslator		Verzija %d.%d.%d
+Write black-and-white images as RGB24	JPEGTranslator		Piši crno-bijele slike kao RGB24
+Make file smaller (sligthtly worse quality)	JPEGTranslator		Napravite datoteku manjom ( neznatno lošija kvaliteta)
+High	JPEGTranslator		Visoko
+Read greyscale images as RGB32	JPEGTranslator		Čitaj sve slike kao RGB32
+Output quality	JPEGTranslator		Izlazna kvaliteta
+Low	JPEGTranslator		Nisko
+Write	JPEGTranslator		Piši
+JPEG Library Warning: %s\n	be_jerror		Upozorenje JPEG biblioteke: %s\n
+JPEG images	JPEGTranslator		JPEG slike

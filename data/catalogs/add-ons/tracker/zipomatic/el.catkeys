@@ -2,7 +2,7 @@
 Drop files here.	file:ZipOMaticWindow.cpp		Αφήστε τα αρχεία εδώ.
 Filename: %s	file:ZipOMaticWindow.cpp		Όνομα αρχείου: %s
 Do you want to stop them?	file:ZipOMatic.cpp		Θέλετε να τα σταματήσετε;
-Error creating archive	file:ZipOMaticWindow.cpp		Σφάλμα κατά τη δημιουργία συμπιεσμένου αρχείου
+Error creating archive	file:ZipOMaticWindow.cpp		Προέκυψε σφάλμα κατά την δημιουργία συμπιεσμένου αρχείου
 Stop them	file:ZipOMatic.cpp		Σταματησέ τα
 Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Είστε σίγουρος ότι θέλετε να σταματήσει η δημιουργία αυτού του αρχείου;
 Preparing to archive	file:ZipperThread.cpp		Προετοιμάζεται το συμπιεσμένο αρχείο

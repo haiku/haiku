@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Installer	2281950717
+1	hungarian	x-vnd.Haiku-Installer	918718200
 Performing installation.	InstallProgress		A telepítés folyamatban…
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Válassza ki a felugró menüből a lemezt melyről telepíteni szeretne, majd kattintson a \"Mehet\" gombra.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		A telepítőablak bezárása előtt kérlek zárd be a Lemezkezelő ablakot!
@@ -33,7 +33,6 @@ Additional disk space required: 0.0 KiB	InstallerWindow		0.0 KiB hely szüksége
 This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Ez egy béta szoftver. Megvan az esélye annak, hogy elvesznek fontos adatok. Gyakran készítsen biztonsági mentéseket! Ön figyelmeztetve volt.\n\n\n
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3) A Haiku első indításakor olvassa el az \"Köszöntő\"-t és a \"Felhasználói útmutató\"-t. Ezek megtalálhatóak az Asztalon és a WebPositive könyvjelzői között.\n\n
 ???	InstallerWindow	Unknown currently copied item	???
-Install anyway	InstallProgress		Telepítés folytatása
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Válaszd ki a lemezt melyről telepíteni szeretnéd és válasz ki azt, amelyre telepíted. Ha végeztél, kattints a \"Mehet\" gombra.
 Hide optional packages	InstallerWindow		Választható csomagok elrejtése
 ???	InstallerWindow	Unknown partition name	???
@@ -57,7 +56,6 @@ Collecting copy information.	InstallProgress		Másolás információinak összeg
 Show optional packages	InstallerWindow		Választható csomagok megjelenítése
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		A céllemezen nincs elég hely a telepítéshez. Válassz egy másik lemezt vagy csak a szükséges rendszerelemeket telepítsd!
 Installation canceled.	InstallProgress		A telepítés félbeszakadt.
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		A cél kötet nem üres. Biztosan telepíteni szeretnéd?\n\nMegjegyzés: a 'rendszer' mappa teljes egészében átmásolásra kerül a forrás lemezről, de a beállítások mappát megtartja, minden más mappa össze lesz fésülve. Azon fájlok és hivatkozások, melyek egyaránt léteznek a forrás és a cél lemezen is, azok esetében a cél lemezen lévő ki lesz cserélve.
 OK	InstallerApp		Rendben
 Are you sure you want to abort the installation?	InstallerWindow		Biztos meg kívánod szakítani a telepítést?
 Stop	InstallerWindow		Leállítás

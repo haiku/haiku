@@ -1,0 +1,4 @@
+1	croatian	x-vnd.Haiku-libpackage	843855018
+Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		Neuspjeh u dobivanju konfiguracije za repozitorij  \"%s\". Preskačem. 
+Refreshing repository \"%s\" failed	PackageManagerKit		Osvježavanje repozitorija \"%s\" nije uspjelo
+Failed to get repository names	PackageManagerKit		Neuspjelo dobavljanje imena repozitorija

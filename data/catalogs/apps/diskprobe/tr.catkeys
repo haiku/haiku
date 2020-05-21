@@ -121,7 +121,7 @@ Image	TypeEditors	This is the type of view	Görsel
 Save changes before closing?	ProbeView		Kapatmadan önce değişiklikler kaydedilsin mi?
 PNG format	TypeEditors		PNG biçimi
 Number	TypeEditors	This is the type of editor	Sayı
-Edit	ProbeView		Düzenle
+Edit	ProbeView		Düzen
 String editor	TypeEditors		Dizi düzenleyicisi
 Boolean editor	TypeEditors		Boolean düzenleyicisi
 Device offset: 	ProbeView		Aygıt ofseti: 

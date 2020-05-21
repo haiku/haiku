@@ -1,7 +1,7 @@
 1	greek, modern (1453-)	x-vnd.Haiku-MatchHeader	1946584206
 Delete message	ConfigView		Διαγραφή μηνύματος
 Match \"%attribute\" against \"%regex\"	RuleFilter		Αναζήτηση στο \"%attribute\" με βάση το \"%regex\"
-Match header	RuleFilter		Ταυτοποίηση της κεφαλίδας
+Match header	RuleFilter		Ταίριασμα κεφαλίδας
 Set flags to	ConfigView		Θέση σημαιών σε
 Header field (e.g. Subject, From, …)	ConfigView		Πεδίο επικεφαλίδας (π.χ. Θέμα, Από, ...)
 <Choose account>	ConfigView		<Επιλέξτε λογαριασμό>

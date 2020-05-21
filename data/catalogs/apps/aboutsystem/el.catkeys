@@ -1,8 +1,9 @@
-1	greek, modern (1453-)	x-vnd.Haiku-About	1839294148
+1	greek, modern (1453-)	x-vnd.Haiku-About	511528774
 Revision	AboutView		Αναθεώρηση
 The Haikuware team and their bounty program\n	AboutView		Η ομάδα της Haikuware και το πρόγραμμα επιδοτήσεων της\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Πνευματική ιδιοκτησία © 1999-2007 Michael C. Ring. Με επιφύλαξη παντός δικαιώματος.
 %.2f GHz	AboutView		%.2f GHz
+Copyright © 2001-%d The Haiku project. 	AboutView		Πνευματική ιδιοκτησία © 2001-%d The Haiku project. 
 \n\nSpecial thanks to:\n	AboutView		\n\nΙδιαίτερες ευχαριστίες στους:\n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (και ο πυρήνας του, NewOS)\n
 Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Πνευματική ιδιοκτησία © 1999-2000 Y.Takagi. Με επιφύλαξη παντός δικαιώματος.
@@ -27,7 +28,7 @@ Unknown	AboutView		Άγνωστο
 Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. και η ομάδα προγραμματιστών, για να έχουν δημιουργήσει το BeOs!\n\n
 Copyright © 2002-2014 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.	AboutView		Πνευματική ιδιοκτησία © 2002-2014 Industrial Light & Magic, τμήμα της Lucas Digital Ltd. LLC.
 Licenses: 	AboutView		Άδειες χρήσης: 
-The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Τα πνευματικά δικαιώματα του κώδικα του Haiku είναι ιδιοκτησία της Haiku, Inc. ή των αντίστοιχων δημιουργών που έχουν ρητά αναφερθεί στον πηγαίο κώδικα. Το Haiku® και το HAIKU logo® είναι εγγεγραμμένα σήματα κατατεθέν της Haiku, Inc.\n\n
+The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Τα πνευματικά δικαιώματα του κώδικα του Haiku είναι ιδιοκτησία της Haiku, Inc. ή των αντίστοιχων δημιουργών που έχουν αναφερθεί ρητά στον πηγαίο κώδικα. Το Haiku® και το HAIKU logo® είναι εγγεγραμμένα σήματα κατατεθέν της Haiku, Inc.\n\n
 Copyright © 2009 Colin Percival	AboutView		Πνευματική ιδιοκτησία © 2009 Colin Percival
 Time running:	AboutView		Χρόνος λειτουργίας:
 %ld MHz	AboutView		%ld MHz
@@ -37,7 +38,7 @@ Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (ιδρυτής του έργου)\n\n
 BSD (3-clause)	AboutWindow		BSD (3-όρων)
 About this system	AboutWindow		Πληροφορίες συστήματος
-%d MiB used (%d%%)	AboutView		%d MiB χρησιμοποιούνται (%d%%)
+%d MiB used (%d%%)	AboutView		%d MiB σε χρήση (%d%%)
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Πνευματική ιδιοκτησία © 1999-2010 απο τους συγγραφείς του Gutenprint. Με επιφύλαξη παντός δικαιώματος.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Πνευματική ιδιοκτησία © 1994-1997 Mark Kilgard. Με επιφύλαξη παντός δικαιώματος.
 AboutSystem	System name		AboutSystem
@@ -68,7 +69,7 @@ Copyright © 2001-2003 Expat maintainers.	AboutView		Πνευματική ιδι
 Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Πνευματική ιδιοκτησία © 2002-2006 Maxim Shemanarev (McSeem).
 Translations:\n	AboutView		Μεταφράσεις:\n
 Memory:	AboutView		Μνήμη:
-\n…and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n…και μάλλον κάποιους άλλους που ξεχάσαμε να αναφέρουμε (συγνώμη!)\n\n
+\n…and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n…και μάλλον άλλα άτομα που ξεχάσαμε να αναφέρουμε (συγνώμη!)\n\n
 BSD (2-clause)	AboutWindow		BSD (2-όρων)
 Website & marketing:\n	AboutView		Ιστοσελίδα & μάρκετινγκ:\n
 2001 by Andy Ritger based on the Generalized Timing Formula	AboutView		2001 απο τον Andy Ritger βασισμένο στο Generalized Timing Formula

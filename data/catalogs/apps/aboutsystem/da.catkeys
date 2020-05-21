@@ -1,8 +1,9 @@
-1	danish	x-vnd.Haiku-About	1839294148
+1	danish	x-vnd.Haiku-About	511528774
 Revision	AboutView		Udgave
 The Haikuware team and their bounty program\n	AboutView		Haikuware-holdet og deres dusørprogram\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Ophavsret © 1999-2007 Michael C. Ring. Alle rettigheder forbeholdes.
 %.2f GHz	AboutView		%.2f GHz
+Copyright © 2001-%d The Haiku project. 	AboutView		Ophavsret © 2001-%d Haiku-projektet. 
 \n\nSpecial thanks to:\n	AboutView		\n\nSærlig tak til:\n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (og hans NewOS-kerne)\n
 Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Ophavsret © 1999-2000 Y.Takagi. Alle rettigheder forbeholdes.

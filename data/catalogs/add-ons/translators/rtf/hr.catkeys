@@ -1,0 +1,10 @@
+1	croatian	x-vnd.Haiku-RTFTranslator	4244461804
+Version %d.%d.%d, %s	ConfigView		Verzija %d.%d.%d, %s
+RTF text files	RTFTranslator		RTF tekst datoteke
+RTF-Translator Settings	ConfigView		Postavke RTF-prevoditelja
+Rich Text Format (RTF) translator	ConfigView		Rich Text Format (RTF) prevoditelj
+RTF Settings	main		RTF postavke
+RichTextFormat file	RTFTranslator		RichTextFormat datoteka
+Plain text file	RTFTranslator		Datoteka običnog teksta
+Rich Text Format translator	RTFTranslator		Rich Text Format prevoditelj
+Rich Text Format translator v%d.%d.%d %s	RTFTranslator		Rich Text Format prevoditelj v%d.%d.%d %s

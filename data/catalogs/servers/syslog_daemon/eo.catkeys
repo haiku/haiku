@@ -1,0 +1,4 @@
+1	esperanto	x-vnd.Haiku-SystemLogger	57960782
+Syslog Daemon	SyslogDaemon		Syslog Demono
+OK	SyslogDaemon		Bone
+%s\n\nThis daemon is responsible for collecting all system messages and write them to the system-wide log at \"%s\".\n\n	SyslogDaemon		%s\n\nĈi demono garantias amasigi ĉiujn sistemajn mesaĝojn, skribante ilin al la sistema protokolo je \"%s\".\n\n

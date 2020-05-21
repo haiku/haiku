@@ -1,0 +1,22 @@
+1	esperanto	x-vnd.Haiku-MediaPlayer	3451842233
+Close	MediaPlayer-PlaylistWindow		Fermi
+OK	MediaPlayer-RemovePLItemsCmd		Bone
+OK	MediaPlayer-Main		Bone
+Open file…	MediaPlayer-Main		Malfermi dosieron…
+Close	MediaPlayer-Main		Fermi
+Error: 	MediaPlayer-Main		Eraro: 
+Save	MediaPlayer-PlaylistWindow		Konservi
+Cancel	MediaPlayer-NetworkStream		Nuligi
+OK	MediaPlayer-SettingsWindow		Bone
+Open…	MediaPlayer-PlaylistWindow		Malfermi…
+Quit	MediaPlayer-Main		Ĉesi
+Redo	MediaPlayer-PlaylistWindow		Refari
+Cancel	MediaPlayer-SettingsWindow		Nuligi
+Open	MediaPlayer-PlaylistWindow		Malfermi
+Undo	MediaPlayer-PlaylistWindow		Malfari
+Settings…	MediaPlayer-Main		Agordoj…
+OK	MediaPlayer-NetworkStream		Bone
+Save	MediaPlayer-Main		Konservi
+Error: 	MediaPlayer-RemovePLItemsCmd		Eraro: 
+Open	MediaPlayer-Main		Malfermi
+OK	MediaPlayer-PlaylistWindow		Bone

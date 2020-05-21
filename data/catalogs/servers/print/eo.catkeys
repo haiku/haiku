@@ -1,0 +1,55 @@
+1	esperanto	x-vnd.Be-PSRV	1222926379
+Undefined	ConfigWindow		Nedefinita
+Return the number of available transports	PrintServerApp Scripting		Liveri kvanton da disponeblaj transportiloj
+Return the number of available printers	PrintServerApp Scripting		Liveri kvanton da disponeblaj presiloj
+Get currently available ports/devices	Transport Scripting		Akiri nundisponeblajn pordojn/aparatojn
+Retrieve or select the active printer	PrintServerApp Scripting		Ricevi aŭ elekti la aktivan presilon
+Cancel	PrintServerApp		Nuligi
+Retrieve a specific printer	PrintServerApp Scripting		Ricevi specifan presilon
+Page %1 to %2	ConfigWindow		Paĝo %1 ĝis %2
+Get name of the printer add-on used for this printer	Printer Scripting		Liveri nomon de la presila aldonaĵo uzata por ĉi presilo
+B5 (JIS)	ConfigWindow	JIS P0138 B5, a Japanese paper size	B5 (JIS)
+OK	ConfigWindow		Bone
+Cancel	ConfigWindow		Nuligi
+Printer server	ConfigWindow		Presila servilo
+Page %1 to %2, %3 copies	ConfigWindow		Paĝo %1 ĝis %2, %3 kopioj
+A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Presilo tiunoma jam ekzistas, sed ĝia pelilo ne troviĝis! Anstataŭigi?
+Yes	PrintServerApp		Jes
+Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Rekordlibro
+Would you like to set one up now?	PrintServerApp		Ĉu vi volas agordi unu nun?
+Print job setup:	ConfigWindow		Presotasko agordo:
+A6	ConfigWindow	ISO 216 paper size	A6
+Portrait	ConfigWindow		Vertikale
+All pages	ConfigWindow		Ĉiom da paĝoj
+There is no default printer set up.	PrintServerApp		Neniu implicita presilo estas agordita.
+B5	ConfigWindow	ISO 216 paper size	B5
+A0	ConfigWindow	ISO 216 paper size	A0
+Letter	ConfigWindow	ANSI A (letter), a North American paper size	Usona letero
+Printer:	ConfigWindow		Printilo:
+A2	ConfigWindow	ISO 216 paper size	A2
+Select a printer	ConfigWindow		Elektu printilon
+Show configuration window	PrintServerApp Scripting		Montri agordan fenestron
+A4	ConfigWindow	ISO 216 paper size	A4
+Get comments about this printer	Printer Scripting		Preni komentojn pri ĉi presilo
+A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		Presilo tiunoma jam ekzistas, sed ĝi tute neuzeblas! Anstataŭigi?
+No	PrintServerApp		Ne
+Get the transport configuration for this printer	Printer Scripting		Ricevi la transportilan agordon de ĉi presilo
+Landscape	ConfigWindow		Horizontale
+Legal	ConfigWindow	A North American paper size (216 x 356 mm, or 8.5 x 14 in)	Leĝa
+There are no printers set up.	PrintServerApp		Neniu presilo agordita.
+Get name of the transport add-on used for this printer	Printer Scripting		Ricevi nomon de la transportila aldonaĵo uzata por ĉi presilo
+All pages, %1 copies	ConfigWindow		Ĉiuj paĝoj, %1 kopioj
+Delete a specific printer	PrintServerApp Scripting		Forigi specifan presilon
+Create a new printer	PrintServerApp Scripting		Krei novan presilon
+OK	PrintServerApp		Bone
+Print setup	ConfigWindow		Presila agordo
+A1	ConfigWindow	ISO 216 paper size	A1
+Retrieve a specific transport	PrintServerApp Scripting		Recevi specifan transportilon
+Get name of printer	Printer Scripting		Liveri nomon de presilo
+A3	ConfigWindow	ISO 216 paper size	A3
+Get name of transport	Transport Scripting		Liveri nomon de transportilo
+A5	ConfigWindow	ISO 216 paper size	A5
+Would you like to make @ the default printer?	PrintServerApp		Ĉu vi deziras marki @ kiel la implicita presilo?
+Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	Ĵurnaleto
+Page setup	ConfigWindow		Paĝa agordo:
+Paper setup:	ConfigWindow		Papera agordo:

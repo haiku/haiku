@@ -1,0 +1,20 @@
+1	croatian	x-vnd.Haiku-DiskUsage	2197571549
+Scanning %refName%	Scanner		Skeniram %refName%
+%d files	Status View	For UI layouting only, use the longest plural form for your language	%d datoteke
+Size	Info Window		Veličina
+Rescan	Pie View		Ponovno skeniraj
+Kind	Info Window		Vrsta
+file unavailable	Pie View		datoteka nedostupna
+Path	Info Window		Putanja
+Scan	Status View		Skeniraj
+Rescan	Status View		Ponovno skeniraj
+file unavailable	Status View		datoteka nedostupna
+Get info	Pie View		Informacije
+DiskUsage	System name		Uporaba diska
+Created	Info Window		Napravljeno
+Modified	Info Window		Izmjenjeno
+Abort	Status View		Prekini
+Open with	Pie View		Otvori pomoću
+Open	Pie View		Otvori
+%a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
+Free on %refName%	Scanner		Slobodno na %refName%

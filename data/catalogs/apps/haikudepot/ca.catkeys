@@ -64,7 +64,7 @@ Network Error	ServerHelper		Error de xarxa
 Available	PackageListView		Disponible
 Cancel	UserLoginWindow		Cancel·la
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		El Dipòsit del Haiku necessita que el dimoni del paquet funcioni i sembla que no funciona.\nVoleu iniciar-lo ara?
-Click a package to view information	PackageInfoView		Cliqueu sobre un paquet per veure'n la informació
+Click a package to view information	PackageInfoView		Cliqueu sobre un paquet per veure'n la informació.
 The password must be at least eight characters long, consist of at least two digits and one upper case character.	UserLoginWindow		La contrasenya ha de tenir com a mínim vuit caràcters, ha de constar d'almenys dos dígits i una majúscula.
 Contents	PackageInfoView		Continguts
 Close	PackageManager		Tanca

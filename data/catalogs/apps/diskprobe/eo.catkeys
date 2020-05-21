@@ -1,0 +1,133 @@
+1	esperanto	x-vnd.Haiku-DiskProbe	2944605311
+Raw editor	AttributeWindow		Fontforma redaktilo
+Remove	AttributeWindow		Forigi
+Close	ProbeView		Fermi
+Boolean value:	TypeEditors		Bulea valoro:
+File	ProbeView		Dosiero
+Block size	ProbeView	Menu item. This is in the same menu window than 'Base' and 'Font size'	Blokogrando
+MIME type editor	TypeEditors		MIME-tipa redaktilo
+Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Deksesuma
+16 bit unsigned value:	TypeEditors		Sensignuma 16-bita valoro:
+8 bit signed value:	TypeEditors		Signuma 8-bita valoro:
+ (native)	ProbeView		 (indiĝena)
+Attribute offset: 	ProbeView		Deŝovo atributa: 
+Text	TypeEditors	This is the type of editor	Teksto
+File offset: 	ProbeView		Deŝovo dosiera: 
+Add	ProbeView		Aldoni
+64 bit signed value:	TypeEditors		Signuma 64-bita valoro:
+Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Ĉu vi certe deziras forigi la atributon \"%s\" de la dosiero \"%s\"?\n\nVi ne povos malfari la forigon.
+No type editor available	AttributeWindow		Neniu laŭtipa redaktilo
+Print…	ProbeView		Presi…
+New…	FileWindow		Nova…
+what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	kiu: '%.4s'\n\n
+OK	DiskProbe		Bone
+DiskProbe	System name		DiskoSondilo
+Back	ProbeView		Reen
+Device: 	ProbeView		Aparato: 
+Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Bazo
+Open file…	FileWindow		Malfermi dosieron…
+32 bit unsigned pointer:	TypeEditors		Sensignuma 32-bita referenco:
+DiskProbe request	DiskProbe		DiskoSondila peto
+Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Deksesuma
+Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Fiaskis dum dosieroskribo:\n%s\n\nDum eliro ĉiuj ŝanĝoj estos perditaj.
+Examine device:	OpenWindow		Testi aparaton:
+Number editor	TypeEditors		Numera redaktilo
+Icon	TypeEditors		Piktogramo
+Attribute	ProbeView		Atributo
+Don't save	ProbeView		Ne konservi
+Undo	ProbeView		Malfari
+Flattened bitmap	TypeEditors		Platigita bitmapo
+Block %Ld (0x%Lx)	ProbeView		Bloko %Ld (0x%Lx)
+Cancel	OpenWindow		Nuligi
+Unknown format	TypeEditors		Nekonata formo
+File: 	ProbeView		Dosiero: 
+Swapped: %Ld (0x%0*Lx)	ProbeView		Permutite: %Ld (0x%0*Lx)
+Stop	ProbeView		Halti
+Cancel	ProbeView		Nuligi
+Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Neeblis malfermi \"%s\":\n%s
+Font size	ProbeView		Tiparogrando
+Type editor not supported	ProbeView		Laŭtipa redaktilo nesubtenatas
+Native: 0x%0*Lx	ProbeView		Indiĝena: 0x%0*Lx
+Copy	ProbeView		Kopii
+Redo	ProbeView		Refari
+Floating-point value:	TypeEditors		Glitpunkta valoro:
+Cancel	AttributeWindow		Nuligi
+16 bit signed value:	TypeEditors		Signuma 16-bita valoro:
+DiskProbe request	AttributeWindow		DiskoSondila peto
+Next	ProbeView		Sekva
+64 bit signed offset:	TypeEditors		Signuma 64-bita deŝovo:
+32 bit signed value:	TypeEditors		Signuma 32-bita valoro:
+Could not find search string.	ProbeView		Literĉeno ne trovita.
+Close	FileWindow		Fermi
+Unknown type	TypeEditors		Nekonata tipo
+Open device	FileWindow		Malfermi aparaton
+Number:	TypeEditors		Numero:
+Quit	FileWindow		Ĉesi
+Text	FindWindow		Teksto
+Block 0x%Lx	ProbeView		Bloko 0x%Lx
+Attribute	AttributeWindow		Atributo
+Mode:	FindWindow		Reĝimo:
+16 bit	TypeEditors		16 bitoj
+32 bit size or status:	TypeEditors		32-bita grando aŭ stato:
+of 	ProbeView		de 
+Contents:	TypeEditors		Enhavo:
+Could not open file \"%s\": %s\n	DiskProbe		Neeblis malfermi dosieron \"%s\": %s\n
+Probe file…	OpenWindow		Sondi dosieron…
+Block: 	ProbeView		Bloko: 
+Bookmarks	ProbeView		Legosignoj
+Probe device	OpenWindow		Sondi aparaton
+none	ProbeView	No attributes	neniu
+Case sensitive	FindWindow		Usklecodistinga
+32 bit unsigned value:	TypeEditors		Sensignuma 32-bita valoro:
+Remove from file	AttributeWindow		Forigi el dosiero
+Attributes	ProbeView		Atributoj
+Message	TypeEditors	This is the type of view	Mesaĝo
+Message View	TypeEditors		Mesaĝa Vido
+Offset: 	ProbeView		Deŝovo: 
+Swapped: 0x%0*Lx	ProbeView		Permutite: 0x%0*Lx
+MIME type:	TypeEditors		MIME-tipo:
+Fit	ProbeView	Size of fonts, fits to available room	Adapti
+Type editor	ProbeView		Laŭtipa redaktilo
+File	FileWindow		Dosiero
+Grayscale	TypeEditors		Grizoskalo
+32 bit	TypeEditors		32 bitoj
+Native: %Ld (0x%0*Lx)	ProbeView		Indiĝena: %Ld (0x%0*Lx)
+Device	ProbeView		Aparato
+Close	AttributeWindow		Fermi
+Type editor	AttributeWindow		Laŭtipa redaktilo
+Save	ProbeView		Konservi
+of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	de 0x0
+Attribute type: 	ProbeView		Atributa tipo: 
+15 bit	TypeEditors		15 bitoj
+Page setup…	ProbeView		Paĝa agordo…
+Boolean	TypeEditors	This is the type of editor	Bulea
+Icon view	TypeEditors		Bildsimbola vido
+Select all	ProbeView		Elekti ĉion
+64 bit unsigned value:	TypeEditors		Sensignuma 64-bita valoro:
+OK	ProbeView		Bone
+Previous	ProbeView		Antaŭa
+Selection	ProbeView		Elekto
+Find	FindWindow		Trovi
+8 bit unsigned value:	TypeEditors		Sensignuma 8-bita valoro:
+%ld (native)	ProbeView		%ld (indiĝena)
+Attribute: 	ProbeView		Atributo: 
+Block	ProbeView		Bloko
+Find again	ProbeView		Reserĉi
+View	ProbeView	This is the last menubar item 'File Edit Block View'	Vido
+Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Neeblis legi bildon
+DiskProbe request	ProbeView		DiskoSondila peto
+Double precision floating-point value:	TypeEditors		Glitpunkta duoblprecizeca valoro:
+Image	TypeEditors	This is the type of view	Bilda
+Save changes before closing?	ProbeView		Ĉu konservi ŝanĝojn antaŭ ĉeso?
+PNG format	TypeEditors		PNG-a formato
+Number	TypeEditors	This is the type of editor	Numera
+Edit	ProbeView		Redakti
+String editor	TypeEditors		Literĉena redaktilo
+Boolean editor	TypeEditors		Bulea redaktilo
+Device offset: 	ProbeView		Deŝovo aparata: 
+Find…	ProbeView		Trovi…
+8 bit palette	TypeEditors		8-bita farboplato
+Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Dekuma
+Image view	TypeEditors	Image means here a picture file, not a disk image.	Bilda vido
+Paste	ProbeView		Alglui
+32 bit unsigned size:	TypeEditors		Sensignuma 32-bita grando:

@@ -1,0 +1,12 @@
+1	croatian	x-vnd.Haiku-Magnify	4042282157
+  size must be > 4 and a multiple of 4	Console		  veličina mora biti > 4 i višekratnik od 4
+Decrease pixel size	Magnify-Main		Smanji veličini piksela
+Increase pixel size	Magnify-Main		Povećaj veličinu u oikselima
+Copy image	Magnify-Main		Kopiraj sliku
+Decrease window size	Magnify-Main		Smanji veličinu prozora
+Freeze image	Magnify-Main		Zamrzni sliku
+Increase window size	Magnify-Main		Povećaj veličinu prozora
+Save image	Magnify-Main		Spremi sliku
+Magnify	System name		Povećaj
+Info	Magnify-Main		Informacije
+Show info	Magnify-Main		Pokaži informacije

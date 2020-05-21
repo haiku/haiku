@@ -1,0 +1,59 @@
+1	croatian	x-vnd.Haiku-ShowImage	3861016830
+Use as background…	Menus		Koristi kao pozadinu...
+File	Menus		Datoteka
+Zoom in	Menus		Povećaj
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Dokument '%s' je promijenjen. Želite li zatvoriti dokument?
+Page setup…	Menus		Postavljanje stranice...
+Print…	Menus		Ispis...
+Get info…	Menus		Dobavi informacije…
+OK	SaveToFile		U redu
+Previous page	Menus		Prethodna stranica
+View	Menus		Pogled
+Full screen	Menus		Cijeli zaslon
+Go to page	Menus		Idi na stranicu
+Zoom out	Menus		Smanji
+Quit	Menus		Isključi
+Rotate counterclockwise	Menus		Rotiraj obrnuto smjeru kazaljke na satu
+High-quality zooming	Menus		Visoko kvalitetno povećavanje
+Browse	Menus		Pregledaj
+Edit	Menus		Uredi
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Ne mogu učitati sliku! Ne postoji datoteka ili prevoditelj slike.
+First page	Menus		Prva stranica
+The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokument '%s' (stranica %d) je promjenjen. Želite li zatvoriti dokument?
+Leave full screen	Menus		Napusti cijeli zaslon
+Close	Menus		Zatvori
+Close	ClosePrompt		Zatvori
+Resize to (in 1/72 inches):	PrintOptionsWindow		Promjeni veličinu (u 1/72 inča):
+Rating	Menus		Ocjenjivanje
+Flip left to right	Menus		Preokreni sa lijeva u desno
+Show caption in full screen mode	Menus		Prikaži naslov u cijeli ekran načinu
+DPI:	PrintOptionsWindow		DPI:
+Open…	Menus		Otvori...
+Next file	Menus		Slijedeća datoteka
+Clear selection	Menus		Očisti odabir
+Close document	ClosePrompt		Zatvori dokument
+Height: 	PrintOptionsWindow		Visina: 
+The file '%s' could not be written.	SaveToFile		Datoteka '%s' ne može biti zapisana.
+Cancel	ClosePrompt		Otkaži
+Show tool bar	Menus		Prikaži alatnu traku
+Fit to window	Menus		Pristajanje u prozor
+Print options	PrintOptionsWindow		Opcije ispisa
+Copy	Menus		Kopiraj
+Last page	Menus		Zadanja stranica
+Stretch to window	Menus		Rastegni po prozoru
+Previous file	Menus		Prethodna datoteka
+ShowImage	System name		Prikaži sliku
+Slide show	Menus		Klizni prikaz
+Fit image to page	PrintOptionsWindow		Postavi sliku u stranicu
+Flip top to bottom	Menus		Okreni od vrha prema dnu
+Select all	Menus		Odaberi sve
+Zoom factor in %:	PrintOptionsWindow		Zoom u %:
+Width:	PrintOptionsWindow		Širina:
+Image	Menus		Slika
+Move to Trash	Menus		Premjesti u smeće
+OK	Alerts		U redu
+Rotate clockwise	Menus		Rotiraj u smjeru kazaljke na satu
+Job setup	PrintOptionsWindow		Postavljanje posla
+Original size	Menus		Izvorna veličina
+Next page	Menus		Slijedeća stranica
+Save as…	Menus		Spremi kao...

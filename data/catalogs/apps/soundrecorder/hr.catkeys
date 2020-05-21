@@ -1,0 +1,39 @@
+1	croatian	x-vnd.Haiku-SoundRecorder	2187836465
+Loop	RecorderWindow		Petlja
+Cannot find default audio hardware	RecorderWindow		Progam ne može naći zadani audio hardware
+Cannot find the temporary file created to hold the new recording	RecorderWindow		Program nemože naći privremenu datoteku koja je kreirana da čuva novi snimak
+Nothing to play	RecorderWindow		Ništa za izvođenje
+None of the files appear to be audio files.	RecorderWindow		Izgleda da nijedna datoteka nije audio datoteka.
+Duration: 	RecorderWindow		Trajanje: 
+File info	RecorderWindow		Informacije o datoteci
+Drop files here	SoundListView		Spusti datoteke ovdje
+Input	RecorderWindow		Ulaz
+Some of the files don't appear to be audio files.	RecorderWindow		Izgleda da neke datoteke nisu audio datoteke.
+Stop	RecorderWindow		Zaustavi
+Format:	RecorderWindow		Format:
+Sound List	RecorderWindow		Lista zvukova
+Compression: 	RecorderWindow		Kompresija: 
+Rewind	RecorderWindow		Premotaj
+Invalid audio files	RecorderWindow		Neispravne audio datoteke
+ seconds	RecorderWindow		 srkunde
+OK	RecorderWindow		U redu
+Cannot open the temporary file created to hold the new recording	RecorderWindow		Nemoguće otvoriti privremeni file kreiran da sadrži novi snimak
+Input:	RecorderWindow		Ulaz:
+Forward	RecorderWindow		Naprijed
+Play	RecorderWindow		Pokreni
+Channels:	RecorderWindow		Kanali:
+None	RecorderWindow		Nijedan
+Record	RecorderWindow		Snimi
+Cannot recognize this file as a media file	RecorderWindow		Nemoguće prepoznati datoteku kao medijsku datoteku
+Format: 	RecorderWindow		Format: 
+File name: 	RecorderWindow		Ime datoteke: 
+Cannot connect to the selected sound input	RecorderWindow		Nije se moguće spojiti sa odagranim zvučnim ulazom
+Cannot record a sound that long	RecorderWindow		Nemoguće snimiti zvuk tako dugo
+Duration:	RecorderWindow		Trajanje:
+Compression:	RecorderWindow		Kompresija:
+Cannot find an unused name to use for the new recording	RecorderWindow		Nemoguće naći nekorišteno ime za novu snimku
+Channels: 	RecorderWindow		Kanali: 
+Save	RecorderWindow		Spremi
+Cannot connect to media server	RecorderWindow		Ne mogu se spojiti na medijski poslužitelj
+The file doesn't appear to be an audio file.	RecorderWindow		Datoteka izgleda nije audio datoteka.
+File name:	RecorderWindow		Ime datoteke:

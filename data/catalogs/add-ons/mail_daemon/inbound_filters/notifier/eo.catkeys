@@ -1,0 +1,14 @@
+1	esperanto	x-vnd.Haiku-NewMailNotification	1375000288
+Log window	NotifierConfigView		Protokola fenestro
+none	NotifierConfigView		neniu
+New mails notification	NotifierFilter		Novmesaĝa sciigo
+Alert	NotifierConfigView		Averto
+OK	NotifierFilter		Bone
+Central alert	NotifierConfigView		Centra averto
+Beep	NotifierConfigView		Pepo
+Central beep	NotifierConfigView		Centra pepo
+{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{Unu nova mesaĝo} other{# novaj mesaĝoj}}
+New messages	NotifierFilter		Novaj mesaĝoj
+Method:	NotifierConfigView		Metodo:
+Keyboard LEDs	NotifierConfigView		Klavaraj lumdiodoj
+You have {0, plural, one{one new message} other{# new messages}} for %account.	NotifierFilter		Vi havas {0, plural, one{unu novan mesaĝon} other{# novajn mesaĝojn}} je %account.

@@ -41,12 +41,12 @@ Account settings	Config Views		Impostazioni account
 minutes	Config Window		minuti
 E-mail	System name		E-mail
 Check every	Config Window		Controlla ogni
-Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Creare un nuovo account con il pulsante Aggiungi.\n\nEliminare un account con il pulsante Rimuovi.\n\nSelezionare un elemento nella lista per modificarne le impostazioni.
+Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Crea un nuovo account con il pulsante Aggiungi.\n\nElimina un account con il pulsante Rimuovi.\n\nSeleziona un elemento nella lista per modificarne le impostazioni.
 Account name:	E-Mail		Nome account:
 Edit mailbox menu…	Config Window		Modifica menu della casella e-mail...
 Server Name:	E-Mail		Nome Server:
 Remove	Config Window		Rimuovi
-Login name:	E-Mail		Nome di login:
+Login name:	E-Mail		Nome utente:
 While sending	Config Window		Durante l'invio
 OK	Config Window		OK
 OK	AutoConfigWindow		OK

@@ -1,0 +1,22 @@
+1	croatian	x-vnd.haiku-registrar	1952612731
+Cancel	ShutdownProcess		Otkaži
+OK	ShutdownProcess		U redu
+Do you really want to shut down the system?	ShutdownProcess		Želite li doista isključiti sustav?
+Shutdown status	ShutdownProcess		Stanje isključivanja
+Shut down	ShutdownProcess		Isključi
+The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Program \"%appName%\" je možda blokiran na modalnom panelu.
+System is shut down	ShutdownProcess		Sustav će se isključiti
+Restart system	ShutdownProcess		Ponovno pokrenite sustav
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Program \"%appName%\" je prekinuo proces isključivanja.
+Asking background applications to quit.	ShutdownProcess		Pitam pozadinsku aplikaciju da prestane.
+Do you really want to restart the system?	ShutdownProcess		Želite li doista ponovno pokrenuti sustav?
+Restart	ShutdownProcess		Ponovno pokreni
+It's now safe to turn off the computer.	ShutdownProcess		Sada je sigurno isključiti računalo.
+Asking other processes to quit.	ShutdownProcess		Pitam ostale procese da prestanu.
+Cancel shutdown	ShutdownProcess		Otkaži isključivanje
+Restarting…	ShutdownProcess		Ponovno pokrećem...
+%action%?	ShutdownProcess		%akcija%?
+Kill application	ShutdownProcess		Uništi program
+Shutdown aborted	ShutdownProcess		Iskjlučivanje prekinuto
+Shutting down…	ShutdownProcess		Isključivanje...
+Asking \"%appName%\" to quit.	ShutdownProcess		Pitam \"%appName%\" da prestane.

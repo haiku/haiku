@@ -1,0 +1,16 @@
+1	croatian	x-vnd.Haiku-DataTranslations	1870647375
+Path:	DataTranslations		Putanja:
+Name:	DataTranslations		Ime:
+DataTranslations - Note	DataTranslations		Prevođenje podataka - bilješka
+The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		Stavka '%name' nije Prevoditelj i neće biti instalirana.
+Could not install %s:\n%s	DataTranslations		Ne mogu instalirati %s:\n%s
+OK	DataTranslations		U redu
+Cancel	DataTranslations		Otkaži
+Info:	DataTranslations		Info:
+DataTranslations - Error	DataTranslations		Prevođenje podataka - greška
+Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Koristite ovu kontrolnu ploču za postavljanje zadanih vrijednosti za prevoditelje, koje će biti korištene kada nijedne druge postavke nisu određene programom.
+The new translator has been installed successfully.	DataTranslations		Novi prevoditelj je uspješno instaliran.
+DataTranslations	System name		Prevođenje podataka
+Info	DataTranslations		Info
+Overwrite	DataTranslations		Prebriši
+Version:	DataTranslations		Verzija:

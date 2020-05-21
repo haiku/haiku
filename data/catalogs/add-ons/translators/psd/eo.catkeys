@@ -1,0 +1,22 @@
+1	esperanto	x-vnd.Haiku-PSDTranslator	3654055550
+Lab	PSDLoader		Laboratorio
+Uncompressed	PSDConfig		Nedensigita
+Indexed	PSDLoader		Indeksita
+Grayscale	PSDLoader		Grizskala
+Photoshop image translator	PSDConfig		Photoshop bildotradukilo
+Photoshop image translator	PSDTranslator		Photoshop bildotradukilo
+Version %d.%d.%d, %s	PSDConfig		Versio %d.%d.%d, %s
+Photoshop Document (PSD file)	PSDConfig		Photoshop Dokumento (PSD dosiero)
+Photoshop image	PSDTranslator		Photoshop bildo
+RLE	PSDConfig		RLE
+Photoshop Big Document (PSB file)	PSDConfig		Photoshop Granda Dokumento (PSB dosiero)
+RGBA	PSDLoader		RGBA
+Photoshop image (%s)	PSDTranslator		Photoshop bildo (%s)
+PSDTranslator Settings	PSDConfig		PSDTranslator Agordoj
+RGB	PSDLoader		RGB
+Bitmap	PSDLoader		Bitmapo
+CMYK	PSDLoader		CMYK
+Compression: 	PSDConfig		Densigo: 
+Format: 	PSDConfig		Formo: 
+Multichannel	PSDLoader		Multkanela
+Duotone	PSDLoader		Dutona

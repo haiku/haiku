@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.haiku-softwareupdater	498905835
+1	greek, modern (1453-)	x-vnd.haiku-softwareupdater	369324613
 Updating version	SoftwareUpdaterWindow	List item text	Ενημέρωση έκδοσης
 Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Πατήστε εδώ για να εγκαταστήσετε {0, plural, one{# ενημερωμένο πακέτο} other{# ενημερωμένα πακέτα}}.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Πακέτα προς απεγκατάσταση
@@ -10,12 +10,13 @@ Updates found	SoftwareUpdaterWindow		Βρέθηκαν ενημερώσεις
 Update now	SoftwareUpdaterWindow		Ενημέρωση τώρα
 For some reason, we could not reboot your computer.	SoftwareUpdaterWindow		Για κάποιον λόγο, δεν μπορέσαμε να ενημερώσουμε τον υπολογιστή σας.
 OK	UpdateManager		Εντάξει
+Unrecognized argument	SoftwareUpdaterApp	Error message	Το όρισμα δεν αναγνωρίζεται
 There were no updates found.	CheckAction		Δεν βρέθηκαν ενημερώσεις.
 No updates available	UpdateAction		Δεν υπάρχουν διαθέσιμες ενημερώσεις
 New packages to be installed	SoftwareUpdaterWindow	List super item label	Νέα πακέτα προς εγκατάσταση
 Packages to be updated	SoftwareUpdaterWindow	List super item label	Πακέτα προς εγκατάσταση
 to	SoftwareUpdaterWindow	List item text	σε
-Attempting to cancel the updates…	SoftwareUpdaterWindow		Γίνεται προσπάθεια ακύρωσης των ενημερώσεων…
+Attempting to cancel the updates…	SoftwareUpdaterWindow		Γίνεται απόπειρα ακύρωσης των ενημερώσεων…
 Contacting software repositories to check for package updates.	CheckManager		Γίνεται επικοινωνία με αποθετήρια λογισμικού για έλεγχο ενημερώσεων πακέτων.
 Available updates found	CheckManager		Υπάρχουν διαθέσιμες ενημερώσεις
 from repository	SoftwareUpdaterWindow	List item text	από το αποθετήριο
@@ -26,6 +27,7 @@ There were no updates found.	UpdateAction		Δεν βρέθηκαν ενημερ�
 OK	SoftwareUpdaterWindow		Εντάξει
 Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Παρακαλώ επιλέξτε ανάμεσα σε αυτές τις επιλογές ενημερώσεων:\n\nΕνημέρωση:\n\tΕνημερώνει όλα τα εγκατεστημένα πακέτα.\nΠλήρης συγχρονισμός:\n\tΣυγχρονίζει όλα τα εγκατεστημένα πακέτα με τα αποθετήρια.
 The following changes will be made:	SoftwareUpdaterWindow		Θα γίνουν οι ακόλουθες αλλαγές:
+Argument variables are no longer accepted\n	SoftwareUpdaterApp		Οι μεταβλητές ορισμάτων δεν είναι αποδεκτές πια\n
 Fatal error while checking for updates: %s\n	CheckAction		Προέκυψε σφάλμα κατάρρευσης κατά τον έλεγχο για ενημερώσεις: %s\n
 SoftwareUpdater	System name		Ενημερωτής
 No active network connection was found.\n	CheckManager		Δεν βρέθηκε καμία ενεργή σύνδεση δικτύου.\n

@@ -1,0 +1,5 @@
+1	esperanto	x-vnd.Haiku-Pairs	2129630370
+Quit	PairsWindow		Ĉesi
+OK	Pairs		Bone
+Quit game	PairsWindow		Ĉesi ludon
+New game	PairsWindow		Nova ludo

@@ -1,0 +1,24 @@
+1	croatian	x-vnd.Haiku-LaunchBox	3501260166
+Set description…	LaunchBox		Postavi opis...
+OK	LaunchBox		U redu
+Ignore double-click	LaunchBox		Zanemari dvostruki klik
+Show on all workspaces	LaunchBox		Pokaži na svim radnim prostorima
+Name Panel	LaunchBox		Ploča imena
+Autostart	LaunchBox		Samopokretanje
+Clone	LaunchBox		Kloniraj
+Description for '%3'	LaunchBox		Opis za '%3'
+Show window border	LaunchBox		Pokaži rub prozora
+\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nNeuspjelo pokretanje aplikacija s potpisom '%2'.\n\nGreška:
+Icon size	LaunchBox		Veličina ikone
+Add button here	LaunchBox		Dodaj dugme ovdje
+Cancel	LaunchBox		Odustani
+last chance	LaunchBox		zadnja prilika
+You can drag an icon here.	LaunchBox		Možete navući ikonu ovdje.
+Failed to launch '%1'.\n\nError:	LaunchBox		Neuspjelo pokretanje '%1'.\n\nGreška:
+Settings	LaunchBox		Postavke
+Vertical layout	LaunchBox		Okomiti raspored
+Close	LaunchBox		Zatvori
+Quit	LaunchBox		Isključi
+Horizontal layout	LaunchBox		Vodoravni raspored
+New	LaunchBox		Novo
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Neuspjelo slanje 'otvori mapu' naredbe Tracker-u.\n\nGreška: 

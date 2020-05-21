@@ -1,0 +1,11 @@
+1	esperanto	x-vnd.Be-PRNT	1590969370
+Remove	PrintersWindow		Forigi
+Default Printer	PrinterListView		Apriora presilo
+Cancel	AddPrinterDialog		Nuligi
+Add printer	AddPrinterDialog		Aldoni presilon
+Printers	PrintersWindow		Presiloj
+Add	AddPrinterDialog		Aldoni
+Printer name:	AddPrinterDialog		Presila nomo:
+Printers	System name		Presiloj
+Print test page	PrintersWindow		Presi testan paĝon
+Cancel job	PrintersWindow		Nuligi taskon

@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Installer	2281950717
+1	polish	x-vnd.Haiku-Installer	918718200
 Performing installation.	InstallProgress		Wykonywanie instalacji.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Wybierz dysk źródłowy z menu podręcznego i naciśnij „Instaluj”.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Zamknij okno DriveSetup przed zamknięciem okna instalatora.
@@ -33,7 +33,6 @@ Additional disk space required: 0.0 KiB	InstallerWindow		Wymagana dodatkowa prze
 This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		To jest wersja beta! To oznacza, że istnieje ryzyko utraty ważnych danych. Wykonuj częste kopie zapasowe. Uznaj to za ostrzeżenie.\n\n\n
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Kiedy po raz pierwszy załadujesz poprawnie Haiku, koniecznie przeczytaj naszą dokumentację „Welcome” i „Userguide”. Na pulpicie znajdują się do nich skróty, a w WebPositive zakładki.\n\n
 ???	InstallerWindow	Unknown currently copied item	???
-Install anyway	InstallProgress		Instaluj mimo to
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Wybierz dysk źródłowy i docelowy z menu podręcznego i naciśnij „Instaluj”.
 Hide optional packages	InstallerWindow		Ukryj pakiety opcjonalne
 ???	InstallerWindow	Unknown partition name	???
@@ -57,7 +56,6 @@ Collecting copy information.	InstallProgress		Zbieranie informacji dotyczących 
 Show optional packages	InstallerWindow		Wyświetl pakiety opcjonalne
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Dysk docelowy może nie mieć wystarczającej ilości wolnego miejsca. Proszę wybrać inny dysk lub odznaczyć pakiety dodatkowe.
 Installation canceled.	InstallProgress		Instalacja anulowana.
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Docelowa partycja nie jest pusta. Jesteś pewien, że chcesz kontynuować?\n\nUwaga: Katalog „system” będzie czystą kopią z partycji źródłowej, ale zachowany zostanie katalog ustawień, cała reszta katalogów zostanie połączona. Pliki i dowiązania, które istnieją na obu partycjach, docelowej i źródłowej, zostaną nadpisane wersją źródłową.
 OK	InstallerApp		OK
 Are you sure you want to abort the installation?	InstallerWindow		Czy na pewno chcesz przerwać instalację?
 Stop	InstallerWindow		Zatrzymaj

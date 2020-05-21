@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku.TextSearch	3595395382
+1	greek, modern (1453-)	x-vnd.Haiku.TextSearch	1867528375
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Παρακαλώ επιλέξτε τα αρχεία που επιθυμείτε, τα οποία έχουν επιλέγει στον Ανιχνευτή για σας.
 %appname% : %path%	GrepWindow		%appname% : %path%
 Failed to start xargs program!	Grepper		Το ξεκίνημα του προγράμματος xargs απέτυχε!
@@ -20,12 +20,15 @@ Please select the files you wish to keep searching.	GrepWindow		Παρακαλώ
 Trim to selection	GrepWindow		Περικοπή στην επιλογή
 Set target…	GrepWindow		Ορισμός στόχου…
 TextSearch	GrepWindow		Αναζήτηση Κειμένου
+Failed to open input pipe!	Grepper		Απέτυχε το άνοιγμα σωλήνα εισόδου!
 Search	GrepWindow		Αναζήτηση
 Copy text to clipboard	GrepWindow		Αντιγραφή κειμένου στο πρόχειρο
 Show lines	GrepWindow		Εμφάνιση γραμμών
-The unselected files will be removed from the list.	GrepWindow		Τα μη επιλεγμένα αρχεία θα διαγραφούν από τη λίστα.
+Failed to open errors pipe!	Grepper		Απέτυχε το άνοιγμα σωλήνα σφαλμάτων!
+The unselected files will be removed from the list.	GrepWindow		Τα αρχεία που δεν έχουν επιλεχθεί θα διαγραφούν από τη λίστα.
 Skip folders starting with a dot	GrepWindow		Παρέκαμψε τους φακέλους που ξεκινούν με μια τελεία
 Open files in code editor	GrepWindow		Άνοιγμα αρχείων σε επεξεργαστή κώδικα
+Failed to open output pipe!	Grepper		Απέτυχε το άνοιγμα σωλήνα εξόδου!
 Cancel	GrepWindow		Άκυρο
 History	GrepWindow		Ιστορικό
 File	GrepWindow		Αρχείο

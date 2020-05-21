@@ -1,0 +1,17 @@
+1	esperanto	x-vnd.Haiku-Input	4079908364
+Cancel	TouchpadPrefView		Nuligi
+OK	TouchpadPrefView		Bone
+Defaults	InputKeyboard		Defaŭltoj
+Short	KeyboardView		Mallonge
+Slow	KeyboardView		Malrapide
+Revert	InputMouse		Malfari
+Key repeat rate	KeyboardView		Klavripeta rapido
+2-Button	SettingsView		2-butona
+Vertical	TouchpadPrefView		Vertikala
+Horizontal	TouchpadPrefView		Horizontala
+Focus mode:	SettingsView		Reĝimo de fokusigo:
+Focus follows mouse	SettingsView		Fokuso sekvas muson
+Double-click test area	SettingsView		Loko por testi duoblalklakon
+Sensitivity	TouchpadPrefView		Sentivo
+3-Button	SettingsView		3-butona
+Revert	TouchpadPrefView		Malfari

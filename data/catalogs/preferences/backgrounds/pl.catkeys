@@ -1,11 +1,14 @@
-1	polish	x-vnd.Haiku-Backgrounds	4123028037
+1	polish	x-vnd.Haiku-Backgrounds	681978856
 Backgrounds	System name		Tła
 X:	Main View		X:
+Setting the background image failed:	Main View		Ustawianie obrazu tła nie powiodło się:
 Resolution: 	Image Filepanel		Rozdzielczość: 
 pick one	Main View		wybierz jeden
 Default	Main View		Domyślne
 Center	Main View		Wyśrodkuj
+Folder: %path	Main View		Katalog: %path
 Manual	Main View		Ręcznie
+Set background image error	Main View		Ustawianie obrazu tła zakończyło się błędem
 Default folder	Main View		Domyślny folder
 Revert	Main View		Cofnij
 None	Main View		Żaden

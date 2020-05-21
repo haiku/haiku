@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-DiskProbe	3344134505
+1	greek, modern (1453-)	x-vnd.Haiku-DiskProbe	2944605311
 Raw editor	AttributeWindow		Επεξεργαστής Raw
 Remove	AttributeWindow		Διαγραφή
 Close	ProbeView		Κλείσιμο
@@ -9,6 +9,7 @@ MIME type editor	TypeEditors		Επεξεργαστής τύπου MIME
 Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Δεκαεξαδικό
 16 bit unsigned value:	TypeEditors		16 bit μη-υπογεγραμμένη τιμή:
 8 bit signed value:	TypeEditors		8 bit υπογεγραμμένη τιμή:
+ (native)	ProbeView		 (εγγενές)
 Attribute offset: 	ProbeView		Στοίχιση σημαίας: 
 Text	TypeEditors	This is the type of editor	Κείμενο
 File offset: 	ProbeView		Στοίχιση αρχείου: 
@@ -70,7 +71,7 @@ Mode:	FindWindow		Λειτουργία:
 32 bit size or status:	TypeEditors		32 bit μέγεθος ή κατάσταση:
 of 	ProbeView		από 
 Contents:	TypeEditors		Περιεχόμενα:
-Could not open file \"%s\": %s\n	DiskProbe		Αδυναμία ανοίγματος του αρχείου \"%s\": %s\n
+Could not open file \"%s\": %s\n	DiskProbe		Δεν ήταν δυνατό το ανοίγμα του αρχείου \"%s\": %s\n
 Probe file…	OpenWindow		Έλεγχος αρχείου…
 Block: 	ProbeView		Μπλοκ: 
 Bookmarks	ProbeView		Σελιδοδείκτες
@@ -108,7 +109,7 @@ Previous	ProbeView		Προηγούμενο
 Selection	ProbeView		Επιλογή
 Find	FindWindow		Εύρεση
 8 bit unsigned value:	TypeEditors		8 bit μη-υπογεγραμμένη τιμή:
-%ld (native)	ProbeView		%ld (φυσικό)
+%ld (native)	ProbeView		%ld (εγγενές)
 Attribute: 	ProbeView		Σημαία: 
 Block	ProbeView		Μπλοκ
 Find again	ProbeView		Εύρεση ξανά

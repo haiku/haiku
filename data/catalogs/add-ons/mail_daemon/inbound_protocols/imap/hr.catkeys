@@ -1,0 +1,12 @@
+1	croatian	x-vnd.Haiku-IMAP	1277304494
+Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Ne mogu se spojiti na poslužitelj \"%poslužitelj%\":\n%greška%
+Failed to fetch available storage.	IMAPFolderConfig		Nisam uspio dohvatiti dostupnu pohranu.
+Cancel	IMAPFolderConfig		Otkaži
+OK	IMAPFolderConfig		U redu
+Server storage: %s / %s used.	IMAPFolderConfig		Pohrana poslužitelja: %s / %s iskorišteno.
+Configure IMAP Folders	imap_config		Konfiguriraj IMAP mape
+SSL	imap_config		SSL
+Apply	IMAPFolderConfig		Primjeni
+status	IMAPFolderConfig		stanje
+IMAP Folders	IMAPFolderConfig		IMAP mape
+Destination:	imap_config		Odredište:

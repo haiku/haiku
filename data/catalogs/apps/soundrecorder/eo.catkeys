@@ -1,0 +1,5 @@
+1	esperanto	x-vnd.Haiku-SoundRecorder	3650060698
+Input	RecorderWindow		Enigo
+Stop	RecorderWindow		Halti
+OK	RecorderWindow		Bone
+Input:	RecorderWindow		Enigo:

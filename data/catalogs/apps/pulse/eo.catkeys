@@ -1,0 +1,17 @@
+1	esperanto	x-vnd.Haiku-Pulse	3671435928
+Quit	DeskbarPulseView		Ĉesi
+Deskbar mode	NormalPulseView		Laborstria reĝimo
+Deskbar mode	MiniPulseView		Laborstria reĝimo
+OK	PulseView		Bone
+OK	PrefsWindow		Bone
+Removing from Deskbar failed.\n%s	DeskbarPulseView		Forigo el Laborstrio malsukcesis.\n%s
+OK	PulseApp		Bone
+Deskbar mode	PrefsWindow		Reĝimo de Laborstrio
+OK	CPUButton		Bone
+Deskbar	CPUButton		Laborstrio
+Settings…	PulseView		Agordoj…
+Deskbar menu	CPUButton		Menuo de Laborstrio
+Quit	MiniPulseView		Ĉesi
+Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]	PulseApp		Uzado: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]
+OK	DeskbarPulseView		Bone
+Installing in Deskbar failed\n%s	PulseApp		Instaligo en Laborstrion malsukcesis\n%s

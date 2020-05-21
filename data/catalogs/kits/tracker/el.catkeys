@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-libtracker	735013609
+1	greek, modern (1453-)	x-vnd.Haiku-libtracker	3186556888
 Created	ContainerWindow		Δημιουργήθηκε
 Icon	AttributesView		Εικονίδιο
 Open and make preferred	OpenWithWindow		'Ανοιγμα και ορισμός προεπιλεγμένου
@@ -109,14 +109,14 @@ Edit templates…	TemplatesMenu		Επεξεργασία προτύπων…
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# byte} other{# bytes}}
 8-bit integer	AttributesView		Ακέραιος αριθμός 8-bit
 8-bit unsigned integer	AttributesView		Ακέραιος αριθμός χωρίς πρόσημο 8-bit
-%capacity (%used used -- %free free)	InfoWindow		%capacity (%used  χρησιμοποιημένα -- %free fελεύθερα)
+%capacity (%used used -- %free free)	InfoWindow		%capacity (%used σε χρήση -- %free ελεύθερα)
 Hide dotfiles	SettingsView		Απόκρυψη αρχείων με τελεία στην αρχή
 Trash	Model		Κάδος Απορριμάτων
 copy	FSUtils	filename copy	αντιγραφή
 New folder%ld	FSUtils		Νέος φάκελος%ld
 Location	OpenWithWindow		Τοποθεσία
 %Ld B	WidgetAttributeText		%Ld B
-Resize to fit	QueryContainerWindow		Αλλαγή μεγέθους για να χωράει
+Resize to fit	QueryContainerWindow		Προσαρμογή μεγέθους
 List folders first	SettingsView		Λίστα φακέλων πρώτα
 Find	FSUtils		Εύρεση
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Ένα στοιχείο που ονομάζεται \"%name\" υπάρχει ήδη σε αυτό το φάκελο. Θα θέλατε να τον αντικαταστήσετε με τον συμβολικό δεσμό που δημιουργείτε;
@@ -179,6 +179,7 @@ Show folder location in title tab	SettingsView		Εμφάνιση τοποθεσ�
 There was an error resolving the link.	Tracker		Υπήρξε κάποιο σφάλμα κατά την επίλυση του συνδέσμου.
 There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Υπήρξε κάποιο πρόβλημα κατά την προσπάθεια αποθήκευσης στο φάκελο που προσδιορίσατε. Παρακαλώ προσπαθήστε με έναν άλλο.
 Desktop	TrackerSettingsWindow		Επιφάνεια εργασίας
+Nested *?+.	libtracker		Εμπεριεχόμενο *?+.
 Move	FSUtils	button label	Μετακίνηση
 Clean up	DeskWindow		Καθαρισμός
 Group	FilePermissionsView		Ομάδα
@@ -221,8 +222,8 @@ Select…	DeskWindow		Επιλογή…
 Files cannot be moved or deleted from a read-only volume.	PoseView		Τα αρχεία δεν μπορούν να μετακινηθούν ή να διαγραφούν από ένα τόμο μόνο προς ανάγνωση.
 Edit name	FilePanelPriv		Επεξεργασία ονόματος
 There was an error deleting \"%name\":\n\t%error	FSUtils		Υπήρξε κάποιο σφάλμα κατά τη διαγραφή \"%name\":\n\t%error
-Resize to fit	ContainerWindow		Αλλαγή μεγέθους για να χωράει
-Link \"%name\" to:	InfoWindow	File dialog title for new sym link	Σύνδεση \"%name\"  με:
+Resize to fit	ContainerWindow		Προσαρμογή μεγέθους
+Link \"%name\" to:	InfoWindow	File dialog title for new sym link	Σύνδεση \"%name\" με:
 Mount server error	AutoMounterSettings		Σφάλμα διακομιστή προσάρτησης
 If you rename the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo rename the home folder anyway, hold down the Shift key and click \"Rename\".	FSUtils		Αν μετονομάσετε τον φάκελο home, το %osName ενδέχεται να μην λειτουργήσει σωστά!\n\nΕίστε σίγουρος πως θέλετε να το κάνετε αυτό;\n\nΓια να μετακινήσετε τον φάκελο home ούτως ή άλλως, κρατήστε πατημένο το πλήκτρο Shift και κάντε κλικ στο κουμπί \"Μετονομασία\".
 Boolean	AttributesView		Δυαδική τιμή
@@ -230,6 +231,7 @@ Invert selection	FilePanelPriv		Αντιστροφή επιλογής
 Memory size	AttributesView		Μέγεθος μνήμης
 TiB	WidgetAttributeText		TiB
 New folder	TemplatesMenu		Νέος φάκελος
+ (broken)	InfoWindow		 (χαλασμένο)
 Replace all	FSUtils		Αντικατάσταση όλων
 The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		Η εφαρμογή \"%appname\" δεν φαίνεται να υποστηρίζει τον τύπο του αρχείου που προσπαθείτε να ανοίξετε.\nΕίστε σίγουρος ότι θέλετε να συνεχίσετε;\n\nΑν ξέρετε πως η εφαρμογή υποστηρίζει αυτόν τον τύπο αρχείου, επικοινωνήστε με τον εκδότη της εφαρμογής και ζητήστε να ενημερώσει την εφαρμογή του έτσι ώστε να ορίσει τον τύπο αυτό ως υποστηριζόμενο.
 Reverse order	ContainerWindow		Ανάποδη σειρά
@@ -256,12 +258,15 @@ You must have at least one attribute showing.	PoseView		Πρέπει να έχε
 Cut	FilePanelPriv		Αποκοπή
 Finish: after several years	StatusWindow		Ολοκλήρωση: σε αρκετά χρόνια
 Favorites	FilePanelPriv		Αγαπημένα
+Point	AttributesView		Σημείο
 home	B_USER_DIRECTORY		αρχικός
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Νέα πρότυπα ανιχνευτή
 Disk mounting during boot	AutoMounterSettings		Προσάρτηση δίσκου κατά την εκκίνηση
 Don't automount	AutoMounterSettings		Να μη γίνει αυτόματη προσάρτηση
 Could not find application \"%appname\"	OpenWithWindow		Αδυναμία εύρεσης της εφαρμογής  \"%appname\"
+Unmatched parenthesis.	libtracker		Η παρένθεση δεν κλείνει.
 Extended attribute	AttributesView		Εκτεταμένη ιδιότητα
+Unmatched brackets.	libtracker		Οι αγκύλες δεν αντιστοιχούν.
 Error %error loading Add-On %name.	ContainerWindow		Σφάλμα %error κατά την φόρτωση προσθέτου %name.
 You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		Προσπαθείτε να αντικαταστήσετε το στοιχείο:\n\t%name%dest\nwith:\n\t%name%src\n\nΘα θέλατε να το αντικαταστήσετε με αυτό που %movemode;
 Empty Trash	ContainerWindow		Άδειασμα Κάδου
@@ -291,7 +296,7 @@ Recent folders	ContainerWindow		Πρόσφατοι φάκελοι
 Desktop	Model		Επιφάνεια εργασίας
 Select all	ContainerWindow		Επιλογή όλων
 apps	B_APPS_DIRECTORY		εφαρμογές
-Error calculating folder size.	InfoWindow		Προέκυψε σφάλμα κατά τον υπολογισμό του μεγέθους φακέλου.
+Error calculating folder size.	InfoWindow		Προέκυψε σφάλμα κατά τον υπολογισμό του μεγέθους του φακέλου.
 MiB	WidgetAttributeText		MB
 Delete	FSUtils		Διαγραφή
 Edit name	ContainerWindow		Επεξεργασία ονόματος
@@ -308,6 +313,7 @@ starts with	SelectionWindow		ξεκινάει με
 New	DeskWindow		Νέο
 Invert	SelectionWindow		Αντιστροφή
 Would you like to find some other suitable application?	FSUtils		Θα θέλετα να επιλέξετε μια ποιο κατάλληλη εφαρμογή;
+*+? operand may be empty.	libtracker		*+? τελεστής ενδέχεται να είναι κενός.
 (unknown)	AttributesView		(άγνωστο)
 Recent folders	FavoritesMenu		Πρόσφατοι φάκελοι
 Signed memory size	AttributesView		Μέγεθος μνήμης με πρόσημο
@@ -344,6 +350,7 @@ Size:	InfoWindow		Μέγεθος:
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		To επιλεγμένο στοιχείο δεν μπορεί να μετακινηθεί στον Κάδο Απορριμμάτων. Θα θέλατε εναλλακτικά να το διαγράψετε; (Αυτή η λειτουργία δεν μπορεί να επανέλθει.)
 Copy	ContainerWindow		Αντιγραφή
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Συγνώμη, η ιδιότητα 'Χαρακτήρας' δεν μπορεί να αποθηκεύσει έναν γλύφο πολλών byte.
+Open parent	VirtualDirectoryWindow		Άνοιγμα γονικού φακέλου
 And	FindPanel		Και
 multiple disks	FindPanel		πολλαπλοί δίσκοι
 Drawing pattern	AttributesView		Μοτίβο σχεδιασμού
@@ -371,6 +378,7 @@ greater than	FindPanel		μεγαλύτερο από
 Add	FindPanel		Προσθήκη
 Created:	InfoWindow		Δημιουργήθηκε:
 Edit Query template	FindPanel		Επεξεργασία προτύπου ερωτήματος
+Save query as template…	FindPanel		Αποθήκευση αιτήματος ως πρότυπο…
 All disks	AutoMounterSettings		Όλοι οι δίσκοι
 link	FSUtils	filename link	σύνδεσμος
 16-bit unsigned integer	AttributesView		Ακέραιος αριθμός χωρίς πρόσημο 16-bit
@@ -436,8 +444,10 @@ ends with	FindPanel		τελειώνει με
 Show Disks icon	SettingsView		Εμφάνιση εικονιδίου δίσκων
 Outline selection rectangle only	SettingsView		Μόνο περίγραμμα ορθογώνιας επιλογής
 by formula	FindPanel		από τον τύπο
+Resize to fit	VirtualDirectoryWindow		Προσαρμογή μεγέθους
 Move to Trash	FilePanelPriv		Μετακίνηση στον Κάδο
 is	FindPanel		είναι
+If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Αν μετονομάσετε τον φάκελο συστήματος ή τα περιεχόμενά του, δεν θα μπορέσετε να εκκινήσετε το %osName!\n\nΕίστε σίγουρος πως θέλετε να το κάνετε αυτό;\n\nΓια να μετονομάσετε τον φάκελο ή τα περιεχόμενά του ούτως ή άλλως, κρατήστε πατημένο το πλήκτρο Shift και κάντε κλικ στο κουμπί \"Μετονομασία\".
 40 x 40	DeskWindow		40 x 40
 40 x 40	ContainerWindow		40 χ 40
 Permissions	FilePermissionsView		Άδειες

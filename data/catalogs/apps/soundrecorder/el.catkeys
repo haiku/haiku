@@ -13,7 +13,7 @@ Some of the files don't appear to be audio files.	RecorderWindow		Μερικά �
 Stop	RecorderWindow		Σταμάτα
 Format:	RecorderWindow		Μορφή:
 Sound List	RecorderWindow		Λίστα ήχου
-Compression: 	RecorderWindow		Συμπίεση: 
+Compression: 	RecorderWindow		Μέθοδος συμπίεσης: 
 Rewind	RecorderWindow		Προς τα πίσω
 Sample rate:	RecorderWindow		Ρυθμός δειγματοληψίας:
 Invalid audio files	RecorderWindow		Άκυρα αρχεία ήχου

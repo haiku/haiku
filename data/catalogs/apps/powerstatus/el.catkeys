@@ -35,7 +35,7 @@ OEM info: 	PowerStatus		Πληροφορίες OEM:
 Design voltage: 	PowerStatus		Σχεδιασμένη τάση: 
 Battery charging	PowerStatus		Η μπαταρία φορτίζεται
 The battery level is critical, please plug in the device immediately.	PowerStatus		Το επίπεδο της μπαταρίας είναι πολύ χαμηλό, παρακαλώ φορτίστε την συσκευή σας άμεσα.
-Design capacity warning: 	PowerStatus		Προειδοποίηση σχεδιασμένης τάσης: 
+Design capacity warning: 	PowerStatus		Προειδοποίηση σχεδιασμού χωρητικότητας: 
 Quit	PowerStatus		Έξοδος
 rechargeable	PowerStatus		επαναφορτιζόμενο
 charging	PowerStatus		φόρτιση

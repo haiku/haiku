@@ -21,7 +21,7 @@ Linear B ideograms	UnicodeBlocks		Ιδεογράμματα Γραμμικής Β
 Devanagari	UnicodeBlocks		Devanagari
 Armenian	UnicodeBlocks		Αρμενικά
 Glagotic	UnicodeBlocks		Glagotic
-Mathematical operators	UnicodeBlocks		Μαθηματικοί φορείς
+Mathematical operators	UnicodeBlocks		Μαθηματικοί τελεστές
 General punctuation	UnicodeBlocks		Γενική στίξη
 Miscellaneous technical	UnicodeBlocks		Γενικά τεχνικά
 Vertical forms	UnicodeBlocks		Κάθετες μορφές
@@ -172,7 +172,7 @@ Mongolian	UnicodeBlocks		Μογγολέζικα
 Supplemental arrows A	UnicodeBlocks		Εκτεταμένα βέλη Α
 Miscellaneous symbols and arrows	UnicodeBlocks		Διάφορα σύμβολα και βέλη
 Yijing hexagram symbols	UnicodeBlocks		Σύμβολα εξαγράμμου Ι Τσινγκ
-Supplemental mathematical operators	UnicodeBlocks		Συπληρωματικοί μαθηματικοί φορείς
+Supplemental mathematical operators	UnicodeBlocks		Συμπληρωματικοί μαθηματικοί τελεστές
 Enclosed CJK letters and months	UnicodeBlocks		Περιεχόμενα CJK γράμματα και μήνες
 Kayah Li	UnicodeBlocks		Kayah Li
 Alphabetic presentation forms	UnicodeBlocks		Αλφαβητικές φόρμες παρουσιάσης
@@ -194,7 +194,7 @@ CJK compatibility	UnicodeBlocks		Συμβατότητα με CJK
 Malayalam	UnicodeBlocks		Malayalam
 N'Ko	UnicodeBlocks		N'Ko
 Kannada	UnicodeBlocks		Καναδέζικα
-Copy as escaped byte string	CharacterView		Ανιγράψετε ώς παραλειπόμενη σειρά byte
+Copy as escaped byte string	CharacterView		Αντιγραφή ως παραλειπόμενη σειρά byte
 Phonetic extensions supplement	UnicodeBlocks		Συμπλήρωμα φωνητικών επεκτάσεων
 Domino tiles	UnicodeBlocks		Πλάκες ντόμινο
 Bhaiksuki	UnicodeBlocks		Μπαϊξούκι

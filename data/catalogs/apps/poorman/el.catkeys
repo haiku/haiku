@@ -20,7 +20,7 @@ Cancel	PoorMan		Άκυρο
 Directory: 	PoorMan		Κατάλογος: 
 Hits: %lu	PoorMan		Επισκέψεις: %lu
 Hits: 0	PoorMan		Επισκέψεις: 0
-Shutting down.\n	PoorMan		Τερματισμός λειτουργίας.\n
+Shutting down.\n	PoorMan		Γίνεται τερματισμός λειτουργίας.\n
 Select all	PoorMan		Επιλογή όλων
 Error Server	PoorMan		Σφάλμα Εξυπηρετητή
 Send file listing if there's no start page	PoorMan		Αν δεν υπάρχει αρχική σελίδα, να αποσταλεί λίστα αρχείων

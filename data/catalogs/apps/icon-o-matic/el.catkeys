@@ -33,7 +33,7 @@ Assign Path	Icon-O-Matic-AddPathsCmd		Ανάθεση μονοπατιού
 Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Επαναφορά μετασχηματισμού
 Transformation	Transformation		Μετασχηματισμός
 Remove	Icon-O-Matic-StylesList		Αφαίρεση
-Cancel	Icon-O-Matic-Menu-Settings		Ακύρωση
+Cancel	Icon-O-Matic-Menu-Settings		Άκυρο
 Assign Style	Icon-O-Matic-AssignStyleCmd		Αντιστοίχιση Στυλ
 Transformation	Icon-O-Matic-TransformationBoxStates		Μετασχηματισμός
 Closed	Icon-O-Matic-PropertyNames		Κλειστό

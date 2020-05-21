@@ -167,7 +167,7 @@ If you rename %target, %osName may not behave properly!\n\nAre you sure you want
 Could not open \"%name\" (%error). 	FSUtils		No s'ha pogut muntar \"%name\" (%error). 
 Media parameter group	AttributesView		Grup de paràmetres multimèdia
 %name info	InfoWindow	InfoWindow Title	Propietats de %name
-If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Si moveu la carpeta personal, el sistema %osName podria no comportar-se correctament!\n\nSegur que ho voleu fer?\n\nSi tanmateix voleu moure la carpeta personal, manteniu premuda la tecla Maj. i cliqueu a \"Mou\".
+If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Si moveu la carpeta personal, el sistema %osName podria no comportar-se correctament!\n\nSegur que ho voleu fer?\n\nSi tanmateix voleu moure la carpeta personal, manteniu premuda la tecla Maj. i cliqueu a Mou.
 Property info	AttributesView		Informació de propietat
 Sorry, you can't create links in the Trash.	PoseView		Disculpeu, no podeu fer enllaços amb la paperera.
 From	Email Query Columns		De
@@ -230,7 +230,7 @@ There was an error deleting \"%name\":\n\t%error	FSUtils		Hi ha hagut un error e
 Resize to fit	ContainerWindow		Ajusta a l'espai
 Link \"%name\" to:	InfoWindow	File dialog title for new sym link	Enllaça \"%name\" amb:
 Mount server error	AutoMounterSettings		Error del servidor de muntatge
-If you rename the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo rename the home folder anyway, hold down the Shift key and click \"Rename\".	FSUtils		Si canvieu de nom la carpeta personal, el sistema %osName podria no comportar-se correctament!\n\nSegur que ho voleu fer?\n\nSi tanmateix voleu canviar-la de nom, mantingueu premuda la tecla Maj. i cliqueu a \"Canvia'n el nom\".
+If you rename the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo rename the home folder anyway, hold down the Shift key and click \"Rename\".	FSUtils		Si canvieu de nom la carpeta personal, el sistema %osName podria no comportar-se correctament!\n\nSegur que ho voleu fer?\n\nSi tanmateix voleu canviar-la de nom, mantingueu premuda la tecla Maj. i cliqueu a Canvia'n el nom.
 Boolean	AttributesView		Booleà
 Invert selection	FilePanelPriv		Selecció inversa
 Memory size	AttributesView		Mida de la memòria
@@ -420,7 +420,7 @@ Emptying Trash… 	StatusWindow		Es buida la paperera...
 KiB	WidgetAttributeText		KiB
 Revert	TrackerSettingsWindow		Torna a l'estat anterior
 trash	B_TRASH_DIRECTORY		paperera
-If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Si moveu la carpeta de sistema o el que hi ha, no podreu fer arrencar el sistema %osName!\n\nSegur que ho voleu fer?\n\nSi tanmateix voleu fer-ho, mantingueu premuda la tecla Maj. i cliqueu a \"Mou\".
+If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Si moveu la carpeta de sistema o el que hi ha, no podreu fer arrencar el sistema %osName!\n\nSegur que ho voleu fer?\n\nSi tanmateix voleu fer-ho, mantingueu premuda la tecla Maj. i cliqueu a Mou.
 Close all in workspace	ContainerWindow		Tancat-ho tot de l'espai de treball
 Corrupted expression.	libtracker		Expressió corrupta.
 32 x 32	DeskWindow		32 x 32

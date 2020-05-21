@@ -1,0 +1,6 @@
+1	esperanto	x-vnd.haiku-softwareupdater	4014616027
+Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Alklaki ĉi tie por instali {0, plural, one{# ĝisdatigitan pakaĵon} other{# ĝisdatigitajn pakaĵoin}}.
+OK	UpdateManager		Bone
+Cancel	SoftwareUpdaterWindow	Alert button label	Nuligi
+OK	SoftwareUpdaterWindow		Bone
+Cancel	SoftwareUpdaterWindow		Nuligi

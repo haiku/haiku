@@ -8,7 +8,7 @@ Muted	NotificationView		Σε σίγαση
 Window width:	GeneralView		Πλάτος παράθυρου:
  is already listed	NotificationView	Alert message	 έχει ήδη προστεθεί
 OK	PrefletWin		Εντάξει
-Notifications	PrefletWin		Κοινοποιήσεις
+Notifications	PrefletWin		Ειδοποιήσεις
 Notifications preflet sample	PrefletWin		Δοκιμαστική ειδοποίηση
 Mute notifications from this application	NotificationView		Να γίνει σίγαση ειδοποιήσεων από αυτήν την εφαρμογή
 pixels	GeneralView		pixels

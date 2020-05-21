@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Installer	116830250
+1	italian	x-vnd.Haiku-Installer	3048565029
 Performing installation.	InstallProgress		Esecuzione dell'installazione.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Scegli il disco d'origine dal menu a pop-up. Quindi fai click su \"Inizia\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Chiudi la finestra del Gestore Disco prima di chiudere quella del programma di installazione.
@@ -33,7 +33,6 @@ Additional disk space required: 0.0 KiB	InstallerWindow		Spazio aggiuntivo richi
 This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Questo software è ancora in versione beta! Ciò significa il rischio di perdere dati importanti. Effettua backup con regolarità! Sei stato avvertito.\n\n\n
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Quando avrai avviato Haiku la prima volta, assicurati di leggere la documentazione alle voci \"Benvenuto\" e \"Guida per l'utente\". Troverai i loro collegamenti sulla Scrivania e tra i preferiti di WebPositive.\n\n
 ???	InstallerWindow	Unknown currently copied item	???
-Install anyway	InstallProgress		Installa comunque
 1)   If you are installing Haiku onto real hardware (not inside an emulator), you may want to prepare a hard disk partition from another OS (you could, for example, use a GParted Live-CD, which can also resize existing partitions to make room).\nYou can also set up partitions by launching DriveSetup from Installer, but you won't be able to resize existing partitions with it. While DriveSetup has been quite thoroughly tested over the years, it's recommended to have up-to-date backups of the other partitions on your system. Just in case…	InstallerApp		1)   Se intendi installare Haiku su una macchina reale (non all'interno di un emulatore), potresti voler preparare una partizione sul disco rigido da un altro sistema operativo (potresti, ad esempio, utilizzare un CD avviabile con GParted, che è anche in grado di ridimensionare le partizioni esistenti per liberare spazio).\nPuoi anche configurare le partizioni lanciando l'utility Gestione Disco dal programma di installazione, ma in questo non sarai in grado di ridimensionare le partizion. Per quanto Gestione Disco sia stato testato a fondo nel corso degli anni, è raccomandato disporre di un backup aggiornato delle altre partizioni del sistema. Non si sa mai…
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Scegli il disco d'origine e di destinazione dai menù a pop-up. Quindi fai click su \"Inizia\".
 Hide optional packages	InstallerWindow		Nascondi pacchetti opzionali
@@ -58,7 +57,6 @@ Collecting copy information.	InstallProgress		Raccolta informazioni di copia.
 Show optional packages	InstallerWindow		Mostra pacchetti opzionali
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Il disco di destinazione potrebbe non avere abbastanza spazio. Prova a scegliere un disco differente oppure non installare elementi opzionali.
 Installation canceled.	InstallProgress		Installazione annullata.
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Il volume di destinazione non è vuoto. Sei sicuro di voler procedere con l'installazione?\n\nNota: la cartella 'system' risultante sarà una copia pulita dal volume sorgente, ma manterrà le sue configurazioni, tutte le altre cartelle saranno unite. Laddove file e collegamenti esistano su entrambi i volume, saranno sovrascritti con la versione nel volume sorgente.
 OK	InstallerApp		OK
 Are you sure you want to abort the installation?	InstallerWindow		Sei sicuro di voler annullare l'installazione?
 Stop	InstallerWindow		Interrompi

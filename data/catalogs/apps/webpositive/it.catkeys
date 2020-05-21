@@ -11,7 +11,7 @@ Fonts	Settings Window		Tipi di caratteri
 Path	Cookie Manager		Percorso:
 of	Download Window	...as in '12kB of 256kB'	di
 Bookmarks	WebPositive Window		Segnalibri
-Use proxy server to connect to the internet	Settings Window		Utilizza un server proxy per connettersi a Internet
+Use proxy server to connect to the internet	Settings Window		Utilizza un server proxy per la connessione a Internet
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url completato
 Auto-hide interface in full screen mode	Settings Window		Nasconti automaticamente l'interfaccia in modalità a schermo intero
 There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	C'è stato un errore nell'accedere alla dei segnalibri.\n\nErrore: %error
@@ -39,7 +39,7 @@ Proxy server port:	Settings Window		Porta del server proxy:
 Error opening downloads folder	Download Window		Errore nell'apertura della cartella dei file scaricati
 Show bookmark bar	WebPositive Window		Mostra barra dei segnalibri
 Find	WebPositive Window		Trova
-Standard font:	Settings Window		Carattere predefinito:
+Standard font:	Settings Window		Tipo di carattere predefinito:
 Open download error	Download Window		Errore nell'apertura del file scaricato
 General	Settings Window		Generali
 New tabs:	Settings Window		Nuove tab:
@@ -114,7 +114,7 @@ History	WebPositive Window		Cronologia
 Reset size	WebPositive Window		Reimposta dimensioni
 Do you really want to clear the browsing history?	WebPositive Window		Sei sicuro di voler cancellare la cronologia del browser?
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Trova la prossima occorrenza dei termini di ricerca
-Fixed font:	Settings Window		Carattere a spaziatura fissa:
+Fixed font:	Settings Window		Tipo di carattere a spaziatura fissa:
 Quit	WebPositive Window		Esci
 Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Cerca la precedente occorrenza dei termini di ricerca
 Remember username and password for this site	Authentication Panel		Ricorda nome utente e password per questo sito

@@ -1,0 +1,44 @@
+1	croatian	x-vnd.Haiku-Time	1514793487
+OK	Time		OK
+Message receiving failed	Time		Neuspjelo primanje poruke
+Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Vrijeme i datum, napisali:\n\n\t Andrew Edward McCall\n\t Mike Berg\n\t Julun\n\t Philippe Saint-Pierre\n\nAutorska prava 2004-2012, Haiku.
+Australia	Time		Australija
+America	Time		Amerika
+Set time zone	Time		Postavi vremensku zonu
+Waiting for answer failed	Time		Neuspjelo čekanje odgovora
+<Other>	Time		<Drugo>
+Received invalid time	Time		Primljeno netočno vrijeme
+Remove	Time		Ukloni
+Synchronize again	Time		Sinkroniziraj opet
+Asia	Time		Azija
+Try all servers	Time		Probaj sve servere
+Time	Time		Vrijeme
+Current time:	Time		Trenutno vrijeme:
+Europe	Time		Europa
+Show day of week	Time		Pokaži dan u tjednu
+Local time (Windows compatible)	Time		Lokalno vrijeme(kompatibilno sa Windows-ima)
+Hardware clock set to:	Time		Hardware-ski sat je postavljen na:
+Arctic	Time		Arktik
+Antarctica	Time		Antartika
+GMT (UNIX compatible)	Time		GMT(kompatibilno sa UNIX-om)
+Africa	Time		Afrika
+Stop	Time		Stani
+Time zone	Time		Vremenska zona
+Clock	Time		Sat
+Network time	Time		Mrežno vrijeme
+Sending request failed	Time		Neuspjelo slanje upita
+Preview time:	Time		Vrijeme gledanja:
+\nNow: 	Time		\nSad: 
+Pacific	Time		Pacifik
+Atlantic	Time		Atlantik
+Display time with seconds	Time		Prikaži vrijeme sa sekundama
+Time	System name		Vrijeme
+about	Time		O
+Show time zone	Time		Pokaži vremensku zonu
+Synchronize at boot	Time		Sinkroniziraj pri podizanju sustava
+Indian	Time		Indijsko
+Revert	Time		Obrni
+Date and time	Time		Datum i vrijeme
+The following error occured while synchronizing:\n%s	Time		Došlo je do slijedeće greške tijekom sinkroniziranja:\n%s
+Synchronize	Time		Sinkroniziraj
+Add	Time		Dodaj

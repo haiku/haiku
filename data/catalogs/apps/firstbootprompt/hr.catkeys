@@ -1,0 +1,74 @@
+1	croatian	x-vnd.Haiku-FirstBootPrompt	3199120150
+Japanese	KeymapNames		Japanski
+Esperanto	KeymapNames		Esperanto
+Belarusian	KeymapNames		Bjeloruski
+Brazilian	KeymapNames		Brazilski
+Dvorak	KeymapNames		Dvorak
+Polish	KeymapNames		Poljski
+Latin-American	KeymapNames		Latinoamerički
+Ukrainian	KeymapNames		Ukrajinski
+Russian (Yawert)	KeymapNames		Ruski (Yawert)
+United-Kingdom	KeymapNames		Ujedinjena kraljevina
+Serbian (Cyrillic)	KeymapNames		Srpski (ćirilica)
+Turkish (Type-F)	KeymapNames		Turski (Type-F)
+Bulgarian (Cyrillic)	KeymapNames		Bugarski (ćirilica)
+Finnish	KeymapNames		Finski
+Swedish	KeymapNames		Švedski
+Svorak	KeymapNames		Svorak
+German	KeymapNames		Njemački
+Swiss-German	KeymapNames		Švicarski njemački
+Keymap	BootPromptWindow		Tipkovnica
+Spanish (Dvorak)	KeymapNames		Španjolski (Dvorak)
+Czech	KeymapNames		Češki
+Turkish (Type-Q)	KeymapNames		Turski (Type-Q)
+Slovak	KeymapNames		Slovački
+Russian (Udmurt, Komi, Mari)	KeymapNames		Ruski (Udmurt, Komi, Mari)
+Thai (TIS-820.2538)	KeymapNames		Tajlandski (TIS-820.2538)
+Russian (Mac)	KeymapNames		Ruski (Mac)
+Thank you for trying out Haiku! We hope you'll like it!\n\nYou can select your preferred language and keyboard layout from the list on the left which will then be used instantly. You can easily change both settings from the Desktop later on on the fly.\n\nDo you wish to run the Installer or continue booting to the Desktop?\n	BootPromptWindow	For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	Hvala vam što isprobavate Haiku! Nadamo se da vam se sviđa!\n\nMožete izabrati željeni jezik i raspored tipkovnice sa liste na lijevo koja će odmah biti korištena. Lako možete promjeniti postavke sa radne povšine u letu.\n\nŽelite li pokrenuti instalacijski program ili ćete nastaviti boot u radnu površinu?\n
+German (Mac)	KeymapNames		Njemački (Mac)
+Arabic (102)	KeymapNames		Arapski (102)
+Belarusian (Latin)	KeymapNames		Bjeloruski (latinica)
+Belarusian (Mac)	KeymapNames		Bjeloruski (Mac)
+Hebrew	KeymapNames		Hebrejski
+Greek	KeymapNames		Grčki
+Croatian	KeymapNames		Hrvatski
+Run Installer	BootPromptWindow		Pokreni instalacijski program
+Faeroese	KeymapNames		Farski
+Polish (Typewriter)	KeymapNames		Poljski (strojopis)
+French (Mac)	KeymapNames		Francuski (Mac)
+Spanish	KeymapNames		Španjolski
+Ukrainian (Mac)	KeymapNames		Ukrajinski (Mac)
+Estonian	KeymapNames		Estonski
+French (Bépo)	KeymapNames		Francuski (Bépo)
+Serbian (Latin)	KeymapNames		Srpski (latinica)
+Russian (Typewriter)	KeymapNames		Ruski (strojopis)
+French	KeymapNames		Francuski
+Italian	KeymapNames		Talijanski
+Portuguese	KeymapNames		Portugalski
+Swiss-French	KeymapNames		Švicarski francuski
+Slovene	KeymapNames		Slovenski
+Lithuanian	KeymapNames		Litvanski
+French (NF Z71-300)	KeymapNames		Francuski (NF Z71-300)
+ISO-9995	KeymapNames		ISO-9995
+Kazakh	KeymapNames		Kazaški
+Language	BootPromptWindow		Jezik
+Lithuanian (Standard)	KeymapNames		Litvanski (standardni)
+Custom	BootPromptWindow		Prilagođeno
+Norwegian	KeymapNames		Norveški
+Danish	KeymapNames		Danski
+Boot to Desktop	BootPromptWindow		Boot u radnu površinu
+Bulgarian (Phonetic)	KeymapNames		Bugarski (fonetski)
+Canadian-French	KeymapNames		Kanadski francuski
+Welcome to Haiku!	BootPromptWindow		Dobro došli u Haiku!
+Russian	KeymapNames		Ruski
+Hungarian	KeymapNames		Mađarski
+Irish	KeymapNames		Irski
+Romanian	KeymapNames		Rumunjski
+Macedonian	KeymapNames		Makedonski
+Czech (Mac)	KeymapNames		Češki (Mac)
+Brazilian (ABNT2)	KeymapNames		Brazilski (ABNT2)
+Albanian	KeymapNames		Albanski
+Dutch	KeymapNames		Nizozemski
+Friulian	KeymapNames		Friulski
+Icelandic	KeymapNames		Islandski

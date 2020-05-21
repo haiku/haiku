@@ -1,0 +1,50 @@
+1	croatian	x-vnd.Haiku-Expander	174719784
+Expand	ExpanderMenu		Proširi
+Expanding '%s'…	ExpanderWindow		Širim '%s'…
+Close window when done expanding	ExpanderPreferences		Zatvori prozor kada je proširivanje završeno
+Set destination…	ExpanderMenu		Postavi odredište...
+Use:	ExpanderPreferences		Korisiti:
+File expanded	ExpanderWindow		Datoteka je proširena
+The destination is read only.	ExpanderWindow		Odredište je samo za čitanje.
+Expander: Open	ExpanderWindow		Proširivač:Otvori
+ is not supported	ExpanderWindow		 - nije podržano
+Expander settings	ExpanderPreferences		Postavke proširivača
+Select current	DirectoryFilePanel		Odaberi trenutno
+Source	ExpanderWindow		Izvor
+Error when expanding archive	ExpanderWindow		Greška pri proširivanju arhive
+Hide contents	ExpanderWindow		Sakrij sadržaj
+Cancel	ExpanderWindow		Otkaži
+Automatically expand files	ExpanderPreferences		Automatski proširi datoteke
+Continue	ExpanderWindow		Nastavi
+Destination folder	ExpanderPreferences		Odredišna mapa
+Other	ExpanderPreferences		Ostalo
+Cancel	ExpanderPreferences		Otkaži
+Expansion	ExpanderPreferences		Širenje
+Select	DirectoryFilePanel		Odaberi
+The folder was either moved, renamed or not supported.	ExpanderWindow		Mapa je ili premještena, preimenovana ili nije podržana.
+Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Odredišna mapa ne postoji. Želite li ju napraviti?
+Same directory as source (archive) file	ExpanderPreferences		Isti direktorij kao i izvorna (arhiva) datoteka
+Settings	ExpanderMenu		Postavke
+Settings…	ExpanderMenu		Postavke...
+Expander: Choose destination	DirectoryFilePanel		Proširivač:Izaberite odredište
+Select	ExpanderPreferences		Odaberi
+Show contents	ExpanderWindow		Pokaži sadržaj
+Automatically show contents listing	ExpanderPreferences		Automatski pokaži izlistavanje sadržaja
+OK	ExpanderPreferences		U redu
+Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Jeste li sigurni da želite prestati proširivati ovu arhivu? Proširene stavke možda nisu kompletne.
+Leave destination folder path empty	ExpanderPreferences		Ostavi putnju odredišne mape praznom
+Failed to create the destination folder.	ExpanderWindow		Neuspjelo stvaranje odredišne mape.
+Select '%s'…	DirectoryFilePanel		Odaberi '%s'...
+Create	ExpanderWindow		Napravi
+The file doesn't exist	ExpanderWindow		Datoteka ne postoji
+Stop	ExpanderMenu		Zaustavi
+File	ExpanderMenu		Datoteka
+Expander	System name		Proširivač
+Expand	ExpanderWindow		Proširi
+Close	ExpanderMenu		Zatvori
+The destination is not a folder.	ExpanderWindow		Odredište nije mapa.
+Open destination folder after extraction	ExpanderPreferences		Otvori odredišnu mapu nakon raspakiranja
+Set source…	ExpanderMenu		Postavi izvor...
+Show contents	ExpanderMenu		Pokaži sadržaj
+Stop	ExpanderWindow		Zaustavi
+Destination	ExpanderWindow		Odredište

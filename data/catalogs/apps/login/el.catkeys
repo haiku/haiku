@@ -17,4 +17,4 @@ Password:	Login View		Κωδικός:
 Unimplemented	Login App		Μη υλοποιημένο
 OK	Login App		ΟΚ
 Error: %1	Login App		Σφάλμα: %1
-error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	Σφάλμα %s\n
+error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	σφάλμα %s\n

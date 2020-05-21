@@ -1,5 +1,5 @@
 1	catalan; valencian	x-vnd.Haiku-Appearance	663472720
-Control border	Colors tab		Control de la vora
+Control border	Colors tab		Vora del control
 Control mark	Colors tab		Marca de control
 Off	AntialiasingSettingsView		Desactivat
 Window border	Colors tab		Vora de la finestra
@@ -61,7 +61,7 @@ Selected list item background	Colors tab		Fons de l'element seleccionat de la ll
 Inactive window tab text	Colors tab		Test de la pestanya de les finestres inactives
 Navigation base	Colors tab		Base de la navegació
 Fonts	APRWindow		Tipus de lletra
-The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	A la taula i al llit, al primer crit.
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Jove xef, sol·licito que porti cafè descafeïnat i whisky amb quinze glaçons d'hidrogen!
 Grayscale	AntialiasingSettingsView		Escala de grisos
 Antialiasing type:	AntialiasingSettingsView		Tipus de suavitzat:
 Panel text	Colors tab		Text del plafó

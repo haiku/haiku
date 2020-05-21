@@ -1,0 +1,17 @@
+1	esperanto	x-vnd.haiku.zip-o-matic	2032806096
+Drop files here.	file:ZipOMaticWindow.cpp		Meti dosierojn tie ĉi.
+Filename: %s	file:ZipOMaticWindow.cpp		Dosiernomo: %s
+Do you want to stop them?	file:ZipOMatic.cpp		Ĉu vi volas halti ilin?
+Error creating archive	file:ZipOMaticWindow.cpp		Eraro de kreado de arkivo
+Stop them	file:ZipOMatic.cpp		Halti ilin
+Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Ĉu vi estas certe, ke vi volas halti la kreadon de la arkivo?
+Preparing to archive	file:ZipperThread.cpp		Pretigante arkivi
+Let them continue	file:ZipOMatic.cpp		Ili daŭru
+Continue	file:ZipOMaticWindow.cpp		Daŭri
+Archive created OK	file:ZipOMaticWindow.cpp		Arkivo sukcese kreita
+{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# doserio aldonita.} other{# dosieroj aldonitaj.}}
+Stop	file:ZipOMaticWindow.cpp		Halti
+Stopped	file:ZipOMaticWindow.cpp		Haltita
+Archive	file:ZipperThread.cpp		Arkivo
+Creating archive: %s	file:ZipOMaticWindow.cpp		Kreante arkivon: %s
+You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		Estas {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matic-oj}} rulante.\n\n

@@ -1,0 +1,17 @@
+1	esperanto	x-vnd.Haiku-FontDemo	3449067186
+Stop cycling	ControlView		Ĉesigi turniĝon
+Haiku, Inc.	FontDemoView		Haiku, Inc.
+Rotation: %d	ControlView		Rotacio: %d
+Shear: %d	ControlView		Tondo: %d
+Spacing: %d	ControlView		Interspaco: %d
+Cycle fonts	ControlView		Cikli tiparojn
+Font:	ControlView		Tiparo:
+Drawing mode:	ControlView		Desegna reĝimo: 
+Haiku, Inc.	ControlView		Haiku, Inc.
+Controls	FontDemo		Stiriloj
+FontDemo	System name		TiparoDemonstro
+Outline: %d	ControlView		Konturo: %d
+Text:	ControlView		Teksto:
+Antialiased text	ControlView		Glatiga teksto
+Bounding boxes	ControlView		Limigaj kestoj
+Size: %d	ControlView		Grando: %d

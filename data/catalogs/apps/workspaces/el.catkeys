@@ -1,6 +1,6 @@
 1	greek, modern (1453-)	x-vnd.Be-WORK	3927737357
 Quit	Workspaces		Έξοδος
-Invalid argument: %s\n	Workspaces		Μη έγκυρη παράμετρος: %s\n
+Invalid argument: %s\n	Workspaces		Μη έγκυρο όρισμα: %s\n
 Change workspace count…	Workspaces		Αλλαγή πλήθους χώρων εργασίας…
 Always on top	Workspaces		Πάντα στην κορυφή
 Show window border	Workspaces		Εμφάνιση περιγράμματος παραθύρου

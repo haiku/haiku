@@ -1,3 +1,3 @@
 1	italian	x-vnd.Haiku-TelnetService	1209067113
-The Telnet server allows you to remotely access your machine with a terminal session using the telnet protocol.\n\nPlease note that it is an insecure and unencrypted connection.	TelnetServiceAddOn		Il server Telnet consente di accedere da remoto alla tua macchina attraverso una sessione di terminale utilizzando il protocollo telnet.\n\nRicorda che la connessione non è crittografata e, quindi, sicura.
+The Telnet server allows you to remotely access your machine with a terminal session using the telnet protocol.\n\nPlease note that it is an insecure and unencrypted connection.	TelnetServiceAddOn		Il server Telnet consente di accedere da remoto alla tua macchina attraverso una sessione di terminale utilizzando il protocollo telnet.\n\nRicorda che la connessione non è sicura, in quanto non crittografata.
 Telnet server	TelnetServiceAddOn		Server Telnet

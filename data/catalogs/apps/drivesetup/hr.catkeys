@@ -1,0 +1,87 @@
+1	croatian	x-vnd.Haiku-DriveSetup	1250478379
+Could not unmount partition %s.	MainWindow		Ne mogu odmontirati particiju %s.
+Mount all	MainWindow		Montiraj sve
+Disk	MainWindow		Disk
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Jeste li sigurni da želite zapisati promjene natrag na disk?\n\nSvi podati na odabranoj particiji biti će nepovratno izgubljeni ako tonapravite!
+Device	PartitionList		Uređaj
+Initialize	MainWindow		Inicijaliziraj
+Could not change the parameters of the selected partition.	MainWindow		Ne mogu promjeniti parametre odabrane particije.
+Delete partition	MainWindow		Izbriši particiju
+Error: 	MainWindow	in any error alert	Greška: 
+Removable	PartitionList		Uklonjiv
+The panel experienced a problem!	MainWindow		Ploča je doživjela problem!
+Device	DiskView		Uređaj
+Are you sure you want to format the Intel Extended Partition? Any subpartitions it contains will be overwritten if you continue. You will be asked again before changes are written to the disk.	MainWindow		Jeste li sigurni da želite formatirati Intel proširenu particiju? Sve podparticije koje sadrži će biti prebrisane ako nastavite. Ponovno ćete biti pitani prije nego izmjene budu zapisane na disk.
+Unmount	MainWindow		Odmontiraj
+Failed to format the partition %s!\n	MainWindow		Neuspjelo formatiranje particije %s!\n
+Partition size	CreateParametersPanel		Veličina particije
+The partition %s is currently mounted.	MainWindow		Particija %s je trenutno montirana.
+Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Jeste li sigurni da želite formatirati particiju \"%s\"? Biti ćete upitani ponovno prije nego se promjene zapišu na disk.
+Mounted at	PartitionList		Montirano na
+Create…	MainWindow		Napravi...
+Write changes	MainWindow		Zapiši promjene
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Neuspjela inicijalizacija particije %s. (Ništa nije zapisano na disk.)
+Eject	MainWindow		Izbaci
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Jeste li sigurni da želite sada zapisati promjene na disk?\n\nSvi podaci na disku %s biti će nepovratno izgubljeni ako to učinite!
+Read only	PartitionList		Samo čitanje
+Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Neuspjela promjena parametara particije. Nikakve promjene neće biti zapisane na disk.
+Partition %ld	DiskView		Particija %ld
+No disk devices have been recognized.	DiskView		Nijedan disk uređaj nije prepoznat.
+Attributes	PartitionList		Atributi
+Failed to delete the partition. No changes have been written to disk.	MainWindow		Neuspjelo brisanje particije. Promjene neće biti zapisane na disk.
+Change parameters…	MainWindow		Promjeni parametere...
+Format	InitializeParametersPanel		Formatiraj
+Could not unmount partition	MainWindow		Ne mogu odmontirati particiju
+Create	CreateParametersPanel		Napravi
+File system	PartitionList		Datotečni sustav
+The selected partition does not contain a partitioning system.	MainWindow		Odabrana particija ne sadrži particijski sustav.
+End: %s	Support		Kraj: %s
+Partition type	PartitionList		Vrsta particije
+Unable to find the selected partition by ID.	MainWindow		Nije moguće naći odabranu particiju pomoću ID-a.
+The currently selected partition is not empty.	MainWindow		Trenutno odabrana particija nije prazna.
+Shared	PartitionList		Djeljeno
+You need to select a partition entry from the list.	MainWindow		Morate odabrati unos particije sa liste.
+Volume name	PartitionList		Ime particije
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		jeste li sigurni da želite sada zapisati promjene na disk?\n\nSvi podaci biti će nepovratno izgubljeni ako to učinite!
+Change	ChangeParametersPanel		Promijeni
+Partition name:	ChangeParametersPanel		Ime particije:
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Jeste li sigurni da želite sada zapisati promjene na disk?\n\nSvi podaci na particiji %s biti će nepovratno izgubljeni ako to učinite!
+Cancel	AbstractParametersPanel		Otkaži
+Format	MainWindow		Formatiraj
+<empty or unknown>	DiskView		<empty or unknown>
+OK	MainWindow		U redu
+Open with DiskProbe	MainWindow		Otvori pomoću DiskProbe
+Could not delete the selected partition.	MainWindow		Nisam mogao obrisati odabranu particiju.
+There was an error preparing the disk for modifications.	MainWindow		Došlo je do greške pri pripremanju diska za promjene.
+The disk has been successfully initialized.\n	MainWindow		Disk je uspješno inicijaliziran.\n
+Cancel	MainWindow		Otkaži
+Free space	PartitionList		Slobodni prostor
+Force unmount	MainWindow		Prisili odmontiranje
+Partition	MainWindow		Particija
+Change parameters	MainWindow		Promjeni parametere...
+Rescan	MainWindow		Ponovno skeniraj
+Failed to initialize the disk %s!\n	MainWindow		Neuspjela inicijalizacija diska %s!\n
+Disk system \"%s\" not found!	MainWindow		Sustav diska \"%s\" nije nađen!
+Delete	MainWindow		Izbriši
+Partition type:	ChangeParametersPanel		Vrsta particije:
+Parameters	PartitionList		Parametri
+Could not acquire partitioning information.	MainWindow		Nisam mogao dobiti informacije o particioniranju.
+Cannot delete the selected partition.	MainWindow		Ne mogu obrisati odabranu particiju.
+Continue	MainWindow		Nastavi
+Could not mount partition %s.	MainWindow		Ne mogu montirati particiju %s.
+Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Jeste li sigurni da želite formatirati particiju? Biti ćete upitani ponovno prije nego promjene budu zapisane na disk.
+<empty or unknown>	PartitionList		<empty or unknown>
+The selected disk is read-only.	MainWindow		Odabrani disk je samo za čitanje.
+The partition %s is already unmounted.	MainWindow		Particija %s je već odmontirana.
+Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		jeste li digurn ida želite promjeniti parametre na odabranoj particiji?\n\nParticiju možda drugi operativni sustav ne može prepoznati!
+OK	AbstractParametersPanel		U redu
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Jeste li sigurni da želite zapisati izmjene na disk sada?\n\nSvi podaci na odabranom disku biti će nepovratno izgubljeni ako to učinite!
+Select a partition from the list below.	DiskView		Odaberite particiju sa donje liste.
+Active	PartitionList		Aktivan
+Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Jeste li sigurni da želite obrisati odabranu particiju?\n\nSvi podaci na particiji biti će nepovratno izgubljeni ako to učinite!
+Failed to format the partition. No changes have been written to disk.	MainWindow		Neuspjelo formatiranje particije. Promjene neće biti zapisane na disk.
+The partition %s has been successfully formatted.\n	MainWindow		Particija %s je uspješno formatirana.\n
+The partition %s is already mounted.	MainWindow		Particija %s je već montirana.
+Size	PartitionList		Veličina
+Creation of the partition has failed.	MainWindow		Stvaranje particije nije uspjelo.
+Mount	MainWindow		Montiraj

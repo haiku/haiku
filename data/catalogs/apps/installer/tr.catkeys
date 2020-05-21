@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Installer	116830250
+1	turkish	x-vnd.Haiku-Installer	3048565029
 Performing installation.	InstallProgress		Kuruluyor…
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Açılır menüden kaynak diski seçin ve \"Başla\"ya tıklayın.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Yükleyici penceresini kapatmadan önce Disk İzlencesi penceresini kapatın.
@@ -33,7 +33,6 @@ Additional disk space required: 0.0 KiB	InstallerWindow		Gereken ek disk alanı:
 This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Bu yazılım geliştirilme aşamasındadır; (önemli) verilerinizin kaybolma riski mevcuttur! Sık sık yedek almayı unutmayın! Demedi demeyin sonra.\n\n\n
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Haiku masaüstünü ilk kez gördükten sonra \"Hoş geldiniz\" ve \"Kullanıcı Kılavuzu\" belgelerini okumayı unutmayın. Masaüstü'nde ve WebPositive yer imleri içinde bağlantılar bulabilirsiniz.\n\n
 ???	InstallerWindow	Unknown currently copied item	???
-Install anyway	InstallProgress		Yine de yükle
 1)   If you are installing Haiku onto real hardware (not inside an emulator), you may want to prepare a hard disk partition from another OS (you could, for example, use a GParted Live-CD, which can also resize existing partitions to make room).\nYou can also set up partitions by launching DriveSetup from Installer, but you won't be able to resize existing partitions with it. While DriveSetup has been quite thoroughly tested over the years, it's recommended to have up-to-date backups of the other partitions on your system. Just in case…	InstallerApp		1)   Haiku'yu bir öykünücü değil de gerçek bir makineye kuruyorsanız, başka işletim sistemleri için bir disk bölümü bırakmak isteyebilirsiniz (bunun için örneğin GParted Live-CD sürümünü kullanabilirsiniz, bu sürüm mevcut bölümlerin de boyutunu değiştirebilir).\nEğer isterseniz disk bölümlendirme için Disk İzlencesi uygulamasını Yükleyici içinden çalıştırabilirsiniz, ancak bu yazılım mevcut bölümlerin boyutunu değiştiremez. Disk İzlencesi uzun yıllardır kullanılan denenmiş bir yazılım olmasına rağmen diğer disk bölümlerinin güncel bir yedeğine sahip olmanız tavsiye edilir. N'olur n'olmaz…
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Açılır menülerden kaynak ve hedef diskleri seçip \"Başla\"ya tıklayın.
 Hide optional packages	InstallerWindow		İsteğe bağlı paketleri gizle
@@ -58,7 +57,6 @@ Collecting copy information.	InstallProgress		Kopya bilgisi toplanıyor…
 Show optional packages	InstallerWindow		İsteğe bağlı paketleri göster
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Hedef diskte yeteri kadar boş alan olmayabilir. Başka bir disk seçin veya isteğe bağlı yüklemeleri gözden geçirin.
 Installation canceled.	InstallProgress		Kurulum iptal edildi.
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Hedef disk bölümü boş değil. Yine de kurmak istiyor musunuz?\n\nNot: 'system' klasörünün tümüyle üzerine yazılırken mevcut sistem ayarları korunacaktır. Diğer tüm klasörler yeni kurulumda korunurken hem kaynak hem de hedef konumda bulunan dosyalar ve bağlar kaynak sürümleri ile değiştirilecektir.
 OK	InstallerApp		Tamam
 Are you sure you want to abort the installation?	InstallerWindow		Kurulumu durdurmak istediğinizden emin misiniz?
 Stop	InstallerWindow		Durdur

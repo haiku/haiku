@@ -1,0 +1,12 @@
+1	croatian	x-vnd.Haiku-JPEG2000Translator	855817675
+High	JPEG2000Translator		Visoko
+Low	JPEG2000Translator		Nisko
+Output quality	JPEG2000Translator		Kvaliteta izlaza
+JPEG2000 images	JPEG2000Translator		JPEG2000 slike
+About	JPEG2000Translator		O programu
+Write black-and-white images as RGB24	JPEG2000Translator		Piši crno-bijele slike kao RGB24
+Version %d.%d.%d	JPEG2000Translator		Verzija %d.%d.%d
+Read	JPEG2000Translator		Čitaj
+Read greyscale images as RGB32	JPEG2000Translator		Čitaj sive slike kao RGB32
+©2002-2003, Shard\n©2005-2006, Haiku\n\nBased on JasPer library:\n© 1999-2000, Image Power, Inc. and\nthe University of British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nImageMagick's jp2 codec was used as \"tutorial\".\n\thttp://www.imagemagick.org/\n	JPEG2000Translator		©2002-2003, Shard\n©2005-2006, Haiku\n\nBazirano na JasPerbiblioteci:\n© 1999-2000, Image Power, Inc. and\nSveučilište British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nImageMagick's jp2 kodek je korišten kao \"tutorial\".\n\thttp://www.imagemagick.org/\n
+Write	JPEG2000Translator		Piši

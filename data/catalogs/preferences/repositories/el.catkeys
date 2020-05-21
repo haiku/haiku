@@ -36,7 +36,7 @@ Changes pending:	RepositoriesView	Status view text	Αλλαγές σε εκκρ�
 Remove	RepositoriesView	Button label	Αφαίρεση
 Remove these repositories?	RepositoriesView	Removal alert confirmation message	Να αφαιρεθούν αυτά τα αποθετήρια;
 Keep trying	TaskTimer	Button label	Να συνεχιστεί
-Cancel	Constants	Button label	Ακύρωση
+Cancel	Constants	Button label	Άκυρο
 Only one URL for each repository can be enabled. Please change your selections.	RepositoriesView	Error message	Για κάθε αποθετήριο, μόνο ένας υπερσύνδεσμος μπορεί να ενεργοποιηθεί. Παρακαλώ άλλάξτε τις επιλογές σας.
 Stop and quit	RepositoriesWindow	Button label	Διακοπή και έξοδος
 Disable all	RepositoriesView	Button label	Απενεργοποίηση όλων

@@ -1,0 +1,50 @@
+1	esperanto	x-vnd.Be-TSKB	2656653225
+Power off	DeskbarMenu		Malŝalti
+Sort applications by name	PreferencesWindow		Ordigi programojn laŭnome
+Suspend	DeskbarMenu		Halteti
+Hide clock	TimeView		Kaŝi la horloĝon
+Applications	PreferencesWindow		Programoj
+Time preferences…	TimeView		Agordoj de tempo…
+About Haiku	DeskbarMenu		Pri Haiku
+Edit in Tracker…	PreferencesWindow		Redakti per Spurilo…
+Recent documents:	PreferencesWindow		Ĵusaj dokumentoj:
+Recent applications	DeskbarMenu		Ĵusaj programoj
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		Programoj
+Find…	DeskbarMenu		Trovi…
+Show clock	Tray		Montri la horloĝon
+Window	PreferencesWindow		Fenestro
+Defaults	PreferencesWindow		Defaŭltoj
+Menu	PreferencesWindow		Menuo
+Recent documents	DeskbarMenu		Ĵusaj dokumentoj
+Auto-hide	PreferencesWindow		Aŭtomatkaŝi
+Always on top	PreferencesWindow		Ĉiam videbla
+<Deskbar folder is empty>	DeskbarMenu		<Dosierujo de Laborstrio estas malplena>
+Show all	WindowMenu		Vidigi ĉiujn
+No windows	WindowMenu		Neniu fenestro
+Deskbar	System name		Laborstrio
+Restart system	DeskbarMenu		Restartigi la sistemon
+Large	PreferencesWindow		Granda
+Auto-raise	PreferencesWindow		Aŭtomate suprenigi
+Recent folders:	PreferencesWindow		Ĵusaj dosierujoj:
+Show application expander	PreferencesWindow		Montri la elvolvilon de programoj
+Close all	WindowMenu		Fermi ĉiujn
+Deskbar preferences	PreferencesWindow		Laborstriaj agordoj
+Mount	DeskbarMenu		Surmeti
+Revert	PreferencesWindow		Malfari
+Small	PreferencesWindow		Malgranda
+Recent applications:	PreferencesWindow		Ĵusaj programoj:
+Shutdown…	DeskbarMenu		Sistemfermi…
+Tracker always first	PreferencesWindow		Spurilo ĉiam unua
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Agordoj
+Recent folders	DeskbarMenu		Ĵusaj dosierujoj
+About this system	DeskbarMenu		Pri ĉi tiu sistemo
+Show calendar…	TimeView		Vidigi la kalendaron…
+Deskbar preferences…	DeskbarMenu		Laborstriaj agordoj…
+Expand new applications	PreferencesWindow		Elvolvi novajn programojn
+Show replicants	DeskbarMenu		Montri replikojn
+Hide application names	PreferencesWindow		Kaŝi nomojn de programoj
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demonstrataĵoj
+Icon size	PreferencesWindow		Bildsimbola grandeco
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Labortablaj aplikaĵetoj
+Hide all	WindowMenu		Malvidigi ĉiujn
+Quit application	WindowMenu		Ĉesi la programon

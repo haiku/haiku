@@ -4,7 +4,7 @@ Defaults	InputMouse		Προεπιλογές
 Tapping	TouchpadPrefView		Αφή
 Long	KeyboardView		Μικρή
 Normal	SettingsView		Κανονική
-Cancel	TouchpadPrefView		Ακύρωση
+Cancel	TouchpadPrefView		Άκυρο
 4-Button	SettingsView		4 κουμπιών
 Slow	TouchpadPrefView		Αργή
 Warp	SettingsView		Παραμόρφωση

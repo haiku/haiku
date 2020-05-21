@@ -1,0 +1,75 @@
+1	croatian	x-vnd.Haiku-Devices	2543312554
+ACPI bus	DevicesView		ACPI bus
+Encryption controller	Device		Kontroler enkripcije
+Bus Information	Device		Bus informacija
+Devices	System name		Uređaji
+Processor	Device		Procesor
+Generate system information	DevicesView		Generiraj informacije sustava
+ACPI Information	DeviceACPI		ACPI informacija
+Detailed	DevicesView		Detaljno
+Computer	DevicesView		Računalo
+Communications	DeviceSCSI		Komunikacije
+Mass storage controller	Device		Upravljač masovne pohrane
+Connection	DevicesView		Veza
+Printer	DeviceSCSI		Pisač
+SCSI Information	DeviceSCSI		SCSI informacija
+Manufacturer	Device		Proizvođač
+Device name:	Device		Ime uređaja:
+Scanner	DeviceSCSI		Skener
+Memory controller	Device		Mrežni upravljač
+Unknown device	DevicesView		Nepoznati uređaj
+Unknown	DevicePCI		Nepoznato
+ACPI node '%1'	DeviceACPI		ACPI čvor '%1'
+Optical Drive	DeviceSCSI		Optički pogon
+Name	PropertyList		Ime
+Manufacturer	DeviceSCSI		Proizvođač
+Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Ime uređaja\t\t\t\t: %Name%\nProizvođač\t\t\t: %Manufacturer%\nKorišteni upravljački program\t\t\t\t: %DriverUsed%\nPutanje uređaja\t: %DevicePaths%
+Device name	Device		Ime uređaja
+Satellite communications controller	Device		Kontroler za satelitsku komunikaciju
+Device class	DeviceSCSI		Klasa uređaja
+Device	Device		Uređaj
+Input device controller	Device		Kontroler ulaznog uređaja
+PCI bus	DevicesView		PCI bus
+PCI Information	DevicePCI		PCI informacija
+Refresh devices	DevicesView		Osvježi uređaje
+Category	DevicesView		Kategorija
+RBC	DeviceSCSI		RBC
+None	Device		Nijedan
+Device paths	Device		Putanje uređaja
+Unknown device	Device		Nepoznati uređaj
+Wireless controller	Device		Bežični kontroler
+Value	PropertyList		Vrijednost
+Devices	DevicesView		Uređaji
+Device name	DeviceACPI		Ime uređaja
+Card Reader	DeviceSCSI		Čitač kartica
+Display controller	Device		Upravljač zaslona
+Basic information	DevicesView		Osnovne informacije
+Bus	DevicesView		Sabirnica
+ACPI <unknown>	DeviceACPI		ACPI <unknown>
+Device name	DevicePCI		Ime uređaja
+Disk Drive	DeviceSCSI		Pogon diska
+Other	DeviceSCSI		Ostalo
+Report compatibility	DevicesView		Izvještaj o kompatibilnosti
+Computer	Device		Računalo
+PCI bus	Device		PCI bus
+Order by:	DevicesView		Poredaj po:
+Multimedia controller	Device		Multimedijalni kontroler
+Quit	DevicesView		Završi
+ISA bus	Device		ISA bus
+ISA bus	DevicesView		ISA bus
+Processor	DeviceSCSI		Procesor
+Manufacturer:	Device		Proizvođač:
+Bridge	Device		Most
+Worm	DeviceSCSI		Crv
+CD-ROM	DeviceSCSI		CD-ROM
+Manufacturer	DevicePCI		Proizvođač
+Bridge	DeviceSCSI		Most
+Device name	DeviceSCSI		Ime uređaja
+Array	DeviceSCSI		Polje
+Unclassified device	Device		Neklasificirani uređaj
+ACPI controller	Device		ACPI upravljač
+Network controller	Device		Mrežni upravljač
+Driver used	Device		Korišteni upravljački program
+Communication controller	Device		Komunikacijski upravljač
+ACPI bus	Device		ACPI bus
+unknown	Device		nepoznato

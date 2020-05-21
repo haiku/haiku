@@ -4,12 +4,12 @@ Connect to server…	pop3		Συνδεθείτε στον εξυπηρετητή�
 APOP	ConfigView		APOP
 Connecting to POP3 server…	pop3		Γίνεται σύνδεση στον εξυπηρετητή POP3…
 : The server does not support APOP.	pop3		: Αυτός ο εξυπηρετητής δεν υποστηρίζει APOP.
-Error while authenticating user %user	pop3		Σφάλμα κατα την πιστοποίηση του χρήστη %user
+Error while authenticating user %user	pop3		Προέκυψε σφάλμα κατά την ταυτοποίηση του χρήστη %user
 Destination:	ConfigView		Προορισμός:
 . The server said:\n	pop3		. Ο εξυπηρετητής αποκρίθηκε:\n
 Plain text	ConfigView		Απλό κείμενο
 Getting mailbox size…	pop3		Γίνεται λήψη μεγέθους του γραμματοκιβωτίου…
-Error while connecting to server %serv	pop3		Σφάλμα κατα τη σύνδεση στον εξυπηρετητή %serv
+Error while connecting to server %serv	pop3		Προέκυψε σφάλμα κατά την σύνδεση στον εξυπηρετητή %serv
 Getting UniqueIDs…	pop3		Λήψη UniqueIDs…
 Sending password…	pop3		Γίνεται αποστολή κωδικού…
 No encryption	ConfigView		Χωρίς κρυπογράφηση

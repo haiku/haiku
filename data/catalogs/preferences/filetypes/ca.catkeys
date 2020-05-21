@@ -100,7 +100,7 @@ no icon	FileTypes Window		cap icona
 Single launch	Application Type Window		Només una instància
 %s file type	FileType Window		Tipus de fitxer %s
 Default	Attribute ListView		Per defecte
-Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		No es pot revertir la supressió d'un supertipus de fitxer.\nEs perdran tots els tipus de fitxers que pertanyen a aquest supertipus!\n\nSegur que ho voleu fer? Per suprimir-ne tot el grup, premeu \"Suprimeix\" mantenint premuda la tecla Maj.
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		No es pot revertir la supressió d'un supertipus de fitxer.\nEs perdran tots els tipus de fitxers que pertanyen a aquest supertipus!\n\nSegur que ho voleu fer? Per suprimir-ne tot el grup, premeu Suprimeix mantenint premuda la tecla Maj.
 String	Attribute ListView		Cadena
 Add type	New File Type Window		Afegeix-hi un tipus
 Remove icon	Icon View		Suprimeix la icona

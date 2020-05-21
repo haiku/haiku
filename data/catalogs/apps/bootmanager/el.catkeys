@@ -7,14 +7,14 @@ Immediately	DefaultPartitionPage		Αμέσως
 Uninstall Boot Manager	UninstallPage	Title	Απεγκατάσταση Διαχειριστή Εκκίνησης
 Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Άγνωστο
 Installation of boot menu failed	BootManagerController	Title	H εγκατάσταση του μενού εκκίνησης απέτυχε
-Backup Master Boot Record	BootManagerController	Title	Λήψη αντίγραφου ασφαλείας του Master Boot Record
+Backup Master Boot Record	BootManagerController	Title	Δημιουργία αντίγραφου ασφαλείας της Κύριας Εγγραφής Εκκίνησης
 Cannot access!	DrivesPage	Cannot install	Αδυναμία πρόσβασης!
 After one second	DefaultPartitionPage		Ύστερα από ένα δευτερόλεπτο
 The old Master Boot Record was successfully saved to %s.	BootManagerController		Η παλιά Κύρια Εγγραφή Εκκίνησης αποθηκεύτηκε με επιτυχία στο %s.
 Quit	WizardView	Button	Έξοδος
 Never	DefaultPartitionPage		Ποτέ
 Summary	BootManagerController	Title	Γενικά
-An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		Ένα σφάλμα προέκυψε κατα τη διάρκεια εγγραφής του μενού εκκίνησης. Το Master Boot Record μπορεί να καταστράφηκε, θα πρέπει να το επαναφέρετε τώρα!
+An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		Προέκυψε ένα σφάλμα κατά την εγγραφή του μενού εκκίνησης. Η Κύρια Εγγραφή Εκκίνησης μπορεί να έχει καταστραφεί, πρέπει να την επαναφέρετε τώρα!
 After three seconds	DefaultPartitionPage		Ύστερα από τρία δευτερόλεπτα
 Read only!	DrivesPage	Cannot install	Μόνο για ανάγνωση!
 Write boot menu	BootManagerController	Button	Εγγραφή μενού εκκίνησης
@@ -36,7 +36,7 @@ Drives	DrivesPage	Title	Μονάδες Δίσκου
 The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Οι παρακάτω κατατμήσεις βρέθηκαν. Παρακαλώ επιλέξτε το κουτί δίπλα στις κατατμήσεις για να συμπεριληφθούν στο μενού εκκίνησης. Μπορείτε επίσης να ορίσετε τα ονόματα των κατατμήσεων για να εμφανίζονται έτσι στο μενού εκκίνησης.
 After five seconds	DefaultPartitionPage		Ύστερα από πέντε δευτερόλεπτα
 Timeout: %s	DefaultPartitionPage		Χρόνος αναμονής: %s
-The Master Boot Record could not be restored!	BootManagerController		Το Master Boot Record δεν μπορούσε να επαναφερθεί!
+The Master Boot Record could not be restored!	BootManagerController		Δεν ήταν δυνατή η επαναφορά της Κύριας Εγγραφής Εκκίνησης!
 The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager only works with IBM PC MBR partitions.	BootManagerController		Ο πίνακας κατατμήσεων του πρώτου σκληρού δίσκου δεν είναι συμβατός με τον Διαχειριστή Εκκίνησης.\nΟ Διαχειριστής Εκκίνησης δουλεύει μόνο με κατατμήσεις IBM PC MBR.
 Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		Παρακαλώ επιλέξτε τον δίσκο από τον οποίο επιθυμείτε να εγκατασταθεί ή να απεγκατασταθεί ο boot manager.
 After four seconds	DefaultPartitionPage		Ύστερα από τέσσερα δευτερόλεπτα
@@ -55,15 +55,15 @@ Partitions	PartitionsPage	Title	Κατατμήσεις
 Uninstallation of boot menu completed	BootManagerController	Title	Η απεγκατάσταση του μενού εκκίνησης ολοκληρώθηκε
 After two seconds	DefaultPartitionPage		Ύστερα από δύο δευτερόλετπα
 Partition table not compatible	BootManagerController	Title	Ο πίνακας κατατμήσεων δεν είναι συμβατός
-The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		Το Master Boot Record του δίσκου (%DISK) επαναφέρθηκε με επιτυχία από το %FILE.
+The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		Η επαναφορά της Κύριας Εγγραφής Εκκίνησης του δίσκου εκκίνησης (%DISK)  από το %FILE ήταν επιτυχής.
 Done	BootManagerController	Button	Έτοιμο
 BootManager	System name		Διαχειριστής Εκκίνησης
-Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Παρακαλώ εντοπίστε το αρχείο Κύριας Εγγραφής Εκκίνησης (MBR) για να κάνετε επαναφορά. Το αρχείο δημιουργήθηκε όταν ο διαχειριστής εκκίνησης εγκαταστάθηκε για πρώτη φορά.
-Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		Παρακαλώ εντοπίστε το αρχείο Κύριας Εγγραφής Εκκίνησης (MBR) για να κάνετε επαναφορά. Το αρχείο δημιουργήθηκε όταν ο διαχειριστής εκκίνησης εγκαταστάθηκε για πρώτη φορά.
-About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Θα γίνει επαναφορά του Master Boot Record (MBR) του δίσκου %disk από το αρχείο %file. Θα θέλατε να συνεχίσετε;
+Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Παρακαλώ εντοπίστε το αντίγραφο ασφαλείας Κύριας Εγγραφής Εκκίνησης (MBR) για να το επαναφέρετε. Το αρχείο δημιουργήθηκε όταν ο διαχειριστής εκκίνησης εγκαταστάθηκε για πρώτη φορά.
+Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		Παρακαλώ εντοπίστε το αντίγραφο ασφαλείας Κύριας Εγγραφής Εκκίνησης (MBR) για να το επαναφέρετε. Το αρχείο δημιουργήθηκε όταν ο Διαχειριστής Εκκίνησης εγκαταστάθηκε για πρώτη φορά.
+About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Θα γίνει επαναφορά της Κύριας Εγγραφής Εκκίνησης (MBR) του δίσκου %disk από το αρχείο %file. Θέλετε να συνεχίσετε;
 Install	DrivesPage	Button	Εγκατάσταση
 File:	FileSelectionPage	Text control label	Αρχείο:
-Error reading partition table	BootManagerController	Title	Σφάλμα ανάγνωσης πίνακα κατατμήσεων
+Error reading partition table	BootManagerController	Title	Προέκυψε σφάλμα κατά την ανάγνωση πίνακα κατατμήσεων
 Back	BootManagerController	Button	Πίσω
 The boot manager has been successfully installed on your system.	BootManagerController		Ο διαχειριστής εκκίνησης εγκαταστάθηκε επιτυχώς στο συστημά σας.
 The old Master Boot Record could not be saved to %s. You can continue the installation but there will be no way to uninstall the boot menu.	BootManagerController		Δεν ήταν δυνατή η εγγραφή παλιάς Κύριας Εγγραφής Εκκίνησης (MBR) στο %s. Μπορείτε να συνεχίσετε την εγκατάσταση, αλλά δεν θα μπορείτε να απεγκαταστήσετε το Μενού Εκκίνησης.

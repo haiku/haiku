@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-WebPositive	2743003860
+1	greek, modern (1453-)	x-vnd.Haiku-WebPositive	4212912362
 Authentication required	Authentication Panel		Απαιτείται ταυτοποίηση
 Previous	WebPositive Window		Προηγούμενο
 (Finish: %date)	Download Window		(Ολοκλήρωση: %date)
@@ -12,15 +12,17 @@ of	Download Window	...as in '12kB of 256kB'	από
 Bookmarks	WebPositive Window		Σελιδοδείκτες
 Use proxy server to connect to the internet	Settings Window		Χρήση μεσολαβητή για την σύνδεση στο διαδίκτυο
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url ολοκληρώθηκε
+Auto-hide interface in full screen mode	Settings Window		Να γίνεται αυτόματη απόκρυψη διεπαφής σε λειτουργία πλήρης οθόνης
 There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Προέκυψε ένα σφάλμα κατά την ανάγνωση του φακέλου σελιδοδεικτών.\n\nΣφάλμα: %error
 Delete	Cookie Manager		Διαγραφή
 (Finish: %date - Over %duration left)	Download Window		(Ολοκλήρωση: %date - Απομένει παραπάνω από %duration)
-Open containing folder	Download Window		Άνοιγμα εμπεριεχόμενου φακέλου 
-Find previous	WebPositive Window		Εύρεση προηγουμένου
+Open containing folder	Download Window		Άνοιγμα εμπεριεχόμενου φακέλου
+Find previous	WebPositive Window		Εύρεση προηγούμενου
 Full screen	WebPositive Window		Πλήρη οθόνη
 Downloads in progress	WebPositive		Λήψεις σε εξέλιξη
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Είστε σίγουρος πως θέλετε να ανοίξετε %addedCount σελιδοδείκτες ταυτόχρονα;
 Copy URL to clipboard	Download Window		Αντιγραφή υπερσυνδέσμου στο πρόχειρο
+Clone current page	Settings Window		Αντίγραφο καρτέλας
 Start page:	Settings Window		Αρχική σελίδα:
 Cancel	Download Window		Ακύρωση
 Settings	Settings Window		Ρυθμίσεις
@@ -28,6 +30,7 @@ Downloads	WebPositive Window		Λήψεις
 Browse…	Settings Window		Περιήγηση…
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Υπάρχει ήδη σελιδοδείκτης για αυτήν την σελίδα (%bookmarkName).
 Resume prior session	Settings Window		Επαναφορά προηγούμενης συνεδρίας
+Match case	WebPositive Window		Ταίριασμα πεζών-κεφαλαίων
 Proxy password:	Settings Window		Κωδικός μεσολαβητή:
 Size:	Font Selection view		Μέγεθος:
 Page source	WebPositive Window		Πηγαίος κώδικας σελίδας
@@ -58,18 +61,21 @@ OK	Authentication Panel		Εντάξει
 Hide password text	Authentication Panel		Απόκρυψη κωδικού
 Username:	Authentication Panel		Όνομα χρήστης:
 Name	Cookie Manager		Όνομα
+Remove finished	Download Window		Αφαίρεση ολοκληρωμένων λήψεων
 Earlier	WebPositive Window		Νωρίτερα
 Edit	WebPositive Window		Επεξεργασία
 Back	WebPositive Window		Πίσω
 Yesterday	WebPositive Window		Εχτές
 Quit	WebPositive		Έξοδος
 Download aborted	Download Window		Η λήψη ακυρώθηκε
+Number of days to keep links in History menu:	Settings Window		Αριθμός ημερών διατήρησης ιστορικού:
 Password:	Authentication Panel		Κωδικός:
 Forward	WebPositive Window		Προώθηση
 Clear	Console Window		Εκκαθάριση
 Cut	URL Bar		Αποκοπή
 View	WebPositive Window		Προβολή
 Paste	URL Bar		Επικόλληση
+Find next	WebPositive Window		Εύρεση επόμενου
 Open search page	Settings Window		Άνοιγμα σελίδας αναζήτησης
 Increase size	WebPositive Window		Μεγέθυνση
 New tab	WebPositive Window		Νέα καρτέλα
@@ -94,30 +100,37 @@ There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPosi
 Revert	Settings Window		Επαναφορά
 Copy	WebPositive Window		Αντιγραφή
 Default standard font size:	Settings Window		Προεπιλεγμένο μέγεθος γραμματοσειράς:
+Bookmark this page	WebPositive Window		Προσθήκη στους σελιδοδείκτες
+Show tabs if only one page is open	Settings Window		Να εμφανίζονται οι καρτέλες όταν μόνο μία σελίδα είναι ανοιχτή
 Close tab	WebPositive Window		Κλείσιμο καρτέλας
 Remove	Download Window		Αφαίρεση
 About	WebPositive Window		Σχετικά
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Υπάρχουν ακόμα λήψεις σε εξέλιξη, είστε σίγουρος ότι θέλετε να κλείσετε το WebPositive τώρα;
 Continue downloads	WebPositive		Συνέχιση λήψεων
 Proxy server requires authentication	Settings Window		Ο μεσολαβητής απαιτεί ταυτοποίηση
-Cancel	Settings Window		Ακύρωση
+Cancel	Settings Window		Άκυρο
 History	WebPositive Window		Ιστορικό
 Reset size	WebPositive Window		Επαναφορά μεγέθους
 Do you really want to clear the browsing history?	WebPositive Window		Είστε σίγουρος ότι θέλετε να διαγράψετε το ιστορικό περιήγησης σας;
+Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Εύρεση επόμενης εμφάνισης των όρων αναζήτησης
 Fixed font:	Settings Window		Γραμματοσειρά σταθερού πλάτους:
 Quit	WebPositive Window		Έξοδος
+Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Εύρεση προηγούμενης εμφάνισης των όρων αναζήτησης
+Remember username and password for this site	Authentication Panel		Να απομνημονευτεί το όνομα χρήστη και ο κωδικός για αυτήν την σελίδα
 (Finish: %date - %duration left)	Download Window		(Ολοκλήρωση: %date - Απομένουν %duration)
 Cookie manager	Cookie Manager		Διαχειριστής Cookie
 Show home button	Settings Window		Εμφάνιση κουμπιού αρχικής σελίδας
 Start new session	Settings Window		Έναρξη νέας συνεδρίας
 The cookie jar is empty!	Cookie Manager		Το βάζο μπισκότων είναι άδειο!
 Value	Cookie Manager		Τιμή
+Remove missing	Download Window		Αφαίρεση λήψεων που λείπουν
 Paste	WebPositive Window		Επικόλληση
 Double-click or middle-click to open new tab.	Tab Manager		Κάντε διπλό κλικ ή μεσαίο κλικ για να ανοίξετε νέα καρτέλα.
 Next	WebPositive Window		Επόμενο
 Bookmark error	WebPositive Window		Σφάλμα σελιδοδείκτη
 OK	WebPositive Window		Εντάξει
 WebPositive	Download Window		WebPositive
+Zoom text only	WebPositive Window		Να μεγενθυθεί το κείμενο μόνο
 Save page as…	WebPositive Window		Αποθήκευση σελίδας ως…
 Page source error	WebPositive Window		Σφάλμα πηγαίου κώδικα σελίδας
 Auto-hide mouse pointer	Settings Window		Αυτόματη απόκρυψη δείκτη ποντικιού

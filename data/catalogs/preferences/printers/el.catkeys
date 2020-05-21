@@ -10,7 +10,7 @@ Cyan	TestPageView		Κυανό
 Completed	JobListView		Ολοκληρώθηκε
 Test page	PrintersWindow		Δοκιμαστική σελίδα
 Transport: %transport% %transport_address%	PrinterListView		Μεταφορά: %transport% %transport_address%
-Failed	JobListView		Αποτυχημένο
+Failed	JobListView		Απέτυχε
 Blue	TestPageView		Μπλέ
 Waiting	JobListView		Αναμονή
 Processing	JobListView		Γίνεται επεξεργασία

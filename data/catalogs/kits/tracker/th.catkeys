@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-libtracker	3028659783
+1	thai	x-vnd.Haiku-libtracker	4043539537
 Created	ContainerWindow		สร้างแล้ว
 Icon	AttributesView		ไอคอน
 Open and make preferred	OpenWithWindow		เปิดและทำให้เป็นที่ต้องการ
@@ -262,6 +262,7 @@ ends with	SelectionWindow		ลงท้ายด้วย
 Open	OpenWithWindow		เปิด
 You must have at least one attribute showing.	PoseView		คุณต้องมี attribute แสดงอย่างน้อยหนึ่งรายการ
 Cut	FilePanelPriv		ตัด
+Finish: after several years	StatusWindow		เสร็จสิ้น: หลังจากผ่านไปหลายปี
 Favorites	FilePanelPriv		รายการโปรด
 Point	AttributesView		ชี้
 home	B_USER_DIRECTORY		หน้าหลัก

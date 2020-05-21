@@ -1,0 +1,5 @@
+1	croatian	x-vnd.Haiku-ICNSTranslator	130825931
+Valid colors: RGB32, RGBA32	ICNSConfig		Ispravne boje: RGB32, RGBA32
+Version %d.%d.%d, %s	ICNSConfig		Verzija %d.%d.%d, %s
+Apple icons	ICNSTranslator		Apple ikone
+Valid sizes: 16, 32, 48, 128, 256, 512, 1024	ICNSConfig		Ispravne veličine: 16, 32, 48, 128, 256, 512, 1024

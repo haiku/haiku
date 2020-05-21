@@ -10,7 +10,7 @@ Page %1 to %2	ConfigWindow		Σελίδα %1 έως %2
 Get name of the printer add-on used for this printer	Printer Scripting		Εύρεση ονόματος πρόσθετου που χρησιμοποιείται για αυτόν τον εκτυπωτή
 B5 (JIS)	ConfigWindow	JIS P0138 B5, a Japanese paper size	B5 (JIS)
 OK	ConfigWindow		Εντάξει
-Cancel	ConfigWindow		Ακύρωση
+Cancel	ConfigWindow		Άκυρο
 Printer server	ConfigWindow		Εκτυπωτής διακομιστής
 Page %1 to %2, %3 copies	ConfigWindow		Σελίδα %1 to %2, %3 αντίγραφα
 A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Ένας εκτυπωτής με ίδιο όνομα υπάρχει ήδη, αλλά ο οδηγός δεν μπόρεσε να βρεθεί! Αντικατάσταση;

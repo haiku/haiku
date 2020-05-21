@@ -1,0 +1,17 @@
+1	croatian	x-vnd.Haiku-Login	2223124708
+Invalid login!	Login View		Neispravna prijava!
+Error	Login App		Greška
+Welcome to Haiku	Login Window		Dobrodošli u Haiku
+Halt	Login View		Zaustavi
+Login application for Haiku\nUsage:\n	Login App		Program za Haiku prijavu\nUporaba:\n
+Desktop	Desktop Window		Radna površina
+Hide password	Login View		Sakrij lozinku
+Reboot	Login View		Ponovno podigni sustav
+OK	Login View		U redu
+Info	Login App		Info
+Login:	Login View		Prijava:
+Password:	Login View		Lozinka:
+Unimplemented	Login App		Neprimjenjeno
+OK	Login App		U redu
+Error: %1	Login App		Greška: %1
+error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	greška %s\n

@@ -1,0 +1,69 @@
+1	croatian	x-vnd.Haiku-CodyCam	185579625
+reply: '%s'\n	SftpClient		odgovor: '%s'\n
+JPEG image	CodyCam		JPEG slika
+Remote host has closed the connection.\n	FtpClient		Udaljeno računalo je prekinlo vezu.\n
+image file format expected	CodyCam		očekivani format slikovne datoteke
+Every 30 minutes	CodyCam		Svakih 30 minuta
+Cannot start time source!	CodyCam		Ne mogu pokrenuti video izvor!
+Waiting…	CodyCam		Čekam...
+Passive FTP	CodyCam		Pasivni FTP
+Every 10 minutes	CodyCam		Svakih 10 minuta
+Every minute	CodyCam		Svake minute
+Server login failed	VideoConsumer.cpp		Neuspjela prijava poslužitelja
+on or off expected	Settings	Do not translate 'on' and 'off'	očekivano on ili off
+invalid upload client %ld\n	VideoConsumer.cpp		neispravni klijent slanja %ld\n
+Every 30 seconds	CodyCam		Svakih 30 sekunda
+Cannot create a video window	CodyCam		Ne mogu napraviti video prozor
+Cannot register the video window	CodyCam		Ne mogu pokrenuti video prozor
+Quit	CodyCam		Isključi
+Cannot connect the video source to the video window	CodyCam		Ne mogu povezati video izvor sa video prozorom
+read: %d\n	SftpClient		čitaj: %d\n
+Every 2 hours	CodyCam		Svaka 2 sata
+Every 4 hours	CodyCam		Svakih 4 sata
+cmd: '%s'\n	FtpClient		cmd: '%s'\n
+Closing the window	VideoConsumer.cpp		Zatvaranje prozora
+Never	CodyCam		Nikada
+Every 8 hours	CodyCam		Svakih 8 sati
+Cannot start the video source	CodyCam		Ne mogu pokrenuti video izvor
+Cannot set the time source for the video source	CodyCam		Ne mogu postaviti izvor vremena za izvor videa
+Renaming…	VideoConsumer.cpp		Preimenovanje...
+Send to…	CodyCam		Pošalji ka...
+Password:	CodyCam		Lozinka:
+File name:	CodyCam		Ime datoteke:
+Directory:	CodyCam		Direktorij:
+Locking the window	VideoConsumer.cpp		Zaključavanje prozora
+Upload…	VideoConsumer.cpp		Pošalji…
+password expected	CodyCam		očekivana lozinka
+SFTP	CodyCam		SFTP
+Output	CodyCam		Izlaz
+Cannot start the video window	CodyCam		Ne mogu pokrenuti video prozor
+reply: %d, %d\n	FtpClient		odgovor: %d, %d\n
+Cannot set the time source for the video window	CodyCam		Ne mogu povstavit izvor vremena za video prozor
+Every 15 minutes	CodyCam		Svakih 15 minuta
+Every 24 hours	CodyCam		Svaka 24 sata
+Image Format Menu	CodyCam		Izbornik formata slika
+Every 5 minutes	CodyCam		Svakih 5 minuta
+Format:	CodyCam		Format:
+Start video	CodyCam		Pokreni video
+Connected…	VideoConsumer.cpp		Spojen...
+Every 15 seconds	CodyCam		Svakih 15 sekundi
+password	CodyCam		lozinka
+Local	CodyCam		Lokalno
+Stop video	CodyCam		Zaustavi video
+Rate:	CodyCam		Ocjena:
+Couldn't find requested directory on server	VideoConsumer.cpp		Nisam mogao nać traženi direktorij na poslužitelju
+Type:	CodyCam		Tip:
+Rename failed	VideoConsumer.cpp		Neuspjelo preimenovanje
+Server:	CodyCam		Poslužitelj:
+Login:	CodyCam		Prijava:
+File	CodyCam		Datoteka
+read: %ld\n	SftpClient		čitaj: %ld\n
+Every hour	CodyCam		Svaki sat
+Video settings	CodyCam		Video postavke
+Can't find an available connection to the video window	CodyCam		Ne mogu naći dostupnu vezu prema video prozoru
+FTP	CodyCam		FTP
+Error creating output file	VideoConsumer.cpp		Greška pri izradi izlazne datoteke
+Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Ne mogu naći video izvor.\nPotrebna vam je web kamera da bi ste koristili CodyCam.
+Logging in…	VideoConsumer.cpp		Prijavljujem se...
+CodyCam	System name		CodyCam
+Error writing output file	VideoConsumer.cpp		Greška pri pisanju izlazne datoteke

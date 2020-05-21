@@ -1,0 +1,118 @@
+1	croatian	x-vnd.Haiku-MediaPlayer	2878408696
+Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Ukloni unos u smeće
+Close	MediaPlayer-PlaylistWindow		Zatvori
+Audio	MediaPlayer-InfoWin		Audio
+Subtitle placement:	MediaPlayer-SettingsWindow		Smještaj podnapisa:
+Audio track	MediaPlayer-Main		Audio zapis
+OK	MediaPlayer-RemovePLItemsCmd		U redu
+Open Playlist	MediaPlayer-PlaylistWindow		Otvori listu izvođenja
+Subtitles	MediaPlayer-Main		Podnapisi
+File info	MediaPlayer-InfoWin		Informacija o datoteci
+Select all	MediaPlayer-PlaylistWindow		Odaberi sve
+Move Entries	MediaPlayer-MovePLItemsCmd		Ukloni unose
+OK	MediaPlayer-Main		U redu
+Remove	MediaPlayer-PlaylistWindow		Ukloni
+<unknown>	MediaPlayer-InfoWin		<nepoznato>
+Duration	MediaPlayer-InfoWin		Trajanje
+Import Entries	MediaPlayer-ImportPLItemsCmd		Uvezi unose
+Open network stream	MediaPlayer-Main		Otvori mrežno strujanje
+Move file to Trash	MediaPlayer-PlaylistWindow		Premjesti datoteku u smeće
+Open file…	MediaPlayer-Main		Otvori datoteku...
+View options	MediaPlayer-SettingsWindow		Pogledaj opcije
+%d kHz	MediaPlayer-InfoWin		%d kHz
+Full volume	MediaPlayer-SettingsWindow		Puna glasnoća
+<untitled>	PlaylistItem-title		<nenaslovljeno>
+Start media server	MediaPlayer-Main		Pokreni medijski poslužitelj
+It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Izgleda da medijski poslužitelj nije pokrenut.\nŽelite li ga pokrenuti ?
+Location	MediaPlayer-InfoWin		Lokacija
+Medium	MediaPlayer-SettingsWindow		Srednje
+Play mode	MediaPlayer-SettingsWindow		Način izvođenja
+Playlist	MediaPlayer-PlaylistWindow		Lista izvođenja
+%d Bit	MediaPlayer-InfoWin		%d Bit
+Track	Audio Track Menu		Zapis
+Close	MediaPlayer-Main		Zatvori
+Save error	MediaPlayer-PlaylistWindow		Spremi grešku
+Attributes	MediaPlayer-Main		Atributi
+Bottom of screen	MediaPlayer-SettingsWindow		Dno zaslona
+MediaPlayer settings	MediaPlayer-SettingsWindow		MediaPlayer postavke
+Copyright	MediaPlayer-InfoWin		Autorska prava
+Invalid URL inserted!	MediaPlayer-NetworkStream		Neispravan URL je unešen!
+Aspect ratio	MediaPlayer-Main		Omjer slike
+Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Neuspjelo spremanje liste izvođenja.\n\nGreška: 
+<no media>	MediaPlayer-InfoWin		<no media>
+Hide interface	MediaPlayer-Main		Sakrij sučelje
+Error: 	MediaPlayer-Main		Greška: 
+Video track	MediaPlayer-Main		Video zapis
+Playlist…	MediaPlayer-Main		Lista izvođenja...
+<unnamed media>	MediaPlayer-InfoWin		<unnamed media>
+Save	MediaPlayer-PlaylistWindow		Spremi
+Cancel	MediaPlayer-NetworkStream		Otkaži
+OK	MediaPlayer-SettingsWindow		U redu
+Remove Entries	MediaPlayer-RemovePLItemsCmd		Ukloni unose
+never	MediaPlayer-SettingsWindow		nikada
+Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Interna greška (oštećena poruka). Neuspjelo spremanje liste izvođenja.
+Open…	MediaPlayer-PlaylistWindow		Otvori...
+Revert	MediaPlayer-SettingsWindow		Obrnuto
+Audio	MediaPlayer-Main		Audio
+Quit	MediaPlayer-Main		Izađi
+Move Entry	MediaPlayer-MovePLItemsCmd		Ukloni unos
+<unknown>	PlaylistItem-author		<nepoznato>
+Cancel	MediaPlayer-SettingsWindow		Otkaži
+Large	MediaPlayer-SettingsWindow		Veliko
+Import Entry	MediaPlayer-ImportPLItemsCmd		Uvezi unos
+unknown format	MediaPlayer-InfoWin		nepoznati format
+Track %d	MediaPlayer-Main		Zapis %d
+All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Nije moguće sve datoteke premjestiti u smeće.
+Total duration: %s	MediaPlayer-PlaylistWindow		Ukupno trajanje: %s
+%.3f kHz	MediaPlayer-InfoWin		%.3f kHz
+Move into trash error	MediaPlayer-RemovePLItemsCmd		Greška pri premještanju u smeće
+Copy Entry	MediaPlayer-CopyPLItemsCmd		Kopiraj unos
+Close window after playing audio	MediaPlayer-SettingsWindow		Zatvori prozor nakon audio sviranja
+Edit	MediaPlayer-PlaylistWindow		Uredi
+Copy Entries	MediaPlayer-CopyPLItemsCmd		Kopiraj unose
+Always on top	MediaPlayer-Main		Uvijek na vrhu
+Open	MediaPlayer-PlaylistWindow		Otvori
+always	MediaPlayer-SettingsWindow		uvijek
+<unknown>	PlaylistItem-album		<nepoznato>
+Stream settings	MediaPlayer-Main		Postavke strujanja
+none	Subtitles menu		nijedan
+Save Playlist	MediaPlayer-PlaylistWindow		Spremi listu izvođenja
+Rating	MediaPlayer-Main		Ocjenjivanje
+Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Interna greška (nedostaje memorije). Neuspjelo spremanje liste izvođenja.
+Video	MediaPlayer-Main		Video
+There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Nema instaliranog dekodera koji podržava format datoteke, ili dekoder ima problema sa specifičnom verzijom formata.
+none	Audio track menu		nijedan
+Open network stream	MediaPlayer-NetworkStream		Otvori mrežno strujanje
+Automatically start playing	MediaPlayer-SettingsWindow		Automatski započni izvođenje
+Display mode	MediaPlayer-InfoWin		Način prikaza
+Bottom of video	MediaPlayer-SettingsWindow		Dno videa
+Small	MediaPlayer-SettingsWindow		Malen
+Settings…	MediaPlayer-Main		Postavke...
+min	MediaPlayer-InfoWin	Minutes	min
+Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Neuspjelo spremanje liste izvođenja:\n\nGreška:  
+Video	MediaPlayer-InfoWin		Video
+File info…	MediaPlayer-Main		Informacija o datoteci...
+<unnamed>	PlaylistItem-name		<neimenovani>
+Track	Video Track Menu		Zapis
+Full screen	MediaPlayer-Main		Cijeli zaslon
+OK	MediaPlayer-NetworkStream		U redu
+Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Interna greška (neuspjelo zaključavanje). Neuspjelo spremanje liste izvođenja.
+<nothing to redo>	MediaPlayer-PlaylistWindow		<nothing to redo>
+Bad URL	MediaPlayer-NetworkStream		Loš URL
+Save	MediaPlayer-Main		Spremi
+Close window after playing video	MediaPlayer-SettingsWindow		Zatvori prozor nakon izvođenja videa
+The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Datoteka '%filename' se ne može otvoriti.\n\n
+None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Nijedna od datoteka koje želite izvoditi izgleda da nisu medijske datoteke.
+Remove Entry	MediaPlayer-RemovePLItemsCmd		Ukloni unos
+Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Uklonite unose u smeće
+Subtitle size:	MediaPlayer-SettingsWindow		Veličina podnapisa:
+none	MediaPlayer-Main		nijedan
+Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Neke datoteke nije moguće premjestiti u smeće.
+<nothing to undo>	MediaPlayer-PlaylistWindow		<nothing to undo>
+Save as…	MediaPlayer-PlaylistWindow		Spremi kao...
+Error: 	MediaPlayer-RemovePLItemsCmd		Greška: 
+Open	MediaPlayer-Main		Otvori
+(not supported)	MediaPlayer-InfoWin		(nije podržano)
+%.3f fps	MediaPlayer-InfoWin		%.3f fps
+h	MediaPlayer-InfoWin	Hours	h
+OK	MediaPlayer-PlaylistWindow		U redu

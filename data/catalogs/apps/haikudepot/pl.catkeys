@@ -1,4 +1,5 @@
-1	polish	x-vnd.Haiku-HaikuDepot	3080531018
+1	polish	x-vnd.Haiku-HaikuDepot	2663094677
+Repository update error	LocalRepositoryUpdateProcess		Błąd podczas odświeżania repozytorium
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Wystąpił błąd podczas odświeżania repozytorium: %error%
 Check for updates…	MainWindow		Sprawdź dostępność aktualizacji…
 Uninstall	PackageManager		Usuń
@@ -6,6 +7,7 @@ Uninstalled	PackageListView		Niezainstalowany
 Available packages	MainWindow		Dostępne pakiety
 Create account	UserLoginWindow		Utwórz konto
 Mostly stable	RatePackageWindow		Całkiem stabilny
+OK	App		OK
 Develop packages	MainWindow		Pakiety deweloperskie
 Rate package…	PackageInfoView		Oceń pakiet…
 Starting the package daemon failed:\n\n%Error%	App		Uruchamianie demona pakietów nie powiodło się:\n\n%Error%
@@ -51,6 +53,7 @@ Changelog	PackageInfoView		Dziennik zmian
 About	PackageInfoView		O pakiecie
 Reboot required	PackageManager		Wymagane ponowne uruchomienie
 Very unstable	RatePackageWindow		Bardzo niestabilny
+Password:	UserLoginWindow		Hasło:
 All packages	PackageListView		Wszystkie pakiety
 Stability	RatePackageWindow		Stabilność
 Send	RatePackageWindow		Wyślij
@@ -81,6 +84,7 @@ Log out	MainWindow		Wyloguj
 Comment language:	RatePackageWindow		Język komentarza:
 Status	PackageListView		Status
 Update	RatePackageWindow		Zaktualizuj
+OK	ServerHelper		OK
 Language	UserLoginWindow		Język
 OK	UserLoginWindow		OK
 Stability:	RatePackageWindow		Stabilność:

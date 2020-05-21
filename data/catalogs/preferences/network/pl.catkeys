@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Network	2313714399
+1	polish	x-vnd.Haiku-Network	2807941663
 Ethernet device	InterfaceListItem		Urządzenie ethernetowe
 Link speed:	IntefaceView		Prędkość połączenia:
 disconnected	IntefaceView		rozłączone
@@ -21,6 +21,7 @@ Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Instalacja Network
 Revert	NetworkWindow		Cofnij
 WEP	WEP protected network		WEP
 <no wireless networks found>	IntefaceView		<nie znaleziono sieci bezprzewodowych>
+Enable	IntefaceView		Włącz
 connected	IntefaceView		połączone
 Apply	IntefaceAddressView		Zastosuj
 Disable	ServiceView		Wyłącz

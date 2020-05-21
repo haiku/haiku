@@ -35,7 +35,7 @@ File \"%file%\" was modified by another application, reload it?	NodeMonitorAlert
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Το αρχείο \"%file%\" έχει αφαιρεθεί από μία άλλη εφαρμογή, θέλετε να το επαναφέρετε;
 Lines:	Statistics		Γραμμές:
 Replace in all windows	FindandReplaceWindow		Αντικατάσταση σε όλα τα παράθυρα
-\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		Το αρχείο \"%s\" έχει αλλαγές που δεν έχουν αποθηκευτεί.\nΘέλετε να το επαναφέρετε στην πιο πρόσφατη έκδοσή του;
+\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		Το αρχείο \"%s\" έχει αλλαγές που δεν έχουν αποθηκευτεί.\nΘέλετε να το επαναφέρετε στην πιο πρόσφατη έκδοσή του; 
 Save	SaveAlert		Αποθήκευση
 Default	Open_and_SaveAsPanel		Προκαθορισμένο
 Cancel	RevertToSavedAlert		Άκυρο

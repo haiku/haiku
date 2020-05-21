@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-libtracker	3028659783
+1	indonesian	x-vnd.Haiku-libtracker	4043539537
 Created	ContainerWindow		Dibuat
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Buka dan buat sebagai yang disukai
@@ -262,6 +262,7 @@ ends with	SelectionWindow		berakhir dengan
 Open	OpenWithWindow		Buka
 You must have at least one attribute showing.	PoseView		Anda harus memiliki setidaknya satu atribut sebagaimana ditampilkan.
 Cut	FilePanelPriv		Potong
+Finish: after several years	StatusWindow		Selesai: setelah beberapa tahun
 Favorites	FilePanelPriv		Favorit
 Point	AttributesView		Titik
 home	B_USER_DIRECTORY		rumah

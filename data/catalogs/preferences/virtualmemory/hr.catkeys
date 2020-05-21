@@ -1,0 +1,12 @@
+1	croatian	x-vnd.Haiku-VirtualMemory	2059684435
+Requested swap file size:	SettingsWindow		Zatražena veličina datoteke za zamjenu:
+VirtualMemory	System name		Virtualna memorija
+OK	VirtualMemoryApp		U redu
+Turn off	SettingsWindow		Isključi
+Revert	SettingsWindow		Vrati na prethodno
+Keep enabled	SettingsWindow		Zadrži omogućeno
+VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		VirtualMemory\n\tnapisao Axel Dörfler\n\tAutorska pravas 2005, Haiku.\n
+Defaults	SettingsWindow		Zadane
+Quit	SettingsWindow		Prestanak
+Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Onemogućavanje virtualne memorije će imati neželjene efekte na stabilnost sustava kad se memorija iskoristi.\nVirtualna memorije nema efekta na performase dok se ne dođe do ovog dijela. \n\nJesi li siguaran da želiš isključiti virtualnu memoriju?
+Enable virtual memory	SettingsWindow		Omogući virtualnu memoriju

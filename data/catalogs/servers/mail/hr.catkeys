@@ -1,0 +1,14 @@
+1	croatian	x-vnd.Be-POST	65594002
+No new messages	MailDaemon		nema novih poruka
+No new messages	DeskbarView		Nema novih poruka
+Shutdown mail services	DeskbarView		Iskjluči servise pošte
+Mail status	MailDaemon		Status pošte
+Fetching mail for %name	Notifier		Dohvaćam poštu za %name
+Create new message…	DeskbarView		Napravi novu poruku...
+Settings…	DeskbarView		Postavke...
+New Messages	MailDaemon		Nove poruke
+<no accounts>	DeskbarView		<no accounts>
+Mail status	Notifier		Status pošte
+Check for mails only	DeskbarView		Provjeri samo poštu
+Check for mail now	DeskbarView		Provjeri poštu sada
+Sending mail for %name	Notifier		Šaljem poštu za %name

@@ -5,7 +5,7 @@ no clip msg	In console, when clipboard is empty after clicking Copy image		κα�
 Increase pixel size	Magnify-Main		Αύξηση μεγέθους pixel
 magnify: size must be a multiple of 4	Console		μεγεθυντικός φακός: το μέγεθος πρέπει να είναι πολλαπλάσιο του 4
 Stick coordinates	Magnify-Main		Συντεταγμένες Στίκ
-%width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main		%width x %height @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}
+%width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main		%width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}
 Copy image	Magnify-Main		Αντιγραφή εικόνας
 Decrease window size	Magnify-Main		Μείωση μεγέθους του παραθύρου
 Remove a crosshair	Magnify-Main		Αφαίρεση ενός σταυρονήματος

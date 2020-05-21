@@ -4,10 +4,10 @@ All Rights Reserved.	AboutWindow		Με επιφύλαξη παντός δικα�
 gold master	AboutWindow		gold master
 Undo	TextView		Αναίρεση
 gamma	AboutWindow		gamma
-development	AboutWindow		ανάπτυξη
+development	AboutWindow		σε ανάπτυξη
 OK	Dragger		Εντάξει
 OK	PrintJob		Εντάξει
-Print Server is not responding.	PrintJob		Ο Εξυπηρετητής εκτυπώσεων δεν ανταποκρίνεται.
+Print Server is not responding.	PrintJob		Ο Εξυπηρετητής Εκτυπώσεων δεν ανταποκρίνεται.
 About %app%	AboutMenuItem		Σχετικά με το %app%
 Warning	Dragger		Προειδοποίηση
 Green:	ColorControl		Πράσινο:
@@ -21,12 +21,12 @@ Can't delete this replicant from its original application. Life goes on.	Dragger
 Error	ZombieReplicantView		Σφάλμα
 Paste	TextView		Επικόλληση
 OK	AboutWindow		Εντάξει
-Special Thanks:	AboutWindow		Ευχαριστούμε Ιδιαίτερα:
+Special Thanks:	AboutWindow		Ευχαριστούμε ιδιαίτερα τους/τις:
 %.2f TiB	StringForSize		%.2f TiB
 Remove replicant	Dragger		Αφαίρεση ρέπλικας
 Version	AboutWindow		Έκδοση
 Red:	ColorControl		Κόκκινο:
-<empty>	Menu		<κενό>
+<empty>	Menu		<άδειο>
 Copy	TextView		Αντιγραφή
 Select all	TextView		Επιλογή όλων
 alpha	AboutWindow		alpha

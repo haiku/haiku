@@ -1,0 +1,46 @@
+1	esperanto	x-vnd.Haiku-WebPositive	1758426397
+Authentication required	Authentication Panel		Aŭtentigo nepra
+Previous	WebPositive Window		Antaŭa
+(Finish: %date)	Download Window		(Fino: %date)
+Download folder:	Settings Window		Elŝutujo
+Close window	WebPositive Window		Fermi fenestron
+Find:	WebPositive Window		Serĉi:
+Script console	WebPositive Window		Skriptokonzolo
+Fonts	Settings Window		Tiparoj
+Path	Cookie Manager		Dosierindiko
+of	Download Window	...as in '12kB of 256kB'	de
+Bookmarks	WebPositive Window		Legosignoj
+Use proxy server to connect to the internet	Settings Window		Konekti al interreto prokurile
+%url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url elŝutita
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Eraris dum malfermado de legosigna dosierujo.\n\nEraro: %error
+Delete	Cookie Manager		Forigi
+Open containing folder	Download Window		Malfermi enhavantan dosierujon
+Find previous	WebPositive Window		Antaŭserĉi
+Full screen	WebPositive Window		Plenekrane
+Downloads in progress	WebPositive		Daŭrantaj elŝutaĵoj
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Ĉu vi volas malfermi ĉiujn %addedCount legosignojn samtempe?
+Copy URL to clipboard	Download Window		Kopii retadreson tonduje
+Clone current page	Settings Window		Duplikati la aktivan paĝon
+Start page:	Settings Window		Komenca paĝo:
+Cancel	Download Window		Nuligi
+Settings	Settings Window		Agordoj
+Downloads	WebPositive Window		Elŝutoj
+Browse…	Settings Window		Foliumi…
+A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Legosigno por ĉi paĝo (%bookmarkName) jam ekzistas.
+Resume prior session	Settings Window		Daŭrigi antaŭan sesion
+Match case	WebPositive Window		Atenti usklecon
+Proxy password:	Settings Window		Prokuroservila pasvorto:
+Size:	Font Selection view		Grando:
+Page source	WebPositive Window		Paĝa fontkodo
+Error opening downloads folder	Download Window		Eraris dum malfermo de elŝutejo
+Show bookmark bar	WebPositive Window		Montri breton legosignan
+Find	WebPositive Window		Serĉi
+Standard font:	Settings Window		Implicita tiparo:
+OK	Authentication Panel		Bone
+Find next	WebPositive Window		Pluserĉi
+Cancel	Authentication Panel		Nuligi
+OK	Download Window		Bone
+Cancel	Settings Window		Nuligi
+Next	WebPositive Window		Sekva
+OK	WebPositive Window		Bone
+Cancel	WebPositive Window		Nuligi

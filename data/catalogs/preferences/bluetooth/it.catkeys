@@ -4,7 +4,7 @@ Only from trusted devices	Settings view		Solo da dispositivi affidabili
 15 secs	Settings view		15 secondi
 Quit	main		Esci
 Manufacturer: 	Device View		Produttore 
-Desktop	Settings view		Scrivania
+Desktop	Settings view		Desktop
 Server	Window		Server
 Identify host as:	Settings view		Identifica host come:
 Refresh…	Remote devices		Aggiorna…
@@ -20,12 +20,12 @@ There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		N
 Policy…	Settings view		Policy…
 Revert	Window		Ripristina
 Refresh local devices…	Window		Aggiornamento dispositivi locali…
-Disconnect	Remote devices		Disconnettere
+Disconnect	Remote devices		Disconnetti
 Identify us as…	Settings view		Identifica come…
 From all devices	Settings view		Da tutti i dispositivi
 Defaults	Window		Predefiniti
 Start bluetooth services…	Window		Avvia servizi bluetooth…
-Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Verificare l'attivazione di Bluetooth sul dispositivo remoto . Premi 'Interroga' per avviare la scansione. Il tempo necessario per il completamento dell'attività non è noto, anche se normalmente sono previsti non più di tre secondi per ogni dispositivo. Questi potranno poi essere aggiunti alla lista principale, per la successiva associazione.
+Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Verifica l'attivazione del Bluetooth sul dispositivo remoto, poi premi 'Scansiona' per avviare la scansione. Il tempo necessario per il completamento dell'attività non è determinabile a priori, anche se normalmente non sono necessari più di tre secondi per ogni dispositivo. Al termine della scansione, i dispositivi potranno essere aggiunti alla lista principale e per essere associati.
 Scanning progress	Inquiry panel		Scansione in corso
 Bluetooth	System name		Bluetooth
 Launch now	main		Avvia adesso
@@ -36,18 +36,18 @@ With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\
 Help	Window		Aiuto
 Pair…	Remote devices		Associa…
 Retrieving name of %1	Inquiry panel		Recupero nome of %1
-Inquiry	Inquiry panel		Interroga
+Inquiry	Inquiry panel		Scansione
 Incoming connections policy:	Settings view		Regole per connessioni in entrata:
 Retrieving names…	Inquiry panel		Recupero nomi in corso…
 Show name	Extended local device view		Mostra nome
 Add device to list	Inquiry panel		Aggiungi dispositivo alla lista
 Remaining %1 seconds	Inquiry panel		Restano ancora %1 secondi
-The Bluetooth services are not currently running on this system.	main		Il servizio Bluethooth non è al momento in esecuzione su questo sistema.
+The Bluetooth services are not currently running on this system.	main		I servizi Bluetooth non sono al momento in esecuzione su questo sistema.
 Discoverable	Extended local device view		Individuabile
 Authenticate	Extended local device view		Autenticazione
 Smart phone	Settings view		Smartphone
 Scanning completed.	Inquiry panel		Scansione completata.
-Default inquiry time:	Settings view		Tempo predefinito di interrogazione:
+Default inquiry time:	Settings view		Durata predefinita di scansione:
 Server	Settings view		Server
 Handheld	Settings view		Palmare
  packets: 	Device View		 pacchetti: 

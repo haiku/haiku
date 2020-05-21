@@ -1,0 +1,10 @@
+1	esperanto	x-vnd.Haiku-ProcessController	1177781656
+Live in the Deskbar	ProcessController		Loĝi en la Laborstrio
+OK	ProcessController		Bone
+You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Vi povas lanĉi Taskadministrilon en fenestro aŭ instali ĝin en la Laborstrio.
+Restart Deskbar	ProcessController		Relanĉi Laborstrion
+Usage: %s [-deskbar]\n	ProcessController		Uzado: %s [-deskbar]\n
+Cancel	ProcessController		Nuligi
+Install in Deskbar	ProcessController		Instali en Labosrstrio
+Restart Tracker	ProcessController		Relanĉi Spurilon
+ProcessController is already installed in Deskbar.	ProcessController		Taskadministrilo jam estas instalita en Laborstrio.

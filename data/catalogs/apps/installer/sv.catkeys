@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Installer	116830250
+1	swedish	x-vnd.Haiku-Installer	3048565029
 Performing installation.	InstallProgress		Verkställer installationen.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Välj källdisk från menyn. Klicka sedan på \"Starta\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Var god stäng Diskhanteringsfönstret innan du stänger fönstret för Installeraren.
@@ -33,7 +33,6 @@ Additional disk space required: 0.0 KiB	InstallerWindow		Ytterligare nödvändig
 This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Detta är programvara av betakvalitet! Det betyder att det finns risk för att du förlorar viktig data. Gör frekventa säkerhetskopior! Du har blivit varnad.\n\n\n
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   När du har startat Haiku första gången. Läs gärna våra dokument \"Välkommen\" och \"Användarguid\". Det finns länkar på skrivbordet och i WebPositive's bokmärken.\n\n
 ???	InstallerWindow	Unknown currently copied item	???
-Install anyway	InstallProgress		Installera iallafall
 1)   If you are installing Haiku onto real hardware (not inside an emulator), you may want to prepare a hard disk partition from another OS (you could, for example, use a GParted Live-CD, which can also resize existing partitions to make room).\nYou can also set up partitions by launching DriveSetup from Installer, but you won't be able to resize existing partitions with it. While DriveSetup has been quite thoroughly tested over the years, it's recommended to have up-to-date backups of the other partitions on your system. Just in case…	InstallerApp		1)   Om du installerar Haiku på riktig hårdvara (inte inuti en emulator) kanske du vill förbereda en hårddiskpartition från ett annat operativsystem (du kan till exempel använda en GParted Live-CD, som också kan ändra storlek på befintliga partitioner för att göra rum för nya)\nDu kan också konfigurera partitioner genom att starta DiskHanterare från installeraren, men du kommer inte att kunna ändra storlek på befintliga partitioner. Även fast DiskHanterare har testats grundligt under årens lopp rekommenderas det att ha uppdaterade säkerhetskopior av de andra partitionerna på ditt system. Utifall att…
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Välj käll- och måldisk från menyn. Klicka sedan på \"Starta\".
 Hide optional packages	InstallerWindow		Göm valbara paket
@@ -58,7 +57,6 @@ Collecting copy information.	InstallProgress		Förbereder inför kopiering.
 Show optional packages	InstallerWindow		Visa valbara paket
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Måldisken kan ha för lite ledigt utrymme. Försök att välja en annan disk eller välj att installera färre valbara paket.
 Installation canceled.	InstallProgress		Installationen avbröts.
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Den tänkta volumen är inte tom. Är du säker att du villinstallera ändå?\n\nNotering: Systemfoldern kommer att vara en kopia från källans systemfolder men kommer att behålla inställningsfoldern, alla anda foldrar kommer att mergas. De filer och länkar som finns på båda ställena kommer att skrivas över med de nyare.
 OK	InstallerApp		OK
 Are you sure you want to abort the installation?	InstallerWindow		Är du säker på att du vill stoppa installationen?
 Stop	InstallerWindow		Stopp

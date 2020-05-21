@@ -11,7 +11,7 @@ Conversion completed	MediaConverter		Η μετατροπή ολοκληρώθη�
 Audio:	MediaConverter-FileInfo		Ήχος:
 MediaConverter+:SaveDirectory	MediaConverter		Μετατροπέας Πολυμέσων+:Αποθήκευση Καταλόγου
 Error creating video.	MediaConverter		Σφάλμα δημιουργίας βίντεο.
-Cancelling	MediaConverter		Ακύρωση
+Cancelling	MediaConverter		Γίνεται ακύρωση
 None available	Audio codecs		Κανένα διαθέσιμο
 No file selected	MediaConverter-FileInfo		Δεν επιλέχτηκε αρχείο
 High	MediaConverter		Υψηλή
@@ -28,7 +28,7 @@ Encoder parameters	MediaConverter-EncoderWindow		Encoder parameters
 Open…	Menu		Άνοιγμα…
 Audio encoding:	MediaConverter		Κωδικοποίηση ήχου:
 Audio quality: %3d%%	MediaConverter		Ποιότητα ήχου: %3d%%
-Cancelling…	MediaConverter		Ακύρωση…
+Cancelling…	MediaConverter		Γίνεται ακύρωση…
 Output file '%filename' created	MediaConverter		Αρχείο εξόδου '%filename' φτιάχτηκε
 Output folder	MediaConverter		Φάκελος εξαγωγής
 Error creating track.	MediaConverter		Σφάλμα κατά την δημιουργία κομματιού.
@@ -41,7 +41,7 @@ Low	MediaConverter		Χαμηλή
 Error loading files	MediaConverter		Σφάλμα κατά τη φόρτωση των αρχείων
 {0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# bit} other{# bits}}
 End   [ms]: 	MediaConverter		Τέλος   [ms]: 
-Cancel	MediaConverter		Άκυρο
+Cancel	MediaConverter		Ακύρωση
 OK	MediaConverter-FileInfo		Εντάξει
 Error read audio frame %ld	MediaConverter		Σφάλμα ανάγνωσης πλαισίου ήχου %ld
 Video encoding:	MediaConverter		Κωδικοποίηση βίντεο:

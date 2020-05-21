@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-Installer	116830250
+1	danish	x-vnd.Haiku-Installer	3048565029
 Performing installation.	InstallProgress		Udfører installation.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Vælg en oprindelsesdisk fra popup-menuen. Tryk dernæst på \"Begynd\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Luk venligst vinduet for drevopsætning, før du lukker installationsvinduet.
@@ -33,7 +33,6 @@ Additional disk space required: 0.0 KiB	InstallerWindow		Yderligere påkrævet d
 This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Dette er software i betakvalitet! Det betyder at der er risiko for tab af vigtige data. Sørg for at foretage regelmæssige sikkerhedskopieringer! Du er hermed blevet advaret.\n\n\n
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Når det lykkedes dig at opstarte Haiku for første gang, så sørg for at læse vores \"Welcome\"- og \"Userguide\"-dokumentation. Det er links på skrivebordet og i WebPositives bogmærker.\n\n
 ???	InstallerWindow	Unknown currently copied item	???
-Install anyway	InstallProgress		Installer alligevel
 1)   If you are installing Haiku onto real hardware (not inside an emulator), you may want to prepare a hard disk partition from another OS (you could, for example, use a GParted Live-CD, which can also resize existing partitions to make room).\nYou can also set up partitions by launching DriveSetup from Installer, but you won't be able to resize existing partitions with it. While DriveSetup has been quite thoroughly tested over the years, it's recommended to have up-to-date backups of the other partitions on your system. Just in case…	InstallerApp		1)   Hvis du installerer Haiku på rigtig hardware (ikke i en emulator), så vil du måske forberede en harddisk-partition fra et andet styresystem (du kan f.eks. bruge en GParted live-CD, som også kan tilpasse størrelsen på eksisterende partitioner, for at gøre plads).\nDu kan også opsætte partitioner ved at starte drevopsætning fra installationsprogrammet, men du kan ikke bruge den til at tilpasse størrelsen på eksisterende partitioner. Selvom drevopsætning er blevet gennemtestet over årene, så anbefales det at have opdaterede sikkerhedskopier af de andre partitioner på dit system. For en sikkerhedsskyld…
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Vælg oprindelses- og destinationsdisk fra popup-menuerne. Tryk dernæst på \"Begynd\".
 Hide optional packages	InstallerWindow		Skjul valgfri pakker
@@ -58,7 +57,6 @@ Collecting copy information.	InstallProgress		Samler information om ophavsret.
 Show optional packages	InstallerWindow		Vis valgfri pakker
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Destinationsdisken har måske ikke nok plads. Prøv at vælge en anden disk, eller prøv ikke at installere valgfrie elementer.
 Installation canceled.	InstallProgress		Installation afbrudt.
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Måldiskområdet er ikke tomt. Er du sikker på, at du vil installere alligevel?\n\nBemærk: 'system'-mappen vil være en frisk kopi af kildediskområdet men bevarer sin indstillingsmappe, alle andre mapper sammenflettes, hvor filer og links som findes på både kilde- og måldiskområdet overskrives med versionen fra kildediskområdet.
 OK	InstallerApp		OK
 Are you sure you want to abort the installation?	InstallerWindow		Er du sikker på, at du vil afbryde installationen?
 Stop	InstallerWindow		Stop

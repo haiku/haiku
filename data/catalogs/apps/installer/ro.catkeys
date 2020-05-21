@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Installer	116830250
+1	romanian	x-vnd.Haiku-Installer	3048565029
 Performing installation.	InstallProgress		Se execută instalarea.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Alege discul sursă din meniul contextual. Apoi apasă \"Începe\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Alegeți fereastra ConfigurareDrive înainte de a închide fereastra Programului de instalare.
@@ -33,7 +33,6 @@ Additional disk space required: 0.0 KiB	InstallerWindow		Spațiu de disc adițio
 This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Acesta este software de calitate beta! Aceasta înseamnă că există un risc de a pierde date importante. Efectuați copii de rezervă frecvent! Ați fost avertizat.\n\n\n
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Când ați pornit cu succes Haiku pentru prima dată, asigurați-vă că veți citi pagina noastră de \"Welcome\" și documentația din \"Userguide\". Există legături pe Desktop și în favorite WebPositive.\n\n
 ???	InstallerWindow	Unknown currently copied item	???
-Install anyway	InstallProgress		Instalează oricum
 1)   If you are installing Haiku onto real hardware (not inside an emulator), you may want to prepare a hard disk partition from another OS (you could, for example, use a GParted Live-CD, which can also resize existing partitions to make room).\nYou can also set up partitions by launching DriveSetup from Installer, but you won't be able to resize existing partitions with it. While DriveSetup has been quite thoroughly tested over the years, it's recommended to have up-to-date backups of the other partitions on your system. Just in case…	InstallerApp		1)   Dacă instalați Haiku pe hardware real (nu în interiorul unui emulator), poate doriți să pregătiți o partiție de hard disc de la alt OS (puteți, de exemplu, să utilizați un CD-Live GParted, care poate și să redimensioneze partițiile existente pentru a crea spațiu).\nPuteți configura partiții și prin lansarea DriveSetup din Installer, dar nu veți putea să redimensionați partiții existente cu acesta. Deși DriveSetup a fost destul de bine testat de-a lungul anilor, este recomandat să aveți copii de rezervă actualizate ale celorlalte partiții de pe sistem. Pentru orice eventualitate…
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Alege discul sursă și de destinație din meniurile contextuale. Apoi apasă \"Începe\".
 Hide optional packages	InstallerWindow		Ascunde pachetele opționale
@@ -58,7 +57,6 @@ Collecting copy information.	InstallProgress		Se colectează informațiile de co
 Show optional packages	InstallerWindow		Afișează pachete opționale
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		E posibil ca discul de destinație să nu dețină destul spațiu. Încercați să alegeți un disc diferit sau alegeți să nu instalați elementele opționale.
 Installation canceled.	InstallProgress		Instalare anulată.
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Volumul țintă nu este liber. Sigur doriți să instalați oricum?\n\nNotă: Dosarul 'system' va fi o copie curată din sursa volumului dar va reține dosarul de configurări, toate celelalte dosare for fi fuzionate, în timp ce fișierele și legăturile care există atât la volumul sursă cât și la cel țintă vor fi suprascrise cu versiunea volumului sursă.
 OK	InstallerApp		OK
 Are you sure you want to abort the installation?	InstallerWindow		Sigur dorești să renunți la instalare?
 Stop	InstallerWindow		Oprește

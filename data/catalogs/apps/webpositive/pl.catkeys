@@ -1,6 +1,7 @@
-1	polish	x-vnd.Haiku-WebPositive	1360232678
+1	polish	x-vnd.Haiku-WebPositive	3023765509
 Authentication required	Authentication Panel		Wymagane uwierzytelnienie
 Previous	WebPositive Window		Poprzedni
+(Finish: %date)	Download Window		(Koniec: %date)
 Open bookmarks confirmation	WebPositive Window		Potwierdzenie otwarcia zakładek
 Download folder:	Settings Window		Katalog pobierania:
 Close window	WebPositive Window		Zamknij okno
@@ -15,6 +16,7 @@ Use proxy server to connect to the internet	Settings Window		Użyj serwera proxy
 Auto-hide interface in full screen mode	Settings Window		Automatyczne ukrywanie interfejsu w trybie pełnoekranowym 
 There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Wystąpił błąd podczas otwierania katalogu zakładek.\n\nBłąd: %error
 Delete	Cookie Manager		Usuń
+(Finish: %date - Over %duration left)	Download Window		(Koniec: %date – pozostało ponad %duration)
 Open containing folder	Download Window		Otwórz katalog zawierający
 Find previous	WebPositive Window		Znajdź poprzednie
 Full screen	WebPositive Window		Pełny ekran
@@ -26,7 +28,9 @@ Start page:	Settings Window		Strona startowa:
 Cancel	Download Window		Anuluj
 Settings	Settings Window		Ustawienia
 Downloads	WebPositive Window		Pobieranie
+Browse…	Settings Window		Przeglądaj…
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Zakładka dla tej strony (%bookmarkName) już istnieje.
+Resume prior session	Settings Window		Wznów poprzednią sesję
 Match case	WebPositive Window		Uwzględnij wielkość liter
 Proxy password:	Settings Window		Hasło serwera proxy:
 Size:	Font Selection view		Rozmiar:
@@ -114,8 +118,10 @@ Fixed font:	Settings Window		Font o stałej szerokości:
 Quit	WebPositive Window		Zakończ
 Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Wyszukuje poprzednie wystąpienie tekstu
 Remember username and password for this site	Authentication Panel		Pamiętaj nazwę użytkownika i hasło dla tej strony
+(Finish: %date - %duration left)	Download Window		(Koniec: %date – pozostało %duration)
 Cookie manager	Cookie Manager		Menedżer ciasteczek
 Show home button	Settings Window		Pokaż przycisk domowy
+Start new session	Settings Window		Rozpocznij nową sesję
 The cookie jar is empty!	Cookie Manager		Słoik ciasteczek jest pusty!
 Value	Cookie Manager		Wartość
 Remove missing	Download Window		Usuń brakujące

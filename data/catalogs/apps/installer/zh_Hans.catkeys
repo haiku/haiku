@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Installer	3204472249
+1	english	x-vnd.Haiku-Installer	1841239732
 Performing installation.	InstallProgress		执行安装。
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		从弹出菜单中选择源磁盘。然后点击\"开始\"。
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		请在关闭系统安装器前关闭磁盘管理器。
@@ -31,7 +31,6 @@ Install from:	InstallerWindow		安装源：
 Additional disk space required: 0.0 KiB	InstallerWindow		需要额外磁盘空间：0.0 KiB
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)  在首次成功启动 Haiku 之后，您需要阅读 \"欢迎使用\" 和 \"用户指南\" 等文档。在桌面和 WebPositive 书签栏内都有相应链接。\n\n
 ???	InstallerWindow	Unknown currently copied item	???
-Install anyway	InstallProgress		继续安装
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		从弹出菜单中选择源磁盘和目标磁盘。然后点击\"开始\"。
 Hide optional packages	InstallerWindow		隐藏附加软件包
 ???	InstallerWindow	Unknown partition name	???
@@ -53,7 +52,6 @@ Collecting copy information.	InstallProgress		收集复制信息。
 Show optional packages	InstallerWindow		显示附加软件包
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		目标磁盘可能没有足够的空间。尝试选择其他的磁盘或者选择不安装附加项目。
 Installation canceled.	InstallProgress		安装已取消。
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		目标卷为非空，是否确定继续安装？\n\n注意： 'system' 目录将完全从源卷进行拷贝，但配置目录将会保留，所有其他的目录都将会进行合并，同时存在于源卷和目标卷的文件和链接都将会被源卷的版本所覆盖。
 OK	InstallerApp		确定
 Are you sure you want to abort the installation?	InstallerWindow		您确定要取消安装吗？
 Stop	InstallerWindow		停止

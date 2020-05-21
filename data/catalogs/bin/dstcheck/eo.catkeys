@@ -1,0 +1,5 @@
+1	esperanto	x-vnd.Haiku-cmd-dstconfig	684321431
+Keep this time	dstcheck		Jes, konservi ĉi tempon
+Manually adjust time…	dstcheck		Permane ĝustigi la horon…
+Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is %current time%.\n\nIs this the correct time?	dstcheck		Atentu!\n\nPro somera tempo, la horloĝo de via komputilo eble unuhore antaŭas aŭ postas la ĝusta horo.\nVia komputila kredas, ke la horo estas %current time%.\n\nĈu tio ĝustas?
+Ask me later	dstcheck		Demandi al mi poste

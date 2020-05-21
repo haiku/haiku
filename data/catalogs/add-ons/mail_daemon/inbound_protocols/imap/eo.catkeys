@@ -1,0 +1,15 @@
+1	esperanto	x-vnd.Haiku-IMAP	1343128980
+Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Ne eblis konekti al \"%server%\":\n%error%
+Updating subscriptions to IMAP folders, please be patient…	IMAPFolderConfig		Ĝisdatiganta abonajn dosierojn IMAPajn, bonvolu pancienci…
+Failed to fetch available storage.	IMAPFolderConfig		Fiaskis akiri liberan konservujon.
+Cancel	IMAPFolderConfig		Nuligi
+OK	IMAPFolderConfig		Bone
+Server storage: %s / %s used.	IMAPFolderConfig		Servila konservujo: %s / %s uzita.
+No encryption	imap_config		Senĉifre
+Fetching IMAP folders, please be patient…	IMAPFolderConfig		Akiranta dosierojn IMAPajn, bonvolu pacienci…
+Configure IMAP Folders	imap_config		Agordi Dosierojn IMAPajn
+SSL	imap_config		SSL
+Apply	IMAPFolderConfig		Apliki
+status	IMAPFolderConfig		stato
+IMAP Folders	IMAPFolderConfig		IMAP Dosierujoj
+Destination:	imap_config		Ricevloko:

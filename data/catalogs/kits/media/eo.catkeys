@@ -1,0 +1,12 @@
+1	esperanto	x-vnd.Haiku-libmedia	1819860668
+Cleaning up.	MediaDefs		Lavumante.
+Starting media_services.	MediaDefs		Startigante media_services.
+Stopping media_addon_server.	MediaDefs		Ĉesigante media_addon_server.
+Waiting for media_addon_server to quit.	MediaDefs		Atendante media_addon_server ĉesiĝi.
+Telling media_addon_server to quit.	MediaDefs		Ordonante al media_addon_server ĉesiĝi.
+Ready for use.	MediaDefs		Uzpretas.
+Stopping media server…	MediaDefs		Ĉesigante aŭdvideaĵan servilon…
+Waiting for media_server to quit.	MediaDefs		Atendante media_server ĉesiĝi.
+Done shutting down.	MediaDefs		Finiĝis malŝalto.
+Error occurred starting media services.	MediaDefs		Eraris dum startigo de aŭdvideaĵaj servoj.
+Media Service	MediaDefs		Aŭdvideaĵa Servo

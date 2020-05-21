@@ -1,0 +1,101 @@
+1	croatian	x-vnd.Haiku-Terminal	2362866022
+Close other tabs	Terminal TermWindow		Zatvori druge kartice
+Insert path	Terminal TermView		Unesi putanju
+Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal nije mogao pokrenuti shell. Žao nam je.
+Text encoding	Terminal TermWindow		Enkodiranje teksta
+OK	Terminal SetTitleWindow		U redu
+Edit	Terminal TermWindow		Uredi
+Select all	Terminal TermWindow		Odaberi sve
+Confirm exit if active programs exist	Terminal AppearancePrefView		Potvrdi izlaz ako postoji aktivni program
+Copy	Terminal TermWindow		kopiraj
+Edit tab title…	Terminal TermWindow		Uredi naslov kartice...
+Print	Terminal TermWindow		Ispis
+Settings	Terminal TermWindow		Postavke
+%app% settings	Terminal PrefWindow	window title	%app% postavke
+Use default	Terminal SetTitleWindow		Koristi zadano
+Close tab	Terminal TermWindow		Zatvori karticu
+Selected background	Terminal AppearancePrefView		Odabrana pozadina
+Error!	Terminal getString		Greška!
+Set tab title	Terminal TermWindow		Postavi naslov kartice
+Appearance	Terminal PrefWindow		Izgled
+Create link here	Terminal TermView		Napravi poveznicu ovdje
+Custom	Terminal AppearancePrefView	Window size	Prilagođeno
+Selected text	Terminal AppearancePrefView		Odabrani tekst
+Change directory	Terminal TermView		Promijeni direktorij
+Page setup…	Terminal TermWindow		Postavljanje stranice...
+Defaults	Terminal PrefWindow		Zadano
+Cancel	Terminal TermView		Odustani
+Revert	Terminal PrefWindow		Obrnuto
+Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
+Use selection	Terminal FindWindow		koristi izbor
+Find next	Terminal TermWindow		Nađi tekst
+Copy link location	Terminal TermView		Kopiraj lokaciju poveznice
+Window title:	Terminal AppearancePrefView		Naslov prozora:
+New tab	Terminal TermWindow		Nova kartica
+Allow bold text	Terminal AppearancePrefView		Dozvoli podebljani tekst
+Window title…	Terminal TermWindow		Naslov prozora...
+Blue	Terminal colors scheme		Plava
+Cannot execute \"%command\":\n\t%error	Terminal Shell		Ne mogu izvršiti \"%command\":\n\t%error
+Open path	Terminal TermView		Otvori putanju
+Terminal	System name		Terminal
+Font size	Terminal TermWindow		Veličina fonta
+Custom	Terminal colors scheme		Prilagođeno
+Really close?	Terminal TermWindow		Doista zatvoriti?
+OK	Terminal TermApp		U redu
+The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Proces \"%1\" i dalje radi.\nAko zatvorite terminal, proces će biti isključen.
+Unrecognized option \"%s\"\n	Terminal arguments parsing		Neprepoznata opcija \"%s\"\n
+Tab title:	Terminal AppearancePrefView		Naslov kartice:
+Text not found.	Terminal TermWindow		Tekst nije pronađen
+Find failed	Terminal TermWindow		Neuspjelo nalaženje
+New Terminal	Terminal TermWindow		Novi terminal
+Quit	Terminal TermWindow		Isključi
+Find previous	Terminal TermWindow		Nađi prethodno
+Close	Terminal TermWindow		Zatvori
+Save to file…	Terminal PrefWindow		Spremi u datoteku...
+Background	Terminal AppearancePrefView		Pozadina
+Copy path	Terminal TermView		Kopiraj putanju
+Window size	Terminal TermWindow		Veličina prozora
+Copy absolute path	Terminal TermView		Kopiraj apsolutnu putanju
+Cancel	Terminal TermWindow		Odustani
+The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Proces \"%1\" i dalje radi.\nAko zatvorite karticu, proces će biti isključen.
+Cursor	Terminal AppearancePrefView		Pokazivač
+Full screen	Terminal TermWindow		Puni zaslon
+Shell 	Terminal TermWindow		Shell 
+Midnight	Terminal colors scheme		Ponoć
+Tab title:	Terminal TermWindow		Naslov kartice:
+Window title:	Terminal TermWindow		Naslov prozora:
+Default	Terminal colors scheme		Zadano
+Window size:	Terminal AppearancePrefView		Veličina prozora
+Switch Terminals	Terminal TermWindow		Zamjeni terminale
+Decrease	Terminal TermWindow		Smanji
+Settings…	Terminal TermWindow		Postavke...
+Cancel	Terminal SetTitleWindow		Odustani
+Blinking cursor	Terminal AppearancePrefView		Trepćući pokazivač
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Uzorak koji specificira naslov prozora. Sljedeće rezarvirano mjesto\n se može koristiti:\n
+Use text:	Terminal FindWindow		Koristi tekst:
+Close active tab	Terminal TermWindow		Zatvori aktivnu karticu
+Save as default	Terminal TermWindow		Spremi kao zadano
+Nothing is selected.	Terminal TermWindow		Ništa nije izabrano
+Find	Terminal FindWindow		Nađi
+The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Uzorak koji specificira trenutni naslov tab-a. Sljedeće rezarvirano mjesto\n se može koristiti:\n
+Font:	Terminal AppearancePrefView		Font:
+Paste	Terminal TermWindow		Zalijepi
+Copy here	Terminal TermView		Kopiraj ovdje
+Use default shell	Terminal Shell		Koristi zadani shell
+Color:	Terminal AppearancePrefView		Boja:
+Open link	Terminal TermView		Otvori poveznicu
+Text	Terminal AppearancePrefView		Tekst
+Not found.	Terminal TermWindow		Nije pronađeno.
+Find…	Terminal TermWindow		Nađi...
+No search string was entered.	Terminal TermWindow		Ništa nije uneseno za pretagu.
+Text under cursor	Terminal AppearancePrefView		Tekst ispod pokazivača
+Move here	Terminal TermView		Premjesti ovdje
+Abort	Terminal Shell		Prekini
+The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Sljedeći procesi još rade:\n\n\t%1\n\nAko zatvorite terminal, procesi će biti isključeni.
+Set window title	Terminal TermWindow		Postavi naslov prozora
+Increase	Terminal TermWindow		Povećaj
+OK	Terminal TermWindow		U redu
+Close window	Terminal TermWindow		Zatvori prozor
+Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nAutorksa prava 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUporaba: %s [OPTION] [SHELL]\n
+Clear all	Terminal TermWindow		Očisti sve
+Search forward	Terminal FindWindow		Traži naprijed

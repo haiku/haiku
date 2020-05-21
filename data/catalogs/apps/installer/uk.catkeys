@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Installer	116830250
+1	ukrainian	x-vnd.Haiku-Installer	3048565029
 Performing installation.	InstallProgress		Виконання інсталяції.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Виберіть джерело з випадаючого меню. Потім натисніть кнопку \"Почати\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Закрийте вікно DriveSetup перед тим як закрити вікно Installer.
@@ -33,7 +33,6 @@ Additional disk space required: 0.0 KiB	InstallerWindow		Потрібен дод
 This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Це програмне забезпечення для бета-тестування! Це означає, що існує ризик втрати важливих даних. Частіше робіть резервні копії, попереджаємо Вас!\n\n\n
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3) При першому успішному завантаженні системи Haiku, не забудьте прочитати нашу документацію, доступну в файлах \"Welcome\" та \"Userguide\". Посилання на них знаходяться на рабочому столі і в закладках WebPositive.\n\n
 ???	InstallerWindow	Unknown currently copied item	???
-Install anyway	InstallProgress		Все рівно інсталювати
 1)   If you are installing Haiku onto real hardware (not inside an emulator), you may want to prepare a hard disk partition from another OS (you could, for example, use a GParted Live-CD, which can also resize existing partitions to make room).\nYou can also set up partitions by launching DriveSetup from Installer, but you won't be able to resize existing partitions with it. While DriveSetup has been quite thoroughly tested over the years, it's recommended to have up-to-date backups of the other partitions on your system. Just in case…	InstallerApp		1)  Якщо Ви встановлююте Haiku на реальний комп'ютер (не емулятор), то можете підготувати розділ жорсткого диска за допомогою іншої ОС (скористайтесь, наприклад, GParted Live-CD, який також уміє змінювати розмір існуючих розділів для створення потрібного місця під систему).\nДля створення розділу можна скористатись програмою DriveSetup прямо в Installer, але він не вміє міняти розміри існуючих розділів. Хоча протягом багатьох років DriveSetup було досить ретельно протестовано, рекомендуємо зробити резервні копії інших розділів у Вашій системі. На всякий випадок…
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Виберіть джерело і цільовий диск з випадаючого меню. Після чого натисніть \"Почати\".
 Hide optional packages	InstallerWindow		Сховати опціональні пакети
@@ -58,7 +57,6 @@ Collecting copy information.	InstallProgress		Збір інформації дл
 Show optional packages	InstallerWindow		Показати опціональні пакети
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Поточний диск має недостатньо місця. Виберіть інший диск або не встановлюйте необов’язкові елементи.
 Installation canceled.	InstallProgress		Інсталяція скасована.
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Цільовий том не порожній. Бажаєте продовжити встановлення будь-що?\n\nПримітка: Папка 'system' буде повною копією папки з вихідного тома при збереженні всіх налаштувань, решта папок будуть об'єднані. В той же час всі папки і посилання що існують на цільовому та вихідному томах будуть переписані згідно з версією останнього.
 OK	InstallerApp		ОК
 Are you sure you want to abort the installation?	InstallerWindow		Ви дійсно бажаєте відмінити інсталяцію?
 Stop	InstallerWindow		Зупинено

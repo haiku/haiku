@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-HaikuDepot	3610372060
+1	indonesian	x-vnd.Haiku-HaikuDepot	1335940664
 Repository update error	LocalRepositoryUpdateProcess		Kesalahan pembaruan repositori
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Terjadi kesalahan saat menyegarkan repositori: %error%
 User Created	UserLoginWindow		Pengguna Dibuat
@@ -53,6 +53,7 @@ Package action failed	PackageInfoView		Tindakan paket gagal
 No changelog available.	PackageInfoView		Tak ada log perubahan tersedia.
 Error	App		Kesalahan
 There was a puzzling response from the web service.	UserLoginWindow		Ada respon membingungkan dari layanan web.
+Version	PackageListView		Versi
 Not logged in	MainWindow		Tidak masuk
 No, quit HaikuDepot	App		Tidak, keluar dari HaikuDepot
 Featured packages	FeaturedPackagesView		Paket unggulan
