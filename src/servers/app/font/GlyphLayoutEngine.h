@@ -147,6 +147,11 @@ GlyphLayoutEngine::FontCacheEntryFor(const ServerFont& font, bool forceVector,
 		return NULL;
 	}
 
+	if (glyphCode != 0 && !entry->CanCreateGlyph(glyphCode)) {
+		cache->Recycle(entry);
+		return NULL;
+	}
+
 	if (needsWriteLock) {
 		if (!entry->WriteLock()) {
 			cache->Recycle(entry);
@@ -163,6 +168,7 @@ GlyphLayoutEngine::FontCacheEntryFor(const ServerFont& font, bool forceVector,
 	// proper mode. We can setup the FontCacheReference so it takes care of
 	// the locking and recycling from now and return the entry.
 	cacheReference.SetTo(entry, needsWriteLock);
+
 	return entry;
 }
 

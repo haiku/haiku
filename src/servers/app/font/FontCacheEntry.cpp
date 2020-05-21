@@ -266,6 +266,16 @@ FontCacheEntry::CachedGlyph(uint32 glyphCode)
 }
 
 
+bool
+FontCacheEntry::CanCreateGlyph(uint32 glyphCode)
+{
+	// Note that this bypass any fallback or caching because it is used in
+	// the fallback code itself.
+	uint32 glyphIndex = fEngine.GlyphIndexForGlyphCode(glyphCode);
+	return glyphIndex != 0;
+}
+
+
 const GlyphCache*
 FontCacheEntry::CreateGlyph(uint32 glyphCode, FontCacheEntry* fallbackEntry)
 {
