@@ -301,7 +301,7 @@ struct ufs2_super_block {
 	int8_t		fs_ronly;		/* mounted read-only flag */
 	int8_t		fs_old_flags;		/* old FS_ flags */
 	u_char		fs_fsmnt[MAXMNTLEN];	/* name mounted on */
-	u_char		fs_volname[MAXVOLLEN];	/* volume name */
+	char		fs_volname[MAXVOLLEN];	/* volume name */
 	u_int64_t	fs_swuid;		/* system-wide uid */
 	int32_t		fs_pad;		/* due to alignment of fs_swuid */
 /* these fields retain the current block allocation info */

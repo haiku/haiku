@@ -27,6 +27,16 @@ ufs2_super_block::IsValid()
 }
 
 
+const char*
+Volume::Name() const
+{
+	if (fSuperBlock.fs_volname[0])
+		return fSuperBlock.fs_volname;
+
+	return fName;
+}
+
+
 bool
 Volume::IsValidSuperBlock()
 {

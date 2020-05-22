@@ -12,6 +12,13 @@
 
 #define	UFS2_ROOT	((ino_t)2)
 
+
+struct timeval32
+{
+	int tv_sec, tv_usec;
+};
+
+
 struct ufs2_inode {
 	u_int16_t	fileMode;
 	int16_t		linkCount;
@@ -20,10 +27,10 @@ struct ufs2_inode {
 	int32_t		inodeBlockSize;
 	int64_t		size;
 	int64_t		byteHeld;
-	int64_t		accessTime;
-	int64_t		modifiedTime;
-	int64_t		changeTime;
-	int64_t		createTime;
+	struct		timeval32	accessTime;
+	struct		timeval32	modifiedTime;
+	struct		timeval32	changeTime;
+	struct		timeval32	createTime;
 	/* time in nano seconds */
 	int32_t		nsModifiedTime;
 	int32_t		nsAccessTime;
@@ -57,6 +64,20 @@ struct ufs2_inode {
 	int64_t		unused2;
 	int64_t		unused3;
 
+
+	static void _DecodeTime(struct timespec& timespec, timeval32 time)
+	{
+		timespec.tv_sec = time.tv_sec;
+		timespec.tv_nsec = time.tv_usec * 1000;
+	}
+	void GetAccessTime(struct timespec& timespec) const
+		{ _DecodeTime(timespec, accessTime); }
+	void GetChangeTime(struct timespec& timespec) const
+		{ _DecodeTime(timespec, changeTime); }
+	void GetModificationTime(struct timespec& timespec) const
+		{ _DecodeTime(timespec, modifiedTime); }
+	void GetCreationTime(struct timespec& timespec) const
+		{ _DecodeTime(timespec, createTime); }
 };
 
 class Inode {
@@ -86,14 +107,14 @@ class Inode {
 			off_t		Size() const { return fNode.size; }
 			uid_t		UserID() const { return fNode.userId; }
 			gid_t		GroupID() const { return fNode.groupId; }
-			/*void		GetChangeTime(struct timespec& timespec) const
+			void		GetChangeTime(struct timespec& timespec) const
 							{ fNode.GetChangeTime(timespec); }
 			void		GetModificationTime(struct timespec& timespec) const
 							{ fNode.GetModificationTime(timespec); }
 			void		GetCreationTime(struct timespec& timespec) const
 							{ fNode.GetCreationTime(timespec); }
 			void		GetAccessTime(struct timespec& timespec) const
-							{ fNode.GetCreationTime(timespec); }*/
+							{ fNode.GetAccessTime(timespec); }
 
 			Volume*		GetVolume() const { return fVolume; }
 
@@ -119,6 +140,7 @@ private:
 			::Volume*	fVolume;
 			ino_t		fID;
 			void*		fCache;
+			bool		fHasNanoTime;
 			void*		fMap;
 			status_t	fInitStatus;
 			ufs2_inode	fNode;
