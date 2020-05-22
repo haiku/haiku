@@ -1196,7 +1196,7 @@ MainWin::OpenPlaylistItem(const PlaylistItemRef& item)
 		_PlaylistItemOpened(item, ret);
 	} else {
 		BString string;
-		string.SetToFormat(B_TRANSLATE("Opening '%s'.", item->Name());
+		string.SetToFormat(B_TRANSLATE("Opening '%s'."), item->Name().String());
 		fControls->SetDisabledString(string.String());
 	}
 }
