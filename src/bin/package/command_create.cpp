@@ -14,6 +14,7 @@
 #include <unistd.h>
 
 #include <Entry.h>
+#include <Path.h>
 
 #include <package/PackageInfo.h>
 #include <package/hpkg/HPKGDefs.h>
@@ -118,6 +119,18 @@ command_create(int argc, const char* const* argv)
 		fprintf(stderr, "Error: \"-I\" is only allowed when \"-b\" is "
 			"given.\n");
 		return 1;
+	}
+
+	BPath outputPath(packageFileName, NULL, true);
+	BPath inputPath(changeToDirectory, NULL, true);
+	BPath parent;
+	while (outputPath.GetParent(&parent) == B_OK) {
+		if (outputPath == inputPath) {
+			fprintf(stderr, "Error: output package can't be in the same "
+				"directory as input files.");
+			return 1;
+		}
+		outputPath = parent;
 	}
 
 	// create package
