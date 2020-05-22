@@ -68,7 +68,7 @@ static const char* kLanguageKeymapMappings[] = {
 
 	// Cyrillic keymaps are not usable alone, as latin alphabet is required to
 	// use Terminal. So we stay in US international until the user has a chance
-	// to set up KeymapSwitcher. TODO enable KeymapSwitcher automatically.
+	// to set up KeymapSwitcher.
 	"Belarusian", "US-International",
 	"Russian", "US-International",
 	"Ukrainian", "US-International",
@@ -202,7 +202,7 @@ BootPromptWindow::BootPromptWindow()
 		fLanguagesListView, B_WILL_DRAW, false, true);
 
 	// Carefully designed to not exceed the 640x480 resolution with a 12pt font.
-	float width = 640 - (labelWidth + 96);
+	float width = 640 * be_plain_font->Size() / 12 - (labelWidth + 64);
 	float height = be_plain_font->Size() * 23;
 	fInfoTextView->SetExplicitMinSize(BSize(width, height));
 	fInfoTextView->SetExplicitMaxSize(BSize(width, B_SIZE_UNSET));
