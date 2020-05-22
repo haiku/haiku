@@ -1111,6 +1111,46 @@ VMCache::SetMinimalCommitment(off_t commitment, int priority)
 }
 
 
+bool
+VMCache::_FreePageRange(VMCachePagesTree::Iterator it,
+	page_num_t* toPage = NULL)
+{
+	for (vm_page* page = it.Next();
+		page != NULL && (toPage == NULL || page->cache_offset < *toPage);
+		page = it.Next()) {
+
+		if (page->busy) {
+			if (page->busy_writing) {
+				// We cannot wait for the page to become available
+				// as we might cause a deadlock this way
+				page->busy_writing = false;
+					// this will notify the writer to free the page
+				continue;
+			}
+
+			// wait for page to become unbusy
+			WaitForPageEvents(page, PAGE_EVENT_NOT_BUSY, true);
+			return true;
+		}
+
+		// remove the page and put it into the free queue
+		DEBUG_PAGE_ACCESS_START(page);
+		vm_remove_all_page_mappings(page);
+		ASSERT(page->WiredCount() == 0);
+			// TODO: Find a real solution! If the page is wired
+			// temporarily (e.g. by lock_memory()), we actually must not
+			// unmap it!
+		RemovePage(page);
+			// Note: When iterating through a IteratableSplayTree
+			// removing the current node is safe.
+
+		vm_page_free(this, page);
+	}
+
+	return false;
+}
+
+
 /*!	This function updates the size field of the cache.
 	If needed, it will free up all pages that don't belong to the cache anymore.
 	The cache lock must be held when you call it.
@@ -1133,44 +1173,16 @@ VMCache::Resize(off_t newSize, int priority)
 	if (status != B_OK)
 		return status;
 
-	uint32 oldPageCount = (uint32)((virtual_end + B_PAGE_SIZE - 1)
+	page_num_t oldPageCount = (page_num_t)((virtual_end + B_PAGE_SIZE - 1)
 		>> PAGE_SHIFT);
-	uint32 newPageCount = (uint32)((newSize + B_PAGE_SIZE - 1) >> PAGE_SHIFT);
+	page_num_t newPageCount = (page_num_t)((newSize + B_PAGE_SIZE - 1)
+		>> PAGE_SHIFT);
 
 	if (newPageCount < oldPageCount) {
 		// we need to remove all pages in the cache outside of the new virtual
 		// size
-		for (VMCachePagesTree::Iterator it
-					= pages.GetIterator(newPageCount, true, true);
-				vm_page* page = it.Next();) {
-			if (page->busy) {
-				if (page->busy_writing) {
-					// We cannot wait for the page to become available
-					// as we might cause a deadlock this way
-					page->busy_writing = false;
-						// this will notify the writer to free the page
-				} else {
-					// wait for page to become unbusy
-					WaitForPageEvents(page, PAGE_EVENT_NOT_BUSY, true);
-
-					// restart from the start of the list
-					it = pages.GetIterator(newPageCount, true, true);
-				}
-				continue;
-			}
-
-			// remove the page and put it into the free queue
-			DEBUG_PAGE_ACCESS_START(page);
-			vm_remove_all_page_mappings(page);
-			ASSERT(page->WiredCount() == 0);
-				// TODO: Find a real solution! If the page is wired
-				// temporarily (e.g. by lock_memory()), we actually must not
-				// unmap it!
-			RemovePage(page);
-			vm_page_free(this, page);
-				// Note: When iterating through a IteratableSplayTree
-				// removing the current node is safe.
-		}
+		while (_FreePageRange(pages.GetIterator(newPageCount, true, true)))
+			;
 	}
 
 	virtual_end = newSize;
@@ -1199,43 +1211,13 @@ VMCache::Rebase(off_t newBase, int priority)
 	if (status != B_OK)
 		return status;
 
-	uint32 basePage = (uint32)(newBase >> PAGE_SHIFT);
+	page_num_t basePage = (page_num_t)(newBase >> PAGE_SHIFT);
 
 	if (newBase > virtual_base) {
 		// we need to remove all pages in the cache outside of the new virtual
-		// size
-		VMCachePagesTree::Iterator it = pages.GetIterator();
-		for (vm_page* page = it.Next();
-				page != NULL && page->cache_offset < basePage;
-				page = it.Next()) {
-			if (page->busy) {
-				if (page->busy_writing) {
-					// We cannot wait for the page to become available
-					// as we might cause a deadlock this way
-					page->busy_writing = false;
-						// this will notify the writer to free the page
-				} else {
-					// wait for page to become unbusy
-					WaitForPageEvents(page, PAGE_EVENT_NOT_BUSY, true);
-
-					// restart from the start of the list
-					it = pages.GetIterator();
-				}
-				continue;
-			}
-
-			// remove the page and put it into the free queue
-			DEBUG_PAGE_ACCESS_START(page);
-			vm_remove_all_page_mappings(page);
-			ASSERT(page->WiredCount() == 0);
-				// TODO: Find a real solution! If the page is wired
-				// temporarily (e.g. by lock_memory()), we actually must not
-				// unmap it!
-			RemovePage(page);
-			vm_page_free(this, page);
-				// Note: When iterating through a IteratableSplayTree
-				// removing the current node is safe.
-		}
+		// base
+		while (_FreePageRange(pages.GetIterator(), &basePage))
+			;
 	}
 
 	virtual_base = newBase;

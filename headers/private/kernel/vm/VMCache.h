@@ -215,6 +215,9 @@ private:
 			void				_MergeWithOnlyConsumer();
 			void				_RemoveConsumer(VMCache* consumer);
 
+			bool				_FreePageRange(VMCachePagesTree::Iterator it,
+									page_num_t* toPage);
+
 private:
 			int32				fRefCount;
 			mutex				fLock;
