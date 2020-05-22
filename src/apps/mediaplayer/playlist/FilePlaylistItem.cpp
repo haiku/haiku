@@ -150,6 +150,8 @@ FilePlaylistItem::GetAttribute(const Attribute& attribute,
 	BString& string) const
 {
 	if (attribute == ATTR_STRING_NAME) {
+		if (fRefs[0].name == NULL)
+			return B_NAME_NOT_FOUND;
 		string = fRefs[0].name;
 		return B_OK;
 	}
