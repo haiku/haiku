@@ -1,7 +1,10 @@
 /*
- * Copyright 2005-2008 Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
- * Distributed under the terms of the MIT license.
+ * Copyright 2005-2008 Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2020 Jacob Secunda <secundaja@gmail.com>
+ * All rights reserved. Distributed under the terms of the MIT license.
  */
+
+
 #include "DeviceReader.h"
 
 #include <malloc.h>
@@ -9,19 +12,21 @@
 
 #include <File.h>
 
+#include <wacom_driver.h>
+
 #include "MasterServerDevice.h"
 
 
-static ssize_t kHeaderSize = 8;
-
+static ssize_t kHeaderSize = sizeof(wacom_device_header);
 
 // constructor
 DeviceReader::DeviceReader()
-	: fDevicePath(NULL),
-	  fDeviceFile(NULL),
-	  fVendorID(0),
-	  fProductID(0),
-	  fMaxPackedSize(0)
+	:
+	fDevicePath(NULL),
+	fDeviceFile(NULL),
+	fVendorID(0),
+	fProductID(0),
+	fMaxPacketSize(0)
 {
 }
 
@@ -36,23 +41,21 @@ status_t
 DeviceReader::SetTo(const char* path)
 {
 	status_t ret = B_BAD_VALUE;
-	if (path) {
+	if (path != NULL) {
 		_Unset();
 		fDevicePath = strdup(path);
 		fDeviceFile = new BFile(path, B_READ_ONLY);
 		ret = fDeviceFile->InitCheck();
 		if (ret >= B_OK) {
-			// read 8 bytes from the file and initialize
+			// read the wacom_device_header from the file and initialize
 			// the rest of the object variables
-			uint8 buffer[kHeaderSize];
-			ret = fDeviceFile->Read(buffer, kHeaderSize);
+			wacom_device_header device_header;
+			ret = fDeviceFile->Read(&device_header, kHeaderSize);
 			if (ret == kHeaderSize) {
 				ret = B_OK;
-				uint16* ids = (uint16*)buffer;
-				fVendorID = ids[0];
-				fProductID = ids[1];
-				uint32* ps = (uint32*)buffer;
-				fMaxPackedSize = ps[1];
+				fVendorID = device_header.vendor_id;
+				fProductID = device_header.product_id;
+				fMaxPacketSize = device_header.max_packet_size;
 			} else {
 				_Unset();
 			}
@@ -100,20 +103,20 @@ DeviceReader::ProductID() const
 size_t
 DeviceReader::MaxPacketSize() const
 {
-	return fMaxPackedSize;
+	return fMaxPacketSize;
 }
 
 // ReadData
 ssize_t
 DeviceReader::ReadData(uint8* data, const size_t size) const
 {
-	if (!fDeviceFile || fMaxPackedSize <= 0 || fMaxPackedSize > 128)
+	if (!fDeviceFile || fMaxPacketSize <= 0 || fMaxPacketSize > 128)
 		return B_NO_INIT;
 	status_t ret = fDeviceFile->InitCheck();
 	if (ret < B_OK)
 		return (ssize_t)ret;
 
-	ssize_t requested = fMaxPackedSize + kHeaderSize;
+	ssize_t requested = fMaxPacketSize + kHeaderSize;
 	uint8 buffer[requested];
 	ssize_t read = fDeviceFile->Read(buffer, requested);
 	if (read > kHeaderSize) {
@@ -153,5 +156,5 @@ DeviceReader::_Unset()
 	fDeviceFile = NULL;
 	fVendorID = 0;
 	fProductID = 0;
-	fMaxPackedSize = 0;
+	fMaxPacketSize = 0;
 }

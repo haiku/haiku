@@ -1,6 +1,8 @@
 SubDir HAIKU_TOP src add-ons kernel drivers input wacom ;
 
 SubDirSysHdrs $(HAIKU_TOP) headers os drivers ;
+UsePrivateHeaders input ;
+UsePrivateKernelHeaders ;
 
 KernelAddon wacom :
 	wacom.c

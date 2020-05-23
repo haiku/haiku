@@ -58,6 +58,6 @@ class DeviceReader {
 
 			uint16				fVendorID;
 			uint16				fProductID;
-			size_t				fMaxPackedSize;
+			size_t				fMaxPacketSize;
 };
 #endif // USB_DEVICE_MONITOR_H

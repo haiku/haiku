@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2005-2020, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -17,6 +17,9 @@
 #include <KernelExport.h>
 #include <OS.h>
 #include <USB3.h>
+
+#include <kernel.h>
+#include <wacom_driver.h>
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
 
@@ -430,7 +433,8 @@ device_open(const char *dname, uint32 flags, void** cookie)
 				release_sem(sDeviceListLock);
 				return ret;
 //			} else {
-//				dprintf(ID "device_open() -> device is already open %ld\n", ret);
+//				dprintf(ID "device_open() -> device is already open %ld\n",
+//					ret);
 //				release_sem(sDeviceListLock);
 //				return B_ERROR;
 //			}
@@ -502,15 +506,20 @@ device_interupt_callback(void* cookie, status_t status, void* data,
 }
 
 // read_header
-static void
+static status_t
 read_header(const wacom_device* device, void* buffer)
 {
-	uint16* ids = (uint16*)buffer;
-	uint32* size = (uint32*)buffer;
+	wacom_device_header device_header;
+	device_header.vendor_id = device->vendor;
+	device_header.product_id = device->product;
+	device_header.max_packet_size = device->max_packet_size;
 
-	ids[0] = device->vendor;
-	ids[1] = device->product;
-	size[1] = device->max_packet_size;
+	if (!IS_USER_ADDRESS(buffer)) {
+		memcpy(buffer, &device_header, sizeof(wacom_device_header));
+		return B_OK;
+	}
+
+	return user_memcpy(buffer, &device_header, sizeof(wacom_device_header));
 }
 
 // device_read
@@ -532,11 +541,11 @@ device_read(void* cookie, off_t pos, void* buf, size_t* count)
 
 	if (ret >= B_OK) {
 		// what the client "reads" is decided depending on how much bytes are
-		// provided 8 bytes are needed to "read" vendor id, product id and max
-		// packet size in case the client wants to read more than 8 bytes, a usb
-		// interupt transfer is scheduled, and an error report is returned as
-		// appropriate
-		if (*count > 8) {
+		// provided. "sizeof(wacom_device_header)" bytes are needed to "read"
+		// vendor id, product id and max packet size in case the client wants to
+		// read more than "sizeof(wacom_device_header)" bytes, a usb interupt
+		// transfer is scheduled, and an error report is returned as appropriate
+		if (*count > sizeof(wacom_device_header)) {
 			// queue the interrupt transfer
 			ret = usb->queue_interrupt(device->pipe, device->data,
 				device->max_packet_size, device_interupt_callback, device);
@@ -557,9 +566,8 @@ device_read(void* cookie, off_t pos, void* buf, size_t* count)
 						DPRINTF_INFO((ID "device_read(%p) name = \"%s%d\" -> "
 							"B_TIMED_OUT\n", cookie, kBasePublishPath,
 							device->number));
-						*count = 8;
-						read_header(device, buffer);
-						ret = B_OK;
+						*count = sizeof(wacom_device_header);
+						ret = read_header(device, buffer);
 					} else {
 						// any other error trying to acquire the semaphore
 						*count = 0;
@@ -568,10 +576,19 @@ device_read(void* cookie, off_t pos, void* buf, size_t* count)
 					if (device->status == 0/*B_USBD_SUCCESS*/) {
 						DPRINTF_INFO((ID "interrupt transfer - success\n"));
 						// copy the data from the buffer
-						dataLength = min_c(device->length, *count - 8);
-						*count = dataLength + 8;
-						read_header(device, buffer);
-						memcpy(buffer + 8, device->data, dataLength);
+						dataLength = min_c(device->length,
+							*count - sizeof(wacom_device_header));
+						*count = dataLength + sizeof(wacom_device_header);
+						ret = read_header(device, buffer);
+						if (ret == B_OK) {
+							if (IS_USER_ADDRESS(buffer))
+								ret = user_memcpy(
+									buffer + sizeof(wacom_device_header),
+									device->data, dataLength);
+							else
+								memcpy(buffer + sizeof(wacom_device_header),
+									device->data, dataLength);
+						}
 					} else {
 						// an error happened during the interrupt transfer
 						*count = 0;
@@ -586,13 +603,12 @@ device_read(void* cookie, off_t pos, void* buf, size_t* count)
 					"interrupt: %" B_PRId32 "\n", cookie, kBasePublishPath,
 					device->number, ret);
 			}
-		} else if (*count == 8) {
-			read_header(device, buffer);
-			ret = B_OK;
+		} else if (*count == sizeof(wacom_device_header)) {
+			ret = read_header(device, buffer);
 		} else {
 			dprintf(ID "device_read(%p) name = \"%s%d\" -> buffer size must be "
-				"at least 8 bytes!\n", cookie, kBasePublishPath,
-				device->number);
+				"at least the size of the wacom_device_header struct!\n",
+				cookie, kBasePublishPath, device->number);
 			*count = 0;
 			ret = B_BAD_VALUE;
 		}
