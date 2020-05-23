@@ -55,13 +55,12 @@ static const Translation kTranslations[] = {
 		"hlwork\n"
 		"raphino\n"
 	},
-#if 0
 	{ "hr",
-		"Ivica Koli\n"
+		"Ivica Kolić\n" // Pootle: zvacet
 		"Zlatko Sehanović\n"
 		// "taos\n" bugfixes only, no actual translations
-		"zvacet\n"
 	},
+#if 0
 	{ "cs",
 		"aXeton\n"
 		"Ivan Masár\n"
@@ -108,12 +107,23 @@ static const Translation kTranslations[] = {
 		"Jessica_Lily\n"
 		"Richie Nyhus\n"
 	},
-#if 0
 	{ "eo",
+		"Alexey Burshtein (Hitech)\n"
 		"Travis D. Reed (Dancxjo)\n"
+		"CodeWeaver\n"
+		"jaidedpts\n"
+		"jmairboeck\n"
+		"kio\n"
 		"kojoto\n"
+		"Lutrulo\n"
+		"miguel-1.mx\n"
+		"Neber\n"
+		"ora_birdo\n"
+		"SandwichDoktoro\n"
+		"sikmir\n"
+		"Teashrock\n"
+		"Va\n"
 	},
-#endif
 	{ "fi",
 		"Jorma Karvonen (Karvjorm)\n"
 		"Jaakko Leikas (Garjala)\n"
