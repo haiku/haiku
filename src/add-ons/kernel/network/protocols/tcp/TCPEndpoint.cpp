@@ -1151,12 +1151,6 @@ TCPEndpoint::_EnterTimeWait()
 
 	if (fState == TIME_WAIT) {
 		_CancelConnectionTimers();
-
-		if (IsLocal()) {
-			// we do not use TIME_WAIT state for local connections
-			fFlags |= FLAG_DELETE_ON_CLOSE;
-			return;
-		}
 	}
 
 	_UpdateTimeWait();
@@ -1905,8 +1899,10 @@ TCPEndpoint::SegmentReceived(tcp_segment_header& segment, net_buffer* buffer)
 
 	if ((fFlags & (FLAG_CLOSED | FLAG_DELETE_ON_CLOSE))
 			== (FLAG_CLOSED | FLAG_DELETE_ON_CLOSE)) {
+
 		locker.Unlock();
-		gSocketModule->release_socket(socket);
+		if (gSocketModule->release_socket(socket))
+			segmentAction |= DELETED_ENDPOINT;
 	}
 
 	return segmentAction;
