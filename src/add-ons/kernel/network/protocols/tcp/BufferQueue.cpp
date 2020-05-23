@@ -19,7 +19,7 @@
 #	define TRACE(x)
 #endif
 
-#if DEBUG_BUFFER_QUEUE
+#if DEBUG_TCP_BUFFER_QUEUE
 #	define VERIFY() Verify();
 #else
 #	define VERIFY() ;
@@ -436,7 +436,7 @@ BufferQueue::SetPushPointer()
 		fPushPointer = fList.Tail()->sequence + fList.Tail()->size;
 }
 
-#if DEBUG_BUFFER_QUEUE
+#if DEBUG_TCP_BUFFER_QUEUE
 
 /*!	Perform a sanity check of the whole queue.
 */
@@ -486,4 +486,4 @@ BufferQueue::Dump() const
 	}
 }
 
-#endif	// DEBUG_BUFFER_QUEUE
+#endif	// DEBUG_TCP_BUFFER_QUEUE

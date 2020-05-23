@@ -140,4 +140,10 @@
 #define SYSTEM_PROFILE_INTERVAL			10000
 
 
+// Network
+
+// Enables additional assertions in the tcp add-on.
+#define DEBUG_TCP_BUFFER_QUEUE			KDEBUG_LEVEL_2
+
+
 #endif	// KERNEL_DEBUG_CONFIG_H
