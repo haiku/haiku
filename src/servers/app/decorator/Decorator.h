@@ -20,6 +20,7 @@
 #include <Window.h>
 
 #include "DrawState.h"
+#include "MultiLocker.h"
 
 class Desktop;
 class DesktopSettings;
@@ -268,6 +269,9 @@ protected:
 			void				_InvalidateFootprint();
 
 			void 				_InvalidateBitmaps();
+
+protected:
+	mutable		MultiLocker	fLocker;
 
 			DrawingEngine*		fDrawingEngine;
 			DrawState			fDrawState;
