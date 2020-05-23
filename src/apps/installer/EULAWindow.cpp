@@ -61,7 +61,7 @@ EULAWindow::EULAWindow()
 		"the Userguide's topic on the application \"BootManager\".\n\n\n");
 	infoText << B_TRANSLATE(
 		"3)   When you successfully boot into Haiku for the first time, make "
-		"sure to read our \"Welcome\" and \"Userguide\" documentation. There "
+		"sure to read our \"Userguide\" and take the \"Quick Tour\". There "
 		"are links on the Desktop and in WebPositive's bookmarks.\n\n");
 	infoText << B_TRANSLATE(
 		"Have fun and thanks for trying out Haiku!");
