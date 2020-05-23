@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-#define DEBUG_BUFFER_QUEUE 1
+#define DEBUG_TCP_BUFFER_QUEUE 1
 
 #include "BufferQueue.h"
 

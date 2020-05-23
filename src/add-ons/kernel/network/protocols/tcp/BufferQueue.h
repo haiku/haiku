@@ -13,10 +13,6 @@
 
 #include <util/DoublyLinkedList.h>
 
-#ifndef DEBUG_BUFFER_QUEUE
-#	define DEBUG_BUFFER_QUEUE 1
-#endif
-
 
 typedef DoublyLinkedList<struct net_buffer,
 	DoublyLinkedListCLink<struct net_buffer> > SegmentList;
@@ -55,7 +51,7 @@ public:
 			tcp_sequence		NextSequence() const
 									{ return fFirstSequence + fContiguousBytes; }
 
-#if DEBUG_BUFFER_QUEUE
+#if DEBUG_TCP_BUFFER_QUEUE
 			void				Verify() const;
 			void				Dump() const;
 #endif

@@ -2533,7 +2533,7 @@ TCPEndpoint::Dump() const
 	kprintf("    max segment size: %" B_PRIu32 "\n", fSendMaxSegmentSize);
 	kprintf("    queue: %" B_PRIuSIZE " / %" B_PRIuSIZE "\n", fSendQueue.Used(),
 		fSendQueue.Size());
-#if DEBUG_BUFFER_QUEUE
+#if DEBUG_TCP_BUFFER_QUEUE
 	fSendQueue.Dump();
 #endif
 	kprintf("    last acknowledge sent: %" B_PRIu32 "\n",
@@ -2549,7 +2549,7 @@ TCPEndpoint::Dump() const
 	kprintf("    max segment size: %" B_PRIu32 "\n", fReceiveMaxSegmentSize);
 	kprintf("    queue: %" B_PRIuSIZE " / %" B_PRIuSIZE "\n",
 		fReceiveQueue.Available(), fReceiveQueue.Size());
-#if DEBUG_BUFFER_QUEUE
+#if DEBUG_TCP_BUFFER_QUEUE
 	fReceiveQueue.Dump();
 #endif
 	kprintf("    initial sequence: %" B_PRIu32 "\n",
