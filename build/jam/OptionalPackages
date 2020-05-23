@@ -155,16 +155,20 @@ if [ IsOptionalHaikuImagePackageAdded Welcome ] {
 		haiku_userguide_en.hpkg
 		haiku_userguide_es.hpkg
 		haiku_userguide_fi.hpkg
+		haiku_userguide_fur.hpkg
 		haiku_userguide_fr.hpkg
 		haiku_userguide_hu.hpkg
+		haiku_userguide_id.hpkg
 		haiku_userguide_it.hpkg
 		haiku_userguide_jp.hpkg
 		haiku_userguide_pl.hpkg
 		haiku_userguide_pt_BR.hpkg
 		haiku_userguide_pt_PT.hpkg
+		haiku_userguide_ro.hpkg
 		haiku_userguide_ru.hpkg
 		haiku_userguide_sk.hpkg
 		haiku_userguide_sv_SE.hpkg
+		haiku_userguide_tr.hpkg
 		haiku_userguide_uk.hpkg
 		haiku_userguide_zh_CN.hpkg
 		haiku_welcome.hpkg
