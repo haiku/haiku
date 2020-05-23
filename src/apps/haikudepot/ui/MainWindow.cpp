@@ -236,11 +236,12 @@ MainWindow::MainWindow(const BMessage& settings, const PackageInfoRef& package)
 		debugger("unable to create the process coordinator semaphore");
 
 	fFilterView = new FilterView();
-	fPackageListView = new PackageListView(fModel.Lock());
 	fPackageInfoView = new PackageInfoView(fModel.Lock(), this);
+	fWorkStatusView = new WorkStatusView("work status");
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.Add(fPackageInfoView)
+		.Add(fWorkStatusView)
 		.SetInsets(0, B_USE_WINDOW_INSETS, 0, 0)
 	;
 
@@ -494,7 +495,7 @@ MainWindow::MessageReceived(BMessage* message)
 					fModel.SetPackageState(ref, ref->State());
 				}
 				_AddRemovePackageFromLists(ref);
-				if (!fSinglePackageMode && (changes & PKG_CHANGED_STATE) != 0
+				if ((changes & PKG_CHANGED_STATE) != 0
 						&& fCoordinator == NULL) {
 					fWorkStatusView->PackageStatusChanged(ref);
 				}
@@ -516,14 +517,12 @@ MainWindow::MessageReceived(BMessage* message)
 			status_t status = message->FindString("reason", &reason);
 			if (status != B_OK)
 				break;
-			if (!fSinglePackageMode)
-				fWorkStatusView->SetBusy(reason);
+			fWorkStatusView->SetBusy(reason);
 			break;
 		}
 
 		case MSG_PACKAGE_WORKER_IDLE:
-			if (!fSinglePackageMode)
-				fWorkStatusView->SetIdle();
+			fWorkStatusView->SetIdle();
 			break;
 
 		case MSG_USER_USAGE_CONDITIONS_NOT_LATEST:
