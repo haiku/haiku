@@ -500,7 +500,6 @@ public:
 		} else {
 			AdoptActions(package);
 		}
-
 	}
 
 	void AdoptActions(const PackageInfo& package)
@@ -1368,9 +1367,8 @@ PackageInfoView::MessageReceived(BMessage* message)
 				fTitleView->SetPackage(*package.Get());
 			}
 
-			if ((changes & PKG_CHANGED_STATE) != 0) {
+			if ((changes & PKG_CHANGED_STATE) != 0)
 				fPackageActionView->SetPackage(*package.Get());
-			}
 
 			break;
 		}
