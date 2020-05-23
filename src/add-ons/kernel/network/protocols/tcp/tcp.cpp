@@ -11,6 +11,7 @@
 
 #include "EndpointManager.h"
 #include "TCPEndpoint.h"
+#include "tcp.h"
 
 #include <net_protocol.h>
 #include <net_stat.h>
@@ -710,7 +711,14 @@ tcp_receive_data(net_buffer* buffer)
 		buffer->destination, buffer->source);
 	if (endpoint != NULL) {
 		segmentAction = endpoint->SegmentReceived(segment, buffer);
-		gSocketModule->release_socket(endpoint->socket);
+
+		// There are some states in which the socket could have been deleted
+		// while handling a segment. If this flag is set in segmentAction
+		// then we know the socket has been freed and can skip releasing
+		// the reference acquired in EndpointManager::FindConnection()
+		// above.
+		if ((segmentAction & DELETED_ENDPOINT) == 0)
+			gSocketModule->release_socket(endpoint->socket);
 	} else if ((segment.flags & TCP_FLAG_RESET) == 0)
 		segmentAction = DROP | RESET;
 
