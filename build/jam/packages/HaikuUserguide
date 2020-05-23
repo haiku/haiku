@@ -88,6 +88,21 @@ AddFilesToPackage bin : userguide ;
 
 BuildHaikuPackage $(haikuUserGuidePackageFR) : haiku_userguide_fr ;
 
+# FUR
+local haikuUserGuidePackageFUR = haiku_userguide_fur.hpkg ;
+HaikuPackage $(haikuUserGuidePackageFUR) ;
+
+CopyDirectoryToPackage documentation userguide : [ FDirName $(HAIKU_TOP) docs userguide fur ]
+	: fur ;
+CopyDirectoryToPackage documentation userguide : [ FDirName $(HAIKU_TOP) docs userguide images ]
+	: images ;
+AddFilesToPackage documentation userguide : [ FDirName $(HAIKU_TOP) docs userguide Haiku-doc.css ]
+	: Haiku-doc.css ;
+SEARCH on userguide = [ FDirName $(HAIKU_TOP) data bin ] ;
+AddFilesToPackage bin : userguide ;
+
+BuildHaikuPackage $(haikuUserGuidePackageFUR) : haiku_userguide_fur ;
+
 # HU
 local haikuUserGuidePackageHU = haiku_userguide_hu.hpkg ;
 HaikuPackage $(haikuUserGuidePackageHU) ;
@@ -102,6 +117,21 @@ SEARCH on userguide = [ FDirName $(HAIKU_TOP) data bin ] ;
 AddFilesToPackage bin : userguide ;
 
 BuildHaikuPackage $(haikuUserGuidePackageHU) : haiku_userguide_hu ;
+
+# ID
+local haikuUserGuidePackageID = haiku_userguide_id.hpkg ;
+HaikuPackage $(haikuUserGuidePackageID) ;
+
+CopyDirectoryToPackage documentation userguide : [ FDirName $(HAIKU_TOP) docs userguide id ]
+	: id ;
+CopyDirectoryToPackage documentation userguide : [ FDirName $(HAIKU_TOP) docs userguide images ]
+	: images ;
+AddFilesToPackage documentation userguide : [ FDirName $(HAIKU_TOP) docs userguide Haiku-doc.css ]
+	: Haiku-doc.css ;
+SEARCH on userguide = [ FDirName $(HAIKU_TOP) data bin ] ;
+AddFilesToPackage bin : userguide ;
+
+BuildHaikuPackage $(haikuUserGuidePackageID) : haiku_userguide_id ;
 
 # IT
 local haikuUserGuidePackageIT = haiku_userguide_it.hpkg ;
@@ -178,6 +208,21 @@ AddFilesToPackage bin : userguide ;
 
 BuildHaikuPackage $(haikuUserGuidePackagePT_PT) : haiku_userguide_pt_PT ;
 
+# RO
+local haikuUserGuidePackageRO = haiku_userguide_ro.hpkg ;
+HaikuPackage $(haikuUserGuidePackageRO) ;
+
+CopyDirectoryToPackage documentation userguide : [ FDirName $(HAIKU_TOP) docs userguide ro ]
+	: ro ;
+CopyDirectoryToPackage documentation userguide : [ FDirName $(HAIKU_TOP) docs userguide images ]
+	: images ;
+AddFilesToPackage documentation userguide : [ FDirName $(HAIKU_TOP) docs userguide Haiku-doc.css ]
+	: Haiku-doc.css ;
+SEARCH on userguide = [ FDirName $(HAIKU_TOP) data bin ] ;
+AddFilesToPackage bin : userguide ;
+
+BuildHaikuPackage $(haikuUserGuidePackageRO) : haiku_userguide_ro ;
+
 # RU
 local haikuUserGuidePackageRU = haiku_userguide_ru.hpkg ;
 HaikuPackage $(haikuUserGuidePackageRU) ;
@@ -222,6 +267,21 @@ SEARCH on userguide = [ FDirName $(HAIKU_TOP) data bin ] ;
 AddFilesToPackage bin : userguide ;
 
 BuildHaikuPackage $(haikuUserGuidePackageSV_SE) : haiku_userguide_sv_SE ;
+
+# TR
+local haikuUserGuidePackageTR = haiku_userguide_tr.hpkg ;
+HaikuPackage $(haikuUserGuidePackageTR) ;
+
+CopyDirectoryToPackage documentation userguide : [ FDirName $(HAIKU_TOP) docs userguide tr ]
+	: tr ;
+CopyDirectoryToPackage documentation userguide : [ FDirName $(HAIKU_TOP) docs userguide images ]
+	: images ;
+AddFilesToPackage documentation userguide : [ FDirName $(HAIKU_TOP) docs userguide Haiku-doc.css ]
+	: Haiku-doc.css ;
+SEARCH on userguide = [ FDirName $(HAIKU_TOP) data bin ] ;
+AddFilesToPackage bin : userguide ;
+
+BuildHaikuPackage $(haikuUserGuidePackageTR) : haiku_userguide_tr ;
 
 # UK
 local haikuUserGuidePackageUK = haiku_userguide_uk.hpkg ;
