@@ -44,8 +44,8 @@ radeon_bios_init_scratch()
 		biosScratch6 = Read32(OUT, RADEON_BIOS_6_SCRATCH);
 	}
 
-	biosScratch2 &= ~ATOM_S2_VRI_BRIGHT_ENABLE;
-		// bios should control backlight
+	biosScratch2 |= ATOM_S2_VRI_BRIGHT_ENABLE;
+		// bios should not control backlight
 	biosScratch6 |= ATOM_S6_ACC_BLOCK_DISPLAY_SWITCH;
 		// bios shouldn't handle mode switching
 
