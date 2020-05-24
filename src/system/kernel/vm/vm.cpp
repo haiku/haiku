@@ -606,6 +606,34 @@ unmap_pages(VMArea* area, addr_t base, size_t size)
 }
 
 
+static inline bool
+intersect_area(VMArea* area, addr_t& address, addr_t& size, addr_t& offset)
+{
+	if (address < area->Base()) {
+		offset = area->Base() - address;
+		if (offset >= size)
+			return false;
+
+		address = area->Base();
+		size -= offset;
+		offset = 0;
+		if (size > area->Size())
+			size = area->Size();
+
+		return true;
+	}
+
+	offset = address - area->Base();
+	if (offset >= area->Size())
+		return false;
+
+	if (size >= area->Size() - offset)
+		size = area->Size() - offset;
+
+	return true;
+}
+
+
 /*!	Cuts a piece out of an area. If the given cut range covers the complete
 	area, it is deleted. If it covers the beginning or the end, the area is
 	resized accordingly. If the range covers some part in the middle of the
@@ -616,15 +644,14 @@ unmap_pages(VMArea* area, addr_t base, size_t size)
 */
 static status_t
 cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
-	addr_t lastAddress, VMArea** _secondArea, bool kernel)
+	addr_t size, VMArea** _secondArea, bool kernel)
 {
-	// Does the cut range intersect with the area at all?
-	addr_t areaLast = area->Base() + (area->Size() - 1);
-	if (area->Base() > lastAddress || areaLast < address)
+	addr_t offset;
+	if (!intersect_area(area, address, size, offset))
 		return B_OK;
 
 	// Is the area fully covered?
-	if (area->Base() >= address && areaLast <= lastAddress) {
+	if (address == area->Base() && size == area->Size()) {
 		delete_area(addressSpace, area, false);
 		return B_OK;
 	}
@@ -650,23 +677,20 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 		&& cache->consumers.IsEmpty() && cache->type == CACHE_TYPE_RAM;
 
 	// Cut the end only?
-	if (areaLast <= lastAddress) {
-		size_t oldSize = area->Size();
-		size_t newSize = address - area->Base();
-
-		status_t error = addressSpace->ShrinkAreaTail(area, newSize,
+	if (offset > 0 && size == area->Size() - offset) {
+		status_t error = addressSpace->ShrinkAreaTail(area, offset,
 			allocationFlags);
 		if (error != B_OK)
 			return error;
 
 		// unmap pages
-		unmap_pages(area, address, oldSize - newSize);
+		unmap_pages(area, address, size);
 
 		if (onlyCacheUser) {
 			// Since VMCache::Resize() can temporarily drop the lock, we must
 			// unlock all lower caches to prevent locking order inversion.
 			cacheChainLocker.Unlock(cache);
-			cache->Resize(cache->virtual_base + newSize, priority);
+			cache->Resize(cache->virtual_base + offset, priority);
 			cache->ReleaseRefAndUnlock();
 		}
 
@@ -674,29 +698,24 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 	}
 
 	// Cut the beginning only?
-	if (area->Base() >= address) {
-		addr_t oldBase = area->Base();
-		addr_t newBase = lastAddress + 1;
-		size_t newSize = areaLast - lastAddress;
-		size_t newOffset = newBase - oldBase;
-
-		// unmap pages
-		unmap_pages(area, oldBase, newOffset);
-
+	if (area->Base() == address) {
 		// resize the area
-		status_t error = addressSpace->ShrinkAreaHead(area, newSize,
+		status_t error = addressSpace->ShrinkAreaHead(area, area->Size() - size,
 			allocationFlags);
 		if (error != B_OK)
 			return error;
+
+		// unmap pages
+		unmap_pages(area, address, size);
 
 		if (onlyCacheUser) {
 			// Since VMCache::Rebase() can temporarily drop the lock, we must
 			// unlock all lower caches to prevent locking order inversion.
 			cacheChainLocker.Unlock(cache);
-			cache->Rebase(cache->virtual_base + newOffset, priority);
+			cache->Rebase(cache->virtual_base + size, priority);
 			cache->ReleaseRefAndUnlock();
 		}
-		area->cache_offset += newOffset;
+		area->cache_offset += size;
 
 		return B_OK;
 	}
@@ -704,9 +723,9 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 	// The tough part -- cut a piece out of the middle of the area.
 	// We do that by shrinking the area to the begin section and creating a
 	// new area for the end section.
-	addr_t firstNewSize = address - area->Base();
-	addr_t secondBase = lastAddress + 1;
-	addr_t secondSize = areaLast - lastAddress;
+	addr_t firstNewSize = offset;
+	addr_t secondBase = address + size;
+	addr_t secondSize = area->Size() - offset - size;
 
 	// unmap pages
 	unmap_pages(area, address, area->Size() - firstNewSize);
@@ -805,7 +824,7 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 }
 
 
-/*!	Deletes all areas in the given address range.
+/*!	Deletes or cuts all areas in the given address range.
 	The address space must be write-locked.
 	The caller must ensure that no part of the given range is wired.
 */
@@ -834,15 +853,12 @@ unmap_address_range(VMAddressSpace* addressSpace, addr_t address, addr_t size,
 
 	for (VMAddressSpace::AreaIterator it = addressSpace->GetAreaIterator();
 			VMArea* area = it.Next();) {
-		addr_t areaLast = area->Base() + (area->Size() - 1);
-		if (area->Base() < lastAddress && address < areaLast) {
-			status_t error = cut_area(addressSpace, area, address,
-				lastAddress, NULL, kernel);
-			if (error != B_OK)
-				return error;
-				// Failing after already messing with areas is ugly, but we
-				// can't do anything about it.
-		}
+		status_t error = cut_area(addressSpace, area, address, size, NULL,
+			kernel);
+		if (error != B_OK)
+			return error;
+			// Failing after already messing with areas is ugly, but we
+			// can't do anything about it.
 	}
 
 	return B_OK;
