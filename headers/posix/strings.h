@@ -13,7 +13,7 @@
 extern "C" {
 #endif
 
-static inline int ffs(int i) { return __builtin_ffs(i); }
+static __inline__ int ffs(int i) { return __builtin_ffs(i); }
 
 extern int		strcasecmp(const char *string1, const char *string2);
 extern int		strncasecmp(const char *string1, const char *string2,
