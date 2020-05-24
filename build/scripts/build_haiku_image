@@ -77,6 +77,7 @@ if [ $isCD ]; then
 	ln=ln
 	mkdir=mkdir
 	rm=rm
+	mkindex="mkindex -d $tPrefix"
 elif [ $isImage ]; then
 	# If FIFOs are used for the communication with the FS shell, prepare them.
 	if $fsShellCommand --uses-fifos; then
@@ -145,7 +146,7 @@ else
 	ln=ln
 	mkdir=mkdir
 	rm=rm
-	mkindex=mkindex
+	mkindex="mkindex -d $tPrefix"
 fi
 
 
@@ -291,6 +292,45 @@ if [ -n "$updateAllPackages" ]; then
 	$mkdir -p "${tPrefix}system/packages"
 fi
 
+echo "Creating filesystem indices..."
+$mkindex -t string Audio:Album
+$mkindex -t string Audio:Artist
+$mkindex -t string Media:Genre
+$mkindex -t string Media:Title
+$mkindex -t string MAIL:account
+$mkindex -t string MAIL:cc
+$mkindex -t string MAIL:chain
+$mkindex -t string MAIL:draft
+$mkindex -t string MAIL:flags
+$mkindex -t string MAIL:from
+$mkindex -t string MAIL:name
+$mkindex -t string MAIL:pending_chain
+$mkindex -t string MAIL:priority
+$mkindex -t string MAIL:reply
+$mkindex -t string MAIL:status
+$mkindex -t string MAIL:subject
+$mkindex -t string MAIL:thread
+$mkindex -t string MAIL:to
+$mkindex -t string META:address
+$mkindex -t string META:city
+$mkindex -t string META:company
+$mkindex -t string META:county
+$mkindex -t string META:email
+$mkindex -t string META:fax
+$mkindex -t string META:group
+$mkindex -t string META:hphone
+$mkindex -t string META:name
+$mkindex -t string META:nickname
+$mkindex -t string META:state
+$mkindex -t string META:url
+$mkindex -t string META:wphone
+$mkindex -t string META:zip
+
+$mkindex -t int32 Media:Rating
+$mkindex -t int32 Media:Year
+$mkindex -t int32 MAIL:account_id
+$mkindex -t int32 MAIL:read
+$mkindex -t int32 MAIL:when
 
 echo "Populating image ..."
 while [ $# -gt 0 ]; do
