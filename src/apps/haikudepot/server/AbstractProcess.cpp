@@ -36,7 +36,7 @@ void
 AbstractProcess::SetListener(AbstractProcessListener* listener)
 {
 	AutoLocker<BLocker> locker(&fLock);
-	fListener = listener;
+	fListener = BReference<AbstractProcessListener>(listener);
 }
 
 
@@ -64,7 +64,7 @@ AbstractProcess::Run()
 	if (runResult != B_OK)
 		printf("[%s] an error has arisen; %s\n", Name(), strerror(runResult));
 
-	AbstractProcessListener* listener;
+	BReference<AbstractProcessListener> listener;
 
 	{
 		AutoLocker<BLocker> locker(&fLock);
@@ -76,7 +76,7 @@ AbstractProcess::Run()
 	// this process may be part of a larger bulk-load process and
 	// if so, the process orchestration needs to know when this
 	// process has completed.
-	if (listener != NULL)
+	if (listener.Get() != NULL)
 		listener->ProcessExited();
 
 	return runResult;
@@ -110,7 +110,7 @@ status_t
 AbstractProcess::Stop()
 {
 	status_t result = B_CANCELED;
-    AbstractProcessListener* listener = NULL;
+    BReference<AbstractProcessListener> listener = NULL;
 
 	{
 		AutoLocker<BLocker> locker(&fLock);
@@ -126,7 +126,7 @@ AbstractProcess::Stop()
 		}
 	}
 
-	if (listener != NULL)
+	if (listener.Get() != NULL)
 		listener->ProcessExited();
 
 	return result;

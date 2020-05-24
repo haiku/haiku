@@ -155,9 +155,10 @@ private:
 			Model				fModel;
 			ModelListenerRef	fModelListener;
 
-			std::queue<ProcessCoordinator*>
+			std::queue<BReference<ProcessCoordinator>>
 								fCoordinatorQueue;
-			ProcessCoordinator*	fCoordinator;
+			BReference<ProcessCoordinator>
+								fCoordinator;
 			BLocker				fCoordinatorLock;
 			sem_id				fCoordinatorRunningSem;
 
