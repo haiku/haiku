@@ -23,6 +23,9 @@
 //	flags region in the protection field.
 #define B_OVERCOMMITTING_AREA	(1 << 12)
 #define B_SHARED_AREA			(1 << 13)
+#define B_KERNEL_AREA			(1 << 14)
+	// Usable from userland according to its protection flags, but the area
+	// itself is not deletable, resizable, etc from userland.
 
 #define B_USER_AREA_FLAGS		\
 	(B_USER_PROTECTION | B_OVERCOMMITTING_AREA | B_CLONEABLE_AREA)
