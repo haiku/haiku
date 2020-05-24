@@ -69,8 +69,7 @@ private:
 	static	const addr_t		kMaxRandomize;
 	static	const addr_t		kMaxInitialRandomize;
 
-			VMUserAreaList		fAreas;
-	mutable	VMUserArea*			fAreaHint;
+			VMUserAreaTree		fAreas;
 };
 
 

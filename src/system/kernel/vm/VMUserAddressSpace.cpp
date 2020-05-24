@@ -82,8 +82,7 @@ align_address(addr_t address, size_t alignment, uint32 addressSpec,
 
 VMUserAddressSpace::VMUserAddressSpace(team_id id, addr_t base, size_t size)
 	:
-	VMAddressSpace(id, base, size, "address space"),
-	fAreaHint(NULL)
+	VMAddressSpace(id, base, size, "address space")
 {
 }
 
@@ -96,9 +95,9 @@ VMUserAddressSpace::~VMUserAddressSpace()
 inline VMArea*
 VMUserAddressSpace::FirstArea() const
 {
-	VMUserArea* area = fAreas.Head();
+	VMUserArea* area = fAreas.LeftMost();
 	while (area != NULL && area->id == RESERVED_AREA_ID)
-		area = fAreas.GetNext(area);
+		area = fAreas.Next(area);
 	return area;
 }
 
@@ -107,9 +106,9 @@ inline VMArea*
 VMUserAddressSpace::NextArea(VMArea* _area) const
 {
 	VMUserArea* area = static_cast<VMUserArea*>(_area);
-	area = fAreas.GetNext(area);
+	area = fAreas.Next(area);
 	while (area != NULL && area->id == RESERVED_AREA_ID)
-		area = fAreas.GetNext(area);
+		area = fAreas.Next(area);
 	return area;
 }
 
@@ -135,23 +134,11 @@ VMUserAddressSpace::DeleteArea(VMArea* _area, uint32 allocationFlags)
 VMArea*
 VMUserAddressSpace::LookupArea(addr_t address) const
 {
-	// check the area hint first
-	VMArea* areaHint = atomic_pointer_get(&fAreaHint);
-	if (areaHint != NULL && areaHint->ContainsAddress(address))
-		return areaHint;
+	VMUserArea* area = fAreas.FindClosest(address, true);
+	if (area == NULL || area->id == RESERVED_AREA_ID)
+		return NULL;
 
-	for (VMUserAreaList::ConstIterator it = fAreas.GetIterator();
-			VMUserArea* area = it.Next();) {
-		if (area->id == RESERVED_AREA_ID)
-			continue;
-
-		if (area->ContainsAddress(address)) {
-			atomic_pointer_set(&fAreaHint, area);
-			return area;
-		}
-	}
-
-	return NULL;
+	return area->ContainsAddress(address) ? area : NULL;
 }
 
 
@@ -218,9 +205,6 @@ VMUserAddressSpace::RemoveArea(VMArea* _area, uint32 allocationFlags)
 	if (area->id != RESERVED_AREA_ID) {
 		IncrementChangeCount();
 		fFreeSpace += area->Size();
-
-		if (area == fAreaHint)
-			fAreaHint = NULL;
 	}
 }
 
@@ -228,7 +212,7 @@ VMUserAddressSpace::RemoveArea(VMArea* _area, uint32 allocationFlags)
 bool
 VMUserAddressSpace::CanResizeArea(VMArea* area, size_t newSize)
 {
-	VMUserArea* next = fAreas.GetNext(static_cast<VMUserArea*>(area));
+	VMUserArea* next = fAreas.Next(static_cast<VMUserArea*>(area));
 	addr_t newEnd = area->Base() + (newSize - 1);
 
 	if (next == NULL)
@@ -254,7 +238,7 @@ VMUserAddressSpace::ResizeArea(VMArea* _area, size_t newSize,
 	VMUserArea* area = static_cast<VMUserArea*>(_area);
 
 	addr_t newEnd = area->Base() + (newSize - 1);
-	VMUserArea* next = fAreas.GetNext(area);
+	VMUserArea* next = fAreas.Next(area);
 	if (next != NULL && next->Base() <= newEnd) {
 		if (next->id != RESERVED_AREA_ID
 			|| (uint64)next->cache_offset > (uint64)area->Base()
@@ -355,14 +339,17 @@ VMUserAddressSpace::UnreserveAddressRange(addr_t address, size_t size,
 		return B_BAD_TEAM_ID;
 	}
 
-	// search area list and remove any matching reserved ranges
-	addr_t endAddress = address + (size - 1);
-	for (VMUserAreaList::Iterator it = fAreas.GetIterator();
-			VMUserArea* area = it.Next();) {
-		// the area must be completely part of the reserved range
-		if (area->Base() + (area->Size() - 1) > endAddress)
-			break;
-		if (area->id == RESERVED_AREA_ID && area->Base() >= (addr_t)address) {
+	// the area must be completely part of the reserved range
+	VMUserArea* area = fAreas.FindClosest(address, false);
+	if (area == NULL)
+		return B_OK;
+
+	addr_t endAddress = address + size - 1;
+	for (VMUserAreaTree::Iterator it = fAreas.GetIterator(area);
+		(area = it.Next()) != NULL
+			&& area->Base() + area->Size() - 1 <= endAddress;) {
+
+		if (area->id == RESERVED_AREA_ID) {
 			// remove reserved range
 			RemoveArea(area, allocationFlags);
 			Put();
@@ -378,7 +365,7 @@ VMUserAddressSpace::UnreserveAddressRange(addr_t address, size_t size,
 void
 VMUserAddressSpace::UnreserveAllAddressRanges(uint32 allocationFlags)
 {
-	for (VMUserAreaList::Iterator it = fAreas.GetIterator();
+	for (VMUserAreaTree::Iterator it = fAreas.GetIterator();
 			VMUserArea* area = it.Next();) {
 		if (area->id == RESERVED_AREA_ID) {
 			RemoveArea(area, allocationFlags);
@@ -394,11 +381,9 @@ void
 VMUserAddressSpace::Dump() const
 {
 	VMAddressSpace::Dump();
-	kprintf("area_hint: %p\n", fAreaHint);
-
 	kprintf("area_list:\n");
 
-	for (VMUserAreaList::ConstIterator it = fAreas.GetIterator();
+	for (VMUserAreaTree::ConstIterator it = fAreas.GetIterator();
 			VMUserArea* area = it.Next();) {
 		kprintf(" area 0x%" B_PRIx32 ": ", area->id);
 		kprintf("base_addr = 0x%lx ", area->Base());
@@ -450,71 +435,65 @@ status_t
 VMUserAddressSpace::_InsertAreaIntoReservedRegion(addr_t start, size_t size,
 	VMUserArea* area, uint32 allocationFlags)
 {
-	VMUserArea* next;
-
-	for (VMUserAreaList::Iterator it = fAreas.GetIterator();
-			(next = it.Next()) != NULL;) {
-		if (next->Base() <= start
-			&& next->Base() + (next->Size() - 1) >= start + (size - 1)) {
-			// This area covers the requested range
-			if (next->id != RESERVED_AREA_ID) {
-				// but it's not reserved space, it's a real area
-				return B_BAD_VALUE;
-			}
-
-			break;
-		}
+	VMUserArea* reserved = fAreas.FindClosest(start, true);
+	if (reserved == NULL
+		|| !reserved->ContainsAddress(start)
+		|| !reserved->ContainsAddress(start + size - 1)) {
+		return B_ENTRY_NOT_FOUND;
 	}
 
-	if (next == NULL)
-		return B_ENTRY_NOT_FOUND;
+	// This area covers the requested range
+	if (reserved->id != RESERVED_AREA_ID) {
+		// but it's not reserved space, it's a real area
+		return B_BAD_VALUE;
+	}
 
 	// Now we have to transfer the requested part of the reserved
 	// range to the new area - and remove, resize or split the old
 	// reserved area.
 
-	if (start == next->Base()) {
+	if (start == reserved->Base()) {
 		// the area starts at the beginning of the reserved range
-		fAreas.Insert(next, area);
 
-		if (size == next->Size()) {
-			// the new area fully covers the reversed range
-			fAreas.Remove(next);
+		if (size == reserved->Size()) {
+			// the new area fully covers the reserved range
+			fAreas.Remove(reserved);
 			Put();
-			next->~VMUserArea();
-			free_etc(next, allocationFlags);
+			reserved->~VMUserArea();
+			free_etc(reserved, allocationFlags);
 		} else {
 			// resize the reserved range behind the area
-			next->SetBase(next->Base() + size);
-			next->SetSize(next->Size() - size);
+			reserved->SetBase(reserved->Base() + size);
+			reserved->SetSize(reserved->Size() - size);
 		}
-	} else if (start + size == next->Base() + next->Size()) {
+	} else if (start + size == reserved->Base() + reserved->Size()) {
 		// the area is at the end of the reserved range
-		fAreas.Insert(fAreas.GetNext(next), area);
-
 		// resize the reserved range before the area
-		next->SetSize(start - next->Base());
+		reserved->SetSize(start - reserved->Base());
 	} else {
 		// the area splits the reserved range into two separate ones
 		// we need a new reserved area to cover this space
-		VMUserArea* reserved = VMUserArea::CreateReserved(this,
-			next->protection, allocationFlags);
-		if (reserved == NULL)
+		VMUserArea* newReserved = VMUserArea::CreateReserved(this,
+			reserved->protection, allocationFlags);
+		if (newReserved == NULL)
 			return B_NO_MEMORY;
 
 		Get();
-		fAreas.Insert(fAreas.GetNext(next), reserved);
-		fAreas.Insert(reserved, area);
 
 		// resize regions
-		reserved->SetSize(next->Base() + next->Size() - start - size);
-		next->SetSize(start - next->Base());
-		reserved->SetBase(start + size);
-		reserved->cache_offset = next->cache_offset;
+		newReserved->SetBase(start + size);
+		newReserved->SetSize(
+			reserved->Base() + reserved->Size() - start - size);
+		newReserved->cache_offset = reserved->cache_offset;
+
+		reserved->SetSize(start - reserved->Base());
+
+		fAreas.Insert(newReserved);
 	}
 
 	area->SetBase(start);
 	area->SetSize(size);
+	fAreas.Insert(area);
 	IncrementChangeCount();
 
 	return B_OK;
@@ -527,11 +506,6 @@ VMUserAddressSpace::_InsertAreaSlot(addr_t start, addr_t size, addr_t end,
 	uint32 addressSpec, size_t alignment, VMUserArea* area,
 	uint32 allocationFlags)
 {
-	VMUserArea* last = NULL;
-	VMUserArea* next;
-	bool foundSpot = false;
-	addr_t originalStart = 0;
-
 	TRACE(("VMUserAddressSpace::_InsertAreaSlot: address space %p, start "
 		"0x%lx, size %ld, end 0x%lx, addressSpec %" B_PRIu32 ", area %p\n",
 		this, start, size, end, addressSpec, area));
@@ -563,6 +537,7 @@ VMUserAddressSpace::_InsertAreaSlot(addr_t start, addr_t size, addr_t end,
 
 	start = align_address(start, alignment);
 
+	addr_t originalStart = 0;
 	if (fRandomizingEnabled && addressSpec == B_RANDOMIZED_BASE_ADDRESS) {
 		originalStart = start;
 		start = _RandomizeAddress(start, end - size + 1, alignment, true);
@@ -570,19 +545,14 @@ VMUserAddressSpace::_InsertAreaSlot(addr_t start, addr_t size, addr_t end,
 
 	// walk up to the spot where we should start searching
 second_chance:
-	VMUserAreaList::Iterator it = fAreas.GetIterator();
-	while ((next = it.Next()) != NULL) {
-		if (next->Base() > start + (size - 1)) {
-			// we have a winner
-			break;
-		}
-
-		last = next;
-	}
+	VMUserArea* next = fAreas.FindClosest(start + size, false);
+	VMUserArea* last = next != NULL
+			? fAreas.Previous(next) : fAreas.FindClosest(start + size, true);
 
 	// find the right spot depending on the address specification - the area
 	// will be inserted directly after "last" ("next" is not referenced anymore)
 
+	bool foundSpot = false;
 	switch (addressSpec) {
 		case B_ANY_ADDRESS:
 		case B_ANY_KERNEL_ADDRESS:
@@ -591,6 +561,9 @@ second_chance:
 		case B_BASE_ADDRESS:
 		case B_RANDOMIZED_BASE_ADDRESS:
 		{
+			VMUserAreaTree::Iterator it = fAreas.GetIterator(
+				next != NULL ? next : fAreas.LeftMost());
+
 			// find a hole big enough for a new area
 			if (last == NULL) {
 				// see if we can build it at the beginning of the virtual map
@@ -667,13 +640,12 @@ second_chance:
 					addressSpec = B_RANDOMIZED_BASE_ADDRESS;
 				}
 
-				last = NULL;
 				goto second_chance;
 			} else if (area->id != RESERVED_AREA_ID) {
 				// We didn't find a free spot - if there are any reserved areas,
 				// we can now test those for free space
 				// TODO: it would make sense to start with the biggest of them
-				it.Rewind();
+				it = fAreas.GetIterator();
 				next = it.Next();
 				for (last = NULL; next != NULL; next = it.Next()) {
 					if (next->id != RESERVED_AREA_ID) {
@@ -746,7 +718,6 @@ second_chance:
 						foundSpot = true;
 						next->SetSize(alignedBase - next->Base());
 						area->SetBase(alignedBase);
-						last = next;
 						break;
 					}
 
@@ -774,11 +745,7 @@ second_chance:
 		return addressSpec == B_EXACT_ADDRESS ? B_BAD_VALUE : B_NO_MEMORY;
 
 	area->SetSize(size);
-	if (last)
-		fAreas.Insert(fAreas.GetNext(last), area);
-	else
-		fAreas.Insert(fAreas.Head(), area);
-
+	fAreas.Insert(area);
 	IncrementChangeCount();
 	return B_OK;
 }

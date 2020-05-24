@@ -6,13 +6,15 @@
 #define VM_USER_AREA_H
 
 
+#include <util/AVLTree.h>
+
 #include <vm/VMArea.h>
 
 
 struct VMUserAddressSpace;
 
 
-struct VMUserArea : VMArea {
+struct VMUserArea : VMArea, AVLTreeNode {
 								VMUserArea(VMAddressSpace* addressSpace,
 									uint32 wiring, uint32 protection);
 								~VMUserArea();
@@ -22,32 +24,38 @@ struct VMUserArea : VMArea {
 									uint32 protection, uint32 allocationFlags);
 	static	VMUserArea*			CreateReserved(VMAddressSpace* addressSpace,
 									uint32 flags, uint32 allocationFlags);
-
-			DoublyLinkedListLink<VMUserArea>& AddressSpaceLink()
-									{ return fAddressSpaceLink; }
-			const DoublyLinkedListLink<VMUserArea>& AddressSpaceLink() const
-									{ return fAddressSpaceLink; }
-
-private:
-			DoublyLinkedListLink<VMUserArea> fAddressSpaceLink;
 };
 
 
-struct VMUserAreaGetLink {
-	inline DoublyLinkedListLink<VMUserArea>* operator()(
-		VMUserArea* area) const
+struct VMUserAreaTreeDefinition {
+	typedef addr_t					Key;
+	typedef VMUserArea				Value;
+
+	AVLTreeNode* GetAVLTreeNode(Value* value) const
 	{
-		return &area->AddressSpaceLink();
+		return value;
 	}
 
-	inline const DoublyLinkedListLink<VMUserArea>* operator()(
-		const VMUserArea* area) const
+	Value* GetValue(AVLTreeNode* node) const
 	{
-		return &area->AddressSpaceLink();
+		return static_cast<Value*>(node);
+	}
+
+	int Compare(addr_t a, const Value* _b) const
+	{
+		addr_t b = _b->Base();
+		if (a == b)
+			return 0;
+		return a < b ? -1 : 1;
+	}
+
+	int Compare(const Value* a, const Value* b) const
+	{
+		return Compare(a->Base(), b);
 	}
 };
 
-typedef DoublyLinkedList<VMUserArea, VMUserAreaGetLink> VMUserAreaList;
+typedef AVLTree<VMUserAreaTreeDefinition> VMUserAreaTree;
 
 
 #endif	// VM_USER_AREA_H
