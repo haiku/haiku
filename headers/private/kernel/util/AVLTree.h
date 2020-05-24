@@ -47,7 +47,9 @@ public:
 			Value*				Previous(Value* value) const;
 			Value*				Next(Value* value) const;
 
+			Value*				LeftMost() const;
 			Value*				LeftMost(Value* value) const;
+			Value*				RightMost() const;
 			Value*				RightMost(Value* value) const;
 
 	inline	Iterator			GetIterator();
@@ -260,12 +262,30 @@ AVLTree<Definition>::Next(Value* value) const
 
 template<typename Definition>
 inline typename AVLTree<Definition>::Value*
+AVLTree<Definition>::LeftMost() const
+{
+	AVLTreeNode* node = fTree.LeftMost();
+	return node != NULL ? _GetValue(node) : NULL;
+}
+
+
+template<typename Definition>
+inline typename AVLTree<Definition>::Value*
 AVLTree<Definition>::LeftMost(Value* value) const
 {
 	if (value == NULL)
 		return NULL;
 
 	AVLTreeNode* node = fTree.LeftMost(_GetAVLTreeNode(value));
+	return node != NULL ? _GetValue(node) : NULL;
+}
+
+
+template<typename Definition>
+inline typename AVLTree<Definition>::Value*
+AVLTree<Definition>::RightMost() const
+{
+	AVLTreeNode* node = fTree.RightMost();
 	return node != NULL ? _GetValue(node) : NULL;
 }
 
