@@ -496,7 +496,7 @@ MainWindow::MessageReceived(BMessage* message)
 				}
 				_AddRemovePackageFromLists(ref);
 				if ((changes & PKG_CHANGED_STATE) != 0
-						&& fCoordinator == NULL) {
+						&& fCoordinator.Get() == NULL) {
 					fWorkStatusView->PackageStatusChanged(ref);
 				}
 			}
@@ -1334,14 +1334,14 @@ MainWindow::_AddProcessCoordinator(ProcessCoordinator* item)
 {
 	AutoLocker<BLocker> lock(&fCoordinatorLock);
 
-	if (fCoordinator == NULL) {
+	if (fCoordinator.Get() == NULL) {
 		if (acquire_sem(fCoordinatorRunningSem) != B_OK)
 			debugger("unable to acquire the process coordinator sem");
 		if (Logger::IsInfoEnabled()) {
 			printf("adding and starting a process coordinator [%s]\n",
 				item->Name().String());
 		}
-		fCoordinator = item;
+		fCoordinator = BReference<ProcessCoordinator>(item);
 		fCoordinator->Start();
 	}
 	else {
@@ -1364,7 +1364,7 @@ MainWindow::_SpinUntilProcessCoordinatorComplete()
 			debugger("unable to release the process coordinator sem");
 		{
 			AutoLocker<BLocker> lock(&fCoordinatorLock);
-			if (fCoordinator == NULL)
+			if (fCoordinator.Get() == NULL)
 				return;
 		}
 	}
@@ -1381,16 +1381,15 @@ MainWindow::_StopProcessCoordinators()
 		AutoLocker<BLocker> lock(&fCoordinatorLock);
 
 		while (!fCoordinatorQueue.empty()) {
-			ProcessCoordinator *processCoordinator = fCoordinatorQueue.front();
+			BReference<ProcessCoordinator> processCoordinator = fCoordinatorQueue.front();
 			if (Logger::IsInfoEnabled()) {
 				printf("will drop queued process coordinator [%s]\n",
 					processCoordinator->Name().String());
 			}
 			fCoordinatorQueue.pop();
-			delete processCoordinator;
 		}
 
-		if (fCoordinator != NULL) {
+		if (fCoordinator.Get() != NULL) {
 			fCoordinator->Stop();
 		}
 	}
@@ -1416,7 +1415,7 @@ MainWindow::CoordinatorChanged(ProcessCoordinatorState& coordinatorState)
 {
 	AutoLocker<BLocker> lock(&fCoordinatorLock);
 
-	if (fCoordinator == coordinatorState.Coordinator()) {
+	if (fCoordinator.Get() == coordinatorState.Coordinator()) {
 		if (!coordinatorState.IsRunning()) {
 			if (release_sem(fCoordinatorRunningSem) != B_OK)
 				debugger("unable to release the process coordinator sem");
@@ -1434,8 +1433,9 @@ MainWindow::CoordinatorChanged(ProcessCoordinatorState& coordinatorState)
 				messenger.SendMessage(message);
 			}
 
-			delete fCoordinator;
-			fCoordinator = NULL;
+			fCoordinator = BReference<ProcessCoordinator>(NULL);
+				// will delete the old process coordinator if it is not used
+				// elsewhere.
 
 			// now schedule the next one.
 			if (!fCoordinatorQueue.empty()) {

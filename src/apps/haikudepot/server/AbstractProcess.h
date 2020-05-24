@@ -8,6 +8,7 @@
 #define ABSTRACT_PROCESS_H
 
 #include <String.h>
+#include <Referenceable.h>
 #include <Url.h>
 
 #include "StandardMetaData.h"
@@ -26,7 +27,7 @@ typedef enum process_state {
     failure.
  */
 
-class AbstractProcessListener {
+class AbstractProcessListener : public BReferenceable {
 public:
 	virtual	void				ProcessExited() = 0;
 };
@@ -55,7 +56,7 @@ protected:
 
 private:
 			BLocker				fLock;
-			AbstractProcessListener*
+			BReference<AbstractProcessListener>
 								fListener;
 			bool				fWasStopped;
 			process_state		fProcessState;
