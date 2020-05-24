@@ -1007,12 +1007,27 @@ command_mkdir(int argc, const char* const* argv)
 static fssh_status_t
 command_mkindex(int argc, const char* const* argv)
 {
-	if (argc != 2) {
-		fprintf(stderr, "Usage: %s <index name>\n", argv[0]);
+	if (argc < 2) {
+		fprintf(stderr, "Usage: %s [-t <type>] <index name>\n", argv[0]);
 		return FSSH_B_BAD_VALUE;
 	}
 
-	const char* indexName = argv[1];
+	int fileArg = 1;
+	int type = FSSH_B_STRING_TYPE;
+
+	if (argc > 3 && strcmp(argv[1], "-t") == 0) {
+		fileArg = 3;
+		if (strcmp(argv[2], "string") == 0)
+			type = FSSH_B_STRING_TYPE;
+		else if (strcmp(argv[2], "int32") == 0)
+			type = FSSH_B_INT32_TYPE;
+		else {
+			fprintf(stderr, "Unhandled attribute type %s\n", argv[2]);
+			return FSSH_B_BAD_VALUE;
+		}
+	}
+
+	const char* indexName = argv[fileArg];
 
 	// get the volume ID
 	fssh_dev_t volumeID = get_volume_id();
@@ -1020,8 +1035,7 @@ command_mkindex(int argc, const char* const* argv)
 		return volumeID;
 
 	// create the index
-	fssh_status_t error =_kern_create_index(volumeID, indexName,
-		FSSH_B_STRING_TYPE, 0);
+	fssh_status_t error =_kern_create_index(volumeID, indexName, type, 0);
 	if (error != FSSH_B_OK) {
 		fprintf(stderr, "Error: Failed to create index \"%s\": %s\n",
 			indexName, fssh_strerror(error));
