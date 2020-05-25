@@ -77,12 +77,12 @@ ServerHelper::AlertServerJsonRpcError(BMessage* responseEnvelopeMessage)
 		default:
 			alertText.SetToFormat(
 				B_TRANSLATE("An unexpected error has been sent from the"
-					" HaikuDepot server [%" B_PRIi32 "]"), errorCode);
+					" server [%" B_PRIi32 "]"), errorCode);
 			break;
 	}
 
 	BAlert* alert = new BAlert(
-		B_TRANSLATE("Server Error"),
+		B_TRANSLATE("Server error"),
 		alertText,
 		B_TRANSLATE("OK"));
 
@@ -125,7 +125,7 @@ ServerHelper::AlertTransportError(BMessage* message)
 
 	switch (errno) {
 		case HD_NETWORK_INACCESSIBLE:
-			errorDescription = B_TRANSLATE("Network Error");
+			errorDescription = B_TRANSLATE("Network error");
 			break;
 		default:
 			errorDescription.SetTo(strerror(errno));
@@ -133,11 +133,11 @@ ServerHelper::AlertTransportError(BMessage* message)
 	}
 
 	alertText.SetToFormat(B_TRANSLATE("A network transport error has arisen"
-		" communicating with the HaikuDepot server system: %s"),
+		" communicating with the server system: %s"),
 		errorDescription.String());
 
 	BAlert* alert = new BAlert(
-		B_TRANSLATE("Network Transport Error"),
+		B_TRANSLATE("Network transport error"),
 		alertText,
 		B_TRANSLATE("OK"));
 
@@ -175,9 +175,9 @@ ServerHelper::AlertClientTooOld(BMessage* message)
 
 	alertText.SetToFormat(
 		B_TRANSLATE("This application is too old to communicate with the"
-			" HaikuDepot server system. Obtain a newer version of HaikuDepot"
-			" by updating your Haiku system. The minimum version of"
-			" HaikuDepot required is \"%s\"."), minimumVersion.String());
+			" server system. Obtain a newer version of this application"
+			" by updating your system. The minimum required version of this"
+			" application is \"%s\"."), minimumVersion.String());
 
 	BAlert* alert = new BAlert(
 		B_TRANSLATE("Client version too old"),
