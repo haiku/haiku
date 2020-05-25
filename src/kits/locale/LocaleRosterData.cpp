@@ -129,7 +129,7 @@ LocaleRosterData::LocaleRosterData(const BLanguage& language,
 	:
 	fLock("LocaleRosterData"),
 	fDefaultLocale(&language, &conventions),
-	fIsFilesystemTranslationPreferred(false),
+	fIsFilesystemTranslationPreferred(true),
 	fAreResourcesLoaded(false)
 {
 	fInitStatus = _Initialize();
