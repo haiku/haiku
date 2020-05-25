@@ -664,51 +664,68 @@ mmu_init(void)
 	if (extMemoryCount > 0) {
 		gKernelArgs.num_physical_memory_ranges = 0;
 
+		// first scan: add all usable ranges
 		for (uint32 i = 0; i < extMemoryCount; i++) {
 			// Type 1 is available memory
-			if (extMemoryBlock[i].type == 1) {
-				uint64 base = extMemoryBlock[i].base_addr;
-				uint64 length = extMemoryBlock[i].length;
-				uint64 end = base + length;
+			if (extMemoryBlock[i].type != 1)
+				continue;
 
-				// round everything up to page boundaries, exclusive of pages
-				// it partially occupies
-				base = ROUNDUP(base, B_PAGE_SIZE);
-				end = ROUNDDOWN(end, B_PAGE_SIZE);
+			uint64 base = extMemoryBlock[i].base_addr;
+			uint64 length = extMemoryBlock[i].length;
+			uint64 end = base + length;
 
-				// We ignore all memory beyond 4 GB, if phys_addr_t is only
-				// 32 bit wide.
-				#if B_HAIKU_PHYSICAL_BITS == 32
-					if (end > 0x100000000ULL)
-						end = 0x100000000ULL;
-				#endif
+			// round everything up to page boundaries, exclusive of pages
+			// it partially occupies
+			base = ROUNDUP(base, B_PAGE_SIZE);
+			end = ROUNDDOWN(end, B_PAGE_SIZE);
 
-				// Also ignore memory below 1 MB. Apparently some BIOSes fail to
-				// provide the correct range type for some ranges (cf. #1925).
-				// Later in the kernel we will reserve the range 0x0 - 0xa0000
-				// and apparently 0xa0000 - 0x100000 never contain usable
-				// memory, so we don't lose anything by doing that.
-				if (base < 0x100000)
-					base = 0x100000;
+			// We ignore all memory beyond 4 GB, if phys_addr_t is only
+			// 32 bit wide.
+			#if B_HAIKU_PHYSICAL_BITS == 32
+				if (end > 0x100000000ULL)
+					end = 0x100000000ULL;
+			#endif
 
-				gKernelArgs.ignored_physical_memory
-					+= length - (max_c(end, base) - base);
+			// Also ignore memory below 1 MB. Apparently some BIOSes fail to
+			// provide the correct range type for some ranges (cf. #1925).
+			// Later in the kernel we will reserve the range 0x0 - 0xa0000
+			// and apparently 0xa0000 - 0x100000 never contain usable
+			// memory, so we don't lose anything by doing that.
+			if (base < 0x100000)
+				base = 0x100000;
 
-				if (end <= base)
-					continue;
+			gKernelArgs.ignored_physical_memory
+				+= length - (max_c(end, base) - base);
 
-				status_t status = insert_physical_memory_range(base, end - base);
-				if (status == B_ENTRY_NOT_FOUND) {
-					panic("mmu_init(): Failed to add physical memory range "
-						"%#" B_PRIx64 " - %#" B_PRIx64 " : all %d entries are "
-						"used already!\n", base, end, MAX_PHYSICAL_MEMORY_RANGE);
-				} else if (status != B_OK) {
-					panic("mmu_init(): Failed to add physical memory range "
-						"%#" B_PRIx64 " - %#" B_PRIx64 "\n", base, end);
-				}
-			} else if (extMemoryBlock[i].type == 3) {
-				// ACPI reclaim -- physical memory we could actually use later
-				gKernelArgs.ignored_physical_memory += extMemoryBlock[i].length;
+			if (end <= base)
+				continue;
+
+			status_t status = insert_physical_memory_range(base, end - base);
+			if (status == B_ENTRY_NOT_FOUND) {
+				panic("mmu_init(): Failed to add physical memory range "
+					"%#" B_PRIx64 " - %#" B_PRIx64 " : all %d entries are "
+					"used already!\n", base, end, MAX_PHYSICAL_MEMORY_RANGE);
+			} else if (status != B_OK) {
+				panic("mmu_init(): Failed to add physical memory range "
+					"%#" B_PRIx64 " - %#" B_PRIx64 "\n", base, end);
+			}
+		}
+
+		uint64 initialPhysicalMemory = total_physical_memory();
+
+		// second scan: remove everything reserved that may overlap
+		for (uint32 i = 0; i < extMemoryCount; i++) {
+			if (extMemoryBlock[i].type == 1)
+				continue;
+
+			uint64 base = extMemoryBlock[i].base_addr;
+			uint64 end = ROUNDUP(base + extMemoryBlock[i].length, B_PAGE_SIZE);
+			base = ROUNDDOWN(base, B_PAGE_SIZE);
+
+			status_t status = remove_physical_memory_range(base, end - base);
+			if (status != B_OK) {
+				panic("mmu_init(): Failed to remove physical memory range "
+					"%#" B_PRIx64 " - %#" B_PRIx64 "\n", base, end);
 			}
 		}
 
@@ -725,11 +742,12 @@ mmu_init(void)
 			uint64 size = gKernelArgs.physical_memory_range[i].size;
 			if (size < 64 * 1024) {
 				uint64 start = gKernelArgs.physical_memory_range[i].start;
-				remove_address_range(gKernelArgs.physical_memory_range,
-					&gKernelArgs.num_physical_memory_ranges,
-					MAX_PHYSICAL_MEMORY_RANGE, start, size);
+				remove_physical_memory_range(start, size);
 			}
 		}
+
+		gKernelArgs.ignored_physical_memory
+			+= initialPhysicalMemory - total_physical_memory();
 	} else {
 		bios_regs regs;
 

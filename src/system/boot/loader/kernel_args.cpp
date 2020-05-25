@@ -248,6 +248,16 @@ is_address_range_covered(addr_range* ranges, uint32 numRanges, uint64 base,
 }
 
 
+extern "C" uint64
+total_address_ranges_size(addr_range* ranges, uint32 numRanges)
+{
+	uint64 total = 0;
+	for (uint32 i = 0; i < numRanges; i++)
+		total += ranges[i].size;
+	return total;
+}
+
+
 void
 sort_address_ranges(addr_range* ranges, uint32 numRanges)
 {
@@ -278,6 +288,23 @@ insert_physical_memory_range(uint64 start, uint64 size)
 	return insert_address_range(gKernelArgs.physical_memory_range,
 		&gKernelArgs.num_physical_memory_ranges, MAX_PHYSICAL_MEMORY_RANGE,
 		start, size);
+}
+
+
+status_t
+remove_physical_memory_range(uint64 start, uint64 size)
+{
+	return remove_address_range(gKernelArgs.physical_memory_range,
+		&gKernelArgs.num_physical_memory_ranges, MAX_PHYSICAL_MEMORY_RANGE,
+		start, size);
+}
+
+
+uint64
+total_physical_memory()
+{
+	return total_address_ranges_size(gKernelArgs.physical_memory_range,
+		gKernelArgs.num_physical_memory_ranges);
 }
 
 
