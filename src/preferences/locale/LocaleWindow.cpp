@@ -664,4 +664,6 @@ LocaleWindow::_Defaults()
 				fDefaultConventionsItem));
 		fConventionsListView->ScrollToSelection();
 	}
+
+	fFilesystemTranslationCheckbox->SetValue(true);
 }
