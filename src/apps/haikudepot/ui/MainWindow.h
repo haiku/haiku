@@ -155,7 +155,7 @@ private:
 			Model				fModel;
 			ModelListenerRef	fModelListener;
 
-			std::queue<BReference<ProcessCoordinator>>
+			std::queue<BReference<ProcessCoordinator> >
 								fCoordinatorQueue;
 			BReference<ProcessCoordinator>
 								fCoordinator;
