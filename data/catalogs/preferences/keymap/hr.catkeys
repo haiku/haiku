@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-Keymap	108680719
+1	croatian	x-vnd.Haiku-Keymap	1468284351
 Key	Modifier keys window	As in a computer keyboard key	Tipka
 Japanese	KeymapNames		Japanski
 Brazilian	KeymapNames		Brazilski
@@ -77,6 +77,7 @@ Russian (Udmurt, Komi, Mari)	KeymapNames		Ruski (Udmurt, Komi, Mari)
 Thai (TIS-820.2538)	KeymapNames		Tajlandski (TIS-820.2538)
 Control:	Modifier keys window	Control key role name	Control:
 Disabled	Modifier keys window	Do nothing	Onemogućeno
+Select dead keys	Keymap window		Odaberi mrtve tipke
 Russian (Mac)	KeymapNames		Ruski (Mac)
 ESC	Keyboard Layout View		ESC
 Belarusian (Latin)	KeymapNames		Bjeloruski (latinica)

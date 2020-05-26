@@ -6,7 +6,7 @@ PG ↑	Keyboard Layout View	Very short for 'page up'	PgUp
 Brazilian	KeymapNames		Бразильская
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (US)
 Right control	Keyboard Layout View		Правый control
-Dvorak	KeymapNames		Дворака
+Dvorak	KeymapNames		Дворак
 Option:	Modifier keys window	Option key role name	Option:
 Cancel	Modifier keys window		Отмена
 Sample and clipboard:	Keymap window		Пример и буфер обмена:
@@ -105,7 +105,7 @@ Swiss-German	KeymapNames		Швейцарская немецкая
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Клавиша Ctrl
 Czech	KeymapNames		Чешская
 Russian (Udmurt, Komi, Mari)	KeymapNames		Русская (удмуртский, коми, мари)
-Thai (TIS-820.2538)	KeymapNames		Тайский (TIS-820.2538)
+Thai (TIS-820.2538)	KeymapNames		Тайская (TIS-820.2538)
 Control:	Modifier keys window	Control key role name	Control:
 Generic 105-key International	KeyboardLayoutNames		Типовая 105-клавишная международная
 Disabled	Modifier keys window	Do nothing	Отключено
@@ -114,7 +114,7 @@ Russian (Mac)	KeymapNames		Русская (Mac)
 Right shift	Keyboard Layout View		Правый shift
 ESC	Keyboard Layout View		ESC
 Belarusian (Latin)	KeymapNames		Беларуская (латиница)
-Hebrew	KeymapNames		Иврит
+Hebrew	KeymapNames		Ивритская
 Layout	Keymap window		Макет
 Greek	KeymapNames		Греческая
 Revert	Keymap window		Вернуть

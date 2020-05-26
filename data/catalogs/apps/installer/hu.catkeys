@@ -1,4 +1,5 @@
-1	hungarian	x-vnd.Haiku-Installer	918718200
+1	hungarian	x-vnd.Haiku-Installer	437621112
+The target volume is not empty. The installer cannot upgrade your system. Please visit the guide on the Haiku website on how to upgrade an existing installation to R1 beta 2.	InstallProgress		A kiválasztott lemez nem üres. A telepítő nem tudja frissíteni a meglévő rendszert. Kérlek látogass el a Haiku oldalára további információkért az R1 beta 2-re történő frissítéshez.
 Performing installation.	InstallProgress		A telepítés folyamatban…
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Válassza ki a felugró menüből a lemezt melyről telepíteni szeretne, majd kattintson a \"Mehet\" gombra.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		A telepítőablak bezárása előtt kérlek zárd be a Lemezkezelő ablakot!

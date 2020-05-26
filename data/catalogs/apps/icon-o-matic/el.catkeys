@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.haiku-icon_o_matic	3554185674
+1	greek, modern (1453-)	x-vnd.haiku-icon_o_matic	2424331018
 None	Icon-O-Matic-Properties		Κανένα
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Περιστροφή μονοπατιού
 Add empty	Icon-O-Matic-ShapesList		Προσθήκη άδειου
@@ -148,7 +148,6 @@ Caps	Icon-O-Matic-PropertyNames		Caps
 OK	Icon-O-Matic-SVGImport		Εντάξει
 Append…	Icon-O-Matic-Menu-File		Προσάρτηση…
 Scale Y	Icon-O-Matic-PropertyNames		Κλίμακα Υ
-Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Το άνοιγμα του αρχείου '%s' ως SVG απέτυχε.\n\nΣφάλμα: %s
 Export icon	Dialog title		Εξαγωγή εικονιδίου
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Χρώμα (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Επεξεργασία Gradient

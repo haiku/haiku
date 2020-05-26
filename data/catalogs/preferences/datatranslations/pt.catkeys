@@ -1,13 +1,16 @@
-1	portuguese	x-vnd.Haiku-DataTranslations	210050587
+1	portuguese	x-vnd.Haiku-DataTranslations	4156631142
 Path:	DataTranslations		Caminho:
 Name:	DataTranslations		Nome:
 DataTranslations - Note	DataTranslations		Tradução de Dados - Nota
+The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		O item '%name' parece não ser um Tradutor e não será instalado.
 Could not install %s:\n%s	DataTranslations		Não foi possível instalar %s:\n%s
 OK	DataTranslations		OK
 Cancel	DataTranslations		Cancelar
 Info:	DataTranslations		Informação:
 DataTranslations - Error	DataTranslations		Tradução de Dados - Erro
+Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Utilize este painel de controlo para introduzir valores predefinidos para os tradutores, a serem usados quando não houver outras definições especificadas por uma aplicação.
 The new translator has been installed successfully.	DataTranslations		O novo tradutor foi instalado com sucesso.
+An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Já existe um item chamado '%name' na pasta de Tradutores! Pretende substituir o tradutor existente?
 DataTranslations	System name		Tradução de Dados
 Info	DataTranslations		Informação
 Overwrite	DataTranslations		Escrever por cima

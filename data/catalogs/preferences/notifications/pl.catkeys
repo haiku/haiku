@@ -1,14 +1,35 @@
-1	polish	x-vnd.Haiku-Notifications	672560863
+1	polish	x-vnd.Haiku-Notifications	332239666
+Lower left	GeneralView		Z dołu po lewej
+Application does not have a valid signature	NotificationView	Alert message	Aplikacja nie posiada poprawnej sygnatury
+Status	NotificationView		Status
+Add…	NotificationView		Dodaj…
+Lower right	GeneralView		Z dołu po prawej
+Muted	NotificationView		Wyciszona
 Window width:	GeneralView		Szerokość okna:
+ is already listed	NotificationView	Alert message	 jest już na liście
 OK	PrefletWin		OK
 Notifications	PrefletWin		Powiadomienia
+Notifications preflet sample	PrefletWin		Przykład panelu powiadomień
+Mute notifications from this application	NotificationView		Wycisz powiadomienia z tej aplikacji
+pixels	GeneralView		pikseli
+seconds	GeneralView		sekund
 Revert	PrefletWin		Cofnij
 Applications	PrefletView		Aplikacje
+Timeout:	GeneralView		Czas wyświetlania:
+Upper right	GeneralView		Z góry po prawej
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Wystąpił błąd podczas zapisywania ustawień.\nMożliwe, że kończy się miejsce na dysku.
+Defaults	PrefletWin		Przywróć domyślne
+Upper left	GeneralView		Z góry po lewej
 Applications	NotificationView		Aplikacje
+Width:	GeneralView		Szerokość:
 General	PrefletView		Ogólne
 OK	NotificationView		OK
+Follow Deskbar	GeneralView		Przy Deskbarze
 Notifications	System name		Powiadomienia
 Allowed	NotificationView		Zezwolone
+Duration:	GeneralView		Czas trwania:
 Application	NotificationView		Aplikacja
 Enable notifications	GeneralView		Włącz powiadomienia
+This is a test notification message	PrefletWin		To jest próbne powiadomienie
+Remove	NotificationView		Usuń
+Position:	GeneralView		Pozycja:

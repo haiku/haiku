@@ -1,6 +1,7 @@
-1	esperanto	x-vnd.Be-MAIL	2597787733
+1	esperanto	x-vnd.Be-MAIL	1579015973
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Via ĉefa teksto enhavas %ld da nedekodeblaj karaktroj. Verŝajne alia karaktraro pli taŭgus? Premu Sendi por sendi ĝin malgraŭe (nedekodeblaj signoj estos anstataŭigitaj), aŭ elekti Rezigni por provi korekti ilin.
 Text wrapping:	Mail		Teksta ĉirkaŭfluo:
-Show icons & labels	Mail		Montri bildetojn kaj etikedojn
+Show icons & labels	Mail		Montri bildsimbolojn kaj etikedojn
 (Date unavailable)	Mail		(Dato estas nedisponebla)
 Reply	Mail		Respondi
 Next message	Mail		Sekva mesaĝo
@@ -35,8 +36,10 @@ Same recipient	Mail		Sama ricevonto
 Previous message	Mail		Antaŭa mesaĝo
 (Address unavailable)	Mail		(Adreso estas nedisponebla)
 Mail	System name		Poŝto
+Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Kunsendaĵo: %name% (Speco: %type%)
 Copy link location	Mail		Kopii ligilan lokon
 Attachments: 	Mail		Kunsendaĵoj: 
+Remove enclosure	Mail		Forigi kunsendaĵon
 Next	Mail		Sekva
 Attachments:	Mail		Kunsendaĵoj:
 Show icons only	Mail		Montri nur bildsimbolojn
@@ -59,16 +62,18 @@ Add signature	Mail		Aldoni subskribon
 Signature	Mail		Subskribo
 Use default account	Mail		Uzi defaŭlton konton
 draft	B_USER_DIRECTORY/mail/draft		malneto
-Really delete this signature? This cannot be undone.	Mail		Vere forigi ĉi tiun subskribon? Ĉi tio ne estos malfarebla.
+Really delete this signature? This cannot be undone.	Mail		Ĉu vere forigi ĉi tiun subskribon? Ĉi tio ne malfareblas.
 spam	B_USER_DIRECTORY/mail/spam		trudaĵo
 Reply to all	Mail		Respondi al ĉiuj
 Cancel	Mail		Nuligi
+Off	Mail		Malŝalti
 Set to %s	Mail		Meti kiel %s
 Signature:	Mail		Subskribo:
 Forward without attachments	Mail		Plusendi sen kunsendaĵoj
 queries	B_USER_DIRECTORY/mail/queries		informpetoj
 View	Mail		Vidi
 Signatures	Mail		Subskriboj
+On	Mail		Ŝalti
 Find	Mail		Trovi
 Sorry, could not find an application that supports the 'Person' data type.	Mail		Pardonu! Ne eblis trovi aplikaĵon, kiu subtenas la 'Persono' datumtipon.
 Date:	Mail		Dato:
@@ -109,6 +114,7 @@ Redo	Mail		Refari
 Leave as '%s'	Mail		Lasi kiel '%s'
 Print…	Mail		Printi…
 Settings…	Mail		Agordoj…
+Warn unencodable:	Mail		Averti pri nedekodebla:
 Trash	Mail		Rubejo
 Show raw message	Mail		Montri krudan mesaĝon
 Find…	Mail		Trovi…
@@ -159,3 +165,4 @@ Couldn't open this signature. Sorry.	Mail		Ne povis malfermi ĉi tiun subskribon
 Revert	Mail		Malfari
 Unknown	Mail		Nekonata
 Increase quote level	Mail		Kreskigi nivelon de citiloj
+Add enclosure…	Mail		Aldoni kunsendaĵon…

@@ -1,4 +1,5 @@
-1	romanian	x-vnd.Haiku-Installer	3048565029
+1	romanian	x-vnd.Haiku-Installer	2567467941
+The target volume is not empty. The installer cannot upgrade your system. Please visit the guide on the Haiku website on how to upgrade an existing installation to R1 beta 2.	InstallProgress		Volumul țintă nu este gol. Instalatorul nu poate actualiza sistemul. Vizitați ghidul pe pagina web Haiku despre cum să actualizați o instalare existentă la R1 beta 2.
 Performing installation.	InstallProgress		Se execută instalarea.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Alege discul sursă din meniul contextual. Apoi apasă \"Începe\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Alegeți fereastra ConfigurareDrive înainte de a închide fereastra Programului de instalare.

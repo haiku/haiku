@@ -1,23 +1,140 @@
-1	esperanto	x-vnd.Haiku-Keymap	2467296046
+1	esperanto	x-vnd.Haiku-Keymap	285252649
+Key	Modifier keys window	As in a computer keyboard key	Klavo
+Japanese	KeymapNames		Japana
+US	KeymapNames		Usona
+PG ↑	Keyboard Layout View	Very short for 'page up'	PĜ ↑
+Brazilian	KeymapNames		Brazila
+ThinkPad (US)	KeyboardLayoutNames		ThinkPad (Usona)
+Right control	Keyboard Layout View		Dekstra striklavo
+Dvorak	KeymapNames		Dvoraka
+Option:	Modifier keys window	Option key role name	Opciklavo:
 Cancel	Modifier keys window		Nuligi
 Sample and clipboard:	Keymap window		Ekzemplo kaj poŝo:
+Polish	KeymapNames		Pola
+Latin-American	KeymapNames		Latinamerika
+Ukrainian	KeymapNames		Ukrainia
+PAGE ↓	Keyboard Layout View		PAĜO ↓
+DEL	Keyboard Layout View		DEL
+United-Kingdom	KeymapNames		Unuiĝinta Reĝlando
+Turkish (Type-F)	KeymapNames		Turka (Speco-F)
+Serbian (Cyrillic)	KeymapNames		Serba (Cirila)
+Belgian (point)	KeymapNames		Belgia (punkto)
+Finnish	KeymapNames		Finna
+Num lock	Keyboard Layout View		Nombraŝloso
 Switch shortcut keys to Windows/Linux mode	Keymap window		Ŝparvojklavoj laŭ Linukso/Vindozo
+Option	Keyboard Layout View	Option key	Opciklavo
+Spanish (Dvorak)	KeymapNames		Hispana (Dvoraka)
+US-International	KeymapNames		Usona internacia
+Right option	Keyboard Layout View		Dekstra opciklavo
+Turkish (Type-Q)	KeymapNames		Turka (Speco-Q)
 Revert	Modifier keys window		Malfari
+Slovak	KeymapNames		Slovaka
+Colemak	KeymapNames		Colmaka
+Dvorak (programmer's)	KeymapNames		Dvoraka (por programistoj)
+PRINT	Keyboard Layout View		PRESI
+German (Mac)	KeymapNames		Germana (por Mac)
+Arabic (102)	KeymapNames		Araba (102)
+ThinkPad	KeyboardLayoutNames		ThinkPad
+Belarusian (Mac)	KeymapNames		Balrusa (por Mac)
+Croatian	KeymapNames		Kroatia
+PAGE ↑	Keyboard Layout View		PAĜO ↑
+Apple Aluminium International	KeyboardLayoutNames		Internacia por Apple Aluminium
+ThinkPad X1 (US)	KeyboardLayoutNames		ThinkPad X1 (Usona)
+Apple Aluminum	KeyboardLayoutNames		Apple Aluminium
+Spanish	KeymapNames		Hispana
+HOME	Keyboard Layout View		HEJMO
+Ukrainian (Mac)	KeymapNames		Ukrainia (por Mac)
+Command:	Modifier keys window	Command key role name	Komandklavo:
+French (Bépo)	KeymapNames		Franca (de Bépo)
+Russian (Typewriter)	KeymapNames		Rusa (Tajpilo)
 Acute trigger	Keymap window		Dekstra korno
+Italian	KeymapNames		Italia
+ThinkPad T400s International	KeyboardLayoutNames		Internacia por ThinkPad T400s
+Apple Aluminum (US)	KeyboardLayoutNames		Apple Aluminum (Usona)
+Kinesis Ergo Elan International	KeyboardLayoutNames		Internacia de Kinesis Ergo Elan
+French (NF Z71-300)	KeymapNames		Franca (por NF Z71-300)
+Modifier keys	Modifier keys window		Modifaj klavoj
+ThinkPad X1 International	KeyboardLayoutNames		Internacia por ThinkPad X1
+Kazakh	KeymapNames		Kazaĥa
 Save as…	Keymap window		Konservi kiel…
+Lithuanian (Standard)	KeymapNames		Litovia (Norma)
+Error: duplicate keys	Modifier keys window		Eraro: duplikataj klavoj
+Bulgarian (Phonetic)	KeymapNames		Bulgara (Fonetika)
+Kinesis Advantage	KeyboardLayoutNames		Kinesis Advantage
+Canadian-French	KeymapNames		Franca por Kanado
+Hungarian	KeymapNames		Hungara
+Irish	KeymapNames		Irlanda
+Remove	Keyboard Layout View		Forigi
 Tilde trigger	Keymap window		Tildo
+Shift	Keyboard Layout View	Shift key	Ŝovklavo
+Macedonian	KeymapNames		Makedona
+Czech (Mac)	KeymapNames		Ĉeĥa (por Mac)
+Albanian	KeymapNames		Albana
 (Current)	Keymap window		(Kuranta)
+Friulian	KeymapNames		Friula
+END	Keyboard Layout View		FINO
+Esperanto	KeymapNames		Esperanta
+Belarusian	KeymapNames		Belarusa
 Circumflex trigger	Keymap window		Ĉapelo
+Russian (Yawert)	KeymapNames		Rusa (Yawert)
+ThinkPad X100e International	KeyboardLayoutNames		Internacia por ThinkPad X100e
+Bulgarian (Cyrillic)	KeymapNames		Bulgara (Cirila)
+Swedish	KeymapNames		Sveda
+Svorak	KeymapNames		Sveda (de Dvorak, alinome Svorak)
+ThinkPad X100e (US)	KeyboardLayoutNames		ThinkPad X100e (Usona)
+German	KeymapNames		Germana
+Swiss-German	KeymapNames		Germana por Svislando
+Czech	KeymapNames		Ĉeĥa
+Russian (Udmurt, Komi, Mari)	KeymapNames		Rusa (la udmurta, la komia, la maria)
+Thai (TIS-820.2538)	KeymapNames		Taja (normo TIS-820.2538)
+Generic 105-key International	KeyboardLayoutNames		Komuna 105-klava Internacia
+Disabled	Modifier keys window	Do nothing	Malŝaltita
 Select dead keys	Keymap window		Elektu senpaŝajn klavojn
+Russian (Mac)	KeymapNames		Rusa (por Mac)
+Belarusian (Latin)	KeymapNames		Belarusa (Latina)
+Hebrew	KeymapNames		Hebrea
 Layout	Keymap window		Aranĝo
+Greek	KeymapNames		Greka
 Revert	Keymap window		Malfari
 Grave trigger	Keymap window		Maldekstra korno
+Menu	Keyboard Layout View	Menu key	Menuklavo
+Faeroese	KeymapNames		Feroa
 Quit	Keymap window		Ĉesi
+Polish (Typewriter)	KeymapNames		Pola (Tajpilo)
+French (Mac)	KeymapNames		Franca (por Mac)
 User:	Keymap window		Uzulaj:
+Apple Aluminium Extended International	KeyboardLayoutNames		Internacia etendita por Apple Aluminium
+SHIFT	Keyboard Layout View		ŜOVI
+Estonian	KeymapNames		Estona
+Serbian (Latin)	KeymapNames		Serba (Latina)
+French	KeymapNames		Franca
+Portuguese	KeymapNames		Portugala
+Swiss-French	KeymapNames		Franca por Svilando
+Keymap	System name		Klavmapo
+Slovene	KeymapNames		Slovena
+Lithuanian	KeymapNames		Litova
 Switch shortcut keys to Haiku mode	Keymap window		Ŝparvojklavoj laŭ Haiku
+Defaults	Keymap window		Defaŭltoj
+ISO-9995	KeymapNames		ISO-9995
 System:	Keymap window		Sistemaj:
+ThinkPad International	KeyboardLayoutNames		Internacia por ThinkPad
+Apple Aluminum Extended (US)	KeyboardLayoutNames		Etendita por Apple Aluminum (US)
 Switch shortcut keys	Keymap window		Ŝparvojklavoj
+MENU	Keyboard Layout View		MENUO
+Belgian (comma)	KeymapNames		Belgio (komo)
+Norwegian	KeymapNames		Norvega
 Font	Keymap window		Tiparo
+Danish	KeymapNames		Dana
+Generic 104-key	KeyboardLayoutNames		Komuna 104-klavoj
+PAUSE	Keyboard Layout View		PAŬZI
+Russian	KeymapNames		Rusa
+TypeMatrix 2030	KeyboardLayoutNames		por TypeMatrix 2030
+Romanian	KeymapNames		Rumana
+Command	Keyboard Layout View	Command key	Komandklavo
 File	Keymap window		Dosiero
+Brazilian (ABNT2)	KeymapNames		Brazila (normo ABNT2)
+Dutch	KeymapNames		Nederlanda
 Diaeresis trigger	Keymap window		Dupunkto
+Icelandic	KeymapNames		Islanda
 Open…	Keymap window		Malfermi…
+ThinkPad T400s (US)	KeyboardLayoutNames		ThinkPad T400s (US)

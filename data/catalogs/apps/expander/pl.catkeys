@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Expander	1129502603
+1	polish	x-vnd.Haiku-Expander	3300517306
 Expand	ExpanderMenu		Rozpakuj
 Expanding '%s'…	ExpanderWindow		Rozpakowywanie „%s”…
 Close window when done expanding	ExpanderPreferences		Zamknij okno po zakończeniu rozpakowywania
@@ -21,6 +21,7 @@ Other	ExpanderPreferences		Inne
 Cancel	ExpanderPreferences		Anuluj
 Expansion	ExpanderPreferences		Rozpakowywanie
 Select	DirectoryFilePanel		Wybierz
+The folder was either moved, renamed or not supported.	ExpanderWindow		Katalog został przeniesiony, zmieniono mu nazwę lub jest nieobsługiwany.
 Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Katalog docelowy nie istnieje. Czy chcesz go utworzyć?
 Same directory as source (archive) file	ExpanderPreferences		Ten sam co archiwum źródłowe
 Settings	ExpanderMenu		Ustawienia
@@ -30,6 +31,7 @@ Select	ExpanderPreferences		Wybierz
 Show contents	ExpanderWindow		Pokaż zawartość
 Automatically show contents listing	ExpanderPreferences		Automatycznie pokaż listę zawartości
 OK	ExpanderPreferences		OK
+Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Na pewno chcesz zatrzymać odpakowywanie tego archiwum? Odpakowane elementy mogą być niekompletne.
 Leave destination folder path empty	ExpanderPreferences		Pozostaw katalog docelowy pusty
 Failed to create the destination folder.	ExpanderWindow		Nie udało się utworzyć katalogu docelowego.
 Select '%s'…	DirectoryFilePanel		Wybierz „%s”…

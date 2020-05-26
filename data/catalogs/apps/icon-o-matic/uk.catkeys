@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.haiku-icon_o_matic	3554185674
+1	ukrainian	x-vnd.haiku-icon_o_matic	2424331018
 None	Icon-O-Matic-Properties		Пусто
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Зворотній напрямок точок смуги
 Add empty	Icon-O-Matic-ShapesList		Додати порожній
@@ -148,7 +148,6 @@ Caps	Icon-O-Matic-PropertyNames		Кінці ліній
 OK	Icon-O-Matic-SVGImport		ОК
 Append…	Icon-O-Matic-Menu-File		Додати…
 Scale Y	Icon-O-Matic-PropertyNames		Масштаб по Y
-Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Не вдалося відкрити файл '%s' як документ SVG.\n\nПомилка: %s
 Export icon	Dialog title		Експортувати значок
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Колір (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Змінити градієнт

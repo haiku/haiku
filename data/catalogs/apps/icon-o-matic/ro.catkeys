@@ -1,4 +1,4 @@
-1	romanian	x-vnd.haiku-icon_o_matic	3554185674
+1	romanian	x-vnd.haiku-icon_o_matic	2424331018
 None	Icon-O-Matic-Properties		Nimic
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Rotește calea indicilor
 Add empty	Icon-O-Matic-ShapesList		Adaugă liber
@@ -148,7 +148,6 @@ Caps	Icon-O-Matic-PropertyNames		Acoperire
 OK	Icon-O-Matic-SVGImport		OK
 Append…	Icon-O-Matic-Menu-File		Adaugă…
 Scale Y	Icon-O-Matic-PropertyNames		Scară Y
-Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		A eșuat deschiderea fișierului '%s' ca document SVG.\n\nEroare: %s
 Export icon	Dialog title		Exportă pictogramă
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Culoare (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Editează degrade

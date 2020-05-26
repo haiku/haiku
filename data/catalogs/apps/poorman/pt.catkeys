@@ -1,31 +1,65 @@
-1	portuguese	x-vnd.Haiku-PoorMan	1468121551
+1	portuguese	x-vnd.Haiku-PoorMan	1819725053
 Select web folder	PoorMan		Selecionar pasta web
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		por favor, escolha a pasta a publicar na web.\n\nPode selecionar uma pasta à sua escolha, ou pode deixar o PoorMan\n criar uma pasta \"public_html\" predefinida na sua pasta pessoal.
+Console logging	PoorMan		Registo em consola
+Create Log File	PoorMan		Criar Ficheiro de Registo
+File logging	PoorMan		Registo em ficheiro
+Website options	PoorMan		Opções do website
+Log to file	PoorMan		Registar para ficheiro
+Shutting down.	PoorMan		A encerrar.
+Web folder:	PoorMan		Pasta web:
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Por favor, escolha a pasta a publicar na web.\n\nPode selecionar uma pasta à sua escolha, ou pode deixar\no PoorMan criar uma pasta \"public_html\" predefinida\nna sua pasta pessoal.
+Log To Console	PoorMan		Registar para consola
 File Name	PoorMan		Nome do Ficheiro
+Starting up... 	PoorMan		A iniciar... 
 Select	PoorMan		Selecionar
+Logging view	PoorMan		Visualização de registo
+Save console as…	PoorMan		Guardar consola como…
 Edit	PoorMan		Editar
 Cancel	PoorMan		Cancelar
+Directory: 	PoorMan		Pasta: 
+Hits: %lu	PoorMan		Solicitações: %lu
+Hits: 0	PoorMan		Solicitações: 0
 Shutting down.\n	PoorMan		A encerrar.\n
 Select all	PoorMan		Selecionar tudo
 Error Server	PoorMan		Erro do Servidor
+Send file listing if there's no start page	PoorMan		Enviar listagem de ficheiros se não houver página inicial
+Create PoorMan log	PoorMan		Criar registo do PoorMan
+Max. simultaneous connections:	PoorMan		Máx. de ligações simultâneas
 Done	PoorMan		Concluído
+Site	PoorMan		Sítio
 Cannot start the server	PoorMan		Não foi possível iniciar o servidor
+Create log file	PoorMan		Criar ficheiro de registo
+Create public_html	PoorMan		Criar public_html
+Clear hit counter	PoorMan		Limpar contador de solicitações
 Status: Stopped	PoorMan		Estado: Parado
 File	PoorMan		Ficheiro
 Settings…	PoorMan		Definições…
+Log To File	PoorMan		Registar Para Ficheiro
 Connections	PoorMan		Ligações
 Controls	PoorMan		Controlos
+Log to console	PoorMan		Registar para consola
 Advanced	PoorMan		Avançado
 Copy	PoorMan		Copiar
+Logging	PoorMan		Registo
+PoorMan	System name		PoorMan
+Clear console log	PoorMan		Limpar registo da consola
 Run server	PoorMan		Iniciar servidor
 Create	PoorMan		Criar
+{0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# ligação} other{# ligações}}
 done.\n	PoorMan		concluído.\n
+PoorMan settings	PoorMan		Definições do PoorMan
+Console Logging	PoorMan		Registo em Consola
 Clear log file	PoorMan		Limpar ficheiro de registo
+Save log console selection	PoorMan		Guardar seleção de consola de registo
+File Logging	PoorMan		Registo em Ficheiro
 Log file name:	PoorMan		Nome do ficheiro de registo:
 Status: Running	PoorMan		Estado: Em execução
 Directory: (none)	PoorMan		Diretório: (nenhum)
-A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Uma pasta web predefinida foi criada em \"/boot/home/public_html.\"\nVerifique que exista um ficheiro HTML chamado \"index.html\" nessa pasta.
-Dir Created	PoorMan		Diretório Criado
+A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Foi criada uma pasta web predefinida foi criada em \"/boot/home/public_html.\"\nVerifique que exista um ficheiro HTML chamado \"index.html\" nessa pasta.
+Dir Created	PoorMan		Pasta criada
+Save console selections as…	PoorMan		Guardar seleções de consola como…
 Quit	PoorMan		Sair
+Save log console	PoorMan		Guardar consola de registo
 Start page:	PoorMan		Página inicial:
 OK	PoorMan		OK
+Website location	PoorMan		Localização do website

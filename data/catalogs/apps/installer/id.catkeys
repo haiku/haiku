@@ -1,4 +1,5 @@
-1	indonesian	x-vnd.Haiku-Installer	3048565029
+1	indonesian	x-vnd.Haiku-Installer	2567467941
+The target volume is not empty. The installer cannot upgrade your system. Please visit the guide on the Haiku website on how to upgrade an existing installation to R1 beta 2.	InstallProgress		Volume target tidak kosong. Pemasang tidak dapat meningkatkan sistem anda. Silahkan mengunjungi panduan pada situs web Haiku tentang cara meningkatkan instalasi yang ada ke R1 beta 2.
 Performing installation.	InstallProgress		Melakukan instalasi.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Pilih disk sumber dari menu pop-up. Lalu klik \"Begin\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Silakan tutup jendela DriveSetup sebelum menutup jendela Installer.

@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-Input	4079908364
+1	esperanto	x-vnd.Haiku-Input	2652896963
 Cancel	TouchpadPrefView		Nuligi
 OK	TouchpadPrefView		Bone
 Defaults	InputKeyboard		Defaŭltoj
@@ -7,6 +7,7 @@ Slow	KeyboardView		Malrapide
 Revert	InputMouse		Malfari
 Key repeat rate	KeyboardView		Klavripeta rapido
 2-Button	SettingsView		2-butona
+Click to focus and raise	SettingsView		Alklaki por enfokusigi kaj suprenigi
 Vertical	TouchpadPrefView		Vertikala
 Horizontal	TouchpadPrefView		Horizontala
 Focus mode:	SettingsView		Reĝimo de fokusigo:

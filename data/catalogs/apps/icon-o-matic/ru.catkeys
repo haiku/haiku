@@ -1,4 +1,4 @@
-1	russian	x-vnd.haiku-icon_o_matic	3554185674
+1	russian	x-vnd.haiku-icon_o_matic	2424331018
 None	Icon-O-Matic-Properties		Ничего
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Повернуть направление контура
 Add empty	Icon-O-Matic-ShapesList		Добавить пустую
@@ -148,7 +148,6 @@ Caps	Icon-O-Matic-PropertyNames		Шапки
 OK	Icon-O-Matic-SVGImport		ОК
 Append…	Icon-O-Matic-Menu-File		Добавить…
 Scale Y	Icon-O-Matic-PropertyNames		Масштабировать по Y
-Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Не удалось открыть файл '%s' как SVG документ.\n\nError: %s
 Export icon	Dialog title		Экспортировать значок
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Цвет (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Изменить градиент

@@ -1,15 +1,15 @@
 1	turkish	x-vnd.Haiku-GLInfo	2211760527
-Maximum clipping planes	Capabilities		En çok kırpma alanı
-Maximum 2D texture size	Capabilities		En çok 2B desen boyutu
+Maximum clipping planes	Capabilities		En büyük kırpma alanı
+Maximum 2D texture size	Capabilities		En büyük 2B desen boyutu
 Auxiliary buffer(s)	Capabilities		Yedek arabellek(ler)
-Maximum evaluators equation order	Capabilities		En çok değerlendirici eşitlik düzeni
+Maximum evaluators equation order	Capabilities		Değerlendicilerin en büyük eşitlik düzeni
 Texture stack size	Capabilities		Desen yığın boyutu
 GL Info	System name		GL Bilgisi
 Information	InfoView		Bilgi
-Maximum convolution	Capabilities		Maksimum kıvrılma
+Maximum convolution	Capabilities		En yüksek kıvrılma
 Attributes stack size	Capabilities		Öznitelik yığın boyutu
 Maximum lights	Capabilities		En çok ışık
-Maximum 3D texture size	Capabilities		En çok 3B desen boyutu
+Maximum 3D texture size	Capabilities		En büyük 3B desen boyutu
 Extensions	Extensions		Uzantılar
 Maximum recommended index elements	Capabilities		Önerilen en çok dizin ögeleri
 Available extensions	Extensions		Kullanılabilir uzantılar

@@ -1,4 +1,5 @@
-1	russian	x-vnd.Haiku-Installer	3048565029
+1	russian	x-vnd.Haiku-Installer	2567467941
+The target volume is not empty. The installer cannot upgrade your system. Please visit the guide on the Haiku website on how to upgrade an existing installation to R1 beta 2.	InstallProgress		Целевой раздел не пустой. Установщик не может обновить вашу систему. Пожалуйста, найдите информацию на сайте Haiku о том как обновить существующую систему до o R1 beta 2.
 Performing installation.	InstallProgress		Выполняется установка…
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Выберите источник из выпадающего меню. Затем нажмите кнопку \"Установить\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Пожалуйста, закройте окно разметки диска перед закрытием окна Установщика.
@@ -37,7 +38,7 @@ This is beta-quality software! It means there is a risk of losing important data
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		В выпадающих меню выберите источник и раздел, на который хотите установить систему. Затем нажмите кнопку Установить.
 Hide optional packages	InstallerWindow		Скрыть опциональные пакеты
 ???	InstallerWindow	Unknown partition name	???
-Have fun and thanks for trying out Haiku!	InstallerApp		Не скучайте и спасибо, что пробуете Haiku!
+Have fun and thanks for trying out Haiku!	InstallerApp		Надеемся, что вам будет интересно и спасибо, что пробуете Haiku!
 Quit	InstallerApp		Выход
 Starting installation.	InstallProgress		Начинаем установку.
 Error writing boot sector.	InstallProgress		Ошибка при записи загрузочного сектора.

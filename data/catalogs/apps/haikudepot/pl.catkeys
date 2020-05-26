@@ -1,113 +1,181 @@
-1	polish	x-vnd.Haiku-HaikuDepot	2663094677
+1	polish	x-vnd.Haiku-HaikuDepot	1335940664
 Repository update error	LocalRepositoryUpdateProcess		Błąd podczas odświeżania repozytorium
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Wystąpił błąd podczas odświeżania repozytorium: %error%
+User Created	UserLoginWindow		Użytkownik utworzony
 Check for updates…	MainWindow		Sprawdź dostępność aktualizacji…
 Uninstall	PackageManager		Usuń
 Uninstalled	PackageListView		Niezainstalowany
+It was not possible to create the new user.	UserLoginWindow		Nie udało się utworzyć nowego użytkownika.
 Available packages	MainWindow		Dostępne pakiety
 Create account	UserLoginWindow		Utwórz konto
 Mostly stable	RatePackageWindow		Całkiem stabilny
 OK	App		OK
+The response to the captcha was incorrect.	ServerHelper		Odpowiedź na test CAPTCHA była nieprawidłowa.
 Develop packages	MainWindow		Pakiety deweloperskie
 Rate package…	PackageInfoView		Oceń pakiet…
 Starting the package daemon failed:\n\n%Error%	App		Uruchamianie demona pakietów nie powiodło się:\n\n%Error%
+You have successfully authenticated as user %Nickname%.	UserLoginWindow		Zalogowano pomyślnie jako %Nickname%.
 <no info>	PackageInfoView		<brak informacji>
 No user ratings available.	PackageInfoView		Brak ocen użytkowników.
+Downloading package '%name%'	WorkStatusView		Pobieranie pakietu „%name%”
+It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Nie udało się uzyskać niezbędnych informacji o teście CAPTCHA z danych przesłanych przez serwer.
 Rating	PackageListView		Ocena
 Synchronizing icons	ServerIconExportUpdateProcess		Synchronizowanie ikon
 Does not start	RatePackageWindow		Nie uruchamia się
 Show	MainWindow		Pokaż
+An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Wystąpił błąd podczas pobierania listy pakietów: %message%
 Unstable but usable	RatePackageWindow		Niestabilny, ale używalny
 Not specified	RatePackageWindow		Nieokreślony
+This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Ta aplikacja zapisuje i odczytuje niektóre pliki robocze na twoim komputerze w celu funkcjonowania. Wygląda na to, że są problemy z zapisaniem testowego pliku w [%TestFilePath%]. Sprawdź czy nie ma problemów z dyskiem lub uprawnieniami, które mogą uniemożliwiać tej aplikacji zapisywanie plików w tym katalogu. Możesz zaakceptować ten problem i kontynuować, ale część funkcjonalności może być wyłączona.
 Active	PackageListView		Aktywny
 Login or Create account	MainWindow		Zaloguj lub utwórz konto
 <Package contents not available for remote packages>	PackageContentsView		<Podgląd zawartości nie jest dostępny dla zdalnych pakietów>
+{0, plural,one{1 package to download}other{# packages to download}}	WorkStatusView		{0, plural, one{1 pakiet do pobrania} few{# pakiety do pobrania} many{# pakietów do pobrania} other{# pakietu do pobrania}}
 Ratings	PackageInfoView		Oceny
 Switch account…	MainWindow		Przełącz konto…
 Preferred language:	UserLoginWindow		Preferowany język:
 Server Error	ServerHelper		Błąd serwera
 Name	PackageListView		Nazwa
+Authorization or security issue. Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		Problem z autoryzacją lub zabezpieczeniami. Wyloguj i zaloguj się ponownie, żeby sprawdzić czy twoje hasło jest poprawne i czy najnowsze warunki korzystania zostały zaakceptowane.
+Local	LocalPkgDataLoadProcess		Lokalne
 Rate %Package%	RatePackageWindow		Oceń %Package%
+An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Wystąpił błąd podczas inicjalizacji menedżera pakietów:%message%
 Quit HaikuDepot	App		Zakończ HaikuDepot
+An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		Wystąpił niespodziewany błąd „%Message%” związany z właściwością „%Property%”
+A response to the captcha question must be provided.	UserLoginWindow		Odpowiedź na test CAPTCHA musi być wypełniona.
 Category	FilterView		Kategoria
 User rating	RatePackageWindow		Ocena użytkowników
 Installed packages	MainWindow		Zainstalowane pakiety
+A requested object or an object involved in the request was not found on the server.	ServerHelper		Żądany obiekt lub obiekt zależny nie został znaleziony na serwerze.
 Stable	RatePackageWindow		Stabilny
 Fatal error	PackageManager		Błąd krytyczny
 Package action failed	PackageInfoView		Akcja dla pakietu nie powiodła się
 No changelog available.	PackageInfoView		Dziennik zmian nie jest dostępny.
 Error	App		Błąd
 There was a puzzling response from the web service.	UserLoginWindow		Odebrano dziwną odpowiedź od usługi sieciowej.
+Version	PackageListView		Wersja
 Not logged in	MainWindow		Niezalogowany
 No, quit HaikuDepot	App		Nie, zakończ HaikuDepot
 Featured packages	FeaturedPackagesView		Polecane pakiety
+The supplied response to the captcha is incorrect. A new captcha will be generated; try again.	UserLoginWindow		Podana odpowiedź CAPTCHA jest nieprawidłowa. Zostanie wygenerowany nowy test CAPTCHA; spróbuj ponownie.
+It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Nie udało się skontaktować z serwerem w celu pozyskania obrazu do testu CAPTCHA wymaganego do utworzenia nowego użytkownika.
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Twoja ocena została pomyślnie wysłana. Możesz ją zmienić lub usunąć na stronie HaikuDepot Server.
 Network Error	ServerHelper		Błąd sieci
 Available	PackageListView		Dostępny
 Cancel	UserLoginWindow		Anuluj
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot wymaga demona pakietów do działania, a ten wydaje się nie być uruchomiony.\nCzy chcesz go uruchomić?
 Click a package to view information	PackageInfoView		Kliknij na pakiet, aby zobaczyć informacje
+The password must be at least eight characters long, consist of at least two digits and one upper case character.	UserLoginWindow		Hasło musi być długie na co najmniej osiem znaków i składać się z co najmniej dwóch cyfr i jednej wielkiej litery.
 Contents	PackageInfoView		Zawartość
 Close	PackageManager		Zamknij
+A network transport error has arisen communicating with the HaikuDepot server system: %s	ServerHelper		Wystąpił błąd sieci podczas komunikacji z serwerem HaikuDepot: %s
 Changelog	PackageInfoView		Dziennik zmian
+Rating not possible	MainWindow		Ocena niemożliwa
+Package update error	MainWindow		Błąd aktualizacji pakietu
 About	PackageInfoView		O pakiecie
+%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# proces} few{# procesy} many{# procesów} other{# procesu}}
 Reboot required	PackageManager		Wymagane ponowne uruchomienie
 Very unstable	RatePackageWindow		Bardzo niestabilny
 Password:	UserLoginWindow		Hasło:
 All packages	PackageListView		Wszystkie pakiety
+Network Transport Error	ServerHelper		Błąd sieci
 Stability	RatePackageWindow		Stabilność
 Send	RatePackageWindow		Wyślij
 Start package daemon	App		Uruchom demona pakietów
+The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Hasło musi zostać wprowadzone dwa razy w celu zredukowania szansy na ustawienie błędnego hasła.
 The package action could not be scheduled: %Error%	PackageInfoView		Akcja dla pakietu nie mogła zostać dodana do kolejki: %Error%
 Cancel	RatePackageWindow		Anuluj
 Inactive	PackageListView		Nieaktywny
+Nickname:	UserLoginWindow		Pseudonim:
+Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Synchronizowanie metadanych dotyczących repozytoriów
+There are problems in the supplied data:	UserLoginWindow		Istnieją problemy w dostarczonych danych:
 OK	MainWindow		OK
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# element} few{# elementy} many{# elementów} other{# elementu}}
+Usage conditions download problem	UserLoginWindow		Problem z pobieraniem warunków korzystania
 OK	PackageInfoView		OK
 Downloading:	PackageInfoView		Pobieranie:
 Success	UserLoginWindow		Powodzenie
+Package daemon problem	App		Problem z demonem pakietów
 (%Votes%)	PackageInfoView		(%Votes%)
 Repository	PackageListView		Repozytorium
+%hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (wersja %hd.version%)
+The email is malformed.	UserLoginWindow		Adres e-mail jest nieprawidłowy.
 Close	UserLoginWindow		Zamknij
 Close	RatePackageWindow		Zamknij
+Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synchronizacja danych pakietów dla repozytorium „%REPO_NAME%”
+View the usage conditions	UserLoginWindow		Zobacz warunki korzystania
+Login issue	MainWindow		Problem z logowaniem
 Size	PackageListView		Rozmiar
 Your rating:	RatePackageWindow		Twoja ocena:
+The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		Użytkownik %Nickname% został pomyślnie utworzony na serwerze HaikuDepot. Możesz zarządzać ustawieniami korzystając z interfejsu w przeglądarce internetowej. Zalogowano cię jako ten nowy użytkownik.
+Your rating was updated.	RatePackageWindow		Zaktualizowano twoją ocenę.
 All categories	FilterView		Wszystkie kategorie
 Repositories	MainWindow		Repozytoria
 n/a	PackageInfoView		Nie dotyczy
+This rating is visible to other users	RatePackageWindow		Ta ocena jest widoczna dla innych użytkowników
+View agreed usage conditions…	MainWindow		Zobacz zaakceptowane warunki korzystania…
 Cancel	MainWindow		Anuluj
+{0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural, one{(1 więcej do pobrania)} other{(# więcej do pobrania)}}
 Refresh repositories	MainWindow		Odśwież repozytoria
 Tools	MainWindow		Narzędzia
+Continue	App		Kontynuuj
+A password is required.	UserLoginWindow		Hasło jest wymagane.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Tego pakietu nie znaleziono na HaikuDepot Server, więc dodanie oceny lub edytowanie istniejącej nie jest możliwe.
 Language	RatePackageWindow		Język
 Log out	MainWindow		Wyloguj
 Comment language:	RatePackageWindow		Język komentarza:
 Status	PackageListView		Status
+The password has been incorrectly repeated.	UserLoginWindow		Hasła nie zgadzają się.
+The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		Hasło wprowadzone poprzednio dla użytkownika [%Nickname%] nie jest obecnie ważne. Ten użytkownik zostanie teraz wylogowany, należy zalogować się ponownie używając aktualnego hasła.
 Update	RatePackageWindow		Zaktualizuj
 OK	ServerHelper		OK
 Language	UserLoginWindow		Język
 OK	UserLoginWindow		OK
+Reading repository data	LocalPkgDataLoadProcess		Odczytywanie danych repozytorium
+Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Synchronizowanie danych wzorcowych z serwerem
 Stability:	RatePackageWindow		Stabilność:
+The usage agreement must be agreed to and a confirmation should be made that the person creating the user meets the minimum age requirement.	UserLoginWindow		Warunki korzystania muszą zostać zaakceptowane oraz należy upewnić się, że osoba tworząca użytkownika spełnia kryterium minimalnego wieku.
+A validation error has occurred	ServerHelper		Wystąpił błąd walidacji
+While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	MainWindow		Podczas aktualizowania danych pakietów, wystąpił problem który mógł spowodować, że dane wyświetlane w aplikacji będą nieaktualne lub niekompletne. Więcej szczegółów o tym problemie może być dostępne w plikach dziennika aplikacji.\nInformacje jak przeglądać dzienniki (logi) są dostępne w sekcji HaikuDepot Podręcznika Użytkownika.
+The nickname is required.	UserLoginWindow		Pseudonim jest wymagany.
 Source packages	MainWindow		Pakiety źródłowe
 -	no package size		-
+Problem with working files	App		Problem z plikami roboczymi
 Try again	App		Spróbuj ponownie
 Rate package	RatePackageWindow		Oceń pakiet
 Unknown	PackageListView		Nieznany
+I agree to the usage conditions	UserLoginWindow		Zgadzam się na warunki korzystania
 Log in	UserLoginWindow		Zaloguj
 Logged in as %User%	MainWindow		Zalogowano jako %User%
 Email address:	UserLoginWindow		Adres e-mail:
 Screenshot	ScreenshotWindow		Zrzut ekranu
 HaikuDepot	System name		HaikuDepot
+A reboot is necessary to complete the installation process.	PackageManager		Ponowne uruchomienie jest wymagane aby zakończyć proces instalacji.
+{0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural, one{Mam co najmniej rok} few{Mam ukończone # lata lub więcej} many{Mam ukończone # lat lub więcej} other{Mam ukończone # roku lub więcej}}
+View latest usage conditions…	MainWindow		Zobacz najnowsze warunki korzystania…
+Quit	App		Zakończ
 Search terms:	FilterView		Szukana fraza:
 Pending…	PackageListView		Oczekiwanie…
+The nickname is malformed. The nickname may only contain digits and lower case latin characters. The nickname must be between four and sixteen characters in length.	UserLoginWindow		Pseudonim jest nieprawidłowy. Może zawierać tylko cyfry i małe litery oraz musi mieć od czterech do szesnastu znaków.
 Category:	FilterView		Kategoria:
 Authentication failed	UserLoginWindow		Autoryzacja nie powiodła się
+Captcha error	UserLoginWindow		Błąd CAPTCHA
+The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		Pseudonim musi być unikalny, a ten wprowadzony jest już zajęty. Wybierz inny.
 Manage repositories…	MainWindow		Zarządzaj repozytoriami…
+Fetching remote repository data	LocalRepositoryUpdateProcess		Pobieranie danych zdalnych repozytoriów
+An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	UserLoginWindow		Wystąpił błąd podczas pobierania warunków korzystania niezbędnych do utworzenia nowego użytkownika. Sprawdź dzienniki i spróbuj ponownie.\nInformacje jak przeglądać dzienniki (logi) są dostępne w sekcji HaikuDepot Podręcznika Użytkownika.
 Description	PackageListView		Opis
 Open %DeskbarLink%	PackageManager		Otwórz %DeskbarLink%
+User creation error	UserLoginWindow		Błąd tworzenia użytkownika
 Install	PackageManager		Zainstaluj
 Input validation	UserLoginWindow		Walidacja wejścia
+This application is too old to communicate with the HaikuDepot server system. Obtain a newer version of HaikuDepot by updating your Haiku system. The minimum version of HaikuDepot required is \"%s\".	ServerHelper		Ta aplikacja jest za stara, aby komunikować się z serwerem HaikuDepot. Pobierz nową wersję HaikuDepot aktualizując system. Minimalna wymagana wersja HaikuDepot to „%s”.
+An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		Niespodziewany błąd został otrzymany od serwera HaikuDepot [%i]
 Log in…	MainWindow		Zaloguj się…
 You need to be logged into an account before you can rate packages.	MainWindow		Musisz być zalogowany, aby móc oceniać pakiety.
+Client version too old	ServerHelper		Wersja klienta za stara
+Local repository load error	LocalPkgDataLoadProcess		Błąd podczas ładowania lokalnego repozytorium
+The user does not exist or the wrong password was supplied. Check your credentials and try again.	UserLoginWindow		Użytkownik nie istnieje lub podano błędne hasło. Sprawdź swoje dane logowania i spróbuj ponownie.
 9999.99 KiB	PackageListView		9999.99 KiB
+Repeat password:	UserLoginWindow		Powtórz hasło:
 All repositories	MainWindow		Wszystkie repozytoria

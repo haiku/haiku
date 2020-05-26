@@ -1,4 +1,5 @@
-1	portuguese	x-vnd.Haiku-Installer	3048565029
+1	portuguese	x-vnd.Haiku-Installer	2567467941
+The target volume is not empty. The installer cannot upgrade your system. Please visit the guide on the Haiku website on how to upgrade an existing installation to R1 beta 2.	InstallProgress		O volume de destino não se encontra vazio. O instalador não consegue atualizar o seu sistema. Por favor, visite no website do Haiku o guia sobre como atualizar uma instalação existente para a R1 beta 2.
 Performing installation.	InstallProgress		A executar a instalação.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Escolha o disco de origem usando o menu de pop-up. Depois clique em \"Iniciar\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Feche a janela do Gestor de Discos antes de fechar a janela do Instalador.

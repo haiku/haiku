@@ -1,0 +1,50 @@
+1	polish	x-vnd.Haiku-Input	3910661481
+Scrolling	TouchpadPrefView		Przewijanie
+Defaults	InputMouse		Przywróć domyślne
+Tapping	TouchpadPrefView		Stukanie
+Long	KeyboardView		Długie
+Normal	SettingsView		Normalny
+Cancel	TouchpadPrefView		Anuluj
+4-Button	SettingsView		4-przyciskowa
+Slow	TouchpadPrefView		Wolny
+Warp	SettingsView		Teleportacja
+Instant warp	SettingsView		Natychmiastowa teleportacja
+Device List	InputWindow		Lista urządzeń
+Double-click speed	SettingsView		Szybkość dwukliku
+5-Button	SettingsView		5-przyciskowa
+Typing test area	KeyboardView		Strefa testowania
+Mouse type:	SettingsView		Typ myszy:
+Revert	InputKeyboard		Przywróć
+Fast	KeyboardView		Duża
+Off	TouchpadPrefView		Wyłączony
+Fast	TouchpadPrefView		Szybki
+Please confirm	TouchpadPrefView		Potwierdź
+Click to focus	SettingsView		Kliknij aby aktywować
+Acceleration	TouchpadPrefView		Przyspieszenie
+Mouse speed	SettingsView		Szybkość myszy
+Accept first click	SettingsView		Akceptuj pierwsze kliknięcie
+OK	TouchpadPrefView		OK
+Horizontal scrolling	TouchpadPrefView		Przesuwanie poziome
+Delay until key repeat	KeyboardView		Opóźnienie przed powtórzeniem
+Two finger scrolling	TouchpadPrefView		Przewijanie dwoma palcami
+Input	System name		Urządzenia wejściowe
+Mouse acceleration	SettingsView		Przyspieszenie myszy
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Nowy obszar przesuwania jest bardzo duży i może przeszkadzać w normalnym używaniu wskaźnika myszy. Na pewno chcesz go ustawić?
+High	TouchpadPrefView		Wysoki
+Defaults	TouchpadPrefView		Przywróć domyślne
+1-Button	SettingsView		1-przyciskowa
+Defaults	InputKeyboard		Przywróć domyślne
+Short	KeyboardView		Krótkie
+Slow	KeyboardView		Mała
+Revert	InputMouse		Cofnij
+Key repeat rate	KeyboardView		Częstotliwość powtarzania klawiszy
+2-Button	SettingsView		2-przyciskowa
+Click to focus and raise	SettingsView		Kliknij aby aktywować i wynieść na wierzch
+Vertical	TouchpadPrefView		Poziomy
+Horizontal	TouchpadPrefView		Pionowy
+Focus mode:	SettingsView		Tryb aktywacji:
+Focus follows mouse	SettingsView		Aktywacja podąża za wskaźnikiem
+Double-click test area	SettingsView		Obszar testowania dwukliku
+Sensitivity	TouchpadPrefView		Czułość
+3-Button	SettingsView		3-przyciskowa
+Revert	TouchpadPrefView		Cofnij

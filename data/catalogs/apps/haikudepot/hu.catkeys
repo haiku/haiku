@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	3137470008
+1	hungarian	x-vnd.Haiku-HaikuDepot	863038612
 Repository update error	LocalRepositoryUpdateProcess		Tároló frissítési hiba
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Hiba történt a tároló frissítésekor: %error%
 User Created	UserLoginWindow		Felhasználó létrehozva
@@ -49,6 +49,7 @@ Package action failed	PackageInfoView		A csomag telepítése sikertelen
 No changelog available.	PackageInfoView		Nincs módosítás-előzmény
 Error	App		Hiba
 There was a puzzling response from the web service.	UserLoginWindow		A webes szolgáltatás rejtélyes választ adott.
+Version	PackageListView		Verzió
 Not logged in	MainWindow		Nincs bejelentkezve
 No, quit HaikuDepot	App		Nem, a Raktár bezárása.
 Featured packages	FeaturedPackagesView		Kiemelt csomagok

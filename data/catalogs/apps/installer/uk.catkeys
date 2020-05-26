@@ -1,14 +1,15 @@
-1	ukrainian	x-vnd.Haiku-Installer	3048565029
+1	ukrainian	x-vnd.Haiku-Installer	2567467941
+The target volume is not empty. The installer cannot upgrade your system. Please visit the guide on the Haiku website on how to upgrade an existing installation to R1 beta 2.	InstallProgress		Цільовий том не порожній. Програма Installer не може обновити Вашу систему. Будь ласка, отримайте на веб-сайті Haiku інформацію про те, як обновити існуючу систему до R1 beta 2.
 Performing installation.	InstallProgress		Виконання інсталяції.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Виберіть джерело з випадаючого меню. Потім натисніть кнопку \"Почати\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Закрийте вікно DriveSetup перед тим як закрити вікно Installer.
 No optional packages available.	PackagesView		Опціональні пакети недоступні.
-Restart system	InstallerWindow		Перезагрузити систему
+Restart system	InstallerWindow		Перезапустити систему
 The mount point could not be retrieved.	InstallProgress		Неможливо визначити точку підключення
 <none>	InstallerWindow	No partition available	<пусто>
 Please choose target	InstallerWindow		Виберіть розділ
 Cancel	InstallProgress		Скасувати
-Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Інсталяція завершена. Завантажувальний сектор записано до '%s'. Натисніть 'Перезагрузити' для рестарту або виберіть новий  цільовий том для іншої інсталяції.
+Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Інсталяція завершена. Завантажувальний сектор записано до '%s'. Натисніть 'Перезапуск' для рестарту або виберіть новий цільовий том для іншої інсталяції.
 Are you sure you want to to stop the installation?	InstallerWindow		Ви впевнені, що бажаєте зупинити інсталяцію?
 Installer	System name		Installer
 Unknown Type	InstallProgress	Partition content type	Невідомий тип
@@ -50,7 +51,7 @@ Additional disk space required: %s	InstallerWindow		Є потреба в дод�
 Stop	InstallerWindow	In alert after pressing Stop	Зупинити
 Boot sector successfully written.	InstallProgress		Завантажувальний сектор успішно записаний.
 An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Сталася помилка і інсталяція неповна:\n\nПомилка: %s
-Restart	InstallerWindow		Перезагрузити
+Restart	InstallerWindow		Перезапуск
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Диск неможливо підключити. Виберіть інший.
 Begin	InstallerWindow		Почати
 Collecting copy information.	InstallProgress		Збір інформації для копіювання.
@@ -84,4 +85,4 @@ scanning…	InstallerWindow		сканування…
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Userguide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2)   Installer власне зробить розділ Haiku завантажувальним, але не зробить жодного кроку щоб додати Haiku до існуючого меню загрузки. Якщо Ви маєте встановлений GRUB, то можете додати Haiku в його меню.\nЗа деталями зверніться до настанови з завантаження Haiku на нашому вебсайті - https://www.haiku-os.org/guides/booting.\nАбо налаштуйте це меню за допомогою меню \"Інструменти\" Installer, дивитись у розділі про програму \"BootManager\".\n\n\n
 Set up boot menu	InstallerWindow		Встановити меню загрузки
 Continue	InstallerApp		Продовжити
-Are you sure you want to abort the installation and restart the system?	InstallerWindow		Ви впевнені що бажаєте зупинити інсталяцію і перезавантажити систему?
+Are you sure you want to abort the installation and restart the system?	InstallerWindow		Ви впевнені що бажаєте зупинити інсталяцію і перезапустити систему?

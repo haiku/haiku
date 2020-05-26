@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-BluetoothPrefs	3830007214
+1	esperanto	x-vnd.Haiku-BluetoothPrefs	4276705900
 Laptop	Settings view		Tekkomputilo
 Only from trusted devices	Settings view		Nur el fidaj aparatoj
 15 secs	Settings view		15 sekondoj
@@ -35,8 +35,10 @@ Always ask	Settings view		Ĉiam demandi
 With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped…\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		Per asisto de:\n- Mika Lindqvist\n- Adrien Destugues\n- Maksym Yevmenkin\n\nDankon al ĉiuj, kiuj helpis…\n\nSendado/Donacado de aparatarojn:\n- Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n- Edwin Erik Amsler\n- Dennis d'Entremont\n- Luroh\n- Pieter Panman\n\nEkonomike:\n- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n- Matt M, Doug F, Hubert H,\n- Sebastian B, Andrew M, Jared E,\n- Frederik H, Tom S, Ferry B,\n- Greg G, David F, Richard S, Martin W:\n\nPor flikaĵoj:\n- Michael Weirauch\n- Fredrik Ekdahl\n- Raynald Lesieur\n- Andreas Färber\n- Joerg Meyer\nProvi:\n- Petter H. Juliussen\nKiu la tutan scion donis al mi:\n- la yellowTAB teamo
 Help	Window		Helpo
 Pair…	Remote devices		Parigi…
+Retrieving name of %1	Inquiry panel		Ricevas nomon de %1
 Inquiry	Inquiry panel		Informmendo
 Incoming connections policy:	Settings view		Reĝimo de enigantaj koneskadoj:
+Retrieving names…	Inquiry panel		Ricevas nomojn…
 Show name	Extended local device view		Montri la nomon
 Add device to list	Inquiry panel		Aldoni la aparaton al liston
 Remaining %1 seconds	Inquiry panel		%1 restantaj sekundoj

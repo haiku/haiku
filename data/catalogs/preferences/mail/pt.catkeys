@@ -40,7 +40,7 @@ Add filter	Config Views		Adicionar filtro
 Account settings	Config Views		Definições de conta
 minutes	Config Window		minutos
 E-mail	System name		Correio Eletrónico
-Check every	Config Window		Verificar todas
+Check every	Config Window		Verificar a cada
 Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Crie uma nova conta com o botão Adicionar.\n\nRemova uma conta com o botão Remover no item selecionado.\n\nSelecione um item na lista para alterar as suas definições.
 Account name:	E-Mail		Nome da conta:
 Edit mailbox menu…	Config Window		Editar menu da caixa de correio…

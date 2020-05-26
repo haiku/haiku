@@ -337,7 +337,7 @@ Copy to	ContainerWindow		Kopii al
 Name	SelectionWindow		Nomo
 by attribute	FindPanel		per atributo
 Write	FilePermissionsView		Skribi
-<%ld bytes of data>	AttributesView		<%Id bitoj da datumaĵojj>
+<%ld bytes of data>	AttributesView		<%ld bitokoj da datumo>
 If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Se vi redaktas la sisteman dosierujon aŭ siajn enhavojn, ne kapablos praŝarĝi %osName!\n\nĈu vi certas, ke vi deziras fari ĉi tion?\n\nPor aliigi la sisteman dosierujon aŭ siajn enhavojn malgraŭe, premu la majuskligan klavon kaj alklaku \"Mi scias kion mi faras\".
 Save	FilePanelPriv		Konservi
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Neeblas malfermi \"%document\" per programo \"%app\" (Mankaj librejoj: %library). \n

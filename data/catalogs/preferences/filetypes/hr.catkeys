@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-FileTypes	255185840
+1	croatian	x-vnd.Haiku-FileTypes	1388182819
 Left	Attribute Window	Attribute column alignment in Tracker	Lijevo
 Final	Application Types Window		Završno
 This file type already exists	New File Type Window		Vrsta datoteke već postoji
@@ -68,6 +68,7 @@ Could not open \"%s\":\n%s	FileTypes		Ne mogu otvoriti \"%s\":\n%s
 Right	Attribute Window	Attribute column alignment in Tracker	Desno
 Save changes before closing?	Application Type Window		Spremiti promjene prije zatvaranja?
 Background app	Application Type Window		Pozadinski program
+Recognition rule is not valid:\n\n	FileTypes Window		Pravilo prepoznavanja nije ispravno:\n\n
 Show icons in list	FileTypes Window		Pokaži ikone u listi
 Application type	Application Type Window		Vrsta programa
 Show in Tracker…	Application Types Window		Pokaži u Trackeru…
@@ -136,5 +137,7 @@ Quit	FileTypes Window		Završi
 File type	FileType Window		Vrsta datoteke
 Add…	FileTypes Window		Dodaj...
 Edit icon…	Icon View		Uredi ikonu...
+Show recognition rule	FileTypes Window		Pokaži pravilo prepoznavanja
+Double	Attribute ListView		Dvostruko
 Move down	FileTypes Window		Pomakni dolje
 Alpha	Application Type Window		Alfa

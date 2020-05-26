@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.haiku-icon_o_matic	3554185674
+1	catalan; valencian	x-vnd.haiku-icon_o_matic	2424331018
 None	Icon-O-Matic-Properties		Cap
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Gira els índexs dels camins
 Add empty	Icon-O-Matic-ShapesList		Afegeix-n'hi una de buida
@@ -148,7 +148,6 @@ Caps	Icon-O-Matic-PropertyNames		Maj.
 OK	Icon-O-Matic-SVGImport		D'acord
 Append…	Icon-O-Matic-Menu-File		Afegeix..
 Scale Y	Icon-O-Matic-PropertyNames		Escala Y
-Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Ha fallat obrir el fitxer %s com a document SVG.\n\nError: %s
 Export icon	Dialog title		Exporta la icona
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Color (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Edita el degradat

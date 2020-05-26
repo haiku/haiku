@@ -1,8 +1,8 @@
 1	esperanto	x-vnd.Haiku-HVIFTranslator	249304797
-Haiku vector icon translator	HVIFTranslator		Haiku vektora bildetotradukilo
-HVIF icons	HVIFTranslator		HVIF bildetoj
+Haiku vector icon translator	HVIFTranslator		Formatpelilo por vektoraj piktogramoj de Haiku
+HVIF icons	HVIFTranslator		HVIF piktogramoj
 Render size:	HVIFView		Desegnogrando:
 HVIFTranslator Settings	HVIFTranslator		HVIFTranslator Agordoj
-Haiku vector icon translator	HVIFView		Haiku vektora bildetotradukilo
+Haiku vector icon translator	HVIFView		Formatpelilo por vektoraj piktogramoj de Haiku 
 HVIF Settings	HVIFMain		HVIF Agordoj
 Version %d.%d.%d, %s	HVIFView		Versio %d.%d.%d, %s

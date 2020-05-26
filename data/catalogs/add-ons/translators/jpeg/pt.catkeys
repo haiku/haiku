@@ -1,5 +1,6 @@
-1	portuguese	x-vnd.Haiku-JPEGTranslator	1552481358
+1	portuguese	x-vnd.Haiku-JPEGTranslator	2943162387
 Read	JPEGTranslator		Leitura
+Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Formato de Mapa de Bits Be (Tradutor JPEG)
 Show warning messages	JPEGTranslator		Mostrar mensagens de aviso
 Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Usar código CMYK com 0 para 100% de cobertura de tinta
 JPEG Library Error: %s\n	be_jerror		Erro da Biblioteca JPEG: %s\n

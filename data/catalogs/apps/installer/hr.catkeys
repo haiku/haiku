@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-Installer	2019838909
+1	croatian	x-vnd.Haiku-Installer	1314647269
 Performing installation.	InstallProgress		Vršim instalaciju.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Izaberite disk izvora iz poo-up izbornika. Zatim kliknite \"Počni\".
 Restart system	InstallerWindow		Ponovo pokreni sustav
@@ -20,6 +20,7 @@ Finishing installation.	InstallProgress		Završavam instalaciju.
 Install from:	InstallerWindow		Instaliraj sa:
 Additional disk space required: 0.0 KiB	InstallerWindow		Potreban dodatni prostor na disku: 0.0 KiB
 This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Ovo je software beta kvalitete!! Znači da postoji rizik gubljenja važnih podataka. Učestalo radite sigurnosne kopije! Upozoreni ste.\n\n\n
+3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Kada po prvi put uspješno podignete Haiku sustav, pročitajte dokumentaciju \"Dobrodošli\" i \"Korisnički vodič\". Postoje poveznice na radno površini i u WebPositive zabilješkama.\n\n
 ???	InstallerWindow	Unknown currently copied item	???
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Izaberite izvor i odredišni disk iz pop-up izbornika. Zatim kliknite \"Počni\".
 Hide optional packages	InstallerWindow		Sakrij neobavezne pakete.

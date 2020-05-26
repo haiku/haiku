@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-WebPositive	3023765509
+1	polish	x-vnd.Haiku-WebPositive	1879106286
 Authentication required	Authentication Panel		Wymagane uwierzytelnienie
 Previous	WebPositive Window		Poprzedni
 (Finish: %date)	Download Window		(Koniec: %date)
@@ -144,6 +144,7 @@ Settings	WebPositive Window		Ustawienia
 Clear	URL Bar		Wyczyść
 Loading %url	WebPositive Window		Ładowanie %url
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Pchnąć w tę łódź jeża lub ośm skrzyń fig.
+Start up:	Settings Window		Po uruchomieniu:
 Confirmation	WebPositive Window		Potwierdzenie
 Session cookie	Cookie Manager		Ciasteczko sesji
 Open all	WebPositive Window		Otwórz wszystko

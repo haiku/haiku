@@ -1,7 +1,8 @@
-1	esperanto	x-vnd.Haiku-DataTranslations	1805129441
+1	esperanto	x-vnd.Haiku-DataTranslations	3408350951
 Path:	DataTranslations		Vojo:
 Name:	DataTranslations		Nomo:
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		La ero '%name' ne ŝajnas esti Tradukanto kaj ĝi ne estos instalata.
+Could not install %s:\n%s	DataTranslations		Ne povis instali %s:\n%s
 OK	DataTranslations		Bone
 Cancel	DataTranslations		Nuligi
 Info:	DataTranslations		Informo:

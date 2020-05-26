@@ -13,7 +13,7 @@ Show window border	LaunchBox		Montri fenestran borderon
 Failed to launch 'something', error in Pad data.	LaunchBox		Malsukcesis lanĉi 'something', estas eraro en panelaj datumoj.
 LaunchBox	System name		Lanĉujo
 Auto-raise	LaunchBox		Aŭtomate suprenigi
-Icon size	LaunchBox		Grando de bildsimboloj
+Icon size	LaunchBox		Piktograma grando
 Open containing folder	LaunchBox		Malfermi la enhavatan dosierujon
 Add button here	LaunchBox		Aldoni butonon ĉi tie
 Cancel	LaunchBox		Nuligi
@@ -21,7 +21,7 @@ launch popup	LaunchBox		Lanĉi ŝprucfenestron
 Clear button	LaunchBox		Malplenigi butonon
 Bummer	LaunchBox		Aj
 last chance	LaunchBox		lasta ŝanco
-You can drag an icon here.	LaunchBox		Vi povas treni bildsimbolon ĉi tie.
+You can drag an icon here.	LaunchBox		Vi povas tiri piktigramon ĉi tien.
 Pad 1	LaunchBox		Panelo 1
 Failed to launch '%1'.\n\nError:	LaunchBox		Malsukcesis lanĉi '%1'.\n\nEraro:
 Settings	LaunchBox		Agordoj

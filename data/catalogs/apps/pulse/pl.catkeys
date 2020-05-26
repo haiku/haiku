@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Pulse	2964417303
+1	polish	x-vnd.Haiku-Pulse	559379362
 Normal mode	DeskbarPulseView		Tryb normalny
 Info	CPUButton		Informacje
 Quit	DeskbarPulseView		Zakończ
@@ -16,6 +16,7 @@ Fade colors	ConfigView		Cieniowanie kolorów
 About Pulse…	PulseView		O Pulse…
 Pulse	NormalPulseView		Pulse
 Deskbar mode	NormalPulseView		Tryb Deskbar
+Pulse settings	PulseApp		Ustawienia Pulse
 Remove replicant	CPUButton		Usuń replikant
 You can't disable the last active CPU.	PulseView		Nie możesz wyłączyć ostatniego aktywnego procesora.
 Width of icon:	ConfigView		Szerokość ikony:
@@ -37,6 +38,7 @@ Deskbar menu	CPUButton		Menu Deskbara
 Mini mode	NormalPulseView		Tryb mini
 Quit	MiniPulseView		Wyjdź
 Info	PulseView		Informacje
+Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]	PulseApp		Użycie: Pulse [--mini] [-w szerokość] [--width=szerokość]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]
 OK	DeskbarPulseView		OK
 Info	PulseApp		Informacje
 Pulse	System name		Pulse

@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.haiku-icon_o_matic	1929083132
+1	lithuanian	x-vnd.haiku-icon_o_matic	799228476
 None	Icon-O-Matic-Properties		Nieko
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Perkelti kreivės galus
 Add empty	Icon-O-Matic-ShapesList		Pridėti tuščią
@@ -146,7 +146,6 @@ Caps	Icon-O-Matic-PropertyNames		Galai
 OK	Icon-O-Matic-SVGImport		Gerai
 Append…	Icon-O-Matic-Menu-File		Pridėti…
 Scale Y	Icon-O-Matic-PropertyNames		Ištempti Y ašyje
-Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Nepavyko atverti failo „%s“ kaip SVG dokumento.\n\nKlaida: %s
 Export icon	Dialog title		Eksportuoti piktogramą
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Spalva (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Keisti gradientą

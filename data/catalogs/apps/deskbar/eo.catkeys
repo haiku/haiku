@@ -41,10 +41,10 @@ About this system	DeskbarMenu		Pri ĉi tiu sistemo
 Show calendar…	TimeView		Vidigi la kalendaron…
 Deskbar preferences…	DeskbarMenu		Laborstriaj agordoj…
 Expand new applications	PreferencesWindow		Elvolvi novajn programojn
-Show replicants	DeskbarMenu		Montri replikojn
+Show replicants	DeskbarMenu		Montri replikilojn
 Hide application names	PreferencesWindow		Kaŝi nomojn de programoj
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demonstrataĵoj
-Icon size	PreferencesWindow		Bildsimbola grandeco
+Icon size	PreferencesWindow		Piktograma grando
 Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Labortablaj aplikaĵetoj
 Hide all	WindowMenu		Malvidigi ĉiujn
 Quit application	WindowMenu		Ĉesi la programon

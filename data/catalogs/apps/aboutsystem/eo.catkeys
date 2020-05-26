@@ -1,8 +1,9 @@
-1	esperanto	x-vnd.Haiku-About	1839294148
+1	esperanto	x-vnd.Haiku-About	511528774
 Revision	AboutView		Revizio
 The Haikuware team and their bounty program\n	AboutView		La Haikuware grupo kaj ilia premia programo\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Kopirajto © 1999-2007 Michael C. Ring. Ĉiuj rajtoj estas rezervitaj.
 %.2f GHz	AboutView		%.2f GHz
+Copyright © 2001-%d The Haiku project. 	AboutView		Kopirajto © 2001-%d La Haiku projekto. 
 \n\nSpecial thanks to:\n	AboutView		\n\nDankegon al:\n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (kaj lia NewOS kerno)\n
 Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Kopirajto © 1999-2000 Y.Takagi. Ĉiuj rajtoj estas rezervitaj.

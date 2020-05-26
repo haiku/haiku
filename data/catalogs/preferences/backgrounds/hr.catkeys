@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-Backgrounds	2829029598
+1	croatian	x-vnd.Haiku-Backgrounds	3755707080
 Backgrounds	System name		Pozadine
 X:	Main View		X:
 Setting the background image failed:	Main View		Neuspjelo postavljanje pozadinske slike:
@@ -18,7 +18,9 @@ Current workspace	Main View		Trenutni radni prostor
 Apply	Main View		Primjeni
 Other folder…	Main View		Druga mapa...
 Y:	Main View		Y:
+Tile	Main View		Popločano
 Select	Main View		Odaberi
+Scale to fit	Main View		Povećaj da pristaje
 OK	Main View		U redu
 Placement:	Main View		Smještaj:
 Preview	Main View		Pregled

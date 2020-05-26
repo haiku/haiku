@@ -1,4 +1,5 @@
-1	catalan; valencian	x-vnd.Haiku-Installer	3048565029
+1	catalan; valencian	x-vnd.Haiku-Installer	2567467941
+The target volume is not empty. The installer cannot upgrade your system. Please visit the guide on the Haiku website on how to upgrade an existing installation to R1 beta 2.	InstallProgress		El volum de destinació no és buit. L'instal·lador no pot actualitzar el sistema. Si us plau, consulteu la guia del lloc web del Haiku per saber com actualitzar una instal·lació existent a la versió R1 beta 2.
 Performing installation.	InstallProgress		Es fa la instal·lació.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Trieu el disc d'origen des del menú emergent. Llavors cliqueu a Comença.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Si us plau, tanqueu la finestra del Gestor de discs abans de tancar la finestra de l'instal·lador.

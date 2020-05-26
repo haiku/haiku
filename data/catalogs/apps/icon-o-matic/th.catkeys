@@ -1,4 +1,4 @@
-1	thai	x-vnd.haiku-icon_o_matic	3554185674
+1	thai	x-vnd.haiku-icon_o_matic	2424331018
 None	Icon-O-Matic-Properties		ไม่มี
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Rotate Path Índices
 Add empty	Icon-O-Matic-ShapesList		การเพิ่มว่างเปล่า
@@ -148,7 +148,6 @@ Caps	Icon-O-Matic-PropertyNames		ตัวพิมพ์ใหญ่
 OK	Icon-O-Matic-SVGImport		ตกลง
 Append…	Icon-O-Matic-Menu-File		ผนวก
 Scale Y	Icon-O-Matic-PropertyNames		สเกล Y
-Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		ไม่สามารถเปิดไฟล์ '%s' เป็นเอกสาร SVG ได้ \n\nข้อผิดพลาด: %s
 Export icon	Dialog title		ส่งออกไอคอน
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		สี (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		แก้ไขการไล่ระดับสี

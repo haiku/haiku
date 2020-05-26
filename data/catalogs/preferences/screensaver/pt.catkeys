@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-ScreenSaver	1784026575
+1	portuguese	x-vnd.Haiku-ScreenSaver	557704281
 Could not load screen saver	ScreenSaver		Não foi possível carregar a proteção de ecrã
 30 seconds	ScreenSaver		30 segundos
 Start screensaver	ScreenSaver		Iniciar proteção de ecrã
@@ -20,6 +20,7 @@ Password Window	ScreenSaver		Janela de Palavra-passe
 Screensaver settings	ScreenSaver		Definições da proteção de ecrã
 Passwords don't match. Please try again.	ScreenSaver		As palavras-passe não coincidem. Por favor tente de novo.
 OK	ScreenSaver		OK
+Blackness	ScreenSaver		Escuridão
 Use custom password	ScreenSaver		Usar palavra-passe personalizada
 Done	ScreenSaver		Concluído
 Confirm password:	ScreenSaver		Confirme a palavra-passe:

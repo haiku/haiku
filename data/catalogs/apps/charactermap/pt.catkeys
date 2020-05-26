@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-CharacterMap	28953206
+1	portuguese	x-vnd.Haiku-CharacterMap	394526778
 Enclosed alphanumerics	UnicodeBlocks		Caracteres delimitados
 Basic Latin	UnicodeBlocks		Latim Básico
 Cyrillic extended C	UnicodeBlocks		Cirílico Expandido C
@@ -99,6 +99,7 @@ Sinhala	UnicodeBlocks		Cingalês
 Ancient Greek musical notation	UnicodeBlocks		Notação musical grega antiga
 Early Dynastic Cuneiform	UnicodeBlocks		Cuneiforme do Dinástico Precoce
 Geometric shapes	UnicodeBlocks		Formas geométricas
+Letterlike symbols	UnicodeBlocks		Símbolos semelhantes a letras
 Hangul Jamo	UnicodeBlocks		Hangul Jamo
 Tamil	UnicodeBlocks		Tâmil
 Currency symbols	UnicodeBlocks		Símbolos de moeda
@@ -140,15 +141,54 @@ Ancient symbols	UnicodeBlocks		Símbolos antigos
 Newa	UnicodeBlocks		Newa
 Adlam	UnicodeBlocks		Adlam
 Braille patterns	UnicodeBlocks		Padrões de Braille
+New Tai Lue	UnicodeBlocks		Novo Tai Lue
 Runic	UnicodeBlocks		Rúnico
 Miscellaneous mathematical symbols B	UnicodeBlocks		Símbolos matemáticos diversos B
 Cuneiform numbers and punctuation	UnicodeBlocks		Números e pontuação cuneiforme
 Private use area	UnicodeBlocks		Área de uso privado
 CJK unified ideographs extension B	UnicodeBlocks		Extensão de ideogramas CJK unificados B
+Phags-pa	UnicodeBlocks		Phags-pa
+Kangxi radicals	UnicodeBlocks		Radicais Kangxi
 Dingbats	UnicodeBlocks		Dingbats
+Tai Xuan Jing symbols	UnicodeBlocks		Símbolos Tai Xuan Jing
+Yi syllables	UnicodeBlocks		Sílabas Yi
+Buhid	UnicodeBlocks		Buhid
+Telugu	UnicodeBlocks		Telugo
+Thai	UnicodeBlocks		Tailandês
+Osage	UnicodeBlocks		Osage
+Deseret	UnicodeBlocks		Deseret
+Tifinagh	UnicodeBlocks		Tifinague
+Gurmukhi	UnicodeBlocks		Gurmukhi
 CharacterMap	System name		Mapa de Caracteres
+Lao	UnicodeBlocks		Lao
+Gothic	UnicodeBlocks		Gótico
+Limbu	UnicodeBlocks		Limbu
+Rejang	UnicodeBlocks		Rejang
+Show private blocks	CharacterWindow		Mostrar blocos privados
+Phoenician	UnicodeBlocks		Fenício
+Mongolian	UnicodeBlocks		Mongol
+Supplemental arrows A	UnicodeBlocks		Setas suplementares A
 Miscellaneous symbols and arrows	UnicodeBlocks		Setas e símbolos diversos
+Yijing hexagram symbols	UnicodeBlocks		Símbolos de hexagrama de Yijing
 Supplemental mathematical operators	UnicodeBlocks		Operadores matemáticos suplementares
+Kayah Li	UnicodeBlocks		Kayah Li
+Alphabetic presentation forms	UnicodeBlocks		Formas de apresentação alfabética
+Halfwidth and fullwidth forms	UnicodeBlocks		Formas de largura completa e meia largura
+Ethiopic supplement	UnicodeBlocks		Suplemento etíope
+Glagolitic supplement	UnicodeBlocks		Suplemento glagolítico
+Latin extended B	UnicodeBlocks		Latim expandido B
+Box drawing	UnicodeBlocks		Desenho de caixa
 Mathematical alphanumeric symbols	UnicodeBlocks		Símbolos matemáticos alfanuméricos
 Copy character	CharacterView		Copiar caráter
+Greek and Coptic	UnicodeBlocks		Grego e copta
+Carian	UnicodeBlocks		Cário
+Georgian	UnicodeBlocks		Georgiano
+Shavian	UnicodeBlocks		Shavian
+CJK compatibility	UnicodeBlocks		Compatibilidade CJK
+Malayalam	UnicodeBlocks		Malaiala
+N'Ko	UnicodeBlocks		N'Ko
+Kannada	UnicodeBlocks		Canarim
+Phonetic extensions supplement	UnicodeBlocks		Suplemento de extensões fonéticas
 Domino tiles	UnicodeBlocks		Peças de dominó
+Bhaiksuki	UnicodeBlocks		Bhaiksuki
+Katakana phonetic extensions	UnicodeBlocks		Extensões fonéticas Katakana

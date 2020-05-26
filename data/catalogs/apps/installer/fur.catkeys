@@ -1,4 +1,5 @@
-1	friulian	x-vnd.Haiku-Installer	3048565029
+1	friulian	x-vnd.Haiku-Installer	2567467941
+The target volume is not empty. The installer cannot upgrade your system. Please visit the guide on the Haiku website on how to upgrade an existing installation to R1 beta 2.	InstallProgress		Il volum di destinazion nol è vueit. L'instaladôr nol pues inzornâ il sisteme. Par plasê visite la vuide sul sît web di Haiku su ce mût inzornâ une instalazion esistente a R1 beta 2.
 Performing installation.	InstallProgress		Esecuzion de instalazion.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Sielç il disc sorzint dal menù a tende. Daspò fâs clic su \"Scomence\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Par plasê siere il barcon di Gjestion disc prime di sierâ chel dal Instaladôr.
@@ -20,7 +21,7 @@ Quit	InstallerWindow		Jes
 Write boot sector to '%s'	InstallerWindow		Scriture setôr di inviament su '%s'
 Boot sector not written because of an internal error.	InstallProgress		Setôr di inviament no scrit par vie di un erôr interni.
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Impussibil inviâ Gjestion disc, la aplicazion par configurâ lis partizions dai discs.
-Welcome to the Haiku Installer!\n\n	InstallerApp		Benvignût tal program di instalazion di Haiku!\n\n
+Welcome to the Haiku Installer!\n\n	InstallerApp		Benvignûts tal program di instalazion di Haiku!\n\n
 ?? of ??	InstallerWindow	Unknown progress	?? di ??
 Quit Boot Manager	InstallerWindow		Jes dal Gjestôr di inviament
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Esecuzion dal Gjestôr di inviament…\n\nSiere il Gjestôr di inviament par continuâ cu la instalazion.

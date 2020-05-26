@@ -111,7 +111,7 @@ Your rating was updated.	RatePackageWindow		Die Bewertung wurde aktualisiert.
 All categories	FilterView		Alle Kategorien
 Repositories	MainWindow		Paketquellen
 n/a	PackageInfoView		n.v.
-This rating is visible to other users	RatePackageWindow		Diese Bewertung is für andere Nutzer sichtbar.
+This rating is visible to other users	RatePackageWindow		Diese Bewertung is für andere Nutzer sichtbar
 View agreed usage conditions…	MainWindow		Zugestimmte Nutzungsbedingungen lesen…
 Cancel	MainWindow		Abbrechen
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 weiterer Download)}other{(# weitere Downloads)}}

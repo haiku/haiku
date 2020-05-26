@@ -1,6 +1,7 @@
-1	esperanto	x-vnd.Haiku-Pulse	3671435928
+1	esperanto	x-vnd.Haiku-Pulse	995483759
 Quit	DeskbarPulseView		Ĉesi
 Deskbar mode	NormalPulseView		Laborstria reĝimo
+Remove replicant	CPUButton		Forigi replikilon
 Deskbar mode	MiniPulseView		Laborstria reĝimo
 OK	PulseView		Bone
 OK	PrefsWindow		Bone

@@ -1,11 +1,16 @@
-1	polish	x-vnd.Haiku-MediaConverter	3142509574
+1	polish	x-vnd.Haiku-MediaConverter	2251404027
+Writing audio track: %d%% complete	MediaConverter		Zapisywanie ścieżki audio: ukończono %d%%
+Input file not recognized as Audio or Video	MediaConverter		Plik wejściowy nierozpoznany jako audio lub wideo
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Video quality: %3d%%	MediaConverter		Jakość wideo: %3d%%
 Source files	MediaConverter		Pliki źródłowe
+Error writing video frame %ld	MediaConverter		Błąd podczas zapisu %ld ramki wideo
 Error converting '%filename'	MediaConverter		Błąd konwersji „%filename”
+Selected directory not found. Defaulting to /boot/home	MediaConverter		Wybrany katalog nie znaleziony. Używanie domyślnego /boot/home
 Conversion completed	MediaConverter		Konwersja ukończona
 Audio:	MediaConverter-FileInfo		Dźwięk:
 MediaConverter+:SaveDirectory	MediaConverter		MediaConverter+:SaveDirectory
+Error creating video.	MediaConverter		Błąd podczas tworzenia wideo.
 Cancelling	MediaConverter		Anulowanie
 None available	Audio codecs		Brak
 No file selected	MediaConverter-FileInfo		Nie wybrano pliku
@@ -26,6 +31,7 @@ Audio quality: %3d%%	MediaConverter		Jakość dźwięku: %3d%%
 Cancelling…	MediaConverter		Anulowanie…
 Output file '%filename' created	MediaConverter		Utworzono plik wynikowy „%filename”
 Output folder	MediaConverter		Katalog wynikowy
+Error creating track.	MediaConverter		Błąd podczas tworzenia ścieżki.
  seconds	MediaFileInfo		sekundy
 Video using parameters form settings	MediaConverter		Wideo używa parametrów z ustawień
 Video:	MediaConverter-FileInfo		Wideo:
@@ -37,6 +43,7 @@ Error loading files	MediaConverter		Błąd wczytywania plików
 End   [ms]: 	MediaConverter		Koniec   [ms]: 
 Cancel	MediaConverter		Anuluj
 OK	MediaConverter-FileInfo		OK
+Error read audio frame %ld	MediaConverter		Błąd podczas odczytu %ld ścieżki audio
 Video encoding:	MediaConverter		Kodowanie wideo:
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Wystąpił błąd podczas odczytu informacji o pliku.\n\nBłąd: 
 Error	MediaConverter		Błąd
@@ -50,14 +57,18 @@ Duration:	MediaConverter-FileInfo		Długość:
 MediaConverter	System name		MediaConverter
 Error launching: %strError%	MediaConverter		Błąd uruchamiania: %strError%
 File format:	MediaConverter		Format pliku:
+Error writing audio frame %ld	MediaConverter		Błąd podczas zapisu %ld ścieżki audio
 File	Menu		Plik
 Video quality not supported	MediaConverter		Jakość wideo nieobsługiwana
 Select this folder	MediaConverter		Wybierz ten katalog
+Error read video frame %ld	MediaConverter		Błąd podczas odczytu %ld ramki wideo
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld-kanałowy
 %d bit 	MediaFileInfo		%d bit
 No video	Video codecs list		Brak wideo
 Continue	MediaConverter		Kontynuuj
 Convert	MediaConverter		Konwertuj
 Audio quality not supported	MediaConverter		Jakość dźwięku nieobsługiwana
+Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Błąd podczas zapisu do ścieżki: %strPath%. Używanie domyślnej: /boot/home
+Writing video track: %d%% complete	MediaConverter		Zapisywanie ścieżki wideo: ukończono %d%%
 Preview	MediaConverter		Podgląd
 Start [ms]: 	MediaConverter		Początek [ms]:

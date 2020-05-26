@@ -1,4 +1,5 @@
-1	swedish	x-vnd.Haiku-Installer	3048565029
+1	swedish	x-vnd.Haiku-Installer	2567467941
+The target volume is not empty. The installer cannot upgrade your system. Please visit the guide on the Haiku website on how to upgrade an existing installation to R1 beta 2.	InstallProgress		Målvolymen är inte tom. Installationsprogrammet kan inte uppgradera ditt system. Besök guiden på Haiku webbplats om hur du uppgraderar en befintlig installation till R1 beta 2.
 Performing installation.	InstallProgress		Verkställer installationen.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Välj källdisk från menyn. Klicka sedan på \"Starta\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Var god stäng Diskhanteringsfönstret innan du stänger fönstret för Installeraren.

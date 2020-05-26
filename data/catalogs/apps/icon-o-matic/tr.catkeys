@@ -1,4 +1,4 @@
-1	turkish	x-vnd.haiku-icon_o_matic	3554185674
+1	turkish	x-vnd.haiku-icon_o_matic	2424331018
 None	Icon-O-Matic-Properties		Yok
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Yol belirtecini döndür
 Add empty	Icon-O-Matic-ShapesList		Boş ekle
@@ -148,7 +148,6 @@ Caps	Icon-O-Matic-PropertyNames		Bykh
 OK	Icon-O-Matic-SVGImport		Tamam
 Append…	Icon-O-Matic-Menu-File		İliştir…
 Scale Y	Icon-O-Matic-PropertyNames		Y ölçeği
-Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		'%s' dosyası bir SVG belgesi olarak açılamıyor.\n\nHata: %s
 Export icon	Dialog title		Simgeyi dışa aktar
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Renk (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Gradyanı düzenle

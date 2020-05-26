@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-FileTypes	640074634
+1	esperanto	x-vnd.Haiku-FileTypes	1440714394
 Left	Attribute Window	Attribute column alignment in Tracker	Maldekstra
 Float	Attribute ListView		Flosilantapunkto
 Final	Application Types Window		Fina
@@ -17,8 +17,11 @@ Attribute name:	Attribute Window		Atribunomo:
 Long description:	Application Type Window		Longa priskribo:
 Cancel	Preferred App Menu		Nuligi
 Remove	FileTypes Window		Forigi
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		La aplikaĵo \"%s\" ne subtenas ĉi tiun dosiertipon.\nĈu vi certas, ke vi volas agordi ĝin?
 Remove	Application Type Window		Forigi
+Gamma	Application Type Window		Gamao
 Cancel	Application Type Window		Nuligi
+Attribute	Attribute Window		Atributo
 Cancel	New File Type Window		Nuligi
 Cancel	Type List Window		Nuligi
 Save	Application Type Window		Konservi
@@ -28,7 +31,10 @@ File	Application Type Window		Dosiero
 Select…	FileType Window		Elekti…
 Settings	FileTypes Window		Agordoj
 Version:	Application Types Window		Versio:
+Save changes before closing?	Application Type Window		Ĉu konservi ŝanĝojn antaŭ fermi?
+Show icons in list	FileTypes Window		Montri piktogramojn en listo
 Visible	Attribute Window		Videbla
+no icon	FileTypes Window		piktogramo forestas
 Remove icon	Icon View		Forigi piktogramon
 Cancel	Extension Window		Nuligi
 Icon	FileType Window		Piktogramo
@@ -45,3 +51,4 @@ Open file	FileTypes		Malfermi dosieron
 Close	Application Type Window		Fermi
 Quit	FileTypes Window		Ĉesi
 Add…	FileTypes Window		Aldoni…
+Edit icon…	Icon View		Redakti piktogramon…

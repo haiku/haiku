@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.haiku-icon_o_matic	1929083132
+1	belarusian	x-vnd.haiku-icon_o_matic	799228476
 None	Icon-O-Matic-Properties		Няма
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Павярнуць Індэксы Шляху
 Add empty	Icon-O-Matic-ShapesList		Дадаць пусты
@@ -146,7 +146,6 @@ Caps	Icon-O-Matic-PropertyNames		Шапкі
 OK	Icon-O-Matic-SVGImport		ОК
 Append…	Icon-O-Matic-Menu-File		Дадаць…
 Scale Y	Icon-O-Matic-PropertyNames		Шкала Y
-Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Не ўдалося адкрыць '%s' як дакумент SVG.\n\nПамылка: %s
 Export icon	Dialog title		Экспартаваць значак
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Колер (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Правіць Градыент

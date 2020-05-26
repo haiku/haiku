@@ -1,9 +1,10 @@
-1	polish	x-vnd.Haiku-mount_server	819316177
+1	polish	x-vnd.Haiku-mount_server	2818767263
 Mount read-only	AutoMounter		Montuj tylko do odczytu
 Error mounting volume:\n\n%s	AutoMounter		Błąd montowania woluminu:\n\n%s
 Cancel	AutoMounter		Anuluj
 OK	AutoMounter		OK
 Unmount error	AutoMounter		Błąd odmontowywania
+The file system on this volume is not the Be file system. It is recommended to mount it in read-only mode, to prevent unintentional data loss because of bugs in Haiku.	AutoMounter		System plików na tej partycji to nie system plików Be. Rekomendowane jest zamontowanie jej w trybie tylko do odczytu, aby zapobiec utracie danych spowodowanej błędami w Haiku.
 Mount read/write	AutoMounter		Montuj do odczytu/zapisu
 Could not unmount disk \"%s\":\n\t%s	AutoMounter		Nie można odmontować dysku „%s”:\n\t%s
 Mounting volume '%s'\n\n	AutoMounter		Montowanie woluminu „%s”\n\n

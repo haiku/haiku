@@ -1,10 +1,11 @@
-1	portuguese	x-vnd.Haiku-GIFTranslator	2873990288
+1	portuguese	x-vnd.Haiku-GIFTranslator	2201651797
 Websafe	GIFView		Seguro para a Web
 Write interlaced images	GIFView		Escrever imagens entrelaçadas
 Optimal	GIFView		Ótimo
 Greyscale	GIFView		Escala de cinzentos
 Colors:	GIFView		Cores:
 GIF image translator	GIFTranslator		Tradutor de imagens GIF
+Be Bitmap Format (GIFTranslator)	GIFTranslator		Formato de Mapa de Bits Be (Tradutor GIF)
 GIF image translator	GIFView		Tradutor de imagens GIF
 Palette:	GIFView		Paleta:
 GIF image	GIFTranslator		Imagem GIF

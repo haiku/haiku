@@ -1,4 +1,4 @@
-1	polish	x-vnd.haiku-icon_o_matic	3554185674
+1	polish	x-vnd.haiku-icon_o_matic	2424331018
 None	Icon-O-Matic-Properties		Nic
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Obrócenie wskaźników ścieżki
 Add empty	Icon-O-Matic-ShapesList		Dodaj pusty
@@ -148,7 +148,6 @@ Caps	Icon-O-Matic-PropertyNames		Nasadka
 OK	Icon-O-Matic-SVGImport		OK
 Append…	Icon-O-Matic-Menu-File		Dołącz…
 Scale Y	Icon-O-Matic-PropertyNames		Skala Y
-Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Nie udało się otworzyć pliku „%s” jako dokument SVG.\n\nBłąd: %s
 Export icon	Dialog title		Eksportuj ikonę
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Kolor (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Edycję gradientu

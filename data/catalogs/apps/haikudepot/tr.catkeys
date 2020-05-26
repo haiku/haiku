@@ -87,7 +87,7 @@ The package action could not be scheduled: %Error%	PackageInfoView		Paket eylemi
 Cancel	RatePackageWindow		İptal
 Inactive	PackageListView		Etkin değil
 Nickname:	UserLoginWindow		Takma ad:
-Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Depoların üst bilgileri eşitleniyor
+Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Depoların üstbilgileri eşitleniyor
 There are problems in the supplied data:	UserLoginWindow		Girilen veride sorunlar var:
 OK	MainWindow		Tamam
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, other{# öge}}
@@ -140,7 +140,7 @@ While updating package data, a problem has arisen that may cause data to be outd
 The nickname is required.	UserLoginWindow		Takma ad gerekli.
 Source packages	MainWindow		Kaynak paketleri
 -	no package size		-
-Problem with working files	App		Çalışma dosyaları ile ilgili sorun
+Problem with working files	App		Çalışma dosyalarında sorun
 Try again	App		Yeniden dene
 Rate package	RatePackageWindow		Paketi derecelendir
 Unknown	PackageListView		Bilinmeyen

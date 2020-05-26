@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-CodyCam	1770279704
+1	polish	x-vnd.Haiku-CodyCam	2593355250
 destination directory expected	CodyCam		oczekiwano katalogu docelowego
 reply: '%s'\n	SftpClient		odpowiedź: „%s”\n
 JPEG image	CodyCam		obraz JPEG
@@ -27,6 +27,7 @@ Every 2 hours	CodyCam		co 2 godziny
 Cannot get a time source	CodyCam		Nie udało się pobrać źródła czasu
 Every 4 hours	CodyCam		co 4 godziny
 cmd: '%s'\n	FtpClient		polecenie: „%s”\n
+Closing the window	VideoConsumer.cpp		Zamykanie okna
 Never	CodyCam		nigdy
 Every 8 hours	CodyCam		co 8 godzin
 Cannot start the video source	CodyCam		Nie udało się rozpocząć przechwytywania ze źródła
@@ -38,6 +39,7 @@ still image filename expected	CodyCam		oczekiwano nazwy pliku obrazu
 File name:	CodyCam		Nazwa pliku:
 Directory:	CodyCam		Katalog:
 Error setting type of output file	VideoConsumer.cpp		Wystąpił błąd podczas ustawiania typu pliku wyjściowego
+Locking the window	VideoConsumer.cpp		Blokowanie okna
 Cannot find an available video stream	CodyCam		Nie znaleziono dostępnego strumienia wideo
 Upload…	VideoConsumer.cpp		Wyślij…
 password expected	CodyCam		oczekiwano hasła

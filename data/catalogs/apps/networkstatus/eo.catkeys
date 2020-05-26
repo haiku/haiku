@@ -4,7 +4,7 @@ Quit	NetworkStatusView		Ĉesi
 Unknown	NetworkStatusView		Nekonata
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Lanĉado de agordilo por reto malsukcesis.\n\nEraro: 
 Install in Deskbar	NetworkStatus		Instaliĝi en Laborstrio
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		Opcioj de la Retstato:\n\t--deskbar\taŭtomate aldoni replikaĵon en la Laborstrion\n\t--help\t\tmontri ĉi informon kaj fini
+NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		Opcioj de la Retstato:\n\t--deskbar\taŭtomate aldoni replikilon en la Laborstrion\n\t--help\t\tmontri ĉi informon kaj fini
 Open network preferences…	NetworkStatusView		Malfermi agordojn por reto…
 NetworkStatus	System name		Retstato
 OK	NetworkStatusView		Bone

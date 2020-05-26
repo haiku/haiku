@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.haiku-icon_o_matic	3554185674
+1	indonesian	x-vnd.haiku-icon_o_matic	2424331018
 None	Icon-O-Matic-Properties		Tidak ada
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Indeks Jalur Putar
 Add empty	Icon-O-Matic-ShapesList		Tambah kosong
@@ -148,7 +148,6 @@ Caps	Icon-O-Matic-PropertyNames		Tutup
 OK	Icon-O-Matic-SVGImport		OK
 Append…	Icon-O-Matic-Menu-File		Tambah…
 Scale Y	Icon-O-Matic-PropertyNames		Skala Y
-Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Gagal membuka file '%s' sebagai dokumen SVG.\n\nKesalahan: %s
 Export icon	Dialog title		Ekspor ikon
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Warna (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Edit Gradient

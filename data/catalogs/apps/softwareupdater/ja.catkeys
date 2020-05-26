@@ -1,5 +1,5 @@
 1	japanese	x-vnd.haiku-softwareupdater	369324613
-Updating version	SoftwareUpdaterWindow	List item text	更新中のバージョン:
+Updating version	SoftwareUpdaterWindow	List item text	更新されるバージョン:
 Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		ここをクリックして、{0, plural, one{# 個の更新されたパッケージ} other{# 個の更新されたパッケージ}}をインストールします。
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	アンインストールされるパッケージ
 No active network connection was found	UpdateManager	Error message	有効なネットワーク接続が見つからなかった。
@@ -45,7 +45,7 @@ Click here to run SoftwareUpdater. Some updates will require a problem solution 
 Checking for updates	SoftwareUpdaterWindow		更新を確認しています
 Updates completed	UpdateManager		更新が完了しました
 Reboot	SoftwareUpdaterWindow		再起動
-Show more details	SoftwareUpdaterWindow		さらに詳細を表示
+Show more details	SoftwareUpdaterWindow		詳細を表示
 Installing version	SoftwareUpdaterWindow	List item text	インストール中のバージョン:
 Checking for updates	CheckManager		更新を確認中
 No remote repositories are available	UpdateManager	Error message	リモートのリポジトリは利用できません。
