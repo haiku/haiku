@@ -375,11 +375,10 @@ ramfs_read_symlink(fs_volume* _volume, fs_vnode* _node, char *buffer,
 				size_t toRead = min(*bufferSize,
 									symLink->GetLinkedPathLength());
 				if (toRead > 0)
-					error = user_memcpy(buffer, symLink->GetLinkedPath(),
+					memcpy(buffer, symLink->GetLinkedPath(),
 						toRead);
 
-				if (error == B_OK)
-					*bufferSize = symLink->GetLinkedPathLength();
+				*bufferSize = symLink->GetLinkedPathLength();
 			} else {
 				FATAL("Node %" B_PRIdINO " pretends to be a SymLink, but isn't!\n",
 					node->GetID());

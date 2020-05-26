@@ -1313,10 +1313,7 @@ ext2_read_link(fs_volume *_volume, fs_vnode *_node, char *buffer,
 		size_t bytesToCopy = std::min(static_cast<size_t>(inode->Size()),
 			*_bufferSize);
 
-		status_t result = user_memcpy(buffer, inode->Node().symlink,
-			bytesToCopy);
-		if (result != B_OK)
-			return result;
+		memcpy(buffer, inode->Node().symlink, bytesToCopy);
 	}
 
 	*_bufferSize = inode->Size();

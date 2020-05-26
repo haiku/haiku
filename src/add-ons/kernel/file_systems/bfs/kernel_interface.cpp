@@ -1606,7 +1606,8 @@ bfs_read_link(fs_volume* _volume, fs_vnode* _node, char* buffer,
 
 	*_bufferSize = linkLength;
 
-	return user_memcpy(buffer, inode->Node().short_symlink, bytesToCopy);
+	memcpy(buffer, inode->Node().short_symlink, bytesToCopy);
+	return B_OK;
 }
 
 

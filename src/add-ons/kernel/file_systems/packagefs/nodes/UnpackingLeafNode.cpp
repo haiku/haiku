@@ -281,7 +281,8 @@ UnpackingLeafNode::ReadSymlink(void* buffer, size_t* bufferSize)
 
 	*bufferSize = linkLength;
 
-	return user_memcpy(buffer, linkPath, bytesToCopy);
+	memcpy(buffer, linkPath, bytesToCopy);
+	return B_OK;
 }
 
 

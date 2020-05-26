@@ -569,7 +569,8 @@ fs_read_link(fs_volume* _volume, fs_vnode* _node, char* buffer,
 
 	*_bufferSize = length;
 
-	return user_memcpy(buffer, node->attr.slName, bytesToCopy);
+	memcpy(buffer, node->attr.slName, bytesToCopy);
+	return B_OK;
 }
 
 

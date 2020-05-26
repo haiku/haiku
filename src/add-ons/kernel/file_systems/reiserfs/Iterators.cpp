@@ -1522,11 +1522,9 @@ StreamReader::_ReadIndirectItem(off_t offset, void *buffer, size_t bufferSize)
 			off_t blockOffset = i * (off_t)fBlockSize;
 			uint32 localOffset = max_c(0LL, offset - blockOffset);
 			uint32 toRead = min_c(fBlockSize - localOffset, bufferSize);
-			status_t copyResult = user_memcpy(buffer,
+			memcpy(buffer,
 				reinterpret_cast<uint8*>(block->GetData()) + localOffset,
 				toRead);
-			if (copyResult != B_OK)
-				return copyResult;
 
 			block->Put();
 			bufferSize -= toRead;
@@ -1547,7 +1545,8 @@ StreamReader::_ReadDirectItem(off_t offset, void *buffer, size_t bufferSize)
 {
 //PRINT(("StreamReader::_ReadDirectItem(%Ld, %p, %lu)\n", offset, buffer, bufferSize));
 	// copy the data into the buffer
-	return user_memcpy(buffer,
+	memcpy(buffer,
 		reinterpret_cast<uint8*>(fItem.GetData()) + offset, bufferSize);
+	return B_OK;
 }
 
