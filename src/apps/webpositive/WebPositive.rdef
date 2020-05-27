@@ -2,12 +2,12 @@ resource app_signature "application/x-vnd.Haiku-WebPositive";
 
 resource app_version {
 	major      = 1,
-	middle     = 1,
+	middle     = 2,
 	minor      = 0,
 	variety    = B_APPV_ALPHA,
 	internal   = 0,
 	short_info = "WebPositive",
-	long_info  = "WebPositive ©2007-2014 The WebKit Haiku Project"
+	long_info  = "WebPositive ©2007-2020 The WebKit Haiku Project"
 };
 
 resource app_flags B_SINGLE_LAUNCH;

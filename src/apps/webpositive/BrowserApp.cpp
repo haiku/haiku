@@ -140,6 +140,8 @@ BrowserApp::AboutRequested()
 		"Andrea Anzani",
 		"Stephan Aßmus",
 		"Alexandre Deckner",
+		"Adrien Destugues",
+		"Rajagopalan Gangadharan",
 		"Rene Gollent",
 		"Ryan Leavengood",
 		"Michael Lotz",

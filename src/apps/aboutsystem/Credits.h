@@ -570,6 +570,7 @@ static const Translation kTranslations[] = {
 	"Marc Flerackers\n" \
 	"Michele Frau (zuMi)\n" \
 	"Landon Fuller\n" \
+	"Rajagopalan Gangadharan\n" \
 	"Deyan Genovski\n" \
 	"Pete Goodeve\n" \
 	"Lucian Adrian Grijincu\n" \
