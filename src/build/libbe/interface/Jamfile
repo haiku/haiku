@@ -9,6 +9,11 @@ USES_BE_API on <libbe_build>interface_kit.o = true ;
 BuildPlatformMergeObjectPIC <libbe_build>interface_kit.o :
 	Bitmap.cpp
 	Gradient.cpp
+	GradientLinear.cpp
+	GradientRadial.cpp
+	GradientRadialFocus.cpp
+	GradientDiamond.cpp
+	GradientConic.cpp
  	GraphicsDefs.cpp
  	Point.cpp
  	Rect.cpp

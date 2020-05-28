@@ -11,6 +11,7 @@
 #include <List.h>
 
 
+class BDataIO;
 class BMessage;
 class BRect;
 
@@ -39,9 +40,9 @@ public:
 		ColorStop(uint8 r, uint8 g, uint8 b, uint8 a, float o);
 		ColorStop(const ColorStop& other);
 		ColorStop();
-		
+
 		bool operator!=(const ColorStop& other) const;
-		
+
 		rgb_color		color;
 		float			offset;
 	};
@@ -50,41 +51,44 @@ public:
 								BGradient();
 								BGradient(BMessage* archive);
 	virtual						~BGradient();
-	
+
 			status_t			Archive(BMessage* into,
 									bool deep = true) const;
-	
+
 			BGradient&			operator=(const BGradient& other);
-	
+
 			bool				operator==(const BGradient& other) const;
 			bool				operator!=(const BGradient& other) const;
 			bool				ColorStopsAreEqual(
 									const BGradient& other) const;
-	
+
 			void				SetColorStops(const BGradient& other);
-	
+
 			int32				AddColor(const rgb_color& color,
 									float offset);
 			bool				AddColorStop(const ColorStop& colorStop,
 									int32 index);
-	
+
 			bool				RemoveColor(int32 index);
-	
+
 			bool				SetColorStop(int32 index,
 									const ColorStop& colorStop);
 			bool				SetColor(int32 index, const rgb_color& color);
 			bool				SetOffset(int32 index, float offset);
-	
+
 			int32				CountColorStops() const;
 			ColorStop*			ColorStopAt(int32 index) const;
 			ColorStop*			ColorStopAtFast(int32 index) const;
 			ColorStop*			ColorStops() const;
 			void				SortColorStopsByOffset();
-	
+
 			Type				GetType() const
 									{ return fType; }
-	
+
 			void				MakeEmpty();
+
+			status_t			Flatten(BDataIO* stream) const;
+	static	status_t			Unflatten(BGradient *&output, BDataIO* stream);
 
 private:
 	friend class BGradientLinear;
