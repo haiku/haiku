@@ -1,0 +1,7 @@
+resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
+
+resource(1, "META:TYPE") "image/vnd.haiku.picture";
+
+resource(2, "META:SNIFF_RULE") "0.50 (\"\\002\\000\\000\\000\\000\\000\\000\\000\")";
+
+resource(3, "META:S:DESC") #'MSDC' "Haiku picture";
