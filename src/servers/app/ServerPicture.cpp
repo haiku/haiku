@@ -49,7 +49,7 @@ using std::stack;
 
 class ShapePainter : public BShapeIterator {
 public:
-	ShapePainter(Canvas* canvas);
+	ShapePainter(Canvas* canvas, BGradient* gradient);
 	virtual ~ShapePainter();
 
 	status_t Iterate(const BShape* shape);
@@ -65,14 +65,16 @@ public:
 
 private:
 	Canvas*	fCanvas;
+	BGradient* fGradient;
 	stack<uint32>	fOpStack;
 	stack<BPoint>	fPtStack;
 };
 
 
-ShapePainter::ShapePainter(Canvas* canvas)
+ShapePainter::ShapePainter(Canvas* canvas, BGradient* gradient)
 	:
-	fCanvas(canvas)
+	fCanvas(canvas),
+	fGradient(gradient)
 {
 }
 
@@ -217,8 +219,14 @@ ShapePainter::Draw(BRect frame, bool filled)
 		transform.Apply(&screenOffset);
 		transform.Apply(&frame);
 
-		fCanvas->GetDrawingEngine()->DrawShape(frame, opCount, opList,
-			ptCount, ptList, filled, screenOffset, fCanvas->Scale());
+		/* stroked gradients are not yet supported */
+		if (fGradient != NULL && filled) {
+			fCanvas->GetDrawingEngine()->FillShape(frame, opCount, opList,
+				ptCount, ptList, *fGradient, screenOffset, fCanvas->Scale());
+		} else {
+			fCanvas->GetDrawingEngine()->DrawShape(frame, opCount, opList,
+				ptCount, ptList, filled, screenOffset, fCanvas->Scale());
+		}
 
 		delete[] opList;
 		delete[] ptList;
@@ -381,7 +389,125 @@ static void
 draw_shape(void* _canvas, const BShape& shape, bool fill)
 {
 	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
-	ShapePainter drawShape(canvas);
+	ShapePainter drawShape(canvas, NULL);
+
+	drawShape.Iterate(&shape);
+	drawShape.Draw(shape.Bounds(), fill);
+}
+
+
+static void
+draw_rect_gradient(void* _canvas, const BRect& _rect, BGradient& gradient, bool fill)
+{
+	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
+	BRect rect = _rect;
+
+	const SimpleTransform transform =
+		canvas->PenToScreenTransform();
+	transform.Apply(&rect);
+	transform.Apply(&gradient);
+
+	canvas->GetDrawingEngine()->FillRect(rect, gradient);
+}
+
+
+static void
+draw_round_rect_gradient(void* _canvas, const BRect& _rect, const BPoint& radii, BGradient& gradient,
+	bool fill)
+{
+	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
+	BRect rect = _rect;
+
+	const SimpleTransform transform =
+		canvas->PenToScreenTransform();
+	transform.Apply(&rect);
+	transform.Apply(&gradient);
+	float scale = canvas->CurrentState()->CombinedScale();
+	canvas->GetDrawingEngine()->FillRoundRect(rect, radii.x * scale,
+		radii.y * scale, gradient);
+}
+
+
+static void
+draw_bezier_gradient(void* _canvas, size_t numPoints, const BPoint viewPoints[], BGradient& gradient,
+	bool fill)
+{
+	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
+
+	const size_t kSupportedPoints = 4;
+	if (numPoints != kSupportedPoints)
+		return;
+
+	BPoint points[kSupportedPoints];
+	const SimpleTransform transform =
+		canvas->PenToScreenTransform();
+	transform.Apply(points, viewPoints, kSupportedPoints);
+	transform.Apply(&gradient);
+	canvas->GetDrawingEngine()->FillBezier(points, gradient);
+}
+
+
+static void
+draw_arc_gradient(void* _canvas, const BPoint& center, const BPoint& radii,
+	float startTheta, float arcTheta, BGradient& gradient, bool fill)
+{
+	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
+
+	BRect rect(center.x - radii.x, center.y - radii.y,
+		center.x + radii.x - 1, center.y + radii.y - 1);
+	const SimpleTransform transform =
+		canvas->PenToScreenTransform();
+	transform.Apply(&rect);
+	transform.Apply(&gradient);
+	canvas->GetDrawingEngine()->FillArc(rect, startTheta, arcTheta, gradient);
+}
+
+
+static void
+draw_ellipse_gradient(void* _canvas, const BRect& _rect, BGradient& gradient, bool fill)
+{
+	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
+	BRect rect = _rect;
+
+	const SimpleTransform transform =
+		canvas->PenToScreenTransform();
+	transform.Apply(&rect);
+	transform.Apply(&gradient);
+	canvas->GetDrawingEngine()->FillEllipse(rect, gradient);
+}
+
+
+static void
+draw_polygon_gradient(void* _canvas, size_t numPoints, const BPoint viewPoints[],
+	bool isClosed, BGradient& gradient, bool fill)
+{
+	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
+
+	if (numPoints == 0)
+		return;
+
+	BStackOrHeapArray<BPoint, 200> points(numPoints);
+	if (!points.IsValid())
+		return;
+
+	const SimpleTransform transform =
+		canvas->PenToScreenTransform();
+	transform.Apply(points, viewPoints, numPoints);
+	transform.Apply(&gradient);
+
+	BRect polyFrame;
+	get_polygon_frame(points, numPoints, &polyFrame);
+
+	canvas->GetDrawingEngine()->FillPolygon(points, numPoints, polyFrame,
+		gradient, isClosed && numPoints > 2);
+}
+
+
+static void
+draw_shape_gradient(void* _canvas, const BShape& shape, BGradient& gradient, bool fill)
+{
+	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
+	ShapePainter drawShape(canvas, &gradient);
 
 	drawShape.Iterate(&shape);
 	drawShape.Draw(shape.Bounds(), fill);
@@ -929,7 +1055,14 @@ static const BPrivate::picture_player_callbacks kPicturePlayerCallbacks = {
 	blend_layer,
 	clip_to_rect,
 	clip_to_shape,
-	draw_string_locations
+	draw_string_locations,
+	draw_rect_gradient,
+	draw_round_rect_gradient,
+	draw_bezier_gradient,
+	draw_arc_gradient,
+	draw_ellipse_gradient,
+	draw_polygon_gradient,
+	draw_shape_gradient
 };
 
 

@@ -21,6 +21,7 @@
 
 
 class BAffineTransform;
+class BGradient;
 class BList;
 class BPicture;
 class BShape;
@@ -94,6 +95,13 @@ struct picture_player_callbacks {
 		int32 ptCount, const BPoint ptList[], bool inverse);
 	void (*draw_string_locations)(void* userData, const char* string,
 		size_t length, const BPoint locations[], size_t locationCount);
+	void (*draw_rect_gradient)(void* userData, const BRect& rect, BGradient& gradient, bool fill);
+	void (*draw_round_rect_gradient)(void* userData, const BRect& rect, const BPoint& radii, BGradient& gradient, bool fill);
+	void (*draw_bezier_gradient)(void* userData, size_t numControlPoints, const BPoint controlPoints[], BGradient& gradient, bool fill);
+	void (*draw_arc_gradient)(void* userData, const BPoint& center, const BPoint& radii, float startTheta, float arcTheta, BGradient& gradient, bool fill);
+	void (*draw_ellipse_gradient)(void* userData, const BRect& rect, BGradient& gradient, bool fill);
+	void (*draw_polygon_gradient)(void* userData, size_t numPoints, const BPoint points[], bool isClosed, BGradient& gradient, bool fill);
+	void (*draw_shape_gradient)(void* userData, const BShape& shape, BGradient& gradient, bool fill);
 };
 
 

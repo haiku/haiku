@@ -20,6 +20,7 @@
 
 
 class Layer;
+class BGradient;
 class BPositionIO;
 class BRegion;
 
@@ -91,6 +92,24 @@ public:
 			status_t			WriteDrawShape(const int32& opCount,
 									const void* opList, const int32& ptCount,
 									const void* ptList, const bool& fill);
+			status_t			WriteDrawRectGradient(const BRect& rect, const BGradient& gradient,
+									const bool& fill);
+			status_t			WriteDrawRoundRectGradient(const BRect& rect,
+									const BPoint& radius, const BGradient& gradient, const bool& fill);
+			status_t			WriteDrawBezierGradient(const BPoint points[4], const BGradient& gradient,
+									const bool& fill);
+			status_t			WriteDrawArcGradient(const BPoint& center,
+									const BPoint& radius,
+									const float& startTheta,
+									const float& arcTheta, const BGradient& gradient, const bool& fill);
+			status_t			WriteDrawEllipseGradient(const BRect& rect, const BGradient& gradient,
+									const bool& fill);
+			status_t			WriteDrawPolygonGradient(const int32& numPoints,
+									BPoint* points, const bool& isClosed, const BGradient& gradient,
+									const bool& fill);
+			status_t			WriteDrawShapeGradient(const int32& opCount,
+									const void* opList, const int32& ptCount,
+									const void* ptList, const BGradient& gradient, const bool& fill);
 			status_t			WriteDrawBitmap(const BRect& srcRect,
 									const BRect& dstRect, const int32& width,
 									const int32& height,
