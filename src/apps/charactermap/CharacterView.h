@@ -7,6 +7,7 @@
 
 
 #include <Messenger.h>
+#include <PopUpMenu.h>
 #include <View.h>
 
 
@@ -79,6 +80,7 @@ private:
 			bool			fHasTopCharacter;
 			uint32			fTopCharacter;
 			int32			fTopOffset;
+			BPopUpMenu*		fMenu;
 
 			bool			fShowPrivateBlocks;
 			bool			fShowContainedBlocksOnly;
