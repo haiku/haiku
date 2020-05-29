@@ -45,6 +45,7 @@ App::App()
 {
 	srand((unsigned int) time(NULL));
 	_CheckPackageDaemonRuns();
+	fIsFirstRun = _CheckIsFirstRun();
 }
 
 
@@ -93,6 +94,13 @@ App::ReadyToRun()
 
 	fMainWindow = new MainWindow(settings);
 	_ShowWindow(fMainWindow);
+}
+
+
+bool
+App::IsFirstRun()
+{
+	return fIsFirstRun;
 }
 
 
@@ -512,6 +520,21 @@ App::_LaunchPackageDaemon()
 	// and get a reply once it is ready.
 	snooze(2000000);
 	return true;
+}
+
+
+/*static*/ bool
+App::_CheckIsFirstRun()
+{
+	BPath testFilePath;
+	bool exists = false;
+	status_t status = StorageUtils::LocalWorkingFilesPath("testfile.txt",
+		testFilePath, false);
+	if (status != B_OK)
+		printf("! unable to establish the location of the test file\n");
+	else
+		status = StorageUtils::ExistsObject(testFilePath, &exists, NULL, NULL);
+	return !exists;
 }
 
 

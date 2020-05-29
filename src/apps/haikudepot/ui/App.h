@@ -21,6 +21,8 @@ public:
 
 	virtual	bool				QuitRequested();
 	virtual	void				ReadyToRun();
+			bool				IsFirstRun();
+
 	virtual	void				MessageReceived(BMessage* message);
 	virtual void				RefsReceived(BMessage* message);
 	virtual void				ArgvReceived(int32 argc, char* argv[]);
@@ -37,6 +39,7 @@ private:
 			bool				_LaunchPackageDaemon();
 
 			bool				_CheckTestFile();
+	static	bool				_CheckIsFirstRun();
 
 private:
 			MainWindow*			fMainWindow;
@@ -44,6 +47,8 @@ private:
 
 			BMessage			fSettings;
 			bool				fSettingsRead;
+
+			bool				fIsFirstRun;
 };
 
 

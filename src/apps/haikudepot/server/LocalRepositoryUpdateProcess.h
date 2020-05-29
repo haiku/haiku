@@ -1,5 +1,5 @@
 /*
- * Copyright 2018, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -43,10 +43,16 @@ protected:
 	virtual status_t			RunInternal();
 
 private:
+			bool				_ShouldRunForRepositoryName(
+									const BString& repoName,
+									BPackageKit::BPackageRoster& roster,
+									BPackageKit::BRepositoryCache* cache);
+
 			status_t			_RunForRepositoryName(const BString& repoName,
 									BPackageKit::BContext& context,
 									BPackageKit::BPackageRoster& roster,
 									BPackageKit::BRepositoryCache* cache);
+
 			void				_NotifyError(const BString& error) const;
 			void				_NotifyError(const BString& error,
 									const BString& details) const;
