@@ -554,6 +554,14 @@ VMAnonymousCache::Rebase(off_t newBase, int priority)
 }
 
 
+status_t
+VMAnonymousCache::Discard(off_t offset, off_t size)
+{
+	_FreeSwapPageRange(offset, offset + size);
+	return VMCache::Discard(offset, size);
+}
+
+
 /*!	Moves the swap pages for the given range from the source cache into this
 	cache. Both caches must be locked.
 */

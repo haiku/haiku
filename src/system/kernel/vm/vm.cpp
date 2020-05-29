@@ -865,6 +865,52 @@ unmap_address_range(VMAddressSpace* addressSpace, addr_t address, addr_t size,
 }
 
 
+static status_t
+discard_area_range(VMArea* area, addr_t address, addr_t size)
+{
+	addr_t offset;
+	if (!intersect_area(area, address, size, offset))
+		return B_OK;
+
+	// If someone else uses the area's cache or it's not an anonymous cache, we
+	// can't discard.
+	VMCache* cache = vm_area_get_locked_cache(area);
+	if (cache->areas != area || area->cache_next != NULL
+		|| !cache->consumers.IsEmpty() || cache->type != CACHE_TYPE_RAM) {
+		return B_OK;
+	}
+
+	VMCacheChainLocker cacheChainLocker(cache);
+	cacheChainLocker.LockAllSourceCaches();
+
+	unmap_pages(area, address, size);
+
+	// Since VMCache::Discard() can temporarily drop the lock, we must
+	// unlock all lower caches to prevent locking order inversion.
+	cacheChainLocker.Unlock(cache);
+	cache->Discard(cache->virtual_base + offset, size);
+	cache->ReleaseRefAndUnlock();
+
+	return B_OK;
+}
+
+
+static status_t
+discard_address_range(VMAddressSpace* addressSpace, addr_t address, addr_t size,
+	bool kernel)
+{
+	for (VMAddressSpace::AreaRangeIterator it
+		= addressSpace->GetAreaRangeIterator(address, size);
+			VMArea* area = it.Next();) {
+		status_t error = discard_area_range(area, address, size);
+		if (error != B_OK)
+			return error;
+	}
+
+	return B_OK;
+}
+
+
 /*! You need to hold the lock of the cache and the write lock of the address
 	space when calling this function.
 	Note, that in case of error your cache will be temporarily unlocked.

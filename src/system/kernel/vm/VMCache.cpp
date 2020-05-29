@@ -1254,6 +1254,19 @@ VMCache::Adopt(VMCache* source, off_t offset, off_t size, off_t newOffset)
 }
 
 
+/*! Discards pages in the given range. */
+status_t
+VMCache::Discard(off_t offset, off_t size)
+{
+	page_num_t startPage = offset >> PAGE_SHIFT;
+	page_num_t endPage = (offset + size + B_PAGE_SIZE - 1) >> PAGE_SHIFT;
+	while (_FreePageRange(pages.GetIterator(startPage, true, true), &endPage))
+		;
+
+	return B_OK;
+}
+
+
 /*!	You have to call this function with the VMCache lock held. */
 status_t
 VMCache::FlushAndRemoveAllPages()
