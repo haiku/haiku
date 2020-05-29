@@ -72,6 +72,7 @@ private:
 	static	const addr_t		kMaxInitialRandomize;
 
 			VMUserAreaTree		fAreas;
+			addr_t				fNextInsertHint;
 };
 
 

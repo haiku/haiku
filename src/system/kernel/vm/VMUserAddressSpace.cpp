@@ -82,7 +82,8 @@ align_address(addr_t address, size_t alignment, uint32 addressSpec,
 
 VMUserAddressSpace::VMUserAddressSpace(team_id id, addr_t base, size_t size)
 	:
-	VMAddressSpace(id, base, size, "address space")
+	VMAddressSpace(id, base, size, "address space"),
+	fNextInsertHint(0)
 {
 }
 
@@ -548,10 +549,17 @@ VMUserAddressSpace::_InsertAreaSlot(addr_t start, addr_t size, addr_t end,
 
 	start = align_address(start, alignment);
 
+	bool useHint
+		= addressSpec != B_EXACT_ADDRESS && !is_base_address_spec(addressSpec);
+
 	addr_t originalStart = 0;
 	if (fRandomizingEnabled && addressSpec == B_RANDOMIZED_BASE_ADDRESS) {
 		originalStart = start;
 		start = _RandomizeAddress(start, end - size + 1, alignment, true);
+	} else if (useHint
+		&& start <= fNextInsertHint && fNextInsertHint <= end - size + 1) {
+		originalStart = start;
+		start = fNextInsertHint;
 	}
 
 	// walk up to the spot where we should start searching
@@ -651,6 +659,10 @@ second_chance:
 					addressSpec = B_RANDOMIZED_BASE_ADDRESS;
 				}
 
+				goto second_chance;
+			} else if (useHint
+					&& originalStart != 0 && start != originalStart) {
+				start = originalStart;
 				goto second_chance;
 			} else if (area->id != RESERVED_AREA_ID) {
 				// We didn't find a free spot - if there are any reserved areas,
@@ -754,6 +766,9 @@ second_chance:
 
 	if (!foundSpot)
 		return addressSpec == B_EXACT_ADDRESS ? B_BAD_VALUE : B_NO_MEMORY;
+
+	if (useHint)
+		fNextInsertHint = area->Base() + size;
 
 	area->SetSize(size);
 	fAreas.Insert(area);
