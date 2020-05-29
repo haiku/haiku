@@ -400,7 +400,8 @@ VMUserAddressSpace::Dump() const
 		kprintf(" area 0x%" B_PRIx32 ": ", area->id);
 		kprintf("base_addr = 0x%lx ", area->Base());
 		kprintf("size = 0x%lx ", area->Size());
-		kprintf("name = '%s' ", area->name);
+		kprintf("name = '%s' ",
+			area->id != RESERVED_AREA_ID ? area->name : "reserved");
 		kprintf("protection = 0x%" B_PRIx32 "\n", area->protection);
 	}
 }
