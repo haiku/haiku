@@ -171,6 +171,18 @@ VMKernelAddressSpace::LookupArea(addr_t address) const
 }
 
 
+//! You must hold the address space's read lock.
+VMArea*
+VMKernelAddressSpace::FindClosestArea(addr_t address, bool less) const
+{
+	Range* range = fRangeTree.FindClosest(address, less);
+	while (range != NULL && range->type != Range::RANGE_AREA)
+		range = fRangeTree.Next(range);
+
+	return range != NULL ? range->area : NULL;
+}
+
+
 /*!	This inserts the area you pass into the address space.
 	It will also set the "_address" argument to its base address when
 	the call succeeds.

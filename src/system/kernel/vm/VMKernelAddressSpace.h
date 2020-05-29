@@ -26,6 +26,8 @@ public:
 	virtual	VMArea*				NextArea(VMArea* area) const;
 
 	virtual	VMArea*				LookupArea(addr_t address) const;
+	virtual	VMArea*				FindClosestArea(addr_t address, bool less)
+									const;
 	virtual	VMArea*				CreateArea(const char* name, uint32 wiring,
 									uint32 protection, uint32 allocationFlags);
 	virtual	void				DeleteArea(VMArea* area,

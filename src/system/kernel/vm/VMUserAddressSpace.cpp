@@ -142,6 +142,17 @@ VMUserAddressSpace::LookupArea(addr_t address) const
 }
 
 
+//! You must hold the address space's read lock.
+VMArea*
+VMUserAddressSpace::FindClosestArea(addr_t address, bool less) const
+{
+	VMUserArea* area = fAreas.FindClosest(address, less);
+	while (area != NULL && area->id == RESERVED_AREA_ID)
+		area = fAreas.Next(area);
+	return area;
+}
+
+
 /*!	This inserts the area you pass into the address space.
 	It will also set the "_address" argument to its base address when
 	the call succeeds.

@@ -6050,21 +6050,14 @@ _get_next_area_info(team_id team, ssize_t* cookie, area_info* info, size_t size)
 	if (!locker.IsLocked())
 		return B_BAD_TEAM_ID;
 
-	VMArea* area;
-	for (VMAddressSpace::AreaIterator it
-				= locker.AddressSpace()->GetAreaIterator();
-			(area = it.Next()) != NULL;) {
-		if (area->Base() > nextBase)
-			break;
-	}
-
+	VMArea* area = locker.AddressSpace()->FindClosestArea(nextBase, false);
 	if (area == NULL) {
 		nextBase = (addr_t)-1;
 		return B_ENTRY_NOT_FOUND;
 	}
 
 	fill_area_info(area, info, size);
-	*cookie = (ssize_t)(area->Base());
+	*cookie = (ssize_t)(area->Base() + 1);
 
 	return B_OK;
 }
