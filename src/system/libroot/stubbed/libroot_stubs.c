@@ -2336,6 +2336,7 @@ void lroundf() {}
 void lroundl() {}
 void lsearch() {}
 void lseek() {}
+void madvise() {}
 void malloc() {}
 void malloc_usable_size() {}
 void matherr() {}

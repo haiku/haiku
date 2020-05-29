@@ -181,9 +181,16 @@ msync(void* address, size_t length, int flags)
 
 
 int
-posix_madvise(void* address, size_t length, int advice)
+madvise(void* address, size_t length, int advice)
 {
 	RETURN_AND_SET_ERRNO(_kern_memory_advice(address, length, advice));
+}
+
+
+int
+posix_madvise(void* address, size_t length, int advice)
+{
+	return madvise(address, length, advice);
 }
 
 

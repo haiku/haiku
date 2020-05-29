@@ -2257,6 +2257,7 @@ void lroundf() {}
 void lroundl() {}
 void lsearch() {}
 void lseek() {}
+void madvise() {}
 void makeSuperblock__Q28BPrivate10superblockiPQ28BPrivate11processHeap() {}
 void malloc() {}
 void malloc__Q28BPrivate10threadHeapUl() {}

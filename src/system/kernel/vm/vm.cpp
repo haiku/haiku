@@ -6782,9 +6782,46 @@ _user_sync_memory(void* _address, size_t size, uint32 flags)
 
 
 status_t
-_user_memory_advice(void* address, size_t size, uint32 advice)
+_user_memory_advice(void* _address, size_t size, uint32 advice)
 {
-	// TODO: Implement!
+	addr_t address = (addr_t)_address;
+	if ((address % B_PAGE_SIZE) != 0)
+		return B_BAD_VALUE;
+
+	size = PAGE_ALIGN(size);
+	if (address + size < address || !IS_USER_ADDRESS(address)
+		|| !IS_USER_ADDRESS(address + size)) {
+		// weird error code required by POSIX
+		return B_NO_MEMORY;
+	}
+
+	switch (advice) {
+		case MADV_NORMAL:
+		case MADV_SEQUENTIAL:
+		case MADV_RANDOM:
+		case MADV_WILLNEED:
+		case MADV_DONTNEED:
+			// TODO: Implement!
+			break;
+
+		case MADV_FREE:
+		{
+			AddressSpaceWriteLocker locker;
+			do {
+				status_t status = locker.SetTo(team_get_current_team_id());
+				if (status != B_OK)
+					return status;
+			} while (wait_if_address_range_is_wired(locker.AddressSpace(),
+					address, size, &locker));
+
+			discard_address_range(locker.AddressSpace(), address, size, false);
+			break;
+		}
+
+		default:
+			return B_BAD_VALUE;
+	}
+
 	return B_OK;
 }
 

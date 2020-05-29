@@ -33,12 +33,20 @@
 #define MS_SYNC			0x02
 #define MS_INVALIDATE	0x04
 
+/* madvise() values */
+#define MADV_NORMAL			1
+#define MADV_SEQUENTIAL		2
+#define MADV_RANDOM			3
+#define MADV_WILLNEED		4
+#define MADV_DONTNEED		5
+#define MADV_FREE			6
+
 /* posix_madvise() values */
-#define POSIX_MADV_NORMAL		1
-#define POSIX_MADV_SEQUENTIAL	2
-#define POSIX_MADV_RANDOM		3
-#define POSIX_MADV_WILLNEED		4
-#define POSIX_MADV_DONTNEED		5
+#define POSIX_MADV_NORMAL		MADV_NORMAL
+#define POSIX_MADV_SEQUENTIAL	MADV_SEQUENTIAL
+#define POSIX_MADV_RANDOM		MADV_RANDOM
+#define POSIX_MADV_WILLNEED		MADV_WILLNEED
+#define POSIX_MADV_DONTNEED		MADV_DONTNEED
 
 
 __BEGIN_DECLS
@@ -50,6 +58,7 @@ int		munmap(void* address, size_t length);
 int		mprotect(void* address, size_t length, int protection);
 int		msync(void* address, size_t length, int flags);
 
+int		madvise(void* address, size_t length, int advice);
 int		posix_madvise(void* address, size_t length, int advice);
 
 int		shm_open(const char* name, int openMode, mode_t permissions);
