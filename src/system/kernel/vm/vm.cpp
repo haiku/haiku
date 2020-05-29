@@ -833,26 +833,26 @@ unmap_address_range(VMAddressSpace* addressSpace, addr_t address, addr_t size,
 	bool kernel)
 {
 	size = PAGE_ALIGN(size);
-	addr_t lastAddress = address + (size - 1);
 
 	// Check, whether the caller is allowed to modify the concerned areas.
 	if (!kernel) {
-		for (VMAddressSpace::AreaIterator it = addressSpace->GetAreaIterator();
-				VMArea* area = it.Next();) {
-			addr_t areaLast = area->Base() + (area->Size() - 1);
-			if (area->Base() < lastAddress && address < areaLast) {
-				if ((area->protection & B_KERNEL_AREA) != 0) {
-					dprintf("unmap_address_range: team %" B_PRId32 " tried to "
-						"unmap range of kernel area %" B_PRId32 " (%s)\n",
-						team_get_current_team_id(), area->id, area->name);
-					return B_NOT_ALLOWED;
-				}
+		for (VMAddressSpace::AreaRangeIterator it
+				= addressSpace->GetAreaRangeIterator(address, size);
+			VMArea* area = it.Next();) {
+
+			if ((area->protection & B_KERNEL_AREA) != 0) {
+				dprintf("unmap_address_range: team %" B_PRId32 " tried to "
+					"unmap range of kernel area %" B_PRId32 " (%s)\n",
+					team_get_current_team_id(), area->id, area->name);
+				return B_NOT_ALLOWED;
 			}
 		}
 	}
 
-	for (VMAddressSpace::AreaIterator it = addressSpace->GetAreaIterator();
-			VMArea* area = it.Next();) {
+	for (VMAddressSpace::AreaRangeIterator it
+			= addressSpace->GetAreaRangeIterator(address, size);
+		VMArea* area = it.Next();) {
+
 		status_t error = cut_area(addressSpace, area, address, size, NULL,
 			kernel);
 		if (error != B_OK)
@@ -1092,15 +1092,9 @@ static inline bool
 wait_if_address_range_is_wired(VMAddressSpace* addressSpace, addr_t base,
 	size_t size, LockerType* locker)
 {
-	addr_t end = base + size - 1;
-	for (VMAddressSpace::AreaIterator it = addressSpace->GetAreaIterator();
+	for (VMAddressSpace::AreaRangeIterator it
+		= addressSpace->GetAreaRangeIterator(base, size);
 			VMArea* area = it.Next();) {
-		// TODO: Introduce a VMAddressSpace method to get a close iterator!
-		if (area->Base() > end)
-			return false;
-
-		if (base >= area->Base() + area->Size() - 1)
-			continue;
 
 		AreaCacheLocker cacheLocker(vm_area_get_locked_cache(area));
 
