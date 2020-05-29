@@ -482,19 +482,35 @@ VMKernelAddressSpace::Dump() const
 {
 	VMAddressSpace::Dump();
 
-	kprintf("area_list:\n");
+	kprintf("range list:\n");
 
 	for (RangeList::ConstIterator it = fRangeList.GetIterator();
 			Range* range = it.Next();) {
-		if (range->type != Range::RANGE_AREA)
-			continue;
 
-		VMKernelArea* area = range->area;
-		kprintf(" area %" B_PRId32 ": ", area->id);
-		kprintf("base_addr = %#" B_PRIxADDR " ", area->Base());
-		kprintf("size = %#" B_PRIxSIZE " ", area->Size());
-		kprintf("name = '%s' ", area->name);
-		kprintf("protection = %#" B_PRIx32 "\n", area->protection);
+		switch (range->type) {
+			case Range::RANGE_AREA:
+			{
+				VMKernelArea* area = range->area;
+				kprintf(" area %" B_PRId32 ": ", area->id);
+				kprintf("base_addr = %#" B_PRIxADDR " ", area->Base());
+				kprintf("size = %#" B_PRIxSIZE " ", area->Size());
+				kprintf("name = '%s' ", area->name);
+				kprintf("protection = %#" B_PRIx32 "\n", area->protection);
+				break;
+			}
+
+			case Range::RANGE_RESERVED:
+				kprintf(" reserved: base_addr = %#" B_PRIxADDR
+					" reserved_base = %#" B_PRIxADDR " size = %#"
+					B_PRIxSIZE " flags = %#" B_PRIx32 "\n", range->base,
+					range->reserved.base, range->size, range->reserved.flags);
+				break;
+
+			case Range::RANGE_FREE:
+				kprintf(" free: base_addr = %#" B_PRIxADDR " size = %#"
+					B_PRIxSIZE "\n", range->base, range->size);
+				break;
+		}
 	}
 }
 
