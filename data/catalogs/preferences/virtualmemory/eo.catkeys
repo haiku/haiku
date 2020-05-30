@@ -1,11 +1,20 @@
-1	esperanto	x-vnd.Haiku-VirtualMemory	386962458
+1	esperanto	x-vnd.Haiku-VirtualMemory	2090796060
 Requested swap file size:	SettingsWindow		Petita permutdosiera grandeco:
+VirtualMemory	System name		La Virtualmemoro
 OK	VirtualMemoryApp		Bone
 Use volume:	SettingsWindow		Uzi volumon:
 Turn off	SettingsWindow		Malŝalti
+Changes will take effect upon reboot.	SettingsWindow		Ŝanĝoj okaziĝos poste restartigo.
 Revert	SettingsWindow		Malfari
 Keep enabled	SettingsWindow		Lasi ŝaltita
+The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		La specifata agordo en la agordadosiero estas nevalida. Vi povas aprobi la defaŭltojn aŭ ĉesi.
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		VirtualaMemoro\n\tskribita per Axel Dörfler\n\tKopirajto 2005, Haiku.\n
-Defaults	SettingsWindow		Aprioraj
+The volume specified in the settings file could not be found. You can use the boot volume or quit.	SettingsWindow		La volumo specifita en dosiero de agordo ne estas trovita. Vi povas uzi lanĉan volumon aŭ ĉesi.
+Current Swap:	SettingsWindow		Nuna Permutaĵo:
+Load defaults	SettingsWindow		Ŝargi defaŭltojn
+Use boot volume	SettingsWindow		Uzi lanĉan volumon
+Automatic swap management	SettingsWindow		Aŭtomate administri permutaĵon
+Defaults	SettingsWindow		Defaŭltoj
+Quit	SettingsWindow		Ĉesi
 Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		La malŝalto de virtuala memoro maldezire efikos la sisteman stabilecon post la eluzo de la memoro.\nVirtuala memoro ne influas la sisteman rendimenton ĝis tiam.\n\nĈu vi certas, ke vi volas malŝalti ĝin?
 Enable virtual memory	SettingsWindow		Ŝalti virtualan memoron

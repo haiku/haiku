@@ -1,6 +1,8 @@
-1	portuguese	x-vnd.Haiku-GLInfo	60453832
+1	portuguese	x-vnd.Haiku-GLInfo	2211760527
+Maximum clipping planes	Capabilities		Planos de recorte máximo
 Maximum 2D texture size	Capabilities		Tamanho máximo de textura 2D
 Auxiliary buffer(s)	Capabilities		Buffer(s) auxiliar(es)
+Maximum evaluators equation order	Capabilities		Ordem de equação de avaliadores máximos
 Texture stack size	Capabilities		Tamanho da pilha de texturas
 GL Info	System name		Informação GL
 Information	InfoView		Informação

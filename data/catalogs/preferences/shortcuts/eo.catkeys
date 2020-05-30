@@ -1,10 +1,39 @@
-1	esperanto	x-vnd.Haiku-Shortcuts	382439261
+1	esperanto	x-vnd.Haiku-Shortcuts	1063933392
 Application	ShortcutsWindow		Programo
+Option	ShortcutsSpec	Name for modifier on keyboard	Opcio
+Save changes before closing?	ShortcutsWindow		Ĉu konservi ŝanĝojn antaŭ fermi?
+Revert to saved	ShortcutsWindow		Reveni al konservita
 Don't save	ShortcutsWindow		Ne konservi
+*Beep	ShortcutsWindow		*Pepo
+Shortcuts wasn't able to save your keyset.	ShortcutsWindow		La Ligiloj ne povas konservi vian ŝlosilaron.
 Save	ShortcutsWindow		Konservi
+Either	ShortcutsSpec		Aŭ
+Oh no	ShortcutsWindow		Ho ne
+Key	ShortcutsWindow		Ŝlosilo
 Select	ShortcutsWindow		Elekti
+Shortcuts	System name		Ligiloj
 Quit	ShortcutsWindow		Ĉesi
+(Choose application with file requester)	ShortcutsWindow		(Elektu aplikaĵon per dosiera serĉilo)
 Cancel	ShortcutsWindow		Nuligi
-Open	ShortcutsWindow		Malfermi
+Control	ShortcutsSpec	Name for modifier on keyboard	Kontroli
+Left	ShortcutsSpec		Maldekstra
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		La Ligiloj ne sukcesis analizi vian ŝlosilaron!
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		La Ligiloj ne sukcesis konservi vian ŝlosilaron!
+*InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"Via teksto ĉi tie\"
+Remove selected shortcut	ShortcutsWindow		Forigi elektitan ligilon
+Error, NULL state description?	ShortcutsSpec		Eraro, NULL da stata priskribo?
+Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		La Ligiloj ne sukcesis uzi vian ŝlosilaron!
+Save & apply	ShortcutsWindow		Konservi kaj uzi
+Open	ShortcutsWindow		Uzi
+Append	ShortcutsWindow		Aldoni
+Both	ShortcutsSpec		Ambaŭ
+Save KeySet as…	ShortcutsWindow		Konservi la ŝlosilaron kiel…
+Append KeySet…	ShortcutsWindow		Aldoni ŝlosilaron…
+Right	ShortcutsSpec		Dekstre
 OK	ShortcutsWindow		Bone
+Add new shortcut	ShortcutsWindow		Aldoni novan ligilon
+(None)	ShortcutsSpec		(Neniu)
+Shift	ShortcutsSpec	Name for modifier on keyboard	Majuskligklavo
+Open KeySet…	ShortcutsWindow		Uzi ŝlosilaron…
 File	ShortcutsWindow		Dosiero

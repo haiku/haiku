@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.haiku-icon_o_matic	2424331018
+1	dutch; flemish	x-vnd.haiku-icon_o_matic	1805671130
 None	Icon-O-Matic-Properties		Geen
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Pad-indices roteren
 Add empty	Icon-O-Matic-ShapesList		Lege toevoegen
@@ -164,6 +164,7 @@ Untitled	Icon-O-Matic-Main		Naamloos
 Max LOD	Icon-O-Matic-PropertyNames		Max. LOD
 Add Path	Icon-O-Matic-AddPathsCmd		Pad toevoegen
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Wilt u wijzigingen aan het huidige icoon opslaan alvorens te sluiten?
+Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		Het openen van het bestand '%s' als SVG-document is mislukt.\n\n
 load error	Icon-O-Matic-SVGImport		laadfout
 Transformation	Icon-O-Matic-TransformersList		Transformatie
 Save as…	Icon-O-Matic-Menu-File		Opslaan als...

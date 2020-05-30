@@ -31,14 +31,14 @@ Closing the window	VideoConsumer.cpp		Fermas la fenestron
 Never	CodyCam		Neniam
 Every 8 hours	CodyCam		Okhore
 Cannot start the video source	CodyCam		Ne eblas komenci la filmetfonton
-Cannot set the time source for the video source	CodyCam		Ne eblas meti la tempfonton por la filmetfonto
+Cannot set the time source for the video source	CodyCam		Ne povas atribui la fonton de tempo por la fonto de video
 Renaming…	VideoConsumer.cpp		Renomiĝas…
 Send to…	CodyCam		Sendi al…
 Password:	CodyCam		Pasvorto:
 still image filename expected	CodyCam		atendata senmovbilda dosiernomo
 File name:	CodyCam		Dosiernomo:
 Directory:	CodyCam		Dosierujo:
-Error setting type of output file	VideoConsumer.cpp		Eraro de agordoj por la rezulta dosiero
+Error setting type of output file	VideoConsumer.cpp		Eraro de atribuado de speco por la rezulta dosiero
 Locking the window	VideoConsumer.cpp		Ŝlosas la fenestron
 Cannot find an available video stream	CodyCam		Ne eblas trovi disponeblan filmetafluon
 Upload…	VideoConsumer.cpp		Alŝuti…
@@ -49,7 +49,7 @@ Output	CodyCam		Eligo
 server address expected	CodyCam		atendis adreson de servilo
 Cannot start the video window	CodyCam		Ne eblas komenci la filmetfenestron
 reply: %d, %d\n	FtpClient		respondo: %d, %d\n
-Cannot set the time source for the video window	CodyCam		Ne eblas meti la tempfonton por la filmetfenestro
+Cannot set the time source for the video window	CodyCam		Ne povas atribui la fonton de tempo por la fenestro de video
 Every 15 minutes	CodyCam		Kvaronhore
 Every 24 hours	CodyCam		Tage
 Image Format Menu	CodyCam		Menuo de Bildaformato
@@ -77,7 +77,7 @@ File	CodyCam		Dosiero
 read: %ld\n	SftpClient		legi: %ld\n
 Every hour	CodyCam		Hore
 login ID expected	CodyCam		atendis ensaluta-ID
-Video settings	CodyCam		Filmetagordoj
+Video settings	CodyCam		Agordo de video
 Can't find an available connection to the video window	CodyCam		Ne eblas trovi disponeblan konektaĵon al la filmetfenestro
 FTP	CodyCam		FTP
 Error creating output file	VideoConsumer.cpp		Eraris krei eligadosieron

@@ -1,15 +1,29 @@
-1	esperanto	x-vnd.Haiku-Media	1580243388
-Restart media services	Media views		Relanĉu la plurmediaj servoj
+1	esperanto	x-vnd.Haiku-Media	582516163
+Couldn't add volume control in Deskbar: %s\n	Media views		Ne povas aldoni administrilon de laŭteco en la Laborstrion: %s\n
+Restart media services	Media views		Relanĉi la plurmediajn servilojn
 Quit	Media Window		Ĉesi
+<none>	VideoInputMenu	Used when no video input is available	<neniu>
+Couldn't remove volume control in Deskbar: %s\n	Media views		Ne povas forigi administrilon de laŭteco el la Laborstrio: %s\n
 Video output:	Media views		Videa eligo:
 Video input:	Media views		Videa enigo:
 Audio output:	Media views		Sona eligo:
-Could not connect to the media server.\nWould you like to start it ?	Media Window		Ne eblas konekti al la plurmedia servilo.\nĈu vi volas lanĉi ĝin ?
-Show volume control on Deskbar	Media views		Montru la volumagordilon en Deskbar
-Start media server	Media Window		Lanĉu la plurmedian servilon
-Audio settings	Media Window		Sonaj agordoj
+Please select a SoundFont.	Midi View		Elektu specon de SoundFont.
+There are no SoundFonts installed.	Midi View		Neniu speco de SoundFont estas instalita.
+Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Ĉesigo de "Media" nun malpermesos relanĉadon de plurmediaj serviloj. Strangaĵoj aŭ foresto de plurmediaj funkcioj estos evidenta rezulto.
+Could not connect to the media server.\nWould you like to start it ?	Media Window		Ne povas konekti al la plurmedia servilo.\nĈu vi volas lanĉi ĝin ?
+Video settings	Media Window		Agordo por video
+Audio mixer	Media Window		Sona miksilo
+Show volume control on Deskbar	Media views		Montri la administrilon de laŭteco en la Laborstrio
+Start media server	Media Window		Lanĉi la plurmedian servilon
+Audio settings	Media Window		Sona agordo
+Quit anyway	Media Window		Ĉesi senkondiĉe
+Media	System name		Plurmedio
+Warning!	Media Window		Averto!
+MIDI Settings	Media Window		Agordo por MIDI
+SoundFonts	Midi View		SoundFonts
 Audio input:	Media views		Sona enigo:
 <none>	Media views		<neniu>
 Channel:	Media views		Kanalo:
-This hardware has no controls.	Media Window		Ĉi-tiu aparato ne havas agordilojn.
-Defaults	Media views		Aprioraj
+This hardware has no controls.	Media Window		Ĉi-tiu aparato ne havas stirilojn.
+Defaults	Media views		Defaŭltoj
+<none>	VideoOutputMenu	Used when no video output is available	<neniu>

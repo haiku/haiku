@@ -26,7 +26,7 @@ Output	MultiAudio		Sortida
 Video	MultiAudio		Vídeo
 Line	MultiAudio		Línia
 Mic	MultiAudio		Mic
- frequency:	MultiAudio		 freqüència:
+ frequency:	MultiAudio		 (freqüència):
 Enable	MultiAudio		Habilita
 Mute	MultiAudio		Silencia
 Wave	MultiAudio		Ones

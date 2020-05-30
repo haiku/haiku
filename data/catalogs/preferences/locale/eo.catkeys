@@ -1,20 +1,31 @@
-1	esperanto	x-vnd.Haiku-Locale	647070599
+1	esperanto	x-vnd.Haiku-Locale	1488345554
 Available languages	Locale Preflet Window		Haveblaj lingvoj
-Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		La listo de haveblaj lingvoj estas maltrovebla! Do vi ne povas uzi ĉi-tiu preferileto!
-Long format:	TimeFormatSettings		Longa aranĝo:
+Negative:	TimeFormatSettings		Negativa:
+already chosen	LanguageListView		antaŭe elektita
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Ne povas trovi la disponeblajn lingvojn! Vi ne povas uzi ĉi preferileto!
+Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		La Laborstrio kaj la Spurilo bezonas relanĉon por efektiviĝi ĉi ŝanĝon. Ĉu vi deziras relanĉi ilin nun?
+Long format:	TimeFormatSettings		Longa formato:
 Currency	TimeFormatSettings		Valuto
 Locale	System name		Lokaĵaro
-Short format:	TimeFormatSettings		Mallonga aranĝo:
+Short format:	TimeFormatSettings		Mallonga formato:
 Language	Locale Preflet Window		Lingvo
-Preferred languages	Locale Preflet Window		Preferaj lingvoj
+Preferred languages	Locale Preflet Window		Preferataj lingvoj
+Use month/day-names from preferred language	TimeFormatSettings		Uzi nomojn de monatoj/tagoj el preferata lingvo
+Formatting	Locale Preflet Window		Formatigo
 Locale	Locale Preflet Window		Lokaĵaro
-Numbers	TimeFormatSettings		Numeroj
+Numbers	TimeFormatSettings		Nombroj
 24 hour	TimeFormatSettings		24 hora
 OK	Locale Preflet Window		Bone
-Defaults	Locale Preflet Window		Aprioraj
+Restart	Locale Preflet Window		Relanĉi
+Full format:	TimeFormatSettings		Plena formato:
+Defaults	Locale Preflet Window		Defaŭltoj
 Cancel	Locale Preflet Window		Nuligi
+Translate application and folder names in Deskbar and Tracker.	Locale Preflet Window		Traduki nomojn de programoj kaj dosierujoj en la Laborstrio kaj la Spurilo.
 Revert	Locale Preflet Window		Malfari
+Medium format:	TimeFormatSettings		Meza formato:
 12 hour	TimeFormatSettings		12 hora
 Time	TimeFormatSettings		Horo
 Date	TimeFormatSettings		Dato
+Positive:	TimeFormatSettings		Pozitiva:
 Locale	Locale Preflet		Lokaĵaro
+Options	Locale Preflet Window		Opcioj

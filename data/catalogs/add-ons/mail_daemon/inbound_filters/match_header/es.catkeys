@@ -1,5 +1,5 @@
 1	spanish; castilian	x-vnd.Haiku-MatchHeader	1946584206
-Delete message	ConfigView		Borrar mensaje
+Delete message	ConfigView		Eliminar mensaje
 Match \"%attribute\" against \"%regex\"	RuleFilter		Concordar \"%attribute\" contra \"%regex\"
 Match header	RuleFilter		Cabecera concordante
 Set flags to	ConfigView		Seleccionar banderas a 

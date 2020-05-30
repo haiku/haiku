@@ -8,6 +8,6 @@ SGI Settings	SGIMain		Configuración SGI
 SGI image translator	SGITranslator		Intérprete de imagen SGI
 None	SGIView		Ninguno
 Version %d.%d.%d, %s	SGIView		Versión %d.%d.%d, %s
-\nbased on GIMP SGI plugin v1.5:\n	SGIView		\nbasado en el plugin SGI v1.5 de GIMP:\n
+\nbased on GIMP SGI plugin v1.5:\n	SGIView		\nbasado en el complemento SGI v1.5 de GIMP:\n
 RLE	SGIView		RLE
 written by:\n	SGIView		escrito por:\n

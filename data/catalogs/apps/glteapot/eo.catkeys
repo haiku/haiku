@@ -9,7 +9,7 @@ Blue	TeapotWindow		Blua
 Gouraud shading	TeapotWindow		Kolorheleco de Gouraud
 Quit	TeapotWindow		Forlasi
 Filled polygons	TeapotWindow		Plenaj plurlateroj
-Settings	TeapotWindow		Agordoj
+Settings	TeapotWindow		Agordo
 Fog	TeapotWindow		Nebulo
 Backface culling	TeapotWindow		Buĉado de malantauajn flankojn
 Z-buffered	TeapotWindow		Z-bufrado

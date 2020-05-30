@@ -1,6 +1,35 @@
-1	esperanto	x-vnd.Haiku-Input	2652896963
+1	esperanto	x-vnd.Haiku-Input	1091408684
+Scrolling	TouchpadPrefView		Rulumado
+Defaults	InputMouse		Defaŭltoj
+Tapping	TouchpadPrefView		Frapado
+Long	KeyboardView		Longa
+Normal	SettingsView		Normala
 Cancel	TouchpadPrefView		Nuligi
+4-Button	SettingsView		4-butona
+Slow	TouchpadPrefView		Malrapida
+Warp	SettingsView		Deformiĝo
+Instant warp	SettingsView		Tuja deformiĝo
+Device List	InputWindow		Listo de aparatoj
+Double-click speed	SettingsView		Rapideco de duobla alklako
+5-Button	SettingsView		5-butona
+Typing test area	KeyboardView		Areo por testi tajpadon
+Mouse type:	SettingsView		Speco de muso:
+Revert	InputKeyboard		Malfari
+Fast	KeyboardView		Rapide
+Off	TouchpadPrefView		Malŝalti
+Fast	TouchpadPrefView		Rapide
+Please confirm	TouchpadPrefView		Konfirmu
+Click to focus	SettingsView		Klaki por fokusigi
+Acceleration	TouchpadPrefView		Akcelado
+Mouse speed	SettingsView		Rapideco de muso
+Accept first click	SettingsView		Akcepti unuan klakon
 OK	TouchpadPrefView		Bone
+Horizontal scrolling	TouchpadPrefView		Horizontala rulumado
+Two finger scrolling	TouchpadPrefView		Rulumado per du fingroj
+Input	System name		Enigo
+Mouse acceleration	SettingsView		Akcelado de muso
+Defaults	TouchpadPrefView		Defaŭltoj
+1-Button	SettingsView		1-butona
 Defaults	InputKeyboard		Defaŭltoj
 Short	KeyboardView		Mallonge
 Slow	KeyboardView		Malrapide

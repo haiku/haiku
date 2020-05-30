@@ -12,7 +12,7 @@ No effect on running applications	DecorSettingsView		Sin efecto en aplicaciones 
 Fixed font:	Font view		Tipo de letra monoespaciado:
 Appearance	System name		Apariencia
 Reduce colored edges filter strength:	AntialiasingSettingsView		Reducir fortaleza del filtro de bordes coloreados:
-Glyph hinting:	AntialiasingSettingsView		Mejorado de símbolos:
+Glyph hinting:	AntialiasingSettingsView		Optimización de glifos:
 Default Haiku ControlLook	DecorSettingsView		ControlLook de Haiku predeterminado
 Menu item text	Colors tab		Texto de elemento de menú
 About decorator	DecorSettingsView		Acerca de Decorador
@@ -53,7 +53,7 @@ ControlLook:	DecorSettingsView		ControlLook:
 Scroll bar thumb	Colors tab		Miniatura de barra de desplazamiento
 Default	DecorSettingsView		Predeterminado
 Link visited	Colors tab		Enlace visitado
-Selected menu item border	Colors tab		Borde de ítem de menú seleccionado
+Selected menu item border	Colors tab		Borde de elemento de menú seleccionado
 Tooltip text	Colors tab		Texto de descripción emergente
 Control background	Colors tab		Fondo de control
 Selected list item text	Colors tab		Texto de elemento de menú seleccionado

@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-FileTypes	1229958646
+1	portuguese	x-vnd.Haiku-FileTypes	436017301
 Left	Attribute Window	Attribute column alignment in Tracker	À esquerda
 Float	Attribute ListView		Float
 Final	Application Types Window		Final
@@ -76,12 +76,14 @@ duration	Attribute ListView		duração
 File could not be opened	Preferred App Menu		Não foi possível abrir o ficheiro
 Args only	Application Type Window		Apenas argumentos
 Could not open \"%s\":\n%s	FileTypes		Não foi possível abrir \"%s\":\n%s
+Right	Attribute Window	Attribute column alignment in Tracker	Direita
 Save changes before closing?	Application Type Window		Guardar alterações antes de fechar?
 Background app	Application Type Window		Aplicação de segundo plano
 Recognition rule is not valid:\n\n	FileTypes Window		Regra de reconhecimento não é válida:\n\n
 Show icons in list	FileTypes Window		Mostrar ícones na lista
 Editable	Attribute Window	If Tracker allows to edit this attribute.	Editável
 New resource file…	FileTypes Window		Novo ficheiro de recursos…
+[Multiple files] file types	FileType Window		[Vários ficheiros] tipos de ficheiro
 Application type	Application Type Window		Tipo de aplicação
 Show in Tracker…	Application Types Window		Mostrar no Tracker…
 Type name:	FileTypes Window		Nome do tipo:
@@ -99,6 +101,7 @@ Single launch	Application Type Window		Instância única
 %s file type	FileType Window		%s tipo de ficheiro
 Default	Attribute ListView		Predefinição
 Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		A remoção e um super tipo não pode ser anulada.\nTodos os tipos de ficheiro que pertencem a este super tipo serão perdidos!\n\nTem a certeza de que quer fazer isto? Para remover todo o grupo, pressione a tecla Shift e clique em \"Remover\".
+String	Attribute ListView		Cadeia
 Add type	New File Type Window		Adicionar tipo
 Remove icon	Icon View		Remover ícone
 Boolean	Attribute ListView		Booleano

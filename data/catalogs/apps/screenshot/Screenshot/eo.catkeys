@@ -1,10 +1,14 @@
-1	esperanto	x-vnd.haiku-screenshot	3339678302
+1	esperanto	x-vnd.haiku-screenshot	3397467397
+Save in:	ScreenshotWindow		Konservi en:
 OK	ScreenshotWindow		Bone
+The destination path exists but is not a folder.	ScreenshotWindow		La itinera celo ekzistas sed ĝi ne estas dosierujo.
 Select	ScreenshotWindow		Elekti
 Save as:	ScreenshotWindow		Konservi kiel:
 seconds	ScreenshotWindow		sekundoj
 Desktop	ScreenshotWindow		Labortablo
+Translator Settings	ScreenshotWindow		Agordo de formatpelilo
 overwrite	ScreenshotWindow		anstataŭigi
+Settings…	ScreenshotWindow		Agordo…
 Choose folder	ScreenshotWindow		Elekti dosierujon
 Name:	ScreenshotWindow		Nomo:
 Cancel	ScreenshotWindow		Nuligi

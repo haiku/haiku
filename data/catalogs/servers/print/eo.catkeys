@@ -17,11 +17,11 @@ A printer with that name already exists, but its driver could not be found! Repl
 Yes	PrintServerApp		Jes
 Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Rekordlibro
 Would you like to set one up now?	PrintServerApp		Ĉu vi volas agordi unu nun?
-Print job setup:	ConfigWindow		Presotasko agordo:
+Print job setup:	ConfigWindow		Presotaska agordo:
 A6	ConfigWindow	ISO 216 paper size	A6
 Portrait	ConfigWindow		Vertikale
 All pages	ConfigWindow		Ĉiom da paĝoj
-There is no default printer set up.	PrintServerApp		Neniu implicita presilo estas agordita.
+There is no default printer set up.	PrintServerApp		Neniu defaŭlta presilo estas atribuita.
 B5	ConfigWindow	ISO 216 paper size	B5
 A0	ConfigWindow	ISO 216 paper size	A0
 Letter	ConfigWindow	ANSI A (letter), a North American paper size	Usona letero

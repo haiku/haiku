@@ -15,7 +15,7 @@ CMY 8:8:8 32 bits	PPMTranslator		CMY 8:8:8 32 bits
 OK	PPMMain		Aceptar
 CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 bits
 PPM image	PPMTranslator		Imagen PPM
-Input color space:	PPMTranslator		Espacio de Color de Entrada:
+Input color space:	PPMTranslator		Espacio de colores de entrada:
 RGB 5:5:5 16 bits big-endian	PPMTranslator		RGB 5:5:5 16 bits big-endian
 RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RGBA 5:5:5:1 16 bits big-endian
 Write ASCII	PPMTranslator		Escribe en formato ASCII

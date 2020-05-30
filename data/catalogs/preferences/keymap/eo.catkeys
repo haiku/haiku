@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-Keymap	285252649
+1	esperanto	x-vnd.Haiku-Keymap	3850365645
 Key	Modifier keys window	As in a computer keyboard key	Klavo
 Japanese	KeymapNames		Japana
 US	KeymapNames		Usona
@@ -24,11 +24,13 @@ Num lock	Keyboard Layout View		Nombraŝloso
 Switch shortcut keys to Windows/Linux mode	Keymap window		Ŝparvojklavoj laŭ Linukso/Vindozo
 Option	Keyboard Layout View	Option key	Opciklavo
 Spanish (Dvorak)	KeymapNames		Hispana (Dvoraka)
+Scroll lock	Keyboard Layout View		Ruluma baskulo
 US-International	KeymapNames		Usona internacia
 Right option	Keyboard Layout View		Dekstra opciklavo
 Turkish (Type-Q)	KeymapNames		Turka (Speco-Q)
 Revert	Modifier keys window		Malfari
 Slovak	KeymapNames		Slovaka
+CAPS LOCK	Keyboard Layout View		MAJUSKLA BASKULO
 Colemak	KeymapNames		Colmaka
 Dvorak (programmer's)	KeymapNames		Dvoraka (por programistoj)
 PRINT	Keyboard Layout View		PRESI
@@ -38,6 +40,7 @@ ThinkPad	KeyboardLayoutNames		ThinkPad
 Belarusian (Mac)	KeymapNames		Balrusa (por Mac)
 Croatian	KeymapNames		Kroatia
 PAGE ↑	Keyboard Layout View		PAĜO ↑
+Set modifier keys	Modifier keys window		Atribui modifajn klavojn
 Apple Aluminium International	KeyboardLayoutNames		Internacia por Apple Aluminium
 ThinkPad X1 (US)	KeyboardLayoutNames		ThinkPad X1 (Usona)
 Apple Aluminum	KeyboardLayoutNames		Apple Aluminium
@@ -59,6 +62,7 @@ Kazakh	KeymapNames		Kazaĥa
 Save as…	Keymap window		Konservi kiel…
 Lithuanian (Standard)	KeymapNames		Litovia (Norma)
 Error: duplicate keys	Modifier keys window		Eraro: duplikataj klavoj
+NUM	Keyboard Layout View	Very short for 'num lock'	NOMBRBASKULO
 Bulgarian (Phonetic)	KeymapNames		Bulgara (Fonetika)
 Kinesis Advantage	KeyboardLayoutNames		Kinesis Advantage
 Canadian-French	KeymapNames		Franca por Kanado
@@ -69,17 +73,24 @@ Tilde trigger	Keymap window		Tildo
 Shift	Keyboard Layout View	Shift key	Ŝovklavo
 Macedonian	KeymapNames		Makedona
 Czech (Mac)	KeymapNames		Ĉeĥa (por Mac)
+Left command	Keyboard Layout View		Maldekstra komanda klavo
 Albanian	KeymapNames		Albana
 (Current)	Keymap window		(Kuranta)
 Friulian	KeymapNames		Friula
+Left option	Keyboard Layout View		Maldekstra opciklavo
 END	Keyboard Layout View		FINO
 Esperanto	KeymapNames		Esperanta
 Belarusian	KeymapNames		Belarusa
+Warning: left and right key roles do not match	Modifier keys window		Averto: roloj de maldekstra kaj dekstra striklavoj ne taŭgas
 Circumflex trigger	Keymap window		Ĉapelo
+Caps lock	Keyboard Layout View		Majuskla baskulo
+Left shift	Keyboard Layout View		Maldekstra majuskla klavo
 Russian (Yawert)	KeymapNames		Rusa (Yawert)
 ThinkPad X100e International	KeyboardLayoutNames		Internacia por ThinkPad X100e
 Bulgarian (Cyrillic)	KeymapNames		Bulgara (Cirila)
 Swedish	KeymapNames		Sveda
+Left control	Keyboard Layout View		Maldekstra strisklavo
+CAPS	Keyboard Layout View	Very short for 'caps lock'	MAJUSKLBASKULO
 Svorak	KeymapNames		Sveda (de Dvorak, alinome Svorak)
 ThinkPad X100e (US)	KeyboardLayoutNames		ThinkPad X100e (Usona)
 German	KeymapNames		Germana
@@ -91,6 +102,7 @@ Generic 105-key International	KeyboardLayoutNames		Komuna 105-klava Internacia
 Disabled	Modifier keys window	Do nothing	Malŝaltita
 Select dead keys	Keymap window		Elektu senpaŝajn klavojn
 Russian (Mac)	KeymapNames		Rusa (por Mac)
+Right shift	Keyboard Layout View		Dekstra majuskliga klavo
 Belarusian (Latin)	KeymapNames		Belarusa (Latina)
 Hebrew	KeymapNames		Hebrea
 Layout	Keymap window		Aranĝo
@@ -110,9 +122,11 @@ Serbian (Latin)	KeymapNames		Serba (Latina)
 French	KeymapNames		Franca
 Portuguese	KeymapNames		Portugala
 Swiss-French	KeymapNames		Franca por Svilando
+Shift:	Modifier keys window	Shift key role name	Majuskligo:
 Keymap	System name		Klavmapo
 Slovene	KeymapNames		Slovena
 Lithuanian	KeymapNames		Litova
+Set modifier keys…	Keymap window		Atribui modifajn klavojn…
 Switch shortcut keys to Haiku mode	Keymap window		Ŝparvojklavoj laŭ Haiku
 Defaults	Keymap window		Defaŭltoj
 ISO-9995	KeymapNames		ISO-9995
@@ -120,21 +134,25 @@ System:	Keymap window		Sistemaj:
 ThinkPad International	KeyboardLayoutNames		Internacia por ThinkPad
 Apple Aluminum Extended (US)	KeyboardLayoutNames		Etendita por Apple Aluminum (US)
 Switch shortcut keys	Keymap window		Ŝparvojklavoj
+Right command	Keyboard Layout View		Dekstra komanda klavo
+NUM LOCK	Keyboard Layout View		NOMBRA BASKULO
 MENU	Keyboard Layout View		MENUO
 Belgian (comma)	KeymapNames		Belgio (komo)
 Norwegian	KeymapNames		Norvega
 Font	Keymap window		Tiparo
 Danish	KeymapNames		Dana
 Generic 104-key	KeyboardLayoutNames		Komuna 104-klavoj
+Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Majuskliga klavo
 PAUSE	Keyboard Layout View		PAŬZI
 Russian	KeymapNames		Rusa
 TypeMatrix 2030	KeyboardLayoutNames		por TypeMatrix 2030
 Romanian	KeymapNames		Rumana
 Command	Keyboard Layout View	Command key	Komandklavo
+SCROLL	Keyboard Layout View		RULUMBASKULO
 File	Keymap window		Dosiero
 Brazilian (ABNT2)	KeymapNames		Brazila (normo ABNT2)
 Dutch	KeymapNames		Nederlanda
 Diaeresis trigger	Keymap window		Dupunkto
 Icelandic	KeymapNames		Islanda
-Open…	Keymap window		Malfermi…
+Open…	Keymap window		Uzi…
 ThinkPad T400s (US)	KeyboardLayoutNames		ThinkPad T400s (US)

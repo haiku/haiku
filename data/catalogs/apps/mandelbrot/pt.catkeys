@@ -1,9 +1,10 @@
-1	portuguese	x-vnd.Haiku-Mandelbrot	2869080606
+1	portuguese	x-vnd.Haiku-Mandelbrot	3875916167
 Burning Ship	MandelbrotWindow		Navio em chamas
 Grassland	MandelbrotWindow		Grassland
 Lightning	MandelbrotWindow		Relâmpago
 About	MandelbrotWindow		Acerca
 Palette	MandelbrotWindow		Paleta
+Set	MandelbrotWindow		Conjunto
 Tricorn	MandelbrotWindow		Tricórnio
 Royal	MandelbrotWindow		Real
 Orbit Trap	MandelbrotWindow		Orbit Trap
@@ -19,5 +20,6 @@ Mandelbrot	System name		Mandelbrot
 Iterations	MandelbrotWindow		Iterações
 High contrast	MandelbrotWindow		Alto contraste
 Multibrot	MandelbrotWindow		Multibrot
+Spring	MandelbrotWindow		Primavera
 Midnight	MandelbrotWindow		Meia-noite
 Mandelbrot	MandelbrotWindow		Mandelbrot

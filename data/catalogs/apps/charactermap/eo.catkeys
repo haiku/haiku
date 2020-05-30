@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-CharacterMap	2628163909
+1	esperanto	x-vnd.Haiku-CharacterMap	1580934951
 Enclosed alphanumerics	UnicodeBlocks		Enfermitaj literciferoj
 Basic Latin	UnicodeBlocks		Baza latina
 Cyrillic extended C	UnicodeBlocks		Cirila etendita-C
@@ -164,6 +164,7 @@ CharacterMap	System name		LiterMapo
 Lao	UnicodeBlocks		Laosa
 Gothic	UnicodeBlocks		Gotika
 Limbu	UnicodeBlocks		Limbua
+Rejang	UnicodeBlocks		"Reĝang"
 Show private blocks	CharacterWindow		Montri privatajn blokojn
 Phoenician	UnicodeBlocks		Fenica
 Mongolian	UnicodeBlocks		Mongola
@@ -172,6 +173,7 @@ Miscellaneous symbols and arrows	UnicodeBlocks		Diversaj simboloj kaj sagoj
 Yijing hexagram symbols	UnicodeBlocks		Heksagramoj de la Libro de ŝanĝiĝoj
 Supplemental mathematical operators	UnicodeBlocks		Suplementaj matematikaj operacisimboloj
 Enclosed CJK letters and months	UnicodeBlocks		Enfermitaj ĈJK-literoj kaj monatoj
+Kayah Li	UnicodeBlocks		"Kajah Li"
 Alphabetic presentation forms	UnicodeBlocks		Alfabetaj prezentadaj formoj
 Halfwidth and fullwidth forms	UnicodeBlocks		Formoj de plena kaj duona vasteco
 Ethiopic supplement	UnicodeBlocks		Etiopa suplemento
@@ -188,7 +190,7 @@ CJK compatibility	UnicodeBlocks		ĈJK-kongrueco
 Malayalam	UnicodeBlocks		Malajala
 N'Ko	UnicodeBlocks		Nokoa skribo
 Kannada	UnicodeBlocks		Kanara
-Copy as escaped byte string	CharacterView		Kopii kiel bajtĉeno kun eskapiloj
+Copy as escaped byte string	CharacterView		Kopii kiel bitoka ĉeno kun eskapiloj
 Phonetic extensions supplement	UnicodeBlocks		Suplemento al fonetikaj etendaĵoj
 Domino tiles	UnicodeBlocks		Domenpecoj
 Katakana phonetic extensions	UnicodeBlocks		Katakana fonetikaj etendaĵoj

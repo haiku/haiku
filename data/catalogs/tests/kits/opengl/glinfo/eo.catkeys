@@ -10,9 +10,9 @@ Maximum convolution	Capabilities		Maksimuma konvolvadoaĵo
 Attributes stack size	Capabilities		Grandeco de atribua stako
 Maximum lights	Capabilities		Maksimuma nombro da lumiloj
 Maximum 3D texture size	Capabilities		Maksimuma grandeco de tridimensia teksturo
-Extensions	Extensions		Etendaĵoj
+Extensions	Extensions		Kromaĵoj
 Maximum recommended index elements	Capabilities		Maksimuma nombro da rekomenditaj indeksaj eroj
-Available extensions	Extensions		Disponeblaj etendaĵoj
+Available extensions	Extensions		Disponeblaj rromaĵoj
 Maximum recommended vertex elements	Capabilities		Maksimuma nombro da rekomenditaj verticaj eroj
 Value	Capabilities		Valoro
 Maximum texture units	Capabilities		Maksimumo de teksturaj blokoj

@@ -2,13 +2,13 @@
 Expand	ExpanderMenu		Elarkivigi
 Expanding '%s'…	ExpanderWindow		Elarkivante '%s'…
 Close window when done expanding	ExpanderPreferences		Ĉesi post la elarkivigo finiĝas
-Set destination…	ExpanderMenu		Elekti elarkivan lokon…
+Set destination…	ExpanderMenu		Atribui celan lokon…
 Use:	ExpanderPreferences		Uzi:
 File expanded	ExpanderWindow		Dosiero elarkivita
 The destination is read only.	ExpanderWindow		La elarkiva loko nurlegeblas.
-Expander: Open	ExpanderWindow		Elarkivilo: Malfermi
+Expander: Open	ExpanderWindow		Elarkivilo: Uzi
  is not supported	ExpanderWindow		 ne estas subtenata
-Expander settings	ExpanderPreferences		Elarkivilaj agordoj
+Expander settings	ExpanderPreferences		Agordo de la Elarkivilo
 Select current	DirectoryFilePanel		Elekti la nunan lokon
 Source	ExpanderWindow		Fonto
 Error when expanding archive	ExpanderWindow		Eraris dum la elarkivado
@@ -24,8 +24,8 @@ Select	DirectoryFilePanel		Elekti
 The folder was either moved, renamed or not supported.	ExpanderWindow		La dosierujo estas movita, alinomita aŭ nesubtenata.
 Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		La elarkiva dosierujo ne ekzistas. Ĉu vi deziras krei ĝin?
 Same directory as source (archive) file	ExpanderPreferences		Uzi la dosierujon de la fonta arkivo
-Settings	ExpanderMenu		Agordoj
-Settings…	ExpanderMenu		Agordoj…
+Settings	ExpanderMenu		Agordo
+Settings…	ExpanderMenu		Agordo…
 Expander: Choose destination	DirectoryFilePanel		Elarkivilo: Elekti elarkivan lokon
 Select	ExpanderPreferences		Elekti
 Show contents	ExpanderWindow		Montri la enhavojn
@@ -43,9 +43,9 @@ Expander	System name		Elarkivilo
 Expand	ExpanderWindow		Elarkivigi
 Close	ExpanderMenu		Malfermi
 The destination is not a folder.	ExpanderWindow		La elarkiva loko ne estas dosierujo.
-Open destination folder after extraction	ExpanderPreferences		Malfermi la elarkivan lokon post elarkivigo
+Open destination folder after extraction	ExpanderPreferences		Montri rezultan dosierujon post elarkivigo
 Creating listing for '%s'…	ExpanderWindow		Kreante liston de dosieroj por '%s'…
-Set source…	ExpanderMenu		Elekti la fonton…
+Set source…	ExpanderMenu		Atribui fonton…
 Show contents	ExpanderMenu		Montri la enhavojn
 Stop	ExpanderWindow		Halti
 Destination	ExpanderWindow		Celo

@@ -67,7 +67,7 @@ Cancel	AbstractParametersPanel		Nuligi
 Format	MainWindow		Strukturi
 <empty or unknown>	DiskView		<malplena aŭ nekonata>
 OK	MainWindow		Bone
-Open with DiskProbe	MainWindow		Malfermi per DiskaSondilon
+Open with DiskProbe	MainWindow		Uzi per la DiskSondilo
 Could not delete the selected partition.	MainWindow		Ne povis forigi la elektitan subdiskon.
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Ĉu vi certas, ke vi volas pravalorizi la elektitan diskon? Ĉiuj datumoj estos perditaj. Ni ankoraŭ demandos vin antaŭ ŝanĝoj estos skribitaj al la disko.\n
 There was an error preparing the disk for modifications.	MainWindow		Estis eraro kiam pretigi la diskon por modifoj.

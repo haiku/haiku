@@ -3,6 +3,6 @@ The application:\n\n      %app\n\nhas encountered an error which prevents it fro
 Oh yeah!	DebugServer		¡Oh, sí!
 Debug	DebugServer		Depurar
 Terminate	DebugServer		Terminar
-Save report	DebugServer		Guardar reporte
+Save report	DebugServer		Guardar informe
 Write core file	DebugServer		Escribir archivo de depuración
 Oh no!	DebugServer		¡Lo siento!

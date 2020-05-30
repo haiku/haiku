@@ -7,10 +7,10 @@ Application keyring access	AppAccessRequestWindow		Acceso a la aplicación del d
 Disallow	AppAccessRequestWindow		Denegar
 Allow once	AppAccessRequestWindow		Permitir una vez
 Unlock keyring	KeyRequestWindow		Desbloquear depósito
-An application wants to access the keyring below, but it is locked with a passphrase. Please enter the passphrase to unlock the keyring.\nIf you unlock the keyring, it stays unlocked until the system is shut down or the keyring is manually locked again.\nIf you cancel this dialog the keyring will remain locked.	KeyRequestWindow		Una aplicación desea acceder al depósito de claves indicado, pero se encuentra bloqueado con una contraseña. Por favor ingrese la contraseña para desbloquear el depósito de claves.\nSi usted desbloquea el depósito de claves, el mismo permanecerá desbloqueado hasta que el sistema sea apagado o el depósito sea manualmente bloqueado.\nSi usted cancela este diálogo el depósito de claves permanecerá bloqueado.
+An application wants to access the keyring below, but it is locked with a passphrase. Please enter the passphrase to unlock the keyring.\nIf you unlock the keyring, it stays unlocked until the system is shut down or the keyring is manually locked again.\nIf you cancel this dialog the keyring will remain locked.	KeyRequestWindow		Una aplicación desea acceder al depósito de claves indicado, pero se encuentra bloqueado con una contraseña. Escriba la contraseña para desbloquear el depósito.\nSi desbloquea el depósito de claves, este permanecerá desbloqueado hasta que se apague el sistema o se bloquee el depósito manualmente.\nSi cancela este diálogo, el depósito de claves permanecerá bloqueado.
 Password:	KeyRequestWindow		Contraseña:
 Cancel	KeyRequestWindow		Cancelar
-This application has been updated since it was last granted access.	AppAccessRequestWindow		Está aplicación ha sido actualizada desde la última vez que se le otorgó acceso.
+This application has been updated since it was last granted access.	AppAccessRequestWindow		Está aplicación se ha actualizado desde la última vez que se le otorgó acceso.
 Allow always	AppAccessRequestWindow		Permitir siempre
 Unlock	KeyRequestWindow		Desbloquear
 The application:\n%signature% (%path%)\n\n	AppAccessRequestWindow		La aplicación:\n%signature% (%path%)\n\n

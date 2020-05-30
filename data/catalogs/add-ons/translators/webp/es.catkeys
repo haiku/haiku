@@ -17,7 +17,7 @@ Low	ConfigView		Baja
 High	ConfigView		Alta
 Drawing	ConfigView		Dibujo
 Based on libwebp %version%	ConfigView		Basado en libwebp %version%
-Default	ConfigView		Defecto
+Default	ConfigView		Predeterminado
 Fast	ConfigView		Rápida
 Photo	ConfigView		Foto
 Preprocessing filter	ConfigView		Filtro de preprocesado

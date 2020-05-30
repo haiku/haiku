@@ -1,10 +1,53 @@
-1	esperanto	x-vnd.Haiku-Mail	3869226518
+1	esperanto	x-vnd.Haiku-Mail	2750130554
+Account settings	AutoConfigWindow		Agordo de konto
+\t\t· Outgoing	Config Window		\t\t· Elira
+An error occurred while creating the config view: %error.	Config Views		Eraro aperis dum krei la agordavidon: %error.
+E-mail address:	E-Mail		Retpoŝta adreso:
+Create new account	AutoConfigWindow		Krei novan konton
+While sending and receiving	Config Window		Sendante kaj ricevante
+Error!	Config Views		Eraro!
+Apply	Config Window		Apliki
+Incoming mail filters	Config Views		Envenaj retpoŝtaj filtriloj
+Outgoing mail filters	Config Views		Eliraj retpoŝtaj filtriloj
+Server name:	E-Mail		Servilnomo:
 Add	Config Window		Aldoni
+Back	AutoConfigWindow		Reen
+Real name:	E-Mail		Vera nomo:
+Real name:	Config Views		Vera nomo:
+\t\t· E-mail filters	Config Window		\t\t· Retpoŝtadresaj filtriloj
+Outgoing	E-Mail		Elira
+Accounts	Config Window		Kontoj
+Outgoing	Config Window		Elira
 Remove	Config Views		Forigi
-Settings	Config Window		Agordoj
+Show notifications:	Config Window		Montri sciigojn:
+Settings	Config Window		Agordo
+Never	Config Window	show status window	Neniam
+Account name:	Config Views		Konta nomo:
+\t\t· Incoming	Config Window		\t\t· Envena
+Enter a valid e-mail address.	AutoConfigWindow		Entajpu validan retpoŝtadreson.
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nLa ĝenerala agordo ne povas esti malfarita.\n\nEraro de ricevo de ĝenerala agordo:\n%s\n
+Incoming	E-Mail		Envena
+Choose Protocol	E-Mail		Elekti Protokolon
+Return address:	Config Views		Revenadreso:
+Password:	E-Mail		Pasvorto:
+Error retrieving general settings: %s\n	Config Window		Eraro de ricevo de ĝenerala agordo: %s\n
+The filter could not be moved. Deleting filter.	Config Views		La filtrilo ne povas esti movita. Filtrilo estas forigata.
 OK	Config Views		Bone
+Revert	Config Window		Malfari
+Incoming	Config Window		Envena
+Finish	AutoConfigWindow		Fini
+Add filter	Config Views		Aldoni filtrilon
+Account settings	Config Views		Agordo de konto
+minutes	Config Window		minutoj
+E-mail	System name		Retpoŝto
+Check every	Config Window		Rekontroli ĉiujn
+Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Krei novan konton per la butono Aldoni.\n\nForigi konton per la butono Forigi sur la elektita ero.\n\nElekti eron el la listo por ŝanĝi ĝian agordon.
+Account name:	E-Mail		Konta nomo:
+Edit mailbox menu…	Config Window		Redakti menuon de retpoŝtujo…
 Server Name:	E-Mail		Servila nomo:
 Remove	Config Window		Forigi
+Login name:	E-Mail		Ensaluta nomo:
+While sending	Config Window		Sendante
 OK	Config Window		Bone
 OK	AutoConfigWindow		Bone
 Next	AutoConfigWindow		Sekva

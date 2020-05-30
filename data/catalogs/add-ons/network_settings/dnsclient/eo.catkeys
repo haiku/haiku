@@ -1,7 +1,7 @@
 1	esperanto	x-vnd.Haiku-DNSClientService	2825577357
-DNS settings	DNSClientServiceAddOn		DNS agordoj
+DNS settings	DNSClientServiceAddOn		Valoro de DNS
 Move down	DNSSettingsView		Movi suben
-DNS settings	DNSSettingsView		DNS agordoj
+DNS settings	DNSSettingsView		Valoro de DNS
 Remove	DNSSettingsView		Forigi
 Domain:	DNSSettingsView		Domajno:
 Add	DNSSettingsView		Aldoni

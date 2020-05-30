@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-DiskProbe	3418781567
+1	croatian	x-vnd.Haiku-DiskProbe	2634081215
 Remove	AttributeWindow		Ukloni
 Close	ProbeView		Zatvori
 Boolean value:	TypeEditors		Booleanska vrijednost:
@@ -6,6 +6,8 @@ File	ProbeView		Datoteka
 Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Heksadecimalno
 Text	TypeEditors	This is the type of editor	Tekst
 Add	ProbeView		Dodaj
+Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Želite li doista ukloniti atribut \"%s\" uz datoteke \"%s\"?\n\nRadnja je nepovratna.
+No type editor available	AttributeWindow		NIje dostupan uređivač vrsta
 Print…	ProbeView		Ispisuj...
 New…	FileWindow		Nova...
 what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	što: '%.4s'\n\n

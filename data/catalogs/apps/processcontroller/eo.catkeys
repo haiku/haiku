@@ -1,10 +1,33 @@
-1	esperanto	x-vnd.Haiku-ProcessController	1177781656
-Live in the Deskbar	ProcessController		Loĝi en la Laborstrio
+1	esperanto	x-vnd.Haiku-ProcessController	462106755
+Error saving file	ProcessController		Eraro dum konservado de dosiero
+Display priority	ProcessController		Montri prioritaton/Prioritato de montrado
+That's no Fun!	ProcessController		Tio ne estas ŝerco!
+What do you want to do with the team \"%s\"?	ProcessController		Kion vi volas fari kun la fadenaro \"%s\"?
+Your setting file could not be saved!\n(%s)	ProcessController		Ne povas konservi vian doisieron de agordo!\n(%s)
+Processor %d	ProcessController		Procesoro %d
+Live in the Deskbar	ProcessController		Aktiva en la Laborstrio
+Kill this team!	ProcessController		Ĉesi la fadenaron!
 OK	ProcessController		Bone
-You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Vi povas lanĉi Taskadministrilon en fenestro aŭ instali ĝin en la Laborstrio.
-Restart Deskbar	ProcessController		Relanĉi Laborstrion
+You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Vi povas lanĉi la Taskadministrilon en fenestro aŭ instali ĝin en la Laborstrion.
+Real-time priority	ProcessController		Realtempa prioritato
+Custom priority	ProcessController		Propra prioritato
+Debug this thread!	ProcessController		Sencimigi la fadenon!
+Low priority	ProcessController		Ŝpara prioritato
+Urgent display priority	ProcessController		Prioritato de urĝa montrado
+Memory usage	ProcessController		Uzado de memorilo
+Ok!	ProcessController		Bone!
+Normal priority	ProcessController		Norma prioritato
+Restart Deskbar	ProcessController		Relanĉi la Laborstrion
+About ProcessController…	ProcessController		Pri la Taskadministrilo…
 Usage: %s [-deskbar]\n	ProcessController		Uzado: %s [-deskbar]\n
+Please confirm	ProcessController		Konfirmu
+Urgent priority	ProcessController		Urĝa prioritato
+What do you want to do with the thread \"%s\"?	ProcessController		Kion vi volas fari kun la fadeno \"%s\"?
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
+Idle priority	ProcessController		Ŝpara prioritato
+Quit application	ProcessController		Ĉesi programon
+Quit an application	ProcessController		Ĉesi programon
 Cancel	ProcessController		Nuligi
 Install in Deskbar	ProcessController		Instali en Labosrstrio
-Restart Tracker	ProcessController		Relanĉi Spurilon
+Restart Tracker	ProcessController		Relanĉi la Spurilon
 ProcessController is already installed in Deskbar.	ProcessController		Taskadministrilo jam estas instalita en Laborstrio.

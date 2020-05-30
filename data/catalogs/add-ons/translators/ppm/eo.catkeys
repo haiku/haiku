@@ -1,6 +1,6 @@
 1	esperanto	x-vnd.Haiku-PPMTranslator	292474603
 None	PPMTranslator		Neniu
-PPM Settings	PPMMain		PPM Agordoj
+PPM Settings	PPMMain		Agordo de PPM
 System palette 8 bits	PPMTranslator		Sistema farboplato 8 bita
 Sample code copyright 1999, Be Incorporated	PPMTranslator		Ekzempla kodo kopirajto 1999, Be Incorporated
 Something is wrong with the PPMTranslator!	PPMMain		Io fiaskas je la PPMTranslator!
@@ -10,7 +10,7 @@ RGB 8:8:8 32 bits big-endian	PPMTranslator		RGC 8:8:8 32 bitoj grand-pezekstrema
 PPM image translator	PPMTranslator		PPM bildotradukilo
 Bitmap 1 bit	PPMTranslator		Bitmapo 1 bita
 RGB 5:6:5 16 bits big-endian	PPMTranslator		RGC 5:6:5 16 bita grand-pezekstrema
-PPMTranslator Settings	PPMTranslator		PPMTranslator Agordoj
+PPMTranslator Settings	PPMTranslator		Agordo de PPMTranslator
 CMY 8:8:8 32 bits	PPMTranslator		CMY 8:8:8 32 bitoj
 OK	PPMMain		Bone
 CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 bitoj

@@ -7,7 +7,7 @@ Shut down	ShutdownProcess		Malŝalti
 The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		La programo \"%appName%\" eble estus barota sur moda panelo.
 System is shut down	ShutdownProcess		Sistemo malŝaltiĝis.
 Restart system	ShutdownProcess		Restartigi komputilon
-Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Programo \"%appName%\" mortigis la malŝaltan procedon.
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Programo \"%appName%\" ĉesigis la malŝaltan procedon.
 Asking background applications to quit.	ShutdownProcess		Petante fonajn programojn ĉesiĝi.
 Do you really want to restart the system?	ShutdownProcess		Ĉu vi certas, ke vi deziras restartigi la komputilon?
 Restart	ShutdownProcess		Restartigi
@@ -18,6 +18,6 @@ Restarting…	ShutdownProcess		Restartante…
 %action%?	ShutdownProcess		%action%?
 Tidying things up a bit.	ShutdownProcess		Iome lavumadas.
 Kill application	ShutdownProcess		Mortigi programojn
-Shutdown aborted	ShutdownProcess		Malŝalto ĉesiĝis
+Shutdown aborted	ShutdownProcess		Malŝalto estas ĉesigita
 Shutting down…	ShutdownProcess		Malŝaltante…
 Asking \"%appName%\" to quit.	ShutdownProcess		Petante \"%appName%\" ĉesiĝi.

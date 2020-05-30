@@ -10,7 +10,7 @@ Written by the Haiku Translation Kit Team	TGAView		Verkis la Haiku Translation K
 Targa image (%d bits RLE truecolor)	TGATranslator		Targa bildo (%d bita RLE verkolora)
 TGA images	TGATranslator		TGA bildoj
 Version %d.%d.%d, %s	TGAView		Versio %d.%d.%d, %s
-TGATranslator Settings	TGATranslator		TGATranslator Agordoj
+TGATranslator Settings	TGATranslator		Agordo de TGATranslator
 TGA image translator	TGATranslator		TGA bildotradukilo
 Targa image (%d bits RLE gray)	TGATranslator		Targa bildo (%d bita RLE griza)
-TGA Settings	TGAMain		TGA Agordoj
+TGA Settings	TGAMain		Agordo de TGA

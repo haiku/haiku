@@ -1,2 +1,55 @@
-1	esperanto	x-vnd.Haiku-Network	2890691539
+1	esperanto	x-vnd.Haiku-Network	2923905377
+Ethernet device	InterfaceListItem		Eterreta aparato
+Link speed:	IntefaceView		Konekta rapido:
+disconnected	IntefaceView		diskonektita
+IP Address:	IntefaceAddressView		IP-adreso:
+WPA	WPA protected network		WPA
+Network:	IntefaceView		Reto:
+Received:	IntefaceView		Ricevita:
+New…	NetworkWindow		Nova…
+no link	InterfaceListItem		konekto forestas
+Other	NetworkWindow		Alia
+Sent:	IntefaceView		Sendita:
+Gateway:	IntefaceAddressView		Defaŭlta kluzo:
+The netmask defines your local network	IntefaceAddressView		La subreta masko precizigas vian lokan reton
+Your IP address	IntefaceAddressView		Via IP-adreso
+DHCP	IntefaceAddressView		DHCP
+Netmask:	IntefaceAddressView		Retmasko:
+EAP	EAP protected network		EAP
+Services	NetworkWindow		Servoj
+Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Instaligo de la Retstato en la Laborstrion malsukcesis: %s
+Revert	NetworkWindow		Malfari
+off	ServiceListItem		malŝaltita
+WEP	WEP protected network		WEP
+<no wireless networks found>	IntefaceView		<ne trovis sendrataretojn>
+Enable	IntefaceView		Ebligi
+connected	IntefaceView		konektita
+Apply	IntefaceAddressView		Apliki
+Disable	ServiceView		Malebligi
+WPA2	WPA2 protected network		WPA2
+Show network status in Deskbar	NetworkWindow		Montri retan staton en la Laborstrio
+Mode:	IntefaceAddressView		Reĝimo:
+connected	InterfaceListItem		konektita
 OK	NetworkWindow		Bone
+Static	IntefaceAddressView		Statika
+launch error	NetworkWindow		lanĉa eraro
+Renegotiate	IntefaceView		Rekonsenti
+MAC address:	IntefaceView		Maŝinadreso:
+%name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
+disabled	InterfaceListItem		malebligita
+Dial-up connection	InterfaceListItem		Pertelefonlinea konekto
+on	ServiceListItem		ŝaltita
+The method for obtaining an IP address	IntefaceAddressView		La metodo por akiri IP-adreson
+disconnected	InterfaceListItem		malkonektita
+Automatic	IntefaceAddressView		Aŭtomata
+Choose automatically	IntefaceView		Elekti aŭtomate
+Status:	IntefaceView		Stato:
+Disable	IntefaceView		Malebligi
+Manage…	NetworkWindow		Administri…
+open	Open network		uzi
+Network	System name		Reto
+Your gateway to the internet	IntefaceAddressView		Via defaŭlta kluzo al la Interreto
+Enable	ServiceView		Ebligi
+Wireless device	InterfaceListItem		Sendrata aparato
+Disabled	IntefaceAddressView		Malebligita
+VPN connection	InterfaceListItem		Konekto per VPN (virtuala privata reto)

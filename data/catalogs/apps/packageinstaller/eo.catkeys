@@ -1,3 +1,18 @@
-1	esperanto	x-vnd.Haiku-PackageInstaller	2534012714
+1	esperanto	x-vnd.Haiku-PackageInstaller	2187448622
+The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		La simbola ligilo kun nomo '%s' jam ekzistas kun donita itinero.\nĈu anstataŭigi ĝin per ligilo el ĉi pakaĵo aŭ preterpasi ĝin?
+The installation of the package has been aborted.	PackageView		Instalado de la pakaĵo estas ĉesigita.
+The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		La elektita pakaĵo ne estas forigita el sistemo. la informa dosiero pri instalita pakaĵo povas esti rompita.
+The item named '%s' already exists in the given path.\nReplace the item with the one from this package or skip it?	PackageView		La ero kun nomo '%s' jam ekzistas laŭ donita itinero.\nĈu anstataŭigi ĝin per ero el ĉi pakaĵo aŭ preterpasi ĝin?
 OK	UninstallView		Bone
+Abort	PackageView		Ĉesigi senkondiĉe
+Installation progress	PackageView		Progreso de instalado
+The script named '%s' already exists in the given path.\nReplace the script with the one from this package or skip it?	PackageView		La skripto kun nomo '%s' jam ekzistas laŭ donita itinero.\nĈu anstataŭigi ĝin per skripto el ĉi pakaĵo aŭ preterpasi ĝin?
+Abort	PackageInstall		Ĉesigi senkondiĉe
+The file named '%s' already exists in the given path.\nReplace the file with the one from this package or skip it?	PackageView		La dosiero kun nomo '%s' jam ekzistas laŭ donita itinero.\nĈu anstataŭigi ĝin per dosiero el ĉi pakaĵo aŭ preterpasi ĝin?
+Error! \"%s\" is not a valid path.\n	Packageinstaller main		Eraro! \"%s\" ne estas valida itinero.\n
+The directory named '%s' already exists in the given path.\nReplace the directory with one from this package or skip it?	PackageView		La dosierujo kun nomo '%s' jam ekzistas laŭ donita itinero.\nĈu anstataŭigi ĝin per dosierujo el ĉi pakaĵo aŭ preterpasi ĝin?
 OK	PackageView		Bone
+Abort	PackageInfo		Ĉesigi senkondiĉe
+Done	PackageInstall		Farite
+Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Eraro (%s)! Malsukcesis uzi \"%s\".\n
+Image not loaded correctly	PackageImageViewer		La bildo ne estas ŝargita korekte

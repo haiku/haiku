@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-JPEGTranslator	2943162387
+1	portuguese	x-vnd.Haiku-JPEGTranslator	3788699631
 Read	JPEGTranslator		Leitura
 Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Formato de Mapa de Bits Be (Tradutor JPEG)
 Show warning messages	JPEGTranslator		Mostrar mensagens de aviso
@@ -17,5 +17,6 @@ Read greyscale images as RGB32	JPEGTranslator		Ler imagens em escala de cinzento
 Output quality	JPEGTranslator		Qualidade de saída
 Low	JPEGTranslator		Baixa
 Write	JPEGTranslator		Escrever
+Prevent colors 'washing out'	JPEGTranslator		Evitar cores "desbotadas"
 JPEG Library Warning: %s\n	be_jerror		Aviso da Biblioteca JPEG: %s\n
 JPEG images	JPEGTranslator		Imagens JPEG

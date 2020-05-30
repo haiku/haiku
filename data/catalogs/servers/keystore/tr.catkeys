@@ -4,7 +4,7 @@ This application doesn't yet have the required privileges.	AppAccessRequestWindo
 Keyring:	KeyRequestWindow		Anahtarlık:
 requests access to keyring:\n%keyringName%\n\n	AppAccessRequestWindow		anahtarlığa erişim izni istiyor:\n%keyringName%\n\n
 Application keyring access	AppAccessRequestWindow		Uygulama anahtarlık erişimi
-Disallow	AppAccessRequestWindow		İzin verme!
+Disallow	AppAccessRequestWindow		İzin verme
 Allow once	AppAccessRequestWindow		Bir kez izin ver
 Unlock keyring	KeyRequestWindow		Anahtarlığı çöz
 An application wants to access the keyring below, but it is locked with a passphrase. Please enter the passphrase to unlock the keyring.\nIf you unlock the keyring, it stays unlocked until the system is shut down or the keyring is manually locked again.\nIf you cancel this dialog the keyring will remain locked.	KeyRequestWindow		Bir uygulama aşağıdaki anahtarlığa erişmek istiyor, ancak anahtarlık bir parola ile kilitlenmiş. Anahtarlığı çözmek için parolayı girin.\nAnahtarlığı çözerseniz sistem kapatılana kadar veya el ile tekrar kilitlenene kadar çözülmüş kalacaktır.\nBu iletişim kutusunu iptal ederseniz anahtarlık kilitli kalacaktır.

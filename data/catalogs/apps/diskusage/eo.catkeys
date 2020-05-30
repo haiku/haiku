@@ -7,7 +7,7 @@ Rescan	Pie View		Reskani
 Kind	Info Window		Speco
 file unavailable	Pie View		dosiero nedisponebla
 no supporting apps	Pie View		Ne apogitaj programoj
-Path	Info Window		Dosierindiko
+Path	Info Window		Itinero
 Scan	Status View		Skani
 Rescan	Status View		Reskani
 file unavailable	Status View		dosiero ne disponebla
@@ -15,9 +15,9 @@ Get info	Pie View		Akiri informon
 DiskUsage	System name		DiskoSpaco
 Created	Info Window		Kreita
 Modified	Info Window		Redaktita
-Abort	Status View		Ĉesigi
-Open with	Pie View		Malfermi per
-Open	Pie View		Malfermi
+Abort	Status View		Ĉesigi senkondiĉe
+Open with	Pie View		Uzi per
+Open	Pie View		Uzi
 {0, plural, one{# file} other{# files}}	Status View		{0, plural, one{# dosiero} other{# dosieroj}}
 %a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
 Free on %refName%	Scanner		Libera loko je %refName%

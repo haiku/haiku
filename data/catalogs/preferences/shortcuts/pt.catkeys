@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-Shortcuts	645384487
+1	portuguese	x-vnd.Haiku-Shortcuts	3834857117
 *MouseUp	ShortcutsWindow		*MouseUp
 Application	ShortcutsWindow		Aplicação
 Option	ShortcutsSpec	Name for modifier on keyboard	Opção
@@ -16,6 +16,7 @@ Key	ShortcutsWindow		Tecla
 Select	ShortcutsWindow		Selecionar
 Shortcuts	System name		Atalhos
 Quit	ShortcutsWindow		Sair
+(Choose application with file requester)	ShortcutsWindow		(Selecionar uma aplicação com solicitação de ficheiro)
 Cancel	ShortcutsWindow		Cancelar
 *MoveMouse +20 +0	ShortcutsWindow		*MoveMouse +20 +0
 Control	ShortcutsSpec	Name for modifier on keyboard	Controlo
@@ -24,6 +25,7 @@ Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		O Atalhos não 
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Não foi possível guardar o ficheiro de combinações de teclas!
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"O Seu Texto Aqui\"
 Remove selected shortcut	ShortcutsWindow		Remover o atalho selecionado
+Error, NULL state description?	ShortcutsSpec		Erro, descrição de estado NULL?
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		O Atalhos não conseguiu abrir o seu ficheiro de combinação de teclas!
 Save & apply	ShortcutsWindow		Guardar e aplicar

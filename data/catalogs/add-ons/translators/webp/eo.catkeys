@@ -2,16 +2,16 @@
 ©2010-2017 Haiku Inc.	ConfigView		©2010-2017 Haiku Inc.
 Compression method:	ConfigView		Densiga metodo:
 WebP image translator	ConfigView		WebP bildotradukilo
-Preset	ConfigView		Antaŭagordita
+Preset	ConfigView		Antaŭagordo
 WebP images	WebPTranslator		WebP bildoj
-WebPTranslator Settings	ConfigView		WebPTranslator Agordoj
+WebPTranslator Settings	ConfigView		Agordo de WebPTranslator
 Output quality:	ConfigView		Eliga kvalito:
 ©2010-2017 Google Inc.	ConfigView		©2010-2017 Google Inc.
-WebP Settings	main		WebP Agordoj
+WebP Settings	main		Agordo de WebP
 Text	ConfigView		Teksto
 Slower but better	ConfigView		Plimalrapida sed plibona
 WebP image	WebPTranslator		WebP bildo
-Output preset:	ConfigView		Eliga antaŭagordo:
+Output preset:	ConfigView		Antaŭagordo por eligo:
 Picture	ConfigView		Bildo
 Low	ConfigView		Malalta
 High	ConfigView		Alta

@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Be-MAIL	983725282
+1	portuguese	x-vnd.Be-MAIL	1477453861
 Set to Saved	Mail		Marcar como guardada
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		O seu texto contém %ld caracteres não codificáveis. Talvez funcionasse melhor um conjunto de caracteres diferente? Clique em Enviar para enviar de qualquer modo (será utilizado um caracter de substituição no lugar dos caracteres não codificáveis) ou escolha Cancelar para voltar atrás e tentar corrigir.
 Text wrapping:	Mail		Translineação:
@@ -37,8 +37,10 @@ Same recipient	Mail		Mesmo destinatário
 Previous message	Mail		Mensagem anterior
 (Address unavailable)	Mail		(Endereço indisponível)
 Mail	System name		Correio
+Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Anexo: %name% (Tipo: %type%)
 Copy link location	Mail		Copiar localização da hiperligação
 Attachments: 	Mail		Anexos: 
+Remove enclosure	Mail		Remover anexo
 Next	Mail		Próximo
 Attachments:	Mail		Anexos:
 Show icons only	Mail		Mostrar apenas ícones
@@ -98,6 +100,7 @@ The mail_daemon could not be started:\n\t	Mail		Não foi possível iniciar o mai
 Mail couldn't find its dictionary.	Mail		O Correio não conseguiu encontrar o seu dicionário.
 Mail preferences	Mail		Preferências de correio
 helpful message	Mail		mensagem útil
+ Read 	Mail		 Lido 
 Font:	Mail		Tipo de letra:
 Accounts…	Mail		Contas…
 Previous	Mail		Anterior
@@ -112,7 +115,9 @@ Redo	Mail		Refazer
 Leave as '%s'	Mail		Deixar como '%s'
 Print…	Mail		Imprimir…
 Settings…	Mail		Definições…
+Warn unencodable:	Mail		Avisar não codificável:
 Trash	Mail		Lixo
+Show raw message	Mail		Mostrar mensagem em bruto
 Find…	Mail		Procurar…
 Select all	Mail		Selecionar tudo
 Show header	Mail		Mostrar cabeçalho
@@ -161,3 +166,4 @@ Couldn't open this signature. Sorry.	Mail		Não foi possível abrir esta assinat
 Revert	Mail		Reverter
 Unknown	Mail		Desconhecido
 Increase quote level	Mail		Aumentar nível de citação.
+Add enclosure…	Mail		Adicionar anexo…

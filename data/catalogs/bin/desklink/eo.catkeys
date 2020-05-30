@@ -6,11 +6,11 @@ Muted	MediaReplicant		Silentigita
 OK	MediaReplicant		Bone
 Couldn't launch 	MediaReplicant		Neeblis ekruli 
 Volume	VolumeControl		Laŭteco
-Open MediaPlayer	MediaReplicant		Malfermi MediaPlayer
+Open MediaPlayer	MediaReplicant		Uzi la Aŭdvidaĵludilon
 %d dB	VolumeControl		%d dB
 Media preferences…	MediaReplicant		Aŭdvideaĵaj agordoj…
 Options	MediaReplicant		Agordoj
 Beep	MediaReplicant		Pepo
-Open %name	DeskButton	Don't translate variable %name	Malfermi %name
+Open %name	DeskButton	Don't translate variable %name	Uzi %name -on
 Control physical output	MediaReplicant		Stiri fizikan eligon
 No media server running	VolumeControl		Neniu aŭdvideaĵa servilo rulanta

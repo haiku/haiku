@@ -5,16 +5,16 @@ short\tlong\tdescription\n	FilePanelApp		mallonga\tlonga\tpriskribo\n
 -s\t--save\tuse a save FilePanel\n	FilePanelApp		-s\t--save\tuzu konservan FilePanel-on\n
 %s: this option requires a parameter\n	FilePanelApp		%s: ĉi elekto postulas argumenton\n
 -h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\tmontri uzmanieran tekston\n
--l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-t\t--load\tuzi malferman FilePanel-on (implicita)\n
--n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tagordi la implicitan dosiernomon por konservo\n
--k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\ttipo de anoj kiuj malfermeblas: ajna kunigo de f, d, s (dosiero (implicita), dosierujo, ligilo)\n
+-l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-t\t--load\tuzi ŝargitan FilePanel-on (defaŭlta)\n
+-n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\telekti la dafaŭltan dosiernomon por konservado\n
+-k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\tspeco de uzeblaj anoj: ajna kombino de f, d, s (f - dosiero (defaŭlta), d - dosierujo, s - ligilo)\n
 %s: UNIMPLEMENTED\n	FilePanelApp		%s: NEFARITA\n
--t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\tagordi la FilePanel-an fenestran titolon\n
+-t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\telekti titolon por fenestro de la FilePanel-o\n
 -f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\tneprogramita\n
 usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n	FilePanelApp		uzmaniero: %s [-h]     [-d dosierujo]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a skemo]      [-f skemo]\n
 -1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\tfariĝas ke nur elekteblas unu dosiero\n
 -a\t--allow\tunimplemented\n	FilePanelApp		-a\t--allow\tneprogramita\n
--m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-n\t--modal\tfariĝas la FilePanel modala\n
+-m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-n\t--modal\tfaras la FilePanel-on modala\n
 options:\n	FilePanelApp		opcioj:\n
--d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\tmalfermi je <doseriujo>\n
+-d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\tuzi en <doseriujo>\n
 usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		uzmaniero: %s [--help] [--directory dosierujo] [--load|--save] [--title ttl] [--single] [--modal] [--allow skemo] [--forbid skemo]\n

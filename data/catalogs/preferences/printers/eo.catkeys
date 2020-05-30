@@ -1,11 +1,41 @@
-1	esperanto	x-vnd.Be-PRNT	1590969370
+1	esperanto	x-vnd.Be-PRNT	1465107170
+Test page	TestPageView		Testa paĝo
 Remove	PrintersWindow		Forigi
+Red	TestPageView		Ruĝa
 Default Printer	PrinterListView		Apriora presilo
+<pick one>	AddPrinterDialog		<elektu iun>
+Connected to:	AddPrinterDialog		Konekti al:
+Make default	PrintersWindow		Fari defaŭlta
+Cyan	TestPageView		Cejana
+Completed	JobListView		Plenumite
+Test page	PrintersWindow		Testa paĝo
+Transport: %transport% %transport_address%	PrinterListView		Peranto: %transport% %transport_address%
+Failed	JobListView		Malsukcesis
+Blue	TestPageView		Blua
+Waiting	JobListView		Atendado
+Processing	JobListView		Prilaborado
 Cancel	AddPrinterDialog		Nuligi
+Unknown status	JobListView		Nekonta stato
+Print jobs for %printer_name%	PrintersWindow		Presaj taskoj por %printer_name%
+{0, plural, =-1{??? pages}=1{# page}other{# pages}}	JobListView		{0, plural, =-1{??? paĝojn}=1{# paĝon}other{# paĝojn}}
 Add printer	AddPrinterDialog		Aldoni presilon
 Printers	PrintersWindow		Presiloj
+No printer found!	TransportMenu		Neniu presilo trovita!
+Add…	PrintersWindow		Aldoni…
+Magenta	TestPageView		Maĝenta
+Transport: %transport% %transport_address%	TestPageView		Peranto: %transport% %transport_address%
 Add	AddPrinterDialog		Aldoni
+Print jobs: No printer selected	PrintersWindow		Presaj taskoj: Neniu presilo elektita
 Printer name:	AddPrinterDialog		Presila nomo:
+Yellow	TestPageView		Flava
+Black	TestPageView		Nigra
+Printer type:	AddPrinterDialog		Speco de presilo:
 Printers	System name		Presiloj
+{0, plural,=0{No pending jobs}=1{1 pending job}other{# pending jobs}}	PrinterListView		{0, plural,=0{Atendantaj taskoj forestas}=1{1 atendanta tasko}other{# atendantaj taskoj}}
+Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Presilo: %printer_name%\nPelilo: %driver%\n
+Green	TestPageView		Verda
 Print test page	PrintersWindow		Presi testan paĝon
-Cancel job	PrintersWindow		Nuligi taskon
+Restart job	PrintersWindow		Relanĉi taskon
+Driver: %driver%	PrinterListView		Pelilo: %driver%
+Cancel job	PrintersWindow		Ĉesi taskon
+%.2f KB	JobListView		%.2f KB

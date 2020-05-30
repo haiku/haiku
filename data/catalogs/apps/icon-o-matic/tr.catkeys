@@ -1,4 +1,4 @@
-1	turkish	x-vnd.haiku-icon_o_matic	2424331018
+1	turkish	x-vnd.haiku-icon_o_matic	1805671130
 None	Icon-O-Matic-Properties		Yok
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Yol belirtecini döndür
 Add empty	Icon-O-Matic-ShapesList		Boş ekle
@@ -164,6 +164,7 @@ Untitled	Icon-O-Matic-Main		Adsız
 Max LOD	Icon-O-Matic-PropertyNames		En yüksek ayrıntı düzeyi
 Add Path	Icon-O-Matic-AddPathsCmd		Yol ekle
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Kapatmadan önce değişiklikler kaydedilsin mi?
+Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		'%s' dosyası bir SVG belgesi olarak açılamadı.\n\n
 load error	Icon-O-Matic-SVGImport		yükleme hatası
 Transformation	Icon-O-Matic-TransformersList		Dönüşüm
 Save as…	Icon-O-Matic-Menu-File		Farklı kaydet…

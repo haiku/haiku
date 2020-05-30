@@ -42,7 +42,7 @@ Lowest active priority	ProcessController		Priorità più bassa attiva
 Restart Tracker	ProcessController		Riavvia il Tracker
 System resources & caches…	ProcessController		Risorse di sistema e cache…
 Damned!	ProcessController		Accidenti!
-New Terminal	ProcessController		Nuovo Terminale
+New Terminal	ProcessController		Nuova finestra
 Power saving	ProcessController		Risparmio energetico
 ProcessController is already installed in Deskbar.	ProcessController		Gestione Processi è già installato nella Deskbar.
 This is the last active processor…\nYou can't turn it off!	ProcessController		Questo è l'ultimo processore attivo…\nNon puoi spegnerlo!

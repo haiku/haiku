@@ -1,4 +1,29 @@
-1	esperanto	x-vnd.Haiku-MediaConverter	3396468016
+1	esperanto	x-vnd.Haiku-MediaConverter	2418988224
+Writing audio track: %d%% complete	MediaConverter		Registrado de sontrako: %d%% de plenumo
+Input file not recognized as Audio or Video	MediaConverter		Eniga dosiero ne estas rekonita kiel Audio aŭ Video
+Video quality: %3d%%	MediaConverter		Kvalito de video: %3d%%
+Source files	MediaConverter		Fontaj dosieroj
+Error writing video frame %ld	MediaConverter		Eraro dum registro de videokadro %ld
+Error converting '%filename'	MediaConverter		Eraro de konvertado de '%filename'
+Selected directory not found. Defaulting to /boot/home	MediaConverter		Elektita dosierujo ne estis trovita. Defaŭltas al /boot/home
+Conversion completed	MediaConverter		Konvertado estis kompletigita
+Audio:	MediaConverter-FileInfo		Audio:
+Error creating video.	MediaConverter		Eraro de videokreado
+Cancelling	MediaConverter		Nuligado
+None available	Audio codecs		Nedisponebla
+No file selected	MediaConverter-FileInfo		Neniu dosiero estis elektita
+High	MediaConverter		Alta
+{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{La dosiero ne estis rekonita kiel subtenata aŭdvida dosiero:} other{# dosieroj ne estis rekonitaj kiel subtenataj aŭdvidaj dosieroj:}}
+File Error	MediaConverter-FileInfo		Dosiera Eraro
+None available	Video codecs		Nedisponebla
+Output format	MediaConverter		Eliga formato
 OK	MediaConverter		Bone
+Open…	Menu		Uzi…
+Video using parameters form settings	MediaConverter		Video uzante agordon de parametroj
 Cancel	MediaConverter		Nuligi
 OK	MediaConverter-FileInfo		Bone
+Quit	Menu		Ĉesi
+{0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# bitoko} other{# bitokoj}}
+Duration:	MediaConverter-FileInfo		Daŭro:
+MediaConverter	System name		PlurmediaKonvertilo
+Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Eraro dum skribo en lokon: %strPath%. Defaŭltigo al loko: /boot/home

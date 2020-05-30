@@ -1,4 +1,4 @@
-1	romanian	x-vnd.haiku-icon_o_matic	2424331018
+1	romanian	x-vnd.haiku-icon_o_matic	1805671130
 None	Icon-O-Matic-Properties		Nimic
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Rotește calea indicilor
 Add empty	Icon-O-Matic-ShapesList		Adaugă liber
@@ -164,6 +164,7 @@ Untitled	Icon-O-Matic-Main		Fără titlu
 Max LOD	Icon-O-Matic-PropertyNames		LOD max
 Add Path	Icon-O-Matic-AddPathsCmd		Adaugă cale
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Salvați modificările pictogramei curente înainte să închideți?
+Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		Nu s-a putut deschide fișierul „%s” ca un document SVG.\n\n
 load error	Icon-O-Matic-SVGImport		eroare de încărcare
 Transformation	Icon-O-Matic-TransformersList		Transformare
 Save as…	Icon-O-Matic-Menu-File		Salvează ca…

@@ -14,7 +14,7 @@ Failed to launch 'something', error in Pad data.	LaunchBox		Malsukcesis lanĉi '
 LaunchBox	System name		Lanĉujo
 Auto-raise	LaunchBox		Aŭtomate suprenigi
 Icon size	LaunchBox		Piktograma grando
-Open containing folder	LaunchBox		Malfermi la enhavatan dosierujon
+Open containing folder	LaunchBox		Uzi la enhavatan dosierujon
 Add button here	LaunchBox		Aldoni butonon ĉi tie
 Cancel	LaunchBox		Nuligi
 launch popup	LaunchBox		Lanĉi ŝprucfenestron
@@ -24,7 +24,7 @@ last chance	LaunchBox		lasta ŝanco
 You can drag an icon here.	LaunchBox		Vi povas tiri piktigramon ĉi tien.
 Pad 1	LaunchBox		Panelo 1
 Failed to launch '%1'.\n\nError:	LaunchBox		Malsukcesis lanĉi '%1'.\n\nEraro:
-Settings	LaunchBox		Agordoj
+Settings	LaunchBox		Agordo
 Vertical layout	LaunchBox		Vertikala aranĝo
 Pad	LaunchBox		Panelo
 Close	LaunchBox		Malfermi
@@ -32,5 +32,5 @@ Remove button	LaunchBox		Forigi butonon
 Quit	LaunchBox		Forlasi
 Horizontal layout	LaunchBox		Horizontala aranĝo
 New	LaunchBox		Krei
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Malsukcesis sendi la komandon 'Malfermi dosierujon' al la Spurilo.\n\nEraro: 
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Malsukcesis sendi la komandon 'uzi dosierujon' al la Spurilo.\n\nEraro: 
 Pad %1	LaunchBox		Panelo %1

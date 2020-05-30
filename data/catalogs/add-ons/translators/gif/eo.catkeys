@@ -14,6 +14,6 @@ GIF images	GIFTranslator		GIF bildoj
 Version %d.%d.%d, %s	GIFView		Versio %d.%d.%d, %s
 Use RGB color	GIFView		Uzu RGB-kolorojn
 Use dithering	GIFView		Uzu punktismon
-GIF Settings	GIFTranslator		GIF Agordoj
+GIF Settings	GIFTranslator		Agordo de GIF
 BeOS system	GIFView		BeOS sistemo
 Automatic (from alpha channel)	GIFView		Aŭtomate (de alfaokanelo)

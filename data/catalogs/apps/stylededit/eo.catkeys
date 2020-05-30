@@ -1,6 +1,8 @@
-1	esperanto	x-vnd.Haiku-StyledEdit	1030296151
+1	esperanto	x-vnd.Haiku-StyledEdit	2394004951
+Cut	Menus		Eltondi
 Center	Menus		Centra
 Wrap-around search	FindandReplaceWindow		Ŝerĉi ek la komenco
+Page setup…	Menus		Agordo de paĝo…
 Untitled 	StyledEditWindow		Sentitolo 
 OK	Statistics		Bone
 Find	FindandReplaceWindow		Trovi
@@ -12,20 +14,22 @@ Save	Menus		Konservi
 Cancel	QuitAlert		Nuligi
 ???	LoadAlert		???
 OK	RevertToSavedAlert		Bone
-Can't undo	Menus		Nemalfarebla
+Can't undo	Menus		Ne povas malfari
 Replace…	Menus		Anstataŭigi…
+Paste	Menus		Alglui
 Replace in all windows	FindandReplaceWindow		Anstataŭigi en ĉiu fenestro
 Save	SaveAlert		Konservi
 Default	Open_and_SaveAsPanel		Apriora
 Cancel	RevertToSavedAlert		Nuligi
 Cancel	FindandReplaceWindow		Nuligi
 Replace all	FindandReplaceWindow		Anstataŭigi ĉiujn
-Left	Menus		Maldekstren
+Left	Menus		Maldekstre
 Default	Menus		Apriora
 OK	SaveAlert		Bone
 Color	Menus		Koloro
 Find:	FindandReplaceWindow		Trovi:
 Don't save	SaveAlert		Ne konservi
+Quit	Menus		Ĉesi
 Wrap lines	Menus		Faldi linojn
 OK	LoadAlert		Bone
 Save	QuitAlert		Konservi
@@ -36,9 +40,10 @@ Find…	Menus		Trovi…
 Size	Menus		Grandeco
 OK	QuitAlert		Bone
 Replace with:	FindandReplaceWindow		Anstataŭigi kun:
-Open…	Menus		Malfermi…
+Open…	Menus		Uzi…
+Save as…	Menus		Konservi kiel…
 Replace	FindandReplaceWindow		Anstaŭigi
 Don't save	QuitAlert		Ne konservi
 Align	Menus		Ĝisrandigo
 Font	Menus		Tiparo
-Right	Menus		Dekstren
+Right	Menus		Dekstre

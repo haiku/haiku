@@ -9,7 +9,7 @@ The mount point could not be retrieved.	InstallProgress		No se pudo recuperar el
 <none>	InstallerWindow	No partition available	<ninguna>
 Please choose target	InstallerWindow		Por favor, elija destino
 Cancel	InstallProgress		Cancelar
-Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Instalación completa. El sector de booteo ha sido escrito en '%s'. Presione Reiniciar para reiniciar la computadora o elija un nuevo volumen de destino para realizar otra instalación.
+Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Instalación completa. Se ha escrito el sector de arranque en '%s'. Pulse en Reiniciar para reiniciar la computadora o elija un nuevo volumen de destino para realizar otra instalación.
 Are you sure you want to to stop the installation?	InstallerWindow		¿Está seguro de querer parar la instalación?
 Installer	System name		Instalador
 Unknown Type	InstallProgress	Partition content type	Tipo desconocido

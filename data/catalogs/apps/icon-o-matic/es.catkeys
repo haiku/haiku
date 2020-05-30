@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.haiku-icon_o_matic	2424331018
+1	spanish; castilian	x-vnd.haiku-icon_o_matic	1805671130
 None	Icon-O-Matic-Properties		Ninguno
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Rotar índices de ruta
 Add empty	Icon-O-Matic-ShapesList		Agregar vacío
@@ -164,6 +164,7 @@ Untitled	Icon-O-Matic-Main		Sin título
 Max LOD	Icon-O-Matic-PropertyNames		LOD máximo
 Add Path	Icon-O-Matic-AddPathsCmd		Agregar ruta
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		¿Guardar los cambios al icono actual antes de cerrar?
+Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		No se puede abrir el archivo «%s» como documento SVG.\n\n
 load error	Icon-O-Matic-SVGImport		error al cargar
 Transformation	Icon-O-Matic-TransformersList		Transformación
 Save as…	Icon-O-Matic-Menu-File		Guardar como...

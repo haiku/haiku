@@ -132,7 +132,7 @@ Cancel	FSClipBoard		Annulla
 Modified	PoseView		Modificato
 Move to Trash	ContainerWindow		Sposta nel Cestino
 All files and folders	FindPanel		Tutti i file e cartelle
-Add-ons	ContainerWindow		Componenti aggiuntivi
+Add-ons	ContainerWindow		Componenti Aggiuntivi
 Too many parenthesis.	libtracker		Troppe parentesi.
 Increase size	ContainerWindow		Aumenta dimensioni
 \nShould this be fixed?	FSUtils		\nCorreggo il problema?
@@ -492,14 +492,14 @@ The file \"%name\" already exists in the specified folder. Do you want to replac
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Devi trascinare e lasciare gli elementi su una delle icone del disco nella finestra \"Disks\".
 Version:	InfoWindow		Versione:
 OK	PoseView		OK
-Add-ons	DeskWindow		Componenti aggiuntivi
+Add-ons	DeskWindow		Componenti Aggiuntivi
 Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Sei sicuro di voler spostare o copiare gli elementi selezionati in questa cartella?
 Find	FindPanel		Trova
 Empty folder	NavMenu		Cartella vuota
 Defaults	TrackerSettingsWindow		Predefiniti
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Spiacenti, non c'è abbastanza spazio libero sul volume di destinazione per copiare gli elementi selezionati.
 True-color picture	AttributesView		Immagine True-color
-Add-ons	FilePanelPriv		Componenti aggiuntivi
+Add-ons	FilePanelPriv		Componenti Aggiuntivi
 96 x 96	DeskWindow		96 x 96
 Empty folder	SlowContextPopup		Cartella vuota
 Alignment	AttributesView		Allineamento

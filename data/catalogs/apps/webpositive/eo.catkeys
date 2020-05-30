@@ -1,29 +1,32 @@
-1	esperanto	x-vnd.Haiku-WebPositive	1758426397
+1	esperanto	x-vnd.Haiku-WebPositive	4269773103
 Authentication required	Authentication Panel		Aŭtentigo nepra
 Previous	WebPositive Window		Antaŭa
 (Finish: %date)	Download Window		(Fino: %date)
+Open bookmarks confirmation	WebPositive Window		Konfirmo por uzi legosignaron
 Download folder:	Settings Window		Elŝutujo
 Close window	WebPositive Window		Fermi fenestron
 Find:	WebPositive Window		Serĉi:
 Script console	WebPositive Window		Skriptokonzolo
 Fonts	Settings Window		Tiparoj
-Path	Cookie Manager		Dosierindiko
+Path	Cookie Manager		Itinero
 of	Download Window	...as in '12kB of 256kB'	de
 Bookmarks	WebPositive Window		Legosignoj
 Use proxy server to connect to the internet	Settings Window		Konekti al interreto prokurile
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url elŝutita
+Auto-hide interface in full screen mode	Settings Window		Aŭtomate kaŝi interfacon dum la plenekrana reĝimo
 There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Eraris dum malfermado de legosigna dosierujo.\n\nEraro: %error
 Delete	Cookie Manager		Forigi
-Open containing folder	Download Window		Malfermi enhavantan dosierujon
+(Finish: %date - Over %duration left)	Download Window		(Fino: %date - Ĉirkaŭ %duration restanta)
+Open containing folder	Download Window		Uzi enhavantan dosierujon
 Find previous	WebPositive Window		Antaŭserĉi
 Full screen	WebPositive Window		Plenekrane
 Downloads in progress	WebPositive		Daŭrantaj elŝutaĵoj
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Ĉu vi volas malfermi ĉiujn %addedCount legosignojn samtempe?
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Ĉu vi volas uzi ĉiujn %addedCount legosignojn samtempe?
 Copy URL to clipboard	Download Window		Kopii retadreson tonduje
 Clone current page	Settings Window		Duplikati la aktivan paĝon
 Start page:	Settings Window		Komenca paĝo:
 Cancel	Download Window		Nuligi
-Settings	Settings Window		Agordoj
+Settings	Settings Window		Agordo
 Downloads	WebPositive Window		Elŝutoj
 Browse…	Settings Window		Foliumi…
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Legosigno por ĉi paĝo (%bookmarkName) jam ekzistas.
@@ -32,15 +35,41 @@ Match case	WebPositive Window		Atenti usklecon
 Proxy password:	Settings Window		Prokuroservila pasvorto:
 Size:	Font Selection view		Grando:
 Page source	WebPositive Window		Paĝa fontkodo
-Error opening downloads folder	Download Window		Eraris dum malfermo de elŝutejo
+Error opening downloads folder	Download Window		Eraro dum uzo de dosierujo por elŝuto
 Show bookmark bar	WebPositive Window		Montri breton legosignan
 Find	WebPositive Window		Serĉi
 Standard font:	Settings Window		Implicita tiparo:
+Open download error	Download Window		Eraro dum uzo de elŝutito
+New tabs:	Settings Window		Novaj langetoj:
+Open downloads folder	Download Window		Uzi dosierujon por elŝuto
+The download could not be opened.	Download Window		La elŝutito ne povas esti uzata.
 OK	Authentication Panel		Bone
+Quit	WebPositive		Ĉesi
+Download aborted	Download Window		Elŝutado estas ĉesigita
+Cut	URL Bar		Eltondi
+Paste	URL Bar		Alglui
 Find next	WebPositive Window		Pluserĉi
+Open search page	Settings Window		Uzi paĝon de serĉado
+Open location	WebPositive Window		Uzi lokon
+Open	Download Window		Uzi
+The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	La dosierujo por elŝuto ne povas esti uzata.\n\nEraro: %error
 Cancel	Authentication Panel		Nuligi
 OK	Download Window		Bone
+Restart	Download Window		Relanĉi
+Show tabs if only one page is open	Settings Window		Montri panelon de langetoj eĉ se nur unu paĝo estas uzata
 Cancel	Settings Window		Nuligi
+Reset size	WebPositive Window		Restarigi grandon
+Quit	WebPositive Window		Ĉesi
+(Finish: %date - %duration left)	Download Window		(Fino: %date - %duration restante)
+Paste	WebPositive Window		Alglui
+Double-click or middle-click to open new tab.	Tab Manager		Dufoja klako aŭ mezbutona klako por uzi novan paĝon.
 Next	WebPositive Window		Sekva
 OK	WebPositive Window		Bone
+Save page as…	WebPositive Window		Konservi paĝon kiel...
+Settings	WebPositive Window		Agordo
+Open all	WebPositive Window		Uzi ĉion
+Cut	WebPositive Window		Eltondi
+Open blank page	Settings Window		Uzi malplenan paĝon
 Cancel	WebPositive Window		Nuligi
+Script console	Console Window		Skriptokonzolo
+Open start page	Settings Window		Uzi komencan paĝon

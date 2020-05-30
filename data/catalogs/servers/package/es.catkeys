@@ -3,7 +3,7 @@ Package changes	PackageResult	Window title	Cambios del paquete
 uninstall package %s\n	PackageResult	Don't change '%s' variable	desinstalar paquete %s\n
 ignore problem for now	PackageProblem		ignorar los problemas por el momento
 solution %d:	PackageProblem	Don't change the %d variable	solución %d:
-The following problems have been encountered. Please select a solution for each:	PackageProblem		Se han encontrado los siguientes problemas. Por favor elige una solución para cada uno:
+The following problems have been encountered. Please select a solution for each:	PackageProblem		Se han encontrado los siguientes problemas. Elija una solución para cada uno:
 Apply changes	PackageResult		Aplicar cambios
 Package daemon	PackageManager		Proceso en segundo plano de paquetes
 install package %s from repository %s\n	PackageResult	Don't change '%s' variables	instalar paquete %s desde el repositorio %s\n

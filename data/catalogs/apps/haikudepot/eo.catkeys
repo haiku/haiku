@@ -26,7 +26,7 @@ Show	MainWindow		Montri
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Eraro okazis dum akirado de la listo de pakaĵoj: %message%
 Unstable but usable	RatePackageWindow		Nestabila sed uzebla
 Not specified	RatePackageWindow		Ne estas difinita
-This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Ĉi tiu programo alskribas kaj ellegas kurantajn dosierojn en via komputilo por funkcii. Ŝajnas ke aperiĝis problemoj skribante provadan dosieron ĉe [%TestFilePath%]. Kontrolu, ke ne estas problemoj rilate al via disko aŭ permesoj, kiuj eble malhelpus ĉi tiun programon skribante tiuloke. Eblas al vi malatenti ĉi problemon kaj malgraŭe daŭri, sed iom da kapabloj malŝaltiĝus.
+This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Ĉi tiu programo konservas kaj prenas laborajn dosierojn je via komputilo por funkcii. Ŝajnas, ke okazis problemoj skribante provizoran dosieron en [%TestFilePath%]-on. Kontrolu, ke forestas problemoj de via disko aŭ permesoj, kiuj povus malhelpi al ĉi programo skribi en tiu loko. Vi rajtas malatenti ĉi problemon kaj malgraŭe daŭri, sed iuj kapabloj povas malŝaltiĝi.
 Active	PackageListView		Aktiva
 Login or Create account	MainWindow		Ensaluti aŭ Krei konton
 <Package contents not available for remote packages>	PackageContentsView		<Pakaĵa enhavo ne estas disponebla por foraj pakaĵoj>
@@ -165,7 +165,7 @@ Manage repositories…	MainWindow		Administri tenejojn…
 Fetching remote repository data	LocalRepositoryUpdateProcess		Elŝutas forajn tenejajn datumojn
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	UserLoginWindow		Eraro estiĝis dum la elŝutado de uzkondiĉoj bezonata por farigi novan uzanton. Kontrolu la protokolon por detaloj kaj reprovu. \nInformoj pri vidi la protokolojn estas en la sekcio pri HaikuTenejo de la manlibro por uzantoj.
 Description	PackageListView		Priskribo
-Open %DeskbarLink%	PackageManager		Malfermi %DeskbarLink%
+Open %DeskbarLink%	PackageManager		Uzi %DeskbarLink%-on
 User creation error	UserLoginWindow		Uzanta kreada eraro
 Install	PackageManager		Instali
 Input validation	UserLoginWindow		Validigo de enigo

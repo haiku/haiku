@@ -14,9 +14,9 @@ Cached memory	DataSource		Kaŝita memoro
 Apps	DataSource		Programoj
 Show legend	ActivityView		Montri klarigeton
 Text clipboard	DataSource		Teksta tondujo
-Settings	ActivityWindow		Agordoj
+Settings	ActivityWindow		Agordo
 Receiving	DataSource		Ricevado
-Settings…	ActivityWindow		Agordoj…
+Settings…	ActivityWindow		Agordo…
 Ports	DataSource		Pordoj
 Page faults	DataSource		Permutodosieraj eraroj
 Sending	DataSource		Elsendado

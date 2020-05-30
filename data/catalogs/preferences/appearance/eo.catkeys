@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-Appearance	2929429368
+1	esperanto	x-vnd.Haiku-Appearance	663472720
 Control border	Colors tab		Fenestraĵa rando
 Control mark	Colors tab		Kontrolmarko
 Off	AntialiasingSettingsView		Malŝaltita
@@ -50,6 +50,7 @@ Window tab	Colors tab		Fenestra langeto
 Link text	Colors tab		Ligila teksto
 Tooltip background	Colors tab		Ŝpruchelpila fono
 ControlLook:	DecorSettingsView		ControlLook:
+Scroll bar thumb	Colors tab		Butono de ruluma strio
 Default	DecorSettingsView		Defaŭlta
 Link visited	Colors tab		Vizitita ligilo
 Selected menu item border	Colors tab		Elektita menuera rando

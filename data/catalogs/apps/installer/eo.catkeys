@@ -2,7 +2,7 @@
 The target volume is not empty. The installer cannot upgrade your system. Please visit the guide on the Haiku website on how to upgrade an existing installation to R1 beta 2.	InstallProgress		La cela subdisko ne estas maplena. La instalilo ne povas promocii vian sistemon. Bonvolu viziti retejon de Haiku por trovi kiel renovigi la ekzistan sistemon al R1 beta 2
 Performing installation.	InstallProgress		Instalante.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Elektu la elan diskon el la ŝpruca menuo. Poste alklaku \"Ek\".
-Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Bonvolu fermi la DiskAgordilan fenestron antaŭ fermi la Instalilan fenestron.
+Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Bonvolu fermi la fenestron de la Diskagordilo antaŭ fermi la fenestron de al Instalilo.
 No optional packages available.	PackagesView		Malnepraj pakaĵoj ne estas haveblaj.
 Restart system	InstallerWindow		Restartigi sistemon
 The mount point could not be retrieved.	InstallProgress		La surmetingo ne povis esti ricevita
@@ -20,12 +20,12 @@ README	InstallerApp		LEGU_MIN
 Quit	InstallerWindow		Ĉesi
 Write boot sector to '%s'	InstallerWindow		Skribi la startsektoron al '%s'
 Boot sector not written because of an internal error.	InstallProgress		Praŝarga sektoro ne estis skribita pro interna eraro.
-DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		DiskAgordilo, la programo por agordi subdiskojn, ne povis esti lanĉita.
+DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		La Diskagordilo, la programo por agordi subdiskojn, ne povas esti lanĉita.
 Welcome to the Haiku Installer!\n\n	InstallerApp		Bonvenon ĉe la Haiku Instalilo!\n\n
 ?? of ??	InstallerWindow	Unknown progress	?? de ??
 Quit Boot Manager	InstallerWindow		Forlasi Praŝargan Administrilon
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Lanĉas Praŝargan Administrilon…\n\nFermu Praŝargan Administrilon por daŭrigi la instaladon.
-Quit DriveSetup	InstallerWindow		Forlasi DiskAgordilon
+Quit DriveSetup	InstallerWindow		Ĉesi la Diskagordilon
 Write boot sector	InstallerWindow		Skribi praŝargan sektoron
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld el %2ld
 Finishing installation.	InstallProgress		Finas instaladon.
@@ -43,7 +43,7 @@ Quit	InstallerApp		Ĉesi
 Starting installation.	InstallProgress		Komencas instaladon.
 Error writing boot sector.	InstallProgress		Eraro okazis dum skribado de praŝarga sektoro.
 OK	InstallerWindow		Bone
-Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Bonvolu fermi la Praŝargajn Administrilajn kaj DiskAgordilajn fenestrojn antaŭ vi fermas la Instalilan fenestron.
+Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Bonvolu fermi la fenestrojn de la Praŝarga Administrilo kaj  de la Diskagordilo antaŭ fermi la fenestron de la Instalilo.
 Failed to launch Boot Manager	InstallerWindow		Ne povis lanĉi Praŝargan Administrilon
 Try installing anyway	InstallProgress		Provi instali ĉiuokaze
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		GRAVA INFORMO ANTAŬ VI INSTALAS HAIKU-ON\n\n
@@ -64,9 +64,9 @@ Stop	InstallerWindow		Halti
 Cancel	InstallerWindow		Nuligi
 Continue	InstallerWindow	In alert after pressing Stop	Daŭrigi
 No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Neniuj subdiskoj estis trovitaj kiuj estas taŭgaj por instalado. Bonvolu agordi subdiskojn kaj pravalorizi minimume unu subdiskon per la Be-a Dosiersistemo.
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Lanĉi DiskAgordilon por dispartigi disponeblajn\nfiksitajn diskojn kaj aliajn datumportilojn. Subdiskoj\npovas esti pravalorizitaj per la Be-a Dosiersistemo\nkiu estas bezonata por Haiku-a praŝarga subdisko.
+Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Lanĉi la Diskagordilon por dispartigi disponeblajn\nfiksitajn diskojn kaj aliajn datumportilojn. Subdiskoj\npovas esti pravalorizitaj per la Be-a Dosiersistemo\nkiu estas bezonata por Haiku-a praŝarga subdisko.\n
 Scanning for disks…	InstallerWindow		Serĉante diskojn…
-Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Lanĉas DiskAgordilon…\n\nFermu DiskAgordilon por daŭrigi la instaladon.
+Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Lanĉas la Diskagordilon…\n\nFermu la Diskagordilon por daŭrigi la instaladon.
 Abort	InstallerWindow		Ĉesigi
 The partition can't be mounted. Please choose a different partition.	InstallProgress		La subdisko ne povas esti surmetita. Bonvolu elekti alian subdiskon.
 Set up partitions…	InstallerWindow		Agordi subdiskojn…
@@ -85,4 +85,4 @@ scanning…	InstallerWindow		skanado…
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Userguide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2)   La Instalilo praŝargebligos la Haiku-an subdiskon mem, sed ne klopodos integritigi Haiku-on en ekzistanta praŝarga menuo. Se vi jam havas instalitan GRUB-on, vi povas aldoni Haiku-on al ĝi.\nPor detaloj, bonvolu konsiliĝi kun la gvido pri la praŝargado de Haiku-o en nia retpaĝaro: https://www.haiku-os.org/guides/booting.\nAŭ vi povas agordi praŝargan menuon el la \"Iloj\" menuo de Instalilo. Rigardu la temon pri la programo \"Praŝarga Administrilo\" en la manlibro por uzantoj.\n\n\n
 Set up boot menu	InstallerWindow		Agordi praŝargan menuon
 Continue	InstallerApp		Daŭrigi
-Are you sure you want to abort the installation and restart the system?	InstallerWindow		Ĉu vi certas, ke vi volas nuligi la instaladon kaj restarti la sistemon?
+Are you sure you want to abort the installation and restart the system?	InstallerWindow		Ĉu vi certas, ke vi volas ĉesigi la instaladon kaj restarti la sistemon?

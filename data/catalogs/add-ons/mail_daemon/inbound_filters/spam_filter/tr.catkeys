@@ -1,5 +1,5 @@
 1	turkish	x-vnd.Haiku-SpamFilter	468104950
-or empty e-mail	SpamFilterConfig		ya da boş e-posta
+or empty e-mail	SpamFilterConfig		veya boş e-posta
 Genuine below and uncertain above:	SpamFilterConfig		Aşağıda hakiki ve yukarıda belirsiz:
 Spam above:	SpamFilterConfig		Yukarıda istenmeyen:
 Add spam rating to start of subject	SpamFilterConfig		Konunun başlangıcına istenmeyenlik derecesini ekle

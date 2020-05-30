@@ -27,7 +27,7 @@ ACPI node '%1'	DeviceACPI		ACPI-nodo '%1'
 Optical Drive	DeviceSCSI		Lumdiskilo
 Name	PropertyList		Nomo
 Manufacturer	DeviceSCSI		Fabrikanto
-Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Nomo de adaptilo\t\t\t\t: %Name%\nProduktanto\t\t\t: %Manufacturer%\nUzata pelilo\t\t\t\t: %DriverUsed%\nIndiko de adaptilo\t: %DevicePaths%
+Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Nomo de aparato\t\t\t\t: %Name%\nProduktanto\t\t\t: %Manufacturer%\nUzata pelilo\t\t\t\t: %DriverUsed%\nItinero al aparato\t: %DevicePaths%
 Device name	Device		Aparata nomo
 Satellite communications controller	Device		Satelitakomunika regilo
 Device class	DeviceSCSI		Aparata klaso
@@ -44,7 +44,7 @@ Refresh devices	DevicesView		Aktualigi aparatojn
 Category	DevicesView		Kategorio
 RBC	DeviceSCSI		RBC
 None	Device		Neniu
-Device paths	Device		Aparataj dosierindikoj
+Device paths	Device		Itinero al aparato
 Unknown device	Device		Nekonata aparato
 Wireless controller	Device		Sendrateca regilo
 Generic system peripheral	Device		Ĝenerala sistemflankaparato

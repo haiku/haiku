@@ -1,15 +1,15 @@
 1	spanish; castilian	x-vnd.Haiku-mount_server	2818767263
 Mount read-only	AutoMounter		Montar como sólo lectura
-Error mounting volume:\n\n%s	AutoMounter		Error montando el volumen:\n\n%s
+Error mounting volume:\n\n%s	AutoMounter		Error al montar el volumen:\n\n%s
 Cancel	AutoMounter		Cancelar
 OK	AutoMounter		Aceptar
-Unmount error	AutoMounter		Error desmontando
-The file system on this volume is not the Be file system. It is recommended to mount it in read-only mode, to prevent unintentional data loss because of bugs in Haiku.	AutoMounter		El sistema de archivos de este volumen no es el sistema de archivos Be. Se recomienda montarlo en modo de "solo lectura" para prevenir la pérdida de datos no intencionada debido a fallos de Haiku.
+Unmount error	AutoMounter		Error al desmontar
+The file system on this volume is not the Be file system. It is recommended to mount it in read-only mode, to prevent unintentional data loss because of bugs in Haiku.	AutoMounter		El sistema de archivos de este volumen no es el sistema de archivos Be. Se recomienda montarlo en modo de solo lectura para evitar pérdidas de datos no intencionadas debidas a fallos de Haiku.
 Mount read/write	AutoMounter		Montar como lectura/escritura
-Could not unmount disk \"%s\":\n\t%s	AutoMounter		No se puede desmontar el disco \"%s\":\n\t%s
-Mounting volume '%s'\n\n	AutoMounter		Montando el volumen '%s'\n\n
-Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		No se puede desmontar el disco \"%s\":\n\t%s\n\n¿Debería forzarse el desmontaje?\n\nNota: Si una aplicación está actualmente escribiendo hacia el volumen, desmontarlo puede resultar en pérdida de datos.\n
+Could not unmount disk \"%s\":\n\t%s	AutoMounter		No se puede desmontar el disco «%s»:\n\t%s
+Mounting volume '%s'\n\n	AutoMounter		Montando el volumen «%s»\n\n
+Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		No se puede desmontar el disco «%s»:\n\t%s\n\n¿Debería forzarse el desmontaje?\n\nNota: si una aplicación está actualmente escribiendo hacia el volumen, desmontarlo puede resultar en pérdida de datos.\n
 Force unmount	AutoMounter		Forzar desmontaje
-Mount error	AutoMounter		Error montando
+Mount error	AutoMounter		Error al montar
 Mounting volume <unnamed volume>\n\n	AutoMounter		Montando el volumen <unnamed volume>\n\n
 Mount warning	AutoMounter		Advertencia de montaje
