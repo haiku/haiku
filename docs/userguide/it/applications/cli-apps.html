@@ -14,6 +14,7 @@
  *		Francesco Franchina
  *		Humdinger
  *		MichaelPeppers
+ *		Gabriele
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -63,16 +64,15 @@
 
 <div id="content">
 <div>
-<div class="box-info">La traduzione di questa pagina non è stata completata. Per questo motivo le parti non tradotte sono visibili in inglese.</div>
+<div class="box-info">La traduzione di questa pagina non è stata ancora completata. Finché non lo sarà, le parti non tradotte saranno visualizzate in inglese.</div>
 
 <h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Applicazioni su riga di comando specifiche per Haiku</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Localita:</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin/</span><br />
-<span class="path">/boot/system/non-packaged/bin/</span><br /><span class="path">~/config/bin/</span><br /><span class="path">~/config/non-packaged/bin/</span></td></tr>
+<tr><td>Percorso:</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin</span><br /><span class="path">/boot/common/bin</span><br /><span class="path">~/config/bin</span></td></tr>
 </table>
 <p><br /></p>
-<p>All commandline applications shipped with Haiku are in <span class="path">/boot/system/bin/</span>. Your own or additionally installed commandline apps will appear there as well, or in <span class="path">~/config/bin/</span>, when installed from a .hpkg package. Otherwise you can put them into  <span class="path">/boot/system/non-packaged/bin/</span> or <span class="path">~/config/non-packaged/bin/</span>. All these locations are part of the PATH variable and are therefore automatically found.<br />
-The following isn't an exhaustive list of all Haiku-specific CLI apps, it serves just to highlight a few of the most useful to give you a taste. Feel encouraged to explore what's in the <span class="path">bin/</span> folders on your own a bit. Executing an app with the parameter <tt>--help</tt> shows the usage of the command and all its various options.</p>
+<p>Tutte le applicazioni da riga di comando fornite con Haiku si trovano in <span class="path">/boot/system/bin</span>. Le applicazioni dell'utente, insieme a quelle installate tramite pacchatti .hpkg, compariranno anche esse in questo percorso o, al più, su <span class="path">~/config/bin</span>. In alternativa, copia i file applicativi in  <span class="path">/boot/system/non-packaged/bin/</span> o <span class="path">~/config/non-packaged/bin/</span> Tutti questi percorsi fanno parte della variabile PATH e pertanto sono trovati automaticamente.<br />
+La seguente lista non comprende tutte le applicazioni da riga di comando specifiche per Haiku, serve semplicemente per evidenziare le più utili e per dare un'idea. È consigliato esplorare il contenuto delle cartelle <span class="path">bin/</span> per farsi un'idea più approfondit. In genere, eseguendo un'applicazione con il parametro <tt>--help</tt> viene mostrato l'uso e tutte le sue opzioni.</p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="cli-attributes" name="cli-attributes">Correlati agli attributi: <span class="cli">listattr</span>, <span class="cli">catattr</span>, <span class="cli">addattr</span>, <span class="cli">rmattr</span>, <span class="cli">copyattr</span></a></h3>
@@ -87,10 +87,10 @@ Ogni volume ha il proprio indice, è utile tenerlo a mente quando si copia un fi
 Questi comandi sono descritti nel capitolo <a href="../index.html">L'indice del filesystem</a>.</p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="cli-pkg" name="cli-pkg">Relating to package management: <span class="cli">package</span>, <span class="cli">pkgman</span></a></h3>
-<p>The <span class="cli">package</span> command is used to manage HPKG packages. Have a look at the article <a href="https://www.haiku-os.org/guides/daily-tasks/install-applications">Installing applications</a> to learn the very basics. Usually the tool <a href="https://github.com/haikuports/haikuports/wiki">haikuporter</a> is used to automatically create packages from so-called recipes.</p>
-<p><span class="cli">pkgman</span> is used to search, install, update and uninstall packages. Package repositories can be added, dropped and their package lists refreshed. A special kind of update is invoked with the parameter <tt>full-sync</tt>: it is more aggressive and also downgrades or removes packages, if necessary.<br />
-For more details on a parameter, append "--help", e.g. <tt>pkgman search --help</tt></p>
+<a id="cli-pkg" name="cli-pkg">Correlati alla gestione dei pacchetti: <span class="cli">package</span>, <span class="cli">pkgman</span></a></h3>
+<p>Il comando <span class="cli">package</span> è utilizzato per gestire i pacchetti in formato HPKG. Alcune informazioni introduttive sono disponibili alla sezione <a href="https://www.haiku-os.org/guides/daily-tasks/install-applications">Installazione di applicazioni</a>. Tipicamente, lo strumento <a href="https://github.com/haikuports/haikuports/wiki">haikuporter</a> è quello utilizzato per crare i pacchetti dalle cosiddette "ricette" (recipe).</p>
+<p><span class="cli">pkgman</span> è utilizzato per cercare, installare, aggiornare e rimuovere i pacchetti software. I repository di pacchetti possono essere aggiunti, rimossi e le liste dei pacchetti in essi contenuti essere aggiornate. Un tipo speciale di aggiornamento viene avviato attraverso il parametro <tt>full-sync</tt>: è più aggressivo e, laddove sia necessario,  può anche ripristinare le versioni precedenti dei pacchetti o rimuoverli.<br />
+Per ulteriori dettagli su un parametro specifico, accoda "--help" all'invocazione, per esempio <tt>pkgman search --help</tt></p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="cli-scripting" name="cli-scripting">Comandi utili per lo scripting</a></h3>
@@ -107,11 +107,11 @@ Would you like a link to it?" "On Desktop" "In Deskbar" "No thanks"</pre>
 <pre class="terminal">filepanel -s -t "Save your logfile" -d ~/config/settings -n Fantastic.log</pre>
 <p><img src="../images/apps-images/cli-filepanel.png" alt="cli-filepanel.png" /></p></td></tr>
 <tr><td><p><span class="cli">hey</span></p></td><td style="width:10px;"> </td>
-<td valign="top"><p><span class="cli">hey</span> is a littler helper tool that sends BMessages to applications and prints out their answer. It can be used for application scripting, i.e. "remote controlling" a program from a script or the command line. It's usage is a bit complex... <a href="https://www.haiku-os.org/blog/humdinger/2017-11-05_scripting_the_gui_with_hey/">Humdinger's blog post</a> serves as a good introduction, and thanks to Scot Hacker's BeOS Bible, there is a much more comprehensive <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting6.html">hey tutorial</a> by Chris Herborth.</p>
+<td valign="top"><p><span class="cli">hey</span> è un piccolo strumento che invia messaggi  BMessages alle applicazioni e ne riporta la risposta. Può essere utilizzata per gestire le applicazioni attraverso uno script, per esempio per il "controllo remoto" di un programma da uno script o da riga di comando. Il suo utilizzo può essere piuttosto complesso... <a href="https://www.haiku-os.org/blog/humdinger/2017-11-05_scripting_the_gui_with_hey/">questo post </a> sul blog di Humdinger rappresenta una buona introduzione, ma per un profondo approfondimento, fai riferimento alla BeOS Bible di  Scot Hacker, che riporta un <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting6.html">tutorial sull'uso di hey</a>  scritto da Chris Herborth.</p>
 </td></tr>
 <tr><td><p><span class="cli">notify</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">notify</span> shows a notification panel with a message. There are various parameters that are described when you call <span class="cli">notify --help</span>. A notification can also be used to show the progress of some action. When doing that, it's important to set a <i>messageID</i> and always use it when you update the progress (a float between 0.0 and 1.0 that's printed as percent). Otherwise you'll see several notification panels if you update quicker then the set timeout.<br />
-An example:</p>
+		<td valign="top"><p><span class="cli">notify</span> mostra un pannello di notifica con un messaggio. Sono possibili diversi parametri, descritti attraverso il comando <span class="cli">notify --help</span>. Una notivia è anche utile per mostrare i progressi di una particolare azione. Quando lo fai, è importante scegliere un <i>messageID</i> ed utilizzare sempre quello quando  intendi aggiornare la progressione (un numero in virgola mobile tra 0.0 e 1.0, che verrà mostrato attraverso un valore percentuale). In caso contrario, vedrai accumularsi diversi pannelli di notifica, laddove gli aggiornamenti siano più rapidi del tempo di dismissione delle notifiche, come impostato nelle prferenze.<br />
+Un esempio:</p>
 <pre class="terminal">notify --type progress --group "--group" --title "--title" --icon /boot/home/bebook.hvif \
 --messageID MyMessageID --progress .75 "Keep waiting"</pre>
 <p><img src="../images/apps-images/cli-notification.png" alt="cli-notification.png" /></p>
@@ -127,17 +127,16 @@ An example:</p>
 
 <table summary="scripting cli tools" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><p><span class="cli">checkfs</span></p></td><td style="width:10px;"> </td>
-		<td><p><span class="cli">checkfs</span> is an important tool to check for errors in your file system. Simply add a volume name like <span class="path">/Haiku</span> or device path and it'll run through every file and correct inconsistencies where possible.</p>
-</td></tr>
+		<td><p><span class="cli">checkfs</span> è un'applicazione importante per verificare la presenza di errori nel filesystem. Basta aggiungere il nome del volume, ad esempio <span class="path">/Haiku</span>, o del dispositivo e il programma esaminerà ogni file e correrreggerà eventuali inconsistenze dove possibile.</p></td></tr>
 <tr><td><p><span class="cli">desklink</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">desklink</span> può aggiungere un'icona per qualsiasi file, cartella, query o applicazione da mostrare nella Deskbar. Offre anche un'opzione che permette di mostrare un menù contestuale quando, per eseguire azioni speciali, si fa clic con il tasto destro su un'icona. Per esempio, digitate nel terminale quanto segue per aggiungere alla Deskbar il programma su riga di comando <span class="app">screenshot</span> con le varie opzioni (il "<tt>\</tt>" nella prima riga serve semplicemente per segnalare l'andata a capo al Terminale):</p>
+		<td valign="top"><p><span class="cli">desklink</span> può aggiungere un'icona per qualsiasi file, cartella, query o applicazione da mostrare nella Deskbar. Offre anche un'opzione che permette di mostrare un menù contestuale quando, per eseguire azioni speciali, si fa clic con il tasto destro su un'icona. Per esempio, digita nel terminale quanto segue per aggiungere alla Deskbar il programma su riga di comando <span class="app">screenshot</span> con le varie opzioni (il "<tt>\</tt>" nella prima riga serve semplicemente per segnalare l'andata a capo al Terminale):</p>
 <pre class="terminal"> desklink "cmd=Active window (2s):/bin/screenshot --window --border --delay 2" \
 "cmd=Remove replicant:desklink --remove=screenshot" /bin/screenshot
 </pre>
 <p><img src="../images/apps-images/cli-desklink.png" alt="cli-alert.png" /></p>
 </td></tr>
 <tr><td><p><span class="cli">diskimage</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">diskimage</span> lets you register a regular file as disk device. For example, you can register a Haiku anyboot image, mount it in Tracker and copy, edit or remove files there before using it as source in the Installer.</p>
+		<td valign="top"><p>Tramite <span class="cli">diskimage</span> puoi registrare un file come un dispositivo disco. Per esempiom puoi registrare un file immagine di Haiku, montarla tramite il Tracker e copiare, modificare o cancellare file prima di utilizzarla come immagine di partenza per una installazione attraverso il Programma di Installazione.</p>
 </td></tr>
 <tr><td><p><span class="cli">launch_roster</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p>The launch_daemon starts all sorts of services and applications at boot-up. For some it was instructed to re-start them if they were quit. If you don't want that – maybe you'd like to test a modified Tracker, for example – you use <span class="cli">launch_roster</span> to <tt>stop</tt> the re-starting of the application before quitting it. Similarly, you can <tt>start</tt> it again or get <tt>info</tt> about it.c  The parameter <tt>log</tt> prints out a log of all launch_daemon related events.<br />

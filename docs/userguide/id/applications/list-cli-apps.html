@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2018, Haiku. All rights reserved.
+ * Copyright 2010-2020, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -24,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>Panduan pengguna</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -61,7 +61,7 @@
 
 <div id="content">
 <div>
-<div class="box-info">Terjemahan halaman ini belum lengkap. Sampai saat itu, bagian yang belum selesai menggunakan aslinya bahasa Inggris.</div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Daftar semua aplikasi commandline</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -76,56 +76,59 @@ Berikut daftar semua aplikasi commandline yang dikirimkan bersama Haiku. Masing-
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
 <tr><td><tt>CortexAddOnHost</tt></td><td style="width:10px;"> </td><td>Mulai layanan untuk memantau add-on media audio dan video yang digunakan.</td></tr>
 <tr><td><tt>FirstBootPrompt</tt></td><td> </td><td>Pengaturan bahasa dan keymap.</td></tr>
-<tr><td><tt>[</tt></td><td> </td><td>Returns true/false after comparing items.</td></tr>
+<tr><td><tt>[</tt></td><td> </td><td>Mengembalikan nilai true / false setelah membandingkan item.</td></tr>
 <tr><td colspan="3"><a id="A" name="A"><h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>A</h2></a></td></tr>
-<tr><td><tt>addattr</tt></td><td> </td><td>Writes an attribute to a file, taking the type into account and converting the values accordingly. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>alert</tt></td><td> </td><td>Shows a message box. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>arp</tt></td><td> </td><td>Manipulates the system ARP cache. </td></tr>
-<tr><td><tt>awk</tt></td><td> </td><td>See <tt>gawk</tt>.</td></tr>
-<tr><td><tt>base64</tt></td><td> </td><td>Base64 encode or decode to standard output. </td></tr>
-<tr><td><tt>basename</tt></td><td> </td><td>Strips directory and optionally suffix from a /path/to/filename string.</td></tr>
-<tr><td><tt>bash</tt></td><td> </td><td>Bourne-again shell.</td></tr>
-<tr><td><tt>bc</tt></td><td> </td><td>An arbitrary precision calculator language.</td></tr>
-<tr><td><tt>beep</tt></td><td> </td><td>Rings a bell. </td></tr>
-<tr><td><tt>bunzip2</tt></td><td> </td><td>See <tt>bzip2</tt>.</td></tr>
-<tr><td><tt>bzip2</tt></td><td> </td><td>File compressor.</td></tr>
+<tr><td><tt>addattr</tt></td><td> </td><td>Menulis atribut ke file, mengambil jenis ke akun dan mengonversi nilai yang sesuai. <a href="cli-apps.html">(spesifik Haiku)</a></td></tr>
+<tr><td><tt>alert</tt></td><td> </td><td>Memperlihatkan kotak pesan. <a href="cli-apps.html">(Khusus Haiku)</a></td></tr>
+<tr><td><tt>arp</tt></td><td> </td><td>Memanipulasi cache ARP sistem.</td></tr>
+<tr><td><tt>awk</tt></td><td> </td><td>Lihat <tt>gawk</tt>.</td></tr>
+<tr><td><tt>base64</tt></td><td> </td><td>Base64 encode atau decode ke output standar.</td></tr>
+<tr><td><tt>basename</tt></td><td> </td><td>Strip direktori dan sufiks opsional dari text /path/to/filename.</td></tr>
+<tr><td><tt>bash</tt></td><td> </td><td>Shell Bourne-again.</td></tr>
+<tr><td><tt>bc</tt></td><td> </td><td>kalkulator presisi yang arbitrer.</td></tr>
+<tr><td><tt>beep</tt></td><td> </td><td>bunyikan bel.</td></tr>
+<tr><td><tt>bfsinfo</tt></td><td> </td><td>Menganalisis sistem file.</td></tr>
+<tr><td><tt>bunzip2</tt></td><td> </td><td>Lihat <tt>bzip2</tt>.</td></tr>
+<tr><td><tt>bzip2</tt></td><td> </td><td>Pengompres berkas</td></tr>
 <tr><td><tt>c++</tt></td><td> </td><td>C++-Compiler.</td></tr>
-<tr><td><tt>cat</tt></td><td> </td><td>Concatenates files and prints to standard output. </td></tr>
-<tr><td><tt>catattr</tt></td><td> </td><td>Prints out the contents of an attribute of a file. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
+<tr><td><tt>cat</tt></td><td> </td><td>Menggabungkan file dan mencetak ke output standar.</td></tr>
+<tr><td><tt>catattr</tt></td><td> </td><td>Mencetak isi atribut file. <a href="cli-apps.html">(Khusus Haiku)</a>
+</td></tr>
 <tr><td><tt>cc</tt></td><td> </td><td>C-Compiler.</td></tr>
-<tr><td><tt>checkfs</tt></td><td> </td><td>Checks and repairs the file system. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>checkitout</tt></td><td> </td><td>Checks out sources simply with their repository's URL.</td></tr>
-<tr><td><tt>chgrp</tt></td><td> </td><td>Changes group ownership of files. </td></tr>
-<tr><td><tt>chmod</tt></td><td> </td><td>Changes permissions of files.</td></tr>
-<tr><td><tt>chop</tt></td><td> </td><td>Splits a file into smaller files. </td></tr>
-<tr><td><tt>chown</tt></td><td> </td><td>Changes the owner of files. </td></tr>
-<tr><td><tt>chroot</tt></td><td> </td><td>Runs a command within a specified root directory. </td></tr>
-<tr><td><tt>cksum</tt></td><td> </td><td>Prints out CRC checksum and byte count of files. </td></tr>
-<tr><td><tt>clear</tt></td><td> </td><td>Clears the terminal window. </td></tr>
-<tr><td><tt>cmp</tt></td><td> </td><td>Compares files byte by byte.</td></tr>
-<tr><td><tt>collectcatkeys </tt></td><td> </td><td>[Leftover from the move of locale-kit.]</td></tr>
-<tr><td><tt>comm</tt></td><td> </td><td>Compares sorted files line by line. </td></tr>
-<tr><td><tt>consoled</tt></td><td> </td><td>Console daemon.</td></tr>
-<tr><td><tt>copyattr</tt></td><td> </td><td>Copies all or a subset of attributes from one or more files to another or new file. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>cp</tt></td><td> </td><td>Copies files and directories. </td></tr>
-<tr><td><tt>csplit</tt></td><td> </td><td>Split a file into pieces separated by a specified pattern.</td></tr>
-<tr><td><tt>ctags</tt></td><td> </td><td>Generates an index file for a variety of language objects found in files.</td></tr>
-<tr><td><tt>cut</tt></td><td> </td><td>Prints out sections from each line of a file.</td></tr>
-<tr><td><tt>date</tt></td><td> </td><td>Displays or sets the current time and date.</td></tr>
-<tr><td><tt>dc</tt></td><td> </td><td>Desk calculator language.</td></tr>
-<tr><td><tt>dd</tt></td><td> </td><td>Copies raw data, converting and formatting according operands. </td></tr>
-<tr><td><tt>desklink</tt></td><td> </td><td>Installs items in Deskbar. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>diskimage</tt></td><td> </td><td>Registers a file as disk device that can then be mounted. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>df</tt></td><td> </td><td>Reports free and used space of mounted volumes.</td></tr>
-<tr><td><tt>diff</tt></td><td> </td><td>Compares files line by line.</td></tr>
-<tr><td><tt>diff3</tt></td><td> </td><td>Compares three files line by line.</td></tr>
-<tr><td><tt>dircolors</tt></td><td> </td><td>Color setup for <tt>ls</tt>. </td></tr>
+<tr><td><tt>checkfs</tt></td><td> </td><td>Memeriksa dan memperbaiki sistem file. <a href="cli-apps.html">(Khusus Haiku)</a></td></tr>
+<tr><td><tt>checkitout</tt></td><td> </td><td>Memeriksa sumber hanya dengan URL repositori mereka.</td></tr>
+<tr><td><tt>chgrp</tt></td><td> </td><td>Mengubah kepemilikan grup atas file.</td></tr>
+<tr><td><tt>chmod</tt></td><td> </td><td>Mengubah izin file.</td></tr>
+<tr><td><tt>chop</tt></td><td> </td><td>Membagi file menjadi file yang lebih kecil.</td></tr>
+<tr><td><tt>chown</tt></td><td> </td><td>Mengubah pemilik file.</td></tr>
+<tr><td><tt>chroot</tt></td><td> </td><td>Menjalankan perintah di dalam direktori root yang ditentukan.</td></tr>
+<tr><td><tt>cksum</tt></td><td> </td><td>Mencetak jumlah checksum dan byte byte CRC file.</td></tr>
+<tr><td><tt>clear</tt></td><td> </td><td>Membersihkan jendela terminal.</td></tr>
+<tr><td><tt>clipboard</tt></td><td> </td><td>Memanipulasi clipboard sistem.</td></tr>
+<tr><td><tt>cmp</tt></td><td> </td><td>Membandingkan file byte demi byte.</td></tr>
+<tr><td><tt>collectcatkeys </tt></td><td> </td><td>Mengumpulkan string yang dapat diterjemahkan untuk membuat catkeys.</td></tr>
+<tr><td><tt>comm</tt></td><td> </td><td>Membandingkan file yang diurutkan baris demi baris.</td></tr>
+<tr><td><tt>consoled</tt></td><td> </td><td>Konsol daemon.</td></tr>
+<tr><td><tt>copyattr</tt></td><td> </td><td>Menyalin semua atau subset atribut dari satu atau lebih file <a href="cli-apps.html">(Khusus Haiku)</a></td></tr>
+<tr><td><tt>cp</tt></td><td> </td><td>Menyalin file dan direktori.</td></tr>
+<tr><td><tt>csplit</tt></td><td> </td><td>Membagi file menjadi beberapa bagian dipisahkan oleh pola yang ditentukan.</td></tr>
+<tr><td><tt>cut</tt></td><td> </td><td>potong Mencetak bagian dari setiap baris file.</td></tr>
+<tr><td><tt>date</tt></td><td> </td><td>Menampilkan atau setel waktu dan tanggal saat ini.</td></tr>
+<tr><td><tt>dc</tt></td><td> </td><td>bahasa kalkulator Meja.</td></tr>
+<tr><td><tt>dd</tt></td><td> </td><td>Menyalin data mentah, mengonversi dan memformat sesuai dengan yang perintah.</td></tr>
+<tr><td><tt>desklink</tt></td><td> </td><td>Melakukan install item di Deskbar. <a href="cli-apps.html">(khusus Haiku)</a></td></tr>
+<tr><td><tt>df</tt></td><td> </td><td>Laporan ruang kosong dan volume yang dipasang.</td></tr>
+<tr><td><tt>diff</tt></td><td> </td><td>Membandingkan file baris demi baris.</td></tr>
+<tr><td><tt>diff3</tt></td><td> </td><td>Membandingkan 3 file baris demi baris.</td></tr>
+<tr><td><tt>dircolors</tt></td><td> </td><td>Pengaturan warna untuk perintah <tt>ls</tt>. </td></tr>
 <tr><td><tt>dirname</tt></td><td> </td><td>Strips the filename from a /path/to/filename string.</td></tr>
+<tr><td><tt>diskimage</tt></td><td> </td><td>Registers a file as disk device that can then be mounted. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
+<tr><td><tt>dpms</tt></td><td> </td><td>Sets the display power management.</td></tr>
 <tr><td><tt>draggers</tt></td><td> </td><td>Shows/sets the dragger state of Replicants.</td></tr>
 <tr><td><tt>driveinfo</tt></td><td> </td><td>Shows hardware information. </td></tr>
 <tr><td><tt>dstcheck</tt></td><td> </td><td>Shows a message box used when switching to/from daylight saving time.</td></tr>
 <tr><td><tt>du</tt></td><td> </td><td>Summarizes disk usage of each file, recursively for directories. </td></tr>
-<tr><td><tt>dumpcatalog</tt></td><td> </td><td>[Leftover from the move of locale-kit.] </td></tr>
+<tr><td><tt>dumpcatalog</tt></td><td> </td><td>Shows the contents of catalog files.</td></tr>
 <tr><td><tt>echo</tt></td><td> </td><td>Displays a line of text.</td></tr>
 <tr><td><tt>egrep</tt></td><td> </td><td>See <tt>grep</tt>.</td></tr>
 <tr><td><tt>eject</tt></td><td> </td><td>Ejects removable media. </td></tr>
@@ -142,12 +145,11 @@ Berikut daftar semua aplikasi commandline yang dikirimkan bersama Haiku. Masing-
 <tr><td><tt>filepanel</tt></td><td> </td><td>Displays a load/save file panel. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
 <tr><td><tt>find</tt></td><td> </td><td>Searches for files in a directory hierarchy.</td></tr>
 <tr><td><tt>finddir</tt></td><td> </td><td>Finds special directories defined by the system.</td></tr>
+<tr><td><tt>findpaths</tt></td><td> </td><td>Prints all paths for system defined directory constants.</td></tr>
 <tr><td><tt>fmt</tt></td><td> </td><td>Reformats the paragraphs of a file.</td></tr>
 <tr><td><tt>fold</tt></td><td> </td><td>Wraps input lines of a file.</td></tr>
 <tr><td><tt>fortune</tt></td><td> </td><td>Prints a random, hopefully interesting, adage. </td></tr>
-<tr><td><tt>freetype-config</tt></td><td> </td><td>Shows FreeType compilation and linking information.</td></tr>
 <tr><td><tt>fstrim</tt></td><td> </td><td>Send a TRIM command to an SSD drive.</td></tr>
-<tr><td><tt>ftp</tt></td><td> </td><td>File transfer program.</td></tr>
 <tr><td><tt>ftpd</tt></td><td> </td><td>FTP daemon.</td></tr>
 <tr><td><tt>funzip</tt></td><td> </td><td>Extracts the first item of an archive to standard output.</td></tr>
 <tr><td><tt>fwcontrol</tt></td><td> </td><td>FireWire control program.</td></tr>
@@ -179,7 +181,7 @@ Berikut daftar semua aplikasi commandline yang dikirimkan bersama Haiku. Masing-
 <tr><td><tt>lessecho</tt></td><td> </td><td>Echos its arguments and expands metacharacters, such as * and ? in filenames.</td></tr>
 <tr><td><tt>lesskey</tt></td><td> </td><td>Specifies key binding for less. </td></tr>
 <tr><td><tt>link</tt></td><td> </td><td>Creates a link to a file. </td></tr>
-<tr><td><tt>linkcatkeys</tt></td><td> </td><td>[Leftover from the move of locale-kit.] </td></tr>
+<tr><td><tt>linkcatkeys</tt></td><td> </td><td>Creates catalogs from catkeys. </td></tr>
 <tr><td><tt>listarea</tt></td><td> </td><td>Lists area info for all currently running teams. </td></tr>
 <tr><td><tt>listattr</tt></td><td> </td><td>Lists the attributes of a file. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
 <tr><td><tt>listdev</tt></td><td> </td><td>Lists all hardware devices.</td></tr>
@@ -233,7 +235,6 @@ Berikut daftar semua aplikasi commandline yang dikirimkan bersama Haiku. Masing-
 <tr><td><tt>pathchk</tt></td><td> </td><td>Diagnoses invalid or unportable file names. </td></tr>
 <tr><td><tt>pc</tt></td><td> </td><td>Programmer's calculator.</td></tr>
 <tr><td><tt>ping</tt></td><td> </td><td>Sends ICMP-echo-request to network host. </td></tr>
-<tr><td><tt>pkg-config</tt></td><td> </td><td>Analyzes and configures a Haiku package.</td></tr>
 <tr><td><tt>pkgman</tt></td><td> </td><td>Manages packages and package repositories.</td></tr>
 <tr><td><tt>play</tt></td><td> </td><td>Plays tracks from CD. </td></tr>
 <tr><td><tt>pr</tt></td><td> </td><td>Paginates or columnates files for printing. </td></tr>
@@ -268,6 +269,7 @@ Berikut daftar semua aplikasi commandline yang dikirimkan bersama Haiku. Masing-
 <tr><td><tt>settype</tt></td><td> </td><td>Sets the MIME type, signature and preferred application of a file. </td></tr>
 <tr><td><tt>setversion</tt></td><td> </td><td>Shows the version of a file.</td></tr>
 <tr><td><tt>setvolume</tt></td><td> </td><td>Sets the system sound volume. </td></tr>
+<tr><td><tt>sftp</tt></td><td> </td><td>File transfer program.</td></tr>
 <tr><td><tt>sh</tt></td><td> </td><td>See <tt>bash</tt>. </td></tr>
 <tr><td><tt>sha1sum</tt></td><td> </td><td>Prints or checks SHA1 checksums. </td></tr>
 <tr><td><tt>shar</tt></td><td> </td><td>Creates shell archives.</td></tr>
@@ -293,7 +295,7 @@ Berikut daftar semua aplikasi commandline yang dikirimkan bersama Haiku. Masing-
 <tr><td><tt>tee</tt></td><td> </td><td>Writes or appends data from standard input to a file.</td></tr>
 <tr><td><tt>telnet</tt></td><td> </td><td>User interface to the telnet protocol. </td></tr>
 <tr><td><tt>telnetd</tt></td><td> </td><td>Telnet daemon.</td></tr>
-<tr><td><tt>test</tt></td><td> </td><td>Returns true/false after comparing items.</td></tr>
+<tr><td><tt>test</tt></td><td> </td><td>Mengembalikan nilai true / false setelah membandingkan item.</td></tr>
 <tr><td><tt>timeout</tt></td><td> </td><td>Starts a command and kills it if it's still running after a specified number of seconds. </td></tr>
 <tr><td><tt>top</tt></td><td> </td><td>Displays running threads and CPU usage.</td></tr>
 <tr><td><tt>touch</tt></td><td> </td><td>Changes a file's timestamp. </td></tr>

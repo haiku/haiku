@@ -9,19 +9,21 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Emir SARI
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Appearance</title>
+	<title>Görünüm</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>Kullanıcı kılavuzu</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -50,89 +52,88 @@
 <li><a href="../../jp/preferences/appearance.html">日本語</a></li>
 </ul>
 <span>
-    <a href="../preferences.html" class="uplink">Preferences</a> 
-::  <a href="backgrounds.html">Backgrounds</a>  »
+    <a href="../preferences.html" class="uplink">Tercihler</a> 
+::  <a href="backgrounds.html">Arka Planlar</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">Bu sayfanın çevrilmesi henüz tamamlanmamıştır. Tamamlanana kadar henüz bitirilmeyen kısımlar İngilizce metni kullanır.</div>
 
-<h2><img src="../../images/prefs-images/appearance-icon_64.png" alt="appearance-icon_64.png" width="64" height="64" />Appearance</h2>
+<h2><img src="../../images/prefs-images/appearance-icon_64.png" alt="appearance-icon_64.png" width="64" height="64" />Görünüm</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Masaüstü Çubuğu:</td><td style="width:15px;"></td><td><span class="menu">Tercihler</span></td></tr>
+<tr><td>Masaüstü Çubuğu:</td><td style="width:15px;"></td><td><span class="menu">Tercihler</span>      </td></tr>
 <tr><td>Konum:</td><td></td><td><span class="path">/boot/system/preferences/Appearance</span></td></tr>
 <tr><td>Ayarlar:</td><td></td><td><span class="path">~/config/settings/system/app_server/appearance</span><br />
 <span class="path">~/config/settings/system/app_server/fonts</span></td></tr>
 </table>
-<p>The Appearance preferences lets you change some aspects of Haiku's visuals.</p>
+<p>Görünüm tercihleri Haiku'nun görsel yüzünü değiştirmenize olanak verir.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="fonts" name="fonts">Fonts</a></h2>
+<a id="fonts" name="fonts">Yazıtipleri</a></h2>
 <img src="../images/prefs-images/appearance-fonts.png" alt="appearance-fonts.png" />
-<p>Haiku defines three standard fonts for different purposes. You set plain, bold and fixed font types and sizes that will be used throughout the system. Besides these, there's also a separate setting for the font used in menus.</p>
+<p>Haiku değişik amaçlar için üç adet standart yazıtipi kullanır. Sistem genelinde kullanım için arzu edilen boyutta düz, kalın ve sabit genişlikli yazıtiplerini buradan ayarlayabilirsiniz. Bunların yanında, menülerde kullanılan yazıtipi için ayrı bir seçenek de bulunmaktadır.</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="installing_fonts" name="installing_fonts">Installing new fonts</a></h3>
-<p>New fonts that don't come as part of a regular .hpkg package, can be installed by copying them into a subfolder according to the font type (<tt>psfonts</tt> or <tt>ttfonts</tt>) into their respective <tt>non-packaged</tt> folder (see topic <a href="../filesystem-layout.html">Filesystem layout</a>). For TrueType fonts that would be:</p>
+<a id="installing_fonts" name="installing_fonts">Yeni yazıtipleri yükleme</a></h3>
+<p>Bir .hpkg paketi olarak gelmeyen yazıtiplerini elle yüklemek için onları yazıtipi türüne göre istenilen <tt>non-packaged</tt> klasörü içinde altklasörlere yerleştirmeniz yeterlidir (<tt>psfonts</tt> veya <tt>ttfonts</tt> - ayrıntılı bilgi için <a href="../filesystem-layout.html">Dosya sistemi yerleşimi</a>) bölümüne bakın. TrueType yazıtipleri için örneğin aşağıdaki düzeni kullanabilirsiniz:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path">/boot/system/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td> for fonts available to every user.</td></tr>
-<tr><td><span class="path">/boot/home/config/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td> for fonts only available to yourself.</td></tr>
+<tr><td><span class="path">/boot/system/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td>bütün kullanıcıların kullanabildiği yazıtipleri</td></tr>
+<tr><td><span class="path">/boot/home/config/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td>yalnızca sizin kullanabildiğiniz yazıtipleri</td></tr>
 </table>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="colors" name="colors">Colors</a></h2>
+<a id="colors" name="colors">Renkler</a></h2>
 <img src="../images/prefs-images/appearance-colors.png" alt="appearance-colors.png" />
-<p>In the <span class="menu">Colors</span> tab, you can change the colors of different parts of the user interface. The color well accepts drag &amp; drops from other programs, letting you drag colors over from e.g. <span class="app">WonderBrush</span>, <span class="app">Icon-O-Matic</span> or the <span class="app">Backgrounds</span> panel.</p>
+<p><span class="menu">Renkler</span> sekmesinde kullanıcı arayüzünün belirli bölümlerinin renklerini değiştirebilirsiniz. Renkler sekmesi başka programlardan sürükle ve bırak yapılmasını destekler, dolayısıyla <span class="app">WonderBrush</span> veya <span class="app">Icon-O-Matic</span> gibi programlardan, ve ek olarak <span class="app">Arka Plan</span> panelinden renkler bırakabilirsiniz.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="decorators" name="decorators">Window decorators</a></h2>
+<a id="decorators" name="decorators">Pencere dekorcuları</a></h2>
 <img src="../images/prefs-images/appearance-decorators.png" alt="appearance-decorators.png" />
-<p>Decorators determine the look and feel of windows and all GUI elements. Currently Haiku comes with only one default decorator. Should you find and install other decorators, you can choose a different one from the pop-up menu.</p>
-<p>Haiku's default decorator lets you set the arrow style of the scroll bar: either single arrows at the end of scrollbars to conserve a bit of space, or double arrows — the traditional BeOS way — potentially saving some mouse moving when scrolling up and down or left and right...</p>
+<p>Dekorcular pencere ve grafik arabirim ögelerinin görünümünü ayarlamanızı sağlar. Haiku öntanımlı olarak yalnızca bir dekorcu ile gelmektedir; başka dekorcu yüklerseniz yine bu menüden seçip kullanmaya başlayabilirsiniz.</p>
+<p>Öntanımlı Haiku dekorcusu, kaydırma çubuğunun ok düğmesi düzenini değiştirmenize izin verir; tekli düğme düzeni veya eskiden BeOS'un da kullandığı ikili düğme düzeninden birisini seçebilirsiniz. Bu ikincisi kaydırma yaparken fare hareketlerinden tasarruf etmenizi sağlar.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="antialiasing" name="antialiasing">Antialiasing</a></h2>
+<a id="antialiasing" name="antialiasing">Yumuşatma</a></h2>
 <img src="../images/prefs-images/appearance-antialiasing.png" alt="appearance-antialiasing.png" />
-<p>The tab <span class="menu">Antialiasing</span> provides different settings for how things are rendered on screen.</p>
+<p>The tab <span class="menu">Yumuşatma</span>, ögelerin ekranda nasıl oluşturulacağına dair değişik ayarlar sunar.</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-Glyph hinting</h3>
-<p>An activated <span class="menu">Glyph hinting</span> aligns all letters in such a way that their vertical and horizontal edges rest exactly between two pixels. The result is a perfect contrast, especially when dealing with black on white. Text appears crisper. There's also a setting for <span class="menu">Monospaced fonts only</span> that's especially helpful with low resolution devices like netbooks. Small fonts can look pretty bad when hinting is turned on, but with this setting you still have the advantage of hinting for text editors and Terminal.</p>
-<p>See the difference hinting makes with these magnified screenshots:</p>
+Glif düzgünleştirme</h3>
+<p><span class="menu">Glif düzgünleştirme</span>, tüm harfleri yatay ve dikey uçları yalnızca iki piksel arasında çizilecek biçimde yerleştirir. Bunun sonucunda mükemmele yakın bir karşıtlık ortaya çıkar, özellikle beyaz zeminde siyah metin daha belirgin, okunaklı görünür. Ek olarak <span class="menu">Yalnızca sabit genişlikli yazıtipleri</span> seçeneği özellikle düşük çözünürlüklü ekrana sahip aygıtlarda yardımcı olur. Küçük boyutlu yazıtipleri, düzgünleştirme açıkken kötü görünebilir, ancak bu ayar sayesinde metin düzenleyicilerde Uçbirim'de düzgünleştirmenin avantajlarından yararlanabilirsiniz.</p>
+<p>Aşağıdaki yakınlaştırılmış ekran görüntülerinde, düzgünleştirmenin yaptığı ayrımı görebilirsiniz:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" /><br />Hinting: off</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on.png" alt="appearance-glyph-on.png" /><br />Hinting: on</td></tr>
+<tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" /><br />Düzgünleştirme: Kapalı</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on.png" alt="appearance-glyph-on.png" /><br />Düzgünleştirme: Açık</td></tr>
 </table>
-<p>It should be pointed out that all the <span class="app">Magnify</span> windows on this page are of course rendered themselves with the different options as well. So, you get a real world impression of the settings by comparing, for example, the bold yellow tab title or the text "33 x 15 @ 8 pixels/pixel".</p>
+<p>Bu sayfadaki <span class="app">Ekranı Büyüt</span> pencerelerinin de bu değişik ayarlarla görüntülendiğini belirtmeden olmaz. Dolayısıyla tam anlamıyla kesin bir karşılaştırmayı, örneğin, sarı kalın sekme başlığına veya "33 x 15 @ 8 pixels/pixel metnine bakarak yapabilirsiniz.".</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-Antialiasing type</h3>
-<p>Another technique to improve rendering is <i>Antialiasing</i>, which supports all vector graphics as well as text. It smooths lines by changing the color of certain pixels. There are two methods for that:</p>
-<p><span class="menu">Grayscale</span> changes the intensity of pixels at the edge.<br />
-<span class="menu">LCD subpixel</span> does an even better job, especially with (high resolution) LCD monitors. Instead of the intensity of a pixel, it changes its color which moves an edge by a fraction of a pixel, because LCD displays produce every pixel with a red, green and blue component.</p>
-<p>Again, the two different methods with magnified screenshots:</p>
+Yumuşatma türü</h3>
+<p>Oluşturulmayı iyileştiren başka bir teknik de metnin yanında tüm vektör grafikleri de destekleyen <i>Yumuşatma</i> tekniğidir. Çizgileri, bazı piksellerin rengini değiştirerek daha düzgün gösterir. Bunun için iki yöntem vardır:</p>
+<p><span class="menu">Gri tonlu</span>  yöntemi uçlardaki piksellerin yoğunluğunu değiştirir.<br />
+<span class="menu">LCD altpiksel</span> yöntemi ise LCD monitörlerde (özellikle yüksek çözünürlüklü olanlarda) daha başarılıdır. Piksel yoğunluğunu değiştirmek yerine ucu aşan pikselin iç kesir parçalarından birinin rengini değiştirir, çünkü LCD ekranlar her bir pikseli kırmızı, yeşil ve mavi bölümlerini ışıldatarak oluştururlar.</p>
+<p>Aşağıda bu iki değişik yöntemi yakınlaştırılmış ekran görüntülerinde inceleyebilirsiniz:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" /><br />Grayscale, Hinting: off</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-subpixel.png" alt="appearance-subpixel.png" /><br />LCD subpixel, Hinting: off</td></tr>
+<tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" /><br />Gri tonlu, Düzgünleştirme: Kapalı</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-subpixel.png" alt="appearance-subpixel.png" /><br />LCD altpiksel, Düzgünleştirme: Kapalı</td></tr>
 </table>
-<p>Subpixel based antialiasing adds a slight colored shine to objects. Something not everyone tolerates. In Haiku you can mix the two antialiasing methods and find the right setting for you by using a slider.</p>
-<div class="box-info">The subpixel based antialiasing in combination with the glyph hinting is subject of a software patent and is therefore not available by default. Depending on where in the world you live, you may get an unlocked version. Sorry about that. Talk with your representative.</div>
-<p>If you do activate hinting plus LCD subpixel rendering by changing the source and recompiling, this is how it looks compared to hinting with Grayscale:</p>
+<p>Altpiksel tabanlı düzgünleştirme nesnelere hafif renkli bir parıltı ekler. Bu herkesin hoşuna gitmeyebilir. Haiku size bir kaydırma çubuğu ile size en uygun ayarı seçmenize olanak verir.</p>
+<div class="box-info">Altpiksel tabanlı yumuşatma ile glif düzgünleştirmenin birlikte kullanılması bir yazılım patentine tabidir ve bazı bölgelerde kullanılamayabilir. Bunun için kusura bakmayın.</div>
+<p>LCD altpiksel dokumasını etkinleştirirseniz, düzgünleştirme ile birlikte aşağıdaki gibi görünür:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on.png" alt="appearance-glyph-on.png" /><br />Grayscale, Hinting: on</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on-subpixel.png" alt="appearance-glyph-on-subpixel.png" /><br />LCD subpixel, Hinting: on</td></tr>
+<tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on.png" alt="appearance-glyph-on.png" /><br />Gri tonlu, Düzgünleştirme: Açık</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on-subpixel.png" alt="appearance-glyph-on-subpixel.png" /><br />LCD altpiksel, Düzgünleştirme: Açık</td></tr>
 </table>
 <p><br /></p>
-<p>At the bottom of the panel are two buttons:</p>
+<p>Panelin alt kısmında iki düğme bulunur:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="button">Öntanımlılar</span></td><td> </td><td>Her şeyi öntanımlı değerlerine sıfırlar.</td></tr>
-<tr><td><span class="button">Eski haline döndür</span></td><td> </td><td>brings back the settings that were active when you started the Appearance preferences.</td></tr>
+<tr><td><span class="button">Öntanımlılar</span></td><td> </td><td>her şeyi öntanımlı değerlere sıfırlar.</td></tr>
+<tr><td><span class="button">Eski haline döndür</span></td><td> </td><td>Görünüm tercihlerini ilk açtığınızdaki ayarlara geri döndürür.</td></tr>
 </table>
 
 </div>
@@ -140,8 +141,8 @@ Antialiasing type</h3>
 
 <div class="nav">
 <div class="inner"><span>
-    <a href="../preferences.html" class="uplink">Preferences</a> 
-::  <a href="backgrounds.html">Backgrounds</a>  »
+    <a href="../preferences.html" class="uplink">Tercihler</a> 
+::  <a href="backgrounds.html">Arka Planlar</a>  »
 </span></div>
 </div>
 

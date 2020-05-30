@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2018, Haiku. All rights reserved.
+ * Copyright 2010-2020, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -25,7 +25,7 @@
 <body>
 
 <div id="banner">
-<div><span>User Guide</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -62,7 +62,7 @@
 
 <div id="content">
 <div>
-<div class="box-info">Solange die Übersetzung dieser Seite noch nicht ganz fertig ist, erscheint für die noch fehlenden Teile die englische Version.</div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Liste aller Konsolenprogramme</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -88,9 +88,10 @@ Nachfolgend eine Liste aller in Haiku enthaltenen Konsolenprogramme mit einer ku
 <tr><td><tt>bash</tt></td><td> </td><td>Bourne-Again Shell.</td></tr>
 <tr><td><tt>bc</tt></td><td> </td><td>Eine Rechen-Sprache mit belieber Genauigkeit.</td></tr>
 <tr><td><tt>beep</tt></td><td> </td><td>Gibt einen Klang aus.</td></tr>
+<tr><td><tt>bfsinfo</tt></td><td> </td><td>Analysiert das Dateisystem.</td></tr>
 <tr><td><tt>bunzip2</tt></td><td> </td><td>Siehe <tt>bzip2</tt>.</td></tr>
 <tr><td><tt>bzip2</tt></td><td> </td><td>Blöcke-sortierender Datei-Komprimierer.</td></tr>
-<tr><td><tt>c++</tt></td><td> </td><td>C++-Compiler.</td></tr>
+<tr><td><tt>c++</tt></td><td> </td><td>C++ Compiler.</td></tr>
 <tr><td><tt>cat</tt></td><td> </td><td>Hängt Dateien aneinander und leitet das Ergebnis zur Standardausgabe.</td></tr>
 <tr><td><tt>catattr</tt></td><td> </td><td>Gibt den Inhalt eines Attributs einer Datei aus. <a href="cli-apps.html">(Haiku spezifisch)</a></td></tr>
 <tr><td><tt>cc</tt></td><td> </td><td>C Kompiler.</td></tr>
@@ -103,30 +104,31 @@ Nachfolgend eine Liste aller in Haiku enthaltenen Konsolenprogramme mit einer ku
 <tr><td><tt>chroot</tt></td><td> </td><td>Ändert das Root-Verzeichnis für einen Prozess.</td></tr>
 <tr><td><tt>cksum</tt></td><td> </td><td>Gibt die CRC Checksumme einer Datei und Größe in Bytes aus.</td></tr>
 <tr><td><tt>clear</tt></td><td> </td><td>Löscht den Inhalt des Terminal Fensters.</td></tr>
+<tr><td><tt>clipboard</tt></td><td> </td><td>Managed die Zwischenablage.</td></tr>
 <tr><td><tt>cmp</tt></td><td> </td><td>Vergleicht Dateien Byte-für-Byte.</td></tr>
-<tr><td><tt>collectcatkeys </tt></td><td> </td><td>[Überbleibsel des ursprünglichen Locale Kit.]</td></tr>
+<tr><td><tt>collectcatkeys </tt></td><td> </td><td>Sammelt zu übersetzende Zeichenketten für catkeys.</td></tr>
 <tr><td><tt>comm</tt></td><td> </td><td>Vergleicht sortierte Dateien Zeile-für-Zeile.</td></tr>
 <tr><td><tt>consoled</tt></td><td> </td><td>Konsolen Daemon.</td></tr>
 <tr><td><tt>copyattr</tt></td><td> </td><td>Kopiert einige oder alle Attribute einer oder mehrerer Dateien zu einer bestehenden oder neuen Datei. <a href="cli-apps.html">(Haiku spezifisch)</a></td></tr>
 <tr><td><tt>cp</tt></td><td> </td><td>Kopiert Dateien und Verzeichnisse.</td></tr>
 <tr><td><tt>csplit</tt></td><td> </td><td>Teilt eine Datei anhand eines vorgegebenen Musters in mehrere kleinere Dateien.</td></tr>
-<tr><td><tt>ctags</tt></td><td> </td><td>Erzeugt eine Indexdatei für eine Anzahl von Sprachobjekten, die in Dateien gefunden wurden.</td></tr>
 <tr><td><tt>cut</tt></td><td> </td><td>Gibt Teile jeder Zeile einer Datei aus.</td></tr>
 <tr><td><tt>date</tt></td><td> </td><td>Zeigt Zeit und Datum oder stellt sie ein.</td></tr>
 <tr><td><tt>dc</tt></td><td> </td><td>Ein Taschenrechner.</td></tr>
 <tr><td><tt>dd</tt></td><td> </td><td>Kopiert Rohdaten und formattiert und konvertiert sie dabei anhand von Operanden.</td></tr>
 <tr><td><tt>desklink</tt></td><td> </td><td>Installiert Objekte in der Deskbar. <a href="cli-apps.html">(Haiku spezifisch)</a></td></tr>
-<tr><td><tt>diskimage</tt></td><td> </td><td>Registriert eine Datei als "Festplatte", die dann eingehängt werden kann. <a href="cli-apps.html">(Haiku spezifisch)</a></td></tr>
 <tr><td><tt>df</tt></td><td> </td><td>Zeigt den freien und belegten Platz eingehängter Partitionen.</td></tr>
 <tr><td><tt>diff</tt></td><td> </td><td>Vergleicht Dateien Zeile-für-Zeile.</td></tr>
 <tr><td><tt>diff3</tt></td><td> </td><td>Vergleicht drei Dateien Zeile-für-Zeile.</td></tr>
 <tr><td><tt>dircolors</tt></td><td> </td><td>Farbeinstellungen für <tt>ls</tt>.</td></tr>
 <tr><td><tt>dirname</tt></td><td> </td><td>Entfernt den Dateinamen von einer /Pfad/zu/Dateinamen Zeichenkette.</td></tr>
+<tr><td><tt>diskimage</tt></td><td> </td><td>Registriert eine Datei als "Festplatte", die dann eingehängt werden kann. <a href="cli-apps.html">(Haiku spezifisch)</a></td></tr>
+<tr><td><tt>dpms</tt></td><td> </td><td>Konfiguriert das Display Power Management.</td></tr>
 <tr><td><tt>draggers</tt></td><td> </td><td>Zeigt oder setzt den Sichtbarkeit der Replikanten-Symbole.</td></tr>
 <tr><td><tt>driveinfo</tt></td><td> </td><td>Zeigt Hardware Informationen.</td></tr>
 <tr><td><tt>dstcheck</tt></td><td> </td><td>Zeigt das Hinweisfenster, das beim Wechsel von Sommer- und Winterzeit erscheint.</td></tr>
 <tr><td><tt>du</tt></td><td> </td><td>Zeigt den Platzverbrauch aller Dateien, inklusive Unterverzeichnisse.</td></tr>
-<tr><td><tt>dumpcatalog</tt></td><td> </td><td>[Überbleibsel des ursprünglichen Locale Kit.]</td></tr>
+<tr><td><tt>dumpcatalog</tt></td><td> </td><td>Zeigt den Inhalt von catalog Dateien.</td></tr>
 <tr><td><tt>echo</tt></td><td> </td><td>Gibt eine Textzeile aus.</td></tr>
 <tr><td><tt>egrep</tt></td><td> </td><td>Siehe <tt>grep</tt>.</td></tr>
 <tr><td><tt>eject</tt></td><td> </td><td>Wirft ein Wechselmedium aus.</td></tr>
@@ -143,12 +145,11 @@ Nachfolgend eine Liste aller in Haiku enthaltenen Konsolenprogramme mit einer ku
 <tr><td><tt>filepanel</tt></td><td> </td><td>Öffnet einen Öffnen- oder Speicher-Dialog. <a href="cli-apps.html">(Haiku spezifisch)</a></td></tr>
 <tr><td><tt>find</tt></td><td> </td><td>Sucht nach Dateien in einer Verzeichnisstruktur.</td></tr>
 <tr><td><tt>finddir</tt></td><td> </td><td>Gibt besondere, vom System definierte, Verzeichnisse aus.</td></tr>
+<tr><td><tt>findpaths</tt></td><td> </td><td>Gibt alle Pfade für vom System definierte Verzeichnis-Konstanten aus.</td></tr>
 <tr><td><tt>fmt</tt></td><td> </td><td>Formattiert Absätze einer Datei neu.</td></tr>
 <tr><td><tt>fold</tt></td><td> </td><td>Sorgt für einen Zeilenumbruch in einer Datei.</td></tr>
 <tr><td><tt>fortune</tt></td><td> </td><td>Gibt einen zufälligen, hoffentlich interessanten, Sinnspruch aus.</td></tr>
-<tr><td><tt>freetype-config</tt></td><td> </td><td>Zeigt Informationen über FreeType's Kompilierung und Verlinkung.</td></tr>
 <tr><td><tt>fstrim</tt></td><td> </td><td>Sendet einen TRIM Befehl zu einem SSD Laufwerk.</td></tr>
-<tr><td><tt>ftp</tt></td><td> </td><td>Programm zur Datenübertragung per FTP.</td></tr>
 <tr><td><tt>ftpd</tt></td><td> </td><td>FTP Daemon.</td></tr>
 <tr><td><tt>funzip</tt></td><td> </td><td>Entpackt das erste Objekt eines Archivs und gibt es zur Standardausgabe aus.</td></tr>
 <tr><td><tt>fwcontrol</tt></td><td> </td><td>FireWire Steuerprogramm.</td></tr>
@@ -180,7 +181,7 @@ Nachfolgend eine Liste aller in Haiku enthaltenen Konsolenprogramme mit einer ku
 <tr><td><tt>lessecho</tt></td><td> </td><td>Gibt übergebene Argumente aus und erweitert Meta-Symbole wie * und ? in Dateinamen.</td></tr>
 <tr><td><tt>lesskey</tt></td><td> </td><td>Tastatureinstellungen für less.</td></tr>
 <tr><td><tt>link</tt></td><td> </td><td>Erzeugt eine Verknüpfung zu einer Datei.</td></tr>
-<tr><td><tt>linkcatkeys</tt></td><td> </td><td>[Überbleibsel des ursprünglichen Locale Kit.]</td></tr>
+<tr><td><tt>linkcatkeys</tt></td><td> </td><td>Erzeugt catalogs aus catkeys Dateien.</td></tr>
 <tr><td><tt>listarea</tt></td><td> </td><td>Zeigt Informationen über den Speicherbereich aller laufenden Teams.</td></tr>
 <tr><td><tt>listattr</tt></td><td> </td><td>Listet alle Attribute einer Datei auf. <a href="cli-apps.html">(Haiku spezifisch)</a></td></tr>
 <tr><td><tt>listdev</tt></td><td> </td><td>Listet alle Geräte auf.</td></tr>
@@ -234,7 +235,6 @@ Nachfolgend eine Liste aller in Haiku enthaltenen Konsolenprogramme mit einer ku
 <tr><td><tt>pathchk</tt></td><td> </td><td>Erkennt ungültige oder nicht portierbare Dateinamen.</td></tr>
 <tr><td><tt>pc</tt></td><td> </td><td>Ein Taschenrechner für Programmierer.</td></tr>
 <tr><td><tt>ping</tt></td><td> </td><td>Schickt ICMP-Echo-Request übers Netzwerk.</td></tr>
-<tr><td><tt>pkg-config</tt></td><td> </td><td>Untersucht und konfiguriert ein Haiku Paket.</td></tr>
 <tr><td><tt>pkgman</tt></td><td> </td><td>Verwaltet Pakete und Repositories.</td></tr>
 <tr><td><tt>play</tt></td><td> </td><td>Spielt Tracks einer CD ab.</td></tr>
 <tr><td><tt>pr</tt></td><td> </td><td>Erzeugt Seiten oder Spalten für den Druck.</td></tr>
@@ -269,6 +269,7 @@ Nachfolgend eine Liste aller in Haiku enthaltenen Konsolenprogramme mit einer ku
 <tr><td><tt>settype</tt></td><td> </td><td>Setzt den MIME Typ, Signatur und die bevorzugte Anwendung einer Datei.</td></tr>
 <tr><td><tt>setversion</tt></td><td> </td><td>Zeigt die Version einer Datei.</td></tr>
 <tr><td><tt>setvolume</tt></td><td> </td><td>Regelt die Lautstärke im System.</td></tr>
+<tr><td><tt>sftp</tt></td><td> </td><td>Programm zur Datenübertragung per FTP.</td></tr>
 <tr><td><tt>sh</tt></td><td> </td><td>Siehe <tt>bash</tt>. </td></tr>
 <tr><td><tt>sha1sum</tt></td><td> </td><td>Zeigt oder überprüft SHA1 Checksummen.</td></tr>
 <tr><td><tt>shar</tt></td><td> </td><td>Erzeugt Shell-Archive.</td></tr>

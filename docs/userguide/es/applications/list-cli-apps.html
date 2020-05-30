@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2018, Haiku. All rights reserved.
+ * Copyright 2010-2020, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -24,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>Guía del usuario</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -61,7 +61,7 @@
 
 <div id="content">
 <div>
-<div class="box-info">La traducción de esta página aún no está completa. Hasta que lo esté, las partes sin traducir se muestran en el inglés original.</div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Lista de todas las aplicaciones de la línea de comandos</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -87,6 +87,7 @@ A continuación se muestra una lista de todas las aplicaciones de línea de coma
 <tr><td><tt>bash</tt></td><td> </td><td>intérprete de comandos Bourne-again.</td></tr>
 <tr><td><tt>bc</tt></td><td> </td><td>Lenguaje de calculadora de precisión arbitraria.</td></tr>
 <tr><td><tt>beep</tt></td><td> </td><td>Emite un pitido.</td></tr>
+<tr><td><tt>bfsinfo</tt></td><td> </td><td>Analyses the filesystem.</td></tr>
 <tr><td><tt>bunzip2</tt></td><td> </td><td>Vea <tt>bzip2</tt>.</td></tr>
 <tr><td><tt>bzip2</tt></td><td> </td><td>Compresor de archivos.</td></tr>
 <tr><td><tt>c++</tt></td><td> </td><td>C++-Compiler.</td></tr>
@@ -102,30 +103,31 @@ A continuación se muestra una lista de todas las aplicaciones de línea de coma
 <tr><td><tt>chroot</tt></td><td> </td><td>Ejecuta una orden dentro de un directorio raíz especificado.</td></tr>
 <tr><td><tt>cksum</tt></td><td> </td><td>Imprime suma de comprobación CRC y conteo de bytes de archivos.</td></tr>
 <tr><td><tt>clear</tt></td><td> </td><td>Limpia la ventana de la terminal.</td></tr>
+<tr><td><tt>clipboard</tt></td><td> </td><td>Manipulates the system clipboard.</td></tr>
 <tr><td><tt>cmp</tt></td><td> </td><td>Compara archivos byte por byte.</td></tr>
-<tr><td><tt>collectcatkeys </tt></td><td> </td><td>[Remanente del traslado de locale-kit.] </td></tr>
+<tr><td><tt>collectcatkeys </tt></td><td> </td><td>Collects translatable strings to create catkeys.</td></tr>
 <tr><td><tt>comm</tt></td><td> </td><td>Compara archivos ordenados línea por línea.</td></tr>
 <tr><td><tt>consoled</tt></td><td> </td><td>Daemon de la consola.</td></tr>
 <tr><td><tt>copyattr</tt></td><td> </td><td>Copia todos los atributos o un subconjunto de ellos de uno o más archivos a otro o a nuevo archivo(s). <a href="cli-apps.html">(específico a Haiku)</a></td></tr>
 <tr><td><tt>cp</tt></td><td> </td><td>Copia archivos y directorios.</td></tr>
 <tr><td><tt>csplit</tt></td><td> </td><td>Divide un archivo en piezas separadas por un patrón específico.</td></tr>
-<tr><td><tt>ctags</tt></td><td> </td><td>Genera un archivo índice para una variedad de objetos de lenguaje que se encuentran en archivos.</td></tr>
 <tr><td><tt>cut</tt></td><td> </td><td>Imprime segmentos de cada línea de un archivo.</td></tr>
 <tr><td><tt>date</tt></td><td> </td><td>Muestra o configura la hora y fecha actual.</td></tr>
 <tr><td><tt>dc</tt></td><td> </td><td>lenguaje de calculadora de escritorio.</td></tr>
 <tr><td><tt>dd</tt></td><td> </td><td>Copia datos en bruto, la convierte y le da formato de acuerdo a operandos.</td></tr>
 <tr><td><tt>desklink</tt></td><td> </td><td>Instala elementos en la Barra de Escritorio. <a href="cli-apps.html">(específico a Haiku)</a></td></tr>
-<tr><td><tt>diskimage</tt></td><td> </td><td>Registra un archivo como un dispositivo de disco que puede ser montado. <a href="cli-apps.html">(específoco a Haiku)</a></td></tr>
 <tr><td><tt>df</tt></td><td> </td><td>Presenta un informe sobre espacio usado y libre de los volúmenes montados.</td></tr>
 <tr><td><tt>diff</tt></td><td> </td><td>Compara archivos línea por línea.</td></tr>
 <tr><td><tt>diff3</tt></td><td> </td><td>Compara tres archivos línea por línea.</td></tr>
 <tr><td><tt>dircolors</tt></td><td> </td><td>Configuración de colores para <tt>ls</tt>. </td></tr>
 <tr><td><tt>dirname</tt></td><td> </td><td>Aísla el nombre de directorio de una cadena ruta/hacia/archivo.</td></tr>
+<tr><td><tt>diskimage</tt></td><td> </td><td>Registra un archivo como un dispositivo de disco que puede ser montado. <a href="cli-apps.html">(específoco a Haiku)</a></td></tr>
+<tr><td><tt>dpms</tt></td><td> </td><td>Sets the display power management.</td></tr>
 <tr><td><tt>draggers</tt></td><td> </td><td>Muestra/establece el estado del agarrable de los Replicantes.</td></tr>
 <tr><td><tt>driveinfo</tt></td><td> </td><td>Muestra información de hardware.</td></tr>
 <tr><td><tt>dstcheck</tt></td><td> </td><td>Muestra un cuadro de texto utilizado al cambiar desde/hacia el horario de verano.</td></tr>
 <tr><td><tt>du</tt></td><td> </td><td>Resume el espacio de uso de disco de cada archivo, de forma recursiva para los directorios.</td></tr>
-<tr><td><tt>dumpcatalog</tt></td><td> </td><td>[Remanente del traslado de locale-kit.] </td></tr>
+<tr><td><tt>dumpcatalog</tt></td><td> </td><td>Shows the contents of catalog files.</td></tr>
 <tr><td><tt>echo</tt></td><td> </td><td>Muestra una línea de texto.</td></tr>
 <tr><td><tt>egrep</tt></td><td> </td><td>Vea <tt>grep</tt>.</td></tr>
 <tr><td><tt>eject</tt></td><td> </td><td>Expulsa medios extraíbles.</td></tr>
@@ -142,12 +144,11 @@ A continuación se muestra una lista de todas las aplicaciones de línea de coma
 <tr><td><tt>filepanel</tt></td><td> </td><td>Muestra un panel de archivos para abrir/guardar. <a href="cli-apps.html">(específico a Haiku)</a></td></tr>
 <tr><td><tt>find</tt></td><td> </td><td>Busca archivos en una jerarquía de directorios.</td></tr>
 <tr><td><tt>finddir</tt></td><td> </td><td>Busca directorios especiales definidos por el sistema.</td></tr>
+<tr><td><tt>findpaths</tt></td><td> </td><td>Prints all paths for system defined directory constants.</td></tr>
 <tr><td><tt>fmt</tt></td><td> </td><td>Reformatea los párrafos de un archivo.</td></tr>
 <tr><td><tt>fold</tt></td><td> </td><td>Ajusta las lineas de entrada de un archivo.</td></tr>
 <tr><td><tt>fortune</tt></td><td> </td><td>Imprime un adagio, posiblemente interesante, al azar.</td></tr>
-<tr><td><tt>freetype-config</tt></td><td> </td><td>Muestra información de vinculado y compilado de FreeType.</td></tr>
 <tr><td><tt>fstrim</tt></td><td> </td><td>Envía una orden TRIM a una unidad SSD.</td></tr>
-<tr><td><tt>ftp</tt></td><td> </td><td>Programa de transferencia de archivos.</td></tr>
 <tr><td><tt>ftpd</tt></td><td> </td><td>Daemon de FTP.</td></tr>
 <tr><td><tt>funzip</tt></td><td> </td><td>Extrae el primer elemento de un archivo comprimido.</td></tr>
 <tr><td><tt>fwcontrol</tt></td><td> </td><td>Programa de control para FireWire.</td></tr>
@@ -179,7 +180,7 @@ A continuación se muestra una lista de todas las aplicaciones de línea de coma
 <tr><td><tt>lessecho</tt></td><td> </td><td>Hace eco de sus argumentos y expande metacaracteres, como * y ? en nombres de archivos.</td></tr>
 <tr><td><tt>lesskey</tt></td><td> </td><td>Establece la tecla clave para less.</td></tr>
 <tr><td><tt>link</tt></td><td> </td><td>Crea un enlace a un archivo.</td></tr>
-<tr><td><tt>linkcatkeys</tt></td><td> </td><td>[Remanente del traslado de locale-kit.] </td></tr>
+<tr><td><tt>linkcatkeys</tt></td><td> </td><td>Creates catalogs from catkeys. </td></tr>
 <tr><td><tt>listarea</tt></td><td> </td><td>Muestra listado de información de área para todos los grupos actualmente en ejecución.</td></tr>
 <tr><td><tt>listattr</tt></td><td> </td><td>Muestra listado de atributos de un archivo. <a href="cli-apps.html">(específico a Haiku)</a></td></tr>
 <tr><td><tt>listdev</tt></td><td> </td><td>Muestra un listado de todos los dispositivos de hardware.</td></tr>
@@ -233,7 +234,6 @@ A continuación se muestra una lista de todas las aplicaciones de línea de coma
 <tr><td><tt>pathchk</tt></td><td> </td><td>Diagnostica nombres de archivos inválidos o no portátiles.</td></tr>
 <tr><td><tt>pc</tt></td><td> </td><td>calculadora de programador.</td></tr>
 <tr><td><tt>ping</tt></td><td> </td><td>envía solicitud de echo-ICMP al <i>host</i> de red.</td></tr>
-<tr><td><tt>pkg-config</tt></td><td> </td><td>analiza y configura un paquete de Haiku.</td></tr>
 <tr><td><tt>pkgman</tt></td><td> </td><td>Administra paquetes y repositorios de paquetes.</td></tr>
 <tr><td><tt>play</tt></td><td> </td><td>Reproduce pistas de un CD.</td></tr>
 <tr><td><tt>pr</tt></td><td> </td><td>Hace paginado o columnado de archivos para impresión.</td></tr>
@@ -268,6 +268,7 @@ A continuación se muestra una lista de todas las aplicaciones de línea de coma
 <tr><td><tt>settype</tt></td><td> </td><td>Establece el tipo MIME de un archivo, su firma y aplicación predilecta.</td></tr>
 <tr><td><tt>setversion</tt></td><td> </td><td>Muestra la versión de un archivo.</td></tr>
 <tr><td><tt>setvolume</tt></td><td> </td><td>Establece el volumen de sonido del sistema.</td></tr>
+<tr><td><tt>sftp</tt></td><td> </td><td>Programa de transferencia de archivos.</td></tr>
 <tr><td><tt>sh</tt></td><td> </td><td>Vea <tt>bash</tt>. </td></tr>
 <tr><td><tt>sha1sum</tt></td><td> </td><td>Imprime o revisa sumas de control SHA1. </td></tr>
 <tr><td><tt>shar</tt></td><td> </td><td>Crea archivos de intérprete de comandos.</td></tr>

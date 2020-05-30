@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2014, Haiku. All rights reserved.
+ * Copyright 2008-2020, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -26,7 +26,7 @@
 <body>
 
 <div id="banner">
-<div><span>Guide de l’utilisateur</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -63,7 +63,7 @@
 
 <div id="content">
 <div>
-<div class="box-info">Cette page n'est pas encore entièrement traduite. Les parties non encore traduites seront en anglais.</div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h2><img src="../../images/apps-images/terminal-icon_64.png" alt="terminal-icon_64.png" width="64" height="64" />Terminal</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -83,9 +83,9 @@
 <p>Vous pouvez ouvrir autant de Terminaux que vous voulez, chacun dans sa fenêtre propre, en lançant plusieurs fois l’application Terminal ou en tapant <span class="key">Alt</span> <span class="key">N</span> depuis un Terminal ouvert. Vous pouvez également utiliser la vue en onglets du Terminal : utilisez la combinaison <span class="key">Alt</span> <span class="key">T</span> pour ouvrir un nouvel onglet.</p>
 <img src="../images/apps-images/terminal.png" alt="terminal.png" />
 <br />
-<p>Double-cliquez dans une partie vide de la barre d'onglets pour ouvrir un nouvel onglet ou sur un onglet  pour le renommer. Plusieurs variables identifiables par un % peuvent être utilisées. Elles sont détaillées dans une info-bulle lorsque vous passez la souris sur le champ de texte.<br />
-Par défaut, <tt>%1d: %p</tt>, un onglet affiche le répertoire courant et, séparé par <tt>:</tt>, le nom de la tâche en cours d'exécution (ou <tt>--</tt> si seul bash est en cours, probablement inactif). La copie d'écran ci-dessus montre le premier onglet avec une session FTP dans le dossier <span class="path">Desktop</span>, et un seconde onglet inactif dans le répertoire personnel <span class="path">home</span>.<br />
-De la même façon, vous pouvez éditer le titre de la fenêtre du Terminal via <span class="menu">Edit|Window title...</span>.</p>
+<p>Double-clicking into the emtpy part of the tab bar opens a new tab; onto a tab opens a dialog to rename its title. There are several %-designated variables that are explained with a tooltip when you hover the mouse over the text field.<br />
+By default, <tt>%1d: %p</tt>, a tab shows the current directory and, separated by a <tt>:</tt>, the name of the currently running process (or <tt>--</tt> if it's just bash running, probably idling). The screenshot above shows the first tab with a FTP session in the <span class="path">Desktop</span> folder and a second tab idling at <span class="path">home</span>.<br />
+Via <span class="menu">Settings | Window title...</span> the Terminal window's title can be edited in a similar way.</p>
 <p>Right-clicking a tab shows a context menu to <span class="menu">Close tab</span>, <span class="menu">Close other tabs</span> or, like double-clicking, <span class="menu">Edit tab title...</span>.
 Un clic droit sur un onglet affiche un menu contextuel pour fermer cet onglet (<span class="menu">Close tab</span>), fermer les autres onglets (<span class="menu">Close other tabs</span>) ou, comme un double-clic, éditer le titre de l'onglet (<span class="menu">Edit tab title...</span>).</p>
 <p>Une fenêtre du Terminal peut être redimensionnée comme toute autre fenêtre ou en utilisant le menu <span class="menu">Settings | Window Size</span>. <span class="key">Alt</span> <span class="key">Entrée</span> permet de basculer en mode plein écran.</p>
@@ -127,12 +127,12 @@ Ces deux fichiers peuvent être créés dans votre dossier <span class="path">/b
 vous ouvrez un nouveau Terminal. Il configure divers alias et variables qui affectent le comportement et l’apparence de bash. Vous trouverez en ligne de nombreuses ressources qui détaillent les possibilités de configuration.</p>
 <p>« The Haiku/BeOS Tip Server » met à votre disposition quelques astuces pour vous aider à démarrer, comme :</p>
 <ul>
-<li><a href="http://betips.net/1997/09/09/customize-your-terminal-prompt/">Personnaliser votre invite de commandes</a></li>
-<li><a href="http://betips.net/1997/09/09/more-prompt-customizations/">Plus de personnalisations de l’invite de commandes</a></li>
-<li><a href="http://betips.net/1997/09/09/enhancing-bash/">Améliorer bash</a></li>
-<li><a href="http://betips.net/1997/09/09/custom-keyboard-shortcuts/">Raccourcis claviers personnalisés</a></li>
+<li><a href="https://betips.net/?p=5">Customize your Terminal prompt</a></li>
+<li><a href="https://betips.net/?p=66">More prompt customizations</a></li>
+<li><a href="https://betips.net/?p=67">Enhancing bash</a></li>
+<li><a href="https://betips.net/?p=105">Custom keyboard shortcuts</a></li>
 </ul>
-<p>Il y en a d’autres, <a href="http://betips.net/index.php?s=.profile">jetez un œil</a>.</p>
+<p>There are more, <a href="https://betips.net/?s=profile">have a look</a>.</p>
 
 <h3>inputrc</h3>
 <p>Le fichier <span class="cli">inputrc</span> permet de configurer des équivalents claviers. Haiku fournit déjà des valeurs par défaut, vous n’aurez donc probablement pas à vous occupez de ces réglages plus compliqués. Si vous avez des besoins spécifiques, consultez des ressources en ligne, comme <a href="http://tiswww.case.edu/php/chet/readline/rluserman.html">The GNU Readline Library</a>.</p>

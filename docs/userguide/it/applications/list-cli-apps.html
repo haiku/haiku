@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2018, Haiku. All rights reserved.
+ * Copyright 2010-2020, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -14,6 +14,7 @@
  *		Barrett
  *		Francesco Franchina
  *		MichaelPeppers
+ *		Gabriele
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -63,21 +64,20 @@
 
 <div id="content">
 <div>
-<div class="box-info">La traduzione di questa pagina non è stata completata. Per questo motivo le parti non tradotte sono visibili in inglese.</div>
 
 <h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Lista di tutte le applicazioni su riga di comando</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Localita:</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin/</span><br /><span class="path">~/config/bin/</span><br /><span class="path">~/config/non-packaged/bin/</span></td></tr>
+<tr><td>Percorso:</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin/</span><br /><span class="path">~/config/bin/</span><br /><span class="path">~/config/non-packaged/bin/</span></td></tr>
 </table>
 <p><br /></p>
-<p>All commandline applications shipped with Haiku are in <span class="path">/boot/system/bin/</span>. Your own or additionally installed commandline apps will appear in <span class="path">~/config/bin/</span> when installed from a .hpkg package. Otherwise you can put them into <span class="path">~/config/non-packaged/bin/</span>. All these locations are part of the PATH variable and are therefore automatically found.<br />
-Here's a list of all commandline applications that are shipped with Haiku. Each with only a short description of what it does, for more detailed information on its usage execute the command with the parameter <tt>--help</tt>.</p>
+<p>Tutte le applicazioni su riga di comando fornite con Haiku si trovano in <span class="path">/boot/system/bin</span>. Le applicazioni dell'utente, insieme a quelle addizionali, risiedono, invece, in <span class="path">~/config/bin</span> quando sono installati attraverso un pacchetto .hpkg. In alternativa, puoi copiarli in <span class="path">~/config/non-packaged/bin/</span>. Tutti questi percorsi fanno parte della variabile PATH e pertanto i file in essi contenuti sono trovati automaticamente.<br />
+Qui a seguire è presentata una lista di tutte le applicazioni su riga di comando fornite con Haiku. Ciascuna ha solamente una breve descrizione di quello che fa. Per informazioni più dettagliate sul suo utilizzo, eseguire il comando con il parametro <tt>--help</tt>.</p>
 <p><br /></p>
 <p>Indice:   <a href="#A">A – E</a>   ::   <a href="#F"> F – J </a>   ::   <a href="#K"> K – O </a>   ::   <a href="#P"> P – S </a>   ::   <a href="#T"> T – Z </a></p>
 <p><br /></p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
 <tr><td><tt>CortexAddOnHost</tt></td><td style="width:10px;"> </td><td>Avvia il servizio per monitorare gli add-on dell'audio e del video in uso.</td></tr>
-<tr><td><tt>FirstBootPrompt</tt></td><td> </td><td>Language and keymap setup. </td></tr>
+<tr><td><tt>ReadOnlyBootPrompt</tt></td><td> </td><td>Configurazione della lingua e della mappa dei tasti.</td></tr>
 <tr><td><tt>[</tt></td><td> </td><td>Ritorna vero o falso dopo aver confrontato due elementi.</td></tr>
 <tr><td colspan="3"><a id="A" name="A"><h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>A</h2></a></td></tr>
 <tr><td><tt>addattr</tt></td><td> </td><td>Assegna un attributo a un file prendendo in considerazione il tipo e converte in base a questo i valori.<a href="cli-apps.html">(specifico per Haiku)</a></td></tr>
@@ -89,9 +89,10 @@ Here's a list of all commandline applications that are shipped with Haiku. Each 
 <tr><td><tt>bash</tt></td><td> </td><td>Bourne-again shell.</td></tr>
 <tr><td><tt>bc</tt></td><td> </td><td>Un linguaggio di calcolo a precisione arbitraria.</td></tr>
 <tr><td><tt>beep</tt></td><td> </td><td>Emette un segnale acustico.</td></tr>
+<tr><td><tt>bfsinfo</tt></td><td> </td><td>Analizza il file system.</td></tr>
 <tr><td><tt>bunzip2</tt></td><td> </td><td>Vedere <tt>bzip2</tt>.</td></tr>
-<tr><td><tt>bzip2</tt></td><td> </td><td>File compressor.</td></tr>
-<tr><td><tt>c++</tt></td><td> </td><td>C++-Compiler.</td></tr>
+<tr><td><tt>bzip2</tt></td><td> </td><td>Compressore di file</td></tr>
+<tr><td><tt>c++</tt></td><td> </td><td>Compilatore C++.</td></tr>
 <tr><td><tt>cat</tt></td><td> </td><td>Concatena file e li visualizza nello standar output.</td></tr>
 <tr><td><tt>catattr</tt></td><td> </td><td>Visualizza il contenuto di un attributo di un file. <a href="cli-apps.html">(specifico per Haiku)</a></td></tr>
 <tr><td><tt>cc</tt></td><td> </td><td>Compilatore C.</td></tr>
@@ -104,30 +105,31 @@ Here's a list of all commandline applications that are shipped with Haiku. Each 
 <tr><td><tt>chroot</tt></td><td> </td><td>Esegue un comando all'interno di una specifica cartella root.</td></tr>
 <tr><td><tt>cksum</tt></td><td> </td><td>Visualizza il numero dei byte e il checksum CRC dei file.</td></tr>
 <tr><td><tt>clear</tt></td><td> </td><td>Ripulisce la finestra del terminale.</td></tr>
+<tr><td><tt>clipboard</tt></td><td> </td><td>Manipola la clipboard di sistema.</td></tr>
 <tr><td><tt>cmp</tt></td><td> </td><td>Confronta due file byte per byte.</td></tr>
-<tr><td><tt>collectcatkeys </tt></td><td> </td><td>[Rimente dallo spostamento di locale-kit.]</td></tr>
+<tr><td><tt>collectcatkeys </tt></td><td> </td><td>Raccoglie le stringe traducibili in un catalogo catkeys.</td></tr>
 <tr><td><tt>comm</tt></td><td> </td><td>Confronta due file ordinati riga per riga.</td></tr>
 <tr><td><tt>consoled</tt></td><td> </td><td>Demone della console.</td></tr>
 <tr><td><tt>copyattr</tt></td><td> </td><td>Copia tutti o una parte di attributi da uno o più file a un'altro o in un nuovo file. <a href="cli-apps.html">(specifico per Haiku)</a></td></tr>
 <tr><td><tt>cp</tt></td><td> </td><td>Copia file e cartelle.</td></tr>
 <tr><td><tt>csplit</tt></td><td> </td><td>Suddivide un file in parti separate in base a uno specifico modello.</td></tr>
-<tr><td><tt>ctags</tt></td><td> </td><td>Genera un file di indice per una varietà di linguaggi oggetto trovati all'inteno dei file.</td></tr>
 <tr><td><tt>cut</tt></td><td> </td><td>Visualizza sezioni a partire da ciascuna riga di un file.</td></tr>
 <tr><td><tt>date</tt></td><td> </td><td>Mostra o permette di impostare la data e l'orario correnti.</td></tr>
 <tr><td><tt>dc</tt></td><td> </td><td>Linguaggio per effettuare calcoli.</td></tr>
 <tr><td><tt>dd</tt></td><td> </td><td>Copia dati grezzi, convertendoli e formattandoli secondo gli operatori.</td></tr>
 <tr><td><tt>desklink</tt></td><td> </td><td>Installa elementi nella Deskbar. <a href="cli-apps.html">(specifico per Haiku)</a></td></tr>
-<tr><td><tt>diskimage</tt></td><td> </td><td>Registers a file as disk device that can then be mounted. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
 <tr><td><tt>df</tt></td><td> </td><td>Mostra lo spazio disponibile e quello utilizzato dei volumi montati.</td></tr>
 <tr><td><tt>diff</tt></td><td> </td><td>Confronta dei file riga per riga.</td></tr>
 <tr><td><tt>diff3</tt></td><td> </td><td>Confronta dei file tre righe per volta.</td></tr>
 <tr><td><tt>dircolors</tt></td><td> </td><td>Imposta i colori per <tt>ls</tt>. </td></tr>
 <tr><td><tt>dirname</tt></td><td> </td><td>Rimuove il nome del file da una stringa /percorso/per/il/file.</td></tr>
+<tr><td><tt>diskimage</tt></td><td> </td><td>Registra un file come un dispositivo disco in modo che possa essere montato. <a href="cli-apps.html">(specifico per Haiku)</a></td></tr>
+<tr><td><tt>dpms</tt></td><td> </td><td>Imposta le funzionalità di risparmio energetico dello schermo.</td></tr>
 <tr><td><tt>draggers</tt></td><td> </td><td>Visualizza o imposta lo stato di trascinamento dei Replicanti.</td></tr>
 <tr><td><tt>driveinfo</tt></td><td> </td><td>Mostra informazioni sull'hardware.</td></tr>
 <tr><td><tt>dstcheck</tt></td><td> </td><td>Mostra una finestra di dialogo usata quando si passa da o all'ora solare</td></tr>
 <tr><td><tt>du</tt></td><td> </td><td>Riassume l'utilizzo del disco per ciascun file, ricorsivamente per le cartelle.</td></tr>
-<tr><td><tt>dumpcatalog</tt></td><td> </td><td>[Rimente dallo spostamento di locale-kit.]</td></tr>
+<tr><td><tt>dumpcatalog</tt></td><td> </td><td>Mostra il contenuto dei file catalog.</td></tr>
 <tr><td><tt>echo</tt></td><td> </td><td>Stampa una riga di testo.</td></tr>
 <tr><td><tt>egrep</tt></td><td> </td><td>Vedere <tt>grep</tt>.</td></tr>
 <tr><td><tt>eject</tt></td><td> </td><td>Espelle dispositivi rimovibili.</td></tr>
@@ -144,17 +146,16 @@ Here's a list of all commandline applications that are shipped with Haiku. Each 
 <tr><td><tt>filepanel</tt></td><td> </td><td>Mostra un caricamento o salvataggio di file panel. <a href="cli-apps.html">(specifico per Haiku)</a></td></tr>
 <tr><td><tt>find</tt></td><td> </td><td>Cerca un file all'interno di una gerarchia di cartelle.</td></tr>
 <tr><td><tt>finddir</tt></td><td> </td><td>Cerca cartelle speciali definite dal sistema.</td></tr>
+<tr><td><tt>findpaths</tt></td><td> </td><td>Mostra tutti i percorsi delle directory di sistema predefinite.</td></tr>
 <tr><td><tt>fmt</tt></td><td> </td><td>Riformatta i paragrafi di un file.</td></tr>
 <tr><td><tt>fold</tt></td><td> </td><td>Sistema le righe di un file in input.</td></tr>
 <tr><td><tt>fortune</tt></td><td> </td><td>Stampa casualmente delle massime, si spera interessanti.</td></tr>
-<tr><td><tt>freetype-config</tt></td><td> </td><td>Stampa le informazioni di compilazione e linking per FreeType.</td></tr>
-<tr><td><tt>fstrim</tt></td><td> </td><td>Send a TRIM command to an SSD drive.</td></tr>
-<tr><td><tt>ftp</tt></td><td> </td><td>Programma di trasferimento file.</td></tr>
+<tr><td><tt>fstrim</tt></td><td> </td><td>Invia un comando di TRIM a un dispositivo SSD.</td></tr>
 <tr><td><tt>ftpd</tt></td><td> </td><td>Demone FTP.</td></tr>
 <tr><td><tt>funzip</tt></td><td> </td><td>Estrae nello standard output il primo elemento di un archivio.</td></tr>
 <tr><td><tt>fwcontrol</tt></td><td> </td><td>programma di controllo FireWire.</td></tr>
 <tr><td><tt>gawk</tt></td><td> </td><td>Ricerca e processa linguaggi.</td></tr>
-<tr><td><tt>getarch</tt></td><td> </td><td>Shows the environment's compiler version. </td></tr>
+<tr><td><tt>getarch</tt></td><td> </td><td>Mostra le informazioni di versione dell'ambiente di compilazione.</td></tr>
 <tr><td><tt>grep</tt></td><td> </td><td>Cerca una corrispondenza a un modello.</td></tr>
 <tr><td><tt>groups</tt></td><td> </td><td>Stampa l'appartenenza ai gruppi per ciascun nome utente.</td></tr>
 <tr><td><tt>gunzip</tt></td><td> </td><td>Vedere <tt>gzip</tt>.</td></tr>
@@ -176,12 +177,12 @@ Here's a list of all commandline applications that are shipped with Haiku. Each 
 <tr><td><tt>kernel_debugger</tt></td><td> </td><td>Entra nel kernel debugger.</td></tr>
 <tr><td><tt>keymap</tt></td><td> </td><td>Carica o salva la mappatura dei caratteri.</td></tr>
 <tr><td><tt>kill</tt></td><td> </td><td>Invia un segnale per terminare un processo.</td></tr>
-<tr><td><tt>launch_roster</tt></td><td> </td><td>Controls the launch_daemon, e.g. stop and restart services. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
+<tr><td><tt>launch_roster</tt></td><td> </td><td>Controlla il launch_daemon, ad esempio per l'arresto e il riavvio di servizi. <a href="cli-apps.html">(specifico per Haiku)</a></td></tr>
 <tr><td><tt>less</tt></td><td> </td><td>Visualizza un file.</td></tr>
 <tr><td><tt>lessecho</tt></td><td> </td><td>Ritorna i propri argomenti ed espande i metacaratteri (come * e ?) presenti nei nomi dei file.</td></tr>
 <tr><td><tt>lesskey</tt></td><td> </td><td>Specifica dei tasti di collegamento per less.</td></tr>
 <tr><td><tt>link</tt></td><td> </td><td>Crea un link a un file.</td></tr>
-<tr><td><tt>linkcatkeys</tt></td><td> </td><td>[Rimente dallo spostamento di locale-kit.]</td></tr>
+<tr><td><tt>linkcatkeys</tt></td><td> </td><td>Crea file catalog da file catkeys.</td></tr>
 <tr><td><tt>listarea</tt></td><td> </td><td>Mostra informazioni sulla zona per tutti i team correntemente in esecuzione.</td></tr>
 <tr><td><tt>listattr</tt></td><td> </td><td>Elenca gli attributi di un file. <a href="cli-apps.html">(specifico per Haiku)</a></td></tr>
 <tr><td><tt>listdev</tt></td><td> </td><td>Elenca tutti i dispositivi hardware.</td></tr>
@@ -191,7 +192,7 @@ Here's a list of all commandline applications that are shipped with Haiku. Each 
 <tr><td><tt>listsem</tt></td><td> </td><td>Elenca i semafori allocati dal team specificato.</td></tr>
 <tr><td><tt>listusb</tt></td><td> </td><td>Elenca i dispositivi USB.</td></tr>
 <tr><td><tt>ln</tt></td><td> </td><td>Crea un link a un file.</td></tr>
-<tr><td><tt>locale</tt></td><td> </td><td>Shows the set preferred language, its LC_CTYPE and the preferred formatting.</td></tr>
+<tr><td><tt>locale</tt></td><td> </td><td>Mostra la lingua predefinita, il suo LC_CTYPE e le regole di formattazione predefinite.</td></tr>
 <tr><td><tt>locate</tt></td><td> </td><td>Localizza un file.</td></tr>
 <tr><td><tt>logger</tt></td><td> </td><td>Invia un messaggio al log di sistema.</td></tr>
 <tr><td><tt>login</tt></td><td> </td><td>Avvia una sessione all'interno del sistema.</td></tr>
@@ -203,10 +204,10 @@ Here's a list of all commandline applications that are shipped with Haiku. Each 
 <tr><td><tt>makebootable</tt></td><td> </td><td>Rende avviabile la partizione o il dispositivo BFS specificato scrivendo all'interno dei primi due settori del codice di boot.</td></tr>
 <tr><td><tt>mbox2mail</tt></td><td> </td><td>Converte i file mailbox di Unix in file e-mail di BeOS.</td></tr>
 <tr><td><tt>md5sum</tt></td><td> </td><td>Stampa o verifica un checksum MD5.</td></tr>
-<tr><td><tt>media_client</tt></td><td> </td><td>"media_client play" plays back audio files.</td></tr>
+<tr><td><tt>media_client</tt></td><td> </td><td>"media_client play" riproduce file audio.</td></tr>
 <tr><td><tt>message</tt></td><td> </td><td>Stampa un file BMessage come file piano.</td></tr>
 <tr><td><tt>mimeset</tt></td><td> </td><td>Imposta un MIME type per un file.</td></tr>
-<tr><td><tt>mkdepend</tt></td><td> </td><td>Makefile dependency generator.</td></tr>
+<tr><td><tt>mkdepend</tt></td><td> </td><td>Generatore di dipendenze per Makefile.</td></tr>
 <tr><td><tt>mkdir</tt></td><td> </td><td>Crea una cartella.</td></tr>
 <tr><td><tt>mkdos</tt></td><td> </td><td>Inizializza una partizione FAT.</td></tr>
 <tr><td><tt>mkfifo</tt></td><td> </td><td>Crea un pipe col nome specificato.</td></tr>
@@ -219,7 +220,7 @@ Here's a list of all commandline applications that are shipped with Haiku. Each 
 <tr><td><tt>mount_nfs</tt></td><td> </td><td>Monta una partizione NFS.</td></tr>
 <tr><td><tt>mountvolume</tt></td><td> </td><td>Monta un volume in base al nome.</td></tr>
 <tr><td><tt>mv</tt></td><td> </td><td>Sposta o rinomina un file.</td></tr>
-<tr><td><tt>nano</tt></td><td> </td><td>The default text editor in the Terminal, a clone of 'Pico'. </td></tr>
+<tr><td><tt>nano</tt></td><td> </td><td>L'editor di testo predefinito da riga di comando, un clone di 'Pico'.</td></tr>
 <tr><td><tt>netstat</tt></td><td> </td><td>Stampa connessioni di rete, tabelle di routing, statistiche delle interfacce, connessioni mascherate e membri di un multicast.</td></tr>
 <tr><td><tt>nl</tt></td><td> </td><td>Stampa un file con le righe numerate.</td></tr>
 <tr><td><tt>nohup</tt></td><td> </td><td>Esegue un comando ignorando i segnali di sospensione.</td></tr>
@@ -227,16 +228,15 @@ Here's a list of all commandline applications that are shipped with Haiku. Each 
 <tr><td><tt>od</tt></td><td> </td><td>Stampa una rappresentazione univoca di un file.</td></tr>
 <tr><td><tt>open</tt></td><td> </td><td>Apre un documento o un'applicazione dalla shell. <a href="cli-apps.html">(specifico per Haiku)</a></td></tr>
 <tr><td colspan="3"><a id="P" name="P"><h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>P</h2></a></td></tr>
-<tr><td><tt>package</tt></td><td> </td><td>Creates, inspects, or extracts a Haiku package.</td></tr>
-<tr><td><tt>package_repo</tt></td><td> </td><td>Creates or inspects a Haiku package repository file.</td></tr>
+<tr><td><tt>package</tt></td><td> </td><td>Crea, ispeziona o estrae il contenuto da un pacchetto Haiku.</td></tr>
+<tr><td><tt>package_repo</tt></td><td> </td><td>Crea o ispeziona il contenuto di un file di repository di pacchetti Haiku.</td></tr>
 <tr><td><tt>passwd</tt></td><td> </td><td>Cambia la password dell'utente.</td></tr>
-<tr><td><tt>paste</tt></td><td> </td><td>Prints lines consisting of the sequentially corresponding lines from each file, separated by tabs.</td></tr>
+<tr><td><tt>paste</tt></td><td> </td><td>Stampa le righe sequenziali corrispondenti di ogni file, separate da tabulazioni.</td></tr>
 <tr><td><tt>patch</tt></td><td> </td><td>Applica un file diff a quello originale.</td></tr>
 <tr><td><tt>pathchk</tt></td><td> </td><td>Segnala nomi di file non validi o non compatibili.</td></tr>
 <tr><td><tt>pc</tt></td><td> </td><td>Calcolatrice per programmatori.</td></tr>
 <tr><td><tt>ping</tt></td><td> </td><td>Invia una richiesta ICMP-echo a un determinato host.</td></tr>
-<tr><td><tt>pkg-config</tt></td><td> </td><td>Analyzes and configures a Haiku package.</td></tr>
-<tr><td><tt>pkgman</tt></td><td> </td><td>Manages packages and package repositories.</td></tr>
+<tr><td><tt>pkgman</tt></td><td> </td><td>Gestisce i pacchetti ed i repository di pacchetti.</td></tr>
 <tr><td><tt>play</tt></td><td> </td><td>Riproduce delle tracce di un CD.</td></tr>
 <tr><td><tt>pr</tt></td><td> </td><td>Impagina o incolonna dei file per la stampa.</td></tr>
 <tr><td><tt>printenv</tt></td><td> </td><td>Stampa il valore di una variabile d'ambiente.</td></tr>
@@ -248,7 +248,7 @@ Here's a list of all commandline applications that are shipped with Haiku. Each 
 <tr><td><tt>pwd</tt></td><td> </td><td>Mostra quale sia la cartella corrente.</td></tr>
 <tr><td><tt>query</tt></td><td> </td><td>Un'applicazione da shell per emulare la funzionalità del Tracker "Find by formula". <a href="cli-apps.html">(specifico per Haiku)</a></td></tr>
 <tr><td><tt>quit</tt></td><td> </td><td>Termina una applicazione.</td></tr>
-<tr><td><tt>ramdisk</tt></td><td> </td><td>Creates a ramdisk. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
+<tr><td><tt>ramdisk</tt></td><td> </td><td>Crea un disco RAM. <a href="cli-apps.html">(specifico per Haiku)</a></td></tr>
 <tr><td><tt>rc</tt></td><td> </td><td>Compilatore di risorse.</td></tr>
 <tr><td><tt>readlink</tt></td><td> </td><td>Mostra quale sia il percorso di destinazione di un link simbolico.</td></tr>
 <tr><td><tt>reindex</tt></td><td> </td><td>Inserisce gli attributi dei file esistenti all'inteno di nuovi indici. <a href="cli-apps.html">(specifico per Haiku)</a></td></tr>
@@ -265,11 +265,12 @@ Here's a list of all commandline applications that are shipped with Haiku. Each 
 <tr><td><tt>screenmode</tt></td><td> </td><td>Visualizza o imposta la modalità dello schermo.</td></tr>
 <tr><td><tt>sdiff</tt></td><td> </td><td>Mostra o compone le differenze tra due file.</td></tr>
 <tr><td><tt>seq</tt></td><td> </td><td>Stampa una sequenza di numeri.</td></tr>
-<tr><td><tt>setarch</tt></td><td> </td><td>Sets the environment to a specific compiler version. </td></tr>
+<tr><td><tt>setarch</tt></td><td> </td><td>Imposta l'ambiente ad una specifica versione del compilatore.</td></tr>
 <tr><td><tt>setdecor</tt></td><td> </td><td>Visualizza o imposta il decoratore.</td></tr>
 <tr><td><tt>settype</tt></td><td> </td><td>Imposta il MIME type, la firma e l'applicazione preferita per un file.</td></tr>
 <tr><td><tt>setversion</tt></td><td> </td><td>Mostra la versione di un file.</td></tr>
 <tr><td><tt>setvolume</tt></td><td> </td><td>Imposta il volume del suono del sistema.</td></tr>
+<tr><td><tt>sftp</tt></td><td> </td><td>Programma di trasferimento file.</td></tr>
 <tr><td><tt>sh</tt></td><td> </td><td>Vedere <tt>bash</tt>. </td></tr>
 <tr><td><tt>sha1sum</tt></td><td> </td><td>Stampa o verifica i checksum SHA1.</td></tr>
 <tr><td><tt>shar</tt></td><td> </td><td>Crea archivi shell.</td></tr>
@@ -321,7 +322,7 @@ Here's a list of all commandline applications that are shipped with Haiku. Each 
 <tr><td><tt>unzipsfx</tt></td><td> </td><td>Usato per rendere autoestraenti degli archivi zip esistenti.</td></tr>
 <tr><td><tt>updatedb</tt></td><td> </td><td>Aggiorna un database per la localizzazione.</td></tr>
 <tr><td><tt>uptime</tt></td><td> </td><td>Mostra la data, l'ora e il tempo passato dall'avvio del sistema.</td></tr>
-<tr><td><tt>urlwrapper</tt></td><td> </td><td>Wraps URL MIME types around command line or other apps that don't handle them directly. </td></tr>
+<tr><td><tt>urlwrapper</tt></td><td> </td><td>Encapsula i tipi URL MIME sulla riga di comando o altre applicazioni che non possono gestirli direttamente.</td></tr>
 <tr><td><tt>useradd</tt></td><td> </td><td>Crea un nuovo utente.</td></tr>
 <tr><td><tt>uudecode</tt></td><td> </td><td>Decodifica un file codificato con uuencode.</td></tr>
 <tr><td><tt>uuencode</tt></td><td> </td><td>Codifica un file affichè si possa inviare via email a un sistema remoto.</td></tr>

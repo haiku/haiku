@@ -9,6 +9,8 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		mazbrili abu ibrahim
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -21,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>Panduan pengguna</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -58,44 +60,43 @@
 
 <div id="content">
 <div>
-<div class="box-info">Terjemahan halaman ini belum lengkap. Sampai saat itu, bagian yang belum selesai menggunakan aslinya bahasa Inggris.</div>
 
-<h2><img src="../../images/apps-images/bootmanager-icon_64.png" alt="bootmanager-icon_64.png" width="64" height="64" />BootManager</h2>
+<h2><img src="../../images/apps-images/bootmanager-icon_64.png" alt="bootmanager-icon_64.png" width="64" height="64" />Manajer Boot (BootManager)</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><i>No entry, normally started from Installer's <span class="menu">Tools</span> menu</i></td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><i>tiada entri, secara normal dijalankan dari installer <span class="menu">Tools</span> menu</i></td></tr>
 <tr><td>Lokasi:</td><td></td><td><span class="path">/boot/system/apps/BootManager</span></td></tr>
-<tr><td>Pengaturan:</td><td></td><td><i>none</i><br />MBR backups are saved by default in <span class="path">~/config/settings/bootman/</span></td></tr>
+<tr><td>Pengaturan:</td><td></td><td><i>tiada</i><br />MBR bekap normalnya disimpan secara bawaan di <span class="path">~/config/settings/bootman/</span></td></tr>
 </table>
 <p><br /></p>
-<p>If you don't add the Haiku partition to an existing boot manager like GRUB, BootManager can install a small boot menu in the Master Boot Record (MBR) that looks something like this:</p>
+<p>Jika Anda tidak menambahkan partisi Haiku ke boot manager yang ada seperti GRUB, BootManager dapat menginstal menu boot kecil di Master Boot Record (MBR) yang terlihat seperti ini:</p>
 <img src="../images/apps-images/bootmenu.png" alt="bootmenu.png" />
-<div class="box-info">BootManager isn't yet tested very well and still has a few restrictions that it will complain about if they aren't met: the menu can only be installed on your first harddisk and there has to be a 2KiB space after the Master Boot Record (MBR).</div>
-<p>BootManager guides you through the installation process of the boot menu.</p>
+<div class="box-info">BootManager belum diuji dengan sangat baik dan masih memiliki beberapa batasan yang akan dikeluhkan jika mereka tidak terpenuhi: menu hanya dapat diinstal pada harddisk pertama Anda dan harus ada ruang 2KiB setelah Master Boot Record ( MBR).</div>
+<p>BootManager memandu Anda melalui proses instalasi menu boot.</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="1-drives" id="1-drives">Choosing the destination drive</a></h2>
+<a name="1-drives" id="1-drives">Memilih drive tujuan</a></h2>
 <img src="../images/apps-images/bootmanager-1.png" alt="bootmanager-1.png" />
-<p>The BootManager starts off with a list of all available drives from which you choose the destination. If there's already a boot menu on that drive, the <span class="button">Uninstall</span> button becomes active, leading you through the simple procedure to restore a formerly backed-up MBR, thereby removing the boot menu. Otherwise, choose <span class="button">Install</span> to continue.</p>
+<p>BootManager dimulai dengan daftar semua drive yang tersedia dari mana Anda memilih tujuan. Jika sudah ada menu boot pada drive itu, tombol <span class="button">Uninstall</span> menjadi aktif, menuntun Anda melalui prosedur sederhana untuk mengembalikan MBR yang sebelumnya didukung, dengan demikian menghapus menu boot. Jika tidak, pilih <span class="button">Install</span> untuk melanjutkan.</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="2-backup" id="2-backup">Backing up the Master Boot Record (MBR)</a></h2>
-<p>In case anything goes wrong or you want to remove the boot menu again, the Master Boot Record (MBR) is now saved. This is obviously a very important step, make sure you don't accidentally overwrite some other MBR-backup maybe from some earlier experimentation, for example!</p>
+<a name="2-backup" id="2-backup">mem-backup Master Boot Record (MBR)</a></h2>
+<p>Jika terjadi kesalahan atau Anda ingin menghapus menu boot lagi, Master Boot Record (MBR) sekarang disimpan. Ini jelas merupakan langkah yang sangat penting, pastikan Anda tidak sengaja menimpa beberapa MBR-cadangan lain mungkin dari beberapa eksperimen sebelumnya, misalnya!</p>
 <img src="../images/apps-images/bootmanager-2.png" alt="bootmanager-2.png" /> 
 <img src="../images/apps-images/bootmanager-3.png" alt="bootmanager-3.png" />
-<p>Just select a destination for the backup file "<tt>MBR</tt>" or leave the default path. After clicking <span class="button">Next</span> you'll get a confirmation if the backup was successful.</p>
+<p>Cukup pilih tujuan untuk file cadangan "<tt>MBR</tt>" atau tinggalkan jalur default. Setelah mengklik <span class="button">berikutnya</span> Anda akan mendapatkan konfirmasi jika cadangan berhasil.</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="3-menu" id="3-menu">Configuring the boot menu</a></h2>
+<a name="3-menu" id="3-menu">mengkonfigurasi boot menu</a></h2>
 <img src="../images/apps-images/bootmanager-4.png" alt="bootmanager-4.png" /> 
 <img src="../images/apps-images/bootmanager-5.png" alt="bootmanager-5.png" />
-<p>Next you're presented with a list of all partitions on the destination drive. By setting checkmarks you decide what entries will appear in the boot menu, the text boxes allow you to rename an entry.</p>
-<p>After that, you pick from the pop-up menu which partition will be booted from by default and set a timeout with the slider below. Here, "<i>Immediately</i>" will skip the boot menu entirely, "<i>Never</i>" will just stop at the boot menu. You can override the timeout setting by holding <span class="key">ALT</span> while booting.</p>
+<p>Selanjutnya Anda disajikan dengan daftar semua partisi pada drive tujuan. Dengan mengatur tanda centang Anda memutuskan entri apa yang akan muncul di menu boot, kotak teks memungkinkan Anda untuk mengubah nama entri.</p>
+<p>Setelah itu, Anda memilih dari menu pop-up yang partisi akan di-boot dari secara default dan menetapkan batas waktu dengan slider di bawah ini. Di sini, "<i>Segera</i>" akan melewati menu boot sepenuhnya, "<i>Tidak pernah</i>" hanya akan berhenti di menu boot Anda dapat mengganti pengaturan batas waktu dengan menahan <span class="key">ALT</span> saat booting.</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="4-mbr" id="4-mbr">Writing the boot menu</a></h2>
+<a name="4-mbr" id="4-mbr">menulis menu boot </a></h2>
 <img src="../images/apps-images/bootmanager-6.png" alt="bootmanager-6.png" /> 
 <img src="../images/apps-images/bootmanager-7.png" alt="bootmanager-7.png" />
-<p>Before the boot menu is written to the MBR, you'll get a summary of your configuration and then one last chance to abort the operation. Don't worry though, as long as you keep the MBR backup safe, you can easily revert the changes. Should things get thoroughly messed up, you can always boot from a Haiku install CD or USB stick and write back the MBR backup with BootManager.</p>
+<p>Sebelum menu boot ditulis ke MBR, Anda akan mendapatkan ringkasan konfigurasi Anda dan kemudian satu kesempatan terakhir untuk membatalkan operasi. Jangan khawatir, selama Anda menyimpan cadangan MBR dengan aman, Anda dapat dengan mudah mengembalikan perubahan. Jika semuanya benar-benar kacau, Anda selalu dapat boot dari Haiku menginstal CD atau USB stick dan menulis kembali cadangan MBR dengan BootManager.</p>
 
 </div>
 </div>

@@ -4,17 +4,19 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2014, Haiku. All rights reserved.
+ * Copyright 2008-2020, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Gabriele
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Terminal</title>
+	<title>Terminale</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
@@ -58,29 +60,29 @@
 
 <div id="content">
 <div>
-<div class="box-info">La traduzione di questa pagina non è stata completata. Per questo motivo le parti non tradotte sono visibili in inglese.</div>
+<div class="box-info">La traduzione di questa pagina non è stata ancora completata. Finché non lo sarà, le parti non tradotte saranno visualizzate in inglese.</div>
 
-<h2><img src="../../images/apps-images/terminal-icon_64.png" alt="terminal-icon_64.png" width="64" height="64" />Terminal</h2>
+<h2><img src="../../images/apps-images/terminal-icon_64.png" alt="terminal-icon_64.png" width="64" height="64" />Terminale</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Applicazioni</span></td></tr>
-<tr><td>Localita:</td><td></td><td><span class="path">/boot/system/apps/Terminal</span></td></tr>
+<tr><td>Percorso:</td><td></td><td><span class="path">/boot/system/apps/Terminal</span></td></tr>
 <tr><td>Impostazioni:</td><td></td><td><span class="path">~/config/settings/Terminal</span><br />
-<span class="path">~/config/settings/profile</span> - adds/overrides defaults in <span class="path">/boot/system/settings/etc/profile</span><br />
-<span class="path">~/config/settings/inputrc</span> - adds/overrides defaults in <span class="path">/boot/system/settings/etc/inputrc</span></td></tr>
+<span class="path">~/config/settings/profile</span> - aggiunge/sostituisce le opzioni specificate in  <span class="path">/boot/system/settings/etc/profile</span><br />
+<span class="path">~/config/settings/inputrc</span> - aggiunge/sostituisce le opzioni specificate in <span class="path">/boot/system/settings/etc/inputrc</span></td></tr>
 </table>
 <p><br /></p>
-<p>The Terminal is Haiku's interface to bash, the Bourne Again Shell.</p>
+<p>Il Terminale è l'interfaccia di Haiku alla riga di comando bash, ovvero la Bourne Again Shell.</p>
 <p>Please refer to the topic on <a href="../bash-scripting.html">Scripting</a> for a few links to online tutorials on working in the shell and also have a look at <a href="cli-apps.html">Haiku's commandline applications</a>. Here, we'll concentrate on the Terminal application itself.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="windows-tabs" name="windows-tabs">Windows and tabs</a></h2>
-<p>You can open as many Terminals as needed, either each in it's own window by simply launching more Terminals or with <span class="key">ALT</span> <span class="key">N</span> from an already running Terminal. Or you use Terminal's tabbed view and open more tabs with <span class="key">ALT</span> <span class="key">T</span>.</p>
+<p>You can open as many Terminals as needed, either each in its own window by simply launching more Terminals or with <span class="key">ALT</span> <span class="key">N</span> from an already running Terminal. Or you use Terminal's tabbed view and open more tabs with <span class="key">ALT</span> <span class="key">T</span>.</p>
 <img src="../images/apps-images/terminal.png" alt="terminal.png" />
 <br />
 <p>Double-clicking into the emtpy part of the tab bar opens a new tab; onto a tab opens a dialog to rename its title. There are several %-designated variables that are explained with a tooltip when you hover the mouse over the text field.<br />
 By default, <tt>%1d: %p</tt>, a tab shows the current directory and, separated by a <tt>:</tt>, the name of the currently running process (or <tt>--</tt> if it's just bash running, probably idling). The screenshot above shows the first tab with a FTP session in the <span class="path">Desktop</span> folder and a second tab idling at <span class="path">home</span>.<br />
-Via <span class="menu">Edit | Window title...</span> the Terminal window's title can be edited in a similar way.</p>
+Via <span class="menu">Settings | Window title...</span> the Terminal window's title can be edited in a similar way.</p>
 <p>Right-clicking a tab shows a context menu to <span class="menu">Close tab</span>, <span class="menu">Close other tabs</span> or, like double-clicking, <span class="menu">Edit tab title...</span>.</p>
 <p>A Terminal window can be resized like any other window or you use the presets from the <span class="menu">Settings | Window size</span> menu. <span class="key">ALT</span> <span class="key">ENTER</span> toggles fullscreen mode.</p>
 <p>All the settings you change directly through the <span class="menu">Settings</span> menu, like <span class="menu">Window title</span>, <span class="menu">Window size</span>, <span class="menu">Text encoding</span> or <span class="menu">Font size</span> are only kept for the current session. If you want to make permanent changes, you have to apply them in the <span class="menu">Settings...</span> panel.</p>
@@ -98,12 +100,12 @@ You can choose pre-defined color schema like <span class="menu">Midnight</span> 
 Activate the checkbox to <span class="menu">Confirm exit if active programs exist</span> and you'll be warned when trying to close a Terminal window while an app is still being executed.</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td class="onelinetop"><span class="button">Save to file...</span></td><td width="10"> </td><td>let's you save different settings as separate profiles, which on double-click open an accordingly configured Terminal.</td></tr>
-<tr><td><span class="button">Revert</span></td><td> </td><td>brings back the settings that were active when you opened the settings panel.</td></tr>
-<tr><td><span class="button">Defaults</span></td><td> </td><td>resets everything to default values.</td></tr>
+<tr><td><span class="button">Ripristina</span></td><td> </td><td>brings back the settings that were active when you opened the settings panel.</td></tr>
+<tr><td><span class="button">Predefiniti</span></td><td> </td><td>ripristina tutto ai valori predefiniti</td></tr>
 </table>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="shortcuts" name="shortcuts">Keyboard shortcuts</a></h2>
+<a id="shortcuts" name="shortcuts">Scorcitoie da tastiera</a></h2>
 <p>You'll find a list of useful shortcuts in <a href="../keyboard-shortcuts.html#terminal">Shortcuts and key combinations</a>.</p>
 <p>Another nice feature that is more a key &amp; mouse combination: When holding <span class="key">ALT</span> a path or URL under the mouse pointer gets highlighted. A left-click opens the file/folder or website. A right-click opens a context menu to either <span class="menu">Copy path</span> or <span class="menu">Copy absolute path</span>. Imagine you're in <span class="path">/MyData/source/haiku/</span> and have the path <span class="path">generated/objects/haiku/x86_gcc2/release/apps/stylededit/StyledEdit</span> under the mouse pointer, the latter menu item  will result in the combined, absolute path &lt;<i>deep breath</i>&gt;:<br /> <span class="path">/MyData/source/haiku/generated/objects/haiku/x86_gcc2/release/apps/stylededit/StyledEdit</span>.</p>
 <p>If you hold down <span class="key">ALT</span> <span class="key">SHIFT</span>, only the path from beginning to where your mouse pointer sits will be highlighted.</p>
@@ -111,7 +113,7 @@ Activate the checkbox to <span class="menu">Confirm exit if active programs exis
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="customization" name="customization">Bash customization</a></h2>
+<a id="customization" name="customization">Personalizzazione della Bash</a></h2>
 <p>Coming from Unix, there are countless possibilities to customize the bash itself. There are two files that are especially important to the user: <span class="cli">profile</span> and <span class="cli">inputrc</span><br />
 Both files can be created in the <span class="path">/boot/home/config/settings/</span> folder and add or override the system defaults that are defined in <span class="path">/boot/system/settings/etc/</span>.</p>
 
@@ -119,12 +121,12 @@ Both files can be created in the <span class="path">/boot/home/config/settings/<
 <p>The <span class="cli">profile</span> is loaded every time you open a new Terminal. It sets all kinds of aliases and variables that will affect bash's behavior and appearance. You'll find many online resources that will detail all possibilities.</p>
 <p>The Haiku/BeOS Tip Server has quite a few tips to get you started, for example:</p>
 <ul>
-<li><a href="http://betips.net/1997/09/09/customize-your-terminal-prompt/">Customize your Terminal prompt</a></li>
-<li><a href="http://betips.net/1997/09/09/more-prompt-customizations/">More prompt customizations</a></li>
-<li><a href="http://betips.net/1997/09/09/enhancing-bash/">Enhancing bash</a></li>
-<li><a href="http://betips.net/1997/09/09/custom-keyboard-shortcuts/">Custom keyboard shortcuts</a></li>
+<li><a href="https://betips.net/?p=5">Customize your Terminal prompt</a></li>
+<li><a href="https://betips.net/?p=66">More prompt customizations</a></li>
+<li><a href="https://betips.net/?p=67">Enhancing bash</a></li>
+<li><a href="https://betips.net/?p=105">Custom keyboard shortcuts</a></li>
 </ul>
-<p>There are more, <a href="http://betips.net/index.php?s=.profile">have a look</a>.</p>
+<p>There are more, <a href="https://betips.net/?s=profile">have a look</a>.</p>
 
 <h3>inputrc</h3>
 <p>The <span class="cli">inputrc</span> deals with keybindings. Since Haiku provides useful defaults, you probably don't have to mess with these more involved settings. If you do have special needs here, consult one of the many online resources, e.g. <a href="http://tiswww.case.edu/php/chet/readline/rluserman.html">The GNU Readline Library</a>.</p>

@@ -9,6 +9,8 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		mazbrili abu ibrahim
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -21,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>Panduan pengguna</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -58,18 +60,17 @@
 
 <div id="content">
 <div>
-<div class="box-info">Terjemahan halaman ini belum lengkap. Sampai saat itu, bagian yang belum selesai menggunakan aslinya bahasa Inggris.</div>
 
 <h2><img src="../../images/apps-images/stylededit-icon_64.png" alt="stylededit-icon_64.png" width="64" height="64" />StyledEdit</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Aplikasi</span></td></tr>
 <tr><td>Lokasi:</td><td></td><td><span class="path">/boot/system/apps/StyledEdit</span></td></tr>
 <tr><td>Pengaturan:</td><td></td><td><i>tiada</i></td></tr>
 </table>
 <p><br /></p>
-<p>StyledEdit is Haiku's simple text editor. Although it saves files in plain text format, additional attributes are written in order to have limited formatting capabilities when viewed with StyledEdit.</p>
+<p>StyledEdit adalah editor teks sederhana Haiku. Meskipun menyimpan file dalam format teks biasa, atribut tambahan ditulis agar memiliki kemampuan format terbatas ketika dilihat dengan StyledEdit.</p>
 <img src="../images/apps-images/stylededit.png" alt="stylededit.png" />
-<p>If you're interested, this is what those additional attributes look like when examined in Terminal with <span class="cli">listattr</span>:</p>
+<p>Jika Anda tertarik, inilah yang terlihat seperti atribut tambahan ketika diperiksa di Terminal dengan: <span class="cli">listattr</span>:</p>
 <pre class="terminal">~&gt; listattr /boot/home/Desktop/test.txt
 File: /boot/home/Desktop/test.txt
   Type         Size                 Name
@@ -81,10 +82,10 @@ MIME String         11  "BEOS:TYPE"
    Raw Data       1048  "styles"
 
 1071 bytes total in attributes.</pre>
-<p>As you can see, all the formatting options from StyledEdit's menu are present: line wrapping (on/off) and alignment (left/center/right), each in one attribute. Styles (font, size, color) of each letter mangled into another.</p>
-<div class="box-info">Because these attributes are a file system feature of BFS, this means that not only other platforms just see a plain text file, it also follows, that the formatting will be lost when a file is stored on a non-BFS partition. The above attributes are simply stripped and what's left is the ordinary, plain text file.</div>
-<p>In any case, it's a nice idea having the possibility of colored text in different fonts and sizes while still being a normal text file. A <span class="cli">ReadMe.txt</span>, for example, is therefore readable in a shell on any platform and still has a bit of style when viewed via double-click from Haiku.</p>
-<p>Actually using StyledEdit is so simple, we'll skip explaining every mundane menu item. Just write down your text then select the words you'd like to format and apply font, size and color from the <span class="menu">Font</span> menu. Line wrapping and alignment from the <span class="menu">Document</span> menu only work on the whole file.</p>
+<p>Seperti yang Anda lihat, semua opsi pemformatan dari menu StyledEdit hadir:  pembungkus garis (on/off) dan perataan (kiri/ tengah/kanan),masing-masing dalam satu atribut. Gaya (font, ukuran, warna) dari setiap huruf berubah menjadi huruf lain.</p>
+<div class="box-info">Karena atribut-atribut ini adalah fitur sistem file BFS, ini berarti bahwa tidak hanya platform lain hanya melihat file teks biasa, itu juga mengikuti, bahwa format akan hilang ketika file disimpan pada partisi non-BFS. hanya dilucuti dan apa yang tersisa adalah file teks biasa, benar benar text biasa.</div>
+<p>Bagaimanapun, itu ide yang baik memiliki kemungkinan teks berwarna dalam font dan ukuran yang berbeda sementara masih menjadi file teks biasa. <span class="cli">ReadMe.txt</span>,misalnya, karena itu dapat dibaca dalam shell pada platform apa pun dan masih memiliki sedikit gaya bila dilihat melalui klik dua kali dari Haiku.</p>
+<p>Sebenarnya menggunakan StyledEdit sangat sederhana, kami akan lewati menjelaskan setiap item menu biasa. Cukup tulis teks Anda lalu pilih kata-kata yang ingin Anda format dan menerapkan font, ukuran dan warna menu <span class="menu">Font</span> Pembungkus garis dan perataan dari Menu <span class="menu">Document</span> hanya berfungsi pada seluruh file.</p>
 
 </div>
 </div>

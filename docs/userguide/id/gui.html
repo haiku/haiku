@@ -23,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>Panduan pengguna</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -53,14 +53,13 @@
 </ul>
 <span>
  «  <a href="filesystem-layout.html">Layout Filesystem</a> 
-::  <a href="contents.html" class="uplink">Daftar Isi</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
 ::  <a href="workspaces.html">Workspace (ruang kerja)</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">Terjemahan halaman ini belum lengkap. Sampai saat itu, bagian yang belum selesai menggunakan aslinya bahasa Inggris.</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Indeks</td></tr>
@@ -84,86 +83,90 @@
 <li>Anda meminimalkan jendela dengan mengklik dua kali pada tabnya (atau dengan <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">M</span>). Jendela tersembunyi semacam itu dapat diakses dengan entri di jendela <a href="deskbar.html">Deskbar</a> or the <a href="twitcher.html">Twitcher</a>.</li>
 <li>Anda dapat mengirim jendela ke belakang dengan mengklik kanan tabnya (atau pembatasnya).</li></ul></li>
 <li><p>Tombol untuk menutup.</p></li>
-<li><p>The "zoom" button (or <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span>). In most applications, this will expand a window to maximum size without obscuring the Deskbar (hold <span class="key">SHIFT</span> to cover the Deskbar as well). It doesn't have to, however. Tracker windows, for example, will resize to best fit the contents.</p></li>
+<li><p>Tombol "zoom"  (atau <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span>).  Pada sebagian besar aplikasi, ini akan memperluas jendela ke ukuran maksimum tanpa mengaburkan Deskbar (tahan <span class="key">SHIFT</span> untuk menutup Deskbar juga). Namun, tidak perlu. , misalnya, akan mengubah ukuran agar paling sesuai dengan konten..</p>
+  </li>
 <li><p>Perbatasan jendela. Seret-kiri menggerakkan jendela, seret-kanan seret.</p></li>
 <li><p>Pojokan pengubah-ukuran.</p></li>
 </ol>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="move-resize" name="move-resize">A quick way to move or resize windows</a></h2>
-<p>Moving and resizing windows is a large part of interacting with several concurrently running applications. Instead of aiming at the small yellow title tab or the even tinier window border, there's a more convenient way to move a window. Also, additionally to its small size, the resize corner has another limitation: It only allows resizing at and in the direction of the lower right corner. <br />Right-dragging a border for resizing works, but again you'll have to aim carefully.</p>
-<p>To address these issues, Haiku provides a neat solution using the window management key combo <span class="key">CTRL</span> <span class="key">ALT</span> and the mouse. See also chapter <a href="keyboard-shortcuts.html#general">Shortcuts and key combinations</a> for more shortcuts concerning window management.</p>
+<a id="move-resize" name="move-resize">Cara cepat untuk memindahkan atau mengubah ukuran windows</a></h2>
+<p>Memindahkan dan mengubah ukuran jendela adalah bagian besar dari berinteraksi dengan beberapa aplikasi yang berjalan bersamaan. Alih-alih membidik tab judul kuning kecil atau batas jendela yang lebih kecil, ada cara yang lebih nyaman untuk memindahkan jendela. Juga, selain ukurannya yang kecil, sudut pengubahan ukuran memiliki batasan lain: Pengubahan ukuran hanya memungkinkan pada dan ke arah sudut kanan bawah.<br />
+Seret kanan batas untuk mengubah ukuran karya, tetapi sekali lagi Anda harus membidik dengan hati-hati.</p>
+<p>Untuk mengatasi masalah ini, Haiku  memberikan solusi yang rapi menggunakan kombo kunci manajemen jendela  <span class="key">CTRL</span> <span class="key">ALT</span> dan mouse. Lihat juga bab  <a href="keyboard-shortcuts.html#general">Pintasan dan kombinasi tombol</a> untuk pintasan lainnya terkait pengelolaan jendela.</p>
 <img src="images/gui-images/resizing.png" alt="resizing.png" />
-<p>Holding down <span class="key">CTRL</span> <span class="key">ALT</span> will highlight the window borders nearest to the mouse pointer. Move the mouse in the direction of another border to change the target. Click and dragging with the <i>right mouse button</i> will resize the window along the highlighted border(s).</p>
-<p>Hold down <span class="key">CTRL</span> <span class="key">ALT</span> and click and drag with the <i>left mouse button</i> anywhere in a window to move it around. A quick click with the <i>right mouse button</i> sends it to the back.</p>
+<p>Menekan <span class="key">CTRL</span> <span class="key">ALT</span> akan menyorot batas jendela yang terdekat dengan penunjuk mouse. Gerakkan mouse ke arah perbatasan lain untuk mengubah target. Klik dan seret dengan <i> tombol kanan mouse</i> akan mengubah ukuran jendela di sepanjang batas yang disorot.
+ </p>
+<p>Tahan <span class="key">CTRL</span> <span class="key">ALT</span> dan klik dan seret dengan <i>left mouse button</i> di mana saja di jendela untuk memindahkannya.Klik cepat dengan <i>right mouse button</i> mengirimkannya ke belakang.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="stack-tile" name="stack-tile">Stack &amp; Tile</a></h2>
-<p>Haiku's user interface provides a unique feature that puts the fact that windows have a yellow tab instead of a full-width title bar to perfect use. It's called "Stack &amp; Tile".<br />
-In the example below, a Tracker window with bookmarks is tiled to the left of a WebPositive window, which itself is stacked with another Tracker window showing the source folder <tt>haiku</tt>. In this animation, the user clicks on the tabs of the stacked windows to alternately bring one or  the other to the front.</p> 
+<a id="stack-tile" name="stack-tile">Tumpuk dan &amp; Ubin</a></h2>
+<p>Antarmuka pengguna Haiku menyediakan fitur unik yang menempatkan fakta bahwa windows memiliki tab kuning alih-alih bilah judul penuh untuk digunakan dengan sempurna. Ini disebut  "Stack &amp; Tile".<br />
+Pada contoh di bawah ini, jendela Pelacak dengan penanda di-ubin di sebelah kiri jendela WebPositive, yang dengan sendirinya ditumpuk dengan jendela Pelacak lain yang menunjukkan folder sumber <tt>haiku</tt>. Dalam animasi ini, pengguna mengklik tab dari jendela yang ditumpuk untuk bergantian bawa satu atau yang lain ke depan.</p> 
 <img src="images/gui-images/gui-s+t.gif" alt="gui-s+t.gif" />
-<p>Connected like this, the group of windows can be moved and resized together - a nice arrangement to work in a more project centric environment. Instead of looking for the right browser window with documentation, editor and Tracker windows and maybe a related email concerning one project you are currently working on, just stack&amp;tile them together.</p>
-<p>Doing the actual arranging of windows is easy: Hold down <span class="key">OPT</span> while dragging a window by its tab close to another window's tab or border until it's highlighted and release the mouse button.</p>
-<p>Stack &amp; Tile consists of two related parts.</p>
+<p>Terhubung seperti ini, kelompok jendela dapat dipindahkan dan diubah ukurannya bersama-pengaturan yang bagus untuk bekerja di lingkungan yang lebih sentris proyek Daripada mencari jendela browser yang tepat dengan dokumentasi, editor dan jendela Tracker dan mungkin email terkait tentang satu proyek yang sedang Anda kerjakan, cukup stack&amp;tile bersama.</p>
+<p>Melakukan pengaturan jendela yang sebenarnya itu mudah: Tekan dan tahan <span class="key">OPT</span>sambil menyeret jendela dengan tabnya dekat dengan tab atau perbatasan jendela lain sampai disorot dan lepaskan tombol mouse.</p>
+<p>Stack &amp;  terdiri dari dua bagian terkait.</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td><img src="images/gui-images/gui-stacking.png" alt="gui-stacking.png" /></td><td width="10"></td>
-<td><p>"<i>Stacking</i>" is putting windows on top of each other, automatically moving the yellow tabs into position.<br />
-While holding <span class="key">OPT</span>, tabs change color when they overlap; drop the window to establish the stacking.</p></td></tr></table>
+<td><p>"<i>Stacking</i>"  adalah menempatkan jendela di atas satu sama lain, secara otomatis memindahkan tab kuning ke posisinya.<br />
+Sambil memegang <span class="key">OPT</span>, tab berubah warna saat tumpang tindih; jatuhkan jendela untuk membentuk susunan.</p></td></tr></table>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2" vspace="10">
 <tr><td><img src="images/gui-images/gui-tiling.png" alt="gui-tilinging.png" /></td><td></td>
-<td><p>"<i>Tiling</i>" means gluing windows horizontally or vertically together.<br />
-Again, while holding <span class="key">OPT</span>, the borders that'll fuse together when you drop the window change color when brought near each other.</p></td></tr></table>
-<p>Separation is done in the same way, by holding <span class="key">OPT</span> while dragging a window by its tab out of the group.</p>
+<td><p>"<i>Tiling</i>" berarti menempelkan jendela secara horizontal atau vertikal bersamaan.<br />
+Sekali lagi, sambil memegang <span class="key">OPT</span>, batas-batas yang akan melebur bersama ketika Anda menjatuhkan warna jendela berubah ketika dibawa berdekatan.</p></td></tr></table>
+<p>Pemisahan dilakukan dengan cara yang sama, dengan memegang <span class="key">OPT</span> sambil menyeret jendela dengan tabnya keluar dari grup.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="open-save-panel" name="open-save-panel">Open and save panels</a></h2>
-<p>When opening or saving a file from any application, a panel like this opens:</p>
+<a id="open-save-panel" name="open-save-panel">Buka dan simpan panel</a></h2>
+<p>Saat membuka atau menyimpan file dari aplikasi apa pun, panel seperti ini terbuka:</p>
 <img src="images/gui-images/open-save.png" alt="open-save.png" />
-<p>It has all the usual things: A list of files of the current folder to choose from, in case of a save panel, a text field to enter a filename and a pop-up menu for different file formats and their settings.<br />
-You can enter parent folders with the pop-up menu above the file listing.</p>
-<p>If you already have a Tracker window with the location for a file open, you can simply drag either any file or the folder-representation (i.e. the symbol to the far right in its menu bar) into the panel. This changes the panel to that new location.</p>
+<p>Ini memiliki semua hal yang biasa: Daftar file folder saat ini untuk dipilih, dalam kasus panel simpan, bidang teks untuk memasukkan nama file dan menu pop-up untuk berbagai format file dan pengaturannya.<br />
+Anda dapat memasukkan folder induk dengan menu pop-up di atas daftar file.</p>
+<p>Jika Anda sudah memiliki jendela Tracker dengan lokasi file terbuka, Anda dapat dengan mudah menyeret file atau representasi folder (yaitu simbol ke paling kanan di bilah menu) ke dalam panel. Ini mengubah panel menjadi lokasi baru.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="open-save-shortcuts" name="open-save-shortcuts">Keyboard shortcuts</a></h3>
-<p>Many shortcuts in open and save panels are the same used in Tracker. Besides the commands that are also available through the <span class="menu">File</span> menu, there are a few not that obvious:</p>
+<a id="open-save-shortcuts" name="open-save-shortcuts">Pintasan keyboard </a></h3>
+<p>Banyak pintasan di panel buka dan simpan sama dengan yang digunakan di Pelacak. Selain perintah yang juga tersedia melalui menu <span class="menu">Berkas</span>, ada beberapa cara yang tidak terlalu jelas:</p>
 <table summary="shortcuts" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="key">ALT</span> <span class="key">N</span></td><td></td><td> Creates a new folder.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">E</span></td><td></td><td> Lets you rename the selected entry.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">↑</span></td><td style="width:24px;"></td><td> Moves into the parent folder.</td></tr>
-<tr><td class="onelinetop"><span class="key">ALT</span> <span class="key">↓</span> or <span class="key">ENTER</span></td><td></td><td> Moves into the selected folder.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">D</span></td><td></td><td> Takes you to your Desktop.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">H</span></td><td></td><td> Takes you to your Home folder.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">N</span></td><td></td><td> Membuat folder baru.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">E</span></td><td></td><td> Memungkinkan Anda mengubah nama entri yang dipilih.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">↑</span></td><td style="width:24px;"></td><td> Pindah ke folder induk.</td></tr>
+<tr><td class="onelinetop"><span class="key">ALT</span> <span class="key">↓</span> or <span class="key">ENTER</span></td><td></td><td> Bergerak ke folder yang dipilih.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">D</span></td><td></td><td> Membawa Anda ke Desktop Anda.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">H</span></td><td></td><td> Membawa Anda ke folder Beranda.</td></tr>
 </table>
-<p>For keyboard shortcuts in Haiku in general, see chapter <a href="keyboard-shortcuts.html">Shortcuts and key combinations</a>.</p>
+<p>Untuk pintasan keyboard di Haiku secara umum, lihat bab <a href="keyboard-shortcuts.html">Pintasan dan kombinasi tombol.</a>
+</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="favorites-recent" name="favorites-recent">Favorites and recent folders</a></h3>
-<p>The <span class="menu">Favorites</span> menu in open and save panels provides recently visited folders and favorite locations that you can set up yourself. As indicated by the little arrow, you can also use these locations to navigate further down the hierarchy via submenus.</p>
+<a id="favorites-recent" name="favorites-recent">Favorite dan folder terbaru</a></h3>
+<p>Menu <span class="menu">Favorit</span> di panel buka dan simpan menyediakan folder yang baru-baru ini dikunjungi dan lokasi favorit yang dapat Anda atur sendiri. Seperti ditunjukkan oleh panah kecil, Anda juga dapat menggunakan lokasi ini untuk menavigasi lebih jauh ke bawah hierarki melalui submenu.</p>
 <img src="images/gui-images/favorites.png" alt="favorites.png" />
-<p>To add a Favorite, you simply navigate to your destination and choose <span class="menu">Favorites | Add current folder</span>. From now on it will appear in every open/save panel. To remove a Favorite, choose <span class="menu">Favorites | Edit favorites...</span> and delete its entry.<br />
-All Favorites are kept in <span class="path">/boot/home/config/settings/Tracker/Go/</span>. So you might as well add and remove links to files and folders there directly.</p>
+<p>Untuk menambahkan Favorit, Anda cukup menavigasi ke tujuan Anda dan memilih  <span class="menu">Favorit | Tambahkan folder saat ini.</span>.  Mulai sekarang akan muncul di setiap panel buka / simpan. Untuk menghapus Favorit, pilih <span class="menu">Favorit | Edit favorit...</span> and delete its entry.<br />
+Semua Favorit disimpan di <span class="path">/boot/home/config/settings/Tracker/Go/</span>. Jadi Anda mungkin juga menambahkan dan menghapus tautan ke file dan folder di sana secara langsung.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="replicants" name="replicants">Replicants</a></h2>
-<p>Replicants are small self-contained parts of applications that can be integrated into other programs. Provided Deskbar's option to <span class="menu">Show replicants</span> is activated, you'll recognize a replicantable part of an application by its small handle, normally in the bottom right corner:</p>
+<p>Replicants adalah bagian kecil aplikasi mandiri yang dapat diintegrasikan ke dalam program lain. Menyediakan opsi Deskbar untuk <span class="menu">Show replicants</span> diaktifkan, Anda akan mengenali bagian yang dapat direplikasi dari aplikasi dengan gagang kecilnya, biasanya di sudut kanan bawah:</p>
 <img src="../images/gui-images/replicant.png" alt="replicant.png" />
-<p>The most prominent place that accepts Replicants is the Desktop: You simply drag &amp; drop the little handle onto it. From now on it's part of the Desktop and the Replicant's originating app doesn't have to be started for it to work.<br />
-A right-click on a Replicant handle offers a context menu to show the originating app's <span class="menu">About</span> window and to <span class="menu">Remove replicant</span>.</p>
-<div class="box-info">Should you experience difficulties with a Replicant on the Desktop and just can't get rid of it, delete <span class="path">~/config/settings/Tracker/tracker_shelf</span>. Unfortunately, this will remove <i>all</i> Replicants from the Desktop.</div>
-<p>Examples for replicatable applications are the graphs of the <a href="applications/activitymonitor.html">ActivityMonitor</a>, the <a href="workspaces.html">Workspaces applet</a> or <a href="applications/deskcalc.html">DeskCalc</a>.</p>
+<p>Tempat paling menonjol yang menerima Replicants adalah Desktop: Anda cukup drag &amp; drop  gagang kecil ke atasnya. Mulai sekarang ini adalah bagian dari Desktop dan aplikasi yang berasal dari Replicant tidak harus dimulai agar dapat berfungsi.<br />
+Klik kanan pada pegangan Replicant menawarkan menu konteks untuk menunjukkan jendela <span class="tentang">About</span> aplikasi asal dan <span class="menu">Menghapus replicant</span>.</p>
+<div class="box-info">Jika Anda mengalami kesulitan dengan Replicant di Desktop dan tidak bisa menghilangkannya, hapus <span class="path">~/config/settings/Tracker/tracker_shelf</span>. Sayangnya, ini akan menghapus <i>semua </i> Replicants dari Desktop.</div>
+<p>Contoh untuk aplikasi yang dapat direplikasi adalah grafik <a href="applications/activitymonitor.html">ActivityMonitor</a>, <a href="workspaces.html">Workspaces applet</a> atau <a href="applications/deskcalc.html">DeskCalc</a>.</p>
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
  «  <a href="filesystem-layout.html">Layout Filesystem</a> 
-::  <a href="contents.html" class="uplink">Daftar Isi</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
 ::  <a href="workspaces.html">Workspace (ruang kerja)</a>  »
 </span></div>
 </div>

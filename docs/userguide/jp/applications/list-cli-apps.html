@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2018, Haiku. All rights reserved.
+ * Copyright 2010-2020, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -17,14 +17,14 @@
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>コマンドラインアプリケーションの一覧表</title>
+	<title>コマンドラインアプリケーションの一覧</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>ユーザーガイド</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -61,13 +61,14 @@
 
 <div id="content">
 <div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />コマンドラインアプリケーションの一覧表</h2>
+<h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />コマンドラインアプリケーションの一覧</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>場所:</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin/</span><br /><span class="path">~/config/bin/</span><br /><span class="path">~/config/non-packaged/bin/</span></td></tr>
 </table>
 <p><br /></p>
-<p>Haiku に標準装備されているコマンドラインアプリケーションは、すべて <span class="path">/boot/system/bin</span> に存在します。ユーザー自身が作ったコマンドラインアプリケーションや、追加インストールしたコマンドラインアプリケーションは、.hpkg パッケージからインストールされた場合 <span class="path">~/config/bin/</span> に現れます。パッケージでない場合は、<span class="path">~/config/non-packaged/bin/</span> に入れられます。これらの場所はすべて PATH 環境変数に含まれているため、自動的に検出されます。<br />
+<p>Haiku に標準装備されているコマンドラインアプリケーションは、すべて <span class="path">/boot/system/bin</span> 内に存在します。ユーザー自身が作ったコマンドラインアプリケーションや、追加インストールしたコマンドラインアプリケーションは、.hpkg パッケージからインストールされた場合 <span class="path">~/config/bin/</span> に現れます。パッケージでない場合は、<span class="path">~/config/non-packaged/bin/</span> に入れられます。これらの場所はすべて PATH 環境変数に含まれているため、自動的に検出されます。<br />
 以下は、Haiku に標準装備されているコマンドラインアプリケーションの一覧表です。それぞれの動作について、ほんの短い説明があります。使い方についてさらに詳しい情報を見るには、<tt>--help</tt> という引数を付けて実行してください。</p>
 <p><br /></p>
 <p>索引:   <a href="#A">A – E</a>   ::   <a href="#F"> F – J </a>   ::   <a href="#K"> K – O </a>   ::   <a href="#P"> P – S </a>   ::   <a href="#T"> T – Z </a></p>
@@ -86,6 +87,7 @@
 <tr><td><tt>bash</tt></td><td> </td><td>Bourne-again シェル</td></tr>
 <tr><td><tt>bc</tt></td><td> </td><td>任意精度の電卓言語</td></tr>
 <tr><td><tt>beep</tt></td><td> </td><td>ベルを鳴らす。</td></tr>
+<tr><td><tt>bfsinfo</tt></td><td> </td><td>ファイルシステムを分析。</td></tr>
 <tr><td><tt>bunzip2</tt></td><td> </td><td><tt>bzip2</tt> を参照。</td></tr>
 <tr><td><tt>bzip2</tt></td><td> </td><td>ファイル圧縮</td></tr>
 <tr><td><tt>c++</tt></td><td> </td><td>C++ コンパイラ</td></tr>
@@ -101,30 +103,31 @@
 <tr><td><tt>chroot</tt></td><td> </td><td>指定したルートディレクトリでコマンドを実行。</td></tr>
 <tr><td><tt>cksum</tt></td><td> </td><td>ファイルの CRC チェックサムとバイト数を表示。</td></tr>
 <tr><td><tt>clear</tt></td><td> </td><td>ターミナルウィンドウの内容を消去。</td></tr>
+<tr><td><tt>clipboard</tt></td><td> </td><td>システムクリップボードを操作。</td></tr>
 <tr><td><tt>cmp</tt></td><td> </td><td>1 バイトずつファイルを比較。</td></tr>
-<tr><td><tt>collectcatkeys </tt></td><td> </td><td>[ロケールキットの移動した残り]</td></tr>
+<tr><td><tt>collectcatkeys </tt></td><td> </td><td>翻訳可能な文字列を集めて、catkeys を作成。</td></tr>
 <tr><td><tt>comm</tt></td><td> </td><td>ソート済ファイルを 1 行ずつ比較。</td></tr>
 <tr><td><tt>consoled</tt></td><td> </td><td>コンソールデーモン</td></tr>
 <tr><td><tt>copyattr</tt></td><td> </td><td>1 つまたは複数のファイルの属性のすべてかサブセットを、ほかのファイルまたは新規ファイルにコピー <a href="cli-apps.html">(Haiku 特有)</a>。</td></tr>
 <tr><td><tt>cp</tt></td><td> </td><td>ファイルおよびディレクトリをコピー。</td></tr>
 <tr><td><tt>csplit</tt></td><td> </td><td>指定のパターンでファイルを分割。</td></tr>
-<tr><td><tt>ctags</tt></td><td> </td><td>ファイルで見つかったさまざまな言語オブジェクト用の索引ファイルを生成。</td></tr>
 <tr><td><tt>cut</tt></td><td> </td><td>ファイルの各行からのセクションを表示。</td></tr>
 <tr><td><tt>date</tt></td><td> </td><td>現在の時刻と日付を表示または設定。</td></tr>
 <tr><td><tt>dc</tt></td><td> </td><td>電卓言語</td></tr>
 <tr><td><tt>dd</tt></td><td> </td><td>生データをオペランドにしたがって変換およびフォーマットしながらコピー。</td></tr>
 <tr><td><tt>desklink</tt></td><td> </td><td>アイテムを Deskbar にインストール <a href="cli-apps.html">(Haiku 特有)</a>。</td></tr>
-<tr><td><tt>diskimage</tt></td><td> </td><td>ファイルをマウントできるディスクデバイスとして登録 <a href="cli-apps.html">(Haiku 特有)。</a></td></tr>
 <tr><td><tt>df</tt></td><td> </td><td>マウントされたボリュームの空き領域と使用済み領域を報告。</td></tr>
 <tr><td><tt>diff</tt></td><td> </td><td>行ごとにファイルを比較。</td></tr>
 <tr><td><tt>diff3</tt></td><td> </td><td>3 つのファイルを行ごとに比較。</td></tr>
 <tr><td><tt>dircolors</tt></td><td> </td><td><tt>ls</tt> の色を設定。</td></tr>
 <tr><td><tt>dirname</tt></td><td> </td><td>/path/to/filename 文字列から、ファイル名を除去。</td></tr>
+<tr><td><tt>diskimage</tt></td><td> </td><td>ファイルをマウントできるディスクデバイスとして登録 <a href="cli-apps.html">(Haiku 特有)。</a></td></tr>
+<tr><td><tt>dpms</tt></td><td> </td><td>ディスプレイの電源管理を設定。</td></tr>
 <tr><td><tt>draggers</tt></td><td> </td><td>レプリカントのハンドルの状態を表示または設定。</td></tr>
 <tr><td><tt>driveinfo</tt></td><td> </td><td>ハードウェア情報を表示。</td></tr>
 <tr><td><tt>dstcheck</tt></td><td> </td><td>夏時間に変わる / 夏時間から変わる際に使われるメッセージボックスを表示。</td></tr>
 <tr><td><tt>du</tt></td><td> </td><td>再帰的にディレクトリに対して、各ファイルのディスク使用量をまとめる。</td></tr>
-<tr><td><tt>dumpcatalog</tt></td><td> </td><td>[ロケールキットの移動した残り]</td></tr>
+<tr><td><tt>dumpcatalog</tt></td><td> </td><td>カタログファイルの内容を表示。</td></tr>
 <tr><td><tt>echo</tt></td><td> </td><td>1 行テキストを表示。</td></tr>
 <tr><td><tt>egrep</tt></td><td> </td><td><tt>grep</tt> を参照。</td></tr>
 <tr><td><tt>eject</tt></td><td> </td><td>リムーバブルメディアをイジェクト。</td></tr>
@@ -141,12 +144,11 @@
 <tr><td><tt>filepanel</tt></td><td> </td><td>読み込み / 保存ファイルパネルを表示 <a href="cli-apps.html">(Haiku 特有)</a>。</td></tr>
 <tr><td><tt>find</tt></td><td> </td><td>ディレクトリ階層内でファイルを検索。</td></tr>
 <tr><td><tt>finddir</tt></td><td> </td><td>システムで定義された特別なディレクトリを検索。</td></tr>
+<tr><td><tt>findpaths</tt></td><td> </td><td>システムで定義されたディレクトリのパスをすべて表示。</td></tr>
 <tr><td><tt>fmt</tt></td><td> </td><td>ファイルの段落を再設定。</td></tr>
 <tr><td><tt>fold</tt></td><td> </td><td>ファイルの入力行を折りたたむ。</td></tr>
-<tr><td><tt>fortune</tt></td><td> </td><td>ランダムに、できれば面白い格言を表示。</td></tr>
-<tr><td><tt>freetype-config</tt></td><td> </td><td>FreeType のコンパイル情報とリンク情報を表示。</td></tr>
+<tr><td><tt>fortune</tt></td><td> </td><td>ランダムに、うまくいけば興味を引く格言を表示。</td></tr>
 <tr><td><tt>fstrim</tt></td><td> </td><td>SSD ドライブに TRIM コマンドを送信。</td></tr>
-<tr><td><tt>ftp</tt></td><td> </td><td>ファイル転送プログラム</td></tr>
 <tr><td><tt>ftpd</tt></td><td> </td><td>FTP デーモン</td></tr>
 <tr><td><tt>funzip</tt></td><td> </td><td>アーカイブの最初のアイテムを標準出力に展開。</td></tr>
 <tr><td><tt>fwcontrol</tt></td><td> </td><td>FireWire 制御プログラム</td></tr>
@@ -178,7 +180,7 @@
 <tr><td><tt>lessecho</tt></td><td> </td><td>引数を表示して、ファイル名中の * や ? のような、メタキャラクタを展開。</td></tr>
 <tr><td><tt>lesskey</tt></td><td> </td><td>less のキーバインディングを指定。</td></tr>
 <tr><td><tt>link</tt></td><td> </td><td>ファイルへのリンクを作成。</td></tr>
-<tr><td><tt>linkcatkeys</tt></td><td> </td><td>[ロケールキットの移動した残り]</td></tr>
+<tr><td><tt>linkcatkeys</tt></td><td> </td><td>catkey からカタログを生成。</td></tr>
 <tr><td><tt>listarea</tt></td><td> </td><td>現在実行中のすべてのチームに対するエリアを一覧表示。</td></tr>
 <tr><td><tt>listattr</tt></td><td> </td><td>ファイルの属性を一覧表示します <a href="cli-apps.html">(Haiku 固有)</a>。</td></tr>
 <tr><td><tt>listdev</tt></td><td> </td><td>ハードウェアデバイスを一覧表示。</td></tr>
@@ -232,7 +234,6 @@
 <tr><td><tt>pathchk</tt></td><td> </td><td>無効な、またはポータブルでないファイル名を診断。</td></tr>
 <tr><td><tt>pc</tt></td><td> </td><td>プログラマー用電卓</td></tr>
 <tr><td><tt>ping</tt></td><td> </td><td>ICMP エコーリクエストをネットワークホストに送信。</td></tr>
-<tr><td><tt>pkg-config</tt></td><td> </td><td>Haiku パッケージを分析 / 設定。</td></tr>
 <tr><td><tt>pkgman</tt></td><td> </td><td>パッケージとパッケージリポジトリを管理。</td></tr>
 <tr><td><tt>play</tt></td><td> </td><td>CD トラックを再生。</td></tr>
 <tr><td><tt>pr</tt></td><td> </td><td>印刷のため、ファイルをページ割付または段組する。</td></tr>
@@ -267,6 +268,7 @@
 <tr><td><tt>settype</tt></td><td> </td><td>ファイルの MIME タイプ、シグネチャー、および優先アプリケーションを設定。</td></tr>
 <tr><td><tt>setversion</tt></td><td> </td><td>ファイルのバージョンを表示。</td></tr>
 <tr><td><tt>setvolume</tt></td><td> </td><td>システムサウンドボリュームを設定。</td></tr>
+<tr><td><tt>sftp</tt></td><td> </td><td>ファイル転送プログラム</td></tr>
 <tr><td><tt>sh</tt></td><td> </td><td><tt>bash</tt> を参照。</td></tr>
 <tr><td><tt>sha1sum</tt></td><td> </td><td>SHA1 チェックサムの表示とチェック。</td></tr>
 <tr><td><tt>shar</tt></td><td> </td><td>シェルアーカイブを作成。</td></tr>
@@ -318,7 +320,7 @@
 <tr><td><tt>unzipsfx</tt></td><td> </td><td>既存の zip アーカイブを自己解凍にするために使用する。  </td></tr>
 <tr><td><tt>updatedb</tt></td><td> </td><td>ローカライズデータベースを更新。</td></tr>
 <tr><td><tt>uptime</tt></td><td> </td><td>システムが開始してからの日付と時間、および経過時間を表示。 </td></tr>
-<tr><td><tt>urlwrapper</tt></td><td> </td><td>それらを直接扱わないコマンドラインあるいはほかのアプリケーションを URL MIME 形式で包む。  </td></tr>
+<tr><td><tt>urlwrapper</tt></td><td> </td><td>URL MIME 形式を直接扱えないコマンドラインあるいはほかのアプリケーションを包む。  </td></tr>
 <tr><td><tt>useradd</tt></td><td> </td><td>新規ユーザーを作成。</td></tr>
 <tr><td><tt>uudecode</tt></td><td> </td><td>uuencode されたファイルをデコード。</td></tr>
 <tr><td><tt>uuencode</tt></td><td> </td><td>離れたシステムにファイルをメールで送れるように、uuencode する。</td></tr>
@@ -335,14 +337,10 @@
 <tr><td><tt>xres</tt></td><td> </td><td>リソースの一覧表示と操作。</td></tr>
 <tr><td><tt>yes</tt></td><td> </td><td>強制終了されるまで文字列を繰り返し表示。</td></tr>
 <tr><td><tt>zcat</tt></td><td> </td><td><tt>gzip</tt> を参照。</td></tr>
-<tr><td><tt>zcmp</tt></td><td> </td><td><tt>zdiff</tt> を参照
-。</td></tr>
-<tr><td><tt>zdiff</tt></td><td> </td><td>圧縮済ファイルを比較
-。</td></tr>
-<tr><td><tt>zforce</tt></td><td> </td><td>gzip ファイルに、'.gz' 拡張子を強制
-。</td></tr>
-<tr><td><tt>zgrep</tt></td><td> </td><td>おそらく圧縮されたファイルを正規表現スキャン
-。 </td></tr>
+<tr><td><tt>zcmp</tt></td><td> </td><td><tt>zdiff</tt> を参照。</td></tr>
+<tr><td><tt>zdiff</tt></td><td> </td><td>圧縮済ファイルを比較。</td></tr>
+<tr><td><tt>zforce</tt></td><td> </td><td>gzip ファイルに、'.gz' 拡張子を強制。</td></tr>
+<tr><td><tt>zgrep</tt></td><td> </td><td>おそらく圧縮されたファイルを正規表現スキャン。 </td></tr>
 <tr><td><tt>zip</tt></td><td> </td><td>Zip アーカイブ中のアイテムを追加または置き換え。</td></tr>
 <tr><td><tt>zipcloak</tt></td><td> </td><td>zip アーカイブ中の暗号化されていないファイルをすべて暗号化。</td></tr>
 <tr><td><tt>zipgrep</tt></td><td> </td><td>指定の zip アイテムを、文字列かパターンでスキャン。  </td></tr>

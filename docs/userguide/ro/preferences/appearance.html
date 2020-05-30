@@ -10,7 +10,7 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
- *		Emrys
+ *		Emrys Lokadottir
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -23,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>Ghid de utilizare</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -59,11 +59,10 @@
 
 <div id="content">
 <div>
-<div class="box-info">Traducerea acestei pagini nu este completă încă. Până când va fi, părțile incomplete utilizează originalul în limba engleză.</div>
 
 <h2><img src="../../images/prefs-images/appearance-icon_64.png" alt="appearance-icon_64.png" width="64" height="64" />Appearance</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Preferințe</span></td></tr>
 <tr><td>Locație:</td><td></td><td><span class="path">/boot/system/preferences/Appearance</span></td></tr>
 <tr><td>Configurări:</td><td></td><td><span class="path">~/config/settings/system/app_server/appearance</span><br />
 <span class="path">~/config/settings/system/app_server/fonts</span></td></tr>
@@ -78,8 +77,8 @@
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="installing_fonts" name="installing_fonts">Instalare fonturi noi</a></h3>
-<p>Fonturile noi care nu vin ca parte a unui pachet .hpkg uzual, pot fi instalate prin copierea acestora într-un subdosar în funcție de tipul de font (<tt>psfonts</tt> sau <tt>ttfonts</tt>) în dosarul <tt>non-packaged</tt> respectiv (vedeți subiectul <a href="../filesystem-layout.html">Filesystem layout</a>). Pentru fonturi TrueType ar fi:</p>
+<a id="installing_fonts" name="installing_fonts">Instalarea de fonturi noi</a></h3>
+<p>Fonturile noi care nu vin ca parte a unui pachet .hpkg uzual, pot fi instalate prin copierea acestora într-un subdosar în funcție de tipul de font (<tt>psfonts</tt> sau <tt>ttfonts</tt>) în dosarul <tt>non-packaged</tt> respectiv (vedeți subiectul <a href="../filesystem-layout.html">Filesystem layout</a>). Pentru fonturile TrueType ar fi:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td><span class="path">/boot/system/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td>pentru fonturi disponibile fiecărui utilizator.</td></tr>
 <tr><td><span class="path">/boot/home/config/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td>pentru fonturi disponibile doar pentru tine.</td></tr>
@@ -89,14 +88,14 @@
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="colors" name="colors">Culori</a></h2>
 <img src="../images/prefs-images/appearance-colors.png" alt="appearance-colors.png" />
-<p>In the <span class="menu">Colors</span> tab, you can change the colors of different parts of the user interface. The color well accepts drag &amp; drops from other programs, letting you drag colors over from e.g. <span class="app">WonderBrush</span>, <span class="app">Icon-O-Matic</span> or the <span class="app">Backgrounds</span> panel.</p>
+<p>În fila <span class="menu">Culori</span> puteți schimba culorile diferitelor părți ale interfeței cu utilizatorul. Fântâna de culori accept trage &amp; plasează din alte programe, permițându-vă să trageți culori din, de ex. <span class="app">WonderBrush</span>, <span class="app">Icon-O-Matic</span> sau panoul <span class="app">Fundaluri</span>.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="decorators" name="decorators">Decorator fereastră</a></h2>
+<a id="decorators" name="decorators">Decorator de fereastră</a></h2>
 <img src="../images/prefs-images/appearance-decorators.png" alt="appearance-decorators.png" />
-<p>Decorators determine the look and feel of windows and all GUI elements. Currently Haiku comes with only one default decorator. Should you find and install other decorators, you can choose a different one from the pop-up menu.</p>
-<p>Haiku's default decorator lets you set the arrow style of the scroll bar: either single arrows at the end of scrollbars to conserve a bit of space, or double arrows — the traditional BeOS way — potentially saving some mouse moving when scrolling up and down or left and right...</p>
+<p>Decoratorii determină aspectul și senzația ferestrelor și a tuturor elementelor GUI. În mod curent Haiku vine doar cu un singur decorator implicit. Dacă veți găsi și instala alte decoratoare, puteți să alegeți unul nou din meniu contextual.</p>
+<p>Decoratorul implicit al Haiku vă permite să stabiliți stilul săgeții barei de derulare: ori săgeți singure la sfârșiul barelor de derulare pentru a salva puțin spațiu ori săgeți duble — metoda BeOS tradițională — potențial salvând ceva mutare de maus când se derulează sus și jos sau stânga și dreapta...</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -106,29 +105,29 @@
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-Sugestii Glyph</h3>
-<p>An activated <span class="menu">Glyph hinting</span> aligns all letters in such a way that their vertical and horizontal edges rest exactly between two pixels. The result is a perfect contrast, especially when dealing with black on white. Text appears crisper. There's also a setting for <span class="menu">Monospaced fonts only</span> that's especially helpful with low resolution devices like netbooks. Small fonts can look pretty bad when hinting is turned on, but with this setting you still have the advantage of hinting for text editors and Terminal.</p>
+Sugerare Glyph</h3>
+<p>O <span class="menu">sugerare Glyph</span> activată aliniază toate literele în așa fel încât marginile verticale și orizontale ale acestora să fie exact între doi pixeli. Rezultatul este un contrast perfect, în special când este vorba de alb pe negru. Textul apare mai vioi. Există de asemenea o configurare <span class="menu">Doar fonturi monospațiate</span> care este în special de ajutor cu dispozitive cu rezoluție scăzută precum netbook-urile. Fonturile mici pot să arate destul de rău când sugerarea este activată, dar cu această configurare veți avea avantajul sugerării pentru editoare de text și Terminal.</p>
 <p>Vedeți diferența pe care o fac sugestiile cu aceste capturi de ecran mărite:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" /><br />Sugestii: dezactivat</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on.png" alt="appearance-glyph-on.png" /><br />Sugestii: activat</td></tr>
+<tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" /><br />Sugerare: dezactivat</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on.png" alt="appearance-glyph-on.png" /><br />Sugerare: activat</td></tr>
 </table>
-<p>It should be pointed out that all the <span class="app">Magnify</span> windows on this page are of course rendered themselves with the different options as well. So, you get a real world impression of the settings by comparing, for example, the bold yellow tab title or the text "33 x 15 @ 8 pixels/pixel".</p>
+<p>Trebuie subliniat faptul că toate ferestrele <span class="app">Magnify</span> de pe această pagină sunt bineînțeles de asemenea randate ele însele cu diferitele opțiuni. Deci, se obține o impresie din viața reală a acestor configurări prin compararea, de exemplu, a titlului aldin de pe fila galbenă de titlu sau textul "33 x 15 @ 8 pixeli/pixel".</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 Tip de antialias</h3>
-<p>Another technique to improve rendering is <i>Antialiasing</i>, which supports all vector graphics as well as text. It smooths lines by changing the color of certain pixels. There are two methods for that:</p>
-<p><span class="menu">Grayscale</span> changes the intensity of pixels at the edge.<br />
-<span class="menu">LCD subpixel</span> does an even better job, especially with (high resolution) LCD monitors. Instead of the intensity of a pixel, it changes its color which moves an edge by a fraction of a pixel, because LCD displays produce every pixel with a red, green and blue component.</p>
-<p>Again, the two different methods with magnified screenshots:</p>
+<p>Altă tehnică pentru a îmbunătăți randarea este <i>Antialiasul</i>, care suportă toate graficele vectoriale precum și text. Face liniile mai fine prin modificarea culorii anumitor pixeli. Există două metode pentru asta:</p>
+<p><span class="menu">Scală de gri</span> modifică intensitatea pixelilor la margine.<br />
+<span class="menu">Subpixel LCD</span> face o treabă și mai bună, în special cu monitoarele LCD (rezoluție înaltă). În locul intensității unui pixel, își schimbă culoarea care mută o margine cu o fracțiune dintr-un pixel, pentru că afișajele LCD produc orice pixel cu o componentă roșie, verde și albastră.</p>
+<p>Din nou, cele două metode cu capturi de ecran mărite:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" /><br />Grayscale, Hinting: off</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-subpixel.png" alt="appearance-subpixel.png" /><br />LCD subpixel, Hinting: off</td></tr>
+<tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" /><br />Scală de gri, sugerare: oprit</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-subpixel.png" alt="appearance-subpixel.png" /><br />Subpixel LCD, sugerare: oprit</td></tr>
 </table>
-<p>Subpixel based antialiasing adds a slight colored shine to objects. Something not everyone tolerates. In Haiku you can mix the two antialiasing methods and find the right setting for you by using a slider.</p>
-<div class="box-info">The subpixel based antialiasing in combination with the glyph hinting is subject of a software patent and is therefore not available by default. Depending on where in the world you live, you may get an unlocked version. Sorry about that. Talk with your representative.</div>
+<p>Antialias pe bază de subpixel adaugă o ușoară strălucire colorată obiectelor. Ceva ce nu toată lumea tolerează. În Haiku puteți să mixați cele două metode de antialias și să găsiți configurarea bună utilizând un glisor.</p>
+<div class="box-info">Antialiasul pe bază de subpixel în combinație cu sugerarea glyph este un subiect de patent de software și nu este disponibil implicit. În funcție de unde locuiți în lume, este posibil să obțineți o versiune deblocată. Ne pare rău pentru asta. Vorbiți cu reprezentativul dumneavoastră.</div>
 <p>Dacă activați sugestiile și randarea subpixel LCD prin modificarea sursei și recompilare, iată cum arată în comparație cu sugestiile în scală de gri:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on.png" alt="appearance-glyph-on.png" /><br />Scală de gri, Sugestii: activat</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on-subpixel.png" alt="appearance-glyph-on-subpixel.png" /><br />Subpixel LCD, Sugestii: activat</td></tr>
+<tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on.png" alt="appearance-glyph-on.png" /><br />Scală de gri, sugerare: activat</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on-subpixel.png" alt="appearance-glyph-on-subpixel.png" /><br />Subpixel LCD, sugerare: activat</td></tr>
 </table>
 <p><br /></p>
 <p>La baza panoului există două butoane:</p>

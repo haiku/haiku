@@ -10,19 +10,21 @@
  * Authors:
  *		Maciej Bałuta  (Google Code-In student)
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Fabio Tomat
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>ProcessController</title>
+	<title>Controlôr dai procès</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Vuide utent</span></div>
 </div>
 
 <div class="nav">
@@ -51,53 +53,52 @@
 <li><a href="../../jp/desktop-applets/processcontroller.html">日本語</a></li>
 </ul>
 <span>
- «  <a href="powerstatus.html">PowerStatus</a> 
-::  <a href="../desktop-applets.html" class="uplink">Applet di Scritori</a> 
-::  <a href="workspaces.html">Workspaces</a>  »
+ «  <a href="powerstatus.html">Stât de Batarie</a> 
+::  <a href="../desktop-applets.html" class="uplink">Desktop Applets</a> 
+::  <a href="workspaces.html">Spazis di lavôr</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h2><img src="../../images/desktop-applets-images/processcontroller-icon_64.png" alt="processcontroller-icon_64.png" width="64" height="64" />ProcessController</h2>
+<h2><img src="../../images/desktop-applets-images/processcontroller-icon_64.png" alt="processcontroller-icon_64.png" width="64" height="64" />Controlôr dai procès</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Desktop Applets</span></td></tr>
 <tr><td>Posizion:</td><td></td><td><span class="path">/boot/system/apps/ProcessController</span></td></tr>
 <tr><td>Impostazions:</td><td></td><td><i>nissune</i></td></tr>
 </table>
 
-<p><img src="../images/processcontroller-images/applet.png" alt="ProcessController applet" style="float:left;margin: 0 1em 0 0" />The primary task of the ProcessController applet is to show the activity of your CPU(s) and the amount of used memory. It allows monitoring of individual teams, change their priority, and kill them if the program freezes. In multiprocessor environments it allows you to disable individual processors/cores. When Tracker or Deskbar crash you can restart them from ProcessController's menu.</p>
-<p>Indicators on the left show each CPU's usage, while the bar on the right shows the memory consumption. Remember that the number of indicators depend on the number of processors/cores in the computer.</p>
-<p>If not yet running, launching ProcessController asks if it should open in window mode or live in the Deskbar. In window mode you can resize the bar-display by resizing the window and then use the <a href="../gui.html#replicants">Replicant</a> handle to drag it to the Desktop.<br />
-Wherever it's installed, it's operated via a right-click context menu.<br />
-To remove the applet again from the Deskbar, uncheck <span class="menu">Live in the Deskbar</span> in its context menu.</p>
-<h2>Quit an application</h2>
+<p><img src="../images/processcontroller-images/applet.png" alt="ProcessController applet" style="float:left;margin: 0 1em 0 0" />Il compit principâl de applet “Controlôr dai procès” al è chel di mostrâ la ativitât dal/des to(s) CPU e la cuantitât di memorie doprade. Ti permet di monitorâ singui team, cambiâ la lôr prioritât, e copâju se il program si bloche. Intai ambients multi-processôrs ti permet di disabilitâ singui processôrs/core. Cuant che Tracker o Deskbar a colassin tu puedis tornâ a inviâju dal menù di Controlôr dai procès.</p>
+<p>I indicadôrs a çampe a mostrin la utilizazion di ogni CPU, Invezit la sbare a diestre e mostre la memore consumade. Visiti che il numar di indicadôrsa al dipent dal numar di processôrs/core dal to computer.</p>
+<p>Se nol è ancjemò in esecuzion, inviant “Controlôr dai procès” al domandarà se si à di vierzilu in modalitât barcon o “vivi” tal Deskbar. In modalitât barcon tu puedis ridimensionâ la visualizazion des sbaris ridimensionant il barcon e dopo doprâ la mantie dal <a href="../gui.html#replicants">Replicant</a> par strissinâlu sul scritori.<br />
+Pardut là che tu lu instalis, al ven doprât cuntun menù contestuâl, vie clic diestri.<br />
+Par tornâ a gjavâ la applet dal Deskbar, deselezione tal so menù contestuâl <span class="menu">Vîf tal Deskbar</span>.</p>
+<h2>Sierâ une aplicazion</h2>
 <img src="../images/processcontroller-images/quit.png" alt="ProcessController - Quit an application" />
-<p>To quit an application just choose its name from the <span class="menu">Quit an application</span> menu. This is a clean way to close app, just like  clicking its close button. Be careful not to quit system processes like servers or daemons, however. Your system may stop working reliably. </p>
-<h2>Memory usage</h2>
+<p>Par sierâ di une aplicazion al baste sielzi il so non dal menù <span class="menu">Siere une aplicazion</span>. Chest al è un mût net par sierâ aplicazions, tant che fâ clic sul so boton par sierâ. Dut câs, sta atent a no sierâ procès di sisteme o demonis. La afidabilitât dal sisteme e podarès jessi comprometude.</p>
+<h2>Ûs de memorie</h2>
 <img src="../images/processcontroller-images/memory.png" alt="ProcessController - Memory usage" />
-<p>Monitoring memory usage can be rather inaccurate.</p>
-<p>This menu allows you to monitor memory usage of different teams in your system. Next to the team's name there are two columns: first with the amount reserved for writable memory, while the second shows all memory including read-only space (shared libraries for example).</p>
-<p>The first row <i>System resources &amp; caches...</i> shows the total amount of memory used by the system and all applications. The length of the blue bar is based on the total physical memory in your computer. The next rows show memory used by each process. Note that the length of the bar is based only on the actually used part of the memory.</p>
+<p>Monitorâ la memorie al pues jessi pitost imprecîs.</p>
+<p>Chest menù ti permet di tignî di voli la utilizazion de memorie par ogni team tal to sisteme. In bande al non dal team si à dôs colonis: la prime cu la cuantitât riservade pe memorie che si pues scrivi, la seconde e mostre dute la memorie includût il spazi in dome-leture (librariis condividudis par esempli).</p>
+<p>La prime rie <i>Risorsis di sisteme e cache...</i> e mostre la cuantitât di memorie totâl doprade dal sisteme e di dutis lis aplicazions. La lungjece de sbare blu si base sul totâl de memorie fisiche tal computer. Lis riis sucessivis a mostri la memorie doprade par ogni procès. Fâs câs che la lungjece de sbare blu si base dome su la part atualmentri doprade de memorie.</p>
 <table>
-		<tr><td style="width:20px;height:20px;background:#1414E7"></td><td style="width:10px"></td><td>Memory used only by given application (with write access)</td></tr>
-		<tr><td style="height:20px;background:#A4A4F5"></td><td></td><td>Memory including read-only space (can be shared with other applications)</td></tr>
+		<tr><td style="width:20px;height:20px;background:#1414E7"></td><td style="width:10px"></td><td>Memorie doprade dome de aplicazion indicade (cun acès in scriture)</td></tr>
+		<tr><td style="height:20px;background:#A4A4F5"></td><td></td><td>Memorie includint il spazi in dome-leture (e pues jessi condividude cun altris aplicazions)</td></tr>
 </table>
 
-<h2>Threads and CPU usage</h2>
-<p>This menu allows you to change thread priorities, kill teams or debug them.</p>
-<div class="box-stop">Changes via the commands in this menu reach deep into the system and can cause data loss and system instability. Keep that mouse hand steady!</div>
+<h2>Thread e ûs de CPU</h2>
+<p>Chest menù al permet di cambiâ lis prioritâts dai thread, copâ i team o fâur il debug.</p>
+<div class="box-stop">Lis modifichis fatis cui comants in chest menù a rivin tal profont dal sisteme e a puedin causâ pierditis di dâts e instabilitâts di sisteme. Ten il mouse cun man salde!</div>
 <img src="../images/processcontroller-images/priority.png" alt="ProcessController - Priority" />
 <table>
-	<tr><td style="width:20px;height:20px;background:#1414E7"></td><td style="width:10px"></td><td>Kernel code</td></tr>
-	<tr><td style="height:20px;background:#A4A4F5"></td><td></td><td>User code</td></tr>
-	<tr><td style="height:20px;background:#6EBE6E"></td><td></td><td>Idle thread</td></tr>
+	<tr><td style="width:20px;height:20px;background:#1414E7"></td><td style="width:10px"></td><td>Codiç dal kernel</td></tr>
+	<tr><td style="height:20px;background:#A4A4F5"></td><td></td><td>Codiç utent</td></tr>
+	<tr><td style="height:20px;background:#6EBE6E"></td><td></td><td>Thread inatîf</td></tr>
 </table>
-<p>At the first level you see team names. By clicking on one, you can kill the whole team. The dark-blue part of the bar is time spent in kernel code, the light-blue part in user code, the green part in the idle thread(s). A bar completely filled with blue means that the team is using all processoring power.</p>
-<p>The second level shows particular threads of a team. By clicking on one, you can debug or kill it. A bar completely filled with blue means that the thread is pegging one processor/core.</p>
-<p>The last level of the menu allows you to change a thread's priority. Be careful with that! As a rule of thumb the priority of a thread should be inverse its CPU usage. That is, the more it tries to claim CPU time, the lower should be it's priority. In general, don't mess with an app's priorities; contact its author, that's his business.
+<p>Al prin nivel si viôt i nons dai team. Fasint clic su di un, tu puedis copâ il team intîr. La part blu scure de sbare al è il timp passât tal codiç dal kernel, la part blu clare in codiç utent, la part verde intal/intai thread inatîf(s). Une sbare jemplade dal dut di blu e significhe che il team al sta doprant dute la potence di elaborazion.</p>
+<p>Il secont nivel al mostre i thread particolârs di un team. Fasint clic suntun, tu puedis fâ il debug o copâlu. Une sbare jemplade dal dut di blu e significhe che il thread si è tacât e al ocupe dal dut un processôr/core.</p>
+<p>L'ultin nivel dal menù ti permet di cambiâ une prioritât dal thread. Sta atent cun chel! Come regule gjenerâl la prioritât di un thread e à di sei contrarie rispiet al so ûs de CPU. Cioè, plui al cîr di rivendicâ timp ae CPU, plui bas al à di jessi la sô prioritât. In gjenerâl, no sta fâ pastiei cu lis prioritâts de aplicazion; contate il so autôr, chel al è il so mistîr.
 </p>
 
 </div>
@@ -105,9 +106,9 @@ To remove the applet again from the Deskbar, uncheck <span class="menu">Live in 
 
 <div class="nav">
 <div class="inner"><span>
-«  <a href="powerstatus.html">PowerStatus</a> 
-::  <a href="../desktop-applets.html" class="uplink">Applet di Scritori</a> 
-::  <a href="workspaces.html">Workspaces</a>  »
+«  <a href="powerstatus.html">Stât de Batarie</a> 
+::  <a href="../desktop-applets.html" class="uplink">Desktop Applets</a> 
+::  <a href="workspaces.html">Spazis di lavôr</a>  »
 </span></div>
 </div>
 

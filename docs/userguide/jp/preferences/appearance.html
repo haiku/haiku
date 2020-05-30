@@ -25,7 +25,7 @@
 <body>
 
 <div id="banner">
-<div><span>ユーザーガイド</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -80,10 +80,10 @@
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="installing_fonts" name="installing_fonts">新しいフォントのインストール</a></h3>
-<p>正規の .hpkg パッケージではない新しいフォントをインストールするには、<tt>non-packaged</tt> フォルダーの、フォントの種類 (<tt>psfonts</tt> または <tt>ttfonts</tt>) に応じたサブフォルダーへコピーします (<a href="../filesystem-layout.html">ファイルシステムレイアウト</a>のトピックを参照ください)。TrueType フォントでは、コピー先は以下のようになるでしょう。</p>
+<p>正規の .hpkg パッケージではない新しいフォントをインストールするには、フォントの種類 (<tt>psfonts</tt> または <tt>ttfonts</tt>) に応じた<tt>non-packaged</tt> フォルダーのサブフォルダーへコピーします (<a href="../filesystem-layout.html">ファイルシステムレイアウト</a>のトピックを参照ください)。TrueType フォントでは、コピー先は以下のようになるでしょう。</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td><span class="path">/boot/system/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td>すべてのユーザー用フォント</td></tr>
-<tr><td><span class="path">/boot/home/config/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td>あなたの専用フォント</td></tr>
+<tr><td><span class="path">/boot/home/config/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td>ユーザーの専用フォント</td></tr>
 </table>
 
 <h2>
@@ -95,7 +95,7 @@
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="decorators" name="decorators">ウィンドウデコレーター (Window decorators)</a></h2>
 <img src="../images/prefs-images/appearance-decorators.png" alt="appearance-decorators.png" />
-<p>デコレーターは、ウィンドウや GUI 要素のルックアンドフィールを決定します。現在、Haiku は1 つのデフォルトデコレーターだけが付属しています。ほかのデコレーターを探してインストールすれば、ポップアップメニューからべつのデコレーターを選択できるでしょう。</p>
+<p>デコレーターは、ウィンドウや GUI 要素のルックアンドフィールを決定します。現在、Haiku にはデフォルトデコレーターが 1 つだけ付属しています。ほかのデコレーターを探してインストールすれば、ポップアップメニューからべつのデコレーターを選択できるでしょう。</p>
 <p>デフォルトデコレーターでは、スクロールバーの矢印スタイルを設定できます。スクロールバーの終端を、スペースを節約できる単独の矢印にするか、上下左右にスクロールする際にマウスの移動を潜在的にいくらか減らせる— 伝統的な BeOS の方法 —上下矢印にするかを設定できます。</p>
 
 <h2>
@@ -107,12 +107,12 @@
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 グリフのヒンティング (Glyph hinting)</h3>
-<p><span class="menu">グリフのヒンティング (Glyph hinting)</span> を有効にすると、すべての文字の縦横方向両端に、必ず 2 ピクセルの空白が入るようになります。特に、白い背景で黒い文字を扱う場合には、有効にしたときとしないときとで、結果は完全に対照的になります。有効にした場合、テキストがはっきり見えます。ネットブックのような低解像度の機器で特に効果的な、<span class="menu">等幅フォントのみ有効 (Monospaced Fonts Only)</span> の設定もあります。ヒンティングをオンにすると、小さい文字がかなり汚く見えることがありますが、その場合でもテキストエディターやターミナルでヒンティングの恩恵を受けられます。</p>
+<p><span class="menu">グリフのヒンティング (Glyph hinting)</span> を有効にすると、すべての文字の縦横方向両端に、必ず 2 ピクセルの空白が入るようになります。特に、白地に黒い文字を扱う場合、有効にしたときとしないときとで、結果は完全に対照的になります。有効にした場合、テキストがはっきり見えます。ネットブックのような低解像度の機器で特に効果的な、<span class="menu">等幅フォントのみ有効 (Monospaced Fonts Only)</span> の設定もあります。ヒンティングをオンにすると、小さい文字がかなり汚く見えることがありますが、その場合でもテキストエディターやターミナルでヒンティングの恩恵を受けられます。</p>
 <p>次の拡大したスクリーンショットは、ヒンティングを有効にした場合としない場合とで、どれだけ見た目が変わるかを示しています:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" /><br />ヒンティング無効</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on.png" alt="appearance-glyph-on.png" /><br />ヒンティング有効</td></tr>
 </table>
-<p>このページに掲載されているすべての<span class="app">拡大鏡 (Magnify)</span> ウィンドウは、当然のことながらそれぞれ異なるオプションで描画されている点に注意が必要です。たとえば、黄色いタブの太文字タイトルや、"33 x 15 @ 8 pixels/pixel" というテキストを比較すれば、各設定が実際に作り出す印象を得ます。</p>
+<p>このページに掲載されているすべての<span class="app">拡大鏡 (Magnify)</span> ウィンドウは、もちろんそれぞれ異なるオプションで描画されている点に注意が必要です。たとえば、黄色いタブの太文字タイトルや、"33 x 15 @ 8 pixels/pixel" というテキストを比較すれば、各設定が実際に作り出す印象を得られます。</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>

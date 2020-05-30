@@ -24,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>Kullanıcı kılavuzu</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -53,15 +53,14 @@
 <li><a href="../jp/applications.html">日本語</a></li>
 </ul>
 <span>
- «  <a href="workshop-filetypes+attributes.html">Atölye</a> 
-::  <a href="contents.html" class="uplink">İçerik</a> 
-::  <a href="desktop-applets.html">Desktop Applets</a>  »
+ «  <a href="workshop-filetypes+attributes.html">Workshop</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="desktop-applets.html">Masaüstü Gereçleri</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">Bu sayfanın çevrilmesi henüz tamamlanmamıştır. Tamamlanana kadar henüz bitirilmeyen kısımlar İngilizce metni kullanır.</div>
 
 <h1>Uygulamalar</h1>
 
@@ -70,112 +69,112 @@
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="hpkg" name="hpkg">Haiku packages (.hpkg)</a></h2>
-<p>The simplest way is to use <a href="applications/haikudepot.html">HaikuDepot</a> to find, download and automatically install and uninstall a package. If you have downloaded a package from somewhere else — maybe because it's not (yet) in a public repository — just double-click it to open in HaikuDepot and install from there.</p>
-<p>You'll find the newly installed application in <tt>/system/apps/</tt> or, in case of a commandline application, in <tt>/system/bin/</tt>. All other files the program depends upon (libraries, data, add-ons, etc.) appear automatically in the right locations in the filesystem.</p>
-<p>Topics <a href="deskbar.html">Deskbar</a> or <a href="desktop-applets/launchbox.html">LaunchBox</a> describe how to add shortcuts to your newly installed application.</p>
-<div class="box-info">By the way, although you can unpack a .hpkg file like any other archive, this is not what the package mangement is doing when you're installing a package. The underlying filesystem only appears to spread files in their respective folders, there's no physical moving around taking place. This is why installing/uninstalling is so very fast and clean.</div>
-<p>If the package depends on some other library or package, a window will pop up, asking if the necessary files shall be downloaded and installed as well.</p>
-<p>Uninstalling is just as easy: Simply find the package in HaikuDepot and click <span class="button">Uninstall</span>.</p>
-<p>If you're working in the Terminal or want to do un/installing of packages in a script, you should have a look at the command <tt>pkgman --help</tt>.</p>
+<a id="hpkg" name="hpkg">Haiku paketleri (.hpkg)</a></h2>
+<p>Paket bulma, yükleme ve kaldırmanın en kısa yolu <a href="applications/haikudepot.html">Haiku Depo</a> uygulamasını kullanmaktır. Eğer başka bir kaynaktan bir paket bulduysanız, yüklemek için yalnızca üzerine çift tıklayın — Haiku Depo uygulaması açılıp bu paketi yükleyecektir.</p>
+<p>Yeni yüklenen paketler <tt>/system/apps/</tt> konumunda bulunur. Komut satırı uygulamaları ise <tt>/system/bin/</tt> dizinine gider. Diğer tüm yüklenen paketler (kitaplıklar, veri dosyaları, eklentiler vb.) ise dosya sisteminde gitmeleri gereken dizinlere kendiliğinden yerleşirler.</p>
+<p><a href="deskbar.html">Masaüstü Çubuğu</a> ve <a href="desktop-applets/launchbox.html">Başlatma Rampası</a> bölümlerinde yeni yüklediğiniz bir uygulamaya nice kısayol oluşturabileceğiniz üzerine ayrıntılı bilgi içerir.</p>
+<div class="box-info">Bir .hpkg dosyasının herhangi bir arşiv dosyası gibi içini açabilirsiniz, ancak siz çift tıklayıp yüklediğinizde gerçekleşen işlem bu değildir. Dosya sistemi yalnızca paketler yukarıda belirtilen klasörlere yerleştirilmiş gibi davranır, ancak paketler dosya sistemi içerisinde açılıp saçılmaz, tek dosya olarak kalırlar. Bu nedenle sisteminizde gereksiz dosyalar birikmez ve yükleme ve kaldırma işlemleri çok tez biter.</div>
+<p>Eğer bir paket başka bir kitaplık veya pakete bağımlıysa, bu paketleri de yükleyip yüklemek istemediğinizi soran bir pencere açılır ve yüklenir.</p>
+<p>Kaldırma işlemi çok kolaydır: Paketi Haiku Depo uygulamasında bulun ve <span class="button">Kaldır</span> düğmesine basın.</p>
+<p>Uçbirim'de çalışıyorsanız veya bir betikteki paketleri indirmek/kaldırmak istiyorsanız <tt>pkgman --help</tt> komutuna bir göz atın.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="beos_apps" name="beos_apps">Old BeOS archives (.zip and .pkg)</a></h2>
-<p>BeOS archives that include all they need in their app's folder can simply be unpacked (double clicking opens <span class="app">Expander</span> or the old <span class="app">PackageInstaller</span>) anywhere in <tt>/boot/home/</tt> and run from there. Uninstalling such self-contained applications is easy: just delete the app's folder.</p>
-<p>This is true for the majority of old BeOS applications. If you happen upon one that doesn't work out-of-the-box, because it wants to spread its files to hard-coded locations that are not guaranteed to exist, you can try to fix things manually. The folder <tt>/system/non-packaged/</tt> allows you to recreate the needed folder hierarchy. As more and more real .hpkg packages become available and old BeOS applications get re-packaged, this will become less needed. Please consult this <a href="http://www.haiku-os.org/guides/daily-tasks/install-applications">online article</a> on how to use the <tt>non-packaged</tt> hierarchy.</p>
+<a id="beos_apps" name="beos_apps">Eski BeOS arşivleri (.zip ve .pkg)</a></h2>
+<p>Gereken tüm verileri kendi içerisindeki pakette tutan BeOS arşivlerinin yüklenmesi ve kaldırılması da çok kolaydır, yalnızca <tt>/boot/home/</tt> içerisindeki herhangi bir konumda çift tıklayın (çift tıklama <span class="app">Paketaçar</span> uygulamasını veya <span class="app">LegacyPackageInstaller</span> uygulamasını açar) anywhere in <tt>/boot/home/</tt> ve çalıştırın. Kaldırmak da yine aynı şekilde uygulama klasörünü silerek yapılabilir.</p>
+<p>Bu eski BeOS uygulamalarının çoğunluğu için geçerlidir. Bu şekilde doğrudan çalışmayan bir uygulamaya denk gelirseniz yüklemeyi el ile yapmayı deneyebilirsiniz. <tt>/system/non-packaged/</tt> klasörü, size gerekli hiyerarşiyi el ile oluşturmanıza izin verir. BeOS uygulamaları yeni .hkpg paket biçiminde paketlenmeye devam edildikçe zamanla buna gerek kalmayacaktır. <tt>non-packaged</tt> hakkında yardım için <a href="http://www.haiku-os.org/guides/daily-tasks/install-applications">bu makaleye</a> bir göz atın.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="list-of-apps" name="list-of-apps">Haiku's applications</a></h2>
-<p>Haiku comes with a set of mostly small but essential applications. You'll find all of them at <span class="path">/boot/system/apps/</span>. Applications that are not usually launched by a double-click on a data file (e.g. ShowImage for image files) can be found in the <span class="menu">Applications</span> menu of the Deskbar.</p>
+<a id="list-of-apps" name="list-of-apps">Haiku uygulamaları</a></h2>
+<p>Haiku az sayıda ancak gerekli sayılabilecek uygulamaları içeren bir uygulama kümesiyle gelir. Bu uygulamalar <span class="path">/boot/system/apps/</span> konumunda bulunurlar. Bir dosyaya çift tıklanarak çalıştırılmayan uygulamalar ise Masaüstü Çubuğu'nun <span class="menu">Uygulamalar</span> menüsünden çalıştırılabilir.</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
-	<tr><td style="width:24px;"><img src="../images/apps-images/activitymonitor-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/activitymonitor.html">ActivityMonitor</a></td><td style="width:10px;"> </td>
-		<td valign="top">A tool to track system resources like CPU and memory usage.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/bootmanager-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/bootmanager.html">BootManager</a></td><td> </td>
-		<td valign="top">A tool to install a boot menu in the Master Boot Record (MBR) of a drive.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/charactermap-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/charactermap.html">CharacterMap</a></td><td> </td>
-		<td valign="top">An application that shows the Unicode character map.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/activitymonitor-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/activitymonitor.html">Etkinlik Monitörü</a></td><td style="width:10px;"> </td>
+		<td valign="top">CPU ve bellek kullanımı gibi sistem kaynaklarını izlemek için bir araç.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/bootmanager-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/bootmanager.html">Önyükleme Yöneticisi</a></td><td> </td>
+		<td valign="top">Bir sürücünün Ana Önyükleme Kaydı (MBR) içerisine bir önyükleme menüsü yüklemek için kullanılan araç.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/charactermap-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/charactermap.html">Karakter Eşlem</a></td><td> </td>
+		<td valign="top">Unicode karakter eşlemlerini gösteren bir uygulama.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/codycam-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/codycam.html">CodyCam</a></td><td> </td>
-		<td valign="top">A tool to regularly upload images from a webcam to a server.</td></tr>
+		<td valign="top">Bir kameradan sunucuya düzenli olarak görüntüler yüklemek için kullanılan bir araç.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/debugger-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/debugger.html">Debugger</a></td><td> </td>
-		<td valign="top">A graphical debugger.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/deskcalc-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/deskcalc.html">DeskCalc</a></td><td> </td>
-		<td valign="top">A calculator.</td></tr>
+		<td valign="top">Grafik arabirime sahip bir hata ayıklayıcı.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/deskcalc-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/deskcalc.html">Hesap Makinesi</a></td><td> </td>
+		<td valign="top">Bir hesap makinesi.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/diskprobe-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/diskprobe.html">DiskProbe</a></td><td> </td>
-		<td valign="top">A HEX editor for files and devices.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/diskusage-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/diskusage.html">DiskUsage</a></td><td> </td>
-		<td valign="top">A tool to visualize a disk's memory usage.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/drivesetup-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/drivesetup.html">DriveSetup</a></td><td> </td>
-		<td valign="top">A harddisk partitioning tool.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/expander-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/expander.html">Expander</a></td><td> </td>
-		<td valign="top">A tool to unpack common archives.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/haikudepot-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/haikudepot.html">HaikuDepot</a></td><td> </td>
-		<td valign="top">A tool to find, download, install, update and uninstall (application) packages</td></tr>
+		<td valign="top">Dosyalar ve aygıtlar için bir HEX düzenleyicisi.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/diskusage-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/diskusage.html">Disk Kullanımı</a></td><td> </td>
+		<td valign="top">Bir diskin kullanılan alanını göstermeye yarayan bir araç.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/drivesetup-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/drivesetup.html">Disk İzlencesi</a></td><td> </td>
+		<td valign="top">Sabit disk bölümlendirme ve yapılandırma aracı.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/expander-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/expander.html">Paketaçar</a></td><td> </td>
+		<td valign="top">Yaygın kullanılan arşiv biçimlerini açmak için bir araç.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/haikudepot-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/haikudepot.html">Haiku Depo</a></td><td> </td>
+		<td valign="top">Uygulama paketlerini bulmak, indirmek, yüklemek veya kaldırmak için bir araç.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/icon-o-matic-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/icon-o-matic.html">Icon-O-Matic</a></td><td> </td>
-		<td valign="top">An app to create Haiku's vector icons.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/installer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/installer.html">Installer</a></td><td> </td>
-		<td valign="top">The tool to install Haiku to a partition.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/magnify-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/magnify.html">Magnify</a></td><td> </td>
-		<td valign="top">A magnified view of the area around your mouse pointer.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/mail-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/mail.html">Mail</a></td><td> </td>
-		<td valign="top">An email client.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/mediaplayer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/mediaplayer.html">MediaPlayer</a></td><td> </td>
-		<td valign="top">A player for all supported audio/video files.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/midiplayer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/midiplayer.html">MidiPlayer</a></td><td> </td>
-		<td valign="top">A player for MIDI files.</td></tr>
+		<td valign="top">Haiku biçimli vektör simgeler oluşturma aracı.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/installer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/installer.html">Yükleyici</a></td><td> </td>
+		<td valign="top">Haiku'yu bir disk bölümüne yükleme aracı.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/magnify-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/magnify.html">Ekranı Büyüt</a></td><td> </td>
+		<td valign="top">Fare imlecinin altındaki alanı büyüten bir araç.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/mail-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/mail.html">Posta</a></td><td> </td>
+		<td valign="top">E-posta istemcisi.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/mediaplayer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/mediaplayer.html">Ortam Oynatıcı</a></td><td> </td>
+		<td valign="top">Desteklenen ses ve video dosyalarını oynatmak için bir program.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/midiplayer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/midiplayer.html">MIDI Oynatıcı</a></td><td> </td>
+		<td valign="top">MIDI dosyalarını oynatmak için bir yazılım.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/packageinstaller-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/packageinstaller.html">LegacyPackageInstaller</a></td><td> </td>
-		<td valign="top">Installer for BeOS packages in PKG format.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/people-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/people.html">People</a></td><td> </td>
-		<td valign="top">A contact manager.</td></tr>
+		<td valign="top">PKG biçimli BeOS uygulamalarını yüklemek için bir araç.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/people-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/people.html">Kişiler</a></td><td> </td>
+		<td valign="top">Kişi yöneticisi.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/poorman-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/poorman.html">PoorMan</a></td><td> </td>
-		<td valign="top">A simple web server.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/screenshot-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/screenshot.html">Screenshot</a></td><td> </td>
-		<td valign="top">A tool to take screenshots.</td></tr>
+		<td valign="top">Yalın bir web sunucusu.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/screenshot-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/screenshot.html">Ekran Görüntüsü</a></td><td> </td>
+		<td valign="top">Ekran görüntüleri almak için bir araç.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/showimage-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/showimage.html">ShowImage</a></td><td> </td>
-		<td valign="top">A simple image viewer.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/softwareupdater-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/softwareupdater.html">SoftwareUpdater</a></td><td> </td>
-		<td valign="top">A tool to update software packages and Haiku itself.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/soundrecorder-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/soundrecorder.html">SoundRecorder</a></td><td> </td>
-		<td valign="top"><span style="color:silver">A tool to record audio from line-in or a microphone. [<i>still missing</i>]</span></td></tr>
+		<td valign="top">Yalın bir görsel görüntüleyici.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/softwareupdater-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/softwareupdater.html">Yazılım Güncelleyici</a></td><td> </td>
+		<td valign="top">Haiku'yu ve uygulama paketlerini güncelleme aracı.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/soundrecorder-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/soundrecorder.html">Ses Kaydedici</a></td><td> </td>
+		<td valign="top"><span style="color:silver">Ses kablo girişi veya mikrofondan ses kaydı için kullanılan bir yazılım. [<i>henüz eksik</i>]</span></td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/stylededit-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/stylededit.html">StyledEdit</a></td><td> </td>
-		<td valign="top">A simple text editor.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/terminal-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/terminal.html">Terminal</a></td><td> </td>
-		<td valign="top">Access to the bash.</td></tr>
+		<td valign="top">Yalın bir metin düzenleyici.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/terminal-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/terminal.html">Uçbirim</a></td><td> </td>
+		<td valign="top">Bash kabuğuna erişim merkezi.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/textsearch-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/textsearch.html">TextSearch</a></td><td> </td>
-		<td valign="top">A search tool for text files.</td></tr>
+		<td valign="top">Metin dosyalarını aramak için bir araç.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/tv-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/tv.html">TV</a></td><td> </td>
-		<td valign="top"><span style="color:silver">A viewer for analog TV. [<i>still missing</i>]</span></td></tr>
+		<td valign="top"><span style="color:silver">Analog TV. [<i>henüz eksik</i>]</span></td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/webpositive-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/webpositive.html">WebPositive</a></td><td> </td>
-		<td valign="top">A native web browser</td></tr>
+		<td valign="top">Haiku'ya özel bir web tarayıcısı.</td></tr>
 </table>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="cli-apps" name="cli-apps">Haiku's commandline applications</a></h2>
-<p>Besides the normal commandline tools coming with the bash shell or are necessary to be POSIX compliant, there are a few Haiku-specific commandline applications worth mentioning. These commands are often useful for scripting purposes, see also topic <a href="bash-scripting.html">Bash and Scripting</a>.</p>
+<a id="cli-apps" name="cli-apps">Haiku komut satırı uygulamaları</a></h2>
+<p>Bash kabuğu ile birlikte gelen veya POSIX uyumluluğu için gerekin komut satırı uygulamalarının yanında, Haiku'ya özel birkaç komut satırı uygulaması bulunmaktadır. Bu komutlar aynı zamanda betik yazımı için de yararlıdır, ek bilgi için <a href="bash-scripting.html">Bash ve betik yazımı</a> bölümüne bakın.</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-		<tr><td style="width:24px;"><img src="../images/apps-images/cli-app-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/list-cli-apps.html">List of all commandline applications</a></td><td> </td></tr>
-		<tr><td style="width:24px;"><img src="../images/apps-images/cli-app-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/cli-apps.html">Haiku-specific commandline applications</a></td><td> </td></tr>
+		<tr><td style="width:24px;"><img src="../images/apps-images/cli-app-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/list-cli-apps.html">Tüm komut satırı uygulamalarının listesi</a></td><td> </td></tr>
+		<tr><td style="width:24px;"><img src="../images/apps-images/cli-app-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/cli-apps.html">Haiku komut satırı uygulamaları</a></td><td> </td></tr>
 </table>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="list-of-bundled-apps" name="list-of-bundled-apps">Bundled applications</a></h2>
-<p>Besides the above listed programs, which are all maintained by the Haiku project, there are a few essential applications bundled in a standard Haiku system. Bugs and feature requests for those have to be filed with the particular maintainer.</p>
+<a id="list-of-bundled-apps" name="list-of-bundled-apps">Pakette gelen uygulamalar</a></h2>
+<p>Haiku projesi tarafından geliştirilen yukarıdaki uygulamalar dışında birkaç gerekli olabilecek uygulama Haiku ile birlikte verilmektedir. Bu uygulamalar için olan hata bildirimleri ve özellik isteklerinin, o uygulamanın kendi geliştiricisine iletilmesi gerekmektedir.</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 		<tr><td style="width:24px;"><img src="../images/apps-images/bepdf-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/bepdf.html">BePDF</a></td><td style="width:10px;"> </td>
-		<td valign="top">A <acronym title="Portable Document Format">PDF</acronym> viewer.</td></tr>
+		<td valign="top"><acronym title="Portable Document Format">PDF</acronym> görüntüleyicisi.</td></tr>
 <!--	<tr><td style="width:24px;"><img src="../images/apps-images/bezillabrowser-icon_16.png" alt="icon" width="16" height="16" /></td><td _translation_id="270"><a href="applications/bezillabrowser.html">BeZillaBrowser</a></td><td> </td>
 		<td valign="top" _translation_id="271">A web browser based on Mozilla's source code.</td></tr> -->
 	<tr><td style="width:24px;"><img src="../images/apps-images/pe-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/pe.html">Pe</a></td><td> </td>
-		<td valign="top">An advanced texteditor with syntax coloring and much more.</td></tr>
+		<td valign="top">Sözdizim vurgulama ve daha fazlasını içeren gelişmiş bir metin düzenleyicisi.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/vision-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/vision.html">Vision</a></td><td> </td>
-		<td valign="top">An <acronym title="Internet Relay Chat">IRC</acronym> client.</td></tr>
+		<td valign="top"><acronym title="Internet Relay Chat">IRC</acronym> istemcisi.</td></tr>
 <!--	<tr><td style="width:24px;"><img src="../images/apps-images/vlc-icon_16.png" alt="icon" width="16" height="16" /></td><td _translation_id="276"><a href="applications/vlc.html">VLC media player</a></td><td> </td>
 		<td valign="top" _translation_id="277">VideoLAN's media player.</td></tr> -->
 	<tr><td style="width:24px;"><img src="../images/apps-images/wonderbrush-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/wonderbrush.html">WonderBrush</a></td><td> </td>
-		<td valign="top">YellowBite's graphics programm.</td></tr>
+		<td valign="top">YellowBite tarafından geliştirilen bir grafik programı.</td></tr>
 </table>
 
 </div>
@@ -183,9 +182,9 @@
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="workshop-filetypes+attributes.html">Atölye</a> 
-::  <a href="contents.html" class="uplink">İçerik</a> 
-::  <a href="desktop-applets.html">Desktop Applets</a>  »
+ «  <a href="workshop-filetypes+attributes.html">Workshop</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="desktop-applets.html">Masaüstü Gereçleri</a>  »
 </span></div>
 </div>
 

@@ -24,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>Használati útmutató</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -55,12 +55,13 @@
 <span>
  «  <a href="mail.html">Levelezés</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Programok</a> 
-::  <a href="midiplayer.html">Midilejátszó</a>  »
+::  <a href="midiplayer.html">MidiPlayer</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h2><img src="../../images/apps-images/mediaplayer-icon_64.png" alt="mediaplayer-icon_64.png" width="64" height="64" />Médialejátszó (MediaPlayer)</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -69,7 +70,7 @@
 <tr><td>Beállítások:</td><td></td><td><span class="path">~/config/settings/MediaPlayer</span></td></tr>
 </table>
 <p><br /></p>
-<p>A Médialejátszó az alapértelmezett zene és videó lejátszó program. Az <a href="http://www.ffmpeg.org/">ffmpeg</a>-nek köszönhetően a formátumok széles palettája támogatott. Bár a felület egyszerű, mégis az összes főbb vezérlőt tartalmazza:</p>
+<p>MediaPlayer is the default player for all audio and video files. Thanks to its <a href="http://www.ffmpeg.org/">ffmpeg</a> backend, a plethora of widely used formats are supported. Its simple interface has all the controls you'd expect:</p>
 <img src="../images/apps-images/mediaplayer.png" alt="mediaplayer.png" />
 <p>A csúszka a folyamatjelzőn a lejátszási pozíciót jelzi, és azzal módosítható is, az egeret felette tartva pedig megjelenik az aktuális lejátszási idő és a hátralévő idő. A jobb oldalon lévő időre kattintva válthatunk az aktuális idő, a teljes hossz és a hátralévő idő között.<br />
 Alatta találhatóak a hagyományos vezérlők (előző, lejátszás/folytatás, megállítás, leállítás, következő). Majd a hangerőszabályzó (a hangszóró ikonra kattintva elnémíthatjuk a lejátszót) és a VU-méter foglal helyet.</p>
@@ -97,12 +98,14 @@ Film.Français.srt</pre>
 <h2>Beállítások</h2>
 <p>Néhány beállítási lehetőséget kapunk a beállítások panelen:</p>
 <img src="../images/apps-images/mediaplayer-settings.png" alt="mediaplayer-settings.png" />
-<p>Az első szakasz, a <span class="menu">Lejátszás módja</span>, magától értetődő. A lejátszás indítása automatikusan, az ablak bezárása a lejátszás végeztével illetve a lejátszás ismétlése.</p>
-<p>A következő szakasz a <span class="menu">Megjelenítési beállítások</span>.<br />
-Bejelölhető a <span class="menu">Hardveres gyorsítás használata ha elérhető</span>, ami lehetővé teszi a CPU terheltségének csökkentését, de csak akkor működik, ha egy videó ablak van megnyitva, illetve ha a grafikus kártya és a vezérlője támogatja azt.<br />
-Méretezéskor illetve teljes képernyős módban a <span class="menu">Filmek simított átméretezése</span>kor nagyon gyorsan frissül a kép a jobb minőség érdekében, míg ellenkező esetben a kép képpont-blokkokra eshet szét.<br />
-A <span class="menu">Nagyított vezérlők teljes képernyős módban</span> opció használata esetén jelentősen nagyobb vezérlőelemeket kapunk a videóhoz teljes képernyős módban.<br />
-A <span class="menu">Felirat mérete</span> és a <span class="menu">Felirat helye</span> is módosítható. Megjelenhet <span class="menu">A videó alján</span>, amikor mindig a kép előtt jelenik meg. Illetve <span class="menu">A képernyő alján</span>, amivel lehetőségünk van arra, hogy az ablakot átméretezve a film alatti fekete sávon jelenljen meg a szöveg.</p>
+<p>The first batch, <span class="menu">Play mode</span>, is pretty self-explaining.<br />
+Start playback automatically, close windows when finished or play clips in a loop.<br />
+From the pop-up menu you choose MediaPlayer's launch behavior. Should it resume playing where it left off last time: <span class="menu">always</span>, <span class="menu">never</span>, or <span class="menu">ask every time</span>.</p>
+<p>Next are different <span class="menu">View options</span>.<br />
+You can opt to <span class="menu">Use hardware overlay if available</span>, which cuts down CPU usage but only works for one video window and needs a supporting video card driver.<br />
+You can <span class="menu">Scale movies smoothly</span> (when not in overlay mode) which uses very fast filtering to smooth over otherwise blocky pixels when zooming video or watching in full-screen mode.<br />
+<span class="menu">Scale controls in full-screen mode</span> if you prefer slightly bigger controls, maybe because you watch the screen from a bit farther away when in full-screen mode.<br />
+Then there are settings for <span class="menu">Subtitle size</span> and <span class="menu">Subtitle placement</span>. They can be shown at the <span class="menu">Bottom of video</span>, which will always have them overlayed over the picture. Or <span class="menu">Bottom of screen</span>, which allows you to resize the window vertically and have the subtitles appear in the black bar at the bottom instead.</p>
 <p>Az utolsó beállítási lehetőség pedig a hangerőre vonatkozik, mikoris a lejátszó a háttérben van, tehát az ablak nem aktív. Ez lehet <span class="menu">Teljes hangerő</span>, <span class="menu">Alacsony hangerő</span> vagy <span class="menu">Némítva</span>.</p>
 
 <h2>Vezérlés billentyűzettel</h2>
@@ -136,7 +139,7 @@ A <span class="menu">Felirat mérete</span> és a <span class="menu">Felirat hel
 <div class="inner"><span>
  «  <a href="mail.html">Levelezés</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Programok</a> 
-::  <a href="midiplayer.html">Midilejátszó</a>  »
+::  <a href="midiplayer.html">MidiPlayer</a>  »
 </span></div>
 </div>
 

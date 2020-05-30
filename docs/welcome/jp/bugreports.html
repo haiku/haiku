@@ -26,7 +26,7 @@
 <body>
 
 <div id="banner">
-<div><span>ユーザーガイド</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -61,7 +61,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">このページの翻訳はまだ完全ではありません。完成するまでは、未完成の部分はオリジナルの英文を使用します。</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>インデックス</td></tr>
@@ -102,12 +101,12 @@
 	
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="app" name="app">アプリケーションのバグ</a></h2>
-<p>アプリケーションがクラッシュしたときは、レポートを保存するかコアファイルを書き込むかができ (どちらもデスクトップ上に保存されます)。それらはバグレポートに添付できます。または、<a href="../../userguide/jp/applications/debugger.html">デバッガー</a>を起動します。</p>
-<p>If it's not a crashing bug, you may get useful information when starting the application from Terminal. Some applications provide logging and other options when started with certain parameters; try <tt>-h</tt> or <tt>--help</tt> to see if that is the case. As example, see the different logging levels of <a href="../../userguide/jp/applications/haikudepot.html#logs">HaikuDepot</a>.</p>
+<p>アプリケーションがクラッシュしたときは、レポートを保存するかコアファイルを書き込むかを選べ (どちらもデスクトップ上に保存されます)、それらはバグレポートに添付できます。または、<a href="../../userguide/jp/applications/debugger.html">デバッガー</a>を起動できます。</p>
+<p>もしクラッシュしないバグならば、アプリケーションをターミナルから立ち上げると有益な情報が得られるかもしれません。いくつかのアプリケーションはログを提供します。また、特定のパラメーターと共に起動するとほかのオプションを提供します。もしそうなら、オプションを見るために <tt>-h</tt> または <tt>--help</tt> を試してみてください。例として、<a href="../../userguide/jp/applications/haikudepot.html#logs">HaikuDepot</a> の異なるログレベルを見てください。</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="server" name="server">サーバーのバグ</a></h2>
-<p>App server、registrar、input server のような重要なサーバーがクラッシュしたときはよくあるクラッシュアラートを見ることは無いでしょう。その代わりに、画面全体が白で塗りつぶされ、デバッガーがテキストモードで開始します。出力はスクリーンに直接出力されます。たぶん、マウスはまだ動かせでも デバッガーの出力を上書きするでしょう。アプリケーションも動いたままで、(たとえば、プロセスコントローラーや デスクバーの時計のように) それもデバッガーの画面上への出力を上書きします。<br />
+<p>App server、registrar、input server のような重要なサーバーがクラッシュしたときはよくあるクラッシュアラートを見ることは無いでしょう。その代わりに、画面全体が白く塗りつぶされ、デバッガーがテキストモードで開始します。出力はスクリーンに直接出力されます。たぶん、マウスはまだ動かせでも デバッガーの出力を上書きするでしょう。アプリケーションも動いたままで、(たとえば、プロセスコントローラーや デスクバーの時計のように) それもデバッガーの画面上への出力を上書きします。<br />
 すべては見にくく便利でないことを除けば、基本的にアプリケーションのバグと同様なものが適用できます。もっとも重要なバックトレースの取得 (<span class="cli">bt</span> コマンド) も、どこでもテキストのコピーができないのでデジタルカメラ等を用いて写真を撮影しないとならないでしょう。<br />
 実際にクラッシュしているものに応じて、デスクトップに <span class="cli">save-report</span> を使ってクラッシュレポートを保存するか、<span class="cli">write-core</span> で core file を保存してみてもよいです。それから電源ボタンを一度押して、手際よくシャットダウンしてみることもできます。電源ボタンが動作しない場合は、<span class="cli">shutdown</span> および <span class="cli">reboot</span> コマンドがあります。</p>
 
@@ -121,15 +120,15 @@
 <li><p>システムは正常に起動しません。起動中に再起動するか、起動中にどこかで止まるか (たとえば、ブートスクリーンでのいくつかのアイコンで) のどちらかかもしれません。後者の場合でも、<span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span> を押してみてください。</p></li>
 <li><p>システム全体または一部のハードウェアで正常な動作をしない。たとえば、動作がすごく遅い、エラーが発生する、完全に動作しない、などです。一部のハードウェアが動作しないならば、まず Haiku がそれをサポートするかどうかを確認してください (メーリングリストやフォーラムで聞いてみるなど)。</p></li>
 </ul>
-<p>最後のポイントだけは、ハードウェアに関係あることを示すように思えますが、すべての他の症状も同様に、ハードウェアのドライバーのバグが原因で発生することがありえることに注意してください。もしドライバーやハードウェアに疑いを持っているならば、そのハードウェアを取り外すか、無効化をしてどのように変わるかを確認してください。たとえば、Wifi が問題だと疑っているならば BIOS 設定を参照して Wifi を無効化できます。設定がない場合は、問題の原因である Wifi ドライバーを Haiku のインストールからブラックリストに入れる (<a href="../../../userguide/en/bootloader.html">ブートローダー</a>を参照ください) ことができます。</p>
+<p>最後のポイントだけは、ハードウェアに関係あることを示すように思えますが、すべての他の症状も同様に、ハードウェアのドライバーのバグが原因で発生することがありえることに注意してください。もしドライバーやハードウェアに疑いを持っているならば、そのハードウェアを取り外すか、無効化をしてどのように変わるかを確認してください。たとえば、Wifi が問題だと疑っているならば BIOS 設定を参照して Wifi を無効化できます。設定が無ければ、問題の原因である Wifi ドライバーを Haiku のインストールからブラックリストに入れられます (<a href="../../../userguide/en/bootloader.html">ブートローダー</a>を参照ください) 。</p>
 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="kdl" name="kdl">Kernel Debugging Land - KDL</a></h3>
-<p>システムが KDL に自動で入らなかった場合、<span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span> (通常、<span class="key">SysReq</span> は、<span class="key">Print</span> キーです) を押して意図的に入ることができます。<br />
-ここで注意することは、KDL ではキーボードが動作しないかもしれないことです。PS/2 キーボードは常に動作します。USB キーボードは、USB コントローラーのタイプ (UHCI/EHCI) 次第です。通常、キーボードはハフを介さず、直接 USB ポートに接続されるべきです。少なくとも一度は、キーボードショートカット経由で KDL に入った場合、状況次第でキーボードのみ動作するでしょう。現時点では、USB OHCI はサポートされていません。</p>
-<p>KDL 自体はシェルの一種です。システム情報を出力するコマンドを実行できますす。次のコマンドが役に立つでしょう:</p>
+<p>システムが KDL に自動で入らなかった場合、<span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span> (通常、<span class="key">SysReq</span> は、<span class="key">Print</span> キーです) を押して意図的に入れます。<br />
+ここで注意することは、KDL ではキーボードが動作しないかもしれないことです。PS/2 キーボードは常に動作します。USB キーボードは、USB コントローラーのタイプ (UHCI/EHCI) 次第です。通常、キーボードはハブを介さず、直接 USB ポートに接続されるべきです。少なくとも一度は、キーボードショートカット経由で KDL に入った場合、状況次第でキーボードのみ動作するでしょう。現時点では、USB OHCI はサポートされていません。</p>
+<p>KDL 自体はシェルの一種です。システム情報を出力するコマンドを実行できます。次のコマンドが役に立つでしょう:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="cli">bt</span> (別名 <span class="cli">sc</span>)</td><td> </td><td>バックトレース (別名 stack crawl) を出力する。システムが自ら KDL に入った場合、通常バックトレースは自動的に出力されます。それが起こらないか、その一部分がよく見えない(たとえば、スタックトレースが非常に長くて、回り込んでいる場合) なら、コマンドを入力してください。そうすると、画面を写真に撮ることがデベロッパーに情報を伝える唯一の方法となります。</td></tr>
+<tr><td><span class="cli">bt</span> (別名 <span class="cli">sc</span>)</td><td> </td><td>バックトレース (別名 stack crawl) を出力する。システムが自ら KDL に入った場合、通常バックトレースは自動的に出力されます。それが起こらないか、その一部分がよく見えない(たとえば、スタックトレースが非常に長くて、回り込んでいる場合) なら、コマンドを入力してください。そうすると、画面を撮影することがデベロッパーに情報を伝える唯一の方法となります。</td></tr>
 <tr><td><span class="cli">ints</span></td><td> </td><td>処理される / 処理されないハードウェア割り込みを表示。</td></tr>
 <tr><td class="onelinetop"><span class="cli">co</span> (または continue)</td><td> </td><td>カーネルデバッガーを離れ、可能ならばシステムの実行に戻る。</td></tr>
 <tr><td><span class="cli">reboot</span></td><td> </td><td>システムをすぐに再起動する。まだ保存されていないすべてのデータ、保存はしていてもまだディスクに書き込まれていないデータは失われる。</td></tr>
@@ -144,7 +143,7 @@
 syslog (system log の略称) はシステムに発生した有益な情報を含んでいます。それは、KDL セッションの出力を含んでいます。それをカーネル関連の Trac チケットに添付することは良いことです。syslog は <span class="path">/boot/system/var/log/syslog</span> に記録されます。ファイルの書き込みには動作しているシステムが必要であり、直近の出力が書き込まれず、カーネルの問題が起きた瞬間を記録していないかもしれません (おもに突然のリブートや続行不能な KDL のセッションで)。</p>
 <p>ブートローダーの <span class="menu">Debug menu</span> にある <span class="menu">Enable debug syslog</span> オプションは syslog を記録します。<span class="menu">Save syslog from previous session during boot</span> オプションがブートローダーオプションで有効な場合 (実際デフォルトです)、最新のセッションの syslog は、<span class="path">/boot/system/var/log/previous_syslog</span>  に見つかるでしょう。<br />
 ブートしても、previous_syslog が得られない場合は、起動するときに <span class="key">SHIFT</span> を押したままにしてブートローダーメニューに入る必要があります。<br />
-ブートローダーメニューにある <span class="menu">Debug menu</span> の中には <span class="menu">Display syslog from previous session</span> と <span class="menu">Save syslog from previous session</span> があります。前者は syslog をスクリーンに表示し、後者はディスクに保存します。現時点では FAT32 フォーマットのみサポートされていることに注意してください。USB メモリを使用する場合は、後から接続しても認識しないので 1 度再起動し、再度ブートローダーメニューに入る必要があります。注意: 誤ってほかのオペレーションシステムを実行しないようにしてください。syslog を失ってしまいます。</p>
+ブートローダーメニューにある <span class="menu">Debug menu</span> の中には <span class="menu">Display syslog from previous session</span> と <span class="menu">Save syslog from previous session</span> があります。前者は syslog をスクリーンに表示し、後者はディスクに保存します。現時点では FAT32 フォーマットのみサポートされていることに注意してください。USB メモリーを使用する場合は、後から接続しても認識しないので 1 度再起動し、再度ブートローダーメニューに入る必要があります。注意: 誤ってほかのオペレーションシステムを実行しないようにしてください。syslog を失ってしまいます。</p>
 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="onscreen" name="onscreen">画面上でのデバッグ</a></h3>

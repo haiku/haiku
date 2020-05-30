@@ -14,14 +14,14 @@
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Tracker Add-Ons</title>
+	<title>İzleyici Eklentileri</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>Kullanıcı kılavuzu</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -51,41 +51,40 @@
 </ul>
 <span>
  «  <a href="tracker.html">İzleyici</a> 
-::  <a href="contents.html" class="uplink">İçerik</a> 
-::  <a href="keyboard-shortcuts.html">Klavye kısayolları</a>  »
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="keyboard-shortcuts.html">Keyboard shortcuts</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">Bu sayfanın çevrilmesi henüz tamamlanmamıştır. Tamamlanana kadar henüz bitirilmeyen kısımlar İngilizce metni kullanır.</div>
 
-<h1>Tracker Add-Ons</h1>
+<h1>İzleyici Eklentileri</h1>
 
-<p>Applications can install add-ons so they can be invoked easily on a selection of files from Tracker. Only the add-ons that can handle a specific filetype are presented under <span class="menu">Add-Ons</span> from the context menu or the <span class="menu">File</span> menu of a Tracker window. Some add-ons don't necessarily need a file to work on and are thus always present.</p>
-<p>New Tracker add-ons that don't come as part of a regular .hpkg package, can be installed by copying them into their respective non-packaged folder (see topic <a href="filesystem-layout.html">Filesystem layout</a>):</p>
+<p>Uygulamalar kendileri eklenti yükleyebilirler, böylece İzleyici'den yapılan dosya seçimlerinden doğrudan çağrılabilirler. Yalnızca belirli bir dosya türü ile çalışan eklentiler sağ tık menüsünün <span class="menu">Eklentiler</span> bölümünden veya bir İzleyici penceresinin <span class="menu">Dosya</span> menüsünden çalıştırılabilir. Kimi eklentiler çalışmak için belirli bir dosya türüne gereksinim duymaz, dolayısıyla her zaman kullanılabilirler.</p>
+<p>Olağan bir .hpkg paketi ile birlikte gelmeyen eklentiler ilgili "non-packaged" klasörüne kopyalanarak çalıştırılabilirler (<a href="filesystem-layout.html">Dosya sistemi yerleşimi</a> konusuna bakın):</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path">/boot/system/non-packaged/add-ons/Tracker/</span></td><td>   </td><td> for add-ons available to every user.</td></tr>
-<tr><td><span class="path">/boot/home/config/non-packaged/add-ons/Tracker/</span></td><td>   </td><td> for add-ons only available to yourself.</td></tr>
+<tr><td><span class="path">/boot/system/non-packaged/add-ons/Tracker/</span></td><td>   </td><td>bütün kullanıcılar için kullanılabilir olan eklentiler</td></tr>
+<tr><td><span class="path">/boot/home/config/non-packaged/add-ons/Tracker/</span></td><td>   </td><td>yalnızca sizin kullanabileceğiniz eklentiler</td></tr>
 </table>
-<p>The file name of an add-on can be suffixed with a dash and capital letter, and is then available via keyboard shortcut. For example, <span class="app">Open Target Folder-O</span> opens with <span class="key">ALT</span> <span class="key">OPT</span> <span class="key">O</span>.<br />
-Of course, you have to take care of possible shortcut collisions when deciding on a shortcut. You can't have the same for different add-ons.</p>
+<p>Bir eklentinin adının sonuna bir harf eki getirilerek o eklenti bir klavye kısayolu ile çağrılabilir. Örneğin, <span class="app">Hedef Klasörü Aç-O</span>, <span class="key">ALT</span> <span class="key">OPT</span> <span class="key">O</span> klavye kısayolu ile ulaşılabilir.<br />
+Klavye kısayollarına karar verirken mevcut veya başka koyacağınız kısayolları da göz önünde bulundurun. Değişik eklentiler için aynı kısayolları kullanamazsınız.</p>
 
-<h2><a id="system-add-ons" name="system-add-ons">Haiku's Tracker Add-Ons</a></h2>
-<p>These Tracker Add-Ons come with every Haiku installation:</p>
+<h2><a id="system-add-ons" name="system-add-ons">Haiku'nun İzleyici Eklentileri</a></h2>
+<p>Aşağıdaki İzleyici eklentileri her Haiku yüklemesi ile birlikte gelir:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="4"> 
-	<tr><td class="onelinetop"><b>Background</b><i>-B</i></td>
-		<td valign="top">Opens the <a href="preferences/backgrounds.html">Background</a> preferences to change the color or image of the Desktop or any folder. Invoked on an image file the Background panel is launched with that image already loaded as a potential background.</td></tr>
-	<tr><td class="onelinetop"><b>DiskUsage</b><i>-I</i></td>
-		<td valign="top">Starts the <a href="applications/diskusage.html">DiskUsage</a> application with the according folder as basis.</td></tr>
+	<tr><td class="onelinetop"><b>Arka Planlar</b><i>-B</i></td>
+		<td valign="top">Masaüstü'nün veya herhangi bir klasörün arka planını değiştirmek ozone <a href="preferences/backgrounds.html">Arka Planlar</a> tercihler panelini açar. Eğer bir resim dosyasının üzerinde çalıştırılırsa Arka Planlar panelini o resim önden yüklenmiş olarak açar.</td></tr>
+	<tr><td class="onelinetop"><b>Disk Kullanımı</b><i>-I</i></td>
+		<td valign="top">Geçerli klasörü temel alarak <a href="applications/diskusage.html">Disk Kullanımı</a> uygulamasını açar.</td></tr>
 	<tr><td class="onelinetop"><b>FileType</b><i>-F</i></td>
-		<td valign="top">Invoked on a file, opens its specific <a href="filetypes.html">FileType</a> panel, otherwise the general FileTypes preferences are launched.</td></tr>
-	<tr><td class="onelinetop"><b>Open Target Folder</b><i>-O</i></td>
-		<td valign="top">Can only be used on a linked file and opens the folder that file lives in.</td></tr>
+		<td valign="top">Bir dosya üzerinde çalıştırılırsa o dosya türünün <a href="filetypes.html">Dosya Türleri</a> panelini açar, başka biçimde genel Dosya Türleri tercihleri çalıştırılır.</td></tr>
+	<tr><td class="onelinetop"><b>Hedef Klasörü Aç</b><i>-O</i></td>
+		<td valign="top">Yalnızca bağlanmış bir dosyada çalışır ve o dosyanın özgün konumunu açar.</td></tr>
 	<tr><td class="onelinetop"><b>TextSearch</b><i>-G</i></td>
-		<td valign="top">Starts the <a href="applications/textsearch.html">TextSearch</a> application to look for a string in the selected folder (and its subfolders).</td></tr>
+		<td valign="top">Seçili klasörde (ve altklasörlerinde) bir diziyi aramak üzere <a href="applications/textsearch.html">TextSearch</a> uygulamasını açar.</td></tr>
 	<tr><td class="onelinetop"><b>ZipOMatic</b><i>-Z</i></td>
-		<td valign="top">A selection of files will be added to a zip archive, invoked without a selection opens a panel to create an archive via drag &amp; drop.</td></tr>
+		<td valign="top">Seçilen dosyaları bir zip arşivine ekler, bir seçim olmadan çalıştırılırsa boş bir arşiv oluşturup sürükle-bırak arabirimini açar.</td></tr>
 </table>
 
 </div>
@@ -94,8 +93,8 @@ Of course, you have to take care of possible shortcut collisions when deciding o
 <div class="nav">
 <div class="inner"><span>
  «  <a href="tracker.html">İzleyici</a> 
-::  <a href="contents.html" class="uplink">İçerik</a> 
-::  <a href="keyboard-shortcuts.html">Klavye kısayolları</a>  »
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="keyboard-shortcuts.html">Keyboard shortcuts</a>  »
 </span></div>
 </div>
 

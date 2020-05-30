@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2018, Haiku. All rights reserved.
+ * Copyright 2010-2020, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -27,7 +27,7 @@
 <body>
 
 <div id="banner">
-<div><span>Руководство пользователя</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -64,7 +64,7 @@
 
 <div id="content">
 <div>
-<div class="box-info">Перевод этой страницы еще не завершен. Пока это не произойдет, незавершенные части будут на английском.</div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Список всех приложений для командной строки</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -90,6 +90,7 @@
 <tr><td><tt>bash</tt></td><td> </td><td>Оболочка bash</td></tr>
 <tr><td><tt>bc</tt></td><td> </td><td>Арифметический язык-калькулятор.</td></tr>
 <tr><td><tt>beep</tt></td><td> </td><td>Воспроизводит системный сигнал.</td></tr>
+<tr><td><tt>bfsinfo</tt></td><td> </td><td>Analyses the filesystem.</td></tr>
 <tr><td><tt>bunzip2</tt></td><td> </td><td>См. <tt>bzip2</tt>.</td></tr>
 <tr><td><tt>bzip2</tt></td><td> </td><td>Программа для сжатия файлов.</td></tr>
 <tr><td><tt>c++</tt></td><td> </td><td>Компилятор C++</td></tr>
@@ -105,30 +106,31 @@
 <tr><td><tt>chroot</tt></td><td> </td><td>Выполняет команду с указанным корневым каталогом.</td></tr>
 <tr><td><tt>cksum</tt></td><td> </td><td>Выводит контрольную сумму CRC и количество байтов для указанных файлов.</td></tr>
 <tr><td><tt>clear</tt></td><td> </td><td>Очищает окно терминала.</td></tr>
+<tr><td><tt>clipboard</tt></td><td> </td><td>Manipulates the system clipboard.</td></tr>
 <tr><td><tt>cmp</tt></td><td> </td><td>Производит побайтовое сравнение файлов.</td></tr>
-<tr><td><tt>collectcatkeys </tt></td><td> </td><td>[Осталась после перемещения locale-kit.]</td></tr>
+<tr><td><tt>collectcatkeys </tt></td><td> </td><td>Collects translatable strings to create catkeys.</td></tr>
 <tr><td><tt>comm</tt></td><td> </td><td>Производит построчное сравнение файлов. </td></tr>
 <tr><td><tt>consoled</tt></td><td> </td><td>Консольный демон</td></tr>
 <tr><td><tt>copyattr</tt></td><td> </td><td>Копирует все или некоторый набор атрибутов из одного или нескольких файлов в другой или новый файл. <a href="cli-apps.html">(специфично для Haiku)</a></td></tr>
 <tr><td><tt>cp</tt></td><td> </td><td>Копирует файлы и каталоги.</td></tr>
 <tr><td><tt>csplit</tt></td><td> </td><td>Разбивает файл на части, разделенные gпо указанному шаблону.</td></tr>
-<tr><td><tt>ctags</tt></td><td> </td><td>Генерирует индексный файл для множества языковых объектов, найденных в файлах.</td></tr>
 <tr><td><tt>cut</tt></td><td> </td><td>Выводит колонку из каждой строки файла.</td></tr>
 <tr><td><tt>date</tt></td><td> </td><td>Выводит текущие дату и время.</td></tr>
 <tr><td><tt>dc</tt></td><td> </td><td>Пакет для арифметических вычислений.</td></tr>
 <tr><td><tt>dd</tt></td><td> </td><td>Копирует двоичные данные, производит конвертацию и ворматирование указанные в операндах.</td></tr>
 <tr><td><tt>desklink</tt></td><td> </td><td>Добавляет элемент в Deskbar. <a href="cli-apps.html">(специфичное для Haiku)</a></td></tr>
-<tr><td><tt>diskimage</tt></td><td> </td><td>Регистрирует файл как монтируемое дисковое устройство. <a href="cli-apps.html">(специфично для Haiku)</a></td></tr>
 <tr><td><tt>df</tt></td><td> </td><td>Выводит объем использованного и свободного пространства подключенных томов.</td></tr>
 <tr><td><tt>diff</tt></td><td> </td><td>Сравнивает файлы построчно.</td></tr>
 <tr><td><tt>diff3</tt></td><td> </td><td>Построчно сравнивает три файла.</td></tr>
 <tr><td><tt>dircolors</tt></td><td> </td><td>Настройка цветов для <tt>ls</tt>. </td></tr>
 <tr><td><tt>dirname</tt></td><td> </td><td>Получает имя_файла из строки /путь/до/имя_файла</td></tr>
+<tr><td><tt>diskimage</tt></td><td> </td><td>Регистрирует файл как монтируемое дисковое устройство. <a href="cli-apps.html">(специфично для Haiku)</a></td></tr>
+<tr><td><tt>dpms</tt></td><td> </td><td>Sets the display power management.</td></tr>
 <tr><td><tt>draggers</tt></td><td> </td><td>Выводит/устанавливает состояние отображения репликантов.</td></tr>
 <tr><td><tt>driveinfo</tt></td><td> </td><td>Выводит информацию об аппаратных компонентах.</td></tr>
 <tr><td><tt>dstcheck</tt></td><td> </td><td>Выводит окно с сообщением о переходе с летнего / на летнее время.</td></tr>
 <tr><td><tt>du</tt></td><td> </td><td>Обощает использование дискового пространства каждым файлом, рекурсивно для каталогов.</td></tr>
-<tr><td><tt>dumpcatalog</tt></td><td> </td><td>[Осталось после перемещения locale-kit.] </td></tr>
+<tr><td><tt>dumpcatalog</tt></td><td> </td><td>Shows the contents of catalog files.</td></tr>
 <tr><td><tt>echo</tt></td><td> </td><td>Выводит строку текста.</td></tr>
 <tr><td><tt>egrep</tt></td><td> </td><td>См. <tt>grep</tt>.</td></tr>
 <tr><td><tt>eject</tt></td><td> </td><td>Извлекает переносной носитель.</td></tr>
@@ -145,12 +147,11 @@
 <tr><td><tt>filepanel</tt></td><td> </td><td>Отображает панель загрузки/сохранения файла. <a href="cli-apps.html">(специфично для Haiku)</a></td></tr>
 <tr><td><tt>find</tt></td><td> </td><td>Выполняет поиск файлов в структуре каталогов.</td></tr>
 <tr><td><tt>finddir</tt></td><td> </td><td>Выполняет поиск специализированных каталогов, определенных на уровне системы.</td></tr>
+<tr><td><tt>findpaths</tt></td><td> </td><td>Prints all paths for system defined directory constants.</td></tr>
 <tr><td><tt>fmt</tt></td><td> </td><td>Переформатирует каждый абзац файла.</td></tr>
 <tr><td><tt>fold</tt></td><td> </td><td>Разбивает строки файла на строки требуемой длины.</td></tr>
 <tr><td><tt>fortune</tt></td><td> </td><td>Выводит случайную, и, надеюсь, интересную пословицу.</td></tr>
-<tr><td><tt>freetype-config</tt></td><td> </td><td>Выводит информацию о параметрах компилляции и линковки FreeType.</td></tr>
 <tr><td><tt>fstrim</tt></td><td> </td><td>Посылает команду TRIM на диск SSD.</td></tr>
-<tr><td><tt>ftp</tt></td><td> </td><td>FTP клиент</td></tr>
 <tr><td><tt>ftpd</tt></td><td> </td><td>FTP сервер</td></tr>
 <tr><td><tt>funzip</tt></td><td> </td><td>Распаковывает первый элемент архива в стандартный вывод.</td></tr>
 <tr><td><tt>fwcontrol</tt></td><td> </td><td>Программа управления FireWire</td></tr>
@@ -182,7 +183,7 @@
 <tr><td><tt>lessecho</tt></td><td> </td><td>Выводит свои аргументы и расширяет метасимволы, такие как * и? в именах файлов.</td></tr>
 <tr><td><tt>lesskey</tt></td><td> </td><td>Назначает клавишу для вызова less.</td></tr>
 <tr><td><tt>link</tt></td><td> </td><td>Создает ссылку на файл.</td></tr>
-<tr><td><tt>linkcatkeys</tt></td><td> </td><td>[Осталось после перемещения locale-kit.] </td></tr>
+<tr><td><tt>linkcatkeys</tt></td><td> </td><td>Creates catalogs from catkeys. </td></tr>
 <tr><td><tt>listarea</tt></td><td> </td><td>Выводит список областей памяти для всех работающих команд.</td></tr>
 <tr><td><tt>listattr</tt></td><td> </td><td>Выводит список атрибутов файла. <a href="cli-apps.html">(специфично для Haiku)</a></td></tr>
 <tr><td><tt>listdev</tt></td><td> </td><td>Выбодит список всех аппаратных устройств.</td></tr>
@@ -236,7 +237,6 @@
 <tr><td><tt>pathchk</tt></td><td> </td><td>Диагностирует неверные или непереносимые имена файлов.</td></tr>
 <tr><td><tt>pc</tt></td><td> </td><td>Калькулятор программиста</td></tr>
 <tr><td><tt>ping</tt></td><td> </td><td>Отправляет ICMP-эхо-запрос сетевому хосту.</td></tr>
-<tr><td><tt>pkg-config</tt></td><td> </td><td>Анализирует и конфигурирует пакет Haiku.</td></tr>
 <tr><td><tt>pkgman</tt></td><td> </td><td>Управляет пакетами и репозиториями.</td></tr>
 <tr><td><tt>play</tt></td><td> </td><td>Воспроизводит трек с CD.</td></tr>
 <tr><td><tt>pr</tt></td><td> </td><td>Разбивает на страници или колонки файл для печати.</td></tr>
@@ -271,6 +271,7 @@
 <tr><td><tt>settype</tt></td><td> </td><td>Устанавливает MIME-тип, сигнатуру и предпочитаемое приложение для файла.</td></tr>
 <tr><td><tt>setversion</tt></td><td> </td><td>Показывает версию файла.</td></tr>
 <tr><td><tt>setvolume</tt></td><td> </td><td>Устанавливает уровень громкости системы.</td></tr>
+<tr><td><tt>sftp</tt></td><td> </td><td>FTP клиент</td></tr>
 <tr><td><tt>sh</tt></td><td> </td><td>См. <tt>bash</tt>. </td></tr>
 <tr><td><tt>sha1sum</tt></td><td> </td><td>Отображает или проверяет контрольные суммы SHA1.</td></tr>
 <tr><td><tt>shar</tt></td><td> </td><td>Создает архивы Unix.</td></tr>

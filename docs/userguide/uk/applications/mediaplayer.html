@@ -24,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>Настанова користувачеві</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -55,12 +55,13 @@
 <span>
  «  <a href="mail.html">Пошта (Mail)</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Applications (Програми)</a> 
-::  <a href="midiplayer.html">Miдiпрогравач (MidiPlayer)</a>  »
+::  <a href="midiplayer.html">MidiPlayer</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h2><img src="../../images/apps-images/mediaplayer-icon_64.png" alt="mediaplayer-icon_64.png" width="64" height="64" />Медіапрогравач (MediaPlayer)</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -69,7 +70,7 @@
 <tr><td>Налаштування:</td><td></td><td><span class="path">~/config/settings/MediaPlayer</span></td></tr>
 </table>
 <p><br /></p>
-<p>Медіапрогравач (MediaPlayer) є типовим програвачем для відтворення всіх аудіо та відео файлів. Завдячуємо цьому бекенду <a href="http://www.ffmpeg.org/">ffmpeg</a> що підтримує безліч широко використовуваних форматів. Його простий інтерфейс має всі потрібні елементи управління які Ви очікуєте:</p>
+<p>MediaPlayer is the default player for all audio and video files. Thanks to its <a href="http://www.ffmpeg.org/">ffmpeg</a> backend, a plethora of widely used formats are supported. Its simple interface has all the controls you'd expect:</p>
 <img src="../images/apps-images/mediaplayer.png" alt="mediaplayer.png" />
 <p>Повзунок індикатора виконання дозволяє швидко ковзати для зміни положення, розташування на ньому курсора  мишки  показує поточний і час кліпу, що залишився.  Натискання на дисплей часу праворуч від нього перемикає відображення між тривалістю, поточним часом та тим що залишився. <br />
 Нижче ви знайдете стандартні елементи управління: перехід до попереднього запису, відтворення / пауза, зупинка та перехід до наступного треку. Потім йде регулятор гучності (натискання символу динаміка вмикає приглушення) та індикатор рівня сигналу.</p>
@@ -99,12 +100,14 @@ MyMovie.Français.srt</pre>
 <h2>Налаштування</h2>
 <p>Існує кілька параметрів для точнішого налаштування поведінки Медіапрогравача:</p>
 <img src="../images/apps-images/mediaplayer-settings.png" alt="mediaplayer-settings.png" />
-<p>Перший пакет <span class="menu">Режим відтворення (Play mode)</span> говорить сам за себе. Запускати відтворення автоматично, закривати вікно при завершенні або закільцювати відтворення кліпів.</p>
-<p>Далі ідуть <span class="menu">Параметри відтворення (View options)</span>.<br />
-Ви можете вибрати режим <span class="menu">Використання апаратного прискорення при доступності (Use hardware overlay if available)</span>, що зменшує навантаження на процесор але працює тільки для одного вікна та потребує підтримки драйвера відеокарти.<br />
-Ви можете вибрати режим  <span class="menu">Масштабувати плавно (Scale movies smoothly)</span> (коли Ви тільки не в оверлеї) для деякого зглажування блоків пікселів при масштабуванні відео або перегляді в повноекранному режимі.<br />
-<span class="menu">Маштабувати органи керування в повноекранному режимі (Scale controls in full-screen mode)</span> якщо ви бажаєте щоб вони були трохи більші можливо тому що перегляд ведеться з дальшої відстані коли Ви в повноекранному режимі.<br />
-Тоді є налаштування <span class="menu">Розмір субтитрів (Subtitle size)</span> та <span class="menu">Розташування субтитрів (Subtitle placement</span>. Вони можуть бути показані <span class="menu">Внизу відео (Bottom of video)</span>, накладанням на зображення. Або <span class="menu">Внизу вікна (Bottom of window)</span> шляхом зменшення його розміру по вертикалі та відображення субтитрів на чорній смузі внизу.</p>
+<p>The first batch, <span class="menu">Play mode</span>, is pretty self-explaining.<br />
+Start playback automatically, close windows when finished or play clips in a loop.<br />
+From the pop-up menu you choose MediaPlayer's launch behavior. Should it resume playing where it left off last time: <span class="menu">always</span>, <span class="menu">never</span>, or <span class="menu">ask every time</span>.</p>
+<p>Next are different <span class="menu">View options</span>.<br />
+You can opt to <span class="menu">Use hardware overlay if available</span>, which cuts down CPU usage but only works for one video window and needs a supporting video card driver.<br />
+You can <span class="menu">Scale movies smoothly</span> (when not in overlay mode) which uses very fast filtering to smooth over otherwise blocky pixels when zooming video or watching in full-screen mode.<br />
+<span class="menu">Scale controls in full-screen mode</span> if you prefer slightly bigger controls, maybe because you watch the screen from a bit farther away when in full-screen mode.<br />
+Then there are settings for <span class="menu">Subtitle size</span> and <span class="menu">Subtitle placement</span>. They can be shown at the <span class="menu">Bottom of video</span>, which will always have them overlayed over the picture. Or <span class="menu">Bottom of screen</span>, which allows you to resize the window vertically and have the subtitles appear in the black bar at the bottom instead.</p>
 <p>Останнє налаштування визначає гучність кліпів чиї вікна зараз неактивні. Ви можете зробити їх крикливими при <span class="menu">Повній гучності (Full volume</span>, менш виразними при  <span class="menu">Низькому рівні (Low volume)</span> або заткнути при <span class="menu">Приглушенні (Muted)</span>.</p>
 
 <h2>Керування з клавіатури</h2>
@@ -138,7 +141,7 @@ MyMovie.Français.srt</pre>
 <div class="inner"><span>
  «  <a href="mail.html">Пошта (Mail)</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Applications (Програми)</a> 
-::  <a href="midiplayer.html">Miдiпрогравач (MidiPlayer)</a>  »
+::  <a href="midiplayer.html">MidiPlayer</a>  »
 </span></div>
 </div>
 

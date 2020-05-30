@@ -24,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>ユーザーガイド</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -53,15 +53,14 @@
 <li><a href="../../uk/preferences/keymap.html">Українська</a></li>
 </ul>
 <span>
- «  <a href="keyboard.html">キーボード</a> 
+ «  <a href="filetypes.html">ファイルタイプ</a> 
 ::  <a href="../preferences.html" class="uplink">Preferences (プレファレンス)</a> 
-::  <a href="locale.html">ロケール</a>  »
+::  <a href="input.html">入力機器</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">このページの翻訳はまだ完全ではありません。完成するまでは、未完成の部分はオリジナルの英文を使用します。</div>
 
 <h2><img src="../../images/prefs-images/keymap-icon_64.png" alt="keymap-icon_64.png" width="64" height="64" />キーマップ (Keymap)</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
@@ -81,16 +80,16 @@
 <tr><td><span class="menu">デッドキーの選択 (Select Dead Keys)</span></td><td> </td><td>上で触れた青いキーの設定用です。</td></tr>
 <tr><td class="onelinetop"><span class="menu">ショートカットキーのスイッチ (Switch Shortcut Key...)</span></td><td> </td><td>ショートカットキーを <span class="key">CONTROL</span> (普通 <span class="key">CTRL</span>) を用いる Windows / Linux モードで利用するか、<span class="key">COMMAND</span> (普通 <span class="key">ALT</span>) を用いる Haiku モードで利用するかを切り替えます。</td></tr>
 </table>
-<p>左の一覧はシステムによって用意された設定済みキーマップで、利用可能なら、その下にユーザー定義のキーマップが列挙されます。キーボード画面でキーマップを変更できます。キーを別のキーにドラッグ＆ドロップするとキーの交換になります。</p>
-<p>You can also create an individual mapping by drag &amp; dropping a character from another app onto the key. For example, you could extend your regular keymap with often used currency symbols. Just click on the <span class="key">CONTROL</span> key and drag &amp; drop the pound symbol from CharacterMap onto the 'P' key to get a ₤ when you press <span class="key">CTRL</span> <span class="key">P</span>.
+<p>左の一覧はシステムで用意された設定済みキーマップで、利用可能なら、その下にユーザー定義のキーマップが列挙されます。キーボード画面でキーマップを変更できます。キーを別のキーにドラッグ＆ドロップするとキーの交換になります。</p>
+<p>同様に個人的なキーマップも、ほかのアプリから文字をキーにドラッグ＆ドロップすることで作成できます。例えば、いつも使用しているキーマップをよく使う通貨文字で拡張できます。<span class="key">CONTROL</span> をクリックして、文字表 (CharacterMap) からポンド記号を 'P' キーにドラッグ＆ドロップするだけで、<span class="key">CTRL</span> <span class="key">P</span>を押した時に、 ₤ が得られます。
 <br />
-By right-clicking a normal key, the context menu offers to <span class="menu">Remove</span> its mapping. Modifier keys can have alternative mappings, like using <span class="key">CAPS LOCK</span> as <span class="key">CTRL</span> key:</p>
+標準キーを右クリックすると、その割当を <span class="menu">削除 (Remove)</span> するコンテキストメニューが表示されます。 修飾キーは、<span class="key">CAPS LOCK</span> を <span class="key">CTRL</span> キーとして使うような別の割当を設定できます:</p>
 <img src="../images/prefs-images/keymap-context.png" alt="keymap-context.png" />
-<p>Alternatively to this or drag &amp; dropping of keys, there's the menu <span class="menu">File | Set modifier keys...</span> that opens this window:</p>
+<p>これや、キーのドラッグ＆ドロップの代わりに、次のウィンドウを開く<span class="menu">ファイル | 修飾キーを設定… (File | Set modifier keys...)</span> メニューがあります:</p>
 <img src="../images/prefs-images/keymap-modifiers.png" alt="keymap-modifiers.png" />
 <p>ここでは、キーをそれぞれの役割へ割り当てること、またはキーの役割を完全に無効にすることができます。同じキーに違う役割を割り当てることさえできますが、それは大体の場合、良い考えではありません。また、その場合、ポップアップメニュー横の小さな ! で警告されます。 <br />
 <span class="button">修飾キーを設定 (Set modifier keys)</span> ボタンを押すと、変更を適用して、ウィンドウを閉じます。</p>
-<p>変更を終えたら、その結果を、<span class="menu">ファイル | 名前をつけて保存… (File | Save as ...)</span> メニューから保存できます。変更したキーマップは <span class="path">~/config/settings/Keymap/</span> に保存されている場合のみユーザー定義の一覧に表示されます。そうでなければ、<span class="menu">ファイル | 開く… (File | Open...) </span>から手動で読み込む必要があります。
+<p>変更後、その結果を、<span class="menu">ファイル | 名前をつけて保存… (File | Save as ...)</span> メニューから保存できます。変更したキーマップは <span class="path">~/config/settings/Keymap/</span> に保存されている場合のみユーザー定義の一覧に表示されます。そうでなければ、<span class="menu">ファイル | 開く… (File | Open...) </span>から手動で読み込む必要があります。
 
 </p>
 <p>キーマップパネルと物理キーボードをより一致させるために、<span class="menu">Layout</span> メニューからいくつかの設定が利用できます。</p>
@@ -100,13 +99,13 @@ By right-clicking a normal key, the context menu offers to <span class="menu">Re
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="advanced-keymapping" name="advanced-keymapping">高度なキーマップの操作</a></h2>
-<p>キーマップをカスタマイズする方法は、キーマップ設定パネル以外にもあります。多くの 16 進値を含んだテキストファイルを編集する必要があるので、一見複雑で面倒に見えますが、扱うのはそれほど不可能なことではありません。</p>
+<p>キーマップをカスタマイズする方法は、キーマップ設定パネル以外にもあります。多くの 16 進値を含んだテキストファイルを編集する必要があるので、一見複雑で面倒に見えますが、理解するのはそれほど不可能なことではありません。</p>
 <p>ターミナルに次のコマンドを入力すれば、現在のキーマップをダンプできます: </p>
 <pre class="terminal">keymap -d &gt; MyKeymap</pre>
 <p>生成されたテキストファイルはテキストエディターで開けます。エディターで等幅フォントを使っていることをよく確認してください。そうでなければいつまでも内容を理解できないでしょう。<br />
 ファイルの冒頭に、16 進数と対応するキーの凡例が用意されています。その下にそれぞれの値の実際の割り当てが記述されています。キーマップ設定パネルで行えるすべてのカスタマイズに加え、いくつかの設定が可能です。キーボードに特別なキーがある場合は、それらを有効にできます。普通のキーとして使うか、あるいはオプションキーやコントロールキーとして使うことができますが、たとえばマルチメディアキーを音量アップ/ダウンやアプリケーションの起動に割り当てることはできません。これにはたとえば、<a href="shortcuts.html">キーボードショートカット
 (Shortcuts)</a> プリファレンスを使用します。</p>
-<p>設定を終えたら、ファイルを保存して、次のコマンドでシステムに変更したキーマップを読み込ませます。</p>
+<p>設定を終えたら、ファイルを保存して、次のコマンドで変更したキーマップをシステムに読み込ませます。</p>
 <pre class="terminal">keymap -s &lt; MyKeymap</pre>
 <p>このキーマップをキーマップパネルにインポートする場合は、まずファイルをバイナリ形式にコンパイルする必要があります: </p>
 <pre class="terminal">keymap -c &lt; MyKeymap</pre>
@@ -393,9 +392,9 @@ TildeTab = Normal Shift Option Option-Shift CapsLock CapsLock-Shift CapsLock-Opt
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="keyboard.html">キーボード</a> 
+ «  <a href="filetypes.html">ファイルタイプ</a> 
 ::  <a href="../preferences.html" class="uplink">Preferences (プレファレンス)</a> 
-::  <a href="locale.html">ロケール</a>  »
+::  <a href="input.html">入力機器</a>  »
 </span></div>
 </div>
 

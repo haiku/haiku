@@ -25,7 +25,7 @@
 <body>
 
 <div id="banner">
-<div><span>ユーザーガイド</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -55,7 +55,7 @@
 </ul>
 <span>
  «  <a href="filetypes.html">ファイルタイプ</a> 
-::  <a href="contents.html" class="uplink">目次</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
 ::  <a href="index.html">インデックス</a>  »
 </span></div>
 </div>
@@ -66,8 +66,8 @@
 <h1>属性</h1>
 
 <p>属性 (Attribute) とは、ファイルに属しているが、その一部ではないデータフィールドです。たとえば、属性はファイルサイズの計算には含まれませんが、ファイル自体に触れることなくコピーまたは変更ができます。システムはこれら属性をファイルサイズやファイルタイプ、ファイルの最終変更日などを保存するのに使用します。この仕組みはほかのオペレーティングシステムやそのファイルシステムと似ています。</p>
-<p>ほかのオペレーティングシステムとの違いは、任意のファイルに任意の種類の属性を追加できること、および、Tracker ウィンドウ中でその属性の表示または編集ができることです。必要なことはファイルタイプに追加する属性の種類 (文字列や整数値、時刻など) を定義し、属性に名前と説明を付けることだけです。</p>
-<p>ファイルそのものは中身がある必要さえまったくありません。たとえば、次の People ファイルを見てください。</p>
+<p>ほかのオペレーティングシステムとの違いは、任意のファイルに任意の種類の属性を追加できること、および、Tracker ウィンドウ中でその属性の表示 / 編集ができることです。必要なことはファイルタイプに追加する属性の型 (文字列や整数値、時刻など) を定義し、名前と説明を付けることだけです。</p>
+<p>ファイルそのものは中身がある必要さえありません。たとえば、次の People ファイルを見てください。</p>
 <img src="images/attributes-images/people.png" alt="people.png" />
 <br />
 <p>見てのとおり、これらはすべて属性が付与されたサイズ 0 のファイルです。Tracker ウィンドウの右側で、"John Nox" のメール属性を編集中です。</p>
@@ -79,7 +79,7 @@
 <p>属性はデータベースやスプレッドシートと非常によく似た形で表示されます。Tracker を使って、どの属性 (列) を表示するのかの選択や、属性にしたがってファイルリストの順番 (行) の並べ替えができます。</p>
 <p>Tracker で属性を操作するには、Tracker ウィンドウを開いて<span class="menu">属性 (Attributes) </span>メニューをクリックし、表示する属性を選択します。あるいは単純に列見出しを右クリックし、コンテキストメニューで該当する項目をマークします。また、列見出しをドラッグ＆ドロップするだけで、列を再配置できます。列をウィンドウ外に移動させれば、不要な列をすばやく取り除けます。</p>
 <p>列見出し中の 属性間の線をダブルクリックすると、列幅が自動的に適切なサイズに調整されます。</p>
-<p>列見出しをクリックすると、並び順が昇順から降順へ切り替わります。<span class="key">SHIFT</span> を押しながら列見出しをクリックすれば、2 番目の並び順を決められます。たとえば、1 番目の並び順を会社名、2 番目をコンタクト名にして People ファイルを並べ替えられます。例として上のスクリーンショットを見てください。2 番目の並び順は、列見出しすぐそばの、1 番目の並び順よりも明るい色の目印でマークされています。</p>
+<p>列見出しをクリックすると、並び順が昇順から降順へ切り替わります。<span class="key">SHIFT</span> を押しながら列見出しをクリックすれば、2 番目の並び順を決められます。たとえば、1 番目の並び順を会社名、2 番目を連絡先にして People ファイルを並べ替えられます。例として上のスクリーンショットを見てください。2 番目の並び順は、列見出しすぐそばの、1 番目の並び順よりも明るい色の目印でマークされています。</p>
 <p>属性の編集はファイルのリネームと同じぐらい簡単です: 項目をクリックするか、<span class="key">ALT</span> <span class="key">E</span> を押します。属性間の移動は <span class="key">TAB</span> および <span class="key">SHIFT</span> <span class="key">TAB</span> で行います。変更を適用せずに編集モードを抜けるには <span class="key">ESC</span> を押します。</p>
 
 <h2>
@@ -89,7 +89,7 @@
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="listattr" name="listattr">listattr</a></h3>
-<p><span class="cli">listattr</span> はファイルの属性を一覧表示します。属性の内容については表示しません。</p>
+<p><span class="cli">listattr</span> はファイルの属性を一覧表示します。属性の内容は表示しません。</p>
 <pre>使い方: listattr 'filename' ['filename' ...]</pre>
 <p>上のスクリーンショットの例です。
 </p>
@@ -118,10 +118,10 @@ MIME String         21  "BEOS:TYPE"
     Raw Data         20  "_trk/pinfo_le"
  
 131 bytes total in attributes.</pre>
-<p>コンタクト情報を保持しているすべての "<tt>META:*</tt>" 属性に加えて、システムによって管理されている次の 2 つの属性が存在します。</p>
+<p>コンタクト情報を保持しているすべての "<tt>META:*</tt>" 属性に加えて、システムで管理されている次の 2 つの属性が存在します。</p>
 <ul>
 <li><p><tt>BEOS:TYPE</tt> は <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> 文字列としてファイルタイプを保持しています。この例では "<tt>application/x-person</tt>" です。この属性により、デフォルトのアイコンやファイルをダブルクリックしたときなどにそのファイルを開くアプリケーションが決まります。</p></li>
-<li><p>"<tt>_trk/pinfo_le</tt>" は Tracker がファイルのアイコンの位置を記録するために使用する属性です。</p></li></ul>
+<li><p>"<tt>_trk/pinfo_le</tt>" は Tracker がファイルのアイコン位置を記録するために使用する属性です。</p></li></ul>
 <div class="box-info">"Clara" のうしろのバックスラッシュに関する補足です。ターミナルでは、<tt>'"*\\$?!</tt> 等の特別な文字を「エスケープ」する必要があります。"Clara" と "Botters" の間のスペースもエスケープする必要のある文字の 1 つです。したがってこの例のバックスラッシュは、実はスペースの直前にあるのであり、"Clara" のうしろにあるのではありません。</div>
 
 <h3>
@@ -175,7 +175,7 @@ Clara Botters : string : Whelton</pre>
 <div class="nav">
 <div class="inner"><span>
  «  <a href="filetypes.html">ファイルタイプ</a> 
-::  <a href="contents.html" class="uplink">目次</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
 ::  <a href="index.html">インデックス</a>  »
 </span></div>
 </div>

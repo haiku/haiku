@@ -9,19 +9,21 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Fabio Tomat
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Workshop: Wireless networking</title>
+	<title>Laboratori: rêts cence fîi</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Vuide utent</span></div>
 </div>
 
 <div class="nav">
@@ -59,74 +61,71 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Tabele</td></tr>
 <tr class="index"><td>
-	<a href="#gui">Joining a wireless network</a><br />
-	<a href="#commandline">Joining from the command line</a><br />
-	<a href="#firmware">Getting supported hardware to work</a><br />
-	<a href="#tips">Tips</a>
-</td></tr>
+	<a href="#gui">Tacâsi a une rêt cence fîi</a><br />
+	<a href="#commandline">Tacâsi de rie di comant</a><br />
+	<a href="#firmware">Fâ funzionâ l'hardware supuartât</a><br /></td></tr>
 </table>
 
-<h1>Workshop: Wireless networking</h1>
+<h1>Laboratori: rêts cence fîi</h1>
 
-<p>Getting the networking to run is essential in today's need for permanent internet connection. As keeping up to date with all the different and ever changing hardware and drivers is quite impossible for a small project, Haiku relies on a <a href="http://www.freebsd.org">FreeBSD</a> compatibility layer for its networking drivers.<br />
-This ensures a massive amount of supported hardware, though probably not 100% of what's out there. See <a href="http://www.freebsd.org/releases/12.0R/hardware.html#wlan">FreeBSD 12.0's release hardware notes</a> for a list of supported models.</p>
-<div class="box-info">Currently only PCI, PCI-X, PCI-Express, Mini PCI, and Mini PCI-Express devices are expected to work.<br />
-PCMCIA, CardBus, ExpressCard, USB and ISA devices still need more work to become functional.</div>
+<p>Vê une rêt che e ledi al è essenziâl in dì di vuê, cu la necessitât di vê une conession permanente cun internet. Stant che tignîsi inzornâts cun ducj i diviers hardware e driver, che a son ancje in continue evoluzion, al è impussibil par un piçul progjet, pai siei driver di rêt Haiku al fâs afidament suntun strât di compatibilitât cun <a href="http://www.freebsd.org">FreeBSD</a>.<br />
+Chest al sigure une grande cuantitât di hardware supuartât, ancje se magari no il 100% di ce che al è in cumierç. Viôt lis <a href="http://www.freebsd.org/releases/12.0R/hardware.html#wlan">notis hardware di publicazion di FreeBSD 12.0</a> par vê une liste dai modei supuartâts.</p>
+<div class="box-info">Pal moment dome i dispositîfs PCI, PCI-X, PCI-Express, Mini PCI e Mini PCI-Express a varessin di funzionâ.<br />
+I dispositîfs PCMCIA, CardBus, ExpressCard, USB e ISA a àn ancjemò bisugne di lavôr par vêju funzionants.</div>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="gui" name="gui">Joining a wireless network</a></h2>
-<p>By default, Haiku will join the first unencrypted wireless network it finds after booting up. To connect to a specific network, you use the Desktop applet <a href="desktop-applets/networkstatus.html">NetworkStatus</a>.</p>
-<p>Right-click on its icon in the Deskbar and choose the network's public name (which is the "SSID" it broadcasts) from the context menu.</p>
+<a id="gui" name="gui">Tacâsi a une rêt cence fîi</a></h2>
+<p>Come configurazion predefinide, Haiku no si tacarà ae prime rêt no cifrade che al cjate daspò un inviament dal sisteme. Par conetisi a une speciiche rêt, si dopre la applet dal scritori <a href="desktop-applets/networkstatus.html">Stât de Rêt</a>.</p>
+<p>Fâs clic diestri su pe sô icone tal Deskbar e sielç il non public de rêt (che al è il "SSID" che al trasmet ator) dal menù contestuâl.</p>
 <img src="images/workshop-wlan-images/join-network.png" alt="join-network.png" />
-<p>A window opens where you enter the type of authentication (probably WPA/WPA2, WEP is not a secure encryption anymore!) and the password for that wireless network. Click <span class="button">OK</span> to start the login process.<br /> Depending on your hardware and network configuration this may take a while. You'll be kept informed of the progress by notifications:</p>
+<p>Si vierzarà un barcon dulà che tu inserirâs il gjenar di autenticazion (probabil WPA/WPA2, WEP no je plui une cifradure sigure!) e la peraule di ordin par chê rêt cence fîi. Fâs clic su <span class="button">Va ben</span> par scomençâ il procès di acès.<br /> In base al to hardware e ae tô configurazion de rêt chest al pues tirâle a dilunc. Tu vignarâs tignût informât sui progrès cu lis notifichis:</p>
 <img src="images/workshop-wlan-images/join-status.gif" alt="join-network.gif" />
-<p>Once it reads "Ready" and the NetworkStatus icon in the Deskbar shows a green round light, the connection is established. If the notifications end in "No link" and a yellow triangle, something went wrong, probably an incorrect password.</p>
+<p>Une volte che tu leis "Pront" e la icone di Stât de Rêt tal Deskbar e mostre une lusute taronde verde, la conession e je stade stabilide. Se lis notifichis a finissin cun "Nissun colegament" e un triangul zâl, al al è lât strucj, probabile une peraule di ordin sbaliade.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="commandline" name="commandline">Joining from the command line</a></h2>
-<p>If you prefer to use the command line or would like to use scripting or the <span class="path">~/config/settings/boot/UserBootscript</span> to automate things to join a specific network on bootup, there's the command <tt>ifconfig</tt>.</p>
-<p>Start a Terminal and enter the first line to scan for available wireless networks:</p>
+<a id="commandline" name="commandline">Tacâsi de rie di comant</a></h2>
+<p>Se tu preferissis doprâ la rie di comant o tu desideris doprâ un lengaç di scripting opûr ancjemò <span class="path">~/config/settings/boot/UserBootscript</span> automatizâ lis robis par tacâti a une specifiche rêt cuant che si invie il sisteme, si à il comant <tt>ifconfig</tt>.</p>
+<p>Fâs partî un Terminâl e inserìs la prime rie par analizâ lis rêts cence fîi disponibilis:</p>
 <pre class="terminal">ifconfig /dev/net/iprowifi3945/0 scan
 name                             address              signal  auth
 haiku-top                        01:d0:19:a6:88:42        30  WPA
 ArcorInternet123                 00:20:12:a4:29:e1        15  WPA</pre>
-<p>The path to your wireless network adapter has to be adjusted, of course.<br />
-The output shows the public name (SSID), MAC address, signal strength and authentication method of all found networks.</p>
-<p>To join a network, use this line and insert the respective public name (SSID) and password:</p>
-<pre class="terminal">ifconfig /dev/net/iprowifi3945/0 join {SSID} {password}</pre>
-<p>Make sure the initial configuration of the wireless network adapter after booting up has finished, before issuing <tt>ifconfig</tt> commands or they might be ignored. Depending on your hardware and network configuration that may take a while. Watch those notifications...</p>
+<p>Logjic, il percors pal to adatatôr di rêt wireless al à di jessi justât.<br />
+Ce che al è jessût al mostre il non public (SSID), la direzion MAC, la fuarce dal segnâl e il metodi di autenticazion di dutis lis rêts cjatadis.</p>
+<p>Par tacâsi a une rêt, dopre cheste rie e inserìs il rispetîf non public (SSID) e peraule di ordin:</p>
+<pre class="terminal">ifconfig /dev/net/iprowifi3945/0 join {SSID} {peraule di ordin}</pre>
+<p>Daspò l'inviament, siguriti che la configurazion iniziâl dal adatadôr di rêt wireless e sedi finide, prime di mandâ i comants <tt>ifconfig</tt> opûr in câs contrari a vignaran ignorâts. In base al to hardware e ae tô configurazion de rêt cheste operazion e pues tirâle a dilunc. Ten di voli chês notifichis...</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="firmware" name="firmware">Getting supported hardware to work</a></h2>
-<p>All supported modern wireless hardware works out of the box.</p>
+<a id="firmware" name="firmware">Fâ funzionâ l'hardware supuartât</a></h2>
+<p>Ducj i components hardware cence fîi, modernis e supuartâts, a funzionin daurman.</p>
 
-<p>A few quite old chipsets (Intel 2100/2200/2225/2915, Broadcom 43xx, Marvell 88w8335) require binary firmware modules that Haiku cannot include due to licensing issues, though. To get these wireless cards to work, a simple script is included which will retrieve and install all of the needed proprietary bits for you.</p>
-<p>Open a Terminal and type:</p>
+<p>Però, cualchi chipset vecjo (Intel 2100/2200/2225/2915, Broadcom 43xx, Marvell 88w8335) al à bisugne di modui firmware binaris che Haiku nol pues includi par vie di problemis di licence. Par fâ funzionâ chestis schedis wireless, al è stât includût un sempliç script che al recuperarà e al instalarà ducj i bit proprietaris che ti coventin.</p>
+<p>Vierç un Terminâl e scrîf:</p>
 <pre class="terminal">install-wifi-firmwares.sh</pre>
-<p>Now review the licenses and accept them to install all of the available firmware files.</p>
+<p>Cumò lei lis licencis e acetilis par instalâ ducj i file dai firmware disponibii.</p>
 
-<p>If you cannot obtain the binary firmware files via the <tt>install-wifi-firmwares.sh</tt> script (for example due to lack of internet connection within Haiku), you can also download <a href="http://www.haiku-os.org/files/download-data-for-wlan-firmwares.txt">this shell script</a>, and run it from another OS that has <tt>wget</tt> and <tt>zip</tt> installed.<br />
-Windows users need to have <a href="http://gnuwin32.sourceforge.net/packages/wget.htm">wget</a> and <a href="http://gnuwin32.sourceforge.net/packages/zip.htm">zip</a> for Windows installed in their default locations and use <a href="https://www.haiku-os.org/files/download-data-for-wlan-firmwares.bat">this batch script</a>.<br />
-The script will download the needed files and create a zip file that is to be extracted to Haiku's <tt>/boot</tt>. Once unpacked, open a Terminal and type:</p>
+<p>Se no tu puedis otignî i file dai firmware binaris cul script <tt>install-wifi-firmwares.sh</tt> (par esempli parcè che ti mancje la conession internet di jenfri Haiku), tu puedis ancje discjariâ <a href="http://www.haiku-os.org/files/download-data-for-wlan-firmwares.txt">chest script di shell</a>, e eseguîlu intun altri SO che al vedi <tt>wget</tt> e <tt>zip</tt> instalâts.<br />
+I utents di Windows a à bisugne di vê instalâts <a href="http://gnuwin32.sourceforge.net/packages/wget.htm">wget</a> e <a href="http://gnuwin32.sourceforge.net/packages/zip.htm">zip</a> par Windows tes lôr posizions predefinidis e doprâ <a href="https://www.haiku-os.org/files/download-data-for-wlan-firmwares.bat">chest script batch</a>.<br />
+Il script al discjariarà i file necessaris e al crearà un file zip che al varà di sei estrat su <tt>/boot</tt> di Haiku. Une volte estrat, vierç un Terminâl e scrîf:</p>
 <pre class="terminal">install-wifi-firmwares.sh</pre>
-<p>Review the licenses and accept them to install all of the now available firmware files.</p>
+<p>Lei lis licencis e acetilis par instalâ ducj i file dai firmware che cumò a son disponibii.</p>
 
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="workshop-email.html">Workshop: Managing Email</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+ «  <a href="workshop-email.html">Laboratori: gjestion de pueste</a> 
+::  <a href="contents.html" class="uplink">Contignûts</a> 
 ::  <a href="applications.html">Aplicazions</a>  »
 </span></div>
 </div>

@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!--
+ *
+ * Copyright 2008-2020, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Input</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>User guide</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now">English&nbsp;<span class="dropdown-caret">&#9660;</span></li>
+<li><a href="../../id/preferences/input.html">Bahasa Indonesia</a></li>
+<li><a href="../../ca/preferences/input.html">Català</a></li>
+<li><a href="../../de/preferences/input.html">Deutsch</a></li>
+<li><a href="../../es/preferences/input.html">Español</a></li>
+<li><a href="../../fr/preferences/input.html">Français</a></li>
+<li><a href="../../fur/preferences/input.html">Furlan</a></li>
+<li><a href="../../it/preferences/input.html">Italiano</a></li>
+<li><a href="../../hu/preferences/input.html">Magyar</a></li>
+<li><a href="../../pl/preferences/input.html">Polski</a></li>
+<li><a href="../../pt_PT/preferences/input.html">Português</a></li>
+<li><a href="../../pt_BR/preferences/input.html">Português (Brazil)</a></li>
+<li><a href="../../ro/preferences/input.html">Română</a></li>
+<li><a href="../../sk/preferences/input.html">Slovenčina</a></li>
+<li><a href="../../fi/preferences/input.html">Suomi</a></li>
+<li><a href="../../sv_SE/preferences/input.html">Svenska</a></li>
+<li><a href="../../tr/preferences/input.html">Türkçe</a></li>
+<li><a href="../../zh_CN/preferences/input.html"> 中文 ［中文］</a></li>
+<li><a href="../../ru/preferences/input.html">Русский</a></li>
+<li><a href="../../uk/preferences/input.html">Українська</a></li>
+<li><a href="../../jp/preferences/input.html">日本語</a></li>
+</ul>
+
+<span>
+ «  <a href="keymap.html">Keymap</a>
+::  <a href="../preferences.html" class="uplink">Preferences</a>
+::  <a href="locale.html">Locale</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<table class="index" id="index" summary="index">
+<tr class="heading"><td>Index</td></tr>
+<tr class="index"><td>
+				<a href="#keyboard">Keyboard</a><br />
+                <a href="#mouse">Mouse</a><br />
+                <a href="#touchpad">Touchpad</a>
+</td></tr>
+</table>
+
+<h2><img src="../../images/prefs-images/input-icon_64.png" alt="input-icon_64.png" width="64" height="64" />Input</h2>
+<table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
+<tr><td>Location:</td><td></td><td><span class="path">/boot/system/preferences/Input</span></td></tr>
+<tr><td>Settings:</td><td></td><td><span class="path">~/config/settings/Keyboard_settings</span><br />
+<span class="path">~/config/settings/Mouse_settings</span><br />
+<span class="path">~/config/settings/Touchpad_settings</span></td></tr>
+</table>
+<p><br /></p>
+<p>The Input preferences combine the formerly separate panels for keyboard, mouse and touchpad, plus any other input device recognized by the system. The devices are listed to the left, while the panel to the right changes according to the available settings for the selected device.</p>
+
+<h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="keyboard" name="keyboard">Keyboard</a></h3>
+<img src="../images/prefs-images/keyboard.png" alt="keyboard.png" />
+<p>Set the repeat rate, and the delay until a held down key starts to repeat. You can test your settings in the text field at the bottom.</p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td><span class="button">Defaults</span></td><td> </td><td>resets everything to default values.</td></tr>
+<tr><td><span class="button">Revert</span></td><td> </td><td>brings back the settings that were active when you started the Keyboard preferences.</td></tr>
+</table>
+
+<h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="mouse" name="mouse">Mouse</a></h3>
+<img src="../images/prefs-images/mouse.png" alt="mouse.png" />
+<p>First you set your type of mouse: 1, 2 or 3 button mouse. You can simulate the 2nd (=right) mouse button by holding down <span class="key">CTRL</span> while left-clicking. For the 3rd (=middle) mouse button, it's <span class="key">CTRL</span> <span class="key">ALT</span> and a left-click.</p>
+<p>You can rearrange the mouse buttons by clicking on them and choosing their new meaning from the pop-up menu.</p>
+<p>With the sliders to the right, you adjust double-click speed, mouse speed and acceleration. The test area below the mouse graphics can be used to check if the double-click speed meets your taste: if double-clicking a word doesn't select it, it's set too fast (or you'll have to get used to clicking quicker...).</p>
+<p>There are three <span class="menu">Focus modes</span> that determine how windows react to clicks:</p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td class="onelinetop"><span class="menu">Click to focus and raise</span></td><td width="15px"> </td><td>This is the default setting: you click a window and it gets focus and is raised to the top.</td></tr>
+<tr><td><span class="menu">Click to focus</span></td><td> </td><td>Clicking a window only gives it the focus, but won't raise it automatically. To do that, you'd have to either click on its title tab or border or click anywhere while holding the <a href="../gui.html#move-resize">window management keys</a> <span class="key">CTRL</span> <span class="key">ALT</span>.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Focus follows mouse</span></td><td></td><td>The window under the mouse pointer automatically gets the focus. Actually raising it, is done as described in the <span class="menu">Click to focus mode.</span></td></tr>
+</table>
+<p>Activating <span class="menu">Accept first click</span> relieves you of having to first put the focus on an inactive window in order to trigger widgets like a button or menu. This bears the risk of unintentionally closing a window, for example, by accidentally hitting the close button when aiming for the window tab. On the other hand it speeds up your workflow considerably.</p>
+<p>All settings are immediately applied.</p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td><span class="button">Defaults</span></td><td> </td><td>resets everything to default values.</td></tr>
+<tr><td><span class="button">Revert</span></td><td> </td><td>brings back the settings that were active when you started the Mouse preferences.</td></tr>
+</table>
+
+<h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="touchpad" name="touchpad">Touchpad</a></h3>
+<img src="../images/prefs-images/touchpad.png" alt="touchpad.png" />
+<p>By dragging the red vertical or horizontal lines on the touchpad representation, you set the scroll area (slightly reddish against the gray general touch area). Moving your finger on that part of the pad will move the scrollbars of a window accordingly.</p>
+<p>To the right are sliders to set the general scroll acceleration and the vertical and horizontal scrolling speed.<br />
+The acceleration setting decides how much quicker a list scrolls by if you swish over the scroll area very fast. The scrolling speeds control the general speed when using the scroll area in a "normal" way.</p>
+<p>Below the touchpad graphic are checkboxes to enable "Two finger scrolling" for vertical and horizontal scrolling. Move two fingers in parallel vertically or horizontally to move the scrollbars of a window. At least for me, it works best with one finger from the left and one from the right hand.<br />
+If you feel comfortable using this feature, you can dispense with setting scroll areas and instead use the whole pad for normal navigation.</p>
+<p>At the bottom is another slider to set the tap click sensitivity. If your taps keep getting ignored, increase the sensitivity. If the system registers clicks all the time, while all you want is to move the mouse pointer, try decreasing it.</p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td><span class="button">Defaults</span></td><td> </td><td>resets everything to default values.</td></tr>
+<tr><td><span class="button">Revert</span></td><td> </td><td>brings back the settings that were active when you started the Touchpad preferences.</td></tr>
+</table>
+<p>Here is a tip that's not related to the Touchpad preferences, but fits the general topic:<br />
+Did you know that you can do a drag and drop just by using the touchpad, i.e. not using the buttons? Just do a double click without lifting the finger after the second click. The picked up icon will stick to the mouse pointer and you can drag it around by moving your finger. Lifting your finger will drop the icon.</p>
+<p>If your finger reaches a border of the touchpad while dragging an icon, but the mouse pointer hasn't yet reached the screen edge, how can you keep on dragging your icon? As soon as you lift your finger, the icon would be dropped.<br />
+Depending on your hardware, there's a nifty feature: just leave your finger without lifting at the touchpad edge. The mouse pointer will keep on moving on auto-pilot.</p>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="keymap.html">Keymap</a> 
+::  <a href="../preferences.html" class="uplink">Preferences</a> 
+::  <a href="locale.html">Locale</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

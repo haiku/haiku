@@ -9,12 +9,14 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Gabriele
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>DataTranslations</title>
+	<title>Traduzione Dati</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
@@ -50,7 +52,7 @@
 <li><a href="../../jp/preferences/datatranslations.html">日本語</a></li>
 </ul>
 <span>
- «  <a href="backgrounds.html">Backgrounds</a> 
+ «  <a href="backgrounds.html">Sfondi</a> 
 ::  <a href="../preferences.html" class="uplink">Preferenze</a> 
 ::  <a href="deskbar.html">Deskbar</a>  »
 </span></div>
@@ -58,46 +60,46 @@
 
 <div id="content">
 <div>
-<div class="box-info">La traduzione di questa pagina non è stata completata. Per questo motivo le parti non tradotte sono visibili in inglese.</div>
+<div class="box-info">La traduzione di questa pagina non è stata ancora completata. Finché non lo sarà, le parti non tradotte saranno visualizzate in inglese.</div>
 
-<h2><img src="../../images/prefs-images/datatranslations-icon_64.png" alt="datatranslations-icon_64.png" width="64" height="64" />DataTranslations</h2>
+<h2><img src="../../images/prefs-images/datatranslations-icon_64.png" alt="datatranslations-icon_64.png" width="64" height="64" />Traduzione Dati</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Preferenze</span></td></tr>
-<tr><td>Localita:</td><td></td><td><span class="path">/boot/system/preferences/DataTranslations</span></td></tr>
-<tr><td>Impostazioni:</td><td></td><td><span class="path">~/config/settings/*</span> - Every Translator creates its own settings file here after you've changes its defaults.<br />
-<span class="path">~/config/settings/system/DataTranslations settings</span> - Stores the panel's window position.</td></tr>
+<tr><td>Percorso:</td><td></td><td><span class="path">/boot/system/preferences/DataTranslations</span></td></tr>
+<tr><td>Impostazioni:</td><td></td><td><span class="path">~/config/settings/*</span> - Ogni traduttore crea in questa directory un file nel momento in cui modifichi le impostazioni predefinite.<br />
+<span class="path">~/config/settings/system/DataTranslations settings</span> - Memorizza la posizione del pannello.</td></tr>
 </table>
-<p>Every application has the ability to open and save every file format for which there's a Translator installed. The settings for these Translators are configured in the DataTranslations preferences.</p>
+<p>Ogni applicazione può aprire e salvare ogni file il cui corrispettivo traduttore sia stato installato. Le impostazioni di questi traduttori sono modificabili nel pannello Traduzione Dati.</p>
 <p><br /></p>
 <img src="../images/prefs-images/datatranslations.png" alt="datatranslations.png" />
-<p>Depending on its capabilities, each Translator offers different settings. At least you'll get an <span class="button">Info...</span> button that opens a window with the credits and the installation path.<br />
-The following table gives an overview of the default Translators and their most useful options.</p>
+<p>In base alle sue caratteristiche, ogni traduttore ha il suo insieme di impostazioni. Il pulsante <span class="button">Informazioni</span> è certamente disponibile ed apre una finestra con i curatori del traduttore e il percorso di installazione.<br />
+La tabella seguente fornisce una panoramica dei traduttori predefiniti e le loro opzioni di funzionamento più utili.</p>
 <table summary="translators" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Apple icons</span></td><td>Valid image sizes are 16, 32, 48, 128, 256, 512, 1024 (RGB32 and RGBA32)</td></tr>
-<tr><td><span class="menu">BMP images</span></td><td>24bit, uncompressed, no transparency</td></tr>
-<tr><td><span class="menu">EXR images</span></td><td><acronym title="Industrial Light &amp; Magic">ILM</acronym>'s high dynamic-range (HDR) format</td></tr>
-<tr><td><span class="menu">GIF images</span></td><td>8bit, lossless compression, transparency<br />
-You can reduce the filesize by limiting the number of used colors and the palette.<br />
-You can write images with transparency, either by automatically using the alpha channel or by setting the RGB value that will be transparent by hand.</td></tr>
-<tr><td><span class="menu">HVIF icons</span></td><td>Translator for Haiku's vector icon format</td></tr>
-<tr><td><span class="menu">JPEG2000 images</span></td><td>24bit, compressed, no transparency<br />
-Here, you normally only care about the output quality.</td></tr>
-<tr><td><span class="menu">JPEG images</span></td><td>24bit, compressed, no transparency<br />
+<tr><td><span class="menu">Icone Apple</span></td><td>Le dimensioni accettate sono 16, 32, 48, 128, 256, 512 o 1024 pixel (RGB32 e RGBA32)</td></tr>
+<tr><td><span class="menu">Immagini BMP</span></td><td>24bit, non compresse, prive di trasparenza</td></tr>
+<tr><td><span class="menu">Immagini EXR</span></td><td>Immagini ad ampia escursione dinamica (HDR) <acronym title="Industrial Light &amp; Magic">ILM</acronym></td></tr>
+<tr><td><span class="menu">Immagini GIF</span></td><td>8bit, compressione priva di perdita (lossless), con trasparenza<br />
+Puoi ridurre la dimensione del file limitando il numero di colori utilizzati e la tavolozza.<br />
+Puoi salvare immagini con trasparenza, sia automatica utilizzando un canale alfa, oppure scegliendo manualmente un valore RGB che sarà utilizzato come colore trasparente.</td></tr>
+<tr><td><span class="menu">Icone HVIF</span></td><td>Traduttore per il formato di icone vettoriali native di Haiku</td></tr>
+<tr><td><span class="menu">Immagini JPEG2000</span></td><td>24bit, compresse, prive di trasparenza<br />
+In questo caso, probabilmente vorrai modificare solo la qualità dei file al salvataggio.</td></tr>
+<tr><td><span class="menu">Immagini JPEG</span></td><td>24bit, compressed, no transparency<br />
 Besides the output quality you can also set a smoothing that will lessen compression artefacts but can blur the picture a little.</td></tr>
-<tr><td><span class="menu">PCX images</span></td><td>24bit, uncompressed, no transparency, PC Paintbrush Exchange format</td></tr>
-<tr><td><span class="menu">Photoshop images</span></td><td>32bit, lossless compression, transparency<br />
+<tr><td><span class="menu">Immagini PCX</span></td><td>24bit, uncompressed, no transparency, PC Paintbrush Exchange format</td></tr>
+<tr><td><span class="menu">Immagini Photoshop</span></td><td>32bit, lossless compression, transparency<br />
 The translator reduces all layers to one bitmap layer.</td></tr>
-<tr><td><span class="menu">PNG images</span></td><td>32bit, lossless compression, transparency</td></tr>
-<tr><td><span class="menu">PPM images</span></td><td>24bit, uncompressed, no transparency, Portable PixMap format</td></tr>
-<tr><td><span class="menu">RAW images</span></td><td>up to 48bit, uncompressed, no transparency</td></tr>
-<tr><td><span class="menu">RTF text files</span></td><td>Formatted text</td></tr>
-<tr><td><span class="menu">SGI images</span></td><td>24bit, optional lossless compression, transparency</td></tr>
-<tr><td><span class="menu">StyledEdit files</span></td><td>Plain text with formatting stored in attibutes</td></tr>
-<tr><td><span class="menu">TGA images</span></td><td>32bit, optional lossless compression, transparency</td></tr>
-<tr><td><span class="menu">TIFF images</span></td><td>24bit, optional lossless compression, layers, transparency</td></tr>
-<tr><td><span class="menu">WebP images</span></td><td>8-bit YUV 4:2:0 image format, compressed, no transparency</td></tr>
-<tr><td><span class="menu">Windows icons</span></td><td>Valid image sizes are 16, 32, 48</td></tr>
-<tr><td class="onelinetop"><span class="menu">WonderBrush images</span></td><td>32bit, layers, transparency, vector/pixel data</td></tr>
+<tr><td><span class="menu">Immagini PNG</span></td><td>32bit, lossless compression, transparency</td></tr>
+<tr><td><span class="menu">Immagini PPM</span></td><td>24bit, uncompressed, no transparency, Portable PixMap format</td></tr>
+<tr><td><span class="menu">Immagini RAW</span></td><td>up to 48bit, uncompressed, no transparency</td></tr>
+<tr><td><span class="menu">File di testo RTF</span></td><td>Testo con formattazione</td></tr>
+<tr><td><span class="menu">Immagini SGI</span></td><td>24bit, optional lossless compression, transparency</td></tr>
+<tr><td><span class="menu">File di testo StyledEdit</span></td><td>Testo semplice con elementi di formattazione salvati tramite attributi</td></tr>
+<tr><td><span class="menu">Immagini TGA</span></td><td>32bit, optional lossless compression, transparency</td></tr>
+<tr><td><span class="menu">Immagini TIFF</span></td><td>24bit, optional lossless compression, layers, transparency</td></tr>
+<tr><td><span class="menu">Immagini WebP</span></td><td>8-bit YUV 4:2:0 image format, compressed, no transparency</td></tr>
+<tr><td><span class="menu">Icone Windows</span></td><td>Le dimensioni accettate sono 16, 32 o 48 pixel </td></tr>
+<tr><td class="onelinetop"><span class="menu">Immagini WonderBrush</span></td><td>32bit, livelli, trasprenza, dati vettoriali/pixel</td></tr>
 </table>
 <p><br /></p>
 <div class="box-info">Screenshots, charts, black&amp;white drawings and other images with few used colors, as well as small pictures are best saved as GIF (up to 256 colors) or PNG (millions of colors). JPEG, for example, introduces compression artefacts without gain in smaller filesize.</div>
@@ -107,7 +109,7 @@ The translator reduces all layers to one bitmap layer.</td></tr>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="backgrounds.html">Backgrounds</a> 
+ «  <a href="backgrounds.html">Sfondi</a> 
 ::  <a href="../preferences.html" class="uplink">Preferenze</a> 
 ::  <a href="deskbar.html">Deskbar</a>  »
 </span></div>

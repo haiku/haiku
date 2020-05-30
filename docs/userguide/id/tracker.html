@@ -9,6 +9,8 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		mazbrili abu ibrahim
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -21,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>Panduan pengguna</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -51,162 +53,168 @@
 </ul>
 <span>
  «  <a href="teammonitor.html">Team Monitor</a> 
-::  <a href="contents.html" class="uplink">Daftar Isi</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
 ::  <a href="tracker-add-ons.html">Tracker Add-Ons</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">Terjemahan halaman ini belum lengkap. Sampai saat itu, bagian yang belum selesai menggunakan aslinya bahasa Inggris.</div>
 
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Indeks</td></tr>
 <tr class="index"><td>
-	<a href="#mounting-volumes">Mounting volumes</a><br />
-	<a href="#navigating">Navigating</a><br />
-	<a href="#appearance">Appearance</a><br />
-	<a href="#tracker-preferences">Tracker preferences</a><br />
-	<a href="#working-with-files">Working with files</a><br />
-	<a href="#transaction-status">Transaction status</a>
+	<a href="#mounting-volumes">Melakukan Mounting volume</a><br />
+	<a href="#navigating">Aktifitas Navigasi</a><br />
+	<a href="#appearance">Penampilan</a><br />
+	<a href="#tracker-preferences">Preferensi Tracker </a><br />
+	<a href="#working-with-files">Bekerja dengan berkas</a><br />
+	<a href="#transaction-status">Status transaksi</a>
 </td></tr>
 </table>
 
 <h1>Tracker</h1>
 
-<p>The Tracker is the graphical interface to all your files. It lets you create new files and folders or find, launch or rename as well as copy or delete existing ones.</p>
-<p>Being an application like any other (the Desktop with its icons is really just a fullscreen window in the background), Tracker appears with its windows in the Deskbar and can be quit and restarted. The easiest way to quit and restart a crashed or frozen Tracker (or a wayward Deskbar) is to call the <a href="teammonitor.html">Team Monitor</a>.</p>
+<p>Tracker adalah antarmuka grafis untuk semua file Anda. Ini memungkinkan Anda membuat file dan folder baru atau menemukan, meluncurkan atau mengganti nama serta menyalin atau menghapus yang sudah ada.</p>
+<p>Menjadi aplikasi seperti yang lain (Desktop dengan ikonnya benar-benar hanya jendela layar penuh di latar belakang), Pelacak muncul dengan jendelanya di Deskbar dan dapat keluar dan memulai kembali. Cara termudah untuk keluar dan memulai kembali Pelacak yang macet atau beku (atau Deskbar bandel) adalah untuk memanggil <a href="teammonitor.html">Team Monitor</a>.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="mounting-volumes" name="mounting-volumes">Mounting Volumes</a></h2>
-<p>In order to access a harddisk, CD, USB stick etc., you first have to mount the volume, that is, let the system know it's there. This is done with a right-click on the Desktop or an already mounted volume (like the boot disk) and choosing the volume from the <span class="menu">Mount</span> submenu. You find the same <span class="menu">Mount</span> menu in the Deskbar.</p>
+<a id="mounting-volumes" name="mounting-volumes">Melakukan Mounting volume</a></h2>
+<p>Untuk mengakses harddisk, CD, stik USB dll, Anda harus terlebih dahulu memasang volume, yaitu, beri tahu sistem bahwa itu ada di sana. Hal ini dilakukan dengan klik kanan pada Desktop atau volume yang sudah terpasang (seperti disk boot) dan pilih volume dari submenu <span class="menu">Mount</span> . Anda menemukan menu <span class="menu">Mount</span> yang sama di Deskbar.</p>
 <img src="images/tracker-images/mount-settings.png" alt="drill-down.png" />
-<p>There are also <span class="menu">Settings</span> so you don't have to mount everything manually after every bootup.<br />
-The above settings will automatically mount any storage device you connect/insert and also mount all disks on bootup that were mounted previously.</p>
-<div class="box-warning">Before you disconnect e.g. a harddrive or USB stick, make sure you have successfully unmounted the volume and its icon has disappeared. This guarantees that all data transfer has finished. Otherwise you may lose data or corrupt the disk!</div>
-<div class="box-warning">Haiku is able to mount non-BFS formatted volumes. Be warned, however, that these non-BFS filesystems haven't been rigorously tested. Writing to those volumes may cause corruption in some cases. If you want to be on the safe side, always choose <span class="button">Mount read-only</span> when mounting!</div>
+<p>Ada juga <span class="menu">Pengaturan </span> sehingga Anda tidak perlu me-mount semuanya secara manual setelah setiap boot.<br />
+Pengaturan di atas akan secara otomatis memasang perangkat penyimpanan apa pun yang Anda sambungkan / masukkan dan juga pasang semua disk saat booting yang sudah dipasang sebelumnya.</p>
+<div class="box-warning">Sebelum Anda memutuskan sambungan, misalnya harddisk atau stik USB, pastikan Anda telah berhasil melepas volume dan ikonnya telah hilang. Ini menjamin bahwa semua transfer data telah selesai. Jika tidak, Anda dapat kehilangan data atau merusak disk!</div>
+<div class="box-warning">Haiku dapat me-mount volume non-BFS yang diformat. Namun, berhati-hatilah, bahwa filesystem non-BFS ini belum diuji secara ketat. Menulis ke volume tersebut dapat menyebabkan korupsi dalam beberapa kasus. Jika Anda ingin berada di sisi yang aman, selalu pilih <span class="button">mount hanya baca </span>  saat mounting! </div>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="navigating" name="navigating">Navigating</a></h2>
-<p>By default, when you double-click a folder, Tracker opens a new window while leaving the parent window open. This can quickly lead to an overcrowded desktop.<br />
-You can prevent that by holding down the <span class="key">OPT</span> key, which automatically closes the parent window.<br />
-This is also true for keyboard navigation. For more on that, see topic <a href="keyboard-shortcuts.html">Shortcuts and key combinations</a>.</p>
-<p>Moving through your folders is one of Trackers main purposes, just like the file managers on other platforms. Haiku's Tracker has some unique features that will help you doing that efficiently.</p>
+<a id="navigating" name="navigating">Melakukan Navigasi</a></h2>
+<p>Secara default, ketika Anda mengklik dua kali folder, Pelacak membuka jendela baru sambil membiarkan jendela induk terbuka. Ini dapat dengan cepat mengarah ke desktop yang penuh sesak.<br />
+Anda dapat mencegahnya dengan menekan terus tombol <span class="key">OPT</span>, yang secara otomatis menutup jendela induk.<br />
+Ini juga berlaku untuk navigasi keyboard. Untuk lebih lanjut tentang itu, lihat topik <a href="keyboard-shortcuts.html">Pintasan dan kombinasi tombol</a> .</p>
+<p>Memindahkan folder Anda adalah salah satu tujuan utama Pelacak, seperti halnya pengelola file di platform lain. Pelacak Haiku memiliki beberapa fitur unik yang akan membantu Anda melakukannya dengan efisien.</p>
 
 <h3>
-<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a><a id="drill-down" name="drill-down">Drilling down the submenus</a></h3>
-<p>Instead of double-clicking your way down folder after folder, there's a better way to drill down:</p>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a><a id="drill-down" name="drill-down">Drilling down submenu</a></h3>
+<p>Alih-alih mengklik dua kali folder bawah ke bawah, ada cara yang lebih baik untuk menelusuri:</p>
 <img src="images/tracker-images/drill-down.png" alt="drill-down.png" />
 <!-- screenshot needs updating to show /boot/system/documentation -->
-<p>Right-click onto a folder, and at the top of the usual context menu you'll find a submenu of the current folder that let's you navigate down a level. Just move down the hierarchy until you find the file or folder you're looking for and click on it to open it. The above shows the contents of the folder <span class="path">/boot/home/config/</span>.<br />
-If you do the above while dragging a file with you, it will be moved to where you eventually drop it.</p>
-<p>A similar method can be used from any Tracker window:</p>
+<p>Klik kanan ke folder, dan di bagian atas menu konteks biasa Anda akan menemukan submenu dari folder saat ini yang memungkinkan Anda menavigasi ke bawah tingkat. Cukup gerakkan hierarki sampai Anda menemukan file atau folder yang Anda cari untuk dan klik untuk membukanya. Di atas menunjukkan isi folder <span class="path">/boot/home/config/</span>.<br />
+Jika Anda melakukan hal di atas sambil menyeret file dengan Anda, itu akan dipindahkan ke tempat Anda akhirnya menjatuhkannya.
+</p>
+<p>Metode serupa dapat digunakan dari jendela Pelacak apa pun:</p>
 <img src="images/tracker-images/window-drill-down.png" alt="window-drill-down.png" />
-<p>Click on the area in the lower left, where the number of items is listed, and you'll get submenus for every level above your current location. From there you can drill down through the folders as usual.</p>
-<p>Note, that the Desktop is always the topmost level as that is where Tracker shows mounted volumes. So, if you want to go to another disk, you first have to navigate to the top (Desktop) and cross over to your other disk from there.</p><br />
-<p>You'll get the same submenu-navigating when you drag a file over a folder. After a short while of hovering, a submenu pops up and you can drill down to your destination. If you initiated the drag with the right mousebutton, you can choose between copying, moving or linking the file when you release the mouse.</p>
+<p>Klik pada area di kiri bawah, di mana jumlah item terdaftar, dan Anda akan mendapatkan submenu untuk setiap level di atas lokasi Anda saat ini. Dari sana Anda dapat menelusuri folder seperti biasa.</p>
+<p>Perhatikan, bahwa Desktop selalu berada pada level paling atas karena di situlah Tracker menunjukkan volume yang terpasang. Jadi, jika Anda ingin pergi ke disk lain, pertama-tama Anda harus menavigasi ke atas (Desktop) dan menyeberang ke disk lain dari sana</p><br />
+<p>Anda akan mendapatkan navigasi submenu yang sama ketika Anda menyeret file ke folder. Setelah beberapa saat melayang, submenu muncul dan Anda dapat menelusuri ke tujuan Anda. Jika Anda memulai drag dengan mousebutton yang tepat, Anda dapat pilih antara menyalin, memindahkan, atau menautkan file ketika Anda melepaskan mouse.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="type-ahead" name="type-ahead">Jumping to files with type-ahead</a></h3>
-<p>You may be familiar with the concept from file managers of other operating systems: typing the first few letters of a filename will jump to the first file matching these starting characters. Haiku took the idea a step further. If there isn't a file starting with those letters it will jump to the first file including the string anywhere in its name. And if there's nothing with the string in its filename, the attributes are searched next.</p>
+<a id="type-ahead" name="type-ahead">Jumping ke file dengan  type-ahead</a></h3>
+<p>Anda mungkin akrab dengan konsep dari manajer file sistem operasi lain: mengetik beberapa huruf pertama dari nama file akan melompat ke file pertama yang cocok dengan karakter awal ini. Haiku mengambil ide selangkah lebih maju. Jika tidak ada file mulai dengan huruf-huruf itu akan melompat ke file pertama termasuk string di mana saja dalam namanya. Dan jika tidak ada apa-apa dengan string dalam nama file, atribut dicari selanjutnya.</p>
 <img src="images/tracker-images/window-type-ahead.png" alt="window-type-ahead.png" />
-<p>In the above example, there are many files starting with "Haiku logo", rendering simpler approaches to typing ahead quite useless. In Haiku however, typing "web" jumps right to its first occurence in "Haiku logo - website". The characters you enter appear in the bottom left corner where you normally find the item count of all files in the folder. A second after entering a character, the display jumps back to normal and you're ready for a new type ahead search.</p>
+<p>Dalam contoh di atas, ada banyak file yang dimulai dengan "logo Haiku", memberikan pendekatan yang lebih sederhana untuk mengetik di depan cukup berguna. Namun di Haiku, mengetik "web" melompat langsung ke kemunculan pertamanya di "situs web logo Haiku". masukkan muncul di sudut kiri bawah di mana Anda biasanya menemukan jumlah item dari semua file dalam folder. Sedetik setelah memasukkan karakter, layar melompat kembali ke normal dan Anda siap untuk jenis baru di depan pencarian.</p>
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="type-ahead-filter" name="type-ahead-filter">Type-ahead filtering</a></h3>
-<p>Instead of jumping to a file while typing, there's also the option to filter out all files not matching your type-ahead string. This can improve clarity dramatically, especially when dealing with crowded folders. By using <span class="key">SHIFT</span> <span class="key">SPACE</span> as delimiter, you can even filter on multiple strings.<br />
-Contrary to type-ahead jumping, the filtering will stick until you press <span class="key">ESC</span> or close the window (or leave the folder if you're using Single Window Navigation).<br />
-This type-ahead filtering is set in the <a href="#tracker-preferences.html">Tracker preferences</a>.</p>
+<a id="type-ahead-filter" name="type-ahead-filter">Type-depan penyaringan</a></h3>
+<p>Alih-alih melompat ke file saat mengetik, ada juga opsi untuk memfilter semua file yang tidak cocok dengan string tipe-depan Anda. Ini dapat meningkatkan kejelasan secara dramatis, terutama ketika berhadapan dengan folder yang penuh sesak. Dengan menggunakan <span class="key">SHIFT</span> <span class="key">SPACE</span> sebagai pembatas, Anda bahkan dapat memfilter pada banyak string.<br />
+Berlawanan dengan lompatan jenis-depan, pemfilteran akan menempel hingga Anda menekan <span class="key">ESC</span> atau menutup jendela (atau meninggalkan folder jika Anda menggunakan Navigasi Satu Jendela).<br />
+Pemfilteran jenis-depan ini diatur dalam <a href="#tracker-preferences.html">preferensi 
+ Tracker</a>.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="appearance" name="appearance">Appearance</a></h2>
+<a id="appearance" name="appearance">Penampilan</a></h2>
 <img src="images/tracker-images/window-menu.png" alt="window-menu.png" />
-<p>Tracker windows offer three different viewing modes from the <span class="menu">Window</span> menu:</p>
+<p>Jendela enawarkan tiga mode tampilan berbeda dari menu : <span class="menu">Window</span>:</p>
 <ul>
-<li><p><span class="menu">Icon view</span> (<span class="key">ALT</span> <span class="key">1</span>) - Big icons, you can change the size from the submenu or in/decrease their size with <span class="key">ALT</span> <span class="key">+</span>/<span class="key">-</span>.</p></li>
-<li><p><span class="menu">Mini icon view</span> (<span class="key">ALT</span> <span class="key">2</span>) - Small icons.</p></li>
-<li><p><span class="menu">List view</span> (<span class="key">ALT</span> <span class="key">3</span>) - A detailed list of your files enabling you to show/hide file attributes (see topic <a href="attributes.html">Attributes</a>.)</p></li>
+<li><p><span class="menu">Tampilan icon </span> (<span class="key">ALT</span> <span class="key">1</span>) - Ikon besar, Anda dapat mengubah ukuran dari submenu atau di / kurangi ukurannya dengan <span class="key">ALT</span> <span class="key">+</span>/<span class="key">-</span>.</p></li>
+<li><p><span class="menu">Mini icon view</span> (<span class="key">ALT</span> <span class="key">2</span>) - Ikon kecil.</p></li>
+<li><p><span class="menu">Tampilan daftar</span> (<span class="key">ALT</span> <span class="key">3</span>) - -Serinci daftar file Anda memungkinkan Anda untuk menampilkan /menyembunyikan atribut file (lihat topik. <a href="attributes.html">Atribut </a>.)</p></li>
 </ul>
-<p>The <span class="menu">Window</span> menu offers a number of other functions:</p>
+<p>Menu <span class="menu">Window</span> menawarkan sejumlah fungsi lain:</p>
 <ul>
-<li><p><span class="menu">Resize to fit</span> (<span class="key">ALT</span> <span class="key">Y</span>) - Resizes the window to its ideal size.</p></li>
-<li><p><span class="menu">Arrange by...</span> - Only available in Icon or Mini icon view, a submenu allows to set the sorting order to various properties:</p>
+<li><p><span class="menu">Ubah ukuran agar pas</span> (<span class="key">ALT</span> <span class="key">Y</span>) - Mengubah ukuran jendela ke ukuran idealnya.</p></li>
+<li><p><span class="menu">Atur dengan...</span> - Hanya tersedia di tampilan Ikon atau ikon Mini, submenu memungkinkan untuk mengatur urutan pengurutan ke berbagai properti:</p>
 	<ul>
-	<li><p><span class="menu">Name</span>, <span class="menu">Real name</span>, <span class="menu">Size</span>, <span class="menu">Modified</span>, <span class="menu">Created</span>, <span class="menu">Kind</span>, <span class="menu">Location</span>, <span class="menu">Permissions</span></p></li>
-	<li><p><span class="menu">Reverse order</span> - Inverts the sorting order</p></li>
-	<li _translation_id="4339"><p><span class="menu">Clean up</span> (<span class="key">ALT</span> <span class="key">K</span>) - Aligns all icons to an invisible grid. Hold down <span class="key">SHIFT</span> and the menu becomes <span class="menu">Clean up all</span> which additionally sorts all icons according to the above selected criterium.</p></li>
+	<li><p><span class="menu">Nama</span>, <span class="menu">nama asli</span>, <span class="menu">Ukuran</span>, <span class="menu">Diubah</span>, <span class="menu">Dibuat</span>, <span class="menu">Jenis</span>, <span class="menu">Lokasi</span>, <span class="menu">Izin</span></p></li>
+	<li><p><span class="menu">Membalik urutan</span> - Membalik urutan penyortiran</p></li>
+	<li _translation_id="4339"><p><span class="menu">Clean up</span> (<span class="key">ALT</span> <span class="key">K</span>) - Menyelaraskan semua ikon ke grid yang tidak terlihat. Tahan tombol SHIFT <span class="key">SHIFT</span> dan menu menjadi <span class="menu">Bersihkan semua</span> yang juga mengurutkan semua ikon sesuai dengan kriteria yang dipilih di atas.</p></li>
 	</ul></li>
-<li><p><span class="menu">Select...</span> (<span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">A</span>) - Select files according to a <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expression">regular expression</a>.</p></li>
-<li><p><span class="menu">Close</span> (<span class="key">ALT</span> <span class="key">W</span>) - Closes the window. Hold down <span class="key">SHIFT</span> and the menu becomes <span class="menu">Close all</span> which closes every Tracker window.</p></li>
-<li><p><span class="menu">Close all in workspace</span> (<span class="key">ALT</span> <span class="key">Q</span>) - Closes every Tracker window in the current workspace. A useful shortcut if you forgot to hold the <span class="key">OPT</span> key while clicking through folders and all those still open Tracker windows clutter your workspace.</p></li>
+<li><p><span class="menu">Pilih...</span> (<span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">A</span>) - Pilih file sesuai dengan <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expression">ekspresi reguler. </a>.</p></li>
+<li><p><span class="menu">Tutup</span> (<span class="key">ALT</span> <span class="key">W</span>) - Menutup jendela, tahan <span class="key">SHIFT</span> dan menu menjadi <span class="menu">Tutup semua</span> yang menutup setiap jendela Tracker.</p></li>
+<li><p><span class="menu">Tutup semua di workspace</span> (<span class="key">ALT</span> <span class="key">Q</span>) -Tutup setiap Tracker window di workspace saat ini . Pintas yang berguna jika Anda lupa menahan tombol  <span class="key">OPT</span> sambil mengklik folder dan semua jendela Tracker yang masih terbuka mengacaukan ruang kerja Anda.</p></li>
 </ul>
-<p>Sometimes you just want to rearrange a few icons without doing a complete <span class="menu">Clean up</span> (<span class="key">ALT</span> <span class="key">K</span>). In that case, you select these icons and start to drag them to their new location. Before you drop them there, keep <span class="key">ALT</span> pressed. This will align the icons to the invisible grid.</p>
-<p>The rest of the functions are pretty self-explanatory, leaving the Tracker preferences.</p>
+<p>Kadang-kadang Anda hanya ingin mengatur ulang beberapa ikon tanpa melakukan <span class="menu">Pembersihan </span> lengkap (<span class="key">ALT</span> <span class="key">K</span>). Dalam hal ini, Anda memilih ikon-ikon ini dan mulai menyeretnya ke lokasi baru. Sebelum Anda menjatuhkanna di sana, terus tekan <span class="key">ALT</span>. Ini akan sejajarkan ikon ke kotak tak terlihat.</p>
+<p>Fungsi lainnya cukup jelas, kita lanjutkan ke preferensi Tracker .</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="tracker-preferences" name="tracker-preferences">Tracker preferences</a></h3>
-<p><span class="menu">Window | Preferences...</span> opens a panel that offers a number of settings that, where not obvious, should become clear once tried out. Since all settings are applied live, you'll immediately see the changes.
-<br />So, in short, the not so obvious settings:</p>
+<a id="tracker-preferences" name="tracker-preferences"> Preferensi Tracker</a></h3>
+<p><span class="menu">Window | Preferensi...</span> membuka panel yang menawarkan sejumlah pengaturan yang, jika tidak jelas, akan menjadi jelas setelah dicoba karena semua pengaturan diterapkan secara langsung, Anda akan segera melihat perubahannya.
+<br />Jadi, singkatnya, pengaturan yang tidak begitu jelas:
+
+</p>
 <ul>
-<li><p><span class="menu">Desktop</span> - Decide if all mounted disks appear directly on the Desktop or in a window after clicking a single Disk icon sitting on the Desktop.</p></li>
-<li><p><span class="menu">Windows</span> - You can set <span class="menu">Single window navigation</span>, i.e. a double-clicked folder doesn't open in its own window, but inside the already open window instead, replacing the view of its parent folder. This is not the same as clicking while holding the <span class="key">OPT</span> key, as described above, because you'll lose the per window saved position and size.
+<li><p><span class="menu">Desktop</span> - Memutuskan apakah semua disk yang dipasang muncul langsung di Desktop atau di jendela setelah mengklik ikon Disk tunggal yang duduk di Desktop.</p></li>
+<li><p><span class="menu">Windows</span> - Anda dapat mengatur <span class="menu">navigasi Satu window</span>, i.e. a yaitu klik-ganda folder tidak terbuka di jendela sendiri, tetapi di dalam jendela yang sudah terbuka, menggantikan tampilan folder induknya. Ini tidak sama dengan mengklik sambil menahan tombol <span class="key">OPT</span> , seperti dijelaskan di atas, karena Anda akan kehilangan posisi dan ukuran per jendela yang tersimpan.
 </p>
 <img src="images/tracker-images/tracker-preferences-navigator.png" alt="tracker-preferences-navigator.png" />
-<p>Before you switch Tracker to <span class="menu">Single window navigation mode</span>, because that may feel more familiar to you, we recommend giving the menu based browsing a try first, as that may actually work much faster for you after getting used to. On the other hand, single window browsing offers a <i>Navigator</i> where you can enter or copy &amp; paste a path name and use back, forward and up buttons.</p> 
-<p>Activating <span class="menu">Type-ahead filtering</span> will filter the contents of a Tracker window while you type to only display the files matching your string in their name or any currently displayed attribute. See <a href="#type-ahead-filter">above</a>.</p></li>
-<li><p><span class="menu">Volume icons</span> - Set the color of an optional indicator of free space that's shown besides a disk's icon.</p></li>
-<li><p><span class="menu">Disk mount</span> - Define when and what disks are mounted automatically, as described above under <a href="#mounting-volumes">"Mounting volumes"</a>.</p></li>
+<p>Sebelum Anda mengalihkan Tracker ke <span class="menu">Single window navigation mode</span>, karena itu mungkin terasa lebih akrab bagi Anda, kami sarankan untuk mencoba penjelajahan berbasis menu terlebih dahulu, karena itu sebenarnya dapat bekerja lebih cepat untuk Anda setelah terbiasa. Disisi lain, penelusuran single window menawarkan  <i>Navigator</i> dimana Anda dapat masuk atau menyalin  &amp; tempel path nama and menggunakan tombol mundur, maju and atas.</p> 
+<p>Mengaktifkan <span class="menu">pemfilter Type-ahead </span> memfilter konten window Tracker sementara Anda mengetik untuk hanya menampilkan file yang cocok dengan teks yang anda ketik di nama atau atribut apapun yang tertampil saat itu. Lihat <a href="#type-ahead-filter">diatas</a>.</p></li>
+<li><p><span class="menu">Ikon volume</span> - Tetapkan warna indikator opsional ruang kosong yang ditampilkan di samping ikon disk.</p></li>
+<li><p><span class="menu">Disk mount</span> - Definisikan kapan dan disk apa yang dipasang secara otomatis, seperti dijelaskan di bawah dalam <a href="#mounting-volumes">"Me-mount volume"</a>.</p></li>
 </ul>
-<p>This panel, by the way, is also available as <span class="app">Tracker</span> from Deskbar's <span class="menu">Preferences</span>.</p>
+<p>Omong-omong, panel ini juga tersedia sebagai <span class="app">Tracker</span> dari  <span class="menu">Preferensi </span>Deskbar.
+</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="working-with-files" name="working-with-files">Working with files</a></h2>
-<p>When invoked on a selected file, most of the <span class="menu">File</span> menu commands are also offered in the context menu by right-clicking that file.</p>
-<p>As usual the commands are pretty clear.</p>
+<a id="working-with-files" name="working-with-files">Bekerja dengan berkas</a></h2>
+<p>Ketika dipanggil pada berkas yang dipilih, sebagian besar perintah menu <span class="menu">Berkas </span> juga ditawarkan dalam menu konteks dengan mengklik kanan berkas itu.</p>
+<p>Seperti biasa perintahnya cukup jelas.</p>
 <ul>
-<li><p><span class="menu">Find...</span> - Find a file or folder. See topic <a href="queries.html">Query</a> for more info.</p></li>
-<li><p><span class="menu">New</span> - Create a new folder or any other file based on a <i>template</i>.
+<li><p><span class="menu">Cari...</span> - Temukan file atau folder. Lihat topik <a href="queries.html">Kueri</a> untuk info lebih lanjut.</p></li>
+<li><p><span class="menu">Baru</span> - Buat folder baru atau file lain berdasarkan pada  <i>template</i>.
 </p>
 <img src="images/tracker-images/new-menu.png" alt="new-menu.png" />
-<p>Choosing <span class="menu">Edit templates...</span> opens the folder <span class="path">/boot/home/config/settings/Tracker/Tracker New Templates</span>. Creating a file in that folder will offer its filetype with the file's name and other attributes as template in the <span class="menu">New</span> menu. Here, there's a file "Text" with the filetype <tt>text/plain</tt>. See topic <a href="filetypes.html">Filetypes</a> for more info.</p></li>
-<li><p><span class="menu">Open with...</span> - A submenu offers all applications that can handle this filetype.
+<p>Memilih <span class="menu">Edit templates...</span> buka folder <span class="path">/boot/home/config/settings/Tracker/Tracker New Templates</span>. Membuat file di folder itu akan menawarkan filetype dengan nama file dan atribut lainnya sebagai templat di menu <span class="menu">Baru</span>. Di sini, ada file "Text" dengan teks tipe file <tt>text/plain</tt>. Lihat topik <a href="filetypes.html">Filetypes</a> untuk info lebih lanjut.</p> </li>
+<li><p><span class="menu">Buka dengan...</span> - Submenu menawarkan semua aplikasi yang dapat menangani jenis file ini.
 </p>
 <img src="images/tracker-images/open-with.png" alt="open-with.png" />
 
-<p>The preferred application that would open the file when double-clicked, is checkmarked. This submenu lists first those applications that can handle the exact filetype, in this case it's a text file, the type <tt>text/plain</tt>. Next come all applications that can handle that supertype in general, here <tt>text/*</tt>. Last in the list are those that can deal with any file. If you don't click on an app in the submenu, but on the <span class="menu">Open with...</span> entry instead, a panel opens:</p>
+<p>Aplikasi pilihan yang akan membuka file ketika diklik dua kali, dicentang. Submenu ini mencantumkan pertama aplikasi yang dapat menangani jenis file yang tepat, dalam hal ini file teks  <tt>text/plain</tt>. Selanjutnya datang semua aplikasi yang dapat menangani supertipe itu secara umum, di sini  <tt>text/*</tt>. Terakhir dalam daftar adalah yang dapat menangani file apa pun. Jika Anda tidak mengklik aplikasi di submenu, tetapi pada entri <span class="menu">Buka dengan...</span> sebaliknya, panel terbuka :</p>
 
 <img src="images/tracker-images/open-with-preferred.png" alt="open-with-preferred" />
-<p>Here you'll again find the programs that were listed in the submenu. By selecting one and clicking the <span class="button">Open and make preferred</span> button, you changed the preferred application for every file of that filetype, here <tt>text/plain</tt>.</p></li>
-<li><span class="menu">Get info</span>
-<p>This opens a panel that shows the meta data of a file and lets you edit its permissions. You can rename it by clicking on the file name at the top.</p>
+<p>Di sini Anda akan menemukan lagi program-program yang terdaftar di submenu. Dengan memilih satu dan tombol <span class="button">Buka dan buat yang disukai</span> , Anda mengubah aplikasi yang disukai untuk setiap file jenis file itu disini <tt>text/plain</tt>.</p></li>
+<li><span class="menu">Dapatkan info</span>
+<p>Ini membuka panel yang menunjukkan meta data file dan memungkinkan Anda mengedit izinnya. Anda dapat mengganti nama dengan mengklik nama file di bagian atas.</p>
 <img src="images/tracker-images/get-info.png" alt="get-info" />
-<p>The panel consists of three tabs:</p>
+<p>Panel terdiri dari tiga tab:</p>
 <ul>
-<li><span class="menu">Information</span>: Shows standard data like size, date of creation/modification, file type and location. Click on the location path to open the files parent folder. The <span class="menu">Open with</span> menu sets the preferred application to open this particular file.</li>
-<li><span class="menu">Permissions</span>: Lets you change owner, group and file permissions.</li>
-<li><span class="menu">Attibutes</span>: Lists all extra file attributes with their value and type.</li>
+<li><span class="menu">
+Informasi</span>: Menampilkan data standar seperti ukuran, tanggal pembuatan / modifikasi, jenis file, dan lokasi. Klik pada jalur lokasi untuk membuka folder induk file. menu <span class="menu">Buka dengan</span> menetapkan aplikasi yang disukai untuk membuka file khusus ini.</li>
+<li><span class="menu">Izin</span>: Memungkinkan Anda mengubah izin pemilik, grup, dan file.</li>
+<li><span class="menu">Attibutes</span>: Daftar semua atribut file tambahan dengan nilai dan jenisnya.</li>
 </ul>
 </li>
-<li><p><span class="menu">Edit name</span>, <span class="menu">Duplicate</span> and <span class="menu">Move to trash</span> - lets you rename or duplicate a file or put the selected file(s) to the trash.</p></li>
-<li><p><span class="menu">Move to</span>, <span class="menu">Copy to</span> and <span class="menu">Create link</span> - lets you move, copy or link the selected file(s) using the submenu navigating method. Holding <span class="key">SHIFT</span> while invoking the menu offers the option to create a relative link.</p></li>
-<li><p><span class="menu">Cut</span>, <span class="menu">Copy</span> and <span class="menu">Paste</span> - lets you cut, copy and paste files using the clipboard. By holding <span class="key">SHIFT</span> while invoking the menu you can <span class="menu">Copy/Cut more</span> files, maybe from another folder that you can paste somewhere else later. Also, while holding <span class="key">SHIFT</span> you can paste the copied files in the clipboard as links.</p></li>
-<li><p><span class="menu">Identify</span> - will sniff out and set the type of files if they didn't have one before, e.g. if you transferred a file with <span class="cli">wget</span> which doesn't set a filetype itself. Holding <span class="key">SHIFT</span> while invoking the menu changes the item to <span class="menu">Force identify</span> which identifies the filetype and corrects it if it was false before.</p></li>
-<li><p><span class="menu">Add-Ons</span> - offers you every generic Tracker add-on and those that can handle the selected file(s). See topic <a href="tracker-add-ons.html">Tracker Add-ons</a> for more information.</p></li>
+<li><p><span class="menu">Edit nama</span>, <span class="menu">Duplikasi </span> and <span class="menu">Pindahkan ke tempat sampah</span> - memungkinkan Anda mengubah nama atau menggandakan file atau memasukkan file yang dipilih ke tempat sampah.</p></li>
+<li><p><span class="menu">Pindah ke</span>, <span class="menu">Salin ke</span> dan <span class="menu">Buat tautan</span> - memungkinkan Anda memindahkan, menyalin, atau menautkan file yang dipilih menggunakan metode navigasi submenu. Memegang <span class="key">SHIFT</span> sambil menjalankan menu menawarkan opsi untuk membuat tautan relatif.</p>
+</li>
+<li><p><span class="menu">Potong</span>, <span class="menu">Salin </span> dan <span class="menu">Tempel</span> - memungkinkan Anda memotong, menyalin, dan menempel file menggunakan clipboard. Dengan menahan <span class="key">SHIFT</span> saat menjalankan menu, Anda dapat <span class="menu">menyalin/memotong lebih banyak </span> file, mungkin dari folder lain yang dapat Anda tempelkan di tempat lain nanti. Selain itu, sambil menahan <span class="key">SHIFT</span> Anda dapat menempelkan file yang disalin di clipboard sebagai tautan.</p></li>
+<li><p><span class="menu">Identifikasi </span> -  akan mengendus-endus dan menetapkan jenis file jika sebelumnya tidak memilikinya, mis. jika Anda mentransfer file dengan <span class="cli">wget</span> yang tidak menetapkan tipe file itu sendiri. Memegang <span class="key">SHIFT</span> sambil menjalankan menu akan mengubah item menjadi <span class="menu">identifikasi paksa</span> yang mengidentifikasi jenis file dan memperbaikinya jika itu salah sebelumnya.</p></li>
+<li><p><span class="menu">Pengaya</span> - menawarkan Anda setiap add-on Tracker generik dan yang dapat menangani file yang dipilih. Lihat topik <a href="tracker-add-ons.html">pengaya Tracker</a>  untuk informasi lebih lanjut.</p></li>
 </ul>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="transaction-status" name="transaction-status">Transaction status</a></h2>
-<p>When you copy, move or delete files, Tracker shows its progress with a status window. If you initiate more than one transaction, each job gets its own status display.</p>
+<a id="transaction-status" name="transaction-status">Status transaksi</a></h2>
+<p>Saat Anda menyalin, memindahkan, atau menghapus file, Pelacak menunjukkan progresnya dengan jendela status. Jika Anda melakukan lebih dari satu transaksi, setiap pekerjaan mendapatkan tampilan statusnya sendiri.</p>
 <img src="images/tracker-images/transaction-status.png" alt="transaction-status.png" />
-<p>To the right are two buttons to pause or stop a transaction entirely. Sometimes it can be useful to temporarily pause a large transaction. For example, you may need to quickly launch a large application. Copying large amounts of data chokes your harddisk's IO bandwidth and thus delays your workflow.</p>
+<p>Di sebelah kanan ada dua tombol untuk menjeda atau menghentikan transaksi sepenuhnya. Terkadang berguna untuk menghentikan sementara transaksi besar. Misalnya, Anda mungkin perlu meluncurkan aplikasi besar dengan cepat. Menyalin sejumlah besar data mencekik bandwidth IO harddisk Anda dan dengan demikian menunda alur kerja Anda.</p>
 
 </div>
 </div>
@@ -214,7 +222,7 @@ This type-ahead filtering is set in the <a href="#tracker-preferences.html">Trac
 <div class="nav">
 <div class="inner"><span>
  «  <a href="teammonitor.html">Team Monitor</a> 
-::  <a href="contents.html" class="uplink">Daftar Isi</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
 ::  <a href="tracker-add-ons.html">Tracker Add-Ons</a>  »
 </span></div>
 </div>

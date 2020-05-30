@@ -58,18 +58,17 @@
 
 <div id="content">
 <div>
-<div class="box-info">La traduzione di questa pagina non è stata completata. Per questo motivo le parti non tradotte sono visibili in inglese.</div>
 
 <h1>Gli add-on del Tracker</h1>
 
 <p>Le Applicazioni possono installare gli add-on in modo che essi possano essere facilmente invocati quando si selezionano dei file dal Tracker. Solo gli addon che possono gestire un tipo di file sono presenti nel menu <span class="menu">Add-Ons</span> o nel menu <span class="menu">File</span> di una finestra del Tracker. Alcuni add-on non hanno necessariamente bisogno di un file su cui lavorare e quindi sono sempre presenti nel menu.</p>
-<p>New Tracker add-ons that don't come as part of a regular .hpkg package, can be installed by copying them into their respective non-packaged folder (see topic <a href="filesystem-layout.html">Filesystem layout</a>):</p>
+<p>I componenti aggiuntivi del Tracker che non sono distribuiti attravero un package .hpkg possono essere installati copiandoli all'interno della rispettiva cartella sotto non-package (consulta alla guida al capitolo <a href="filesystem-layout.html">Struttura del Filesystem</a>):</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path">/boot/system/non-packaged/add-ons/Tracker/</span></td><td>   </td><td>per gli add-on disponibili a tutti gli utenti.</td></tr>
-<tr><td><span class="path">/boot/home/config/non-packaged/add-ons/Tracker/</span></td><td>   </td><td>per gli add-on disponibili solo all'utente</td></tr>
+<tr><td><span class="path">/boot/common/add-ons/Tracker/</span></td><td>   </td><td>per gli add-on disponibili a tutti gli utenti.</td></tr>
+<tr><td><span class="path">/boot/home/config/add-ons/Tracker/</span></td><td>   </td><td>per gli add-on disponibili solo all'utente</td></tr>
 </table>
-<p>The file name of an add-on can be suffixed with a dash and capital letter, and is then available via keyboard shortcut. For example, <span class="app">Open Target Folder-O</span> opens with <span class="key">ALT</span> <span class="key">OPT</span> <span class="key">O</span>.<br />
-Of course, you have to take care of possible shortcut collisions when deciding on a shortcut. You can't have the same for different add-ons.</p>
+<p>Il nome file di un addon può essere indicato con il suffisso "-" e lettera maiuscola ed è, quindi, disponibile tramite le scorciatoie da tastiera. Ad esempio <span class="app">Apri cartella di destinazione-O</span> può essere aperto con <span class="key">ALT</span> <span class="key">OPT</span> <span class="key">T</span>.<br />
+Naturalmente non è possibile avere la stessa scorciatoia per diversi add-on. Quando ne viene scelta una, è importante essere sicuri che non ci siano collisioni tra quelle esistenti.</p>
 
 <h2><a id="system-add-ons" name="system-add-ons">Gli add-on del Tracker forniti da Haiku</a></h2>
 <p>Questi add-on del Tracker sono disponibili con ogni installazione di Haiku:</p>
@@ -80,7 +79,7 @@ Of course, you have to take care of possible shortcut collisions when deciding o
 		<td valign="top">Lancia l'applicazione <a href="applications/diskusage.html">DiskUsage</a> con la cartella di base specificata.</td></tr>
 	<tr><td class="onelinetop"><b>FileType</b><i>-F</i></td>
 		<td valign="top">Invocato su di un file, apre il suo specifico pannello <a href="filetypes.html">FileType</a>, in caso contrario verrà lanciato il pannello generale delle preferenze FileTypes.</td></tr>
-	<tr><td class="onelinetop"><b>Open Target Folder</b><i>-O</i></td>
+	<tr><td class="onelinetop"><b>Apri cartella di destinazione</b><i>-O</i></td>
 		<td valign="top">Può essere utilizzato solo con un collegamento ad un file ed apre la cartella in cui si trova.</td></tr>
 	<tr><td class="onelinetop"><b>TextSearch</b><i>-G</i></td>
 		<td valign="top">Apre l'applicazione <a href="applications/textsearch.html">TextSearch</a> per cercare una stringa nella cartella selezionata (e nelle sue sottocartelle).</td></tr>

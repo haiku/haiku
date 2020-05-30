@@ -25,7 +25,7 @@
 <body>
 
 <div id="banner">
-<div><span>ユーザーガイド</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -83,7 +83,7 @@
 <tr><td>場所:</td><td></td><td><span class="path">/boot/system/preferences/E-mail</span></td></tr>
 <tr><td>設定ファイル:</td><td></td><td><span class="path">~/config/settings/Mail/*</span></td></tr>
 </table>
-<p>Haiku は、メールサービス (mail_daemon) を通じ定期的に電子メールを取得して、メールごとに単一のテキストファイルに保存するシステムを提供します。システムはメールを解析して、差出人、宛先、題名、未読 (既読) といった必要なすべてのヘッダー情報でメールファイルの属性を設定します。処理は直接あるいは各アプリケーションから要求できます。また、このシステムはすべてのデータと構成を保ちつつメールクライアントを切り替えることを容易にします。<br />
+<p>Haiku は、メールサービス (mail_daemon) を通じ電子メールを定期的に取得して、メールごとに単一のテキストファイルに保存するシステムを提供します。システムはメールを解析して、差出人、宛先、題名、未読 (既読) といった必要なすべてのヘッダー情報でメールファイルの属性を設定します。処理は直接あるいは各アプリケーションから要求できます。また、このシステムはすべてのデータと構成を保ちつつメールクライアントを切り替えることを容易にします。<br />
 構成はメール設定パネルで行います。</p>
 
 <h2>
@@ -93,8 +93,8 @@
 まず<span class="button">追加 (Add)</span> ボタンをクリックして、新しく無名のアカウントを作成します。すると、アカウント情報を入力するパネルが開きます。</p>
 <img src="../images/prefs-images/e-mail-new-account.png" alt="e-mail-new-account.png" />
 <p>最初に、メールを取得する方法として、<span class="menu">POP3</span> か <span class="menu">IMAP</span> を選びます。</p>
-<p>それから、<i>E-mail アドレス</i> (E-mail Address)、<i>ログイン名</i> (Login Name)、<i>パスワード</i> (Password) を入力して、Haiku 内で用いられる<i>アカウント名</i> (Account Name) と<i>本名</i> (Real Name) も決めてください。</p>
-<p>(海外の) 主要な電子メールプロバイダーを利用している場合、Haiku はすでにサーバーの IP アドレスのような技術項目をすべて理解しています。それ以外の場合は、<span class="button">次へ (Next)</span> をクリックすると、これらの情報を手入力するためのウィンドウが開きます。</p>
+<p>それから、<i>E-mail アドレス</i> (E-mail Address)、<i>ログイン名</i> (Login Name)、<i>パスワード</i> (Password) を入力して、Haiku 内で用いられる<i>アカウント名</i> (Account Name) と<i>実名</i> (Real Name) も決めてください。</p>
+<p>(海外の) 主要な電子メールプロバイダーを利用している場合、Haiku はすでにサーバーの IP アドレスのような技術項目をすべて理解しています。それ以外の場合は、<span class="button">次へ (Next)</span> をクリックすると、これらの情報を手入力するウィンドウが開きます。</p>
 <img src="../images/prefs-images/e-mail-new-account-2.png" alt="e-mail-new-account-2.png" />
 <p>まず、受信メールの<i>サーバー名 (Server name)</i>、<i>認証方法 (Login type)</i>、および<i>接続タイプ (Connection type)</i> を設定します。その下は、送信メールの設定です。ユーザーの電子メールプロバイダーのウェブサイトで必要な情報は得られるはずです。<br />
 各種設定や追加の設定について詳しくは以下を見てください。</p>
@@ -104,7 +104,7 @@
 <a id="account-settings" name="account-settings">アカウント設定</a></h2>
 <p>左側のリスト中のアカウント名を選ぶと、いくつかの全般設定を変更できます。</p>
 <img src="../images/prefs-images/e-mail-accounts.png" alt="e-mail-accounts.png" />
-<p><i>アカウント名</i>は、たとえば E-mail 設定のアカウントリストに表示される名前です。<i>実名</i>は、メールを受信した人が見る名前です。<i>返信先アドレス</i>は、メールに返信するときに用いられるメールアドレスです。通常は、送信元アドレスと同じになります。</p>
+<p><i>アカウント名 (Account name)</i> は、たとえば E-mail 設定のアカウントリストに表示される名前です。<i>実名 (Real name)</i> は、メールを受信した人が見る名前です。<i>返信先アドレス (Return address)</i> は、メールに返信するときに用いられるメールアドレスです。通常は、送信元アドレスと同じになります。</p>
 <p>もし、アカウントを送信専用、または受信専用にするなら、左側のアカウント名を右クリックして、チェックマークをセットすることで、機能を無効 / 有効にできます。</p>
 
 <h2>
@@ -127,17 +127,17 @@
 <img src="../images/prefs-images/e-mail-out.png" alt="e-mail-out.png" />
 <p>最初に、送信用の <i>SMTP サーバー (SMTP Server)</i>  アドレスを設定します。先の受信サーバーと同様、必要に応じて特定のポートを指定できます (例 <tt>mail.your-provider.org:1200</tt>)。</p>
 <p>ログインする必要があれば、<i>ログインの種類 (Login Type)</i> を <span class="menu">ESMTP</span> に変更しユーザー名とパスワードを入力します。もう 1 つは、プロバイダーがメール確認時に認証のため <span class="menu">POP3 before SMTP</span> を要求する場合に用いられます。</p>
-<p>受信メールと同様に、送信箱の <i>場所</i> (Destination) を変更できます。(デフォルト: <span class="path">/boot/home/mail/out/</span>)</p>
+<p>受信メールと同様に、送信箱の<i>場所</i> (Destination) を変更できます。(デフォルト: <span class="path">/boot/home/mail/out/</span>)</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="filters" name="filters">通知とその他の電子メールフィルター</a></h2>
-<p>新着メールの通知および、メールの並び替え、フィルターについては、アカウント名の下の<span class="menu">メールフィルター (E-Mail filters)</span> で見つかります。互いに適用するフィルターをいくらでも追加でき、それらをドラッグ＆ドロップで新しい場所に再配置できます。<br />
+<p>新着メールの通知および、メールの並び替え、フィルターは、アカウント名の下の<span class="menu">メールフィルター (E-Mail filters)</span> で見つかります。互いに適用するフィルターをいくらでも追加でき、それらをドラッグ＆ドロップで新しい場所に再配置できます。<br />
 今のところ、3 種類の<span class="menu">受信メールフィルター (Incoming mail filters)</span> を追加できます。フィルターを追加したら、オプションを理解するためにそれを選択してください。</p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 スパムフィルター (AGMS ベイジアン)</h3>
 <img src="../images/prefs-images/e-mail-filter-spam.png" alt="e-mail-filter-spam.png" />
-<p>スパムフィルターは不要なスパムの判定に統計的手法を利用します。メールには 0 から 1 までの評価値が付与され、ユーザーはスパムと通常のメールとの境界値を決めることができます。<br />
+<p>スパムフィルターは不要なスパムの判定に統計的手法を利用します。メールには 0 から 1 までの評価値が付与され、ユーザーはスパムと通常のメールとの境界値を決められます。<br />
 評価値を受信メールの題名の先頭に追加できます。<br />
 また、スパムフィルターはすべての受信メールから学習できます。もちろん、誤ってスパム判定されている偽陽性のメールを仕分けて、スパムフィルターに学習させなくてはいけません。<span class="app">メール</span>アプリケーションの説明時に詳しく知るでしょう。</p>
 <p><span class="menu">ルールフィルター (Rule filter)</span> との併用で、検出されたスパムメールを自動的に整理できます。</p>
@@ -151,9 +151,9 @@
 <table summary="match header" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><span class="menu">名前</span></td><td style="width:5px;"> </td>
 		<td>差出人の名前</td></tr>
-	<tr><td><span class="menu">差出人</span></td><td> </td>
+	<tr><td><span class="menu">From</span></td><td> </td>
 		<td>差出人のメールアドレス</td></tr>
-	<tr><td><span class="menu">To</span> (宛先)</td><td> </td>
+	<tr><td><span class="menu">To</span></td><td> </td>
 		<td>あなたのメールアドレス (アカウントによって異なります)</td></tr>
 	<tr><td><span class="menu">Reply To</span></td><td> </td>
 		<td>返信先のメールアドレス</td></tr>
@@ -176,7 +176,7 @@
 	<tr><td class="onelinetop"><span class="menu">Spam/Genuine Estimate</span> (評価値)</td><td> </td>
 		<td>これはスパムフィルターが電子メールに付加する評価値です。これは科学的記法で表記され、たとえば、1.065e-12 は 1.065 を 10 の 12 乗で割った 0.000000000001065 を意味します。</td></tr>
 </table>
-<p>2 番目のテキストフィールドには検索パターンを入力します。ここでは、<a href="http://ja.wikipedia.org/wiki/%E6%AD%A3%E8%A6%8F%E8%A1%A8%E7%8F%BE" class="external free" title="Wikipedia: Regular expression" rel="nofollow">正規表現 (regular expression)</a> が利用可能で、多少複雑になる場合があるものの高い柔軟性を提供しています。リンク先を少し読めば、正規表現を利用する価値が充分にあり、また単純な検索パターンに関しては<i>それほど</i>複雑にならないことがわかるでしょう。</p>
+<p>2 番目のテキストフィールドには検索パターンを入力します。ここでは、<a href="http://ja.wikipedia.org/wiki/%E6%AD%A3%E8%A6%8F%E8%A1%A8%E7%8F%BE" class="external free" title="Wikipedia: Regular expression" rel="nofollow">正規表現 (Regular expression)</a> が利用可能で、多少複雑になる場合があるものの高い柔軟性を提供しています。リンク先を少し読めば、正規表現を利用する価値が充分にあり、また単純な検索パターンに関しては<i>それほど</i>複雑にならないことがわかるでしょう。</p>
 <p>その下のポップアップメニューで、パターンが一致した際の処理を選択します。メールの移動や削除、"Read (既読)" などメールのステータス変更、返信に用いるメールアドレスの設定ができます。</p>
 
 <h3>
@@ -189,13 +189,13 @@
 		<td>通知しない</td></tr>
 	<tr><td><span class="menu">ビープ音</span></td><td> </td>
 		<td><i>すべての</i>新着メールに対して、<a href="sounds.html">サウンド</a>プレファレンスで設定したサウンドファイルを再生</td></tr>
-	<tr><td><span class="menu">警告</span></td><td> </td>
+	<tr><td><span class="menu">警告ウィンドウ</span></td><td> </td>
 		<td><i>すべての</i>新着メールに対して、警告ウィンドウを表示</td></tr>
 	<tr><td><span class="menu">キーボード LED</span></td><td> </td>
 		<td>CapsLock キーのような、キーボードの LED を点滅</td></tr>
-	<tr><td class="onelinetop"><span class="menu">Central alert</span></td><td> </td>
+	<tr><td class="onelinetop"><span class="menu">警告ウィンドウ (すべてのアカウント)</span></td><td> </td>
 		<td>新着メールに対して、警告ウィンドウを<i> 1 つ</i>表示</td></tr>
-	<tr><td><span class="menu">Central beep</span></td><td> </td>
+	<tr><td><span class="menu">ビープ音 (すべてのアカウント)</span></td><td> </td>
 		<td><a href="sounds.html">サウンド</a>プレファレンスで設定した新着メール用サウンドファイルを<i>一度</i>再生</td></tr>
 	<tr><td><span class="menu">ログウィンドウ</span></td><td> </td>
 		<td>ログウィンドウを表示</td></tr>

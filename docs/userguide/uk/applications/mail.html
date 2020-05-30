@@ -10,6 +10,7 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
+ *		'
  *		totish
  *
 -->
@@ -23,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>Настанова користувачеві</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -60,7 +61,7 @@
 
 <div id="content">
 <div>
-<div class="box-info">Переклад даної сторінки ще неповний. Допоки це так, незавершені частини користайте у англійському варіанті. </div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Зміст</td></tr>
@@ -79,14 +80,14 @@
 <span class="path">~/config/settings/Mail/status/</span> - Місце для зберігання призначених для користувача статусів.</td></tr>
 </table>
 <p><br /></p>
-<p>Пошта типовий для Haiku переглядач та редактор повідомлень. Він не має нічого спільного з реальною вибіркою і відправкою пошти, яка здійснюється за допомогою mail_daemon і може бути налаштований за допомогою налаштувань <a href="../preferences/e-mail.html">Пошта (E-mail)</a> .</p>
+<p>Пошта, це програма для перегляду та редагування поштових повідомлень яка використовується системою Haiku за замовчуванням. Вона не має нічого спільного з реальними отриманням та відправкою пошти, що здійснюються за допомогою mail_daemon, процес конфігурації якого описаний у розділі <a href="../preferences/e-mail.html">E-mail</a>.</p>
 <p>Ця сторінка загальний огляд поштової програми. Для отримання додаткової інформації про те, як працює електронна пошта в Haiku, зверніться до <a href="../workshop-email.html">Семінару про обслуговування пошти</a>.</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="reading" name="reading">Читання повідомлень</a></h2>
 <p>Ваш двоклік на поштовому файлі відкриє його у Пошті. Інтерфейс надзвичайно простий:</p>
 <img src="../images/apps-images/mail-read.png" alt="email-read.png" /> 
-<p>Меню і додаткові панелі інструментів зверху, місце цікавих атрибутів пошти (до, з, за умови, дати) нижче, а потім фактичне тіло пошти. Якщо пошта показує дивні символи або пустоту, спробуйте змінити <span class="menu">Кодування (Decoding)</span> з випадаючого меню.</p>
+<p>A menu and optional tool bar on top, with an area of the interesting attributes of a mail (to, from, subject, date) below that, and then the actual body of the mail. If the mail appears with strange characters or empty, try to change the <span class="menu">Encoding</span> in the <span class="menu">Message</span> menu.</p>
 <p>Якщо є файли, прикріплені до електронної пошти вони перераховані в кінці цього повідомлення. Клікання правою кнопкою мишки на ньому відкриває контекстне меню <span class="menu">Зберегти вкладення... (Save attachment...)</span> або  <span class="menu">Відкрити вкладення (Open attachment)</span>. Ви також можете перетягнути його прямо на робочий стіл або інше вікно Tracker'а.</p>
 <p>Більшість із основних пунктів меню і інструментів досить зрозумілі, тому ми зосередимося тільки на основних моментах.</p>
 <h3>
@@ -99,7 +100,7 @@
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Перегляд</h3>
 <p>Вам дуже рідко знадобляться  ці два елементи, взагалі то:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="menu">Показати заголовок (Show header)</span></td><td class="onelinetop"><span class="key">ALT</span> <span class="key">H</span></td><td style="width:10px;"></td><td>Показує повний заголовок листа, в разі, якщо вам потрібно відстежити шлях вашої пошти, наприклад.</td></tr>
+<tr><td><span class="menu">Показати заголовок (Show header)</span></td><td class="onelinetop"><span class="key">ALT</span> <span class="key">H</span></td><td style="width:10px;"></td><td>Показує повний заголовок листа, наприклад, в тому випадку, якщо вам потрібно відстежити шлях вашої пошти.</td></tr>
 <tr><td class="onelinetop"><span class="menu">Показати чисте повідомлення (Show raw message)</span></td><td></td><td></td><td>Відображає пошту в сирому вигляді, тобто з усіма керуючими символами і без забарвлення в цитатах або URL, наприклад .</td></tr>
 </table>
 <h3>
@@ -122,7 +123,7 @@
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="creating" name="creating">Creating new messages</a></h2>
-<p>A new email is created by invoking the <span class="menu">New mail message</span> menu or the corresponding icon from the tool bar of an open email. Or you just start the Mail application or choose <span class="menu">Create new message...</span> from the context menu of the mailbox icon in the Deskbar.</p>
+<p>A new email is created by invoking <span class="menu">New mail message</span> of the <span class="menu">File</span> menu or the corresponding icon from the tool bar of an open email. Or you just start the Mail application or choose <span class="menu">Create new message...</span> from the context menu of the mailbox icon in the Deskbar.</p>
 <img src="../images/apps-images/mail-write.png" alt="email-write.png" /> 
 <p>The window is pretty similar to the one when reading mails. The menu and tool bar items are slightly different and the text boxes have to be filled with the recipient's email address, subject and so on, of course.</p>
 <p><span class="menu">Cc</span> is short for the anachronistic term "<i>carbon copy</i>" and results in copies of your mail being sent to the listed people. The difference to just listing a buch of addresses in the "To" field is, that you don't directly address the cc'ed people, thereby signaling that you probably don't expect an answer of them.<br />

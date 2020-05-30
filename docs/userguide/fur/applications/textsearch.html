@@ -9,6 +9,8 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Fabio Tomat
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -21,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Vuide utent</span></div>
 </div>
 
 <div class="nav">
@@ -50,7 +52,7 @@
 <li><a href="../../jp/applications/textsearch.html">日本語</a></li>
 </ul>
 <span>
- «  <a href="terminal.html">Terminal</a> 
+ «  <a href="terminal.html">Terminâl</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Aplicazions</a> 
 ::  <a href="tv.html">TV</a>  »
 </span></div>
@@ -58,48 +60,47 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h2><img src="../../images/apps-images/textsearch-icon_64.png" alt="textsearch-icon_64.png" width="64" height="64" />TextSearch</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><i>No entry, normally launched via Tracker Add-on</i></td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><i>Nissune vôs, di solit inviât vie component adizionâl di Tracker</i></td></tr>
 <tr><td>Posizion:</td><td></td><td><span class="path">/boot/system/apps/TextSearch</span></td></tr>
 <tr><td>Impostazions:</td><td></td><td><span class="path">~/config/settings/TextSearch</span></td></tr>
 </table>
 <p><br /></p>
-<p>TextSearch looks for a string in text files. Typically it is invoked from <a href="../tracker-add-ons.html">Tracker's Add-on</a> context menu on the selection of files or folders you want to search.</p>
+<p>TextSearch al cîr une stringhe tai file di test. Di solit al ven invocât dal menù contestuâl dai <a href="../tracker-add-ons.html">components adizionâi di Tracker</a> su la selezion dai file o des cartelis dulà che tu desideris cirî.</p>
 
 <img src="../images/apps-images/textsearch.png" alt="textsearch.png" />
 
-<p>You enter a search string in the text box on top and hit <span class="key">RETURN</span> or click <span class="button">Search</span> to start. If <span class="menu">Show lines</span> is checked, the hits are automatically expanded to show the lines of the file containing the search string.</p>
+<p>Tu inserissis une stringhe di ricercje inte casele di test parsore e tu frachis <span class="key">INVIE</span> o tu fasis clic su <span class="button">Cîr</span> par scomençâ. Se <span class="menu">Mostre riis</span> al è segnât, i risultâts a vegnin slargjâts in automatic par mostrâ lis riis dal file che a contegnin la stringhe di ricercje.</p>
 
-<p>Only a few words on some of the otherwise self-explaining menu items:</p>
+<p>Dome cualchi peraule su cualchi element dal menù che se no si spieghe di bessôl:</p>
 <table summary="menus" border="0" cellpadding="2" cellspacing="0">
-<tr><td colspan="5"><h3>File menu</h3></td></tr>
-<tr><td class="onelinetop"><span class="menu">New window</span></td><td></td><td><span class="key">ALT</span> <span class="key">N</span></td><td> </td><td>Opens a new window where you can enter another string and search through the same files/folders.
+<tr><td colspan="5"><h3>Menù File</h3></td></tr>
+<tr><td class="onelinetop"><span class="menu">Gnûf barcon</span></td><td></td><td><span class="key">ALT</span> <span class="key">N</span></td><td> </td><td>Al vierç un gnûf barcon dulà che tu puedis cirî intal stes file/cartele une altre stringhe.
 </td></tr>
-<tr><td><span class="menu">Set target...</span></td><td></td><td><span class="key">ALT</span> <span class="key">F</span></td><td></td><td>Lets you choose a new set of files and folders to search through. Alternatively you can drag and drop files/folders into the window.</td></tr>
-<tr><td colspan="5"><h3>Action menu</h3></td></tr>
-<tr><td><span class="menu">Trim selection</span></td><td></td><td><span class="key">ALT</span> <span class="key">T</span></td><td> </td><td>Removes all entries from the list that are not currently selected.</td></tr>
-<tr><td><span class="menu">Open selection</span></td><td></td><td><span class="key">ALT</span> <span class="key">O</span></td><td></td><td>Opens the currently selected files with their preferred application (same as a double-click). If it's a text editor supporting it (like Pe), you can jump to the exact line the search string was found.</td></tr>
-<tr><td><span class="menu">Show files in Tracker</span></td><td></td><td><span class="key">ALT</span> <span class="key">K</span></td><td></td><td>Opens the location of the currently selected files in Tracker.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Copy text to clipboard</span></td><td></td><td><span class="key">ALT</span> <span class="key">B</span></td><td></td><td>Copies the current selection to the clipboard.</td></tr>
-<tr><td colspan="5"><h3>Settings menu</h3></td></tr>
-<tr><td colspan="3" class="onelinetop"><span class="menu">Skip folders starting with a dot</span></td><td> </td><td>This is useful when working in a "unixy" environment, where often administrative files are hidden inside "<tt>.folders/</tt>". Source versioning systems like SVN and CVS are examples of applications using this and are also widely used in Haiku.</td></tr>
-<tr><td colspan="3"><span class="menu">Regular expression</span></td><td> </td><td>TextSearch uses the command line tool <span class="cli">grep</span>. For it, special characters like <tt>'"*\$?!</tt> and spaces have to be escaped with a <tt>\</tt>. Activating this setting means you have to do this yourself, but in exchange grants you the power of <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expressions" rel="nofollow">regular expressions</a>.</td></tr>
-<tr><td colspan="3"><span class="menu">Text files only</span></td><td> </td><td>TextSearch is currently only useful for finding strings in plain text files. Deactivating this setting will have it look through any kind of file anyway.</td></tr>
-<tr><td colspan="3"><span class="menu">Open files in code editor</span></td><td> </td><td>Forces files to be opened in the preferred code editor (that handles text/x-source-code). Otherwise a file will be opened in whatever app is set for its filetype. Useful, for example, when editing HTML files that normally would open in your browser.</td></tr>
-<tr><td colspan="5"><h3>History menu</h3></td></tr>
-<tr><td colspan="4"></td><td>Contains recently used search strings.</td></tr>
-<tr><td colspan="5"><h3>Encoding menu</h3></td></tr>
-<tr><td colspan="4"></td><td>Lets you choose different character encodings if needed.</td></tr>
+<tr><td><span class="menu">Stabilìs destinazion...</span></td><td></td><td><span class="key">ALT</span> <span class="key">F</span></td><td></td><td>Ti permet di sielzi un gnûf grup di file e cartelis dulà lâ a cirî. In alternative tu puedis strissinâ e molâ i file/cartelis intal barcon.</td></tr>
+<tr><td colspan="5"><h3>Menù Azions</h3></td></tr>
+<tr><td><span class="menu">Ridûs ae selezion</span></td><td></td><td><span class="key">ALT</span> <span class="key">T</span></td><td> </td><td>Al gjave de liste dutis lis vôs che no son in chel moment selezionadis.</td></tr>
+<tr><td><span class="menu">Vierç selezion</span></td><td></td><td><span class="key">ALT</span> <span class="key">O</span></td><td></td><td>Al vierç i file che in chel moment a son selezionâts, cu la lôr aplicazion preferide (tant che un dopli-clic). Se si trate di un editôr di test che lu supuarte (come Pe), tu puedis saltâ daurman ae rie esate dulà che e je stade cjatade la stringhe di ricercje.</td></tr>
+<tr><td><span class="menu">Mostre i file tal Tracker</span></td><td></td><td><span class="key">ALT</span> <span class="key">K</span></td><td></td><td>Al vierç in Tracker la posizion dai file che in chel moment a son selezionâts.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Copie il test tes notis</span></td><td></td><td><span class="key">ALT</span> <span class="key">B</span></td><td></td><td>Al copie la selezione atuâl intes notis.</td></tr>
+<tr><td colspan="5"><h3>Menù Impostazions</h3></td></tr>
+<tr><td colspan="3" class="onelinetop"><span class="menu">Salte lis cartelis che a tachin cuntun pont</span></td><td> </td><td>Chest al è util cuant che si lavore intun ambient dal gjenar "unix", dulà che dispès i file di aministrazion a vegnin platâts dentri di "<tt>.cartelis/</tt>". I sistemis pe gjestion des varis versions dai sorzints, come SVN e CVS, a son esemplis di aplicazions che ju doprin e chescj programs a vegnin doprâts une vore in Haiku.</td></tr>
+<tr><td colspan="3"><span class="menu">Espression regolâr</span></td><td> </td><td>TextSearch al dopre il strument a rie di comant <span class="cli">grep</span>. Par lui, i caratars speciâi come <tt>'"*\$?!</tt> e i spazis a scugnin jessi interpretâts cul caratar “escape” <tt>\</tt>. Ativâ cheste impostazion al significhe che tu scugnis fâlu di bessôl, ma di cuintri ti garantìs lis potenzialitâts des <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expressions" rel="nofollow">espressions regolârs</a>.</td></tr>
+<tr><td colspan="3"><span class="menu">Dome file di test</span></td><td> </td><td>TextSearch cumò al è util dome par cirî stringhis tai file di test sempliçs. Se si disative che impostazion al cirarà dut câs su ogni gjenar di file.</td></tr>
+<tr><td colspan="3"><span class="menu">Vierç i file tal editôr di codiç</span></td><td> </td><td>Al sfuarce la vierzidure dai file intal editôr di codiç preferît (che al gjestìs text/x-source-code). In câs contrari un file al vignarà viert in cualsisei aplicazion stabilide pal so gjenar di file. Util, par esempli, cuant che si modifiche i file HTML che di solit a vegnin vierts cul navigadôr.</td></tr>
+<tr><td colspan="5"><h3>Menù Cronologjie</h3></td></tr>
+<tr><td colspan="4"></td><td>Al conten lis stringhis cirudis di resint.</td></tr>
+<tr><td colspan="5"><h3>Menù Codifiche</h3></td></tr>
+<tr><td colspan="4"></td><td>Ti permet di sielzi codifichis di caratar diviersis se a coventin.</td></tr>
 </table>
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="terminal.html">Terminal</a> 
+ «  <a href="terminal.html">Terminâl</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Aplicazions</a> 
 ::  <a href="tv.html">TV</a>  »
 </span></div>

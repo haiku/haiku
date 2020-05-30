@@ -9,6 +9,8 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Emir SARI
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -21,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>Kullanıcı kılavuzu</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -50,7 +52,7 @@
 <li><a href="../../jp/applications/stylededit.html">日本語</a></li>
 </ul>
 <span>
- «  <a href="soundrecorder.html">Ses Kaydedicisi</a> 
+ «  <a href="soundrecorder.html">Ses Kaydedici</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Uygulamalar</a> 
 ::  <a href="terminal.html">Terminal</a>  »
 </span></div>
@@ -58,18 +60,17 @@
 
 <div id="content">
 <div>
-<div class="box-info">Bu sayfanın çevrilmesi henüz tamamlanmamıştır. Tamamlanana kadar henüz bitirilmeyen kısımlar İngilizce metni kullanır.</div>
 
 <h2><img src="../../images/apps-images/stylededit-icon_64.png" alt="stylededit-icon_64.png" width="64" height="64" />StyledEdit</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Masaüstü Çubuğu:</td><td style="width:15px;"></td><td><span class="menu">Uygulamalar</span></td></tr>
 <tr><td>Konum:</td><td></td><td><span class="path">/boot/system/apps/StyledEdit</span></td></tr>
-<tr><td>Ayarlar:</td><td></td><td><i>none</i></td></tr>
+<tr><td>Ayarlar:</td><td></td><td><i>yok</i></td></tr>
 </table>
 <p><br /></p>
-<p>StyledEdit is Haiku's simple text editor. Although it saves files in plain text format, additional attributes are written in order to have limited formatting capabilities when viewed with StyledEdit.</p>
+<p>StyledEdit, Haiku'nun yalın metin düzenleyicisidir. Dosyalar düz metin biçiminde kaydedilmelerine rağmen, yalnızca StyledEdit'te açıldıklarında görüntülenen biçimlendirme özelliklerini saklamak için ek öznitelikler barındırırlar.</p>
 <img src="../images/apps-images/stylededit.png" alt="stylededit.png" />
-<p>If you're interested, this is what those additional attributes look like when examined in Terminal with <span class="cli">listattr</span>:</p>
+<p>İlginizi çekmesi durumunda, <span class="cli">listattr</span> komutu kullanarak Uçbirim'de dosya özniteliklerini görüntüleyebilirsiniz:</p>
 <pre class="terminal">~&gt; listattr /boot/home/Desktop/test.txt
 File: /boot/home/Desktop/test.txt
   Type         Size                 Name
@@ -81,17 +82,17 @@ MIME String         11  "BEOS:TYPE"
    Raw Data       1048  "styles"
 
 1071 bytes total in attributes.</pre>
-<p>As you can see, all the formatting options from StyledEdit's menu are present: line wrapping (on/off) and alignment (left/center/right), each in one attribute. Styles (font, size, color) of each letter mangled into another.</p>
-<div class="box-info">Because these attributes are a file system feature of BFS, this means that not only other platforms just see a plain text file, it also follows, that the formatting will be lost when a file is stored on a non-BFS partition. The above attributes are simply stripped and what's left is the ordinary, plain text file.</div>
-<p>In any case, it's a nice idea having the possibility of colored text in different fonts and sizes while still being a normal text file. A <span class="cli">ReadMe.txt</span>, for example, is therefore readable in a shell on any platform and still has a bit of style when viewed via double-click from Haiku.</p>
-<p>Actually using StyledEdit is so simple, we'll skip explaining every mundane menu item. Just write down your text then select the words you'd like to format and apply font, size and color from the <span class="menu">Font</span> menu. Line wrapping and alignment from the <span class="menu">Document</span> menu only work on the whole file.</p>
+<p>Gördüğünüz üzere, StyledEdit menüsünde bulunan tüm biçimlendirme seçeneklerini Uçbirim üzerinden de görüntülenebilir: Satır kaydırma, yaslama, vb. Stiller (yazıtipi, boyut, renk), birbirine karışık durumda bulunurlar.</p>
+<div class="box-info">Bu öznitelikler BFS dosya sisteminin bir özelliği olduğundan başka platformlar adı geçen dosyayı yalnızca düz metin olarak görürler ve BFS olmayan bir disk bölümünde saklandıklarında biçimlendirme kaybolur. Yukarıdaki öznitelikler dosyadan çıkartılırlar ve geriye yalnızca düz metin dosyası kalır.</div>
+<p>Düz bir metin dosyasını görüntüleyip değişik yazıtipleri ve renkler kullanabilmek yararlı bir özellik olarak görülebilir. Örneğin bir <span class="cli">BeniOku.txt</span> dosyası Uçbirim'de veya başka bir platformda herhangi ek bir programa gerek kalmadan görüntülenebilir, ancak aynı dosyayı Haiku'da çift tıklayarak açtığınızda biraz daha janjanlı bir içerik görebilir/kullanabilirsiniz.</p>
+<p>StyledEdit'in kullanımı o kadar kolaydır ki burada her özelliği teker teker açıklamaya gerek olmadığını düşünüyoruz. Yazacağınızı yazın ve yazıtipini ve metin boyutunu ayarlayın. Bu ayarlar için <span class="menu">Yazıtipi</span> menüsünü, satır kaydırma ve yaslama ayarları için ise <span class="menu">Belge</span> menüsünü kullanabilirsiniz.</p>
 
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="soundrecorder.html">Ses Kaydedicisi</a> 
+ «  <a href="soundrecorder.html">Ses Kaydedici</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Uygulamalar</a> 
 ::  <a href="terminal.html">Terminal</a>  »
 </span></div>

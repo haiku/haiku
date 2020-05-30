@@ -14,12 +14,13 @@
  *		Humdinger
  *		Andrea
  *		MichaelPeppers
+ *		Gabriele
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Appearance</title>
+	<title>Aspetto</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
@@ -56,88 +57,87 @@
 </ul>
 <span>
     <a href="../preferences.html" class="uplink">Preferenze</a> 
-::  <a href="backgrounds.html">Backgrounds</a>  »
+::  <a href="backgrounds.html">Sfondi</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">La traduzione di questa pagina non è stata completata. Per questo motivo le parti non tradotte sono visibili in inglese.</div>
 
-<h2><img src="../../images/prefs-images/appearance-icon_64.png" alt="appearance-icon_64.png" width="64" height="64" />Appearance</h2>
+<h2><img src="../../images/prefs-images/appearance-icon_64.png" alt="appearance-icon_64.png" width="64" height="64" />Aspetto</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Preferenze</span></td></tr>
-<tr><td>Localita:</td><td></td><td><span class="path">/boot/system/preferences/Appearance</span></td></tr>
+<tr><td>Percorso:</td><td></td><td><span class="path">/boot/system/preferences/Appearance</span></td></tr>
 <tr><td>Impostazioni:</td><td></td><td><span class="path">~/config/settings/system/app_server/appearance</span><br />
 <span class="path">~/config/settings/system/app_server/fonts</span></td></tr>
 </table>
-<p>Le preferenze in Appearance permettono di cambiare alcuni aspetti visivi di Haiku .</p>
+<p>Le preferenze in Aspetto permettono di cambiare alcuni aspetti visivi di Haiku .</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="fonts" name="fonts">Fonts</a></h2>
+<a id="fonts" name="fonts">Tipi di carattere</a></h2>
 <img src="../images/prefs-images/appearance-fonts.png" alt="appearance-fonts.png" />
-<p>Haiku defines three standard fonts for different purposes. You set plain, bold and fixed font types and sizes that will be used throughout the system. Besides these, there's also a separate setting for the font used in menus.</p>
+<p>Haiku definisce tre tipi di caratteri standard per il suo aspetto: testo normale, grassetto e a spaziatura fissa. Per ognuno di essi puoi definire il tipo di carattere da utilizzare e la dimensione. Oltre a questi, puoi definire anche il tipo di carattere da utilizzare per i menu.</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="installing_fonts" name="installing_fonts">Installing new fonts</a></h3>
-<p>New fonts that don't come as part of a regular .hpkg package, can be installed by copying them into a subfolder according to the font type (<tt>psfonts</tt> or <tt>ttfonts</tt>) into their respective <tt>non-packaged</tt> folder (see topic <a href="../filesystem-layout.html">Filesystem layout</a>). For TrueType fonts that would be:</p>
+<a id="installing_fonts" name="installing_fonts">Installare nuovi tipi di carattere</a></h3>
+<p>Nuovi tipi di carattere che non sono aggiunti in quanto parte di un pacchetto .hpkg possono essere aggiunti copiandoli in una sottocartella definita in base alla tipologia (<tt>postscript</tt> oppure <tt>truetype</tt>) nella rispettiva cartella <tt>non-packaged</tt> (consulta il paragrafo <a href="../filesystem-layout.html">Schema del File System</a>). Per i font TrueType:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path">/boot/system/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td> for fonts available to every user.</td></tr>
-<tr><td><span class="path">/boot/home/config/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td> for fonts only available to yourself.</td></tr>
+<tr><td><span class="path">/boot/system/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td>per i tipi di carattere che saranno disponibili a tutti gli utenti.</td></tr>
+<tr><td><span class="path">/boot/home/config/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td>per i tipi di carattere che saranno disponibili solo all'utente corrente.</td></tr>
 </table>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="colors" name="colors">Colori</a></h2>
 <img src="../images/prefs-images/appearance-colors.png" alt="appearance-colors.png" />
-<p>Nella prima tab, <span class="menu">Colori</span>, si possono cambiare i colori di diverse parti dell'interfaccia utente. Il colore accetta anche drag&amp;drop da altri programmi, permettendo di prendere colori da, per esempio, <span class="app">WonderBrush</span>, <span class="app">Icon-O-Matic</span> o dal pannello di <span class="app">Backgrounds</span>.</p>
+<p>Nella prima tab, <span class="menu">Colori</span>, si possono cambiare i colori di diverse parti dell'interfaccia utente. Il colore accetta anche drag&amp;drop da altri programmi, permettendo di prendere colori da, per esempio, <span class="app">WonderBrush</span>, <span class="app">Icon-O-Matic</span> o dal pannello di <span class="app">Sfondi</span>.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="decorators" name="decorators">Window decorators</a></h2>
+<a id="decorators" name="decorators">Decoratori di Finestra</a></h2>
 <img src="../images/prefs-images/appearance-decorators.png" alt="appearance-decorators.png" />
-<p>Decorators determine the look and feel of windows and all GUI elements. Currently Haiku comes with only one default decorator. Should you find and install other decorators, you can choose a different one from the pop-up menu.</p>
-<p>Haiku's default decorator lets you set the arrow style of the scroll bar: either single arrows at the end of scrollbars to conserve a bit of space, or double arrows — the traditional BeOS way — potentially saving some mouse moving when scrolling up and down or left and right...</p>
+<p>I decodatori determinano l'aspetto delle finestre e degli elementi dell'interfaccia grafica. Haiku è distribuito con un solo decoratore, ma è possibile cercarne e installarne di altri. Una volta fatto, essi saranno disponibili nell'apposito menu a tendina.</p>
+<p>Il decoratore predefinito di Haiku consente di personalizzare lo stile delle frecce nella barra di scorrimento: una sola freccia ad ognuna delle estremità per risparmiare un po' di spazio, o una doppia freccia — come in BeOS — che consente potenzialmente di diminuire il movimento del mouse durante lo scrolling...</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="antialiasing" name="antialiasing">Antialiasing</a></h2>
+<a id="antialiasing" name="antialiasing">Antialias</a></h2>
 <img src="../images/prefs-images/appearance-antialiasing.png" alt="appearance-antialiasing.png" />
-<p>The tab <span class="menu">Antialiasing</span> provides different settings for how things are rendered on screen.</p>
+<p>La tab <span class="menu">Antialias</span> consente di personalizzare diversi aspetti di come gli oggetti sono riportati sullo schermo.</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-Glyph hinting</h3>
-<p>An activated <span class="menu">Glyph hinting</span> aligns all letters in such a way that their vertical and horizontal edges rest exactly between two pixels. The result is a perfect contrast, especially when dealing with black on white. Text appears crisper. There's also a setting for <span class="menu">Monospaced fonts only</span> that's especially helpful with low resolution devices like netbooks. Small fonts can look pretty bad when hinting is turned on, but with this setting you still have the advantage of hinting for text editors and Terminal.</p>
+Hinting dei glifi</h3>
+<p>Quando <span class="menu">l'hinting dei glifi</span> è attivato, i caratteri sono allineati in un modo che i loro limiti verticali e orizzontali siano esattamente tra due pixel. Il risultato è un contrasto perfetto, specialmente sul bianco e nero. Il testo appare più nitido. È disponibile anche un parametro solo per i tipi di carattere <span class="menu">a spaziatura fissa</span>, particolamente adatto per i dispositivi con una bassa risoluzione, come i netbook. Caratteri di dimensioni ridotte possono presentare un effetto sgradevole, con l'hinting attivat. D'altra parte, quando attivo, anche l'aspetto dei caratteri negli editor di testo e nelle finestre di terminale risulta migliore.</p>
 <p>Osservate le differenze che si hanno attivando o disattivando l'hinting in questi due screenshot:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" /><br />Hinting: disattivato</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on.png" alt="appearance-glyph-on.png" /><br />Hinting: attivato</td></tr>
 </table>
-<p>It should be pointed out that all the <span class="app">Magnify</span> windows on this page are of course rendered themselves with the different options as well. So, you get a real world impression of the settings by comparing, for example, the bold yellow tab title or the text "33 x 15 @ 8 pixels/pixel".</p>
+<p>È opportuno notare che, in questa pagina, tutti gli screensot dell'applicazione <span class="app">Magnify</span> sono stati ottenuti con diverse impostazioni attivate. In questo modo, puoi farti una idea molto precisa del loro impatto confrontando, ad esempio, il grassetto sulla tab gialla del titolo della finestra oppure il testo "33 x 15 @ 8 pixels/pixel".</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-Tipo di Antialiasing</h3>
-<p>Another technique to improve rendering is <i>Antialiasing</i>, which supports all vector graphics as well as text. It smooths lines by changing the color of certain pixels. There are two methods for that:</p>
-<p><span class="menu">Grayscale</span> changes the intensity of pixels at the edge.<br />
-<span class="menu">LCD subpixel</span> does an even better job, especially with (high resolution) LCD monitors. Instead of the intensity of a pixel, it changes its color which moves an edge by a fraction of a pixel, because LCD displays produce every pixel with a red, green and blue component.</p>
-<p>Again, the two different methods with magnified screenshots:</p>
+Tipo di Antialias</h3>
+<p>Un'altra tecnica per migliorare l'aspetto degli oggetti sullo schermo è <em>l'antialia</em>, supportanto per tutti gli elementi vettoriali presenti su schermo, compreso il testo. Il principio è quello di sfumare le linee nette con dei colori intermedi. Ci sono due modi possibili per ottenerlo:</p>
+<p><span class="menu">Scala di grigio</span> per cambiare l'intensità dei pixel sui bordi.<br />
+<span class="menu">Componenti LCD</span> fa un lavoro ancora migliore, specialmente su schermi LCD ad alta risoluzione. Invece di alterare l'intensità di un pixel, cambia il colore in modo da spostare il bordo di una frazione di pixel. Ciò è possibile per via del fatto che lo schermo LCD produce ogni pixel attraverso tre componenti rossa, verde e blu prossime tra di loro.</p>
+<p>Ecco due screenshot con le due modalità sopra riportate:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" /><br />Scala di grigi, Hinting: disattivato</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-subpixel.png" alt="appearance-subpixel.png" /><br />LCD subpixel, Hinting: disattivato</td></tr>
+<tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" /><br />Scala di grigi, Hinting: disattivato</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-subpixel.png" alt="appearance-subpixel.png" /><br />Componenti LCD, Hinting: disattivato</td></tr>
 </table>
-<p>Subpixel based antialiasing adds a slight colored shine to objects. Something not everyone tolerates. In Haiku you can mix the two antialiasing methods and find the right setting for you by using a slider.</p>
-<div class="box-info">The subpixel based antialiasing in combination with the glyph hinting is subject of a software patent and is therefore not available by default. Depending on where in the world you live, you may get an unlocked version. Sorry about that. Talk with your representative.</div>
-<p>If you do activate hinting plus LCD subpixel rendering by changing the source and recompiling, this is how it looks compared to hinting with Grayscale:</p>
+<p>L'antialias basato sulle componenti LCD aggiunge un impercettibile alone agli oggetti, qualcosa che alcuni utenti potrebbero non tollerare. In Haiku puoi miscelare le due componenti e trovare il giusto bilanciamento agendo sul selettore apposito.</p>
+<div class="box-info">L'antialias basato sulle componenti LCD in combinazione con l'hinting dei glifi è soggetto a una software patent e non è abilitato per definizione. In base al tuo paese di residenza, potresti non essere in grado di utilizzarlo completamente. Ci dispiace tanto!</div>
+<p>Se attivi l'hinting dei glifi e l'antialias mediante componenti LCD (modificando il codice sorgente e ricompilando Haiku), questo è ciò che otterrest rispetto all'hinting pià l'antialias in scala di grigi:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on.png" alt="appearance-glyph-on.png" /><br />Scala di grigi, Hinting: attivato</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on-subpixel.png" alt="appearance-glyph-on-subpixel.png" /><br />LCD subpixel, Hinting: attivato</td></tr>
+<tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on.png" alt="appearance-glyph-on.png" /><br />Scala di grigi, Hinting: attivato</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on-subpixel.png" alt="appearance-glyph-on-subpixel.png" /><br />Componenti LCD, Hinting: attivato</td></tr>
 </table>
 <p><br /></p>
 <p>Nel fondo del pannello ci sono due pulsanti:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="button">Predefiniti</span></td><td> </td><td>riporta tutto ai valori predefiniti.</td></tr>
-<tr><td><span class="button">Ripristina</span></td><td> </td><td>brings back the settings that were active when you started the Appearance preferences.</td></tr>
+<tr><td><span class="button">Predefiniti</span></td><td> </td><td>ripristina tutto ai valori predefiniti</td></tr>
+<tr><td><span class="button">Ripristina</span></td><td> </td><td>ripristina i valori presenti nel momento in cui hai avviato il pannello Aspetto.</td></tr>
 </table>
 
 </div>
@@ -146,7 +146,7 @@ Tipo di Antialiasing</h3>
 <div class="nav">
 <div class="inner"><span>
     <a href="../preferences.html" class="uplink">Preferenze</a> 
-::  <a href="backgrounds.html">Backgrounds</a>  »
+::  <a href="backgrounds.html">Sfondi</a>  »
 </span></div>
 </div>
 

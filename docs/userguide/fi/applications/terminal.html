@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2014, Haiku. All rights reserved.
+ * Copyright 2008-2020, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -24,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>Käyttäjäopas</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -61,7 +61,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
 <h2><img src="../../images/apps-images/terminal-icon_64.png" alt="terminal-icon_64.png" width="64" height="64" />Pääteikkuna</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -83,7 +82,7 @@
 <br />
 <p>Kaksoisnapsautus välilehtipalkin tyhjään osaan avaa uuden välilehden; kaksoisnapsautus välilehteen avaa valintaikkunan otsikon uudelleennimeämiseksi. Kun siirrät hiiren osoittimen tekstikentän yläpuolelle niin käytettävissä on useita työkaluvihjeessä selitettyjä %-suunniteltuja muuttujia.<br />
 Välilehti näyttää oletuksena <tt>%1d: %p</tt> nykyisen kansion ja merkillä <tt>:</tt> erotettuna parhaillaan suoritettavan prosessin nimen (tai <tt>--</tt> jos se on vain suoritettava komentotulkki, luultavasti joutokäynnissä). Yllä oleva näytönkaappaus näyttää ensimmäisen välilehden FTP-istunnolla <span class="path">Työpöytä</span>-kansiossa ja toisen välilehden joutokäynnissä <span class="path">koti</span>-kansiossa.<br />
-Valikon <span class="menu">Muokkaa | Ikkunaotsikko...</span> Pääteikkunaotsikkoa voidaan muokata samalla tavoin.</p>
+Valikon <span class="menu">Asetukset | Ikkunaotsikko...</span> avulla Pääteikkunaotsikkoa voidaan muokata samalla tavoin.</p>
 <p>Välilehden napsauttaminen hiiren kakkospainikkeella näyttää asiayhteysvalikon <span class="menu">Sulje välilehti</span>, <span class="menu">Sulje muut välilehdet</span> tai, kuten kaksoisnapsautuksessa, <span class="menu">Muokkaa välilehtiotsikkoa...</span>.</p>
 <p>Pääteikkunan kokoa voidaan muuttaa kuten kaikkia muitakin ikkunoita tai voit käyttää uudelleenasetuksia valikosta <span class="menu">Asetukset | Ikkunakoko</span>. Näppäimet <span class="key">ALT</span> <span class="key">ENTER</span> vaihtavat kokonäyttötilaan.</p>
 <p>Kaikki asetukset, jotka muutat suoraan <span class="menu">Asetukset</span>-valikon kautta, kuten <span class="menu">Ikkunaotsikko</span>, <span class="menu">Ikkunakoko</span>, <span class="menu">Tekstikoodaus</span> tai <span class="menu">Kirjasinkoko</span> säilytetään vain nykyisessä istunnossa. Jos haluat tehdä pysyvät muutokset, sinun on toteutettava ne <span class="menu">Asetukset...</span>-paneelissa.</p>
@@ -93,9 +92,9 @@ Valikon <span class="menu">Muokkaa | Ikkunaotsikko...</span> Pääteikkunaotsikk
 <p><span class="menu">Asetukset | Asetukset...</span> avaa paneelin Pääteikkunan vakioasetusten asettamiseksi.</p>
 <img src="../images/apps-images/terminal-settings.png" alt="terminal-settings.png" />
 <br />
-<p>Most of the offered settings speak for themselves. Not entirely obvious though, the font size is set in the submenu of the <span class="menu">Font</span> popup menu.<br />
-Hover your mouse over the "formulas" for naming tab and window titles to get tooltips for the available variables. <br />
-You can choose pre-defined color schema like <span class="menu">Midnight</span> or <span class="menu">Retro</span> or create a <span class="menu">Custom</span> one by selecting which color you want to change (<span class="menu">Text</span>, <span class="menu">Background</span>, <span class="menu">Cursor</span> etc.) and then use  the color picker below.</p>
+<p>Useimmat tarjotut asetukset selittävät itsensä. Ei ole kuitenkaan täysin ilmeistä, että kirjasinkoko asetetaan <span class="menu">Kirjasin</span>-ponnahdusvalikon alivalikossa.<br />
+Välilehden ja ikkunaotsikon nimeämiseksi liikuta hiiren kohdistinta Välilehtiotsikko- ja Ikkunaotsikko-"kaavojen" päällä, jolloin saat työkaluvihjeet saatavilla olevista muuttujista. <br />
+Voit valita esiasennetun värikaavan kuten <span class="menu">Keskiyö</span> tai <span class="menu">Retro</span> tai luoda <span class="menu">Oma</span>:n värikaavan valitsemalla sen värin, jonka haluat muuttaa valikossa (<span class="menu">Teksti</span>, <span class="menu">Tausta</span>, <span class="menu">Kohdistin</span> jne.) ja käytä sitten alla olevaa väripoimijaa.</p>
 <p>Sitten seuraa lisää valitsimia: sinulla voi olla <span class="menu">Vilkkuva kohdistin</span> ja valitse <span class="menu">Salli lihavoitu teksti</span><br /><span class="menu">Käytä vasenta Option-painiketta Meta-näppäimenä</span> jos työskentelet tiettyjen laajennetun ASCII-kirjaimiston merkistön osuutta käyttävien UNIX-ohjelmistojen (kuten esimerkiksi GNU Emacs ja GNU readline-kirjasto) kanssa.<br /> 
 Aktivoi valintaruutu <span class="menu">Vahvista poistuminen, jos ohjelmia on käytössä</span> ja sinua varoitetaan, kun yrität sulkea Pääteikkunan, jossa suoritetaan sovellusta.</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
@@ -121,12 +120,12 @@ Molemmat tiedostot voidaan luoda <span class="path">/boot/home/config/settings/<
 <p>Tiedosto <span class="cli">profile</span> ladataan joka kerta avattaessa Pääteikkunaa. Se asettaa kaikentyyppisiä alias-määrittelyjä ja muuttujia, jotka vaikuttavat bash-komentotulkin käyttäytymiseen ja ulkonäköön. Löydät monia verkkoresursseja, jotka kertovat yksityiskohtaisesti kaikista mahdollisuuksista.</p>
 <p>Haiku/BeOS-vihjepalvelimessa on esimerkiksi muutamia vihjeitä, joilla voit aloittaa:</p>
 <ul>
-<li><a href="http://betips.net/1997/09/09/customize-your-terminal-prompt/">Räätälöi Pääteikkuna-kehotteesi</a></li>
-<li><a href="http://betips.net/1997/09/09/more-prompt-customizations/">Lisää kehoteräätälöintiä</a></li>
-<li><a href="http://betips.net/1997/09/09/enhancing-bash/">Bash-komentotulkin laajentaminen</a></li>
-<li><a href="http://betips.net/1997/09/09/custom-keyboard-shortcuts/">Omat näppäimistön pikanäppäimet</a></li>
+<li><a href="http://betips.net/?p=5">Räätälöi Pääteikkuna-kehotteesi</a></li>
+<li><a href="http://betips.net/?p=66">Lisää kehoteräätälöintiä</a></li>
+<li><a href="http://betips.net/?p=67">Bash-komentotulkin laajentaminen</a></li>
+<li><a href="http://betips.net/?p=105">Omat näppäimistön pikanäppäimet</a></li>
 </ul>
-<p>Mahdollisuuksia on vielä lisää, <a href="http://betips.net/index.php?s=.profile">vilkaise tänne</a>.</p>
+<p>Mahdollisuuksia on vielä lisää, <a href="http://betips.net/?s=profile">vilkaise tänne</a>.</p>
 
 <h3>inputrc</h3>
 <p>Tiedosto <span class="cli">inputrc</span> käsittelee näppäinsidoksia. Koska Haiku tarjoaa hyödyllisiä oletusarvoja, sinun ei luultavasti tarvitse sotkeutua näihin kietoutuneempiin asetuksiin. Jos sinulla on tässä erikoistarpeita, perehdy moniin verkkoresursseihin, esim.: <a href="http://tiswww.case.edu/php/chet/readline/rluserman.html">The GNU Readline Library</a>.</p>
