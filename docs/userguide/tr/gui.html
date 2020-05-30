@@ -9,19 +9,21 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Emir SARI
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Haiku's GUI</title>
+	<title>Haiku Grafik Kullanıcı Arabirimi</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>Kullanıcı kılavuzu</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -50,118 +52,118 @@
 <li><a href="../jp/gui.html">日本語</a></li>
 </ul>
 <span>
- «  <a href="filesystem-layout.html">Dosya sistemi yerleşimi</a> 
-::  <a href="contents.html" class="uplink">İçerik</a> 
+ «  <a href="filesystem-layout.html">Filesystem layout</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
 ::  <a href="workspaces.html">Workspaces</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">Bu sayfanın çevrilmesi henüz tamamlanmamıştır. Tamamlanana kadar henüz bitirilmeyen kısımlar İngilizce metni kullanır.</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>İçindekiler</td></tr>
 <tr class="index"><td>
-		<a href="#move-resize">Easy moving and resizing</a><br />
-                <a href="#stack-tile">Stack &amp; Tile</a><br />
-                <a href="#open-save-panel">Open and save panels</a><br />
-                <a href="#replicants">Replicants</a></td></tr>
+		<a href="#move-resize">Hızlıca taşıma ve boyutlandırma</a><br />
+                <a href="#stack-tile">Yığma ve Döşeme</a><br />
+                <a href="#open-save-panel">Aç ve Kaydet panelleri</a><br />
+                <a href="#replicants">Yinelenenler</a></td></tr>
 </table>
 
-<h1>Haiku's GUI</h1>
+<h1>Haiku Grafik Kullanıcı Arabirimi</h1>
 
-<p>Haiku's graphical user interface is an integral part of the system. Unlike other Unix-like operating systems, there is no separate window manager and booting just into a command-line shell is not possible. Haiku's focus being on the desktop user, this is just not considered necessary.</p>
-<p>As you probably have experience with other graphical environments, let's skip over the standards like menus, right-click context menus, drag &amp; drop etc. Let's have a look at the few unique aspects of Haiku's GUI instead.</p>
+<p>Haiku'nun grafik kullanıcı arabirimi, sistemin değişmez bir parçasıdır. Diğer Unix tarzı işletim sistemlerinin aksine ayrı bir pencere yöneticisi bulunmamaktadır ve bilgisayar açılırken komut satırına girme özelliği bulunmaz. Haiku'nun önceliği masaüstü kullanıcısı olduğundan buna gerek duyulmamıştır.</p>
+<p>Diğer grafik birimli işletim sistemleri ile daha önceden deneyiminiz olduğunu varsayaraktan, herkesin bildiği kısımları atlıyoruz. Daha çok Haiku'ya özel kısımların üzerinde duracağız.</p>
 <img src="images/gui-images/gui.png" alt="gui.png" />
-<p>There are only a few things in Haiku's GUI that aren't obvious and deserve an explanation.</p>
+<p>Haiku'nun grafik kullanıcı arabiriminde açıklanması gereken yalnızca birkaç bölüm bulunmaktadır:</p>
 <ol>
-<li><p>The Deskbar is Haiku's "Start" menu and taskbar, if you will. See topic <a href="deskbar.html">Deskbar</a>.</p></li>
-<li>The yellow tab offers more than just a program's name or a document's filename:
-<ul><li>You can move it by holding the <span class="key">SHIFT</span> key while dragging it to another position, enabling you to stack a number of windows and conveniently access them by their named tab.</li>
-<li>You minimize a window with a double-click on its tab (or with <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">M</span>). A such hidden window can be accessed by its entry in the <a href="deskbar.html">Deskbar</a> or the <a href="twitcher.html">Twitcher</a>.</li>
-<li>You can send a window to the back with a right-click on its tab (or its border).</li></ul></li>
-<li><p>The close button.</p></li>
-<li><p>The "zoom" button (or <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span>). In most applications, this will expand a window to maximum size without obscuring the Deskbar (hold <span class="key">SHIFT</span> to cover the Deskbar as well). It doesn't have to, however. Tracker windows, for example, will resize to best fit the contents.</p></li>
-<li><p>The window border. Left-dragging moves the window, right-dragging resizes.</p></li>
-<li><p>The resize corner.</p></li>
+<li><p>Masaüstü Çubuğu, Haiku'nun "Başlat" menüsü ve görev çubuğu olarak düşünülebilir. Ayrıntılı bilgi için: <a href="deskbar.html">Masaüstü Çubuğu</a>.</p></li>
+<li>Sarı renkli sekme başlığı bir dosya veya program adından daha fazlasını barındırır:
+<ul><li><span class="key">SHIFT</span> düğmesini basılı tutup fare ile hareket ettirerek konumunu değiştirebilirsiniz; böylece birden fazla pencereyi üst üste yığabilir ve hepsine aynı yerden erişebilirsiniz.</li>
+<li>Sekme başlığına çift tıklayarak bir pencereyi simge durumuna küçültebilirsiniz (veya <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">M</span> düğmeleri ile). Simge durumuna küçültülmüş pencerelere <a href="deskbar.html">Masaüstü Çubuğu</a>'ndan veya <a href="twitcher.html">Seğirtici</a>'den erişilebilir.</li>
+<li>Bir pencereyi sekme başlığına (veya kenarlığına) sağ fare düğmesi ile tıklayarak arka plana gönderebilirsiniz.</li></ul></li>
+<li><p>Kapatma düğmesi</p></li>
+<li><p>Büyütme/küçültme düğmesi (veya <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span>). Bu düğme birçok uygulamada pencereyi olabilecek en büyük haline getirecektir (Masaüstü Çubuğu'nu kaplamadan - <span class="key">SHIFT</span> düğmesini basılı tutarak kaplamasını sağlayabilirsiniz).</p></li>
+<li><p>Pencere kenarı. Sol fare düğmesi ile sürükleme pencereyi taşır, sağ fare düğmesi yeniden boyutlandırır.</p></li>
+<li><p>Yeniden boyutlandırma köşesi.</p></li>
 </ol>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="move-resize" name="move-resize">A quick way to move or resize windows</a></h2>
-<p>Moving and resizing windows is a large part of interacting with several concurrently running applications. Instead of aiming at the small yellow title tab or the even tinier window border, there's a more convenient way to move a window. Also, additionally to its small size, the resize corner has another limitation: It only allows resizing at and in the direction of the lower right corner. <br />Right-dragging a border for resizing works, but again you'll have to aim carefully.</p>
-<p>To address these issues, Haiku provides a neat solution using the window management key combo <span class="key">CTRL</span> <span class="key">ALT</span> and the mouse. See also chapter <a href="keyboard-shortcuts.html#general">Shortcuts and key combinations</a> for more shortcuts concerning window management.</p>
+<a id="move-resize" name="move-resize">Pencereleri hızlıca taşıma ve boyutlandırma</a></h2>
+<p>Pencereleri taşıma ve boyutlandırma birden fazla uygulama ile etkileşmenin önemli bir kısmıdır. Görece ufak boyutlu pencere sekme başlığına veya daha ufak pencere kenarlığına imleci götürmek yerine daha kolay bir yol bulunmaktadır. Bunun yanında pencere boyutu ayarlama tutacı küçük boyutlu olmasının yanında başka bir sınırlaması daha mevcut: Yalnızca alt sağ köşede ve yönünde boyutlandırmaya izin verir.<br />
+Bir kenarı sağ fare düğmesiyle sürükleyebilirsiniz, ancak bunun için de dikkatli hedef almak gerekir.</p>
+<p>Bu sorunları çözmek için Haiku <span class="key">CTRL</span> <span class="key">ALT</span> düğme ikilisi ve fareden oluşan gayet düzgün bir seçenek sunar. Ayrıca <a href="keyboard-shortcuts.html#general">Kısayollar ve düğme kombinasyonları</a> bölümü pencere yönetimi ile ilgili daha fazla kısayolu öğrenmenize olanak verir.</p>
 <img src="images/gui-images/resizing.png" alt="resizing.png" />
-<p>Holding down <span class="key">CTRL</span> <span class="key">ALT</span> will highlight the window borders nearest to the mouse pointer. Move the mouse in the direction of another border to change the target. Click and dragging with the <i>right mouse button</i> will resize the window along the highlighted border(s).</p>
-<p>Hold down <span class="key">CTRL</span> <span class="key">ALT</span> and click and drag with the <i>left mouse button</i> anywhere in a window to move it around. A quick click with the <i>right mouse button</i> sends it to the back.</p>
+<p><span class="key">CTRL</span> <span class="key">ALT</span> düğmelerine birlikte basmak, fare imlecine en yakın pencere kenarını vurgular. Vurguyu başka bir kenara taşımak için imleci o kenara doğru hareket ettirin. <i>Sağ fare düğmesi</i> ile tıklayıp sürüklemek pencereyi vurgulanan kenar(lar) boyunca yeniden boyutlandırır.</p>
+<p><span class="key">CTRL</span> <span class="key">ALT</span> düğmelerine birlikte basın ve <i>sol fare düğmesini</i> de basılı tutarak pencereyi istediğiniz yöne doğru taşıyın. Sağ fare düğmesiyle tek bir tık ise pencereyi arkaya gönderir.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="stack-tile" name="stack-tile">Stack &amp; Tile</a></h2>
-<p>Haiku's user interface provides a unique feature that puts the fact that windows have a yellow tab instead of a full-width title bar to perfect use. It's called "Stack &amp; Tile".<br />
-In the example below, a Tracker window with bookmarks is tiled to the left of a WebPositive window, which itself is stacked with another Tracker window showing the source folder <tt>haiku</tt>. In this animation, the user clicks on the tabs of the stacked windows to alternately bring one or  the other to the front.</p> 
+<a id="stack-tile" name="stack-tile">Yığma ve Döşeme</a></h2>
+<p>Haiku'nun kullanıcı arabirimi pencerelerin üst bölümünün başlık çubuğu değil de bir sekme çubuğu olduğunu hatırlatan benzersiz bir özelliğe sahiptir. Bu özelliğe biz "Yığma ve Döşeme" diyoruz.<br />
+Aşağıdaki örnekte yer imlerini gösteren bir İzleyici penceresi, <tt>haiku</tt> kaynak klasörü ile yığılmış başka bir WebPositive penceresinin soluna döşenmiş görünüyor. Bu canlandırmada kullanıcı üst üste yığılmış pencere sekmelerine tıklayarak birini veya öbürünü öne getiriyor.</p> 
 <img src="images/gui-images/gui-s+t.gif" alt="gui-s+t.gif" />
-<p>Connected like this, the group of windows can be moved and resized together - a nice arrangement to work in a more project centric environment. Instead of looking for the right browser window with documentation, editor and Tracker windows and maybe a related email concerning one project you are currently working on, just stack&amp;tile them together.</p>
-<p>Doing the actual arranging of windows is easy: Hold down <span class="key">OPT</span> while dragging a window by its tab close to another window's tab or border until it's highlighted and release the mouse button.</p>
-<p>Stack &amp; Tile consists of two related parts.</p>
+<p>Bu biçimde bağlı pencere grupları birlikte taşınabilir veya boyutlandırılabilir - üzerinde çalıştığınız projeleri böylece düzgünce ayırabilirsiniz. Pencere karmaşasında arama yapmak yerine örneğin bir düzenleyici ve İzleyici penceresini, belki ilgili bir e-postayı vb. üst üste yığabilir veya yan yana döşeyebilirsiniz.</p>
+<p>Düzenleme işleminin kendisi ekseriyetle kolaydır: Bir pencerenin sekme çubuğuna tıklayıp sürüklerken <span class="key">OPT</span> düğmesine basılı tutun ve üzerine yığacağınız pencere sekmesinin üzerine getirin. Renk değişikliğini gördüğünüzde fare düğmesini bırakın.</p>
+<p>Yığma ve Döşeme iki ilgili bölümden oluşur.</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td><img src="images/gui-images/gui-stacking.png" alt="gui-stacking.png" /></td><td width="10"></td>
-<td><p>"<i>Stacking</i>" is putting windows on top of each other, automatically moving the yellow tabs into position.<br />
-While holding <span class="key">OPT</span>, tabs change color when they overlap; drop the window to establish the stacking.</p></td></tr></table>
+<td><p>"<I>Yığma</I>", pencereleri birbirlerinin üzerine koyup sekmeli duruma getirmektir.<br />
+<span class="key">OPT</span>, düğmesini basılı tutarken sekmeler üst üste geldiklerinde renk değiştirirler, böylece yığma işlemine hazır olduklarını anlayabilirsiniz.</p></td></tr></table>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2" vspace="10">
 <tr><td><img src="images/gui-images/gui-tiling.png" alt="gui-tilinging.png" /></td><td></td>
-<td><p>"<i>Tiling</i>" means gluing windows horizontally or vertically together.<br />
-Again, while holding <span class="key">OPT</span>, the borders that'll fuse together when you drop the window change color when brought near each other.</p></td></tr></table>
-<p>Separation is done in the same way, by holding <span class="key">OPT</span> while dragging a window by its tab out of the group.</p>
+<td><p>"<i>Döşeme</i>", pencereleri birbirlerine yatay veya dikey olarak yapıştırmak demektir.<br />
+Yığmaya benzer biçimde, <span class="key">OPT</span> düğmesini basılı tuttuğunuzda, yapışması istenen pencere kenarları renk değiştirir ve döşeme işlemini yapabilirsiniz.</p></td></tr></table>
+<p>Ayırma işlemi de yine aynı biçimde <span class="key">OPT</span> düğmesini basılı tutarken ayrılması istenen ögeyi çekip almakla gerçekleştirilir.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="open-save-panel" name="open-save-panel">Open and save panels</a></h2>
-<p>When opening or saving a file from any application, a panel like this opens:</p>
+<a id="open-save-panel" name="open-save-panel">Aç ve Kaydet panelleri</a></h2>
+<p>Herhangi bir uygulamada dosya açarken veya kaydederken, aşağıdaki gibi bir panel açılır:</p>
 <img src="images/gui-images/open-save.png" alt="open-save.png" />
-<p>It has all the usual things: A list of files of the current folder to choose from, in case of a save panel, a text field to enter a filename and a pop-up menu for different file formats and their settings.<br />
-You can enter parent folders with the pop-up menu above the file listing.</p>
-<p>If you already have a Tracker window with the location for a file open, you can simply drag either any file or the folder-representation (i.e. the symbol to the far right in its menu bar) into the panel. This changes the panel to that new location.</p>
+<p>Bu panelde gerekli tüm ögeler bulunmaktadır: Dosya seçmek için geçerli klasörün içeriğinin bir listesi, kaydetme işlemi için bir dosya adı satırı, değişik dosya türleri için bir açılır menü ve ayarları.<br />
+Üst klasörlere dosya listesinin üstündeki açılır menüden ulaşabilirsiniz.</p>
+<p>Eğer halihazırda bir İzleyici penceresi açıksa herhangi bir dosya veya klasör betimleme simgesini panele sürükleyip bırakabilirsiniz, böylece panel içeriği o klasörün konumuna geçecektir.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="open-save-shortcuts" name="open-save-shortcuts">Keyboard shortcuts</a></h3>
-<p>Many shortcuts in open and save panels are the same used in Tracker. Besides the commands that are also available through the <span class="menu">File</span> menu, there are a few not that obvious:</p>
+<a id="open-save-shortcuts" name="open-save-shortcuts">Klavye kısayolları</a></h3>
+<p>Aç ve Kaydet panellerinde kullanılan kısayolların büyük çoğunluğu İzleyici kısayolları ile aynıdır. <span class="menu">Dosya</span> menüsünde görünür olan kısayollara ek birkaç tane daha kısayolu aşağıda bulabilirsiniz:</p>
 <table summary="shortcuts" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="key">ALT</span> <span class="key">N</span></td><td></td><td> Creates a new folder.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">E</span></td><td></td><td> Lets you rename the selected entry.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">↑</span></td><td style="width:24px;"></td><td> Moves into the parent folder.</td></tr>
-<tr><td class="onelinetop"><span class="key">ALT</span> <span class="key">↓</span> or <span class="key">ENTER</span></td><td></td><td> Moves into the selected folder.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">D</span></td><td></td><td> Takes you to your Desktop.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">H</span></td><td></td><td> Takes you to your Home folder.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">N</span></td><td></td><td> Yeni bir klasör oluşturur.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">E</span></td><td></td><td> Seçili girdiyi yeniden adlandırır.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">↑</span></td><td style="width:24px;"></td><td> Üst klasöre geçer.</td></tr>
+<tr><td class="onelinetop"><span class="key">ALT</span> <span class="key">↓</span> or <span class="key">ENTER</span></td><td></td><td> Seçili klasöre geçer.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">D</span></td><td></td><td> Masaüstü'ne geçer.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">H</span></td><td></td><td> Ev klasörüne geçer.</td></tr>
 </table>
-<p>For keyboard shortcuts in Haiku in general, see chapter <a href="keyboard-shortcuts.html">Shortcuts and key combinations</a>.</p>
+<p>Haiku'daki klavye kısayollarına genel bir bakış için <a href="keyboard-shortcuts.html">Kısayollar ve düğme kombinasyonları</a> bölümüne bakın.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="favorites-recent" name="favorites-recent">Favorites and recent folders</a></h3>
-<p>The <span class="menu">Favorites</span> menu in open and save panels provides recently visited folders and favorite locations that you can set up yourself. As indicated by the little arrow, you can also use these locations to navigate further down the hierarchy via submenus.</p>
+<a id="favorites-recent" name="favorites-recent">Favoriler ve son kullanılan klasörler</a></h3>
+<p>Aç ve Kaydet panellerindeki <span class="menu">Favoriler</span> menüsü, en son kullandığınız klasörleri ve sizin sık sık açtığınız konumları ekleyebileceğiniz favori klasörlerinizi içerir. Ufak ok simgesinden de anlaşılabileceği gibi, alt menüleri kullanarak dosya hiyerarşisindeki alt konumlara geçebilirsiniz.</p>
 <img src="images/gui-images/favorites.png" alt="favorites.png" />
-<p>To add a Favorite, you simply navigate to your destination and choose <span class="menu">Favorites | Add current folder</span>. From now on it will appear in every open/save panel. To remove a Favorite, choose <span class="menu">Favorites | Edit favorites...</span> and delete its entry.<br />
-All Favorites are kept in <span class="path">/boot/home/config/settings/Tracker/Go/</span>. So you might as well add and remove links to files and folders there directly.</p>
+<p>Bir Favori eklemek için istediğiniz konuma geiin ve <span class="menu">Favoriler | Geçerli klasörü ekle</span> yapın. Bu andan itibaren bu konum bütün Aç ve Kaydet panellerinde görünecektir. Bir Favoriyi silmek için <span class="menu">Favoriler | Favorileri düzenle...</span> yapın ve girdisini silin.<br />
+Favoriler <span class="path">/boot/home/config/settings/Tracker/Go/</span> klasöründe saklanırlar. Bu demek oluyor ki, bu klasöre gidip istediğiniz dosyayı silerek de aynı işlemi yapabilirsiniz.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="replicants" name="replicants">Replicants</a></h2>
-<p>Replicants are small self-contained parts of applications that can be integrated into other programs. Provided Deskbar's option to <span class="menu">Show replicants</span> is activated, you'll recognize a replicantable part of an application by its small handle, normally in the bottom right corner:</p>
+<a id="replicants" name="replicants">Yinelenenler</a></h2>
+<p>Yinenenler, uygulamaların başka uygulamalar içine entegre edilebilecek kısımlarıdır. Masaüstü Çubuğu'nda <span class="menu">Yinelenenleri göster</span> seçeneği etkinleştirildiğinde kullanılabilir uygulamaların sağ alt köşesinde el biçiminde ufak bir tutaç göreceksiniz:</p>
 <img src="../images/gui-images/replicant.png" alt="replicant.png" />
-<p>The most prominent place that accepts Replicants is the Desktop: You simply drag &amp; drop the little handle onto it. From now on it's part of the Desktop and the Replicant's originating app doesn't have to be started for it to work.<br />
-A right-click on a Replicant handle offers a context menu to show the originating app's <span class="menu">About</span> window and to <span class="menu">Remove replicant</span>.</p>
-<div class="box-info">Should you experience difficulties with a Replicant on the Desktop and just can't get rid of it, delete <span class="path">~/config/settings/Tracker/tracker_shelf</span>. Unfortunately, this will remove <i>all</i> Replicants from the Desktop.</div>
-<p>Examples for replicatable applications are the graphs of the <a href="applications/activitymonitor.html">ActivityMonitor</a>, the <a href="workspaces.html">Workspaces applet</a> or <a href="applications/deskcalc.html">DeskCalc</a>.</p>
+<p>Yinenenleri kullanabileceğiniz en belirgin ber Masaüstü'dür: Tutacı sürükleyip Masaüstü'ne bırakın. Bu andan itibaren bu uygulama Masaüstü'nün bir parçası olarak işlem görür ve uygulamayı yeniden açmanıza gerek kalmaz.<br />
+Yinelenen üzerinde sağ tıklama kaynak uygulamanın <span class="menu">Hakkında</span> penceresini görebileceğiniz bir seçenek ve yineleneni kaldırabileceğiniz <span class="menu">Yineleneni kaldır</span> seçeneğini içerir.</p>
+<div class="box-info">Yinelenen size sorun çıkartıyor ve onu kaldıramıyorsanız <span class="path">~/config/settings/Tracker/tracker_shelf</span> dosyasını silin. Ancak bu seçenek <i>tüm</i> yinelenenleri Masaüstü'nden kaldıracaktır.</div>
+<p>Yinelenebilir uygulamalara örnek olarak <a href="applications/activitymonitor.html">Etkinlik Monitörü</a>, <a href="workspaces.html">Çalışma Alanları gereci</a> veya <a href="applications/deskcalc.html">Hesap Makinesi</a> örnek olarak verilebilir.</p>
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="filesystem-layout.html">Dosya sistemi yerleşimi</a> 
-::  <a href="contents.html" class="uplink">İçerik</a> 
+ «  <a href="filesystem-layout.html">Filesystem layout</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
 ::  <a href="workspaces.html">Workspaces</a>  »
 </span></div>
 </div>

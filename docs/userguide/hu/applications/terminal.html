@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2014, Haiku. All rights reserved.
+ * Copyright 2008-2020, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -24,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>Használati útmutató</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -55,13 +55,13 @@
 <span>
  «  <a href="stylededit.html">StyledEdit</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Programok</a> 
-::  <a href="textsearch.html">Szövegkeresés</a>  »
+::  <a href="textsearch.html">TextSearch</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">Az oldal fordítása még folyamatban van. Amíg tart a fordítás, addig a lefordítatlan részek angolul jelennek meg.</div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h2><img src="../../images/apps-images/terminal-icon_64.png" alt="terminal-icon_64.png" width="64" height="64" />Terminál (Terminal)</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -81,9 +81,9 @@
 <p>Szükség szerint bármennyi Terminál elindítható vagy a program újbóli elindításával, vagy pedig az <span class="key">ALT</span> <span class="key">N</span> kombinációval egy már futó programból. Továbbá fülek/lapok is használhatóak, amit az <span class="key">ALT</span> <span class="key">T</span> lenyomásával adhatunk egy meglévő ablakhoz.</p>
 <img src="../images/apps-images/terminal.png" alt="terminal.png" />
 <br />
-<p>A lap-fül sorában egy üres területen duplán kattintva megnyithatunk egy új lapot; magán a lap-fülön duplán kattintva pedig kapunk egy ablakot, ahol új nevet adhatunk a lapnak. A beviteli mezőn tartva az egeret kaphatunk egy kis segítséget a használható %-al jelölt változókról.<br />
-Alap esetben, <tt>%1d: %p</tt>, a fülön az aktuális mappa neve, egy <tt>:</tt>, mint tagóló karakter és a jelenleg futó program neve látható (vagy <tt>--</tt>  ha épp nem futtatunk semmit a Terminálban). Mint azt a fenti képen is láthatjuk, hogy az első lapon épp FTP-t használunk az <span class="path">Asztal</span>on, a másikon pedig a <span class="path">/</span> mappában vagyunk.<br />
-A <span class="menu">Szerkesztés | Ablak címe...</span> menüvel magának a Terminál ablaknak a címe módosítható épp úgy, mint a lap esetében.</p>
+<p>Double-clicking into the emtpy part of the tab bar opens a new tab; onto a tab opens a dialog to rename its title. There are several %-designated variables that are explained with a tooltip when you hover the mouse over the text field.<br />
+By default, <tt>%1d: %p</tt>, a tab shows the current directory and, separated by a <tt>:</tt>, the name of the currently running process (or <tt>--</tt> if it's just bash running, probably idling). The screenshot above shows the first tab with a FTP session in the <span class="path">Desktop</span> folder and a second tab idling at <span class="path">home</span>.<br />
+Via <span class="menu">Settings | Window title...</span> the Terminal window's title can be edited in a similar way.</p>
 <p>A lap-füleken jobb gombbal kattintva kapunk egy menüt: <span class="menu">Lap bezárása</span>, <span class="menu">Többi lap bezárása</span> vagy <span class="menu">Lap címének szerkesztése...</span> (épp úgy, mint dupla kattintáskor).</p>
 <p>A Terminál ablak épp úgy méretezheztő, mint bármely más ablak. Ugyanakkor előre beállított méretet is választhatunk a <span class="menu">Beállítások | Ablak mérete</span> menüből. Az <span class="key">ALT</span> <span class="key">ENTER</span> lenyomásakor pedig teljes képernyőre válthatunk.</p>
 <p>All the settings you change directly through the <span class="menu">Settings</span> menu, like <span class="menu">Window title</span>, <span class="menu">Window size</span>, <span class="menu">Text encoding</span> or <span class="menu">Font size</span> are only kept for the current session. If you want to make permanent changes, you have to apply them in the <span class="menu">Settings...</span> panel.</p>
@@ -123,12 +123,12 @@ Mind a kettőt a <span class="path">/boot/home/config/settings/</span> mappában
 <p>A <span class="cli">profile</span> minden alkalommal betöltődik mikor egy új Terminált nyitunk meg. Ebben minden, a bash-el kapcsolatos működési és megjelenítési beállítás megtalálható. További információk találhatóak az interneten.</p>
 <p>A Haiku/BeOS Tip Server is tartalmaz néhány ötletet, amin elindulhatunk. Például:</p>
 <ul>
-<li><a href="http://betips.net/1997/09/09/customize-your-terminal-prompt/">Customize your Terminal prompt</a> - A prompt személyre szabása</li>
-<li><a href="http://betips.net/1997/09/09/more-prompt-customizations/">More prompt customizations</a> - További személyre szabás</li>
-<li><a href="http://betips.net/1997/09/09/enhancing-bash/">Enhancing bash</a> - A bash konfigurálása</li>
-<li><a href="http://betips.net/1997/09/09/custom-keyboard-shortcuts/">Custom keyboard shortcuts</a> - Egyéni kombinációk</li>
+<li><a href="https://betips.net/?p=5">Customize your Terminal prompt</a></li>
+<li><a href="https://betips.net/?p=66">More prompt customizations</a></li>
+<li><a href="https://betips.net/?p=67">Enhancing bash</a></li>
+<li><a href="https://betips.net/?p=105">Custom keyboard shortcuts</a></li>
 </ul>
-<p><a href="http://betips.net/index.php?s=.profile">Itt</a> még többet találsz.</p>
+<p>There are more, <a href="https://betips.net/?s=profile">have a look</a>.</p>
 
 <h3>inputrc</h3>
 <p>Az <span class="cli">inputrc</span>-vel billentyű-módosításokat hajthatunk végre. Mivel a Haiku a leghasznosabb alap beállításokat használja, így valószínű, hogy nem kell ezzel foglalkoznunk. Ha valami speciális dologra van szükségünk, akkor az interneten kapunk információt, például a <a href="http://tiswww.case.edu/php/chet/readline/rluserman.html">The GNU Readline Library</a> oldalon.</p>
@@ -156,7 +156,7 @@ Mind a kettőt a <span class="path">/boot/home/config/settings/</span> mappában
 <div class="inner"><span>
  «  <a href="stylededit.html">StyledEdit</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Programok</a> 
-::  <a href="textsearch.html">Szövegkeresés</a>  »
+::  <a href="textsearch.html">TextSearch</a>  »
 </span></div>
 </div>
 

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2014, Haiku. All rights reserved.
+ * Copyright 2008-2020, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -24,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>用户指南</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -53,16 +53,16 @@
 <li><a href="../../jp/applications/terminal.html">日本語</a></li>
 </ul>
 <span>
- «  <a href="stylededit.html">文本编辑器</a> 
+ «  <a href="stylededit.html">StyledEdit</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">应用程序
 </a> 
-::  <a href="textsearch.html">文本搜索</a>  »
+::  <a href="textsearch.html">TextSearch</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">本节的翻译还未完成。在未完成之前，所有的未完成部分都将使用英语原文。</div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h2><img src="../../images/apps-images/terminal-icon_64.png" alt="terminal-icon_64.png" width="64" height="64" />终端</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -82,11 +82,9 @@
 <p>您可以根据需要打开任意数量的终端，可以简单的启动，或者从正在运行的终端中使用 <span class="key">ALT</span> <span class="key">N</span> 组合键来打开多个终端窗口。您也可以使用终端的标签视图方式，使用 <span class="key">ALT</span> <span class="key">T</span> 组合键打开新的终端标签。</p>
 <img src="../images/apps-images/terminal.png" alt="terminal.png" />
 <br />
-<p>双击标签栏的空白区域将打开一个新标签；双击标签将会打开一个对话框重命名标签标题。当您在文本域中悬停鼠标时，会有几个 %-指定变量 ，并且伴随着一个提示框，解释其含义。<br />
-
-默认情况下，<tt>%1d: %p</tt>，标签显示了当前目录和当前运行进程的名称，并且它们被 <tt>:</tt>所分隔（或者 <tt>--</tt>，如果它仅仅是一个运行的 bash ，或者空闲进程）。上面的屏幕截图中的第一个标签显示了 <span class="path">Desktop</span> 文件夹中的 FTP 会话，而第二个标签闲置于 <span class="path">home</span> 文件夹。<br />
-
-使用 <span class="menu">Edit|Window title...</span> 也可以以类似的方式编辑终端窗口的标题。</p>
+<p>Double-clicking into the emtpy part of the tab bar opens a new tab; onto a tab opens a dialog to rename its title. There are several %-designated variables that are explained with a tooltip when you hover the mouse over the text field.<br />
+By default, <tt>%1d: %p</tt>, a tab shows the current directory and, separated by a <tt>:</tt>, the name of the currently running process (or <tt>--</tt> if it's just bash running, probably idling). The screenshot above shows the first tab with a FTP session in the <span class="path">Desktop</span> folder and a second tab idling at <span class="path">home</span>.<br />
+Via <span class="menu">Settings | Window title...</span> the Terminal window's title can be edited in a similar way.</p>
 <p>右键点击标签将会出现一个右键菜单：<span class="menu">关闭标签</span>，<span class="menu">关闭其他标签</span> 或者，如双击，则显示<span class="menu"> 编辑标签主题...</span>。</p>
 <p>终端的窗口和其他窗口一样可以调整尺寸，或者使用 <span class="menu">设置 | 窗口大小</span> 菜单中的预置尺寸。<span class="key">ALT</span> <span class="key">ENTER</span> 组合键将会切换到全屏模式。</p>
 <p>所有直接通过 <span class="menu">Settings</span> 菜单修改的设置，例如 <span class="menu">窗口标题</span>， <span class="menu">窗口大小</span>， <span class="menu">文本编码</span> 或者 <span class="menu">字体大小</span> 仅对当前会话有效。 如果您希望永久保存这些改动，您可以通过 <span class="menu">设置...</span> 面板应用这些设置。</p>
@@ -126,12 +124,12 @@ Activate the checkbox to <span class="menu">Confirm exit if active programs exis
 <p>在您每次打开新的终端时， <span class="cli">profile</span> 都会被载入程序。在该文件中，设置了所有影响到 bash 行为和外观的各种类型的设备接口和变量。你可以在网络上找到许多资源，它们将会给出所有可能性的详细介绍。</p>
 <p>Haiku/BeOS Tip Server 提供了许多入门的技巧，例如：</p>
 <ul>
-<li><a href="http://betips.net/1997/09/09/customize-your-terminal-prompt/">定制终端的提示信息</a></li>
-<li><a href="http://betips.net/1997/09/09/more-prompt-customizations/">更多提示信息的定制</a></li>
-<li><a href="http://betips.net/1997/09/09/enhancing-bash/">bash的优化和增强</a></li>
-<li><a href="http://betips.net/1997/09/09/custom-keyboard-shortcuts/">定制快捷键</a></li>
+<li><a href="https://betips.net/?p=5">Customize your Terminal prompt</a></li>
+<li><a href="https://betips.net/?p=66">More prompt customizations</a></li>
+<li><a href="https://betips.net/?p=67">Enhancing bash</a></li>
+<li><a href="https://betips.net/?p=105">Custom keyboard shortcuts</a></li>
 </ul>
-<p>还有很多类似的信息，<a href="http://betips.net/index.php?s=.profile">请参阅</a>。</p>
+<p>There are more, <a href="https://betips.net/?s=profile">have a look</a>.</p>
 
 <h3>inputrc</h3>
 <p> <span class="cli">inputrc</span> 用于处理键盘关联的配置。由于Haiku默认提供了非常有用的配置，您不需要修改相关的设置。如果您确实有特殊的需要，可以参考许多在线的资源，例如<a href="http://tiswww.case.edu/php/chet/readline/rluserman.html"> GNU 的命令行读取库</a> 。</p>
@@ -157,10 +155,10 @@ Activate the checkbox to <span class="menu">Confirm exit if active programs exis
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="stylededit.html">文本编辑器</a> 
+ «  <a href="stylededit.html">StyledEdit</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">应用程序
 </a> 
-::  <a href="textsearch.html">文本搜索</a>  »
+::  <a href="textsearch.html">TextSearch</a>  »
 </span></div>
 </div>
 

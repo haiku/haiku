@@ -11,6 +11,7 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		MichaelPeppers
+ *		Gabriele
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -59,13 +60,13 @@
 
 <div id="content">
 <div>
-<div class="box-info">La traduzione di questa pagina non è stata completata. Per questo motivo le parti non tradotte sono visibili in inglese.</div>
+<div class="box-info">La traduzione di questa pagina non è stata ancora completata. Finché non lo sarà, le parti non tradotte saranno visualizzate in inglese.</div>
 <h2><img src="../../images/apps-images/webpositive-icon_64.png" alt="webpositive-icon_64.png" width="64" height="64" />WebPositive</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Applicazioni</span></td></tr>
-<tr><td>Localita:</td><td></td><td><span class="path">/boot/system/apps/WebPositive</span></td></tr>
+<tr><td>Percorso:</td><td></td><td><span class="path">/boot/system/apps/WebPositive</span></td></tr>
 <tr><td>Impostazioni:</td><td></td><td><span class="path">~/config/settings/WebPositive/</span> - File di configurazione, cookie, cache e cronologia di navigazione</td></tr>
-<tr><td></td><td></td><td><span class="path">~/config/settings/WebPositive/Bookmarks</span> - All bookmarks as single files</td></tr>
+<tr><td></td><td></td><td><span class="path">~/config/settings/WebPositive/Bookmarks</span> - Tutti i segnalibri, ognuno in un file</td></tr>
 </table>
 <p><br /></p>
 <p>WebPositive, o più brevemente Web+, è il browser nativo di Haiku. Una parte del suo nome è un omaggio al browser del BeOS, NetPositive, l'altra indica la sua base moderna: il WebKit. Questa libreria di rendering HTML è alla base di browser ben conosciuti, come Safari, browser del Mac OS X, e il browser di Google, Chrome. Grazie all'uso di WebKit, libreria in evoluzione continua, Web+ sarà capace di essere sempre pronto alle nuove tecnologie del web.</p>
@@ -104,7 +105,7 @@ Strings not recognized as URLs will get looked up with Google, so the locator fi
 <p>By using Tracker to manage and navigate bookmarks you can lift its unique features to quickly find what you're looking for.<br />
 Activating <span class="menu">Type-ahead filtering</span> in <a href="../tracker.html#tracker-preferences">Tracker's preferences</a>, you can instantly trim down your list of bookmarks to matches of your filter-string. A few more <span class="key">↑</span> or <span class="key">↓</span> to move the selection and pressing <span class="key">ENTER</span> opens the site. Make sure to display all attribute columns to have the filter applied to name, title, URL and keywords.</p>
 <p>For this to work, all bookmarks should be kept in the <tt>~/config/settings/WebPositive/Bookmarks/</tt> folder and only copies should be sorted into custom subfolders for usage in WebPositive's <span class="menu">Bookmarks</span> menu (if at all). Also, actually filling the keywords attribute helps...</p>
-<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Downloads</h2>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>File scaricati</h2>
 <p><span class="menu">Window | Downloads</span> opens a window listing all past and ongoing downloads:</p>
 <img src="../images/apps-images/webpositive-downloads.png" alt="webpositive-downloads.png" />
 <p>Currently downloading files are shown with a growing progress bar and, similar to copying files in Tracker, information on the download speed, file size and expected finishing time. Buttons to the right let you <span class="button">Cancel</span> and <span class="button">Restart</span> a download, or  <span class="button">Open</span> the file, or <span class="button">Remove</span> its entry from the list. The <span class="button">Remove missing</span> and <span class="button">Remove finished</span> buttons at the bottom do this for all entries in this list. "Missing" are files that were deleted in the meantime.</p>
@@ -112,14 +113,14 @@ Activating <span class="menu">Type-ahead filtering</span> in <a href="../tracker
 Generally, WebPositive is very tolerant when it comes to managing files with Tracker. Files can be renamed or moved even while they are being downloaded and even after the download is finished, these changes are reflected in the Downloads window.</p>
 <div class="box-info"><p>Ever wondered from what site you downloaded a particular package, image or any other file? You can track that down by opening the file with <a href="diskprobe.html">DiskProbe</a> and have a look at its <tt>META:url</tt> attribute.</p>
 <p>Want to have the URL permanently shown in your downloads folder? Just copy a bookmark into it, have the bookmark's URL attribute column displayed and remove the bookmark again.</p></div>
-<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Keyboard shortcuts</h2>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Scorciatoie da tastiera</h2>
 <p>Here are some useful keyboard shortcuts:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td><span class="key">ALT</span> <span class="key">T</span></td><td style="width:15px;"></td><td>Opens a new tab.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">W</span></td><td> </td><td>Closes the current tab.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">N</span></td><td> </td><td>Opens a new window.</td></tr>
 <tr><td><span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">W</span></td><td> </td><td>Closes the current window.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">ENTER</span></td><td> </td><td>Toggles full screen mode.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">INVIO</span></td><td> </td><td>Toggles full screen mode.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">R</span> or  <span class="key">F5</span></td><td> </td><td>Refreshes the current page.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">H</span></td><td> </td><td>Opens the home page.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">D</span></td><td> </td><td>Shows/hides the Downloads window.</td></tr>

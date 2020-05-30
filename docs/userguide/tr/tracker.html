@@ -23,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>Kullanıcı kılavuzu</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -52,26 +52,25 @@
 <li><a href="../jp/tracker.html">日本語</a></li>
 </ul>
 <span>
- «  <a href="teammonitor.html">Team Monitor</a> 
-::  <a href="contents.html" class="uplink">İçerik</a> 
-::  <a href="tracker-add-ons.html">Tracker Add-Ons</a>  »
+ «  <a href="teammonitor.html">Takım Monitörü</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="tracker-add-ons.html">İzleyici Eklentileri</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">Bu sayfanın çevrilmesi henüz tamamlanmamıştır. Tamamlanana kadar henüz bitirilmeyen kısımlar İngilizce metni kullanır.</div>
 
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>İçindekiler</td></tr>
 <tr class="index"><td>
-	<a href="#mounting-volumes">Mounting volumes</a><br />
-	<a href="#navigating">Navigating</a><br />
-	<a href="#appearance">Appearance</a><br />
-	<a href="#tracker-preferences">Tracker preferences</a><br />
-	<a href="#working-with-files">Working with files</a><br />
-	<a href="#transaction-status">Transaction status</a>
+	<a href="#mounting-volumes">Diskleri Bağlama</a><br />
+	<a href="#navigating">Dolaşım</a><br />
+	<a href="#appearance">Görünüm</a><br />
+	<a href="#tracker-preferences">İzleyici tercihleri</a><br />
+	<a href="#working-with-files">Dosyalarla çalışmak</a><br />
+	<a href="#transaction-status">İşlem durumu</a>
 </td></tr>
 </table>
 
@@ -109,115 +108,113 @@ Yukarıdaki işlemi bir dosyayı birlikte sürükleyerek yaparsanız dosya bıra
 <img src="images/tracker-images/window-drill-down.png" alt="window-drill-down.png" />
 <p>Sol aşağıda öge sayılarının belirtildiği alana tıklayın; o konumdan aşağı gidebileceğiniz tüm konumların listesini belirten altmenüleri göreceksiniz. Buradan istediğiniz konuma geçebilirsiniz.</p>
 <p>Masaüstü'nün nice her zaman en üst düzeyde olduğuna dikkat edin; bu İzleyici'nin bağlı diskleri listelediği konum olduğundan dolayıdır. Başka bir diske geçmek isterseniz önce en üst düzeye (Masaüstü'ne) gelip oradan başka disklere geçmeniz gerekmektedir.</p><br />
-<p>You'll get the same submenu-navigating when you drag a file over a folder. After a short while of hovering, a submenu pops up and you can drill down to your destination. If you initiated the drag with the right mousebutton, you can choose between copying, moving or linking the file when you release the mouse.</p>
+<p>Aynı altmenü dolaşımını bir dosyayı bir klasörün üzerine getirdiğinizde de kullanılabilir. Biraz üzerinde tuttuğunuzda bir altmenü açılır ve gitmek istediğiniz konuma ulaşabilirsiniz. Sürüklemeyi sağ fare düğmesi ile başlattıysanız fareyi bırakacağınız zaman size kopyalama, taşıma ve bağlama seçeneklerinden birini seçebilirsiniz.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="type-ahead" name="type-ahead">Jumping to files with type-ahead</a></h3>
-<p>You may be familiar with the concept from file managers of other operating systems: typing the first few letters of a filename will jump to the first file matching these starting characters. Haiku took the idea a step further. If there isn't a file starting with those letters it will jump to the first file including the string anywhere in its name. And if there's nothing with the string in its filename, the attributes are searched next.</p>
+<a id="type-ahead" name="type-ahead">Hemen bulma ile dosyalara atlama</a></h3>
+<p>Bu konsepte başka işletim sistemlerinden aşina olabilirsiniz; bir dosyanın ilk birkaç harfini girmek eşleşen ilk dosyaya atlar. Haiku bu düşünceyi bir adım öteye taşıyor. Eğer bu harflerle başlayan bir dosya yoksa içinde girilen harflerin bulunduğu ilk dosya önünüze getirilir. Eğer bu harfler hiçbir dosyanın içinde yoksa dosya özniteliklerinde arama sürdürülür.</p>
 <img src="images/tracker-images/window-type-ahead.png" alt="window-type-ahead.png" />
-<p>In the above example, there are many files starting with "Haiku logo", rendering simpler approaches to typing ahead quite useless. In Haiku however, typing "web" jumps right to its first occurence in "Haiku logo - website". The characters you enter appear in the bottom left corner where you normally find the item count of all files in the folder. A second after entering a character, the display jumps back to normal and you're ready for a new type ahead search.</p>
+<p>Yukarıdaki örnekte adında "Haiku logo" bulunan birçok dosyayı görüyorsunuz; dolayısıyla klasik bir arama mantığı burada işe yaramayacaktır. Ancak Haiku'da "web" yazdığınızda "Haiku-logo - website" örneği doğrudan seçilir. Girdiğiniz karakterler aşağıda normalde öge sayısını gördüğünüz bölümde görüntülenir. Bir karakter girdikten bir saniye sonra görünüm eski durumuna döner ve yeni bir arama yapabilirsiniz. </p>
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="type-ahead-filter" name="type-ahead-filter">Type-ahead filtering</a></h3>
-<p>Instead of jumping to a file while typing, there's also the option to filter out all files not matching your type-ahead string. This can improve clarity dramatically, especially when dealing with crowded folders. By using <span class="key">SHIFT</span> <span class="key">SPACE</span> as delimiter, you can even filter on multiple strings.<br />
-Contrary to type-ahead jumping, the filtering will stick until you press <span class="key">ESC</span> or close the window (or leave the folder if you're using Single Window Navigation).<br />
-This type-ahead filtering is set in the <a href="#tracker-preferences.html">Tracker preferences</a>.</p>
+<a id="type-ahead-filter" name="type-ahead-filter">Hemen bulan süzme</a></h3>
+<p>Yazarken bir dosyaya atlamak yerine girdiğiniz karakterler ile eşleşmeyen dosyaları ekrandan kaldırmanızı sağlayan bir seçenek de bulunmaktadır. Bu, özellikle büyük klasörlerle çalışırken çok rahatlık sağlar. <span class="key">SHIFT</span> <span class="key">SPACE</span> düğme ikilisini kullanarak birden çok diziyi bile süzebilirsiniz.<br />
+Hemen bularak atlama yerine, süzme seçeneği siz <span class="key">ESC</span> düğmesine basana veya pencereyi kapatana kadar (eğer Tek pencereli dolaşım kullanıyorsanız klasörden ayrılana kadar) silinmez.<br />
+Bu süzme seçeneğini <a href="#tracker-preferences.html">İzleyici tercihleri</a>'nden ayarlayabilirsiniz.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="appearance" name="appearance">Appearance</a></h2>
+<a id="appearance" name="appearance">Görünüm</a></h2>
 <img src="images/tracker-images/window-menu.png" alt="window-menu.png" />
-<p>Tracker windows offer three different viewing modes from the <span class="menu">Window</span> menu:</p>
+<p>İzleyici pencereleri <span class="menu">Window</span> menüsünden ayarlayabileceğiniz üç görüntüleme kipi sunar:</p>
 <ul>
-<li><p><span class="menu">Icon view</span> (<span class="key">ALT</span> <span class="key">1</span>) - Big icons, you can change the size from the submenu or in/decrease their size with <span class="key">ALT</span> <span class="key">+</span>/<span class="key">-</span>.</p></li>
-<li><p><span class="menu">Mini icon view</span> (<span class="key">ALT</span> <span class="key">2</span>) - Small icons.</p></li>
-<li><p><span class="menu">List view</span> (<span class="key">ALT</span> <span class="key">3</span>) - A detailed list of your files enabling you to show/hide file attributes (see topic <a href="attributes.html">Attributes</a>.)</p></li>
+<li><p><span class="menu">Simge görünümü</span> (<span class="key">ALT</span> <span class="key">1</span>) - Büyük simgeler; boyutlarını alt menüden veya <span class="key">ALT</span> <span class="key">+</span>/<span class="key">-</span> düğmeleri ile değiştirebilirsiniz.</p></li>
+<li><p><span class="menu">Ufak simge görünümü</span> (<span class="key">ALT</span> <span class="key">2</span>) - Küçük simgeler.</p></li>
+<li><p><span class="menu">Liste görünümü</span> (<span class="key">ALT</span> <span class="key">3</span>) - Dosyalarınız ayrıntılı bir görünümü; buradan dosya özniteliklerini görüntüleyebilir veya gizleyebilirsiniz (<a href="attributes.html">Öznitelikler</a> bölümüne bakın.)</p></li>
 </ul>
-<p>The <span class="menu">Window</span> menu offers a number of other functions:</p>
+<p><span class="menu">Pencere</span> menüsünde birkaç tane daha ek işlev bulunmaktadır:</p>
 <ul>
-<li><p><span class="menu">Resize to fit</span> (<span class="key">ALT</span> <span class="key">Y</span>) - Resizes the window to its ideal size.</p></li>
-<li><p><span class="menu">Arrange by...</span> - Only available in Icon or Mini icon view, a submenu allows to set the sorting order to various properties:</p>
+<li><p><span class="menu">Sığacak biçimde boyutlandır</span> (<span class="key">ALT</span> <span class="key">Y</span>) - Pencereyi ideal boyutuna getirir.</p></li>
+<li><p><span class="menu">Sırala</span> - 
+Yalnızca Simge veya Ufak simge görünümünde kullanılabilir. Bu alt menüden dosyaları aşağıdaki özniteliklerine göre sıralayabilirsiniz:</p>
 	<ul>
-	<li><p><span class="menu">Name</span>, <span class="menu">Real name</span>, <span class="menu">Size</span>, <span class="menu">Modified</span>, <span class="menu">Created</span>, <span class="menu">Kind</span>, <span class="menu">Location</span>, <span class="menu">Permissions</span></p></li>
-	<li><p><span class="menu">Reverse order</span> - Inverts the sorting order</p></li>
-	<li _translation_id="4339"><p><span class="menu">Clean up</span> (<span class="key">ALT</span> <span class="key">K</span>) - Aligns all icons to an invisible grid. Hold down <span class="key">SHIFT</span> and the menu becomes <span class="menu">Clean up all</span> which additionally sorts all icons according to the above selected criterium.</p></li>
+	<li><p><span class="menu">Ad</span>, <span class="menu">Gerçek ad</span>, <span class="menu">Boyut</span>, <span class="menu">Değiştirilme</span>, <span class="menu">Oluşturulma</span>, <span class="menu">Tür</span>, <span class="menu">Konum</span>, <span class="menu">İzinler</span></p></li>
+	<li><p><span class="menu">Ters sıra</span> - Sıralamayı tersine çevirir</p></li>
+	<li _translation_id="4339"><p><span class="menu">Toparla</span> (<span class="key">ALT</span> <span class="key">K</span>) - Tüm simgeleri görünmez bir ızgaraya hizalar. <span class="key">SHIFT</span> düğmesini basılı tutarsanız menü girdisi <span class="menu">Hepsini toparla</span> olur ve tüm simgeleri yukarıda seçili kritere göre sıralar.</p></li>
 	</ul></li>
-<li><p><span class="menu">Select...</span> (<span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">A</span>) - Select files according to a <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expression">regular expression</a>.</p></li>
-<li><p><span class="menu">Close</span> (<span class="key">ALT</span> <span class="key">W</span>) - Closes the window. Hold down <span class="key">SHIFT</span> and the menu becomes <span class="menu">Close all</span> which closes every Tracker window.</p></li>
-<li><p><span class="menu">Close all in workspace</span> (<span class="key">ALT</span> <span class="key">Q</span>) - Closes every Tracker window in the current workspace. A useful shortcut if you forgot to hold the <span class="key">OPT</span> key while clicking through folders and all those still open Tracker windows clutter your workspace.</p></li>
+<li><p><span class="menu">Seç…</span> (<span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">A</span>) - Bir <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expression">düzenli ifade</a> kullanarak dosya(ları) seçer.</p></li>
+<li><p><span class="menu">Kapat</span> (<span class="key">ALT</span> <span class="key">W</span>) - Pencereyi kapatır. <span class="key">SHIFT</span> düğmesini basılı tutarsanız menü girdisi <span class="menu">Tümünü kapat</span> olur ve tüm İzleyici pencerelerini kapatır.</p></li>
+<li><p><span class="menu">Bu çalışma alanındakini kapat</span> (<span class="key">ALT</span> <span class="key">Q</span>) - Geçerli çalışma alanındaki tüm İzleyici pencerelerini kapatır. Ola ki İzleyici pencereleri arasında dolaşırken <span class="key">OPT</span> düğmesine basmayı unutup her yanı İzleyici pencereleri ile doldurursanız bu özellik işinize yarayabilir.</p></li>
 </ul>
-<p>Sometimes you just want to rearrange a few icons without doing a complete <span class="menu">Clean up</span> (<span class="key">ALT</span> <span class="key">K</span>). In that case, you select these icons and start to drag them to their new location. Before you drop them there, keep <span class="key">ALT</span> pressed. This will align the icons to the invisible grid.</p>
-<p>The rest of the functions are pretty self-explanatory, leaving the Tracker preferences.</p>
+<p>Bazen tam bir <span class="menu">Toparla</span> (<span class="key">ALT</span> <span class="key">K</span>) yapmadan yalnızca birkaç simgeyi hizalamak isteyebilirsiniz. Bu durumda simgeyi seçip yeni yerine bırakmadan önce <span class="key">ALT</span> düğmesine basılı tutun. Bu simgeleri görünmez ızgaraya hizalayacaktır.</p>
+<p>Geriye kalan seçeneklerin gayet açık olduğunu farz ederek İzleyici tercihlerine geçelim.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="tracker-preferences" name="tracker-preferences">Tracker preferences</a></h3>
-<p><span class="menu">Window | Preferences...</span> opens a panel that offers a number of settings that, where not obvious, should become clear once tried out. Since all settings are applied live, you'll immediately see the changes.
-<br />So, in short, the not so obvious settings:</p>
+<a id="tracker-preferences" name="tracker-preferences">İzleyici tercihleri</a></h3>
+<p><span class="menu">Pencere | Tercihler...</span> seçeneği ilk bakışta biraz karmaşık görünebilecek İzleyici tercihleri panelini açar. Hepsini denedikten sonra bir sorun kalmayacağını öngörüyoruz. Tüm ayarlar anında etkin olduğundan dolayı neyin değiştiğini hemen görebileceksiniz.<br />Pek açık olmayan diğer ayarlara şöyle bir bakalım:</p>
 <ul>
-<li><p><span class="menu">Desktop</span> - Decide if all mounted disks appear directly on the Desktop or in a window after clicking a single Disk icon sitting on the Desktop.</p></li>
-<li><p><span class="menu">Windows</span> - You can set <span class="menu">Single window navigation</span>, i.e. a double-clicked folder doesn't open in its own window, but inside the already open window instead, replacing the view of its parent folder. This is not the same as clicking while holding the <span class="key">OPT</span> key, as described above, because you'll lose the per window saved position and size.
+<li><p><span class="menu">Masaüstü</span> - Bağlanan disklerin Masaüstü'nde ayrı simgelerle mi gösterileceğini, yoksa tek bir Diskler simgesinden mi erişilebileceğini ayarlayın.</p></li>
+<li><p><span class="menu">Pencereler</span> - <span class="menu">Tek pencereli dolaşım</span> kullanarak dizinler arasında yalnızca tek bir pencere kullanarak dolaşabilirsiniz; böylece bir klasöre çift tıkladığınızda yeni bir pencere açılmaz, içerik üst ögesinin yerini alarak ekranda görüntülenir. Bu <span class="key">OPT</span> düğmesini basılı tutarak açma ile aynı şey değildir, çünkü bu seçenekte pencerenin konumu ve boyutu aynı kalmaz.
 </p>
 <img src="images/tracker-images/tracker-preferences-navigator.png" alt="tracker-preferences-navigator.png" />
-<p>Before you switch Tracker to <span class="menu">Single window navigation mode</span>, because that may feel more familiar to you, we recommend giving the menu based browsing a try first, as that may actually work much faster for you after getting used to. On the other hand, single window browsing offers a <i>Navigator</i> where you can enter or copy &amp; paste a path name and use back, forward and up buttons.</p> 
-<p>Activating <span class="menu">Type-ahead filtering</span> will filter the contents of a Tracker window while you type to only display the files matching your string in their name or any currently displayed attribute. See <a href="#type-ahead-filter">above</a>.</p></li>
-<li><p><span class="menu">Volume icons</span> - Set the color of an optional indicator of free space that's shown besides a disk's icon.</p></li>
-<li><p><span class="menu">Disk mount</span> - Define when and what disks are mounted automatically, as described above under <a href="#mounting-volumes">"Mounting volumes"</a>.</p></li>
+<p>Sadece önceden aşinalığınız var diye İzleyici'yi <span class="menu">Tek pencereli dolaşım</span> kipine geçirmeden önce menü tabanlı dolaşım kipini biraz daha denemenizi öneririz; bu biçimde alıştıktan sonra istediğiniz yere daha hızlı gidebilir ve işinizi daha tez halledebilirsiniz. Diğer yanda, tek pencereli dolaşım kipinde <i>Adres çubuğu</i>'nu kullanarak gitmek istediğiniz konumu girebilir ve ileri/geri/yukarı düğmeleri ile dolaşabilirsiniz.</p> 
+<p><span class="menu">Hemen bulan süzme</span> seçeneği İzleyici penceresinin içeriğini girdiğiniz karakterlere göre süzer ve ekranda sırasıyla ad, içerik ve özniteliklere göre sonuçlar gösterir. Ek bilgi için <a href="#type-ahead-filter">yukarıya</a> bakın.</p></li>
+<li><p><span class="menu">Disk simgeleri</span> - Bir disk simgesinin yanında gösterilen boş alan belirtecinin renklerini ayarlayın.</p></li>
+<li><p><span class="menu">Disk bağlama</span> - Hangi disklerin ne zaman kendiliğinden bağlanacağını belirleyin (ek bilgi için: <a href="#mounting-volumes">"Diskleri bağlama"</a>).</p></li>
 </ul>
-<p>This panel, by the way, is also available as <span class="app">Tracker</span> from Deskbar's <span class="menu">Preferences</span>.</p>
+<p>Bu panele aynı zamanda Masaüstü Çubuğu'nun <span class="menu">Tercihler</span> → <span class="app">İzleyici</span> bölümünden de ulaşılabilir.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="working-with-files" name="working-with-files">Working with files</a></h2>
-<p>When invoked on a selected file, most of the <span class="menu">File</span> menu commands are also offered in the context menu by right-clicking that file.</p>
-<p>As usual the commands are pretty clear.</p>
+<a id="working-with-files" name="working-with-files">Dosyalarla çalışmak</a></h2>
+<p>Seçili bir dosya ile çalışırken <span class="menu">Dosya</span> menüsünün içeriğinin çoğuna o dosyaya sağ tıklayarak da ulaşabilirsiniz.</p>
+<p>Komutlar genelde gayet açıktır.</p>
 <ul>
-<li><p><span class="menu">Find...</span> - Find a file or folder. See topic <a href="queries.html">Query</a> for more info.</p></li>
-<li><p><span class="menu">New</span> - Create a new folder or any other file based on a <i>template</i>.
-</p>
+<li><p><span class="menu">Bul...</span> - Bir dosyayı veya klasörü bulun. Ek bilgi için <a href="queries.html">Sorgular</a> bölümüne bakın.</p></li>
+<li><p><span class="menu">Yeni</span> - Bir klasör veya bir <i>şablonu</i> temel alan yeni bir dosya oluşturun.</p>
 <img src="images/tracker-images/new-menu.png" alt="new-menu.png" />
-<p>Choosing <span class="menu">Edit templates...</span> opens the folder <span class="path">/boot/home/config/settings/Tracker/Tracker New Templates</span>. Creating a file in that folder will offer its filetype with the file's name and other attributes as template in the <span class="menu">New</span> menu. Here, there's a file "Text" with the filetype <tt>text/plain</tt>. See topic <a href="filetypes.html">Filetypes</a> for more info.</p></li>
-<li><p><span class="menu">Open with...</span> - A submenu offers all applications that can handle this filetype.
+<p><span class="menu">Şablonları düzenle...</span> seçeneği <span class="path">/boot/home/config/settings/Tracker/Yeni İzleyici şablonları</span> klasörünü açar. Bu klasörde yeni bir dosya oluşturmak, <span class="menu">Yeni</span> menüsünde oluşturulan dosyanın öznitelikleri ve türüne iye yeni bir şablon girdisi ekler. Burada "Metin" adında ve <tt>text/plain</tt> türünde bir şablon görüyorsunuz. Ek bilgi için <a href="filetypes.html">Dosya Türleri</a> bölümüne bakın.</p></li>
+<li><p><span class="menu">Birlikte aç...</span> - Bu dosya türünü açabilen tüm uygulamaların listelendiği bir alt menü.
 </p>
 <img src="images/tracker-images/open-with.png" alt="open-with.png" />
 
-<p>The preferred application that would open the file when double-clicked, is checkmarked. This submenu lists first those applications that can handle the exact filetype, in this case it's a text file, the type <tt>text/plain</tt>. Next come all applications that can handle that supertype in general, here <tt>text/*</tt>. Last in the list are those that can deal with any file. If you don't click on an app in the submenu, but on the <span class="menu">Open with...</span> entry instead, a panel opens:</p>
+<p>Çift tıklandığı zaman bu dosyayı açacak olan uygulamanın yanında bir onay imi bulunmaktadır. Bu alt menü bu dosya türünü açabilecek olan uygulamaları ilk olarak listeler; bu örnekte bu bir metin dosyasıdır, türü <tt>text/plain</tt>. Daha sonra bu genel türü açabilecek olan uygulamalar gelir, bu örnekte <tt>text/*</tt>. Listenin sonunda ise her tür dosyayı açabilecek olan uygulamalar yer alır. Bu listeden bir uygulama seçmez de <span class="menu">Birlikte aç...</span> menü girdisinin üzerine tıklarsanız bir panel açılır:</p>
 
 <img src="images/tracker-images/open-with-preferred.png" alt="open-with-preferred" />
-<p>Here you'll again find the programs that were listed in the submenu. By selecting one and clicking the <span class="button">Open and make preferred</span> button, you changed the preferred application for every file of that filetype, here <tt>text/plain</tt>.</p></li>
-<li><span class="menu">Get info</span>
-<p>This opens a panel that shows the meta data of a file and lets you edit its permissions. You can rename it by clicking on the file name at the top.</p>
+<p>Burada daha önce listede gördüğünüz uygulamaları listeleyen bir pencere açılır. Uygulamalardan birine tıklayıp <span class="button">Aç ve tercih edilen yap</span> düğmesine basarsanız bu dosya türünün (<tt>text/plain</tt>) açılmasını her zaman açılmasını istediğiniz uygulamayı belirlemiş olursunuz.</p></li>
+<li><span class="menu">Bilgi al</span>
+<p>Bu seçenek dosya üst bilgilerini ve izinlerini düzenleyebileceğiniz bir panel açar. Üst kısımdaki dosya adına tıklayarak dosya adını değiştirebilirsiniz.</p>
 <img src="images/tracker-images/get-info.png" alt="get-info" />
-<p>The panel consists of three tabs:</p>
+<p>Panel üç sekmeden oluşur:</p>
 <ul>
-<li><span class="menu">Information</span>: Shows standard data like size, date of creation/modification, file type and location. Click on the location path to open the files parent folder. The <span class="menu">Open with</span> menu sets the preferred application to open this particular file.</li>
-<li><span class="menu">Permissions</span>: Lets you change owner, group and file permissions.</li>
-<li><span class="menu">Attibutes</span>: Lists all extra file attributes with their value and type.</li>
-</ul>
-</li>
-<li><p><span class="menu">Edit name</span>, <span class="menu">Duplicate</span> and <span class="menu">Move to trash</span> - lets you rename or duplicate a file or put the selected file(s) to the trash.</p></li>
-<li><p><span class="menu">Move to</span>, <span class="menu">Copy to</span> and <span class="menu">Create link</span> - lets you move, copy or link the selected file(s) using the submenu navigating method. Holding <span class="key">SHIFT</span> while invoking the menu offers the option to create a relative link.</p></li>
-<li><p><span class="menu">Cut</span>, <span class="menu">Copy</span> and <span class="menu">Paste</span> - lets you cut, copy and paste files using the clipboard. By holding <span class="key">SHIFT</span> while invoking the menu you can <span class="menu">Copy/Cut more</span> files, maybe from another folder that you can paste somewhere else later. Also, while holding <span class="key">SHIFT</span> you can paste the copied files in the clipboard as links.</p></li>
-<li><p><span class="menu">Identify</span> - will sniff out and set the type of files if they didn't have one before, e.g. if you transferred a file with <span class="cli">wget</span> which doesn't set a filetype itself. Holding <span class="key">SHIFT</span> while invoking the menu changes the item to <span class="menu">Force identify</span> which identifies the filetype and corrects it if it was false before.</p></li>
-<li><p><span class="menu">Add-Ons</span> - offers you every generic Tracker add-on and those that can handle the selected file(s). See topic <a href="tracker-add-ons.html">Tracker Add-ons</a> for more information.</p></li>
+<li><span class="menu">Bilgi</span>: Dosya boyutu, oluşturulma/değiştirilme tarihi, dosya türü ve konumu gibi standart bilgiyi gösterir. Konum satırındaki yola tıklayarak dosyanın üst konumunu açabilirsiniz. <span class="menu">Birlikte aç</span> menüsü bu dosyayı açmak için kullanacağınız uygulamayı belirler.</li>
+<li><span class="menu">İzinler</span>: Dosya izinlerini, grubu ve dosya sahibini değiştirmenize izin verir.</li>
+<li><span class="menu">Öznitelikler</span>: Tüm ek dosya özniteliklerini değerleri ve türleri ile birlikte listeler.</li>
+</ul></li>
+<li><p><span class="menu">Yeniden adlandır</span>, <span class="menu">Çoğalt</span> ve <span class="menu">Çöp'e taşı</span> - dosyaları yeniden adlandırmanıza, çoğaltmanıza ve seçili dosyaları çöpe atmanıza olanak verir.</p></li>
+<li><p><span class="menu">Taşı</span>, <span class="menu">Kopyala</span> ve <span class="menu">Bağlantı oluştur</span> - seçili dosyaları altmenü dolaşımını kullanarak taşımanıza, kopyalamanıza ve bağlantı oluşturmanıza izin verir. <span class="key">SHIFT</span> düğmesini basılı tutarsanız göreceli bağlantı oluşturmak için bir seçenek de çıkar.</p></li>
+<li><p><span class="menu">Kes</span>, <span class="menu">Kopyala</span> ve <span class="menu">Yapıştır</span> - dosyaları pano kullanarak kesmenize, kopyalamanıza ve yapıştırmanıza izin verir. <span class="key">SHIFT</span>düğmesini basılı tutarsanız  while invoking the menu you can <span class="menu">Daha fazla kes/kopyala</span> seçeneği ortaya çıkar, bununla daha sonra tamamlamak üzere örneğin başka bir klasörden işlem yapabilirsiniz. Ayrıca <span class="key">SHIFT</span> düğmesi ile kopyalanan dosyaları panoya bağlantılar olarak yapıştırabilirsiniz.</p></li>
+<li><p><span class="menu">Tanımla</span> - eğer daha önce dosya türü tanımlanmamışsa koklar ve dosya türünü ayarlar. Bu, örneğin <span class="cli">wget</span> gibi dosya türünü ayarlamayan bir uygulamayla dosya indirdiyseniz yararlı olabilir. <span class="key">SHIFT</span> düğmesini basılı tutarsanız öge <span class="menu">Tanımlamaya zorla</span> olarak değişir ve örneğin daha önceden yanlış bir tür belirlenmişse bunu düzeltir.</p></li>
+<li><p><span class="menu">Eklentiler</span> - seçili dosya ile işlem yapabilecek tüm standart İzleyici eklentisini gösterir. Ek bilgi için <a href="tracker-add-ons.html">İzleyici Eklentileri</a> bölümüne bakın.</p></li>
 </ul>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="transaction-status" name="transaction-status">Transaction status</a></h2>
-<p>When you copy, move or delete files, Tracker shows its progress with a status window. If you initiate more than one transaction, each job gets its own status display.</p>
+<a id="transaction-status" name="transaction-status">İşlem durumu</a></h2>
+<p>Dosyaları kopyaladığınız, taşıdığınız veya sildiğiniz zaman, İzleyici işlemin durumunu bir durum penceresinde gösterir. Eğer birden çok işlem başlatırsanız her iş ayrı ilerleme çubuğu ile gösterilir.</p>
 <img src="images/tracker-images/transaction-status.png" alt="transaction-status.png" />
-<p>To the right are two buttons to pause or stop a transaction entirely. Sometimes it can be useful to temporarily pause a large transaction. For example, you may need to quickly launch a large application. Copying large amounts of data chokes your harddisk's IO bandwidth and thus delays your workflow.</p>
+<p>Sağ tarafta bir işlemi duraklatmak veya durdurmak için iki düğme bulunur. Bazı durumlarda büyük bir işlemi duraklatmak yararlı olabilir. Örneğin büyük boyutlu bir uygulamayı hemen başlatmanız gerekebilir. Çok fazla veri kopyalamak sabit diskinizin girdi ve çıktı kanallarını doldurur ve bilgisayarınız yavaş davranabilir.</p>
 
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="teammonitor.html">Team Monitor</a> 
-::  <a href="contents.html" class="uplink">İçerik</a> 
-::  <a href="tracker-add-ons.html">Tracker Add-Ons</a>  »
+ «  <a href="teammonitor.html">Takım Monitörü</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="tracker-add-ons.html">İzleyici Eklentileri</a>  »
 </span></div>
 </div>
 

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2018, Haiku. All rights reserved.
+ * Copyright 2010-2020, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -24,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>Käyttäjäopas</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -87,6 +87,7 @@ Tässä on luettelo Haikun mukana tulevista komentorivisovelluksista. Jokaisen k
 <tr><td><tt>bash</tt></td><td> </td><td>Bourne-again shell</td></tr>
 <tr><td><tt>bc</tt></td><td> </td><td>Satunnaistarkkuuksinen laskinkieli.</td></tr>
 <tr><td><tt>beep</tt></td><td> </td><td>Soittaa kelloa. </td></tr>
+<tr><td><tt>bfsinfo</tt></td><td> </td><td>Analysoi tiedostojärjestelmää.</td></tr>
 <tr><td><tt>bunzip2</tt></td><td> </td><td>Katso <tt>bzip2</tt>.</td></tr>
 <tr><td><tt>bzip2</tt></td><td> </td><td>Tiedostotiivistäjä.</td></tr>
 <tr><td><tt>c++</tt></td><td> </td><td>C++-kääntäjä.</td></tr>
@@ -102,30 +103,31 @@ Tässä on luettelo Haikun mukana tulevista komentorivisovelluksista. Jokaisen k
 <tr><td><tt>chroot</tt></td><td> </td><td>Suorittaa komennon määritellyn root-hakemiston sisällä. </td></tr>
 <tr><td><tt>cksum</tt></td><td> </td><td>Tulostaa CRC-tarkistussumman ja tiedoston tavumäärän. </td></tr>
 <tr><td><tt>clear</tt></td><td> </td><td>Tyhjentää Pääteikkunan. </td></tr>
+<tr><td><tt>clipboard</tt></td><td> </td><td>Käsittelee järjestelmän leikepöytää.</td></tr>
 <tr><td><tt>cmp</tt></td><td> </td><td>Vertaa tiedostoja tavu tavulta.</td></tr>
-<tr><td><tt>collectcatkeys </tt></td><td> </td><td>[Ohjelmaa käytettiin ennen siirtymistä locale-kit-käyttöön.]</td></tr>
+<tr><td><tt>collectcatkeys </tt></td><td> </td><td>Kerää käännettäviä merkkijonoja catkey-luettelojen luomiseksi.</td></tr>
 <tr><td><tt>comm</tt></td><td> </td><td>Vertaa lajiteltuja tiedostoja rivi riviltä. </td></tr>
 <tr><td><tt>consoled</tt></td><td> </td><td>Pääteikkunataustaprosessi </td></tr>
 <tr><td><tt>copyattr</tt></td><td> </td><td>Kopioi kaikki attribuutit tai attribuuttien alijoukon yhdestä tai useammasta tiedostosta toiseen tai uuteen tiedostoon. <a href="cli-apps.html">(Haiku-kohtainen)</a></td></tr>
 <tr><td><tt>cp</tt></td><td> </td><td>Kopioi tiedostoja ja hakemistoja. </td></tr>
 <tr><td><tt>csplit</tt></td><td> </td><td>Katkoo tiedoston määrätyn mallin erottelemiin palasiin.</td></tr>
-<tr><td><tt>ctags</tt></td><td> </td><td>Tuottaa indeksitiedoston tiedostosta löytyvistä eri kieliobjekteista</td></tr>
 <tr><td><tt>cut</tt></td><td> </td><td>Tulostaa tiedoston jokaisesta rivistä lohkoja.</td></tr>
 <tr><td><tt>date</tt></td><td> </td><td>Näyttää ja asettaa nykyisen ajan ja päivämäärän.</td></tr>
 <tr><td><tt>dc</tt></td><td> </td><td>Työpöytälaskinkieli.</td></tr>
 <tr><td><tt>dd</tt></td><td> </td><td>Kopioi raakatietoja, muuntaa ja muotoilee niitä operandien mukaan. </td></tr>
 <tr><td><tt>desklink</tt></td><td> </td><td>Asentaa kohteita Työpöytäpalkkiin. <a href="cli-apps.html">(Haiku-kohtainen)</a></td></tr>
-<tr><td><tt>diskimage</tt></td><td> </td><td>Rekisteröi tiedoston levylaitteena, joka voidaan liittää. <a href="cli-apps.html">(Haiku-kohtainen)</a></td></tr>
 <tr><td><tt>df</tt></td><td> </td><td>Ilmoittaa liitettyjen taltioiden vapaan ja käytetyn tilan.</td></tr>
 <tr><td><tt>diff</tt></td><td> </td><td>Vertailee tiedostoja rivi riviltä.</td></tr>
 <tr><td><tt>diff3</tt></td><td> </td><td>Vertailee kolmea tiedostoa rivi riviltä.</td></tr>
 <tr><td><tt>dircolors</tt></td><td> </td><td>Väriasetukset komennolle <tt>ls</tt>. </td></tr>
 <tr><td><tt>dirname</tt></td><td> </td><td>Riisuu tiedostonimen /polku/tiedostonimi -merkkijonosta.</td></tr>
+<tr><td><tt>diskimage</tt></td><td> </td><td>Rekisteröi tiedoston levylaitteena, joka voidaan liittää. <a href="cli-apps.html">(Haiku-kohtainen)</a></td></tr>
+<tr><td><tt>dpms</tt></td><td> </td><td>Asettaa näytön virranhallinnan.</td></tr>
 <tr><td><tt>draggers</tt></td><td> </td><td>Näyttää/asettaa Kopioiden raahaajatilan.</td></tr>
 <tr><td><tt>driveinfo</tt></td><td> </td><td>Näyttää laitteistotietoja. </td></tr>
 <tr><td><tt>dstcheck</tt></td><td> </td><td>Näyttää viesti-ikkunan kun vaihdetaan kesäaikaan tai talviaikaan.</td></tr>
 <tr><td><tt>du</tt></td><td> </td><td>Tekee yhteenvedon jokaisen tiedoston levyasemakäytöstä, rekursiivisesti myös alihakemistoissa. </td></tr>
-<tr><td><tt>dumpcatalog</tt></td><td> </td><td>[Ohjelma, jota käytettiin ennen siirtymistä locale-kit-kotoistamiseen.] </td></tr>
+<tr><td><tt>dumpcatalog</tt></td><td> </td><td>[Ohjelmaa käytettiin ennen siirtymistä locale-kit-käyttöön.]</td></tr>
 <tr><td><tt>echo</tt></td><td> </td><td>Näyttää rivin tekstiä.</td></tr>
 <tr><td><tt>egrep</tt></td><td> </td><td>Katso <tt>grep</tt>.</td></tr>
 <tr><td><tt>eject</tt></td><td> </td><td>Poistaa irroitettavan median. </td></tr>
@@ -142,12 +144,11 @@ Tässä on luettelo Haikun mukana tulevista komentorivisovelluksista. Jokaisen k
 <tr><td><tt>filepanel</tt></td><td> </td><td>Näyttää lataa/tallenna tiedosto -paneelin. <a href="cli-apps.html">(Haiku-kohtainen)</a></td></tr>
 <tr><td><tt>find</tt></td><td> </td><td>Etsii tiedostoja hakemistohierarkiassa.</td></tr>
 <tr><td><tt>finddir</tt></td><td> </td><td>Löytää järjestelmän määrittelemän erikoishakemiston.</td></tr>
+<tr><td><tt>findpaths</tt></td><td> </td><td>Tulostaa kaikki polut järjestelmämääritetyistä hakemistovakioista.</td></tr>
 <tr><td><tt>fmt</tt></td><td> </td><td>Muotoilee uudelleen tiedoston kappaleet.</td></tr>
 <tr><td><tt>fold</tt></td><td> </td><td>Jakaa tiedoston syöttörivit riviltä toiselle.</td></tr>
 <tr><td><tt>fortune</tt></td><td> </td><td>Tulostaa satunnaisia, toivon mukaan mielenkiintoisia, mietelauseita.</td></tr>
-<tr><td><tt>freetype-config</tt></td><td> </td><td>Näyttää FreeType-käännös- ja -linkitystiedot.</td></tr>
 <tr><td><tt>fstrim</tt></td><td> </td><td>Lähetä TRIM-komento SSD-asemalle.</td></tr>
-<tr><td><tt>ftp</tt></td><td> </td><td>Tiedostonsiirto-ohjelma</td></tr>
 <tr><td><tt>ftpd</tt></td><td> </td><td>FTP-taustaprosessi</td></tr>
 <tr><td><tt>funzip</tt></td><td> </td><td>Poimii arkiston ensimmäisen kohdan vakiotulosteeseen.</td></tr>
 <tr><td><tt>fwcontrol</tt></td><td> </td><td>FireWire-ohjausohjelma</td></tr>
@@ -179,7 +180,7 @@ Tässä on luettelo Haikun mukana tulevista komentorivisovelluksista. Jokaisen k
 <tr><td><tt>lessecho</tt></td><td> </td><td>Tulostaa argumentit ja laajentaa metamerkit, kuten * ja ? tiedostonimissä.</td></tr>
 <tr><td><tt>lesskey</tt></td><td> </td><td>Määrittää näppäinsidonnat less-komennolle. </td></tr>
 <tr><td><tt>link</tt></td><td> </td><td>Luo linkin tiedostoon. </td></tr>
-<tr><td><tt>linkcatkeys</tt></td><td> </td><td>[Ohjelma, jota käytettiin ennen siirtymistä locale-kit-kotoistamiseen.] </td></tr>
+<tr><td><tt>linkcatkeys</tt></td><td> </td><td>Luo luetteloita catkeys-tiedostoista. </td></tr>
 <tr><td><tt>listarea</tt></td><td> </td><td>Luettelee aluetiedot kaikille parhaillaan suoritettaville ryhmille. </td></tr>
 <tr><td><tt>listattr</tt></td><td> </td><td>Luettelee tiedoston attribuutit. <a href="cli-apps.html">(Haiku-kohtainen)</a></td></tr>
 <tr><td><tt>listdev</tt></td><td> </td><td>Luettelee kaikki laitteet.</td></tr>
@@ -233,7 +234,6 @@ Tässä on luettelo Haikun mukana tulevista komentorivisovelluksista. Jokaisen k
 <tr><td><tt>pathchk</tt></td><td> </td><td>Diagnostoi virheelliset ja siirtokelvottomat tiedostonimet. </td></tr>
 <tr><td><tt>pc</tt></td><td> </td><td>Ohjelmoijan laskin.</td></tr>
 <tr><td><tt>ping</tt></td><td> </td><td>Lähettää pyynnön ICMP-echo-request verkkolaitteelle. </td></tr>
-<tr><td><tt>pkg-config</tt></td><td> </td><td>Analysoi ja asentaa Haiku-pakkauksen.</td></tr>
 <tr><td><tt>pkgman</tt></td><td> </td><td>Hallitsee pakkauksia ja pakkausvarastoja.</td></tr>
 <tr><td><tt>play</tt></td><td> </td><td>Soittaa kappaleita CD-levyltä. </td></tr>
 <tr><td><tt>pr</tt></td><td> </td><td>Muotoilee tiedostoille sivut ja sarakkeet tulostusta  varten. </td></tr>
@@ -268,6 +268,7 @@ Tässä on luettelo Haikun mukana tulevista komentorivisovelluksista. Jokaisen k
 <tr><td><tt>settype</tt></td><td> </td><td>Asettaa tiedoston MIME-tyypin, allekirjoituksen ja ensisijaisen sovelluksen. </td></tr>
 <tr><td><tt>setversion</tt></td><td> </td><td>Näyttää tiedoston version.</td></tr>
 <tr><td><tt>setvolume</tt></td><td> </td><td>Asettaa järjestelmän äänen voimakkuuden. </td></tr>
+<tr><td><tt>ftp</tt></td><td> </td><td>Tiedostonsiirto-ohjelma</td></tr>
 <tr><td><tt>sh</tt></td><td> </td><td>Katso <tt>bash</tt>. </td></tr>
 <tr><td><tt>sha1sum</tt></td><td> </td><td>Tulostaa ja tarkistaa SHA1-tarkistussummia. </td></tr>
 <tr><td><tt>shar</tt></td><td> </td><td>Luo komentotulkkiarkistoja.</td></tr>

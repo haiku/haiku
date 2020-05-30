@@ -24,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>Käyttäjäopas</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -61,18 +61,17 @@
 
 <div id="content">
 <div>
-<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Hakemisto</td></tr>
-<tr class="index"><td><a href="#filter">The Filter</a><br />
-                <a href="#list">The List</a><br />
-                <a href="#info">The Info Area</a><br />
-                <a href="#menu">Tools and Show menus</a><br />
-                <a href="#account">Creating a User Account</a><br />
-                <a href="#rating">Rating and Commenting</a><br />
-                <a href="#logs">Diagnostic Logs</a><br />
-</td></tr>
+<tr class="index"><td><a href="#filter">Suodatin</a><br />
+                <a href="#list">Luettelo</a><br />
+                <a href="#info">Tietoalue</a><br />
+                <a href="#menu">Työkalut ja Näytä-valikot</a><br />
+                <a href="#account">Käyttäjätilin luominen</a><br />
+                <a href="#rating">Arvosanat ja kommentointi</a><br />
+                <a href="#logs">Diagnostiikkalokitiedostot</a><br /></td></tr>
 </table>
 
 <h2><img src="../../images/apps-images/haikudepot-icon_64.png" alt="haikudepot-icon_64.png" width="64" height="64" />HaikuVarasto</h2>
@@ -83,7 +82,7 @@
 <span class="path">~/config/cache/HaikuDepot/</span> - Välimuistissa olevat kuvakkeet, kuvakaappaukset, kuvaukset jne.</td></tr>
 </table>
 <p><br /></p>
-<p>HaikuVarasto on keskeinen sovellus ohjelmistopakkaustesi hallintaan. Sovelluksella voit selata ja etsiä tietovarastoja sekä asentaa, päivittää ja poistaa pakkauksia. HaikuVarasto alkaa <i>Jakeluversiopakkaukset</i>-luettelolla, jossa on ohjelmistoja, jotka tuntuvat kiinnostavan monia käyttäjiä.</p>
+<p>HaikuDepot is the central application when it comes to managing your software packages. With it you can browse and search through package repositories and install and uninstall packages. By default, HaikuDepot starts up with a list of "<i>Featured packages</i>", software that's deemed interesting to many users.</p>
 <img src="../images/apps-images/haikudepot.png" alt="haikudepot.png" />
 <p>Toinen välilehti näyttää <span class="menu">Kaikki pakkaukset</span>, näyttöön vaihtuu pienempi kuvake ja lisätiedot järjestetään sarakkeisiin:</p>
 <img src="../images/apps-images/haikudepot_all.png" alt="haikudepot.png" />
@@ -105,14 +104,13 @@
 <li><p><span class="menu">Aktiivi</span>: Pakkaus on asennettu ja valmiina käytettäväksi.</p></li>
 <li><p><span class="menu">Saatavilla</span>: Pakkaus on tässä tietovarastossa ja se voidaan ladata ja asentaa. Jos pakkauksella on riippuvuuksia muihin pakkauksiin, sinulle kerrotaan siitä asennuksen aikana ja tarjotaan mahdollisuus ladata/asentaa kaikki välttämätön.</p></li>
 <li><p><span class="menu">Odottaa / %</span>: <i>Odottaa</i> näytetään pakkaukselle, jota jonotetaan lataukseen/asennukseen. Pakkauksen latauksen aikana edistyminen näytetään prosentteina.</p></li>
-<li><p><span class="menu">Päivitys saatavilla</span>: Asennettuun pakkaukseen on saatavilla uudempi versio.</p></li>
 </ul>
 <p>Voit tarttua pisteviivaan pakkausluettelon välissä ja vaakasuoraan tietoalueeseen pakkausluettelon koon muuttamiseksi.</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="info" name="info">Tietoalue</a></h2>
-<p>Alimmaisena on alue, joka näyttää tietoja pakkauksesta, joka on parhaillaan valittuna luettelossa.<br />
-Pakkausnimen, tekijän, arvosanan ja version oikealla puolella on painike, joka – riippuen pakkauksen nykyisestä tilasta – sallii sinun <span class="button">Asentaa</span>, <span class="button">Poistaa asennus</span> tai <span class="button">Päivittää</span> se. Jos pakkaus on jo asennettu, löydät täältä lisäpainikkeen, joka <span class="button">Avaa</span> sovelluksen.</p>
+<p>At the bottom is an area that displays information on the package that is currently selected in the list above it.<br />
+To the right of package name, author, rating and version is a button, that – depending on the current state of the package – lets you <span class="button">Install</span> or <span class="button">Uninstall</span> it. If a package is already installed, you'll find an additional button there to <span class="button">Open</span> the application.</p>
 <p>Alla on neljä välilehteä: Ohjelmasta, Arvosanat, Muutosloki ja Sisällöt.</p>
 <ul>
 <li><p _translation_id="5252"><span class="menu">Ohjelmasta</span></p>
@@ -156,16 +154,16 @@ Keskellä on käyttäjäkommentteja käyttäjätunnuksilla, heidän antamiensa t
 <img src="../images/apps-images/haiku-depot-ratingpanel.png" alt="haiku-depot-ratingpanel.png" />
 <p>Tässä liikutat hiiren kohdistinta tähtien yläpuolella niiden sytyttämiseksi ja arvosanasi valitsemiseksi, voit myös valita tasonumeron sovelluksen stabilisuusarvioksi ja poimia valinnaisen kommentin kielen. Jotta kommentti olisi merkityksellinen, sinun pitäisi työskennellä arvioitavalla sovelluksella tutustuaksesi sen ominaisuuksiin, ohjelmointivirheisiin ja oikkuihin. Ja älä kirjoita seuraavaa suomalaista suurromaania... pidä kommenttisi lyhyenä, lempeänä ja kohteliaana. :)<br />
 <span class="button">Lähetä</span>-painikkeen napsauttamisen jälkeen tiedot lähetetään palvelimelle. Sinun on ehkä siirryttävä <span class="menu">Työkalut</span>-valikkoon valitsemaan <span class="menu">Päivitä tietovarastot</span> ennen kuin voit nähdä muutoksesi.</p>
-<p>Milloin tahansa voit palata ja muokata kommenttiasi tai antaa arvosanan uudelleen. Voit myös piilottaa arvioinnin muilta käyttäjältä poistamalla valinnan valintaruudusta <span class="menu">Muut käyttäjät voivat nähdä tämän arvosanan</span>.</p>
+<p>At any time, you can come back and edit your comment and re-rate it. You can also hide your rating from other users by deactivating a checkbox <span class="menu">This rating is visible to other users</span>, that appears in this window once you've rated a package.</p>
 
  <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="logs" name="logs">Diagnostic Logs</a></h2>
-<p>As HaikuDepot is used, it interacts with network as well as local services. Things can go wrong, sometimes in ways that were not anticipated when the application was written. In those cases the error message may be quite unspecific. To help diagnosing a given problem, HaikuDepot can provide a log of what the application does.</p>
-<p>An error message may suggest to view the logs to get further in-depth information or you may be asked to provide the log when you file an issue at the Haiku <a href="https://dev.haiku-os.org/">bug tracking system</a>.</p>
-<p>To see the diagnostic logs, HaikuDepot needs to be started from <a href="terminal.html">Terminal</a>:</p>
+<a id="logs" name="logs">Diagnostiikkalokitiedostot</a></h2>
+<p>Kun HaikuVarastoa käytetään, se keskustelee niin verkon kuin paikallisten palvelujen kanssa. Asiat voivat mennä pieleen, joskus tavoilla, joita ei odoteta, kun sovellusta kirjoitetaan. Niissä tapauksissa virheilmoitus on aivan määrittelemätön. Tietyn pulman diagnostoimisen helpottamiseksi HaikuVarasto voi tarjota lokitiedoston siitä, mitä sovellus tekee.</p>
+<p>Virheilmoitus saattaa suositella katsomaan lokitiedostosta lisätietoja tai sinua saatetaan pyytää tarjoamaan lokitiedosto, kun teet vikailmoituksen Haikun <a href="https://dev.haiku-os.org/">vianjäljitysjärjestelmässä</a>.</p>
+<p>Diagnostiikkalokitiedostojen katsomiseksi HaikuVarasto on käynnistettävä <a href="terminal.html">Pääteikkuna</a>-sovelluksesta:</p>
 <pre>HaikuDepot -v debug</pre>
-<p>The command uses the <span class="cli">-v</span> flag to control the verbosity of the diagnostic logs. Possible values are: <span class="cli">off</span>, <span class="cli">info</span>, <span class="cli">debug</span> and <span class="cli">trace</span>. Using <span class="cli">off</span> will do only a small amount of logging, while <span class="cli">trace</span> does it in the highest detail.</p>
-<p>As HaikuDepot starts up and when interacting with the application, you will see text scroll by in the Terminal window; this is the diagnostic log.</p>
+<p>Komento käyttää <span class="cli">-v</span>-lippua ohjaamaan diagnostiikkalokien perusteellisuutta. Mahdolliset arvot ovat: <span class="cli">off</span>, <span class="cli">info</span>, <span class="cli">debug</span> ja <span class="cli">trace</span>. Asetuksen <span class="cli">off</span>-käyttäminen näyttää vain pienen määrän tietoja lokitiedostossa kun taas <span class="cli">trace</span> näyttää suurimman määrän yksityiskohtia.</p>
+<p>Kun HaikuVarasto käynnistyy ja kun käytät sovellusta, näet tekstin vierivän Pääteikkunassa; se on diagnostiikkalokitiedosto.</p>
 </div>
 </div>
 

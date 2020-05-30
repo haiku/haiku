@@ -9,6 +9,8 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		mazbrili abu ibrahim
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -21,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>Panduan pengguna</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -51,103 +53,105 @@
 </ul>
 <span>
  «  <a href="tracker-add-ons.html">Tracker Add-Ons</a> 
-::  <a href="contents.html" class="uplink">Daftar Isi</a> 
-::  <a href="filetypes.html">Filetypes</a>  »
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="filetypes.html">Tipe file</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">Terjemahan halaman ini belum lengkap. Sampai saat itu, bagian yang belum selesai menggunakan aslinya bahasa Inggris.</div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Indeks</td></tr>
 <tr class="index"><td>
-	<a href="#deskbar-menu">The Deskbar Menu</a><br />
-	<a href="#tray">The Tray</a><br />
-	<a href="#list-of-apps">The list of running programs</a>
+	<a href="#deskbar-menu">Menu Deskbar </a><br />
+	<a href="#tray">Tray</a><br />
+	<a href="#list-of-apps">Daftar aplikasi yang berjalan</a>
 </td></tr>
 </table>
 
 <h1>Deskbar</h1>
 
-<p>The Deskbar is the little panel that by default is located in the upper right corner of the screen. It's Haiku's version of Windows' taskbar with its Start button. It contains the Deskbar menu from where you can start applications and preferences, a tray with a clock and other tools below that and a list of currently running programs at the bottom.</p>
+<p>Deskbar adalah panel kecil yang secara default terletak di sudut kanan atas layar. Ini adalah versi taskbar Windows Haiku dengan tombol Start-nya. Ini berisi menu Deskbar dari mana Anda dapat memulai aplikasi dan preferensi, baki dengan jam dan alat-alat lain di bawahnya dan daftar program yang sedang berjalan di bagian bawah.</p>
 <img src="images/deskbar-images/positions.png" alt="positions" />
-<p>You can move the Deskbar to any corner or as a bar along the upper or lower border of the screen by gripping the knobbly area on one side of the tray (see arrows above) and drag &amp; drop it into the new position.<br />
-You can also fold it into a more compact layout by drag &amp; dropping the knobbly area onto Deskbar's Leaf menu. Being only the height of a regular window tab, even windows that take up the whole screen won't obscure the Deskbar tray with its clock and icons.</p>
-<p>By gripping the other knobbly widget of the tray, you can change the width of the Deskbar by dragging the mouse left or right:</p>
+<p>Anda dapat memindahkan Deskbar ke sudut mana pun atau sebagai bilah di sepanjang batas atas atau bawah layar dengan memegang area knobbly di satu sisi baki (lihat panah di atas) dan drag &amp; drop ke posisi yang baru.<br />
+Anda juga dapat melipatnya menjadi tata letak yang lebih ringkas dengan drag &amp; dropping knobbly ke menu Leaf Deskbar. Menjadi hanya ketinggian tab jendela biasa, bahkan jendela yang mengambil seluruh layar tidak akan mengaburkan baki Deskbar dengan jamnya dan ikon.</p>
+<p>Dengan memegang widget knobbly lainnya dari baki, Anda dapat mengubah lebar Deskbar dengan menyeret mouse ke kiri atau kanan:</p>
 <img src="images/deskbar-images/width.png" alt="width" />
-<p>A wider Deskbar allows for more icons in the tray on a single row. It also truncates longer application names in the list of running programs less often, especially if you use larger icons.</p>
+<p>Deskbar yang lebih luas memungkinkan lebih banyak ikon dalam baki dalam satu baris, tetapi juga lebih jarang memotong nama aplikasi dalam daftar program yang sedang berjalan, terutama jika Anda menggunakan ikon yang lebih besar.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="deskbar-menu" name="deskbar-menu">The Deskbar Menu</a></h2>
-<p>A menu opens when you click on the Deskbar's top:</p>
+<a id="deskbar-menu" name="deskbar-menu">Menu Deskbar</a></h2>
+<p>Menu terbuka ketika Anda mengklik di bagian atas Deskbar:</p>
 <img src="images/deskbar-images/deskbar.png" alt="deskbar.png" />
 <ul>
-<li><p><b>About this system...</b> - Shows some basic information of the system, licenses and the credits of the Haiku project.</p></li>
+<li><p><b>About this system...</b> -Menunjukkan beberapa informasi dasar dari sistem, lisensi dan kredit proyek Haiku.</p></li>
 
-<li><p><b>Find...</b> - Opens the <a href="queries.html">Query</a> dialog.</p></li>
-<li><p><b>Show replicants</b> - Shows/hides the little <a href="gui.html#replicants">Replicant</a> widget you use to drag it around, remove or access its context menu.</p></li>
-<li><p><b>Mount</b> - Offers the same options as when invoked by right-clicking the Desktop (see <a href="tracker.html#mounting-volumes">Mounting Volumes</a>).</p></li>
-<li><p><b>Deskbar preferences...</b> - Opens a panel to configure the Deskbar (see below).</p></li>
-<li><p><b>Shutdown</b> - Offers options to either <span class="menu">Restart system</span> or <span class="menu">Power off</span>.</p></li>
-<li><p><b>Recent documents, folders, applications</b> - List of the last recently opened documents, folders and applications (see <span class="menu">Deskbar preferences</span> below).</p></li>
-<li><p><b>Applications, Demos, Deskbar applets, Preferences</b> - List of installed applications, demos, applets and preferences.<br />You can add links to other programs (or any folder, document, query etc.) by putting them into <span class="path">~/config/settings/deskbar/menu/</span>.</p></li>
+<li><p><b>Find...</b> - Membuka dialog <a href="queries.html">Kuery</a> .</p></li>
+<li><p><b>Show replicants</b> - Memperlihatkan/menyembunyikan widget  <a href="gui.html#replicants">Replicant</a> kecil yang Anda gunakan untuk menyeretnya, menghapus atau mengakses menu konteksnya.</p></li>
+<li><p><b>Mount</b> - Menawarkan opsi yang sama seperti ketika dipanggil dengan mengklik kanan Desktop (lihat <a href="tracker.html#mounting-volumes">Melakukan mount Volume</a>).</p></li>
+<li><p><b>Deskbar preferences...</b> - Buka panel untuk mengonfigurasi Deskbar (lihat di bawah).</p></li>
+<li><p><b>Shutdown</b> - Menawarkan opsi untuk <span class="menu">Restart </span> atau <span class="menu">Matikan</span>.</p></li>
+<li><p><b>Recent documents, folders, applications</b> - Daftar dokumen, folder, dan aplikasi yang terakhir dibuka (lihat <span class="menu">preferensi Deskbar</span> dibawah).</p></li>
+<li><p><b>Aplikasi, Demo, applet Deskbar, Preferensi</b> -Daftar aplikasi yang terinstal, demo, applet dan preferensi.<br />Anda dapat menambahkan tautan ke program lain (atau folder, dokumen, kueri, dll.) Dengan memasukkannya ke <span class="path">~/config/settings/deskbar/menu/</span>.</p>
+
+</li>
 </ul>
 
 <h3>
-<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>Deskbar Preferences</h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>preferensi Deskbar</h3>
 <img src="images/deskbar-images/prefs-deskbar.png" alt="prefs-deskbar.png" />
-<p>The Deskbar preference panel is divided into three sections.</p>
+<p>Panel preferensi Deskbar dibagi menjadi tiga bagian.</p>
 
 <h4>Aplikasi</h4>
-<p>The following settings don't apply to your installed applications, but to the behavior and visuals of the list of running applications.</p>
+<p>Pengaturan berikut tidak berlaku untuk aplikasi yang Anda instal, tetapi untuk perilaku dan visual dari daftar aplikasi yang berjalan.</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Sort running applications</span></td><td> </td><td>Sorts the list of running programs alphabetically.</td></tr>
-<tr><td><span class="menu">Tracker always first</span></td><td> </td><td>Even if you sort alphabetically, the Tracker entry always stays first in the list.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Show application expander</span></td><td> </td><td>Provides a small widget to show/hide all windows of a program directly under its entry in the Deskbar.</td></tr>
-<tr><td><span class="menu">Expand new applications</span></td><td> </td><td>Newly launched programs have their windows automatically expanded under their entry in the Deskbar.</td></tr>
-<tr><td><span class="menu">Hide application names</span></td><td> </td><td>Removes the text labels of running applications.</td></tr>
-<tr><td><span class="menu">Icon size</span></td><td> </td><td>Adjusts the icon size of running applications. </td></tr>
+<tr><td><span class="menu">Urutkan aplikasi yang sedang berjalan</span></td><td> </td><td>Urutkan daftar program yang sedang berjalan berdasarkan abjad.</td></tr>
+<tr><td><span class="menu">Tracker selalu pertama</span></td><td> </td><td>Bahkan jika Anda mengurutkan menurut abjad, entri Pelacak selalu tetap pertama dalam daftar.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Tunjukkan aplikasi expander</span></td><td> </td><td>Menyediakan widget kecil untuk menampilkan / menyembunyikan semua jendela program langsung di bawah entri di Deskbar.</td></tr>
+<tr><td><span class="menu">Perluas aplikasi baru</span></td><td> </td><td>Program yang baru diluncurkan membuat windows mereka diperluas secara otomatis di bawah entri mereka di Deskbar.</td></tr>
+<tr><td><span class="menu">Sembunyikan nama aplikasi </span></td><td> </td><td>Menghapus label teks dari aplikasi yang sedang berjalan.</td></tr>
+<tr><td><span class="menu">Ukuran ikon</span></td><td> </td><td>Menyesuaikan ukuran ikon dari aplikasi yang sedang berjalan.</td></tr>
 </table>
 
 <h4>Menu</h4>
-<p>While the first couple of menu items of the Deskbar are fixed, you can customized the ones below <span class="menu">Shutdown...</span>.<br />
-Here you can set the number of recent documents, folders and applications that are shown in their menu in the Deskbar, or if you want to see them at all.<br />
-The button <span class="button">Edit in Tracker...</span> opens the folder <span class="path">~/config/settings/deskbar/menu/</span>. In it you'll find the files and folders that appear in the Deskbar, by default these are <span class="menu">Applications</span>, <span class="menu">Demos</span>, <span class="menu">Deskbar applets</span>, and <span class="menu">Preferences</span>.<br />
-You can delete or add entries like links to applications, documents or even queries by simply copying/deleting them to/from this folder.</p>
+<p>Meskipun beberapa item menu Deskbar sudah diperbaiki, Anda dapat menyesuaikan yang di bawah <span class="menu">Shutdown...</span>.<br />
+Di sini Anda dapat mengatur jumlah dokumen, folder, dan aplikasi terbaru yang ditampilkan di menu mereka di Deskbar, atau jika Anda ingin melihatnya sama sekali.<br />
+Tombol <span class="button">Edit di Tracker...</span> membuka folder <span class="path">~/config/settings/deskbar/menu/</span>. Di dalamnya Anda akan menemukan file dan folder yang muncul di Deskbar, secara default ini adalah <span class="menu">Applications</span>, <span class="menu">Demo</span>, <span class="menu">Deskbar applets</span>, and <span class="menu">Preferensi</span>.<br />
+Anda dapat menghapus atau menambahkan entri seperti tautan ke aplikasi, dokumen, atau bahkan kueri hanya dengan menyalin / menghapusnya ke/dari folder ini.</p>
 <!-- <p _translation_id="432">It's even easier to simply drag a file, folder or saved query and drop it where you want it into the Deskbar.</p> -->
-<div class="box-info"><p>Programs installed from a package automatically put an entry into the Deskbar. Depending on the number of packages you have installed, this can become a bit crowded. If you prefer to have total control, and only want to see applications you link there yourself (possibly in categorizing sub-folders), here's how to do it:<br />
-You create a link of the <span class="path">menu</span> folder in <span class="path">~/config/settings/deskbar/</span> and rename to <span class="path">menu_entries</span>. From Terminal that is achieved with:</p>
+<div class="box-info"><p>Program yang diinstal dari suatu paket secara otomatis memasukkan entri ke Deskbar. Tergantung pada jumlah paket yang telah Anda instal, ini dapat menjadi agak ramai. Jika Anda lebih suka memiliki kontrol total, dan hanya ingin melihat aplikasi yang Anda tautkan sendiri di sana (mungkin dalam mengkategorikan sub-folder), inilah cara melakukannya:<br />
+Anda membuat tautan <span class="path">menu</span> folder di<span class="path">~/config/settings/deskbar/</span> dan ganti nama ke <span class="path">menu_entries</span>. Dari Terminal yang dicapai dengan:</p>
 <pre class="terminal">ln -s ~/config/settings/deskbar/menu ~/config/settings/deskbar/menu_entries</pre></div>
 
 <h4>Window</h4>
-<p>Finally, the preferences for the Deskbar window.</p>
+<p>Akhirnya, preferensi untuk jendela Deskbar.</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Always on top</span></td><td> </td><td>The Deskbar always stays above all other windows.</td></tr>
-<tr><td><span class="menu">Auto-raise</span></td><td> </td><td>The Deskbar pops to the front when the mouse pointer touches where the Deskbar meets the screen edge, and is lowered when it leaves the Desktop area.</td></tr>
-<tr><td><span class="menu">Auto-hide</span></td><td> </td><td>The Deskbar is reduced to only a few pixels and only pops up if the mouse pointer touches them.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Selalu di atas</span></td><td> </td><td>Deskbar selalu berada di atas semua jendela lainnya.</td></tr>
+<tr><td><span class="menu">Auto-muncul</span></td><td> </td><td>The Deskbar pops to the front when the mouse pointer touches where the Deskbar meets the screen edge, and is lowered when it leaves the Deskbar area.</td></tr>
+<tr><td><span class="menu">Auto-sembuyikan</span></td><td> </td><td>Deskbar dikurangi menjadi hanya beberapa piksel dan hanya muncul jika pointer mouse menyentuhnya.</td></tr>
 </table>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="tray" name="tray">The Tray</a></h2>
+<a id="tray" name="tray">Tray</a></h2>
 <img src="images/deskbar-images/calendar.png" alt="calendar.png" />
-<p>Among other things, the tray is housing the clock. Hover the mouse over it to display the date in a tooltip. Left-click it to show a calendar. Right-click it to hide/show the clock or launch the <a href="preferences/time.html">Time</a> preferences to set it.</p>
-<p>Any program can install an icon in the tray to provide an interface to the user. The email system, for instance, shows a different symbol when there's unread mail and offers a context menu to e.g. create or check for new mail. <span class="app">ProcessController</span> is another example that uses its icon in the tray to provide information (CPU/memory usage) and to offer a context menu.</p>
+<p>Di antara hal-hal lain, baki adalah tempat jam. Arahkan tetikus ke atasnya untuk menampilkan tanggal dalam tooltip. Klik kiri untuk menampilkan kalender. Klik kanan untuk menyembunyikan / menampilkan jam atau meluncurkan preferensi <a href="preferences/time.html">Waktu</a> untuk mengaturnya.</p>
+<p>Program apa pun dapat memasang ikon di baki untuk menyediakan antarmuka bagi pengguna. Sistem email, misalnya, menunjukkan simbol yang berbeda ketika ada surat yang belum dibaca dan menawarkan menu konteks untuk misalnya membuat atau memeriksa surat baru. <span class="app">ProcessController</span> adalah contoh lain yang menggunakan ikonnya di tray untuk memberikan informasi (penggunaan CPU / memori) dan untuk menawarkan menu konteks.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="list-of-apps" name="list-of-apps">The list of running programs</a></h2>
+<a id="list-of-apps" name="list-of-apps">Daftar program yang sedang berjalan</a></h2>
 <img src="images/deskbar-images/list-of-apps.png" alt="list-of-apps.png" />
-<p>You can change to a specific running application by clicking on its entry in the Deskbar and choosing (one of) its windows from the submenu. By right-clicking you can <span class="menu">Hide/Show all</span> windows or <span class="menu">Close all</span> and with them the entire application.</p>
-<p>A <span class="key">SHIFT</span> <span class="key">CTRL</span> click on an application hides all its windows, a <span class="key">CTRL</span> click shows them again.</p>
-<p>When using the "expander" setting to show all windows of an application, you can middle-click on a window or app to start a new instance. For example, middle-clicking a running StyledEdit will open a new document window.<br />
-Maybe more useful: while holding <span class="key">SHIFT</span>, a middle-click on a window closes it. Handy when you'd like to close some of many open Tracker windows, for example.</p>
-<div class="box-info">Sometimes an application may hang and even though all its windows are gone, the entry in the list of running applications in the Deskbar just won't disappear. In such a situation you use the Vulcan Death Grip to get rid of it: hold <span class="key">SHIFT</span> <span class="key">CTRL</span> <span class="key">ALT</span> and click on the offending entry in the Deskbar. Fascinating!</div>
-<p>If you activated Expanders in the Deskbar settings, you can expand/collapse the list of windows directly under an application's entry.</p>
-<p>In front of every application's window is a symbol providing info on its state. A bright symbol means a window is visible, a dark one that it's minimized. Three lines in front of a symbol shows that it's not on the current workspace.</p>
+<p>Anda dapat mengubah aplikasi berjalan tertentu dengan mengklik entri di Deskbar dan memilih (salah satu) windows dari submenu. Dengan mengklik kanan Anda dapat  <span class="menu">Sembunyikan/Tampilkan semua </span> windows atau <span class="menu">Tutup semua</span> dengannya seluruh aplikasi.</p>
+<p><span class="key">SHIFT</span> <span class="key">CTRL</span> pada aplikasi menyembunyikan semua window, sebuah klik  <span class="key">CTRL</span> menunjukkannya lagi.</p>
+<p>Saat menggunakan pengaturan "expander" untuk menampilkan semua jendela aplikasi, Anda dapat mengklik tengah pada jendela atau aplikasi untuk memulai contoh baru. Misalnya, mengklik tengah StyledEdit yang sedang berjalan akan membuka jendela dokumen baru.<br />
+Mungkin lebih bermanfaat: sambil menahan tombol <span class="key">SHIFT</span>, klik tengah pada jendela menutupnya. Berguna ketika Anda ingin menutup beberapa jendela Tracker yang terbuka, misalnya.</p>
+<div class="box-info">Terkadang aplikasi mungkin hang dan meskipun semua jendelanya hilang, entri dalam daftar aplikasi yang berjalan di Deskbar tidak akan hilang. Dalam situasi seperti itu Anda menggunakan Vulcan Death Grip untuk menyingkirkannya: tahan <span class="key">SHIFT</span> <span class="key">CTRL</span> <span class="key">ALT</span> dan klik pada entri yang menyinggung di Deskbar. Menyenangkan!.</div>
+<p>Jika Anda mengaktifkan Ekspander dalam pengaturan Deskbar, Anda dapat memperluas / menutup daftar jendela langsung di bawah entri aplikasi.</p>
+<p>Di depan setiap jendela aplikasi adalah simbol yang memberikan info tentang keadaannya. Simbol cerah berarti jendela terlihat, yang gelap yang diminimalkan. Tiga baris di depan simbol menunjukkan bahwa itu tidak ada di ruang kerja saat ini.</p>
 
 </div>
 </div>
@@ -155,8 +159,8 @@ Maybe more useful: while holding <span class="key">SHIFT</span>, a middle-click 
 <div class="nav">
 <div class="inner"><span>
  «  <a href="tracker-add-ons.html">Tracker Add-Ons</a> 
-::  <a href="contents.html" class="uplink">Daftar Isi</a> 
-::  <a href="filetypes.html">Filetypes</a>  »
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="filetypes.html">Tipe file</a>  »
 </span></div>
 </div>
 

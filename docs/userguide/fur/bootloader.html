@@ -23,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Vuide utent</span></div>
 </div>
 
 <div class="nav">
@@ -54,18 +54,17 @@
 <span>
     <!-- «  <a href="installation.html">Installing Haiku</a> 
 ::  -->
-    <a href="contents.html" class="uplink">Contents</a> 
+    <a href="contents.html" class="uplink">Contignûts</a> 
 ::  <a href="filesystem-layout.html">Disposizion dal filesystem</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h1>Il Boot Loader</h1>
 
-<p>Lis opzions dal Boot Loader di Haiku a puedin judâ cuant che si à a ce fâ un problemis di hardware opûr cuant che si à plui instalazions di Haiku e si desidere sielzi cuale instalazion di Haiku fâ partî (par esempli un CD di instalazion o une clavute USB). Al è ancje utile se si à instalât un component software che al impedìs di inviâ Haiku e duncje di gjavâlu, viôt la <a href="#troubleshooting">Risoluzion dai problemis</a> chi sot.</p>
+<p>Lis opzions dal Boot Loader di Haiku a puedin judâ cuant che si à a ce fâ cun problemis di hardware opûr cuant che si à plui instalazions di Haiku e si desidere sielzi cuale instalazion di Haiku fâ partî (par esempli un CD di instalazion o une clavute USB). Al è ancje util se si à instalât un component software che al impedìs di inviâ Haiku e duncje di gjavâlu, viôt la <a href="#troubleshooting">Risoluzion dai problemis</a> chi sot.</p>
 <p>Par jentrâ tes Opzions dal Boot Loader, tu âs di tignî fracât il tast <span class="key">MAIUSC</span> prime che al tachi il procès di inviament di Haiku. Se al è instalât un gjestôr di inviament, tu puedis tacâ a tignî fracât <span class="key">MAIUSC</span> prime di invocâ la vôs dal menù par Haiku. Se Haiku al è l'unic sisteme operatîf inte machine, tu puedis tacâ a fracâ il tast bielzà cuant che tu viodis i messaçs di inviament dal BIOS.</p>
 <div class="box-info">Sui computer che a doprin UEFI pal inviament al puest dal classic BIOS, tu scugnis doprâ invezit la <span class="key">SBARE DI SPAZI</span>.</div>
 <h2>
@@ -77,34 +76,34 @@
 <tr><td><b>Select safe mode options</b></td><td> </td><td>A son diviersis opzions di provâ tal câs di un probleme hardware o se il sisteme al devente instabil o no si pues inviâ par vie di un compuartament sbaliât di un component zontât. Cuant che si sposte la sbare di selezion suntune opzion, e ven fûr une curte spiegazion in bas tal schermi.</td></tr>
 <tr><td></td><td></td><td>
 	<p><span class="menu">Safe mode</span><br />
-		Puts the system into safe mode. This can be enabled independently from the other options.</p>
+		Al met il sisteme in modalitât sigure. Chest al pues jessi abilitât in maniere indipendente des altris opzions.</p>
 	<p><span class="menu">Disable user add-ons</span><br />
-		Prevents all user installed add-ons from being loaded. Only the add-ons in the system directory will be used. See <a href="#troubleshooting">Troubleshooting</a> below.</p>
+		Al impedìs il cjariament di dutis lis zontis (add-on) instaladis dal utent. Dome lis zontis inte cartele di sisteme a vignaran dopradis. Viôt la <a href="#troubleshooting">Risoluzion dai problemis</a> chi sot.</p>
 	<p><span class="menu">Disable IDE DMA</span><br />
-		Disables IDE DMA, increasing IDE compatibility at the expense of performance.</p>
+		Al disabilite il DMA dal IDE, aumentant la compatibilitât IDE al cost des prestazions.</p>
 	<p><span class="menu">Ignore memory beyond 4 GiB</span><br />
-		Ignores all memory beyond the 4 GiB address limit, overriding the setting in the kernel settings file.
+		Al ignore dute la memorie che e supere il limit di direzion di 4 GiB, passant parsore de impostazion tal file des impostazions dal kernel.
 </p>
 	<p><span class="menu">Use fail-safe graphics driver</span><br />
-		The system will use VESA mode and won't try to use any video graphics drivers.</p>
+		Il sisteme al doprarà la modalitât VESA e no cirarà di doprâ nissun driver grafic di schede video.</p>
 	<p><span class="menu">Disable IO-APIC</span><br />
-		Disables using the IO APIC for interrupt routing, forcing the use of the legacy PIC instead.</p>
+		Al disabilite l'ûs dal IO APIC pal indreçament dai interrupt, sfuarçant invezit l'ûs dal PIC vecje maniere.</p>
 	<p><span class="menu">Disable local APIC</span><br />
-		Disables using the local APIC, also disables SMP.</p>
+		Al disabilite l'ûs dal APIC locâl, al disabilite ancje il SMP.</p>
 	<p><span class="menu">Disable X2APIC</span><br />
-		Disables second generation APIC.</p>
+		Al disabilite la seconde gjenerazion di APIC.</p>
 	<p><span class="menu">Disable SMEP and SMAP</span><br />
-		Disables SMEP/SMAP security features of the CPU.</p>
+		Al disabilite lis funzionalitâts di sigurece SMEP/SMAP de CPU.</p>
 	<p><span class="menu">Disable SMP</span><br />
-		Disables all but one CPU core.</p>
+		Al disabilite ducj i cûrs de CPU infûr di un.</p>
 	<p><span class="menu">Don't call the BIOS</span><br />
-		Stops the system from calling BIOS functions.</p>
+		Al ferme il sisteme dal clamâ lis funzions dal BIOS.</p>
 	<p><span class="menu">Disable APM</span><br />
-		Disables Advanced Power Management hardware support, overriding the APM setting in the kernel settings file.</p>
+		Al disabilite il supuart hardware dal Advanced Power Management (gjestion alimentazion avanzade), passant parsore de impostazion APM tal file des impostazions dal kernel.</p>
 	<p><span class="menu">Disable ACPI</span><br />
-		Disables Advanced Configuration and Power Interface hardware support, overriding the ACPI setting in the kernel settings file.</p>
+		Al disabilite il supuart hardware dal Advanced Configuration and Power Interface (configurazion avanzade e interface di alimentazion), passant parsore de configurazion ACPI intal file des impostazions dal kernel.</p>
 	<p><span class="menu">Blacklist entries</span><br />
-		Allows to select system files that shall be ignored. Useful e.g. to disable drivers temporarily. See <a href="#troubleshooting">Troubleshooting</a> below.</p></td></tr>
+		Al permet di selezionâ i file di sisteme che si à di ignorâ. Util p.e. par disabilitâ i driver in mût temponi. Viôt la <a href="#troubleshooting">Risoluzion dai problemis</a> chi sot.</p></td></tr>
 <tr><td><b>Select debug options</b></td><td> </td><td>Chi tu cjatarâs diviersis opzions che a judin cul debug o a vê detais par fâ une <a href="../../welcome/en/bugreports.html">segnalazion di erôr</a>. Di gnûf, une curte spiegazion par ogni opzion e ven mostrade in bas.</td></tr>
 <tr><td></td><td></td><td>
 	<p><span class="menu">Enable serial debug output</span><br />
@@ -167,7 +166,7 @@ I simbui diferents a corispuindin sù par jù a chestis fasis:</p>
 <div class="inner"><span>
     <!-- «  <a href="installation.html">Installing Haiku</a> 
 ::  -->
-    <a href="contents.html" class="uplink">Contents</a> 
+    <a href="contents.html" class="uplink">Contignûts</a> 
 ::  <a href="filesystem-layout.html">Disposizion dal filesystem</a>  »
 </span></div>
 </div>

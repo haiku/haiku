@@ -9,19 +9,21 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		mazbrili abu ibrahim
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>WebPositive</title>
+	<title>WebPositive (peramban)</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>Panduan pengguna</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -57,75 +59,77 @@
 
 <div id="content">
 <div>
-<div class="box-info">Terjemahan halaman ini belum lengkap. Sampai saat itu, bagian yang belum selesai menggunakan aslinya bahasa Inggris.</div>
 <h2><img src="../../images/apps-images/webpositive-icon_64.png" alt="webpositive-icon_64.png" width="64" height="64" />WebPositive</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Aplikasi</span></td></tr>
 <tr><td>Lokasi:</td><td></td><td><span class="path">/boot/system/apps/WebPositive</span></td></tr>
-<tr><td>Pengaturan:</td><td></td><td><span class="path">~/config/settings/WebPositive/</span> - Configuration files, cookies, cache and browsing history</td></tr>
-<tr><td></td><td></td><td><span class="path">~/config/settings/WebPositive/Bookmarks</span> - All bookmarks as single files</td></tr>
+<tr><td>Pengaturan:</td><td></td><td><span class="path">~/config/settings/WebPositive/</span> - Berkas konfigurasi, cookies, cache dan sejarah rambahan</td></tr>
+<tr><td></td><td></td><td><span class="path">~/config/settings/WebPositive/Bookmarks</span> - semua bukmak dalam satu berkas</td></tr>
 </table>
 <p><br /></p>
-<p>WebPositive, or Web+ for short, is Haiku's native web browser. One part of its name is a tip of the hat to BeOS' simple NetPositive, the other points to its modern foundation: the WebKit. This open source HTML rendering library is at the heart of other mainstream browsers as well, like Safari of Mac OS X and Google's Chrome. By using the ever evolving WebKit, Web+ will be able to keep up with new web technologies.</p>
+<p>WebPositive, atau singkatnya Web+, adalah peramban web asli Haiku. Salah satu bagian dari namanya adalah untuk perambah sederhana BeOS NetPositive , yang lain menunjuk pada fondasinya yang modern: WebKit. Pustaka terbuka pemroses HTML ini adalah jantung dari browser populer yang lain, seperti Safari di Mac OS X dan Google Chrome. Dengan menggunakan pustaka weblik, Web+ dapat sejajar dengan teknologi web yang baru.</p>
 <img src="../images/apps-images/webpositive.png" alt="webpositive.png" />
-<p>WebPositive's interface is pretty straight forward: Under a menu bar is another bar with buttons to navigate to the previous and next sites in your browsing history, to stop the loading of a page and (optionally) a button to jump to your starting page.<br />
-Then comes the locator field to enter a site's URL.<br />
-Below this navigating bar appear the webpages. You can open many pages in parallel by loading them into their own tab.<br />
-At the bottom of the window is a status bar, showing the URL of the site being loaded or of the link the mouse pointer is hovering over. While a page is being loaded, a progress bar appears to the right.</p>
-<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Settings</h2>
-<p>From the <span class="menu">Window</span> menu you can open a <span class="menu">Settings</span> panel to configure a few essentials of WebPositive.</p>
+<p>Antarmuka WebPositive tidak bertele-tele: Di bawah bilah menu adalah bilah lain dengan tombol untuk menavigasi ke situs sebelumnya dan berikutnya dalam riwayat penjelajahan Anda, untuk menghentikan pemuatan halaman dan (opsional) tombol untuk melompat ke halaman awal Anda.<br />
+Kemudian muncul bidang locator untuk memasukkan URL situs.<br />
+Di bawah bilah navigasi ini muncul halaman web Anda dapat membuka banyak halaman secara paralel dengan memuatnya ke dalam tab mereka sendiri.<br />
+Di bagian bawah jendela adalah bilah status, yang menunjukkan URL situs yang sedang dimuat atau tautan penunjuk mouse melayang-layang. Saat halaman sedang dimuat, bilah kemajuan muncul di sebelah kanan.</p>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Pengaturan</h2>
+<p>Dari menu <span class="menu">Jendela</span> Anda dapat membuka panel Pengaturan untuk mengkonfigurasi beberapa hal penting dari WebPositive.</p>
 <img src="../images/apps-images/webpositive-settings.png" alt="webpositive-settings.png" />
-<p>The first tab deals with general settings: What file or URL serves as a <span class="menu">Start page</span>, what's used as a <span class="menu">Search page</span>, what <span class="menu">Download folder</span> is used for stuff you get from the net.<br />
-Two pop-up menus let you decide what page to load - if any - when opening a new window or tab.<br />
-Via the following checkboxes you can avoid showing the tab bar when there's only one page open anyway. WebPositive's interface can be told to automatically hide in full screen mode, and the mouse pointer can be automatically hidden whenever it's not moved for a while.<br />
-Finally, you can decide to include the "Home" button in the navigation bar and set the number of days the browser remembers the sites you have visited in its history.</p>
-<p>In the second tab you can choose the fonts used for standard, serif, non-serif and monospaced fonts and set their default sizes.</p>
-<p>The last tab is used to configure a proxy server.</p>
-<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Browsing</h2>
-<p>If you have used any browser before, WebPositive shouldn't provide too many surprises. Instead of going through every menu item and feature, let's have a look at just a few points.</p>
+<p>Tab pertama berkaitan dengan pengaturan umum: File atau URL apa yang berfungsi sebagai <span class="menu">Start page</span>, apa yang digunakan sebagai <span class="menu">Halaman pencarian </span>, <span class="menu">Folder unduhan</span> apa yang digunakan untuk barang yang Anda dapatkan dari internet.<br />
+Dua menu pop-up memungkinkan Anda memutuskan halaman mana yang akan dimuat - jika ada - saat membuka jendela atau tab baru.<br />
+Melalui kotak centang berikut, Anda dapat menghindari menampilkan bilah tab saat hanya ada satu halaman yang terbuka. Antarmuka WebPositive dapat diperintahkan untuk secara otomatis bersembunyi dalam mode layar penuh, dan penunjuk tetikus dapat secara otomatis disembunyikan kapan pun tidak dipindahkan untuk sementara waktu.<br />
+Terakhir, Anda dapat memutuskan untuk memasukkan tombol "Beranda" di bilah navigasi dan mengatur berapa hari browser mengingat situs yang telah Anda kunjungi dalam riwayatnya.</p>
+<p>Pada tab kedua Anda dapat memilih font yang digunakan untuk font standar, serif, non-serif dan monospace dan mengatur ukuran bawaan-nya.</p>
+<p>Tab terakhir digunakan untuk mengonfigurasi server proxy.</p>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Menjelajah</h2>
+<p>Jika Anda pernah menggunakan peramban apa pun sebelumnya, WebPositive seharusnya tidak memberikan terlalu banyak kejutan, alih-alih memeriksa setiap item menu dan fitur, mari kita lihat beberapa poin saja.</p>
 <ul>
 <li><img src="../images/apps-images/webpositive-tabbar.png" alt="webpositive-tabbar.png" />
-<p>New tabs are created with the <span class="key">+</span> button to the right in the tab bar or, if there's still enough space, by double-clicking into an empty area of it. If there are more tabs open than fit into the bar, the <span class="key">&lt;</span> <span class="key">&gt;</span> scroll-buttons become active, allowing you to scroll the tab bar left and right. The <span class="key">∨</span> button to the far right hosts a pop-up menu with all open tabs for even quicker navigation.</p></li>
-<li><p>Clicking on a link with the middle mouse button opens the page in a new tab in the background. Holding <span class="key">SHIFT</span> while middle-clicking, opens it in the foreground.</p></li>
-<li><p>From the <span class="menu">View</span> menu you can <span class="menu">Zoom in</span> and <span class="menu">Zoom out</span> of a page. There's also an option to <span class="menu">Zoom text only</span>, leaving all images with their original size.</p></li>
-<li><p>If you switch to full screen mode and have activated the setting to hide the interface, it will disappear after a second. To slide it temporarily back in, simply move the mouse pointer to the top of the screen.</p></li>
+<p>Tab baru dibuat dengan tombol <span class="key">+</span>  di sebelah kanan di bilah tab atau, jika masih ada ruang yang cukup, dengan mengklik dua kali ke area kosong itu. Jika ada lebih banyak tab yang terbuka daripada masuk ke dalam bilah, gulir <span class="key">&lt;</span> <span class="key">&gt;</span> tombol menjadi aktif, memungkinkan Anda untuk menggulir bilah tab ke kiri dan ke kanan. Tombol <span class="key">∨</span> di paling kanan meng-host menu pop-up dengan semua tab terbuka untuk navigasi yang lebih cepat.</p></li>
+<li><p>Mengklik tautan dengan tombol tengah mouse akan membuka halaman di tab baru di latar belakang. Memegang <span class="key">SHIFT</span> sambil mengklik tengah, membukanya di latar depan.</p></li>
+<li><p>Dari menu <span class="menu">Lihat</span>, Anda dapat <span class="menu">Memperbesar</span> dan <span class="menu">Memperkecil</span> halaman. Ada juga pilihan untuk <span class="menu">Perbesar Text saja</span>, meninggalkan semua gambar dengan ukuran aslinya.</p></li>
+<li><p>Jika Anda beralih ke mode layar penuh dan telah mengaktifkan pengaturan untuk menyembunyikan antarmuka, itu akan menghilang setelah satu detik. Untuk menggesernya kembali sementara, cukup gerakkan penunjuk mouse ke bagian atas layar.</p></li>
 <li><img src="../images/apps-images/webpositive-locator.png" alt="webpositive-locator.png" />
-<p>While you type in the locator text field, the browser matches the string to sites you have visited in the past and lists them below the text field. You either keep adding more letters to shorten the  list of possible sites, or choose an entry with <span class="key">↑</span> or <span class="key">↓</span>. <span class="key">ENTER</span> will load the page. You can also use the button to the far right which also serves to reload a page.<br />
-Strings not recognized as URLs will get looked up with Google, so the locator field doubles as quick shortcut to web searches.</p></li>
-<li><p>Right-clicking opens a context menu which, depending on the object you've clicked on, offers to open the link in a new window or a new tab, download the object etc.</p></li>
-<li><p><span class="menu">Edit | Find</span> shows a find bar at the bottom to start an in-page search. Matches are highlighted in the page.</p></li>
+<p>Saat Anda mengetik di bidang teks locator, browser mencocokkan string ke situs yang telah Anda kunjungi di masa lalu dan mencantumkannya di bawah bidang teks. Anda tetap menambahkan lebih banyak surat untuk mempersingkat daftar situs yang mungkin, atau memilih entri dengan <span class="key">↑</span> atau <span class="key">↓</span>. <span class="key">ENTER</span> akan memuat halaman. Anda juga dapat menggunakan tombol di ujung kanan yang juga berfungsi untuk memuat ulang halaman.
+Text yang tidak dikenali sebagai URL akan terlihat oleh Google, sehingga bidang locator berfungsi ganda sebagai pintasan cepat untuk pencarian web.</p></li>
+<li><p>Mengklik kanan membuka menu konteks yang, tergantung pada objek yang Anda klik, menawarkan untuk membuka tautan di jendela baru atau tab baru, mengunduh objek dll.</p></li>
+<li><p><span class="menu">Sunting | cari </span> menunjukkan bilah cari di bagian bawah untuk memulai pencarian dalam halaman. Kecocokan disorot dalam halaman.</p></li>
 </ul>
-<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Bookmarks</h2>
-<p>WebPositive's bookmarks are managed as files and folders in <tt>~/config/settings/WebPositive/Bookmarks/</tt>. Adding a bookmark will create a new file there. You can quickly open the folder with <span class="menu">Manage Bookmarks...</span>.</p>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Bookmark</h2>
+<p>Bookmark WebPositive dikelola sebagai file dan folder di <tt>~/config/settings/WebPositive/Bookmarks/</tt>. Menambahkan bookmark akan membuat file baru di sana. Anda dapat dengan cepat membuka folder <span class="menu">Memenej Bookmark...</span>.</p>
 <img src="../images/apps-images/webpositive-bookmarks.png" alt="webpositive-bookmarks" />
-<p>You can change a bookmark's URL, name, title and enter keywords just like with any other file with attributes. Just make sure you have all their columns displayed via Tracker's <span class="menu">Attributes</span> menu, then select a file, press <span class="key">ALT</span> <span class="key">E</span> and start editing the attribute; change attribute columns with <span class="key">TAB</span>.<br />You can sort bookmarks into different folders you create yourself.</p>
-<p>By using Tracker to manage and navigate bookmarks you can lift its unique features to quickly find what you're looking for.<br />
-Activating <span class="menu">Type-ahead filtering</span> in <a href="../tracker.html#tracker-preferences">Tracker's preferences</a>, you can instantly trim down your list of bookmarks to matches of your filter-string. A few more <span class="key">↑</span> or <span class="key">↓</span> to move the selection and pressing <span class="key">ENTER</span> opens the site. Make sure to display all attribute columns to have the filter applied to name, title, URL and keywords.</p>
-<p>For this to work, all bookmarks should be kept in the <tt>~/config/settings/WebPositive/Bookmarks/</tt> folder and only copies should be sorted into custom subfolders for usage in WebPositive's <span class="menu">Bookmarks</span> menu (if at all). Also, actually filling the keywords attribute helps...</p>
-<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Downloads</h2>
-<p><span class="menu">Window | Downloads</span> opens a window listing all past and ongoing downloads:</p>
+<p>Anda dapat mengubah URL bookmark, nama, judul, dan memasukkan kata kunci seperti halnya file lain dengan atribut. Pastikan Anda memiliki semua kolomnya ditampilkan melalui menu <span class="menu">Atribut</span> Tracker, lalu pilih file, tekan <span class="key">ALT</span> <span class="key">E</span> dan mulai mengedit atribut; ubah kolom atribut dengan <span class="key">TAB</span>.<br />
+Anda dapat mengurutkan bookmark ke folder berbeda yang Anda buat sendiri.</p>
+<p>Dengan menggunakan Pelacak untuk mengelola dan menavigasi penanda, Anda dapat mengangkat fitur uniknya untuk dengan cepat menemukan apa yang Anda cari.<br />
+Mengaktifkan pemfilteran <span class="menu">Type-ahead </span> dalam <a href="../tracker.html#tracker-preferences"> preferensi Tracker </a>, Anda dapat langsung memangkas daftar bookmark untuk mencocokkan string-filter Anda. Beberapa lagi <span class="key">↑</span> atau <span class="key">↓</span> untuk memindahkan pilihan dan menekan <span class="key">ENTER</span> membuka situs. Pastikan untuk menampilkan semua kolom atribut agar filter diterapkan pada nama, judul, URL, dan kata kunci.</p>
+<p>Agar ini berfungsi, semua bookmark harus disimpan di folder <tt>~/config/settings/WebPositive/Bookmarks/</tt> dan hanya salinan yang akan disortir ke dalam subfolder khusus untuk digunakan dalam menu <span class="menu">Bookmarks</span> WebPositive (jika ada) juga , sejatinya membantu mengisi kata kunci atribut ...</p>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Unduhan</h2>
+<p><span class="menu">Jendela | Unduhan </span> membuka jendela yang berisi daftar semua unduhan yang lalu dan yang sedang berlangsung:</p>
 <img src="../images/apps-images/webpositive-downloads.png" alt="webpositive-downloads.png" />
-<p>Currently downloading files are shown with a growing progress bar and, similar to copying files in Tracker, information on the download speed, file size and expected finishing time. Buttons to the right let you <span class="button">Cancel</span> and <span class="button">Restart</span> a download, or  <span class="button">Open</span> the file, or <span class="button">Remove</span> its entry from the list. The <span class="button">Remove missing</span> and <span class="button">Remove finished</span> buttons at the bottom do this for all entries in this list. "Missing" are files that were deleted in the meantime.</p>
-<p>Moving a file that is currently being downloaded to Trash will stop the download. You'll also notice, that its icon becomes "ghosted".<br />
-Generally, WebPositive is very tolerant when it comes to managing files with Tracker. Files can be renamed or moved even while they are being downloaded and even after the download is finished, these changes are reflected in the Downloads window.</p>
-<div class="box-info"><p>Ever wondered from what site you downloaded a particular package, image or any other file? You can track that down by opening the file with <a href="diskprobe.html">DiskProbe</a> and have a look at its <tt>META:url</tt> attribute.</p>
-<p>Want to have the URL permanently shown in your downloads folder? Just copy a bookmark into it, have the bookmark's URL attribute column displayed and remove the bookmark again.</p></div>
-<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Keyboard shortcuts</h2>
-<p>Here are some useful keyboard shortcuts:</p>
+<p>Saat ini mengunduh file ditunjukkan dengan bilah kemajuan yang berkembang dan, mirip dengan menyalin file dalam Pelacak, informasi tentang kecepatan unduh, ukuran file dan waktu penyelesaian yang diharapkan. Tombol di sebelah kanan memungkinkan Anda <span class="button">Batal</span> dan <span class="button">Mulai ulang</span> unduhan, atau <span class="button">Buka</span> file, atau Hapus entri dari daftar. Tombol <span class="button">buang hilang</span> dan <span class="button">buang yang selesai </span> selesai di bagian bawah melakukan ini untuk semua entri dalam daftar ini. "Hilang" adalah file yang dihapus sementara itu.</p>
+<p>Memindahkan file yang saat ini sedang diunduh ke Sampah akan menghentikan unduhan. Anda juga akan melihat, bahwa ikonnya menjadi "hantu".<br />
+Secara umum, WebPositive sangat toleran ketika mengelola file dengan Tracker. File dapat diubah namanya atau dipindahkan walaupun sedang diunduh dan bahkan setelah pengunduhan selesai, perubahan ini tercermin di jendela Unduhan.</p>
+<div class="box-info"><p>Pernah bertanya-tanya dari situs apa Anda mengunduh paket tertentu, gambar atau file lain? Anda dapat melacaknya dengan membuka file dengan <a href="diskprobe.html">DiskProbe</a>  dan melihat atribut <tt>META:url</tt>.
+</p>
+<p>
+Ingin URL ditampilkan secara permanen di folder unduhan Anda? Cukup salin bookmark ke dalamnya, minta kolom atribut URL bookmark ditampilkan dan hapus bookmark lagi.</p></div>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Pintasan keyboard</h2>
+<p>Berikut beberapa pintasan keyboard yang bermanfaat:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="key">ALT</span> <span class="key">T</span></td><td style="width:15px;"></td><td>Opens a new tab.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">W</span></td><td> </td><td>Closes the current tab.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">N</span></td><td> </td><td>Opens a new window.</td></tr>
-<tr><td><span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">W</span></td><td> </td><td>Closes the current window.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">ENTER</span></td><td> </td><td>Toggles full screen mode.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">R</span> or  <span class="key">F5</span></td><td> </td><td>Refreshes the current page.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">H</span></td><td> </td><td>Opens the home page.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">D</span></td><td> </td><td>Shows/hides the Downloads window.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">F</span></td><td> </td><td>Shows the find bar for in-page searching (hide with <span class="key">ESC</span>).</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">B</span></td><td> </td><td>Bookmarks the current page.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">M</span></td><td> </td><td>Manage bookmarks, opening the Bookmarks folder.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">←</span></td><td> </td><td>Previous page in the history.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">→</span></td><td> </td><td>Next page in the history.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">T</span></td><td style="width:15px;"></td><td>Buka tab baru</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">W</span></td><td> </td><td>Menutup tab saat ini.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">N</span></td><td> </td><td>Buka jendela baru.</td></tr>
+<tr><td><span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">W</span></td><td> </td><td>Menutup jendela saat ini.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">ENTER</span></td><td> </td><td>Mengalihkan mode layar penuh.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">R</span> or  <span class="key">F5</span></td><td> </td><td>Perbarui halaman saat ini.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">H</span></td><td> </td><td>Buka halaman beranda.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">D</span></td><td> </td><td>Memperlihatkan/menyembunyikan jendela Unduhan.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">F</span></td><td> </td><td>Memperlihatkan bilah cari untuk pencarian dalam-halaman (sembunyikan dengan <span class="key">ESC</span>). </td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">B</span></td><td> </td><td>Bookmark halaman saat ini.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">M</span></td><td> </td><td>Kelola bookmark, buka folder Bookmark.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">←</span></td><td> </td><td>Halaman sebelumnya dalam sejarah.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">→</span></td><td> </td><td>Halaman selanjutnya dalam sejarah.</td></tr>
 </table>
 
 </div>

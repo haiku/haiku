@@ -24,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>ユーザーガイド</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -81,7 +81,7 @@
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="mailsystem" name="mailsystem">Haiku のメールシステム</a></h2>
-<p>読者がほかのオペレーティングシステムから Haiku へやってきたとしたら、おそらく、MS Outlook や Mozilla の Thunderbird のような大きなアプリケーションを使っていたでしょう。それらはメールサーバーのアドレスなどの、すべての情報を入力する必要があり、また、それらは独自のコンタクトデータベースを使用しています。それらはメールの送信や受信を管理し、いくつかの特別なファイルに保管します。<br />
+<p>読者がほかのオペレーティングシステムから Haiku へやってきたとしたら、おそらく、MS Outlook や Mozilla Thunderbird のような大きなアプリケーションを使っていたでしょう。それらはメールサーバーのアドレスなどの、すべての情報を入力する必要があり、また、それらは独自のコンタクトデータベースを使用しています。それらはメールの送信や受信を管理し、いくつかの特別なファイルに保管します。<br />
 メールクライアントの変更は、いくつかのエクスポート / インポートおよび変換が進行する面倒なことになることがあります。ほかになにか使えるものを調べるために、同時に複数のクライアントを使うことも、たまに問題が起こります。</p>
 <p>Haiku のメールシステムはそれらとは異なったものです。それは、より小さな別々のモジュールに分かれています。</p>
 <p>メールサーバーとの通信を管理する、<span class="app">mail_daemon</span> があります。<a href="preferences/e-mail.html">メール</a>プレファレンスは、メールをチェックする頻度を設定する中心の 1 つであり、たとえば、メールアカウントや、メールをチェックする頻度を設定します。</p>
@@ -113,7 +113,7 @@
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="queries" name="queries">クエリを使う</a></h2>
-<p>確かに、メールをすべて格納するためにフォルダーを指定し、しかもそれを開けることができます。そこにユーザーのメールのすべてがあります。しかし、時間とともにフォルダーは込み入ってきます。そして、すべてを表示することは何千ものファイルのようにますます長くかかり、それらの属性を解析し、並び替えしなければなりません。同様に、たいていの場合、2 年前のナイジェリアの王子たちと彼らの相続問題のメールには実際に関心がありません…</p>
+<p>確かに、メールをすべて格納するためにフォルダーを指定し、しかもそれを開けられます。そこにユーザーのメールのすべてがあります。しかし、時間とともにフォルダーは込み入ってきます。そして、すべてを表示することは何千ものファイルのようにますます長くかかり、それらの属性を解析し、並び替えしなければなりません。同様に、たいていの場合、2 年前のナイジェリアの王子たちと彼らの相続問題のメールには実際に関心がありません…</p>
 <div class="box-info">フォルダーを読み込むとき、ディスクから読み込まれたファイルを正しい並び順にし、それらをウィンドウ中に表示することに多くの時間が費やされます。非常に多くのファイルがあるフォルダーを開く必要があるならば、Tracker ウィンドウを、"不可視" にすることで待ち時間を短くできます、つまり、ウィンドウを最小化するか、あるいは別のワークスペースへ変更するかのいずれかです。それがどのように CPU 使用率に影響するか確かめるためには、<a href="desktop-applets/processcontroller.html">プロセスコントローラー</a>を観察してください。</div>
 <p>メールを探すための<a href="queries.html">クエリ</a></p>
 <p>クエリを使うことで、メールの表示範囲を絞れます。実際、Deskbar 中のメールボックスアイコンはクエリを使っています。</p>
@@ -145,7 +145,7 @@
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="tips" name="tips">追加のヒント</a></h2>
 <ul>
-<li><p>クエリを、"<i>クエリ</i>" で保存せず、"<i>クエリテンプレート</i>" として保存するなら、その起動は結果ウィンドウではなく、検索…ウィンドウとなるでしょう。そのほうが、件名または送信元に対する検索文字列の交換や、たとえば、"<i>2 days</i>" タイムリミットの "<i>3 days</i>" への変更が容易にできます。</p></li>
+<li><p>クエリを、"<i>クエリ</i>" でなく、"<i>クエリテンプレート</i>" として保存するなら、その起動は結果ウィンドウではなく、検索…ウィンドウとなるでしょう。そのほうが、件名または送信元に対する検索文字列の交換や、たとえば、日時制限の "<i>2 days</i>" から "<i>3 days</i>" への変更が容易にできます。</p></li>
 <li><p> <a href="tracker.html#tracker-preferences">Tracker 設定</a>で、"先行入力フィルタリング (type-ahead filtering)" を有効にすると、さらにクエリの結果をよりすばやくフィルタリングできます。たいてい、すべてのメールを過去 3 日間でクエリし、そこから先行入力フィルタリングで進むだけで充分です。大きな利点は、検索する属性を正確に指定する必要がないことです。フィルタリング中は、表示されている属性がすべて考慮されます。</p></li>
 <!-- <li _translation_id="4718"><p><a href="http://haikuware.com/directory/view-details/utilities/desktop-accessories/relatedmail">RelatedMail</a> is a nifty little application that will query for all mails with the same subject/sender/time-frame etc. of a dropped email. Kind of what the <span class="menu">Queries</span> menu in the <span class="app">Mail</span> app is supposed to do.</p></li> -->
 </ul>
@@ -156,7 +156,7 @@
 <div class="nav">
 <div class="inner"><span>
  «  <a href="queries.html">クエリ</a> 
-::  <a href="contents.html" class="uplink">目次</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
 ::  <a href="applications.html">アプリケーション</a>  »
 </span></div>
 </div>

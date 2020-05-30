@@ -11,12 +11,13 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		Francesco Franchina
+ *		Gabriele
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>DiskUsage</title>
+	<title>Utilizzo Disco</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
@@ -54,38 +55,37 @@
 <span>
  «  <a href="diskprobe.html">DiskProbe</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Applicazioni</a> 
-::  <a href="drivesetup.html">DriveSetup</a>  »
+::  <a href="drivesetup.html">Gestione Disco</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">La traduzione di questa pagina non è stata completata. Per questo motivo le parti non tradotte sono visibili in inglese.</div>
 
-<h2><img src="../../images/apps-images/diskusage-icon_64.png" alt="diskusage-icon_64.png" width="64" height="64" />DiskUsage</h2>
+<h2><img src="../../images/apps-images/diskusage-icon_64.png" alt="diskusage-icon_64.png" width="64" height="64" />Utilizzo Disco</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Applicazioni</span></td></tr>
-<tr><td>Localita:</td><td></td><td><span class="path">/boot/system/apps/DiskUsage</span></td></tr>
+<tr><td>Percorso:</td><td></td><td><span class="path">/boot/system/apps/DiskUsage</span></td></tr>
 <tr><td>Impostazioni:</td><td></td><td><span class="path">~/config/settings/DiskUsage</span></td></tr>
 </table>
 <p><br /></p>
-<p>DiskUsage si occupa di mostrare graficamente come è utilizzato lo spazio sui volumi.<br />
+<p>Utilizzo Disco si occupa di mostrare graficamente come è utilizzato lo spazio sui volumi.<br />
 Un'applicazione piuttosto utile per rispondere alla domanda, "<i>Che fine ha fatto tutto lo spazio libero sul disco?</i>".</p>
-<p>After launching, DiskUsage shows only an empty window with all mounted volumes as tabs at the top. You'll have to choose the one you're interested in and click <span class="button">Scan</span> to start chugging through the disk. For larger disks this can take some time... While you wait, you may switch to a different tab and start exploring that volume or begin the scan process there as well.<br />
-It's not recommended to start several concurrent scan processes on the same physical disk, as the constant repositioning of the heads of the drive will only extend the wait.</p>
+<p>Dopo l'avvio, Utilizzo Disco mostrerà solo una finestra vuota con tuttii volumi montati visualizzati attraverso l'uso di tab in alto. Devi sceglierne uno e poi cliccare su <span class="button">Scansiona</span> per avviare il controllo su tutto il disco. Per dischi molto grandi, l'operazione potrebbe richiedere nolto tempo... Mentre attendi, puoi passare a un'altra tab e iniziare la scansione anche da lì allo stesos modo. <br />
+Non è, comunque, raccomandato iniziare diversi processi di scansione contemporaneamente sullo stesso disco fisico, in quanto il continuo riposizionamento delle testine del disco non farà che aumentare il tempo di esecuzione complessivo.</p>
 <p><img id="diskusage" src="../images/apps-images/diskusage.png" alt="diskusage.png" /></p>
 <p>I cerchi concentrici rappresentano i diversi livelli nella gerarchia del filesystem. Nell'immagine qui sopra, il cerchio centrale rappresenta la cartella <span class="path">/boot/home/</span>. Ogni segmento dell'anello immediatamente successivo a quello centrale è un file o una cartella presente sotto <span class="path">/boot/home/</span>. Ogni segmento sempre più esterno rappresenta un livello inferiore nella gerarchia dei file. È possibile ridimensionare la finestra in modo che vengano mostrate anche le cartelle dei livelli più bassi.</p>
 <div class="box-info"><ul>
 <li>Se la rappresentazione grafica di un file o cartella è resa con meno di 2° circa, sarà tralasciata nella visualizzazione.</li>
 <li>Il numero dei file che sono riportati all'interno di una cartella, include anche i file nelle sottocartelle. Le cartelle contano come file.</li>
-<li>DiskUsage ignora i link simbolici.</li>
+<li>Utilizzo Disco ignora i link simbolici.</li>
 </ul></div>
 <p>Spostando il mouse su un segmento, è possibile visualizzare nella barra di stato in basso informazioni su quel file o cartella.</p>
-<p>Right-clicking a segment offers a context menu to <span class="menu">Get info</span>, <span class="menu">Open</span> (with Tracker), <span class="menu">Open with</span> another suitable application or <span class="menu">Rescan</span> that particular folder.<br />
-Left-clicking a segment makes that file/folder the center circle.<br />
-Left-clicking the center circle moves you up one level.</p>
-<p>È possibile trascinare file e cartelle da DiskUsage su altre applicazioni o sul Desktop o in altre finestre del Tracker per copiarle. Al contrario, trascinando volumi e cartelle nella finestra di DiskUsage si passerà direttamente a loro rendendoli il cerchio centrale.</p>
-<p>You can also use the Tracker add-on from the context menu of any folder to start DiskUsage with that particular location.</p>
+<p>Cliccando col tasto destro su un segmento, apparirà un menù contestuale con <span class="menu">Ottieni informazioni</span>, <span class="menu">Apri</span> (attraverso il Tracker), <span class="menu">Apri con</span> un'altra applicazione adatta o <span class="menu">Riscansiona</span> quella cartella in particolare.<br />
+Cliccando col tasto sinistro su un segmento, il cerchio centrale sarà dato da quel file o cartella.<br />
+Cliccando col tasto sinistro il cerchio centrale, si passerà al livello superiore.</p>
+<p>È possibile trascinare file e cartelle da Utilizzo Disco su altre applicazioni o sulla Scrivania o in altre finestre del Tracker per copiarle. Al contrario, trascinando volumi e cartelle nella finestra di Utilizzo Disco si passerà direttamente a loro rendendoli il cerchio centrale.</p>
+<p>Puoi anche utilizzare il componenti aggiuntivi del Tracker attraverso il menu contestuale da qualsiasi cartella per avviare Utilizzo Disco e analizzare quel particolare percorso.</p>
 
 </div>
 </div>
@@ -94,7 +94,7 @@ Left-clicking the center circle moves you up one level.</p>
 <div class="inner"><span>
  «  <a href="diskprobe.html">DiskProbe</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Applicazioni</a> 
-::  <a href="drivesetup.html">DriveSetup</a>  »
+::  <a href="drivesetup.html">Gestione Disco</a>  »
 </span></div>
 </div>
 

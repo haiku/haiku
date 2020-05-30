@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2018, Haiku. All rights reserved.
+ * Copyright 2010-2020, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -24,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>Használati útmutató</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -61,7 +61,7 @@
 
 <div id="content">
 <div>
-<div class="box-info">Az oldal fordítása még folyamatban van. Amíg tart a fordítás, addig a lefordítatlan részek angolul jelennek meg.</div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Parancssori programok listája</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -87,6 +87,7 @@ Ez a lista tartalmazza az összes, a Haiku-val érkező programot. Mindegyikhez 
 <tr><td><tt>bash</tt></td><td> </td><td>Bourne-again shell</td></tr>
 <tr><td><tt>bc</tt></td><td> </td><td>Egy precíz számológép.</td></tr>
 <tr><td><tt>beep</tt></td><td> </td><td>Figyelmeztető hang megszólaltatása.</td></tr>
+<tr><td><tt>bfsinfo</tt></td><td> </td><td>Analyses the filesystem.</td></tr>
 <tr><td><tt>bunzip2</tt></td><td> </td><td>Ugyan az, mint a <tt>bzip2</tt>.</td></tr>
 <tr><td><tt>bzip2</tt></td><td> </td><td>Fájl tömörítő.</td></tr>
 <tr><td><tt>c++</tt></td><td> </td><td>C++-Compiler.</td></tr>
@@ -102,30 +103,31 @@ Ez a lista tartalmazza az összes, a Haiku-val érkező programot. Mindegyikhez 
 <tr><td><tt>chroot</tt></td><td> </td><td>Egy parancs futtatása egy megadott gyökér-mappában. </td></tr>
 <tr><td><tt>cksum</tt></td><td> </td><td>Egy fájl CRC ellenőrzés eredményét és a bájtok számát jeleníti meg. </td></tr>
 <tr><td><tt>clear</tt></td><td> </td><td>A Terminál ablak ürítése.</td></tr>
+<tr><td><tt>clipboard</tt></td><td> </td><td>Manipulates the system clipboard.</td></tr>
 <tr><td><tt>cmp</tt></td><td> </td><td>Fájlok bájtról-bájtra történő összehasolítása.</td></tr>
-<tr><td><tt>collectcatkeys </tt></td><td> </td><td>-</td></tr>
+<tr><td><tt>collectcatkeys </tt></td><td> </td><td>Collects translatable strings to create catkeys.</td></tr>
 <tr><td><tt>comm</tt></td><td> </td><td>Rendezett fájl sorról-sorra történő összehasonlítása.</td></tr>
 <tr><td><tt>consoled</tt></td><td> </td><td>Konzol szolgáltatás.</td></tr>
 <tr><td><tt>copyattr</tt></td><td> </td><td>A jellemzőket vagy azok egy részét egy vagy több fájlból egy újba másolja. <a href="cli-apps.html">(Haiku-specifikus)</a></td></tr>
 <tr><td><tt>cp</tt></td><td> </td><td>Fájlok/mappák másolása.</td></tr>
 <tr><td><tt>csplit</tt></td><td> </td><td>Egy fájl darabolása a megadott minta alapján.</td></tr>
-<tr><td><tt>ctags</tt></td><td> </td><td>Egy index-fájlt hoz létre az egy fájlban talált különféle nyelvi objektumokból.</td></tr>
 <tr><td><tt>cut</tt></td><td> </td><td>A fájl minden sorából megjeleníti a szakaszokat.</td></tr>
 <tr><td><tt>date</tt></td><td> </td><td>A jelenlegi dátum és idő megjelenítése/módosítása.</td></tr>
 <tr><td><tt>dc</tt></td><td> </td><td>Parancssori számológép.</td></tr>
 <tr><td><tt>dd</tt></td><td> </td><td>Nyers adat másolása, illetve átalakítási és formázási műveletek. </td></tr>
 <tr><td><tt>desklink</tt></td><td> </td><td>Egy elem az Asztalsáv Polcára helyezése. <a href="cli-apps.html">(Haiku-specifikus)</a></td></tr>
-<tr><td><tt>diskimage</tt></td><td> </td><td>Fájl lemezként történő regisztrálása amit így már csatolhatunk. <a href="cli-apps.html">(Haiku specifikus)</a></td></tr>
 <tr><td><tt>df</tt></td><td> </td><td>Csatolt lemezek kihasználtsága.</td></tr>
 <tr><td><tt>diff</tt></td><td> </td><td>Fájlok sorról-sorra történő összehasonlítása.</td></tr>
 <tr><td><tt>diff3</tt></td><td> </td><td>3 fájl sorról-sorra történő összehasonlítása.</td></tr>
 <tr><td><tt>dircolors</tt></td><td> </td><td>Az <tt>ls</tt>-hez a színek beállítása.</td></tr>
 <tr><td><tt>dirname</tt></td><td> </td><td>Megadja egy fájl teljes elérési útvonalából a mappa nevét.</td></tr>
+<tr><td><tt>diskimage</tt></td><td> </td><td>Fájl lemezként történő regisztrálása amit így már csatolhatunk. <a href="cli-apps.html">(Haiku specifikus)</a></td></tr>
+<tr><td><tt>dpms</tt></td><td> </td><td>Sets the display power management.</td></tr>
 <tr><td><tt>draggers</tt></td><td> </td><td>A replikánsok jelölőjének megjelenítése/elrejtése.</td></tr>
 <tr><td><tt>driveinfo</tt></td><td> </td><td>A számítógép összetevőinek információi.</td></tr>
 <tr><td><tt>dstcheck</tt></td><td> </td><td>Óraátállításkor egy üzenetet jelenít meg.</td></tr>
 <tr><td><tt>du</tt></td><td> </td><td>A lemezhasználat kiszámítása mappákra bontva. </td></tr>
-<tr><td><tt>dumpcatalog</tt></td><td> </td><td>-</td></tr>
+<tr><td><tt>dumpcatalog</tt></td><td> </td><td>Shows the contents of catalog files.</td></tr>
 <tr><td><tt>echo</tt></td><td> </td><td>Egy sornyi szöveg megjelenítése.</td></tr>
 <tr><td><tt>egrep</tt></td><td> </td><td>Ugyan az, mint a <tt>grep</tt>.</td></tr>
 <tr><td><tt>eject</tt></td><td> </td><td>Eltávolítható eszköz kiadása.</td></tr>
@@ -142,12 +144,11 @@ Ez a lista tartalmazza az összes, a Haiku-val érkező programot. Mindegyikhez 
 <tr><td><tt>filepanel</tt></td><td> </td><td>A megnyitás/mentés panel megjelenítése. <a href="cli-apps.html">(Haiku-specifikus)</a></td></tr>
 <tr><td><tt>find</tt></td><td> </td><td>Egy fájl megkeresése a fájlrendszerben.</td></tr>
 <tr><td><tt>finddir</tt></td><td> </td><td>A rendszer által deffiniált mappa megkeresése.</td></tr>
+<tr><td><tt>findpaths</tt></td><td> </td><td>Prints all paths for system defined directory constants.</td></tr>
 <tr><td><tt>fmt</tt></td><td> </td><td>Egy fájl bekezdéseinek újraformázása.</td></tr>
 <tr><td><tt>fold</tt></td><td> </td><td>Egy fájl bemeneti sorainak tördelése.</td></tr>
 <tr><td><tt>fortune</tt></td><td> </td><td>Véletlenszerű, remélhetőleg érdekes mondatok.</td></tr>
-<tr><td><tt>freetype-config</tt></td><td> </td><td>A FreeType fordítói információi programozók számára.</td></tr>
 <tr><td><tt>fstrim</tt></td><td> </td><td>Elküldi a TRIM parancsot az SSD lemezeken.</td></tr>
-<tr><td><tt>ftp</tt></td><td> </td><td>Fájl átviteli program.</td></tr>
 <tr><td><tt>ftpd</tt></td><td> </td><td>FTP szolgáltatás.</td></tr>
 <tr><td><tt>funzip</tt></td><td> </td><td>Egy csomag első elemét megjeleníti.</td></tr>
 <tr><td><tt>fwcontrol</tt></td><td> </td><td>FireWire vezérlő program.</td></tr>
@@ -179,7 +180,7 @@ Ez a lista tartalmazza az összes, a Haiku-val érkező programot. Mindegyikhez 
 <tr><td><tt>lessecho</tt></td><td> </td><td>A paraméterek és a helyettesítő karakterek (mint például a * és a ? egy fájlnévben) megjelenítése.</td></tr>
 <tr><td><tt>lesskey</tt></td><td> </td><td>A less számára a kötelező kulcs megadása.</td></tr>
 <tr><td><tt>link</tt></td><td> </td><td>Hivatkozás létrehozása.</td></tr>
-<tr><td><tt>linkcatkeys</tt></td><td> </td><td>-</td></tr>
+<tr><td><tt>linkcatkeys</tt></td><td> </td><td>Creates catalogs from catkeys. </td></tr>
 <tr><td><tt>listarea</tt></td><td> </td><td>A jelenleg futó programok terület-információi. </td></tr>
 <tr><td><tt>listattr</tt></td><td> </td><td>Egy fájl jellemzőinek megjelenítése. <a href="cli-apps.html">(Haiku-specifikus)</a></td></tr>
 <tr><td><tt>listdev</tt></td><td> </td><td>A számítógépben található eszközök listája.</td></tr>
@@ -233,7 +234,6 @@ Ez a lista tartalmazza az összes, a Haiku-val érkező programot. Mindegyikhez 
 <tr><td><tt>pathchk</tt></td><td> </td><td>Érvénytelen és nem portolható fájlnevek ellenőrzése.</td></tr>
 <tr><td><tt>pc</tt></td><td> </td><td>Programozók számológépe.</td></tr>
 <tr><td><tt>ping</tt></td><td> </td><td>ICMP-viszhang-kérés küldése egy másik gépre a hálózaton.</td></tr>
-<tr><td><tt>pkg-config</tt></td><td> </td><td>Csomagok ellenőrzése és beállítása.</td></tr>
 <tr><td><tt>pkgman</tt></td><td> </td><td>Csomagok és raktárak kezelése.</td></tr>
 <tr><td><tt>play</tt></td><td> </td><td>Egy zene CD szám lejátszása.</td></tr>
 <tr><td><tt>pr</tt></td><td> </td><td>Fájl oldalakra vagy oszlopokra tagolása.</td></tr>
@@ -268,6 +268,7 @@ Ez a lista tartalmazza az összes, a Haiku-val érkező programot. Mindegyikhez 
 <tr><td><tt>settype</tt></td><td> </td><td>Egy fájl MIME típusának, aláírásának és az előnyben részesített programjának megadása.</td></tr>
 <tr><td><tt>setversion</tt></td><td> </td><td>Egy fájl verziójának megjelenítése.</td></tr>
 <tr><td><tt>setvolume</tt></td><td> </td><td>A rendszerhangok hangerejének megadása.</td></tr>
+<tr><td><tt>sftp</tt></td><td> </td><td>Fájl átviteli program.</td></tr>
 <tr><td><tt>sh</tt></td><td> </td><td>Ugyan az, mint a <tt>bash</tt>. </td></tr>
 <tr><td><tt>sha1sum</tt></td><td> </td><td>SHA1 ellenőrzés.</td></tr>
 <tr><td><tt>shar</tt></td><td> </td><td>Shell csomagok létrehozása.</td></tr>

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2014, Haiku. All rights reserved.
+ * Copyright 2008-2020, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -25,7 +25,7 @@
 <body>
 
 <div id="banner">
-<div><span>Guia do Usuário</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -57,13 +57,13 @@
  «  <a href="stylededit.html">StyledEdit</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Aplicativos
 </a> 
-::  <a href="textsearch.html">Pesquisa de Texto</a>  »
+::  <a href="textsearch.html">TextSearch</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">A tradução desta página ainda não está completa. Até lá, partes incompletas mostrarão o original em inglês.</div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h2><img src="../../images/apps-images/terminal-icon_64.png" alt="terminal-icon_64.png" width="64" height="64" />Terminal</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -83,9 +83,9 @@
 <p>Pode-se abrir quantos Terminais forem necessários, também cada um em sua própria janela simplesmente carregando mais Terminais ou com <span class="key">ALT</span> <span class="key">N</span> a partir de um Terminal já aberto. Ou utilizar a visão em guias do Terminal e abrir mais guias com <span class="key">ALT</span> <span class="key">T</span>.</p>
 <img src="../images/apps-images/terminal.png" alt="terminal.png" />
 <br />
-<p>Duplo clique dentro de uma parte vazia da barra de guias abre uma nova guia; dentro de uma guia abre um diálogo para renomear seu título. Existem muitas variáveis %-designadas que são explicadas com uma dica quando paira o mouse sobre o campo de texto.<br />
-Por padrão, <tt>%1d: %p</tt>, uma guia exibe o diretório atual e, separado por <tt>:</tt>, o nome do processo atualmente em execução (ou <tt>--</tt> se apenas o bash está executando, provavelmente ocioso). A captura de tela acima exibe a primeira guia com uma sessão FTP na pasta <span class="path">Área de Trabalho</span> e a segunda guia ociosa na <span class="path">home</span>.<br />
-Através de <span class="menu">Editar | Título da janela...</span> o título da janela do Terminal pode ser editado de maneira similar.</p>
+<p>Double-clicking into the emtpy part of the tab bar opens a new tab; onto a tab opens a dialog to rename its title. There are several %-designated variables that are explained with a tooltip when you hover the mouse over the text field.<br />
+By default, <tt>%1d: %p</tt>, a tab shows the current directory and, separated by a <tt>:</tt>, the name of the currently running process (or <tt>--</tt> if it's just bash running, probably idling). The screenshot above shows the first tab with a FTP session in the <span class="path">Desktop</span> folder and a second tab idling at <span class="path">home</span>.<br />
+Via <span class="menu">Settings | Window title...</span> the Terminal window's title can be edited in a similar way.</p>
 <p>Clicar com o botão direito do mouse em uma guia exibe um menu de contexto para <span class="menu">Fechar guia</span>, <span class="menu">Fechar outras guias</span> ou, como o duplo clique, <span class="menu">Editar título da guia...</span>.</p>
 <p>Uma janela do Terminal pode ser redimensionada como qualquer outra janela ou usando as predefinições a partir do menu <span class="menu">Definções | Tamanho da janela</span>. <span class="key">ALT</span> <span class="key">ENTER</span> alterna para o modo de tela cheia.</p>
 <p>All the settings you change directly through the <span class="menu">Settings</span> menu, like <span class="menu">Window title</span>, <span class="menu">Window size</span>, <span class="menu">Text encoding</span> or <span class="menu">Font size</span> are only kept for the current session. If you want to make permanent changes, you have to apply them in the <span class="menu">Settings...</span> panel.</p>
@@ -124,12 +124,12 @@ Ambos podem ser criados na pasta <span class="path">/boot/home/config/settings/<
 <p>O <span class="cli">profile</span> é carregado toda vez que se abre um novo Terminal. Ele define todos os tipos de apelidos e variáveis que afetarão o comportamento e a aparência do bash. Você encontrará muitos recursos online que detalharão todas as possibilidades.</p>
 <p>O Haiku/BeOS Tip Server tem algumas dicas para que possa começar, por exemplo:</p>
 <ul>
-<li><a href="http://betips.net/1997/09/09/customize-your-terminal-prompt/">Personalize o prompt do seu Terminal</a></li>
-<li><a href="http://betips.net/1997/09/09/more-prompt-customizations/">Mais personalizações do prompt</a></li>
-<li><a href="http://betips.net/1997/09/09/enhancing-bash/">Melhorando o bash</a></li>
-<li><a href="http://betips.net/1997/09/09/custom-keyboard-shortcuts/">Atalhos de teclado personalizados</a></li>
+<li><a href="https://betips.net/?p=5">Customize your Terminal prompt</a></li>
+<li><a href="https://betips.net/?p=66">More prompt customizations</a></li>
+<li><a href="https://betips.net/?p=67">Enhancing bash</a></li>
+<li><a href="https://betips.net/?p=105">Custom keyboard shortcuts</a></li>
 </ul>
-<p>Há mais, <a href="http://betips.net/index.php?s=.profile">dê uma olhada</a>.</p>
+<p>There are more, <a href="https://betips.net/?s=profile">have a look</a>.</p>
 
 <h3>inputrc</h3>
 <p>O <span class="cli">inputrc</span> mexe com combinação de teclas. Uma vez que o Haiku proporciona padrões úteis, provavelmente não precisa se atrapalhar com estas definições mais complicadas. Se possui necessidades especiais aqui, consulte um dos muitos recursos online, por exemplo <a href="http://tiswww.case.edu/php/chet/readline/rluserman.html">The GNU Readline Library</a>.</p>
@@ -158,7 +158,7 @@ Ambos podem ser criados na pasta <span class="path">/boot/home/config/settings/<
  «  <a href="stylededit.html">StyledEdit</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Aplicativos
 </a> 
-::  <a href="textsearch.html">Pesquisa de Texto</a>  »
+::  <a href="textsearch.html">TextSearch</a>  »
 </span></div>
 </div>
 

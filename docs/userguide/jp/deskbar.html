@@ -27,7 +27,7 @@
 <body>
 
 <div id="banner">
-<div><span>ユーザーガイド</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -56,15 +56,14 @@
 <li><a href="../uk/deskbar.html">Українська</a></li>
 </ul>
 <span>
- «  <a href="tracker-add-ons.html">Tracker アドオン</a> 
-::  <a href="contents.html" class="uplink">目次</a> 
+ «  <a href="tracker-add-ons.html">Tracker Add-Ons</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
 ::  <a href="filetypes.html">ファイルタイプ</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">このページの翻訳はまだ完全ではありません。完成するまでは、未完成の部分はオリジナルの英文を使用します。</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>インデックス</td></tr>
@@ -79,11 +78,11 @@
 
 <p>Deskbar は小さなパネルで、初期設定では画面右上隅に配置されています。これは、Windows でのスタートボタンを備えたタスクバーの Haiku 版です。アプリケーションや設定を開くための Deskbar メニューと、時計やその他のツールを表示するトレイを持ち、実行中のプログラムの一覧をその下に表示します。</p>
 <img src="images/deskbar-images/positions.png" alt="positions" />
-<p>You can move the Deskbar to any corner or as a bar along the upper or lower border of the screen by gripping the knobbly area on one side of the tray (see arrows above) and drag &amp; drop it into the new position.<br />
-You can also fold it into a more compact layout by drag &amp; dropping the knobbly area onto Deskbar's Leaf menu. Being only the height of a regular window tab, even windows that take up the whole screen won't obscure the Deskbar tray with its clock and icons.</p>
+<p>トレイの片側にある凸の部分をつかんで (上図の矢印を見てください) 新しい位置にドラッグ＆ドロップすると、画面の四隅、または上下に Deskbar を移動できます。<br />
+Deskbar メニューに凸の部分をドラッグ＆ドロップすれば、バーを小さく折りたたむこともできます。それは普通のウィンドウのタブの高さであるため、スクリーン全体を占めるウィンドウでも、時計とアイコンを備えた Deskbarトレイを隠しません。</p>
 <p>トレイのもう一方の凸の部分をつまんで、マウスを左右に動かすと、Deskbar の幅を変更できます。</p>
 <img src="images/deskbar-images/width.png" alt="width" />
-<p>幅のより広い Deskbar は、トレイ内の 1 行により多くのアイコンを置けます。それほど煩雑ではありませんが、特に大きなアイコンを使用している場合、それはまた、実行中プログラム一覧内の長いアプリケーション名を切り詰めます。</p>
+<p>幅のより広い Deskbar は、トレイ内の 1 行により多くのアイコンを置けます。それほどよくあることではありませんが、特に大きなアイコンを使用している場合、それはまた、実行中プログラム一覧内の長いアプリケーション名を切り詰めます。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -133,8 +132,8 @@ You can also fold it into a more compact layout by drag &amp; dropping the knobb
 <h4>Window (ウィンドウ)</h4>
 <p>最後に、Deskbar ウィンドウの設定があります。</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">常に手前に (Always on top)</span></td><td> </td><td>Deskbar は常にほかのすべてのウィンドウより前面にいます。</td></tr>
-<tr><td><span class="menu">マウスオーバーで手前に (Auto-raise)</span></td><td> </td><td>The Deskbar pops to the front when the mouse pointer touches where the Deskbar meets the screen edge, and is lowered when it leaves the Desktop area.</td></tr>
+<tr><td class="onelinetop"><span class="menu">常に手前に (Always on top)</span></td><td> </td><td>Deskbar は常にほかのすべてのウィンドウより前面にいます。</td></tr>
+<tr><td><span class="menu">マウスオーバーで手前に (Auto-raise)</span></td><td> </td><td>マウスのポインターが Deskbar とスクリーンの境に触れたときに、Deskbar は最前面に出てきます。また、デスクトップから離れると背面に移動します。</td></tr>
 <tr><td><span class="menu">自動的に隠す (Auto-hide)</span></td><td> </td><td>Deskbar は数ピクセルに縮小し、マウスポインターがタッチした時だけ現れます。</td></tr>
 </table>
 
@@ -143,16 +142,16 @@ You can also fold it into a more compact layout by drag &amp; dropping the knobb
 <a id="tray" name="tray">トレイ</a></h2>
 <img src="images/deskbar-images/calendar.png" alt="calendar.png" />
 <p>トレイに配置されているものの 1 つに時計があります。時計にカーソルを合わせると、ツールチップに日付が表示されます。左クリックでカレンダーが表示されます。時計の表示 / 非表示を切り替えるには、時計を右クリックするか、<a href="preferences/time.html">日付と時間</a>プレファレンスを起動してください。</p>
-<p>どのプログラムもトレイにアイコンをインストールして、ユーザーにインターフェースを提供できます。たとえばメールシステムでは、未読メールがある時は別のシンボルを表示します。さらに、メールの作成や確認などを行うためにコンテキストメニューを提供します。もう 1 つの例として、<span class="app">プロセスコントローラー</span>はトレイアイコンを情報 (CPU / メモリ使用状況) 表示とコンテキストメニューの提供に使用します。</p>
+<p>どのプログラムも、トレイにアイコンをインストールしてユーザーにインターフェースを提供できます。たとえばメールシステムでは、未読メールがある時は別のシンボルを表示します。さらに、メールの作成や確認などを行うためにコンテキストメニューを提供します。もう 1 つの例として、<span class="app">プロセスコントローラー</span>はトレイアイコンを情報 (CPU / メモリー使用状況) 表示とコンテキストメニューの提供に使用します。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="list-of-apps" name="list-of-apps">実行中プログラムの一覧</a></h2>
 <img src="images/deskbar-images/list-of-apps.png" alt="list-of-apps.png" />
 <p>特定の実行中アプリケーションを変更するには、Deskbar 中のアプリケーションの項目をクリックし、サブメニューからウィンドウの (1 つ) を選びます。右クリックでウィンドウを<span class="menu">隠す / すべて表示 (Hide/Show all)</span>、または<span class="menu">すべて閉じる (Close all)</span> ことができます。アプリケーション全体も同様にできます。</p>
-<p>アプリケーション上で、<span class="key">SHIFT</span> と <span class="key">CTRL</span> を押しながらクリックすると、すべてのウィンドウを隠します。<span class="key">CTRL</span> を押しながらクリックすれば、ウィンドウを再表示します。</p>
-<p>When using the "expander" setting to show all windows of an application, you can middle-click on a window or app to start a new instance. For example, middle-clicking a running StyledEdit will open a new document window.<br />
-Maybe more useful: while holding <span class="key">SHIFT</span>, a middle-click on a window closes it. Handy when you'd like to close some of many open Tracker windows, for example.</p>
+<p><span class="key">SHIFT</span> と <span class="key">CTRL</span> を押しながらアプリケーション上でクリックすると、すべてのウィンドウを隠します。<span class="key">CTRL</span> を押しながらクリックすれば、ウィンドウを再表示します。</p>
+<p>"エキスパンダー (expander)" 設定を使って、アプリケーションのウィンドっをすべて表示するとき、ウィンドウまたはアプリ上でミドルクリックして新しいインスタンスを開始できます。例えば、実行中の StyledEdit をミドルクリックすると新規のドキュメントウィンドウを開きます。<br />
+多分もっと便利なこと: <span class="key">SHIFT</span> を押しながらウィンドウをミドルクリックするとそれを閉じます。たとえば、たくさん開いた Tracker ウィンドっを閉じたいときに便利です。</p>
 <div class="box-info">時々、アプリケーションが固まり、ウィンドウがすべて消えてしまっても、Deskbar の実行中アプリケーション一覧内から全くアプリケーションが消えないことがあります。そのような場合は、"Vulcan Death Grip" を使って取り除けます。<span class="key">SHIFT</span> <span class="key">CTRL</span> <span class="key">ALT</span> を押しながら、Deskbar 内の問題を起こしている項目をクリックします。素晴らしい!</div>
 <p>Deskbar の設定でエキスパンダーを有効にしているなら、アプリケーションのウィンドウの一覧を展開または折りたためます。</p>
 <p>各アプリケーションウィンドウの前には、その状態を示すシンボルが付いています。明るいシンボルはウィンドウが可視であること、暗いものは最小化されていることを意味します。シンボルの前に引かれている 3 本線は、ウィンドウが現在のワークスペースに存在しないことを示しています。</p>
@@ -162,8 +161,8 @@ Maybe more useful: while holding <span class="key">SHIFT</span>, a middle-click 
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="tracker-add-ons.html">Tracker アドオン</a> 
-::  <a href="contents.html" class="uplink">目次</a> 
+ «  <a href="tracker-add-ons.html">Tracker Add-Ons</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
 ::  <a href="filetypes.html">ファイルタイプ</a>  »
 </span></div>
 </div>

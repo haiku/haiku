@@ -9,19 +9,21 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		mazbrili abu ibrahim
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Commandline Applications</title>
+	<title>Aplikasi Commandline</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>Panduan pengguna</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -58,109 +60,110 @@
 
 <div id="content">
 <div>
-<div class="box-info">Terjemahan halaman ini belum lengkap. Sampai saat itu, bagian yang belum selesai menggunakan aslinya bahasa Inggris.</div>
 
-<h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Haiku-specific commandline applications</h2>
+<h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Aplikasi command-line khusus-haiku</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Lokasi:</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin/</span><br />
 <span class="path">/boot/system/non-packaged/bin/</span><br /><span class="path">~/config/bin/</span><br /><span class="path">~/config/non-packaged/bin/</span></td></tr>
 </table>
 <p><br /></p>
-<p>All commandline applications shipped with Haiku are in <span class="path">/boot/system/bin/</span>. Your own or additionally installed commandline apps will appear there as well, or in <span class="path">~/config/bin/</span>, when installed from a .hpkg package. Otherwise you can put them into  <span class="path">/boot/system/non-packaged/bin/</span> or <span class="path">~/config/non-packaged/bin/</span>. All these locations are part of the PATH variable and are therefore automatically found.<br />
-The following isn't an exhaustive list of all Haiku-specific CLI apps, it serves just to highlight a few of the most useful to give you a taste. Feel encouraged to explore what's in the <span class="path">bin/</span> folders on your own a bit. Executing an app with the parameter <tt>--help</tt> shows the usage of the command and all its various options.</p>
+<p>Semua aplikasi commandline yang dikirimkan dengan Haiku ada di <span class="path">/boot/system/bin/</span>.  Aplikasi commandline Anda sendiri atau tambahan yang diinstal juga akan muncul di sana,  atau di  <span class="path">~/config/bin/</span>, ketika diinstal dari paket .hpkg .  Jika tidak, Anda dapat meletakkan mereka di <span class="path">/boot/system/non-packaged/bin/</span> atau <span class="path">~/config/non-packaged/bin/</span>. Semua lokasi ini adalah bagian dari variabel PATH dan karenanya secara otomatis ditemukan.<br />
+Berikut ini bukan daftar lengkap dari semua aplikasi CLI khusus Haiku, ini berfungsi hanya untuk menyoroti beberapa yang paling berguna untuk memberi Anda perasaan. Merasa terdorong untuk menjelajahi apa yang ada di  <span class="path">bin/</span> sedikit pada Anda sendiri. eksekusi aplikasi dengan parameter <tt>--help</tt> menunjukkan penggunaan perintah dan semua berbagai pilihannya.</p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="cli-attributes" name="cli-attributes">Relating to attributes: <span class="cli">listattr</span>, <span class="cli">catattr</span>, <span class="cli">addattr</span>, <span class="cli">rmattr</span>, <span class="cli">copyattr</span></a></h3>
-<p>These commands are used to display, read out, add and remove attributes of files. Remember that these meta data are currently only available on BFS formatted volumes. Moving files onto other file systems will strip all attributes!<br />
-All these commands are described in topic <a href="../attributes.html#attributes-terminal">Attributes in Terminal</a>.</p>
+<a id="cli-attributes" name="cli-attributes">berhubungan dengan atribut: <span class="cli">listattr</span>, <span class="cli">catattr</span>, <span class="cli">addattr</span>, <span class="cli">rmattr</span>, <span class="cli">copyattr</span></a></h3>
+<p>Perintah-perintah ini digunakan untuk menampilkan, membaca, menambah dan menghapus atribut file. Ingat bahwa meta data ini saat ini hanya tersedia pada volume yang diformat BFS. Memindahkan file ke sistem file lain akan menghapus semua atribut!<br />
+Semua perintah ini dijelaskan dalam topik  <a href="../attributes.html#attributes-terminal">Atribut di Terminal</a>.
+
+</p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="cli-index" name="cli-index">Relating to the index: <span class="cli">lsindex</span>, <span class="cli">mkindex</span>, <span class="cli">reindex</span>, <span class="cli">rmindex</span></a></h3>
-<p>With these commands you list, make, reindex and remove attributes to BFS' index. Every volume has it's own index, remember that when copying files from one volume to another.<br />
-These commands are described in topic <a href="../index.html">Index</a>.</p>
+<a id="cli-index" name="cli-index">Berkaitan dengan index: <span class="cli">lsindex</span>, <span class="cli">mkindex</span>, <span class="cli">reindex</span>, <span class="cli">rmindex</span></a></h3>
+<p>Dengan perintah-perintah ini Anda membuat daftar, membuat, mengindeks ulang, dan menghapus atribut ke indeks BFS. Setiap volume memiliki indeks sendiri, ingat bahwa ketika menyalin file dari satu volume ke volume lain.<br />
+Perintah-perintah ini dijelaskan dalam topik <a href="../index.html">Indeks</a>.
+
+</p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="cli-pkg" name="cli-pkg">Relating to package management: <span class="cli">package</span>, <span class="cli">pkgman</span></a></h3>
-<p>The <span class="cli">package</span> command is used to manage HPKG packages. Have a look at the article <a href="https://www.haiku-os.org/guides/daily-tasks/install-applications">Installing applications</a> to learn the very basics. Usually the tool <a href="https://github.com/haikuports/haikuports/wiki">haikuporter</a> is used to automatically create packages from so-called recipes.</p>
-<p><span class="cli">pkgman</span> is used to search, install, update and uninstall packages. Package repositories can be added, dropped and their package lists refreshed. A special kind of update is invoked with the parameter <tt>full-sync</tt>: it is more aggressive and also downgrades or removes packages, if necessary.<br />
-For more details on a parameter, append "--help", e.g. <tt>pkgman search --help</tt></p>
+<a id="cli-pkg" name="cli-pkg">Berkaitan dengan manajemen paket: <span class="cli">package</span>, <span class="cli">pkgman</span></a></h3>
+<p>Perintah yang berkaitan dengan <span class="cli">paket  </span> digunakan untuk mengelola paket HPKG. Lihatlah artikel <a href="https://www.haiku-os.org/guides/daily-tasks/install-applications">Menginstal aplikasi</a> untuk mempelajari dasar-dasarnya. Biasanya alat <a href="https://github.com/haikuports/haikuports/wiki">haikuporter</a> digunakan untuk secara otomatis membuat paket dari apa yang disebut resep.</p>
+<p><span class="cli">pkgman</span> digunakan untuk mencari, menginstal, memperbarui, dan menghapus paket. Repositori paket dapat ditambahkan, dihapus, dan daftar paketnya di-refresh. Pembaruan khusus dilakukan dengan parameter <tt>full-sync</tt>: lebih agresif dan juga menurunkan atau menghapus paket. , jika perlu.<br />
+Untuk detail lebih lanjut tentang parameter, tambahkan "--help", mis. <tt>pkgman search --help</tt></p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="cli-scripting" name="cli-scripting">Useful scripting commands</a></h3>
-<p>Here are a few commandline tools that are especially useful for scripting (see also topic <a href="../bash-scripting.html">Bash and Scripting</a>).</p>
+<a id="cli-scripting" name="cli-scripting">perintah yang berguna untuk scripting </a></h3>
+<p>Berikut adalah beberapa alat commandline yang sangat berguna untuk scripting (lihat juga topik <a href="../bash-scripting.html">Bash dan Scripting</a>).</p>
 <table summary="scripting cli tools" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><p><span class="cli">alert</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">alert</span> conjures up the typical alert window with a pre-defined icon, explanatory text and up to three buttons. It will return the title of the pressed button and an exit status (starting with 0). For example, this is made of the line:</p>
+		<td valign="top"><p><span class="cli">alert</span> memunculkan jendela peringatan khas dengan ikon yang telah ditentukan, teks penjelasan dan hingga tiga tombol. Ini akan mengembalikan judul tombol yang ditekan dan status keluar (dimulai dengan 0). Misalnya, ini dibuat dari baris :</p>
 <pre class="terminal">alert --idea "FantasticApp(tm) installed successfully! \
 Would you like a link to it?" "On Desktop" "In Deskbar" "No thanks"</pre>
 <p><img src="../images/apps-images/cli-alert.png" alt="cli-alert.png" /></p>
+
 </td></tr>
 <tr><td><p><span class="cli">filepanel</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">filepanel</span> displays a load or save file panel and lets the user choose a file or location. As a return value you'll get the chosen file or folder's path. There are several parameters available, for example to set a starting directory, a window title, a default name when saving or restrictions to the allowed types of files. This is an example of</p>
+		<td valign="top"><p><span class="cli">filepanel</span> 
+ menampilkan memuat atau menyimpan panel file dan memungkinkan pengguna memilih file atau lokasi. Sebagai nilai kembali Anda akan mendapatkan jalur file atau folder yang dipilih. Ada beberapa parameter yang tersedia, misalnya untuk mengatur direktori mulai, judul jendela , nama standar saat menyimpan atau membatasi jenis file yang diizinkan. Ini adalah contoh dari</p>
 <pre class="terminal">filepanel -s -t "Save your logfile" -d ~/config/settings -n Fantastic.log</pre>
 <p><img src="../images/apps-images/cli-filepanel.png" alt="cli-filepanel.png" /></p>
+
+
 </td></tr>
 <tr><td><p><span class="cli">hey</span></p></td><td style="width:10px;"> </td>
-<td valign="top"><p><span class="cli">hey</span> is a littler helper tool that sends BMessages to applications and prints out their answer. It can be used for application scripting, i.e. "remote controlling" a program from a script or the command line. It's usage is a bit complex... <a href="https://www.haiku-os.org/blog/humdinger/2017-11-05_scripting_the_gui_with_hey/">Humdinger's blog post</a> serves as a good introduction, and thanks to Scot Hacker's BeOS Bible, there is a much more comprehensive <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting6.html">hey tutorial</a> by Chris Herborth.</p>
-</td></tr>
+<td valign="top"><p><span class="cli">hey</span> adalah alat pembantu yang lebih kecil yang mengirimkan BMessage ke aplikasi dan mencetak jawaban mereka. Dapat digunakan untuk skrip aplikasi, yaitu "mengendalikan jarak jauh" suatu program dari skrip atau baris perintah. Penggunaannya agak rumit ... <a href="https://www.haiku-os.org/blog/humdinger/2017-11-05_scripting_the_gui_with_hey/">postingan blog Humdinger</a> berfungsi sebagai pengantar yang bagus, dan terima kasih kepada Scot Hacker's BeOS Bible, ada <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting6.html">hey tutorial</a> yang jauh lebih komprehensif oleh Chris Herborth.</p></td></tr>
 <tr><td><p><span class="cli">notify</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">notify</span> shows a notification panel with a message. There are various parameters that are described when you call <span class="cli">notify --help</span>. A notification can also be used to show the progress of some action. When doing that, it's important to set a <i>messageID</i> and always use it when you update the progress (a float between 0.0 and 1.0 that's printed as percent). Otherwise you'll see several notification panels if you update quicker then the set timeout.<br />
+		<td valign="top"><p><span class="cli">notify</span> menunjukkan panel notifikasi dengan pesan. Ada berbagai parameter yang dijelaskan ketika Anda memanggil  <span class="cli">notify --help</span>. Notifikasi juga dapat digunakan untuk menunjukkan kemajuan beberapa tindakan.  Ketika melakukan itu, penting untuk mengatur  <i>messageID</i> dan selalu gunakan saat Anda memperbarui progres (float antara 0,0 dan 1.0 yang dicetak sebagai persen). Jika tidak, Anda akan melihat beberapa panel notifikasi jika Anda memperbarui lebih cepat daripada batas waktu yang ditetapkan.<br />
 An example:</p>
 <pre class="terminal">notify --type progress --group "--group" --title "--title" --icon /boot/home/bebook.hvif \
 --messageID MyMessageID --progress .75 "Keep waiting"</pre>
-<p><img src="../images/apps-images/cli-notification.png" alt="cli-notification.png" /></p>
-</td></tr>
+<p><img src="../images/apps-images/cli-notification.png" alt="cli-notification.png" /></p></td></tr>
 <tr><td><p><span class="cli">query</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">query</span> is the commandline version of the Find panel. In fact, a quick way to generate the search term is to build a query in the Find panel, switch to <span class="menu">by formula</span>, add double quotes (<tt>"</tt>) in front and back and paste the whole string after your <span class="cli">query</span> command in Terminal or your script.</p>
-</td></tr>
+		<td valign="top"><p><span class="cli">query</span> adalah versi commandline dari panel Find. Faktanya, cara cepat untuk menghasilkan istilah pencarian adalah dengan membuat query di panel Find, beralih ke <span class="menu">dengan formula</span> , tambahkan tanda kutip ganda (<tt>"</tt>) di depan dan belakang dan tempelkan seluruh string setelah perintah <span class="cli">kueri</span> Anda di Terminal atau skrip Anda.</p></td></tr>
 <tr><td><p><span class="cli">waitfor</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">waitfor</span> is a nice way to wait for a particular application or thread to be started or to have ended.</p>
+		<td valign="top"><p><span class="cli">waitfor</span> adalah cara yang bagus untuk menunggu aplikasi atau utas baru dimulai atau telah berakhir.</p>
 </td></tr></table>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="cli-other" name="cli-other">Other commands</a></h3>
+<a id="cli-other" name="cli-other">Perintah lain</a></h3>
 
 <table summary="scripting cli tools" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><p><span class="cli">checkfs</span></p></td><td style="width:10px;"> </td>
-		<td><p><span class="cli">checkfs</span> is an important tool to check for errors in your file system. Simply add a volume name like <span class="path">/Haiku</span> or device path and it'll run through every file and correct inconsistencies where possible.</p>
-</td></tr>
+		<td><p><span class="cli">checkfs</span> adalah alat penting untuk memeriksa kesalahan dalam sistem file Anda. Cukup tambahkan nama volume seperti <span class="path">/Haiku</span> atau jalur perangkat dan itu akan dijalankan melalui setiap file dan memperbaiki ketidakkonsistenan jika memungkinkan.</p></td></tr>
 <tr><td><p><span class="cli">desklink</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">desklink</span> can install an icon for any file, folder, query or application in the Deskbar tray. It also offers the option to provide a context menu when right-clicking an icon to execute special actions. As an example, try this to add the commandline app <span class="app">screenshot</span> with various options (the "<tt>\</tt>" in the first line is just for the line break in Terminal):</p>
+		<td valign="top"><p><span class="cli">desklink</span> dapat menginstal ikon untuk file, folder, kueri, atau aplikasi apa pun di baki Deskbar. Ia juga menawarkan opsi untuk menyediakan menu konteks ketika mengklik kanan ikon untuk melakukan tindakan khusus. Sebagai contoh, coba ini untuk menambahkan aplikasi commandline <span class="app">screenshot</span> dengan berbagai opsi (karakter "<tt>\</tt>"di baris pertama hanya untuk ganti baris di Terminal ):</p>
 <pre class="terminal"> desklink "cmd=Active window (2s):/bin/screenshot --window --border --delay 2" \
 "cmd=Remove replicant:desklink --remove=screenshot" /bin/screenshot
 </pre>
-<p><img src="../images/apps-images/cli-desklink.png" alt="cli-alert.png" /></p>
-</td></tr>
+<p><img src="../images/apps-images/cli-desklink.png" alt="cli-alert.png" /></p></td></tr>
 <tr><td><p><span class="cli">diskimage</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">diskimage</span> lets you register a regular file as disk device. For example, you can register a Haiku anyboot image, mount it in Tracker and copy, edit or remove files there before using it as source in the Installer.</p>
-</td></tr>
+		<td valign="top"><p><span class="cli">diskimage</span> memungkinkan Anda mendaftarkan file biasa sebagai perangkat disk. Misalnya, Anda dapat mendaftarkan gambar Haiku anyboot, pasang di Tracker dan salin, edit atau hapus file di sana sebelum menggunakannya sebagai sumber di Installer.</p></td></tr>
 <tr><td><p><span class="cli">launch_roster</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p>The launch_daemon starts all sorts of services and applications at boot-up. For some it was instructed to re-start them if they were quit. If you don't want that – maybe you'd like to test a modified Tracker, for example – you use <span class="cli">launch_roster</span> to <tt>stop</tt> the re-starting of the application before quitting it. Similarly, you can <tt>start</tt> it again or get <tt>info</tt> about it.c  The parameter <tt>log</tt> prints out a log of all launch_daemon related events.<br />
-Without parameter, <span class="cli">launch_roster</span> lists all apps/services that are under its control.<br />
-For example, this will stop the re-launching of the Deskbar:</p>
-<pre class="terminal">launch_roster stop x-vnd.be-tskb</pre></td></tr>
+		<td valign="top"><p>Launch_daemon memulai semua jenis layanan dan aplikasi saat boot-up. Untuk beberapa itu diinstruksikan untuk memulai kembali jika mereka keluar. Jika Anda tidak mau - mungkin Anda ingin menguji Tracker yang dimodifikasi, misalnya - Anda menggunakan <span class="cli">launch_roster</span> untuk <tt>stop</tt> memulai kembali  sebelum berhenti. Mirip, Anda dapat <tt>start</tt> lagi atau mendapatkan <tt>info</tt>hal itu.c  parameter <tt>log</tt> mencetak semua log yang berkaitan dengan launch_daemon.<br />
+Tanpa parameter, <span class="cli">launch_roster</span> mencantumkan semua aplikasi / layanan yang berada di bawah kendalinya.<br />
+Misalnya, ini akan menghentikan peluncuran kembali Deskbar:</p>
+<pre class="terminal">launch_roster stop x-vnd.be-tskb</pre>
+</td></tr>
 <tr><td><p><span class="cli">mountvolume</span><br /><span class="cli">mount</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">mountvolume</span> is preferred by many to mount local partitions and disks, because its usage is so easy: just call it with the name of the partition and you're done. Try <tt>--help</tt> for more options.</p>
-<p><span class="cli">mount</span> can additionally mount remote disks by using a network filesystem, like NFS4. You specify the used filesystem with the <tt>-t</tt> parameter and the remote location with the <tt>-p</tt> parameter. As filesystem parameter you can use anything you find in <span class="path">/system/add-ons/kernel/file_system</span> (and corresponding file hierarchies under <span class="path">~/config</span> or "<span class="path">non-packaged</span>", of course). You also have to create a folder as mountpoint. Here's an example:</p>
+		<td valign="top"><p><span class="cli">mountvolume</span> lebih disukai oleh banyak orang untuk me-mount partisi dan disk lokal, karena penggunaannya sangat mudah: cukup panggil dengan nama partisi dan Anda selesai. Cobalah <tt>--help</tt> untuk opsi lainnya.</p>
+<p><span class="cli">mount</span> juga dapat me-mount disk remote dengan menggunakan sistem file jaringan, seperti NFS4. Anda menentukan filesystem yang digunakan dengan parameter <tt>-t</tt> dan lokasi remote dengan parameter <tt>-p</tt>. Sebagai parameter filesystem Anda dapat menggunakan apa pun yang Anda temukan di <span class="path">/system/add-ons/kernel/file_system</span> (and corresponding file hierarchies under <span class="path">~/config</span> or "<span class="path">non-packaged</span>" tentu saja). Anda juga harus membuat folder sebagai mountpoint. Berikut ini contohnya:</p>
 <pre class="terminal">mkdir -p /DiskStation
 mount -t nfs4 -p "192.168.178.3:volume1" /DiskStation</pre></td></tr>
 <tr><td><p><span class="cli">open</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">open</span> is a very handy little tool. With it you open any file with its preferred application, or start a specific application by its signature without the need to know its exact path. It also works with URLs and even with the "virtual" directories <tt>.</tt> for the current directory and <tt>..</tt> for the parent, opening the folder in Tracker.</p>
-</td></tr>
+		<td valign="top"><p><span class="cli">open</span> adalah alat kecil yang sangat berguna. Dengan itu Anda membuka file apa pun dengan aplikasi pilihannya, atau memulai aplikasi tertentu dengan tanda tangannya tanpa perlu mengetahui jalurnya dengan tepat. Ia juga bekerja dengan URL dan bahkan dengan direktori "virtual". <tt>.</tt> untuk direktori saat ini dan <tt>..</tt> untuk orang tua, buka folder di Tracker.</p></td></tr>
 <tr><td><p><span class="cli">ramdisk</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p>A ramdisk is like a harddisk running only in the computer's memory. That makes it very fast but also volatile, because its contents vanishes when you shut down the computer, or it crashes or you experience a blackout.<br />
-To create a ramdisk of 1 GiB, format to the name "RAMses" and mount it, you enter this in Terminal or create a script of it:</p>
+		<td valign="top"><p>Ramdisk adalah seperti harddisk yang hanya berjalan di memori komputer, yang membuatnya sangat cepat tetapi juga mudah berubah, karena isinya menghilang ketika Anda mematikan komputer, atau crash atau Anda mengalami pemadaman.<br />
+Untuk membuat ramdisk 1 GiB, format dengan nama "RAM" dan pasang, masukkan ini di Terminal atau buat skripnya:</p>
 <pre class="terminal">ramdisk create -s 1gb
 mkfs -q -t bfs /dev/disk/virtual/ram/0/raw RAMses
 mountvolume RAMses</pre>
-<p>Note: When creating a ramdisk, the <span class="cli">ramdisk</span> command prints out the path to it. If you create several disks, that path <span class="path">/dev/disk/virtual/ram/0/raw</span> will change!</p>
-<p>To preserve the contents, at least if no calamity like a blackout etc. strikes, a ramdisk can be set up to read/write an image on the harddisk. For that, you need to supply a file of the desired size that will be read from every time you start your ramdisk, and written to when you unmount it. To create an image file "RAMimage" of 500MiB and format it, do this:</p>
+<p>Catatan: Saat membuat ramdisk, perintah<span class="cli">ramdisk</span> mencetak path ke sana. Jika Anda membuat beberapa disk, path <span class="path">/dev/disk/virtual/ram/0/raw</span> akan berubah!</p>
+<p>Untuk mempertahankan konten, setidaknya jika tidak ada musibah seperti pemadaman dll., Ramdisk dapat diatur untuk membaca / menulis gambar pada harddisk. Untuk itu, Anda perlu menyediakan file dengan ukuran yang diinginkan yang akan dibaca dari setiap kali Anda memulai ramdisk, dan menulis ketika Anda melepasnya. Untuk membuat file image "RAMimage" dari 500MiB dan memformatnya, lakukan ini:</p>
 <pre class="terminal">dd if=/dev/zero of=RAMimage bs=500M count=1
 mkfs -q -t bfs /dev/disk/virtual/ram/0/raw RAMimage</pre>
-<p>From now on, you start the ramdisk like this:</p>
+<p>Mulai saat ini, amda mulai ramdisk dengan seperti ini :</p>
 <pre class="terminal">ramdisk create RAMimage
 mountvolume RAMimage</pre>
-<p>It's very important to always cleanly unmount you ramdisk, either from Tracker or with <span class="cli">unmount /RAMimage</span>, or the changes won't be written back to the image file!</p>
+<p>Sangat penting untuk selalu melakukan unmount ramdisk dengan bersih, baik melalui Tracker atau dengan <span class="cli">unmount /RAMimage</span>, jika tidak perubahan anda tidak ditulis kembali ke berkas image!</p>
 </td></tr>
 </table>
 </div>

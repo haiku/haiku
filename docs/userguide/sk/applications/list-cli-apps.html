@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2018, Haiku. All rights reserved.
+ * Copyright 2010-2020, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -25,7 +25,7 @@
 <body>
 
 <div id="banner">
-<div><span>Používateľská príručka</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -62,7 +62,7 @@
 
 <div id="content">
 <div>
-<div class="box-info">Preklad tejto stránky zatiaľ nie je dokončený. Dovtedy sa nedokončené časti zobrazia v anglickom origináli.</div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Zoznam všetkých aplikácií príkazového riadka</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -88,6 +88,7 @@ Tu je zoznam všetkých aplikácií príkazového riadka, ktoré sa nachádzajú
 <tr><td><tt>bash</tt></td><td> </td><td>Bourne-again shell</td></tr>
 <tr><td><tt>bc</tt></td><td> </td><td>Jazyk na výpočty s ľubovoľnou presnosťou.</td></tr>
 <tr><td><tt>beep</tt></td><td> </td><td>Zazvoní zvonček.</td></tr>
+<tr><td><tt>bfsinfo</tt></td><td> </td><td>Analyses the filesystem.</td></tr>
 <tr><td><tt>bunzip2</tt></td><td> </td><td>Pozrite <tt>bzip2</tt>.</td></tr>
 <tr><td><tt>bzip2</tt></td><td> </td><td>Komprimácia súborov.</td></tr>
 <tr><td><tt>c++</tt></td><td> </td><td>C++-Compiler.</td></tr>
@@ -103,30 +104,31 @@ Tu je zoznam všetkých aplikácií príkazového riadka, ktoré sa nachádzajú
 <tr><td><tt>chroot</tt></td><td> </td><td>Spustí príkaz v rámci zadaného koreňového adresára.</td></tr>
 <tr><td><tt>cksum</tt></td><td> </td><td>Vypíše kontrolný súčet CRC a počet bajtov súborov.</td></tr>
 <tr><td><tt>clear</tt></td><td> </td><td>Vymaže okno terminálu.</td></tr>
+<tr><td><tt>clipboard</tt></td><td> </td><td>Manipulates the system clipboard.</td></tr>
 <tr><td><tt>cmp</tt></td><td> </td><td>Porovná súbory bajt po bajte.</td></tr>
-<tr><td><tt>collectcatkeys </tt></td><td> </td><td>[Pozostatok po prechode z locale-kit.]</td></tr>
+<tr><td><tt>collectcatkeys </tt></td><td> </td><td>Collects translatable strings to create catkeys.</td></tr>
 <tr><td><tt>comm</tt></td><td> </td><td>Porovná utriedené súbory riadok po riadku.</td></tr>
 <tr><td><tt>consoled</tt></td><td> </td><td>Démon konzoly</td></tr>
 <tr><td><tt>copyattr</tt></td><td> </td><td>Skopíruje všetky alebo podmnožinu atribútov z jedného súboru do iného alebo do nového súboru. <a href="cli-apps.html">(špecifické pre Haiku)</a></td></tr>
 <tr><td><tt>cp</tt></td><td> </td><td>Skopíruje súbory a priečinky.</td></tr>
 <tr><td><tt>csplit</tt></td><td> </td><td>Rozdelí súbor na časti rozdelené podľa konkrétneho vzoru.</td></tr>
-<tr><td><tt>ctags</tt></td><td> </td><td>Vygeneruje indexový súbor pre množstvo jazykových objektov nájdených v súboroch.</td></tr>
 <tr><td><tt>cut</tt></td><td> </td><td>Vypíše sekcie z každého riadka súboru.</td></tr>
 <tr><td><tt>date</tt></td><td> </td><td>Zobrazí alebo nastaví aktuálny čas a dátum.</td></tr>
 <tr><td><tt>dc</tt></td><td> </td><td>Jazyk dc na výpočty.</td></tr>
 <tr><td><tt>dd</tt></td><td> </td><td>Kopíruje nespracované dáta, konvertuje a formátuje podľa operandov.</td></tr>
 <tr><td><tt>desklink</tt></td><td> </td><td>Inštaluje položky do Panela. <a href="cli-apps.html">(špecifické pre Haiku)</a></td></tr>
-<tr><td><tt>diskimage</tt></td><td> </td><td>Zaregistruje súbor ako diskové zariadenie, ktoré je následne možné pripojiť. <a href="cli-apps.html">(špecifické pre Haiku)</a></td></tr>
 <tr><td><tt>df</tt></td><td> </td><td>Podá správu o voľnom a využívanom mieste na pripojených zväzkoch.</td></tr>
 <tr><td><tt>diff</tt></td><td> </td><td>Porovná súbory riadok po riadku.</td></tr>
 <tr><td><tt>diff3</tt></td><td> </td><td>Porovná 3 súbory riadok po riadku.</td></tr>
 <tr><td><tt>dircolors</tt></td><td> </td><td>Nastavenie farieb pre <tt>ls</tt>. </td></tr>
 <tr><td><tt>dirname</tt></td><td> </td><td>Odstráni názov súboru z reťazca /cesta/k/súboru.</td></tr>
+<tr><td><tt>diskimage</tt></td><td> </td><td>Zaregistruje súbor ako diskové zariadenie, ktoré je následne možné pripojiť. <a href="cli-apps.html">(špecifické pre Haiku)</a></td></tr>
+<tr><td><tt>dpms</tt></td><td> </td><td>Sets the display power management.</td></tr>
 <tr><td><tt>draggers</tt></td><td> </td><td>Zobrazí/nastaví stav rúčok Replikantov.</td></tr>
 <tr><td><tt>driveinfo</tt></td><td> </td><td>Zobrazí informácie o hardvéri.</td></tr>
 <tr><td><tt>dstcheck</tt></td><td> </td><td>Zobrazí okno so správou použité pri prepínaní na/z letného času.</td></tr>
 <tr><td><tt>du</tt></td><td> </td><td>Sumarizuje využitie disku každého súboru, rekurzívne pre priečinky.</td></tr>
-<tr><td><tt>dumpcatalog</tt></td><td> </td><td>[Zostatok po prechode z locale-kit.]</td></tr>
+<tr><td><tt>dumpcatalog</tt></td><td> </td><td>Shows the contents of catalog files.</td></tr>
 <tr><td><tt>echo</tt></td><td> </td><td>Zobrazí riadok textu.</td></tr>
 <tr><td><tt>egrep</tt></td><td> </td><td>Pozrite <tt>grep</tt>.</td></tr>
 <tr><td><tt>eject</tt></td><td> </td><td>Vysunie výmenné médium.</td></tr>
@@ -143,12 +145,11 @@ Tu je zoznam všetkých aplikácií príkazového riadka, ktoré sa nachádzajú
 <tr><td><tt>filepanel</tt></td><td> </td><td>Zobrazí panel na otvorenie/uloženie súboru. <a href="cli-apps.html">(špecifické pre Haiku)</a></td></tr>
 <tr><td><tt>find</tt></td><td> </td><td>Hľadá súbory v rámci adresárovej štruktúry.</td></tr>
 <tr><td><tt>finddir</tt></td><td> </td><td>Hľadá špeciálne priečinky definované systémom.</td></tr>
+<tr><td><tt>findpaths</tt></td><td> </td><td>Prints all paths for system defined directory constants.</td></tr>
 <tr><td><tt>fmt</tt></td><td> </td><td>Preformátuje odstavce súboru.</td></tr>
 <tr><td><tt>fold</tt></td><td> </td><td>Zalomí riadky vstupného súboru.</td></tr>
 <tr><td><tt>fortune</tt></td><td> </td><td>Vypíše náhodné, snáď zaujímavé, porekadlo.</td></tr>
-<tr><td><tt>freetype-config</tt></td><td> </td><td>Zobrazí informácie o kompilácii a linkovaní FreeType.</td></tr>
 <tr><td><tt>fstrim</tt></td><td> </td><td>Pošle príkaz TRIM disku SSD.</td></tr>
-<tr><td><tt>ftp</tt></td><td> </td><td>Program na prenos súborov</td></tr>
 <tr><td><tt>ftpd</tt></td><td> </td><td>FTP démon</td></tr>
 <tr><td><tt>funzip</tt></td><td> </td><td>Rozbalí prvý súbor z archívu na štandardný výstup.</td></tr>
 <tr><td><tt>fwcontrol</tt></td><td> </td><td>Program na ovládanie FireWire</td></tr>
@@ -180,7 +181,7 @@ Tu je zoznam všetkých aplikácií príkazového riadka, ktoré sa nachádzajú
 <tr><td><tt>lessecho</tt></td><td> </td><td>Vypíše argumenty, ktoré dostal a expanduje metaznaky ako * a ? v názvoch súborov.</td></tr>
 <tr><td><tt>lesskey</tt></td><td> </td><td>Určuje klávesové väzby pre less. </td></tr>
 <tr><td><tt>link</tt></td><td> </td><td>Vytvorí odkaz na súbor.</td></tr>
-<tr><td><tt>linkcatkeys</tt></td><td> </td><td>[Zostatok po prechode z locale-kit.]</td></tr>
+<tr><td><tt>linkcatkeys</tt></td><td> </td><td>Creates catalogs from catkeys. </td></tr>
 <tr><td><tt>listarea</tt></td><td> </td><td>Vypíše informácie z oblasti každého bežiaceho tímu.</td></tr>
 <tr><td><tt>listattr</tt></td><td> </td><td>Vypíše atribúty súboru. <a href="cli-apps.html">(špecifické pre Haiku)</a></td></tr>
 <tr><td><tt>listdev</tt></td><td> </td><td>Vypíše zoznam všetkých hardvérových zariadení.</td></tr>
@@ -234,7 +235,6 @@ Tu je zoznam všetkých aplikácií príkazového riadka, ktoré sa nachádzajú
 <tr><td><tt>pathchk</tt></td><td> </td><td>Diagnostikuje neplatné alebo neprenosné názvy súborov.</td></tr>
 <tr><td><tt>pc</tt></td><td> </td><td>Programátorská kalkulačka</td></tr>
 <tr><td><tt>ping</tt></td><td> </td><td>Pošle počítaču v sieti paket ICMP-echo-request.</td></tr>
-<tr><td><tt>pkg-config</tt></td><td> </td><td>Analyzuje a nastavuje balík Haiku.</td></tr>
 <tr><td><tt>pkgman</tt></td><td> </td><td>Spravuje balíky a zdroje balíkov.</td></tr>
 <tr><td><tt>play</tt></td><td> </td><td>Prehrá stopu z CD.</td></tr>
 <tr><td><tt>pr</tt></td><td> </td><td>Ostránkuje alebo ostĺpcuje súbory na tlač.</td></tr>
@@ -269,6 +269,7 @@ Tu je zoznam všetkých aplikácií príkazového riadka, ktoré sa nachádzajú
 <tr><td><tt>settype</tt></td><td> </td><td>Nastaví typ MIME, podpis a preferovanú aplikáciu súboru.</td></tr>
 <tr><td><tt>setversion</tt></td><td> </td><td>Zobrazí verziu súboru.</td></tr>
 <tr><td><tt>setvolume</tt></td><td> </td><td>Nastaví systémovú úroveň hlasitosti.</td></tr>
+<tr><td><tt>sftp</tt></td><td> </td><td>Program na prenos súborov</td></tr>
 <tr><td><tt>sh</tt></td><td> </td><td>Pozrite <tt>bash</tt>. </td></tr>
 <tr><td><tt>sha1sum</tt></td><td> </td><td>Vypíše alebo skontroluje kontrolné súčty SHA1. </td></tr>
 <tr><td><tt>shar</tt></td><td> </td><td>Vytvára shell archívy.</td></tr>

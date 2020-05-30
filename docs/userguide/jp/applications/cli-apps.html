@@ -25,7 +25,7 @@
 <body>
 
 <div id="banner">
-<div><span>ユーザーガイド</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -69,18 +69,18 @@
 <span class="path">/boot/system/non-packaged/bin/</span><br /><span class="path">~/config/bin/</span><br /><span class="path">~/config/non-packaged/bin/</span></td></tr>
 </table>
 <p><br /></p>
-<p>Haiku に標準装備されているすべてのコマンドラインアプリケーションは、<span class="path">/boot/system/bin/</span> の中にあります。ユーザー自身の、または追加でインストールしたコマンドラインアプリケーションは同様にそこにあるか、hpkg パッケージからインストールされているなら、<span class="path">~/config/bin/</span> に現れるでしょう。または、これらを <span class="path">/boot/system/non-packaged/bin/</span> あるいは、<span class="path">~/config/non-packaged/bin/</span> に置くことができます。これらすべてのパスは PATH 環境変数の一部なので、コマンドは自動的に見つかります。<br />
-以下は、Haiku 特有のコマンドラインアプリケーションの完全なリストではありません。お試しのために、もっとも有用な一部のコマンドを単に強調しているだけです。<span class="path">bin/</span> フォルダーにあるものをユーザー自身で少し調査することを後押しします。コマンドを <tt>--help</tt> 引数を付けて実行すると、コマンドの使い方とさまざまなオプションについて表示します。</p>
+<p>Haiku に標準装備されているすべてのコマンドラインアプリケーションは、<span class="path">/boot/system/bin/</span> の中にあります。ユーザー自身の、または追加でインストールしたコマンドラインアプリケーションは同様にそこにあるか、hpkg パッケージからインストールされているなら、<span class="path">~/config/bin/</span> に現れるでしょう。これらはまた、<span class="path">/boot/system/non-packaged/bin/</span> あるいは、<span class="path">~/config/non-packaged/bin/</span> に置けます。これらすべてのパスは PATH 環境変数の一部なので、コマンドは自動的に見つかります。<br />
+以下は、Haiku 特有のコマンドラインアプリケーションの完全なリストではありません。味わってもらうために、もっとも有用な一部のコマンドを単に強調しているだけです。<span class="path">bin/</span> フォルダーにあるものをユーザー自身で少し調査することを促します。コマンドを <tt>--help</tt> 引数を付けて実行すると、コマンドの使い方とさまざまなオプションについて表示します。</p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="cli-attributes" name="cli-attributes">属性に関するコマンド: <span class="cli">listattr</span>, <span class="cli">catattr</span>、<span class="cli">addattr</span>、<span class="cli">rmattr</span>、<span class="cli">copyattr</span></a></h3>
 <p>これらのコマンドは、ファイル属性を表示、出力、追加、および削除するために使用します。現在のところ、これらのメタデータは BFS で初期化されたボリュームでのみ使用できることに注意してください。BFS 以外のファイルシステムにファイルを移動させると、すべての属性が失われてしまいます!<br />
-これらのコマンドについては、<a href="../attributes.html#attributes-terminal">ターミナルでの属性</a>のトピックで解説しています。</p>
+これらのコマンドは、<a href="../attributes.html#attributes-terminal">ターミナルでの属性</a>のトピックで解説しています。</p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="cli-index" name="cli-index">インデックスに関するコマンド: <span class="cli">lsindex</span>, <span class="cli">mkindex</span>, <span class="cli">reindex</span>, <span class="cli">rmindex</span></a></h3>
 <p>これらのコマンドによって、インデックスの一覧表示やインデックスの生成・再生成、BFS のインデックスへ結びつけられた属性の削除が行えます。各ボリュームは固有のインデックスを保持しています。ファイルをあるボリュームから別のボリュームへコピーするときには、この点に注意してください。<br />
-これらのコマンドについては、<a href="../index.html">インデックス</a>のトピックで解説しています。</p>
+これらのコマンドは、<a href="../index.html">インデックス</a>のトピックで解説しています。</p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="cli-pkg" name="cli-pkg">パッケージ管理に関するコマンド: <span class="cli">package</span>, <span class="cli">pkgman</span></a></h3>
@@ -106,7 +106,7 @@ Would you like a link to it?" "On Desktop" "In Deskbar" "No thanks"</pre>
 <td valign="top"><p><span class="cli">hey</span> は、BMessage をアプリケーションに送信し、アプリケーションからの返信を出力する小さなヘルパーツールです。それは、アプリケーションスクリプティングに使用されます。つまり、あるプログラムを、スクリプトまたはコマンドラインから "リモートコントロール" します。使い方はすこし複雑です... <a href="https://www.haiku-os.org/blog/humdinger/2017-11-05_scripting_the_gui_with_hey/">Humdinger 氏の ブログへの投稿</a> が良い入門書となります。また、Scot Hacker 氏の BeOS Bible のおかげで、Chris Herborth によるさらに広範囲の <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting6.html">hey チュートリアル</a>があります。</p>
 </td></tr>
 <tr><td><p><span class="cli">notify</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">notify</span> は、メッセージ入りの通知パネルを表示します。<span class="cli">notify --help</span> を呼び出すと、さまざまなパラメーターが表示されます。また、通知は何らかのアクションの進捗表示にも使用されます。それを行う際は、<i>messageID</i> を設定して、進捗 (0.0 と 1.0 の間の不動小数点値で、%として表示されます) を更新するときに常に使用することが大切です。そうしないと、設定されたタイムアウトより早く更新した場合、いくつかの通知パネルが表示されます。<br />
+		<td valign="top"><p><span class="cli">notify</span> は、メッセージ入りの通知パネルを表示します。<span class="cli">notify --help</span> を呼び出すと、さまざまなパラメーターが表示されます。また、通知は何らかのアクションの進捗表示にも使用されます。その際、<i>messageID</i> を設定して、進捗 (0.0 と 1.0 の間の浮動小数点値で、% として表示されます) を更新するときに常に使用することが大切です。そうしないと、設定されたタイムアウトより早く更新した場合、いくつかの通知パネルが表示されます。<br />
 例:</p>
 <pre class="terminal">notify --type progress --group "--group" --title "--title" --icon /boot/home/bebook.hvif \
 --messageID MyMessageID --progress .75 "Keep waiting"</pre>
@@ -133,7 +133,7 @@ Would you like a link to it?" "On Desktop" "In Deskbar" "No thanks"</pre>
 <p><img src="../images/apps-images/cli-desklink.png" alt="cli-alert.png" /></p>
 </td></tr>
 <tr><td><p><span class="cli">diskimage</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">diskimage</span> は、普通のファイルをディスクデバイスとして登録します。たとえば、Haiku anyboot イメージを登録して、Tracker 中にマウントし、インストーラーのソースとして使う前にそこにあるファイルを編集、コピーまたは削除できます。</p>
+		<td valign="top"><p><span class="cli">diskimage</span> は、普通のファイルをディスクデバイスとして登録します。たとえば、Haiku anyboot イメージを登録して、Tracker 中にマウントし、インストーラーのソースとして使う前にそこに存在するファイルの編集 / コピー / 削除ができます。</p>
 </td></tr>
 <tr><td><p><span class="cli">launch_roster</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p>launch_daemon は、起動時に各種サービスやアプリケーションを開始します。それらのいくつかに対しては、終了後再起動するように指示されています。それを望まないのであれば – たぶん、たとえば修正した Tracker をテストする場合、<span class="cli">launch_roster</span> を使って、アプリケーションの終了前に再起動を停止 <tt>(stop)</tt> させます。同様に、それを再び起動 <tt>(start)</tt> することや、それについての情報 <tt>(info)</tt> を得ることもできます。引数 <tt>log</tt> は、launch_daemon に関連するすべてのイベントのログを出力します。<br />引数がないと、<span class="cli">launch_roster</span> はコントロールしているすべてのアプリ / サービスの一覧を出力します。<br />
@@ -141,7 +141,7 @@ Would you like a link to it?" "On Desktop" "In Deskbar" "No thanks"</pre>
 <pre class="terminal">launch_roster stop x-vnd.be-tskb</pre>
 </td></tr>
 <tr><td><p><span class="cli">mountvolume</span><br /><span class="cli">mount</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">mountvolume</span> は、ローカルのパーティションやディスクをマウントするのに多くの人に好まれます。なぜなら、使い方がとても簡単だからです。パーティション名とともに呼び出して、それでおしまいです。追加のオプションについては、<tt>--help</tt> を試してみてください。</p>
+		<td valign="top"><p><span class="cli">mountvolume</span> は、ローカルのパーティションやディスクをマウントするのに多くの人に好まれます。なぜなら、使い方がとても簡単だからです。パーティション名とともに呼び出して、それでおしまいです。追加のオプションについては、<tt>--help</tt> を試してください。</p>
 <p>さらに、<span class="cli">mount</span> は、NFS4 のようなネットワークファイルシステムを使うことで、リモートディスクをマウントできます。<tt>-t</tt> 引数で使用するファイルシステムを指定し、<tt>-p</tt> 引数でリモートの場所を指定します。ファイルシステム引数については、<span class="path">/system/add-ons/kernel/file_system</span> (および、もちろん、<span class="path">~/config</span> または "<span class="path">non-packaged</span>" 以下の対応するファイル階層) で見つかるものをすべて使用できます。また、マウントポイントとしてフォルダーを作成する必要があります。以下に例を示します。</p>
 <pre class="terminal">mkdir -p /DiskStation
 mount -t nfs4 -p "192.168.178.3:volume1" /DiskStation</pre></td></tr>
@@ -149,26 +149,26 @@ mount -t nfs4 -p "192.168.178.3:volume1" /DiskStation</pre></td></tr>
 		<td valign="top"><p><span class="cli">open</span> は非常に便利な小さいツールです。このコマンドを使うと任意のファイルを適切なアプリケーションで開け、また、正確なパスを知らなくてもシグネチャーを用いて特定のアプリケーションを起動できます。このコマンドは URL や「仮想的な」ディレクトリを用いることさえできます。ディレクトリの場合は <tt>.</tt> で現在のディレクトリを、<tt>..</tt> で親ディレクトリを表すことができ、そのフォルダーを Tracker 内に開きます。</p>
 </td></tr>
 <tr><td><p><span class="cli">ramdisk</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p>ラムディスク (ramdisk) は、コンピューターのメモリ内だけで動くハードディスクのようなものです。メモリ内で動くことは、ラムディスクを非常に高速にしますが、しかしまた揮発性にもします。それは、コンピューターをシャットダウンするか、クラッシュするか、停電を経験することでその内容は消えてなくなるからです。<br />
-1 GiB のラムディスクを作成し、"RAMses" の名前でフォーマットし、マウントするには、端末で以下を入力するかスクリプトを作成します:</p>
+		<td valign="top"><p>RAM ディスク (ramdisk) は、コンピューターのメモリ内だけで動くハードディスクのようなものです。メモリ内で動くことは、RAM ディスクを非常に高速にしますが、しかしまた揮発性にもします。それは、コンピューターをシャットダウンするか、クラッシュするか、停電を経験することでその内容は消えてなくなるからです。<br />
+1 GiB の RAM ディスクを作成し、"RAMses" の名前でフォーマットし、マウントするには、端末で以下を入力するかスクリプトを作成します:</p>
 <pre class="terminal">ramdisk create -s 1gb
 mkfs -q -t bfs /dev/disk/virtual/ram/0/raw RAMses
 mountvolume RAMses</pre>
-<p>注意: ラムディスクを作成する際、<span class="cli">ramdisk</span> コマンドはラムディスクへのパスを出力します。複数のラムディスクを作成する場合、そのパス <span class="path">/dev/disk/virtual/ram/0/raw</span> は変化します!</p>
-<p>少なくとも停電などの災難が襲わない場合、内容を保存するために、ラムディスクはハードディスク上のイメージを読み書きできるよう設定できます。そのためには、ラムディスクの起動毎に読みだし、アンマウント時に書き込む、望ましいサイズのファイルを提供する必要があります。"RAMimage" という 500MiB のイメージを作成してフォーマットするには、以下のようにします:</p>
+<p>注意: RAM ディスクを作成する際、<span class="cli">ramdisk</span> コマンドは RAM ディスクへのパスを出力します。複数のラムディスクを作成する場合、そのパス <span class="path">/dev/disk/virtual/ram/0/raw</span> は変化します!</p>
+<p>少なくとも停電などの災難が襲わない場合、内容を保存するために、RAM ディスクはハードディスク上のイメージを読み書きできるよう設定できます。そのためには、RAM ディスクの起動毎に読みだし、アンマウント時に書き込む、望ましいサイズのファイルを提供する必要があります。"RAMimage" という 500MiB のイメージを作成してフォーマットするには、以下のようにします:</p>
 <pre class="terminal">dd if=/dev/zero of=RAMimage bs=500M count=1
 mkfs -q -t bfs /dev/disk/virtual/ram/0/raw RAMimage</pre>
-<p>今後は、以下のようにラムディスクを開始します:</p>
+<p>今後は、以下のように RAM ディスクを開始します:</p>
 <pre class="terminal">ramdisk create RAMimage
 mountvolume RAMimage</pre>
-<p>Tracker からか、<span class="cli">unmount /RAMimage</span> のどちらかで、ラムディスクを常に正常にアンマウントすることはとても重要です。そうしなければ、変更点がイメージファイルに書き込まれないでしょう!</p></td></tr>
+<p>Tracker からか、<span class="cli">unmount /RAMimage</span> のどちらかで、RAM ディスクを常に正常にアンマウントすることはとても重要です。そうしなければ、変更がイメージファイルに書き込まれないでしょう!</p></td></tr>
 </table>
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="list-cli-apps.html">コマンドラインアプリケーションの一覧表</a> 
+ «  <a href="list-cli-apps.html">コマンドラインアプリケーションの一覧</a> 
 ::  <a href="../applications.html#cli-apps" class="uplink">アプリケーション</a> 
 </span></div>
 </div>

@@ -9,6 +9,8 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		mazbrili abu ibrahim
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -21,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>Panduan pengguna</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -58,204 +60,215 @@
 
 <div id="content">
 <div>
-<div class="box-info">Terjemahan halaman ini belum lengkap. Sampai saat itu, bagian yang belum selesai menggunakan aslinya bahasa Inggris.</div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Indeks</td></tr>
 <tr class="index"><td>
-	<a href="#shortcuts">Keyboard shortcuts</a><br />
-	<a href="#commands">Built-in commands</a></td></tr>
+	<a href="#shortcuts">Pintasa Keyboard</a><br />
+	<a href="#commands">Perintah Built-in</a></td></tr>
 </table>
 
 <h2><img src="../../images/apps-images/vision-icon_64.png" alt="vision-icon_64.png" width="64" height="64" />Vision</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Aplikasi</span></td></tr>
 <tr><td>Lokasi:</td><td></td><td><span class="path">/boot/system/apps/Vision/Vision</span></td></tr>
 <tr><td>Pengaturan:</td><td></td><td><span class="path">~/config/settings/Vision/*</span></td></tr>
 </table>
 <p><br /></p>
-<p>Vision is an IRC client originally developed for the BeOS. More documentation and a bug tracker are available at the <a href="https://github.com/HaikuArchives/Vision/">Vision homepage</a>.</p>
-<div class="box-info">You can find help from other Haiku users and developers on <a href="https://www.haiku-os.org/community/irc">Haiku channels</a> in various languages.<br />
-The most frequented channel is the English speaking #haiku at irc.freenode.net.</div>
-<p>Some advice, especially if you're new to IRC:</p>
+<p>Vision adalah klien IRC yang awalnya dikembangkan untuk BeOS. Lebih banyak dokumentasi dan pelacak bug tersedia di beranda Vision. <a href="https://github.com/HaikuArchives/Vision/">Vision homepage</a>.</p>
+<div class="box-info">Anda dapat menemukan bantuan dari pengguna dan pengembang Haiku lainnya di  <a href="https://www.haiku-os.org/community/irc">Haiku channels</a>alam berbagai bahasa.<br />
+Saluran yang paling sering dikunjungi adalah #haiku berbahasa Inggris di irc.freenode.net.
+</div>
+<p>Beberapa saran, terutama jika Anda baru mengenal IRC:</p>
 <ul>
-<li><p>Search the web for "IRC etiquette" to learn about the do's and don'ts of chatting. Without much searching, I found <a href="https://workaround.org/getting-help-on-irc/">Getting help on IRC</a> by Christoph Haas to be quite helpful.</p></li>
-<li><p>By registering your nickname you make sure nobody can pull any shenanigans and you gain the trust of the residents. See <a href="http://freenode.net/kb/answer/registration">Freenode's FAQ</a> on that matter.</p></li>
-<li><p>Set up a sound in Haiku's Sounds preferences to be notified if someone mentions your nickname. People don't always watch their IRC client screen. Putting the nickname of the person you're talking to at the beginning of what you're about to post increases your chance to be noticed. Similar to the Terminal, Vision supports tab-completion for nicknames, i.e. if you enter the starting letters of  a nickname and press the tab key, Vision completes it with the first name that matches.</p></li>
+<li><p>Cari di web untuk "etiket IRC" untuk mengetahui apa yang harus dan tidak boleh dilakukan dalam obrolan. Tanpa banyak pencarian, saya menemukan <a href="https://workaround.org/getting-help-on-irc/">Mendapatkan bantuan di IRC</a> oleh Christoph Haas sangat membantu.</p>
+
+  </li>
+<li><p>Dengan mendaftarkan nama panggilan Anda, Anda memastikan tidak ada yang bisa menarik perhatian dan Anda mendapatkan kepercayaan dari penduduk. Lihat <a href="http://freenode.net/kb/answer/registration">Freenode's FAQ</a> tentang hal itu.</p>
+</li>
+<li><p>Siapkan suara di preferensi Suara Haiku untuk diberitahukan jika seseorang menyebutkan nama panggilan Anda. Orang tidak selalu menonton layar klien IRC mereka. Menempatkan nama panggilan orang yang Anda ajak bicara di awal apa yang akan Anda posting meningkatkan peluang Anda untuk diperhatikan. Mirip dengan Terminal, Vision mendukung penyelesaian tab untuk nama panggilan, yaitu jika Anda memasukkan huruf awal nama panggilan dan menekan tombol tab, Vision melengkapinya dengan nama depan yang cocok.</p></li>
 </ul>
 
 <img src="../images/apps-images/vision.png" alt="vision.png" />
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="shortcuts" name="shortcuts">Keyboard shortcuts</a></h2>
-<p>Vision provides a few handy keyboard shortcuts:</p>
+<a id="shortcuts" name="shortcuts">Pintasan Keyboard</a></h2>
+<p>Vision menyediakan beberapa pintasan keyboard praktis:</p>
 <table summary="shortcuts" border="0" cellspacing="0" cellpadding="4">
-<tr><td><span class="key">TAB</span></td><td style="width:15px;"></td><td>Tab-completion like in Terminal: After entering a few letters of a nickname, hitting <span class="key">TAB</span> completes to the first matching nickname.</td></tr>
-<tr><td><span class="key">↑</span> / <span class="key">↓</span></td><td style="width:15px;"></td><td>When the input control has focus, this will cycle through your recently entered text.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">↑</span> / <span class="key">↓</span></td><td></td><td>Activates the window that appears above / below the currently active (selected) one in the "Window list"</td></tr>
-<tr><td class="onelinetop"><span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">↑</span> / <span class="key">↓</span></td><td></td><td>Similar to <span class="key">ALT</span> <span class="key">↑</span> / <span class="key">↓</span>, but with a twist. Instead of activating the window immedietly above / below the current one, it looks ahead. If there are any windows with higher status bits then the current window, it jumps to those. It jumps to the highest found status bit first.<br />
+<tr><td><span class="key">TAB</span></td><td style="width:15px;"></td><td>TAB penyelesai seperti di Terminal: Setelah memasukkan beberapa huruf nama panggilan, memukul <span class="key">TAB</span> melengkapi nama panggilan yang cocok pertama.</td></tr>
+<tr><td><span class="key">↑</span> / <span class="key">↓</span></td><td style="width:15px;"></td><td>Ketika kontrol input memiliki fokus, ini akan menggilir teks yang baru Anda masukkan.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">↑</span> / <span class="key">↓</span></td><td></td><td>Mengaktifkan jendela yang muncul di atas / di bawah jendela yang saat ini aktif (dipilih) di "Daftar jendela"</td></tr>
+<tr><td class="onelinetop"><span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">↑</span> / <span class="key">↓</span></td><td></td><td>Mirip dengan <span class="key">ALT</span> <span class="key">↑</span> / <span class="key">↓</span>, tetapi dengan twist. Alih-alih mengaktifkan jendela dengan segera di atas / di bawah yang sekarang, itu terlihat di depan. Jika ada jendela dengan bit status yang lebih tinggi daripada jendela saat ini, ia melompat untuk itu, ia melompat ke bit status tertinggi yang ditemukan terlebih dahulu.<br />
 
-To understand this, you must know that Vision color codes windows in the list with different "status bits" depending on how its contents have changed since it last had focus:
+Untuk memahami hal ini, Anda harus tahu bahwa Vision color mengkodekan windows dalam daftar dengan "bit status" yang berbeda tergantung pada bagaimana isinya telah berubah sejak terakhir memiliki fokus:
 <ul>
-<li><b><span style="color:black">black</span></b> - no new text</li>
-<li><b><span style="color:silver">gray</span></b> - new text, but nothing exciting (joins, parts, etc.)</li>
-<li><b><span style="color:green">green</span></b> - someone has said something</li>
-<li><b><span style="color:red">red</span></b> - someone has said something, and mentioned your nickname</li>
+<li><b><span style="color:black">black</span></b> - tidak ada teks baru</li>
+<li><b><span style="color:silver">gray</span></b> - baru, tetapi tidak ada yang menarik (bergabung, bagian, dll.))</li>
+<li><b><span style="color:green">green</span></b> - -seseorang telah mengatakan sesuatu
+</li>
+<li><b><span style="color:red">red</span></b> -seseorang telah mengatakan sesuatu, dan menyebutkan nama panggilan Anda</li>
 </ul>
-Vision treats these with sequential priority. When you press <span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">↑</span> / <span class="key">↓</span>, Vision will first jump to a red window above / below the current one if it sees one. If it doesn't see a red one, it will jump to a green one, and so on.</td></tr>
+Visi memperlakukan ini dengan prioritas berurutan. Ketika Anda menekan <span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">↑</span> / <span class="key">↓</span>, Visi pertama-tama akan melompat ke jendela merah di atas / di bawah jendela saat ini jika melihat. Jika tidak melihat yang merah, itu akan melompat ke yang hijau, dan sebagainya.</td></tr>
 </table>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="commands" name="commands">Built-in commands</a></h2>
-<p>Here's a list of built-in commands, taken with permission from Vision's website.</p>
-<p>The syntax:</p>
+<a id="commands" name="commands">perintah bawaan</a>
+</h2>
+<p>Berikut adalah daftar dari perintah bawaan ,diambil dengan izin dari situs web Vision.</p>
+<p>sintaks:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="0">
-<tr><td><tt>/COMMAND</tt></td><td width="10"></td><td>the command</td></tr>
-<tr><td><tt>&lt;required&gt;</tt></td><td></td><td>a required parameter</td></tr>
-<tr><td><tt>[optional]</tt></td><td></td><td>an optional parameter</td></tr>
-<tr><td><tt>|</tt></td><td></td><td>a logical OR</td></tr>
-<tr><td><tt>...</tt></td><td></td><td>more parameters possible</td></tr>
+<tr><td><tt>/COMMAND</tt></td><td width="10"></td><td>perintah</td></tr>
+<tr><td><tt>&lt;required&gt;</tt></td><td></td><td>parameter dibutuhkan</td></tr>
+<tr><td><tt>[optional]</tt></td><td></td><td>parameter opsional</td></tr>
+<tr><td><tt>|</tt></td><td></td><td>tanda logika "atau"</td></tr>
+<tr><td><tt>...</tt></td><td></td><td>memungkinkan lebih banyak parameter </td></tr>
 </table>
 
 <ul>
 <li><p><span class="menu">/ABOUT</span><br />
-Opens Vision's About window.</p></li>
+Buka jendela Tentang Visi..</p></li>
 
 <li><p><span class="menu">/ACRONYM [word]</span><br />
-Opens www.acronymfinder.com with your current html handler. (Note: If the file-handler is not a browser, it opens the application specified in FileTypes.)</p></li>
+Membuka www.acronymfinder.com dengan html handler Anda saat ini. (Catatan: Jika file-handler bukan browser, itu membuka aplikasi yang ditentukan dalam FileTypes.))</p></li>
 
-<li><p><span class="menu">/AWAY [away-reason]</span><br />
-Sets away status on current network. If no away reason is specified, it is set to 'BRB'. (be right back)</p></li>
+<li><p><span class="menu">/AWAY [alasan-jauhnya]</span><br />
+Menyetel status di jaringan saat ini. Jika tidak ada alasan jauhnya yang ditentukan, itu diatur ke 'BRB'. (Segera kembali) </p></li>
 
 <li><p><span class="menu">/BACK</span><br />
-Sets your status to 'back' on current network.</p></li>
+Atur status Anda ke 'kembali' di jaringan saat ini.</p></li>
 
 <li><p><span class="menu">/CLEAR</span><br />
-Clears the contents of the current text buffer.</p></li>
+Menghapus konten buffer teks saat ini.</p></li>
 
 <li><p><span class="menu">/CTCP &lt;nick|channel&gt; &lt;PING|VERSION|FINGER|TIME|CLIENTINFO|USERINFO&gt;</span><br />
-Executes the specified ctcp command on a channel or nick.</p></li>
+Menjalankan perintah ctcp yang ditentukan pada saluran atau nick.</p></li>
 
 <li><p><span class="menu">/DCC &lt;CHAT&gt; &lt;nick&gt;</span><br />
-Opens a private dcc chat session with the specified nick.</p></li>
+Membuka sesi obrolan dcc pribadi dengan nick yang ditentukan.</p></li>
 
 <li><p><span class="menu">/DCC &lt;SEND&gt; &lt;nick&gt; [file]</span><br />
-Sends a file to &lt;nick&gt;. If no file is specified, a File panel will open.</p></li>
+Mengirim file ke &lt;nick&gt;. Jika tidak ada file yang ditentukan, panel File akan terbuka.</p>
+</li>
 
 <li><p><span class="menu">/DEOP /DOP /DEVOICE &lt;nick1&gt; [nick2] ...</span><br />
-De-ops or de-voices &lt;nick(s)&gt;.</p></li>
+Non-aktifkan atau non-suara  &lt;nick(s)&gt;.</p></li>
 
 <li><p><span class="menu">/DESCRIBE &lt;nick&gt; &lt;message&gt;</span><br />
-Like a private /ME, only &lt;nick&gt; can see it.</p></li>
+Seperti  private /ME, hanya &lt;nick&gt; yang bisa melihatnya.</p></li>
 
 <li><p><span class="menu">/DNS &lt;domain name/IP address&gt;</span><br />
-Resolves the given IP or domain name.</p></li>
+meresolve IP atau nama domain yang diberikan.</p></li>
 
 <li><p><span class="menu">/EXIT</span><br />
-Quits Vision.</p></li>
+Keluar dari Vision.</p></li>
 
 <li><p><span class="menu">/GAWAY [away-reason]</span><br />
-Same as /AWAY [away-reason], but applies to all connected networks.</p></li>
+Sama seperti /AWAY [alasan-jauhnya], tetapi berlaku untuk semua jaringan yang terhubung.</p></li>
 
 <li><p><span class="menu">/GBACK</span><br />
-Same as /BACK, but on applies to all connected networks.</p></li>
+Sama seperti /BACK, tetapi aktif berlaku untuk semua jaringan yang terhubung. </p></li>
 
 <li><p><span class="menu">/GOOGLE [search-string]</span><br />
-Opens www.google.com with your current html handler. (Note: If the file-handler is not a browser, it opens the application specified in FileTypes.)</p></li>
+Buka www.google.com dengan html handler Anda saat ini. (Catatan: Jika file-handler bukan browser, itu membuka aplikasi yang ditentukan dalam FileTypes.)</p></li>
 
 <li><p><span class="menu">/INVITE /I &lt;nick&gt; &lt;channel&gt;</span><br />
-Invites &lt;nick&gt; to the &lt;channel&gt;.</p></li>
+Undang &lt;nick&gt; ke  &lt;kanal&gt;.</p></li>
 
 <li><p><span class="menu">/JOIN /J &lt;channel&gt; [channel-key]</span><br />
-Joins the &lt;channel&gt;. Provide a [channel-key] if necessary.</p></li>
+gabung ke  &lt;channel&gt;. menyediakan [channel-key] jika dibutuhkan.</p></li>
 
 <li><p><span class="menu">/KICK /K &lt;nick&gt; [reason]</span><br />
-Kicks &lt;nick&gt; from current channel. If [reason] is not specified, it will be set to the reason specified in Preferences.</p></li>
+Tendang &lt;nick&gt; dari saluran saat ini. Jika [alasan] tidak ditentukan, itu akan diatur ke alasan yang ditentukan dalam Preferensi.</p></li>
 
 <li><p><span class="menu">/KILL &lt;nick&gt; [message]</span><br />
-IRC operator command to disconnect a user from the network.</p></li>
+Perintah operator IRC untuk memutuskan pengguna dari jaringan.</p></li>
 
 <li><p><span class="menu">/LIST</span><br />
-Opens a new view which lists all the channels on the current network. [except hidden channels]</p></li>
+Membuka tampilan baru yang mencantumkan semua saluran di jaringan saat ini. [Kecuali saluran tersembunyi]</p></li>
 
 <li><p><span class="menu">/M</span><br />
-Displays the channel modes of the current channel.</p></li>
+Menampilkan mode saluran dari saluran saat ini.</p></li>
 
 <li><p><span class="menu">/M &lt; -ohvbeqa&gt; &lt;nick1&gt; [nick2] ...</span><br />
-Same as <span class="menu">/MODE &lt;channel&gt; &lt;modes&gt; &lt;nick&gt;</span>, but on current channel.</p></li>
+sama seperti <span class="menu">/MODE &lt;channel&gt; &lt;modes&gt; &lt;nick&gt;</span>, tetapi pada saluran saat ini.</p></li>
 
 <li><p><span class="menu">/M &lt;+-kfL,l,psmntirRcOAQKVHGCuzN&gt;</span><br />
-Same as <span class="menu">/MODE &lt;channel&gt; &lt;modes&gt;</span>, but on current channel.</p></li>
+Sama seperti <span class="menu">/MODE &lt;channel&gt; &lt;modes&gt;</span>, tetapi pada saluran saat ini.</p></li>
 
 <li><p><span class="menu">/ME &lt;text&gt;</span><br />
-Displays: <i>* {YourNickname} &lt;text&gt;.</i></p></li>
+Menampilkan: <i>* {YourNickname} &lt;text&gt;.</i></p></li>
 
 <li><p><span class="menu">/MODE &lt;channel&gt; &lt;+-ohvbeqa&gt; &lt;nick1&gt; [nick2] ...</span><br />
-Sets mode for &lt;nick(s)&gt; on &lt;channel&gt;.<br />
-e.g. <span class="menu">/MODE #channel +o nick1</span><br />
-or <span class="menu">/MODE #channel +oo-o nick1 nick2 nick3</span></p></li>
+Mengeset mode untuk  &lt;nick(s)&gt; di &lt;channel&gt;.<br />
+mis. <span class="menu">/MODE #channel +o nick1</span><br />
+atau <span class="menu">/MODE #channel +oo-o nick1 nick2 nick3</span></p></li>
 
 <li><p><span class="menu">/MODE &lt;channel&gt; &lt;+-kfL,l,psmntirRcOAQKVHGCuzN&gt;</span><br />
-Sets the mode of &lt;channel&gt;. (Note: Commata just for optical separation.)<br />
+mengeset mode of &lt;channel&gt;. (Note: Commata hanya untuk pembagi optik.)<br />
 e.g. <span class="menu">/MODE #channel +ms</span></p></li>
 
 <li><p><span class="menu">/MSG &lt;nick&gt; &lt;message&gt;</span><br />
-Sends a &lt;message&gt; to &lt;nick&gt;.</p></li>
+Kirim  &lt;pesan&gt; ke &lt;nick&gt;.</p></li>
 
 <li><p><span class="menu">/NAMES</span><br />
-Displays all channels and all nicks of the network in the network window. (Careful with this one)</p></li>
+Menampilkan semua saluran dan semua torehan jaringan di jendela jaringan. (Hati-hati dengan yang ini)</p></li>
 
 <li><p><span class="menu">/NAMES &lt;channel&gt;</span><br />
-Displays nick(s) in &lt;channel&gt;.</p></li>
+tampilkan nick(s) di &lt;channel&gt;.</p></li>
 
 <li><p><span class="menu">/NICK &lt;newnick&gt;</span><br />
-Changes your nick to &lt;newnick&gt;.</p></li>
+Rubah nickname anda ke &lt;newnick&gt;.</p></li>
 
 <li><p><span class="menu">/NOTICE &lt;nick&gt; &lt;message&gt;</span><br />
-Sends a notice to &lt;nick&gt; with the given &lt;message&gt;.</p></li>
+Kirim notifikasi ke  &lt;nick&gt; dengan  &lt;message&gt;.</p></li>
 
 <li><p><span class="menu">/NOTIFY &lt;nick1&gt; [nick2] ...</span><br />
-Adds &lt;nick(s)&gt; to your notify list.</p></li>
+tambahkan &lt;nick(s)&gt; ke daftar notifikasi.</p></li>
 
 <li><p><span class="menu">/PEXEC /RRUN &lt;app1&gt; [ | &lt;app2&gt; | ... ]</span><br />
-Executes the given &lt;app&gt;. If more than one application is provided, they will be executed in a pipe.<br />
-e.g. <span class="menu">/PEXEC Terminal | StyledEdit</span> opens a new Terminal, and afterwards StyledEdit<br />
-or <span class="menu">/PEXEC ls -la ~/Downloads/</span> displays the contents of your ~/Downloads/ directory in the current window (Attention!)</p></li>
+Menjalankan &lt;app&gt;. yang diberikan. Jika lebih dari satu aplikasi disediakan, mereka akan dieksekusi dalam pipa.<br />
+misalnya <span class="menu">/PEXEC Terminal | StyledEdit</span> membuka Terminal baru, dan setelahnya StyledEdit<br />
+atau <span class="menu">/PEXEC ls -la ~/Downloads/</span> menampilkan isi direktori ~/Downloads/ Anda di jendela saat ini (Perhatian!)</p></li>
 
 <li><p><span class="menu">/OP /VOICE &lt;nick1&gt; [nick2] ...</span><br />
-Ops or voices to &lt;nick(s)&gt;.</p></li>
+Ops atau suara ke &lt;nick(s)&gt;.</p></li>
 
 <li><p><span class="menu">/PART</span><br />
-Leaves current channel or network.</p></li>
+Meninggalkan kanal atau jaringan saat ini.</p></li>
 
 <li><p><span class="menu">/PING &lt;nick&gt;</span><br />
-Pings the &lt;nick&gt; and returns the ping-time. Equivalent to <span class="menu">/CTCP &lt;nick&gt; PING</span>.</p></li>
+ping &lt;nick&gt;  dan mengembalikan waktu ping. Setara dengan <span class="menu">/CTCP &lt;nick&gt; PING</span>.</p></li>
 
 <li><p><span class="menu">/QUERY /Q &lt;nick&gt; [message]</span><br />
-Opens a query window on &lt;nick&gt;, optionally along with a [message].</p></li>
+Membuka jendela permintaan pada  &lt;nick&gt;, opsional bersama dengan sebuah [message].</p></li>
 
 <li><p><span class="menu">/QUIT /QUI [custom-quit-message]</span><br />
-Quits current network. If [custom-quit-message] is not specified, the default set in Preferences will be used.</p></li>
+Keluar dari jaringan saat ini. Jika [custom-quit-message] tidak ditentukan, pengaturan default di Preferensi akan digunakan.</p>
+
+</li>
 
 <li><p><span class="menu">/RAW /QUOTE &lt;command|text&gt;</span><br />
-Sends a raw IRC command.</p></li>
+Mengirim perintah IRC mentah.</p></li>
 
 <li><p><span class="menu">/RECONNECT</span><br />
-Will reconnect you to the current network if the 47 automatic reconnection attempts have failed.</p></li>
+Akan menghubungkan kembali Anda ke jaringan saat ini jika 47 upaya koneksi ulang otomatis gagal.</p></li>
 
 <li><p><span class="menu">/SLEEP &lt;deciseconds&gt;</span><br />
-Causes current thread to sleep for the specified time ; for future scripting use.</p></li>
+Menyebabkan utas saat ini tidur untuk waktu yang ditentukan; untuk penggunaan skrip di masa depan.</p></li>
 
 <li><p><span class="menu">/SQUIT</span><br />
-IRC operator command to disconnect a server.</p></li>
+Perintah operator IRC untuk memutuskan koneksi server.</p></li>
 
 <li><p><span class="menu">/TIME &lt;nick&gt;</span><br />
-Returns local time of &lt;nick&gt;. Equivalent to <span class="menu">/CTCP &lt;nick&gt; TIME.</span></p></li>
+Mengembalikan waktu lokal  &lt;nick&gt;. Setara dengan <span class="menu">/CTCP &lt;nick&gt; TIME.</span></p>
+</li>
 
 <li><p><span class="menu">/TOPIC /T [channel]</span><br />
-Displays the topic of the current channel or, if provided, of &lt;channel&gt;.</p></li>
+Menampilkan topik saluran saat ini atau, jika disediakan, dari &lt;channel&gt;.</p>
+</li>
 
 <li><p><span class="menu">/TOPIC &lt;channel&gt; &lt;new-channel-topic&gt;</span><br />
 Sets the topic of &lt;channel&gt; to &lt;new-channel-topic&gt;.</p></li>

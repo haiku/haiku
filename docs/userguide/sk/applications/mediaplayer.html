@@ -25,7 +25,7 @@
 <body>
 
 <div id="banner">
-<div><span>Používateľská príručka</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -56,12 +56,13 @@
 <span>
  «  <a href="mail.html">Pošta</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Aplikácie</a> 
-::  <a href="midiplayer.html">Prehrávač MIDI</a>  »
+::  <a href="midiplayer.html">MidiPlayer</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h2><img src="../../images/apps-images/mediaplayer-icon_64.png" alt="mediaplayer-icon_64.png" width="64" height="64" />Prehrávač multimédií</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -70,7 +71,7 @@
 <tr><td>Nastavenia:</td><td></td><td><span class="path">~/config/settings/MediaPlayer</span></td></tr>
 </table>
 <p><br /></p>
-<p>Prehrávač multimédií je predvolený prehrávač všetkých audio a video súborov. Vďaka tomu, že na pozadí používa <a href="http://www.ffmpeg.org/">ffmpeg</a>, podporuje hromadu populárnych typov súborov. Jeho rozhranie a ovládanie je také, aké by ste čakali:</p>
+<p>MediaPlayer is the default player for all audio and video files. Thanks to its <a href="http://www.ffmpeg.org/">ffmpeg</a> backend, a plethora of widely used formats are supported. Its simple interface has all the controls you'd expect:</p>
 <img src="../images/apps-images/mediaplayer.png" alt="mediaplayer.png" />
 <p>Posuvník indikátora priebehu vám umožňuje rýchlo preskočiť na požadovanú pozíciu, držanie myši nad ním zobrazí aktuálny a zostávajúci čas klipu. Kliknutím na ukazovateľa času vpravo prepínate medzi dĺžkou, aktuálnym a zostávajúcim časom.<br />
 Pod tým nájdete obvyklé ovládacie prvky na preskočenie do ďalšej/predošlej stopy, prehrať/pozastaviť alebo zastaviť. Ďalej nasleduje ovládanie hlasitosti (kliknutím na reproduktor stlmíte zvuk) a VU meter. </p>
@@ -98,12 +99,14 @@ MyMovie.Français.srt</pre>
 <h2>Nastavenia</h2>
 <p>Existuje viacero nastavení na doladenie správania Prehrávača multimédií:</p>
 <img src="../images/apps-images/mediaplayer-settings.png" alt="mediaplayer-settings.png" />
-<p>Prvá skupina, <span class="menu">Režim prehrávania</span>, je ľahko pochopiteľná. Automaticky spustiť prehrávanie, zatvoriť okno po prehraní alebo prehrávať klip dokola.</p>
-<p>Nasledujú rôzne <span class="menu">Možnosti zobrazenia</span>.<br />
-Môžete <span class="menu">Použiť hardvérové vrstvy videa ak sú dostupné</span>, čo zníži záťaž na CPU, no funguje iba pre jedno okno a potrebuje ovládače video karty, ktoré to podporujú.<br />
-Môžete <span class="menu">Zmeniť veľkosť filmov hladko</span> (nie v režime vrstiev), čím sa využije veľmi rýchle filtrovanie na zahľadenie inak kockato vyzerajúcich pixlov pri zväčšenom videu alebo celoobrazovkovom režime.<br />Môžete
-<span class="menu">Prispôsobiť veľkosť ovládacích prvkov v celoobrazovkovom režime</span> ak preferujete väčšie ovládacie prvky, možno keď sledujete video v celoobrazovkovom režime z väčšej vzdialenosti.<br />
-Ďalej sú tu nastavenia <span class="menu">Veľkosť titulkov</span> a <span class="menu">Umiestnenie titulkov</span>. Tie môžu byť zobrazené na <span class="menu">Spodku videa</span>, čím budú video stále prekrývať. Alebo na <span class="menu">Spodku okna</span>, čím môžete meniť veľkosť videa zvisle a mať tak titulky v čiernom páse na spodku.</p>
+<p>The first batch, <span class="menu">Play mode</span>, is pretty self-explaining.<br />
+Start playback automatically, close windows when finished or play clips in a loop.<br />
+From the pop-up menu you choose MediaPlayer's launch behavior. Should it resume playing where it left off last time: <span class="menu">always</span>, <span class="menu">never</span>, or <span class="menu">ask every time</span>.</p>
+<p>Next are different <span class="menu">View options</span>.<br />
+You can opt to <span class="menu">Use hardware overlay if available</span>, which cuts down CPU usage but only works for one video window and needs a supporting video card driver.<br />
+You can <span class="menu">Scale movies smoothly</span> (when not in overlay mode) which uses very fast filtering to smooth over otherwise blocky pixels when zooming video or watching in full-screen mode.<br />
+<span class="menu">Scale controls in full-screen mode</span> if you prefer slightly bigger controls, maybe because you watch the screen from a bit farther away when in full-screen mode.<br />
+Then there are settings for <span class="menu">Subtitle size</span> and <span class="menu">Subtitle placement</span>. They can be shown at the <span class="menu">Bottom of video</span>, which will always have them overlayed over the picture. Or <span class="menu">Bottom of screen</span>, which allows you to resize the window vertically and have the subtitles appear in the black bar at the bottom instead.</p>
 <p>Posledné nastavenie určuje hlasitosť klipov, ktoré sa prehrávajú na pozadí. Môžete ich nechať revať na <span class="menu">Plnej hlasitosti</span>, menej mätúcej <span class="menu">Nízkej hlasitosti</span> alebo ich mať <span class="menu">Stlmené</span>.</p>
 
 <h2>Ovládanie klávesnicou</h2>
@@ -137,7 +140,7 @@ Môžete <span class="menu">Zmeniť veľkosť filmov hladko</span> (nie v režim
 <div class="inner"><span>
  «  <a href="mail.html">Pošta</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Aplikácie</a> 
-::  <a href="midiplayer.html">Prehrávač MIDI</a>  »
+::  <a href="midiplayer.html">MidiPlayer</a>  »
 </span></div>
 </div>
 

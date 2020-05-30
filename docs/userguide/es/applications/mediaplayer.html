@@ -25,7 +25,7 @@
 <body>
 
 <div id="banner">
-<div><span>Guía del usuario</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -62,6 +62,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h2><img src="../../images/apps-images/mediaplayer-icon_64.png" alt="mediaplayer-icon_64.png" width="64" height="64" />MediaPlayer</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -70,7 +71,7 @@
 <tr><td>Configuración:</td><td></td><td><span class="path">~/config/settings/MediaPlayer</span></td></tr>
 </table>
 <p><br /></p>
-<p>MediaPlayer es el reproductor predeterminado para todos los archivos de audio y video. Gracias a su backend de <a href="http://www.ffmpeg.org/">ffmpeg</a> soporta una gran cantidad de formatos ampliamente usados. Su interfaz sencilla tiene todos los controles que esperaría tener:</p>
+<p>MediaPlayer is the default player for all audio and video files. Thanks to its <a href="http://www.ffmpeg.org/">ffmpeg</a> backend, a plethora of widely used formats are supported. Its simple interface has all the controls you'd expect:</p>
 <img src="../images/apps-images/mediaplayer.png" alt="mediaplayer.png" />
 <p>El deslizador de la barra de progreso le permite saltar rapidamente a una posición, y si descansa el puntero sobre él, mostrará el tiempo actual y restante del clip. Si hace clic en la visualización a la derecha, alternando entre el tiempo total, el tiempo actual y el tiempo restante.<br />
 Debajo de eso encontrará los controles habituales para saltar a la pista anterior, reproducir/pausar, detener y saltar a la siguiente pista. Luego se muestra el control de volumen (si le da clic en el símbolo de parlante alterna el modo de silencio) y un medidor VU.</p>
@@ -98,12 +99,14 @@ MyMovie.Français.srt</pre>
 <h2>Configuración</h2>
 <p>Hay varias opciones para ajustar el comportamiento de MediaPlayer:</p>
 <img src="../images/apps-images/mediaplayer-settings.png" alt="mediaplayer-settings.png" />
-<p>El primer segmento, <span class="menu">Modo de Reproducción</span>, se explica sólo. Puede iniciar la reproducción automaticamente, cerrar las ventanas cuando termina de reproducir, o reproducir en ciclo.</p>
-<p>Luego estan las diferentes <span class="menu">Opciones de visualización</span>.<br />
-Puede optar por <span class="menu">Usar sobreposición por hardware si está disponible</span>, que reduce el uso del CPU pero sólo funciona para una ventana de video y necesita tener una tarjeta de video soportada.<br />
-Puede <span class="menu">Cambiar escala de videos suavemente</span> (cuando no está en modalidad sobrepuesta) que use filtrado rápido para suavizar sobre pixeles que de otra forma se verían granulados cuando se acerca el lvideo o cuando se ve en modalidad de pantalla completa.<br />
-Puede <span class="menu">Cambiar tamaño de los controles en mode de pantalla completa</span> si prefiere controles un poco más grandes, quizás para ver la pantalla desde un poco más lejos cuando está en pantalla completa.<br />
-Luego se encuentran los ajustes para el <span class="menu">Tamaño de subtítulos</span> y <span class="menu">Ubiciación de subtítulos</span>. Estos se pueden mostrar en la parte <span class="menu">Inferior del video</span>, lo que los tendrá siempre sobrepuestas a la imagen. O pueden estar en la parte <span class="menu">Inferior de la ventana</span>, que le permitiran cambiar el tamaño de la ventana verticalmente y los subtítulos apareceran en vez en la barra oscura de abajo.</p>
+<p>The first batch, <span class="menu">Play mode</span>, is pretty self-explaining.<br />
+Start playback automatically, close windows when finished or play clips in a loop.<br />
+From the pop-up menu you choose MediaPlayer's launch behavior. Should it resume playing where it left off last time: <span class="menu">always</span>, <span class="menu">never</span>, or <span class="menu">ask every time</span>.</p>
+<p>Next are different <span class="menu">View options</span>.<br />
+You can opt to <span class="menu">Use hardware overlay if available</span>, which cuts down CPU usage but only works for one video window and needs a supporting video card driver.<br />
+You can <span class="menu">Scale movies smoothly</span> (when not in overlay mode) which uses very fast filtering to smooth over otherwise blocky pixels when zooming video or watching in full-screen mode.<br />
+<span class="menu">Scale controls in full-screen mode</span> if you prefer slightly bigger controls, maybe because you watch the screen from a bit farther away when in full-screen mode.<br />
+Then there are settings for <span class="menu">Subtitle size</span> and <span class="menu">Subtitle placement</span>. They can be shown at the <span class="menu">Bottom of video</span>, which will always have them overlayed over the picture. Or <span class="menu">Bottom of screen</span>, which allows you to resize the window vertically and have the subtitles appear in the black bar at the bottom instead.</p>
 <p>El último ajuste determina el volumen de los clips cuyas ventanas no se muestran activas actualmente. Puede hacer que todas esten funcionando a <span class="menu">Volumen completo</span>, a un <span class="menu">Volumen bajo</span> menos confuso o en <span class="menu">Silencio</span>.</p>
 
 <h2>Controles de teclado</h2>

@@ -10,6 +10,8 @@
  * Authors:
  *		Maciej Bałuta  (Google Code-In student)
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		mazbrili abu ibrahim
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -22,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>Panduan pengguna</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -52,35 +54,34 @@
 </ul>
 <span>
  «  <a href="launchbox.html">LaunchBox</a> 
-::  <a href="../desktop-applets.html" class="uplink">Desktop Applets</a> 
+::  <a href="../desktop-applets.html" class="uplink">Desktop Applet</a> 
 ::  <a href="powerstatus.html">PowerStatus</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">Terjemahan halaman ini belum lengkap. Sampai saat itu, bagian yang belum selesai menggunakan aslinya bahasa Inggris.</div>
 
-<h2><img src="../../images/desktop-applets-images/networkstatus-icon_64.png" alt="networkstatus-icon_64.png" width="64" height="64" />NetworkStatus</h2>
+<h2><img src="../../images/desktop-applets-images/networkstatus-icon_64.png" alt="networkstatus-icon_64.png" width="64" height="64" />Status jaringan (NetworkStatus)</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Desktop Applets</span></td></tr>
 <tr><td>Lokasi:</td><td></td><td><span class="path">/boot/system/apps/NetworkStatus</span></td></tr>
 <tr><td>Pengaturan:</td><td></td><td><i>tiada</i></td></tr>
 </table>
-<p>NetworkStatus shows the status of your network connections. If not yet running, launching the applet will ask if it should open in window mode or live in the Deskbar. In window mode you're able to resize the icon by resizing the window and use the <a href="../gui.html#replicants">Replicant</a> handle to drag it to the Desktop.<br />
-Wherever installed, it's operated via a right-click context menu.</p>
+<p>NetworkStatus menunjukkan status koneksi jaringan Anda. Jika belum berjalan, meluncurkan applet akan menanyakan apakah itu harus dibuka dalam mode jendela atau langsung di Deskbar. Dalam mode jendela Anda dapat mengubah ukuran ikon dengan mengubah ukuran jendela dan menggunakan pegangan <a href="../gui.html#replicants">Replicant</a> untuk menyeretnya ke Desktop.<br />
+Di mana pun diinstal, itu dioperasikan melalui menu konteks klik kanan.</p>
 <p><img src="../images/networkstatus-images/applet.png" alt="NetworkStatus applet" /><br />
-The first section contains all network devices' names and their state. Clicking on such an entry brings up a window showing its IP, broadcast and netmask address.<br />
-Below is a list of all wireless networks found by the first wireless adapter and an indicator of their signal strength. Have a look at the <a href="..\workshop-wlan.html">Workshop: Wireless networking</a> for more information on how to set up a connection.<br />
-Lastly, you can <span class="menu">Open network preferences...</span> to change your <a href="../preferences/network.html">network configuration</a> or <span class="menu">Quit</span> the applet.</p>
+Bagian pertama berisi nama semua perangkat jaringan dan statusnya. Mengklik entri seperti itu memunculkan jendela yang menampilkan IP, broadcast, dan alamat netmask-nya.<br />
+Di bawah ini adalah daftar semua jaringan nirkabel yang ditemukan oleh adaptor nirkabel pertama dan indikator kekuatan sinyalnya. Lihat <a href="..\workshop-wlan.html">Workshop: Jaringan nirkabel</a> untuk informasi lebih lanjut tentang cara mengatur koneksi.
+Terakhir, Anda dapat Buka <span class="menu">preferensi jaringan ...</span>  untuk mengubah <a href="../preferences/network.html">konfigurasi jaringan</a> Anda atau <span class="menu">Keluar </span> the applet.</p>
 
-<h2>Status icons</h2>
+<h2>Status ikon</h2>
 <table summary="status icons" border="0" cellspacing="0" cellpadding="2">
-	<tr><td><img src="../images/networkstatus-images/icon-ready.png" /></td><td style="width:15px;"></td><td>Ready</td><td>Link is established.</td></tr>
-	<tr><td><img src="../images/networkstatus-images/icon-connecting.png" /></td><td></td><td>Configuring</td><td>Connecting in progress.</td></tr>
-	<tr><td><img src="../images/networkstatus-images/icon-nosettings.png" /></td><td></td><td>No stateful configuration</td><td>Some settings are missing (check <a href="../preferences/network.html">IP configuration</a>).</td></tr>
-	<tr><td><img src="../images/networkstatus-images/icon-noconnection.png" /></td><td></td><td>No link</td><td>There is no physical connection (probably the network cable is not connected and wireless networks are unavailable).</td></tr>
-	<tr><td><img src="../images/networkstatus-images/icon-nodevices.png" /></td><td></td><td>-</td><td>There are no network adapters available (if you are sure that at least one is connected, there are probably no drivers yet).</td></tr>
+	<tr><td><img src="../images/networkstatus-images/icon-ready.png" /></td><td style="width:15px;"></td><td>Siap</td><td>Hubungan terjadi</td></tr>
+	<tr><td><img src="../images/networkstatus-images/icon-connecting.png" /></td><td></td><td>Mengkonfigurasi</td><td>Sedang proses koneksi</td></tr>
+	<tr><td><img src="../images/networkstatus-images/icon-nosettings.png" /></td><td></td><td>Tidak ada konfigurasi stateful</td><td>beberapa pengaturan kurang (check <a href="../preferences/network.html">IP configuration</a>).</td></tr>
+	<tr><td><img src="../images/networkstatus-images/icon-noconnection.png" /></td><td></td><td>tiada jaringan</td><td>Tidak ada koneksi fisik (mungkin kabel jaringan tidak terhubung dan jaringan nirkabel tidak tersedia).</td></tr>
+	<tr><td><img src="../images/networkstatus-images/icon-nodevices.png" /></td><td></td><td>-</td><td>Tidak ada adapter jaringan yang tersedia (jika Anda yakin bahwa setidaknya satu terhubung, mungkin belum ada driver).</td></tr>
 </table>
 
 </div>
@@ -89,7 +90,7 @@ Lastly, you can <span class="menu">Open network preferences...</span> to change 
 <div class="nav">
 <div class="inner"><span>
  «  <a href="launchbox.html">LaunchBox</a> 
-::  <a href="../desktop-applets.html" class="uplink">Desktop Applets</a> 
+::  <a href="../desktop-applets.html" class="uplink">Desktop Applet</a> 
 ::  <a href="powerstatus.html">PowerStatus</a>  »
 </span></div>
 </div>

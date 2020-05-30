@@ -12,6 +12,7 @@
  * Translators:
  *		Barrett
  *		Humdinger
+ *		Gabriele
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -61,7 +62,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">La traduzione di questa pagina non è stata completata. Per questo motivo le parti non tradotte sono visibili in inglese.</div>
 
 <h1>La bash e lo "scripting"</h1>
 
@@ -71,8 +71,7 @@ Gli script possono variare dalla semplice esecuzione di alcuni comandi in un pre
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="bash" name="bash">La bash</a></h2>
-<p>Since scripts rely naturally a lot on the shell they are interpreted by, you should first familiarize yourself with the BASH that's used by Haiku. There are many resources online as it's a widely used shell. One nice document is Johan Jansson's <a href="https://web.archive.org/web/20011205095723/http://www.beforever.com/bashtut.htm" class="printurl">Introduction to bash - a tutorial for bash under BeOS</a>.<br />
-The <a href="https://www.gnu.org/software/bash/manual/bash.pdf" class="printurl">Bash Reference Manual (PDF, 720 KiB)</a> is a nice resource to get into the details.</p>
+<p>Dal momento che gli script si basano molto sulla shell che li interpreta, bisogna prima familiarizzare con la BASH, la shell usata da Haiku. Ci sono molte risorse online dal momento che si tratta di una delle shell più comuni. Un buon documento è <a href="https://web.archive.org/web/20011205095723/http://www.beforever.com/bashtut.htm" class="printurl">Introduction to bash - a tutorial for bash under BeOS</a> di Johan Jansson. Il <a href="https://www.gnu.org/software/bash/manual/bash.pdf" class="printurl">Manuale di riferimento di Bash (PDF, 720 KiB)</a>è un'ottima fonte di approfondimento. Entrambi i documenti sono in lingua inglese.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -81,8 +80,7 @@ The <a href="https://www.gnu.org/software/bash/manual/bash.pdf" class="printurl"
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a><a id="user-scripts" name="user-scripts">Gli script in Haiku</a></h2>
-<p>Haiku used to have scripts for booting and shutting down. Today it uses the <a href="https://dev.haiku-os.org/wiki/LaunchDaemon">launch_daemon</a> instead. However, the user can still augment this process with certain user scripts.
-If they don't exist already, you'll have to create the needed files yourself. Otherwise simply add your commands where in the process you want them to be executed.</p>
+<p>Haiku in passato ha utilizzato script per le sue procedure di avvio e di arresto. Oggi, invece, questo compito è assolto dal <a href="https://dev.haiku-os.org/wiki/LaunchDaemon">launch_daemon</a>. In ogni caso, l'utente può comunque arricchire questo processo attraverso l'uso di alcuni script. Se non esistono già, puoi creare tu stesso questi file. In caso contrario, aggiungi semplicemente i comendi nel punto dle processo in cui vuoi che questi vengano eseguiti.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -95,15 +93,15 @@ If they don't exist already, you'll have to create the needed files yourself. Ot
 /boot/system/apps/Workspaces &amp;</pre>
 <p>Si consiglia di terminare i comandi con il carattere "<tt>&amp;</tt>" in modo da avviarli in background, altrimenti lo script si fermerà soltanto quando il comando avrà terminato la sua esecuzione (in questo caso: fin quando l'applicazione non viene chiusa).</p>
 
-<p>Per lanciare le applicazioni all'avvio esiste una semplice alternativa a quella presentata all'inizio del paragrafo, consiste nel creare dei collegamenti alla cartella <span class="path">/boot/home/config/settings/boot/launch</span>. E' sufficiente cliccare con il tasto destro sull'applicazione che si desidera avviare automaticamente, andando su <span class="menu">Crea Link</span> e  <a href="tracker.html#navigating">navigando</a> fino alla cartella indicata.</p>
+<p>Per lanciare le applicazioni all'avvio esiste una semplice alternativa a quella presentata all'inizio del paragrafo; consiste nel creare dei collegamenti alla cartella <span class="path">/boot/home/config/settings/boot/launch</span>. È sufficiente cliccare con il tasto destro sull'applicazione che si desidera avviare automaticamente, andando su <span class="menu">Crea collegamento</span> e <a href="tracker.html#navigating">navigando</a> fino alla cartella indicata.</p>
 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="usershutdownscript" name="usershutdownscript">The UserShutdownScript - <i>not yet working</i></a></h3>
+<a id="usershutdownscript" name="usershutdownscript">L'UserShutdownScript - <i>non ancora implementato</i></a></h3>
 <p><span class="path">/boot/home/config/settings/boot/UserShutdownScript</span> verrà eseguito come primo passo nel processo di spegnimento. Se lo script ritorna uno stato diverso da 0, lo spegnimento viene arrestato.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="usershutdownfinishscript" name="usershutdownfinishscript">The UserShutdownFinishScript - <i>not yet working</i></a></h3>
+<a id="usershutdownfinishscript" name="usershutdownfinishscript">L'UserShutdownFinishScript - <i>non ancora implementato</i></a></h3>
 <p><span class="path">/boot/home/config/settings/boot/UserShutdownFinishScript</span> verrà eseguito come ultimo passo nel processo di spegnimento. Si noti che la maggior parte del sistema sarà già stato terminato al momento dell'esecuzione di questo script.</p>
 
 </div>

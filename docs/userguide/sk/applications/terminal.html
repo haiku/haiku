@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2014, Haiku. All rights reserved.
+ * Copyright 2008-2020, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -25,7 +25,7 @@
 <body>
 
 <div id="banner">
-<div><span>Používateľská príručka</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -56,13 +56,13 @@
 <span>
  «  <a href="stylededit.html">StyledEdit</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Aplikácie</a> 
-::  <a href="textsearch.html">Hľadanie textu</a>  »
+::  <a href="textsearch.html">TextSearch</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">Preklad tejto stránky zatiaľ nie je dokončený. Dovtedy sa nedokončené časti zobrazia v anglickom origináli.</div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h2><img src="../../images/apps-images/terminal-icon_64.png" alt="terminal-icon_64.png" width="64" height="64" />Terminál</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -83,9 +83,9 @@
 buť každý vo vlastnom okne jednoduchým spustením viacerých Terminálov alebo stlačením <span class="key">ALT</span> <span class="key">N</span> z už bežiaceho Terminálu. Alebo použite zobrazenie v kartách a otvorte viacero kariet pomocou <span class="key">ALT</span> <span class="key">T</span>.</p>
 <img src="../images/apps-images/terminal.png" alt="terminal.png" />
 <br />
-<p>Dvojitým kliknutím na prázdne miesto na panel; kartu otvoríte novú kartu; dvojitým kliknutím na kartu otvoríte dialóg na premenovanie názvu. Je tam niekoľko premenných začínajúcich znakom %, ktoré sú vysvetlené bublinovým popiskom, keď podržíte kurzor myši nad textovým poľom.<br />
-Predvolene. <tt>%1d: %p</tt>, karta zobrazuje aktuálny priečinok, oddelený znakom <tt>:</tt>, názov aktuálne bežiaceho procesu (alebo <tt>--</tt> ak beží iba bash, pravdepodobne čakajúci na príkaz). Snímka hore ukazuje prvú karty s reláciou FTP v priečinku <span class="path">Plocha</span> a druhú záložka čakajúcu na príkaz v priečinku <span class="path">home</span>.<br />
-Cez <span class="menu">Upraviť | Titulok okna...</span> je možné upravovať titulok okna terminálu podobným spôsobom.</p>
+<p>Double-clicking into the emtpy part of the tab bar opens a new tab; onto a tab opens a dialog to rename its title. There are several %-designated variables that are explained with a tooltip when you hover the mouse over the text field.<br />
+By default, <tt>%1d: %p</tt>, a tab shows the current directory and, separated by a <tt>:</tt>, the name of the currently running process (or <tt>--</tt> if it's just bash running, probably idling). The screenshot above shows the first tab with a FTP session in the <span class="path">Desktop</span> folder and a second tab idling at <span class="path">home</span>.<br />
+Via <span class="menu">Settings | Window title...</span> the Terminal window's title can be edited in a similar way.</p>
 <p>Kliknutie pravým tlačidlom na kartu zobrazí kontextové menu  <span class="menu">Zatvoriť okno</span>, <span class="menu">Zatvoriť ostatné karty</span> alebo ako dvojité kliknutie, <span class="menu">Upraviť titulok karty...</span>.</p>
 <p>Môžete zmeniť veľkosť okna Terminálu ako každého iného okna alebo použiť predvoľby z ponuky <span class="menu">Nastavenia | Veľkosť okna</span>. <span class="key">ALT</span> <span class="key">ENTER</span> prepne do celoobrazovkového režimu.</p>
 <p>Všetky nastavenia, ktoré meníte priamo prostredníctvom menu <span class="menu">Nastavenia</span>, napr. <span class="menu">Názov okna</span>, <span class="menu">Veľkosť okna</span>, <span class="menu">Kódovanie textu</span> alebo <span class="menu">Veľkosť písma</span>, sa zachovajú iba v rámi aktuálnej relácie. Ak chcete, aby tieto zmeny zostali aktívne permanentne, musíte ich použiť v paneli <span class="menu">Nastavenia...</span>.</p>
@@ -124,12 +124,12 @@ Oba súbory môžu byť vytvorené v priečinku <span class="path">/boot/home/co
 <p><span class="cli">profile</span> sa načíta pri každom otvorení nového Terminálu. Nastavuje to všetky druhy aliasov a premenných, ktoré ovplyvňujú správanie bashu a jeho výzor. Nájdete veľa online zdrojov, ktoré vám priblížia všetky možnosti.</p>
 <p>Haiku/BeOS Tip Server má pomerne málo tipov, ako začať, napríklad:</p>
 <ul>
-<li><a href="http://betips.net/1997/09/09/customize-your-terminal-prompt/">Prispôsobte si príkazový riadok Terminálu</a></li>
-<li><a href="http://betips.net/1997/09/09/more-prompt-customizations/">Ďalšie prispôsobenia príkazového riadku</a></li>
-<li><a href="http://betips.net/1997/09/09/enhancing-bash/">Rozširovanie bashu</a></li>
-<li><a href="http://betips.net/1997/09/09/custom-keyboard-shortcuts/">Vlastné klávesové skratky</a></li>
+<li><a href="https://betips.net/?p=5">Customize your Terminal prompt</a></li>
+<li><a href="https://betips.net/?p=66">More prompt customizations</a></li>
+<li><a href="https://betips.net/?p=67">Enhancing bash</a></li>
+<li><a href="https://betips.net/?p=105">Custom keyboard shortcuts</a></li>
 </ul>
-<p>Je toho viac, <a href="http://betips.net/index.php?s=.profile">pozrite sa</a>.</p>
+<p>There are more, <a href="https://betips.net/?s=profile">have a look</a>.</p>
 
 <h3>inputrc</h3>
 <p><span class="cli">inputrc</span> sa zaoberá klávesovými skratkami. Vzhľadom k tomu, že Haiku poskytuje užitočné prednastavenia, pravdepodobne s tým nič viac nemusíte robiť. Ak máte zvláštne potreby tu vám poradí s jeden z mnohých online zdrojov, napr <a href="http://tiswww.case.edu/php/chet/readline/rluserman.html">The GNU Readline Knižnica</a>.</p>
@@ -157,7 +157,7 @@ Oba súbory môžu byť vytvorené v priečinku <span class="path">/boot/home/co
 <div class="inner"><span>
  «  <a href="stylededit.html">StyledEdit</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Aplikácie</a> 
-::  <a href="textsearch.html">Hľadanie textu</a>  »
+::  <a href="textsearch.html">TextSearch</a>  »
 </span></div>
 </div>
 

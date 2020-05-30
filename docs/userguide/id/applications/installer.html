@@ -16,14 +16,14 @@
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Installer (penginstall)</title>
+	<title>Installer</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>Panduan pengguna</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -60,11 +60,10 @@
 
 <div id="content">
 <div>
-<div class="box-info">Terjemahan halaman ini belum lengkap. Sampai saat itu, bagian yang belum selesai menggunakan aslinya bahasa Inggris.</div>
 
-<h2><img src="../../images/apps-images/installer-icon_64.png" alt="installer-icon_64.png" width="64" height="64" />Installer</h2>
+<h2><img src="../../images/apps-images/installer-icon_64.png" alt="installer-icon_64.png" width="64" height="64" />Penginstall (Installer)</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Aplikasi</span></td></tr>
 <tr><td>Lokasi:</td><td></td><td><span class="path">/boot/system/apps/Installer</span></td></tr>
 <tr><td>Pengaturan:</td><td></td><td><i>tiada</i></td></tr>
 </table>
@@ -73,22 +72,24 @@
 <ul>
 <li><p>Ini adalah perangkat halus berkualitas beta. Buat cadangan atau menderita konsekuensinya!</p></li>
 <li><p>Penginstall memerlukan partisi yang disiapkan. Anda dapat menggunakan <a href="drivesetup.html">DriveSetup</a>  untuk membuat dan memformat partisi, tetapi belum dapat mengubah ukuran partisi yang ada. Untuk itu, Anda harus menggunakan  <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> atau alat serupa untuk saat ini.</p></li>
-<li>Haiku can be added manually to the bootmanager <a href="http://www.gnu.org/software/grub/manual/grub.html">GRUB</a>. How that is done exactly is available as an <a href="http://www.haiku-os.org/get-haiku/installation-guide">online guide</a>.</li>
+<li>Haiku dapat ditambahkan secara manual ke <a href="http://www.gnu.org/software/grub/manual/grub.html">GRUB</a> bootmanager. Cara yang dilakukan persis tersedia sebagai  <a href="http://www.haiku-os.org/get-haiku/installation-guide">panduan online</a>.</li>
 </ul>
 <p><br /><br /></p>
-<p>Once you acknowledged with <span class="button">Continue</span>, you're presented with the main window:</p>
+<p>Setelah Anda mengakui dengan  <span class="button">Lanjutkan</span>, Anda akan diberikan jendela utama:
+
+</p>
 <img src="../images/apps-images/installer.png" alt="installer.png" />
-<p>In the first pop-up menu you choose the source for the installation. It can be a currently installed Haiku or can come from an install CD or USB drive, etc.<br />
-The second pop-up menu specifies the target for the installation. This target partition/volume will be completely overwritten and has to be set aside beforehand by a partitioning tool like GParted.</p>
-<p>Clicking the little expander widget will <i>Show optional packages</i>, if available, that you can choose to install in addition to the basic Haiku.</p>
-<p>You should do a last check if you really picked the right target before starting the installation process. Click on <span class="button">Setup partitions...</span> to open <a href="drivesetup.html">DriveSetup</a> and have a look at the naming and layout of the available volumes and partitions.</p>
-<p><span class="button">Begin</span> starts the installation procedure, which basically copies the <span class="path">/home/</span> and <span class="path">/system/</span> folder onto the target volume and makes it bootable.</p>
+<p>Pada menu pop-up pertama Anda memilih sumber untuk instalasi. Ini bisa menjadi Haiku yang saat ini diinstal atau dapat berasal dari CD instal atau drive USB, dll.<br />
+Menu pop-up kedua menentukan target untuk instalasi. Partisi / volume target ini akan sepenuhnya ditimpa dan harus disisihkan sebelumnya oleh alat partisi seperti GParted.</p>
+<p>Mengklik widget expander kecil akan <i>Tampilkan paket opsional</i>,jika tersedia, yang dapat Anda pilih untuk diinstal sebagai tambahan untuk Haiku dasar. </p>
+<p>Anda harus melakukan pemeriksaan terakhir jika Anda benar-benar memilih target yang tepat sebelum memulai proses instalasi.  Klik pada <span class="button">Setup partisi...</span> to open <a href="drivesetup.html">DriveSetup</a> dan lihatlah penamaan dan tata letak volume dan partisi yang tersedia.</p>
+<p><span class="button">Mulai</span> memulai prosedur instalasi, yang pada dasarnya menyalin folder <span class="path">/home/</span> dan <span class="path">/system/</span> volume target dan membuatnya dapat di-boot.</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="tools" name="tools">Tools</a></h2>
-<p>At the end of the installation procedure, the partition is automatically made bootable. However, it can happen that some other operating system or partitioning tool (accidentally) overwrites the boot sector of your Haiku volume. In this case, boot your installation CD and start the Installer. Select your Haiku boot partition from the <span class="menu">Onto: Please choose target</span> menu and select <span class="menu">Write boot sector</span> from the <span class="menu">Tools</span> menu to make it bootable again.</p>
-<p>The other item in the <span class="menu">Tools</span> menu is used to <span class="menu">Set up a boot menu</span> that puts a menu in the boot sector to choose what operating system to boot. See topic <a href="bootmanager.html">BootManager</a> for more information.<br />
- You don't need to run the <span class="app">BootManager</span> if you already use a bootmanager like GRUB, in which case you have to add Haiku manually (see above), or Haiku runs exclusively on your machine.</p>
+<a id="tools" name="tools">Perkakas</a></h2>
+<p>Pada akhir prosedur instalasi, partisi secara otomatis dibuat dapat di-boot. Namun, dapat terjadi bahwa beberapa sistem operasi atau alat pemartisi lain (tanpa sengaja) menimpa sektor boot volume Haiku Anda. Dalam hal ini, boot CD instalasi Anda dan mulai Installer. Pilih partisi boot Haiku Anda dari <span class="menu">ke: Silakan pilih target </span> menu and select <span class="menu">Write boot sector</span> dari menu <span class="menu">perkakas</span> menu untuk membuatnya bisa boot lagi.</p>
+<p>Item lain di menu <span class="menu">Tools</span> digunakan untuk <span class="menu">mengatur menu boot</span>yang menempatkan menu di sektor boot untuk memilih sistem operasi apa yang akan di-boot. Lihat topik <a href="bootmanager.html">BootManager</a> funtuk informasi lebih lanjut.<br />
+ Anda tidak perlu menjalankan <span class="app">BootManager</span>jika Anda sudah menggunakan bootmanager seperti GRUB, dalam hal ini Anda harus menambahkan Haiku secara manual (lihat di atas), atau Haiku berjalan secara eksklusif di mesin Anda.</p>
 
 
 </div>

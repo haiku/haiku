@@ -23,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>ユーザーガイド</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -53,14 +53,14 @@
 </ul>
 <span>
  «  <a href="queries.html">クエリ</a> 
-::  <a href="contents.html" class="uplink">目次</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
 ::  <a href="applications.html">アプリケーション</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">このページの翻訳はまだ完全ではありません。完成するまでは、未完成の部分はオリジナルの英文を使用します。</div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 
 <table class="index" id="index" summary="index">
@@ -162,18 +162,17 @@
     </ul></li>
 </ul>
 <ul>
-<li><i>Visible</i> - This checkbox determines if the attribute is visible in a Tracker window at all. Since the Tracker will be the interface to our DVD database, we check it and define its appearance with:
-<ul>
-    <li><span class="menu">Display as</span> - Leave on "Default" if the values are to be displayed according to the attribute's "Type" (e.g. string/integer/float etc.). The other options are:
+<li><i>表示する (Visible)</i> - このチェックボックスは、Tracker ウィンドウで属性が表示できるかどうか決定します。Tracker が DVD データベースのインターフェースになるので、これをチェックし、以下の項目で外観を定義します。<ul>
+    <li><span class="menu">表示形式 (Display as)</span> - 属性の "型" (例. string/integer/float など) に応じて表示するなら、"Default" のままにしてください。ほかのオプションは以下のとおりです:
 	<ul>
-		<li><span class="menu">Checkbox</span> - Can be used to show either one of two symbols, see <span class="menu">Special</span> below.</li>
-		<li><span class="menu">Duration</span> - Shows an integer as 1/60, e.g. "90" becomes "1:30".</li>
-		<li><span class="menu">Rating</span> - Shows a rating between 0 and 10 as star symbols.</li>
+		<li><span class="menu">チェックボックス (Checkbox)</span> - 2 つのシンボルのうちどちらかを選ぶ際に使えます。以下の<span class="menu">スペシャル</span>を見てください。</li>
+		<li><span class="menu">経過時間 (Duration)</span> - 整数を 1/60 として表示します。例. "90" は "1:30" と表示されます。</li>
+		<li><span class="menu">評価 (Rating)</span> - 0 から 10 までの星の数で評価を表示します。</li>
 	</ul></li>
-    <li><span class="menu">Editable</span> - Determines if the attribute shall be editable in Tracker.</li>
-    <li><span class="menu">Special</span> - Defines the two symbols used for a checkbox display. For example, "xo" will show a "x" for all values &gt;0 and "o" for 0.</li>
-    <li><span class="menu">Width</span> - The default width of that attributes column in a Tracker window.</li>
-    <li><span class="menu">Alignment</span> - The attribute can be displayed left, center, or right aligned.</li>
+    <li><span class="menu">編集可能 (Editable)</span> - Tracker 上で属性が編集できるかどうか決定します。</li>
+    <li><span class="menu">スペシャル (Special)</span> - チェックボックス表示用に 2 つのシンボルを定義します。たとえば、"xo" は、0 より大きい数に対して "x" を、0 に対して "o" を表示します。</li>
+    <li><span class="menu">幅 (Width)</span> - Tracker ウィンドウの属性行のデフォルト幅。</li>
+    <li><span class="menu">配置 (Alignment)</span> - 属性は左寄せ、中央寄せ、または右寄せで表示できます。</li>
 </ul></li></ul>
 <p>では、属性の情報をすべて挿入しましょう。</p>
 <table summary="DVDdb Attributes" cellpadding="10" border="1">
@@ -224,7 +223,7 @@ mkindex -t int DVDdb:rating</pre>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="query-db" name="query-db">データベースにクエリを行う</a></h2>
 <p>数時間の単調な仕事の後、クエリによって、すべての Christina Ricci 映画で 7+ の点数があるものを見つけられる小さくすてきなデータベースがあります… :)</p>
-<p>特定のファイルタイプのクエリ結果にふさわしい属性レイアウトを割り当てることができます。<br />
+<p>特定のファイルタイプのクエリ結果にふさわしい属性レイアウトを割り当てられます。<br />
 DVDdb ファイルを含んでいるフォルダーを開き、クエリ結果をどのように示したいかに従い、属性を整えます。このレイアウトを、<span class="menu">属性 | レイアウトをコピー (Attributes | Copy layout)</span> でコピーします。</p>
 <p><span class="path">/boot/home/config/settings/Tracker/DefaultQueryTemplates</span> を開いて、新規フォルダーを作成し、それを <i>group/filetype</i> にリネームします。ここで、/ はアンダースコアに置き換えます。今回の例では、"applications_DVDdb" となります。</p>
 <p>新規フォルダーを開いて、<span class="menu">属性 | レイアウトを貼り付ける (Attributes | Paste layout) </span> で、レイアウトをウィンドウにペーストします。以下が結果です!</p>
@@ -236,7 +235,7 @@ DVDdb ファイルを含んでいるフォルダーを開き、クエリ結果�
 <div class="nav">
 <div class="inner"><span>
  «  <a href="queries.html">クエリ</a> 
-::  <a href="contents.html" class="uplink">目次</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
 ::  <a href="applications.html">アプリケーション</a>  »
 </span></div>
 </div>

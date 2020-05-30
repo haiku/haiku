@@ -10,7 +10,7 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
- *		Emrys
+ *		Emrys Lokadottir
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -23,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>Ghid de utilizare</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -54,93 +54,92 @@
 <span>
     <!-- «  <a href="installation.html">Installing Haiku</a> 
 ::  -->
-    <a href="contents.html" class="uplink">Conținut</a> 
+    <a href="contents.html" class="uplink">Contents</a> 
 ::  <a href="filesystem-layout.html">Filesystem layout</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">Traducerea acestei pagini nu este completă încă. Până când va fi, părțile incomplete utilizează originalul în limba engleză.</div>
 
 <h1>Boot Loader</h1>
 
-<p>Haiku's Boot Loader Options can help when you experience hardware related problems or want to choose which Haiku installation to start, if you have more than one (maybe on an installation CD or USB stick). It's also handy if you have installed a software component that acts up and prevents you from booting Haiku, see <a href="#troubleshooting">Troubleshooting</a> below.</p>
-<p>To enter the Boot Loader Options, you have to press and keep holding the <span class="key">SHIFT</span> key before the beginning of Haiku's boot process. If there's a boot manager installed, you can start holding <span class="key">SHIFT</span> before invoking the boot entry for Haiku. If Haiku is the only operating system on the machine, you can begin holding the key while still seeing boot messages from the BIOS.</p>
-<div class="box-info">On computers that use UEFI for booting instead of the classic BIOS, you need to use the <span class="key">SPACEBAR</span> instead.</div>
+<p>Opțiunile de Boot Loader Haiku pot să vă ajute când experimentați probleme de hardware sau doriți să alegeți care instalare de Haiku să porniți, dacă aveți mai mult decât una (poate pe un CD de instalare sau un stick USB). Este de asemenea util dacă ați instalat o componentă software care nu se comportă cum trebuie și vă blochează de a porni Haiku, vedeți <a href="#troubleshooting">Depanare</a> mai jos.</p>
+<p>Pentru a intra în opțiunile Boot Loader, va trebui să apăsați și să mențineți apăsată tasta <span class="key">SHIFT</span> înaintea începerii procesului de pornire a Haiku. Dacă este un manager de boot instalat, puteți să începeți prin apăsarea a <span class="key">SHIFT</span> înainte invocării intrării de boot pentru Haiku. Dacă Haiku este singurul sistem de operare pe mașină, puteți începe să țineți apăsată tasta în timp ce încă vedeți mesajele de boot de la BIOS.</p>
+<div class="box-info">Pe calculatoare care utilizează UEFI pentru pornire în loc de clasicul BIOS, va trebui să utilizați în schimb <span class="key">SPACEBAR</span>.</div>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="options" name="options">Opțiuni Boot Loader</a></h2>
 <p>Odată ce a apărut, vă sunt oferite patru meniuri:</p>
 <table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
-<tr><td><b>Selectează volum de boot</b></td><td> </td><td>Choose which Haiku installation/state to start (see <a href="#troubleshooting">Troubleshooting</a> below).</td></tr>
-<tr><td><b>Selectează opțiuni safe mode</b></td><td> </td><td>There are several options to try in case of hardware related trouble or if the system becomes unstable or unbootable because of a misbehaving add-on. When moving the selection bar to an option, a short explanation appears at the bottom of the screen.</td></tr>
+<tr><td><b>Selectează volum de boot</b></td><td> </td><td>Alegeți care instalare/stare Haiku să pornească (vedeți <a href="#troubleshooting">Depanare</a> mai jos).</td></tr>
+<tr><td><b>Selectează opțiuni safe mode</b></td><td> </td><td>Există mai multe opțiuni de încercat în cazul de probleme de hardware sau dacă sistemul devine instabil sau nebootabil din cauza unui add-on care nu se comportă cum trebuie. Când mutați bara de selecție către o opțiune, o explicație scurtă apare în josul ecranului.</td></tr>
 <tr><td></td><td></td><td>
-	<p><span class="menu">Safe mode</span><br />
-		Puts the system into safe mode. This can be enabled independently from the other options.</p>
-	<p><span class="menu">Disable user add-ons</span><br />
-		Prevents all user installed add-ons from being loaded. Only the add-ons in the system directory will be used. See <a href="#troubleshooting">Troubleshooting</a> below.</p>
-	<p><span class="menu">Disable IDE DMA</span><br />
-		Disables IDE DMA, increasing IDE compatibility at the expense of performance.</p>
-	<p><span class="menu">Ignore memory beyond 4 GiB</span><br />
-		Ignores all memory beyond the 4 GiB address limit, overriding the setting in the kernel settings file.
+	<p><span class="menu">Mod sigur</span><br />
+		Pune sistemul în modul sigur. Aceasta poate fi activată independent de alte opțiuni.</p>
+	<p><span class="menu">Dezactivează add-onuri utilizator</span><br />
+		Previne toate add-onurile instalate de utilizator să fie încărcate. Doar add-onurile din directorul de sistem for fi utilizate. Vedeți <a href="#troubleshooting">Depanare</a> mai jos.</p>
+	<p><span class="menu">Dezactivează IDE DMA</span><br />
+		Dezactivează IDE DMA, crescând compatibilitatea IDE în detrimentul performanței.</p>
+	<p><span class="menu">Ignoră memoria peste 4 GiB</span><br />
+		Ignoră toată memoria peste limita de adresă de 4 GiB, suprascriind configurarea în fișierul de configurări kernel.
 </p>
-	<p><span class="menu">Use fail-safe graphics driver</span><br />
-		The system will use VESA mode and won't try to use any video graphics drivers.</p>
-	<p><span class="menu">Disable IO-APIC</span><br />
-		Disables using the IO APIC for interrupt routing, forcing the use of the legacy PIC instead.</p>
-	<p><span class="menu">Disable local APIC</span><br />
-		Disables using the local APIC, also disables SMP.</p>
-	<p><span class="menu">Disable X2APIC</span><br />
-		Disables second generation APIC.</p>
-	<p><span class="menu">Disable SMEP and SMAP</span><br />
-		Disables SMEP/SMAP security features of the CPU.</p>
-	<p><span class="menu">Disable SMP</span><br />
-		Disables all but one CPU core.</p>
-	<p><span class="menu">Don't call the BIOS</span><br />
-		Stops the system from calling BIOS functions.</p>
-	<p><span class="menu">Disable APM</span><br />
-		Disables Advanced Power Management hardware support, overriding the APM setting in the kernel settings file.</p>
-	<p><span class="menu">Disable ACPI</span><br />
-		Disables Advanced Configuration and Power Interface hardware support, overriding the ACPI setting in the kernel settings file.</p>
-	<p><span class="menu">Blacklist entries</span><br />
-		Allows to select system files that shall be ignored. Useful e.g. to disable drivers temporarily. See <a href="#troubleshooting">Troubleshooting</a> below.</p></td></tr>
-<tr><td><b>Selectează opțiuni depanare</b></td><td> </td><td>Here you'll find several options that help with debugging or getting details for a <a href="../../welcome/en/bugreports.html">bug report</a>. Again, a short explanation for each option is displayed at the bottom.</td></tr>
+	<p><span class="menu">Utilizează driverul de grafice care eșuează în siguranță</span><br />
+		Sistemul va utiliza modul VESA și nu va încerca să utilizeze oricare drivere de grafice video.</p>
+	<p><span class="menu">Dezactivează IO-APIC</span><br />
+		Dezactivează utilizarea a IO APIC pentru rutarea de întrerupere, forțând utilizatorul să utilizeze în schimb PIC moștenit.</p>
+	<p><span class="menu">Dezactivează APIC local</span><br />
+		Dezactivează utilizând APIC-ul local, dezactivează de asemenea SMP.</p>
+	<p><span class="menu">Dezactivează X2APIC</span><br />
+		Dezactivează a doua generație de APIC.</p>
+	<p><span class="menu">Dezactivează SMEP și SMAP</span><br />
+		Dezactivează funcționalitățile de securitate SMEP/SMAP ale CPU-ului.</p>
+	<p><span class="menu">Dezactivează SMP</span><br />
+		Dezactivează toate în afară de un nucleu de CPU.</p>
+	<p><span class="menu">Nu apela BIOS-ul</span><br />
+		Oprește sistemul din a apela funcționalități BIOS.</p>
+	<p><span class="menu">Dezactiveazp APM</span><br />
+		Dezactivează suportul hardware al Administrării avansate a puterii, suprascriind configurarea APM în fișierul de configurări de kernel.</p>
+	<p><span class="menu">Dezactivează ACPI</span><br />
+		Dezactivează suportul hardware al Interfaței de putere și configurare avansate, suprascriind configurările ACPI din fișierul de configurări de kernel.</p>
+	<p><span class="menu">Intrări listă neagră</span><br />
+		Permite să selectați sisteme de fișier care vor fi ignorate. Util de ex. pentru a dezactiva temporar driverele. Vedeți <a href="#troubleshooting">Depanare</a> mai jos.</p></td></tr>
+<tr><td><b>Selectează opțiuni depanare</b></td><td> </td><td>Aici veți găsi mai multe opțiuni care ajută cu depanarea sau veți obține detalii pentru un <a href="../../welcome/en/bugreports.html">raport de defecțiune</a>. Din nou, o explicație pentru fiecare opțiune este afișată jos.</td></tr>
 <tr><td></td><td></td><td>
-	<p><span class="menu">Enable serial debug output</span><br />
-		Turns on forwarding the syslog output to the serial interface (default: 115200, 8N1).</p>
-	<p><span class="menu">Enable on screen debug output</span><br />
-		Display debug output on screen while the system is booting, instead of the normal boot logo.</p>
-	<p><span class="menu">Disable on screen paging</span><br />
-		Disables paging when on screen debug output is enabled.</p>
-	<p><span class="menu">Enable debug syslog</span><br />
-		Enables a special in-memory syslog buffer for this session that the boot loader will be able to access after rebooting.</p>
-	<p><span class="menu">Display current boot loader log</span><br />
-		Displays the debug info the boot loader has logged (press <span class="key">Q</span> to exit the log)</p>
-	<p><span class="menu">Add advanced debug option</span><br />
-		Allows advanced debugging options to be entered directly.</p></td></tr>
-<tr><td></td><td></td><td>If <span class="menu">Enable debug syslog</span> is activated, a warm reboot after a crash shows these additional options:</td></tr>
-<tr><td></td><td></td><td>	<p><span class="menu">Save syslog from previous session during boot</span><br />
-		Saves the syslog from the previous Haiku session to <span class="path">/var/log/previous_syslog</span> when booting.</p>
-	<p><span class="menu">Display syslog from previous session</span><br />
-		Displays the syslog from the previous Haiku session.</p>
-	<p><span class="menu">Save syslog from previous session</span><br />
-		Saves the syslog from the previous Haiku session to disk. Currently only FAT32 volumes are supported.</p></td></tr>
-<tr><td class="onelinetop"><b>Select screen resolution</b></td><td> </td><td>Lets you force a certain screen resolution and color depth.</td></tr>
+	<p><span class="menu">Activează ieșirea de depanare serială</span><br />
+		Activează redirecționarea ieșirii syslog către interfața serială (implicit: 115200, 8N1).</p>
+	<p><span class="menu">Activează ieșire de depanare pe ecran</span><br />
+		Afișează ieșirea de depanare pe ecran în timp ce sistemul pornește, în locul logo-ului normal de pornire.</p>
+	<p><span class="menu">Dezactivează paginarea pe ecran</span><br />
+		Dezactivează paginarea când ieșirea de depanare pe ecran este activată.</p>
+	<p><span class="menu">Activează syslog de depanare</span><br />
+		Activează o preîncărcare specială în memorie de syslog pentru această sesiune care încărcătorul de pornire va putea accesa după repornire.</p>
+	<p><span class="menu">Afișează istoricul încărcătorului de pornire curent</span><br />
+		Afișează informațiile de depanare pe care încărcătorul de pornire le-a înregistrat (apăsați <span class="key">Q</span> pentru a ieși din istoric)</p>
+	<p><span class="menu">Adaugă o opțiune de depanare avansată</span><br />
+		Permite opțiuni de depanare avansae să fie introduse direct.</p></td></tr>
+<tr><td></td><td></td><td>Dacă <span class="menu">Activează depanarea syslog</span> este activată, o repornire caldă după o prăbușire arată aceste opțiuni adiționale:</td></tr>
+<tr><td></td><td></td><td>	<p><span class="menu">Salvează syslog-ul de la sesiunea anterioară în timpul pornirii</span><br />
+		Salvează syslog-ul de la sesiunea anterioară Haiku la <span class="path">/var/log/previous_syslog</span> când se pornește.</p>
+	<p><span class="menu">Afișează syslog-ul de la sesiunea anterioară</span><br />
+		Afișează syslog-ul de la sesiunea anterioară Haiku.</p>
+	<p><span class="menu">Salvează syslog-ul de la sesiunea anterioară</span><br />
+		Salvează syslog-ul de la sesiunea anterioară Haiku pe disc. În mod curent doar volumele FAT32 sunt suportate.</p></td></tr>
+<tr><td class="onelinetop"><b>Selectează rezoluția ecranului</b></td><td> </td><td>Vă permite să forțați o anumită rezoluție de ecran și o adâncime a culorii.</td></tr>
 </table>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="troubleshooting" name="troubleshooting">Depanare</a></h2>
-<p>If Haiku refuses to boot on your hardware from the get-go, try out setting different options under <span class="menu">Select safe mode options</span>. Consider filing a <a href="../../welcome/en/bugreports.html">bug report</a> in any case.</p>
-<p>On the other hand, if Haiku only suddenly acts up after you have installed some software, especially hardware drivers, you have several options to get Haiku bootable again so you can uninstall the offending package:</p>
+<p>Dacă Haiku refuză să pornează pe hardware de la început, încercați să configurați diferite opțiuni sub <span class="menu">Selectați opțiunile în modul sigur</span>. Luați în considerare completarea unui <a href="../../welcome/en/bugreports.html">raport de defecțiune</a> în orice caz.</p>
+<p>Pe de altă parte, dacă Haiku se comportă dintr-o dată diferit după ce ați instalat un software, în special drivere de hardware, aveți mai multe opțiuni pentru a avea un Haiku care pornește din nou, deci puteți să dezinstalați pachetul care a cauzat problema:</p>
 <ul>
-<li><p>Activating <span class="menu">Safe mode</span> will prevent most servers, daemons and the UserBootscript from being started.</p></li>
-<li><p>Activating <span class="menu">Disable user add-ons</span> will prevent using any add-ons (drivers, translators, etc.) you have installed in the user hierarchy under your Home folder.</p></li>
-<li><p>If activating <span class="menu">Use fail-safe graphics driver</span> solves your troubles by falling back to VESA graphics, you can make the setting permanent by removing the <tt>#</tt> of the line <i>#fail_safe_video_mode true</i> in the text file <span class="path">/boot/home/config/settings/kernel/drivers/kernel</span>.</p></li>
-<li><p>If the offending driver, add-on etc. is installed in the system hierarchy, things get a bit more complicated, because that area is read-only. Here, the <span class="menu">Blacklist entries</span> comes into play. With it, you can navigate through the whole system hierarchy and disable the component that's messing things up for you by checking an entry with the <span class="key">SPACE</span> or <span class="key">RETURN</span> key. <span class="key">ESC</span> returns you up one level to the parent directory.</p>
-<p>Online, there's the article <a href="http://www.haiku-os.org/blog/barrett/2013-12-15_how_permanently_blacklist_package_file">How to Permanently Blacklist a Package File</a> showing how to make that setting stick.</p></li>
-<li><p>Under <span class="menu">Select boot volume</span> you can specify what former "version" of Haiku to boot. Every time you un/install a package, the old state is saved and you can boot into it by choosing it from the list presented in the boot loader options.<br />
-So, if you encounter boot problems after installing some package, boot a Haiku state from before that time and uninstall the offending package.</p></li>
+<li><p>Activând <span class="menu">modul sigur</span> va preveni mai multe servere, servicii și UserBootscript din a fi pornite.</p></li>
+<li><p>Activarea <span class="menu">Dezactivează add-onuri utilizator</span> va preveni utilizarea de oricare add-onuri (drivere, traducători, etc.) pe care le-ați instalat în ierarhia sub dosarul Acasă.</p></li>
+<li><p>Dacă activarea a <span class="menu">Utilizeaază driver de grafice care eșuează în siguranță</span> rezolvă problemele prin reîntoarcerea la grafice VESA, puteți să faceți configurarea permanentă prin eliminarea <tt>#</tt> liniei <i>#fail_safe_video_mode true</i> în fișierul text <span class="path">/boot/home/config/settings/kernel/drivers/kernel</span>.</p></li>
+<li><p>Dacă driverul, add-onul, etc. care nu funcționează este instalat în ierarhia de sisem, lucrurile devin puțin mai complicate, pentru că acea zonă este în modul numai citire. Aici,<span class="menu">intrările listei negre</span> sunt utile. Cu lista aceasta, puteți naviga prin întrega ierarhie de sistem și dezactiva componenta care strică lucrurile pentru dvs. prin verificarea unei intrări cu tastele <span class="key">SPACE</span> sau <span class="key">RETURN</span>. <span class="key">ESC</span> vă întoarce în sus cu un nivel în directorul superior.</p>
+<p>Online, este articolul <a href="http://www.haiku-os.org/blog/barrett/2013-12-15_how_permanently_blacklist_package_file">Cum să adăugați în lista neagră permanent un fișier de pachet</a> care arată cum să faceți pentru a păstra această configurare.</p></li>
+<li><p>Sub <span class="menu">Selectează volumul de pornire</span> puteți specifica „versiunea” de Haiku anterioară pe care doriți să o porniți. De fiecare dată când dez/instalați un pachet, starea veche este salvată și puteți să o porniți prin alegerea acesteia din lista prezentată în opțiunile încărcătorului de pornire.<br />
+Deci, dacă întâlniți probleme de pornire după instalarea unui pachet, porniți o stare Haiku înaintea acelui timp și dezinstalați pachetul care are probleme.</p></li>
 </ul>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -167,7 +166,7 @@ Diferitele simboluri corespund aproximativ cu aceste etape de boot:</p>
 <div class="inner"><span>
     <!-- «  <a href="installation.html">Installing Haiku</a> 
 ::  -->
-    <a href="contents.html" class="uplink">Conținut</a> 
+    <a href="contents.html" class="uplink">Contents</a> 
 ::  <a href="filesystem-layout.html">Filesystem layout</a>  »
 </span></div>
 </div>

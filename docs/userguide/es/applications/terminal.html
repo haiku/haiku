@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2014, Haiku. All rights reserved.
+ * Copyright 2008-2020, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -25,7 +25,7 @@
 <body>
 
 <div id="banner">
-<div><span>Guía del usuario</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -56,13 +56,13 @@
 <span>
  «  <a href="stylededit.html">StyledEdit</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Aplicaciones</a> 
-::  <a href="textsearch.html">TextSearch (Buscador de texto)</a>  »
+::  <a href="textsearch.html">TextSearch</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">La traducción de esta página aún no está completa. Hasta que lo esté, las partes sin traducir se muestran en el inglés original.</div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h2><img src="../../images/apps-images/terminal-icon_64.png" alt="terminal-icon_64.png" width="64" height="64" />Terminal</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -82,9 +82,9 @@
 <p>Puede abrir tantas Terminales como se necesite, cada una de ellas en su propia ventana simplemente abriendo más Terminales o con <span class="key">ALT</span> <span class="key">N</span> desde una Terminal que ya esté corriendo. O puede usar la vista por pestañas de Terminal y abrir otra pestaña con <span class="key">ALT</span> <span class="key">T</span>.</p>
 <img src="../images/apps-images/terminal.png" alt="terminal.png" />
 <br />
-<p>Si da doble clic en una parte vacía de la barra de pestañas abrirá una nueva pestaña; si da doble clic en una pestaña podrá cambiarle el título. Hay varias variables designadas con '%' que se explican con información emergente cuando reposa el puntero sobre el campo de texto.<br />
-De manera predeterminada, <tt>%1d: %p</tt>, una pestaña muestra el directorio actual, y separado por <tt>:</tt>, el nombre del proceso que se ejecuta actualmente (o <tt>--</tt> si solamente es el intérprete de comandos bash, probablemente en reposo). La captura de pantalla que se muestra arriba presenta la primera pestaña con una sesión FTP en el <span class="path">Escritorio</span> y una segunda pestaña en reposo en el directorio de usuario <span class="path">home</span>.<br />
-A través de <span class="menu">Editar | Título de Ventana…</span> se puede editar el título de la ventana de la Terminal de manera similar.</p>
+<p>Double-clicking into the emtpy part of the tab bar opens a new tab; onto a tab opens a dialog to rename its title. There are several %-designated variables that are explained with a tooltip when you hover the mouse over the text field.<br />
+By default, <tt>%1d: %p</tt>, a tab shows the current directory and, separated by a <tt>:</tt>, the name of the currently running process (or <tt>--</tt> if it's just bash running, probably idling). The screenshot above shows the first tab with a FTP session in the <span class="path">Desktop</span> folder and a second tab idling at <span class="path">home</span>.<br />
+Via <span class="menu">Settings | Window title...</span> the Terminal window's title can be edited in a similar way.</p>
 <p>Un clic derecho en una ficha muestra un menú contextual para <span class="menu">Cerrar pestaña</span>, <span class="menu">Cerrar otras pestañas</span> o, igual que dar doble clic, <span class="menu">Editar título de pestaña…</span></p>
 <p>Se puede cambiar el tamaño de una ventana de Terminal igual que cualquier otra ventana o puede usar los ajustes preestablecidos desde el menú <span class="menu">Settings | Window Size</span> (Configuración | Ventana). <span class="key">ALT</span> <span class="key">ENTER</span> alterna el modo de pantalla completa.</p>
 <p>Toda configuración que haga desde el menú <span class="menu">Configuración</span>, como el <span class="menu">Título de ventana</span>, <span class="menu">Tamaño de ventana</span>, <span class="menu">Codificación de texto</span> o <span class="menu">Tamaño de letra</span> solamente se mantienen para la sesión actual. Si quiere hacer cambios permanentes, debe aplicarlos en el panel de <span class="menu">Configuración…</span></p>
@@ -123,12 +123,12 @@ Ambos archivos pueden crearse en la carpeta <span class="path">/boot/home/config
 <p>El archivo <span class="cli">profile</span> se caraga cada vez que se abre una Terminal nueva. Selecciona toda clase de "aliases" y variables que afectarán el comportamiento y apariencia de Bash. Encontrará muchos recursos en línea que detallen todas las posibilidades.</p>
 <p>El "Haiku/BeOS Tip Server" (Servidor de consejos de Haiku/BeOS, en inglés) tiene bastantes consejos para iniciar, por ejemplo:</p>
 <ul>
-<li><a href="http://betips.net/1997/09/09/customize-your-terminal-prompt/">Personalizar el prompt de la Terminal (en inglés)</a></li>
-<li><a href="http://betips.net/1997/09/09/more-prompt-customizations/">Más personalizaciones del prompt (en inglés)</a></li>
-<li><a href="http://betips.net/1997/09/09/enhancing-bash/">Incrementar a Bash (en inglés)</a></li>
-<li><a href="http://betips.net/1997/09/09/custom-keyboard-shortcuts/">Atajos de teclado personalizados (en inglés)</a></li>
+<li><a href="https://betips.net/?p=5">Customize your Terminal prompt</a></li>
+<li><a href="https://betips.net/?p=66">More prompt customizations</a></li>
+<li><a href="https://betips.net/?p=67">Enhancing bash</a></li>
+<li><a href="https://betips.net/?p=105">Custom keyboard shortcuts</a></li>
 </ul>
-<p>Y hay más, <a href="http://betips.net/index.php?s=.profile">déle un vistazo</a> (en inglés).</p>
+<p>There are more, <a href="https://betips.net/?s=profile">have a look</a>.</p>
 
 <h3>inputrc</h3>
 <p>El archivo <span class="cli">inputrc</span> trata con teclas de acceso rápido. Ya que Haiku proporciona predeterminados útiles, probablemente no tenga que lidiar con estas selecciones más envueltas. Si tiene necesidades especiales aquí, consulte alguno de los vastos recursos en línea, p. ej., la <a href="http://tiswww.case.edu/php/chet/readline/rluserman.html">GNU Readline Library</a> (La biblioteca de lectura en línea de GNU, en inglés).</p>
@@ -156,7 +156,7 @@ Ambos archivos pueden crearse en la carpeta <span class="path">/boot/home/config
 <div class="inner"><span>
  «  <a href="stylededit.html">StyledEdit</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Aplicaciones</a> 
-::  <a href="textsearch.html">TextSearch (Buscador de texto)</a>  »
+::  <a href="textsearch.html">TextSearch</a>  »
 </span></div>
 </div>
 

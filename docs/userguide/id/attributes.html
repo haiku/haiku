@@ -23,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>Panduan pengguna</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -52,15 +52,14 @@
 <li><a href="../jp/attributes.html">日本語</a></li>
 </ul>
 <span>
- «  <a href="filetypes.html">Filetypes</a> 
-::  <a href="contents.html" class="uplink">Daftar Isi</a> 
+ «  <a href="filetypes.html">Tipe file</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
 ::  <a href="index.html">Indeks</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">Terjemahan halaman ini belum lengkap. Sampai saat itu, bagian yang belum selesai menggunakan aslinya bahasa Inggris.</div>
 
 <h1>Atribut</h1>
 
@@ -116,18 +115,19 @@ MIME String         21  "BEOS:TYPE"
     Raw Data         20  "_trk/pinfo_le"
  
 131 bytes total in attributes.</pre>
-<p>Besides all the "<tt>META:*</tt>" attributes that hold the contact's information, there are two attributes that are managed by the system:</p>
+<p>Selain semua atribut "<tt>META:*</tt>" yang menyimpan informasi kontak, ada dua atribut yang dikelola oleh sistem:</p>
 <ul>
-<li><p><tt>BEOS:TYPE</tt> holds the file type as a <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> string, here "<tt>application/x-person</tt>". It determines the default icon and the application that opens the file when you e.g. double click it.</p></li>
-<li><p>"<tt>_trk/pinfo_le</tt>" is the attribute with which Tracker keeps track of a file's icon position.</p></li></ul>
-<div class="box-info">Note the backslash after "Clara". In Terminal you have to "escape" special characters like <tt>'"*\$?!</tt>. The space between "Clara" and "Botters" is also one of those. Therefore the backslash is really in front of the space character, and not after "Clara".</div>
+<li><p><tt>BEOS:TYPE</tt> menyimpan tipe file sebagai <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym>
+disini  "<tt>application/x-person</tt>" Ini menentukan ikon default dan aplikasi yang membuka file ketika Anda mis. klik dua kali.</p></li>
+<li><p>"<tt>_trk/pinfo_le</tt>" adalah atribut yang dengannya Tracker melacak posisi ikon file.</p></li></ul>
+<div class="box-info">Catat backslash setelah "Clara". Di Terminal Anda harus "escape" karakter khusus seperti <tt>'"*\$?!</tt>.  Ruang antara "Clara " dan "Botters" juga salah satunya. Oleh karena itu backslash benar-benar ada di depan karakter ruang, dan bukan setelah "Clara".</div>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="catattr" name="catattr">catattr</a></h3>
-<p><span class="cli">catattr</span> displays the contents of a specific attribute of a file.</p>
-<pre>usage: catattr [--raw|-r] attr_name file1 [file2...]</pre>
-<p>Again our example:</p>
+<p><span class="cli">catattr</span> menampilkan konten atribut tertentu dari suatu file.</p>
+<pre>penggunaan: catattr [--raw|-r] attr_name file1 [file2...]</pre>
+<p>Contoh kita yang lain:</p>
 <pre class="terminal"> ~/people -&gt;catattr META:city Clara\ Botters
 Clara Botters : string : Whelton</pre>
 
@@ -135,31 +135,31 @@ Clara Botters : string : Whelton</pre>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="addattr" name="addattr">addattr</a></h3>
 <p><span class="cli">addattr</span> menambahkan atribut ke file dan / atau mengisinya dengan nilai.</p>
-<pre>usage: addattr [-t type] attr value file1 [file2...]
-    or: addattr [-f value-from-file] [-t type] attr file1 [file2...]
+<pre>penggunaan: addattr [-t type] attr value file1 [file2...]
+    atau: addattr [-f value-from-file] [-t type] attr file1 [file2...]
  
-         Type is one of:
+         Type adalah salah satu dari:
                  string, mime, int, llong, float, double, bool, icon, raw
                  or a numeric value (ie. 0x1234, 42, 'ABCD', ...)
-         The default is "string"</pre>
+         nilai default adalah "string"</pre>
 <p>Jadi, katakanlah Clara mengambil pekerjaan dengan perusahaan multi-nasional Barkelbaer Inc., Anda mengisi atribut "Perusahaan" yang sebelumnya kosong dengan data itu (yang bertipe "string"):</p>
 <pre class="terminal"> ~/people -&gt;addattr -t string META:company Barkelbaer\ Inc. Clara\ Botters</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="rmattr" name="rmattr">rmattr</a></h3>
-<p><span class="cli">rmattr</span> completely removes an attribute from a file.</p>
+<p><span class="cli">rmattr</span> menghapus total antribut dari sebuah berkas.</p>
 
-<pre>usage: rmattr [-p] attr filename1 [filename2...]
+<pre>penggunaan: rmattr [-p] attr filename1 [filename2...]
          'attr' is the name of an attribute of the file
          If '-p' is specified, 'attr' is regarded as a pattern.</pre>
-<p>Though in all practicality it would be enough to just not fill the "Fax" attribute, you can completely remove it from Clara's file by typing:</p>
+<p>Meskipun dalam semua kepraktisan itu sudah cukup untuk tidak mengisi atribut "Faks", Anda dapat menghapusnya sepenuhnya dari file Clara dengan mengetik:</p>
 <pre class="terminal"> ~/people -&gt;rmattr META:fax Clara\ Botters</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="copyattr" name="copyattr">copyattr</a></h3>
-<p><span class="cli">copyattr</span> copies attributes from one or more files to another. By default, the actual contents of the file is <b>not</b> copied.</p>
+<p><span class="cli">copyattr</span> menyalin atribut dari satu atau lebih file ke yang lain. Secara default, isi sebenarnya dari file tersebut <b>tidak</b> disalin.</p>
 <pre>Penggunaan: copyattr &lt;opsi&gt; &lt;sumber&gt; [ ... ] &lt;tujuan&gt;</pre>
 
 <p>Jika Anda ingin menyalin atribut plus data file itu sendiri, Anda dapat menambahkan opsi "<span class="cli">-d</span>" atau "<span class="cli">--data</span>".</p>
@@ -172,8 +172,8 @@ Clara Botters : string : Whelton</pre>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="filetypes.html">Filetypes</a> 
-::  <a href="contents.html" class="uplink">Daftar Isi</a> 
+ «  <a href="filetypes.html">Tipe file</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
 ::  <a href="index.html">Indeks</a>  »
 </span></div>
 </div>
