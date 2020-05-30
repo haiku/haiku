@@ -212,6 +212,8 @@ status_t
 FlatIconExporter::_WriteStyles(LittleEndianBuffer& buffer,
 							   StyleContainer* styles)
 {
+	if (styles->CountStyles() > 255)
+		return B_RESULT_NOT_REPRESENTABLE;
 	uint8 styleCount = min_c(255, styles->CountStyles());
 	if (!buffer.Write(styleCount))
 		return B_NO_MEMORY;
@@ -369,6 +371,8 @@ write_path_with_commands(LittleEndianBuffer& buffer, VectorPath* path,
 status_t
 FlatIconExporter::_WritePaths(LittleEndianBuffer& buffer, PathContainer* paths)
 {
+	if (paths->CountPaths() > 255)
+		return B_RESULT_NOT_REPRESENTABLE;
 	uint8 pathCount = min_c(255, paths->CountPaths());
 	if (!buffer.Write(pathCount))
 		return B_NO_MEMORY;
@@ -379,6 +383,8 @@ FlatIconExporter::_WritePaths(LittleEndianBuffer& buffer, PathContainer* paths)
 		if (path->IsClosed())
 			pathFlags |= PATH_FLAG_CLOSED;
 
+		if (path->CountPoints() > 255)
+			return B_RESULT_NOT_REPRESENTABLE;
 		uint8 pointCount = min_c(255, path->CountPoints());
 
 		// see if writing segments with commands is more efficient
@@ -490,6 +496,8 @@ _WritePathSourceShape(LittleEndianBuffer& buffer, Shape* shape,
 	if (styleIndex < 0 || styleIndex > 255)
 		return false;
 
+	if (shape->Paths()->CountPaths() > 255)
+		return B_RESULT_NOT_REPRESENTABLE;
 	uint8 pathCount = min_c(255, shape->Paths()->CountPaths());
 
 	// write shape type and style index
@@ -509,6 +517,8 @@ _WritePathSourceShape(LittleEndianBuffer& buffer, Shape* shape,
 			return false;
 	}
 
+	if (shape->CountTransformers() > 255)
+		return B_RESULT_NOT_REPRESENTABLE;
 	uint8 transformerCount = min_c(255, shape->CountTransformers());
 
 	// shape flags
@@ -572,6 +582,8 @@ FlatIconExporter::_WriteShapes(LittleEndianBuffer& buffer,
 							   PathContainer* paths,
 							   ShapeContainer* shapes)
 {
+	if (shapes->CountShapes() > 255)
+		return B_RESULT_NOT_REPRESENTABLE;
 	uint8 shapeCount = min_c(255, shapes->CountShapes());
 	if (!buffer.Write(shapeCount))
 		return B_NO_MEMORY;
