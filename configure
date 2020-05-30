@@ -541,7 +541,7 @@ configurePath=$0
 configureEnvirons=
 for var in `env`; do
 	case "$var" in
-		CC\=*|HAIKU*\=*)
+		CC\=*|HAIKU*\=*|JAMSHELL\=*)
 			configureEnvirons="$configureEnvirons $var"
 			;;
 	esac
@@ -824,6 +824,19 @@ if [ $HOST_PLATFORM = "darwin" ]; then
 	HOST_EXTENDED_REGEX_SED="sed -E"
 fi
 
+# pick a JAMSHELL
+if [ "$JAMSHELL" = "" ]; then
+	if check_file_exists /bin/dash; then
+		JAMSHELL=/bin/dash
+	else
+		JAMSHELL=/bin/sh
+	fi
+fi
+if ! $JAMSHELL -c true; then
+	echo "$JAMSHELL does not work! Please specify a working JAMSHELL."
+	exit 1
+fi
+
 # locate python
 if python3 --version < /dev/null > /dev/null 2>&1; then
 	HOST_PYTHON="python3"
@@ -1067,6 +1080,8 @@ HAIKU_HOST_USE_32BIT		?= "${HAIKU_HOST_USE_32BIT}" ;
 HAIKU_HOST_USE_XATTR		?= "${HAIKU_HOST_USE_XATTR}" ;
 HAIKU_HOST_USE_XATTR_REF	?= "${HAIKU_HOST_USE_XATTR_REF}" ;
 HAIKU_HOST_BUILD_ONLY		?= "${HAIKU_HOST_BUILD_ONLY}" ;
+
+JAMSHELL					?= ${JAMSHELL} -c ;
 
 HOST_CC						?= ${CC} ;
 HOST_GCC_RAW_VERSION		?= ${HOST_GCC_RAW_VERSION} ;
