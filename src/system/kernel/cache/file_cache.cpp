@@ -629,6 +629,43 @@ write_to_cache(file_cache_ref* ref, void* cookie, off_t offset,
 
 
 static status_t
+write_zeros_to_file(struct vnode* vnode, void* cookie, off_t offset,
+	size_t* _size)
+{
+	size_t size = *_size;
+	status_t status = B_OK;
+	while (size > 0) {
+		generic_size_t length = min_c(size, kZeroVecSize);
+		generic_io_vec* vecs = sZeroVecs;
+		generic_io_vec vec;
+		size_t count = kZeroVecCount;
+		if (length != kZeroVecSize) {
+			if (length > B_PAGE_SIZE) {
+				length = ROUNDDOWN(length, B_PAGE_SIZE);
+				count = length / B_PAGE_SIZE;
+			} else {
+				vec.base = sZeroPage;
+				vec.length = length;
+				vecs = &vec;
+				count = 1;
+			}
+		}
+
+		status = vfs_write_pages(vnode, cookie, offset,
+			vecs, count, B_PHYSICAL_IO_REQUEST, &length);
+		if (status != B_OK || length == 0)
+			break;
+
+		offset += length;
+		size -= length;
+	}
+
+	*_size = *_size - size;
+	return status;
+}
+
+
+static status_t
 write_to_file(file_cache_ref* ref, void* cookie, off_t offset, int32 pageOffset,
 	addr_t buffer, size_t bufferSize, bool useBuffer,
 	vm_page_reservation* reservation, size_t reservePages)
@@ -640,18 +677,8 @@ write_to_file(file_cache_ref* ref, void* cookie, off_t offset, int32 pageOffset,
 	status_t status = B_OK;
 
 	if (!useBuffer) {
-		while (bufferSize > 0) {
-			generic_size_t written = min_c(bufferSize, kZeroVecSize);
-			status = vfs_write_pages(ref->vnode, cookie, offset + pageOffset,
-				sZeroVecs, kZeroVecCount, B_PHYSICAL_IO_REQUEST, &written);
-			if (status != B_OK)
-				return status;
-			if (written == 0)
-				return B_ERROR;
-
-			bufferSize -= written;
-			pageOffset += written;
-		}
+		status = write_zeros_to_file(ref->vnode, cookie, offset + pageOffset,
+			&bufferSize);
 	} else {
 		generic_io_vec vec;
 		vec.base = buffer;
@@ -1312,7 +1339,6 @@ file_cache_write(void* _cacheRef, void* cookie, off_t offset,
 
 	if (ref->disabled_count > 0) {
 		// Caching is disabled -- write directly to the file.
-
 		if (buffer != NULL) {
 			generic_io_vec vec;
 			vec.base = (addr_t)buffer;
@@ -1322,40 +1348,8 @@ file_cache_write(void* _cacheRef, void* cookie, off_t offset,
 				1, 0, &size);
 			*_size = size;
 			return error;
-		}
-
-		// NULL buffer -- use a dummy buffer to write zeroes
-		size_t size = *_size;
-		while (size > 0) {
-			generic_size_t length = min_c(size, kZeroVecSize);
-			generic_io_vec* vecs = sZeroVecs;
-			generic_io_vec vec;
-			size_t count = kZeroVecCount;
-			if ((length % B_PAGE_SIZE) != 0) {
-				if (length > B_PAGE_SIZE) {
-					length = ROUNDDOWN(length, B_PAGE_SIZE);
-					count = length / B_PAGE_SIZE;
-				} else {
-					vec.base = sZeroPage;
-					vec.length = length;
-					vecs = &vec;
-					count = 1;
-				}
-			}
-
-			status_t error = vfs_write_pages(ref->vnode, cookie, offset,
-				vecs, count, B_PHYSICAL_IO_REQUEST, &length);
-			if (error != B_OK)
-				return error;
-			if (length == 0)
-				break;
-
-			offset += length;
-			size -= length;
-		}
-
-		*_size -= size;
-		return B_OK;
+		} else
+			return write_zeros_to_file(ref->vnode, cookie, offset, _size);
 	}
 
 	status_t status = cache_io(ref, cookie, offset,
