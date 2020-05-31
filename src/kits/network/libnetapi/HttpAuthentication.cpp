@@ -21,13 +21,13 @@
 #define PRINT(x)
 #endif
 
-extern "C" {
 #ifdef OPENSSL_ENABLED
+extern "C" {
 #include <openssl/md5.h>
+};
 #else
 #include "md5.h"
 #endif
-};
 
 #ifndef MD5_DIGEST_LENGTH
 #define MD5_DIGEST_LENGTH 16

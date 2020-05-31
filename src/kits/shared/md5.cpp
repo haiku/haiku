@@ -85,6 +85,9 @@
 	(ctx->block[(n)])
 #endif
 
+
+namespace BPrivate {
+
 /*
  * This processes one or more 64-byte data blocks, but does NOT update
  * the bit counters.  There are no alignment requirements.
@@ -95,7 +98,7 @@ static const void *body(MD5_CTX *ctx, const void *data, unsigned long size)
 	MD5_u32plus a, b, c, d;
 	MD5_u32plus saved_a, saved_b, saved_c, saved_d;
 
-	ptr = data;
+	ptr = (const unsigned char*)data;
 
 	a = ctx->a;
 	b = ctx->b;
@@ -291,3 +294,5 @@ void MD5_Final(unsigned char *result, MD5_CTX *ctx)
 
 	memset(ctx, 0, sizeof(*ctx));
 }
+
+};
