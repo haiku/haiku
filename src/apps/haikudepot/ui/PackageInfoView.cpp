@@ -1251,7 +1251,8 @@ public:
 		TabAt(TAB_CHANGELOG)->SetEnabled(
 			package.Get() != NULL && package->HasChangelog());
 		TabAt(TAB_CONTENTS)->SetEnabled(
-			package.Get() != NULL && package->State() == ACTIVATED);
+			package.Get() != NULL
+				&& (package->State() == ACTIVATED || package->IsLocalFile()));
 		Invalidate(TabFrame(TAB_CHANGELOG));
 		Invalidate(TabFrame(TAB_CONTENTS));
 
