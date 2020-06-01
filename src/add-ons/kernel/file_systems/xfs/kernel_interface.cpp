@@ -1,9 +1,10 @@
 /*
- * Copyright 2001-2017, Axel Dörfler, axeld@pinc-software.de.
- * Copyright 2020, Shubham Bhagat, shubhambhagat111@yahoo.com
- * All rights reserved. Distributed under the terms of the MIT License.
- */
+* Copyright 2001-2017, Axel Dörfler, axeld@pinc-software.de.
+* Copyright 2020, Shubham Bhagat, shubhambhagat111@yahoo.com
+* All rights reserved. Distributed under the terms of the MIT License.
+*/
 #include "system_dependencies.h"
+#include "Inode.h"
 #include "Volume.h"
 
 
@@ -12,8 +13,8 @@
 struct identify_cookie
 {
 	/*	super_block_struct super_block;
-	 *	No structure yet implemented.
-	 */
+	*	No structure yet implemented.
+	*/
 	int cookie;
 };
 
@@ -85,11 +86,17 @@ xfs_mount(fs_volume *_volume, const char *device, uint32 flags,
 		return status;
 	}
 
-/* Don't have Inodes yet */
-#if 0
-	 *_rootID = volume->Root()->ID();
-#endif
+	//publish the root inode
+	Inode* rootInode = new(std::nothrow) Inode(volume, volume->Root());
+	if (rootInode != NULL) {
+		status = publish_vnode(volume->FSVolume(), volume->Root(),
+			(void*)rootInode, &gxfsVnodeOps, rootInode->Mode(), 0);
 
+		if (status!=B_OK)
+			return B_BAD_VALUE;
+	}
+
+	*_rootID = volume->Root();
 	return B_OK;
 }
 
@@ -101,7 +108,6 @@ xfs_unmount(fs_volume *_volume)
 
 	status_t status = volume->Unmount();
 	delete volume;
-	
 	TRACE("xfs_unmount(): Deleted volume");
 	return status;
 }
@@ -134,7 +140,26 @@ static status_t
 xfs_get_vnode(fs_volume *_volume, ino_t id, fs_vnode *_node, int *_type,
 	uint32 *_flags, bool reenter)
 {
-	return B_NOT_SUPPORTED;
+	Volume* volume = (Volume*)_volume->private_volume;
+
+	Inode* inode = new(std::nothrow) Inode(volume, id);
+
+	if (inode == NULL)
+		return B_NO_MEMORY;
+
+	status_t status = inode->InitCheck();
+	if (status == false) {
+		delete inode;
+		ERROR("get_vnode: InitCheck() failed. Error: %s\n", strerror(status));
+		return B_NO_INIT;
+	}
+
+	_node->private_node = inode;
+	_node->ops = &gxfsVnodeOps;
+	*_type = inode->Mode();
+	*_flags = 0;
+
+	return B_OK;
 }
 
 
@@ -198,7 +223,29 @@ xfs_ioctl(fs_volume *_volume, fs_vnode *_node, void *_cookie, uint32 cmd,
 static status_t
 xfs_read_stat(fs_volume *_volume, fs_vnode *_node, struct stat *stat)
 {
-	return B_NOT_SUPPORTED;
+	Inode* inode = (Inode*)_node->private_node;
+	stat->st_dev = inode->GetVolume()->ID();
+	stat->st_ino = inode->ID();
+	stat->st_nlink = 1;
+	stat->st_blksize = XFS_IO_SIZE;
+
+	stat->st_uid = inode->UserId();
+	stat->st_gid = inode->GroupId();
+	stat->st_mode = inode->Mode();
+	stat->st_type = 0;	// TODO
+
+	stat->st_size = inode->GetVolume()->InodeSize();
+	stat->st_blocks = inode->NoOfBlocks();
+
+	inode->GetAccessTime(stat->st_atim);
+	inode->GetModificationTime(stat->st_mtim);
+	inode->GetChangeTime(stat->st_ctim);
+
+	/* TODO: Can we obtain the Creation Time in v4 system? */
+	inode->GetChangeTime(stat->st_crtim);
+
+	return B_OK;
+
 }
 
 

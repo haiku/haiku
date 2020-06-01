@@ -1,3 +1,8 @@
+/*
+* Copyright 2020, Shubham Bhagat, shubhambhagat111@yahoo.com
+* All rights reserved. Distributed under the terms of the MIT License.
+*/
+
 #include "Inode.h"
 
 
@@ -31,10 +36,90 @@ xfs_inode::SwapEndian()
 }
 
 
+xfs_rfsblock_t
+xfs_inode::NoOfBlocks() const
+{
+	return di_nblocks;
+}
+
+
+xfs_fsize_t
+xfs_inode::Size() const
+{
+	return di_size;
+}
+
+
 mode_t
 xfs_inode::Mode()
 {
 	return di_mode;
+}
+
+
+uint32
+xfs_inode::UserId()
+{
+	return di_uid;
+}
+
+
+uint32
+xfs_inode::GroupId()
+{
+	return di_gid;
+}
+
+
+void
+xfs_inode::GetModificationTime(struct timespec& stamp)
+{
+	stamp.tv_sec = di_mtime.t_sec;
+	stamp.tv_nsec = di_mtime.t_nsec;
+}
+
+
+void
+xfs_inode::GetAccessTime(struct timespec& stamp)
+{
+	stamp.tv_sec = di_atime.t_sec;
+	stamp.tv_nsec = di_atime.t_nsec;
+}
+
+
+void
+xfs_inode::GetChangeTime(struct timespec& stamp)
+{
+	stamp.tv_sec = di_ctime.t_sec;
+	stamp.tv_nsec = di_ctime.t_nsec;
+}
+
+
+uint32
+xfs_inode::NLink()
+{
+	return di_nlink;
+}
+
+
+int8
+xfs_inode::Version()
+{
+	return di_version;
+}
+
+
+uint16
+xfs_inode::Flags()
+{
+	return di_flags;
+}
+
+
+int8
+xfs_inode::Format()
+{
+	return di_format;
 }
 
 

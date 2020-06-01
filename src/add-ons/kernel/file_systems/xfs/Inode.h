@@ -55,10 +55,18 @@ typedef enum xfs_dinode_fmt
 typedef struct xfs_inode
 {
 		void				SwapEndian();
-		void				DirIsV2();		//TODO
+		int8				Version();		//TODO
 		mode_t				Mode();
-		void				GetModificationTime();
+		void				GetModificationTime(struct timespec& timestamp);
+		void				GetChangeTime(struct timespec& timestamp);
+		void				GetAccessTime(struct timespec& timestamp);
 		int8				Format();		// The format of the inode
+		xfs_fsize_t			Size() const;	// TODO
+		xfs_rfsblock_t		NoOfBlocks() const;
+		uint32				NLink();
+		uint16				Flags();
+		uint32				UserId();
+		uint32				GroupId();
 
 		uint16				di_magic;
 		uint16				di_mode;		// uses standard S_Ixxx
@@ -97,6 +105,9 @@ class Inode
 					Inode(Volume* volume, xfs_ino_t id);
 					~Inode();
 		bool		InitCheck();
+
+		xfs_ino_t	ID() const { return fId; }
+
 		bool		IsDirectory() const
 						{ return S_ISDIR(Mode()); }
 
@@ -114,27 +125,28 @@ class Inode
 
 		bool		IsLocal() { return Format() == XFS_DINODE_FMT_LOCAL; }
 
-	#if 0
-		int32		Flags() const { return fNode->Flags(); }
+		uint32		NLink() { return fNode->NLink(); }
 
-		off_t		Size() const { return fNode->Size(); }
+		int8		Version() { return fNode->Version(); }
 
-		void		GetChangeTime(xfs_timestamp_t *stamp) const
-					{ fNode.GetChangeTime(stamp, fHasExtraAttributes); }
+		xfs_fsize_t	Size() const { return fNode->Size(); }
 
-		void		GetModificationTime(xfs_timestamp_t *stamp) const
-					{ fNode.GetModificationTime(stamp,
-						fHasExtraAttributes); }
+		xfs_rfsblock_t	NoOfBlocks() const { return fNode->NoOfBlocks(); }
 
-		void		GetCreationTime(xfs_timestamp_t *stamp) const
-					{ fNode.GetCreationTime(stamp,
-						fHasExtraAttributes); }
+		int16		Flags() const { return fNode->Flags(); }
 
-		void		GetAccessTime(xfs_timestamp_t *stamp) const
-					{ fNode.GetAccessTime(stamp, fHasExtraAttributes); }
-	#endif
+		void		GetChangeTime(struct timespec& timestamp) const
+					{ fNode->GetChangeTime(timestamp); }
+
+		void		GetModificationTime(struct timespec& timestamp) const
+					{ fNode->GetModificationTime(timestamp); }
+
+		void		GetAccessTime(struct timespec& timestamp) const
+					{ fNode->GetAccessTime(timestamp); }
 
 	private:
+		uint32		UserId() { return fNode->UserId(); }
+		uint32		GroupId() { return fNode->GroupId(); }
 
 		status_t			GetFromDisk();
 		xfs_inode_t*		fNode;
