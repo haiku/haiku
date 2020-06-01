@@ -83,7 +83,8 @@ private:
 									const PEFContainerHeader& pefHeader);
 			void				_ReadHeader(resource_parse_info& parseInfo);
 			void				_ReadIndex(resource_parse_info& parseInfo);
-			bool				_ReadIndexEntry(resource_parse_info& parseInfo,
+			bool				_ReadIndexEntry(BPositionIO& buffer,
+									resource_parse_info& parseInfo,
 									int32 index, uint32 tableOffset,
 									bool peekAhead);
 			void				_ReadInfoTable(resource_parse_info& parseInfo);

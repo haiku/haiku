@@ -17,7 +17,7 @@
 #include <stdio.h>
 
 #include <AutoDeleter.h>
-
+#include <BufferIO.h>
 #include <Elf.h>
 #include <Exception.h>
 #include <Pef.h>
@@ -781,9 +781,11 @@ ResourceFile::_ReadIndex(resource_parse_info& parseInfo)
 {
 	int32& resourceCount = parseInfo.resource_count;
 	off_t& fileSize = parseInfo.file_size;
+	BBufferIO buffer(&fFile, 2048, false);
+
 	// read the header
 	resource_index_section_header header;
-	read_exactly(fFile, kResourceIndexSectionOffset, &header,
+	read_exactly(buffer, kResourceIndexSectionOffset, &header,
 		kResourceIndexSectionHeaderSize,
 		"Failed to read the resource index section header.");
 	// check the header
@@ -820,6 +822,7 @@ ResourceFile::_ReadIndex(resource_parse_info& parseInfo)
 			"offset. Is: %lu, should be: %lu.",
 			unknownSectionOffset, kUnknownResourceSectionSize);
 	}
+
 	// info table offset and size
 	uint32 infoTableOffset = _GetInt(header.rish_info_table_offset);
 	uint32 infoTableSize = _GetInt(header.rish_info_table_size);
@@ -827,6 +830,7 @@ ResourceFile::_ReadIndex(resource_parse_info& parseInfo)
 		throw Exception(B_IO_ERROR, "Invalid info table location.");
 	parseInfo.info_table_offset = infoTableOffset;
 	parseInfo.info_table_size = infoTableSize;
+
 	// read the index entries
 	uint32 indexTableOffset = indexSectionOffset
 		+ kResourceIndexSectionHeaderSize;
@@ -836,8 +840,8 @@ ResourceFile::_ReadIndex(resource_parse_info& parseInfo)
 	bool tableEndReached = false;
 	for (int32 i = 0; !tableEndReached && i < maxResourceCount; i++) {
 		// read one entry
-		tableEndReached = !_ReadIndexEntry(parseInfo, i, indexTableOffset,
-			(i >= resourceCount));
+		tableEndReached = !_ReadIndexEntry(buffer, parseInfo, i,
+			indexTableOffset, (i >= resourceCount));
 		if (!tableEndReached)
 			actualResourceCount++;
 	}
@@ -855,41 +859,37 @@ ResourceFile::_ReadIndex(resource_parse_info& parseInfo)
 
 
 bool
-ResourceFile::_ReadIndexEntry(resource_parse_info& parseInfo, int32 index,
-	uint32 tableOffset, bool peekAhead)
+ResourceFile::_ReadIndexEntry(BPositionIO& buffer,
+	resource_parse_info& parseInfo, int32 index, uint32 tableOffset,
+	bool peekAhead)
 {
 	off_t& fileSize = parseInfo.file_size;
-	//
 	bool result = true;
 	resource_index_entry entry;
+
 	// read one entry
 	off_t entryOffset = tableOffset + index * kResourceIndexEntrySize;
-	read_exactly(fFile, entryOffset, &entry, kResourceIndexEntrySize,
+	read_exactly(buffer, entryOffset, &entry, kResourceIndexEntrySize,
 		"Failed to read a resource index entry.");
+
 	// check, if the end is reached early
 	if (result && check_pattern(entryOffset, &entry,
 			kResourceIndexEntrySize / 4, fHostEndianess)) {
-		if (!peekAhead) {
-//			Warnings::AddCurrentWarning("Unexpected end of resource index "
-//										"table at index: %ld (/%ld).",
-//										index + 1, resourceCount);
-		}
 		result = false;
 	}
 	uint32 offset = _GetInt(entry.rie_offset);
 	uint32 size = _GetInt(entry.rie_size);
+
 	// check the location
 	if (result && offset + size > fileSize) {
-		if (peekAhead) {
-//			Warnings::AddCurrentWarning("Invalid data after resource index "
-//										"table.");
-		} else {
+		if (!peekAhead) {
 			throw Exception(B_IO_ERROR, "Invalid resource index entry: index: "
 				"%ld, offset: %lu (%lx), size: %lu (%lx).", index + 1, offset,
 				offset, size, size);
 		}
 		result = false;
 	}
+
 	// add the entry
 	if (result) {
 		ResourceItem* item = new(std::nothrow) ResourceItem;
@@ -901,6 +901,7 @@ ResourceFile::_ReadIndexEntry(resource_parse_info& parseInfo, int32 index,
 			throw Exception(B_NO_MEMORY);
 		}
 	}
+
 	return result;
 }
 

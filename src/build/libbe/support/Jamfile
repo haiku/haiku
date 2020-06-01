@@ -10,6 +10,7 @@ SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits support ] ;
 BuildPlatformMergeObjectPIC <libbe_build>support_kit.o :
 	Archivable.cpp
 	BlockCache.cpp
+	BufferIO.cpp
 	ByteOrder.cpp
 	CompressionAlgorithm.cpp
 	DataIO.cpp
