@@ -699,6 +699,9 @@ void
 KeyboardLayoutView::_DrawKeyButton(BView* view, BRect& rect, BRect updateRect,
 	rgb_color base, rgb_color background, bool pressed)
 {
+	uint32 flags = pressed ? BControlLook::B_ACTIVATED : 0;
+	flags |= BControlLook::B_FLAT;
+
 	be_control_look->DrawButtonFrame(view, rect, updateRect, 4.0f, base,
 		background, pressed ? BControlLook::B_ACTIVATED : 0);
 	be_control_look->DrawButtonBackground(view, rect, updateRect, 4.0f,
@@ -731,6 +734,9 @@ KeyboardLayoutView::_DrawKey(BView* view, BRect updateRect, const Key* key,
 
 	_SetFontSize(view, keyKind);
 
+	uint32 flags = pressed ? BControlLook::B_ACTIVATED : 0;
+	flags |= BControlLook::B_FLAT;
+
 	if (secondDeadKey)
 		base = kSecondDeadKeyColor;
 	else if (deadKey > 0 && isDeadKeyEnabled)
@@ -743,7 +749,8 @@ KeyboardLayoutView::_DrawKey(BView* view, BRect updateRect, const Key* key,
 
 		_GetAbbreviatedKeyLabelIfNeeded(view, rect, key, text, sizeof(text));
 		be_control_look->DrawLabel(view, text, rect, updateRect,
-			base, 0, BAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE), &keyLabelColor);
+			base, flags, BAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE),
+			&keyLabelColor);
 	} else if (key->shape == kEnterKeyShape) {
 		BRect topLeft = rect;
 		BRect topRight = rect;
@@ -769,35 +776,29 @@ KeyboardLayoutView::_DrawKey(BView* view, BRect updateRect, const Key* key,
 
 		// draw top left corner
 		be_control_look->DrawButtonFrame(view, topLeft, updateRect,
-			4.0f, 0.0f, 4.0f, 0.0f, base, background,
-			pressed ? BControlLook::B_ACTIVATED : 0,
+			4.0f, 0.0f, 4.0f, 0.0f, base, background, flags,
 			BControlLook::B_LEFT_BORDER | BControlLook::B_TOP_BORDER
 				| BControlLook::B_BOTTOM_BORDER);
 		be_control_look->DrawButtonBackground(view, topLeft, updateRect,
-			4.0f, 0.0f, 4.0f, 0.0f, base,
-			pressed ? BControlLook::B_ACTIVATED : 0,
+			4.0f, 0.0f, 4.0f, 0.0f, base, flags,
 			BControlLook::B_LEFT_BORDER | BControlLook::B_TOP_BORDER
 				| BControlLook::B_BOTTOM_BORDER);
 
 		// draw top right corner
 		be_control_look->DrawButtonFrame(view, topRight, updateRect,
-			0.0f, 4.0f, 0.0f, 0.0f, base, background,
-			pressed ? BControlLook::B_ACTIVATED : 0,
+			0.0f, 4.0f, 0.0f, 0.0f, base, background, flags,
 			BControlLook::B_TOP_BORDER | BControlLook::B_RIGHT_BORDER);
 		be_control_look->DrawButtonBackground(view, topRight, updateRect,
-			0.0f, 4.0f, 0.0f, 0.0f, base,
-			pressed ? BControlLook::B_ACTIVATED : 0,
+			0.0f, 4.0f, 0.0f, 0.0f, base, flags,
 			BControlLook::B_TOP_BORDER | BControlLook::B_RIGHT_BORDER);
 
 		// draw bottom right corner
 		be_control_look->DrawButtonFrame(view, bottomRight, updateRect,
-			0.0f, 0.0f, 4.0f, 4.0f, base, background,
-			pressed ? BControlLook::B_ACTIVATED : 0,
+			0.0f, 0.0f, 4.0f, 4.0f, base, background, flags,
 			BControlLook::B_LEFT_BORDER | BControlLook::B_RIGHT_BORDER
 				| BControlLook::B_BOTTOM_BORDER);
 		be_control_look->DrawButtonBackground(view, bottomRight, updateRect,
-			0.0f, 0.0f, 4.0f, 4.0f, base,
-			pressed ? BControlLook::B_ACTIVATED : 0,
+			0.0f, 0.0f, 4.0f, 4.0f, base, flags,
 			BControlLook::B_LEFT_BORDER | BControlLook::B_RIGHT_BORDER
 				| BControlLook::B_BOTTOM_BORDER);
 
@@ -811,15 +812,15 @@ KeyboardLayoutView::_DrawKey(BView* view, BRect updateRect, const Key* key,
 		// draw the button background
 		BRect bgRect = rect.InsetByCopy(2, 2);
 		be_control_look->DrawButtonBackground(view, bgRect, updateRect,
-			4.0f, 4.0f, 0.0f, 4.0f, base,
-			pressed ? BControlLook::B_ACTIVATED : 0);
+			4.0f, 4.0f, 0.0f, 4.0f, base, flags);
 
 		rect.left = bottomLeft.right;
 		_GetAbbreviatedKeyLabelIfNeeded(view, rect, key, text, sizeof(text));
 
 		// draw the button label
 		be_control_look->DrawLabel(view, text, rect, updateRect,
-			base, 0, BAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE), &keyLabelColor);
+			base, flags, BAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE),
+			&keyLabelColor);
 
 		// reset the clipping region
 		view->ConstrainClippingRegion(NULL);

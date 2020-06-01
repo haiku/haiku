@@ -16,6 +16,7 @@
 #include <ControlLook.h>
 #include <GroupView.h>
 #include <SpaceLayoutItem.h>
+#include <TabView.h>
 #include <Window.h>
 
 #include "TabContainerView.h"
@@ -36,7 +37,7 @@ TabView::TabView()
 TabView::~TabView()
 {
 	// The layout item is deleted for us by the layout which contains it.
-	if (!fContainerView)
+	if (fContainerView == NULL)
 		delete fLayoutItem;
 }
 
@@ -70,60 +71,55 @@ void
 TabView::Draw(BRect updateRect)
 {
 	BRect frame(fLayoutItem->Frame());
-	if (fIsFront) {
-		// Extend the front tab outward left/right in order to merge
-		// the frames of adjacent tabs.
-		if (!fIsFirst)
-			frame.left--;
-		if (!fIsLast)
-			frame.right++;
-	}
+	frame.right++;
 	frame.bottom++;
 
-	DrawBackground(fContainerView, frame, updateRect, fIsFirst, fIsLast,
-		fIsFront);
+	int32 index = fContainerView->IndexOf(this);
 
-	if (fIsFront) {
+	// make room for tail of last tab
+	bool isLast = index == fContainerView->LastTabIndex();
+	if (isLast)
+		frame.right -= 2;
+
+	DrawBackground(fContainerView, frame, updateRect);
+
+	bool isFront = index == fContainerView->SelectedTabIndex();
+	if (isFront)
 		frame.top += 3.0f;
-		if (!fIsFirst)
-			frame.left++;
-		if (!fIsLast)
-			frame.right--;
-	} else
+	else
 		frame.top += 6.0f;
 
 	float spacing = be_control_look->DefaultLabelSpacing();
 	frame.InsetBy(spacing, spacing / 2);
-	DrawContents(fContainerView, frame, updateRect, fIsFirst, fIsLast,
-		fIsFront);
+	DrawContents(fContainerView, frame, updateRect);
 }
 
 
 void
-TabView::DrawBackground(BView* owner, BRect frame, const BRect& updateRect,
-	bool isFirst, bool isLast, bool isFront)
+TabView::DrawBackground(BView* owner, BRect frame, const BRect& updateRect)
 {
 	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+	uint32 flags = 0;
 	uint32 borders = BControlLook::B_TOP_BORDER
 		| BControlLook::B_BOTTOM_BORDER;
 
-	if (isFirst)
-		borders |= BControlLook::B_LEFT_BORDER;
-	if (isLast)
-		borders |= BControlLook::B_RIGHT_BORDER;
-	if (isFront) {
-		be_control_look->DrawActiveTab(owner, frame, updateRect, base,
-			0, borders);
+	int32 index = fContainerView->IndexOf(this);
+	int32 selected = fContainerView->SelectedTabIndex();
+	int32 first = fContainerView->FirstTabIndex();
+	int32 last = fContainerView->LastTabIndex();
+
+	if (index == selected) {
+		be_control_look->DrawActiveTab(owner, frame, updateRect, base, flags,
+			borders, BControlLook::B_TOP_BORDER, index, selected, first, last);
 	} else {
-		be_control_look->DrawInactiveTab(owner, frame, updateRect, base,
-			0, borders);
+		be_control_look->DrawInactiveTab(owner, frame, updateRect, base, flags,
+			borders, BControlLook::B_TOP_BORDER, index, selected, first, last);
 	}
 }
 
 
 void
-TabView::DrawContents(BView* owner, BRect frame, const BRect& updateRect,
-	bool isFirst, bool isLast, bool isFront)
+TabView::DrawContents(BView* owner, BRect frame, const BRect& updateRect)
 {
 	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
 	be_control_look->DrawLabel(owner, fLabel.String(), frame, updateRect,
@@ -151,35 +147,8 @@ TabView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 
 
 void
-TabView::SetIsFront(bool isFront)
+TabView::Update()
 {
-	Update(fIsFirst, fIsLast, isFront);
-}
-
-
-bool
-TabView::IsFront() const
-{
-	return fIsFront;
-}
-
-
-void
-TabView::SetIsLast(bool isLast)
-{
-	Update(fIsFirst, isLast, fIsFront);
-}
-
-
-void
-TabView::Update(bool isFirst, bool isLast, bool isFront)
-{
-	if (fIsFirst == isFirst && fIsLast == isLast && fIsFront == isFront)
-		return;
-	fIsFirst = isFirst;
-	fIsLast = isLast;
-	fIsFront = isFront;
-
 	fLayoutItem->InvalidateContainer();
 }
 
@@ -210,6 +179,7 @@ TabView::SetLabel(const char* label)
 {
 	if (fLabel == label)
 		return;
+
 	fLabel = label;
 	fLayoutItem->InvalidateLayout();
 }
@@ -339,8 +309,8 @@ void
 TabLayoutItem::InvalidateContainer(BRect frame)
 {
 	// Invalidate more than necessary, to help the TabContainerView
-	// redraw the parts outside any tabs...
-	frame.bottom++;
-	frame.right++;
+	// redraw the parts outside any tabs... need 2px
+	frame.bottom += 2;
+	frame.right += 2;
 	fParent->ContainerView()->Invalidate(frame);
 }

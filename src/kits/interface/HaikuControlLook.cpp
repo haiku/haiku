@@ -1635,33 +1635,23 @@ HaikuControlLook::DrawTabFrame(BView* view, BRect& rect,
 	if (side == BTabView::kTopSide || side == BTabView::kBottomSide) {
 		// draw an inactive tab frame behind all tabs
 		borders = B_TOP_BORDER | B_BOTTOM_BORDER;
-		if (borderStyle == B_NO_BORDER) {
-			// removes left border that is an artifact of DrawInactiveTab()
-			rect.left -= 1;
-		} else
+		if (borderStyle != B_NO_BORDER)
 			borders |= B_LEFT_BORDER | B_RIGHT_BORDER;
 
 		// DrawInactiveTab draws 2px border
-		// draw a little wider tab frame to align B_PLAIN_BORDER with it
-		if (borderStyle == B_PLAIN_BORDER) {
-			rect.left -= 1;
-			rect.right += 1;
-		}
+		// draw tab frame wider to align B_PLAIN_BORDER with it
+		if (borderStyle == B_PLAIN_BORDER)
+			rect.InsetBy(-1, 0);
 	} else if (side == BTabView::kLeftSide || side == BTabView::kRightSide) {
 		// draw an inactive tab frame behind all tabs
 		borders = B_LEFT_BORDER | B_RIGHT_BORDER;
-		if (borderStyle == B_NO_BORDER) {
-			// removes top border that is an artifact of DrawInactiveTab()
-			rect.top -= 1;
-		} else
+		if (borderStyle != B_NO_BORDER)
 			borders |= B_TOP_BORDER | B_BOTTOM_BORDER;
 
 		// DrawInactiveTab draws 2px border
-		// draw a little wider tab frame to align B_PLAIN_BORDER with it
-		if (borderStyle == B_PLAIN_BORDER) {
-			rect.top -= 1;
-			rect.bottom += 1;
-		}
+		// draw tab frame wider to align B_PLAIN_BORDER with it
+		if (borderStyle == B_PLAIN_BORDER)
+			rect.InsetBy(0, -1);
 	}
 
 	DrawInactiveTab(view, rect, rect, base, 0, borders, side);
@@ -1669,8 +1659,9 @@ HaikuControlLook::DrawTabFrame(BView* view, BRect& rect,
 
 
 void
-HaikuControlLook::DrawActiveTab(BView* view, BRect& rect, const BRect& updateRect,
-	const rgb_color& base, uint32 flags, uint32 borders, uint32 side)
+HaikuControlLook::DrawActiveTab(BView* view, BRect& rect,
+	const BRect& updateRect, const rgb_color& base, uint32 flags,
+	uint32 borders, uint32 side, int32, int32, int32, int32)
 {
 	if (!rect.IsValid() || !rect.Intersects(updateRect))
 		return;
@@ -1848,8 +1839,9 @@ HaikuControlLook::DrawActiveTab(BView* view, BRect& rect, const BRect& updateRec
 
 
 void
-HaikuControlLook::DrawInactiveTab(BView* view, BRect& rect, const BRect& updateRect,
-	const rgb_color& base, uint32 flags, uint32 borders, uint32 side)
+HaikuControlLook::DrawInactiveTab(BView* view, BRect& rect,
+	const BRect& updateRect, const rgb_color& base, uint32 flags,
+	uint32 borders, uint32 side, int32, int32, int32, int32)
 {
 	if (!rect.IsValid() || !rect.Intersects(updateRect))
 		return;
@@ -1886,22 +1878,26 @@ HaikuControlLook::DrawInactiveTab(BView* view, BRect& rect, const BRect& updateR
 
 	BRect background = rect;
 	switch (side) {
+		default:
 		case B_TOP_BORDER:
 			rect.top += 4;
 			background.bottom = rect.top;
 			break;
+
 		case B_BOTTOM_BORDER:
 			rect.bottom -= 4;
 			background.top = rect.bottom;
 			break;
+
 		case B_LEFT_BORDER:
 			rect.left += 4;
 			background.right = rect.left;
 			break;
+
 		case B_RIGHT_BORDER:
 			rect.right -= 4;
 			background.left = rect.right;
-		break;
+			break;
 	}
 
 	// active tabs stand out at the top, but this is an inactive tab
@@ -1915,22 +1911,20 @@ HaikuControlLook::DrawInactiveTab(BView* view, BRect& rect, const BRect& updateR
 	_DrawFrame(view, rect, frameLightColor, frameLightColor, frameShadowColor,
 		frameShadowColor, borders);
 
-	if (rect.IsValid()) {
-		if (side == B_TOP_BORDER || side == B_BOTTOM_BORDER) {
+	if ((side == B_TOP_BORDER || side == B_BOTTOM_BORDER)
+		&& (borders & B_LEFT_BORDER) != 0) {
+		if (rect.IsValid()) {
 			_DrawFrame(view, rect, bevelShadowColor, bevelShadowColor,
 				bevelLightColor, bevelLightColor, B_LEFT_BORDER & ~borders);
-		} else if (side == B_LEFT_BORDER || side == B_RIGHT_BORDER) {
+		} else if ((B_LEFT_BORDER & ~borders) != 0)
+			rect.left++;
+	} else if ((side == B_LEFT_BORDER || side == B_RIGHT_BORDER)
+		&& (borders & B_TOP_BORDER) != 0) {
+		if (rect.IsValid()) {
 			_DrawFrame(view, rect, bevelShadowColor, bevelShadowColor,
 				bevelLightColor, bevelLightColor, B_TOP_BORDER & ~borders);
-		}
-	} else {
-		if (side == B_TOP_BORDER || side == B_BOTTOM_BORDER) {
-			if ((B_LEFT_BORDER & ~borders) != 0)
-				rect.left++;
-		} else if (side == B_LEFT_BORDER || side == B_RIGHT_BORDER) {
-			if ((B_TOP_BORDER & ~borders) != 0)
-				rect.top++;
-		}
+		} else if ((B_TOP_BORDER & ~borders) != 0)
+			rect.top++;
 	}
 
 	view->FillRect(rect, fillGradient);

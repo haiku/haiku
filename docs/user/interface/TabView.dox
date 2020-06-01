@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Haiku, Inc. All rights reserved.
+ * Copyright 2014-2020 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,8 +7,8 @@
  *		John Scipione, jscipione@gmail.com
  *
  * Corresponds to:
- *		headers/os/interface/TabView.h	 hrev45377
- *		src/kits/interface/TabView.cpp	 hrev45377
+ *		headers/os/interface/TabView.h	 hrev54500
+ *		src/kits/interface/TabView.cpp	 hrev54500
  */
 
 
@@ -27,33 +27,45 @@
 	Tab position flags
 
 	\since BeOS R3
+
+	\deprecated This should not be used anymore.
+	\sa BTab::DrawTab()
 */
 
 
 /*!
 	\var tab_position B_TAB_FIRST
 
-	First tab in the tab view.
+	The first tab in the tab view.
 
 	\since BeOS R3
+
+	\deprecated This should not be used anymore.
+	\sa BTab::DrawTab()
 */
 
 
 /*!
 	\var tab_position B_TAB_FRONT
 
-	Front most tab in the tab view.
+	The selected tab in the tab view.
 
 	\since BeOS R3
+
+	\deprecated This should not be used anymore.
+	\sa BTab::DrawTab()
 */
 
 
 /*!
 	\var tab_position B_TAB_ANY
 
-	Any tab in the tab view.
+	Any tab in the tab view that is not the first or selected tab.
 
 	\since BeOS R3
+
+	\deprecated This should not be used anymore.
+	\sa BTab::DrawTab()
 */
 
 
@@ -239,20 +251,27 @@
 /*!
 	\fn void BTab::DrawTab(BView* owner, BRect frame, tab_position position,
 		bool full)
-	\brief Draws the tab.
+	\brief Draws the tab and label according to \a position and \a full.
 
-	This method draws the tab's title by calling DrawLabel(), then draws the
-	tab itself. The \a position of the tab may affect how the tab is rendered
-	-- for example the frontmost tab may have a different appearance than the
-	other tabs.
+	This method draws the tab, then draws the tab's title by calling
+	DrawLabel(). The \a position of the tab may affect how the tab is
+	rendered -- for example the first tab may have a differene appearance
+	than the other tabs. You may override this method to draw tabs
+	differently in your BTab subclass.
 
 	\param owner The view that owns the tab.
 	\param frame The frame rectangle to draw in.
 	\param position May affect how the tab is rendered. Choices include:
-	       - \c B_TAB_FIRST
-	       - \c B_TAB_FRONT
-	       - \c B_TAB_ANY
-	\param full Whether or not to completely draw the tab, no longer used.
+	       - \c B_TAB_FIRST The first tab
+	       - \c B_TAB_FRONT The selected or active tab
+	       - \c B_TAB_ANY	Tab that is not first or front
+	\param full Whether or not to completely draw the tab. All tabs were full
+	            except for the tab before the selected tab on BeOS R5.
+
+	\warning The \a position and \a full parameters should no longer be used.
+	         This information can be gathered from BTabView by calling the
+	         BTabView::IndexOf(), BTabView::Selection(), and
+	         BTabView::CountTabs() methods.
 
 	\since BeOS R3
 */
@@ -484,7 +503,7 @@
 
 /*!
 	\fn int32 BTabView::Selection() const
-	\brief Returns the currently selected tab's index.
+	\brief Returns the index of the selected tab or -1 if not found.
 
 	\since BeOS R3
 */
@@ -724,6 +743,14 @@
 /*!
 	\fn BView* BTabView::ViewForTab(int32 tabIndex) const
 	\brief Returns the BView of the tab at the specified \a tabIndex.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn int32 BTabView::IndexOf(Tab* tab) const
+	\brief Returns the index of \a tab or -1 if not found.
 
 	\since Haiku R1
 */

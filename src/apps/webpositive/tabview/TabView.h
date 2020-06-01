@@ -28,26 +28,20 @@ public:
 
 			void 				Draw(BRect updateRect);
 	virtual	void				DrawBackground(BView* owner, BRect frame,
-									const BRect& updateRect, bool isFirst,
-									bool isLast, bool isFront);
+									const BRect& updateRect);
 	virtual	void				DrawContents(BView* owner, BRect frame,
-									const BRect& updateRect, bool isFirst,
-									bool isLast, bool isFront);
+									const BRect& updateRect);
 
 	virtual	void				MouseDown(BPoint where, uint32 buttons);
 	virtual	void				MouseUp(BPoint where);
 	virtual	void				MouseMoved(BPoint where, uint32 transit,
 									const BMessage* dragMessage);
 
-			void				SetIsFront(bool isFront);
-			bool				IsFront() const;
-			void				SetIsLast(bool isLast);
-	virtual	void				Update(bool isFirst, bool isLast,
-									bool isFront);
+	virtual	void				Update();
 
 			BLayoutItem*		LayoutItem() const;
-			void				SetContainerView(
-									TabContainerView* containerView);
+
+			void				SetContainerView(TabContainerView* view);
 			TabContainerView*	ContainerView() const;
 
 			void				SetLabel(const char* label);
@@ -63,10 +57,6 @@ private:
 			TabLayoutItem*		fLayoutItem;
 
 			BString				fLabel;
-
-			bool				fIsFirst;
-			bool				fIsLast;
-			bool				fIsFront;
 };
 
 

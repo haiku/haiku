@@ -16,7 +16,7 @@ class TabContainerView : public BGroupView {
 public:
 	class Controller {
 	public:
-		virtual	void			TabSelected(int32 tabIndex) = 0;
+		virtual	void			UpdateSelection(int32 index) = 0;
 		virtual	bool			HasFrames() = 0;
 		virtual	TabView*		CreateTabView() = 0;
 		virtual	void			DoubleClickOutsideTabs() = 0;
@@ -48,6 +48,16 @@ public:
 			TabView*			TabAt(int32 index) const;
 
 			int32				IndexOf(TabView* tab) const;
+
+			int32				FirstTabIndex() { return 0; };
+			int32				LastTabIndex()
+									{ return GroupLayout() == NULL ? -1
+										: GroupLayout()->CountItems() - 1; };
+			int32				SelectedTabIndex()
+									{ return fSelectedTab == NULL ? -1
+										: IndexOf(fSelectedTab); };
+
+			TabView*			SelectedTab() { return fSelectedTab; };
 
 			void				SelectTab(int32 tabIndex);
 			void				SelectTab(TabView* tab);
