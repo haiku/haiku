@@ -10115,7 +10115,7 @@ _user_open_query(dev_t device, const char* userQuery, size_t queryLength,
 	if (queryLength >= 65536)
 		return B_NAME_TOO_LONG;
 
-	BStackOrHeapArray<char, 128> query(queryLength);
+	BStackOrHeapArray<char, 128> query(queryLength + 1);
 	if (!query.IsValid())
 		return B_NO_MEMORY;
 
