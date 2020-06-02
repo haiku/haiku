@@ -235,7 +235,6 @@ m_cljget(struct mbuf* memoryBuffer, int how, int size)
 static void
 mb_free_ext(struct mbuf *memoryBuffer)
 {
-	object_cache *cache = NULL;
 	volatile u_int *refcnt;
 	struct mbuf *mref;
 	int freembuf;
@@ -270,22 +269,24 @@ mb_free_ext(struct mbuf *memoryBuffer)
 		freembuf = 1;
 
 	/* Free attached storage only if this mbuf is the only reference to it. */
-	if (!(*refcnt == 1 || atomic_add(refcnt, -1) == 1)
-			&& !(freembuf && memoryBuffer != mref))
-		return;
+	if (*refcnt == 1 || atomic_add((int32*)refcnt, -1) == 1) {
+		object_cache *cache = NULL;
 
-	if (memoryBuffer->m_ext.ext_type == EXT_CLUSTER)
-		cache = sChunkCache;
-	else if (memoryBuffer->m_ext.ext_type == EXT_JUMBO9)
-		cache = sJumbo9ChunkCache;
-	else if (memoryBuffer->m_ext.ext_type == EXT_JUMBOP)
-		cache = sJumboPageSizeCache;
-	else
-		panic("unknown mbuf ext_type %d", memoryBuffer->m_ext.ext_type);
+		if (memoryBuffer->m_ext.ext_type == EXT_CLUSTER)
+			cache = sChunkCache;
+		else if (memoryBuffer->m_ext.ext_type == EXT_JUMBO9)
+			cache = sJumbo9ChunkCache;
+		else if (memoryBuffer->m_ext.ext_type == EXT_JUMBOP)
+			cache = sJumboPageSizeCache;
+		else
+			panic("unknown mbuf ext_type %d", memoryBuffer->m_ext.ext_type);
 
-	object_cache_free(cache, memoryBuffer->m_ext.ext_buf, 0);
-	memoryBuffer->m_ext.ext_buf = NULL;
-	object_cache_free(sMBufCache, memoryBuffer, 0);
+		object_cache_free(cache, memoryBuffer->m_ext.ext_buf, 0);
+		object_cache_free(sMBufCache, mref, 0);
+	}
+
+	if (freembuf && memoryBuffer != mref)
+		object_cache_free(sMBufCache, memoryBuffer, 0);
 }
 
 
