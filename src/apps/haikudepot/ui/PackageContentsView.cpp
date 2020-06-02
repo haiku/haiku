@@ -302,11 +302,13 @@ PackageContentsView::SetPackage(const PackageInfoRef& package)
 		fLastPackageState = package.Get() != NULL ? package->State() : NONE;
 	}
 
-	// if the package is not installed then there is no point in attempting to
-	// populate data for it.
+	// if the package is not installed and is not a local file on disk then
+	// there is no point in attempting to populate data for it.
 
-	if (package.Get() != NULL && package->State() == ACTIVATED)
+	if (package.Get() != NULL
+			&& (package->State() == ACTIVATED || package->IsLocalFile())) {
 		release_sem_etc(fContentPopulatorSem, 1, 0);
+	}
 }
 
 
