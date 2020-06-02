@@ -31,11 +31,11 @@
 #define PLACEHOLDER_TEXT "..."
 
 #define INTRODUCTION_TEXT_LATEST "HaikuDepot communicates with a " \
-	"sever component called HaikuDepotServer. These are the latest " \
+	"server component called HaikuDepotServer. These are the latest " \
 	"usage conditions for use of the HaikuDepotServer service."
 
 #define INTRODUCTION_TEXT_USER "HaikuDepot communicates with a " \
-	"sever component called HaikuDepotServer. These are the usage " \
+	"server component called HaikuDepotServer. These are the usage " \
 	"conditions that the user '%Nickname%' agreed to at %AgreedToTimestamp% "\
 	"in relation to the use of the HaikuDepotServer service."
 
