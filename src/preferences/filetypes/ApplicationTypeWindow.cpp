@@ -498,7 +498,8 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position,
 		.Add(fMinorVersionControl, 4, 0, 2)
 		.Add(varietyField, 6, 0, 3)
 		.Add(fInternalVersionControl, 9, 0, 2)
-		.AddTextControl(fShortDescriptionControl, 0, 1)
+		.AddTextControl(fShortDescriptionControl, 0, 1,
+			B_ALIGN_HORIZONTAL_UNSET, 1, 10)
 		.Add(longLabel, 0, 2)
 		.Add(scrollView, 1, 2, 10, 3)
 		.SetRowWeight(3, 3);
