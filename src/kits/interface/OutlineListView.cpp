@@ -199,8 +199,10 @@ BOutlineListView::KeyDown(const char* bytes, int32 numBytes)
 				if (item && item->fHasSubitems) {
 					if (!item->IsExpanded())
 						Expand(item);
-					else
+					else {
 						Select(currentSel + 1);
+						ScrollToSelection();
+					}
 				}
 				return;
 			}
@@ -209,12 +211,14 @@ BOutlineListView::KeyDown(const char* bytes, int32 numBytes)
 			{
 				BListItem* item = ItemAt(currentSel);
 				if (item) {
-					if (item->fHasSubitems)
+					if (item->fHasSubitems && item->IsExpanded())
 						Collapse(item);
 					else {
 						item = Superitem(item);
-						if (item)
+						if (item) {
 							Select(IndexOf(item));
+							ScrollToSelection();
+						}
 					}
 				}
 				return;
