@@ -7,7 +7,7 @@ RemotePackageRepository HaikuPorts
 	ca_root_certificates-2020_01_01-1
 	gnu_efi_kernel-3.0.10-1
 	haikuporter-1.2.3-2
-	noto-20170920-3
+	noto-20170920-4
 	noto_sans_cjk_jp-1.004-2
 	timgmsoundfont-fixed-5
 	wqy_microhei-0.2.0~beta-4
@@ -15,10 +15,10 @@ RemotePackageRepository HaikuPorts
 	# repository architecture packages
 	# primary architecture (x86_gcc2)
 	autoconf-2.69-8
-	automake-1.16.1-1
-	bash-5.0.016-1
+	automake-1.16.2-1
+	bash-5.0.017-1
 	bc-1.07.1-2
-	bepdf-2.1.1-1
+	bepdf-2.1.2-1
 	binutils-2.17_2016_07_24-4
 	bison-3.0.5-1
 	bzip2-1.0.8-1
@@ -66,7 +66,7 @@ RemotePackageRepository HaikuPorts
 	jam-2.5_2018_11_21-7
 	jasper-2.0.16-4
 	jasper_devel-2.0.16-4
-	keymapswitcher-1.2.7.11-8
+	keymapswitcher-1.2.7.14-1
 	lame-3.100-3
 	lame_devel-3.100-3
 	less-551-1
@@ -95,7 +95,7 @@ RemotePackageRepository HaikuPorts
 	libtheora-1.1.1-7
 	libtheora_devel-1.1.1-7
 	libtool-2.4.6-2
-	libuuid-1.3.1-1
+	libuuid-1.3.1-4
 	libvorbis-1.3.6-1
 	libvorbis_devel-1.3.6-1
 	libvpx-1.0.0-2
@@ -124,15 +124,15 @@ RemotePackageRepository HaikuPorts
 	openexr_devel-2.2.1-3
 	openjpeg-2.1.2-3
 	openjpeg_devel-2.1.2-3
-	openssh-8.2p1-3
-	openssl-1.1.1e-1
-	openssl_devel-1.1.1e-1
+	openssh-8.3p1-1
+	openssl-1.1.1g-2
+	openssl_devel-1.1.1g-2
 	p7zip-16.02-1
 	patch-2.7.5-3
 	pdflib-5.0.3-3
 	pdfwriter-1.0-3
 	pe-2.4.5-8
-	perl-5.30.1-1
+	perl-5.30.2-1
 	pkgconfig-0.29.2-3
 	python-2.7.17-2
 	qrencode_kdl_devel-3.4.4-2
@@ -152,17 +152,17 @@ RemotePackageRepository HaikuPorts
 	tiff4-4.1.0-3
 	tiff4_devel-4.1.0-3
 	unzip-6.10c23-4
-	vision-0.10.3-2
+	vision-0.10.4-1
 	wget-1.20.3-2
 	which-2.21-5
 	wonderbrush-2.1.2-9
-	wpa_supplicant-2.9.haiku.1-1
+	wpa_supplicant-2.9.haiku.1-2
 	zip-3.0-4
 	zlib-1.2.11-3
 	zlib_devel-1.2.11-3
 	# secondary architecture (x86)
 	binutils_x86-2.26.1_2016_07_22-6
-	bison_x86-3.5.3-1
+	bison_x86-3.5.4-1
 	bzip2_x86-1.0.8-1
 	bzip2_x86_devel-1.0.8-1
 	cdrtools_x86-3.02~a09-1
@@ -188,8 +188,8 @@ RemotePackageRepository HaikuPorts
 	glu_x86-9.0.0-7
 	glu_x86_devel-9.0.0-7
 	gmp_x86-6.1.2-3
-	haikuwebkit_x86-1.6.9-2
-	haikuwebkit_x86_devel-1.6.9-2
+	haikuwebkit_x86-1.7.0-1
+	haikuwebkit_x86_devel-1.7.0-1
 	icu_x86-57.2-2
 	icu_x86_devel-57.2-2
 	jasper_x86-2.0.16-4
@@ -252,8 +252,8 @@ RemotePackageRepository HaikuPorts
 	openexr_x86_devel-2.4.1-1
 	openjpeg_x86-2.3.1-2
 	openjpeg_x86_devel-2.3.1-2
-	openssl_x86-1.1.1e-1
-	openssl_x86_devel-1.1.1e-1
+	openssl_x86-1.1.1g-2
+	openssl_x86_devel-1.1.1g-2
 	pkgconfig_x86-0.29.2-3
 	sharutils_x86-4.15.2-3
 	speex_x86-1.2.0-4
