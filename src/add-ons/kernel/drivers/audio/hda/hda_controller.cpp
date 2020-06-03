@@ -135,7 +135,7 @@ static const struct {
 
 
 static uint32
-get_controller_quirks(pci_info& info)
+get_controller_quirks(const pci_info& info)
 {
 	for (size_t i = 0;
 			i < sizeof(kControllerQuirks) / sizeof(kControllerQuirks[0]); i++) {
@@ -1003,20 +1003,25 @@ hda_hw_init(hda_controller* controller)
 	uint16 stateStatus;
 	uint16 cmd;
 	status_t status;
-	uint32 quirks = get_controller_quirks(controller->pci_info);
+	const pci_info& pciInfo = controller->pci_info; 	
+	uint32 quirks = get_controller_quirks(pciInfo);
+
+	// map the registers (low + high for 64-bit when requested)
+	phys_addr_t physicalAddress = pciInfo.u.h0.base_registers[0];
+	physicalAddress &= PCI_address_memory_32_mask;
+	if ((pciInfo.u.h0.base_register_flags[0] & 0xC) == PCI_address_type_64)
+		physicalAddress += (phys_addr_t)pciInfo.u.h0.base_registers[1] << 32;
 
 	// Map MMIO registers
 	controller->regs_area = map_physical_memory("hda_hw_regs",
-		controller->pci_info.u.h0.base_registers[0],
-		controller->pci_info.u.h0.base_register_sizes[0], B_ANY_KERNEL_ADDRESS,
-		0, (void**)&controller->regs);
+		physicalAddress, pciInfo.u.h0.base_register_sizes[0],
+		B_ANY_KERNEL_ADDRESS, 0, (void**)&controller->regs);
 	if (controller->regs_area < B_OK) {
 		status = controller->regs_area;
 		goto error;
 	}
 
-	cmd = (gPci->read_pci_config)(controller->pci_info.bus,
-		controller->pci_info.device, controller->pci_info.function,
+	cmd = (gPci->read_pci_config)(pciInfo.bus, pciInfo.device, pciInfo.function,
 		PCI_command, 2);
 	if (!(cmd & PCI_command_master)) {
 		dprintf("hda: enabling PCI bus mastering\n");
@@ -1030,27 +1035,22 @@ hda_hw_init(hda_controller* controller)
 		dprintf("hda: enabling PCI interrupts\n");
 		cmd &= ~PCI_command_int_disable;
 	}
-	(gPci->write_pci_config)(controller->pci_info.bus,
-		controller->pci_info.device, controller->pci_info.function,
+	(gPci->write_pci_config)(pciInfo.bus, pciInfo.device, pciInfo.function,
 			PCI_command, 2, cmd);
 
 	// Absolute minimum hw is online; we can now install interrupt handler
 
-	controller->irq = controller->pci_info.u.h0.interrupt_line;
+	controller->irq = pciInfo.u.h0.interrupt_line;
 	controller->msi = false;
 
 	if (gPCIx86Module != NULL && (quirks & HDA_QUIRK_NO_MSI) == 0
-			&& gPCIx86Module->get_msi_count(
-				controller->pci_info.bus, controller->pci_info.device,
-				controller->pci_info.function) >= 1) {
+			&& gPCIx86Module->get_msi_count(pciInfo.bus, pciInfo.device,
+				pciInfo.function) >= 1) {
 		// Try MSI first
 		uint8 vector;
-		if (gPCIx86Module->configure_msi(controller->pci_info.bus,
-				controller->pci_info.device, controller->pci_info.function,
-				1, &vector) == B_OK
-			&& gPCIx86Module->enable_msi(controller->pci_info.bus,
-				controller->pci_info.device, controller->pci_info.function)
-					== B_OK) {
+		if (gPCIx86Module->configure_msi(pciInfo.bus, pciInfo.device,
+			pciInfo.function, 1, &vector) == B_OK && gPCIx86Module->enable_msi(
+				pciInfo.bus, pciInfo.device, pciInfo.function) == B_OK) {
 			dprintf("hda: using MSI vector %u\n", vector);
 			controller->irq = vector;
 			controller->msi = true;
@@ -1071,7 +1071,7 @@ hda_hw_init(hda_controller* controller)
 	controller->dma_snooping = false;
 
 	if ((quirks & HDA_QUIRK_SNOOP) != 0) {
-		switch (controller->pci_info.vendor_id) {
+		switch (pciInfo.vendor_id) {
 			case PCI_VENDOR_NVIDIA:
 			{
 				controller->dma_snooping = update_pci_register(controller,
