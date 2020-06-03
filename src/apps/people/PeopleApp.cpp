@@ -58,6 +58,7 @@ struct DefaultAttribute sDefaultAttributes[] = {
 	{ "META:zip", 50, B_TRANSLATE("Zip") },
 	{ "META:country", 120, B_TRANSLATE("Country") },
 	{ "META:hphone", 90, B_TRANSLATE("Home phone") },
+	{ "META:mphone", 90, B_TRANSLATE("Mobile phone") },
 	{ "META:wphone", 90, B_TRANSLATE("Work phone") },
 	{ "META:fax", 90, B_TRANSLATE("Fax") },
 	{ "META:email", 120, B_TRANSLATE("E-mail") },

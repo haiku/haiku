@@ -82,6 +82,7 @@ static const char* kAttrState = "META:state";
 static const char* kAttrZip = "META:zip";
 static const char* kAttrCountry = "META:country";
 static const char* kAttrHomePhone = "META:hphone";
+static const char* kAttrMobilePhone = "META:mphone";
 static const char* kAttrWorkPhone = "META:wphone";
 static const char* kAttrFax = "META:fax";
 static const char* kAttrEmail = "META:email";
@@ -370,6 +371,8 @@ TTracker::InitMimeTypes()
 		installer.AddExtraAttribute("E-mail", kAttrEmail, B_STRING_TYPE,
 			true, true, 120, B_ALIGN_LEFT, false);
 		installer.AddExtraAttribute("Home phone", kAttrHomePhone,
+			B_STRING_TYPE, true, true, 90, B_ALIGN_LEFT, false);
+		installer.AddExtraAttribute("Mobile phone", kAttrMobilePhone,
 			B_STRING_TYPE, true, true, 90, B_ALIGN_LEFT, false);
 		installer.AddExtraAttribute("Work phone", kAttrWorkPhone,
 			B_STRING_TYPE, true, true, 90, B_ALIGN_LEFT, false);
