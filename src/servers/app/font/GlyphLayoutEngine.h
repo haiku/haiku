@@ -16,6 +16,7 @@
 #include "FontManager.h"
 #include "ServerFont.h"
 
+#include <Autolock.h>
 #include <Debug.h>
 
 #include <ctype.h>
@@ -337,22 +338,29 @@ GlyphLayoutEngine::_WriteLockAndAcquireFallbackEntry(
 		NULL
 	};
 
-	int i = 0;
 	fallbackEntry = NULL;
 
-	// Try to get the glyph from the fallback fonts
-	for (i = 0; fallbacks[i] != NULL; i++) {
-		if (gFontManager->Lock()) {
-			FontStyle* fallbackStyle = gFontManager->GetStyle(fallbacks[i],
-				font.Style());
+	// Try to get the glyph from the fallback fonts.
+	for (int c = 0; c < 2; c++) {
+		const char* fontStyle;
+		if (c == 0)
+			fontStyle = font.Style();
+		else
+			fontStyle = NULL;
 
-			if (fallbackStyle == NULL) {
-				gFontManager->Unlock();
+		for (int i = 0; fallbacks[i] != NULL; i++) {
+			BAutolock locker(gFontManager);
+			if (!locker.IsLocked())
 				continue;
-			}
+
+			FontStyle* fallbackStyle = gFontManager->GetStyle(fallbacks[i],
+				fontStyle, 0xffff, 0);
+
+			if (fallbackStyle == NULL)
+				continue;
 
 			ServerFont fallbackFont(*fallbackStyle, font.Size());
-			gFontManager->Unlock();
+			locker.Unlock();
 
 			// Force the write-lock on the fallback entry, since we
 			// don't transfer or copy GlyphCache objects from one cache
@@ -369,6 +377,9 @@ GlyphLayoutEngine::_WriteLockAndAcquireFallbackEntry(
 				break;
 			}
 		}
+
+		if (fallbackEntry != NULL)
+			break;
 	}
 
 	// NOTE: We don't care if fallbackEntry is still NULL, fetching
