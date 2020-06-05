@@ -64,8 +64,8 @@ using std::nothrow;
 
 using namespace BPrivate;
 
-//! The minimal time interval for message runners (50 ms).
-static const bigtime_t kMininalTimeInterval = 50000LL;
+//! The minimal time interval for message runners (1 us).
+static const bigtime_t kMinimalTimeInterval = 1LL;
 
 
 static bigtime_t
@@ -101,7 +101,7 @@ public:
 	/*!	\brief Hook method invoked when the event is executed.
 
 		Implements Event. Calls MessageRunnerManager::_DoEvent().
-		
+
 		\param queue The event queue executing the event.
 		\return \c true, if the object shall be deleted, \c false otherwise.
 	*/
@@ -283,7 +283,7 @@ MessageRunnerManager::HandleRegisterRunner(BMessage *request)
 	// add a new runner info
 	RunnerInfo *info = NULL;
 	if (error == B_OK) {
-		interval = max(interval, kMininalTimeInterval);
+		interval = max(interval, kMinimalTimeInterval);
 		info = new(nothrow) RunnerInfo(team, _NextToken(), target, message,
 									   interval, count, replyTarget);
 		if (info) {
@@ -420,7 +420,7 @@ MessageRunnerManager::HandleSetRunnerParams(BMessage *request)
 			eventRemoved = fEventQueue->RemoveEvent(info->event);
 			if (!eventRemoved)
 				info->rescheduled = true;
-			interval = max(interval, kMininalTimeInterval);
+			interval = max(interval, kMinimalTimeInterval);
 			info->interval = interval;
 			info->time = system_time();
 			if (!_ScheduleEvent(info))
