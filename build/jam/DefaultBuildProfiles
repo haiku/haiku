@@ -65,6 +65,9 @@ rule DefineDefaultBuildProfiles
 
 	switch $(HAIKU_BUILD_PROFILE) {
 		case "release-*" : {
+			# Forced on beta branch.
+			HAIKU_INCLUDE_SOURCES = 1 ;
+
 			Echo Building Haiku R1/development preview ;
 			HAIKU_ROOT_USER_NAME ?= user ;
 			HAIKU_ROOT_USER_REAL_NAME ?= "Yourself" ;
@@ -243,8 +246,8 @@ rule DefineDefaultBuildProfiles
 
 
 	# Uncomment in official release branch.
-	#HAIKU_DEFINES += HAIKU_OFFICIAL_RELEASE ;
-	#TARGET_DEFINES += HAIKU_OFFICIAL_RELEASE ;
+	HAIKU_DEFINES += HAIKU_OFFICIAL_RELEASE ;
+	TARGET_DEFINES += HAIKU_OFFICIAL_RELEASE ;
 
 
 	# If a build profile was specified on the command line, now is the time to
