@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018, Haiku, Inc. All Rights Reserved.
+ * Copyright 2011-2020, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -92,15 +92,14 @@ BRepositoryInfo::Archive(BMessage* data, bool deep) const
 
 	if ((result = data->AddString(kNameField, fName)) != B_OK)
 		return result;
-	// Field in the archive is named "url" for backward compatility reasons.
-	// We can change this when everyone has updated to a version of Haiku
-	// with support for reading the "identifier" field.
+	if ((result = data->AddString(kIdentifierField, fIdentifier)) != B_OK)
+		return result;
+	// "url" is an older, deprecated key for "identifier"
 	if ((result = data->AddString(kURLField, fIdentifier)) != B_OK)
 		return result;
 	if ((result = data->AddString(kVendorField, fVendor)) != B_OK)
 		return result;
-	result = data->AddString(kSummaryField, fSummary);
-	if (result != B_OK)
+	if ((result = data->AddString(kSummaryField, fSummary)) != B_OK)
 		return result;
 	if ((result = data->AddUInt8(kPriorityField, fPriority)) != B_OK)
 		return result;
@@ -282,34 +281,35 @@ BRepositoryInfo::_SetTo(const BMessage* data)
 	status_t result;
 	if ((result = data->FindString(kNameField, &fName)) != B_OK)
 		return result;
-	if ((result = data->FindString(kIdentifierField, &fIdentifier)) != B_OK) {
-		// Handle the "url" field as well (it is still the one we generate).
-		// Later on when everyone is using this code we can switch the writing
-		// side to use the "identifier" field with its correct name.
-		if ((result = data->FindString(kURLField, &fIdentifier)) != B_OK)
-			return result;
+	result = data->FindString(kIdentifierField, &fIdentifier);
+	if (result == B_NAME_NOT_FOUND) {
+		result = data->FindString(kURLField, &fIdentifier);
+			// this is a legacy key for the identifier.
 	}
+	if (result != B_OK)
+		return result;
 	if ((result = data->FindString(kVendorField, &fVendor)) != B_OK)
 		return result;
 	if ((result = data->FindString(kSummaryField, &fSummary)) != B_OK)
 		return result;
 	if ((result = data->FindUInt8(kPriorityField, &fPriority)) != B_OK)
 		return result;
-	result = data->FindUInt8(kArchitectureField, (uint8*)&fArchitecture);
-	if (result != B_OK)
+	if ((result = data->FindUInt8(
+			kArchitectureField, (uint8*)&fArchitecture)) != B_OK) {
 		return result;
+	}
 	if (fArchitecture == B_PACKAGE_ARCHITECTURE_ANY)
 		return B_BAD_DATA;
 
-	// Old packages had no base-url field, the "url" field acted both as an
-	// identifier and locator for the repository.
-	data->FindString(kBaseURLField, &fBaseURL);
-	if (fBaseURL.Length() == 0) {
-		fBaseURL = fIdentifier;
-		// In that case make sure the identifier is indeed an http URL
-		// (in the new format, the protocol is not required to be http anymore)
-		if (!fBaseURL.StartsWith("http"))
-			return B_BAD_DATA;
+	// this field is optional because earlier versions did not support this
+	// field.
+	status_t baseUrlResult = data->FindString(kBaseURLField, &fBaseURL);
+	switch (baseUrlResult) {
+		case B_OK:
+		case B_NAME_NOT_FOUND:
+			break;
+		default:
+			return baseUrlResult;
 	}
 
 	const char* licenseName;
