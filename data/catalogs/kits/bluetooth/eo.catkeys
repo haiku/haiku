@@ -5,7 +5,7 @@ Common ISDN access	DeviceClass		Komuna ISDN aliro
 Unknown (reserved) minor device class	DeviceClass		Nekonata (rezervita) minora aparato
 Uncategorized	DeviceClass		Nekategoriigita
 Keyboard	DeviceClass		Klavaro
-Smart phone	DeviceClass		Poŝtelefono
+Smart phone	DeviceClass		Saĝtelefono
 VCR	DeviceClass		VCR
 Cellular	DeviceClass		Ĉela
 Audio	DeviceClass		Aŭdaĵo

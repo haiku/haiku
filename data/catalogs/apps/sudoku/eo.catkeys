@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-Sudoku	3781663456
+1	esperanto	x-vnd.Haiku-Sudoku	3382377306
 Restore snapshot	SudokuWindow		Restaŭri kaptitan staton
 File	SudokuWindow		Dosiero
 Mark invalid values	SudokuWindow		Marki malvalidajn valorojn
@@ -31,4 +31,5 @@ Creating solvable field	SudokuGenerator		Kreado de divenebla krado
 View	SudokuWindow		Rigardi
 Snapshot current	SudokuWindow		Kapti nunan staton
 Mark valid hints	SudokuWindow		Sugesti validaĵojn
+Sudoku request	SudokuWindow		Informpeto de la Sudoko
 Open file…	SudokuWindow		Uzi dosieron…

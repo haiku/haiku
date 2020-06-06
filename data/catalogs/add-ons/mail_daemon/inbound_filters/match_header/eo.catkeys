@@ -2,7 +2,7 @@
 Delete message	ConfigView		Forigi mesaĝon
 Match \"%attribute\" against \"%regex\"	RuleFilter		Kongrua \"%attribute\" per \"%regex\"
 Match header	RuleFilter		Kongrua kapo
-Set flags to	ConfigView		Fiksi flagojn al
+Set flags to	ConfigView		Atribui flagojn al
 Header field (e.g. Subject, From, …)	ConfigView		Mesaĝkapo (ekz. Subjekto, Sendinto, …)
 <Choose account>	ConfigView		<Elekti konton>
 Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Ajnsigna valoro kiel \"*spam*\".\nAnstataŭigi \"REGEX:\" por uzi regulajn esprimojn.

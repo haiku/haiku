@@ -1,8 +1,18 @@
-1	esperanto	x-vnd.Haiku-Pairs	1206892220
+1	esperanto	x-vnd.Haiku-Pairs	818003250
+Pairs	System name		La Parkaptado
 Quit	PairsWindow		Ĉesi
+Medium	PairsWindow		Meznivela
+Game	PairsWindow		Ludo
+Expert (8x8)	PairsWindow		Spertnivela (8*8)
+New	PairsWindow		Nova
 OK	Pairs		Bone
-Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	La Pairs-o ne trovis sufiĉe da vektorajn piktogramojn por komenci; ĝi bezonas almenaŭ %zu, trovite %zu.\n
+Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	La Parkaptado ne trovis sufiĉe da vektorajn piktogramojn por komenci; ĝi bezonas almenaŭ %zu, trovite %zu.\n
 You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWindow		Vi kompletigis la ludon en {0, plural, one{# klakon} other{# klakojn}}.\n
+Small	PairsWindow		Malgranda
+Size	PairsWindow		Grando
+%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n	PairsWindow		%app%\n\tkreita per Ralf Schülke\n\tKopirajto 2008-2010, Haiku Inc.\n\n
 Quit game	PairsWindow		Ĉesi ludon
-Intermediate (6x6)	PairsWindow		Meza nivelo (6x6)
+Large	PairsWindow		Granda
+Beginner (4x4)	PairsWindow		Komencnivela (4*4)
+Intermediate (6x6)	PairsWindow		Meznivela (6*6)
 New game	PairsWindow		Nova ludo

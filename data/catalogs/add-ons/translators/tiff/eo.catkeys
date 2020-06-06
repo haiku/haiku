@@ -1,5 +1,5 @@
 1	esperanto	x-vnd.Haiku-TIFFTranslator	2234713102
-TIFF Library:	TIFFView		TIFF Libraro:
+TIFF Library:	TIFFView		TIFF kodoteko:
 RLE (Packbits)	TIFFView		RLE (Packbits)
 ZIP (Deflate)	TIFFView		ZIP (Maldensiga)
 identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: nevalida dokumentindekso\n

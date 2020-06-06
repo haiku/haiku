@@ -114,8 +114,8 @@ Edit templates…	TemplatesMenu		Edita les plantilles...
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used usat -- %free lliure)
 Hide dotfiles	SettingsView		Amaga els fitxers amb un punt inicial
 Trash	Model		Paperera
-Enable type-ahead filtering	SettingsView		Habilita el filtratge mentre s'escriu
-copy	FSUtils	filename copy	còpia
+Enable type-ahead filtering	SettingsView		Habilita el filtratge d'anticipació de tecleig
+copy	FSUtils	filename copy	copia
 New folder%ld	FSUtils		Carpeta nova %ld
 Location	OpenWithWindow		Ubicació
 %Ld B	WidgetAttributeText		%Ld B
@@ -218,7 +218,7 @@ Modified	ContainerWindow		Modificat
 Mini icon view	ContainerWindow		Mostra les icones petites
 File	FilePanelPriv		Fitxer
 Search	FindPanel		Cerca
-Modified:	InfoWindow		Modificat
+Modified:	InfoWindow		Modificat:
 Cancel	FilePanelPriv		Cancel·la
 Sorry, you cannot edit that attribute.	WidgetAttributeText		Disculpeu, no podeu editar aquest atribut.
 Memory pointer	AttributesView		Punter de memòria
@@ -338,7 +338,7 @@ Paste layout	ContainerWindow		Enganxa la disposició
 Cancel	Tracker		Cancel·la
 yes	AttributesView		sí
 Make active printer	ContainerWindow		Estableix com a impressora activa
-Copy to	ContainerWindow		Còpia a
+Copy to	ContainerWindow		Copia a
 Name	SelectionWindow		Nom
 by attribute	FindPanel		per l'atribut
  info	InfoWindow		 informació
@@ -421,7 +421,7 @@ KiB	WidgetAttributeText		KiB
 Revert	TrackerSettingsWindow		Torna a l'estat anterior
 trash	B_TRASH_DIRECTORY		paperera
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Si moveu la carpeta de sistema o el que hi ha, no podreu fer arrencar el sistema %osName!\n\nSegur que ho voleu fer?\n\nSi tanmateix voleu fer-ho, mantingueu premuda la tecla Maj. i cliqueu a Mou.
-Close all in workspace	ContainerWindow		Tancat-ho tot de l'espai de treball
+Close all in workspace	ContainerWindow		Tanca-ho tot de l'espai de treball
 Corrupted expression.	libtracker		Expressió corrupta.
 32 x 32	DeskWindow		32 x 32
 Network address	AttributesView		Adreça de xarxa

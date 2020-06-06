@@ -6,7 +6,7 @@ OK	HWindow		Bone
 Other…	HWindow		Aliaj…
 OK	SoundsHApp		Bone
 Sound file:	HWindow		Dosiero de sono:
-This is not an audio file.	HWindow		Tio ne estas sondisero.
+This is not an audio file.	HWindow		Tio ne estas sondosiero.
 <none>	HEventList		<neniu>
 OK	HEventList		Bone
 About Sounds	SoundsHApp		Pri sonoj

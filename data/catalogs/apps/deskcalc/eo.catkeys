@@ -14,7 +14,7 @@ ceil	CalcView		plaf
 -	CalcView		-
 cbrt	CalcView		kbrd
 BS	CalcView	Key label, 'BS' means backspace	RP
-floor	CalcView		planko
+floor	CalcView		entjero
 sinh	CalcView		sinh
 6	CalcView		6
 sin	CalcView		sin
@@ -23,8 +23,8 @@ tanh	CalcView		tanh
 cosh	CalcView		cosh
 ln	CalcView		ln
 Compact	CalcView		Densa
-Calculating	CalcView		Kalkulas
-Enable Num Lock on startup	CalcView		Ebligi Nombraŝlosklavon ĉe startigo
+Calculating	CalcView		Kalkulado
+Enable Num Lock on startup	CalcView		Ŝalti nombran baskulon dum startigo
 4	CalcView		4
 Scientific	CalcView		Scienca
 )	CalcView		)
@@ -41,7 +41,7 @@ exp	CalcView		exp
 atan	CalcView		atan
 9	CalcView		9
 .	CalcView		.
-DeskCalc	System name		LabortablaKalkulo
+DeskCalc	System name		La Ĉetablkalkulo
 Degrees	CalcView		Gradoj
 7	CalcView		7
 !	CalcView		!

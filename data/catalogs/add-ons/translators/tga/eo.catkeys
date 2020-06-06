@@ -1,7 +1,7 @@
 1	esperanto	x-vnd.Haiku-TGATranslator	3075011211
 Save with RLE compression	TGAView		Konservi RLE-densige
 Targa image (%d bits truecolor)	TGATranslator		Targa bildo (%d bita verkolora)
-Ignore TGA alpha channel	TGAView		Malatenti TGA alfakanelon
+Ignore TGA alpha channel	TGAView		Malatenti alfa kanalon de TGA
 Targa image (%d bits colormap)	TGATranslator		Targa bildo (%d bita kolormapa)
 TGA image translator	TGAView		TGA bildotradukilo
 Targa image (%d bits RLE colormap)	TGATranslator		Targa bildo (%d bita RLE kolormapa)

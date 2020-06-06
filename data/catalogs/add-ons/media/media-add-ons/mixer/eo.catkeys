@@ -1,7 +1,7 @@
 1	esperanto	x-vnd.Haiku-mixer.media_addon	3450667169
 Input gain controls represent	AudioMixer		Enigopliigaj stiriloj reprezentas
 Linear interpolation	AudioMixer		Linia interpolado
-Virtual output channels	AudioMixer		Virtualaj eligaj kaneloj
+Virtual output channels	AudioMixer		Virtualaj eligaj kanaloj
 Refuse output format changes	AudioMixer		Malpermesi eligajn formŝangojn
 Output mapping	AudioMixer		Eliga mapado
 Allow input channel remapping	AudioMixer		Permesi enigkanelan remapadon
@@ -23,5 +23,5 @@ Master output	AudioMixer		Majstra eligo
 Setup	AudioMixer		Agordi
 Use non linear gain sliders (like BeOS R5)	AudioMixer		Uzu neliniajn pliigstirilojn (kiel BeOS R5)
 Gain	AudioMixer		Pliigo
-Allow output channel remapping	AudioMixer		Permesi eligkanelan remapadon
+Allow output channel remapping	AudioMixer		Permesi eligkanalan remapadon
 Physical input channels	AudioMixer		Fizikaj enigaj kaneloj

@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.haiku-icon_o_matic	1885016727
+1	esperanto	x-vnd.haiku-icon_o_matic	1805671130
 None	Icon-O-Matic-Properties		Nenio
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Turni Indeksojn de itineroj
 Add empty	Icon-O-Matic-ShapesList		Aldoni malplenan
@@ -99,7 +99,7 @@ Translation X	Icon-O-Matic-PropertyNames		Konverto X
 Flip Control Points	Icon-O-Matic-FlipPointsCmd		Renversi Apogajn Punktojn
 Add Transformers	Icon-O-Matic-AddTransformersCmd		Aldoni Transformilojn
 BEOS:ICON Attribute	Icon-O-Matic-SavePanel		BEOS:ICON Atributo
-Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		la Icon-O-Matic ŝajne ne interpretis la tutan datumon de la ŝarĝita SVG. Per anstataŭigo de originala dosiero ĝia datumo estos perdita.
+Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		La Piktogramilo ŝajne ne interpretis la tutan datumon de la ŝargita SVG. Per anstataŭigo de originala dosiero ĝia datumo estos perdita.
 Rotate indices backwards	Icon-O-Matic-PathsList		Turni indeksojn reen.
 Overwrite	Icon-O-Matic-SVGExport		Anstataŭigi
 Modify Control Point	Icon-O-Matic-ChangePointCmd		Modifi Apogan Punkton
@@ -159,7 +159,9 @@ No	Icon-O-Matic-StyledTextImport		Ne
 Add circle	Icon-O-Matic-PathsList		Aldoni rondon
 Freeze transformation	Icon-O-Matic-ShapesList		Fiksi transformon
 Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Fiksi formojn
+Miter Limit	Icon-O-Matic-PropertyNames		Limo de deklivo
 Untitled	Icon-O-Matic-Main		Sennoma
+Max LOD	Icon-O-Matic-PropertyNames		Maksimumo por LOD
 Add Path	Icon-O-Matic-AddPathsCmd		Aldoni itineron
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Ĉu konservi nunan piktogramon antaŭ ĉesi?
 Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		Malsukcesis uzi la dosieron '%s' supozante formaton SVG.\n\n
@@ -169,8 +171,10 @@ Save as…	Icon-O-Matic-Menu-File		Konservi kiel…
 Swatches	Icon-O-Matic-Menus		Modeloj
 <modify path>	Icon-O-Matic-PathCmd		<ŝanĝi itineron>
 HVIF Source Code	Icon-O-Matic-SavePanel		HVIF fonta kodo
+Icon-O-Matic	System name		La Piktogramilo
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<nenio por malfari>
 Add	Icon-O-Matic-StylesList		Aldoni
+Translation Y	Icon-O-Matic-PropertyNames		Transformo de Y
 Freeze Shape	Icon-O-Matic-FreezeTransformationCmd		Fiksi formon
 Scale	Icon-O-Matic-TransformationBoxStates		Skali
 Remove Shape	Icon-O-Matic-RemoveShapesCmd		Forigi formon
@@ -190,6 +194,8 @@ Move Transformer	Icon-O-Matic-MoveTransformersCmd		Movi transformilon
 Perspective	Transformation		Perspektivo
 Export	Icon-O-Matic-Menu-File		Eksporti
 Width	Icon-O-Matic-PropertyNames		Larĝo
+Bummer	Cancel button - error alert		Seniluziiĝo
 Style	Icon-O-Matic-Menus		Stilo
 edit it's properties here.	Empty property list - 3rd line		redakti ĝiajn atributojn ĉi tie.
+Off	Icon-O-Matic-Menu-Settings		Malŝalti
 Edit	Icon-O-Matic-Menus		Redakti

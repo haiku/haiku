@@ -92,7 +92,7 @@ Continue	MainWindow		Daŭri
 Could not mount partition %s.	MainWindow		Ne povis surmeti subdiskon %s.
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Ĉu vi certas, ke vi volas strukturi la subdiskon? Ni ankoraŭ demandos vin antaŭ ŝanĝoj estos skribitaj al la disko. 
 <empty or unknown>	PartitionList		<malplena aŭ nekonata>
-The selected disk is read-only.	MainWindow		La elektita disko estas nurlega.
+The selected disk is read-only.	MainWindow		La elektita disko estas nurlegebla.
 The partition %s is already unmounted.	MainWindow		La subdisko %s jam estas surmetita.
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Ĉu vi certas, ke vi volas ŝanĝi la parametrojn de la elektita subdiskon?\n\nLa subdisko eble ne plu estos konata de aliaj operaciumoj!
 Boot	PartitionList		Praĝarga

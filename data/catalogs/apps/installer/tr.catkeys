@@ -63,8 +63,8 @@ Are you sure you want to abort the installation?	InstallerWindow		Kurulumu durdu
 Stop	InstallerWindow		Durdur
 Cancel	InstallerWindow		İptal
 Continue	InstallerWindow	In alert after pressing Stop	Sürdür
-No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Kurulum için uygun bir disk bölümü bulunamadı. Lütfen disk bölümlerini ayarlayın ve en azından bir disk bölümünü Be Dosya Sistemi ile ilkçalıştırın.
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Disk İzlencesi uygulamasını mevcut disk\nbölümlerini ve diğer ortamları biçimlendirmek\niçin çalıştırın. Haiku yüklenecek disk\nbölümlerinin Be Dosya Sistemi ile ilkçalıştırılması\ngerekmektedir.
+No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Kurulum için uygun bir disk bölümü bulunamadı. Lütfen disk bölümlerini ayarlayın ve en azından bir disk bölümünü Be Dosya Sistemi ile ilklendirin.
+Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Disk İzlencesi uygulamasını mevcut disk\nbölümlerini ve diğer ortamları biçimlendirmek\niçin çalıştırın. Haiku yüklenecek disk\nbölümlerinin Be Dosya Sistemi ile ilklendirilmesi\ngerekmektedir.
 Scanning for disks…	InstallerWindow		Diskler taranıyor…
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Disk İzlencesi çalışıyor…\n\nKurulumu sürdürmek için Disk İzlencesi'ni kapatın.
 Abort	InstallerWindow		İptal et

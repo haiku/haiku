@@ -1,5 +1,5 @@
 1	catalan; valencian	x-vnd.Haiku-BootManager	867546001
-Old Master Boot Record backup failure	BootManagerController	Title	Fallada de la còpia de seguretat del Registre d'arrencada mestre antic.
+Old Master Boot Record backup failure	BootManagerController	Title	Fallada de la còpia de seguretat del Registre d'arrencada mestre antic
 At least one partition must be selected!	BootManagerController		Cal seleccionar almenys una partició!
 No space available!	DrivesPage	Cannot install	No hi ha espai disponible!
 Boot Manager is unable to read the partition table!	BootManagerController		El Gestor d'arrencada no ha pogut llegir la taula de particions!

@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-CharacterMap	1580934951
+1	esperanto	x-vnd.Haiku-CharacterMap	124574598
 Enclosed alphanumerics	UnicodeBlocks		Enfermitaj literciferoj
 Basic Latin	UnicodeBlocks		Baza latina
 Cyrillic extended C	UnicodeBlocks		Cirila etendita-C
@@ -151,6 +151,7 @@ CJK unified ideographs extension B	UnicodeBlocks		ĈJK-unuecigitaj ideogramoj-et
 Phags-pa	UnicodeBlocks		Mongola kvadrata skribsistemo de lamao Pĥagva (normo ISO15924)
 Kangxi radicals	UnicodeBlocks		Kanĝi-radikoj
 Dingbats	UnicodeBlocks		Vinjetoj
+Tai Xuan Jing symbols	UnicodeBlocks		Signoj de "Tai Xuan Jing"
 Yi syllables	UnicodeBlocks		Skribsistemo de la siĉuana loloa (normo ISO15924)
 Buhid	UnicodeBlocks		Abugido de indeĝenoj de Filipinoj (normo ISO15924)
 Telugu	UnicodeBlocks		Telugua
@@ -176,6 +177,7 @@ Enclosed CJK letters and months	UnicodeBlocks		Enfermitaj ĈJK-literoj kaj monat
 Kayah Li	UnicodeBlocks		"Kajah Li"
 Alphabetic presentation forms	UnicodeBlocks		Alfabetaj prezentadaj formoj
 Halfwidth and fullwidth forms	UnicodeBlocks		Formoj de plena kaj duona vasteco
+Lydian	UnicodeBlocks		"Lydian"
 Ethiopic supplement	UnicodeBlocks		Etiopa suplemento
 Glagolitic supplement	UnicodeBlocks		Aldono por glagolico
 CJK unified ideographs extension E	UnicodeBlocks		ĈJK-unuecigitaj ideogramoj-etendaĵo-E
@@ -184,7 +186,9 @@ Box drawing	UnicodeBlocks		Kadra desegno
 Mathematical alphanumeric symbols	UnicodeBlocks		Matematikaj literciferaj simboloj
 Copy character	CharacterView		Kopii Signon
 Greek and Coptic	UnicodeBlocks		Greka kaj kopta
+Carian	UnicodeBlocks		"Carian"
 Georgian	UnicodeBlocks		Kartvela
+Phaistos disc	UnicodeBlocks		Signoj de disko el "Phaistos"
 Shavian	UnicodeBlocks		Ŝava alfabeto
 CJK compatibility	UnicodeBlocks		ĈJK-kongrueco
 Malayalam	UnicodeBlocks		Malajala
@@ -193,4 +197,5 @@ Kannada	UnicodeBlocks		Kanara
 Copy as escaped byte string	CharacterView		Kopii kiel bitoka ĉeno kun eskapiloj
 Phonetic extensions supplement	UnicodeBlocks		Suplemento al fonetikaj etendaĵoj
 Domino tiles	UnicodeBlocks		Domenpecoj
+Bhaiksuki	UnicodeBlocks		"Bhaiksuki"
 Katakana phonetic extensions	UnicodeBlocks		Katakana fonetikaj etendaĵoj

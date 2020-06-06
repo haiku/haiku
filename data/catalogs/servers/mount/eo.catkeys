@@ -1,5 +1,5 @@
 1	esperanto	x-vnd.Haiku-mount_server	2818767263
-Mount read-only	AutoMounter		Munti nurlege
+Mount read-only	AutoMounter		Munti nurlegeble
 Error mounting volume:\n\n%s	AutoMounter		Eraro de voluma muntado:\n\n%s
 Cancel	AutoMounter		Nuligi
 OK	AutoMounter		Bone

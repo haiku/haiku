@@ -1,8 +1,8 @@
 1	esperanto	x-vnd.Haiku-Appearance	663472720
-Control border	Colors tab		Fenestraĵa rando
+Control border	Colors tab		Kontrola bordero
 Control mark	Colors tab		Kontrolmarko
 Off	AntialiasingSettingsView		Malŝaltita
-Window border	Colors tab		Fenestra limo
+Window border	Colors tab		Fenestra bordero
 Inactive window tab	Colors tab		Neaktiva fenestra langeto
 Defaults	APRWindow		Aprioraj
 Shadow	Colors tab		Ombro
@@ -53,7 +53,7 @@ ControlLook:	DecorSettingsView		ControlLook:
 Scroll bar thumb	Colors tab		Butono de ruluma strio
 Default	DecorSettingsView		Defaŭlta
 Link visited	Colors tab		Vizitita ligilo
-Selected menu item border	Colors tab		Elektita menuera rando
+Selected menu item border	Colors tab		Bordero de elektita menua elemento
 Tooltip text	Colors tab		Ŝpruchelpila teksto
 Control background	Colors tab		Fenestraĵa fono
 Selected list item text	Colors tab		Teksto de elektita listero
@@ -70,7 +70,7 @@ Scroll bar:	DecorSettingsView		Rulumskalo:
 Choose ControlLook	DecorSettingsView		Elekti ControlLook
 Monospaced fonts only	AntialiasingSettingsView		Sole egallarĝaj tiparoj
 Document text	Colors tab		Dokumenta teksto
-Inactive window border	Colors tab		Neaktiva fenestralimo
+Inactive window border	Colors tab		Bordero de neaktiva fenestro
 Colors	APRWindow		Koloroj
 About control look	DecorSettingsView		Pri ControlLook
 Control highlight	Colors tab		Fenestraĵa emfazo

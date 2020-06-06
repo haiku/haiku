@@ -115,7 +115,7 @@ Edit templates…	TemplatesMenu		Şablonları düzenle…
 Hide dotfiles	SettingsView		Nokta ile başlayan dosyaları gizle
 Trash	Model		Çöp
 Enable type-ahead filtering	SettingsView		Hemen bulan süzmeyi etkinleştir
-copy	FSUtils	filename copy	kopyala
+copy	FSUtils	filename copy	kopyası
 New folder%ld	FSUtils		Yeni klasör%ld
 Location	OpenWithWindow		Konum
 %Ld B	WidgetAttributeText		%Ld B
@@ -291,7 +291,7 @@ The Tracker must be running to set the default printer.	PoseView		Öntanımlı y
 calculating…	InfoWindow		hesaplanıyor…
 Preferred for file	OpenWithWindow		Dosya için tercih edilen
 OK	AutoMounterSettings		Tamam
-copying	FSUtils		kopyaladığınız
+copying	FSUtils		kopyalanıyor
 Get info	FilePanelPriv		Bilgi al
 MIME String	AttributesView		MIME dizisi
 Delete	ContainerWindow		Sil

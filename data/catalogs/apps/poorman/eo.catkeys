@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-PoorMan	2877673150
+1	esperanto	x-vnd.Haiku-PoorMan	1829050509
 Select web folder	PoorMan		Elektu dosierujon retpaĝaran
 Console logging	PoorMan		Protokolo de konzolo
 Create Log File	PoorMan		Krei protokolan dosieron
@@ -37,6 +37,7 @@ File	PoorMan		Dosiero
 Settings…	PoorMan		Agordo…
 Log To File	PoorMan		Protokoli en dosieron
 Connections	PoorMan		Konektoj
+Controls	PoorMan		Stiriloj
 Log to console	PoorMan		Protokoli en konzolon
 Advanced	PoorMan		Por spertuloj
 Copy	PoorMan		Kopii
