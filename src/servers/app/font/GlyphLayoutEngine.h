@@ -341,10 +341,12 @@ GlyphLayoutEngine::_WriteLockAndAcquireFallbackEntry(
 	fallbackEntry = NULL;
 
 	// Try to get the glyph from the fallback fonts.
-	for (int c = 0; c < 2; c++) {
+	for (int c = 0; c < 3; c++) {
 		const char* fontStyle;
 		if (c == 0)
 			fontStyle = font.Style();
+		else if (c == 1)
+			fontStyle = "Regular";
 		else
 			fontStyle = NULL;
 
