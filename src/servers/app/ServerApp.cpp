@@ -922,6 +922,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 					int32 token = -1;
 					link.Read<int32>(&token);
 
+					BAutolock _(fMapLocker);
 					if (ServerPicture* subPicture = _FindPicture(token))
 						picture->NestPicture(subPicture);
 				}
