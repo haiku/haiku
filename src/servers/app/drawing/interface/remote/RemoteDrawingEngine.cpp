@@ -114,7 +114,7 @@ RemoteDrawingEngine::SetDrawState(const DrawState* state, int32 xOffset,
 	SetHighColor(state->HighColor());
 	SetLowColor(state->LowColor());
 	SetFont(state->Font());
-	SetTransform(state->CombinedTransform());
+	SetTransform(state->CombinedTransform(), xOffset, yOffset);
 
 	RemoteMessage message(NULL, fHWInterface->SendBuffer());
 	message.Start(RP_SET_OFFSETS);
@@ -270,8 +270,11 @@ RemoteDrawingEngine::SetFont(const DrawState* state)
 
 
 void
-RemoteDrawingEngine::SetTransform(const BAffineTransform& transform)
+RemoteDrawingEngine::SetTransform(const BAffineTransform& transform,
+	int32 xOffset, int32 yOffset)
 {
+	// TODO: take offset into account
+
 	if (fState.Transform() == transform)
 		return;
 
