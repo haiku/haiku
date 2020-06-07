@@ -323,9 +323,10 @@ DrawingEngine::SetFont(const DrawState* state)
 
 
 void
-DrawingEngine::SetTransform(const BAffineTransform& transform)
+DrawingEngine::SetTransform(const BAffineTransform& transform, int32 xOffset,
+	int32 yOffset)
 {
-	fPainter->SetTransform(transform);
+	fPainter->SetTransform(transform, xOffset, yOffset);
 }
 
 

@@ -68,8 +68,7 @@ public:
 
 								// object settings
 			void				SetTransform(BAffineTransform transform,
-									int32 xOffset = 0,
-									int32 yOffset = 0);
+									int32 xOffset, int32 yOffset);
 
 	inline	bool				IsIdentityTransform() const
 									{ return fIdentityTransform; }
