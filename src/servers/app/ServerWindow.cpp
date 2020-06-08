@@ -47,6 +47,7 @@
 #include <PortLink.h>
 #include <ShapePrivate.h>
 #include <ServerProtocolStructs.h>
+#include <StackOrHeapArray.h>
 #include <ViewPrivate.h>
 #include <WindowInfo.h>
 #include <WindowPrivate.h>
@@ -3078,15 +3079,11 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 				break;
 			}
 
-			const ssize_t kMaxStackStringSize = 4096;
-			char stackString[kMaxStackStringSize];
-			char* string = stackString;
-			if (info.stringLength >= kMaxStackStringSize) {
-				// NOTE: Careful, the + 1 is for termination!
-				string = (char*)malloc((info.stringLength + 1 + 63) / 64 * 64);
-				if (string == NULL)
-					break;
-			}
+			// NOTE: Careful, the + 1 is for termination!
+			BStackOrHeapArray<char, 4096> string(
+				(info.stringLength + 1 + 63) / 64 * 64);
+			if (!string.IsValid())
+				break;
 
 			escapement_delta* delta = NULL;
 			if (code == AS_DRAW_STRING_WITH_DELTA) {
@@ -3094,11 +3091,9 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 				delta = &info.delta;
 			}
 
-			if (link.Read(string, info.stringLength) != B_OK) {
-				if (string != stackString)
-					free(string);
+			if (link.Read(string, info.stringLength) != B_OK)
 				break;
-			}
+
 			// Terminate the string, if nothing else, it's important
 			// for the DTRACE call below...
 			string[info.stringLength] = '\0';
@@ -3113,8 +3108,6 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 			fCurrentView->ScreenToPenTransform().Apply(&penLocation);
 			fCurrentView->CurrentState()->SetPenLocation(penLocation);
 
-			if (string != stackString)
-				free(string);
 			break;
 		}
 		case AS_DRAW_STRING_WITH_OFFSETS:
@@ -3127,27 +3120,12 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 			if (link.Read<int32>(&glyphCount) != B_OK || glyphCount <= 0)
 				break;
 
-			const ssize_t kMaxStackStringSize = 512;
-			char stackString[kMaxStackStringSize];
-			char* string = stackString;
-			BPoint stackLocations[kMaxStackStringSize];
-			BPoint* locations = stackLocations;
-			MemoryDeleter stringDeleter;
-			MemoryDeleter locationsDeleter;
-			if (stringLength >= kMaxStackStringSize) {
-				// NOTE: Careful, the + 1 is for termination!
-				string = (char*)malloc((stringLength + 1 + 63) / 64 * 64);
-				if (string == NULL)
-					break;
-				stringDeleter.SetTo(string);
-			}
-			if (glyphCount > kMaxStackStringSize) {
-				locations = (BPoint*)malloc(
-					((glyphCount * sizeof(BPoint)) + 63) / 64 * 64);
-				if (locations == NULL)
-					break;
-				locationsDeleter.SetTo(locations);
-			}
+			// NOTE: Careful, the + 1 is for termination!
+			BStackOrHeapArray<char, 512> string(
+				(stringLength + 1 + 63) / 64 * 64);
+			BStackOrHeapArray<BPoint, 512> locations(glyphCount);
+			if (!string.IsValid() || !locations.IsValid())
+				break;
 
 			if (link.Read(string, stringLength) != B_OK)
 				break;
@@ -3647,27 +3625,12 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver& link)
 			if (link.Read<int32>(&glyphCount) != B_OK || glyphCount <= 0)
 				break;
 
-			const ssize_t kMaxStackStringSize = 512;
-			char stackString[kMaxStackStringSize];
-			char* string = stackString;
-			BPoint stackLocations[kMaxStackStringSize];
-			BPoint* locations = stackLocations;
-			MemoryDeleter stringDeleter;
-			MemoryDeleter locationsDeleter;
-			if (stringLength >= kMaxStackStringSize) {
-				// NOTE: Careful, the + 1 is for termination!
-				string = (char*)malloc((stringLength + 1 + 63) / 64 * 64);
-				if (string == NULL)
-					break;
-				stringDeleter.SetTo(string);
-			}
-			if (glyphCount > kMaxStackStringSize) {
-				locations = (BPoint*)malloc(
-					((glyphCount * sizeof(BPoint)) + 63) / 64 * 64);
-				if (locations == NULL)
-					break;
-				locationsDeleter.SetTo(locations);
-			}
+			// NOTE: Careful, the + 1 is for termination!
+			BStackOrHeapArray<char, 512> string(
+				(stringLength + 1 + 63) / 64 * 64);
+			BStackOrHeapArray<BPoint, 512> locations(glyphCount);
+			if (!string.IsValid() || !locations.IsValid())
+				break;
 
 			if (link.Read(string, stringLength) != B_OK)
 				break;
