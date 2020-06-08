@@ -36,6 +36,7 @@
 #include <PortLink.h>
 #include <ServerProtocol.h>
 #include <ShapePrivate.h>
+#include <StackOrHeapArray.h>
 
 #include <Bitmap.h>
 #include <Debug.h>
