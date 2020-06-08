@@ -21,6 +21,8 @@
 #include <PictureProtocol.h>
 #include <Shape.h>
 
+#include <StackOrHeapArray.h>
+
 
 using BPrivate::PicturePlayer;
 
@@ -116,24 +118,15 @@ draw_polygon(void* _context, size_t numPoints, const BPoint _points[],
 {
 	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
 
-	// This is rather ugly but works for such a trivial class.
-	const size_t kMaxStackCount = 200;
-	char stackData[kMaxStackCount * sizeof(BPoint)];
-	BPoint* points = (BPoint*)stackData;
-	if (numPoints > kMaxStackCount) {
-		points = (BPoint*)malloc(numPoints * sizeof(BPoint));
-		if (points == NULL)
-			return;
-	}
+	BStackOrHeapArray<BPoint, 200> points(numPoints);
+	if (!points.IsValid())
+		return;
 
 	memcpy((void*)points, _points, numPoints * sizeof(BPoint));
 
 	((void (*)(void*, int32, BPoint*, bool))
 		context->function_table[fill ? 14 : 13])(context->user_data, numPoints,
 			points, isClosed);
-
-	if (numPoints > kMaxStackCount)
-		free(points);
 }
 
 
@@ -196,22 +189,14 @@ set_clipping_rects(void* _context, size_t numRects, const BRect _rects[])
 	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
 
 	// This is rather ugly but works for such a trivial class.
-	const size_t kMaxStackCount = 100;
-	char stackData[kMaxStackCount * sizeof(BRect)];
-	BRect* rects = (BRect*)stackData;
-	if (numRects > kMaxStackCount) {
-		rects = (BRect*)malloc(numRects * sizeof(BRect));
-		if (rects == NULL)
-			return;
-	}
+	BStackOrHeapArray<BRect, 100> rects(numRects);
+	if (!rects.IsValid())
+		return;
 
 	memcpy((void*)rects, _rects, numRects * sizeof(BRect));
 
 	((void (*)(void*, BRect*, uint32))context->function_table[20])(
 		context->user_data, rects, numRects);
-
-	if (numRects > kMaxStackCount)
-		free(rects);
 }
 
 
