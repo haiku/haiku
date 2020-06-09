@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku.TextSearch	1609008100
+1	portuguese (brazil)	x-vnd.Haiku.TextSearch	1966170500
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Por favor selecione os arquivos que você deseja ter selecionados por você no Tracker
 %appname% : %path%	GrepWindow		%appname% : %path%
 Open selection	GrepWindow		Abrir seleção
@@ -17,7 +17,6 @@ Show files in Tracker	GrepWindow		Mostrar arquivos no Tracker
 Please select the files you wish to keep searching.	GrepWindow		Por favor selecione os arquivos em que deseja que a procura continue.
 Trim to selection	GrepWindow		Reduzir para seleção
 Set target…	GrepWindow		Estabelecer objetivo…
-TextSearch	GrepWindow		Localizador de Texto
 Search	GrepWindow		Localizar
 Copy text to clipboard	GrepWindow		Copiar texto para a Área de Transferência
 Show lines	GrepWindow		Mostrar linhas

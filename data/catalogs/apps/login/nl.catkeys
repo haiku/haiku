@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Login	2683778354
+1	dutch; flemish	x-vnd.Haiku-Login	336867745
 Invalid login!	Login View		Ongeldige inloggegevens!
 Error	Login App		Fout
 --edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\t Start in onderhoudsmodus om het bureaublad aan te passen.\n
@@ -9,6 +9,7 @@ Login application for Haiku\nUsage:\n	Login App		Loginapplicatie voor Haiku\nGeb
 Desktop	Desktop Window		Bureaublad
 Hide password	Login View		Wachtwoord verbergen
 Reboot	Login View		Herstarten
+You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		U kan het bureaublad achter de Inlogtoepassing aanpassen door replicants erop te plaatsen.\n\nWanneer u klaar bent, kunt u deze toepassing afsluiten (Cmd-Q).
 OK	Login View		OK
 Info	Login App		Informatie
 Login:	Login View		Gebruikersnaam:

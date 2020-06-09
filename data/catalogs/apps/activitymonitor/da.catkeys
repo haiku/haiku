@@ -1,47 +1,46 @@
-1	danish	x-vnd.Haiku-ActivityMonitor	1155619009
-P-faults	DataSource		P-fejl
-Media nodes	DataSource		Medie noder
-Threads	DataSource		Tråde
-Always on top	ActivityWindow		Altid øverst
-Add graph	ActivityWindow		Tilføj graf
+1	danish	x-vnd.Haiku-ActivityMonitor	3672498538
 Teams	DataSource		Hold
+Semaphores	DataSource		Semaforer
+TX	DataSource	Shorter version for Sending	TX
+Block cache memory	DataSource		Blok mellemlager hukommelse
+%lld ms	SettingsWindow		%lld ms
 MiB	DataSource		MiB
-Network send	DataSource		Netværk afsende
-CPU usage (combined)	DataSource		CPU forbrug (samlet)
-CPU	DataSource		CPU
-Used memory	DataSource		Brugt hukommelse
-Cached memory	DataSource		Mellemlager hukommelse
-Apps	DataSource		Programmer
-Show legend	ActivityView		Vis forklaring
+Media nodes	DataSource		Medie noder
 Text clipboard	DataSource		Tekst udklipsholder
-Settings	ActivityWindow		Indstillinger
+Network send	DataSource		Netværk afsende
+Running applications	DataSource		Kørende programmer
+Cache	DataSource		Mellemlager
+CPU usage (combined)	DataSource		CPU forbrug (samlet)
+Threads	DataSource		Tråde
 Receiving	DataSource		Modtager
+Remove graph	ActivityView		Fjern graf
+Swap space	DataSource		Udvekslings plads
+CPU	DataSource		CPU
+ActivityMonitor	System name		AktivitetsMonitor
+Update time interval:	SettingsWindow		Opdatering tids interval:
+RX	DataSource	Shorter version for Receiving.	RX
 Settings…	ActivityWindow		Indstillinger…
+Block cache	DataSource		Blok mellemlager
+Memory	DataSource		Hukommelse
+CPU usage	DataSource		CPU forbrug
+Quit	ActivityWindow		Afslut
+Raw clipboard	DataSource		Rå udklipsholder
+Settings	ActivityWindow		Indstillinger
+Used memory	DataSource		Brugt hukommelse
+%.1f faults/s	DataSource		%.1f fejl/s
+Show legend	ActivityView		Vis forklaring
+Cached memory	DataSource		Mellemlager hukommelse
+File	ActivityWindow		Fil
 Ports	DataSource		Porte
 Page faults	DataSource		Side fejl
-Sending	DataSource		Afsender
-Cache	DataSource		Mellemlager
-%.1f faults/s	DataSource		%.1f fejl/s
-Update time interval:	SettingsWindow		Opdatering tids interval:
-TX	DataSource	Shorter version for Sending	TX
-Quit	ActivityWindow		Afslut
-Block cache memory	DataSource		Blok mellemlager hukommelse
-Remove graph	ActivityView		Fjern graf
-%lld sec.	SettingsWindow		%lld sek.
-%lld ms	SettingsWindow		%lld ms
-CPU usage	DataSource		CPU forbrug
-Raw clipboard	DataSource		Rå udklipsholder
-Sems	DataSource		Semas
-%.1f MiB	DataSource		%.1f MiB
-ActivityMonitor	System name		AktivitetsMonitor
-Running applications	DataSource		Kørende programmer
-Semaphores	DataSource		Semaforer
-Block cache	DataSource		Blok mellemlager
-Swap space	DataSource		Udvekslings plads
-Swap	DataSource		Udveksling
-File	ActivityWindow		Fil
-usage	DataSource		forbrug
+Apps	DataSource		Programmer
 Additional items	ActivityView		Yderligere elementer
+Add graph	ActivityWindow		Tilføj graf
+Sending	DataSource		Afsender
+%.1f MiB	DataSource		%.1f MiB
+Always on top	ActivityWindow		Altid øverst
+Swap	DataSource		Udveksling
+%lld sec.	SettingsWindow		%lld sek.
+P-faults	DataSource		P-fejl
+Sems	DataSource		Semas
 Network receive	DataSource		Netværks modtag
-Memory	DataSource		Hukommelse
-RX	DataSource	Shorter version for Receiving.	RX

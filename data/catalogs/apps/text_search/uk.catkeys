@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku.TextSearch	1867528375
+1	ukrainian	x-vnd.Haiku.TextSearch	2224690775
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Виберіть файли які Ви маєте виділити у Tracker.
 %appname% : %path%	GrepWindow		%appname% : %path%
 Failed to start xargs program!	Grepper		Не вдалося запустити програму xargs!
@@ -19,7 +19,6 @@ Show files in Tracker	GrepWindow		Показати файли у Tracker
 Please select the files you wish to keep searching.	GrepWindow		Будь ласка виберіть файли в яких Ви хочете продовжити пошук.
 Trim to selection	GrepWindow		Обмежитись вибраними
 Set target…	GrepWindow		Встановити ціль…
-TextSearch	GrepWindow		Пошук тексту
 Failed to open input pipe!	Grepper		Збій при відкритті вхідного каналу!
 Search	GrepWindow		Пошук
 Copy text to clipboard	GrepWindow		Копіювати текст до буферу обміну

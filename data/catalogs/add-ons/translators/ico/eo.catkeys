@@ -1,0 +1,14 @@
+1	esperanto	x-vnd.Haiku-ICOTranslator	3916328565
+Cursor	ICOTranslator		Kursoro
+Version %d.%d.%d, %s	ConfigView		Versio %d.%d.%d, %s
+Windows %s %ld bit image	ICOTranslator		Fenestroj %s %ld bito bildo
+Valid icon sizes are 16, 32, or 48	ConfigView		Validaj piktogramaj grandoj estas 16, 32, aŭ 48
+Windows icons	ICOTranslator		Piktogramoj de Vindozo
+Enforce valid icon sizes	ConfigView		Apliki validajn piktogramajn grandojn
+ICO Settings	main		Agordo de ICO
+Windows icon translator	ICOTranslator		Formatpelilo por piktogramoj de Vindozo
+pixels in either direction.	ConfigView		bilderoj ajndirekte.
+Write 32 bit images on true color input	ConfigView		Konservi 32-bitajn bildojn per verkolora enigo
+Icon	ICOTranslator		Piktogramo
+ICOTranslator Settings	ConfigView		Agordo de ICOTranslator
+Windows icon translator	ConfigView		Formatpelilo por piktogramoj de Vindozo

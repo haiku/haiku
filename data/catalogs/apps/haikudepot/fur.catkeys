@@ -1,10 +1,9 @@
-1	friulian	x-vnd.Haiku-HaikuDepot	1107427137
+1	friulian	x-vnd.Haiku-HaikuDepot	3833361367
 Repository update error	LocalRepositoryUpdateProcess		Erôr di inzornament dal dipuesit
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Si è verificât un erôr intal inzornâ il dipuesit: %error%
 User Created	UserLoginWindow		Utent creât
 Check for updates…	MainWindow		Controle inzornaments…
 Uninstall	PackageManager		Disinstale
-(%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		Disinstalât
 It was not possible to create the new user.	UserLoginWindow		Nol è stât pussibil creâ il gnûf utent.
 Available packages	MainWindow		Pachets disponibii
@@ -35,7 +34,6 @@ Login or Create account	MainWindow		Jentre o Regjistriti
 Ratings	PackageInfoView		Valutazions
 Switch account…	MainWindow		Cambie account…
 Preferred language:	UserLoginWindow		Lenghe preferide:
-Server Error	ServerHelper		Erôr di servidôr
 Name	PackageListView		Non
 Authorization or security issue. Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		Problemis di autorizazion o di sigurece. Jes e torne jentre par controlâ che la tô peraule di ordin e sedi juste e controle ancje di vê acetât lis ultimis condizions di ûs.
 Local	LocalPkgDataLoadProcess		Locâl
@@ -61,7 +59,6 @@ Featured packages	FeaturedPackagesView		Pachets in risalt
 The supplied response to the captcha is incorrect. A new captcha will be generated; try again.	UserLoginWindow		La rispueste dade al captcha no je juste. Al vignarà gjenerât un gnûf captcha; torne prove.
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Nol è stât pussibil comunicâ cul servidôr par otignî une imagjin captcha necessarie par creâ un gnûf utent.
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		La tô valutazion e je stade cjariade cun sucès. Tu puedis modificâle o gjavâle sul sît web dal servidôr di HaikuDepot.
-Network Error	ServerHelper		Erôr di rêt
 Available	PackageListView		Disponibil
 Cancel	UserLoginWindow		Anule
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot al à bisugne dal demoni dai pachets par funzionâ, ma pal moment al semee che nol sedi in esecuzion.\nInviâlu cumò?
@@ -69,7 +66,6 @@ Click a package to view information	PackageInfoView		Fâs clic suntun pachet par
 The password must be at least eight characters long, consist of at least two digits and one upper case character.	UserLoginWindow		La peraule d'ordin e scugne jessi di almancul vot caratars e e à di vê almancul doi numars e un caratar maiuscul.
 Contents	PackageInfoView		Contignût
 Close	PackageManager		Siere
-A network transport error has arisen communicating with the HaikuDepot server system: %s	ServerHelper		Al è vignût fûr un erôr di traspuart di rêt tal comunicâ cul sisteme dal servidôr di HaikuDepot: %s
 Changelog	PackageInfoView		Regjistri modifichis
 Rating not possible	MainWindow		Valutazion dineade
 Package update error	MainWindow		Erôr di inzornament dal pachet
@@ -79,7 +75,6 @@ Reboot required	PackageManager		Tornâ a inviâ necessari
 Very unstable	RatePackageWindow		Une vore instabil
 Password:	UserLoginWindow		Peraule d'ordin:
 All packages	PackageListView		Ducj i pachets
-Network Transport Error	ServerHelper		Erôr traspuart di rêt
 Stability	RatePackageWindow		Stabilitât
 Send	RatePackageWindow		Invie
 Start package daemon	App		Invie demoni dai pachets
@@ -106,8 +101,8 @@ Close	RatePackageWindow		Siere
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Sincronizazion dâts pachet pal dipuesit '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Viôt lis condizions di ûs
 Login issue	MainWindow		Probleme di acès
-Your rating:	RatePackageWindow		La tô valutazion:
 Size	PackageListView		Dimension
+Your rating:	RatePackageWindow		La tô valutazion:
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		L'utent %Nickname% al è stât creât cun sucès tal sisteme di HaikuDepotServer. Tu puedis gjestî i tiei detais-utent doprant la interface web. Tu sês cumò jentrât come chest utent gnûf.
 Your rating was updated.	RatePackageWindow		La tô valutazion e je stade inzornade.
 All categories	FilterView		Dutis lis categoriis
@@ -170,8 +165,6 @@ Open %DeskbarLink%	PackageManager		Vierç %DeskbarLink%
 User creation error	UserLoginWindow		Erôr di creazion dal utent
 Install	PackageManager		Instale
 Input validation	UserLoginWindow		Convalide input
-This application is too old to communicate with the HaikuDepot server system. Obtain a newer version of HaikuDepot by updating your Haiku system. The minimum version of HaikuDepot required is \"%s\".	ServerHelper		Cheste aplicazion e je masse vecje par comunicâ cul sisteme-servidôr di HaikuDepot. Oten une version plui gnove di HaikuDepot inzornant il to sisteme Haiku. La version minime necessarie di HaikuDepot e je la  \"%s\".
-An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		Un erôr inspietât al è stât inviât dal servidôr di HaikuDepot [%i]
 Log in…	MainWindow		Acès…
 You need to be logged into an account before you can rate packages.	MainWindow		Si scugne jessi jentrâts intun account prime di podê valutâ i pachets.
 Client version too old	ServerHelper		Version dal client masse vecje

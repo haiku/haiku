@@ -1,9 +1,21 @@
-1	french	x-vnd.Haiku-GLInfo	3678488342
-Capability	Capabilities		Aptitude
-Information	InfoView		Information
+1	french	x-vnd.Haiku-GLInfo	3578356280
+Maximum clipping planes	Capabilities		Plans de coupe maximum
+Maximum 2D texture size	Capabilities		Taille maximale des textures 2D
+Auxiliary buffer(s)	Capabilities		Buffer(s) auxiliaire(s)
+Texture stack size	Capabilities		Taille de la pile de textures
 GL Info	System name		GL Info
-Capabilities	Capabilities		Aptitudes
+Information	InfoView		Information
 Maximum convolution	Capabilities		Nombre maximum de convolution
+Attributes stack size	Capabilities		Taille de la pile d'attributs
+Maximum lights	Capabilities		Maximum de lumières
+Maximum 3D texture size	Capabilities		Taille maximale des textures 3D
+Extensions	Extensions		Extensions
 Available extensions	Extensions		Extensions disponibles
 Value	Capabilities		Valeur
-Extensions	Extensions		Extensions
+Maximum texture units	Capabilities		Maximum d’unités de textures
+Capabilities	Capabilities		Aptitudes
+Name stack size	Capabilities		Taille de la pile de noms
+List stack size	Capabilities		Taille de la pile de listes
+Projection stack size	Capabilities		Taille de la pile de projections
+Model stack size	Capabilities		Taille de la pile de modèles
+Capability	Capabilities		Aptitude

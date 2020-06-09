@@ -1,0 +1,50 @@
+1	dutch; flemish	x-vnd.Haiku-Input	3910661481
+Scrolling	TouchpadPrefView		Scrollen
+Defaults	InputMouse		Standaarden
+Tapping	TouchpadPrefView		Indrukken
+Long	KeyboardView		Lang
+Normal	SettingsView		Normaal
+Cancel	TouchpadPrefView		Annuleren
+4-Button	SettingsView		4 knoppen
+Slow	TouchpadPrefView		Langzaam
+Warp	SettingsView		Warpen
+Instant warp	SettingsView		Direct warpen
+Device List	InputWindow		Apparatenlijst
+Double-click speed	SettingsView		Dubbelkliksnelheid
+5-Button	SettingsView		5 knoppen
+Typing test area	KeyboardView		Testgebied om te typen
+Mouse type:	SettingsView		Muistype:
+Revert	InputKeyboard		Herstellen
+Fast	KeyboardView		Snel
+Off	TouchpadPrefView		Uit
+Fast	TouchpadPrefView		Snel
+Please confirm	TouchpadPrefView		Gelieve te bevestigen
+Click to focus	SettingsView		Klik om focus te krijgen
+Acceleration	TouchpadPrefView		Acceleratie
+Mouse speed	SettingsView		Muissnelheid
+Accept first click	SettingsView		Eerste klik accepteren
+OK	TouchpadPrefView		Okee
+Horizontal scrolling	TouchpadPrefView		Horizontaal scrollen
+Delay until key repeat	KeyboardView		Vertragen totdat de toets herhaalt
+Two finger scrolling	TouchpadPrefView		Met twee vingers scrollen
+Input	System name		Invoer
+Mouse acceleration	SettingsView		Muisversnelling
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Het nieuwe scrollgebied is erg groot en kan het moeilijk maken om de muis goed te gebruiken. Weet u zeker dat u het wilt veranderen?
+High	TouchpadPrefView		Hoog
+Defaults	TouchpadPrefView		Standaarden
+1-Button	SettingsView		1 knop
+Defaults	InputKeyboard		Standaarden
+Short	KeyboardView		Kort
+Slow	KeyboardView		Langzaam
+Revert	InputMouse		Herstellen
+Key repeat rate	KeyboardView		Snelheid van toetsherhalingen
+2-Button	SettingsView		2 knoppen
+Click to focus and raise	SettingsView		Klik om te focussen en naar voren te halen
+Vertical	TouchpadPrefView		Verticaal
+Horizontal	TouchpadPrefView		Horizontaal
+Focus mode:	SettingsView		Focusmodus:
+Focus follows mouse	SettingsView		Focus volgt muis
+Double-click test area	SettingsView		Dubbelkik testgebied
+Sensitivity	TouchpadPrefView		Gevoeligheid
+3-Button	SettingsView		3 knoppen
+Revert	TouchpadPrefView		Herstellen

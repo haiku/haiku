@@ -1,9 +1,24 @@
-1	catalan; valencian	x-vnd.Haiku-GLInfo	3678488342
-Capability	Capabilities		Capacitat
-Information	InfoView		Informació
+1	catalan; valencian	x-vnd.Haiku-GLInfo	2211760527
+Maximum clipping planes	Capabilities		Màxim de plans de retall
+Maximum 2D texture size	Capabilities		Mida màxima de textura en 2D
+Auxiliary buffer(s)	Capabilities		Memòria intermèdia auxiliar
+Maximum evaluators equation order	Capabilities		Màxim d'ordre d'equació d'avaluadors
+Texture stack size	Capabilities		Mida de la pila de textura
 GL Info	System name		Quant a GL
-Capabilities	Capabilities		Funcionalitats
+Information	InfoView		Informació
 Maximum convolution	Capabilities		Convolució màxima
-Available extensions	Extensions		Extensions disponibles
-Value	Capabilities		Valor
+Attributes stack size	Capabilities		Mida de la pila d'atributs
+Maximum lights	Capabilities		Màxim de llums
+Maximum 3D texture size	Capabilities		Mida màxima de textura en 3D
 Extensions	Extensions		Extensions
+Maximum recommended index elements	Capabilities		Màxim recomanat d'elements d’índex
+Available extensions	Extensions		Extensions disponibles
+Maximum recommended vertex elements	Capabilities		Màxim recomanat d'elements de vèrtex
+Value	Capabilities		Valor
+Maximum texture units	Capabilities		Màxim d'unitats de textura
+Capabilities	Capabilities		Funcionalitats
+Name stack size	Capabilities		Mida de la pila de noms
+List stack size	Capabilities		Mida de la pila de llista
+Projection stack size	Capabilities		Mida de la pila de projecció
+Model stack size	Capabilities		Mida de la pila de model
+Capability	Capabilities		Capacitat

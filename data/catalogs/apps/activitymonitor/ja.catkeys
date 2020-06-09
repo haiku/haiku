@@ -1,47 +1,46 @@
-1	japanese	x-vnd.Haiku-ActivityMonitor	1155619009
-P-faults	DataSource		ページフォルト
-Media nodes	DataSource		メディアノード数
-Threads	DataSource		スレッド数
-Always on top	ActivityWindow		常に最前面
-Add graph	ActivityWindow		グラフを追加
+1	japanese	x-vnd.Haiku-ActivityMonitor	3672498538
 Teams	DataSource		チーム数
+Semaphores	DataSource		セマフォ数
+TX	DataSource	Shorter version for Sending	送信
+Block cache memory	DataSource		ブロックキャッシュメモリ
+%lld ms	SettingsWindow		%lld マイクロ秒
 MiB	DataSource		MiB
-Network send	DataSource		ネットワーク送信量
-CPU usage (combined)	DataSource		CPU 使用率 (合計)
-CPU	DataSource		CPU
-Used memory	DataSource		使用メモリ
-Cached memory	DataSource		キャッシュメモリ
-Apps	DataSource		アプリ
-Show legend	ActivityView		説明を表示
+Media nodes	DataSource		メディアノード数
 Text clipboard	DataSource		テキストクリップボード
-Settings	ActivityWindow		設定
+Network send	DataSource		ネットワーク送信量
+Running applications	DataSource		実行中のアプリケーション数
+Cache	DataSource		キャッシュ
+CPU usage (combined)	DataSource		CPU 使用率 (合計)
+Threads	DataSource		スレッド数
 Receiving	DataSource		受信量
+Remove graph	ActivityView		グラフを削除
+Swap space	DataSource		スワップサイズ
+CPU	DataSource		CPU
+ActivityMonitor	System name		アクティビティモニター
+Update time interval:	SettingsWindow		更新間隔:
+RX	DataSource	Shorter version for Receiving.	受信
 Settings…	ActivityWindow		設定…
+Block cache	DataSource		ブロックキャッシュ
+Memory	DataSource		メモリ
+CPU usage	DataSource		CPU 使用率
+Quit	ActivityWindow		終了
+Raw clipboard	DataSource		バイナリクリップボード
+Settings	ActivityWindow		設定
+Used memory	DataSource		使用メモリ
+%.1f faults/s	DataSource		%.1f フォールト/s
+Show legend	ActivityView		説明を表示
+Cached memory	DataSource		キャッシュメモリ
+File	ActivityWindow		ファイル
 Ports	DataSource		ポート数
 Page faults	DataSource		ページフォールト数
-Sending	DataSource		送信量
-Cache	DataSource		キャッシュ
-%.1f faults/s	DataSource		%.1f フォールト/s
-Update time interval:	SettingsWindow		更新間隔:
-TX	DataSource	Shorter version for Sending	送信
-Quit	ActivityWindow		終了
-Block cache memory	DataSource		ブロックキャッシュメモリ
-Remove graph	ActivityView		グラフを削除
-%lld sec.	SettingsWindow		%lld 秒
-%lld ms	SettingsWindow		%lld マイクロ秒
-CPU usage	DataSource		CPU 使用率
-Raw clipboard	DataSource		バイナリクリップボード
-Sems	DataSource		セマフォ
-%.1f MiB	DataSource		%.1f MiB
-ActivityMonitor	System name		アクティビティモニター
-Running applications	DataSource		実行中のアプリケーション数
-Semaphores	DataSource		セマフォ数
-Block cache	DataSource		ブロックキャッシュ
-Swap space	DataSource		スワップサイズ
-Swap	DataSource		スワップ
-File	ActivityWindow		ファイル
-usage	DataSource		使用率
+Apps	DataSource		アプリ
 Additional items	ActivityView		追加項目
+Add graph	ActivityWindow		グラフを追加
+Sending	DataSource		送信量
+%.1f MiB	DataSource		%.1f MiB
+Always on top	ActivityWindow		常に最前面
+Swap	DataSource		スワップ
+%lld sec.	SettingsWindow		%lld 秒
+P-faults	DataSource		ページフォルト
+Sems	DataSource		セマフォ
 Network receive	DataSource		ネットワーク受信量
-Memory	DataSource		メモリ
-RX	DataSource	Shorter version for Receiving.	受信

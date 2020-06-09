@@ -1,5 +1,5 @@
-1	hungarian	x-vnd.haiku-softwareupdater	1299810914
-Updating version	SoftwareUpdaterWindow	List item text	Új verzió: 
+1	hungarian	x-vnd.haiku-softwareupdater	1515642756
+Updating version	SoftwareUpdaterWindow	List item text	Jelenlegi:
 Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Kattints ide {0, plural, one{# friss csomag} other{# friss csomag}} telepítéséhez.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Eltávolítandó csomagok
 No active network connection was found	UpdateManager	Error message	Nincs aktív hálózati kapcsolat.
@@ -15,10 +15,11 @@ There were no updates found.	CheckAction		Nem találtam frissítéseket.
 No updates available	UpdateAction		Nincs elérhető frissítés
 New packages to be installed	SoftwareUpdaterWindow	List super item label	Újonnan telepítendő csomagok
 Packages to be updated	SoftwareUpdaterWindow	List super item label	Frissítendő csomagok
+to	SoftwareUpdaterWindow	List item text	, új:
 Attempting to cancel the updates…	SoftwareUpdaterWindow		Frissítés megszakítása…
 Contacting software repositories to check for package updates.	CheckManager		Kapcsolódás a tárolókhoz frissítések kereséséhez.
 Available updates found	CheckManager		Frissítések érhetők el
-from repository	SoftwareUpdaterWindow	List item text	tároló: 
+from repository	SoftwareUpdaterWindow	List item text	tároló:
 Contacting software repositories to check for package updates.	SoftwareUpdaterWindow		Kapcsolódás a tárolókhoz frissítések kereséséhez.
 Cancelling updates	SoftwareUpdaterWindow		Frissítések megszakítása
 Cancel	SoftwareUpdaterWindow	Alert button label	Mégse
@@ -42,7 +43,7 @@ Checking for updates	SoftwareUpdaterWindow		Frissítések keresése
 Updates completed	UpdateManager		Sikeres frissítés
 Reboot	SoftwareUpdaterWindow		Újraindítás
 Show more details	SoftwareUpdaterWindow		Részletek
-Installing version	SoftwareUpdaterWindow	List item text	Telepítendő verzió: 
+Installing version	SoftwareUpdaterWindow	List item text	Telepítendő verzió:
 Checking for updates	CheckManager		Frissítések ellenörzése
 No remote repositories are available	UpdateManager	Error message	Egyetlen távoli tároló sem érhető el
 Software {0, plural, one{update} other{updates}} available	CheckManager		{0, plural, one{frissítés} other{frissítés}} elérhető
@@ -51,7 +52,7 @@ Update	SoftwareUpdaterWindow	Alert button label	Frissítés
 Open Repositories	SoftwareUpdaterWindow	Alert button label	Tároló megnyitása
 Updates did not complete	UpdateAction		Frissítés nem fejeződött be
 Invalid update type, cannot continue with updates	UpdateAction		Érvénytelen frissítés, nem folytatható tovább
-Uninstalling version	SoftwareUpdaterWindow	List item text	Eltávolítandó verzió: 
+Uninstalling version	SoftwareUpdaterWindow	List item text	Eltávolítandó verzió:
 %i of %i	UpdateManager	Do not translate %i	%i / %i
 Quit	SoftwareUpdaterWindow		Kilépés
 No updates available	CheckManager		Nincs elérhető frissítés

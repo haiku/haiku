@@ -1,0 +1,16 @@
+1	greek, modern (1453-)	x-vnd.Haiku-TIFFTranslator	2234713102
+TIFF Library:	TIFFView		TIFF Βιβλιοθήκη:
+RLE (Packbits)	TIFFView		RLE (Packbits)
+ZIP (Deflate)	TIFFView		ZIP (Deflate)
+identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: λανθασμένο έγγραφο ευρετηρίου\n
+Use compression:	TIFFView		Χρήση συμπίεσης:
+TIFF image translator	TIFFView		Μετατροπέας εικόνας TIFF
+TIFF image	TIFFTranslator		TIFF εικόνα
+TIFF Settings	TIFFMain		TIFF Ρυθμίσεις
+TIFF image translator	TIFFTranslator		Μετατροπέας εικόνων TIFF
+identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: αδυναμία ορισμού του καταλόγου\n
+Version %d.%d.%d, %s	TIFFView		Έκδοση %d.%d.%d, %s
+TIFFTranslator Settings	TIFFTranslator		Ρυθμίσεις μετατροπέα TIFF
+LZW	TIFFView		LZW
+TIFF images	TIFFTranslator		TIFF εικόνες
+None	TIFFView		Κανένα

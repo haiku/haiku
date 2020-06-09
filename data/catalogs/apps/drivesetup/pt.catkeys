@@ -20,7 +20,7 @@ Partition size	CreateParametersPanel		Tamanho de partição
 Validation of the given parameters failed.	MainWindow		A validação dos parâmetros fornecidos falhou.
 The partition %s is currently mounted.	MainWindow		A partição %s já está montada.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Tem a certeza que deseja formatar a partição \"%s\"? Apenas lhe será perguntado uma vez mais antes de as alterações serem escritas no disco.
-DriveSetup	System name		DriveSetup
+DriveSetup	System name		Gestor de Discos
 Mounted at	PartitionList		Montado em
 Create…	MainWindow		Criar…
 Write changes	MainWindow		Aplicar alterações
@@ -67,7 +67,7 @@ Cancel	AbstractParametersPanel		Cancelar
 Format	MainWindow		Formatar
 <empty or unknown>	DiskView		<vazio ou desconhecido>
 OK	MainWindow		OK
-Open with DiskProbe	MainWindow		Abrir com DiskProbe
+Open with DiskProbe	MainWindow		Abrir com o Analisador de Disco
 Could not delete the selected partition.	MainWindow		Não foi possível eliminar a partição seleccionada.
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Tem a certeza de que pretende inicializar o disco selecionado? Todos os dados serão perdidos. Será questionado novamente antes de escrever as alterações no disco.\n
 There was an error preparing the disk for modifications.	MainWindow		Ocorreu um erro ao preparar o disco para as alterações.

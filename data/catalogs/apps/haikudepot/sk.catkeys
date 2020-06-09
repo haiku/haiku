@@ -1,6 +1,5 @@
-1	slovak	x-vnd.Haiku-HaikuDepot	1763371214
+1	slovak	x-vnd.Haiku-HaikuDepot	1991884741
 Uninstall	PackageManager		Odinštalovať
-(%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		Odinštalované
 Available packages	MainWindow		Dostupné balíky
 Create account	UserLoginWindow		Vytvoriť účet
@@ -55,8 +54,8 @@ Success	UserLoginWindow		Úspech
 (%Votes%)	PackageInfoView		(%Votes%)
 Close	UserLoginWindow		Zatvoriť
 Close	RatePackageWindow		Zatvoriť
-Your rating:	RatePackageWindow		Vaše hodnotenie:
 Size	PackageListView		Veľkosť
+Your rating:	RatePackageWindow		Vaše hodnotenie:
 All categories	FilterView		Všetky kategórie
 n/a	PackageInfoView		n/a
 Cancel	MainWindow		Zrušiť

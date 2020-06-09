@@ -1,0 +1,515 @@
+1	greek, modern (1453-)	x-vnd.Haiku-libtracker	3261784361
+Created	ContainerWindow		Δημιουργήθηκε
+Icon	AttributesView		Εικονίδιο
+Open and make preferred	OpenWithWindow		'Ανοιγμα και ορισμός προεπιλεγμένου
+Kind	ContainerWindow		Είδος
+Open with…	ContainerWindow		Άνοιγμα με…
+Error moving \"%name\" to Trash. (%error)	FSUtils		Σφάλμα κατά τη μετακίνηση του \"%name\" στον Κάδο Απορριμμάτων. (%error)
+Or	FindPanel		Ή
+before	FindPanel		πριν
+Volume icons	TrackerSettingsWindow		Εικονίδια τόμου
+Ignore case	SelectionWindow		Αγνόηση
+Current folder	ContainerWindow		Τρέχων κατάλογος
+Finish: %time - Over %finishtime left	StatusWindow		Ολοκλήρωση: %time - Παραμένουν πάνω από %finishtime
+Mount all disks now	AutoMounterSettings		Προσάρτηση όλων των δίσκων τώρα
+Location:	InfoWindow		Τοποθεσία:
+Name	PoseView		Όνομα
+Kind:	InfoWindow		Είδος:
+{0, plural, one{# byte} other{# bytes}}	WidgetAttributeText		{0, plural, one{# byte} other{# bytes}}
+contains	FindPanel		περιέχει
+32 x 32	ContainerWindow		32 χ 32
+Open	FilePanelPriv		Άνοιγμα
+Bitmap icon	AttributesView		Εικονίδιο Bitmap
+You can't replace a folder with one of its sub-folders.	FSUtils		Δεν μπορείτε να αντικαταστήσετε ένα φάκελο με ένα από τους υποφακέλους του.
+<%ld dates>	AttributesView		<%ld ημερομηνίες>
+Select…	VirtualDirectoryWindow		Επιλογή…
+Name	Default Query Columns		Όνομα
+Unmount	ContainerWindow		Αποπροσάρτηση
+Eject when unmounting	AutoMounterSettings		Εξαγωγή κατά την αποπροσάρτηση
+Searching for disks to mount…	StatusWindow		Αναζήτηση δίσκων για προσάρτηση…
+Value	AttributesView		Τιμή
+Information	InfoWindow		Πληροφορίες
+Error emptying Trash	FSUtils		Σφάλμα αδειάσματος Κάδου Απορριμάτων
+Opens with:	InfoWindow		Άνοιγμα με:
+Size	QueryPoseView		Μέγεθος
+128 x 128	ContainerWindow		128 x 128
+Disk mount	TrackerSettingsWindow		Προσάρτηση δίσκου
+Type	AttributesView		Τύπος
+Prompt	FSUtils		Προτροπή
+Error in regular expression:\n\n'%errstring'	PoseView		Σφάλμα στην κανονική έκφραση:\n\n'%errstring'
+Small bitmap icon	AttributesView		Μικρό εικονίδιο bitmap
+Would you like to find a suitable application to open the file?	FSUtils		Θα θέλατε να πραγματοποιηθεί η έυρεση μιας κατάλληλης εφαρμογής για το άνοιγμα του αρχείου;
+64 x 64	ContainerWindow		64 x 64
+You cannot replace a folder or a symbolic link with a file.	FSUtils		Δεν μπορείται να αντικαταστήσετε έναν φάκελο ή έναν συμβολικό δεσμό με ένα αρχείο.
+Trailing \\.	libtracker		Περισσευούμενο \\.
+At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Στην %func \nαπέτυχε η find_directory(). \nΑιτία: %error
+Handles any file	OpenWithWindow		Χειρίζεται κάθε αρχείο
+save text	FilePanelPriv		αποθήκευση κειμένου
+Raw data	AttributesView		Ανεπεξέργαστα δεδομένα
+Preparing to move items…	StatusWindow		Προετοιμασία για τη μεταφορά στοιχείων…
+Size	ContainerWindow		Μέγεθος
+Select…	ContainerWindow		Επιλογή…
+Show shared volumes on Desktop	SettingsView		Εμφάνιση κοινών τόμων στην επιφάνεια εργασίας
+<%ld values>	AttributesView		<%ld τιμές>
+Size	PoseView		Μέγεθος
+matches wildcard expression	SelectionWindow		αντιστοιχεί με την έκφραση μπαλαντέρ
+96 x 96	ContainerWindow		96 x 96
+Title	Bookmark Query Columns		Τίτλος
+Identify	ContainerWindow		Αναγνώριση
+You can't move or copy items to read-only volumes.	FSUtils		Δεν μπορείτε να μετακινήσετε ή να αντιγράψετε στοιχεία σε τόμους μόνο ανάγνωσης.
+Create link	ContainerWindow		Δημιουργία σύνδεσμου
+starts with	FindPanel		ξεκινά με
+Replace	FSUtils		Αντικατάσταση
+?+* follows nothing.	libtracker		δεν υπάρχει τίποτα μετά το ?+*.
+Rectangle	AttributesView		Παραλληλόγραμμο
+Move to	ContainerWindow		Μετακίνηση στο
+Status	Email Query Columns		Κατάσταση
+New folder	FSUtils		Νέος φάκελος
+Junk on end.	libtracker		Περιττοί χαρακτήρες στο τέλος.
+New Query	FindPanel		Νέο Ερώτημα
+system	B_SYSTEM_DIRECTORY		σύστημα
+Preparing to delete items…	StatusWindow		Γίνεται προετοιμασία για την διαγραφή των στοιχείων…
+Open %name with:	OpenWithWindow		Άνοιγμα %name με:
+\"%name\" is an unsupported executable.	FSUtils		Το \"%name\" είναι εκτελέσιμο αρχείο που δεν υποστηρίζεται.
+You cannot copy or move the root directory.	FSUtils		Δε μπορείτε να αντιγράψετε ή να μετακινήσετε τον ριζικό κατάλογο.
+Plain text	AttributesView		Απλό κείμενο
+Capacity:	InfoWindow		Χωρητικότητα:
+File	ContainerWindow		Αρχείο
+Relation	OpenWithWindow		Σχέση
+Moving: 	StatusWindow		Μετακινείται: 
+Select	SelectionWindow		Επιλογή
+Select	InfoWindow		Επιλογή
+OK	OpenWithWindow		Εντάξει
+Include trash	FindPanel		Συμπερίληψη Κάδου
+GiB	WidgetAttributeText		GiB
+Clean up	ContainerWindow		Καθαρισμός
+Modified	FindPanel		Τροποποιήθηκε
+Select all	QueryContainerWindow		Επιλογή όλων
+Select…	FilePanelPriv		Επιλογή…
+preferences	B_PREFERENCES_DIRECTORY		προτιμήσεις
+Name	Person Query Columns		Όνομα
+Skip all	FSUtils		Παράλειψη όλων
+Corrupted opcode.	libtracker		Μη έγκυρος κώδικας χειρισμού.
+%SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%SizeProcessed από %TotalSize, %BytesPerSecond/δ
+Preparing to restore items…	StatusWindow		Γίνεται προετοιμασία για την επαναφορά αντικειμένων…
+Mount	ContainerWindow		Προσάρτηση
+Desktop	B_DESKTOP_DIRECTORY		Επιφάνεια Εργασίας
+Corrupted pointers.	libtracker		Κατεστραμμένοι δείκτες.
+Link to:	InfoWindow		Σύνδεση με:
+Copy here	ContainerWindow		Αντιγραφή εδώ
+Character	AttributesView		Χαρακτήρας
+All disks	FindPanel		Όλοι οι δίσκοι
+Window	ContainerWindow		Παράθυρο
+%BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
+Remove	FindPanel		Αφαίρεση
+Company	Person Query Columns		Εταιρία
+Recent documents	FavoritesMenu		Πρόσφατα έγγραφα
+Save as Query template:	FindPanel		Αποθήκευση ως πρότυπο Query:
+Edit templates…	TemplatesMenu		Επεξεργασία προτύπων…
+{0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# byte} other{# bytes}}
+8-bit integer	AttributesView		Ακέραιος αριθμός 8-bit
+8-bit unsigned integer	AttributesView		Ακέραιος αριθμός χωρίς πρόσημο 8-bit
+%capacity (%used used -- %free free)	InfoWindow		%capacity (%used σε χρήση -- %free ελεύθερα)
+Hide dotfiles	SettingsView		Απόκρυψη αρχείων με τελεία στην αρχή
+Trash	Model		Κάδος Απορριμάτων
+copy	FSUtils	filename copy	αντιγραφή
+New folder%ld	FSUtils		Νέος φάκελος%ld
+Location	OpenWithWindow		Τοποθεσία
+%Ld B	WidgetAttributeText		%Ld B
+Resize to fit	QueryContainerWindow		Προσαρμογή μεγέθους
+List folders first	SettingsView		Λίστα φακέλων πρώτα
+Find	FSUtils		Εύρεση
+An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Ένα στοιχείο που ονομάζεται \"%name\" υπάρχει ήδη σε αυτό το φάκελο. Θα θέλατε να τον αντικαταστήσετε με τον συμβολικό δεσμό που δημιουργείτε;
+Temporary	FindPanel		Προσωρινό
+Modified	QueryPoseView		Τροποποιήθηκε
+Create relative link	ContainerWindow		Δημιουργία συγγενικού συνδέσμου
+Owner	FilePermissionsView		Ιδιοκτήτης
+Cancel	FSClipBoard		Άκυρο
+Modified	PoseView		Τροποποήθηκε
+Move to Trash	ContainerWindow		Μετακίνηση στον Κάδο
+All files and folders	FindPanel		Όλα τα αρχεία και τους φακέλους
+Add-ons	ContainerWindow		Πρόσθετα
+Too many parenthesis.	libtracker		Υπερβολικά πολλές παρενθέσεις.
+Increase size	ContainerWindow		Αύξηση μεγέθους
+\nShould this be fixed?	FSUtils		\nΠρέπει αυτό να διορθωθεί;
+URL	Bookmark Query Columns		Υπερσύνδεσμος
+Move	PoseView		Μετακίνηση
+Floating point number	AttributesView		Αριθμός με κινητή υποδιαστολή
+Cancel	ContainerWindow		Άκυρο
+Attributes	ContainerWindow		Ιδιότητες
+Error deleting items	FSUtils		Σφάλμα κατα τη διαγραφή στοιχείων
+Cut	ContainerWindow		Αποκοπή
+Disks	Model		Δίσκοι
+Create a Query template	FindPanel		Δημιουργία ενός προτύπου Ερωτημάτος
+Size	FindPanel		Μέγεθος
+Window	FilePanelPriv		Παράθυρο
+Replace other file	WidgetAttributeText		Αντικατάσταση άλλου αρχείου
+OK	Email Query Columns		Εντάξει
+Location	QueryPoseView		Τοποθεσία
+Edit query	ContainerWindow		Επεξεργασία ερωτήματος
+{0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# byte)} other{(# bytes)}}
+Previously mounted disks	AutoMounterSettings		Προηγουμένως προσαρτημένοι δίσκοι
+You cannot replace a file with a folder or a symbolic link.	FSUtils		Δε μπορείτε να αντικαταστήσετε ένα αρχείο με έναν φάκελο ή έναν συμβολικό δεσμό.
+The target disk does not support creating links.	FSUtils		Το δίσκος προορισμού δεν υποστηρίζει τη δημιουργία συνδέσμων.
+develop	B_SYSTEM_DEVELOP_DIRECTORY		ανάπτυξη
+64-bit integer	AttributesView		Ακέραιος αριθμός 64-bit
+Cut more	ContainerWindow		Αποκοπή περισσότερων
+The Tracker must be running to see Info windows.	PoseView		Ο ανιχνευτής πρέπει να εκτελείται για την εμφάνιση των παραθύρων πληροφοριών.
+Tracker preferences	TrackerSettingsWindow		Προτιμήσεις ανιχνευτή
+Read	FilePermissionsView		Ανάγνωση
+There was an error writing the attribute.	WidgetAttributeText		Υπήρξε ένα σφάλμα κατά την εγγραφή της ιδιότητας.
+Path	Default Query Columns		Τοποθεσία
+If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Αν μετονομάσετε το %target, το %osName ενδέχεται να μην λειτουργήσει σωστά!\n\nΕίστε σίγουρος;
+Could not open \"%name\" (%error). 	FSUtils		Αδυναμία ανοίγματος του \"%name\" (%error). 
+Media parameter group	AttributesView		Ομάδα παραμέτρων πολυμέσων
+%name info	InfoWindow	InfoWindow Title	%name πληροφορίες
+If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Αν μετακινήσετε τον φάκελο home, το %osName ενδέχεται να μην λειτουργήσει σωστά!\n\nΕίστε σίγουρος πως θέλετε να το κάνετε αυτό;\n\nΓια να μετακινήσετε τον φάκελο home ούτως ή άλλως, κρατήστε πατημένο το πλήκτρο Shift και κάντε κλικ στο κουμπί \"Μετακίνηση\".
+Property info	AttributesView		Πληροφορίες ιδιοτήτων
+Sorry, you can't create links in the Trash.	PoseView		Συγνώμη, δεν μπορείτε να δημιουργήσετε συνδέσμους στο Κάδο.
+From	Email Query Columns		Από
+Invert selection	QueryContainerWindow		Αντιστροφή επιλεγμένου
+Open selection with:	OpenWithWindow		Άνοιγμα επιλεγμένου με:
+Preferences…	ContainerWindow		Προτιμήσεις…
+Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Αδυναμία ανοίγματος του \"%document\" επειδή η εφαρμογή \"%app\" είναι στον Κάδο Απορριμάτων. 
+Work Phone	Person Query Columns		Τηλέφωνο εργασίας
+Close	ContainerWindow		Κλείσιμο
+Get info	ContainerWindow		Λήψη πληροφοριών
+MIME Type	AttributesView		Τύπος MIME
+Show folder location in title tab	SettingsView		Εμφάνιση τοποθεσίας φακέλου στον τίτλο καρέλας
+There was an error resolving the link.	Tracker		Υπήρξε κάποιο σφάλμα κατά την επίλυση του συνδέσμου.
+There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Υπήρξε κάποιο πρόβλημα κατά την προσπάθεια αποθήκευσης στο φάκελο που προσδιορίσατε. Παρακαλώ προσπαθήστε με έναν άλλο.
+Desktop	TrackerSettingsWindow		Επιφάνεια εργασίας
+Nested *?+.	libtracker		Εμπεριεχόμενο *?+.
+Move	FSUtils	button label	Μετακίνηση
+Clean up	DeskWindow		Καθαρισμός
+Group	FilePermissionsView		Ομάδα
+Could not find an application to open \"%name\" (%error). 	FSUtils		Αδυναμία εύρεσης εφαρμογής για το άνοιγμα του \"%name\" (%error). 
+Internal error.	libtracker		Εσωτερικό σφάλμα.
+Mini icon view	DeskWindow		Προβολή μικρού εικονιδίου
+Geometric size	AttributesView		Γεωμετρικό μέγεθος
+contains	SelectionWindow		περιέχει
+Replace	FilePanelPriv		Αντικατάσταση
+is not	FindPanel		δεν είναι
+Icon view	DeskWindow		Προβολή εικονιδίου
+<%ld rectangles>	AttributesView		<%ld ορθογώνια>
+Mount settings…	ContainerWindow		Ρυθμίσεις προσάρτησης…
+Keywords	Bookmark Query Columns		Λέξεις κλειδιά
+Copy more	ContainerWindow		Αντιγραφή κι άλλων
+by name	FindPanel		κατα όνομα
+Sorry, you can't save things at the root of your system.	FilePanelPriv		Λυπούμαστε, αλλά δεν μπορείτε να αποθηκεύσετε αντικείμενα στη ρίζα του συστήματός σας.
+Restore	ContainerWindow		Επαναφορά
+Location	ContainerWindow		Τοποθεσία
+Warning space color	SettingsView		Χρώμα διαστήματος προειδοποίησης
+Skip	FSUtils		Παράλειψη
+Text list	AttributesView		Λίστα κειμένου
+Used space color	SettingsView		Χρώμα χρησιμοποιημένου χώρου
+Cancel	FSUtils		Άκυρο
+Original name	ContainerWindow		Πρωτότυπο όνομα
+Unknown	WidgetAttributeText		Άγνωστο
+32-bit integer	AttributesView		Ακέραιος αριθμός 32-bit
+The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		Το προσδιορισμένο όνομα ήδη χρησιμοποιείται ως όνομα φακέλου. Παρακαλώ διαλέξτε άλλο όνομα.
+48 x 48	ContainerWindow		48 χ 48
+Modified	ContainerWindow		Τροποποιήθηκε
+Mini icon view	ContainerWindow		Προβολή μικρού εικονιδίου
+File	FilePanelPriv		Αρχείο
+Search	FindPanel		Αναζήτηση
+Modified:	InfoWindow		Τροποποιήθηκε:
+Cancel	FilePanelPriv		Άκυρο
+Sorry, you cannot edit that attribute.	WidgetAttributeText		Συγνώμη, δεν μπορείτε να επεξεργαστείτε αυτή την ιδιότητα.
+Memory pointer	AttributesView		Δείκτης μνήμης
+Cancel	OpenWithWindow		Άκυρο
+Select…	DeskWindow		Επιλογή…
+Files cannot be moved or deleted from a read-only volume.	PoseView		Τα αρχεία δεν μπορούν να μετακινηθούν ή να διαγραφούν από ένα τόμο μόνο προς ανάγνωση.
+Edit name	FilePanelPriv		Επεξεργασία ονόματος
+There was an error deleting \"%name\":\n\t%error	FSUtils		Υπήρξε κάποιο σφάλμα κατά τη διαγραφή \"%name\":\n\t%error
+Resize to fit	ContainerWindow		Προσαρμογή μεγέθους
+Link \"%name\" to:	InfoWindow	File dialog title for new sym link	Σύνδεση \"%name\" με:
+Mount server error	AutoMounterSettings		Σφάλμα διακομιστή προσάρτησης
+If you rename the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo rename the home folder anyway, hold down the Shift key and click \"Rename\".	FSUtils		Αν μετονομάσετε τον φάκελο home, το %osName ενδέχεται να μην λειτουργήσει σωστά!\n\nΕίστε σίγουρος πως θέλετε να το κάνετε αυτό;\n\nΓια να μετακινήσετε τον φάκελο home ούτως ή άλλως, κρατήστε πατημένο το πλήκτρο Shift και κάντε κλικ στο κουμπί \"Μετονομασία\".
+Boolean	AttributesView		Δυαδική τιμή
+Invert selection	FilePanelPriv		Αντιστροφή επιλογής
+Memory size	AttributesView		Μέγεθος μνήμης
+TiB	WidgetAttributeText		TiB
+New folder	TemplatesMenu		Νέος φάκελος
+ (broken)	InfoWindow		 (χαλασμένο)
+Replace all	FSUtils		Αντικατάσταση όλων
+The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		Η εφαρμογή \"%appname\" δεν φαίνεται να υποστηρίζει τον τύπο του αρχείου που προσπαθείτε να ανοίξετε.\nΕίστε σίγουρος ότι θέλετε να συνεχίσετε;\n\nΑν ξέρετε πως η εφαρμογή υποστηρίζει αυτόν τον τύπο αρχείου, επικοινωνήστε με τον εκδότη της εφαρμογής και ζητήστε να ενημερώσει την εφαρμογή του έτσι ώστε να ορίσει τον τύπο αυτό ως υποστηριζόμενο.
+Reverse order	ContainerWindow		Ανάποδη σειρά
+Copying: 	StatusWindow		Γίνεται αντιγραφή: 
+Show navigator	SettingsView		Εμφάνιση πλοηγού
+Select all	DeskWindow		Επιλογή όλων
+Double-precision floating point number	AttributesView		Αριθμός με κινητή υποδιαστολή διπλής ακρίβειας
+Decrease size	ContainerWindow		Μείωση μεγέθους
+Recent queries	FindPanel		Πρόσφατες αναζητήσεις
+Mount all	MountMenu		Προσάρτηση όλων
+128 x 128	DeskWindow		128 x 128
+Size	Default Query Columns		Μέγεθος
+Favorites	FavoritesMenu		Αγαπημένα
+Delete	FilePanelPriv		Διαγραφή
+<No recent items>	FavoritesMenu		<Κανένα πρόσφατο στοιχείο>
+Formula %formula	FindPanel	FindResultTitle	Τύπος %formula
+Preparing to create links…	StatusWindow		Προετοιμασία δημιουργίας συνδέσμων…
+Tracker status	StatusWindow		Κατάσταση Tracker
+Handles any %type	OpenWithWindow		Χειρίζεται κάθε %type
+The mount server could not be contacted.	AutoMounterSettings		Αδυναμία επικοινωνίας με τον εξυπηρετητή προσάρτησης.
+ends with	SelectionWindow		τελειώνει με
+Open	OpenWithWindow		Άνοιγμα
+You must have at least one attribute showing.	PoseView		Πρέπει να έχετε τουλάχιστον μία εμφανής ιδιότητα.
+Cut	FilePanelPriv		Αποκοπή
+Finish: after several years	StatusWindow		Ολοκλήρωση: σε αρκετά χρόνια
+Favorites	FilePanelPriv		Αγαπημένα
+Point	AttributesView		Σημείο
+home	B_USER_DIRECTORY		αρχικός
+Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Νέα πρότυπα ανιχνευτή
+Disk mounting during boot	AutoMounterSettings		Προσάρτηση δίσκου κατά την εκκίνηση
+Don't automount	AutoMounterSettings		Να μη γίνει αυτόματη προσάρτηση
+Could not find application \"%appname\"	OpenWithWindow		Αδυναμία εύρεσης της εφαρμογής  \"%appname\"
+Unmatched parenthesis.	libtracker		Η παρένθεση δεν κλείνει.
+Extended attribute	AttributesView		Εκτεταμένη ιδιότητα
+Unmatched brackets.	libtracker		Οι αγκύλες δεν αντιστοιχούν.
+Error %error loading Add-On %name.	ContainerWindow		Σφάλμα %error κατά την φόρτωση προσθέτου %name.
+You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		Προσπαθείτε να αντικαταστήσετε το στοιχείο:\n\t%name%dest\nwith:\n\t%name%src\n\nΘα θέλατε να το αντικαταστήσετε με αυτό που %movemode;
+Empty Trash	ContainerWindow		Άδειασμα Κάδου
+no supporting apps	OpenWithWindow		καμία υποστηριζόμενη εφαρμογή
+32-bit unsigned integer	AttributesView		Ακέραιος αριθμός χωρίς πρόσημο 32-bit
+Preparing to empty Trash…	StatusWindow		Γίνεται προετοιμασία καθαρισμού του Κάδου…
+Deleting: 	StatusWindow		Γίνεται διαγραφή: 
+the MIME settings	FSUtils		οι ρυθμίσεις MIME
+You can't move or copy the trash.	FSUtils		Δεν μπορείτε να μετακινήσετε ή να αντιγράψετε στο καλάθι αχρήστων.
+label too long	PoseView		ετικέτα πολύ μεγάλη
+Error creating link to \"%name\".	FSUtils		Σφάλμα κατά τη δημιουργία συνδέσμου με το \"%name\".
+Unknown	FilePermissionsView		Άγνωστο
+Paste links	ContainerWindow		Επικόλληση συνδέσμων
+Restoring: 	StatusWindow		Γίνεται αποκατάσταση: 
+The Tracker must be running to set the default printer.	PoseView		Το Tracker πρέπει να εκτελείται για να οριστεί ο προεπιλεγμένος εκτυπωτής.
+calculating…	InfoWindow		γίνεται υπολογισμός…
+Preferred for file	OpenWithWindow		Προτινόμενο για το αρχείο
+OK	AutoMounterSettings		Εντάξει
+copying	FSUtils		αντιγραφή
+Get info	FilePanelPriv		Λήψη πληροφοριών
+MIME String	AttributesView		Γραμματοσειρά MIME
+Delete	ContainerWindow		Διαγραφή
+Execute	FilePermissionsView		Εκτέλεση
+Show volumes on Desktop	SettingsView		Προβολή τομέων στην επιφάνεια
+no	AttributesView		όχι
+Recent folders	ContainerWindow		Πρόσφατοι φάκελοι
+Desktop	Model		Επιφάνεια εργασίας
+Select all	ContainerWindow		Επιλογή όλων
+apps	B_APPS_DIRECTORY		εφαρμογές
+Error calculating folder size.	InfoWindow		Προέκυψε σφάλμα κατά τον υπολογισμό του μεγέθους του φακέλου.
+MiB	WidgetAttributeText		MB
+Delete	FSUtils		Διαγραφή
+Edit name	ContainerWindow		Επεξεργασία ονόματος
+Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Αδυναμία ανοίγματος του \"%document\" (Λείπει το σύμβολο: %symbol). \n
+ASCII Text	AttributesView		Κείμενο ASCII
+config	B_USER_CONFIG_DIRECTORY		ρύθμιση
+Error moving \"%name\".	FSUtils		Σφάλμα κατα τη μετακίνηση του \"%name\".
+Select…	QueryContainerWindow		Επιλογή…
+Open	ContainerWindow		Άνοιγμα
+Settings…	MountMenu		Ρυθμίσεις…
+You cannot put the selected item(s) into the trash.	FSUtils		Δεν μπορείτε να τοποθετήσετε την επιλογή σας στον Κάδο Απορριμάτων.
+Increase size	DeskWindow		Αύξηση μεγέθους
+starts with	SelectionWindow		ξεκινάει με
+New	DeskWindow		Νέο
+Invert	SelectionWindow		Αντιστροφή
+Would you like to find some other suitable application?	FSUtils		Θα θέλετα να επιλέξετε μια ποιο κατάλληλη εφαρμογή;
+*+? operand may be empty.	libtracker		*+? τελεστής ενδέχεται να είναι κενός.
+(unknown)	AttributesView		(άγνωστο)
+Recent folders	FavoritesMenu		Πρόσφατοι φάκελοι
+Signed memory size	AttributesView		Μέγεθος μνήμης με πρόσημο
+The specified name is illegal. Please choose another name.	FilePanelPriv		Το προσδιορισμένο όνομα είναι μη αποδεκτό. Παρακαλώ διαλέξτε άλλο όνομα.
+of %items	StatusWindow		από %items
+less than	FindPanel		λιγότερο από
+Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Σφάλμα αντιγραφής του αρχείου \"%name\":\n\t%error\n\nΘα θέλατε να συνεχίσετε;
+Creating links: 	StatusWindow		Γίνεται δημιουργία συνδέσμων: 
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Αδυναμία ανοίγματος του \"%document\" με την εφαρμογή \"%app\" (%error). 
+Create %s clipping	PoseView		Δημιουργία %s αποκόμματος
+Error moving \"%name\"	FSUtils		Σφάλμα κατά τη μετακίνηση του \"%name\"
+To: %dir	StatusWindow		Στο: %dir
+Paste layout	ContainerWindow		Επικόλληση διάταξης
+Cancel	Tracker		Άκυρο
+yes	AttributesView		ναι
+Make active printer	ContainerWindow		Δημιουργία ενεργού εκτυπωτή
+Copy to	ContainerWindow		Αντιγραφή στο
+Name	SelectionWindow		Όνομα
+by attribute	FindPanel		κατά ιδιότητα
+Write	FilePermissionsView		Εγγραφή
+<%ld bytes of data>	AttributesView		<%ld byte δεδομένων>
+If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Αν πειράξετε τον φάκελο συστήματος ή τα περιεχόμενά του, δεν θα μπορέσετε να εκκινήσετε το %osName!\n\nΕίστε σίγουρος πως θέλετε να το κάνετε αυτό;\n\nΓια να πειράξετε τον φάκελο ή τα περιεχόμενά του ούτως ή άλλως, κρατήστε πατημένο το πλήκτρο Shift και κάντε κλικ στο κουμπί \"Ξέρω τι κάνω\".
+Save	FilePanelPriv		Αποθήκευση
+Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Αδυναμία ανοίγματος του \"%document\"  με την εφαρμογή \"%app\" (Βιβλιοθήκες που λείπουν: %library). \n
+Finish: %time	StatusWindow		Ολοκλήρωση: %time
+after	FindPanel		μετά
+Version	OpenWithWindow		Έκδοση
+Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Μερικά από τα επιλεγμένα στοιχεία δεν μπορούν να μετακινηθούν στον Κάδο Απορριμμάτων. Θα θέλατε να τα διαγράψετε αντ' αυτού; (Αυτή η λειτουργία δεν μπορεί να επανέλθει.)
+Add printer…	ContainerWindow		Προσθήκη εκτυπωτή…
+On	FindPanel		Ενεργοποιημένο
+Permissions	ContainerWindow		Άδειες
+Size:	InfoWindow		Μέγεθος:
+The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		To επιλεγμένο στοιχείο δεν μπορεί να μετακινηθεί στον Κάδο Απορριμμάτων. Θα θέλατε εναλλακτικά να το διαγράψετε; (Αυτή η λειτουργία δεν μπορεί να επανέλθει.)
+Copy	ContainerWindow		Αντιγραφή
+Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Συγνώμη, η ιδιότητα 'Χαρακτήρας' δεν μπορεί να αποθηκεύσει έναν γλύφο πολλών byte.
+Open parent	VirtualDirectoryWindow		Άνοιγμα γονικού φακέλου
+And	FindPanel		Και
+multiple disks	FindPanel		πολλαπλοί δίσκοι
+Drawing pattern	AttributesView		Μοτίβο σχεδιασμού
+File offset	AttributesView		Στοίχιση αρχείου
+Name = %name	FindPanel	FindResultTitle	Όνομα = %name
+Subject	Email Query Columns		Θέμα
+Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Σφάλμα αντιγραφής του φακέλου \"%name\":\n\t%error\n\nΘα θέλατε να συνεχίσετε;
+You cannot create a link to the root directory.	FSUtils		Δε μπορείτε να δημιουργήσετε σύνδεσμο με το ριζικό κατάλογο.
+Select all	FilePanelPriv		Επιλογή όλων
+Other	FilePermissionsView		Άλλο
+Automatic disk mounting	AutoMounterSettings		Αυτόματη προσάρτηση δίσκων
+parent folder	NavMenu		φάκελος γονέα
+Create link here	ContainerWindow		Δημιουργία συνδέσμου εδώ
+Force identify	ContainerWindow		Εξαναγκασμός αναγνώρισης
+48 x 48	DeskWindow		48 χ 48
+no items	CountView		καθόλου αντικείμενα
+Time	AttributesView		Ώρα
+Disks	DirMenu		Δίσκοι
+Query name:	FindPanel		Όνομα ερωτήματος:
+Open parent	ContainerWindow		Άνοιγμα γονέα
+Find…	ContainerWindow		Εύρεση…
+moving	FSUtils		μετακίνηση
+Single window navigation	SettingsView		Πλοήγηση απλού παράθυρου
+greater than	FindPanel		μεγαλύτερο από
+Add	FindPanel		Προσθήκη
+Created:	InfoWindow		Δημιουργήθηκε:
+Edit Query template	FindPanel		Επεξεργασία προτύπου ερωτήματος
+Save query as template…	FindPanel		Αποθήκευση αιτήματος ως πρότυπο…
+All disks	AutoMounterSettings		Όλοι οι δίσκοι
+link	FSUtils	filename link	σύνδεσμος
+16-bit unsigned integer	AttributesView		Ακέραιος αριθμός χωρίς πρόσημο 16-bit
+Proceed	FSUtils		Συνέχεια
+Edit favorites…	FilePanelPriv		Επεξεργασία αγαπημένων…
+You can't move a folder into itself or any of its own sub-folders.	FSUtils		Δεν μπορείτε να μετακινήσετε ένα φάκελο μέσα στον εαυτό του ή σε οποιοδήποτε από τους δικούς του υποφακέλους του.
+New	ContainerWindow		Νέο
+You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Πρέπει να αφήσετε τα αντικείμενα σε ένα από τα εικονίδια δίσκων στο παράθυρο \"Δίσκοι\".
+If you alter %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Αν πειράξετε το %target, το %osName ενδέχεται να μην λειτουργήσει σωστά!\n\nΕίστε σίγουρος ότι θέλετε να το κάνετε αυτό;
+Sorry, you can't copy items to the Trash.	FSClipBoard		Συγνώμη, δεν μπορείτε να αντιγράψετε στοιχεία στον Κάδο Απορριμάτων.
+Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Ορισμένα στοιχεία υπάρχουν ήδη σε αυτόν το φάκελο με τα ίδια ονόματα με τα στοιχεία που %verb.\n \nΘα θέλατε να τα αντικαταστήσετε με αυτά που %verb ή θα θέλατε να αποφασίσετε για κάθε αρχείο μεμονωμένα;
+When	Email Query Columns		Πότε
+Object	AttributesView		Αντικείμενο
+Paste	FilePanelPriv		Επικόλληση
+Paste	ContainerWindow		Επικόλληση
+An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Ένα στοιχείο που ονομάζεται \"%name\" υπάρχει ήδη σε αυτό το φάκελο μπορεί να περιέχει\nστοιχεία με ίδια ονόματα.  Θα θέλατε να τα αντικαταστήσετε με αυτά που περιέχονται στο φάκελο που %verb;
+Cannot unmount the boot volume \"%name\".	FSUtils		Αδυναμία αποπροσάρτησης του τόμου εκκίνησης \"%name\".
+Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Αδυναμία ανοίγματος του \"%document\" με την εφαρμογή \"%app\" (Λείπει το σύμβολο: %symbol). \n
+New folder	ContainerWindow		Νέος κατάλογος
+Name	OpenWithWindow		Όνομα
+There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Υπήρξε κάποιο πρόβλημα κατά την προσπάθεια αντικατάστασης του \"%name\". Το αντικείμενο μπορεί να είναι ήδη ανοιχτό ή απασχολημένο.
+Windows	TrackerSettingsWindow		Παράθυρα
+Show space bars on volumes	SettingsView		Εμφάνιση μπαρών διαστήματος στους τόμους
+Could not update permissions of file \"%name\". %error	FSUtils		Αδυναμία αναθεώρησης των δικαιωμάτων του αρχείου \"%name\". %error
+Decrease size	DeskWindow		Μείωση μεγέθους
+Emptying Trash… 	StatusWindow		Άδειασμα Κάδου Απορριμάτων… 
+{0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{για # αρχείο} other{για # αρχεία}}
+KiB	WidgetAttributeText		KiB
+Revert	TrackerSettingsWindow		Επαναφορά
+trash	B_TRASH_DIRECTORY		κάδος
+If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Αν μετακινήσετε τον φάκελο συστήματος ή τα περιεχόμενά του, δεν θα μπορέσετε να εκκινήσετε το %osName!\n\nΕίστε σίγουρος ότι θέλετε να το κάνετε αυτό;\n\nΓια να μετακινήσετε τον φάκελο συστήματος ή τα περιεχόμενά του ούτως ή άλλως, κρατήστε το πλήκτρο Shift πατημένο και κάντε κλικ στο κουμπί \"Μετακίνηση\".
+Close all in workspace	ContainerWindow		Κλείσιμο όλων
+Corrupted expression.	libtracker		Κατεστραμμένη έκφραση.
+32 x 32	DeskWindow		32 x 32
+Network address	AttributesView		Διεύθυνση δικτύου
+Finish: %time - %finishtime left	StatusWindow		Ολοκλήρωση: %time - απομένουν %finishtime
+Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		Αδυναμία ανοίγματος του \"%document\" (Βιβλιοθήκες που απουσιάζουν: %library). \n
+Create relative link here	ContainerWindow		Δημιουργία συγγενικού συνδέσμου εδώ
+Copy	FilePanelPriv		Αντιγραφή
+All Haiku disks	AutoMounterSettings		Όλοι οι δίσκοι Haiku
+Close all	ContainerWindow		Κλείσιμο όλων
+Paused: click to resume or stop	StatusWindow		Σταματημένο: κάντε κλικ για συνέχεια ή διακοπή
+Name	QueryPoseView		Όνομα
+Error %error loading add-On %name.	ContainerWindow		Σφάλμα %error κατά την φόρτωση του προσθέτου %name.
+Does not handle file	OpenWithWindow		Δε χειρίζεται το αρχείο
+E-mail	Person Query Columns		E-mail
+Arrange by	ContainerWindow		Ταξινόμιση κατά
+Attributes	AttributesView		Ιδιότητες
+Sorry, saving more than one item is not allowed.	FilePanelPriv		Δεν επιτρέπεται η αποθήκευση περισσότερων του ενός αντικειμένου.
+64-bit unsigned integer	AttributesView		Ακέραιος αριθμός χωρίς πρόσημο 64-bit
+Move here	ContainerWindow		Μετακίνηση εδώ
+the config folder	FSUtils		ο φάκελος παραμέτρων
+Sorry, could not create a new folder.	FSUtils		Λυπούμαστε, αδυναμία δημιουργίας ενός νέου φακέλου.
+Select all	VirtualDirectoryWindow		Επιλογή όλων
+Rename	FSUtils	button label	Μετονομασία
+Clean up all	ContainerWindow		Καθαρισμός όλων
+Add current folder	FilePanelPriv		Προσθήκη τρέχοντος φακέλου
+Description:	InfoWindow		Περιγραφή:
+Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Είστε σίγουρος οτι θέλετε να διαγράψετε ό,τι αντικείμενο έχετε επιλέξει; Αυτή η λειτουργία δεν είναι αναιρέσιμη.
+Grayscale picture	AttributesView		Φωτογραφία κλίμακας γκρι
+Mount	DeskWindow		Προσάρτηση
+ends with	FindPanel		τελειώνει με
+Show Disks icon	SettingsView		Εμφάνιση εικονιδίου δίσκων
+Outline selection rectangle only	SettingsView		Μόνο περίγραμμα ορθογώνιας επιλογής
+by formula	FindPanel		από τον τύπο
+Resize to fit	VirtualDirectoryWindow		Προσαρμογή μεγέθους
+Move to Trash	FilePanelPriv		Μετακίνηση στον Κάδο
+is	FindPanel		είναι
+If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Αν μετονομάσετε τον φάκελο συστήματος ή τα περιεχόμενά του, δεν θα μπορέσετε να εκκινήσετε το %osName!\n\nΕίστε σίγουρος πως θέλετε να το κάνετε αυτό;\n\nΓια να μετονομάσετε τον φάκελο ή τα περιεχόμενά του ούτως ή άλλως, κρατήστε πατημένο το πλήκτρο Shift και κάντε κλικ στο κουμπί \"Μετονομασία\".
+40 x 40	DeskWindow		40 x 40
+40 x 40	ContainerWindow		40 χ 40
+Permissions	FilePermissionsView		Άδειες
+New folder %ld	FSUtils		Νέος φάκελος %ld
+64 x 64	DeskWindow		64 x 64
+\"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		Το \"%name\" είναι ένα απαρχαιωμένο εκτελέσιμο αρχείο. Παρακαλώ βρείτε μία ενημερωμένη έκδοση ή δημιουργήστε το δικό σας εκτελέσιμο αρχείο.
+Only the boot disk	AutoMounterSettings		Μόνο ο δίσκος εκκίνησης
+That name is already taken. Please type another one.	WidgetAttributeText		Αυτό το όνομα είναι κατηλειμμένο. Παρακαλώ πληκτρολογήστε κάποιο άλλο.
+Message	AttributesView		Μήνυμα
+Modified	Default Query Columns		Τροποποιήθηκε
+Default application	InfoWindow		Προεπιλεγμένη εφαρμογή
+Untitled bitmap	PoseView		Εικόνα bitmap χωρίς τίτλο
+matches regular expression	SelectionWindow		ταιριάζει με τη συνήθη έκφραση
+Invert selection	ContainerWindow		Αντιστροφή επιλογής
+Close	VirtualDirectoryWindow		Κλείσιμο
+Monochrome picture	AttributesView		Μονοχρωματική εικόνα
+Real name	ContainerWindow		Κανονικό όνομα
+Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		Αδυναμία ανοίγματος του \"%name\". Το αρχείο λανθασμένα έχει επισημανθεί λανθασμένα ως εκτελέσιμο. 
+Go to parent	FilePanelPriv		Μετάβαση στο γονέα
+Save	FindPanel		Αποθήκευση
+Name	FindPanel		Όνομα
+Cancel	WidgetAttributeText		Άκυρο
+Memory corruption.	libtracker		Κατάρρευση μνήμης.
+Expression too long.	libtracker		Η έκφραση είναι υπερβολικά μεγάλη.
+Color	AttributesView		Χρώμα
+Copy layout	ContainerWindow		Αντιγραφή διάταξης
+Duplicate	ContainerWindow		Διπλότυπο
+16-bit integer	AttributesView		Ακέραιος αριθμός 16-bit
+The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		το αρχείο \"%name\" υπάρχει ήδη στον προσδιορισμένο φάκελο. Θέλετε σίγουρα να το αντικαταστήσετε;
+You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Πρέπει να αφήσετε τα αντικείμενα σε ένα από τα εικονίδια δίσκων στο παράθυρο \"Δίσκοι\".
+Version:	InfoWindow		Έκδοση:
+OK	PoseView		Εντάξει
+Add-ons	DeskWindow		Πρόσθετα
+Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Είστε σίγουρος ότι θα θέλατε να μεταφέρετε ή να αντιγράψετε ό,τι αντικείμενο έχετε επιλέξει σε αυτόν τον φάκελο;
+Find	FindPanel		Εύρεση
+Empty folder	NavMenu		Άδειος φάκελος
+Defaults	TrackerSettingsWindow		Προεπιλεγμένα
+Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Δεν υπάρχει ο απαιτούμενος ελευθερος χώρος στον τόμο για την αποθήκευση.
+True-color picture	AttributesView		Φωτογραφία ρεαλιστικών χρωμάτων
+Add-ons	FilePanelPriv		Πρόσθετα
+96 x 96	DeskWindow		96 x 96
+Empty folder	SlowContextPopup		Άδειος φάκελος
+Alignment	AttributesView		Στοίχιση
+Move to Trash	FSUtils		Μετακίνηση στον Κάδο
+Handles %type	OpenWithWindow		Χειρίζεται %type
+Cancel	PoseView		Άκυρο
+Delete	PoseView		Διαγραφή
+Media parameter	AttributesView		Παράμετρος πολυμέσων
+If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Αν πειράξετε τον φάκελο home, το %osName ενδέχεται να μην λειτουργήσει σωστά!\n\nΕίστε σίγουρος πως θέλετε να το κάνετε αυτό;\n\nΓια να μετακινήσετε τον φάκελο home ούτως ή άλλως, κρατήστε πατημένο το πλήκτρο Shift και κάντε κλικ στο κουμπί \"Ξέρω τι κάνω\".
+Sorry, you can't copy items to the Trash.	PoseView		Δεν μπορείτε να αντιγράψετε στοιχεία στον Κάδο Απορριμάτων.
+Invert selection	VirtualDirectoryWindow		Αντιστροφή επιλογής
+New folder	FilePanelPriv		Νέος φάκελος
+{0, plural, one{# item} other{# items}}	CountView	Number of selected items: \"1 item\" or \"2 items\"	{0, plural, one{# αντικείμενο} other{# αντικείμενα}}
+Name	AttributesView		Όνομα
+the settings folder	FSUtils		ο φάκελος ρυθμίσεων
+If you move %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Αν μετακινήσετε το %target, το %osName ενδέχεται να μην λειτουργήσει σωστά!\n\nΕίστε σίγουρος ότι θέλετε να το κάνετε αυτό;
+Create a Query	FindPanel		Δημιούργησε ένα ερώτημα
+Close	QueryContainerWindow		Κλείσιμο
+I know what I'm doing	FSUtils	button label	Ξέρω τι κάνω
+Preparing to copy items…	StatusWindow		Προετοιμασία για αντιγραφή στοιχείων…
+Icon view	ContainerWindow		Προβολή εικονιδίου
+Name	ContainerWindow		Όνομα
+Preferred for %type	OpenWithWindow		Προτινόμενο για %type
+Free space color	SettingsView		Χρώμα ελεύθερου χώρου
+OK	WidgetAttributeText		Εντάξει
+OK	FSUtils		Εντάξει

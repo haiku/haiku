@@ -1,8 +1,9 @@
-1	thai	x-vnd.Haiku-About	1828471351
+1	thai	x-vnd.Haiku-About	511528774
 Revision	AboutView		ปรับปรุง
 The Haikuware team and their bounty program\n	AboutView		ทีมไฮกุแวร์และโปรแกรมสนับสนุนของพวกเขา\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		ลิขสิทธิ์© 1999-2007 Michael C. Ring สงวนลิขสิทธิ์.
 %.2f GHz	AboutView		%.2f GHz
+Copyright © 2001-%d The Haiku project. 	AboutView		ลิขสิทธิ์© 2001-%d โครงงาน Haiku 
 \n\nSpecial thanks to:\n	AboutView		\n\nขอขอบคุณเป็นพิเศษสำหรับ: \n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (และเคอร์เนล NewOS ของเขา) \n
 Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		ลิขสิทธิ์© 1999-2000 Y.Takagi สงวนลิขสิทธิ์.
@@ -14,6 +15,7 @@ Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		�
 Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		ลิขสิทธิ์ © 1990-2002 Info-ZIP. สงวนลิขสิทธิ์
 Past website & marketing:\n	AboutView		เว็บไซต์และการตลาดในอดีต: \n
 Copyright © 2003 Peter Hanappe and others.	AboutView		ลิขสิทธิ์ © 2003 Peter Hanappe และเพื่อนๆ
+Testing and bug triaging:\n	AboutView		การทดสอบและการทำข้อผิดพลาดในการจำลอง:\n
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{Processor:} อื่น{# Processors:}}
 %d MiB total	AboutView		รวม %d MiB
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	รหัสที่เป็นเอกลักษณ์ของไฮกุโดยเฉพาะเคอร์เนลและรหัสทั้งหมดที่แอพพลิเคชั่นอาจเชื่อมโยงนั้นได้รับการแจกจ่ายภายใต้เงื่อนไขของ <MIT license> ไลบรารีระบบบางแห่งมีรหัสบุคคลที่สามที่แจกจ่ายภายใต้ <LGPL license> คุณสามารถค้นหาลิขสิทธิ์ของรหัสบุคคลที่สามด้านล่างนี้ \n\n

@@ -1,0 +1,17 @@
+1	esperanto	x-vnd.Haiku-keystore_server	2429996361
+to perform the following action:\n%accessString%\n\n	AppAccessRequestWindow		por fari la sekvan:\n%accessString%\n\n
+This application doesn't yet have the required privileges.	AppAccessRequestWindow		Ĉi programo mankas la sufiĉaj rajtoj.
+Keyring:	KeyRequestWindow		Ŝlosilaro:
+requests access to keyring:\n%keyringName%\n\n	AppAccessRequestWindow		petas atingopermeson de ŝlosilaro:\n%keyringName%\n\n
+Application keyring access	AppAccessRequestWindow		Aplikaĵa ŝlosilara permeso
+Disallow	AppAccessRequestWindow		Malpermesi
+Allow once	AppAccessRequestWindow		Permesi unufoje
+Unlock keyring	KeyRequestWindow		Malŝlosi ŝlosilaron
+An application wants to access the keyring below, but it is locked with a passphrase. Please enter the passphrase to unlock the keyring.\nIf you unlock the keyring, it stays unlocked until the system is shut down or the keyring is manually locked again.\nIf you cancel this dialog the keyring will remain locked.	KeyRequestWindow		Programo deziras atingi la suban ŝlosilaron, sed ĝi estas ŝlosita per pasvorto. Bonvole eniru la pasvorton pro malŝlosi la ŝlosilaron.\nSe vi malŝlosas la ŝlosilaron, ĝi restos malŝlose ĝis aŭ komputilo malŝaltiĝas, aŭ ĝis vi permane ĝin reŝlosas.\nSe vi rezignus ĉi fenestron, la ŝlosilaro daŭre ŝlosatos.
+Password:	KeyRequestWindow		Pasvorto:
+Cancel	KeyRequestWindow		Nuligi
+This application has been updated since it was last granted access.	AppAccessRequestWindow		Ĉi programo ĝisdatiĝis ekde ĝi lastatempe permesiĝis.
+Allow always	AppAccessRequestWindow		Permesi ĉiam
+Unlock	KeyRequestWindow		Malŝlosi
+The application:\n%signature% (%path%)\n\n	AppAccessRequestWindow		La programo:\n%signature% (%path%)\n\n
+This application hasn't been granted access before.	AppAccessRequestWindow		Ĉi programo neniam ĝis nun permesiĝis.

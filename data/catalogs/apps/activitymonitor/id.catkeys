@@ -1,47 +1,46 @@
-1	indonesian	x-vnd.Haiku-ActivityMonitor	1155619009
-P-faults	DataSource		P-faults
-Media nodes	DataSource		Simpul media
-Threads	DataSource		Benang
-Always on top	ActivityWindow		Selalu di atas
-Add graph	ActivityWindow		Menambahkan grafis
+1	indonesian	x-vnd.Haiku-ActivityMonitor	3672498538
 Teams	DataSource		Tim
+Semaphores	DataSource		Semaphore
+TX	DataSource	Shorter version for Sending	TX
+Block cache memory	DataSource		Memori cache blok
+%lld ms	SettingsWindow		%lld ms
 MiB	DataSource		MiB
-Network send	DataSource		Jaringan mengirim
-CPU usage (combined)	DataSource		Penggunaan CPU (gabungan)
-CPU	DataSource		CPU
-Used memory	DataSource		Memori yang digunakan
-Cached memory	DataSource		Memori cache
-Apps	DataSource		Aplikasi
-Show legend	ActivityView		Tampilkan legenda
+Media nodes	DataSource		Simpul media
 Text clipboard	DataSource		Teks clipboard
-Settings	ActivityWindow		Pengaturan
+Network send	DataSource		Jaringan mengirim
+Running applications	DataSource		Menjalankan aplikasi
+Cache	DataSource		Cache
+CPU usage (combined)	DataSource		Penggunaan CPU (gabungan)
+Threads	DataSource		Benang
 Receiving	DataSource		Menerima
+Remove graph	ActivityView		Menghapus grafik
+Swap space	DataSource		Ruang swap
+CPU	DataSource		CPU
+ActivityMonitor	System name		MonitorAktifitas
+Update time interval:	SettingsWindow		Memperbarui interval waktu:
+RX	DataSource	Shorter version for Receiving.	RX
 Settings…	ActivityWindow		Pengaturan…
+Block cache	DataSource		Blok cache
+Memory	DataSource		Memory
+CPU usage	DataSource		Penggunaan CPU
+Quit	ActivityWindow		Keluar
+Raw clipboard	DataSource		Clipboard mentah
+Settings	ActivityWindow		Pengaturan
+Used memory	DataSource		Memori yang digunakan
+%.1f faults/s	DataSource		%.1f kesalahan/s
+Show legend	ActivityView		Tampilkan legenda
+Cached memory	DataSource		Memori cache
+File	ActivityWindow		Berkas
 Ports	DataSource		Ports
 Page faults	DataSource		Kesalahan halaman
-Sending	DataSource		Mengirim
-Cache	DataSource		Cache
-%.1f faults/s	DataSource		%.1f kesalahan/s
-Update time interval:	SettingsWindow		Memperbarui interval waktu:
-TX	DataSource	Shorter version for Sending	TX
-Quit	ActivityWindow		Keluar
-Block cache memory	DataSource		Memori cache blok
-Remove graph	ActivityView		Menghapus grafik
-%lld sec.	SettingsWindow		%lld detik.
-%lld ms	SettingsWindow		%lld ms
-CPU usage	DataSource		Penggunaan CPU
-Raw clipboard	DataSource		Clipboard mentah
-Sems	DataSource		Sems
-%.1f MiB	DataSource		%.1f MiB
-ActivityMonitor	System name		MonitorAktifitas
-Running applications	DataSource		Menjalankan aplikasi
-Semaphores	DataSource		Semaphore
-Block cache	DataSource		Blok cache
-Swap space	DataSource		Ruang swap
-Swap	DataSource		Swap
-File	ActivityWindow		Berkas
-usage	DataSource		pemakaian
+Apps	DataSource		Aplikasi
 Additional items	ActivityView		Barang tambahan
+Add graph	ActivityWindow		Menambahkan grafis
+Sending	DataSource		Mengirim
+%.1f MiB	DataSource		%.1f MiB
+Always on top	ActivityWindow		Selalu di atas
+Swap	DataSource		Swap
+%lld sec.	SettingsWindow		%lld detik.
+P-faults	DataSource		P-faults
+Sems	DataSource		Sems
 Network receive	DataSource		Jaringan menerima
-Memory	DataSource		Memory
-RX	DataSource	Shorter version for Receiving.	RX

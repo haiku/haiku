@@ -49,7 +49,7 @@ An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo
 Error	MediaConverter		Ошибка
 File details	MediaConverter		Параметры файла
 No audio	Audio codecs list		Без аудио
-Drop media files onto this window	MediaConverter		Перенесите медиа файлы в это окно
+Drop media files onto this window	MediaConverter		Перетащите медиа файлы в это окно
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# кадр} few{# кадра} other{# кадров}}
 Quit	Menu		Выход
 {0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# байт} few{# байта} other{# байтов}}

@@ -16,7 +16,7 @@ No image available to save.	ImageWindow		无图像可用于保存。
 OK	ImageView		确定
 Bummer	ImageWindow		Bummer
 \nOutput Formats:	ImageView		\n导出格式：
-Number of Documents: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		文档数：%1\n\n\已用转换器：\n名称：%2\n信息：%3\n版本：%4\n
+Number of Documents: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		文档数：%1\n\n已用转换器：\n名称：%2\n信息：%3\n版本：%4\n
 User Translators	ActiveTranslatorsWindow		用户翻译器
 Last Page	ImageWindow		上一页
 \nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\n已用翻译器：\n名称：%1\n信息：%2\n版本：%3\n

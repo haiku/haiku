@@ -21,13 +21,13 @@ Print…	ProbeView		Imprimir…
 New…	FileWindow		Novo…
 what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	o quê: '%.4s'\n\n
 OK	DiskProbe		OK
-DiskProbe	System name		DiskProbe
+DiskProbe	System name		Analisador de Disco
 Back	ProbeView		Retroceder
 Device: 	ProbeView		Dispositivo: 
 Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Base
 Open file…	FileWindow		Abrir ficheiro…
 32 bit unsigned pointer:	TypeEditors		Apontador 32 bit sem sinal:
-DiskProbe request	DiskProbe		Solicitação de DiskProbe
+DiskProbe request	DiskProbe		Solicitação do Analisador de Disco
 Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hex
 Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		A escrita para o ficheiro falhou:\n%s\n\nTodas as alterações serão perdidas quando sair do programa.
 Examine device:	OpenWindow		Examinar dispositivo:
@@ -53,7 +53,7 @@ Redo	ProbeView		Refazer
 Floating-point value:	TypeEditors		Valor de vírgula flutuante:
 Cancel	AttributeWindow		Cancelar
 16 bit signed value:	TypeEditors		Valor de 16 bits com sinal:
-DiskProbe request	AttributeWindow		Solicitação de DiskProbe
+DiskProbe request	AttributeWindow		Solicitação do Analisador de Disco
 Next	ProbeView		Seguinte
 64 bit signed offset:	TypeEditors		Offset de 64 bit com sinal:
 32 bit signed value:	TypeEditors		Valor 32 bit com sinal:
@@ -115,7 +115,7 @@ Block	ProbeView		Bloco
 Find again	ProbeView		Procurar seguinte
 View	ProbeView	This is the last menubar item 'File Edit Block View'	Visualização
 Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Não foi possível ler a imagem
-DiskProbe request	ProbeView		Solicitação do DiskProbe
+DiskProbe request	ProbeView		Solicitação do Analisador de Disco
 Double precision floating-point value:	TypeEditors		Valor de vírgula-flutuante de dupla precisão:
 Image	TypeEditors	This is the type of view	Imagem
 Save changes before closing?	ProbeView		Guardar alterações antes de fechar?

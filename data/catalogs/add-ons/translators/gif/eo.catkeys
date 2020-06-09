@@ -1,0 +1,19 @@
+1	esperanto	x-vnd.Haiku-GIFTranslator	2201651797
+Websafe	GIFView		Taŭga por la reto
+Write interlaced images	GIFView		Skribi interplekitajn bildojn
+Optimal	GIFView		Taŭga
+Greyscale	GIFView		Grizskala
+Colors:	GIFView		Koloroj:
+GIF image translator	GIFTranslator		GIF bildotradukilo
+Be Bitmap Format (GIFTranslator)	GIFTranslator		Be Bitmapa Formo (GIFTranslator)
+GIF image translator	GIFView		GIF bildotradukilo
+Palette:	GIFView		Farboplato:
+GIF image	GIFTranslator		GIF bildo
+Write transparent images	GIFView		Skribi travideblajn bildojn
+GIF images	GIFTranslator		GIF bildoj
+Version %d.%d.%d, %s	GIFView		Versio %d.%d.%d, %s
+Use RGB color	GIFView		Uzu RGB-kolorojn
+Use dithering	GIFView		Uzu punktismon
+GIF Settings	GIFTranslator		Agordo de GIF
+BeOS system	GIFView		BeOS sistemo
+Automatic (from alpha channel)	GIFView		Aŭtomate (de alfa kanalo)

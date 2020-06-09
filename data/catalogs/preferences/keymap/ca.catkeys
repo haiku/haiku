@@ -21,7 +21,7 @@ Serbian (Cyrillic)	KeymapNames		Sèrbi (Cyrillic)
 Belgian (point)	KeymapNames		Belga (punt)
 Finnish	KeymapNames		Acaba
 Num lock	Keyboard Layout View		Bloqueig numèric
-Switch shortcut keys to Windows/Linux mode	Keymap window		Canvia les dreceres de tecla al mode Windows/Linux
+Switch shortcut keys to Windows/Linux mode	Keymap window		Canvia les tecles de drecera al mode de Windows / Linux
 Option	Keyboard Layout View	Option key	Opció
 Spanish (Dvorak)	KeymapNames		Espanyol (Dvorak)
 Scroll lock	Keyboard Layout View		Bloqueig de desplaçament
@@ -139,7 +139,7 @@ Keymap	System name		Mapa de tecles
 Slovene	KeymapNames		Eslovè
 Lithuanian	KeymapNames		Lituà
 Set modifier keys…	Keymap window		Establiu les tecles modificadores...
-Switch shortcut keys to Haiku mode	Keymap window		Canvia les dreceres de teclat en mode Haiku
+Switch shortcut keys to Haiku mode	Keymap window		Canvia les tecles de drecera al mode del Haiku
 Defaults	Keymap window		Valors predeterminats
 ISO-9995	KeymapNames		ISO-9995
 System:	Keymap window		Sistema:

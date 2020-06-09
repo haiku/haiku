@@ -1,0 +1,88 @@
+1	esperanto	x-vnd.Haiku-Bluetooth	3550394259
+Positioning	DeviceClass		Lokado
+Controller	DeviceClass		Ludregilo
+Common ISDN access	DeviceClass		Komuna ISDN aliro
+Unknown (reserved) minor device class	DeviceClass		Nekonata (rezervita) minora aparato
+Uncategorized	DeviceClass		Nekategoriigita
+Keyboard	DeviceClass		Klavaro
+Smart phone	DeviceClass		Saĝtelefono
+VCR	DeviceClass		VCR
+Cellular	DeviceClass		Ĉela
+Audio	DeviceClass		Aŭdaĵo
+Audio/Video	DeviceClass		Aŭdaĵo/Video
+Car audio	DeviceClass		Aŭdaĵo de aŭto
+Major class: 	DeviceClass		Maĵora klaso: 
+HiFi audio device	DeviceClass		HiFi sona aparato
+Microphone	DeviceClass		Mikrofono
+Capturing	DeviceClass		Kaptado
+Jacket	DeviceClass		Konekto
+50-67% utilized	DeviceClass		50-67% utiligita
+Headphones	DeviceClass		Kapaŭdiloj
+Imaging	DeviceClass		Bildigo
+Device conforms to the headset profile	DeviceClass		Aparato konformas al la aŭdila profilo
+Remote control	DeviceClass		Defora stirado
+Fully available	DeviceClass		Plene disponebla
+#CommandFailed#Not Valid name	RemoteDevice		#KomandoMalsukcesis#Nomo Nevalidas
+Server	DeviceClass		Servilo
+No service available	DeviceClass		Servo ne disponeblas
+Printer	DeviceClass		Presilo
+Card reader	DeviceClass		Kartolegilo
+Wired modem or voice gateway	DeviceClass		Kabligita modemo aŭ voĉa kluzo
+#ServerNotReady#Not Valid name	RemoteDevice		#ServiloNePreta#Nomo Nevalidas
+#NoOwnerError#Not Valid name	RemoteDevice		#SenPosedantoEraro#Nomo Nevalidas
+Camcorder	DeviceClass		Videfotilo
+#NotCompletedRequest#Not Valid name	RemoteDevice		#NeKompletaPeto#Nomo Nevalidas
+17-33% utilized	DeviceClass		17-33% utiligita
+Desktop workstation	DeviceClass		Labortabla stacio
+Unspecified	DeviceClass		Nespecifita
+Miscellaneous	DeviceClass		Diversaĵoj
+Robot	DeviceClass		Roboto
+Vehicle	DeviceClass		Veturilo
+LAN access	DeviceClass		LAN aliro
+Glasses	DeviceClass		Okulvitroj
+Phone	DeviceClass		Telefono
+Laptop	DeviceClass		Portebla komputilo
+67-83% utilized	DeviceClass		67-83% utiligita
+Cordless	DeviceClass		Sendrata
+Invalid device class!\n	DeviceClass		Nevalida aparata klaso\n
+Minor class: 	DeviceClass		Minora klaso:
+Doll/Action figure	DeviceClass		Pupo/Figuro de Agado
+Not implemented	RemoteDevice		Ne efektivigita
+33-50% utilized	DeviceClass		33-50% utiligita
+Gaming/Toy	DeviceClass		Ludado/Ludilo
+Video camera	DeviceClass		Videa fotilo
+Handheld	DeviceClass		Mankomputilo
+Service classes: 	DeviceClass		Servaj Klasoj:
+Loudspeaker	DeviceClass		Laŭtparolilo
+83-99% utilized	DeviceClass		83-99% utiligita
+SIM card reader	DeviceClass		SIM kartolegilo
+Computer	DeviceClass		Komputilo
+Scanner	DeviceClass		Skanilo
+Wearable	DeviceClass	A wearable computer	Portebla
+Display	DeviceClass		Ekrano
+Gamepad	DeviceClass		Ludregilo
+Video monitor	DeviceClass		Videoekrano
+Palm	DeviceClass	A palm-held device	Manplato
+Joystick	DeviceClass		Stirilo
+Networking	DeviceClass		Retada
+Telephony	DeviceClass		Telefonado
+Game	DeviceClass		Ludo
+Video display and loudspeaker	DeviceClass		Videoekrano kaj laŭtparolilo
+Wrist watch	DeviceClass		Brakhorloĝo
+Sensing device	DeviceClass		Sentanta aparato
+Pointing device	DeviceClass		Indikilo
+(reserved)	DeviceClass		(rezervita)
+Rendering	DeviceClass		Bildigada
+Information	DeviceClass		Informo
+Helmet	DeviceClass		Kasko
+Pager	DeviceClass	A small radio device to receive short text messages	Homserĉilo
+Hands-free	DeviceClass		Senmane
+Digitizer tablet	DeviceClass		Ciferecigila tabuleto
+Portable audio	DeviceClass		Portebla aŭdilo
+Camera	DeviceClass		Fotilo
+1-17% utilized	DeviceClass		1-17% utiligita
+Combo keyboard/pointing device	DeviceClass		Kunigita klavaro/indikilo
+Video conferencing	DeviceClass		Videokonferenco
+Peripheral	DeviceClass		Periferia
+Object transfer	DeviceClass		Translokado de objekto
+Set-top box	DeviceClass		Surŝranketo

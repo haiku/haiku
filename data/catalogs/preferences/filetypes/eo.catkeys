@@ -1,0 +1,173 @@
+1	esperanto	x-vnd.Haiku-FileTypes	436017301
+Left	Attribute Window	Attribute column alignment in Tracker	Maldekstra
+Float	Attribute ListView		Flosilantapunkto
+Final	Application Types Window		Fina
+FileTypes request	FileTypes Window		Informpeto de la Dosierspeco
+This file type already exists	New File Type Window		Ĉi tiu dosiertipo estas jam ekzistanta
+Preferred application	FileTypes Window		Preferata aplikaĵo
+Launch	Application Types Window		Lanĉi
+Removing uninstalled application types	Application Types Window		Forigas malinstalajn aplikajn tipojn
+Width:	Attribute Window	Default column width in Tracker for this attribute.	Larĝeco:
+Same as…	FileType Window	The same TYPE as ...	Sama kiel…
+(from super type)	FileTypes Window		(de supertipo)
+Select same preferred application as	FileTypes Window		Elekti saman preferan aplkaĵon kiel
+Could not change attributes	Attribute Window		Ne eble ŝanĝis atribuojn
+Icon	FileTypes Window		Piktogramo
+Add…	Application Type Window		Aldoni…
+Attribute name:	Attribute Window		Atribunomo:
+Long description:	Application Type Window		Longa priskribo:
+Cancel	Preferred App Menu		Nuligi
+Remove	FileTypes Window		Forigi
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		La aplikaĵo \"%s\" ne subtenas ĉi tiun dosiertipon.\nĈu vi certas, ke vi volas atribui ĝin?
+Remove	Application Type Window		Forigi
+Gamma	Application Type Window		Gamao
+Cancel	Application Type Window		Nuligi
+Attribute	Attribute Window		Atributo
+Multiple launch	Application Type Window		Multobla lanĉo
+{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, one{# Programa speco ne povas esti forigita} other{# Programaj specoj ne povas esti forigitaj}}
+Edit…	Application Types Window		Redakti…
+Could not set preferred application	FileTypes Window		Ne povas atribui preferatan programon
+Description	FileTypes Window		Priskribo
+Signature:	Application Types Window		Subskribo:
+None	FileTypes Window		Nenio
+Exclusive launch	Application Type Window		Ekskluzive lanĉi
+Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		Forigo de dosiera speco ne povas esti malfarebla.\nĈu vi certas ke vi volas forigi ĝin?
+Integer 64 bit	Attribute ListView		Entjero 64 bita
+Cancel	New File Type Window		Nuligi
+Select same preferred application as	FileType Window		Elekti preferatan programon kiel
+Cancel	Type List Window		Nuligi
+Don't save	Application Type Window		Ne konservi
+Center	Attribute Window	Attribute column alignment in Tracker	Centigi
+Done	Extension Window		Farite
+Development	Application Types Window		Disvolvado
+Same as…	FileType Window	The same APPLICATION as ...	Same kiel…
+Abort	Application Types Window		Ĉesigi senkondiĉe
+Save	Application Type Window		Konservi
+%1 application type	Application Type Window		%1 programa speco
+Icon	Application Type Window		Piktogramo
+Duration	Attribute ListView		Daŭro
+Version:	Application Type Window		Versio:
+Default application	FileType Window		Defaŭlta programo
+Internal name:	New File Type Window		Interna nomo:
+Integer 8 bit	Attribute ListView		Entjero 8 bita
+Extension:	Extension Window		Kromaĵo:
+Time	Attribute ListView		Tempo
+Extensions:	FileTypes Window		Kromaĵoj:
+Select preferred application	FileType Window		Elekti preferatan programon
+Description:	FileTypes Window		Priskribo:
+Multiple files from \"%s\" file type	FileType Window		Pluraj doseroj de dosiera speco \"%s\"
+Add new group	New File Type Window		Aldoni novan grupon
+Remove uninstalled	Application Types Window		Forigi malinstalitajn
+File	Application Type Window		Dosiero
+Progress	Application Types Window		Progreso
+Select…	FileType Window		Elekti…
+Information	Application Types Window		Informo
+Settings	FileTypes Window		Agordo
+Done	Attribute Window		Farite
+FileTypes request	FileTypes		Informpeto de la Dosierspeco
+Select same type as	FileType Window		Elekti specon same kiel
+Version:	Application Types Window		Versio:
+(from application)	FileTypes Window		(de programo)
+Application types	Application Types Window		Specoj de programoj
+Description:	Application Types Window		Priskribo:
+Name:	Application Types Window		Nomo:
+Rating	Attribute ListView		Takso
+duration	Attribute ListView		daŭro
+File could not be opened	Preferred App Menu		Dosiero ne estas uzebla
+Args only	Application Type Window		Nur argumentoj
+Could not open \"%s\":\n%s	FileTypes		Malsukcesis uzi \"%s\":\n%s
+Right	Attribute Window	Attribute column alignment in Tracker	Dekstre
+Save changes before closing?	Application Type Window		Ĉu konservi ŝanĝojn antaŭ fermi?
+Background app	Application Type Window		Fona programo
+Recognition rule is not valid:\n\n	FileTypes Window		Regulo de rekono estas nevalida:\n\n
+Show icons in list	FileTypes Window		Montri piktogramojn en listo
+Editable	Attribute Window	If Tracker allows to edit this attribute.	Redaktebla
+New resource file…	FileTypes Window		Nova dosiero de risurcoj…
+[Multiple files] file types	FileType Window		[Pluropaj dosieroj] dosieraj specoj
+Application type	Application Type Window		Speco de programo
+Show in Tracker…	Application Types Window		Montri en la Spurilo…
+Type name:	FileTypes Window		Tajpu nomon:
+Visible	Attribute Window		Videbla
+Select preferred application	FileTypes Window		Elektu preferatan programon
+Path:	Application Types Window		Itinero:
+rating	Attribute ListView		takso
+Could not install file type	New File Type Window		Ne povas instali dosieran specon
+Same as…	FileTypes Window		Same kiel…
+Golden master	Application Type Window		Ora mastro
+Checkbox	Attribute ListView		Elektobutono
+FileTypes request	Preferred App Menu		Informpeto de la Dosierspeco
+no icon	FileTypes Window		piktogramo forestas
+Single launch	Application Type Window		Solrulado
+%s file type	FileType Window		%s dosiera speco
+Default	Attribute ListView		Defaŭlto
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Forigo de supra speco ne povas esti malfarita.\nĈiuj dosiera specoj apartenantaj al supera speco estos perditaj!\n\nĈu vi certas ke volas fari tion? Por forigi tutan grupon premu majuskligan klavon kaj premu \"Forigi"\.
+String	Attribute ListView		Ĉeno
+Add type	New File Type Window		Aldoni specon
+Remove icon	Icon View		Forigi piktogramon
+Boolean	Attribute ListView		Bulea
+Cancel	Extension Window		Nuligi
+Alignment:	Attribute Window		Ĝisrandigo:
+Icon	FileType Window		Piktogramo
+Signature:	Application Type Window		Subskribo:
+Development	Application Type Window		Disvolvo
+Golden master	Application Types Window		Ora mastro
+Add	Extension Window		Aldoni
+Open…	FileTypes Window		Uzi…
+checkbox	Attribute ListView		elektobutono
+Could not change file extensions	Extension Window		Ne povas ŝanĝi dosiernoman finaĵon
+Could not open file	FileType Window		Malsukcesis uzi dosieron
+Choose type	Type List Window		Elektu specon
+Select…	FileTypes Window		Elekti…
+File recognition	FileTypes Window		Rekonado de dosiero
+Application types…	FileTypes Window		Specoj de programoj…
+Add icon…	Icon View		Aldoni piktogramon…
+Cancel	FileTypes Window		Nuligi
+Save into resource file…	Application Type Window		Konservi en dosieron de risurcoj…
+Special:	Attribute Window		Speciala:
+Type:	Attribute Window		Speco:
+Could not retrieve application signature	Preferred App Menu		Ne povas ricevi subskribon por programo
+Beta	Application Types Window		Beta
+Add group	New File Type Window		Aldoni grupon
+Cancel	Attribute Window		Nuligi
+Gamma	Application Types Window		Gama
+Supported types	Application Type Window		Subtenataj specoj
+Integer 32 bit	Attribute ListView		Entjero 32 bita
+Beta	Application Type Window		Beta
+Could not retrieve preferred application of this file	Preferred App Menu		Ne povas ricevi preferatan programon por la dosiero
+Application flags	Application Type Window		Flagoj de programoj
+OK	FileTypes		Bone
+Group name:	New File Type Window		Nomo de grupo:
+Move up	FileTypes Window		Movi supren
+File	FileTypes Window		Dosiero
+Add	Attribute Window		Aldoni
+Open file	FileTypes		Uzi dosieron
+Version info	Application Type Window		Informo pri versio
+Final	Application Type Window		Fina
+Preferred application	FileType Window		Preferataj programoj
+FileTypes	FileTypes		La Dosierspeco
+Set preferred application	Preferred App Menu		Atribui preferatan programon
+New file type	New File Type Window		Nova dosiera speco
+Short description:	Application Type Window		Mallonga priskribo:
+Save request	Application Type Window		Konservi informpeton
+Could not remove file type: %s\n	FileTypes Window		Ne povas forigi dosieran specon: %s\n
+Display as:	Attribute Window	Tracker offers different display modes for attributes.	Montri kiel:
+Done	Type List Window		Farite
+Extra attributes	FileTypes Window		Kromaj atributoj
+Group:	New File Type Window		Grupo:
+Alpha	Application Types Window		Alfa
+Close	Application Type Window		Fermi
+Integer 16 bit	Attribute ListView		Entjero 16 bita
+Extension	Extension Window		Kromaĵo
+Rule:	FileTypes Window		Regulo:
+FileTypes	System name		La Dosierspeco
+Version	Application Types Window		Versio
+Quit	FileTypes Window		Ĉesi
+File type	FileType Window		Dosiera speco
+Internal name:	FileTypes Window		Interna nomo:
+Add…	FileTypes Window		Aldoni…
+Edit icon…	Icon View		Redakti piktogramon…
+Internal name:	Attribute Window		Interna nomo:
+Show recognition rule	FileTypes Window		Montri regulon de rekono
+Double	Attribute ListView		Duobla precizeco
+Move down	FileTypes Window		Movi suben
+Alpha	Application Type Window		Alfa

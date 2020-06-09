@@ -1,0 +1,159 @@
+1	esperanto	x-vnd.Haiku-WebPositive	1879106286
+Authentication required	Authentication Panel		Aŭtentigo nepra
+Previous	WebPositive Window		Antaŭa
+(Finish: %date)	Download Window		(Fino: %date)
+Open bookmarks confirmation	WebPositive Window		Konfirmo por uzi legosignaron
+Download folder:	Settings Window		Elŝutujo
+Close window	WebPositive Window		Fermi fenestron
+Find:	WebPositive Window		Serĉi:
+Script console	WebPositive Window		Skriptokonzolo
+Fonts	Settings Window		Tiparoj
+Path	Cookie Manager		Itinero
+of	Download Window	...as in '12kB of 256kB'	de
+Bookmarks	WebPositive Window		La Legosignoj
+Use proxy server to connect to the internet	Settings Window		Konekti al interreto per prokurilo
+%url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url elŝutita
+Auto-hide interface in full screen mode	Settings Window		Aŭtomate kaŝi interfacon dum la plenekrana reĝimo
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Eraro dum ricevado el legosigna dosierujo.\n\nEraro: %error
+Delete	Cookie Manager		Forigi
+(Finish: %date - Over %duration left)	Download Window		(Fino: %date - Ĉirkaŭ %duration restis)
+Open containing folder	Download Window		Uzi enhavantan dosierujon
+Find previous	WebPositive Window		Antaŭserĉi
+Full screen	WebPositive Window		Plenekrane
+Downloads in progress	WebPositive		Daŭrantaj elŝutadoj
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Ĉu vi volas uzi ĉiujn %addedCount legosignojn samtempe?
+Copy URL to clipboard	Download Window		Kopii retadreson en tondujon
+Clone current page	Settings Window		Dubli la aktivan paĝon
+Start page:	Settings Window		Komenca paĝo:
+Cancel	Download Window		Nuligi
+Settings	Settings Window		Agordo
+Downloads	WebPositive Window		Elŝutoj
+Browse…	Settings Window		Foliumi…
+A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Legosigno por ĉi paĝo (%bookmarkName) jam ekzistas.
+Resume prior session	Settings Window		Daŭrigi antaŭan sesion
+Match case	WebPositive Window		Atenti usklecon
+Proxy password:	Settings Window		Prokuroservila pasvorto:
+Size:	Font Selection view		Grando:
+Page source	WebPositive Window		Paĝa fontkodo
+Proxy server port:	Settings Window		Prokurservila pordnumero:
+Error opening downloads folder	Download Window		Eraro dum uzo de elŝuta dosierujo
+Show bookmark bar	WebPositive Window		Montri breton de legosignoj
+Find	WebPositive Window		Serĉi
+Standard font:	Settings Window		Defaŭlta tiparo:
+Open download error	Download Window		Eraro dum uzo de elŝutito
+General	Settings Window		Ĝenerala
+New tabs:	Settings Window		Novaj langetoj:
+%url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url malsukcesis
+Open downloads folder	Download Window		Uzi dosierujon de elŝutoj
+Proxy server	Settings Window		Prokura servilo
+Decrease size	WebPositive Window		Malgrandigi
+Default fixed font size:	Settings Window		Defaŭlta grado de fiksitlarĝa tiparo:
+Sans serif font:	Settings Window		Senserifa tiparo:
+Clear	WebPositive Window		Viŝi
+Cookies for %s	Cookie Manager		Retkuketo por %s
+The download could not be opened.	Download Window		La elŝutito ne povas esti uzata.
+Close	Download Window		Fermi
+WebPositive	System name		La Retprospero (WebPositive)
+Reload	WebPositive Window		Reŝargi
+Expiration	Cookie Manager		Eksvalidiĝo
+Download finished	Download Window		Ŝargado finiĝis
+Cookie manager	WebPositive Window		Administrilo de retkuketoj
+OK	Authentication Panel		Bone
+Hide password text	Authentication Panel		Kaŝi pasvorton
+Username:	Authentication Panel		Uzantnomo:
+Name	Cookie Manager		Nomo
+Remove finished	Download Window		Forigado finiĝis
+Earlier	WebPositive Window		Antaŭa
+Edit	WebPositive Window		Redakti
+Back	WebPositive Window		Reen
+Yesterday	WebPositive Window		Hieraŭ
+Quit	WebPositive		Ĉesi
+Download aborted	Download Window		Elŝutado estas ĉesigita
+Number of days to keep links in History menu:	Settings Window		Nombro da tagoj por dume gardi ligilojn en historia menuo:
+Password:	Authentication Panel		Pasvorto:
+Forward	WebPositive Window		Antaŭen
+Clear	Console Window		Viŝi
+Cut	URL Bar		Eltondi
+View	WebPositive Window		Rigardi
+Paste	URL Bar		Alglui
+Find next	WebPositive Window		Pluserĉi
+Open search page	Settings Window		Uzi paĝon de serĉado
+Increase size	WebPositive Window		Pligrandigi
+New tab	WebPositive Window		Nova langeto
+Today	WebPositive Window		Hodiaŭ
+Open location	WebPositive Window		Uzi lokon
+New browser window	Download Window		Nova fenestro de retumilo
+Open	Download Window		Uzi
+New window	WebPositive Window		Nova fenestro
+New windows:	Settings Window		Novaj fenestroj:
+The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	La dosierujo por elŝuto ne povas esti uzata.\n\nEraro: %error
+Cancel	Authentication Panel		Nuligi
+Style:	Font Selection view		Stilo:
+There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	Eraro dum kreado de dosiero de legosignoj.\n\nEraro: %error
+OK	Download Window		Bone
+Proxy username:	Settings Window		Usantnomo ĉe prokurilo:
+Manage bookmarks	WebPositive Window		Administri legosignojn
+/s)	Download Window	...as in 'per second'	/s)
+Restart	Download Window		Relanĉi
+Serif font:	Settings Window		Serifa tiparo:
+Apply	Settings Window		Apliki
+There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Eraro dum montrado de dosierujo de legosignoj.\n\nEraro: %error
+Revert	Settings Window		Malfari
+Copy	WebPositive Window		Kopii
+Default standard font size:	Settings Window		Defaŭlta grado de implica tiparo:
+Bookmark this page	WebPositive Window		Konservi ligilon de ĉi paĝo
+Show tabs if only one page is open	Settings Window		Montri panelon de langetoj eĉ se nur unu paĝo estas uzata
+Close tab	WebPositive Window		Fermi langeton
+Remove	Download Window		Forigi
+About	WebPositive Window		Pri
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		La ŝargado daŭras, ĉu vi certas ke vi volas ĉesigi la Retprosperon nun?
+Continue downloads	WebPositive		Daŭrigi ŝargadojn
+Proxy server requires authentication	Settings Window		La prokurilo postulas aŭtentigon
+Cancel	Settings Window		Nuligi
+History	WebPositive Window		Historio
+Reset size	WebPositive Window		Restarigi gra(n)don
+Do you really want to clear the browsing history?	WebPositive Window		Ĉu vi certas ke volas nuligi historion de rigardado?
+Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Serĉi sekvan aperon de serĉaĵo
+Fixed font:	Settings Window		Fiksitlarĝa tiparo:
+Quit	WebPositive Window		Ĉesi
+Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Serĉi antaŭan aperon de serĉaĵo
+Remember username and password for this site	Authentication Panel		Memorigi uzantnomon kaj pasvorton por ĉi retejo
+(Finish: %date - %duration left)	Download Window		(Fino: %date - %duration restis)
+Cookie manager	Cookie Manager		Administrilo de retkuketoj
+Show home button	Settings Window		Montri hejman butonon
+Start new session	Settings Window		Komenci novan sesion
+The cookie jar is empty!	Cookie Manager		Ujo de retkuketoj estas malplena!
+Value	Cookie Manager		Valoro
+Remove missing	Download Window		Forigi mankantajn
+Paste	WebPositive Window		Alglui
+Double-click or middle-click to open new tab.	Tab Manager		Dufoja alklako aŭ mezbutona alklako por uzi novan paĝon.
+Next	WebPositive Window		Sekva
+Bookmark error	WebPositive Window		Eraro de legosignoj
+OK	WebPositive Window		Bone
+WebPositive	Download Window		La Retprospero (WebPositive)
+Zoom text only	WebPositive Window		Zomi nur tekston
+Save page as…	WebPositive Window		Konservi paĝon kiel...
+Page source error	WebPositive Window		Eraro de paĝa fonto
+Auto-hide mouse pointer	Settings Window		Aŭtomatkaŝi musan montrilon
+Requesting %url	WebPositive Window		Datumpetado de %url
+Flags	Cookie Manager		Flagoj
+Window	WebPositive Window		Fenestro
+Proxy server address:	Settings Window		Adreso de prokurila servilo:
+Search page:	Settings Window		Serĉi paĝon:
+Settings	WebPositive Window		Agordo
+Clear	URL Bar		Viŝi
+Loading %url	WebPositive Window		Ŝargado de %url
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Deca paroĥo havebligas ŝinkon. Almozatoj furaĝas ĉiuĵaŭde.
+Start up:	Settings Window		Startado:
+Confirmation	WebPositive Window		Konfirmo
+Session cookie	Cookie Manager		Sesia retkuketo
+Open all	WebPositive Window		Uzi ĉion
+Cut	WebPositive Window		Eltondi
+Downloads	Download Window		Ŝargaĵoj
+Open blank page	Settings Window		Uzi malplenan paĝon
+Clear history	WebPositive Window		Forigi historion
+Cancel	WebPositive Window		Nuligi
+Bookmark info	WebPositive Window		Informo pri legosigno
+Script console	Console Window		Skriptokonzolo
+Copy	URL Bar		Kopii
+Open start page	Settings Window		Uzi komencan paĝon

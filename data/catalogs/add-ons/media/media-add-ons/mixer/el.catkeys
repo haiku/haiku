@@ -1,0 +1,27 @@
+1	greek, modern (1453-)	x-vnd.Haiku-mixer.media_addon	3450667169
+Input gain controls represent	AudioMixer		Αναπαράσταση απολαβής εισόδου ήχου
+Linear interpolation	AudioMixer		Γραμμική παρεμβολή
+Virtual output channels	AudioMixer		Κανάλια εικονικής εξόδου
+Refuse output format changes	AudioMixer		Απαγόρευση αλλαγών στις μονάδες εξόδου
+Output mapping	AudioMixer		Χαρτογράφηση εξόδου
+Allow input channel remapping	AudioMixer		Έγκριση επαναχαρτογράφησης του καναλιού εισαγωγής
+Resampling algorithm	AudioMixer		Αλγόριθμος αναδειγματοληψίας
+Attenuate mixer output by 3dB (like BeOS R5)	AudioMixer		Εξασθένηση της εξόδου του μείκτη κατά 3dB (όπως στο BeOS R5)
+Display balance control for stereo connections	AudioMixer		Προβολή ελέγχου ισορροπίας ήχου για στερεοφωνικές συνδέσεις
+To output	AudioMixer		Προς έξοδο
+not connected	AudioMixer		μη συνδεδεμένο
+Refuse input format changes	AudioMixer		Απαγόρευση αλλαγών στις μονάδες εισόδου
+Drop/repeat samples	AudioMixer		Ρίψιμο/επανάληψη δειγμάτων
+Output channel sources	AudioMixer		Πηγές καναλιών εξόδου
+dB	AudioMixer		dB
+Gain controls	AudioMixer		Έλεγχος απολαβής
+Input mapping	AudioMixer		Χαρτογράφηση εισόδου
+Mute	AudioMixer		Σίγαση
+Input channel destinations	AudioMixer		Προορισμοί καναλιού εισαγωγής
+To master	AudioMixer		Προς κύρια έξοδο
+Master output	AudioMixer		Κύρια έξοδος
+Setup	AudioMixer		Ρύθμιση
+Use non linear gain sliders (like BeOS R5)	AudioMixer		Χρήση μη-γραμμικών μπαρών απολαβής (όπως στο BeOS R5)
+Gain	AudioMixer		Απολαβή
+Allow output channel remapping	AudioMixer		Έγκριση επαναχαρτογράφησης του καναλιού εξαγωγής
+Physical input channels	AudioMixer		Υλικά κανάλια εισόδου

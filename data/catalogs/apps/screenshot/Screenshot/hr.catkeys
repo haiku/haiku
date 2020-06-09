@@ -1,0 +1,30 @@
+1	croatian	x-vnd.haiku-screenshot	3385109649
+Include window border	ScreenshotWindow		Uključi rub prozora
+Overwrite	ScreenshotWindow		Prebriši
+Save in:	ScreenshotWindow		Spremi u:
+Error saving \"%s\":\n\t%s	ScreenshotWindow		Greška pri spremanju \"%s\":\n\t%s
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Ova datoteka već postoji.\n Jeste li sigurni da je želite prebrisati?
+OK	ScreenshotWindow		U redu
+The destination path exists but is not a folder.	ScreenshotWindow		Odredišna putanja postoji ali nije mapa.
+Select	ScreenshotWindow		Odaberi
+Save as:	ScreenshotWindow		Spremi kao:
+seconds	ScreenshotWindow		sekunde
+New screenshot	ScreenshotWindow		Nova slika zaslona
+Screenshot	System name		Slika zaslona
+Desktop	ScreenshotWindow		Radna površina
+Artwork folder	ScreenshotWindow		Mapa sa umjetničkim dijelima
+Translator Settings	ScreenshotWindow		Postavke Prevoditelja
+Include mouse pointer	ScreenshotWindow		Uključi pokazivač miša
+overwrite	ScreenshotWindow		Prebriši
+Settings…	ScreenshotWindow		Postavke...
+Choose folder	ScreenshotWindow		Izaberite mapu
+Name:	ScreenshotWindow		Ime:
+Choose folder…	ScreenshotWindow		Izaberite mapu...
+Please select	ScreenshotWindow		Molim izaberite
+Failed to save screenshot	ScreenshotWindow		Neuspjelo spremanje slike zaslona
+Cancel	ScreenshotWindow		Odustani
+Delay:	ScreenshotWindow		Odgoda:
+screenshot	Screenshot	Base filename of screenshot files	slika zaslona
+Home folder	ScreenshotWindow		Osobna mapa
+Save	ScreenshotWindow		Spremi
+Capture active window	ScreenshotWindow		Uhvati aktivni prozor

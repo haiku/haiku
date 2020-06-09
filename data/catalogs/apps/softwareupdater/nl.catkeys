@@ -1,0 +1,64 @@
+1	dutch; flemish	x-vnd.haiku-softwareupdater	369324613
+Updating version	SoftwareUpdaterWindow	List item text	Versie bijwerken
+Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Klik hier om {0, plural, one{# bijgewerkt pakket} other{# bijgewerkte pakketten}} te installeren.
+Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Pakketten om te verwijderen
+No active network connection was found	UpdateManager	Error message	Er is geen actieve netwerkverbinding gevonden
+Quit	SoftwareUpdaterWindow	Alert button label	Afsluiten
+There were no updates found.	CheckManager		Er zijn geen updates gevonden.
+Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		De updates zijn niet voltooid, weet u zeker dat u af wilt sluiten?
+Updates found	SoftwareUpdaterWindow		Updates gevonden
+Update now	SoftwareUpdaterWindow		Nu bijwerken
+For some reason, we could not reboot your computer.	SoftwareUpdaterWindow		Het was niet mogelijk om uw computer opnieuw op te starten.
+OK	UpdateManager		Okee
+Unrecognized argument	SoftwareUpdaterApp	Error message	Onbekend argument
+There were no updates found.	CheckAction		Er zijn geen updates gevonden.
+No updates available	UpdateAction		Geen updates beschikbaar.
+New packages to be installed	SoftwareUpdaterWindow	List super item label	Nieuwe pakketten om te installeren
+Packages to be updated	SoftwareUpdaterWindow	List super item label	Pakketten om bij te werken
+to	SoftwareUpdaterWindow	List item text	tot
+Attempting to cancel the updates…	SoftwareUpdaterWindow		Bezet met het annuleren van het bijwerken…
+Contacting software repositories to check for package updates.	CheckManager		Bezig met het verbinden met de softwarearchieven om te kijken of er updates voor pakketten zijn.
+Available updates found	CheckManager		Beschikbare updates gevonden
+from repository	SoftwareUpdaterWindow	List item text	uit archief
+Contacting software repositories to check for package updates.	SoftwareUpdaterWindow		Bezig met het verbinden met de softwarearchieven om te kijken of er updates voor pakketten zijn.
+Cancelling updates	SoftwareUpdaterWindow		Bezig met het annuleren van het bijwerken
+Cancel	SoftwareUpdaterWindow	Alert button label	Annuleren
+There were no updates found.	UpdateAction		Er zijn geen updates gevonden.
+OK	SoftwareUpdaterWindow		Okee
+Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Kies uit een van deze updateopties:\n\nBijwerken:\n\tWerkt alle geïnstalleerde pakketten bij.\nVolledig synchroniseren:\n\tSynchroniseert de geïnstalleerde pakketten met de archieven.
+The following changes will be made:	SoftwareUpdaterWindow		De volgende wijzigingen worden toegepast:
+Argument variables are no longer accepted\n	SoftwareUpdaterApp		Argumentvariabelen worden niet langer geaccepteerd\n
+Fatal error while checking for updates: %s\n	CheckAction		Fatale fout bij het controleren op updates: %s\n
+SoftwareUpdater	System name		SoftwareUpdater
+No active network connection was found.\n	CheckManager		Geen actieve netwerkverbinding gevonden.\n
+Applying changes	UpdateManager		Wijzigingen worden toegepast
+Full sync	SoftwareUpdaterWindow	Alert button label	Volledig synchroniseren
+Quit	SoftwareUpdaterWindow	Button label	Afsluiten
+Updates have been successfully installed.	UpdateManager		De updates zijn met succes geïnstalleerd.
+Exception occurred while updating packages : %s\n	UpdateAction		Fout tijdens het bijwerken van de pakketten : %s\n
+A reboot is necessary to complete the update process.	UpdateManager		Een herstart is vereist om het updateproces te voltooien.
+Exception occurred while checking for updates: %s\n	CheckAction		Fout tijdens het controleren op updates: %s\n
+Packages are being updated	UpdateManager		Pakketten worden bijgewerkt
+Cancel	SoftwareUpdaterWindow		Annuleren
+Don't quit	SoftwareUpdaterWindow		Niet afsluiten
+Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Klik hier om SoftwareUpdater uit te voeren. Sommige updates vereisen dat u een probleemoplossing kiest.
+Checking for updates	SoftwareUpdaterWindow		Controleren op updates
+Updates completed	UpdateManager		Bijwerken voltooid
+Reboot	SoftwareUpdaterWindow		Herstarten
+Show more details	SoftwareUpdaterWindow		Meer details tonen
+Installing version	SoftwareUpdaterWindow	List item text	Versie installeren
+Checking for updates	CheckManager		Controleren op updates
+No remote repositories are available	UpdateManager	Error message	Er zijn geen online softwarearchieven beschikbaar
+Software {0, plural, one{update} other{updates}} available	CheckManager		Software {0, plural, one{update} other{updates}} beschikbaar
+Reboot	SoftwareUpdaterWindow	Button label	Herstarten
+Update	SoftwareUpdaterWindow	Alert button label	Bijwerken
+Open Repositories	SoftwareUpdaterWindow	Alert button label	Archieven openen
+Updates did not complete	UpdateAction		Bijwerken is niet voltooid
+Invalid update type, cannot continue with updates	UpdateAction		Ongeldig update-type, kan niet doorgaan met bijwerken
+Uninstalling version	SoftwareUpdaterWindow	List item text	Versie verwijderen
+%i of %i	UpdateManager	Do not translate %i	%i van %i
+Quit	SoftwareUpdaterWindow		Afsluiten
+No updates available	CheckManager		Geen updates beschikbaar
+Usage:  SoftwareUpdater <command> [ <option> ]\nUpdates installed packages.\n\nCommands:\n  update     - Search repositories for updates on all packages.\n  check      - Check for available updates but only display a notification with results.\n  full-sync  - Synchronize the installed packages with the repositories.\n\nOptions:\n  -h or --help       Print this usage help\n  -v or --verbose    Output verbose information\n	SoftwareUpdaterApp	Command line usage help	Gebruik:  SoftwareUpdater <commando> [ <optie> ]\nWerkt geïnstalleerde pakketten bij.\n\nCommando's:\n  update     - Doorzoek archieven op updates voor alle pakketten.\n  check      - Controleer op beschikbare updates, maar toon alleen een melding met de resultaten.\n  full-sync  - Synchroniseer de geïnstalleerde pakketten met de archieven.\n\nOpties:\n  -h of --help       Toon deze hulptekst\n  -v of --verbose    Toon extra informatie\n
+No remote repositories are available. Please verify that some repositories are enabled using the Repositories preflet or the 'pkgman' command.	SoftwareUpdaterWindow	Error message	Er zijn geen online archieven beschikbaar. Verifieer dat er archieven ingeschakeld zijn door middel van het Archieven voorkeurenscherm of het 'pkgman'-commando.
+Downloading packages	UpdateManager		Bezig met het downloaden van pakketten

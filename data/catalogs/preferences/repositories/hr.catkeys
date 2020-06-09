@@ -1,0 +1,37 @@
+1	croatian	x-vnd.Haiku-Repositories	2214310510
+This is not a valid URL.	AddRepoWindow	Add URL error message	Ovo nije valjani URL.
+Repository URL:	AddRepoWindow	Text box label	URL repozitorija:
+Unknown	Constants	Unknown repository name	Nepoznato
+Remove all	RepositoriesView	Button label	Ukloni sve
+Enable repositories to use with package management:	RepositoriesView	Label text	Omogući repozitorije da bi koristio upravljanje paketima:
+Disable	RepositoriesView	Button label	Onemogući
+Cancel task	TaskTimer	Button label	Otkaži zadatak
+Changes completed	RepositoriesView	Status view text	Izmene dovršene
+Details	TaskLooper	Job log details header	Pojedinosti
+Enabled	RepoRow	Tag in the Status column	Omogućeno
+Remove	Constants	Button label	Ukloni
+There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	Došlo je do greške pri omogućavanju repozitorija %url%
+Remove this repository?	RepositoriesView	Removal alert confirmation message	Ukloniti ovaj repozitorij?
+The task for repository %name% is taking a long time to complete.	TaskTimer	Alert message.  Do not translate %name%	Zadatku za repozitorij %name% treba previše vremena da se kompletira.
+Completed	TaskLooper	Completed task status message	Kompletirano
+OK	Constants	Button label	U redu
+Status	RepositoriesView	Column title	Status
+Name	RepositoriesView	Column title	Ime
+Add	AddRepoWindow	Button label	Dodaj
+Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	Repozitoriji ne mogu primiti imena trenutno omogućenih repozitorija.
+Enable all	RepositoriesView	Button label	Omogući sve
+Aborted	TaskLooper	Aborted task status message	Prekinuto
+URL	RepositoriesView	Column title	URL
+Enable	RepositoriesView	Button label	Omogući
+Error getting repository configuration for %name%.	RepositoriesView	Alert error message, do not translate %name%	Greška pri dobivanju konfiguracije repozitorija za %name%.
+Description	TaskLooper	Failed task error description	Opis
+Failed	TaskLooper	Failed task status message	Neuspjelo
+Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	Dobre vijesti! Zadatak za repozitorij %name% je završen.
+This repository URL already exists.	RepositoriesView	Error message	URL repozitorija već postoji.
+Repositories	System name		Repozitoriji
+Remove	RepositoriesView	Button label	Ukloni
+Remove these repositories?	RepositoriesView	Removal alert confirmation message	Ukloniti ove repozitorije?
+Keep trying	TaskTimer	Button label	Nastavi pokušavati
+Cancel	Constants	Button label	Otkaži
+Stop and quit	RepositoriesWindow	Button label	Zaustavi i prestani
+Disable all	RepositoriesView	Button label	Onemogući sve

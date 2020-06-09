@@ -1,15 +1,15 @@
 1	portuguese	x-vnd.Haiku-Keymap	1075970008
 Key	Modifier keys window	As in a computer keyboard key	Tecla
 Japanese	KeymapNames		Japonês
-US	KeymapNames		US
+US	KeymapNames		EUA (US)
 PG ↑	Keyboard Layout View	Very short for 'page up'	PG ↑
 Brazilian	KeymapNames		Brasileiro
-ThinkPad (US)	KeyboardLayoutNames		ThinkPad (US)
+ThinkPad (US)	KeyboardLayoutNames		ThinkPad (EUA)
 Right control	Keyboard Layout View		Controlo da direita
 Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Opção:
 Cancel	Modifier keys window		Cancelar
-Sample and clipboard:	Keymap window		Exemplo e Área de Transferência:
+Sample and clipboard:	Keymap window		Exemplo e área de transferência:
 Polish	KeymapNames		Polaco
 Latin-American	KeymapNames		Latino-americano
 Ukrainian	KeymapNames		Ucraniano
@@ -109,7 +109,7 @@ Thai (TIS-820.2538)	KeymapNames		Tailandês (TIS-820.2538)
 Control:	Modifier keys window	Control key role name	Controlo:
 Generic 105-key International	KeyboardLayoutNames		Genérico Internacional de 105 teclas
 Disabled	Modifier keys window	Do nothing	Desativado
-Select dead keys	Keymap window		Teclas Mortas
+Select dead keys	Keymap window		Teclas mortas
 Russian (Mac)	KeymapNames		Russo (Mac)
 Right shift	Keyboard Layout View		Shift da direita
 ESC	Keyboard Layout View		ESC

@@ -1,0 +1,35 @@
+1	esperanto	x-vnd.Haiku-Sudoku	3382377306
+Restore snapshot	SudokuWindow		Restaŭri kaptitan staton
+File	SudokuWindow		Dosiero
+Mark invalid values	SudokuWindow		Marki malvalidajn valorojn
+Solve single field	SudokuWindow		Solvi unuopan kampon
+Hard	SudokuWindow		Malfacila
+Start again	SudokuWindow		Komenci denove
+New	SudokuWindow		Nova ludo
+Easy	SudokuWindow		Facila
+Undo	SudokuWindow		Malfari
+Export as…	SudokuWindow		Eksporti kiel…
+Quit	SudokuWindow		Ĉesi
+Redo	SudokuWindow		Refari
+Could not open \"%s\":\n%s\n	SudokuWindow		Ne povas uzi \"%s\"-on:\n%s\n
+Blank	SudokuWindow		Malplena
+Sudoku solved - congratulations!\n	SudokuWindow		Sudoku estis solvita - gratulojn!\n
+Text	SudokuWindow		Teksto
+Copy	SudokuWindow		Kopii
+Solve	SudokuWindow		Solvi
+HTML	SudokuWindow		HTML
+Advanced	SudokuWindow		Altnivela
+Set all hints	SudokuWindow		Metu ĉiujn sugestojn
+Searching for removable values	SudokuGenerator		Serĉado de forigeblaj valoroj
+Abort	ProgressWindow		Ĉesi senkodiĉe
+Could not set Sudoku:\n%s\n	SudokuWindow		Ne sukcesis plenigi kradon de Sudoko:\n%s\n
+Help	SudokuWindow		Helpo
+OK	SudokuWindow		Bone
+Sudoku	System name		Sudoko
+Progress monitor	ProgressWindow		Indikilo de progreso
+Creating solvable field	SudokuGenerator		Kreado de divenebla krado
+View	SudokuWindow		Rigardi
+Snapshot current	SudokuWindow		Kapti nunan staton
+Mark valid hints	SudokuWindow		Sugesti validaĵojn
+Sudoku request	SudokuWindow		Informpeto de la Sudoko
+Open file…	SudokuWindow		Uzi dosieron…

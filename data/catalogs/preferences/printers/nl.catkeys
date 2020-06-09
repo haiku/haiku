@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Be-PRNT	2042381362
+1	dutch; flemish	x-vnd.Be-PRNT	1465107170
 Test page	TestPageView		Testpagina
 Remove	PrintersWindow		Verwijderen
 Red	TestPageView		Rood
@@ -16,6 +16,8 @@ Waiting	JobListView		Bezig met wachten
 Processing	JobListView		Bezig met verwerken
 Cancel	AddPrinterDialog		Annuleren
 Unknown status	JobListView		Onbekende status
+Print jobs for %printer_name%	PrintersWindow		Printtaken voor %printer_name%
+{0, plural, =-1{??? pages}=1{# page}other{# pages}}	JobListView		{0, plural, =-1{??? pagina's}=1{# pagina}other{# pagina's}}
 Add printer	AddPrinterDialog		Printer toevoegen
 Printers	PrintersWindow		Printers
 No printer found!	TransportMenu		Er werd geen printer gevonden!
@@ -29,6 +31,7 @@ Yellow	TestPageView		Geel
 Black	TestPageView		Zwart
 Printer type:	AddPrinterDialog		Printertype:
 Printers	System name		Printers
+{0, plural,=0{No pending jobs}=1{1 pending job}other{# pending jobs}}	PrinterListView		{0, plural,=0{Geen uit te voeren taken}=1{1 uit te voeren taak}other{# uit te voeren taken}}
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Printer: %printer_name%\nDriver:   %driver%\n
 Green	TestPageView		Groen
 Print test page	PrintersWindow		Druk een testpagina af

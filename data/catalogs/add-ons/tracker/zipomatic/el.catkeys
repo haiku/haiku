@@ -1,0 +1,17 @@
+1	greek, modern (1453-)	x-vnd.haiku.zip-o-matic	2032806096
+Drop files here.	file:ZipOMaticWindow.cpp		Αφήστε τα αρχεία εδώ.
+Filename: %s	file:ZipOMaticWindow.cpp		Όνομα αρχείου: %s
+Do you want to stop them?	file:ZipOMatic.cpp		Θέλετε να τα σταματήσετε;
+Error creating archive	file:ZipOMaticWindow.cpp		Προέκυψε σφάλμα κατά την δημιουργία συμπιεσμένου αρχείου
+Stop them	file:ZipOMatic.cpp		Σταματησέ τα
+Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Είστε σίγουρος ότι θέλετε να σταματήσει η δημιουργία αυτού του αρχείου;
+Preparing to archive	file:ZipperThread.cpp		Προετοιμάζεται το συμπιεσμένο αρχείο
+Let them continue	file:ZipOMatic.cpp		Αφήστε τα να συνεχίσουν
+Continue	file:ZipOMaticWindow.cpp		Συνέχεια
+Archive created OK	file:ZipOMaticWindow.cpp		Το αρχείο δημιουργήθηκε επιτυχώς
+{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{Προστέθηκε # αρχείο.} other{Προστέθηκαν # αρχεία.}}
+Stop	file:ZipOMaticWindow.cpp		Διακοπή
+Stopped	file:ZipOMaticWindow.cpp		Σταματημένο
+Archive	file:ZipperThread.cpp		Συμπιεσμένο αρχείο
+Creating archive: %s	file:ZipOMaticWindow.cpp		Δημιουργία συμπιεσμένου αρχείου: %s
+You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		{0, plural, one{Εκτελείται # παράθυρο του Zip-O-Matic} other{Εκτελούνται # παράθυρα του Zip-O-Matic}}.\n\n

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Pulse	139895817
+1	hungarian	x-vnd.Haiku-Pulse	559379362
 Normal mode	DeskbarPulseView		Normál mód
 Info	CPUButton		Infó
 Quit	DeskbarPulseView		Kilépés
@@ -16,6 +16,7 @@ Fade colors	ConfigView		Színek elhalványítása
 About Pulse…	PulseView		Pulzus névjegye…
 Pulse	NormalPulseView		Pulzus
 Deskbar mode	NormalPulseView		Asztalsáv mód
+Pulse settings	PulseApp		Beállítások
 Remove replicant	CPUButton		Replikáns eltávolítása
 You can't disable the last active CPU.	PulseView		Nem lehet letiltani a legutolsó aktív processzort.
 Width of icon:	ConfigView		Ikon szélessége
@@ -45,4 +46,3 @@ Active color	ConfigView		Aktív szín
 Installing in Deskbar failed\n%s	PulseApp		Nem sikerült telepíteni az Asztalsávra\n%s
 Idle color	ConfigView		Üresjárat színe
 Normal mode	PrefsWindow		Normál mód
-Pulse settings	PulseWindow		Pulzus beállításai

@@ -11,9 +11,9 @@ Scope	Main Window		Abast
 Drop MIDI file here	Scope View		Arrossegueu un fitxer MIDI aquí
 None	Main Window		Cap
 Reverb:	Main Window		Reverberació
-MidiPlayer	System name		Reproductor MIDI
+MidiPlayer	System name		Reproductor de MIDI
 OK	Main Window		D'acord
-Stop	Main Window		Atura
+Stop	Main Window		Interromp
 Live input:	Main Window		Entrada en directe:
 Garage	Main Window		Garatge
 Play	Main Window		Reprodueix

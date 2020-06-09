@@ -5,7 +5,7 @@ Bus Information	Device		Informació del bus
 Devices	System name		Dispositius
 Graphics Peripheral	DeviceSCSI		Perifèric gràfic
 Processor	Device		Processador
-Generate system information	DevicesView		Mostra la informació del sistema
+Generate system information	DevicesView		Genera la informació del sistema
 Class info	DevicePCI		Informació de la classe
 ACPI Information	DeviceACPI		Informació ACPI
 Detailed	DevicesView		Detallat
@@ -39,14 +39,14 @@ ACPI System Bus	DeviceACPI		Bus del sistema ACPI
 PCI Information	DevicePCI		Informació PCI
 Tape Drive	DeviceSCSI		Unitat de cinta
 Changer	DeviceSCSI		Canviador
-Serial bus controller	Device		Controlador del bus sèrie
+Serial bus controller	Device		Controlador del bus de sèrie
 Refresh devices	DevicesView		Actualitza la llista de dispositius
 Category	DevicesView		Categoria
 RBC	DeviceSCSI		RBC
 None	Device		Cap
 Device paths	Device		Camins als dispositius
 Unknown device	Device		El dispositiu és desconegut
-Wireless controller	Device		Controlador de xarxa sense fils
+Wireless controller	Device		Controlador de xarxa sense fil
 Generic system peripheral	Device		Perifèric genèric del sistema
 Value	PropertyList		Valor
 Devices	DevicesView		Dispositius
@@ -63,7 +63,7 @@ Other	DeviceSCSI		Altres
 Report compatibility	DevicesView		Informe de compatibilitat
 Computer	Device		Ordinador
 PCI bus	Device		Bus PCI
-Enclosure	DeviceSCSI		Adjunció
+Enclosure	DeviceSCSI		Annex
 Order by:	DevicesView		Ordena per:
 ACPI Thermal Zone	DeviceACPI		Zona tèrmica ACPI
 Intelligent controller	Device		Controlador intel·ligent

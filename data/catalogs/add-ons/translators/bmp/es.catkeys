@@ -1,9 +1,9 @@
 1	spanish; castilian	x-vnd.Haiku-BMPTranslator	2497639570
-BMP images	BMPTranslator		Imágenes Bitmap
-BMPTranslator Settings	BMPTranslator		Configuración de BMPTranslator
-BMP image (OS/2 format, %d bits)	BMPTranslator		Imagen de Mapa de Bits (Formato OS/2, %d bits)
-BMP image translator	BMPView		Convertidor de imagen BMP
-BMP image (MS format, %d bits	BMPTranslator	Ignore missing closing round bracket	Imagen BMP (Formato MS, %d bits)
-BMP Settings	BMPMain		Configuración BMP
+BMP images	BMPTranslator		Imágenes BMP
+BMPTranslator Settings	BMPTranslator		Configuración del Intérprete BMP
+BMP image (OS/2 format, %d bits)	BMPTranslator		Imagen BMP (formato OS/2, %d bits)
+BMP image translator	BMPView		Intérprete de imagen BMP
+BMP image (MS format, %d bits	BMPTranslator	Ignore missing closing round bracket	Imagen BMP (formato MS, %d bits)
+BMP Settings	BMPMain		Configuración de BMP
 Version %d.%d.%d, %s	BMPView		Version %d.%d.%d,%s
-BMP image translator	BMPTranslator		Convertidor de imagen BMP
+BMP image translator	BMPTranslator		Intérprete de imagen BMP

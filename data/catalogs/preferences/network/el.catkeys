@@ -1,0 +1,55 @@
+1	greek, modern (1453-)	x-vnd.Haiku-Network	2923905377
+Ethernet device	InterfaceListItem		Συσκευή Ethernet
+Link speed:	IntefaceView		Ταχύτητα σύνδεσης:
+disconnected	IntefaceView		έγινε αποσύνδεση
+IP Address:	IntefaceAddressView		Διεύθυνση IP:
+WPA	WPA protected network		WPA
+Network:	IntefaceView		Δίκτυο:
+Received:	IntefaceView		Ελήφθη:
+New…	NetworkWindow		Νέο…
+no link	InterfaceListItem		καμία σύνδεση
+Other	NetworkWindow		Άλλο
+Sent:	IntefaceView		Απεστάλη:
+Gateway:	IntefaceAddressView		Πύλη δικτύου:
+The netmask defines your local network	IntefaceAddressView		Η μάσκα δικτύου καθορίζει το τοπικό σας δίκτυο
+Your IP address	IntefaceAddressView		Η διεύθυνση IP σας
+DHCP	IntefaceAddressView		DHCP
+Netmask:	IntefaceAddressView		Μάσκα δικτύου:
+EAP	EAP protected network		EAP
+Services	NetworkWindow		Υπηρεσίες
+Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Η εγκατάσταση του NetworkStatus στην Γραμμή Εργασιών απέτυχε: %s
+Revert	NetworkWindow		Επαναφορά
+off	ServiceListItem		κλειστό
+WEP	WEP protected network		WEP
+<no wireless networks found>	IntefaceView		<δεν βρέθηκαν ασύρματα δίκτυα>
+Enable	IntefaceView		Ενεργοποίηση
+connected	IntefaceView		σε σύνδεση
+Apply	IntefaceAddressView		Εφαρμογή
+Disable	ServiceView		Απενεργοποίηση
+WPA2	WPA2 protected network		WPA2
+Show network status in Deskbar	NetworkWindow		Εμφάνιση κατάστασης δικτύου στην Γραμμή Εργασιών
+Mode:	IntefaceAddressView		Λειτουργία:
+connected	InterfaceListItem		σε σύνδεση
+OK	NetworkWindow		Εντάξει
+Static	IntefaceAddressView		Στατική
+launch error	NetworkWindow		σφάλμα εκκίνησης
+Renegotiate	IntefaceView		Επαναδιαπραγμάτευση
+MAC address:	IntefaceView		Διεύθυνση MAC:
+%name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
+disabled	InterfaceListItem		απενεργοποιημένο
+Dial-up connection	InterfaceListItem		Σύνδεση τηλεφωνικής γραμμής
+on	ServiceListItem		ανοιχτό
+The method for obtaining an IP address	IntefaceAddressView		Ο τρόπος με τον οποίο αποκτάται μία διεύθυνση IP
+disconnected	InterfaceListItem		αποσυνδέθηκε
+Automatic	IntefaceAddressView		Αυτόματο
+Choose automatically	IntefaceView		Να επιλεγεί αυτόματα
+Status:	IntefaceView		Κατάσταση:
+Disable	IntefaceView		Απενεργοποίηση
+Manage…	NetworkWindow		Διαχείριση…
+open	Open network		ανοιχτό
+Network	System name		Δίκτυο
+Your gateway to the internet	IntefaceAddressView		Η πύλη σας για το διαδίκτυο
+Enable	ServiceView		Ενεργοποίηση
+Wireless device	InterfaceListItem		Συσκευή ασύρματων τηλεπικοινωνιών
+Disabled	IntefaceAddressView		Απενεργοποιημένο
+VPN connection	InterfaceListItem		Σύνδεση VPN

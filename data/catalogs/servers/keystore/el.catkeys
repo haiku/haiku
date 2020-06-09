@@ -1,0 +1,17 @@
+1	greek, modern (1453-)	x-vnd.Haiku-keystore_server	2429996361
+to perform the following action:\n%accessString%\n\n	AppAccessRequestWindow		για να εκτελέσετε την ακόλουθη ενέργεια:\n%access String%\n\n
+This application doesn't yet have the required privileges.	AppAccessRequestWindow		Αυτή η εφαρμογή δεν έχει ακόμη τα απαιτούμενα δικαιώματα.
+Keyring:	KeyRequestWindow		Κλειδοθήκη:
+requests access to keyring:\n%keyringName%\n\n	AppAccessRequestWindow		ζητάει πρόσβαση στην κλειδοθήκη\n%keyringName%\n\n
+Application keyring access	AppAccessRequestWindow		Πρόσβαση εφαρμογής στην κλειδοθήκη
+Disallow	AppAccessRequestWindow		Απαγόρευση
+Allow once	AppAccessRequestWindow		Να επιτραπεί μόνο για μια φορά
+Unlock keyring	KeyRequestWindow		Ξεκλείδωμα κλειδοθήκης
+An application wants to access the keyring below, but it is locked with a passphrase. Please enter the passphrase to unlock the keyring.\nIf you unlock the keyring, it stays unlocked until the system is shut down or the keyring is manually locked again.\nIf you cancel this dialog the keyring will remain locked.	KeyRequestWindow		Μια εφαρμογή ζητάει πρόσβαση στην παρακάτω κλειδοθήκη, αλλά απαιτείται κωδικό πρόσβασης. Παρακαλώ εισάγετε τον κωδικό για να ξεκλειδώσετε την κλειδοθήκη.\nΑν ξεκλειδώσετε την κλειδοθήκη, θα παραμείνει ξεκλείδωτη μέχρι να την κλειδώσετε ξανά ή να απενεργοποιηθεί το σύστημα.\nΑν κλείσετε αυτόν τον διάλογο, η κλειδοθήκη θα παραμείνει κλειδωμένη.
+Password:	KeyRequestWindow		Συνθηματικό:
+Cancel	KeyRequestWindow		Άκυρο
+This application has been updated since it was last granted access.	AppAccessRequestWindow		Αυτή η εφαρμογή έχει ενημερωθεί από την τελευταία φορά που της παραχωρήθηκε εξουσιοδότηση.
+Allow always	AppAccessRequestWindow		Να επιτρέπεται πάντα
+Unlock	KeyRequestWindow		Ξεκλείδωμα
+The application:\n%signature% (%path%)\n\n	AppAccessRequestWindow		Η εφαρμογή:\n%signature% (%path%)\n\n
+This application hasn't been granted access before.	AppAccessRequestWindow		Αυτή η εφαρμογή δεν έχει εξουσιοδοτηθεί προηγουμένως.

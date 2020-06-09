@@ -1,9 +1,9 @@
 1	lithuanian	x-vnd.Haiku-GLInfo	3678488342
-Capability	Capabilities		Galimybė
-Information	InfoView		Informacija
 GL Info	System name		GL informacija
-Capabilities	Capabilities		Galimybės
+Information	InfoView		Informacija
 Maximum convolution	Capabilities		Didžiausias susukimas
+Extensions	Extensions		Plėtiniai
 Available extensions	Extensions		Galimi plėtiniai
 Value	Capabilities		Reikšmė
-Extensions	Extensions		Plėtiniai
+Capabilities	Capabilities		Galimybės
+Capability	Capabilities		Galimybė

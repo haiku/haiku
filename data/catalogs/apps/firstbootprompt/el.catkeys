@@ -1,0 +1,80 @@
+1	greek, modern (1453-)	x-vnd.Haiku-FirstBootPrompt	2670843542
+Japanese	KeymapNames		Ιαπωνικό
+US	KeymapNames		ΗΠΑ
+Esperanto	KeymapNames		Εσπεράντο
+Belarusian	KeymapNames		Λευκορώσικο
+Brazilian	KeymapNames		Βραζιλιάνικο
+Dvorak	KeymapNames		Dvorak
+Polish	KeymapNames		Πολωνικό
+Latin-American	KeymapNames		Λατινοαμερικάνικο
+Ukrainian	KeymapNames		Ουκρανικό
+Russian (Yawert)	KeymapNames		Ρώσικο (Yawert)
+United-Kingdom	KeymapNames		Ηνωμένου Βασιλείου
+Serbian (Cyrillic)	KeymapNames		Σέρβικο (Κυριλλικό)
+Turkish (Type-F)	KeymapNames		Τούρκικο (Τύπου-F)
+Bulgarian (Cyrillic)	KeymapNames		Βουλγαρικό (Κυριλλικό)
+Belgian (point)	KeymapNames		Βελγικό (point)
+Finnish	KeymapNames		Φινλαδικό
+Swedish	KeymapNames		Σουηδικό
+Svorak	KeymapNames		Svorak
+German	KeymapNames		Γερμανικό
+Swiss-German	KeymapNames		Ελβετικό-Γερμανικό
+Keymap	BootPromptWindow		Διάταξη πληκτρολογίου
+Spanish (Dvorak)	KeymapNames		Ισπανικό (Dvorak)
+US-International	KeymapNames		Διεθνές ΗΠΑ
+Czech	KeymapNames		Τσέχικο
+Turkish (Type-Q)	KeymapNames		Τούρκικο (τύπου Q)
+Slovak	KeymapNames		Σλοβακικό
+Russian (Udmurt, Komi, Mari)	KeymapNames		Ρώσικο (Ουντμούρτ, Κόμι, Μάρι)
+Thai (TIS-820.2538)	KeymapNames		Ταϊλανδέζικo (TIS-820.2538)
+Colemak	KeymapNames		Colemak
+Dvorak (programmer's)	KeymapNames		Dvorak (προγραμματιστή)
+Russian (Mac)	KeymapNames		Ρώσικο (Mac)
+Thank you for trying out Haiku! We hope you'll like it!\n\nYou can select your preferred language and keyboard layout from the list on the left which will then be used instantly. You can easily change both settings from the Desktop later on on the fly.\n\nDo you wish to run the Installer or continue booting to the Desktop?\n	BootPromptWindow	For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	Σας ευχαριστούμε που προτιμήσατε το Haiku! Ελπίζουμε να σας αρέσει!\n\nΜπορείτε να επιλέξετε την γλώσσα της προτίμησής σας και τη διάταξη πληκτρολογίου από τη λίστα στα αριστερά και οι επιλογές θα εφαρμοστούν άμεσα. Μπορείτε να αλλάξετε μεταγενέστερα και τις δυο ρυθμίσεις από την Επιφάνεια Εργασίας.\n\nΘα θέλετε να εκτελέσετε το Πρόγραμμα Εγκατάστασης ή να μεταβείτε στην Επιφάνεια Εργασίας;\n
+German (Mac)	KeymapNames		Γερμανικό (Mac)
+Arabic (102)	KeymapNames		Αραβικό (102)
+Belarusian (Latin)	KeymapNames		Λευκορώσικο (Λατινικό)
+Belarusian (Mac)	KeymapNames		Λευκορώσικο (Mac)
+Hebrew	KeymapNames		Εβραϊκό
+Greek	KeymapNames		Ελληνικό
+Croatian	KeymapNames		Κροατικό
+Run Installer	BootPromptWindow		Έναρξη Εγκατάστασης
+Faeroese	KeymapNames		Φεροϊκό
+Polish (Typewriter)	KeymapNames		Πολωνικό (Γραφομηχανής)
+French (Mac)	KeymapNames		Γαλλικό (Mac)
+Spanish	KeymapNames		Ισπανικό
+Ukrainian (Mac)	KeymapNames		Ουκρανικό (Mac)
+Estonian	KeymapNames		Εσθονικό
+French (Bépo)	KeymapNames		Γαλλικό (Bépo)
+Serbian (Latin)	KeymapNames		Σέρβικο (Λατινικό)
+Russian (Typewriter)	KeymapNames		Ρώσικο (Γραφομηχανής)
+French	KeymapNames		Γαλλικό
+Italian	KeymapNames		Ιταλικό
+Portuguese	KeymapNames		Πορτογαλικό
+Swiss-French	KeymapNames		Ελβετικό-Γαλλικό
+Slovene	KeymapNames		Σλοβενικό
+Lithuanian	KeymapNames		Λιθουανικό
+French (NF Z71-300)	KeymapNames		Γαλλικό (NF Z71-300)
+ISO-9995	KeymapNames		ISO-9995
+Kazakh	KeymapNames		Καζακστανικό
+Language	BootPromptWindow		Γλώσσα
+Lithuanian (Standard)	KeymapNames		Λιθουανικό (Standard)
+Belgian (comma)	KeymapNames		Βελγικό (κόμμα)
+Custom	BootPromptWindow		Προσαρμοσμένο
+Norwegian	KeymapNames		Νορβηγικό
+Danish	KeymapNames		Δανικό
+Boot to Desktop	BootPromptWindow		Μετάβαση σε Επιφάνεια Εργασίας
+Bulgarian (Phonetic)	KeymapNames		Βουλγαρικό (Φωνητικό)
+Canadian-French	KeymapNames		Καναδικό-Γαλλικό
+Welcome to Haiku!	BootPromptWindow		Καλωσορίσατε στο Haiku!
+Russian	KeymapNames		Ρώσικο
+Hungarian	KeymapNames		Ουγγρικό
+Irish	KeymapNames		Ιρλανδικό
+Romanian	KeymapNames		Ρουμανικό
+Macedonian	KeymapNames		Βόρειο Μακεδονικό
+Czech (Mac)	KeymapNames		Τσέχικο (Mac)
+Brazilian (ABNT2)	KeymapNames		Βραζιλιάνικο (ABNT2)
+Albanian	KeymapNames		Αλβανικό
+Dutch	KeymapNames		Ολλανδικό
+Friulian	KeymapNames		Φριουλιανό
+Icelandic	KeymapNames		Ισλανδικό

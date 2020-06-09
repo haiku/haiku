@@ -1,47 +1,46 @@
-1	catalan; valencian	x-vnd.Haiku-ActivityMonitor	1155619009
-P-faults	DataSource		Averies de P
-Media nodes	DataSource		Nodes de mitjans
-Threads	DataSource		Fils
-Always on top	ActivityWindow		Sempre a primer pla
-Add graph	ActivityWindow		Afegeix un gràfic
+1	catalan; valencian	x-vnd.Haiku-ActivityMonitor	3672498538
 Teams	DataSource		Equips
+Semaphores	DataSource		Semàfors
+TX	DataSource	Shorter version for Sending	TX
+Block cache memory	DataSource		Bloca la memòria cau
+%lld ms	SettingsWindow		%lld ms
 MiB	DataSource		MiB
-Network send	DataSource		Envia amb la xarxa
-CPU usage (combined)	DataSource		Ús de la CPU (combinat)
-CPU	DataSource		CPU
-Used memory	DataSource		Memòria usada
-Cached memory	DataSource		A la memòria cau
-Apps	DataSource		Aplicacions
-Show legend	ActivityView		Mostra la llegenda
+Media nodes	DataSource		Nodes de mitjans
 Text clipboard	DataSource		Porta-retalls per a text
-Settings	ActivityWindow		Paràmetres
+Network send	DataSource		Envia amb la xarxa
+Running applications	DataSource		Aplicacions en execució
+Cache	DataSource		Memòria cau
+CPU usage (combined)	DataSource		Ús de la CPU (combinat)
+Threads	DataSource		Fils
 Receiving	DataSource		Es rep
+Remove graph	ActivityView		Suprimeix el gràfic
+Swap space	DataSource		Espai d'intercanvi
+CPU	DataSource		CPU
+ActivityMonitor	System name		Monitor d'activitat
+Update time interval:	SettingsWindow		Interval d'actualització:
+RX	DataSource	Shorter version for Receiving.	RX
 Settings…	ActivityWindow		Paràmetres...
+Block cache	DataSource		Bloca la cau
+Memory	DataSource		Memòria
+CPU usage	DataSource		Ús de la CPU
+Quit	ActivityWindow		Surt
+Raw clipboard	DataSource		Porta-retalls en cru
+Settings	ActivityWindow		Paràmetres
+Used memory	DataSource		Memòria usada
+%.1f faults/s	DataSource		%.1f falles/s
+Show legend	ActivityView		Mostra la llegenda
+Cached memory	DataSource		A la memòria cau
+File	ActivityWindow		Fitxer
 Ports	DataSource		Ports
 Page faults	DataSource		Falles de pàgina
+Apps	DataSource		Aplicacions
+Additional items	ActivityView		Elements addicionals
+Add graph	ActivityWindow		Afegeix-hi un gràfic
 Sending	DataSource		S'envia
-Cache	DataSource		Memòria cau
-%.1f faults/s	DataSource		%.1f falles/s
-Update time interval:	SettingsWindow		Interval d'actualització:
-TX	DataSource	Shorter version for Sending	TX
-Quit	ActivityWindow		Surt
-Block cache memory	DataSource		Bloca la memòria cau
-Remove graph	ActivityView		Suprimeix el gràfic
-%lld sec.	SettingsWindow		%lld seg.
-%lld ms	SettingsWindow		%lld ms
-CPU usage	DataSource		Ús de la CPU
-Raw clipboard	DataSource		Porta-retalls en cru
-Sems	DataSource		Sems
 %.1f MiB	DataSource		%.1f MB
-ActivityMonitor	System name		Monitor d'activitat
-Running applications	DataSource		Aplicacions en execució
-Semaphores	DataSource		Semàfors
-Block cache	DataSource		Bloca la cau
-Swap space	DataSource		Espai d'intercanvi
+Always on top	ActivityWindow		Sempre en primer pla
 Swap	DataSource		Memòria d'intercanvi
-File	ActivityWindow		Fitxer
-usage	DataSource		ús
-Additional items	ActivityView		Més
+%lld sec.	SettingsWindow		%lld seg.
+P-faults	DataSource		Averies de P
+Sems	DataSource		Sems
 Network receive	DataSource		Rep de la xarxa
-Memory	DataSource		Memòria
-RX	DataSource	Shorter version for Receiving.	RX

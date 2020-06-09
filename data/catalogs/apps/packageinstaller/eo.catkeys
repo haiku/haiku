@@ -1,0 +1,64 @@
+1	esperanto	x-vnd.Haiku-PackageInstaller	2472572058
+Package description	UninstallView		Priskribo de pakaĵo
+none	PackageView		nenio
+Continue	PackageInstall		Daŭri
+Running post-installation scripts	PackageInstall		Plenumado de post-instaladaj skriptoj
+Package installer	PackageView		Instalilo de pakaĵoj
+All existing files will be skipped?	PackageView		Ĉu preterpasi ĉiujn ekzistantajn dosierojn? 
+Replace	PackageView		Anstataŭigi
+All existing files will be replaced?	PackageView		Ĉu anstataŭigi ĉiujn ekzistantajn dosierojn?
+Other…	PackageView		Alia…
+The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		La simbola ligilo kun nomo '%s' jam ekzistas kun donita itinero.\nĈu anstataŭigi ĝin per ligilo el ĉi pakaĵo aŭ preterpasi ĝin?
+Stop	PackageStatus		Ĉesi
+Install to:	PackageView		Instali al:
+The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		La menciita pakaĵo aspektas kiel jam instalita en via sistemo. Ĉu vi volas malinstali ĝin kaj daŭrigi instaladon?
+Skip all	PackageView		Preterpasi ĉion
+The installation of the package has been aborted.	PackageView		Instalado de la pakaĵo estas ĉesigita.
+No installation type selected	PackageView		Speco de instalado ne estas elektita
+Do you want to remember this decision for the rest of this installation?\n	PackageView		Ĉu vi volas memorigi la decidos por resto de instalado?\n
+The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		La elektita pakaĵo ne estas forigita el sistemo. la informa dosiero pri instalita pakaĵo povas esti rompita.
+Install…	UninstallView		Instali…
+The item named '%s' already exists in the given path.\nReplace the item with the one from this package or skip it?	PackageView		La ero kun nomo '%s' jam ekzistas laŭ donita itinero.\nĈu anstataŭigi ĝin per ero el ĉi pakaĵo aŭ preterpasi ĝin?
+Installing files and folders	PackageInstall		Instalado de dosieroj kaj dosierujoj
+Installed packages	UninstallWindow		Instalitaj pakaĵoj
+Remove	UninstallView		Forigi
+The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Malsukceso de instalado de la petita pakaĵo en vian sistemon. Tio povas esti problemo de cela dosiero de la pakaĵo. Klarigu la problemon ĉe pakaĵa disvastiganto.
+OK	UninstallView		Bone
+Accept	PackageTextViewer		Akcepti
+Abort	PackageView		Ĉesigi senkondiĉe
+Disclaimer	PackageTextViewer		Malgarantio
+Preparing package	PackageInstall		Preparado de pakaĵo
+The package you requested has been successfully installed on your system.	PackageView		La petita pakaĵo estas sukcese instalita en vian sistemon.
+Installation progress	PackageView		Progreso de instalado
+Decline	PackageTextViewer		Malakcepti
+Continue	PackageTextViewer		Daŭrigi
+Installing package	PackageStatus		Instalado de pakaĵo
+Install %name%	PackageView		Instali %name%
+%index% of %total%	PackageInstall		%index% da %total%
+No package selected.	UninstallView		Pakaĵo ne elektita.
+%name% (%size% free)	PackageView		%name% (%size% libera)
+Error while installing the package\n	PackageView		Eraro dum instalado de la pakaĵo\n
+Finishing installation	PackageInstall		Finado de instalado
+No package available.	PackageInfo		Pakaĵo ne estas disponebla.
+The script named '%s' already exists in the given path.\nReplace the script with the one from this package or skip it?	PackageView		La skripto kun nomo '%s' jam ekzistas laŭ donita itinero.\nĈu anstataŭigi ĝin per skripto el ĉi pakaĵo aŭ preterpasi ĝin?
+Installation type:	PackageView		Speco de instalado:
+The package you selected has been successfully removed from your system.	UninstallView		La elektita pakaĵo estas sukcese malinstalita for de sistemo.
+There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Aspektas ke okazis nekongruo de dosieraj grandoj en la pakaĵo. La pakaĵo povas esti rompita aŭ modifita post kreado. Ĉu vi ankoraŭ volas daŭrigi? 
+%name% (%size%)	PackageView		%name% (%size%)
+Abort	PackageInstall		Ĉesigi senkondiĉe
+The file named '%s' already exists in the given path.\nReplace the file with the one from this package or skip it?	PackageView		La dosiero kun nomo '%s' jam ekzistas laŭ donita itinero.\nĈu anstataŭigi ĝin per dosiero el ĉi pakaĵo aŭ preterpasi ĝin?
+Replace all	PackageView		Anstataŭigi ĉion
+The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		La pakaĵa dosiero ne estas legebla.\nEventuala kaŭzo povas esti ke petita dosiero ne estas valida .pkg pakaĵo por BeOS.
+Continue	PackageInfo		Daŭrigi
+No package selected.	PackageInfo		Neniu pakaĵo estas elektita.
+Error! \"%s\" is not a valid path.\n	Packageinstaller main		Eraro! \"%s\" ne estas valida itinero.\n
+The directory named '%s' already exists in the given path.\nReplace the directory with one from this package or skip it?	PackageView		La dosierujo kun nomo '%s' jam ekzistas laŭ donita itinero.\nĈu anstataŭigi ĝin per dosierujo el ĉi pakaĵo aŭ preterpasi ĝin?
+LegacyPackageInstaller	System name		La Hereda Pakaĵinstalilo
+Ask again	PackageView		Peti denove
+Begin	PackageView		Komenco
+OK	PackageView		Bone
+Abort	PackageInfo		Ĉesigi senkondiĉe
+Done	PackageInstall		Farite
+Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Eraro (%s)! Malsukcesis uzi \"%s\".\n
+Skip	PackageView		Preterpasi
+Image not loaded correctly	PackageImageViewer		La bildo ne estas ŝargita korekte

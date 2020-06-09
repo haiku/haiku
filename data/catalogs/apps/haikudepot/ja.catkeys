@@ -1,10 +1,9 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	1107427137
+1	japanese	x-vnd.Haiku-HaikuDepot	3833361367
 Repository update error	LocalRepositoryUpdateProcess		リポジトリアップデートエラー
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		リポジトリの更新中に次のエラーが発生しました: %error%
 User Created	UserLoginWindow		作成されたユーザー
 Check for updates…	MainWindow		更新をチェック…
 Uninstall	PackageManager		アンインストール
-(%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		アンインストール済
 It was not possible to create the new user.	UserLoginWindow		新規ユーザーを作成できませんでした。
 Available packages	MainWindow		使用可能なパッケージ
@@ -35,7 +34,6 @@ Login or Create account	MainWindow		ログインまたはアカウントの作�
 Ratings	PackageInfoView		評価
 Switch account…	MainWindow		アカウントの切り替え…
 Preferred language:	UserLoginWindow		優先言語:
-Server Error	ServerHelper		サーバーエラー
 Name	PackageListView		名前
 Authorization or security issue. Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		認証またはセキュリティの問題です。ログアウト後再ログインして、パスワードが正しいこと、また、最新の使用許諾に同意していることを確認してください。
 Local	LocalPkgDataLoadProcess		ローカル
@@ -61,7 +59,6 @@ Featured packages	FeaturedPackagesView		おすすめパッケージ
 The supplied response to the captcha is incorrect. A new captcha will be generated; try again.	UserLoginWindow		キャプチャへの返答が間違っています。新しいキャプチャが生成されます、もう一度試してください。
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		新規ユーザーを作成するために必要なキャプチャの取得のためのサーバーとの通信ができませんでした。
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		評価が正常に更新されました。HaikuDepot Server のウェブサイトで評価を更新または削除できます。
-Network Error	ServerHelper		ネットワークエラー
 Available	PackageListView		利用可能
 Cancel	UserLoginWindow		中止
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot はパッケージデーモンが動作することを必要とします。 そしてそれは動作していないようです。\n今起動しますか?
@@ -69,7 +66,6 @@ Click a package to view information	PackageInfoView		パッケージをクリッ
 The password must be at least eight characters long, consist of at least two digits and one upper case character.	UserLoginWindow		パスワードは、最小8文字以上の長さで、少なくとも2つの数字と1つの英大文字を含む必要があります。
 Contents	PackageInfoView		内容
 Close	PackageManager		閉じる
-A network transport error has arisen communicating with the HaikuDepot server system: %s	ServerHelper		HaikuDepot サーバーシステムとの通信中に、次のネットワークトランスポートエラーが発生しました: %s
 Changelog	PackageInfoView		変更履歴
 Rating not possible	MainWindow		評価不能
 Package update error	MainWindow		パッケージアップデートエラー
@@ -79,7 +75,6 @@ Reboot required	PackageManager		再起動が必要です
 Very unstable	RatePackageWindow		非常に不安定
 Password:	UserLoginWindow		パスワード:
 All packages	PackageListView		すべてのパッケージ
-Network Transport Error	ServerHelper		ネットワークトランスポートエラー
 Stability	RatePackageWindow		安定度
 Send	RatePackageWindow		送信する
 Start package daemon	App		パッケージデーモンを起動
@@ -106,8 +101,8 @@ Close	RatePackageWindow		閉じる
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		リポジトリ '%REPO_NAME%' のパッケージデータを同期中
 View the usage conditions	UserLoginWindow		使用条件を見る
 Login issue	MainWindow		ログインに問題
-Your rating:	RatePackageWindow		評価:
 Size	PackageListView		サイズ
+Your rating:	RatePackageWindow		評価:
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		ユーザー %Nickname% が、HaikuDepotServer システム内に正常に作成されました。ユーザーの詳細をウェブインターフェースで管理できます。あなたは現在新規ユーザーとしてログインしています。
 Your rating was updated.	RatePackageWindow		評価が更新されました。
 All categories	FilterView		すべての分類
@@ -170,8 +165,6 @@ Open %DeskbarLink%	PackageManager		%DeskbarLink% を開く
 User creation error	UserLoginWindow		ユーザー作成エラー
 Install	PackageManager		インストール
 Input validation	UserLoginWindow		入力検証
-This application is too old to communicate with the HaikuDepot server system. Obtain a newer version of HaikuDepot by updating your Haiku system. The minimum version of HaikuDepot required is \"%s\".	ServerHelper		このアプリケーションは古いので、HaikuDepot サーバーシステムと対話できません。Haiku システムをアップデートして、より新しいバージョンの HaikuDepot を入手してください。最小限必要な バージョンは \"%s\" です。
-An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		予期しないエラーが次の HaikuDepot サーバーから送信されました [%i]
 Log in…	MainWindow		ログイン…
 You need to be logged into an account before you can rate packages.	MainWindow		パッケージを評価する前にアカウントにログインする必要があります。
 Client version too old	ServerHelper		クライアントのバージョンが古すぎます

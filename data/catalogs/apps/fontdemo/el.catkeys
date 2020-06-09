@@ -1,0 +1,17 @@
+1	greek, modern (1453-)	x-vnd.Haiku-FontDemo	3449067186
+Stop cycling	ControlView		Διακοπή γυρίσματος
+Haiku, Inc.	FontDemoView		Haiku, Inc.
+Rotation: %d	ControlView		Κλίση: %d
+Shear: %d	ControlView		Shear: %d
+Spacing: %d	ControlView		Κενό: %d
+Cycle fonts	ControlView		Κυκλικές γραμματοσειρές
+Font:	ControlView		Γραμματοσειρά:
+Drawing mode:	ControlView		Τρόπος σχεδίασης:
+Haiku, Inc.	ControlView		Haiku, Inc.
+Controls	FontDemo		Κουμπιά
+FontDemo	System name		Δοκιμή Γραμματοσειρών
+Outline: %d	ControlView		Εξωτερική γραμμή: %d
+Text:	ControlView		Κείμενο:
+Antialiased text	ControlView		Antialiased κείμενο
+Bounding boxes	ControlView		Εξωτερικά κουτιά
+Size: %d	ControlView		Μέγεθος: %d

@@ -1,6 +1,5 @@
-1	portuguese (brazil)	x-vnd.Haiku-HaikuDepot	2487844666
+1	portuguese (brazil)	x-vnd.Haiku-HaikuDepot	1649805476
 Uninstall	PackageManager		Desinstalar
-(%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		Não instalado
 Available packages	MainWindow		Pacotes disponíveis
 Create account	UserLoginWindow		Criar conta
@@ -48,15 +47,14 @@ Start package daemon	App		Iniciar daemon de pacote
 The package action could not be scheduled: %Error%	PackageInfoView		A ação do pacote não pode ser agendada: %Error%
 Cancel	RatePackageWindow		Cancelar
 Inactive	PackageListView		Inativo
-{0, plural, one{# item} other{# items}}	PackageListView		{0, plural, um{# item} outro{# itens}}
 OK	PackageInfoView		OK
 Downloading:	PackageInfoView		Baixando:
 Success	UserLoginWindow		Sucesso
 (%Votes%)	PackageInfoView		(%Votes%)
 Close	UserLoginWindow		Fechar
 Close	RatePackageWindow		Fechar
-Your rating:	RatePackageWindow		Sua avaliação:
 Size	PackageListView		Tamanho
+Your rating:	RatePackageWindow		Sua avaliação:
 All categories	FilterView		Todas as categorias
 n/a	PackageInfoView		n/a
 Cancel	MainWindow		Cancelar

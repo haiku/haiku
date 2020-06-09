@@ -1,0 +1,38 @@
+1	esperanto	x-vnd.Haiku-libsolvsolver	3404387783
+allow architecture change of %source% to %target%	SolverProblemSolution		permesi ŝanĝi arkitekturon de %source% al %target%
+install %source% from excluded repository	SolverProblemSolution		instali %source%-on el eliminita deponejo
+unspecified problem	SolverProblem		nekonata problemo
+package %source% requires %dependency%, but none of the providers can be installed	SolverProblem		la pakaĵo %source% postulas %dependency%-on, sed nenio el la provizantoj povas esti instalata
+package %source% implicitly obsoletes %dependency% provided by %target%	SolverProblem		la pakaĵo %source% implicas malaktualaĵojn %dependency% provizatajn per %target%
+nothing provides requested %dependency%	SolverProblem		neniu provizas petitan %dependency%-on
+do not keep %source% installed	SolverProblemSolution		ne konservi %source%-on instalita
+do not deinstall \"%selection%\"	SolverProblemSolution		ne forigi \"%selection%\"-on
+install %source% despite its inferior architecture	SolverProblemSolution		instali %source%-on malgraŭ ĝia malsupera arkitekturo
+conflicting requests	SolverProblem		konfliktado de petoj
+do not install the most recent version of \"%selection%\"	SolverProblemSolution		ne instali la plej aktualan version de \"%selection%\"
+allow replacement of %source% with %target%	SolverProblemSolution		permesi submeti %source%-on per %target%
+package %source% obsoletes %dependency% provided by %target%	SolverProblem		pakaĵo %source% malaktualigas %dependency% provizatan per %target%
+do not forbid installation of %source%	SolverProblemSolution		ne malpermesi instali %source% -on
+allow downgrade of %source% to %target%	SolverProblemSolution		permesi malpromocii %source%-on al %target%
+dependency problem	SolverProblem		problemo de dependeco
+%dependency% is provided by the system	SolverProblem		%dependency% estas provizata per la sistemo
+keep %source% despite its inferior architecture	SolverProblemSolution		lasi %source%-on malgraŭ ĝia malsupera arkitekturo
+%source% does not belong to a distupgrade repository	SolverProblem		%source% ne apartenas al deponejo de distribuaĵa promociado
+installed package %source% obsoletes %dependency% provided by %target%	SolverProblem		instalita pakaĵo %source% malpromocias %dependency%-on provizatan per %target%
+allow name change of %source% to %target%	SolverProblemSolution		permesi ŝanĝi nomon de %source% al %target%
+package %source% conflicts with %dependency% provided by %target%	SolverProblem		la pakaĵo %source% konfliktas kun %dependency% provizata per %target%
+do something	SolverProblemSolution		fari ion
+install %selection% despite its old version	SolverProblemSolution		instali %selection%-on spite ĝi estas malnova versio
+cannot install both %source% and %target%	SolverProblem		ne kapablas instali ambaŭ %source%-on kaj %target%-on
+package %source% is not installable	SolverProblem		la pakaĵo %source% ne estas instalebla
+problem with installed package %source%	SolverProblem		problemo kun instalita pakaĵo %source%
+allow deinstallation of %source%	SolverProblemSolution		permesi malinstali %source%-on
+keep %source% from excluded repository	SolverProblemSolution		lasi %source%-on el eliminita deponejo
+keep old %source%	SolverProblemSolution		lasi malnovan %source%-on
+package %source% conflicts with %dependency% provided by itself	SolverProblem		la pakaĵo %source% konfliktas kun %dependency% provizata per ĝi mem
+allow vendor change from \"%sourceVendor%\" (%source%) to \"%targetVendor%\" (%target%)	SolverProblemSolution		permesi ŝanĝi vendiston de \"%sourceVendor%\" (%source%) al \"%targetVendor%\" (%target%)
+do not lock \"%selection%\"	SolverProblemSolution		ne ŝlosi \"%selection%\"-on
+do not install \"%selection%\"	SolverProblemSolution		ne instali \"%selection%\"
+nothing provides %dependency% needed by %source%	SolverProblem		neniu provizas %dependency%-on postulatan per %source%
+%source% has inferior architecture	SolverProblem		%source% havas malsuperan arkitekturon
+do not deinstall all resolvables \"%selection%\"	SolverProblemSolution		ne instali ĉiujn postulaĵojn \"%selection%\"

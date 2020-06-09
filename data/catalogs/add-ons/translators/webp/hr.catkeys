@@ -1,0 +1,22 @@
+1	croatian	x-vnd.Haiku-WebPTranslator	3343078170
+Compression method:	ConfigView		Način kompresije:
+WebP image translator	ConfigView		WebP prevoditelj slika
+Preset	ConfigView		Unaprijed postavljeno
+WebP images	WebPTranslator		WebP slike
+WebPTranslator Settings	ConfigView		Postavke WebPT prevoditelja
+Output quality:	ConfigView		Izlazna kvaliteta:
+WebP Settings	main		WebP postavke
+Text	ConfigView		Tekst
+Slower but better	ConfigView		Sporije ali bolje
+WebP image	WebPTranslator		WebP slika
+Output preset:	ConfigView		Izlazne postavke:
+Picture	ConfigView		Slika
+Low	ConfigView		Nisko
+High	ConfigView		Visoko
+Drawing	ConfigView		Crtanje
+Default	ConfigView		Zadano
+Fast	ConfigView		Brzo
+Photo	ConfigView		Fotografija
+Preprocessing filter	ConfigView		Predprocesorski filter
+WebP image translator	WebPTranslator		WebP prevoditelj slika
+Icon	ConfigView		Ikona

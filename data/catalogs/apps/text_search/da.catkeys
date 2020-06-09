@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku.TextSearch	1867528375
+1	danish	x-vnd.Haiku.TextSearch	2224690775
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Vælg venligst de filer du vil have valgt til dig i Trackeren.
 %appname% : %path%	GrepWindow		%appname% : %path%
 Failed to start xargs program!	Grepper		Kunne ikke starte xargs-program!
@@ -19,7 +19,6 @@ Show files in Tracker	GrepWindow		Vis filer i Tracker
 Please select the files you wish to keep searching.	GrepWindow		Vælg venligst de filer du vil fortsat søge efter.
 Trim to selection	GrepWindow		Trim alt andet en markeringen
 Set target…	GrepWindow		Sæt mål…
-TextSearch	GrepWindow		TextSearch
 Failed to open input pipe!	Grepper		Kunne ikke åbne inputledning!
 Search	GrepWindow		Søg
 Copy text to clipboard	GrepWindow		Kopiér tekst til udklipsholderen

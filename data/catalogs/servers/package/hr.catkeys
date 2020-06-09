@@ -1,0 +1,14 @@
+1	croatian	x-vnd.haiku-package_daemon	2091748299
+Package changes	PackageResult	Window title	Izmjene paketa
+uninstall package %s\n	PackageResult	Don't change '%s' variable	deinstaliraj paket %s\n
+ignore problem for now	PackageProblem		Ignoriraj problem za sada
+solution %d:	PackageProblem	Don't change the %d variable	solucija %d:
+The following problems have been encountered. Please select a solution for each:	PackageProblem		Došlo je do slijedećih problema. Molim odaberite soluciju za svaki:
+Apply changes	PackageResult		Primjeni izmjene
+install package %s from repository %s\n	PackageResult	Don't change '%s' variables	instaliraj paket %s it repozitorija %s\n
+The following additional package changes have to be made:	PackageResult		Slijedeće dodatne izmjene pakete moraju biti učinjene:
+Warning	PackageManager		Upozorenje
+Cancel	PackageProblem		Otkaži
+Cancel	PackageResult		Otkaži
+Retry	PackageProblem		Pokušaj ponovno
+Package problems	PackageProblem	Window title	Problemi paketa

@@ -1,0 +1,22 @@
+1	esperanto	x-vnd.Haiku-JPEGTranslator	3788699631
+Read	JPEGTranslator		Legi
+Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Be Bitmapa Formo (JPEGTranslator)
+Show warning messages	JPEGTranslator		Montri avertmesaĝojn
+Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Uzi CMYK-an kodon kun 0 por 100% tegado de inko
+JPEG Library Error: %s\n	be_jerror		Eraro de JPEG kodoteko: %s\n
+©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBazita sur IJG kodoteko ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nkun \"senperda\" enkodiga subteno de Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nKun kelkaj metodoj de kolorspaca konvertado de Magnus Hellman\n\thttp://www.bebits.com/app/802\n
+None	JPEGTranslator		Neniu
+About	JPEGTranslator		Pri
+Version %d.%d.%d	JPEGTranslator		Versio %d.%d.%d
+Write black-and-white images as RGB24	JPEGTranslator		Skribi nigr-kaj-blankajn bildojn kiel RGB24
+Output smoothing strength	JPEGTranslator		Eligoglatiga severeco
+Use progressive compression	JPEGTranslator		Uzu progresan densigon
+Make file smaller (sligthtly worse quality)	JPEGTranslator		Malgrandigi dosieron (iomete malpli bona kvalito)
+High	JPEGTranslator		Alta
+Read greyscale images as RGB32	JPEGTranslator		Legi grizskalaj bildoj kiel RGB32
+Output quality	JPEGTranslator		Eliga kvalito
+Low	JPEGTranslator		Malalta
+Write	JPEGTranslator		Skribi
+Prevent colors 'washing out'	JPEGTranslator		Malebligi kolorojn 'ellaviĝi'
+JPEG Library Warning: %s\n	be_jerror		Averto de JPEG kodoteko: %s\n
+JPEG images	JPEGTranslator		JPEG bildoj

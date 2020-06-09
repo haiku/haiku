@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Pulse	139895817
+1	russian	x-vnd.Haiku-Pulse	559379362
 Normal mode	DeskbarPulseView		Обычный режим
 Info	CPUButton		Информация
 Quit	DeskbarPulseView		Выход
@@ -16,6 +16,7 @@ Fade colors	ConfigView		Затенять цвета
 About Pulse…	PulseView		О программе…
 Pulse	NormalPulseView		Пульс
 Deskbar mode	NormalPulseView		Режим Deskbar
+Pulse settings	PulseApp		Настройки Пульса
 Remove replicant	CPUButton		Удалить репликант
 You can't disable the last active CPU.	PulseView		Нельзя отключить последний активный процессор.
 Width of icon:	ConfigView		Размер значка:
@@ -45,4 +46,3 @@ Active color	ConfigView		Активный цвет
 Installing in Deskbar failed\n%s	PulseApp		Не удалось установить в Deskbar.\n%s
 Idle color	ConfigView		Цвет бездействия
 Normal mode	PrefsWindow		Обычный режим
-Pulse settings	PulseWindow		Настройки пульсации

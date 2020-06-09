@@ -3,10 +3,10 @@
 All Rights Reserved.	AboutWindow		Tots els drets reservats.
 gold master	AboutWindow		candidat
 Undo	TextView		Desfés
+OK	PrintJob		D'acord
 gamma	AboutWindow		gamma
 development	AboutWindow		desenvolupament
 OK	Dragger		D'acord
-OK	PrintJob		D'acord
 Print Server is not responding.	PrintJob		El servidor d'impressió no respon.
 About %app%	AboutMenuItem		Quant a %app%
 Warning	Dragger		Avís
@@ -33,7 +33,7 @@ alpha	AboutWindow		alfa
 %3.2f MiB	StringForSize		%3.2f MiB
 Error	PrintJob		Error
 About %app%	AboutWindow		Quant a %app%
-About %app…	Dragger		Quan a %app…
+About %app…	Dragger		Quant a %app…
 Version history:	AboutWindow		Historial de versions:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		No es pot trobar l'aplicació del replicant. No s'ha proporcionat cap signatura de l'aplicació.\n%error
 %3.2f KiB	StringForSize		%3.2f KiB

@@ -1,47 +1,46 @@
-1	friulian	x-vnd.Haiku-ActivityMonitor	1155619009
-P-faults	DataSource		Erôrs-pagjine
-Media nodes	DataSource		Grops multimediâi
-Threads	DataSource		Thread
-Always on top	ActivityWindow		Simpri denant
-Add graph	ActivityWindow		Zonte grafic
+1	friulian	x-vnd.Haiku-ActivityMonitor	3672498538
 Teams	DataSource		Team
+Semaphores	DataSource		Semafars
+TX	DataSource	Shorter version for Sending	TX
+Block cache memory	DataSource		Memorie cache a blocs
+%lld ms	SettingsWindow		%lld ms
 MiB	DataSource		MiB
-Network send	DataSource		Rêt (inviament)
-CPU usage (combined)	DataSource		CPU doprade (cumbinât)
-CPU	DataSource		CPU
-Used memory	DataSource		Memorie doprade
-Cached memory	DataSource		Memorie cache
-Apps	DataSource		Aplicazions
-Show legend	ActivityView		Mostre liende
+Media nodes	DataSource		Grops multimediâi
 Text clipboard	DataSource		Notis di test
-Settings	ActivityWindow		Impostazions
+Network send	DataSource		Rêt (inviament)
+Running applications	DataSource		Aplicazions in esecuzion
+Cache	DataSource		Cache
+CPU usage (combined)	DataSource		CPU doprade (cumbinât)
+Threads	DataSource		Thread
 Receiving	DataSource		Ricezion
+Remove graph	ActivityView		Gjave grafic
+Swap space	DataSource		Spazi memorie di scambi
+CPU	DataSource		CPU
+ActivityMonitor	System name		VisôrAtivitâts
+Update time interval:	SettingsWindow		Interval di inzornament:
+RX	DataSource	Shorter version for Receiving.	RX
 Settings…	ActivityWindow		Impostazions…
+Block cache	DataSource		Bloche cache
+Memory	DataSource		Memorie
+CPU usage	DataSource		CPU doprade
+Quit	ActivityWindow		Jes
+Raw clipboard	DataSource		Notis gresis
+Settings	ActivityWindow		Impostazions
+Used memory	DataSource		Memorie doprade
+%.1f faults/s	DataSource		%.1f erôrs/s
+Show legend	ActivityView		Mostre liende
+Cached memory	DataSource		Memorie cache
+File	ActivityWindow		File
 Ports	DataSource		Puartis
 Page faults	DataSource		Erôrs di pagjine
-Sending	DataSource		Inviament
-Cache	DataSource		Cache
-%.1f faults/s	DataSource		%.1f erôrs/s
-Update time interval:	SettingsWindow		Interval di inzornament:
-TX	DataSource	Shorter version for Sending	TX
-Quit	ActivityWindow		Jes
-Block cache memory	DataSource		Bloche memorie cache
-Remove graph	ActivityView		Gjave grafic
-%lld sec.	SettingsWindow		%lld sec.
-%lld ms	SettingsWindow		%lld ms
-CPU usage	DataSource		CPU doprade
-Raw clipboard	DataSource		Notis gresis
-Sems	DataSource		Sems
-%.1f MiB	DataSource		%.1f MiB
-ActivityMonitor	System name		VisôrAtivitâts
-Running applications	DataSource		Aplicazions in esecuzion
-Semaphores	DataSource		Semafars
-Block cache	DataSource		Bloche cache
-Swap space	DataSource		Spazi memorie di scambi
-Swap	DataSource		Mem. di scambi
-File	ActivityWindow		File
-usage	DataSource		doprât
+Apps	DataSource		Aplicazions
 Additional items	ActivityView		Elements adizionâi
+Add graph	ActivityWindow		Zonte grafic
+Sending	DataSource		Inviament
+%.1f MiB	DataSource		%.1f MiB
+Always on top	ActivityWindow		Simpri denant
+Swap	DataSource		Mem. di scambi
+%lld sec.	SettingsWindow		%lld sec.
+P-faults	DataSource		Erôrs-pagjine
+Sems	DataSource		Sems
 Network receive	DataSource		Rêt (ricezion)
-Memory	DataSource		Memorie
-RX	DataSource	Shorter version for Receiving.	RX

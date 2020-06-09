@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-PackageInstaller	307431916
+1	dutch; flemish	x-vnd.Haiku-PackageInstaller	2472572058
 Package description	UninstallView		Pakketbeschrijving
 none	PackageView		geen
 Continue	PackageInstall		Doorgaan
@@ -44,6 +44,7 @@ The script named '%s' already exists in the given path.\nReplace the script with
 Installation type:	PackageView		Installatietype:
 The package you selected has been successfully removed from your system.	UninstallView		Het geselecteerde pakket is succesvol van het systeem verwijderd.
 There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Er lijkt een bestandsgrootte in het pakket niet overeen te komen. Mogelijks is het pakket beschadigd of werd het gewijzigd na het aanmaken. Wil je nog steeds verdergaan?
+%name% (%size%)	PackageView		%name% (%size%)
 Abort	PackageInstall		Afbreken
 The file named '%s' already exists in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Het opgegeven pad bevat al een bestand met de naam '%s'.\nWilt u het bestand vervangen met de pakketinhoud, of wilt u deze overslaan?
 Replace all	PackageView		Alles vervangen
@@ -52,7 +53,9 @@ Continue	PackageInfo		Doorgaan
 No package selected.	PackageInfo		Geen pakket geselecteerd.
 Error! \"%s\" is not a valid path.\n	Packageinstaller main		Fout! \"%s\" is geen geldige bestandslocatie.\n
 The directory named '%s' already exists in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Het opgegeven pad bevat al een map met de naam '%s'.\nWilt u de map vervangen met de pakketinhoud, of wilt u deze overslaan?
+LegacyPackageInstaller	System name		LegacyPackageInstaller
 Ask again	PackageView		Opnieuw vragen
+Begin	PackageView		Beginnen
 OK	PackageView		OK
 Abort	PackageInfo		Afbreken
 Done	PackageInstall		Gereed

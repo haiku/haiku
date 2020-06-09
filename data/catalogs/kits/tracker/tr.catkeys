@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-libtracker	2332899407
+1	turkish	x-vnd.Haiku-libtracker	1497671210
 Created	ContainerWindow		Oluşturulma
 Icon	AttributesView		Simge
 Open and make preferred	OpenWithWindow		Aç ve tercih edilen yap
@@ -9,7 +9,7 @@ Or	FindPanel		veya
 before	FindPanel		önce
 Volume icons	TrackerSettingsWindow		Disk simgeleri
 Ignore case	SelectionWindow		BÜYÜK/küçük harf yoksay
-Current folder	ContainerWindow		Şu anki klasör
+Current folder	ContainerWindow		Geçerli klasör
 Finish: %time - Over %finishtime left	StatusWindow		Bitiş: %time - Yaklaşık %finishtime kaldı
 Mount all disks now	AutoMounterSettings		Tüm diskleri şimdi bağla
 Location:	InfoWindow		Konum:
@@ -115,7 +115,7 @@ Edit templates…	TemplatesMenu		Şablonları düzenle…
 Hide dotfiles	SettingsView		Nokta ile başlayan dosyaları gizle
 Trash	Model		Çöp
 Enable type-ahead filtering	SettingsView		Hemen bulan süzmeyi etkinleştir
-copy	FSUtils	filename copy	kopyala
+copy	FSUtils	filename copy	kopyası
 New folder%ld	FSUtils		Yeni klasör%ld
 Location	OpenWithWindow		Konum
 %Ld B	WidgetAttributeText		%Ld B
@@ -131,7 +131,7 @@ Owner	FilePermissionsView		Sahibi
 Cancel	FSClipBoard		İptal
 Modified	PoseView		Değiştirilme
 Move to Trash	ContainerWindow		Çöp'e taşı
-All files and folders	FindPanel		Tüm dosyalar ve klasörler
+All files and folders	FindPanel		Tüm dosyalar/klasörler
 Add-ons	ContainerWindow		Eklentiler
 Too many parenthesis.	libtracker		Çok fazla parantez.
 Increase size	ContainerWindow		Büyüt
@@ -191,7 +191,7 @@ Could not find an application to open \"%name\" (%error). 	FSUtils		\"%name\" ö
 Internal error.	libtracker		İç hata.
 Mini icon view	DeskWindow		Ufak simge görünümü
 Geometric size	AttributesView		Geometrik boyut
-contains	SelectionWindow		içerir
+contains	SelectionWindow		şunu içerir:
 Replace	FilePanelPriv		Değiştir
 is not	FindPanel		değil
 Icon view	DeskWindow		Simge görünümü
@@ -262,6 +262,7 @@ ends with	SelectionWindow		ile biter
 Open	OpenWithWindow		Aç
 You must have at least one attribute showing.	PoseView		En azından bir öznitelik görünür olmalı.
 Cut	FilePanelPriv		Kes
+Finish: after several years	StatusWindow		Bitiş: Birkaç yıl içinde
 Favorites	FilePanelPriv		Favoriler
 Point	AttributesView		Nokta
 home	B_USER_DIRECTORY		ev
@@ -290,7 +291,7 @@ The Tracker must be running to set the default printer.	PoseView		Öntanımlı y
 calculating…	InfoWindow		hesaplanıyor…
 Preferred for file	OpenWithWindow		Dosya için tercih edilen
 OK	AutoMounterSettings		Tamam
-copying	FSUtils		kopyaladığınız
+copying	FSUtils		kopyalanıyor
 Get info	FilePanelPriv		Bilgi al
 MIME String	AttributesView		MIME dizisi
 Delete	ContainerWindow		Sil
@@ -307,7 +308,6 @@ Delete	FSUtils		Sil
 Edit name	ContainerWindow		Yeniden adlandır
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		\"%document\" açılamıyor (Eksik sembol: %symbol).\n
 ASCII Text	AttributesView		ASCII metin
-More options	FindPanel		Daha fazla seçenek
 Atom reference	AttributesView		Atom başvurusu
 config	B_USER_CONFIG_DIRECTORY		yapılandırma
 Error moving \"%name\".	FSUtils		\"%name\" taşınırken hata.
@@ -341,7 +341,6 @@ Make active printer	ContainerWindow		Etkin yazıcı yap
 Copy to	ContainerWindow		Kopyala
 Name	SelectionWindow		Ad
 by attribute	FindPanel		öznitelik ile
- info	InfoWindow		 bilgisi
 Write	FilePermissionsView		Yazma
 <%ld bytes of data>	AttributesView		<%ld bayt veri>
 If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Sistem klasörünü veya içeriğini değiştirirseniz %osName çalışmayacaktır!\n\nBunu yapmak istediğinizden emin misiniz?\n\nYine de değiştirmek istiyorsanız, Shift düğmesini basılı tutun ve \"Ne yaptığımı biliyorum\"a tıklayın.
@@ -384,7 +383,7 @@ Open parent	ContainerWindow		Üst klasörü aç
 Find…	ContainerWindow		Bul…
 moving	FSUtils		taşıdığınız
 Single window navigation	SettingsView		Tek pencereli dolaşım
-greater than	FindPanel		daha büyük
+greater than	FindPanel		şundan büyük:
 Add	FindPanel		Ekle
 Created:	InfoWindow		Oluşturulma:
 Edit Query template	FindPanel		Sorgu şablonunu düzenle
@@ -396,7 +395,6 @@ Proceed	FSUtils		Sürdür
 Edit favorites…	FilePanelPriv		Favorileri düzenle…
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		Bir klasörü kendi içine veya herhangi bir alt klasörünün içine taşıyamazsınız.
 New	ContainerWindow		Yeni
-Fewer options	FindPanel		Daha az seçenek
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Ögeleri \"Diskler\" penceresinin içindeki disk simgelerinden birinin üzerine bırakmalısınız.
 If you alter %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		%target ögesini değiştirirseniz %osName düzgün çalışmayabilir!\n\nBunu yapmak istediğinizden emin misiniz?
 Sorry, you can't copy items to the Trash.	FSClipBoard		Üzgünüm, ögeler Çöp'e kopyalanamaz.
@@ -447,7 +445,7 @@ Sorry, could not create a new folder.	FSUtils		Üzgünüm, yeni bir klasör olu�
 Select all	VirtualDirectoryWindow		Tümünü seç
 Rename	FSUtils	button label	Yeniden adlandır
 Clean up all	ContainerWindow		Hepsini toparla
-Add current folder	FilePanelPriv		Şu anki klasörü ekle
+Add current folder	FilePanelPriv		Geçerli klasörü ekle
 Description:	InfoWindow		Açıklama:
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Seçili öge/ögeleri silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.
 Grayscale picture	AttributesView		Gri tonlu resim

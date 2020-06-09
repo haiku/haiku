@@ -1,0 +1,9 @@
+1	croatian	x-vnd.Haiku-keystore_server	4158779977
+Allow once	AppAccessRequestWindow		Dopusti jednom
+Password:	KeyRequestWindow		Lozinka:
+Cancel	KeyRequestWindow		Otkaži
+This application has been updated since it was last granted access.	AppAccessRequestWindow		Ova aplikacija je ažurirana otkad joj je zadnji put dozvoljen pristup.
+Allow always	AppAccessRequestWindow		Dopusti uvijek
+Unlock	KeyRequestWindow		Otključaj
+The application:\n%signature% (%path%)\n\n	AppAccessRequestWindow		Aplikacija:\n%signature% (%path%)\n\n
+This application hasn't been granted access before.	AppAccessRequestWindow		Ovoj aplikaciji prije nije bio dozvoljen pristup.

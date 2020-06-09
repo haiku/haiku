@@ -1,0 +1,17 @@
+1	greek, modern (1453-)	x-vnd.Haiku-DataTranslations	4156631142
+Path:	DataTranslations		Διαδρομή:
+Name:	DataTranslations		Όνομα:
+DataTranslations - Note	DataTranslations		Μετατροπέας - Σημείωση
+The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		Το στοιχείο '%name' δεν φαίνεται να είναι ένας Μετατροπέας και δεν θα εγκατασταθεί.
+Could not install %s:\n%s	DataTranslations		Αδυναμία εγκατάστασης του %s:\n%s
+OK	DataTranslations		Εντάξει
+Cancel	DataTranslations		Ακύρωση
+Info:	DataTranslations		Πληροφορίες:
+DataTranslations - Error	DataTranslations		Μετατροπέας - Σφάλμα
+Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Χρησιμοποιήστε αυτό τον πίνακα ελέγχου για να θέσετε τις προεπιλεγμένες τιμές για τους μετατροπείς, για να χρησιμοποιηθούν όταν δε θα καθοριστούν άλλες ρυθμίσεις απο μια εφαρμογή.
+The new translator has been installed successfully.	DataTranslations		Ο νέος μετατροπέας προστέθηκε με επιτυχία.
+An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Ένα στοιχείο που ονομάζεται '%name' ήδη υπάρχει στον φάκελο Μετατροπέων! Να αντικατασταθεί ο υπάρχων μετατροπέας;
+DataTranslations	System name		Μετατροπέας
+Info	DataTranslations		πληροφορίες
+Overwrite	DataTranslations		Αντικατάσταση
+Version:	DataTranslations		Έκδοση:

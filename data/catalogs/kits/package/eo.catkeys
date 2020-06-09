@@ -1,0 +1,10 @@
+1	esperanto	x-vnd.Haiku-libpackage	134767648
+Fetching repository-cache from %url	RefreshRepositoryRequest		Ŝargado de deponeja kaŝmemoro el %url
+Validating checksum for %repositoryName	RefreshRepositoryRequest		Validigado de kontrolsumo por %repositoryName
+Failed to remove transaction directory	PackageManagerKit		Malsukcesis forigigo de transakcia dosierujo
+Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		Malsukcesis preno de agordo por deponejo \"%s\". Preterlasite.
+Refreshing repository \"%s\" failed	PackageManagerKit		Malsukcesis renovigo por deponejo \"%s\"
+Fetching repository checksum from %url	RefreshRepositoryRequest		Ŝargado de deponeja kontrolsumo el %url
+Failed to get repository names	PackageManagerKit		Malsukcesis preno de deponeja nomo
+Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		Malsukcesis preno de kaŝmemoro por deponejo \"%s\". Preterlasite.
+Package %s-%s doesn't have a matching requires for its base package \"%s\"	PackageManagerKit		La pakaĵo %s-%s ne entenas taŭgajn postulojn por ĝia baza pakaĵo \"%s\"

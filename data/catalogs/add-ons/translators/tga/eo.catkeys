@@ -1,0 +1,16 @@
+1	esperanto	x-vnd.Haiku-TGATranslator	3075011211
+Save with RLE compression	TGAView		Konservi RLE-densige
+Targa image (%d bits truecolor)	TGATranslator		Targa bildo (%d bita verkolora)
+Ignore TGA alpha channel	TGAView		Malatenti alfa kanalon de TGA
+Targa image (%d bits colormap)	TGATranslator		Targa bildo (%d bita kolormapa)
+TGA image translator	TGAView		TGA bildotradukilo
+Targa image (%d bits RLE colormap)	TGATranslator		Targa bildo (%d bita RLE kolormapa)
+Targa image (%d bits gray)	TGATranslator		Targa bildo (%d bita griza)
+Written by the Haiku Translation Kit Team	TGAView		Verkis la Haiku Translation Kit Teamo
+Targa image (%d bits RLE truecolor)	TGATranslator		Targa bildo (%d bita RLE verkolora)
+TGA images	TGATranslator		TGA bildoj
+Version %d.%d.%d, %s	TGAView		Versio %d.%d.%d, %s
+TGATranslator Settings	TGATranslator		Agordo de TGATranslator
+TGA image translator	TGATranslator		TGA bildotradukilo
+Targa image (%d bits RLE gray)	TGATranslator		Targa bildo (%d bita RLE griza)
+TGA Settings	TGAMain		Agordo de TGA

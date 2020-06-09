@@ -1,7 +1,7 @@
 1	catalan; valencian	x-vnd.Haiku-GLTeapot	1569683445
 Upper center	TeapotWindow		A dalt al centre
 Lighting	TeapotWindow		Il·luminació
-Off	TeapotWindow		Apaga
+Off	TeapotWindow		Desactivat
 Lower left	TeapotWindow		Inferior esquerre
 White	TeapotWindow		Blanc
 Yellow	TeapotWindow		Groc
@@ -12,13 +12,13 @@ Filled polygons	TeapotWindow		Polígons plens
 Settings	TeapotWindow		Paràmetres
 Fog	TeapotWindow		Boira
 Backface culling	TeapotWindow		Supressió de cares posteriors
-Z-buffered	TeapotWindow		Z-emmagatzematge intermedi
+Z-buffered	TeapotWindow		Z-memòria intermèdia
 File	TeapotWindow		Fitxer
 Perspective	TeapotWindow		Perspectiva
 GLTeapot	System name		GLTeapot
 Green	TeapotWindow		Verd
 Right	TeapotWindow		A la dreta
 FPS display	TeapotWindow		Mostra la velocitat de l'animació
-Add a teapot	TeapotWindow		Afegeix una tetera
+Add a teapot	TeapotWindow		Afegeix-hi una tetera
 Red	TeapotWindow		Vermell
 Lights	TeapotWindow		Llums

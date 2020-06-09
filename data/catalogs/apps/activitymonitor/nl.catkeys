@@ -1,47 +1,46 @@
-1	dutch; flemish	x-vnd.Haiku-ActivityMonitor	1155619009
-P-faults	DataSource		P-onderbrekingen
-Media nodes	DataSource		Media-eenheid
-Threads	DataSource		Threads
-Always on top	ActivityWindow		Altijd bovenop
-Add graph	ActivityWindow		Voeg grafiek toe
+1	dutch; flemish	x-vnd.Haiku-ActivityMonitor	3672498538
 Teams	DataSource		Teams
+Semaphores	DataSource		Semaforen
+TX	DataSource	Shorter version for Sending	TX
+Block cache memory	DataSource		Geheugen blok-cache
+%lld ms	SettingsWindow		%lld ms
 MiB	DataSource		MiB
-Network send	DataSource		Netwerk (uitgaand)
-CPU usage (combined)	DataSource		CPU-gebruik (gecombineerd)
-CPU	DataSource		CPU
-Used memory	DataSource		Gebruikt geheugen
-Cached memory	DataSource		Geheugen in cache
-Apps	DataSource		Toepassingen
-Show legend	ActivityView		Toon legenda
+Media nodes	DataSource		Media-eenheid
 Text clipboard	DataSource		Tekst klembord
-Settings	ActivityWindow		Instellingen
+Network send	DataSource		Netwerk (uitgaand)
+Running applications	DataSource		Lopende toepassingen
+Cache	DataSource		Cache
+CPU usage (combined)	DataSource		CPU-gebruik (gecombineerd)
+Threads	DataSource		Threads
 Receiving	DataSource		Ontvangend
+Remove graph	ActivityView		Verwijder grafiek
+Swap space	DataSource		Swap-ruimte
+CPU	DataSource		CPU
+ActivityMonitor	System name		ActivityMonitor
+Update time interval:	SettingsWindow		Interval bijwerktijd:
+RX	DataSource	Shorter version for Receiving.	RX
 Settings…	ActivityWindow		Instellingen...
+Block cache	DataSource		Blok-cache
+Memory	DataSource		Geheugen
+CPU usage	DataSource		CPU-gebruik
+Quit	ActivityWindow		Afsluiten
+Raw clipboard	DataSource		Onbewerkt klembord
+Settings	ActivityWindow		Instellingen
+Used memory	DataSource		Gebruikt geheugen
+%.1f faults/s	DataSource		%.1f fout(en)
+Show legend	ActivityView		Toon legenda
+Cached memory	DataSource		Geheugen in cache
+File	ActivityWindow		Bestand
 Ports	DataSource		Poorten
 Page faults	DataSource		Page-onderbrekingen
-Sending	DataSource		Versturend
-Cache	DataSource		Cache
-%.1f faults/s	DataSource		%.1f fout(en)
-Update time interval:	SettingsWindow		Interval bijwerktijd:
-TX	DataSource	Shorter version for Sending	TX
-Quit	ActivityWindow		Afsluiten
-Block cache memory	DataSource		Geheugen blok-cache
-Remove graph	ActivityView		Verwijder grafiek
-%lld sec.	SettingsWindow		%lld sec.
-%lld ms	SettingsWindow		%lld ms
-CPU usage	DataSource		CPU-gebruik
-Raw clipboard	DataSource		Onbewerkt klembord
-Sems	DataSource		Semaforen
-%.1f MiB	DataSource		%.1f MiB
-ActivityMonitor	System name		ActivityMonitor
-Running applications	DataSource		Lopende toepassingen
-Semaphores	DataSource		Semaforen
-Block cache	DataSource		Blok-cache
-Swap space	DataSource		Swap-ruimte
-Swap	DataSource		Swap
-File	ActivityWindow		Bestand
-usage	DataSource		gebruik
+Apps	DataSource		Toepassingen
 Additional items	ActivityView		Toegevoegde items
+Add graph	ActivityWindow		Voeg grafiek toe
+Sending	DataSource		Versturend
+%.1f MiB	DataSource		%.1f MiB
+Always on top	ActivityWindow		Altijd bovenop
+Swap	DataSource		Swap
+%lld sec.	SettingsWindow		%lld sec.
+P-faults	DataSource		P-onderbrekingen
+Sems	DataSource		Semaforen
 Network receive	DataSource		Netwerk (ontvangst)
-Memory	DataSource		Geheugen
-RX	DataSource	Shorter version for Receiving.	RX

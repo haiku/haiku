@@ -1,0 +1,16 @@
+1	esperanto	x-vnd.Haiku-TIFFTranslator	2234713102
+TIFF Library:	TIFFView		TIFF kodoteko:
+RLE (Packbits)	TIFFView		RLE (Packbits)
+ZIP (Deflate)	TIFFView		ZIP (Maldensiga)
+identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: nevalida dokumentindekso\n
+Use compression:	TIFFView		Densigi:
+TIFF image translator	TIFFView		TIFF bildotradukilo
+TIFF image	TIFFTranslator		TIFF bildo
+TIFF Settings	TIFFMain		Agordo de TIFF
+TIFF image translator	TIFFTranslator		TIFF bildotradukilo
+identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: ne povas atribui dosierujon\n
+Version %d.%d.%d, %s	TIFFView		Versio %d.%d.%d, %s
+TIFFTranslator Settings	TIFFTranslator		Agordo de TIFFTranslator
+LZW	TIFFView		LZW
+TIFF images	TIFFTranslator		TIFF bildoj
+None	TIFFView		Neniu

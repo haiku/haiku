@@ -1,0 +1,23 @@
+1	esperanto	x-vnd.haiku-registrar	2599857937
+Cancel	ShutdownProcess		Nuligi
+OK	ShutdownProcess		Bone
+Do you really want to shut down the system?	ShutdownProcess		Ĉu vi certas, ke vi deziras malŝalti la komputilon?
+Shutdown status	ShutdownProcess		Malŝalta stato
+Shut down	ShutdownProcess		Malŝalti
+The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		La programo \"%appName%\" povas esti blokita per neevitebla fenestro.
+System is shut down	ShutdownProcess		Sistemo malŝaltiĝis.
+Restart system	ShutdownProcess		Restartigi komputilon
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Programo \"%appName%\" ĉesigis la malŝaltan procedon.
+Asking background applications to quit.	ShutdownProcess		Petante fonajn programojn ĉesiĝi.
+Do you really want to restart the system?	ShutdownProcess		Ĉu vi certas, ke vi deziras restartigi la komputilon?
+Restart	ShutdownProcess		Restartigi
+It's now safe to turn off the computer.	ShutdownProcess		Nun eblas sekure malŝalti la komputilon.
+Asking other processes to quit.	ShutdownProcess		Petante aliajn procezojn ĉesiĝi.
+Cancel shutdown	ShutdownProcess		Nuligi sistemfermon
+Restarting…	ShutdownProcess		Restartante…
+%action%?	ShutdownProcess		%action%?
+Tidying things up a bit.	ShutdownProcess		Iome lavumadas.
+Kill application	ShutdownProcess		Mortigi programojn
+Shutdown aborted	ShutdownProcess		Malŝalto estas ĉesigita
+Shutting down…	ShutdownProcess		Malŝaltante…
+Asking \"%appName%\" to quit.	ShutdownProcess		Petante \"%appName%\" ĉesiĝi.

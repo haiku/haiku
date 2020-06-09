@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-libtracker	659027911
+1	italian	x-vnd.Haiku-libtracker	4118767010
 Created	ContainerWindow		Creato
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Apri e rendi preferito
@@ -132,7 +132,7 @@ Cancel	FSClipBoard		Annulla
 Modified	PoseView		Modificato
 Move to Trash	ContainerWindow		Sposta nel Cestino
 All files and folders	FindPanel		Tutti i file e cartelle
-Add-ons	ContainerWindow		Componenti aggiuntivi
+Add-ons	ContainerWindow		Componenti Aggiuntivi
 Too many parenthesis.	libtracker		Troppe parentesi.
 Increase size	ContainerWindow		Aumenta dimensioni
 \nShould this be fixed?	FSUtils		\nCorreggo il problema?
@@ -262,6 +262,7 @@ ends with	SelectionWindow		finisce con
 Open	OpenWithWindow		Apri
 You must have at least one attribute showing.	PoseView		Non si può avere meno di un attributo visibile.
 Cut	FilePanelPriv		Taglia
+Finish: after several years	StatusWindow		Completato: dopo diversi anni
 Favorites	FilePanelPriv		Preferiti
 Point	AttributesView		Punto
 home	B_USER_DIRECTORY		home
@@ -307,7 +308,6 @@ Delete	FSUtils		Elimina
 Edit name	ContainerWindow		Modifica nome
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Non è stato possibile aprire \"%document\" (Simbolo mancante: %symbol). \n
 ASCII Text	AttributesView		Testo ASCII
-More options	FindPanel		Altre opzioni
 Atom reference	AttributesView		Riferimento Atom
 config	B_USER_CONFIG_DIRECTORY		configurazione
 Error moving \"%name\".	FSUtils		Errore durante lo spostamento di \"%name\".
@@ -341,7 +341,6 @@ Make active printer	ContainerWindow		Rendi la stampante attiva
 Copy to	ContainerWindow		Copia in
 Name	SelectionWindow		Nome
 by attribute	FindPanel		per attributo
- info	InfoWindow		 informazioni
 Write	FilePermissionsView		Scrittura
 <%ld bytes of data>	AttributesView		<%ld byte di dati>
 If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Se modifichi la cartella di sistema o il suo contenuto, non sarai più in grado di avviare %osName!\n\nSei sicuro di voler procedere?\n\nPer modificare la cartella di sistema o il suo contenuto, tieni premuto il tasto Maiusc e clicca su \"So quello che faccio\".
@@ -396,7 +395,6 @@ Proceed	FSUtils		Procedi
 Edit favorites…	FilePanelPriv		Modifica preferiti…
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		Non è possibile spostare una cartella dentro a se stessa o a qualsiasi altra delle sue sotto-cartelle
 New	ContainerWindow		Nuovo
-Fewer options	FindPanel		Meno opzioni
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Trascinare gli elementi su una delle icone dei dischi nella finestra \"Dischi\".
 If you alter %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Se modifichi %target, %osName potrebbe non fuinzionare correttamente!\n\nSei sicuro di voler procedere?
 Sorry, you can't copy items to the Trash.	FSClipBoard		Non è possibile copiare elementi nel Cestino.
@@ -493,14 +491,14 @@ The file \"%name\" already exists in the specified folder. Do you want to replac
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Devi trascinare e lasciare gli elementi su una delle icone del disco nella finestra \"Disks\".
 Version:	InfoWindow		Versione:
 OK	PoseView		OK
-Add-ons	DeskWindow		Componenti aggiuntivi
+Add-ons	DeskWindow		Componenti Aggiuntivi
 Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Sei sicuro di voler spostare o copiare gli elementi selezionati in questa cartella?
 Find	FindPanel		Trova
 Empty folder	NavMenu		Cartella vuota
 Defaults	TrackerSettingsWindow		Predefiniti
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Spiacenti, non c'è abbastanza spazio libero sul volume di destinazione per copiare gli elementi selezionati.
 True-color picture	AttributesView		Immagine True-color
-Add-ons	FilePanelPriv		Componenti aggiuntivi
+Add-ons	FilePanelPriv		Componenti Aggiuntivi
 96 x 96	DeskWindow		96 x 96
 Empty folder	SlowContextPopup		Cartella vuota
 Alignment	AttributesView		Allineamento

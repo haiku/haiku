@@ -1,4 +1,4 @@
-1	polish	x-vnd.Be-MAIL	1559146339
+1	polish	x-vnd.Be-MAIL	1477453861
 Set to Saved	Mail		Ustaw do Zapisanych
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Twój główny tekst zawiera %ld niekodowalnych znaków. Być może inny zestaw znaków będzie lepiej działać? Wybierz Wyślij aby wysłać mimo wszystko (znak zastępczy będzie użyty w miejscach niekodowalnych znaków), lub wybierz Anuluj aby wrócić i poprawić to.
 Text wrapping:	Mail		Zawijanie tekstu:
@@ -8,10 +8,12 @@ Reply	Mail		Odpowiedz
 Next message	Mail		Następna wiadomość
 Mailing	Mail		Pocztowe
 Unread	Mail		Nieprzeczytane
+Same sender	Mail		Ten sam nadawca
 Copy to new	Mail		Kopiuj do nowego
 Save as draft	Mail		Zapisz jako szkic
 Encoding:	Mail		Kodowanie:
 Print	Mail		Drukuj
+Decrease quote level	Mail		Zmniejsz poziom cytatu
 Encoding	Mail		Kodowanie
 Default account:	Mail		Domyślne konto
 Message	Mail		Wiadomość
@@ -31,6 +33,7 @@ Only files can be added as attachments.	Mail		Tylko pliki mogą być dodane jako
 Close	Mail		Zamknij
 Untitled	Mail		Bez tytułu
 Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Usuwanie załączników z przekazywanych wiadomości nie jest jeszcze zaimplementowane!\nNie będzie to jeszcze działać prawidłowo.
+Same recipient	Mail		Ten sam odbiorca
 Previous message	Mail		Poprzednia wiadomość
 (Address unavailable)	Mail		(Adres niedostępny)
 Mail	System name		Poczta
@@ -82,6 +85,7 @@ Colored quotes:	Mail		Kolorowe cytaty:
 Automatic	Mail		Automatyczne
 Open this link	Mail		Otwórz ten odnośnik
 Auto signature:	Mail		Automatyczna sygnaturka:
+Same subject	Mail		Ten sam temat
 Send	Mail		Wyślij
 Open draft	Mail		Otwórz szkic
 Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Pozostaw jako „New”
@@ -161,4 +165,5 @@ Spam	Mail		Spam
 Couldn't open this signature. Sorry.	Mail		Nie można otworzyć tej sygnaturki. Przepraszamy.
 Revert	Mail		Cofnij
 Unknown	Mail		Nieznany
+Increase quote level	Mail		Zwiększ poziom cytatu
 Add enclosure…	Mail		Dodaj załącznik…

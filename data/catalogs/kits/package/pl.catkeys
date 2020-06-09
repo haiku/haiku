@@ -1,0 +1,10 @@
+1	polish	x-vnd.Haiku-libpackage	134767648
+Fetching repository-cache from %url	RefreshRepositoryRequest		Pobieranie pamięci podręcznej repozytorium z %url
+Validating checksum for %repositoryName	RefreshRepositoryRequest		Sprawdzanie sumy kontrolnej %repositoryName
+Failed to remove transaction directory	PackageManagerKit		Nie udało się usunąć katalogu transakcji
+Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		Nie udało się uzyskać konfiguracji repozytorium „%s”. Pomijanie.
+Refreshing repository \"%s\" failed	PackageManagerKit		Odświeżanie repozytorium „%s” nieudane
+Fetching repository checksum from %url	RefreshRepositoryRequest		Pobieranie sumy kontrolnej repozytorium z %url
+Failed to get repository names	PackageManagerKit		Nie udało się pobrać nazw repozytoriów
+Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		Nie udało się uzyskać pamięci podręcznej dla repozytorium „%s”. Pomijanie.
+Package %s-%s doesn't have a matching requires for its base package \"%s\"	PackageManagerKit		Pakiet %s-%s nie ma odpowiadających wymagań dla bazowego pakietu „%s”

@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Screen	4090394050
+1	dutch; flemish	x-vnd.Haiku-Screen	133788249
 no	Screen		nee
 bits/pixel	Screen		bits/pixel
 15 bits/pixel, 32768 colors	Screen		15 bits/pixel, 32768 kleuren
@@ -17,6 +17,7 @@ vertically	Screen		verticaal
 All workspaces	Screen		Alle werkplekken
 Use laptop panel:	Screen		Gebruik laptopscherm:
 Could not write VESA mode settings file:\n\t	Screen		Kon instellingenbestand voor de VESA-modus niet instellen:\n\t
+Display info	Screen		Scherminformatie
 Settings will revert in %seconds.	Screen		Instellingen zullen ongedaan gemaakt worden in %seconds.
 Cancel	Screen		Annuleren
 Other…	Screen		Anders...
@@ -33,6 +34,7 @@ Warning	Screen		Waarschuwing
 24 bits/pixel, 16 Million colors	Screen		24 bits/pixel, 16 miljoen kleuren
 Hz	Screen		Hz
 Workspaces	Screen		Werkplekken
+Brightness:	Screen		Helderheid:
 32 bits/pixel, 16 Million colors	Screen		32 bits/pixel, 16 miljoen kleuren
 Done	Screen		Klaar
 16 bits/pixel, 65536 colors	Screen		16 bits/pixel, 65536 kleuren

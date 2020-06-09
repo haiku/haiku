@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Installer	116830250
+1	japanese	x-vnd.Haiku-Installer	3753756669
 Performing installation.	InstallProgress		インストールを実行しています。
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		メニューからインストールディスクを選択し、次に\"開始\"ボタンをクリックしてください。
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		インストーラーを閉じる前に、DriveSetup を終了してください。
@@ -31,9 +31,7 @@ Finishing installation.	InstallProgress		インストールを終了していま
 Install from:	InstallerWindow		インストール元:
 Additional disk space required: 0.0 KiB	InstallerWindow		必要な追加ディスク容量: 0.0 KiB
 This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		ベータ品質のソフトウェアです。重要なデータを失う恐れがあります。こまめにバックアップをとってください!さらに、次の点に留意してください。\n\n\n
-3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)はじめてHaikuのブートに成功したら、\"Welcome\"と\"Userguide\"を必ず読んでください。これらは、デスクトップ上のリンクおよび、WebPositiveのブックマークにあります。\n\n
 ???	InstallerWindow	Unknown currently copied item	???
-Install anyway	InstallProgress		それでもインストールする
 1)   If you are installing Haiku onto real hardware (not inside an emulator), you may want to prepare a hard disk partition from another OS (you could, for example, use a GParted Live-CD, which can also resize existing partitions to make room).\nYou can also set up partitions by launching DriveSetup from Installer, but you won't be able to resize existing partitions with it. While DriveSetup has been quite thoroughly tested over the years, it's recommended to have up-to-date backups of the other partitions on your system. Just in case…	InstallerApp		1)Haikuを(エミュレータでなく)実機にインストールする場合は、先にほかのOSからハードディスクのパーティションを用意しておくことが望ましいです (たとえば、GParted LiveCDが使えます。それはまた、空き容量を作成するため既存のパーティションのリサイズもできます)。\nまた、インストーラーからDriveSetupを呼び出してパーティションを設定できます。しかし、既存パーティションのリサイズはできません。DriveSetupは、長年に渡って徹底的にテストされていますが、システムの他のパーティションの最新のバックアップを取ることを勧めます。念の為…
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		ポップアップメニューからインストール元とインストール先を選択し、次に\"開始\"ボタンをクリックしてください。
 Hide optional packages	InstallerWindow		オプショナルパッケージを隠す
@@ -58,7 +56,6 @@ Collecting copy information.	InstallProgress		コピー元の情報を集めて�
 Show optional packages	InstallerWindow		オプショナルパッケージを表示
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		インストール先ディスクの空き容量が不足している可能性があります。他のディスクを選択するか、インストールするオプションを減らしてください。
 Installation canceled.	InstallProgress		インストールが中断されました。
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		インストール先ボリュームにはデータがあります。それでもインストールしますか?\n\n注意: システムフォルダーはインストール元からそのままクリーンコピーされますが、その他のフォルダーはマージされ、両方のボリュームに存在するファイルやリンクはインストール元のバージョンで上書きされます。
 OK	InstallerApp		OK
 Are you sure you want to abort the installation?	InstallerWindow		本当にインストールを中断しますか?
 Stop	InstallerWindow		中断

@@ -1,0 +1,3 @@
+1	greek, modern (1453-)	x-vnd.Haiku-FTPService	4086152171
+FTP server	FTPServiceAddOn		Διακομιστής FTP
+The FTP server allows you to remotely access the files on your machine using the FTP protocol.\n\nPlease note that it is an insecure and unencrypted connection.	FTPServiceAddOn		Ο διακομιστής FTP επιτρέπει την απομακρυσμένη πρόσβαση αρχείων στον υπολογιστή σας μέσω του πρωτοκόλλου FTP.\n\nΠαρακαλώ να λάβετε υπόψη ότι αποτελεί μια ανασφαλή, μη-κρυπτογραφημένη μέθοδο σύνδεσης.

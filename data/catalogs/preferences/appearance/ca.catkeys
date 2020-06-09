@@ -1,7 +1,7 @@
 1	catalan; valencian	x-vnd.Haiku-Appearance	663472720
-Control border	Colors tab		Control de la vora
+Control border	Colors tab		Vora del control
 Control mark	Colors tab		Marca de control
-Off	AntialiasingSettingsView		Apagat
+Off	AntialiasingSettingsView		Desactivat
 Window border	Colors tab		Vora de la finestra
 Inactive window tab	Colors tab		Pestanya de la finestra inactiva
 Defaults	APRWindow		Valors predeterminats
@@ -20,7 +20,7 @@ Antialiasing menu	AntialiasingSettingsView		Menú del suavitzat
 Success	Colors tab		Correcte
 About	DecorSettingsView		Quant a
 Shine	Colors tab		Llum
-Arrow style	DecorSettingsView		Estil de la fletxa
+Arrow style	DecorSettingsView		Estil de fletxa
 On	AntialiasingSettingsView		Activat
 Decorator:	DecorSettingsView		Decorador:
 Menu background	Colors tab		Fons del menú
@@ -50,7 +50,7 @@ Window tab	Colors tab		Pestanya de la finestra
 Link text	Colors tab		Text de l'enllaç
 Tooltip background	Colors tab		Fons del consell
 ControlLook:	DecorSettingsView		Control d'aparença:
-Scroll bar thumb	Colors tab		Cursor de la barra de desplaçament
+Scroll bar thumb	Colors tab		Miniatura de la barra de desplaçament
 Default	DecorSettingsView		Per defecte
 Link visited	Colors tab		Enllaç visitat
 Selected menu item border	Colors tab		Vora de l'element seleccionat del menú
@@ -61,7 +61,7 @@ Selected list item background	Colors tab		Fons de l'element seleccionat de la ll
 Inactive window tab text	Colors tab		Test de la pestanya de les finestres inactives
 Navigation base	Colors tab		Base de la navegació
 Fonts	APRWindow		Tipus de lletra
-The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	A la taula i al llit, al primer crit.
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Jove xef, sol·licito que porti cafè descafeïnat i whisky amb quinze glaçons d'hidrogen!
 Grayscale	AntialiasingSettingsView		Escala de grisos
 Antialiasing type:	AntialiasingSettingsView		Tipus de suavitzat:
 Panel text	Colors tab		Text del plafó
@@ -72,8 +72,8 @@ Monospaced fonts only	AntialiasingSettingsView		Només tipus de lletra monoespai
 Document text	Colors tab		Text del document
 Inactive window border	Colors tab		Vora de la finestra inactiva
 Colors	APRWindow		Colors
-About control look	DecorSettingsView		Quant al control d'aparença
-Control highlight	Colors tab		Control de realçat
+About control look	DecorSettingsView		Quant al Control d'aparença
+Control highlight	Colors tab		Control de realçament
 Status bar	Colors tab		Barra d'estat
 Link hover	Colors tab		Pas per l'enllaç
 Single:	DecorSettingsView		Senzill

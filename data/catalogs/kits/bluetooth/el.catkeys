@@ -1,0 +1,88 @@
+1	greek, modern (1453-)	x-vnd.Haiku-Bluetooth	3550394259
+Positioning	DeviceClass		Τοποθέτηση
+Controller	DeviceClass		Ελεγκτής
+Common ISDN access	DeviceClass		Κοινή πρόσβαση ISDN
+Unknown (reserved) minor device class	DeviceClass		Άγνωστη (δεσμευμένη) μικρή κατηγορία συσκευών
+Uncategorized	DeviceClass		Χωρίς κατηγορία
+Keyboard	DeviceClass		Πληκτρολόγιο
+Smart phone	DeviceClass		Smart phone
+VCR	DeviceClass		VCR
+Cellular	DeviceClass		Κινητό
+Audio	DeviceClass		Ήχος
+Audio/Video	DeviceClass		Ήχος/Εικόνα
+Car audio	DeviceClass		Ήχος αυτοκινήτου
+Major class: 	DeviceClass		Κύρια κατηγορία: 
+HiFi audio device	DeviceClass		Συκσκευή ήχου HiFi
+Microphone	DeviceClass		Μικρόφωνο
+Capturing	DeviceClass		Αποκόμιση
+Jacket	DeviceClass		Ζακέτα
+50-67% utilized	DeviceClass		50-67% σε χρήση
+Headphones	DeviceClass		Ακουστικά
+Imaging	DeviceClass		Απεικόνιση
+Device conforms to the headset profile	DeviceClass		Η συσκευή συμμορφώνεται με το προφίλ των ακουστικών
+Remote control	DeviceClass		Τηλεχειρηστήριο
+Fully available	DeviceClass		Πλήρως διαθέσιμο
+#CommandFailed#Not Valid name	RemoteDevice		#CommandFailed#Μη έγκυρη ονομασία
+Server	DeviceClass		Εξυπηρετητής
+No service available	DeviceClass		Δεν υπάρχει διαθέσιμη υπηρεσία
+Printer	DeviceClass		Εκτυπωτής
+Card reader	DeviceClass		Αναγνώστης καρτών μνήμης
+Wired modem or voice gateway	DeviceClass		Ενσύρματο μόντεμ ή συσκευή τηλεφωνίας
+#ServerNotReady#Not Valid name	RemoteDevice		#ServerNotReady#Μη έγκυρη ονομασία
+#NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError#Μη έγκυρη ονομασία
+Camcorder	DeviceClass		Βιντεοκάμερα
+#NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest#Μη έγκυρη ονομασία
+17-33% utilized	DeviceClass		17-33% σε χρήση
+Desktop workstation	DeviceClass		Χώρος επιφάνειας εργασίας
+Unspecified	DeviceClass		Απροσδιόριστο
+Miscellaneous	DeviceClass		Διάφορα
+Robot	DeviceClass		Ρομπότ
+Vehicle	DeviceClass		Όχημα
+LAN access	DeviceClass		Πρόσβαση LAN
+Glasses	DeviceClass		Γυαλιά
+Phone	DeviceClass		Τηλέφωνο
+Laptop	DeviceClass		Φορητός υπολογιστής
+67-83% utilized	DeviceClass		67-83% σε χρήση
+Cordless	DeviceClass		Ασύρματο
+Invalid device class!\n	DeviceClass		Μη έγκυρη κατηγορία συσκευής!\n
+Minor class: 	DeviceClass		Μικρή κατηγορία: 
+Doll/Action figure	DeviceClass		Κούκλα/Φιγούρα δράσης
+Not implemented	RemoteDevice		Δεν εφαρμόζεται
+33-50% utilized	DeviceClass		33-50% σε χρήση
+Gaming/Toy	DeviceClass		Gaming/Παιχνίδια
+Video camera	DeviceClass		Βιντεοκάμερα
+Handheld	DeviceClass		Φορητή συσκευή
+Service classes: 	DeviceClass		Κατηγορίες υπηρεσιών: 
+Loudspeaker	DeviceClass		Ηχείο
+83-99% utilized	DeviceClass		83-99% σε χρήση
+SIM card reader	DeviceClass		Αναγνώστης καρτών SIM
+Computer	DeviceClass		Υπολογιστής
+Scanner	DeviceClass		Σαρωτής
+Wearable	DeviceClass	A wearable computer	Wearable
+Display	DeviceClass		Εμφάνιση
+Gamepad	DeviceClass		Χειρηστήριο
+Video monitor	DeviceClass		Οθόνη βίντεο
+Palm	DeviceClass	A palm-held device	Συσκευή παλάμης
+Joystick	DeviceClass		Χειριστήριο
+Networking	DeviceClass		Δικτύωση
+Telephony	DeviceClass		Τηλεφωνία
+Game	DeviceClass		Παιχνίδι
+Video display and loudspeaker	DeviceClass		Προβολή γραφικών και ηχείο
+Wrist watch	DeviceClass		Ρολόι χειρός
+Sensing device	DeviceClass		Αισθητήρας
+Pointing device	DeviceClass		Συσκευή κατάδειξης
+(reserved)	DeviceClass		(δεσμευμένο)
+Rendering	DeviceClass		Απόδοση
+Information	DeviceClass		Πληροφορίες
+Helmet	DeviceClass		Κράνος
+Pager	DeviceClass	A small radio device to receive short text messages	Βομβητής
+Hands-free	DeviceClass		Συσκευή hands-free
+Digitizer tablet	DeviceClass		Ψηφιακή ταμπλέτα
+Portable audio	DeviceClass		Φορητή συσκευή ήχου
+Camera	DeviceClass		Φωτογραφική μηχανή
+1-17% utilized	DeviceClass		1-17% σε χρήση
+Combo keyboard/pointing device	DeviceClass		Συνδυασμός πληκτρολογίου/συσκευής κατάδειξης
+Video conferencing	DeviceClass		Συσκευή τηλεδιάσκεψης
+Peripheral	DeviceClass		Περιφερειακή συσκευή
+Object transfer	DeviceClass		Μεταφορά αντικειμένου
+Set-top box	DeviceClass		Αποκωδικοποιητής

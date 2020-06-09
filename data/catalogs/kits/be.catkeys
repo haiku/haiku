@@ -2,10 +2,10 @@
 All Rights Reserved.	AboutWindow		Усе правы захаваныя.
 gold master	AboutWindow		залатая
 Undo	TextView		Адвярнуць
+OK	PrintJob		ОК
 gamma	AboutWindow		гамма
 development	AboutWindow		распрацоўны
 OK	Dragger		ОК
-OK	PrintJob		ОК
 Print Server is not responding.	PrintJob		Сервер друку не адказвае.
 About %app%	AboutMenuItem		Пра %app%
 Warning	Dragger		Папярэджанне

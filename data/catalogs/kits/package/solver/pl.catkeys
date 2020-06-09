@@ -1,2 +1,38 @@
-1	polish	x-vnd.Haiku-libsolvsolver	1073061891
+1	polish	x-vnd.Haiku-libsolvsolver	3404387783
+allow architecture change of %source% to %target%	SolverProblemSolution		zezwól na zmianę architektury %source% na %target%
+install %source% from excluded repository	SolverProblemSolution		zainstaluj %source% z wykluczonego repozytorium
 unspecified problem	SolverProblem		nieokreślony problem
+package %source% requires %dependency%, but none of the providers can be installed	SolverProblem		pakiet %source% wymaga %dependency%, ale żaden z dostępnych nie może być zainstalowany
+package %source% implicitly obsoletes %dependency% provided by %target%	SolverProblem		pakiet %source% pośrednio czyni przestarzałym %dependency% dostarczony przez %target%
+nothing provides requested %dependency%	SolverProblem		nic nie dostarcza wymaganego %dependency%
+do not keep %source% installed	SolverProblemSolution		nie zachowuj zainstalownego pakietu %source%
+do not deinstall \"%selection%\"	SolverProblemSolution		nie usuwaj „%selection%”
+install %source% despite its inferior architecture	SolverProblemSolution		zainstaluj %source% mimo gorszej architektury
+conflicting requests	SolverProblem		konfliktujące żądania
+do not install the most recent version of \"%selection%\"	SolverProblemSolution		nie instaluj najnowszej wersji „%selection%”
+allow replacement of %source% with %target%	SolverProblemSolution		zezwól na zamianę %source% na %target%
+package %source% obsoletes %dependency% provided by %target%	SolverProblem		pakiet %source% czyni przestarzałym %dependency% dostarczony przez %target%
+do not forbid installation of %source%	SolverProblemSolution		nie zakazuj instalacji %source%
+allow downgrade of %source% to %target%	SolverProblemSolution		zezwól na zdegradowanie %source% do %target%
+dependency problem	SolverProblem		problem z zależnościami
+%dependency% is provided by the system	SolverProblem		%dependency% nie jest dostarczony przez system
+keep %source% despite its inferior architecture	SolverProblemSolution		zachowaj %source% mimo gorszej architektury
+%source% does not belong to a distupgrade repository	SolverProblem		%source% nie należy do repozytorium aktualizacji dystrybucji
+installed package %source% obsoletes %dependency% provided by %target%	SolverProblem		zainstalowany pakiet %source% czyni przestarzałym %dependency% dostarczony przez %target%
+allow name change of %source% to %target%	SolverProblemSolution		zezwól na zmianę nazwy %source% na %target%
+package %source% conflicts with %dependency% provided by %target%	SolverProblem		pakiet %source% konfliktuje z %dependency% dostarczonym przez %target%
+do something	SolverProblemSolution		zrób coś
+install %selection% despite its old version	SolverProblemSolution		zainstaluj %selection% mimo starszej wersji
+cannot install both %source% and %target%	SolverProblem		nie można zainstalować %source% i %target% naraz
+package %source% is not installable	SolverProblem		pakiet %source% nie jest instalowalny
+problem with installed package %source%	SolverProblem		problem z zainstalowanym pakietem %source%
+allow deinstallation of %source%	SolverProblemSolution		zezwól na usunięcie %source%
+keep %source% from excluded repository	SolverProblemSolution		zachowaj %source% z wykluczonego repozytorium
+keep old %source%	SolverProblemSolution		zachowaj stary %source%
+package %source% conflicts with %dependency% provided by itself	SolverProblem		pakiet %source% konfliktuje z %dependency% dostarczonym przez samego siebie
+allow vendor change from \"%sourceVendor%\" (%source%) to \"%targetVendor%\" (%target%)	SolverProblemSolution		zezwól na zmianę dostawcy z „%sourceVendor%” (%source%) na „%targetVendor” (%target%)
+do not lock \"%selection%\"	SolverProblemSolution		nie blokuj „%selection%”
+do not install \"%selection%\"	SolverProblemSolution		nie instaluj „%selection%”
+nothing provides %dependency% needed by %source%	SolverProblem		nic nie dostarcza %dependency% wymaganego przez %source%
+%source% has inferior architecture	SolverProblem		%source% ma gorszą architekturę
+do not deinstall all resolvables \"%selection%\"	SolverProblemSolution		nie usuwaj wszystkich rozwiązywalnych „%selection%”

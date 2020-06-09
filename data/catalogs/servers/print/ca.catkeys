@@ -2,7 +2,7 @@
 Undefined	ConfigWindow		No definit
 Return the number of available transports	PrintServerApp Scripting		Torna el nombre de transports disponibles
 Return the number of available printers	PrintServerApp Scripting		Torna el nombre d'impressores disponibles
-Get currently available ports/devices	Transport Scripting		Obté els ports i dispositius disponibles en aquest moment
+Get currently available ports/devices	Transport Scripting		Obtén els ports i dispositius disponibles actualment
 Retrieve or select the active printer	PrintServerApp Scripting		Obtingueu o seleccioneu la impressora activa
 Cancel	PrintServerApp		Cancel·la
 Retrieve a specific printer	PrintServerApp Scripting		Obtén una impressora específica
@@ -21,7 +21,7 @@ Print job setup:	ConfigWindow		Configuració de la tasca d'impressió:
 A6	ConfigWindow	ISO 216 paper size	A6
 Portrait	ConfigWindow		Vertical
 All pages	ConfigWindow		Totes les pàgines
-There is no default printer set up.	PrintServerApp		No hi ha cap impressora establerta.
+There is no default printer set up.	PrintServerApp		No hi ha cap impressora predeterminada establerta.
 B5	ConfigWindow	ISO 216 paper size	B5
 A0	ConfigWindow	ISO 216 paper size	A0
 Letter	ConfigWindow	ANSI A (letter), a North American paper size	Carta (8,5 x 11 polzades)
@@ -40,7 +40,7 @@ There are no printers set up.	PrintServerApp		No hi ha cap impressora establerta
 Get name of the transport add-on used for this printer	Printer Scripting		Obtén el complement de transport usat per a aquesta impressora
 All pages, %1 copies	ConfigWindow		Totes les pàgines, %1 còpies
 Delete a specific printer	PrintServerApp Scripting		Suprimeix una impressora específica
-Create a new printer	PrintServerApp Scripting		Nova impressora
+Create a new printer	PrintServerApp Scripting		Impressora nova
 OK	PrintServerApp		D'acord
 Print setup	ConfigWindow		Configuració d'impressió
 A1	ConfigWindow	ISO 216 paper size	A1

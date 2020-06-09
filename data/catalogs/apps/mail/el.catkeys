@@ -1,0 +1,168 @@
+1	greek, modern (1453-)	x-vnd.Be-MAIL	1328273043
+Set to Saved	Mail		Ορισμός ως Αποθηκευμένο
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Το κύριο κείμενό σας περιέχει %ld που δεν μπορούν να κωδικοποιηθούν. Ίσως μία άλλη μέθοδος κωδικοποίησης να λειτουργήσει καλύτερα. Πατήστε Αποστολή για να στείλετε το μήνυμά σας (οι χαρακτήρες που δεν μπορούν να κωδικοποιηθούν θα αντικατασταθούν με έναν υποκατάστατο χαρακτήρα) ούτως ή άλλως, ή επιλέξτε Ακύρωση για να ακυρώσετε την αποστολή και να διορθώσετε το πρόβλημα.
+Text wrapping:	Mail		Αναδίπλωση κειμένου:
+Show icons & labels	Mail		Εμφάνιση εικονιδίων & ετικετών
+(Date unavailable)	Mail		(Μη διαθέσιμη ημερομηνία)
+Reply	Mail		Απάντηση
+Next message	Mail		Επόμενο μήνυμα
+Mailing	Mail		Γίνεται αποστολή
+Unread	Mail		Μη αναγνωσμένα
+Same sender	Mail		Ίδιος αποστολέας
+Copy to new	Mail		Αντιγραφή σε νέο
+Save as draft	Mail		Αποθήκευση ως πρόχειρο
+Encoding:	Mail		Κωδικοποίηση:
+Print	Mail		Εκτύπωση
+Decrease quote level	Mail		Μείωση εσοχής παραθέσεων
+Encoding	Mail		Κωδικοποίηση
+Default account:	Mail		Προεπιλεγμένος λογαριασμός:
+Message	Mail		Μήνυμα
+Bcc:	Mail		Κρ. Κοιν.:
+New	Mail		Νέο
+Save	Mail		Αποθήκευση
+Undo	Mail		Αναίρεση
+Button bar:	Mail		Γραμμή κουμπιών:
+%e wrote:\\n	Mail		Ο/Η %e έγραψε:\\n
+Save changes to this signature?	Mail		Να αποθηκευτούν οι αλλαγές στην υπογραφή;
+Save attachment…	Mail		Αποθήκευση επισύναψης…
+Paste	Mail		Επικόλληση
+E-mail draft could not be saved!	Mail		Δεν ήταν δυνατή η αποθήκευση του προχείρου E-mail!
+Don't send	Mail		Να μην αποσταλεί
+sent	B_USER_DIRECTORY/mail/sent		εστάλη
+Only files can be added as attachments.	Mail		Μπορείτε να επισυνάψετε μόνο αρχεία.
+Close	Mail		Κλείσιμο
+Untitled	Mail		Χωρίς τίτλο
+Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Η αφαίρεση συνημμένων αρχείων από προωθημένα μηνύματα δεν υποστηρίζεται αυτήν την στιγμή!\nΔεν θα λειτουργήσει σωστά.
+Same recipient	Mail		Ίδιος παραλήπτης
+Previous message	Mail		Προηγούμενο μήνυμα
+(Address unavailable)	Mail		(Μη διαθέσιμη διεύθυνση)
+Mail	System name		Αλληλογραφία
+Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Εισαγωγή: %name% (Tύπος: %type%)
+Copy link location	Mail		Αντιγραφή υπερσυνδέσμου
+Attachments: 	Mail		Επισυνάψεις: 
+Remove enclosure	Mail		Αφαίρεση επισύναψης
+Next	Mail		Επόμενο
+Attachments:	Mail		Επισυνάψεις:
+Show icons only	Mail		Εμφάνιση μόνο των εικονιδίων
+Subject:	Mail		Θέμα:
+OK	Mail		Εντάξει
+UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
+Quit	Mail		Έξοδος
+Title:	Mail		Τίτλος:
+Account from mail	Mail		Λογαριασμός μηνύματος
+%e - E-mail address	Mail		%e - Διεύθυνση ηλεκτρονικού ταχυδρομείου
+Cc:	Mail		Κοιν.:
+No matches	Mail		Κανένα αποτέλεσμα
+Queries	Mail		Πρότυπα
+Cut	Mail		Αποκοπή
+Reply to sender	Mail		Απάντηση στον αποστολέα
+\\n - Newline	Mail		\\n - Νέα γραμμή
+Copy	Mail		Αντιγραφή
+Add signature	Mail		Προσθήκη υπογραφής
+%n - Full name	Mail		%n - Πλήρες όνομα
+Signature	Mail		Υπογραφή
+Use default account	Mail		Χρήση προεπιλεγμένου λογαριασμού
+draft	B_USER_DIRECTORY/mail/draft		πρόχειρο
+Really delete this signature? This cannot be undone.	Mail		Είστε σίγουρος ότι θέλετε να διαγράψετε την υπογραφή αυτή; Αυτό δεν μπορεί να αναιρεθεί.
+spam	B_USER_DIRECTORY/mail/spam		ανεπιθύμητη αλληλογραφία
+Reply to all	Mail		Απάντηση σε όλους
+Cancel	Mail		Ακύρωση
+Off	Mail		Κλειστό
+Set to %s	Mail		Ορισμός σε %s
+Signature:	Mail		Υπογραφή:
+Forward without attachments	Mail		Προώθηση χωρίς επισυνάψεις
+queries	B_USER_DIRECTORY/mail/queries		προτύπων
+View	Mail		Προβολή
+Signatures	Mail		Υπογραφές
+On	Mail		Ανοιχτό
+Find	Mail		Εύρεση
+Sorry, could not find an application that supports the 'Person' data type.	Mail		Συγνώμη, δεν ήταν δυνατός ο εντοπισμός εφαρμογής που υποστηρίζει τον τύπο δεδομένων 'Επαφές'.
+Date:	Mail		Ημερομηνία:
+Expert	Mail		Έμπειρος
+Automatically mark mail as read:	Mail		Αυτόματη επισήμανση μηνυμάτων ως αναγνωσμένων
+Close and 	Mail		Κλείσιμο και 
+Colored quotes:	Mail		Έγχρωμες παραθέσεις:
+Automatic	Mail		Αυτόματο
+Open this link	Mail		Άνοιγμα υπερσυνδέσμου
+Auto signature:	Mail		Αυτόματη υπογραφή:
+Same subject	Mail		Ίδιο θέμα
+Send	Mail		Αποστολή
+Open draft	Mail		Άνοιγμα προχείρου
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Να αφεθεί ως 'New'
+Random	Mail		Τυχαίο
+Attach attributes:	Mail		Επισύναψη ιδιοτήτων:
+Find again	Mail		Εύρεση ξανά
+Size:	Mail		Μέγεθος:
+To:	Mail		Προς:
+Need Tracker to move items to trash	Mail		Απαιτείται ο Tracker για την μετακίνηση αντικειμένων στον κάδο
+The mail_daemon could not be started:\n\t	Mail		Το mail_daemon δεν μπόρεσε να ξεκινήσει:\n\t
+<no account found>	Mail		<δεν βρέθηκε λογαριασμός>
+Mail couldn't find its dictionary.	Mail		Η εφαρμογή Αλληλογραφία δεν μπόρεσε να εντοπίσει το λεξικό της.
+Mail preferences	Mail		Προτιμήσεις Αλληλογραφίας
+helpful message	Mail		βοηθητικό μήνυμα
+Font:	Mail		Γραμματοσειρά:
+Accounts…	Mail		Λογαριασμοί…
+Previous	Mail		Προηγούμενο
+Include file attributes in attachments	Mail		Να συμπεριληφθούν οι ιδιότητες αρχείων στις επισυνάψεις
+Start now	Mail		Εκκίνηση τώρα
+(Name unavailable)	Mail		(Μη διαθέσιμο όνομα)
+Move to trash	Mail		Μετακίνηση στον Κάδο
+<none>	Mail		<κανένα>
+%d - Date	Mail		%d - Ημερομηνία
+Check spelling	Mail		Ορθογραφικός έλεγχος
+Redo	Mail		Επαναφορά
+Leave as '%s'	Mail		Να αφεθεί ως '%s'
+Print…	Mail		Εκτύπωση…
+Settings…	Mail		Ρυθμίσεις…
+Warn unencodable:	Mail		Προειδοποιήσεις για μη κωδικοποιήσιμους χαρακτήρες:
+Trash	Mail		Κάδος
+Show raw message	Mail		Εμφάνιση ανεπεξέργαστου μηνύματος
+Find…	Mail		Εύρεση…
+Select all	Mail		Επιλογή όλων
+Show header	Mail		Εμφάνιση κεφαλίδας
+Reply account:	Mail		Λογαριασμός απαντήσεων:
+Sorry	Mail		Συγνώμη
+Forward	Mail		Προώθηση
+Open attachment	Mail		Άνοιγμα επισύναψης
+mail	B_USER_DIRECTORY/mail		mail
+Save this message as a draft before closing?	Mail		Να αποθηκευτεί το μήνυμα ως πρόχειρο πριν το κλείσιμο;
+The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Το mail_daemon δεν εκτελείται. Το μήνυμα έχει προστεθεί στην ουρά και θα αποσταλεί όταν ξεκινήσει το mail_daemon.
+None	Mail		Κανένα
+Resend	Mail		Επαναποστολή
+Hide	Mail		Απόκρυψη
+From:	Mail		Από:
+No file attributes, just plain data	Mail		Να μην συμπεριληφθεί καμία ιδιότητα αρχείου, μόνο τα δεδομένα του αρχείου
+Add	Mail		Προσθήκη
+out	B_USER_DIRECTORY/mail/out		out
+Send this message before closing?	Mail		Να αποσταλεί το μήνυμα πριν το κλείσιμο;
+in	B_USER_DIRECTORY/mail/in		in
+Open	Mail		Άνοιγμα
+Don't save	Mail		Χωρίς αποθήκευση
+Leave same	Mail		Να αφεθεί έτσι όπως είναι
+An error occurred trying to save the attachment.	Mail		Παρουσιάστηκε ένα σφάλμα, κατά την αποθήκευση του συνημμένου.
+Save address	Mail		Αποθήκευση διεύθυνσης
+Initial spell check mode:	Mail		Λειτουργία διορθωτή από προεπιλογή:
+Edit queries…	Mail		Επεξεργασία προτύπων…
+There is no installed handler for URL links.	Mail		Δεν έχει εγκατασταθεί χειριστής για υπερσυνδέσμους.
+File	Mail		Αρχείο
+Reply preamble:	Mail		Εισαγωγή απάντησης:
+New mail message	Mail		Νέο μήνυμα ταχυδρομείου
+An error occurred trying to open this signature.	Mail		Προέκυψε ένα σφάλμα κατά το άνοιγμα της υπογραφής.
+Edit signatures…	Mail		Επεξεργασία υπογραφών…
+User interface	Mail		Διεπαφή χρήστη
+Inconsistency occurred in the undo/redo buffer.	Mail		Παρουσιάστηκε ασυνέπεια στην ενδιάμεση μνήμη αναιρέσεων και επαναφοράς.
+Remove attachment	Mail		Αφαίρεση επισύναψης
+Set to…	Mail		Ορισμός σε…
+Edit	Mail		Επεξεργασία
+Page setup…	Mail		Διαμόρφωση σελίδας…
+An error occurred trying to save this signature.	Mail		Προέκυψε ένα σφάλμα κατά την αποθήκευση της υπογραφής.
+Beginner	Mail		Αρχάριος
+Send message	Mail		Αποστολή μηνύματος
+Delete	Mail		Διαγραφή
+Put your favorite e-mail queries and query templates in this folder.	Mail		Τοποθετήστε τα αγαπημένα σας πρότυπα e-mail σε αυτόν τον φάκελο.
+Spam	Mail		Ανεπιθύμητη αλληλογραφία
+Couldn't open this signature. Sorry.	Mail		Δεν ήταν δυνατό το άνοιγμα της υπογραφής. Συγνώμη.
+Revert	Mail		Επαναφορά
+Unknown	Mail		Άγνωστο
+Increase quote level	Mail		Αύξηση εσοχής παραθέσεων
+Add enclosure…	Mail		Προσθήκη επισύναψης…

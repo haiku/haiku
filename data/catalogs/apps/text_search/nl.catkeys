@@ -1,10 +1,13 @@
-1	dutch; flemish	x-vnd.Haiku.TextSearch	1652401640
+1	dutch; flemish	x-vnd.Haiku.TextSearch	2224690775
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Kies alstublieft de bestanden die u in Tracker geselecteerd wilt hebben.
+%appname% : %path%	GrepWindow		%appname% : %path%
+Failed to start xargs program!	Grepper		Het starten van de xargs-toepassing is mislukt!
 Open selection	GrepWindow		Selectie openen
 Actions	GrepWindow		Acties
 New window	GrepWindow		Nieuw venster
 Encoding	GrepWindow		Codering
 OK	GrepWindow		Oké
+%appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
 Close	GrepWindow		Sluiten
 Look in sub-folders	GrepWindow		In submappen zoeken
 %s: Not enough room to escape the filename.	Grepper		%s: Niet genoeg ruimte om de bestandsnaam om te vormen.
@@ -16,12 +19,15 @@ Show files in Tracker	GrepWindow		Toon bestanden in Tracker
 Please select the files you wish to keep searching.	GrepWindow		Selecteer alstublieft de bestanden waarin u wilt blijven zoeken. 
 Trim to selection	GrepWindow		Beperken tot selectie
 Set target…	GrepWindow		Doel instellen...
-TextSearch	GrepWindow		Tekst zoeken
+Failed to open input pipe!	Grepper		Het openen van de invoerpijp is mislukt!
 Search	GrepWindow		Zoeken
 Copy text to clipboard	GrepWindow		Kopieer de tekst naar het klembord
 Show lines	GrepWindow		Toon regels
+Failed to open errors pipe!	Grepper		Het openen van de foutpijp is mislukt!
 The unselected files will be removed from the list.	GrepWindow		De niet-geselecteerde bestanden zullen van de lijst verwijderd worden.
 Skip folders starting with a dot	GrepWindow		Mappen overslaan die met een punt (.) beginnen
+Open files in code editor	GrepWindow		Bestanden in codebewerker openen
+Failed to open output pipe!	Grepper		Het openen van de uitvoerpijp is mislukt!
 Cancel	GrepWindow		Annuleren
 History	GrepWindow		Geschiedenis
 File	GrepWindow		Bestand

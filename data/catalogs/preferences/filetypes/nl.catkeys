@@ -1,5 +1,6 @@
-1	dutch; flemish	x-vnd.Haiku-FileTypes	734679611
+1	dutch; flemish	x-vnd.Haiku-FileTypes	436017301
 Left	Attribute Window	Attribute column alignment in Tracker	Links
+Float	Attribute ListView		Decimaal (float)
 Final	Application Types Window		Laatste
 FileTypes request	FileTypes Window		BestandsTypen-aanvraag
 This file type already exists	New File Type Window		Dit bestandstype bestaat al
@@ -31,6 +32,7 @@ Signature:	Application Types Window		Onderschrift:
 None	FileTypes Window		Geen
 Exclusive launch	Application Type Window		Exclusieve lancering
 Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		Verwijderen van een bestandstype is onomkeerbaar.\nWeet u zeker dat u het wilt verwijderen?
+Integer 64 bit	Attribute ListView		Integer 64 bit
 Cancel	New File Type Window		Annuleren
 Select same preferred application as	FileType Window		Selecteer dezelfde voorkeurstoepassing als
 Cancel	Type List Window		Annuleren
@@ -43,10 +45,13 @@ Abort	Application Types Window		Afbreken
 Save	Application Type Window		Opslaan
 %1 application type	Application Type Window		%1 toepassingstype
 Icon	Application Type Window		Icoon
+Duration	Attribute ListView		Duur
 Version:	Application Type Window		Versie:
 Default application	FileType Window		Standaardtoepassing
 Internal name:	New File Type Window		Interne naam:
+Integer 8 bit	Attribute ListView		Integer 8 bit
 Extension:	Extension Window		Extensie:
+Time	Attribute ListView		Tijd
 Extensions:	FileTypes Window		Extensies:
 Select preferred application	FileType Window		Selecteer voorkeurstoepassing
 Description:	FileTypes Window		Beschrijving:
@@ -66,6 +71,8 @@ Version:	Application Types Window		Versie:
 Application types	Application Types Window		Applicatietypes...
 Description:	Application Types Window		Beschrijving:
 Name:	Application Types Window		Naam:
+Rating	Attribute ListView		Waardering
+duration	Attribute ListView		duur
 File could not be opened	Preferred App Menu		Bestand kon niet geopend worden
 Args only	Application Type Window		Alleen argumenten
 Could not open \"%s\":\n%s	FileTypes		Kon \"%s\":\n%s niet openen
@@ -83,16 +90,21 @@ Type name:	FileTypes Window		Type naam:
 Visible	Attribute Window		Zichtbaar
 Select preferred application	FileTypes Window		Selecteer voorkeurstoepassing
 Path:	Application Types Window		Pad:
+rating	Attribute ListView		waardering
 Could not install file type	New File Type Window		Kon bestandstype niet installeren
 Same as…	FileTypes Window		Zelfde als...
 Golden master	Application Type Window		Golden master
+Checkbox	Attribute ListView		Selectievakje
 FileTypes request	Preferred App Menu		BestandsTypen-verzoek
 no icon	FileTypes Window		geen icoon
 Single launch	Application Type Window		Enkelvoudige opstart
 %s file type	FileType Window		%s bestandstype
+Default	Attribute ListView		Standaard
 Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Het verwijderen van een supertype kan niet ongedaan gemaakt worden.\nAlle bestandstypes die toebehoren aan dit supertype zullen verloren gaan!\n\nBent u zeker dat u dit wilt doen? Om de hele groep te verwijderen, druk de Shift-toets in en klik op \"Remove\".
+String	Attribute ListView		Tekstregel
 Add type	New File Type Window		Voeg een type toe
 Remove icon	Icon View		Icoon verwijderen
+Boolean	Attribute ListView		Boolean
 Cancel	Extension Window		Annuleren
 Alignment:	Attribute Window		Uitlijning:
 Icon	FileType Window		Icoon
@@ -101,6 +113,7 @@ Development	Application Type Window		Ontwikkeling
 Golden master	Application Types Window		Golden master
 Add	Extension Window		Toevoegen
 Open…	FileTypes Window		Open...
+checkbox	Attribute ListView		selectievakje
 Could not change file extensions	Extension Window		Kon bestandsextensies niet veranderen
 Could not open file	FileType Window		Kon bestand niet openen
 Choose type	Type List Window		Kies type
@@ -118,6 +131,7 @@ Add group	New File Type Window		Groep toevoegen
 Cancel	Attribute Window		Annuleren
 Gamma	Application Types Window		Gamma
 Supported types	Application Type Window		Ondersteunde soorten
+Integer 32 bit	Attribute ListView		Integer 32 bit
 Beta	Application Type Window		Bèta
 Could not retrieve preferred application of this file	Preferred App Menu		Kon de voorkeurstoepassing van dit bestand niet verkrijgen
 Application flags	Application Type Window		Toepassingsvlaggen
@@ -142,6 +156,7 @@ Extra attributes	FileTypes Window		Extra attributen
 Group:	New File Type Window		Groep:
 Alpha	Application Types Window		Alfa
 Close	Application Type Window		Sluit
+Integer 16 bit	Attribute ListView		Integer 16 bit
 Extension	Extension Window		Extensie
 Rule:	FileTypes Window		Regel:
 FileTypes	System name		BestandsTypen
@@ -153,5 +168,6 @@ Add…	FileTypes Window		Toevoegen...
 Edit icon…	Icon View		Icoon aanpassen...
 Internal name:	Attribute Window		Interne naam:
 Show recognition rule	FileTypes Window		Toon herkenningsregel
+Double	Attribute ListView		Decimaal (double)
 Move down	FileTypes Window		Naar beneden verplaatsen
 Alpha	Application Type Window		Alfa

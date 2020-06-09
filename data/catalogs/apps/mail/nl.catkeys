@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Be-MAIL	1630923361
+1	dutch; flemish	x-vnd.Be-MAIL	1477453861
 Set to Saved	Mail		Als Bewaard markeren
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Uw hoofdtekst bevat %ld niet-codeerbare tekens. Mogelijk werkt een andere letterset beter? Klik op 'Versturen' om de tekst toch te versturen (een vervangend teken zal dan gebruikt worden op de plaats van elk niet-codeerbaar teken), of kies 'Annuleren' om terug te keren voor een herstelpoging.
 Text wrapping:	Mail		Tekstafbreking:
@@ -8,10 +8,12 @@ Reply	Mail		Beantwoorden
 Next message	Mail		Volgend bericht
 Mailing	Mail		Mailverkeer
 Unread	Mail		Ongelezen
+Same sender	Mail		Zelfde verzender
 Copy to new	Mail		Kopiëren naar nieuw
 Save as draft	Mail		Bewaren als concept
 Encoding:	Mail		Codering:
 Print	Mail		Afdrukken
+Decrease quote level	Mail		Citaatniveau verkleinen
 Encoding	Mail		Codering
 Default account:	Mail		Standaard-account:
 Message	Mail		Bericht
@@ -25,10 +27,13 @@ Save changes to this signature?	Mail		Veranderingen aan dit onderschrift opslaan
 Save attachment…	Mail		Bewaar bijlage…
 Paste	Mail		Plakken
 E-mail draft could not be saved!	Mail		E-mailconcept kon niet bewaard worden!
+Don't send	Mail		Niet verzenden
 sent	B_USER_DIRECTORY/mail/sent		verzonden
 Only files can be added as attachments.	Mail		Alleen bestanden kunnen bijlagen worden.
 Close	Mail		Sluiten
+Untitled	Mail		Geen titel
 Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Verwijdering van bijlagen uit een doorgestuurd bericht is nog niet geïmplementeerd!\nHet zal nog niet goed werken.
+Same recipient	Mail		Zelfde ontvanger
 Previous message	Mail		Vorig bericht
 (Address unavailable)	Mail		(Adres niet beschikbaar)
 Mail	System name		Mail
@@ -66,7 +71,7 @@ Off	Mail		Uit
 Set to %s	Mail		Instellen als  %s
 Signature:	Mail		Onderschrift:
 Forward without attachments	Mail		Doorsturen zonder bijlagen
-queries	B_USER_DIRECTORY/mail/queries		queries
+queries	B_USER_DIRECTORY/mail/queries		zoekopdrachten
 View	Mail		Bekijken
 Signatures	Mail		Onderschriften
 On	Mail		Aan
@@ -80,6 +85,7 @@ Colored quotes:	Mail		Quotes in kleur:
 Automatic	Mail		Automatisch
 Open this link	Mail		Deze link openen
 Auto signature:	Mail		Automatisch onderschrift:
+Same subject	Mail		Zelfde onderwerp
 Send	Mail		Versturen
 Open draft	Mail		Concept openen
 Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Behouden als 'Nieuw'
@@ -129,6 +135,7 @@ From:	Mail		Van:
 No file attributes, just plain data	Mail		Geen bestandskenmerken, alleen gewone gegevens
 Add	Mail		Toevoegen
 out	B_USER_DIRECTORY/mail/out		uit
+Send this message before closing?	Mail		Wilt u het bericht versturen voordat u het sluit?
 in	B_USER_DIRECTORY/mail/in		in
 Open	Mail		Openen
 Don't save	Mail		Niet opslaan
@@ -153,7 +160,10 @@ An error occurred trying to save this signature.	Mail		Er is een fout ontstaan b
 Beginner	Mail		Beginner
 Send message	Mail		Bericht versturen
 Delete	Mail		Verwijderen
-Put your favorite e-mail queries and query templates in this folder.	Mail		Plaats je favoriete e-mailqueries en querysjablonen in deze map.
+Put your favorite e-mail queries and query templates in this folder.	Mail		Plaats je favoriete e-mailqueries en zoekopdrachtsjablonen in deze map.
+Spam	Mail		Spam
 Couldn't open this signature. Sorry.	Mail		Kon dit onderschrift niet openen. Sorry.
 Revert	Mail		Herstellen
+Unknown	Mail		Onbekend
+Increase quote level	Mail		Citaatniveau vergroten
 Add enclosure…	Mail		Bijlage toevoegen...

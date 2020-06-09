@@ -1,17 +1,17 @@
 1	catalan; valencian	x-vnd.haiku.zip-o-matic	2032806096
 Drop files here.	file:ZipOMaticWindow.cpp		Deixeu anar els fitxers aquí.
 Filename: %s	file:ZipOMaticWindow.cpp		Nom del fitxer: %s
-Do you want to stop them?	file:ZipOMatic.cpp		Voleu aturar-los?
+Do you want to stop them?	file:ZipOMatic.cpp		Voleu interrompre'ls?
 Error creating archive	file:ZipOMaticWindow.cpp		Error en crear l'arxiu.
-Stop them	file:ZipOMatic.cpp		Atura'ls
-Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Segur que voleu aturar la creació d'aquest arxiu?
+Stop them	file:ZipOMatic.cpp		Interromp-los
+Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Segur que voleu interrompre la creació d'aquest arxiu?
 Preparing to archive	file:ZipperThread.cpp		Es prepara l'arxivament
 Let them continue	file:ZipOMatic.cpp		Deixa que continuïn
 Continue	file:ZipOMaticWindow.cpp		Continua
-Archive created OK	file:ZipOMaticWindow.cpp		L'arxiu s'ha generat correctament
+Archive created OK	file:ZipOMaticWindow.cpp		L'arxiu s'ha creat correctament
 {0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# fitxer afegit.} other{# fitxers afegits.}}
-Stop	file:ZipOMaticWindow.cpp		Atura
-Stopped	file:ZipOMaticWindow.cpp		Aturat
+Stop	file:ZipOMaticWindow.cpp		Interromp
+Stopped	file:ZipOMaticWindow.cpp		Interromput
 Archive	file:ZipperThread.cpp		Arxiva
 Creating archive: %s	file:ZipOMaticWindow.cpp		Es crea l'arxiu: %s
-You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		Teniu {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} en execució.\n\n
+You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		Teniu {0, plural, one{# Zipomàtic} other{# Zipomàtics}} en execució.\n\n

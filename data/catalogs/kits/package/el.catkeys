@@ -1,0 +1,10 @@
+1	greek, modern (1453-)	x-vnd.Haiku-libpackage	134767648
+Fetching repository-cache from %url	RefreshRepositoryRequest		Γίνεται λήψη προσωρινών δεδομένων αποθετηρίων από %url
+Validating checksum for %repositoryName	RefreshRepositoryRequest		Γίνεται επικύρωση κρυπτογραφικού αθροίσματος ελέγχου για %repositoryName
+Failed to remove transaction directory	PackageManagerKit		Δεν ήταν δυνατή η διαγραφή προσωρινού καταλόγου λήψεων
+Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		Η λήψη ρυθμίσεων για το αποθετήριο \"%s\" απέτυχε. Γίνεται παράληψη.
+Refreshing repository \"%s\" failed	PackageManagerKit		Η ανανέωση του αποθετηρίου \"%s\" απέτυχε
+Fetching repository checksum from %url	RefreshRepositoryRequest		Γίνεται λήψη κρυπτογραφικού αθροίσματος ελέγχου από %url
+Failed to get repository names	PackageManagerKit		Η λήψη ονομάτων αποθετηρίων απέτυχε
+Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		Η λήψη προσωρινών δεδομένων για το αποθετήριο \"%s\" απέτυχε. Γίνεται παράληψη.
+Package %s-%s doesn't have a matching requires for its base package \"%s\"	PackageManagerKit		Το πακέτο %s-%s δεν έχει ένα αντίστοιχο "requires" για το πακέτο \"%s\", στο οποίο βασίζεται

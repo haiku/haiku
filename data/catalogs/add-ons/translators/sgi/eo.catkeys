@@ -1,0 +1,13 @@
+1	esperanto	x-vnd.Haiku-SGITranslator	129108011
+SGI images	SGITranslator		SGI bildoj
+Use compression:	SGIView		Densigi:
+SGI image translator	SGIView		SGI bildotradukilo
+SGI image	SGITranslator		SGI bildo
+SGITranslator Settings	SGITranslator		Agordo de SGITranslator
+SGI Settings	SGIMain		Agordo de SGI
+SGI image translator	SGITranslator		SGI bildotradukilo
+None	SGIView		Neniu
+Version %d.%d.%d, %s	SGIView		Versio %d.%d.%d, %s
+\nbased on GIMP SGI plugin v1.5:\n	SGIView		\nbazita sur GIMP SGI aldonaĵo v1.5:\n
+RLE	SGIView		RLE
+written by:\n	SGIView		verkis:\n

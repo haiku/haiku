@@ -1,0 +1,87 @@
+1	croatian	x-vnd.Haiku-DiskProbe	2634081215
+Remove	AttributeWindow		Ukloni
+Close	ProbeView		Zatvori
+Boolean value:	TypeEditors		Booleanska vrijednost:
+File	ProbeView		Datoteka
+Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Heksadecimalno
+Text	TypeEditors	This is the type of editor	Tekst
+Add	ProbeView		Dodaj
+Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Želite li doista ukloniti atribut \"%s\" uz datoteke \"%s\"?\n\nRadnja je nepovratna.
+No type editor available	AttributeWindow		NIje dostupan uređivač vrsta
+Print…	ProbeView		Ispisuj...
+New…	FileWindow		Nova...
+what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	što: '%.4s'\n\n
+OK	DiskProbe		U redu
+Back	ProbeView		Natrag
+Device: 	ProbeView		Uređaj: 
+Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Osnova
+Open file…	FileWindow		Otvori datoteku...
+Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hex
+Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Pisanje u datoteku nije uspjelo:\n%s\n\nSve promjene će biti izgubljene kada isključite.
+Examine device:	OpenWindow		Pregledaj uređaj:
+Number editor	TypeEditors		Uređivač-broja
+Icon	TypeEditors		Ikona
+Attribute	ProbeView		Atribut
+Don't save	ProbeView		Nemoj spremiti
+Cancel	OpenWindow		Otkaži
+Unknown format	TypeEditors		Nepoznati format
+File: 	ProbeView		Datoteka: 
+Stop	ProbeView		Stani
+Cancel	ProbeView		Otkaži
+Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Ne mogu otvoriti  \"%s\":\n%s
+Font size	ProbeView		Veličina fonta
+Type editor not supported	ProbeView		Vrsta uređivača nije podržana
+Copy	ProbeView		Kopiraj
+Cancel	AttributeWindow		Otkaži
+Next	ProbeView		Slijedeće
+Close	FileWindow		Zatvori
+Unknown type	TypeEditors		Nepoznati tip
+Open device	FileWindow		Otvori uređaj
+Number:	TypeEditors		Broj:
+Quit	FileWindow		Isključi
+Text	FindWindow		Tekst
+Attribute	AttributeWindow		Atribut
+Mode:	FindWindow		Način rada:
+16 bit	TypeEditors		16 bit
+32 bit size or status:	TypeEditors		32 bitna veličina ili status:
+Contents:	TypeEditors		Sadržaj:
+Could not open file \"%s\": %s\n	DiskProbe		Ne mogu otvoriti datoteku \"%s\": %s\n
+Bookmarks	ProbeView		Zabilješke
+none	ProbeView	No attributes	nijedan
+Case sensitive	FindWindow		Osjetljivo na velika i mala slova
+Remove from file	AttributeWindow		Ukloni iz datoteke
+Attributes	ProbeView		Atributi
+Message	TypeEditors	This is the type of view	Poruka
+MIME type:	TypeEditors		MIME vrsta:
+File	FileWindow		Datoteka
+Grayscale	TypeEditors		Sivo
+32 bit	TypeEditors		32 bit
+Device	ProbeView		Uređaj
+Close	AttributeWindow		Zatvori
+Save	ProbeView		Spremi
+of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	od 0x0
+Attribute type: 	ProbeView		Vrsta atributa: 
+15 bit	TypeEditors		15 bit
+Page setup…	ProbeView		Postavljanje stranice...
+Boolean	TypeEditors	This is the type of editor	Boolean
+Icon view	TypeEditors		Pogled ikona
+Select all	ProbeView		Odaberi sve
+OK	ProbeView		U redu
+Previous	ProbeView		Prethodno
+Selection	ProbeView		Odabir
+Find	FindWindow		Nađi
+Attribute: 	ProbeView		Atribut: 
+Block	ProbeView		Blok
+Find again	ProbeView		Nađi ponovno
+View	ProbeView	This is the last menubar item 'File Edit Block View'	Pogled
+Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Ne mogu čitati sliku
+Image	TypeEditors	This is the type of view	Slika
+Save changes before closing?	ProbeView		Spremiti izmjene prije zatvaranja?
+PNG format	TypeEditors		PNG format
+Number	TypeEditors	This is the type of editor	Broj
+Edit	ProbeView		Uredi
+Find…	ProbeView		Nađi...
+8 bit palette	TypeEditors		8 bitna paleta
+Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Decimalni
+Image view	TypeEditors	Image means here a picture file, not a disk image.	Pregled slike
+Paste	ProbeView		Zalijepi

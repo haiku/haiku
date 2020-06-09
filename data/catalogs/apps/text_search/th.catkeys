@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku.TextSearch	1867528375
+1	thai	x-vnd.Haiku.TextSearch	2224690775
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		โปรดเลือกไฟล์ที่คุณต้องการให้คุณเลือกในตัวติดตาม
 %appname% : %path%	GrepWindow		%appname% : %path%
 Failed to start xargs program!	Grepper		ไม่สามารถเริ่มโปรแกรม xargs ได้!
@@ -19,7 +19,6 @@ Show files in Tracker	GrepWindow		แสดงไฟล์ในตัวติ�
 Please select the files you wish to keep searching.	GrepWindow		โปรดเลือกไฟล์ที่คุณต้องการค้นหาต่อไป
 Trim to selection	GrepWindow		ปรับแต่งเพื่อการเลือก
 Set target…	GrepWindow		กำหนดเป้าหมาย
-TextSearch	GrepWindow		ค้นหาข้อความ
 Failed to open input pipe!	Grepper		ไม่สามารถเปิดอินพุตเชื่อมโยงสองโปรแกรม!
 Search	GrepWindow		ค้นหา
 Copy text to clipboard	GrepWindow		คัดลอกข้อความไปยังคลิปบอร์ด

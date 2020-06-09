@@ -1,16 +1,16 @@
 1	spanish; castilian	x-vnd.Haiku-TIFFTranslator	2234713102
-TIFF Library:	TIFFView		Librería TIFF:
+TIFF Library:	TIFFView		Biblioteca TIFF:
 RLE (Packbits)	TIFFView		RLE (Packbits)
 ZIP (Deflate)	TIFFView		ZIP(Deflate)
 identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: Indice de documento invalido\n
 Use compression:	TIFFView		Usar la compresión:
-TIFF image translator	TIFFView		Traductor de imagen TIFF
+TIFF image translator	TIFFView		Intérprete de imagen TIFF
 TIFF image	TIFFTranslator		imagen TIFF
 TIFF Settings	TIFFMain		Configuración TIFF
 TIFF image translator	TIFFTranslator		Traductor de imagen TIFF
-identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: no pudo setear directorio\n
+identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: no se pudo establecer el directorio\n
 Version %d.%d.%d, %s	TIFFView		Versión %d.%d.%d, %s
-TIFFTranslator Settings	TIFFTranslator		Configuración TIFFTranslator
+TIFFTranslator Settings	TIFFTranslator		Configuración del Intérprete TIFF
 LZW	TIFFView		LZW
 TIFF images	TIFFTranslator		Imágenes TIFF
 None	TIFFView		Ninguno

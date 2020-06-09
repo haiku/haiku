@@ -3,10 +3,10 @@
 All Rights Reserved.	AboutWindow		Tous droits réservés.
 gold master	AboutWindow		finale
 Undo	TextView		Annuler
+OK	PrintJob		OK
 gamma	AboutWindow		gamma
 development	AboutWindow		développement
 OK	Dragger		OK
-OK	PrintJob		OK
 Print Server is not responding.	PrintJob		Le serveur d’impression ne répond pas.
 About %app%	AboutMenuItem		À propos de %app%
 Warning	Dragger		Avertissement

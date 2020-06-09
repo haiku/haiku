@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Pulse	3788463253
+1	slovak	x-vnd.Haiku-Pulse	2964417303
 Normal mode	DeskbarPulseView		Normálny režim
 Info	CPUButton		Info
 Quit	DeskbarPulseView		Ukončiť
@@ -44,4 +44,3 @@ Active color	ConfigView		Aktívna farba
 Installing in Deskbar failed\n%s	PulseApp		Inštalácia do Panelu zlyhala\n%s
 Idle color	ConfigView		Farba pri nečinnosti
 Normal mode	PrefsWindow		Normálny režim
-Pulse settings	PulseWindow		Nastavenia Pulse

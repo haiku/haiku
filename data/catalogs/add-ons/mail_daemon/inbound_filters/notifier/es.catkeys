@@ -6,9 +6,9 @@ Alert	NotifierConfigView		Alerta
 OK	NotifierFilter		Aceptar
 Central alert	NotifierConfigView		Alerta central 
 Beep	NotifierConfigView		Pitido
-Central beep	NotifierConfigView		Beep central
+Central beep	NotifierConfigView		Pitido central
 {0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{One new message} other{# new messages}}
 New messages	NotifierFilter		Mensajes nuevos
 Method:	NotifierConfigView		Método:
 Keyboard LEDs	NotifierConfigView		Luces LED de teclado
-You have {0, plural, one{one new message} other{# new messages}} for %account.	NotifierFilter		Usted tiene {0, plural, one{one new message} other{# new messages}} en %account.
+You have {0, plural, one{one new message} other{# new messages}} for %account.	NotifierFilter		 Tiene {0, plural, one{one new message} other{# new messages}} en %account.

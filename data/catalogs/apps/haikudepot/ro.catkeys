@@ -1,10 +1,9 @@
-1	romanian	x-vnd.Haiku-HaikuDepot	1107427137
+1	romanian	x-vnd.Haiku-HaikuDepot	3833361367
 Repository update error	LocalRepositoryUpdateProcess		Eroare la actualizarea depozitului
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		A apărut o eroare în timpul reîmprospătării depozitului: %error%
 User Created	UserLoginWindow		Utilizator creat
 Check for updates…	MainWindow		Verifică pentru actualizări…
 Uninstall	PackageManager		Dezinstalare
-(%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		Dezinstalat
 It was not possible to create the new user.	UserLoginWindow		Nu a fost posibil să se creeze utilizatorul nou.
 Available packages	MainWindow		Pachete disponibile
@@ -35,7 +34,6 @@ Login or Create account	MainWindow		Autentificare sau Creare cont
 Ratings	PackageInfoView		Evaluări
 Switch account…	MainWindow		Schimbare cont…
 Preferred language:	UserLoginWindow		Limbă preferată:
-Server Error	ServerHelper		Eroare de server
 Name	PackageListView		Nume
 Authorization or security issue. Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		Problemă de autorizație sau securitate. Deautentificați-vă și autentificați-vă din nou pentru a verifica că parola este corectă și de asemenea verifica dacă ați fost de acod cu ultimele condiții de utilizare.
 Local	LocalPkgDataLoadProcess		Local
@@ -61,7 +59,6 @@ Featured packages	FeaturedPackagesView		Pachete recomandate
 The supplied response to the captcha is incorrect. A new captcha will be generated; try again.	UserLoginWindow		Răspunsul furnizat pentru captcha nu este corect. O captcha nouă va fi generată, încercați din nou.
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Nu a fost posibil să comunicați cu serverul pentru a obține imaginea captcha necesară pentru a crea un utilizator nou.
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Evaluarea a fost încărcată cu succes. Puteți să o actualizați sau să o eliminați pe pagina web Server HaikuDepot.
-Network Error	ServerHelper		Eroare de rețea
 Available	PackageListView		Disponibil
 Cancel	UserLoginWindow		Anulează
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot are nevoie de serviciul de pachete pentru a functiona și se pare că nu rulează.\nDoriți să-l porniți acum?
@@ -69,7 +66,6 @@ Click a package to view information	PackageInfoView		Clic pe un pachet pentru a 
 The password must be at least eight characters long, consist of at least two digits and one upper case character.	UserLoginWindow		Parola trebuie să aibă lungimea de cel puțin opt caractere, să consiste din cel puțin două cifre și un caracter cu majusculă.
 Contents	PackageInfoView		Conținut
 Close	PackageManager		Închidere
-A network transport error has arisen communicating with the HaikuDepot server system: %s	ServerHelper		O eroare de transport în rețea a apărut în timpul comunicării cu sistemul de servere HaikuDepot: %s
 Changelog	PackageInfoView		Jurnal de modificări
 Rating not possible	MainWindow		Evaluarea nu este posibilă
 Package update error	MainWindow		Eroare la actualizarea pachetului
@@ -79,7 +75,6 @@ Reboot required	PackageManager		Repornire necesară
 Very unstable	RatePackageWindow		Foarte instabil
 Password:	UserLoginWindow		Parolă:
 All packages	PackageListView		Toate pachetele
-Network Transport Error	ServerHelper		Eroare de transport în rețea
 Stability	RatePackageWindow		Stabilitate
 Send	RatePackageWindow		Trimitere
 Start package daemon	App		Pornire demon de pachet
@@ -106,8 +101,8 @@ Close	RatePackageWindow		Închidere
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Se sincronizează datele pachetelor pentru depozitul „%REPO_NAME%”
 View the usage conditions	UserLoginWindow		Vizualizați condițiile de utilizare
 Login issue	MainWindow		Problemă de autentificare
-Your rating:	RatePackageWindow		Evaluare:
 Size	PackageListView		Mărime
+Your rating:	RatePackageWindow		Evaluare:
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		Utilizatorul %Nickname% a fost creat cu succes în sistemul HaikuDepotServer. Puteți administra detaliile utilizatorului utilizând interfața web. Acum sunteți autentificat ca acest utilizator nou.
 Your rating was updated.	RatePackageWindow		Evaluarea a fost actualizată.
 All categories	FilterView		Toate categoriile
@@ -170,8 +165,6 @@ Open %DeskbarLink%	PackageManager		Deschide %DeskbarLink%
 User creation error	UserLoginWindow		Eroare la crearea utilizatorului
 Install	PackageManager		Instalare
 Input validation	UserLoginWindow		Validare intrare
-This application is too old to communicate with the HaikuDepot server system. Obtain a newer version of HaikuDepot by updating your Haiku system. The minimum version of HaikuDepot required is \"%s\".	ServerHelper		Aceasă aplicație ese prea veche penru a comunica cu sistemul de server HaikuDepot. Obțineți o nouă versiune a HaikuDepot prin actualizarea sistemului Haiku. Versiunea minimă necesară a HaikuDepot este \„%s\”.
-An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		O eroare neașteptată a fost trimisă de la serverul HaikuDepot [%i]
 Log in…	MainWindow		Autentificare…
 You need to be logged into an account before you can rate packages.	MainWindow		Trebuie să fiți autentificat într-un cont înainte de a evalua pachete.
 Client version too old	ServerHelper		Versiunea clientului este prea veche

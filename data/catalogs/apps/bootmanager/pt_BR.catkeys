@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-BootManager	3886671855
+1	portuguese (brazil)	x-vnd.Haiku-BootManager	2253006644
 Old Master Boot Record backup failure	BootManagerController	Title	Falha da cópia de segurança do antigo Master Boot Record
 At least one partition must be selected!	BootManagerController		Pelo menos uma partição precisa ser selecionada!
 No space available!	DrivesPage	Cannot install	Sem espaço disponível!
@@ -36,7 +36,6 @@ The following partitions were detected. Please check the box next to the partiti
 After five seconds	DefaultPartitionPage		Após cinco segundos
 Timeout: %s	DefaultPartitionPage		Tempo restante: %s
 The Master Boot Record could not be restored!	BootManagerController		O Master Boot Record não pode ser restaurado.
-The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager only works with IBM PC MBR partitions.	BootManagerController		A tábua de particção do primeiro disco rígido não é compatível com o Gerenciador de Inicialização./nO Gerenciador de Inicialização trabalha exclusivamente com partições MBR IBM PC.
 Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		Escolha o drive que você quer instalar ou desinstalar o gerenciador de boot.
 After four seconds	DefaultPartitionPage		Após quatro segundos
 Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	%d sem nome

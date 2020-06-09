@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-Terminal	838376638
+1	portuguese (brazil)	x-vnd.Haiku-Terminal	232328482
 Close other tabs	Terminal TermWindow		Fechar outras guias
 Insert path	Terminal TermView		Inserir caminho
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal não pôde iniciar o shell. Desculpe.
@@ -7,7 +7,7 @@ OK	Terminal SetTitleWindow		OK
 Edit	Terminal TermWindow		Editar
 Select all	Terminal TermWindow		Selecionar tudo
 Confirm exit if active programs exist	Terminal AppearancePrefView		Confirmar saída se existirem aplicativos em execução
-\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tEste diretório de trabalho tem um processo ativo na\n\t\t\tguia atual. Opcionalmente, o número máximo de componentes do caminho\n\t\t\tpode ser especificado. Por exemplo, '% 2d' para dois componentes no máximo.\n\t%e\t-\tO nome do aplicativo Terminal para a localidade atual.\n\t%i\t-\tA codificação da guia atual. Não exibido para UTF-8.\n\t%i\t-\tO índice da janela.\n\t%p\t-\tO nome do processo ativo na guia atual.\n\t%t\t-\tO título da guia atual.
+\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tO diretório atual do processo ativo na\n\t\t\tatual aba. Opcionalmente o número máximo de caminhos de componentes\n\t\t\tpode ser especificados. Ex: '%2d' por ao menos dois componentes.\n\t%T\t-\tO nome do aplicativo Terminal para o corrente local.\n\t%e\t-\tA codificação da aba atual. Não mostrar para UTF-8.\n\t%i\t-\tO índice da janela.\n\t%p\t-\tO nome do processo ativo na aba atual.\n\t%t\t-\tO título da aba atual.
 Solarized Dark	Terminal colors scheme		Solarizado Escuro
 Copy	Terminal TermWindow		Copiar
 Retro	Terminal colors scheme		Retrô
@@ -70,7 +70,6 @@ Cursor	Terminal AppearancePrefView		Cursor
 Full screen	Terminal TermWindow		Tela inteira
 Shell 	Terminal TermWindow		Shell
 Midnight	Terminal colors scheme		Meia-noite
-\t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tO caractere '%'.\n\t%<\t-\tInicia uma seção que somente será mostrada se um espaço reservado\n\t\t\tposteriormente não está vazio.\n\t%>\t-\Inicia uma seção que somente será mostrada se um espaço reservado\n\t\t\tentre uma seção %< prévia e esta seção não está vazio.\n\t%-\t-\tEncerra uma seção %< ou %>.\n\nQualquer caractere não alfanumérico entre '%' e a letra formato irá inserir um espaço, apenas\n se o espaço reservado não está vazio. Ele adicionará à seção %<.
 Tab title:	Terminal TermWindow		Título da guia:
 Window title:	Terminal TermWindow		Título da janela:
 Default	Terminal colors scheme		Padrão

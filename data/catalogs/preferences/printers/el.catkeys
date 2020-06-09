@@ -1,0 +1,41 @@
+1	greek, modern (1453-)	x-vnd.Be-PRNT	1465107170
+Test page	TestPageView		Δοκιμαστική σελίδα
+Remove	PrintersWindow		Αφαίρεση
+Red	TestPageView		Κόκκινο
+Default Printer	PrinterListView		Προεπιλεγμένος εκτυπωτής
+<pick one>	AddPrinterDialog		<διαλέξτε ένα>
+Connected to:	AddPrinterDialog		Συνδεδεμένο σε:
+Make default	PrintersWindow		Ορισμός ως προεπιλογή
+Cyan	TestPageView		Κυανό
+Completed	JobListView		Ολοκληρώθηκε
+Test page	PrintersWindow		Δοκιμαστική σελίδα
+Transport: %transport% %transport_address%	PrinterListView		Μεταφορά: %transport% %transport_address%
+Failed	JobListView		Απέτυχε
+Blue	TestPageView		Μπλέ
+Waiting	JobListView		Αναμονή
+Processing	JobListView		Γίνεται επεξεργασία
+Cancel	AddPrinterDialog		Άκυρο
+Unknown status	JobListView		Άγνωστη κατάσταση
+Print jobs for %printer_name%	PrintersWindow		Εργασίες εκτύπωσης για τον %printer_name%
+{0, plural, =-1{??? pages}=1{# page}other{# pages}}	JobListView		{0, plural, =-1{??? σελίδες}=1{# σελίδα}other{# σελίδες}}
+Add printer	AddPrinterDialog		Προσθήκη εκτυπωτή
+Printers	PrintersWindow		Εκτυπωτές
+No printer found!	TransportMenu		Δεν βρέθηκε εκτυπωτής!
+Add…	PrintersWindow		Προσθήκη…
+Magenta	TestPageView		Ματζέντα
+Transport: %transport% %transport_address%	TestPageView		Μεταφορά: %transport% %transport_address%
+Add	AddPrinterDialog		Προσθήκη
+Print jobs: No printer selected	PrintersWindow		Εργασίες εκτύπωσης: Δεν επιλέχθηκε εκτυπωτής
+Printer name:	AddPrinterDialog		Όνομα εκτυπωτή:
+Yellow	TestPageView		Κίτρινο
+Black	TestPageView		Μαύρο
+Printer type:	AddPrinterDialog		Τύπος εκτυπωτή:
+Printers	System name		Printers
+{0, plural,=0{No pending jobs}=1{1 pending job}other{# pending jobs}}	PrinterListView		{0, plural,=0{Καμία εργασία σε εκρεμμότητα}=1{1 εργασία σε εκκρεμότητα}other{# εργασίες σε εκκρεμότητα}}
+Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Εκτυπωτής: %printer_name%\nDriver: %driver%\n
+Green	TestPageView		Πράσινο
+Print test page	PrintersWindow		Εκτύπωση δοκιμαστικής σελίδας
+Restart job	PrintersWindow		Επανεκκίνηση εργασίας
+Driver: %driver%	PrinterListView		Οδηγός: %driver%
+Cancel job	PrintersWindow		Ακύρωση εργασίας
+%.2f KB	JobListView		%.2f KB

@@ -1,0 +1,7 @@
+1	greek, modern (1453-)	x-vnd.Haiku-bluetooth_server	3418434903
+Stopping the Bluetooth server failed.	BluetoothReplicant		Η διακοπή του διακομιστή Bluetooth απέτυχε.
+Bluetooth error	BluetoothReplicant		Σφάλμα Bluetooth
+Settings…	BluetoothReplicant		Ρυθμίσεις…
+OK	BluetoothReplicant		Εντάξει
+Error: %status%	BluetoothReplicant		Σφάλμα: %status%
+Quit	BluetoothReplicant		Κλείσιμο

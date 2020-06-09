@@ -10,7 +10,7 @@ File info	RecorderWindow		Informació del fitxer
 Drop files here	SoundListView		Deixeu anar els fitxers aquí.
 Input	RecorderWindow		Entrada
 Some of the files don't appear to be audio files.	RecorderWindow		Alguns dels fitxers no semblen fitxers d'àudio.
-Stop	RecorderWindow		Atura
+Stop	RecorderWindow		Interromp
 Format:	RecorderWindow		Format:
 Sound List	RecorderWindow		Llista de so
 Compression: 	RecorderWindow		Compressió:

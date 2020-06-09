@@ -1,23 +1,23 @@
 1	spanish; castilian	x-vnd.haiku-registrar	2599857937
 Cancel	ShutdownProcess		Cancelar
 OK	ShutdownProcess		OK
-Do you really want to shut down the system?	ShutdownProcess		¿Realmente quieres apagar el sistema?
+Do you really want to shut down the system?	ShutdownProcess		¿Realmente quiere apagar el sistema?
 Shutdown status	ShutdownProcess		Estado de apagado
 Shut down	ShutdownProcess		Apagar
-The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		La aplicación \"%appName%\" puede estar bloqueada en un panel modal
+The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		La aplicación «%appName%» puede estar bloqueada en un panel modal
 System is shut down	ShutdownProcess		El sistema está apagado
 Restart system	ShutdownProcess		Reiniciar sistema
-Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		La aplicación \"%appName%\" ha cancelado el proceso de apagado.
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		La aplicación «%appName%» ha cancelado el proceso de apagado.
 Asking background applications to quit.	ShutdownProcess		Solicitando a las aplicaciones de fondo que salgan.
-Do you really want to restart the system?	ShutdownProcess		¿Realmente quieres reiniciar el sistema?
+Do you really want to restart the system?	ShutdownProcess		¿Realmente quiere reiniciar el sistema?
 Restart	ShutdownProcess		Reiniciar
-It's now safe to turn off the computer.	ShutdownProcess		Es seguro apagar la computadora
-Asking other processes to quit.	ShutdownProcess		Solicitando que salgan a otros procesos
+It's now safe to turn off the computer.	ShutdownProcess		Es seguro apagar el equipo.
+Asking other processes to quit.	ShutdownProcess		Solicitando a otros procesos que se cierren.
 Cancel shutdown	ShutdownProcess		Cancelar apagado
 Restarting…	ShutdownProcess		Reiniciando...
-%action%?	ShutdownProcess		%action%?
+%action%?	ShutdownProcess		¿%action%?
 Tidying things up a bit.	ShutdownProcess		Limpiando un poco las cosas.
 Kill application	ShutdownProcess		Matar aplicación
 Shutdown aborted	ShutdownProcess		Cancelado el apagado
 Shutting down…	ShutdownProcess		Apagando...
-Asking \"%appName%\" to quit.	ShutdownProcess		solicitando a \"%appName%\" a que salga
+Asking \"%appName%\" to quit.	ShutdownProcess		Solicitando a «%appName%» que se cierre.

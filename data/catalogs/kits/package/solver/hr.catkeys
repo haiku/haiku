@@ -1,0 +1,18 @@
+1	croatian	x-vnd.Haiku-libsolvsolver	794881004
+unspecified problem	SolverProblem		neodređeni problem
+do not keep %source% installed	SolverProblemSolution		ne drži %source% instaliranim
+do not deinstall \"%selection%\"	SolverProblemSolution		nemoj deinstaliratil \"%selection%\"
+install %source% despite its inferior architecture	SolverProblemSolution		instaliraj %source% usprkos inferiornoj arhitekturi
+do not install the most recent version of \"%selection%\"	SolverProblemSolution		nemoj instalirati najnoviju inačicu \"%selection%\"
+allow replacement of %source% with %target%	SolverProblemSolution		dozvoli zamjenu %source% sa %target%
+do not forbid installation of %source%	SolverProblemSolution		ne zabranjuj instalaciju %source%
+dependency problem	SolverProblem		problem zavisnosti
+keep %source% despite its inferior architecture	SolverProblemSolution		zadrži %source% usprkos inferiornoj arhitekturi
+allow name change of %source% to %target%	SolverProblemSolution		dozvoli promjenu imena %source% u %target%
+do something	SolverProblemSolution		učini nešto
+install %selection% despite its old version	SolverProblemSolution		instaliraj %selection% usprkos njegovoj staroj inačici
+cannot install both %source% and %target%	SolverProblem		ne mogu instalirati oboje %source% i %target%
+allow deinstallation of %source%	SolverProblemSolution		dozvoli deinstalaciju %source%
+do not lock \"%selection%\"	SolverProblemSolution		ne zaključavaj \"%selection%\"
+do not install \"%selection%\"	SolverProblemSolution		ne instaliraj \"%selection%\"
+%source% has inferior architecture	SolverProblem		%source% ima inferiornu arhitekturu

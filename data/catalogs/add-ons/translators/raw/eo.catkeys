@@ -1,0 +1,9 @@
+1	esperanto	x-vnd.Haiku-RAWTranslator	2975919330
+RAWTranslator Settings	ConfigView		Agordo de RAWTranslator
+Version %d.%d.%d, %s	ConfigView		Versio %d.%d.%d, %s
+RAW image translator	RAWTranslator		RAW bildotradukilo
+RAW Settings	RAWTranslator main		Agordo de RAW
+RAW images	RAWTranslator		RAW bildoj
+RAW image translator	ConfigView		RAW bildotradukilo
+%s RAW image	RAWTranslator	Parameter (%s) is the name of the manufacturer (like 'Canon')	%s RAW bildo
+Based on Dave Coffin's dcraw 8.63	ConfigView		Bazita sur dcraw 8.63 de Dave Coffin

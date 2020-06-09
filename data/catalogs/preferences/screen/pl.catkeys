@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Screen	4090394050
+1	polish	x-vnd.Haiku-Screen	133788249
 no	Screen		nie
 bits/pixel	Screen		bitów/piksel
 15 bits/pixel, 32768 colors	Screen		15 bitów/piksel, 32768 kolorów
@@ -17,6 +17,7 @@ vertically	Screen		pionowo
 All workspaces	Screen		Wszystkie obszary robocze
 Use laptop panel:	Screen		Użyj ekranu laptopa:
 Could not write VESA mode settings file:\n\t	Screen		Nie można zapisać pliku ustawień trybu VESA:\n\t
+Display info	Screen		Informacje o wyświetlaczu
 Settings will revert in %seconds.	Screen		Ustawienia zostaną cofnięte w ciągu %seconds.
 Cancel	Screen		Anuluj
 Other…	Screen		Inne…
@@ -33,6 +34,7 @@ Warning	Screen		Ostrzeżenie
 24 bits/pixel, 16 Million colors	Screen		24 bity/piksel, 16 Milionów kolorów
 Hz	Screen		Hz
 Workspaces	Screen		Obszary robocze
+Brightness:	Screen		Jasność:
 32 bits/pixel, 16 Million colors	Screen		32 bity/piksel, 16 Milionów kolorów
 Done	Screen		Gotowe
 16 bits/pixel, 65536 colors	Screen		16 bitów/piksel, 65536 kolorów

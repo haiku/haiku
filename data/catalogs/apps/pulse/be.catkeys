@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Pulse	3788463253
+1	belarusian	x-vnd.Haiku-Pulse	2964417303
 Normal mode	DeskbarPulseView		Звычайны рэжым
 Info	CPUButton		Інфа
 Quit	DeskbarPulseView		Выйсці
@@ -44,4 +44,3 @@ Active color	ConfigView		Актыўны колер
 Installing in Deskbar failed\n%s	PulseApp		Немагчыма ўсталяваць у Deskbar.\n%s
 Idle color	ConfigView		Неактыўны колер
 Normal mode	PrefsWindow		Звычайны рэжым
-Pulse settings	PulseWindow		Наладкі Пульса

@@ -2,10 +2,10 @@
 All Rights Reserved.	AboutWindow		Visos teisės saugomos.
 gold master	AboutWindow		galutinė
 Undo	TextView		Atšaukti
+OK	PrintJob		Gerai
 gamma	AboutWindow		gama
 development	AboutWindow		vystoma
 OK	Dragger		Gerai
-OK	PrintJob		Gerai
 Print Server is not responding.	PrintJob		Spausdinimo serveris neatsako.
 About %app%	AboutMenuItem		Apie „%app%“
 Warning	Dragger		Įspėjimas

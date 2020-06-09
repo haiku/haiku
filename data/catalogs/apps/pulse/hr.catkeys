@@ -1,0 +1,43 @@
+1	croatian	x-vnd.Haiku-Pulse	2445305338
+Normal mode	DeskbarPulseView		Normalan način rada
+Info	CPUButton		Info
+Quit	DeskbarPulseView		Izađi
+Info	DeskbarPulseView		Info
+Normal mode	MiniPulseView		Normalan način rada
+Frame color	ConfigView		Boja okvira
+Error	PulseApp		Greška
+Bar colors	ConfigView		Boje trake
+%.2f GHz	NormalPulseView		%.2f GHz
+Defaults	PrefsWindow		Zadano
+%ld MHz	NormalPulseView		%ld MHz
+Mini mode	PrefsWindow		Mini način rada
+About Pulse…	PulseView		O Pulse...
+Pulse	NormalPulseView		Pulse
+Deskbar mode	NormalPulseView		Deskbar način rada
+Remove replicant	CPUButton		Ukloni replikanta
+You can't disable the last active CPU.	PulseView		Ne možete onemogućiti zadnji aktivni procesor.
+Width of icon:	ConfigView		Širina ikone:
+Deskbar mode	MiniPulseView		Deskbar način rada
+OK	PulseView		U redu
+%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nNapravili David Ramsey and Arve Hjønnevåg\nPregledao Daniel Switkin\n
+OK	PrefsWindow		U redu
+Pulse	PulseApp		Pulse
+Removing from Deskbar failed.\n%s	DeskbarPulseView		Neuspjelo uklanjanje sa  Deskbara .\n%s
+OK	PulseApp		U redu
+About Pulse…	CPUButton		O Pulse...
+Deskbar mode	PrefsWindow		Deskbar način rada
+Mini mode	DeskbarPulseView		Mini način rada
+You can't disable the last active CPU.	CPUButton		Ne možete onemogućiti zadnji aktivni procesor.
+OK	CPUButton		U redu
+Deskbar	CPUButton		Deskbar
+Settings…	PulseView		Postavke...
+Deskbar menu	CPUButton		Deskbar izbornik
+Mini mode	NormalPulseView		Mini način rada
+Quit	MiniPulseView		Izađi
+Info	PulseView		Info
+OK	DeskbarPulseView		U redu
+Info	PulseApp		Info
+Pulse	System name		Pulse
+Active color	ConfigView		Aktivna boja
+Installing in Deskbar failed\n%s	PulseApp		Neuspjelo instaliranje Deskbara\n%s
+Normal mode	PrefsWindow		Normalan način rada

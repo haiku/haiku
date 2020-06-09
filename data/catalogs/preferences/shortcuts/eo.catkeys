@@ -1,0 +1,47 @@
+1	esperanto	x-vnd.Haiku-Shortcuts	3834857117
+*MouseUp	ShortcutsWindow		*MusonSupren
+Application	ShortcutsWindow		Programo
+Option	ShortcutsSpec	Name for modifier on keyboard	Opcio
+Save changes before closing?	ShortcutsWindow		Ĉu konservi ŝanĝojn antaŭ fermi?
+Revert to saved	ShortcutsWindow		Reveni al konservita
+Don't save	ShortcutsWindow		Ne konservi
+*MouseDown	ShortcutsWindow		*MusonMalsupren
+*Beep	ShortcutsWindow		*Pepo
+Shortcuts wasn't able to save your keyset.	ShortcutsWindow		La Ŝparklavoj ne povis konservi vian klavan atribuaron.
+Save	ShortcutsWindow		Konservi
+Either	ShortcutsSpec		Aŭ
+Oh no	ShortcutsWindow		Ho ne
+Key	ShortcutsWindow		Klavo
+*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*SendiMesaĝon application/x-vnd.Be-TRAK 'Tfnd'
+Select	ShortcutsWindow		Elekti
+Shortcuts	System name		La Ŝparklavoj
+Quit	ShortcutsWindow		Ĉesi
+(Choose application with file requester)	ShortcutsWindow		(Elektu aplikaĵon per dosiera serĉilo)
+Cancel	ShortcutsWindow		Nuligi
+*MoveMouse +20 +0	ShortcutsWindow		*ŜoviMuson +20 +0
+Control	ShortcutsSpec	Name for modifier on keyboard	Kontrola
+Left	ShortcutsSpec		Maldekstra
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		La Ŝparklavoj ne sukcesis analizi vian dosieron de klava atribuaro!
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		La Ŝparklavoj ne sukcesis konservi vian dosieron de klava atribuaro!
+*InsertString \"Your Text Here\"	ShortcutsWindow		*InsertiĈenon \"Via teksto ĉi tie\"
+Remove selected shortcut	ShortcutsWindow		Forigi elektitan klavan atribuon
+Error, NULL state description?	ShortcutsSpec		Eraro, NULL en stata priskribo?
+Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		La Ŝparklavoj ne sukcesis uzi vian klavan atribuaron!
+Save & apply	ShortcutsWindow		Konservi kaj uzi
+Open	ShortcutsWindow		Uzi
+Append	ShortcutsWindow		Aldoni
+Both	ShortcutsSpec		Ambaŭ
+Save KeySet as…	ShortcutsWindow		Konservi la klavan atribuaron kiel…
+Append KeySet…	ShortcutsWindow		Aldoni klavan atribuaron…
+*MouseButton 1	ShortcutsWindow		*MusaButono 1
+*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Kunigi \"*ŜovuMusonAl 100% 0\" \"*MusaButono 1\"
+Right	ShortcutsSpec		Dekstra
+OK	ShortcutsWindow		Bone
+Add new shortcut	ShortcutsWindow		Aldoni novan klavan atribuon
+(None)	ShortcutsSpec		(Neniu)
+Shift	ShortcutsSpec	Name for modifier on keyboard	Majuskligklavo
+Open KeySet…	ShortcutsWindow		Uzi klavan atribuaron…
+File	ShortcutsWindow		Dosiero
+*LaunchHandler text/html	ShortcutsWindow		*PrilaboriloPor text/html
+*MoveMouseTo 50% 50%	ShortcutsWindow		*ŜoviMusonAl 50% 50%

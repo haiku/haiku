@@ -1,0 +1,74 @@
+1	esperanto	x-vnd.Haiku-MediaConverter	2251404027
+Writing audio track: %d%% complete	MediaConverter		Registrado de sontrako: %d%% de plenumo
+Input file not recognized as Audio or Video	MediaConverter		Eniga dosiero ne estas rekonita kiel aŭdaĵo aŭ video
+%u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u * %u, %.2f kadrojn sekunde
+Video quality: %3d%%	MediaConverter		Kvalito de video: %3d%%
+Source files	MediaConverter		Fontaj dosieroj
+Error writing video frame %ld	MediaConverter		Eraro dum registrado de videokadro %ld
+Error converting '%filename'	MediaConverter		Eraro de konvertado de '%filename'
+Selected directory not found. Defaulting to /boot/home	MediaConverter		Elektita dosierujo ne estis trovita. Defaŭltigita al /boot/home
+Conversion completed	MediaConverter		Konvertado estis kompletigita
+Audio:	MediaConverter-FileInfo		Aŭdaĵo:
+MediaConverter+:SaveDirectory	MediaConverter		La PlurmediaKonvertilo+:KonservaDosierujo
+Error creating video.	MediaConverter		Eraro de videokreado
+Cancelling	MediaConverter		Nuligado
+None available	Audio codecs		Nedisponebla
+No file selected	MediaConverter-FileInfo		Neniu dosiero estis elektita
+High	MediaConverter		Alta
+{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{La dosiero ne estis rekonita kiel subtenata aŭdvida dosiero:} other{# dosieroj ne estis rekonitaj kiel subtenataj aŭdvidaj dosieroj:}}
+File Error	MediaConverter-FileInfo		Dosiera eraro
+None available	Video codecs		Nedisponebla
+Output format	MediaConverter		Eliga formato
+%.1f kHz mono	MediaFileInfo		%.1f kHz unukanale
+%.1f kHz stereo	MediaFileInfo		%.1f kHz dukanale
+OK	MediaConverter		Bone
+Error creating '%filename'	MediaConverter		Eraro dum kreado de '%filename'
+Error loading a file	MediaConverter		Eraro dum ŝargado de dosiero
+Encoder parameters	MediaConverter-EncoderWindow		Parametroj de enkodigilo
+Open…	Menu		Uzi…
+Audio encoding:	MediaConverter		Aŭdaĵa enkodigeco:
+Audio quality: %3d%%	MediaConverter		Aŭdaĵa kvalito: %3d%%
+Cancelling…	MediaConverter		Nuligado…
+Output file '%filename' created	MediaConverter		Elira dosiero '%filename' estas kreita
+Output folder	MediaConverter		Elira dosierujo
+Error creating track.	MediaConverter		Eraro dum kreado de trako.
+ seconds	MediaFileInfo		 sekundoj
+Video using parameters form settings	MediaConverter		Video uzante parametrojn de agorda formularo
+Video:	MediaConverter-FileInfo		Video:
+Select	MediaConverter		Elekti
+Conversion cancelled	MediaConverter		Konvertado estas nuligita
+Low	MediaConverter		Malalta
+Error loading files	MediaConverter		Eraro dum ŝargado de dosieroj
+{0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# bito} other{# bitoj}}
+End   [ms]: 	MediaConverter		Fino   [ms]: 
+Cancel	MediaConverter		Nuligi
+OK	MediaConverter-FileInfo		Bone
+Error read audio frame %ld	MediaConverter		Eraro dum preno de aŭdaĵa kadro %ld
+Video encoding:	MediaConverter		Videa enkodigeco:
+An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Eraro okazis dum preno de la dosiera informo.\n\nEraro: 
+Error	MediaConverter		Eraro
+File details	MediaConverter		Informo pri dosiero
+No audio	Audio codecs list		Aŭdaĵo forestas
+Drop media files onto this window	MediaConverter		Ĵetu plurmediajn dosierojn en la fenestron
+{0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# kadro} other{# kadroj}}
+Quit	Menu		Ĉesi
+{0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# bitoko} other{# bitokoj}}
+Duration:	MediaConverter-FileInfo		Daŭro:
+MediaConverter	System name		PlurmediaKonvertilo
+Error launching: %strError%	MediaConverter		Eraro dum lanĉado: %strError%
+File format:	MediaConverter		Formato de dosiero:
+Error writing audio frame %ld	MediaConverter		Eraro dum skribado de aŭdaĵa kadro %ld
+File	Menu		Dosiero
+Video quality not supported	MediaConverter		Kvalito de video ne estas subtenata
+Select this folder	MediaConverter		Elekti ĉi dosierujon
+Error read video frame %ld	MediaConverter		Eraro dum legado de videa kadro %ld
+%.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld kanalo
+%d bit 	MediaFileInfo		%d bito(j) 
+No video	Video codecs list		Video forestas
+Continue	MediaConverter		Daŭri
+Convert	MediaConverter		Konverti
+Audio quality not supported	MediaConverter		Aŭdaĵa kvalito ne estas subtenata
+Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Eraro dum skribo en lokon: %strPath%. Defaŭltigo al loko: /boot/home
+Writing video track: %d%% complete	MediaConverter		Skribado de videa trako: %d%% farite
+Preview	MediaConverter		Antaŭrigardo
+Start [ms]: 	MediaConverter		Komenco [ms]: 

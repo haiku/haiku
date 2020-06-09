@@ -1,4 +1,4 @@
-1	french	x-vnd.haiku-icon_o_matic	3554185674
+1	french	x-vnd.haiku-icon_o_matic	2424331018
 None	Icon-O-Matic-Properties		Aucun
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Rotation des indices de chemin
 Add empty	Icon-O-Matic-ShapesList		Ajouter une forme vide
@@ -112,7 +112,7 @@ Drop shapes	Icon-O-Matic-ShapesList		Supprimer les formes
 PNG Set	Icon-O-Matic-SavePanel		Ensemble PNG
 to attach transformers.	Empty transformers list - 2nd line		pour attacher des transformations.
 Linear	Icon-O-Matic-StyleTypes		Linéaire
-any of the other lists to	Empty property list - 2nd line		l'une des autres listes pour
+any of the other lists to	Empty property list - 2nd line		l’une des autres listes pour
 Nudge Control Point	Icon-O-Matic-NudgePointsCommand		Déplacer le point de contrôle
 Flip Control Point	Icon-O-Matic-FlipPointsCmd		Retourner le Point de Contrôle
 Add Paths	Icon-O-Matic-AddPathsCmd		Ajouter les chemins
@@ -148,7 +148,6 @@ Caps	Icon-O-Matic-PropertyNames		Majuscules
 OK	Icon-O-Matic-SVGImport		OK
 Append…	Icon-O-Matic-Menu-File		Ajouter…
 Scale Y	Icon-O-Matic-PropertyNames		Échelle en Y
-Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Impossible d’ouvrir le fichier « %s » en tant que document SVG.\n\nError : %s
 Export icon	Dialog title		Exporter l’icône
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Couleur (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Éditer le dégadé

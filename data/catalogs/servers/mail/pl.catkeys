@@ -16,4 +16,4 @@ Mail status	Notifier		Status poczty
 Check for mails only	DeskbarView		Sprawdź tylko pocztę
 Check for mail now	DeskbarView		Sprawdź pocztę teraz
 Sending mail for %name	Notifier		Wysyłanie poczty z konta %name
-Mail daemon status log	MailDaemon		Plik logów serwera poczty
+Mail daemon status log	MailDaemon		Plik dziennika demona poczty

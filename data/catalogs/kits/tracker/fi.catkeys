@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	659027911
+1	finnish	x-vnd.Haiku-libtracker	4118767010
 Created	ContainerWindow		Luotu
 Icon	AttributesView		Kuvake
 Open and make preferred	OpenWithWindow		Avaa ja tee ensisijaiseksi
@@ -262,6 +262,7 @@ ends with	SelectionWindow		loppuu kohteella
 Open	OpenWithWindow		Avaa
 You must have at least one attribute showing.	PoseView		Sinulla on oltava vähintään yksi attribuutti näytettäväksi.
 Cut	FilePanelPriv		Leikkaa
+Finish: after several years	StatusWindow		Valmis: useiden vuosien jälkeen
 Favorites	FilePanelPriv		Suosikit
 Point	AttributesView		Piste
 home	B_USER_DIRECTORY		koti
@@ -307,7 +308,6 @@ Delete	FSUtils		Poista
 Edit name	ContainerWindow		Muokkaa nimeä
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Asiakirjan ”%document” avaus epäonnistui (Symboli puuttuu: %symbol).\n
 ASCII Text	AttributesView		ASCI-teksti
-More options	FindPanel		Lisää valitsimia
 Atom reference	AttributesView		Atomiviite
 config	B_USER_CONFIG_DIRECTORY		asetukset
 Error moving \"%name\".	FSUtils		Virhe siirrettäessä kohdetta ”%name”.
@@ -341,7 +341,6 @@ Make active printer	ContainerWindow		Aseta aktiivinen tulostin
 Copy to	ContainerWindow		Kopioi kohteeseen
 Name	SelectionWindow		Nimi
 by attribute	FindPanel		attribuuteittain
- info	InfoWindow		 tiedot
 Write	FilePermissionsView		Kirjoita
 <%ld bytes of data>	AttributesView		<%ld tavua tietoja>
 If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Jos muutat kansiota tai sen sisältöä, et ehkä kykene käynnistämään käyttöjärjestelmää %osName!\n\nOletko varma, että haluat tehdä tämän?\n\nJos kuitenkin muutat kansiota tai sen sisältöä, pidä alhaalla Vaihto-näppäin ja napsauta ”Tiedän, mitä olen tekemässä”.
@@ -396,7 +395,6 @@ Proceed	FSUtils		Jatketaan
 Edit favorites…	FilePanelPriv		Muokkaa suosikkeja...
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		Et voi siirtää kansiota itseensä tai mihinkään sen omista alikansioista.
 New	ContainerWindow		Uusi
-Fewer options	FindPanel		Vähemmän valitsimia
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Sinun on pudotettava kohteet ”Levyt”-ikkunan yhdelle levykuvakkeelle.
 If you alter %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Jos muutat kohdetta %target, %osName ei ehkä toimi oikein!\n\nOletko varma, että haluat tehdä tämän?
 Sorry, you can't copy items to the Trash.	FSClipBoard		Et voi kopioida kohteita roskakoriin.

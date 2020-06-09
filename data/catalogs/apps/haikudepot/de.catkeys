@@ -1,10 +1,9 @@
-1	german	x-vnd.Haiku-HaikuDepot	3381858533
+1	german	x-vnd.Haiku-HaikuDepot	1812825467
 Repository update error	LocalRepositoryUpdateProcess		Fehler bei Paketquellenaktualisierung
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Fehler bei der Aktualisierung der Paketquelle: %error%
 User Created	UserLoginWindow		Benutzerkonto erstellt
 Check for updates…	MainWindow		Aktualisierungen suchen…
 Uninstall	PackageManager		Deinstallieren
-(%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		Deinstalliert
 It was not possible to create the new user.	UserLoginWindow		Das neue Benutzerkonto konntenicht angelegt werden.
 Available packages	MainWindow		Verfügbare Pakete
@@ -35,7 +34,6 @@ Login or Create account	MainWindow		Anmelden oder Benutzerkonto anlegen
 Ratings	PackageInfoView		Bewertungen
 Switch account…	MainWindow		Konto wechseln…
 Preferred language:	UserLoginWindow		Bevorzugte Sprache:
-Server Error	ServerHelper		Serverfehler
 Name	PackageListView		Name
 Authorization or security issue. Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		Berechtigungs- oder Sicherheitsproblem. Bitte aus- und wieder einloggen, um sicherzustellen dass das Kennwort stimmt. Außerdem prüfen, ob die aktuellen Nutzerbedingungen akzeptiert wurden.
 Local	LocalPkgDataLoadProcess		Lokal
@@ -60,7 +58,6 @@ Featured packages	FeaturedPackagesView		Empfohlene Pakete
 The supplied response to the captcha is incorrect. A new captcha will be generated; try again.	UserLoginWindow		Das Captcha wurde nicht richtig beantwortet. Es wird ein neues Captcha erzeugt; bitte nochmal probieren.
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Es konnte keine Verbindung mit dem Server aufgebaut werden, um ein Captcha für das Anlegen eines neuen Benutzerkontos zu erhalten.
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Die Bewertung wurde erfolgreich hochgeladen. Auf der HaikuDepot Server Webseite lässt sie sich aktualisieren oder auch wieder löschen.
-Network Error	ServerHelper		Netzwerkfehler
 Available	PackageListView		Verfügbar
 Cancel	UserLoginWindow		Abbrechen
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		Um richtig zu funktionieren, benötigt HaikuDepot den Paket-Daemon, der aber anscheinend gerade nicht läuft.\nSoll er gestartet werden?
@@ -68,7 +65,6 @@ Click a package to view information	PackageInfoView		Paket anklicken, um Infos a
 The password must be at least eight characters long, consist of at least two digits and one upper case character.	UserLoginWindow		Das Kennwort muss mindestens acht Zeichen lang sein und wenigstens zwei Zahlen und einen Großbuchstaben enthalten.
 Contents	PackageInfoView		Inhalt
 Close	PackageManager		Schließen
-A network transport error has arisen communicating with the HaikuDepot server system: %s	ServerHelper		Bei der Kommunikation mit dem HaikuDepot Server ist ein Netzwerk-Übertragungsfehler aufgetreten: %s
 Changelog	PackageInfoView		Änderungsprotokoll
 Rating not possible	MainWindow		Bewertung nicht möglich
 Package update error	MainWindow		Fehler bei Paketaktualisierung
@@ -78,7 +74,6 @@ Reboot required	PackageManager		Neustart erforderlich
 Very unstable	RatePackageWindow		Sehr instabil
 Password:	UserLoginWindow		Kennwort:
 All packages	PackageListView		Alle Pakete
-Network Transport Error	ServerHelper		Netzwerk-Übertragungsfehler 
 Stability	RatePackageWindow		Stabilität
 Send	RatePackageWindow		Senden
 Start package daemon	App		Paket-Daemon starten
@@ -105,14 +100,14 @@ Close	RatePackageWindow		Schließen
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synchronisieren von Paketdaten für Paketquelle '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Nutzungsbedingungen lesen
 Login issue	MainWindow		Anmeldungsproblem
-Your rating:	RatePackageWindow		Eigene Bewertung:
 Size	PackageListView		Größe
+Your rating:	RatePackageWindow		Eigene Bewertung:
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		Der Nutzer %Nickname% wurde erfolgreich im HaikuDepotServer System angelegt. Nutzerdaten können im Webinterface verwaltet werden. Der neu angelegte Nutzer ist jetzt angemeldet.
 Your rating was updated.	RatePackageWindow		Die Bewertung wurde aktualisiert.
 All categories	FilterView		Alle Kategorien
 Repositories	MainWindow		Paketquellen
 n/a	PackageInfoView		n.v.
-This rating is visible to other users	RatePackageWindow		Diese Bewertung is für andere Nutzer sichtbar.
+This rating is visible to other users	RatePackageWindow		Diese Bewertung is für andere Nutzer sichtbar
 View agreed usage conditions…	MainWindow		Zugestimmte Nutzungsbedingungen lesen…
 Cancel	MainWindow		Abbrechen
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 weiterer Download)}other{(# weitere Downloads)}}
@@ -169,8 +164,6 @@ Open %DeskbarLink%	PackageManager		%DeskbarLink% öffnen
 User creation error	UserLoginWindow		Fehler beim Erstellen des Benutzerkontos
 Install	PackageManager		Installieren
 Input validation	UserLoginWindow		Eingabeprüfung
-This application is too old to communicate with the HaikuDepot server system. Obtain a newer version of HaikuDepot by updating your Haiku system. The minimum version of HaikuDepot required is \"%s\".	ServerHelper		Diese Anwendung ist zu alt um mit dem HaikuDepotServer System zu kommunizieren. Um die HaikuDepot Anwendung zu aktualisieren, bitte ein Update von Haiku durchführen. HaikuDepot muss mindestens in der Version \"%s\" vorliegen.
-An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		Der HaikuDepot Server hat einen unerwarteten Fehler gesandt [%i]
 Log in…	MainWindow		Anmelden…
 You need to be logged into an account before you can rate packages.	MainWindow		Nur angemeldete Benutzer können Pakete bewerten.
 Client version too old	ServerHelper		Client Version zu alt

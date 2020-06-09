@@ -1,8 +1,9 @@
-1	russian	x-vnd.Haiku-About	1828471351
+1	russian	x-vnd.Haiku-About	511528774
 Revision	AboutView		Ревизия
 The Haikuware team and their bounty program\n	AboutView		Команде Haikuware и их программе пожертвований\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Все права защищены © 1999-2007 Michael C. Ring.
 %.2f GHz	AboutView		%.2f ГГц
+Copyright © 2001-%d The Haiku project. 	AboutView		Все права защищены © 2001-%d Проект Haiku. 
 \n\nSpecial thanks to:\n	AboutView		\n\nОсобая благодарность:\n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (за его ядро NewOS)\n
 Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Все права защищены © 1999-2000 Y.Takagi.
@@ -14,6 +15,7 @@ Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		В
 Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Все права защищены © 1990-2002 Info-ZIP.
 Past website & marketing:\n	AboutView		Старый вебсайт и маркетинг:\n
 Copyright © 2003 Peter Hanappe and others.	AboutView		Все права защищены © 2003 Peter Hanappe и другие.
+Testing and bug triaging:\n	AboutView		Тестирование и сортировка багов:\n
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{Процессор:} few{# процессора:} other{# процессоров:}}
 %d MiB total	AboutView		Всего %d МБ
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Код, написанный специально для Haiku, особенно ядро и весь код, с которым могут быть связаны приложения, распространяется на условиях <MIT license>. Некоторые системные библиотеки содержат сторонний код, распространяемый под <LGPL license>. Вы можете найти авторские права на этот код ниже.\n\n

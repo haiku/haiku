@@ -1,47 +1,46 @@
-1	thai	x-vnd.Haiku-ActivityMonitor	1155619009
-P-faults	DataSource		P-faults
-Media nodes	DataSource		โหนดสื่อ
-Threads	DataSource		Threads
-Always on top	ActivityWindow		อยู่ด้านบนเสมอ
-Add graph	ActivityWindow		เพิ่มกราฟ
+1	thai	x-vnd.Haiku-ActivityMonitor	3672498538
 Teams	DataSource		ทีม
+Semaphores	DataSource		การให้สัญญาณ
+TX	DataSource	Shorter version for Sending	TX
+Block cache memory	DataSource		บล็อกหน่วยความจำแคช
+%lld ms	SettingsWindow		%lld ms
 MiB	DataSource		MiB
-Network send	DataSource		เครือข่ายส่ง
-CPU usage (combined)	DataSource		การใช้งาน CPU (รวมกัน)
-CPU	DataSource		CPU
-Used memory	DataSource		หน่วยความจำที่ใช้
-Cached memory	DataSource		หน่วยความจำแคช
-Apps	DataSource		แอพส์
-Show legend	ActivityView		แสดงคำอธิบาย
+Media nodes	DataSource		โหนดสื่อ
 Text clipboard	DataSource		คลิปบอร์ดข้อความ
-Settings	ActivityWindow		การตั้งค่า
+Network send	DataSource		เครือข่ายส่ง
+Running applications	DataSource		แอพที่กำลังทำงาน
+Cache	DataSource		แคช
+CPU usage (combined)	DataSource		การใช้งาน CPU (รวมกัน)
+Threads	DataSource		Threads
 Receiving	DataSource		ได้รับ
+Remove graph	ActivityView		ลบกราฟ
+Swap space	DataSource		สลับพื้นที่
+CPU	DataSource		CPU
+ActivityMonitor	System name		การตรวจสอบกิจกรรม
+Update time interval:	SettingsWindow		อัปเดตช่วงเวลา:
+RX	DataSource	Shorter version for Receiving.	RX
 Settings…	ActivityWindow		การตั้งค่า
+Block cache	DataSource		บล็อคแคช
+Memory	DataSource		หน่วยความจำ
+CPU usage	DataSource		การใช้งาน CPU
+Quit	ActivityWindow		หยุด
+Raw clipboard	DataSource		คลิปบอร์ดต้นฉบับ
+Settings	ActivityWindow		การตั้งค่า
+Used memory	DataSource		หน่วยความจำที่ใช้
+%.1f faults/s	DataSource		%.1f faults/s
+Show legend	ActivityView		แสดงคำอธิบาย
+Cached memory	DataSource		หน่วยความจำแคช
+File	ActivityWindow		ไฟล์
 Ports	DataSource		พอร์ท
 Page faults	DataSource		ความผิดพลาดของหน้า
-Sending	DataSource		ส่ง
-Cache	DataSource		แคช
-%.1f faults/s	DataSource		%.1f faults/s
-Update time interval:	SettingsWindow		อัปเดตช่วงเวลา:
-TX	DataSource	Shorter version for Sending	TX
-Quit	ActivityWindow		หยุด
-Block cache memory	DataSource		บล็อกหน่วยความจำแคช
-Remove graph	ActivityView		ลบกราฟ
-%lld sec.	SettingsWindow		%lld sec.
-%lld ms	SettingsWindow		%lld ms
-CPU usage	DataSource		การใช้งาน CPU
-Raw clipboard	DataSource		คลิปบอร์ดต้นฉบับ
-Sems	DataSource		Sems
-%.1f MiB	DataSource		%.1f MiB
-ActivityMonitor	System name		การตรวจสอบกิจกรรม
-Running applications	DataSource		แอพที่กำลังทำงาน
-Semaphores	DataSource		การให้สัญญาณ
-Block cache	DataSource		บล็อคแคช
-Swap space	DataSource		สลับพื้นที่
-Swap	DataSource		สลับ
-File	ActivityWindow		ไฟล์
-usage	DataSource		การใช้งาน
+Apps	DataSource		แอพส์
 Additional items	ActivityView		รายการเพิ่มเติม
+Add graph	ActivityWindow		เพิ่มกราฟ
+Sending	DataSource		ส่ง
+%.1f MiB	DataSource		%.1f MiB
+Always on top	ActivityWindow		อยู่ด้านบนเสมอ
+Swap	DataSource		สลับ
+%lld sec.	SettingsWindow		%lld sec.
+P-faults	DataSource		P-faults
+Sems	DataSource		Sems
 Network receive	DataSource		เครือข่ายได้รับ
-Memory	DataSource		หน่วยความจำ
-RX	DataSource	Shorter version for Receiving.	RX

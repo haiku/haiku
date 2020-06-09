@@ -1,18 +1,25 @@
-1	english	x-vnd.Haiku-Notifications	1507213255
+1	english	x-vnd.Haiku-Notifications	2398118545
+Lower left	GeneralView		左下方
 Application does not have a valid signature	NotificationView	Alert message	应用程序没有有效标签签名
 Status	NotificationView		状态
 Add…	NotificationView		添加…
+Lower right	GeneralView		右下方
 Muted	NotificationView		静音
 Window width:	GeneralView		窗口宽度：
 OK	PrefletWin		确定
 Notifications	PrefletWin		通知
+Mute notifications from this application	NotificationView		屏蔽来自这个应用程序的通知
 Revert	PrefletWin		还原
 Applications	PrefletView		应用程序
 Timeout:	GeneralView		超时：
+Upper right	GeneralView		右上方
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		首选项保存时发生错误。\n可能硬盘空间不足。
+Upper left	GeneralView		左上方
 Applications	NotificationView		应用程序
+Width:	GeneralView		宽度：
 General	PrefletView		常规
 OK	NotificationView		确定
+Follow Deskbar	GeneralView		跟随 Deskbar
 Notifications	System name		通知
 Allowed	NotificationView		允许
 Duration:	GeneralView		时长：
@@ -20,3 +27,4 @@ Application	NotificationView		应用程序
 Enable notifications	GeneralView		启用通知
 This is a test notification message	PrefletWin		这是测试通知消息
 Remove	NotificationView		移除
+Position:	GeneralView		位置：

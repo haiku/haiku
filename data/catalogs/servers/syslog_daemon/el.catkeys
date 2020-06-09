@@ -1,0 +1,4 @@
+1	greek, modern (1453-)	x-vnd.Haiku-SystemLogger	57960782
+Syslog Daemon	SyslogDaemon		Πρόγραμμα Παρασκηνίου Syslog
+OK	SyslogDaemon		Εντάξει
+%s\n\nThis daemon is responsible for collecting all system messages and write them to the system-wide log at \"%s\".\n\n	SyslogDaemon		%s\n\nΑυτό το πρόγραμμα παρασκηνίου είναι υπεύθυνο για την συλλογή όλων των μηνυμάτων του συστήματος και την καταχώρηση της καταγραφής του συστήματος στο \"%s\".\n\n

@@ -1,0 +1,64 @@
+1	greek, modern (1453-)	x-vnd.Haiku-PackageInstaller	2472572058
+Package description	UninstallView		Περίληψη πακέτου
+none	PackageView		κανένα
+Continue	PackageInstall		Συνέχεια
+Running post-installation scripts	PackageInstall		Εκτέλεση script πριν την εγκατάσταση
+Package installer	PackageView		Εγκαταστάτης Πακέτων
+All existing files will be skipped?	PackageView		Όλα τα υπάρχοντα αρχεία θα παραβλεφθούν;
+Replace	PackageView		Αντικατάσταση
+All existing files will be replaced?	PackageView		Όλα τα υπάρχοντα αρχεία θα αντικατασταθούν;
+Other…	PackageView		Άλλο…
+The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		Ο συμβολικός δεσμός με όνομα '%s' υπάρχει ήδη σε αυτήν την τοποθεσία.\nΘέλετε να αντικαταστήσετε τον δεσμό αυτό με τον δεσμό στο πακέτο ή να τον παραλείψετε;
+Stop	PackageStatus		Διακοπή
+Install to:	PackageView		Εγκατάσταση στο:
+The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Το ζητούμενο πακέτο φαίνεται να είναι ήδη εγκατεστημένο στο υστημα σας. Θα θέλατε να απεγκαταστήσετε το υπάρχων πακέτο και να συνεχίσετε την εγκατάσταση;
+Skip all	PackageView		Παράβλεψη όλων
+The installation of the package has been aborted.	PackageView		Η εγκατάσταση αυτού του πακέτου ματαιώθηκε.
+No installation type selected	PackageView		Δεν επιλέχθηκε τύπος εγκατάστασης
+Do you want to remember this decision for the rest of this installation?\n	PackageView		Θα θέλατε να απομνημονευτεί αυτή η απόφαση για την υπόλοιπη διαδικασία της εγκατάστασης;\n
+The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Το επιλεγμένο πακέτο δεν έχει αφαιρεθεί από το σύστημά σας. Το αρχείο πληροφοριών του επιλεγμένου πακέτου είναι ενδεχομένως κατεστραμμένο.
+Install…	UninstallView		Εγκατάσταση…
+The item named '%s' already exists in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Το αντικείμενο με όνομα '%s' υπάρχει ήδη σε αυτήν την τοποθεσία.\nΘέλετε να αντικαταστήσετε το αντικείμενο αυτό με το αντικείμενο στο πακέτο ή να το παραλείψετε;
+Installing files and folders	PackageInstall		Εγκατάσταση αρχείων και φακέλων
+Installed packages	UninstallWindow		Εγκατεστημένα πακέτα
+Remove	UninstallView		Αφαίρεση
+The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Η εγκατάσταση του ζητούμενου πακέτου στο σύστημα σας απέτυχε. Αυτό μπορεί να είναι ένα πρόβλημα με το προορισμένο αρχείο πακέτου. Παρακαλώ, αναφέρετε το πρόβλημα αυτό στον διανομέα του πακέτου.
+OK	UninstallView		Εντάξει
+Accept	PackageTextViewer		Αποδοχή
+Abort	PackageView		Ματαίωση
+Disclaimer	PackageTextViewer		Disclaimer
+Preparing package	PackageInstall		Προετοιμασία πακέτου
+The package you requested has been successfully installed on your system.	PackageView		Το πακέτο που ζητήσατε εγκαταστάθηκε επιτυχός στο σύστημα σας.
+Installation progress	PackageView		Πρόοδος εγκατάστασης
+Decline	PackageTextViewer		Απόρριψη
+Continue	PackageTextViewer		Συνέχεια
+Installing package	PackageStatus		Εγκατάσταση πακέτου
+Install %name%	PackageView		Εγκατάσταση %name%
+%index% of %total%	PackageInstall		%index% από %total%
+No package selected.	UninstallView		Δεν επιλέχθηκε πακέτο.
+%name% (%size% free)	PackageView		%name% (%size% ελεύθερα)
+Error while installing the package\n	PackageView		Σφάλμα κατά την εγκατάσταση του πακέτου\n
+Finishing installation	PackageInstall		Ολοκλήρωση εγκατάστασης
+No package available.	PackageInfo		Δεν υπάρχει διαθέσιμο πακέτο.
+The script named '%s' already exists in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Το σενάριο με όνομα '%s' υπάρχει ήδη σε αυτήν την τοποθεσία.\nΘέλετε να αντικαταστήσετε το σενάριο αυτό με το σενάριο στο πακέτο ή να το παραλείψετε;
+Installation type:	PackageView		Τύπος εγκατάστασης:
+The package you selected has been successfully removed from your system.	UninstallView		Το πακέτο που επιλέξατε αφαιρέθηκε επιτυχώς από το σύστημά σας.
+There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Φαίνεται ότι το μεγέθος του αρχείου πακέτου είναι απρόσμενο. Το πακέτο μπορεί ενδεχομένως να είναι καταστραμμένο ή να έχει τροποποιηθεί αφού δημιουργήθηκε. Θέλετε οπωσδήποτε να συνεχίσετε;
+%name% (%size%)	PackageView		%name% (%size%)
+Abort	PackageInstall		Ματαίωση
+The file named '%s' already exists in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Το αρχείο με όνομα '%s' υπάρχει ήδη σε αυτήν την τοποθεσία.\nΘέλετε να αντικαταστήσετε το αρχείο αυτό με το αρχείο στο πακέτο ή να το παραλείψετε;
+Replace all	PackageView		Αντικατάσταση όλων
+The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Το αρχείο πακέτου δεν είναι αναγνώσιμο.\nΈνας από τους πιθανούς λόγους για αυτό είναι οτι μπορεί το ζητούμενο πακέτο να μην είναι ένα έγκυρο πακέτο .pkg του BeOS.
+Continue	PackageInfo		Συνέχεια
+No package selected.	PackageInfo		Δεν επιλέχθηκε πακέτο.
+Error! \"%s\" is not a valid path.\n	Packageinstaller main		Σφάλμα! Το \"%s\" δεν αποτελεί έγκυρη διαδρομή.\n
+The directory named '%s' already exists in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Ο κατάλογος με όνομα '%s' υπάρχει ήδη σε αυτήν την τοποθεσία.\nΘέλετε να αντικαταστήσετε τον κατάλογο αυτό με τον κατάλογο στο πακέτο ή να τον παραλείψετε;
+LegacyPackageInstaller	System name		Παλαιωμένος Εγκαταστάτης Πακέτων
+Ask again	PackageView		Ερώτηση ξανά
+Begin	PackageView		Ξεκίνημα
+OK	PackageView		Εντάξει
+Abort	PackageInfo		Ματαίωση
+Done	PackageInstall		Έγινε
+Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Σφάλμα(%s)! Αδυναμία ανοίγματος του \"%s\".\n
+Skip	PackageView		Παράλειψη
+Image not loaded correctly	PackageImageViewer		Η εικόνα δε φορτώθηκε σωστά

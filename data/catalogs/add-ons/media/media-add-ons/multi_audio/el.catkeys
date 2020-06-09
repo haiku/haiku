@@ -1,0 +1,34 @@
+1	greek, modern (1453-)	x-vnd.Haiku-hmulti_audio.media_addon	451057402
+Master	MultiAudio		Κύριο
+SPDIF	MultiAudio		SPDIF
+Gain	MultiAudio		Απολαβή
+Output 3D center	MultiAudio		Κέντρο 3D εξόδου ήχου
+Extended Setup	MultiAudio		Προχωρημένες Ρυθμίσεις
+CD	MultiAudio		CD
+Tone control	MultiAudio		Έλεγχος τόνου
+Phone	MultiAudio		Τηλέφωνο
+Aux	MultiAudio		Aux
+Output bass	MultiAudio		Μπάσο εξόδου ήχου
+Headphones	MultiAudio		Ακουστικά
+Beep	MultiAudio		Ηχητικό σήμα
+Output mono mix	MultiAudio		Μονοφωνική μίξη εξόδου ήχου
+Output stereo mix	MultiAudio		Στερεοφωνική μίξη εξόδου ήχου
+Input	MultiAudio		Είσοδος ήχου
+Output treble	MultiAudio		Πρίμα εξόδου ήχου
+Mono mix	MultiAudio		Μίξη μονοφωνικού
+General	MultiAudio		Γενικά
+Input & Output	MultiAudio		Είσοδος & Έξοδος
+Enhanced Setup	MultiAudio		Ρυθμίσεις για προχωρημένους
+Stereo mix	MultiAudio		Στερεοφωνική μίξη
+Output 3D depth	MultiAudio		Βάθος 3D εξόδου ήχου
+Volume	MultiAudio		Ένταση
+Output	MultiAudio		Έξοδος ήχου
+Video	MultiAudio		Βίντεο
+Line	MultiAudio		Σύνδεση
+Mic	MultiAudio		Μικρόφωνο
+ frequency:	MultiAudio		 συχνότητα:
+Enable	MultiAudio		Ενεργοποίηση
+Mute	MultiAudio		Σίγαση
+Wave	MultiAudio		Κύμα
+Setup	MultiAudio		Ρύθμιση
+Level	MultiAudio		Στάθμη

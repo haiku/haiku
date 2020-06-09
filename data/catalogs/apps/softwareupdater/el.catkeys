@@ -1,0 +1,64 @@
+1	greek, modern (1453-)	x-vnd.haiku-softwareupdater	369324613
+Updating version	SoftwareUpdaterWindow	List item text	Ενημέρωση έκδοσης
+Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Πατήστε εδώ για να εγκαταστήσετε {0, plural, one{# ενημερωμένο πακέτο} other{# ενημερωμένα πακέτα}}.
+Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Πακέτα προς απεγκατάσταση
+No active network connection was found	UpdateManager	Error message	Δεν βρέθηκε καμία ενεργή σύνδεση δικτύου
+Quit	SoftwareUpdaterWindow	Alert button label	Κλείσιμο
+There were no updates found.	CheckManager		Δεν βρέθηκαν ενημερώσεις.
+Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		Οι ενημερώσεις δεν έχουν ολοκληρωθεί, είστε σίγουρος;
+Updates found	SoftwareUpdaterWindow		Βρέθηκαν ενημερώσεις
+Update now	SoftwareUpdaterWindow		Ενημέρωση τώρα
+For some reason, we could not reboot your computer.	SoftwareUpdaterWindow		Για κάποιον λόγο, δεν μπορέσαμε να ενημερώσουμε τον υπολογιστή σας.
+OK	UpdateManager		Εντάξει
+Unrecognized argument	SoftwareUpdaterApp	Error message	Το όρισμα δεν αναγνωρίζεται
+There were no updates found.	CheckAction		Δεν βρέθηκαν ενημερώσεις.
+No updates available	UpdateAction		Δεν υπάρχουν διαθέσιμες ενημερώσεις
+New packages to be installed	SoftwareUpdaterWindow	List super item label	Νέα πακέτα προς εγκατάσταση
+Packages to be updated	SoftwareUpdaterWindow	List super item label	Πακέτα προς εγκατάσταση
+to	SoftwareUpdaterWindow	List item text	σε
+Attempting to cancel the updates…	SoftwareUpdaterWindow		Γίνεται απόπειρα ακύρωσης των ενημερώσεων…
+Contacting software repositories to check for package updates.	CheckManager		Γίνεται επικοινωνία με αποθετήρια λογισμικού για έλεγχο ενημερώσεων πακέτων.
+Available updates found	CheckManager		Υπάρχουν διαθέσιμες ενημερώσεις
+from repository	SoftwareUpdaterWindow	List item text	από το αποθετήριο
+Contacting software repositories to check for package updates.	SoftwareUpdaterWindow		Γίνεται επικοινωνία με αποθετήρια λογισμικού για έλεγχο ενημερωμένων πακέτων.
+Cancelling updates	SoftwareUpdaterWindow		Γίνεται ακύρωση των ενημερώσεων
+Cancel	SoftwareUpdaterWindow	Alert button label	Ακύρωση
+There were no updates found.	UpdateAction		Δεν βρέθηκαν ενημερώσεις.
+OK	SoftwareUpdaterWindow		Εντάξει
+Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Παρακαλώ επιλέξτε ανάμεσα σε αυτές τις επιλογές ενημερώσεων:\n\nΕνημέρωση:\n\tΕνημερώνει όλα τα εγκατεστημένα πακέτα.\nΠλήρης συγχρονισμός:\n\tΣυγχρονίζει όλα τα εγκατεστημένα πακέτα με τα αποθετήρια.
+The following changes will be made:	SoftwareUpdaterWindow		Θα γίνουν οι ακόλουθες αλλαγές:
+Argument variables are no longer accepted\n	SoftwareUpdaterApp		Οι μεταβλητές ορισμάτων δεν είναι αποδεκτές πια\n
+Fatal error while checking for updates: %s\n	CheckAction		Προέκυψε σφάλμα κατάρρευσης κατά τον έλεγχο για ενημερώσεις: %s\n
+SoftwareUpdater	System name		Ενημερωτής
+No active network connection was found.\n	CheckManager		Δεν βρέθηκε καμία ενεργή σύνδεση δικτύου.\n
+Applying changes	UpdateManager		Γίνεται εφαρμογή αλλαγών
+Full sync	SoftwareUpdaterWindow	Alert button label	Πλήρης συγχρονισμός
+Quit	SoftwareUpdaterWindow	Button label	Έξοδος
+Updates have been successfully installed.	UpdateManager		Οι ενημερώσεις εγκαταστάθηκαν με επιτυχία.
+Exception occurred while updating packages : %s\n	UpdateAction		Προέκυψε εξαίρεση κατά την ενημέρωση πακέτων: %s\n
+A reboot is necessary to complete the update process.	UpdateManager		Είναι απαραίτητη μία επανεκκίνηση για την ολοκλήρωση της ενημέρωσης.
+Exception occurred while checking for updates: %s\n	CheckAction		Προέκυψε σφάλμα κατά τον έλεγχο για ενημερώσεις: %s\n
+Packages are being updated	UpdateManager		Τα πακέτα ενημερώνονται
+Cancel	SoftwareUpdaterWindow		Ακύρωση
+Don't quit	SoftwareUpdaterWindow		Να μην γίνει έξοδος
+Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Πατήστε εδώ για να χρησιμοποιήσετε τον Ενημερωτή. Ορισμένες ενημερώσεις ενδεχομένως να προκαλέσουν προβλήματα, τα οποία θα πρέπει να επιλύσετε.
+Checking for updates	SoftwareUpdaterWindow		Γίνεται έλεγχος για ενημερώσεις
+Updates completed	UpdateManager		Οι ενημερώσεις ολοκληρώθηκαν
+Reboot	SoftwareUpdaterWindow		Επανεκκίνηση
+Show more details	SoftwareUpdaterWindow		Εμφάνιση περισσότερων λεπτομερειών
+Installing version	SoftwareUpdaterWindow	List item text	Γίνεται εγκατάσταση έκδοσης
+Checking for updates	CheckManager		Γίνεται έλεγχος για ενημερώσεις
+No remote repositories are available	UpdateManager	Error message	Δεν υπάρχουν διαθέσιμα απομακρυσμένα αποθετήρια
+Software {0, plural, one{update} other{updates}} available	CheckManager		{0, plural, one{Υπάρχει διαθέσιμη ενημέρωση λογισμικού} other{Υπάρχουν διαθέσιμες ενημερώσεις λογισμικού}}
+Reboot	SoftwareUpdaterWindow	Button label	Επανεκκίνηση
+Update	SoftwareUpdaterWindow	Alert button label	Ενημέρωση
+Open Repositories	SoftwareUpdaterWindow	Alert button label	Άνοιγμα Αποθετηρίων
+Updates did not complete	UpdateAction		Οι ενημερώσεις δεν ολοκληρώθηκαν
+Invalid update type, cannot continue with updates	UpdateAction		Μη έγκυρος τύπος ενημέρωσης, δεν είναι δυνατή η ενημέρωση.
+Uninstalling version	SoftwareUpdaterWindow	List item text	Απεγκατάσταση έκδοσης
+%i of %i	UpdateManager	Do not translate %i	%i από %i
+Quit	SoftwareUpdaterWindow		Έξοδος
+No updates available	CheckManager		Δεν υπάρχουν διαθέσιμες ενημερώσεις
+Usage:  SoftwareUpdater <command> [ <option> ]\nUpdates installed packages.\n\nCommands:\n  update     - Search repositories for updates on all packages.\n  check      - Check for available updates but only display a notification with results.\n  full-sync  - Synchronize the installed packages with the repositories.\n\nOptions:\n  -h or --help       Print this usage help\n  -v or --verbose    Output verbose information\n	SoftwareUpdaterApp	Command line usage help	Χρήση:  SoftwareUpdater <εντολή> [ <ρύθμιση> ]\nΕνημερώνει τα εγκατεστημένα πακέτα.\n\nΕντολές:\n  update     - Να αναζητηθούν ενημερώσεις όλων των πακέτων στα αποθετήρια.\n  check       - Να γίνει έλεγχος για διαθέσιμες ενημερώσεις, όμως να εμφανιστεί μόνο μία ειδοποίηση με τα αποτελέσματα.\n  full-sync   - Να συγχρονιστούν τα εγκατεστημένα πακέτα με τα αποθετήρια.\n\nΡυθμίσεις:\n  -h or --help        Να εμφανιστεί αυτό το μήνυμα\n  -v or --verbose  Να εμφανιστούν αναλυτικές πληροφορίες\n
+No remote repositories are available. Please verify that some repositories are enabled using the Repositories preflet or the 'pkgman' command.	SoftwareUpdaterWindow	Error message	Δεν υπάρχουν διαθέσιμα απομακρυσμένα αποθετήρια. Παρακαλώ ελέγξτε ότι υπάρχουν ενεργά αποθετήρια στο βοηθητικό πρόγραμμα Αποθετήρια ή με την εντολή 'pkgman'.
+Downloading packages	UpdateManager		Γίνεται λήψη πακέτων

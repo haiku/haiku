@@ -1,0 +1,23 @@
+1	greek, modern (1453-)	x-vnd.Haiku-DiskUsage	2951688400
+%size% in {0, plural, one{# file} other{# files}}	Info Window		%size% σε {0, plural, one{# αρχείο} other{# αρχεία}}
+Scanning %refName%	Scanner		Σάρωση %refName%
+%d files	Status View	For UI layouting only, use the longest plural form for your language	%d αρχεία
+Size	Info Window		Μέγεθος
+Rescan	Pie View		Σάρωσε Ξανά
+Kind	Info Window		Είδος
+file unavailable	Pie View		μη διαθέσιμο αρχείο
+no supporting apps	Pie View		καμιά υποστηριζόμενη εφαρμογή
+Path	Info Window		Διαδρομή
+Scan	Status View		Σάρωση
+Rescan	Status View		Σάρωσε Ξανά
+file unavailable	Status View		μη διαθέσιμο αρχείο
+Get info	Pie View		Πληροφορίες
+DiskUsage	System name		Χρήση Δίσκου
+Created	Info Window		Δημιουργήθηκε
+Modified	Info Window		Τροποποιήθηκε
+Abort	Status View		Ακύρωση
+Open with	Pie View		Άνοιγμα με
+Open	Pie View		Άνοιγμα
+{0, plural, one{# file} other{# files}}	Status View		{0, plural, one{# αρχείο} other{# αρχεία}}
+%a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
+Free on %refName%	Scanner		Ελεύθερα στο %refName%

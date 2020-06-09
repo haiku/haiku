@@ -1,10 +1,9 @@
-1	thai	x-vnd.Haiku-HaikuDepot	1107427137
+1	thai	x-vnd.Haiku-HaikuDepot	3833361367
 Repository update error	LocalRepositoryUpdateProcess		ข้อผิดพลาดการอัพเดตที่เก็บ
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		เกิดข้อผิดพลาดขณะรีเฟรชที่เก็บ: %error%
 User Created	UserLoginWindow		ผู้ใช้ถูกสร้างแล้ว
 Check for updates…	MainWindow		ตรวจสอบสำหรับการอัพเดท
 Uninstall	PackageManager		ยกเลิกการติดตั้ง
-(%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		ยกเลิกการติดตั้งแล้ว
 It was not possible to create the new user.	UserLoginWindow		ไม่สามารถสร้างผู้ใช้ใหม่ได้
 Available packages	MainWindow		แพ็คเกจที่มี
@@ -35,7 +34,6 @@ Login or Create account	MainWindow		เข้าสู่ระบบหรื�
 Ratings	PackageInfoView		อัตรา
 Switch account…	MainWindow		เปลี่ยนบัญชีผู้ใช้งาน
 Preferred language:	UserLoginWindow		ภาษาที่ต้องการ:
-Server Error	ServerHelper		เซิร์ฟเวอร์ผิดพลาด
 Name	PackageListView		ชื่ิอ
 Authorization or security issue. Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		ปัญหาการอนุญาตหรือความปลอดภัย ออกจากระบบและเข้าสู่ระบบอีกครั้งเพื่อตรวจสอบว่ารหัสผ่านของคุณถูกต้องและตรวจสอบว่าคุณได้ยอมรับเงื่อนไขการใช้งานล่าสุด
 Local	LocalPkgDataLoadProcess		ท้องถิ่น
@@ -61,7 +59,6 @@ Featured packages	FeaturedPackagesView		แพคเกจเฉพาะ
 The supplied response to the captcha is incorrect. A new captcha will be generated; try again.	UserLoginWindow		การตอบกลับที่ระบุไปยัง captcha ไม่ถูกต้อง captcha ใหม่จะถูกสร้างขึ้น ลองอีกครั้ง.
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		ไม่สามารถสื่อสารกับเซิร์ฟเวอร์เพื่อรับอิมเมจ captcha ที่ต้องการเพื่อสร้างผู้ใช้ใหม่
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		คะแนนของคุณได้รับการอัปโหลดเรียบร้อยแล้ว คุณสามารถอัปเดตหรือลบได้ที่เว็บไซต์เซิร์ฟเวอร์ HaikuDepot
-Network Error	ServerHelper		เครือข่ายผิดพลาด
 Available	PackageListView		พร้อมใช้งาน
 Cancel	UserLoginWindow		ยกเลิก
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot ต้องการ package daemon เพื่อทำงานและดูเหมือนว่าจะไม่ทำงาน \nคุณต้องการเริ่มต้นทันทีไหม?
@@ -69,7 +66,6 @@ Click a package to view information	PackageInfoView		คลิกแพ็คเ
 The password must be at least eight characters long, consist of at least two digits and one upper case character.	UserLoginWindow		รหัสผ่านจะต้องมีความยาวอย่างน้อยแปดตัวอักษรประกอบด้วยอย่างน้อยสองหลักและตัวอักษรตัวใหญ่หนึ่งตัว
 Contents	PackageInfoView		เนื้อหา
 Close	PackageManager		ปิด
-A network transport error has arisen communicating with the HaikuDepot server system: %s	ServerHelper		ข้อผิดพลาดในการขนส่งเครือข่ายเกิดขึ้นในการสื่อสารกับระบบเซิร์ฟเวอร์ HaikuDepot:%s
 Changelog	PackageInfoView		การเปลี่ยนแปลง
 Rating not possible	MainWindow		ไม่สามารถให้คะแนน
 Package update error	MainWindow		ข้อผิดพลาดในการอัพเดตแพ็คเกจ
@@ -79,7 +75,6 @@ Reboot required	PackageManager		ต้องรีบูต
 Very unstable	RatePackageWindow		ไม่เสถียรมากๆ
 Password:	UserLoginWindow		รหัส:
 All packages	PackageListView		แพ็คเกจทั้งหมด
-Network Transport Error	ServerHelper		ข้อผิดพลาดในการส่งเครือข่าย
 Stability	RatePackageWindow		ความเสถียร
 Send	RatePackageWindow		ส่ง
 Start package daemon	App		เริ่มแพคเกจ daemon
@@ -106,8 +101,8 @@ Close	RatePackageWindow		ปิด
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		การซิงโครไนซ์ข้อมูลแพ็คเกจสำหรับที่เก็บ '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		ดูเงื่อนไขการใช้งาน
 Login issue	MainWindow		ปัญหาการเข้าสู่ระบบ
-Your rating:	RatePackageWindow		คะแนนของคุณ:
 Size	PackageListView		ขนาด
+Your rating:	RatePackageWindow		คะแนนของคุณ:
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		ผู้ใช้ %Nickname% ถูกสร้างขึ้นสำเร็จในระบบ Haiku Depot Server คุณสามารถจัดการรายละเอียดผู้ใช้ของคุณโดยใช้เว็บอินเตอร์เฟส ตอนนี้คุณเข้าสู่ระบบในฐานะผู้ใช้ใหม่นี้
 Your rating was updated.	RatePackageWindow		คะแนนของคุณได้รับการอัพเดท
 All categories	FilterView		ทุกประเภท
@@ -170,8 +165,6 @@ Open %DeskbarLink%	PackageManager		เปิด %DeskbarLink%
 User creation error	UserLoginWindow		ข้อผิดพลาดในการสร้างผู้ใช้
 Install	PackageManager		ติดตั้ง
 Input validation	UserLoginWindow		การตรวจสอบอินพุต
-This application is too old to communicate with the HaikuDepot server system. Obtain a newer version of HaikuDepot by updating your Haiku system. The minimum version of HaikuDepot required is \"%s\".	ServerHelper		แอปพลิเคชันนี้เก่าเกินไปที่จะสื่อสารกับระบบเซิร์ฟเวอร์ Haiku Depot รับ Haiku Depot รุ่นที่ใหม่กว่าโดยอัปเดตระบบ Haiku ของคุณ เวอร์ชั่นขั้นต่ำของ Haiku Depot คือ \"%s\"
-An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		เกิดข้อผิดพลาดที่ไม่คาดคิดจากเซิร์ฟเวอร์ HaikuDepot [%i]
 Log in…	MainWindow		เข้าใช้งาน
 You need to be logged into an account before you can rate packages.	MainWindow		คุณต้องเข้าสู่ระบบบัญชีก่อนจึงจะสามารถให้คะแนนแพ็คเกจได้
 Client version too old	ServerHelper		รุ่นไคลเอ็นต์เก่าเกินไป

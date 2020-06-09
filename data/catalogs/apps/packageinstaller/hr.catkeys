@@ -1,0 +1,63 @@
+1	croatian	x-vnd.Haiku-PackageInstaller	3110601390
+Package description	UninstallView		Opis paketa
+none	PackageView		nijedan
+Continue	PackageInstall		Nastavi
+Running post-installation scripts	PackageInstall		Pokretanje post-instalacijskih skripti
+Package installer	PackageView		Instaler paketa
+All existing files will be skipped?	PackageView		Sve postojeće datoteke će biti preskočene?
+Replace	PackageView		Zamijeni
+All existing files will be replaced?	PackageView		Sve postojeće datoteke će biti zamijenjene?
+Other…	PackageView		Ostalo...
+The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		Simbolička poveznica imena '%s' već postoji u danoj putanji.\nZamijeniti poveznicu sa onom iz paketa ili je preskočiti?
+Stop	PackageStatus		Stani
+Install to:	PackageView		Instaliraj u:
+The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Izgleda da je paket već instaliran u vašem sustavu. Želite li deinstalirati postojeći i nastaviti sa instalacijom?
+Skip all	PackageView		Preskoči sve
+The installation of the package has been aborted.	PackageView		Instalacija paketa je prekinuta.
+No installation type selected	PackageView		Nije označena niti jedna vrsta instalacije
+Do you want to remember this decision for the rest of this installation?\n	PackageView		Želite li zapamtiti ovu odluku za ostatak ove instalacije?\n
+The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Odabrani paket nije uklonjen iz vašeg sustava. Dana datoteka informacija o instaliranom paketu je možda oštećena.
+Install…	UninstallView		Instaliraj…
+The item named '%s' already exists in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Stavka imena '%s' već postoji u danoj putanji.\nZamijeniti stavku s onom iz paketa ili je preskočiti?
+Installing files and folders	PackageInstall		Instaliram datoteke i mape
+Installed packages	UninstallWindow		Instalirani paketi
+Remove	UninstallView		Ukloni
+The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Neuspjelo instaliranje traženog paketa u vaš sustav. Možda je problem sa ciljanom datotekom paketa. Savjetujte se sa distributerom paketa.
+OK	UninstallView		U redu
+Accept	PackageTextViewer		Prihvati
+Abort	PackageView		Prekini
+Disclaimer	PackageTextViewer		Izjava o odricanju
+Preparing package	PackageInstall		Pripremam paket
+The package you requested has been successfully installed on your system.	PackageView		Traženi paket je uspješno instaliran u vaš sustav.
+Installation progress	PackageView		Napredak instalacije
+Decline	PackageTextViewer		Odbij
+Continue	PackageTextViewer		Nastavi
+Installing package	PackageStatus		Instaliram paket
+Install %name%	PackageView		Instaliraj %name%
+%index% of %total%	PackageInstall		%index% of %total%
+No package selected.	UninstallView		Nijedan paket nije izabran.
+%name% (%size% free)	PackageView		%name% (%size% slobodno)
+Error while installing the package\n	PackageView		Greška tijekom instalacije paketa\n
+Finishing installation	PackageInstall		Završavanje instalacije
+No package available.	PackageInfo		Nema dostupnih paketa.
+The script named '%s' already exists in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Skripta po imenu '%s' već postoji u danoj putanji.\nZamijeniti skriptu sa onom iz ovog paketa ili preskočiti?
+Installation type:	PackageView		Tip instalacije:
+The package you selected has been successfully removed from your system.	UninstallView		Paket koji ste izabrali uspješno je uklonjen iz vašeg sustava.
+There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Izgleda da se veličina paketa ne podudara u datoteci paketa. Paket je moža oštećen ili je možda bio pomijenjen nakon što je kreiran. Želite li ipak nastaviti?
+%name% (%size%)	PackageView		%name% (%size%)
+Abort	PackageInstall		Prekini
+The file named '%s' already exists in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Datoteka po imenu '%s' već postoji u danoj putanji.\nZamijeniti datoteku sa onom iz ovog paketa ili preskočiti?
+Replace all	PackageView		Zamijeni sve
+The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Paket nije čitljiv\nJedan od mogućih razloga može biti da tražena datoteka nije valjani BeOS .pkg paket.
+Continue	PackageInfo		Nastavi
+No package selected.	PackageInfo		Nijedan paket nije izabran.
+Error! \"%s\" is not a valid path.\n	Packageinstaller main		Greška! \"%s\" nije ispravna putanja.\n
+The directory named '%s' already exists in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Direktorij po imenu'%s' već postoji u danoj putanji.\nZamijeniti direktorij  sa onim iz ovog paketa ili preskočiti?
+Ask again	PackageView		Pitaj ponovno
+Begin	PackageView		Počni
+OK	PackageView		U redu
+Abort	PackageInfo		Prekini
+Done	PackageInstall		Izvršeno
+Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Greška (%s)! Ne mogu otvoriti \"%s\".\n
+Skip	PackageView		Preskoči
+Image not loaded correctly	PackageImageViewer		Slika nije ispravno učitana

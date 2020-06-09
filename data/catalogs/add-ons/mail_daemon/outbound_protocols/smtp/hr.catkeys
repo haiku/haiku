@@ -1,0 +1,14 @@
+1	croatian	x-vnd.Haiku-SMTP	815985329
+POP3 authentication failed. The server said:\n	smtp		POP3 provjera valjanosti neuspjela. Poslužitelj je rekao:\n
+Destination:	ConfigView		Odredište:
+Error while logging in to %serv	smtp		Greška pri prijavi u %serv
+Connecting to server…	smtp		Spajanje sa poslužiteljem...
+Unencrypted	ConfigView		Nekriptirano
+. The server says:\n	smtp		. Poslužitelj je rekao:\n
+Error while opening connection to %serv	smtp		Greška pri otvaranju veze za %serv
+. The server said:\n	smtp		. Poslužitelj  je rekao:\n
+None	ConfigView		NIjedan
+SMTP server:	ConfigView		SMTP poslužitelj:
+ESMTP	ConfigView		ESMTP
+POP3 before SMTP	ConfigView		POP3 prije SMTP
+SSL	ConfigView		SSL

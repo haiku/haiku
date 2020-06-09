@@ -1,0 +1,46 @@
+1	greek, modern (1453-)	x-vnd.Haiku-ActivityMonitor	3672498538
+Teams	DataSource		Ομάδες
+Semaphores	DataSource		Σηματοφόροι
+TX	DataSource	Shorter version for Sending	ΑΠ
+Block cache memory	DataSource		Αποκλεισμός λανθάνουσας μνήμης
+%lld ms	SettingsWindow		%lld ms
+MiB	DataSource		MiB
+Media nodes	DataSource		Κόμβοι πολυμέσων
+Text clipboard	DataSource		Πρόχειρο κειμένου
+Network send	DataSource		Αποστολή δικτύου
+Running applications	DataSource		Ενεργές εφαρμογές
+Cache	DataSource		Λανθάνουσα μνήμη
+CPU usage (combined)	DataSource		Χρήση ΚΜΕ (συνδυασμένη)
+Threads	DataSource		Νήματα
+Receiving	DataSource		Λήψη
+Remove graph	ActivityView		Αφαίρεση γραφήματος
+Swap space	DataSource		Χώρος Swap
+CPU	DataSource		ΚΜΕ
+ActivityMonitor	System name		Διαχείριση Εργασιών
+Update time interval:	SettingsWindow		Ενημέρωση χρονικού διαστήματος:
+RX	DataSource	Shorter version for Receiving.	ΛΗ
+Settings…	ActivityWindow		Ρυθμίσεις…
+Block cache	DataSource		Αποκλεισμός cache
+Memory	DataSource		Μνήμη
+CPU usage	DataSource		Χρήση ΚΜΕ
+Quit	ActivityWindow		Έξοδος
+Raw clipboard	DataSource		Ακατέργαστο πρόχειρο
+Settings	ActivityWindow		Ρυθμίσεις
+Used memory	DataSource		Χρησιμοποιημένη μνήμη
+%.1f faults/s	DataSource		%.1f σφάλματα/s
+Show legend	ActivityView		Εμφάνιση υπομνήματος
+Cached memory	DataSource		Μνήμη προσωρινής αποθήκευσης
+File	ActivityWindow		Αρχείο
+Ports	DataSource		Θύρες
+Page faults	DataSource		Σφάλματα σελίδας
+Apps	DataSource		Εφαρμογές
+Additional items	ActivityView		Επιπλέον αντικείμενα
+Add graph	ActivityWindow		Προσθήκη γραφήματος
+Sending	DataSource		Αποστολή
+%.1f MiB	DataSource		%.1f MiB
+Always on top	ActivityWindow		Πάντα στην κορυφή
+Swap	DataSource		Swap
+%lld sec.	SettingsWindow		%lld δευτ.
+P-faults	DataSource		P-σφάλματα
+Sems	DataSource		Sems
+Network receive	DataSource		Λήψεις δικτύου

@@ -1,30 +1,47 @@
-1	portuguese	x-vnd.Haiku-Shortcuts	1583496174
+1	portuguese	x-vnd.Haiku-Shortcuts	3834857117
+*MouseUp	ShortcutsWindow		*MouseUp
 Application	ShortcutsWindow		Aplicação
 Option	ShortcutsSpec	Name for modifier on keyboard	Opção
 Save changes before closing?	ShortcutsWindow		Guardar as alterações antes de fechar?
 Revert to saved	ShortcutsWindow		Reverter para a versão guardada
 Don't save	ShortcutsWindow		Não guardar
+*MouseDown	ShortcutsWindow		*MouseDown
+*Beep	ShortcutsWindow		*Beep
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		O Atalhos não pôde guardar a sua combinação de teclas.
 Save	ShortcutsWindow		Guardar
+Either	ShortcutsSpec		Qualquer uma
 Oh no	ShortcutsWindow		Oh, não
 Key	ShortcutsWindow		Tecla
+*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*SendMessage application/x-vnd.Be-TRAK 'Tfnd'
 Select	ShortcutsWindow		Selecionar
 Shortcuts	System name		Atalhos
 Quit	ShortcutsWindow		Sair
+(Choose application with file requester)	ShortcutsWindow		(Selecionar uma aplicação com solicitação de ficheiro)
 Cancel	ShortcutsWindow		Cancelar
+*MoveMouse +20 +0	ShortcutsWindow		*MoveMouse +20 +0
 Control	ShortcutsSpec	Name for modifier on keyboard	Controlo
+Left	ShortcutsSpec		Esquerda
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		O Atalhos não conseguiu analisar o ficheiro de combinações de teclas!
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Não foi possível guardar o ficheiro de combinações de teclas!
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"O Seu Texto Aqui\"
 Remove selected shortcut	ShortcutsWindow		Remover o atalho selecionado
+Error, NULL state description?	ShortcutsSpec		Erro, descrição de estado NULL?
+Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		O Atalhos não conseguiu abrir o seu ficheiro de combinação de teclas!
 Save & apply	ShortcutsWindow		Guardar e aplicar
 Open	ShortcutsWindow		Abrir
 Append	ShortcutsWindow		Acrescentar
+Both	ShortcutsSpec		Ambas
 Save KeySet as…	ShortcutsWindow		Guardar combinação de teclas como…
 Append KeySet…	ShortcutsWindow		Adicionar combinação de teclas…
+*MouseButton 1	ShortcutsWindow		*MouseButton 1
+*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"
+Right	ShortcutsSpec		Direita
 OK	ShortcutsWindow		OK
 Add new shortcut	ShortcutsWindow		Adicionar novo atalho
+(None)	ShortcutsSpec		(Nenhuma)
 Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
 Open KeySet…	ShortcutsWindow		Abrir combinação de teclas…
 File	ShortcutsWindow		Ficheiro
+*LaunchHandler text/html	ShortcutsWindow		*LaunchHandler text/html
+*MoveMouseTo 50% 50%	ShortcutsWindow		*MoveMouseTo 50% 50%

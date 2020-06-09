@@ -1,0 +1,6 @@
+1	croatian	x-vnd.Haiku-bluetooth_server	403379575
+Bluetooth error	BluetoothReplicant		Bluetooth greška
+Settings…	BluetoothReplicant		Postavke…
+OK	BluetoothReplicant		U redu
+Error: %status%	BluetoothReplicant		Greška: %status%
+Quit	BluetoothReplicant		Završi

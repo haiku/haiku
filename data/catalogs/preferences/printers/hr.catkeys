@@ -1,0 +1,35 @@
+1	croatian	x-vnd.Be-PRNT	3007839174
+Test page	TestPageView		Test stranica
+Remove	PrintersWindow		Ukloni
+Red	TestPageView		Crvena
+Default Printer	PrinterListView		Zadani pisač
+<pick one>	AddPrinterDialog		<odaberi jedan>
+Connected to:	AddPrinterDialog		Spojen na:
+Make default	PrintersWindow		Napravi zadano
+Cyan	TestPageView		Svijetlo plava
+Completed	JobListView		Završeno
+Test page	PrintersWindow		Test stranica
+Failed	JobListView		Neuspjelo
+Blue	TestPageView		Plava
+Waiting	JobListView		Čekanje
+Processing	JobListView		Procesiranje
+Cancel	AddPrinterDialog		Otkaži
+Unknown status	JobListView		Nepoznat status
+Add printer	AddPrinterDialog		Dodaj pisač
+Printers	PrintersWindow		Pisači
+No printer found!	TransportMenu		Nijedan pisač nije nađen!
+Add…	PrintersWindow		Dodaj ...
+Magenta	TestPageView		Magenta
+Add	AddPrinterDialog		Dodaj
+Print jobs: No printer selected	PrintersWindow		Zadaci za ispisivanje: Nema odabranog pisača
+Printer name:	AddPrinterDialog		Ime pisača:
+Yellow	TestPageView		Žuta
+Black	TestPageView		Crna
+Printer type:	AddPrinterDialog		Tip pisača:
+Printers	System name		Pisači
+Green	TestPageView		Zelena
+Print test page	PrintersWindow		Ispiši test stranicu
+Restart job	PrintersWindow		Ponovno pokreni zadatak
+Driver: %driver%	PrinterListView		Upravljači program: %driver%
+Cancel job	PrintersWindow		Otkaži zadatak
+%.2f KB	JobListView		%.2f KB

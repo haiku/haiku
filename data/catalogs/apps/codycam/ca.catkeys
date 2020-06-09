@@ -63,7 +63,7 @@ Every 15 seconds	CodyCam		Cada 15 segons
 Error getting initial latency for the capture node	CodyCam		Error en obtenir la latència inicial del node de captura
 password	CodyCam		contrasenya
 Local	CodyCam		Local
-Stop video	CodyCam		Atura el vídeo
+Stop video	CodyCam		Interromp el vídeo
 Last Capture: 	VideoConsumer.cpp		Darrera Captura: 
 Rate:	CodyCam		Freqüència:
 Couldn't find requested directory on server	VideoConsumer.cpp		No s'ha pogut trobar el directori sol·licitat al servidor.

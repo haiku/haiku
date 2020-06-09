@@ -1,0 +1,44 @@
+1	croatian	x-vnd.Haiku-Network	96440294
+Ethernet device	InterfaceListItem		Ethernet uređaj
+Link speed:	IntefaceView		Brzina poveznice:
+disconnected	IntefaceView		odspojeno
+IP Address:	IntefaceAddressView		IP adresa:
+WPA	WPA protected network		WPA
+Network:	IntefaceView		Mreža:
+Received:	IntefaceView		Primljeno:
+New…	NetworkWindow		Novo...
+no link	InterfaceListItem		nema poveznice
+Other	NetworkWindow		Ostalo
+Sent:	IntefaceView		Poslano:
+Your IP address	IntefaceAddressView		Vaša IP adresa
+DHCP	IntefaceAddressView		DHCP
+EAP	EAP protected network		EAP
+Services	NetworkWindow		Usluge
+Revert	NetworkWindow		Obrnuto
+WEP	WEP protected network		WEP
+<no wireless networks found>	IntefaceView		<no wireless networks found>
+Enable	IntefaceView		Omogući
+connected	IntefaceView		spojeno
+Apply	IntefaceAddressView		Primjeni
+Disable	ServiceView		Onemogući
+WPA2	WPA2 protected network		WPA2
+Mode:	IntefaceAddressView		Način:
+connected	InterfaceListItem		spojeno
+OK	NetworkWindow		U redu
+Static	IntefaceAddressView		Statična
+launch error	NetworkWindow		greška pokretanja
+MAC address:	IntefaceView		MAC adresa:
+disabled	InterfaceListItem		onemogućeno
+Dial-up connection	InterfaceListItem		Dial-up veza
+disconnected	InterfaceListItem		odspojeno
+Automatic	IntefaceAddressView		Automatski
+Choose automatically	IntefaceView		Izaberi automatski
+Status:	IntefaceView		Status:
+Disable	IntefaceView		Onemogući
+Manage…	NetworkWindow		Upravljaj...
+open	Open network		otvori
+Network	System name		Mreža
+Enable	ServiceView		Omogući
+Wireless device	InterfaceListItem		Bežični uređaj
+Disabled	IntefaceAddressView		Onemogućeno
+VPN connection	InterfaceListItem		VPN veza

@@ -1,5 +1,6 @@
-1	portuguese	x-vnd.Haiku-Mail	1939496501
+1	portuguese	x-vnd.Haiku-Mail	2750130554
 Account settings	AutoConfigWindow		Definições de conta
+\t\t· Outgoing	Config Window		\t\t· Saída
 An error occurred while creating the config view: %error.	Config Views		Ocorreu um erro ao criar a vista de configuração: %error.
 E-mail address:	E-Mail		Endereço de correio eletrónico:
 Create new account	AutoConfigWindow		Criar nova conta
@@ -14,28 +15,40 @@ Back	AutoConfigWindow		Retroceder
 Real name:	E-Mail		Nome verdadeiro:
 Real name:	Config Views		Nome verdadeiro:
 \t\t· E-mail filters	Config Window		\t\t· Filtros de correio
+Outgoing	E-Mail		Saída
 Accounts	Config Window		Contas
+Outgoing	Config Window		Saída
 Remove	Config Views		Remover
 Show notifications:	Config Window		Mostrar notificações:
 Settings	Config Window		Definições
 Never	Config Window	show status window	Nunca
 Account name:	Config Views		Nome da conta:
+\t\t· Incoming	Config Window		\t\t· Entrada
 Enter a valid e-mail address.	AutoConfigWindow		Introduza um endereço de e-mail válido.
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nNão foi possível reverter as definições gerais.\n\nErro ao obter as definições gerais:\n%s\n
+Incoming	E-Mail		Entrada
 Choose Protocol	E-Mail		Selecionar Protocolo
 Return address:	Config Views		Endereço de retorno:
 Password:	E-Mail		Palavra-passe:
 Error retrieving general settings: %s\n	Config Window		Erro ao obter as configurações gerais: %s\n
+The filter could not be moved. Deleting filter.	Config Views		Não foi possível mover o filtro. A eliminar o filtro.
+OK	Config Views		OK
+Revert	Config Window		Reverter
 Incoming	Config Window		Recebido
 Finish	AutoConfigWindow		Concluir
 Add filter	Config Views		Adicionar filtro
 Account settings	Config Views		Definições de conta
 minutes	Config Window		minutos
 E-mail	System name		Correio Eletrónico
+Check every	Config Window		Verificar a cada
+Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Crie uma nova conta com o botão Adicionar.\n\nRemova uma conta com o botão Remover no item selecionado.\n\nSelecione um item na lista para alterar as suas definições.
 Account name:	E-Mail		Nome da conta:
 Edit mailbox menu…	Config Window		Editar menu da caixa de correio…
 Server Name:	E-Mail		Nome do Servidor:
 Remove	Config Window		Remover
 Login name:	E-Mail		Nome de utilizador:
 While sending	Config Window		Enquanto envia
+OK	Config Window		OK
+OK	AutoConfigWindow		OK
 Next	AutoConfigWindow		Seguinte
 Error	Config Window		Erro

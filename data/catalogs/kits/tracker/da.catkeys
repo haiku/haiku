@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-libtracker	659027911
+1	danish	x-vnd.Haiku-libtracker	4118767010
 Created	ContainerWindow		Oprettet
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Åbn og lav foretrukket
@@ -262,6 +262,7 @@ ends with	SelectionWindow		ender med
 Open	OpenWithWindow		Åbn
 You must have at least one attribute showing.	PoseView		Du skal have mindst én egenskab vist.
 Cut	FilePanelPriv		Klip
+Finish: after several years	StatusWindow		Færdig: efter flere år
 Favorites	FilePanelPriv		Favoritter
 Point	AttributesView		Punkt
 home	B_USER_DIRECTORY		hjem
@@ -307,7 +308,6 @@ Delete	FSUtils		Slet
 Edit name	ContainerWindow		Rediger navn
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Kunne ikke åbne \"%document\" (Manglende symbol: %symbol). \n
 ASCII Text	AttributesView		ASCII-tekst
-More options	FindPanel		Flere indstillinger
 Atom reference	AttributesView		Atom-reference
 config	B_USER_CONFIG_DIRECTORY		opsætning
 Error moving \"%name\".	FSUtils		Fejl ved flytning af \"%name\".
@@ -341,7 +341,6 @@ Make active printer	ContainerWindow		Gør til aktiv printer
 Copy to	ContainerWindow		Kopiér til
 Name	SelectionWindow		Navn
 by attribute	FindPanel		efter attribut
- info	InfoWindow		 info
 Write	FilePermissionsView		Skriv
 <%ld bytes of data>	AttributesView		<%ld bytes data>
 If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Hvis du ændre systemmappen eller dens indhold, så vil du ikke være i stand til at opstarte %osName!\n\nEr du sikker på, at du vil gøre det?\n\nFor alligevel at ændre systemmappen eller dens indhold, hold Skift-tasten nede og klik på \"Jeg ved hvad jeg gør\".
@@ -396,7 +395,6 @@ Proceed	FSUtils		Fortsæt
 Edit favorites…	FilePanelPriv		Rediger favoritter…
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		Du kan ikke flytte en mappe ind i sig selv eller en af sine egne undermapper.
 New	ContainerWindow		Ny
-Fewer options	FindPanel		Færre valgmuligheder
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Du skal slippe elementer på et af diskikonerne i \"Diske\"-vinduet.
 If you alter %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Hvis du ændre %target, så vil %osName måske ikke opføre sig korrekt!\n\nEr du sikker på, at du vil gøre det?
 Sorry, you can't copy items to the Trash.	FSClipBoard		Beklager, du kan ikke kopiere elementer til papirkurven.

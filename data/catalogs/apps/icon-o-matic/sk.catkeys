@@ -1,4 +1,4 @@
-1	slovak	x-vnd.haiku-icon_o_matic	3554185674
+1	slovak	x-vnd.haiku-icon_o_matic	2424331018
 None	Icon-O-Matic-Properties		Žiadne
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Otočiť indexy cesty
 Add empty	Icon-O-Matic-ShapesList		Pridať prázdne
@@ -148,7 +148,6 @@ Caps	Icon-O-Matic-PropertyNames		Zakončenia
 OK	Icon-O-Matic-SVGImport		OK
 Append…	Icon-O-Matic-Menu-File		Pripojiť…
 Scale Y	Icon-O-Matic-PropertyNames		Mierka Y
-Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Nepodarilo sa otvoriť súbor „%s“ ako dokument SVG.\n\nChyba: %s
 Export icon	Dialog title		Exportovať ikonu
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Farba (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Upraviť farebný prechod

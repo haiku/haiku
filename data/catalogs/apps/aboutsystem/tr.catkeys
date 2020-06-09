@@ -1,8 +1,9 @@
-1	turkish	x-vnd.Haiku-About	1828471351
+1	turkish	x-vnd.Haiku-About	511528774
 Revision	AboutView		Revizyon
 The Haikuware team and their bounty program\n	AboutView		Haikuware takımı ve onların ödül programı\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Telif hakkı © 1999-2007 Michael C. Ring. Tüm hakları saklıdır.
 %.2f GHz	AboutView		%.2f GHz
+Copyright © 2001-%d The Haiku project. 	AboutView		Telif hakkı © 2001-%d The Haiku project. 
 \n\nSpecial thanks to:\n	AboutView		\n\nÖzel teşekkürlerimizle:\n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (ve kendisinin NewOS çekirdeği)\n
 Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Telif Hakkı © 1999 - 2000 Y. Takagi. Tüm hakları saklıdır.
@@ -14,6 +15,7 @@ Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Te
 Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Telif hakkı © 1990-2002 Info-ZIP. Tüm hakları saklıdır.
 Past website & marketing:\n	AboutView		Eski web sitesi ve pazarlama:\n
 Copyright © 2003 Peter Hanappe and others.	AboutView		Telif hakkı © 2003 Peter Hanappe ve diğerleri.
+Testing and bug triaging:\n	AboutView		Sınama ve hata sınıflandırma:\n
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, other{# işlemci:}}
 %d MiB total	AboutView		%d MiB toplam
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Haiku'ya özel olan tüm kodlar, özellikle çekirdek ve uygulamaların bağlı olduğu kodlar <MIT lisansı> koşulları altında dağıtılmaktadır. Bazı sistem kitaplıkları ve üçüncü parti kodlar <LGPL lisansı> koşulları altında dağıtılır. Üçüncü parti kodların telif hakları ile ilgili bilgiyi aşağıda bulabilirsiniz.\n\n
@@ -26,7 +28,7 @@ Unknown	AboutView		Bilinmeyen
 Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. ve geliştirici takımına BeOS'u yarattıkları için!\n\n
 Copyright © 2002-2014 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.	AboutView		Telif hakkı © 2002-2014 Industrial Light & Magic, Lucas Digital Ltd. LLC'nin bir bölümü.
 Licenses: 	AboutView		Lisanslar: 
-The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Haiku işletim sistemi kodunun telif hakkı Haiku, Inc.'in veya kaynak kodunda belirtilen yazarların mülkiyetine tabidir. Haiku® ve HAIKU logosu® Haiku Inc.'in tescilli markasıdır.\n\n
+The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Haiku işletim sistemi kodunun telif hakkı Haiku, Inc.'in veya kaynak kodunda belirtilen yazarların mülkiyetine tabidir. Haiku® ve HAIKU logosu® Haiku Inc.'in tescilli markalarıdır.\n\n
 Copyright © 2009 Colin Percival	AboutView		Telif hakkı © 2009 Colin Percival
 Time running:	AboutView		Çalıştığı süre:
 %ld MHz	AboutView		%ld MHz

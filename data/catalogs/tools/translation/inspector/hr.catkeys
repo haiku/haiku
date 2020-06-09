@@ -1,0 +1,27 @@
+1	croatian	x.vnd.OBOS-Inspector	396190845
+\nInput Formats:	ImageView		\nUlazni formati:
+Next Page	ImageWindow		Slijedeća strana
+Previous Page	ImageWindow		Prethodna stranica
+Active Translators	InspectorApp		Aktivni prevoditelji
+System Translators	ActiveTranslatorsWindow		Prevoditelji sustava
+\nType: '%1' (%2)\nGroup: '%3' (%4)\nQuality: %5\nCapability: %6\nMIME Type: %7\nName: %8\n	ImageView		\nVrsta: '%1' (%2)\nGrupa: '%3' (%4)\nKvaliteta: %5\nSposobnost: %6\nMIME vrsta: %7\nIme: %8\n
+OK	ImageWindow		U redu
+View	ImageWindow		Prikaz
+Open…	ImageWindow		Otvori...
+Active Translators	ImageWindow		Aktivni prevoditelji
+Info	ImageWindow		Informacije
+No image available to save.	ImageWindow		Nema dostupne slike za spremanje.
+OK	ImageView		U redu
+\nOutput Formats:	ImageView		\nIzlazni formati::
+Number of Documents: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Broj dokumenata: %1\n\nKorišteni prevoditelj:\nIme: %2\nInfo: %3\nVerzija: %4\n
+Last Page	ImageWindow		Zadnja stranica
+\nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\nKorišteni prevoditelj:\nIme: %1\nInfo: %2\nVerzija: %3\n
+Unknown	ImageView		Napoznato
+Sorry, unable to load the image.	ImageView		Oprostite, nije moguće učitati sliku.
+File	ImageWindow		Datoteka
+Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Odabrani dokument: %1\n\nKorišteni prevoditelj:\nIme: %2\nInfo: %3\nVerzija: %4\n
+Quit	ImageWindow		Izađi
+Sorry, unable to write the image file.	ImageView		Oprostite, nemoguće je zapisati slikovnu datoteku.
+Save…	ImageWindow		Spremi...
+Window	ImageWindow		Prozor
+First Page	ImageWindow		Prva stranica

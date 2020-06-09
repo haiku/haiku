@@ -1,0 +1,173 @@
+1	greek, modern (1453-)	x-vnd.Haiku-FileTypes	436017301
+Left	Attribute Window	Attribute column alignment in Tracker	Αριστερά
+Float	Attribute ListView		Αριθμός κινητής υποδιαστολής
+Final	Application Types Window		Τελικός
+FileTypes request	FileTypes Window		Αίτημα του FileTypes
+This file type already exists	New File Type Window		Αυτός ο τύπος αρχείου υπάρχει ήδη
+Preferred application	FileTypes Window		Προτεινόμενη εφαρμογή
+Launch	Application Types Window		Άνοιγμα
+Removing uninstalled application types	Application Types Window		Αφαίρεση απεγκατεστημένων τύπων εφαρμογών
+Width:	Attribute Window	Default column width in Tracker for this attribute.	Πλάτος:
+Same as…	FileType Window	The same TYPE as ...	Ίδιο με…
+(from super type)	FileTypes Window		(από υπέρτύπο)
+Select same preferred application as	FileTypes Window		Επιλογή της ίδιας προτεινόμενης εφαρμογής ως
+Could not change attributes	Attribute Window		Δεν ήταν δυνατή η αλλαγή των ιδιοτήτων
+Icon	FileTypes Window		Εικονίδιο
+Add…	Application Type Window		Προσθήκη…
+Attribute name:	Attribute Window		Όνομα ιδιότητας:
+Long description:	Application Type Window		Εκτενής περιγραφή:
+Cancel	Preferred App Menu		Άκυρο
+Remove	FileTypes Window		Διαγραφή
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Η εφαρμογή \"%s\" δεν υποστηρίζει αυτόν το τύπο αρχείου.\nΕίστε σίγουρος ότι θέλετε να τον ορίσετε έτσι;
+Remove	Application Type Window		Διαγραφή
+Gamma	Application Type Window		Γάμα
+Cancel	Application Type Window		Άκυρο
+Attribute	Attribute Window		Ιδιότητα
+Multiple launch	Application Type Window		Πολλαπλή εκκίνηση
+{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, one{# τύπος εφαρμογής θα μπορούσε να αφαιρεθεί} other{# τύποι εφαρμογής θα μπορούσαν να αφαιρεθούν}}
+Edit…	Application Types Window		Επεξεργασία…
+Could not set preferred application	FileTypes Window		Αδυναμία ορισμού προτεινόμενης εφαρμογής
+Description	FileTypes Window		Περιγραφή
+Signature:	Application Types Window		Υπογραφή:
+None	FileTypes Window		Κανένα
+Exclusive launch	Application Type Window		Αποκλειστή εκκίνηση
+Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		Διαγράφοντας ένα τύπο αρχείου, δεν θα μπορείτε να το επαναφέρετε.\nΕίστε σίγουρος ότι θέλετε να το διαγράψετε;
+Integer 64 bit	Attribute ListView		Ακέραιος αριθμός 64-bit
+Cancel	New File Type Window		Άκυρο
+Select same preferred application as	FileType Window		Επιλογή ίδιας προτεινόμενης εφαρμογής ως
+Cancel	Type List Window		Άκυρο
+Don't save	Application Type Window		Χωρίς αποθήκευση
+Center	Attribute Window	Attribute column alignment in Tracker	Κέντρο
+Done	Extension Window		Ολοκληρώθηκε
+Development	Application Types Window		Ανάπτυξη
+Same as…	FileType Window	The same APPLICATION as ...	Ίδιο με…
+Abort	Application Types Window		Ακύρωση
+Save	Application Type Window		Αποθήκευση
+%1 application type	Application Type Window		τύπος εφαρμογής %1
+Icon	Application Type Window		Εικονίδιο
+Duration	Attribute ListView		Διάρκεια
+Version:	Application Type Window		Έκδοση:
+Default application	FileType Window		Προεπιλεγμένη εφαρμογή
+Internal name:	New File Type Window		Εσωτερικό όνομα:
+Integer 8 bit	Attribute ListView		Ακέραιος αριθμός 8-bit
+Extension:	Extension Window		Επέκταση:
+Time	Attribute ListView		Χρόνος
+Extensions:	FileTypes Window		Επεκτάσεις:
+Select preferred application	FileType Window		Επιλογή προτεινόμενης εφαρμογής
+Description:	FileTypes Window		Περιγραφή:
+Multiple files from \"%s\" file type	FileType Window		Πολλαπλά αρχεία από \"%s\" τύπος αρχείου
+Add new group	New File Type Window		Προσθήκη νέας ομάδας
+Remove uninstalled	Application Types Window		Αφαίρεση απεγκατεστημένων
+File	Application Type Window		Αρχείο
+Progress	Application Types Window		Πρόοδος
+Select…	FileType Window		Επιλογή…
+Information	Application Types Window		Πληροφορίες
+Settings	FileTypes Window		Ρυθμίσεις
+Done	Attribute Window		Ολοκληρώθηκε
+FileTypes request	FileTypes		Αίτηση Τύποι Αρχείων
+Select same type as	FileType Window		Επιλογή ίδιου τύπου ως
+Version:	Application Types Window		Έκδοση:
+(from application)	FileTypes Window		(από την εφαρμογή)
+Application types	Application Types Window		Τύποι εφαρμογής
+Description:	Application Types Window		Περιγραφή:
+Name:	Application Types Window		Όνομα:
+Rating	Attribute ListView		Βαθμολογία
+duration	Attribute ListView		διάρκεια
+File could not be opened	Preferred App Menu		Το αρχείο δεν μπoρεί να ανοιχτεί
+Args only	Application Type Window		Μόνο παράμετροι
+Could not open \"%s\":\n%s	FileTypes		Αδυναμία ανοίγματος \"%s\":\n%s
+Right	Attribute Window	Attribute column alignment in Tracker	Δεξιά
+Save changes before closing?	Application Type Window		Να αποθηκευτούν οι αλλαγές πριν το κλείσιμο;
+Background app	Application Type Window		Εφαρμογή παρασκηνίου
+Recognition rule is not valid:\n\n	FileTypes Window		Ο κανόνας αναγνώρισης δεν έγκυρος:\n\n
+Show icons in list	FileTypes Window		Εμφάνιση εικονιδίων σε λίστα
+Editable	Attribute Window	If Tracker allows to edit this attribute.	Επεξεργάσιμο
+New resource file…	FileTypes Window		Νέο αρχείο πόρων…
+[Multiple files] file types	FileType Window		[Πολλαπλά αρχεία] τύποι αρχείων
+Application type	Application Type Window		Τύπος εφαρμογής
+Show in Tracker…	Application Types Window		Προβολή στο Tracker…
+Type name:	FileTypes Window		Όνομα τύπου:
+Visible	Attribute Window		Ορατό
+Select preferred application	FileTypes Window		Επιλογή προτεινόμενης εφαρμογής
+Path:	Application Types Window		Διαδρομή:
+rating	Attribute ListView		βαθμολογία
+Could not install file type	New File Type Window		Δεν μπορεί να γίνει εγκατάσταση του τύπου αρχείου
+Same as…	FileTypes Window		Ίδιο με…
+Golden master	Application Type Window		Χρυσή έκδοση
+Checkbox	Attribute ListView		Πλαίσιο ελέγχου
+FileTypes request	Preferred App Menu		Αίτηση Τύποι Αρχείων
+no icon	FileTypes Window		χωρίς εικονίδιο
+Single launch	Application Type Window		Απλή εκκίνηση
+%s file type	FileType Window		%s τύπος αρχείου
+Default	Attribute ListView		Προεπιλογή
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Δεν θα μπορείτε να επαναφέρετε έναν υπέρτυπο αφού τον διαγράψετε.\n Όλοι οι τύποι αρχείων που ανήκουν σε αυτόν τον υπέρτυπο θα χαθούν!\n\nΕίστε σίγουρος ότι θέλετε να το κάνετε αυτό; Για να καταργήσετε ολόκληρη την ομάδα, κρατήστε πατημένο το πλήκτρο Shift και μετά πατήστε \"Διαγραφή\".
+String	Attribute ListView		Γραμματοσειρά
+Add type	New File Type Window		Προσθήκη τύπου
+Remove icon	Icon View		Διαγραφή εικονίδιου
+Boolean	Attribute ListView		Δυαδική τιμή
+Cancel	Extension Window		Άκυρο
+Alignment:	Attribute Window		Στοίχιση:
+Icon	FileType Window		Εικονίδιο
+Signature:	Application Type Window		Υπογραφή:
+Development	Application Type Window		Υπό ανάπτυξη
+Golden master	Application Types Window		Χρυσό προτεύον
+Add	Extension Window		Προσθήκη
+Open…	FileTypes Window		Άνοιγμα…
+checkbox	Attribute ListView		πλαίσιο ελέγχου
+Could not change file extensions	Extension Window		Δεν μπορείτε να αλλάξετε τις επεκτάσεις αρχείων
+Could not open file	FileType Window		Αδυναμία ανοίγματος του αρχείου
+Choose type	Type List Window		Επιλογή τύπου
+Select…	FileTypes Window		Επιλογή…
+File recognition	FileTypes Window		Αναγνώριση αρχείου
+Application types…	FileTypes Window		Τύποι εφαρμογής…
+Add icon…	Icon View		Προσθήκη εικονίδιου…
+Cancel	FileTypes Window		Άκυρο
+Save into resource file…	Application Type Window		Αποθήκευση μέσα στο αρχείο πόρου…
+Special:	Attribute Window		Ειδικό:
+Type:	Attribute Window		Τύπος:
+Could not retrieve application signature	Preferred App Menu		Αδυναμία ανάκτησης υπογραφής της εφαρμογής
+Beta	Application Types Window		Βήτα
+Add group	New File Type Window		Προσθήκη ομάδας
+Cancel	Attribute Window		Άκυρο
+Gamma	Application Types Window		Γάμμα
+Supported types	Application Type Window		Υποστηριζόμενοι τύποι
+Integer 32 bit	Attribute ListView		Ακέραιος αριθμός 32-bit
+Beta	Application Type Window		Βήτα
+Could not retrieve preferred application of this file	Preferred App Menu		Αδυναμία ανάκτησης προτεινόμενης εφαρμογής του αρχείου
+Application flags	Application Type Window		Σημαίες εφαρμογής
+OK	FileTypes		Εντάξει
+Group name:	New File Type Window		Όνομα ομάδας:
+Move up	FileTypes Window		Κίνηση κάτω
+File	FileTypes Window		Αρχείο
+Add	Attribute Window		Προσθήκη
+Open file	FileTypes		Άνοιγμα αρχείου
+Version info	Application Type Window		Πληροφορίες έκδοσης
+Final	Application Type Window		Τελικό
+Preferred application	FileType Window		Προτεινόμενη εφαρμογή
+FileTypes	FileTypes		Τύποι Αρχείων
+Set preferred application	Preferred App Menu		Ορισμός προεπιλεγμένης εφαρμογής
+New file type	New File Type Window		Νέος τύπος αρχείου
+Short description:	Application Type Window		Σύντομη περιγραφή:
+Save request	Application Type Window		Αποθήκευση αίτησης
+Could not remove file type: %s\n	FileTypes Window		Δεν μπορείτε να διαγράψετε το τύπο αρχείου: %s\n
+Display as:	Attribute Window	Tracker offers different display modes for attributes.	Εμφάνιση ως:
+Done	Type List Window		Ολοκληρώθηκε
+Extra attributes	FileTypes Window		Επιπλέον ιδιότητες
+Group:	New File Type Window		Ομάδα:
+Alpha	Application Types Window		Άλφα
+Close	Application Type Window		Κλείσιμο
+Integer 16 bit	Attribute ListView		Ακέραιος αριθμός 16-bit
+Extension	Extension Window		Επέκταση
+Rule:	FileTypes Window		Κανόνας:
+FileTypes	System name		Τύποι αρχείων
+Version	Application Types Window		ΈΚδοση
+Quit	FileTypes Window		Έξοδος
+File type	FileType Window		Τύπος αρχείου
+Internal name:	FileTypes Window		Εσωτερικό όνομα:
+Add…	FileTypes Window		Προσθήκη…
+Edit icon…	Icon View		Επεξεργασία εικονίδιου…
+Internal name:	Attribute Window		Εσωτερικό όνομα:
+Show recognition rule	FileTypes Window		Εμφάνιση κανόνα αναγνώρισης
+Double	Attribute ListView		Αριθμός διπλής ακρίβειας
+Move down	FileTypes Window		Κίνηση επάνω
+Alpha	Application Type Window		Άλφα

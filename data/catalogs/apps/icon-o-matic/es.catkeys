@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.haiku-icon_o_matic	3554185674
+1	spanish; castilian	x-vnd.haiku-icon_o_matic	1805671130
 None	Icon-O-Matic-Properties		Ninguno
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Rotar índices de ruta
 Add empty	Icon-O-Matic-ShapesList		Agregar vacío
@@ -148,7 +148,6 @@ Caps	Icon-O-Matic-PropertyNames		Mayúsculas
 OK	Icon-O-Matic-SVGImport		Aceptar
 Append…	Icon-O-Matic-Menu-File		Agregar...
 Scale Y	Icon-O-Matic-PropertyNames		Escala Y
-Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Falló abrir el archivo '%s' como un documento de SVG.\n\nError: %s
 Export icon	Dialog title		Exportar icono
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Color (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Editar gradiente
@@ -165,6 +164,7 @@ Untitled	Icon-O-Matic-Main		Sin título
 Max LOD	Icon-O-Matic-PropertyNames		LOD máximo
 Add Path	Icon-O-Matic-AddPathsCmd		Agregar ruta
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		¿Guardar los cambios al icono actual antes de cerrar?
+Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		No se puede abrir el archivo «%s» como documento SVG.\n\n
 load error	Icon-O-Matic-SVGImport		error al cargar
 Transformation	Icon-O-Matic-TransformersList		Transformación
 Save as…	Icon-O-Matic-Menu-File		Guardar como...

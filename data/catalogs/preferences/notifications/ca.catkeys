@@ -18,7 +18,7 @@ Applications	PrefletView		Aplicacions
 Timeout:	GeneralView		Temps d'espera:
 Upper right	GeneralView		A dalt a la dreta
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Hi ha hagut un error en desar les preferències.\nÉs possible que us estigueu quedant sense espai de disc.
-Defaults	PrefletWin		Per defecte
+Defaults	PrefletWin		Valors predeterminats
 Upper left	GeneralView		A dalt a l'esquerra
 Applications	NotificationView		Aplicacions
 Width:	GeneralView		Amplada:

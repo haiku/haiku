@@ -7,7 +7,7 @@ Revert to saved	ShortcutsWindow		Torna al desat
 Don't save	ShortcutsWindow		No ho desis
 *MouseDown	ShortcutsWindow		*Ratolí a baix
 *Beep	ShortcutsWindow		*Timbre
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Les Dreceres no ha pogut desar el vostre joc de claus.
+Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Dreceres no ha pogut desar el joc de claus.
 Save	ShortcutsWindow		Desa
 Either	ShortcutsSpec		Qualsevol
 Oh no	ShortcutsWindow		Oh no!
@@ -21,24 +21,24 @@ Cancel	ShortcutsWindow		Cancel·la
 *MoveMouse +20 +0	ShortcutsWindow		*Mou el ratolí +20 +0
 Control	ShortcutsSpec	Name for modifier on keyboard	Control
 Left	ShortcutsSpec		Esquerra
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Les Dreceres no han pogut analitzar el vostre fitxer del conjunt de claus!
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Les Dreceres no han pogut desar el vostre fitxer del conjunt de claus!
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Dreceres no ha pogut analitzar el fitxer de joc de claus!
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Dreceres no ha pogut desar el fitxer de joc de claus!
 *InsertString \"Your Text Here\"	ShortcutsWindow		*Insereix Text \"el vostre text aquí \"
 Remove selected shortcut	ShortcutsWindow		Suprimeix la drecera seleccionada
 Error, NULL state description?	ShortcutsSpec		Error, descripció de l’estat NULL?
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
-Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Les Dreceres no han pogut obrir el vostre fitxer del joc de claus!
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Dreceres no ha pogut obrir el fitxer del joc de claus!
 Save & apply	ShortcutsWindow		Desa i aplica-ho
 Open	ShortcutsWindow		Obre
 Append	ShortcutsWindow		Afegeix
 Both	ShortcutsSpec		Ambdós
-Save KeySet as…	ShortcutsWindow		Desa el conjunt de claus com a...
-Append KeySet…	ShortcutsWindow		Afegeix un joc de claus...
+Save KeySet as…	ShortcutsWindow		Desa el joc de claus com a...
+Append KeySet…	ShortcutsWindow		Afegeix-hi un joc de claus...
 *MouseButton 1	ShortcutsWindow		*Botó 1 del ratolí
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Múltiple \"*Mou el ratolí a 100 % 0\" \"*Botó 1 del ratolí\"
 Right	ShortcutsSpec		Dreta
 OK	ShortcutsWindow		D'acord
-Add new shortcut	ShortcutsWindow		Afegeix una drecera nova
+Add new shortcut	ShortcutsWindow		Afegeix-hi una drecera nova
 (None)	ShortcutsSpec		(Cap)
 Shift	ShortcutsSpec	Name for modifier on keyboard	Majúscules
 Open KeySet…	ShortcutsWindow		Obre un joc de claus...

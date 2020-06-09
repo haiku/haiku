@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku.TextSearch	1609008100
+1	slovak	x-vnd.Haiku.TextSearch	1966170500
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Prosím, vyberte súbory, ktoré chcete mať vybrané v Trackeri.
 %appname% : %path%	GrepWindow		%appname% : %path%
 Open selection	GrepWindow		Otvoriť výber
@@ -17,7 +17,6 @@ Show files in Tracker	GrepWindow		Zobraziť súbory v Trackeri
 Please select the files you wish to keep searching.	GrepWindow		Prosím, vyberte súbory, v ktorých chcete ďalej hľadať.
 Trim to selection	GrepWindow		Orezať na výber
 Set target…	GrepWindow		Nastaviť cieľ…
-TextSearch	GrepWindow		Hľadanie textu
 Search	GrepWindow		Hľadať
 Copy text to clipboard	GrepWindow		Skopírovať text do schránky
 Show lines	GrepWindow		Zobrazovať riadky

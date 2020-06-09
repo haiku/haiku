@@ -1,0 +1,16 @@
+1	croatian	x-vnd.haiku.zip-o-matic	2255868945
+Drop files here.	file:ZipOMaticWindow.cpp		Spusti datoteke ovdje.
+Filename: %s	file:ZipOMaticWindow.cpp		Ime datoteke: %s
+Do you want to stop them?	file:ZipOMatic.cpp		Da li ih želiš zaustaviti?
+Error creating archive	file:ZipOMaticWindow.cpp		Greška pri stvaranju arhive
+Stop them	file:ZipOMatic.cpp		Zaustavi ih
+Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Jesi li siguran da želiš zaustaviti stvaranje ove arhive?
+Preparing to archive	file:ZipperThread.cpp		Priprema za arhiviranje
+Let them continue	file:ZipOMatic.cpp		Pusti ih da nastave
+Continue	file:ZipOMaticWindow.cpp		Nastavi
+Archive created OK	file:ZipOMaticWindow.cpp		Arhiva kreirana u redu
+{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, množina, jedna{# datoteka dodana.} ostale{# datoteke dodane.}}
+Stop	file:ZipOMaticWindow.cpp		Stani
+Stopped	file:ZipOMaticWindow.cpp		Zaustavljeno
+Archive	file:ZipperThread.cpp		Arhiva
+Creating archive: %s	file:ZipOMaticWindow.cpp		Stvaranje arhive: %s

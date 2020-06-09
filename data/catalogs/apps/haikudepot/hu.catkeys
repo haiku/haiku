@@ -1,10 +1,9 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	2908956481
+1	hungarian	x-vnd.Haiku-HaikuDepot	1161209988
 Repository update error	LocalRepositoryUpdateProcess		Tároló frissítési hiba
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Hiba történt a tároló frissítésekor: %error%
 User Created	UserLoginWindow		Felhasználó létrehozva
 Check for updates…	MainWindow		Frissítések keresése…
 Uninstall	PackageManager		Eltávolítás
-(%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		Eltávolítva
 It was not possible to create the new user.	UserLoginWindow		Nem sikerült létrehozni a felhasználót.
 Available packages	MainWindow		Elérhető csomagok
@@ -34,7 +33,6 @@ Login or Create account	MainWindow		Belépés vagy fiók létrehozása
 Ratings	PackageInfoView		Értékelés
 Switch account…	MainWindow		Másik fiók…
 Preferred language:	UserLoginWindow		Előnyben részesített nyelv:
-Server Error	ServerHelper		Kiszolgáló hiba
 Name	PackageListView		Név
 Local	LocalPkgDataLoadProcess		Helyi
 Rate %Package%	RatePackageWindow		%Package% értékelése
@@ -50,11 +48,11 @@ Package action failed	PackageInfoView		A csomag telepítése sikertelen
 No changelog available.	PackageInfoView		Nincs módosítás-előzmény
 Error	App		Hiba
 There was a puzzling response from the web service.	UserLoginWindow		A webes szolgáltatás rejtélyes választ adott.
+Version	PackageListView		Verzió
 Not logged in	MainWindow		Nincs bejelentkezve
 No, quit HaikuDepot	App		Nem, a Raktár bezárása.
 Featured packages	FeaturedPackagesView		Kiemelt csomagok
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Nem sikerült kapcsolódni a kiszolgálóhoz a captcha kód letöltéséhez.
-Network Error	ServerHelper		Hálózati hiba
 Available	PackageListView		Elérhető
 Cancel	UserLoginWindow		Mégse
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		A Raktárnak szüksége van a csomag démonra a helyes működéshez, de úgy látszik, hogy az nem fut.\nElindíthatom?
@@ -71,7 +69,6 @@ Reboot required	PackageManager		Újraindítás szükséges
 Very unstable	RatePackageWindow		Nagyon instabil
 Password:	UserLoginWindow		Jelszó:
 All packages	PackageListView		Minden csomag
-Network Transport Error	ServerHelper		Hálózati adatátviteli hiba
 Stability	RatePackageWindow		Stabilitás
 Send	RatePackageWindow		Küldés
 Start package daemon	App		Csomag démon indítása
@@ -97,8 +94,8 @@ Close	RatePackageWindow		Bezárás
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Csomagadatok szinkronizálása a tárolóból: '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Felhasználási feltételek
 Login issue	MainWindow		Belépési hiba
-Your rating:	RatePackageWindow		Saját értékelés:
 Size	PackageListView		Méret
+Your rating:	RatePackageWindow		Saját értékelés:
 Your rating was updated.	RatePackageWindow		Az értékelés módosítása sikerült.
 All categories	FilterView		Minden kategória
 Repositories	MainWindow		Tárolók

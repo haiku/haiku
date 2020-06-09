@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-Installer	1520226307
+1	portuguese (brazil)	x-vnd.Haiku-Installer	2343117405
 Performing installation.	InstallProgress		Fazendo a instalação.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Escolha o disco de origem no menu pop-up. Então clique em \"Iniciar\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Por favor feche o Configurador de Disco antes de fechar o Instalador.
@@ -29,9 +29,7 @@ Write boot sector	InstallerWindow		Gravar o setor de inicialização
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld de %2ld
 Install from:	InstallerWindow		Instalar de:
 Additional disk space required: 0.0 KiB	InstallerWindow		Espaço adicional de disco requerido: 0.0 KB
-3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)  Quando iniciar com sucesso no Haiku pela primeira vez, certifique-se de ler a documentação \"Bem vindo\" e \"Guia do Usuário\". Existem vínculos na Área de Trabalho e nos marcadores do WebPositive.\n\n
 ???	InstallerWindow	Unknown currently copied item	???
-Install anyway	InstallProgress		Instalar mesmo assim
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Escolha o disco de origem e o disco de destinação nos menus pop-ups. Então clique em \"Iniciar\".
 Hide optional packages	InstallerWindow		Esconder items opcionais
 ???	InstallerWindow	Unknown partition name	???
@@ -52,7 +50,6 @@ Collecting copy information.	InstallProgress		Coletando informações para cópi
 Show optional packages	InstallerWindow		Mostrar items opcionais
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		O disco destino não tem espaço suficiente. Tente escolher um disco diferente ou escolha não instalar os items opcionais.
 Installation canceled.	InstallProgress		Instalação cancelada.
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		O volume de destino não está vazio. Está seguro de que deseja instalar mesmo assim:\n\nNota: A pasta 'sistema' será uma cópia limpa do volume de origem mas irá conservar sua pasta de definições, todas as outras pastas serão mescladas, ao passo que arquivos e vínculos que existam em ambos os volumes serão sobreescritos com a versão do volume de origem.
 OK	InstallerApp		OK
 Are you sure you want to abort the installation?	InstallerWindow		Está seguro de que quer cancelar a instalação?
 Stop	InstallerWindow		Parar
@@ -74,7 +71,6 @@ Running Boot Manager and DriveSetup…\n\nClose both applications to continue wi
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Você tem certeza que deseja instalar no atual disco de inicialização? O Instalador irá reiniciar seu computador se você continuar.
 Onto:	InstallerWindow		Para:
 Quit Boot Manager and DriveSetup	InstallerWindow		Sair do Gerenciador de Inicialização e do Configurador de Drive
-Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Instalador\n\desenvolvido por Jérôme Duval e Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 Tools	InstallerWindow		Ferramentas
 scanning…	InstallerWindow		analisando…
 Set up boot menu	InstallerWindow		Configurar o menu de inicialização

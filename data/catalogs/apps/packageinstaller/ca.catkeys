@@ -9,7 +9,7 @@ Replace	PackageView		Reemplaça
 All existing files will be replaced?	PackageView		Tots els fitxers existents es reemplaçaran?
 Other…	PackageView		Altres...
 The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		L'enllaç simbòlic anomenat "%s" ja existeix al camí indicat.\nVoleu reemplaçar l'enllaç pel d'aquest paquet o ometre'l?
-Stop	PackageStatus		Atura
+Stop	PackageStatus		Interromp
 Install to:	PackageView		Instal·la a:
 The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Sembla que el paquet indicat ja està instal·lat al sistema. Voleu desinstal·lar l’existent i continuar la instal·lació?
 Skip all	PackageView		Omet-ho tot
@@ -43,7 +43,7 @@ No package available.	PackageInfo		No hi ha cap paquet disponible.
 The script named '%s' already exists in the given path.\nReplace the script with the one from this package or skip it?	PackageView		L'script anomenat "%s" ja existeix al camí indicat.\nVoleu reemplaçar l'script pel d'aquest paquet o ometre'l?
 Installation type:	PackageView		Tipus d'instal·lació:
 The package you selected has been successfully removed from your system.	UninstallView		El paquet que heu seleccionat s'ha suprimit correctament del sistema.
-There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Sembla que no hi ha coincidència de mida de fitxer al fitxer del paquets. El paquet podria estar danyat o s'ha modificat després crear-lo. Encara voleu continuar?
+There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Sembla que no hi ha coincidència de mida de fitxer al fitxer del paquet. El paquet podria ser corrupte o haver-se modificat després de crear-lo. Encara voleu continuar?
 %name% (%size%)	PackageView		%name% (%size%)
 Abort	PackageInstall		Avorta
 The file named '%s' already exists in the given path.\nReplace the file with the one from this package or skip it?	PackageView		El fitxer anomenat "%s" ja existeix al camí indicat.\nVoleu reemplaçar el fitxer pel d'aquest paquet o ometre'l?

@@ -1,0 +1,55 @@
+1	greek, modern (1453-)	x-vnd.Haiku-Screen	133788249
+no	Screen		όχι
+bits/pixel	Screen		bits/εικονοστοιχείο
+15 bits/pixel, 32768 colors	Screen		15 bits/εικονοστοιχείο, 32768 χρώματα
+Rows:	Screen		Γραμμές:
+%.1f Hz	Screen		%.1f Hz
+The screen mode could not be set:\n\t%s\n	Screen		Αυτή η λειτουργία οθόνης δε μπορούσε να οριστεί:\n\t%s\n
+Keep	Screen		Διατήρηση
+/other…	Screen		/άλλο…
+Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Οριζόντια συχνότητα:\t%lu - %lu kHz\nΚάθετη συχνότητα:\t%lu - %lu Hz\n\nΜέγιστος μετρητής εικονοστοιχείων:\t%g MHz
+Refresh rate:	Screen		Ρυθμός Ανανέωσης:
+Video format:	Screen		Μορφή βίντεο:
+Undo	Screen		Αναίρεση
+OK	Screen		Εντάξει
+Current workspace	Screen		Τρέχων χώρος εργασίας
+vertically	Screen		κάθετα
+All workspaces	Screen		Όλοι οι χώροι εργασίας
+Use laptop panel:	Screen		Χρήση πάνελ φορητού υπολογιστή:
+Could not write VESA mode settings file:\n\t	Screen		Αδυναμία εγγραφής του αρχείο ρυθμίσεων της λειτουργίας VESA:\n\t
+Display info	Screen		Πληροφορίες οθόνης
+Settings will revert in %seconds.	Screen		Θα γίνει επαναφορά σε %seconds.
+Cancel	Screen		Άκυρο
+Other…	Screen		Άλλο…
+Screen	Screen		Οθόνη
+Colors:	Screen		Χρώματα:
+yes	Screen		ναι
+Swap displays:	Screen		Ανταλαγή οθόνης:
+%sSerial no.: %s	Screen		%sΣειριακός αριθμός.: %s
+8 bits/pixel, 256 colors	Screen		8 bits/εικονοστοιχείο, 256 χρώματα
+Revert	Screen		Επαναφορά
+always	Screen		πάντα
+Confirm changes	Screen		Επιβεβαίωση αλλαγών
+Warning	Screen		Προσοχή
+24 bits/pixel, 16 Million colors	Screen		24 bits/εικονοστοιχείο, 16 Εκατομμύρια χρώματα
+Hz	Screen		Hz
+Workspaces	Screen		Χώροι Εργασίας
+Brightness:	Screen		Φωτεινότητα:
+32 bits/pixel, 16 Million colors	Screen		32 bits/εικονοστοιχείο, 16 Εκατομμύρια χρώματα
+Done	Screen		Έγινε
+16 bits/pixel, 65536 colors	Screen		16 bits/εικονοστοιχείο, 65536 χρώματα
+Screen preferences by the Haiku team	Screen		Screen preferences από την ομάδα του Haiku
+Refresh rate	Screen		ρυθμός ανανέωσης
+if needed	Screen		εαν χρειάζεται
+Combine displays:	Screen		συνδιασμός οθόνων:
+Unknown mode	Screen		Άγνωστη λειτουργία
+About	Screen		Σχετικά
+Columns:	Screen		Στήλες:
+Resolution:	Screen		Ανάλυση:
+Apply	Screen		Εφαρμογή
+horizontally	Screen		οριζόντια
+disable	Screen		απενεργοποίηση
+Set background…	Screen		Ορισμός φόντου…
+Type or use the left and right arrow keys.	Screen		Πληκτρολογήστε ή χρησιμοποιήστε τα πλήκτρα αριστερού ή δεξιού βέλους.
+Screen	System name		Screen
+Do you wish to keep these settings?	Screen		Θέλετε να διατηρήσετε τις ακόλουθες ρυθμίσεις;

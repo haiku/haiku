@@ -1,0 +1,17 @@
+1	esperanto	x-vnd.Haiku-DataTranslations	4156631142
+Path:	DataTranslations		Itinero:
+Name:	DataTranslations		Nomo:
+DataTranslations - Note	DataTranslations		Datumkonvertado - Notaĵo
+The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		La ero '%name' ne ŝajnas esti formatpelilo kaj ĝi ne estos instalata.
+Could not install %s:\n%s	DataTranslations		Ne povis instali %s -on:\n%s
+OK	DataTranslations		Bone
+Cancel	DataTranslations		Nuligi
+Info:	DataTranslations		Informo:
+DataTranslations - Error	DataTranslations		Datumkonvertado - Eraro
+Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Uzu ĉi administrilon por atribui defaŭltajn valorojn por formatpeliloj, kiuj estos uzataj se aliajn valorojn ne atribuos iu programo.
+The new translator has been installed successfully.	DataTranslations		La nova formatpelilo sukcese estas instalita.
+An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Ero kun nomo '%name' jam ekzistas en la dosierujo de formatpeliloj! Ĉu devas anstataŭigi la ekzistantan formatpelilon?
+DataTranslations	System name		Datumkonvertado
+Info	DataTranslations		Informo
+Overwrite	DataTranslations		Anstataŭigu
+Version:	DataTranslations		Versio:

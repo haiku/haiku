@@ -3,5 +3,5 @@ or empty e-mail	SpamFilterConfig		o un e-mail vacío.
 Genuine below and uncertain above:	SpamFilterConfig		Original lo siguiente e incierto lo anterior:
 Spam above:	SpamFilterConfig		Spam anterior:
 Add spam rating to start of subject	SpamFilterConfig		Añada una calificación de spam al comienzo del asunto
-Bayesian Spam Filter	SpamFilter		Filtro de Spam bayesiano
+Bayesian Spam Filter	SpamFilter		Filtro de correo basura bayesiano
 Learn from all incoming e-mail	SpamFilterConfig		Aprender de todos los correos entrantes

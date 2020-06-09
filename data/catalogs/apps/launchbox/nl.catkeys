@@ -1,10 +1,11 @@
-1	dutch; flemish	x-vnd.Haiku-LaunchBox	3692177981
+1	dutch; flemish	x-vnd.Haiku-LaunchBox	1530497419
 Set description…	LaunchBox		Naamgeving...
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Deze balk echt sluiten?\n(De balk wordt niet onthouden.)
 OK	LaunchBox		Oké
 Ignore double-click	LaunchBox		Negeer dubbelklik
 Show on all workspaces	LaunchBox		Toon in alle werkplekken
 Name Panel	LaunchBox		Naampaneel
+Autostart	LaunchBox		Autostart
 Clone	LaunchBox		Kloon
 Description for '%3'	LaunchBox		Beschrijving voor '%3'
 Show window border	LaunchBox		Toon vensterrand

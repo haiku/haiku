@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Installer	4200011523
+1	belarusian	x-vnd.Haiku-Installer	4054994348
 Performing installation.	InstallProgress		Выконваецца ўсталёўка.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Выберыце зыходны дыск з усплывальнага меню. Потым націсніце \"Пачаць\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Калі ласка, закройце вакно DriveSetup перад тым як закрыць Усталёўшчык.
@@ -29,9 +29,7 @@ Write boot sector	InstallerWindow		Запісаць загрузачны сек�
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld з %2ld
 Install from:	InstallerWindow		Усталяваць з:
 Additional disk space required: 0.0 KiB	InstallerWindow		Патрэбна яшчэ 0.0 KiB месца на дыску
-3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)  Пасля першай паспяховай загрузкі Haiku, азнаёмцеся, калі ласка з дакументацыей ў \"Welcome\" і \"Userguide\" файлах. Спасылі на іх знаходзяцца на рабочым стале і ў закладках WebPositive.\n\n
 ???	InstallerWindow	Unknown currently copied item	???
-Install anyway	InstallProgress		Усталяваць усё роўна
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Выберыце зыходны дыск і дыск прызначэння з усплывальнага меню. Потым націсніце \"Пачаць\".
 Hide optional packages	InstallerWindow		Схаваць дадатковыя пакункі
 ???	InstallerWindow	Unknown partition name	???

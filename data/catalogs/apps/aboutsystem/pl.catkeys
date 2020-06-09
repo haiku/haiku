@@ -1,8 +1,9 @@
-1	polish	x-vnd.Haiku-About	105154281
+1	polish	x-vnd.Haiku-About	511528774
 Revision	AboutView		Rewizja
 The Haikuware team and their bounty program\n	AboutView		Zespołu Haikuware i ich programu nagród\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. Wszelkie prawa zastrzeżone.
 %.2f GHz	AboutView		%.2f GHz
+Copyright © 2001-%d The Haiku project. 	AboutView		Copyright © 2001-%d Projekt Haiku. 
 \n\nSpecial thanks to:\n	AboutView		\n\nSpecjalne podziękowania dla:\n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travisa Geiselbrechta (i jego jądra NewOS)\n
 Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Copyright © 1999-2000 Y.Takagi. Wszelkie prawa zastrzeżone..
@@ -14,6 +15,7 @@ Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Co
 Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Copyright © 1990-2002 Info-ZIP. Wszelkie prawa zastrzeżone.
 Past website & marketing:\n	AboutView		Strona internetowa i marketing (dawniej):\n
 Copyright © 2003 Peter Hanappe and others.	AboutView		Copyright © 2003 Peter Hanappe i inni.
+Testing and bug triaging:\n	AboutView		Testowanie i segregacja raportów o błędach:\n
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{# procesor:} few{# procesory:} many{# procesorów:} other{# procesora:}}
 %d MiB total	AboutView		%d MiB ogółem
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Kod, który jest unikalny dla Haiku, w szczególności jądro i cały kod z którymi aplikacje mogą być skonsolidowane, jest rozpowszechniany na <licencji MIT>. Niektóre biblioteki systemowe zawierają kod stron trzecich rozpowszechniany na <licencji LGPL>. Możesz poznać prawa autorskie kodu stron trzecich poniżej.\n\n
@@ -50,6 +52,7 @@ Contains software from the GNU Project, released under the GPL and LGPL licenses
 Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.
 Contains software from the FreeBSD Project, released under the BSD license:\nftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		Zawiera oprogramowanie z Projektu FreeBSD, udostępnione na licencji BSD:\nftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. Wszelkie prawa zastrzeżone.
 Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		Copyright © 2002-2003 Steve Lhomme. Wszelkie prawa zastrzeżone.
+Copyright © 2000-2019 Fabrice Bellard, et al.	AboutView		Copyright © 2000-2019 Fabrice Bellard, i in.
 Current maintainers:\n	AboutView		Obecni współpracownicy:\n
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Copyright © 1995, 1998-2001 Jef Poskanzer. Wszelkie prawa zastrzeżone.
 Version:	AboutView		Wersja:

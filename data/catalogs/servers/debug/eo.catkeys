@@ -1,0 +1,8 @@
+1	esperanto	x-vnd.Haiku-debug_server	3188340596
+The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		La programo:\n\n      %app\n\ntrafis senreveneblan eraron, kiu malebligas daŭrigon. Haiku mortigos la programon kaj lavumos.
+Oh yeah!	DebugServer		Ho jes!
+Debug	DebugServer		Senerarigi
+Terminate	DebugServer		Mortigi
+Save report	DebugServer		Konservi raporton
+Write core file	DebugServer		Konservi kernodosieron
+Oh no!	DebugServer		Hoj ve!

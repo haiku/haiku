@@ -1,47 +1,46 @@
-1	swedish	x-vnd.Haiku-ActivityMonitor	1155619009
-P-faults	DataSource		P-fel
-Media nodes	DataSource		Medianoder
-Threads	DataSource		Trådar
-Always on top	ActivityWindow		Alltid överst
-Add graph	ActivityWindow		Lägg till graf
+1	swedish	x-vnd.Haiku-ActivityMonitor	3672498538
 Teams	DataSource		Processer
+Semaphores	DataSource		Semaforer
+TX	DataSource	Shorter version for Sending	TX
+Block cache memory	DataSource		Blockcacheminne
+%lld ms	SettingsWindow		%lld ms
 MiB	DataSource		MiB
-Network send	DataSource		Nätverkssändning
-CPU usage (combined)	DataSource		CPU användning (kombinerad)
-CPU	DataSource		CPU
-Used memory	DataSource		Minnesanvändning
-Cached memory	DataSource		Buffertminne
-Apps	DataSource		Program
-Show legend	ActivityView		Visa graftext
+Media nodes	DataSource		Medianoder
 Text clipboard	DataSource		Urklipp text
-Settings	ActivityWindow		Inställningar
+Network send	DataSource		Nätverkssändning
+Running applications	DataSource		Aktiva program
+Cache	DataSource		Buffert
+CPU usage (combined)	DataSource		CPU användning (kombinerad)
+Threads	DataSource		Trådar
 Receiving	DataSource		Tar emot
+Remove graph	ActivityView		Ta bort graf
+Swap space	DataSource		Växlingsutrymme
+CPU	DataSource		CPU
+ActivityMonitor	System name		AktivitetsÖvervakare
+Update time interval:	SettingsWindow		Uppdateringsintervall:
+RX	DataSource	Shorter version for Receiving.	RX
 Settings…	ActivityWindow		Inställningar...
+Block cache	DataSource		Blockbuffert
+Memory	DataSource		Minne
+CPU usage	DataSource		CPU användning
+Quit	ActivityWindow		Avsluta
+Raw clipboard	DataSource		Urklipp rådata
+Settings	ActivityWindow		Inställningar
+Used memory	DataSource		Minnesanvändning
+%.1f faults/s	DataSource		%.1f fel/s
+Show legend	ActivityView		Visa graftext
+Cached memory	DataSource		Buffertminne
+File	ActivityWindow		Arkiv
 Ports	DataSource		Portar
 Page faults	DataSource		Sidfel
-Sending	DataSource		Skickar
-Cache	DataSource		Buffert
-%.1f faults/s	DataSource		%.1f fel/s
-Update time interval:	SettingsWindow		Uppdateringsintervall:
-TX	DataSource	Shorter version for Sending	TX
-Quit	ActivityWindow		Avsluta
-Block cache memory	DataSource		Blockcacheminne
-Remove graph	ActivityView		Ta bort graf
-%lld sec.	SettingsWindow		%lld sek.
-%lld ms	SettingsWindow		%lld ms
-CPU usage	DataSource		CPU användning
-Raw clipboard	DataSource		Urklipp rådata
-Sems	DataSource		Semaforer
-%.1f MiB	DataSource		%.1f MiB
-ActivityMonitor	System name		AktivitetsÖvervakare
-Running applications	DataSource		Aktiva program
-Semaphores	DataSource		Semaforer
-Block cache	DataSource		Blockbuffert
-Swap space	DataSource		Växlingsutrymme
-Swap	DataSource		Växling
-File	ActivityWindow		Arkiv
-usage	DataSource		användning
+Apps	DataSource		Program
 Additional items	ActivityView		Ytterligare mätvärden
+Add graph	ActivityWindow		Lägg till graf
+Sending	DataSource		Skickar
+%.1f MiB	DataSource		%.1f MiB
+Always on top	ActivityWindow		Alltid överst
+Swap	DataSource		Växling
+%lld sec.	SettingsWindow		%lld sek.
+P-faults	DataSource		P-fel
+Sems	DataSource		Semaforer
 Network receive	DataSource		Nätverksmottagning
-Memory	DataSource		Minne
-RX	DataSource	Shorter version for Receiving.	RX

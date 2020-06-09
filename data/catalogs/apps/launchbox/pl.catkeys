@@ -1,10 +1,11 @@
-1	polish	x-vnd.Haiku-LaunchBox	3692177981
+1	polish	x-vnd.Haiku-LaunchBox	1530497419
 Set description…	LaunchBox		Ustaw opis…
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Na pewno zamknąć ten panel?\n(Nie zostanie on zapamiętany.)
 OK	LaunchBox		OK
 Ignore double-click	LaunchBox		Ignoruj dwuklik
 Show on all workspaces	LaunchBox		Pokaż na wszystkich przestrzeniach roboczych
 Name Panel	LaunchBox		Panel nazeweniczy
+Autostart	LaunchBox		Autostart
 Clone	LaunchBox		Klonuj
 Description for '%3'	LaunchBox		Opis dla „%3”
 Show window border	LaunchBox		Pokaż obramowanie okna

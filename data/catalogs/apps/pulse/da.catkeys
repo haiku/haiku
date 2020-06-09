@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-Pulse	139895817
+1	danish	x-vnd.Haiku-Pulse	559379362
 Normal mode	DeskbarPulseView		Normal tilstand
 Info	CPUButton		Info
 Quit	DeskbarPulseView		Afslut
@@ -16,6 +16,7 @@ Fade colors	ConfigView		Fade farver
 About Pulse…	PulseView		Om Pulse…
 Pulse	NormalPulseView		Pulse
 Deskbar mode	NormalPulseView		Skrivebordslinje-tilstand
+Pulse settings	PulseApp		Pulse-indstillinger
 Remove replicant	CPUButton		Fjern replikant
 You can't disable the last active CPU.	PulseView		Du kan ikke deaktivere den sidste aktive CPU.
 Width of icon:	ConfigView		Bredde af ikon:
@@ -45,4 +46,3 @@ Active color	ConfigView		Aktiv farve
 Installing in Deskbar failed\n%s	PulseApp		Installation i skrivebordslinje mislykkede\n%s
 Idle color	ConfigView		Stille farve
 Normal mode	PrefsWindow		Normal tilstand
-Pulse settings	PulseWindow		Pulse-indstillinger

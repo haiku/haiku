@@ -1,0 +1,50 @@
+1	greek, modern (1453-)	x-vnd.Be-PEPL	2332202134
+Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Η εκκίνηση του βοηθητικού προγράμματος FileTypes για τη διαχείριση των ιδιοτήτων του ατόμου απέτυχε.\n\nΣφάλμα: 
+Unnamed person	People		Ανώνυμο άτομο
+New person…	People		Νέα επαφή…
+Address	People		Όδος
+Zip	People		Τ.Κ.
+Select all	People		Επιλογή όλων
+Could not create %s.	People		Δεν ήταν δυνατή η δημιουργία του %s.
+Quit	People		Έξοδος
+Company	People		Εταιρεία
+Name	People		Όνομα
+The file '%name%' could not be written.	People		Το αρχείο '%name%' δε μπορούσε να εγγραφεί.
+Contact name	People		Όνομα της επαφής
+Cancel	People		Άκυρο
+Edit	People		Επεξεργασία
+Save changes before closing?	People		Να αποθηκευτούν οι αλλαγές πριν το κλείσιμο;
+People	System name		Επαφές
+Error	People		Σφάλμα
+Revert	People		Επαναφόρα
+Country	People		Χώρα
+Person	Short mimetype description		Άτομο
+New person	People		Νέα επαφή
+Save	People		Αποθήκευση
+Fax	People		Φαξ
+URL	People		Υπερσύνδεσμος
+%name% picture	People		%name% φωτογραφία
+Home phone	People		Τηλέφωνο σπιτιού
+none	Groups list		Ουδείς
+Save as…	People		Αποθήκευση ως…
+Cut	People		Αποκοπή
+Contact information for a person.	Long mimetype description		Πληροφορίες επικοινωνίας επαφής.
+Remove image	People		Αφαίρεση εικόνας
+City	People		Πόλη
+Undo	People		Αναίρεση
+Don't save	People		Χωρίς αποθήκευση
+Configure attributes	People		Ρύθμιση ιδιοτήτων
+Work phone	People		Τηλέφωνο εργασίας
+State	People		Πολιτεία
+Nickname	People		Ψευδόνυμο
+OK	People		Εντάξει
+File	People		Αρχείο
+Redo	People		Επαναφορά
+Close	People		Κλείσιμο
+Copy	People		Αντιγραφή
+Paste	People		Επικόλληση
+E-mail	People		E-mail
+Group	People		Ομάδα
+Drop an image here,\nor use the contextual menu.	People		Σύρετε μια εικόνα εδώ,\nή χρησιμοποιήστε το σχετικό μενού.
+Load image…	People		Φόρτωση εικόνας…
+Sorry	People		Συγγνώμη

@@ -3,8 +3,8 @@ Test page	TestPageView		Stampa di prova
 Remove	PrintersWindow		Rimuovere
 Red	TestPageView		Rosso
 Default Printer	PrinterListView		Stampante predefinita
-<pick one>	AddPrinterDialog		<scegliere>
-Connected to:	AddPrinterDialog		Connesso a:
+<pick one>	AddPrinterDialog		<scegli>
+Connected to:	AddPrinterDialog		Connessione:
 Make default	PrintersWindow		Rendi predefinita
 Cyan	TestPageView		Ciano
 Completed	JobListView		Completata
@@ -25,11 +25,11 @@ Add…	PrintersWindow		Aggiungi…
 Magenta	TestPageView		Magenta
 Transport: %transport% %transport_address%	TestPageView		Transport: %transport% %transport_address%
 Add	AddPrinterDialog		Aggiungi
-Print jobs: No printer selected	PrintersWindow		Nessuna stampante selezionata
-Printer name:	AddPrinterDialog		Nome della stampante:
+Print jobs: No printer selected	PrintersWindow		Coda di stampa: Nessuna stampante selezionata
+Printer name:	AddPrinterDialog		Nome:
 Yellow	TestPageView		Giallo
 Black	TestPageView		Nero
-Printer type:	AddPrinterDialog		Tipo stampante:
+Printer type:	AddPrinterDialog		Tipo:
 Printers	System name		Stampanti
 {0, plural,=0{No pending jobs}=1{1 pending job}other{# pending jobs}}	PrinterListView		{0, plural,=0{Nessun lavoro di stampa in attesa}=1{1 lavoro di stampa in attesa}other{# lavori di stampa in attesa}}
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Stampante: %printer_name%\nDriver:  %driver%\n

@@ -1,0 +1,54 @@
+1	croatian	x-vnd.haiku-softwareupdater	629128705
+Updating version	SoftwareUpdaterWindow	List item text	Ažuriram inačicu
+Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Kliknite ovdje za instalaciju {0, plural, one{# updated package} other{# updated packages}}.
+Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Paketi koji će biti deinstalirani
+No active network connection was found	UpdateManager	Error message	Nije nađena aktivna mrežna veza
+Quit	SoftwareUpdaterWindow	Alert button label	Prekini
+There were no updates found.	CheckManager		Nisu pronađena ažuriranja.
+Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		Ažuriranja nisu kompletirana, jeste li sigurni da želite prekinuti?
+Updates found	SoftwareUpdaterWindow		Ažuriranja su nađena
+Update now	SoftwareUpdaterWindow		Ažuriraj sada
+For some reason, we could not reboot your computer.	SoftwareUpdaterWindow		Iz nekog razloga, ne možemo ponovno pokrenuti vaše računalo.
+OK	UpdateManager		U redu
+Unrecognized argument	SoftwareUpdaterApp	Error message	Neprepoznati argument
+There were no updates found.	CheckAction		Nisu pronađena ažuriranja.
+No updates available	UpdateAction		Ažuriranja nisu dostupna
+New packages to be installed	SoftwareUpdaterWindow	List super item label	Novi paketi koji će biti instalirani
+Packages to be updated	SoftwareUpdaterWindow	List super item label	Paketi koje će se ažurirati
+Attempting to cancel the updates…	SoftwareUpdaterWindow		Pokušavam otkazati ažuriranja…
+Contacting software repositories to check for package updates.	CheckManager		Kontaktiram repozitorije softvera za provjeru ažuriranja paketa.
+Available updates found	CheckManager		Nađena su dostupna ažuriranja
+from repository	SoftwareUpdaterWindow	List item text	iz repozitorija
+Contacting software repositories to check for package updates.	SoftwareUpdaterWindow		Kontaktiram repozitorije softvera za provjeru ažuriranja paketa.
+Cancelling updates	SoftwareUpdaterWindow		Otkazivanje ažuriranja
+Cancel	SoftwareUpdaterWindow	Alert button label	Otkaži
+There were no updates found.	UpdateAction		Nisu nađena ažuriranja.
+OK	SoftwareUpdaterWindow		U redu
+Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Molim izaberite jednu od ovih opcija ažuriranja:\n\nAžuriraj:\n\tAžurira sve istalirane pakete.\nPotpuna sinkronizacija:\n\tSinkronizira sve instalirane pakete sa repozitorijima.
+The following changes will be made:	SoftwareUpdaterWindow		BIti će napravljene slijedeće izmjene:
+Fatal error while checking for updates: %s\n	CheckAction		Fatalna greška za vrijeme provjere za ažuriranja: %s\n
+No active network connection was found.\n	CheckManager		Nijedna mrežma veza nije pronađena.\n
+Applying changes	UpdateManager		Primjeni promjene
+Full sync	SoftwareUpdaterWindow	Alert button label	Potpuna sinkronizacija
+Quit	SoftwareUpdaterWindow	Button label	Prekini
+Updates have been successfully installed.	UpdateManager		Ažuriranja su uspješno instalirana.
+A reboot is necessary to complete the update process.	UpdateManager		Neophodno je ponovno podizanje sustava da bi se kompletirao proces ažuriranja.
+Packages are being updated	UpdateManager		Paketi su ažurirani
+Cancel	SoftwareUpdaterWindow		Otkaži
+Checking for updates	SoftwareUpdaterWindow		Provjeravam za ažuriranja
+Updates completed	UpdateManager		Ažuriranja kompletirana
+Reboot	SoftwareUpdaterWindow		Ponovno podigni sustav
+Show more details	SoftwareUpdaterWindow		Pokaži više pojedinosti
+Checking for updates	CheckManager		Provjeri za ažuriranja
+No remote repositories are available	UpdateManager	Error message	Nijedan udaljeni repozitorij nije dostupan
+Software {0, plural, one{update} other{updates}} available	CheckManager		Software {0, plural, one{update} other{updates}} dostupan
+Reboot	SoftwareUpdaterWindow	Button label	Ponovno podigni sustav
+Update	SoftwareUpdaterWindow	Alert button label	Ažuriraj
+Open Repositories	SoftwareUpdaterWindow	Alert button label	Otvoreni repozitoriji
+Updates did not complete	UpdateAction		Ažuriranja nisu kompletirana
+Invalid update type, cannot continue with updates	UpdateAction		Neispravna vrsta ažuriranja, ne mogu nastaviti sa ažuriranjima
+Uninstalling version	SoftwareUpdaterWindow	List item text	Deinstaliram inačicu
+%i of %i	UpdateManager	Do not translate %i	%i of %i
+Quit	SoftwareUpdaterWindow		Prekini
+No updates available	CheckManager		Nema dostupnih ažuriranja
+Downloading packages	UpdateManager		Preuzimam pakete

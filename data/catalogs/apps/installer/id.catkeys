@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-Installer	116830250
+1	indonesian	x-vnd.Haiku-Installer	3753756669
 Performing installation.	InstallProgress		Melakukan instalasi.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Pilih disk sumber dari menu pop-up. Lalu klik \"Begin\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Silakan tutup jendela DriveSetup sebelum menutup jendela Installer.
@@ -31,9 +31,7 @@ Finishing installation.	InstallProgress		Menyelesikan instalasi.
 Install from:	InstallerWindow		Instal dari:
 Additional disk space required: 0.0 KiB	InstallerWindow		Ruang diska tambahan yang diperlukan: 0.0 KiB
 This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Ini adalah perangkat lunak berkualitas beta! Itu berarti ada risiko kehilangan data penting. Sering membuat cadangan! Anda telah diperingatkan.\n\n\n
-3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Ketika Anda berhasil boot ke Haiku untuk pertama kalinya, pastikan untuk membaca dokumentasi kami \"Welcome\" and \"Userguide\". Ada tautan di Desktop dan di bookmark WebPositive.\n\n
 ???	InstallerWindow	Unknown currently copied item	???
-Install anyway	InstallProgress		Bagaimanapun lanjut install
 1)   If you are installing Haiku onto real hardware (not inside an emulator), you may want to prepare a hard disk partition from another OS (you could, for example, use a GParted Live-CD, which can also resize existing partitions to make room).\nYou can also set up partitions by launching DriveSetup from Installer, but you won't be able to resize existing partitions with it. While DriveSetup has been quite thoroughly tested over the years, it's recommended to have up-to-date backups of the other partitions on your system. Just in case…	InstallerApp		1)   Jika Anda menginstal Haiku ke perangkat keras yang sebenarnya (tidak di dalam emulator),Anda mungkin ingin menyiapkan partisi hard disk dari OS lain (Anda dapat, misalnya, menggunakan GParted Live-CD, yang juga dapat mengubah ukuran partisi yang ada untuk membuat ruang).\nAnda juga dapat mengatur partisi dengan meluncurkan DriveSetup dari Installer, tetapi Anda tidak akan dapat mengubah ukuran partisi yang ada dengannya. Sementara DriveSetup telah diuji secara menyeluruh selama bertahun-tahun,disarankan untuk memiliki cadangan terbaru dari partisi lain di sistem Anda. Untuk berjaga-jaga…
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Pilih sumber dan disk tujuan dari menu pop-up. Lalu klik \"Begin\".
 Hide optional packages	InstallerWindow		Sembunyikan paket opsional
@@ -58,7 +56,6 @@ Collecting copy information.	InstallProgress		Mengumpulkan informasi salinan.
 Show optional packages	InstallerWindow		Tampilkan paket opsional
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Disk tujuan mungkin tidak memiliki cukup ruang. Coba pilih disk yang berbeda atau pilih untuk tidak memasang item opsional.
 Installation canceled.	InstallProgress		Instalasi dibatalkan.
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Volume target tidak kosong. Anda yakin ingin memasangnya?\n\nCatatan: Folder 'sistem' akan menjadi salinan bersih dari volume sumber tetapi akan mempertahankan folder pengaturannya,sedangkan file dan tautan yang ada pada sumber dan volume target akan ditimpa dengan versi volume sumber.
 OK	InstallerApp		OKE
 Are you sure you want to abort the installation?	InstallerWindow		Anda yakin ingin membatalkan instalasi?
 Stop	InstallerWindow		Berhenti

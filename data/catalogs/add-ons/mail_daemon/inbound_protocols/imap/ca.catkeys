@@ -12,4 +12,4 @@ SSL	imap_config		SSL
 Apply	IMAPFolderConfig		Aplica
 status	IMAPFolderConfig		estat
 IMAP Folders	IMAPFolderConfig		Carpetes IMAP
-Destination:	imap_config		Destí:
+Destination:	imap_config		Destinació:

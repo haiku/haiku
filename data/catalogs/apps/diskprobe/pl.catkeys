@@ -100,7 +100,7 @@ of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In language
 Attribute type: 	ProbeView		Typ atrybutu: 
 15 bit	TypeEditors		15-bitowy
 Page setup…	ProbeView		Ustawienia strony wydruku…
-Boolean	TypeEditors	This is the type of editor	Typ boolowski
+Boolean	TypeEditors	This is the type of editor	Wartości logicznej
 Icon view	TypeEditors		Widok ikon
 Select all	ProbeView		Zaznacz wszystko
 64 bit unsigned value:	TypeEditors		64-bitowa wartość bez znaku:

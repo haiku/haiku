@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-DriveSetup	2981446742
+1	portuguese (brazil)	x-vnd.Haiku-DriveSetup	2960101368
 Could not unmount partition %s.	MainWindow		Não foi possível desmontar a partição %s.
 Mount all	MainWindow		Montar tudo
 Disk	MainWindow		Disco
@@ -23,7 +23,6 @@ Write changes	MainWindow		Gravar alterações
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Inicialização da partição %s falhou. (Nada foi gravado no disco.)
 Validation of the given creation parameters failed.	MainWindow		A validação dos parâmetros de criação inseridas falhou.
 Eject	MainWindow		Ejetar
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Tem certeza que deseja aplicar todas as alterações agora?\n\nTodos os dados na partição selecionada serão perdidos de forma irrecuperável se continuar!
 Surface test (not implemented)	MainWindow		Teste de superfície (não implementado)
 The panel could not return successfully.	MainWindow		A janela de diálogo pode não responder adequadamente.
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Falha ao modificar os parâmetros da partição. Nenhuma mudança foi gravada no disco.
@@ -50,42 +49,36 @@ Volume name	PartitionList		Nome do volume
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Deseja realmente gravar as alterações no disco agora?\n\nTodos os dados na partição serão irrecuperavelmente perdidos se fizer isso!
 Change	ChangeParametersPanel		Modificar
 Partition name:	ChangeParametersPanel		Nome da partição:
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Tem certeza que deseja aplicar todas as alterações agora?\n\nTodos os dados na partição selecionada serão perdidos de forma irrecuperável se continuar!
 Cancel	AbstractParametersPanel		Cancelar
 Format	MainWindow		Formatar
 OK	MainWindow		OK
-Could not delete the selected partition.	MainWindow		Não foi possível excluir a partição selecionada.
-Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Deseja realmente inicializar o disco selecionado? Todos os dados serão perdidos. Você será consultado novamente antes das alterações serem gravados no disco.\n
-There was an error preparing the disk for modifications.	MainWindow		Ocorreu um erro ao preparar o disco para modificações.
-The disk has been successfully initialized.\n	MainWindow		O disco foi inicializado com sucesso.\n
-Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		A desmontagem deve ser forçada?\n\nNota: se um aplicativo está atualmente gravando no volume, desmontá-lo agora pode resultar em perda de dados.\n
-Cancel	MainWindow		Cancelar
-Force unmount	MainWindow		Forçar desmontagem
-Partition	MainWindow		Partição
-Change parameters	MainWindow		Modificar parâmetros
-Rescan	MainWindow		Re-examinar
-There was an error acquiring the partition row.	MainWindow		Ocorreu um erro ao obter a linha da partição.
-Failed to initialize the disk %s!\n	MainWindow		Falha ao inicializar o disco %s!\n
-Disk system \"%s\" not found!	MainWindow		Disco de sistema \"%s\" não encontrado!
-Delete	MainWindow		Excluir
-Partition type:	ChangeParametersPanel		Tipo de partição:
-Parameters	PartitionList		Parâmetros
-Could not acquire partitioning information.	MainWindow		Não foi possível obter informação sobre o particionamento.
-Cannot delete the selected partition.	MainWindow		Não foi posível deletar a partição selecionada.
-Continue	MainWindow		Continuar
+Open with DiskProbe	MainWindow		Abrir com o Analisador de Disco
+Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Deseja realmente inicializar o disco selecionado? Todos os dados serão perdidos. Perguntaremos de novo antes das alterações serem gravadas.\n
+There was an error preparing the disk for modifications.	MainWindow		Há um erro ao preparar o disco para modificações.
+Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Desmontar a força?\n\nNota: se um aplicativo está gravando no volume, desmontá-lo agora pode resultar em perda de dados.\n
+Free space	PartitionList		Espaço livre
+Queries	PartitionList		Consultas
+Change parameters	MainWindow		Mudar parâmetros
+Rescan	MainWindow		Reanalisar
+There was an error acquiring the partition row.	MainWindow		Houve um erro ao obter a linha de partição.
+Failed to initialize the disk %s!\n	MainWindow		Falha ao iniciar o disco %s!\n
+Disk system \"%s\" not found!	MainWindow		Disco do sistema \"%s\" não foi encontrado!
+Could not acquire partitioning information.	MainWindow		Não foi possível obter informação do particionamento.
+Cannot delete the selected partition.	MainWindow		Não foi possível deletar a partição selecionada.
 Could not mount partition %s.	MainWindow		Não foi possível montar a partição %s.
-Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Deseja realmente formatar a partição? Você será consultado novamente antes que as alterações sejam gravadas no disco.
-The selected disk is read-only.	MainWindow		O disco selecionado está marcado como somente leitura
+Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Deseja realmente formatar a partição? Você será consultado de novo antes das alterações gravadas no disco.
+The selected disk is read-only.	MainWindow		O disco selecionado está marcado como somente leitura.
 The partition %s is already unmounted.	MainWindow		A partição %s já está desmontada.
-Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Está seguro que deseja modificar os parâmetros da partição selecionada?\n\nA partição pode não mais ser reconhecida por outros sistemas operacionais!
+Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Deseja mesmo modificar os parâmetros da partição selecionada?\n\nA partição pode não mais ser reconhecida por outros sistemas operacionais!
+Boot	PartitionList		Inicialização
 OK	AbstractParametersPanel		OK
-Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Tem certeza que deseja aplicar todas as alterações agora?\n\nTodos os dados na partição selecionada serão perdidos de forma irrecuperável se continuar!
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Deseja aplicar todas as alterações agora?\n\nTodos os dados na partição selecionada serão perdidos pra sempre se continuar!
 Select a partition from the list below.	DiskView		Selecione a partição a partir da lista abaixo.
 Active	PartitionList		Ativo
-Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Tem certeza que deseja apagar a partição selecionada?\n\nTodos os dados na partição serão perdidos de forma irrecuperável se continuar!
+Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Deseja apagar a partição selecionada?\n\nTodos os dados na partição serão perdidos pra sempre se continuar!
 Failed to format the partition. No changes have been written to disk.	MainWindow		Falha ao formatar a partição. Nenhuma alteração foi gravada no disco.
 The partition %s has been successfully formatted.\n	MainWindow		A partição %s foi formatada com sucesso.\n
 The partition %s is already mounted.	MainWindow		A partição %s já está montada.
 Size	PartitionList		Tamanho
-Creation of the partition has failed.	MainWindow		A criação da partição selecionada falhou.
+Creation of the partition has failed.	MainWindow		A criação da partição falhou.
 Mount	MainWindow		Montar

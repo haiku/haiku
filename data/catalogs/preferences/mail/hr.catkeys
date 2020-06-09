@@ -1,0 +1,51 @@
+1	croatian	x-vnd.Haiku-Mail	3567949408
+Account settings	AutoConfigWindow		Postavke računa
+\t\t· Outgoing	Config Window		\t\t· Odlazno
+E-mail address:	E-Mail		Adresa elektroničke pošte:
+Create new account	AutoConfigWindow		Napravite novi račun
+While sending and receiving	Config Window		Za vrijeme slanja i primanja
+Error!	Config Views		Greška!
+Apply	Config Window		Primjeni
+Incoming mail filters	Config Views		Filteri dolazne pošte
+Outgoing mail filters	Config Views		Filteri odlazne pošte
+Server name:	E-Mail		Ime poslužitelja:
+Add	Config Window		Dodaj
+Back	AutoConfigWindow		Natrag
+Real name:	E-Mail		Pravo ime:
+Real name:	Config Views		Pravo ime:
+\t\t· E-mail filters	Config Window		\t\t· Filteri ekektroničke pošte
+Outgoing	E-Mail		Odlazno
+Accounts	Config Window		Računi
+Outgoing	Config Window		Odlazno
+Remove	Config Views		Ukloni
+Show notifications:	Config Window		Pokaži obavijesti:
+Settings	Config Window		Postavke
+Never	Config Window	show status window	Nikada
+Account name:	Config Views		Ime računa:
+\t\t· Incoming	Config Window		\t\t· Dolazno
+Enter a valid e-mail address.	AutoConfigWindow		Unesite valjanu adresu elektroničke pošte.
+Incoming	E-Mail		Dolazno
+Choose Protocol	E-Mail		Odaberite protokol
+Return address:	Config Views		Povratna adresa:
+Password:	E-Mail		Lozinka:
+The filter could not be moved. Deleting filter.	Config Views		Filter se ne može maknuti. Brišem filter.
+OK	Config Views		U redu
+Revert	Config Window		Obrnuto
+Incoming	Config Window		Dolazno
+Finish	AutoConfigWindow		Kraj
+Add filter	Config Views		Dodaj filter
+Account settings	Config Views		Postavke računa
+minutes	Config Window		minute
+E-mail	System name		Elektronička pošta
+Check every	Config Window		Provjeri svakih
+Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Napravi novi račun sa Dodaj gumbom.\n\nUkloni račun sa Ukloni gumbom na odabranoj stavci.\n\nOdaberite stavku na listi da biste promijenili njene postavke.
+Account name:	E-Mail		Ime računa:
+Edit mailbox menu…	Config Window		Uredi izbornik poštanskog sandučića...
+Server Name:	E-Mail		Ime poslužitelja:
+Remove	Config Window		Ukloni
+Login name:	E-Mail		Ime prijave:
+While sending	Config Window		Prilikom slanja
+OK	Config Window		U redu
+OK	AutoConfigWindow		U redu
+Next	AutoConfigWindow		Slijedeće
+Error	Config Window		Greška

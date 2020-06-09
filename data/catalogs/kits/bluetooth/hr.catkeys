@@ -1,0 +1,50 @@
+1	croatian	x-vnd.Haiku-Bluetooth	2418272625
+Positioning	DeviceClass		Pozicioniranje
+Controller	DeviceClass		Kontroler
+Common ISDN access	DeviceClass		Uobičajeni ISDN pristup
+Uncategorized	DeviceClass		Nesortirano
+Keyboard	DeviceClass		Tipkovnica
+Smart phone	DeviceClass		Smartphone
+VCR	DeviceClass		VCR
+Cellular	DeviceClass		Mobitel
+Audio	DeviceClass		Audio
+Audio/Video	DeviceClass		Audio/Video
+HiFi audio device	DeviceClass		HiFi audio uređaj
+Microphone	DeviceClass		Mikrofon
+Jacket	DeviceClass		Jakna
+Headphones	DeviceClass		Slušalice
+Remote control	DeviceClass		Udaljena kontrola
+Fully available	DeviceClass		Potpuno dostupno
+Server	DeviceClass		Poslužitelj
+No service available	DeviceClass		Nema dostupnih servisa
+Printer	DeviceClass		Pisač
+Card reader	DeviceClass		Čitač kartica
+#ServerNotReady#Not Valid name	RemoteDevice		#Poslužitelj nije spreman#Ime nije valjano
+Unspecified	DeviceClass		Neodređeno
+Miscellaneous	DeviceClass		Razno
+Robot	DeviceClass		Robot
+Vehicle	DeviceClass		Vozilo
+LAN access	DeviceClass		LAN pristup
+Glasses	DeviceClass		Naočale
+Phone	DeviceClass		Telefon
+Laptop	DeviceClass		Prijenosno računalo
+Cordless	DeviceClass		Bežično
+Invalid device class!\n	DeviceClass		Neispravna klasa uređaja!\n
+Not implemented	RemoteDevice		Nije primjenjeno
+Gaming/Toy	DeviceClass		Igranje/Igračka
+Video camera	DeviceClass		Video kamera
+Handheld	DeviceClass		Priručni
+Loudspeaker	DeviceClass		Zvučnik
+SIM card reader	DeviceClass		Čitač SIM kartica
+Computer	DeviceClass		Računalo
+Scanner	DeviceClass		Skener
+Display	DeviceClass		Zaslon
+Palm	DeviceClass	A palm-held device	Palm
+Networking	DeviceClass		Umrežavanje
+Telephony	DeviceClass		Telefonija
+Game	DeviceClass		Igra
+Video display and loudspeaker	DeviceClass		Video zaslon i zvučnik
+Wrist watch	DeviceClass		Ručni sat
+(reserved)	DeviceClass		(rezervirano)
+Information	DeviceClass		Informacija
+Camera	DeviceClass		Kamera

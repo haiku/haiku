@@ -1,47 +1,46 @@
-1	romanian	x-vnd.Haiku-ActivityMonitor	1155619009
-P-faults	DataSource		Defecțiuni-P
-Media nodes	DataSource		Noduri media
-Threads	DataSource		Fire de execuție
-Always on top	ActivityWindow		Mereu deasupra
-Add graph	ActivityWindow		Adaugă grafic
+1	romanian	x-vnd.Haiku-ActivityMonitor	3672498538
 Teams	DataSource		Echipe
+Semaphores	DataSource		Semafoare
+TX	DataSource	Shorter version for Sending	TX
+Block cache memory	DataSource		Blochează memoria tampon
+%lld ms	SettingsWindow		%lld ms
 MiB	DataSource		MiO
-Network send	DataSource		Trimite în rețea
-CPU usage (combined)	DataSource		Utilizare CPU (combinat)
-CPU	DataSource		CPU
-Used memory	DataSource		Memorie utilizată
-Cached memory	DataSource		Memorie în cache
-Apps	DataSource		Aplicații
-Show legend	ActivityView		Arată legenda
+Media nodes	DataSource		Noduri media
 Text clipboard	DataSource		Clipboard text
-Settings	ActivityWindow		Configurări
+Network send	DataSource		Trimite în rețea
+Running applications	DataSource		Aplicații care rulează
+Cache	DataSource		Cache
+CPU usage (combined)	DataSource		Utilizare CPU (combinat)
+Threads	DataSource		Fire de execuție
 Receiving	DataSource		Primire
+Remove graph	ActivityView		Elimină grafic
+Swap space	DataSource		Spaţiu swap
+CPU	DataSource		CPU
+ActivityMonitor	System name		ActivityMonitor
+Update time interval:	SettingsWindow		Actualizează intervalul de timp:
+RX	DataSource	Shorter version for Receiving.	RX
 Settings…	ActivityWindow		Configurări…
+Block cache	DataSource		Blochează cache
+Memory	DataSource		Memorie
+CPU usage	DataSource		Utilizare CPU
+Quit	ActivityWindow		Închidere
+Raw clipboard	DataSource		Clipboard brut
+Settings	ActivityWindow		Configurări
+Used memory	DataSource		Memorie utilizată
+%.1f faults/s	DataSource		%.1f defecțiuni/s
+Show legend	ActivityView		Arată legenda
+Cached memory	DataSource		Memorie în cache
+File	ActivityWindow		Fișier
 Ports	DataSource		Porturi
 Page faults	DataSource		Defecțiuni de pagină
-Sending	DataSource		Trimitere
-Cache	DataSource		Cache
-%.1f faults/s	DataSource		%.1f defecțiuni/s
-Update time interval:	SettingsWindow		Actualizează intervalul de timp:
-TX	DataSource	Shorter version for Sending	TX
-Quit	ActivityWindow		Închidere
-Block cache memory	DataSource		Blochează memoria tampon
-Remove graph	ActivityView		Elimină grafic
-%lld sec.	SettingsWindow		%lld sec.
-%lld ms	SettingsWindow		%lld ms
-CPU usage	DataSource		Utilizare CPU
-Raw clipboard	DataSource		Clipboard brut
-Sems	DataSource		Sems
-%.1f MiB	DataSource		%.1f MO
-ActivityMonitor	System name		ActivityMonitor
-Running applications	DataSource		Aplicații care rulează
-Semaphores	DataSource		Semafoare
-Block cache	DataSource		Blochează cache
-Swap space	DataSource		Spaţiu swap
-Swap	DataSource		Swap
-File	ActivityWindow		Fișier
-usage	DataSource		utilizare
+Apps	DataSource		Aplicații
 Additional items	ActivityView		Elemente adiționale
+Add graph	ActivityWindow		Adaugă grafic
+Sending	DataSource		Trimitere
+%.1f MiB	DataSource		%.1f MO
+Always on top	ActivityWindow		Mereu deasupra
+Swap	DataSource		Swap
+%lld sec.	SettingsWindow		%lld sec.
+P-faults	DataSource		Defecțiuni-P
+Sems	DataSource		Sems
 Network receive	DataSource		Recepție rețea
-Memory	DataSource		Memorie
-RX	DataSource	Shorter version for Receiving.	RX

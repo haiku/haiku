@@ -3,13 +3,13 @@ Include window border	ScreenshotWindow		Inclou la vora de la finestra
 Overwrite	ScreenshotWindow		Sobreescriu
 Save in:	ScreenshotWindow		Desa a:
 Error saving \"%s\":\n\t%s	ScreenshotWindow		Error en desar \"%s\":\n\t%s
-This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Aquest fitxer ja existeix.\n  Segur que voleu sobreescriure'l?
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Aquest fitxer ja existeix.\n Segur que voleu sobreescriure'l?
 OK	ScreenshotWindow		D'acord
 The destination path exists but is not a folder.	ScreenshotWindow		El camí de destinació existeix però no és una carpeta.
 Select	ScreenshotWindow		Selecciona
 Save as:	ScreenshotWindow		Desa com a:
 seconds	ScreenshotWindow		segons
-New screenshot	ScreenshotWindow		Nova captura
+New screenshot	ScreenshotWindow		Captura nova
 Screenshot	System name		Captura de pantalla
 Desktop	ScreenshotWindow		Escriptori
 Artwork folder	ScreenshotWindow		Carpeta d'imatges

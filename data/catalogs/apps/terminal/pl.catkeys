@@ -1,10 +1,11 @@
-1	polish	x-vnd.Haiku-Terminal	722771482
+1	polish	x-vnd.Haiku-Terminal	2664488407
 Close other tabs	Terminal TermWindow		Zamknij pozostałe karty
 Insert path	Terminal TermView		Wstaw ścieżkę
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal nie może uruchomić powłoki. Przepraszamy.
 Text encoding	Terminal TermWindow		Kodowanie tekstu
 OK	Terminal SetTitleWindow		OK
 Edit	Terminal TermWindow		Edycja
+  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory\n	Terminal TermApp		  -h,     --help               wypisz tę wiadomość\n  -t,     --title              ustaw tytuł okna\n  -f,     --fullscreen         uruchom w trybie pełnego ekranu\n  -w,     --working-directory  ustaw początkowy katalog roboczy\n
 Select all	Terminal TermWindow		Zaznacz wszystko
 Confirm exit if active programs exist	Terminal AppearancePrefView		Potwierdź wyjście jeśli istnieją aktywne programy
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t–\tAktualny katalog roboczy bieżącego procesu na aktywnej\n\t\t\tkarcie. Opcjonalnie może zostać podana maksymalna liczba\n\t\t\telementów ścieżki. Np. „%2d” dla maksymalnie dwóch elementów.\n\t%T\t–\tZlokalizowana nazwa aplikacji Terminal.\n\t%e\t–\tKodowanie aktywnej karty. Niewidoczne dla UTF-8.\n\t%i\t–\tIndeks okna.\n\t%t\t–\tTytuł aktywnej karty.
@@ -86,6 +87,7 @@ Use text:	Terminal FindWindow		Użyj tekstu:
 Close active tab	Terminal TermWindow		Zamknij aktywną kartę
 Save as default	Terminal TermWindow		Zapisz jako domyślny
 Nothing is selected.	Terminal TermWindow		Nic nie jest zaznaczone.
+Use left Option as Meta key	Terminal AppearancePrefView		Użyj lewego klawisza Option jako klawisza Meta
 Find	Terminal FindWindow		Znajdź
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Wzór ustalający tytuł aktywnej karty. Następujące wyznaczniki\nmogą zostać użyte:\n
 Professional	Terminal colors scheme		Profesjonalny
@@ -109,6 +111,7 @@ Set window title	Terminal TermWindow		Ustaw tytuł okna
 Increase	Terminal TermWindow		Powiększ
 OK	Terminal TermWindow		OK
 Close window	Terminal TermWindow		Zamknij okno
+Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Terminal Haiku\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui i Takashi Murai.\n\nUżycie: %s [OPCJA] [POWŁOKA]\n
 Solarized Light	Terminal colors scheme		Solarized Light
 Clear all	Terminal TermWindow		Wyczyść wszystko
 Search forward	Terminal FindWindow		Szukaj dalej

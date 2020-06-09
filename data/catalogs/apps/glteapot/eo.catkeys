@@ -1,0 +1,24 @@
+1	esperanto	x-vnd.Haiku-GLTeapot	1569683445
+Upper center	TeapotWindow		Suprecentre
+Lighting	TeapotWindow		Lumo
+Off	TeapotWindow		Malŝalti
+Lower left	TeapotWindow		Malsupre maldekstere
+White	TeapotWindow		Blanka
+Yellow	TeapotWindow		Flava
+Blue	TeapotWindow		Blua
+Gouraud shading	TeapotWindow		Kolorheleco de Gouraud
+Quit	TeapotWindow		Forlasi
+Filled polygons	TeapotWindow		Plenaj plurlateroj
+Settings	TeapotWindow		Agordo
+Fog	TeapotWindow		Nebulo
+Backface culling	TeapotWindow		Buĉado de malantauajn flankojn
+Z-buffered	TeapotWindow		Z-bufrado
+File	TeapotWindow		Dosiero
+Perspective	TeapotWindow		Perspektivo
+GLTeapot	System name		GLBolkruĉo
+Green	TeapotWindow		Verda
+Right	TeapotWindow		Dekstre
+FPS display	TeapotWindow		Montri kadrojn sekunde
+Add a teapot	TeapotWindow		Aldoni bolkruĉon
+Red	TeapotWindow		Ruĝa
+Lights	TeapotWindow		Lumoj

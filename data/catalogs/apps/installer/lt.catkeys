@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Installer	4200011523
+1	lithuanian	x-vnd.Haiku-Installer	4054994348
 Performing installation.	InstallProgress		Diegiama.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Pasirinkite šaltinio diską iš išskleidžiamojo meniu. Tada spustelėkite mygtuką „Pradėti“.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Prieš užverdami įdiegimo programos langą, užverkite Diskų ženklintuvo langą.
@@ -29,9 +29,7 @@ Write boot sector	InstallerWindow		Įrašyti paleidimo sektorių
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld iš %2ld
 Install from:	InstallerWindow		Diegti iš:
 Additional disk space required: 0.0 KiB	InstallerWindow		Papildomai reikės disko vietos: 0,0 KiB
-3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Pirmąkart sėkmingai paleidę „Haiku“, nepamirškite paskaityti dokumentacijos, esančios „Welcome“ ir „Userguide“ failuose. Saitus į juos rasite Darbalaukyje ir „WebPositive“ adresyne.\n\n
 ???	InstallerWindow	Unknown currently copied item	???
-Install anyway	InstallProgress		Vis tiek diegti
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Pasirinkite šaltinio ir paskirties diskus iš išskleidžiamųjų meniu. Tada spustelėkite mygtuką „Pradėti“.
 Hide optional packages	InstallerWindow		Nerodyti papildomų paketų
 ???	InstallerWindow	Unknown partition name	???

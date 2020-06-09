@@ -4,16 +4,16 @@ No new messages	DeskbarView		No hay mensajes nuevos
 Shutdown mail services	DeskbarView		Apagar servicios de correo
 Mail status	MailDaemon		Estado del correro
 Fetching mail for %name	Notifier		Búsqueda de correo para %name
-{0, plural, one{# new message} other{# new messages}}	DeskbarView		{0, plural, one{# new message} other{# new messages}}
-{0, plural, one{# new message} other{# new messages}} for %name\n	MailDaemon		{0, plural, one{# new message} other{# new messages}} para %name\n
-Create new message…	DeskbarView		Crear nuevo mensaje...
+{0, plural, one{# new message} other{# new messages}}	DeskbarView		{0, plural, one{# mensaje nuevo} other{# mensajes nuevos}}
+{0, plural, one{# new message} other{# new messages}} for %name\n	MailDaemon		{0, plural, one{# mensaje nuevo} other{# mensajes nuevos}} para %name\n
+Create new message…	DeskbarView		Crear mensaje...
 Send pending mails	DeskbarView		Enviar correos pendientes
 Settings…	DeskbarView		Configuración…
-{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{One new message} other{# new messages}}
-New Messages	MailDaemon		Nuevos Mensajes
+{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{1 mensaje nuevo} other{# mensajes nuevos}}
+New Messages	MailDaemon		Mensajes nuevos
 <no accounts>	DeskbarView		<no hay ninguna cuenta>
 Mail status	Notifier		Estado del correo
 Check for mails only	DeskbarView		Sólo mirar si hay correo
 Check for mail now	DeskbarView		Mirar si hay correo ahora
-Sending mail for %name	Notifier		Envio de correo para %name
+Sending mail for %name	Notifier		Envío de correo para %name
 Mail daemon status log	MailDaemon		Registro del estado del demonio de correo

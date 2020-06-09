@@ -3,5 +3,5 @@ or empty e-mail	SpamFilterConfig		o correu buit
 Genuine below and uncertain above:	SpamFilterConfig		Genuí per sota i incert per sobre de:
 Spam above:	SpamFilterConfig		Brossa per sobre de:
 Add spam rating to start of subject	SpamFilterConfig		Afegeix el valor del correu brossa a l'inici del tema
-Bayesian Spam Filter	SpamFilter		Filtre de brossa Bayesian
+Bayesian Spam Filter	SpamFilter		Filtre de brossa bayesià
 Learn from all incoming e-mail	SpamFilterConfig		Aprèn de tot el correu d'entrada

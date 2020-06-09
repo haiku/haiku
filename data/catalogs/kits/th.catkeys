@@ -3,10 +3,10 @@
 All Rights Reserved.	AboutWindow		สงวนลิขสิทธิ์
 gold master	AboutWindow		gold master
 Undo	TextView		เลิกทำ
+OK	PrintJob		ตกลง
 gamma	AboutWindow		แกมม่า
 development	AboutWindow		การพัฒนา
 OK	Dragger		ตกลง
-OK	PrintJob		ตกลง
 Print Server is not responding.	PrintJob		เซิร์ฟเวอร์การพิมพ์ไม่ตอบสนอง
 About %app%	AboutMenuItem		เกี่ยวกับ %app%
 Warning	Dragger		คำเตือน

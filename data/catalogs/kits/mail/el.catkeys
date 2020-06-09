@@ -1,0 +1,11 @@
+1	greek, modern (1453-)	x-vnd.Haiku-libmail	3450478295
+Partially download messages larger than	ProtocolConfigView		Να γίνεται μερικό κατέβασμα για μηνύματα μεγαλύτερα από
+Password:	ProtocolConfigView		Κωδικός:
+Remove mail from server when deleted	ProtocolConfigView		Να διαγράφεται η αλληλογραφία από τον διακομιστή όταν διαγράφεται τοπικά
+Mail server:	ProtocolConfigView		Διακομιστής αλληλογραφίας:
+Select…	MailKit		Επιλογή…
+Connection type:	ProtocolConfigView		Τύπος σύνδεσης:
+KB	ProtocolConfigView	kilo byte	KB
+Leave mail on server	ProtocolConfigView		Να μην διαγράφεται η αλληλογραφία στον διακομιστή
+Username:	ProtocolConfigView		Όνομα χρήστη:
+Login type:	ProtocolConfigView		Τύπος εισόδου:

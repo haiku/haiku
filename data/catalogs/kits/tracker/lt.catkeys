@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-libtracker	3282059211
+1	lithuanian	x-vnd.Haiku-libtracker	1356723787
 Created	ContainerWindow		Sukūrimo data
 Open and make preferred	OpenWithWindow		Atverti ir laikyti numatytąja
 Kind	ContainerWindow		Tipas
@@ -239,7 +239,6 @@ MiB	WidgetAttributeText		MiB
 Delete	FSUtils		Šalinti
 Edit name	ContainerWindow		Pervardinti
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Failo „%document“ nepavyko atverti (trūksta simbolio: %symbol).\n
-More options	FindPanel		Daugiau parinkčių
 config	B_USER_CONFIG_DIRECTORY		Konfigūracija
 Error moving \"%name\".	FSUtils		Klaida perkeliant „%name“.
 Select…	QueryContainerWindow		Pažymėti…
@@ -311,7 +310,6 @@ Proceed	FSUtils		Vykdyti
 Edit favorites…	FilePanelPriv		Tvarkyti parankinius…
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		Aplanko perkelti į jį patį arba į bet kurį jo poaplankį negalima.
 New	ContainerWindow		Naujas
-Fewer options	FindPanel		Mažiau parinkčių
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Objektus turėtumėte numesti ant vieno iš tomų piktogramos Tomų lange.
 Sorry, you can't copy items to the Trash.	FSClipBoard		Deja, Šiukšlinėn objektų kopijuoti neleidžiama.
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Šiame aplanke, jau yra objektų, kurių vardai sutampa su objektų, kuriuos %verb, pavadinimais.\n\nAr norite visus konfliktinius objektus pakeisti tais, kuriuos %verb, ar geriau Jūsų atsiklausti dėl kiekvieno atskirai?

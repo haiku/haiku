@@ -1,47 +1,46 @@
-1	spanish; castilian	x-vnd.Haiku-ActivityMonitor	1155619009
-P-faults	DataSource		Errores de página
-Media nodes	DataSource		Nodos de media
-Threads	DataSource		Hilos
-Always on top	ActivityWindow		Siempre visible
-Add graph	ActivityWindow		Insertar gráfico
+1	spanish; castilian	x-vnd.Haiku-ActivityMonitor	3672498538
 Teams	DataSource		Equipos
+Semaphores	DataSource		Semáforos
+TX	DataSource	Shorter version for Sending	TX
+Block cache memory	DataSource		Bloquear memoria de caché
+%lld ms	SettingsWindow		%lld ms
 MiB	DataSource		MiB
-Network send	DataSource		Envío de red
-CPU usage (combined)	DataSource		Uso de CPU (conjunto)
-CPU	DataSource		CPU
-Used memory	DataSource		Memoria usada
-Cached memory	DataSource		Memoria de caché
-Apps	DataSource		Aplicaciones
-Show legend	ActivityView		Mostrar clave
+Media nodes	DataSource		Nodos de media
 Text clipboard	DataSource		Texto en el portapapeles
-Settings	ActivityWindow		Configuración
+Network send	DataSource		Envío de red
+Running applications	DataSource		Aplicaciones ejecutándose
+Cache	DataSource		Caché
+CPU usage (combined)	DataSource		Uso de CPU (conjunto)
+Threads	DataSource		Hilos
 Receiving	DataSource		Recibiendo
+Remove graph	ActivityView		Quitar el gráfico
+Swap space	DataSource		Espacio de intercambio
+CPU	DataSource		CPU
+ActivityMonitor	System name		Monitor de actividad
+Update time interval:	SettingsWindow		Intervalo de tiempo de actualización:
+RX	DataSource	Shorter version for Receiving.	RX
 Settings…	ActivityWindow		Configuración...
+Block cache	DataSource		Bloqueando caché
+Memory	DataSource		Memoria 
+CPU usage	DataSource		Uso de CPU
+Quit	ActivityWindow		Salir
+Raw clipboard	DataSource		Portapapeles en bruto
+Settings	ActivityWindow		Configuración
+Used memory	DataSource		Memoria usada
+%.1f faults/s	DataSource		%.1f fallas/s
+Show legend	ActivityView		Mostrar clave
+Cached memory	DataSource		Memoria de caché
+File	ActivityWindow		Archivo
 Ports	DataSource		Puertos
 Page faults	DataSource		Errores de página
-Sending	DataSource		Enviando
-Cache	DataSource		Caché
-%.1f faults/s	DataSource		%.1f fallas/s
-Update time interval:	SettingsWindow		Intervalo de tiempo de actualización:
-TX	DataSource	Shorter version for Sending	TX
-Quit	ActivityWindow		Salir
-Block cache memory	DataSource		Bloquear memoria de caché
-Remove graph	ActivityView		Quitar el gráfico
-%lld sec.	SettingsWindow		%lld sec.
-%lld ms	SettingsWindow		%lld ms
-CPU usage	DataSource		Uso de CPU
-Raw clipboard	DataSource		Portapapeles en bruto
-Sems	DataSource		Sems
-%.1f MiB	DataSource		%.1f MiB
-ActivityMonitor	System name		Monitor de actividad
-Running applications	DataSource		Aplicaciones ejecutándose
-Semaphores	DataSource		Semáforos
-Block cache	DataSource		Bloqueando caché
-Swap space	DataSource		Espacio de intercambio
-Swap	DataSource		Intercambio
-File	ActivityWindow		Archivo
-usage	DataSource		uso
+Apps	DataSource		Aplicaciones
 Additional items	ActivityView		Elementos adicionales
+Add graph	ActivityWindow		Insertar gráfico
+Sending	DataSource		Enviando
+%.1f MiB	DataSource		%.1f MiB
+Always on top	ActivityWindow		Siempre visible
+Swap	DataSource		Intercambio
+%lld sec.	SettingsWindow		%lld sec.
+P-faults	DataSource		Errores de página
+Sems	DataSource		Sems
 Network receive	DataSource		Recibir de red
-Memory	DataSource		Memoria 
-RX	DataSource	Shorter version for Receiving.	RX

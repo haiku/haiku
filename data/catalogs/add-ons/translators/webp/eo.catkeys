@@ -1,0 +1,25 @@
+1	esperanto	x-vnd.Haiku-WebPTranslator	828165164
+©2010-2017 Haiku Inc.	ConfigView		©2010-2017 Haiku Inc.
+Compression method:	ConfigView		Densiga metodo:
+WebP image translator	ConfigView		WebP bildotradukilo
+Preset	ConfigView		Antaŭagordo
+WebP images	WebPTranslator		WebP bildoj
+WebPTranslator Settings	ConfigView		Agordo de WebPTranslator
+Output quality:	ConfigView		Eliga kvalito:
+©2010-2017 Google Inc.	ConfigView		©2010-2017 Google Inc.
+WebP Settings	main		Agordo de WebP
+Text	ConfigView		Teksto
+Slower but better	ConfigView		Plimalrapida sed plibona
+WebP image	WebPTranslator		WebP bildo
+Output preset:	ConfigView		Antaŭagordo por eligo:
+Picture	ConfigView		Bildo
+Low	ConfigView		Malalta
+High	ConfigView		Alta
+Drawing	ConfigView		Desegno
+Based on libwebp %version%	ConfigView		Bazita sur libwebp %version%
+Default	ConfigView		Implicita
+Fast	ConfigView		Rapida
+Photo	ConfigView		Fotografo
+Preprocessing filter	ConfigView		Antaŭtrakta filtrilo
+WebP image translator	WebPTranslator		WebP bildotradukilo
+Icon	ConfigView		Piktogramo

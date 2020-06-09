@@ -11,7 +11,7 @@ List background	Colors tab		Liste arka planı
 No effect on running applications	DecorSettingsView		Çalışan uygulamalar üzerinde etkisiz
 Fixed font:	Font view		Sabit yazıtipi:
 Appearance	System name		Görünüm
-Reduce colored edges filter strength:	AntialiasingSettingsView		Renklendirilmiş kenarların süzgeç gücünü azalt
+Reduce colored edges filter strength:	AntialiasingSettingsView		Renklendirilmiş uç ışıma düzeyi:
 Glyph hinting:	AntialiasingSettingsView		Glif düzgünleştirme:
 Default Haiku ControlLook	DecorSettingsView		Öntanımlı Haiku ControlLook
 Menu item text	Colors tab		Menü ögesi metni

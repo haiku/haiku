@@ -10,7 +10,7 @@ TIFF Settings	TIFFMain		Paràmetres de TIFF
 TIFF image translator	TIFFTranslator		Traductor d'imatges TIFF
 identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: no s'ha pogut establir la carpeta\n
 Version %d.%d.%d, %s	TIFFView		Versió %d.%d.%d, %s
-TIFFTranslator Settings	TIFFTranslator		Paràmetres del Traductor TIFF
+TIFFTranslator Settings	TIFFTranslator		Paràmetres del Traductor de TIFF
 LZW	TIFFView		LZW
 TIFF images	TIFFTranslator		Imatges TIFF
 None	TIFFView		Cap

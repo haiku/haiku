@@ -1,0 +1,90 @@
+1	esperanto	x-vnd.Haiku-StyledEdit	2796309255
+Document statistics	Statistics		Statistiko pri dokumentoj
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Ne povas malfari, dosiero forestas: \"%s\".
+Cut	Menus		Eltondi
+Center	Menus		Centra
+Increase size	Menus		Pligrandigi
+Wrap-around search	FindandReplaceWindow		Iteracia serĉo
+Page setup…	Menus		Agordo de paĝo…
+Untitled 	StyledEditWindow		Sentitola 
+OK	Statistics		Bone
+Find	FindandReplaceWindow		Serĉi
+New	Menus		Nova
+Document	Menus		Dokumento
+Search backwards	FindandReplaceWindow		Ŝerĉi kontraŭen
+Find again	Menus		Retrovi
+Read-only	StatusView		Nurlegebla
+Save	Menus		Konservi
+Cancel	QuitAlert		Nuligi
+Copy	Menus		Kopii
+Reload	NodeMonitorAlerts		Renovigi
+line %d, column %d	StatusView		Vico %d, kolumno %d
+Words:	Statistics		Vortoj:
+???	LoadAlert		???
+Recover	NodeMonitorAlerts		Restaŭri
+Error saving \"%s\":\n%s	SaveAlert		Eraro dum konservado\"%s\":\n%s
+OK	RevertToSavedAlert		Bone
+Unlock file	StatusView		Malŝlosi dosieron
+Italic	Menus		Kursiva
+Can't undo	Menus		Ne povas malfari
+Replace…	Menus		Anstataŭigi…
+File	Menus		Dosiero
+Bold	Menus		Grasa
+Paste	Menus		Alglui
+File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Dosiero \"%file%\" estas ŝanĝita per alia programo, ĉu reŝargi ĝin?
+File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Dosiero \"%file%\" estas forigita per alia programo, ĉu restaŭri ĝin?
+Lines:	Statistics		Vicojn:
+Replace in all windows	FindandReplaceWindow		Anstataŭigi en ĉiuj fenestroj
+\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" ne konservis ŝanĝojn.\nĈu restaŭri ĝin per la lasta konservita versio? 
+Save	SaveAlert		Konservi
+Default	Open_and_SaveAsPanel		Defaŭlta
+Cancel	RevertToSavedAlert		Nuligi
+Cancel	FindandReplaceWindow		Nuligi
+Statistics…	Menus		Statistiko…
+Encoding	Open_and_SaveAsPanel		Kodoprezento
+Replace all	FindandReplaceWindow		Anstataŭigi ĉiujn
+Close	Menus		Fermi
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Eraro dum ŝargado de \"%s\":\n\tNesubtenata formato
+Left	Menus		Maldekstre
+Default	Menus		Defaŭlta
+OK	SaveAlert		Bone
+Color	Menus		Koloro
+Save changes to the document \"%s\"? 	QuitAlert		Ĉu konservi ŝanĝojn en dokumenton \"%s\"? 
+StyledEdit	System name		La Stilredaktilo
+Find:	FindandReplaceWindow		Serĉi:
+Undo typing	QuitAlert		Malfari tajpadon
+Error loading \"%s\":\n\t%s	LoadAlert		Eraro dum ŝargado de \"%s\":\n\t%s
+Don't save	SaveAlert		Ne konservi
+Reload…	Menus		Reŝargi…
+Print…	Menus		Presi…
+Quit	Menus		Ĉesi
+Redo typing	QuitAlert		Refari tajpadon
+Ignore	NodeMonitorAlerts		Ignori
+Wrap lines	Menus		Faldi lineojn
+Text encoding	Menus		Teksta kodprezento
+Unable to unlock file\n\t%s	QuitAlert		Ne povas malŝlosi dosieron\n\t%s
+Modified	StatusView		Ŝanĝita
+OK	LoadAlert		Bone
+Save	QuitAlert		Konservi
+Case-sensitive	FindandReplaceWindow		Usklecodistinga
+Find selection	Menus		Trovi elektitan
+Cancel	SaveAlert		Nuligi
+Find…	Menus		Serĉi…
+Revert	RevertToSavedAlert		Malfari
+Decrease size	Menus		Malgrandigi
+Size	Menus		Grando
+Autodetect	Menus		Detekti aŭtomate
+Replace next	Menus		Anstataŭigi tekston
+OK	QuitAlert		Bone
+Replace with:	FindandReplaceWindow		Anstataŭigi per:
+Edit	Menus		Redakti
+Open…	Menus		Uzi…
+Save as…	Menus		Konservi kiel…
+Replace	FindandReplaceWindow		Anstataŭigi
+Characters:	Statistics		Signoj:
+Don't save	QuitAlert		Ne konservi
+This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		La dosiero estas markita kiel nurlegebla. Ĉu konservi ŝanĝojn en dokumento \"%s\"? 
+Align	Menus		Ĝisrandigi
+Font	Menus		Tiparo
+Select all	Menus		Elekti ĉion
+Right	Menus		Dekstre

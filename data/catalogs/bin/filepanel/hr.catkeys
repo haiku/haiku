@@ -1,0 +1,8 @@
+1	croatian	x-vnd.mmu_man.filepanel	513972171
+short\tlong\tdescription\n	FilePanelApp		kratki\t dugi\t opis\n
+%s not a valid option\n	FilePanelApp		%s nije valjana opcija\n
+%s: this option requires a parameter\n	FilePanelApp		%s: ova opcija zahtjeva parametar\n
+%s: UNIMPLEMENTED\n	FilePanelApp		%s: NEPRIMJENJENO\n
+-1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t --single\t dozvoli da samo 1 datoteka bude odabrana\n
+options:\n	FilePanelApp		opcije:\n
+-d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--direktorij\topen u <folder>\n

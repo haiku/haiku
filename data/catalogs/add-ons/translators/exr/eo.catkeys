@@ -1,0 +1,9 @@
+1	esperanto	x-vnd.Haiku-EXRTranslator	3596882613
+Version %d.%d.%d, %s	ConfigView		Versio %d.%d.%d, %s
+EXR image translator	EXRTranslator		EXR bildotradukilo
+EXR Settings	main		Agordo de EXR
+EXR images	EXRTranslator		EXR bildoj
+a division of Lucasfilm Entertainment Company Ltd	ConfigView		subero de Lucasfilm Entertainment Company Ltd
+EXR image	EXRTranslator		EXR bildo
+EXR image translator	ConfigView		EXR bildotradukilo
+Based on OpenEXR %version%	ConfigView		Bazita sur OpenEXR %version%

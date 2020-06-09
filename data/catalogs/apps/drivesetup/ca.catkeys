@@ -22,7 +22,7 @@ The partition %s is currently mounted.	MainWindow		La partició %s ara està mun
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Segur que voleu formatar la partició \"%s\"? Se us preguntarà un cop més abans d'escriure els canvis al disc.
 DriveSetup	System name		Gestor de discs
 Mounted at	PartitionList		Muntada a
-Create…	MainWindow		Nova...
+Create…	MainWindow		Crea...
 Write changes	MainWindow		Escriu els canvis
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		No s'ha pogut iniciar la partició %s. (No s'han desat els canvis al disc.)
 Validation of the given creation parameters failed.	MainWindow		Ha fallat validar els paràmetres de creació indicats.
@@ -33,7 +33,7 @@ Read only	PartitionList		Només de lectura
 The panel could not return successfully.	MainWindow		El plafó no ha pogut tenir un retorn correcte.
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Ha fallat canviar els paràmetres de la partició. No s'ha escrit cap canvi al disc.
 Partition %ld	DiskView		Partició %ld
-There's no space on the partition where a child partition could be created.	MainWindow		No hi ha espai a la partició per fer-hi una nova partició.
+There's no space on the partition where a child partition could be created.	MainWindow		No hi ha espai a la partició per fer-hi una partició nova.
 No disk devices have been recognized.	DiskView		No s'ha reconegut cap dispositiu de disc.
 Attributes	PartitionList		Atributs
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Ha fallat suprimir la partició. No s'ha escrit cap canvi al disc.
@@ -55,7 +55,7 @@ Shared	PartitionList		Compartida
 MIMEs	PartitionList		MIMEs
 BitLocker encrypted	Encryption utils		Encriptat amb BitLocker
 You need to select a partition entry from the list.	MainWindow		Cal que seleccioneu una partició de la llista.
-Offset: %s	Support		Desplaçament: %s
+Offset: %s	Support		Compensació: %s
 SafeBoot encrypted	Encryption utils		Encriptat amb SafeBoot
 Volume name	PartitionList		Nom del volum
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Segur que voleu escriure el canvis al disc ara?\n\nSi ho feu, es perdran irrecuperablement totes les dades de la partició!

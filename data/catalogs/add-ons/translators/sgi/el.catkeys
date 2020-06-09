@@ -1,0 +1,13 @@
+1	greek, modern (1453-)	x-vnd.Haiku-SGITranslator	129108011
+SGI images	SGITranslator		SGI εικόνες
+Use compression:	SGIView		Χρήση συμπίεσης:
+SGI image translator	SGIView		Μετατροπέας εικόνας SGI
+SGI image	SGITranslator		SGI εικόνα
+SGITranslator Settings	SGITranslator		Ρυθμίσεις μετατροπέα SGI
+SGI Settings	SGIMain		SGI Ρυθμίσεις
+SGI image translator	SGITranslator		Μετατροπέας είκονας SGI
+None	SGIView		Κανένα
+Version %d.%d.%d, %s	SGIView		Έκδοση %d.%d.%d, %s
+\nbased on GIMP SGI plugin v1.5:\n	SGIView		\nβασισμένο στο πρόσθετο GIMP SGI v1.5:\n
+RLE	SGIView		RLE
+written by:\n	SGIView		αναπτύχθηκε από τον/την:\n

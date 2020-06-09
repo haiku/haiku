@@ -1,0 +1,22 @@
+1	greek, modern (1453-)	x-vnd.Haiku-PSDTranslator	3654055550
+Lab	PSDLoader		Εργαστήριο
+Uncompressed	PSDConfig		Αποσυμπιεσμένο
+Indexed	PSDLoader		Έχει καταλογογραφεί
+Grayscale	PSDLoader		Αποχρώσεις του γκρι
+Photoshop image translator	PSDConfig		Μετατροπέας εικόνας Photoshop
+Photoshop image translator	PSDTranslator		Μετατροπέας εικόνας Photoshop
+Version %d.%d.%d, %s	PSDConfig		Έκδοση %d.%d.%d, %s
+Photoshop Document (PSD file)	PSDConfig		Έγγραφο Photoshop (αρχείο PSD)
+Photoshop image	PSDTranslator		Εικόνα Photoshop
+RLE	PSDConfig		RLE
+Photoshop Big Document (PSB file)	PSDConfig		Ευμεγεθές αρχείο Photoshop (αρχείο PSB)
+RGBA	PSDLoader		RGBA
+Photoshop image (%s)	PSDTranslator		Εικόνα Photoshop (%s)
+PSDTranslator Settings	PSDConfig		Ρυθμίσεις μετατροπέα εικόνας Photoshop
+RGB	PSDLoader		RGB
+Bitmap	PSDLoader		Bitmap
+CMYK	PSDLoader		CMYK
+Compression: 	PSDConfig		Συμπίεση: 
+Format: 	PSDConfig		Μορφοποίηση: 
+Multichannel	PSDLoader		Πολυκάναλο
+Duotone	PSDLoader		Δυτονικό

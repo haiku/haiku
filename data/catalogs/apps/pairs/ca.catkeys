@@ -8,11 +8,11 @@ New	PairsWindow		Nou
 OK	Pairs		D'acord
 Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	Parells no ha trobat prou icones vectorials per començar; en necessita almenys %zu, però se n'ha trobat %zu.\n
 You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWindow		Heu acabat el joc amb {0, plural, one{# clic} other{# clics}}.\n
-Small	PairsWindow		Petit
+Small	PairsWindow		Petita
 Size	PairsWindow		Mida
 %app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n	PairsWindow		%app%\n\tEscrita per Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n
 Quit game	PairsWindow		Deixa la partida
-Large	PairsWindow		Gros
+Large	PairsWindow		Grossa
 Beginner (4x4)	PairsWindow		Principiant (4x4)
 Intermediate (6x6)	PairsWindow		Intermedi (6x6)
 New game	PairsWindow		Partida nova

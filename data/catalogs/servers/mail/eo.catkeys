@@ -1,0 +1,19 @@
+1	esperanto	x-vnd.Be-POST	2949558073
+No new messages	MailDaemon		Neniu nova mesaĝo
+No new messages	DeskbarView		Neniu nova mesaĝo
+Shutdown mail services	DeskbarView		Malŝalti retpoŝtajn servojn
+Mail status	MailDaemon		Repoŝta stato
+Fetching mail for %name	Notifier		Akirante retmesaĝojn por %name
+{0, plural, one{# new message} other{# new messages}}	DeskbarView		{0, plural, one{# nova mesaĝo} other{# novaj mesaĝoj}}
+{0, plural, one{# new message} other{# new messages}} for %name\n	MailDaemon		{0, plural, one{# nova mesaĝo} other{# novaj mesaĝoj}} por %name\n
+Create new message…	DeskbarView		Verki novan mesaĝon…
+Send pending mails	DeskbarView		Sendi atendatajn retpoŝtojn
+Settings…	DeskbarView		Agordo…
+{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{Unu nova mesaĝo} other{# novaj mesaĝoj}}
+New Messages	MailDaemon		Novaj Mesaĝoj
+<no accounts>	DeskbarView		<neniu konto>
+Mail status	Notifier		Repoŝta stato
+Check for mails only	DeskbarView		Kontroli retmesaĝojn sole
+Check for mail now	DeskbarView		Kontroli retmesaĝojn nun
+Sending mail for %name	Notifier		Sendante retpoŝton por %name
+Mail daemon status log	MailDaemon		Retpoŝta demono statoprotokolo

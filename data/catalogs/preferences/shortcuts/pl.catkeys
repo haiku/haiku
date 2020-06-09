@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Shortcuts	1611284793
+1	polish	x-vnd.Haiku-Shortcuts	3834857117
 *MouseUp	ShortcutsWindow		*MouseUp
 Application	ShortcutsWindow		Aplikacja
 Option	ShortcutsSpec	Name for modifier on keyboard	Opcja
@@ -9,6 +9,7 @@ Don't save	ShortcutsWindow		Nie zapisuj
 *Beep	ShortcutsWindow		*Beep
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Skróty nie mogły zapisać ustawienia klawiszy.
 Save	ShortcutsWindow		Zapisz
+Either	ShortcutsSpec		Którykolwiek
 Oh no	ShortcutsWindow		Och nie
 Key	ShortcutsWindow		Przycisk
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*SendMessage application/x-vnd.Be-TRAK 'Tfnd'
@@ -19,21 +20,26 @@ Quit	ShortcutsWindow		Wyjdź
 Cancel	ShortcutsWindow		Anuluj
 *MoveMouse +20 +0	ShortcutsWindow		*MoveMouse +20 +0
 Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl
+Left	ShortcutsSpec		Lewy
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Skróty nie zdołały przetworzyć pliku Keyset!
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Skróty nie zdołały zapisać pliku Keyset!
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"Tutaj umieść swój tekst\"
 Remove selected shortcut	ShortcutsWindow		Usuń zaznaczony skrót
 Error, NULL state description?	ShortcutsSpec		Błąd, brak opisu stanu?
+Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Skróty nie zdołały otworzyć pliku KeySet!
 Save & apply	ShortcutsWindow		Zapisz i zastosuj
 Open	ShortcutsWindow		Otwórz
 Append	ShortcutsWindow		Dodaj
+Both	ShortcutsSpec		Oba
 Save KeySet as…	ShortcutsWindow		Zapisz KeySet jako…
 Append KeySet…	ShortcutsWindow		Dodaj KeySet…
 *MouseButton 1	ShortcutsWindow		*MouseButton 1
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"
+Right	ShortcutsSpec		Prawy
 OK	ShortcutsWindow		OK
 Add new shortcut	ShortcutsWindow		Dodaj nowy skrót
+(None)	ShortcutsSpec		(Żaden)
 Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
 Open KeySet…	ShortcutsWindow		Otwórz KeySet…
 File	ShortcutsWindow		Plik

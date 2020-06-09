@@ -1,0 +1,30 @@
+1	esperanto	x-vnd.Haiku-PPMTranslator	292474603
+None	PPMTranslator		Neniu
+PPM Settings	PPMMain		Agordo de PPM
+System palette 8 bits	PPMTranslator		Sistema farboplato 8 bita
+Sample code copyright 1999, Be Incorporated	PPMTranslator		Ekzempla kodo kopirajto 1999, Be Incorporated
+Something is wrong with the PPMTranslator!	PPMMain		Io fiaskas je la PPMTranslator!
+Grayscale 8 bits	PPMTranslator		Grizskala 8 bita
+Based on PPMTranslator sample code	PPMTranslator		Bazita sur PPMTranslator ekzemplokodo
+RGB 8:8:8 32 bits big-endian	PPMTranslator		RGC 8:8:8 32 bitoj grand-pezekstrema
+PPM image translator	PPMTranslator		PPM bildotradukilo
+Bitmap 1 bit	PPMTranslator		Bitmapo 1 bita
+RGB 5:6:5 16 bits big-endian	PPMTranslator		RGC 5:6:5 16 bita grand-pezekstrema
+PPMTranslator Settings	PPMTranslator		Agordo de PPMTranslator
+CMY 8:8:8 32 bits	PPMTranslator		CMY 8:8:8 32 bitoj
+OK	PPMMain		Bone
+CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 bitoj
+PPM image	PPMTranslator		PPM bildo
+Input color space:	PPMTranslator		Eniga kolorspaco:
+RGB 5:5:5 16 bits big-endian	PPMTranslator		RGB 5:5:5 16 bita grand-pezekstrema
+RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RGBA 5:5:5:1 16 bita grand-pezekstrema
+Write ASCII	PPMTranslator		Skribi ASCIIe
+RGB 5:6:5 16 bits	PPMTranslator		RGC 5:6:5 16 bitoj
+RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8 32 bita grand-pezekstrema
+RGBA 8:8:8:8 32 bits	PPMTranslator		RGBA 8:8:8:8 32 bitoj
+Version %d.%d.%d, %s	PPMTranslator		Versio %d.%d.%d, %s
+CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8 32 bitoj
+RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8 32 bitoj
+RGB 5:5:5 16 bits	PPMTranslator		RGB 5:5:5 16 bitoj
+RGBA 5:5:5:1 16 bits	PPMTranslator		RGBA 5:5:5:1 16 bitoj
+Be Bitmap Format (PPMTranslator)	PPMTranslator		Be Bitmapa Formo (PPMTranslator)

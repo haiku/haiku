@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku.TextSearch	1609008100
+1	english	x-vnd.Haiku.TextSearch	1966170500
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		请选择需要在文件浏览器中显示的文件。
 %appname% : %path%	GrepWindow		%appname% : %path%
 Open selection	GrepWindow		打开
@@ -17,7 +17,6 @@ Show files in Tracker	GrepWindow		在文件浏览器中显示文件
 Please select the files you wish to keep searching.	GrepWindow		请您选择需要进一步搜索的文件。
 Trim to selection	GrepWindow		缩减选中内容
 Set target…	GrepWindow		设置目标...
-TextSearch	GrepWindow		文本搜索
 Search	GrepWindow		搜索
 Copy text to clipboard	GrepWindow		复制文本到剪贴板
 Show lines	GrepWindow		显示行

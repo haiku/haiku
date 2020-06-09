@@ -3,10 +3,10 @@
 All Rights Reserved.	AboutWindow		All Rights Reserved.
 gold master	AboutWindow		ゴールデンマスター
 Undo	TextView		元に戻す
+OK	PrintJob		OK
 gamma	AboutWindow		γ
 development	AboutWindow		開発版
 OK	Dragger		OK
-OK	PrintJob		OK
 Print Server is not responding.	PrintJob		プリントサーバーが応答しません。
 About %app%	AboutMenuItem		%app% について
 Warning	Dragger		警告

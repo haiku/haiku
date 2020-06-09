@@ -3,10 +3,10 @@
 All Rights Reserved.	AboutWindow		Minden jog fenntartva.
 gold master	AboutWindow		arany fokozatú
 Undo	TextView		Visszavonás
+OK	PrintJob		Rendben
 gamma	AboutWindow		gamma
 development	AboutWindow		fejlesztés
 OK	Dragger		Rendben
-OK	PrintJob		Rendben
 Print Server is not responding.	PrintJob		A nyomtatókiszolgáló nem válaszol.
 About %app%	AboutMenuItem		%app% névjegye
 Warning	Dragger		Figyelmeztetés

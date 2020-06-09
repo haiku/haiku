@@ -1,0 +1,32 @@
+1	croatian	x-vnd.Haiku-ActivityMonitor	777815583
+Teams	DataSource		Timovi
+Semaphores	DataSource		Semafori
+TX	DataSource	Shorter version for Sending	TX
+%lld ms	SettingsWindow		%lld ms
+MiB	DataSource		MiB
+Running applications	DataSource		Pokretanje programa
+CPU usage (combined)	DataSource		CPU upotreba (kombinirano)
+Receiving	DataSource		Primanje
+Remove graph	ActivityView		Ukloni grafikon
+Swap space	DataSource		Swap prostor
+CPU	DataSource		CPU
+ActivityMonitor	System name		Nadzoraktivnosti
+Update time interval:	SettingsWindow		Dopuni vremenski interval:
+RX	DataSource	Shorter version for Receiving.	RX
+Settings…	ActivityWindow		Postavke...
+Memory	DataSource		Memorija
+CPU usage	DataSource		CPU upotreba
+Quit	ActivityWindow		Isključi
+Settings	ActivityWindow		Postavke
+Used memory	DataSource		Korištena memorija
+File	ActivityWindow		Datoteka
+Ports	DataSource		Portovi
+Apps	DataSource		Programi
+Additional items	ActivityView		Dodatne stavke
+Add graph	ActivityWindow		Dodaj grafikon
+Sending	DataSource		Slanje
+%.1f MiB	DataSource		%.1f MB
+Always on top	ActivityWindow		Uvijek na vrhu
+Swap	DataSource		Swap
+%lld sec.	SettingsWindow		%lld sek.
+Network receive	DataSource		Mreža prima

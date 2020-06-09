@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Pulse	139895817
+1	romanian	x-vnd.Haiku-Pulse	559379362
 Normal mode	DeskbarPulseView		Mod normal
 Info	CPUButton		Info
 Quit	DeskbarPulseView		Închidere
@@ -16,6 +16,7 @@ Fade colors	ConfigView		Culori translucide
 About Pulse…	PulseView		Despre Pulse…
 Pulse	NormalPulseView		Puls
 Deskbar mode	NormalPulseView		Mod bară de desktop
+Pulse settings	PulseApp		Configurări Pulse
 Remove replicant	CPUButton		Elimină replicant
 You can't disable the last active CPU.	PulseView		Nu puteți dezactiva ultimul CPU activ.
 Width of icon:	ConfigView		Lățimea pictogramei:
@@ -45,4 +46,3 @@ Active color	ConfigView		Culoare activă
 Installing in Deskbar failed\n%s	PulseApp		Instalarea pe Deskbar a eșuat\n%s
 Idle color	ConfigView		Culoare în așteptare
 Normal mode	PrefsWindow		Mod normal
-Pulse settings	PulseWindow		Configurări Pulse

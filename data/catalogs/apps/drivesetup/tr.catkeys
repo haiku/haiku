@@ -24,7 +24,7 @@ DriveSetup	System name		Disk İzlencesi
 Mounted at	PartitionList		Bağlama noktası
 Create…	MainWindow		Oluştur…
 Write changes	MainWindow		Değişiklikleri yaz
-Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		%s bölümünün ilkçalıştırması başarısız oldu (Diske hiçbir şey yazılmadı).
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		%s bölümünün ilklendirilmesi başarısız oldu (Diske hiçbir şey yazılmadı).
 Validation of the given creation parameters failed.	MainWindow		Verilen oluşturma parametrelerinin doğrulaması başarısız oldu.
 Eject	MainWindow		Çıkar
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Değişiklikleri diske şimdi yazmak istediğinizden emin misiniz?\n\n%s diski üzerindeki tüm veri geri alınamayacak bir biçimde kaybolacak!
@@ -47,10 +47,10 @@ End: %s	Support		Son: %s
 Partition type	PartitionList		Bölüm türü
 Unable to find the selected partition by ID.	MainWindow		Seçili bölüm ID ile bulunamıyor.
 The currently selected partition is not empty.	MainWindow		Mevcut seçili bölüm boş değil.
-Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Ham bir diski biçimlendirmek istediğinizden emin misiniz? (Genelde önce diski bir bölümlendirme sistemi ile ilkçalıştırmak daha makbuldür.) Değişiklikler diske yazılmadan önce bir kez daha onayınız istenecektir.
+Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Ham bir diski biçimlendirmek istediğinizden emin misiniz? (Genelde önce diski bir bölümlendirme sistemi ile ilklendirmek daha makbuldür.) Değişiklikler diske yazılmadan önce bir kez daha onayınız istenecektir.
 Wipe (not implemented)	MainWindow		Sil (işlevsel değil)
 The currently selected partition does not have a parent partition.	MainWindow		Mevcut seçili disk bölümü ana bir disk bölümüne sahip değil.
-Validation of the given initialization parameters failed.	MainWindow		Verilen ilkçalıştırma parametrelerinin doğrulaması başarısız oldu.
+Validation of the given initialization parameters failed.	MainWindow		Verilen ilklendirme parametrelerinin doğrulanması başarısız oldu.
 Shared	PartitionList		Paylaşılan
 MIMEs	PartitionList		MIME'ler
 BitLocker encrypted	Encryption utils		BitLocker şifreli
@@ -69,9 +69,9 @@ Format	MainWindow		Biçimlendir
 OK	MainWindow		Tamam
 Open with DiskProbe	MainWindow		DiskProbe ile aç
 Could not delete the selected partition.	MainWindow		Seçili bölüm silinemedi.
-Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Seçili diski ilkçalıştırmak istediğinizden emin misiniz? Tüm veriler kaybolacak. Değişiklikler diske yazılmadan önce bir kez daha onayınız istenecektir.\n
+Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Seçili diski ilklendirmek istediğinizden emin misiniz? Tüm veriler kaybolacak. Değişiklikler diske yazılmadan önce bir kez daha onayınız istenecektir.\n
 There was an error preparing the disk for modifications.	MainWindow		Diski değişikliklere hazırlarken bir hata oluştu.
-The disk has been successfully initialized.\n	MainWindow		Disk başarıyla ilkçalıştırıldı.\n
+The disk has been successfully initialized.\n	MainWindow		Disk başarıyla ilklendirildi.\n
 Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Disk bağlantısı kesilmeye zorlansın mı?\n\nNot: Eğer bir uygulama diske yazmakta ise, disk bağlantısını kesmek veri kaybına neden olabilir.\n
 Cancel	MainWindow		İptal
 Free space	PartitionList		Boş alan
@@ -81,7 +81,7 @@ Partition	MainWindow		Bölüm
 Change parameters	MainWindow		Parametreleri değiştir
 Rescan	MainWindow		Yeniden tara
 There was an error acquiring the partition row.	MainWindow		Bölüm satırını alırken bir hata oluştu.
-Failed to initialize the disk %s!\n	MainWindow		%s diski ilkçalıştırılamadı!\n
+Failed to initialize the disk %s!\n	MainWindow		%s diski ilklendirilemedi!\n
 Disk system \"%s\" not found!	MainWindow		\"%s\" disk sistemi bulunamadı!
 Delete	MainWindow		Sil
 Partition type:	ChangeParametersPanel		Bölüm türü:

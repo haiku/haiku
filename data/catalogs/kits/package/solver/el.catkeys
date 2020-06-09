@@ -1,0 +1,38 @@
+1	greek, modern (1453-)	x-vnd.Haiku-libsolvsolver	3404387783
+allow architecture change of %source% to %target%	SolverProblemSolution		να επιτραπεί η αλλαγή αρχιτεκτονικής από %source% σε %target%
+install %source% from excluded repository	SolverProblemSolution		να γίνει εγκατάσταση του %source% από απενεργοποιημένο αποθετήριο
+unspecified problem	SolverProblem		απροσδιόριστο πρόβλημα
+package %source% requires %dependency%, but none of the providers can be installed	SolverProblem		το πακέτο %source% απαιτεί το %dependency%, αλλά δεν μπορούν να εγκατασταθούν
+package %source% implicitly obsoletes %dependency% provided by %target%	SolverProblem		το πακέτο %source% αχρηστεύει εμμέσως το %dependency%, το οποίο παρέχεται από το %target%
+nothing provides requested %dependency%	SolverProblem		τίποτα δεν παρέχει το ζητούμενο %dependency%
+do not keep %source% installed	SolverProblemSolution		το %source% να μην παραμείνει εγκατεστημένο
+do not deinstall \"%selection%\"	SolverProblemSolution		να μην απεγκατασταθεί το \"%selection%\"
+install %source% despite its inferior architecture	SolverProblemSolution		να εγκατασταθεί το %source% ανεξάρτητα από την κατώτερη αρχιτεκτονική του
+conflicting requests	SolverProblem		αντιφατικά αιτήματα
+do not install the most recent version of \"%selection%\"	SolverProblemSolution		να εγκατασταθεί η πιο πρόσφατη έκδοση του \"%selection%\"
+allow replacement of %source% with %target%	SolverProblemSolution		να επιτραπεί η αντικατάσταση του %source% με %target%
+package %source% obsoletes %dependency% provided by %target%	SolverProblem		το πακέτο %source% αχρηστεύει το %dependency%, το οποίο παρέχεται από το %target%
+do not forbid installation of %source%	SolverProblemSolution		να μην απαγορευτεί η εγκατάσταση του %source%
+allow downgrade of %source% to %target%	SolverProblemSolution		να επιτραπεί η υποβάθμιση έκδοσης από %source% σε %target%
+dependency problem	SolverProblem		πρόβλημα εξαρτήσεων
+%dependency% is provided by the system	SolverProblem		το %dependency% παρέχεται από το σύστημα
+keep %source% despite its inferior architecture	SolverProblemSolution		να διατηρηθεί το %source%, παρόλο που είναι σχεδιασμένο για επεξεργαστές κατώτερης αρχιτεκτονικής
+%source% does not belong to a distupgrade repository	SolverProblem		το %source% δεν ανήκει σε αποθετήριο ενημέρωσης διανομής
+installed package %source% obsoletes %dependency% provided by %target%	SolverProblem		το εγκατεστημένο πακέτο %source% απαρχαιώνει το %dependency%, το οποίο παρέχεται από το %target%
+allow name change of %source% to %target%	SolverProblemSolution		να επιτραπεί η αλλαγή ονόματος του πακέτου από %source% σε %target%
+package %source% conflicts with %dependency% provided by %target%	SolverProblem		το πακέτο %source% συγχέεται με το %dependency%, το οποίο παρέχεται από το %target%
+do something	SolverProblemSolution		να γίνει κάτι
+install %selection% despite its old version	SolverProblemSolution		να εγκατασταθεί το %selection% παρόλο που η έκδοσή του είναι παλιά
+cannot install both %source% and %target%	SolverProblem		δεν μπορεί να εγκατασταθεί το %source% και το %target% ταυτόχρονα
+package %source% is not installable	SolverProblem		το %source% δεν μπορεί να εγκατασταθεί
+problem with installed package %source%	SolverProblem		πρόβλημα με εγκατεστημένο πακέτο %source%
+allow deinstallation of %source%	SolverProblemSolution		να επιτραπεί η απεγκατάσταση του %source%
+keep %source% from excluded repository	SolverProblemSolution		να διατηρηθεί το %source% του απενεργοποιημένου αποθετηρίου
+keep old %source%	SolverProblemSolution		να διατηρηθεί το παλιό %source%
+package %source% conflicts with %dependency% provided by itself	SolverProblem		το πακέτο %source% συγχέεται με το %dependency%, το οποίο παρέχεται από το ίδιο
+allow vendor change from \"%sourceVendor%\" (%source%) to \"%targetVendor%\" (%target%)	SolverProblemSolution		να επιτραπεί η αλλαγή προμηθευτή από \"%sourceVendor%\" (%source%) σε \"%targetVendor%\" (%target%)
+do not lock \"%selection%\"	SolverProblemSolution		να μην κλειδωθεί το \"%selection%\"
+do not install \"%selection%\"	SolverProblemSolution		να μην εγκατασταθεί το \"%selection%\"
+nothing provides %dependency% needed by %source%	SolverProblem		τίποτα δεν παρέχει το %dependency%, το οποίο είναι αναγκαίο για το %source%
+%source% has inferior architecture	SolverProblem		το %source% έχει σχεδιαστεί για επεξεργαστές κατώτερη αρχιτεκτονική
+do not deinstall all resolvables \"%selection%\"	SolverProblemSolution		να μην απεγκατασταθούν όλα τα αποτελέσματα \"%selection%\"

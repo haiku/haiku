@@ -1,47 +1,46 @@
-1	polish	x-vnd.Haiku-ActivityMonitor	1155619009
-P-faults	DataSource		P-błędy
-Media nodes	DataSource		Węzły multimediów
-Threads	DataSource		Wątki
-Always on top	ActivityWindow		Zawsze na wierzchu
-Add graph	ActivityWindow		Dodaj wykres
+1	polish	x-vnd.Haiku-ActivityMonitor	3672498538
 Teams	DataSource		Zespoły
+Semaphores	DataSource		Semafory
+TX	DataSource	Shorter version for Sending	TX
+Block cache memory	DataSource		Blokowa pamięć podręczna
+%lld ms	SettingsWindow		%lld ms
 MiB	DataSource		MiB
-Network send	DataSource		Wysłane
-CPU usage (combined)	DataSource		Użycie procesora (całkowite)
-CPU	DataSource		Procesor
-Used memory	DataSource		Używana pamięć
-Cached memory	DataSource		Pamięć podręczna
-Apps	DataSource		Aplikacje
-Show legend	ActivityView		Pokaż legendę
+Media nodes	DataSource		Węzły multimediów
 Text clipboard	DataSource		Schowek tekstowy
-Settings	ActivityWindow		Ustawienia
+Network send	DataSource		Wysłane
+Running applications	DataSource		Uruchomione aplikacje
+Cache	DataSource		Cache
+CPU usage (combined)	DataSource		Użycie procesora (całkowite)
+Threads	DataSource		Wątki
 Receiving	DataSource		Otrzymane
+Remove graph	ActivityView		Usuń wykres
+Swap space	DataSource		Przestrzeń wymiany
+CPU	DataSource		Procesor
+ActivityMonitor	System name		Monitor Aktywności
+Update time interval:	SettingsWindow		Częstotliwość odświeżania:
+RX	DataSource	Shorter version for Receiving.	RX
 Settings…	ActivityWindow		Ustawienia…
+Block cache	DataSource		Blokowa pamięć podręczna
+Memory	DataSource		Pamięć
+CPU usage	DataSource		Użycie procesora
+Quit	ActivityWindow		Zakończ
+Raw clipboard	DataSource		Schowek binarny
+Settings	ActivityWindow		Ustawienia
+Used memory	DataSource		Używana pamięć
+%.1f faults/s	DataSource		%.1f błędów/s
+Show legend	ActivityView		Pokaż legendę
+Cached memory	DataSource		Pamięć podręczna
+File	ActivityWindow		Plik
 Ports	DataSource		Porty
 Page faults	DataSource		Błędy stronicowania
-Sending	DataSource		Wysłane
-Cache	DataSource		Cache
-%.1f faults/s	DataSource		%.1f błędów/s
-Update time interval:	SettingsWindow		Częstotliwość odświeżania:
-TX	DataSource	Shorter version for Sending	TX
-Quit	ActivityWindow		Zakończ
-Block cache memory	DataSource		Blokowa pamięć podręczna
-Remove graph	ActivityView		Usuń wykres
-%lld sec.	SettingsWindow		%lld s
-%lld ms	SettingsWindow		%lld ms
-CPU usage	DataSource		Użycie procesora
-Raw clipboard	DataSource		Schowek binarny
-Sems	DataSource		Semy
-%.1f MiB	DataSource		%.1f MiB
-ActivityMonitor	System name		Monitor Aktywności
-Running applications	DataSource		Uruchomione aplikacje
-Semaphores	DataSource		Semafory
-Block cache	DataSource		Blokowa pamięć podręczna
-Swap space	DataSource		Przestrzeń wymiany
-Swap	DataSource		Przestrzeń wymiany
-File	ActivityWindow		Plik
-usage	DataSource		użycie
+Apps	DataSource		Aplikacje
 Additional items	ActivityView		Dodatkowe informacje
+Add graph	ActivityWindow		Dodaj wykres
+Sending	DataSource		Wysłane
+%.1f MiB	DataSource		%.1f MiB
+Always on top	ActivityWindow		Zawsze na wierzchu
+Swap	DataSource		Przestrzeń wymiany
+%lld sec.	SettingsWindow		%lld s
+P-faults	DataSource		P-błędy
+Sems	DataSource		Semy
 Network receive	DataSource		Otrzymane
-Memory	DataSource		Pamięć
-RX	DataSource	Shorter version for Receiving.	RX

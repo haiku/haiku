@@ -1,0 +1,64 @@
+1	esperanto	x-vnd.haiku-softwareupdater	369324613
+Updating version	SoftwareUpdaterWindow	List item text	Ĝisdatigi version
+Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Alklaki tie por instali {0, plural, one{# ĝisdatigitan pakaĵon} other{# ĝisdatigitajn pakaĵoin}}.
+Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Instalotaj pakaĵoj
+No active network connection was found	UpdateManager	Error message	Efektiva reta konekto forestas
+Quit	SoftwareUpdaterWindow	Alert button label	Ĉesi
+There were no updates found.	CheckManager		La ĝisdatigoj forestas.
+Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		Ĝisdatigo ne estas kompleta, ĉu vi certas ke vi deziras ĉesi?
+Updates found	SoftwareUpdaterWindow		Ĝisdatigoj estas trovitaj
+Update now	SoftwareUpdaterWindow		Ĝisdatigi nun
+For some reason, we could not reboot your computer.	SoftwareUpdaterWindow		Pro iuj kaŭzoj vi ne povas restartigi la komputilon.
+OK	UpdateManager		Bone
+Unrecognized argument	SoftwareUpdaterApp	Error message	Nerekonita argumento
+There were no updates found.	CheckAction		Ĝisdatigoj forestas.
+No updates available	UpdateAction		Ĝisdatigo ne estas akireblaj
+New packages to be installed	SoftwareUpdaterWindow	List super item label	Novaj instalotaj pakaĵoj 
+Packages to be updated	SoftwareUpdaterWindow	List super item label	Ĝisdatigotaj pakaĵoj
+to	SoftwareUpdaterWindow	List item text	al
+Attempting to cancel the updates…	SoftwareUpdaterWindow		Provo nuligi ĝisdatigon…
+Contacting software repositories to check for package updates.	CheckManager		Vokado al programaraj deponejoj por determini ĝisdatigeblajn pakaĵojn.
+Available updates found	CheckManager		Trovitaj akireblaj ĝisdatigoj
+from repository	SoftwareUpdaterWindow	List item text	el deponejo
+Contacting software repositories to check for package updates.	SoftwareUpdaterWindow		Vokado al programaraj deponejoj por determini ĝisdatigeblajn pakaĵojn.
+Cancelling updates	SoftwareUpdaterWindow		Ĉesigado de ĝisdatigado
+Cancel	SoftwareUpdaterWindow	Alert button label	Nuligi
+There were no updates found.	UpdateAction		Ĝisdatigoj forestas.
+OK	SoftwareUpdaterWindow		Bone
+Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Elektu opciojn de ĝisdatigo:\n\nĜisdatigi:\n\tĜisdatigi ĉiujn instalitajn pakaĵojn.\nPlena sinkronigo:\n\tSinkronigi la instalitajn pakaĵojn al deponejoj.
+The following changes will be made:	SoftwareUpdaterWindow		Sekvaj ŝanĝoj estos faritaj:
+Argument variables are no longer accepted\n	SoftwareUpdaterApp		Argumentaj variabloj plu ne estas akceptataj\n
+Fatal error while checking for updates: %s\n	CheckAction		Fatala eraro dum determinado de ĝisdatigoj: %s\n
+SoftwareUpdater	System name		La Programĝisdatigilo
+No active network connection was found.\n	CheckManager		Efektivaj retaj konektoj forestas.\n
+Applying changes	UpdateManager		Aplikado de ŝanĝoj
+Full sync	SoftwareUpdaterWindow	Alert button label	Plena sinkronigo
+Quit	SoftwareUpdaterWindow	Button label	Ĉesi
+Updates have been successfully installed.	UpdateManager		Ĝisdatigoj estas sukcese instalitaj.
+Exception occurred while updating packages : %s\n	UpdateAction		Escepto okazis dum ĝisdatigo de pakaĵoj : %s\n
+A reboot is necessary to complete the update process.	UpdateManager		Restartigo necesas por kompletigi ĝisdatigon.
+Exception occurred while checking for updates: %s\n	CheckAction		Escepto okazis dum determinado de ĝisdatigoj: %s\n
+Packages are being updated	UpdateManager		Ĝisdatigotaj pakaĵoj
+Cancel	SoftwareUpdaterWindow		Nuligi
+Don't quit	SoftwareUpdaterWindow		Ne ĉesi
+Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Alklaku tie por lanĉi la Parogramĝisdatigilon. Iuj ĝisdatigoj bezonas elekti solvilon de problemoj,
+Checking for updates	SoftwareUpdaterWindow		Determinado de ĝisdatigoj
+Updates completed	UpdateManager		Ĝisdatigo estas kompletigita
+Reboot	SoftwareUpdaterWindow		Restartigi
+Show more details	SoftwareUpdaterWindow		Montri plu detalojn
+Installing version	SoftwareUpdaterWindow	List item text	Instalado de versio
+Checking for updates	CheckManager		Determinado de ĝisdatigoj
+No remote repositories are available	UpdateManager	Error message	Foraj deponejoj ne estas disponeblaj
+Software {0, plural, one{update} other{updates}} available	CheckManager		Programara(j) {0, plural, one{ĝisdatigo} other{ĝisdatigoj}} estas disponebla(j)
+Reboot	SoftwareUpdaterWindow	Button label	Restartigi
+Update	SoftwareUpdaterWindow	Alert button label	Ĝisdatigi
+Open Repositories	SoftwareUpdaterWindow	Alert button label	Uzi deponejojn
+Updates did not complete	UpdateAction		Ĝisdatigoj ne estas kompletaj
+Invalid update type, cannot continue with updates	UpdateAction		Nevalida ĝisdatiga speco, ne povas daŭrigi ĝisdatigon
+Uninstalling version	SoftwareUpdaterWindow	List item text	Malinstalado de versio
+%i of %i	UpdateManager	Do not translate %i	%i de %i
+Quit	SoftwareUpdaterWindow		Ĉesi
+No updates available	CheckManager		Ĝisdatigoj forestas
+Usage:  SoftwareUpdater <command> [ <option> ]\nUpdates installed packages.\n\nCommands:\n  update     - Search repositories for updates on all packages.\n  check      - Check for available updates but only display a notification with results.\n  full-sync  - Synchronize the installed packages with the repositories.\n\nOptions:\n  -h or --help       Print this usage help\n  -v or --verbose    Output verbose information\n	SoftwareUpdaterApp	Command line usage help	Uzado:  SoftwareUpdater <komando> [ <opcio> ]\nĜisdatigas instalitajn pakaĵojn.\n\nKomandoj:\n  update     - Serĉi en deponejoj ĝisdatigojn por ĉiuj pakaĵoj.\n  check      - Determini disponeblecon sed nur sciigi pri rezultoj.\n  full-sync  - Sinkronigi la instalitajn pakaĵojn kun la deponejoj.\n\nOpcioj:\n  -h or --help       Montri ĉi helpon\n  -v or --verbose    Informi detale\n
+No remote repositories are available. Please verify that some repositories are enabled using the Repositories preflet or the 'pkgman' command.	SoftwareUpdaterWindow	Error message	Foraj deponejoj forestas. Kontrolu ke eĉ iuj deponejoj estas ŝaltitaj per preferileto la Deponejoj aŭ per la komando "pkgman".
+Downloading packages	UpdateManager		Ŝargado de pakaĵoj

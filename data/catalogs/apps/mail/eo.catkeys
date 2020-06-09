@@ -1,0 +1,169 @@
+1	esperanto	x-vnd.Be-MAIL	1477453861
+Set to Saved	Mail		Atribui al Konservita
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Via ĉefa teksto enhavas %ld da nedekodeblaj signoj. Verŝajne alia signaro pli taŭgus? Premu "Sendi" por sendi ĝin malgraŭe (nedekodeblaj signoj estos anstataŭigitaj), aŭ elektu "Rezigni" por provi korekti ilin.
+Text wrapping:	Mail		Teksta ĉirkaŭfluo:
+Show icons & labels	Mail		Montri bildsimbolojn kaj etikedojn
+(Date unavailable)	Mail		(Dato estas nedisponebla)
+Reply	Mail		Respondi
+Next message	Mail		Sekva mesaĝo
+Mailing	Mail		Retpoŝtado
+Unread	Mail		Nelegita
+Same sender	Mail		Sama sendanto
+Copy to new	Mail		Kopii al novo
+Save as draft	Mail		Konservi kiel malneto
+Encoding:	Mail		Kodoprezento:
+Print	Mail		Printi
+Decrease quote level	Mail		Malpliigi nivelon de citiloj
+Encoding	Mail		Kodoprezento
+Default account:	Mail		Defaŭlta konto:
+Message	Mail		Mesaĝo
+Bcc:	Mail		Kaŝkopio:
+New	Mail		Nova
+Save	Mail		Konservi
+Undo	Mail		Malfari
+Button bar:	Mail		Butonaro:
+%e wrote:\\n	Mail		%e verkis:\\n
+Save changes to this signature?	Mail		Konservi ŝanĝojn de ĉi tiu subskribo?
+Save attachment…	Mail		Konservi kunsendaĵon…
+Paste	Mail		Alglui
+E-mail draft could not be saved!	Mail		Ne eblis konservi la retpoŝtan malneton!
+Don't send	Mail		Ne sendi
+sent	B_USER_DIRECTORY/mail/sent		sendita
+Only files can be added as attachments.	Mail		Nur dosieroj povas esti aldonata kiel kunsendaĵoj.
+Close	Mail		Fermi
+Untitled	Mail		Sentitola
+Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Por forigi kunsendaĵojn de plusendita retmesaĝo, ankoraŭ ne estas efektivigata!\nĜi ankoraŭ ne funkcias ĝuste.
+Same recipient	Mail		Sama ricevonto
+Previous message	Mail		Antaŭa mesaĝo
+(Address unavailable)	Mail		(Adreso estas nedisponebla)
+Mail	System name		Poŝto
+Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Kunsendaĵo: %name% (Speco: %type%)
+Copy link location	Mail		Kopii ligilan lokon
+Attachments: 	Mail		Kunsendaĵoj: 
+Remove enclosure	Mail		Forigi kunsendaĵon
+Next	Mail		Sekva
+Attachments:	Mail		Kunsendaĵoj:
+Show icons only	Mail		Montri nur bildsimbolojn
+Subject:	Mail		Temo:
+OK	Mail		Bone
+UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
+Quit	Mail		Forlasi
+Title:	Mail		Titolo:
+Account from mail	Mail		Konto el retpoŝto
+%e - E-mail address	Mail		%e - Retpoŝtadreso
+Cc:	Mail		Kopiricevontoj:
+No matches	Mail		Neniuj kongruaj
+Queries	Mail		Informpetoj
+Cut	Mail		Eltondi
+Reply to sender	Mail		Respondi al sendinto
+\\n - Newline	Mail		\\n - Linifino
+Copy	Mail		Kopii
+Add signature	Mail		Aldoni subskribon
+%n - Full name	Mail		%n - Tuta nomo
+Signature	Mail		Subskribo
+Use default account	Mail		Uzi defaŭlton konton
+draft	B_USER_DIRECTORY/mail/draft		malneto
+Really delete this signature? This cannot be undone.	Mail		Ĉu vere forigi ĉi tiun subskribon? Ĉi tio ne malfareblas.
+spam	B_USER_DIRECTORY/mail/spam		trudaĵo
+Reply to all	Mail		Respondi al ĉiuj
+Cancel	Mail		Nuligi
+Off	Mail		Malŝalti
+Set to %s	Mail		Atribui al %s
+Signature:	Mail		Subskribo:
+Forward without attachments	Mail		Plusendi sen kunsendaĵoj
+queries	B_USER_DIRECTORY/mail/queries		informpetoj
+View	Mail		Vidi
+Signatures	Mail		Subskriboj
+On	Mail		Ŝalti
+Find	Mail		Trovi
+Sorry, could not find an application that supports the 'Person' data type.	Mail		Pardonu! Ne eblis trovi aplikaĵon, kiu subtenas la 'Persono' datumtipon.
+Date:	Mail		Dato:
+Expert	Mail		Sperto
+Automatically mark mail as read:	Mail		Aŭtomate marki mesaĝojn kiel legitaj:
+Close and 	Mail		Fermi kaj 
+Colored quotes:	Mail		Koloraj citaĵoj:
+Automatic	Mail		Aŭtomata
+Open this link	Mail		Uzi ĉi tiun ligilon
+Auto signature:	Mail		Aŭtomata subskribo:
+Same subject	Mail		Sama temo
+Send	Mail		Sendi
+Open draft	Mail		Uzi malneton
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Lasi kiel 'New'
+Random	Mail		Senorda
+Attach attributes:	Mail		Aldoni atributojn:
+Find again	Mail		Retrovi
+Size:	Mail		Grando:
+To:	Mail		Al:
+Need Tracker to move items to trash	Mail		Oni bezonas la Spurilon por movi elementojn al la Rubujo
+The mail_daemon could not be started:\n\t	Mail		La mail_daemon (retpoŝta_demono) ne povis esti komencata:\n\t
+<no account found>	Mail		<Neniu trovita konto>
+Mail couldn't find its dictionary.	Mail		Poŝto ne povis trovi ĝian vortaron.
+Mail preferences	Mail		Preferoj de Poŝto
+helpful message	Mail		helpema mesaĝo
+ Read 	Mail		 Legita 
+Font:	Mail		Tiparo:
+Accounts…	Mail		Kontoj…
+Previous	Mail		Antaŭa
+Include file attributes in attachments	Mail		Inkluzivi dosieratributojn en kunsendaĵoj
+Start now	Mail		Komenci nun
+(Name unavailable)	Mail		(Nedisponebla nomo)
+Move to trash	Mail		Movi al la Rubujo
+<none>	Mail		<Neniu>
+%d - Date	Mail		%d - Dato
+Check spelling	Mail		Kontroli literumadon
+Redo	Mail		Refari
+Leave as '%s'	Mail		Lasi kiel '%s'
+Print…	Mail		Printi…
+Settings…	Mail		Agordo…
+Warn unencodable:	Mail		Averti pri nedekodebla:
+Trash	Mail		Rubujo
+Show raw message	Mail		Montri krudan mesaĝon
+Find…	Mail		Trovi…
+Select all	Mail		Selekti ĉion
+Show header	Mail		Montri mesaĝkapon
+Reply account:	Mail		Responda konto:
+Sorry	Mail		Pardonu
+Forward	Mail		Plusendi
+Open attachment	Mail		Uzi kunsendaĵon
+mail	B_USER_DIRECTORY/mail		poŝto
+Save this message as a draft before closing?	Mail		Ĉu konservi ĉi tiun mesaĝon kiel malneto antaŭ fermi?
+The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		La mail_daemon (retpoŝta_demono) ne estas aktivigata. La envicigita mesaĝo estas sendota, kiam la mail_daemon (retpoŝta_demono) estos komencita.
+None	Mail		Neniu
+Resend	Mail		Resendi
+Hide	Mail		Kaŝi
+From:	Mail		De:
+No file attributes, just plain data	Mail		Neniuj dosieratributoj, nur simplaj datumoj
+Add	Mail		Aldoni
+out	B_USER_DIRECTORY/mail/out		elira
+Send this message before closing?	Mail		Sendi ĉi tiun mesaĝon antaŭ fermi?
+in	B_USER_DIRECTORY/mail/in		envena
+Open	Mail		Uzi
+Don't save	Mail		Ne konservi
+Leave same	Mail		Lasi same
+An error occurred trying to save the attachment.	Mail		Eraro okazis dum la konservado de la kunsendaĵo.
+Save address	Mail		Konservi adreson
+Initial spell check mode:	Mail		Defaŭlta literumila reĝimo:
+Edit queries…	Mail		Redakti informpetojn…
+There is no installed handler for URL links.	Mail		Neniu traktilo estas instalita pro URL-aj ligiloj.
+File	Mail		Dosiero
+Reply preamble:	Mail		Responda antaŭparolo:
+New mail message	Mail		Nova mesaĝo
+An error occurred trying to open this signature.	Mail		Eraro okazis, dum provo uzi ĉi tiun subskribon.
+Edit signatures…	Mail		Redakti subskribojn…
+User interface	Mail		Uzanta interfaco
+Inconsistency occurred in the undo/redo buffer.	Mail		Nekonsekvenco okazis en la malfara/refara bufro.
+Remove attachment	Mail		Forigi kunsendaĵon
+Set to…	Mail		Atribui al…
+Edit	Mail		Redakti
+Page setup…	Mail		Agordo de paĝo…
+An error occurred trying to save this signature.	Mail		Eraro okazis, kiam provas konservi ĉi tiun subskribon.
+Beginner	Mail		Komencanto
+Send message	Mail		Sendi mesaĝon
+Delete	Mail		Forigi
+Put your favorite e-mail queries and query templates in this folder.	Mail		Meti viajn ŝatatajn retpoŝtinformpetojn kaj informpetamodelojn en ĉi tiun dosierujon.
+Spam	Mail		Trudaĵo
+Couldn't open this signature. Sorry.	Mail		Ne sukcesis uzi ĉi tiun subskribon. Pardonu.
+Revert	Mail		Malfari
+Unknown	Mail		Nekonata
+Increase quote level	Mail		Kreskigi nivelon de citiloj
+Add enclosure…	Mail		Aldoni kunsendaĵon…

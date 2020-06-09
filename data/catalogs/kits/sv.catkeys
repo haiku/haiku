@@ -3,10 +3,10 @@
 All Rights Reserved.	AboutWindow		Alla rättigheter resarverade.
 gold master	AboutWindow		guld mästare
 Undo	TextView		Ångra
+OK	PrintJob		OK
 gamma	AboutWindow		gamma
 development	AboutWindow		utveckling
 OK	Dragger		OK
-OK	PrintJob		OK
 Print Server is not responding.	PrintJob		Utskriftservern svarar inte.
 About %app%	AboutMenuItem		Om %app%
 Warning	Dragger		Varning

@@ -1,0 +1,20 @@
+1	esperanto	x-vnd.Haiku-MidiPlayer	1046133011
+This tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Ĉi simpla programo\nscipovas ludi milojn\nda kliŝaj kantoj
+Dungeon	Main Window		Karcero
+Could not load song	Main Window		La kanto ne eblis ŝarĝiĝi
+Igor's lab	Main Window		La laboratorio de Igoro
+Off	Main Window		Malŝaltita
+Loading instruments…	Scope View		Ŝarĝado de instrumentoj…
+Volume:	Main Window		Laŭteco:
+Closet	Main Window		Ĉambreto
+Scope	Main Window		Skopo
+Drop MIDI file here	Scope View		Faligu MIDI-an dosieron ĉi tie
+None	Main Window		Neniu
+Reverb:	Main Window		Eĥo:
+MidiPlayer	System name		MIDI ludilo
+OK	Main Window		Bone
+Stop	Main Window		Halti
+Live input:	Main Window		Viva enigo:
+Garage	Main Window		Garaĝo
+Play	Main Window		Ludi
+Cavern	Main Window		Kaverno

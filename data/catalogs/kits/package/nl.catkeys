@@ -1,7 +1,10 @@
-1	dutch; flemish	x-vnd.Haiku-libpackage	2012114212
+1	dutch; flemish	x-vnd.Haiku-libpackage	134767648
+Fetching repository-cache from %url	RefreshRepositoryRequest		Bezig met het ophalen van de cache van het archief van %url
+Validating checksum for %repositoryName	RefreshRepositoryRequest		Bezig met het valideren van het controlegetal voor %repositoryName
 Failed to remove transaction directory	PackageManagerKit		Het verwijderen van de transactiemap is mislukt
 Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		Het ophalen van de configuratie voor het archief \"%s\" is mislukt. Deze wordt overgeslagen.
 Refreshing repository \"%s\" failed	PackageManagerKit		Het verversen van het archief \"%s\" is mislukt
+Fetching repository checksum from %url	RefreshRepositoryRequest		Bezig met het ophalen van het controlegetal van het archief van %url
 Failed to get repository names	PackageManagerKit		Het ophalen van de namen van de namen van de archieven is mislukt
 Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		Het is niet gelukt om de cache voor het archief \"%s\" op te halen. Deze wordt overgeslagen.
 Package %s-%s doesn't have a matching requires for its base package \"%s\"	PackageManagerKit		Pakket %s-%s heeft geen bijbehorende vereisten voor zijn basispakket \"%s\"

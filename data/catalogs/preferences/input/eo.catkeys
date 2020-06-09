@@ -1,0 +1,50 @@
+1	esperanto	x-vnd.Haiku-Input	3910661481
+Scrolling	TouchpadPrefView		Rulumado
+Defaults	InputMouse		Defaŭltoj
+Tapping	TouchpadPrefView		Frapado
+Long	KeyboardView		Longa
+Normal	SettingsView		Normala
+Cancel	TouchpadPrefView		Nuligi
+4-Button	SettingsView		4-butona
+Slow	TouchpadPrefView		Malrapida
+Warp	SettingsView		Deformiĝo
+Instant warp	SettingsView		Tuja deformiĝo
+Device List	InputWindow		Listo de aparatoj
+Double-click speed	SettingsView		Rapideco de duobla alklako
+5-Button	SettingsView		5-butona
+Typing test area	KeyboardView		Areo por testi tajpadon
+Mouse type:	SettingsView		Speco de muso:
+Revert	InputKeyboard		Malfari
+Fast	KeyboardView		Rapide
+Off	TouchpadPrefView		Malŝalti
+Fast	TouchpadPrefView		Rapide
+Please confirm	TouchpadPrefView		Konfirmu
+Click to focus	SettingsView		Klaki por fokusigi
+Acceleration	TouchpadPrefView		Akcelado
+Mouse speed	SettingsView		Rapideco de muso
+Accept first click	SettingsView		Akcepti unuan klakon
+OK	TouchpadPrefView		Bone
+Horizontal scrolling	TouchpadPrefView		Horizontala rulumado
+Delay until key repeat	KeyboardView		Prokrasto dum klava ripeto
+Two finger scrolling	TouchpadPrefView		Rulumado per du fingroj
+Input	System name		Enigo
+Mouse acceleration	SettingsView		Akcelado de muso
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		La nova areo por rulumo estas tre vasta kaj povas malhelpi operaciojn per muso. Ĉu vi vere volas ŝanĝi ĝin?
+High	TouchpadPrefView		Alta
+Defaults	TouchpadPrefView		Defaŭltoj
+1-Button	SettingsView		1-butona
+Defaults	InputKeyboard		Defaŭltoj
+Short	KeyboardView		Mallonge
+Slow	KeyboardView		Malrapide
+Revert	InputMouse		Malfari
+Key repeat rate	KeyboardView		Klavripeta rapido
+2-Button	SettingsView		2-butona
+Click to focus and raise	SettingsView		Alklaki por enfokusigi kaj suprenigi
+Vertical	TouchpadPrefView		Vertikala
+Horizontal	TouchpadPrefView		Horizontala
+Focus mode:	SettingsView		Reĝimo de fokusigo:
+Focus follows mouse	SettingsView		Fokuso sekvas muson
+Double-click test area	SettingsView		Loko por testi duoblalklakon
+Sensitivity	TouchpadPrefView		Sentivo
+3-Button	SettingsView		3-butona
+Revert	TouchpadPrefView		Malfari

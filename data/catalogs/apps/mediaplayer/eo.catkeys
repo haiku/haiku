@@ -1,0 +1,155 @@
+1	esperanto	x-vnd.Haiku-MediaPlayer	1313616492
+Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Movi la dosieron al la Rubujo
+Close	MediaPlayer-PlaylistWindow		Fermi
+Volume of background clips	MediaPlayer-SettingsWindow		Laŭteco de fonaj aŭdvidaĵoj
+Use hardware video overlays if available	MediaPlayer-SettingsWindow		Uzi aparatarajn videaĵajn interkovrojn se disponeble
+Audio	MediaPlayer-InfoWin		Aŭdaĵo
+Subtitle placement:	MediaPlayer-SettingsWindow		Lokado de subtekstoj:
+MediaPlayer	System name		AŭdvidaĵLudilo
+Audio track	MediaPlayer-Main		Sontrako
+Muted	MediaPlayer-SettingsWindow		Silentigita
+OK	MediaPlayer-RemovePLItemsCmd		Bone
+Open Playlist	MediaPlayer-PlaylistWindow		Uzi ludliston
+Subtitles	MediaPlayer-Main		Subtekstoj
+%app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% renkontis internan eraron. Malsukcesis uzi la dosieron.
+DrawBitmap	MediaPlayer-InfoWin		DrawBitmap
+File info	MediaPlayer-InfoWin		Dosiera informo
+raw audio	MediaPlayer-InfoWin		neprilaborita aŭdaĵo
+Select all	MediaPlayer-PlaylistWindow		Elekti ĉion
+New player…	MediaPlayer-Main		Nova ludilo…
+Move Entries	MediaPlayer-MovePLItemsCmd		Movi anojn
+OK	MediaPlayer-Main		Bone
+Remove	MediaPlayer-PlaylistWindow		Forigi
+<unknown>	MediaPlayer-InfoWin		<nekonata>
+Resume:	MediaPlayer-SettingsWindow		Daŭrigi:
+Duration	MediaPlayer-InfoWin		Daŭro
+Import Entries	MediaPlayer-ImportPLItemsCmd		Importi anojn
+Open network stream	MediaPlayer-Main		Uzi retan datumfluon
+Move file to Trash	MediaPlayer-PlaylistWindow		Movi dosieron al la Rubujo
+Open file…	MediaPlayer-Main		Uzi dosieron…
+Scale controls in full screen mode	MediaPlayer-SettingsWindow		Skalilo en la plenekrana reĝimo
+View options	MediaPlayer-SettingsWindow		Rigardi opciojn
+%d kHz	MediaPlayer-InfoWin		%d kHz
+Full volume	MediaPlayer-SettingsWindow		Plena laŭteco
+<untitled>	PlaylistItem-title		<sentitola>
+Start media server	MediaPlayer-Main		Lanĉi la plurmedian servilon
+It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Aspektas ke la plurmedia servilo ne funkcias.\nĈu vi volas lanĉi ĝin?
+Location	MediaPlayer-InfoWin		Loko
+Medium	MediaPlayer-SettingsWindow		Meza
+Play mode	MediaPlayer-SettingsWindow		Ludreĝimo
+Playlist	MediaPlayer-PlaylistWindow		Ludlisto
+%d Bit	MediaPlayer-InfoWin		%d Bitoj
+Track	Audio Track Menu		Trako
+Close	MediaPlayer-Main		Fermi
+Save error	MediaPlayer-PlaylistWindow		Eraro dum la konservado
+Attributes	MediaPlayer-Main		Atributoj
+Bottom of screen	MediaPlayer-SettingsWindow		Malsupro de la ekrano
+MediaPlayer settings	MediaPlayer-SettingsWindow		Agordo de la AŭdvidaĵLudilo
+Copyright	MediaPlayer-InfoWin		Aŭtorrajto
+Invalid URL inserted!	MediaPlayer-NetworkStream		Nevalida retadreso enmetita!
+Aspect ratio	MediaPlayer-Main		Proporcio
+Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Malsukcesis konservi la ludliston.\n\nEraro: 
+<no media>	MediaPlayer-InfoWin		<mankanta plurmedio>
+Hide interface	MediaPlayer-Main		Kaŝi interfacon
+Error: 	MediaPlayer-Main		Eraro: 
+Video track	MediaPlayer-Main		Videa trako
+Playlist…	MediaPlayer-Main		Ludlisto…
+<unnamed media>	MediaPlayer-InfoWin		<sentitola plurmedio>
+Save	MediaPlayer-PlaylistWindow		Konservi
+Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Hazardigi anojn
+Cancel	MediaPlayer-NetworkStream		Nuligi
+Nothing to Play	MediaPlayer-Main		Nenio por ludi
+OK	MediaPlayer-SettingsWindow		Bone
+Remove Entries	MediaPlayer-RemovePLItemsCmd		Forigi anojn
+never	MediaPlayer-SettingsWindow		neniam
+Loop audio	MediaPlayer-SettingsWindow		Iteracii aŭdaĵon
+Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Interna eraro (misformita mesaĝo). Malsukcesis konservi la ludliston.
+Open…	MediaPlayer-PlaylistWindow		Uzi…
+Revert	MediaPlayer-SettingsWindow		Malfari
+Low volume	MediaPlayer-SettingsWindow		Mallaŭte
+Audio	MediaPlayer-Main		Aŭdaĵo
+{0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{unukanale} =2{dukanale} other{# kanaloj}}
+Quit	MediaPlayer-Main		Ĉesi
+Redo	MediaPlayer-PlaylistWindow		Refari
+Move Entry	MediaPlayer-MovePLItemsCmd		Movi anon
+<unknown>	PlaylistItem-author		<nekonata>
+Cancel	MediaPlayer-SettingsWindow		Nuligi
+Large	MediaPlayer-SettingsWindow		Granda
+Import Entry	MediaPlayer-ImportPLItemsCmd		Importi anon
+unknown format	MediaPlayer-InfoWin		nekonata formato
+Track %d	MediaPlayer-Main		Trako %d
+All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Ĉiuj dosieroj ne povas esti movitaj al la Rubujo.
+Total duration: %s	MediaPlayer-PlaylistWindow		Tuta daŭro: %s
+%.3f kHz	MediaPlayer-InfoWin		%.3f kHz
+Move into trash error	MediaPlayer-RemovePLItemsCmd		Eraro dum movado al la Rubujo
+50% scale	MediaPlayer-Main		50% skalo
+Drop files to play	MediaPlayer-Main		Demetu dosierojn por ekludi ĝin
+Copy Entry	MediaPlayer-CopyPLItemsCmd		Kopii anon
+Close window after playing audio	MediaPlayer-SettingsWindow		Fermi fenestron post aŭdaĵo estos ludita
+Edit	MediaPlayer-PlaylistWindow		Redakti
+Copy Entries	MediaPlayer-CopyPLItemsCmd		Kopii anojn
+Always on top	MediaPlayer-Main		Ĉiam videbla
+Open	MediaPlayer-PlaylistWindow		Uzi
+always	MediaPlayer-SettingsWindow		ĉiam
+Loop video	MediaPlayer-SettingsWindow		Iteracii videaĵon
+Stream URL:	MediaPlayer-NetworkStream		Retadreso de la datumfluo:
+<unknown>	PlaylistItem-album		<nekonata>
+Stream settings	MediaPlayer-Main		Agordo de la datumfluo
+none	Subtitles menu		nenio
+Save Playlist	MediaPlayer-PlaylistWindow		Konservi ludliston
+Overlay	MediaPlayer-InfoWin		Interkovro
+2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
+Rating	MediaPlayer-Main		Takso
+Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Interna eraro (memormanko). Malsukcesis konservi la ludliston.
+Video	MediaPlayer-Main		Videaĵo
+There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Forestas formatpelilo por prilabori formaton de la dosiero, aŭ la formatpelilo havas problemon kun la aparta versio de formato.
+Lock Peaks	MediaPlayer-PeakView		Ŝlosi pintojn
+none	Audio track menu		nenio
+Open network stream	MediaPlayer-NetworkStream		Uzi retan datumfluon
+Automatically start playing	MediaPlayer-SettingsWindow		Ekludi aŭtomate
+Undo	MediaPlayer-PlaylistWindow		Malfari
+Display mode	MediaPlayer-InfoWin		Reĝimo de montrado
+Bottom of video	MediaPlayer-SettingsWindow		Malsupro de la videaĵo
+Small	MediaPlayer-SettingsWindow		Malgranda
+Settings…	MediaPlayer-Main		Agordo…
+min	MediaPlayer-InfoWin	Minutes	min
+Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Malsukcesis konservi la ludliston:\n\nEraro: 
+Video	MediaPlayer-InfoWin		Videaĵo
+File info…	MediaPlayer-Main		Informo pri dosiero…
+1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Amerikana)
+<unnamed>	PlaylistItem-name		<sennoma>
+Track	Video Track Menu		Trako
+Full screen	MediaPlayer-Main		Plenekrana reĝimo
+OK	MediaPlayer-NetworkStream		Bone
+Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Interna eraro (malsukcesa ŝlosado). Malsukcesis konservi la ludliston.
+100% scale	MediaPlayer-Main		Skalo 100%
+<nothing to redo>	MediaPlayer-PlaylistWindow		<nenio por refari>
+Bad URL	MediaPlayer-NetworkStream		Malbona retadreso
+Save	MediaPlayer-Main		Konservi
+Close window after playing video	MediaPlayer-SettingsWindow		Fermi fenestron post videaĵo estos ludita
+Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Skaligi videaĵojn glade (ne-interkovra reĝimo)
+200% scale	MediaPlayer-Main		200% skalo
+The file '%filename' could not be opened.\n\n	MediaPlayer-Main		La dosiero '%filename' ne povas esti uzata.\n\n
+None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Neniu el la dosieroj kiujn vi volis ludi aspektas kiel plurmedia dosiero.
+Remove Entry	MediaPlayer-RemovePLItemsCmd		Forigi anon
+Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Forigi anojn al la Rubujo
+Subtitle size:	MediaPlayer-SettingsWindow		Grando de subtekstoj:
+No aspect correction	MediaPlayer-Main		Ne konservi proporcion
+raw video	MediaPlayer-InfoWin		kruda videaĵo
+Container	MediaPlayer-InfoWin		Ujo
+none	MediaPlayer-Main		nenio
+Open clips	MediaPlayer-Main		Uzi aŭdvidaĵojn
+Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Iuj dosieroj ne povas esti movitaj al la Rubujo.
+<nothing to undo>	MediaPlayer-PlaylistWindow		<nenio por malfari>
+Save as…	MediaPlayer-PlaylistWindow		Konservi kiel...
+Error: 	MediaPlayer-RemovePLItemsCmd		Eraro: 
+300% scale	MediaPlayer-Main		300% skalo
+Open	MediaPlayer-Main		Uzi
+ask every time	MediaPlayer-SettingsWindow		demandi ĉiun fojon
+(not supported)	MediaPlayer-InfoWin		(nesubtenata)
+Randomize	MediaPlayer-PlaylistWindow		Hazardigi
+%.3f fps	MediaPlayer-InfoWin		%.3f kadrojn sekunde
+Off	Subtitles menu		Malŝalti
+400% scale	MediaPlayer-Main		400% skalo
+h	MediaPlayer-InfoWin	Hours	h
+OK	MediaPlayer-PlaylistWindow		Bone

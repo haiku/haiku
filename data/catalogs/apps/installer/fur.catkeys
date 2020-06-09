@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-Installer	116830250
+1	friulian	x-vnd.Haiku-Installer	3753756669
 Performing installation.	InstallProgress		Esecuzion de instalazion.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Sielç il disc sorzint dal menù a tende. Daspò fâs clic su \"Scomence\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Par plasê siere il barcon di Gjestion disc prime di sierâ chel dal Instaladôr.
@@ -20,7 +20,7 @@ Quit	InstallerWindow		Jes
 Write boot sector to '%s'	InstallerWindow		Scriture setôr di inviament su '%s'
 Boot sector not written because of an internal error.	InstallProgress		Setôr di inviament no scrit par vie di un erôr interni.
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Impussibil inviâ Gjestion disc, la aplicazion par configurâ lis partizions dai discs.
-Welcome to the Haiku Installer!\n\n	InstallerApp		Benvignût tal program di instalazion di Haiku!\n\n
+Welcome to the Haiku Installer!\n\n	InstallerApp		Benvignûts tal program di instalazion di Haiku!\n\n
 ?? of ??	InstallerWindow	Unknown progress	?? di ??
 Quit Boot Manager	InstallerWindow		Jes dal Gjestôr di inviament
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Esecuzion dal Gjestôr di inviament…\n\nSiere il Gjestôr di inviament par continuâ cu la instalazion.
@@ -31,9 +31,7 @@ Finishing installation.	InstallProgress		Daûr a finî la instalazion.
 Install from:	InstallerWindow		Instale di:
 Additional disk space required: 0.0 KiB	InstallerWindow		Spazi adizionâl domandât sul disc: 0.0 KiB
 This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Chest software al è ancjemò in version beta! Che al significhe che al esist il pericul di pierdi dâts impuartants. Fâs dispès copiis di backup! O sês stâts visâts.\n\n\n
-3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Cuant che si varà inviât Haiku pe prime volte, sigurâsi di lei la documentazion aes vôs \"Benvignût\" e \"Vuide pal utent\". Si cjatarà i lôr colegaments sul Scritori e tai preferîts di WebPositive.\n\n
 ???	InstallerWindow	Unknown currently copied item	???
-Install anyway	InstallProgress		Instale distès
 1)   If you are installing Haiku onto real hardware (not inside an emulator), you may want to prepare a hard disk partition from another OS (you could, for example, use a GParted Live-CD, which can also resize existing partitions to make room).\nYou can also set up partitions by launching DriveSetup from Installer, but you won't be able to resize existing partitions with it. While DriveSetup has been quite thoroughly tested over the years, it's recommended to have up-to-date backups of the other partitions on your system. Just in case…	InstallerApp		1)   Se si sta instalant Haiku su hardware reâl (no dentri di un emuladôr), si podarès volê preparâ une partizion sul disc fis di dentri un altri sisteme operatîf (par esempli doprant un CD inviabil cun jenfri GParted, che al rive ancje a ridimensionâ lis partizions esistentis, par liberâ spazi).\nSi pues ancje configurâ lis partizions doprant Gjestion disc, dal program di instalazion, ma no si rivarà a ridimensionâ lis partizions cun chel. Par cetant che Gjestion disc al sedi stât provât in ducj chescj agns, si consee di fâ un backup des altris partizions dal sisteme. No si sa mai…
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Sielç il disc sorzint e di destinazion dai menù a tende. Daspò fâs clic su \"Scomence\".
 Hide optional packages	InstallerWindow		Plate pachets opzionâi
@@ -58,7 +56,6 @@ Collecting copy information.	InstallProgress		Daûr a dâ dongje lis informazion
 Show optional packages	InstallerWindow		Mostre pachets opzionâi
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Il disc di destinazion al podarès no vê vonde spazi. Prove a sielzi un disc diferent o sielç di no instalâ elements opzionâi.
 Installation canceled.	InstallProgress		Instalazion anulade.
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Il volum di destinazion nol è vueit. Instalâ distès?\n\nNote: La cartele 'system' e deventarà une copie nete di chê dal volum sorzint, ma e tignarà lis sôs configurazions, dutis chês altris a vignaran unidis. Dulà che file e colegaments a esistin su ducj i doi i volums, si sorescrivarà dut cu la version dal volum sorzint.
 OK	InstallerApp		Va ben
 Are you sure you want to abort the installation?	InstallerWindow		Interompi pardabon la instalazion?
 Stop	InstallerWindow		Ferme

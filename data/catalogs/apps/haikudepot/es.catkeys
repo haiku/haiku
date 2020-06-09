@@ -1,10 +1,9 @@
-1	spanish; castilian	x-vnd.Haiku-HaikuDepot	3381858533
+1	spanish; castilian	x-vnd.Haiku-HaikuDepot	3833361367
 Repository update error	LocalRepositoryUpdateProcess		Error de actualización de repositorio
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Ocurrió un error al actualizar el repositorio: %error%
 User Created	UserLoginWindow		Usuario creado
 Check for updates…	MainWindow		Buscar actualizaciones…
 Uninstall	PackageManager		Desinstalar
-(%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		Desinstalado
 It was not possible to create the new user.	UserLoginWindow		No fue posible crear el nuevo usuario.
 Available packages	MainWindow		Paquetes disponibles
@@ -35,7 +34,6 @@ Login or Create account	MainWindow		Ingresar o crear una cuenta
 Ratings	PackageInfoView		Valoraciones
 Switch account…	MainWindow		Cambiar de cuenta…
 Preferred language:	UserLoginWindow		Idioma preferido:
-Server Error	ServerHelper		Error del servidor
 Name	PackageListView		Nombre
 Authorization or security issue. Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		Problema de Autorización o seguridad. Cierre la sesión y vuelva a iniciarla para verificar que su contraseña sea correcta y también que haya aceptado las últimas condiciones de uso.
 Local	LocalPkgDataLoadProcess		Local
@@ -54,13 +52,13 @@ Package action failed	PackageInfoView		La acción del paquete falló
 No changelog available.	PackageInfoView		No hay registro de cambios disponible.
 Error	App		Error
 There was a puzzling response from the web service.	UserLoginWindow		Hubo una respuesta misteriosa desde el servicio Web.
+Version	PackageListView		Versión
 Not logged in	MainWindow		No se inició sesión
 No, quit HaikuDepot	App		No, salir de HaikuDepot
 Featured packages	FeaturedPackagesView		Paquetes recomendados
 The supplied response to the captcha is incorrect. A new captcha will be generated; try again.	UserLoginWindow		La respuesta proporcionada al captcha es incorrecta. Se generará un nuevo captcha; Inténtelo de nuevo.
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		No fue posible comunicarse con el servidor para obtener el captcha requerido para crear un nuevo usuario.
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Su evaluación fue subida con éxito. Puede actualizarla o eliminarla en el sitio web de HaikuDepot Server.
-Network Error	ServerHelper		Error de red
 Available	PackageListView		Disponible
 Cancel	UserLoginWindow		Cancelar
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot necesita que el demonio de paquete funcione, y parece no estar corriendo.\n¿Le gustaría iniciarlo ahora?
@@ -68,7 +66,6 @@ Click a package to view information	PackageInfoView		Haga clic en un paquete par
 The password must be at least eight characters long, consist of at least two digits and one upper case character.	UserLoginWindow		La contraseña debe ser de al menos ocho caracteres de longitud, consistir de al menos dos números y una letra en mayúsculas.
 Contents	PackageInfoView		Contenidos
 Close	PackageManager		Cerrar
-A network transport error has arisen communicating with the HaikuDepot server system: %s	ServerHelper		Ocurrió un error al comunicarse con el servidor de HaikuDepot: %s
 Changelog	PackageInfoView		Registro de cambios
 Rating not possible	MainWindow		No ha sido posible puntuar
 Package update error	MainWindow		Error de actualización del paquete.
@@ -78,7 +75,6 @@ Reboot required	PackageManager		Reinicio requerido
 Very unstable	RatePackageWindow		Muy inestable
 Password:	UserLoginWindow		Contraseña:
 All packages	PackageListView		Todos los paquetes
-Network Transport Error	ServerHelper		Error de red
 Stability	RatePackageWindow		Estabilidad
 Send	RatePackageWindow		Enviar
 Start package daemon	App		Arrancar demonio de paquetes
@@ -105,8 +101,8 @@ Close	RatePackageWindow		Cerrar
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Sincronizando datos de paquetes para el repositorio '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Ver las condiciones de uso
 Login issue	MainWindow		Problema de inicio de sesión
-Your rating:	RatePackageWindow		Su puntuación:
 Size	PackageListView		Tamaño
+Your rating:	RatePackageWindow		Su puntuación:
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		El usuario %Nickname% ha sido creado en el sistema de HaikuDepotServer. Usted puede administratar los detalles de su usuario usando la interface web. Usted ahora puede iniciar con este nuevo usuario.
 Your rating was updated.	RatePackageWindow		Su evaluación ha sido actualizada.
 All categories	FilterView		Todas las categorías
@@ -169,8 +165,6 @@ Open %DeskbarLink%	PackageManager		Abrir %DeskbarLink%
 User creation error	UserLoginWindow		Se produjo un error al crear el usuario
 Install	PackageManager		Instalar
 Input validation	UserLoginWindow		Validación de entrada
-This application is too old to communicate with the HaikuDepot server system. Obtain a newer version of HaikuDepot by updating your Haiku system. The minimum version of HaikuDepot required is \"%s\".	ServerHelper		Esta aplicación es muy vieja para comunicarse con el sistema de HaikuDepot. Obtenga la nueva versión de HaikuDepot actualizando su sistema Haiku. La version minima de HaikuDepot requerida es \"%s\".
-An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		Un error inesperado fue enviado por el servidor de HaikuDepot [%i]
 Log in…	MainWindow		Iniciar sesión…
 You need to be logged into an account before you can rate packages.	MainWindow		Necesita haber ingresado con una cuenta antes de poder valorar paquetes.
 Client version too old	ServerHelper		Versión del cliente demasiado antigua

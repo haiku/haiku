@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-libtracker	3186644318
+1	slovak	x-vnd.Haiku-libtracker	1336536367
 Created	ContainerWindow		Vytvorené
 Open and make preferred	OpenWithWindow		Otvoriť a nastaviť ako preferovanú
 Kind	ContainerWindow		Druh
@@ -269,7 +269,6 @@ MiB	WidgetAttributeText		MiB
 Delete	FSUtils		Zmazať
 Edit name	ContainerWindow		Upraviť názov
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Nebolo možné otvoriť „%document“ (Chýbajúci symbol: %symbol). \n
-More options	FindPanel		Ďalšie možnosti
 config	B_USER_CONFIG_DIRECTORY		konfigurácia
 Error moving \"%name\".	FSUtils		Chyba pri presúvaní „%name“.
 Select…	QueryContainerWindow		Vybrať…
@@ -298,7 +297,6 @@ Make active printer	ContainerWindow		Urobiť tlačiareň aktívnou
 Copy to	ContainerWindow		Kopírovať do
 Name	SelectionWindow		Názov
 by attribute	FindPanel		podľa atribútu
- info	InfoWindow		 info
 Write	FilePermissionsView		Zapísať
 If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Ak zmeníte systémový priečinok alebo jeho obsah, nebude možné spustiť %osName!\n\nSte si istý, že to chcete urobiť?\n\nAk chcete napriek tomu zmeniť systémový priečinok alebo jeho obsah, podržte kláves Shift a kliknite na „Viem, čo robím“.
 Save	FilePanelPriv		Uložiť
@@ -344,7 +342,6 @@ Proceed	FSUtils		Pokračovať
 Edit favorites…	FilePanelPriv		Upraviť obľúbené…
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		Nemôžete presunúť priečinok do seba samého alebo do jeho podpriečinka.
 New	ContainerWindow		Nový
-Fewer options	FindPanel		Menej možností
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Musíte pretiahnuť položky na jednu z ikon diskov v okne „disky“.
 If you alter %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Ak zmeníte %target, %osName sa nemusí správať správne!\n\nSte si istý, že to chcete urobiť?
 Sorry, you can't copy items to the Trash.	FSClipBoard		Ľutujeme, nemôžete kopírovať položky do Koša.

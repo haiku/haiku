@@ -17,7 +17,7 @@ Attribute name:	Attribute Window		属性名:
 Long description:	Application Type Window		详细特征:
 Cancel	Preferred App Menu		取消
 Remove	FileTypes Window		删除
-The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		该程序 \"%s\" 不支持这种文件类型.\是否继续进行设置?
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		该程序 \"%s\" 不支持这种文件类型。\n是否继续进行设置?
 Remove	Application Type Window		删除
 Gamma	Application Type Window		候选版
 Cancel	Application Type Window		取消

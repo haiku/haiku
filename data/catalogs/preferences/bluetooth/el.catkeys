@@ -1,0 +1,55 @@
+1	greek, modern (1453-)	x-vnd.Haiku-BluetoothPrefs	4276705900
+Laptop	Settings view		Φορητός Υπολογιστής
+Only from trusted devices	Settings view		Μόνο από αξιόπιστες συσκευές
+15 secs	Settings view		15 δευτερόλεπτα
+Quit	main		Έξοδος
+Manufacturer: 	Device View		Κατασκευαστής: 
+Desktop	Settings view		Επιφάνεια εργασίας
+Server	Window		Εξυπηρετητής
+Identify host as:	Settings view		Αναγνώριση ξενιστή ως:
+Refresh…	Remote devices		Ανανέωση…
+Local devices found on system:	Settings view		Τοπικές συσκευές που βρέθηκαν στο σύστημα:
+Service classes: 	Device View		Κατηγορίες υπηρεσιών: 
+Remote devices	Window		Απομακρυσμένες συσκευές
+Settings	Window		Ρυθμίσεις
+Stop bluetooth services…	Window		Διακοπή υπηρεσιών bluetooth…
+61 secs	Settings view		61 δευτερόλεπτα
+Add…	Remote devices		Προσθήκη…
+As blocked	Remote devices		Ως αποκλεισμένο
+There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Δεν υπάρχει καμία τοπική συσκευή Bluetooth που να έχει καταχωρηθεί στο σύστημα.
+Policy…	Settings view		Πολιτική…
+Revert	Window		Επαναφορά
+Refresh local devices…	Window		Ανανέωση τοπικών συσκευών…
+Disconnect	Remote devices		Αποσύνδεση
+Identify us as…	Settings view		Όνομα συσκευής…
+From all devices	Settings view		Από όλες τις συσκευές
+Defaults	Window		Προεπιλογές
+Start bluetooth services…	Window		Έναρξη υπηρεσιών bluetooth…
+Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Ελέγξτε αν οι δυνατότητες Bluetooth της απομακρυσμένης συσκευής είναι ενεργές. Πατήστε ''Σάρωση'' για να ξεκινήσει η σάρωση. Ο απαιτούμενος χρόνος για την λήψη των ονομάτων είναι απροσδιόριστος, ωστόσο δεν πρέπει να πάρει πάνω από 3 δευτερόλεπτα για κάθε συσκευή. Έπειτα, θα είστε σε θέση να τα προσθέσετε στην κύρια λίστα, όπου και θα μπορείτε να συνδεθείτε με αυτές.
+Scanning progress	Inquiry panel		Πρόοδος σάρωσης
+Bluetooth	System name		Bluetooth
+Launch now	main		Εκκίνηση τώρα
+Remove	Remote devices		Αφαίρεσε
+Pick device…	Settings view		Επιλογή συσκευής…
+Always ask	Settings view		Πάντα ρώτα
+With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped…\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		Με την υποστήριξη των:\n- Mika Lindqvist\n- Adrien Destugues\n- Maksym Yevmenkin\n\nΕυχαριστούμε τα άτομα που βοήθησαν…\n\nΜε δωρεές/αποστολές υλισμικού:\n- Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n- Edwin Erik Amsler\n- Dennis d'Entremont\n- Luroh\n- Pieter Panman\n\nΟικονομικά:\n- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n- Matt M, Doug F, Hubert H,\n- Sebastian B, Andrew M, Jared E,\n- Frederik H, Tom S, Ferry B,\n- Greg G, David F, Richard S, Martin W:\n\nΜε συνεισφορές κώδικα:\n- Michael Weirauch\n- Fredrik Ekdahl\n- Raynald Lesieur\n- Andreas Färber\n- Joerg Meyer\nΜε δοκιμές:\n- Petter H. Juliussen\nΜε όλη τους την γνώση:\n- the yellowTAB team
+Help	Window		Βοήθεια
+Pair…	Remote devices		Διάζευξη…
+Retrieving name of %1	Inquiry panel		Ανάκτηση ονόματος του %1
+Inquiry	Inquiry panel		Σάρωση
+Incoming connections policy:	Settings view		Εισερχόμενες συνδέσεις πολιτικής:
+Retrieving names…	Inquiry panel		Γίνεται λήψη ονομάτων…
+Show name	Extended local device view		Εμφάνιση ονόματος
+Add device to list	Inquiry panel		Προσθήκη συσκευής στη λίστα
+Remaining %1 seconds	Inquiry panel		Απομένουν %1 δευτερόλεπτα
+The Bluetooth services are not currently running on this system.	main		Οι υπηρεσίες Bluetooth δεν εκτελούνται αυτήν την στιγμή στο σύστημά σας.
+Discoverable	Extended local device view		Ορατό
+Authenticate	Extended local device view		Αναγνώριση
+Smart phone	Settings view		Smart phone
+Scanning completed.	Inquiry panel		Η ανίχνευση ολοκληρώθηκε.
+Default inquiry time:	Settings view		Προκαθορισμένος χρόνος σάρωσης:
+Server	Settings view		Εξυπηρετητής
+Handheld	Settings view		Φορητός
+ packets: 	Device View		 πακέτα: 
+About Bluetooth…	Window		Σχετικά με το Bluetooth…
+Starting scan…	Inquiry panel		Γίνεται εντοπισμός συσκευών…

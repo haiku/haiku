@@ -1,10 +1,9 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	1107427137
+1	swedish	x-vnd.Haiku-HaikuDepot	3833361367
 Repository update error	LocalRepositoryUpdateProcess		Fel vid uppdatering av repositorie
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Ett fel inträffade vid uppdatering av repositoriet: %error%
 User Created	UserLoginWindow		Användare skapad
 Check for updates…	MainWindow		Leta efter uppdateringar…
 Uninstall	PackageManager		Avinstallera
-(%Votes%)	FeaturedPackagesView		(%Votes%)
 Uninstalled	PackageListView		Avinstallera
 It was not possible to create the new user.	UserLoginWindow		Det gick inte att skapa den nya användaren.
 Available packages	MainWindow		Tillgängliga paket
@@ -35,7 +34,6 @@ Login or Create account	MainWindow		Logga in eller skapa konto
 Ratings	PackageInfoView		Betyg
 Switch account…	MainWindow		Byt konto...
 Preferred language:	UserLoginWindow		Föredraget språk:
-Server Error	ServerHelper		Serverfel
 Name	PackageListView		Namn
 Authorization or security issue. Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		Autoriserings- eller säkerhetsproblem. Logga ut och logga in igen för att kontrollera att ditt lösenord är korrekt och också kontrollera att du har godkänt de senaste användningsvillkoren.
 Local	LocalPkgDataLoadProcess		Lokal
@@ -61,7 +59,6 @@ Featured packages	FeaturedPackagesView		Utvalda paket
 The supplied response to the captcha is incorrect. A new captcha will be generated; try again.	UserLoginWindow		Det svaret på captcha är felaktigt. En ny captcha kommer att genereras; försök igen.
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Det var inte möjligt att kommunicera med servern för att få en captcha-bild som krävs för att skapa en ny användare.
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Ditt betyg har laddats upp. Du kan uppdatera eller ta bort det på webbplatsen för HaikuDepot-servern.
-Network Error	ServerHelper		Nätverksfel
 Available	PackageListView		Tillgänglig
 Cancel	UserLoginWindow		Avbryt
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		Servicen behövs för HaikuDepot och den verkar inte köra.\nSkulle du vilja starta den nu?
@@ -69,7 +66,6 @@ Click a package to view information	PackageInfoView		Klicka på ett paket för a
 The password must be at least eight characters long, consist of at least two digits and one upper case character.	UserLoginWindow		Lösenordet måste vara minst åtta tecken långt och innehålla minst två siffror och en versal.
 Contents	PackageInfoView		Innehåll
 Close	PackageManager		Stäng
-A network transport error has arisen communicating with the HaikuDepot server system: %s	ServerHelper		Ett nättransportfel har uppstått i kommunikationen med HaikuDepot-serversystemet: %s
 Changelog	PackageInfoView		Ändringslogg
 Rating not possible	MainWindow		Betyg ej möjligt
 Package update error	MainWindow		Paketuppdateringsfel
@@ -79,7 +75,6 @@ Reboot required	PackageManager		Omstart krävs
 Very unstable	RatePackageWindow		Mycket ostabil
 Password:	UserLoginWindow		Lösenord:
 All packages	PackageListView		Alla paket
-Network Transport Error	ServerHelper		Nättransportfel
 Stability	RatePackageWindow		Stabilitet
 Send	RatePackageWindow		Skicka
 Start package daemon	App		Starta paket-servicen
@@ -106,8 +101,8 @@ Close	RatePackageWindow		Stäng
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synkroniserar paketdata för repositoriet '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Visa användarvillkor
 Login issue	MainWindow		Inloggnings problem
-Your rating:	RatePackageWindow		Dina betyg:
 Size	PackageListView		Storlek
+Your rating:	RatePackageWindow		Dina betyg:
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		Användaren %Nickname% har framgångsrikt skapats i HaikuDepotServer-systemet. Du kan administrera dina användarinformation genom att använda webbgränssnittet. Du är nu inloggad som den här nya användaren.
 Your rating was updated.	RatePackageWindow		Ditt betyg ändrades.
 All categories	FilterView		Alla kategorier
@@ -170,8 +165,6 @@ Open %DeskbarLink%	PackageManager		Öppna %DeskbarLink%
 User creation error	UserLoginWindow		Användarskapande-fel
 Install	PackageManager		Installera
 Input validation	UserLoginWindow		Ogiltigt indata
-This application is too old to communicate with the HaikuDepot server system. Obtain a newer version of HaikuDepot by updating your Haiku system. The minimum version of HaikuDepot required is \"%s\".	ServerHelper		Denna applikation är för gammal för att kommunicera med HaikuDepot-serversystemet. Få en nyare version av HaikuDepot genom att uppdatera ditt Haiku-system. Den minsta versionen av HaikuDepot som krävs är \"%s\".
-An unexpected error has been sent from the HaikuDepot server [%i]	ServerHelper		Ett oväntat fel har skickats från HaikuDepot-servern [%i]
 Log in…	MainWindow		Logga in...
 You need to be logged into an account before you can rate packages.	MainWindow		Du måste logga in för att kunna betygsätta paket.
 Client version too old	ServerHelper		Klientversionen är för gammal

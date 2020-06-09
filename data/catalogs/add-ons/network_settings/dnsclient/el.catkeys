@@ -1,0 +1,10 @@
+1	greek, modern (1453-)	x-vnd.Haiku-DNSClientService	2825577357
+DNS settings	DNSClientServiceAddOn		Ρυθμίσεις DNS
+Move down	DNSSettingsView		Μετακίνηση κάτω
+DNS settings	DNSSettingsView		Ρυθμίσεις DNS
+Remove	DNSSettingsView		Αφαίρεση
+Domain:	DNSSettingsView		Διεύθυνση:
+Add	DNSSettingsView		Προσθήκη
+Server:	DNSSettingsView		Διακομιστής:
+Move up	DNSSettingsView		Μετακίνηση επάνω
+Apply	DNSSettingsView		Εφαρμογή

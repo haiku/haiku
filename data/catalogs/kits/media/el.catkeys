@@ -1,0 +1,12 @@
+1	greek, modern (1453-)	x-vnd.Haiku-libmedia	1819860668
+Cleaning up.	MediaDefs		Γίνεται ξεκαθάρισμα.
+Starting media_services.	MediaDefs		Γίνεται εκκίνηση του media_services.
+Stopping media_addon_server.	MediaDefs		Γίνεται διακοπή του media_services.
+Waiting for media_addon_server to quit.	MediaDefs		Αναμένεται η διακοπή του media_services_server.
+Telling media_addon_server to quit.	MediaDefs		Γίνεται αίτηση διακοπής στον media_addon_server.
+Ready for use.	MediaDefs		Έτοιμος για χρήση.
+Stopping media server…	MediaDefs		Γίνεται διακοπή του διακομιστή πολυμέσων…
+Waiting for media_server to quit.	MediaDefs		Αναμένεται η διακοπή του media_server.
+Done shutting down.	MediaDefs		Η απενεργοποίηση ολοκληρώθηκε.
+Error occurred starting media services.	MediaDefs		Προέκυψε σφάλμα κατά την εκκίνηση των υπηρεσιών πολυμέσων.
+Media Service	MediaDefs		Υπηρεσία Πολυμέσων

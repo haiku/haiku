@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Pulse	139895817
+1	italian	x-vnd.Haiku-Pulse	559379362
 Normal mode	DeskbarPulseView		Modalità normale
 Info	CPUButton		Informazioni
 Quit	DeskbarPulseView		Esci
@@ -16,6 +16,7 @@ Fade colors	ConfigView		Colori sfumati
 About Pulse…	PulseView		Informazioni su Pulse…
 Pulse	NormalPulseView		Pulse
 Deskbar mode	NormalPulseView		Modalità Deskbar
+Pulse settings	PulseApp		Impostazioni di Pulse
 Remove replicant	CPUButton		Rimuovi replicante
 You can't disable the last active CPU.	PulseView		Non puoi disattivare l'unica CPU attiva.
 Width of icon:	ConfigView		Larghezza dell'icona:
@@ -45,4 +46,3 @@ Active color	ConfigView		Colore attivo
 Installing in Deskbar failed\n%s	PulseApp		Installazione nella Deskbar fallita\n%s
 Idle color	ConfigView		Colore di inattività
 Normal mode	PrefsWindow		Modalità normale
-Pulse settings	PulseWindow		Impostazioni di Pulse

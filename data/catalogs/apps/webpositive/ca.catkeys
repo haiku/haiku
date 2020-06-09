@@ -30,11 +30,11 @@ Settings	Settings Window		Paràmetres
 Downloads	WebPositive Window		Baixades
 Browse…	Settings Window		Navega...
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Ja hi ha una adreça d'interès per a aquesta pàgina: %bookmarkName.
-Resume prior session	Settings Window		Continua la sessió prèvia
+Resume prior session	Settings Window		Continua la sessió anterior
 Match case	WebPositive Window		Coincidència de caixa
 Proxy password:	Settings Window		Contrasenya del servidor intermediari:
 Size:	Font Selection view		Mida:
-Page source	WebPositive Window		Font de la pàgina
+Page source	WebPositive Window		Codi font de la pàgina
 Proxy server port:	Settings Window		Port del servidor intermediari:
 Error opening downloads folder	Download Window		Error en obrir la carpeta de baixades
 Show bookmark bar	WebPositive Window		Mostra la barra d'adreces d'interès
@@ -122,7 +122,7 @@ Remember username and password for this site	Authentication Panel		Recorda el no
 Cookie manager	Cookie Manager		Gestor de galetes
 Show home button	Settings Window		Mostra el botó d'inici
 Start new session	Settings Window		Inicia una sessió nova
-The cookie jar is empty!	Cookie Manager		El pot de galetes està buit!
+The cookie jar is empty!	Cookie Manager		El pot de galetes és buit!
 Value	Cookie Manager		Valor
 Remove missing	Download Window		Suprimeix el que falta
 Paste	WebPositive Window		Enganxa
@@ -143,7 +143,7 @@ Search page:	Settings Window		Cerca a la pàgina:
 Settings	WebPositive Window		Paràmetres
 Clear	URL Bar		Neteja
 Loading %url	WebPositive Window		Es carrega %url
-The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	La ràpida guineu bruna salta sobre el gos mandrós.
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Jove xef, sol·licito que porti cafè descafeïnat i whisky amb quinze glaçons d'hidrogen!
 Start up:	Settings Window		Inicia:
 Confirmation	WebPositive Window		Confirmació
 Session cookie	Cookie Manager		Galeta de la sessió

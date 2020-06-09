@@ -1,0 +1,51 @@
+1	croatian	x-vnd.Haiku-Screen	1475614814
+no	Screen		ne
+bits/pixel	Screen		bit/pixel
+15 bits/pixel, 32768 colors	Screen		15 bits/pixel, 32768 boja
+Rows:	Screen		Redovi:
+%.1f Hz	Screen		%.1f Hz
+The screen mode could not be set:\n\t%s\n	Screen		Način rada ekrana se ne može postaviti:\n\t%s\n
+Keep	Screen		Zadrži
+/other…	Screen		/ostalo...
+Refresh rate:	Screen		Vrijeme osvježenja:
+Video format:	Screen		Format videa:
+Undo	Screen		Poništi
+OK	Screen		U redu
+Current workspace	Screen		Trenutni radni prostor
+vertically	Screen		vertikalno
+All workspaces	Screen		Svi radni prostori
+Use laptop panel:	Screen		Koristi laptop ploču:
+Could not write VESA mode settings file:\n\t	Screen		Nije moguće zapisati datoteku postavki VESA načina rada :\n\t
+Settings will revert in %seconds.	Screen		Postavke će se vratiti za %sekundi.
+Cancel	Screen		Poništi
+Other…	Screen		Drugo...
+Screen	Screen		Ekran
+Colors:	Screen		Boje:
+yes	Screen		da
+Swap displays:	Screen		Zamjeni ekrane:
+%sSerial no.: %s	Screen		%sSerial no.: %s
+8 bits/pixel, 256 colors	Screen		8 bits/pixel, 256 boja
+Revert	Screen		Preokreni
+always	Screen		uvijek
+Warning	Screen		Upozorenje
+24 bits/pixel, 16 Million colors	Screen		24 bits/pixel, 16 Miliona boja
+Hz	Screen		Hz
+Workspaces	Screen		Radni prostori
+32 bits/pixel, 16 Million colors	Screen		32 bits/pixel, 16 Miliona boja
+Done	Screen		Završeno
+16 bits/pixel, 65536 colors	Screen		16 bits/pixel, 65536 boja
+Screen preferences by the Haiku team	Screen		Osobitosti ekrana koje je načinio Haiku tim
+Refresh rate	Screen		Vrijeme osveženja
+if needed	Screen		ako je potrebno
+Combine displays:	Screen		Koristi ekrane zajedno:
+Unknown mode	Screen		Nepoznati način rada
+About	Screen		O programu
+Columns:	Screen		Kolone:
+Resolution:	Screen		Rezolucija:
+Apply	Screen		Primjeni
+horizontally	Screen		horizontalno
+disable	Screen		onemogući
+Set background…	Screen		Postavi pozadinu...
+Type or use the left and right arrow keys.	Screen		Tipkaj ili koristi tipku lijeve i desne strelice.
+Screen	System name		Ekran
+Do you wish to keep these settings?	Screen		Da li želite zadržati ove postavke?

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Installer	116830250
+1	russian	x-vnd.Haiku-Installer	3753756669
 Performing installation.	InstallProgress		Выполняется установка…
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Выберите источник из выпадающего меню. Затем нажмите кнопку \"Установить\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Пожалуйста, закройте окно разметки диска перед закрытием окна Установщика.
@@ -31,14 +31,12 @@ Finishing installation.	InstallProgress		Завершение установки
 Install from:	InstallerWindow		Установить с:
 Additional disk space required: 0.0 KiB	InstallerWindow		Дополнительное потребуется: 0.0 Кб
 This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Это программное обеспечение пока еще находится в состоянии беты! Это значит, что есть риск потери данных. Чаще делайте резервные копии! Мы вас предупредили.\n\n\n
-3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3) Когда вы первый раз загрузитесь в установленную Haiku, не забудьте прочесть нашу документацию, доступную в файлах \"Welcome\" и  \"Userguide\". Ссылки на них будут на рабочем столе и в закладках WebPositive.\n\n
 ???	InstallerWindow	Unknown currently copied item	???
-Install anyway	InstallProgress		Все равно установить
 1)   If you are installing Haiku onto real hardware (not inside an emulator), you may want to prepare a hard disk partition from another OS (you could, for example, use a GParted Live-CD, which can also resize existing partitions to make room).\nYou can also set up partitions by launching DriveSetup from Installer, but you won't be able to resize existing partitions with it. While DriveSetup has been quite thoroughly tested over the years, it's recommended to have up-to-date backups of the other partitions on your system. Just in case…	InstallerApp		1) Если вы устанавливаете Haiku на реальный компьютер (не в эмуляторе), то мы рекомендуем заранее подготовить раздел на жестком диске из другой ОС (например, можно воспользоваться загрузочным диском GParted Live-CD, который также умеет изменять размеры разделов).\nВы также можете настроить разделы запустив встроенную утилиту разметки диска DriveSetup прямо из Установщика, однако функция изменения размеров разделов пока еще не реализована. Хотя DriveSetup и был протестирован на достаточном количестве компьютеров за последние годы, мы все же рекомендуем сделать резервную копию ваших данных перед его использованием. Просто на всякий случай…
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		В выпадающих меню выберите источник и раздел, на который хотите установить систему. Затем нажмите кнопку Установить.
 Hide optional packages	InstallerWindow		Скрыть опциональные пакеты
 ???	InstallerWindow	Unknown partition name	???
-Have fun and thanks for trying out Haiku!	InstallerApp		Не скучайте и спасибо, что пробуете Haiku!
+Have fun and thanks for trying out Haiku!	InstallerApp		Надеемся, что вам будет интересно и спасибо, что пробуете Haiku!
 Quit	InstallerApp		Выход
 Starting installation.	InstallProgress		Начинаем установку.
 Error writing boot sector.	InstallProgress		Ошибка при записи загрузочного сектора.
@@ -58,7 +56,6 @@ Collecting copy information.	InstallProgress		Сбор иформации для
 Show optional packages	InstallerWindow		Показать опциональные пакеты
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		На выбранном диске недостаточно места. Попробуйте выбрать другой диск или не устанавливайте опциональные пакеты.
 Installation canceled.	InstallProgress		Установка отменена.
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Целевой раздел не пустой. Вы точно хотите установить?\n\nПримечание: существующая папка 'system' будет заменена версией с установочного раздела, папка с системными настройками сохранится, все остальные директории буду объединены. Все существующие файлы и ссылки существующие как на исходном так и на целевом разделе будут перезаписаны версией с исходного раздела.
 OK	InstallerApp		ОК
 Are you sure you want to abort the installation?	InstallerWindow		Вы уверены, что хотите прервать установку?
 Stop	InstallerWindow		Остановить

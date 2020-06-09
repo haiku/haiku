@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-VirtualMemory	837291207
+1	portuguese	x-vnd.Haiku-VirtualMemory	2090796060
 Requested swap file size:	SettingsWindow		Tamanho do ficheiro swap requerido:
 VirtualMemory	System name		Memória Virtual
 OK	VirtualMemoryApp		OK
@@ -12,6 +12,7 @@ VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMem
 The volume specified in the settings file could not be found. You can use the boot volume or quit.	SettingsWindow		O volume especificado no ficheiro de definições não foi encontrado. Pode utilizar o volume de arranque ou sair.
 Current Swap:	SettingsWindow		Swap atual:
 Load defaults	SettingsWindow		Carregar predefinições
+Use boot volume	SettingsWindow		Usar volume de arranque
 Automatic swap management	SettingsWindow		Gestão automática de swap
 Defaults	SettingsWindow		Predefinições
 Quit	SettingsWindow		Sair

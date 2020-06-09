@@ -1,0 +1,15 @@
+1	croatian	x-vnd.Haiku-mount_server	2818767263
+Mount read-only	AutoMounter		Montiraj samo za čitanje
+Error mounting volume:\n\n%s	AutoMounter		Greška pri montiranju particije:\n\n%s
+Cancel	AutoMounter		Otkaži
+OK	AutoMounter		U redu
+Unmount error	AutoMounter		Greška odmontiranja
+The file system on this volume is not the Be file system. It is recommended to mount it in read-only mode, to prevent unintentional data loss because of bugs in Haiku.	AutoMounter		Datotečni sustav ovog diska nije Be datotečni sustav. Preporučljivo je montirati ga kao samo za čitanje, da bi se spriječio nenamjeran gubitak podataka zbog grešaka u Haiku.
+Mount read/write	AutoMounter		Montiraj čitaj/piši
+Could not unmount disk \"%s\":\n\t%s	AutoMounter		Ne mogu odmontirati disk \"%s\":\n\t %s
+Mounting volume '%s'\n\n	AutoMounter		Montiram particiju '%s'\n\n
+Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Ne mogu odmontirati disk \"%s\":\n\t%s\n\nTreba li prisiliti odmontiranje?\n\nObavijest: Ako program trenutno zapisuje na particiju, odmontiranje bi moglo prouzročiti gubitak podataka.\n
+Force unmount	AutoMounter		Prisili odmontiranje
+Mount error	AutoMounter		Greška montiranja
+Mounting volume <unnamed volume>\n\n	AutoMounter		Montiram particiju <neimenovana particija>\n\n
+Mount warning	AutoMounter		Upozorenje montiranja

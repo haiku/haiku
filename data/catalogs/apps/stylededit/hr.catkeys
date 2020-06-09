@@ -1,0 +1,78 @@
+1	croatian	x-vnd.Haiku-StyledEdit	1012139350
+Document statistics	Statistics		Statistike dokumenta
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nemoguće obrnuti, datoteka nije pronađena: \"%s\".
+Cut	Menus		Isjeci
+Center	Menus		Centar
+Increase size	Menus		Povećaj veličinu
+Page setup…	Menus		Postavke stranice...
+Untitled 	StyledEditWindow		Neimenovano 
+OK	Statistics		U redu
+Find	FindandReplaceWindow		Pronađi
+New	Menus		Novo
+Document	Menus		Dokument
+Search backwards	FindandReplaceWindow		Traži unazad
+Find again	Menus		Pronađi opet
+Read-only	StatusView		Samo za čitanje
+Save	Menus		Spremi
+Cancel	QuitAlert		Poništi
+Copy	Menus		Kopiraj
+Reload	NodeMonitorAlerts		Ponovno učitaj
+Words:	Statistics		Riječi:
+???	LoadAlert		???
+Error saving \"%s\":\n%s	SaveAlert		Greška pri spremanju \"%s\":\n%s
+OK	RevertToSavedAlert		U redu
+Unlock file	StatusView		Otključaj datoteku
+Italic	Menus		Italik
+Can't undo	Menus		Nemoguće vratiti korak nazad
+Replace…	Menus		Zamjeni...
+File	Menus		Datoteka
+Bold	Menus		Podebljano
+Paste	Menus		Zalijepi
+File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Datoteka \"%file%\" je izmjenjena drugom aplikacijom, ponovno je učitati?
+Lines:	Statistics		Linije:
+Replace in all windows	FindandReplaceWindow		Zamjeni u svim prozorima
+Save	SaveAlert		Spremi
+Default	Open_and_SaveAsPanel		Zadano
+Cancel	RevertToSavedAlert		Otkaži
+Cancel	FindandReplaceWindow		Otkaži
+Statistics…	Menus		Statistike...
+Encoding	Open_and_SaveAsPanel		Enkodiranje
+Replace all	FindandReplaceWindow		Zamjeni sve
+Close	Menus		Zatvori
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Greška pri učitavanju \"%s\":\n\tNepodržani format
+Left	Menus		Lijevo
+Default	Menus		Zadano
+OK	SaveAlert		U redu
+Color	Menus		Boja
+Save changes to the document \"%s\"? 	QuitAlert		Spremi izmjene u dokument \"%s\"? 
+StyledEdit	System name		StyleEdit
+Find:	FindandReplaceWindow		Pronađi:
+Error loading \"%s\":\n\t%s	LoadAlert		Greška pri učitavanju \"%s\":\n\t%s
+Don't save	SaveAlert		Nemoj spremiti
+Reload…	Menus		Ponovno učitaj…
+Print…	Menus		Ispis...
+Quit	Menus		Izađi
+Ignore	NodeMonitorAlerts		Ignoriraj
+Modified	StatusView		Izmjenjeno
+OK	LoadAlert		U redu
+Save	QuitAlert		Spremi
+Case-sensitive	FindandReplaceWindow		Osjetljivo na veličinu slova
+Find selection	Menus		Nađi označeno
+Cancel	SaveAlert		Otkaži
+Find…	Menus		Pronađi...
+Revert	RevertToSavedAlert		Obrnuto
+Decrease size	Menus		Smanji veličinu
+Size	Menus		Veličina
+Replace next	Menus		Zamijeni slijedeće
+OK	QuitAlert		U redu
+Replace with:	FindandReplaceWindow		Zamjeni sa:
+Edit	Menus		Uredi
+Open…	Menus		Otvori...
+Save as…	Menus		Spremi kao...
+Replace	FindandReplaceWindow		Zamijeni
+Characters:	Statistics		Znakovi:
+Don't save	QuitAlert		Nemoj spremiti
+Align	Menus		Poredaj
+Font	Menus		Font
+Select all	Menus		Odaberi sve
+Right	Menus		Desno

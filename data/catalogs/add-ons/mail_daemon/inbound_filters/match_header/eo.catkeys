@@ -1,0 +1,17 @@
+1	esperanto	x-vnd.Haiku-MatchHeader	1946584206
+Delete message	ConfigView		Forigi mesaĝon
+Match \"%attribute\" against \"%regex\"	RuleFilter		Kongrua \"%attribute\" per \"%regex\"
+Match header	RuleFilter		Kongrua kapo
+Set flags to	ConfigView		Atribui flagojn al
+Header field (e.g. Subject, From, …)	ConfigView		Mesaĝkapo (ekz. Subjekto, Sendinto, …)
+<Choose account>	ConfigView		<Elekti konton>
+Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Ajnsigna valoro kiel \"*spam*\".\nAnstataŭigi \"REGEX:\" por uzi regulajn esprimojn.
+Then	ConfigView		Do
+If	ConfigView		Se
+Set as read	ConfigView		Marki kiel legita
+Reply with	ConfigView		Respondi per
+<Choose action>	ConfigView		<Elekti agon>
+Move to	ConfigView		Movi al
+this field is based on the action	ConfigView		ĉi tiu kampo estas bazita sur la ago
+Account	ConfigView		Konto
+has	ConfigView		havas

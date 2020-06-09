@@ -4,7 +4,7 @@ bits/pixel	Screen		бита на пиксель
 15 bits/pixel, 32768 colors	Screen		15 бит на пиксель, 32768 цветов
 Rows:	Screen		Ряды:
 %.1f Hz	Screen		%.1f Гц
-The screen mode could not be set:\n\t%s\n	Screen		Не возможно установить этот режим:\n\t%s\n
+The screen mode could not be set:\n\t%s\n	Screen		Невозможно установить этот режим:\n\t%s\n
 Keep	Screen		Сохранить
 /other…	Screen		/другое…
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Горизонтальная частота:\t%lu - %lu кГц\nВертикальная частота:\t\t%lu - %lu Гц\n\nЧастота пикселизации:\t\t%g MГц

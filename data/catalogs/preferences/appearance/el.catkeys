@@ -1,0 +1,79 @@
+1	greek, modern (1453-)	x-vnd.Haiku-Appearance	663472720
+Control border	Colors tab		Περίγραμμα στοιχείων ελέγχου
+Control mark	Colors tab		Επισήμανση στοιχείων ελέγχου
+Off	AntialiasingSettingsView		Κλειστό
+Window border	Colors tab		Περίγραμμα παραθύρου
+Inactive window tab	Colors tab		Αδρανές παράθυρο καρτέλας
+Defaults	APRWindow		Προεπιλογές
+Shadow	Colors tab		Σκιά
+Document background	Colors tab		Φόντο εγγράφου
+List background	Colors tab		Φόντο λίστας αντικειμένων
+No effect on running applications	DecorSettingsView		Δεν θα επηρεαστούν εφαρμογές που εκτελούνται αυτήν την στιγμή
+Fixed font:	Font view		Γραμματοσειρά σταθερού πλάτους:
+Appearance	System name		Εμφάνιση
+Reduce colored edges filter strength:	AntialiasingSettingsView		Φίλτρο μείωσης έντασης χρωματισμένων άκρων:
+Glyph hinting:	AntialiasingSettingsView		Υπόδειξη γραμματοσειράς:
+Default Haiku ControlLook	DecorSettingsView		Προεπιλογή εμφάνισης στοιχείων ελέγχου Haiku
+Menu item text	Colors tab		Κείμενο μενού
+About decorator	DecorSettingsView		Σχετικά με το περίβλημα
+Antialiasing menu	AntialiasingSettingsView		Εξομάλυνση
+Success	Colors tab		Επιτυχία
+About	DecorSettingsView		Σχετικά
+Shine	Colors tab		Λάμψη
+Arrow style	DecorSettingsView		Στυλ βελών
+On	AntialiasingSettingsView		Ανοικτό
+Decorator:	DecorSettingsView		Περίβλημα παραθύρου:
+Menu background	Colors tab		Φόντο μενού
+Revert	APRWindow		Επαναφορά
+List item text	Colors tab		Κείμενο αντικειμένου λίστας
+OK	DecorSettingsView		Εντάξει
+Control text	Colors tab		Κείμενο κουμπιού ελέγχου
+Look and feel	APRWindow		Αισθητική
+Selected menu item background	Colors tab		Φόντο επιλεγμένου αντικειμένου μενού
+Link active	Colors tab		Ενεργός υπερσύνδεσμος
+Antialiasing	APRWindow		Εξομάλυνση
+Menu font:	Font view		Γραμματοσειρά μενού:
+Bold font:	Font view		Έντονη γραμματοσειρά:
+%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nΔημιουργοί:\n\t%decorAuthors\n\nΙστοσελίδα: %decorURL\nΆδεια χρήσης: %decorLic\n\n%decorDesc\n
+Choose Decorator	DecorSettingsView		Επιλέξετε Περίβλημα
+Strong	AntialiasingSettingsView		Ισχυρό
+Failure	Colors tab		Αποτυχία
+Double:	DecorSettingsView		Με δύο κουμπιά σε κάθε άκρη:
+Selected menu item text	Colors tab		Επιλεγμένο κείμενο μενού
+Size:	Font Selection view		Μέγεθος:
+Panel background	Colors tab		Φόντο πάνελ
+Plain font:	Font view		Απλή γραμματοσειρά:
+Window tab text	Colors tab		Κείμενο καρτέλας παράθυρου
+Navigation pulse	Colors tab		Παλμός πλοήγησης
+LCD subpixel	AntialiasingSettingsView		Υπο-εικονοστοιχείο LCD
+Window tab	Colors tab		Καρτέλα παράθυρου
+Link text	Colors tab		Κείμενο υπερσυνδέσμου
+Tooltip background	Colors tab		Φόντο αναδυόμενης συμβουλής
+ControlLook:	DecorSettingsView		Στοιχεία Ελέγχου:
+Scroll bar thumb	Colors tab		Λαβή γραμμής κύλισης
+Default	DecorSettingsView		Προεπιλογή
+Link visited	Colors tab		Υπερσύνδεσμος με επίσκεψη
+Selected menu item border	Colors tab		Περίγραμμα επιλεγμένου μενού
+Tooltip text	Colors tab		Κείμενο αναδυόμενης συμβουλής
+Control background	Colors tab		Φόντο στοιχείων ελέγχου
+Selected list item text	Colors tab		Επιλεγμένο κείμενο αντικειμένου λίστας
+Selected list item background	Colors tab		Επιλεγμένο κείμενο αντικειμένου φόντου
+Inactive window tab text	Colors tab		Κείμενο της αδρανής καρτέλας παράθυρου
+Navigation base	Colors tab		Βάση πλοήγησης
+Fonts	APRWindow		Γραμματοσειρές
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Ο καλύμνιος σφουγγαράς ψιθύρησε πως θα βουτήξει χωρίς να διστάζει.
+Grayscale	AntialiasingSettingsView		Κλίμακα του γκρι
+Antialiasing type:	AntialiasingSettingsView		Τύπος εξομάλυνσης:
+Panel text	Colors tab		Κείμενο πάνελ
+Hinting menu	AntialiasingSettingsView		Μενού υποδείξεων
+Scroll bar:	DecorSettingsView		Γραμμή κύλισης:
+Choose ControlLook	DecorSettingsView		Επιλέξτε την εμφάνιση των στοιχείων ελέγχου
+Monospaced fonts only	AntialiasingSettingsView		Μόνο σταθερές γραμματοσειρές
+Document text	Colors tab		Κείμενο εγγράφου
+Inactive window border	Colors tab		Ανενεργό περιθώριο παραθύρου
+Colors	APRWindow		Χρώματα
+About control look	DecorSettingsView		Σχετικά με την εμφάνιση στοιχείων ελέγχου
+Control highlight	Colors tab		Υπογράμμιση στοιχείων ελέγχου
+Status bar	Colors tab		Γραμμή κατάστασης
+Link hover	Colors tab		Πέρασμα υπερσυνδέσμου
+Single:	DecorSettingsView		Με ένα κουμπί σε κάθε άκρη:

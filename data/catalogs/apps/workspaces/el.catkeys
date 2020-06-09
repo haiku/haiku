@@ -1,0 +1,13 @@
+1	greek, modern (1453-)	x-vnd.Be-WORK	3927737357
+Quit	Workspaces		Έξοδος
+Invalid argument: %s\n	Workspaces		Μη έγκυρο όρισμα: %s\n
+Change workspace count…	Workspaces		Αλλαγή πλήθους χώρων εργασίας…
+Always on top	Workspaces		Πάντα στην κορυφή
+Show window border	Workspaces		Εμφάνιση περιγράμματος παραθύρου
+Show window tab	Workspaces		Εμφάνιση καρτέλας παραθύρου
+Auto-raise	Workspaces		Αυτόματη ανύψωση
+Remove replicant	Workspaces		Αφαίρεση ρέπλικας
+Live in the Deskbar	Workspaces		Παραμονή στην Γραμμή Εργασιών
+Usage: %s [options] [workspace]\nwhere \"options\" are:\n  --notitle\t\ttitle bar removed, border and resize kept\n  --noborder\t\ttitle, border, and resize removed\n  --avoidfocus\t\tprevents the window from being the target of keyboard events\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when it's at the screen edge\n  --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n	Workspaces		Χρήση: %s [ρυθμίσεις] [χώρος εργασίας]\nόπου οι \"ρυθμίσεις\" είναι:\n  --notitle\t\tη μπάρα τίτλου αφαιρείται, το πεδίο και το μέγεθος παραμένουν\n  --noborder\t\tο τίτλος, το πεδίο και το μέγεθος αφαιρούνται\n  --avoidfocus\t\tαποτρέπει το παράθυρο από το να γίνεται στόχος πατημάτων του πληκτρολογίου\n  --alwaysontop\t\tκρατά το παράθυρο στην κορυφή\n  --notmovable\t\tτο παράθυρο δε μπορεί να μετακινηθεί\n  --autoraise\t\tαυτόματη ανύψωση του παραθύρου του χώρου εργασίας όταν είναι στην άκρη της οθόνης\n  --help\t\tεμφάνιση μηνύματος βοήθειας και έξοδος\nκαι \"χώρος εργασίας\" είναι ο αριθμός του χώρου εργασίας στον οποίο γίνεται η μετάβαση (0-31)\n
+Switch on mouse wheel	Workspaces		Ενεργοποίηση τροχού ποντικιού
+Workspaces	System name		Workspaces

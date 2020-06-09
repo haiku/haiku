@@ -1,35 +1,53 @@
-1	dutch; flemish	x-vnd.Haiku-Network	2195710068
+1	dutch; flemish	x-vnd.Haiku-Network	2923905377
 Ethernet device	InterfaceListItem		Ethernet-apparaat
 Link speed:	IntefaceView		Verbindingssnelheid:
 disconnected	IntefaceView		niet verbonden
 IP Address:	IntefaceAddressView		IP-adres:
+WPA	WPA protected network		WPA
 Network:	IntefaceView		Netwerk:
 Received:	IntefaceView		Ontvangen:
 New…	NetworkWindow		Nieuw…
 no link	InterfaceListItem		geen verbinding
+Other	NetworkWindow		Andere
 Sent:	IntefaceView		Verzonden:
+Gateway:	IntefaceAddressView		Gateway:
 The netmask defines your local network	IntefaceAddressView		Het netwerkmasker bepaalt uw lokale netwerk
 Your IP address	IntefaceAddressView		Uw IP-adres
+DHCP	IntefaceAddressView		DHCP
 Netmask:	IntefaceAddressView		Netwerkmasker:
+EAP	EAP protected network		EAP
 Services	NetworkWindow		Diensten
 Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Installatie van NetwerkStatus in Deskbar mislukt: %s
 Revert	NetworkWindow		Herstellen
+off	ServiceListItem		uit
+WEP	WEP protected network		WEP
 <no wireless networks found>	IntefaceView		<geen draadloze netwerken gevonden>
+Enable	IntefaceView		Inschakelen
 connected	IntefaceView		verbonden
 Apply	IntefaceAddressView		Toepassen
 Disable	ServiceView		Uitschakelen
+WPA2	WPA2 protected network		WPA2
 Show network status in Deskbar	NetworkWindow		Toon netwerkstatus in Deskbar
 Mode:	IntefaceAddressView		Modus:
 connected	InterfaceListItem		verbonden
+OK	NetworkWindow		Okee
 Static	IntefaceAddressView		Statisch
+launch error	NetworkWindow		opstartfout
 Renegotiate	IntefaceView		Heronderhandelen
 MAC address:	IntefaceView		MAC-adres:
+%name% (%authenticationMode%)	WirelessNetworkMenuItem		%naam% (%authenticationMode%)
 disabled	InterfaceListItem		uitgeschakeld
 Dial-up connection	InterfaceListItem		Inbelverbinding
+on	ServiceListItem		aan
 The method for obtaining an IP address	IntefaceAddressView		De wijze voor het verkrijgen van een IP-adres
+disconnected	InterfaceListItem		niet verbonden
 Automatic	IntefaceAddressView		Automatisch
+Choose automatically	IntefaceView		Automatisch kiezen
+Status:	IntefaceView		Status:
 Disable	IntefaceView		Uitschakelen
 Manage…	NetworkWindow		Beheren…
+open	Open network		open
+Network	System name		Netwerk
 Your gateway to the internet	IntefaceAddressView		Uw gateway naar het internet
 Enable	ServiceView		Inschakelen
 Wireless device	InterfaceListItem		Draadloos apparaat

@@ -1,13 +1,13 @@
 1	spanish; castilian	x-vnd.Haiku-SGITranslator	129108011
 SGI images	SGITranslator		Imágenes SGI
 Use compression:	SGIView		Usar compresión: 
-SGI image translator	SGIView		Traductor de imagen SGI
+SGI image translator	SGIView		Intérprete de imagen SGI
 SGI image	SGITranslator		imagen SGI
-SGITranslator Settings	SGITranslator		Configuración SGITranslator
+SGITranslator Settings	SGITranslator		Configuración del Intérprete SGI
 SGI Settings	SGIMain		Configuración SGI
-SGI image translator	SGITranslator		Traductor de imagen SGI
+SGI image translator	SGITranslator		Intérprete de imagen SGI
 None	SGIView		Ninguno
 Version %d.%d.%d, %s	SGIView		Versión %d.%d.%d, %s
-\nbased on GIMP SGI plugin v1.5:\n	SGIView		\nbasado en el plugin SGI v1.5 de GIMP:\n
+\nbased on GIMP SGI plugin v1.5:\n	SGIView		\nbasado en el complemento SGI v1.5 de GIMP:\n
 RLE	SGIView		RLE
 written by:\n	SGIView		escrito por:\n

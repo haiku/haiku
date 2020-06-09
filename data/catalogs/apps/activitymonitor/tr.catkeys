@@ -1,47 +1,46 @@
-1	turkish	x-vnd.Haiku-ActivityMonitor	1155619009
-P-faults	DataSource		Olasılık hataları
-Media nodes	DataSource		Ortam uçları
-Threads	DataSource		İş parçacıkları
-Always on top	ActivityWindow		Her zaman üstte
-Add graph	ActivityWindow		Grafik ekle
+1	turkish	x-vnd.Haiku-ActivityMonitor	3672498538
 Teams	DataSource		Takımlar
+Semaphores	DataSource		Semaforlar
+TX	DataSource	Shorter version for Sending	TX
+Block cache memory	DataSource		Blok önbellek dosyası
+%lld ms	SettingsWindow		%lld ms
 MiB	DataSource		MiB
-Network send	DataSource		Ağ göndermeleri
-CPU usage (combined)	DataSource		CPU kullanımı (birleştirilmiş)
-CPU	DataSource		CPU
-Used memory	DataSource		Kullanılan bellek
-Cached memory	DataSource		Önbellekteki dosya
-Apps	DataSource		Uygulamalar
-Show legend	ActivityView		Göstergeleri aç
+Media nodes	DataSource		Ortam uçları
 Text clipboard	DataSource		Metin panosu
-Settings	ActivityWindow		Ayarlar
+Network send	DataSource		Ağ göndermeleri
+Running applications	DataSource		Çalışan uygulamalar
+Cache	DataSource		Önbellek
+CPU usage (combined)	DataSource		CPU kullanımı (birleştirilmiş)
+Threads	DataSource		İş parçacıkları
 Receiving	DataSource		Alınıyor
+Remove graph	ActivityView		Grafiği kaldır
+Swap space	DataSource		Takas alanı
+CPU	DataSource		CPU
+ActivityMonitor	System name		Etkinlik Monitörü
+Update time interval:	SettingsWindow		Yenileme aralığı:
+RX	DataSource	Shorter version for Receiving.	RX
 Settings…	ActivityWindow		Ayarlar…
+Block cache	DataSource		Blok önbelleği
+Memory	DataSource		Bellek
+CPU usage	DataSource		CPU kullanımı
+Quit	ActivityWindow		Çık
+Raw clipboard	DataSource		Ham pano
+Settings	ActivityWindow		Ayarlar
+Used memory	DataSource		Kullanılan bellek
+%.1f faults/s	DataSource		%.1f hata/s
+Show legend	ActivityView		Göstergeleri aç
+Cached memory	DataSource		Önbellekteki dosya
+File	ActivityWindow		Dosya
 Ports	DataSource		Portlar
 Page faults	DataSource		Sayfa hataları
-Sending	DataSource		Gönderiliyor
-Cache	DataSource		Önbellek
-%.1f faults/s	DataSource		%.1f hata/s
-Update time interval:	SettingsWindow		Yenileme aralığı:
-TX	DataSource	Shorter version for Sending	TX
-Quit	ActivityWindow		Çık
-Block cache memory	DataSource		Blok önbellek dosyası
-Remove graph	ActivityView		Grafiği kaldır
-%lld sec.	SettingsWindow		%lld san.
-%lld ms	SettingsWindow		%lld ms
-CPU usage	DataSource		CPU kullanımı
-Raw clipboard	DataSource		Ham pano
-Sems	DataSource		Semler
-%.1f MiB	DataSource		%.1f MiB
-ActivityMonitor	System name		Etkinlik Monitörü
-Running applications	DataSource		Çalışan uygulamalar
-Semaphores	DataSource		Semaforlar
-Block cache	DataSource		Blok önbelleği
-Swap space	DataSource		Takas alanı
-Swap	DataSource		Takas
-File	ActivityWindow		Dosya
-usage	DataSource		kullanım
+Apps	DataSource		Uygulamalar
 Additional items	ActivityView		Ek ögeler
+Add graph	ActivityWindow		Grafik ekle
+Sending	DataSource		Gönderiliyor
+%.1f MiB	DataSource		%.1f MiB
+Always on top	ActivityWindow		Her zaman üstte
+Swap	DataSource		Takas
+%lld sec.	SettingsWindow		%lld san.
+P-faults	DataSource		Olasılık hataları
+Sems	DataSource		Semler
 Network receive	DataSource		Ağ gelen trafik
-Memory	DataSource		Bellek
-RX	DataSource	Shorter version for Receiving.	RX

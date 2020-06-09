@@ -7,7 +7,7 @@ Nothing to play	RecorderWindow		Нечего играть
 None of the files appear to be audio files.	RecorderWindow		Ни один из этих файлов не является звуковым файлом.
 Duration: 	RecorderWindow		Продолжительность: 
 File info	RecorderWindow		Информация о файле:
-Drop files here	SoundListView		Перенесите сюда файлы
+Drop files here	SoundListView		Перетащите сюда файлы
 Input	RecorderWindow		Вход
 Some of the files don't appear to be audio files.	RecorderWindow		Некоторые из этих файлов не являются звуковым файлами.
 Stop	RecorderWindow		Остановить

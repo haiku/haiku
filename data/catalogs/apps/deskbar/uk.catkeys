@@ -22,7 +22,7 @@ Always on top	PreferencesWindow		Завжди зверху
 Show all	WindowMenu		Показати все
 No windows	WindowMenu		Немає вікон
 Deskbar	System name		Deskbar
-Restart system	DeskbarMenu		Перезагрузити систему
+Restart system	DeskbarMenu		Перезапуск системи
 Large	PreferencesWindow		Великі
 Auto-raise	PreferencesWindow		Авто-випливати
 Recent folders:	PreferencesWindow		Недавні папки:

@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Installer	1520226307
+1	slovak	x-vnd.Haiku-Installer	862185430
 Performing installation.	InstallProgress		Prebieha inštalácia.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Zvoľte zdrojový disk z roletového menu. Potom kliknite na „Začať“.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Prosím, zatvorte okno Nastavenie diskových oblastí pred zatvorením okna Inštalátora.
@@ -29,9 +29,7 @@ Write boot sector	InstallerWindow		Zapísať zavádzací sektor
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld z %2ld
 Install from:	InstallerWindow		Inštalovať z:
 Additional disk space required: 0.0 KiB	InstallerWindow		Je potrebných ešte 0.0 KiB miesta.
-3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3) Keď prvýkrát úspešne naštartujete Haiku, uistite sa, že si prečítate našu dokumentáciu „Vitajte“ a „Používateľská príručka“. Nájdete ich v záložkách na Ploche a vo WebPositive.\n\n
 ???	InstallerWindow	Unknown currently copied item	???
-Install anyway	InstallProgress		Inštalovať napriek tomu
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Zvoľte zdrojový a cieľový disk z roletových menu. Potom kliknite na „Začať“.
 Hide optional packages	InstallerWindow		Skryť voliteľné balíky
 ???	InstallerWindow	Unknown partition name	???
@@ -52,7 +50,6 @@ Collecting copy information.	InstallProgress		Zhromažďujú sa informácie o ko
 Show optional packages	InstallerWindow		Zobraziť voliteľné balíky
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Cieľový disk nemusí mať dostatok miesta. Skúste zvoliť iný disk alebo zvoľte neinštalovať voliteľné položky.
 Installation canceled.	InstallProgress		Inštalácia zrušená.
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Cieľový zväzok nie je prázdny. Ste si istý, že napriek tomu chcete pokračovať v inštalácii?\n\nPozn.: Priečinok „system“ bude čistou kópiou zo zdrojového zväzku, ale zachová si priečinok nastavení, všetky ostatné priečinky budú zlúčené, zatiaľ čo súbory a odkazy existujúce zároveň na zdrojovom aj cieľovom zväzku budú prepísané verziou zo zdrojového zväzku.
 OK	InstallerApp		OK
 Are you sure you want to abort the installation?	InstallerWindow		Ste si istí, že chcete prerušiť inštaláciu?
 Stop	InstallerWindow		Zastaviť

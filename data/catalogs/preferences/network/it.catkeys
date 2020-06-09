@@ -17,7 +17,7 @@ DHCP	IntefaceAddressView		DHCP
 Netmask:	IntefaceAddressView		Netmask:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Servizi
-Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Installazione di Stato rete nella Deskbar fallita: %s
+Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Installazione di Stato Rete nella Deskbar fallita: %s
 Revert	NetworkWindow		Ripristina
 off	ServiceListItem		disattivato
 WEP	WEP protected network		WEP
@@ -38,7 +38,7 @@ MAC address:	IntefaceView		Indirizzo MAC:
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
 disabled	InterfaceListItem		disabilitato
 Dial-up connection	InterfaceListItem		Connessione Dial-up
-on	ServiceListItem		attivata
+on	ServiceListItem		attivato
 The method for obtaining an IP address	IntefaceAddressView		Modalità di assegnazione indirizzo IP
 disconnected	InterfaceListItem		disconnesso
 Automatic	IntefaceAddressView		Automatico

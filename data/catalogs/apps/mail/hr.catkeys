@@ -1,0 +1,131 @@
+1	croatian	x-vnd.Be-MAIL	396150332
+Show icons & labels	Mail		Pokaži ikone & natpise
+(Date unavailable)	Mail		(Datum je nedostupan)
+Reply	Mail		Odgovori
+Next message	Mail		Sljedeća poruka
+Unread	Mail		Nepročitano
+Same sender	Mail		Isti pošiljatelj
+Copy to new	Mail		Kopiraj u novi
+Save as draft	Mail		Spremi kao skicu
+Print	Mail		Ispis
+Default account:	Mail		Zadani račun:
+Message	Mail		Poruka
+Bcc:	Mail		Bcc:
+New	Mail		Novi
+Save	Mail		Spremi
+%e wrote:\\n	Mail		%e napisao:\\n
+Save changes to this signature?	Mail		Spremiti promjene za ovaj potpis?
+Save attachment…	Mail		Spremi privitak...
+Paste	Mail		Zalijepi
+E-mail draft could not be saved!	Mail		Nacrt e-pošte ne može biti spremljen!
+Don't send	Mail		Ne šalji
+sent	B_USER_DIRECTORY/mail/sent		poslano
+Only files can be added as attachments.	Mail		Samo datoteke mogu biti dodane kao privici.
+Close	Mail		Zatvori
+Untitled	Mail		Bez naslova
+Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Uklanjanje privitaka sa proslijeđene pošte još nije primijenjeno.\nJoš uvijek neće raditi pravilno.
+Same recipient	Mail		Isti primatelj
+Previous message	Mail		Prethodna poruka
+(Address unavailable)	Mail		(Adresa nedostupna)
+Mail	System name		Pošta
+Copy link location	Mail		Kopiraj lokaciju poveznice
+Attachments: 	Mail		Privici: 
+Next	Mail		Slijedeće
+Attachments:	Mail		Privici:
+Show icons only	Mail		Pokaži samo ikone
+Subject:	Mail		Naslov:
+OK	Mail		U redu
+UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
+Quit	Mail		Završi
+Title:	Mail		Naslov:
+Account from mail	Mail		Račun sa maila
+%e - E-mail address	Mail		%e - Adresa e-pošte
+Cc:	Mail		Cc:
+No matches	Mail		Nema podudaranja
+Cut	Mail		Izreži
+Reply to sender	Mail		Odgovori pošiljatelju
+\\n - Newline	Mail		\\n - Novi redak
+Copy	Mail		Kopiraj
+Add signature	Mail		Dodaj potpis
+%n - Full name	Mail		%n - Puno ime
+Signature	Mail		Potpis
+Use default account	Mail		Koristi zadani račun
+draft	B_USER_DIRECTORY/mail/draft		nacrt
+spam	B_USER_DIRECTORY/mail/spam		neželjena poruka
+Reply to all	Mail		Odgovori svima
+Cancel	Mail		Otkaži
+Set to %s	Mail		Postavi na: %s
+Signature:	Mail		Potpis:
+Forward without attachments	Mail		Proslijedi bez privitaka
+View	Mail		Pogled
+Signatures	Mail		Potpisi
+Find	Mail		Nađi
+Date:	Mail		Datum:
+Expert	Mail		Ekspert
+Automatically mark mail as read:	Mail		Automatski označi mail kao pročitan:
+Close and 	Mail		Zatvori i 
+Colored quotes:	Mail		Obojani navodi:
+Automatic	Mail		Automatski
+Open this link	Mail		Otvori ovu poveznicu
+Same subject	Mail		Isti naslov
+Send	Mail		Pošalji
+Open draft	Mail		Otvori nacrt
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Ostavi kao 'Novo'
+Random	Mail		Nasumično
+Find again	Mail		Nađi ponovo
+Size:	Mail		Veličina:
+To:	Mail		Za:
+<no account found>	Mail		<nijedan račun nije nađen>
+Mail couldn't find its dictionary.	Mail		Pošta ne može naći svoj rječnik.
+Mail preferences	Mail		Osobitosti pošte
+helpful message	Mail		korisna poruka
+ Read 	Mail		 Čitaj 
+Font:	Mail		Font:
+Accounts…	Mail		Računi...
+Previous	Mail		Prethodna
+Start now	Mail		Počni sada
+(Name unavailable)	Mail		(Ime nije dostupno)
+Move to trash	Mail		Premjesti u smeće
+<none>	Mail		<nijedan>
+%d - Date	Mail		%d - Datum
+Check spelling	Mail		Provjeri pravopis
+Leave as '%s'	Mail		Ostavi kao '%s'
+Print…	Mail		Ispis...
+Settings…	Mail		Postavke...
+Trash	Mail		Smeće
+Show raw message	Mail		Pokaži sirovu poruku
+Find…	Mail		Nađi...
+Select all	Mail		Odaberi sve
+Show header	Mail		Pokaži zaglavlje
+Sorry	Mail		Oprostite
+Forward	Mail		Proslijedi
+Open attachment	Mail		Otvori privitak
+mail	B_USER_DIRECTORY/mail		pošta
+Save this message as a draft before closing?	Mail		Spremiti poruku kao skicu prije zatvaranja?
+None	Mail		NIjedan
+Resend	Mail		Ponovno pošalji
+Hide	Mail		Sakrij
+From:	Mail		Od:
+Add	Mail		Dodaj
+Send this message before closing?	Mail		Poslati ovu poruku prije zatvaranja?
+in	B_USER_DIRECTORY/mail/in		u
+Open	Mail		Otvori
+Don't save	Mail		Nemoj spremiti
+Leave same	Mail		Ostavi isto
+An error occurred trying to save the attachment.	Mail		Došlo je do greške pri spremanju privitka.
+Save address	Mail		Spremi adresu
+Initial spell check mode:	Mail		Početni način rada provjere pravopisa:
+File	Mail		Datoteka
+New mail message	Mail		Nova mail poruka
+An error occurred trying to open this signature.	Mail		Došlo je do greške pri pokušaju otvaranja ovoga potpisa.
+User interface	Mail		Korisničko sučelje
+Remove attachment	Mail		Ukloni privitak
+Set to…	Mail		Postavi na...
+Edit	Mail		Uredi
+An error occurred trying to save this signature.	Mail		Došlo je do greške pri pokušaju spremanja ovoga potpisa.
+Beginner	Mail		Početnik
+Send message	Mail		Pošalji poruku
+Delete	Mail		Izbriši
+Spam	Mail		Neželjena poruka
+Revert	Mail		Obrnuto
+Unknown	Mail		Nepoznato

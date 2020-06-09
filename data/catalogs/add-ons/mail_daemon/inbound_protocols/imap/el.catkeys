@@ -1,0 +1,15 @@
+1	greek, modern (1453-)	x-vnd.Haiku-IMAP	1343128980
+Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Δεν ήταν δυνατή η σύνδεση με τον διακομιστή \"%server%\":\n%error%
+Updating subscriptions to IMAP folders, please be patient…	IMAPFolderConfig		Γίνεται ενημέρωση εγγραφών σε φακέλους IMAP, παρακαλώ περιμένετε…
+Failed to fetch available storage.	IMAPFolderConfig		Το κατέβασμα επιπλέον χωρητικότητας απέτυχε.
+Cancel	IMAPFolderConfig		Άκυρο
+OK	IMAPFolderConfig		Εντάξει
+Server storage: %s / %s used.	IMAPFolderConfig		Χώρος διακομιστή: %s / %s σε χρήση.
+No encryption	imap_config		Χωρίς κρυπτογράφηση
+Fetching IMAP folders, please be patient…	IMAPFolderConfig		Γίνεται ανανέωση φακέλων IMAP, παρακαλώ περιμένετε…
+Configure IMAP Folders	imap_config		Ρύθμιση φακέλων IMAP
+SSL	imap_config		SSL
+Apply	IMAPFolderConfig		Εφαρμογή
+status	IMAPFolderConfig		κατάσταση
+IMAP Folders	IMAPFolderConfig		Φάκελοι IMAP
+Destination:	imap_config		Προορισμός:

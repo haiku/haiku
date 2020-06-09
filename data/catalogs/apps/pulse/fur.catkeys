@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-Pulse	139895817
+1	friulian	x-vnd.Haiku-Pulse	559379362
 Normal mode	DeskbarPulseView		Modalitât normâl
 Info	CPUButton		Informazions
 Quit	DeskbarPulseView		Jes
@@ -16,6 +16,7 @@ Fade colors	ConfigView		Colôrs sfantâts
 About Pulse…	PulseView		Informazions su Pulse…
 Pulse	NormalPulseView		Pulse
 Deskbar mode	NormalPulseView		Modalitât Deskbar
+Pulse settings	PulseApp		Impostazions di Pulse
 Remove replicant	CPUButton		Gjave replicant
 You can't disable the last active CPU.	PulseView		No si pues disabilitâ l'ultime CPU ative.
 Width of icon:	ConfigView		Largjece de icone:
@@ -45,4 +46,3 @@ Active color	ConfigView		Colôr atîf
 Installing in Deskbar failed\n%s	PulseApp		Instalazion tal Deskbar falide.\n%s
 Idle color	ConfigView		Colôr inativitât
 Normal mode	PrefsWindow		Modalitât normâl
-Pulse settings	PulseWindow		Impostazions di Pulse

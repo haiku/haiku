@@ -3,10 +3,10 @@
 All Rights Reserved.	AboutWindow		Всі права захищені.
 gold master	AboutWindow		золотий майстер
 Undo	TextView		Відмінити
+OK	PrintJob		ОК
 gamma	AboutWindow		гамма
 development	AboutWindow		розробка
 OK	Dragger		ОК
-OK	PrintJob		ОК
 Print Server is not responding.	PrintJob		Принт-сервер недоступний.
 About %app%	AboutMenuItem		Про %app%
 Warning	Dragger		Попередження
@@ -23,7 +23,7 @@ Paste	TextView		Вставити
 OK	AboutWindow		ОК
 Special Thanks:	AboutWindow		Особлива подяка:
 %.2f TiB	StringForSize		%.2f ТБ
-Remove replicant	Dragger		Вилучити реплікант
+Remove replicant	Dragger		Прибрати реплікант
 Version	AboutWindow		Версія
 Red:	ColorControl		Червоний:
 <empty>	Menu		<пусто>

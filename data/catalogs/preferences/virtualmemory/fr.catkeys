@@ -5,7 +5,7 @@ OK	VirtualMemoryApp		OK
 Use volume:	SettingsWindow		Utiliser le volume :
 Turn off	SettingsWindow		Désactiver
 Changes will take effect upon reboot.	SettingsWindow		Les changements seront pris en compte au redémarrage.
-Revert	SettingsWindow		Défaire
+Revert	SettingsWindow		Rétablir
 Keep enabled	SettingsWindow		Laisser actif
 The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		Les paramètres spécifiés dans le fichier de paramètres ne sont pas valides. Vous pouvez charger les valeurs par défaut ou quitter.
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		Mémoire Virtuelle\n\tÉcrit par Axel Dörfler\n\tCopyright 2005, Haiku.\n

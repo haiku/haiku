@@ -40,7 +40,7 @@ A reboot is necessary to complete the update process.	UpdateManager		Güncelleme
 Exception occurred while checking for updates: %s\n	CheckAction		Güncellemeler denetlenirken kural dışı durum oluştu: %s\n
 Packages are being updated	UpdateManager		Paketler güncelleniyor
 Cancel	SoftwareUpdaterWindow		İptal
-Don't quit	SoftwareUpdaterWindow		Çıkma!
+Don't quit	SoftwareUpdaterWindow		Çıkma
 Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Yazılım Güncelleyici'yi çalıştırmak için buraya tıklayın. Bazı güncellemeler bir sorun çözümünün seçilmesini gerektirecektir.
 Checking for updates	SoftwareUpdaterWindow		Güncellemeler denetleniyor
 Updates completed	UpdateManager		Güncellemeler tamamlandı

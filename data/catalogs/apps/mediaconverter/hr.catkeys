@@ -1,0 +1,52 @@
+1	croatian	x-vnd.Haiku-MediaConverter	2664027747
+Writing audio track: %d%% complete	MediaConverter		Zapisujem audio zapis: %d%% završeno
+Input file not recognized as Audio or Video	MediaConverter		Datoteka unosa nije prepoznata kao Audio ili Video
+%u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
+Video quality: %3d%%	MediaConverter		Video kvaliteta: %3d%%
+Source files	MediaConverter		Izvorne datoteke
+Audio:	MediaConverter-FileInfo		Audio:
+Error creating video.	MediaConverter		Greška pri stvaranju videa.
+Cancelling	MediaConverter		Otkazujem
+None available	Audio codecs		Nijedan nije doatupan
+No file selected	MediaConverter-FileInfo		Nije odabrana ni jedna datoteka
+High	MediaConverter		Visok
+File Error	MediaConverter-FileInfo		Greška datoteke
+None available	Video codecs		Nijedan nije dostupan
+Output format	MediaConverter		Izlazni format
+%.1f kHz mono	MediaFileInfo		%.1f kHz mono
+%.1f kHz stereo	MediaFileInfo		%.1f kHz stereo
+OK	MediaConverter		U redu
+Error creating '%filename'	MediaConverter		Greška pri stvaranju '%filename'
+Error loading a file	MediaConverter		Greška pri učitavanju datoteke
+Open…	Menu		Otvori...
+Audio quality: %3d%%	MediaConverter		Audio kvaliteta: %3d%%
+Cancelling…	MediaConverter		Otkazujem...
+Output file '%filename' created	MediaConverter		Izlazna datoteka '%filename' napravljena
+Output folder	MediaConverter		Izlazna mapa
+Error creating track.	MediaConverter		Greška pri stvaranju zapisa.
+ seconds	MediaFileInfo		 sekundi
+Video:	MediaConverter-FileInfo		Video:
+Select	MediaConverter		Odaberi
+Low	MediaConverter		Nizak
+Error loading files	MediaConverter		Greška pri učitavanju datoteka
+End   [ms]: 	MediaConverter		Kraj [ms]: 
+Cancel	MediaConverter		Otkaži
+OK	MediaConverter-FileInfo		U redu
+An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Došlo je do greške prilikom čitanja informacije o datoteci.\n\nGreška : 
+Error	MediaConverter		Greška
+File details	MediaConverter		Pojedinosti datoteke
+Drop media files onto this window	MediaConverter		Spustite medijske datoteke u ovaj prozor
+Quit	Menu		Izađi
+Duration:	MediaConverter-FileInfo		Trajanje:
+Error launching: %strError%	MediaConverter		Greška pri pokretanju: %strError%
+File format:	MediaConverter		Format datoteke:
+File	Menu		Datoteka
+Video quality not supported	MediaConverter		Video kvaliteta nije podržana
+Select this folder	MediaConverter		Odaberi ovu mapu
+%.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld kanal
+%d bit 	MediaFileInfo		%d bit 
+Continue	MediaConverter		Nastavi
+Convert	MediaConverter		Pretvori
+Audio quality not supported	MediaConverter		Audio kvaliteta nije podržana
+Preview	MediaConverter		Pregled
+Start [ms]: 	MediaConverter		Start [ms]: 

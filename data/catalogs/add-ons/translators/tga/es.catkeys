@@ -3,14 +3,14 @@ Save with RLE compression	TGAView		Guardar con compresión RLE
 Targa image (%d bits truecolor)	TGATranslator		Imagen Targa (%d bits de color verdadero)
 Ignore TGA alpha channel	TGAView		Ignorar el canal alfa TGA
 Targa image (%d bits colormap)	TGATranslator		Imagen Targa (%d bits de mapa de color)
-TGA image translator	TGAView		Conversor de imagen TGA
+TGA image translator	TGAView		Intérprete de imagen TGA
 Targa image (%d bits RLE colormap)	TGATranslator		Imagen Targa (%d bits RLE de mapa de color)
 Targa image (%d bits gray)	TGATranslator		Imagen Targa (%d bits de gris)
 Written by the Haiku Translation Kit Team	TGAView		Escrito por el equipo de traducción de Haiku
 Targa image (%d bits RLE truecolor)	TGATranslator		Imagen Targa (%d bits RLE de color verdadero)
 TGA images	TGATranslator		Imágenes TGA
 Version %d.%d.%d, %s	TGAView		Versión %d.%d.%d, %s
-TGATranslator Settings	TGATranslator		Configuración TGATranslator
-TGA image translator	TGATranslator		Conversor de imagen TGA
+TGATranslator Settings	TGATranslator		Configuración del Intérprete TGA
+TGA image translator	TGATranslator		Intérprete de imagen TGA
 Targa image (%d bits RLE gray)	TGATranslator		Imagen Targa (%d bits RLE de gris)
 TGA Settings	TGAMain		Configuración TGA

@@ -1,0 +1,8 @@
+1	greek, modern (1453-)	x-vnd.Haiku-debug_server	3188340596
+The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		Η εφαρμογή :\n\n %app\n\nhas εντόπισε ένα σφάλμα το οποίο το αποτρέπει απο το να συνεχίσει. Το Haiku θα τερματίσει την εφαρμογή και θα καθαρίσει.
+Oh yeah!	DebugServer		Ω, ναι!
+Debug	DebugServer		Αποσφαλμάτωση
+Terminate	DebugServer		Τερματισμός
+Save report	DebugServer		Αποθήκευση αναφοράς
+Write core file	DebugServer		Εγγραφή αρχείου αποτυπώματος μνήμης
+Oh no!	DebugServer		Ω, όχι!

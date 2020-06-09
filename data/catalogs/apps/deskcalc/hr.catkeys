@@ -1,0 +1,40 @@
+1	croatian	x-vnd.Haiku-DeskCalc	3392024532
+cos	CalcView		cos
+3	CalcView		3
+(	CalcView		(
+BS	CalcView		BS
+1	CalcView		1
+acos	CalcView		acos
+E	CalcView		E
+/	CalcView		/
+C	CalcView		C
+C	CalcView	Key label, 'C' means clear	C
+8	CalcView		8
+-	CalcView		-
+BS	CalcView	Key label, 'BS' means backspace	BS
+6	CalcView		6
+sin	CalcView		sin
++	CalcView		+
+ln	CalcView		ln
+Compact	CalcView		Kompaktno
+Calculating	CalcView		Računanje
+Enable Num Lock on startup	CalcView		Omogući Num Lock pri pokretanju
+4	CalcView		4
+Scientific	CalcView		Znanstveno
+)	CalcView		)
+^	CalcView		^
+=	CalcView		=
+Radians	CalcView		Radijani
+2	CalcView		2
+tan	CalcView		tan
+0	CalcView		0
+9	CalcView		9
+.	CalcView		.
+DeskCalc	System name		DeskCalc
+Degrees	CalcView		Stupnjevi
+7	CalcView		7
+!	CalcView		!
+π	CalcView		π
+5	CalcView		5
+Basic	CalcView		Osnovno
+*	CalcView		*

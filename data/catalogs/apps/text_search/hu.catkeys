@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku.TextSearch	1867528375
+1	hungarian	x-vnd.Haiku.TextSearch	2224690775
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Válassza ki azokat a fájlokat a Nyomkövetőben, melyek kijelölésre kerüljenek.
 %appname% : %path%	GrepWindow		%appname% : %path%
 Failed to start xargs program!	Grepper		Az xargs indítása sikertelen!
@@ -19,7 +19,6 @@ Show files in Tracker	GrepWindow		Fájlok megjelenítése a Nyomkövetőben
 Please select the files you wish to keep searching.	GrepWindow		Kérlek válaszd ki azokat a fájlokat amelyekben folytatni kívánod a keresést.
 Trim to selection	GrepWindow		Kijelölés kivágása
 Set target…	GrepWindow		Cél megadása…
-TextSearch	GrepWindow		Szövegkeresés
 Failed to open input pipe!	Grepper		Nem sikerült megnyitni a bementi eszközt
 Search	GrepWindow		Keresés
 Copy text to clipboard	GrepWindow		Szöveg másolása a vágólapra

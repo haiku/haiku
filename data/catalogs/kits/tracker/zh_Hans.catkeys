@@ -1,5 +1,6 @@
-1	english	x-vnd.Haiku-libtracker	3441960750
+1	english	x-vnd.Haiku-libtracker	226539321
 Created	ContainerWindow		创建
+Icon	AttributesView		图标
 Open and make preferred	OpenWithWindow		打开并创建首选
 Kind	ContainerWindow		种类
 Open with…	ContainerWindow		打开方式...
@@ -18,18 +19,25 @@ Kind:	InfoWindow		种类:
 contains	FindPanel		包含
 32 x 32	ContainerWindow		32 x 32
 Open	FilePanelPriv		打开
+Bitmap icon	AttributesView		位图图标
 You can't replace a folder with one of its sub-folders.	FSUtils		您无法替换目录为其子目录。
+<%ld dates>	AttributesView		<%ld dates>
+Select…	VirtualDirectoryWindow		选择…
 Name	Default Query Columns		名称
 Unmount	ContainerWindow		卸载
 Eject when unmounting	AutoMounterSettings		卸载并弹出
 Searching for disks to mount…	StatusWindow		搜索挂载磁盘...
+Value	AttributesView		值
+Information	InfoWindow		信息
 Error emptying Trash	FSUtils		清空垃圾箱出错!
 Opens with:	InfoWindow		打开方式：
 Size	QueryPoseView		大小
 128 x 128	ContainerWindow		128 x 128
 Disk mount	TrackerSettingsWindow		磁盘挂载
+Type	AttributesView		种类
 Prompt	FSUtils		提示
 Error in regular expression:\n\n'%errstring'	PoseView		正则表达式错误：\n\n'%errstring'
+Small bitmap icon	AttributesView		小尺寸位图图标
 Would you like to find a suitable application to open the file?	FSUtils		您希望搜索可用程序以打开文件吗？
 64 x 64	ContainerWindow		64 x 64
 You cannot replace a folder or a symbolic link with a file.	FSUtils		您不能够使用文件夹或符号链接替代文件。
@@ -245,7 +253,6 @@ MiB	WidgetAttributeText		MiB
 Delete	FSUtils		删除
 Edit name	ContainerWindow		编辑名称
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		无法打开 \"%document\"（缺失符号：%symbol）。\n
-More options	FindPanel		更多选项
 config	B_USER_CONFIG_DIRECTORY		设置
 Error moving \"%name\".	FSUtils		移动 \"%name\" 出错。
 Select…	QueryContainerWindow		选择...
@@ -317,7 +324,6 @@ Proceed	FSUtils		执行
 Edit favorites…	FilePanelPriv		编辑收藏夹...
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		您无法移动目录到其本身及子目录。
 New	ContainerWindow		新建
-Fewer options	FindPanel		简单选项
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		您必须放置项目到 \"Disks\" 窗口中的磁盘图标上。
 Sorry, you can't copy items to the Trash.	FSClipBoard		对不起，您不能够复制项目到垃圾箱。
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		目录中已经存在与您将 %verb 的项目同名的内容。\n\n您希望将其替换为您正在 %verb 的项目并将其应用于所有内容吗？
@@ -367,7 +373,7 @@ Move to Trash	FilePanelPriv		移动到垃圾箱
 is	FindPanel		是
 40 x 40	DeskWindow		40 x 40
 40 x 40	ContainerWindow		40 x 40
-New folder %ld	FSUtils		新建目录 %d
+New folder %ld	FSUtils		新建目录 %ld
 64 x 64	DeskWindow		64 x 64
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" 为遗留可执行文件。请获取更新版本或者重新编译应用。
 Only the boot disk	AutoMounterSettings		仅引导磁盘

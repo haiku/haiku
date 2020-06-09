@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku.TextSearch	1867528375
+1	italian	x-vnd.Haiku.TextSearch	2224690775
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Scegli i file che desideri che vengano selezionati per te nel Tracker.
 %appname% : %path%	GrepWindow		%appname% : %path%
 Failed to start xargs program!	Grepper		Impossibile avviare applicativo xargs!
@@ -19,7 +19,6 @@ Show files in Tracker	GrepWindow		Mostra i file nel Tracker
 Please select the files you wish to keep searching.	GrepWindow		Seleziona i file sui quali desideri continuare la ricerca.
 Trim to selection	GrepWindow		Riduci alla selezione
 Set target…	GrepWindow		Seleziona destinazione…
-TextSearch	GrepWindow		Ricerca Testo
 Failed to open input pipe!	Grepper		Impossibile aprire la connessione di ingresso!
 Search	GrepWindow		Trova
 Copy text to clipboard	GrepWindow		Copia il testo nella clipboard

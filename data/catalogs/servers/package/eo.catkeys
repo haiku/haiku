@@ -1,0 +1,16 @@
+1	esperanto	x-vnd.haiku-package_daemon	1440586681
+Package changes	PackageResult	Window title	Pakaĵoŝanĝoj
+uninstall package %s\n	PackageResult	Don't change '%s' variable	malinstali pakaĵojn %s\n
+ignore problem for now	PackageProblem		malatenti problemon provizore
+solution %d:	PackageProblem	Don't change the %d variable	solvigo %d:
+The following problems have been encountered. Please select a solution for each:	PackageProblem		Trafis la sekvajn problemojn. Bonvole elektu solvigon po problemo:
+Apply changes	PackageResult		Apliki ŝanĝojn
+Package daemon	PackageManager		Pakaĵa demono
+install package %s from repository %s\n	PackageResult	Don't change '%s' variables	instali pakaĵon %s el deponejo %s\n
+The following additional package changes have to be made:	PackageResult		Bezonatas la sekvaj pakaĵaj kromŝanĝoj:
+Warning	PackageManager		Averto
+Cancel	PackageProblem		Nuligi
+don't activate package %source%	PackageProblem	don't change '%source%	ne ŝalti pakaĵon %source%
+Cancel	PackageResult		Nuligi
+Retry	PackageProblem		Reprovi
+Package problems	PackageProblem	Window title	Pakaĵoproblemoj

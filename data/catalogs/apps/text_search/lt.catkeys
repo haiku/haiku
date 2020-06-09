@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku.TextSearch	1609008100
+1	lithuanian	x-vnd.Haiku.TextSearch	1966170500
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Išrinkite failus, kuriuos norite matyti pažymėtus Pėdsekyje.
 %appname% : %path%	GrepWindow		%appname% : %path%
 Open selection	GrepWindow		Atverti pažymėtus failus
@@ -17,7 +17,6 @@ Show files in Tracker	GrepWindow		Parodyti failus Pėdsekyje
 Please select the files you wish to keep searching.	GrepWindow		Pažymėkite failus, kuriuose norite tęsti paiešką.
 Trim to selection	GrepWindow		Apsiriboti pažymėtais failais
 Set target…	GrepWindow		Paieškos sritis…
-TextSearch	GrepWindow		Teksto paieška
 Search	GrepWindow		Ieškoti
 Copy text to clipboard	GrepWindow		Kopijuoti tekstą į iškarpinę
 Show lines	GrepWindow		Rodyti eilutes

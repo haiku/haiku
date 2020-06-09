@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku.TextSearch	1867528375
+1	spanish; castilian	x-vnd.Haiku.TextSearch	2224690775
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Por favor selecciona los archivos que quieras 
 %appname% : %path%	GrepWindow		%appname% : %path%
 Failed to start xargs program!	Grepper		¡Falló al iniciar el programa xargs !
@@ -19,7 +19,6 @@ Show files in Tracker	GrepWindow		Mostrar archivos en el rastreador
 Please select the files you wish to keep searching.	GrepWindow		Por favor selecciona los archivos que desea seguir buscado
 Trim to selection	GrepWindow		Recortar selección
 Set target…	GrepWindow		Fijar objetivos
-TextSearch	GrepWindow		TextSearch
 Failed to open input pipe!	Grepper		¡Falló al abrir el conducto de entrada!
 Search	GrepWindow		Buscar
 Copy text to clipboard	GrepWindow		Copiar texto al portapapeles

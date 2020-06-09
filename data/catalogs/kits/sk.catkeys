@@ -3,10 +3,10 @@
 All Rights Reserved.	AboutWindow		Všetky práva vyhradené.
 gold master	AboutWindow		gold master
 Undo	TextView		Späť
+OK	PrintJob		OK
 gamma	AboutWindow		gama
 development	AboutWindow		vývoj
 OK	Dragger		OK
-OK	PrintJob		OK
 Print Server is not responding.	PrintJob		Tlačový server neodpovedá.
 About %app%	AboutMenuItem		O aplikácii %app%
 Warning	Dragger		Upozornenie

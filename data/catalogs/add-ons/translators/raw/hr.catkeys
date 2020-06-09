@@ -1,0 +1,9 @@
+1	croatian	x-vnd.Haiku-RAWTranslator	2975919330
+RAWTranslator Settings	ConfigView		RAWTranslator postavke
+Version %d.%d.%d, %s	ConfigView		Verzija %d.%d.%d, %s
+RAW image translator	RAWTranslator		RAW prevoditelj slika
+RAW Settings	RAWTranslator main		RAW postavke
+RAW images	RAWTranslator		RAW slike
+RAW image translator	ConfigView		RAW prevoditelj slika
+%s RAW image	RAWTranslator	Parameter (%s) is the name of the manufacturer (like 'Canon')	%s RAW slika
+Based on Dave Coffin's dcraw 8.63	ConfigView		Bazirano na Dave Coffin-ovom dcraw 8.63

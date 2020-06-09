@@ -1,17 +1,17 @@
 1	spanish; castilian	x-vnd.Haiku-ChartDemo	986636897
-Slow rotation	ChartWindow		Baja rotación
+Slow rotation	ChartWindow		Rotación lenta
 Pink	ChartWindow		Rosa
 Comet	ChartWindow		Cometa
 DirectWindow	ChartWindow		Ventana directa
 Orange	ChartWindow		Naranja
-Refresh rate	ChartWindow		Tasa de refresco
+Refresh rate	ChartWindow		Frecuencia de actualización
 Blue	ChartWindow		Azul
 Colors	ChartWindow		Colores
 Novas	ChartWindow		Novas
 LineArray	ChartWindow		LineArray
  0.6 f/s  (logarythmic scale)	ChartWindow		 0.6 f/s  (escala logarítmica)
 Free motion	ChartWindow		Movimiento libre
-(high) 100% 	ChartWindow		(alto) 100%
+(high) 100% 	ChartWindow		(alto) 100 %
 Green	ChartWindow		Verde
 Amas	ChartWindow		Amas
 2 threads	ChartWindow		2 hilos
@@ -21,7 +21,7 @@ Chaos	ChartWindow		Chaos
 Full screen	ChartWindow		Pantalla completa
 Spiral	ChartWindow		Espiral
 Slow motion	ChartWindow		Movimiento lento
- 5% (low)	ChartWindow		 5% (bajo)
+ 5% (low)	ChartWindow		 5 % (bajo)
 Fast motion	ChartWindow		Movimiento rápido
 Special	ChartWindow		Especial
 Status	ChartWindow		Estado

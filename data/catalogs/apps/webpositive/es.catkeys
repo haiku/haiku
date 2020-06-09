@@ -15,12 +15,12 @@ Use proxy server to connect to the internet	Settings Window		Usar un servidor pr
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url terminado
 Auto-hide interface in full screen mode	Settings Window		Ocultar automáticamente la interfaz en modo de pantalla completa
 There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Hubo un error al obtener la carpeta de marcadores.\n\nError: %error
-Delete	Cookie Manager		Borrar
+Delete	Cookie Manager		Eliminar
 (Finish: %date - Over %duration left)	Download Window		(Finalizado: %date - Más de %duration restante)
 Open containing folder	Download Window		Abrir carpeta
 Find previous	WebPositive Window		Buscar anterior
 Full screen	WebPositive Window		Pantalla completa
-Downloads in progress	WebPositive		Descarga en proceso
+Downloads in progress	WebPositive		Descargas en proceso
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	¿Desea abrir %addedCount marcadores al mismo tiempo?
 Copy URL to clipboard	Download Window		Copiar URL al portapapeles
 Clone current page	Settings Window		Duplicar página actual
@@ -86,13 +86,13 @@ New browser window	Download Window		Nueva ventana del navegador
 Open	Download Window		Abrir
 New window	WebPositive Window		Nueva ventana
 New windows:	Settings Window		Nuevas ventanas:
-The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	La carpeta de descargas no pudo ser abierta.\n\nError: %error
+The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	No se pudo abrir la carpeta de descargas.\n\nError: %error
 Cancel	Authentication Panel		Cancelar
 Style:	Font Selection view		Estilo:
 There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	Se produjo un error al crear el archivo de marcadores.\n\nError: %error
 OK	Download Window		Aceptar
-Proxy username:	Settings Window		Proxy usuario:
-Manage bookmarks	WebPositive Window		Administrar marcadores
+Proxy username:	Settings Window		Nombre de usuario para proxy:
+Manage bookmarks	WebPositive Window		Gestionar marcadores
 /s)	Download Window	...as in 'per second'	/s)
 Restart	Download Window		Reiniciar
 Serif font:	Settings Window		Fuente Serif:
@@ -100,7 +100,7 @@ Apply	Settings Window		Aplicar
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Hubo un error al intentar mostrar la carpeta de Marcadores.\n\nError: %error
 Revert	Settings Window		Revertir
 Copy	WebPositive Window		Copiar
-Default standard font size:	Settings Window		Tamaño de fuente por defecto:
+Default standard font size:	Settings Window		Tamaño de texto predeterminado:
 Bookmark this page	WebPositive Window		Agregar esta página a marcadores
 Show tabs if only one page is open	Settings Window		Mostrar pestañas si sólo hay una página abierta
 Close tab	WebPositive Window		Cerrar pestaña
@@ -119,7 +119,7 @@ Quit	WebPositive Window		Salir
 Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Buscar la coincidencia anterior de los términos de búsqueda
 Remember username and password for this site	Authentication Panel		Recordar nombre de usuario y contraseña para este sitio
 (Finish: %date - %duration left)	Download Window		(Finalizado: %date - %duration restante)
-Cookie manager	Cookie Manager		Administrador de cookies
+Cookie manager	Cookie Manager		Gestor de cookies
 Show home button	Settings Window		Mostrar botón de inicio
 Start new session	Settings Window		Comenzar nueva sesión
 The cookie jar is empty!	Cookie Manager		¡El contenedor de cookies está vacío!
@@ -153,7 +153,7 @@ Downloads	Download Window		Descargas
 Open blank page	Settings Window		Abrir página en blanco
 Clear history	WebPositive Window		Borrar historial
 Cancel	WebPositive Window		Cancelar
-Bookmark info	WebPositive Window		Información de Marcadores
+Bookmark info	WebPositive Window		Información de marcadores
 Script console	Console Window		Consola de scripts
 Copy	URL Bar		Copiar
 Open start page	Settings Window		Abrir página de inicio

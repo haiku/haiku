@@ -1,0 +1,19 @@
+1	croatian	x-vnd.Haiku-Media	4170108237
+Restart media services	Media views		Ponovno pokreni medijske servise
+Quit	Media Window		Završi
+<none>	VideoInputMenu	Used when no video input is available	<none>
+Video output:	Media views		Video izlaz:
+Video input:	Media views		Video ulaz:
+Audio output:	Media views		Audio izlaz:
+Could not connect to the media server.\nWould you like to start it ?	Media Window		ne mogu se povezati sa medijskim poslužiteljem.\nŽelite li ga pokrenuti ?
+Video settings	Media Window		Video postavke
+Start media server	Media Window		Pokreni medijski poslužitelj
+Audio settings	Media Window		Audio postavke
+Media	System name		Medij
+Warning!	Media Window		Upozorenje!
+MIDI Settings	Media Window		MIDI postavke
+Audio input:	Media views		Audio ulaz:
+<none>	Media views		<nijedan>
+Channel:	Media views		Kanal:
+Defaults	Media views		Zadano
+<none>	VideoOutputMenu	Used when no video output is available	<none>

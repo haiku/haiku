@@ -1,0 +1,46 @@
+1	esperanto	x-vnd.Haiku-PowerStatus	3173765686
+Design capacity low warning: 	PowerStatus		Konstrukcia ŝargnivelo por averto pri malpleneco: 
+Show percent	PowerStatus		Montri procentojn
+Design capacity: 	PowerStatus		Konstrukcia kapacito: 
+ mW	PowerStatus		 mW
+The battery level is getting low, please plug in the device.	PowerStatus		La akumulilo malpleniĝas, konektu elektroreton.
+Battery low	PowerStatus		La akumulilo estas malplena
+Type: 	PowerStatus		Speco: 
+non-rechargeable	PowerStatus		ne reŝargebla
+Empty battery slot	PowerStatus		Akumulilingo estas malplena
+ mV	PowerStatus		 mV
+Run in window	PowerStatus		Lanĉi en fenestro
+PowerStatus	System name		La Povumstato
+ mWh	PowerStatus		 mWh
+Battery info…	PowerStatus		Informo pri akumulilo…
+Damaged battery	PowerStatus		Akumulilo estas rompita
+Show time	PowerStatus		Montri tempon
+Last full charge: 	PowerStatus		Lasta plena ŝargo: 
+Battery unused	PowerStatus		Akumulilo ne estas uzata
+Extended battery info	PowerStatus		Plia informo pri akumulilo
+ mA	PowerStatus		 mA
+Current rate: 	PowerStatus		Nuna taksado: 
+discharging	PowerStatus		malŝargado
+Show text label	PowerStatus		Montri tekstan etikedon
+About…	PowerStatus		Pri…
+Model number: 	PowerStatus		Numero de modelo: 
+Install in Deskbar	PowerStatus		Instali en la Laborstrion
+ mAh	PowerStatus		 mAh
+Capacity: 	PowerStatus		Kapacito: 
+Battery discharging	PowerStatus		Malŝargado de akumulilo
+Serial number: 	PowerStatus		Numero de serio: 
+Battery critical	PowerStatus		Kriza stato de akumulilo
+Capacity granularity 1: 	PowerStatus		Proksimuma valoro de 1/100 de plena ŝargkapacito:
+OEM info: 	PowerStatus		Informo pri origina aparata produktanto: 
+Design voltage: 	PowerStatus		Konstrukcia tensio: 
+Battery charging	PowerStatus		Ŝargado de akumulilo
+The battery level is critical, please plug in the device immediately.	PowerStatus		La ŝargnivelo de akumulilo estas kriza, konektu al elektroreto tuj.
+Design capacity warning: 	PowerStatus		Konstrukcia ŝrargnivelo por averto: 
+Quit	PowerStatus		Ĉesi
+rechargeable	PowerStatus		reŝargebla
+charging	PowerStatus		ŝargado
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Vi povas lanĉi la Povumstaton en fenestro aŭ instali en la Laborstrion.
+Show status icon	PowerStatus		Montri piktogramon de stato
+Capacity granularity 2: 	PowerStatus		Proksimuma valoro de 1/400 de plena ŝargkapacito
+Technology: 	PowerStatus		Teknologio: 
+no battery	PowerStatus		akumulilo forestas

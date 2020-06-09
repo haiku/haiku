@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-PackageInstaller	4116690169
+1	polish	x-vnd.Haiku-PackageInstaller	2472572058
 Package description	UninstallView		Opis pakietu
 none	PackageView		brak
 Continue	PackageInstall		Kontynuuj
@@ -18,6 +18,7 @@ No installation type selected	PackageView		Sposób instalacji nie został wybran
 Do you want to remember this decision for the rest of this installation?\n	PackageView		Czy chcesz zapamiętać tę decyzję do końca instalacji?\n
 The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Wybrany pakiet nie został usunięty. Plik informacyjny pakietu mógł zostać uszkodzony.
 Install…	UninstallView		Zainstaluj…
+The item named '%s' already exists in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Element nazwany „%s” już istnieje w podanej ścieżce.\nZastąpić go elementem z pakietu, czy pominąć?
 Installing files and folders	PackageInstall		Instalowanie plików i katalogów
 Installed packages	UninstallWindow		Zainstalowane pakiety
 Remove	UninstallView		Usuń
@@ -39,16 +40,20 @@ No package selected.	UninstallView		Żaden pakiet nie został wybrany.
 Error while installing the package\n	PackageView		Błąd instalacji pakietu\n
 Finishing installation	PackageInstall		Kończenie instalacji
 No package available.	PackageInfo		Brak dostępnych pakietów.
+The script named '%s' already exists in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Skrypt nazwany „%s” już istnieje w podanej ścieżce.\nZastąpić go skryptem z pakietu, czy pominąć?
 Installation type:	PackageView		Typ instalacji:
 The package you selected has been successfully removed from your system.	UninstallView		Wybrany pakiet został pomyślnie usunięty.
 There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Prawdopodobnie pliki w pakiecie mają nieprawidłowy rozmiar. Pakiet może być uszkodzony, lub został zmodyfikowany po jego utworzeniu. Czy nadal chcesz kontynuować?
 %name% (%size%)	PackageView		%name% (%size%)
 Abort	PackageInstall		Przerwij
+The file named '%s' already exists in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Plik nazwany „%s” już istnieje w podanej ścieżce.\nZastąpić go plikiem z pakietu, czy pominąć?
 Replace all	PackageView		Zastąp wszystkie
 The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Plik pakietu jest nie do odczytania.\nJedną z możliwości jest to, że żądany plik nie jest poprawnym pakietem .pkg systemu BeOS.
 Continue	PackageInfo		Kontynuuj
 No package selected.	PackageInfo		Żaden pakiet nie został wybrany.
 Error! \"%s\" is not a valid path.\n	Packageinstaller main		Błąd! „%s” niepoprawna ścieżka.\n
+The directory named '%s' already exists in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Katalog nazwany „%s” już istnieje w podanej ścieżce.\nZastąpić go katalogiem z pakietu, czy pominąć?
+LegacyPackageInstaller	System name		LegacyPackageInstaller
 Ask again	PackageView		Zapytaj ponownie
 Begin	PackageView		Instaluj
 OK	PackageView		OK

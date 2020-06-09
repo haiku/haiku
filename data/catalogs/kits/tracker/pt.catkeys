@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-libtracker	659027911
+1	portuguese	x-vnd.Haiku-libtracker	4118767010
 Created	ContainerWindow		Criado
 Icon	AttributesView		Ícone
 Open and make preferred	OpenWithWindow		Abrir e tornar preferida
@@ -82,7 +82,7 @@ Select	InfoWindow		Selecionar
 OK	OpenWithWindow		OK
 Include trash	FindPanel		Incluir lixo
 GiB	WidgetAttributeText		GiB
-Clean up	ContainerWindow		Limpar
+Clean up	ContainerWindow		Arrumar
 Modified	FindPanel		Modificado
 Select all	QueryContainerWindow		Selecionar tudo
 Select…	FilePanelPriv		Selecionar…
@@ -151,7 +151,7 @@ Replace other file	WidgetAttributeText		Substituir outro ficheiro
 OK	Email Query Columns		OK
 Location	QueryPoseView		Localização
 Edit query	ContainerWindow		Editar consulta
-{0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# byte)} other{(# bytes)}}
+{0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, zero{(# bytes)} one{(# byte)} other{(# bytes)}}
 Previously mounted disks	AutoMounterSettings		Discos montados anteriormente
 You cannot replace a file with a folder or a symbolic link.	FSUtils		Não pode substituir um ficheiro por uma pasta ou uma ligação simbólica.
 The target disk does not support creating links.	FSUtils		O disco de destino não suporta a criação de atalhos.
@@ -185,7 +185,7 @@ There was a problem trying to save in the folder you specified. Please try anoth
 Desktop	TrackerSettingsWindow		Área de Trabalho
 Nested *?+.	libtracker		*?+ aninhados.
 Move	FSUtils	button label	Mover
-Clean up	DeskWindow		Limpar
+Clean up	DeskWindow		Arrumar
 Group	FilePermissionsView		Grupo
 Could not find an application to open \"%name\" (%error). 	FSUtils		Não foi possível encontrar uma aplicação para abrir \"%name\" (%error). 
 Internal error.	libtracker		Erro interno.
@@ -262,6 +262,7 @@ ends with	SelectionWindow		termina com
 Open	OpenWithWindow		Abrir
 You must have at least one attribute showing.	PoseView		Deve ter pelo menos um atributo visível.
 Cut	FilePanelPriv		Cortar
+Finish: after several years	StatusWindow		Fim: após vários anos
 Favorites	FilePanelPriv		Favoritos
 Point	AttributesView		Ponto
 home	B_USER_DIRECTORY		pessoal
@@ -294,7 +295,7 @@ copying	FSUtils		a copiar
 Get info	FilePanelPriv		Obter informações
 MIME String	AttributesView		MIME String
 Delete	ContainerWindow		Apagar
-Execute	FilePermissionsView		Executar
+Execute	FilePermissionsView		Execução
 Show volumes on Desktop	SettingsView		Mostrar volumes na Área de Trabalho
 no	AttributesView		não
 Recent folders	ContainerWindow		Pastas recentes
@@ -307,7 +308,6 @@ Delete	FSUtils		Apagar
 Edit name	ContainerWindow		Editar nome
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Não foi possível abrir \"%document\" (Símbolo em falta: %symbol). \n
 ASCII Text	AttributesView		Texto ASCII
-More options	FindPanel		Mais opções
 Atom reference	AttributesView		Referência Atom
 config	B_USER_CONFIG_DIRECTORY		configuração
 Error moving \"%name\".	FSUtils		Erro ao mover \"%name\".
@@ -341,7 +341,6 @@ Make active printer	ContainerWindow		Tornar impressora ativa
 Copy to	ContainerWindow		Copiar para
 Name	SelectionWindow		Nome
 by attribute	FindPanel		por atributo
- info	InfoWindow		 informação
 Write	FilePermissionsView		Escrita
 <%ld bytes of data>	AttributesView		<%ld bytes de dados>
 If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Se alterar a pasta de sistema ou o seu conteúdo, é possível que não consiga arrancar o %osName!\n\nTem a certeza de que quer fazer isso?\n\nPara alterar a pasta de sistema ou o seu conteúdo, mantenha premida a tecla Maiúsculas (Shift) e clique \"Eu sei o que estou a fazer\".
@@ -396,7 +395,6 @@ Proceed	FSUtils		Prosseguir
 Edit favorites…	FilePanelPriv		Editar favoritos…
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		Não é possível mover uma pasta para dentro de si mesma ou para uma das suas subpastas.
 New	ContainerWindow		Novo
-Fewer options	FindPanel		Menos opções
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Deve arrastar itens para um dos ícones de disco na janela \"Discos\".
 If you alter %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Se alterar %target, o %osName poderá não funcionar corretamente!\n\nTem a certeza de que quer fazer isso?
 Sorry, you can't copy items to the Trash.	FSClipBoard		Desculpe, não é possível copiar itens para o Lixo.
@@ -446,7 +444,7 @@ the config folder	FSUtils		a pasta de configuração
 Sorry, could not create a new folder.	FSUtils		Desculpe, não foi possível criar uma nova pasta.
 Select all	VirtualDirectoryWindow		Selecionar tudo
 Rename	FSUtils	button label	Alterar nome
-Clean up all	ContainerWindow		Limpar tudo
+Clean up all	ContainerWindow		Arrumar tudo
 Add current folder	FilePanelPriv		Adicionar a pasta atual
 Description:	InfoWindow		Descrição:
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Tem certeza de que deseja apagar o(s) item(ns) selecionado(s)? Esta operação não pode ser revertida.

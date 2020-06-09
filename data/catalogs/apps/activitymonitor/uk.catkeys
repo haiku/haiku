@@ -1,47 +1,46 @@
-1	ukrainian	x-vnd.Haiku-ActivityMonitor	1155619009
-P-faults	DataSource		Р-помилки
-Media nodes	DataSource		Медіа вузли
-Threads	DataSource		Потоки
-Always on top	ActivityWindow		Завжди зверху
-Add graph	ActivityWindow		Додати графік
+1	ukrainian	x-vnd.Haiku-ActivityMonitor	3672498538
 Teams	DataSource		Команди
+Semaphores	DataSource		Семафори
+TX	DataSource	Shorter version for Sending	TX
+Block cache memory	DataSource		Блок кеш пам'яті
+%lld ms	SettingsWindow		%lld мс
 MiB	DataSource		МБ
-Network send	DataSource		Відправлено по мережі
-CPU usage (combined)	DataSource		Використання СPU (загальне)
-CPU	DataSource		CPU
-Used memory	DataSource		Використана пам'ять
-Cached memory	DataSource		Кешована пам'ять
-Apps	DataSource		Програми
-Show legend	ActivityView		Показати легенду
+Media nodes	DataSource		Медіа вузли
 Text clipboard	DataSource		Текстовий буфер обміну
-Settings	ActivityWindow		Налаштування
+Network send	DataSource		Відправлено по мережі
+Running applications	DataSource		Запущені програми
+Cache	DataSource		Кеш
+CPU usage (combined)	DataSource		Використання СPU (загальне)
+Threads	DataSource		Потоки
 Receiving	DataSource		Отримання
+Remove graph	ActivityView		Вилучити графік
+Swap space	DataSource		Розмір своп-файлу
+CPU	DataSource		CPU
+ActivityMonitor	System name		ActivityMonitor
+Update time interval:	SettingsWindow		Інтервал оновлення:
+RX	DataSource	Shorter version for Receiving.	RX
 Settings…	ActivityWindow		Налаштування…
+Block cache	DataSource		Кеш блоку
+Memory	DataSource		Пам'ять
+CPU usage	DataSource		Використання CPU
+Quit	ActivityWindow		Вийти
+Raw clipboard	DataSource		Буфер обміну
+Settings	ActivityWindow		Налаштування
+Used memory	DataSource		Використана пам'ять
+%.1f faults/s	DataSource		%.1f помилок/сек
+Show legend	ActivityView		Показати легенду
+Cached memory	DataSource		Кешована пам'ять
+File	ActivityWindow		Файл
 Ports	DataSource		Порти
 Page faults	DataSource		Помилки на сторінці
-Sending	DataSource		Відправка
-Cache	DataSource		Кеш
-%.1f faults/s	DataSource		%.1f помилок/сек
-Update time interval:	SettingsWindow		Інтервал оновлення:
-TX	DataSource	Shorter version for Sending	TX
-Quit	ActivityWindow		Вийти
-Block cache memory	DataSource		Блок кеш пам'яті
-Remove graph	ActivityView		Вилучити графік
-%lld sec.	SettingsWindow		%lld сек.
-%lld ms	SettingsWindow		%lld мс
-CPU usage	DataSource		Використання CPU
-Raw clipboard	DataSource		Буфер обміну
-Sems	DataSource		Sems
-%.1f MiB	DataSource		%.1f МБ
-ActivityMonitor	System name		ActivityMonitor
-Running applications	DataSource		Запущені програми
-Semaphores	DataSource		Семафори
-Block cache	DataSource		Кеш блоку
-Swap space	DataSource		Розмір своп-файлу
-Swap	DataSource		Файл підкачки
-File	ActivityWindow		Файл
-usage	DataSource		використання
+Apps	DataSource		Програми
 Additional items	ActivityView		Додаткові елементи
+Add graph	ActivityWindow		Додати графік
+Sending	DataSource		Відправка
+%.1f MiB	DataSource		%.1f МБ
+Always on top	ActivityWindow		Завжди зверху
+Swap	DataSource		Файл підкачки
+%lld sec.	SettingsWindow		%lld сек.
+P-faults	DataSource		Р-помилки
+Sems	DataSource		Sems
 Network receive	DataSource		Отримано по мережі
-Memory	DataSource		Пам'ять
-RX	DataSource	Shorter version for Receiving.	RX

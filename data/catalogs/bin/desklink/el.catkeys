@@ -1,0 +1,16 @@
+1	greek, modern (1453-)	x-vnd.Haiku-desklink	3568085956
+desklink	MediaReplicant	Title of an alert box	desklink
+Sound preferences…	MediaReplicant		Προτιμήσεις ήχου…
+Muted	MediaReplicant		Σε σίγαση
+%g dB	MediaReplicant		%g dB
+OK	MediaReplicant		Εντάξει
+Couldn't launch 	MediaReplicant		Δεν μπορεί να γίνει εκκίνηση 
+Volume	VolumeControl		Ένταση
+Open MediaPlayer	MediaReplicant		Ανοίξετε το MediaPlayer
+%d dB	VolumeControl		%d dB
+Media preferences…	MediaReplicant		Προτιμήσεις πολυμέσων…
+Options	MediaReplicant		Επιλογές
+Beep	MediaReplicant		Μπιπ
+Open %name	DeskButton	Don't translate variable %name	Άνοιγμα %name
+Control physical output	MediaReplicant		Έλεγχος φυσικής εξόδου
+No media server running	VolumeControl		Δεν τρέχει διακομιστής πολυμέσων

@@ -1,6 +1,7 @@
-1	dutch; flemish	x-vnd.Haiku-Shortcuts	372053878
+1	dutch; flemish	x-vnd.Haiku-Shortcuts	3834857117
 *MouseUp	ShortcutsWindow		*MuisOmhoog
 Application	ShortcutsWindow		Toepassing
+Option	ShortcutsSpec	Name for modifier on keyboard	Optie
 Save changes before closing?	ShortcutsWindow		Wijzigingen opslaan alvorens te sluiten?
 Revert to saved	ShortcutsWindow		Herstellen naar opgeslagen data
 Don't save	ShortcutsWindow		Niet opslaan
@@ -8,6 +9,7 @@ Don't save	ShortcutsWindow		Niet opslaan
 *Beep	ShortcutsWindow		*Piep
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Sneltoetsen was niet in staat om uw toetsencombinatie op te slaan.
 Save	ShortcutsWindow		Opslaan
+Either	ShortcutsSpec		En/of
 Oh no	ShortcutsWindow		Oh nee
 Key	ShortcutsWindow		Toets
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*VerzendBericht toepassing/x-vnd.Be-TRAK 'Tfnd'
@@ -18,21 +20,26 @@ Quit	ShortcutsWindow		Afsluiten
 Cancel	ShortcutsWindow		Annuleren
 *MoveMouse +20 +0	ShortcutsWindow		*VerplaatsMuis +20 +0
 Control	ShortcutsSpec	Name for modifier on keyboard	Control
+Left	ShortcutsSpec		Links
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Sneltoetsen was niet in staat om uw toetsencombinatiebestand te lezen!
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Sneltoetsen was niet in staat om uw toetsencombinatiebestand op te slaan!
 *InsertString \"Your Text Here\"	ShortcutsWindow		*VoegTekstIn \"Uw Tekst Hier\"
 Remove selected shortcut	ShortcutsWindow		Geselecteerde sneltoets verwijderen
 Error, NULL state description?	ShortcutsSpec		Fout, NULL-statusbeschrijving?
+Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Sneltoetsen kon uw toetsencombinatiebestand niet openen!
 Save & apply	ShortcutsWindow		Opslaan & toepassen
 Open	ShortcutsWindow		Openen
 Append	ShortcutsWindow		Toevoegen
+Both	ShortcutsSpec		Beiden
 Save KeySet as…	ShortcutsWindow		Toetsencombinatie opslaan als...
 Append KeySet…	ShortcutsWindow		Toevoegen toetsencombinatie...
 *MouseButton 1	ShortcutsWindow		*Muisknop 1
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Meerdere \"*VerplaatsMuisNaar 100% 0\" \"*MuisKnop 1\"
+Right	ShortcutsSpec		Rechts
 OK	ShortcutsWindow		Oké
 Add new shortcut	ShortcutsWindow		Nieuwe sneltoets toevoegen
+(None)	ShortcutsSpec		(Geen)
 Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
 Open KeySet…	ShortcutsWindow		Openen toetsencombinatie...
 File	ShortcutsWindow		Bestand

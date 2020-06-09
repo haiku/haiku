@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Installer	116830250
+1	french	x-vnd.Haiku-Installer	3753756669
 Performing installation.	InstallProgress		Installation en cours.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Choisir le disque source dans la liste déroulante, puis cliquer sur « Commencer ».
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Veuillez fermer la fenêtre du Gestionnaire de Disques avant celle de l’Installeur.
@@ -31,9 +31,7 @@ Finishing installation.	InstallProgress		Finalisation de l’installation.
 Install from:	InstallerWindow		Installer depuis :
 Additional disk space required: 0.0 KiB	InstallerWindow		Espace disque additionnel requis: 0.0 Kio
 This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Ce logiciel est de qualité bêta ! Cela signifie que vous risquez de perdre des données importantes. Faites des sauvegardes fréquentes ! Vous aurez été prévenus.\n\n\n
-3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Lorsque vous aurez démarré Haiku pour la première fois, prenez le temps de lire notre documentation de « Bienvenue » et le « Guide utilisateur ». Vous les trouverez en liens sur le bureau et en signet dans WebPositive.\n\n
 ???	InstallerWindow	Unknown currently copied item	???
-Install anyway	InstallProgress		Installer quand même
 1)   If you are installing Haiku onto real hardware (not inside an emulator), you may want to prepare a hard disk partition from another OS (you could, for example, use a GParted Live-CD, which can also resize existing partitions to make room).\nYou can also set up partitions by launching DriveSetup from Installer, but you won't be able to resize existing partitions with it. While DriveSetup has been quite thoroughly tested over the years, it's recommended to have up-to-date backups of the other partitions on your system. Just in case…	InstallerApp		1)   Si vous installez Haiku sur du matériel réel (pas dans un émulateur), vous pouvez préparer une partition de disque dur à partir d’un autre système d’exploitation (vous pouvez, par exemple, utiliser un Live-CD de GParted, qui peut aussi redimensionner des partitions existantes pour faire de la place).\nVous pouvez également configurer des partitions en lançant le « Gestionnaire de Disque » à partir du programme d’installation, mais vous ne pourrez pas redimensionner les partitions existantes avec lui. Bien que le « Gestionnaire de Disque » ait été testé à fond au fil des ans, il est recommandé d’avoir des sauvegardes à jour pour les autres partitions de votre système. Juste au cas où…
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Sélectionner la source et la destination dans les listes déroulantes. Puis cliquer sur « Commencer ».
 Hide optional packages	InstallerWindow		Cacher les paquets optionnels
@@ -58,7 +56,6 @@ Collecting copy information.	InstallProgress		Récupération des informations de
 Show optional packages	InstallerWindow		Montrer les paquets optionnels
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Le disque de destination pourrait ne pas avoir assez de place. Sélectionnez un autre disque ou retirez certains objets optionnels.
 Installation canceled.	InstallProgress		Installation annulée.
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Le volume cible n’est pas vide. Êtes-vous sûr de vouloir poursuivre l’installation ?\n\nNote : Le dossier « system » sera une copie propre depuis le volume source, à l’exception du dossier de réglages. Tous les autres dossiers seront fusionnés, et les fichiers qui existent à la fois sur les volumes source et destination seront écrasés par la version de la source.
 OK	InstallerApp		OK
 Are you sure you want to abort the installation?	InstallerWindow		Êtes-vous sûr de vouloir abandonner l’installation ?
 Stop	InstallerWindow		Arrêter

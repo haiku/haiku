@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Devices	490380176
+1	polish	x-vnd.Haiku-Devices	3345509916
 ACPI bus	DevicesView		Magistrala ACPI
 Encryption controller	Device		Kontroler szyfrowania
 Bus Information	Device		Informacje o szynie
@@ -54,7 +54,9 @@ Device name	DeviceACPI		Nazwa urządzenia
 Card Reader	DeviceSCSI		Czytnik kart
 Display controller	Device		Kontroler ekranu
 Basic information	DevicesView		Podstawowe informacje
+ACPI Button '%1'	DeviceACPI		Przycisk ACPI „%1”
 Bus	DevicesView		Magistrala
+ACPI <unknown>	DeviceACPI		ACPI <nieznany>
 Device name	DevicePCI		Nazwa urządzenia
 Disk Drive	DeviceSCSI		Dysk
 Other	DeviceSCSI		Inne

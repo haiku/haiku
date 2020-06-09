@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Network	2313714399
+1	polish	x-vnd.Haiku-Network	2923905377
 Ethernet device	InterfaceListItem		Urządzenie ethernetowe
 Link speed:	IntefaceView		Prędkość połączenia:
 disconnected	IntefaceView		rozłączone
@@ -7,7 +7,7 @@ WPA	WPA protected network		WPA
 Network:	IntefaceView		Sieć:
 Received:	IntefaceView		Otrzymane:
 New…	NetworkWindow		Nowa…
-no link	InterfaceListItem		brak odnośnika
+no link	InterfaceListItem		brak połączenia
 Other	NetworkWindow		Inne
 Sent:	IntefaceView		Wysłane:
 Gateway:	IntefaceAddressView		Brama:
@@ -19,8 +19,10 @@ EAP	EAP protected network		EAP
 Services	NetworkWindow		Usługi
 Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Instalacja NetworkStatus w Deskbarze nie powiodła się: %s
 Revert	NetworkWindow		Cofnij
+off	ServiceListItem		wyłączony
 WEP	WEP protected network		WEP
 <no wireless networks found>	IntefaceView		<nie znaleziono sieci bezprzewodowych>
+Enable	IntefaceView		Włącz
 connected	IntefaceView		połączone
 Apply	IntefaceAddressView		Zastosuj
 Disable	ServiceView		Wyłącz
@@ -28,6 +30,7 @@ WPA2	WPA2 protected network		WPA2
 Show network status in Deskbar	NetworkWindow		Pokaż status interfejsów w Deskbarze
 Mode:	IntefaceAddressView		Tryb:
 connected	InterfaceListItem		połączone
+OK	NetworkWindow		OK
 Static	IntefaceAddressView		Statyczny
 launch error	NetworkWindow		błąd uruchamiania
 Renegotiate	IntefaceView		Negocjuj ponownie
@@ -35,13 +38,16 @@ MAC address:	IntefaceView		Adres MAC:
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
 disabled	InterfaceListItem		wyłączone
 Dial-up connection	InterfaceListItem		Połączenie modemowe
+on	ServiceListItem		włączony
 The method for obtaining an IP address	IntefaceAddressView		Metoda uzyskiwania adresu IP
+disconnected	InterfaceListItem		rozłączone
 Automatic	IntefaceAddressView		Automatyczny
 Choose automatically	IntefaceView		Wybierz automatycznie
 Status:	IntefaceView		Stan:
 Disable	IntefaceView		Wyłącz
 Manage…	NetworkWindow		Zarządzaj…
 open	Open network		otwarta
+Network	System name		Sieć
 Your gateway to the internet	IntefaceAddressView		Twoja brama do Internetu
 Enable	ServiceView		Włącz
 Wireless device	InterfaceListItem		Urządzenie bezprzewodowe

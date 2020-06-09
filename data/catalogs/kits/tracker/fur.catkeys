@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-libtracker	659027911
+1	friulian	x-vnd.Haiku-libtracker	4118767010
 Created	ContainerWindow		Creât
 Icon	AttributesView		Icone
 Open and make preferred	OpenWithWindow		Vierç e rint preferît
@@ -262,6 +262,7 @@ ends with	SelectionWindow		al finìs cun
 Open	OpenWithWindow		Vierç
 You must have at least one attribute showing.	PoseView		Si scugne vê almancul un atribût di mostrâ.
 Cut	FilePanelPriv		Taie
+Finish: after several years	StatusWindow		Finît: dopo tancj agns
 Favorites	FilePanelPriv		Preferîts
 Point	AttributesView		Pont
 home	B_USER_DIRECTORY		home
@@ -307,7 +308,6 @@ Delete	FSUtils		Elimine
 Edit name	ContainerWindow		Modifiche non
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Nol è stât pussibil vierzi \"%document\" (Al mancje il simbul: %symbol). \n
 ASCII Text	AttributesView		Test ASCII
-More options	FindPanel		Altris opzions
 Atom reference	AttributesView		Riferiment Atom
 config	B_USER_CONFIG_DIRECTORY		configurazion
 Error moving \"%name\".	FSUtils		Erôr tal spostâ \"%name\".
@@ -341,7 +341,6 @@ Make active printer	ContainerWindow		Rint ative la stampadore
 Copy to	ContainerWindow		Copie su
 Name	SelectionWindow		Non
 by attribute	FindPanel		par atribût
- info	InfoWindow		 informazions
 Write	FilePermissionsView		Scriture
 <%ld bytes of data>	AttributesView		<%ld byte di dâts>
 If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Se si modifiche la cartele di sisteme o i siei contignûts, no si rivarà plui inviâ %osName!\n\nContinuâ pardabon?\n\nPar modificâ distès la cartele di sisteme o i siei contignûts, ten fracât il tast Maiusc e fâs clic su \"O sai ce che o fâs\".
@@ -396,7 +395,6 @@ Proceed	FSUtils		Procêt
 Edit favorites…	FilePanelPriv		Modifiche preferîts…
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		No si pues spostâ une cartele dentri se stesse o cualsisei des sôs sot-cartelis. 
 New	ContainerWindow		Gnûf
-Fewer options	FindPanel		Mancul opzions
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Si scugne strissinâ e molâ i elements suntune des iconis dai discs, tal barcon \"Disks\".
 If you alter %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Se si modifiche %target, %osName al funzionarà mâl!\n\nContinuâ pardabon?
 Sorry, you can't copy items to the Trash.	FSClipBoard		No si pues copiâ i elements te Scovacere.

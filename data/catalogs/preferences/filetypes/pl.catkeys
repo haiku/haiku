@@ -1,5 +1,6 @@
-1	polish	x-vnd.Haiku-FileTypes	734679611
+1	polish	x-vnd.Haiku-FileTypes	436017301
 Left	Attribute Window	Attribute column alignment in Tracker	Do lewej
+Float	Attribute ListView		Liczba zmiennoprzecinkowa
 Final	Application Types Window		Finalna
 FileTypes request	FileTypes Window		Żądanie FileTypes
 This file type already exists	New File Type Window		Ten typ pliku już istnieje
@@ -31,6 +32,7 @@ Signature:	Application Types Window		Sygnatura:
 None	FileTypes Window		Brak
 Exclusive launch	Application Type Window		Wyłączne uruchomienie
 Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		Usuwanie typu pliku nie może być cofnięte.\nCzy na pewno chcesz go usunąć?
+Integer 64 bit	Attribute ListView		Liczba całkowita (64-bitowa)
 Cancel	New File Type Window		Anuluj
 Select same preferred application as	FileType Window		Wybierz taką samą preferowaną aplikację jak w przypadku
 Cancel	Type List Window		Anuluj
@@ -43,10 +45,13 @@ Abort	Application Types Window		Przerwij
 Save	Application Type Window		Zapisz
 %1 application type	Application Type Window		%1 typ aplikacji
 Icon	Application Type Window		Ikona
+Duration	Attribute ListView		Czas trwania
 Version:	Application Type Window		Wersja:
 Default application	FileType Window		Domyślna aplikacja
 Internal name:	New File Type Window		Nazwa wewnętrzna:
+Integer 8 bit	Attribute ListView		Liczba całkowita (8-bitowa)
 Extension:	Extension Window		Rozszerzenie:
+Time	Attribute ListView		Czas
 Extensions:	FileTypes Window		Rozszerzenia:
 Select preferred application	FileType Window		Wybierz preferowaną aplikację
 Description:	FileTypes Window		Opis:
@@ -66,6 +71,8 @@ Version:	Application Types Window		Wersja:
 Application types	Application Types Window		Typy aplikacji
 Description:	Application Types Window		Opis:
 Name:	Application Types Window		Nazwa:
+Rating	Attribute ListView		Ocena
+duration	Attribute ListView		czas trwania
 File could not be opened	Preferred App Menu		Nie można otworzyć pliku
 Args only	Application Type Window		Tylko argumenty
 Could not open \"%s\":\n%s	FileTypes		Nie można otworzyć „%s”:\n%s
@@ -83,16 +90,21 @@ Type name:	FileTypes Window		Podaj nazwę:
 Visible	Attribute Window		Widoczne
 Select preferred application	FileTypes Window		Wybierz preferowaną aplikację
 Path:	Application Types Window		Ścieżka:
+rating	Attribute ListView		ocena
 Could not install file type	New File Type Window		Nie można zainstalować typu plików
 Same as…	FileTypes Window		Taki sam jak…
 Golden master	Application Type Window		Golden master
+Checkbox	Attribute ListView		Pole wyboru
 FileTypes request	Preferred App Menu		Żądanie FileTypes
 no icon	FileTypes Window		brak ikony
 Single launch	Application Type Window		Pojedyncze uruchomienie
 %s file type	FileType Window		typ pliku %s
+Default	Attribute ListView		Domyślnie
 Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Usuwanie supertypu nie może być cofnięte.\nWszystkie typy plików które należą do supertypu zostaną utracone!\n\nCzy na pewno chcesz to zrobić? Aby usunąć całą grupę, przytrzymaj klawisz Shift i naciśnij „Usuń”.
+String	Attribute ListView		Tekst
 Add type	New File Type Window		Dodaj typ
 Remove icon	Icon View		Usuń ikonę
+Boolean	Attribute ListView		Wartość logiczna
 Cancel	Extension Window		Anuluj
 Alignment:	Attribute Window		Wyrównanie:
 Icon	FileType Window		Ikona
@@ -101,6 +113,7 @@ Development	Application Type Window		Rozwój
 Golden master	Application Types Window		Golden master
 Add	Extension Window		Dodaj
 Open…	FileTypes Window		Otwórz…
+checkbox	Attribute ListView		pole wyboru
 Could not change file extensions	Extension Window		Nie można zmienić rozszerzeń plików
 Could not open file	FileType Window		Nie można otworzyć pliku
 Choose type	Type List Window		Wybierz typ
@@ -118,6 +131,7 @@ Add group	New File Type Window		Dodaj grupę
 Cancel	Attribute Window		Anuluj
 Gamma	Application Types Window		Gamma
 Supported types	Application Type Window		Obsługiwane typy
+Integer 32 bit	Attribute ListView		Liczba całkowita (32-bitowa)
 Beta	Application Type Window		Beta
 Could not retrieve preferred application of this file	Preferred App Menu		Nie można odnaleźć preferowanej aplikacji dla tego typu pliku
 Application flags	Application Type Window		Flagi aplikacji
@@ -142,6 +156,7 @@ Extra attributes	FileTypes Window		Dodatkowe atrybuty
 Group:	New File Type Window		Grupa:
 Alpha	Application Types Window		Alpha
 Close	Application Type Window		Zamknij
+Integer 16 bit	Attribute ListView		Liczba całkowita (16-bitowa)
 Extension	Extension Window		Rozszerzenie
 Rule:	FileTypes Window		Zasada:
 FileTypes	System name		FileTypes
@@ -153,5 +168,6 @@ Add…	FileTypes Window		Dodaj…
 Edit icon…	Icon View		Edytuj ikonę…
 Internal name:	Attribute Window		Nazwa wewnętrzna:
 Show recognition rule	FileTypes Window		Pokaż zasadę rozpoznawania
+Double	Attribute ListView		Liczba zmiennoprzecinkowa podwójnej precyzji
 Move down	FileTypes Window		Przesuń w dół
 Alpha	Application Type Window		Alpha

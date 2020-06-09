@@ -1,0 +1,29 @@
+1	croatian	x-vnd.Haiku.TextSearch	2601528845
+Please select the files you wish to have selected for you in Tracker.	GrepWindow		Označi datoteke koje želiš selektirati za sebe u Tracker-u.
+Failed to start xargs program!	Grepper		Neuspjelo pokretanje xargs programa!
+Open selection	GrepWindow		Otvori lokaciju
+Actions	GrepWindow		Akcije
+New window	GrepWindow		Novi prozor
+Encoding	GrepWindow		Enkodiranje
+OK	GrepWindow		Uredu
+Close	GrepWindow		Zatvori
+Look in sub-folders	GrepWindow		Pogledaj u podmape
+%s: Not enough room to escape the filename.	Grepper		%s: Nedovoljno prostora za izbjegavanje imena datoteke.
+Follow symbolic links	GrepWindow		Slijedi simboličke poveznice
+Text files only	GrepWindow		Samo tekstualne datoteke
+Quit	GrepWindow		Isključi
+Show files in Tracker	GrepWindow		Prikaži datoteke u Tracker-u
+Please select the files you wish to keep searching.	GrepWindow		Odaberite datoteke koje želite nastaviti tražiti.
+Trim to selection	GrepWindow		Skrati odabir
+Set target…	GrepWindow		Postavi metu...
+Search	GrepWindow		Traži
+Show lines	GrepWindow		Pokaži retke
+The unselected files will be removed from the list.	GrepWindow		Neizabrane datoteke će biti uklonjene sa liste.
+Skip folders starting with a dot	GrepWindow		Preskoči mape koje počinju sa točkom
+Cancel	GrepWindow		Odustani
+History	GrepWindow		Povijest
+File	GrepWindow		Datoteka
+Case-sensitive	GrepWindow		Osjetljivost na slova
+Select all	GrepWindow		Odaberi sve
+%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME ne može otvoriti jednu iili više mapa.
+Settings	GrepWindow		Postavke

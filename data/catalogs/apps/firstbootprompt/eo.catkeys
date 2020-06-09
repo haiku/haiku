@@ -1,0 +1,80 @@
+1	esperanto	x-vnd.Haiku-FirstBootPrompt	2670843542
+Japanese	KeymapNames		Japana
+US	KeymapNames		Usona
+Esperanto	KeymapNames		Esperanta
+Belarusian	KeymapNames		Belorusa
+Brazilian	KeymapNames		Brazila
+Dvorak	KeymapNames		Dvorak
+Polish	KeymapNames		Pola
+Latin-American	KeymapNames		Latin-Amerika
+Ukrainian	KeymapNames		Ukraina
+Russian (Yawert)	KeymapNames		Rusa (Yawert)
+United-Kingdom	KeymapNames		Angluja
+Serbian (Cyrillic)	KeymapNames		Serba (Cirila)
+Turkish (Type-F)	KeymapNames		Turka (Tipo-F)
+Bulgarian (Cyrillic)	KeymapNames		Bulgara (Cirila)
+Belgian (point)	KeymapNames		Belga (punkto)
+Finnish	KeymapNames		Finna
+Swedish	KeymapNames		Sveda
+Svorak	KeymapNames		Svoraka
+German	KeymapNames		Germana
+Swiss-German	KeymapNames		Svisgermana
+Keymap	BootPromptWindow		Klavararanĝo
+Spanish (Dvorak)	KeymapNames		Hispana (Dvorak)
+US-International	KeymapNames		Usona Internacia
+Czech	KeymapNames		Ĉeĥa
+Turkish (Type-Q)	KeymapNames		Turka (Tipo-Q)
+Slovak	KeymapNames		Slovaka
+Russian (Udmurt, Komi, Mari)	KeymapNames		Rusa (Udmurt, Komi, Mari)
+Thai (TIS-820.2538)	KeymapNames		Taja (TIS-820.2538)
+Colemak	KeymapNames		Colemak
+Dvorak (programmer's)	KeymapNames		Dvorak (por programistoj)
+Russian (Mac)	KeymapNames		Rusa (Makintoŝa)
+Thank you for trying out Haiku! We hope you'll like it!\n\nYou can select your preferred language and keyboard layout from the list on the left which will then be used instantly. You can easily change both settings from the Desktop later on on the fly.\n\nDo you wish to run the Installer or continue booting to the Desktop?\n	BootPromptWindow	For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	Ni dankas vin pro vi provas Haiku-on! Ni esperas ke vi ŝatos ĝin!\n\nVi povas elekti vian preferatan lingvon kaj klavaran aranĝon el la maldekstra listo, kiuj estos tuj uzataj. Vi povos facile ŝanĝi ambaŭ opciojn el la Laborstrio pli malfrue dinamike.\n\nĈu vi volas lanĉi la Instalilon aŭ daŭre praŝargi en medion de labortablo?\n\nNoto: Tradukado de Hakiu-aj programoj kaj aliaj eroj estas daŭranta klopodo. Vi ofte renkontos netradukitajn ĉenojn, sed se vi volus, vi povus partopreni la laboron ĉe <www.haiku-os.org>.\n
+German (Mac)	KeymapNames		Germana (Makintoŝa)
+Arabic (102)	KeymapNames		Araba (102)
+Belarusian (Latin)	KeymapNames		Belorusa (Latina)
+Belarusian (Mac)	KeymapNames		Belorusa (Makintoŝa)
+Hebrew	KeymapNames		Hebrea
+Greek	KeymapNames		Greka
+Croatian	KeymapNames		Kroata
+Run Installer	BootPromptWindow		Lanĉi Instalilon
+Faeroese	KeymapNames		Feroa
+Polish (Typewriter)	KeymapNames		Pola (Skribmaŝina)
+French (Mac)	KeymapNames		Franca (Makintoŝa)
+Spanish	KeymapNames		Hispana
+Ukrainian (Mac)	KeymapNames		Ukraina (Makintoŝa)
+Estonian	KeymapNames		Estona
+French (Bépo)	KeymapNames		Franca (Bépo)
+Serbian (Latin)	KeymapNames		Serba (Latina)
+Russian (Typewriter)	KeymapNames		Rusa (Skribmaŝina)
+French	KeymapNames		Franca
+Italian	KeymapNames		Itala
+Portuguese	KeymapNames		Portugala
+Swiss-French	KeymapNames		Svisfranca
+Slovene	KeymapNames		Slovena
+Lithuanian	KeymapNames		Litova
+French (NF Z71-300)	KeymapNames		Franca (NF Z71-300)
+ISO-9995	KeymapNames		ISO-9995
+Kazakh	KeymapNames		Kazaĥa
+Language	BootPromptWindow		Lingvo
+Lithuanian (Standard)	KeymapNames		Litova (Norma)
+Belgian (comma)	KeymapNames		Belga (komo)
+Custom	BootPromptWindow		Laŭmende
+Norwegian	KeymapNames		Norvega
+Danish	KeymapNames		Dana
+Boot to Desktop	BootPromptWindow		Praŝargi al Labortablo
+Bulgarian (Phonetic)	KeymapNames		Bulgara (Fonetika)
+Canadian-French	KeymapNames		Kanadfranca
+Welcome to Haiku!	BootPromptWindow		Bonvenon ĉe Haiku!
+Russian	KeymapNames		Rusa
+Hungarian	KeymapNames		Hungara
+Irish	KeymapNames		Irlanda
+Romanian	KeymapNames		Rumana
+Macedonian	KeymapNames		Makedona
+Czech (Mac)	KeymapNames		Ĉeĥa (Makintoŝa)
+Brazilian (ABNT2)	KeymapNames		Brazila (ABNT2)
+Albanian	KeymapNames		Albana
+Dutch	KeymapNames		Nederlanda
+Friulian	KeymapNames		Friula
+Icelandic	KeymapNames		Islanda

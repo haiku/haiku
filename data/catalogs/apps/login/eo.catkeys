@@ -1,0 +1,20 @@
+1	esperanto	x-vnd.Haiku-Login	336867745
+Invalid login!	Login View		Nevalida salutvorto!
+Error	Login App		Eraro
+--edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tEkruli en bretredakta reĝimo por permesi agordi la labortablon.\n
+Welcome to Haiku	Login Window		Bonvenon al Haiku
+Halt	Login View		Ĉesigi
+Login application for Haiku\nUsage:\n	Login App		Ensaluta programo por Haiku\nUzado:\n
+--nonmodal\tDo not make the window modal\n	Login App		--nonmodal\tNe fari la fenestron neevitebla\n
+Desktop	Desktop Window		Labortablo
+Hide password	Login View		Kaŝi pasvorton
+Reboot	Login View		Restartigi
+You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Eblas akomodi la labortablon videblan antaŭ ensaluta programo, ĵetante replikilojn sur ĝi.\n\nKiam vi finos akomodi simple ĉesu la programon (Kmd-Q).
+OK	Login View		Bone
+Info	Login App		Informo
+Login:	Login View		Salutnomo:
+Password:	Login View		Pasvorto:
+Unimplemented	Login App		Nerealigita
+OK	Login App		Bone
+Error: %1	Login App		Eraris: %1
+error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	eraro %s\n

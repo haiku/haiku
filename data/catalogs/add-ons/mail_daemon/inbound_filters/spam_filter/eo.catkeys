@@ -1,0 +1,7 @@
+1	esperanto	x-vnd.Haiku-SpamFilter	468104950
+or empty e-mail	SpamFilterConfig		aŭ vakua retmesaĝo
+Genuine below and uncertain above:	SpamFilterConfig		Aŭtentika malsupren kaj necerta supren:
+Spam above:	SpamFilterConfig		Trudaĵo supren:
+Add spam rating to start of subject	SpamFilterConfig		Antaŭi subjekton per trudmesaĝa rango
+Bayesian Spam Filter	SpamFilter		Bayesian'a Trudmesaĝa Filtrilo
+Learn from all incoming e-mail	SpamFilterConfig		Lerni per ĉiu ricevata retmesaĝo

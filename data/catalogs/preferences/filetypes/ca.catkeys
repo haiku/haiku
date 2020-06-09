@@ -47,7 +47,7 @@ Save	Application Type Window		Desa
 Icon	Application Type Window		Icona
 Duration	Attribute ListView		Durada
 Version:	Application Type Window		Versió:
-Default application	FileType Window		Aplicació per omissió
+Default application	FileType Window		Aplicació per defecte
 Internal name:	New File Type Window		Nom intern:
 Integer 8 bit	Attribute ListView		Enter de 8 bits
 Extension:	Extension Window		Extensió:
@@ -56,7 +56,7 @@ Extensions:	FileTypes Window		Extensions:
 Select preferred application	FileType Window		Seleccioneu l'aplicació preferida
 Description:	FileTypes Window		Descripció:
 Multiple files from \"%s\" file type	FileType Window		Múltiples fitxers basat al tipus \"%s\"
-Add new group	New File Type Window		Afegeix un grup nou
+Add new group	New File Type Window		Afegeix-hi un grup nou
 Remove uninstalled	Application Types Window		Suprimeix el que s'han desinstal·tat
 File	Application Type Window		Fitxer
 Progress	Application Types Window		Progrés
@@ -100,9 +100,9 @@ no icon	FileTypes Window		cap icona
 Single launch	Application Type Window		Només una instància
 %s file type	FileType Window		Tipus de fitxer %s
 Default	Attribute ListView		Per defecte
-Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		No es pot revertir la supressió d'un supertipus de fitxer.\nEs perdran tots els tipus de fitxers que pertanyen a aquest supertipus!\n\nSegur que ho voleu fer? Per suprimir-ne tot el grup, premeu \"Suprimeix\" mantenint premuda la tecla Maj.
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		No es pot revertir la supressió d'un supertipus de fitxer.\nEs perdran tots els tipus de fitxers que pertanyen a aquest supertipus!\n\nSegur que ho voleu fer? Per suprimir-ne tot el grup, premeu Suprimeix mantenint premuda la tecla Maj.
 String	Attribute ListView		Cadena
-Add type	New File Type Window		Afegeix un tipus
+Add type	New File Type Window		Afegeix-hi un tipus
 Remove icon	Icon View		Suprimeix la icona
 Boolean	Attribute ListView		Booleà
 Cancel	Extension Window		Cancel·la
@@ -120,14 +120,14 @@ Choose type	Type List Window		Escolliu el tipus
 Select…	FileTypes Window		Seleccioneu...
 File recognition	FileTypes Window		Reconeixement de fitxers
 Application types…	FileTypes Window		Tipus d'aplicacions...
-Add icon…	Icon View		Afegeix una icona...
+Add icon…	Icon View		Afegeix-hi una icona...
 Cancel	FileTypes Window		Cancel·la
 Save into resource file…	Application Type Window		Desa-ho al fitxer de recursos...
 Special:	Attribute Window		Especial:
 Type:	Attribute Window		Tipus:
 Could not retrieve application signature	Preferred App Menu		No s'ha pogut obtenir la signatura de l'aplicació.
 Beta	Application Types Window		Beta
-Add group	New File Type Window		Afegeix un grup
+Add group	New File Type Window		Afegeix-hi un grup
 Cancel	Attribute Window		Cancel·la
 Gamma	Application Types Window		Gama
 Supported types	Application Type Window		Tipus permesos
@@ -169,5 +169,5 @@ Edit icon…	Icon View		Edita la icona...
 Internal name:	Attribute Window		Nom intern:
 Show recognition rule	FileTypes Window		Mostra l regla de reconeixement
 Double	Attribute ListView		Doble
-Move down	FileTypes Window		Desplaça cap avall
+Move down	FileTypes Window		Mou avall
 Alpha	Application Type Window		Alfa

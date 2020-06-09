@@ -1,8 +1,8 @@
 1	spanish; castilian	x-vnd.Haiku-STXTTranslator	274886668
 Be styled text file	STXTTranslator		Archivo de estilo Be
-Plain text file	STXTTranslator		Archivo de texto plano
-STXTTranslator Settings	STXTTranslator		Configuración STXTTranslator
-StyledEdit file translator	STXTView		Transformador de archivos StyledEdit
+Plain text file	STXTTranslator		Archivo de texto sin formato
+STXTTranslator Settings	STXTTranslator		Configuración del Intérprete STXT
+StyledEdit file translator	STXTView		Intérprete de archivos StyledEdit
 StyledEdit files	STXTTranslator		Archivos StyledEdit
-StyledEdit file translator	STXTTranslator		Transformador de archivos StyledEdit
+StyledEdit file translator	STXTTranslator		Intérprete de archivos StyledEdit
 STXT Settings	STXTMain		Configuración STXT

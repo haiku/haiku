@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku.TextSearch	1867528375
+1	friulian	x-vnd.Haiku.TextSearch	2224690775
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Sielç i file che tu desideris che a vignedin selezionâts par te tal Tracker.
 %appname% : %path%	GrepWindow		%appname% : %path%
 Failed to start xargs program!	Grepper		No si è rivâts a inviâ il program xargs!
@@ -19,7 +19,6 @@ Show files in Tracker	GrepWindow		Mostre i file tal Tracker
 Please select the files you wish to keep searching.	GrepWindow		Selezione i file che su chei tu desideris continuâ la ricercje. 
 Trim to selection	GrepWindow		Ridûs ae selezion
 Set target…	GrepWindow		Stabilìs destinazion…
-TextSearch	GrepWindow		TextSearch
 Failed to open input pipe!	Grepper		No si è rivâts a vierzi il condot/pipe di input!
 Search	GrepWindow		Cîr
 Copy text to clipboard	GrepWindow		Copie il test tes notis

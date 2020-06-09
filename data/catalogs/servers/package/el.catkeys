@@ -1,0 +1,16 @@
+1	greek, modern (1453-)	x-vnd.haiku-package_daemon	1440586681
+Package changes	PackageResult	Window title	Αλλαγές πακέτου
+uninstall package %s\n	PackageResult	Don't change '%s' variable	απεγκατάσταση πακέτου %s\n
+ignore problem for now	PackageProblem		αγνόησε το πρόβλημα προς το παρόν
+solution %d:	PackageProblem	Don't change the %d variable	λύση %d:
+The following problems have been encountered. Please select a solution for each:	PackageProblem		Παρουσιάστηκαν τα ακόλουθα προβλήματα. Παρακαλώ επιλέξτε μία λύση για το καθένα από αυτά:
+Apply changes	PackageResult		Εφαρμογή αλλαγών
+Package daemon	PackageManager		Πρόγραμμα παρασκηνίου πακέτων
+install package %s from repository %s\n	PackageResult	Don't change '%s' variables	εγκατάσταση πακέτου %s από το αποθετήριο %s\n
+The following additional package changes have to be made:	PackageResult		Πρέπει να γίνουν οι ακόλουθες επιπλέον αλλαγές πακέτων:
+Warning	PackageManager		Προσοχή
+Cancel	PackageProblem		Ακύρωση
+don't activate package %source%	PackageProblem	don't change '%source%	να μην ενεργοποιηθεί το πακέτο %source%
+Cancel	PackageResult		Ακύρωση
+Retry	PackageProblem		Προσπάθεια εκ νέου
+Package problems	PackageProblem	Window title	Προβλήματα πακέτου

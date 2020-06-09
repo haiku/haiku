@@ -1,10 +1,12 @@
-1	dutch; flemish	x-vnd.Haiku-WebPositive	2121601852
+1	dutch; flemish	x-vnd.Haiku-WebPositive	1879106286
 Authentication required	Authentication Panel		Aanmelding is vereist
 Previous	WebPositive Window		Vorige
+(Finish: %date)	Download Window		(Voltooid: %date)
 Open bookmarks confirmation	WebPositive Window		Bladwijzerbevestiging openen
 Download folder:	Settings Window		Downloadmap:
 Close window	WebPositive Window		Venster sluiten
 Find:	WebPositive Window		Zoeken:
+Script console	WebPositive Window		Scriptconsole
 Fonts	Settings Window		Lettertypen
 Path	Cookie Manager		Pad
 of	Download Window	...as in '12kB of 256kB'	van
@@ -14,6 +16,7 @@ Use proxy server to connect to the internet	Settings Window		Gebruik een proxyse
 Auto-hide interface in full screen mode	Settings Window		Verberg interface automatisch in volledig-scherm modus
 There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Er was een fout bij het ophalen van de bladwijzermap.\n\nFout: %error
 Delete	Cookie Manager		Verwijderen
+(Finish: %date - Over %duration left)	Download Window		(Voltooid: %date - Meer dan %duration te doen)
 Open containing folder	Download Window		Bijbehorende map openen
 Find previous	WebPositive Window		Vorige zoeken
 Full screen	WebPositive Window		Volledig scherm
@@ -25,7 +28,9 @@ Start page:	Settings Window		Startpagina:
 Cancel	Download Window		Annuleren
 Settings	Settings Window		Instellingen
 Downloads	WebPositive Window		Downloads
+Browse…	Settings Window		Bladeren…
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Een bladwijzer voor deze pagina (%bookmarkName) bestaat al.
+Resume prior session	Settings Window		Vorige sessie hervatten
 Match case	WebPositive Window		Hoofdlettergevoelig
 Proxy password:	Settings Window		Wachtwoord proxyserver:
 Size:	Font Selection view		Grootte:
@@ -52,6 +57,7 @@ WebPositive	System name		WebPositive
 Reload	WebPositive Window		Herladen
 Expiration	Cookie Manager		Vervaldatum
 Download finished	Download Window		Download gereed
+Cookie manager	WebPositive Window		Cookiemanager
 OK	Authentication Panel		Ok
 Hide password text	Authentication Panel		Wachtwoordtekst verbergen
 Username:	Authentication Panel		Gebruikersnaam:
@@ -66,6 +72,7 @@ Download aborted	Download Window		Download afgebroken
 Number of days to keep links in History menu:	Settings Window		Aantal dagen dat links in het geschiedenismenu staan:
 Password:	Authentication Panel		Wachtwoord:
 Forward	WebPositive Window		Volgende
+Clear	Console Window		Legen
 Cut	URL Bar		Knippen
 View	WebPositive Window		Beeld
 Paste	URL Bar		Plakken
@@ -106,10 +113,15 @@ Cancel	Settings Window		Annuleren
 History	WebPositive Window		Geschiedenis
 Reset size	WebPositive Window		Grootte opnieuw instellen
 Do you really want to clear the browsing history?	WebPositive Window		Wilt u echt de browsergeschiedenis wissen?
+Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Naar de volgende plek met deze zoektermen gaan
 Fixed font:	Settings Window		Lettertype met vaste breedte:
 Quit	WebPositive Window		Afsluiten
+Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Naar de vorige plek met deze zoektermen gaan
 Remember username and password for this site	Authentication Panel		Gebruikersnaam en wachtwoord voor deze site onthouden
+(Finish: %date - %duration left)	Download Window		(Voltooid: %date - not %duration te gaan)
+Cookie manager	Cookie Manager		Cookiemanager
 Show home button	Settings Window		Thuisknop tonen
+Start new session	Settings Window		Nieuwe sessie starten
 The cookie jar is empty!	Cookie Manager		De koektrommel is leeg!
 Value	Cookie Manager		Waarde
 Remove missing	Download Window		Ontbrekende verwijderen
@@ -118,11 +130,13 @@ Double-click or middle-click to open new tab.	Tab Manager		Dubbelklik of middel-
 Next	WebPositive Window		Volgende
 Bookmark error	WebPositive Window		Bladwijzerfout
 OK	WebPositive Window		Ok
+WebPositive	Download Window		WebPositive
 Zoom text only	WebPositive Window		Alleen tekst inzoomen
 Save page as…	WebPositive Window		Pagina opslaan als…
 Page source error	WebPositive Window		Paginabronfout
 Auto-hide mouse pointer	Settings Window		Muisaanwijzer automatisch verbergen
 Requesting %url	WebPositive Window		Opvragen van %url
+Flags	Cookie Manager		Opties
 Window	WebPositive Window		Venster
 Proxy server address:	Settings Window		Adres proxyserver:
 Search page:	Settings Window		Zoekpagina:
@@ -130,7 +144,9 @@ Settings	WebPositive Window		Instellingen
 Clear	URL Bar		Wissen
 Loading %url	WebPositive Window		Bezig met het laden van %url
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Pa's wijze lynx bezag vroom het fikse aquaduct.
+Start up:	Settings Window		Opstarten:
 Confirmation	WebPositive Window		Bevestiging
+Session cookie	Cookie Manager		Sessiecookie
 Open all	WebPositive Window		Alles openen
 Cut	WebPositive Window		Knippen
 Downloads	Download Window		Downloads
@@ -138,5 +154,6 @@ Open blank page	Settings Window		Lege pagina openen
 Clear history	WebPositive Window		Geschiedenis legen
 Cancel	WebPositive Window		Annuleren
 Bookmark info	WebPositive Window		Bladwijzerinfo
+Script console	Console Window		Scriptconsole
 Copy	URL Bar		Kopiëren
 Open start page	Settings Window		Startpagina openen

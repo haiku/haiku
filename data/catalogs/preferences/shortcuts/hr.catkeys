@@ -1,0 +1,31 @@
+1	croatian	x-vnd.Haiku-Shortcuts	4234149315
+*MouseUp	ShortcutsWindow		*Mišgore
+Application	ShortcutsWindow		Program
+Option	ShortcutsSpec	Name for modifier on keyboard	Opcija
+Save changes before closing?	ShortcutsWindow		Spremiti izmjene prije zatvaranja?
+Revert to saved	ShortcutsWindow		Vrati na spremljeno
+Don't save	ShortcutsWindow		Nemoj spremiti
+*MouseDown	ShortcutsWindow		*Mišdolje
+Save	ShortcutsWindow		Spremi
+Oh no	ShortcutsWindow		Oh ne
+Key	ShortcutsWindow		Tipka
+Select	ShortcutsWindow		Odaberi
+Shortcuts	System name		Prečaci
+Quit	ShortcutsWindow		Izađi
+(Choose application with file requester)	ShortcutsWindow		(Odaberi program sa zahtjevom za datoteku)
+Cancel	ShortcutsWindow		Otkaži
+Control	ShortcutsSpec	Name for modifier on keyboard	Control
+Left	ShortcutsSpec		Lijevo
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Shorcuts nije mogao raščlaniti vaš keyset file!
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Shorcuts nije mogao snimiti vaš keyset file!
+Remove selected shortcut	ShortcutsWindow		Ukloni odabrani prečac
+Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
+Save & apply	ShortcutsWindow		Spremi i primjeni
+Open	ShortcutsWindow		Otvori
+Append	ShortcutsWindow		Dodaj
+Both	ShortcutsSpec		Oba
+Right	ShortcutsSpec		Desno
+OK	ShortcutsWindow		U redu
+Add new shortcut	ShortcutsWindow		Dodaj novi prečac
+Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
+File	ShortcutsWindow		Datoteka

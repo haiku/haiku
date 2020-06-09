@@ -1,46 +1,45 @@
-1	lithuanian	x-vnd.Haiku-ActivityMonitor	581504566
-P-faults	DataSource		Psl. klaidos
-Threads	DataSource		Gijos
-Always on top	ActivityWindow		Visada viršuje
-Add graph	ActivityWindow		Pridėti grafiką
+1	lithuanian	x-vnd.Haiku-ActivityMonitor	3098384095
 Teams	DataSource		Procesų grupės
+Semaphores	DataSource		Semaforai
+TX	DataSource	Shorter version for Sending	Išs.
+Block cache memory	DataSource		Blokinio podėlio atmintis
+%lld ms	SettingsWindow		%lld ms
 MiB	DataSource		MiB
-Network send	DataSource		Išsiunčiami duomenys
-CPU usage (combined)	DataSource		Centrinio procesoriaus apkrova (kompleksinė)
-CPU	DataSource		Centrinis procesorius Nr.
-Used memory	DataSource		Naudojama atmintis
-Cached memory	DataSource		Atmintis podėlyje
-Apps	DataSource		Programos
-Show legend	ActivityView		Rodyti legendą
 Text clipboard	DataSource		Tekstas iškarpinėje
-Settings	ActivityWindow		Nuostatos
+Network send	DataSource		Išsiunčiami duomenys
+Running applications	DataSource		Veikiančios programos
+Cache	DataSource		Podėlis
+CPU usage (combined)	DataSource		Centrinio procesoriaus apkrova (kompleksinė)
+Threads	DataSource		Gijos
 Receiving	DataSource		Atsiuntimas
+Remove graph	ActivityView		Pašalinti grafiką
+Swap space	DataSource		Sukeitimų failo dydis
+CPU	DataSource		Centrinis procesorius Nr.
+ActivityMonitor	System name		Aktyvumo monitorius
+Update time interval:	SettingsWindow		Atnaujinimo periodas:
+RX	DataSource	Shorter version for Receiving.	Ats.
 Settings…	ActivityWindow		Nuostatos…
+Block cache	DataSource		Blokinis podėlis
+Memory	DataSource		Atmintis
+CPU usage	DataSource		Centrinio procesoriaus apkrova
+Quit	ActivityWindow		Baigti darbą
+Raw clipboard	DataSource		Iškarpinės apimtis
+Settings	ActivityWindow		Nuostatos
+Used memory	DataSource		Naudojama atmintis
+%.1f faults/s	DataSource		%.1f klaidų/s
+Show legend	ActivityView		Rodyti legendą
+Cached memory	DataSource		Atmintis podėlyje
+File	ActivityWindow		Failas
 Ports	DataSource		Prievadai
 Page faults	DataSource		Puslapiavimo klaidos
-Sending	DataSource		Išsiuntimas
-Cache	DataSource		Podėlis
-%.1f faults/s	DataSource		%.1f klaidų/s
-Update time interval:	SettingsWindow		Atnaujinimo periodas:
-TX	DataSource	Shorter version for Sending	Išs.
-Quit	ActivityWindow		Baigti darbą
-Block cache memory	DataSource		Blokinio podėlio atmintis
-Remove graph	ActivityView		Pašalinti grafiką
-%lld sec.	SettingsWindow		%lld sek.
-%lld ms	SettingsWindow		%lld ms
-CPU usage	DataSource		Centrinio procesoriaus apkrova
-Raw clipboard	DataSource		Iškarpinės apimtis
-Sems	DataSource		Sem.
-%.1f MiB	DataSource		%.1f MiB
-ActivityMonitor	System name		Aktyvumo monitorius
-Running applications	DataSource		Veikiančios programos
-Semaphores	DataSource		Semaforai
-Block cache	DataSource		Blokinis podėlis
-Swap space	DataSource		Sukeitimų failo dydis
-Swap	DataSource		Sukeitimų failas
-File	ActivityWindow		Failas
-usage	DataSource		apkrova
+Apps	DataSource		Programos
 Additional items	ActivityView		Papildomi elementai
+Add graph	ActivityWindow		Pridėti grafiką
+Sending	DataSource		Išsiuntimas
+%.1f MiB	DataSource		%.1f MiB
+Always on top	ActivityWindow		Visada viršuje
+Swap	DataSource		Sukeitimų failas
+%lld sec.	SettingsWindow		%lld sek.
+P-faults	DataSource		Psl. klaidos
+Sems	DataSource		Sem.
 Network receive	DataSource		Atsiunčiami duomenys
-Memory	DataSource		Atmintis
-RX	DataSource	Shorter version for Receiving.	Ats.
