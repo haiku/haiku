@@ -208,18 +208,10 @@ ShapePainter::Draw(BRect frame, bool filled)
 			fPtStack.pop();
 		}
 
-		// this might seem a bit weird, but under R5, the shapes
-		// are always offset by the current pen location
-		BPoint screenOffset
-			= fCanvas->CurrentState()->PenLocation();
-		frame.OffsetBy(screenOffset);
-
-		const SimpleTransform transform = fCanvas->PenToScreenTransform();
-		transform.Apply(&screenOffset);
-		transform.Apply(&frame);
-
+		BPoint offset(fCanvas->CurrentState()->PenLocation());
+		fCanvas->PenToScreenTransform().Apply(&offset);
 		fCanvas->GetDrawingEngine()->DrawShape(frame, opCount, opList,
-			ptCount, ptList, filled, screenOffset, fCanvas->Scale());
+			ptCount, ptList, filled, offset, fCanvas->Scale());
 
 		delete[] opList;
 		delete[] ptList;
@@ -415,18 +407,9 @@ draw_string(void* _canvas, const char* string, size_t length, float deltaSpace,
 
 static void
 draw_string_locations(void* _canvas, const char* string, size_t length,
-	const BPoint* _locations, size_t locationsCount)
+	const BPoint* locations, size_t locationsCount)
 {
 	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
-	BStackOrHeapArray<BPoint, 200> locations(locationsCount);
-	if (!locations.IsValid())
-		return;
-
-	const SimpleTransform transform = canvas->PenToScreenTransform();
-	for (size_t i = 0; i < locationsCount; i++) {
-		locations[i] = _locations[i];
-		transform.Apply(&locations[i]);
-	}
 
 	BPoint location = canvas->GetDrawingEngine()->DrawString(string, length,
 		locations);
@@ -775,13 +758,8 @@ static void
 set_transform(void* _canvas, const BAffineTransform& transform)
 {
 	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
-
-	BPoint leftTop(0, 0);
-	canvas->PenToScreenTransform().Apply(&leftTop);
-
 	canvas->CurrentState()->SetTransform(transform);
-	canvas->GetDrawingEngine()->SetTransform(
-		canvas->CurrentState()->CombinedTransform(), leftTop.x, leftTop.y);
+	canvas->GetDrawingEngine()->SetTransform(transform);
 }
 
 
@@ -789,15 +767,10 @@ static void
 translate_by(void* _canvas, double x, double y)
 {
 	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
-
-	BPoint leftTop(0, 0);
-	canvas->PenToScreenTransform().Apply(&leftTop);
-
 	BAffineTransform transform = canvas->CurrentState()->Transform();
 	transform.PreTranslateBy(x, y);
 	canvas->CurrentState()->SetTransform(transform);
-	canvas->GetDrawingEngine()->SetTransform(
-		canvas->CurrentState()->CombinedTransform(), leftTop.x, leftTop.y);
+	canvas->GetDrawingEngine()->SetTransform(transform);
 }
 
 
@@ -805,15 +778,10 @@ static void
 scale_by(void* _canvas, double x, double y)
 {
 	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
-
-	BPoint leftTop(0, 0);
-	canvas->PenToScreenTransform().Apply(&leftTop);
-
 	BAffineTransform transform = canvas->CurrentState()->Transform();
 	transform.PreScaleBy(x, y);
 	canvas->CurrentState()->SetTransform(transform);
-	canvas->GetDrawingEngine()->SetTransform(
-		canvas->CurrentState()->CombinedTransform(), leftTop.x, leftTop.y);
+	canvas->GetDrawingEngine()->SetTransform(transform);
 }
 
 
@@ -821,15 +789,10 @@ static void
 rotate_by(void* _canvas, double angleRadians)
 {
 	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
-
-	BPoint leftTop(0, 0);
-	canvas->PenToScreenTransform().Apply(&leftTop);
-
 	BAffineTransform transform = canvas->CurrentState()->Transform();
 	transform.PreRotateBy(angleRadians);
 	canvas->CurrentState()->SetTransform(transform);
-	canvas->GetDrawingEngine()->SetTransform(
-		canvas->CurrentState()->CombinedTransform(), leftTop.x, leftTop.y);
+	canvas->GetDrawingEngine()->SetTransform(transform);
 }
 
 
