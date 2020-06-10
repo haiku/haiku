@@ -275,7 +275,7 @@ const struct unicode_block_entry kUnicodeBlocks[] = {
 	{B_TRANSLATE("Warang Citi"), 0x0118a0, 0x0118ff, false, kNoBlock},
 	{B_TRANSLATE("Dives Akuru"), 0x011900, 0x01195f, false, kNoBlock},
 	{B_TRANSLATE("Nandingari"), 0x0119a0, 0x0119ff, false, kNoBlock},
-	{B_TRANSLATE("Zanzabar Square"), 0x011a00, 0x011a4f, false, kNoBlock},
+	{B_TRANSLATE("Zanabazar Square"), 0x011a00, 0x011a4f, false, kNoBlock},
 	{B_TRANSLATE("Soyombo"), 0x011a50, 0x011aaf, false, kNoBlock},
 	{B_TRANSLATE("Pau Cin Hau"), 0x011ac0, 0x011aff, false, kNoBlock},
 	{B_TRANSLATE("Bhaiksuki"), 0x011c00, 0x011c6f, false, kNoBlock},
