@@ -1406,12 +1406,14 @@
 	aligned. A FS doesn't have to read more than one entry at a time, but it is
 	recommended to support that for performance reasons.
 
-	When the function is invoked after the end of the directory has been
-	reached, it shall set the variable \a _num points to to \c 0 and return
-	\c B_OK. If the provided buffer is too small to contain even the single next
+	If the provided buffer is too small to contain even the single next
 	entry, \c B_BUFFER_OVERFLOW shall be returned. It shall not fail, if at
 	least one entry has been read, and the buffer is just too small to hold as
-	many entries as requested.
+	many entries as requested. When the function is invoked after the end of
+	the directory has been reached, it shall set the variable \a _num points to
+	\c 0 and return \c B_OK. Usually the function is invoked repeatedly until
+	then to get more entries. The \c cookie parameter must be used to track the
+	position in the directory.
 
 	Note that a directory is expected to contain the special entries \c "." and
 	\c "..", referring to the same directory and the parent directory
