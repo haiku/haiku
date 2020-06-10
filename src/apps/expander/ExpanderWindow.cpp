@@ -152,9 +152,9 @@ ExpanderWindow::ExpanderWindow(BRect frame, const entry_ref* ref,
 					.Add(fStatusView = new StatusView())
 					.End()
 				.End()
-			.Add(fScrollView)
 			.SetInsets(B_USE_WINDOW_SPACING)
-			.End();
+			.End()
+		.Add(fScrollView);
 
 	pathLayout->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 	size = GetLayout()->View()->PreferredSize();
