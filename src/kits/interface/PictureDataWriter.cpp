@@ -157,6 +157,21 @@ PictureDataWriter::WriteSetLineMode(const cap_mode& cap, const join_mode& join,
 
 
 status_t
+PictureDataWriter::WriteSetFillRule(int32 fillRule)
+{
+	try {
+		BeginOp(B_PIC_SET_FILL_RULE);
+		Write<int32>(fillRule);
+		EndOp();
+	} catch (status_t& status) {
+		return status;
+	}
+
+	return B_OK;
+}
+
+
+status_t
 PictureDataWriter::WriteSetScale(const float& scale)
 {
 	try {

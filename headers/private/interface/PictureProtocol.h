@@ -58,6 +58,7 @@ enum {
 	B_PIC_SET_STIPLE_PATTERN	= 0x0308,
 	B_PIC_ENTER_FONT_STATE		= 0x0309,
 	B_PIC_SET_BLENDING_MODE		= 0x030A,
+	B_PIC_SET_FILL_RULE			= 0x030B,
 	B_PIC_SET_FONT_FAMILY		= 0x0380,
 	B_PIC_SET_FONT_STYLE		= 0x0381,
 	B_PIC_SET_FONT_SPACING		= 0x0382,
@@ -76,7 +77,7 @@ enum {
 };
 
 
-const static uint32 kOpsTableSize = 70;
+const static uint32 kOpsTableSize = 71;
 
 
 #endif

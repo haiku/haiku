@@ -3303,6 +3303,19 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver& link)
 				info.lineJoin, info.miterLimit);
 			break;
 		}
+		case AS_VIEW_SET_FILL_RULE:
+		{
+			int32 fillRule;
+			if (link.Read<int32>(&fillRule) != B_OK)
+				break;
+
+			picture->WriteSetFillRule(fillRule);
+
+			fCurrentView->CurrentState()->SetFillRule(fillRule);
+			fWindow->GetDrawingEngine()->SetFillRule(fillRule);
+
+			break;
+		}
 		case AS_VIEW_SET_SCALE:
 		{
 			float scale;

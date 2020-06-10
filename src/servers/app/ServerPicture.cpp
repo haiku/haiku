@@ -897,6 +897,15 @@ set_blending_mode(void* _canvas, source_alpha alphaSrcMode,
 
 
 static void
+set_fill_rule(void* _canvas, int32 fillRule)
+{
+	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
+	canvas->CurrentState()->SetFillRule(fillRule);
+	canvas->GetDrawingEngine()->SetFillRule(fillRule);
+}
+
+
+static void
 set_transform(void* _canvas, const BAffineTransform& transform)
 {
 	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
@@ -1062,7 +1071,8 @@ static const BPrivate::picture_player_callbacks kPicturePlayerCallbacks = {
 	draw_arc_gradient,
 	draw_ellipse_gradient,
 	draw_polygon_gradient,
-	draw_shape_gradient
+	draw_shape_gradient,
+	set_fill_rule
 };
 
 
