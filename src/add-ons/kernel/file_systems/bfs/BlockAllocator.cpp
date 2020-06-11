@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2017, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2020, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -238,7 +238,7 @@ AllocationBlock::SetTo(AllocationGroup& group, uint16 block)
 #ifdef DEBUG
 	fWritable = false;
 #endif
-	return CachedBlock::SetTo(group.Start() + block) != NULL ? B_OK : B_ERROR;
+	return CachedBlock::SetTo(group.Start() + block);
 }
 
 
@@ -255,8 +255,7 @@ AllocationBlock::SetToWritable(Transaction& transaction, AllocationGroup& group,
 #ifdef DEBUG
 	fWritable = true;
 #endif
-	return CachedBlock::SetToWritable(transaction, group.Start() + block)
-		!= NULL ? B_OK : B_ERROR;
+	return CachedBlock::SetToWritable(transaction, group.Start() + block);
 }
 
 

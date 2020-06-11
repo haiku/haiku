@@ -112,11 +112,17 @@ iter_csi(struct csi *csi, int sectors)
 uint8 *
 csi_get_block(struct csi *csi)
 {
+	status_t status;
+	const void* block;
+
 	if (_validate_cs_(csi->vol, csi->cluster, csi->sector) != 0)
 		return NULL;
 
-	return (uint8 *)block_cache_get_etc(csi->vol->fBlockCache,
-		csi_to_block(csi), 1, csi->vol->bytes_per_sector);
+	status = block_cache_get_etc(csi->vol->fBlockCache,
+		csi_to_block(csi), 1, csi->vol->bytes_per_sector, &block);
+	if (status != B_OK)
+		return NULL;
+	return (uint8 *)block;
 }
 
 
@@ -214,8 +220,12 @@ csi_write_blocks(struct csi *csi, uint8 *buffer, ssize_t len)
 	}
 
 	for (i = block; i < block + sectors; i++) {
-		char *blockData = block_cache_get_writable_etc(csi->vol->fBlockCache, i,
-			0, 1, -1);
+		char *blockData;
+		status_t status = block_cache_get_writable_etc(csi->vol->fBlockCache,
+			i, 0, 1, -1, &blockData);
+		if (status != B_OK)
+			return status;
+
 		memcpy(blockData, buf, csi->vol->bytes_per_sector);
 		buf += csi->vol->bytes_per_sector;
 		block_cache_put(csi->vol->fBlockCache, i);
@@ -233,6 +243,7 @@ csi_write_blocks(struct csi *csi, uint8 *buffer, ssize_t len)
 status_t
 csi_write_block(struct csi *csi, uint8 *buffer)
 {
+	status_t status;
 	off_t block;
 	char *blockData;
 
@@ -242,8 +253,11 @@ csi_write_block(struct csi *csi, uint8 *buffer)
 	if (_validate_cs_(csi->vol, csi->cluster, csi->sector) != 0)
 		return EINVAL;
 
-	blockData = block_cache_get_writable_etc(csi->vol->fBlockCache, block, 0, 1,
-		-1);
+	status = block_cache_get_writable_etc(csi->vol->fBlockCache, block, 0, 1,
+		-1, &blockData);
+	if (status != B_OK)
+		return status;
+
 	memcpy(blockData, buffer, csi->vol->bytes_per_sector);
 	block_cache_put(csi->vol->fBlockCache, block);
 

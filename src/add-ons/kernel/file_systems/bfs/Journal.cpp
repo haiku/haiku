@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2017, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2020, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -484,11 +484,11 @@ Journal::_ReplayRunArray(int32* _start)
 
 	CachedBlock cachedArray(fVolume);
 
-	const run_array* array = (const run_array*)cachedArray.SetTo(logOffset
-		+ firstBlockNumber);
-	if (array == NULL)
-		return B_IO_ERROR;
+	status_t status = cachedArray.SetTo(logOffset + firstBlockNumber);
+	if (status != B_OK)
+		return status;
 
+	const run_array* array = (const run_array*)cachedArray.Block();
 	if (_CheckRunArray(array) < B_OK)
 		return B_BAD_DATA;
 
@@ -505,16 +505,16 @@ Journal::_ReplayRunArray(int32* _start)
 
 		off_t offset = fVolume->ToOffset(run);
 		for (int32 i = 0; i < run.Length(); i++) {
-			const uint8* data = cached.SetTo(logOffset + blockNumber);
-			if (data == NULL)
-				RETURN_ERROR(B_IO_ERROR);
+			status = cached.SetTo(logOffset + blockNumber);
+			if (status != status)
+				RETURN_ERROR(status);
 
 			// TODO: eventually check other well known offsets, like the
 			// root and index dirs
 			if (offset == 0) {
 				// This log entry writes over the superblock - check if
 				// it's valid!
-				if (Volume::CheckSuperBlock(data) != B_OK) {
+				if (Volume::CheckSuperBlock(cached.Block()) != B_OK) {
 					FATAL(("Log contains invalid superblock!\n"));
 					RETURN_ERROR(B_BAD_DATA);
 				}
@@ -537,12 +537,12 @@ Journal::_ReplayRunArray(int32* _start)
 
 		off_t offset = fVolume->ToOffset(run);
 		for (int32 i = 0; i < run.Length(); i++) {
-			const uint8* data = cached.SetTo(logOffset + blockNumber);
-			if (data == NULL)
-				RETURN_ERROR(B_IO_ERROR);
+			status = cached.SetTo(logOffset + blockNumber);
+			if (status != B_OK)
+				RETURN_ERROR(status);
 
-			ssize_t written = write_pos(fVolume->Device(), offset, data,
-				blockSize);
+			ssize_t written = write_pos(fVolume->Device(), offset,
+				cached.Block(), blockSize);
 			if (written != blockSize)
 				RETURN_ERROR(B_IO_ERROR);
 

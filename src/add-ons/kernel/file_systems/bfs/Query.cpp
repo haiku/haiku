@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2017, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2020, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2010, Clemens Zeidler <haiku@clemens-zeidler.de>
  * This file may be used under the terms of the MIT License.
  */
@@ -384,9 +384,9 @@ Equation::Match(Inode* inode, const char* attributeName, int32 type,
 		buffer = const_cast<uint8*>(key);
 	} else if (!strcmp(fAttribute, "name")) {
 		// we need to lock before accessing Inode::Name()
-		nodeGetter.SetToNode(inode);
-		if (nodeGetter.Node() == NULL)
-			return B_IO_ERROR;
+		status_t status = nodeGetter.SetTo(inode);
+		if (status != B_OK)
+			return status;
 
 		recursive_lock_lock(&inode->SmallDataLock());
 		locked = true;
@@ -417,9 +417,9 @@ Equation::Match(Inode* inode, const char* attributeName, int32 type,
 	} else {
 		// then for attributes in the small_data section, and finally for the
 		// real attributes
-		nodeGetter.SetToNode(inode);
-		if (nodeGetter.Node() == NULL)
-			return B_IO_ERROR;
+		status_t status = nodeGetter.SetTo(inode);
+		if (status != B_OK)
+			return status;
 
 		Inode* attribute;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2012, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2020, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2012, Andreas Henriksson, sausageboy@gmail.com
  * This file may be used under the terms of the MIT License.
  */
@@ -211,10 +211,11 @@ CheckVisitor::VisitDirectoryEntry(Inode* inode, Inode* parent,
 	// check if the inode's name is the same as in the b+tree
 	if (inode->IsRegularNode()) {
 		RecursiveLocker locker(inode->SmallDataLock());
-		NodeGetter node(GetVolume(), inode);
-		if (node.Node() == NULL) {
+		NodeGetter node(GetVolume());
+		status_t status = node.SetTo(inode);
+		if (status != B_OK) {
 			Control().errors |= BFS_COULD_NOT_OPEN;
-			Control().status = B_IO_ERROR;
+			Control().status = status;
 			return B_OK;
 		}
 
@@ -496,16 +497,17 @@ CheckVisitor::_CheckInodeBlocks(Inode* inode, const char* name)
 
 	if (data->max_indirect_range) {
 		status = _CheckAllocated(data->indirect, "indirect");
-		if (status < B_OK)
+		if (status != B_OK)
 			return status;
 
 		off_t block = GetVolume()->ToBlock(data->indirect);
 
 		for (int32 i = 0; i < data->indirect.Length(); i++) {
-			block_run* runs = (block_run*)cached.SetTo(block + i);
-			if (runs == NULL)
-				RETURN_ERROR(B_IO_ERROR);
+			status = cached.SetTo(block + i);
+			if (status != B_OK)
+				RETURN_ERROR(status);
 
+			block_run* runs = (block_run*)cached.Block();
 			int32 runsPerBlock = GetVolume()->BlockSize() / sizeof(block_run);
 			int32 index = 0;
 			for (; index < runsPerBlock; index++) {
@@ -542,12 +544,12 @@ CheckVisitor::_CheckInodeBlocks(Inode* inode, const char* name)
 		for (int32 indirectIndex = 0; indirectIndex < runsPerArray;
 				indirectIndex++) {
 			// get the indirect array block
-			block_run* array = (block_run*)cached.SetTo(
-				GetVolume()->ToBlock(data->double_indirect)
+			status = cached.SetTo(GetVolume()->ToBlock(data->double_indirect)
 					+ indirectIndex / runsPerBlock);
-			if (array == NULL)
-				return B_IO_ERROR;
+			if (status != B_OK)
+				return status;
 
+			block_run* array = (block_run*)cached.Block();
 			block_run indirect = array[indirectIndex % runsPerBlock];
 			// are we finished yet?
 			if (indirect.IsZero())
@@ -562,10 +564,12 @@ CheckVisitor::_CheckInodeBlocks(Inode* inode, const char* name)
 					/ sizeof(block_run);
 
 			for (int32 index = 0; index < maxIndex; ) {
-				block_run* runs = (block_run*)cachedDirect.SetTo(
-					GetVolume()->ToBlock(indirect) + index / runsPerBlock);
-				if (runs == NULL)
-					return B_IO_ERROR;
+				status = cachedDirect.SetTo(GetVolume()->ToBlock(indirect)
+						+ index / runsPerBlock);
+				if (status != B_OK)
+					return status;
+
+				block_run* runs = (block_run*)cachedDirect.Block();
 
 				do {
 					// are we finished yet?

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2017, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2020, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef CACHED_BLOCK_H
@@ -24,27 +24,26 @@
 class CachedBlock {
 public:
 								CachedBlock(Volume* volume);
-								CachedBlock(Volume* volume, off_t block);
-								CachedBlock(Volume* volume, block_run run);
 								CachedBlock(CachedBlock* cached);
 								~CachedBlock();
 
 	inline	void				Keep();
 	inline	void				Unset();
 
-	inline const uint8*			SetTo(off_t block, off_t base, size_t length);
-	inline const uint8*			SetTo(off_t block);
-	inline const uint8*			SetTo(block_run run);
-	inline uint8*				SetToWritable(Transaction& transaction,
+	inline status_t				SetTo(off_t block, off_t base, size_t length);
+	inline status_t				SetTo(off_t block);
+	inline status_t				SetTo(block_run run);
+	inline status_t				SetToWritable(Transaction& transaction,
 									off_t block, off_t base, size_t length,
 									bool empty = false);
-	inline uint8*				SetToWritable(Transaction& transaction,
+	inline status_t				SetToWritable(Transaction& transaction,
 									off_t block, bool empty = false);
-	inline uint8*				SetToWritable(Transaction& transaction,
+	inline status_t				SetToWritable(Transaction& transaction,
 									block_run run, bool empty = false);
 	inline status_t				MakeWritable(Transaction& transaction);
 
 			const uint8*		Block() const { return fBlock; }
+			uint8*				WritableBlock() const { return fBlock; }
 			off_t				BlockNumber() const { return fBlockNumber; }
 			uint32				BlockSize() const
 									{ return fVolume->BlockSize(); }
@@ -73,28 +72,6 @@ CachedBlock::CachedBlock(Volume* volume)
 	fBlockNumber(0),
 	fBlock(NULL)
 {
-}
-
-
-inline
-CachedBlock::CachedBlock(Volume* volume, off_t block)
-	:
-	fVolume(volume),
-	fBlockNumber(0),
-	fBlock(NULL)
-{
-	SetTo(block);
-}
-
-
-inline
-CachedBlock::CachedBlock(Volume* volume, block_run run)
-	:
-	fVolume(volume),
-	fBlockNumber(0),
-	fBlock(NULL)
-{
-	SetTo(volume->ToBlock(run));
 }
 
 
@@ -133,31 +110,31 @@ CachedBlock::Unset()
 }
 
 
-inline const uint8*
+inline status_t
 CachedBlock::SetTo(off_t block, off_t base, size_t length)
 {
 	Unset();
 	fBlockNumber = block;
-	return fBlock = (uint8*)block_cache_get_etc(fVolume->BlockCache(),
-		block, base, length);
+	return block_cache_get_etc(fVolume->BlockCache(), block, base, length,
+		(const void**)&fBlock);
 }
 
 
-inline const uint8*
+inline status_t
 CachedBlock::SetTo(off_t block)
 {
 	return SetTo(block, block, 1);
 }
 
 
-inline const uint8*
+inline status_t
 CachedBlock::SetTo(block_run run)
 {
 	return SetTo(fVolume->ToBlock(run));
 }
 
 
-inline uint8*
+inline status_t
 CachedBlock::SetToWritable(Transaction& transaction, off_t block, off_t base,
 	size_t length, bool empty)
 {
@@ -167,23 +144,22 @@ CachedBlock::SetToWritable(Transaction& transaction, off_t block, off_t base,
 	if (empty) {
 		fBlock = (uint8*)block_cache_get_empty(fVolume->BlockCache(),
 			block, transaction.ID());
-	} else {
-		fBlock = (uint8*)block_cache_get_writable_etc(fVolume->BlockCache(),
-			block, base, length, transaction.ID());
+		return fBlock != NULL ? B_OK : B_NO_MEMORY;
 	}
 
-	return fBlock;
+	return block_cache_get_writable_etc(fVolume->BlockCache(),
+		block, base, length, transaction.ID(), (void**)&fBlock);
 }
 
 
-inline uint8*
+inline status_t
 CachedBlock::SetToWritable(Transaction& transaction, off_t block, bool empty)
 {
 	return SetToWritable(transaction, block, block, 1, empty);
 }
 
 
-inline uint8*
+inline status_t
 CachedBlock::SetToWritable(Transaction& transaction, block_run run, bool empty)
 {
 	return SetToWritable(transaction, fVolume->ToBlock(run), empty);

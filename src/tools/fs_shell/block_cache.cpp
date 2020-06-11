@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2020, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -716,14 +716,14 @@ put_cached_block(block_cache* cache, fssh_off_t blockNumber)
 		not already in the cache. The block you retrieve may contain random
 		data.
 */
-static cached_block*
+static fssh_status_t
 get_cached_block(block_cache* cache, fssh_off_t blockNumber, bool* _allocated,
-	bool readBlock = true)
+	bool readBlock, cached_block** _block)
 {
 	if (blockNumber < 0 || blockNumber >= cache->max_blocks) {
 		fssh_panic("get_cached_block: invalid block number %" FSSH_B_PRIdOFF
 			" (max %" FSSH_B_PRIdOFF ")", blockNumber, cache->max_blocks - 1);
-		return NULL;
+		return FSSH_B_BAD_VALUE;
 	}
 
 	cached_block* block = (cached_block*)hash_lookup(cache->hash,
@@ -734,7 +734,7 @@ get_cached_block(block_cache* cache, fssh_off_t blockNumber, bool* _allocated,
 		// read block into cache
 		block = cache->NewBlock(blockNumber);
 		if (block == NULL)
-			return NULL;
+			return FSSH_B_NO_MEMORY;
 
 		hash_insert(cache->hash, block);
 		*_allocated = true;
@@ -747,7 +747,7 @@ get_cached_block(block_cache* cache, fssh_off_t blockNumber, bool* _allocated,
 				blockSize) < blockSize) {
 			cache->RemoveBlock(block);
 			FATAL(("could not read block %" FSSH_B_PRIdOFF "\n", blockNumber));
-			return NULL;
+			return fssh_errno;
 		}
 	}
 
@@ -760,7 +760,8 @@ get_cached_block(block_cache* cache, fssh_off_t blockNumber, bool* _allocated,
 	block->ref_count++;
 	block->accessed++;
 
-	return block;
+	*_block = block;
+	return FSSH_B_OK;
 }
 
 
@@ -771,9 +772,9 @@ get_cached_block(block_cache* cache, fssh_off_t blockNumber, bool* _allocated,
 	This is the only method to insert a block into a transaction. It makes
 	sure that the previous block contents are preserved in that case.
 */
-static void*
+static fssh_status_t
 get_writable_cached_block(block_cache* cache, fssh_off_t blockNumber, fssh_off_t base,
-	fssh_off_t length, int32_t transactionID, bool cleared)
+	fssh_off_t length, int32_t transactionID, bool cleared, void** _block)
 {
 	TRACE(("get_writable_cached_block(blockNumber = %Ld, transaction = %d)\n",
 		blockNumber, transactionID));
@@ -782,13 +783,15 @@ get_writable_cached_block(block_cache* cache, fssh_off_t blockNumber, fssh_off_t
 		fssh_panic("get_writable_cached_block: invalid block number %"
 			FSSH_B_PRIdOFF " (max %" FSSH_B_PRIdOFF ")", blockNumber,
 			cache->max_blocks - 1);
+		return FSSH_B_BAD_VALUE;
 	}
 
 	bool allocated;
-	cached_block* block = get_cached_block(cache, blockNumber, &allocated,
-		!cleared);
-	if (block == NULL)
-		return NULL;
+	cached_block* block;
+	fssh_status_t status = get_cached_block(cache, blockNumber, &allocated,
+		!cleared, &block);
+	if (status != FSSH_B_OK)
+		return status;
 
 	block->discard = false;
 
@@ -800,7 +803,8 @@ get_writable_cached_block(block_cache* cache, fssh_off_t blockNumber, fssh_off_t
 		block->is_dirty = true;
 			// mark the block as dirty
 
-		return block->current_data;
+		*_block = block->current_data;
+		return FSSH_B_OK;
 	}
 
 	cache_transaction* transaction = block->transaction;
@@ -810,7 +814,7 @@ get_writable_cached_block(block_cache* cache, fssh_off_t blockNumber, fssh_off_t
 		//	Maybe we should even panic, since we can't prevent any deadlocks.
 		fssh_panic("get_writable_cached_block(): asked to get busy writable block (transaction %d)\n", (int)transaction->id);
 		put_cached_block(cache, block);
-		return NULL;
+		return FSSH_B_BAD_VALUE;
 	}
 	if (transaction == NULL && transactionID != -1) {
 		// get new transaction
@@ -819,12 +823,12 @@ get_writable_cached_block(block_cache* cache, fssh_off_t blockNumber, fssh_off_t
 			fssh_panic("get_writable_cached_block(): invalid transaction %d!\n",
 				(int)transactionID);
 			put_cached_block(cache, block);
-			return NULL;
+			return FSSH_B_BAD_VALUE;
 		}
 		if (!transaction->open) {
 			fssh_panic("get_writable_cached_block(): transaction already done!\n");
 			put_cached_block(cache, block);
-			return NULL;
+			return FSSH_B_BAD_VALUE;
 		}
 
 		block->transaction = transaction;
@@ -844,7 +848,7 @@ get_writable_cached_block(block_cache* cache, fssh_off_t blockNumber, fssh_off_t
 		if (block->original_data == NULL) {
 			FATAL(("could not allocate original_data\n"));
 			put_cached_block(cache, block);
-			return NULL;
+			return FSSH_B_NO_MEMORY;
 		}
 
 		fssh_memcpy(block->original_data, block->current_data, cache->block_size);
@@ -856,7 +860,7 @@ get_writable_cached_block(block_cache* cache, fssh_off_t blockNumber, fssh_off_t
 			// TODO: maybe we should just continue the current transaction in this case...
 			FATAL(("could not allocate parent\n"));
 			put_cached_block(cache, block);
-			return NULL;
+			return FSSH_B_NO_MEMORY;
 		}
 
 		fssh_memcpy(block->parent_data, block->current_data, cache->block_size);
@@ -870,7 +874,8 @@ get_writable_cached_block(block_cache* cache, fssh_off_t blockNumber, fssh_off_t
 
 	block->is_dirty = true;
 
-	return block->current_data;
+	*_block = block->current_data;
+	return FSSH_B_OK;
 }
 
 
@@ -1634,20 +1639,21 @@ fssh_block_cache_make_writable(void* _cache, fssh_off_t blockNumber,
 		fssh_panic("tried to make block writable on a read-only cache!");
 
 	// TODO: this can be done better!
-	void* block = get_writable_cached_block(cache, blockNumber,
-		blockNumber, 1, transaction, false);
-	if (block != NULL) {
+	void* block;
+	fssh_status_t status = get_writable_cached_block(cache, blockNumber,
+		blockNumber, 1, transaction, false, &block);
+	if (status == FSSH_B_OK) {
 		put_cached_block((block_cache*)_cache, blockNumber);
 		return FSSH_B_OK;
 	}
 
-	return FSSH_B_ERROR;
+	return status;
 }
 
 
-void*
-fssh_block_cache_get_writable_etc(void* _cache, fssh_off_t blockNumber, fssh_off_t base,
-	fssh_off_t length, int32_t transaction)
+fssh_status_t
+fssh_block_cache_get_writable_etc(void* _cache, fssh_off_t blockNumber,
+	fssh_off_t base, fssh_off_t length, int32_t transaction, void** _block)
 {
 	block_cache* cache = (block_cache*)_cache;
 	MutexLocker locker(&cache->lock);
@@ -1658,7 +1664,7 @@ fssh_block_cache_get_writable_etc(void* _cache, fssh_off_t blockNumber, fssh_off
 		fssh_panic("tried to get writable block on a read-only cache!");
 
 	return get_writable_cached_block(cache, blockNumber, base, length,
-		transaction, false);
+		transaction, false, _block);
 }
 
 
@@ -1666,8 +1672,13 @@ void*
 fssh_block_cache_get_writable(void* _cache, fssh_off_t blockNumber,
 	int32_t transaction)
 {
-	return fssh_block_cache_get_writable_etc(_cache, blockNumber,
-		blockNumber, 1, transaction);
+	void* block;
+	fssh_status_t status = fssh_block_cache_get_writable_etc(_cache,
+		blockNumber, blockNumber, 1, transaction, &block);
+	if (status == FSSH_B_OK)
+		return block;
+
+	return NULL;
 }
 
 
@@ -1683,22 +1694,28 @@ fssh_block_cache_get_empty(void* _cache, fssh_off_t blockNumber,
 	if (cache->read_only)
 		fssh_panic("tried to get empty writable block on a read-only cache!");
 
-	return get_writable_cached_block((block_cache*)_cache, blockNumber,
-		blockNumber, 1, transaction, true);
+	void* block;
+	if (get_writable_cached_block((block_cache*)_cache, blockNumber,
+			blockNumber, 1, transaction, true, &block) == FSSH_B_OK)
+		return block;
+
+	return NULL;
 }
 
 
-const void*
+fssh_status_t
 fssh_block_cache_get_etc(void* _cache, fssh_off_t blockNumber, fssh_off_t base,
-	fssh_off_t length)
+	fssh_off_t length, const void** _block)
 {
 	block_cache* cache = (block_cache*)_cache;
 	MutexLocker locker(&cache->lock);
 	bool allocated;
 
-	cached_block* block = get_cached_block(cache, blockNumber, &allocated);
-	if (block == NULL)
-		return NULL;
+	cached_block* block;
+	fssh_status_t status = get_cached_block(cache, blockNumber, &allocated,
+		true, &block);
+	if (status != FSSH_B_OK)
+		return status;
 
 #ifdef DEBUG_CHANGED
 	if (block->compare == NULL)
@@ -1706,14 +1723,20 @@ fssh_block_cache_get_etc(void* _cache, fssh_off_t blockNumber, fssh_off_t base,
 	if (block->compare != NULL)
 		memcpy(block->compare, block->current_data, cache->block_size);
 #endif
-	return block->current_data;
+	*_block = block->current_data;
+	return FSSH_B_OK;
 }
 
 
 const void*
 fssh_block_cache_get(void* _cache, fssh_off_t blockNumber)
 {
-	return fssh_block_cache_get_etc(_cache, blockNumber, blockNumber, 1);
+	const void* block;
+	if (fssh_block_cache_get_etc(_cache, blockNumber, blockNumber, 1, &block)
+			== FSSH_B_OK)
+		return block;
+
+	return NULL;
 }
 
 

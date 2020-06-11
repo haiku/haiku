@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2017, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2020, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -83,9 +83,9 @@ Attribute::Get(const char* name)
 
 	// try to find it in the small data region
 	if (recursive_lock_lock(&fInode->SmallDataLock()) == B_OK) {
-		fNodeGetter.SetToNode(fInode);
-		if (fNodeGetter.Node() == NULL)
-			return B_IO_ERROR;
+		status_t status = fNodeGetter.SetTo(fInode);
+		if (status != B_OK)
+			return status;
 
 		fSmall = fInode->FindSmallData(fNodeGetter.Node(), (const char*)name);
 		if (fSmall != NULL)

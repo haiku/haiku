@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2012, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2020, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -1897,16 +1897,16 @@ put_cached_block(block_cache* cache, off_t blockNumber)
 		data. If \c true, the cache will be temporarily unlocked while the
 		block is read in.
 */
-static cached_block*
+static status_t
 get_cached_block(block_cache* cache, off_t blockNumber, bool* _allocated,
-	bool readBlock = true)
+	bool readBlock, cached_block** _block)
 {
 	ASSERT_LOCKED_MUTEX(&cache->lock);
 
 	if (blockNumber < 0 || blockNumber >= cache->max_blocks) {
 		panic("get_cached_block: invalid block number %" B_PRIdOFF " (max %" B_PRIdOFF ")",
 			blockNumber, cache->max_blocks - 1);
-		return NULL;
+		return B_BAD_VALUE;
 	}
 
 retry:
@@ -1917,7 +1917,7 @@ retry:
 		// put block into cache
 		block = cache->NewBlock(blockNumber);
 		if (block == NULL)
-			return NULL;
+			return B_NO_MEMORY;
 
 		cache->hash->Insert(block);
 		*_allocated = true;
@@ -1951,7 +1951,7 @@ retry:
 
 			TRACE_ALWAYS(("could not read block %" B_PRIdOFF ": bytesRead: %zd, error: %s\n",
 				blockNumber, bytesRead, strerror(errno)));
-			return NULL;
+			return errno;
 		}
 		TB(Read(cache, block));
 
@@ -1961,7 +1961,8 @@ retry:
 	block->ref_count++;
 	block->last_accessed = system_time() / 1000000L;
 
-	return block;
+	*_block = block;
+	return B_OK;
 }
 
 
@@ -1972,9 +1973,9 @@ retry:
 	This is the only method to insert a block into a transaction. It makes
 	sure that the previous block contents are preserved in that case.
 */
-static void*
+static status_t
 get_writable_cached_block(block_cache* cache, off_t blockNumber, off_t base,
-	off_t length, int32 transactionID, bool cleared)
+	off_t length, int32 transactionID, bool cleared, void** _block)
 {
 	TRACE(("get_writable_cached_block(blockNumber = %" B_PRIdOFF ", transaction = %" B_PRId32 ")\n",
 		blockNumber, transactionID));
@@ -1982,13 +1983,15 @@ get_writable_cached_block(block_cache* cache, off_t blockNumber, off_t base,
 	if (blockNumber < 0 || blockNumber >= cache->max_blocks) {
 		panic("get_writable_cached_block: invalid block number %" B_PRIdOFF " (max %" B_PRIdOFF ")",
 			blockNumber, cache->max_blocks - 1);
+		return B_BAD_VALUE;
 	}
 
 	bool allocated;
-	cached_block* block = get_cached_block(cache, blockNumber, &allocated,
-		!cleared);
-	if (block == NULL)
-		return NULL;
+	cached_block* block;
+	status_t status = get_cached_block(cache, blockNumber, &allocated,
+		!cleared, &block);
+	if (status != B_OK)
+		return status;
 
 	if (block->busy_writing)
 		wait_for_busy_writing_block(cache, block);
@@ -2016,7 +2019,8 @@ get_writable_cached_block(block_cache* cache, off_t blockNumber, off_t base,
 		}
 
 		TB(Get(cache, block));
-		return block->current_data;
+		*_block = block->current_data;
+		return B_OK;
 	}
 
 	cache_transaction* transaction = block->transaction;
@@ -2027,7 +2031,7 @@ get_writable_cached_block(block_cache* cache, off_t blockNumber, off_t base,
 		panic("get_writable_cached_block(): asked to get busy writable block "
 			"(transaction %" B_PRId32 ")\n", block->transaction->id);
 		put_cached_block(cache, block);
-		return NULL;
+		return B_BAD_VALUE;
 	}
 	if (transaction == NULL && transactionID != -1) {
 		// get new transaction
@@ -2036,12 +2040,12 @@ get_writable_cached_block(block_cache* cache, off_t blockNumber, off_t base,
 			panic("get_writable_cached_block(): invalid transaction %" B_PRId32 "!\n",
 				transactionID);
 			put_cached_block(cache, block);
-			return NULL;
+			return B_BAD_VALUE;
 		}
 		if (!transaction->open) {
 			panic("get_writable_cached_block(): transaction already done!\n");
 			put_cached_block(cache, block);
-			return NULL;
+			return B_BAD_VALUE;
 		}
 
 		block->transaction = transaction;
@@ -2064,7 +2068,7 @@ get_writable_cached_block(block_cache* cache, off_t blockNumber, off_t base,
 			TB(Error(cache, blockNumber, "allocate original failed"));
 			FATAL(("could not allocate original_data\n"));
 			put_cached_block(cache, block);
-			return NULL;
+			return B_NO_MEMORY;
 		}
 
 		mark_block_busy_reading(cache, block);
@@ -2084,7 +2088,7 @@ get_writable_cached_block(block_cache* cache, off_t blockNumber, off_t base,
 			TB(Error(cache, blockNumber, "allocate parent failed"));
 			FATAL(("could not allocate parent\n"));
 			put_cached_block(cache, block);
-			return NULL;
+			return B_NO_MEMORY;
 		}
 
 		mark_block_busy_reading(cache, block);
@@ -2114,7 +2118,8 @@ get_writable_cached_block(block_cache* cache, off_t blockNumber, off_t base,
 	TB(Get(cache, block));
 	TB2(BlockData(cache, block, "get writable"));
 
-	return block->current_data;
+	*_block = block->current_data;
+	return B_OK;
 }
 
 
@@ -3583,20 +3588,21 @@ block_cache_make_writable(void* _cache, off_t blockNumber, int32 transaction)
 	}
 
 	// TODO: this can be done better!
-	void* block = get_writable_cached_block(cache, blockNumber,
-		blockNumber, 1, transaction, false);
-	if (block != NULL) {
+	void* block;
+	status_t status = get_writable_cached_block(cache, blockNumber,
+		blockNumber, 1, transaction, false, &block);
+	if (status == B_OK) {
 		put_cached_block((block_cache*)_cache, blockNumber);
 		return B_OK;
 	}
 
-	return B_ERROR;
+	return status;
 }
 
 
-void*
+status_t
 block_cache_get_writable_etc(void* _cache, off_t blockNumber, off_t base,
-	off_t length, int32 transaction)
+	off_t length, int32 transaction, void** _block)
 {
 	block_cache* cache = (block_cache*)_cache;
 	MutexLocker locker(&cache->lock);
@@ -3607,15 +3613,19 @@ block_cache_get_writable_etc(void* _cache, off_t blockNumber, off_t base,
 		panic("tried to get writable block on a read-only cache!");
 
 	return get_writable_cached_block(cache, blockNumber, base, length,
-		transaction, false);
+		transaction, false, _block);
 }
 
 
 void*
 block_cache_get_writable(void* _cache, off_t blockNumber, int32 transaction)
 {
-	return block_cache_get_writable_etc(_cache, blockNumber,
-		blockNumber, 1, transaction);
+	void* block;
+	if (block_cache_get_writable_etc(_cache, blockNumber,
+			blockNumber, 1, transaction, &block) == B_OK)
+		return block;
+
+	return NULL;
 }
 
 
@@ -3630,21 +3640,28 @@ block_cache_get_empty(void* _cache, off_t blockNumber, int32 transaction)
 	if (cache->read_only)
 		panic("tried to get empty writable block on a read-only cache!");
 
-	return get_writable_cached_block((block_cache*)_cache, blockNumber,
-		blockNumber, 1, transaction, true);
+	void* block;
+	if (get_writable_cached_block((block_cache*)_cache, blockNumber,
+			blockNumber, 1, transaction, true, &block) == B_OK)
+		return block;
+
+	return NULL;
 }
 
 
-const void*
-block_cache_get_etc(void* _cache, off_t blockNumber, off_t base, off_t length)
+status_t
+block_cache_get_etc(void* _cache, off_t blockNumber, off_t base, off_t length,
+	const void** _block)
 {
 	block_cache* cache = (block_cache*)_cache;
 	MutexLocker locker(&cache->lock);
 	bool allocated;
 
-	cached_block* block = get_cached_block(cache, blockNumber, &allocated);
-	if (block == NULL)
-		return NULL;
+	cached_block* block;
+	status_t status = get_cached_block(cache, blockNumber, &allocated, true,
+		&block);
+	if (status != B_OK)
+		return status;
 
 #if BLOCK_CACHE_DEBUG_CHANGED
 	if (block->compare == NULL)
@@ -3654,14 +3671,20 @@ block_cache_get_etc(void* _cache, off_t blockNumber, off_t base, off_t length)
 #endif
 	TB(Get(cache, block));
 
-	return block->current_data;
+	*_block = block->current_data;
+	return B_OK;
 }
 
 
 const void*
 block_cache_get(void* _cache, off_t blockNumber)
 {
-	return block_cache_get_etc(_cache, blockNumber, blockNumber, 1);
+	const void* block;
+	if (block_cache_get_etc(_cache, blockNumber, blockNumber, 1, &block)
+			== B_OK)
+		return block;
+
+	return NULL;
 }
 
 

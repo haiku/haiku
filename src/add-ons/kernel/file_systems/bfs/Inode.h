@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2017, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2020, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef INODE_H
@@ -338,30 +338,25 @@ private:
 class NodeGetter : public CachedBlock {
 public:
 	NodeGetter(Volume* volume)
-		: CachedBlock(volume)
+		:
+		CachedBlock(volume)
 	{
-	}
-
-	NodeGetter(Volume* volume, const Inode* inode)
-		: CachedBlock(volume)
-	{
-		SetTo(volume->VnodeToBlock(inode->ID()));
-	}
-
-	NodeGetter(Volume* volume, Transaction& transaction,
-			const Inode* inode, bool empty = false)
-		: CachedBlock(volume)
-	{
-		SetToWritable(transaction, volume->VnodeToBlock(inode->ID()), empty);
 	}
 
 	~NodeGetter()
 	{
 	}
 
-	const bfs_inode* SetToNode(const Inode* inode)
+	status_t SetTo(const Inode* inode)
 	{
-		return (const bfs_inode*)SetTo(fVolume->VnodeToBlock(inode->ID()));
+		return CachedBlock::SetTo(fVolume->VnodeToBlock(inode->ID()));
+	}
+
+	status_t SetToWritable(Transaction& transaction, const Inode* inode,
+		bool empty = false)
+	{
+		return CachedBlock::SetToWritable(transaction,
+			fVolume->VnodeToBlock(inode->ID()), empty);
 	}
 
 	const bfs_inode* Node() const { return (const bfs_inode*)Block(); }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2017, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2020, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -294,14 +294,16 @@ bfs_get_vnode(fs_volume* _volume, ino_t id, fs_vnode* _node, int* _type,
 		return B_ERROR;
 	}
 
-	CachedBlock cached(volume, id);
-	bfs_inode* node = (bfs_inode*)cached.Block();
-	if (node == NULL) {
-		FATAL(("could not read inode: %" B_PRIdINO "\n", id));
-		return B_IO_ERROR;
+	CachedBlock cached(volume);
+	status_t status = cached.SetTo(id);
+	if (status != B_OK) {
+		FATAL(("could not read inode: %" B_PRIdINO ": %s\n", id,
+			strerror(status)));
+		return status;
 	}
+	bfs_inode* node = (bfs_inode*)cached.Block();
 
-	status_t status = node->InitCheck(volume);
+	status = node->InitCheck(volume);
 	if (status != B_OK) {
 		if ((node->Flags() & INODE_DELETED) != 0) {
 			INFORM(("inode at %" B_PRIdINO " is already deleted!\n", id));
@@ -736,7 +738,7 @@ bfs_ioctl(fs_volume* _volume, fs_vnode* _node, void* _cookie, uint32 cmd,
 						status = checker->StartIndexPass();
 				}
 			}
-			
+
 			if (status == B_OK) {
 				status = user_memcpy(buffer, &checker->Control(),
 					sizeof(check_control));
@@ -803,9 +805,9 @@ bfs_ioctl(fs_volume* _volume, fs_vnode* _node, void* _cookie, uint32 cmd,
 				PRINT(("write block_run(%ld, %d, %d)\n", run.allocation_group,
 					run.start, run.length));
 				for (int32 i = 0;i < run.length;i++) {
-					uint8* block = cached.SetToWritable(transaction, run);
-					if (block != NULL)
-						memset(block, 0, volume->BlockSize());
+					status_t status = cached.SetToWritable(transaction, run);
+					if (status == B_OK)
+						memset(cached.WritableBlock(), 0, volume->BlockSize());
 				}
 			}
 			return B_OK;

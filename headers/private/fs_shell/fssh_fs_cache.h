@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008, Haiku Inc. All Rights Reserved.
+ * Copyright 2004-2020, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _FSSH_FS_CACHE_H
@@ -76,16 +76,17 @@ extern void				fssh_block_cache_discard(void *_cache,
 							fssh_off_t blockNumber, fssh_size_t numBlocks);
 extern fssh_status_t	fssh_block_cache_make_writable(void *_cache,
 							fssh_off_t blockNumber, int32_t transaction);
-extern void *			fssh_block_cache_get_writable_etc(void *_cache,
+extern fssh_status_t	fssh_block_cache_get_writable_etc(void *_cache,
 							fssh_off_t blockNumber, fssh_off_t base,
-							fssh_off_t length, int32_t transaction);
+							fssh_off_t length, int32_t transaction,
+							void **_block);
 extern void *			fssh_block_cache_get_writable(void *_cache,
 							fssh_off_t blockNumber, int32_t transaction);
 extern void *			fssh_block_cache_get_empty(void *_cache,
 							fssh_off_t blockNumber, int32_t transaction);
-extern const void *		fssh_block_cache_get_etc(void *_cache,
+extern fssh_status_t	fssh_block_cache_get_etc(void *_cache,
 							fssh_off_t blockNumber, fssh_off_t base,
-							fssh_off_t length);
+							fssh_off_t length, const void **_block);
 extern const void *		fssh_block_cache_get(void *_cache,
 							fssh_off_t blockNumber);
 extern fssh_status_t	fssh_block_cache_set_dirty(void *_cache,

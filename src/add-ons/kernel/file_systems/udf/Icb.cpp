@@ -123,20 +123,24 @@ Icb::Icb(Volume *volume, long_address address)
 
 	off_t block;
 	status_t status = fVolume->MapBlock(address, &block);
-	if (!status) {
-		icb_header *header = (icb_header *)fData.SetTo(block);
-		if (header->tag().id() == TAGID_FILE_ENTRY) {
-			file_icb_entry *entry = (file_icb_entry *)header;
-			PDUMP(entry);
-			(void)entry;	// warning death
-		} else if (header->tag().id() == TAGID_EXTENDED_FILE_ENTRY) {
-			extended_file_icb_entry *entry = (extended_file_icb_entry *)header;
-			PDUMP(entry);
-			(void)entry;	// warning death
-		} else {
-			PDUMP(header);
+	if (status == B_OK) {
+		status = fData.SetTo(block);
+		if (status == B_OK) {
+			icb_header *header = (icb_header *)fData.Block();
+			if (header->tag().id() == TAGID_FILE_ENTRY) {
+				file_icb_entry *entry = (file_icb_entry *)header;
+				PDUMP(entry);
+				(void)entry;	// warning death
+			} else if (header->tag().id() == TAGID_EXTENDED_FILE_ENTRY) {
+				extended_file_icb_entry *entry
+					= (extended_file_icb_entry *)header;
+				PDUMP(entry);
+				(void)entry;	// warning death
+			} else {
+				PDUMP(header);
+			}
+			status = header->tag().init_check(address.block());
 		}
-		status = header->tag().init_check(address.block());
 	}
 
 	if (IsFile()) {
@@ -447,9 +451,10 @@ Icb::_Read(DescriptorList &list, off_t pos, void *_buffer, size_t *length, uint3
 
 			TRACE(("Icb::_Read: %ld bytes from disk block %" B_PRIdOFF " using"
 				" block_cache_get_etc()\n", readLength, diskBlock));
-			uint8 *data = (uint8*)block_cache_get_etc(volume->BlockCache(),
-				diskBlock, 0, readLength);
-			if (data == NULL)
+			const uint8 *data;
+			status = block_cache_get_etc(volume->BlockCache(),
+				diskBlock, 0, readLength, (const void**)&data);
+			if (status != B_OK)
 				break;
 			memcpy(buffer, data + blockOffset, readLength);
 			block_cache_put(volume->BlockCache(), diskBlock);
