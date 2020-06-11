@@ -244,8 +244,8 @@ rule KernelArchitectureSetup architecture
 			HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 384 ; # in kB
 
 		case arm :
-			HAIKU_KERNEL_PLATFORM ?= u-boot ;
-			HAIKU_BOOT_TARGETS += u-boot ;
+			HAIKU_KERNEL_PLATFORM ?= efi ;
+			HAIKU_BOOT_TARGETS += efi ;
 
 			HAIKU_BOOT_SDIMAGE_SIZE ?= 32 ;
 			# SOC's like allwinner need an offset to skip the hardcoded initial loader

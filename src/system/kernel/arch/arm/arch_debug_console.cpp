@@ -95,7 +95,9 @@ status_t
 arch_debug_console_init(kernel_args *args)
 {
 	// first try with hints from the FDT
-	gArchDebugUART = debug_uart_from_fdt(args->platform_args.fdt);
+	// TODO: Use UEFI somehow
+
+	//gArchDebugUART = debug_uart_from_fdt(args->platform_args.fdt);
 
 	// Do we can some kind of direct fallback here
 	// (aka, guess arch_get_uart_pl011 or arch_get_uart_8250?)

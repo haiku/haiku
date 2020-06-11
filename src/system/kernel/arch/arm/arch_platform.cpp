@@ -10,17 +10,11 @@
 #include <arch/platform.h>
 #include <boot/kernel_args.h>
 
-#include <drivers/bus/FDT.h>
-
-char *gFDT;
 
 status_t
 arch_platform_init(struct kernel_args *kernelArgs)
 {
 	// NOTE: dprintf() is off-limits here, too early...
-
-	// If we have an FDT blob, point the gFDT to it now
-	gFDT = (char *)kernelArgs->platform_args.fdt;
 
 	return B_OK;
 }
