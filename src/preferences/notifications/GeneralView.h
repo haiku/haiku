@@ -51,7 +51,6 @@ private:
 		uint32				fNewPosition;
 
 		void				_EnableControls();
-		void				_SetWidthLabel(int32 value);
 		void				_SetTimeoutLabel(int32 value);
 		bool				_IsServerRunning();
 };

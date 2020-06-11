@@ -27,6 +27,7 @@
 #include <Query.h>
 #include <Roster.h>
 #include <String.h>
+#include <StringFormat.h>
 #include <SymLink.h>
 #include <Volume.h>
 #include <VolumeRoster.h>
@@ -76,19 +77,16 @@ GeneralView::GeneralView(SettingsHost* host)
 	box->SetLabel(fNotificationBox);
 
 	// Window width
-	int32 minWidth = int32(kMinimumWidth / kWidthStep);
-	int32 maxWidth = int32(kMaximumWidth / kWidthStep);
-	fWidthSlider = new BSlider("width", B_TRANSLATE("Window width:"),
+	float ratio = be_plain_font->Size() / 12.f;
+	int32 minWidth = int32(kMinimumWidth / kWidthStep * ratio);
+	int32 maxWidth = int32(kMaximumWidth / kWidthStep * ratio);
+	fWidthSlider = new BSlider("width", B_TRANSLATE("Window width"),
 		new BMessage(kWidthChanged), minWidth, maxWidth, B_HORIZONTAL);
 	fWidthSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fWidthSlider->SetHashMarkCount(maxWidth - minWidth + 1);
-	BString minWidthLabel;
-	minWidthLabel << int32(kMinimumWidth);
-	BString maxWidthLabel;
-	maxWidthLabel << int32(kMaximumWidth);
 	fWidthSlider->SetLimitLabels(
-		B_TRANSLATE_COMMENT(minWidthLabel.String(), "Slider low text"),
-		B_TRANSLATE_COMMENT(maxWidthLabel.String(), "Slider high text"));
+		B_TRANSLATE_COMMENT("narrow", "Window width: Slider low text"),
+		B_TRANSLATE_COMMENT("wide", "Window width: Slider high text"));
 
 	// Display time
 	fDurationSlider = new BSlider("duration", B_TRANSLATE("Duration:"),
@@ -167,8 +165,6 @@ GeneralView::MessageReceived(BMessage* msg)
 			break;
 		}
 		case kWidthChanged: {
-			int32 value = fWidthSlider->Value() * 50;
-			_SetWidthLabel(value);
 			SettingsPane::SettingsChanged(true);
 			break;
 		}
@@ -238,7 +234,7 @@ GeneralView::Save(BMessage& settings)
 	int32 timeout = fDurationSlider->Value();
 	settings.AddInt32(kTimeoutName, timeout);
 
-	float width = fWidthSlider->Value() * 50;
+	float width = fWidthSlider->Value() * kWidthStep;
 	settings.AddFloat(kWidthName, width);
 
 	icon_size iconSize = B_LARGE_ICON;
@@ -256,8 +252,7 @@ GeneralView::Revert()
 	fDurationSlider->SetValue(fOriginalTimeout);
 	_SetTimeoutLabel(fOriginalTimeout);
 	
-	fWidthSlider->SetValue(fOriginalWidth / 50);
-	_SetWidthLabel(fOriginalWidth);
+	fWidthSlider->SetValue(fOriginalWidth / kWidthStep);
 
 	fNewPosition = fOriginalPosition;
 	BMenuItem* item = fPositionMenu->ItemAt(
@@ -276,7 +271,7 @@ GeneralView::RevertPossible()
 	if (fOriginalTimeout != timeout)
 		return true;
 	
-	int32 width = fWidthSlider->Value() * 50;
+	int32 width = fWidthSlider->Value() * kWidthStep;
 	if (fOriginalWidth != width)
 		return true;
 
@@ -293,8 +288,7 @@ GeneralView::Defaults()
 	fDurationSlider->SetValue(kDefaultTimeout);
 	_SetTimeoutLabel(kDefaultTimeout);
 
-	fWidthSlider->SetValue(kDefaultWidth / 50);
-	_SetWidthLabel(kDefaultWidth);
+	fWidthSlider->SetValue(kDefaultWidth / kWidthStep);
 
 	fNewPosition = kDefaultNotificationPosition;
 	BMenuItem* item = fPositionMenu->ItemAt(
@@ -313,7 +307,7 @@ GeneralView::DefaultsPossible()
 	if (kDefaultTimeout != timeout)
 		return true;
 
-	int32 width = fWidthSlider->Value() * 50;
+	int32 width = fWidthSlider->Value() * kWidthStep;
 	if (kDefaultWidth != width)
 		return true;
 
@@ -347,22 +341,12 @@ GeneralView::_EnableControls()
 void
 GeneralView::_SetTimeoutLabel(int32 value)
 {
-	BString label(B_TRANSLATE("Timeout:"));
-	label.Append(" ");
-	label << value;
-	label.Append(" ").Append(B_TRANSLATE("seconds"));
+	static BStringFormat format(B_TRANSLATE("{0, plural, "
+		"=1{Timeout: # second}"
+		"other{Timeout: # seconds}}"));
+	BString label;
+	format.Format(label, value);
 	fDurationSlider->SetLabel(label.String());
-}
-
-
-void
-GeneralView::_SetWidthLabel(int32 value)
-{
-	BString label(B_TRANSLATE("Width:"));
-	label.Append(" ");
-	label << value;
-	label.Append(" ").Append(B_TRANSLATE("pixels"));
-	fWidthSlider->SetLabel(label.String());
 }
 
 
