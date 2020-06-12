@@ -1755,8 +1755,8 @@ swap_get_info(system_info* info)
 	info->max_swap_pages = swap_total_swap_pages();
 	info->free_swap_pages = swap_available_pages();
 #else
-	info->max_swap_space = 0;
-	info->free_swap_space = 0;
+	info->max_swap_pages = 0;
+	info->free_swap_pages = 0;
 #endif
 }
 

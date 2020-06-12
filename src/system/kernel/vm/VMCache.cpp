@@ -55,7 +55,9 @@ static mutex sCacheListLock = MUTEX_INITIALIZER("global VMCache list");
 	// The lock is also needed when the debug feature is disabled.
 
 ObjectCache* gCacheRefObjectCache;
+#if ENABLE_SWAP_SUPPORT
 ObjectCache* gAnonymousCacheObjectCache;
+#endif
 ObjectCache* gAnonymousNoSwapCacheObjectCache;
 ObjectCache* gVnodeCacheObjectCache;
 ObjectCache* gDeviceCacheObjectCache;
@@ -505,8 +507,10 @@ vm_cache_init(kernel_args* args)
 	// Create object caches for the structures we allocate here.
 	gCacheRefObjectCache = create_object_cache("cache refs", sizeof(VMCacheRef),
 		0, NULL, NULL, NULL);
+#if ENABLE_SWAP_SUPPORT
 	gAnonymousCacheObjectCache = create_object_cache("anon caches",
 		sizeof(VMAnonymousCache), 0, NULL, NULL, NULL);
+#endif
 	gAnonymousNoSwapCacheObjectCache = create_object_cache(
 		"anon no-swap caches", sizeof(VMAnonymousNoSwapCache), 0, NULL, NULL,
 		NULL);
@@ -517,7 +521,10 @@ vm_cache_init(kernel_args* args)
 	gNullCacheObjectCache = create_object_cache("null caches",
 		sizeof(VMNullCache), 0, NULL, NULL, NULL);
 
-	if (gCacheRefObjectCache == NULL || gAnonymousCacheObjectCache == NULL
+	if (gCacheRefObjectCache == NULL
+#if ENABLE_SWAP_SUPPORT
+		|| gAnonymousCacheObjectCache == NULL
+#endif
 		|| gAnonymousNoSwapCacheObjectCache == NULL
 		|| gVnodeCacheObjectCache == NULL
 		|| gDeviceCacheObjectCache == NULL
