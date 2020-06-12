@@ -37,6 +37,9 @@
 
 #include "system_dependencies.h"
 
+typedef uint32 cluster_t;
+typedef uint64_t ufs2_daddr_t;
+
 #define	SBLOCK_FLOPPY		0
 #define	SBLOCK_UFS1			8192
 #define	SBLOCK_UFS2			65536

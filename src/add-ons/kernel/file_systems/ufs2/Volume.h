@@ -32,6 +32,7 @@ class Volume {
 								{ return (fFlags & VOLUME_READ_ONLY) != 0; }
 		const char*				Name() const;
 		fs_volume*				FSVolume() const { return fFSVolume; }
+		int						Device() const { return fDevice; }
 		dev_t					ID() const
 								{ return fFSVolume ? fFSVolume->id : -1; }
 		ufs2_super_block&		SuperBlock() { return fSuperBlock; }
