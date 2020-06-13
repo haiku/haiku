@@ -180,7 +180,8 @@ Painter::BitmapPainter::_DetermineTransform(BRect sourceRect,
 {
 	if (!fPainter->fValidClipping
 		|| !sourceRect.IsValid()
-		|| !sourceRect.Intersects(fBitmapBounds)
+		|| ((fOptions & B_TILE_BITMAP) == 0
+			&& !sourceRect.Intersects(fBitmapBounds))
 		|| !destinationRect.IsValid()) {
 		return false;
 	}
