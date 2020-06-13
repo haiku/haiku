@@ -949,8 +949,10 @@ ThreadHandler::_HandleBreakpointConditionIfNeeded(CpuState* cpuState)
 		ExpressionInfo* expressionInfo = new(std::nothrow) ExpressionInfo(
 			userBreakpoint->Condition());
 
-		if (expressionInfo == NULL)
+		if (expressionInfo == NULL) {
+			delete listener;
 			return false;
+		}
 
 		BReference<ExpressionInfo> expressionReference(expressionInfo, true);
 
