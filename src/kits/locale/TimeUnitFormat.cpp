@@ -121,8 +121,10 @@ BTimeUnitFormat::Format(BString& buffer, const int32 value,
 		= new TimeUnitAmount((double)value, skUnitMap[unit], icuStatus);
 	if (timeUnitAmount == NULL)
 		return B_NO_MEMORY;
-	if (!U_SUCCESS(icuStatus))
+	if (!U_SUCCESS(icuStatus)) {
+		delete timeUnitAmount;
 		return B_ERROR;
+	}
 
 	Formattable formattable;
 	formattable.adoptObject(timeUnitAmount);
