@@ -1,7 +1,8 @@
 /*
-* Copyright 2020, Shubham Bhagat, shubhambhagat111@yahoo.com
-* All rights reserved. Distributed under the terms of the MIT License.
-*/
+ * Copyright 2020, Shubham Bhagat, shubhambhagat111@yahoo.com
+ * All rights reserved. Distributed under the terms of the MIT License.
+ */
+
 
 #include "BPlusTree.h"
 

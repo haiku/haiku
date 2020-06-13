@@ -5,7 +5,7 @@
 #ifndef _DEBUG_H_
 #define _DEBUG_H_
 
-#define TRACE_XFS
+// #define TRACE_XFS
 #ifdef TRACE_XFS
 #define TRACE(x...) dprintf("\n\33[34mxfs:\33[0m " x)
 #else

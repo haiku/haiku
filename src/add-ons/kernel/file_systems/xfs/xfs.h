@@ -1,18 +1,18 @@
 /*
-* Copyright 2020, Shubham Bhagat, shubhambhagat111@yahoo.com
-* All rights reserved. Distributed under the terms of the MIT License.
-*/
+ * Copyright 2020, Shubham Bhagat, shubhambhagat111@yahoo.com
+ * All rights reserved. Distributed under the terms of the MIT License.
+ */
 
 /*
-*Important:
-*All fields in XFS metadata structures are in big-endian byte order
-*except for log items which are formatted in host order.
-*
-*This file contains all global structure definitions.
-*/
-
+ *Important:
+ *All fields in XFS metadata structures are in big-endian byte order
+ *except for log items which are formatted in host order.
+ *
+ *This file contains all global structure definitions.
+ */
 #ifndef _XFS_SB_H_
 #define _XFS_SB_H_
+
 
 #include "system_dependencies.h"
 #include "xfs_types.h"
@@ -22,83 +22,86 @@ extern fs_vnode_ops gxfsVnodeOps;
 extern fs_volume_ops gxfsVolumeOps;
 
 
-#define XFS_SB_MAGIC 0x58465342 /* Identifies XFS. "XFSB" */
+#define XFS_SB_MAGIC 0x58465342
+	// Identifies XFS. "XFSB"
 #define XFS_SB_MAXSIZE 512
-#define BBLOCKLOG 9		/* Log of block size should be 9 */
-#define BBLOCKSIZE 1 << BBLOCKLOG		/* The size of a basic block should be 512 */
+#define BASICBLOCKLOG 9
+	// Log of block size should be 9
+#define BASICBLOCKSIZE 1 << BASICBLOCKLOG
+	// The size of a basic block should be 512
 
 
 /*	Version 4 superblock definition	*/
-class XfsSuperBlock
-{
+class XfsSuperBlock {
 public:
 
-			bool 			IsValid();
-			char*			Name();
-			uint32			BlockSize();
-			uint8			BlockLog();
-			uint32			DirBlockSize();		// maximum 65536
-			uint8			AgInodeBits();
-			uint8			InodesPerBlkLog();
-			uint8			AgBlocksLog();
-			xfs_rfsblock_t	TotalBlocks();
-			xfs_rfsblock_t	TotalBlocksWithLog();
-			uint64			FreeBlocks();
-			uint64			UsedBlocks();
-			uint32			Size();
-			uint16			InodeSize();
-			void			SwapEndian();
-			xfs_ino_t		Root() const;
-			xfs_agnumber_t	AgCount();
-			xfs_agblock_t	AgBlocks();
-
+			bool 				IsValid() const;
+			const char*			Name() const;
+			uint32				BlockSize() const;
+			uint8				BlockLog() const;
+			uint32				DirBlockSize() const;
+				// maximum 65536
+			uint8				AgInodeBits() const;
+			uint8				InodesPerBlkLog() const;
+			uint8				AgBlocksLog() const;
+			xfs_rfsblock_t		TotalBlocks() const;
+			xfs_rfsblock_t		TotalBlocksWithLog() const;
+			uint64				FreeBlocks() const;
+			uint64				UsedBlocks() const;
+			uint32				Size() const;
+			uint16				InodeSize() const;
+			void				SwapEndian();
+			xfs_ino_t			Root() const;
+			xfs_agnumber_t		AgCount() const;
+			xfs_agblock_t		AgBlocks() const;
+			uint8				Flags() const;
 private:
 
-			uint32			sb_magicnum;
-			uint32			sb_blocksize;
-			xfs_rfsblock_t	sb_dblocks;
-			xfs_rfsblock_t	sb_rblocks;
-			xfs_rtblock_t	sb_rextents;
-			uuid_t			sb_uuid;
-			xfs_fsblock_t	sb_logstart;
-			xfs_ino_t		sb_rootino;
-			xfs_ino_t		sb_rbmino;
-			xfs_ino_t		sb_rsumino;
-			xfs_agblock_t	sb_rextsize;
-			xfs_agblock_t	sb_agblocks;
-			xfs_agnumber_t	sb_agcount;
-			xfs_extlen_t	sb_rbmblocks;
-			xfs_extlen_t	sb_logblocks;
-			uint16			sb_versionnum;
-			uint16			sb_sectsize;
-			uint16			sb_inodesize;
-			uint16			sb_inopblock;
-			char			sb_fname[12];
-			uint8			sb_blocklog;
-			uint8			sb_sectlog;
-			uint8			sb_inodelog;
-			uint8			sb_inopblog;
-			uint8			sb_agblklog;
-			uint8			sb_rextslog;
-			uint8			sb_inprogress;
-			uint8			sb_imax_pct;
-			uint64			sb_icount;
-			uint64			sb_ifree;
-			uint64			sb_fdblocks;
-			uint64			sb_frextents;
-			xfs_ino_t		sb_uquotino;
-			xfs_ino_t		sb_gquotino;
-			uint16			sb_qflags;
-			uint8			sb_flags;
-			uint8			sb_shared_vn;
-			xfs_extlen_t	sb_inoalignmt;
-			uint32			sb_unit;
-			uint32			sb_width;
-			uint8			sb_dirblklog;
-			uint8			sb_logsectlog;
-			uint16			sb_logsectsize;
-			uint32			sb_logsunit;
-			uint32			sb_features2;
+			uint32				sb_magicnum;
+			uint32				sb_blocksize;
+			xfs_rfsblock_t		sb_dblocks;
+			xfs_rfsblock_t		sb_rblocks;
+			xfs_rtblock_t		sb_rextents;
+			uuid_t				sb_uuid;
+			xfs_fsblock_t		sb_logstart;
+			xfs_ino_t			sb_rootino;
+			xfs_ino_t			sb_rbmino;
+			xfs_ino_t			sb_rsumino;
+			xfs_agblock_t		sb_rextsize;
+			xfs_agblock_t		sb_agblocks;
+			xfs_agnumber_t		sb_agcount;
+			xfs_extlen_t		sb_rbmblocks;
+			xfs_extlen_t		sb_logblocks;
+			uint16				sb_versionnum;
+			uint16				sb_sectsize;
+			uint16				sb_inodesize;
+			uint16				sb_inopblock;
+			char				sb_fname[12];
+			uint8				sb_blocklog;
+			uint8				sb_sectlog;
+			uint8				sb_inodelog;
+			uint8				sb_inopblog;
+			uint8				sb_agblklog;
+			uint8				sb_rextslog;
+			uint8				sb_inprogress;
+			uint8				sb_imax_pct;
+			uint64				sb_icount;
+			uint64				sb_ifree;
+			uint64				sb_fdblocks;
+			uint64				sb_frextents;
+			xfs_ino_t			sb_uquotino;
+			xfs_ino_t			sb_gquotino;
+			uint16				sb_qflags;
+			uint8				sb_flags;
+			uint8				sb_shared_vn;
+			xfs_extlen_t		sb_inoalignmt;
+			uint32				sb_unit;
+			uint32				sb_width;
+			uint8				sb_dirblklog;
+			uint8				sb_logsectlog;
+			uint16				sb_logsectsize;
+			uint32				sb_logsunit;
+			uint32				sb_features2;
 };
 
 

@@ -1,9 +1,12 @@
 /*
-* Copyright 2001-2017, Axel Dörfler, axeld@pinc-software.de.
-* Copyright 2020, Shubham Bhagat, shubhambhagat111@yahoo.com
-* All rights reserved. Distributed under the terms of the MIT License.
-*/
+ * Copyright 2001-2017, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2020, Shubham Bhagat, shubhambhagat111@yahoo.com
+ * All rights reserved. Distributed under the terms of the MIT License.
+ */
+
+
 #include "system_dependencies.h"
+#include "Directory.h"
 #include "Inode.h"
 #include "Volume.h"
 
@@ -86,16 +89,6 @@ xfs_mount(fs_volume *_volume, const char *device, uint32 flags,
 		return status;
 	}
 
-	//publish the root inode
-	Inode* rootInode = new(std::nothrow) Inode(volume, volume->Root());
-	if (rootInode != NULL) {
-		status = publish_vnode(volume->FSVolume(), volume->Root(),
-			(void*)rootInode, &gxfsVnodeOps, rootInode->Mode(), 0);
-
-		if (status!=B_OK)
-			return B_BAD_VALUE;
-	}
-
 	*_rootID = volume->Root();
 	return B_OK;
 }
@@ -116,6 +109,7 @@ xfs_unmount(fs_volume *_volume)
 static status_t
 xfs_read_fs_info(fs_volume *_volume, struct fs_info *info)
 {
+	TRACE("XFS_READ_FS_INFO:\n");
 	Volume* volume = (Volume*)_volume->private_volume;
 
 	info->flags = B_FS_IS_READONLY
@@ -140,15 +134,15 @@ static status_t
 xfs_get_vnode(fs_volume *_volume, ino_t id, fs_vnode *_node, int *_type,
 	uint32 *_flags, bool reenter)
 {
+	TRACE("XFS_GET_VNODE:\n");
 	Volume* volume = (Volume*)_volume->private_volume;
 
 	Inode* inode = new(std::nothrow) Inode(volume, id);
-
 	if (inode == NULL)
 		return B_NO_MEMORY;
 
-	status_t status = inode->InitCheck();
-	if (status == false) {
+	status_t status = inode->Init();
+	if (status != B_OK) {
 		delete inode;
 		ERROR("get_vnode: InitCheck() failed. Error: %s\n", strerror(status));
 		return B_NO_INIT;
@@ -158,7 +152,7 @@ xfs_get_vnode(fs_volume *_volume, ino_t id, fs_vnode *_node, int *_type,
 	_node->ops = &gxfsVnodeOps;
 	*_type = inode->Mode();
 	*_flags = 0;
-
+	TRACE("(%d)\n", inode->ID());
 	return B_OK;
 }
 
@@ -166,7 +160,9 @@ xfs_get_vnode(fs_volume *_volume, ino_t id, fs_vnode *_node, int *_type,
 static status_t
 xfs_put_vnode(fs_volume *_volume, fs_vnode *_node, bool reenter)
 {
-	return B_NOT_SUPPORTED;
+	TRACE("XFS_PUT_VNODE:\n");
+	delete (Inode*)_node->private_node;
+	return B_OK;
 }
 
 
@@ -208,7 +204,36 @@ static status_t
 xfs_lookup(fs_volume *_volume, fs_vnode *_directory, const char *name,
 	ino_t *_vnodeID)
 {
-	return B_NOT_SUPPORTED;
+	TRACE("XFS_LOOKUP: %p (%s)\n", name, name);
+	Volume* volume = (Volume*)_volume->private_volume;
+	Inode* directory = (Inode*)_directory->private_node;
+
+	if (!directory->IsDirectory())
+		return B_NOT_A_DIRECTORY;
+
+	//TODO: pretend everything is accessible. We should actually checking
+	//for permission here.
+	DirectoryIterator* iterator =
+		new(std::nothrow) DirectoryIterator(directory);
+	if (iterator == NULL)
+		return B_NO_MEMORY;
+
+	status_t status = iterator->Init();
+	if (status != B_OK) {
+		delete iterator;
+		return status;
+	}
+
+	status = iterator->Lookup(name, strlen(name), (xfs_ino_t*)_vnodeID);
+	if (status != B_OK) {
+		delete iterator;
+		return status;
+	}
+
+	TRACE("XFS_LOOKUP: ID: (%d)\n", *_vnodeID);
+	status = get_vnode(volume->FSVolume(), *_vnodeID, NULL);
+	TRACE("get_vnode status: (%d)\n", status);
+	return status;
 }
 
 
@@ -224,6 +249,7 @@ static status_t
 xfs_read_stat(fs_volume *_volume, fs_vnode *_node, struct stat *stat)
 {
 	Inode* inode = (Inode*)_node->private_node;
+	TRACE("XFS_READ_STAT: root_id: (%d)\n", inode->ID());
 	stat->st_dev = inode->GetVolume()->ID();
 	stat->st_ino = inode->ID();
 	stat->st_nlink = 1;
@@ -234,7 +260,7 @@ xfs_read_stat(fs_volume *_volume, fs_vnode *_node, struct stat *stat)
 	stat->st_mode = inode->Mode();
 	stat->st_type = 0;	// TODO
 
-	stat->st_size = inode->GetVolume()->InodeSize();
+	stat->st_size = inode->Size();
 	stat->st_blocks = inode->NoOfBlocks();
 
 	inode->GetAccessTime(stat->st_atim);
@@ -282,7 +308,9 @@ xfs_free_cookie(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 static status_t
 xfs_access(fs_volume *_volume, fs_vnode *_node, int accessMode)
 {
-	return B_NOT_SUPPORTED;
+	//TODO: pretend everything is accessible. We should actually checking
+	//for permission here.
+	return B_OK;
 }
 
 
@@ -322,7 +350,20 @@ xfs_remove_dir(fs_volume *_volume, fs_vnode *_directory, const char *name)
 static status_t
 xfs_open_dir(fs_volume * /*_volume*/, fs_vnode *_node, void **_cookie)
 {
-	return B_NOT_SUPPORTED;
+	Inode* inode = (Inode*)_node->private_node;
+	TRACE("XFS_OPEN_DIR: (%d)\n", inode->ID());
+
+	if (!inode->IsDirectory())
+		return B_NOT_A_DIRECTORY;
+
+	DirectoryIterator* iterator = new(std::nothrow) DirectoryIterator(inode);
+	if (iterator == NULL) {
+		delete iterator;
+		return B_NO_MEMORY;
+	}
+	status_t status = iterator->Init();
+	*_cookie = iterator;
+	return status;
 }
 
 
@@ -330,7 +371,39 @@ static status_t
 xfs_read_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 	struct dirent *dirent, size_t bufferSize, uint32 *_num)
 {
-	return B_NOT_SUPPORTED;
+	TRACE("XFS_READ_DIR\n");
+	DirectoryIterator* iterator = (DirectoryIterator*)_cookie;
+	Volume* volume = (Volume*)_volume->private_volume;
+
+	uint32 maxCount = *_num;
+	uint32 count = 0;
+
+	while (count < maxCount and (bufferSize > sizeof(struct dirent))) {
+		size_t length = bufferSize - sizeof(struct dirent) + 1;
+		xfs_ino_t ino;
+
+		status_t status = iterator->GetNext(dirent->d_name, &length, &ino);
+		if (status == B_ENTRY_NOT_FOUND)
+			break;
+		if (status == B_BUFFER_OVERFLOW) {
+			if (count == 0)
+				return status;
+			break;
+		}
+		if (status != B_OK)
+			return status;
+
+		dirent->d_dev = volume->ID();
+		dirent->d_ino = ino;
+		dirent->d_reclen = sizeof(dirent) + length;
+		bufferSize -= dirent->d_reclen;
+		dirent = (struct dirent*)((uint8*)dirent + dirent->d_reclen);
+		count++;
+	}
+
+	*_num = count;
+	TRACE("Count: (%d)\n", count);
+	return B_OK;
 }
 
 
