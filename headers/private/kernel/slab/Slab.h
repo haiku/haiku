@@ -12,7 +12,7 @@
 
 
 enum {
-	/* object_cache_{alloc,free}() flags  */
+	/* object_cache_{alloc,free}() flags */
 	CACHE_DONT_WAIT_FOR_MEMORY		= HEAP_DONT_WAIT_FOR_MEMORY,
 	CACHE_DONT_LOCK_KERNEL_SPACE	= HEAP_DONT_LOCK_KERNEL_SPACE,
 	CACHE_PRIORITY_VIP				= HEAP_PRIORITY_VIP,

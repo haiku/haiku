@@ -3714,8 +3714,8 @@ unmap_and_free_physical_pages(VMTranslationMap* map, addr_t start, addr_t end)
 			&& (flags & PAGE_PRESENT) != 0) {
 			vm_page* page = vm_lookup_page(physicalAddress / B_PAGE_SIZE);
 			if (page != NULL && page->State() != PAGE_STATE_FREE
-					 && page->State() != PAGE_STATE_CLEAR
-					 && page->State() != PAGE_STATE_UNUSED) {
+					&& page->State() != PAGE_STATE_CLEAR
+					&& page->State() != PAGE_STATE_UNUSED) {
 				DEBUG_PAGE_ACCESS_START(page);
 				vm_page_set_state(page, PAGE_STATE_FREE);
 			}

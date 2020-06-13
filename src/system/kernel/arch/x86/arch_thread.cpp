@@ -186,7 +186,7 @@ arch_team_init_team_struct(Team* p, bool kernel)
 
 /*!	Initializes the user-space TLS local storage pointer in
 	the thread structure, and the reserved TLS slots.
-	
+
 	Is called from _create_user_thread_kentry().
 */
 status_t

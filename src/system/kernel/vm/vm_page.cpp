@@ -3746,7 +3746,7 @@ allocate_page_run(page_num_t start, page_num_t length, uint32 flags,
 	if ((flags & VM_PAGE_ALLOC_CLEAR) != 0) {
 		for (VMPageQueue::PageList::Iterator it = freePages.GetIterator();
 				vm_page* page = it.Next();) {
- 			clear_page(page);
+			clear_page(page);
 		}
 	}
 

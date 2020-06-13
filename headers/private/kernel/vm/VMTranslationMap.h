@@ -26,7 +26,7 @@ public:
 								VMTranslationMap();
 	virtual						~VMTranslationMap();
 
-	virtual	bool	 			Lock() = 0;
+	virtual	bool				Lock() = 0;
 	virtual	void				Unlock() = 0;
 
 	virtual	addr_t				MappedSize() const = 0;
