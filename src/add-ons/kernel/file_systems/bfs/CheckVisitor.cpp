@@ -336,7 +336,8 @@ status_t
 CheckVisitor::OpenInodeFailed(status_t reason, ino_t id, Inode* parent,
 		char* treeName, TreeIterator* iterator)
 {
-	FATAL(("Could not open inode at %" B_PRIdOFF "\n", id));
+	FATAL(("Could not open inode at %" B_PRIdOFF ": %s\n", id,
+		strerror(reason)));
 
 	if (treeName != NULL)
 		strlcpy(Control().name, treeName, B_FILE_NAME_LENGTH);
@@ -346,13 +347,19 @@ CheckVisitor::OpenInodeFailed(status_t reason, ino_t id, Inode* parent,
 	Control().inode = id;
 	Control().errors = BFS_COULD_NOT_OPEN;
 
-	// remove inode from the tree if we can
-	if (parent != NULL && iterator != NULL
-		&& (Control().flags & BFS_REMOVE_INVALID) != 0) {
-		Control().status = _RemoveInvalidNode(parent, iterator->Tree(), NULL,
-			treeName);
-	} else
-		Control().status = B_ERROR;
+	// TODO: check other error codes; B_IO_ERROR might be a temporary
+	// issue, so it should be guarded by a force mode
+	if (reason == B_BAD_VALUE || reason == B_BAD_DATA || reason == B_IO_ERROR) {
+		// Remove inode from the tree if we can
+		if (parent != NULL && iterator != NULL
+			&& (Control().flags & BFS_REMOVE_INVALID) != 0) {
+			Control().status = _RemoveInvalidNode(parent, iterator->Tree(),
+				NULL, treeName);
+		} else
+			Control().status = B_ERROR;
+	} else {
+		Control().status = B_OK;
+	}
 
 	return B_OK;
 }
