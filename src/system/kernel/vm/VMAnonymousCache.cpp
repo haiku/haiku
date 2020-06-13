@@ -1752,8 +1752,12 @@ void
 swap_get_info(system_info* info)
 {
 #if ENABLE_SWAP_SUPPORT
-	info->max_swap_pages = swap_total_swap_pages();
-	info->free_swap_pages = swap_available_pages();
+	MutexLocker locker(sSwapFileListLock);
+	for (SwapFileList::Iterator it = sSwapFileList.GetIterator();
+		swap_file* swapFile = it.Next();) {
+		info->max_swap_pages += swapFile->last_slot - swapFile->first_slot;
+		info->free_swap_pages += swapFile->bmp->free_slots;
+	}
 #else
 	info->max_swap_pages = 0;
 	info->free_swap_pages = 0;
