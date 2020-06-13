@@ -296,6 +296,7 @@ IMAPProtocol::_CreateFolder(const BString& mailbox, const BString& separator)
 	if (status != B_OK) {
 		fprintf(stderr, "Initializing folder %s failed: %s\n", path.Path(),
 			strerror(status));
+		delete folder;
 		return NULL;
 	}
 
