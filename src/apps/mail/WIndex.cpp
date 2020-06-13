@@ -80,6 +80,7 @@ WIndex::SetTo(const char *dataPath, const char *indexPath)
 	dataFile = new BFile();
 
 	if (dataFile->SetTo(dataPath, B_READ_ONLY) != B_OK) {
+		delete dataFile;
 		return B_ERROR;
 	} else {
 		bool buildIndex = true;
