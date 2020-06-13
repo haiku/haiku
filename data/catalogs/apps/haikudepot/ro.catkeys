@@ -1,5 +1,6 @@
-1	romanian	x-vnd.Haiku-HaikuDepot	3833361367
+1	romanian	x-vnd.Haiku-HaikuDepot	1546691996
 Repository update error	LocalRepositoryUpdateProcess		Eroare la actualizarea depozitului
+Network error	ServerHelper		Eroare de rețea
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		A apărut o eroare în timpul reîmprospătării depozitului: %error%
 User Created	UserLoginWindow		Utilizator creat
 Check for updates…	MainWindow		Verifică pentru actualizări…
@@ -19,6 +20,7 @@ You have successfully authenticated as user %Nickname%.	UserLoginWindow		Ați fo
 No user ratings available.	PackageInfoView		Nu sunt disponibile evaluările utilizatorilor.
 Downloading package '%name%'	WorkStatusView		Se descarcă pachetul „%name%”
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Nu a fost posibil să fie extrase informațiile captcha necesare din datele trimise înapoi de la server.
+A network transport error has arisen communicating with the server system: %s	ServerHelper		A apărut o eroare de transport de rețea în timpul comunicării cu sistemul de servere: %s
 Rating	PackageListView		Evaluare
 Synchronizing icons	ServerIconExportUpdateProcess		Se sincronizează iconițele
 Does not start	RatePackageWindow		Nu pornește
@@ -75,6 +77,7 @@ Reboot required	PackageManager		Repornire necesară
 Very unstable	RatePackageWindow		Foarte instabil
 Password:	UserLoginWindow		Parolă:
 All packages	PackageListView		Toate pachetele
+This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Această aplicație este prea veche pentru a comunica cu sistemul de servere. Obțineți o versiune nouă a acestei aplicații prin actualizarea sistemului. Versiunea necesară minimă a acestei aplicații este \„%s\”.
 Stability	RatePackageWindow		Stabilitate
 Send	RatePackageWindow		Trimitere
 Start package daemon	App		Pornire demon de pachet
@@ -98,6 +101,7 @@ Repository	PackageListView		Depozit
 The email is malformed.	UserLoginWindow		Emailul este deformat.
 Close	UserLoginWindow		Închidere
 Close	RatePackageWindow		Închidere
+An unexpected error has been sent from the server [%i]	ServerHelper		O eroare neașteptată a fost trimisă de la serverul [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Se sincronizează datele pachetelor pentru depozitul „%REPO_NAME%”
 View the usage conditions	UserLoginWindow		Vizualizați condițiile de utilizare
 Login issue	MainWindow		Problemă de autentificare
@@ -122,6 +126,7 @@ Log out	MainWindow		Ieșire
 Comment language:	RatePackageWindow		Limbă comentariu:
 Status	PackageListView		Stare
 The password has been incorrectly repeated.	UserLoginWindow		Parola a fost repetată incorect.
+Network transport error	ServerHelper		Eroare de transport de rețea
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		Parola furnizată anterior pentru utilizatorul [%Nickname%] nu este validă în mod curent. Utilizatorul va fi deautentificat din această aplicație și ar trebui să vă autentificați din nou cu parola actualizată.
 Update	RatePackageWindow		Actualizare
 OK	ServerHelper		OK
@@ -137,6 +142,7 @@ The nickname is required.	UserLoginWindow		Pseudonimul este necesar.
 Source packages	MainWindow		Pachete sursă
 -	no package size		-
 Problem with working files	App		Problemă cu fișierele de lucru
+Server error	ServerHelper		Eroare de server
 Try again	App		Încearcă din nou
 Rate package	RatePackageWindow		Evaluați pachet
 Unknown	PackageListView		Necunoscut

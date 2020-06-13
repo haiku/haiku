@@ -100,7 +100,7 @@ no icon	FileTypes Window		piktogramo forestas
 Single launch	Application Type Window		Solrulado
 %s file type	FileType Window		%s dosiera speco
 Default	Attribute ListView		Defaŭlto
-Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Forigo de supra speco ne povas esti malfarita.\nĈiuj dosiera specoj apartenantaj al supera speco estos perditaj!\n\nĈu vi certas ke volas fari tion? Por forigi tutan grupon premu majuskligan klavon kaj premu \"Forigi"\.
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Forigo de supera speco ne povas esti malfarita.\nĈiuj dosieraj specoj apartenantaj al supera speco estos perditaj!\n\nĈu vi certas ke volas fari tion? Por forigi tutan grupon premu majuskligklavon kaj premu \"Forigi"\.
 String	Attribute ListView		Ĉeno
 Add type	New File Type Window		Aldoni specon
 Remove icon	Icon View		Forigi piktogramon

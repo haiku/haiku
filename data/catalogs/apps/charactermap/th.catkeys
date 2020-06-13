@@ -1,20 +1,41 @@
-1	thai	x-vnd.Haiku-CharacterMap	124574598
+1	thai	x-vnd.Haiku-CharacterMap	3116961068
+Tirhuta	UnicodeBlocks		Tirhuta
 Miscellaneous mathematical symbols B	UnicodeBlocks		สัญลักษณ์ทางคณิตศาสตร์เบ็ดเตล็ด B
+Latin extended E	UnicodeBlocks		Latin ขยาย E
+Dogra	UnicodeBlocks		Dogra
+Javanese	UnicodeBlocks		ชวา
 Saurashtra	UnicodeBlocks		Saurashtra
 Arabic supplement	UnicodeBlocks		อาราบิก เพิ่มเติม
 Hanunoo	UnicodeBlocks		Hanunoo
 Ogham	UnicodeBlocks		Ogham
+Inscriptional Pahlavi	UnicodeBlocks		ปาห์ลาวี แบบจารึก
 Hebrew	UnicodeBlocks		ฮีบรู
 Katakana	UnicodeBlocks		คาตาคะนะ
+Miao	UnicodeBlocks		Miao
+Mro	UnicodeBlocks		Mro
 Mongolian	UnicodeBlocks		มองโกเลี่ยน
+Pau Cin Hau	UnicodeBlocks		Pau Cin Hau
+Yezidi	UnicodeBlocks		ยาซิดี
 Linear B ideograms	UnicodeBlocks		Linear B ideograms
+Caucasian Albanian	UnicodeBlocks		คอร์เเคเชี่ยน อัลบาเนีย
+CJK unified ideographs extension D	UnicodeBlocks		CJK unified ideographs extension D
+Sharada	UnicodeBlocks		ชาราดา
 Multani	UnicodeBlocks		Multani
+Linear A	UnicodeBlocks		เชิงเส้น A
 CJK compatibility ideographs Supplement	UnicodeBlocks		CJK compatibility ideographs Supplement
+Pahawh Hmong	UnicodeBlocks		Pahawh Hmong
 Bopomofo extended	UnicodeBlocks		Bopomofo ขยาย
+Bassa Vah	UnicodeBlocks		Bassa Vah
+Georgian extended	UnicodeBlocks		จอร์เจียน ขยาย
 Mathematical alphanumeric symbols	UnicodeBlocks		สัญลักษณ์ตัวอักษรและตัวเลขทางคณิตศาสตร์
 Coptic	UnicodeBlocks		Coptic
+Masaram Gondi	UnicodeBlocks		Masaram Gondi
 Cuneiform numbers and punctuation	UnicodeBlocks		เลขคิวนิฟอร์มและเครื่องหมายวรรคตอน
 Miscellaneous symbols	UnicodeBlocks		สัญลักษณ์เบ็ดเตล็ด
+Kana supplement	UnicodeBlocks		คานะ เสริม
+Medefaidrin	UnicodeBlocks		Medefaidrin
+Enclosed ideographic supplement	UnicodeBlocks		Enclosed ideographic supplement
+Warang Citi	UnicodeBlocks		Warang Citi
 Vertical forms	UnicodeBlocks		รูปแบบแนวตั้ง
 Miscellaneous mathematical symbols A	UnicodeBlocks		สัญลักษณ์ทางคณิตศาสตร์เบ็ดเตล็ด A
 CharacterMap	System name		รูปแบบแผนที่
@@ -22,23 +43,33 @@ Latin extended D	UnicodeBlocks		ละติน ขยาย D
 Aegean numbers	UnicodeBlocks		อีเจียน ตัวเลข
 Hangul syllables	UnicodeBlocks		ฮังกุล พยางค์
 Modifier tone letters	UnicodeBlocks		ตัวอักษรโทนดัดแปลง
+Kaithi	UnicodeBlocks		Kaithi
+Psalter Pahlavi	UnicodeBlocks		Psalter Pahlavi
 Newa	UnicodeBlocks		Newa
 View	CharacterWindow		ดู
+Rumi numeral symbols	UnicodeBlocks		Rumi สัญลักษณ์ตัวเลข
 Enclosed CJK letters and months	UnicodeBlocks		แทรก ตัวอักษร CJK และเดือน
 Deseret	UnicodeBlocks		Deseret
 Cham	UnicodeBlocks		Cham
 Cyrillic	UnicodeBlocks		Cyrillic
+Makasar	UnicodeBlocks		Makasar
+Palmyrene	UnicodeBlocks		Palmyrene
 Shavian	UnicodeBlocks		Shavian
 Tangut	UnicodeBlocks		Tangut
+CJK unified ideographs extension C	UnicodeBlocks		CJK unified ideographs extension C
 Ancient Greek musical notation	UnicodeBlocks		โน้ตดนตรีกรีกโบราณ
 Thai	UnicodeBlocks		ไทย
 Ethiopic supplement	UnicodeBlocks		เสริมเอธิโอเปีย
+Chess symbols	UnicodeBlocks		สัญลักษณ์ หมากรุก
 Yijing hexagram symbols	UnicodeBlocks		สัญลักษณ์ Yijing hexagram
+Ottoman Siyaq numbers	UnicodeBlocks		ตัวเลข Ottoman Siyaq
 Ideographic symbols and punctuation	UnicodeBlocks		สัญลักษณ์และเครื่องหมายวรรคตอน
 File	CharacterWindow		ไฟล์
+Sudanese supplement	UnicodeBlocks		ซูดาน เสริม
 Myanmar	UnicodeBlocks		พม่า
 Tifinagh	UnicodeBlocks		Tifinagh
 Musical symbols	UnicodeBlocks		สัญลักษณ์ทางดนตรี
+Bamum supplement	UnicodeBlocks		Bamum เสริม
 Arabic presentation forms B	UnicodeBlocks		รูปแบบการนำเสนออาราบิก B
 Cypriot syllabary	UnicodeBlocks		พยางค์ภาษาไซปรัส
 IPA extensions	UnicodeBlocks		IPA ขยาย
@@ -47,7 +78,12 @@ N'Ko	UnicodeBlocks		N'Ko
 Cherokee supplement	UnicodeBlocks		เชอโรกี เพิ่มเติม
 Halfwidth and fullwidth forms	UnicodeBlocks		แบบครึ่งความกว้างและเต็มความกว้าง
 Counting rod numerals	UnicodeBlocks		การนับเลข
+Sora Sompeng	UnicodeBlocks		Sora Sompeng
+Supplemental arrows C	UnicodeBlocks		Supplemental arrows C
+Alchemical symbols	UnicodeBlocks		สัญลักษณ์ธาตุ
 Latin extended C	UnicodeBlocks		ละติน ขยาย C
+Old Turkic	UnicodeBlocks		ตรุกี เก่า
+Meroitic hieroglyphs	UnicodeBlocks		อักษรอียิปต์โบราณ
 Combining diacritical marks for symbols	UnicodeBlocks		การรวมเครื่องหมายกำกับการออกเสียงสำหรับสัญลักษณ์
 Osage	UnicodeBlocks		Osage
 Combining diacritical marks supplement	UnicodeBlocks		การรวมเครื่องหมายกำกับเสียงเสริม
@@ -57,39 +93,58 @@ Georgian	UnicodeBlocks		จอร์เจีย
 CJK compatibility forms	UnicodeBlocks		CJK รูปแบบความเข้ากันได้
 Old Hungarian	UnicodeBlocks		ฮังการี เก่า
 CJK unified ideographs extension B	UnicodeBlocks		ส่วนขยายอุดมคติของภาพรวม CJK B
+Meroitic cursive	UnicodeBlocks		ตัวเขียนแบบ Meroitic
 Ahom	UnicodeBlocks		Ahom
+Nyiakeng Puachue Hmong	UnicodeBlocks		Nyiakeng Puachue Hmong
+Duployan	UnicodeBlocks		Duployan
 Early Dynastic Cuneiform	UnicodeBlocks		Early Dynastic Cuneiform
+Kana extended A	UnicodeBlocks		คานะ ขยาย A
 Arabic presentation forms A	UnicodeBlocks		อาราบิก แบบฟอร์มการนำเสนอ A
 Filter:	CharacterWindow		กรอง:
+Small Kana extension	UnicodeBlocks		คานะแบบเล็ก ขยาย
 Kannada	UnicodeBlocks		Kannada
+Brahmi	UnicodeBlocks		พราหมณ์
 Lydian	UnicodeBlocks		Lydian
 Hatran	UnicodeBlocks		Hatran
 Glagolitic supplement	UnicodeBlocks		เสริม Glagolitic
+Elymaic	UnicodeBlocks		Elymaic
 Gurmukhi	UnicodeBlocks		Gurmukhi
 Supplemental arrows B	UnicodeBlocks		ลูกศรเสริม B
 CJK unified ideographs	UnicodeBlocks		CJK unified ideographs
+Enclosed alphanumeric supplement	UnicodeBlocks		ตัวอักษรและตัวเลข ขยาย
 Latin extended B	UnicodeBlocks		ละตินขยาย B
 Phonetic extensions	UnicodeBlocks		ส่วนขยายการออกเสียง
+Indic Siyaq numbers	UnicodeBlocks		ตัวเลข Indic Siyaq
+Batak	UnicodeBlocks		Batak
 Code	CharacterWindow		รหัส
 Block elements	UnicodeBlocks		รูปแบบบล็อค
+Ethiopic extended A	UnicodeBlocks		เอธิโอเปีย ขยาย A
 Mahjong tiles	UnicodeBlocks		Mahjong tiles
 Carian	UnicodeBlocks		Carian
 Gothic	UnicodeBlocks		โกธิค
 Specials	UnicodeBlocks		พิเศษ
+Sinhala Archaic numbers	UnicodeBlocks		ตัวเลข Sinhala Archaic
 Syloti Nagri	UnicodeBlocks		Syloti Nagri
 Latin-1 supplement	UnicodeBlocks		ละติน-1 เพิ่มเติม
 CJK unified ideographs extension A	UnicodeBlocks		CJK unified ideographs extension A
 Linear B syllabary	UnicodeBlocks		Linear B syllabary
 Yi syllables	UnicodeBlocks		Yi syllables
+Khojki	UnicodeBlocks		Khojki
 Currency symbols	UnicodeBlocks		สัญลักษณ์สกุลเงิน
+Soyombo	UnicodeBlocks		Soyombo
+Khitan small script	UnicodeBlocks		ตัวเขียน Khitan แบบเล็ก
+Imperial Aramaic	UnicodeBlocks		อิมพีเรียลอราเมอิก
 Domino tiles	UnicodeBlocks		แผ่นโดมิโน่
 Kayah Li	UnicodeBlocks		Kayah Li
+Nushu	UnicodeBlocks		Nushu
 Oriya	UnicodeBlocks		โอริยา
 Ancient Greek numbers	UnicodeBlocks		ตัวเลขกรีกโบราณ
 Superscripts and subscripts	UnicodeBlocks		ตัวยกและตัวห้อย
 Osmanya	UnicodeBlocks		Osmanya
+Modi	UnicodeBlocks		Modi
 Small form variants	UnicodeBlocks		ชุดรูปแบบขนาดเล็ก
 Arrows	UnicodeBlocks		ลูกศร
+Tangut supplement	UnicodeBlocks		Tangut เสริม
 Bengali	UnicodeBlocks		เบงกาลี
 Phoenician	UnicodeBlocks		ฟินิเชี่ยน
 Ideographic description characters	UnicodeBlocks		อักขระคำอธิบายเชิงอุดมคติ

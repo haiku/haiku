@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku.TextSearch	2224690775
+1	catalan; valencian	x-vnd.Haiku.TextSearch	3859480651
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Si us plau, trieu els fitxers que voleu tenir seleccionats al Rastrejador.
 %appname% : %path%	GrepWindow		%appname% : %path%
 Failed to start xargs program!	Grepper		No s'ha pogut iniciar el programa xargs!
@@ -30,6 +30,7 @@ Open files in code editor	GrepWindow		Obre els fitxers a l’editor de codi.
 Failed to open output pipe!	Grepper		Ha fallat obrir el conducte de sortida!
 Cancel	GrepWindow		Cancel·la
 History	GrepWindow		Historial
+TextSearch	System name		Cerca de text
 File	GrepWindow		Fitxer
 Case-sensitive	GrepWindow		Distingeix entre majúscules i minúscules
 Select all	GrepWindow		Selecciona-ho tot

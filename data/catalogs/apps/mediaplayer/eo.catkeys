@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-MediaPlayer	1313616492
+1	esperanto	x-vnd.Haiku-MediaPlayer	1961774506
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Movi la dosieron al la Rubujo
 Close	MediaPlayer-PlaylistWindow		Fermi
 Volume of background clips	MediaPlayer-SettingsWindow		Laŭteco de fonaj aŭdvidaĵoj
@@ -35,6 +35,7 @@ Full volume	MediaPlayer-SettingsWindow		Plena laŭteco
 Start media server	MediaPlayer-Main		Lanĉi la plurmedian servilon
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Aspektas ke la plurmedia servilo ne funkcias.\nĈu vi volas lanĉi ĝin?
 Location	MediaPlayer-InfoWin		Loko
+Opening '%s'.	MediaPlayer-Main		Ekuzado de '%s'.
 Medium	MediaPlayer-SettingsWindow		Meza
 Play mode	MediaPlayer-SettingsWindow		Ludreĝimo
 Playlist	MediaPlayer-PlaylistWindow		Ludlisto
@@ -83,7 +84,7 @@ Total duration: %s	MediaPlayer-PlaylistWindow		Tuta daŭro: %s
 %.3f kHz	MediaPlayer-InfoWin		%.3f kHz
 Move into trash error	MediaPlayer-RemovePLItemsCmd		Eraro dum movado al la Rubujo
 50% scale	MediaPlayer-Main		50% skalo
-Drop files to play	MediaPlayer-Main		Demetu dosierojn por ekludi ĝin
+Drop files to play	MediaPlayer-Main		Ĵetu dosierojn ĉi tien por ekludi ilin
 Copy Entry	MediaPlayer-CopyPLItemsCmd		Kopii anon
 Close window after playing audio	MediaPlayer-SettingsWindow		Fermi fenestron post aŭdaĵo estos ludita
 Edit	MediaPlayer-PlaylistWindow		Redakti

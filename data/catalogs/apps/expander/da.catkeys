@@ -8,7 +8,7 @@ File expanded	ExpanderWindow		Fil pakket ud
 The destination is read only.	ExpanderWindow		Destination er kun læsebar.
 Expander: Open	ExpanderWindow		Expander: Åben
  is not supported	ExpanderWindow		 understøttes ikke
-Expander settings	ExpanderPreferences		Udviderindstillinger
+Expander settings	ExpanderPreferences		Udvider-indstillinger
 Select current	DirectoryFilePanel		Vælg nuværende
 Source	ExpanderWindow		Kilde
 Error when expanding archive	ExpanderWindow		Fejl ved udpakning af arkiv

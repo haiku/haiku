@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	4118767010
+1	romanian	x-vnd.Haiku-libtracker	2906566299
 Created	ContainerWindow		Creat
 Icon	AttributesView		Iconiță
 Open and make preferred	OpenWithWindow		Deschide sau fixează ca preferat
@@ -111,6 +111,7 @@ Edit templates…	TemplatesMenu		Editează șabloane…
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# octet} other{# octeți}}
 8-bit integer	AttributesView		întreg pe 8 biți
 8-bit unsigned integer	AttributesView		întreg fără semn pe 8 biți
+%s info	InfoWindow	window title	Informații %s
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used utilizat -- %free liber)
 Hide dotfiles	SettingsView		Ascunde fișierele punct
 Trash	Model		Gunoi

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-ActivityMonitor	3672498538
+1	swedish	x-vnd.Haiku-ActivityMonitor	2601047281
 Teams	DataSource		Processer
 Semaphores	DataSource		Semaforer
 TX	DataSource	Shorter version for Sending	TX
@@ -17,6 +17,7 @@ Remove graph	ActivityView		Ta bort graf
 Swap space	DataSource		Växlingsutrymme
 CPU	DataSource		CPU
 ActivityMonitor	System name		AktivitetsÖvervakare
+CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		Uppdateringsintervall:
 RX	DataSource	Shorter version for Receiving.	RX
 Settings…	ActivityWindow		Inställningar...
@@ -30,6 +31,7 @@ Used memory	DataSource		Minnesanvändning
 %.1f faults/s	DataSource		%.1f fel/s
 Show legend	ActivityView		Visa graftext
 Cached memory	DataSource		Buffertminne
+CPU %d usage	DataSource		CPU %d användande
 File	ActivityWindow		Arkiv
 Ports	DataSource		Portar
 Page faults	DataSource		Sidfel

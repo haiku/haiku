@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku.TextSearch	2224690775
+1	esperanto	x-vnd.Haiku.TextSearch	3859480651
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Bonvolu elekti la dosierojn, kiuj por via deziro estus elektitaj en la Spurilo.
 %appname% : %path%	GrepWindow		%appname% : %path%
 Failed to start xargs program!	Grepper		La programa xargs ne eblas komenciĝi!
@@ -30,6 +30,7 @@ Open files in code editor	GrepWindow		Uzi dosierojn per la koda redaktilo.
 Failed to open output pipe!	Grepper		Malsukcesis uzi la eligan dukton!
 Cancel	GrepWindow		Nuligi
 History	GrepWindow		Historio
+TextSearch	System name		Tekstoserĉo
 File	GrepWindow		Dosiero
 Case-sensitive	GrepWindow		Usklecodistinga
 Select all	GrepWindow		Selekti ĉion

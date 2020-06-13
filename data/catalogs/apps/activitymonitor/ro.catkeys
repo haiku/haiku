@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-ActivityMonitor	3672498538
+1	romanian	x-vnd.Haiku-ActivityMonitor	2601047281
 Teams	DataSource		Echipe
 Semaphores	DataSource		Semafoare
 TX	DataSource	Shorter version for Sending	TX
@@ -17,6 +17,7 @@ Remove graph	ActivityView		Elimină grafic
 Swap space	DataSource		Spaţiu swap
 CPU	DataSource		CPU
 ActivityMonitor	System name		ActivityMonitor
+CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		Actualizează intervalul de timp:
 RX	DataSource	Shorter version for Receiving.	RX
 Settings…	ActivityWindow		Configurări…
@@ -30,6 +31,7 @@ Used memory	DataSource		Memorie utilizată
 %.1f faults/s	DataSource		%.1f defecțiuni/s
 Show legend	ActivityView		Arată legenda
 Cached memory	DataSource		Memorie în cache
+CPU %d usage	DataSource		Utilizare CPU %d
 File	ActivityWindow		Fișier
 Ports	DataSource		Porturi
 Page faults	DataSource		Defecțiuni de pagină

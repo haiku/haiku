@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-ActivityMonitor	3672498538
+1	hungarian	x-vnd.Haiku-ActivityMonitor	2601047281
 Teams	DataSource		Csapatok
 Semaphores	DataSource		Szemaforok
 TX	DataSource	Shorter version for Sending	Adás
@@ -17,6 +17,7 @@ Remove graph	ActivityView		Grafikon eltávolítása
 Swap space	DataSource		Virtuális memória
 CPU	DataSource		CPU
 ActivityMonitor	System name		Folyamatmonitor
+CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		Frissítési gyakoriság:
 RX	DataSource	Shorter version for Receiving.	Vétel
 Settings…	ActivityWindow		Beállítások…
@@ -30,6 +31,7 @@ Used memory	DataSource		Használt memória
 %.1f faults/s	DataSource		%.1f hiba/mp
 Show legend	ActivityView		Magyarázat megjelenítése
 Cached memory	DataSource		Gyorsítótárazott memória
+CPU %d usage	DataSource		CPU %d használat
 File	ActivityWindow		Fájl
 Ports	DataSource		Portok
 Page faults	DataSource		Laphibák

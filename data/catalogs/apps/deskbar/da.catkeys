@@ -26,7 +26,7 @@ Restart system	DeskbarMenu		Genstart systemet
 Large	PreferencesWindow		Stor
 Auto-raise	PreferencesWindow		Auto hæv
 Recent folders:	PreferencesWindow		Seneste foldere:
-Show application expander	PreferencesWindow		Vis program udvider
+Show application expander	PreferencesWindow		Vis programudvider
 Close all	WindowMenu		Luk alle
 Deskbar preferences	PreferencesWindow		Skrivebordslinje-præferencer
 Mount	DeskbarMenu		Monter

@@ -1,27 +1,33 @@
-1	esperanto	x-vnd.Haiku-libbe	3337473349
+1	esperanto	x-vnd.Haiku-libbe	2914417806
 {0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# bitoko} other{# bitokoj}}
-All Rights Reserved.	AboutWindow		Ĉiuj raitoj estas protektitaj.
+%.2f TiB/s	StringForRate		%.2f TiB/s
+All Rights Reserved.	AboutWindow		Ĉiuj rajtoj estas rezervitaj.
 gold master	AboutWindow		ora mastro
 Undo	TextView		Malfari
 OK	PrintJob		Bone
 gamma	AboutWindow		gamo
 development	AboutWindow		kostrukciado
 OK	Dragger		Bone
+%3.2f GiB/s	StringForRate		%3.2f GiB/s
 Print Server is not responding.	PrintJob		Servilo de presado ne respondas.
 About %app%	AboutMenuItem		Pri %app%
 Warning	Dragger		Averto
 Green:	ColorControl		Verda:
+%3.2f KiB/s	StringForRate		%3.2f KiB/s
 Redo	TextView		Refari
 No pages to print!	PrintJob		Paĝoj por presi forestas!
 beta	AboutWindow		beto
 OK	ZombieReplicantView		Bone
 Cut	TextView		Eltondi
 %3.2f GiB	StringForSize		%3.2f GiB
+Default	Default decorator about box		Defaŭlta
 Can't delete this replicant from its original application. Life goes on.	Dragger		Ne povas foriĝi replikilon de ĝia fonta programo. Vivo daŭriĝas.
 Error	ZombieReplicantView		Eraro
 Paste	TextView		Alglui
 OK	AboutWindow		Bone
+{0, plural, one{# byte/s} other{# bytes/s}}	StringForRate		{0, plural, one{# bitoko/s} other{# bitokoj/s}}
 Special Thanks:	AboutWindow		Apartaj dankoj al:
+Default Haiku window decorator.	Default decorator about box		Defaŭlta dekoraciilo por fenestroj de la Hajko
 %.2f TiB	StringForSize		%.2f TiB
 Remove replicant	Dragger		Forigi replikilon
 Version	AboutWindow		Versio
@@ -31,6 +37,7 @@ Copy	TextView		Kopii
 Select all	TextView		Elekti ĉion
 alpha	AboutWindow		alfo
 %3.2f MiB	StringForSize		%3.2f MiB
+%3.2f MiB/s	StringForRate		%3.2f MiB/s
 Error	PrintJob		Eraro
 About %app%	AboutWindow		Pri %app%
 About %app…	Dragger		Pri %app…

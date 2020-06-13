@@ -15,10 +15,10 @@ Backface culling	TeapotWindow		Backface culling
 Z-buffered	TeapotWindow		Z-bufferet
 File	TeapotWindow		Fil
 Perspective	TeapotWindow		Perspektiv
-GLTeapot	System name		GLTepotte
+GLTeapot	System name		GLTekande
 Green	TeapotWindow		Grøn
 Right	TeapotWindow		Højre
 FPS display	TeapotWindow		FPS-display
-Add a teapot	TeapotWindow		Tilføj en tepotte
+Add a teapot	TeapotWindow		Tilføj en tekande
 Red	TeapotWindow		Rød
 Lights	TeapotWindow		Lys

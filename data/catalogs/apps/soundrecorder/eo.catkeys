@@ -23,7 +23,7 @@ Cannot open the temporary file created to hold the new recording	RecorderWindow	
 Input:	RecorderWindow		Enigo:
 Forward	RecorderWindow		Antaŭen
 Play	RecorderWindow		Ludi
-SoundRecorder	System name		La Sonregistrilo
+SoundRecorder	System name		Sonregistrilo
 Channels:	RecorderWindow		Kanaloj:
  bits	RecorderWindow		 bitoj
 None	RecorderWindow		Neniu

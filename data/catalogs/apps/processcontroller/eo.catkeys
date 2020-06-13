@@ -1,20 +1,20 @@
 1	esperanto	x-vnd.Haiku-ProcessController	168752057
 Error saving file	ProcessController		Eraro dum konservado de dosiero
-Display priority	ProcessController		Montri prioritaton
+Display priority	ProcessController		Prioritaton de montrado
 That's no Fun!	ProcessController		Tio ne estas ŝerco!
 What do you want to do with the team \"%s\"?	ProcessController		Kion vi volas fari kun la procezfadenaro \"%s\"?
 Your setting file could not be saved!\n(%s)	ProcessController		Ne povas konservi vian dosieron de agordo!\n(%s)
 Processor %d	ProcessController		Procesoro %d
 Live in the Deskbar	ProcessController		Montri en la Laborstrio
-Kill this team!	ProcessController		Ĉesi la procezfadenaron!
+Kill this team!	ProcessController		Ĉesigi la procezfadenaron!
 OK	ProcessController		Bone
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Vi povas lanĉi la Taskadministrilon en fenestro aŭ instali ĝin en la Laborstrion.
 Real-time priority	ProcessController		Realtempa prioritato
 Custom priority	ProcessController		Propra prioritato
 Debug this thread!	ProcessController		Sencimigi la procezfadenon!
-Low priority	ProcessController		Ŝpara prioritato
+Low priority	ProcessController		Malgranda prioritato
 Urgent display priority	ProcessController		Prioritato de urĝa montrado
-Memory usage	ProcessController		Uzado de memorilo
+Memory usage	ProcessController		Konsumo de memoro
 Ok!	ProcessController		Bone!
 Normal priority	ProcessController		Norma prioritato
 Restart Deskbar	ProcessController		Relanĉi la Laborstrion
@@ -24,25 +24,25 @@ Please confirm	ProcessController		Konfirmu
 Urgent priority	ProcessController		Urĝa prioritato
 What do you want to do with the thread \"%s\"?	ProcessController		Kion vi volas fari kun la procezfadeno \"%s\"?
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
-Idle priority	ProcessController		Ŝpara prioritato
+Idle priority	ProcessController		Senokupa prioritato
 Real-time display priority	ProcessController		Prioritato de realtempa montrado
-Threads and CPU usage	ProcessController		Procezfadenoj kaj uzo de CPU
+Threads and CPU usage	ProcessController		Procezfadenoj kaj konsumo de CPU
 Quit application	ProcessController		Ĉesigi programon
 Info	ProcessController		Informo
 Kill this thread!	ProcessController		Ĉesigi senkondiĉe ĉi procezfadenon!
 This team is already gone…	ProcessController		Ĉi procezfadenaro jam estas ĉesigita…
 Gone teams…	ProcessController		Ĉesigitaj procezfadenaroj…
-Quit an application	ProcessController		Ĉesi programon
+Quit an application	ProcessController		Ĉesigi programon
 Cancel	ProcessController		Nuligi
 Install in Deskbar	ProcessController		Instali en la Laborstrion
 Debug this team!	ProcessController		Sencimigi ĉi procezfadenaron!
 Low latency	ProcessController		Malgranda respondotempo
-ProcessController	System name		La Taskadministrilo
-Lowest active priority	ProcessController		La plej malalta prioritato
+ProcessController	System name		La Taskadministrilo (ProcessController)
+Lowest active priority	ProcessController		La plej malgranda prioritato
 Restart Tracker	ProcessController		Relanĉi la Spurilon
 System resources & caches…	ProcessController		Sistemaj risurcoj & kaŝmemoroj…
 Damned!	ProcessController		Damne!
-New Terminal	ProcessController		Nova konzolo
+New Terminal	ProcessController		Nova la Terminalo
 Power saving	ProcessController		Ŝparado de energio
 ProcessController is already installed in Deskbar.	ProcessController		La Taskadministrilo jam estas instalita en la Laborstrion.
 This is the last active processor…\nYou can't turn it off!	ProcessController		Ĉi tio estas la lasta aktiva procesoro...\nVi ne povas malŝalti ĝin!!

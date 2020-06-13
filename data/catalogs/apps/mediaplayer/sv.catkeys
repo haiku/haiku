@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-MediaPlayer	1313616492
+1	swedish	x-vnd.Haiku-MediaPlayer	1961774506
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Flytta post till Papperskorgen
 Close	MediaPlayer-PlaylistWindow		Stäng
 Volume of background clips	MediaPlayer-SettingsWindow		Volym för bakgrundsklipp
@@ -35,6 +35,7 @@ Full volume	MediaPlayer-SettingsWindow		Högsta volym
 Start media server	MediaPlayer-Main		Starta mediaserver
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Det verkar som att mediaservern inte körs.\nVill du starta den?
 Location	MediaPlayer-InfoWin		Plats
+Opening '%s'.	MediaPlayer-Main		Öppnar '%s'.
 Medium	MediaPlayer-SettingsWindow		Medium
 Play mode	MediaPlayer-SettingsWindow		Uppspelningsläge
 Playlist	MediaPlayer-PlaylistWindow		Spellista

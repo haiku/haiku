@@ -1,5 +1,6 @@
-1	esperanto	x-vnd.Haiku-HaikuDepot	3833361367
+1	esperanto	x-vnd.Haiku-HaikuDepot	1546691996
 Repository update error	LocalRepositoryUpdateProcess		Eraro dum ĝisdatigo de deponejo
+Network error	ServerHelper		Eraro de reto
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Eraro okazis dum aktualigo de la deponejo: %error%
 User Created	UserLoginWindow		Kreis Uzanton
 Check for updates…	MainWindow		Kontroli ĝisdatigojn…
@@ -19,6 +20,7 @@ You have successfully authenticated as user %Nickname%.	UserLoginWindow		Vi sukc
 No user ratings available.	PackageInfoView		Uzantaj taksoj ne estas disponeblaj
 Downloading package '%name%'	WorkStatusView		Elŝutas pakaĵon '%name%'
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Ne povis eltiri necesan kapĉan informon el la datuma bloko kiu estis sendita el la servilo.
+A network transport error has arisen communicating with the server system: %s	ServerHelper		Eraro de reta transporto dum konversacio kun servilo: %s
 Rating	PackageListView		Takso
 Synchronizing icons	ServerIconExportUpdateProcess		Sinkronigas piktogramojn
 Does not start	RatePackageWindow		Ne komencas
@@ -75,6 +77,7 @@ Reboot required	PackageManager		Restartigo estas deviga
 Very unstable	RatePackageWindow		Nestabilega
 Password:	UserLoginWindow		Pasvorto:
 All packages	PackageListView		Ĉiuj pakaĵoj
+This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		La programo estas tro malnova por komuniki kun la servilo. Akiru pli novan version de la programo per ĝisdatigo de via sistemo. La minimuma necesa versio de la programo estas \"%s\".
 Stability	RatePackageWindow		Stabileco
 Send	RatePackageWindow		Sendi
 Start package daemon	App		Lanĉi pakaĵan demonon
@@ -98,6 +101,7 @@ Repository	PackageListView		Deponejo
 The email is malformed.	UserLoginWindow		La retpoŝtadreso estas misformita.
 Close	UserLoginWindow		Forlasi
 Close	RatePackageWindow		Forlasi
+An unexpected error has been sent from the server [%i]	ServerHelper		La servilo sendis neatenditan eraron [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Sinkronigado de pakaĵa datumo por la deponejo '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Vidi la kondiĉojn de uzado
 Login issue	MainWindow		Ensaluta eraro
@@ -122,6 +126,7 @@ Log out	MainWindow		Elsaluti
 Comment language:	RatePackageWindow		Komenta lingvo:
 Status	PackageListView		Stato
 The password has been incorrectly repeated.	UserLoginWindow		La pasvorto malĝuste estis ripetita.
+Network transport error	ServerHelper		Eraro de reta transporto
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		La pasvorton, kiu antaŭe estis donita por la uzanto [%Nickname%], ne plu estas valida. La uzanto estos elsalutita de ĉi tiu programo kaj vi denove devus ensaluti per via ĝisdatigita pasvorto.
 Update	RatePackageWindow		Ĝisdatigi
 OK	ServerHelper		Bone
@@ -137,6 +142,7 @@ The nickname is required.	UserLoginWindow		La kromnomo estas deviga.
 Source packages	MainWindow		Fontaj pakaĵoj
 -	no package size		-
 Problem with working files	App		Problemo kun kurantaj dosieroj
+Server error	ServerHelper		Eraro de servilo
 Try again	App		Provi denove
 Rate package	RatePackageWindow		Taksi pakaĵon
 Unknown	PackageListView		Nekonata

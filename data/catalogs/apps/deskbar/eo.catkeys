@@ -10,7 +10,7 @@ Edit in Tracker…	PreferencesWindow		Redakti per la Spurilo…
 Recent documents:	PreferencesWindow		Ĵusaj dokumentoj:
 Recent applications	DeskbarMenu		Ĵusaj programoj
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Programoj
-Find…	DeskbarMenu		Trovi…
+Find…	DeskbarMenu		Serĉi…
 Show clock	Tray		Montri la horloĝon
 Window	PreferencesWindow		Fenestro
 Defaults	PreferencesWindow		Defaŭltoj
@@ -18,32 +18,32 @@ Menu	PreferencesWindow		Menuo
 Recent documents	DeskbarMenu		Ĵusaj dokumentoj
 Auto-hide	PreferencesWindow		Aŭtomatkaŝi
 Always on top	PreferencesWindow		Ĉiam videbla
-<Deskbar folder is empty>	DeskbarMenu		<Dosierujo de Laborstrio estas malplena>
-Show all	WindowMenu		Vidigi ĉiujn
+<Deskbar folder is empty>	DeskbarMenu		<Dosierujo de la Laborstrio estas malplena>
+Show all	WindowMenu		Montri ĉiujn
 No windows	WindowMenu		Neniu fenestro
-Deskbar	System name		Laborstrio
+Deskbar	System name		La Laborstrio (Deskbar)
 Restart system	DeskbarMenu		Restartigi la sistemon
 Large	PreferencesWindow		Granda
-Auto-raise	PreferencesWindow		Aŭtomate suprenigi
+Auto-raise	PreferencesWindow		Aŭtomate antaŭigi
 Recent folders:	PreferencesWindow		Ĵusaj dosierujoj:
-Show application expander	PreferencesWindow		Montri la elvolvilon de programoj
+Show application expander	PreferencesWindow		Montri la liston de programaj fenestroj
 Close all	WindowMenu		Fermi ĉiujn
 Deskbar preferences	PreferencesWindow		Agordo de la Laborstrio
 Mount	DeskbarMenu		Surmeti
 Revert	PreferencesWindow		Malfari
 Small	PreferencesWindow		Malgranda
 Recent applications:	PreferencesWindow		Ĵusaj programoj:
-Shutdown…	DeskbarMenu		Sistemfermi…
+Shutdown…	DeskbarMenu		Ĉesi laboron…
 Tracker always first	PreferencesWindow		La Spurilo ĉiam unua
 Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Agordo
 Recent folders	DeskbarMenu		Ĵusaj dosierujoj
 About this system	DeskbarMenu		Pri ĉi tiu sistemo
-Show calendar…	TimeView		Vidigi la kalendaron…
-Deskbar preferences…	DeskbarMenu		Agordoj de la Laborstrio…
-Expand new applications	PreferencesWindow		Elvolvi novajn programojn
+Show calendar…	TimeView		Montri kalendaron…
+Deskbar preferences…	DeskbarMenu		Agordo de la Laborstrio…
+Expand new applications	PreferencesWindow		Montri novajn programojn
 Show replicants	DeskbarMenu		Montri replikilojn
 Hide application names	PreferencesWindow		Kaŝi nomojn de programoj
-Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demonstrataĵoj
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demonstraĵoj
 Icon size	PreferencesWindow		Piktograma grando
 Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Labortablaj aplikaĵetoj
 Hide all	WindowMenu		Kaŝi ĉiujn

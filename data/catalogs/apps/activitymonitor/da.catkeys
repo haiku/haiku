@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-ActivityMonitor	3672498538
+1	danish	x-vnd.Haiku-ActivityMonitor	2601047281
 Teams	DataSource		Hold
 Semaphores	DataSource		Semaforer
 TX	DataSource	Shorter version for Sending	TX
@@ -16,7 +16,8 @@ Receiving	DataSource		Modtager
 Remove graph	ActivityView		Fjern graf
 Swap space	DataSource		Udvekslings plads
 CPU	DataSource		CPU
-ActivityMonitor	System name		AktivitetsMonitor
+ActivityMonitor	System name		Aktivitetsmonitor
+CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		Opdatering tids interval:
 RX	DataSource	Shorter version for Receiving.	RX
 Settings…	ActivityWindow		Indstillinger…
@@ -30,6 +31,7 @@ Used memory	DataSource		Brugt hukommelse
 %.1f faults/s	DataSource		%.1f fejl/s
 Show legend	ActivityView		Vis forklaring
 Cached memory	DataSource		Mellemlager hukommelse
+CPU %d usage	DataSource		CPU %d forbrug
 File	ActivityWindow		Fil
 Ports	DataSource		Porte
 Page faults	DataSource		Side fejl

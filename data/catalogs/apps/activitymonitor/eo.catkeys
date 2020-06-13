@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-ActivityMonitor	3672498538
+1	esperanto	x-vnd.Haiku-ActivityMonitor	2601047281
 Teams	DataSource		Teamoj
 Semaphores	DataSource		Semaforoj
 TX	DataSource	Shorter version for Sending	Elsendado
@@ -17,6 +17,7 @@ Remove graph	ActivityView		Forigi diagramon
 Swap space	DataSource		Permutejo
 CPU	DataSource		Ĉefprocesoro
 ActivityMonitor	System name		ObserviloDeAktiveco
+CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		Tempo inter ĝisdatigoj:
 RX	DataSource	Shorter version for Receiving.	Ricevado
 Settings…	ActivityWindow		Agordo…
@@ -30,6 +31,7 @@ Used memory	DataSource		Uzita memoro
 %.1f faults/s	DataSource		%.1f eraroj/s
 Show legend	ActivityView		Montri klarigeton
 Cached memory	DataSource		Kaŝita memoro
+CPU %d usage	DataSource		CPU %d uzado
 File	ActivityWindow		Dosiero
 Ports	DataSource		Pordoj
 Page faults	DataSource		Permutodosieraj eraroj

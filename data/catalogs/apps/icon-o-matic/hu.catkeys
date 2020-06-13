@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.haiku-icon_o_matic	2424331018
+1	hungarian	x-vnd.haiku-icon_o_matic	1805671130
 None	Icon-O-Matic-Properties		Nincs
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Útvonal jelzőinek elforgatása
 Add empty	Icon-O-Matic-ShapesList		Hozzáadás
@@ -164,6 +164,7 @@ Untitled	Icon-O-Matic-Main		Névtelen
 Max LOD	Icon-O-Matic-PropertyNames		Max RSz
 Add Path	Icon-O-Matic-AddPathsCmd		Útvonal hozzáadása
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Menti a változtatásokat a jelenlegi ikonba bezárás előtt?
+Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		Nem sikerült megnyit a fájlt (%s), mint SVG dokumentum.\n\n
 load error	Icon-O-Matic-SVGImport		betöltési hiba
 Transformation	Icon-O-Matic-TransformersList		Átalakítás
 Save as…	Icon-O-Matic-Menu-File		Mentés másként…

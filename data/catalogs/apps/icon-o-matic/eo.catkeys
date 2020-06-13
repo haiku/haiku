@@ -99,7 +99,7 @@ Translation X	Icon-O-Matic-PropertyNames		Konverto X
 Flip Control Points	Icon-O-Matic-FlipPointsCmd		Renversi Apogajn Punktojn
 Add Transformers	Icon-O-Matic-AddTransformersCmd		Aldoni Transformilojn
 BEOS:ICON Attribute	Icon-O-Matic-SavePanel		BEOS:ICON Atributo
-Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		La Piktogramilo ŝajne ne interpretis la tutan datumon de la ŝargita SVG. Per anstataŭigo de originala dosiero ĝia datumo estos perdita.
+Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Piktogramilo ŝajne ne interpretis la tutan datumon de la ŝargita SVG. Per anstataŭigo de originala dosiero ĝia datumo estos perdita.
 Rotate indices backwards	Icon-O-Matic-PathsList		Turni indeksojn reen.
 Overwrite	Icon-O-Matic-SVGExport		Anstataŭigi
 Modify Control Point	Icon-O-Matic-ChangePointCmd		Modifi Apogan Punkton
@@ -171,7 +171,7 @@ Save as…	Icon-O-Matic-Menu-File		Konservi kiel…
 Swatches	Icon-O-Matic-Menus		Modeloj
 <modify path>	Icon-O-Matic-PathCmd		<ŝanĝi itineron>
 HVIF Source Code	Icon-O-Matic-SavePanel		HVIF fonta kodo
-Icon-O-Matic	System name		La Piktogramilo
+Icon-O-Matic	System name		Piktogramilo
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<nenio por malfari>
 Add	Icon-O-Matic-StylesList		Aldoni
 Translation Y	Icon-O-Matic-PropertyNames		Transformo de Y
@@ -194,7 +194,7 @@ Move Transformer	Icon-O-Matic-MoveTransformersCmd		Movi transformilon
 Perspective	Transformation		Perspektivo
 Export	Icon-O-Matic-Menu-File		Eksporti
 Width	Icon-O-Matic-PropertyNames		Larĝo
-Bummer	Cancel button - error alert		Seniluziiĝo
+Bummer	Cancel button - error alert		Ho ve!
 Style	Icon-O-Matic-Menus		Stilo
 edit it's properties here.	Empty property list - 3rd line		redakti ĝiajn atributojn ĉi tie.
 Off	Icon-O-Matic-Menu-Settings		Malŝalti

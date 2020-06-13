@@ -10,7 +10,7 @@ Script console	WebPositive Window		Skriptokonzolo
 Fonts	Settings Window		Tiparoj
 Path	Cookie Manager		Itinero
 of	Download Window	...as in '12kB of 256kB'	de
-Bookmarks	WebPositive Window		La Legosignoj
+Bookmarks	WebPositive Window		Legosignaro
 Use proxy server to connect to the internet	Settings Window		Konekti al interreto per prokurilo
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url elŝutita
 Auto-hide interface in full screen mode	Settings Window		Aŭtomate kaŝi interfacon dum la plenekrana reĝimo
@@ -32,10 +32,10 @@ Browse…	Settings Window		Foliumi…
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Legosigno por ĉi paĝo (%bookmarkName) jam ekzistas.
 Resume prior session	Settings Window		Daŭrigi antaŭan sesion
 Match case	WebPositive Window		Atenti usklecon
-Proxy password:	Settings Window		Prokuroservila pasvorto:
+Proxy password:	Settings Window		Prokurila pasvorto:
 Size:	Font Selection view		Grando:
 Page source	WebPositive Window		Paĝa fontkodo
-Proxy server port:	Settings Window		Prokurservila pordnumero:
+Proxy server port:	Settings Window		Prokurila pordnumero:
 Error opening downloads folder	Download Window		Eraro dum uzo de elŝuta dosierujo
 Show bookmark bar	WebPositive Window		Montri breton de legosignoj
 Find	WebPositive Window		Serĉi
@@ -45,7 +45,7 @@ General	Settings Window		Ĝenerala
 New tabs:	Settings Window		Novaj langetoj:
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url malsukcesis
 Open downloads folder	Download Window		Uzi dosierujon de elŝutoj
-Proxy server	Settings Window		Prokura servilo
+Proxy server	Settings Window		Prokurilo
 Decrease size	WebPositive Window		Malgrandigi
 Default fixed font size:	Settings Window		Defaŭlta grado de fiksitlarĝa tiparo:
 Sans serif font:	Settings Window		Senserifa tiparo:
@@ -74,7 +74,7 @@ Password:	Authentication Panel		Pasvorto:
 Forward	WebPositive Window		Antaŭen
 Clear	Console Window		Viŝi
 Cut	URL Bar		Eltondi
-View	WebPositive Window		Rigardi
+View	WebPositive Window		Aspekto
 Paste	URL Bar		Alglui
 Find next	WebPositive Window		Pluserĉi
 Open search page	Settings Window		Uzi paĝon de serĉado
@@ -86,10 +86,10 @@ New browser window	Download Window		Nova fenestro de retumilo
 Open	Download Window		Uzi
 New window	WebPositive Window		Nova fenestro
 New windows:	Settings Window		Novaj fenestroj:
-The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	La dosierujo por elŝuto ne povas esti uzata.\n\nEraro: %error
+The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	La dosierujo por elŝutoj ne povas esti uzata.\n\nEraro: %error
 Cancel	Authentication Panel		Nuligi
 Style:	Font Selection view		Stilo:
-There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	Eraro dum kreado de dosiero de legosignoj.\n\nEraro: %error
+There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	Eraro dum kreado de legosigna dosiero.\n\nEraro: %error
 OK	Download Window		Bone
 Proxy username:	Settings Window		Usantnomo ĉe prokurilo:
 Manage bookmarks	WebPositive Window		Administri legosignojn
@@ -106,12 +106,12 @@ Show tabs if only one page is open	Settings Window		Montri panelon de langetoj e
 Close tab	WebPositive Window		Fermi langeton
 Remove	Download Window		Forigi
 About	WebPositive Window		Pri
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		La ŝargado daŭras, ĉu vi certas ke vi volas ĉesigi la Retprosperon nun?
-Continue downloads	WebPositive		Daŭrigi ŝargadojn
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		La elŝutado daŭras, ĉu vi certas ke vi volas ĉesigi la Retprosperon nun?
+Continue downloads	WebPositive		Daŭrigi elŝutadon
 Proxy server requires authentication	Settings Window		La prokurilo postulas aŭtentigon
 Cancel	Settings Window		Nuligi
 History	WebPositive Window		Historio
-Reset size	WebPositive Window		Restarigi gra(n)don
+Reset size	WebPositive Window		Restarigi grandon
 Do you really want to clear the browsing history?	WebPositive Window		Ĉu vi certas ke volas nuligi historion de rigardado?
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Serĉi sekvan aperon de serĉaĵo
 Fixed font:	Settings Window		Fiksitlarĝa tiparo:
@@ -149,7 +149,7 @@ Confirmation	WebPositive Window		Konfirmo
 Session cookie	Cookie Manager		Sesia retkuketo
 Open all	WebPositive Window		Uzi ĉion
 Cut	WebPositive Window		Eltondi
-Downloads	Download Window		Ŝargaĵoj
+Downloads	Download Window		Elŝutoj
 Open blank page	Settings Window		Uzi malplenan paĝon
 Clear history	WebPositive Window		Forigi historion
 Cancel	WebPositive Window		Nuligi

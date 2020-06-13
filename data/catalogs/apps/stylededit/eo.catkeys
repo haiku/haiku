@@ -2,7 +2,7 @@
 Document statistics	Statistics		Statistiko pri dokumentoj
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Ne povas malfari, dosiero forestas: \"%s\".
 Cut	Menus		Eltondi
-Center	Menus		Centra
+Center	Menus		Centre
 Increase size	Menus		Pligrandigi
 Wrap-around search	FindandReplaceWindow		Iteracia serĉo
 Page setup…	Menus		Agordo de paĝo…
@@ -12,14 +12,14 @@ Find	FindandReplaceWindow		Serĉi
 New	Menus		Nova
 Document	Menus		Dokumento
 Search backwards	FindandReplaceWindow		Ŝerĉi kontraŭen
-Find again	Menus		Retrovi
+Find again	Menus		Reserĉi
 Read-only	StatusView		Nurlegebla
 Save	Menus		Konservi
 Cancel	QuitAlert		Nuligi
 Copy	Menus		Kopii
 Reload	NodeMonitorAlerts		Renovigi
 line %d, column %d	StatusView		Vico %d, kolumno %d
-Words:	Statistics		Vortoj:
+Words:	Statistics		Vortojn:
 ???	LoadAlert		???
 Recover	NodeMonitorAlerts		Restaŭri
 Error saving \"%s\":\n%s	SaveAlert		Eraro dum konservado\"%s\":\n%s
@@ -50,7 +50,7 @@ Default	Menus		Defaŭlta
 OK	SaveAlert		Bone
 Color	Menus		Koloro
 Save changes to the document \"%s\"? 	QuitAlert		Ĉu konservi ŝanĝojn en dokumenton \"%s\"? 
-StyledEdit	System name		La Stilredaktilo
+StyledEdit	System name		Stilredaktilo
 Find:	FindandReplaceWindow		Serĉi:
 Undo typing	QuitAlert		Malfari tajpadon
 Error loading \"%s\":\n\t%s	LoadAlert		Eraro dum ŝargado de \"%s\":\n\t%s
@@ -67,12 +67,12 @@ Modified	StatusView		Ŝanĝita
 OK	LoadAlert		Bone
 Save	QuitAlert		Konservi
 Case-sensitive	FindandReplaceWindow		Usklecodistinga
-Find selection	Menus		Trovi elektitan
+Find selection	Menus		Serĉi elektitan
 Cancel	SaveAlert		Nuligi
 Find…	Menus		Serĉi…
 Revert	RevertToSavedAlert		Malfari
 Decrease size	Menus		Malgrandigi
-Size	Menus		Grando
+Size	Menus		Grado
 Autodetect	Menus		Detekti aŭtomate
 Replace next	Menus		Anstataŭigi tekston
 OK	QuitAlert		Bone
@@ -81,7 +81,7 @@ Edit	Menus		Redakti
 Open…	Menus		Uzi…
 Save as…	Menus		Konservi kiel…
 Replace	FindandReplaceWindow		Anstataŭigi
-Characters:	Statistics		Signoj:
+Characters:	Statistics		Signojn:
 Don't save	QuitAlert		Ne konservi
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		La dosiero estas markita kiel nurlegebla. Ĉu konservi ŝanĝojn en dokumento \"%s\"? 
 Align	Menus		Ĝisrandigi

@@ -20,7 +20,7 @@ Would you like to set one up now?	PrintServerApp		Ĉu vi volas agordi unu nun?
 Print job setup:	ConfigWindow		Presotaska agordo:
 A6	ConfigWindow	ISO 216 paper size	A6
 Portrait	ConfigWindow		Vertikale
-All pages	ConfigWindow		Ĉiom da paĝoj
+All pages	ConfigWindow		Ĉiuj da paĝoj
 There is no default printer set up.	PrintServerApp		Neniu defaŭlta presilo estas atribuita.
 B5	ConfigWindow	ISO 216 paper size	B5
 A0	ConfigWindow	ISO 216 paper size	A0

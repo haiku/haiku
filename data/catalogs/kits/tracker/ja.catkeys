@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	4118767010
+1	japanese	x-vnd.Haiku-libtracker	2906566299
 Created	ContainerWindow		作成日時
 Icon	AttributesView		アイコン
 Open and make preferred	OpenWithWindow		関連付けて開く
@@ -111,6 +111,7 @@ Edit templates…	TemplatesMenu		テンプレートを編集…
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# バイト} other{# バイト}}
 8-bit integer	AttributesView		8 ビット整数
 8-bit unsigned integer	AttributesView		8 ビット符号なし整数
+%s info	InfoWindow	window title	%s の情報
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used 使用中 -- %free 使用可能)
 Hide dotfiles	SettingsView		ドットファイルを隠す
 Trash	Model		ごみ箱

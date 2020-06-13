@@ -2,7 +2,7 @@
 Close other tabs	Terminal TermWindow		Luk andre faneblade
 Insert path	Terminal TermView		Indsæt sti
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal kunne ikke køre skallen. Beklager.
-Text encoding	Terminal TermWindow		Tekst-indkodning
+Text encoding	Terminal TermWindow		Tekstkodning
 OK	Terminal SetTitleWindow		OK
 Edit	Terminal TermWindow		Rediger
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory\n	Terminal TermApp		  -h,     --help               vis denne hjælp\n  -t,     --title              indstil vinduets titel\n  -f,     --fullscreen         start fuldskærm\n  -w,     --working-directory  indstil indledende arbejdsmappe\n

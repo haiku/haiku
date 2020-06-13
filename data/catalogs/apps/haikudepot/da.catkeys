@@ -39,7 +39,7 @@ Authorization or security issue. Logout and log back in again to check that your
 Local	LocalPkgDataLoadProcess		Lokal
 Rate %Package%	RatePackageWindow		Bedøm %Package%
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Der opstod en fejl under initialisering af pakkehåndteringen: %message%
-Quit HaikuDepot	App		Afslut HaikuDepot
+Quit HaikuDepot	App		Afslut Haikudepot
 An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		Der opstod en uventet fejl '%Message%' med egenskaben '%Property%'
 A response to the captcha question must be provided.	UserLoginWindow		Der skal gives et svar til captcha-spørgsmålet.
 Category	FilterView		Kategori
@@ -54,14 +54,14 @@ Error	App		Fejl
 There was a puzzling response from the web service.	UserLoginWindow		Der var et gådesvar fra webtjenesten.
 Version	PackageListView		Version
 Not logged in	MainWindow		Ikke logget ind
-No, quit HaikuDepot	App		Nej, afslut HaikuDepot
+No, quit HaikuDepot	App		Nej, afslut Haikudepot
 Featured packages	FeaturedPackagesView		Udvalgte pakker
 The supplied response to the captcha is incorrect. A new captcha will be generated; try again.	UserLoginWindow		Det angivne svar til captcha'en er forkert. Der genereres en ny captcha — prøv igen.
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Det var ikke muligt at kommunikere med serveren for at indhente et captcha-billede som kræves for at oprette en ny bruger.
-Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Din bedømmelse blev uploadet. Du kan opdatere eller fjerne den på HaikuDepot-server-webstedet.
+Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Din bedømmelse blev uploadet. Du kan opdatere eller fjerne den på Haikudepot-server-webstedet.
 Available	PackageListView		Tilgængelig
 Cancel	UserLoginWindow		Annuller
-HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot behøver pakkedæmonen for at fungere, og den ser ikke ud til at køre.\nVil du starte den nu?
+HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		Haikudepot behøver pakkedæmonen for at fungere, og den ser ikke ud til at køre.\nVil du starte den nu?
 Click a package to view information	PackageInfoView		Klik på en pakke for at vise information
 The password must be at least eight characters long, consist of at least two digits and one upper case character.	UserLoginWindow		Adgangskoden skal være mindst 8 tegn langt, bestå af mindst 2 tal og 1 stort bogstav.
 Contents	PackageInfoView		Indhold
@@ -103,7 +103,7 @@ View the usage conditions	UserLoginWindow		Vis anvendelsesbetingelserne
 Login issue	MainWindow		Problem med at logge ind
 Size	PackageListView		Størrelse
 Your rating:	RatePackageWindow		Din bedømmelse:
-The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		Brugeren %Nickname% er blevet oprettet i HaikuDepotServer-systemet. Du kan administrere dine brugerdetaljer ved at bruge webgrænsefladen. Du er nu logget ind som den nye bruger.
+The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		Brugeren %Nickname% er blevet oprettet i Haikudepotserver-systemet. Du kan administrere dine brugerdetaljer ved at bruge webgrænsefladen. Du er nu logget ind som den nye bruger.
 Your rating was updated.	RatePackageWindow		Din bedømmelse blev opdateret.
 All categories	FilterView		Alle kategorier
 Repositories	MainWindow		Softwarekilder
@@ -116,7 +116,7 @@ Refresh repositories	MainWindow		Genopfrisk softwarekilder
 Tools	MainWindow		Værktøjer
 Continue	App		Fortsæt
 A password is required.	UserLoginWindow		Der kræves en adgangskode.
-This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Pakken ser ikke ud til at være på HaikuDepot-serveren, så det er ikke muligt at oprette en ny bedømmelse eller redigere end eksisterende bedømmelse.
+This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Pakken ser ikke ud til at være på Haikudepot-serveren, så det er ikke muligt at oprette en ny bedømmelse eller redigere end eksisterende bedømmelse.
 Language	RatePackageWindow		Sprog
 Log out	MainWindow		Log ud
 Comment language:	RatePackageWindow		Kommentarsprog:
@@ -132,7 +132,7 @@ Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Synkr
 Stability:	RatePackageWindow		Stabilitet:
 The usage agreement must be agreed to and a confirmation should be made that the person creating the user meets the minimum age requirement.	UserLoginWindow		Anvendelsesaftalen skal accepteres og det skal bekræftes at personen som opretter brugeren opfylder den krævede minimumsalder.
 A validation error has occurred	ServerHelper		Der opstod en fejl ved validering
-While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	MainWindow		Der opstod et problem under opdatering af pakkedata der kan få data til at være forældet eller mangle fra programmets visning. Yderligere detaljer om problemet kan måske hentes i programmets logge.\nInformation om hvordan loggene vises er tilgængelig i HaikuDepot-afsnittet i brugervejledningen.
+While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	MainWindow		Der opstod et problem under opdatering af pakkedata der kan få data til at være forældet eller mangle fra programmets visning. Yderligere detaljer om problemet kan måske hentes i programmets logge.\nInformation om hvordan loggene vises er tilgængelig i Haikudepot-afsnittet i brugervejledningen.
 The nickname is required.	UserLoginWindow		Kaldenavnet kræves.
 Source packages	MainWindow		Kildepakker
 -	no package size		-
@@ -145,7 +145,7 @@ Log in	UserLoginWindow		Log ind
 Logged in as %User%	MainWindow		Logger ind som %User%
 Email address:	UserLoginWindow		E-mailadresse:
 Screenshot	ScreenshotWindow		Skærmbillede
-HaikuDepot	System name		HaikuDepot
+HaikuDepot	System name		Haikudepot
 A reboot is necessary to complete the installation process.	PackageManager		Der kræves en genstart for at fuldføre installationsprocessen.
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{Jeg er mindst et år gammel}other{Jeg er # år eller ældre}}
 View latest usage conditions…	MainWindow		Vis seneste anvendelsesbetingelser…
@@ -159,7 +159,7 @@ Captcha error	UserLoginWindow		Fejl ved captcha
 The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		Kaldenavnet skal være unikt, men det angivne kaldenavn er allerede taget. Vælg et andet kaldenavn.
 Manage repositories…	MainWindow		Håndter softwarekilder…
 Fetching remote repository data	LocalRepositoryUpdateProcess		Henter data for fjernsoftwarekilde
-An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	UserLoginWindow		Der opstod en fejl ved download af de anvendelsesbetingelser som kræves for at oprette en ny bruger. Tjek loggen for detaljer og prøv igen. \nInformation om hvordan loggene vises er tilgængelig i HaikuDepot-afsnittet i brugervejledningen.
+An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	UserLoginWindow		Der opstod en fejl ved download af de anvendelsesbetingelser som kræves for at oprette en ny bruger. Tjek loggen for detaljer og prøv igen. \nInformation om hvordan loggene vises er tilgængelig i Haikudepot-afsnittet i brugervejledningen.
 Description	PackageListView		Beskrivelse
 Open %DeskbarLink%	PackageManager		Åbn %DeskbarLink%
 User creation error	UserLoginWindow		Fejl i oprettelse af bruger

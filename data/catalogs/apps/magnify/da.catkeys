@@ -15,7 +15,7 @@ usage: magnify [size] (magnify size * size pixels)	Console		anvendelse: magnify 
 Increase window size	Magnify-Main		Større vinduesstørrelse
 Save image	Magnify-Main		Gem billede
 Show grid	Magnify-Main		Vis gitter
-Magnify	System name		Forstør
+Magnify	System name		Forstørrelsesglas
 Info	Magnify-Main		Info
 Show info	Magnify-Main		Vis info
 Make square	Magnify-Main		Gør firkantet

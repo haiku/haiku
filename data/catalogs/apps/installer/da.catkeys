@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-Installer	3753756669
+1	danish	x-vnd.Haiku-Installer	308998188
 Performing installation.	InstallProgress		Udfører installation.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Vælg en oprindelsesdisk fra popup-menuen. Tryk dernæst på \"Begynd\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Luk venligst vinduet for drevopsætning, før du lukker installationsvinduet.
@@ -32,6 +32,7 @@ Install from:	InstallerWindow		Installer fra:
 Additional disk space required: 0.0 KiB	InstallerWindow		Yderligere påkrævet diskplads: 0.0 KiB
 This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Dette er software i betakvalitet! Det betyder at der er risiko for tab af vigtige data. Sørg for at foretage regelmæssige sikkerhedskopieringer! Du er hermed blevet advaret.\n\n\n
 ???	InstallerWindow	Unknown currently copied item	???
+Install anyway	InstallProgress		Installer alligevel
 1)   If you are installing Haiku onto real hardware (not inside an emulator), you may want to prepare a hard disk partition from another OS (you could, for example, use a GParted Live-CD, which can also resize existing partitions to make room).\nYou can also set up partitions by launching DriveSetup from Installer, but you won't be able to resize existing partitions with it. While DriveSetup has been quite thoroughly tested over the years, it's recommended to have up-to-date backups of the other partitions on your system. Just in case…	InstallerApp		1)   Hvis du installerer Haiku på rigtig hardware (ikke i en emulator), så vil du måske forberede en harddisk-partition fra et andet styresystem (du kan f.eks. bruge en GParted live-CD, som også kan tilpasse størrelsen på eksisterende partitioner, for at gøre plads).\nDu kan også opsætte partitioner ved at starte drevopsætning fra installationsprogrammet, men du kan ikke bruge den til at tilpasse størrelsen på eksisterende partitioner. Selvom drevopsætning er blevet gennemtestet over årene, så anbefales det at have opdaterede sikkerhedskopier af de andre partitioner på dit system. For en sikkerhedsskyld…
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Vælg oprindelses- og destinationsdisk fra popup-menuerne. Tryk dernæst på \"Begynd\".
 Hide optional packages	InstallerWindow		Skjul valgfri pakker
@@ -45,7 +46,7 @@ Please close the Boot Manager and DriveSetup windows before closing the Installe
 Failed to launch Boot Manager	InstallerWindow		Kunne ikke start opstartshåndteringen
 Try installing anyway	InstallProgress		Prøv at installer alligevel
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		VIGTIG INFORMATION INDEN INSTALLATION AF HAIKU\n\n
-Additional disk space required: %s	InstallerWindow		Yderlig disk plads påkrævet: %s
+Additional disk space required: %s	InstallerWindow		Yderligere påkrævet diskplads: %s
 Stop	InstallerWindow	In alert after pressing Stop	Stop
 Boot sector successfully written.	InstallProgress		Opstartssektoren blev skrevet.
 An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		En fejl opstod en fejl, og installationen er ikke færdiggjort:\n\nFejl:   %s
@@ -61,8 +62,8 @@ Are you sure you want to abort the installation?	InstallerWindow		Er du sikker p
 Stop	InstallerWindow		Stop
 Cancel	InstallerWindow		Annuller
 Continue	InstallerWindow	In alert after pressing Stop	Fortsæt
-No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Der er ikke fundet nogen egnede partitioner for installationen. Konfigurer venligst partitioner og sæt mindst én partition op med Be-filsystem.
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Igangsæt drevopsætning-værktøjet for at partitionere\ntilgængelige diskdrev og andre medier.\nPartitioner kan sættes op med\nBe-filsystemet, der er nødvendigt\nfor en Haiku-opstartspartition.
+No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Der blev fundet nogen egnede partitioner til installationen. Opsæt venligst partitioner og initialiser mindst én partition med Be-filsystemet.
+Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Igangsæt drevopsætning-værktøjet for at partitionere\ntilgængelige diskdrev og andre medier.\nPartitioner kan initialiseres med\nBe-filsystemet, der er nødvendigt\nfor en Haiku-opstartspartition.
 Scanning for disks…	InstallerWindow		Leder efter diske…
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Kører drevopsætning…\n\nLuk vinduet for drevopsætning for at fortsætte installationen.
 Abort	InstallerWindow		Afbryd

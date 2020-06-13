@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Installer	1623909840
+1	hungarian	x-vnd.Haiku-Installer	2474118655
 Performing installation.	InstallProgress		A telepítés folyamatban…
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Válassza ki a felugró menüből a lemezt melyről telepíteni szeretne, majd kattintson a \"Mehet\" gombra.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		A telepítőablak bezárása előtt kérlek zárd be a Lemezkezelő ablakot!
@@ -32,6 +32,7 @@ Install from:	InstallerWindow		Honnan:
 Additional disk space required: 0.0 KiB	InstallerWindow		0.0 KiB hely szükséges
 This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Ez egy béta szoftver. Megvan az esélye annak, hogy elvesznek fontos adatok. Gyakran készítsen biztonsági mentéseket! Ön figyelmeztetve volt.\n\n\n
 ???	InstallerWindow	Unknown currently copied item	???
+Install anyway	InstallProgress		Mindenképp telepítse
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Válaszd ki a lemezt melyről telepíteni szeretnéd és válasz ki azt, amelyre telepíted. Ha végeztél, kattints a \"Mehet\" gombra.
 Hide optional packages	InstallerWindow		Választható csomagok elrejtése
 ???	InstallerWindow	Unknown partition name	???

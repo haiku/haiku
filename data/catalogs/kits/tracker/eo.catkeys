@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-libtracker	4118767010
+1	esperanto	x-vnd.Haiku-libtracker	2906566299
 Created	ContainerWindow		Kreita
 Icon	AttributesView		Piktogramo
 Open and make preferred	OpenWithWindow		Uzi kaj igi preferata
@@ -111,6 +111,7 @@ Edit templates…	TemplatesMenu		Redakti ŝablonojn…
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# bitoko} other{# bitokoj}}
 8-bit integer	AttributesView		8-bita entjero
 8-bit unsigned integer	AttributesView		8-bita sensignuma entjero
+%s info	InfoWindow	window title	%s informo
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used uzita -- %free libera)
 Hide dotfiles	SettingsView		Kaŝi dosierojn antaŭigitajn per punkto
 Trash	Model		Rubujo
@@ -249,7 +250,7 @@ Recent queries	FindPanel		Freŝdataj serĉmendoj
 Mount all	MountMenu		Surmeti ĉion
 128 x 128	DeskWindow		128 x 128
 Size	Default Query Columns		Grando
-Favorites	FavoritesMenu		Plej ŝatataj
+Favorites	FavoritesMenu		Preferaĵoj
 Delete	FilePanelPriv		Forigi
 <No recent items>	FavoritesMenu		<Neniu freŝdata elemento>
 Formula %formula	FindPanel	FindResultTitle	Formulo %formula
@@ -263,7 +264,7 @@ Open	OpenWithWindow		Uzi
 You must have at least one attribute showing.	PoseView		Necesas ke almenaŭ unu atributo estas montrata.
 Cut	FilePanelPriv		Tondi
 Finish: after several years	StatusWindow		Fino: post kelkaj jaroj
-Favorites	FilePanelPriv		Plej ŝatataj
+Favorites	FilePanelPriv		Preferaĵoj
 Point	AttributesView		Montrilo
 home	B_USER_DIRECTORY		hejmo
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Novaj Ŝablonoj de la Spurilo
@@ -392,7 +393,7 @@ All disks	AutoMounterSettings		Ĉiuj diskoj
 link	FSUtils	filename link	ligilo
 16-bit unsigned integer	AttributesView		16-bita sensignuma entjero
 Proceed	FSUtils		Daŭrigi
-Edit favorites…	FilePanelPriv		Redakti plej ŝatatajn…
+Edit favorites…	FilePanelPriv		Redakti preferaĵojn…
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		Neeblas movi dosierujon al si mem aŭ iu ajn propra subdosierujo.
 New	ContainerWindow		Nova
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Vi devas ĵeti elementojn sur iun diskan piktogramon de la fenestro \"Diskoj\".

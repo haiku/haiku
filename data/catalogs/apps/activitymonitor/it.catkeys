@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-ActivityMonitor	3672498538
+1	italian	x-vnd.Haiku-ActivityMonitor	2601047281
 Teams	DataSource		Team
 Semaphores	DataSource		Semafori
 TX	DataSource	Shorter version for Sending	TX
@@ -17,6 +17,7 @@ Remove graph	ActivityView		Rimuovi grafico
 Swap space	DataSource		Spazio swap
 CPU	DataSource		CPU
 ActivityMonitor	System name		Monitoraggio Attività
+CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		Intervallo di aggiornamento:
 RX	DataSource	Shorter version for Receiving.	RX
 Settings…	ActivityWindow		Impostazioni...
@@ -30,6 +31,7 @@ Used memory	DataSource		Memoria utilizzata
 %.1f faults/s	DataSource		%.1f faults/s
 Show legend	ActivityView		Mostra legenda
 Cached memory	DataSource		Memoria cache
+CPU %d usage	DataSource		Utilizzo CPU %d
 File	ActivityWindow		File
 Ports	DataSource		Porte
 Page faults	DataSource		Page fault

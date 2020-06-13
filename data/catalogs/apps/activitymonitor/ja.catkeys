@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-ActivityMonitor	3672498538
+1	japanese	x-vnd.Haiku-ActivityMonitor	2601047281
 Teams	DataSource		チーム数
 Semaphores	DataSource		セマフォ数
 TX	DataSource	Shorter version for Sending	送信
@@ -17,6 +17,7 @@ Remove graph	ActivityView		グラフを削除
 Swap space	DataSource		スワップサイズ
 CPU	DataSource		CPU
 ActivityMonitor	System name		アクティビティモニター
+CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		更新間隔:
 RX	DataSource	Shorter version for Receiving.	受信
 Settings…	ActivityWindow		設定…
@@ -30,6 +31,7 @@ Used memory	DataSource		使用メモリ
 %.1f faults/s	DataSource		%.1f フォールト/s
 Show legend	ActivityView		説明を表示
 Cached memory	DataSource		キャッシュメモリ
+CPU %d usage	DataSource		CPU %d 使用率
 File	ActivityWindow		ファイル
 Ports	DataSource		ポート数
 Page faults	DataSource		ページフォールト数

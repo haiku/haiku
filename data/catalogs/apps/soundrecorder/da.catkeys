@@ -23,7 +23,7 @@ Cannot open the temporary file created to hold the new recording	RecorderWindow	
 Input:	RecorderWindow		Input:
 Forward	RecorderWindow		Spol fremad
 Play	RecorderWindow		Afspil
-SoundRecorder	System name		LydOptager
+SoundRecorder	System name		Lydoptager
 Channels:	RecorderWindow		Kanaler:
  bits	RecorderWindow		 bit
 None	RecorderWindow		Ingen

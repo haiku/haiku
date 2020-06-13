@@ -1,5 +1,6 @@
-1	hungarian	x-vnd.Haiku-libbe	3337473349
+1	hungarian	x-vnd.Haiku-libbe	2914417806
 {0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# bájt} other{# bájt}}
+%.2f TiB/s	StringForRate		%.2f TiB/mp
 All Rights Reserved.	AboutWindow		Minden jog fenntartva.
 gold master	AboutWindow		arany fokozatú
 Undo	TextView		Visszavonás
@@ -7,21 +8,26 @@ OK	PrintJob		Rendben
 gamma	AboutWindow		gamma
 development	AboutWindow		fejlesztés
 OK	Dragger		Rendben
+%3.2f GiB/s	StringForRate		%3.2f GiB/mp
 Print Server is not responding.	PrintJob		A nyomtatókiszolgáló nem válaszol.
 About %app%	AboutMenuItem		%app% névjegye
 Warning	Dragger		Figyelmeztetés
 Green:	ColorControl		Zöld
+%3.2f KiB/s	StringForRate		%3.2f KiB/mp
 Redo	TextView		Újra
 No pages to print!	PrintJob		Nincs nyomtatható oldal!
 beta	AboutWindow		béta
 OK	ZombieReplicantView		Rendben
 Cut	TextView		Kivágás
 %3.2f GiB	StringForSize		%3.2f GiB
+Default	Default decorator about box		Alapértelmezett
 Can't delete this replicant from its original application. Life goes on.	Dragger		Nem lehet ezt a replikánst törölni az eredeti programtól.
 Error	ZombieReplicantView		Hiba
 Paste	TextView		Beillesztés
 OK	AboutWindow		Rendben
+{0, plural, one{# byte/s} other{# bytes/s}}	StringForRate		{0, plural, one{# bájt/mp} other{# bájt/mp}}
 Special Thanks:	AboutWindow		Külön köszönet:
+Default Haiku window decorator.	Default decorator about box		Alapértelmezett Haiku ablak-dekoráció
 %.2f TiB	StringForSize		%.2f TiB
 Remove replicant	Dragger		Replikáns eltávolítása
 Version	AboutWindow		Verzió
@@ -31,6 +37,7 @@ Copy	TextView		Másolás
 Select all	TextView		Összes kijelölése
 alpha	AboutWindow		alfa
 %3.2f MiB	StringForSize		%3.2f MiB
+%3.2f MiB/s	StringForRate		%3.2f MiB/mp
 Error	PrintJob		Hiba
 About %app%	AboutWindow		%app% névjegye
 About %app…	Dragger		%app névjegye…

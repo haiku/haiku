@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-libtracker	4118767010
+1	italian	x-vnd.Haiku-libtracker	2906566299
 Created	ContainerWindow		Creato
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Apri e rendi preferito
@@ -111,6 +111,7 @@ Edit templates…	TemplatesMenu		Modifica modelli…
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# byte} other{# byte}}
 8-bit integer	AttributesView		Intero a 8 bit
 8-bit unsigned integer	AttributesView		Intero senza segno a 8 bit
+%s info	InfoWindow	window title	Informazioni su %s
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used usato -- %free libero)
 Hide dotfiles	SettingsView		Nascondi i file .*
 Trash	Model		Cestino

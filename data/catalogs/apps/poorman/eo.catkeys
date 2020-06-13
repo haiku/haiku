@@ -8,7 +8,7 @@ Log to file	PoorMan		Protokoli en dosieron
 Shutting down.	PoorMan		Malŝaltado.
 Error Dir	PoorMan		Dosierujo de eraroj
 Web folder:	PoorMan		Dosierujo de retpaĝaro:
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Elektu dosierujon por publikigi rete.\n\nLa Purmano povas krei defaŭltan dosierujon \"public_html\" en via hejma dosierujo.\nAŭ anstataŭ elektu iun el viaj propraj.
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Elektu dosierujon por publikigi rete.\n\nPurmano povas krei defaŭltan dosierujon \"public_html\" en via hejma dosierujo.\nAŭ anstataŭ elektu iun el viaj propraj.
 Log To Console	PoorMan		Protokoli en konzolon
 File Name	PoorMan		Dosiernomo
 Starting up... 	PoorMan		Ŝargante... 
@@ -24,7 +24,7 @@ Shutting down.\n	PoorMan		Malŝaltado.\n
 Select all	PoorMan		Elekti ĉion
 Error Server	PoorMan		Servila eraro
 Send file listing if there's no start page	PoorMan		Sendi liston de dosieroj se forestas ĉefpaĝo
-Create PoorMan log	PoorMan		Krei protokolon de la Purmano
+Create PoorMan log	PoorMan		Krei protokolon de Purmano
 Max. simultaneous connections:	PoorMan		Maksimumo de samtempaj konektoj:
 Done	PoorMan		Farite
 Site	PoorMan		Retejo
@@ -42,13 +42,13 @@ Log to console	PoorMan		Protokoli en konzolon
 Advanced	PoorMan		Por spertuloj
 Copy	PoorMan		Kopii
 Logging	PoorMan		Protokolado
-PoorMan	System name		La Purmano
+PoorMan	System name		Purmano
 Clear console log	PoorMan		Nuligi konzolan protokolon
 Run server	PoorMan		Lanĉi servilon
 Create	PoorMan		Krei
 {0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# konekto} other{# konektoj}}
 done.\n	PoorMan		farite.\n
-PoorMan settings	PoorMan		Agordo de la Purmano
+PoorMan settings	PoorMan		Agordo de Purmano
 Console Logging	PoorMan		Konzola protokolado
 Clear log file	PoorMan		Nuligi dosieron de protokolo
 Save log console selection	PoorMan		Konservi elekton el konzola protokolo

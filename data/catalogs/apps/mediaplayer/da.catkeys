@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-MediaPlayer	1313616492
+1	danish	x-vnd.Haiku-MediaPlayer	1961774506
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Fjern element til papirkurv
 Close	MediaPlayer-PlaylistWindow		Luk
 Volume of background clips	MediaPlayer-SettingsWindow		Lydstyrke for baggrundsklips
@@ -35,6 +35,7 @@ Full volume	MediaPlayer-SettingsWindow		Fuld lydstyrke
 Start media server	MediaPlayer-Main		Start medieserver
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Det ser ikke ud til at medieserveren kører.\nVil du starte den ?
 Location	MediaPlayer-InfoWin		Placering
+Opening '%s'.	MediaPlayer-Main		Åbner '%s'.
 Medium	MediaPlayer-SettingsWindow		Medium
 Play mode	MediaPlayer-SettingsWindow		Afspilningstilstand
 Playlist	MediaPlayer-PlaylistWindow		Afspilningsliste

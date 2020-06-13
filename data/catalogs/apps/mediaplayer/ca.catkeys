@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-MediaPlayer	1313616492
+1	catalan; valencian	x-vnd.Haiku-MediaPlayer	1961774506
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Envia l'entrada a la paperera
 Close	MediaPlayer-PlaylistWindow		Tanca
 Volume of background clips	MediaPlayer-SettingsWindow		Volum dels clips de fons
@@ -35,6 +35,7 @@ Full volume	MediaPlayer-SettingsWindow		Volum complet
 Start media server	MediaPlayer-Main		Inicia el servidor multimèdia
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Sembla que el servidor multimèdia no s'executa.\nVoleu iniciar-lo?
 Location	MediaPlayer-InfoWin		Ubicació
+Opening '%s'.	MediaPlayer-Main		S'obre %s.
 Medium	MediaPlayer-SettingsWindow		Mitjà
 Play mode	MediaPlayer-SettingsWindow		Mode de reproducció
 Playlist	MediaPlayer-PlaylistWindow		Llista de reproducció

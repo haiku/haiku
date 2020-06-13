@@ -1,5 +1,6 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	3833361367
+1	swedish	x-vnd.Haiku-HaikuDepot	1546691996
 Repository update error	LocalRepositoryUpdateProcess		Fel vid uppdatering av repositorie
+Network error	ServerHelper		Nätverksfel
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Ett fel inträffade vid uppdatering av repositoriet: %error%
 User Created	UserLoginWindow		Användare skapad
 Check for updates…	MainWindow		Leta efter uppdateringar…
@@ -19,6 +20,7 @@ You have successfully authenticated as user %Nickname%.	UserLoginWindow		Du har 
 No user ratings available.	PackageInfoView		Ingen betygsättnings tillgänglig.
 Downloading package '%name%'	WorkStatusView		Laddar hem paket '%name%'
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Det var inte möjligt att extrahera nödvändig captcha-information från de data som skickades tillbaka från servern.
+A network transport error has arisen communicating with the server system: %s	ServerHelper		Ett nättransportfel har uppstått vid kommunikation med serversystemet: %s
 Rating	PackageListView		Betyg
 Synchronizing icons	ServerIconExportUpdateProcess		Synkroniserar ikoner
 Does not start	RatePackageWindow		Starta inte
@@ -75,6 +77,7 @@ Reboot required	PackageManager		Omstart krävs
 Very unstable	RatePackageWindow		Mycket ostabil
 Password:	UserLoginWindow		Lösenord:
 All packages	PackageListView		Alla paket
+This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Denna applikation är för gammal för att kommunicera med serversystemet. Få en nyare version av den här applikationen genom att uppdatera ditt system. Den minsta nödvändiga versionen av denna applikation är \"%s\".
 Stability	RatePackageWindow		Stabilitet
 Send	RatePackageWindow		Skicka
 Start package daemon	App		Starta paket-servicen
@@ -98,6 +101,7 @@ Repository	PackageListView		Repositorie
 The email is malformed.	UserLoginWindow		E-postadressen är felaktigt angiven.
 Close	UserLoginWindow		Stäng
 Close	RatePackageWindow		Stäng
+An unexpected error has been sent from the server [%i]	ServerHelper		Ett oväntat fel har skickats från servern [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synkroniserar paketdata för repositoriet '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Visa användarvillkor
 Login issue	MainWindow		Inloggnings problem
@@ -122,6 +126,7 @@ Log out	MainWindow		Logga ut
 Comment language:	RatePackageWindow		Kommentarspråk:
 Status	PackageListView		Status
 The password has been incorrectly repeated.	UserLoginWindow		Lösenordet upprepades felaktigt.
+Network transport error	ServerHelper		Nättransportfel
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		Lösenordet som du tidigare skrev för användaren [%Nickname%] är för närvarande inte giltigt. Användaren kommer att loggas ut från den här applikationen och du bör logga in igen med ditt uppdaterade lösenord.
 Update	RatePackageWindow		Uppdatera
 OK	ServerHelper		OK
@@ -137,6 +142,7 @@ The nickname is required.	UserLoginWindow		Ett användarnamn krävs.
 Source packages	MainWindow		Källkodspaket
 -	no package size		-
 Problem with working files	App		Problem med att arbeta filer
+Server error	ServerHelper		Serverfel
 Try again	App		Försök igen
 Rate package	RatePackageWindow		Betygsatt paket
 Unknown	PackageListView		Okänd

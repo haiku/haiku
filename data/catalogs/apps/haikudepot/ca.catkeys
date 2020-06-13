@@ -1,5 +1,6 @@
-1	catalan; valencian	x-vnd.Haiku-HaikuDepot	3833361367
+1	catalan; valencian	x-vnd.Haiku-HaikuDepot	1546691996
 Repository update error	LocalRepositoryUpdateProcess		Error d'actualització del repositori
+Network error	ServerHelper		Error de xarxa
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Hi ha hagut un error en actualitzar el repositori: %error%
 User Created	UserLoginWindow		Usuari creat
 Check for updates…	MainWindow		Comprova si hi ha actualitzacions...
@@ -19,6 +20,7 @@ You have successfully authenticated as user %Nickname%.	UserLoginWindow		Us heu 
 No user ratings available.	PackageInfoView		No hi ha puntuacions dels usuaris disponibles.
 Downloading package '%name%'	WorkStatusView		Es baixa el paquet %name%.
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		No s'ha pogut extreure la informació de CAPTCHA necessària de les dades retornades del servidor.
+A network transport error has arisen communicating with the server system: %s	ServerHelper		Hi ha hagut un error de transport de xarxa en comunicar-se amb el sistema del servidor: %s
 Rating	PackageListView		Puntuació
 Synchronizing icons	ServerIconExportUpdateProcess		Sincronització de les icones
 Does not start	RatePackageWindow		No s'inicia.
@@ -75,6 +77,7 @@ Reboot required	PackageManager		Cal reiniciar
 Very unstable	RatePackageWindow		Molt inestable
 Password:	UserLoginWindow		Contrasenya:
 All packages	PackageListView		Tots els paquets
+This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Aquesta aplicació és massa antiga per comunicar-se amb el sistema del servidor. Obtingueu-ne una versió més recent actualitzant el sistema. La versió mínima requerida d’aquesta aplicació és \"%s\".
 Stability	RatePackageWindow		Estabilitat
 Send	RatePackageWindow		Envia
 Start package daemon	App		Inicia el dimoni de paquets
@@ -98,6 +101,7 @@ Repository	PackageListView		Repositori
 The email is malformed.	UserLoginWindow		L'adreça electrònica no és correcta.
 Close	UserLoginWindow		Tanca
 Close	RatePackageWindow		Tanca
+An unexpected error has been sent from the server [%i]	ServerHelper		S'ha enviat un error inesperat des del servidor [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Se sincronitzen les dades de paquets per al repositori %REPO_NAME%.
 View the usage conditions	UserLoginWindow		Mostra'n les condicions d'ús
 Login issue	MainWindow		Problema d’inici de sessió
@@ -122,6 +126,7 @@ Log out	MainWindow		Surt
 Comment language:	RatePackageWindow		Llengua del comentari:
 Status	PackageListView		Estat
 The password has been incorrectly repeated.	UserLoginWindow		La contrasenya no s'ha repetit bé.
+Network transport error	ServerHelper		Error de transport de xarxa
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		La contrasenya proporcionada prèviament per a l'usuari [%Nickname%] actualment no és vàlida. L'usuari quedarà fora d'aquesta aplicació i haureu de tornar a iniciar la sessió amb la contrasenya actualitzada.
 Update	RatePackageWindow		Actualitza
 OK	ServerHelper		D'acord
@@ -137,6 +142,7 @@ The nickname is required.	UserLoginWindow		Cal el sobrenom.
 Source packages	MainWindow		Paquets font
 -	no package size		-
 Problem with working files	App		Problema amb els fitxers de treball
+Server error	ServerHelper		Error de servidor
 Try again	App		Torneu-ho a provar
 Rate package	RatePackageWindow		Puntueu el paquet
 Unknown	PackageListView		Desconegut

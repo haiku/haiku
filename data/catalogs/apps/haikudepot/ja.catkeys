@@ -1,5 +1,6 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	3833361367
+1	japanese	x-vnd.Haiku-HaikuDepot	1546691996
 Repository update error	LocalRepositoryUpdateProcess		リポジトリアップデートエラー
+Network error	ServerHelper		ネットワークエラー
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		リポジトリの更新中に次のエラーが発生しました: %error%
 User Created	UserLoginWindow		作成されたユーザー
 Check for updates…	MainWindow		更新をチェック…
@@ -19,6 +20,7 @@ You have successfully authenticated as user %Nickname%.	UserLoginWindow		ユー�
 No user ratings available.	PackageInfoView		ユーザー評価はありません。
 Downloading package '%name%'	WorkStatusView		パッケージ '%name%' をダウンロード中
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		サーバーが返信したデータから、必要なキャプチャ情報を抽出できませんでした。
+A network transport error has arisen communicating with the server system: %s	ServerHelper		サーバーシステムと通信中にネットワーク転送エラーが発生しました: %s
 Rating	PackageListView		評価
 Synchronizing icons	ServerIconExportUpdateProcess		アイコンを同期しています。
 Does not start	RatePackageWindow		起動しない
@@ -75,6 +77,7 @@ Reboot required	PackageManager		再起動が必要です
 Very unstable	RatePackageWindow		非常に不安定
 Password:	UserLoginWindow		パスワード:
 All packages	PackageListView		すべてのパッケージ
+This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		このアプリケーションはサーバーシステムと通信するには古すぎます。システムをアップデートして新しいバージョンを入手してください。必要な最小限のバージョンは\"%s\"です。
 Stability	RatePackageWindow		安定度
 Send	RatePackageWindow		送信する
 Start package daemon	App		パッケージデーモンを起動
@@ -98,6 +101,7 @@ Repository	PackageListView		リポジトリ
 The email is malformed.	UserLoginWindow		メールアドレスが不正です。
 Close	UserLoginWindow		閉じる
 Close	RatePackageWindow		閉じる
+An unexpected error has been sent from the server [%i]	ServerHelper		サーバーから予期しないエラーが送信されました [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		リポジトリ '%REPO_NAME%' のパッケージデータを同期中
 View the usage conditions	UserLoginWindow		使用条件を見る
 Login issue	MainWindow		ログインに問題
@@ -122,6 +126,7 @@ Log out	MainWindow		ログアウト
 Comment language:	RatePackageWindow		コメント言語:
 Status	PackageListView		状態
 The password has been incorrectly repeated.	UserLoginWindow		パスワードが間違って再入力されています。
+Network transport error	ServerHelper		ネットワーク転送エラー
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		以前にユーザー [%Nickname%] に提供されたパスワードは現在期限切れです。ユーザーはこのアプリケーションをログアウトして、新しいパスワードで再ログインする必要があります。
 Update	RatePackageWindow		更新
 OK	ServerHelper		OK
@@ -137,6 +142,7 @@ The nickname is required.	UserLoginWindow		ニックネームが必要です。
 Source packages	MainWindow		ソースパッケージ
 -	no package size		-
 Problem with working files	App		作業用ファイルに問題があります
+Server error	ServerHelper		サーバーエラー
 Try again	App		再試行
 Rate package	RatePackageWindow		パッケージを評価
 Unknown	PackageListView		不明

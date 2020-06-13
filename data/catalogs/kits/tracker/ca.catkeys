@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-libtracker	4118767010
+1	catalan; valencian	x-vnd.Haiku-libtracker	2906566299
 Created	ContainerWindow		Creat
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Obre-ho i fes-ho preferit
@@ -111,6 +111,7 @@ Edit templates…	TemplatesMenu		Edita les plantilles...
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# byte} other{# bytes}}
 8-bit integer	AttributesView		Enter de 8 bits
 8-bit unsigned integer	AttributesView		Enter de 8 bits no signat
+%s info	InfoWindow	window title	Informació: %s
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used usat -- %free lliure)
 Hide dotfiles	SettingsView		Amaga els fitxers amb un punt inicial
 Trash	Model		Paperera

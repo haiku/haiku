@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-ActivityMonitor	3672498538
+1	thai	x-vnd.Haiku-ActivityMonitor	2601047281
 Teams	DataSource		ทีม
 Semaphores	DataSource		การให้สัญญาณ
 TX	DataSource	Shorter version for Sending	TX
@@ -17,6 +17,7 @@ Remove graph	ActivityView		ลบกราฟ
 Swap space	DataSource		สลับพื้นที่
 CPU	DataSource		CPU
 ActivityMonitor	System name		การตรวจสอบกิจกรรม
+CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		อัปเดตช่วงเวลา:
 RX	DataSource	Shorter version for Receiving.	RX
 Settings…	ActivityWindow		การตั้งค่า
@@ -30,6 +31,7 @@ Used memory	DataSource		หน่วยความจำที่ใช้
 %.1f faults/s	DataSource		%.1f faults/s
 Show legend	ActivityView		แสดงคำอธิบาย
 Cached memory	DataSource		หน่วยความจำแคช
+CPU %d usage	DataSource		การใช้งาน CPU %d
 File	ActivityWindow		ไฟล์
 Ports	DataSource		พอร์ท
 Page faults	DataSource		ความผิดพลาดของหน้า

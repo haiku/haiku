@@ -13,10 +13,10 @@ Defaults	PrefsWindow		Standarder
 Mini mode	PrefsWindow		Minitilstand
 CPU progress bar	NormalPulseView		CPU fremskridt bar
 Fade colors	ConfigView		Fade farver
-About Pulse…	PulseView		Om Pulse…
-Pulse	NormalPulseView		Pulse
+About Pulse…	PulseView		Om Puls…
+Pulse	NormalPulseView		Puls
 Deskbar mode	NormalPulseView		Skrivebordslinje-tilstand
-Pulse settings	PulseApp		Pulse-indstillinger
+Pulse settings	PulseApp		Puls-indstillinger
 Remove replicant	CPUButton		Fjern replikant
 You can't disable the last active CPU.	PulseView		Du kan ikke deaktivere den sidste aktive CPU.
 Width of icon:	ConfigView		Bredde af ikon:
@@ -24,10 +24,10 @@ Deskbar mode	MiniPulseView		Skrivebordslinje-tilstand
 OK	PulseView		OK
 %s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nAf David Ramsey og Arve Hjønnevåg\nRevideret af Daniel Switkin\n
 OK	PrefsWindow		OK
-Pulse	PulseApp		Pulse
+Pulse	PulseApp		Puls
 Removing from Deskbar failed.\n%s	DeskbarPulseView		Fjernelse fra skrivebordslinje mislykkede.\n%s
 OK	PulseApp		OK
-About Pulse…	CPUButton		Om Pulse…
+About Pulse…	CPUButton		Om Puls…
 Deskbar mode	PrefsWindow		Skrivebordslinje-tilstand
 Mini mode	DeskbarPulseView		Minitilstand
 You can't disable the last active CPU.	CPUButton		Du kan ikke deaktivere den sidste aktive CPU.
@@ -41,7 +41,7 @@ Info	PulseView		Info
 Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]	PulseApp		Anvendelse: Pulse [--mini] [-w bredde] [--width=højde]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]
 OK	DeskbarPulseView		OK
 Info	PulseApp		Info
-Pulse	System name		Pulse
+Pulse	System name		Puls
 Active color	ConfigView		Aktiv farve
 Installing in Deskbar failed\n%s	PulseApp		Installation i skrivebordslinje mislykkede\n%s
 Idle color	ConfigView		Stille farve

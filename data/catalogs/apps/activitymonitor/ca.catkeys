@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-ActivityMonitor	3672498538
+1	catalan; valencian	x-vnd.Haiku-ActivityMonitor	2601047281
 Teams	DataSource		Equips
 Semaphores	DataSource		Semàfors
 TX	DataSource	Shorter version for Sending	TX
@@ -17,6 +17,7 @@ Remove graph	ActivityView		Suprimeix el gràfic
 Swap space	DataSource		Espai d'intercanvi
 CPU	DataSource		CPU
 ActivityMonitor	System name		Monitor d'activitat
+CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		Interval d'actualització:
 RX	DataSource	Shorter version for Receiving.	RX
 Settings…	ActivityWindow		Paràmetres...
@@ -30,6 +31,7 @@ Used memory	DataSource		Memòria usada
 %.1f faults/s	DataSource		%.1f falles/s
 Show legend	ActivityView		Mostra la llegenda
 Cached memory	DataSource		A la memòria cau
+CPU %d usage	DataSource		Ús de la CPU %d
 File	ActivityWindow		Fitxer
 Ports	DataSource		Ports
 Page faults	DataSource		Falles de pàgina

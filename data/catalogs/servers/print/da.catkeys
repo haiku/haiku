@@ -21,7 +21,7 @@ Print job setup:	ConfigWindow		Opsætning af udskrivningsjob:
 A6	ConfigWindow	ISO 216 paper size	A6
 Portrait	ConfigWindow		Portræt
 All pages	ConfigWindow		Alle sider
-There is no default printer set up.	PrintServerApp		Der er ikke konfigureret nogen standard printer.
+There is no default printer set up.	PrintServerApp		Der er ikke konfigureret nogen standardprinter.
 B5	ConfigWindow	ISO 216 paper size	B5
 A0	ConfigWindow	ISO 216 paper size	A0
 Letter	ConfigWindow	ANSI A (letter), a North American paper size	Brev

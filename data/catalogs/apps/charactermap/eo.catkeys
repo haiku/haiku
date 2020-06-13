@@ -1,16 +1,23 @@
-1	esperanto	x-vnd.Haiku-CharacterMap	124574598
+1	esperanto	x-vnd.Haiku-CharacterMap	661269597
 Miscellaneous mathematical symbols B	UnicodeBlocks		Diversaj matematikaj simboloj-B
+Latin extended E	UnicodeBlocks		Latina etendita E
 Saurashtra	UnicodeBlocks		Sauraŝtra
 Arabic supplement	UnicodeBlocks		Araba suplemento
 Hanunoo	UnicodeBlocks		Hanunoa
 Ogham	UnicodeBlocks		Ogama
 Hebrew	UnicodeBlocks		Hebrea
 Katakana	UnicodeBlocks		Katakana
+Miao	UnicodeBlocks		La miaa lingvo
 Mongolian	UnicodeBlocks		Mongola
-Linear B ideograms	UnicodeBlocks		Ideogramoj de lineara-B
+Linear B ideograms	UnicodeBlocks		Ideogramoj de linia skribo B
+Caucasian Albanian	UnicodeBlocks		Praudia lingvo (aghbania aŭ de Kaŭkaza Albanio)
+CJK unified ideographs extension D	UnicodeBlocks		Ĉin-japan-korea unuigita ideogramara etendaĵo D
 Multani	UnicodeBlocks		Multana
-CJK compatibility ideographs Supplement	UnicodeBlocks		Suplemento al ĈJK-kongruecaj ideogramoj
+Linear A	UnicodeBlocks		Linia skribo A
+CJK compatibility ideographs Supplement	UnicodeBlocks		Suplemento al Ĉin-japan-korea kongrua ideogramaro
+Pahawh Hmong	UnicodeBlocks		Skriba sistemo Pahajo de la miaa lingvo
 Bopomofo extended	UnicodeBlocks		Bopomofa etendita
+Georgian extended	UnicodeBlocks		Kartvela etendaĵo
 Mathematical alphanumeric symbols	UnicodeBlocks		Matematikaj literciferaj simboloj
 Coptic	UnicodeBlocks		Kopta
 Cuneiform numbers and punctuation	UnicodeBlocks		Kojnoskribaj numeroj kaj interpunkcio
@@ -24,12 +31,13 @@ Hangul syllables	UnicodeBlocks		Hangulaj silaboj
 Modifier tone letters	UnicodeBlocks		Literoj kiuj modifas tonon
 Newa	UnicodeBlocks		Nevara
 View	CharacterWindow		Vidi
-Enclosed CJK letters and months	UnicodeBlocks		Enfermitaj ĈJK-literoj kaj monatoj
+Enclosed CJK letters and months	UnicodeBlocks		Ĉirkaŭigitaj Ĉin-japan-koreaj literoj kaj monatsignoj
 Deseret	UnicodeBlocks		Desereta
 Cham	UnicodeBlocks		Ĉama skribsistemo
 Cyrillic	UnicodeBlocks		Cirila
 Shavian	UnicodeBlocks		Ŝava alfabeto
 Tangut	UnicodeBlocks		Tanguta skribsistemo
+CJK unified ideographs extension C	UnicodeBlocks		Ĉin-japan-korea unuigita ideogramara etendaĵo C
 Ancient Greek musical notation	UnicodeBlocks		Antikva greka muzika notacio
 Thai	UnicodeBlocks		Taja
 Ethiopic supplement	UnicodeBlocks		Etiopa suplemento
@@ -54,9 +62,9 @@ Combining diacritical marks supplement	UnicodeBlocks		Suplemento al kunligaj dia
 Cherokee	UnicodeBlocks		Ĉeroka
 Balinese	UnicodeBlocks		Balia
 Georgian	UnicodeBlocks		Kartvela
-CJK compatibility forms	UnicodeBlocks		ĈJK-kongruecaj formoj
+CJK compatibility forms	UnicodeBlocks		Ĉin-japan-koreaj kongruaj formoj
 Old Hungarian	UnicodeBlocks		Hungara malnova
-CJK unified ideographs extension B	UnicodeBlocks		ĈJK-unuecigitaj ideogramoj-etendaĵo-B
+CJK unified ideographs extension B	UnicodeBlocks		Ĉin-japan-korea unuigita ideogramara etendaĵo B
 Ahom	UnicodeBlocks		Ahoma
 Early Dynastic Cuneiform	UnicodeBlocks		Frua-Dinastika Kojnoskribo
 Arabic presentation forms A	UnicodeBlocks		Arabaj prezentformoj-A
@@ -67,7 +75,7 @@ Hatran	UnicodeBlocks		Hatrana
 Glagolitic supplement	UnicodeBlocks		Aldono por glagolico
 Gurmukhi	UnicodeBlocks		Gurumuĥa ortografio, abugido de orienta Panĝabo (normo ISO15924)
 Supplemental arrows B	UnicodeBlocks		Suplementaj sagoj-B
-CJK unified ideographs	UnicodeBlocks		ĈJK-unuecigitaj ideogramoj
+CJK unified ideographs	UnicodeBlocks		Ĉin-japan-korea unuigita ideogramaro
 Latin extended B	UnicodeBlocks		Latina etendita B
 Phonetic extensions	UnicodeBlocks		Fonetikaj etendaĵoj
 Code	CharacterWindow		Kodo
@@ -78,8 +86,8 @@ Gothic	UnicodeBlocks		Gotika
 Specials	UnicodeBlocks		Specialaĵoj
 Syloti Nagri	UnicodeBlocks		Siloti Nagri skribsistemo
 Latin-1 supplement	UnicodeBlocks		Latin-1 suplemento
-CJK unified ideographs extension A	UnicodeBlocks		ĈJK-unuecigitaj ideogramoj-etendaĵo-A
-Linear B syllabary	UnicodeBlocks		Lineara-B silabaro
+CJK unified ideographs extension A	UnicodeBlocks		Ĉin-japan-korea unuigita ideogramara etendaĵo A
+Linear B syllabary	UnicodeBlocks		Silabsignoj de linia skribo B
 Yi syllables	UnicodeBlocks		Skribsistemo de la siĉuana loloa (normo ISO15924)
 Currency symbols	UnicodeBlocks		Valutsimboloj
 Domino tiles	UnicodeBlocks		Domenpecoj
@@ -107,7 +115,7 @@ Ol Chiki	UnicodeBlocks		Santala
 Box drawing	UnicodeBlocks		Kadra desegno
 Vai	UnicodeBlocks		Vaja
 Ethiopic extended	UnicodeBlocks		Etiopa etendita
-CJK compatibility	UnicodeBlocks		ĈJK-kongrueco
+CJK compatibility	UnicodeBlocks		Ĉin-japan-koreaj kongruaj
 Tai Le	UnicodeBlocks		Taj-Lea
 Lao	UnicodeBlocks		Laosa
 Optical character recognition	UnicodeBlocks		Optika signorekono
@@ -148,15 +156,16 @@ Yi Radicals	UnicodeBlocks		Jiaj Radikoj
 Supplementary private use area A	UnicodeBlocks		Suplementa privata interkonsenta aro-A
 Armenian	UnicodeBlocks		Armena
 Phags-pa	UnicodeBlocks		Mongola kvadrata skribsistemo de lamao Pĥagva (normo ISO15924)
-CJK compatibility ideographs	UnicodeBlocks		ĈJK-kongruecaj ideogramoj
+CJK compatibility ideographs	UnicodeBlocks		Ĉin-japan-korea kongrua ideogramaro
 Show private blocks	CharacterWindow		Montri privatajn blokojn
-Latin extended additional	UnicodeBlocks		Latinaj etenditaj aldonaĵoj
+Latin extended additional	UnicodeBlocks		Latina etendita aldonaĵo
 Tibetan	UnicodeBlocks		Tibeta
 Combining diacritical marks	UnicodeBlocks		Kunligaj diakritaj signoj
 Tags	UnicodeBlocks		Etikedoj
 Khmer	UnicodeBlocks		Kmera
 Georgian supplement	UnicodeBlocks		Kartvela suplemento
 Tagalog	UnicodeBlocks		Tagaloga
+CJK unified ideographs extension F	UnicodeBlocks		Ĉin-japan-korea unuigita ideogramara etendaĵo F
 Supplemental Symbols and Pictographs	UnicodeBlocks		Helpaj signoj kaj piktogramoj
 Devanagari	UnicodeBlocks		Devanagara
 Runic	UnicodeBlocks		Runa
@@ -185,10 +194,10 @@ Byzantine musical symbols	UnicodeBlocks		Bizancaj muzikaj simboloj
 Gujarati	UnicodeBlocks		Guĝarata
 Hangul compatibility Jamo	UnicodeBlocks		Hangula kongrueca Jamo
 Phonetic extensions supplement	UnicodeBlocks		Suplemento al fonetikaj etendaĵoj
-CJK unified ideographs extension E	UnicodeBlocks		ĈJK-unuecigitaj ideogramoj-etendaĵo-E
+CJK unified ideographs extension E	UnicodeBlocks		Ĉin-japan-korea unuigita ideogramara etendaĵo E
 Old Persian	UnicodeBlocks		Antikva persa
 Malayalam	UnicodeBlocks		Malajala
-CJK radicals supplement	UnicodeBlocks		ĈJK-radikala suplemento
+CJK radicals supplement	UnicodeBlocks		Ĉin-japan-korea kompanaĵa suplemento
 Marchen	UnicodeBlocks		Marĉena skribsistemo
 Control pictures	UnicodeBlocks		Bildsimboloj de komandoj
 Cyrillic extended A	UnicodeBlocks		Cirila etendita-A
@@ -196,6 +205,6 @@ New Tai Lue	UnicodeBlocks		Nova skribsistemo por la taja de popolo ljuo (normo I
 Sutton SignWriting	UnicodeBlocks		Signo-Skribado de Sutono
 Limbu	UnicodeBlocks		Limbua
 Kanbun	UnicodeBlocks		Kanbuna
-CJK symbols and punctuation	UnicodeBlocks		ĈJK-simboloj kaj interpunkcio
-CJK strokes	UnicodeBlocks		ĈJK-strekoj
+CJK symbols and punctuation	UnicodeBlocks		Ĉin-japan-koreaj simboloj kaj interpunkcioj
+CJK strokes	UnicodeBlocks		Ĉin-japan-koreaj strekoj
 Combining half marks	UnicodeBlocks		Kunligaj duonsignoj

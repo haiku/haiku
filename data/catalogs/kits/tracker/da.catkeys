@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-libtracker	4118767010
+1	danish	x-vnd.Haiku-libtracker	2906566299
 Created	ContainerWindow		Oprettet
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Åbn og lav foretrukket
@@ -7,7 +7,7 @@ Open with…	ContainerWindow		Åbn med…
 Error moving \"%name\" to Trash. (%error)	FSUtils		Fejl ved flytning af \"%name\" til papirkurven. (%error)
 Or	FindPanel		Eller
 before	FindPanel		før
-Volume icons	TrackerSettingsWindow		Diskområdeikoner
+Volume icons	TrackerSettingsWindow		Ikoner for diskområder
 Ignore case	SelectionWindow		Skel ikke mellem store og små bogstaver
 Current folder	ContainerWindow		Nuværende mappe
 Finish: %time - Over %finishtime left	StatusWindow		Færdig: %time - Over %finishtime tilbage
@@ -58,7 +58,7 @@ Title	Bookmark Query Columns		Titel
 Identify	ContainerWindow		Identificer
 You can't move or copy items to read-only volumes.	FSUtils		Du kan ikke flytte eller kopiere elementer til skrivebeskyttede diskområder.
 Create link	ContainerWindow		Opret lænke
-starts with	FindPanel		starter med
+starts with	FindPanel		begynder med
 Replace	FSUtils		Erstat
 ?+* follows nothing.	libtracker		?+* efterfølger ikke noget.
 Rectangle	AttributesView		Rektangel
@@ -83,7 +83,7 @@ OK	OpenWithWindow		OK
 Include trash	FindPanel		Inkluder papirkurven
 GiB	WidgetAttributeText		GiB
 Clean up	ContainerWindow		Ryd op
-Modified	FindPanel		Modificeret
+Modified	FindPanel		Ændret
 Select all	QueryContainerWindow		Vælg alt
 Select…	FilePanelPriv		Vælg…
 preferences	B_PREFERENCES_DIRECTORY		præferencer
@@ -111,8 +111,9 @@ Edit templates…	TemplatesMenu		Rediger skabeloner…
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# byte} other{# bytes}}
 8-bit integer	AttributesView		8-bit heltal
 8-bit unsigned integer	AttributesView		8-bit heltal uden fortegn
+%s info	InfoWindow	window title	%s info
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used brugt -- %free ledig)
-Hide dotfiles	SettingsView		Skjul dot-filer
+Hide dotfiles	SettingsView		Skjul punktumfiler
 Trash	Model		Papirkurv
 Enable type-ahead filtering	SettingsView		Aktivér forudskrivningsfiltrering
 copy	FSUtils	filename copy	kopiér
@@ -214,11 +215,11 @@ Unknown	WidgetAttributeText		Ukendt
 32-bit integer	AttributesView		32-bit heltal
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		Det specificerede navn bliver allerede brugt som navnet på en mappe. Vælg venligst et andet navn.
 48 x 48	ContainerWindow		48 x 48
-Modified	ContainerWindow		Modificeret
+Modified	ContainerWindow		Ændret
 Mini icon view	ContainerWindow		Miniikonvisning
 File	FilePanelPriv		Fil
 Search	FindPanel		Søg
-Modified:	InfoWindow		Modificeret:
+Modified:	InfoWindow		Ændret:
 Cancel	FilePanelPriv		Annuller
 Sorry, you cannot edit that attribute.	WidgetAttributeText		Beklager, du kan ikke redigere den attribut.
 Memory pointer	AttributesView		Hukommelsespointer
@@ -258,7 +259,7 @@ Tracker status	StatusWindow		Trackerstatus
 Handles any %type	OpenWithWindow		Håndterer alle %type
 The mount server could not be contacted.	AutoMounterSettings		Monteringsserveren kunne ikke blive kontaktet.
 Query template	FindPanel		Forespørgselsskabelon
-ends with	SelectionWindow		ender med
+ends with	SelectionWindow		slutter med
 Open	OpenWithWindow		Åbn
 You must have at least one attribute showing.	PoseView		Du skal have mindst én egenskab vist.
 Cut	FilePanelPriv		Klip
@@ -267,7 +268,7 @@ Favorites	FilePanelPriv		Favoritter
 Point	AttributesView		Punkt
 home	B_USER_DIRECTORY		hjem
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Tracker nye skabeloner
-Disk mounting during boot	AutoMounterSettings		Disk monterer under opstart
+Disk mounting during boot	AutoMounterSettings		Diskmontering under opstart
 Don't automount	AutoMounterSettings		Automonter ikke
 Could not find application \"%appname\"	OpenWithWindow		Kunne ikke finde programmet \"%appname\"
 Unmatched parenthesis.	libtracker		Ikke-matchede parenteser.
@@ -316,7 +317,7 @@ Open	ContainerWindow		Åbn
 Settings…	MountMenu		Indstillinger…
 You cannot put the selected item(s) into the trash.	FSUtils		Du kan ikke lægge de valgte elementer i papirkurven.
 Increase size	DeskWindow		Større
-starts with	SelectionWindow		starter med
+starts with	SelectionWindow		begynder med
 Any	AttributesView		Enhver
 New	DeskWindow		Ny
 Invert	SelectionWindow		Omvend
@@ -385,7 +386,7 @@ moving	FSUtils		flytter
 Single window navigation	SettingsView		Enkelt vinduesnavigation
 greater than	FindPanel		større end
 Add	FindPanel		Tilføj
-Created:	InfoWindow		Lavet:
+Created:	InfoWindow		Oprettet:
 Edit Query template	FindPanel		Rediger forespørgselsskabelon
 Save query as template…	FindPanel		Gem forespørgsel som skabelon…
 All disks	AutoMounterSettings		Alle diske
@@ -450,10 +451,10 @@ Description:	InfoWindow		Beskrivelse:
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Er du sikker på, at du vil slette de valgte elementer? Handlingen kan ikke fortrydes.
 Grayscale picture	AttributesView		Gråtone billede
 Mount	DeskWindow		Monter
-ends with	FindPanel		ender med
+ends with	FindPanel		slutter med
 Show Disks icon	SettingsView		Vis diskikoner
 Outline selection rectangle only	SettingsView		Omrids markering kun for rektanglen
-by formula	FindPanel		af formlen
+by formula	FindPanel		efter formular
 Resize to fit	VirtualDirectoryWindow		Tilpas størrelse til at passe
 Move to Trash	FilePanelPriv		Flyt til papirkurven
 is	FindPanel		er

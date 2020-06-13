@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-Installer	3753756669
+1	esperanto	x-vnd.Haiku-Installer	2743617657
 Performing installation.	InstallProgress		Instalante.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Elektu la elan diskon el la ŝpruca menuo. Poste alklaku \"Ek\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Bonvolu fermi la fenestron de la Diskagordilo antaŭ fermi la fenestron de al Instalilo.
@@ -32,6 +32,7 @@ Install from:	InstallerWindow		Instali el:
 Additional disk space required: 0.0 KiB	InstallerWindow		Ekstra bezonata diskospaco: 0.0 KiB
 This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Ĉi tio estas beta-kvalita programaro! Tio intencas, ke estas hazardo de perdi gravan datumon. Faru oftajn savkopiojn! Vi estis avertita.\n\n\n
 ???	InstallerWindow	Unknown currently copied item	???
+Install anyway	InstallProgress		Instali senkondiĉe
 1)   If you are installing Haiku onto real hardware (not inside an emulator), you may want to prepare a hard disk partition from another OS (you could, for example, use a GParted Live-CD, which can also resize existing partitions to make room).\nYou can also set up partitions by launching DriveSetup from Installer, but you won't be able to resize existing partitions with it. While DriveSetup has been quite thoroughly tested over the years, it's recommended to have up-to-date backups of the other partitions on your system. Just in case…	InstallerApp		1)   Se vi instalas Haiku-on per efektiva aparataro (ne en imitilo), vi eble volus fari subdiskon per alia operaciumo (vi povus, ekzemple, uzi GParted-an aŭtonoman KD-on, kiu ankaŭ povas ŝanĝi la grandecon de jamaj subdiskoj por malokupi diskospacon).\nVi ankaŭ povas agordi subdiskojn per lanĉi DiskAgordilon el la Instalilo, sed vi ne povos ŝanĝi la grandecon de jamaj subdiskoj per ĝi. Kvankam DiskAgordilo estis ĝisfunde provita tra multaj jaroj, estas rekomendita havi aktualajn savkopiojn de la aliaj subdiskoj en via sistemo. Nur por sekureco…
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Elektu la elan kaj la alan diskojn el le ŝprucmenuoj. Tiam klaku al \"Ek\".
 Hide optional packages	InstallerWindow		Kaŝi malneprajn pakaĵojn
@@ -56,6 +57,7 @@ Collecting copy information.	InstallProgress		Kunigante kopiajn informojn.
 Show optional packages	InstallerWindow		Montri malneprajn pakaĵojn
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		La spaco de la ala disko ne sufiĉas. Bonvolu elekti alian diskon aŭ elekti ne instali nedevigajn pakaĵojn.
 Installation canceled.	InstallProgress		Instalado estis nuligita.
+The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		La cela volumo ne estas malplena. Ĉu vi certas ke vi volas instali senkondiĉe?\n\nNoto: La dosierujo 'system' estos pura kopio el fonta volumo, sed la dosierujo de agordoj estos konservita, ĉiuj aliaj dosierujoj estos kunmetitaj kie dosieroj kaj ligoj ekzistantaj en ambaŭ cela kaj fonta volumoj estos submetitaj per versioj el fonta volumo.
 OK	InstallerApp		Bone
 Are you sure you want to abort the installation?	InstallerWindow		Ĉu vi certas, ke vi volas ĉesigi la instaladon?
 Stop	InstallerWindow		Halti
@@ -77,6 +79,7 @@ Running Boot Manager and DriveSetup…\n\nClose both applications to continue wi
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Ĉu vi certas, ke vi volas instali en la aktualan startdiskon? La Instalilo devigos restarti la komputilon se vi daŭras.
 Onto:	InstallerWindow		En:
 Quit Boot Manager and DriveSetup	InstallerWindow		Ĉesigi Praŝargan Administrilon kaj DiskAgordilon
+3)   When you successfully boot into Haiku for the first time, make sure to read our \"Userguide\" and take the \"Quick Tour\". There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Kiam vi sukcese lanĉos la Hajkon unuan fojon nepre legu nian \"Gvidlibron\" kaj \"Rapidan ekondukon\". Ĝiaj ligiloj lokiĝas en labortablo kaj en legosignoj de la Retprospero.\n\n
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Instalilo\n\tskribita per Jérôme Duval kaj Stephan Aßmus\n\tKopirajto 2005-2010, Haiku.\n\n
 Tools	InstallerWindow		Iloj
 scanning…	InstallerWindow		skanado…
