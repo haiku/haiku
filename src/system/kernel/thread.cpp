@@ -78,7 +78,7 @@ static thread_id sNextThreadID = 2;
 	// ID 1 is allocated for the kernel by Team::Team() behind our back
 
 // some arbitrarily chosen limits -- should probably depend on the available
-// memory (the limit is not yet enforced)
+// memory
 static int32 sMaxThreads = 4096;
 static int32 sUsedThreads = 0;
 
