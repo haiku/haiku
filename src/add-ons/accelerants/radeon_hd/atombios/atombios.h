@@ -191,7 +191,7 @@
 #define HW_ASSISTED_I2C_STATUS_FAILURE     2
 #define HW_ASSISTED_I2C_STATUS_SUCCESS     1
 
-#pragma pack(1)                                       // BIOS data must use byte aligment
+#pragma pack(1)                                       // BIOS data must use byte alignment
 
 // Define offset to location of ROM header.
 #define OFFSET_TO_POINTER_TO_ATOM_ROM_HEADER         0x00000048L
@@ -497,6 +497,7 @@ typedef struct _COMPUTE_MEMORY_ENGINE_PLL_PARAMETERS_V3
   union
   {
     ATOM_COMPUTE_CLOCK_FREQ  ulClock;         //Input Parameter
+    ULONG ulClockParams;                      //ULONG access for BE
     ATOM_S_MPLL_FB_DIVIDER   ulFbDiv;         //Output Parameter
   };
   UCHAR   ucRefDiv;                           //Output Parameter
@@ -529,6 +530,7 @@ typedef struct _COMPUTE_MEMORY_ENGINE_PLL_PARAMETERS_V5
   union
   {
     ATOM_COMPUTE_CLOCK_FREQ  ulClock;         //Input Parameter
+    ULONG ulClockParams;                      //ULONG access for BE
     ATOM_S_MPLL_FB_DIVIDER   ulFbDiv;         //Output Parameter
   };
   UCHAR   ucRefDiv;                           //Output Parameter
@@ -632,6 +634,13 @@ typedef struct _COMPUTE_MEMORY_CLOCK_PARAM_PARAMETERS_V2_2
   COMPUTE_MEMORY_ENGINE_PLL_PARAMETERS_V4 ulClock;
   ULONG ulReserved;
 }COMPUTE_MEMORY_CLOCK_PARAM_PARAMETERS_V2_2;
+
+typedef struct _COMPUTE_MEMORY_CLOCK_PARAM_PARAMETERS_V2_3
+{
+  COMPUTE_MEMORY_ENGINE_PLL_PARAMETERS_V4 ulClock;
+  USHORT  usMclk_fcw_frac;                  //fractional divider of fcw = usSclk_fcw_frac/65536
+  USHORT  usMclk_fcw_int;                   //integer divider of fcwc
+}COMPUTE_MEMORY_CLOCK_PARAM_PARAMETERS_V2_3;
 
 //Input parameter of DynamicMemorySettingsTable
 //when ATOM_COMPUTE_CLOCK_FREQ.ulComputeClockFlag = COMPUTE_MEMORY_PLL_PARAM
@@ -4100,7 +4109,7 @@ typedef struct  _ATOM_LCD_MODE_CONTROL_CAP
 typedef struct _ATOM_FAKE_EDID_PATCH_RECORD
 {
   UCHAR ucRecordType;
-  UCHAR ucFakeEDIDLength;       // = 128 means EDID lenght is 128 bytes, otherwise the EDID length = ucFakeEDIDLength*128
+  UCHAR ucFakeEDIDLength;       // = 128 means EDID length is 128 bytes, otherwise the EDID length = ucFakeEDIDLength*128
   UCHAR ucFakeEDIDString[1];    // This actually has ucFakeEdidLength elements.
 } ATOM_FAKE_EDID_PATCH_RECORD;
 

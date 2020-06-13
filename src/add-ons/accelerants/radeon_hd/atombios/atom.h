@@ -51,6 +51,7 @@ struct card_info {
 #define ATOM_ATI_MAGIC_PTR	0x30
 #define ATOM_ATI_MAGIC		" 761295520"
 #define ATOM_ROM_TABLE_PTR	0x48
+#define ATOM_ROM_PART_NUMBER_PTR	0x6E
 
 #define ATOM_ROM_MAGIC		"ATOM"
 #define ATOM_ROM_MAGIC_PTR	4
@@ -63,6 +64,7 @@ struct card_info {
 #define ATOM_CMD_SETSCLK	0x0A
 #define ATOM_CMD_SETMCLK	0x0B
 #define ATOM_CMD_SETPCLK	0x0C
+#define ATOM_CMD_SPDFANCNTL	0x39
 
 #define ATOM_DATA_FWI_PTR	0xC
 #define ATOM_DATA_IIO_PTR	0x32
@@ -87,8 +89,8 @@ struct card_info {
 #define ATOM_ARG_REG		0
 #define ATOM_ARG_PS		1
 #define ATOM_ARG_WS		2
-#define ATOM_ARG_ID		4
 #define ATOM_ARG_FB		3
+#define ATOM_ARG_ID		4
 #define ATOM_ARG_IMM		5
 #define ATOM_ARG_PLL		6
 #define ATOM_ARG_MC		7
