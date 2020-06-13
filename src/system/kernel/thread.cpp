@@ -1029,6 +1029,7 @@ thread_create_thread(const ThreadCreationAttributes& attributes, bool kernel)
 		thread->user_thread = NULL;
 
 		threadLocker.Unlock();
+		teamLocker.Unlock();
 
 		if (userThread != NULL)
 			team_free_user_thread(team, userThread);
