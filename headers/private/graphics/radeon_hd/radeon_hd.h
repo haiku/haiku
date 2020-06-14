@@ -171,7 +171,8 @@ static const char radeon_chip_name[][MAX_NAME_LENGTH] = {
 	"Topaz",
 	"Tonga",
 	"Carrizo",
-	"Polaris"
+	"Polaris",
+	"Vega"
 };
 
 
