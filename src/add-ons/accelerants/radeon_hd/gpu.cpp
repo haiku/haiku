@@ -230,7 +230,7 @@ radeon_gpu_quirks()
 
 	// Fix PCIe power distribution issue for Polaris10 XT
 	// aka "Card draws >75W from PCIe bus"
-	if (info.chipsetID == RADEON_POLARIS && info.pciRev == 0xc7) {
+	if (info.chipsetID == RADEON_POLARIS10 && info.pciRev == 0xc7) {
 		ERROR("%s: Applying Polaris10 power distribution fix.\n",
 			__func__);
 		radeon_gpu_i2c_cmd(0x10, 0x96, 0x1e, 0xdd);

@@ -488,18 +488,20 @@ const struct supported_device {
 	{0x985e, 8, 3, RADEON_MULLINS, CHIP_STD, "Radeon HD Mullins"},
 	{0x985f, 8, 3, RADEON_MULLINS, CHIP_STD, "Radeon HD Mullins"},
 	//  Hawaii DCE 8.5
-	{0x67a0, 8, 5, RADEON_HAWAII, CHIP_STD, "Radeon HD Hawaii"},
-	{0x67a1, 8, 5, RADEON_HAWAII, CHIP_STD, "Radeon HD Hawaii"},
+	{0x67a0, 8, 5, RADEON_HAWAII, CHIP_STD, "Radeon FirePro W9100"},
+	{0x67a1, 8, 5, RADEON_HAWAII, CHIP_STD, "Radeon FirePro W8100"},
 	{0x67a2, 8, 5, RADEON_HAWAII, CHIP_STD, "Radeon HD Hawaii"},
 	{0x67a8, 8, 5, RADEON_HAWAII, CHIP_STD, "Radeon HD Hawaii"},
 	{0x67a9, 8, 5, RADEON_HAWAII, CHIP_STD, "Radeon HD Hawaii"},
 	{0x67aa, 8, 5, RADEON_HAWAII, CHIP_STD, "Radeon HD Hawaii"},
-	{0x67b0, 8, 5, RADEON_HAWAII, CHIP_STD, "Radeon HD Hawaii"},
-	{0x67b1, 8, 5, RADEON_HAWAII, CHIP_STD, "Radeon HD Hawaii"},
+	{0x67b0, 8, 5, RADEON_HAWAII, CHIP_STD, "Radeon R9 290X/390X"},
+	{0x67b1, 8, 5, RADEON_HAWAII, CHIP_STD, "Radeon R9 290/390"},
 	{0x67b8, 8, 5, RADEON_HAWAII, CHIP_STD, "Radeon HD Hawaii"},
-	{0x67b9, 8, 5, RADEON_HAWAII, CHIP_STD, "Radeon HD Hawaii"},
+	{0x67b9, 8, 5, RADEON_HAWAII, CHIP_STD, "Radeon R9 295X2"},
 	{0x67ba, 8, 5, RADEON_HAWAII, CHIP_STD, "Radeon HD Hawaii"},
 	{0x67be, 8, 5, RADEON_HAWAII, CHIP_STD, "Radeon HD Hawaii"},
+
+	// WARN: DCE versions below here get sketchy
 
 	// Introduced: 2014
 	// Codename: Volcanic Islands
@@ -511,40 +513,102 @@ const struct supported_device {
 	//{0x6903, 99, 0, RADEON_TOPAZ, CHIP_STD, "Radeon HD Topaz"},
 	//{0x6907, 99, 0, RADEON_TOPAZ, CHIP_STD, "Radeon HD Topaz"},
 	// Tonga DCE 10.0
-	{0x6920, 10, 0, RADEON_TONGA, CHIP_STD, "Radeon HD Tonga"},
-	{0x6921, 10, 0, RADEON_TONGA, CHIP_STD, "Radeon HD Tonga"},
+	{0x6920, 10, 0, RADEON_TONGA, CHIP_STD, "Radeon R9 M395/M395X"},
+	{0x6921, 10, 0, RADEON_TONGA, CHIP_STD, "Radeon R9 M295/M390X"},
 	{0x6928, 10, 0, RADEON_TONGA, CHIP_STD, "Radeon HD Tonga"},
-	{0x6929, 10, 0, RADEON_TONGA, CHIP_STD, "Radeon HD Tonga"},
-	{0x692b, 10, 0, RADEON_TONGA, CHIP_STD, "Radeon HD Tonga"},
-	{0x692f, 10, 0, RADEON_TONGA, CHIP_STD, "Radeon HD Tonga"},
-	{0x6930, 10, 0, RADEON_TONGA, CHIP_STD, "Radeon HD Tonga"},
-	{0x6938, 10, 0, RADEON_TONGA, CHIP_STD, "Radeon HD Tonga"},
-	{0x6939, 10, 0, RADEON_TONGA, CHIP_STD, "Radeon HD Tonga"},
+	{0x6929, 10, 0, RADEON_TONGA, CHIP_STD, "Radeon FirePro S7150"},
+	{0x692b, 10, 0, RADEON_TONGA, CHIP_STD, "Radeon FirePro W7100"},
+	{0x692f, 10, 0, RADEON_TONGA, CHIP_STD, "Radeon FirePro S7150V"},
+	{0x6930, 10, 0, RADEON_TONGA, CHIP_STD, "Radeon HD 6930"},
+	{0x6938, 10, 0, RADEON_TONGA, CHIP_STD, "Radeon R9 380X/M295X"},
+	{0x6939, 10, 0, RADEON_TONGA, CHIP_STD, "Radeon R9 285/380"},
+	// Fiji DCE 10.1?
+	{0x7300, 10, 1, RADEON_FIJI, CHIP_STD, "Radeon R9 Fury"},
+	{0x730f, 10, 1, RADEON_FIJI, CHIP_STD, "Radeon HD Fiji"},
 	// Carrizo DCE 11.0
 	{0x9870, 11, 0, RADEON_CARRIZO, CHIP_APU, "Radeon HD Carrizo"},
 	{0x9874, 11, 0, RADEON_CARRIZO, CHIP_APU, "Radeon HD Carrizo"},
 	{0x9875, 11, 0, RADEON_CARRIZO, CHIP_APU, "Radeon HD Carrizo"},
 	{0x9876, 11, 0, RADEON_CARRIZO, CHIP_APU, "Radeon HD Carrizo"},
 	{0x9877, 11, 0, RADEON_CARRIZO, CHIP_APU, "Radeon HD Carrizo"},
+	// Stoney Ridge 11.1?
+	{0x98e4, 11, 1, RADEON_STONEY, CHIP_APU, "Radeon HD Stoney Ridge"},
 
 	// Introduced: 2016
 	// Codename: Artic Islands / Polaris
 	// Process: 14 nm
-	{0x67ef, 12, 0, RADEON_POLARIS, CHIP_STD, "Radeon RX 460"},
-	{0x67df, 12, 0, RADEON_POLARIS, CHIP_STD, "Radeon RX 470/480"},
-	{0x67ff, 12, 0, RADEON_POLARIS, CHIP_STD, "Radeon RX 560"},
+	// Polaris 11
+	{0x67e0, 12, 1, RADEON_POLARIS11, CHIP_STD, "Radeon Pro WX 4170"},
+	{0x67e3, 12, 1, RADEON_POLARIS11, CHIP_STD, "Radeon Pro WX 4100"},
+	{0x67e8, 12, 1, RADEON_POLARIS11, CHIP_STD, "Radeon Pro WX 4130"},
+	{0x67eb, 12, 1, RADEON_POLARIS11, CHIP_STD, "Radeon Pro V5300X"},
+	{0x67ef, 12, 1, RADEON_POLARIS11, CHIP_STD, "Radeon RX 460"},
+	{0x67ff, 12, 1, RADEON_POLARIS11, CHIP_STD, "Radeon RX 560"},
+	{0x67e1, 12, 1, RADEON_POLARIS11, CHIP_STD, "Radeon Polaris 11"},
+	{0x67e7, 12, 1, RADEON_POLARIS11, CHIP_STD, "Radeon Polaris 11"},
+	{0x67e9, 12, 1, RADEON_POLARIS11, CHIP_STD, "Radeon Polaris 11"},
+	// Polaris 10
+	{0x67c0, 12, 0, RADEON_POLARIS10, CHIP_STD, "Radeon Pro WX 7100 Mobile"},
+	{0x67c1, 12, 0, RADEON_POLARIS10, CHIP_STD, "Radeon Polaris 10"},
+	{0x67c2, 12, 0, RADEON_POLARIS10, CHIP_STD, "Radeon Pro V7300X"},
+	{0x67c4, 12, 0, RADEON_POLARIS10, CHIP_STD, "Radeon Pro WX 7100"},
+	{0x67c7, 12, 0, RADEON_POLARIS10, CHIP_STD, "Radeon Pro WX 5100"},
+	{0x67c8, 12, 0, RADEON_POLARIS10, CHIP_STD, "Radeon Polaris 10"},
+	{0x67c9, 12, 0, RADEON_POLARIS10, CHIP_STD, "Radeon Polaris 10"},
+	{0x67ca, 12, 0, RADEON_POLARIS10, CHIP_STD, "Radeon Polaris 10"},
+	{0x67cc, 12, 0, RADEON_POLARIS10, CHIP_STD, "Radeon Polaris 10"},
+	{0x67cf, 12, 0, RADEON_POLARIS10, CHIP_STD, "Radeon Polaris 10"},
+	{0x67d0, 12, 0, RADEON_POLARIS10, CHIP_STD, "Radeon Pro V7300X"},
+	{0x67df, 12, 0, RADEON_POLARIS10, CHIP_STD, "Radeon RX 470/480"},
+	// Polaris 12
+	{0x6980, 12, 2, RADEON_POLARIS12, CHIP_STD, "Radeon Polaris 12"},
+	{0x6981, 12, 2, RADEON_POLARIS12, CHIP_STD, "Radeon Pro WX 3200"},
+	{0x6985, 12, 2, RADEON_POLARIS12, CHIP_STD, "Radeon Pro WX 3100"},
+	{0x6986, 12, 2, RADEON_POLARIS12, CHIP_STD, "Radeon Polaris 12"},
+	{0x6987, 12, 2, RADEON_POLARIS12, CHIP_STD, "Radeon 540X/550X/RX 640"},
+	{0x6995, 12, 2, RADEON_POLARIS12, CHIP_STD, "Radeon Pro WX 2100"},
+	{0x6997, 12, 2, RADEON_POLARIS12, CHIP_STD, "Radeon Polaris 12"},
+	{0x699f, 12, 2, RADEON_POLARIS12, CHIP_STD, "Radeon 540/540X/RX 540X"},
 
 	// Introduced: 2017
 	// Codename: Vega
 	// Process: 14nm
-	{0x15dd, 13, 0, RADEON_VEGA, CHIP_STD, "Radeon RX Vega Mobility"},
-	{0x15ff, 13, 0, RADEON_VEGA, CHIP_STD, "Radeon RX Vega Mobility"},
-	{0x6861, 13, 0, RADEON_VEGA, CHIP_STD, "Radeon PRO WX 9100"},
-	{0x6863, 13, 0, RADEON_VEGA, CHIP_STD, "Radeon Vega Frontier Edition"},
-	{0x6867, 13, 0, RADEON_VEGA, CHIP_STD, "Radeon RX Vega 56"},
-	{0x687f, 13, 0, RADEON_VEGA, CHIP_STD, "Radeon RX Vega 64"},
-	{0x684c, 13, 0, RADEON_VEGA, CHIP_STD, "Radeon RX Vega M GH"},
-	{0x684e, 13, 0, RADEON_VEGA, CHIP_STD, "Radeon RX Vega M GL"}
+	{0x694c, 13, 0, RADEON_VEGAM, CHIP_MOBILE, "Radeon RX Vega M GH"},
+	{0x694e, 13, 0, RADEON_VEGAM, CHIP_MOBILE, "Radeon RX Vega M GL"},
+	{0x694f, 13, 0, RADEON_VEGAM, CHIP_MOBILE, "Radeon Pro WX Vega M GL"},
+	// Vega 10
+	{0x6860, 13, 0, RADEON_VEGA10, CHIP_STD, "Radeon Instinct MI25"},
+	{0x6861, 13, 0, RADEON_VEGA10, CHIP_STD, "Radeon Pro WX 9100"},
+	{0x6862, 13, 0, RADEON_VEGA10, CHIP_STD, "Radeon Pro SSG"},
+	{0x6863, 13, 0, RADEON_VEGA10, CHIP_STD, "Radeon Vega Frontier"},
+	{0x6864, 13, 0, RADEON_VEGA10, CHIP_STD, "Radeon Pro V340"},
+	{0x6867, 13, 0, RADEON_VEGA10, CHIP_STD, "Radeon Pro Vega 56"},
+	{0x6868, 13, 0, RADEON_VEGA10, CHIP_STD, "Radeon Pro WX 8100/8200"},
+	{0x6869, 13, 0, RADEON_VEGA10, CHIP_STD, "Radeon Vega 10"},
+	{0x686a, 13, 0, RADEON_VEGA10, CHIP_STD, "Radeon Vega 10"},
+	{0x686b, 13, 0, RADEON_VEGA10, CHIP_STD, "Radeon Vega 10"},
+	{0x686c, 13, 0, RADEON_VEGA10, CHIP_STD, "Radeon Instinct MI25 MxGPU"},
+	{0x686d, 13, 0, RADEON_VEGA10, CHIP_STD, "Radeon Vega 10"},
+	{0x686e, 13, 0, RADEON_VEGA10, CHIP_STD, "Radeon Vega 10"},
+	{0x686f, 13, 0, RADEON_VEGA10, CHIP_STD, "Radeon Vega 10"},
+	{0x687f, 13, 0, RADEON_VEGA10, CHIP_STD, "Radeon Vega 56/64"},
+	// Vega 12
+	{0x69a0, 13, 0, RADEON_VEGA12, CHIP_STD, "Radeon Vega 12"},
+	{0x69a1, 13, 0, RADEON_VEGA12, CHIP_STD, "Radeon Vega 12"},
+	{0x69a2, 13, 0, RADEON_VEGA12, CHIP_STD, "Radeon Vega 12"},
+	{0x69a3, 13, 0, RADEON_VEGA12, CHIP_STD, "Radeon Vega 12"},
+	{0x69af, 13, 0, RADEON_VEGA12, CHIP_STD, "Radeon Pro Vega 12"},
+	// Vega 20
+	{0x66a0, 13, 2, RADEON_VEGA20, CHIP_STD, "Radeon Vega 20"},
+	{0x66a1, 13, 2, RADEON_VEGA20, CHIP_STD, "Radeon Vega 20"},
+	{0x66a2, 13, 2, RADEON_VEGA20, CHIP_STD, "Radeon Vega 20"},
+	{0x66a3, 13, 2, RADEON_VEGA20, CHIP_STD, "Radeon Vega 20"},
+	{0x66a4, 13, 2, RADEON_VEGA20, CHIP_STD, "Radeon Vega 20"},
+	{0x66a7, 13, 2, RADEON_VEGA20, CHIP_STD, "Radeon Pro Vega 20"},
+	{0x66af, 13, 2, RADEON_VEGA20, CHIP_STD, "Radeon Pro Vega 20"},
+	// Raven (APU)
+	{0x15dd, 13, 0, RADEON_RAVEN, CHIP_APU, "Radeon Vega Raven"},
+	{0x15d8, 13, 0, RADEON_RAVEN, CHIP_APU, "Radeon Vega Raven"},
 };
 
 
