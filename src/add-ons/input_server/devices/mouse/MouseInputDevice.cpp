@@ -323,7 +323,10 @@ MouseDevice::_BuildShortName() const
 	else
 		name.Capitalize();
 
-	if (deviceName.FindFirst("touchpad") >= 0) {
+	// Check the whole string for "touchpad" because it's a different directory
+	// FIXME use MS_IS_TOUCHPAD ioctl instead (or fIsTouchpad which caches its
+	// result) but this can only be done after the control thread is running
+	if (string.FindFirst("touchpad") >= 0) {
 		name << " Touchpad ";
 	} else if (deviceName.FindFirst("trackpoint") >= 0) {
 		// That's always PS/2, so don't keep the bus name
