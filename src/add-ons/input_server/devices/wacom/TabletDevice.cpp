@@ -225,6 +225,9 @@ TabletDevice::DetectDevice(const DeviceReader* reader)
 		case 0xB2:
 			SetDevice(60960.0, 45720.0, DEVICE_INTUOS3);
 			break;
+		case 0xB7:  // Wacom PTZ-431W Intuos3 4x6
+			SetDevice(31496.0, 19685.0, DEVICE_INTUOS3);
+			break;
 		case 0xD0:	// Wacom Bamboo 2FG (from Linux Wacom Project)
 			SetDevice(14720.0, 9200.0, DEVICE_BAMBOO_PT);
 			break;
