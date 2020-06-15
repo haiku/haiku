@@ -236,12 +236,14 @@ choose_link_device_configurations(acpi_module_info* acpi,
 			link->possible_irqs);
 		if (status != B_OK) {
 			panic("failed to read possible irqs of link device");
+			delete link;
 			return status;
 		}
 
 		status = read_current_irq(acpi, link->handle, link->current_irq);
 		if (status != B_OK) {
 			panic("failed to read current irq of link device");
+			delete link;
 			return status;
 		}
 
