@@ -2211,8 +2211,10 @@ FUSEVolume::OpenAttr(void* _node, const char* name, int openMode,
 
 	int bytesRead = fuse_fs_getxattr(fFS, path, name, cookie->Buffer(),
 		attrSize);
-	if (bytesRead < 0)
+	if (bytesRead < 0) {
+		delete cookie;
 		return bytesRead;
+	}
 
 	*_cookie = cookie;
 
