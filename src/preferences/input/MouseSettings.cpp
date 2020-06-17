@@ -147,7 +147,8 @@ MouseSettings::Dump()
 	printf("type:\t\t%" B_PRId32 " button mouse\n", fSettings.type);
 	printf("map:\t\tleft = %" B_PRIu32 " : middle = %" B_PRIu32 " : right = %"
 		B_PRIu32 "\n", fSettings.map.button[0], fSettings.map.button[2],
-		fSettings.map.button[1]);
+		fSettings.map.button[1], fSettings.map.button[3],
+		fSettings.map.button[4]);
 	printf("click speed:\t%" B_PRId64 "\n", fSettings.click_speed);
 	printf("accel:\t\t%s\n", fSettings.accel.enabled ? "enabled" : "disabled");
 	printf("accel factor:\t%" B_PRId32 "\n", fSettings.accel.accel_factor);
@@ -203,6 +204,8 @@ MouseSettings::Defaults()
 		map.button[0] = B_PRIMARY_MOUSE_BUTTON;
 		map.button[1] = B_SECONDARY_MOUSE_BUTTON;
 		map.button[2] = B_TERTIARY_MOUSE_BUTTON;
+		map.button[3] = B_MOUSE_BUTTON(4);
+		map.button[4] = B_MOUSE_BUTTON(5);
 		SetMapping(map);
 	}
 }
@@ -221,7 +224,9 @@ MouseSettings::IsDefaultable()
 		|| fAcceptFirstClick != kDefaultAcceptFirstClick
 		|| fSettings.map.button[0] != B_PRIMARY_MOUSE_BUTTON
 		|| fSettings.map.button[1] != B_SECONDARY_MOUSE_BUTTON
-		|| fSettings.map.button[2] != B_TERTIARY_MOUSE_BUTTON;
+		|| fSettings.map.button[2] != B_TERTIARY_MOUSE_BUTTON
+		|| fSettings.map.button[3] != B_MOUSE_BUTTON(4)
+		|| fSettings.map.button[4] != B_MOUSE_BUTTON(5);
 }
 
 
@@ -254,7 +259,9 @@ MouseSettings::IsRevertable()
 		|| fAcceptFirstClick != fOriginalAcceptFirstClick
 		|| fSettings.map.button[0] != fOriginalSettings.map.button[0]
 		|| fSettings.map.button[1] != fOriginalSettings.map.button[1]
-		|| fSettings.map.button[2] != fOriginalSettings.map.button[2];
+		|| fSettings.map.button[2] != fOriginalSettings.map.button[2]
+		|| fSettings.map.button[3] != fOriginalSettings.map.button[3]
+		|| fSettings.map.button[4] != fOriginalSettings.map.button[4];
 }
 
 
