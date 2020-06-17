@@ -166,11 +166,11 @@ void
 OverlayView::OverlayAboutRequested()
 {
 	BAlert *alert = new BAlert("about",
-		"OverlayImage\n"
+		B_TRANSLATE("OverlayImage\n"
 		"Copyright 1999-2010\n\n\t"
 		"originally by Seth Flaxman\n\t"
 		"modified by Hartmuth Reh\n\t"
-		"further modified by Humdinger\n",
+		"further modified by Humdinger\n"),
 		"OK");
 	BTextView *view = alert->TextView();
 	BFont font;

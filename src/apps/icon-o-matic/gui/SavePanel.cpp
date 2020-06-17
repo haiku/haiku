@@ -373,7 +373,7 @@ SavePanel::_ExportSettings()
 //	// Build a window around this translator's configuration view
 //	status_t err = roster->MakeConfigurationView(item->id, NULL, &view, &rect);
 //	if (err < B_OK || view == NULL) {
-//		BAlert *alert = new BAlert(NULL, strerror(err), "OK");
+//		BAlert *alert = new BAlert(NULL, strerror(err), B_TRANSLATE("OK"));
 //		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 //		alert->Go();
 //	} else {
