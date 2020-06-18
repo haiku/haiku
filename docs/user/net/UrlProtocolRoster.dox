@@ -1,0 +1,42 @@
+/*
+ * Copyright 2020 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Leorize, leorize+oss@disroot.org
+ *
+ * Corresponds to:
+ *		headers/os/net/UrlProtocolRoster.h hrev54280
+ *		src/kits/network/libnetapi/UrlProtocolRoster.cpp hrev54280
+ */
+
+
+/*!
+	\file UrlProtocolRoster.h
+	\ingroup network
+	\brief Provides the BUrlProtocolRoster interface.
+*/
+
+
+/*!
+	\class BUrlProtocolRoster
+	\ingroup network
+	\brief Interfaces for protocol-agnostic operations.
+*/
+
+
+/*!
+	\fn static BUrlRequest* BUrlProtocolRoster::MakeRequest(const BUrl& url,
+		BUrlProtocolListener* listener = NULL, BUrlContext* context = NULL)
+	\brief Create a BUrlRequest that can handle the given BUrl
+
+	\param url The URL to create a request for
+	\param listener The BUrlProtocolListener to be registered with the created
+		BUrlRequest, can be \c NULL
+	\param context The BUrlContext to be registered with the created
+		BUrlRequest, can be \c NULL
+
+	\returns A pointer to the BUrlRequest that can handle the given BUrl.
+		\c NULL will be returned if there aren't any BUrlRequest that can
+		handle the given protocol or if memory couldn't be allocated.
+*/
