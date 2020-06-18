@@ -87,7 +87,27 @@ BHttpResult::Length() const
 	const char* length = Headers()["Content-Length"];
 	if (length == NULL)
 		return 0;
-	return atoi(length);
+
+	/* NOTE: Not RFC7230 compliant:
+	 * - If Content-Length is a list, all values must be checked and verified
+	 *   to be duplicates of each other, but this is currently not supported.
+	 */
+	size_t result = 0;
+	/* strtoul() will ignore a prefixed sign, so we verify that there aren't
+	 * any before continuing (RFC7230 only permits digits).
+	 *
+	 * We can check length[0] directly because header values are trimmed by
+	 * HttpHeader beforehand. */
+	if (length[0] != '-' || length[0] != '+') {
+		errno = 0;
+		char *endptr = NULL;
+		result = strtoul(length, &endptr, 10);
+		/* ERANGE will be signalled if the result is too large (which can
+		 * happen), in that case, return 0. */
+		if (errno != 0 || *endptr != '\0')
+			result = 0;
+	}
+	return result;
 }
 
 
