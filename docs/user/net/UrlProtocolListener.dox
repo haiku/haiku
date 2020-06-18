@@ -1,0 +1,151 @@
+/*
+ * Copyright 2020 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Leorize, leorize+oss@disroot.org
+ *
+ * Corresponds to:
+ *		headers/os/net/UrlProtocolListener.h hrev54280
+ *		src/kits/network/libnetapi/UrlProtocolListener.cpp hrev54280
+ */
+
+
+/*!
+	\file UrlProtocolListener.h
+	\ingroup network
+	\brief Provides the BUrlProtocolListener abstract interface.
+*/
+
+
+/*!
+	\class BUrlProtocolListener
+	\ingroup network
+	\brief Abstract interface for handling BUrlRequest events.
+
+	BUrlProtocolListener is the base class for handling networking events from
+	BUrlRequest.
+*/
+
+
+/*!
+	\fn virtual void BUrlProtocolListener::ConnectionOpened(BUrlRequest* caller)
+	\brief Called when the socket is opened.
+
+	\b Frequency: Once
+
+	\param caller The BUrlRequest that invoked this callback.
+*/
+
+/*!
+	\fn virtual void BUrlProtocolListener::HostnameResolved(BUrlRequest* caller,
+		const char* ip)
+	\brief Called when the final IP is discovered.
+
+	\b Frequency: Once
+
+	\param caller The BUrlRequest that invoked this callback.
+	\param ip String representing the IP address of the resource host.
+*/
+
+/*!
+	\fn virtual void BUrlProtocolListener::ResponseStarted(BUrlRequest* caller)
+	\brief Called when the request has been emitted and the server begins to reply.
+
+	Typically this callback will be called when the HTTP status code is
+	received.
+
+	\b Frequency: Once
+
+	\param caller The BUrlRequest that invoked this callback.
+*/
+
+/*!
+	\fn virtual void BUrlProtocolListener::HeadersReceived(BUrlRequest* caller,
+		const BUrlResult& result);
+	\brief Called when all of the server response metadata (such as headers)
+		have been read and parsed.
+
+	\b Frequency: Once
+
+	\param caller The BUrlRequest that invoked this callback.
+	\param result The BUrlResult associated with the request.
+*/
+
+/*!
+	\fn virtual void BUrlProtocolListener::DataReceived(BUrlRequest* caller,
+		const char* data, off_t position, size_t size)
+	\brief Called each time a block of data is received.
+
+	\b Frequency: Zero or more
+
+	\param caller The BUrlRequest that invoked this callback.
+	\param data Pointer to the data block in memory.
+	\param position Offset of the data in the stream.
+	\param size Size of the data block.
+*/
+
+/*!
+	\fn virtual void BUrlProtocolListener::DownloadProgress(BUrlRequest* caller,
+		ssize_t bytesReceived, ssize_t bytesTotal)
+	\brief Called each time a block of data is received.
+
+	This callback will be called after DataReceived().
+
+	\b Frequency: Once or more
+
+	\param caller The BUrlRequest that invoked this callback.
+	\param bytesReceived Number of data bytes received.
+	\param bytesTotal Total number of data bytes expected. This value is not
+		guaranteed to be meaningful.
+*/
+
+/*!
+	\fn virtual void BUrlProtocolListener::UploadProgress(BUrlRequest* caller,
+		ssize_t bytesSent, ssize_t bytesTotal)
+	\brief Called each time a block of data is sent.
+
+	\note Currently this callback is never called.
+
+	\param caller The BUrlRequest that invoked this callback.
+	\param bytesSent Number of data bytes sent.
+	\param bytesTotal Total number of data bytes left.
+*/
+
+/*!
+	\fn virtual void BUrlProtocolListener::RequestCompleted(BUrlRequest* caller,
+		bool success)
+	\brief Called once the request is complete.
+
+	\b Frequency: Once
+
+	\param caller The BUrlRequest that invoked this callback.
+	\param success Whether the request has been successfully completed.
+*/
+
+/*!
+	\fn virtual void BUrlProtocolListener::DebugMessage(BUrlRequest* caller,
+		BUrlProtocolDebugMessage type, const char* text)
+	\brief Called each time a debug message is emitted.
+
+	\b Frequency: Zero or more
+
+	\param caller The BUrlRequest that invoked this callback.
+	\param type Type of the message.
+	\param text The message.
+*/
+
+/*!
+	\fn virtual bool BUrlProtocolListener::CertificateVerificationFailed(
+		BUrlRequest* caller, BCertificate& certificate, const char* message
+	)
+	\brief Called when cerificate verification failed.
+
+	\b Frequency: Once
+
+	\param caller The BUrlRequest that invoked this callback.
+	\param certificate The SSL certificate of which validation failed.
+	\param message The error message describing the issue.
+
+	\returns \c true to ignore and proceed with the request, \c false to abort.
+*/
