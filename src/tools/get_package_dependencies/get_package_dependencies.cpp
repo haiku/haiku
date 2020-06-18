@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2018, Haiku, Inc. All Rights Reserved.
+ * Copyright 2013-2020, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -104,6 +104,10 @@ main(int argc, const char* const* argv)
 			DIE(error, "failed to read repository file '%s'", repositories[i]);
 		BRepositoryBuilder(*repository, cache)
 			.AddToSolver(solver, false);
+		if (cache.Info().BaseURL().IsEmpty()) {
+			DIE(B_ERROR, "missing base url in repository file '%s'",
+				repositories[i]);
+		}
 		repositoryInfos[repository] = cache.Info();
 	}
 

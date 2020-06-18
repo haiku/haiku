@@ -1,9 +1,10 @@
 /*
- * Copyright 2013, Haiku, Inc. All Rights Reserved.
+ * Copyright 2013-2020, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Ingo Weinhold <ingo_weinhold@gmx.de>
+ *		Andrew Lindesay <apl@lindesay.co.nz>
  */
 
 
@@ -141,18 +142,37 @@ BRepositoryBuilder::AddPackage(const char* path, BSolverPackage** _package)
 	size_t pathLength = strlen(path);
 	status_t error;
 	PackageInfoErrorListener errorListener(path);
+	BEntry entry(path, true);
+
+	if (!entry.Exists()) {
+		DIE_DETAILS(errorListener.Errors(), B_FILE_NOT_FOUND,
+			"the package data file does not exist at \"%s\"", path);
+	}
+
+	struct stat entryStat;
+	error = entry.GetStat(&entryStat);
+
+	if (error != B_OK) {
+		DIE_DETAILS(errorListener.Errors(), error,
+			"failed to access the package data file at \"%s\"", path);
+	}
+
+	if (entryStat.st_size == 0) {
+		DIE_DETAILS(errorListener.Errors(), B_BAD_DATA,
+			"empty package data file at \"%s\"", path);
+	}
+
 	if (pathLength > 5 && strcmp(path + pathLength - 5, ".hpkg") == 0) {
 		// a package file
 		error = packageInfo.ReadFromPackageFile(path);
 	} else {
 		// a package info file (supposedly)
-		error = packageInfo.ReadFromConfigFile(BEntry(path, true),
-			&errorListener);
+		error = packageInfo.ReadFromConfigFile(entry, &errorListener);
 	}
 
 	if (error != B_OK) {
 		DIE_DETAILS(errorListener.Errors(), error,
-			"failed to read package info from \"%s\"", path);
+			"failed to read package data file at \"%s\"", path);
 	}
 
 	// add the package

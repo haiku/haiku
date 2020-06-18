@@ -3,5 +3,5 @@ vendor "Haiku Project"
 summary "The Haiku repository (for Haiku %HAIKU_VERSION_NO_REVISION%)"
 priority 1
 baseurl https://eu.hpkg.haiku-os.org/haiku/master/%HAIKU_PACKAGING_ARCH%/current
-url https://hpkg.haiku-os.org/haiku/master/%HAIKU_PACKAGING_ARCH%/current
+identifier https://hpkg.haiku-os.org/haiku/master/%HAIKU_PACKAGING_ARCH%/current
 architecture %HAIKU_PACKAGING_ARCH%
