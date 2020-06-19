@@ -328,6 +328,30 @@ PixelFormat::SetDrawingMode(drawing_mode mode, source_alpha alphaSrcMode,
 						fBlendSolidVSpan = blend_solid_vspan_alpha_pc;
 						fBlendColorHSpan = blend_color_hspan_alpha_pc;
 					}
+				} else if (alphaFncMode == B_ALPHA_COMPOSITE_SOURCE_IN) {
+					SetAggCompOpAdapter<alpha_src_in>();
+				} else if (alphaFncMode == B_ALPHA_COMPOSITE_SOURCE_OUT) {
+					SetAggCompOpAdapter<alpha_src_out>();
+				} else if (alphaFncMode == B_ALPHA_COMPOSITE_SOURCE_ATOP) {
+					SetAggCompOpAdapter<alpha_src_atop>();
+				} else if (alphaFncMode == B_ALPHA_COMPOSITE_DESTINATION_OVER) {
+					SetAggCompOpAdapter<alpha_dst_over>();
+				} else if (alphaFncMode == B_ALPHA_COMPOSITE_DESTINATION_IN) {
+					SetAggCompOpAdapter<alpha_dst_in>();
+				} else if (alphaFncMode == B_ALPHA_COMPOSITE_DESTINATION_OUT) {
+					SetAggCompOpAdapter<alpha_dst_out>();
+				} else if (alphaFncMode == B_ALPHA_COMPOSITE_DESTINATION_ATOP) {
+					SetAggCompOpAdapter<alpha_dst_atop>();
+				} else if (alphaFncMode == B_ALPHA_COMPOSITE_XOR) {
+					SetAggCompOpAdapter<alpha_xor>();
+				} else if (alphaFncMode == B_ALPHA_COMPOSITE_CLEAR) {
+					SetAggCompOpAdapter<alpha_clear>();
+				} else if (alphaFncMode == B_ALPHA_COMPOSITE_DIFFERENCE) {
+					SetAggCompOpAdapter<alpha_difference>();
+				} else if (alphaFncMode == B_ALPHA_COMPOSITE_LIGHTEN) {
+					SetAggCompOpAdapter<alpha_lighten>();
+				} else if (alphaFncMode == B_ALPHA_COMPOSITE_DARKEN) {
+					SetAggCompOpAdapter<alpha_darken>();
 				}
 			}
 			break;

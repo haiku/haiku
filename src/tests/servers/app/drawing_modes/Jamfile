@@ -7,5 +7,10 @@ UseHeaders [ FDirName os interface ] ;
 
 Application DrawingModes :
 	DrawingModes.cpp
-	: [ TargetLibstdc++ ] be
+	: [ TargetLibstdc++ ] be translation
 ;
+
+if ( $(TARGET_PLATFORM) = libbe_test ) {
+	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : DrawingModes
+		: tests!apps ;
+}

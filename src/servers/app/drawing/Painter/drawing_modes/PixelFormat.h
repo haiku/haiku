@@ -17,8 +17,11 @@
 #include <agg_basics.h>
 #include <agg_color_rgba.h>
 #include <agg_rendering_buffer.h>
+#include <agg_pixfmt_rgba.h>
 
 #include <GraphicsDefs.h>
+
+#include "AggCompOpAdapter.h"
 
 class PatternHandler;
 
@@ -28,6 +31,34 @@ class PixelFormat {
 	typedef agg::rendering_buffer			agg_buffer;
 	typedef agg::rendering_buffer::row_data	row_data;
 	typedef agg::order_bgra					order_type;
+
+	typedef agg::comp_op_rgba_src_in<color_type, order_type>	comp_src_in;
+	typedef agg::comp_op_rgba_src_out<color_type, order_type>	comp_src_out;
+	typedef agg::comp_op_rgba_src_atop<color_type, order_type>	comp_src_atop;
+	typedef agg::comp_op_rgba_dst_over<color_type, order_type>	comp_dst_over;
+	typedef agg::comp_op_rgba_dst_in<color_type, order_type>	comp_dst_in;
+	typedef agg::comp_op_rgba_dst_out<color_type, order_type>	comp_dst_out;
+	typedef agg::comp_op_rgba_dst_atop<color_type, order_type>	comp_dst_atop;
+	typedef agg::comp_op_rgba_xor<color_type, order_type>		comp_xor;
+	typedef agg::comp_op_rgba_clear<color_type, order_type>		comp_clear;
+	typedef agg::comp_op_rgba_difference<color_type, order_type>
+		comp_difference;
+	typedef agg::comp_op_rgba_lighten<color_type, order_type>	comp_lighten;
+	typedef agg::comp_op_rgba_darken<color_type, order_type>	comp_darken;
+
+	typedef AggCompOpAdapter<comp_src_in, agg_buffer>		alpha_src_in;
+	typedef AggCompOpAdapter<comp_src_out, agg_buffer>		alpha_src_out;
+	typedef AggCompOpAdapter<comp_src_atop, agg_buffer>		alpha_src_atop;
+	typedef AggCompOpAdapter<comp_dst_over, agg_buffer>		alpha_dst_over;
+	typedef AggCompOpAdapter<comp_dst_in, agg_buffer>		alpha_dst_in;
+	typedef AggCompOpAdapter<comp_dst_out, agg_buffer>		alpha_dst_out;
+	typedef AggCompOpAdapter<comp_dst_atop, agg_buffer>		alpha_dst_atop;
+	typedef AggCompOpAdapter<comp_xor, agg_buffer>			alpha_xor;
+	typedef AggCompOpAdapter<comp_clear, agg_buffer>		alpha_clear;
+	typedef AggCompOpAdapter<comp_difference, agg_buffer>	alpha_difference;
+	typedef AggCompOpAdapter<comp_lighten, agg_buffer>		alpha_lighten;
+	typedef AggCompOpAdapter<comp_darken, agg_buffer>		alpha_darken;
+
 	enum base_scale_e
 	{
 		base_shift = color_type::base_shift,
@@ -146,6 +177,17 @@ class PixelFormat {
 	blend_solid_span			fBlendSolidVSpan;
 	blend_color_span			fBlendColorHSpan;
 	blend_color_span			fBlendColorVSpan;
+
+	template<typename T>
+	void SetAggCompOpAdapter()
+	{
+		fBlendPixel = T::blend_pixel;
+		fBlendHLine = T::blend_hline;
+		fBlendSolidHSpanSubpix = T::blend_solid_hspan_subpix;
+		fBlendSolidHSpan = T::blend_solid_hspan;
+		fBlendSolidVSpan = T::blend_solid_vspan;
+		fBlendColorHSpan = T::blend_color_hspan;
+	}
 };
 
 // inlined functions

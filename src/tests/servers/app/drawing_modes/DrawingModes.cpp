@@ -5,6 +5,14 @@
 #include <stdio.h>
 #include <string.h>
 
+//#define DUMP_BLENDING_RESULTS
+#ifdef DUMP_BLENDING_RESULTS
+#include <BitmapStream.h>
+#include <File.h>
+#include <TranslatorRoster.h>
+#include <String.h>
+#endif
+
 uint32 kBitmapBits[] = {
 	0x00777477, 0x00777477, 0x00777477, 0x00777477, 0x00777477, 0x00777477,
 	0x00777477, 0x00777477, 0x00777477, 0x00777477, 0x00777477, 0x00777477,
@@ -188,6 +196,8 @@ virtual	void				Draw(BRect updateRect);
 
 private:
 		BBitmap *			fBitmap;
+		BBitmap *			fTriangleLeft;
+		BBitmap *			fTriangleRight;
 };
 
 
@@ -212,7 +222,7 @@ private:
 DrawingModeApp::DrawingModeApp()
 	:	BApplication("application/x.vnd-Haiku.DrawingModeTest")
 {
-	fWindow = new DrawingModeWindow(BRect(200, 200, 380, 600));
+	fWindow = new DrawingModeWindow(BRect(200, 200, 760, 800));
 	fWindow->Show();
 }
 
@@ -234,12 +244,34 @@ DrawingModeView::DrawingModeView(BRect frame)
 {
 	fBitmap = new BBitmap(BRect(0, 0, 31, 31), B_RGB32);
 	memcpy(fBitmap->Bits(), kBitmapBits, fBitmap->BitsLength());
+
+	uint32 triangleLeftBits[32 * 32] = { 0 };
+	uint32 triangleRightBits[32 * 32] = { 0 };
+	for(int y = 0; y < 32; ++y) {
+		for(int x = 0; x < 32; ++x) {
+			if(x < 32 - y) {
+				triangleLeftBits[y * 32 + x] = 0xffff0000;
+			}
+			if(x >= y) {
+				triangleRightBits[y * 32 + x] = 0xff0000ff;
+			}
+		}
+	}
+
+	fTriangleLeft = new BBitmap(BRect(0, 0, 31, 31), B_RGBA32);
+	memcpy(fTriangleLeft->Bits(), triangleLeftBits,
+		fTriangleLeft->BitsLength());
+	fTriangleRight = new BBitmap(BRect(0, 0, 31, 31), B_RGBA32);
+	memcpy(fTriangleRight->Bits(), triangleRightBits,
+		fTriangleRight->BitsLength());
 }
 
 
 DrawingModeView::~DrawingModeView()
 {
 	delete fBitmap;
+	delete fTriangleLeft;
+	delete fTriangleRight;
 }
 
 
@@ -256,21 +288,45 @@ DrawingModeView::Draw(BRect updateRect)
 	BRect bitmapBounds = fBitmap->Bounds();
 	int32 imageHeight = bitmapBounds.IntegerHeight() + 10;
 	int32 imageWidth = bitmapBounds.IntegerWidth() + 10;
+	BRect triangleBounds = fTriangleLeft->Bounds();
+	int32 triangleHeight = triangleBounds.IntegerHeight() + 10;
+	int32 triangleWidth = triangleBounds.IntegerWidth() + 10;
+
+#define MODE(m) { m, #m }
 
 	struct {
 		drawing_mode mode;
 		const char *name;
 	} drawingModes[] = {
-		{ B_OP_COPY, "B_OP_COPY" },
-		{ B_OP_OVER, "B_OP_OVER" },
-		{ B_OP_ERASE, "B_OP_ERASE" },
-		{ B_OP_INVERT, "B_OP_INVERT" },
-		{ B_OP_SELECT, "B_OP_SELECT" },
-		{ B_OP_ADD, "B_OP_ADD" },
-		{ B_OP_SUBTRACT, "B_OP_SUBTRACT" },
-		{ B_OP_BLEND, "B_OP_BLEND" },
-		{ B_OP_MIN, "B_OP_MIN" },
-		{ B_OP_MAX, "B_OP_MAX" }
+		MODE(B_OP_COPY),
+		MODE(B_OP_OVER),
+		MODE(B_OP_ERASE),
+		MODE(B_OP_INVERT),
+		MODE(B_OP_SELECT),
+		MODE(B_OP_ADD),
+		MODE(B_OP_SUBTRACT),
+		MODE(B_OP_BLEND),
+		MODE(B_OP_MIN),
+		MODE(B_OP_MAX)
+	};
+
+	struct {
+		alpha_function mode;
+		const char *name;
+	} blendingModes[] = {
+		MODE(B_ALPHA_COMPOSITE_SOURCE_OVER),
+		MODE(B_ALPHA_COMPOSITE_SOURCE_IN),
+		MODE(B_ALPHA_COMPOSITE_SOURCE_OUT),
+		MODE(B_ALPHA_COMPOSITE_SOURCE_ATOP),
+		MODE(B_ALPHA_COMPOSITE_DESTINATION_OVER),
+		MODE(B_ALPHA_COMPOSITE_DESTINATION_IN),
+		MODE(B_ALPHA_COMPOSITE_DESTINATION_OUT),
+		MODE(B_ALPHA_COMPOSITE_DESTINATION_ATOP),
+		MODE(B_ALPHA_COMPOSITE_XOR),
+		MODE(B_ALPHA_COMPOSITE_CLEAR),
+		MODE(B_ALPHA_COMPOSITE_DIFFERENCE),
+		MODE(B_ALPHA_COMPOSITE_LIGHTEN),
+		MODE(B_ALPHA_COMPOSITE_DARKEN)
 	};
 
 	int32 modeCount = sizeof(drawingModes) / sizeof(drawingModes[0]);
@@ -312,6 +368,92 @@ DrawingModeView::Draw(BRect updateRect)
 		DrawString(drawingModes[i].name, BPoint(imageWidth * 2,
 			imageHeight * i + 20));
 	}
+
+#ifdef DUMP_BLENDING_RESULTS
+	BTranslatorRoster* roster = BTranslatorRoster::Default();
+	if (roster == NULL)
+		abort();
+
+	translator_id* outId;
+	int32 outCount;
+	translation_format pngFormat;
+	roster->GetAllTranslators(&outId, &outCount);
+	for(int32 i = 0; i < outCount; ++i) {
+		const translation_format* formats;
+		int32 formatCount;
+		roster->GetOutputFormats(outId[i], &formats, &formatCount);
+		for(int32 j = 0; j < formatCount; ++j) {
+			if(strcmp(formats[j].MIME, "image/png") == 0) {
+				pngFormat = formats[j];
+			}
+		}
+	}
+
+	status_t r = B_OK;
+	{
+		BFile file("DESTINATION.png",
+			B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
+		BBitmapStream stream(fTriangleLeft);
+		r = roster->Translate(&stream, NULL, NULL, &file, pngFormat.type);
+		if(r != B_OK)
+			fprintf(stderr, "Failed to save PNG file for destination\n");
+		stream.DetachBitmap(&fTriangleLeft);
+	}
+	{
+		BFile file("SOURCE.png", B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
+		BBitmapStream stream(fTriangleRight);
+		r = roster->Translate(&stream, NULL, NULL, &file, pngFormat.type);
+		if(r != B_OK)
+			fprintf(stderr, "Failed to save PNG file for source\n");
+		stream.DetachBitmap(&fTriangleRight);
+	}
+#endif
+
+	modeCount = sizeof(blendingModes) / sizeof(blendingModes[0]);
+	const int columnOffset = 180;
+	BView *blitter = new BView(BRect(0, 0, 31, 31),
+		"blitter", B_FOLLOW_ALL, B_WILL_DRAW);
+	BBitmap *resultBitmap = new BBitmap(BRect(0, 0, 31, 31),
+		B_RGBA32, true, false);
+	resultBitmap->AddChild(blitter);
+	for (int32 i = 0; i < modeCount; i++) {
+		resultBitmap->Lock();
+		blitter->SetDrawingMode(B_OP_COPY);
+		blitter->SetHighColor(0, 0, 0, 0);
+		blitter->FillRect(resultBitmap->Bounds());
+		blitter->DrawBitmap(fTriangleLeft, B_ORIGIN);
+		blitter->SetDrawingMode(B_OP_ALPHA);
+		blitter->SetBlendingMode(B_PIXEL_ALPHA, blendingModes[i].mode);
+		blitter->DrawBitmap(fTriangleRight, B_ORIGIN);
+		resultBitmap->Unlock();
+
+#ifdef DUMP_BLENDING_RESULTS
+		BBitmapStream stream(resultBitmap);
+		BString fileName(blendingModes[i].name);
+		BFile file(fileName.Append(".png"),
+			B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
+
+		r = roster->Translate(&stream, NULL, NULL, &file, pngFormat.type);
+		if(r != B_OK) {
+			fprintf(stderr, "Failed to save PNG file for %s\n",
+				blendingModes[i].name);
+		}
+
+		stream.DetachBitmap(&resultBitmap);
+#endif
+
+		SetDrawingMode(B_OP_ALPHA);
+		SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
+		DrawBitmap(resultBitmap, BPoint(columnOffset, triangleHeight * i));
+
+		SetDrawingMode(B_OP_OVER);
+		DrawString(blendingModes[i].name, BPoint(columnOffset + triangleWidth,
+			triangleHeight * i + 20));
+	}
+	resultBitmap->Lock();
+	resultBitmap->RemoveChild(blitter);
+	delete resultBitmap;
+	delete blitter;
 }
 
 

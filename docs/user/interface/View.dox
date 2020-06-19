@@ -2124,9 +2124,11 @@ SetViewColor(Parent()->ViewColor());
 	\param alphaFunc Set to one of the following:
 	- \c B_ALPHA_OVERLAY Used for drawing a image with transparency over an opaque
 	     background.
-	- \c B_ALPHA_COMPOSITE Used to composite two or more transparent images
+	- \c B_ALPHA_COMPOSITE_* Used to composite two or more transparent images
 	     together offscreen to produce a new image drawn using
-		 \c B_ALPHA_OVERLAY mode.
+	     \c B_ALPHA_OVERLAY mode.
+	\note Modes other than \c B_ALPHA_OVERLAY and \c B_ALPHA_COMPOSITE work
+	      only with \c B_PIXEL_ALPHA.
 
 	\since BeOS R5
 */

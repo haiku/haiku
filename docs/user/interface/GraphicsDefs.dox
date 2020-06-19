@@ -111,3 +111,204 @@
 
 	\since BeOS R3
 */
+
+
+/*!
+	\var alpha_function B_ALPHA_COMPOSITE_SOURCE_OVER
+
+	Draws source over destination preserving transparency. Same as
+	\c B_ALPHA_COMPOSITE.
+
+	\image{inline} html B_ALPHA_COMPOSITE_SOURCE.png "Source"
+	->
+	\image{inline} html B_ALPHA_COMPOSITE_DESTINATION.png "Destination"
+	=
+	\image{inline} html B_ALPHA_COMPOSITE_SOURCE_OVER.png "Result"
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var alpha_function B_ALPHA_COMPOSITE_SOURCE_IN
+
+	Draws source only where destination is not transparent.
+
+	\image{inline} html B_ALPHA_COMPOSITE_SOURCE.png "Source"
+	->
+	\image{inline} html B_ALPHA_COMPOSITE_DESTINATION.png "Destination"
+	=
+	\image{inline} html B_ALPHA_COMPOSITE_SOURCE_IN.png "Result"
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var alpha_function B_ALPHA_COMPOSITE_SOURCE_OUT
+
+	Draws source only where destination is transparent.
+
+	\image{inline} html B_ALPHA_COMPOSITE_SOURCE.png "Source"
+	->
+	\image{inline} html B_ALPHA_COMPOSITE_DESTINATION.png "Destination"
+	=
+	\image{inline} html B_ALPHA_COMPOSITE_SOURCE_OUT.png "Result"
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var alpha_function B_ALPHA_COMPOSITE_SOURCE_ATOP
+
+	Draws source only where destination is not transparent. Colors from both
+	are used in the result.
+
+	\image{inline} html B_ALPHA_COMPOSITE_SOURCE.png "Source"
+	->
+	\image{inline} html B_ALPHA_COMPOSITE_DESTINATION.png "Destination"
+	=
+	\image{inline} html B_ALPHA_COMPOSITE_SOURCE_ATOP.png "Result"
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var alpha_function B_ALPHA_COMPOSITE_DESTINATION_OVER
+
+	Draws source where destination is transparent, making it appear as if it
+	is drawn behind.
+
+	\image{inline} html B_ALPHA_COMPOSITE_SOURCE.png "Source"
+	->
+	\image{inline} html B_ALPHA_COMPOSITE_DESTINATION.png "Destination"
+	=
+	\image{inline} html B_ALPHA_COMPOSITE_DESTINATION_OVER.png "Result"
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var alpha_function B_ALPHA_COMPOSITE_DESTINATION_IN
+
+	Blends source alpha channel with destination.
+
+	\image{inline} html B_ALPHA_COMPOSITE_SOURCE.png "Source"
+	->
+	\image{inline} html B_ALPHA_COMPOSITE_DESTINATION.png "Destination"
+	=
+	\image{inline} html B_ALPHA_COMPOSITE_DESTINATION_IN.png "Result"
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var alpha_function B_ALPHA_COMPOSITE_DESTINATION_OUT
+
+	Blends inverse of source alpha channel with destination. Result appears as
+	if source was cut out of destination.
+
+	\image{inline} html B_ALPHA_COMPOSITE_SOURCE.png "Source"
+	->
+	\image{inline} html B_ALPHA_COMPOSITE_DESTINATION.png "Destination"
+	=
+	\image{inline} html B_ALPHA_COMPOSITE_DESTINATION_OUT.png "Result"
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var alpha_function B_ALPHA_COMPOSITE_DESTINATION_ATOP
+
+	Draws source only where it is not transparent. Destination is blended on
+	top of it. Colors from both are used in the result.
+
+	\image{inline} html B_ALPHA_COMPOSITE_SOURCE.png "Source"
+	->
+	\image{inline} html B_ALPHA_COMPOSITE_DESTINATION.png "Destination"
+	=
+	\image{inline} html B_ALPHA_COMPOSITE_DESTINATION_ATOP.png "Result"
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var alpha_function B_ALPHA_COMPOSITE_XOR
+
+	Result is transparent only where both source and destination are transparent
+	or opaque.
+
+	\image{inline} html B_ALPHA_COMPOSITE_SOURCE.png "Source"
+	->
+	\image{inline} html B_ALPHA_COMPOSITE_DESTINATION.png "Destination"
+	=
+	\image{inline} html B_ALPHA_COMPOSITE_XOR.png "Result"
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var alpha_function B_ALPHA_COMPOSITE_CLEAR
+
+	Erases destination to full transparency, regardless of source alpha value.
+
+	\image{inline} html B_ALPHA_COMPOSITE_SOURCE.png "Source"
+	->
+	\image{inline} html B_ALPHA_COMPOSITE_DESTINATION.png "Destination"
+	=
+	\image{inline} html B_ALPHA_COMPOSITE_CLEAR.png "Result"
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var alpha_function B_ALPHA_COMPOSITE_DIFFERENCE
+
+	Subtracts both inputs in a way that always yields positive result.
+
+	\image{inline} html B_ALPHA_COMPOSITE_SOURCE.png "Source"
+	->
+	\image{inline} html B_ALPHA_COMPOSITE_DESTINATION.png "Destination"
+	=
+	\image{inline} html B_ALPHA_COMPOSITE_DIFFERENCE.png "Result"
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var alpha_function B_ALPHA_COMPOSITE_LIGHTEN
+
+	Retains lighter pixels of both inputs.
+
+	\image{inline} html B_ALPHA_COMPOSITE_SOURCE.png "Source"
+	->
+	\image{inline} html B_ALPHA_COMPOSITE_DESTINATION.png "Destination"
+	=
+	\image{inline} html B_ALPHA_COMPOSITE_LIGHTEN.png "Result"
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var alpha_function B_ALPHA_COMPOSITE_DARKEN
+
+	Retains darker pixels of both inputs.
+
+	\image{inline} html B_ALPHA_COMPOSITE_SOURCE.png "Source"
+	->
+	\image{inline} html B_ALPHA_COMPOSITE_DESTINATION.png "Destination"
+	=
+	\image{inline} html B_ALPHA_COMPOSITE_DARKEN.png "Result"
+
+	\since Haiku R1
+*/
