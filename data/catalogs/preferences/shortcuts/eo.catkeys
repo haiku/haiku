@@ -1,7 +1,7 @@
 1	esperanto	x-vnd.Haiku-Shortcuts	3834857117
 *MouseUp	ShortcutsWindow		*MusonSupren
 Application	ShortcutsWindow		Programo
-Option	ShortcutsSpec	Name for modifier on keyboard	Opcio
+Option	ShortcutsSpec	Name for modifier on keyboard	Opciklavo
 Save changes before closing?	ShortcutsWindow		Ĉu konservi ŝanĝojn antaŭ fermi?
 Revert to saved	ShortcutsWindow		Reveni al konservita
 Don't save	ShortcutsWindow		Ne konservi
@@ -9,25 +9,25 @@ Don't save	ShortcutsWindow		Ne konservi
 *Beep	ShortcutsWindow		*Pepo
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		La Ŝparklavoj ne povis konservi vian klavan atribuaron.
 Save	ShortcutsWindow		Konservi
-Either	ShortcutsSpec		Aŭ
+Either	ShortcutsSpec		Ajna
 Oh no	ShortcutsWindow		Ho ne
 Key	ShortcutsWindow		Klavo
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*SendiMesaĝon application/x-vnd.Be-TRAK 'Tfnd'
 Select	ShortcutsWindow		Elekti
-Shortcuts	System name		La Ŝparklavoj
+Shortcuts	System name		La Ŝparklavoj (Shortcuts)
 Quit	ShortcutsWindow		Ĉesi
-(Choose application with file requester)	ShortcutsWindow		(Elektu aplikaĵon per dosiera serĉilo)
+(Choose application with file requester)	ShortcutsWindow		(Elektu programon per dosiera serĉilo)
 Cancel	ShortcutsWindow		Nuligi
 *MoveMouse +20 +0	ShortcutsWindow		*ŜoviMuson +20 +0
-Control	ShortcutsSpec	Name for modifier on keyboard	Kontrola
+Control	ShortcutsSpec	Name for modifier on keyboard	Stirklavo
 Left	ShortcutsSpec		Maldekstra
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		La Ŝparklavoj ne sukcesis analizi vian dosieron de klava atribuaro!
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		La Ŝparklavoj ne sukcesis konservi vian dosieron de klava atribuaro!
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsertiĈenon \"Via teksto ĉi tie\"
 Remove selected shortcut	ShortcutsWindow		Forigi elektitan klavan atribuon
 Error, NULL state description?	ShortcutsSpec		Eraro, NULL en stata priskribo?
-Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
-Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		La Ŝparklavoj ne sukcesis uzi vian klavan atribuaron!
+Alt	ShortcutsSpec	Name for modifier on keyboard	Alternativklavo
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		La Ŝparklavoj ne sukcesis uzi vian dosieron de klava atribuaro!
 Save & apply	ShortcutsWindow		Konservi kaj uzi
 Open	ShortcutsWindow		Uzi
 Append	ShortcutsWindow		Aldoni

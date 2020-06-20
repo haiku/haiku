@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-MediaPlayer	1313616492
+1	turkish	x-vnd.Haiku-MediaPlayer	1961774506
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Girdiyi Çöp'e taşı
 Close	MediaPlayer-PlaylistWindow		Kapat
 Volume of background clips	MediaPlayer-SettingsWindow		Arka plan kliplerinin ses düzeyi
@@ -35,6 +35,7 @@ Full volume	MediaPlayer-SettingsWindow		Tam ses
 Start media server	MediaPlayer-Main		Ortam sunucusu başlat
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Ortam sunucusu çalışmıyor gibi görünüyor.\nBaşlatılsın mı?
 Location	MediaPlayer-InfoWin		Konum
+Opening '%s'.	MediaPlayer-Main		'%s' açılıyor.
 Medium	MediaPlayer-SettingsWindow		Orta
 Play mode	MediaPlayer-SettingsWindow		Oynatma kipi
 Playlist	MediaPlayer-PlaylistWindow		Oynatma Listesi

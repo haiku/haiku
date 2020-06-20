@@ -1,31 +1,44 @@
-1	esperanto	x-vnd.Haiku-CharacterMap	661269597
+1	esperanto	x-vnd.Haiku-CharacterMap	1685391092
+Tirhuta	UnicodeBlocks		Tirhuta, la tradicia maitila abugida skribsistemo (normo ISO15924)
 Miscellaneous mathematical symbols B	UnicodeBlocks		Diversaj matematikaj simboloj-B
-Latin extended E	UnicodeBlocks		Latina etendita E
+Latin extended E	UnicodeBlocks		Latina etendaĵo E
+Dogra	UnicodeBlocks		Dogra lingvo
+Javanese	UnicodeBlocks		Java lingvo
 Saurashtra	UnicodeBlocks		Sauraŝtra
-Arabic supplement	UnicodeBlocks		Araba suplemento
+Arabic supplement	UnicodeBlocks		Suplemento al la araba 
 Hanunoo	UnicodeBlocks		Hanunoa
 Ogham	UnicodeBlocks		Ogama
+Inscriptional Pahlavi	UnicodeBlocks		Prapahlava skribsistemo
 Hebrew	UnicodeBlocks		Hebrea
 Katakana	UnicodeBlocks		Katakana
 Miao	UnicodeBlocks		La miaa lingvo
-Mongolian	UnicodeBlocks		Mongola
+Mro	UnicodeBlocks		Mroa lingvo
+Mongolian	UnicodeBlocks		Mongola lingvo
+Yezidi	UnicodeBlocks		Kurmanĝia (norda kurda) lingvo
 Linear B ideograms	UnicodeBlocks		Ideogramoj de linia skribo B
 Caucasian Albanian	UnicodeBlocks		Praudia lingvo (aghbania aŭ de Kaŭkaza Albanio)
 CJK unified ideographs extension D	UnicodeBlocks		Ĉin-japan-korea unuigita ideogramara etendaĵo D
+Sharada	UnicodeBlocks		Sanskrito, hindarja lingvaro (kaŝmira lingvo k.t.p)
 Multani	UnicodeBlocks		Multana
 Linear A	UnicodeBlocks		Linia skribo A
 CJK compatibility ideographs Supplement	UnicodeBlocks		Suplemento al Ĉin-japan-korea kongrua ideogramaro
 Pahawh Hmong	UnicodeBlocks		Skriba sistemo Pahajo de la miaa lingvo
-Bopomofo extended	UnicodeBlocks		Bopomofa etendita
+Bopomofo extended	UnicodeBlocks		Bopomofa etendaĵo
+Bassa Vah	UnicodeBlocks		Basaa lingvo 
 Georgian extended	UnicodeBlocks		Kartvela etendaĵo
 Mathematical alphanumeric symbols	UnicodeBlocks		Matematikaj literciferaj simboloj
 Coptic	UnicodeBlocks		Kopta
+Masaram Gondi	UnicodeBlocks		Skribsistemo por gondaj lingvoj kreita de Munŝi Mangal Singĥ Masaram 
 Cuneiform numbers and punctuation	UnicodeBlocks		Kojnoskribaj numeroj kaj interpunkcio
 Miscellaneous symbols	UnicodeBlocks		Diversaj simboloj
+Kana supplement	UnicodeBlocks		Suplemento al (strekaj/rondaj) kanaoj
+Medefaidrin	UnicodeBlocks		Medefajdrino
+Enclosed ideographic supplement	UnicodeBlocks		Suplemento al ĉirkaŭigitaj ideogramoj 
+Warang Citi	UnicodeBlocks		Hoa lingvo, abugido de Lako Bodra
 Vertical forms	UnicodeBlocks		Vertikalaj formoj
 Miscellaneous mathematical symbols A	UnicodeBlocks		Diversaj matematikaj simboloj-A
 CharacterMap	System name		LiterMapo
-Latin extended D	UnicodeBlocks		Latina etendita D
+Latin extended D	UnicodeBlocks		Latina etendaĵo D
 Aegean numbers	UnicodeBlocks		Egeaj numeroj
 Hangul syllables	UnicodeBlocks		Hangulaj silaboj
 Modifier tone letters	UnicodeBlocks		Literoj kiuj modifas tonon
@@ -34,28 +47,33 @@ View	CharacterWindow		Vidi
 Enclosed CJK letters and months	UnicodeBlocks		Ĉirkaŭigitaj Ĉin-japan-koreaj literoj kaj monatsignoj
 Deseret	UnicodeBlocks		Desereta
 Cham	UnicodeBlocks		Ĉama skribsistemo
-Cyrillic	UnicodeBlocks		Cirila
+Cyrillic	UnicodeBlocks		Cirila skribsistemo
 Shavian	UnicodeBlocks		Ŝava alfabeto
 Tangut	UnicodeBlocks		Tanguta skribsistemo
 CJK unified ideographs extension C	UnicodeBlocks		Ĉin-japan-korea unuigita ideogramara etendaĵo C
 Ancient Greek musical notation	UnicodeBlocks		Antikva greka muzika notacio
 Thai	UnicodeBlocks		Taja
-Ethiopic supplement	UnicodeBlocks		Etiopa suplemento
+Ethiopic supplement	UnicodeBlocks		Suplemento al la etiopa
+Chess symbols	UnicodeBlocks		Signoj de ŝako
 Yijing hexagram symbols	UnicodeBlocks		Heksagramoj de la Libro de ŝanĝiĝoj
 Ideographic symbols and punctuation	UnicodeBlocks		Ideografiaj simboloj kaj interpunkcio
 File	CharacterWindow		Dosiero
-Myanmar	UnicodeBlocks		Birma
+Myanmar	UnicodeBlocks		La birma
 Tifinagh	UnicodeBlocks		Tifinaĥa abĝado de berbera/maziĥa lingvaro (normo ISO15924)
 Musical symbols	UnicodeBlocks		Muzikaj Simboloj
+Bamum supplement	UnicodeBlocks		Suplemento al bamuma skribsistemo de Ibrahimo Nĵoja
 Arabic presentation forms B	UnicodeBlocks		Arabaj prezentformoj-B
 Cypriot syllabary	UnicodeBlocks		Kipra silabaro
 IPA extensions	UnicodeBlocks		IFA-etendaĵoj
 Katakana phonetic extensions	UnicodeBlocks		Katakana fonetikaj etendaĵoj
 N'Ko	UnicodeBlocks		Nokoa skribo
-Cherokee supplement	UnicodeBlocks		Unikoda bloko por la ĉeroka
+Cherokee supplement	UnicodeBlocks		Suplemento al la ĉeroka
 Halfwidth and fullwidth forms	UnicodeBlocks		Formoj de plena kaj duona vasteco
 Counting rod numerals	UnicodeBlocks		Kalkulbastonaj ciferoj
-Latin extended C	UnicodeBlocks		Latina etendita C
+Supplemental arrows C	UnicodeBlocks		Suplemento al sagoj C
+Alchemical symbols	UnicodeBlocks		Signoj de alkemio
+Latin extended C	UnicodeBlocks		Latina etendaĵo C
+Old Turkic	UnicodeBlocks		Orĥona lingvo (malnovtjurka lingvo) 
 Combining diacritical marks for symbols	UnicodeBlocks		Kunligaj diakritaĵoj por simboloj
 Osage	UnicodeBlocks		Skribsistemo de popolo de Meza akvo, indiĝenoj de Oklahomo en Usono (normo ISO15924)
 Combining diacritical marks supplement	UnicodeBlocks		Suplemento al kunligaj diakritaĵoj
@@ -66,66 +84,87 @@ CJK compatibility forms	UnicodeBlocks		Ĉin-japan-koreaj kongruaj formoj
 Old Hungarian	UnicodeBlocks		Hungara malnova
 CJK unified ideographs extension B	UnicodeBlocks		Ĉin-japan-korea unuigita ideogramara etendaĵo B
 Ahom	UnicodeBlocks		Ahoma
+Duployan	UnicodeBlocks		Stenografio de Émile Duployé
 Early Dynastic Cuneiform	UnicodeBlocks		Frua-Dinastika Kojnoskribo
+Kana extended A	UnicodeBlocks		Kanaa etendaĵo A
 Arabic presentation forms A	UnicodeBlocks		Arabaj prezentformoj-A
 Filter:	CharacterWindow		Filtrilo:
+Small Kana extension	UnicodeBlocks		Malgranda kanaa etendaĵo
 Kannada	UnicodeBlocks		Kanara
 Lydian	UnicodeBlocks		"Lydian"
 Hatran	UnicodeBlocks		Hatrana
-Glagolitic supplement	UnicodeBlocks		Aldono por glagolico
+Glagolitic supplement	UnicodeBlocks		Suplemento al glagolico
 Gurmukhi	UnicodeBlocks		Gurumuĥa ortografio, abugido de orienta Panĝabo (normo ISO15924)
-Supplemental arrows B	UnicodeBlocks		Suplementaj sagoj-B
+Supplemental arrows B	UnicodeBlocks		Suplemento al sagoj B
 CJK unified ideographs	UnicodeBlocks		Ĉin-japan-korea unuigita ideogramaro
-Latin extended B	UnicodeBlocks		Latina etendita B
+Enclosed alphanumeric supplement	UnicodeBlocks		Suplemento al ĉirkaŭigitaj literciferoj
+Latin extended B	UnicodeBlocks		Latina etendaĵo B
 Phonetic extensions	UnicodeBlocks		Fonetikaj etendaĵoj
+Batak	UnicodeBlocks		Batakaj lingvoj de Indonezio
 Code	CharacterWindow		Kodo
 Block elements	UnicodeBlocks		Blokecaj elementoj
+Ethiopic extended A	UnicodeBlocks		Etiopa etendaĵo A
 Mahjong tiles	UnicodeBlocks		Maĝangaj Pecoj
 Carian	UnicodeBlocks		"Carian"
 Gothic	UnicodeBlocks		Gotika
 Specials	UnicodeBlocks		Specialaĵoj
+Sinhala Archaic numbers	UnicodeBlocks		Arkaikaj nombrosignoj de sinhala lingvo
 Syloti Nagri	UnicodeBlocks		Siloti Nagri skribsistemo
-Latin-1 supplement	UnicodeBlocks		Latin-1 suplemento
+Latin-1 supplement	UnicodeBlocks		Suplemento al Latin-1
 CJK unified ideographs extension A	UnicodeBlocks		Ĉin-japan-korea unuigita ideogramara etendaĵo A
 Linear B syllabary	UnicodeBlocks		Silabsignoj de linia skribo B
 Yi syllables	UnicodeBlocks		Skribsistemo de la siĉuana loloa (normo ISO15924)
 Currency symbols	UnicodeBlocks		Valutsimboloj
+Soyombo	UnicodeBlocks		Mongola skribsistemo de Zanabazar (normo ISO15924)
 Domino tiles	UnicodeBlocks		Domenpecoj
 Kayah Li	UnicodeBlocks		"Kajah Li"
 Oriya	UnicodeBlocks		Odia
 Ancient Greek numbers	UnicodeBlocks		Antikvaj grekaj numeroj
 Superscripts and subscripts	UnicodeBlocks		Superskriboj kaj subskriboj
 Osmanya	UnicodeBlocks		Somala
+Modi	UnicodeBlocks		Marata lingvo
 Small form variants	UnicodeBlocks		Etformaj variantoj
 Arrows	UnicodeBlocks		Sagoj
+Tangut supplement	UnicodeBlocks		Suplemento al tanguta skribsistemo
 Bengali	UnicodeBlocks		Bengala
 Phoenician	UnicodeBlocks		Fenica
 Ideographic description characters	UnicodeBlocks		Ideografiaj priskribaj signoj
-Supplemental arrows A	UnicodeBlocks		Suplementaj sagoj-A
+Supplemental arrows A	UnicodeBlocks		Suplemento al sagoj A
 Rejang	UnicodeBlocks		"Reĝang"
 Number forms	UnicodeBlocks		Formoj de numeroj
-Latin extended A	UnicodeBlocks		Latina etendita A
+Avestan	UnicodeBlocks		Avesta lingvo
+Latin extended A	UnicodeBlocks		Latina etendaĵo A
+Zanabazar Square	UnicodeBlocks		Mongola horizontala kvadrata skribsistemo de Zanabazar (normo ISO15924)
 Sundanese	UnicodeBlocks		Sunda
 Geometric shapes	UnicodeBlocks		Geometriaj formoj
 Clear	CharacterWindow		Vakigi
+Symbols and pictographs extended A	UnicodeBlocks		Signa kaj piktograma etendaĵo A
 Adlam	UnicodeBlocks		Skribsistemo por la fulana (normo ISO15924)
 Arabic	UnicodeBlocks		Araba
 Khmer symbols	UnicodeBlocks		Kmeraj Simboloj
 Ol Chiki	UnicodeBlocks		Santala
 Box drawing	UnicodeBlocks		Kadra desegno
+Egyptian hieroglyphs	UnicodeBlocks		Egiptaj hieroglifoj
 Vai	UnicodeBlocks		Vaja
-Ethiopic extended	UnicodeBlocks		Etiopa etendita
+Meetei Mayek extensions	UnicodeBlocks		Etendaĵo de manipura lingvo
+Ethiopic extended	UnicodeBlocks		Etiopa etendaĵo
 CJK compatibility	UnicodeBlocks		Ĉin-japan-koreaj kongruaj
 Tai Le	UnicodeBlocks		Taj-Lea
+Old Sogdian	UnicodeBlocks		Malnova abĵado de sogda lingvo
+Devanagari extended	UnicodeBlocks		Devanagara etendaĵo
 Lao	UnicodeBlocks		Laosa
+Shorthand format controls	UnicodeBlocks		Formatigiloj por stenografio
+Inscriptional Parthian	UnicodeBlocks		Skribsistemo por parta lingvo
 Optical character recognition	UnicodeBlocks		Optika signorekono
-Tamil	UnicodeBlocks		Tamila
-Greek extended	UnicodeBlocks		Greka etendita
+Tamil	UnicodeBlocks		La tamila
+Greek extended	UnicodeBlocks		Greka etendaĵo
+Myanmar extended B	UnicodeBlocks		Birma etendaĵo B
 Lepcha	UnicodeBlocks		Lepĉa
 Old italic	UnicodeBlocks		Antikva kursiva
 Quit	CharacterWindow		Ĉesi
+Playing cards	UnicodeBlocks		Signoj de ludkartoj
 Buhid	UnicodeBlocks		Abugido de indeĝenoj de Filipinoj (normo ISO15924)
-Supplementary private use area B	UnicodeBlocks		Suplementa privata interkonsenta aro-B
+Supplementary private use area B	UnicodeBlocks		Suplemento al aro por privata uzo B
 Cuneiform	UnicodeBlocks		Kojnoskriba
 Alphabetic presentation forms	UnicodeBlocks		Alfabetaj prezentadaj formoj
 Tangut components	UnicodeBlocks		Eroj de tanguta skribsistemo
@@ -137,42 +176,48 @@ Mathematical operators	UnicodeBlocks		Matematikaj operacisimboloj
 Bopomofo	UnicodeBlocks		Bopomofo
 Variation selectors	UnicodeBlocks		Variaĵaj elektiloj
 Variation selectors supplement	UnicodeBlocks		Suplemento al variaĵaj elektiloj
-Supplemental mathematical operators	UnicodeBlocks		Suplementaj matematikaj operacisimboloj
-Sinhala	UnicodeBlocks		Sinhala
+Supplemental mathematical operators	UnicodeBlocks		Suplemento al matematikaj operacisimboloj
+Sinhala	UnicodeBlocks		Sinhala lingvo
 Bhaiksuki	UnicodeBlocks		"Bhaiksuki"
 Ugaritic	UnicodeBlocks		Ugarita
-Cyrillic extended C	UnicodeBlocks		Cirila etendita-C
+Geometric shapes extended	UnicodeBlocks		Etendaĵo por Geometriaj formoj
+Transport and map symbols	UnicodeBlocks		Transportaj kaj mapaj signoj
+Tamil supplement	UnicodeBlocks		Suplemento al la tamila
+Cyrillic extended C	UnicodeBlocks		Cirila etendaĵo C
 Syriac	UnicodeBlocks		Siria
-Private use area	UnicodeBlocks		Aro pri privata interkonsento
-Supplement punctuation	UnicodeBlocks		Suplementa interpunkcio
+Private use area	UnicodeBlocks		Aro por privata uzo
+Supplement punctuation	UnicodeBlocks		Suplemento al interpunkcioj
 Lycian	UnicodeBlocks		Likia skribsistemo
+Myanmar extended A	UnicodeBlocks		Birma etendaĵo A
 Ancient symbols	UnicodeBlocks		Prasimboloj
 Miscellaneous symbols and arrows	UnicodeBlocks		Diversaj simboloj kaj sagoj
 Kharoshthi	UnicodeBlocks		Karoŝta
 Buginese	UnicodeBlocks		Buĝia
 Telugu	UnicodeBlocks		Telugua
-Cyrillic supplement	UnicodeBlocks		Cirila suplemento
+Cyrillic supplement	UnicodeBlocks		Suplemento al cirila skribsistemo
 Yi Radicals	UnicodeBlocks		Jiaj Radikoj
-Supplementary private use area A	UnicodeBlocks		Suplementa privata interkonsenta aro-A
+Supplementary private use area A	UnicodeBlocks		Suplemento al aro por privata uzo A
 Armenian	UnicodeBlocks		Armena
 Phags-pa	UnicodeBlocks		Mongola kvadrata skribsistemo de lamao Pĥagva (normo ISO15924)
+Meetei Mayek	UnicodeBlocks		Manipura lingvo
 CJK compatibility ideographs	UnicodeBlocks		Ĉin-japan-korea kongrua ideogramaro
-Show private blocks	CharacterWindow		Montri privatajn blokojn
-Latin extended additional	UnicodeBlocks		Latina etendita aldonaĵo
+Show private blocks	CharacterWindow		Montri blokojn por privata uzo
+Latin extended additional	UnicodeBlocks		Latina aldona etendaĵo
 Tibetan	UnicodeBlocks		Tibeta
 Combining diacritical marks	UnicodeBlocks		Kunligaj diakritaj signoj
 Tags	UnicodeBlocks		Etikedoj
 Khmer	UnicodeBlocks		Kmera
-Georgian supplement	UnicodeBlocks		Kartvela suplemento
+Hangul Jamo extended B	UnicodeBlocks		Hangula etendaĵo B
+Georgian supplement	UnicodeBlocks		Suplemento al la kartvela
 Tagalog	UnicodeBlocks		Tagaloga
 CJK unified ideographs extension F	UnicodeBlocks		Ĉin-japan-korea unuigita ideogramara etendaĵo F
-Supplemental Symbols and Pictographs	UnicodeBlocks		Helpaj signoj kaj piktogramoj
-Devanagari	UnicodeBlocks		Devanagara
+Supplemental Symbols and Pictographs	UnicodeBlocks		Suplemento al signoj kaj piktogramoj
+Devanagari	UnicodeBlocks		La devanagara
 Runic	UnicodeBlocks		Runa
 General punctuation	UnicodeBlocks		Ĝenerala interpunkcio
-Mongolian supplement	UnicodeBlocks		Mongola suplemento
+Mongolian supplement	UnicodeBlocks		Suplemento al la mongola
 Glagotic	UnicodeBlocks		Glagolica
-Cyrillic extended B	UnicodeBlocks		Cirila etendita-B
+Cyrillic extended B	UnicodeBlocks		Cirila etendaĵo B
 Anatolian hieroglyphs	UnicodeBlocks		Anatoliaj hieroglifoj
 Copy as escaped byte string	CharacterView		Kopii kiel bitoka ĉeno kun eskapiloj
 Tai Xuan Jing symbols	UnicodeBlocks		Signoj de "Tai Xuan Jing"
@@ -182,25 +227,28 @@ Basic Latin	UnicodeBlocks		Baza latina
 Greek and Coptic	UnicodeBlocks		Greka kaj kopta
 Kangxi radicals	UnicodeBlocks		Kanĝi-radikoj
 Copy character	CharacterView		Kopii Signon
-Hangul Jamo	UnicodeBlocks		Hangula jama
+Hangul Jamo	UnicodeBlocks		Hangulo
 Font	CharacterWindow		Tiparo
+Ornamental dingbats	UnicodeBlocks		Ornamaj vinjetoj
 Phaistos disc	UnicodeBlocks		Signoj de disko el "Phaistos"
 Miscellaneous technical	UnicodeBlocks		Diversaj teknikaj
 Braille patterns	UnicodeBlocks		Brajlaj ŝablonoj
-Enclosed alphanumerics	UnicodeBlocks		Enfermitaj literciferoj
+Enclosed alphanumerics	UnicodeBlocks		Ĉirkaŭigitaj literciferoj
 Thaana	UnicodeBlocks		Tana-skribo
-Ethiopic	UnicodeBlocks		Etiopa
+Ethiopic	UnicodeBlocks		La etiopa
 Byzantine musical symbols	UnicodeBlocks		Bizancaj muzikaj simboloj
 Gujarati	UnicodeBlocks		Guĝarata
-Hangul compatibility Jamo	UnicodeBlocks		Hangula kongrueca Jamo
+Hangul Jamo extended A	UnicodeBlocks		Hangula etendaĵo A
+Hangul compatibility Jamo	UnicodeBlocks		Hangula kongruaro
 Phonetic extensions supplement	UnicodeBlocks		Suplemento al fonetikaj etendaĵoj
 CJK unified ideographs extension E	UnicodeBlocks		Ĉin-japan-korea unuigita ideogramara etendaĵo E
 Old Persian	UnicodeBlocks		Antikva persa
 Malayalam	UnicodeBlocks		Malajala
-CJK radicals supplement	UnicodeBlocks		Ĉin-japan-korea kompanaĵa suplemento
+CJK radicals supplement	UnicodeBlocks		Suplemento al Ĉin-japan-korea kompanaĵaro
 Marchen	UnicodeBlocks		Marĉena skribsistemo
+Sogdian	UnicodeBlocks		Sogda lingvo
 Control pictures	UnicodeBlocks		Bildsimboloj de komandoj
-Cyrillic extended A	UnicodeBlocks		Cirila etendita-A
+Cyrillic extended A	UnicodeBlocks		Cirila etendaĵo A
 New Tai Lue	UnicodeBlocks		Nova skribsistemo por la taja de popolo ljuo (normo ISO 15924)
 Sutton SignWriting	UnicodeBlocks		Signo-Skribado de Sutono
 Limbu	UnicodeBlocks		Limbua

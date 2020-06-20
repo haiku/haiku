@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-ActivityMonitor	861506004
+1	german	x-vnd.Haiku-ActivityMonitor	4085022043
 Teams	DataSource		Teams
 Semaphores	DataSource		Semaphoren
 TX	DataSource	Shorter version for Sending	Senden
@@ -16,6 +16,7 @@ Receiving	DataSource		Empfangen
 Remove graph	ActivityView		Graph entfernen
 Swap space	DataSource		Auslagerungsspeicher
 CPU	DataSource		CPU
+CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		Aktualisierungsintervall:
 RX	DataSource	Shorter version for Receiving.	Empfangen
 Settings…	ActivityWindow		Einstellungen…
@@ -29,6 +30,7 @@ Used memory	DataSource		Benutzter Speicher
 %.1f faults/s	DataSource		%.1f Fehler/s
 Show legend	ActivityView		Legende anzeigen
 Cached memory	DataSource		Gecachter Speicher
+CPU %d usage	DataSource		CPU %d Auslastung
 File	ActivityWindow		Datei
 Ports	DataSource		Ports
 Page faults	DataSource		Seitenfehler

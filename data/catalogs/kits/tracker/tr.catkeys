@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-libtracker	1497671210
+1	turkish	x-vnd.Haiku-libtracker	285470499
 Created	ContainerWindow		Oluşturulma
 Icon	AttributesView		Simge
 Open and make preferred	OpenWithWindow		Aç ve tercih edilen yap
@@ -111,6 +111,7 @@ Edit templates…	TemplatesMenu		Şablonları düzenle…
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, other{# bayt}}
 8-bit integer	AttributesView		8 bit tamsayı
 8-bit unsigned integer	AttributesView		8 bit imzalanmamış tamsayı
+%s info	InfoWindow	window title	%s bilgisi
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used kullanılıyor -- %free kullanılmayan)
 Hide dotfiles	SettingsView		Nokta ile başlayan dosyaları gizle
 Trash	Model		Çöp

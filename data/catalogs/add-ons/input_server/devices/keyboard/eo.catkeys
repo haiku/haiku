@@ -4,7 +4,7 @@ Quit application	Team monitor		Ĉesi programon
 Restart the desktop	Team monitor		Relanĉi la labortablon
 Force reboot	Team monitor		Perforte restartigi
 Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Elektu programon el la supra listo kaj alklaku aŭ la butonon 'Mortigi programon' aŭ la butonon 'Ĉesi programon' por malfermi ĝin.\n\nTinu Ktrl+Alt+Forigi dum %ld sekondoj por restartigi.
-Team monitor	Team monitor		Teama observilo
+Team monitor	Team monitor		La Procezarobservilo
 Kill application	Team monitor		Ĉesigi programon
 Cancel	Team monitor		Nuligi
-(This team is a system component)	Team monitor		(Ĉi tiu teamo estas sistema konsistaĵo)
+(This team is a system component)	Team monitor		(Ĉi tiu procezaro estas sistema elemento)

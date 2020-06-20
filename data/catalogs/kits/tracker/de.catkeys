@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	3057808940
+1	german	x-vnd.Haiku-libtracker	1845608229
 Created	ContainerWindow		Erstellt
 Icon	AttributesView		Icon
 Open and make preferred	OpenWithWindow		Öffnen und zur Bevorzugten machen
@@ -109,6 +109,7 @@ Edit templates…	TemplatesMenu		Vorlagen bearbeiten…
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{(# Byte)} other{(# Bytes)}}
 8-bit integer	AttributesView		8 bit Integer
 8-bit unsigned integer	AttributesView		8 bit vorzeichenloser Integer
+%s info	InfoWindow	window title	%s Info
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used benutzt -- %free frei)
 Hide dotfiles	SettingsView		Mit \".\" beginnende Dateien ausblenden
 Trash	Model		Papierkorb

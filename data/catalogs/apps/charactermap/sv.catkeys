@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-CharacterMap	2966788416
+1	swedish	x-vnd.Haiku-CharacterMap	671591999
 Tirhuta	UnicodeBlocks		Tirhuta
 Miscellaneous mathematical symbols B	UnicodeBlocks		Diverse matematiska symboler B
 Latin extended E	UnicodeBlocks		Latin förlängd E
@@ -153,6 +153,7 @@ Rejang	UnicodeBlocks		Rejang
 Number forms	UnicodeBlocks		Numreriska former
 Avestan	UnicodeBlocks		Avestan
 Latin extended A	UnicodeBlocks		Latin A (utökad)
+Zanabazar Square	UnicodeBlocks		Zanabazar Square
 Sundanese	UnicodeBlocks		Sundanesiska
 Geometric shapes	UnicodeBlocks		Geometriska figurer
 Clear	CharacterWindow		Rensa

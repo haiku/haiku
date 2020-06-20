@@ -12,16 +12,16 @@ To output	AudioMixer		Al enigo
 not connected	AudioMixer		nekonektanta
 Refuse input format changes	AudioMixer		Rifuzi enigformajn ŝanĝojn
 Drop/repeat samples	AudioMixer		Ellasi/ripeti specimenojn
-Output channel sources	AudioMixer		Eligkanelaj fontoj
+Output channel sources	AudioMixer		Eligkanalaj fontoj
 dB	AudioMixer		dB
 Gain controls	AudioMixer		Pliigaj stiriloj
 Input mapping	AudioMixer		Eniga mapado
 Mute	AudioMixer		Silentigi
-Input channel destinations	AudioMixer		Enigkanelaj celoj
+Input channel destinations	AudioMixer		Enigkanalaj celoj
 To master	AudioMixer		Al majstro
 Master output	AudioMixer		Majstra eligo
 Setup	AudioMixer		Agordi
 Use non linear gain sliders (like BeOS R5)	AudioMixer		Uzu neliniajn pliigstirilojn (kiel BeOS R5)
 Gain	AudioMixer		Pliigo
 Allow output channel remapping	AudioMixer		Permesi eligkanalan remapadon
-Physical input channels	AudioMixer		Fizikaj enigaj kaneloj
+Physical input channels	AudioMixer		Fizikaj enigaj kanaloj

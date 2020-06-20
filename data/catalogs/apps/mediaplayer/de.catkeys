@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-MediaPlayer	1250854242
+1	german	x-vnd.Haiku-MediaPlayer	1899012256
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Eintrag in den Papierkorb verschieben
 Close	MediaPlayer-PlaylistWindow		Schließen
 Volume of background clips	MediaPlayer-SettingsWindow		Wiedergabe im Hintergrund
@@ -34,6 +34,7 @@ Full volume	MediaPlayer-SettingsWindow		Volle Lautstärke
 Start media server	MediaPlayer-Main		Mediaserver starten
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Der Mediaserver läuft anscheinend nicht.\nSoll er gestartet werden?
 Location	MediaPlayer-InfoWin		Ort
+Opening '%s'.	MediaPlayer-Main		Öffne '%s'.
 Medium	MediaPlayer-SettingsWindow		Mittel
 Play mode	MediaPlayer-SettingsWindow		Wiedergabe
 Playlist	MediaPlayer-PlaylistWindow		Playliste

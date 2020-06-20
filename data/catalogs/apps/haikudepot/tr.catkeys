@@ -1,5 +1,6 @@
-1	turkish	x-vnd.Haiku-HaikuDepot	3833361367
+1	turkish	x-vnd.Haiku-HaikuDepot	1546691996
 Repository update error	LocalRepositoryUpdateProcess		Depo güncelleme hatası
+Network error	ServerHelper		Ağ hatası
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Depo güncellenirken bir hata oluştu: %error%
 User Created	UserLoginWindow		Kullanıcı Oluşturuldu
 Check for updates…	MainWindow		Güncellemeleri denetle…
@@ -19,6 +20,7 @@ You have successfully authenticated as user %Nickname%.	UserLoginWindow		Kimlik 
 No user ratings available.	PackageInfoView		Kullanıcı oyu yok.
 Downloading package '%name%'	WorkStatusView		'%name%' paketi indiriliyor
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Sunucudan geri gönderilen veriyle gerekli CAPTCHA bilgisi alınamadı.
+A network transport error has arisen communicating with the server system: %s	ServerHelper		Sunucu sistemi ile iletişim kurarken bir ağ ulaşım hatası oluştu: %s
 Rating	PackageListView		Derecelendirme
 Synchronizing icons	ServerIconExportUpdateProcess		Simgeler eşitleniyor
 Does not start	RatePackageWindow		Başlamıyor
@@ -75,6 +77,7 @@ Reboot required	PackageManager		Yeniden başlatma gerekli
 Very unstable	RatePackageWindow		Kararlı değil
 Password:	UserLoginWindow		Parola:
 All packages	PackageListView		Tüm paketler
+This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Bu uygulama sunucu sistemi ile iletişim kurmak için çok eski. Sisteminizi güncelleyerek bu uygulamanın yeni bir sürümünü edinin. Gerekli en düşük sürüm: \"%s\".
 Stability	RatePackageWindow		Kararlılık
 Send	RatePackageWindow		Gönder
 Start package daemon	App		Paket hizmetini başlat
@@ -98,6 +101,7 @@ Repository	PackageListView		Depo
 The email is malformed.	UserLoginWindow		E-posta biçimi hatalı.
 Close	UserLoginWindow		Kapat
 Close	RatePackageWindow		Kapat
+An unexpected error has been sent from the server [%i]	ServerHelper		Sunucudan beklenmedik bir hata gönderildi [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		'%REPO_NAME%' depo paket bilgisi eşitleniyor
 View the usage conditions	UserLoginWindow		Kullanım koşullarını görüntüle
 Login issue	MainWindow		Giriş sorunu
@@ -122,6 +126,7 @@ Log out	MainWindow		Çıkış yap
 Comment language:	RatePackageWindow		Yorum dili:
 Status	PackageListView		Durum
 The password has been incorrectly repeated.	UserLoginWindow		İkinci parola girişinde yanlış(lar) var.
+Network transport error	ServerHelper		Ağ ulaşım hatası
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		Önceden [%Nickname%] kullanıcısına ait olan parola şu anda geçerli değil. Uygulamadan çıkış yapılacaktır; güncellenmiş parola ile yeniden giriş yapmanız gerekmektedir.
 Update	RatePackageWindow		Güncelle
 OK	ServerHelper		Tamam
@@ -137,6 +142,7 @@ The nickname is required.	UserLoginWindow		Takma ad gerekli.
 Source packages	MainWindow		Kaynak paketleri
 -	no package size		-
 Problem with working files	App		Çalışma dosyalarında sorun
+Server error	ServerHelper		Sunucu hatası
 Try again	App		Yeniden dene
 Rate package	RatePackageWindow		Paketi derecelendir
 Unknown	PackageListView		Bilinmeyen

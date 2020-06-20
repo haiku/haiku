@@ -1,27 +1,22 @@
-1	esperanto	x-vnd.Haiku-Notifications	332239666
+1	esperanto	x-vnd.Haiku-Notifications	3906219317
 Lower left	GeneralView		Malsupra maldekstra
 Application does not have a valid signature	NotificationView	Alert message	Programo ne havas validan subskribon
 Status	NotificationView		Stato
 Add…	NotificationView		Aldoni…
 Lower right	GeneralView		Malsupra dekstra
 Muted	NotificationView		Silentigita
-Window width:	GeneralView		Fenestra larĝo:
  is already listed	NotificationView	Alert message	 jam listigita
 OK	PrefletWin		Bone
 Notifications	PrefletWin		Sciigo
 Notifications preflet sample	PrefletWin		Ekzemplo de sciiga preferileto
 Mute notifications from this application	NotificationView		Silentigi sciigojn de ĉi aplikaĵo
-pixels	GeneralView		bilderoj
-seconds	GeneralView		sekundoj
 Revert	PrefletWin		Neigi
 Applications	PrefletView		Programoj
-Timeout:	GeneralView		Templimo:
 Upper right	GeneralView		Supra dekstra
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Iu eraro okazis dum konservado de agordo.\nEventuale libera diska spaco forestas.
 Defaults	PrefletWin		Defaŭltoj
 Upper left	GeneralView		Supra maldekstra
 Applications	NotificationView		Programoj
-Width:	GeneralView		Larĝo:
 General	PrefletView		Ĝenerala
 OK	NotificationView		Bone
 Follow Deskbar	GeneralView		Sekvi la Laborstrion

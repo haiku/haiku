@@ -1,5 +1,6 @@
-1	german	x-vnd.Haiku-HaikuDepot	1812825467
+1	german	x-vnd.Haiku-HaikuDepot	1546691996
 Repository update error	LocalRepositoryUpdateProcess		Fehler bei Paketquellenaktualisierung
+Network error	ServerHelper		Netzwerk Fehler
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Fehler bei der Aktualisierung der Paketquelle: %error%
 User Created	UserLoginWindow		Benutzerkonto erstellt
 Check for updates…	MainWindow		Aktualisierungen suchen…
@@ -19,6 +20,7 @@ You have successfully authenticated as user %Nickname%.	UserLoginWindow		Der Ben
 No user ratings available.	PackageInfoView		Keine Bewertungen vorhanden.
 Downloading package '%name%'	WorkStatusView		Paket '%name%' wird heruntergeladen
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Aus den vom Server geschickten Daten konnten nicht die benötigten Captcha Infos gewonnen werden.
+A network transport error has arisen communicating with the server system: %s	ServerHelper		Bei der Kommunikation mit dem Server ist ein Fehler im Netzwerk-Transport aufgetreten: %s
 Rating	PackageListView		Bewertung
 Synchronizing icons	ServerIconExportUpdateProcess		Synchronisierungs-Icons
 Does not start	RatePackageWindow		Startet nicht
@@ -52,6 +54,7 @@ Package action failed	PackageInfoView		Paket-Aktion fehlgeschlagen
 No changelog available.	PackageInfoView		Änderungsprotokoll nicht vorhanden.
 Error	App		Fehler
 There was a puzzling response from the web service.	UserLoginWindow		Der Web-Dienst hat mit einer wirren Meldung geantwortet.
+Version	PackageListView		Version
 Not logged in	MainWindow		Nicht angemeldet
 No, quit HaikuDepot	App		Nein, HaikuDepot beenden
 Featured packages	FeaturedPackagesView		Empfohlene Pakete
@@ -74,6 +77,7 @@ Reboot required	PackageManager		Neustart erforderlich
 Very unstable	RatePackageWindow		Sehr instabil
 Password:	UserLoginWindow		Kennwort:
 All packages	PackageListView		Alle Pakete
+This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Diese Anwendung ist zu alt, um mit dem Server zu kommunizieren. Für eine neuere Version muss das System aktualisiert werden. Die Anwendung muss mindestens in Version \"%s\" vorliegen.
 Stability	RatePackageWindow		Stabilität
 Send	RatePackageWindow		Senden
 Start package daemon	App		Paket-Daemon starten
@@ -97,6 +101,7 @@ Repository	PackageListView		Paketquelle
 The email is malformed.	UserLoginWindow		Das Format der Emailadresse ist inkorrekt.
 Close	UserLoginWindow		Schließen
 Close	RatePackageWindow		Schließen
+An unexpected error has been sent from the server [%i]	ServerHelper		Vom Server wurde ein unerwarteter Fehler geschickt [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synchronisieren von Paketdaten für Paketquelle '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Nutzungsbedingungen lesen
 Login issue	MainWindow		Anmeldungsproblem
@@ -121,6 +126,7 @@ Log out	MainWindow		Abmelden
 Comment language:	RatePackageWindow		Kommentar-Sprache:
 Status	PackageListView		Status
 The password has been incorrectly repeated.	UserLoginWindow		Das Kennwort wurde falsch wiederholt.
+Network transport error	ServerHelper		Netzwerk-Transport Fehler
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		Das für den Benutzer [%Nickname%] hinterlegte Kennwort ist ungültig. Der Benutzer wird daher von dieser Anwendung abgemeldet. Bitte erneut mit dem aktualisierten Kennwort anmelden.
 Update	RatePackageWindow		Aktualisieren
 OK	ServerHelper		OK
@@ -136,6 +142,7 @@ The nickname is required.	UserLoginWindow		Der Benutzername wird benötigt.
 Source packages	MainWindow		Quellcode-Pakete
 -	no package size		-
 Problem with working files	App		Problem mit Arbeitsdateien
+Server error	ServerHelper		Server Fehler
 Try again	App		Nochmal versuchen
 Rate package	RatePackageWindow		Paket bewerten
 Unknown	PackageListView		Unbekannt

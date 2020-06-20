@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-CharacterMap	2966788416
+1	japanese	x-vnd.Haiku-CharacterMap	671591999
 Tirhuta	UnicodeBlocks		ティルフータ文字
 Miscellaneous mathematical symbols B	UnicodeBlocks		各種数学記号 B
 Latin extended E	UnicodeBlocks		ラテン文字拡張 E
@@ -153,6 +153,7 @@ Rejang	UnicodeBlocks		ルジャン文字
 Number forms	UnicodeBlocks		数字に準じるもの
 Avestan	UnicodeBlocks		アヴェスター文字
 Latin extended A	UnicodeBlocks		ラテン文字拡張 A
+Zanabazar Square	UnicodeBlocks		ザナバザル方形文字
 Sundanese	UnicodeBlocks		スンダ文字
 Geometric shapes	UnicodeBlocks		幾何学模様
 Clear	CharacterWindow		クリア

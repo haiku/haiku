@@ -29,7 +29,7 @@ Error getting repository configuration for %name%.	RepositoriesView	Alert error 
 Description	TaskLooper	Failed task error description	Priskribo
 Failed	TaskLooper	Failed task status message	Malsukceso
 Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	Bona novaĵo! La tasko por deponejo %name% estas plenumita.
-Some tasks are still running. Stop these tasks and quit?	RepositoriesWindow	Application quit alert message	Iuj taskoj ankoraŭ estas funkciantaj. Ĉu vi volas halti ilin kaj forlasi?
+Some tasks are still running. Stop these tasks and quit?	RepositoriesWindow	Application quit alert message	Iuj taskoj ankoraŭ daŭras ruli. Ĉu vi volas halti ilin kaj forlasi?
 This repository URL already exists.	RepositoriesView	Error message	Ĉi tiu deponeja URL jam ekzistas.
 Repositories	System name		La Deponejoj (Repositories)
 Changes pending:	RepositoriesView	Status view text	Atendataj ŝanĝoj:

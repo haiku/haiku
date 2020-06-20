@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku.TextSearch	2224690775
+1	turkish	x-vnd.Haiku.TextSearch	3859480651
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Lütfen sizin için İzleyici'de seçilmesini dilediğiniz dosyaları seçin.
 %appname% : %path%	GrepWindow		%appname% : %path%
 Failed to start xargs program!	Grepper		xargs programı başlatılamadı!
@@ -30,6 +30,7 @@ Open files in code editor	GrepWindow		Dosyaları kod düzenleyicisinde aç
 Failed to open output pipe!	Grepper		Çıktı veri yolu açılamadı!
 Cancel	GrepWindow		İptal
 History	GrepWindow		Geçmiş
+TextSearch	System name		Metin Arama
 File	GrepWindow		Dosya
 Case-sensitive	GrepWindow		BÜYÜK/küçük harf duyarlı
 Select all	GrepWindow		Tümünü seç

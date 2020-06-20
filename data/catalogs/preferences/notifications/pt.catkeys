@@ -1,27 +1,22 @@
-1	portuguese	x-vnd.Haiku-Notifications	332239666
+1	portuguese	x-vnd.Haiku-Notifications	3906219317
 Lower left	GeneralView		Inferior esquerdo
 Application does not have a valid signature	NotificationView	Alert message	A aplicação não tem uma assinatura válida
 Status	NotificationView		Estado
 Add…	NotificationView		Adicionar…
 Lower right	GeneralView		Em baixo à direita
 Muted	NotificationView		Mudo
-Window width:	GeneralView		Largura da janela:
  is already listed	NotificationView	Alert message	 já aparece na lista
 OK	PrefletWin		OK
 Notifications	PrefletWin		Notificações
 Notifications preflet sample	PrefletWin		Amostra do painel de preferências de notificações
 Mute notifications from this application	NotificationView		Silenciar notificações desta aplicação
-pixels	GeneralView		pixels
-seconds	GeneralView		segundos
 Revert	PrefletWin		Reverter
 Applications	PrefletView		Aplicações
-Timeout:	GeneralView		Tempo de expiração:
 Upper right	GeneralView		Em cima à direita
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Ocorreu um erro ao guardar as preferências.\nÉ possível que esteja a ficar sem espaço em disco.
 Defaults	PrefletWin		Predefinições
 Upper left	GeneralView		Superior direito
 Applications	NotificationView		Aplicações
-Width:	GeneralView		Largura:
 General	PrefletView		Geral
 OK	NotificationView		OK
 Follow Deskbar	GeneralView		Seguir a Deskbar

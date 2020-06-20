@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-CharacterMap	2966788416
+1	catalan; valencian	x-vnd.Haiku-CharacterMap	671591999
 Tirhuta	UnicodeBlocks		Tirhuta
 Miscellaneous mathematical symbols B	UnicodeBlocks		Símbols matemàtics diversos - B
 Latin extended E	UnicodeBlocks		Llatí ampliat E
@@ -153,6 +153,7 @@ Rejang	UnicodeBlocks		Rejang
 Number forms	UnicodeBlocks		Formes de números
 Avestan	UnicodeBlocks		Avestan
 Latin extended A	UnicodeBlocks		Llatí ampliat A
+Zanabazar Square	UnicodeBlocks		Zanabazar quadrat
 Sundanese	UnicodeBlocks		Sudanès
 Geometric shapes	UnicodeBlocks		Formes geomètriques
 Clear	CharacterWindow		Neteja

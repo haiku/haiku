@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-ActivityMonitor	3672498538
+1	turkish	x-vnd.Haiku-ActivityMonitor	2601047281
 Teams	DataSource		Takımlar
 Semaphores	DataSource		Semaforlar
 TX	DataSource	Shorter version for Sending	TX
@@ -17,6 +17,7 @@ Remove graph	ActivityView		Grafiği kaldır
 Swap space	DataSource		Takas alanı
 CPU	DataSource		CPU
 ActivityMonitor	System name		Etkinlik Monitörü
+CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		Yenileme aralığı:
 RX	DataSource	Shorter version for Receiving.	RX
 Settings…	ActivityWindow		Ayarlar…
@@ -30,6 +31,7 @@ Used memory	DataSource		Kullanılan bellek
 %.1f faults/s	DataSource		%.1f hata/s
 Show legend	ActivityView		Göstergeleri aç
 Cached memory	DataSource		Önbellekteki dosya
+CPU %d usage	DataSource		CPU %d kullanımı
 File	ActivityWindow		Dosya
 Ports	DataSource		Portlar
 Page faults	DataSource		Sayfa hataları

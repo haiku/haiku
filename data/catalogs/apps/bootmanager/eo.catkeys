@@ -2,7 +2,7 @@
 Old Master Boot Record backup failure	BootManagerController	Title	Eraro okazis dum enarkivigado de antaŭa Ĉefa Ŝargodosiero (MBR)
 At least one partition must be selected!	BootManagerController		Almenaŭ unu subdisko devas esti elektita!
 No space available!	DrivesPage	Cannot install	Ne estas libera spaco!
-Boot Manager is unable to read the partition table!	BootManagerController		Praŝarga Administrilo ne povis legi la subdiska tablo!
+Boot Manager is unable to read the partition table!	BootManagerController		Praŝarga Administrilo ne povis legi la subdiskan tablon!
 Immediately	DefaultPartitionPage		Tuj
 Uninstall Boot Manager	UninstallPage	Title	Malinstali Praŝargan Administrilon
 Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Nekonata

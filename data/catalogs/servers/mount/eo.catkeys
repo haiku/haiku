@@ -4,12 +4,12 @@ Error mounting volume:\n\n%s	AutoMounter		Eraro de voluma muntado:\n\n%s
 Cancel	AutoMounter		Nuligi
 OK	AutoMounter		Bone
 Unmount error	AutoMounter		Eraro de malmuntado
-The file system on this volume is not the Be file system. It is recommended to mount it in read-only mode, to prevent unintentional data loss because of bugs in Haiku.	AutoMounter		La dosiersistemo sur ĉi portilo ne estas la Be dosiersistemo. Ni rekomendas, ke vi surmeti ĝin nurlegeble, por eviti nevolan datumperdon pro Haiku cimoj.
+The file system on this volume is not the Be file system. It is recommended to mount it in read-only mode, to prevent unintentional data loss because of bugs in Haiku.	AutoMounter		La dosiersistemo sur ĉi volumo ne estas BFS. Ni rekomendas surmeti ĝin nurlegeble, por eviti nevolan datumperdon pro cimoj de Hajko.
 Mount read/write	AutoMounter		Surmeti legeble/skribeble
 Could not unmount disk \"%s\":\n\t%s	AutoMounter		Neeblis demeti diskon \"%s\":\n\t%s
-Mounting volume '%s'\n\n	AutoMounter		Surmetante portilon '%s'\n\n
+Mounting volume '%s'\n\n	AutoMounter		Surmetante volumon '%s'\n\n
 Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Neeblis demeti diskon \"%s\":\n\t%s\n\nĈu perforte demeti?\n\nAverto: Se programo nuntempe skribas al la portilo, demeti ĝin nun eble postulas datumperdon.\n
 Force unmount	AutoMounter		Perforte demeti
 Mount error	AutoMounter		Surmeta eraro
-Mounting volume <unnamed volume>\n\n	AutoMounter		Surmetante portilon <sennoma portilo>\n\n
+Mounting volume <unnamed volume>\n\n	AutoMounter		Surmetante volumon <sennoma volumo>\n\n
 Mount warning	AutoMounter		Surmeta averto

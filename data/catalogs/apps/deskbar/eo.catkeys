@@ -16,7 +16,7 @@ Window	PreferencesWindow		Fenestro
 Defaults	PreferencesWindow		Defaŭltoj
 Menu	PreferencesWindow		Menuo
 Recent documents	DeskbarMenu		Ĵusaj dokumentoj
-Auto-hide	PreferencesWindow		Aŭtomatkaŝi
+Auto-hide	PreferencesWindow		Aŭtomate kaŝi
 Always on top	PreferencesWindow		Ĉiam videbla
 <Deskbar folder is empty>	DeskbarMenu		<Dosierujo de la Laborstrio estas malplena>
 Show all	WindowMenu		Montri ĉiujn
@@ -26,7 +26,7 @@ Restart system	DeskbarMenu		Restartigi la sistemon
 Large	PreferencesWindow		Granda
 Auto-raise	PreferencesWindow		Aŭtomate antaŭigi
 Recent folders:	PreferencesWindow		Ĵusaj dosierujoj:
-Show application expander	PreferencesWindow		Montri la liston de programaj fenestroj
+Show application expander	PreferencesWindow		Montri liston de programaj fenestroj
 Close all	WindowMenu		Fermi ĉiujn
 Deskbar preferences	PreferencesWindow		Agordo de la Laborstrio
 Mount	DeskbarMenu		Surmeti
@@ -40,7 +40,7 @@ Recent folders	DeskbarMenu		Ĵusaj dosierujoj
 About this system	DeskbarMenu		Pri ĉi tiu sistemo
 Show calendar…	TimeView		Montri kalendaron…
 Deskbar preferences…	DeskbarMenu		Agordo de la Laborstrio…
-Expand new applications	PreferencesWindow		Montri novajn programojn
+Expand new applications	PreferencesWindow		Disvolvi la liston dum lanĉo
 Show replicants	DeskbarMenu		Montri replikilojn
 Hide application names	PreferencesWindow		Kaŝi nomojn de programoj
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demonstraĵoj

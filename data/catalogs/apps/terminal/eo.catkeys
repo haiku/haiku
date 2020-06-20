@@ -48,7 +48,7 @@ Font size	Terminal TermWindow		Tipara grado
 Custom	Terminal colors scheme		Laŭmenda
 Really close?	Terminal TermWindow		Ĉu vere fermi?
 OK	Terminal TermApp		Bone
-The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		La procezo \"%1\" ankoraŭ funkcias.\nSe vi fermas la terminalon, la procezo finiĝos.
+The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		La procezo \"%1\" daŭras ruli.\nSe vi fermos la terminalon, la procezo finiĝos.
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Nerekonita opcio \"%s\"\n
 Tab title:	Terminal AppearancePrefView		Titolo de la langeto:
 Text not found.	Terminal TermWindow		Teksto ne trovita.
@@ -67,7 +67,7 @@ Copy path	Terminal TermView		Kopii itineron
 Window size	Terminal TermWindow		Fenestrogrando
 Copy absolute path	Terminal TermView		Kopii absolutan itineron
 Cancel	Terminal TermWindow		Nuligi
-The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		La procezo \"%1\" ankoraŭ estas rulante.\nSe vi fermus la langeton, la procezo finiĝos.
+The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		La procezo \"%1\" daŭras ruli.\nSe vi fermos la langeton, la procezo finiĝos.
 Cursor	Terminal AppearancePrefView		Kursoro
 Full screen	Terminal TermWindow		Plenekrane
 Shell 	Terminal TermWindow		Ŝelo 
@@ -106,7 +106,7 @@ Text under cursor	Terminal AppearancePrefView		Teksto sub kursoro
 Move here	Terminal TermView		Movi ĉi tie
 Abort	Terminal Shell		Ĉesigi senkondiĉe
 \t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tLa nuna labora dosierujo de la aktiva procezo.\n\t\t\tNedevige la maksimuma kvanto de eroj de itinero povas esti\n\t\t\tdonito. Ekz. '%2d' por almenaŭ du eroj.\n\t%i\t-\tLa indekso de la langeto.\n\t%e\t-\tLa kodprezento de la aktuala langeto. Nemontrata por UTF-8.\n\t%p\t-\tLa nomo de la aktiva procezo.\n\t%%\t-\tLa signo '%'.
-The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		La sekvaj procezoj daŭras ruli:\n\n\t%1\n\nSe vi fermos la terminalon, la procezoj ĉesos laboron.
+The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		La sekvaj procezoj daŭras ruli:\n\n\t%1\n\nSe vi fermos la terminalon, la procezoj finiĝos.
 Set window title	Terminal TermWindow		Elekti fenestran titolon
 Increase	Terminal TermWindow		Pliigi
 OK	Terminal TermWindow		Bone

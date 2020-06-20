@@ -15,15 +15,15 @@ Video settings	Media Window		Agordo por video
 Audio mixer	Media Window		Sona miksilo
 Show volume control on Deskbar	Media views		Montri la administrilon de laŭteco en la Laborstrio
 Start media server	Media Window		Lanĉi la plurmedian servilon
-Audio settings	Media Window		Sona agordo
+Audio settings	Media Window		Agordo por sono
 Quit anyway	Media Window		Ĉesi senkondiĉe
-Media	System name		Plurmedio
+Media	System name		Plurmedio (Media)
 Warning!	Media Window		Averto!
 MIDI Settings	Media Window		Agordo por MIDI
-SoundFonts	Midi View		SoundFonts
+SoundFonts	Midi View		Aro de SoundFont
 Audio input:	Media views		Sona enigo:
 <none>	Media views		<neniu>
 Channel:	Media views		Kanalo:
-This hardware has no controls.	Media Window		Ĉi-tiu aparato ne havas stirilojn.
+This hardware has no controls.	Media Window		Ĉi aparato ne havas stirilojn.
 Defaults	Media views		Defaŭltoj
 <none>	VideoOutputMenu	Used when no video output is available	<neniu>
