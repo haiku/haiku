@@ -204,5 +204,8 @@ InputMouse::MessageReceived(BMessage* message)
 			}
 			break;
 		}
+
+		default:
+			BView::MessageReceived(message);
 	}
 }

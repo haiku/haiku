@@ -146,6 +146,8 @@ InputKeyboard::MessageReceived(BMessage* message)
 
 			fRevertButton->SetEnabled(true);
 			break;
-	    }
-    }
+		}
+		default:
+			BView::MessageReceived(message);
+	}
 }
