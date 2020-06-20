@@ -1686,8 +1686,8 @@ BColumnListView::MessageReceived(BMessage* message)
 void
 BColumnListView::KeyDown(const char* bytes, int32 numBytes)
 {
-	char c = bytes[0];
-	switch (c) {
+	char key = bytes[0];
+	switch (key) {
 		case B_RIGHT_ARROW:
 		case B_LEFT_ARROW:
 		{
@@ -1699,9 +1699,9 @@ BColumnListView::KeyDown(const char* bytes, int32 numBytes)
 				float oldVal = fHorizontalScrollBar->Value();
 				float newVal = oldVal;
 
-				if (c == B_LEFT_ARROW)
+				if (key == B_LEFT_ARROW)
 					newVal -= smallStep;
-				else if (c == B_RIGHT_ARROW)
+				else if (key == B_RIGHT_ARROW)
 					newVal += smallStep;
 
 				if (newVal < minVal)
@@ -1715,10 +1715,25 @@ BColumnListView::KeyDown(const char* bytes, int32 numBytes)
 				if (focusRow == NULL)
 					break;
 
-				bool expanded = focusRow->IsExpanded();
-				if ((c == B_RIGHT_ARROW && !expanded)
-					|| (c == B_LEFT_ARROW && expanded)) {
-					fOutlineView->ToggleFocusRowOpen();
+				bool isExpanded = focusRow->HasLatch()
+					&& focusRow->IsExpanded();
+				switch (key) {
+					case B_LEFT_ARROW:
+						if (isExpanded)
+							fOutlineView->ToggleFocusRowOpen();
+						else if (focusRow->fParent != NULL) {
+							fOutlineView->DeselectAll();
+							fOutlineView->SetFocusRow(focusRow->fParent, true);
+							fOutlineView->ScrollTo(focusRow->fParent);
+						}
+						break;
+
+					case B_RIGHT_ARROW:
+						if (!isExpanded)
+							fOutlineView->ToggleFocusRowOpen();
+						else
+							fOutlineView->ChangeFocusRow(false, true, false);
+						break;
 				}
 			}
 			break;
@@ -1746,7 +1761,7 @@ BColumnListView::KeyDown(const char* bytes, int32 numBytes)
 			float currentValue = fVerticalScrollBar->Value();
 			float newValue = currentValue;
 
-			if (c == B_PAGE_UP)
+			if (key == B_PAGE_UP)
 				newValue -= largeStep;
 			else
 				newValue += largeStep;
