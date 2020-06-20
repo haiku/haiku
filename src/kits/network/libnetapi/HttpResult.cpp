@@ -7,8 +7,9 @@
  *		Adrien Destugues, pulkomandy@pulkomandy.tk
  */
 
-
 #include <HttpResult.h>
+
+#include <errno.h>
 #include <Debug.h>
 
 
