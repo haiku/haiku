@@ -7,6 +7,7 @@
 #define ALPHA_MASK_H
 
 #include <Referenceable.h>
+#include <locks.h>
 
 #include "agg_clipped_alpha_mask.h"
 #include "ServerPicture.h"
@@ -14,8 +15,6 @@
 #include "DrawState.h"
 #include "drawing/Painter/defines.h"
 #include "IntRect.h"
-
-#include <Locker.h>
 
 
 class BShape;
@@ -65,7 +64,7 @@ protected:
 			BReference<AlphaMask> fPreviousMask;
 			IntRect				fBounds;
 			bool				fClippedToCanvas;
-			BLocker				fLock;
+			recursive_lock		fLock;
 
 private:
 	friend class AlphaMaskCache;
