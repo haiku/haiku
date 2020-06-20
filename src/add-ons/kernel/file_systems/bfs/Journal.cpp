@@ -506,7 +506,7 @@ Journal::_ReplayRunArray(int32* _start)
 		off_t offset = fVolume->ToOffset(run);
 		for (int32 i = 0; i < run.Length(); i++) {
 			status = cached.SetTo(logOffset + blockNumber);
-			if (status != status)
+			if (status != B_OK)
 				RETURN_ERROR(status);
 
 			// TODO: eventually check other well known offsets, like the
