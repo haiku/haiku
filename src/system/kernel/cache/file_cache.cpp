@@ -1348,8 +1348,8 @@ file_cache_write(void* _cacheRef, void* cookie, off_t offset,
 				1, 0, &size);
 			*_size = size;
 			return error;
-		} else
-			return write_zeros_to_file(ref->vnode, cookie, offset, _size);
+		}
+		return write_zeros_to_file(ref->vnode, cookie, offset, _size);
 	}
 
 	status_t status = cache_io(ref, cookie, offset,
