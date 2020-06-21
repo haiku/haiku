@@ -1,0 +1,22 @@
+SubDir HAIKU_TOP src system libnetwork musl ;
+
+SubDirSysHdrs [ FDirName $(SUBDIR) .. .. libroot posix musl include ] ;
+UseHeaders [ FDirName $(SUBDIR) .. .. libroot posix musl internal ] ;
+
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
+
+		SEARCH_SOURCE += [ FDirName $(SUBDIR) network ] ;
+
+		MergeObject <$(architecture)>posix_musl_network.o :
+			inet_addr.c
+			inet_aton.c
+			inet_legacy.c
+			inet_ntoa.c
+			inet_ntop.c
+			inet_pton.c
+			;
+	}
+}

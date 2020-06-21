@@ -23,6 +23,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			r5_compatibility.cpp
 			:
 			<netresolv!$(architecture)>netresolv.o
+			<$(architecture)>posix_musl_network.o
 			[ MultiArchDefaultGristFiles libutil.a libbsd.so ]
 			[ TargetLibsupc++ ]
 			;
@@ -31,4 +32,5 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 	}
 }
 
+SubInclude HAIKU_TOP src system libnetwork musl ;
 SubInclude HAIKU_TOP src system libnetwork netresolv ;
