@@ -356,7 +356,7 @@ TWindow::GetSupportedSuites(BMessage* msg)
 	BPropertyInfo propertyInfo(sProperties);
 	msg->AddFlat("messages", &propertyInfo);
 
-	return BHandler::GetSupportedSuites(msg);
+	return BWindow::GetSupportedSuites(msg);
 }
 
 
@@ -368,7 +368,7 @@ TWindow::ResolveSpecifier(BMessage* msg, int32 index, BMessage* specifier,
 	if (propertyInfo.FindMatch(msg, index, specifier, what, property) >= 0)
 		return this;
 
-	return BHandler::ResolveSpecifier(msg, index, specifier, what, property);
+	return BWindow::ResolveSpecifier(msg, index, specifier, what, property);
 }
 
 
