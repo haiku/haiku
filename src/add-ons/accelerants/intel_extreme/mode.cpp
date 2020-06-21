@@ -537,8 +537,19 @@ intel_set_brightness(float brightness)
 		return B_BAD_VALUE;
 
 	uint32_t period = read32(intel_get_backlight_register(true)) >> 16;
+
+	// The "duty cycle" is a proportion of the period (0 = backlight off,
+	// period = maximum brightness). The low bit must be masked out because
+	// it is apparently used for something else on some Atom machines (no
+	// reference to that in the documentation that I know of).
+	// Additionally we don't want it to be completely 0 here, because then
+	// it becomes hard to turn the display on again (at least until we get
+	// working ACPI keyboard shortcuts for this). So always keep the backlight
+	// at least a little bit on for now.
 	uint32_t duty = (uint32_t)(period * brightness) & 0xfffe;
-		/* Setting the low bit seems to give strange results on some Atom machines */
+	if (duty == 0 && period != 0)
+		duty = 2;
+
 	write32(intel_get_backlight_register(false), duty | (period << 16));
 
 	return B_OK;
