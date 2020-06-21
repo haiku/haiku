@@ -82,7 +82,7 @@ private:
 									// one in the cache, without being
 									// in the cache itself
 
-			UtilityBitmap*		fBits;
+			BReference<UtilityBitmap> fBits;
 			agg::rendering_buffer fBuffer;
 			agg::clipped_alpha_mask fMask;
 			scanline_unpacked_masked_type fScanline;
@@ -172,7 +172,7 @@ private:
 private:
 	friend class AlphaMaskCache;
 
-			shape_data*			fShape;
+			BReference<shape_data> fShape;
 			BRect				fShapeBounds;
 	static	DrawState*			fDrawState;
 };
