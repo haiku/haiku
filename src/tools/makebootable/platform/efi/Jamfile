@@ -1,0 +1,13 @@
+SubDir HAIKU_TOP src tools makebootable platform efi ;
+
+SEARCH_SOURCE
+	+= [ FDirName $(HAIKU_TOP) src bin makebootable platform efi ] ;
+
+BuildPlatformMain <build>makebootable :
+	makebootable.cpp
+	$(hostPlatformSources)
+	:
+	# $(HOST_LIBBE)
+	$(HOST_LIBSTDC++) $(HOST_LIBSUPC++)
+;
+
