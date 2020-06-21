@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2012 Haiku, Inc. All Rights Reserved.
+ * Copyright 2009-2020 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _INET_H_
@@ -18,10 +18,6 @@ extern "C" {
 
 in_addr_t		inet_addr(const char* addressString);
 int				inet_aton(const char* addressString, struct in_addr* address);
-char*			inet_cidr_ntop(int family, const void* source, int bits,
-					char* dest, size_t destSize);
-int				inet_cidr_pton(int family, const char* sourceString, void* dest,
-					int* _bits);
 in_addr_t		inet_lnaof(struct in_addr address);
 struct in_addr	inet_makeaddr(in_addr_t net, in_addr_t host);
 char*			inet_net_ntop(int family, const void* source, int bits,
