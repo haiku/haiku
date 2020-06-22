@@ -162,7 +162,7 @@ filter_result PadBlocker::Filter(BMessage *message, BList *outList)
 		case B_MOUSE_DOWN:
 		{
 			// do nothing if disabled
-			if (threshold == 0)
+			if (_threshold == 0)
 				break;
 
 			bigtime_t now = system_time();
