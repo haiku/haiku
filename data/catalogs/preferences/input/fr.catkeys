@@ -5,13 +5,13 @@ Tapping	TouchpadPrefView		Tapotement
 Long	KeyboardView		Long
 Normal	SettingsView		Normal
 Cancel	TouchpadPrefView		Annuler
-4-Button	SettingsView		4-Bouttons
+4-Button	SettingsView		4-Boutons
 Slow	TouchpadPrefView		Lent
 Warp	SettingsView		Téléportation
 Instant warp	SettingsView		Téléportation instantanée
 Device List	InputWindow		Liste des périphériques
 Double-click speed	SettingsView		Vitesse du double clic
-5-Button	SettingsView		5-Bouttons
+5-Button	SettingsView		5-Boutons
 Typing test area	KeyboardView		Zone de test de frappe
 Mouse type:	SettingsView		Type de souris :
 Revert	InputKeyboard		Rétablir
@@ -32,13 +32,13 @@ Mouse acceleration	SettingsView		Accélération de la souris
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Une zone de défilement aussi large pourrait empêcher le fonctionnement normal du pointeur de souris. Est-ce vraiment ce que vous voulez?
 High	TouchpadPrefView		Haut
 Defaults	TouchpadPrefView		Par défaut
-1-Button	SettingsView		1-Boutton
+1-Button	SettingsView		1-Bouton
 Defaults	InputKeyboard		Par défaut
 Short	KeyboardView		Court
 Slow	KeyboardView		Lent
 Revert	InputMouse		Rétablir
 Key repeat rate	KeyboardView		Vitesse de répétition
-2-Button	SettingsView		2-Bouttons
+2-Button	SettingsView		2-Boutons
 Click to focus and raise	SettingsView		Cliquer pour activer et remonter
 Vertical	TouchpadPrefView		Vertical
 Horizontal	TouchpadPrefView		Horizontal
@@ -46,5 +46,5 @@ Focus mode:	SettingsView		Mode de focus :
 Focus follows mouse	SettingsView		L’activation suit le pointeur
 Double-click test area	SettingsView		Zone de test du double clic
 Sensitivity	TouchpadPrefView		Sensibilité
-3-Button	SettingsView		3-Bouttons
+3-Button	SettingsView		3-Boutons
 Revert	TouchpadPrefView		Rétablir
