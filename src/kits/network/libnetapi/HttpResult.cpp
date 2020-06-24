@@ -99,7 +99,7 @@ BHttpResult::Length() const
 	 *
 	 * We can check length[0] directly because header values are trimmed by
 	 * HttpHeader beforehand. */
-	if (length[0] != '-' || length[0] != '+') {
+	if (length[0] != '-' && length[0] != '+') {
 		errno = 0;
 		char *endptr = NULL;
 		result = strtoul(length, &endptr, 10);
