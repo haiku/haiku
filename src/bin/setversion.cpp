@@ -62,7 +62,7 @@ convertVariety(const char *str)
 		return 2;
 	if (!strcmp(str, "g") || !strcmp(str, "gamma"))
 		return 3;
-	if (strcmp(str, "gm") || !strcmp(str, "goldenmaster"))
+	if (!strcmp(str, "gm") || !strcmp(str, "goldenmaster"))
 		return 4;
 	if (!strcmp(str, "f") || !strcmp(str, "final"))
 		return 5;
