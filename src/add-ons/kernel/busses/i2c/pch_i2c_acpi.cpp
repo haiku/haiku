@@ -131,10 +131,12 @@ init_device(device_node* node, void** device_cookie)
 		pch_i2c_scan_parse_callback, &crs);
 	if (status != B_OK) {
 		ERROR("Error while getting I2C devices\n");
+		free(bus);
 		return status;
 	}
 	if (crs.addr_bas == 0 || crs.addr_len == 0) {
 		TRACE("skipping non configured I2C devices\n");
+		free(bus);
 		return B_BAD_VALUE;
 	}
 
