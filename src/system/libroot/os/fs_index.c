@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2020, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -67,6 +67,7 @@ fs_open_index_dir(dev_t device)
 
 	// allocate the DIR structure
 	if ((dir = __create_dir_struct(fd)) == NULL) {
+		// __create_dir_struct() already sets errno
 		_kern_close(fd);
 		return NULL;
 	}
