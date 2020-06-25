@@ -5,52 +5,49 @@
 #ifndef __SHORT_DIR_H__
 #define __SHORT_DIR_H__
 
+
 #include "Inode.h"
 
 
-struct xfs_dir2_sf_off_t { uint8 i[2]; };
-	//offset into the literal area
+/*
+ * offset into the literal area
+ * xfs_dir2_sf_off_t
+ */
+struct ShortFormOffset {
+			uint16				i;
+} __attribute__((packed));
 
-union xfs_dir2_inou_t {
+//xfs_dir2_inou_t
+union ShortFormInodeUnion {
 			uint64				i8;
 			uint32				i4;
-};
+} __attribute__((packed));
 
 
-// Short form directory header
-struct xfs_dir2_sf_hdr_t {
+// xfs_dir2_sf_hdr_t
+struct ShortFormHeader {
 			uint8				count;
 				// number of entries
 			uint8				i8count;
 				// # of 64bit inode entries
-			xfs_dir2_inou_t		parent;
+			ShortFormInodeUnion	parent;
 				// absolute inode # of parent
-};
+} __attribute__((packed));
 
 
-/*
- *The xfs_dir2_sf_entry is split into
- * two parts because the entries size is variable
- */
-struct xfs_dir2_sf_entry_t {
+//xfs_dir2_sf_entry_t
+struct ShortFormEntry {
 			uint8				namelen;
 				// length of the name, in bytes
-			xfs_dir2_sf_off_t	offset;
+			ShortFormOffset		offset;
 				// offset tag, for directory iteration
 			uint8				name[];
 				// name of directory entry
-};
-
-
-union xfs_dir2_sf_entry_inum_t {
-	struct xfs_ftype_inum{
-		uint8			ftype;
-		xfs_dir2_inou_t	inumber;
-	};
-	struct xfs_inum{
-		xfs_dir2_inou_t	inumber;
-	};
-};
+/*
+ * Following will be a single byte file type variable
+ * and inode number (64bits or 32 bits)
+ */
+} __attribute__((packed));
 
 
 class ShortDirectory
@@ -58,21 +55,24 @@ class ShortDirectory
 public:
 								ShortDirectory(Inode* inode);
 								~ShortDirectory();
+			size_t				HeaderSize();
+			bool				HasFileTypeField();
+			uint8				GetFileType(ShortFormEntry* entry);
+			ShortFormEntry*		FirstEntry();
+			xfs_ino_t			GetIno(ShortFormInodeUnion* inum);
+			xfs_ino_t			GetEntryIno(ShortFormEntry* entry);
+			size_t				EntrySize(int namelen);
 			status_t			GetNext(char* name, size_t* length,
 									xfs_ino_t* ino);
-			xfs_ino_t			GetParentIno();
 			status_t			Lookup(const char* name, size_t length,
 									xfs_ino_t* id);
-
 private:
 			Inode*				fInode;
-			xfs_dir2_sf_hdr_t	fHeader;
-			xfs_dir2_sf_off_t	fLastEntryOffset;
-				// offset into the literal area
+			ShortFormHeader*	fHeader;
+			uint16				fLastEntryOffset;
+			// offset into the literal area
 			uint8				fTrack;
-				// Takes the values 0, 1 or 2 only
-
+			// Takes the values 0, 1 or 2
 };
-
 
 #endif

@@ -174,6 +174,9 @@ Inode::GetFromDisk()
 	uint32 len = fVolume->InodeSize();
 		// Inode len to read (size of inode)
 
+	TRACE("AgNumber: (%d), AgRelativeIno: (%d), AgRelativeBlockNum: (%d),"
+		"Offset: (%d), len: (%d)\n", agNo, agInodeNo, agBlock, offset, len);
+
 	if (agNo > fVolume->AgCount()) {
 		ERROR("Inode::GetFromDisk : AG Number more than number of AGs");
 		return B_ENTRY_NOT_FOUND;
@@ -184,7 +187,7 @@ Inode::GetFromDisk()
 	xfs_fsblock_t blockToRead = FSBLOCKS_TO_BASICBLOCKS(fVolume->BlockLog(),
 		((uint64)(agNo * numberOfBlocksInAg) + agBlock));
 
-	xfs_daddr_t readPos = blockToRead*(BASICBLOCKSIZE) + offset;
+	xfs_daddr_t readPos = blockToRead * (BASICBLOCKSIZE) + offset * len;
 
 	if (read_pos(fVolume->Device(), readPos, fBuffer, len) != len) {
 		ERROR("Inode::Inode(): IO Error");

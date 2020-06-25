@@ -50,6 +50,7 @@ DirectoryIterator::Init()
 	return B_BAD_VALUE;
 }
 
+
 status_t
 DirectoryIterator::GetNext(char* name, size_t* length, xfs_ino_t* ino)
 {

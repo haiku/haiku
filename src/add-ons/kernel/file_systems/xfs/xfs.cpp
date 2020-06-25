@@ -24,7 +24,24 @@ XfsSuperBlock::IsValid() const
 		return false;
 	}
 
+	// Checking version 4 file system
+	ASSERT((Version() & 0x000f) == 4)
+
 	return true;
+}
+
+
+uint16
+XfsSuperBlock::Version() const
+{
+	return sb_versionnum;
+}
+
+
+uint32
+XfsSuperBlock::Features2() const
+{
+	return sb_features2;
 }
 
 

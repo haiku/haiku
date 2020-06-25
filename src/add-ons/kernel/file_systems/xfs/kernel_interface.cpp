@@ -249,7 +249,7 @@ static status_t
 xfs_read_stat(fs_volume *_volume, fs_vnode *_node, struct stat *stat)
 {
 	Inode* inode = (Inode*)_node->private_node;
-	TRACE("XFS_READ_STAT: root_id: (%d)\n", inode->ID());
+	TRACE("XFS_READ_STAT: id: (%d)\n", inode->ID());
 	stat->st_dev = inode->GetVolume()->ID();
 	stat->st_ino = inode->ID();
 	stat->st_nlink = 1;

@@ -55,6 +55,8 @@ public:
 			xfs_agnumber_t		AgCount() const;
 			xfs_agblock_t		AgBlocks() const;
 			uint8				Flags() const;
+			uint16				Version() const;
+			uint32				Features2() const;
 private:
 
 			uint32				sb_magicnum;
@@ -151,13 +153,13 @@ Superblock quota flags - sb_qflags
 	Extended v4 Superblock flags - sb_features2
 */
 
-#define XFS_SB_VERSION2_LAZYSBCOUNTBIT	0x0001
+#define XFS_SB_VERSION2_LAZYSBCOUNTBIT	0x00000001
 	// update global free space and inode on clean unmount
-#define XFS_SB_VERSION2_ATTR2BIT	0x0002
+#define XFS_SB_VERSION2_ATTR2BIT	0x00000002
 	// optimises the inode layout of ext-attr
-#define XFS_SB_VERSION2_PARENTBIT 0x0004	/* Parent pointers */
-#define XFS_SB_VERSION2_PROJID32BIT 0x0008	/* 32-bit project id */
-#define XFS_SB_VERSION2_CRCBIT 0x0010		/* Metadata checksumming */
-#define XFS_SB_VERSION2_FTYPE 0x0020
+#define XFS_SB_VERSION2_PARENTBIT 0x00000010	/* Parent pointers */
+#define XFS_SB_VERSION2_PROJID32BIT 0x00000080	/* 32-bit project id */
+#define XFS_SB_VERSION2_CRCBIT 0x00000100		/* Metadata checksumming */
+#define XFS_SB_VERSION2_FTYPE 0x00000200
 
 #endif

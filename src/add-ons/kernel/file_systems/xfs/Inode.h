@@ -30,9 +30,10 @@
 	// Gets the AG relative block number that contains inode
 #define INO_TO_BLOCKOFFSET(id, volume) (id & INO_MASK(volume->InodesPerBlkLog()))
 	// Gets the offset into the block from the inode number
-#define DIR_DFORK_PTR(dir_ino_ptr) (char*) dir_ino_ptr + DATA_FORK_OFFSET
+#define DIR_DFORK_PTR(dir_ino_ptr) (void*) \
+		((char*) dir_ino_ptr + DATA_FORK_OFFSET)
 #define DIR_AFORK_PTR(dir_ino_ptr) \
-					(XFS_DFORK_PTR + \
+					(void*)((char*)XFS_DFORK_PTR + \
 					((uint32)dir_ino_ptr->di_forkoff<<3))
 #define DIR_AFORK_EXIST(dir_ino_ptr) dir_ino_ptr->di_forkoff!=0
 
