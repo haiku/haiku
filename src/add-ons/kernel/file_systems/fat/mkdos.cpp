@@ -635,7 +635,7 @@ dosfs_uninitialize(int fd, partition_id partitionID, off_t partitionSize,
 	char bootsector[512];
 	memset(bootsector,0x00,512);
 
-	if (write_pos(fd, 512, bootsector, sizeof(512)) < 0)
+	if (write_pos(fd, 512, bootsector, sizeof(bootsector)) < 0)
 		return errno;
 
 	update_disk_device_job_progress(job, 1.0);
