@@ -36,21 +36,17 @@
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "InputMouse"
 
-static const bigtime_t kDefaultClickSpeed = 500000;
-static const int32 kDefaultMouseSpeed = 65536;
-static const int32 kDefaultMouseType = 3;	// 3 button mouse
-static const int32 kDefaultAccelerationFactor = 65536;
-static const bool kDefaultAcceptFirstClick = true;
 
-
-InputMouse::InputMouse(BInputDevice* dev)
+InputMouse::InputMouse(BInputDevice* dev, MouseSettings* settings)
 	: BView("InputMouse", B_WILL_DRAW)
 {
-	fSettingsView = new SettingsView(fSettings);
+	fSettings = settings;
+
+	fSettingsView = new SettingsView(*fSettings);
 
 	fDefaultsButton = new BButton(B_TRANSLATE("Defaults"),
 		new BMessage(kMsgDefaults));
-	fDefaultsButton->SetEnabled(fSettings.IsDefaultable());
+	fDefaultsButton->SetEnabled(fSettings->IsDefaultable());
 
 	fRevertButton = new BButton(B_TRANSLATE("Revert"),
 		new BMessage(kMsgRevert));
@@ -76,19 +72,19 @@ InputMouse::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case kMsgDefaults: {
-			fSettings.Defaults();
+			fSettings->Defaults();
 			fSettingsView->UpdateFromSettings();
 
 			fDefaultsButton->SetEnabled(false);
-			fRevertButton->SetEnabled(fSettings.IsRevertable());
+			fRevertButton->SetEnabled(fSettings->IsRevertable());
 			break;
 		}
 
 		case kMsgRevert: {
-			fSettings.Revert();
+			fSettings->Revert();
 			fSettingsView->UpdateFromSettings();
 
-			fDefaultsButton->SetEnabled(fSettings.IsDefaultable());
+			fDefaultsButton->SetEnabled(fSettings->IsDefaultable());
 			fRevertButton->SetEnabled(false);
 			break;
 
@@ -98,10 +94,10 @@ InputMouse::MessageReceived(BMessage* message)
 		{
 			int32 type;
 			if (message->FindInt32("be:value", &type) == B_OK) {
-				fSettings.SetMouseType(type);
+				fSettings->SetMouseType(type);
 				fSettingsView->SetMouseType(type);
-				fDefaultsButton->SetEnabled(fSettings.IsDefaultable());
-				fRevertButton->SetEnabled(fSettings.IsRevertable());
+				fDefaultsButton->SetEnabled(fSettings->IsDefaultable());
+				fRevertButton->SetEnabled(fSettings->IsRevertable());
 			}
 			break;
 		}
@@ -110,9 +106,9 @@ InputMouse::MessageReceived(BMessage* message)
 		{
 			int32 mode;
 			if (message->FindInt32("mode", &mode) == B_OK) {
-				fSettings.SetMouseMode((mode_mouse)mode);
-				fDefaultsButton->SetEnabled(fSettings.IsDefaultable());
-				fRevertButton->SetEnabled(fSettings.IsRevertable());
+				fSettings->SetMouseMode((mode_mouse)mode);
+				fDefaultsButton->SetEnabled(fSettings->IsDefaultable());
+				fRevertButton->SetEnabled(fSettings->IsRevertable());
 				fSettingsView->fFocusFollowsMouseMenu->SetEnabled(
 					mode == B_FOCUS_FOLLOWS_MOUSE);
 				fSettingsView->fAcceptFirstClickBox->SetEnabled(
@@ -126,10 +122,10 @@ InputMouse::MessageReceived(BMessage* message)
 			int32 mode;
 			if (message->FindInt32("mode_focus_follows_mouse", &mode)
 				== B_OK) {
-				fSettings.SetFocusFollowsMouseMode(
+				fSettings->SetFocusFollowsMouseMode(
 					(mode_focus_follows_mouse)mode);
-				fDefaultsButton->SetEnabled(fSettings.IsDefaultable());
-				fRevertButton->SetEnabled(fSettings.IsRevertable());
+				fDefaultsButton->SetEnabled(fSettings->IsDefaultable());
+				fRevertButton->SetEnabled(fSettings->IsRevertable());
 			}
 			break;
 		}
@@ -145,9 +141,9 @@ InputMouse::MessageReceived(BMessage* message)
 				if (acceptFirstClickBox)
 					acceptFirstClick = acceptFirstClickBox->Value()
 						== B_CONTROL_ON;
-				fSettings.SetAcceptFirstClick(acceptFirstClick);
-				fDefaultsButton->SetEnabled(fSettings.IsDefaultable());
-				fRevertButton->SetEnabled(fSettings.IsRevertable());
+				fSettings->SetAcceptFirstClick(acceptFirstClick);
+				fDefaultsButton->SetEnabled(fSettings->IsDefaultable());
+				fRevertButton->SetEnabled(fSettings->IsRevertable());
 			}
 			break;
 		}
@@ -157,9 +153,9 @@ InputMouse::MessageReceived(BMessage* message)
 			int32 value;
 			if (message->FindInt32("be:value", &value) == B_OK) {
 				// slow = 1000000, fast = 0
-				fSettings.SetClickSpeed(value * 1000);
-				fDefaultsButton->SetEnabled(fSettings.IsDefaultable());
-				fRevertButton->SetEnabled(fSettings.IsRevertable());
+				fSettings->SetClickSpeed(value * 1000);
+				fDefaultsButton->SetEnabled(fSettings->IsDefaultable());
+				fRevertButton->SetEnabled(fSettings->IsRevertable());
 			}
 			break;
 		}
@@ -169,10 +165,10 @@ InputMouse::MessageReceived(BMessage* message)
 			int32 value;
 			if (message->FindInt32("be:value", &value) == B_OK) {
 				// slow = 8192, fast = 524287
-				fSettings.SetMouseSpeed((int32)pow(2,
+				fSettings->SetMouseSpeed((int32)pow(2,
 					value * 6.0 / 1000) * 8192);
-				fDefaultsButton->SetEnabled(fSettings.IsDefaultable());
-				fRevertButton->SetEnabled(fSettings.IsRevertable());
+				fDefaultsButton->SetEnabled(fSettings->IsDefaultable());
+				fRevertButton->SetEnabled(fSettings->IsRevertable());
 			}
 			break;
 		}
@@ -182,10 +178,10 @@ InputMouse::MessageReceived(BMessage* message)
 			int32 value;
 			if (message->FindInt32("be:value", &value) == B_OK) {
 				// slow = 0, fast = 262144
-				fSettings.SetAccelerationFactor((int32)pow(
+				fSettings->SetAccelerationFactor((int32)pow(
 					value * 4.0 / 1000, 2) * 16384);
-				fDefaultsButton->SetEnabled(fSettings.IsDefaultable());
-				fRevertButton->SetEnabled(fSettings.IsRevertable());
+				fDefaultsButton->SetEnabled(fSettings->IsDefaultable());
+				fRevertButton->SetEnabled(fSettings->IsRevertable());
 			}
 			break;
 		}
@@ -197,9 +193,9 @@ InputMouse::MessageReceived(BMessage* message)
 			if (message->FindInt32("index", &index) == B_OK
 				&& message->FindInt32("button", &button) == B_OK) {
 				int32 mapping = B_MOUSE_BUTTON(index + 1);
-				fSettings.SetMapping(button, mapping);
-				fDefaultsButton->SetEnabled(fSettings.IsDefaultable());
-				fRevertButton->SetEnabled(fSettings.IsRevertable());
+				fSettings->SetMapping(button, mapping);
+				fDefaultsButton->SetEnabled(fSettings->IsDefaultable());
+				fRevertButton->SetEnabled(fSettings->IsRevertable());
 				fSettingsView->MouseMapUpdated();
 			}
 			break;

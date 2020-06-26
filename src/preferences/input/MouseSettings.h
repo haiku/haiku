@@ -11,6 +11,9 @@
 #define MOUSE_SETTINGS_H
 
 
+#include <map>
+
+#include <Archivable.h>
 #include <Input.h>
 #include <InterfaceDefs.h>
 #include <Point.h>
@@ -24,6 +27,7 @@ class BPath;
 class MouseSettings {
 public:
 		MouseSettings();
+		MouseSettings(mouse_settings settings);
 		~MouseSettings();
 
 		void Revert();
@@ -31,9 +35,6 @@ public:
 		void Defaults();
 		bool IsDefaultable();
 		void Dump();
-
-		BPoint WindowPosition() const { return fWindowPosition; }
-		void SetWindowPosition(BPoint corner);
 
 		int32 MouseType() const { return fSettings.type; }
 		void SetMouseType(int32 type);
@@ -62,18 +63,48 @@ public:
 
 		bool AcceptFirstClick() const { return fAcceptFirstClick; }
 		void SetAcceptFirstClick(bool accept_first_click);
+		void _RetrieveSettings();
+
+		mouse_settings* GetSettings();
 
 private:
 		static status_t _GetSettingsPath(BPath &path);
-		void _RetrieveSettings();
-		status_t _SaveSettings();
 
-		mouse_settings	fSettings, fOriginalSettings;
 		mode_mouse		fMode, fOriginalMode;
 		mode_focus_follows_mouse	fFocusFollowsMouseMode;
 		mode_focus_follows_mouse	fOriginalFocusFollowsMouseMode;
 		bool			fAcceptFirstClick, fOriginalAcceptFirstClick;
-		BPoint			fWindowPosition;
+
+		mouse_settings	fSettings, fOriginalSettings;
+};
+
+
+class MultipleMouseSettings: public BArchivable
+{
+	public:
+		MultipleMouseSettings();
+		~MultipleMouseSettings();
+
+		status_t Archive(BMessage* into, bool deep = false) const;
+
+		void Defaults();
+		void Dump();
+		status_t SaveSettings();
+
+		/** Get or create settings for the given mouse */
+		MouseSettings* AddMouseSettings(BString mouse_name);
+		/** Get the existing settings, or return NULL */
+		MouseSettings* GetMouseSettings(BString mouse_name);
+
+	private:
+		static status_t GetSettingsPath(BPath &path);
+		void RetrieveSettings();
+
+	private:
+		MouseSettings*	fDeprecatedMouseSettings;
+
+		typedef std::map<BString, MouseSettings*> mouse_settings_object;
+		mouse_settings_object  fMouseSettingsObject;
 };
 
 #endif	// MOUSE_SETTINGS_H

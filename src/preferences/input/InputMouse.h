@@ -34,7 +34,7 @@ class DeviceListView;
 
 class InputMouse : public BView {
 public:
-					InputMouse(BInputDevice* dev);
+					InputMouse(BInputDevice* dev, MouseSettings* settings);
 	virtual			~InputMouse();
 	void			SetMouseType(int32 type);
 	void			MessageReceived(BMessage* message);
@@ -46,9 +46,7 @@ private:
 	MouseView*			fMouseView;
 	BButton*			fDefaultsButton;
 	BButton*			fRevertButton;
-	MouseSettings		fSettings;
-
-	mouse_settings		fMouseSettings, fOriginalSettings;
+	MouseSettings*		fSettings;
 };
 
 #endif	/* INPUT_MOUSE_H */

@@ -185,21 +185,26 @@ InputWindow::AddDevice(BInputDevice* dev)
 
 	if (dev->Type() == B_POINTING_DEVICE
 		&& name.FindFirst("Touchpad") >= 0) {
-
 		TouchpadPrefView* view = new TouchpadPrefView(dev);
 		fCardView->AddChild(view);
+
 		DeviceListItemView* touchpad = new DeviceListItemView(
 			name, TOUCHPAD_TYPE);
 		fDeviceListView->AddItem(touchpad);
 	} else if (dev->Type() == B_POINTING_DEVICE) {
-		InputMouse* view = new InputMouse(dev);
+		MouseSettings* settings;
+		settings = fMultipleMouseSettings.AddMouseSettings(name);
+
+		InputMouse* view = new InputMouse(dev, settings);
 		fCardView->AddChild(view);
+
 		DeviceListItemView* mouse = new DeviceListItemView(
 			name, MOUSE_TYPE);
 		fDeviceListView->AddItem(mouse);
 	} else if (dev->Type() == B_KEYBOARD_DEVICE) {
 		InputKeyboard* view = new InputKeyboard(dev);
 		fCardView->AddChild(view);
+
 		DeviceListItemView* keyboard = new DeviceListItemView(
 			name, KEYBOARD_TYPE);
 		fDeviceListView->AddItem(keyboard);
