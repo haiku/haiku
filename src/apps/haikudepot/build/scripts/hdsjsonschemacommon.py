@@ -20,7 +20,7 @@ JSON_TYPE_NUMBER = "number"
 
 # The possible C++ types
 CPP_TYPE_STRING = "BString"
-CPP_TYPE_ARRAY = "List"
+CPP_TYPE_ARRAY = "BObjectList"
 CPP_TYPE_BOOLEAN = "bool"
 CPP_TYPE_INTEGER = "int64"
 CPP_TYPE_NUMBER = "double"
@@ -75,7 +75,7 @@ def propmetadatatocpptypename(propmetadata):
         if not itemsjavatype or 0 == len(itemsjavatype):
             raise Exception('missing "javaType" field')
 
-        return "%s <%s*, true>" % (CPP_TYPE_ARRAY, javatypetocppname(itemsjavatype))
+        return "%s <%s>" % (CPP_TYPE_ARRAY, javatypetocppname(itemsjavatype))
 
     raise Exception('unknown json-schema type [' + type + ']')
 

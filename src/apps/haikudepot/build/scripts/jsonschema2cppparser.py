@@ -442,11 +442,11 @@ public:
     bool Handle(const BJsonEvent& event);
 
 
-    List<${subtype_cppmodelclassname}*, true>* Target(); // list of %s pointers
+    BObjectList<${subtype_cppmodelclassname}>* Target(); // list of %s pointers
 
 
 private:
-    List<${subtype_cppmodelclassname}*, true>* fTarget;
+    BObjectList<${subtype_cppmodelclassname}>* fTarget;
 };
 """).substitute(jscom.uniondicts(naming.todict(), subtypenaming.todict())))
 
@@ -758,7 +758,7 @@ ${subtype_cppstackedlistlistenerclassname}::${subtype_cppstackedlistlistenerclas
     :
     ${cppsuperstackedlistenerclassname}(mainListener, parent)
 {
-    fTarget = new List<${subtype_cppmodelclassname}*, true>();
+    fTarget = new BObjectList<${subtype_cppmodelclassname}>();
 }
 
 
@@ -767,7 +767,7 @@ ${subtype_cppstackedlistlistenerclassname}::~${subtype_cppstackedlistlistenercla
 }
 
 
-List<${subtype_cppmodelclassname}*, true>*
+BObjectList<${subtype_cppmodelclassname}>*
 ${subtype_cppstackedlistlistenerclassname}::Target()
 {
     return fTarget;
@@ -792,7 +792,7 @@ ${subtype_cppstackedlistlistenerclassname}::Handle(const BJsonEvent& event)
         {
             ${subtype_cppstackedlistenerclassname}* nextListener =
                 new ${subtype_cppstackedlistenerclassname}(fMainListener, this);
-            fTarget->Add(nextListener->Target());
+            fTarget->AddItem(nextListener->Target());
             Push(nextListener);
             break;
         }
@@ -1164,8 +1164,9 @@ def schematocppparser(inputfile, schema, outputdirectory, supportbulkcontainer):
 """).substitute({'guarddefname': guarddefname}))
 
         cpphfile.write(
-            string.Template("""
+            string.Template("""            
 #include <JsonEventListener.h>
+#include <ObjectList.h>
 
 #include "${cpprootmodelclassname}.h"
 
@@ -1272,7 +1273,7 @@ private:
         istate = CppParserImplementationState(cppifile, naming)
         jscom.writetopcomment(cppifile, os.path.split(inputfile)[1], 'Listener')
         cppifile.write('#include "%s"\n' % cppheaderleafname)
-        cppifile.write('#include "List.h"\n\n')
+        cppifile.write('#include <ObjectList.h>\n\n')
         cppifile.write('#include <stdio.h>\n\n')
 
         cppifile.write('// #pragma mark - private interfaces for the stacked listeners\n\n')

@@ -38,15 +38,15 @@ void
 ${cppclassname}::AddTo${cppname}(${cppcontainertype}* value)
 {
     if (${cppmembername} == NULL)
-        ${cppmembername} = new List<${cppcontainertype}*, true>();
-    ${cppmembername}->Add(value);
+        ${cppmembername} = new BObjectList<${cppcontainertype}>();
+    ${cppmembername}->AddItem(value);
 }
 
 
 void
-${cppclassname}::Set${cppname}(List<${cppcontainertype}*, true>* value)
+${cppclassname}::Set${cppname}(BObjectList<${cppcontainertype}>* value)
 {
-   ${cppmembername} = value; 
+   ${cppmembername} = value;
 }
 
 
@@ -82,7 +82,7 @@ def writelistaccessorsheader(outputfile, cppname, cppcontainertype):
 
     outputfile.write(
         string.Template("""    void AddTo${cppname}(${cppcontainertype}* value);
-    void Set${cppname}(List<${cppcontainertype}*, true>* value);
+    void Set${cppname}(BObjectList<${cppcontainertype}>* value);
     int32 Count${cppname}();
     ${cppcontainertype}* ${cppname}ItemAt(int32 index);
     bool ${cppname}IsNull();
@@ -336,7 +336,7 @@ def schematocppmodels(inputfile, schema, outputdirectory):
 #ifndef ${guarddefname}
 #define ${guarddefname}
 
-#include "List.h"
+#include <ObjectList.h>
 #include "String.h"
 
 """).substitute({'guarddefname': guarddefname}))
