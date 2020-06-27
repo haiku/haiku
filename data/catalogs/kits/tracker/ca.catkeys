@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-libtracker	2906566299
+1	catalan; valencian	x-vnd.Haiku-libtracker	1358760392
 Created	ContainerWindow		Creat
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Obre-ho i fes-ho preferit
@@ -21,7 +21,6 @@ contains	FindPanel		conté
 Open	FilePanelPriv		Obre
 Bitmap icon	AttributesView		Icona de mapa de bits
 You can't replace a folder with one of its sub-folders.	FSUtils		No podeu reemplaçar una carpeta per alguna de les subcarpetes.
-<%ld dates>	AttributesView		<%ld dates>
 Select…	VirtualDirectoryWindow		Seleccioneu...
 Name	Default Query Columns		Nom
 Unmount	ContainerWindow		Desmunta
@@ -50,7 +49,6 @@ Preparing to move items…	StatusWindow		Es prepara el trasllat dels elements...
 Size	ContainerWindow		Mida
 Select…	ContainerWindow		Seleccioneu...
 Show shared volumes on Desktop	SettingsView		Mostra els volums compartits a l'escriptori
-<%ld values>	AttributesView		<%ld valors>
 Size	PoseView		Mida
 matches wildcard expression	SelectionWindow		es correspon amb l'expressió regular
 96 x 96	ContainerWindow		96 x 96
@@ -196,7 +194,6 @@ contains	SelectionWindow		conté
 Replace	FilePanelPriv		Reemplaça
 is not	FindPanel		no és
 Icon view	DeskWindow		Mostra les icones
-<%ld rectangles>	AttributesView		<%ld rectangles>
 Mount settings…	ContainerWindow		Paràmetres del muntatge...
 Keywords	Bookmark Query Columns		Paraules clau
 Media parameter web	AttributesView		Paràmetre web multimèdia
@@ -343,7 +340,6 @@ Copy to	ContainerWindow		Copia a
 Name	SelectionWindow		Nom
 by attribute	FindPanel		per l'atribut
 Write	FilePermissionsView		Escriu
-<%ld bytes of data>	AttributesView		<%ld bytes de dades>
 If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Si altereu la carpeta de sistema o el que hi ha, no podreu fer arrencar %osName!\n\nSegur que ho voleu fer?\n\nSi tanmateix voleu alterar-ho, mantingueu premuda la tecla Maj. i cliqueu a \"Sé el que faig\".
 Save	FilePanelPriv		Desa
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		No s'ha pogut obrir \"%document\" amb l'aplicació \"%app\" (Falten biblioteques: %library). \n

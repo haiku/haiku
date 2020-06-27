@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libtracker	226539321
+1	english	x-vnd.Haiku-libtracker	287843084
 Created	ContainerWindow		创建
 Icon	AttributesView		图标
 Open and make preferred	OpenWithWindow		打开并创建首选
@@ -21,7 +21,6 @@ contains	FindPanel		包含
 Open	FilePanelPriv		打开
 Bitmap icon	AttributesView		位图图标
 You can't replace a folder with one of its sub-folders.	FSUtils		您无法替换目录为其子目录。
-<%ld dates>	AttributesView		<%ld dates>
 Select…	VirtualDirectoryWindow		选择…
 Name	Default Query Columns		名称
 Unmount	ContainerWindow		卸载

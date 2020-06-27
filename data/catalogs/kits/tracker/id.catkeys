@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-libtracker	4118767010
+1	indonesian	x-vnd.Haiku-libtracker	2570961103
 Created	ContainerWindow		Dibuat
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Buka dan buat sebagai yang disukai
@@ -21,7 +21,6 @@ contains	FindPanel		berisi
 Open	FilePanelPriv		Buka
 Bitmap icon	AttributesView		Ikon bitmap
 You can't replace a folder with one of its sub-folders.	FSUtils		Anda tidak dapat mengganti folder dengan salah satu sub-folder nya.
-<%ld dates>	AttributesView		<%ld tanggal>
 Select…	VirtualDirectoryWindow		Pilih…
 Name	Default Query Columns		Nama
 Unmount	ContainerWindow		Unmount
@@ -50,7 +49,6 @@ Preparing to move items…	StatusWindow		Mempersiapkan memindah item...
 Size	ContainerWindow		Ukuran
 Select…	ContainerWindow		Pilih...
 Show shared volumes on Desktop	SettingsView		Tampilkan volume berbagi pada Desktop
-<%ld values>	AttributesView		<%ld nilai>
 Size	PoseView		Ukuran
 matches wildcard expression	SelectionWindow		sesuai dengan ungkapan wildcard
 96 x 96	ContainerWindow		96 x 96
@@ -195,7 +193,6 @@ contains	SelectionWindow		berisi
 Replace	FilePanelPriv		Ganti
 is not	FindPanel		tidak
 Icon view	DeskWindow		Tampilan ikon
-<%ld rectangles>	AttributesView		<%ld persegi>
 Mount settings…	ContainerWindow		Pengaturan mount…
 Keywords	Bookmark Query Columns		Katakunci
 Media parameter web	AttributesView		Parameter media web
@@ -342,7 +339,6 @@ Copy to	ContainerWindow		Salin ke
 Name	SelectionWindow		Nama
 by attribute	FindPanel		berdasar atribut
 Write	FilePermissionsView		Tulis
-<%ld bytes of data>	AttributesView		<%ld bita data>
 If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Jika Anda mengubah folder sistem atau isinya, Anda tidak akan bisa boot %osName!\n\nApakah Anda yakin ingin melakukan ini?\n\nUntuk mengubah folder sistem atau isinya pula, tahan tombol Shift dan klik \"I know what I'm doing\".
 Save	FilePanelPriv		Simpan
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Tidak bisa membuka \"%document\" dengan aplikasi \"%app\" (Pustaka tidak ada: %library). \n

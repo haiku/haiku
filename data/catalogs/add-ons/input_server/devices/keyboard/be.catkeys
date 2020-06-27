@@ -1,9 +1,8 @@
-1	belarusian	x-vnd.Haiku-KeyboardInputServerDevice	2536418998
+1	belarusian	x-vnd.Haiku-KeyboardInputServerDevice	2228550365
 If the application will not quit you may have to kill it.	Team monitor		Калі праграма не спыніцца вам магчыма прыдзецца знішчыць яе.
 Quit application	Team monitor		Спыніць праграму
 Restart the desktop	Team monitor		Перазапусціць дэсктоп
 Force reboot	Team monitor		Перагрузіць
-Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Абярыце праграму ў спісе і націсніце кнопку 'Знішчыць праграму' альбо 'Спыніць праграму' каб яе спыніць.\n\nНацісніце і трымайце CONTROL+ALT+DELETE %ld сэкунд каб перагрузіць сістэму.
 Team monitor	Team monitor		Манітор працэсаў
 Kill application	Team monitor		Знішчыць праграму
 Cancel	Team monitor		Скасаваць

@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-libtracker	808706263
+1	croatian	x-vnd.Haiku-libtracker	3555867652
 Created	ContainerWindow		Napravljeno
 Icon	AttributesView		Ikona
 Kind	ContainerWindow		Vrsta
@@ -18,7 +18,6 @@ contains	FindPanel		sadrži
 Open	FilePanelPriv		Otvori
 Bitmap icon	AttributesView		Bitmap ikona
 You can't replace a folder with one of its sub-folders.	FSUtils		Ne možte zamijeniti mapu sa njenim podmapama.
-<%ld dates>	AttributesView		<%ld dates>
 Select…	VirtualDirectoryWindow		Odaberi…
 Name	Default Query Columns		Ime
 Unmount	ContainerWindow		Odmontiraj
@@ -40,7 +39,6 @@ Raw data	AttributesView		Sirovi podaci
 Preparing to move items…	StatusWindow		Priprema za premještanje stavki...
 Size	ContainerWindow		Veličina
 Select…	ContainerWindow		Odaberi...
-<%ld values>	AttributesView		<%ld values>
 Size	PoseView		Veličina
 96 x 96	ContainerWindow		96 x 96
 Title	Bookmark Query Columns		Naslov
@@ -147,7 +145,6 @@ contains	SelectionWindow		sadrži
 Replace	FilePanelPriv		Zamijeni
 is not	FindPanel		nije
 Icon view	DeskWindow		Ikonski pregled
-<%ld rectangles>	AttributesView		<%ld rectangles>
 Mount settings…	ContainerWindow		Postavke za montiranje...
 Keywords	Bookmark Query Columns		Ključne riječi
 Copy more	ContainerWindow		Kopiraj više
@@ -258,7 +255,6 @@ Copy to	ContainerWindow		Kopiraj u
 Name	SelectionWindow		Ime
 by attribute	FindPanel		po osobinama
 Write	FilePermissionsView		Pisanje
-<%ld bytes of data>	AttributesView		<%ld bytes of data>
 Save	FilePanelPriv		Spremi
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Nemože se otvoriti \"%document\" sa programom \"%app\"(nedostaju biblioteke: %library). \n
 Finish: %time	StatusWindow		Završi: %time

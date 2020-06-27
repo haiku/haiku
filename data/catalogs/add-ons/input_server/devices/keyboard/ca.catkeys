@@ -1,9 +1,8 @@
-1	catalan; valencian	x-vnd.Haiku-KeyboardInputServerDevice	2536418998
+1	catalan; valencian	x-vnd.Haiku-KeyboardInputServerDevice	2228550365
 If the application will not quit you may have to kill it.	Team monitor		Si l'aplicació no surt, potser l'haureu de matar.
 Quit application	Team monitor		Surt de l'aplicació
 Restart the desktop	Team monitor		Reinicia l'escriptori
 Force reboot	Team monitor		Força el reinici
-Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Seleccioneu una aplicació de la llista anterior i premeu el botó "Mata l'aplicació" o bé "Surt de l'aplicació" per tancar-la.\n\nPremeu CONTROL+ALT+SUPR durant %ld segons per reiniciar el sistema.
 Team monitor	Team monitor		Monitor de l'equip
 Kill application	Team monitor		Mata l'aplicació
 Cancel	Team monitor		Cancel·la

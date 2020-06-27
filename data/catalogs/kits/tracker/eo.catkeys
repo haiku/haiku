@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-libtracker	2906566299
+1	esperanto	x-vnd.Haiku-libtracker	1358760392
 Created	ContainerWindow		Kreita
 Icon	AttributesView		Piktogramo
 Open and make preferred	OpenWithWindow		Uzi kaj igi preferata
@@ -21,7 +21,6 @@ contains	FindPanel		enhavas
 Open	FilePanelPriv		Uzi
 Bitmap icon	AttributesView		Bitmapa piktogramo
 You can't replace a folder with one of its sub-folders.	FSUtils		Vi ne povas anstataŭigi dosierujon per ĝia propra subdosierujo.
-<%ld dates>	AttributesView		<%Id datoj>
 Select…	VirtualDirectoryWindow		Elekti...
 Name	Default Query Columns		Nomo
 Unmount	ContainerWindow		Demeti
@@ -50,7 +49,6 @@ Preparing to move items…	StatusWindow		Preparante movi elementojn...
 Size	ContainerWindow		Grando
 Select…	ContainerWindow		Elekti...
 Show shared volumes on Desktop	SettingsView		Montri komunajn volumojn sur labortablo
-<%ld values>	AttributesView		<%ld valoroj>
 Size	PoseView		Grando
 matches wildcard expression	SelectionWindow		taŭgas al ĵokera esprimo
 96 x 96	ContainerWindow		96 x 96
@@ -82,7 +80,7 @@ Select	InfoWindow		Elekti
 OK	OpenWithWindow		Bone
 Include trash	FindPanel		Inkludante rubujon
 GiB	WidgetAttributeText		GiB
-Clean up	ContainerWindow		Purigi
+Clean up	ContainerWindow		Alkradigi
 Modified	FindPanel		Redaktita
 Select all	QueryContainerWindow		Elekti ĉion
 Select…	FilePanelPriv		Elekti…
@@ -180,13 +178,13 @@ Work Phone	Person Query Columns		Labora Telefono
 Close	ContainerWindow		Fermi
 Get info	ContainerWindow		Akiri informon
 MIME Type	AttributesView		MIME Tipo
-Show folder location in title tab	SettingsView		Montri dosierujan lokon en la titola langeto
+Show folder location in title tab	SettingsView		Montri itineron en la titola langeto
 There was an error resolving the link.	Tracker		Eraro resolvante la ligilon.
 There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Aperis iu problemo penante konservi en la dosierujon specifitan. Bonvolu provi alian.
 Desktop	TrackerSettingsWindow		Labortablo
 Nested *?+.	libtracker		Ingita *?+.
 Move	FSUtils	button label	Movi
-Clean up	DeskWindow		Purigi
+Clean up	DeskWindow		Alkradigi
 Group	FilePermissionsView		Grupo
 Could not find an application to open \"%name\" (%error). 	FSUtils		Ne povis trovi programon por uzi \"%name\"-on (%error). 
 Internal error.	libtracker		Interna eraro.
@@ -196,7 +194,6 @@ contains	SelectionWindow		enhavas
 Replace	FilePanelPriv		Anstataŭigi
 is not	FindPanel		ne estas
 Icon view	DeskWindow		Piktograma vido
-<%ld rectangles>	AttributesView		<%ld ortanguloj>
 Mount settings…	ContainerWindow		Agordo de surmetado…
 Keywords	Bookmark Query Columns		Ŝlosilvortoj
 Media parameter web	AttributesView		Plurmediaj parametroj de reto
@@ -261,7 +258,7 @@ The mount server could not be contacted.	AutoMounterSettings		Neeblis kontakti l
 Query template	FindPanel		Serĉmenda ŝablono
 ends with	SelectionWindow		finiĝas per
 Open	OpenWithWindow		Uzi
-You must have at least one attribute showing.	PoseView		Necesas ke almenaŭ unu atributo estas montrata.
+You must have at least one attribute showing.	PoseView		Necesas almenaŭ unu montrata atributo.
 Cut	FilePanelPriv		Tondi
 Finish: after several years	StatusWindow		Fino: post kelkaj jaroj
 Favorites	FilePanelPriv		Preferaĵoj
@@ -297,7 +294,7 @@ Get info	FilePanelPriv		Akiri informon
 MIME String	AttributesView		MIME Literĉeno
 Delete	ContainerWindow		Forigi
 Execute	FilePermissionsView		Ruli
-Show volumes on Desktop	SettingsView		Montri portilojn sur Labortablo
+Show volumes on Desktop	SettingsView		Montri volumojn sur labortablo
 no	AttributesView		ne
 Recent folders	ContainerWindow		Ĵusaj dosierujoj
 Desktop	Model		Labortablo
@@ -343,7 +340,6 @@ Copy to	ContainerWindow		Kopii al
 Name	SelectionWindow		Nomo
 by attribute	FindPanel		per atributo
 Write	FilePermissionsView		Skribi
-<%ld bytes of data>	AttributesView		<%ld bitokoj da datumo>
 If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Se vi redaktas la sisteman dosierujon aŭ siajn enhavojn, ne kapablos praŝarĝi %osName!\n\nĈu vi certas, ke vi deziras fari ĉi tion?\n\nPor aliigi la sisteman dosierujon aŭ siajn enhavojn malgraŭe, premu la majuskligan klavon kaj alklaku \"Mi scias kion mi faras\".
 Save	FilePanelPriv		Konservi
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Malsukcesis uzi \"%document\"-on per programo \"%app\" (Mankas kodotekoj: %library). \n
@@ -374,7 +370,7 @@ Other	FilePermissionsView		Alia
 Automatic disk mounting	AutoMounterSettings		Surmeti diskojn aŭtomate
 parent folder	NavMenu		patra dosierujo
 Create link here	ContainerWindow		Krei ligilon ĉi tie
-Force identify	ContainerWindow		Devigi identigon
+Force identify	ContainerWindow		Devige identigi
 48 x 48	DeskWindow		48 x 48
 no items	CountView		neniu elemento
 Time	AttributesView		Horo
@@ -421,7 +417,7 @@ KiB	WidgetAttributeText		KiB
 Revert	TrackerSettingsWindow		Malfari
 trash	B_TRASH_DIRECTORY		rubujo
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Se vi movos la sisteman dosierujon aŭ ĝian enhavon, vi ne kapablos praŝarĝi %osName!\n\nĈu vi certas, ke vi volas fari tion?\n\nPor movi la sisteman dosierujon aŭ ĝian enhavon senkondiĉe, premu la majuskligklavon kaj klaku \"Movi\".
-Close all in workspace	ContainerWindow		Fermi ĉion en la laborejo
+Close all in workspace	ContainerWindow		Fermi ĉion en la laborspaco
 Corrupted expression.	libtracker		Koruptita esprimo.
 32 x 32	DeskWindow		32 x 32
 Network address	AttributesView		Retadreso
@@ -436,7 +432,7 @@ Name	QueryPoseView		Nomo
 Error %error loading add-On %name.	ContainerWindow		Eraris %error ŝarĝante aldonaĵon %name.
 Does not handle file	OpenWithWindow		Ne traktas dosieron
 E-mail	Person Query Columns		Retpoŝto
-Arrange by	ContainerWindow		Ordigi
+Arrange by	ContainerWindow		Ordigi laŭ
 Attributes	AttributesView		Atributoj
 Sorry, saving more than one item is not allowed.	FilePanelPriv		Bedaŭron, konservi pli ol unu elemento ne estas permesita.
 64-bit unsigned integer	AttributesView		64-bita sensignuma entjero
@@ -445,14 +441,14 @@ the config folder	FSUtils		la config dosierujo
 Sorry, could not create a new folder.	FSUtils		Bedaŭron, neeblis krei novan dosierujon.
 Select all	VirtualDirectoryWindow		Elekti ĉion
 Rename	FSUtils	button label	Renomi
-Clean up all	ContainerWindow		Purigi ĉion
+Clean up all	ContainerWindow		Alkradigi ĉion
 Add current folder	FilePanelPriv		Aldoni nunan dosierujon
 Description:	InfoWindow		Priskribo:
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Ĉu vi certas, ke vi volas forigi la elektita(j)n elemento(j)n? Tiu ago ne estas malfarebla.
 Grayscale picture	AttributesView		Grizoskala bildo
 Mount	DeskWindow		Surmeti
 ends with	FindPanel		finiĝas per
-Show Disks icon	SettingsView		Montri piktogramojn de diskoj
+Show Disks icon	SettingsView		Montri piktogramon de diskoj
 Outline selection rectangle only	SettingsView		Konturi sole elektan ortangulon
 by formula	FindPanel		per formulo
 Resize to fit	VirtualDirectoryWindow		Adapti laŭ grando
@@ -496,7 +492,7 @@ Add-ons	DeskWindow		Aldonaĵoj
 Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Ĉu vi certas, ke vi volas movi aŭ kopii la elekta(j)n ero(j)n al ĉi tiu dosierujo?
 Find	FindPanel		Serĉi
 Empty folder	NavMenu		Malplena dosierujo
-Defaults	TrackerSettingsWindow		Implicitoj
+Defaults	TrackerSettingsWindow		Defaŭltoj
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Bedaŭron, mankas sufiĉe da libera spaco en la portilo cela por kopii la elekton.
 True-color picture	AttributesView		Vere-kolora bildo
 Add-ons	FilePanelPriv		Aldonaĵoj

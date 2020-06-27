@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Installer	2743617657
+1	catalan; valencian	x-vnd.Haiku-Installer	2230593955
 Performing installation.	InstallProgress		Es fa la instal·lació.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Trieu el disc d'origen des del menú emergent. Llavors cliqueu a Comença.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Si us plau, tanqueu la finestra del Gestor de discs abans de tancar la finestra de l'instal·lador.
@@ -57,7 +57,6 @@ Collecting copy information.	InstallProgress		Es recopila la informació de còp
 Show optional packages	InstallerWindow		Mostra els paquets opcionals
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Pot ser que el disc de destinació no tingui prou espai lliure. Intenteu triar un altre disc o no instal·leu alguns elements opcionals.
 Installation canceled.	InstallProgress		S'ha cancel·lat la instal·lació.
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		El volum de destinació no és buit. Segur que voleu fer la instal·lació tanmateix?\n\nNota: la carpeta de sistema serà una còpia neta del volum d'origen, però conservarà la carpeta de configuració; totes les altres carpetes es combinaran, mentre que els fitxers i enllaços que existeixin tant al volum d'origen com al volum de destinació se sobreescriuran amb la versió del volum d'origen.
 OK	InstallerApp		D'acord
 Are you sure you want to abort the installation?	InstallerWindow		Segur que voleu avortar la instal·lació?
 Stop	InstallerWindow		Interromp

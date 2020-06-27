@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Notifications	3906219317
+1	romanian	x-vnd.Haiku-Notifications	4196496676
 Lower left	GeneralView		Stânga jos
 Application does not have a valid signature	NotificationView	Alert message	Aplicația nu are o semnătură validă
 Status	NotificationView		Stare
@@ -10,12 +10,16 @@ OK	PrefletWin		OK
 Notifications	PrefletWin		Înștiințări
 Notifications preflet sample	PrefletWin		Mostră de aplicație de preferințe ale notificărilor
 Mute notifications from this application	NotificationView		Mută notificări de la această aplicație
+wide	GeneralView	Window width: Slider high text	larg
+narrow	GeneralView	Window width: Slider low text	îngust
 Revert	PrefletWin		Revenire
 Applications	PrefletView		Aplicații
+{0, plural, =1{Timeout: # second}other{Timeout: # seconds}}	GeneralView		{0, plural, =1{Timeout: # second}other{Timeout: # seconds}}
 Upper right	GeneralView		Dreapta sus
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		A apărut o eroare la salvarea preferințelor.\nEste posibil că rămâneți fără spațiu pe hard disc.
 Defaults	PrefletWin		Implicite
 Upper left	GeneralView		Stânga sus
+Window width	GeneralView		Lățime fereastră
 Applications	NotificationView		Aplicații
 General	PrefletView		General
 OK	NotificationView		OK

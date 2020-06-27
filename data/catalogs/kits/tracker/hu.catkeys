@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	2906566299
+1	hungarian	x-vnd.Haiku-libtracker	1358760392
 Created	ContainerWindow		Létrehozva
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Megnyitás és előnyben részesítés
@@ -21,7 +21,6 @@ contains	FindPanel		tartalmazza
 Open	FilePanelPriv		Megnyitás
 Bitmap icon	AttributesView		Bittérkép ikon
 You can't replace a folder with one of its sub-folders.	FSUtils		Nem lehet egy mappát felülírni egy almappájával.
-<%ld dates>	AttributesView		<%ld dátumok>
 Select…	VirtualDirectoryWindow		Kijelölés…
 Name	Default Query Columns		Név
 Unmount	ContainerWindow		Leválasztás
@@ -50,7 +49,6 @@ Preparing to move items…	StatusWindow		Felkészülés az elemek mozgatására�
 Size	ContainerWindow		Méret
 Select…	ContainerWindow		Kijelölés…
 Show shared volumes on Desktop	SettingsView		Megosztott lemezek megjelenítése az Asztalon
-<%ld values>	AttributesView		<%ld értékek>
 Size	PoseView		Méret
 matches wildcard expression	SelectionWindow		megfelel a helyettesítő kifejezésnek
 96 x 96	ContainerWindow		95 × 95
@@ -196,7 +194,6 @@ contains	SelectionWindow		tartalmaz
 Replace	FilePanelPriv		Csere
 is not	FindPanel		nem egyenlő
 Icon view	DeskWindow		Ikon nézet
-<%ld rectangles>	AttributesView		<%ld téglalapok>
 Mount settings…	ContainerWindow		Csatolási beállítások…
 Keywords	Bookmark Query Columns		Kulcsszavak
 Media parameter web	AttributesView		Média paraméter web
@@ -343,7 +340,6 @@ Copy to	ContainerWindow		Másolás
 Name	SelectionWindow		A név
 by attribute	FindPanel		jellemző szerint
 Write	FilePermissionsView		Írás
-<%ld bytes of data>	AttributesView		<%ld bájtnyi adat>
 If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Ha megváltoztatos a rendszermappát vagy annak tartalmát, akkor a %osName nem fog elindulni!\n\nBiztosan ezt akarod tenni?\n\nA rendszermappa vagy annak tartalmának bármilyen módosításához tartsd lenyomva a Shift billentyűt, és kattints a \"Tudom, mit csinálok\" gombra.
 Save	FilePanelPriv		Mentés
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Nem sikerült megnyitni a dokumentumot (%document) a programmal (%app).\n\tHiányzó funkciótár: %library. \n

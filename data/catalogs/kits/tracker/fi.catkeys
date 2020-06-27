@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	4118767010
+1	finnish	x-vnd.Haiku-libtracker	2570961103
 Created	ContainerWindow		Luotu
 Icon	AttributesView		Kuvake
 Open and make preferred	OpenWithWindow		Avaa ja tee ensisijaiseksi
@@ -21,7 +21,6 @@ contains	FindPanel		sisältää
 Open	FilePanelPriv		Avaa
 Bitmap icon	AttributesView		Bittikarttakuvake
 You can't replace a folder with one of its sub-folders.	FSUtils		Et voi korvata kansiota yhdellä sen alikansioista.
-<%ld dates>	AttributesView		<%ld päivää>
 Select…	VirtualDirectoryWindow		Valitse…
 Name	Default Query Columns		Nimi
 Unmount	ContainerWindow		Irrota
@@ -50,7 +49,6 @@ Preparing to move items…	StatusWindow		Valmistaudutaan siirtämään kohteita.
 Size	ContainerWindow		Koko
 Select…	ContainerWindow		Valitse...
 Show shared volumes on Desktop	SettingsView		Näytä jaetut taltiot työpöydällä
-<%ld values>	AttributesView		<%ld arvot>
 Size	PoseView		Koko
 matches wildcard expression	SelectionWindow		täsmää jokerimerkkilausekkeeseen
 96 x 96	ContainerWindow		96 x 96
@@ -195,7 +193,6 @@ contains	SelectionWindow		sisältää
 Replace	FilePanelPriv		Korvaa
 is not	FindPanel		ei ole
 Icon view	DeskWindow		Kuvakenäkymä
-<%ld rectangles>	AttributesView		<%ld suorakaiteet>
 Mount settings…	ContainerWindow		Liittämisasetukset...
 Keywords	Bookmark Query Columns		Avainsanat
 Media parameter web	AttributesView		Mediaparametriwebbi
@@ -342,7 +339,6 @@ Copy to	ContainerWindow		Kopioi kohteeseen
 Name	SelectionWindow		Nimi
 by attribute	FindPanel		attribuuteittain
 Write	FilePermissionsView		Kirjoita
-<%ld bytes of data>	AttributesView		<%ld tavua tietoja>
 If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Jos muutat kansiota tai sen sisältöä, et ehkä kykene käynnistämään käyttöjärjestelmää %osName!\n\nOletko varma, että haluat tehdä tämän?\n\nJos kuitenkin muutat kansiota tai sen sisältöä, pidä alhaalla Vaihto-näppäin ja napsauta ”Tiedän, mitä olen tekemässä”.
 Save	FilePanelPriv		Tallenna
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Asiakirjan ”%document” avaus sovelluksella ”%app” epäonnistui (Puuttuvat kirjastot: %library). \n

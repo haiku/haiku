@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libbe	3337473349
+1	ukrainian	x-vnd.Haiku-libbe	3662205465
 {0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# байт} few{# байти} other{# байтів}}
 All Rights Reserved.	AboutWindow		Всі права захищені.
 gold master	AboutWindow		золотий майстер
@@ -17,6 +17,7 @@ beta	AboutWindow		бета
 OK	ZombieReplicantView		ОК
 Cut	TextView		Вирізати
 %3.2f GiB	StringForSize		%3.2f ГБ
+Default	Default decorator about box		За замовчуванням
 Can't delete this replicant from its original application. Life goes on.	Dragger		Не вдалося видалити реплікант з оригінальної програми. Життя продовжується.
 Error	ZombieReplicantView		Помилка
 Paste	TextView		Вставити

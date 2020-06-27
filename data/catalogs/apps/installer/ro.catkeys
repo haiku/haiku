@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Installer	2743617657
+1	romanian	x-vnd.Haiku-Installer	2230593955
 Performing installation.	InstallProgress		Se execută instalarea.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Alege discul sursă din meniul contextual. Apoi apasă \"Începe\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Alegeți fereastra ConfigurareDrive înainte de a închide fereastra Programului de instalare.
@@ -57,7 +57,6 @@ Collecting copy information.	InstallProgress		Se colectează informațiile de co
 Show optional packages	InstallerWindow		Afișează pachete opționale
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		E posibil ca discul de destinație să nu dețină destul spațiu. Încercați să alegeți un disc diferit sau alegeți să nu instalați elementele opționale.
 Installation canceled.	InstallProgress		Instalare anulată.
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Volumul țintă nu este gol. Sigur doriți să instalați oricum?\n\nNotă: Dosarul „system” va fi o copie curată de la volumul sursă dar va reține dosarul de configurări, toate celelalte dosare vor fi fuzionate, în timp ce fișierele și legăturile care există atât la sursă cât și la volumul țintă vor fi suprascrise cu versiunea volumului sursă.
 OK	InstallerApp		OK
 Are you sure you want to abort the installation?	InstallerWindow		Sigur dorești să renunți la instalare?
 Stop	InstallerWindow		Oprește

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	4118767010
+1	russian	x-vnd.Haiku-libtracker	2570961103
 Created	ContainerWindow		Создан
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Открыть и сделать предпочтительным
@@ -21,7 +21,6 @@ contains	FindPanel		содержит
 Open	FilePanelPriv		Открыть
 Bitmap icon	AttributesView		Растровый значок
 You can't replace a folder with one of its sub-folders.	FSUtils		Невозможно заменить папку её же собственной подпапкой.
-<%ld dates>	AttributesView		<%ld дат>
 Select…	VirtualDirectoryWindow		Выделить…
 Name	Default Query Columns		Имя
 Unmount	ContainerWindow		Отключить
@@ -50,7 +49,6 @@ Preparing to move items…	StatusWindow		Подготовка к перемещ�
 Size	ContainerWindow		Размер
 Select…	ContainerWindow		Выделить…
 Show shared volumes on Desktop	SettingsView		Показывать значки общих дисков
-<%ld values>	AttributesView		<%ld значений>
 Size	PoseView		Размер
 matches wildcard expression	SelectionWindow		совпадает с шаблонным выражением
 96 x 96	ContainerWindow		96 x 96
@@ -195,7 +193,6 @@ contains	SelectionWindow		содержит
 Replace	FilePanelPriv		Заменить
 is not	FindPanel		не равен
 Icon view	DeskWindow		Большие значки
-<%ld rectangles>	AttributesView		<%ld прямоугольников>
 Mount settings…	ContainerWindow		Настройка подключения дисков…
 Keywords	Bookmark Query Columns		Ключевые слова
 Media parameter web	AttributesView		Медиа параметры веб
@@ -342,7 +339,6 @@ Copy to	ContainerWindow		Копировать в
 Name	SelectionWindow		Имя
 by attribute	FindPanel		по атрибуту
 Write	FilePermissionsView		Запись
-<%ld bytes of data>	AttributesView		<%ld байт данных>
 If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Если вы измените папку system или её содержимое, вы не сможете больше загрузить %osName!\n\nВы уверены, что изменить ее?\n\nЧтобы изменить папку system или её содержимое, зажмите клавишу Shift и нажмите \"Я знаю, что я делаю\".
 Save	FilePanelPriv		Сохранить
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Невозможно открыть \"%document\" приложением \"%app\" (Отсутствуют библиотеки: %library). \n

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Installer	2743617657
+1	german	x-vnd.Haiku-Installer	2230593955
 Performing installation.	InstallProgress		Installation läuft.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Bitte Quelllaufwerk aus dem Menü wählen. Danach auf \"Start\" klicken.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Das DriveSetup-Fenster muss geschlossen werden, bevor der Installer verlassen werden kann.
@@ -57,7 +57,6 @@ Collecting copy information.	InstallProgress		Es werden Infos über zu kopierend
 Show optional packages	InstallerWindow		Optionale Pakete einblenden
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Auf der Zielpartition ist anscheinend nicht genügend Platz. Entweder eine andere Partition wählen oder einige optionale Pakete deaktivieren.
 Installation canceled.	InstallProgress		Installation abgebrochen.
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Die Zielpartition ist nicht leer. Soll trotzdem installiert werden?\n\nMan beachte: der 'system' Ordner wird eine saubere Kopie der Quelle sein, der bestehende 'settings' Ordner bleibt jedoch erhalten. Alle anderen Ordner werden zusammengeführt, wobei Dateien und Verknüpfungen die auf Quell- und Zielpartition existieren mit denen der Quelle eretzt werden.
 OK	InstallerApp		OK
 Are you sure you want to abort the installation?	InstallerWindow		Soll die Installation wirklich abgebrochen werden?
 Stop	InstallerWindow		Anhalten

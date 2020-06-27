@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-libtracker	2906566299
+1	italian	x-vnd.Haiku-libtracker	1358760392
 Created	ContainerWindow		Creato
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Apri e rendi preferito
@@ -21,7 +21,6 @@ contains	FindPanel		contiene
 Open	FilePanelPriv		Apri
 Bitmap icon	AttributesView		Icona bitmap
 You can't replace a folder with one of its sub-folders.	FSUtils		Non è possibile sostituire una cartella con una delle sue sotto-cartelle.
-<%ld dates>	AttributesView		<%ld date>
 Select…	VirtualDirectoryWindow		Seleziona…
 Name	Default Query Columns		Nome
 Unmount	ContainerWindow		Smonta
@@ -50,7 +49,6 @@ Preparing to move items…	StatusWindow		Preparazione allo spostamento degli ele
 Size	ContainerWindow		Dimensione
 Select…	ContainerWindow		Seleziona…
 Show shared volumes on Desktop	SettingsView		Mostra volumi condivisi sulla Scrivania
-<%ld values>	AttributesView		<%ld valori>
 Size	PoseView		Dimensione
 matches wildcard expression	SelectionWindow		espressione wildcard
 96 x 96	ContainerWindow		96 x 96
@@ -125,7 +123,7 @@ List folders first	SettingsView		Elenca prima le cartelle
 Find	FSUtils		Trova
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Esiste già in questa cartella un elemento chiamato \"%name\". Vuoi sostituirlo con il collegamento simbolico che stai creando?
 List view	ContainerWindow		Vista a liste
-Temporary	FindPanel		Temporaneo
+Temporary	FindPanel		Temporanea
 Modified	QueryPoseView		Modificato
 Create relative link	ContainerWindow		Crea collegamenti relativi
 Owner	FilePermissionsView		Proprietario
@@ -196,7 +194,6 @@ contains	SelectionWindow		contiene
 Replace	FilePanelPriv		Sostituisci
 is not	FindPanel		non è
 Icon view	DeskWindow		Visualizza icone
-<%ld rectangles>	AttributesView		<%ld rettangoli>
 Mount settings…	ContainerWindow		Impostazioni di mount
 Keywords	Bookmark Query Columns		Parole chiave
 Media parameter web	AttributesView		Parametro multimediale web
@@ -343,7 +340,6 @@ Copy to	ContainerWindow		Copia in
 Name	SelectionWindow		Nome
 by attribute	FindPanel		per attributo
 Write	FilePermissionsView		Scrittura
-<%ld bytes of data>	AttributesView		<%ld byte di dati>
 If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Se modifichi la cartella di sistema o il suo contenuto, non sarai più in grado di avviare %osName!\n\nSei sicuro di voler procedere?\n\nPer modificare la cartella di sistema o il suo contenuto, tieni premuto il tasto Maiusc e clicca su \"So quello che faccio\".
 Save	FilePanelPriv		Salva
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Non è stato possibile aprire \"%document\" con l'applicazione \"%app\" (Librerie mancanti: %library). \n

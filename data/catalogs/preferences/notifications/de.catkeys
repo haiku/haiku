@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Notifications	3906219317
+1	german	x-vnd.Haiku-Notifications	4196496676
 Lower left	GeneralView		Unten links
 Application does not have a valid signature	NotificationView	Alert message	Die Anwendung besitzt keine gültige Signatur
 Status	NotificationView		Status
@@ -10,12 +10,16 @@ OK	PrefletWin		OK
 Notifications	PrefletWin		Notifications - Benachrichtigungen
 Notifications preflet sample	PrefletWin		Benachrichtigungsbeispiel
 Mute notifications from this application	NotificationView		Benachrichtigungen dieser Anwendung stummschalten
+wide	GeneralView	Window width: Slider high text	breit
+narrow	GeneralView	Window width: Slider low text	schmal
 Revert	PrefletWin		Anfangswerte
 Applications	PrefletView		Anwendungen
+{0, plural, =1{Timeout: # second}other{Timeout: # seconds}}	GeneralView		{0, plural, =1{Anzeigezeit: # Sekunde}other{Anzeigezeit: # Sekunden}}
 Upper right	GeneralView		Oben rechts
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Das Speichern der Einstellungen ist fehlgeschlagen.\nMöglicherweise steht nicht genügend Speicherplatz zur Verfügung.
 Defaults	PrefletWin		Standardwerte
 Upper left	GeneralView		Oben links
+Window width	GeneralView		Fensterbreite
 Applications	NotificationView		Anwendungen
 General	PrefletView		Allgemein
 OK	NotificationView		OK

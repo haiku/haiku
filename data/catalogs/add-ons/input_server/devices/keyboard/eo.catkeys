@@ -1,9 +1,8 @@
-1	esperanto	x-vnd.Haiku-KeyboardInputServerDevice	2536418998
+1	esperanto	x-vnd.Haiku-KeyboardInputServerDevice	2228550365
 If the application will not quit you may have to kill it.	Team monitor		Se la programo ne malfermiĝos, vi eble devas mortigi ĝin.
 Quit application	Team monitor		Ĉesi programon
 Restart the desktop	Team monitor		Relanĉi la labortablon
 Force reboot	Team monitor		Perforte restartigi
-Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Elektu programon el la supra listo kaj alklaku aŭ la butonon 'Mortigi programon' aŭ la butonon 'Ĉesi programon' por malfermi ĝin.\n\nTinu Ktrl+Alt+Forigi dum %ld sekondoj por restartigi.
 Team monitor	Team monitor		La Procezarobservilo
 Kill application	Team monitor		Ĉesigi programon
 Cancel	Team monitor		Nuligi

@@ -64,7 +64,7 @@ Report compatibility	DevicesView		Raporto pri kongruo
 Computer	Device		Komputilo
 PCI bus	Device		Buso de PCI
 Enclosure	DeviceSCSI		Kunigaĵo
-Order by:	DevicesView		Ordigi per:
+Order by:	DevicesView		Ordigi laŭ:
 ACPI Thermal Zone	DeviceACPI		Temperatura intervalo de ACPI
 Intelligent controller	Device		Inteligenta adaptilo
 Multimedia controller	Device		Plurmedia adaptilo

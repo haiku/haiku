@@ -1,9 +1,8 @@
-1	romanian	x-vnd.Haiku-KeyboardInputServerDevice	2536418998
+1	romanian	x-vnd.Haiku-KeyboardInputServerDevice	2228550365
 If the application will not quit you may have to kill it.	Team monitor		Dacă aplicația nu se închide va trebui să o termini forțat.
 Quit application	Team monitor		Închide aplicația
 Restart the desktop	Team monitor		Repornește desktopul
 Force reboot	Team monitor		Forțează repornirea
-Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Selectează o aplicație din lista de mai sus și apasă pe 'Termină aplicația' sau 'Închide aplicația' pentru a o închide.\n\nȚine apăsat CONTROL+ALT+DELETE timp de %ld secunde pentru a reporni.
 Team monitor	Team monitor		Monitor echipe
 Kill application	Team monitor		Termină aplicația
 Cancel	Team monitor		Anulează

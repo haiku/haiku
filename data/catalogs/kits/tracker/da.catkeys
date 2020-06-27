@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-libtracker	2906566299
+1	danish	x-vnd.Haiku-libtracker	1358760392
 Created	ContainerWindow		Oprettet
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Åbn og lav foretrukket
@@ -21,7 +21,6 @@ contains	FindPanel		indeholder
 Open	FilePanelPriv		Åbn
 Bitmap icon	AttributesView		Bitmap-ikon
 You can't replace a folder with one of its sub-folders.	FSUtils		Du kan ikke erstatte en mappe med dets undermapper.
-<%ld dates>	AttributesView		<%ld datoer>
 Select…	VirtualDirectoryWindow		Vælg …
 Name	Default Query Columns		Navn
 Unmount	ContainerWindow		Afmonter
@@ -50,7 +49,6 @@ Preparing to move items…	StatusWindow		Forbereder flytning af elementerne…
 Size	ContainerWindow		Størrelse
 Select…	ContainerWindow		Vælg…
 Show shared volumes on Desktop	SettingsView		Vis delte diskområder på skrivebordet
-<%ld values>	AttributesView		<%ld værdier>
 Size	PoseView		Størrelse
 matches wildcard expression	SelectionWindow		matcher jokertegnudtryk
 96 x 96	ContainerWindow		96 x 96
@@ -196,7 +194,6 @@ contains	SelectionWindow		indeholder
 Replace	FilePanelPriv		Erstat
 is not	FindPanel		er ikke
 Icon view	DeskWindow		Ikonvisning
-<%ld rectangles>	AttributesView		<%ld rektangler>
 Mount settings…	ContainerWindow		Monteringsindstillinger…
 Keywords	Bookmark Query Columns		Nøgleord
 Media parameter web	AttributesView		Medieparameterweb
@@ -343,7 +340,6 @@ Copy to	ContainerWindow		Kopiér til
 Name	SelectionWindow		Navn
 by attribute	FindPanel		efter attribut
 Write	FilePermissionsView		Skriv
-<%ld bytes of data>	AttributesView		<%ld bytes data>
 If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Hvis du ændre systemmappen eller dens indhold, så vil du ikke være i stand til at opstarte %osName!\n\nEr du sikker på, at du vil gøre det?\n\nFor alligevel at ændre systemmappen eller dens indhold, hold Skift-tasten nede og klik på \"Jeg ved hvad jeg gør\".
 Save	FilePanelPriv		Gem
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Kunne ikke åbne \"%document\" med programmet \"%app\" (Manglende biblioteker: %library). \n

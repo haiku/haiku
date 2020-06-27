@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Notifications	3906219317
+1	japanese	x-vnd.Haiku-Notifications	4196496676
 Lower left	GeneralView		左下
 Application does not have a valid signature	NotificationView	Alert message	アプリケーションは有効なシグネチャーがありません
 Status	NotificationView		ステータス
@@ -10,12 +10,16 @@ OK	PrefletWin		OK
 Notifications	PrefletWin		通知
 Notifications preflet sample	PrefletWin		通知サンプル
 Mute notifications from this application	NotificationView		このアプリケーションからの通知をミュートする
+wide	GeneralView	Window width: Slider high text	広く
+narrow	GeneralView	Window width: Slider low text	狭く
 Revert	PrefletWin		戻す
 Applications	PrefletView		アプリケーション
+{0, plural, =1{Timeout: # second}other{Timeout: # seconds}}	GeneralView		{0, plural, =1{タイムアウト: # 秒}other{タイムアウト: # 秒}}
 Upper right	GeneralView		右上
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		設定の保存中にエラーが発生しました。\nディスクの空きが無いのかもしれません。
 Defaults	PrefletWin		デフォルト
 Upper left	GeneralView		左上
+Window width	GeneralView		ウィンドウの幅
 Applications	NotificationView		アプリケーション
 General	PrefletView		一般設定
 OK	NotificationView		OK

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Notifications	3906219317
+1	swedish	x-vnd.Haiku-Notifications	4196496676
 Lower left	GeneralView		Nere till vänster
 Application does not have a valid signature	NotificationView	Alert message	Applikationen har inte en giltig signatur
 Status	NotificationView		Status
@@ -10,12 +10,16 @@ OK	PrefletWin		OK
 Notifications	PrefletWin		Aviseringar
 Notifications preflet sample	PrefletWin		Test av underrättelsepanel
 Mute notifications from this application	NotificationView		Tysta ner underrättelser från denna applikation
+wide	GeneralView	Window width: Slider high text	bred
+narrow	GeneralView	Window width: Slider low text	smal
 Revert	PrefletWin		Återgå
 Applications	PrefletView		Program
+{0, plural, =1{Timeout: # second}other{Timeout: # seconds}}	GeneralView		{0, plural, =1{Timeout: # second}other{Timeout: # seconds}}
 Upper right	GeneralView		Uppe till höger
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Ett fel uppstod när inställningarna skulle sparas.\nEn möjlighet är att du har slut på diskutrymme.
 Defaults	PrefletWin		Förinställt värde
 Upper left	GeneralView		Uppe till vänster
+Window width	GeneralView		Fönsterbredd
 Applications	NotificationView		Program
 General	PrefletView		Allmän
 OK	NotificationView		OK

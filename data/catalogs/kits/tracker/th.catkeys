@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-libtracker	4118767010
+1	thai	x-vnd.Haiku-libtracker	2570961103
 Created	ContainerWindow		สร้างแล้ว
 Icon	AttributesView		ไอคอน
 Open and make preferred	OpenWithWindow		เปิดและทำให้เป็นที่ต้องการ
@@ -21,7 +21,6 @@ contains	FindPanel		มี
 Open	FilePanelPriv		เปิด
 Bitmap icon	AttributesView		ไอคอน Bitmap
 You can't replace a folder with one of its sub-folders.	FSUtils		คุณไม่สามารถแทนที่โฟลเดอร์ด้วยหนึ่งในโฟลเดอร์ย่อย
-<%ld dates>	AttributesView		<%ld dates>
 Select…	VirtualDirectoryWindow		เลือก
 Name	Default Query Columns		ชื่อ
 Unmount	ContainerWindow		ยกเลิกการเชื่อมต่อ
@@ -50,7 +49,6 @@ Preparing to move items…	StatusWindow		กำลังเตรียมย้
 Size	ContainerWindow		ขนาด
 Select…	ContainerWindow		เลือก
 Show shared volumes on Desktop	SettingsView		แสดงปริมาณที่แชร์บนเดสก์ท็อป
-<%ld values>	AttributesView		<%ld values>
 Size	PoseView		ขนาด
 matches wildcard expression	SelectionWindow		จับคู่แสดงสัญลักษณ์
 96 x 96	ContainerWindow		96 x 96
@@ -195,7 +193,6 @@ contains	SelectionWindow		บรรจุ
 Replace	FilePanelPriv		แทนที่
 is not	FindPanel		ไม่เป็น
 Icon view	DeskWindow		ดูไอคอน
-<%ld rectangles>	AttributesView		<%ld rectangles>
 Mount settings…	ContainerWindow		ตั้งค่าเชื่อมต่อ
 Keywords	Bookmark Query Columns		คำสำคัญ
 Media parameter web	AttributesView		เว็บพารามิเตอร์สื่อ
@@ -342,7 +339,6 @@ Copy to	ContainerWindow		คัดลอกไปที่
 Name	SelectionWindow		ชื่อ
 by attribute	FindPanel		โดย attribute
 Write	FilePermissionsView		เขียน
-<%ld bytes of data>	AttributesView		<%ld bytes of data>
 If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		หากคุณแก้ไขโฟลเดอร์ระบบหรือเนื้อหาในโฟลเดอร์คุณจะไม่สามารถบูท %osName!\n\nคุณแน่ใจหรือว่าต้องการทำสิ่งนี้?\n\nหากต้องการแก้ไขโฟลเดอร์ระบบหรือเนื้อหาในระบบให้กดแป้น Shift ค้างไว้แล้วคลิก \"ฉันรู้ว่าฉันกำลังทำอะไร\"
 Save	FilePanelPriv		บันทึก
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		ไม่สามารถเปิด \"%document\" พร้อมกับแอปพลิเคชัน \"%app\" (ไม่มีไลบรารี: %library)\n

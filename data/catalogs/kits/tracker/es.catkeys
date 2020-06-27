@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-libtracker	4118767010
+1	spanish; castilian	x-vnd.Haiku-libtracker	2570961103
 Created	ContainerWindow		Creado
 Icon	AttributesView		Icono
 Open and make preferred	OpenWithWindow		Abrir y hacer preferido
@@ -21,7 +21,6 @@ contains	FindPanel		contiene
 Open	FilePanelPriv		Abrir
 Bitmap icon	AttributesView		Icono de mapa de bits
 You can't replace a folder with one of its sub-folders.	FSUtils		No puedes reemplazar una carpeta por una de sus subcarpetas
-<%ld dates>	AttributesView		<fechas %ld>
 Select…	VirtualDirectoryWindow		Seleccione…
 Name	Default Query Columns		Nombre
 Unmount	ContainerWindow		Desmontar
@@ -50,7 +49,6 @@ Preparing to move items…	StatusWindow		Preparándose para mover los elementos.
 Size	ContainerWindow		Tamaño
 Select…	ContainerWindow		Seleccionar...
 Show shared volumes on Desktop	SettingsView		Mostrar las carpetas compartidas en el escritorio
-<%ld values>	AttributesView		<%ld valores>
 Size	PoseView		Tamaño
 matches wildcard expression	SelectionWindow		coincide con la expresión comodín
 96 x 96	ContainerWindow		96 x 96
@@ -195,7 +193,6 @@ contains	SelectionWindow		contiene
 Replace	FilePanelPriv		Reemplazar
 is not	FindPanel		No es
 Icon view	DeskWindow		Vista de icono
-<%ld rectangles>	AttributesView		<%ld rectángulos>
 Mount settings…	ContainerWindow		Opciones de montaje
 Keywords	Bookmark Query Columns		Palabras clave
 Media parameter web	AttributesView		Medios de parámetro Web
@@ -342,7 +339,6 @@ Copy to	ContainerWindow		Copiar a
 Name	SelectionWindow		Nombre
 by attribute	FindPanel		Por atributo
 Write	FilePermissionsView		Escribir
-<%ld bytes of data>	AttributesView		<%ld bytes de datos>
 If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Si modifica la carpeta de sistema o sus contenidos, es posible que no pueda iniciar %osName!\n\n¿Está seguro de que desea hacer esto?\n\nPara modificar la carpeta de sistema o sus contenidos, mantenga presionada la tecla Mayúsculas (Shift) y haga clic en \"Sé lo que estoy haciendo\".
 Save	FilePanelPriv		Guardar
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		no se pudo abrir \"%document\" con la aplicación \"%app\" (Librerías faltantes: %library). \n

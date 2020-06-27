@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-libtracker	4118767010
+1	friulian	x-vnd.Haiku-libtracker	2570961103
 Created	ContainerWindow		Creât
 Icon	AttributesView		Icone
 Open and make preferred	OpenWithWindow		Vierç e rint preferît
@@ -21,7 +21,6 @@ contains	FindPanel		al conten
 Open	FilePanelPriv		Vierç
 Bitmap icon	AttributesView		Icone Bitmap
 You can't replace a folder with one of its sub-folders.	FSUtils		No si pues sostituî une cartele cuntune des sôs sot-cartelis.
-<%ld dates>	AttributesView		<%ld datis>
 Select…	VirtualDirectoryWindow		Selezione…
 Name	Default Query Columns		Non
 Unmount	ContainerWindow		Dismonte
@@ -50,7 +49,6 @@ Preparing to move items…	StatusWindow		Daûr a prontâ il spostament dai eleme
 Size	ContainerWindow		Dimension
 Select…	ContainerWindow		Selezione…
 Show shared volumes on Desktop	SettingsView		Mostre i volums condividûts sul Scritori
-<%ld values>	AttributesView		<%ld valôrs>
 Size	PoseView		Dimension
 matches wildcard expression	SelectionWindow		al coincît cu la espression cun matis (*)
 96 x 96	ContainerWindow		96 x 96
@@ -195,7 +193,6 @@ contains	SelectionWindow		al conten
 Replace	FilePanelPriv		Sostituìs
 is not	FindPanel		nol è
 Icon view	DeskWindow		Viodude a iconis
-<%ld rectangles>	AttributesView		<%ld retangui>
 Mount settings…	ContainerWindow		Impostazions di montaç…
 Keywords	Bookmark Query Columns		Peraulis clâf
 Media parameter web	AttributesView		Parametri multimediâl web
@@ -342,7 +339,6 @@ Copy to	ContainerWindow		Copie su
 Name	SelectionWindow		Non
 by attribute	FindPanel		par atribût
 Write	FilePermissionsView		Scriture
-<%ld bytes of data>	AttributesView		<%ld byte di dâts>
 If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Se si modifiche la cartele di sisteme o i siei contignûts, no si rivarà plui inviâ %osName!\n\nContinuâ pardabon?\n\nPar modificâ distès la cartele di sisteme o i siei contignûts, ten fracât il tast Maiusc e fâs clic su \"O sai ce che o fâs\".
 Save	FilePanelPriv		Salve
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Nol è stât pussibil vierzi \"%document\" cu la aplicazion \"%app\" (Librariis che a mancjin: %library). \n

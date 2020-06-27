@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-libtracker	3261784361
+1	greek, modern (1453-)	x-vnd.Haiku-libtracker	1713978454
 Created	ContainerWindow		Δημιουργήθηκε
 Icon	AttributesView		Εικονίδιο
 Open and make preferred	OpenWithWindow		'Ανοιγμα και ορισμός προεπιλεγμένου
@@ -21,7 +21,6 @@ contains	FindPanel		περιέχει
 Open	FilePanelPriv		Άνοιγμα
 Bitmap icon	AttributesView		Εικονίδιο Bitmap
 You can't replace a folder with one of its sub-folders.	FSUtils		Δεν μπορείτε να αντικαταστήσετε ένα φάκελο με ένα από τους υποφακέλους του.
-<%ld dates>	AttributesView		<%ld ημερομηνίες>
 Select…	VirtualDirectoryWindow		Επιλογή…
 Name	Default Query Columns		Όνομα
 Unmount	ContainerWindow		Αποπροσάρτηση
@@ -50,7 +49,6 @@ Preparing to move items…	StatusWindow		Προετοιμασία για τη μ
 Size	ContainerWindow		Μέγεθος
 Select…	ContainerWindow		Επιλογή…
 Show shared volumes on Desktop	SettingsView		Εμφάνιση κοινών τόμων στην επιφάνεια εργασίας
-<%ld values>	AttributesView		<%ld τιμές>
 Size	PoseView		Μέγεθος
 matches wildcard expression	SelectionWindow		αντιστοιχεί με την έκφραση μπαλαντέρ
 96 x 96	ContainerWindow		96 x 96
@@ -191,7 +189,6 @@ contains	SelectionWindow		περιέχει
 Replace	FilePanelPriv		Αντικατάσταση
 is not	FindPanel		δεν είναι
 Icon view	DeskWindow		Προβολή εικονιδίου
-<%ld rectangles>	AttributesView		<%ld ορθογώνια>
 Mount settings…	ContainerWindow		Ρυθμίσεις προσάρτησης…
 Keywords	Bookmark Query Columns		Λέξεις κλειδιά
 Copy more	ContainerWindow		Αντιγραφή κι άλλων
@@ -334,7 +331,6 @@ Copy to	ContainerWindow		Αντιγραφή στο
 Name	SelectionWindow		Όνομα
 by attribute	FindPanel		κατά ιδιότητα
 Write	FilePermissionsView		Εγγραφή
-<%ld bytes of data>	AttributesView		<%ld byte δεδομένων>
 If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Αν πειράξετε τον φάκελο συστήματος ή τα περιεχόμενά του, δεν θα μπορέσετε να εκκινήσετε το %osName!\n\nΕίστε σίγουρος πως θέλετε να το κάνετε αυτό;\n\nΓια να πειράξετε τον φάκελο ή τα περιεχόμενά του ούτως ή άλλως, κρατήστε πατημένο το πλήκτρο Shift και κάντε κλικ στο κουμπί \"Ξέρω τι κάνω\".
 Save	FilePanelPriv		Αποθήκευση
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Αδυναμία ανοίγματος του \"%document\"  με την εφαρμογή \"%app\" (Βιβλιοθήκες που λείπουν: %library). \n

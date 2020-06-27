@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	2906566299
+1	romanian	x-vnd.Haiku-libtracker	1358760392
 Created	ContainerWindow		Creat
 Icon	AttributesView		Iconiță
 Open and make preferred	OpenWithWindow		Deschide sau fixează ca preferat
@@ -21,7 +21,6 @@ contains	FindPanel		conține
 Open	FilePanelPriv		Deschide
 Bitmap icon	AttributesView		Iconiță bitmap
 You can't replace a folder with one of its sub-folders.	FSUtils		Nu puteți înlocui un dosar cu unul din subdosarele acestuia.
-<%ld dates>	AttributesView		<%ld dates>
 Select…	VirtualDirectoryWindow		Selectare…
 Name	Default Query Columns		Nume
 Unmount	ContainerWindow		Demontează
@@ -50,7 +49,6 @@ Preparing to move items…	StatusWindow		Se pregătește mutarea elementelor…
 Size	ContainerWindow		Dimensiune
 Select…	ContainerWindow		Selectează…
 Show shared volumes on Desktop	SettingsView		Afișează volumele comune pe desktop
-<%ld values>	AttributesView		<%ld values>
 Size	PoseView		Dimensiune
 matches wildcard expression	SelectionWindow		se potrivește expresiei metacaracter
 96 x 96	ContainerWindow		96 x 96
@@ -196,7 +194,6 @@ contains	SelectionWindow		conține
 Replace	FilePanelPriv		Înlocuiește
 is not	FindPanel		nu este
 Icon view	DeskWindow		Vizualizare pictogramă
-<%ld rectangles>	AttributesView		<%ld rectangles>
 Mount settings…	ContainerWindow		Configurări montare…
 Keywords	Bookmark Query Columns		Cuvinte cheie
 Media parameter web	AttributesView		Web parametru media
@@ -343,7 +340,6 @@ Copy to	ContainerWindow		Copiază la
 Name	SelectionWindow		Nume
 by attribute	FindPanel		după atribut
 Write	FilePermissionsView		Scrie
-<%ld bytes of data>	AttributesView		<%ld bytes of data>
 If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Dacă alterați dosarul de sistem sau conținutul acestuia, nu veți putea să porniți %osName!\n\nSigur doriți să faceți asta?\n\nPentru a altera dosarul de sistem sau conținutul acestuia oricum, țineți apăsată tasta Shift și dați clic pe \"Știu ce fac\".
 Save	FilePanelPriv		Salvează
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Nu s-a putut deschide \"%document\" cu aplicația \"%app\" (Biblioteci lipsă: %library). \n

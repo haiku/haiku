@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-Installer	2743617657
+1	esperanto	x-vnd.Haiku-Installer	2230593955
 Performing installation.	InstallProgress		Instalante.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Elektu la elan diskon el la ŝpruca menuo. Poste alklaku \"Ek\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Bonvolu fermi la fenestron de la Diskagordilo antaŭ fermi la fenestron de al Instalilo.
@@ -57,7 +57,6 @@ Collecting copy information.	InstallProgress		Kunigante kopiajn informojn.
 Show optional packages	InstallerWindow		Montri malneprajn pakaĵojn
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		La spaco de la ala disko ne sufiĉas. Bonvolu elekti alian diskon aŭ elekti ne instali nedevigajn pakaĵojn.
 Installation canceled.	InstallProgress		Instalado estis nuligita.
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		La cela volumo ne estas malplena. Ĉu vi certas ke vi volas instali senkondiĉe?\n\nNoto: La dosierujo 'system' estos pura kopio el fonta volumo, sed la dosierujo de agordoj estos konservita, ĉiuj aliaj dosierujoj estos kunmetitaj kie dosieroj kaj ligoj ekzistantaj en ambaŭ cela kaj fonta volumoj estos submetitaj per versioj el fonta volumo.
 OK	InstallerApp		Bone
 Are you sure you want to abort the installation?	InstallerWindow		Ĉu vi certas, ke vi volas ĉesigi la instaladon?
 Stop	InstallerWindow		Halti

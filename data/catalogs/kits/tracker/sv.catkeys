@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	2906566299
+1	swedish	x-vnd.Haiku-libtracker	1358760392
 Created	ContainerWindow		Skapad
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Öppna och gör till förval
@@ -21,7 +21,6 @@ contains	FindPanel		innehåller
 Open	FilePanelPriv		Öppna
 Bitmap icon	AttributesView		Bitmappsikon
 You can't replace a folder with one of its sub-folders.	FSUtils		Du kan inte ersätta en katalog med en av dess underkataloger.
-<%ld dates>	AttributesView		<%ld dates>
 Select…	VirtualDirectoryWindow		Välj…
 Name	Default Query Columns		Namn
 Unmount	ContainerWindow		Avmontera
@@ -50,7 +49,6 @@ Preparing to move items…	StatusWindow		Förbereder flytt av objekt...
 Size	ContainerWindow		Storlek
 Select…	ContainerWindow		Markera...
 Show shared volumes on Desktop	SettingsView		Visa delade volymer på Skrivbordet
-<%ld values>	AttributesView		<%ld values>
 Size	PoseView		Storlek
 matches wildcard expression	SelectionWindow		matchar jokeruttryck
 96 x 96	ContainerWindow		96 x 96
@@ -196,7 +194,6 @@ contains	SelectionWindow		innehåller
 Replace	FilePanelPriv		Ersätt
 is not	FindPanel		är inte
 Icon view	DeskWindow		Ikonvy
-<%ld rectangles>	AttributesView		<%ld rectangles>
 Mount settings…	ContainerWindow		Monteringsinställningar...
 Keywords	Bookmark Query Columns		Nyckelord
 Media parameter web	AttributesView		Mediaparameter väv
@@ -343,7 +340,6 @@ Copy to	ContainerWindow		Kopiera till
 Name	SelectionWindow		Namn
 by attribute	FindPanel		via attribut
 Write	FilePermissionsView		Skriv
-<%ld bytes of data>	AttributesView		<%ld bytes of data>
 If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Om du gör ändringar i systemmappen kommer du kanske inte kunna starta %osName!\n\nÄr du säker på att du vill göra detta?\n\nFör att göra ändringar ändå, håll nere Shift-tangenten samtidigt som du trycker på \"Jag vet vad jag håller på med\".
 Save	FilePanelPriv		Spara
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Kunde inte öppna \"%document\" med programmet \"%app\" (Saknar bibliotek: %library). \n

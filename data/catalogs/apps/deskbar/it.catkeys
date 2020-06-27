@@ -43,8 +43,8 @@ Deskbar preferences…	DeskbarMenu		Preferenze di Deskbar…
 Expand new applications	PreferencesWindow		Espandi le nuove applicazioni
 Show replicants	DeskbarMenu		Mostra replicanti
 Hide application names	PreferencesWindow		Nascondi il nome delle applicazioni
-Demos	B_USER_DESKBAR_DIRECTORY/Demos		Applicazioni dimostrative
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Applicazioni Dimostrative
 Icon size	PreferencesWindow		Dimensione icone
-Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Applet della scrivania
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Applet della Scrivania
 Hide all	WindowMenu		Nascondi tutto
 Quit application	WindowMenu		Chiudi l'applicazione

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Installer	2743617657
+1	japanese	x-vnd.Haiku-Installer	2230593955
 Performing installation.	InstallProgress		インストールを実行しています。
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		メニューからインストールディスクを選択し、次に\"開始\"ボタンをクリックしてください。
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		インストーラーを閉じる前に、DriveSetup を終了してください。
@@ -57,7 +57,6 @@ Collecting copy information.	InstallProgress		コピー元の情報を集めて�
 Show optional packages	InstallerWindow		オプショナルパッケージを表示
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		インストール先ディスクの空き容量が不足している可能性があります。他のディスクを選択するか、インストールするオプションを減らしてください。
 Installation canceled.	InstallProgress		インストールが中断されました。
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		インストール先は空ではありません。それでもインストールしますか?\n\n注: 'システム' フォルダーはインストール元からのクリーンなコピーになりますが、設定フォルダーは元のままです。ほかのすべてのフォルダーはマージされますが、一方両方にあるファイルやリンクはインストール元のバージョンに上書きされます。
 OK	InstallerApp		OK
 Are you sure you want to abort the installation?	InstallerWindow		本当にインストールを中断しますか?
 Stop	InstallerWindow		中断

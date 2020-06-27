@@ -1,2 +1,31 @@
-1	romanian	x-vnd.haiku-screenshot-cli	721864121
+1	romanian	x-vnd.haiku-screenshot-cli	3958461128
+Include window border	ScreenshotWindow		Include marginea ferestrei
+Overwrite	ScreenshotWindow		Suprascrie
+Save in:	ScreenshotWindow		Salvează în:
+Error saving \"%s\":\n\t%s	ScreenshotWindow		Eroare la salvarea a \„%s\”:\n\t%s
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Acest fișier există deja.\n Sigur doriți să îl suprascrieți?
+OK	ScreenshotWindow		OK
+The destination path exists but is not a folder.	ScreenshotWindow		Calea de destinație există dar nu este un dosar.
+Select	ScreenshotWindow		Selectează
+Save as:	ScreenshotWindow		Salvează ca:
+seconds	ScreenshotWindow		secunde
+New screenshot	ScreenshotWindow		Captură de ecran nouă
+Screenshot	System name		Captură de ecran
+Desktop	ScreenshotWindow		Desktop
+Artwork folder	ScreenshotWindow		Dosar de opere de artă
+Translator Settings	ScreenshotWindow		Configurări traducător
+Include mouse pointer	ScreenshotWindow		Include indicatorul mausului
+overwrite	ScreenshotWindow		suprascrie
+Settings…	ScreenshotWindow		Configurări…
+Choose folder	ScreenshotWindow		Alege dosarul
+Name:	ScreenshotWindow		Nume:
+Choose folder…	ScreenshotWindow		Alege dosarul…
+Please select	ScreenshotWindow		Alegeți
+Failed to save screenshot	ScreenshotWindow		Nu s-a putut salva captura de ecran
+Cancel	ScreenshotWindow		Anulează
+Delay:	ScreenshotWindow		Întârziere:
+Copy to clipboard	ScreenshotWindow		Copiază la clipboard
 screenshot	Screenshot	Base filename of screenshot files	captură de ecran
+Home folder	ScreenshotWindow		Dosarul personal
+Save	ScreenshotWindow		Salvează
+Capture active window	ScreenshotWindow		Capturează fereastra activă

@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-libtracker	285470499
+1	turkish	x-vnd.Haiku-libtracker	3032631888
 Created	ContainerWindow		Oluşturulma
 Icon	AttributesView		Simge
 Open and make preferred	OpenWithWindow		Aç ve tercih edilen yap
@@ -21,7 +21,6 @@ contains	FindPanel		içerir:
 Open	FilePanelPriv		Aç
 Bitmap icon	AttributesView		Biteşlem simge
 You can't replace a folder with one of its sub-folders.	FSUtils		Bir klasörü kendi alt klasörlerinden biriyle değiştiremezsiniz.
-<%ld dates>	AttributesView		<%ld tarih>
 Select…	VirtualDirectoryWindow		Seç…
 Name	Default Query Columns		Ad
 Unmount	ContainerWindow		Bağlantıyı kes
@@ -50,7 +49,6 @@ Preparing to move items…	StatusWindow		Ögeler taşınmaya hazırlanıyor…
 Size	ContainerWindow		Boyut
 Select…	ContainerWindow		Seç…
 Show shared volumes on Desktop	SettingsView		Paylaşılan diskleri Masaüstü'nde göster
-<%ld values>	AttributesView		<%ld değer>
 Size	PoseView		Boyut
 matches wildcard expression	SelectionWindow		joker ifadesi ile eşleşir
 96 x 96	ContainerWindow		96 x 96
@@ -196,7 +194,6 @@ contains	SelectionWindow		şunu içerir:
 Replace	FilePanelPriv		Değiştir
 is not	FindPanel		değil
 Icon view	DeskWindow		Simge görünümü
-<%ld rectangles>	AttributesView		<%ld dikdörtgen>
 Mount settings…	ContainerWindow		Bağlama ayarları…
 Keywords	Bookmark Query Columns		Anahtar sözcükler
 Media parameter web	AttributesView		Ortam parametre ağı
@@ -343,7 +340,6 @@ Copy to	ContainerWindow		Kopyala
 Name	SelectionWindow		Ad
 by attribute	FindPanel		öznitelik ile
 Write	FilePermissionsView		Yazma
-<%ld bytes of data>	AttributesView		<%ld bayt veri>
 If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Sistem klasörünü veya içeriğini değiştirirseniz %osName çalışmayacaktır!\n\nBunu yapmak istediğinizden emin misiniz?\n\nYine de değiştirmek istiyorsanız, Shift düğmesini basılı tutun ve \"Ne yaptığımı biliyorum\"a tıklayın.
 Save	FilePanelPriv		Kaydet
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		\"%document\" \"%app\" uygulaması ile açılamadı (Eksik kitaplıklar: %library). \n

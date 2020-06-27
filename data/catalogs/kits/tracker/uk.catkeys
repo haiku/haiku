@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libtracker	4118767010
+1	ukrainian	x-vnd.Haiku-libtracker	1358760392
 Created	ContainerWindow		Cтворений
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Відкрити і зробити пріоритетним
@@ -21,7 +21,6 @@ contains	FindPanel		містить
 Open	FilePanelPriv		Відкрити
 Bitmap icon	AttributesView		Растровий значок
 You can't replace a folder with one of its sub-folders.	FSUtils		Ви не можете замінити папку однією з її ж підпапок.
-<%ld dates>	AttributesView		<%ld дат>
 Select…	VirtualDirectoryWindow		Вибрати…
 Name	Default Query Columns		Ім'я
 Unmount	ContainerWindow		Відключити
@@ -50,7 +49,6 @@ Preparing to move items…	StatusWindow		Підготовка до перемі�
 Size	ContainerWindow		Розмір
 Select…	ContainerWindow		Вибрати…
 Show shared volumes on Desktop	SettingsView		Показати спільні томи на робочому столі
-<%ld values>	AttributesView		<%ld значень>
 Size	PoseView		Розмір
 matches wildcard expression	SelectionWindow		відповідає шаблону виразу
 96 x 96	ContainerWindow		96 x 96
@@ -111,6 +109,7 @@ Edit templates…	TemplatesMenu		Редагувати шаблони…
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# байт} few{# байти} other{# байтів}}
 8-bit integer	AttributesView		8-бітове ціле
 8-bit unsigned integer	AttributesView		8-бітове ціле беззнакове
+%s info	InfoWindow	window title	%s інфо
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used використано -- %free вільно)
 Hide dotfiles	SettingsView		Сховати файли з крапкою
 Trash	Model		Смітник
@@ -195,7 +194,6 @@ contains	SelectionWindow		вміст
 Replace	FilePanelPriv		Замінити
 is not	FindPanel		не є
 Icon view	DeskWindow		У вигляді значків
-<%ld rectangles>	AttributesView		<%ld прямокутників>
 Mount settings…	ContainerWindow		Налаштування підключення…
 Keywords	Bookmark Query Columns		Ключові слова
 Media parameter web	AttributesView		Медіа параметри веб
@@ -342,7 +340,6 @@ Copy to	ContainerWindow		Копіювати до
 Name	SelectionWindow		Ім'я
 by attribute	FindPanel		за атрибутом
 Write	FilePermissionsView		Записати
-<%ld bytes of data>	AttributesView		<%ld байтів даних>
 If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Якщо ви зміните папку system або її вміст, то не зможете завантажити %osName!\n\nВи впевнені що бажаєте цього?\n\nЩоб все рівно змінити папку system або її вміст, затисніть кнопку Shift та натисніть \"Я знаю що роблю\".
 Save	FilePanelPriv		Зберегти
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Не вдалося відкрити \"%document\" програмою \"%app\" (Відсутні бібліотеки: %library). \n

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-ActivityMonitor	3672498538
+1	ukrainian	x-vnd.Haiku-ActivityMonitor	2601047281
 Teams	DataSource		Команди
 Semaphores	DataSource		Семафори
 TX	DataSource	Shorter version for Sending	TX
@@ -17,6 +17,7 @@ Remove graph	ActivityView		Вилучити графік
 Swap space	DataSource		Розмір своп-файлу
 CPU	DataSource		CPU
 ActivityMonitor	System name		ActivityMonitor
+CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		Інтервал оновлення:
 RX	DataSource	Shorter version for Receiving.	RX
 Settings…	ActivityWindow		Налаштування…
@@ -30,6 +31,7 @@ Used memory	DataSource		Використана пам'ять
 %.1f faults/s	DataSource		%.1f помилок/сек
 Show legend	ActivityView		Показати легенду
 Cached memory	DataSource		Кешована пам'ять
+CPU %d usage	DataSource		Використання CPU %d
 File	ActivityWindow		Файл
 Ports	DataSource		Порти
 Page faults	DataSource		Помилки на сторінці

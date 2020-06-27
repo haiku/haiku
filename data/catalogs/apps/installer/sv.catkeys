@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Installer	2743617657
+1	swedish	x-vnd.Haiku-Installer	2230593955
 Performing installation.	InstallProgress		Verkställer installationen.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Välj källdisk från menyn. Klicka sedan på \"Starta\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Var god stäng Diskhanteringsfönstret innan du stänger fönstret för Installeraren.
@@ -57,7 +57,6 @@ Collecting copy information.	InstallProgress		Förbereder inför kopiering.
 Show optional packages	InstallerWindow		Visa valbara paket
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Måldisken kan ha för lite ledigt utrymme. Försök att välja en annan disk eller välj att installera färre valbara paket.
 Installation canceled.	InstallProgress		Installationen avbröts.
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Målvolymen är inte tom. Är du säker på att du vill installera ändå?\n\nObs: "system" -mappen kommer att vara en ren kopia från källvolymen men behåller dess inställningsmapp, alla andra mappar slås samman, medan filer och länkar som finns på både käll- och målvolym skrivs över med källvolymen version.
 OK	InstallerApp		OK
 Are you sure you want to abort the installation?	InstallerWindow		Är du säker på att du vill stoppa installationen?
 Stop	InstallerWindow		Stopp

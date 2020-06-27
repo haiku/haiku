@@ -1,50 +1,48 @@
-1	finnish	x-vnd.Haiku-Input	3910661481
-Scrolling	TouchpadPrefView		Vieritettään
+1	finnish	x-vnd.Haiku-Input	1910113385
 Defaults	InputMouse		Oletukset
-Tapping	TouchpadPrefView		Haaroitus
+Scrolling	TouchpadPrefView		Vieritettään
 Long	KeyboardView		Pitkä
 Normal	SettingsView		Normaali
 Cancel	TouchpadPrefView		Peru
-4-Button	SettingsView		4-painikkeinen
 Slow	TouchpadPrefView		Hidas
 Warp	SettingsView		Vääntäminen
-Instant warp	SettingsView		Pikaväännös
 Device List	InputWindow		Laiteluettelo
 Double-click speed	SettingsView		Kaksoisnapsautusnopeus
 5-Button	SettingsView		5-painikkeinen
 Typing test area	KeyboardView		Kirjoitustestausalue
-Mouse type:	SettingsView		Hiirityyppi:
-Revert	InputKeyboard		Palauta
 Fast	KeyboardView		Nopea
-Off	TouchpadPrefView		Pois käytöstä
-Fast	TouchpadPrefView		Nopea
 Please confirm	TouchpadPrefView		Vahvista
-Click to focus	SettingsView		Kohdista napsauttamalla
-Acceleration	TouchpadPrefView		Kiihdytys
 Mouse speed	SettingsView		Hiirinopeus
-Accept first click	SettingsView		Hyväksy ensimmäisellä napsautuksella
-OK	TouchpadPrefView		Valmis
 Horizontal scrolling	TouchpadPrefView		Vaakasuora vieritys
-Delay until key repeat	KeyboardView		Näppäintoiston viive
-Two finger scrolling	TouchpadPrefView		Kaksisormivieritys
 Input	System name		Syöte
-Mouse acceleration	SettingsView		Hiirikiihdytys
-The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Uusi vieritysalue on hyvin laaja ja se saattaa hidastuttaa normaalia hiiritoimintaa. Haluatko todella muuttaa sen?
-High	TouchpadPrefView		Korkea
-Defaults	TouchpadPrefView		Oletukset
-1-Button	SettingsView		1-painikkeinen
-Defaults	InputKeyboard		Oletukset
 Short	KeyboardView		Lyhyt
-Slow	KeyboardView		Hidas
 Revert	InputMouse		Käänteinen
-Key repeat rate	KeyboardView		Näppäimen toistonopeus
+Slow	KeyboardView		Hidas
 2-Button	SettingsView		2-painikkeinen
 Click to focus and raise	SettingsView		Kohdista ja nosta napsauttamalla
 Vertical	TouchpadPrefView		Pystysuora
-Horizontal	TouchpadPrefView		Vaakasuora
-Focus mode:	SettingsView		Kohdistustila:
-Focus follows mouse	SettingsView		Kohdistus seuraa hiirtä
 Double-click test area	SettingsView		Kaksoisnapsautuksen testausalue
-Sensitivity	TouchpadPrefView		Herkkyys
-3-Button	SettingsView		3-painikkeinen
+Focus follows mouse	SettingsView		Kohdistus seuraa hiirtä
+Focus mode:	SettingsView		Kohdistustila:
 Revert	TouchpadPrefView		Käänteinen
+4-Button	SettingsView		4-painikkeinen
+Instant warp	SettingsView		Pikaväännös
+Revert	InputKeyboard		Palauta
+Mouse type:	SettingsView		Hiirityyppi:
+Off	TouchpadPrefView		Pois käytöstä
+Fast	TouchpadPrefView		Nopea
+Click to focus	SettingsView		Kohdista napsauttamalla
+Acceleration	TouchpadPrefView		Kiihdytys
+Accept first click	SettingsView		Hyväksy ensimmäisellä napsautuksella
+OK	TouchpadPrefView		Valmis
+Delay until key repeat	KeyboardView		Näppäintoiston viive
+Two finger scrolling	TouchpadPrefView		Kaksisormivieritys
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Uusi vieritysalue on hyvin laaja ja se saattaa hidastuttaa normaalia hiiritoimintaa. Haluatko todella muuttaa sen?
+Mouse acceleration	SettingsView		Hiirikiihdytys
+Defaults	TouchpadPrefView		Oletukset
+High	TouchpadPrefView		Korkea
+1-Button	SettingsView		1-painikkeinen
+Defaults	InputKeyboard		Oletukset
+Key repeat rate	KeyboardView		Näppäimen toistonopeus
+Horizontal	TouchpadPrefView		Vaakasuora
+3-Button	SettingsView		3-painikkeinen

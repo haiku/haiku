@@ -67,7 +67,7 @@ Cancel	AbstractParametersPanel		Annulla
 Format	MainWindow		Formatta
 <empty or unknown>	DiskView		<vuoto o sconosciuto>
 OK	MainWindow		OK
-Open with DiskProbe	MainWindow		Apri con Utility Disco
+Open with DiskProbe	MainWindow		Apri con Gestione Disco
 Could not delete the selected partition.	MainWindow		Impossibile rimuovere la partizione selezionata.
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Sei sicuro di voler inizializzare il disco selezionato? Tutti i dati saranno perduti. Ti sarà nuovamente chiesta conferma prima della scrittura delle modifiche sul disco.\n
 There was an error preparing the disk for modifications.	MainWindow		Si è verificato un errore nella preparazione delle modifiche al disco.

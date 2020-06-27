@@ -1,32 +1,31 @@
-1	english	x-vnd.Haiku-Input	3239669044
-Scrolling	TouchpadPrefView		滚动
+1	english	x-vnd.Haiku-Input	3935256310
 Defaults	InputMouse		默认
+Scrolling	TouchpadPrefView		滚动
 Long	KeyboardView		长
 Normal	SettingsView		常规
 Cancel	TouchpadPrefView		取消
-4-Button	SettingsView		4键
 Slow	TouchpadPrefView		慢
 Device List	InputWindow		设备列表
 Double-click speed	SettingsView		双击速度
 Typing test area	KeyboardView		按键测试区
-Mouse type:	SettingsView		鼠标类型：
 Fast	KeyboardView		快
 Please confirm	TouchpadPrefView		请确认
 Mouse speed	SettingsView		鼠标速度
-OK	TouchpadPrefView		确认
-Delay until key repeat	KeyboardView		重复前延迟
 Input	System name		输入
-High	TouchpadPrefView		高
-Defaults	TouchpadPrefView		默认
-Defaults	InputKeyboard		默认
 Short	KeyboardView		短
-Key repeat rate	KeyboardView		按键重复
 Click to focus and raise	SettingsView		点击时获取焦点并提升
 Vertical	TouchpadPrefView		垂直
-Horizontal	TouchpadPrefView		水平
-Focus mode:	SettingsView		焦点模式：
-Focus follows mouse	SettingsView		焦点跟随鼠标
 Double-click test area	SettingsView		双击测试区
-Sensitivity	TouchpadPrefView		灵敏度
-3-Button	SettingsView		3键
+Focus follows mouse	SettingsView		焦点跟随鼠标
+Focus mode:	SettingsView		焦点模式：
 Revert	TouchpadPrefView		反转
+4-Button	SettingsView		4键
+Mouse type:	SettingsView		鼠标类型：
+OK	TouchpadPrefView		确认
+Delay until key repeat	KeyboardView		重复前延迟
+Defaults	TouchpadPrefView		默认
+High	TouchpadPrefView		高
+Defaults	InputKeyboard		默认
+Key repeat rate	KeyboardView		按键重复
+Horizontal	TouchpadPrefView		水平
+3-Button	SettingsView		3键

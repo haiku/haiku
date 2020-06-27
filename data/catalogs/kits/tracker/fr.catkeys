@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	2388964399
+1	french	x-vnd.Haiku-libtracker	841158492
 Created	ContainerWindow		Créé
 Icon	AttributesView		Icône
 Open and make preferred	OpenWithWindow		Ouvrir et en faire la préférence
@@ -21,7 +21,6 @@ contains	FindPanel		contient
 Open	FilePanelPriv		Ouvrir
 Bitmap icon	AttributesView		Icône bitmap
 You can't replace a folder with one of its sub-folders.	FSUtils		Vous ne pouvez pas remplacer un dossier par l’un de ses sous-dossiers.
-<%ld dates>	AttributesView		<%ld dates>
 Select…	VirtualDirectoryWindow		Sélectionner…
 Name	Default Query Columns		Nom
 Unmount	ContainerWindow		Démonter
@@ -50,7 +49,6 @@ Preparing to move items…	StatusWindow		Préparation au déplacement des élém
 Size	ContainerWindow		Taille
 Select…	ContainerWindow		Sélectionner…
 Show shared volumes on Desktop	SettingsView		Afficher les volumes partagés sur le Bureau
-<%ld values>	AttributesView		<%ld valeurs>
 Size	PoseView		Taille
 matches wildcard expression	SelectionWindow		correspond à l’expression générique
 96 x 96	ContainerWindow		96 x 96
@@ -194,7 +192,6 @@ contains	SelectionWindow		contient
 Replace	FilePanelPriv		Remplacer
 is not	FindPanel		n’est pas
 Icon view	DeskWindow		Vue en icônes
-<%ld rectangles>	AttributesView		<%ld rectangles>
 Mount settings…	ContainerWindow		Réglages du montage…
 Keywords	Bookmark Query Columns		Mots-clés
 Copy more	ContainerWindow		Copier plus
@@ -340,7 +337,6 @@ Copy to	ContainerWindow		Copier vers
 Name	SelectionWindow		Nom
 by attribute	FindPanel		par attribut
 Write	FilePermissionsView		Écrire
-<%ld bytes of data>	AttributesView		<%ld octets de données>
 If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Si vous altérez le dossier système ou son contenu, vous ne pourrez plus démarrer %osName !\n\nÊtes vous sûr de vouloir le faire ?\n\nPour altérer quand-même le dossier système ou son contenu , maintenez la touche Majuscule enfoncée et cliquez sur « Je sais ce que je fais ».
 Save	FilePanelPriv		Sauvegarder
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Impossible d’ouvrir « %document » avec l’application « %app » (Il manque la bibliothèque : %library).\n

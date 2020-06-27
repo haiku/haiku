@@ -21,7 +21,7 @@ Trim to selection	GrepWindow		Riduci alla selezione
 Set target…	GrepWindow		Seleziona destinazione…
 Failed to open input pipe!	Grepper		Impossibile aprire la connessione di ingresso!
 Search	GrepWindow		Trova
-Copy text to clipboard	GrepWindow		Copia il testo nella clipboard
+Copy text to clipboard	GrepWindow		Copia il testo negli appunti
 Show lines	GrepWindow		Mostra righe
 Failed to open errors pipe!	Grepper		Impossibile aprire la pipe degli errori!
 The unselected files will be removed from the list.	GrepWindow		I file non selezionati verranno rimossi dalla lista.

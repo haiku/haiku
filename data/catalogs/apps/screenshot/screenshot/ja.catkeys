@@ -1,2 +1,31 @@
-1	japanese	x-vnd.haiku-screenshot-cli	721864121
+1	japanese	x-vnd.haiku-screenshot-cli	3958461128
+Include window border	ScreenshotWindow		ウィンドウの枠を含める
+Overwrite	ScreenshotWindow		上書き
+Save in:	ScreenshotWindow		次へ保存:
+Error saving \"%s\":\n\t%s	ScreenshotWindow		\"%s\" を保存中にエラー:\n\t%s
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		このファイルはすでに存在します。\n 本当に上書きしますか?
+OK	ScreenshotWindow		OK
+The destination path exists but is not a folder.	ScreenshotWindow		保存先のパスは存在しますがフォルダーではありません。
+Select	ScreenshotWindow		選択
+Save as:	ScreenshotWindow		名前を付けて保存:
+seconds	ScreenshotWindow		秒
+New screenshot	ScreenshotWindow		新規スクリーンショット
+Screenshot	System name		スクリーンショット
+Desktop	ScreenshotWindow		デスクトップ
+Artwork folder	ScreenshotWindow		Artwork フォルダー
+Translator Settings	ScreenshotWindow		トランスレーター設定
+Include mouse pointer	ScreenshotWindow		マウスポインターを含める
+overwrite	ScreenshotWindow		上書き
+Settings…	ScreenshotWindow		設定…
+Choose folder	ScreenshotWindow		フォルダーを選択
+Name:	ScreenshotWindow		ファイル名:
+Choose folder…	ScreenshotWindow		フォルダーを選択…
+Please select	ScreenshotWindow		選択してください
+Failed to save screenshot	ScreenshotWindow		スクリーンショットの保存に失敗しました
+Cancel	ScreenshotWindow		キャンセル
+Delay:	ScreenshotWindow		取得までの時間:
+Copy to clipboard	ScreenshotWindow		クリップボードへコピー
 screenshot	Screenshot	Base filename of screenshot files	スクリーンショット
+Home folder	ScreenshotWindow		ホームフォルダー
+Save	ScreenshotWindow		保存
+Capture active window	ScreenshotWindow		アクティブウィンドウのみ

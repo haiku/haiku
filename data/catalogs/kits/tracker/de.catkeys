@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	1845608229
+1	german	x-vnd.Haiku-libtracker	297802322
 Created	ContainerWindow		Erstellt
 Icon	AttributesView		Icon
 Open and make preferred	OpenWithWindow		Öffnen und zur Bevorzugten machen
@@ -21,7 +21,6 @@ contains	FindPanel		enthält
 Open	FilePanelPriv		Öffnen
 Bitmap icon	AttributesView		Bitmap Icon
 You can't replace a folder with one of its sub-folders.	FSUtils		Ordner können nicht mit einem seiner Unterordner ersetzt werden.
-<%ld dates>	AttributesView		<%ld Daten>
 Select…	VirtualDirectoryWindow		Auswählen…
 Name	Default Query Columns		Name
 Unmount	ContainerWindow		Aushängen
@@ -50,7 +49,6 @@ Preparing to move items…	StatusWindow		Verschieben wird vorbereitet…
 Size	ContainerWindow		Größe
 Select…	ContainerWindow		Auswählen…
 Show shared volumes on Desktop	SettingsView		Netzwerk-Laufwerke auf dem Desktop zeigen
-<%ld values>	AttributesView		<%ld Werte>
 Size	PoseView		Größe
 matches wildcard expression	SelectionWindow		entspricht Platzhalter-Ausdruck
 96 x 96	ContainerWindow		96 x 96
@@ -193,7 +191,6 @@ contains	SelectionWindow		enthält
 Replace	FilePanelPriv		Ersetzen
 is not	FindPanel		ist nicht
 Icon view	DeskWindow		Icon-Ansicht
-<%ld rectangles>	AttributesView		<%ld Rechtecke>
 Mount settings…	ContainerWindow		Einhänge-Einstellungen…
 Keywords	Bookmark Query Columns		Schlagwörter
 Media parameter web	AttributesView		Media Parametenetz
@@ -338,7 +335,6 @@ Copy to	ContainerWindow		Kopieren nach
 Name	SelectionWindow		Name:
 by attribute	FindPanel		nach Attribut
 Write	FilePermissionsView		Schreiben
-<%ld bytes of data>	AttributesView		<%ld Bytes an Daten>
 If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Wird der System Ordner oder dessen Inhalt verändert, kann %osName nicht mehr gestartet werden!\n\nÄnderungen trotzdem durchführen?\n\nUm den System Ordner oder dessen Inhalt trotzdem zu ändern, Shift-Taste gedrückt halten und \"Ich bin sicher\" klicken.
 Save	FilePanelPriv		Speichern
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		\"%document\" konnte nicht mit der Anwendung \"%app\" geöffnet werden (fehlende Bibliothek: %library.). \n

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	2906566299
+1	japanese	x-vnd.Haiku-libtracker	1358760392
 Created	ContainerWindow		作成日時
 Icon	AttributesView		アイコン
 Open and make preferred	OpenWithWindow		関連付けて開く
@@ -21,7 +21,6 @@ contains	FindPanel		含む
 Open	FilePanelPriv		開く
 Bitmap icon	AttributesView		ビットマップアイコン
 You can't replace a folder with one of its sub-folders.	FSUtils		サブフォルダーを同名のフォルダーと置き換えられません。
-<%ld dates>	AttributesView		<%ld 個の日付>
 Select…	VirtualDirectoryWindow		選択…
 Name	Default Query Columns		名前
 Unmount	ContainerWindow		マウント解除
@@ -50,7 +49,6 @@ Preparing to move items…	StatusWindow		移動の準備をしています…
 Size	ContainerWindow		サイズ
 Select…	ContainerWindow		選択…
 Show shared volumes on Desktop	SettingsView		共有ディスクをデスクトップに表示
-<%ld values>	AttributesView		<%ld 個の値>
 Size	PoseView		サイズ
 matches wildcard expression	SelectionWindow		ワイルドカード表現と一致
 96 x 96	ContainerWindow		96 x 96
@@ -196,7 +194,6 @@ contains	SelectionWindow		含む
 Replace	FilePanelPriv		置換
 is not	FindPanel		除く
 Icon view	DeskWindow		アイコン表示
-<%ld rectangles>	AttributesView		<%ld 個の四角>
 Mount settings…	ContainerWindow		マウント設定…
 Keywords	Bookmark Query Columns		キーワード
 Media parameter web	AttributesView		メディアパラメーターウェブ
@@ -343,7 +340,6 @@ Copy to	ContainerWindow		次へコピー
 Name	SelectionWindow		名前
 by attribute	FindPanel		属性で検索
 Write	FilePermissionsView		書き込み
-<%ld bytes of data>	AttributesView		<%ld バイトのデータ>
 If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		システムフォルダーやその内容を変更すると、%osName が起動しなくなります!\n\n変更しますか?\n\nそれでもシステムフォルダーやその内容を変更するなら、シフトキーを押したまま\"私はなにをするか理解しています\"をクリックします。
 Save	FilePanelPriv		保存
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		%libraryライブラリがインストールされてないため、\"%app\" を使って \"%document\" を開くことはできませんでした。

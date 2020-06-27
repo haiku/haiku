@@ -1,2 +1,31 @@
-1	german	x-vnd.haiku-screenshot-cli	721864121
-screenshot	Screenshot	Base filename of screenshot files	Bildschirmfoto
+1	german	x-vnd.haiku-screenshot-cli	3958461128
+Include window border	ScreenshotWindow		Inklusive Fensterrahmen
+Overwrite	ScreenshotWindow		Überschreiben
+Save in:	ScreenshotWindow		Speichern in:
+Error saving \"%s\":\n\t%s	ScreenshotWindow		Fehler beim Speichern von \"%s\":\n\t%s
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Diese Datei existiert bereits.\nSoll sie überschrieben werden?
+OK	ScreenshotWindow		OK
+The destination path exists but is not a folder.	ScreenshotWindow		Der Zielpfad existiert, ist aber kein Ordner.
+Select	ScreenshotWindow		Auswählen
+Save as:	ScreenshotWindow		Format:
+seconds	ScreenshotWindow		Sekunden
+New screenshot	ScreenshotWindow		Neue Aufnahme
+Screenshot	System name		Screenshot
+Desktop	ScreenshotWindow		Desktop
+Artwork folder	ScreenshotWindow		Artwork-Ordner
+Translator Settings	ScreenshotWindow		Translator-Einstellungen
+Include mouse pointer	ScreenshotWindow		Inklusive Mauszeiger
+overwrite	ScreenshotWindow		überschreiben
+Settings…	ScreenshotWindow		Einstellungen…
+Choose folder	ScreenshotWindow		Ordner wählen
+Name:	ScreenshotWindow		Name:
+Choose folder…	ScreenshotWindow		Ordner wählen…
+Please select	ScreenshotWindow		Bitte auswählen
+Failed to save screenshot	ScreenshotWindow		Speichern des Screenshots fehlgeschlagen
+Cancel	ScreenshotWindow		Abbrechen
+Delay:	ScreenshotWindow		Verzögerung:
+Copy to clipboard	ScreenshotWindow		In Ablage kopieren
+screenshot	Screenshot	Base filename of screenshot files	screenshot
+Home folder	ScreenshotWindow		Home-Ordner
+Save	ScreenshotWindow		Speichern
+Capture active window	ScreenshotWindow		Nur aktives Fenster
