@@ -71,7 +71,7 @@ typedef struct{
 3 X Obsolete
 4-5 X Retired
 6 X Obsolete
-7-8 O V Reserved for assignment by the CompactFlashä Association
+7-8 O V Reserved for assignment by the CompactFlashâ„¢ Association
 9 X Retired
 */
   uint16 pad1[9];
@@ -158,7 +158,7 @@ typedef struct{
   F 7-0 PIO modes supported
 65 M Minimum Multiword DMA transfer cycle time per word
   F 15-0 Cycle time in nanoseconds
-66 M Manufacturer’s recommended Multiword DMA transfer cycle time
+66 M Manufacturerâ€™s recommended Multiword DMA transfer cycle time
   F 15-0 Cycle time in nanoseconds
 67 M Minimum PIO transfer cycle time without flow control
   F 15-0 Cycle time in nanoseconds
@@ -168,7 +168,7 @@ typedef struct{
 71-74 F Reserved for IDENTIFY PACKET DEVICE command.
 75 O Queue depth
   F 15-5 Reserved
-  F 4-0 Maximum queue depth – 1
+  F 4-0 Maximum queue depth â€“ 1
 76-79 F Reserved
 80 M Major version number
   0000h or FFFFh = device does not report version
@@ -338,7 +338,7 @@ typedef struct{
   10 = the CSEL signal was used.
   11 = some other method was used or the method is unknown.
   F 0 Shall be set to one.
-94 O V 15-8 Vendor’s recommended acoustic management value.
+94 O V 15-8 Vendorâ€™s recommended acoustic management value.
   V 7-0 Current automatic acoustic management value.
 95-99 F Reserved
 100-103 O V Maximum user LBA for 48-bit Address feature set.
@@ -367,7 +367,7 @@ typedef struct{
   device
   V 12 CFA power mode 1 disabled
   F 11-0 Maximum current in ma
-161-175 X Reserved for assignment by the CompactFlashä Association
+161-175 X Reserved for assignment by the CompactFlashâ„¢ Association
 176-205 O V Current media serial number
 206-254 F Reserved
 255 M X Integrity word

@@ -3,7 +3,7 @@
 	PriorityMenu.h
 
 	ProcessController
-	© 2000, Georges-Edouard Berenger, All Rights Reserved.
+	Â© 2000, Georges-Edouard Berenger, All Rights Reserved.
 	Copyright (C) 2004 beunited.org 
 
 	This library is free software; you can redistribute it and/or 

@@ -1,5 +1,5 @@
 /* prio.c - prio command for BeOs, change priority of a given thread
- * (c) 2001, 2002, François Revol (mmu_man) for OpenBeOS
+ * (c) 2001, 2002, FranÃ§ois Revol (mmu_man) for OpenBeOS
  * released under the MIT licence.
  *
  * ChangeLog:
