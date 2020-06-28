@@ -377,5 +377,6 @@ MouseView::_CreateButtonsPicture()
 	FillShape(&mouseShape, B_SOLID_HIGH);
 
 	EndPicture();
+	SetOrigin(0, 0);
 	SetScale(1);
 }
