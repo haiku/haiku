@@ -107,7 +107,7 @@ IppTransport::~IppTransport()
 		HTTP_RESPONSECODE response_code = conn.getResponseCode();
 		if (response_code == HTTP_OK) {
 			const char *content_type = conn.getContentType();
-			if (content_type && !strncasecmp(content_type, "application/ipp", 15)) {
+			if (content_type == NULL || strncasecmp(content_type, "application/ipp", 15) == 0) {
 				const IppContent *ipp_response = conn.getIppResponse();
 				if (ipp_response->fail()) {
 					__error = true;
