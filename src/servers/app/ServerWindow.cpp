@@ -3608,11 +3608,16 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			// We need to update the pen location
 			fCurrentView->PenToScreenTransform().Apply(&info.location);
-			BPoint penLocation = fWindow->GetDrawingEngine()->DrawStringDry(
-				string, info.stringLength, info.location, &info.delta);
+			DrawingEngine* drawingEngine = fWindow->GetDrawingEngine();
+			if (drawingEngine->LockParallelAccess()) {
+				BPoint penLocation = drawingEngine->DrawStringDry(
+					string, info.stringLength, info.location, &info.delta);
 
-			fCurrentView->ScreenToPenTransform().Apply(&penLocation);
-			fCurrentView->CurrentState()->SetPenLocation(penLocation);
+				fCurrentView->ScreenToPenTransform().Apply(&penLocation);
+				fCurrentView->CurrentState()->SetPenLocation(penLocation);
+
+				drawingEngine->UnlockParallelAccess();
+			}
 
 			free(string);
 			break;
@@ -3653,12 +3658,17 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver& link)
 			picture->WriteDrawString(string, stringLength, locations,
 				glyphCount);
 
-			// Update pen location
-			BPoint penLocation = fWindow->GetDrawingEngine()->DrawStringDry(
-				string, stringLength, locations);
+			DrawingEngine* drawingEngine = fWindow->GetDrawingEngine();
+			if (drawingEngine->LockParallelAccess()) {
+				// Update pen location
+				BPoint penLocation = drawingEngine->DrawStringDry(
+					string, stringLength, locations);
 
-			fCurrentView->ScreenToPenTransform().Apply(&penLocation);
-			fCurrentView->CurrentState()->SetPenLocation(penLocation);
+				fCurrentView->ScreenToPenTransform().Apply(&penLocation);
+				fCurrentView->CurrentState()->SetPenLocation(penLocation);
+
+				drawingEngine->UnlockParallelAccess();
+			}
 
 			break;
 		}
