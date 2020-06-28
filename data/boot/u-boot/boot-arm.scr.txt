@@ -1,0 +1,19 @@
+echo "Haiku u-boot script entry"
+test -e mmc 0 uEnv.txt && setenv media mmc
+test -e virtio 0 uEnv.txt && setenv media virtio
+test -e nvme 0 uEnv.txt && setenv media nvme
+env exists media || echo "ERROR: Unable to locate uEnv.txt on any known media!" && exit
+test -e ${media} 0 uEnv.txt && fatload ${media} 0 ${scriptaddr} uEnv.txt && env import -t ${scriptaddr} ${filesize}
+env exists loader || echo "ERROR: uEnv.txt doesn't specify bootloader!" && exit
+env exists platform || echo "ERROR: uEnv.txt doesn't specify platform!" && exit
+echo "uEnv.txt says to look for ${platform} bootloader named ${loader} on ${media} 0!"
+test -e ${media} 0 ${loader} && echo "Found ${loader} on ${media} 0!"
+echo "Loading bootloader..."
+fatload ${media} 0 ${kernel_addr_r} ${loader}
+test -e ${media} 0 haiku_floppyboot.ub && fatload ${media} 0 ${ramdisk_addr_r} haiku_floppyboot.ub
+env exists dtb && echo "Using custom DTB..." && fatload ${media} 0 ${fdt_addr_r} ${dtb} && fdt addr ${fdt_addr_r}
+env exists dtb || echo "Using internal DTB..." && fdt addr ${fdtcontroladdr}
+test "${platform}" = "efi" && echo "Launching EFI loader..." && bootefi ${kernel_addr_r}
+test "${platform}" = "u-boot" && env exists dtb && echo "Launching ub loader..." && bootm ${kernel_addr_r} ${ramdisk_addr_r} ${fdtcontroladdr}
+test "${platform}" = "u-boot" && env exists dtb || echo "Launching ub loader (w/custom fdt)..." && bootm ${kernel_addr_r} ${ramdisk_addr_r} ${fdt_addr_r}
+echo "Haiku u-boot script fell through!" && exit

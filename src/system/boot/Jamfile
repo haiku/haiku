@@ -141,22 +141,23 @@ actions BuildUImage1
     mkimage $(MKIMAGE_ARGS) -d $(>:J=$(colon)) $(<)
 }
 
-rule BuildUImageScript script : content
+#
+# Given a txt, generate a binary u-boot script
+#
+rule BuildUImageScript script : source
 {
-    LocalClean clean : $(script) ;
-    SCRIPTCONTENT on $(script) = $(content) ;
-    SCRIPTNAME on $(script) = $(script) ;
-    FAKEOS on $(script) = "linux" ;
-    BuildUImageScript1 $(script) : $(content) ;
+	Depends $(script) : $(source) ;
+	LocalClean clean : $(script) ;
+	SCRIPTNAME on $(script) = $(script) ;
+	FAKEOS on $(script) = "linux" ;
+	BuildUImageScript1 $(script) : $(source) ;
 }
 
 actions BuildUImageScript1
 {
-    rm -f $(<) $(<).txt
-    echo '$(SCRIPTCONTENT)' > $(<).txt
-    mkimage -A $(TARGET_ARCH) -O $(FAKEOS) -T script -C none -n $(SCRIPTNAME) \
-        -d $(<).txt $(<)
-    rm -f $(<).txt
+	rm -f $(1)
+	mkimage -A $(TARGET_ARCH) -O $(FAKEOS) -T script -C none -n $(SCRIPTNAME) \
+		-d $(2) $(1)
 }
 
 # the bootsector on haiku_loader.amiga_m68k must be checksummed
@@ -319,10 +320,12 @@ for platform in [ MultiBootSubDirSetup ] {
 			case efi :
 				BuildEFILoader haiku_loader.$(TARGET_BOOT_PLATFORM) : boot_loader_$(TARGET_BOOT_PLATFORM) ;
 				if $(TARGET_ARCH) = arm || $(TARGET_ARCH) = arm64 {
+					# These platforms sometimes need u-boot to get them going
 					BuildUImage haiku-floppyboot.tgz.$(TARGET_BOOT_PLATFORM) : haiku-floppyboot.tgz :
 						-A $(TARGET_ARCH) -O linux -T ramdisk -C none
 						-n 'Haiku $(TARGET_KERNEL_ARCH) floppyboot' ;
-					BuildUImageScript boot.scr : $(HAIKU_MMC_UBOOT_SCRIPT) ;
+					BuildUImageScript boot.scr
+						: [ FDirName $(HAIKU_TOP) data boot u-boot boot-$(TARGET_ARCH).scr.txt ] ;
 				}
 
 			case bios_ia32 :
@@ -344,7 +347,8 @@ for platform in [ MultiBootSubDirSetup ] {
 				BuildUImage haiku-floppyboot.tgz.$(TARGET_BOOT_PLATFORM) : haiku-floppyboot.tgz :
 					-A $(TARGET_ARCH) -O linux -T ramdisk -C none
 					-n 'Haiku $(TARGET_KERNEL_ARCH) floppyboot' ;
-				BuildUImageScript boot.scr : $(HAIKU_MMC_UBOOT_SCRIPT) ;
+				BuildUImageScript boot.scr
+					: [ FDirName $(HAIKU_TOP) data boot u-boot boot-$(TARGET_ARCH).scr.txt ] ;
 
 			case amiga_m68k :
 				BuildBiosLoader haiku_loader.$(TARGET_BOOT_PLATFORM) : boot_loader_$(TARGET_BOOT_PLATFORM) ;

@@ -256,25 +256,6 @@ rule KernelArchitectureSetup architecture
 			HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 192 ; # in kB - unused yet
 			HAIKU_BOOT_LOADER_BASE ?= 0x1000000 ;
 
-			# Modern u-boot fill in sane addresses for us.
-			# Leverage the built-in fdt dtb for this board, unless a custom dtb is specified in uEnv.txt
-			# We skip uEnv.txt on virtio due to an unknown lockup in qemu around it.
-			HAIKU_MMC_UBOOT_SCRIPT = "\
-				echo \"Haiku u-boot script entry\" \
-				test -e mmc 0 haiku_loader.ub && setenv media mmc \
-				test -e virtio 0 haiku_loader.ub && setenv media virtio \
-				test -e nvme 0 haiku_loader.ub && setenv media nvme \
-				env exists media && echo \"Found Haiku on ${media} 0!\" \
-				env exists media || echo \"ERROR: Unable to locate Haiku loader on any media!\" && exit \
-				test ${media} != virtio && test -e ${media} 0 uEnv.txt && fatload ${media} 0 ${scriptaddr} uEnv.txt && env import -t ${scriptaddr} ${filesize} \
-				echo \"Loading haiku_loader...\" \
-				fatload ${media} 0 ${kernel_addr_r} haiku_loader.ub \
-				echo \"Loading haiku_floppyboot...\" \
-				fatload ${media} 0 ${ramdisk_addr_r} haiku_floppyboot.ub \
-				env exists dtb && echo \"Loading DTB...\" && fatload ${media} 0 ${fdt_addr_r} ${dtb} && fdt addr ${fdt_addr_r} && bootm ${kernel_addr_r} ${ramdisk_addr_r} ${fdt_addr_r} \
-				echo \"Booting Haiku!\" \
-				fdt addr ${fdtcontroladdr} && bootm ${kernel_addr_r} ${ramdisk_addr_r} ${fdtcontroladdr}" ;
-
 		case arm64 :
 			HAIKU_KERNEL_PLATFORM ?= efi ;
 
