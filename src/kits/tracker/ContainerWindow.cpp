@@ -476,7 +476,8 @@ DraggableContainerIcon::MouseMoved(BPoint where, uint32, const BMessage*)
 
 	rgb_color textColor = ui_color(B_PANEL_TEXT_COLOR);
 	textColor.alpha = 128;
-		// set the level of transparency by value
+	
+	// set the level of transparency by value
 	view->SetHighColor(textColor);
 	view->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_COMPOSITE);
 
@@ -2887,10 +2888,17 @@ BContainerWindow::AddFileContextMenus(BMenu* menu)
 {
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Open"),
 		new BMessage(kOpenSelection), 'O'));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Open related" B_UTF8_ELLIPSIS),
+		new BMessage(kOpenSelection), 'R'));
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Get info"),
 		new BMessage(kGetInfo), 'I'));
+	
+	menu->AddSeparatorItem();
+	
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Edit name"),
 		new BMessage(kEditItem), 'E'));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Edit relations"),
+		new BMessage(kEditItem), 'L'));
 
 	if (!IsTrash() && !InTrash() && !IsPrintersDir()) {
 		menu->AddItem(new BMenuItem(B_TRANSLATE("Duplicate"),
