@@ -1281,6 +1281,8 @@ MainWin::MessageReceived(BMessage *msg)
 				SelectInterface(msg->what - M_SELECT_INTERFACE - 1);
 				break;
 			}
+
+			BWindow::MessageReceived(msg);
 	}
 }
 
