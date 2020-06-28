@@ -283,6 +283,7 @@ for platform in [ MultiBootSubDirSetup ] {
 		# efi loader needs to be shared.
 		if $(TARGET_BOOT_PLATFORM) = efi {
 			ldflags += -shared ;
+			ldflags += -Map=efi.map ;
 		}
 
 		BootLd boot_loader_$(platform:G=) :
