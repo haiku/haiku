@@ -3,8 +3,9 @@
 
 #include <Alert.h>
 #include <DataIO.h>
-#include <Message.h>
 #include <Directory.h>
+#include <Message.h>
+#include <Url.h>
 
 #include <pwd.h>
 #include <stdio.h>
@@ -12,7 +13,6 @@
 #include <strings.h>
 #include <unistd.h>
 
-#include "URL.h"
 #include "IppContent.h"
 #include "IppURLConnection.h"
 #include "IppSetupDlg.h"
@@ -97,7 +97,7 @@ IppTransport::~IppTransport()
 		__fs.seekg(0, ios::beg);
 		request->setRawData(__fs, fssize);
 
-		URL url(__url);
+		BUrl url(__url);
 		IppURLConnection conn(url);
 		conn.setIppRequest(request);
 		conn.setRequestProperty("Connection", "close");

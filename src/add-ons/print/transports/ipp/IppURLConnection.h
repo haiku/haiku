@@ -10,7 +10,7 @@ class IppContent;
 
 class IppURLConnection : public HttpURLConnection {
 public:
-	IppURLConnection(const URL &url);
+	IppURLConnection(const BUrl &url);
 	~IppURLConnection();
 
 	void setIppRequest(IppContent *);

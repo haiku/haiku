@@ -21,7 +21,7 @@ char *itoa(int i, char *buf, int unit)
 #include "IppURLConnection.h"
 #include "IppContent.h"
 
-IppURLConnection::IppURLConnection(const URL &Url)
+IppURLConnection::IppURLConnection(const BUrl &Url)
 	: HttpURLConnection(Url)
 {
 	__ippRequest  = NULL;

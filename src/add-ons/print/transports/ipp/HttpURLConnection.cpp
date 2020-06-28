@@ -47,7 +47,7 @@ bool Field::operator == (const Field &o)
 	return (key == o.key) && (value == o.value);
 }
 
-HttpURLConnection::HttpURLConnection(const URL &Url)
+HttpURLConnection::HttpURLConnection(const BUrl &Url)
 	: connected(false), doInput(true), doOutput(false), url(Url)
 {
 	__sock     = NULL;
@@ -130,9 +130,9 @@ void HttpURLConnection::setDoOutput(bool doOutput)
 void HttpURLConnection::connect()
 {
 	if (!connected) {
-		int port = url.getPort();
+		int port = url.Port();
 		if (port < 0) {
-			const char *protocol = url.getProtocol();
+			const char *protocol = url.Protocol();
 			if (!stricmp(protocol, "http")) {
 				port = DEFAULT_PORT;
 			} else if (!stricmp(protocol, "ipp")) {
@@ -141,7 +141,7 @@ void HttpURLConnection::connect()
 				port = DEFAULT_PORT;
 			}
 		}
-		__sock = new Socket(url.getHost(), port);
+		__sock = new Socket(url.Host(), port);
 		if (__sock->fail()) {
 			__error_msg = __sock->getLastError();
 		} else {
@@ -213,9 +213,9 @@ void HttpURLConnection::action()
 void HttpURLConnection::setRequest()
 {
 	if (connected) {
-		setRequestProperty("Host", url.getHost());
+		setRequestProperty("Host", url.Host());
 		ostream &os = getOutputStream();
-		os << __method << ' ' << url.getFile() << " HTTP/1.1" << '\r' << '\n';
+		os << __method << ' ' << url.Path() << " HTTP/1.1" << '\r' << '\n';
 		for (Fields::iterator it = __request->begin(); it != __request->end(); it++) {
 			os << (*it).key << ": " << (*it).value << '\r' << '\n';
 		}
@@ -287,7 +287,7 @@ void HttpURLConnection::getResponse()
 				{
 					const char *p = getHeaderField("Location");
 					if (p) {
-						URL trueUrl(p);
+						BUrl trueUrl(p);
 						url = trueUrl;
 						delete __response;
 						__response = NULL;

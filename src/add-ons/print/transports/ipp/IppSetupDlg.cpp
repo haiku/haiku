@@ -4,14 +4,14 @@
 #include <string.h>
 #include <strings.h>
 
+#include <Alert.h>
 #include <Button.h>
+#include <Directory.h>
 #include <Rect.h>
 #include <TextControl.h>
 #include <View.h>
-#include <Directory.h>
-#include <Alert.h>
+#include <Url.h>
 
-#include "URL.h"
 #include "IppContent.h"
 #include "IppURLConnection.h"
 #include "IppSetupDlg.h"
@@ -114,7 +114,7 @@ bool IppSetupView::UpdateViewData()
 		request->setURI("printer-uri", url->Text());
 		request->setDelimiter(IPP_END_OF_ATTRIBUTES_TAG);
 
-		IppURLConnection conn(URL(url->Text()));
+		IppURLConnection conn(BUrl(url->Text()));
 		conn.setIppRequest(request);
 		conn.setRequestProperty("Connection", "close");
 

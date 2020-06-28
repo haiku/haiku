@@ -9,7 +9,7 @@
 #include <list>
 #include <string>
 
-#include "URL.h"
+#include <Url.h>
 
 using namespace std;
 
@@ -76,7 +76,7 @@ typedef list<Field>	Fields;
 
 class HttpURLConnection {
 public:
-	HttpURLConnection(const URL &url);
+	HttpURLConnection(const BUrl &url);
 	virtual ~HttpURLConnection();
 
 	virtual void connect();
@@ -92,7 +92,7 @@ public:
 	long getDate();
 	const char *getHeaderField(int n);
 	const char *getHeaderField(const char *);
-	const URL &getURL() const;
+	const BUrl &getURL() const;
 	HTTP_RESPONSECODE getResponseCode();
 	const char *getResponseMessage();
 
@@ -111,7 +111,7 @@ protected:
 	bool connected;
 	bool doInput;
 	bool doOutput;
-	URL  url;
+	BUrl  url;
 
 	virtual void action();
 	virtual void setRequest();
