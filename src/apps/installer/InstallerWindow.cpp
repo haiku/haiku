@@ -290,7 +290,7 @@ InstallerWindow::InstallerWindow()
 	fLaunchDriveSetupButton->SetToolTip(
 		B_TRANSLATE("Launch the DriveSetup utility to partition\n"
 		"available hard drives and other media.\n"
-		"Partitions can be initialized with the\n"
+		"Partitions can be formatted with the\n"
 		"Be File System needed for a Haiku boot\n"
 		"partition."));
 //	fLaunchBootManagerItem->SetToolTip(
@@ -444,7 +444,7 @@ InstallerWindow::MessageReceived(BMessage *msg)
 		{
 			BAlert* alert = new BAlert("use drive setup", B_TRANSLATE("No partitions have "
 				"been found that are suitable for installation. Please set "
-				"up partitions and initialize at least one partition with the "
+				"up partitions and format at least one partition with the "
 				"Be File System."), B_TRANSLATE("OK"));
 			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 			alert->Go();
