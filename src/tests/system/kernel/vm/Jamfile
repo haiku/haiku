@@ -16,8 +16,6 @@ UnitTestLib libkernelvmtest.so
 	  # fs
 	  KPath.cpp
 
-	  # locks
-	  lock.cpp
 	: [ TargetLibstdc++ ]
 ;
 
