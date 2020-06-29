@@ -15,6 +15,7 @@ UnitTestLib libsharedtest.so :
 	JsonToMessageTest.cpp
 	KeymapTest.cpp
 	LRUCacheTest.cpp
+	MemoryRingIOTest.cpp
 	NaturalCompareTest.cpp
 
 	: be shared bnetapi [ TargetLibstdc++ ] [ TargetLibsupc++ ]
