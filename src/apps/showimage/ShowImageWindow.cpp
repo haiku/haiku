@@ -1251,6 +1251,10 @@ ShowImageWindow::_ClosePrompt()
 status_t
 ShowImageWindow::_LoadImage(bool forward)
 {
+	// If the user triggered a _LoadImage while in a slide show,
+	// make sure the new image is shown for the set delay:
+	_ResetSlideShowDelay();
+
 	BMessenger us(this);
 	status_t status = my_app->DefaultCache().RetrieveImage(
 		fNavigator.CurrentRef(), fNavigator.CurrentPage(), &us);
@@ -1510,6 +1514,14 @@ ShowImageWindow::_StopSlideShow()
 		delete fSlideShowRunner;
 		fSlideShowRunner = NULL;
 	}
+}
+
+
+void
+ShowImageWindow::_ResetSlideShowDelay()
+{
+	if (fSlideShowRunner != NULL)
+		fSlideShowRunner->SetInterval(fSlideShowDelay);
 }
 
 

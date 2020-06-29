@@ -101,6 +101,7 @@ private:
 			void				_SetSlideShowDelay(bigtime_t delay);
 			void				_StartSlideShow();
 			void				_StopSlideShow();
+			void				_ResetSlideShowDelay();
 
 			void				_UpdateRatingMenu();
 
