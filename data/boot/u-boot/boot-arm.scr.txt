@@ -11,9 +11,8 @@ test -e ${media} 0 ${loader} && echo "Found ${loader} on ${media} 0!"
 echo "Loading bootloader..."
 fatload ${media} 0 ${kernel_addr_r} ${loader}
 test -e ${media} 0 haiku_floppyboot.ub && fatload ${media} 0 ${ramdisk_addr_r} haiku_floppyboot.ub
-env exists dtb && echo "Using custom DTB..." && fatload ${media} 0 ${fdt_addr_r} ${dtb} && fdt addr ${fdt_addr_r}
-env exists dtb || echo "Using internal DTB..." && fdt addr ${fdtcontroladdr}
-test "${platform}" = "efi" && echo "Launching EFI loader..." && bootefi ${kernel_addr_r}
-test "${platform}" = "u-boot" && env exists dtb && echo "Launching ub loader..." && bootm ${kernel_addr_r} ${ramdisk_addr_r} ${fdtcontroladdr}
-test "${platform}" = "u-boot" && env exists dtb || echo "Launching ub loader (w/custom fdt)..." && bootm ${kernel_addr_r} ${ramdisk_addr_r} ${fdt_addr_r}
+env exists dtb && echo "Using custom DTB..." && fatload ${media} 0 ${fdt_addr_r} ${dtb}
+env exists dtb || echo "Using internal DTB..." && setenv fdt_addr_r ${fdtcontroladdr}
+test "${platform}" = "efi" && echo "Launching EFI loader..." && bootefi ${kernel_addr_r} ${fdt_addr_r}
+test "${platform}" = "u-boot" && echo "Launching ub loader..." && bootm ${kernel_addr_r} ${ramdisk_addr_r} ${fdt_addr_r}
 echo "Haiku u-boot script fell through!" && exit
