@@ -107,6 +107,8 @@ rule BuildEFILoader {
 			OUTPUT_TARGET on $(efiLoader) = efi-app-x86_64 ;
 		case arm :
 			OUTPUT_TARGET on $(efiLoader) = binary ;
+		case arm64 :
+			OUTPUT_TARGET on $(efiLoader) = binary ;
 		case * :
 			Exit "Currently unsupported arch:" $(TARGET_ARCH) ;
 	}
