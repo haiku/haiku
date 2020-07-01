@@ -3,7 +3,7 @@ SubDir HAIKU_TOP src system boot platform efi ;
 UsePrivateHeaders [ FDirName kernel boot ] ;
 UsePrivateHeaders [ FDirName kernel platform ] ;
 UsePrivateHeaders [ FDirName kernel boot platform efi ] ;
-UsePrivateHeaders [ FDirName kernel arch $(TARGET_KERNEL_ARCH) ] ;
+UsePrivateHeaders [ FDirName kernel boot arch $(TARGET_KERNEL_ARCH) ] ;
 
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems gpt ;
 
@@ -17,6 +17,7 @@ SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems gpt ;
 local platform_src =
 	start.cpp
 	console.cpp
+	cpu.cpp
 	video.cpp
 	debug.cpp
 	mmu.cpp
@@ -25,7 +26,6 @@ local platform_src =
 	timer.cpp
 	menu.cpp
 	devices.cpp
-	cpu.cpp
 	quirks.cpp
 	smp.cpp
 	serial.cpp

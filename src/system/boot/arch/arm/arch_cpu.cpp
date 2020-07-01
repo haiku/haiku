@@ -1,12 +1,10 @@
 /*
- * Copyright 2012, Haiku, Inc.
+ * Copyright 2012-2020, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Ithamar R. Adema <ithamar@upgrade-android.com>
  */
-
-#include "cpu.h"
 
 #include <OS.h>
 #include <boot/platform.h>
@@ -16,8 +14,8 @@
 #include <arch/cpu.h>
 #include <arch_kernel.h>
 #include <arch_system_info.h>
-#include <arch_cpu.h>
 #include <string.h>
+
 
 #define TRACE_CPU
 #ifdef TRACE_CPU
@@ -25,6 +23,7 @@
 #else
 #	define TRACE(x) ;
 #endif
+
 
 /*! Detect ARM core version and features.
     Please note the fact that ARM7 and ARMv7 are two different things ;)
@@ -82,8 +81,8 @@ check_cpu_features()
 			break;
 	}
 
-	// TODO actually check for VFP support, and maybe there is a better place
-	// to do this.
+	// We could check for VFP/NEON support here, but for the moment we only
+	// really target ARM CPU's with VFP/NEON built-in (cortex-a7+)
 	if (arch >= ARCH_ARM_v7)
 	{
 		// Enable VFP/NEON. We HAVE to do this before the trace call below,
@@ -109,20 +108,6 @@ check_cpu_features()
 }
 
 
-extern "C" void
-arch_cpu_memory_read_barrier(void)
-{
-	asm volatile ("" : : : "memory");
-}
-
-
-extern "C" void
-arch_cpu_memory_write_barrier(void)
-{
-	asm volatile ("" : : : "memory");
-}
-
-
 extern "C" status_t
 boot_arch_cpu_init(void)
 {
@@ -132,10 +117,14 @@ boot_arch_cpu_init(void)
 		return err;
 	}
 
-	gKernelArgs.num_cpus = 1;
-		// this will eventually be corrected later on
-
 	return B_OK;
+}
+
+
+extern "C" void
+arch_ucode_load(BootVolume& volume)
+{
+	// NOP on arm currently
 }
 
 

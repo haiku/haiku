@@ -75,5 +75,5 @@ cpu_init()
 extern "C" void
 platform_load_ucode(BootVolume& volume)
 {
-	ucode_load(volume);
+	arch_ucode_load(volume);
 }

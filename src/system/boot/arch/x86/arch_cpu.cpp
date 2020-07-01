@@ -387,3 +387,18 @@ spin(bigtime_t microseconds)
 	while ((system_time() - time) < microseconds)
 		asm volatile ("pause;");
 }
+
+
+extern "C" status_t
+boot_arch_cpu_init()
+{
+    // Nothing really to init on x86
+    return B_OK;
+}
+
+
+extern "C" void
+arch_ucode_load(BootVolume& volume)
+{
+    ucode_load(volume);
+}

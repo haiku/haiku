@@ -8,10 +8,10 @@
 #include <boot/kernel_args.h>
 #include <boot/platform.h>
 #include <boot/stage2.h>
+#include <boot/vfs.h>
 #include <arch/cpu.h>
-#ifdef __x86_64__
-#  include <boot/arch/x86/arch_cpu.h>
-#endif
+
+#include <arch_cpu.h>
 
 
 void
@@ -19,13 +19,13 @@ cpu_init()
 {
 	gKernelArgs.num_cpus = 1;
 		// this will eventually be corrected later on
+
+	boot_arch_cpu_init();
 }
 
 
 extern "C" void
 platform_load_ucode(BootVolume& volume)
 {
-#ifdef __x86_64__
-	ucode_load(volume);
-#endif
+	arch_ucode_load(volume);
 }

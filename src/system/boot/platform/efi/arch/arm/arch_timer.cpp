@@ -1,5 +1,5 @@
 /*
- * Copyright, 2019, Haiku, Inc. All rights reserved.
+ * Copyright, 2019-2020, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -11,7 +11,6 @@
 
 #include <KernelExport.h>
 
-#include <kernel.h>
 #include <safemode.h>
 #include <boot/stage2.h>
 #include <boot/menu.h>
