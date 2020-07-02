@@ -892,7 +892,7 @@ BMenu::RemoveItem(int32 index)
 {
 	BMenuItem* item = ItemAt(index);
 	if (item != NULL)
-		_RemoveItems(0, 0, item, false);
+		_RemoveItems(index, 1, NULL, false);
 	return item;
 }
 
@@ -1666,12 +1666,17 @@ void BMenu::_ScriptReceived(BMessage* message)
 		case 7: { // Menu: DELETE
 			if (message->what == B_DELETE_PROPERTY) {
 				BMenuItem *item = NULL;
-				err = _ResolveItemSpecifier(specifier, what, item);
+				int32 index;
+				err = _ResolveItemSpecifier(specifier, what, item, &index);
 				if (err >= B_OK) {
 					if (item->Submenu() == NULL)
 						err = B_BAD_VALUE;
-					else
-						RemoveItem(item);
+					else {
+						if (index >= 0)
+							RemoveItem(index);
+						else
+							RemoveItem(item);
+					}
 				}
 			}
 			break;
@@ -1736,9 +1741,14 @@ void BMenu::_ScriptReceived(BMessage* message)
 		case 11: // MenuItem: DELETE
 			if (message->what == B_DELETE_PROPERTY) {
 				BMenuItem *item = NULL;
-				err = _ResolveItemSpecifier(specifier, what, item);
-				if (err >= B_OK)
-					RemoveItem(item);
+				int32 index;
+				err = _ResolveItemSpecifier(specifier, what, item, &index);
+				if (err >= B_OK) {
+					if (index >= 0)
+						RemoveItem(index);
+					else
+						RemoveItem(item);
+				}
 			}
 			break;
 		case 12: { // MenuItem: EXECUTE
@@ -1857,14 +1867,14 @@ void BMenu::_ItemScriptReceived(BMessage* message, BMenuItem* item)
 
 
 status_t BMenu::_ResolveItemSpecifier(const BMessage& specifier, int32 what,
-	BMenuItem*& item)
+	BMenuItem*& item, int32 *_index)
 {
 	status_t err;
 	item = NULL;
+	int32 index = -1;
 	switch (what) {
 		case B_INDEX_SPECIFIER:
 		case B_REVERSE_INDEX_SPECIFIER: {
-			int32 index;
 			err = specifier.FindInt32("index", &index);
 			if (err < B_OK)
 				return err;
@@ -1884,6 +1894,9 @@ status_t BMenu::_ResolveItemSpecifier(const BMessage& specifier, int32 what,
 	}
 	if (item == NULL)
 		return B_BAD_INDEX;
+
+	if (_index != NULL)
+		*_index = index;
 
 	return B_OK;
 }
@@ -2358,7 +2371,7 @@ BMenu::_RemoveItems(int32 index, int32 count, BMenuItem* item,
 		for (; i >= index; i--) {
 			item = static_cast<BMenuItem*>(fItems.ItemAt(i));
 			if (item != NULL) {
-				if (fItems.RemoveItem(item)) {
+				if (fItems.RemoveItem(i)) {
 					if (item == fSelected && window != NULL)
 						_SelectItem(NULL);
 					item->Uninstall();

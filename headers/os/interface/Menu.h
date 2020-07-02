@@ -196,7 +196,8 @@ private:
 			void				_ItemScriptReceived(BMessage* message,
 									BMenuItem* item);
 			status_t			_ResolveItemSpecifier(const BMessage& specifier,
-									int32 what, BMenuItem*& item);
+									int32 what, BMenuItem*& item,
+									int32 *index = NULL);
 			status_t			_InsertItemAtSpecifier(
 									const BMessage& specifier, int32 what,
 									BMenuItem* item);
