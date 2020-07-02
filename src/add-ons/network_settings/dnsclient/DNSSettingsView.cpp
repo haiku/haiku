@@ -196,22 +196,22 @@ DNSSettingsView::_LoadDNSConfiguration()
 	if (res_init() != 0)
 		return B_ERROR;
 
-	res_state state = __res_get_state();
+	struct __res_state state;
+	memset(&state, 0, sizeof(struct __res_state));
 
-	if (state != NULL) {
-		for (int i = 0; i < state->nscount; i++) {
-			char* address = inet_ntoa(state->nsaddr_list[i].sin_addr);
-			fServerListView->AddItem(new BStringItem(address));
-			fRevertList.Add(address);
-		}
+	if (res_ninit(&state) != 0)
+		return B_ERROR;
 
-		fDomain->SetText(state->dnsrch[0]);
-
-		__res_put_state(state);
-		return B_OK;
+	for (int i = 0; i < state.nscount; i++) {
+		char* address = inet_ntoa(state.nsaddr_list[i].sin_addr);
+		fServerListView->AddItem(new BStringItem(address));
+		fRevertList.Add(address);
 	}
 
-	return B_ERROR;
+	fDomain->SetText(state.dnsrch[0]);
+
+	res_nclose(&state);
+	return B_OK;
 }
 
 
