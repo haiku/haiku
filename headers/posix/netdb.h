@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2012 Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2020, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -15,11 +15,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *	This product includes software developed by the University of
- *	California, Berkeley and its contributors.
- * 4. Neither the name of the University nor the names of its contributors
+ * 3. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -34,7 +30,9 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
- * -
+ */
+
+/*
  * Portions Copyright (c) 1993 by Digital Equipment Corporation.
  *
  * Permission to use, copy, modify, and distribute this software for any
@@ -52,57 +50,23 @@
  * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS
  * ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
  * SOFTWARE.
- * -
- * Portions Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *    This product includes software developed by WIDE Project and
- *    its contributors.
- * 4. Neither the name of the project nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE PROJECT AND CONTRIBUTORS ``AS IS'' AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE PROJECT OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
  */
+
 #ifndef _NETDB_H_
 #define _NETDB_H_
 
-
-#include <sys/param.h>
-#include <sys/types.h>
-#include <sys/cdefs.h>
-#include <sys/socket.h>
+#include <stdint.h>
 #include <netinet/in.h>
-#include <stdio.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #ifndef _PATH_NETWORKS
 #define	_PATH_NETWORKS	"/etc/networks"
 #endif
 
-
-__BEGIN_DECLS
 extern int * __h_errno(void);
-__END_DECLS
 #define	h_errno (*__h_errno())
 
 /*
@@ -116,13 +80,9 @@ struct hostent {
 	int			h_addrtype;			/* host address type */
 	int			h_length;			/* length of address */
 	char		**h_addr_list;		/* list of addresses from name server */
-#define	h_addr	h_addr_list[0]		/* address, for backward compatiblity */
+#define	h_addr	h_addr_list[0]	/* address, for backward compatibility */
 };
 
-/*
- * Assumption here is that a network number
- * fits in an unsigned long -- probably a poor one.
- */
 struct netent {
 	char		*n_name;			/* official name of net */
 	char		**n_aliases;		/* alias list */
@@ -230,8 +190,6 @@ struct addrinfo {
  */
 #define SCOPE_DELIMITER	'%'
 
-
-__BEGIN_DECLS
 void			endhostent(void);
 void			endnetent(void);
 void			endprotoent(void);
@@ -255,7 +213,6 @@ struct servent	*getservent(void);
 void			herror(const char *);
 const char		*hstrerror(int);
 void			sethostent(int);
-/* void			sethostfile(const char *); */
 void			setnetent(int);
 void			setprotoent(int);
 void			setservent(int);
@@ -296,6 +253,9 @@ struct servent	*getservbyport_r(int port, const char *,
 struct servent	*getservent_r(struct servent *, struct servent_data *);
 void			setservent_r(int, struct servent_data *);
 void			endservent_r(struct servent_data *);
-__END_DECLS
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _NETDB_H_ */
