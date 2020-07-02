@@ -11,7 +11,8 @@
 	ArrayDeleter   - deletes an array
 	MemoryDeleter  - free()s malloc()ed memory
 	CObjectDeleter - calls an arbitrary specified destructor function
-	FileDescriptorCloser - closes a file descriptor
+	HandleDeleter  - use arbitrary handle type and destructor function
+	FileDescriptorCloser - closes a file descriptor, based on HandleDeleter
 */
 
 
@@ -211,54 +212,69 @@ struct MethodDeleter
 };
 
 
-// FileDescriptorCloser
+// HandleDeleter
 
-struct FileDescriptorCloser {
-	inline FileDescriptorCloser()
-		:
-		fDescriptor(-1)
+template<typename C, typename DestructorResult,
+	DestructorResult (*Destructor)(C), C nullValue = -1>
+class HandleDeleter {
+public:
+	inline HandleDeleter()
+		: fHandle(nullValue)
 	{
 	}
 
-	inline FileDescriptorCloser(int descriptor)
-		:
-		fDescriptor(descriptor)
+	inline HandleDeleter(C handle)
+		: fHandle(handle)
 	{
 	}
 
-	inline ~FileDescriptorCloser()
+	inline ~HandleDeleter()
 	{
-		SetTo(-1);
+		Destructor(fHandle);
 	}
 
-	inline void SetTo(int descriptor)
+	inline void SetTo(C handle)
 	{
-		if (fDescriptor >= 0)
-			close(fDescriptor);
-
-		fDescriptor = descriptor;
+		if (handle != fHandle) {
+			Destructor(fHandle);
+			fHandle = handle;
+		}
 	}
 
 	inline void Unset()
 	{
-		SetTo(-1);
+		SetTo(nullValue);
 	}
 
-	inline int Get()
+	inline void Delete()
 	{
-		return fDescriptor;
+		SetTo(nullValue);
 	}
 
-	inline int Detach()
+	inline C Get() const
 	{
-		int descriptor = fDescriptor;
-		fDescriptor = -1;
-		return descriptor;
+		return fHandle;
 	}
+
+	inline C Detach()
+	{
+		C handle = fHandle;
+		fHandle = nullValue;
+		return handle;
+	}
+
+protected:
+	C			fHandle;
 
 private:
-	int	fDescriptor;
+	HandleDeleter(const HandleDeleter&);
+	HandleDeleter& operator=(const HandleDeleter&);
 };
+
+
+// FileDescriptorCloser
+
+typedef HandleDeleter<int, int, close, -1> FileDescriptorCloser;
 
 
 }	// namespace BPrivate
@@ -269,6 +285,7 @@ using ::BPrivate::ArrayDeleter;
 using ::BPrivate::MemoryDeleter;
 using ::BPrivate::CObjectDeleter;
 using ::BPrivate::MethodDeleter;
+using ::BPrivate::HandleDeleter;
 using ::BPrivate::FileDescriptorCloser;
 
 
