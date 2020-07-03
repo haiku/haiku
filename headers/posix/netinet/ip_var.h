@@ -1,4 +1,3 @@
-/* Parts of this file are covered under the following copyright */
 /*
  * Copyright (c) 1982, 1986, 1993
  *      The Regents of the University of California.  All rights reserved.
@@ -11,11 +10,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *      This product includes software developed by the University of
- *      California, Berkeley and its contributors.
- * 4. Neither the name of the University nor the names of its contributors
+ * 3. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -30,8 +25,6 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
- *
- *      @(#)ip_var.h    8.1 (Berkeley) 6/10/93
  */
 
 #ifndef NETINET_IP_VAR_H
@@ -51,7 +44,7 @@ struct ipovly {
 	uint16_t  ih_len;          /* protocol length */
 	struct    in_addr ih_src;  /* source internet address */
 	struct    in_addr ih_dst;  /* destination internet address */
-}; 
+};
 
 /*
  * Structure stored in mbuf in inpcb.ip_options
@@ -64,7 +57,7 @@ struct ipovly {
 struct ipoption {
 	struct  in_addr ipopt_dst;         /* first-hop dst if source routed */
 	int8_t  ipopt_list[MAX_IPOPTLEN];  /* options proper */
-};  
+};
 
 /*
  * Structure attached to inpcb.ip_moptions and
@@ -106,59 +99,37 @@ struct ipq {
 };
 
 struct  ipstat {
-        int32_t  ips_total;              /* total packets received */
-        int32_t  ips_badsum;             /* checksum bad */
-        int32_t  ips_tooshort;           /* packet too short */
-        int32_t  ips_toosmall;           /* not enough data */
-        int32_t  ips_badhlen;            /* ip header length < data size */
-        int32_t  ips_badlen;             /* ip length < ip header length */
-        int32_t  ips_fragments;          /* fragments received */
-        int32_t  ips_fragdropped;        /* frags dropped (dups, out of space) */
-        int32_t  ips_fragtimeout;        /* fragments timed out */
-        int32_t  ips_forward;            /* packets forwarded */
-        int32_t  ips_cantforward;        /* packets rcvd for unreachable dest */
-        int32_t  ips_redirectsent;       /* packets forwarded on same net */
-        int32_t  ips_noproto;            /* unknown or unsupported protocol */
-        int32_t  ips_delivered;          /* datagrams delivered to upper level*/
-        int32_t  ips_localout;           /* total ip packets generated here */
-        int32_t  ips_odropped;           /* lost packets due to nobufs, etc. */
-        int32_t  ips_reassembled;        /* total packets reassembled ok */
-        int32_t  ips_fragmented;         /* datagrams sucessfully fragmented */
-        int32_t  ips_ofragments;         /* output fragments created */
-        int32_t  ips_cantfrag;           /* don't fragment flag was set, etc. */
-        int32_t  ips_badoptions;         /* error in option processing */
-        int32_t  ips_noroute;            /* packets discarded due to no route */
-        int32_t  ips_badvers;            /* ip version != 4 */
-        int32_t  ips_rawout;             /* total raw ip packets generated */
-        int32_t  ips_badfrags;           /* malformed fragments (bad length) */
-        int32_t  ips_rcvmemdrop;         /* frags dropped for lack of memory */
-        int32_t  ips_toolong;            /* ip length > max ip packet size */
-        int32_t  ips_nogif;              /* no match gif found */
-        int32_t  ips_badaddr;            /* invalid address on header */
-        int32_t  ips_inhwcsum;           /* hardware checksummed on input */
-        int32_t  ips_outhwcsum;          /* hardware checksummed on output */
+	int32_t  ips_total;              /* total packets received */
+	int32_t  ips_badsum;             /* checksum bad */
+	int32_t  ips_tooshort;           /* packet too short */
+	int32_t  ips_toosmall;           /* not enough data */
+	int32_t  ips_badhlen;            /* ip header length < data size */
+	int32_t  ips_badlen;             /* ip length < ip header length */
+	int32_t  ips_fragments;          /* fragments received */
+	int32_t  ips_fragdropped;        /* frags dropped (dups, out of space) */
+	int32_t  ips_fragtimeout;        /* fragments timed out */
+	int32_t  ips_forward;            /* packets forwarded */
+	int32_t  ips_cantforward;        /* packets rcvd for unreachable dest */
+	int32_t  ips_redirectsent;       /* packets forwarded on same net */
+	int32_t  ips_noproto;            /* unknown or unsupported protocol */
+	int32_t  ips_delivered;          /* datagrams delivered to upper level*/
+	int32_t  ips_localout;           /* total ip packets generated here */
+	int32_t  ips_odropped;           /* lost packets due to nobufs, etc. */
+	int32_t  ips_reassembled;        /* total packets reassembled ok */
+	int32_t  ips_fragmented;         /* datagrams sucessfully fragmented */
+	int32_t  ips_ofragments;         /* output fragments created */
+	int32_t  ips_cantfrag;           /* don't fragment flag was set, etc. */
+	int32_t  ips_badoptions;         /* error in option processing */
+	int32_t  ips_noroute;            /* packets discarded due to no route */
+	int32_t  ips_badvers;            /* ip version != 4 */
+	int32_t  ips_rawout;             /* total raw ip packets generated */
+	int32_t  ips_badfrags;           /* malformed fragments (bad length) */
+	int32_t  ips_rcvmemdrop;         /* frags dropped for lack of memory */
+	int32_t  ips_toolong;            /* ip length > max ip packet size */
+	int32_t  ips_nogif;              /* no match gif found */
+	int32_t  ips_badaddr;            /* invalid address on header */
+	int32_t  ips_inhwcsum;           /* hardware checksummed on input */
+	int32_t  ips_outhwcsum;          /* hardware checksummed on output */
 };
-
-/* #ifdef _KERNEL_MODE */
-
-#define IP_FORWARDING			0x1				/* most of ip header exists */
-#define IP_ALLOWBROADCAST		SO_BROADCAST	/* can send broadcast packets */
-#define IP_RAWOUTPUT			0x4				/* raw ip header exists */
-#define IP_ROUTETOIF			SO_DONTROUTE	/* bypass routing tables */
-#define IP_MTUDISC				0x10			/* pmtu discovery, set DF */
-
-#if 0
-/* struct ipstat ipstat; */
-
-void  ipv4_input(struct mbuf *, int);
-int   ipv4_output(struct mbuf *, struct mbuf *, struct route *, int, void *);
-int   ipv4_ctloutput(int, struct socket *, int, int, struct mbuf **);
-
-int   ip_dooptions(struct mbuf *);
-void  ip_stripoptions (struct mbuf *, struct mbuf *);
-struct mbuf *ip_srcroute(void);
-
-
-#endif /* _KERNEL_MODE */
 
 #endif /* NETINET_IP_VAR_H */
