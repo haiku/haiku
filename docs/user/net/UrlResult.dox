@@ -1,0 +1,119 @@
+/*
+ * Copyright 2020 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Leorize, leorize+oss@disroot.org
+ *
+ * Corresponds to:
+ *		headers/os/net/UrlResult.h hrev54384
+ *		src/kits/network/libnetapi/UrlResult.cpp hrev54384
+ */
+
+
+/*!
+	\file UrlResult.h
+	\ingroup network
+	\brief Provides the BUrlResult class.
+*/
+
+
+/*!
+	\class BUrlResult
+	\ingroup network
+	\brief The result of a request made with BUrlRequest.
+
+	This class contains the metadata acquired during a request made
+	with BUrlRequest.
+
+	Note that subclasses are usually defined with protocol-specific information.
+	For example see BHttpResult for the result of a request using the HTTP
+	protocol.
+*/
+
+
+/*!
+	\fn BUrlResult::BUrlResult()
+	\brief Create an uninitialized BUrlResult object.
+*/
+
+
+/*!
+	\fn BUrlResult::BUrlResult(BMessage* archive)
+	\brief Create a BUrlResult object from a BMessage.
+
+	\param archive The BMessage used to construct the object.
+
+	\note Instantiate() should be used instead to verify whether the BMessage
+		can be used to construct the object.
+*/
+
+
+/*!
+	\fn virtual status_t BUrlResult::Archive(BMessage* archive, bool deep) const
+	\brief Archive the object into a BMessage.
+
+	\param archive Pointer to the BMessage object to archive into.
+	\param deep If \c true, all children of this object should be archived as
+		well.
+
+	\retval B_OK The operation was successful.
+	\retval B_BAD_VALUE \a archive was \c NULL.
+	\retval B_ERROR An error occurred.
+
+	\sa Instantiate() for construcing the object from the archived BMessage.
+*/
+
+
+/*!
+	\fn void BUrlResult::SetContentType(BString contentType)
+	\brief Set the content type of the response.
+
+	This method is used by a BUrlRequest object to set the content type
+	of the response. The content type should be a valid MIME type.
+
+	\param contentType The content type to set to.
+
+	\sa ContentType() for retrieving the set content type.
+*/
+
+
+/*!
+	\fn void BUrlResult::SetLength(size_t length)
+	\brief Set the length of the response.
+
+	This method is used by a BUrlRequest object to set the length of
+	the response.
+
+	\param length The length to set to.
+
+	\sa Length() for retrieving the set length.
+*/
+
+
+/*!
+	\fn virtual BString BUrlResult::ContentType() const
+	\brief Get the MIME type of the response contents.
+
+	\sa SetContentType() for setting the content type to be returned by this
+		method.
+*/
+
+
+/*!
+	\fn virtual size_t BUrlResult::Length() const
+	\brief Get the length of the response.
+
+	\sa SetLength() for setting the length to be returned by this method.
+*/
+
+
+/*!
+	\fn static BArchivable* BUrlResult::Instantiate(BMessage* archive)
+	\brief Create a BUrlResult object from a BMessage.
+
+	\param archive The BMessage to construct a BUrlResult from.
+
+	\returns A pointer to the created BUrlResult, or \c NULL if unarchival
+		failed.
+*/
