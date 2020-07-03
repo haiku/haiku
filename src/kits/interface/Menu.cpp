@@ -1670,10 +1670,8 @@ void BMenu::_ScriptReceived(BMessage* message)
 				if (err >= B_OK) {
 					if (item->Submenu() == NULL)
 						err = B_BAD_VALUE;
-					else {
+					else
 						RemoveItem(item);
-						delete item;
-					}
 				}
 			}
 			break;
@@ -1739,10 +1737,8 @@ void BMenu::_ScriptReceived(BMessage* message)
 			if (message->what == B_DELETE_PROPERTY) {
 				BMenuItem *item = NULL;
 				err = _ResolveItemSpecifier(specifier, what, item);
-				if (err >= B_OK) {
+				if (err >= B_OK)
 					RemoveItem(item);
-					delete item;
-				}
 			}
 			break;
 		case 12: { // MenuItem: EXECUTE
