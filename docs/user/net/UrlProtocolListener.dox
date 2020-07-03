@@ -19,6 +19,48 @@
 
 
 /*!
+	\enum BUrlProtocolDebugMessage
+	\brief The type of the debug message.
+*/
+
+
+/*!
+	\var B_URL_PROTOCOL_DEBUG_TEXT
+	\brief Informational debug message.
+*/
+
+
+/*!
+	\var B_URL_PROTOCOL_DEBUG_ERROR
+	\brief Error debug message.
+*/
+
+
+/*!
+	\var B_URL_PROTOCOL_DEBUG_HEADER_IN
+	\brief Debug messages related to metadata received.
+*/
+
+
+/*!
+	\var B_URL_PROTOCOL_DEBUG_HEADER_OUT
+	\brief Debug messages related to metadata sent.
+*/
+
+
+/*!
+	\var B_URL_PROTOCOL_DEBUG_TRANSFER_IN
+	\brief Debug messages related to data received.
+*/
+
+
+/*!
+	\var B_URL_PROTOCOL_DEBUG_TRANSFER_OUT
+	\brief Debug messages related to data sent.
+*/
+
+
+/*!
 	\class BUrlProtocolListener
 	\ingroup network
 	\brief Abstract interface for handling BUrlRequest events.
