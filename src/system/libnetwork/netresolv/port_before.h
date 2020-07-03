@@ -48,6 +48,10 @@
 #	define	inet_nsap_ntoa	__inet_nsap_ntoa
 
 #define	__weak_alias(alias, sym) __asm(".weak " #alias "\n" #alias " = " #sym);
+
+/* From nameser.h: Private data structure - do not use from outside library. */
+struct _ns_flagdata {  int mask, shift;  };
+extern struct _ns_flagdata _ns_flagdata[];
 #endif
 
 struct group;           /* silence warning */

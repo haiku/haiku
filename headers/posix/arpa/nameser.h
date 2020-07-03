@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2020, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -7,17 +7,18 @@
  * Portions Copyright (C) 2004, 2005, 2008, 2009  Internet Systems Consortium, Inc. ("ISC")
  * Portions Copyright (C) 1996-2003  Internet Software Consortium.
  *
- * Permission to use, copy, modify, and/or distribute this software for any
+ * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
  * copyright notice and this permission notice appear in all copies.
  *
- * THE SOFTWARE IS PROVIDED "AS IS" AND ISC DISCLAIMS ALL WARRANTIES WITH
- * REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
- * AND FITNESS.  IN NO EVENT SHALL ISC BE LIABLE FOR ANY SPECIAL, DIRECT,
- * INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
- * LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE
- * OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
- * PERFORMANCE OF THIS SOFTWARE.
+ * THE SOFTWARE IS PROVIDED "AS IS" AND INTERNET SOFTWARE CONSORTIUM DISCLAIMS
+ * ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL INTERNET SOFTWARE
+ * CONSORTIUM BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS
+ * ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
+ * SOFTWARE.
  */
 
 /*
@@ -32,11 +33,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- * 	This product includes software developed by the University of
- * 	California, Berkeley and its contributors.
- * 4. Neither the name of the University nor the names of its contributors
+ * 3. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -55,21 +52,12 @@
 #ifndef _ARPA_NAMESER_H_
 #define _ARPA_NAMESER_H_
 
-
+#include <stddef.h>
 #include <stdint.h>
-#include <sys/param.h>
-#include <sys/cdefs.h>
-#include <sys/types.h>
 
-
-/*
- * Revision information.  This is the release date in YYYYMMDD format.
- * It can change every day so the right thing to do with it is use it
- * in preprocessor commands such as "#if (__NAMESER > 19931104)".  Do not
- * compare for equality; rather, use it to determine whether your libbind.a
- * contains a new enough lib/nameser/ to support the feature you need.
- */
-#define __NAMESER	20090302	/* New interface version stamp. */
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*
  * Define constants based on RFC 883, RFC 1034, RFC 1035
@@ -85,9 +73,9 @@
 #define NS_HFIXEDSZ		12		/* #/bytes of fixed data in header */
 #define NS_QFIXEDSZ		4		/* #/bytes of fixed data in query */
 #define NS_RRFIXEDSZ	10		/* #/bytes of fixed data in r record */
-#define NS_INT32SZ		4		/* #/bytes of data in a u_int32_t */
-#define NS_INT16SZ		2		/* #/bytes of data in a u_int16_t */
-#define NS_INT8SZ		1		/* #/bytes of data in a u_int8_t */
+#define NS_INT32SZ		4		/* #/bytes of data in a uint32_t */
+#define NS_INT16SZ		2		/* #/bytes of data in a uint16_t */
+#define NS_INT8SZ		1		/* #/bytes of data in a uint8_t */
 #define NS_INADDRSZ		4		/* IPv4 T_A */
 #define NS_IN6ADDRSZ	16		/* IPv6 T_AAAA */
 #define NS_CMPRSFLGS	0xc0	/* Flag bits indicating name compression. */
@@ -112,9 +100,9 @@ typedef enum __ns_sect {
  * Network name (compressed or not) type. Equivalent to a pointer when used
  * in a function prototype. Can be const'd.
  */
-typedef u_char ns_nname[NS_MAXNNAME];
-typedef const u_char *ns_nname_ct;
-typedef u_char *ns_nname_t;
+typedef unsigned char ns_nname[NS_MAXNNAME];
+typedef const unsigned char *ns_nname_ct;
+typedef unsigned char *ns_nname_t;
 
 struct ns_namemap { ns_nname_ct base; int len; };
 typedef struct ns_namemap *ns_namemap_t;
@@ -126,15 +114,15 @@ typedef const struct ns_namemap *ns_namemap_ct;
  * leading _'s on the member names.  Use the accessor functions, not the _'s.
  */
 typedef struct __ns_msg {
-	const u_char	*_msg;
-	const u_char	*_eom;
-	u_int16_t		_id;
-	u_int16_t		_flags;
-	u_int16_t		_counts[ns_s_max];
-	const u_char	*_sections[ns_s_max];
+	const unsigned char	*_msg;
+	const unsigned char	*_eom;
+	uint16_t		_id;
+	uint16_t		_flags;
+	uint16_t		_counts[ns_s_max];
+	const unsigned char	*_sections[ns_s_max];
 	ns_sect			_sect;
 	int				_rrnum;
-	const u_char	*_msg_ptr;
+	const unsigned char	*_msg_ptr;
 } ns_msg;
 
 /*
@@ -143,46 +131,37 @@ typedef struct __ns_msg {
  */
 struct ns_newmsg {
 	ns_msg			msg;
-	const u_char	*dnptrs[25];
-	const u_char	**lastdnptr;
+	const unsigned char	*dnptrs[25];
+	const unsigned char	**lastdnptr;
 };
 typedef struct ns_newmsg ns_newmsg;
 
-/* Private data structure - do not use from outside library. */
-struct _ns_flagdata {  int mask, shift;  };
-extern struct _ns_flagdata _ns_flagdata[];
-
 /* Accessor macros - this is part of the public interface. */
-
 #define ns_msg_id(handle) ((handle)._id + 0)
 #define ns_msg_base(handle) ((handle)._msg + 0)
 #define ns_msg_end(handle) ((handle)._eom + 0)
 #define ns_msg_size(handle) ((handle)._eom - (handle)._msg)
 #define ns_msg_count(handle, section) ((handle)._counts[section] + 0)
 
-/*
- * This is a parsed record.  It is caller allocated and has no dynamic data.
- */
+/* This is a parsed record. It is caller allocated and has no dynamic data. */
 typedef	struct __ns_rr {
 	char			name[NS_MAXDNAME];
-	u_int16_t		type;
-	u_int16_t		rr_class;
-	u_int32_t		ttl;
-	u_int16_t		rdlength;
-	const u_char	*rdata;
+	uint16_t		type;
+	uint16_t		rr_class;
+	uint32_t		ttl;
+	uint16_t		rdlength;
+	const unsigned char	*rdata;
 } ns_rr;
 
-/*
- * Same thing, but using uncompressed network binary names, and real C types.
- */
+/* Same thing, but using uncompressed network binary names, and real C types. */
 typedef struct __ns_rr2 {
 	ns_nname		nname;
 	size_t			nnamel;
 	int				type;
 	int				rr_class;
-	u_int			ttl;
+	unsigned int			ttl;
 	int				rdlength;
-	const u_char	*rdata;
+	const unsigned char	*rdata;
 } ns_rr2;
 
 /* Accessor macros - this is part of the public interface. */
@@ -214,22 +193,18 @@ typedef enum __ns_flag {
 	ns_f_max
 } ns_flag;
 
-/*
- * Currently defined opcodes.
- */
+/* Currently defined opcodes. */
 typedef enum __ns_opcode {
 	ns_o_query = 0,		/* Standard query. */
 	ns_o_iquery = 1,	/* Inverse query (deprecated/unsupported). */
 	ns_o_status = 2,	/* Name server status query (unsupported). */
-	/* Opcode 3 is undefined/reserved. */
+						/* Opcode 3 is undefined/reserved. */
 	ns_o_notify = 4,	/* Zone change notification. */
 	ns_o_update = 5,	/* Zone update message. */
 	ns_o_max = 6
 } ns_opcode;
 
-/*
- * Currently defined response codes.
- */
+/* Currently defined response codes. */
 typedef	enum __ns_rcode {
 	ns_r_noerror = 0,	/* No error occurred. */
 	ns_r_formerr = 1,	/* Format error. */
@@ -237,6 +212,7 @@ typedef	enum __ns_rcode {
 	ns_r_nxdomain = 3,	/* Name error. */
 	ns_r_notimpl = 4,	/* Unimplemented. */
 	ns_r_refused = 5,	/* Operation refused. */
+
 	/* these are for BIND_UPDATE */
 	ns_r_yxdomain = 6,	/* Name exists */
 	ns_r_yxrrset = 7,	/* RRset exists */
@@ -244,8 +220,10 @@ typedef	enum __ns_rcode {
 	ns_r_notauth = 9,	/* Not authoritative for zone */
 	ns_r_notzone = 10,	/* Zone of record different from zone section */
 	ns_r_max = 11,
+
 	/* The following are EDNS extended rcodes */
 	ns_r_badvers = 16,
+
 	/* The following are TSIG errors */
 	ns_r_badsig = 16,
 	ns_r_badkey = 17,
@@ -259,9 +237,7 @@ typedef enum __ns_update_operation {
 	ns_uop_max = 2
 } ns_update_operation;
 
-/*
- * This structure is used for TSIG authenticated messages
- */
+/* This structure is used for TSIG authenticated messages */
 struct ns_tsig_key {
 	char			name[NS_MAXDNAME];
 	char			alg[NS_MAXDNAME];
@@ -270,9 +246,7 @@ struct ns_tsig_key {
 };
 typedef struct ns_tsig_key ns_tsig_key;
 
-/*
- * This structure is used for TSIG authenticated TCP messages
- */
+/* This structure is used for TSIG authenticated TCP messages */
 struct ns_tcp_tsig_state {
 	int				counter;
 	struct dst_key	*key;
@@ -290,9 +264,7 @@ typedef struct ns_tcp_tsig_state ns_tcp_tsig_state;
 #define NS_TSIG_ERROR_NO_SPACE -11
 #define NS_TSIG_ERROR_FORMERR -12
 
-/*
- * Currently defined type values for resources and queries.
- */
+/* Currently defined type values for resources and queries. */
 typedef enum __ns_type {
 	ns_t_invalid = 0,	/* Cookie. */
 	ns_t_a = 1,			/* Host address. */
@@ -371,15 +343,14 @@ typedef enum __ns_type {
 #define ns_t_xfr_p(t) ((t) == ns_t_axfr || (t) == ns_t_ixfr || \
 		       (t) == ns_t_zxfr)
 
-/*
- * Values for class field
- */
+/* Values for class field */
 typedef enum __ns_class {
 	ns_c_invalid = 0,	/* Cookie. */
 	ns_c_in = 1,		/* Internet. */
-	ns_c_2 = 2,		/* unallocated/unsupported. */
+	ns_c_2 = 2,			/* unallocated/unsupported. */
 	ns_c_chaos = 3,		/* MIT Chaos-net. */
 	ns_c_hs = 4,		/* MIT Hesiod. */
+
 	/* Query class values which do not appear in resource records */
 	ns_c_none = 254,	/* for prereq. sections in update requests */
 	ns_c_any = 255,		/* Wildcard match. */
@@ -478,44 +449,40 @@ typedef enum __ns_cert_types {
 #define	NS_NXT_BIT_ISSET(n,p) (p[(n)/NS_NXT_BITS] &   (0x80>>((n)%NS_NXT_BITS)))
 #define NS_NXT_MAX 127
 
-/*
- * EDNS0 extended flags, host order.
- */
+/* EDNS0 extended flags, host order. */
 #define NS_OPT_DNSSEC_OK	0x8000U
 #define NS_OPT_NSID			3
 
-/*
- * Inline versions of get/put short/long.  Pointer is advanced.
- */
+/* Inline versions of get/put short/long. Pointer is advanced. */
 #define NS_GET16(s, cp) do { \
-	register const u_char *t_cp = (const u_char *)(cp); \
-	(s) = ((u_int16_t)t_cp[0] << 8) \
-	    | ((u_int16_t)t_cp[1]) \
+	register const unsigned char *t_cp = (const unsigned char *)(cp); \
+	(s) = ((uint16_t)t_cp[0] << 8) \
+	    | ((uint16_t)t_cp[1]) \
 	    ; \
 	(cp) += NS_INT16SZ; \
 } while (0)
 
 #define NS_GET32(l, cp) do { \
-	register const u_char *t_cp = (const u_char *)(cp); \
-	(l) = ((u_int32_t)t_cp[0] << 24) \
-	    | ((u_int32_t)t_cp[1] << 16) \
-	    | ((u_int32_t)t_cp[2] << 8) \
-	    | ((u_int32_t)t_cp[3]) \
+	register const unsigned char *t_cp = (const unsigned char *)(cp); \
+	(l) = ((uint32_t)t_cp[0] << 24) \
+	    | ((uint32_t)t_cp[1] << 16) \
+	    | ((uint32_t)t_cp[2] << 8) \
+	    | ((uint32_t)t_cp[3]) \
 	    ; \
 	(cp) += NS_INT32SZ; \
 } while (0)
 
 #define NS_PUT16(s, cp) do { \
-	register u_int16_t t_s = (u_int16_t)(s); \
-	register u_char *t_cp = (u_char *)(cp); \
+	register uint16_t t_s = (uint16_t)(s); \
+	register unsigned char *t_cp = (unsigned char *)(cp); \
 	*t_cp++ = t_s >> 8; \
 	*t_cp   = t_s; \
 	(cp) += NS_INT16SZ; \
 } while (0)
 
 #define NS_PUT32(l, cp) do { \
-	register u_int32_t t_l = (u_int32_t)(l); \
-	register u_char *t_cp = (u_char *)(cp); \
+	register uint32_t t_l = (uint32_t)(l); \
+	register unsigned char *t_cp = (unsigned char *)(cp); \
 	*t_cp++ = t_l >> 24; \
 	*t_cp++ = t_l >> 16; \
 	*t_cp++ = t_l >> 8; \
@@ -534,7 +501,6 @@ typedef enum __ns_cert_types {
 #define ns_initparse		__ns_initparse
 #define ns_skiprr			__ns_skiprr
 #define ns_parserr			__ns_parserr
-#define ns_parserr2			__ns_parserr2
 #define	ns_sprintrr			__ns_sprintrr
 #define	ns_sprintrrf		__ns_sprintrrf
 #define	ns_format_ttl		__ns_format_ttl
@@ -543,32 +509,22 @@ typedef enum __ns_cert_types {
 #define	ns_name_ntol		__ns_name_ntol
 #define	ns_name_ntop		__ns_name_ntop
 #define	ns_name_pton		__ns_name_pton
-#define	ns_name_pton2		__ns_name_pton2
 #define	ns_name_unpack		__ns_name_unpack
-#define	ns_name_unpack2		__ns_name_unpack2
 #define	ns_name_pack		__ns_name_pack
 #define	ns_name_compress	__ns_name_compress
 #define	ns_name_uncompress	__ns_name_uncompress
 #define	ns_name_skip		__ns_name_skip
 #define	ns_name_rollback	__ns_name_rollback
+#define	ns_samedomain		__ns_samedomain
+#define	ns_subdomain		__ns_subdomain
+#define	ns_makecanon		__ns_makecanon
+#define	ns_samename			__ns_samename
+
 #define ns_name_length		__ns_name_length
 #define ns_name_eq			__ns_name_eq
 #define ns_name_owned		__ns_name_owned
 #define ns_name_map			__ns_name_map
 #define ns_name_labels		__ns_name_labels
-#define	ns_sign				__ns_sign
-#define	ns_sign2			__ns_sign2
-#define	ns_sign_tcp			__ns_sign_tcp
-#define	ns_sign_tcp2		__ns_sign_tcp2
-#define	ns_sign_tcp_init	__ns_sign_tcp_init
-#define ns_find_tsig		__ns_find_tsig
-#define	ns_verify			__ns_verify
-#define	ns_verify_tcp		__ns_verify_tcp
-#define	ns_verify_tcp_init	__ns_verify_tcp_init
-#define	ns_samedomain		__ns_samedomain
-#define	ns_subdomain		__ns_subdomain
-#define	ns_makecanon		__ns_makecanon
-#define	ns_samename			__ns_samename
 #define ns_newmsg_init		__ns_newmsg_init
 #define ns_newmsg_copy		__ns_newmsg_copy
 #define ns_newmsg_id		__ns_newmsg_id
@@ -580,45 +536,42 @@ typedef enum __ns_cert_types {
 #define ns_rdata_equal		__ns_rdata_equal
 #define ns_rdata_refers		__ns_rdata_refers
 
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 int		ns_msg_getflag(ns_msg, int);
-uint16_t ns_get16(const u_char *);
-uint32_t ns_get32(const u_char *);
-void	ns_put16(uint16_t, u_char *);
-void	ns_put32(uint32_t, u_char *);
-int		ns_initparse(const u_char *, int, ns_msg *);
-int		ns_skiprr(const u_char *, const u_char *, ns_sect, int);
+uint16_t ns_get16(const unsigned char *);
+uint32_t ns_get32(const unsigned char *);
+void	ns_put16(uint16_t, unsigned char *);
+void	ns_put32(uint32_t, unsigned char *);
+int		ns_initparse(const unsigned char *, int, ns_msg *);
+int		ns_skiprr(const unsigned char *, const unsigned char *, ns_sect, int);
 int		ns_parserr(ns_msg *, ns_sect, int, ns_rr *);
-int		ns_parserr2(ns_msg *, ns_sect, int, ns_rr2 *);
 int		ns_sprintrr(const ns_msg *, const ns_rr *,
 			const char *, const char *, char *, size_t);
-int		ns_sprintrrf(const u_char *, size_t, const char *,
-			ns_class, ns_type, u_long, const u_char *,
+int		ns_sprintrrf(const unsigned char *, size_t, const char *,
+			ns_class, ns_type, unsigned long, const unsigned char *,
 			size_t, const char *, const char *,
 			char *, size_t);
-int		ns_format_ttl(u_long, char *, size_t);
-int		ns_parse_ttl(const char *, u_long *);
-u_int32_t ns_datetosecs(const char *cp, int *errp);
-int		ns_name_ntol(const u_char *, u_char *, size_t);
-int		ns_name_ntop(const u_char *, char *, size_t);
-int		ns_name_pton(const char *, u_char *, size_t);
-int		ns_name_pton2(const char *, u_char *, size_t, size_t *);
-int		ns_name_unpack(const u_char *, const u_char *,
-			const u_char *, u_char *, size_t);
-int		ns_name_unpack2(const u_char *, const u_char *,
-			const u_char *, u_char *, size_t, size_t *);
-int		ns_name_pack(const u_char *, u_char *, int,
-			const u_char **, const u_char **);
-int		ns_name_uncompress(const u_char *, const u_char *,
-			const u_char *, char *, size_t);
-int		ns_name_compress(const char *, u_char *, size_t,
-			 const u_char **, const u_char **);
-int		ns_name_skip(const u_char **, const u_char *);
-void	ns_name_rollback(const u_char *, const u_char **, const u_char **);
+int		ns_format_ttl(unsigned long, char *, size_t);
+int		ns_parse_ttl(const char *, unsigned long *);
+uint32_t ns_datetosecs(const char *cp, int *errp);
+int		ns_name_ntol(const unsigned char *, unsigned char *, size_t);
+int		ns_name_ntop(const unsigned char *, char *, size_t);
+int		ns_name_pton(const char *, unsigned char *, size_t);
+int		ns_name_unpack(const unsigned char *, const unsigned char *,
+			const unsigned char *, unsigned char *, size_t);
+int		ns_name_pack(const unsigned char *, unsigned char *, int,
+			const unsigned char **, const unsigned char **);
+int		ns_name_uncompress(const unsigned char *, const unsigned char *,
+			const unsigned char *, char *, size_t);
+int		ns_name_compress(const char *, unsigned char *, size_t,
+			const unsigned char **, const unsigned char **);
+int		ns_name_skip(const unsigned char **, const unsigned char *);
+void	ns_name_rollback(const unsigned char *, const unsigned char **,
+			const unsigned char **);
+int		ns_samedomain(const char *, const char *);
+int		ns_subdomain(const char *, const char *);
+int		ns_makecanon(const char *, char *, size_t);
+int		ns_samename(const char *, const char *);
+
 ssize_t	ns_name_length(ns_nname_ct nname, size_t nameSize);
 int		ns_name_eq(ns_nname_ct a, size_t aLength, ns_nname_ct b,
 			size_t bLength);
@@ -627,43 +580,22 @@ int		ns_name_owned(ns_namemap_ct a, int aLength, ns_namemap_ct b,
 int		ns_name_map(ns_nname_ct nname, size_t nameLength, ns_namemap_t map,
 			int mapSize);
 int		ns_name_labels(ns_nname_ct, size_t);
-int		ns_sign(u_char *, int *, int, int, void *,
-			const u_char *, int, u_char *, int *, time_t);
-int		ns_sign2(u_char *, int *, int, int, void *,
-			const u_char *, int, u_char *, int *, time_t,
-			u_char **, u_char **);
-int		ns_sign_tcp(u_char *, int *, int, int,
-			ns_tcp_tsig_state *, int);
-int		ns_sign_tcp2(u_char *, int *, int, int,
-			ns_tcp_tsig_state *, int,
-			u_char **, u_char **);
-int		ns_sign_tcp_init(void *, const u_char *, int,
-			ns_tcp_tsig_state *);
-u_char	*ns_find_tsig(u_char *, u_char *);
-int		ns_verify(u_char *, int *, void *,
-			const u_char *, int, u_char *, int *,
-			time_t *, int);
-int		ns_verify_tcp(u_char *, int *, ns_tcp_tsig_state *, int);
-int		ns_verify_tcp_init(void *, const u_char *, int,
-			ns_tcp_tsig_state *);
-int		ns_samedomain(const char *, const char *);
-int		ns_subdomain(const char *, const char *);
-int		ns_makecanon(const char *, char *, size_t);
-int		ns_samename(const char *, const char *);
-int		ns_newmsg_init(u_char *buffer, size_t bufsiz, ns_newmsg *);
+int		ns_newmsg_init(unsigned char *buffer, size_t bufsiz, ns_newmsg *);
 int		ns_newmsg_copy(ns_newmsg *, ns_msg *);
-void	ns_newmsg_id(ns_newmsg *handle, u_int16_t id);
-void	ns_newmsg_flag(ns_newmsg *handle, ns_flag flag, u_int value);
+void	ns_newmsg_id(ns_newmsg *handle, uint16_t id);
+void	ns_newmsg_flag(ns_newmsg *handle, ns_flag flag, unsigned int value);
 int		ns_newmsg_q(ns_newmsg *handle, ns_nname_ct qname, ns_type qtype,
 			ns_class qclass);
 int		ns_newmsg_rr(ns_newmsg *handle, ns_sect sect, ns_nname_ct name,
-			ns_type type, ns_class rr_class, u_int32_t ttl, u_int16_t rdlen,
-			const u_char *rdata);
+			ns_type type, ns_class rr_class, uint32_t ttl, uint16_t rdlen,
+			const unsigned char *rdata);
 size_t	ns_newmsg_done(ns_newmsg *handle);
-ssize_t	ns_rdata_unpack(const u_char *, const u_char *, ns_type, const u_char *,
-			size_t, u_char *, size_t);
-int		ns_rdata_equal(ns_type, const u_char *, size_t, const u_char *, size_t);
-int		ns_rdata_refers(ns_type, const u_char *, size_t, const u_char *);
+ssize_t	ns_rdata_unpack(const unsigned char *, const unsigned char *, ns_type,
+			const unsigned char *, size_t, unsigned char *, size_t);
+int		ns_rdata_equal(ns_type, const unsigned char *, size_t,
+			const unsigned char *, size_t);
+int		ns_rdata_refers(ns_type, const unsigned char *, size_t,
+			const unsigned char *);
 
 #ifdef __cplusplus
 }
