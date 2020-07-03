@@ -41,6 +41,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) src tools fs_shell ] ;
 local xfsSource =
 	DeviceOpener.cpp
 	Directory.cpp
+	Extent.cpp
 	Inode.cpp
 	kernel_interface.cpp
 	ShortDirectory.cpp

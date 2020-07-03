@@ -6,6 +6,7 @@
 #define _DIRECTORY_H_
 
 
+#include "Extent.h"
 #include "Inode.h"
 #include "ShortDirectory.h"
 
@@ -29,6 +30,8 @@ private:
 			Inode*				fInode;
 			ShortDirectory*		fShortDir;
 				// Short form Directory type
+			Extent*				fExtentDir;
+				// Extent form Directory type
 };
 
 

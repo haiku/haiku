@@ -22,6 +22,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) src libs uuid ] : true ;
 local xfsSources =
 	DeviceOpener.cpp
 	Directory.cpp
+	Extent.cpp
 	Inode.cpp
 	kernel_cpp.cpp
 	kernel_interface.cpp

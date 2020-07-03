@@ -152,7 +152,7 @@ xfs_get_vnode(fs_volume *_volume, ino_t id, fs_vnode *_node, int *_type,
 	_node->ops = &gxfsVnodeOps;
 	*_type = inode->Mode();
 	*_flags = 0;
-	TRACE("(%d)\n", inode->ID());
+	TRACE("(%ld)\n", inode->ID());
 	return B_OK;
 }
 
@@ -230,7 +230,7 @@ xfs_lookup(fs_volume *_volume, fs_vnode *_directory, const char *name,
 		return status;
 	}
 
-	TRACE("XFS_LOOKUP: ID: (%d)\n", *_vnodeID);
+	TRACE("XFS_LOOKUP: ID: (%ld)\n", *_vnodeID);
 	status = get_vnode(volume->FSVolume(), *_vnodeID, NULL);
 	TRACE("get_vnode status: (%d)\n", status);
 	return status;
@@ -249,7 +249,7 @@ static status_t
 xfs_read_stat(fs_volume *_volume, fs_vnode *_node, struct stat *stat)
 {
 	Inode* inode = (Inode*)_node->private_node;
-	TRACE("XFS_READ_STAT: id: (%d)\n", inode->ID());
+	TRACE("XFS_READ_STAT: id: (%ld)\n", inode->ID());
 	stat->st_dev = inode->GetVolume()->ID();
 	stat->st_ino = inode->ID();
 	stat->st_nlink = 1;
@@ -351,7 +351,7 @@ static status_t
 xfs_open_dir(fs_volume * /*_volume*/, fs_vnode *_node, void **_cookie)
 {
 	Inode* inode = (Inode*)_node->private_node;
-	TRACE("XFS_OPEN_DIR: (%d)\n", inode->ID());
+	TRACE("XFS_OPEN_DIR: (%ld)\n", inode->ID());
 
 	if (!inode->IsDirectory())
 		return B_NOT_A_DIRECTORY;

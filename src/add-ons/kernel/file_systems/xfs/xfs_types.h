@@ -29,10 +29,9 @@ typedef uint32	xfs_dablk_t;	// block number for directories
 typedef uint32	xfs_dahash_t;	// hash of a directory file name
 								// or extended attribute name
 typedef uint64 xfs_fsblock_t;	// filesystem block number combining AG number
-								// and block offset into the AG
 typedef uint64 xfs_rfsblock_t;	// raw filesystem block number
 typedef uint64 xfs_rtblock_t;	// extent number in the real-time sub-volume
-typedef uint64 xfs_filoff_t;	// block offset into a file
+typedef uint64 xfs_fileoff_t;	// block offset into a file
 typedef uint64 xfs_filblks_t;	// block count for a file
 typedef int64 xfs_fsize_t;		// byte size of a file
 

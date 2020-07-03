@@ -38,6 +38,10 @@
 #define DIR_AFORK_EXIST(dir_ino_ptr) dir_ino_ptr->di_forkoff!=0
 
 
+uint32
+hashfunction(const char* name, int length);
+
+
 struct xfs_timestamp_t {
 		int32				t_sec;
 		int32				t_nsec;
@@ -158,6 +162,9 @@ public:
 			int16				Flags() const { return fNode->Flags(); }
 
 			xfs_fsize_t			Size() const { return fNode->Size(); }
+
+			uint32				DirBlockSize() const
+									{ return fVolume->DirBlockSize(); }
 
 			void				GetChangeTime(struct timespec& timestamp) const
 								{ fNode->GetChangeTime(timestamp); }

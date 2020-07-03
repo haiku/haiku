@@ -175,7 +175,8 @@ Inode::GetFromDisk()
 		// Inode len to read (size of inode)
 
 	TRACE("AgNumber: (%d), AgRelativeIno: (%d), AgRelativeBlockNum: (%d),"
-		"Offset: (%d), len: (%d)\n", agNo, agInodeNo, agBlock, offset, len);
+		"Offset: (%d), len: (%d)\n", agNo,
+		agRelativeInodeNo, agBlock, offset, len);
 
 	if (agNo > fVolume->AgCount()) {
 		ERROR("Inode::GetFromDisk : AG Number more than number of AGs");
@@ -205,4 +206,39 @@ Inode::~Inode()
 {
 	delete fBuffer;
 	delete fNode;
+}
+
+
+uint32
+hashfunction(const char* name, int length)
+{
+	uint32 hashVal = 0;
+
+	int lengthCovered = 0;
+	int index = 0;
+	if (length >= 4) {
+		for (; index <= length; index+=4)
+		{
+			lengthCovered = index;
+			hashVal = (name[index] << 21) ^ (name[index+1] << 14)
+				^ (name[index+2] << 7) ^ (name[index+3] << 0)
+				^ ((hashVal << 28) | (hashVal >> (4)));
+		}
+	}
+
+	int leftToCover = length - lengthCovered;
+	if (leftToCover == 3) {
+		hashVal = (name[index] << 14) ^ (name[index+1] << 7)
+			^ (name[index+2] << 0) ^ ((hashVal << 21) | (hashVal >> (11)));
+	}
+	if (leftToCover == 2) {
+		hashVal = (name[index] << 7) ^ (name[index+1] << 0)
+			^ ((hashVal << 14) | (hashVal >> (32 - 14)));
+	}
+	if (leftToCover == 1) {
+		hashVal = (name[index] << 0)
+			^ ((hashVal << 7) | (hashVal >> (32 - 7)));
+	}
+
+	return hashVal;
 }
