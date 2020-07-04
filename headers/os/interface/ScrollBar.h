@@ -12,10 +12,6 @@
 #define B_V_SCROLL_BAR_WIDTH	14.0f
 #define B_H_SCROLL_BAR_HEIGHT	14.0f
 
-// TODO: shouldn't these be moved into the implementation?
-#define SCROLL_BAR_MAXIMUM_KNOB_SIZE	50
-#define SCROLL_BAR_MINIMUM_KNOB_SIZE	9
-
 #define DISABLES_ON_WINDOW_DEACTIVATION 1
 
 

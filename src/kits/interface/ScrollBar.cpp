@@ -45,6 +45,9 @@ typedef enum {
 } arrow_direction;
 
 
+#define SCROLL_BAR_MAXIMUM_KNOB_SIZE	50
+#define SCROLL_BAR_MINIMUM_KNOB_SIZE	9
+
 #define SBC_SCROLLBYVALUE	0
 #define SBC_SETDOUBLE		1
 #define SBC_SETPROPORTIONAL	2
