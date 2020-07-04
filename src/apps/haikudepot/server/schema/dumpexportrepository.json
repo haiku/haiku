@@ -26,11 +26,16 @@
           "code": {
             "type": "string"
           },
-          "url": {
-            "type": "string"
+          "identifier": {
+            "type": "string",
+            "javaType": "java.lang.String"
           },
-          "repoInfoUrl": {
-            "type": "string"
+          "extraIdentifiers": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "javaType": "java.lang.String"
+            }
           },
           "repositorySourceMirrors": {
             "type": "array",

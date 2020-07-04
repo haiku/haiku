@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -37,11 +37,12 @@
 	"  \"repositorySources\": [\n" \
 	"    {\n" \
 	"      \"code\": \"haikuports_x86_64\",\n" \
-	"      \"url\": \"http://example.com/0\"\n" \
+	"      \"identifier\": \"haiku:hpkr:haikuports_x86_64\",\n" \
+	"      \"extraIdentifiers\":[\"zing\"]\n" \
 	"    },\n" \
 	"    {\n" \
 	"      \"code\": \"haikuports_x86_gcc2\",\n" \
-	"      \"url\": \"http://example.com/1\"\n" \
+	"      \"identifier\": \"haiku:hpkr:haikuports_x86_gcc2\"\n" \
 	"    }\n" \
 	"  ]\n" \
 	"}\n"
@@ -67,7 +68,8 @@
    "      \"repositorySources\": [\n" \
    "        {\n" \
    "          \"code\": \"fatelk_x86_gcc2\",\n" \
-   "          \"url\": \"http://coquillemartialarts.com/fatelk/repo\"\n" \
+   "          \"identifier\": \"can-be-anything\",\n" \
+   "          \"extraIdentifiers\":[\"zing\"]\n" \
    "        }\n" \
    "      ]\n" \
    "    },\n" \
@@ -78,7 +80,7 @@
    "      \"repositorySources\": [\n" \
    "        {\n" \
    "          \"code\": \"besly_x86_gcc2\",\n" \
-   "          \"url\": \"http://software.besly.de/repo\"\n" \
+   "          \"identifier\": \"haiku:hpkr:wojfqdi23e\"\n" \
    "        }\n" \
    "      ]\n" \
    "    },\n" \
@@ -89,11 +91,11 @@
    "      \"repositorySources\": [\n" \
    "        {\n" \
    "          \"code\": \"clasqm_x86_64\",\n" \
-   "          \"url\": \"http://8ABA\"\n" \
+   "          \"identifier\": \"haiku:hpkr:23r829rro\"\n" \
    "        },\n" \
    "        {\n" \
    "          \"code\": \"clasqm_x86_gcc2\",\n" \
-   "          \"url\": \"http://8D0B\"\n" \
+   "          \"identifier\": \"haiku:hpkr:joihir32r\"\n" \
    "        }\n" \
    "      ]\n" \
    "    },\n" \
@@ -105,11 +107,11 @@
    "      \"repositorySources\": [\n" \
    "        {\n" \
    "          \"code\": \"haikuports_x86_64\",\n" \
-   "          \"url\": \"http://B362\"\n" \
+   "          \"identifier\": \"haiku:hpkr:jqod2333r3r\"\n" \
    "        },\n" \
    "        {\n" \
    "          \"code\": \"haikuports_x86_gcc2\",\n" \
-   "          \"url\": \"http://8AF3\"\n" \
+   "          \"identifier\": \"haiku:hpkr:wyeuhfwiewe\"\n" \
    "        }\n" \
    "      ]\n" \
    "    }\n" \
@@ -172,10 +174,12 @@ DumpExportRepositoryJsonListenerTest::TestBulkContainer()
 		BString("fatelk besly clasqm haikuports"),
 		itemListener.ConcatenatedCodes());
 	CPPUNIT_ASSERT_EQUAL_MESSAGE("!ConcatenatedSourcesUrls",
-		BString("http://coquillemartialarts.com/fatelk/repo"
-		" http://software.besly.de/repo"
-		" http://8ABA http://8D0B"
-		" http://B362 http://8AF3"),
+		BString("can-be-anything"
+			" haiku:hpkr:wojfqdi23e"
+			" haiku:hpkr:23r829rro"
+			" haiku:hpkr:joihir32r"
+			" haiku:hpkr:jqod2333r3r"
+			" haiku:hpkr:wyeuhfwiewe"),
 		itemListener.ConcatenatedSourcesUrls());
 }
 
@@ -219,10 +223,11 @@ DumpExportRepositoryJsonListenerTest::TestSingle()
 		repository->RepositorySourcesItemAt(1);
 
 	CPPUNIT_ASSERT_EQUAL(BString("haikuports_x86_64"), *(source0->Code()));
-	CPPUNIT_ASSERT_EQUAL(BString("http://example.com/0"), *(source0->Url()));
+	CPPUNIT_ASSERT_EQUAL(BString("haiku:hpkr:haikuports_x86_64"), *(source0->Identifier()));
+	CPPUNIT_ASSERT_EQUAL(BString("zing"), *(source0->ExtraIdentifiersItemAt(0)));
 
 	CPPUNIT_ASSERT_EQUAL(BString("haikuports_x86_gcc2"), *(source1->Code()));
-	CPPUNIT_ASSERT_EQUAL(BString("http://example.com/1"), *(source1->Url()));
+	CPPUNIT_ASSERT_EQUAL(BString("haiku:hpkr:haikuports_x86_gcc2"), *(source1->Identifier()));
 }
 
 
@@ -276,7 +281,7 @@ TestBulkContainerItemListener::Handle(DumpExportRepository* item)
     		fConcatenatedSourcesUrl.Append(" ");
 
 		fConcatenatedSourcesUrl.Append(
-			item->RepositorySourcesItemAt(i)->Url()->String());
+			item->RepositorySourcesItemAt(i)->Identifier()->String());
 	}
 
 	return true;

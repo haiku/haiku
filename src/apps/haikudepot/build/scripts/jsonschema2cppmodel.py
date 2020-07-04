@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 # =====================================
-# Copyright 2017-2019, Andrew Lindesay
+# Copyright 2017-2020, Andrew Lindesay
 # Distributed under the terms of the MIT License.
 # =====================================
 
@@ -18,7 +18,7 @@ import string
 
 def hasanylistproperties(schema):
     for propname, propmetadata in schema['properties'].items():
-        if propmetadata['type'] == 'array':
+        if propmetadata['type'] == jscom.JSON_TYPE_ARRAY:
             return True
     return False
 
@@ -217,12 +217,12 @@ def writescalaraccessorsheader(outputfile, cppname, cpptype):
 def writeaccessors(outputfile, cppclassname, propname, propmetadata):
     type = propmetadata['type']
 
-    if type == 'array':
+    if type == jscom.JSON_TYPE_ARRAY:
         writelistaccessors(outputfile,
                            cppclassname,
                            jscom.propnametocppname(propname),
                            jscom.propnametocppmembername(propname),
-                           jscom.javatypetocppname(propmetadata['items']['javaType']))
+                           jscom.propmetadatatocpptypename(propmetadata['items']))
     elif jscom.propmetadatatypeisscalar(propmetadata):
         writescalaraccessors(outputfile,
                              cppclassname,
@@ -240,10 +240,10 @@ def writeaccessors(outputfile, cppclassname, propname, propmetadata):
 def writeaccessorsheader(outputfile, propname, propmetadata):
     type = propmetadata['type']
 
-    if type == 'array':
+    if type == jscom.JSON_TYPE_ARRAY:
         writelistaccessorsheader(outputfile,
                                  jscom.propnametocppname(propname),
-                                 jscom.javatypetocppname(propmetadata['items']['javaType']))
+                                 jscom.propmetadatatocpptypename(propmetadata['items']))
     elif jscom.propmetadatatypeisscalar(propmetadata):
         writescalaraccessorsheader(outputfile,
                                    jscom.propnametocppname(propname),
@@ -278,7 +278,7 @@ def writedestructor(outputfile, cppname, schema):
 
         outputfile.write('    if (%s != NULL) {\n' % propmembername)
 
-        if propmetadata['type'] == 'array':
+        if propmetadata['type'] == jscom.JSON_TYPE_ARRAY:
             writedestructorlogicforlist(outputfile, propname, propmetadata)
 
         outputfile.write((
@@ -304,10 +304,10 @@ def writeheaderincludes(outputfile, properties):
         jsontype = propmetadata['type']
         javatype = None
 
-        if jsontype == 'object':
+        if jsontype == jscom.JSON_TYPE_OBJECT:
             javatype = propmetadata['javaType']
 
-        if jsontype == 'array':
+        if jsontype == jscom.JSON_TYPE_ARRAY:
             javatype = propmetadata['items']['javaType']
 
         if javatype is not None:
@@ -315,8 +315,9 @@ def writeheaderincludes(outputfile, properties):
 
 
 def schematocppmodels(inputfile, schema, outputdirectory):
-    if schema['type'] != 'object':
-        raise Exception('expecting object')
+    type = schema['type']
+    if type != jscom.JSON_TYPE_OBJECT:
+        raise Exception('expecting object, but was [' + type + ']')
 
     javatype = schema['javaType']
 
@@ -337,7 +338,7 @@ def schematocppmodels(inputfile, schema, outputdirectory):
 #define ${guarddefname}
 
 #include <ObjectList.h>
-#include "String.h"
+#include <String.h>
 
 """).substitute({'guarddefname': guarddefname}))
 
@@ -388,10 +389,12 @@ public:
     for propname, propmetadata in schema['properties'].items():
         jsontype = propmetadata['type']
 
-        if jsontype == 'array':
-            schematocppmodels(inputfile, propmetadata['items'], outputdirectory)
+        if jsontype == jscom.JSON_TYPE_ARRAY:
+            arraySchema = propmetadata['items']
+            if arraySchema['type'] == jscom.JSON_TYPE_OBJECT:
+                schematocppmodels(inputfile, arraySchema, outputdirectory)
 
-        if jsontype == 'object':
+        if jsontype == jscom.JSON_TYPE_OBJECT:
             schematocppmodels(inputfile, propmetadata, outputdirectory)
 
 

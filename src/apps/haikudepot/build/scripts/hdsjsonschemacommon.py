@@ -1,6 +1,6 @@
 
 # =====================================
-# Copyright 2017-2019, Andrew Lindesay
+# Copyright 2017-2020, Andrew Lindesay
 # Distributed under the terms of the MIT License.
 # =====================================
 
@@ -70,12 +70,21 @@ def propmetadatatocpptypename(propmetadata):
 
     if type == JSON_TYPE_ARRAY:
         itemsmetadata = propmetadata['items']
-        itemsjavatype = itemsmetadata['javaType']
+        itemstype = itemsmetadata['type']
 
-        if not itemsjavatype or 0 == len(itemsjavatype):
-            raise Exception('missing "javaType" field')
+        if not itemstype or 0 == len(itemstype):
+            raise Exception('missing "type" field')
 
-        return "%s <%s>" % (CPP_TYPE_ARRAY, javatypetocppname(itemsjavatype))
+        if itemstype == JSON_TYPE_OBJECT:
+            itemsjavatype = itemsmetadata['javaType']
+            if not itemsjavatype or 0 == len(itemsjavatype):
+                raise Exception('missing "javaType" field')
+            return "%s<%s>" % (CPP_TYPE_ARRAY, javatypetocppname(itemsjavatype))
+
+        if itemstype == JSON_TYPE_STRING:
+            return "%s<%s>" % (CPP_TYPE_ARRAY, CPP_TYPE_STRING)
+
+        raise Exception('unsupported type [%s]' % itemstype)
 
     raise Exception('unknown json-schema type [' + type + ']')
 

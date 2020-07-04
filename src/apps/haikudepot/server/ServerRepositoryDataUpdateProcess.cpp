@@ -28,6 +28,12 @@
 #define B_TRANSLATION_CONTEXT "ServerRepositoryDataUpdateProcess"
 
 
+struct repository_and_repository_source {
+	DumpExportRepository* repository;
+	DumpExportRepositorySource* repositorySource;
+};
+
+
 /*! This repository listener (not at the JSON level) is feeding in the
     repositories as they are parsed and processing them.  Processing
     includes finding the matching depot record and coupling the data
@@ -43,6 +49,9 @@ public:
 
 	virtual DepotInfo			MapDepot(const DepotInfo& depot, void *context);
 	virtual	bool				Handle(DumpExportRepository* item);
+			void				Handle(repository_and_repository_source& pair);
+			void				Handle(const BString& identifier,
+									repository_and_repository_source& pair);
 	virtual	void				Complete();
 
 private:
@@ -73,12 +82,6 @@ DepotMatchingRepositoryListener::~DepotMatchingRepositoryListener()
 }
 
 
-struct repository_and_repository_source {
-	DumpExportRepository* repository;
-	DumpExportRepositorySource* repositorySource;
-};
-
-
 /*! This is invoked as a result of logic in 'Handle(..)' that requests that the
     model call this method with the requested DepotInfo instance.
 */
@@ -104,7 +107,8 @@ DepotMatchingRepositoryListener::MapDepot(const DepotInfo& depot, void *context)
 			modifiedDepotInfo.Name().String(),
 			modifiedDepotInfo.URL().String(),
 			repositorySourceCode->String(),
-			repositoryAndRepositorySource->repositorySource->Url()->String());
+			repositoryAndRepositorySource
+				->repositorySource->Identifier()->String());
 	} else {
 		printf("[DepotMatchingRepositoryListener] associated depot [%s] with "
 			"server repository source [%s]\n",
@@ -113,6 +117,33 @@ DepotMatchingRepositoryListener::MapDepot(const DepotInfo& depot, void *context)
 	}
 
 	return modifiedDepotInfo;
+}
+
+
+void
+DepotMatchingRepositoryListener::Handle(const BString& identifier,
+	repository_and_repository_source& pair)
+{
+	if (!identifier.IsEmpty()) {
+		fModel->ReplaceDepotByIdentifier(identifier, this, &pair);
+	}
+}
+
+
+void
+DepotMatchingRepositoryListener::Handle(repository_and_repository_source& pair)
+{
+	Handle(*(pair.repositorySource->Identifier()), pair);
+
+	// there may be additional identifiers for the remote repository and
+	// these should also be taken into consideration.
+
+	for(int32 i = 0;
+			i < pair.repositorySource->CountExtraIdentifiers();
+			i++)
+	{
+		Handle(*(pair.repositorySource->ExtraIdentifiersItemAt(i)), pair);
+	}
 }
 
 
@@ -126,14 +157,7 @@ DepotMatchingRepositoryListener::Handle(DumpExportRepository* repository)
 		repositoryAndRepositorySource.repository = repository;
 		repositoryAndRepositorySource.repositorySource =
 			repository->RepositorySourcesItemAt(i);
-
-		BString* repoInfoURL = repositoryAndRepositorySource
-			.repositorySource->RepoInfoUrl();
-
-		if (!repoInfoURL->IsEmpty()) {
-			fModel->ReplaceDepotByUrl(*repoInfoURL, this,
-				&repositoryAndRepositorySource);
-		}
+		Handle(repositoryAndRepositorySource);
 	}
 
 	return !fStoppable->WasStopped();

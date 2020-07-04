@@ -147,8 +147,8 @@ public:
 								GetWebAppInterface() const
 									{ return fWebAppInterface; }
 
-			void				ReplaceDepotByUrl(
-									const BString& URL,
+			void				ReplaceDepotByIdentifier(
+									const BString& identifier,
 									DepotMapper* depotMapper,
 									void* context);
 

@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 # =====================================
-# Copyright 2017-2019, Andrew Lindesay
+# Copyright 2017-2020, Andrew Lindesay
 # Distributed under the terms of the MIT License.
 # =====================================
 
@@ -23,12 +23,22 @@ class CppParserSubTypeNaming:
     _naming = None
 
     def __init__(self, schema, naming):
-        javatype = schema['javaType']
+        type = schema['type']
 
-        if not javatype or 0 == len(javatype):
-            raise Exception('missing "javaType" field')
+        if not type or 0 == len(type):
+            raise Exception('missing "type" field')
 
-        self._cppmodelclassname = jscom.javatypetocppname(javatype)
+        def derivecppmodelclassname():
+            if type == jscom.JSON_TYPE_OBJECT:
+                javatype = schema['javaType']
+                if not javatype or 0 == len(javatype):
+                    raise Exception('missing "javaType" field')
+                return jscom.javatypetocppname(javatype)
+            if type == jscom.JSON_TYPE_STRING:
+                return jscom.CPP_TYPE_STRING
+            raise Exception('unsupported "type" of "%s"' % type)
+
+        self._cppmodelclassname = derivecppmodelclassname()
         self._naming = naming
 
     def cppmodelclassname(self):
@@ -38,6 +48,8 @@ class CppParserSubTypeNaming:
         return self._cppmodelclassname + '_' + self._naming.generatejsonlistenername('Stacked')
 
     def cppstackedlistlistenerclassname(self):
+        if self._cppmodelclassname == jscom.CPP_TYPE_STRING:
+            return self._naming.cppstringliststackedlistenerclassname()
         return self._cppmodelclassname + '_List_' + self._naming.generatejsonlistenername('Stacked')
 
     def todict(self):
@@ -48,7 +60,8 @@ class CppParserSubTypeNaming:
         }
 
 
-# This naming relates to the whole schema.  It's point of reference is the top level.
+# This naming relates to the whole schema.  It's point of
+# reference is the top level.
 
 class CppParserNaming:
     _schemaroot = None
@@ -57,8 +70,9 @@ class CppParserNaming:
         self._schemaroot = schemaroot
 
     def cpprootmodelclassname(self):
-        if self._schemaroot['type'] != 'object':
-            raise Exception('expecting object')
+        type = self._schemaroot['type']
+        if type != 'object':
+            raise Exception('expecting object, but was [' + type + "]")
 
         javatype = self._schemaroot['javaType']
 
@@ -81,6 +95,9 @@ class CppParserNaming:
 
     def cppsuperstackedlistenerclassname(self):
         return self.generatejsonlistenername('AbstractStacked')
+
+    def cppstringliststackedlistenerclassname(self):
+        return self.generatejsonlistenername('StringList')
 
     def cppbulkcontainerstackedlistenerclassname(self):
         return self.generatejsonlistenername('BulkContainerStacked')
@@ -113,6 +130,7 @@ class CppParserNaming:
             'cppbulkcontaineritemliststackedlistenerclassname': self.cppbulkcontaineritemliststackedlistenerclassname(),
             'cppsuperstackedlistenerclassname': self.cppsuperstackedlistenerclassname(),
             'cppitemlistenerstackedlistenerclassname': self.cppitemlistenerstackedlistenerclassname(),
+            'cppstringliststackedlistenerclassname': self.cppstringliststackedlistenerclassname(),
             'cppgeneralobjectstackedlistenerclassname': self.cppgeneralobjectstackedlistenerclassname(),
             'cppgeneralarraystackedlistenerclassname': self.cppgeneralarraystackedlistenerclassname(),
             'cppitemlistenerclassname': self.cppitemlistenerclassname()
@@ -246,6 +264,81 @@ ${cppsuperstackedlistenerclassname}::Pop()
 """).substitute(istate.naming().todict()))
 
 
+def writestringliststackedlistenerinterface(istate):
+    istate.outputfile().write(
+        string.Template("""
+        
+/*! Sometimes attributes of objects are able to be arrays of strings.  This
+    listener will parse and return the array of strings.
+*/
+        
+class ${cppstringliststackedlistenerclassname} : public ${cppsuperstackedlistenerclassname} {
+public:
+    ${cppstringliststackedlistenerclassname}(
+        ${cppsupermainlistenerclassname}* mainListener,
+        ${cppsuperstackedlistenerclassname}* parent);
+    ~${cppstringliststackedlistenerclassname}();
+
+    bool Handle(const BJsonEvent& event);
+    BObjectList<BString>* Target();
+
+protected:
+    BObjectList<BString>* fTarget;
+};
+""").substitute(istate.naming().todict()))
+
+
+def writestringliststackedlistenerimplementation(istate):
+    istate.outputfile().write(
+        string.Template("""
+${cppstringliststackedlistenerclassname}::${cppstringliststackedlistenerclassname}(
+    ${cppsupermainlistenerclassname}* mainListener,
+    ${cppsuperstackedlistenerclassname}* parent)
+    :
+    ${cppsuperstackedlistenerclassname}(mainListener, parent)
+{
+    fTarget = new BObjectList<BString>();
+}
+
+
+${cppstringliststackedlistenerclassname}::~${cppstringliststackedlistenerclassname}()
+{
+}
+
+
+BObjectList<BString>*
+${cppstringliststackedlistenerclassname}::Target()
+{
+    return fTarget;
+}
+
+
+bool
+${cppstringliststackedlistenerclassname}::Handle(const BJsonEvent& event)
+{
+    switch (event.EventType()) {
+        case B_JSON_ARRAY_END:
+        {
+            bool status = Pop() && (ErrorStatus() == B_OK);
+            delete this;
+            return status;
+        }
+        case B_JSON_STRING:
+        {
+            fTarget->AddItem(new BString(event.Content()));
+            break;
+        }
+        default:
+            HandleError(B_NOT_ALLOWED, JSON_EVENT_LISTENER_ANY_LINE,
+                "illegal state - unexpected json event parsing a string array");
+            break;
+    }
+
+    return ErrorStatus() == B_OK;
+}
+""").substitute(istate.naming().todict()))
+
+
 def writeageneralstackedlistenerinterface(istate, alistenerclassname):
     istate.outputfile().write(
         string.Template("""
@@ -310,7 +403,6 @@ bool
 ${generalobjectclassname}::Handle(const BJsonEvent& event)
 {
     switch (event.EventType()) {
-
         case B_JSON_OBJECT_NAME:
         case B_JSON_NUMBER:
         case B_JSON_STRING:
@@ -319,33 +411,22 @@ ${generalobjectclassname}::Handle(const BJsonEvent& event)
         case B_JSON_NULL:
             // ignore
             break;
-
-
         case B_JSON_OBJECT_START:
             Push(new ${generalobjectclassname}(fMainListener, this));
             break;
-
-
         case B_JSON_ARRAY_START:
             Push(new ${generalarrayclassname}(fMainListener, this));
             break;
-
-
         case B_JSON_ARRAY_END:
             HandleError(B_NOT_ALLOWED, JSON_EVENT_LISTENER_ANY_LINE, "illegal state - unexpected end of array");
             break;
-
-
         case B_JSON_OBJECT_END:
         {
             bool status = Pop() && (ErrorStatus() == B_OK);
             delete this;
             return status;
         }
-
-
     }
-
 
     return ErrorStatus() == B_OK;
 }
@@ -361,7 +442,6 @@ bool
 ${generalarrayclassname}::Handle(const BJsonEvent& event)
 {
     switch (event.EventType()) {
-
         case B_JSON_OBJECT_NAME:
         case B_JSON_NUMBER:
         case B_JSON_STRING:
@@ -370,31 +450,21 @@ ${generalarrayclassname}::Handle(const BJsonEvent& event)
         case B_JSON_NULL:
             // ignore
             break;
-
-
         case B_JSON_OBJECT_START:
             Push(new ${generalobjectclassname}(fMainListener, this));
             break;
-
-
         case B_JSON_ARRAY_START:
             Push(new ${generalarrayclassname}(fMainListener, this));
             break;
-
-
         case B_JSON_OBJECT_END:
             HandleError(B_NOT_ALLOWED, JSON_EVENT_LISTENER_ANY_LINE, "illegal state - unexpected end of object");
             break;
-
-
         case B_JSON_ARRAY_END:
         {
             bool status = Pop() && (ErrorStatus() == B_OK);
             delete this;
             return status;
         }
-
-
     }
 
 
@@ -438,23 +508,24 @@ public:
         ${cppsuperstackedlistenerclassname}* parent);
     ~${subtype_cppstackedlistlistenerclassname}();
 
-
     bool Handle(const BJsonEvent& event);
 
-
-    BObjectList<${subtype_cppmodelclassname}>* Target(); // list of %s pointers
-
+    BObjectList<${subtype_cppmodelclassname}>* Target();
+        // list of ${subtype_cppmodelclassname} pointers
 
 private:
     BObjectList<${subtype_cppmodelclassname}>* fTarget;
 };
 """).substitute(jscom.uniondicts(naming.todict(), subtypenaming.todict())))
 
-        for propname, propmetadata in subschema['properties'].items():
-            if propmetadata['type'] == 'array':
-                writestackedlistenerinterface(istate, propmetadata['items'])
-            elif propmetadata['type'] == 'object':
-                writestackedlistenerinterface(istate, propmetadata)
+        if 'properties' in subschema:
+
+            for propname, propmetadata in subschema['properties'].items():
+                if propmetadata['type'] == jscom.JSON_TYPE_ARRAY:
+                    if propmetadata['items']['type'] == jscom.JSON_TYPE_OBJECT:
+                        writestackedlistenerinterface(istate, propmetadata['items'])
+                elif propmetadata['type'] == jscom.JSON_TYPE_OBJECT:
+                    writestackedlistenerinterface(istate, propmetadata)
 
 
 def writebulkcontainerstackedlistenerinterface(istate, schema):
@@ -605,18 +676,12 @@ bool
 ${subtype_cppstackedlistenerclassname}::Handle(const BJsonEvent& event)
 {
     switch (event.EventType()) {
-
-
         case B_JSON_ARRAY_END:
             HandleError(B_NOT_ALLOWED, JSON_EVENT_LISTENER_ANY_LINE, "illegal state - unexpected start of array");
             break;
-
-
         case B_JSON_OBJECT_NAME:
             fNextItemName = event.Content();
             break;
-
-
         case B_JSON_OBJECT_END:
         {
             bool status = Pop() && (ErrorStatus() == B_OK);
@@ -778,16 +843,12 @@ bool
 ${subtype_cppstackedlistlistenerclassname}::Handle(const BJsonEvent& event)
 {
     switch (event.EventType()) {
-
-
         case B_JSON_ARRAY_END:
         {
             bool status = Pop() && (ErrorStatus() == B_OK);
             delete this;
             return status;
         }
-
-
         case B_JSON_OBJECT_START:
         {
             ${subtype_cppstackedlistenerclassname}* nextListener =
@@ -796,14 +857,11 @@ ${subtype_cppstackedlistlistenerclassname}::Handle(const BJsonEvent& event)
             Push(nextListener);
             break;
         }
-
-
         default:
             HandleError(B_NOT_ALLOWED, JSON_EVENT_LISTENER_ANY_LINE,
                 "illegal state - unexpected json event parsing an array of ${subtype_cppmodelclassname}");
             break;
     }
-
 
     return ErrorStatus() == B_OK;
 }
@@ -861,44 +919,31 @@ bool
 ${cppbulkcontainerstackedlistenerclassname}::Handle(const BJsonEvent& event)
 {
     switch (event.EventType()) {
-
-
         case B_JSON_ARRAY_END:
             HandleError(B_NOT_ALLOWED, JSON_EVENT_LISTENER_ANY_LINE, "illegal state - unexpected start of array");
             break;
-
-
         case B_JSON_OBJECT_NAME:
             fNextItemName = event.Content();
             break;
-
-
         case B_JSON_OBJECT_START:
             Push(new ${cppgeneralobjectstackedlistenerclassname}(fMainListener, this));
             break;
-
-
         case B_JSON_ARRAY_START:
             if (fNextItemName == "items")
                 Push(new ${cppbulkcontaineritemliststackedlistenerclassname}(fMainListener, this, fItemListener));
             else
                 Push(new ${cppgeneralarraystackedlistenerclassname}(fMainListener, this));
             break;
-
-
         case B_JSON_OBJECT_END:
         {
             bool status = Pop() && (ErrorStatus() == B_OK);
             delete this;
             return status;
         }
-
-
         default:
                 // ignore
             break;
     }
-
 
     return ErrorStatus() == B_OK;
 }
@@ -923,26 +968,19 @@ bool
 ${cppbulkcontaineritemliststackedlistenerclassname}::Handle(const BJsonEvent& event)
 {
     switch (event.EventType()) {
-
-
         case B_JSON_OBJECT_START:
             Push(new ${cppitemlistenerstackedlistenerclassname}(fMainListener, this, fItemListener));
             break;
-
-
         case B_JSON_ARRAY_END:
         {
             bool status = Pop() && (ErrorStatus() == B_OK);
             delete this;
             return status;
         }
-
-
         default:
             HandleError(B_NOT_ALLOWED, JSON_EVENT_LISTENER_ANY_LINE, "illegal state - unexpected json event");
             break;
     }
-
 
     return ErrorStatus() == B_OK;
 }
@@ -972,7 +1010,9 @@ def writestackedlistenerimplementation(istate, schema):
 
         for propname, propmetadata in schema['properties'].items():
             if propmetadata['type'] == 'array':
-                writestackedlistenerimplementation(istate, propmetadata['items'])
+                items = propmetadata['items']
+                if items['type'] == jscom.JSON_TYPE_OBJECT:
+                    writestackedlistenerimplementation(istate, items)
             elif propmetadata['type'] == 'object':
                 writestackedlistenerimplementation(istate, propmetadata)
 
@@ -1054,14 +1094,10 @@ ${cppsinglemainlistenerclassname}::Handle(const BJsonEvent& event)
     if (fErrorStatus != B_OK)
        return false;
 
-
     if (fStackedListener != NULL)
         return fStackedListener->Handle(event);
 
-
     switch (event.EventType()) {
-
-
         case B_JSON_OBJECT_START:
         {
             ${subtype_cppstackedlistenerclassname}* nextListener = new ${subtype_cppstackedlistenerclassname}(
@@ -1070,8 +1106,6 @@ ${cppsinglemainlistenerclassname}::Handle(const BJsonEvent& event)
             SetStackedListener(nextListener);
             break;
         }
-
-
         default:
             HandleError(B_NOT_ALLOWED, JSON_EVENT_LISTENER_ANY_LINE,
                 "illegal state - unexpected json event parsing top level for ${cpprootmodelclassname}");
@@ -1115,14 +1149,10 @@ ${cppbulkcontainermainlistenerclassname}::Handle(const BJsonEvent& event)
     if (fErrorStatus != B_OK)
        return false;
 
-
     if (fStackedListener != NULL)
         return fStackedListener->Handle(event);
 
-
     switch (event.EventType()) {
-
-
         case B_JSON_OBJECT_START:
         {
             ${cppbulkcontainerstackedlistenerclassname}* nextListener =
@@ -1132,8 +1162,6 @@ ${cppbulkcontainermainlistenerclassname}::Handle(const BJsonEvent& event)
             return true;
             break;
         }
-
-
         default:
             HandleError(B_NOT_ALLOWED, JSON_EVENT_LISTENER_ANY_LINE,
                 "illegal state - unexpected json event parsing top level for ${cppbulkcontainermainlistenerclassname}");
@@ -1178,11 +1206,9 @@ public:
     ${cppsupermainlistenerclassname}();
     virtual ~${cppsupermainlistenerclassname}();
 
-
     void HandleError(status_t status, int32 line, const char* message);
     void Complete();
     status_t ErrorStatus();
-
 
 protected:
     void SetStackedListener(
@@ -1202,10 +1228,8 @@ public:
     ${cppsinglemainlistenerclassname}();
     virtual ~${cppsinglemainlistenerclassname}();
 
-
     bool Handle(const BJsonEvent& event);
     ${cpprootmodelclassname}* Target();
-
 
 private:
     ${cpprootmodelclassname}* fTarget;
@@ -1226,7 +1250,6 @@ private:
     ${cpprootmodelclassname}* instance as
     it is parsed from the bulk container.  When the stream is
     finished, the Complete() method is invoked.
-
 
     Note that the item object will be deleted after the Handle method
     is invoked.  The Handle method need not take responsibility
@@ -1258,9 +1281,7 @@ public:
         ${cppitemlistenerclassname}* itemListener);
     ~${cppbulkcontainermainlistenerclassname}();
 
-
     bool Handle(const BJsonEvent& event);
-
 
 private:
     ${cppitemlistenerclassname}* fItemListener;
@@ -1280,6 +1301,7 @@ private:
 
         writerootstackedlistenerinterface(istate)
         writegeneralstackedlistenerinterface(istate)
+        writestringliststackedlistenerinterface(istate)
         writestackedlistenerinterface(istate, schema)
 
         if supportbulkcontainer:
@@ -1289,6 +1311,7 @@ private:
 
         writerootstackedlistenerimplementation(istate)
         writegeneralstackedlistenerimplementation(istate)
+        writestringliststackedlistenerimplementation(istate)
         writestackedlistenerimplementation(istate, schema)
 
         if supportbulkcontainer:

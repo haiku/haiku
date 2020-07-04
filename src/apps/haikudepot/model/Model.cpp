@@ -1041,19 +1041,19 @@ Model::_NotifyCategoryListChanged()
 
 
 /*! This method will find the stored 'DepotInfo' that correlates to the
-    supplied 'url' and will invoke the mapper function in order to get a
-    replacement for the 'DepotInfo'.  The 'url' is a unique identifier
-    for the repository that holds across mirrors.
+    supplied 'identifier' and will invoke the mapper function in order
+    to get a replacement for the 'DepotInfo'.  The 'identifier' holds
+    across mirrors.
 */
 
 void
-Model::ReplaceDepotByUrl(const BString& URL, DepotMapper* depotMapper,
-	void* context)
+Model::ReplaceDepotByIdentifier(const BString& identifier,
+	DepotMapper* depotMapper, void* context)
 {
 	for (int32 i = 0; i < fDepots.CountItems(); i++) {
 		DepotInfo depotInfo = fDepots.ItemAtFast(i);
 
-		if (RepositoryUrlUtils::EqualsNormalized(URL, depotInfo.URL())) {
+		if (identifier == depotInfo.URL()) {
 			BAutolock locker(&fLock);
 			fDepots.Replace(i, depotMapper->MapDepot(depotInfo, context));
 		}
