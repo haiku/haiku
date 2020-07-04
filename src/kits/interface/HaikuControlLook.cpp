@@ -2422,6 +2422,8 @@ HaikuControlLook::GetFrameInsets(frame_type frameType, uint32 flags, float& _lef
 			break;
 	}
 
+	inset = ceilf(inset * (be_plain_font->Size() / 12.0f));
+
 	_left = inset;
 	_top = inset;
 	_right = inset;
