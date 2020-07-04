@@ -1,6 +1,8 @@
-1	catalan; valencian	x-vnd.Haiku-KeyboardInputServerDevice	2228550365
+1	catalan; valencian	x-vnd.Haiku-KeyboardInputServerDevice	131044710
 If the application will not quit you may have to kill it.	Team monitor		Si l'aplicació no surt, potser l'haureu de matar.
 Quit application	Team monitor		Surt de l'aplicació
+Open Terminal	Team monitor		Obre el Terminal
+{0, plural,one{Hold CONTROL+ALT+DELETE for # second to reboot.}other{Hold CONTROL+ALT+DELETE for # seconds to reboot.}}	Team monitor		r{0, plural,one{Mantingueu CONTROL+ALT+SUPR durant # segon per reiniciar.}other{Mantingueu CONTROL+ALT+SUPR durant # segons per reiniciar.}}
 Restart the desktop	Team monitor		Reinicia l'escriptori
 Force reboot	Team monitor		Força el reinici
 Team monitor	Team monitor		Monitor de l'equip

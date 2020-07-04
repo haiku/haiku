@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Input	1910113385
+1	spanish; castilian	x-vnd.Haiku-Input	488048002
 Defaults	InputMouse		Por defecto
 Scrolling	TouchpadPrefView		Desplazamiento
 Long	KeyboardView		Largo
@@ -30,11 +30,14 @@ Instant warp	SettingsView		Deformación instantánea
 Revert	InputKeyboard		Revertir
 Mouse type:	SettingsView		Tipo de ratón:
 Off	TouchpadPrefView		Inactivo
+Never	TouchpadPrefView		Nunca
 Fast	TouchpadPrefView		Rápido
+6-Button	SettingsView		Seis botones
 Click to focus	SettingsView		Clic para selección
 Acceleration	TouchpadPrefView		Aceleración
 Accept first click	SettingsView		Aceptar primer clic
 OK	TouchpadPrefView		Aceptar
+Keyboard Lock Delay	TouchpadPrefView		Retraso del bloqueo de teclado
 Delay until key repeat	KeyboardView		Demora hasta que se repita la tecla
 Two finger scrolling	TouchpadPrefView		Desplazamiento con dos dedos
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		La nueva área de desplazamiento es muy grande y puede impedir el funcionamiento normal del ratón. ¿Realmente desea cambiarla?

@@ -37,7 +37,7 @@ Workspaces	Screen		Espacios de trabajo
 Brightness:	Screen		Brillo:
 32 bits/pixel, 16 Million colors	Screen		32 bits/píxel, 16 millones de colores
 Done	Screen		Terminado
-16 bits/pixel, 65536 colors	Screen		16 pits/píxel, 65536 colores
+16 bits/pixel, 65536 colors	Screen		16 bits/píxel, 65536 colores
 Screen preferences by the Haiku team	Screen		Preferencias de pantalla por el equipo de Haiku
 Refresh rate	Screen		velocidad de actualización
 if needed	Screen		si se necesita
@@ -50,6 +50,6 @@ Apply	Screen		Aplicar
 horizontally	Screen		horizontalmente
 disable	Screen		desactivar
 Set background…	Screen		Configurar el fondo
-Type or use the left and right arrow keys.	Screen		Pulsa o utiliza las teclas de flechas a la derecha y a la izquierda.
+Type or use the left and right arrow keys.	Screen		Teclee o utilice las teclas de flechas a la derecha y a la izquierda.
 Screen	System name		Pantalla
 Do you wish to keep these settings?	Screen		¿Desea guardar esta configuración?

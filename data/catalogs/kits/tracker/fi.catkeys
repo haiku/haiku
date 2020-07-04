@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	2570961103
+1	finnish	x-vnd.Haiku-libtracker	3510417168
 Created	ContainerWindow		Luotu
 Icon	AttributesView		Kuvake
 Open and make preferred	OpenWithWindow		Avaa ja tee ensisijaiseksi
@@ -40,6 +40,7 @@ Small bitmap icon	AttributesView		Pieni bittikarttakuvake
 Would you like to find a suitable application to open the file?	FSUtils		Haluaisitko etsiä sopivan sovelluksen tiedoston avaamiseen?
 64 x 64	ContainerWindow		64 x 64
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Et voi korvata kansiota tai symbolista linkkiä tiedostolla.
+{0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# päivää>}}
 Trailing \\.	libtracker		Jäljessä oleva \\.
 At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Funktiossa %func \nfind_directory() epäonnistui. \nSyy: %error
 Handles any file	OpenWithWindow		Käsittelee kaikkia tiedostoja
@@ -92,6 +93,7 @@ Atom	AttributesView		Atomi
 %SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%SizeProcessed / %TotalSize, %BytesPerSecond/s
 Preparing to restore items…	StatusWindow		Valmistaudutaan palauttamaan kohteita...
 Mount	ContainerWindow		Liitä
+{0, plural, other{<# rectangles>}}	AttributesView		{0, plural, other{<# suorakaidetta>}}
 Desktop	B_DESKTOP_DIRECTORY		Työpöytä
 Corrupted pointers.	libtracker		Osoittimet vaurioituneet.
 Link to:	InfoWindow		Linkitä kohteeseen:
@@ -109,6 +111,7 @@ Edit templates…	TemplatesMenu		Muokkaa mallinteita...
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# tavu} other{# tavua}}
 8-bit integer	AttributesView		8-bittinen kokonaisluku
 8-bit unsigned integer	AttributesView		8-bittinen etumerkitön kokonaisluku
+%s info	InfoWindow	window title	%s tieto
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used käytetty -- %free vapaana)
 Hide dotfiles	SettingsView		Piilota pistetiedostot
 Trash	Model		Roskakori
@@ -180,6 +183,7 @@ MIME Type	AttributesView		MIME-tyyppi
 Show folder location in title tab	SettingsView		Näytä kansion sijainti otsikkovälilehdessä
 There was an error resolving the link.	Tracker		Virhe linkin ratkaisemisessa.
 There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Tallentaminen haluamaasi kansioon epäonnistui. Kokeile jotain toista kansiota.
+{0, plural, other{<# values>}}	AttributesView		{0, plural, other{<# arvot>}}
 Desktop	TrackerSettingsWindow		Työpöytä
 Nested *?+.	libtracker		Sisäkkäiset *?+.
 Move	FSUtils	button label	Siirrä
@@ -345,6 +349,7 @@ Could not open \"%document\" with application \"%app\" (Missing libraries: %libr
 Finish: %time	StatusWindow		Loppuu: %time
 Messenger	AttributesView		Viestintäsovellus
 after	FindPanel		jälkeen
+{0, plural, one{<# data byte>} other{<# bytes of data>}}	AttributesView		{0, plural, one{<# datatavu>} other{<# datatavua>}}
 Version	OpenWithWindow		Versio
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Joitakin valittuja kohteita ei voi siirtää roskakoriin. Haluaisitko sen sijaan poistaa ne? (Tätä toimintoa ei voi palauttaa.)
 Add printer…	ContainerWindow		Lisää tulostin...

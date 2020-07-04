@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku.TextSearch	2224690775
+1	finnish	x-vnd.Haiku.TextSearch	3859480651
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Valitse tiedostot, jotka haluat valittaviksi Seuraajassa.
 %appname% : %path%	GrepWindow		%appname% : %path%
 Failed to start xargs program!	Grepper		Xargs-ohjelman käynnistäminen epäonnistui!
@@ -30,6 +30,7 @@ Open files in code editor	GrepWindow		Avaa tiedostot koodieditorissa
 Failed to open output pipe!	Grepper		Tulostusputken avaaminen epäonnistui!
 Cancel	GrepWindow		Peru
 History	GrepWindow		Historia
+TextSearch	System name		Tekstihaku
 File	GrepWindow		Tiedosto
 Case-sensitive	GrepWindow		Kirjainkoosta riippuva
 Select all	GrepWindow		Valitse kaikki

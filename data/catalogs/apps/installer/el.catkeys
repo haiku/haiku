@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Installer	3753756669
+1	greek, modern (1453-)	x-vnd.Haiku-Installer	3880503748
 Performing installation.	InstallProgress		Η εγκατάσταση είναι σε εξέλιξη.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Επιλέξτε το δίσκο προέλευσης από το αναδυόμενο μενού. Στη συνέχεια, κάντε κλικ στην \"Έναρξη\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Παρακαλώ κλείστε το παράθυρο Διαχειριστή Δίσκου, πριν κλείσετε το Πρόγραμμα Εγκατάστασης.
@@ -61,8 +61,6 @@ Are you sure you want to abort the installation?	InstallerWindow		Σίγουρα
 Stop	InstallerWindow		Τερματισμός
 Cancel	InstallerWindow		Ακύρωση
 Continue	InstallerWindow	In alert after pressing Stop	Συνέχεια
-No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Δεν βρέθηκαν κατάλληλες κατατμήσεις για την εγκατάσταση. Παρακαλώ να ορίσετε κατατμήσεις και να αρχικοποιήσετε τουλάχιστον μια κατάτμηση με το σύστημα αρχείων BeFS.
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Ανοίξτε το εργαλείο Διαχείριση Δίσκου \nγια την κατάτμηση διαθέσιμων σκληρών \nδίσκων και άλλων μέσων αποθήκευσης.\nΟι κατατμήσεις μπορoύν να αρχικοποιηθούν\nμε το σύστημα αρχείων BeFS, το οποίο απαιτείται\nγια μια κατάτμηση εκκίνησης Haiku.
 Scanning for disks…	InstallerWindow		Αναζήτηση δίσκων…
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Σε εξέλιξη η Διαχείρηση Δίσκου…\n\nΚλείστε τη Διαχείρηση Δίσκου για να συνεχίσετε με την εγκατάσταση.
 Abort	InstallerWindow		Ακύρωση

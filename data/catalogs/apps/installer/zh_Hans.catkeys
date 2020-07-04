@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Installer	2546431372
+1	english	x-vnd.Haiku-Installer	2673178451
 Performing installation.	InstallProgress		执行安装。
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		从弹出菜单中选择源磁盘。然后点击\"开始\"。
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		请在关闭系统安装器前关闭磁盘管理器。
@@ -56,8 +56,6 @@ Are you sure you want to abort the installation?	InstallerWindow		您确定要�
 Stop	InstallerWindow		停止
 Cancel	InstallerWindow		取消
 Continue	InstallerWindow	In alert after pressing Stop	继续
-No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		未发现可用于安装的分区。请设置分区，并至少将一个分区初始化为 Be 文件系统。
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		启动磁盘管理器为可用硬盘\n和其他媒介进行分区。\n分区可以初始化为 Be \n 文件系统以作为 Haiku \n引导分区。
 Scanning for disks…	InstallerWindow		扫描磁盘...
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		磁盘管理器运行中...\n\n请关闭磁盘管理器以继续安装。
 Abort	InstallerWindow		取消

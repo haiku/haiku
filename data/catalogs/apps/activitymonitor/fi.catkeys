@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-ActivityMonitor	3672498538
+1	finnish	x-vnd.Haiku-ActivityMonitor	2601047281
 Teams	DataSource		Ryhmät
 Semaphores	DataSource		Opastimet
 TX	DataSource	Shorter version for Sending	Läh.
@@ -17,6 +17,7 @@ Remove graph	ActivityView		Poista kuvaaja
 Swap space	DataSource		Vaihda tila
 CPU	DataSource		Suoritin
 ActivityMonitor	System name		Aktiviteettivalvonta
+CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		Päivitä aikaväli:
 RX	DataSource	Shorter version for Receiving.	Vast.
 Settings…	ActivityWindow		Asetukset...
@@ -30,6 +31,7 @@ Used memory	DataSource		Käytetty muisti
 %.1f faults/s	DataSource		%.1f vikaa/s
 Show legend	ActivityView		Näytä merkin selitys
 Cached memory	DataSource		Välimuistitettu muisti
+CPU %d usage	DataSource		CPU %d käyttö
 File	ActivityWindow		Tiedosto
 Ports	DataSource		Portit
 Page faults	DataSource		Sivuvirheet

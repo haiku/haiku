@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Notifications	3906219317
+1	finnish	x-vnd.Haiku-Notifications	4196496676
 Lower left	GeneralView		Alhaalla vasemmalla
 Application does not have a valid signature	NotificationView	Alert message	Sovelluksella ei ole kelvollista allekirjoitusta
 Status	NotificationView		Tila
@@ -10,12 +10,16 @@ OK	PrefletWin		Valmis
 Notifications	PrefletWin		Ilmoitukset
 Notifications preflet sample	PrefletWin		Ilmoitusasetusmalli
 Mute notifications from this application	NotificationView		Mykistä ilmoitukset tästä sovelluksesta
+wide	GeneralView	Window width: Slider high text	leveä
+narrow	GeneralView	Window width: Slider low text	kapea
 Revert	PrefletWin		Palauta
 Applications	PrefletView		Sovellukset
+{0, plural, =1{Timeout: # second}other{Timeout: # seconds}}	GeneralView		{0, plural, =1{Aikavalvonta: # sekunti}other{Aikavalvonta: # sekuntia}}
 Upper right	GeneralView		Ylhäällä oikealla
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Asetuksia tallennettaessa tapahtui virhe.\nLevytila on mahdollisesti lopussa.
 Defaults	PrefletWin		Oletukset
 Upper left	GeneralView		Ylhäällä vasemmalla
+Window width	GeneralView		Ikkunaleveys
 Applications	NotificationView		Sovellukset
 General	PrefletView		Yleistä
 OK	NotificationView		Valmis

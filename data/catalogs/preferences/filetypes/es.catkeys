@@ -8,7 +8,7 @@ Preferred application	FileTypes Window		Aplicación preferida
 Launch	Application Types Window		Ejecutar
 Removing uninstalled application types	Application Types Window		Quitando tipos de aplicación desinstalados
 Width:	Attribute Window	Default column width in Tracker for this attribute.	Ancho:
-Same as…	FileType Window	The same TYPE as ...	Mismo que...
+Same as…	FileType Window	The same TYPE as ...	Lo mismo que…
 (from super type)	FileTypes Window		(de supertipo)
 Select same preferred application as	FileTypes Window		Selecciona la misma aplicación preferida que
 Could not change attributes	Attribute Window		No se pudieron cambiar los atributos
@@ -38,7 +38,7 @@ Select same preferred application as	FileType Window		Seleccionar la misma aplic
 Cancel	Type List Window		Cancelar
 Don't save	Application Type Window		No guardar
 Center	Attribute Window	Attribute column alignment in Tracker	Centrar
-Done	Extension Window		Listo
+Done	Extension Window		Hecho
 Development	Application Types Window		Desarrollo
 Same as…	FileType Window	The same APPLICATION as ...	Mismo que...
 Abort	Application Types Window		Cancelar
@@ -74,7 +74,7 @@ Name:	Application Types Window		Nombre:
 Rating	Attribute ListView		Clasificación
 duration	Attribute ListView		duración
 File could not be opened	Preferred App Menu		No se pudo abrir el archivo
-Args only	Application Type Window		Solamente args
+Args only	Application Type Window		Argumentos solo
 Could not open \"%s\":\n%s	FileTypes		No se pudo abrir \"%s\":\n%s
 Right	Attribute Window	Attribute column alignment in Tracker	Derecha
 Save changes before closing?	Application Type Window		¿Guardar cambios antes de cerrar?
@@ -85,7 +85,7 @@ Editable	Attribute Window	If Tracker allows to edit this attribute.	Modificable
 New resource file…	FileTypes Window		Nuevo archivo de recursos...
 [Multiple files] file types	FileType Window		Tipos de archivo [múltiples archivos]
 Application type	Application Type Window		Tipo de aplicación
-Show in Tracker…	Application Types Window		Mostrar en Tracker...
+Show in Tracker…	Application Types Window		Mostrar en el rastreador…
 Type name:	FileTypes Window		Escriba el nombre:
 Visible	Attribute Window		Visible
 Select preferred application	FileTypes Window		Elegir aplicación preferida
@@ -137,7 +137,7 @@ Could not retrieve preferred application of this file	Preferred App Menu		No se 
 Application flags	Application Type Window		Banderas de aplicación
 OK	FileTypes		Aceptar
 Group name:	New File Type Window		Nombre de grupo:
-Move up	FileTypes Window		Mover hacia arriba
+Move up	FileTypes Window		Subir
 File	FileTypes Window		Archivo
 Add	Attribute Window		Añadir
 Open file	FileTypes		Abrir archivo
@@ -169,5 +169,5 @@ Edit icon…	Icon View		Editar icono…
 Internal name:	Attribute Window		Nombre interno:
 Show recognition rule	FileTypes Window		Mostrar regla de reconocimiento
 Double	Attribute ListView		Doble
-Move down	FileTypes Window		Mover hacia abajo
+Move down	FileTypes Window		Bajar
 Alpha	Application Type Window		Alfa

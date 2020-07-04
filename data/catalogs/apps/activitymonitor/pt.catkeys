@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-ActivityMonitor	3672498538
+1	portuguese	x-vnd.Haiku-ActivityMonitor	4123759361
 Teams	DataSource		Equipas
 Semaphores	DataSource		Semáforos
 TX	DataSource	Shorter version for Sending	TX
@@ -17,6 +17,7 @@ Remove graph	ActivityView		Remover gráfico
 Swap space	DataSource		Espaço de swap
 CPU	DataSource		CPU
 ActivityMonitor	System name		Monitor de Atividade
+CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		Intervalo entre actualizações:
 RX	DataSource	Shorter version for Receiving.	RX
 Settings…	ActivityWindow		Definições…

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Installer	2230593955
+1	swedish	x-vnd.Haiku-Installer	2357341034
 Performing installation.	InstallProgress		Verkställer installationen.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Välj källdisk från menyn. Klicka sedan på \"Starta\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Var god stäng Diskhanteringsfönstret innan du stänger fönstret för Installeraren.
@@ -62,8 +62,6 @@ Are you sure you want to abort the installation?	InstallerWindow		Är du säker 
 Stop	InstallerWindow		Stopp
 Cancel	InstallerWindow		Avbryt
 Continue	InstallerWindow	In alert after pressing Stop	Fortsätt
-No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Inga partitioner har hittats som är dugliga för installation. Var god ställ in partitioner och initialisera minst en partition med Be-filsystemet.
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Starta DiskHanteringsverktyget för att partitionera\ntillgängliga hårddiskar och annan media.\nPartitioner can formateras med Be-filsystemet\nsom krävs för en Haiku boot-partition.
 Scanning for disks…	InstallerWindow		Skannar efter diskar…
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Kör DriveSetup…\n\nStäng DriveSetup för att fortsätta med installationen.
 Abort	InstallerWindow		Avbryt

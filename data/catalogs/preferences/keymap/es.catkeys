@@ -53,7 +53,7 @@ Ukrainian (Mac)	KeymapNames		Ucraniano (Mac)
 Command:	Modifier keys window	Command key role name	Comando:
 French (Bépo)	KeymapNames		Francés (Bépo)
 Russian (Typewriter)	KeymapNames		Ruso (Mecanográfico)
-Acute trigger	Keymap window		Disparador de acento agudo (´)
+Acute trigger	Keymap window		Desencadenador de acento agudo (´)
 Italian	KeymapNames		Italiano
 ThinkPad T400s International	KeyboardLayoutNames		ThinkPad T400s Internacional
 Apple Aluminum (US)	KeyboardLayoutNames		Apple Aluminum (US)
@@ -73,7 +73,7 @@ Hungarian	KeymapNames		Húngaro
 Control	Keyboard Layout View	Control key	Control
 Irish	KeymapNames		Irlandés
 Remove	Keyboard Layout View		Eliminar
-Tilde trigger	Keymap window		Disparador de tilde (~)
+Tilde trigger	Keymap window		Desencadenador de virgulilla (~)
 Shift	Keyboard Layout View	Shift key	Mayúsculas
 CONTROL	Keyboard Layout View		CONTROL
 Macedonian	KeymapNames		Macedonio
@@ -88,7 +88,7 @@ END	Keyboard Layout View		FIN
 Esperanto	KeymapNames		Esperanto
 Belarusian	KeymapNames		Bielorruso
 Warning: left and right key roles do not match	Modifier keys window		Advertencia: los roles de tecla izquierda y derecha no concuerdan
-Circumflex trigger	Keymap window		Disparador de acento circunflejo (^)
+Circumflex trigger	Keymap window		Desencadenador de acento circunflejo (^)
 Caps lock	Keyboard Layout View		Bloqueo de mayúsculas
 Left shift	Keyboard Layout View		Mayús izquierda
 Russian (Yawert)	KeymapNames		Ruso (Yawert)
@@ -119,7 +119,7 @@ Layout	Keymap window		Distribución
 Greek	KeymapNames		Griego
 Revert	Keymap window		Revertir
 CTRL	Keyboard Layout View	Very short for 'control'	CTRL
-Grave trigger	Keymap window		Disparador de acento grave (`)
+Grave trigger	Keymap window		Desencadenador de acento grave (`)
 Menu	Keyboard Layout View	Menu key	Menú
 Faeroese	KeymapNames		Feroés
 Quit	Keymap window		Salir
@@ -167,7 +167,7 @@ Brazilian (ABNT2)	KeymapNames		Brasileño (ABNT2)
 INS	Keyboard Layout View		INS
 OPTION	Keyboard Layout View		OPCIÓN
 Dutch	KeymapNames		Danés
-Diaeresis trigger	Keymap window		Disparador de diéresis (¨)
+Diaeresis trigger	Keymap window		Desencadenador de diéresis (¨)
 Icelandic	KeymapNames		Islandés
 Open…	Keymap window		Abrir…
 ThinkPad T400s (US)	KeyboardLayoutNames		ThinkPad T400s (US)

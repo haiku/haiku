@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-Installer	3753756669
+1	thai	x-vnd.Haiku-Installer	3880503748
 Performing installation.	InstallProgress		กำลังทำการติดตั้ง
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		เลือกดิสก์ต้นทางจากเมนูป๊อปอัป จากนั้นคลิก \"เริ่มต้น\"
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		โปรดปิดหน้าต่าง DriveSetup ก่อนที่จะปิดหน้าต่างตัวติดตั้ง
@@ -61,8 +61,6 @@ Are you sure you want to abort the installation?	InstallerWindow		คุณแ�
 Stop	InstallerWindow		หยุด
 Cancel	InstallerWindow		ยกเลิก
 Continue	InstallerWindow	In alert after pressing Stop	ต่อไป
-No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		ไม่พบพาร์ติชันที่เหมาะสำหรับการติดตั้ง โปรดตั้งค่าพาร์ติชันและเริ่มต้นอย่างน้อยหนึ่งพาร์ติชันด้วยระบบไฟล์เป็น
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		เรียกใช้ยูทิลิตี้ DriveSetup เพื่อแบ่งพาร์ติชัน \nฮาร์ดไดรฟ์ที่มีอยู่และสื่ออื่น ๆ \nพาร์ติชันสามารถเริ่มต้นได้ด้วย \nไฟล์ ฺBe File System จำเป็นสำหรับการบูต Haiku \n
 Scanning for disks…	InstallerWindow		กำลังสแกนหาดิสก์
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		กำลังเรียกใช้งาน DriveSetup … \n\nปิด DriveSetup เพื่อดำเนินการติดตั้งต่อไป
 Abort	InstallerWindow		ยกเลิก

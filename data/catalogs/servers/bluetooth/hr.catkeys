@@ -1,4 +1,5 @@
-1	croatian	x-vnd.Haiku-bluetooth_server	403379575
+1	croatian	x-vnd.Haiku-bluetooth_server	3418434903
+Stopping the Bluetooth server failed.	BluetoothReplicant		Neuspjelo zaustavljanje Bluetooth poslužitelja.
 Bluetooth error	BluetoothReplicant		Bluetooth greška
 Settings…	BluetoothReplicant		Postavke…
 OK	BluetoothReplicant		U redu

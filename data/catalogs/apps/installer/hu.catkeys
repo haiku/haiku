@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Installer	2474118655
+1	hungarian	x-vnd.Haiku-Installer	2600865734
 Performing installation.	InstallProgress		A telepítés folyamatban…
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Válassza ki a felugró menüből a lemezt melyről telepíteni szeretne, majd kattintson a \"Mehet\" gombra.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		A telepítőablak bezárása előtt kérlek zárd be a Lemezkezelő ablakot!
@@ -61,8 +61,6 @@ Are you sure you want to abort the installation?	InstallerWindow		Biztos meg kí
 Stop	InstallerWindow		Leállítás
 Cancel	InstallerWindow		Mégse
 Continue	InstallerWindow	In alert after pressing Stop	Folytatás
-No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Nincs a telepítéshez alkalmas partíció. Kérlek hozd létre a szükséges partíció(ka)t és legalább egy partíciót BFS-sel (Be File System) készíts elő!
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Indítsa el a Lemezbeállító segédprogramot a\nlétező merevlemezek és egyéb adathordozók\npartícionálásához! A partíciókat a Haiku\noperációs rendszer rendszerbetöltőjéhez\n BFS-sel (Be FájlrendSzerrel) kell inicializálni.
 Scanning for disks…	InstallerWindow		Lemezek keresése…
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		A Lemezkezelő fut.\n\nHa végzett, zárja be a lemezbeállítót a telepítés folytatásához!
 Abort	InstallerWindow		Megszakítás

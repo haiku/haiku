@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Installer	3753756669
+1	spanish; castilian	x-vnd.Haiku-Installer	2357341034
 Performing installation.	InstallProgress		Realizando instalación.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Elija el disco de origen del menú desplegable. Después haga clic en \"Empezar\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Por favor, cierre la ventana de DriveSetup antes de cerrar la ventana del Instalador.
@@ -32,6 +32,7 @@ Install from:	InstallerWindow		Instalar desde:
 Additional disk space required: 0.0 KiB	InstallerWindow		Espacio adicional requerido en disco: 0.0 KiB
 This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		¡Este software es beta! Esto significa que existe el riesgo de perder información valiosa. ¡Recuerde realizar copias de seguridad con frecuencia!\n\n\n
 ???	InstallerWindow	Unknown currently copied item	¿¿¿???
+Install anyway	InstallProgress		Instalar de todos modos
 1)   If you are installing Haiku onto real hardware (not inside an emulator), you may want to prepare a hard disk partition from another OS (you could, for example, use a GParted Live-CD, which can also resize existing partitions to make room).\nYou can also set up partitions by launching DriveSetup from Installer, but you won't be able to resize existing partitions with it. While DriveSetup has been quite thoroughly tested over the years, it's recommended to have up-to-date backups of the other partitions on your system. Just in case…	InstallerApp		1) Si usted está instalando Haiku sobre hardware real (es decir, no utilizando un emulador), puede preparar una partición de disco rígido desde otro sistema operativo (usted puede, por ejemplo, usar GParted Live-CD, el cual además le permite modificar el tamaño de particiones existentes si es necesario).\nUsted también puede configurar particiones utilizando DriveSetup desde el instalador, pero no podrá modificar el tamaño de las particiones existentes.  Aunque DriveSetup ha sido probado exhaustivamente durante años, le recomendamos que tenga una copia de seguridad actualizada de las particiones existentes en su sistema,  sólo por si acaso… 
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Elija los discos de origen y destino del menú desplegable. Después haga clic en \"Empezar\".
 Hide optional packages	InstallerWindow		Ocultar paquetes opcionales
@@ -61,8 +62,6 @@ Are you sure you want to abort the installation?	InstallerWindow		¿Está seguro
 Stop	InstallerWindow		Detener
 Cancel	InstallerWindow		Cancelar
 Continue	InstallerWindow	In alert after pressing Stop	Continuar
-No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		No se han encontrado particiones válidas para la instalación. Por favor, configure las particiones y de formato al menos a una de ellas con el sistema de ficheros de Be (BFS).
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Inicia la utilidad DriveSetup para particionar\nlos discos duros disponibles y otros medios.\nSe pueden formatear particiones con el sistema\nde archivos de Be, necesario para la partición\nde arranque de Haiku.
 Scanning for disks…	InstallerWindow		Buscando discos…
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Ejecutando DriveSetup…\n\nCierre DriveSetup para continuar con la instalación.
 Abort	InstallerWindow		Abortar
@@ -77,6 +76,7 @@ Running Boot Manager and DriveSetup…\n\nClose both applications to continue wi
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		¿Está seguro de querer instalar sobre el disco de arranque actual? El instalador tendrá que reiniciar la máquina.
 Onto:	InstallerWindow		En:
 Quit Boot Manager and DriveSetup	InstallerWindow		Salir del administrador de arranque y DriveSetup
+3)   When you successfully boot into Haiku for the first time, make sure to read our \"Userguide\" and take the \"Quick Tour\". There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Una vez que haya arrancado Haiku por vez primera, no olvide leer nuestra «Guía de usuario» y tomar el «Paseo rápido». Encontrará enlaces a estos recursos en el escritorio y en los marcadores de WebPositive.\n\n
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installer\n\tescrito por Jérôme Duval y Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 Tools	InstallerWindow		Herramientas
 scanning…	InstallerWindow		buscando discos...

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Input	1910113385
+1	finnish	x-vnd.Haiku-Input	1950274171
 Defaults	InputMouse		Oletukset
 Scrolling	TouchpadPrefView		Vieritettään
 Long	KeyboardView		Pitkä
@@ -15,6 +15,7 @@ Please confirm	TouchpadPrefView		Vahvista
 Mouse speed	SettingsView		Hiirinopeus
 Horizontal scrolling	TouchpadPrefView		Vaakasuora vieritys
 Input	System name		Syöte
+Quick	TouchpadPrefView		Nopea
 Short	KeyboardView		Lyhyt
 Revert	InputMouse		Käänteinen
 Slow	KeyboardView		Hidas
@@ -26,15 +27,19 @@ Focus follows mouse	SettingsView		Kohdistus seuraa hiirtä
 Focus mode:	SettingsView		Kohdistustila:
 Revert	TouchpadPrefView		Käänteinen
 4-Button	SettingsView		4-painikkeinen
+Tapping sensitivity	TouchpadPrefView		Naputusherkkyys
 Instant warp	SettingsView		Pikaväännös
 Revert	InputKeyboard		Palauta
 Mouse type:	SettingsView		Hiirityyppi:
 Off	TouchpadPrefView		Pois käytöstä
+Never	TouchpadPrefView		Ei koskaan
 Fast	TouchpadPrefView		Nopea
+6-Button	SettingsView		6-painike
 Click to focus	SettingsView		Kohdista napsauttamalla
 Acceleration	TouchpadPrefView		Kiihdytys
 Accept first click	SettingsView		Hyväksy ensimmäisellä napsautuksella
 OK	TouchpadPrefView		Valmis
+Keyboard Lock Delay	TouchpadPrefView		Näppäimistön lukkoviive
 Delay until key repeat	KeyboardView		Näppäintoiston viive
 Two finger scrolling	TouchpadPrefView		Kaksisormivieritys
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Uusi vieritysalue on hyvin laaja ja se saattaa hidastuttaa normaalia hiiritoimintaa. Haluatko todella muuttaa sen?

@@ -1,20 +1,41 @@
-1	english	x-vnd.Haiku-CharacterMap	2747182081
+1	english	x-vnd.Haiku-CharacterMap	757248569
+Tirhuta	UnicodeBlocks		底罗仆多文
 Miscellaneous mathematical symbols B	UnicodeBlocks		其他数学符号 B
+Latin extended E	UnicodeBlocks		拉丁字母扩展E
+Dogra	UnicodeBlocks		多格拉文
+Javanese	UnicodeBlocks		爪哇字母
 Saurashtra	UnicodeBlocks		索拉什特拉语
 Arabic supplement	UnicodeBlocks		阿拉伯语扩展
 Hanunoo	UnicodeBlocks		哈努诺文
 Ogham	UnicodeBlocks		欧甘文字
+Inscriptional Pahlavi	UnicodeBlocks		巴列维铭文
 Hebrew	UnicodeBlocks		希伯来语
 Katakana	UnicodeBlocks		片假名
+Miao	UnicodeBlocks		苗文
+Mro	UnicodeBlocks		默文
 Mongolian	UnicodeBlocks		蒙古语
+Pau Cin Hau	UnicodeBlocks		包钦豪文
+Yezidi	UnicodeBlocks		雅兹迪文
 Linear B ideograms	UnicodeBlocks		线性象形文字 B
+Caucasian Albanian	UnicodeBlocks		高加索阿尔巴尼亚文
+CJK unified ideographs extension D	UnicodeBlocks		中日韩统一表意文字扩展D
+Sharada	UnicodeBlocks		夏拉达文
 Multani	UnicodeBlocks		Multani
+Linear A	UnicodeBlocks		线形文字A
 CJK compatibility ideographs Supplement	UnicodeBlocks		CJK 兼容象形文字扩展
+Pahawh Hmong	UnicodeBlocks		救世苗文
 Bopomofo extended	UnicodeBlocks		汉语拼音扩展
+Bassa Vah	UnicodeBlocks		巴萨哇文字
+Georgian extended	UnicodeBlocks		格鲁吉亚字母扩展
 Mathematical alphanumeric symbols	UnicodeBlocks		数学字符数字符号
 Coptic	UnicodeBlocks		科普特语
+Masaram Gondi	UnicodeBlocks		古吉拉共地文字
 Cuneiform numbers and punctuation	UnicodeBlocks		楔形文数字和标点
 Miscellaneous symbols	UnicodeBlocks		其他符号
+Kana supplement	UnicodeBlocks		日文假名补充
+Medefaidrin	UnicodeBlocks		梅德法伊德林文
+Enclosed ideographic supplement	UnicodeBlocks		带圈表意文字补充
+Warang Citi	UnicodeBlocks		瓦兰齐地文
 Vertical forms	UnicodeBlocks		垂直样式
 Miscellaneous mathematical symbols A	UnicodeBlocks		其他数学符号 A
 CharacterMap	System name		字符映射表
@@ -22,20 +43,33 @@ Latin extended D	UnicodeBlocks		拉丁语扩展 D
 Aegean numbers	UnicodeBlocks		爱琴海数字
 Hangul syllables	UnicodeBlocks		朝鲜文音节
 Modifier tone letters	UnicodeBlocks		声调修饰字母
+Kaithi	UnicodeBlocks		凯提文
+Psalter Pahlavi	UnicodeBlocks		巴列维诗文
+Newa	UnicodeBlocks		尼泊尔纽瓦字母
 View	CharacterWindow		视图
+Rumi numeral symbols	UnicodeBlocks		卢米文数字
 Enclosed CJK letters and months	UnicodeBlocks		封装 CJK 字符和月份
 Deseret	UnicodeBlocks		Deseret
 Cham	UnicodeBlocks		卡姆语
 Cyrillic	UnicodeBlocks		斯拉夫字母
+Makasar	UnicodeBlocks		玛卡莎文
+Palmyrene	UnicodeBlocks		帕尔迈拉字母
 Shavian	UnicodeBlocks		萧氏字母表
+Tangut	UnicodeBlocks		西夏文
+CJK unified ideographs extension C	UnicodeBlocks		中日韩统一表意文字扩展C
 Ancient Greek musical notation	UnicodeBlocks		古希腊音乐符号
 Thai	UnicodeBlocks		泰语
 Ethiopic supplement	UnicodeBlocks		埃塞俄比亚语扩展
+Chess symbols	UnicodeBlocks		国际象棋符号
 Yijing hexagram symbols	UnicodeBlocks		易经六爻符号
+Ottoman Siyaq numbers	UnicodeBlocks		奥斯曼西亚克数字
+Ideographic symbols and punctuation	UnicodeBlocks		表意符号和标点符号
 File	CharacterWindow		文件
+Sudanese supplement	UnicodeBlocks		巽他字母补充
 Myanmar	UnicodeBlocks		缅甸文
 Tifinagh	UnicodeBlocks		 提非纳文 
 Musical symbols	UnicodeBlocks		音乐符号
+Bamum supplement	UnicodeBlocks		巴姆穆文字补充
 Arabic presentation forms B	UnicodeBlocks		阿拉伯语表示形式 B
 Cypriot syllabary	UnicodeBlocks		塞浦路斯音节文字
 IPA extensions	UnicodeBlocks		IPA扩展
@@ -44,8 +78,14 @@ N'Ko	UnicodeBlocks		N'Ko
 Cherokee supplement	UnicodeBlocks		切罗基文补充
 Halfwidth and fullwidth forms	UnicodeBlocks		半型及全型形式
 Counting rod numerals	UnicodeBlocks		算筹数字
+Sora Sompeng	UnicodeBlocks		索拉僧平文字
+Supplemental arrows C	UnicodeBlocks		追加箭头C
+Alchemical symbols	UnicodeBlocks		炼金术符号
 Latin extended C	UnicodeBlocks		拉丁语扩展 C
+Old Turkic	UnicodeBlocks		古突厥文
+Meroitic hieroglyphs	UnicodeBlocks		麦罗埃文圣书体
 Combining diacritical marks for symbols	UnicodeBlocks		组合变音符号
+Osage	UnicodeBlocks		欧塞奇字母
 Combining diacritical marks supplement	UnicodeBlocks		组合变音符号扩展
 Cherokee	UnicodeBlocks		彻罗基语
 Balinese	UnicodeBlocks		巴厘语
@@ -53,11 +93,17 @@ Georgian	UnicodeBlocks		格鲁吉亚语
 CJK compatibility forms	UnicodeBlocks		CJK兼容表
 Old Hungarian	UnicodeBlocks		古匈牙利语
 CJK unified ideographs extension B	UnicodeBlocks		CJK 统一象形文字扩展 B
+Meroitic cursive	UnicodeBlocks		麦罗埃文草书体
 Ahom	UnicodeBlocks		Ahom
+Nyiakeng Puachue Hmong	UnicodeBlocks		创世纪苗文
+Duployan	UnicodeBlocks		杜普雷速记
 Early Dynastic Cuneiform	UnicodeBlocks		早期楔形文字
+Kana extended A	UnicodeBlocks		日文假名扩展A
 Arabic presentation forms A	UnicodeBlocks		阿拉伯语表示形式 A
 Filter:	CharacterWindow		过滤器：
+Small Kana extension	UnicodeBlocks		小假名扩充
 Kannada	UnicodeBlocks		卡纳达语
+Brahmi	UnicodeBlocks		婆罗米文字
 Lydian	UnicodeBlocks		吕底亚语
 Hatran	UnicodeBlocks		Hatran
 Gurmukhi	UnicodeBlocks		古木基文

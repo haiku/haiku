@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Input	1910113385
+1	romanian	x-vnd.Haiku-Input	1950274171
 Defaults	InputMouse		Implicite
 Scrolling	TouchpadPrefView		Se derulează
 Long	KeyboardView		Lung
@@ -15,6 +15,7 @@ Please confirm	TouchpadPrefView		Confirmați
 Mouse speed	SettingsView		Viteză maus
 Horizontal scrolling	TouchpadPrefView		Derulare orizontală
 Input	System name		Intrare
+Quick	TouchpadPrefView		Repede
 Short	KeyboardView		Scund
 Revert	InputMouse		Revenire
 Slow	KeyboardView		Încet
@@ -26,15 +27,19 @@ Focus follows mouse	SettingsView		Focalizarea urmărește mausul
 Focus mode:	SettingsView		Mod de focalizare:
 Revert	TouchpadPrefView		Revenire
 4-Button	SettingsView		4-Buton
+Tapping sensitivity	TouchpadPrefView		Senzitivitate la atingere
 Instant warp	SettingsView		Deviere instantă
 Revert	InputKeyboard		Revenire
 Mouse type:	SettingsView		Tip de maus:
 Off	TouchpadPrefView		Oprit
+Never	TouchpadPrefView		Niciodată
 Fast	TouchpadPrefView		Rapid
+6-Button	SettingsView		Butonul-6
 Click to focus	SettingsView		Dați clic pentru a focaliza
 Acceleration	TouchpadPrefView		Accelerare
 Accept first click	SettingsView		Acceptă primul clic
 OK	TouchpadPrefView		OK
+Keyboard Lock Delay	TouchpadPrefView		Amânare de blocare de tastatură
 Delay until key repeat	KeyboardView		Amânare până la repetarea tastei
 Two finger scrolling	TouchpadPrefView		Derulare cu două degete
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Noua zonă de derulare este foarte mare și poate să împiedice operația normală a mausului. Sigur doriți să o modificați?

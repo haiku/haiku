@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-Input	1910113385
+1	esperanto	x-vnd.Haiku-Input	1950274171
 Defaults	InputMouse		Defaŭltoj
 Scrolling	TouchpadPrefView		Rulumado
 Long	KeyboardView		Longa
@@ -15,6 +15,7 @@ Please confirm	TouchpadPrefView		Konfirmu
 Mouse speed	SettingsView		Rapideco de muso
 Horizontal scrolling	TouchpadPrefView		Horizontala rulumado
 Input	System name		Enigo
+Quick	TouchpadPrefView		Rapide
 Short	KeyboardView		Mallonge
 Revert	InputMouse		Malfari
 Slow	KeyboardView		Malrapide
@@ -26,15 +27,19 @@ Focus follows mouse	SettingsView		Fokuso sekvas muson
 Focus mode:	SettingsView		Reĝimo de fokusigo:
 Revert	TouchpadPrefView		Malfari
 4-Button	SettingsView		4-butona
+Tapping sensitivity	TouchpadPrefView		Frapsentemo
 Instant warp	SettingsView		Tuja deformiĝo
 Revert	InputKeyboard		Malfari
 Mouse type:	SettingsView		Speco de muso:
 Off	TouchpadPrefView		Malŝalti
+Never	TouchpadPrefView		Neniam
 Fast	TouchpadPrefView		Rapide
+6-Button	SettingsView		6-butona
 Click to focus	SettingsView		Klaki por fokusigi
 Acceleration	TouchpadPrefView		Akcelado
 Accept first click	SettingsView		Akcepti unuan klakon
 OK	TouchpadPrefView		Bone
+Keyboard Lock Delay	TouchpadPrefView		Prokrasto de klavara ŝlosigo
 Delay until key repeat	KeyboardView		Prokrasto dum klava ripeto
 Two finger scrolling	TouchpadPrefView		Rulumado per du fingroj
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		La nova areo por rulumo estas tre vasta kaj povas malhelpi operaciojn per muso. Ĉu vi vere volas ŝanĝi ĝin?

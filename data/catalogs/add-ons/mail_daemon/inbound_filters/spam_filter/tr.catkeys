@@ -3,5 +3,5 @@ or empty e-mail	SpamFilterConfig		veya boş e-posta
 Genuine below and uncertain above:	SpamFilterConfig		Aşağıda hakiki ve yukarıda belirsiz:
 Spam above:	SpamFilterConfig		Yukarıda istenmeyen:
 Add spam rating to start of subject	SpamFilterConfig		Konunun başlangıcına istenmeyenlik derecesini ekle
-Bayesian Spam Filter	SpamFilter		Bayesci İstenmeyen süzgeci
+Bayesian Spam Filter	SpamFilter		Bayes İstenmeyen süzgeci
 Learn from all incoming e-mail	SpamFilterConfig		Gelen tüm e-postalardan öğren

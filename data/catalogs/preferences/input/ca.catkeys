@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Input	1910113385
+1	catalan; valencian	x-vnd.Haiku-Input	1950274171
 Defaults	InputMouse		Valors predeterminats
 Scrolling	TouchpadPrefView		Desplaçament
 Long	KeyboardView		Llarg
@@ -15,6 +15,7 @@ Please confirm	TouchpadPrefView		Confirmeu-ho, si us plau
 Mouse speed	SettingsView		Velocitat del ratolí
 Horizontal scrolling	TouchpadPrefView		Desplaçament horitzontal
 Input	System name		Entrada
+Quick	TouchpadPrefView		Ràpid
 Short	KeyboardView		Curt
 Revert	InputMouse		Reverteix
 Slow	KeyboardView		Lent
@@ -26,15 +27,19 @@ Focus follows mouse	SettingsView		El focus segueix el ratolí
 Focus mode:	SettingsView		Mode del focus:
 Revert	TouchpadPrefView		Reverteix
 4-Button	SettingsView		Botó 4
+Tapping sensitivity	TouchpadPrefView		Sensibilitat del toc
 Instant warp	SettingsView		Guerxesa instantània
 Revert	InputKeyboard		Reverteix
 Mouse type:	SettingsView		Tipus de ratolí:
 Off	TouchpadPrefView		Desactivat
+Never	TouchpadPrefView		Mai
 Fast	TouchpadPrefView		Ràpid
+6-Button	SettingsView		Botó 6
 Click to focus	SettingsView		Clic per al focus
 Acceleration	TouchpadPrefView		Acceleració
 Accept first click	SettingsView		Accepta el primer clic
 OK	TouchpadPrefView		D'acord
+Keyboard Lock Delay	TouchpadPrefView		Retard del bloqueig del teclat
 Delay until key repeat	KeyboardView		Retard fins a la repetició de tecla
 Two finger scrolling	TouchpadPrefView		Desplaçament amb dos dits
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		L'àrea de desplaçament nova és molt grossa i pot impedir el funcionament normal del ratolí. Realment voleu canviar-ho?

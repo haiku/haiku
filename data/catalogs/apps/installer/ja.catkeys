@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Installer	2230593955
+1	japanese	x-vnd.Haiku-Installer	3047345038
 Performing installation.	InstallProgress		インストールを実行しています。
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		メニューからインストールディスクを選択し、次に\"開始\"ボタンをクリックしてください。
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		インストーラーを閉じる前に、DriveSetup を終了してください。
@@ -25,6 +25,7 @@ Welcome to the Haiku Installer!\n\n	InstallerApp		Haikuインストーラーへ�
 Quit Boot Manager	InstallerWindow		ブートマネージャーを終了
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		ブートマネージャー実行中…\n\nインストールを続けるには、ブートマネージャーを閉じてください。
 Quit DriveSetup	InstallerWindow		DriveSetup を終了
+The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume while the existing 'settings' folder is retained. All other folders will be merged, in which files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		インストール先は空ではありません。それでもインストールしますか?\n\n注: 'システム' フォルダーはインストール元からのクリーンなコピーになりますが、設定フォルダーは元のままです。ほかのすべてのフォルダーはマージされますが、一方両方にあるファイルやリンクはインストール元のバージョンに上書きされます。
 Write boot sector	InstallerWindow		ブートセクターを書き込む
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld / %2ld
 Finishing installation.	InstallProgress		インストールを終了しています。
@@ -62,8 +63,6 @@ Are you sure you want to abort the installation?	InstallerWindow		本当にイ�
 Stop	InstallerWindow		中断
 Cancel	InstallerWindow		中止
 Continue	InstallerWindow	In alert after pressing Stop	続ける
-No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		インストール可能なパーティションが見つかりません。DriveSetupを使って、パーティションを作成し、最低一つのパーティションをBeファイルシステムで初期化してください。
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		使用可能なハードディスクおよび他のメディア上の\nパーティションを操作するツールDriveSetupを\n起動します。このツールを使って、パーティションを\nHaikuの起動に必要な Be ファイルシステムで\n初期化します。
 Scanning for disks…	InstallerWindow		ディスクを検出しています…
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		DriveSetupは実行中です。\n\nDriveSetupを終了させてからインストールを続行してください。
 Abort	InstallerWindow		中断

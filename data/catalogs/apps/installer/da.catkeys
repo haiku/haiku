@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-Installer	308998188
+1	danish	x-vnd.Haiku-Installer	435745267
 Performing installation.	InstallProgress		Udfører installation.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Vælg en oprindelsesdisk fra popup-menuen. Tryk dernæst på \"Begynd\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Luk venligst vinduet for drevopsætning, før du lukker installationsvinduet.
@@ -62,8 +62,6 @@ Are you sure you want to abort the installation?	InstallerWindow		Er du sikker p
 Stop	InstallerWindow		Stop
 Cancel	InstallerWindow		Annuller
 Continue	InstallerWindow	In alert after pressing Stop	Fortsæt
-No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Der blev fundet nogen egnede partitioner til installationen. Opsæt venligst partitioner og initialiser mindst én partition med Be-filsystemet.
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Igangsæt drevopsætning-værktøjet for at partitionere\ntilgængelige diskdrev og andre medier.\nPartitioner kan initialiseres med\nBe-filsystemet, der er nødvendigt\nfor en Haiku-opstartspartition.
 Scanning for disks…	InstallerWindow		Leder efter diske…
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Kører drevopsætning…\n\nLuk vinduet for drevopsætning for at fortsætte installationen.
 Abort	InstallerWindow		Afbryd

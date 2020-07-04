@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Input	1910113385
+1	japanese	x-vnd.Haiku-Input	1950274171
 Defaults	InputMouse		デフォルト
 Scrolling	TouchpadPrefView		スクロール
 Long	KeyboardView		長い
@@ -15,6 +15,7 @@ Please confirm	TouchpadPrefView		確認してください
 Mouse speed	SettingsView		マウスの速度
 Horizontal scrolling	TouchpadPrefView		水平スクロール
 Input	System name		入力機器
+Quick	TouchpadPrefView		素早い
 Short	KeyboardView		短い
 Revert	InputMouse		戻す
 Slow	KeyboardView		遅い
@@ -26,15 +27,19 @@ Focus follows mouse	SettingsView		フォーカスをマウス位置に合わせ�
 Focus mode:	SettingsView		フォーカスモード:
 Revert	TouchpadPrefView		戻す
 4-Button	SettingsView		4 ボタン
+Tapping sensitivity	TouchpadPrefView		タップ感度
 Instant warp	SettingsView		インスタントワープ
 Revert	InputKeyboard		戻す
 Mouse type:	SettingsView		マウスの種類:
 Off	TouchpadPrefView		オフ
+Never	TouchpadPrefView		反応なし
 Fast	TouchpadPrefView		速い
+6-Button	SettingsView		6 ボタン
 Click to focus	SettingsView		クリックでフォーカスのみ
 Acceleration	TouchpadPrefView		加速度
 Accept first click	SettingsView		最初のクリックを受け入れる
 OK	TouchpadPrefView		OK
+Keyboard Lock Delay	TouchpadPrefView		キーボードをロックするまでの時間
 Delay until key repeat	KeyboardView		キーリピートの開始までの時間
 Two finger scrolling	TouchpadPrefView		2本指スクロール
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		新しいスクロール範囲はとても広いので、通常のマウス操作を妨害するかもしれません。本当に変更しますか?

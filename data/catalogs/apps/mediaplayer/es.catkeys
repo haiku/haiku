@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-MediaPlayer	1313616492
+1	spanish; castilian	x-vnd.Haiku-MediaPlayer	1961774506
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Enviar entrada a la papelera
 Close	MediaPlayer-PlaylistWindow		Cerrar
 Volume of background clips	MediaPlayer-SettingsWindow		Volumen de secuencias de fondo
@@ -35,6 +35,7 @@ Full volume	MediaPlayer-SettingsWindow		Máximo volumen
 Start media server	MediaPlayer-Main		Iniciar servidor de medios
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Parece el servidor de medios no está ejecutando.\n¿Quiere iniciarlo?
 Location	MediaPlayer-InfoWin		Ubicación
+Opening '%s'.	MediaPlayer-Main		Abriendo «%s».
 Medium	MediaPlayer-SettingsWindow		Mediano
 Play mode	MediaPlayer-SettingsWindow		Modo de reproducción
 Playlist	MediaPlayer-PlaylistWindow		Lista de temas

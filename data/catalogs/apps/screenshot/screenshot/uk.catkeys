@@ -1,2 +1,9 @@
-1	ukrainian	x-vnd.haiku-screenshot-cli	721864121
+1	ukrainian	x-vnd.haiku-screenshot-cli	2650150283
+OK	ScreenshotWindow		ОК
+Save as:	ScreenshotWindow		Зберегти як:
+seconds	ScreenshotWindow		секунд
+Name:	ScreenshotWindow		Ім'я:
+Cancel	ScreenshotWindow		Скасувати
+Delay:	ScreenshotWindow		Затримка:
 screenshot	Screenshot	Base filename of screenshot files	знімок екрана
+Save	ScreenshotWindow		Зберегти

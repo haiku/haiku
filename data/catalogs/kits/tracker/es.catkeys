@@ -87,13 +87,13 @@ Select…	FilePanelPriv		Seleccionar...
 preferences	B_PREFERENCES_DIRECTORY		preferences
 Name	Person Query Columns		Nombre
 Skip all	FSUtils		Omitir todo
-Corrupted opcode.	libtracker		Opcode corrupto.
+Corrupted opcode.	libtracker		Opcode dañado.
 Atom	AttributesView		Átomo
 %SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%SizeProcessed de %TotalSize, %BytesPerSecond/s
 Preparing to restore items…	StatusWindow		Preparandose para restaurar los elementos
 Mount	ContainerWindow		Montar
 Desktop	B_DESKTOP_DIRECTORY		Desktop
-Corrupted pointers.	libtracker		Punteros corruptos.
+Corrupted pointers.	libtracker		Punteros dañados.
 Link to:	InfoWindow		Enlazar con:
 Copy here	ContainerWindow		Copiar aquí
 Character	AttributesView		Carácter
@@ -167,7 +167,7 @@ Media parameter group	AttributesView		Medios de parámetros de grupo
 %name info	InfoWindow	InfoWindow Title	%name información
 If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Si mueve la carpeta home, es posible que %osName no funcione adecuadamente!\n\n¿Está seguro de que desea hacer esto?\n\nPara mover la carpeta home, mantenga presionada la tecla Mayúsculas (Shift) y haga clic en \"Mover\".
 Property info	AttributesView		Información de propiedad
-Sorry, you can't create links in the Trash.	PoseView		Lo sentimos, No puedes crear enlaces en la papelera.
+Sorry, you can't create links in the Trash.	PoseView		No es posible crear enlaces en la papelera.
 From	Email Query Columns		Desde
 Invert selection	QueryContainerWindow		Invertir selección
 Open selection with:	OpenWithWindow		Abrir selección con:
@@ -179,7 +179,7 @@ Get info	ContainerWindow		Obtener información
 MIME Type	AttributesView		Tipo MIME
 Show folder location in title tab	SettingsView		Mostrar la localización de la carpeta en el título de la pestaña
 There was an error resolving the link.	Tracker		Hubo un error resolviendo un enlace
-There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Hubo un problema intentando guardarlo en la carpeta especificada. Por favor prueba otra vez
+There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Hubo un problema al intentar guardarlo en la carpeta especificada. Pruebe en otra.
 Desktop	TrackerSettingsWindow		Escritorio
 Nested *?+.	libtracker		*?+ anidados.
 Move	FSUtils	button label	Mover
@@ -275,7 +275,7 @@ You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould y
 Empty Trash	ContainerWindow		Vaciar papelera
 no supporting apps	OpenWithWindow		Aplicaciones no soportadas
 32-bit unsigned integer	AttributesView		Entero de 32 bits sin signo
-Preparing to empty Trash…	StatusWindow		Preparándose para vaciar la papelera
+Preparing to empty Trash…	StatusWindow		Preparándose para vaciar la papelera…
 Deleting: 	StatusWindow		Eliminando:
 the MIME settings	FSUtils		las configuraciones MIME
 You can't move or copy the trash.	FSUtils		No puedes mover o copiar la papelera.
@@ -389,11 +389,11 @@ link	FSUtils	filename link	Enlace
 16-bit unsigned integer	AttributesView		Entero de 16 bits sin signo
 Proceed	FSUtils		Proceder
 Edit favorites…	FilePanelPriv		Editar favoritos
-You can't move a folder into itself or any of its own sub-folders.	FSUtils		No puedes mover una carpeta sobre sí misma o cualquiera de sus subcarpetas
+You can't move a folder into itself or any of its own sub-folders.	FSUtils		No puede mover una carpeta sobre sí misma o cualquiera de sus subcarpetas.
 New	ContainerWindow		Nuevo
-You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Debe arrastrar elementos en uno de los iconos de los discos en el \"Disks\" ventana
-If you alter %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Si modificas %target, es posible que %osName no funcione adecuadamente.\n\n¿Estás seguro de que deseas hacer esto?
-Sorry, you can't copy items to the Trash.	FSClipBoard		Lo sentimos, no puedes copiar elementos a la papelera
+You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Debe colocar los elementos sobre uno de los iconos de la ventana «Discos».
+If you alter %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Si modifica %target, es posible que %osName no funcione adecuadamente.\n\n¿Confirma que desea hacerlo?
+Sorry, you can't copy items to the Trash.	FSClipBoard		No es posible copiar elementos en la papelera.
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Existen algunos elementos en esta carpeta con el mismo nombre que elementos que tienes en %verb.\n \n¿Quieres reemplazarlos por los que tienes en %verb?
 When	Email Query Columns		Cuando
 Object	AttributesView		Objeto
@@ -417,7 +417,7 @@ Revert	TrackerSettingsWindow		Revertir
 trash	B_TRASH_DIRECTORY		trash
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Si mueve la carpeta de sistema o sus contenidos, es posible que no pueda iniciar %osName!\n\n¿Está seguro de que desea hacer esto?\n\nPara modificar la carpeta de sistema o sus contenidos, mantenga presionada la tecla Mayúsculas (Shift) y haga clic en \"Mover\".
 Close all in workspace	ContainerWindow		Cerrar todo en el área de trabajo
-Corrupted expression.	libtracker		Expresión corrupta.
+Corrupted expression.	libtracker		Expresión dañada.
 32 x 32	DeskWindow		32 x 32
 Network address	AttributesView		Dirección de red
 Finish: %time - %finishtime left	StatusWindow		Terminar: %time - queda %finishtime
@@ -476,7 +476,7 @@ Go to parent	FilePanelPriv		Ir al nivel superior
 Save	FindPanel		Guardar
 Name	FindPanel		Nombre
 Cancel	WidgetAttributeText		Cancelar
-Memory corruption.	libtracker		Corrupción de memoria.
+Memory corruption.	libtracker		Daño de memoria.
 Expression too long.	libtracker		Expresión demasiado larga.
 Color	AttributesView		Color
 Copy layout	ContainerWindow		Copia de la disposición

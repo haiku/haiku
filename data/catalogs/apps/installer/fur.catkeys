@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-Installer	3753756669
+1	friulian	x-vnd.Haiku-Installer	3880503748
 Performing installation.	InstallProgress		Esecuzion de instalazion.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Sielç il disc sorzint dal menù a tende. Daspò fâs clic su \"Scomence\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Par plasê siere il barcon di Gjestion disc prime di sierâ chel dal Instaladôr.
@@ -61,8 +61,6 @@ Are you sure you want to abort the installation?	InstallerWindow		Interompi pard
 Stop	InstallerWindow		Ferme
 Cancel	InstallerWindow		Anule
 Continue	InstallerWindow	In alert after pressing Stop	Continue
-No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		No je stade cjatade nissune partizion adate pe instalazion. Configure lis partizions e inizialize almancul une cul Be File System.
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Invie la utilitât Gjestion disc par partizionâ\ni discs fis e altris supuarts disponibii.\nLis partizions a puedin jessi inizializadis cul\nBe File System, necessari pes partizions di\ninviament di Haiku.
 Scanning for disks…	InstallerWindow		Scansion dai discs…
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Esecuzion di Gjestion disc…\n\nSiere Gjestion disc par continuâ cu la instalazion.
 Abort	InstallerWindow		Interomp

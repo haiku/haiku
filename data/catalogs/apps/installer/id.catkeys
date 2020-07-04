@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-Installer	3753756669
+1	indonesian	x-vnd.Haiku-Installer	3880503748
 Performing installation.	InstallProgress		Melakukan instalasi.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Pilih disk sumber dari menu pop-up. Lalu klik \"Begin\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Silakan tutup jendela DriveSetup sebelum menutup jendela Installer.
@@ -61,8 +61,6 @@ Are you sure you want to abort the installation?	InstallerWindow		Anda yakin ing
 Stop	InstallerWindow		Berhenti
 Cancel	InstallerWindow		Batal
 Continue	InstallerWindow	In alert after pressing Stop	Lanjut
-No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Tidak ada partisi yang ditemukan yang cocok untuk pemasangan. Silakan mengatur partisi dan menginisialisasi setidaknya satu partisi dengan Be File System.
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Luncurkan utilitas DriveSetup untuk mempartisi\nhard drive yang tersedia dan media lainnya.\nPartisi dapat diinisialisasi dengan\nBe File System yang dibutuhkan untuk partisi \nboot Haiku.
 Scanning for disks…	InstallerWindow		Memindai diska…
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Menjalankan DriveSetup...\n\nTutup DriveSetup untuk melanjutkan instalasi.
 Abort	InstallerWindow		Batal

@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Installer	4054994348
+1	belarusian	x-vnd.Haiku-Installer	4181741427
 Performing installation.	InstallProgress		Выконваецца ўсталёўка.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Выберыце зыходны дыск з усплывальнага меню. Потым націсніце \"Пачаць\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Калі ласка, закройце вакно DriveSetup перад тым як закрыць Усталёўшчык.
@@ -54,8 +54,6 @@ Are you sure you want to abort the installation?	InstallerWindow		Вы наса�
 Stop	InstallerWindow		Стоп
 Cancel	InstallerWindow		Адмена
 Continue	InstallerWindow	In alert after pressing Stop	Працяг
-No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		У сістэме не знойдзена падыходзячых падзелаў. Калі ласка, размецьце дыск і ініцыялізуйце хаця б адзін падзел файлавай сістэмай Be File System.
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Запусціце утыліту DriveSetup каб\nразмеціць даступныя дыскі.\nПадзелы могуць быць ініцыялізаваны файлавай сістэмай\nBe File System, патрэбнай для загрузачнага падзелу Haiku.
 Scanning for disks…	InstallerWindow		Сканіраванне дыскаў…
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Працуе DriveSetup…\n\nЗакрыйце DriveSetup для працягу ўсталёўкі.
 Abort	InstallerWindow		Перарваць

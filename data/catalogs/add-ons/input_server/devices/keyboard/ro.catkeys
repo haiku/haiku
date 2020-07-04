@@ -1,6 +1,8 @@
-1	romanian	x-vnd.Haiku-KeyboardInputServerDevice	2228550365
+1	romanian	x-vnd.Haiku-KeyboardInputServerDevice	131044710
 If the application will not quit you may have to kill it.	Team monitor		Dacă aplicația nu se închide va trebui să o termini forțat.
 Quit application	Team monitor		Închide aplicația
+Open Terminal	Team monitor		Deschide Terminal
+{0, plural,one{Hold CONTROL+ALT+DELETE for # second to reboot.}other{Hold CONTROL+ALT+DELETE for # seconds to reboot.}}	Team monitor		{0, plural,one{Hold CONTROL+ALT+DELETE for # second to reboot.}other{Hold CONTROL+ALT+DELETE for # seconds to reboot.}}
 Restart the desktop	Team monitor		Repornește desktopul
 Force reboot	Team monitor		Forțează repornirea
 Team monitor	Team monitor		Monitor echipe

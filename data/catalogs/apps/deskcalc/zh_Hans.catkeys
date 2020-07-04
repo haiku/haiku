@@ -1,9 +1,51 @@
-1	english	x-vnd.Haiku-DeskCalc	1425096792
+1	english	x-vnd.Haiku-DeskCalc	3178768763
+cos	CalcView		cos
+3	CalcView		3
+(	CalcView		(
+BS	CalcView		退格
+1	CalcView		1
+acos	CalcView		acos
+E	CalcView		E
+/	CalcView		/
+C	CalcView		清除
+C	CalcView	Key label, 'C' means clear	清除
+8	CalcView		8
+ceil	CalcView		向上取整
+-	CalcView		-
+cbrt	CalcView		立方根
+BS	CalcView	Key label, 'BS' means backspace	退格
+floor	CalcView		向下取整
+sinh	CalcView		sinh
+6	CalcView		6
+sin	CalcView		sin
+tanh	CalcView		tanh
++	CalcView		+
+cosh	CalcView		cosh
+ln	CalcView		ln
 Compact	CalcView		精简模式
 Calculating	CalcView		计算
-Enable Num Lock on startup	CalcView		启用数字键锁定
+Enable Num Lock on startup	CalcView		默认启用数字键锁定
+4	CalcView		4
 Scientific	CalcView		科学计算
+)	CalcView		)
+^	CalcView		^
+sqrt	CalcView		平方根
+log	CalcView		log
+asin	CalcView		asin
+=	CalcView		=
 Radians	CalcView		弧度
+2	CalcView		2
+tan	CalcView		tan
+0	CalcView		0
+exp	CalcView		exp
+atan	CalcView		atan
+9	CalcView		9
+.	CalcView		.
 DeskCalc	System name		计算器
-Degrees	CalcView		度
+Degrees	CalcView		角度
+7	CalcView		7
+!	CalcView		!
+π	CalcView		π
+5	CalcView		5
 Basic	CalcView		基本模式
+*	CalcView		*

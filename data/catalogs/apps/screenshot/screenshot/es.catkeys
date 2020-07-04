@@ -1,2 +1,29 @@
-1	spanish; castilian	x-vnd.haiku-screenshot-cli	721864121
+1	spanish; castilian	x-vnd.haiku-screenshot-cli	2402915917
+Include window border	ScreenshotWindow		Incluir el borde de la ventana
+Overwrite	ScreenshotWindow		Sobrescribir
+Save in:	ScreenshotWindow		Guardar en:
+Error saving \"%s\":\n\t%s	ScreenshotWindow		Error al guardar «%s»:\n\t%s
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		El archivo ya existe.\n¿Está seguro de que desea sobrescribirlo?
+OK	ScreenshotWindow		Aceptar
+The destination path exists but is not a folder.	ScreenshotWindow		La ruta de destino existe pero no es una carpeta.
+Select	ScreenshotWindow		Seleccionar
+Save as:	ScreenshotWindow		Guardar en:
+seconds	ScreenshotWindow		segundos
+New screenshot	ScreenshotWindow		Nueva captura de pantalla
+Screenshot	System name		Captura de pantalla
+Desktop	ScreenshotWindow		Escritorio
+Include mouse pointer	ScreenshotWindow		Incluir puntero del ratón
+overwrite	ScreenshotWindow		sobrescribir
+Settings…	ScreenshotWindow		Configuración…
+Choose folder	ScreenshotWindow		Elija una carpeta
+Name:	ScreenshotWindow		Nombre:
+Choose folder…	ScreenshotWindow		Elegir carpeta…
+Please select	ScreenshotWindow		Seleccione
+Failed to save screenshot	ScreenshotWindow		No se pudo guardar la captura de pantalla
+Cancel	ScreenshotWindow		Cancelar
+Delay:	ScreenshotWindow		Demora:
+Copy to clipboard	ScreenshotWindow		Copiar en el portapapeles
 screenshot	Screenshot	Base filename of screenshot files	Capturas
+Home folder	ScreenshotWindow		Carpeta home
+Save	ScreenshotWindow		Guardar
+Capture active window	ScreenshotWindow		Capturar ventana activa

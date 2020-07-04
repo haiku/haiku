@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Installer	2230593955
+1	romanian	x-vnd.Haiku-Installer	3047345038
 Performing installation.	InstallProgress		Se execută instalarea.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Alege discul sursă din meniul contextual. Apoi apasă \"Începe\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Alegeți fereastra ConfigurareDrive înainte de a închide fereastra Programului de instalare.
@@ -25,6 +25,7 @@ Welcome to the Haiku Installer!\n\n	InstallerApp		Bine ați venit la Programul d
 Quit Boot Manager	InstallerWindow		Închide Boot Manager
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Se pornește Administratorul de boot...\n\nÎnchideți Administratorul de Boot pentru a continua cu instalarea.
 Quit DriveSetup	InstallerWindow		Închide DriveSetup
+The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume while the existing 'settings' folder is retained. All other folders will be merged, in which files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Volumul țintă nu este gol. Sigur doriți să îl instalați oricum?\n\nNotă: Dosarul „system” va fi o copie clară de la volumul sursă în timp ce dosarul „settings” existent va fi reținut. Toate celelalte dosare vor fi fuzionate, în care fișierele și legăturile care există în amândouă volume sursă și țintă vor fi suprascrise cu versiunea de volum sursă.
 Write boot sector	InstallerWindow		Scrie sectorul de boot
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld din %2ld
 Finishing installation.	InstallProgress		Se termină instalarea.
@@ -62,8 +63,6 @@ Are you sure you want to abort the installation?	InstallerWindow		Sigur dorești
 Stop	InstallerWindow		Oprește
 Cancel	InstallerWindow		Anulează
 Continue	InstallerWindow	In alert after pressing Stop	Continuă
-No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Nu s-au găsit partiții care sunt potrivite pentru instalare. Configurați partițiile și inițializați cel puțin o partiție cu sistemul de fișiere Be.
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Porniți utilitatea ConfigurareDrive pentru a partiționa\nhard discurile disponibile și alte media.\nPartițiile pot fi inițializate cu\nsistemul de fișiere Be necesar pentru o partiție de boot\nHaiku.
 Scanning for disks…	InstallerWindow		Se scanează pentru discuri…
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Se pornește ConfigurareDrive...\n\nÎnchideți ConfigurareDrive pentru a continua cu instalarea.
 Abort	InstallerWindow		Renunță

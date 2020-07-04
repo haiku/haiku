@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Installer	3753756669
+1	polish	x-vnd.Haiku-Installer	3880503748
 Performing installation.	InstallProgress		Wykonywanie instalacji.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Wybierz dysk źródłowy z menu podręcznego i naciśnij „Instaluj”.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Zamknij okno DriveSetup przed zamknięciem okna instalatora.
@@ -61,8 +61,6 @@ Are you sure you want to abort the installation?	InstallerWindow		Czy na pewno c
 Stop	InstallerWindow		Zatrzymaj
 Cancel	InstallerWindow		Anuluj
 Continue	InstallerWindow	In alert after pressing Stop	Kontynuuj
-No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Nie znaleziono partycji odpowiednich dla przeprowadzenia instalacji. Należy skonfigurować partycje i zainicjalizować przynajmniej jedną z nich systemem plików Be.
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Uruchamia narzędzie DriveSetup służące do partycjonowania\ndostępnych dysków i innych nośników.\nPartycje mogą zostać zainicjalizowane systemem plików Be,\npotrzebnym do poprawnego działania systemu Haiku.
 Scanning for disks…	InstallerWindow		Skanowanie w poszukiwaniu dysków…
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		DriveSetup uruchomiony…\n\nZamknij DriveSetup, aby kontynuować instalację.
 Abort	InstallerWindow		Przerwij

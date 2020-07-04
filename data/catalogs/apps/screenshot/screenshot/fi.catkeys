@@ -1,2 +1,31 @@
-1	finnish	x-vnd.haiku-screenshot-cli	721864121
+1	finnish	x-vnd.haiku-screenshot-cli	3958461128
+Include window border	ScreenshotWindow		Sisällytä ikkunaraja
+Overwrite	ScreenshotWindow		Korvaa
+Save in:	ScreenshotWindow		Tallenna kohteeseen:
+Error saving \"%s\":\n\t%s	ScreenshotWindow		Virhe tallennettaessa kohdetta \"%s\":\n\t%s
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Tämä tiedosto on jo olemassa.\n Oletko varma, että haluat korvata sen?
+OK	ScreenshotWindow		Valmis
+The destination path exists but is not a folder.	ScreenshotWindow		Kohdepolku on olemassa, mutta ei ole kansio.
+Select	ScreenshotWindow		Valitse
+Save as:	ScreenshotWindow		Tallenna nimellä:
+seconds	ScreenshotWindow		sekuntia
+New screenshot	ScreenshotWindow		Uusi ruutukaappaus
+Screenshot	System name		Ruutukaappaus
+Desktop	ScreenshotWindow		Työpöytä
+Artwork folder	ScreenshotWindow		Kuvituskansio
+Translator Settings	ScreenshotWindow		Muunninasetukset
+Include mouse pointer	ScreenshotWindow		Sisällytä hiiriosoitin
+overwrite	ScreenshotWindow		korvaa
+Settings…	ScreenshotWindow		Asetukset…
+Choose folder	ScreenshotWindow		Valitse kansio
+Name:	ScreenshotWindow		Nimi:
+Choose folder…	ScreenshotWindow		Valitse kansio…
+Please select	ScreenshotWindow		Valitse
+Failed to save screenshot	ScreenshotWindow		Ruutukaappauksen tallentaminen epäonnistui
+Cancel	ScreenshotWindow		Peru
+Delay:	ScreenshotWindow		Viive:
+Copy to clipboard	ScreenshotWindow		Kopioi leikepöydälle
 screenshot	Screenshot	Base filename of screenshot files	näytönkaappaus
+Home folder	ScreenshotWindow		Kotikansio
+Save	ScreenshotWindow		Tallenna
+Capture active window	ScreenshotWindow		Kaappaa aktiivinen ikkuna

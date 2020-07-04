@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Installer	862185430
+1	slovak	x-vnd.Haiku-Installer	988932509
 Performing installation.	InstallProgress		Prebieha inštalácia.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Zvoľte zdrojový disk z roletového menu. Potom kliknite na „Začať“.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Prosím, zatvorte okno Nastavenie diskových oblastí pred zatvorením okna Inštalátora.
@@ -55,8 +55,6 @@ Are you sure you want to abort the installation?	InstallerWindow		Ste si istí, 
 Stop	InstallerWindow		Zastaviť
 Cancel	InstallerWindow		Zrušiť
 Continue	InstallerWindow	In alert after pressing Stop	Pokračovať
-No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Neboli nájdené žiadne oblasti vhodné na inštaláciu. Prosím, pripravte diskové oblasti a inicializujte aspoň jednu oblasť Súborovým systémom Be.
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Spustiť nástroj Nastavenie diskových oblastí na rozdelenie\ndostupných pevných diskov a ďalších médií.\nOblasti je možné inicializovať Súborovým\nsystémom Be, ktorý je vyžadovaný pre\nzavádzaciu oblasť Haiku.
 Scanning for disks…	InstallerWindow		Zisťujú sa disky…
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Spúšťa sa Nastavenie diskových oblastí…\n\nInštalácia bude pokračovať, keď zatvoríte Nastavenie diskových oblastí.
 Abort	InstallerWindow		Prerušiť

@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Notifications	3906219317
+1	spanish; castilian	x-vnd.Haiku-Notifications	4081944265
 Lower left	GeneralView		Inferior izquierda
 Application does not have a valid signature	NotificationView	Alert message	La aplicación no tiene una firma válida
 Status	NotificationView		Estado
@@ -10,12 +10,15 @@ OK	PrefletWin		Aceptar
 Notifications	PrefletWin		Notificaciones
 Notifications preflet sample	PrefletWin		Muestra de notificación de un comando de preferencias
 Mute notifications from this application	NotificationView		Silenciar las notificaciones de esta aplicación
+wide	GeneralView	Window width: Slider high text	amplio
+narrow	GeneralView	Window width: Slider low text	estrecho
 Revert	PrefletWin		Revertir
 Applications	PrefletView		Aplicaciones
 Upper right	GeneralView		Superior derecha
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Ha ocurrido un error al guardar las preferencias.\nEs posible que no haya suficiente espacio en disco.
 Defaults	PrefletWin		Predeterminados
 Upper left	GeneralView		Superior izquierda
+Window width	GeneralView		Ancho de ventana
 Applications	NotificationView		Aplicaciones
 General	PrefletView		General
 OK	NotificationView		Aceptar

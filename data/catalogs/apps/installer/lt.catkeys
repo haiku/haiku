@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Installer	4054994348
+1	lithuanian	x-vnd.Haiku-Installer	4181741427
 Performing installation.	InstallProgress		Diegiama.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Pasirinkite šaltinio diską iš išskleidžiamojo meniu. Tada spustelėkite mygtuką „Pradėti“.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Prieš užverdami įdiegimo programos langą, užverkite Diskų ženklintuvo langą.
@@ -54,8 +54,6 @@ Are you sure you want to abort the installation?	InstallerWindow		Ar tikrai nori
 Stop	InstallerWindow		Nutraukti
 Cancel	InstallerWindow		Atsisakyti
 Continue	InstallerWindow	In alert after pressing Stop	Tęsti
-No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Nerasta įdiegimui tinkamų tomų. Paruoškite ir suženklinkite kaip „Be File System“ bent vieną tomą.
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Paleisti Diskų ženklintuvą, kuriuo galima\nskaidyti standžiuosius diskus ir kitus kaupiklius.\nSkaidinius galima suženklinti „Be“ failų sistema,\nkurią būtina naudoti „Haiku“ paleidimo skaidinyje.
 Scanning for disks…	InstallerWindow		Apžvelgiami kaupikliai…
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Vykdomas Diskų ženklintuvas…\n\nUžvėrę Diskų ženklintuvą, galėsite tęsti diegimą.
 Abort	InstallerWindow		Nutraukti

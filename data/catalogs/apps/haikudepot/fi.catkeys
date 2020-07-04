@@ -1,5 +1,6 @@
-1	finnish	x-vnd.Haiku-HaikuDepot	3833361367
+1	finnish	x-vnd.Haiku-HaikuDepot	1546691996
 Repository update error	LocalRepositoryUpdateProcess		Tietovaraston päivitysvirhe
+Network error	ServerHelper		Verkkovirhe
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Tietovaraston päivityksen yhteydessä tapahtui virhe: %error%
 User Created	UserLoginWindow		Käyttäjän luoma
 Check for updates…	MainWindow		Tarkista päivitykset…
@@ -19,6 +20,7 @@ You have successfully authenticated as user %Nickname%.	UserLoginWindow		Käytt�
 No user ratings available.	PackageInfoView		Käyttäjäarvosanoja ei ole saatavilla.
 Downloading package '%name%'	WorkStatusView		Ladataan pakkaus '%name%'
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Välttämättömän captcha-tiedon poiminen takaisin palvelimelle lähetetyistä tiedoista epäonnistui.
+A network transport error has arisen communicating with the server system: %s	ServerHelper		Verkkosiirtovirhe syntyi palvelinjärjestelmäviestinnässä: %s 
 Rating	PackageListView		Arvosana
 Synchronizing icons	ServerIconExportUpdateProcess		Synkronoidaan kuvakkeet
 Does not start	RatePackageWindow		Ei käynnisty
@@ -75,6 +77,7 @@ Reboot required	PackageManager		Tarvitaan uudelleenkäynnistys
 Very unstable	RatePackageWindow		Hyvin epävakaa
 Password:	UserLoginWindow		Salasana:
 All packages	PackageListView		Kaikki pakkaukset
+This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Tämä sovellus on liian vanha palvelinjärjestelmän kanssa viestimiseen. Hanki tämän sovelluksen uudempi versio päivittämällä järjestelmääsi. Sovelluksen vaadittu minimiversio on \"%s\".
 Stability	RatePackageWindow		Stabiilisuus
 Send	RatePackageWindow		Lähetä
 Start package daemon	App		Käynnistä pakkaustaustaprosessi
@@ -98,6 +101,7 @@ Repository	PackageListView		Tietovarasto
 The email is malformed.	UserLoginWindow		Sähköpostiosoite on vääränmuotoinen.
 Close	UserLoginWindow		Sulje
 Close	RatePackageWindow		Sulje
+An unexpected error has been sent from the server [%i]	ServerHelper		Palvelin [%i] lähetti odottamattoman virheen
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synkronoidaan pakkaustietoja tietovarastolle '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Katso käyttöehtoja
 Login issue	MainWindow		Kirjautumispulma
@@ -122,6 +126,7 @@ Log out	MainWindow		Kirjaudu ulos
 Comment language:	RatePackageWindow		Kommenttikieli:
 Status	PackageListView		Tila
 The password has been incorrectly repeated.	UserLoginWindow		Salasanan toistaminen epäonnistui.
+Network transport error	ServerHelper		Verkkosiirtovirhe
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		Käyttäjälle [%Nickname%] aiemmin tarjottu salasana ei ole nykyään kelvollinen. Käyttäjä kirjautuu ulos tästä sovelluksesta ja sinun pitäisi kirjautua uudelleen päivitetyllä salasanallasi.
 Update	RatePackageWindow		Päivitä
 OK	ServerHelper		Valmis
@@ -137,6 +142,7 @@ The nickname is required.	UserLoginWindow		Vaaditaan käyttäjätunnus.
 Source packages	MainWindow		Lähdekoodipakkaukset
 -	no package size		-
 Problem with working files	App		Pulma työtiedostoissa
+Server error	ServerHelper		Palvelinvirhe
 Try again	App		Yritä uudelleen
 Rate package	RatePackageWindow		Anna pakkaukselle arvosana
 Unknown	PackageListView		Tuntematon

@@ -1,5 +1,6 @@
-1	ukrainian	x-vnd.Haiku-HaikuDepot	3833361367
+1	ukrainian	x-vnd.Haiku-HaikuDepot	3909417319
 Repository update error	LocalRepositoryUpdateProcess		Помилка оновлення репозитарія 
+Network error	ServerHelper		Помилка мережі
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Під час оновлення репозитарія сталася помилка: %error%
 User Created	UserLoginWindow		Користувача створено
 Check for updates…	MainWindow		Перевірити на обнови…
@@ -122,6 +123,7 @@ Log out	MainWindow		Вийти з системи
 Comment language:	RatePackageWindow		Мова коментарів:
 Status	PackageListView		Стан
 The password has been incorrectly repeated.	UserLoginWindow		Пароль був повторений неправильно.
+Network transport error	ServerHelper		Помилка мережевого транспорту
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		Пароль, раніше наданий для користувача [%Nickname%], наразі не дійсний. Користувачеві треба завершити сеанс з цією програмою та знову увійти в систему з оновленим паролем.
 Update	RatePackageWindow		Обновити
 OK	ServerHelper		ОК
@@ -137,6 +139,7 @@ The nickname is required.	UserLoginWindow		Псевдонім обов'язко�
 Source packages	MainWindow		Пакети з вихідними текстами
 -	no package size		-
 Problem with working files	App		Проблеми з робочими файлами
+Server error	ServerHelper		Помилка серверу
 Try again	App		Спробувати знову
 Rate package	RatePackageWindow		Оцінка пакета
 Unknown	PackageListView		Невідомо

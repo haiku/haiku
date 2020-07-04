@@ -16,7 +16,7 @@ Skip all	PackageView		Omitir todo
 The installation of the package has been aborted.	PackageView		La instalación del paquete ha sido abortada.
 No installation type selected	PackageView		No se ha seleccionado el tipo de instalación
 Do you want to remember this decision for the rest of this installation?\n	PackageView		¿Desea recordar la decisión para el resto de la instalación?\n
-The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		El paquete seleccionado no pudo ser desinstalado del sistema. El archivo con la información de la instalación del paquete puede estar dañado.
+The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		No se pudo desinstalar el paquete seleccionado del sistema. El archivo con la información de la instalación del paquete puede estar dañado.
 Install…	UninstallView		Instalar…
 The item named '%s' already exists in the given path.\nReplace the item with the one from this package or skip it?	PackageView		El elemento '%s' ya existe en la ruta informada.\n¿Desea reemplazar el elemento con el existente en este paquete o desea omitirlo?
 Installing files and folders	PackageInstall		Instalando archivos y carpetas
@@ -43,7 +43,7 @@ No package available.	PackageInfo		No hay un paquete disponible.
 The script named '%s' already exists in the given path.\nReplace the script with the one from this package or skip it?	PackageView		El script '%s' ya existe en la ruta informada.\n¿Desea reemplazar el script con el existente en este paquete o desea omitirlo?
 Installation type:	PackageView		Tipo de instalación:
 The package you selected has been successfully removed from your system.	UninstallView		El paquete seleccionado ha sido correctamente desinstalado del sistema.
-There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Parece haber una diferencia de tamaño en el paquete de archivo. El paquete puede estar corrupto o puede haber sido modificado desde su creación. ¿Deseas continuar de todos modos?
+There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Parece haber una diferencia de tamaño en el paquete de archivo. El paquete puede estar dañado o haberse modificado desde su creación. ¿Desea continuar de todos modos?
 %name% (%size%)	PackageView		%name% (%size%)
 Abort	PackageInstall		Cancelar
 The file named '%s' already exists in the given path.\nReplace the file with the one from this package or skip it?	PackageView		El archivo '%s' ya existe en la ruta indicada.\n¿Reemplazar el archivo con el existente en este paquete, u omitirlo?

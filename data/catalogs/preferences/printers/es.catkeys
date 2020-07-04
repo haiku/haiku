@@ -5,7 +5,7 @@ Red	TestPageView		Rojo
 Default Printer	PrinterListView		Impresora predeterminada
 <pick one>	AddPrinterDialog		<elegir uno >
 Connected to:	AddPrinterDialog		Conectado a:
-Make default	PrintersWindow		Convertir en la impresora por defecto
+Make default	PrintersWindow		Establecerla como predeterminada
 Cyan	TestPageView		Cian
 Completed	JobListView		Terminado
 Test page	PrintersWindow		Página de prueba

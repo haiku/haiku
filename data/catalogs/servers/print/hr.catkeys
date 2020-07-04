@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Be-PSRV	3747595904
+1	croatian	x-vnd.Be-PSRV	2080445276
 Undefined	ConfigWindow		Nedefinirano
 Return the number of available transports	PrintServerApp Scripting		Vrati broj dostupnih transporta
 Return the number of available printers	PrintServerApp Scripting		Vrati broj dostupnih pisača
@@ -31,6 +31,7 @@ Get comments about this printer	Printer Scripting		Uzmi komentare o ovom pisaču
 A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		Pisač sa ovim imenom već postoji, ali se ne može koristiti! Zamijeniti?
 No	PrintServerApp		Ne
 Get the transport configuration for this printer	Printer Scripting		Uzmi transportne konfiguracije za ovaj poslužitelj
+Landscape	ConfigWindow		Krajobraz
 Legal	ConfigWindow	A North American paper size (216 x 356 mm, or 8.5 x 14 in)	Legal
 There are no printers set up.	PrintServerApp		Nema postavljenih pisača.
 Get name of the transport add-on used for this printer	Printer Scripting		Uzmi ime transportnog dodatzka koji se koristi za ovaj pisač

@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Installer	3753756669
+1	dutch; flemish	x-vnd.Haiku-Installer	3880503748
 Performing installation.	InstallProgress		Uitvoering installatie.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Kies de bronschijf in de pop-up-menu's. Klik daarna \"Begin\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Sluit alstublieft het DriveSetup-venster voordat u het Installer-venster sluit.
@@ -61,8 +61,6 @@ Are you sure you want to abort the installation?	InstallerWindow		Bent u zeker d
 Stop	InstallerWindow		Stop
 Cancel	InstallerWindow		Annuleren
 Continue	InstallerWindow	In alert after pressing Stop	Doorgaan
-No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Er zijn geen partities gevonden die geschikt zijn voor de installatie. Creëer alstublieft partities en initialiseer tenminste één partitie met het Be File System.
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Start het DriveSetup-programma om partities te maken\nin aanwezige harde schijven en andere media.\nPartities kunnen worden geïnitialiseerd\nmet het Be File System, dat nodig is\nvoor een Haiku-opstartpartitie.
 Scanning for disks…	InstallerWindow		Zoekt naar schijven…
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		DriveSetup is actief…\n\nSluit DriveSetup om door te gaan met de installatie.
 Abort	InstallerWindow		Afbreken

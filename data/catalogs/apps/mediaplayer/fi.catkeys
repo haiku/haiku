@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-MediaPlayer	1313616492
+1	finnish	x-vnd.Haiku-MediaPlayer	1961774506
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Poista kappale roskakoriin
 Close	MediaPlayer-PlaylistWindow		Sulje
 Volume of background clips	MediaPlayer-SettingsWindow		Taustavideoleikkeen voimakkuus
@@ -35,6 +35,7 @@ Full volume	MediaPlayer-SettingsWindow		Täysi äänenvoimakkuus
 Start media server	MediaPlayer-Main		Käynnistä mediapalvelin
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Näyttää kuin mediapalvelin ei olisi käynnissä.\nHaluaisitko käynnistää sen ?
 Location	MediaPlayer-InfoWin		Sijainti
+Opening '%s'.	MediaPlayer-Main		Avataan '%s'.
 Medium	MediaPlayer-SettingsWindow		Keskikokoinen
 Play mode	MediaPlayer-SettingsWindow		Soittotila
 Playlist	MediaPlayer-PlaylistWindow		Soittoluettelo

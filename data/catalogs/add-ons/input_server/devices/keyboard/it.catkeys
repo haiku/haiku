@@ -1,6 +1,8 @@
-1	italian	x-vnd.Haiku-KeyboardInputServerDevice	2228550365
+1	italian	x-vnd.Haiku-KeyboardInputServerDevice	131044710
 If the application will not quit you may have to kill it.	Team monitor		Se l'applicazione non si chiude potresti doverla terminare.
 Quit application	Team monitor		Esci dall'applicazione
+Open Terminal	Team monitor		Apri Terminale
+{0, plural,one{Hold CONTROL+ALT+DELETE for # second to reboot.}other{Hold CONTROL+ALT+DELETE for # seconds to reboot.}}	Team monitor		{0, plural,one{Tieni premuti CONTROL+ALT+CANC per # secondo per riavviare.}other{Tieni CONTROL+ALT+CANC per # secondi per riavviare.}}
 Restart the desktop	Team monitor		Riavvia la scrivania
 Force reboot	Team monitor		Forza il riavvio
 Team monitor	Team monitor		Team monitor

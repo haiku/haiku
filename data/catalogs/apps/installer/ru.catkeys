@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Installer	3753756669
+1	russian	x-vnd.Haiku-Installer	3880503748
 Performing installation.	InstallProgress		Выполняется установка…
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Выберите источник из выпадающего меню. Затем нажмите кнопку \"Установить\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Пожалуйста, закройте окно разметки диска перед закрытием окна Установщика.
@@ -61,8 +61,6 @@ Are you sure you want to abort the installation?	InstallerWindow		Вы увер�
 Stop	InstallerWindow		Остановить
 Cancel	InstallerWindow		Отмена
 Continue	InstallerWindow	In alert after pressing Stop	Продолжить
-No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Не были найдены разделы, подходящие для установки. Пожалуйста, подготовьте разделы и инициализируйте хотя бы один из них как Be File System.
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Запустить утилиту DriveSetup для настройки разделов\nна доступных жестких дисках или других носителях.\nРазделы могут быть инициализированы в Be File System,\nкоторая требуются для загрузочного раздела Haiku.
 Scanning for disks…	InstallerWindow		Сканирование дисков…
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Запущена утилита разметки диска (DriveSetup)…\n\nЗакройте ее для продолжения установки.
 Abort	InstallerWindow		Прервать
