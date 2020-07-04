@@ -585,7 +585,7 @@ BAlert::_CreateTypeIcon()
 			return NULL;
 	}
 
-	int32 iconSize = 32 * icon_layout_scale();
+	int32 iconSize = (int32)(32 * icon_layout_scale());
 	// Allocate the icon bitmap
 	icon = new(std::nothrow) BBitmap(BRect(0, 0, iconSize - 1, iconSize - 1),
 		0, B_RGBA32);
