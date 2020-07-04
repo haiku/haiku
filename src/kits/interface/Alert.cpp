@@ -90,10 +90,11 @@ static const int kWindowMinWidth = 310;
 static const int kWindowOffsetMinWidth = 335;
 
 
-static inline int32
+static inline float
 icon_layout_scale()
 {
-	return max_c(1, ((int32)be_plain_font->Size() + 15) / 16);
+	float scale = be_plain_font->Size() / 12;
+	return max_c(1, scale);
 }
 
 
@@ -756,7 +757,7 @@ TAlertView::Archive(BMessage* archive, bool deep) const
 void
 TAlertView::GetPreferredSize(float* _width, float* _height)
 {
-	int32 scale = icon_layout_scale();
+	float scale = icon_layout_scale();
 
 	if (_width != NULL) {
 		if (fIconBitmap != NULL)
@@ -788,7 +789,7 @@ TAlertView::Draw(BRect updateRect)
 
 	// Here's the fun stuff
 	BRect stripeRect = Bounds();
-	int32 iconLayoutScale = icon_layout_scale();
+	float iconLayoutScale = icon_layout_scale();
 	stripeRect.right = kIconStripeWidth * iconLayoutScale;
 	SetHighColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
 	FillRect(stripeRect);
