@@ -1148,11 +1148,12 @@ ScreenWindow::MessageReceived(BMessage* message)
 			_UpdateWorkspaceButtons();
 
 			fScreenMode.Revert();
-			_UpdateActiveMode();
 
 			BScreen screen(this);
 			screen.SetBrightness(fOriginalBrightness);
 			fBrightnessSlider->SetValue(fOriginalBrightness * 255);
+
+			_UpdateActiveMode();
 			break;
 		}
 
