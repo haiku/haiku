@@ -1043,12 +1043,8 @@ BScrollBar::MaxSize()
 BSize
 BScrollBar::PreferredSize()
 {
-	BSize preferredSize = _MinSize();
-	if (fOrientation == B_HORIZONTAL)
-		preferredSize.width *= 2;
-	else
-		preferredSize.height *= 2;
-
+	BSize preferredSize;
+	GetPreferredSize(&preferredSize.width, &preferredSize.height);
 	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(), preferredSize);
 }
 
