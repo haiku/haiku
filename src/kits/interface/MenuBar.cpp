@@ -741,9 +741,12 @@ BMenuBar::_RestoreFocus()
 void
 BMenuBar::_InitData(menu_layout layout)
 {
+	const float fontSize = be_plain_font->Size();
+	float lr = fontSize * 2.0f / 3.0f, tb = fontSize / 6.0f;
+	SetItemMargins(lr, tb, lr, tb);
+
 	fBorders = BControlLook::B_ALL_BORDERS;
 	fLastBounds = new BRect(Bounds());
-	SetItemMargins(8.0f, 2.0f, 8.0f, 2.0f);
 	_SetIgnoreHidden(true);
 	SetLowUIColor(B_MENU_BACKGROUND_COLOR);
 	SetViewColor(B_TRANSPARENT_COLOR);
