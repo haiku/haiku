@@ -720,14 +720,12 @@ BScrollBar::MouseUp(BPoint where)
 }
 
 
-#if DISABLES_ON_WINDOW_DEACTIVATION
 void
 BScrollBar::WindowActivated(bool active)
 {
 	fPrivateData->fEnabled = active;
 	Invalidate();
 }
-#endif // DISABLES_ON_WINDOW_DEACTIVATION
 
 
 void

@@ -12,8 +12,6 @@
 #define B_V_SCROLL_BAR_WIDTH	14.0f
 #define B_H_SCROLL_BAR_HEIGHT	14.0f
 
-#define DISABLES_ON_WINDOW_DEACTIVATION 1
-
 
 class BScrollBar : public BView {
 public:
@@ -46,9 +44,7 @@ public:
 	virtual	void				MouseMoved(BPoint where, uint32 code,
 									const BMessage* dragMessage);
 
-#if DISABLES_ON_WINDOW_DEACTIVATION
 	virtual	void				WindowActivated(bool active);
-#endif
 
 			void				SetValue(float value);
 			float				Value() const;
