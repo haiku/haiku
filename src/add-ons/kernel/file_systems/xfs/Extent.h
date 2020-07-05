@@ -12,9 +12,13 @@
 
 #define DIR2_BLOCK_HEADER_MAGIC 0x58443242
 	// for v4 system
+#define DIR2_FREE_TAG 0xffff
 #define XFS_DIR2_DATA_FD_COUNT 3
 #define EXTENT_REC_SIZE		128
 #define MASK(n) ((1UL << n) - 1)
+#define FSBLOCKS_TO_AGNO(n, volume) (n >> volume->AgBlocksLog())
+#define FSBLOCKS_TO_AGBLOCKNO(n, volume) (n & MASK(volume->AgBlocksLog()))
+
 
 
 // xfs_exntst_t
@@ -97,10 +101,12 @@ public:
 			status_t			Init();
 			bool				BlockType();
 			void				FillMapEntry(void* pointerToMap);
-			ExtentDataHeader*	BlockHeader();
-			ExtentBlockTail*	BlockTail(ExtentDataHeader* header);
+			status_t			FillBlockBuffer();
+			ExtentBlockTail*	BlockTail();
 			ExtentLeafEntry*	BlockFirstLeaf(ExtentBlockTail* tail);
 			xfs_ino_t			GetIno();
+			uint32				GetOffsetFromAddress(uint32 address);
+			int					EntrySize(int len) const;
 			status_t			GetNext(char* name, size_t* length,
 									xfs_ino_t* ino);
 			status_t			Lookup(const char* name, size_t length,
@@ -108,6 +114,7 @@ public:
 private:
 			Inode*				fInode;
 			ExtentMapEntry*		fMap;
+			uint32				fOffset;
 			char*				fBlockBuffer;
 				// This isn't inode data. It holds the directory block.
 };

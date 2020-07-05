@@ -62,15 +62,17 @@ DirectoryIterator::Init()
 status_t
 DirectoryIterator::GetNext(char* name, size_t* length, xfs_ino_t* ino)
 {
+	status_t status;
 	if (fInode->Format() == XFS_DINODE_FMT_LOCAL) {
-		status_t status = fShortDir->GetNext(name, length, ino);
+		status = fShortDir->GetNext(name, length, ino);
 		return status;
 	}
 
 	//TODO: Reading from extent based directories
 	if (fInode->Format() == XFS_DINODE_FMT_EXTENTS) {
 		TRACE("Iterator:GetNext: EXTENTS");
-		return B_NOT_SUPPORTED;
+		status = fExtentDir->GetNext(name, length, ino);
+		return status;
 	}
 
 	//TODO: Reading from B+Trees based directories
@@ -87,19 +89,17 @@ DirectoryIterator::GetNext(char* name, size_t* length, xfs_ino_t* ino)
 status_t
 DirectoryIterator::Lookup(const char* name, size_t length, xfs_ino_t* ino)
 {
+	status_t status;
 	if (fInode->Format() == XFS_DINODE_FMT_LOCAL) {
-		status_t status = fShortDir->Lookup(name, length, ino);
+		status = fShortDir->Lookup(name, length, ino);
 		return status;
 	}
 
 	//TODO: Reading from extent based dirs
 	if (fInode->Format() == XFS_DINODE_FMT_EXTENTS) {
 		TRACE("Iterator:Lookup: EXTENTS");
-		#if 0
-			status_t status = fExtentDir->Lookup(name, length, ino);
-			return status;
-		#endif
-		return B_NOT_SUPPORTED;
+		status = fExtentDir->Lookup(name, length, ino);
+		return status;
 	}
 
 	//TODO: Reading from B+Tree based dirs

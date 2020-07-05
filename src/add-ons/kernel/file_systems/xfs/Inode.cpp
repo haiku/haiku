@@ -160,6 +160,13 @@ Inode::Init()
 }
 
 
+bool
+Inode::HasFileTypeField() const
+{
+	return fVolume->SuperBlockFeatures2() & XFS_SB_VERSION2_FTYPE;
+}
+
+
 status_t
 Inode::GetFromDisk()
 {
@@ -209,17 +216,21 @@ Inode::~Inode()
 }
 
 
+/*
+ * Basically take 4 characters at a time as long as you can, and xor with
+ * previous hashVal after rotating 4 bits of hashVal. Likewise, continue
+ * xor and rotating. This is quite a generic hash function.
+*/
 uint32
 hashfunction(const char* name, int length)
 {
 	uint32 hashVal = 0;
-
 	int lengthCovered = 0;
 	int index = 0;
 	if (length >= 4) {
-		for (; index <= length; index+=4)
+		for (;index < length && (length - index) >= 4; index += 4)
 		{
-			lengthCovered = index;
+			lengthCovered += 4;
 			hashVal = (name[index] << 21) ^ (name[index+1] << 14)
 				^ (name[index+2] << 7) ^ (name[index+3] << 0)
 				^ ((hashVal << 28) | (hashVal >> (4)));

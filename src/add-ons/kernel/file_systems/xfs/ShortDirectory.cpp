@@ -22,20 +22,10 @@ ShortDirectory::~ShortDirectory()
 }
 
 
-bool
-ShortDirectory::HasFileTypeField()
-{
-	if (fInode->GetVolume()->SuperBlockFeatures2() & XFS_SB_VERSION2_FTYPE)
-		return true;
-	else
-		return false;
-}
-
-
 uint8
 ShortDirectory::GetFileType(ShortFormEntry* entry)
 {
-	ASSERT(HasFileTypeField() == true);
+	ASSERT(fInode->HasFileTypeField() == true);
 	return entry->name[entry->namelen];
 }
 
@@ -70,7 +60,7 @@ ShortDirectory::GetIno(ShortFormInodeUnion* inum)
 xfs_ino_t
 ShortDirectory::GetEntryIno(ShortFormEntry* entry)
 {
-	if (HasFileTypeField())
+	if (fInode->HasFileTypeField())
 		return GetIno((ShortFormInodeUnion*)(entry->name
 				+ entry->namelen + sizeof(uint8)));
 	else
@@ -82,7 +72,7 @@ size_t
 ShortDirectory::EntrySize(int namelen)
 {
 	return sizeof(ShortFormEntry) + namelen
-			+ (HasFileTypeField()? sizeof(uint8) : 0)
+			+ (fInode->HasFileTypeField()? sizeof(uint8) : 0)
 			+ (fHeader->i8count? sizeof(uint64):sizeof(uint32));
 }
 

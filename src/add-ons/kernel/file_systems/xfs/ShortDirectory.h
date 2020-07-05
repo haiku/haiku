@@ -56,7 +56,6 @@ public:
 								ShortDirectory(Inode* inode);
 								~ShortDirectory();
 			size_t				HeaderSize();
-			bool				HasFileTypeField();
 			uint8				GetFileType(ShortFormEntry* entry);
 			ShortFormEntry*		FirstEntry();
 			xfs_ino_t			GetIno(ShortFormInodeUnion* inum);

@@ -178,6 +178,7 @@ public:
 
 			uint32				UserId() const { return fNode->UserId(); }
 			uint32				GroupId() const { return fNode->GroupId(); }
+			bool				HasFileTypeField() const;
 
 private:
 			status_t			GetFromDisk();
