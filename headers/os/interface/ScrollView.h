@@ -106,11 +106,11 @@ private:
 			void				_AlignScrollBars(bool horizontal,
 									bool vertical, BRect targetFrame);
 
-	static	BRect				_ComputeFrame(BRect frame, bool horizontal,
-									bool vertical, border_style border,
+	static	BRect				_ComputeFrame(BRect frame, BScrollBar* horizontal,
+									BScrollBar* vertical, border_style border,
 									uint32 borders);
-	static	BRect				_ComputeFrame(BView* target, bool horizontal,
-									bool vertical, border_style border,
+	static	BRect				_ComputeFrame(BView* target, BScrollBar* horizontal,
+									BScrollBar* vertical, border_style border,
 									uint32 borders);
 	static	float				_BorderSize(border_style border);
 	static	uint32				_ModifyFlags(uint32 flags, BView* target,

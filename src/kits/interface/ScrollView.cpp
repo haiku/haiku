@@ -29,9 +29,7 @@ static const float kPlainBorderSize = 1;
 BScrollView::BScrollView(const char* name, BView* target, uint32 resizingMode,
 	uint32 flags, bool horizontal, bool vertical, border_style border)
 	:
-	BView(_ComputeFrame(target, horizontal, vertical, border,
-		BControlLook::B_ALL_BORDERS), name, resizingMode,
-		_ModifyFlags(flags, target, border)),
+	BView(BRect(), name, resizingMode, _ModifyFlags(flags, target, border)),
 	fTarget(target),
 	fBorder(border)
 {
@@ -208,9 +206,9 @@ BScrollView::AttachedToWindow()
 	}
 
 	if (fHorizontalScrollBar != NULL)
-		fHorizontalScrollBar->ResizeBy(-B_V_SCROLL_BAR_WIDTH, 0);
+		fHorizontalScrollBar->ResizeBy(-fHorizontalScrollBar->Frame().Width(), 0);
 	else if (fVerticalScrollBar != NULL)
-		fVerticalScrollBar->ResizeBy(0, -B_H_SCROLL_BAR_HEIGHT);
+		fVerticalScrollBar->ResizeBy(0, -fHorizontalScrollBar->Frame().Height());
 }
 
 
@@ -780,6 +778,13 @@ BScrollView::_Init(bool horizontal, bool vertical)
 		AddChild(fVerticalScrollBar);
 	}
 
+	if ((Flags() & B_SUPPORTS_LAYOUT) == 0) {
+		BRect frame = _ComputeFrame(fTarget, fHorizontalScrollBar,
+			fVerticalScrollBar, fBorder, BControlLook::B_ALL_BORDERS);
+		MoveTo(frame.LeftTop());
+		ResizeTo(frame.Size());
+	}
+
 	BRect targetFrame;
 	if (fTarget) {
 		// layout target and add it
@@ -795,9 +800,9 @@ BScrollView::_Init(bool horizontal, bool vertical)
 		// no target specified
 		targetFrame = Bounds();
 		if (horizontal)
-			targetFrame.bottom -= B_H_SCROLL_BAR_HEIGHT + 1;
+			targetFrame.bottom -= fHorizontalScrollBar->PreferredSize().Height() + 1;
 		if (vertical)
-			targetFrame.right -= B_V_SCROLL_BAR_WIDTH + 1;
+			targetFrame.right -= fVerticalScrollBar->PreferredSize().Width() + 1;
 		if (fBorder == B_FANCY_BORDER) {
 			targetFrame.bottom--;
 			targetFrame.right--;
@@ -827,12 +832,12 @@ BScrollView::_InnerFrame() const
 	float borderSize = _BorderSize();
 
 	if (fHorizontalScrollBar != NULL) {
-		frame.bottom -= B_H_SCROLL_BAR_HEIGHT;
+		frame.bottom -= fHorizontalScrollBar->PreferredSize().Height();
 		if (borderSize == 0)
 			frame.bottom--;
 	}
 	if (fVerticalScrollBar != NULL) {
-		frame.right -= B_V_SCROLL_BAR_WIDTH;
+		frame.right -= fVerticalScrollBar->PreferredSize().Width();
 		if (borderSize == 0)
 			frame.right--;
 	}
@@ -854,8 +859,8 @@ BScrollView::_ComputeSize(BSize targetSize) const
 BRect
 BScrollView::_ComputeFrame(BRect targetRect) const
 {
-	return _ComputeFrame(targetRect, fHorizontalScrollBar != NULL,
-		fVerticalScrollBar != NULL, fBorder, fBorders);
+	return _ComputeFrame(targetRect, fHorizontalScrollBar,
+		fVerticalScrollBar, fBorder, fBorders);
 }
 
 
@@ -865,7 +870,7 @@ BScrollView::_AlignScrollBars(bool horizontal, bool vertical, BRect targetFrame)
 	if (horizontal) {
 		BRect rect = targetFrame;
 		rect.top = rect.bottom + 1;
-		rect.bottom = rect.top + B_H_SCROLL_BAR_HEIGHT;
+		rect.bottom = rect.top + fHorizontalScrollBar->PreferredSize().Height();
 		if (fBorder != B_NO_BORDER || vertical) {
 			// extend scrollbar so that it overlaps one pixel with vertical
 			// scrollbar
@@ -884,7 +889,7 @@ BScrollView::_AlignScrollBars(bool horizontal, bool vertical, BRect targetFrame)
 	if (vertical) {
 		BRect rect = targetFrame;
 		rect.left = rect.right + 1;
-		rect.right = rect.left + B_V_SCROLL_BAR_WIDTH;
+		rect.right = rect.left + fVerticalScrollBar->PreferredSize().Width();
 		if (fBorder != B_NO_BORDER || horizontal) {
 			// extend scrollbar so that it overlaps one pixel with vertical
 			// scrollbar
@@ -908,20 +913,20 @@ BScrollView::_AlignScrollBars(bool horizontal, bool vertical, BRect targetFrame)
 	It is used in the constructor and at other places.
 */
 /*static*/ BRect
-BScrollView::_ComputeFrame(BRect frame, bool horizontal, bool vertical,
-	border_style border, uint32 borders)
+BScrollView::_ComputeFrame(BRect frame, BScrollBar* horizontal,
+	BScrollBar* vertical, border_style border, uint32 borders)
 {
-	if (vertical)
-		frame.right += B_V_SCROLL_BAR_WIDTH;
-	if (horizontal)
-		frame.bottom += B_H_SCROLL_BAR_HEIGHT;
+	if (vertical != NULL)
+		frame.right += vertical->PreferredSize().Width();
+	if (horizontal != NULL)
+		frame.bottom += horizontal->PreferredSize().Height();
 
 	_InsetBorders(frame, border, borders, true);
 
 	if (_BorderSize(border) == 0) {
-		if (vertical)
+		if (vertical != NULL)
 			frame.right++;
-		if (horizontal)
+		if (horizontal != NULL)
 			frame.bottom++;
 	}
 
@@ -930,8 +935,8 @@ BScrollView::_ComputeFrame(BRect frame, bool horizontal, bool vertical,
 
 
 /*static*/ BRect
-BScrollView::_ComputeFrame(BView *target, bool horizontal, bool vertical,
-	border_style border, uint32 borders)
+BScrollView::_ComputeFrame(BView *target, BScrollBar* horizontal,
+	BScrollBar* vertical, border_style border, uint32 borders)
 {
 	return _ComputeFrame(target != NULL ? target->Frame()
 		: BRect(0, 0, 16, 16), horizontal, vertical, border, borders);
