@@ -1049,20 +1049,23 @@ BContainerWindow::InitLayout()
 
 	fCountContainer->GroupLayout()->AddView(fPoseView->CountView(), 0.25f);
 
-	// Eliminate the extra borders
-	fPoseContainer->GridLayout()->SetInsets(-1, 0, -1, -1);
-	fCountContainer->GroupLayout()->SetInsets(0, -1, 0, 0);
+	bool forFilePanel = PoseView()->IsFilePanel();
+	if (!forFilePanel) {
+		// Eliminate the extra borders
+		fPoseContainer->GridLayout()->SetInsets(-1, 0, -1, -1);
+		fCountContainer->GroupLayout()->SetInsets(0, -1, 0, 0);
+	}
 
 	if (fPoseView->VScrollBar() != NULL) {
 		fVScrollBarContainer = new BGroupView(B_VERTICAL, 0);
 		fVScrollBarContainer->GroupLayout()->AddView(fPoseView->VScrollBar());
-		fVScrollBarContainer->GroupLayout()->SetInsets(-1, -1, 0, 0);
+		fVScrollBarContainer->GroupLayout()->SetInsets(-1, forFilePanel ? 0 : -1, 0, 0);
 		fPoseContainer->GridLayout()->AddView(fVScrollBarContainer, 1, 1);
 	}
 	if (fPoseView->HScrollBar() != NULL) {
 		BGroupView* hScrollBarContainer = new BGroupView(B_VERTICAL, 0);
 		hScrollBarContainer->GroupLayout()->AddView(fPoseView->HScrollBar());
-		hScrollBarContainer->GroupLayout()->SetInsets(0, -1, 0, -1);
+		hScrollBarContainer->GroupLayout()->SetInsets(0, -1, 0, forFilePanel ? 0 : -1);
 		fCountContainer->GroupLayout()->AddView(hScrollBarContainer);
 	}
 }

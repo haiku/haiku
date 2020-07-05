@@ -43,8 +43,6 @@ namespace BPrivate {
 
 class BPoseView;
 
-const int32 kCountViewWidth = 76;
-
 
 class BCountView : public BView {
 	// displays the item count and a barber pole while the view is updating

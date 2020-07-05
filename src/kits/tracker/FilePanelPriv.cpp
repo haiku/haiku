@@ -44,6 +44,7 @@ All rights reserved.
 #include <Debug.h>
 #include <Directory.h>
 #include <FindDirectory.h>
+#include <GridView.h>
 #include <Locale.h>
 #include <MenuBar.h>
 #include <MenuField.h>
@@ -245,6 +246,13 @@ TFilePanel::TFilePanel(file_panel_mode mode, BMessenger* target,
 	fBorderedView = new BorderedView;
 	CreatePoseView(model);
 	fBorderedView->GroupLayout()->SetInsets(1);
+
+	fPoseContainer = new BGridView(0.0, 0.0);
+	fPoseContainer->GridLayout()->AddView(fBorderedView, 0, 1);
+
+	fCountContainer = new BGroupView(B_HORIZONTAL, 0);
+	fPoseContainer->GridLayout()->AddView(fCountContainer, 0, 2);
+
 	fPoseView->SetRefFilter(filter);
 	if (!fIsSavePanel)
 		fPoseView->SetMultipleSelection(multipleSelection);
@@ -735,16 +743,16 @@ TFilePanel::Init(const BMessage*)
 
 	// Add PoseView
 	PoseView()->SetName("ActualPoseView");
-	fBorderedView->SetName("PoseView");
-	fBorderedView->SetResizingMode(B_FOLLOW_ALL);
+	fPoseContainer->SetName("PoseView");
+	fPoseContainer->SetResizingMode(B_FOLLOW_ALL);
 	fBorderedView->EnableBorderHighlight(true);
 
 	rect = windRect;
 	rect.OffsetTo(10, fDirMenuField->Frame().bottom + 10);
 	rect.bottom = windRect.bottom - 60;
 	rect.right -= B_V_SCROLL_BAR_WIDTH + 20;
-	fBorderedView->MoveTo(rect.LeftTop());
-	fBorderedView->ResizeTo(rect.Width(), rect.Height());
+	fPoseContainer->MoveTo(rect.LeftTop());
+	fPoseContainer->ResizeTo(rect.Width(), rect.Height());
 
 	PoseView()->AddScrollBars();
 	PoseView()->SetDragEnabled(false);
@@ -753,28 +761,10 @@ TFilePanel::Init(const BMessage*)
 	PoseView()->SetSelectionChangedHook(true);
 	PoseView()->DisableSaveLocation();
 
-	// horizontal
-	rect = fBorderedView->Frame();
-	rect.top = rect.bottom;
-	rect.bottom = rect.top + (float)B_H_SCROLL_BAR_HEIGHT;
-	PoseView()->HScrollBar()->MoveTo(rect.LeftTop());
-	PoseView()->HScrollBar()->ResizeTo(rect.Size());
-	PoseView()->HScrollBar()->SetResizingMode(B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM);
-	fBackView->AddChild(PoseView()->HScrollBar());
-
-	// vertical
-	rect = fBorderedView->Frame();
-	rect.left = rect.right;
-	rect.right = rect.left + (float)B_V_SCROLL_BAR_WIDTH;
-	PoseView()->VScrollBar()->MoveTo(rect.LeftTop());
-	PoseView()->VScrollBar()->ResizeTo(rect.Size());
-	PoseView()->VScrollBar()->SetResizingMode(B_FOLLOW_TOP_BOTTOM | B_FOLLOW_RIGHT);
-	fBackView->AddChild(PoseView()->VScrollBar());
-
 	if (fIsSavePanel)
-		fBackView->AddChild(fBorderedView, fTextControl);
+		fBackView->AddChild(fPoseContainer, fTextControl);
 	else
-		fBackView->AddChild(fBorderedView);
+		fBackView->AddChild(fPoseContainer);
 
 	AddShortcut('W', B_COMMAND_KEY, new BMessage(kCancelButton));
 	AddShortcut('H', B_COMMAND_KEY, new BMessage(kSwitchToHome));
@@ -918,29 +908,25 @@ TFilePanel::RestoreState()
 	}
 
 	// Finish UI creation now that the PoseView is initialized
-	fBorderedView->GroupLayout()->AddView(0, fPoseView->TitleView());
+	InitLayout();
 
-	BRect rect(fBorderedView->Frame());
-	rect.right = rect.left + kCountViewWidth;
-	rect.top = rect.bottom + 1;
-	rect.bottom = rect.top + PoseView()->HScrollBar()->Bounds().Height() - 1;
-	PoseView()->CountView()->MoveTo(rect.LeftTop());
-	PoseView()->CountView()->ResizeTo(rect.Size());
-	PoseView()->CountView()->SetResizingMode(B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
-	fBackView->AddChild(PoseView()->CountView(), fBorderedView);
-
-	PoseView()->HScrollBar()->MoveBy(kCountViewWidth + 1, 0);
-	PoseView()->HScrollBar()->ResizeBy(-kCountViewWidth - 1, 0);
-
-	// The Be Book states that the BTitleView will have a name of "TitleView",
-	// and so some apps will try to grab it by that name and move it around.
-	// They don't need to, because resizing "PoseView" (really the BorderedView)
-	// will resize the BTitleView as well. So just create a dummy view here
-	// so that they don't get NULL when trying to find the view.
+#if 1
+	// The Be Book gives the names for some of these views so that apps could
+	// move them around if they needed to, but we have them here in layouts,
+	// so we need to change their names and add dummy views for compatibility.
+	// (The same is done for the PoseView above.)
 	fPoseView->TitleView()->SetName("ActualTitleView");
-	BView* dummyTitleView = new BView(BRect(), "TitleView", B_FOLLOW_NONE, 0);
-	fBackView->AddChild(dummyTitleView);
-	dummyTitleView->Hide();
+	fPoseView->CountView()->SetName("ActualCountView");
+	fPoseView->HScrollBar()->SetName("ActualHScrollBar");
+	fPoseView->VScrollBar()->SetName("ActualVScrollBar");
+
+	const char* views[] = {"TitleView", "HScrollBar", "VScrollBar", "CountVw", NULL};
+	for (int i = 0; views[i] != NULL; i++) {
+		BView* dummy = new BView(BRect(), views[i], B_FOLLOW_NONE, 0);
+		fBackView->AddChild(dummy);
+		dummy->Hide();
+	}
+#endif
 }
 
 
