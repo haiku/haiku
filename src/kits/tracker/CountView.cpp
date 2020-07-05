@@ -159,7 +159,7 @@ BRect
 BCountView::TextInvalRect() const
 {
 	BRect result = Bounds();
-	result.InsetBy(4, 3);
+	result.InsetBy(4, 4);
 
 	// if the barber pole is not present, use its space for text
 	if (fShowingBarberPole)
@@ -313,7 +313,7 @@ void
 BCountView::AttachedToWindow()
 {
 	SetFont(be_plain_font);
-	SetFontSize(9);
+	SetFontSize(be_plain_font->Size() * 0.75f);
 
 	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	SetLowUIColor(ViewUIColor());

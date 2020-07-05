@@ -1047,10 +1047,7 @@ BContainerWindow::InitLayout()
 {
 	fBorderedView->GroupLayout()->AddView(0, fPoseView->TitleView());
 
-	BLayoutItem* item = fCountContainer->GroupLayout()->AddView(
-		fPoseView->CountView());
-	item->SetExplicitMinSize(BSize(kCountViewWidth, B_H_SCROLL_BAR_HEIGHT));
-	item->SetExplicitMaxSize(BSize(kCountViewWidth, B_SIZE_UNSET));
+	fCountContainer->GroupLayout()->AddView(fPoseView->CountView(), 0.25f);
 
 	// Eliminate the extra borders
 	fPoseContainer->GridLayout()->SetInsets(-1, 0, -1, -1);
