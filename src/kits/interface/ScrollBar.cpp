@@ -90,13 +90,16 @@ public:
 	fButtonDown(NOARROW)
 	{
 #ifdef TEST_MODE
-			fScrollBarInfo.proportional = true;
-			fScrollBarInfo.double_arrows = true;
-			fScrollBarInfo.knob = 0;
-			fScrollBarInfo.min_knob_size = 15;
+		fScrollBarInfo.proportional = true;
+		fScrollBarInfo.double_arrows = true;
+		fScrollBarInfo.knob = 0;
+		fScrollBarInfo.min_knob_size = 15;
 #else
-			get_scroll_bar_info(&fScrollBarInfo);
+		get_scroll_bar_info(&fScrollBarInfo);
 #endif
+
+		fScrollBarInfo.min_knob_size = (int32)(fScrollBarInfo.min_knob_size *
+				(be_plain_font->Size() / 12.0f));
 	}
 
 	~Private()
@@ -990,9 +993,10 @@ BScrollBar::SetBorderHighlighted(bool highlight)
 void
 BScrollBar::GetPreferredSize(float* _width, float* _height)
 {
+	const float scale = be_plain_font->Size() / 12.0f;
 	if (fOrientation == B_VERTICAL) {
 		if (_width)
-			*_width = B_V_SCROLL_BAR_WIDTH;
+			*_width = B_V_SCROLL_BAR_WIDTH * scale;
 
 		if (_height)
 			*_height = Bounds().Height();
@@ -1001,7 +1005,7 @@ BScrollBar::GetPreferredSize(float* _width, float* _height)
 			*_width = Bounds().Width();
 
 		if (_height)
-			*_height = B_H_SCROLL_BAR_HEIGHT;
+			*_height = B_H_SCROLL_BAR_HEIGHT * scale;
 	}
 }
 
