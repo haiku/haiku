@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -68,22 +68,22 @@ status_t
 LocalIconStore::_IdentifyBestIconFileAtDirectory(const BPath& directory,
 	BPath& bestIconPath) const
 {
-	StringList iconLeafnames;
-
-	iconLeafnames.Add("icon.hvif");
-	iconLeafnames.Add("64.png");
-	iconLeafnames.Add("32.png");
-	iconLeafnames.Add("16.png");
+	static const char* kIconLeafnames[] = {
+		"icon.hvif",
+		"64.png",
+		"32.png",
+		"16.png",
+		NULL
+	};
 
 	bestIconPath.Unset();
 
-	for (int32 i = 0; i < iconLeafnames.CountItems(); i++) {
-		BString iconLeafname = iconLeafnames.ItemAt(i);
+	for (int32 i = 0; kIconLeafnames[i] != NULL; i++) {
 		BPath workingPath(directory);
 		bool exists;
 		bool isDir;
 
-		if ( (workingPath.Append(iconLeafname) == B_OK
+		if ( (workingPath.Append(kIconLeafnames[i]) == B_OK
 			&& StorageUtils::ExistsObject(
 				workingPath, &exists, &isDir, NULL) == B_OK)
 			&& exists

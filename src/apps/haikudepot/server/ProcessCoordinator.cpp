@@ -1,5 +1,5 @@
 /*
- * Copyright 2018, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -104,7 +104,7 @@ void
 ProcessCoordinator::AddNode(ProcessNode* node)
 {
 	AutoLocker<BLocker> locker(&fLock);
-	fNodes.Add(node);
+	fNodes.AddItem(node);
 	node->Process()->SetListener(this);
 }
 

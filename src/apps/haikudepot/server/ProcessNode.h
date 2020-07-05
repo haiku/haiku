@@ -1,5 +1,5 @@
 /*
- * Copyright 2018, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -7,10 +7,8 @@
 #ifndef PROCESS_NODE_H
 #define PROCESS_NODE_H
 
-
+#include <ObjectList.h>
 #include <OS.h>
-
-#include "List.h"
 
 
 class AbstractProcess;
@@ -48,9 +46,9 @@ private:
 
 			thread_id			fWorker;
 			AbstractProcess*	fProcess;
-			List<ProcessNode*, true>
+			BObjectList<ProcessNode>
 								fPredecessorNodes;
-			List<ProcessNode*, true>
+			BObjectList<ProcessNode>
 								fSuccessorNodes;
 };
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -9,9 +9,10 @@
 
 #include "ProcessCoordinator.h"
 
+#include <ObjectList.h>
+
 #include "AbstractProcess.h"
 #include "ProcessNode.h"
-#include "List.h"
 
 
 class ProcessCoordinator;
@@ -111,7 +112,7 @@ private:
 private:
 			BString				fName;
 			BLocker				fLock;
-			List<ProcessNode*, true>
+			BObjectList<ProcessNode>
 								fNodes;
 			ProcessCoordinatorListener*
 								fListener;

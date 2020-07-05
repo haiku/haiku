@@ -1,5 +1,5 @@
 /*
- * Copyright 2018, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -142,7 +142,7 @@ ProcessNode::_StartProcess(void* cookie)
 void
 ProcessNode::AddPredecessor(ProcessNode *node)
 {
-	fPredecessorNodes.Add(node);
+	fPredecessorNodes.AddItem(node);
 	node->_AddSuccessor(this);
 }
 
@@ -176,7 +176,7 @@ ProcessNode::AllPredecessorsComplete() const
 void
 ProcessNode::_AddSuccessor(ProcessNode* node)
 {
-	fSuccessorNodes.Add(node);
+	fSuccessorNodes.AddItem(node);
 }
 
 
