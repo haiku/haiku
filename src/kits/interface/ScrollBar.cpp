@@ -1035,7 +1035,8 @@ BScrollBar::MinSize()
 BSize
 BScrollBar::MaxSize()
 {
-	BSize maxSize = _MinSize();
+	BSize maxSize;
+	GetPreferredSize(&maxSize.width, &maxSize.height);
 	if (fOrientation == B_HORIZONTAL)
 		maxSize.width = B_SIZE_UNLIMITED;
 	else
