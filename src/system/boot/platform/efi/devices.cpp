@@ -12,6 +12,14 @@
 #include <efi/protocol/block-io.h>
 
 
+//#define TRACE_DEVICES
+#ifdef TRACE_DEVICES
+#   define TRACE(x...) dprintf("efi/devices: " x)
+#else
+#   define TRACE(x...) ;
+#endif
+
+
 static efi_guid BlockIoGUID = EFI_BLOCK_IO_PROTOCOL_GUID;
 
 
@@ -50,6 +58,9 @@ EfiDevice::~EfiDevice()
 ssize_t
 EfiDevice::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 {
+	TRACE("%s called. pos: %" B_PRIdOFF ", %p, %" B_PRIuSIZE "\n", __func__,
+		pos, buffer, bufferSize);
+
 	off_t offset = pos % BlockSize();
 	pos /= BlockSize();
 
@@ -69,6 +80,8 @@ EfiDevice::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 static off_t
 get_next_check_sum_offset(int32 index, off_t maxSize)
 {
+	TRACE("%s: called\n", __func__);
+
 	if (index < 2)
 		return index * 512;
 
@@ -82,6 +95,8 @@ get_next_check_sum_offset(int32 index, off_t maxSize)
 static uint32
 compute_check_sum(Node *device, off_t offset)
 {
+	TRACE("%s: called\n", __func__);
+
 	char buffer[512];
 	ssize_t bytesRead = device->ReadAt(NULL, offset, buffer, sizeof(buffer));
 	if (bytesRead < B_OK)
@@ -103,6 +118,8 @@ compute_check_sum(Node *device, off_t offset)
 status_t
 platform_add_boot_device(struct stage2_args *args, NodeList *devicesList)
 {
+	TRACE("%s: called\n", __func__);
+
 	efi_block_io_protocol *blockIo;
 	size_t memSize = 0;
 
@@ -127,6 +144,14 @@ platform_add_boot_device(struct stage2_args *args, NodeList *devicesList)
 				(void**)&blockIo) != EFI_SUCCESS)
 			panic("Cannot get block device handle!");
 
+		TRACE("%s: %p: present: %s, logical: %s, removeable: %s, "
+			"blocksize: %" B_PRIuSIZE ", lastblock: %" B_PRIu64 "\n",
+			__func__, blockIo,
+			blockIo->Media->MediaPresent ? "true" : "false",
+			blockIo->Media->LogicalPartition ? "true" : "false",
+			blockIo->Media->RemovableMedia ? "true" : "false",
+			blockIo->Media->BlockSize, blockIo->Media->LastBlock);
+
 		if (!blockIo->Media->MediaPresent || blockIo->Media->LogicalPartition)
 			continue;
 
@@ -141,6 +166,8 @@ platform_add_boot_device(struct stage2_args *args, NodeList *devicesList)
 status_t
 platform_add_block_devices(struct stage2_args *args, NodeList *devicesList)
 {
+	TRACE("%s: called\n", __func__);
+
 	//TODO: Currently we add all in platform_add_boot_device
 	return B_ENTRY_NOT_FOUND;
 }
@@ -149,6 +176,7 @@ status_t
 platform_get_boot_partition(struct stage2_args *args, Node *bootDevice,
 		NodeList *partitions, boot::Partition **_partition)
 {
+	TRACE("%s: called\n", __func__);
 	*_partition = (boot::Partition*)partitions->GetIterator().Next();
 	return *_partition != NULL ? B_OK : B_ENTRY_NOT_FOUND;
 }
@@ -157,6 +185,8 @@ platform_get_boot_partition(struct stage2_args *args, Node *bootDevice,
 status_t
 platform_register_boot_device(Node *device)
 {
+	TRACE("%s: called\n", __func__);
+
 	EfiDevice *efiDevice = (EfiDevice *)device;
 	disk_identifier identifier;
 
