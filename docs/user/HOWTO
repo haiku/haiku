@@ -7,7 +7,7 @@ here, not development related docs (those belong in trunk/docs/develop).
 
 This HOWTO only explains how to include your kit into the "Haiku Book", it
 is not a Doxygen tutorial. For information about using Doxygen, see the Doxygen
-manual, www.doxygen.org, and OpenBeOS newletters 31 and 29.
+manual, www.doxygen.org.
 
 There are two ways to document your kit:
 
