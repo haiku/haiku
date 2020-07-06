@@ -1499,10 +1499,6 @@ iwm_nic_rx_legacy_init(struct iwm_softc *sc)
 	IWM_WRITE(sc, IWM_FH_MEM_RCSR_CHNL0_CONFIG_REG,
 	    IWM_FH_RCSR_RX_CONFIG_CHNL_EN_ENABLE_VAL		|
 	    IWM_FH_RCSR_CHNL0_RX_IGNORE_RXF_EMPTY		|  /* HW bug */
-//#ifdef __HAIKU__
-		/* multi-frame RX seems to cause UAFs and double-frees */
-		IWM_FH_RCSR_CHNL0_RX_CONFIG_SINGLE_FRAME_MSK |
-//#endif
 	    IWM_FH_RCSR_CHNL0_RX_CONFIG_IRQ_DEST_INT_HOST_VAL	|
 	    IWM_FH_RCSR_RX_CONFIG_REG_VAL_RB_SIZE_4K		|
 	    (IWM_RX_RB_TIMEOUT << IWM_FH_RCSR_RX_CONFIG_REG_IRQ_RBTH_POS) |
