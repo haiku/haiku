@@ -191,7 +191,7 @@ callout_reset(struct callout *c, int _ticks, void (*func)(void *), void *arg)
 		if (c->due <= 0)
 			list_add_item(&sTimers, c);
 
-		c->due = system_time() + ticks_to_usecs(_ticks);
+		c->due = system_time() + TICKS_2_USEC(_ticks);
 
 		// notify timer about the change if necessary
 		if (sTimeout > c->due)

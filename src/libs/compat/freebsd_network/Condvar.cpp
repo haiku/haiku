@@ -38,7 +38,7 @@ int
 conditionTimedWait(struct cv* variable, const int timeout)
 {
 	status_t status = variable->condition.Wait(B_RELATIVE_TIMEOUT,
-		ticks_to_usecs(timeout));
+		TICKS_2_USEC(timeout));
 
 	if (status != B_OK)
 		status = EWOULDBLOCK;
@@ -64,7 +64,7 @@ int
 publishedConditionTimedWait(const void* waitChannel, const int timeout)
 {
 	ConditionVariableEntry variableEntry;
-	bigtime_t usecs = ticks_to_usecs(timeout);
+	bigtime_t usecs = TICKS_2_USEC(timeout);
 
 	// FreeBSD has a condition-variable scheduling system with different
 	// scheduling semantics than ours does. As a result, it seems there are

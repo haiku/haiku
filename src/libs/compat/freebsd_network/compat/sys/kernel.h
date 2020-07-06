@@ -25,11 +25,8 @@
  * as it defines a long long constant. */
 #define hz	1000LL
 
-int32_t get_ticks();
-#define ticks (get_ticks())
-
-#define ticks_to_usecs(t) (1000000*((bigtime_t)t) / hz)
-#define usecs_to_ticks(t) (((bigtime_t)t*hz) / 1000000)
+int32_t _get_ticks();
+#define ticks (_get_ticks())
 
 
 /* sysinit */

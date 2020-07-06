@@ -8,7 +8,7 @@
 
 
 int32_t
-get_ticks()
+_get_ticks()
 {
-	return usecs_to_ticks(system_time());
+	return USEC_2_TICKS(system_time());
 }

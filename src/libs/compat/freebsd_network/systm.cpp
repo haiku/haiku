@@ -16,7 +16,7 @@ int
 _pause(const char* waitMessage, int timeout)
 {
 	KASSERT(timeout != 0, ("pause: timeout required"));
-	return snooze(ticks_to_usecs(timeout));
+	return snooze(TICKS_2_USEC(timeout));
 }
 
 
