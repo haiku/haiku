@@ -308,7 +308,7 @@ void
 CheckManager::_SendNotification(const char* title, const char* text)
 {
 	BNotification notification(B_INFORMATION_NOTIFICATION);
-	notification.SetGroup("SoftwareUpdater");
+	notification.SetGroup(B_TRANSLATE_SYSTEM_NAME("SoftwareUpdater"));
 	notification.SetTitle(title);
 	notification.SetContent(text);
 	notification.SetOnClickApp(kAppSignature);
