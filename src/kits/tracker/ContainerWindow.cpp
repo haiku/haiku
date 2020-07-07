@@ -1059,14 +1059,19 @@ BContainerWindow::InitLayout()
 	if (fPoseView->VScrollBar() != NULL) {
 		fVScrollBarContainer = new BGroupView(B_VERTICAL, 0);
 		fVScrollBarContainer->GroupLayout()->AddView(fPoseView->VScrollBar());
-		fVScrollBarContainer->GroupLayout()->SetInsets(-1, forFilePanel ? 0 : -1, 0, 0);
+		fVScrollBarContainer->GroupLayout()->SetInsets(-1, forFilePanel ? 0 : -1,
+			0, 0);
 		fPoseContainer->GridLayout()->AddView(fVScrollBarContainer, 1, 1);
 	}
 	if (fPoseView->HScrollBar() != NULL) {
 		BGroupView* hScrollBarContainer = new BGroupView(B_VERTICAL, 0);
 		hScrollBarContainer->GroupLayout()->AddView(fPoseView->HScrollBar());
-		hScrollBarContainer->GroupLayout()->SetInsets(0, -1, 0, forFilePanel ? 0 : -1);
+		hScrollBarContainer->GroupLayout()->SetInsets(0, -1, 0,
+			forFilePanel ? 0 : -1);
 		fCountContainer->GroupLayout()->AddView(hScrollBarContainer);
+
+		fPoseView->CountView()->SetExplicitMinSize(
+			fPoseView->HScrollBar()->MinSize());
 	}
 }
 
