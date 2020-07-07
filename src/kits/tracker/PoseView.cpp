@@ -10495,6 +10495,9 @@ TScrollBar::TScrollBar(const char* name, BView* target, float min, float max)
 	BScrollBar(name, target, min, max, B_HORIZONTAL),
 	fTitleView(NULL)
 {
+	// We always want to be at least the preferred scrollbar size,
+	// no matter what layout we get placed into.
+	SetExplicitMinSize(PreferredSize());
 }
 
 
