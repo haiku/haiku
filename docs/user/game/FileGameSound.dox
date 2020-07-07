@@ -39,7 +39,7 @@
 	beginning once the end is reached. This is useful for playing
 	background music in a loop.
 
-	You can specify the sound devise to use by setting the \a device
+	You can specify the sound device to use by setting the \a device
 	parameter. Setting \a device to \c NULL uses the default sound device.
 
 	\param file The entry ref pointing to the sound file on disk.
@@ -61,7 +61,7 @@
 	beginning once the end is reached. This is useful for playing
 	background music in a loop.
 
-	You can specify the sound devise to use by setting the \a device
+	You can specify the sound device to use by setting the \a device
 	parameter. Setting \a device to \c NULL uses the default sound device.
 
 	\param file The path of the sound file on disk.
@@ -86,7 +86,7 @@
 	beginning once the end is reached. This is useful for playing
 	background music in a loop.
 
-	You can specify the sound devise to use by setting the \a device
+	You can specify the sound device to use by setting the \a device
 	parameter. Setting \a device to \c NULL uses the default sound device.
 
 	\param source The place to get the data from.
