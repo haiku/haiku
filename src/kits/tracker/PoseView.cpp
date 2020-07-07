@@ -278,7 +278,7 @@ BPoseView::BPoseView(Model* model, uint32 viewMode)
 	fDeskbarFrame(0, 0, -1, -1),
 	fTextWidgetToCheck(NULL)
 {
-	fListElemHeight = std::fmax(ListIconSize(), ceilf(sFontHeight * 1.2f));
+	fListElemHeight = be_plain_font->Size() * 1.65f;
 
 	fViewState->SetViewMode(viewMode);
 	fShowSelectionWhenInactive
@@ -718,7 +718,7 @@ float
 BPoseView::StringWidth(const char* str) const
 {
 	return BPrivate::gWidthBuffer->StringWidth(str, 0, (int32)strlen(str),
-		&sCurrentFont);
+		be_plain_font);
 }
 
 
@@ -727,7 +727,7 @@ BPoseView::StringWidth(const char* str, int32 len) const
 {
 	ASSERT(strlen(str) == (uint32)len);
 
-	return BPrivate::gWidthBuffer->StringWidth(str, 0, len, &sCurrentFont);
+	return BPrivate::gWidthBuffer->StringWidth(str, 0, len, be_plain_font);
 }
 
 
@@ -985,14 +985,10 @@ BPoseView::AttachedToWindow()
 		kMsgMouseDragged));
 
 	fLastLeftTop = LeftTop();
-	BFont font(be_plain_font);
-	font.SetSpacing(B_BITMAP_SPACING);
-	SetFont(&font);
-	GetFont(&sCurrentFont);
 
 	// static - init just once
 	if (sFontHeight == -1) {
-		font.GetHeight(&sFontInfo);
+		be_plain_font->GetHeight(&sFontInfo);
 		sFontHeight = sFontInfo.ascent + sFontInfo.descent
 			+ sFontInfo.leading;
 	}
@@ -10548,6 +10544,5 @@ TPoseViewFilter::Filter(BMessage* message, BHandler**)
 
 float BPoseView::sFontHeight = -1;
 font_height BPoseView::sFontInfo = { 0, 0, 0 };
-BFont BPoseView::sCurrentFont;
 OffscreenBitmap* BPoseView::sOffscreen = new OffscreenBitmap;
 BString BPoseView::sMatchString = "";
