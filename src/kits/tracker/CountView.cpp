@@ -160,7 +160,7 @@ BRect
 BCountView::TextInvalRect() const
 {
 	BRect result = Bounds();
-	result.InsetBy(4, 4);
+	result.InsetBy(4, 3);
 
 	// if the barber pole is not present, use its space for text
 	if (fShowingBarberPole)
