@@ -56,6 +56,7 @@ All rights reserved.
 
 
 const bigtime_t kBarberPoleDelay = 500000;
+static const float kMinFontSize = 8.0f;
 
 
 //	#pragma mark - BCountView
@@ -313,7 +314,8 @@ void
 BCountView::AttachedToWindow()
 {
 	SetFont(be_plain_font);
-	SetFontSize(be_plain_font->Size() * 0.75f);
+	SetFontSize(std::max(kMinFontSize,
+		floorf(be_plain_font->Size() * 0.75f)));
 
 	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	SetLowUIColor(ViewUIColor());
