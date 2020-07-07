@@ -749,7 +749,7 @@ TFilePanel::Init(const BMessage*)
 
 	rect = windRect;
 	rect.OffsetTo(10, fDirMenuField->Frame().bottom + 10);
-	rect.bottom = windRect.bottom - 60;
+	rect.bottom = windRect.bottom - 46;
 	rect.right -= 20;
 	fPoseContainer->MoveTo(rect.LeftTop());
 	fPoseContainer->ResizeTo(rect.Width(), rect.Height());
