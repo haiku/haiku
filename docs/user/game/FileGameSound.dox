@@ -74,6 +74,31 @@
 
 
 /*!
+	\fn BFileGameSound::BFileGameSound(BDataIO* source, bool looping,
+		BGameSoundDevice* device)
+	\brief Creates and initializes a BFileGameSound object from a BDataIO
+		   allowing you to play the specified sound data.
+
+	This allows using BFileGameSound with BFile as well as non-file based
+	storage (BMemoryIO, etc).
+
+	If \a looping is \c true, the sound automatically replays from the
+	beginning once the end is reached. This is useful for playing
+	background music in a loop.
+
+	You can specify the sound devise to use by setting the \a device
+	parameter. Setting \a device to \c NULL uses the default sound device.
+
+	\param source The place to get the data from.
+	\param looping Whether or not to repeat the sound in a loop.
+	\param device The sound device to use to play the sound, use \c NULL for
+	       default.
+
+	\since Haiku R1
+*/
+
+
+/*!
 	\fn BFileGameSound::~BFileGameSound()
 	\brief Destroys the BFileGameSound object.
 
