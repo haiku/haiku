@@ -999,10 +999,10 @@ BScrollBar::GetPreferredSize(float* _width, float* _height)
 			*_width = B_V_SCROLL_BAR_WIDTH * scale;
 
 		if (_height)
-			*_height = Bounds().Height();
+			*_height = _MinSize().Height();
 	} else if (fOrientation == B_HORIZONTAL) {
 		if (_width)
-			*_width = Bounds().Width();
+			*_width = _MinSize().Width();
 
 		if (_height)
 			*_height = B_H_SCROLL_BAR_HEIGHT * scale;
@@ -1228,7 +1228,7 @@ BScrollBar::_UpdateThumbFrame()
 	thumbSize = floorf(thumbSize + 0.5);
 	thumbSize--;
 
-	// the thumb can be scrolled within the remaining area "maxSize - thumbSize - 1.0"	
+	// the thumb can be scrolled within the remaining area "maxSize - thumbSize - 1.0"
 	float offset = 0.0;
 	if (fMax > fMin) {
 		offset = floorf(((fValue - fMin) / (fMax - fMin))
