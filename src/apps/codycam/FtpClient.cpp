@@ -83,7 +83,7 @@ FtpClient::ListDirContents(string& listing)
 							memset(buf, 0, sizeof(buf));
 							numRead = fData->Receive(buf, sizeof(buf) - 1);
 							listing += buf;
-							printf(buf);
+							printf("%s", buf);
 						}
 						if (_GetReply(replyString, code, codeType)) {
 							if (codeType <= 2)
