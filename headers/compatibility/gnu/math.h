@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Haiku, Inc. All Rights Reserved.
+ * Copyright 2018-2020, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _GNU_MATH_H_
@@ -16,9 +16,16 @@
 extern "C" {
 #endif
 
-extern void sincos(double x, double *sin, double *cos);
-extern void sincosf(float x, float *sin, float *cos);
-extern void sincosl(long double x, long double *sin, long double *cos);
+
+void sincos(double x, double *sin, double *cos);
+void sincosf(float x, float *sin, float *cos);
+void sincosl(long double x, long double *sin, long double *cos);
+
+
+double exp10(double);
+float exp10f(float);
+long double exp10l(long double);
+
 
 #ifdef __cplusplus
 }
