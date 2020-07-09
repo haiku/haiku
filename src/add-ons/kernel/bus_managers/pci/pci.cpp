@@ -1174,47 +1174,78 @@ PCI::_CreateDevice(PCIBus *parent, uint8 device, uint8 function)
 }
 
 
-uint32
-PCI::_BarSize(uint32 bits, uint32 mask)
+uint64
+PCI::_BarSize(uint64 bits)
 {
-	bits &= mask;
 	if (!bits)
 		return 0;
-	uint32 size = 1;
-	while (!(bits & size))
+
+	uint64 size = 1;
+	while ((bits & size) == 0)
 		size <<= 1;
+
 	return size;
 }
 
 
 size_t
-PCI::_GetBarInfo(PCIDev *dev, uint8 offset, uint32 *_address, uint32 *_size,
-	uint8 *_flags, uint32 *_highAddress)
+PCI::_GetBarInfo(PCIDev *dev, uint8 offset, uint32 &_ramAddress,
+	uint32 &_pciAddress, uint32 &_size, uint8 &flags, uint32 *_highRAMAddress,
+	uint32 *_highPCIAddress, uint32 *_highSize)
 {
-	uint32 oldValue = ReadConfig(dev->domain, dev->bus, dev->device, dev->function,
-		offset, 4);
+	uint64 pciAddress = ReadConfig(dev->domain, dev->bus, dev->device,
+		dev->function, offset, 4);
 	WriteConfig(dev->domain, dev->bus, dev->device, dev->function, offset, 4,
 		0xffffffff);
-	uint32 newValue = ReadConfig(dev->domain, dev->bus, dev->device, dev->function,
+	uint64 size = ReadConfig(dev->domain, dev->bus, dev->device, dev->function,
 		offset, 4);
 	WriteConfig(dev->domain, dev->bus, dev->device, dev->function, offset, 4,
-		oldValue);
+		pciAddress);
 
 	uint32 mask = PCI_address_memory_32_mask;
-	bool is64bit = (oldValue & PCI_address_type_64) != 0;
-	if ((oldValue & PCI_address_space) == PCI_address_space)
+	bool is64bit = false;
+	if ((pciAddress & PCI_address_space) != 0)
 		mask = PCI_address_io_mask;
-	else if (is64bit && _highAddress != NULL) {
-		*_highAddress = ReadConfig(dev->domain, dev->bus, dev->device,
-			dev->function, offset + 4, 4);
+	else {
+		is64bit = (pciAddress & PCI_address_type) == PCI_address_type_64;
+
+		if (is64bit && _highRAMAddress != NULL) {
+			uint64 highPCIAddress = ReadConfig(dev->domain, dev->bus,
+				dev->device, dev->function, offset + 4, 4);
+			WriteConfig(dev->domain, dev->bus, dev->device, dev->function,
+				offset + 4, 4, 0xffffffff);
+			uint64 highSize = ReadConfig(dev->domain, dev->bus, dev->device,
+				dev->function, offset + 4, 4);
+			WriteConfig(dev->domain, dev->bus, dev->device, dev->function,
+				offset + 4, 4, highPCIAddress);
+
+			pciAddress |= highPCIAddress << 32;
+			size |= highSize << 32;
+		}
 	}
 
-	*_address = oldValue & mask;
-	if (_size != NULL)
-		*_size = _BarSize(newValue, mask);
-	if (_flags != NULL)
-		*_flags = oldValue & ~mask;
-	return is64bit ? 2 : 1;
+	flags = (uint32)pciAddress & ~mask;
+	pciAddress &= ((uint64)0xffffffff << 32) | mask;
+	size &= ((uint64)0xffffffff << 32) | mask;
+
+	size = _BarSize(size);
+	uint64 ramAddress = pci_ram_address(pciAddress);
+
+	_ramAddress = ramAddress;
+	_pciAddress = pciAddress;
+	_size = size;
+	if (!is64bit)
+		return 1;
+
+	if (_highRAMAddress == NULL || _highPCIAddress == NULL || _highSize == NULL)
+		panic("64 bit PCI BAR but no space to store high values\n");
+	else {
+		*_highRAMAddress = ramAddress >> 32;
+		*_highPCIAddress = pciAddress >> 32;
+		*_highSize = size >> 32;
+	}
+
+	return 2;
 }
 
 
@@ -1233,7 +1264,7 @@ PCI::_GetRomBarInfo(PCIDev *dev, uint8 offset, uint32 *_address, uint32 *_size,
 
 	*_address = oldValue & PCI_rom_address_mask;
 	if (_size != NULL)
-		*_size = _BarSize(newValue, PCI_rom_address_mask);
+		*_size = _BarSize(newValue & PCI_rom_address_mask);
 	if (_flags != NULL)
 		*_flags = newValue & 0xf;
 }
@@ -1296,23 +1327,14 @@ PCI::_ReadHeaderInfo(PCIDev *dev)
 			_GetRomBarInfo(dev, PCI_rom_base, &dev->info.u.h0.rom_base_pci,
 				&dev->info.u.h0.rom_size);
 			for (int i = 0; i < 6;) {
-				size_t barSize = _GetBarInfo(dev, PCI_base_registers + 4 * i,
-					&dev->info.u.h0.base_registers_pci[i],
-					&dev->info.u.h0.base_register_sizes[i],
-					&dev->info.u.h0.base_register_flags[i],
-					i < 5 ? &dev->info.u.h0.base_registers_pci[i + 1] : NULL);
-
-				phys_addr_t addr = dev->info.u.h0.base_registers_pci[i];
-				if (barSize == 2) {
-					addr += ((phys_addr_t)dev->info.u.h0.base_registers_pci[i + 1])
-						<< 32;
-				}
-				addr = pci_ram_address(addr);
-				dev->info.u.h0.base_registers[i] = (uint32)addr;
-				if (barSize == 2)
-					dev->info.u.h0.base_registers[i + 1] = (uint32)(addr >> 32);
-
-				i += barSize;
+				i += _GetBarInfo(dev, PCI_base_registers + 4 * i,
+					dev->info.u.h0.base_registers[i],
+					dev->info.u.h0.base_registers_pci[i],
+					dev->info.u.h0.base_register_sizes[i],
+					dev->info.u.h0.base_register_flags[i],
+					i < 5 ? &dev->info.u.h0.base_registers[i + 1] : NULL,
+					i < 5 ? &dev->info.u.h0.base_registers_pci[i + 1] : NULL,
+					i < 5 ? &dev->info.u.h0.base_register_sizes[i + 1] : NULL);
 			}
 
 			// restore PCI device address decoding
@@ -1351,22 +1373,14 @@ PCI::_ReadHeaderInfo(PCIDev *dev)
 			_GetRomBarInfo(dev, PCI_bridge_rom_base,
 				&dev->info.u.h1.rom_base_pci);
 			for (int i = 0; i < 2;) {
-				size_t barSize = _GetBarInfo(dev, PCI_base_registers + 4 * i,
-					&dev->info.u.h1.base_registers_pci[i],
-					&dev->info.u.h1.base_register_sizes[i],
-					&dev->info.u.h1.base_register_flags[i],
-					i < 2 ? &dev->info.u.h1.base_registers_pci[i + 1] : NULL);
-
-				phys_addr_t addr = dev->info.u.h1.base_registers_pci[i];
-				if (barSize == 2) {
-					addr += ((phys_addr_t)dev->info.u.h0.base_registers_pci[i + 1])
-						<< 32;
-				}
-				addr = pci_ram_address(addr);
-				dev->info.u.h1.base_registers[i] = (uint32)addr;
-				if (barSize == 2)
-					dev->info.u.h1.base_registers[i + 1] = (uint32)(addr >> 32);
-				i += barSize;
+				i += _GetBarInfo(dev, PCI_base_registers + 4 * i,
+					dev->info.u.h1.base_registers[i],
+					dev->info.u.h1.base_registers_pci[i],
+					dev->info.u.h1.base_register_sizes[i],
+					dev->info.u.h1.base_register_flags[i],
+					i < 1 ? &dev->info.u.h1.base_registers[i + 1] : NULL,
+					i < 1 ? &dev->info.u.h1.base_registers_pci[i + 1] : NULL,
+					i < 1 ? &dev->info.u.h1.base_register_sizes[i + 1] : NULL);
 			}
 
 			// restore PCI device address decoding

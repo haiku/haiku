@@ -146,10 +146,13 @@ private:
 			void			_ConfigureBridges(PCIBus *bus);
 			void			_RefreshDeviceInfo(PCIBus *bus);
 
-			uint32			_BarSize(uint32 bits, uint32 mask);
+			uint64			_BarSize(uint64 bits);
 			size_t			_GetBarInfo(PCIDev *dev, uint8 offset,
-								uint32 *address, uint32 *size = 0,
-								uint8 *flags = 0, uint32 *highAddress = 0);
+								uint32 &ramAddress, uint32 &pciAddress,
+								uint32 &size, uint8 &flags,
+								uint32 *highRAMAddress = NULL,
+								uint32 *highPCIAddress = NULL,
+								uint32 *highSize = NULL);
 			void			_GetRomBarInfo(PCIDev *dev, uint8 offset,
 								uint32 *address, uint32 *size = 0,
 								uint8 *flags = 0);
