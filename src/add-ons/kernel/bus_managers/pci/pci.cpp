@@ -1250,7 +1250,7 @@ PCI::_GetBarInfo(PCIDev *dev, uint8 offset, uint32 &_ramAddress,
 
 
 void
-PCI::_GetRomBarInfo(PCIDev *dev, uint8 offset, uint32 *_address, uint32 *_size,
+PCI::_GetRomBarInfo(PCIDev *dev, uint8 offset, uint32 &_address, uint32 *_size,
 	uint8 *_flags)
 {
 	uint32 oldValue = ReadConfig(dev->domain, dev->bus, dev->device, dev->function,
@@ -1262,7 +1262,7 @@ PCI::_GetRomBarInfo(PCIDev *dev, uint8 offset, uint32 *_address, uint32 *_size,
 	WriteConfig(dev->domain, dev->bus, dev->device, dev->function, offset, 4,
 		oldValue);
 
-	*_address = oldValue & PCI_rom_address_mask;
+	_address = oldValue & PCI_rom_address_mask;
 	if (_size != NULL)
 		*_size = _BarSize(newValue & PCI_rom_address_mask);
 	if (_flags != NULL)
@@ -1324,7 +1324,7 @@ PCI::_ReadHeaderInfo(PCIDev *dev)
 				pcicmd & ~(PCI_command_io | PCI_command_memory));
 
 			// get BAR size infos
-			_GetRomBarInfo(dev, PCI_rom_base, &dev->info.u.h0.rom_base_pci,
+			_GetRomBarInfo(dev, PCI_rom_base, dev->info.u.h0.rom_base_pci,
 				&dev->info.u.h0.rom_size);
 			for (int i = 0; i < 6;) {
 				i += _GetBarInfo(dev, PCI_base_registers + 4 * i,
@@ -1349,7 +1349,8 @@ PCI::_ReadHeaderInfo(PCIDev *dev)
 			dev->info.u.h0.subsystem_id = ReadConfig(dev->domain, dev->bus,
 				dev->device, dev->function, PCI_subsystem_id, 2);
 			dev->info.u.h0.subsystem_vendor_id = ReadConfig(dev->domain,
-				dev->bus, dev->device, dev->function, PCI_subsystem_vendor_id, 2);
+				dev->bus, dev->device, dev->function, PCI_subsystem_vendor_id,
+				2);
 			dev->info.u.h0.interrupt_line = ReadConfig(dev->domain, dev->bus,
 				dev->device, dev->function, PCI_interrupt_line, 1);
 			dev->info.u.h0.interrupt_pin = ReadConfig(dev->domain, dev->bus,
@@ -1363,7 +1364,8 @@ PCI::_ReadHeaderInfo(PCIDev *dev)
 
 		case PCI_header_type_PCI_to_PCI_bridge:
 		{
-			// disable PCI device address decoding (io and memory) while BARs are modified
+			// disable PCI device address decoding (io and memory) while BARs
+			// are modified
 			uint16 pcicmd = ReadConfig(dev->domain, dev->bus, dev->device,
 				dev->function, PCI_command, 2);
 			WriteConfig(dev->domain, dev->bus, dev->device, dev->function,
@@ -1371,7 +1373,7 @@ PCI::_ReadHeaderInfo(PCIDev *dev)
 				pcicmd & ~(PCI_command_io | PCI_command_memory));
 
 			_GetRomBarInfo(dev, PCI_bridge_rom_base,
-				&dev->info.u.h1.rom_base_pci);
+				dev->info.u.h1.rom_base_pci);
 			for (int i = 0; i < 2;) {
 				i += _GetBarInfo(dev, PCI_base_registers + 4 * i,
 					dev->info.u.h1.base_registers[i],
@@ -1409,7 +1411,8 @@ PCI::_ReadHeaderInfo(PCIDev *dev)
 			dev->info.u.h1.memory_limit = ReadConfig(dev->domain, dev->bus,
 				dev->device, dev->function, PCI_memory_limit, 2);
 			dev->info.u.h1.prefetchable_memory_base = ReadConfig(dev->domain,
-				dev->bus, dev->device, dev->function, PCI_prefetchable_memory_base, 2);
+				dev->bus, dev->device, dev->function,
+				PCI_prefetchable_memory_base, 2);
 			dev->info.u.h1.prefetchable_memory_limit = ReadConfig(
 				dev->domain, dev->bus, dev->device, dev->function,
 				PCI_prefetchable_memory_limit, 2);

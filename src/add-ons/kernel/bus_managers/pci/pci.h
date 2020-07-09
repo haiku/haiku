@@ -154,8 +154,8 @@ private:
 								uint32 *highPCIAddress = NULL,
 								uint32 *highSize = NULL);
 			void			_GetRomBarInfo(PCIDev *dev, uint8 offset,
-								uint32 *address, uint32 *size = 0,
-								uint8 *flags = 0);
+								uint32 &address, uint32 *size = NULL,
+								uint8 *flags = NULL);
 
 			domain_data *	_GetDomainData(uint8 domain);
 
