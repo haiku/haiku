@@ -1,2 +1,2 @@
-//#define ATH_TX99_DIAG 1
-//#define ATH_DEBUG 1
+#define ATH_ENABLE_11N
+#define AH_AR5416_INTERRUPT_MITIGATION
