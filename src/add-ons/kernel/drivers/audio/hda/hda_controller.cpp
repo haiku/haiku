@@ -1008,9 +1008,10 @@ hda_hw_init(hda_controller* controller)
 
 	// map the registers (low + high for 64-bit when requested)
 	phys_addr_t physicalAddress = pciInfo.u.h0.base_registers[0];
-	physicalAddress &= PCI_address_memory_32_mask;
-	if ((pciInfo.u.h0.base_register_flags[0] & 0xC) == PCI_address_type_64)
-		physicalAddress += (phys_addr_t)pciInfo.u.h0.base_registers[1] << 32;
+	if ((pciInfo.u.h0.base_register_flags[0] & PCI_address_type)
+			== PCI_address_type_64) {
+		physicalAddress |= (uint64)pciInfo.u.h0.base_registers[1] << 32;
+	}
 
 	// Map MMIO registers
 	controller->regs_area = map_physical_memory("hda_hw_regs",

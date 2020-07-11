@@ -237,9 +237,10 @@ XHCI::XHCI(pci_info *info, Stack *stack)
 
 	// map the registers (low + high for 64-bit when requested)
 	phys_addr_t physicalAddress = fPCIInfo->u.h0.base_registers[0];
-	physicalAddress &= PCI_address_memory_32_mask;
-	if ((fPCIInfo->u.h0.base_register_flags[0] & 0xC) == PCI_address_type_64)
-		physicalAddress += (phys_addr_t)fPCIInfo->u.h0.base_registers[1] << 32;
+	if ((fPCIInfo->u.h0.base_register_flags[0] & PCI_address_type)
+			== PCI_address_type_64) {
+		physicalAddress |= (uint64)fPCIInfo->u.h0.base_registers[1] << 32;
+	}
 
 	size_t mapSize = fPCIInfo->u.h0.base_register_sizes[0];
 

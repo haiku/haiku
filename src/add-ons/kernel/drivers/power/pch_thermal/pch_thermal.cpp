@@ -290,9 +290,10 @@ pch_thermal_init_device(void *_cookie, void **cookie)
 
 	// map the registers (low + high for 64-bit when requested)
 	phys_addr_t physicalAddress = info.u.h0.base_registers[0];
-	physicalAddress &= PCI_address_memory_32_mask;
-	if ((info.u.h0.base_register_flags[0] & 0xc) == PCI_address_type_64)
-		physicalAddress += (phys_addr_t)info.u.h0.base_registers[1] << 32;
+	if ((info.u.h0.base_register_flags[0] & PCI_address_type)
+			== PCI_address_type_64) {
+		physicalAddress |= (uint64)info.u.h0.base_registers[1] << 32;
+	}
 
 	size_t mapSize = info.u.h0.base_register_sizes[0];
 

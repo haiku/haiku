@@ -131,9 +131,11 @@ init_device(device_node* node, void** device_cookie)
 	pci->get_pci_info(device, pciInfo);
 
 	bus->info.base_addr = pciInfo->u.h0.base_registers[0];
-	bus->info.base_addr &= PCI_address_memory_32_mask;
-	if ((pciInfo->u.h0.base_register_flags[0] & 0xc) == PCI_address_type_64)
-		bus->info.base_addr += (phys_addr_t)pciInfo->u.h0.base_registers[1] << 32;
+	if ((pciInfo->u.h0.base_register_flags[0] & PCI_address_type)
+			== PCI_address_type_64) {
+		bus->info.base_addr |= (uint64)pciInfo->u.h0.base_registers[1] << 32;
+	}
+
 	bus->info.map_size = pciInfo->u.h0.base_register_sizes[0];
 
 	// enable power
