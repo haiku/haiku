@@ -1,146 +1,21 @@
-1	english	x-vnd.Haiku-WebPositive	3678460971
-Show home button	Settings Window		显示 home 按钮
-Username:	Authentication Panel		用户名：
-Copy URL to clipboard	Download Window		复制 URL 到剪贴板
-Cancel	Settings Window		取消
+1	english	x-vnd.Haiku-WebPositive	4147122882
+Authentication required	Authentication Panel		需要认证
+Download folder:	Settings Window		下载文件夹：
 Close window	WebPositive Window		关闭窗口
-Quit	WebPositive		退出
-The download could not be opened.	Download Window		下载内容无法打开。
-The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	下载目录无法打开。\n\n错误：%error
-Open location	WebPositive Window		打开位置
-Clear history	WebPositive Window		清空历史
-WebPositive	System name		WebPositive
-Yesterday	WebPositive Window		昨天
-Default standard font size:	Settings Window		默认标准字体大小：
-Start page:	Settings Window		开始页面：
-History	WebPositive Window		历史
-Error opening downloads folder	Download Window		打开下载目录出错
-Paste	WebPositive Window		粘贴
-Double-click or middle-click to open new tab.	Tab Manager		双击或者单击中键以打开新标签。
-Proxy username:	Settings Window		代理服务器 用户名：
-Save page as…	WebPositive Window		页面保存为…
-Over %days left	Download Window		剩余 %days 天
-Settings	Settings Window		设置
-Confirmation	WebPositive Window		确认
-Window	WebPositive Window		窗口
-Decrease size	WebPositive Window		缩小
-Serif font:	Settings Window		衬线字体：
-Loading %url	WebPositive Window		载入 %url
-Download aborted	Download Window		下载已取消
-Page source	WebPositive Window		查看网页源码
-Next	WebPositive Window		下一页
-Find next	WebPositive Window		查找下一个
-Download folder:	Settings Window		下载目录：
-Edit	WebPositive Window		编辑
-Cancel	Authentication Panel		取消
-Match case	WebPositive Window		匹配条件
-Search page:	Settings Window		搜索页面：
-Zoom text only	WebPositive Window		仅缩放文本
-Default fixed font size:	Settings Window		默认等宽字体大小：
-Close tab	WebPositive Window		关闭标签页
-Auto-hide mouse pointer	Settings Window		自动隐藏鼠标焦点
-Quit	WebPositive Window		退出
-Full screen	WebPositive Window		全屏
-Open download error	Download Window		打开下载出错
-Standard font:	Settings Window		标准字体：
-Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	查找前一个搜索项
-Restart	Download Window		重新下载
-Proxy server	Settings Window		代理服务器
-Open containing folder	Download Window		打开文件目录
-New window	WebPositive Window		新建窗口：
-WebPositive	Download Window		WebPositive
-Open	Download Window		打开
-Reload	WebPositive Window		重载页面
-Downloads	Download Window		下载
-Sans serif font:	Settings Window		无衬线字体：
-Forward	WebPositive Window		前一页
-of	Download Window	...as in '12kB of 256kB'	 全部
-Revert	Settings Window		恢复
-Fixed font:	Settings Window		等宽字体：
-Cut	WebPositive Window		剪切
-Bookmark this page	WebPositive Window		添为书签页
-There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	书签页目录显示出错。\n\n错误：%error
-Open downloads folder	Download Window		打开下载目录
-Proxy password:	Settings Window		代理服务器密码：
-Number of days to keep links in History menu:	Settings Window		历史菜单链接保留天数：
-Hide	Download Window		隐藏
-Reset size	WebPositive Window		重设大小
 Find:	WebPositive Window		查找：
-Increase size	WebPositive Window		放大
-There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	检索书签目录出错。\n错误：%error
-Downloads	WebPositive Window		下载
-Requesting %url	WebPositive Window		请求 %url
-Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	查找搜索项出现的下个位置
-Apply	Settings Window		应用
-Bookmark info	WebPositive Window		书签信息
-Size:	Font Selection view		大小：
-Show tabs if only one page is open	Settings Window		只有单页则显示标签页
-About	WebPositive Window		关于
-Finish: 	Download Window	Finishing time	完成：
-Fonts	Settings Window		字体
-OK	Download Window		确定
-Page source error	WebPositive Window		页面源码出错
-Open blank page	Settings Window		打开空白页
-New tabs:	Settings Window		新建标签页：
-Cancel	WebPositive Window		取消
-Open all	WebPositive Window		打开所有
-Proxy server requires authentication	Settings Window		代理服务器需要认证
-Clear	URL Bar		清除
-Cut	URL Bar		剪切
-Clear	WebPositive Window		清除
-Script console	Console Window		脚本控制台
-Remove	Download Window		删除
-Find	WebPositive Window		查找
-Find previous	WebPositive Window		查找上一个
-Settings	WebPositive Window		设置
 Script console	WebPositive Window		脚本控制台
-Proxy server address:	Settings Window		代理服务器地址：
-Proxy server port:	Settings Window		代理服务器端口：
+Fonts	Settings Window		字体
+Path	Cookie Manager		路径
 Bookmarks	WebPositive Window		书签
-Paste	URL Bar		粘贴
-/s)	Download Window	...as in 'per second'	/s)
-Hide password text	Authentication Panel		隐藏密码文本
-The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	敏捷的棕毛小狐狸超越了懒惰的大黄狗。
-Over 1 minute left	Download Window		剩余 1 分钟
-Open start page	Settings Window		打开开始页面
-Continue downloads	WebPositive		继续下载
-Cancel	Download Window		取消
-Open search page	Settings Window		打开搜索页面
-Clear	Console Window		清除
-Password:	Authentication Panel		密码：
-Back	WebPositive Window		后退
-New browser window	Download Window		新建浏览窗口
-Today	WebPositive Window		今天
-Over %hours left	Download Window		剩余 %hours 小时
-Remember username and password for this site	Authentication Panel		记住本站点的用户名和密码
-Earlier	WebPositive Window		早期
-Authentication required	Authentication Panel		需要身份验证
-Use proxy server to connect to the internet	Settings Window		使用代理服务器连接网络
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		还有未完成的下载内容，确定退出 WebPositive？
-Auto-hide interface in full screen mode	Settings Window		全屏模式自动隐藏窗口
-%url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url 失败
-%seconds left	Download Window		剩余 %seconds 秒
-New tab	WebPositive Window		新建标签页
-Downloads in progress	WebPositive		下载进度
-Style:	Font Selection view		样式：
-General	Settings Window		常规
-View	WebPositive Window		视图
-Previous	WebPositive Window		后一页
-There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	书签文件创建失败。\n\n错误：%error
-Bookmark error	WebPositive Window		书签错误
-Do you really want to clear the browsing history?	WebPositive Window		确定清除浏览历史？
-Copy	WebPositive Window		复制
-Open bookmarks confirmation	WebPositive Window		打开书签确认
-Remove missing	Download Window		移除失败下载
-Clone current page	Settings Window		复制当前页面
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	确认全部打开 %addedCount 个书签页 
-OK	Authentication Panel		确定
-Copy	URL Bar		复制
-Download finished	Download Window		下载完成
-Show bookmark bar	WebPositive Window		显示书签栏
-OK	WebPositive Window		确定
-Manage bookmarks	WebPositive Window		管理书签
-A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	本页面的书签页（%bookmarkName）已经存在。
-New windows:	Settings Window		新建窗口：
-%url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url 完成
-Remove finished	Download Window		删除完成内容
+Use proxy server to connect to the internet	Settings Window		使用代理服务器连接互联网
+%url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url 已完成
+Auto-hide interface in full screen mode	Settings Window		在全屏模式下自动隐藏界面
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	获取书签文件夹时发生错误。\n\n错误：%error
+Delete	Cookie Manager		删除
+(Finish: %date - Over %duration left)	Download Window		（完成时间：%date - 还需大于%duration）
+Open containing folder	Download Window		打开所在文件夹
+Find previous	WebPositive Window		查找上一个
+Full screen	WebPositive Window		全屏
+Downloads in progress	WebPositive		正在下载
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	你想同时打开 %addedCount 个书签吗？
+Copy URL to clipboard	Download Window		复制网址至剪贴板

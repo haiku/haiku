@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-libtracker	1358760392
+1	danish	x-vnd.Haiku-libtracker	858481545
 Created	ContainerWindow		Oprettet
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Åbn og lav foretrukket
@@ -40,6 +40,7 @@ Small bitmap icon	AttributesView		Lille bitmap-ikon
 Would you like to find a suitable application to open the file?	FSUtils		Vil du finde et egnet program til at åbne filen?
 64 x 64	ContainerWindow		64 x 64
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Du kan ikke erstatte en mappe eller symbolsk lænke med en fil.
+{0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# datoer>}}
 Trailing \\.	libtracker		Efterstillede \\.
 At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Ved %func \nfind_directory() mislykkede. \nÅrsag: %error
 Handles any file	OpenWithWindow		Håndterer enhver fil
@@ -181,6 +182,7 @@ MIME Type	AttributesView		MIME-type
 Show folder location in title tab	SettingsView		Vis mappeplacering i fanebladstitlen
 There was an error resolving the link.	Tracker		Der opstod en fejl ved løsning af linket.
 There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Der opstod et problem under forsøget i at gemme i den mappe du angav. Prøv venligst en anden.
+{0, plural, other{<# values>}}	AttributesView		{0, plural, other{<# værdier>}}
 Desktop	TrackerSettingsWindow		Skrivebord
 Nested *?+.	libtracker		Indlejret *?+.
 Move	FSUtils	button label	Flyt
