@@ -24,6 +24,7 @@
 
 #include "HaikuDepotConstants.h"
 #include "LanguageMenuUtils.h"
+#include "Logger.h"
 #include "MarkupParser.h"
 #include "RatingView.h"
 #include "ServerHelper.h"
@@ -530,7 +531,7 @@ RatePackageWindow::_RelayServerDataToUI(BMessage& response)
 
 		Unlock();
 	} else {
-		fprintf(stderr, "unable to acquire lock to update the ui\n");
+		HDERROR("unable to acquire lock to update the ui");
 	}
 }
 
@@ -539,7 +540,7 @@ void
 RatePackageWindow::_QueryRatingThread()
 {
 	if (!Lock()) {
-		fprintf(stderr, "rating query: Failed to lock window\n");
+		HDERROR("rating query: Failed to lock window");
 		return;
 	}
 
@@ -552,7 +553,7 @@ RatePackageWindow::_QueryRatingThread()
 	locker.Unlock();
 
 	if (package.Get() == NULL) {
-		fprintf(stderr, "rating query: No package\n");
+		HDERROR("rating query: No package");
 		_SetWorkerThread(-1);
 		return;
 	}
@@ -566,8 +567,8 @@ RatePackageWindow::_QueryRatingThread()
 		repositoryCode = depot->WebAppRepositoryCode();
 
 	if (repositoryCode.IsEmpty()) {
-		printf("unable to obtain the repository code for depot; %s\n",
-			package->DepotName().String());
+		HDERROR("unable to obtain the repository code for depot; %s",
+			package->DepotName().String())
 		BMessenger(this).SendMessage(B_QUIT_REQUESTED);
 	} else {
 		status_t status = interface
@@ -586,8 +587,7 @@ RatePackageWindow::_QueryRatingThread()
 					if (info.FindMessage("result", &result) == B_OK) {
 						_RelayServerDataToUI(result);
 					} else {
-						fprintf(stderr, "bad response envelope missing 'result'"
-							"entry\n");
+						HDERROR("bad response envelope missing 'result' entry")
 						ServerHelper::NotifyTransportError(B_BAD_VALUE);
 						BMessenger(this).SendMessage(B_QUIT_REQUESTED);
 					}
@@ -595,9 +595,9 @@ RatePackageWindow::_QueryRatingThread()
 				}
 				case ERROR_CODE_OBJECTNOTFOUND:
 						// an expected response
-					fprintf(stderr, "there was no previous rating for this"
+					HDINFO("there was no previous rating for this"
 						" user on this version of this package so a new rating"
-						" will be added.\n");
+						" will be added.")
 					break;
 				default:
 					ServerHelper::NotifyServerJsonRpcError(info);
@@ -605,9 +605,9 @@ RatePackageWindow::_QueryRatingThread()
 					break;
 			}
 		} else {
-			fprintf(stderr, "an error has arisen communicating with the"
-				" server to obtain data for an existing rating [%s]\n",
-				strerror(status));
+			HDERROR("an error has arisen communicating with the"
+				" server to obtain data for an existing rating [%s]",
+				strerror(status))
 			ServerHelper::NotifyTransportError(status);
 			BMessenger(this).SendMessage(B_QUIT_REQUESTED);
 		}
@@ -630,7 +630,7 @@ void
 RatePackageWindow::_SendRatingThread()
 {
 	if (!Lock()) {
-		fprintf(stderr, "upload rating: Failed to lock window\n");
+		HDERROR("upload rating: Failed to lock window")
 		return;
 	}
 
@@ -658,9 +658,9 @@ RatePackageWindow::_SendRatingThread()
 	Unlock();
 
 	if (repositoryCode.Length() == 0) {
-		printf("unable to find the web app repository code for the local "
-			"depot %s\n",
-			fPackage->DepotName().String());
+		HDERROR("unable to find the web app repository code for the local "
+			"depot %s",
+			fPackage->DepotName().String())
 		return;
 	}
 
@@ -670,13 +670,11 @@ RatePackageWindow::_SendRatingThread()
 	status_t status;
 	BMessage info;
 	if (ratingID.Length() > 0) {
-		printf("will update the existing user rating [%s]\n",
-			ratingID.String());
+		HDINFO("will update the existing user rating [%s]", ratingID.String())
 		status = interface.UpdateUserRating(ratingID,
 			languageCode, comment, stability, rating, active, info);
 	} else {
-		printf("will create a new user rating for pkg [%s]\n",
-			package.String());
+		HDINFO("will create a new user rating for pkg [%s]", package.String())
 		status = interface.CreateUserRating(package, fPackage->Version(),
 			architecture, repositoryCode, languageCode, comment, stability,
 			rating, info);
@@ -699,9 +697,9 @@ RatePackageWindow::_SendRatingThread()
 				break;
 		}
 	} else {
-		fprintf(stderr, "an error has arisen communicating with the"
-			" server to obtain data for an existing rating [%s]\n",
-			strerror(status));
+		HDERROR("an error has arisen communicating with the"
+			" server to obtain data for an existing rating [%s]",
+			strerror(status))
 		ServerHelper::NotifyTransportError(status);
 	}
 

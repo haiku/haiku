@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #include "Logger.h"
@@ -22,7 +22,28 @@ Logger::SetLevel(log_level value)
 }
 
 
-bool
+/*static*/
+const char*
+Logger::NameForLevel(log_level value)
+{
+	switch (value) {
+		case LOG_LEVEL_OFF:
+			return "off";
+		case LOG_LEVEL_INFO:
+			return "info";
+		case LOG_LEVEL_DEBUG:
+			return "debug";
+		case LOG_LEVEL_TRACE:
+			return "trace";
+		case LOG_LEVEL_ERROR:
+			return "error";
+		default:
+			return "?";
+	}
+}
+
+
+/*static*/ bool
 Logger::SetLevelByName(const char *name)
 {
 	if (strcmp(name, "off") == 0) {
@@ -33,6 +54,8 @@ Logger::SetLevelByName(const char *name)
 		fLevel = LOG_LEVEL_DEBUG;
 	} else if (strcmp(name, "trace") == 0) {
 		fLevel = LOG_LEVEL_TRACE;
+	} else if (strcmp(name, "error") == 0) {
+		fLevel = LOG_LEVEL_ERROR;
 	} else {
 		return false;
 	}
@@ -41,22 +64,30 @@ Logger::SetLevelByName(const char *name)
 }
 
 
+/*static*/
+bool
+Logger::IsLevelEnabled(log_level value)
+{
+	return fLevel >= value;
+}
+
+
 bool
 Logger::IsInfoEnabled()
 {
-	return fLevel >= LOG_LEVEL_INFO;
+	return IsLevelEnabled(LOG_LEVEL_INFO);
 }
 
 
 bool
 Logger::IsDebugEnabled()
 {
-	return fLevel >= LOG_LEVEL_DEBUG;
+	return IsLevelEnabled(LOG_LEVEL_DEBUG);
 }
 
 
 bool
 Logger::IsTraceEnabled()
 {
-	return fLevel >= LOG_LEVEL_TRACE;
+	return IsLevelEnabled(LOG_LEVEL_TRACE);
 }

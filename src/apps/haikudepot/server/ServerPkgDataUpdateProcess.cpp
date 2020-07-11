@@ -143,8 +143,8 @@ PackageFillingPkgListener::ConsumePackage(const PackageInfoRef& package,
 		int categoryIndex = IndexOfCategoryByCode(*(categoryCode));
 
 		if (categoryIndex == -1) {
-			printf("unable to find the category for [%s]\n",
-				categoryCode->String());
+			HDERROR("unable to find the category for [%s]",
+				categoryCode->String())
 		} else {
 			package->AddCategory(
 				fCategories.ItemAtFast(categoryIndex));
@@ -176,10 +176,8 @@ PackageFillingPkgListener::ConsumePackage(const PackageInfoRef& package,
 		));
 	}
 
-	if (fDebugEnabled) {
-		printf("did populate data for [%s] (%s)\n", pkg->Name()->String(),
-			fDepotName.String());
-	}
+	HDDEBUG("did populate data for [%s] (%s)", pkg->Name()->String(),
+			fDepotName.String())
 
 	fCount++;
 
@@ -213,12 +211,12 @@ PackageFillingPkgListener::Handle(DumpExportPkg* pkg)
 			AutoLocker<BLocker> locker(fModel->Lock());
 			ConsumePackage(packageInfoRef, pkg);
 		} else {
-			printf("[PackageFillingPkgListener] unable to find the pkg [%s]\n",
-				packageName.String());
+			HDINFO("[PackageFillingPkgListener] unable to find the pkg [%s]",
+				packageName.String())
 		}
 	} else {
-		printf("[PackageFillingPkgListener] unable to find the depot [%s]\n",
-			fDepotName.String());
+		HDINFO("[PackageFillingPkgListener] unable to find the depot [%s]",
+			fDepotName.String())
 	}
 
 	return !fStoppable->WasStopped();
@@ -322,8 +320,8 @@ ServerPkgDataUpdateProcess::ProcessLocalData()
 
 	if (Logger::IsInfoEnabled()) {
 		double secs = watch.ElapsedTime() / 1000000.0;
-		printf("[%s] did process %" B_PRIi32 " packages' data "
-			"in  (%6.3g secs)\n", Name(), itemListener->Count(), secs);
+		HDINFO("[%s] did process %" B_PRIi32 " packages' data "
+			"in  (%6.3g secs)", Name(), itemListener->Count(), secs)
 	}
 
 	return listener->ErrorStatus();
@@ -362,11 +360,9 @@ status_t
 ServerPkgDataUpdateProcess::RunInternal()
 {
 	if (_DeriveWebAppRepositorySourceCode().IsEmpty()) {
-		if (Logger::IsInfoEnabled()) {
-			printf("[%s] am not updating data for depot [%s] as there is no"
-				" web app repository source code available\n",
-				Name(), fDepotName.String());
-		}
+		HDINFO("[%s] am not updating data for depot [%s] as there is no"
+			" web app repository source code available",
+			Name(), fDepotName.String())
 		return B_OK;
 	}
 

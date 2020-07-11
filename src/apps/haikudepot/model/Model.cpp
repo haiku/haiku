@@ -9,7 +9,6 @@
 
 #include <ctime>
 #include <stdarg.h>
-#include <stdio.h>
 #include <time.h>
 
 #include <Autolock.h>
@@ -187,13 +186,9 @@ public:
 		if (package.Get() == NULL)
 			return false;
 
-		printf("TEST %s\n", package->Name().String());
-
 		for (int32 i = 0; i < fPackageLists.CountItems(); i++) {
-			if (fPackageLists.ItemAtFast(i)->Contains(package)) {
-				printf("  contained in %" B_PRId32 "\n", i);
+			if (fPackageLists.ItemAtFast(i)->Contains(package))
 				return false;
-			}
 		}
 		return true;
 	}
@@ -649,8 +644,8 @@ Model::PopulatePackage(const PackageInfoRef& package, uint32 flags)
 
 					BString code;
 					if (item.FindString("code", &code) != B_OK) {
-						printf("corrupt user rating at index %" B_PRIi32 "\n",
-							index);
+						HDERROR("corrupt user rating at index %" B_PRIi32,
+							index)
 						continue;
 					}
 
@@ -658,8 +653,8 @@ Model::PopulatePackage(const PackageInfoRef& package, uint32 flags)
 					BMessage userInfo;
 					if (item.FindMessage("user", &userInfo) != B_OK
 						|| userInfo.FindString("nickname", &user) != B_OK) {
-						printf("ignored user rating [%s] without a user "
-							"nickname\n", code.String());
+						HDERROR("ignored user rating [%s] without a user "
+							"nickname", code.String())
 						continue;
 					}
 
@@ -672,8 +667,8 @@ Model::PopulatePackage(const PackageInfoRef& package, uint32 flags)
 					if (item.FindDouble("rating", &rating) != B_OK)
 						rating = -1;
 					if (comment.Length() == 0 && rating == -1) {
-						printf("rating [%s] has no comment or rating so will be"
-							"ignored\n", code.String());
+						HDERROR("rating [%s] has no comment or rating so will"
+							" be ignored", code.String())
 						continue;
 					}
 
@@ -717,22 +712,15 @@ Model::PopulatePackage(const PackageInfoRef& package, uint32 flags)
 						comment, languageCode, versionString,
 						(uint64) createTimestamp);
 					package->AddUserRating(userRating);
-
-					if (Logger::IsDebugEnabled()) {
-						printf("rating [%s] retrieved from server\n",
-							code.String());
-					}
+					HDDEBUG("rating [%s] retrieved from server", code.String())
 				}
-
-				if (Logger::IsDebugEnabled()) {
-					printf("did retrieve %" B_PRIi32 " user ratings for [%s]\n",
-						index - 1, packageName.String());
-				}
+				HDDEBUG("did retrieve %" B_PRIi32 " user ratings for [%s]",
+						index - 1, packageName.String())
 			} else {
 				_MaybeLogJsonRpcError(info, "retrieve user ratings");
 			}
 		} else {
-			printf("unable to retrieve user ratings\n");
+			HDERROR("unable to retrieve user ratings")
 		}
 	}
 
@@ -773,22 +761,16 @@ Model::_PopulatePackageChangelog(const PackageInfoRef& package)
 				&& 0 != content.Length()) {
 				BAutolock locker(&fLock);
 				package->SetChangelog(content);
-				if (Logger::IsDebugEnabled()) {
-					fprintf(stdout, "changelog populated for [%s]\n",
-						packageName.String());
-				}
+				HDDEBUG("changelog populated for [%s]", packageName.String())
 			} else {
-				if (Logger::IsDebugEnabled()) {
-					fprintf(stdout, "no changelog present for [%s]\n",
-						packageName.String());
-				}
+				HDDEBUG("no changelog present for [%s]", packageName.String())
 			}
 		} else {
 			_MaybeLogJsonRpcError(info, "populate package changelog");
 		}
 	} else {
-		fprintf(stdout, "unable to obtain the changelog for the package"
-			" [%s]\n", packageName.String());
+		HDERROR("unable to obtain the changelog for the package [%s]",
+			packageName.String())
 	}
 }
 
@@ -809,15 +791,15 @@ model_remove_key_for_user(const BString& nickname)
 		case B_OK:
 			result = keyStore.RemoveKey(kHaikuDepotKeyring, key);
 			if (result != B_OK) {
-				printf("! error occurred when removing password for nickname "
-					"[%s] : %s\n", nickname.String(), strerror(result));
+				HDERROR("error occurred when removing password for nickname "
+					"[%s] : %s", nickname.String(), strerror(result))
 			}
 			break;
 		case B_ENTRY_NOT_FOUND:
 			return;
 		default:
-			printf("! error occurred when finding password for nickname "
-				"[%s] : %s\n", nickname.String(), strerror(result));
+			HDERROR("error occurred when finding password for nickname "
+				"[%s] : %s", nickname.String(), strerror(result))
 			break;
 	}
 }
@@ -956,7 +938,7 @@ Model::_PopulatePackageScreenshot(const PackageInfoRef& package,
 		"Screenshots", screenshotCachePath);
 
 	if (result != B_OK) {
-		printf("[!] unable to get the screenshot dir - unable to proceed");
+		HDERROR("unable to get the screenshot dir - unable to proceed")
 		return;
 	}
 
@@ -1007,9 +989,9 @@ Model::_PopulatePackageScreenshot(const PackageInfoRef& package,
 			screenshotFile.Write(buffer.Buffer(), buffer.BufferLength());
 		}
 	} else {
-		fprintf(stderr, "Failed to retrieve screenshot for code '%s' "
-			"at %" B_PRIi32 "x%" B_PRIi32 ".\n", info.Code().String(),
-			scaledWidth, scaledHeight);
+		HDERROR("Failed to retrieve screenshot for code '%s' "
+			"at %" B_PRIi32 "x%" B_PRIi32 ".", info.Code().String(),
+			scaledWidth, scaledHeight)
 	}
 }
 
@@ -1070,13 +1052,15 @@ Model::LogDepotsWithNoWebAppRepositoryCode() const
 		const DepotInfo& depot = fDepots.ItemAt(i);
 
 		if (depot.WebAppRepositoryCode().Length() == 0) {
-			printf("depot [%s]", depot.Name().String());
-
-			if (depot.URL().Length() > 0)
-				printf(" (%s)", depot.URL().String());
-
-			printf(" correlates with no repository in the haiku"
-				"depot server system\n");
+			if (depot.URL().Length() > 0) {
+				HDINFO("depot [%s] (%s) correlates with no repository in the"
+					" the haiku depot server system", depot.Name().String(),
+					depot.URL().String())
+			}
+			else {
+				HDINFO("depot [%s] correlates with no repository in the"
+					" the haiku depot server system", depot.Name().String())
+			}
 		}
 	}
 }
@@ -1093,11 +1077,10 @@ Model::_MaybeLogJsonRpcError(const BMessage &responsePayload,
 	if (responsePayload.FindMessage("error", &error) == B_OK
 		&& error.FindString("message", &errorMessage) == B_OK
 		&& error.FindDouble("code", &errorCode) == B_OK) {
-		printf("[%s] --> error : [%s] (%f)\n", sourceDescription,
-			errorMessage.String(), errorCode);
-
+		HDERROR("[%s] --> error : [%s] (%f)", sourceDescription,
+			errorMessage.String(), errorCode)
 	} else {
-		printf("[%s] --> an undefined error has occurred\n", sourceDescription);
+		HDERROR("[%s] --> an undefined error has occurred", sourceDescription)
 	}
 }
 

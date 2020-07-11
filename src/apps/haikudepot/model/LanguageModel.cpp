@@ -70,8 +70,7 @@ void
 LanguageModel::_SetPreferredLanguage(const Language& language)
 {
 	fPreferredLanguage = LanguageRef(new Language(language));
-	if(Logger::IsDebugEnabled())
-		printf("set preferred language [%s]\n", language.Code());
+	HDDEBUG("set preferred language [%s]", language.Code())
 }
 
 
@@ -98,11 +97,7 @@ Language
 LanguageModel::_DeriveDefaultLanguage() const
 {
 	Language defaultLanguage = _DeriveSystemDefaultLanguage();
-
-	if(Logger::IsDebugEnabled()) {
-		printf("derived system default language [%s]\n",
-			defaultLanguage.Code());
-	}
+	HDDEBUG("derived system default language [%s]", defaultLanguage.Code())
 
 	// if there are no supported languages; as is the case to start with as the
 	// application starts, the default language from the system is used anyway.
@@ -119,15 +114,15 @@ LanguageModel::_DeriveDefaultLanguage() const
 		defaultLanguage.Code());
 
 	if (foundSupportedLanguage == NULL) {
-		printf("unable to find the language [%s] - looking for app default",
-			defaultLanguage.Code());
+		HDERROR("unable to find the language [%s] - looking for app default",
+			defaultLanguage.Code())
 		foundSupportedLanguage = _FindSupportedLanguage(
 			LANGUAGE_DEFAULT.Code());
 	}
 
 	if (foundSupportedLanguage == NULL) {
-		printf("unable to find the app default language - using the first "
-			"supported language");
+		HDERROR("unable to find the app default language - using the first "
+			"supported language")
 		foundSupportedLanguage = fSupportedLanguages.ItemAt(0);
 	}
 

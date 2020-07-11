@@ -102,18 +102,18 @@ DepotMatchingRepositoryListener::MapDepot(const DepotInfo& depot, void *context)
 		BString(*repositorySourceCode));
 
 	if (Logger::IsDebugEnabled()) {
-		printf("[DepotMatchingRepositoryListener] associated depot [%s] (%s) "
-			"with server repository source [%s] (%s)\n",
+		HDDEBUG("[DepotMatchingRepositoryListener] associated depot [%s] (%s) "
+			"with server repository source [%s] (%s)",
 			modifiedDepotInfo.Name().String(),
 			modifiedDepotInfo.URL().String(),
 			repositorySourceCode->String(),
 			repositoryAndRepositorySource
-				->repositorySource->Identifier()->String());
+				->repositorySource->Identifier()->String())
 	} else {
-		printf("[DepotMatchingRepositoryListener] associated depot [%s] with "
-			"server repository source [%s]\n",
+		HDINFO("[DepotMatchingRepositoryListener] associated depot [%s] with "
+			"server repository source [%s]",
 			modifiedDepotInfo.Name().String(),
-			repositorySourceCode->String());
+			repositorySourceCode->String())
 	}
 
 	return modifiedDepotInfo;
@@ -133,7 +133,8 @@ DepotMatchingRepositoryListener::Handle(const BString& identifier,
 void
 DepotMatchingRepositoryListener::Handle(repository_and_repository_source& pair)
 {
-	Handle(*(pair.repositorySource->Identifier()), pair);
+	if (!pair.repositorySource->IdentifierIsNull())
+		Handle(*(pair.repositorySource->Identifier()), pair);
 
 	// there may be additional identifiers for the remote repository and
 	// these should also be taken into consideration.

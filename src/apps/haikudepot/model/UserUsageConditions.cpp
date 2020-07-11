@@ -1,11 +1,11 @@
 /*
- * Copyright 2019, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2019-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  *
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #include "UserUsageConditions.h"
 
-#include <stdio.h>
+#include "Logger.h"
 
 // These are keys that are used to store this object's data into a BMessage
 // instance.
@@ -24,14 +24,14 @@ UserUsageConditions::UserUsageConditions(BMessage* from)
 	int16 minimumAge;
 
 	if (from->FindInt16(KEY_MINIMUM_AGE, &minimumAge) != B_OK)
-		printf("expected key [%s] in the message data\n", KEY_MINIMUM_AGE);
+		HDERROR("expected key [%s] in the message data", KEY_MINIMUM_AGE)
 	fMinimumAge = (uint8) minimumAge;
 
 	if (from->FindString(KEY_CODE, &fCode) != B_OK)
-		printf("expected key [%s] in the message data\n", KEY_CODE);
+		HDERROR("expected key [%s] in the message data", KEY_CODE)
 
 	if (from->FindString(KEY_COPY_MARKDOWN, &fCopyMarkdown) != B_OK)
-		printf("expected key [%s] in the message data\n", KEY_COPY_MARKDOWN);
+		HDERROR("expected key [%s] in the message data", KEY_COPY_MARKDOWN)
 }
 
 

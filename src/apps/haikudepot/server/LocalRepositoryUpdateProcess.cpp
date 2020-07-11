@@ -66,10 +66,7 @@ LocalRepositoryUpdateProcess::RunInternal()
 {
 	BPackageRoster roster;
 	BStringList repoNames;
-
-	if (Logger::IsInfoEnabled()) {
-		printf("[%s] will update local repositories' caches\n", Name());
-	}
+	HDINFO("[%s] will update local repositories' caches", Name())
 
 	status_t result = roster.GetRepositoryNames(repoNames);
 
@@ -91,9 +88,9 @@ LocalRepositoryUpdateProcess::RunInternal()
 		result = B_ERROR;
 	}
 
-	if (result == B_OK && Logger::IsInfoEnabled()) {
-		printf("[%s] did update %" B_PRIi32 " local repositories' caches\n",
-			Name(), repoNames.CountStrings());
+	if (result == B_OK) {
+		HDINFO("[%s] did update %" B_PRIi32 " local repositories' caches",
+			Name(), repoNames.CountStrings())
 	}
 
 	return result;
@@ -106,34 +103,25 @@ LocalRepositoryUpdateProcess::_ShouldRunForRepositoryName(
 	BPackageKit::BRepositoryCache* cache)
 {
 	if (fForce) {
-		if (Logger::IsInfoEnabled()) {
-			printf("[%s] am refreshing cache for repo [%s] as it was forced\n",
-				Name(), repoName.String());
-		}
+		HDINFO("[%s] am refreshing cache for repo [%s] as it was forced",
+			Name(), repoName.String())
 		return true;
 	}
 
 	if (roster.GetRepositoryCache(repoName, cache) != B_OK) {
-		if (Logger::IsInfoEnabled()) {
-			printf("[%s] am updating cache for repo [%s] as there was no"
-				" cache\n", Name(), repoName.String());
-		}
+		HDINFO("[%s] am updating cache for repo [%s] as there was no cache",
+			Name(), repoName.String())
 		return true;
 	}
 
 	if (static_cast<App*>(be_app)->IsFirstRun()) {
-		if (Logger::IsInfoEnabled()) {
-			printf("[%s] am updating cache for repo [%s] as this is the first"
-				" time that the application has run\n", Name(),
-				repoName.String());
-		}
+		HDINFO("[%s] am updating cache for repo [%s] as this is the first"
+			" time that the application has run", Name(), repoName.String())
 		return true;
 	}
 
-	if (Logger::IsDebugEnabled()) {
-		printf("[%s] skipped update local repo [%s] cache\n", Name(),
-			repoName.String());
-	}
+	HDDEBUG("[%s] skipped update local repo [%s] cache", Name(),
+		repoName.String())
 
 	return false;
 }
@@ -152,10 +140,8 @@ LocalRepositoryUpdateProcess::_RunForRepositoryName(const BString& repoName,
 			try {
 				BRefreshRepositoryRequest refreshRequest(context, repoConfig);
 				result = refreshRequest.Process();
-				if (Logger::IsInfoEnabled()) {
-					printf("[%s] did update local repo [%s] cache\n", Name(),
-						repoName.String());
-				}
+				HDINFO("[%s] did update local repo [%s] cache", Name(),
+					repoName.String());
 				result = B_OK;
 			} catch (BFatalErrorException& ex) {
 				_NotifyError(ex.Message(), ex.Details());
@@ -182,8 +168,8 @@ void
 LocalRepositoryUpdateProcess::_NotifyError(const BString& error,
 	const BString& details) const
 {
-	printf("an error has arisen updating the local repositories : %s\n",
-		error.String());
+	HDINFO("an error has arisen updating the local repositories : %s",
+		error.String())
 
 	BString alertText(B_TRANSLATE("An error occurred while refreshing the "
 		"repository: %error%"));

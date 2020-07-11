@@ -16,6 +16,7 @@
 #include "HaikuDepotConstants.h"
 #include "LocalPkgDataLoadProcess.h"
 #include "LocalRepositoryUpdateProcess.h"
+#include "Logger.h"
 #include "Model.h"
 #include "PackageInfoListener.h"
 #include "ProcessCoordinator.h"
@@ -114,7 +115,7 @@ ProcessCoordinatorFactory::CreateBulkLoadCoordinator(
 				processCoordinator->AddNode(processNode);
 			}
 		} else {
-			printf("a problem has arisen getting the repository names.\n");
+			HDERROR("a problem has arisen getting the repository names.")
 		}
 	}
 
@@ -128,8 +129,8 @@ ProcessCoordinatorFactory::_CalculateServerProcessOptions()
 	uint32 processOptions = 0;
 
 	if (ServerSettings::IsClientTooOld()) {
-		printf("bulk load proceeding without network communications "
-			"because the client is too old\n");
+		HDINFO("bulk load proceeding without network communications "
+			"because the client is too old")
 		processOptions |= SERVER_PROCESS_NO_NETWORKING;
 	}
 

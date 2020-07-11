@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -8,8 +8,7 @@
 #include <File.h>
 #include <HttpRequest.h>
 
-#include <stdio.h>
-
+#include "Logger.h"
 
 ToFileUrlProtocolListener::ToFileUrlProtocolListener(BPath path,
 	BString traceLoggingIdentifier, bool traceLogging)
@@ -59,8 +58,8 @@ ToFileUrlProtocolListener::HeadersReceived(BUrlRequest* caller,
 	int32 statusCode = httpResult.StatusCode();
 
 	if (!BHttpRequest::IsSuccessStatusCode(statusCode)) {
-		fprintf(stdout, "received http status %" B_PRId32
-			" --> will not store download to file\n", statusCode);
+		HDINFO("received http status %" B_PRId32
+			" --> will not store download to file", statusCode)
 		fShouldDownload = false;
 	}
 
@@ -84,7 +83,7 @@ ToFileUrlProtocolListener::DataReceived(BUrlRequest* caller, const char* data,
 		} while (remaining > 0 && written > 0);
 
 		if (remaining > 0)
-			fprintf(stdout, "unable to write all of the data to the file\n");
+			HDERROR("unable to write all of the data to the file")
 	}
 }
 
@@ -113,10 +112,7 @@ void
 ToFileUrlProtocolListener::DebugMessage(BUrlRequest* caller,
 	BUrlProtocolDebugMessage type, const char* text)
 {
-	if (fTraceLogging) {
-		fprintf(stdout, "url->file <%s>; %s\n",
-			fTraceLoggingIdentifier.String(), text);
-	}
+	HDTRACE("url->file <%s>; %s", fTraceLoggingIdentifier.String(), text)
 }
 
 

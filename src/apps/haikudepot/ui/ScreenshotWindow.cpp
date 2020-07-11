@@ -1,13 +1,13 @@
 /*
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2017, Julian Harnath <julian.harnath@rwth-aachen.de>.
+ * Copyright 2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 #include "ScreenshotWindow.h"
 
 #include <algorithm>
-#include <stdio.h>
 
 #include <Autolock.h>
 #include <Catalog.h>
@@ -18,6 +18,7 @@
 #include "BarberPole.h"
 #include "BitmapView.h"
 #include "HaikuDepotConstants.h"
+#include "Logger.h"
 #include "WebAppInterface.h"
 
 
@@ -253,9 +254,8 @@ ScreenshotWindow::_DownloadThreadEntry(void* data)
 void
 ScreenshotWindow::_DownloadThread()
 {
-	printf("_DownloadThread()\n");
 	if (!Lock()) {
-		printf("  failed to lock screenshot window\n");
+		HDERROR("failed to lock screenshot window")
 		return;
 	}
 
@@ -268,7 +268,7 @@ ScreenshotWindow::_DownloadThread()
 	Unlock();
 
 	if (screenshotInfos.CountItems() == 0) {
-		printf("  package has no screenshots\n");
+		HDINFO("package has no screenshots")
 		return;
 	}
 
@@ -295,13 +295,13 @@ ScreenshotWindow::_DownloadThread()
 	messenger.SendMessage(MSG_DOWNLOAD_STOP);
 
 	if (status == B_OK && Lock()) {
-		printf("got screenshot");
+		HDINFO("got screenshot")
 		fScreenshot = BitmapRef(new(std::nothrow)SharedBitmap(buffer), true);
 		fScreenshotView->SetBitmap(fScreenshot);
 		_ResizeToFitAndCenter();
 		Unlock();
 	} else {
-		printf("  failed to download screenshot\n");
+		HDERROR("failed to download screenshot")
 	}
 }
 

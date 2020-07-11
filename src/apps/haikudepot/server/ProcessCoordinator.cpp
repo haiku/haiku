@@ -142,13 +142,16 @@ ProcessCoordinator::Stop()
 	AutoLocker<BLocker> locker(&fLock);
 	if (!fWasStopped) {
 		fWasStopped = true;
-		printf("[Coordinator] will stop process coordinator\n");
+		HDINFO("[Coordinator] will stop process coordinator")
 		for (int32 i = 0; i < fNodes.CountItems(); i++) {
 			ProcessNode* node = fNodes.ItemAt(i);
-			printf("[%s] stopping process", node->Process()->Name());
-			if (node->Process()->ErrorStatus() != B_OK)
-				printf(" (error)\n");
-			printf("\n");
+			if (node->Process()->ErrorStatus() != B_OK) {
+				HDINFO("[Coordinator] stopping process [%s] (owing to error)",
+					node->Process()->Name());
+			} else {
+				HDINFO("[Coordinator] stopping process [%s]",
+					node->Process()->Name());
+			}
 			node->StopProcess();
 		}
 	}
@@ -260,11 +263,8 @@ ProcessCoordinator::_CoordinateAndCallListener()
 ProcessCoordinatorState
 ProcessCoordinator::_Coordinate()
 {
-	if (Logger::IsTraceEnabled())
-		printf("[Coordinator] will coordinate nodes\n");
-
+	HDTRACE("[Coordinator] will coordinate nodes")
 	AutoLocker<BLocker> locker(&fLock);
-
 	_StopSuccessorNodesToErroredOrStoppedNodes();
 
 	// go through the nodes and find those that are still to be run and
@@ -276,16 +276,12 @@ ProcessCoordinator::_Coordinate()
 			if (node->AllPredecessorsComplete())
 				node->StartProcess();
 			else {
-				if (Logger::IsTraceEnabled()) {
-					printf("[Coordinator] all predecessors not complete -> "
-						"[%s] not started\n", node->Process()->Name());
-				}
+				HDTRACE("[Coordinator] all predecessors not complete -> "
+					"[%s] not started", node->Process()->Name());
 			}
 		} else {
-			if (Logger::IsTraceEnabled()) {
-				printf("[Coordinator] process [%s] running or complete\n",
-					node->Process()->Name());
-			}
+			HDTRACE("[Coordinator] process [%s] running or complete",
+				node->Process()->Name());
 		}
 	}
 
@@ -318,10 +314,8 @@ ProcessCoordinator::_StopSuccessorNodes(ProcessNode* predecessorNode)
 		AbstractProcess* process = node->Process();
 
 		if (process->ProcessState() == PROCESS_INITIAL) {
-			if (Logger::IsDebugEnabled()) {
-				printf("[Coordinator] [%s] (failed) --> [%s] (stopping)\n",
-					predecessorNode->Process()->Name(), process->Name());
-			}
+			HDDEBUG("[Coordinator] [%s] (failed) --> [%s] (stopping)",
+				predecessorNode->Process()->Name(), process->Name())
 			node->StopProcess();
 			_StopSuccessorNodes(node);
 		}

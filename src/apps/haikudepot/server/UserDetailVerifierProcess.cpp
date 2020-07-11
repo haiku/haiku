@@ -62,8 +62,8 @@ UserDetailVerifierProcess::RunInternal()
 				break;
 			case B_OK:
 				if (!userDetail.Agreement().IsLatest()) {
-					printf("! the user has not agreed to the latest user usage"
-						" conditions.\n");
+					HDINFO("the user has not agreed to the latest user usage"
+						" conditions.")
 					fListener->UserUsageConditionsNotLatest(userDetail);
 				}
 				break;
@@ -80,14 +80,14 @@ bool
 UserDetailVerifierProcess::_ShouldVerify()
 {
 	if (!ServerHelper::IsNetworkAvailable()) {
-		printf("no network --> will not verify user\n");
+		HDINFO("no network --> will not verify user")
 		return false;
 	}
 
 	{
 		AutoLocker<BLocker> locker(fModel->Lock());
 		if (fModel->Nickname().IsEmpty()) {
-			printf("no nickname --> will not verify user\n");
+			HDINFO("no nickname --> will not verify user");
 			return false;
 		}
 	}
@@ -105,8 +105,8 @@ UserDetailVerifierProcess::_TryFetchUserDetail(UserDetail& userDetail)
 
 	result = interface.RetrieveCurrentUserDetail(userDetailResponse);
 	if (result != B_OK) {
-		printf("a problem has arisen retrieving the current user detail: %s\n",
-			strerror(result));
+		HDERROR("a problem has arisen retrieving the current user detail: %s",
+			strerror(result))
 	}
 
 	if (result == B_OK) {
@@ -118,9 +118,9 @@ UserDetailVerifierProcess::_TryFetchUserDetail(UserDetail& userDetail)
 				result = B_PERMISSION_DENIED;
 				break;
 			default:
-				printf("! a problem has arisen retrieving the current user "
-					"detail for user [%s]: jrpc error code %" B_PRId32 "\n",
-					fModel->Nickname().String(), errorCode);
+				HDERROR("a problem has arisen retrieving the current user "
+					"detail for user [%s]: jrpc error code %" B_PRId32 "",
+					fModel->Nickname().String(), errorCode)
 				result = B_ERROR;
 				break;
 		}
@@ -134,7 +134,7 @@ UserDetailVerifierProcess::_TryFetchUserDetail(UserDetail& userDetail)
 
 		result = interface.UnpackUserDetail(userDetailResponse, userDetail);
 		if (result != B_OK)
-			printf("! it was not possible to unpack the user details.\n");
+			HDERROR("it was not possible to unpack the user details.")
 	}
 
 	return result;

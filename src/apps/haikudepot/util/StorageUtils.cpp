@@ -5,8 +5,8 @@
 
 #include "StorageUtils.h"
 
-#include <stdio.h>
 #include <errno.h>
+#include <stdlib.h>
 
 #include <Directory.h>
 #include <File.h>
@@ -86,13 +86,9 @@ StorageUtils::RemoveDirectoryContents(BPath& path)
 				RemoveDirectoryContents(directoryEntryPath);
 
 			if (remove(directoryEntryPath.Path()) == 0) {
-				if (Logger::IsDebugEnabled()) {
-					fprintf(stdout, "did delete [%s]\n",
-						directoryEntryPath.Path());
-				}
+				HDDEBUG("did delete [%s]", directoryEntryPath.Path())
 			} else {
-				fprintf(stderr, "unable to delete [%s]\n",
-					directoryEntryPath.Path());
+				HDERROR("unable to delete [%s]", directoryEntryPath.Path())
 				result = B_ERROR;
 			}
 		}
@@ -167,17 +163,13 @@ StorageUtils::CheckCanWriteTo(const BPath& path)
 		result = ExistsObject(path, &exists, NULL, NULL);
 
 	if (result == B_OK && exists) {
-		if (Logger::IsTraceEnabled()) {
-			printf("an object exists at the candidate path "
-				"[%s] - it will be deleted\n", path.Path());
-		}
+		HDTRACE("an object exists at the candidate path "
+			"[%s] - it will be deleted", path.Path())
 
 		if (remove(path.Path()) == 0) {
-			if (Logger::IsTraceEnabled()) {
-				printf("did delete the candidate file [%s]\n", path.Path());
-			}
+			HDTRACE("did delete the candidate file [%s]", path.Path())
 		} else {
-			printf("unable to delete the candidate file [%s]\n", path.Path());
+			HDERROR("unable to delete the candidate file [%s]", path.Path())
 			result = B_ERROR;
 		}
 	}
@@ -185,8 +177,8 @@ StorageUtils::CheckCanWriteTo(const BPath& path)
 	if (result == B_OK) {
 		BFile file(path.Path(), O_WRONLY | O_CREAT);
 		if (file.Write(buffer, 16) != 16) {
-			printf("unable to write test data to candidate file [%s]\n",
-				path.Path());
+			HDERROR("unable to write test data to candidate file [%s]",
+				path.Path())
 			result = B_ERROR;
 		}
 	}
@@ -195,15 +187,15 @@ StorageUtils::CheckCanWriteTo(const BPath& path)
 		BFile file(path.Path(), O_RDONLY);
 		uint8 readBuffer[16];
 		if (file.Read(readBuffer, 16) != 16) {
-			printf("unable to read test data from candidate file [%s]\n",
-				path.Path());
+			HDERROR("unable to read test data from candidate file [%s]",
+				path.Path())
 			result = B_ERROR;
 		}
 
 		for (int i = 0; result == B_OK && i < 16; i++) {
 			if (readBuffer[i] != buffer[i]) {
-				printf("mismatched read..write check on candidate file [%s]\n",
-					path.Path());
+				HDERROR("mismatched read..write check on candidate file [%s]",
+					path.Path())
 				result = B_ERROR;
 			}
 		}
@@ -245,8 +237,8 @@ StorageUtils::LocalWorkingFilesPath(const BString leaf, BPath& path,
 		path.SetTo(resultPath.Path());
 	else {
 		path.Unset();
-		fprintf(stdout, "unable to find the user cache file for "
-			"[%s] data; %s\n", leaf.String(), strerror(result));
+		HDERROR("unable to find the user cache file for "
+			"[%s] data; %s", leaf.String(), strerror(result))
 	}
 
 	return result;
@@ -280,8 +272,8 @@ StorageUtils::LocalWorkingDirectoryPath(const BString leaf, BPath& path,
 		path.SetTo(resultPath.Path());
 	else {
 		path.Unset();
-		fprintf(stdout, "unable to find the user cache directory for "
-			"[%s] data; %s\n", leaf.String(), strerror(result));
+		HDERROR("unable to find the user cache directory for "
+			"[%s] data; %s", leaf.String(), strerror(result))
 	}
 
 	return result;

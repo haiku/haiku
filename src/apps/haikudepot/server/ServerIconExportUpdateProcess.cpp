@@ -1,12 +1,11 @@
 /*
- * Copyright 2017-2018, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 
 #include "ServerIconExportUpdateProcess.h"
 
-#include <stdio.h>
 #include <sys/stat.h>
 #include <time.h>
 
@@ -40,7 +39,7 @@ ServerIconExportUpdateProcess::ServerIconExportUpdateProcess(
 {
 	AutoLocker<BLocker> locker(fModel->Lock());
 	if (fModel->IconStoragePath(fLocalIconStoragePath) != B_OK) {
-		printf("[%s] unable to obtain the path for storing icons\n", Name());
+		HDINFO("[%s] unable to obtain the path for storing icons", Name())
 		fLocalIconStoragePath.Unset();
 		fLocalIconStore = NULL;
 	} else {
@@ -116,10 +115,8 @@ ServerIconExportUpdateProcess::Populate()
 		depots = fModel->Depots();
 	}
 
-	if (Logger::IsDebugEnabled()) {
-		printf("[%s] will populate icons for %" B_PRId32 " depots\n", Name(),
-			depots.CountItems());
-	}
+	HDDEBUG("[%s] will populate icons for %" B_PRId32 " depots", Name(),
+		depots.CountItems())
 
 	for (int32 i = 0;
 		(i < depots.CountItems()) && !WasStopped() && (result == B_OK);
@@ -131,8 +128,8 @@ ServerIconExportUpdateProcess::Populate()
 
 	if (Logger::IsInfoEnabled()) {
 		double secs = watch.ElapsedTime() / 1000000.0;
-		printf("[%s] did populate %" B_PRId32 " packages' icons (%6.3g secs)\n",
-			Name(), fCountIconsSet, secs);
+		HDINFO("[%s] did populate %" B_PRId32 " packages' icons (%6.3g secs)",
+			Name(), fCountIconsSet, secs)
 	}
 
 	return result;
@@ -144,8 +141,8 @@ ServerIconExportUpdateProcess::Populate()
 status_t
 ServerIconExportUpdateProcess::PopulateForDepot(const DepotInfo& depot)
 {
-	printf("[%s] will populate icons for depot [%s]\n",
-		Name(), depot.Name().String());
+	HDINFO("[%s] will populate icons for depot [%s]",
+		Name(), depot.Name().String())
 	status_t result = B_OK;
 	const PackageList& packages = depot.Packages();
 	for(int32 j = 0;
@@ -176,20 +173,16 @@ ServerIconExportUpdateProcess::PopulateForPkg(const PackageInfoRef& package)
 		BitmapRef bitmapRef(new(std::nothrow)SharedBitmap(bestIconFile), true);
 		package->SetIcon(bitmapRef);
 
-		if (Logger::IsDebugEnabled()) {
-			printf("[%s] have set the package icon for [%s] from [%s]\n",
-				Name(), package->Name().String(), bestIconPath.Path());
-		}
+		HDDEBUG("[%s] have set the package icon for [%s] from [%s]",
+			Name(), package->Name().String(), bestIconPath.Path())
 
 		fCountIconsSet++;
 
 		return B_OK;
 	}
 
-	if (Logger::IsDebugEnabled()) {
-		printf("[%s] did not set the package icon for [%s]; no data\n",
-			Name(), package->Name().String());
-	}
+	HDDEBUG("[%s] did not set the package icon for [%s]; no data",
+		Name(), package->Name().String())
 
 	return B_FILE_NOT_FOUND;
 }
@@ -201,13 +194,13 @@ ServerIconExportUpdateProcess::_DownloadAndUnpack()
 	BPath tarGzFilePath(tmpnam(NULL));
 	status_t result = B_OK;
 
-	printf("[%s] will start fetching icons\n", Name());
+	HDINFO("[%s] will start fetching icons", Name())
 
 	result = _Download(tarGzFilePath);
 
 	switch (result) {
 		case HD_ERR_NOT_MODIFIED:
-			printf("[%s] icons not modified - will use existing\n", Name());
+			HDINFO("[%s] icons not modified - will use existing", Name())
 			return result;
 			break;
 		case B_OK:
@@ -231,14 +224,14 @@ ServerIconExportUpdateProcess::_HandleDownloadFailure()
 
 	if (result == B_OK) {
 		if (hasData) {
-			printf("[%s] failed to update data, but have old data anyway "
-				"so will carry on with that\n", Name());
+			HDINFO("[%s] failed to update data, but have old data anyway "
+				"so will carry on with that", Name())
 		} else {
-			printf("[%s] failed to obtain data\n", Name());
+			HDINFO("[%s] failed to obtain data", Name())
 			result = HD_ERR_NO_DATA;
 		}
 	} else {
-		printf("[%s] unable to detect if there is local data\n", Name());
+		HDERROR("[%s] unable to detect if there is local data\n", Name())
 	}
 
 	return result;
@@ -253,7 +246,7 @@ status_t
 ServerIconExportUpdateProcess::_Unpack(BPath& tarGzFilePath)
 {
 	status_t result;
-	printf("[%s] delete any existing stored data\n", Name());
+	HDINFO("[%s] delete any existing stored data", Name())
 	StorageUtils::RemoveDirectoryContents(fLocalIconStoragePath);
 
 	BFile *tarGzFile = new BFile(tarGzFilePath.Path(), O_RDONLY);
@@ -276,18 +269,17 @@ ServerIconExportUpdateProcess::_Unpack(BPath& tarGzFilePath)
 
 		if (result == B_OK) {
 			double secs = watch.ElapsedTime() / 1000000.0;
-			printf("[%s] did unpack icon tgz in (%6.3g secs)\n", Name(),
-				secs);
+			HDINFO("[%s] did unpack icon tgz in (%6.3g secs)", Name(), secs)
 
 			if (0 != remove(tarGzFilePath.Path())) {
-				printf("unable to delete the temporary tgz path; %s\n",
-					tarGzFilePath.Path());
+				HDERROR("[%s] unable to delete the temporary tgz path; %s",
+					Name(), tarGzFilePath.Path())
 			}
 		}
 	}
 
 	delete tarGzFile;
-	printf("[%s] did complete unpacking icons\n", Name());
+	HDINFO("[%s] did complete unpacking icons", Name())
 	return result;
 }
 

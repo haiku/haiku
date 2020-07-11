@@ -1,5 +1,5 @@
 /*
- * Copyright 2018, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #include "AbstractProcess.h"
@@ -47,12 +47,12 @@ AbstractProcess::Run()
 		AutoLocker<BLocker> locker(&fLock);
 
 		if (ProcessState() != PROCESS_INITIAL) {
-			printf("cannot start process as it is not idle");
+			HDINFO("cannot start process as it is not idle")
 			return B_NOT_ALLOWED;
 		}
 
 		if (fWasStopped) {
-			printf("cannot start process as it was stopped");
+			HDINFO("cannot start process as it was stopped")
 			return B_CANCELED;
 		}
 
@@ -62,7 +62,7 @@ AbstractProcess::Run()
 	status_t runResult = RunInternal();
 
 	if (runResult != B_OK)
-		printf("[%s] an error has arisen; %s\n", Name(), strerror(runResult));
+		HDERROR("[%s] an error has arisen; %s", Name(), strerror(runResult))
 
 	BReference<AbstractProcessListener> listener;
 

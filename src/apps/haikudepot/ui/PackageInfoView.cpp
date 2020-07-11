@@ -7,7 +7,6 @@
 #include "PackageInfoView.h"
 
 #include <algorithm>
-#include <stdio.h>
 
 #include <Alert.h>
 #include <Autolock.h>
@@ -39,6 +38,7 @@
 #include "LinkView.h"
 #include "LinkedBitmapView.h"
 #include "LocaleUtils.h"
+#include "Logger.h"
 #include "MarkupTextView.h"
 #include "MessagePackageListener.h"
 #include "PackageActionHandler.h"
@@ -624,10 +624,10 @@ private:
 			= fPackageActionHandler->SchedulePackageActions(actions);
 
 		if (result != B_OK) {
-			fprintf(stderr, "Failed to schedule action: "
-				"%s '%s': %s\n", action->Label(),
+			HDERROR("Failed to schedule action: %s '%s': %s",
+				action->Label(),
 				action->Package()->Name().String(),
-				strerror(result));
+				strerror(result))
 			BString message(B_TRANSLATE("The package action "
 				"could not be scheduled: %Error%"));
 			message.ReplaceAll("%Error%", strerror(result));

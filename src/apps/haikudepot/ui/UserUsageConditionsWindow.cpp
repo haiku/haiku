@@ -215,10 +215,8 @@ UserUsageConditionsWindow::QuitRequested()
 
 	if (fWorkerThread == -1)
 		return true;
-	if (Logger::IsInfoEnabled()) {
-		fprintf(stderr, "unable to quit when the user usage "
-			"conditions window is still fetching data\n");
-	}
+	HDINFO("unable to quit when the user usage "
+		"conditions window is still fetching data")
 	return false;
 }
 
@@ -360,25 +358,21 @@ UserUsageConditionsWindow::_FetchUserUsageConditionsCodeForUserPerform(
 				break;
 		}
 	} else {
-		fprintf(stderr, "an error has arisen communicating with the"
+		HDERROR("an error has arisen communicating with the"
 			" server to obtain data for a user's user usage conditions"
-			" [%s]\n", strerror(result));
+			" [%s]", strerror(result))
 		ServerHelper::NotifyTransportError(result);
 	}
 
 	if (result == B_OK) {
 		BString userUsageConditionsCode = userDetail.Agreement().Code();
-		if (Logger::IsDebugEnabled()) {
-			printf("the user [%s] has agreed to uuc [%s]\n",
-				interface.Nickname().String(),
-				userUsageConditionsCode.String());
-		}
+		HDDEBUG("the user [%s] has agreed to uuc [%s]",
+			interface.Nickname().String(),
+			userUsageConditionsCode.String())
 		code.SetTo(userUsageConditionsCode);
 	} else {
-		if (Logger::IsDebugEnabled()) {
-			printf("unable to get details of the user [%s]\n",
-				interface.Nickname().String());
-		}
+		HDDEBUG("unable to get details of the user [%s]",
+			interface.Nickname().String())
 	}
 
 	return result;
@@ -400,8 +394,7 @@ void
 UserUsageConditionsWindow::_SetWorkerThread(thread_id thread)
 {
 	if (!Lock()) {
-		if (Logger::IsInfoEnabled())
-			fprintf(stderr, "failed to lock window\n");
+		HDERROR("failed to lock window")
 	} else {
 		fWorkerThread = thread;
 		Unlock();

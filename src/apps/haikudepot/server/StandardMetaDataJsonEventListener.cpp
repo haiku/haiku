@@ -1,12 +1,12 @@
 /*
- * Copyright 2017, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 
 #include "StandardMetaDataJsonEventListener.h"
 
-#include "stdio.h"
+#include "Logger.h"
 
 
 #define KEY_CREATE_TIMESTAMP "createTimestamp"
@@ -384,8 +384,8 @@ void
 StandardMetaDataJsonEventListener::HandleError(status_t status, int32 line,
 	const char* message)
 {
-	fprintf(stderr, "an error has arisen processing the standard "
-		"meta data; %s\n", message);
+	HDERROR("an error has arisen processing the standard "
+		"meta data; %s", message)
 	fErrorStatus = status;
 }
 

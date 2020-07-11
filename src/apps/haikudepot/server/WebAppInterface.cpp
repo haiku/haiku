@@ -6,8 +6,6 @@
 
 #include "WebAppInterface.h"
 
-#include <stdio.h>
-
 #include <Application.h>
 #include <HttpHeaders.h>
 #include <HttpRequest.h>
@@ -35,10 +33,9 @@
 
 class ProtocolListener : public BUrlProtocolListener {
 public:
-	ProtocolListener(bool traceLogging)
+	ProtocolListener()
 		:
-		fDownloadIO(NULL),
-		fTraceLogging(traceLogging)
+		fDownloadIO(NULL)
 	{
 	}
 
@@ -86,8 +83,7 @@ public:
 	virtual void DebugMessage(BUrlRequest* caller,
 		BUrlProtocolDebugMessage type, const char* text)
 	{
-		if (fTraceLogging)
-			printf("jrpc: %s\n", text);
+		HDTRACE("jrpc: %s", text)
 	}
 
 	void SetDownloadIO(BDataIO* downloadIO)
@@ -97,7 +93,6 @@ public:
 
 private:
 	BDataIO*		fDownloadIO;
-	bool			fTraceLogging;
 };
 
 
@@ -342,7 +337,7 @@ WebAppInterface::UnpackUserDetail(BMessage& responseEnvelopeMessage,
 		"result", &resultMessage);
 
 	if (result != B_OK) {
-		fprintf(stderr, "bad response envelope missing 'result' entry\n");
+		HDERROR("bad response envelope missing 'result' entry");
 		return result;
 	}
 
@@ -405,7 +400,7 @@ WebAppInterface::RetrieveUserUsageConditions(const BString& code,
 
 	BMessage resultMessage;
 	if (responseEnvelopeMessage.FindMessage("result", &resultMessage) != B_OK) {
-		fprintf(stderr, "bad response envelope missing 'result' entry\n");
+		HDERROR("bad response envelope missing 'result' entry")
 		return B_BAD_DATA;
 	}
 
@@ -414,10 +409,10 @@ WebAppInterface::RetrieveUserUsageConditions(const BString& code,
 	BString copyMarkdown;
 
 	if ( (resultMessage.FindString("code", &metaDataCode) != B_OK)
-		|| (resultMessage.FindDouble(
-			"minimumAge", &metaDataMinimumAge) != B_OK) ) {
-		printf("unexpected response from server with missing user usage "
-			"conditions data\n");
+			|| (resultMessage.FindDouble(
+				"minimumAge", &metaDataMinimumAge) != B_OK) ) {
+		HDERROR("unexpected response from server with missing user usage "
+			"conditions data")
 		return B_BAD_DATA;
 	}
 
@@ -811,48 +806,40 @@ WebAppInterface::_SendJsonRequest(const char* domain,
 	size_t requestDataSize, uint32 flags, BMessage& reply) const
 {
 	if (requestDataSize == 0) {
-		if (Logger::IsInfoEnabled())
-			printf("jrpc; empty request payload\n");
+		HDINFO("jrpc; empty request payload")
 		return B_ERROR;
 	}
 
 	if (!ServerHelper::IsNetworkAvailable()) {
-		if (Logger::IsDebugEnabled()) {
-			printf("jrpc; dropping request to ...[%s] as network is not "
-				"available\n", domain);
-		}
+		HDDEBUG("jrpc; dropping request to ...[%s] as network is not"
+		 	" available", domain)
 		delete requestData;
 		return HD_NETWORK_INACCESSIBLE;
 	}
 
 	if (ServerSettings::IsClientTooOld()) {
-		if (Logger::IsDebugEnabled()) {
-			printf("jrpc; dropping request to ...[%s] as client is too "
-				"old\n", domain);
-		}
+		HDDEBUG("jrpc; dropping request to ...[%s] as client is too old",
+			domain)
 		delete requestData;
 		return HD_CLIENT_TOO_OLD;
 	}
 
 	BUrl url = ServerSettings::CreateFullUrl(BString("/__api/v1/") << domain);
 	bool isSecure = url.Protocol() == "https";
-
-	if (Logger::IsDebugEnabled()) {
-		printf("jrpc; will make request to [%s]\n",
-			url.UrlString().String());
-	}
+	HDDEBUG("jrpc; will make request to [%s]", url.UrlString().String())
 
 	// If the request payload is logged then it must be copied to local memory
 	// from the stream.  This then requires that the request data is then
 	// delivered from memory.
 
 	if (Logger::IsTraceEnabled()) {
+		HDLOGPREFIX(LOG_LEVEL_TRACE)
 		printf("jrpc request; ");
 		_LogPayload(requestData, requestDataSize);
 		printf("\n");
 	}
 
-	ProtocolListener listener(Logger::IsTraceEnabled());
+	ProtocolListener listener;
 	BUrlContext context;
 
 	BHttpHeaders headers;
@@ -886,10 +873,8 @@ WebAppInterface::_SendJsonRequest(const char* domain,
 
 	int32 statusCode = result.StatusCode();
 
-	if (Logger::IsDebugEnabled()) {
-		printf("jrpc; did receive http-status [%" B_PRId32 "] "
-			"from [%s]\n", statusCode, url.UrlString().String());
-	}
+	HDDEBUG("jrpc; did receive http-status [%" B_PRId32 "] from [%s]",
+		statusCode, url.UrlString().String())
 
 	switch (statusCode) {
 		case B_HTTP_STATUS_OK:
@@ -900,14 +885,15 @@ WebAppInterface::_SendJsonRequest(const char* domain,
 			return HD_CLIENT_TOO_OLD;
 
 		default:
-			printf("jrpc request to endpoint [.../%s] failed with http "
-				"status [%" B_PRId32 "]\n", domain, statusCode);
+			HDERROR("jrpc request to endpoint [.../%s] failed with http "
+				"status [%" B_PRId32 "]\n", domain, statusCode)
 			return B_ERROR;
 	}
 
 	replyData.Seek(0, SEEK_SET);
 
 	if (Logger::IsTraceEnabled()) {
+		HDLOGPREFIX(LOG_LEVEL_TRACE)
 		printf("jrpc response; ");
 		_LogPayload(&replyData, replyData.BufferLength());
 		printf("\n");
@@ -920,7 +906,7 @@ WebAppInterface::_SendJsonRequest(const char* domain,
 	if (Logger::IsTraceEnabled() && status == B_BAD_DATA) {
 		BString resultString(static_cast<const char *>(replyData.Buffer()),
 			replyData.BufferLength());
-		printf("Parser choked on JSON:\n%s\n", resultString.String());
+		HDERROR("Parser choked on JSON:\n%s", resultString.String())
 	}
 	return status;
 }
@@ -946,7 +932,7 @@ WebAppInterface::_SendRawGetRequest(const BString urlPathComponents,
 	BUrl url = ServerSettings::CreateFullUrl(urlPathComponents);
 	bool isSecure = url.Protocol() == "https";
 
-	ProtocolListener listener(Logger::IsTraceEnabled());
+	ProtocolListener listener;
 	listener.SetDownloadIO(stream);
 
 	BHttpHeaders headers;
@@ -967,8 +953,8 @@ WebAppInterface::_SendRawGetRequest(const BString urlPathComponents,
 	if (statusCode == 200)
 		return B_OK;
 
-	fprintf(stderr, "failed to get data from '%s': %" B_PRIi32 "\n",
-		url.UrlString().String(), statusCode);
+	HDERROR("failed to get data from '%s': %" B_PRIi32 "",
+		url.UrlString().String(), statusCode)
 	return B_ERROR;
 }
 
@@ -983,7 +969,7 @@ WebAppInterface::_LogPayload(BPositionIO* requestData, size_t size)
 		size = LOG_PAYLOAD_LIMIT;
 
 	if (B_OK != requestData->ReadExactly(buffer, size)) {
-		printf("jrpc; error logging payload\n");
+		printf("jrpc; error logging payload");
 	} else {
 		for (uint32 i = 0; i < size; i++) {
     		bool esc = buffer[i] > 126 ||

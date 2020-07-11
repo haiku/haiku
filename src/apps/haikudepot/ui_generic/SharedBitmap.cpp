@@ -1,12 +1,12 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2020, Andrew Lindesay <apl@lindesay.co.nz>
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 #include "SharedBitmap.h"
 
 #include <algorithm>
-#include <stdio.h>
 
 #include <Application.h>
 #include <Bitmap.h>
@@ -16,6 +16,8 @@
 #include <MimeType.h>
 #include <Resources.h>
 #include <TranslationUtils.h>
+
+#include "Logger.h"
 
 #include "support.h"
 
@@ -98,8 +100,8 @@ SharedBitmap::SharedBitmap(BPositionIO& data)
 		} else
 			fSize = 0;
 	} else {
-		fprintf(stderr, "SharedBitmap(): Stream too large: %" B_PRIi64
-			", max: %" B_PRIi64 "\n", fSize, kMaxSize);
+		HDERROR("SharedBitmap(): Stream too large: %" B_PRIi64
+			", max: %" B_PRIi64, fSize, kMaxSize)
 	}
 
 	fBitmap[0] = NULL;

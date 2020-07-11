@@ -1,5 +1,5 @@
 /*
- * Copyright 2018, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -89,9 +89,7 @@ LocalPkgDataLoadProcess::Description() const
 status_t
 LocalPkgDataLoadProcess::RunInternal()
 {
- 	if (Logger::IsDebugEnabled())
- 		printf("[%s] will refresh the package list\n", Name());
-
+ 	HDDEBUG("[%s] will refresh the package list", Name())
  	BPackageRoster roster;
  	BStringList repositoryNames;
 
@@ -111,16 +109,12 @@ LocalPkgDataLoadProcess::RunInternal()
 
  		if (getRepositoryConfigStatus == B_OK) {
  			depotInfo.SetURL(repoConfig.Identifier());
-
- 			if (Logger::IsDebugEnabled()) {
- 				printf("[%s] local repository [%s] info;\n"
- 					" * url [%s]\n", Name(), repoName.String(),
- 					repoConfig.Identifier().String());
- 			}
+ 			HDDEBUG("[%s] local repository [%s] identifier; [%s]",
+ 				Name(), repoName.String(), repoConfig.Identifier().String())
  		} else {
- 			printf("[%s] unable to obtain the repository config for local "
- 				"repository '%s'; %s\n", Name(),
- 				repoName.String(), strerror(getRepositoryConfigStatus));
+ 			HDINFO("[%s] unable to obtain the repository config for local "
+ 				"repository '%s'; %s", Name(),
+ 				repoName.String(), strerror(getRepositoryConfigStatus))
  		}
 
  		depots[i] = depotInfo;
@@ -226,18 +220,12 @@ LocalPkgDataLoadProcess::RunInternal()
  			}
 
  			if (it == depots.end()) {
- 				if (Logger::IsDebugEnabled()) {
- 					printf("pkg [%s] repository [%s] not recognized"
- 						" --> ignored\n",
- 						modelInfo->Name().String(), repositoryName.String());
- 				}
+ 				HDDEBUG("pkg [%s] repository [%s] not recognized --> ignored",
+ 					modelInfo->Name().String(), repositoryName.String())
  			} else {
  				it->AddPackage(modelInfo);
-
- 				if (Logger::IsTraceEnabled()) {
- 					printf("pkg [%s] assigned to [%s]\n",
- 						modelInfo->Name().String(), repositoryName.String());
- 				}
+ 				HDTRACE("pkg [%s] assigned to [%s]",
+ 					modelInfo->Name().String(), repositoryName.String());
  			}
 
  			remotePackages[modelInfo->Name()] = modelInfo;
@@ -363,20 +351,19 @@ LocalPkgDataLoadProcess::RunInternal()
  			}
  		}
 	} catch (BFatalErrorException& ex) {
- 		printf("Fatal exception occurred while resolving system dependencies: "
- 			"%s, details: %s\n", strerror(ex.Error()), ex.Details().String());
+ 		HDERROR("Fatal exception occurred while resolving system dependencies: "
+ 			"%s, details: %s", strerror(ex.Error()), ex.Details().String())
 	} catch (BNothingToDoException&) {
  		// do nothing
 	} catch (BException& ex) {
- 		printf("Exception occurred while resolving system dependencies: %s\n",
- 			ex.Message().String());
+ 		HDERROR("Exception occurred while resolving system dependencies: %s",
+ 			ex.Message().String())
  	} catch (...) {
- 		printf("Unknown exception occurred while resolving system "
- 			"dependencies.\n");
+ 		HDERROR("Unknown exception occurred while resolving system "
+ 			"dependencies.")
  	}
 
- 	if (Logger::IsDebugEnabled())
- 		printf("did refresh the package list\n");
+ 	HDDEBUG("did refresh the package list")
 
  	return B_OK;
 }
@@ -385,8 +372,8 @@ LocalPkgDataLoadProcess::RunInternal()
 void
 LocalPkgDataLoadProcess::_NotifyError(const BString& messageText) const
 {
-	printf("an error has arisen loading data of packages from local : %s\n",
-		messageText.String());
+	HDERROR("an error has arisen loading data of packages from local : %s",
+		messageText.String())
 	AppUtils::NotifySimpleError(
 		B_TRANSLATE("Local repository load error"),
 		messageText);

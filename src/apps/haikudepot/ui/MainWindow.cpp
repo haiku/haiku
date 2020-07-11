@@ -302,7 +302,7 @@ MainWindow::MessageReceived(BMessage* message)
 			if (message->FindInt64(KEY_ERROR_STATUS, &errorStatus64) == B_OK)
 				_BulkLoadCompleteReceived((status_t) errorStatus64);
 			else
-				printf("! expected [%s] value in message\n", KEY_ERROR_STATUS);
+				HDERROR("expected [%s] value in message", KEY_ERROR_STATUS)
 			break;
 		}
 		case B_SIMPLE_DATA:
@@ -412,11 +412,9 @@ MainWindow::MessageReceived(BMessage* message)
 				if (fPackageInfoView->Package()->Name() == name) {
 					_PopulatePackageAsync(true);
 				} else {
-					if (Logger::IsDebugEnabled()) {
-						printf("pkg [%s] is updated on the server, but is "
-							"not selected so will not be updated.\n",
-							name.String());
-					}
+					HDDEBUG("pkg [%s] is updated on the server, but is "
+						"not selected so will not be updated.",
+						name.String())
 				}
 			}
         	break;
@@ -823,8 +821,7 @@ MainWindow::_AdoptModelControls()
 void
 MainWindow::_AdoptModel()
 {
-	if (Logger::IsTraceEnabled())
-		printf("adopting model to main window ui\n");
+	HDTRACE("adopting model to main window ui")
 
 	if (fSinglePackageMode)
 		return;
@@ -1039,10 +1036,8 @@ MainWindow::_PopulatePackageAsync(bool forcePopulate)
 	}
 	release_sem_etc(fPackageToPopulateSem, 1, 0);
 
-	if (Logger::IsDebugEnabled()) {
-		printf("pkg [%s] will be updated from the server.\n",
-			fPackageToPopulate->Name().String());
-	}
+	HDDEBUG("pkg [%s] will be updated from the server.",
+		fPackageToPopulate->Name().String())
 }
 
 
@@ -1075,10 +1070,7 @@ MainWindow::_PopulatePackageWorker(void* arg)
 
 			window->fModel.PopulatePackage(package, populateFlags);
 
-			if (Logger::IsDebugEnabled()) {
-				printf("populating package [%s]\n",
-					package->Name().String());
-			}
+			HDDEBUG("populating package [%s]", package->Name().String())
 		}
 	}
 
@@ -1184,22 +1176,19 @@ MainWindow::_SelectedPackageHasWebAppRepositoryCode()
 	const BString depotName = package->DepotName();
 
 	if (depotName.IsEmpty()) {
-		if (Logger::IsDebugEnabled()) {
-			printf("the package [%s] has no depot name\n",
-				package->Name().String());
-		}
+		HDDEBUG("the package [%s] has no depot name", package->Name().String())
 	} else {
 		const DepotInfo* depot = fModel.DepotForName(depotName);
 
 		if (depot == NULL) {
-			printf("the depot [%s] was not able to be found\n",
-				depotName.String());
+			HDINFO("the depot [%s] was not able to be found",
+				depotName.String())
 		} else {
 			BString repositoryCode = depot->WebAppRepositoryCode();
 
 			if (repositoryCode.IsEmpty()) {
-				printf("the depot [%s] has no web app repository code\n",
-					depotName.String());
+				HDINFO("the depot [%s] has no web app repository code",
+					depotName.String())
 			} else {
 				return true;
 			}
@@ -1312,7 +1301,7 @@ MainWindow::UserUsageConditionsNotLatest(const UserDetail& userDetail)
 	BMessage detailsMessage;
 	if (userDetail.Archive(&detailsMessage, true) != B_OK
 			|| message.AddMessage("userDetail", &detailsMessage) != B_OK) {
-		printf("!! unable to archive the user detail into a message\n");
+		HDERROR("unable to archive the user detail into a message")
 	}
 	else
 		BMessenger(this).SendMessage(&message);
@@ -1337,18 +1326,14 @@ MainWindow::_AddProcessCoordinator(ProcessCoordinator* item)
 	if (fCoordinator.Get() == NULL) {
 		if (acquire_sem(fCoordinatorRunningSem) != B_OK)
 			debugger("unable to acquire the process coordinator sem");
-		if (Logger::IsInfoEnabled()) {
-			printf("adding and starting a process coordinator [%s]\n",
-				item->Name().String());
-		}
+		HDINFO("adding and starting a process coordinator [%s]",
+			item->Name().String())
 		fCoordinator = BReference<ProcessCoordinator>(item);
 		fCoordinator->Start();
 	}
 	else {
-		if (Logger::IsInfoEnabled()) {
-			printf("adding process coordinator [%s] to the queue\n",
-				item->Name().String());
-		}
+		HDINFO("adding process coordinator [%s] to the queue",
+			item->Name().String());
 		fCoordinatorQueue.push(item);
 	}
 }
@@ -1374,18 +1359,16 @@ MainWindow::_SpinUntilProcessCoordinatorComplete()
 void
 MainWindow::_StopProcessCoordinators()
 {
-	if (Logger::IsInfoEnabled())
-		printf("will stop all process coordinators\n");
+	HDINFO("will stop all process coordinators")
 
 	{
 		AutoLocker<BLocker> lock(&fCoordinatorLock);
 
 		while (!fCoordinatorQueue.empty()) {
-			BReference<ProcessCoordinator> processCoordinator = fCoordinatorQueue.front();
-			if (Logger::IsInfoEnabled()) {
-				printf("will drop queued process coordinator [%s]\n",
-					processCoordinator->Name().String());
-			}
+			BReference<ProcessCoordinator> processCoordinator
+				= fCoordinatorQueue.front();
+			HDINFO("will drop queued process coordinator [%s]",
+				processCoordinator->Name().String())
 			fCoordinatorQueue.pop();
 		}
 
@@ -1394,13 +1377,11 @@ MainWindow::_StopProcessCoordinators()
 		}
 	}
 
-	if (Logger::IsInfoEnabled())
-		printf("will wait until the process coordinator has stopped\n");
+	HDINFO("will wait until the process coordinator has stopped")
 
 	_SpinUntilProcessCoordinatorComplete();
 
-	if (Logger::IsInfoEnabled())
-		printf("did stop all process coordinators\n");
+	HDINFO("did stop all process coordinators")
 }
 
 
@@ -1419,10 +1400,8 @@ MainWindow::CoordinatorChanged(ProcessCoordinatorState& coordinatorState)
 		if (!coordinatorState.IsRunning()) {
 			if (release_sem(fCoordinatorRunningSem) != B_OK)
 				debugger("unable to release the process coordinator sem");
-			if (Logger::IsInfoEnabled()) {
-				printf("process coordinator [%s] did complete\n",
-					fCoordinator->Name().String());
-			}
+			HDINFO("process coordinator [%s] did complete",
+				fCoordinator->Name().String())
 			// complete the last one that just finished
 			BMessage* message = fCoordinator->Message();
 
@@ -1442,10 +1421,8 @@ MainWindow::CoordinatorChanged(ProcessCoordinatorState& coordinatorState)
 				if (acquire_sem(fCoordinatorRunningSem) != B_OK)
 					debugger("unable to acquire the process coordinator sem");
 				fCoordinator = fCoordinatorQueue.front();
-				if (Logger::IsInfoEnabled()) {
-					printf("starting next process coordinator [%s]\n",
-						fCoordinator->Name().String());
-				}
+				HDINFO("starting next process coordinator [%s]",
+					fCoordinator->Name().String());
 				fCoordinatorQueue.pop();
 				fCoordinator->Start();
 			}
@@ -1459,8 +1436,7 @@ MainWindow::CoordinatorChanged(ProcessCoordinatorState& coordinatorState)
 				// show the progress to the user.
 		}
 	} else {
-		if (Logger::IsInfoEnabled())
-			printf("! unknown process coordinator changed\n");
+		HDINFO("! unknown process coordinator changed")
 	}
 }
 

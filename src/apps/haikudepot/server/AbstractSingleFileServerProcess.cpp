@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -29,9 +29,7 @@ AbstractSingleFileServerProcess::~AbstractSingleFileServerProcess()
 status_t
 AbstractSingleFileServerProcess::RunInternal()
 {
-	if (Logger::IsInfoEnabled())
-		printf("[%s] will fetch data\n", Name());
-
+	HDINFO("[%s] will fetch data", Name())
 	BPath localPath;
 	status_t result = GetLocalPath(localPath);
 
@@ -58,15 +56,14 @@ AbstractSingleFileServerProcess::RunInternal()
 
 		if (!IsSuccess(result)) {
 			if (hasData) {
-				printf("[%s] failed to update data, but have old data "
-					"anyway so carry on with that\n", Name());
+				HDINFO("[%s] failed to update data, but have old data "
+					"anyway so carry on with that", Name())
 				result = B_OK;
 			} else {
-				printf("[%s] failed to obtain data\n", Name());
+				HDERROR("[%s] failed to obtain data", Name())
 			}
 		} else {
-			if (Logger::IsInfoEnabled())
-				printf("[%s] did fetch data\n", Name());
+			HDINFO("[%s] did fetch data", Name())
 		}
 	}
 
@@ -81,12 +78,12 @@ AbstractSingleFileServerProcess::RunInternal()
 	}
 
 	if (IsSuccess(result)) {
-		printf("[%s] will process data\n", Name());
+		HDINFO("[%s] will process data", Name())
 		result = ProcessLocalData();
 
 		switch (result) {
 			case B_OK:
-				printf("[%s] did process data\n", Name());
+				HDINFO("[%s] did process data", Name())
 				break;
 			default:
 				MoveDamagedFileAside(localPath);

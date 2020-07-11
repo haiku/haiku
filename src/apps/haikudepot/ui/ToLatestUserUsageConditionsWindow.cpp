@@ -211,8 +211,8 @@ ToLatestUserUsageConditionsWindow::QuitRequested()
 
 	if (fWorkerThread >= 0) {
 		if (Logger::IsDebugEnabled())
-			printf("quit requested while worker thread is operating -- will "
-				"try again once the worker thread has completed\n");
+			HDINFO("quit requested while worker thread is operating -- will "
+				"try again once the worker thread has completed")
 		fQuitRequestedDuringWorkerThread = true;
 		return false;
 	}

@@ -121,8 +121,8 @@ status_t
 ServerReferenceDataUpdateProcess::_ProcessNaturalLanguages(
 	DumpExportReference* data)
 {
-	printf("[%s] will populate %" B_PRId32 " natural languages\n",
-		Name(), data->CountNaturalLanguages());
+	HDINFO("[%s] will populate %" B_PRId32 " natural languages",
+		Name(), data->CountNaturalLanguages())
 
 	LanguageList result;
 
@@ -143,8 +143,8 @@ ServerReferenceDataUpdateProcess::_ProcessNaturalLanguages(
 		fModel->Language().AddSupportedLanguages(result);
 	}
 
-	printf("[%s] did add %" B_PRId32 " supported languages\n",
-		Name(), result.CountItems());
+	HDINFO("[%s] did add %" B_PRId32 " supported languages",
+		Name(), result.CountItems())
 
 	return B_OK;
 }
@@ -154,8 +154,8 @@ status_t
 ServerReferenceDataUpdateProcess::_ProcessPkgCategories(
 	DumpExportReference* data)
 {
-	printf("[%s] will populate %" B_PRId32 " pkg categories\n",
-		Name(), data->CountPkgCategories());
+	HDINFO("[%s] will populate %" B_PRId32 " pkg categories",
+		Name(), data->CountPkgCategories())
 
 	CategoryList result;
 

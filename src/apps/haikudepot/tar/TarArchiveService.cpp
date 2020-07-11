@@ -1,12 +1,10 @@
 /*
- * Copyright 2017-2018, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 
 #include "TarArchiveService.h"
-
-#include <stdio.h>
 
 #include <Directory.h>
 #include <File.h>
@@ -28,7 +26,7 @@ TarArchiveService::Unpack(BDataIO& tarDataIo, BPath& targetDirectory,
 	status_t result = B_OK;
 	uint32_t count_items_read = 0;
 
-	fprintf(stdout, "will unpack to [%s]\n", targetDirectory.Path());
+	HDINFO("will unpack to [%s]", targetDirectory.Path())
 
 	memset(zero_buffer, 0, sizeof zero_buffer);
 
@@ -39,15 +37,14 @@ TarArchiveService::Unpack(BDataIO& tarDataIo, BPath& targetDirectory,
 		count_items_read++;
 
 		if (0 == memcmp(zero_buffer, buffer, sizeof zero_buffer)) {
-			if (Logger::IsDebugEnabled())
-				printf("detected end of tar-ball\n");
+			HDDEBUG("detected end of tar-ball")
 			return B_OK; // end of tar-ball.
 		} else {
 			TarArchiveHeader* header = TarArchiveHeader::CreateFromBlock(
 				buffer);
 
 			if (NULL == header) {
-				fprintf(stderr, "unable to parse a tar header\n");
+				HDERROR("unable to parse a tar header")
 				result = B_ERROR;
 			}
 
@@ -58,11 +55,10 @@ TarArchiveService::Unpack(BDataIO& tarDataIo, BPath& targetDirectory,
 		}
 	}
 
-	fprintf(stdout, "did unpack %d tar items\n", count_items_read);
+	HDERROR("did unpack %d tar items", count_items_read)
 
 	if (B_OK != result) {
-		fprintf(stdout, "error occurred unpacking tar items; %s\n",
-			strerror(result));
+		HDERROR("error occurred unpacking tar items; %s", strerror(result))
 	}
 
 	return result;
@@ -83,7 +79,7 @@ TarArchiveService::_EnsurePathToTarItemFile(
 		BString component = components.StringAt(i);
 
 		if (_ValidatePathComponent(component) != B_OK) {
-			fprintf(stdout, "malformed component; [%s]\n", component.String());
+			HDERROR("malformed component; [%s]", component.String())
 			return B_ERROR;
 		}
 	}
@@ -112,10 +108,8 @@ TarArchiveService::_UnpackItem(BDataIO& tarDataIo,
 	BString entryFileName = header.GetFileName();
 	uint32 entryLength = header.GetLength();
 
-	if (Logger::IsDebugEnabled()) {
-		fprintf(stdout, "will unpack item [%s] length [%" B_PRIu32 "]b\n",
-			entryFileName.String(), entryLength);
-	}
+	HDDEBUG("will unpack item [%s] length [%" B_PRIu32 "]b",
+		entryFileName.String(), entryLength)
 
 	// if the path ends in "/" then it is a directory and there's no need to
 	// unpack it although if there is a length, it will need to be skipped.
@@ -172,8 +166,7 @@ TarArchiveService::_UnpackItemData(BDataIO& tarDataIo,
 	}
 
 	if (result != B_OK)
-		fprintf(stdout, "unable to unpack item data to; [%s]\n",
-			targetFilePath.Path());
+		HDERROR("unable to unpack item data to; [%s]", targetFilePath.Path())
 
 	return result;
 }

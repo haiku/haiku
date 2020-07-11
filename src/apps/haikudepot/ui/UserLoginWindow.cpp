@@ -8,7 +8,6 @@
 
 #include <algorithm>
 #include <ctype.h>
-#include <stdio.h>
 
 #include <mail_encoding.h>
 
@@ -158,8 +157,8 @@ UserLoginWindow::UserLoginWindow(BWindow* parent, BRect frame, Model& model)
 			languagesMenu);
 		languagesMenu->SetTargetForItems(this);
 
-		printf("using preferred language code [%s]\n",
-			fPreferredLanguageCode.String());
+		HDINFO("using preferred language code [%s]",
+			fPreferredLanguageCode.String())
 		LanguageMenuUtils::MarkLanguageInMenu(fPreferredLanguageCode,
 			languagesMenu);
 	}
@@ -299,7 +298,7 @@ UserLoginWindow::MessageReceived(BMessage* message)
 		}
 
 		case MSG_CREATE_ACCOUNT_SETUP_ERROR:
-			printf("failed to setup for account setup - window must quit\n");
+			HDERROR("failed to setup for account setup - window must quit")
 			BMessenger(this).SendMessage(B_QUIT_REQUESTED);
 			break;
 
@@ -371,8 +370,8 @@ UserLoginWindow::QuitRequested()
 
 	if (fWorkerThread >= 0) {
 		if (Logger::IsDebugEnabled())
-			printf("quit requested while worker thread is operating -- will "
-				"try again once the worker thread has completed\n");
+			HDINFO("quit requested while worker thread is operating -- will "
+				"try again once the worker thread has completed")
 		fQuitRequestedDuringWorkerThread = true;
 		return false;
 	}
@@ -531,9 +530,9 @@ UserLoginWindow::_AuthenticateThread(UserCredentials& userCredentials)
 
 		if (Logger::IsDebugEnabled()) {
 			if (token.IsEmpty())
-				printf("authentication failed\n");
+				HDINFO("authentication failed")
 			else
-				printf("authentication successful\n");
+				HDINFO("authentication successful")
 		}
 
 		BMessenger messenger(this);
@@ -751,9 +750,8 @@ UserLoginWindow::_CreateAccountSetupThreadEntry(void* data)
 			}
 		}
 		if (result == B_OK) {
-			if (Logger::IsDebugEnabled())
-				printf("successfully completed collection of create account "
-					"data from the server in background thread\n");
+			HDDEBUG("successfully completed collection of create account "
+				"data from the server in background thread")
 			messenger.SendMessage(&message);
 		} else {
 			debugger("unable to configure the "
@@ -887,9 +885,7 @@ UserLoginWindow::_UnpackCaptcha(BMessage& responsePayload, Captcha& captcha)
 void
 UserLoginWindow::_HandleCreateAccountSetupSuccess(BMessage* message)
 {
-	if (Logger::IsDebugEnabled())
-		printf("handling account setup success\n");
-
+	HDDEBUG("handling account setup success")
 	BMessage captchaMessage;
 	BMessage userUsageConditionsMessage;
 
@@ -909,8 +905,7 @@ UserLoginWindow::_HandleCreateAccountSetupSuccess(BMessage* message)
 void
 UserLoginWindow::_SetCaptcha(Captcha* captcha)
 {
-	if (Logger::IsDebugEnabled())
-		printf("setting captcha\n");
+	HDDEBUG("setting captcha")
 	if (fCaptcha != NULL)
 		delete fCaptcha;
 	fCaptcha = captcha;
@@ -936,8 +931,7 @@ void
 UserLoginWindow::_SetUserUsageConditions(
 	UserUsageConditions* userUsageConditions)
 {
-	if (Logger::IsDebugEnabled())
-		printf("setting user usage conditions\n");
+	HDDEBUG("setting user usage conditions")
 	if (fUserUsageConditions != NULL)
 		delete fUserUsageConditions;
 	fUserUsageConditions = userUsageConditions;
@@ -1275,8 +1269,8 @@ UserLoginWindow::_CreateAccountThread(CreateUserDetail* detail)
 					BString debugString;
 					_ValidationFailuresToString(validationFailures,
 						debugString);
-					printf("create account validation issues; %s\n",
-						debugString.String());
+					HDDEBUG("create account validation issues; %s",
+						debugString.String())
 				}
 				BMessage validationFailuresMessage;
 				validationFailures.Archive(&validationFailuresMessage);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2019-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #include "LanguageMenuUtils.h"
@@ -23,8 +23,8 @@
 LanguageMenuUtils::AddLanguagesToMenu(
 	const LanguageList& languages, BMenu* menu)
 {
-	if (languages.IsEmpty() && Logger::IsInfoEnabled())
-		printf("there are no languages defined\n");
+	if (languages.IsEmpty())
+		HDINFO("there are no languages defined")
 
 	int32 addedPopular = LanguageMenuUtils::_AddLanguagesToMenu(
 		languages, menu, true);
@@ -35,11 +35,9 @@ LanguageMenuUtils::AddLanguagesToMenu(
 	int32 addedNonPopular = LanguageMenuUtils::_AddLanguagesToMenu(
 		languages, menu, false);
 
-	if (Logger::IsDebugEnabled()) {
-		printf("did add %" B_PRId32 " popular languages and %" B_PRId32
-			" non-popular languages to a menu\n", addedPopular,
-			addedNonPopular);
-	}
+	HDDEBUG("did add %" B_PRId32 " popular languages and %" B_PRId32
+		" non-popular languages to a menu", addedPopular,
+		addedNonPopular)
 }
 
 
@@ -56,8 +54,8 @@ LanguageMenuUtils::MarkLanguageInMenu(
 		languageCode, menu);
 
 	if (index == -1) {
-		printf("unable to find the language [%s] in the menu\n",
-			languageCode.String());
+		HDINFO("unable to find the language [%s] in the menu",
+			languageCode.String())
 		menu->ItemAt(0)->SetMarked(true);
 	}
 	else

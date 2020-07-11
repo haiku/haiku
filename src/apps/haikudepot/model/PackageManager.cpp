@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017, Haiku, Inc. All Rights Reserved.
+ * Copyright 2013-2020, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,12 +7,11 @@
  * 		Stephan Aßmus <superstippi@gmx.de>
  * 		Rene Gollent <rene@gollent.com>
  *		Julian Harnath <julian.harnath@rwth-aachen.de>
+ *		Andrew Lindesay <apl@lindesay.co.nz>
  */
 
 
 #include "PackageManager.h"
-
-#include <stdio.h>
 
 #include <Alert.h>
 #include <Catalog.h>
@@ -36,6 +35,7 @@
 
 #include "AutoDeleter.h"
 #include "AutoLocker.h"
+#include "Logger.h"
 #include "Model.h"
 #include "PackageInfo.h"
 #include "ProblemWindow.h"
@@ -163,19 +163,18 @@ public:
 			ref->SetState(state);
 			return ex.Error();
 		} catch (BAbortedByUserException& ex) {
-			fprintf(stderr, "Installation of package "
-				"%s aborted by user: %s\n", packageNameString,
-				ex.Message().String());
+			HDINFO("Installation of package %s is aborted by user: %s",
+				packageNameString, ex.Message().String())
 			_SetDownloadedPackagesState(NONE);
 			ref->SetState(state);
 			return B_OK;
 		} catch (BNothingToDoException& ex) {
-			fprintf(stderr, "Nothing to do while installing package "
-				"%s: %s\n", packageNameString, ex.Message().String());
+			HDINFO("Nothing to do while installing package %s: %s",
+				packageNameString, ex.Message().String())
 			return B_OK;
 		} catch (BException& ex) {
-			fprintf(stderr, "Exception occurred while installing package "
-				"%s: %s\n", packageNameString, ex.Message().String());
+			HDERROR("Exception occurred while installing package %s: %s",
+				packageNameString, ex.Message().String())
 			_SetDownloadedPackagesState(NONE);
 			ref->SetState(state);
 			return B_ERROR;
@@ -291,8 +290,8 @@ public:
 		} catch (BNothingToDoException& ex) {
 			return B_OK;
 		} catch (BException& ex) {
-			fprintf(stderr, "Exception occurred while uninstalling package "
-				"%s: %s\n", packageName, ex.Message().String());
+			HDERROR("Exception occurred while uninstalling package %s: %s",
+				packageName, ex.Message().String())
 			ref->SetState(state);
 			return B_ERROR;
 		}
@@ -390,9 +389,9 @@ public:
 	{
 		BString path = MakePath(entry);
 		if (path.FindFirst("data/deskbar/menu") == 0
-			&& entry->SymlinkPath() != NULL) {
-			printf("found deskbar entry: %s -> %s\n", path.String(),
-				entry->SymlinkPath());
+				&& entry->SymlinkPath() != NULL) {
+			HDINFO("found deskbar entry: %s -> %s",
+				path.String(), entry->SymlinkPath())
 			fDeskbarLinks.Add(DeskbarLink(path, entry->SymlinkPath()));
 		}
 		return B_OK;
@@ -464,7 +463,7 @@ public:
 		BPath path;
 		if (fDeskbarLink.link.FindFirst('/') == 0) {
 			status = path.SetTo(fDeskbarLink.link);
-			printf("trying to launch (absolute link): %s\n", path.Path());
+			HDINFO("trying to launch (absolute link): %s", path.Path())
 		} else {
 			int32 location = InstallLocation();
 			if (location == B_PACKAGE_INSTALLATION_LOCATION_SYSTEM) {
@@ -484,7 +483,7 @@ public:
 				status = path.GetParent(&path);
 			if (status == B_OK) {
 				status = path.Append(fDeskbarLink.link, true);
-				printf("trying to launch: %s\n", path.Path());
+				HDINFO("trying to launch: %s", path.Path())
 			}
 		}
 
@@ -518,8 +517,8 @@ public:
 				return false;
 			}
 		} else {
-			printf("OpenPackageAction::FindAppToLaunch(): "
-				"unknown install location");
+			HDINFO("OpenPackageAction::FindAppToLaunch(): "
+				"unknown install location")
 			return false;
 		}
 
@@ -530,9 +529,9 @@ public:
 
 		status_t status = reader.Init(packagePath.Path());
 		if (status != B_OK) {
-			printf("OpenPackageAction::FindAppToLaunch(): "
-				"failed to init BPackageReader(%s): %s\n",
-				packagePath.Path(), strerror(status));
+			HDINFO("OpenPackageAction::FindAppToLaunch(): "
+				"failed to init BPackageReader(%s): %s",
+				packagePath.Path(), strerror(status))
 			return false;
 		}
 
@@ -540,9 +539,9 @@ public:
 		DeskbarLinkFinder contentHandler(foundLinks);
 		status = reader.ParseContent(&contentHandler);
 		if (status != B_OK) {
-			printf("OpenPackageAction::FindAppToLaunch(): "
-				"failed parse package contents (%s): %s\n",
-				packagePath.Path(), strerror(status));
+			HDINFO("OpenPackageAction::FindAppToLaunch(): "
+				"failed parse package contents (%s): %s",
+				packagePath.Path(), strerror(status))
 			return false;
 		}
 
@@ -635,12 +634,12 @@ PackageManager::RefreshRepository(const BRepositoryConfig& repoConfig)
 	try {
 		result = BPackageManager::RefreshRepository(repoConfig);
 	} catch (BFatalErrorException& ex) {
-		fprintf(stderr, "Fatal error occurred while refreshing repository: "
-			"%s (%s)\n", ex.Message().String(), ex.Details().String());
+		HDERROR("Fatal error occurred while refreshing repository: "
+			"%s (%s)", ex.Message().String(), ex.Details().String())
 		result = ex.Error();
 	} catch (BException& ex) {
-		fprintf(stderr, "Exception occurred while refreshing "
-			"repository: %s\n", ex.Message().String());
+		HDERROR("Exception occurred while refreshing "
+			"repository: %s\n", ex.Message().String())
 		result = B_ERROR;
 	}
 
@@ -657,13 +656,13 @@ PackageManager::DownloadPackage(const BString& fileURL,
 		result = BPackageManager::DownloadPackage(fileURL, targetEntry,
 			checksum);
 	} catch (BFatalErrorException& ex) {
-		fprintf(stderr, "Fatal error occurred while downloading package: "
-			"%s: %s (%s)\n", fileURL.String(), ex.Message().String(),
-			ex.Details().String());
+		HDERROR("Fatal error occurred while downloading package: "
+			"%s: %s (%s)", fileURL.String(), ex.Message().String(),
+			ex.Details().String())
 		result = ex.Error();
 	} catch (BException& ex) {
-		fprintf(stderr, "Exception occurred while downloading package "
-			"%s: %s\n", fileURL.String(), ex.Message().String());
+		HDERROR("Exception occurred while downloading package "
+			"%s: %s", fileURL.String(), ex.Message().String())
 		result = B_ERROR;
 	}
 

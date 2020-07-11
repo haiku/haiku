@@ -8,7 +8,6 @@
 #include "FeaturedPackagesView.h"
 
 #include <algorithm>
-#include <stdio.h>
 #include <vector>
 
 #include <Bitmap.h>
@@ -23,6 +22,7 @@
 
 #include "BitmapView.h"
 #include "HaikuDepotConstants.h"
+#include "Logger.h"
 #include "MainWindow.h"
 #include "MarkupTextView.h"
 #include "MessagePackageListener.h"
@@ -81,8 +81,9 @@ public:
 			case MSG_UPDATE_PACKAGE:
 			{
 				BString name;
-				if (message->FindString("name", &name) != B_OK)
-					printf("expected 'name' key on package update message\n");
+				if (message->FindString("name", &name) != B_OK) {
+					HDINFO("expected 'name' key on package update message")
+				}
 				else
 					_HandleUpdatePackage(name);
 				break;
@@ -653,7 +654,7 @@ FeaturedPackagesView::RemovePackage(const PackageInfoRef& package)
 void
 FeaturedPackagesView::Clear()
 {
-	printf("did clear the featured packages view\n");
+	HDINFO("did clear the featured packages view")
 	fPackagesView->Clear();
 	_AdjustViews();
 }

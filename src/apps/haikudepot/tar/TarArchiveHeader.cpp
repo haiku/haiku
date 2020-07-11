@@ -1,12 +1,11 @@
 /*
- * Copyright 2017, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 #include "TarArchiveHeader.h"
 
-#include <stdio.h>
-
+#include "Logger.h"
 
 #define OFFSET_FILENAME 0
 #define OFFSET_LENGTH 124
@@ -116,9 +115,9 @@ TarArchiveHeader::CreateFromBlock(const unsigned char* block)
 		LENGTH_CHECKSUM);
 
 	if(actualChecksum != expectedChecksum) {
-		fprintf(stderr, "tar archive header has bad checksum;"
-			"expected %" B_PRIu32 " actual %" B_PRIu32 "\n",
-			expectedChecksum, actualChecksum);
+		HDERROR("tar archive header has bad checksum;"
+			"expected %" B_PRIu32 " actual %" B_PRIu32,
+			expectedChecksum, actualChecksum)
 	} else {
 		return new TarArchiveHeader(
 			_ReadString(&block[OFFSET_FILENAME], LENGTH_FILENAME),

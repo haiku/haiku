@@ -7,13 +7,12 @@
 
 #include "PackageInfo.h"
 
-#include <stdio.h>
-
 #include <FindDirectory.h>
 #include <package/PackageDefs.h>
 #include <package/PackageFlags.h>
 #include <Path.h>
 
+#include "Logger.h"
 
 // #pragma mark - Language
 
@@ -1176,16 +1175,16 @@ DepotInfo::SyncPackages(const PackageList& otherPackages)
 			}
 		}
 		if (!found) {
-			printf("%s: new package: '%s'\n", fName.String(),
-				otherPackage->Name().String());
+			HDINFO("%s: new package: '%s'", fName.String(),
+				otherPackage->Name().String())
 			fPackages.Add(otherPackage);
 		}
 	}
 
 	for (int32 i = packages.CountItems() - 1; i >= 0; i--) {
 		const PackageInfoRef& package = packages.ItemAtFast(i);
-		printf("%s: removing package: '%s'\n", fName.String(),
-			package->Name().String());
+		HDINFO("%s: removing package: '%s'", fName.String(),
+			package->Name().String())
 		fPackages.Remove(package);
 	}
 }
