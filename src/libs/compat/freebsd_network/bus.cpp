@@ -113,8 +113,8 @@ static int
 bus_alloc_mem_resource(device_t dev, struct resource *res, pci_info *info,
 	int bar_index)
 {
-	uint32 addr = info->u.h0.base_registers[bar_index];
-	uint32 size = info->u.h0.base_register_sizes[bar_index];
+	phys_addr_t addr = info->u.h0.base_registers[bar_index];
+	uint64 size = info->u.h0.base_register_sizes[bar_index];
 	uchar flags = info->u.h0.base_register_flags[bar_index];
 
 	// reject empty regions
@@ -126,6 +126,11 @@ bus_alloc_mem_resource(device_t dev, struct resource *res, pci_info *info,
 		return -1;
 
 	// TODO: check flags & PCI_address_prefetchable ?
+
+	if ((flags & PCI_address_type) == PCI_address_type_64) {
+		addr |= (uint64)info->u.h0.base_registers[bar_index + 1] << 32;
+		size |= (uint64)info->u.h0.base_register_sizes[bar_index + 1] << 32;
+	}
 
 	// enable this I/O resource
 	if (pci_enable_io(dev, SYS_RES_MEMORY) != 0)
