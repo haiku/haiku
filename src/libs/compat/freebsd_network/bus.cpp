@@ -110,29 +110,19 @@ bus_alloc_irq_resource(device_t dev, struct resource *res)
 
 
 static int
-bus_alloc_mem_resource(device_t dev, struct resource *res, int regid)
+bus_alloc_mem_resource(device_t dev, struct resource *res, pci_info *info,
+	int bar_index)
 {
-	pci_info *info = &((struct root_device_softc *)dev->root->softc)->pci_info;
-
-	// check the offset really is of a BAR
-	if (regid < PCI_base_registers || (regid % sizeof(uint32) != 0)
-		|| (regid >= PCI_base_registers + 6 * (int)sizeof(uint32)))
-		return -1;
-
-	// turn offset into array index
-	regid -= PCI_base_registers;
-	regid /= sizeof(uint32);
-
-	uint32 addr = info->u.h0.base_registers[regid];
-	uint32 size = info->u.h0.base_register_sizes[regid];
-	uchar flags = info->u.h0.base_register_flags[regid];
+	uint32 addr = info->u.h0.base_registers[bar_index];
+	uint32 size = info->u.h0.base_register_sizes[bar_index];
+	uchar flags = info->u.h0.base_register_flags[bar_index];
 
 	// reject empty regions
 	if (size == 0)
 		return -1;
 
 	// reject I/O space
-	if (flags & PCI_address_space)
+	if ((flags & PCI_address_space) != 0)
 		return -1;
 
 	// TODO: check flags & PCI_address_prefetchable ?
@@ -155,15 +145,43 @@ bus_alloc_mem_resource(device_t dev, struct resource *res, int regid)
 
 
 static int
-bus_alloc_ioport_resource(device_t dev, struct resource *res, int regid)
+bus_alloc_ioport_resource(device_t dev, struct resource *res, pci_info *info,
+	int bar_index)
 {
+	uint32 size = info->u.h0.base_register_sizes[bar_index];
+	uchar flags = info->u.h0.base_register_flags[bar_index];
+
+	// reject empty regions
+	if (size == 0)
+		return -1;
+
+	// reject memory space
+	if ((flags & PCI_address_space) == 0)
+		return -1;
+
 	// enable this I/O resource
 	if (pci_enable_io(dev, SYS_RES_IOPORT) != 0)
 		return -1;
 
 	res->r_bustag = X86_BUS_SPACE_IO;
-	res->r_bushandle = pci_read_config(dev, regid, 4) & PCI_address_io_mask;
+	res->r_bushandle = info->u.h0.base_registers[bar_index];
 	return 0;
+}
+
+
+static int
+bus_register_to_bar_index(pci_info *info, int regid)
+{
+	// check the offset really is of a BAR
+	if (regid < PCI_base_registers || (regid % sizeof(uint32) != 0)
+		|| (regid >= PCI_base_registers + 6 * (int)sizeof(uint32))) {
+		return -1;
+	}
+
+	// turn offset into array index
+	regid -= PCI_base_registers;
+	regid /= sizeof(uint32);
+	return regid;
 }
 
 
@@ -198,10 +216,17 @@ bus_alloc_resource(device_t dev, int type, int *rid, unsigned long start,
 			res->r_bushandle = info->u.h0.interrupt_line + *rid - 1;
 			result = 0;
 		}
-	} else if (type == SYS_RES_MEMORY)
-		result = bus_alloc_mem_resource(dev, res, *rid);
-	else if (type == SYS_RES_IOPORT)
-		result = bus_alloc_ioport_resource(dev, res, *rid);
+	} else if (type == SYS_RES_MEMORY || type == SYS_RES_IOPORT) {
+		pci_info *info
+			= &((struct root_device_softc *)dev->root->softc)->pci_info;
+		int bar_index = bus_register_to_bar_index(info, *rid);
+		if (bar_index >= 0) {
+			if (type == SYS_RES_MEMORY)
+				result = bus_alloc_mem_resource(dev, res, info, bar_index);
+			else
+				result = bus_alloc_ioport_resource(dev, res, info, bar_index);
+		}
+	}
 
 	if (result < 0) {
 		free(res);
