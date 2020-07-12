@@ -747,7 +747,6 @@ DownloadProgressView::_UpdateStatusText()
 	if (sShowSpeed && fBytesPerSecond != 0.0) {
 		// Draw speed info
 		char sizeBuffer[128];
-		buffer = "(";
 		// Get strings for current and expected size and remove the unit
 		// from the current size string if it's the same as the expected
 		// size unit.
@@ -762,21 +761,19 @@ DownloadProgressView::_UpdateStatusText()
 				expectedSize.String() + expectedSizeUnitPos) == 0) {
 			currentSize.Truncate(currentSizeUnitPos);
 		}
-		buffer << currentSize;
-		buffer << " ";
-		buffer << B_TRANSLATE_COMMENT("of", "...as in '12kB of 256kB'");
-		buffer << " ";
-		buffer << expectedSize;
-		buffer << ", ";
-		buffer << string_for_size(fBytesPerSecond, sizeBuffer,
-			sizeof(sizeBuffer));
-		buffer << B_TRANSLATE_COMMENT("/s)", "...as in 'per second'");
+
+		buffer = B_TRANSLATE("(%currentSize% of %expectedSize%, %rate%/s)");
+		buffer.ReplaceFirst("%currentSize%", currentSize);
+		buffer.ReplaceFirst("%expectedSize%", expectedSize);
+		buffer.ReplaceFirst("%rate%", string_for_size(fBytesPerSecond,
+				sizeBuffer, sizeof(sizeBuffer)));
+
 		float stringWidth = fInfoView->StringWidth(buffer.String());
 		if (stringWidth < fInfoView->Bounds().Width())
 			fInfoView->SetText(buffer.String());
 		else {
 			// complete string too wide, try with shorter version
-			buffer << string_for_size(fBytesPerSecond, sizeBuffer,
+			buffer = string_for_size(fBytesPerSecond, sizeBuffer,
 				sizeof(sizeBuffer));
 			buffer << B_TRANSLATE_COMMENT("/s)", "...as in 'per second'");
 			stringWidth = fInfoView->StringWidth(buffer.String());
