@@ -649,12 +649,11 @@ DrawingEngine::DrawArc(BRect r, const float& angle, const float& span,
 
 	make_rect_valid(r);
 	fPainter->AlignEllipseRect(&r, filled);
-	BRect clipped(r);
 
 	if (!filled)
-		extend_by_stroke_width(clipped, fPainter->PenSize());
+		extend_by_stroke_width(r, fPainter->PenSize());
 
-	clipped = fPainter->TransformAndClipRect(r);
+	BRect clipped(fPainter->TransformAndClipRect(r));
 
 	if (clipped.IsValid()) {
 		AutoFloatingOverlaysHider _(fGraphicsCard, clipped);
@@ -682,9 +681,7 @@ DrawingEngine::FillArc(BRect r, const float& angle, const float& span,
 
 	make_rect_valid(r);
 	fPainter->AlignEllipseRect(&r, true);
-	BRect clipped(r);
-
-	clipped = fPainter->TransformAndClipRect(r);
+	BRect clipped(fPainter->TransformAndClipRect(r));
 
 	if (clipped.IsValid()) {
 		AutoFloatingOverlaysHider _(fGraphicsCard, clipped);
