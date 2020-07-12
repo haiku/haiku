@@ -52,6 +52,13 @@ XfsSuperBlock::BlockSize() const
 }
 
 
+uint32
+XfsSuperBlock::DirBlockLog() const
+{
+	return sb_dirblklog;
+}
+
+
 uint8
 XfsSuperBlock::BlockLog() const
 {

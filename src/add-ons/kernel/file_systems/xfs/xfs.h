@@ -27,7 +27,7 @@ extern fs_volume_ops gxfsVolumeOps;
 #define XFS_SB_MAXSIZE 512
 #define BASICBLOCKLOG 9
 	// Log of block size should be 9
-#define BASICBLOCKSIZE 1 << BASICBLOCKLOG
+#define BASICBLOCKSIZE (1 << BASICBLOCKLOG)
 	// The size of a basic block should be 512
 
 
@@ -41,6 +41,7 @@ public:
 			uint8				BlockLog() const;
 			uint32				DirBlockSize() const;
 				// maximum 65536
+			uint32				DirBlockLog() const;
 			uint8				AgInodeBits() const;
 			uint8				InodesPerBlkLog() const;
 			uint8				AgBlocksLog() const;

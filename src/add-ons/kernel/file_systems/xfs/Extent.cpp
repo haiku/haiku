@@ -15,6 +15,11 @@ Extent::Extent(Inode* inode)
 }
 
 
+Extent::~Extent()
+{
+}
+
+
 void
 Extent::FillMapEntry(void* pointerToMap)
 {
@@ -56,7 +61,7 @@ Extent::FillBlockBuffer()
 	xfs_fsblock_t blockToRead = FSBLOCKS_TO_BASICBLOCKS(volume->BlockLog(),
 		((uint64)(agNo * numberOfBlocksInAg) + agBlockNo));
 
-	xfs_daddr_t readPos = blockToRead * (BASICBLOCKSIZE) + fMap->br_startoff;
+	xfs_daddr_t readPos = blockToRead * BASICBLOCKSIZE;
 
 	TRACE("blockToRead: (%ld), readPos: (%ld)\n", blockToRead, readPos);
 	if (read_pos(volume->Device(), readPos, fBlockBuffer, len) != len) {
@@ -75,7 +80,7 @@ Extent::Init()
 	if (fMap == NULL)
 		return B_NO_MEMORY;
 
-	ASSERT(BlockType() == true);
+	ASSERT(IsBlockType() == true);
 	void* pointerToMap = DIR_DFORK_PTR(fInode->Buffer());
 	FillMapEntry(pointerToMap);
 	ASSERT(fMap->br_blockcount == 1);
@@ -121,10 +126,10 @@ Extent::BlockFirstLeaf(ExtentBlockTail* tail)
 
 
 bool
-Extent::BlockType()
+Extent::IsBlockType()
 {
 	bool status = true;
-	if (fInode->NoOfBlocks() != 1)
+	if (fInode->BlockCount() != 1)
 		status = false;
 	if (fInode->Size() != fInode->DirBlockSize())
 		status = false;
@@ -158,11 +163,12 @@ Extent::GetNext(char* name, size_t* length, xfs_ino_t* ino)
 	TRACE("numberOfEntries:(%d)\n", numberOfEntries);
 
 	for (int i = 0; i < numberOfEntries; i++) {
-		TRACE("i:(%d)\n", i);
+		TRACE("EntryNumber:(%d)\n", i);
 		ExtentUnusedEntry* unusedEntry = (ExtentUnusedEntry*)entry;
 
 		if (B_BENDIAN_TO_HOST_INT16(unusedEntry->freetag) == DIR2_FREE_TAG) {
 			TRACE("Unused entry found\n");
+			i--;
 			entry = (void*)
 				((char*)entry + B_BENDIAN_TO_HOST_INT16(unusedEntry->length));
 			continue;

@@ -77,11 +77,12 @@ struct xfs_inode_t {
 			int8				Format() const;
 				// The format of the inode
 			xfs_fsize_t			Size() const;
-			xfs_rfsblock_t		NoOfBlocks() const;
+			xfs_rfsblock_t		BlockCount() const;
 			uint32				NLink() const;
 			uint16				Flags() const;
 			uint32				UserId() const;
 			uint32				GroupId() const;
+			xfs_extnum_t		DataExtentsCount() const;
 
 			uint16				di_magic;
 			uint16				di_mode;
@@ -154,8 +155,8 @@ public:
 
 			int8				Version() const { return fNode->Version(); }
 
-			xfs_rfsblock_t		NoOfBlocks() const
-									{ return fNode->NoOfBlocks(); }
+			xfs_rfsblock_t		BlockCount() const
+									{ return fNode->BlockCount(); }
 
 			char*				Buffer() { return fBuffer; }
 
@@ -179,6 +180,8 @@ public:
 			uint32				UserId() const { return fNode->UserId(); }
 			uint32				GroupId() const { return fNode->GroupId(); }
 			bool				HasFileTypeField() const;
+			xfs_extnum_t		DataExtentsCount() const
+									{ return fNode->DataExtentsCount(); }
 
 private:
 			status_t			GetFromDisk();

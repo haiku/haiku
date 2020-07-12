@@ -261,7 +261,7 @@ xfs_read_stat(fs_volume *_volume, fs_vnode *_node, struct stat *stat)
 	stat->st_type = 0;	// TODO
 
 	stat->st_size = inode->Size();
-	stat->st_blocks = inode->NoOfBlocks();
+	stat->st_blocks = inode->BlockCount();
 
 	inode->GetAccessTime(stat->st_atim);
 	inode->GetModificationTime(stat->st_mtim);

@@ -56,6 +56,9 @@ public:
 			uint32				DirBlockSize() const
 									{ return fSuperBlock.DirBlockSize(); }
 
+			uint32				DirBlockLog() const
+									{ return fSuperBlock.DirBlockLog(); }
+
 			uint8				AgInodeBits() const
 									{ return fSuperBlock.AgInodeBits(); }
 

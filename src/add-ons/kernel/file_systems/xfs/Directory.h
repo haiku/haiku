@@ -8,6 +8,7 @@
 
 #include "Extent.h"
 #include "Inode.h"
+#include "LeafDirectory.h"
 #include "ShortDirectory.h"
 
 
@@ -32,6 +33,9 @@ private:
 				// Short form Directory type
 			Extent*				fExtentDir;
 				// Extent form Directory type
+				// TODO: Rename all to block type
+			LeafDirectory*		fLeafDir;
+				// Extent based leaf directory
 };
 
 

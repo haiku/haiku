@@ -38,7 +38,7 @@ xfs_inode_t::SwapEndian()
 
 
 xfs_rfsblock_t
-xfs_inode_t::NoOfBlocks() const
+xfs_inode_t::BlockCount() const
 {
 	return di_nblocks;
 }
@@ -124,6 +124,13 @@ xfs_inode_t::Format() const
 }
 
 
+xfs_extnum_t
+xfs_inode_t::DataExtentsCount() const
+{
+	return di_nextents;
+}
+
+
 Inode::Inode(Volume* volume, xfs_ino_t id)
 	:
 	fVolume(volume),
@@ -195,7 +202,7 @@ Inode::GetFromDisk()
 	xfs_fsblock_t blockToRead = FSBLOCKS_TO_BASICBLOCKS(fVolume->BlockLog(),
 		((uint64)(agNo * numberOfBlocksInAg) + agBlock));
 
-	xfs_daddr_t readPos = blockToRead * (BASICBLOCKSIZE) + offset * len;
+	xfs_daddr_t readPos = blockToRead * BASICBLOCKSIZE + offset * len;
 
 	if (read_pos(fVolume->Device(), readPos, fBuffer, len) != len) {
 		ERROR("Inode::Inode(): IO Error");

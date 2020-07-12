@@ -15,8 +15,8 @@
 #define ASSERT(x) \
 	{ if (!(x)) kernel_debugger("xfs: assert failed: " #x "\n"); }
 #else
-#define TRACE(x...) ;
-#define ASSERT(x) ;
+#define TRACE(x...)
+#define ASSERT(x)
 #endif
 #define ERROR(x...) dprintf("\n\33[34mxfs:\33[0m " x)
 

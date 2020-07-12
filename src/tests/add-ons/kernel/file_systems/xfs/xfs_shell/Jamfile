@@ -44,6 +44,7 @@ local xfsSource =
 	Extent.cpp
 	Inode.cpp
 	kernel_interface.cpp
+	LeafDirectory.cpp
 	ShortDirectory.cpp
 	Volume.cpp
 	xfs.cpp

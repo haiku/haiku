@@ -31,23 +31,23 @@ enum ExtentState {
 
 // xfs_dir2_data_free_t
 struct FreeRegion {
-				uint16			offset;
-				uint16			length;
+			uint16				offset;
+			uint16				length;
 };
 
 
 // xfs_dir2_data_hdr_t
 struct ExtentDataHeader {
-				uint32			magic;
-				FreeRegion		bestfree[XFS_DIR2_DATA_FD_COUNT];
+			uint32				magic;
+			FreeRegion			bestfree[XFS_DIR2_DATA_FD_COUNT];
 };
 
 
 // xfs_dir2_data_entry_t
 struct ExtentDataEntry {
-				xfs_ino_t		inumber;
-				uint8			namelen;
-				uint8			name[];
+			xfs_ino_t			inumber;
+			uint8				namelen;
+			uint8				name[];
 
 // Followed by a file type (8bit) if applicable and a 16bit tag
 // tag is the offset from start of the block
@@ -56,28 +56,28 @@ struct ExtentDataEntry {
 
 // xfs_dir2_data_unused_t
 struct ExtentUnusedEntry {
-				uint16			freetag;
-					// takes the value 0xffff
-				uint16			length;
-					// freetag+length overrides the inumber of an entry
-				uint16			tag;
+			uint16				freetag;
+				// takes the value 0xffff
+			uint16				length;
+				// freetag+length overrides the inumber of an entry
+			uint16				tag;
 };
 
 
 // xfs_dir2_leaf_entry_t
 struct ExtentLeafEntry {
-				uint32			hashval;
-				uint32			address;
-					// offset into block after >> 3
+			uint32				hashval;
+			uint32				address;
+				// offset into block after >> 3
 };
 
 
 // xfs_dir2_block_tail_t
 struct ExtentBlockTail {
-				uint32			count;
-					// # of entries in leaf
-				uint32			stale;
-					// # of free leaf entries
+			uint32				count;
+				// # of entries in leaf
+			uint32				stale;
+				// # of free leaf entries
 };
 
 
@@ -99,7 +99,7 @@ public:
 								Extent(Inode* inode);
 								~Extent();
 			status_t			Init();
-			bool				BlockType();
+			bool				IsBlockType();
 			void				FillMapEntry(void* pointerToMap);
 			status_t			FillBlockBuffer();
 			ExtentBlockTail*	BlockTail();
