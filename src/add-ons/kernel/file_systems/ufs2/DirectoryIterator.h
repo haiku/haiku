@@ -47,13 +47,12 @@ public:
 			status_t			GetNext(char* name, size_t* _nameLength,
 										ino_t* _id);
 			status_t			_GetNext(const char* name, size_t* _nameLength,
-										ino_t* _id, int count);
+										ino_t* _id, int64_t* offset);
 			dir*				DirectContent() { return direct; }
 			dir_info*			DirectInfo() { return direct_info; }
-	static	int					countDir;
 
 private:
-
+			int 				fCountDir;
 			int64				fOffset;
 			cluster_t			fCluster;
 			Inode* 				fInode;
