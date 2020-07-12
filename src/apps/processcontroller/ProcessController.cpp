@@ -471,9 +471,13 @@ ProcessController::MessageReceived(BMessage *message)
 
 		case 'Schd':
 		{
-			int32 mode;
-			if (message->FindInt32 ("mode", &mode) == B_OK)
-				set_scheduler_mode(mode);
+			BMenuItem* source;
+			if (message->FindPointer("source", (void**)&source) != B_OK)
+				break;
+			if (!source->IsMarked())
+				set_scheduler_mode(SCHEDULER_MODE_POWER_SAVING);
+			else
+				set_scheduler_mode(SCHEDULER_MODE_LOW_LATENCY);
 			break;
 		}
 
@@ -842,19 +846,13 @@ thread_popup(void *arg)
 	}
 
 	// Scheduler modes
-	static const char* schedulerModes[] = { B_TRANSLATE_MARK("Low latency"),
-		B_TRANSLATE_MARK("Power saving") };
-	unsigned int modesCount = sizeof(schedulerModes) / sizeof(const char*);
 	int32 currentMode = get_scheduler_mode();
-	for (unsigned int i = 0; i < modesCount; i++) {
-		BMessage* m = new BMessage('Schd');
-		m->AddInt32("mode", i);
-		item = new BMenuItem(B_TRANSLATE(schedulerModes[i]), m);
-		if ((uint32)currentMode == i)
-			item->SetMarked(true);
-		item->SetTarget(gPCView);
-		addtopbottom(item);
-	}
+	BMessage* msg = new BMessage('Schd');
+	item = new BMenuItem(B_TRANSLATE("Power saving"), msg);
+	if ((uint32)currentMode == SCHEDULER_MODE_POWER_SAVING)
+		item->SetMarked(true);
+	item->SetTarget(gPCView);
+	addtopbottom(item);
 	addtopbottom(new BSeparatorItem());
 
 	if (!be_roster->IsRunning(kTrackerSig)) {
