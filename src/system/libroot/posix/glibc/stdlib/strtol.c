@@ -288,7 +288,7 @@ INTERNAL (strtol) (nptr, endptr, base, group LOCALE_PARAM)
     grouping = NULL;
 #endif
 
-  if (base < 0 || base == 1 || base > 36)
+  if (base < 0 || base == 1 || base > 36 || nptr == NULL)
     {
       __set_errno (EINVAL);
       return 0;

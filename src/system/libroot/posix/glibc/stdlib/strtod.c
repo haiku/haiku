@@ -494,6 +494,12 @@ INTERNAL (STRTOF) (nptr, endptr, group LOCALE_PARAM)
   struct locale_data *current = loc->__locales[LC_NUMERIC];
 #endif
 
+  if (nptr == NULL)
+  {
+      __set_errno (EINVAL);
+      return NAN;
+  }
+
   if (group)
     {
       grouping = _NL_CURRENT (LC_NUMERIC, GROUPING);
