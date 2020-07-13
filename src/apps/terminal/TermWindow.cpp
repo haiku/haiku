@@ -537,7 +537,8 @@ TermWindow::_SetupMenu()
 			.AddItem(fFontSizeMenu)
 			.AddItem(B_TRANSLATE("Save as default"), MSG_SAVE_AS_DEFAULT)
 			.AddSeparator()
-			.AddItem(B_TRANSLATE("Settings" B_UTF8_ELLIPSIS), MENU_PREF_OPEN)
+			.AddItem(B_TRANSLATE("Settings" B_UTF8_ELLIPSIS), MENU_PREF_OPEN,
+				',')
 		.End();
 
 	AddChild(fMenuBar);

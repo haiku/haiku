@@ -634,7 +634,7 @@ ExpanderWindow::_CreateMenuBar()
 	menu = new BMenu(B_TRANSLATE("Settings"));
 	menu->AddItem(fPreferencesItem
 		= new BMenuItem(B_TRANSLATE("Settings" B_UTF8_ELLIPSIS),
-			new BMessage(MSG_PREFERENCES), 'S'));
+			new BMessage(MSG_PREFERENCES), ','));
 	fBar->AddItem(menu);
 }
 

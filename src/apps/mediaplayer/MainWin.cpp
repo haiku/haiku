@@ -1567,7 +1567,7 @@ MainWin::_CreateMenu()
 		new BMessage(M_TOGGLE_ALWAYS_ON_TOP), 'A'));
 
 	item = new BMenuItem(B_TRANSLATE("Settings" B_UTF8_ELLIPSIS),
-		new BMessage(M_SETTINGS), 'S');
+		new BMessage(M_SETTINGS), ',');
 	fFileMenu->AddItem(item);
 	item->SetTarget(be_app);
 
