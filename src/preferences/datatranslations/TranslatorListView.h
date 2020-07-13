@@ -12,6 +12,7 @@
 
 
 #include <ListView.h>
+#include <String.h>
 #include <TranslationDefs.h>
 
 
@@ -21,9 +22,11 @@ public:
 	virtual					~TranslatorItem();
 
 			translator_id	ID() const { return fID; }
+			const BString&	Supertype() const { return fSupertype; }
 
 private:
 			translator_id	fID;
+			BString			fSupertype;
 };
 
 
