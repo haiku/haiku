@@ -13,5 +13,4 @@ resource(4, "META:EXTENS") message(234) {
 	"type" = "video/ogg"
 };
 
-resource(5, "META:SNIFF_RULE") "0.50 (\"OggS\")";
-
+resource(5, "META:SNIFF_RULE") "0.6 (\"OggS\") [28] (\"BBCD\\0\" | \"\\213JNG\\r\\n\\032\\n\" | \"\\212MNG\\r\\n\\032\\n\" | \"\\211PNG\\r\\n\\032\\n\" | \"\\x80theora\" | \"YUV4MPEG\")";
