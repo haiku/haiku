@@ -18,6 +18,7 @@ public:
 								ProxyVideoSupplier();
 	virtual						~ProxyVideoSupplier();
 
+	virtual	const media_format&	Format() const;
 	virtual	status_t			FillBuffer(int64 startFrame, void* buffer,
 									const media_raw_video_format& format,
 									bool forceGeneration, bool& wasCached);

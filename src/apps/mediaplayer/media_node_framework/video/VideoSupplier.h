@@ -8,6 +8,7 @@
 
 
 #include <SupportDefs.h>
+#include <MediaFormats.h>
 
 
 struct media_raw_video_format;
@@ -18,6 +19,7 @@ public:
 								VideoSupplier();
 	virtual						~VideoSupplier();
 
+	virtual	const media_format&	Format() const = 0;
 	virtual	status_t			FillBuffer(int64 startFrame, void* buffer,
 									const media_raw_video_format& format,
 									bool forceGeneration, bool& wasCached) = 0;

@@ -357,14 +357,22 @@ VideoProducer::PrepareToConnect(const media_source& source,
 		return B_MEDIA_BAD_FORMAT;
 	}
 
-	if (format->u.raw_video.display.line_width == 0)
-		format->u.raw_video.display.line_width = 384;
-	if (format->u.raw_video.display.line_count == 0)
-		format->u.raw_video.display.line_count = 288;
-	if (format->u.raw_video.field_rate == 0)
-		format->u.raw_video.field_rate = 25.0;
-	if (format->u.raw_video.display.bytes_per_row == 0)
-		format->u.raw_video.display.bytes_per_row = format->u.raw_video.display.line_width * 4;
+	if (format->u.raw_video.display.line_width == 0) {
+		format->u.raw_video.display.line_width
+			= fSupplier->Format().u.raw_video.display.line_width;
+	}
+	if (format->u.raw_video.display.line_count == 0) {
+		format->u.raw_video.display.line_count
+			= fSupplier->Format().u.raw_video.display.line_count;
+	}
+	if (format->u.raw_video.field_rate == 0) {
+		format->u.raw_video.field_rate
+			= fSupplier->Format().u.raw_video.field_rate;
+	}
+	if (format->u.raw_video.display.bytes_per_row == 0) {
+		format->u.raw_video.display.bytes_per_row
+			= fSupplier->Format().u.raw_video.display.bytes_per_row;
+	}
 
 	*outSource = fOutput.source;
 	strcpy(outName, fOutput.name);

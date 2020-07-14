@@ -28,6 +28,13 @@ ProxyVideoSupplier::~ProxyVideoSupplier()
 }
 
 
+const media_format&
+ProxyVideoSupplier::Format() const
+{
+	return fSupplier->Format();
+}
+
+
 status_t
 ProxyVideoSupplier::FillBuffer(int64 startFrame, void* buffer,
 	const media_raw_video_format& format, bool forceGeneration,
