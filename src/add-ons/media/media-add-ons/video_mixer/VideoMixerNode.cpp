@@ -25,7 +25,7 @@ using std::vector;
 
 VideoMixerNode::~VideoMixerNode(void)
 {
-	fprintf(stderr,"VideoMixerNode::~VideoMixerNode\n");
+	fprintf(stderr, "VideoMixerNode::~VideoMixerNode\n");
 	// Stop the BMediaEventLooper thread
 	Quit();
 }
@@ -39,7 +39,7 @@ VideoMixerNode::VideoMixerNode(
   	  BBufferProducer(B_MEDIA_RAW_VIDEO),	// Raw video buffers out
 	  BMediaEventLooper()
 {
-	fprintf(stderr,"VideoMixerNode::VideoMixerNode\n");
+	fprintf(stderr, "VideoMixerNode::VideoMixerNode\n");
 	// keep our creator around for AddOn calls later
 	fAddOn = addOn;
 	// NULL out our latency estimates
@@ -65,7 +65,7 @@ VideoMixerNode::VideoMixerNode(
 
 void VideoMixerNode::NodeRegistered(void)
 {
-	fprintf(stderr,"VideoMixerNode::NodeRegistered\n");
+	fprintf(stderr, "VideoMixerNode::NodeRegistered\n");
 
 	// for every node created so far set to this Node;
 	for (uint32 i=0;i<fConnectedInputs.size();i++) {
@@ -93,8 +93,8 @@ VideoMixerNode::CreateInput(uint32 inputID) {
 	ClearInput(input);
 
 	// don't overwrite available space, and be sure to terminate
-	sprintf(input->name, "VideoMixer Input %ld", inputID);
-	
+	sprintf(input->name, "VideoMixer Input %" B_PRIu32, inputID);
+
 	return input;
 }
 
@@ -154,14 +154,14 @@ VideoMixerNode::GetInput(const int32 id) {
 
 status_t VideoMixerNode::InitCheck(void) const
 {
-	fprintf(stderr,"VideoMixerNode::InitCheck\n");
+	fprintf(stderr, "VideoMixerNode::InitCheck\n");
 	return fInitCheckStatus;
 }
 
 status_t VideoMixerNode::GetConfigurationFor(
 				BMessage *into_message)
 {
-	fprintf(stderr,"VideoMixerNode::GetConfigurationFor\n");
+	fprintf(stderr, "VideoMixerNode::GetConfigurationFor\n");
 	return B_OK;
 }
 
@@ -172,7 +172,7 @@ status_t VideoMixerNode::GetConfigurationFor(
 BMediaAddOn *VideoMixerNode::AddOn(
 				int32 *internal_id) const
 {
-	fprintf(stderr,"VideoMixerNode::AddOn\n");
+	fprintf(stderr, "VideoMixerNode::AddOn\n");
 	// BeBook says this only gets called if we were in an add-on.
 	if (fAddOn != NULL) {
 		// If we get a null pointer then we just won't write.
@@ -185,7 +185,7 @@ BMediaAddOn *VideoMixerNode::AddOn(
 
 void VideoMixerNode::Start(bigtime_t performance_time)
 {
-	fprintf(stderr,"VideoMixerNode::Start(pt=%lld)\n", performance_time);
+	fprintf(stderr, "VideoMixerNode::Start(pt=%" B_PRIdBIGTIME ")\n", performance_time);
 	BMediaEventLooper::Start(performance_time);
 }
 
@@ -194,9 +194,11 @@ void VideoMixerNode::Stop(
 				bool immediate)
 {
 	if (immediate) {
-		fprintf(stderr,"VideoMixerNode::Stop(pt=%lld,<immediate>)\n", performance_time);
+		fprintf(stderr, "VideoMixerNode::Stop(pt=%" B_PRIdBIGTIME ",<immediate>)\n",
+			performance_time);
 	} else {
-		fprintf(stderr,"VideoMixerNode::Stop(pt=%lld,<scheduled>)\n", performance_time);
+		fprintf(stderr, "VideoMixerNode::Stop(pt=%" B_PRIdBIGTIME ",<scheduled>)\n",
+			performance_time);
 	}
 	BMediaEventLooper::Stop(performance_time, immediate);
 }
@@ -205,13 +207,14 @@ void VideoMixerNode::Seek(
 				bigtime_t media_time,
 				bigtime_t performance_time)
 {
-	fprintf(stderr,"VideoMixerNode::Seek(mt=%lld,pt=%lld)\n", media_time,performance_time);
+	fprintf(stderr, "VideoMixerNode::Seek(mt=%" B_PRIdBIGTIME ",pt=%" B_PRIdBIGTIME ")\n",
+		media_time, performance_time);
 	BMediaEventLooper::Seek(media_time, performance_time);
 }
 
 void VideoMixerNode::SetRunMode(run_mode mode)
 {
-	fprintf(stderr,"VideoMixerNode::SetRunMode(%i)\n", mode);
+	fprintf(stderr, "VideoMixerNode::SetRunMode(%i)\n", mode);
 	BMediaEventLooper::SetRunMode(mode);
 }
 
@@ -219,20 +222,21 @@ void VideoMixerNode::TimeWarp(
 				bigtime_t at_real_time,
 				bigtime_t to_performance_time)
 {
-	fprintf(stderr,"VideoMixerNode::TimeWarp(rt=%lld,pt=%lld)\n", at_real_time, to_performance_time);
+	fprintf(stderr, "VideoMixerNode::TimeWarp(rt=%" B_PRIdBIGTIME ",pt=%" B_PRIdBIGTIME ")\n",
+		at_real_time, to_performance_time);
 	BMediaEventLooper::TimeWarp(at_real_time, to_performance_time);
 }
 
 void VideoMixerNode::Preroll(void)
 {
-	fprintf(stderr,"VideoMixerNode::Preroll\n");
+	fprintf(stderr, "VideoMixerNode::Preroll\n");
 	// XXX:Performance opportunity
 	BMediaNode::Preroll();
 }
 
 void VideoMixerNode::SetTimeSource(BTimeSource *time_source)
 {
-	fprintf(stderr,"VideoMixerNode::SetTimeSource\n");
+	fprintf(stderr, "VideoMixerNode::SetTimeSource\n");
 	BMediaNode::SetTimeSource(time_source);
 }
 
@@ -241,7 +245,7 @@ status_t VideoMixerNode::HandleMessage(
 				const void *data,
 				size_t size)
 {
-	fprintf(stderr,"VideoMixerNode::HandleMessage\n");
+	fprintf(stderr, "VideoMixerNode::HandleMessage\n");
 	status_t status = B_OK;
 	switch (message) {
 		// no special messages for now
@@ -267,13 +271,13 @@ status_t VideoMixerNode::HandleMessage(
 
 status_t VideoMixerNode::RequestCompleted(const media_request_info &info)
 {
-	fprintf(stderr,"VideoMixerNode::RequestCompleted\n");
+	fprintf(stderr, "VideoMixerNode::RequestCompleted\n");
 	return BMediaNode::RequestCompleted(info);
 }
 
 status_t VideoMixerNode::DeleteHook(BMediaNode *node)
 {
-	fprintf(stderr,"VideoMixerNode::DeleteHook\n");
+	fprintf(stderr, "VideoMixerNode::DeleteHook\n");
 	return BMediaEventLooper::DeleteHook(node);
 }
 
@@ -281,7 +285,7 @@ status_t VideoMixerNode::GetNodeAttributes(
 				media_node_attribute *outAttributes,
 				size_t inMaxCount)
 {
-	fprintf(stderr,"VideoMixerNode::GetNodeAttributes\n");
+	fprintf(stderr, "VideoMixerNode::GetNodeAttributes\n");
 	return BMediaNode::GetNodeAttributes(outAttributes, inMaxCount);
 }
 
@@ -289,7 +293,7 @@ status_t VideoMixerNode::AddTimer(
 					bigtime_t at_performance_time,
 					int32 cookie)
 {
-	fprintf(stderr,"VideoMixerNode::AddTimer\n");
+	fprintf(stderr, "VideoMixerNode::AddTimer\n");
 	return BMediaEventLooper::AddTimer(at_performance_time, cookie);
 }
 
@@ -301,12 +305,12 @@ status_t VideoMixerNode::AddTimer(
 
 void VideoMixerNode::GetFlavor(flavor_info *outInfo, int32 id)
 {
-	fprintf(stderr,"VideoMixerNode::GetFlavor\n");
+	fprintf(stderr, "VideoMixerNode::GetFlavor\n");
 
 	if (outInfo != NULL) {
 		outInfo->internal_id = id;
-		strcpy(outInfo->name, "Haiku VideoMixer");
-		strcpy(outInfo->info, "A VideoMixerNode node mixes multiple video"
+		outInfo->name = strdup("Haiku VideoMixer");
+		outInfo->info = strdup("A VideoMixerNode node mixes multiple video"
 			" streams into a single stream.");
 		outInfo->kinds = B_BUFFER_CONSUMER | B_BUFFER_PRODUCER;
 		outInfo->flavor_flags = B_FLAVOR_IS_LOCAL;
@@ -324,7 +328,7 @@ void VideoMixerNode::GetFlavor(flavor_info *outInfo, int32 id)
 
 void VideoMixerNode::GetInputFormat(media_format *outFormat)
 {
-	fprintf(stderr,"VideoMixerNode::GetInputFormat\n");
+	fprintf(stderr, "VideoMixerNode::GetInputFormat\n");
 
 	if (outFormat != NULL) {
 		outFormat->type = B_MEDIA_RAW_VIDEO;
@@ -336,7 +340,7 @@ void VideoMixerNode::GetInputFormat(media_format *outFormat)
 
 void VideoMixerNode::GetOutputFormat(media_format *outFormat)
 {
-	fprintf(stderr,"VideoMixerNode::GetOutputFormat\n");
+	fprintf(stderr, "VideoMixerNode::GetOutputFormat\n");
 	if (outFormat != NULL) {
 		outFormat->type = B_MEDIA_RAW_VIDEO;
 		outFormat->require_flags = B_MEDIA_MAUI_UNDEFINED_FLAGS;
@@ -349,6 +353,6 @@ void VideoMixerNode::GetOutputFormat(media_format *outFormat)
 
 status_t VideoMixerNode::AddRequirements(media_format *format)
 {
-	fprintf(stderr,"VideoMixerNode::AddRequirements\n");
+	fprintf(stderr, "VideoMixerNode::AddRequirements\n");
 	return B_OK;
 }

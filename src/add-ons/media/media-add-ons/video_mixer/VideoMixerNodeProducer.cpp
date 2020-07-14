@@ -27,7 +27,7 @@ status_t VideoMixerNode::FormatSuggestionRequested(
 				int32 quality,
 				media_format * format)
 {
-	fprintf(stderr,"VideoMixerNode(BBufferProducer)::FormatSuggestionRequested\n");
+	fprintf(stderr, "VideoMixerNode(BBufferProducer)::FormatSuggestionRequested\n");
 
 	if (format->type == B_MEDIA_NO_TYPE) {
 		format->type = B_MEDIA_RAW_VIDEO;
@@ -49,7 +49,7 @@ status_t VideoMixerNode::FormatProposal(
 				const media_source &output_source,
 				media_format *format)
 {
-	fprintf(stderr,"VideoMixerNode(BBufferProducer)::FormatProposal\n");
+	fprintf(stderr, "VideoMixerNode(BBufferProducer)::FormatProposal\n");
 
 	fOutput.source = output_source;
 	
@@ -81,11 +81,11 @@ status_t VideoMixerNode::FormatChangeRequested(
 				media_format *io_format,
 				int32 * _deprecated_)
 {
-	fprintf(stderr,"VideoMixerNode(BBufferProducer)::FormatChangeRequested\n");
+	fprintf(stderr, "VideoMixerNode(BBufferProducer)::FormatChangeRequested\n");
 
 	if (fOutput.source != source) {
 		// we don't have that output
-		fprintf(stderr,"<- B_MEDIA_BAD_SOURCE\n");
+		fprintf(stderr, "<- B_MEDIA_BAD_SOURCE\n");
 		return B_MEDIA_BAD_SOURCE;
 	}
 
@@ -99,11 +99,11 @@ status_t VideoMixerNode::GetNextOutput(	/* cookie starts as 0 */
 				int32 *cookie,
 				media_output *out_output)
 {
-	fprintf(stderr,"VideoMixerNode(BBufferProducer)::GetNextOutput (%ld)\n",*cookie);
-	
+	fprintf(stderr, "VideoMixerNode(BBufferProducer)::GetNextOutput (%" B_PRId32 ")\n", *cookie);
+
 	// only 1 output
 	if (*cookie != 0) {
-		fprintf(stderr,"<- B_ERROR (no more outputs)\n");
+		fprintf(stderr, "<- B_ERROR (no more outputs)\n");
 		return B_ERROR;
 	}
 
@@ -115,7 +115,7 @@ status_t VideoMixerNode::GetNextOutput(	/* cookie starts as 0 */
 
 status_t VideoMixerNode::DisposeOutputCookie(int32 cookie)
 {
-	fprintf(stderr,"VideoMixerNode(BBufferProducer)::DisposeOutputCookie\n");
+	fprintf(stderr, "VideoMixerNode(BBufferProducer)::DisposeOutputCookie\n");
 	// nothing to do since our cookies are part of the vector iterator
 	return B_OK;
 }
@@ -124,11 +124,11 @@ status_t VideoMixerNode::SetBufferGroup(
 				const media_source & for_source,
 				BBufferGroup * group)
 {
-	fprintf(stderr,"VideoMixerNode(BBufferProducer)::SetBufferGroup\n");
+	fprintf(stderr, "VideoMixerNode(BBufferProducer)::SetBufferGroup\n");
 
 	if (fOutput.source != for_source) {
 		// we don't have that output
-		fprintf(stderr,"<- B_MEDIA_BAD_SOURCE\n");
+		fprintf(stderr, "<- B_MEDIA_BAD_SOURCE\n");
 		return B_MEDIA_BAD_SOURCE;
 	}
 
@@ -156,9 +156,9 @@ status_t VideoMixerNode::VideoClippingChanged(
 status_t VideoMixerNode::GetLatency(
 				bigtime_t *out_latency)
 {
-	fprintf(stderr,"VideoMixerNode(BBufferProducer)::GetLatency\n");
+	fprintf(stderr, "VideoMixerNode(BBufferProducer)::GetLatency\n");
 	if (out_latency == NULL) {
-		fprintf(stderr,"<- B_BAD_VALUE\n");
+		fprintf(stderr, "<- B_BAD_VALUE\n");
 		return B_BAD_VALUE;
 	}
 	
@@ -173,11 +173,11 @@ status_t VideoMixerNode::PrepareToConnect(
 				media_source *out_source,
 				char *out_name)
 {
-	fprintf(stderr,"VideoMixerNode(BBufferProducer)::PrepareToConnect\n");
+	fprintf(stderr, "VideoMixerNode(BBufferProducer)::PrepareToConnect\n");
 
 	if (fOutput.source != what) {
 		// we don't have that output
-		fprintf(stderr,"<- B_MEDIA_BAD_SOURCE\n");
+		fprintf(stderr, "<- B_MEDIA_BAD_SOURCE\n");
 		return B_MEDIA_BAD_SOURCE;
 	}
 	
@@ -196,16 +196,16 @@ void VideoMixerNode::Connect(
 				const media_format &format,
 				char *io_name)
 {
-	fprintf(stderr,"VideoMixerNode(BBufferProducer)::Connect\n");
+	fprintf(stderr, "VideoMixerNode(BBufferProducer)::Connect\n");
 
 	if (fOutput.source != source) {
 		// we don't have that output
-		fprintf(stderr,"<- B_MEDIA_BAD_SOURCE\n");
+		fprintf(stderr, "<- B_MEDIA_BAD_SOURCE\n");
 		return;
 	}
 	
 	if (error != B_OK) {
-		fprintf(stderr,"<- error already\n");
+		fprintf(stderr, "<- error already\n");
 		fOutput.destination = media_destination::null;
 		fOutput.format.u.raw_video = media_raw_video_format::wildcard;
 		return;
@@ -238,25 +238,25 @@ void VideoMixerNode::Connect(
 }
 
 void VideoMixerNode::ComputeInternalLatency() {
-	fprintf(stderr,"VideoMixerNode(BBufferProducer)::ComputeInternalLatency\n");
+	fprintf(stderr, "VideoMixerNode(BBufferProducer)::ComputeInternalLatency\n");
 	fInternalLatency = 100; // just guess
-	fprintf(stderr,"  internal latency guessed = %lld\n",fInternalLatency);
+	fprintf(stderr, "  internal latency guessed = %" B_PRIdBIGTIME "\n", fInternalLatency);
 }
 
 void VideoMixerNode::Disconnect(
 				const media_source & what,
 				const media_destination & where)
 {
-	fprintf(stderr,"VideoMixerNode(BBufferProducer)::Disconnect\n");
+	fprintf(stderr, "VideoMixerNode(BBufferProducer)::Disconnect\n");
 
 	if (fOutput.source != what) {
 		// we don't have that output
-		fprintf(stderr,"<- B_MEDIA_BAD_SOURCE\n");
+		fprintf(stderr, "<- B_MEDIA_BAD_SOURCE\n");
 		return;
 	}
 
 	if (fOutput.destination != where) {
-		fprintf(stderr,"<- B_MEDIA_BAD_DESTINATION\n");
+		fprintf(stderr, "<- B_MEDIA_BAD_DESTINATION\n");
 		return;
 	}
 
@@ -269,11 +269,11 @@ void VideoMixerNode::LateNoticeReceived(
 				bigtime_t how_much,
 				bigtime_t performance_time)
 {
-	fprintf(stderr,"VideoMixerNode(BBufferProducer)::LateNoticeReceived\n");
+	fprintf(stderr, "VideoMixerNode(BBufferProducer)::LateNoticeReceived\n");
 
 	if (fOutput.source != what) {
 		// we don't have that output
-		fprintf(stderr,"<- B_MEDIA_BAD_SOURCE\n");
+		fprintf(stderr, "<- B_MEDIA_BAD_SOURCE\n");
 		return;
 	}
 
@@ -295,7 +295,7 @@ void VideoMixerNode::LateNoticeReceived(
 			// XXX: should we really drop buffers?  just for that output?
 			break;
 		default:
-			fprintf(stderr,"VideoMixerNode::LateNoticeReceived with unexpected run mode.\n");
+			fprintf(stderr, "VideoMixerNode::LateNoticeReceived with unexpected run mode.\n");
 			break;
 	}
 }
@@ -305,17 +305,17 @@ void VideoMixerNode::EnableOutput(
 				bool enabled,
 				int32 *_deprecated_)
 {
-	fprintf(stderr,"VideoMixerNode(BBufferProducer)::EnableOutput\n");
+	fprintf(stderr, "VideoMixerNode(BBufferProducer)::EnableOutput\n");
 
 	if (fOutput.source != what) {
 		// we don't have that output
-		fprintf(stderr,"<- B_MEDIA_BAD_SOURCE\n");
+		fprintf(stderr, "<- B_MEDIA_BAD_SOURCE\n");
 		return;
 	}
 
 	status_t status = B_OK;
 	if (status != B_OK) {
-		fprintf(stderr,"  error in itr->EnableOutput\n");
+		fprintf(stderr, "  error in itr->EnableOutput\n");
 	}
 }
 
@@ -333,18 +333,18 @@ void VideoMixerNode::AdditionalBufferRequested(			//	used to be Reserved 0
 				bigtime_t prev_time,
 				const media_seek_tag * prev_tag)
 {
-	fprintf(stderr,"VideoMixerNode(BBufferProducer)::AdditionalBufferRequested\n");
+	fprintf(stderr, "VideoMixerNode(BBufferProducer)::AdditionalBufferRequested\n");
 
 	if (fOutput.source != source) {
 		// we don't have that output
-		fprintf(stderr,"<- B_MEDIA_BAD_SOURCE\n");
+		fprintf(stderr, "<- B_MEDIA_BAD_SOURCE\n");
 		return;
 	}
 
 //	BBuffer * buffer;
 //	status_t status = itr->AdditionalBufferRequested(prev_buffer, prev_time, prev_tag);
 //	if (status != B_OK) {
-//		fprintf(stderr,"  itr->AdditionalBufferRequested returned an error.\n");
+//		fprintf(stderr, "  itr->AdditionalBufferRequested returned an error.\n");
 //	}
 }
 
@@ -354,16 +354,16 @@ void VideoMixerNode::LatencyChanged(
 				bigtime_t new_latency,
 				uint32 flags)
 {
-	fprintf(stderr,"VideoMixerNode(BBufferProducer)::LatencyChanged\n");
+	fprintf(stderr, "VideoMixerNode(BBufferProducer)::LatencyChanged\n");
 
 	if (fOutput.source != source) {
 		// we don't have that output
-		fprintf(stderr,"<- B_MEDIA_BAD_SOURCE\n");
+		fprintf(stderr, "<- B_MEDIA_BAD_SOURCE\n");
 		return;
 	}
 
 	if (fOutput.destination != destination) {
-		fprintf(stderr,"<- B_MEDIA_BAD_DESTINATION\n");
+		fprintf(stderr, "<- B_MEDIA_BAD_DESTINATION\n");
 		return;
 	}
 	

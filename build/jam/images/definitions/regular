@@ -224,6 +224,7 @@ SYSTEM_ADD_ONS_MEDIA += [ FFilterByBuildFeatures
 	opensound.media_addon
 	tone_producer_demo.media_addon
 	usb_webcam.media_addon
+	video_mixer.media_addon
 	video_producer_demo.media_addon
 	video_window_demo.media_addon
 	vst_host.media_addon

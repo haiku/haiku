@@ -49,7 +49,7 @@ void VideoMixerNode::HandleEvent(
 			HandleParameter(event,lateness,realTimeEvent);
 			break;
 		default:
-			fprintf(stderr,"  unknown event type: %ld\n",event->type);
+			fprintf(stderr, "  unknown event type: %" B_PRId32 "\n", event->type);
 			break;
 	}
 }
@@ -60,12 +60,12 @@ void VideoMixerNode::CleanUpEvent(
 {
 	BMediaEventLooper::CleanUpEvent(event);
 }
-		
+
 /* called from Offline mode to determine the current time of the node */
 /* update your internal information whenever it changes */
 bigtime_t VideoMixerNode::OfflineTime()
 {
-	fprintf(stderr,"VideoMixerNode(BMediaEventLooper)::OfflineTime\n");
+	fprintf(stderr, "VideoMixerNode(BMediaEventLooper)::OfflineTime\n");
 	return BMediaEventLooper::OfflineTime();
 // XXX: do something else?
 }
@@ -85,7 +85,7 @@ status_t VideoMixerNode::HandleStart(
 						bigtime_t lateness,
 						bool realTimeEvent)
 {
-	fprintf(stderr,"VideoMixerNode(BMediaEventLooper)::HandleStart()\n");
+	fprintf(stderr, "VideoMixerNode(BMediaEventLooper)::HandleStart()\n");
 	if (RunState() != B_STARTED) {
 		media_timed_event firstBufferEvent(event->event_time, BTimedEventQueue::B_HANDLE_BUFFER);
 		HandleEvent(&firstBufferEvent, 0, false);
@@ -99,16 +99,17 @@ status_t VideoMixerNode::HandleSeek(
 						bigtime_t lateness,
 						bool realTimeEvent)
 {
-	fprintf(stderr,"VideoMixerNode(BMediaEventLooper)::HandleSeek(t=%lld,d=%ld,bd=%lld)\n",event->event_time, event->data, event->bigdata);
+	fprintf(stderr, "VideoMixerNode(BMediaEventLooper)::HandleSeek(t=%" B_PRIdBIGTIME ",d=%"
+		B_PRId32 ",bd=%" B_PRId64 ")\n", event->event_time, event->data, event->bigdata);
 	return B_OK;
 }
-						
+
 status_t VideoMixerNode::HandleWarp(
 						const media_timed_event *event,
 						bigtime_t lateness,
 						bool realTimeEvent)
 {
-	fprintf(stderr,"VideoMixerNode(BMediaEventLooper)::HandleWarp\n");
+	fprintf(stderr, "VideoMixerNode(BMediaEventLooper)::HandleWarp\n");
 	return B_OK;
 }
 
@@ -117,9 +118,10 @@ status_t VideoMixerNode::HandleStop(
 						bigtime_t lateness,
 						bool realTimeEvent)
 {
-	fprintf(stderr,"VideoMixerNode(BMediaEventLooper)::HandleStop\n");
+	fprintf(stderr, "VideoMixerNode(BMediaEventLooper)::HandleStop\n");
 	// flush the queue so downstreamers don't get any more
-	EventQueue()->FlushEvents(0, BTimedEventQueue::B_ALWAYS, true, BTimedEventQueue::B_HANDLE_BUFFER);
+	EventQueue()->FlushEvents(0, BTimedEventQueue::B_ALWAYS, true,
+		BTimedEventQueue::B_HANDLE_BUFFER);
 	return B_OK;
 }
 
@@ -127,27 +129,27 @@ status_t VideoMixerNode::HandleBuffer(
 				const media_timed_event *event,
 				bigtime_t lateness,
 				bool realTimeEvent)
-{	
+{
 	if (event->type != BTimedEventQueue::B_HANDLE_BUFFER) {
-		fprintf(stderr,"HandleBuffer called on non buffer event type\n");
+		fprintf(stderr, "HandleBuffer called on non buffer event type\n");
 		return B_BAD_VALUE;
 	}
-	
+
 	BBuffer *buffer = const_cast<BBuffer*>((BBuffer*)event->pointer);
 	if (buffer == NULL) {
-		fprintf(stderr,"NO BUFFER PASSED\n");
+		fprintf(stderr, "NO BUFFER PASSED\n");
 		return B_BAD_VALUE;
 	}
-	
+
 	media_input *input = GetInput(buffer->Header()->destination);
-	
+
 	if (input == NULL) {
-		fprintf(stderr,"<- B_MEDIA_BAD_DESTINATION\n");
+		fprintf(stderr, "<- B_MEDIA_BAD_DESTINATION\n");
 		return B_MEDIA_BAD_DESTINATION;
 	}
-	
+
 	if (fOutput.format.u.raw_video == media_raw_video_format::wildcard) {
-		fprintf(stderr,"<- B_MEDIA_NOT_CONNECTED\n");
+		fprintf(stderr, "<- B_MEDIA_NOT_CONNECTED\n");
 		return B_MEDIA_NOT_CONNECTED;
 	}
 
@@ -170,7 +172,7 @@ status_t VideoMixerNode::HandleDataStatus(
 						bigtime_t lateness,
 						bool realTimeEvent)
 {
-	fprintf(stderr,"VideoMixerNode(BMediaEventLooper)::HandleDataStatus");
+	fprintf(stderr, "VideoMixerNode(BMediaEventLooper)::HandleDataStatus");
 	SendDataStatus(event->data, fOutput.destination, event->event_time);
 	return B_OK;
 }
@@ -180,6 +182,6 @@ status_t VideoMixerNode::HandleParameter(
 				bigtime_t lateness,
 				bool realTimeEvent)
 {
-	fprintf(stderr,"VideoMixerNode(BMediaEventLooper)::HandleParameter");
+	fprintf(stderr, "VideoMixerNode(BMediaEventLooper)::HandleParameter");
 	return B_OK;
 }

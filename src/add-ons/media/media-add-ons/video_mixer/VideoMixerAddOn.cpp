@@ -40,7 +40,7 @@ VideoMixerAddOn::~VideoMixerAddOn()
 VideoMixerAddOn::VideoMixerAddOn(image_id image) :
 	BMediaAddOn(image)
 {
-	PRINT("VideoMixerAddOn::VideoMixerAddOn\n");
+	PRINT(("VideoMixerAddOn::VideoMixerAddOn\n"));
 	refCount = 0;
 }
 	
@@ -51,13 +51,13 @@ VideoMixerAddOn::VideoMixerAddOn(image_id image) :
 status_t VideoMixerAddOn::InitCheck(
 	const char **out_failure_text)
 {
-	PRINT("VideoMixerAddOn::InitCheck\n");
+	PRINT(("VideoMixerAddOn::InitCheck\n"));
 	return B_OK;
 }
 
 int32 VideoMixerAddOn::CountFlavors()
 {
-	PRINT("VideoMixerAddOn::CountFlavors\n");
+	PRINT(("VideoMixerAddOn::CountFlavors\n"));
 	return 1;
 }
 
@@ -65,7 +65,7 @@ status_t VideoMixerAddOn::GetFlavorAt(
 	int32 n,
 	const flavor_info **out_info)
 {
-	PRINT("VideoMixerAddOn::GetFlavorAt\n");
+	PRINT(("VideoMixerAddOn::GetFlavorAt\n"));
 	if (n != 0) {
 		fprintf(stderr,"<- B_BAD_INDEX\n");
 		return B_BAD_INDEX;
@@ -81,22 +81,22 @@ BMediaNode * VideoMixerAddOn::InstantiateNodeFor(
 				BMessage * config,
 				status_t * out_error)
 {
-	PRINT("VideoMixerAddOn::InstantiateNodeFor\n");
+	PRINT(("VideoMixerAddOn::InstantiateNodeFor\n"));
 	VideoMixerNode *node = new VideoMixerNode(info, config, this);
 	if (node == NULL) {
 		*out_error = B_NO_MEMORY;
 		fprintf(stderr,"<- B_NO_MEMORY\n");
-	} else { 
+	} else {
 		*out_error = node->InitCheck();
 	}
-	return node;	
+	return node;
 }
 
 status_t VideoMixerAddOn::GetConfigurationFor(
 				BMediaNode * your_node,
 				BMessage * into_message)
 {
-	PRINT("VideoMixerAddOn::GetConfigurationFor\n");
+	PRINT(("VideoMixerAddOn::GetConfigurationFor\n"));
 	VideoMixerNode *node = dynamic_cast<VideoMixerNode *>(your_node);
 	if (node == NULL) {
 		fprintf(stderr,"<- B_BAD_TYPE\n");
@@ -107,7 +107,7 @@ status_t VideoMixerAddOn::GetConfigurationFor(
 
 bool VideoMixerAddOn::WantsAutoStart()
 {
-	PRINT("VideoMixerAddOn::WantsAutoStart\n");
+	PRINT(("VideoMixerAddOn::WantsAutoStart\n"));
 	return false;
 }
 
@@ -117,7 +117,7 @@ status_t VideoMixerAddOn::AutoStart(
 				int32 *out_internal_id,
 				bool *out_has_more)
 {
-	PRINT("VideoMixerAddOn::AutoStart\n");
+	PRINT(("VideoMixerAddOn::AutoStart\n"));
 	return B_OK;
 }
 

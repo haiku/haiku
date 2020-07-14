@@ -54,7 +54,7 @@ BufferMixer::Merge(BBuffer *input, BBuffer *output) {
 	
 	uint8 *source = (uint8 *)input->Data();
 	uint8 *destination = (uint8 *)output->Data();
-	uint32 size = input->Header()->size_used / 4;	
+	uint32 size = input->Header()->size_used / 4;
 	uint8 alpha = 0;
 	uint8 c1, c2, c3;
 
