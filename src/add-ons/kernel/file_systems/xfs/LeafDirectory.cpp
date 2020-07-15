@@ -93,7 +93,7 @@ LeafDirectory::FillMapEntry(int num, ExtentMapEntry* fMap)
 
 
 status_t
-LeafDirectory::FillBuffer(int type, char* blockBuffer)
+LeafDirectory::FillBuffer(int type, char* blockBuffer, int howManyBlocksFurthur)
 {
 	TRACE("FILLBUFFER\n");
 	ExtentMapEntry* map;
@@ -116,8 +116,11 @@ LeafDirectory::FillBuffer(int type, char* blockBuffer)
 	Volume* volume = fInode->GetVolume();
 	xfs_agblock_t numberOfBlocksInAg = volume->AgBlocks();
 
-	uint64 agNo = FSBLOCKS_TO_AGNO(map->br_startblock, volume);
-	uint64 agBlockNo = FSBLOCKS_TO_AGBLOCKNO(map->br_startblock, volume);
+	uint64 agNo =
+		FSBLOCKS_TO_AGNO(map->br_startblock + howManyBlocksFurthur, volume);
+	uint64 agBlockNo =
+		FSBLOCKS_TO_AGBLOCKNO(map->br_startblock + howManyBlocksFurthur, volume);
+
 	xfs_fsblock_t blockToRead = FSBLOCKS_TO_BASICBLOCKS(volume->BlockLog(),
 		(agNo * numberOfBlocksInAg + agBlockNo));
 
@@ -168,7 +171,7 @@ LeafDirectory::FirstLeaf()
 	TRACE("LeafDirectory: FirstLeaf\n");
 	if (fLeafBuffer == NULL) {
 		ASSERT(fLeafMap != NULL);
-		status_t status = FillBuffer(LEAF, fLeafBuffer);
+		status_t status = FillBuffer(LEAF, fLeafBuffer, 0);
 		if (status != B_OK)
 			return NULL;
 	}
@@ -189,6 +192,21 @@ LeafDirectory::EntrySize(int len) const
 }
 
 
+void
+LeafDirectory::SearchAndFillDataMap(int blockNo)
+{
+	int len = fInode->DataExtentsCount();
+
+	for(int i = 0; i < len - 1; i++) {
+		FillMapEntry(i, fDataMap);
+		if (fDataMap->br_startoff <= blockNo
+			&& (blockNo <= fDataMap->br_startoff + fDataMap->br_blockcount - 1))
+			// Map found
+			return;
+	}
+}
+
+
 status_t
 LeafDirectory::GetNext(char* name, size_t* length, xfs_ino_t* ino)
 {
@@ -196,7 +214,7 @@ LeafDirectory::GetNext(char* name, size_t* length, xfs_ino_t* ino)
 	status_t status;
 
 	if (fDataBuffer == NULL) {
-		status = FillBuffer(DATA, fDataBuffer);
+		status = FillBuffer(DATA, fDataBuffer, 0);
 		if (status != B_OK)
 			return status;
 	}
@@ -205,25 +223,42 @@ LeafDirectory::GetNext(char* name, size_t* length, xfs_ino_t* ino)
 	void* entry = (void*)((ExtentDataHeader*)fDataBuffer + 1);
 		// This could be an unused entry so we should check
 
-	if (BLOCKNO_FROM_ADDRESS(fOffset, volume) == fCurBlockNumber
-		&& fOffset != 0)
+	uint32 blockNoFromAddress = BLOCKNO_FROM_ADDRESS(fOffset, volume);
+	if (fOffset != 0 && blockNoFromAddress == fCurBlockNumber)
 		entry = (void*)(fDataBuffer
 				+ BLOCKOFFSET_FROM_ADDRESS(fOffset, fInode));
 		// This gets us a little faster to the next entry
 
-	ExtentLeafHeader* leafHeader = (ExtentLeafHeader*)(void*)fLeafBuffer;
 	uint32 curDirectorySize = fInode->Size();
 
 	while (fOffset != curDirectorySize) {
-		TRACE("fOffset:(%d)\n", fOffset);
-		if (fCurBlockNumber != BLOCKNO_FROM_ADDRESS(fOffset, volume)) {
-			fCurBlockNumber = BLOCKNO_FROM_ADDRESS(fOffset, volume);
-			FillMapEntry(fCurBlockNumber, fDataMap);
-			status = FillBuffer(DATA, fDataBuffer);
+		blockNoFromAddress = BLOCKNO_FROM_ADDRESS(fOffset, volume);
+
+		TRACE("fOffset:(%d), blockNoFromAddress:(%d)\n",
+			fOffset, blockNoFromAddress);
+		if (fCurBlockNumber != blockNoFromAddress
+			&& blockNoFromAddress > fDataMap->br_startoff
+			&& blockNoFromAddress
+				<= fDataMap->br_startoff + fDataMap->br_blockcount - 1) {
+			// When the block is mapped in the same data
+			// map entry but is not the first block
+			status = FillBuffer(DATA, fDataBuffer,
+				blockNoFromAddress - fDataMap->br_startoff);
 			if (status != B_OK)
 				return status;
 			entry = (void*)((ExtentDataHeader*)fDataBuffer + 1);
 			fOffset = fOffset + sizeof(ExtentDataHeader);
+			fCurBlockNumber = blockNoFromAddress;
+		} else if (fCurBlockNumber != blockNoFromAddress) {
+			// When the block isn't mapped in the current data map entry
+			SearchAndFillDataMap(blockNoFromAddress);
+			status = FillBuffer(DATA, fDataBuffer,
+				blockNoFromAddress - fDataMap->br_startoff);
+			if (status != B_OK)
+				return status;
+			entry = (void*)((ExtentDataHeader*)fDataBuffer + 1);
+			fOffset = fOffset + sizeof(ExtentDataHeader);
+			fCurBlockNumber = blockNoFromAddress;
 		}
 
 		ExtentUnusedEntry* unusedEntry = (ExtentUnusedEntry*)entry;
@@ -274,7 +309,7 @@ LeafDirectory::Lookup(const char* name, size_t length, xfs_ino_t* ino)
 
 	status_t status;
 	if (fLeafBuffer == NULL)
-		status = FillBuffer(LEAF, fLeafBuffer);
+		status = FillBuffer(LEAF, fLeafBuffer, 0);
 	if (status != B_OK)
 		return status;
 
@@ -323,8 +358,9 @@ LeafDirectory::Lookup(const char* name, size_t length, xfs_ino_t* ino)
 		TRACE("DataBlockNumber:(%d), offset:(%d)\n", dataBlockNumber, offset);
 		if (dataBlockNumber != fCurBlockNumber) {
 			fCurBlockNumber = dataBlockNumber;
-			FillMapEntry(dataBlockNumber, fDataMap);
-			status = FillBuffer(DATA, fDataBuffer);
+			SearchAndFillDataMap(dataBlockNumber);
+			status = FillBuffer(DATA, fDataBuffer,
+				dataBlockNumber - fDataMap->br_startoff);
 			if (status != B_OK)
 				return B_OK;
 		}
