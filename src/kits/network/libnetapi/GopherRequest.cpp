@@ -272,7 +272,6 @@ BGopherRequest::_ProtocolLoop()
 	BStackOrHeapArray<char, 4096> chunk(kGopherBufferSize);
 
 	while (!fQuit && !receiveEnd) {
-		fSocket->WaitForReadable();
 		bytesRead = fSocket->Read(chunk, kGopherBufferSize);
 
 		if (bytesRead < 0) {
