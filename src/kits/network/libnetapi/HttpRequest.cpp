@@ -584,7 +584,6 @@ BHttpRequest::_MakeRequest()
 
 	while (!fQuit && !(receiveEnd && parseEnd)) {
 		if ((!receiveEnd) && (fInputBuffer.Size() == previousBufferSize)) {
-			fSocket->WaitForReadable();
 			BStackOrHeapArray<char, 4096> chunk(kHttpBufferSize);
 			bytesRead = fSocket->Read(chunk, kHttpBufferSize);
 
