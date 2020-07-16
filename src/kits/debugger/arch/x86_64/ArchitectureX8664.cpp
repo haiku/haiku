@@ -29,6 +29,7 @@
 
 #include "disasm/DisassemblerX8664.h"
 
+#define X86_64_EXTENDED_FEATURE_AVX	(1 << 28)
 
 static const int32 kFromDwarfRegisters[] = {
 	X86_64_REGISTER_RAX,
@@ -170,6 +171,20 @@ ArchitectureX8664::Init()
 	if (fAssemblyLanguage == NULL)
 		return B_NO_MEMORY;
 
+	int featureFlags = 0;
+#ifdef __x86_64__
+	// TODO: this needs to be determined/retrieved indirectly from the
+	// target host interface, as in the remote case the CPU features may
+	// differ from those of the local CPU.
+	cpuid_info info;
+	status_t error = get_cpuid(&info, 1, 0);
+	if (error != B_OK)
+		return error;
+
+	if ((info.eax_1.extended_features & X86_64_EXTENDED_FEATURE_AVX) != 0)
+		featureFlags |= X86_64_CPU_FEATURE_FLAG_AVX;
+#endif
+
 	try {
 		_AddIntegerRegister(X86_64_REGISTER_RIP, "rip", B_UINT64_TYPE,
 			REGISTER_TYPE_INSTRUCTION_POINTER, false);
@@ -240,38 +255,73 @@ ArchitectureX8664::Init()
 		_AddSIMDRegister(X86_64_REGISTER_MM6, "mm6", sizeof(uint64));
 		_AddSIMDRegister(X86_64_REGISTER_MM7, "mm7", sizeof(uint64));
 
-		_AddSIMDRegister(X86_64_REGISTER_XMM0, "xmm0",
-			sizeof(x86_64_xmm_register));
-		_AddSIMDRegister(X86_64_REGISTER_XMM1, "xmm1",
-			sizeof(x86_64_xmm_register));
-		_AddSIMDRegister(X86_64_REGISTER_XMM2, "xmm2",
-			sizeof(x86_64_xmm_register));
-		_AddSIMDRegister(X86_64_REGISTER_XMM3, "xmm3",
-			sizeof(x86_64_xmm_register));
-		_AddSIMDRegister(X86_64_REGISTER_XMM4, "xmm4",
-			sizeof(x86_64_xmm_register));
-		_AddSIMDRegister(X86_64_REGISTER_XMM5, "xmm5",
-			sizeof(x86_64_xmm_register));
-		_AddSIMDRegister(X86_64_REGISTER_XMM6, "xmm6",
-			sizeof(x86_64_xmm_register));
-		_AddSIMDRegister(X86_64_REGISTER_XMM7, "xmm7",
-			sizeof(x86_64_xmm_register));
-		_AddSIMDRegister(X86_64_REGISTER_XMM8, "xmm8",
-			sizeof(x86_64_xmm_register));
-		_AddSIMDRegister(X86_64_REGISTER_XMM9, "xmm9",
-			sizeof(x86_64_xmm_register));
-		_AddSIMDRegister(X86_64_REGISTER_XMM10, "xmm10",
-			sizeof(x86_64_xmm_register));
-		_AddSIMDRegister(X86_64_REGISTER_XMM11, "xmm11",
-			sizeof(x86_64_xmm_register));
-		_AddSIMDRegister(X86_64_REGISTER_XMM12, "xmm12",
-			sizeof(x86_64_xmm_register));
-		_AddSIMDRegister(X86_64_REGISTER_XMM13, "xmm13",
-			sizeof(x86_64_xmm_register));
-		_AddSIMDRegister(X86_64_REGISTER_XMM14, "xmm14",
-			sizeof(x86_64_xmm_register));
-		_AddSIMDRegister(X86_64_REGISTER_XMM15, "xmm15",
-			sizeof(x86_64_xmm_register));
+		if ((featureFlags & X86_64_CPU_FEATURE_FLAG_AVX) != 0) {
+			_AddSIMDRegister(X86_64_REGISTER_XMM0, "ymm0",
+					sizeof(x86_64_xmm_register) * 2);
+			_AddSIMDRegister(X86_64_REGISTER_XMM1, "ymm1",
+					sizeof(x86_64_xmm_register) * 2);
+			_AddSIMDRegister(X86_64_REGISTER_XMM2, "ymm2",
+					sizeof(x86_64_xmm_register) * 2);
+			_AddSIMDRegister(X86_64_REGISTER_XMM3, "ymm3",
+					sizeof(x86_64_xmm_register) * 2);
+			_AddSIMDRegister(X86_64_REGISTER_XMM4, "ymm4",
+					sizeof(x86_64_xmm_register) * 2);
+			_AddSIMDRegister(X86_64_REGISTER_XMM5, "ymm5",
+					sizeof(x86_64_xmm_register) * 2);
+			_AddSIMDRegister(X86_64_REGISTER_XMM6, "ymm6",
+					sizeof(x86_64_xmm_register) * 2);
+			_AddSIMDRegister(X86_64_REGISTER_XMM7, "ymm7",
+					sizeof(x86_64_xmm_register) * 2);
+			_AddSIMDRegister(X86_64_REGISTER_XMM8, "ymm8",
+					sizeof(x86_64_xmm_register) * 2);
+			_AddSIMDRegister(X86_64_REGISTER_XMM9, "ymm9",
+					sizeof(x86_64_xmm_register) * 2);
+			_AddSIMDRegister(X86_64_REGISTER_XMM10, "ymm10",
+					sizeof(x86_64_xmm_register) * 2);
+			_AddSIMDRegister(X86_64_REGISTER_XMM11, "ymm11",
+					sizeof(x86_64_xmm_register) * 2);
+			_AddSIMDRegister(X86_64_REGISTER_XMM12, "ymm12",
+					sizeof(x86_64_xmm_register) * 2);
+			_AddSIMDRegister(X86_64_REGISTER_XMM13, "ymm13",
+					sizeof(x86_64_xmm_register) * 2);
+			_AddSIMDRegister(X86_64_REGISTER_XMM14, "ymm14",
+					sizeof(x86_64_xmm_register) * 2);
+			_AddSIMDRegister(X86_64_REGISTER_XMM15, "ymm15",
+					sizeof(x86_64_xmm_register) * 2);
+		} else {
+			_AddSIMDRegister(X86_64_REGISTER_XMM0, "xmm0",
+					sizeof(x86_64_xmm_register));
+			_AddSIMDRegister(X86_64_REGISTER_XMM1, "xmm1",
+					sizeof(x86_64_xmm_register));
+			_AddSIMDRegister(X86_64_REGISTER_XMM2, "xmm2",
+					sizeof(x86_64_xmm_register));
+			_AddSIMDRegister(X86_64_REGISTER_XMM3, "xmm3",
+					sizeof(x86_64_xmm_register));
+			_AddSIMDRegister(X86_64_REGISTER_XMM4, "xmm4",
+					sizeof(x86_64_xmm_register));
+			_AddSIMDRegister(X86_64_REGISTER_XMM5, "xmm5",
+					sizeof(x86_64_xmm_register));
+			_AddSIMDRegister(X86_64_REGISTER_XMM6, "xmm6",
+					sizeof(x86_64_xmm_register));
+			_AddSIMDRegister(X86_64_REGISTER_XMM7, "xmm7",
+					sizeof(x86_64_xmm_register));
+			_AddSIMDRegister(X86_64_REGISTER_XMM8, "xmm8",
+					sizeof(x86_64_xmm_register));
+			_AddSIMDRegister(X86_64_REGISTER_XMM9, "xmm9",
+					sizeof(x86_64_xmm_register));
+			_AddSIMDRegister(X86_64_REGISTER_XMM10, "xmm10",
+					sizeof(x86_64_xmm_register));
+			_AddSIMDRegister(X86_64_REGISTER_XMM11, "xmm11",
+					sizeof(x86_64_xmm_register));
+			_AddSIMDRegister(X86_64_REGISTER_XMM12, "xmm12",
+					sizeof(x86_64_xmm_register));
+			_AddSIMDRegister(X86_64_REGISTER_XMM13, "xmm13",
+					sizeof(x86_64_xmm_register));
+			_AddSIMDRegister(X86_64_REGISTER_XMM14, "xmm14",
+					sizeof(x86_64_xmm_register));
+			_AddSIMDRegister(X86_64_REGISTER_XMM15, "xmm15",
+					sizeof(x86_64_xmm_register));
+		}
 
 	} catch (std::bad_alloc&) {
 		return B_NO_MEMORY;
