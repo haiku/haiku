@@ -360,6 +360,9 @@ BGopherRequest::_ProtocolLoop()
 
 			fPosition += fInputBuffer.Size();
 
+			if (fListener != NULL)
+				fListener->DownloadProgress(this, fPosition, 0);
+
 			// XXX: this is plain stupid, we already copied the data
 			// and just want to drop it...
 			char *inputTempBuffer = new(std::nothrow) char[bytesRead];
@@ -372,11 +375,8 @@ BGopherRequest::_ProtocolLoop()
 		}
 	}
 
-	if (fPosition > 0) {
+	if (fPosition > 0)
 		fResult.SetLength(fPosition);
-		if (fListener != NULL)
-			fListener->DownloadProgress(this, fPosition, fPosition);
-	}
 
 	fSocket->Disconnect();
 
@@ -650,7 +650,7 @@ BGopherRequest::_ParseInput(bool last)
 
 			// emit header
 			BString header;
-			header << 
+			header <<
 				"<html>\n"
 				"<head>\n"
 				"<meta http-equiv=\"Content-Type\""
@@ -668,17 +668,27 @@ BGopherRequest::_ParseInput(bool last)
 				"</div>\n"
 				"<h1>" << pageTitle << "</h1>\n";
 
-			fListener->DataReceived(this, header.String(), fPosition,
-				header.Length());
+			if (fListener != NULL) {
+				fListener->DataReceived(this, header.String(), fPosition,
+					header.Length());
+			}
 
 			fPosition += header.Length();
+
+			if (fListener != NULL)
+				fListener->DownloadProgress(this, fPosition, 0);
 		}
 
 		if (item.Length()) {
-			fListener->DataReceived(this, item.String(), fPosition,
-				item.Length());
+			if (fListener != NULL) {
+				fListener->DataReceived(this, item.String(), fPosition,
+					item.Length());
+			}
 
 			fPosition += item.Length();
+
+			if (fListener != NULL)
+				fListener->DownloadProgress(this, fPosition, 0);
 		}
 	}
 
@@ -689,10 +699,15 @@ BGopherRequest::_ParseInput(bool last)
 			"</body>\n"
 			"</html>\n";
 
-		fListener->DataReceived(this, footer.String(), fPosition,
-			footer.Length());
+		if (fListener != NULL) {
+			fListener->DataReceived(this, footer.String(), fPosition,
+				footer.Length());
+		}
 
 		fPosition += footer.Length();
+
+		if (fListener != NULL)
+			fListener->DownloadProgress(this, fPosition, 0);
 	}
 }
 
