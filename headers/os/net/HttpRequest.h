@@ -14,6 +14,7 @@
 #include <HttpResult.h>
 #include <NetworkAddress.h>
 #include <NetworkRequest.h>
+#include <UrlProtocolRoster.h>
 
 
 namespace BPrivate {
@@ -24,12 +25,6 @@ namespace BPrivate {
 
 class BHttpRequest : public BNetworkRequest {
 public:
-								BHttpRequest(const BUrl& url,
-									bool ssl = false,
-									const char* protocolName = "HTTP",
-									BUrlProtocolListener* listener = NULL,
-									BUrlContext* context = NULL);
-								BHttpRequest(const BHttpRequest& other);
 	virtual						~BHttpRequest();
 
 			void				SetMethod(const char* const method);
@@ -64,6 +59,15 @@ public:
 	static	int16				StatusCodeClass(int16 code);
 
 private:
+			friend class BUrlProtocolRoster;
+
+								BHttpRequest(const BUrl& url,
+									bool ssl = false,
+									const char* protocolName = "HTTP",
+									BUrlProtocolListener* listener = NULL,
+									BUrlContext* context = NULL);
+								BHttpRequest(const BHttpRequest& other);
+
 			void				_ResetOptions();
 			status_t			_ProtocolLoop();
 			status_t			_MakeRequest();

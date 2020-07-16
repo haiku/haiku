@@ -6,7 +6,9 @@
 
 #include "DataTest.h"
 
+#include <AutoDeleter.h>
 #include <DataRequest.h>
+#include <UrlProtocolRoster.h>
 
 #include <cppunit/TestCaller.h>
 
@@ -155,12 +157,14 @@ DataTest::_RunTest(BString url, const char* expected, size_t expectedLength)
 	NextSubTest();
 
 	BUrl testUrl(url);
-	BDataRequest t(testUrl);
+	ObjectDeleter<BUrlRequest> requestDeleter(
+		BUrlProtocolRoster::MakeRequest(testUrl, this));
+	BDataRequest* request = dynamic_cast<BDataRequest*>(requestDeleter.Get());
+	CPPUNIT_ASSERT(request != NULL);
 	fReceivedData.clear();
-	t.SetListener(this);
-	t.Run();
+	request->Run();
 
-	while(t.IsRunning())
+	while(request->IsRunning())
 		snooze(1000);
 
 	CPPUNIT_ASSERT_EQUAL(expectedLength, fReceivedData.size());

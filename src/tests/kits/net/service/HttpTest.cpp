@@ -20,6 +20,7 @@
 #include <HttpRequest.h>
 #include <NetworkKit.h>
 #include <UrlProtocolListener.h>
+#include <UrlProtocolRoster.h>
 
 #include <tools/cppunit/ThreadedTestCaller.h>
 
@@ -125,22 +126,23 @@ void SendAuthenticatedRequest(
 {
 	TestListener listener(expectedResponseBody, expectedResponseHeaders);
 
-	BHttpRequest request(testUrl, testUrl.Protocol() == "https");
-	request.SetContext(&context);
-	request.SetListener(&listener);
+	ObjectDeleter<BUrlRequest> requestDeleter(
+		BUrlProtocolRoster::MakeRequest(testUrl, &listener, &context));
+	BHttpRequest* request = dynamic_cast<BHttpRequest*>(requestDeleter.Get());
+	CPPUNIT_ASSERT(request != NULL);
 
-	request.SetUserName("walter");
-	request.SetPassword("secret");
+	request->SetUserName("walter");
+	request->SetPassword("secret");
 
-	CPPUNIT_ASSERT(request.Run());
+	CPPUNIT_ASSERT(request->Run());
 
-	while (request.IsRunning())
+	while (request->IsRunning())
 		snooze(1000);
 
-	CPPUNIT_ASSERT_EQUAL(B_OK, request.Status());
+	CPPUNIT_ASSERT_EQUAL(B_OK, request->Status());
 
 	const BHttpResult &result =
-		dynamic_cast<const BHttpResult &>(request.Result());
+		dynamic_cast<const BHttpResult &>(request->Result());
 	CPPUNIT_ASSERT_EQUAL(200, result.StatusCode());
 	CPPUNIT_ASSERT_EQUAL(BString("OK"), result.StatusText());
 
@@ -220,18 +222,19 @@ HttpTest::GetTest()
 
 	TestListener listener(expectedResponseBody, expectedResponseHeaders);
 
-	BHttpRequest request(testUrl, testUrl.Protocol() == "https");
-	request.SetContext(context);
-	request.SetListener(&listener);
+	ObjectDeleter<BUrlRequest> requestDeleter(
+		BUrlProtocolRoster::MakeRequest(testUrl, &listener, context));
+	BHttpRequest* request = dynamic_cast<BHttpRequest*>(requestDeleter.Get());
+	CPPUNIT_ASSERT(request != NULL);
 
-	CPPUNIT_ASSERT(request.Run());
-	while (request.IsRunning())
+	CPPUNIT_ASSERT(request->Run());
+	while (request->IsRunning())
 		snooze(1000);
 
-	CPPUNIT_ASSERT_EQUAL(B_OK, request.Status());
+	CPPUNIT_ASSERT_EQUAL(B_OK, request->Status());
 
 	const BHttpResult& result
-		= dynamic_cast<const BHttpResult&>(request.Result());
+		= dynamic_cast<const BHttpResult&>(request->Result());
 	CPPUNIT_ASSERT_EQUAL(200, result.StatusCode());
 	CPPUNIT_ASSERT_EQUAL(BString("OK"), result.StatusText());
 
@@ -282,19 +285,20 @@ HttpTest::ProxyTest()
 
 	TestListener listener(expectedResponseBody, expectedResponseHeaders);
 
-	BHttpRequest request(testUrl);
-	request.SetContext(context);
-	request.SetListener(&listener);
+	ObjectDeleter<BUrlRequest> requestDeleter(
+		BUrlProtocolRoster::MakeRequest(testUrl, &listener, context));
+	BHttpRequest* request = dynamic_cast<BHttpRequest*>(requestDeleter.Get());
+	CPPUNIT_ASSERT(request != NULL);
 
-	CPPUNIT_ASSERT(request.Run());
+	CPPUNIT_ASSERT(request->Run());
 
-	while (request.IsRunning())
+	while (request->IsRunning())
 		snooze(1000);
 
-	CPPUNIT_ASSERT_EQUAL(B_OK, request.Status());
+	CPPUNIT_ASSERT_EQUAL(B_OK, request->Status());
 
 	const BHttpResult& response
-		= dynamic_cast<const BHttpResult&>(request.Result());
+		= dynamic_cast<const BHttpResult&>(request->Result());
 	CPPUNIT_ASSERT_EQUAL(200, response.StatusCode());
 	CPPUNIT_ASSERT_EQUAL(BString("OK"), response.StatusText());
 	CPPUNIT_ASSERT_EQUAL(169, response.Length());
@@ -373,9 +377,10 @@ HttpTest::UploadTest()
 
 	BUrlContext context;
 
-	BHttpRequest request(testUrl, testUrl.Protocol() == "https");
-	request.SetContext(&context);
-	request.SetListener(&listener);
+	ObjectDeleter<BUrlRequest> requestDeleter(
+		BUrlProtocolRoster::MakeRequest(testUrl, &listener, &context));
+	BHttpRequest* request = dynamic_cast<BHttpRequest*>(requestDeleter.Get());
+	CPPUNIT_ASSERT(request != NULL);
 
 	BHttpForm form;
 	form.AddString("hello", "world");
@@ -383,17 +388,17 @@ HttpTest::UploadTest()
 		B_OK,
 		form.AddFile("_uploadfile", BPath(testFilePath.c_str())));
 
-	request.SetPostFields(form);
+	request->SetPostFields(form);
 
-	CPPUNIT_ASSERT(request.Run());
+	CPPUNIT_ASSERT(request->Run());
 
-	while (request.IsRunning())
+	while (request->IsRunning())
 		snooze(1000);
 
-	CPPUNIT_ASSERT_EQUAL(B_OK, request.Status());
+	CPPUNIT_ASSERT_EQUAL(B_OK, request->Status());
 
 	const BHttpResult &result =
-		dynamic_cast<const BHttpResult &>(request.Result());
+		dynamic_cast<const BHttpResult &>(request->Result());
 	CPPUNIT_ASSERT_EQUAL(200, result.StatusCode());
 	CPPUNIT_ASSERT_EQUAL(BString("OK"), result.StatusText());
 	CPPUNIT_ASSERT_EQUAL(913, result.Length());

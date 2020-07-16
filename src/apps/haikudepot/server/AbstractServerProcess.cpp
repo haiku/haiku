@@ -344,14 +344,19 @@ AbstractServerProcess::DownloadToLocalFile(const BPath& targetFilePath,
 
 	thread_id thread;
 
-	{
-		fRequest = dynamic_cast<BHttpRequest *>(
-			BUrlProtocolRoster::MakeRequest(url, &listener));
-		fRequest->SetHeaders(headers);
-		fRequest->SetMaxRedirections(0);
-		fRequest->SetTimeout(TIMEOUT_MICROSECONDS);
-		thread = fRequest->Run();
+	BUrlRequest* request = BUrlProtocolRoster::MakeRequest(url, &listener);
+	if (request == NULL)
+		return B_NO_MEMORY;
+
+	fRequest = dynamic_cast<BHttpRequest *>(request);
+	if (fRequest == NULL) {
+		delete request;
+		return B_ERROR;
 	}
+	fRequest->SetHeaders(headers);
+	fRequest->SetMaxRedirections(0);
+	fRequest->SetTimeout(TIMEOUT_MICROSECONDS);
+	thread = fRequest->Run();
 
 	wait_for_thread(thread, NULL);
 

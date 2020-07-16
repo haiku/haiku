@@ -11,17 +11,21 @@
 #define _B_DATA_REQUEST_H_
 
 
+#include <UrlProtocolRoster.h>
 #include <UrlRequest.h>
 
 
 class BDataRequest: public BUrlRequest {
 public:
+		const BUrlResult&	Result() const;
+private:
+		friend class BUrlProtocolRoster;
+
 							BDataRequest(const BUrl& url,
 								BUrlProtocolListener* listener = NULL,
 								BUrlContext* context = NULL);
-		const BUrlResult&	Result() const;
-private:
-		status_t			_ProtocolLoop();	
+
+		status_t			_ProtocolLoop();
 private:
 		BUrlResult			fResult;
 };

@@ -6,6 +6,7 @@
 
 #include "WebAppInterface.h"
 
+#include <AutoDeleter.h>
 #include <Application.h>
 #include <HttpHeaders.h>
 #include <HttpRequest.h>
@@ -94,6 +95,21 @@ public:
 private:
 	BDataIO*		fDownloadIO;
 };
+
+
+static BHttpRequest*
+make_http_request(const BUrl& url, BUrlProtocolListener* listener = NULL,
+	BUrlContext* context = NULL)
+{
+	BUrlRequest* request = BUrlProtocolRoster::MakeRequest(url, listener,
+		context);
+	BHttpRequest* httpRequest = dynamic_cast<BHttpRequest*>(request);
+	if (httpRequest == NULL) {
+		delete request;
+		return NULL;
+	}
+	return httpRequest;
+}
 
 
 int
@@ -825,7 +841,6 @@ WebAppInterface::_SendJsonRequest(const char* domain,
 	}
 
 	BUrl url = ServerSettings::CreateFullUrl(BString("/__api/v1/") << domain);
-	bool isSecure = url.Protocol() == "https";
 	HDDEBUG("jrpc; will make request to [%s]", url.UrlString().String());
 
 	// If the request payload is logged then it must be copied to local memory
@@ -846,9 +861,12 @@ WebAppInterface::_SendJsonRequest(const char* domain,
 	headers.AddHeader("Content-Type", "application/json");
 	ServerSettings::AugmentHeaders(headers);
 
-	BHttpRequest request(url, isSecure, "HTTP", &listener, &context);
-	request.SetMethod(B_HTTP_POST);
-	request.SetHeaders(headers);
+	BHttpRequest* request = make_http_request(url, &listener, &context);
+	ObjectDeleter<BHttpRequest> _(request);
+	if (request == NULL)
+		return B_ERROR;
+	request->SetMethod(B_HTTP_POST);
+	request->SetHeaders(headers);
 
 	// Authentication via Basic Authentication
 	// The other way would be to obtain a token and then use the Token Bearer
@@ -860,16 +878,16 @@ WebAppInterface::_SendJsonRequest(const char* domain,
 		context.AddAuthentication(url, authentication);
 	}
 
-	request.AdoptInputData(requestData, requestDataSize);
+	request->AdoptInputData(requestData, requestDataSize);
 
 	BMallocIO replyData;
 	listener.SetDownloadIO(&replyData);
 
-	thread_id thread = request.Run();
+	thread_id thread = request->Run();
 	wait_for_thread(thread, NULL);
 
 	const BHttpResult& result = dynamic_cast<const BHttpResult&>(
-		request.Result());
+		request->Result());
 
 	int32 statusCode = result.StatusCode();
 
@@ -930,7 +948,6 @@ WebAppInterface::_SendRawGetRequest(const BString urlPathComponents,
 	BDataIO* stream)
 {
 	BUrl url = ServerSettings::CreateFullUrl(urlPathComponents);
-	bool isSecure = url.Protocol() == "https";
 
 	ProtocolListener listener;
 	listener.SetDownloadIO(stream);
@@ -938,15 +955,18 @@ WebAppInterface::_SendRawGetRequest(const BString urlPathComponents,
 	BHttpHeaders headers;
 	ServerSettings::AugmentHeaders(headers);
 
-	BHttpRequest request(url, isSecure, "HTTP", &listener);
-	request.SetMethod(B_HTTP_GET);
-	request.SetHeaders(headers);
+	BHttpRequest *request = make_http_request(url, &listener);
+	ObjectDeleter<BHttpRequest> _(request);
+	if (request == NULL)
+		return B_ERROR;
+	request->SetMethod(B_HTTP_GET);
+	request->SetHeaders(headers);
 
-	thread_id thread = request.Run();
+	thread_id thread = request->Run();
 	wait_for_thread(thread, NULL);
 
 	const BHttpResult& result = dynamic_cast<const BHttpResult&>(
-		request.Result());
+		request->Result());
 
 	int32 statusCode = result.StatusCode();
 
