@@ -87,6 +87,7 @@ BFileRequest::_ProtocolLoop()
 					fListener->DataReceived(this, chunk, transferredSize,
 						chunkSize);
 					transferredSize += chunkSize;
+					fListener->DownloadProgress(this, transferredSize, size);
 				} else
 					break;
 			}
@@ -99,7 +100,6 @@ BFileRequest::_ProtocolLoop()
 				else
 					return B_IO_ERROR;
 			}
-			fListener->DownloadProgress(this, size, size);
 		}
 
 		return B_OK;
@@ -124,6 +124,7 @@ BFileRequest::_ProtocolLoop()
 
 		// Add a parent directory entry.
 		fListener->DataReceived(this, "+/,\t..\r\n", transferredSize, 8);
+		fListener->DownloadProgress(this, transferredSize, 0);
 		transferredSize += 8;
 	}
 
@@ -161,12 +162,11 @@ BFileRequest::_ProtocolLoop()
 		if (fListener != NULL) {
 			fListener->DataReceived(this, eplf.String(), transferredSize,
 				eplf.Length());
+			fListener->DownloadProgress(this, transferredSize, 0);
 		}
 		transferredSize += eplf.Length();
 	}
 
-	if (fListener != NULL)
-		fListener->DownloadProgress(this, transferredSize, transferredSize);
 	if (!fQuit)
 		fResult.SetLength(transferredSize);
 
