@@ -575,6 +575,7 @@ BHttpRequest::_MakeRequest()
 	size_t previousBufferSize = 0;
 	off_t bytesUnpacked = 0;
 	char* inputTempBuffer = new(std::nothrow) char[kHttpBufferSize];
+	ArrayDeleter<char> inputTempBufferDeleter(inputTempBuffer);
 	ssize_t inputTempSize = kHttpBufferSize;
 	ssize_t chunkSize = -1;
 	DynamicBuffer decompressorStorage;
@@ -664,10 +665,10 @@ BHttpRequest::_MakeRequest()
 							// 2 more bytes to handle the closing CR+LF
 						bytesRead = chunkSize;
 						if (inputTempSize < chunkSize + 2) {
-							delete[] inputTempBuffer;
 							inputTempSize = chunkSize + 2;
 							inputTempBuffer
 								= new(std::nothrow) char[inputTempSize];
+							inputTempBufferDeleter.SetTo(inputTempBuffer);
 						}
 
 						if (inputTempBuffer == NULL) {
@@ -715,8 +716,8 @@ BHttpRequest::_MakeRequest()
 				if (bytesRead > 0) {
 					if (inputTempSize < bytesRead) {
 						inputTempSize = bytesRead;
-						delete[] inputTempBuffer;
 						inputTempBuffer = new(std::nothrow) char[bytesRead];
+						inputTempBufferDeleter.SetTo(inputTempBuffer);
 					}
 
 					if (inputTempBuffer == NULL) {
@@ -781,7 +782,6 @@ BHttpRequest::_MakeRequest()
 	}
 
 	fSocket->Disconnect();
-	delete[] inputTempBuffer;
 
 	if (readError != B_OK)
 		return readError;
