@@ -1398,6 +1398,13 @@ AboutView::_CreateCreditsView()
 		.SetLicense(kBSDThreeClause)
 		.SetURL("http://www.webmproject.org/code/#libwebp_webp_image_library"));
 
+	// libavif
+	_AddPackageCredit(PackageCredit("libavif")
+		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING
+			"2019 Joe Drago. All rights reserved."))
+		.SetLicense(kBSDThreeClause)
+		.SetURL("https://github.com/AOMediaCodec/libavif"));
+
 	// GTF
 	_AddPackageCredit(PackageCredit("GTF")
 		.SetCopyright(B_TRANSLATE("2001 by Andy Ritger based on the "

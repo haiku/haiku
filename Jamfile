@@ -60,7 +60,7 @@ if $(HAIKU_PACKAGING_ARCHS[2]) {
 				freetype icu libsolv zlib
 
 				regular_image @{
-					ffmpeg glu jasper jpeg libicns libpng16 libwebp mesa
+					ffmpeg glu jasper jpeg libavif libicns libpng16 libwebp mesa
 				}@
 			] ;
 			if $(TARGET_PACKAGING_ARCH) != x86_gcc2 {

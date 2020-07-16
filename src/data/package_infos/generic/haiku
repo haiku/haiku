@@ -130,6 +130,9 @@ requires {
 #ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_libpng_ENABLED
 	lib:libpng16
 #endif
+#ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_libavif_ENABLED
+	lib:libavif >= 12
+#endif
 #ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_openssl_ENABLED
 	lib:libssl
 	lib:libcrypto

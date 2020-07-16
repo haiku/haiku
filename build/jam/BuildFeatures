@@ -650,6 +650,26 @@ if [ IsPackageAvailable libwebp_devel ] {
 }
 
 
+# libavif
+if [ IsPackageAvailable libavif_devel ] {
+	if $(HAIKU_PACKAGING_ARCH) = x86_64 {
+		ExtractBuildFeatureArchives libavif :
+			file: base libavif
+				runtime: lib
+			file: devel libavif_devel
+				depends: base
+				library: $(developLibDir)/libavif.so.12
+				headers: $(developHeadersDir) $(developHeadersDir)/avif
+			;
+		EnableBuildFeatures libavif ;
+	} else {
+		unavailableBuildFeatures += libavif ;
+	}
+} else {
+	unavailableBuildFeatures += libavif ;
+}
+
+
 # live555
 if [ IsPackageAvailable live555_devel ] {
 	ExtractBuildFeatureArchives live555 :

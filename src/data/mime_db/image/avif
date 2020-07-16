@@ -1,0 +1,13 @@
+
+resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
+
+resource(1, "META:TYPE") "image/avif";
+
+resource(2, "META:SNIFF_RULE") "0.50 \(\"\\000\\000\\000 ftypavif\"\)";
+
+resource(3, "META:S:DESC") #'MSDC' "AV1 Image File Format";
+
+resource(4, "META:EXTENS") message(234) {
+	"extensions" = "avif",
+	"type" = "image/avif"
+};

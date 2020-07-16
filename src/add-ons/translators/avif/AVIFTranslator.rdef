@@ -1,0 +1,15 @@
+/*
+ * AVIFTranslator.rdef
+ */
+
+resource app_signature "application/x-vnd.Haiku-AVIFTranslator";
+
+resource app_version {
+	major  = 0,
+	middle = 1,
+	minor  = 0,
+	variety = 0,
+	internal = 0,
+	short_info = "0.1.0",
+	long_info = "Haiku AVIFTranslator Add-Ons."
+};
