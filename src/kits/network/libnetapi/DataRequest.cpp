@@ -9,6 +9,7 @@
 
 #include "DataRequest.h"
 
+#include <AutoDeleter.h>
 #include <HttpAuthentication.h>
 #include <mail_encoding.h>
 #include <stdio.h>
@@ -88,6 +89,7 @@ BDataRequest::_ProtocolLoop()
 
 	}
 
+	ArrayDeleter<char> buffer;
 	if (isBase64) {
 		// Check that the base64 data is properly padded (we process characters
 		// by groups of 4 and there must not be stray chars at the end as
@@ -95,18 +97,17 @@ BDataRequest::_ProtocolLoop()
 		if (data.Length() & 3)
 			return B_BAD_DATA;
 
-		char* buffer = new char[data.Length() * 3 / 4];
-		payload = buffer;
+		buffer.SetTo(new char[data.Length() * 3 / 4]);
+		payload = buffer.Get();
 			// payload must be a const char* so we can assign data.String() to
 			// it below, but decode_64 modifies buffer.
-		length = decode_base64(buffer, data.String(), data.Length());
+		length = decode_base64(buffer.Get(), data.String(), data.Length());
 
 		// There may be some padding at the end of the base64 stream. This
 		// prevents us from computing the exact length we should get, so allow
 		// for some error margin.
 		if (length > data.Length() * 3 / 4
 			|| length < data.Length() * 3 / 4 - 3) {
-			delete[] buffer;
 			return B_BAD_DATA;
 		}
 	} else {
@@ -123,9 +124,6 @@ BDataRequest::_ProtocolLoop()
 			fListener->DownloadProgress(this, length, length);
 		}
 	}
-
-	if (isBase64)
-		delete[] payload;
 
 	return B_OK;
 }
