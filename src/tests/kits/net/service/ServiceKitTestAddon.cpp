@@ -11,6 +11,7 @@
 #include "DataTest.h"
 #include "HttpTest.h"
 #include "UrlTest.h"
+#include "FileTest.h"
 
 
 BTestSuite*
@@ -22,6 +23,7 @@ getTestSuite()
 	UrlTest::AddTests(*suite);
 	HttpTest::AddTests(*suite);
 	DataTest::AddTests(*suite);
+	FileTest::AddTests(*suite);
 
 	return suite;
 }
