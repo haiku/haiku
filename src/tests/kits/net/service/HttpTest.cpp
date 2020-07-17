@@ -172,6 +172,7 @@ void AddCommonTests(BThreadedTestCaller<T>& testCaller)
 	testCaller.addThread("UploadTest", &T::UploadTest);
 	testCaller.addThread("BasicAuthTest", &T::AuthBasicTest);
 	testCaller.addThread("DigestAuthTest", &T::AuthDigestTest);
+	testCaller.addThread("AutoRedirectTest", &T::AutoRedirectTest);
 }
 
 }
@@ -202,53 +203,7 @@ HttpTest::setUp()
 void
 HttpTest::GetTest()
 {
-	BUrl testUrl(fTestServer.BaseUrl(), "/");
-	BUrlContext* context = new BUrlContext();
-	context->AcquireReference();
-
-	std::string expectedResponseBody(
-		"Path: /\r\n"
-		"\r\n"
-		"Headers:\r\n"
-		"--------\r\n"
-		"Host: 127.0.0.1:PORT\r\n"
-		"Accept: */*\r\n"
-		"Accept-Encoding: gzip\r\n"
-		"Connection: close\r\n"
-		"User-Agent: Services Kit (Haiku)\r\n");
-	HttpHeaderMap expectedResponseHeaders;
-	expectedResponseHeaders["Content-Encoding"] = "gzip";
-	expectedResponseHeaders["Content-Length"] = "144";
-	expectedResponseHeaders["Content-Type"] = "text/plain";
-	expectedResponseHeaders["Date"] = "Sun, 09 Feb 2020 19:32:42 GMT";
-	expectedResponseHeaders["Server"] = "Test HTTP Server for Haiku";
-
-	TestListener listener(expectedResponseBody, expectedResponseHeaders);
-
-	ObjectDeleter<BUrlRequest> requestDeleter(
-		BUrlProtocolRoster::MakeRequest(testUrl, &listener, context));
-	BHttpRequest* request = dynamic_cast<BHttpRequest*>(requestDeleter.Get());
-	CPPUNIT_ASSERT(request != NULL);
-
-	CPPUNIT_ASSERT(request->Run());
-	while (request->IsRunning())
-		snooze(1000);
-
-	CPPUNIT_ASSERT_EQUAL(B_OK, request->Status());
-
-	const BHttpResult& result
-		= dynamic_cast<const BHttpResult&>(request->Result());
-	CPPUNIT_ASSERT_EQUAL(200, result.StatusCode());
-	CPPUNIT_ASSERT_EQUAL(BString("OK"), result.StatusText());
-
-	CPPUNIT_ASSERT_EQUAL(144, result.Length());
-
-	listener.Verify();
-
-	CPPUNIT_ASSERT(!context->GetCookieJar().GetIterator().HasNext());
-		// This page should not set cookies
-
-	context->ReleaseReference();
+	_GetTest("/");
 }
 
 
@@ -507,6 +462,13 @@ HttpTest::AuthDigestTest()
 }
 
 
+void
+HttpTest::AutoRedirectTest()
+{
+	_GetTest("/302");
+}
+
+
 /* static */ void
 HttpTest::AddTests(BTestSuite& parent)
 {
@@ -539,6 +501,61 @@ HttpTest::AddTests(BTestSuite& parent)
 		suite.addTest(httpsTestCaller);
 		parent.addTest("HttpsTest", &suite);
 	}
+}
+
+
+void
+HttpTest::_GetTest(const BString& path)
+{
+	BUrl testUrl(fTestServer.BaseUrl(), path);
+	BUrlContext* context = new BUrlContext();
+	context->AcquireReference();
+
+	std::string expectedResponseBody(
+		"Path: /\r\n"
+		"\r\n"
+		"Headers:\r\n"
+		"--------\r\n"
+		"Host: 127.0.0.1:PORT\r\n"
+		"Accept: */*\r\n"
+		"Accept-Encoding: gzip\r\n"
+		"Connection: close\r\n"
+		"User-Agent: Services Kit (Haiku)\r\n");
+	HttpHeaderMap expectedResponseHeaders;
+	expectedResponseHeaders["Content-Encoding"] = "gzip";
+	expectedResponseHeaders["Content-Length"] = "144";
+	expectedResponseHeaders["Content-Type"] = "text/plain";
+	expectedResponseHeaders["Date"] = "Sun, 09 Feb 2020 19:32:42 GMT";
+	expectedResponseHeaders["Server"] = "Test HTTP Server for Haiku";
+
+	TestListener listener(expectedResponseBody, expectedResponseHeaders);
+
+	ObjectDeleter<BUrlRequest> requestDeleter(
+		BUrlProtocolRoster::MakeRequest(testUrl, &listener, context));
+	BHttpRequest* request = dynamic_cast<BHttpRequest*>(requestDeleter.Get());
+	CPPUNIT_ASSERT(request != NULL);
+
+	request->SetAutoReferrer(false);
+
+	CPPUNIT_ASSERT(request->Run());
+	while (request->IsRunning())
+		snooze(1000);
+
+	CPPUNIT_ASSERT_EQUAL(B_OK, request->Status());
+
+	const BHttpResult& result
+		= dynamic_cast<const BHttpResult&>(request->Result());
+	CPPUNIT_ASSERT_EQUAL(200, result.StatusCode());
+	CPPUNIT_ASSERT_EQUAL(BString("OK"), result.StatusText());
+
+	CPPUNIT_ASSERT_EQUAL(144, result.Length());
+
+	listener.Verify();
+
+	CPPUNIT_ASSERT(!context->GetCookieJar().GetIterator().HasNext());
+		// This page should not set cookies
+
+	context->ReleaseReference();
 }
 
 

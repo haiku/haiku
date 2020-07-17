@@ -590,6 +590,7 @@ BHttpRequest::_MakeRequest()
 
 
 	// Receive loop
+	bool disableListener = false;
 	bool receiveEnd = false;
 	bool parseEnd = false;
 	bool readByChunks = false;
@@ -640,8 +641,16 @@ BHttpRequest::_MakeRequest()
 		if (fRequestStatus < kRequestStatusReceived) {
 			_ParseStatus();
 
+#ifndef LIBNETAPI_DEPRECATED
+			// Deprecated behavior is to not disable the listener on redirect
+			if (fOptFollowLocation
+					&& IsRedirectionStatusCode(fResult.StatusCode()))
+				disableListener = true;
+#endif
+
 			//! ProtocolHook:ResponseStarted
-			if (fRequestStatus >= kRequestStatusReceived && fListener != NULL)
+			if (fRequestStatus >= kRequestStatusReceived && fListener != NULL
+					&& !disableListener)
 				fListener->ResponseStarted(this);
 		}
 
@@ -662,7 +671,7 @@ BHttpRequest::_MakeRequest()
 				}
 
 				//! ProtocolHook:HeadersReceived
-				if (fListener != NULL)
+				if (fListener != NULL && !disableListener)
 					fListener->HeadersReceived(this, fResult);
 
 
@@ -768,7 +777,7 @@ BHttpRequest::_MakeRequest()
 			if (bytesRead >= 0) {
 				bytesReceived += bytesRead;
 
-				if (fListener != NULL) {
+				if (fListener != NULL && !disableListener) {
 					if (decompress) {
 						readError = decompressingStream->WriteExactly(
 							inputTempBuffer, bytesRead);
@@ -791,7 +800,7 @@ BHttpRequest::_MakeRequest()
 				if (bytesTotal >= 0 && bytesReceived >= bytesTotal)
 					receiveEnd = true;
 
-				if (decompress && receiveEnd) {
+				if (decompress && receiveEnd && !disableListener) {
 					readError = decompressingStream->Flush();
 
 					if (readError == B_BUFFER_OVERFLOW)
@@ -803,9 +812,11 @@ BHttpRequest::_MakeRequest()
 					ssize_t size = decompressorStorage.Size();
 					BStackOrHeapArray<char, 4096> buffer(size);
 					size = decompressorStorage.Read(buffer, size);
-					_NotifyDataReceived(buffer, bytesUnpacked, size,
-						bytesReceived, bytesTotal);
-					bytesUnpacked += size;
+					if (fListener != NULL) {
+						_NotifyDataReceived(buffer, bytesUnpacked, size,
+							bytesReceived, bytesTotal);
+						bytesUnpacked += size;
+					}
 				}
 			}
 		}
