@@ -192,6 +192,8 @@ ServerFont::operator=(const ServerFont& font)
 
 	SetStyle(font.fStyle);
 
+	fFace = font.fFace;
+
 	return *this;
 }
 
@@ -252,7 +254,7 @@ ServerFont::SetStyle(FontStyle* style)
 	if (style && style != fStyle) {
 		fStyle.SetTo(style, false);
 
-		fFace = fStyle->Face();
+		fFace = fStyle->PreservedFace(fFace);
 		fDirection = fStyle->Direction();
 	}
 }
@@ -304,10 +306,8 @@ ServerFont::SetFamilyAndStyle(uint32 fontID)
 status_t
 ServerFont::SetFace(uint16 face)
 {
-	// TODO: This needs further investigation. The face variable is actually
-	// flags, but some of them are not enforcable at the same time. Also don't
-	// confuse the Be API "face" with the Freetype face, which is just an
-	// index in case a single font file exports multiple font faces. The
+	// Don't confuse the Be API "face" with the Freetype face, which is just
+	// an index in case a single font file exports multiple font faces. The
 	// FontStyle class takes care of mapping the font style name to the Be
 	// API face flags in FontStyle::_TranslateStyleToFace().
 
@@ -319,7 +319,7 @@ ServerFont::SetFace(uint16 face)
 			style.SetTo(gFontManager->GetStyleByIndex(familyID, i), false);
 			if (style == NULL)
 				break;
-			if (style->Face() == face)
+			if (style->PreservedFace(face) == face)
 				break;
 			else
 				style = NULL;
@@ -331,6 +331,7 @@ ServerFont::SetFace(uint16 face)
 	if (!style)
 		return B_ERROR;
 
+	fFace = face;
 	SetStyle(style);
 
 	return B_OK;

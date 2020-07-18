@@ -188,7 +188,8 @@ uint16
 FontStyle::PreservedFace(uint16 face) const
 {
 	// TODO: make this better
-	face &= ~(B_REGULAR_FACE | B_BOLD_FACE | B_ITALIC_FACE);
+	face &= ~(B_REGULAR_FACE | B_BOLD_FACE | B_ITALIC_FACE | B_CONDENSED_FACE
+		| B_LIGHT_FACE | B_HEAVY_FACE);
 	face |= Face();
 
 	return face;
