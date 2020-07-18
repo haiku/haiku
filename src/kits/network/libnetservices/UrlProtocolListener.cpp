@@ -45,10 +45,19 @@ BUrlProtocolListener::ResponseStarted(BUrlRequest*)
 }
 
 
+#ifdef LIBNETAPI_DEPRECATED
 void
 BUrlProtocolListener::HeadersReceived(BUrlRequest*, const BUrlResult& result)
 {
 }
+
+#else
+
+void
+BUrlProtocolListener::HeadersReceived(BUrlRequest*)
+{
+}
+#endif // LIBNETAPI_DEPRECATED
 
 
 void

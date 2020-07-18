@@ -103,15 +103,13 @@
 */
 
 /*!
-	\fn virtual void BUrlProtocolListener::HeadersReceived(BUrlRequest* caller,
-		const BUrlResult& result);
+	\fn virtual void BUrlProtocolListener::HeadersReceived(BUrlRequest* caller)
 	\brief Called when all of the server response metadata (such as headers)
 		have been read and parsed.
 
 	\b Frequency: Once
 
 	\param caller The BUrlRequest that invoked this callback.
-	\param result The BUrlResult associated with the request.
 */
 
 /*!

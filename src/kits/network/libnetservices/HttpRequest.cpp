@@ -672,7 +672,11 @@ BHttpRequest::_MakeRequest()
 
 				//! ProtocolHook:HeadersReceived
 				if (fListener != NULL && !disableListener)
+#ifdef LIBNETAPI_DEPRECATED
 					fListener->HeadersReceived(this, fResult);
+#else
+					fListener->HeadersReceived(this);
+#endif
 
 
 				if (BString(fHeaders["Transfer-Encoding"]) == "chunked")

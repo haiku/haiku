@@ -58,11 +58,10 @@ public:
 	}
 
 	virtual void HeadersReceived(
-		BUrlRequest* caller,
-		const BUrlResult& result)
+		BUrlRequest* caller)
 	{
 		const BHttpResult& http_result
-			= dynamic_cast<const BHttpResult&>(result);
+			= dynamic_cast<const BHttpResult&>(caller->Result());
 		const BHttpHeaders& headers = http_result.Headers();
 
 		for (int32 i = 0; i < headers.CountHeaders(); ++i) {

@@ -32,7 +32,6 @@ local sources =
 	UrlProtocolListener.cpp
 	UrlProtocolRoster.cpp
 	UrlRequest.cpp
-	UrlResult.cpp
 	UrlSynchronousRequest.cpp
 	;
 
@@ -51,12 +50,14 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 
 			MergeObject <libnetapi!$(architecture)>netservices.o :
 				$(sources)
+				UrlResult_Deprecated.cpp
 				: <$(architecture)>libshared.a
 				;
 		} else {
 			StaticLibrary [ MultiArchDefaultGristFiles libnetservices.a ] :
 				$(sources)
 				Geolocation.cpp
+				UrlResult.cpp
 				;
 		}
 

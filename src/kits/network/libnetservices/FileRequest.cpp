@@ -81,7 +81,11 @@ BFileRequest::_ProtocolLoop()
 				return error;
 			fResult.SetLength(size);
 
+#ifdef LIBNETAPI_DEPRECATED
 			fListener->HeadersReceived(this, fResult);
+#else
+			fListener->HeadersReceived(this);
+#endif
 
 			ssize_t chunkSize = 0;
 			char chunk[4096];
@@ -124,7 +128,11 @@ BFileRequest::_ProtocolLoop()
 
 	if (fListener != NULL) {
 		fListener->ConnectionOpened(this);
+#ifdef LIBNETAPI_DEPRECATED
 		fListener->HeadersReceived(this, fResult);
+#else
+		fListener->HeadersReceived(this);
+#endif
 
 		// Add a parent directory entry.
 		fListener->DataReceived(this, "+/,\t..\r\n", transferredSize, 8);

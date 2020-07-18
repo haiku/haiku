@@ -72,6 +72,7 @@ BUrlProtocolDispatchingListener::ResponseStarted(BUrlRequest* caller)
 }
 
 
+#ifdef LIBNETAPI_DEPRECATED
 void
 BUrlProtocolDispatchingListener::HeadersReceived(BUrlRequest* caller,
 	const BUrlResult& result)
@@ -86,6 +87,16 @@ BUrlProtocolDispatchingListener::HeadersReceived(BUrlRequest* caller,
 
 	_SendMessage(&message, B_URL_PROTOCOL_HEADERS_RECEIVED, caller);
 }
+
+#else
+
+void
+BUrlProtocolDispatchingListener::HeadersReceived(BUrlRequest* caller)
+{
+	BMessage message(B_URL_PROTOCOL_NOTIFICATION);
+	_SendMessage(&message, B_URL_PROTOCOL_HEADERS_RECEIVED, caller);
+}
+#endif // LIBNETAPI_DEPRECATED
 
 
 void

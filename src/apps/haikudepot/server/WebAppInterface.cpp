@@ -58,7 +58,7 @@ public:
 	{
 	}
 
-	virtual void HeadersReceived(BUrlRequest* caller, const BUrlResult& result)
+	virtual void HeadersReceived(BUrlRequest* caller)
 	{
 	}
 

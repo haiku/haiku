@@ -102,6 +102,7 @@ BUrlProtocolAsynchronousListener::MessageReceived(BMessage* message)
 			ResponseStarted(caller);
 			break;
 
+#ifdef LIBNETAPI_DEPRECATED
 		case B_URL_PROTOCOL_HEADERS_RECEIVED:
 			{
 				BMessage archive;
@@ -115,7 +116,11 @@ BUrlProtocolAsynchronousListener::MessageReceived(BMessage* message)
 				HeadersReceived(caller, *result);
 				delete result;
 			}
+#else
+		case B_URL_PROTOCOL_HEADERS_RECEIVED:
+			HeadersReceived(caller);
 			break;
+#endif
 
 		case B_URL_PROTOCOL_DATA_RECEIVED:
 			{

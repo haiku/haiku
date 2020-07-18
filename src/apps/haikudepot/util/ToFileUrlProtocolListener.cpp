@@ -51,14 +51,14 @@ ToFileUrlProtocolListener::ResponseStarted(BUrlRequest* caller)
 
 
 void
-ToFileUrlProtocolListener::HeadersReceived(BUrlRequest* caller,
-	const BUrlResult& result)
+ToFileUrlProtocolListener::HeadersReceived(BUrlRequest* caller)
 {
 
 	// check that the status code is success.  Only if it is successful
 	// should the payload be streamed to the file.
 
-	const BHttpResult& httpResult = dynamic_cast<const BHttpResult&>(result);
+	const BHttpResult& httpResult = dynamic_cast<const BHttpResult&>(
+		caller->Result());
 	int32 statusCode = httpResult.StatusCode();
 
 	if (!BHttpRequest::IsSuccessStatusCode(statusCode)) {

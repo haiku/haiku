@@ -49,8 +49,12 @@ public:
 	virtual void				HostnameResolved(BUrlRequest* caller,
 									const char* ip);
 	virtual void				ResponseStarted(BUrlRequest* caller);
+#ifdef LIBNETAPI_DEPRECATED
 	virtual void				HeadersReceived(BUrlRequest* caller,
 									const BUrlResult& result);
+#else
+	virtual void				HeadersReceived(BUrlRequest* caller);
+#endif
 	virtual void				DataReceived(BUrlRequest* caller,
 									const char* data, off_t position,
 									ssize_t size);

@@ -350,7 +350,11 @@ BGopherRequest::_ProtocolLoop()
 			// we don't really have headers but well...
 			//! ProtocolHook:HeadersReceived
 			if (fListener != NULL)
+#ifdef LIBNETAPI_DEPRECATED
 				fListener->HeadersReceived(this, fResult);
+#else
+				fListener->HeadersReceived(this);
+#endif
 		}
 
 		if (_NeedsParsing())

@@ -6,15 +6,12 @@
 #define _B_URL_RESULT_H_
 
 
-#include <Archivable.h>
 #include <String.h>
 
 
-#ifndef LIBNETAPI_DEPRECATED
-namespace BPrivate {
+#ifdef LIBNETAPI_DEPRECATED
+#include <Archivable.h>
 
-namespace Network {
-#endif
 
 class BUrlResult: public BArchivable {
 public:
@@ -37,10 +34,32 @@ private:
 			size_t			fLength;
 };
 
-#ifndef LIBNETAPI_DEPRECATED
-} // namespace Network
+#else
 
-} // namespace BPrivate
-#endif
+namespace BPrivate {
 
-#endif
+namespace Network {
+
+class BUrlResult {
+public:
+							BUrlResult();
+	virtual					~BUrlResult();
+
+			void			SetContentType(BString contentType);
+			void			SetLength(off_t length);
+
+	virtual	BString			ContentType() const;
+	virtual	off_t			Length() const;
+
+private:
+			BString			fContentType;
+			off_t			fLength;
+};
+
+}
+
+}
+
+#endif // LIBNETAPI_DEPRECATED
+
+#endif // _B_URL_RESULT_H_

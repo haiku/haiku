@@ -73,11 +73,21 @@ BUrlSynchronousRequest::ResponseStarted(BUrlRequest*)
 }
 
 
+#ifdef LIBNETAPI_DEPRECATED
 void
 BUrlSynchronousRequest::HeadersReceived(BUrlRequest*, const BUrlResult& result)
 {
 	PRINT(("SynchronousRequest::HeadersReceived()\n"));
 }
+
+#else
+
+void
+BUrlSynchronousRequest::HeadersReceived(BUrlRequest*)
+{
+	PRINT(("SynchronousRequest::HeadersReceived()\n"));
+}
+#endif // LIBNETAPI_DEPRECATED
 
 
 void

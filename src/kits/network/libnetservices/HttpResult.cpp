@@ -29,6 +29,7 @@ BHttpResult::BHttpResult(const BUrl& url)
 }
 
 
+#ifdef LIBNETAPI_DEPRECATED
 BHttpResult::BHttpResult(BMessage* archive)
 	:
 	BUrlResult(archive),
@@ -42,6 +43,7 @@ BHttpResult::BHttpResult(BMessage* archive)
 	archive->FindMessage("http:headers", &headers);
 	fHeaders.PopulateFromArchive(&headers);
 }
+#endif
 
 
 BHttpResult::BHttpResult(const BHttpResult& other)
@@ -86,6 +88,7 @@ BHttpResult::ContentType() const
 }
 
 
+#ifdef LIBNETAPI_DEPRECATED
 size_t
 BHttpResult::Length() const
 {
@@ -114,6 +117,38 @@ BHttpResult::Length() const
 	}
 	return result;
 }
+
+#else
+
+off_t
+BHttpResult::Length() const
+{
+	const char* length = Headers()["Content-Length"];
+	if (length == NULL)
+		return 0;
+
+	/* NOTE: Not RFC7230 compliant:
+	 * - If Content-Length is a list, all values must be checked and verified
+	 *   to be duplicates of each other, but this is currently not supported.
+	 */
+	off_t result = 0;
+	/* strtoull() will ignore a prefixed sign, so we verify that there aren't
+	 * any before continuing (RFC7230 only permits digits).
+	 *
+	 * We can check length[0] directly because header values are trimmed by
+	 * HttpHeader beforehand. */
+	if (length[0] != '-' && length[0] != '+') {
+		errno = 0;
+		char *endptr = NULL;
+		result = strtoull(length, &endptr, 10);
+		/* ERANGE will be signalled if the result is too large (which can
+		 * happen), in that case, return 0. */
+		if (errno != 0 || *endptr != '\0')
+			result = 0;
+	}
+	return result;
+}
+#endif // BNETAPI_DEPRECATED
 
 
 const BHttpHeaders&
@@ -165,6 +200,7 @@ BHttpResult::operator=(const BHttpResult& other)
 }
 
 
+#ifdef LIBNETAPI_DEPRECATED
 status_t
 BHttpResult::Archive(BMessage* target, bool deep) const
 {
@@ -192,3 +228,4 @@ BHttpResult::Instantiate(BMessage* archive)
 
 	return new BHttpResult(archive);
 }
+#endif

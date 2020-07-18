@@ -123,7 +123,11 @@ BDataRequest::_ProtocolLoop()
 	fResult.SetLength(length);
 
 	if (fListener != NULL) {
+#ifdef LIBNETAPI_DEPRECATED
 		fListener->HeadersReceived(this, fResult);
+#else
+		fListener->HeadersReceived(this);
+#endif
 		if (length > 0) {
 			fListener->DataReceived(this, payload, 0, length);
 			fListener->DownloadProgress(this, length, length);
