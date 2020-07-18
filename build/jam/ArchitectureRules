@@ -56,8 +56,7 @@ rule ArchitectureSetup architecture
 
 	# activating graphite optimizations
 	if $(HAIKU_USE_GCC_GRAPHITE_$(architecture)) = 1 {
-		ccBaseFlags += -floop-interchange -ftree-loop-distribution
-			-floop-strip-mine -floop-block ;
+		ccBaseFlags += -floop-nest-optimize -fgraphite-identity ;
 	}
 
 	# initial state for flags etc.
