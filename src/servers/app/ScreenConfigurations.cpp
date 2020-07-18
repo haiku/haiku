@@ -144,6 +144,16 @@ ScreenConfigurations::Set(int32 id, const monitor_info* info,
 
 
 void
+ScreenConfigurations::SetBrightness(int32 id, float brightness)
+{
+	for (int32 i = fConfigurations.CountItems(); i-- > 0;) {
+		screen_configuration* configuration = fConfigurations.ItemAt(i);
+		configuration->brightness = brightness;
+	}
+}
+
+
+void
 ScreenConfigurations::Remove(screen_configuration* configuration)
 {
 	if (configuration == NULL)
@@ -184,6 +194,7 @@ ScreenConfigurations::Store(BMessage& settings) const
 		screenSettings.AddRect("frame", configuration->frame);
 		screenSettings.AddData("mode", B_RAW_TYPE, &configuration->mode,
 			sizeof(display_mode));
+		screenSettings.AddFloat("brightness", configuration->brightness);
 
 		settings.AddMessage("screen", &screenSettings);
 	}
@@ -230,7 +241,8 @@ ScreenConfigurations::Restore(const BMessage& settings)
 			// create monitor info
 			strlcpy(configuration->info.vendor, vendor,
 				sizeof(configuration->info.vendor));
-			strlcpy(configuration->info.name, name, sizeof(configuration->info.name));
+			strlcpy(configuration->info.name, name,
+				sizeof(configuration->info.name));
 			strlcpy(configuration->info.serial_number, serial,
 				sizeof(configuration->info.serial_number));
 			configuration->info.product_id = productID;
@@ -242,6 +254,9 @@ ScreenConfigurations::Restore(const BMessage& settings)
 
 		stored.FindRect("frame", &configuration->frame);
 		memcpy(&configuration->mode, mode, sizeof(display_mode));
+
+		if (stored.FindFloat("brightness", &configuration->brightness) != B_OK)
+			configuration->brightness = 1.0f;
 
 		fConfigurations.AddItem(configuration);
 	}

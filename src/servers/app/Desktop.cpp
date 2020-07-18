@@ -888,6 +888,22 @@ Desktop::RevertScreenModes(uint32 workspaces)
 
 
 status_t
+Desktop::SetBrightness(int32 id, float brightness)
+{
+	status_t result = HWInterface()->SetBrightness(brightness);
+
+	if (result == B_OK) {
+		fWorkspaces[0].StoredScreenConfiguration().SetBrightness(id,
+			brightness);
+		// Save brightness for next boot
+		StoreWorkspaceConfiguration(0);
+	}
+
+	return result;
+}
+
+
+status_t
 Desktop::LockDirectScreen(team_id team)
 {
 	// TODO: BWindowScreens should use the same mechanism as BDirectWindow,
@@ -2676,14 +2692,13 @@ Desktop::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			fQuitting = true;
 			BroadcastToAllApps(AS_QUIT_APP);
 
-			// We now need to process the remaining AS_DELETE_APP messages and
-			// wait for the kMsgShutdownServer message.
-			// If an application does not quit as asked, the picasso thread
-			// will send us this message in 2-3 seconds.
+			// We now need to process the remaining AS_DELETE_APP messages.
+			// We quit the looper when the last app is deleted.
 
 			// if there are no apps to quit, shutdown directly
 			if (fShutdownCount == 0)
 				PostMessage(kMsgQuitLooper);
+
 			break;
 
 		case AS_ACTIVATE_WORKSPACE:

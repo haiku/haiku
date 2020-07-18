@@ -125,6 +125,8 @@ public:
 									BRect& frame);
 			void				RevertScreenModes(uint32 workspaces);
 
+			status_t			SetBrightness(int32 id, float brightness);
+
 			MultiLocker&		ScreenLocker() { return fScreenLock; }
 
 			status_t			LockDirectScreen(team_id team);
