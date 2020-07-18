@@ -16,11 +16,6 @@ if [ -z "$MAKE" ]; then
 	export MAKE=make
 fi
 
-if [ -z "$HAIKU_USE_GCC_GRAPHITE" ]; then
-	echo "HAIKU_USE_GCC_GRAPHITE undefined. Assuming false"
-	export HAIKU_USE_GCC_GRAPHITE=0
-fi
-
 haikuMachine=$1
 haikuSourceDir=$2
 buildToolsDir=$3
@@ -177,21 +172,6 @@ mkdir -p "$installDir" "$objDir" "$binutilsObjDir" "$gccObjDir" "$gdbObjDir" \
 	"$stdcxxObjDir" "$tmpIncludeDir" "$tmpLibDir" || exit 1
 mkdir -p "$installDir/lib/gcc/$haikuMachine/$gccVersion"
 
-if [ "$HAIKU_USE_GCC_GRAPHITE" = 1 ]; then
-	cloogSourceDir="$buildToolsDir/cloog"
-	gmpSourceDir="$buildToolsDir/gcc/gmp"
-	islSourceDir="$buildToolsDir/isl"
-
-	islObjDir="$objDir/isl"
-	gmpObjDir="$objDir/gmp"
-	cloogObjDir="$objDir/cloog"
-	mkdir -p "$islObjDir" "$gmpObjDir" "$cloogObjDir" || exit 1
-
-	gccConfigureArgs="$gccConfigureArgs --with-cloog=$installDir \
-		--enable-cloog-backend=isl --with-isl=$installDir \
-		--with-gmp=$installDir \
-		--with-host-libstdcxx=\"-lstdc++\""
-fi
 if [ "$HAIKU_USE_GCC_PIPE" = 1 ]; then
 	ccFlags="$ccFlags -pipe"
 	cxxFlags="$cxxFlags -pipe"
@@ -229,32 +209,6 @@ $MAKE $additionalMakeArgs || exit 1
 $MAKE $additionalMakeArgs install || exit 1
 
 export PATH="$PATH:$installDir/bin"
-
-if [ "$HAIKU_USE_GCC_GRAPHITE" = 1 ]; then
-	# build gmp
-	cd "$gmpObjDir"
-	CFLAGS="$ccFlags" CXXFLAGS="$cxxFlags" "$gmpSourceDir/configure" \
-		--prefix="$installDir" --disable-shared --enable-cxx || exit 1
-	$MAKE $additionalMakeArgs || exit 1
-	$MAKE $additionalMakeArgs install || exit 1
-
-	# build isl
-	cd "$islObjDir"
-	CFLAGS="$ccFlags" CXXFLAGS="$cxxFlags" "$islSourceDir/configure" \
-		--prefix="$installDir" --disable-nls --disable-shared \
-		 --with-gmp-prefix="$installDir" || exit 1
-	$MAKE $additionalMakeArgs || exit 1
-	$MAKE $additionalMakeArgs install || exit 1
-
-	# build cloog
-	cd "$cloogObjDir"
-	CFLAGS="$ccFlags" CXXFLAGS="$cxxFlags" "$cloogSourceDir/configure" \
-		--prefix="$installDir" --disable-nls --disable-shared \
-		--with-gmp-prefix="$installDir" --with-isl-prefix=="$installDir" \
-		|| exit 1
-	$MAKE $additionalMakeArgs || exit 1
-	$MAKE $additionalMakeArgs install || exit 1
-fi
 
 # build gcc
 
