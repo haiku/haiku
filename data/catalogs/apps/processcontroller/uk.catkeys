@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-ProcessController	168752057
+1	ukrainian	x-vnd.Haiku-ProcessController	2280875657
 Error saving file	ProcessController		Помилка при збереженні файлу
 Display priority	ProcessController		Пріоритет відображення
 That's no Fun!	ProcessController		Це не жарт!
@@ -36,7 +36,6 @@ Quit an application	ProcessController		Вийти з програми
 Cancel	ProcessController		Скасувати
 Install in Deskbar	ProcessController		Встановити у Deskbar
 Debug this team!	ProcessController		Відладити цю команду!
-Low latency	ProcessController		Низька затримка
 ProcessController	System name		ProcessController
 Lowest active priority	ProcessController		Найнижча перевага
 Restart Tracker	ProcessController		Перезапустити Tracker

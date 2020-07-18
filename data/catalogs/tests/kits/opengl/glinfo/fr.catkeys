@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-GLInfo	3578356280
+1	french	x-vnd.Haiku-GLInfo	3666421000
 Maximum clipping planes	Capabilities		Plans de coupe maximum
 Maximum 2D texture size	Capabilities		Taille maximale des textures 2D
 Auxiliary buffer(s)	Capabilities		Buffer(s) auxiliaire(s)
@@ -10,7 +10,9 @@ Attributes stack size	Capabilities		Taille de la pile d'attributs
 Maximum lights	Capabilities		Maximum de lumières
 Maximum 3D texture size	Capabilities		Taille maximale des textures 3D
 Extensions	Extensions		Extensions
+Maximum recommended index elements	Capabilities		Nombre maximal d’indexes recommandés
 Available extensions	Extensions		Extensions disponibles
+Maximum recommended vertex elements	Capabilities		Nombre maximal de sommets recommandés
 Value	Capabilities		Valeur
 Maximum texture units	Capabilities		Maximum d’unités de textures
 Capabilities	Capabilities		Aptitudes

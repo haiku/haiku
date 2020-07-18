@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-WebPositive	1879106286
+1	danish	x-vnd.Haiku-WebPositive	55235296
 Authentication required	Authentication Panel		Autentifikation kræves
 Previous	WebPositive Window		Forrige
 (Finish: %date)	Download Window		(færdig: %date)
@@ -9,7 +9,6 @@ Find:	WebPositive Window		Find:
 Script console	WebPositive Window		Script-konsol
 Fonts	Settings Window		Skrifttyper
 Path	Cookie Manager		Sti
-of	Download Window	...as in '12kB of 256kB'	af
 Bookmarks	WebPositive Window		Bogmærker
 Use proxy server to connect to the internet	Settings Window		Brug proxyserver til at oprette forbindelse til internettet
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url færdig

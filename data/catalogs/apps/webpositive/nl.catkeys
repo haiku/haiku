@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-WebPositive	1879106286
+1	dutch; flemish	x-vnd.Haiku-WebPositive	55235296
 Authentication required	Authentication Panel		Aanmelding is vereist
 Previous	WebPositive Window		Vorige
 (Finish: %date)	Download Window		(Voltooid: %date)
@@ -9,7 +9,6 @@ Find:	WebPositive Window		Zoeken:
 Script console	WebPositive Window		Scriptconsole
 Fonts	Settings Window		Lettertypen
 Path	Cookie Manager		Pad
-of	Download Window	...as in '12kB of 256kB'	van
 Bookmarks	WebPositive Window		Bladwijzers
 Use proxy server to connect to the internet	Settings Window		Gebruik een proxyserver om met het internet te verbinden
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url gereed

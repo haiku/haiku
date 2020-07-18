@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Input	1910113385
+1	german	x-vnd.Haiku-Input	1950274171
 Defaults	InputMouse		Standardwerte
 Scrolling	TouchpadPrefView		Scrollen
 Long	KeyboardView		Lang
@@ -15,6 +15,7 @@ Please confirm	TouchpadPrefView		Bitte bestätigen
 Mouse speed	SettingsView		Geschwindigkeit
 Horizontal scrolling	TouchpadPrefView		Horizontales Scrollen
 Input	System name		Eingabegeräte
+Quick	TouchpadPrefView		Schnell
 Short	KeyboardView		Kurz
 Revert	InputMouse		Anfangswerte
 Slow	KeyboardView		Langsam
@@ -26,15 +27,19 @@ Focus follows mouse	SettingsView		Ohne Klicken aktivieren
 Focus mode:	SettingsView		Modus:
 Revert	TouchpadPrefView		Anfangswerte
 4-Button	SettingsView		4-Tasten
+Tapping sensitivity	TouchpadPrefView		Tipp Empfindlichkeit
 Instant warp	SettingsView		Sofortiger Warp
 Revert	InputKeyboard		Anfangswerte
 Mouse type:	SettingsView		Mausart:
 Off	TouchpadPrefView		Aus
+Never	TouchpadPrefView		Nie
 Fast	TouchpadPrefView		Schnell
+6-Button	SettingsView		6-Tasten
 Click to focus	SettingsView		Klicken aktiviert Fenster
 Acceleration	TouchpadPrefView		Beschleunigung
 Accept first click	SettingsView		Auf ersten Klick reagieren
 OK	TouchpadPrefView		OK
+Keyboard Lock Delay	TouchpadPrefView		Verzögerung der Tastatursperre
 Delay until key repeat	KeyboardView		Verzögerung bis Tastenwiederholung
 Two finger scrolling	TouchpadPrefView		Zwei-Finger-Scrollen
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Der neue Scroll-Bereich ist sehr groß und könnte eine normale Mausfunktion beeinträchtigen. Soll die Einstellung wirklich geändert werden?

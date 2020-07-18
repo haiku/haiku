@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-WebPositive	1879106286
+1	esperanto	x-vnd.Haiku-WebPositive	55235296
 Authentication required	Authentication Panel		Aŭtentigo nepra
 Previous	WebPositive Window		Antaŭa
 (Finish: %date)	Download Window		(Fino: %date)
@@ -9,7 +9,6 @@ Find:	WebPositive Window		Serĉi:
 Script console	WebPositive Window		Skriptokonzolo
 Fonts	Settings Window		Tiparoj
 Path	Cookie Manager		Itinero
-of	Download Window	...as in '12kB of 256kB'	de
 Bookmarks	WebPositive Window		Legosignaro
 Use proxy server to connect to the internet	Settings Window		Konekti al interreto per prokurilo
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url elŝutita

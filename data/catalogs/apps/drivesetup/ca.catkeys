@@ -37,7 +37,7 @@ There's no space on the partition where a child partition could be created.	Main
 No disk devices have been recognized.	DiskView		No s'ha reconegut cap dispositiu de disc.
 Attributes	PartitionList		Atributs
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Ha fallat suprimir la partició. No s'ha escrit cap canvi al disc.
-Change parameters…	MainWindow		Canvia els paràmetres...
+Change parameters…	MainWindow		Canvia'n els paràmetres...
 Format	InitializeParametersPanel		Format
 Could not unmount partition	MainWindow		No s'ha pogut desmuntar la partició.
 Create	CreateParametersPanel		Crea
@@ -78,7 +78,7 @@ Free space	PartitionList		Espai lliure
 Queries	PartitionList		Consultes
 Force unmount	MainWindow		Força'n el desmuntatge
 Partition	MainWindow		Partició
-Change parameters	MainWindow		Canvia els paràmetres
+Change parameters	MainWindow		Canvia'n els paràmetres
 Rescan	MainWindow		Torna a explorar
 There was an error acquiring the partition row.	MainWindow		Hi ha hagut un error en obtenir la fila de particions.
 Failed to initialize the disk %s!\n	MainWindow		Ha fallat iniciar el disc %s!\n

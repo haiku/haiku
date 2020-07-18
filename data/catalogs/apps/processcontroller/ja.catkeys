@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-ProcessController	168752057
+1	japanese	x-vnd.Haiku-ProcessController	2280875657
 Error saving file	ProcessController		ファイル保存中にエラーが発生しました
 Display priority	ProcessController		表示優先度
 That's no Fun!	ProcessController		そんなのおもしろくない!
@@ -36,7 +36,6 @@ Quit an application	ProcessController		アプリケーションを終了
 Cancel	ProcessController		中止
 Install in Deskbar	ProcessController		Deskbar にインストール
 Debug this team!	ProcessController		スレッドをデバッグ
-Low latency	ProcessController		低遅延モード
 ProcessController	System name		プロセスコントローラー
 Lowest active priority	ProcessController		最低アクティブ優先度
 Restart Tracker	ProcessController		Tracker を再起動

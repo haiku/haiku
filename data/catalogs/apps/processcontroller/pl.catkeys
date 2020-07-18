@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-ProcessController	168752057
+1	polish	x-vnd.Haiku-ProcessController	2280875657
 Error saving file	ProcessController		Błąd przy zapisywaniu pliku
 Display priority	ProcessController		Priorytet wyświetlania
 That's no Fun!	ProcessController		To nie zabawa!
@@ -36,7 +36,6 @@ Quit an application	ProcessController		Zakończ aplikację
 Cancel	ProcessController		Anuluj
 Install in Deskbar	ProcessController		Zainstaluj w Deskbarze
 Debug this team!	ProcessController		Debuguj ten wątek!
-Low latency	ProcessController		Niskie opóźnienia
 ProcessController	System name		ProcessController
 Lowest active priority	ProcessController		Najniższy aktywny priorytet
 Restart Tracker	ProcessController		Zrestartuj Trackera

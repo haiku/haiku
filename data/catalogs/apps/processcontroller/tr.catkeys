@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-ProcessController	168752057
+1	turkish	x-vnd.Haiku-ProcessController	2280875657
 Error saving file	ProcessController		Dosya kaydedilirken hata
 Display priority	ProcessController		Görüntüleme önceliği
 That's no Fun!	ProcessController		O da nesi öyle!
@@ -36,7 +36,6 @@ Quit an application	ProcessController		Bir uygulamadan çık
 Cancel	ProcessController		İptal
 Install in Deskbar	ProcessController		Masaüstü Çubuğu'na yükle
 Debug this team!	ProcessController		Hata ayıkla
-Low latency	ProcessController		Düşük gecikme
 ProcessController	System name		İşlem Denetimcisi
 Lowest active priority	ProcessController		En düşük etkin öncelik
 Restart Tracker	ProcessController		İzleyici'yi yeniden başlat

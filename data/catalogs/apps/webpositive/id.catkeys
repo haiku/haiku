@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-WebPositive	1879106286
+1	indonesian	x-vnd.Haiku-WebPositive	55235296
 Authentication required	Authentication Panel		Otentikasi dibutuhkan
 Previous	WebPositive Window		Sebelumnya
 (Finish: %date)	Download Window		(Selesai: %date)
@@ -9,7 +9,6 @@ Find:	WebPositive Window		Cari:
 Script console	WebPositive Window		Konsol skrip
 Fonts	Settings Window		Fon
 Path	Cookie Manager		Jalur
-of	Download Window	...as in '12kB of 256kB'	dari
 Bookmarks	WebPositive Window		Bookmark
 Use proxy server to connect to the internet	Settings Window		Gunakan server proksi untuk terhubung ke internet
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url selesai

@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-ProcessController	168752057
+1	catalan; valencian	x-vnd.Haiku-ProcessController	2280875657
 Error saving file	ProcessController		Error en desar el fitxer
 Display priority	ProcessController		Mostra'n la prioritat
 That's no Fun!	ProcessController		No té cap gràcia!
@@ -36,7 +36,6 @@ Quit an application	ProcessController		Surt d'una aplicació
 Cancel	ProcessController		Cancel·la
 Install in Deskbar	ProcessController		Instal·la-ho a la barra d'escriptori
 Debug this team!	ProcessController		Depureu aquest equip!
-Low latency	ProcessController		Latència baixa
 ProcessController	System name		Controlador de processos
 Lowest active priority	ProcessController		Prioritat activa més baixa
 Restart Tracker	ProcessController		Reinicia el Rastrejador

@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-ProcessController	168752057
+1	dutch; flemish	x-vnd.Haiku-ProcessController	2280875657
 Error saving file	ProcessController		Fout bij bestandsopslag
 Display priority	ProcessController		Weergave prioriteit
 That's no Fun!	ProcessController		Da's niet Leuk!
@@ -36,7 +36,6 @@ Quit an application	ProcessController		Een toepassing afsluiten
 Cancel	ProcessController		Annuleren
 Install in Deskbar	ProcessController		Installeren in Deskbar
 Debug this team!	ProcessController		Debug dit team!
-Low latency	ProcessController		Lage latentie
 ProcessController	System name		ProcessController
 Lowest active priority	ProcessController		Laagste actieve prioriteit
 Restart Tracker	ProcessController		Tracker herstarten

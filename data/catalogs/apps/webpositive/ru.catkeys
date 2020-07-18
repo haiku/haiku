@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-WebPositive	1879106286
+1	russian	x-vnd.Haiku-WebPositive	55235296
 Authentication required	Authentication Panel		Требуется авторизация
 Previous	WebPositive Window		Ранее
 (Finish: %date)	Download Window		(Завершение: %date)
@@ -9,7 +9,6 @@ Find:	WebPositive Window		Найти:
 Script console	WebPositive Window		Консоль сценариев
 Fonts	Settings Window		Шрифты
 Path	Cookie Manager		Путь
-of	Download Window	...as in '12kB of 256kB'	из
 Bookmarks	WebPositive Window		Закладки
 Use proxy server to connect to the internet	Settings Window		Использовать прокси-сервер для соединения с интернетом
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url загружен

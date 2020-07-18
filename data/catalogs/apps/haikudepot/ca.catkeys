@@ -24,7 +24,7 @@ A network transport error has arisen communicating with the server system: %s	Se
 Rating	PackageListView		Puntuació
 Synchronizing icons	ServerIconExportUpdateProcess		Sincronització de les icones
 Does not start	RatePackageWindow		No s'inicia.
-Show	MainWindow		Mostra-ho
+Show	MainWindow		Mostra...
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Hi ha hagut un error en obtenir la llista de paquets: %message%
 Unstable but usable	RatePackageWindow		Inestable però usable
 Not specified	RatePackageWindow		Sense especificar

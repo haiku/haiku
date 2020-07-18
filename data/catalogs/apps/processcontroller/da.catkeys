@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-ProcessController	168752057
+1	danish	x-vnd.Haiku-ProcessController	2280875657
 Error saving file	ProcessController		Fejl ved gemning af fil
 Display priority	ProcessController		Visningsprioritet
 That's no Fun!	ProcessController		Det var kedeligt!
@@ -36,7 +36,6 @@ Quit an application	ProcessController		Afslut et program
 Cancel	ProcessController		Annuller
 Install in Deskbar	ProcessController		Installer i skrivebordslinje
 Debug this team!	ProcessController		Fejlret teamet!
-Low latency	ProcessController		Lav latens
 ProcessController	System name		Processtyring
 Lowest active priority	ProcessController		Laveste aktive prioritet
 Restart Tracker	ProcessController		Genstart tracker

@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-WebPositive	3989495979
+1	portuguese (brazil)	x-vnd.Haiku-WebPositive	2165624989
 Authentication required	Authentication Panel		Autenticação requerida
 Previous	WebPositive Window		Anterior
 Open bookmarks confirmation	WebPositive Window		Abrir confirmação de marcadores
@@ -7,7 +7,6 @@ Close window	WebPositive Window		Fechar janela
 Find:	WebPositive Window		Localizar:
 Script console	WebPositive Window		Console do script
 Fonts	Settings Window		Fontes
-of	Download Window	...as in '12kB of 256kB'	de
 Bookmarks	WebPositive Window		Marcadores
 Use proxy server to connect to the internet	Settings Window		Utilize o servidor proxy para conectar à internet
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url concluído

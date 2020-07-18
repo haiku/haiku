@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-ProcessController	168752057
+1	swedish	x-vnd.Haiku-ProcessController	2280875657
 Error saving file	ProcessController		Fel vid sparning av fil
 Display priority	ProcessController		Visningsprioritet
 That's no Fun!	ProcessController		Det var inte roligt!
@@ -36,7 +36,6 @@ Quit an application	ProcessController		Avsluta ett program
 Cancel	ProcessController		Avbryt
 Install in Deskbar	ProcessController		Installera i Deskbar
 Debug this team!	ProcessController		Felsök tråden!
-Low latency	ProcessController		Låg latens
 ProcessController	System name		ProcessKontroll
 Lowest active priority	ProcessController		Lägsta aktiva prioritet
 Restart Tracker	ProcessController		Starta om Tracker

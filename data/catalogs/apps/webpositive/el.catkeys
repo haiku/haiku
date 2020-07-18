@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-WebPositive	4212912362
+1	greek, modern (1453-)	x-vnd.Haiku-WebPositive	2389041372
 Authentication required	Authentication Panel		Απαιτείται ταυτοποίηση
 Previous	WebPositive Window		Προηγούμενο
 (Finish: %date)	Download Window		(Ολοκλήρωση: %date)
@@ -8,7 +8,6 @@ Find:	WebPositive Window		Εύρεση:
 Script console	WebPositive Window		Κονσόλα σεναρίων
 Fonts	Settings Window		Γραμματοσειρές
 Path	Cookie Manager		Διαδρομή
-of	Download Window	...as in '12kB of 256kB'	από
 Bookmarks	WebPositive Window		Σελιδοδείκτες
 Use proxy server to connect to the internet	Settings Window		Χρήση μεσολαβητή για την σύνδεση στο διαδίκτυο
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url ολοκληρώθηκε

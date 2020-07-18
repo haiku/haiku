@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-WebPositive	2763299522
+1	slovak	x-vnd.Haiku-WebPositive	939428532
 Authentication required	Authentication Panel		Vyžaduje sa overenie totožnosti
 Previous	WebPositive Window		Predošlé
 (Finish: %date)	Download Window		(Dokončenie: %date)
@@ -9,7 +9,6 @@ Find:	WebPositive Window		Nájsť:
 Script console	WebPositive Window		Konzola skriptov
 Fonts	Settings Window		Písma
 Path	Cookie Manager		Cesta
-of	Download Window	...as in '12kB of 256kB'	z
 Bookmarks	WebPositive Window		Záložky
 Use proxy server to connect to the internet	Settings Window		Použiť na pripojenie k internetu server proxy
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url hotovo

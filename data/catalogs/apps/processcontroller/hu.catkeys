@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-ProcessController	168752057
+1	hungarian	x-vnd.Haiku-ProcessController	2280875657
 Error saving file	ProcessController		Hiba történt a fájl mentése során
 Display priority	ProcessController		Kijelzési prioritás
 That's no Fun!	ProcessController		Ez nem vicces!
@@ -36,7 +36,6 @@ Quit an application	ProcessController		Program leállítása
 Cancel	ProcessController		Mégse
 Install in Deskbar	ProcessController		Telepítés az Asztalsávra
 Debug this team!	ProcessController		Szál hibakeresése!
-Low latency	ProcessController		Kis késleltetés
 ProcessController	System name		Folyamatkezelő
 Lowest active priority	ProcessController		Legalacsonyabb aktív prioritás
 Restart Tracker	ProcessController		Nyomkövető újraindítása

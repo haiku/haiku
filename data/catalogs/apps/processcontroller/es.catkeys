@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-ProcessController	168752057
+1	spanish; castilian	x-vnd.Haiku-ProcessController	2280875657
 Error saving file	ProcessController		Error cuando tratamos de gaurdar el archivo
 Display priority	ProcessController		Prioridad de Muestra
 That's no Fun!	ProcessController		¡No es divertido!
@@ -36,7 +36,6 @@ Quit an application	ProcessController		Cerrar una aplicación
 Cancel	ProcessController		Cancelar
 Install in Deskbar	ProcessController		Instalar en barra de escritorio
 Debug this team!	ProcessController		¡Depurar este hilo!
-Low latency	ProcessController		Baja latencia
 ProcessController	System name		Controlador de Procesos
 Lowest active priority	ProcessController		La prioridad activa más baja
 Restart Tracker	ProcessController		Reactivar Tracker

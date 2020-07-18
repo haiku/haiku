@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	297802322
+1	german	x-vnd.Haiku-libtracker	2449459098
 Created	ContainerWindow		Erstellt
 Icon	AttributesView		Icon
 Open and make preferred	OpenWithWindow		Öffnen und zur Bevorzugten machen
@@ -40,6 +40,7 @@ Small bitmap icon	AttributesView		Kleines Bitmap Icon
 Would you like to find a suitable application to open the file?	FSUtils		Soll nach einer geeigneten Anwendung gesucht werden, um die Datei zu öffnen?
 64 x 64	ContainerWindow		64 x 64
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Ordner oder Verknüpfungen können nicht mit einer Datei ersetzt werden.
+{0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# Daten>}}
 Trailing \\.	libtracker		\\ am Ende.
 At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Bei %func \nfind_directory() fehlgeschlagen \nGrund: %error
 Handles any file	OpenWithWindow		Geeignet für jede Datei
@@ -90,6 +91,7 @@ Atom	AttributesView		Atom
 %SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%SizeProcessed von %TotalSize, %BytesPerSecond/s
 Preparing to restore items…	StatusWindow		Wiederherstellen wird vorbereitet…
 Mount	ContainerWindow		Einhängen
+{0, plural, other{<# rectangles>}}	AttributesView		{0, plural, other{<# Rechtecke>}}
 Desktop	B_DESKTOP_DIRECTORY		Desktop
 Corrupted pointers.	libtracker		Zeigerfehler.
 Link to:	InfoWindow		Verknüpfung zu:
@@ -178,6 +180,7 @@ MIME Type	AttributesView		MIME Typ
 Show folder location in title tab	SettingsView		Ordnerpfad im Fenstertitel zeigen
 There was an error resolving the link.	Tracker		Fehler beim Auflösen der Verknüpfung.
 There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Es ist ein Problem beim Speichern in den angegebenen Ordner aufgetreten. Bitte einen anderen wählen.
+{0, plural, other{<# values>}}	AttributesView		{0, plural, other{<# Werte>}}
 Desktop	TrackerSettingsWindow		Desktop
 Nested *?+.	libtracker		Verschachtelte *?+.
 Move	FSUtils	button label	Verschieben
@@ -341,6 +344,7 @@ Could not open \"%document\" with application \"%app\" (Missing libraries: %libr
 Finish: %time	StatusWindow		Fertig: %time
 Messenger	AttributesView		Messenger
 after	FindPanel		nach
+{0, plural, one{<# data byte>} other{<# bytes of data>}}	AttributesView		{0, plural, one{<# Datenbyte>} other{<# Datenbytes>}}
 Version	OpenWithWindow		Version
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Einige der ausgewählten Objekte können nicht in den Papierkorb verschoben werden. Sollen sie stattdessen gelöscht werden? (Diese Aktion kann nicht rückgängig gemacht werden.)
 Add printer…	ContainerWindow		Drucker hinzufügen…

@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-ProcessController	4131818684
+1	slovak	x-vnd.Haiku-ProcessController	1948974988
 Error saving file	ProcessController		Chyba pri ukladaní súboru
 Display priority	ProcessController		Priorita zobrazenie
 That's no Fun!	ProcessController		To nie je sranda!
@@ -36,7 +36,6 @@ Quit an application	ProcessController		Ukončiť aplikáciu
 Cancel	ProcessController		Zrušiť
 Install in Deskbar	ProcessController		Nainštalovať do Panelu
 Debug this team!	ProcessController		Ladiť tento tím!
-Low latency	ProcessController		Nízka latencia
 ProcessController	System name		Správca procesov
 Lowest active priority	ProcessController		Najnižšia aktívna priorita
 Restart Tracker	ProcessController		Reštartovať Tracker

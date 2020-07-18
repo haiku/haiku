@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-WebPositive	1879106286
+1	thai	x-vnd.Haiku-WebPositive	55235296
 Authentication required	Authentication Panel		ต้องการการรับรองความถูกต้อง
 Previous	WebPositive Window		ก่อนหน้า
 (Finish: %date)	Download Window		(สิ้นสุด: %date)
@@ -9,7 +9,6 @@ Find:	WebPositive Window		ค้นหา:
 Script console	WebPositive Window		คอนโซลสคริปต์
 Fonts	Settings Window		ตัวอักษร
 Path	Cookie Manager		พาธ
-of	Download Window	...as in '12kB of 256kB'	ของ
 Bookmarks	WebPositive Window		บุคมาร์ค
 Use proxy server to connect to the internet	Settings Window		ใช้พร็อกซีเซิร์ฟเวอร์เพื่อเชื่อมต่ออินเทอร์เน็ต
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url เสร็จ

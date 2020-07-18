@@ -2,7 +2,7 @@
 Cancel	ShutdownProcess		Annulla
 OK	ShutdownProcess		OK
 Do you really want to shut down the system?	ShutdownProcess		Vuoi davvero spegnere il computer?
-Shutdown status	ShutdownProcess		Spegnimento in corso
+Shutdown status	ShutdownProcess		Arresto in corso
 Shut down	ShutdownProcess		Spegni
 The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		L'applicazione \"%appName%\" potrebbe essere bloccata da una finestra di dialogo.
 System is shut down	ShutdownProcess		Sistema in fase di spegnimento
@@ -18,6 +18,6 @@ Restarting…	ShutdownProcess		Riavvio in corso...
 %action%?	ShutdownProcess		%action%?
 Tidying things up a bit.	ShutdownProcess		Il lavoro di pulitura è in corso.
 Kill application	ShutdownProcess		Interrompi l'applicazione
-Shutdown aborted	ShutdownProcess		Spegnimento interrotto
+Shutdown aborted	ShutdownProcess		Arresto interrotto
 Shutting down…	ShutdownProcess		Arresto in corso…
 Asking \"%appName%\" to quit.	ShutdownProcess		In attesa che \"%appName%\" termini.

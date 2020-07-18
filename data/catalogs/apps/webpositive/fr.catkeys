@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-WebPositive	1879106286
+1	french	x-vnd.Haiku-WebPositive	55235296
 Authentication required	Authentication Panel		Authentification requise
 Previous	WebPositive Window		Précédent
 (Finish: %date)	Download Window		(Fin : %date)
@@ -9,7 +9,6 @@ Find:	WebPositive Window		Rechercher :
 Script console	WebPositive Window		Console de script
 Fonts	Settings Window		Polices
 Path	Cookie Manager		Emplacement
-of	Download Window	...as in '12kB of 256kB'	sur
 Bookmarks	WebPositive Window		Signets
 Use proxy server to connect to the internet	Settings Window		Utiliser un serveur mandataire pour se connecter à Internet
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url terminé

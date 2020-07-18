@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-WebPositive	1879106286
+1	finnish	x-vnd.Haiku-WebPositive	55235296
 Authentication required	Authentication Panel		Vaaditaan todentamista
 Previous	WebPositive Window		Edellinen
 (Finish: %date)	Download Window		(Päättyi: %date)
@@ -9,7 +9,6 @@ Find:	WebPositive Window		Etsi:
 Script console	WebPositive Window		Skriptipääteikkuna
 Fonts	Settings Window		Kirjasimet
 Path	Cookie Manager		Polku
-of	Download Window	...as in '12kB of 256kB'	/
 Bookmarks	WebPositive Window		Kirjanmerkit
 Use proxy server to connect to the internet	Settings Window		Käytä välityspalvelinta internet-yhteydellä
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url päättyi

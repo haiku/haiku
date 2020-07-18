@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-CharacterMap	3090826940
+1	spanish; castilian	x-vnd.Haiku-CharacterMap	3116372149
 Tirhuta	UnicodeBlocks		Tirhuta
 Miscellaneous mathematical symbols B	UnicodeBlocks		Variado de símbolos matemáticos B
 Latin extended E	UnicodeBlocks		Latin extendido E
@@ -211,9 +211,12 @@ Supplemental mathematical operators	UnicodeBlocks		Operadores matemáticos suple
 Sinhala	UnicodeBlocks		Cingalés
 Bhaiksuki	UnicodeBlocks		Bhaiksuki
 Ugaritic	UnicodeBlocks		Ugarítico
+Old North Arabian	UnicodeBlocks		Nordarábigo antiguo
+Mende Kikakui	UnicodeBlocks		Kikakui de Mende
 Geometric shapes extended	UnicodeBlocks		Formas geométricas extendidas
 Transport and map symbols	UnicodeBlocks		Símbolos de transporte y mapas
 Tamil supplement	UnicodeBlocks		Tamil suplementario
+Combining diacritical marks extended	UnicodeBlocks		Marcas diacríticas de combinación (extensión)
 Cyrillic extended C	UnicodeBlocks		Cirílico extendido C
 Syriac	UnicodeBlocks		Siríaco
 Private use area	UnicodeBlocks		Espacio para utilización privada
@@ -261,6 +264,7 @@ Kangxi radicals	UnicodeBlocks		Carácteres de Kangxi
 Copy character	CharacterView		Copiar carácter
 Hangul Jamo	UnicodeBlocks		Hangul Jamo
 Font	CharacterWindow		Tipo de letra
+Manichaean	UnicodeBlocks		Maniqueo
 Phaistos disc	UnicodeBlocks		Disco de Festos
 Miscellaneous technical	UnicodeBlocks		Variado técnico
 Braille patterns	UnicodeBlocks		Braille

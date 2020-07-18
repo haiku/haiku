@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-ProcessController	168752057
+1	friulian	x-vnd.Haiku-ProcessController	2280875657
 Error saving file	ProcessController		Erôr tal salvâ il file
 Display priority	ProcessController		Prioritât di visualizazion
 That's no Fun!	ProcessController		Nol fâs ridi!
@@ -36,7 +36,6 @@ Quit an application	ProcessController		Siere une aplicazion
 Cancel	ProcessController		Cancele
 Install in Deskbar	ProcessController		Instale tal Deskbar
 Debug this team!	ProcessController		Fâs il debug di chest team!
-Low latency	ProcessController		Timp di rispueste bas
 ProcessController	System name		Controlôr dai procès
 Lowest active priority	ProcessController		Prioritât ative plui basse
 Restart Tracker	ProcessController		Torne invie Tracker

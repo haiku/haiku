@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-ProcessController	168752057
+1	thai	x-vnd.Haiku-ProcessController	2280875657
 Error saving file	ProcessController		การบันทึกไฟล์ผิดพลาด
 Display priority	ProcessController		แสดงลำดับความสำคัญ
 That's no Fun!	ProcessController		ไม่สนุกเลย!
@@ -36,7 +36,6 @@ Quit an application	ProcessController		ออกจากแอปพลิเ�
 Cancel	ProcessController		ยกเลิก
 Install in Deskbar	ProcessController		ติดตั้งในเดสก์บาร์
 Debug this team!	ProcessController		แก้ปัญหาทีมนี้!
-Low latency	ProcessController		ความหน่วงต่ำ
 ProcessController	System name		ตัวควบคุมกระบวนการ
 Lowest active priority	ProcessController		ลำดับความสำคัญต่ำสุดที่ใช้งาน
 Restart Tracker	ProcessController		รีสตาร์ท Tracker

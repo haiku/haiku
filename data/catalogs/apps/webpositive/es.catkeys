@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-WebPositive	1879106286
+1	spanish; castilian	x-vnd.Haiku-WebPositive	55235296
 Authentication required	Authentication Panel		Autenticación requerida
 Previous	WebPositive Window		Anterior
 (Finish: %date)	Download Window		(Finaliza: %date)
@@ -9,7 +9,6 @@ Find:	WebPositive Window		Buscar:
 Script console	WebPositive Window		Consola de scripts
 Fonts	Settings Window		Tipos de letra
 Path	Cookie Manager		Ruta
-of	Download Window	...as in '12kB of 256kB'	de
 Bookmarks	WebPositive Window		Marcadores
 Use proxy server to connect to the internet	Settings Window		Usar un servidor proxy para conectarse a internet
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url terminado

@@ -1,11 +1,11 @@
 1	german	x-vnd.Haiku-RTFTranslator	334451110
 Version %d.%d.%d, %s	ConfigView		Version %d.%d.%d, %s
-RTF text files	RTFTranslator		RTF-Textdateien
+RTF text files	RTFTranslator		RTF-Texte
 RTF-Translator Settings	ConfigView		RTFTranslator-Einstellungen
-Rich Text Format (RTF) translator	ConfigView		Rich Text Format Translator
+Rich Text Format (RTF) translator	ConfigView		RTF-Text-Translator
 RTF Settings	main		RTF-Einstellungen
 RichTextFormat file	RTFTranslator		RichTextFormat Datei
 Be style text file	RTFTranslator		Be-Styled-Textdatei
 Plain text file	RTFTranslator		Einfache Textdatei
-Rich Text Format translator	RTFTranslator		Rich Text Format Translator
+Rich Text Format translator	RTFTranslator		RTF-Text-Translator
 Rich Text Format translator v%d.%d.%d %s	RTFTranslator		Rich Text Format Translator v%d.%d.%d %s

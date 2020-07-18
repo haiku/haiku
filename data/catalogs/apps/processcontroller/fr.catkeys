@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-ProcessController	168752057
+1	french	x-vnd.Haiku-ProcessController	2280875657
 Error saving file	ProcessController		Erreur à l’enregistrement du fichier
 Display priority	ProcessController		Priorité affichage
 That's no Fun!	ProcessController		C’est pas fun !
@@ -36,7 +36,6 @@ Quit an application	ProcessController		Quitter une application
 Cancel	ProcessController		Annuler
 Install in Deskbar	ProcessController		Installer dans la Deskbar
 Debug this team!	ProcessController		Déboguer ce processus !
-Low latency	ProcessController		Faible latence
 ProcessController	System name		Gestionnaire de tâche
 Lowest active priority	ProcessController		Priorité active la plus basse
 Restart Tracker	ProcessController		Redémarrer le Tracker

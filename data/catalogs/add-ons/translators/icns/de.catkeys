@@ -1,7 +1,7 @@
 1	german	x-vnd.Haiku-ICNSTranslator	660278989
 Valid colors: RGB32, RGBA32	ICNSConfig		Gültige Farben: RGB32, RGBA32
 Version %d.%d.%d, %s	ICNSConfig		Version %d.%d.%d, %s
-Apple icons	ICNSTranslator		Apple Icons
+Apple icons	ICNSTranslator		Apple-Icons
 Apple icon translator	ICNSTranslator		Apple Icon-Translator
 Valid sizes: 16, 32, 48, 128, 256, 512, 1024	ICNSConfig		Gültige Größen: 16, 32, 48, 128, 256, 512, 1024
 Apple icon translator	ICNSConfig		Apple Icon-Translator

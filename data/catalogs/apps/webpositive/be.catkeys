@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-WebPositive	2159718606
+1	belarusian	x-vnd.Haiku-WebPositive	335847616
 Authentication required	Authentication Panel		Патрабуецца аўтарызацыя
 Previous	WebPositive Window		Папярэдні
 Open bookmarks confirmation	WebPositive Window		Падцвержваць пераход па закладкам
@@ -7,7 +7,6 @@ Close window	WebPositive Window		Зачыніць вакно
 Find:	WebPositive Window		Шукаць:
 Script console	WebPositive Window		Кансоль сцэнароў
 Fonts	Settings Window		Шрыфты
-of	Download Window	...as in '12kB of 256kB'	з
 Bookmarks	WebPositive Window		Закладкі
 Use proxy server to connect to the internet	Settings Window		Злучацца з сецівам праз проксі-сервер
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url скончана

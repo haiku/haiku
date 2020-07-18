@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-WebPositive	1879106286
+1	romanian	x-vnd.Haiku-WebPositive	55235296
 Authentication required	Authentication Panel		Autentificare necesară
 Previous	WebPositive Window		Anterior
 (Finish: %date)	Download Window		(Terminare: %date)
@@ -9,7 +9,6 @@ Find:	WebPositive Window		Caută:
 Script console	WebPositive Window		Consolă de script
 Fonts	Settings Window		Fonturi
 Path	Cookie Manager		Cale
-of	Download Window	...as in '12kB of 256kB'	din
 Bookmarks	WebPositive Window		Favorite
 Use proxy server to connect to the internet	Settings Window		Utilizează serverul proxy pentru conectare la internet
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url terminat

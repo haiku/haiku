@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-WebPositive	1879106286
+1	swedish	x-vnd.Haiku-WebPositive	55235296
 Authentication required	Authentication Panel		Autentisiering krävs
 Previous	WebPositive Window		Tidigare
 (Finish: %date)	Download Window		(Avsluta: %date)
@@ -9,7 +9,6 @@ Find:	WebPositive Window		Hitta:
 Script console	WebPositive Window		Skriptkonsoll
 Fonts	Settings Window		Teckensnitt
 Path	Cookie Manager		Sökväg
-of	Download Window	...as in '12kB of 256kB'	av
 Bookmarks	WebPositive Window		Bokmärken
 Use proxy server to connect to the internet	Settings Window		Använd proxyserver för att koppla upp mot internet
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url färdig

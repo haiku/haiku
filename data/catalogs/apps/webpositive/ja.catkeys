@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-WebPositive	1879106286
+1	japanese	x-vnd.Haiku-WebPositive	55235296
 Authentication required	Authentication Panel		認証が必要です
 Previous	WebPositive Window		前へ
 (Finish: %date)	Download Window		(完了: %date)
@@ -9,7 +9,6 @@ Find:	WebPositive Window		検索:
 Script console	WebPositive Window		スクリプトコンソール
 Fonts	Settings Window		フォント
 Path	Cookie Manager		パス
-of	Download Window	...as in '12kB of 256kB'	/
 Bookmarks	WebPositive Window		ブックマーク
 Use proxy server to connect to the internet	Settings Window		インターネット接続に、プロキシサーバーを使用する
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url の読み込み完了

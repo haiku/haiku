@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-ProcessController	168752057
+1	romanian	x-vnd.Haiku-ProcessController	2280875657
 Error saving file	ProcessController		Eroare la salvarea fișierului
 Display priority	ProcessController		Prioritate afișaj
 That's no Fun!	ProcessController		Nu e amuzant!
@@ -36,7 +36,6 @@ Quit an application	ProcessController		Închide o aplicație
 Cancel	ProcessController		Anulează
 Install in Deskbar	ProcessController		Instalează pe bara de desktop
 Debug this team!	ProcessController		Depanează această echipă!
-Low latency	ProcessController		Latență scăzută
 ProcessController	System name		ControlProcese
 Lowest active priority	ProcessController		Cea mai scăzută prioritate activă
 Restart Tracker	ProcessController		Repornește Tracker

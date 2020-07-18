@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-WebPositive	2159718606
+1	lithuanian	x-vnd.Haiku-WebPositive	335847616
 Authentication required	Authentication Panel		Būtina nustatyti tapatybę
 Previous	WebPositive Window		Ankstesnis
 Open bookmarks confirmation	WebPositive Window		Adresyno įrašų atvėrimo patvirtinimas
@@ -7,7 +7,6 @@ Close window	WebPositive Window		Užverti langą
 Find:	WebPositive Window		Ieškoti:
 Script console	WebPositive Window		Scenarijų pultas
 Fonts	Settings Window		Šriftai
-of	Download Window	...as in '12kB of 256kB'	iš
 Bookmarks	WebPositive Window		Adresynas
 Use proxy server to connect to the internet	Settings Window		Jungimuisi prie interneto naudoti įgaliotąjį serverį
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	Tinklapis „%url“ įkeltas.

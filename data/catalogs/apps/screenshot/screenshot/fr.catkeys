@@ -1,2 +1,28 @@
-1	french	x-vnd.haiku-screenshot-cli	721864121
+1	french	x-vnd.haiku-screenshot-cli	3276742551
+Include window border	ScreenshotWindow		Inclure le bord de la fenêtre
+Save in:	ScreenshotWindow		Enregistrer dans :
+Error saving \"%s\":\n\t%s	ScreenshotWindow		Erreur à l’enregistrement de « %s » :\n\t%s
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Ce fichier existe déjà.\n Êtes-vous sûr de vouloir l’écraser ?
+OK	ScreenshotWindow		OK
+The destination path exists but is not a folder.	ScreenshotWindow		Le chemin de destination existe mais n'est pas un dossier.
+Select	ScreenshotWindow		Sélectionner
+Save as:	ScreenshotWindow		Enregistrer sous :
+seconds	ScreenshotWindow		secondes
+New screenshot	ScreenshotWindow		Nouvelle capture
+Screenshot	System name		Capture d’écran
+Desktop	ScreenshotWindow		Bureau
+Artwork folder	ScreenshotWindow		Dossier d'illustrations
+Translator Settings	ScreenshotWindow		Réglages du traducteur
+Include mouse pointer	ScreenshotWindow		Inclure le curseur
+overwrite	ScreenshotWindow		écraser
+Settings…	ScreenshotWindow		Réglages…
+Choose folder	ScreenshotWindow		Choisir un dossier
+Name:	ScreenshotWindow		Nom :
+Choose folder…	ScreenshotWindow		Choisir un dossier…
+Failed to save screenshot	ScreenshotWindow		L’enregistrement de la capture a échouée
+Cancel	ScreenshotWindow		Annuler
+Delay:	ScreenshotWindow		Délai :
+Copy to clipboard	ScreenshotWindow		Copier dans le presse-papiers
 screenshot	Screenshot	Base filename of screenshot files	capture
+Save	ScreenshotWindow		Enregistrer
+Capture active window	ScreenshotWindow		Capturer la fenêtre active

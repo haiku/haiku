@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-WebPositive	1879106286
+1	hungarian	x-vnd.Haiku-WebPositive	55235296
 Authentication required	Authentication Panel		Azonosítás szükséges
 Previous	WebPositive Window		Előző
 (Finish: %date)	Download Window		(Befejezés: %date)
@@ -9,7 +9,6 @@ Find:	WebPositive Window		Keres:
 Script console	WebPositive Window		Script konzol
 Fonts	Settings Window		Betűtípusok
 Path	Cookie Manager		Elérési út
-of	Download Window	...as in '12kB of 256kB'	/
 Bookmarks	WebPositive Window		Könyvjelzők
 Use proxy server to connect to the internet	Settings Window		Proxy kiszolgáló használata az internethez kapcsolódáshoz
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url kész

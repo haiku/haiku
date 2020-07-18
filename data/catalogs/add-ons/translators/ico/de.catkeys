@@ -3,12 +3,12 @@ Cursor	ICOTranslator		Cursor
 Version %d.%d.%d, %s	ConfigView		Version %d.%d.%d, %s
 Windows %s %ld bit image	ICOTranslator		Windows %s %ld Bit Bild
 Valid icon sizes are 16, 32, or 48	ConfigView		Gültige Icongrößen sind 16, 32 oder 48 Pixel
-Windows icons	ICOTranslator		Windows Icons
+Windows icons	ICOTranslator		Windows-Icons
 Enforce valid icon sizes	ConfigView		Nur gültige Icongrößen zulassen
 ICO Settings	main		ICO-Einstellungen
 Windows icon translator	ICOTranslator		Windows Icon-Translator
 pixels in either direction.	ConfigView		als Höhe oder Breite.
-Write 32 bit images on true color input	ConfigView		Bei Truecolor-Eingabe 32-Bit-Bilder ausgeben
+Write 32 bit images on true color input	ConfigView		Bei Truecolor 32bit Bilder ausgeben
 Icon	ICOTranslator		Icon
 ICOTranslator Settings	ConfigView		ICOTranslator-Einstellungen
 Windows icon translator	ConfigView		Windows Icon-Translator

@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-ProcessController	4131818684
+1	portuguese (brazil)	x-vnd.Haiku-ProcessController	1948974988
 Error saving file	ProcessController		Erro ao gravar o arquivo
 Display priority	ProcessController		Exibir prioridade
 That's no Fun!	ProcessController		Isso não é Engraçado!
@@ -36,7 +36,6 @@ Quit an application	ProcessController		Fechar uma aplicação
 Cancel	ProcessController		Cancelar
 Install in Deskbar	ProcessController		Instalar no Deskbar
 Debug this team!	ProcessController		Depurar esta equipe!
-Low latency	ProcessController		Baixa latência
 ProcessController	System name		Controlador de Processo
 Lowest active priority	ProcessController		Prioridade de mais baixa atividade
 Restart Tracker	ProcessController		Reiniciar o Rastreador (Tracker)

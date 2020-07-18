@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Installer	2357341034
+1	german	x-vnd.Haiku-Installer	2971371102
 Performing installation.	InstallProgress		Installation läuft.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Bitte Quelllaufwerk aus dem Menü wählen. Danach auf \"Start\" klicken.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Das DriveSetup-Fenster muss geschlossen werden, bevor der Installer verlassen werden kann.
@@ -25,6 +25,7 @@ Welcome to the Haiku Installer!\n\n	InstallerApp		Herzlich Willkommen zum Haiku-
 Quit Boot Manager	InstallerWindow		BootManager beenden
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		BootManager läuft...\n\nBootManager muss beendet werden, um mit der Installation fortzufahren.
 Quit DriveSetup	InstallerWindow		DriveSetup beenden
+The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume while the existing 'settings' folder is retained. All other folders will be merged, in which files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Die Zielpartition ist nicht leer. Soll trotzdem installiert werden?\n\nZur Info: Der 'System' Ordner wird eine saubere Kopie der Quelle, während der 'settings' Ordner beibehalten wird. Alle anderen Ordner werden zusammengeführt, wobei Dateien und Verknüpfungen, die sowohl auf der Quell- als auch der Zielpartition existieren, mit der Quell-Version überschrieben werden.
 Write boot sector	InstallerWindow		Bootsektor schreiben
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld von %2ld
 Finishing installation.	InstallProgress		Installation wird abgeschlossen.
@@ -55,6 +56,7 @@ The disk can't be mounted. Please choose a different disk.	InstallProgress		Das 
 Begin	InstallerWindow		Start
 Collecting copy information.	InstallProgress		Es werden Infos über zu kopierende Dateien gesammelt.
 Show optional packages	InstallerWindow		Optionale Pakete einblenden
+No partitions have been found that are suitable for installation. Please set up partitions and format at least one partition with the Be File System.	InstallerWindow		Für die Installation wurden keine brauchbaren Partitionen gefunden. Bitte Partitionen erstellen und zumindest eine mit dem 'Be File System' formatieren.
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Auf der Zielpartition ist anscheinend nicht genügend Platz. Entweder eine andere Partition wählen oder einige optionale Pakete deaktivieren.
 Installation canceled.	InstallProgress		Installation abgebrochen.
 OK	InstallerApp		OK
@@ -80,6 +82,7 @@ Quit Boot Manager and DriveSetup	InstallerWindow		BootManager und DriveSetup bee
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installer\n\tvon Jérôme Duval und Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 Tools	InstallerWindow		Werkzeuge
 scanning…	InstallerWindow		Untersuchung läuft…
+Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be formatted with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Die Anwendung DriveSetup starten, um\nverfügbare Laufwerke zu partitionieren.\nPartitionen können mit dem 'Be File System'\nformatiert werden, das für eine Haiku\nBootpartition nötig ist.
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Userguide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2)    Der Installer wird die Haiku-Partition selbst bootfähig machen, aber nichts unternehmen, um Haiku in ein bestehendes Bootmenü zu integrieren. Ist GRUB bereits installiert, kann man Haiku zu dessen Bootmenü hinzufügen.\nNäheres dazu steht im Booting Guide auf unserer Website unter https://www.haiku-os.org/guides/booting.\nAus Installers \"Werkzeug\" Menü lässt sich auch ein Bootmenü einrichten, siehe das Kapitel zum \"BootManager\" im Userguide.\n\n\n
 Set up boot menu	InstallerWindow		Bootmenü einrichten
 Continue	InstallerApp		Weiter

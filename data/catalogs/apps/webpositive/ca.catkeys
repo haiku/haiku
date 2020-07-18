@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-WebPositive	1879106286
+1	catalan; valencian	x-vnd.Haiku-WebPositive	55235296
 Authentication required	Authentication Panel		Cal autenticació
 Previous	WebPositive Window		Anterior
 (Finish: %date)	Download Window		(Acabament: %date)
@@ -9,7 +9,6 @@ Find:	WebPositive Window		Troba:
 Script console	WebPositive Window		Script de consola
 Fonts	Settings Window		Lletres
 Path	Cookie Manager		Camí
-of	Download Window	...as in '12kB of 256kB'	de
 Bookmarks	WebPositive Window		Adreces d'interès
 Use proxy server to connect to the internet	Settings Window		Useu un servidor intermediari per connectar-vos a Internet.
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url acabat

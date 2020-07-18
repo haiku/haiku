@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-ProcessController	4131818684
+1	belarusian	x-vnd.Haiku-ProcessController	1948974988
 Error saving file	ProcessController		Памылка пры захаванні файла
 Display priority	ProcessController		Прыярытэт адлюстравання
 That's no Fun!	ProcessController		Гэта непрыкольна!
@@ -36,7 +36,6 @@ Quit an application	ProcessController		Закрыць праграму
 Cancel	ProcessController		Адмена
 Install in Deskbar	ProcessController		Усталяваць у Deskbar
 Debug this team!	ProcessController		Адладжваць паток!
-Low latency	ProcessController		Рэжым найменшых затрымак
 ProcessController	System name		Працэсы і патокі
 Lowest active priority	ProcessController		Найнізшы актыўны прыярытэт
 Restart Tracker	ProcessController		Перазапусціць Трэкер

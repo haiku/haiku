@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-ProcessController	168752057
+1	finnish	x-vnd.Haiku-ProcessController	2280875657
 Error saving file	ProcessController		Virhe tallennettaessa tiedostoa
 Display priority	ProcessController		Näyttöprioriteetti
 That's no Fun!	ProcessController		Se ei ole hauskaa!
@@ -36,7 +36,6 @@ Quit an application	ProcessController		Lopeta ohjelma
 Cancel	ProcessController		Peru
 Install in Deskbar	ProcessController		Asenna Työpöytäpalkissa
 Debug this team!	ProcessController		Vikajäljitä tätä säiettä!
-Low latency	ProcessController		Alhainen latenssi
 ProcessController	System name		Prosessiohjain
 Lowest active priority	ProcessController		Alhaisin aktiivinen prioriteetti
 Restart Tracker	ProcessController		Käynnistä Seuraaja uudelleen

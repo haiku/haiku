@@ -23,7 +23,7 @@ Show all	WindowMenu		Tümünü göster
 No windows	WindowMenu		Pencere yok
 Deskbar	System name		Masaüstü Çubuğu
 Restart system	DeskbarMenu		Yeniden başlat
-Large	PreferencesWindow		Geniş
+Large	PreferencesWindow		Büyük
 Auto-raise	PreferencesWindow		Kendiliğinden öne getir
 Recent folders:	PreferencesWindow		Son kullanılan klasörler:
 Show application expander	PreferencesWindow		Uygulama genişleticisini göster

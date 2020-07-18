@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-ProcessController	168752057
+1	esperanto	x-vnd.Haiku-ProcessController	2280875657
 Error saving file	ProcessController		Eraro dum konservado de dosiero
 Display priority	ProcessController		Prioritaton de montrado
 That's no Fun!	ProcessController		Tio ne estas ŝerco!
@@ -36,7 +36,6 @@ Quit an application	ProcessController		Ĉesigi programon
 Cancel	ProcessController		Nuligi
 Install in Deskbar	ProcessController		Instali en la Laborstrion
 Debug this team!	ProcessController		Sencimigi ĉi procezaron!
-Low latency	ProcessController		Malgranda respondotempo
 ProcessController	System name		La Taskadministrilo (ProcessController)
 Lowest active priority	ProcessController		La plej malgranda prioritato
 Restart Tracker	ProcessController		Relanĉi la Spurilon

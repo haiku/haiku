@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-WebPositive	1879106286
+1	friulian	x-vnd.Haiku-WebPositive	55235296
 Authentication required	Authentication Panel		Autenticazion necessarie
 Previous	WebPositive Window		Precedent
 (Finish: %date)	Download Window		(Terminât: %date)
@@ -9,7 +9,6 @@ Find:	WebPositive Window		Cjate:
 Script console	WebPositive Window		Console script
 Fonts	Settings Window		Caratars
 Path	Cookie Manager		Percors
-of	Download Window	...as in '12kB of 256kB'	di
 Bookmarks	WebPositive Window		Segnelibris
 Use proxy server to connect to the internet	Settings Window		Doprâ un servidôr proxy par conetisi a internet
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url completât

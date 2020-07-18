@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-ProcessController	168752057
+1	greek, modern (1453-)	x-vnd.Haiku-ProcessController	2280875657
 Error saving file	ProcessController		Σφάλμα αποθήκευσης αρχείου
 Display priority	ProcessController		Προτεραιότητα εμφάνισης
 That's no Fun!	ProcessController		Αυτό δεν έχει πλάκα!
@@ -36,7 +36,6 @@ Quit an application	ProcessController		Έξοδος από μια εφαρμογ
 Cancel	ProcessController		Άκυρο
 Install in Deskbar	ProcessController		Εγκατάσταση στην Γραμμή Εργασιών
 Debug this team!	ProcessController		Αποσφαλμάτωσε αυτήν την ομάδα!
-Low latency	ProcessController		Χαμηλή καθυστέρηση
 ProcessController	System name		Διαχείριση Εργασιών
 Lowest active priority	ProcessController		Χαμηλότερη ενεργή προτεραιότητα
 Restart Tracker	ProcessController		Επανεκκίνηση Ιχνηλάτη

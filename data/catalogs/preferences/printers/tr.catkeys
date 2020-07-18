@@ -4,7 +4,7 @@ Remove	PrintersWindow		Kaldır
 Red	TestPageView		Kırmızı
 Default Printer	PrinterListView		Öntanımlı yazıcı
 <pick one>	AddPrinterDialog		<birini seçin>
-Connected to:	AddPrinterDialog		Bağlı:
+Connected to:	AddPrinterDialog		Şuraya bağlı:
 Make default	PrintersWindow		Öntanımlı yap
 Cyan	TestPageView		Camgöbeği
 Completed	JobListView		Tamamlandı
@@ -20,7 +20,7 @@ Print jobs for %printer_name%	PrintersWindow		%printer_name% işleri
 {0, plural, =-1{??? pages}=1{# page}other{# pages}}	JobListView		{0, plural, =-1{??? sayfa}=1{# sayfa}other{# sayfa}}
 Add printer	AddPrinterDialog		Yazıcı ekle
 Printers	PrintersWindow		Yazıcılar
-No printer found!	TransportMenu		Yazıcı bulunamadı!
+No printer found!	TransportMenu		Bağlı yazıcı yok!
 Add…	PrintersWindow		Ekle…
 Magenta	TestPageView		Eflatun
 Transport: %transport% %transport_address%	TestPageView		Taşıyıcı: %transport% %transport_address%

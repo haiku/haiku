@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-WebPositive	1879106286
+1	ukrainian	x-vnd.Haiku-WebPositive	55235296
 Authentication required	Authentication Panel		Потрібна авторизація
 Previous	WebPositive Window		Попереднє
 (Finish: %date)	Download Window		(Завершення: %date)
@@ -9,7 +9,6 @@ Find:	WebPositive Window		Знайти:
 Script console	WebPositive Window		Консоль сценаріїв
 Fonts	Settings Window		Шрифти
 Path	Cookie Manager		Шлях
-of	Download Window	...as in '12kB of 256kB'	з
 Bookmarks	WebPositive Window		Закладки
 Use proxy server to connect to the internet	Settings Window		Використовувати проксі-сервер для під'єднання
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url завантажився

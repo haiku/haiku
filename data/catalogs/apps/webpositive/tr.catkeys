@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-WebPositive	1879106286
+1	turkish	x-vnd.Haiku-WebPositive	55235296
 Authentication required	Authentication Panel		Kimlik doğrulaması gerekli
 Previous	WebPositive Window		Önceki
 (Finish: %date)	Download Window		(Bitiş: %date)
@@ -9,7 +9,6 @@ Find:	WebPositive Window		Bul:
 Script console	WebPositive Window		Betik konsolu
 Fonts	Settings Window		Yazıtipleri
 Path	Cookie Manager		Yol
-of	Download Window	...as in '12kB of 256kB'	/
 Bookmarks	WebPositive Window		Yer İmleri
 Use proxy server to connect to the internet	Settings Window		İnternete bağlanmak için vekil sunucu kullan
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url yüklendi

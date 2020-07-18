@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-ProcessController	168752057
+1	indonesian	x-vnd.Haiku-ProcessController	2280875657
 Error saving file	ProcessController		Kesalahan menyimpan file
 Display priority	ProcessController		Prioritas tampilan
 That's no Fun!	ProcessController		Itu tidak seru!
@@ -36,7 +36,6 @@ Quit an application	ProcessController		Hentikan suatu aplikasi
 Cancel	ProcessController		Batal
 Install in Deskbar	ProcessController		Pasang di Deskbar
 Debug this team!	ProcessController		Debug tim ini!
-Low latency	ProcessController		Latensi rendah
 ProcessController	System name		ProcessController
 Lowest active priority	ProcessController		Prioritas aktif terendah
 Restart Tracker	ProcessController		Mulai Ulang Tracker

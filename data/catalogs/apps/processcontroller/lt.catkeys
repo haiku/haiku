@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-ProcessController	4131818684
+1	lithuanian	x-vnd.Haiku-ProcessController	1948974988
 Error saving file	ProcessController		Klaida įrašant failą
 Display priority	ProcessController		Rodymo prioritetas
 That's no Fun!	ProcessController		Visai nejuokinga!
@@ -36,7 +36,6 @@ Quit an application	ProcessController		Baigti programos darbą
 Cancel	ProcessController		Atsisakyti
 Install in Deskbar	ProcessController		Patalpinti pranešimų srityje
 Debug this team!	ProcessController		Derinti šią procesų grupę!
-Low latency	ProcessController		Minimali delsa
 ProcessController	System name		Procesų valdiklis
 Lowest active priority	ProcessController		Žemiausias aktyvus prioritetas
 Restart Tracker	ProcessController		Perleisti Pėdsekį

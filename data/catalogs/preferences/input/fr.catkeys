@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Input	1910113385
+1	french	x-vnd.Haiku-Input	1950274171
 Defaults	InputMouse		Par défaut
 Scrolling	TouchpadPrefView		Défilement
 Long	KeyboardView		Long
@@ -8,41 +8,46 @@ Slow	TouchpadPrefView		Lent
 Warp	SettingsView		Téléportation
 Device List	InputWindow		Liste des périphériques
 Double-click speed	SettingsView		Vitesse du double clic
-5-Button	SettingsView		5-Bouttons
+5-Button	SettingsView		5-Boutons
 Typing test area	KeyboardView		Zone de test de frappe
 Fast	KeyboardView		Rapide
 Please confirm	TouchpadPrefView		Merci de confirmer
 Mouse speed	SettingsView		Vitesse de la souris
 Horizontal scrolling	TouchpadPrefView		Défilement horizontal
 Input	System name		Entrées
+Quick	TouchpadPrefView		Rapide
 Short	KeyboardView		Court
 Revert	InputMouse		Rétablir
 Slow	KeyboardView		Lent
-2-Button	SettingsView		2-Bouttons
+2-Button	SettingsView		2-Boutons
 Click to focus and raise	SettingsView		Cliquer pour activer et remonter
 Vertical	TouchpadPrefView		Vertical
 Double-click test area	SettingsView		Zone de test du double clic
 Focus follows mouse	SettingsView		L’activation suit le pointeur
 Focus mode:	SettingsView		Mode de focus :
 Revert	TouchpadPrefView		Rétablir
-4-Button	SettingsView		4-Bouttons
+4-Button	SettingsView		4-Boutons
+Tapping sensitivity	TouchpadPrefView		Sensibilité au toucher
 Instant warp	SettingsView		Téléportation instantanée
 Revert	InputKeyboard		Rétablir
 Mouse type:	SettingsView		Type de souris :
 Off	TouchpadPrefView		Désactivé
+Never	TouchpadPrefView		Jamais
 Fast	TouchpadPrefView		Rapide
+6-Button	SettingsView		6-Boutons
 Click to focus	SettingsView		Cliquer pour activer
 Acceleration	TouchpadPrefView		Accélération
 Accept first click	SettingsView		Accepter le premier clic
 OK	TouchpadPrefView		OK
+Keyboard Lock Delay	TouchpadPrefView		Délai de verrouillage du clavier
 Delay until key repeat	KeyboardView		Délai avant répétition des touches
 Two finger scrolling	TouchpadPrefView		Défilement à deux doigts
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Une zone de défilement aussi large pourrait empêcher le fonctionnement normal du pointeur de souris. Est-ce vraiment ce que vous voulez?
 Mouse acceleration	SettingsView		Accélération de la souris
 Defaults	TouchpadPrefView		Par défaut
 High	TouchpadPrefView		Haut
-1-Button	SettingsView		1-Boutton
+1-Button	SettingsView		1-Bouton
 Defaults	InputKeyboard		Par défaut
 Key repeat rate	KeyboardView		Vitesse de répétition
 Horizontal	TouchpadPrefView		Horizontal
-3-Button	SettingsView		3-Bouttons
+3-Button	SettingsView		3-Boutons
