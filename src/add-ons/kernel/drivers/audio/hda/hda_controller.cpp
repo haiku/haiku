@@ -1209,6 +1209,8 @@ no_irq_handler:
 	if (controller->msi) {
 		gPCIx86Module->disable_msi(controller->pci_info.bus,
 			controller->pci_info.device, controller->pci_info.function);
+		gPCIx86Module->unconfigure_msi(controller->pci_info.bus,
+			controller->pci_info.device, controller->pci_info.function);
 	}
 
 	delete_area(controller->regs_area);
@@ -1254,9 +1256,11 @@ hda_hw_uninit(hda_controller* controller)
 	// Disable interrupts, and remove interrupt handler
 	controller->Write32(HDAC_INTR_CONTROL, 0);
 
-	if (controller->msi && gPCIx86Module != NULL) {
+	if (controller->msi) {
 		// Disable MSI
 		gPCIx86Module->disable_msi(controller->pci_info.bus,
+			controller->pci_info.device, controller->pci_info.function);
+		gPCIx86Module->unconfigure_msi(controller->pci_info.bus,
 			controller->pci_info.device, controller->pci_info.function);
 	}
 
