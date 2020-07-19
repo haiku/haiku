@@ -34,6 +34,7 @@ private:
 									BMessage* message);
 			void				_SetWindowTitle();
 			void				_CreateMenus();
+			void				_UpdateMenus();
 			void				_CreateViews();
 			void				_LayoutViews();
 			void				_TileIfMultipleWindows();
@@ -72,6 +73,7 @@ private:
 			void				_OnOpenPanelCancel();
 			void				_OnSelectAll(BMessage* message);
 			void				_OnNewWindow();
+			void				_OnSetTargetToParent();
 
 			void				_ModelChanged();
 			bool				_OpenInEditor(const entry_ref& ref, int32 lineNum);
@@ -89,6 +91,7 @@ private:
 			BMenu*				fFileMenu;
 			BMenuItem*			fNew;
 			BMenuItem*			fOpen;
+			BMenuItem*			fSetTargetToParent;
 			BMenuItem*			fClose;
 			BMenuItem*			fQuit;
 			BMenu*				fActionMenu;
