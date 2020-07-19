@@ -1040,12 +1040,11 @@ hda_hw_init(hda_controller* controller)
 		dprintf("hda: enabling PCI memory access\n");
 		cmd |= PCI_command_memory;
 	}
-	if ((cmd & PCI_command_int_disable)) {
-		dprintf("hda: enabling PCI interrupts\n");
-		cmd &= ~PCI_command_int_disable;
-	}
 	(gPci->write_pci_config)(pciInfo.bus, pciInfo.device, pciInfo.function,
 			PCI_command, 2, cmd);
+
+	// Disable interrupt generation
+	controller->Write32(HDAC_INTR_CONTROL, 0);
 
 	// Absolute minimum hw is online; we can now install interrupt handler
 
@@ -1070,6 +1069,21 @@ hda_hw_init(hda_controller* controller)
 		(interrupt_handler)hda_interrupt_handler, controller, 0);
 	if (status != B_OK)
 		goto no_irq_handler;
+
+	cmd = gPci->read_pci_config(pciInfo.bus, pciInfo.device, pciInfo.function,
+		PCI_command, 2);
+	if (controller->msi != ((cmd & PCI_command_int_disable) != 0)) {
+		if ((cmd & PCI_command_int_disable) != 0) {
+			dprintf("hda: enabling PCI interrupts\n");
+			cmd &= ~PCI_command_int_disable;
+		} else {
+			dprintf("hda: disabling PCI interrupts for MSI use\n");
+			cmd |= PCI_command_int_disable;
+		}
+
+		gPci->write_pci_config(pciInfo.bus, pciInfo.device, pciInfo.function,
+			PCI_command, 2, cmd);
+	}
 
 	// TCSEL is reset to TC0 (clear 0-2 bits)
 	if ((quirks & HDA_QUIRK_NOTCSEL) == 0) {
