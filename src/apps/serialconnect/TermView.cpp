@@ -111,7 +111,7 @@ TermView::Draw(BRect updateRect)
 				background.alpha = 255;
 
 				// Draw the cursor by swapping foreground and background colors
-				if (isCursor) {
+				if (isCursor ^ cell.attrs.reverse) {
 					SetLowColor(foreground);
 					SetViewColor(foreground);
 					SetHighColor(background);
@@ -135,8 +135,12 @@ TermView::Draw(BRect updateRect)
 					font.SetFace(B_ITALIC_FACE);
 				if (cell.attrs.blink) // FIXME make it actually blink
 					font.SetFace(B_OUTLINED_FACE);
+#if 0
+				// FIXME B_NEGATIVE_FACE isn't actually implemented so we
+				// instead swap the colors above
 				if (cell.attrs.reverse)
 					font.SetFace(B_NEGATIVE_FACE);
+#endif
 				if (cell.attrs.strike)
 					font.SetFace(B_STRIKEOUT_FACE);
 
