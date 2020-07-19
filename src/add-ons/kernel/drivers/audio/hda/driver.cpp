@@ -84,8 +84,9 @@ init_driver(void)
 	}
 
 	if (get_module(B_PCI_X86_MODULE_NAME, (module_info**)&gPCIx86Module)
-			!= B_OK)
+			!= B_OK) {
 		gPCIx86Module = NULL;
+	}
 
 	return B_OK;
 }
@@ -118,9 +119,8 @@ publish_devices(void)
 	static const char* devs[MAX_CARDS + 1];
 	uint32 i;
 
-	for (i = 0; i < gNumCards; i++) {
+	for (i = 0; i < gNumCards; i++)
 		devs[i] = gCards[i].devfs_path;
-	}
 
 	devs[i] = NULL;
 

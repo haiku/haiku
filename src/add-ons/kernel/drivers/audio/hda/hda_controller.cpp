@@ -435,8 +435,10 @@ reset_controller(hda_controller* controller)
 		}
 
 		// stop DMA
-		controller->ReadModifyWrite8(HDAC_CORB_CONTROL, HDAC_CORB_CONTROL_MASK, 0);
-		controller->ReadModifyWrite8(HDAC_RIRB_CONTROL, HDAC_RIRB_CONTROL_MASK, 0);
+		controller->ReadModifyWrite8(HDAC_CORB_CONTROL, HDAC_CORB_CONTROL_MASK,
+			0);
+		controller->ReadModifyWrite8(HDAC_RIRB_CONTROL, HDAC_RIRB_CONTROL_MASK,
+			0);
 
 		if (!wait_for_bits<8>(controller, HDAC_CORB_CONTROL, ~0, false)
 			|| !wait_for_bits<8>(controller, HDAC_RIRB_CONTROL, ~0, false)) {
@@ -1039,7 +1041,7 @@ hda_hw_init(hda_controller* controller)
 	uint16 stateStatus;
 	uint16 cmd;
 	status_t status;
-	const pci_info& pciInfo = controller->pci_info; 	
+	const pci_info& pciInfo = controller->pci_info;
 	uint32 quirks = get_controller_quirks(pciInfo);
 
 	// map the registers (low + high for 64-bit when requested)
@@ -1058,7 +1060,7 @@ hda_hw_init(hda_controller* controller)
 		goto error;
 	}
 
-	cmd = (gPci->read_pci_config)(pciInfo.bus, pciInfo.device, pciInfo.function,
+	cmd = gPci->read_pci_config(pciInfo.bus, pciInfo.device, pciInfo.function,
 		PCI_command, 2);
 	if (!(cmd & PCI_command_master)) {
 		dprintf("hda: enabling PCI bus mastering\n");
@@ -1068,8 +1070,8 @@ hda_hw_init(hda_controller* controller)
 		dprintf("hda: enabling PCI memory access\n");
 		cmd |= PCI_command_memory;
 	}
-	(gPci->write_pci_config)(pciInfo.bus, pciInfo.device, pciInfo.function,
-			PCI_command, 2, cmd);
+	gPci->write_pci_config(pciInfo.bus, pciInfo.device, pciInfo.function,
+		PCI_command, 2, cmd);
 
 	// Disable interrupt generation
 	controller->Write32(HDAC_INTR_CONTROL, 0);
