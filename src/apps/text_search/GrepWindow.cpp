@@ -427,7 +427,8 @@ GrepWindow::_CreateMenus()
 		B_TRANSLATE("Search"), new BMessage(MSG_START_CANCEL), 'S');
 
 	fSelectAll = new BMenuItem(
-		B_TRANSLATE("Select all"), new BMessage(MSG_SELECT_ALL), 'A');
+		B_TRANSLATE("Select all"), new BMessage(MSG_SELECT_ALL),
+		'A', B_SHIFT_KEY);
 
 	fTrimSelection = new BMenuItem(
 		B_TRANSLATE("Trim to selection"), new BMessage(MSG_TRIM_SELECTION), 'T');
