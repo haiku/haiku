@@ -217,7 +217,9 @@ void
 console_clear_screen(void)
 {
 #ifdef __sparc__
-	sOutput.Write("\014", 1);
+	// Send both a clear screen (for serial terminal) and a vertical form
+	// feed for on-screen console
+	sOutput.Write("\014\033[2J", 5);
 #else
 	of_interpret("erase-screen", 0, 0);
 #endif
@@ -320,7 +322,7 @@ console_set_color(int32 foreground, int32 background)
 #ifdef __sparc__
 	// Sadly it seems we can only get inverse video, nothing else seems to work
 	if (background != 0)
-		sOutput.Write("\033[1m", 4);
+		sOutput.Write("\033[7m", 4);
 	else
 		sOutput.Write("\033[0m", 4);
 #else
