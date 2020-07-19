@@ -98,19 +98,10 @@ DepotMatchingRepositoryListener::MapDepot(const DepotInfo& depot, void *context)
 	modifiedDepotInfo.SetWebAppRepositorySourceCode(
 		BString(*repositorySourceCode));
 
-	if (Logger::IsDebugEnabled()) {
-		printf("[DepotMatchingRepositoryListener] associated depot [%s] (%s) "
-			"with server repository source [%s] (%s)\n",
-			modifiedDepotInfo.Name().String(),
-			modifiedDepotInfo.URL().String(),
-			repositorySourceCode->String(),
-			repositoryAndRepositorySource->repositorySource->Url()->String());
-	} else {
-		printf("[DepotMatchingRepositoryListener] associated depot [%s] with "
-			"server repository source [%s]\n",
-			modifiedDepotInfo.Name().String(),
-			repositorySourceCode->String());
-	}
+	printf("[DepotMatchingRepositoryListener] associated depot [%s] with "
+		"server repository source [%s]\n",
+		modifiedDepotInfo.Name().String(),
+		repositorySourceCode->String());
 
 	return modifiedDepotInfo;
 }
