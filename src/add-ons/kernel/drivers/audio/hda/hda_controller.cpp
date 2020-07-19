@@ -1069,7 +1069,7 @@ hda_hw_init(hda_controller* controller)
 	status = install_io_interrupt_handler(controller->irq,
 		(interrupt_handler)hda_interrupt_handler, controller, 0);
 	if (status != B_OK)
-		goto no_irq;
+		goto no_irq_handler;
 
 	// TCSEL is reset to TC0 (clear 0-2 bits)
 	if ((quirks & HDA_QUIRK_NOTCSEL) == 0) {
@@ -1202,15 +1202,15 @@ corb_rirb_failed:
 	controller->Write32(HDAC_INTR_CONTROL, 0);
 
 reset_failed:
+	remove_io_interrupt_handler(controller->irq,
+		(interrupt_handler)hda_interrupt_handler, controller);
+
+no_irq_handler:
 	if (controller->msi) {
 		gPCIx86Module->disable_msi(controller->pci_info.bus,
 			controller->pci_info.device, controller->pci_info.function);
 	}
 
-	remove_io_interrupt_handler(controller->irq,
-		(interrupt_handler)hda_interrupt_handler, controller);
-
-no_irq:
 	delete_area(controller->regs_area);
 	controller->regs_area = B_ERROR;
 	controller->regs = NULL;
