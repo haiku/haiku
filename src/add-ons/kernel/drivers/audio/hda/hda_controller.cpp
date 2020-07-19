@@ -148,6 +148,37 @@ get_controller_quirks(const pci_info& info)
 }
 
 
+template<int bits, typename base_type>
+bool
+wait_for_bits(base_type base, uint32 reg, uint32 mask, bool set,
+	bigtime_t delay = 100, int timeout = 10)
+{
+	STATIC_ASSERT(bits == 8 || bits == 16 || bits == 32);
+
+	for (; timeout >= 0; timeout--) {
+		snooze(delay);
+
+		uint32 value;
+		switch (bits) {
+			case 8:
+				value = base->Read8(reg);
+				break;
+			case 16:
+				value = base->Read16(reg);
+				break;
+			case 32:
+				value = base->Read32(reg);
+				break;
+		}
+
+		if (((value & mask) != 0) == set)
+			return true;
+	}
+
+	return false;
+}
+
+
 static inline bool
 update_pci_register(hda_controller* controller, uint8 reg, uint32 mask,
 	uint32 value, uint8 size, bool check = false)
@@ -407,17 +438,8 @@ reset_controller(hda_controller* controller)
 		controller->ReadModifyWrite8(HDAC_CORB_CONTROL, HDAC_CORB_CONTROL_MASK, 0);
 		controller->ReadModifyWrite8(HDAC_RIRB_CONTROL, HDAC_RIRB_CONTROL_MASK, 0);
 
-		uint8 corbControl = 0;
-		uint8 rirbControl = 0;
-		for (int timeout = 0; timeout < 10; timeout++) {
-			snooze(100);
-
-			corbControl = controller->Read8(HDAC_CORB_CONTROL);
-			rirbControl = controller->Read8(HDAC_RIRB_CONTROL);
-			if (corbControl == 0 && rirbControl == 0)
-				break;
-		}
-		if (corbControl != 0 || rirbControl != 0) {
+		if (!wait_for_bits<8>(controller, HDAC_CORB_CONTROL, ~0, false)
+			|| !wait_for_bits<8>(controller, HDAC_RIRB_CONTROL, ~0, false)) {
 			dprintf("hda: unable to stop dma\n");
 			return B_BUSY;
 		}
@@ -431,15 +453,8 @@ reset_controller(hda_controller* controller)
 
 	// Set reset bit - it must be asserted for at least 100us
 	controller->Write32(HDAC_GLOBAL_CONTROL, control & ~GLOBAL_CONTROL_RESET);
-
-	for (int timeout = 0; timeout < 10; timeout++) {
-		snooze(100);
-
-		control = controller->Read32(HDAC_GLOBAL_CONTROL);
-		if ((control & GLOBAL_CONTROL_RESET) == 0)
-			break;
-	}
-	if ((control & GLOBAL_CONTROL_RESET) != 0) {
+	if (!wait_for_bits<32>(controller, HDAC_GLOBAL_CONTROL,
+			GLOBAL_CONTROL_RESET, false)) {
 		dprintf("hda: unable to reset controller\n");
 		return B_BUSY;
 	}
@@ -451,15 +466,8 @@ reset_controller(hda_controller* controller)
 
 	control = controller->Read32(HDAC_GLOBAL_CONTROL);
 	controller->Write32(HDAC_GLOBAL_CONTROL, control | GLOBAL_CONTROL_RESET);
-
-	for (int timeout = 0; timeout < 10; timeout++) {
-		snooze(100);
-
-		control = controller->Read32(HDAC_GLOBAL_CONTROL);
-		if ((control & GLOBAL_CONTROL_RESET) != 0)
-			break;
-	}
-	if ((control & GLOBAL_CONTROL_RESET) == 0) {
+	if (!wait_for_bits<32>(controller, HDAC_GLOBAL_CONTROL,
+			GLOBAL_CONTROL_RESET, true)) {
 		dprintf("hda: unable to exit reset\n");
 		return B_BUSY;
 	}
@@ -584,13 +592,8 @@ init_corb_rirb_pos(hda_controller* controller, uint32 quirks)
 
 	corbReadPointer |= CORB_READ_POS_RESET;
 	controller->Write16(HDAC_CORB_READ_POS, corbReadPointer);
-	for (int timeout = 0; timeout < 10; timeout++) {
-		snooze(100);
-		corbReadPointer = controller->Read16(HDAC_CORB_READ_POS);
-		if ((corbReadPointer & CORB_READ_POS_RESET) != 0)
-			break;
-	}
-	if ((corbReadPointer & CORB_READ_POS_RESET) == 0) {
+	if (!wait_for_bits<16>(controller, HDAC_CORB_READ_POS, CORB_READ_POS_RESET,
+			true)) {
 		dprintf("hda: CORB read pointer reset not acknowledged\n");
 
 		// According to HDA spec v1.0a ch3.3.21, software must read the
@@ -602,13 +605,8 @@ init_corb_rirb_pos(hda_controller* controller, uint32 quirks)
 
 	corbReadPointer &= ~CORB_READ_POS_RESET;
 	controller->Write16(HDAC_CORB_READ_POS, corbReadPointer);
-	for (int timeout = 0; timeout < 10; timeout++) {
-		snooze(100);
-		corbReadPointer = controller->Read16(HDAC_CORB_READ_POS);
-		if ((corbReadPointer & CORB_READ_POS_RESET) == 0)
-			break;
-	}
-	if ((corbReadPointer & CORB_READ_POS_RESET) != 0) {
+	if (!wait_for_bits<16>(controller, HDAC_CORB_READ_POS, CORB_READ_POS_RESET,
+			false)) {
 		dprintf("hda: CORB read pointer reset failed\n");
 		return B_BUSY;
 	}
