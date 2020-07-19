@@ -754,6 +754,32 @@ hda_stream_stop(hda_controller* controller, hda_stream* stream)
 	}
 
 	stream->running = false;
+	return B_OK;
+}
+
+
+/*! Runs a stream through a reset cycle.
+*/
+status_t
+hda_stream_reset(hda_stream* stream)
+{
+	if (stream->running)
+		hda_stream_stop(stream->controller, stream);
+
+	stream->Write8(HDAC_STREAM_CONTROL0,
+		stream->Read8(HDAC_STREAM_CONTROL0) | CONTROL0_RESET);
+	if (!wait_for_bits<8>(stream, HDAC_STREAM_CONTROL0, CONTROL0_RESET, true)) {
+		dprintf("hda: unable to start stream reset\n");
+		return B_BUSY;
+	}
+
+	stream->Write8(HDAC_STREAM_CONTROL0,
+		stream->Read8(HDAC_STREAM_CONTROL0) & ~CONTROL0_RESET);
+	if (!wait_for_bits<8>(stream, HDAC_STREAM_CONTROL0, CONTROL0_RESET, false))
+	{
+		dprintf("hda: unable to stop stream reset\n");
+		return B_BUSY;
+	}
 
 	return B_OK;
 }
@@ -763,6 +789,8 @@ status_t
 hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 	const char* desc)
 {
+	hda_stream_reset(stream);
+
 	// Clear previously allocated memory
 	if (stream->buffer_area >= 0) {
 		delete_area(stream->buffer_area);
