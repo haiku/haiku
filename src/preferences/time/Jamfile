@@ -7,7 +7,6 @@ UseBuildFeatureHeaders icu ;
 local sources =
 	AnalogClock.cpp
 	BaseView.cpp
-	Bitmaps.cpp
 	ClockView.cpp
 	DateTimeEdit.cpp
 	SectionEdit.cpp
