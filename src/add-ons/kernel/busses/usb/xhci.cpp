@@ -2467,6 +2467,7 @@ XHCI::HandleTransferComplete(xhci_trb* trb)
 		  (flags & TRB_3_EVENT_DATA_BIT), completionCode, transferred);
 
 	if ((flags & TRB_3_EVENT_DATA_BIT) == 0) {
+		// This should only occur under error conditions.
 		TRACE("got an interrupt for a non-Event Data TRB!\n");
 		remainder = transferred;
 		transferred = -1;

@@ -25,6 +25,9 @@ struct xhci_endpoint;
 class XHCIRootHub;
 
 
+/* Each transfer requires 2 TRBs on the endpoint "ring" (one for the link TRB,
+ * and one for the Event Data TRB), plus one more at the end for the link TRB
+ * to the start. */
 #define XHCI_ENDPOINT_RING_SIZE	(XHCI_MAX_TRANSFERS * 2 + 1)
 
 
