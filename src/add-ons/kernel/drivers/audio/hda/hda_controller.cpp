@@ -1267,11 +1267,6 @@ hda_hw_uninit(hda_controller* controller)
 	remove_io_interrupt_handler(controller->irq,
 		(interrupt_handler)hda_interrupt_handler, controller);
 
-	if (gPCIx86Module != NULL) {
-		put_module(B_PCI_X86_MODULE_NAME);
-		gPCIx86Module = NULL;
-	}
-
 	// Delete corb/rirb area
 	if (controller->corb_rirb_pos_area >= 0) {
 		delete_area(controller->corb_rirb_pos_area);
