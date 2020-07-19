@@ -55,7 +55,6 @@ private:
 			LanguageListItem*	fInitialConventionsItem;
 			LanguageListItem*	fDefaultConventionsItem;
 			BMessage			fInitialPreferredLanguages;
-			BCheckBox*			fFilesystemTranslationCheckbox;
 };
 
 

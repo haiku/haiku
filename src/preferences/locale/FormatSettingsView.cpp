@@ -59,6 +59,12 @@ FormatSettingsView::FormatSettingsView()
 		B_TRANSLATE("Use month/day-names from preferred language"),
 		new BMessage(kStringsLanguageChange));
 
+	fFilesystemTranslationCheckbox = new BCheckBox("filesystemTranslation",
+		B_TRANSLATE("Translate application and folder names"),
+		new BMessage(kMsgFilesystemTranslationChanged));
+	fFilesystemTranslationCheckbox->SetValue(
+		BLocaleRoster::Default()->IsFilesystemTranslationPreferred());
+
 	BStringView* fullDateLabel
 		= new BStringView("", B_TRANSLATE("Full format:"));
 	fullDateLabel->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
@@ -230,6 +236,7 @@ FormatSettingsView::FormatSettingsView()
 	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.Add(fFilesystemTranslationCheckbox)
 		.Add(fUseLanguageStringsCheckBox)
 		.Add(fDateBox)
 		.Add(fTimeBox)
@@ -249,6 +256,7 @@ FormatSettingsView::~FormatSettingsView()
 void
 FormatSettingsView::AttachedToWindow()
 {
+	fFilesystemTranslationCheckbox->SetTarget(Window());
 	fUseLanguageStringsCheckBox->SetTarget(this);
 	f24HourRadioButton->SetTarget(this);
 	f12HourRadioButton->SetTarget(this);
@@ -315,6 +323,8 @@ FormatSettingsView::Revert()
 	MutableLocaleRoster::Default()->SetDefaultFormattingConventions(
 		fInitialConventions);
 
+	fFilesystemTranslationCheckbox->SetValue(fInitialTranslateNames);
+
 	_UpdateExamples();
 }
 
@@ -324,8 +334,11 @@ FormatSettingsView::Refresh(bool setInitial)
 {
 	BFormattingConventions conventions;
 	BLocale::Default()->GetFormattingConventions(&conventions);
-	if (setInitial)
+	if (setInitial) {
 		fInitialConventions = conventions;
+		fInitialTranslateNames
+			= BLocaleRoster::Default()->IsFilesystemTranslationPreferred();
+	}
 
 	if (!conventions.Use24HourClock()) {
 		f12HourRadioButton->SetValue(B_CONTROL_ON);
@@ -351,7 +364,8 @@ FormatSettingsView::IsReversible() const
 	BFormattingConventions conventions;
 	BLocale::Default()->GetFormattingConventions(&conventions);
 
-	return conventions != fInitialConventions;
+	return (conventions != fInitialConventions)
+		|| (fFilesystemTranslationCheckbox->Value() != fInitialTranslateNames);
 }
 
 

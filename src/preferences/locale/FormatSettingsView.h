@@ -23,6 +23,7 @@ class BTextControl;
 
 static const uint32 kClockFormatChange = 'cfmc';
 static const uint32 kStringsLanguageChange = 'strc';
+static const uint32 kMsgFilesystemTranslationChanged = 'fsys';
 
 
 class FormatSettingsView : public BView {
@@ -41,6 +42,7 @@ private:
 			void				_UpdateExamples();
 
 private:
+			BCheckBox*			fFilesystemTranslationCheckbox;
 			BCheckBox*			fUseLanguageStringsCheckBox;
 
 			BRadioButton*		f24HourRadioButton;
@@ -64,6 +66,7 @@ private:
 			bool				fLocaleIs24Hour;
 
 			BFormattingConventions	fInitialConventions;
+			bool	fInitialTranslateNames;
 
 			BBox*				fDateBox;
 			BBox*				fTimeBox;

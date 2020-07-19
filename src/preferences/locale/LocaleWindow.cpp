@@ -48,7 +48,6 @@ static const uint32 kMsgConventionsSelection = 'csel';
 static const uint32 kMsgDefaults = 'dflt';
 
 static const uint32 kMsgPreferredLanguagesChanged = 'lang';
-static const uint32 kMsgFilesystemTranslationChanged = 'fsys';
 
 
 static int
@@ -71,8 +70,7 @@ LocaleWindow::LocaleWindow()
 		B_QUIT_ON_WINDOW_CLOSE | B_ASYNCHRONOUS_CONTROLS
 			| B_AUTO_UPDATE_SIZE_LIMITS),
 	fInitialConventionsItem(NULL),
-	fDefaultConventionsItem(NULL),
-	fFilesystemTranslationCheckbox(NULL)
+	fDefaultConventionsItem(NULL)
 {
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 
@@ -185,8 +183,8 @@ LocaleWindow::LocaleWindow()
 		.SetInsets(B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING,
 			B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING);
 
-	BView* countryTab = new BView(B_TRANSLATE("Formatting"), B_WILL_DRAW);
-	countryTab->SetLayout(new BGroupLayout(B_VERTICAL, 0));
+	BView* formattingTab = new BView(B_TRANSLATE("Formatting"), B_WILL_DRAW);
+	formattingTab->SetLayout(new BGroupLayout(B_VERTICAL, 0));
 
 	fConventionsListView = new LanguageListView("formatting",
 		B_SINGLE_SELECTION_LIST);
@@ -242,12 +240,12 @@ LocaleWindow::LocaleWindow()
 			fInitialConventionsItem));
 	}
 
-	fConventionsListView->SetExplicitMinSize(BSize(20 * be_plain_font->Size(),
+	fConventionsListView->SetExplicitMinSize(BSize(21 * be_plain_font->Size(),
 		B_SIZE_UNSET));
 
 	fFormatView = new FormatSettingsView();
 
-	countryTab->AddChild(BLayoutBuilder::Group<>(B_HORIZONTAL, spacing)
+	formattingTab->AddChild(BLayoutBuilder::Group<>(B_HORIZONTAL, spacing)
 		.AddGroup(B_VERTICAL, 3)
 			.Add(scrollView)
 			.End()
@@ -255,25 +253,8 @@ LocaleWindow::LocaleWindow()
 		.SetInsets(B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING,
 			B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING));
 
-	BView* optionsTab = new BView(B_TRANSLATE("Options"), B_WILL_DRAW);
-	optionsTab->SetLayout(new BGroupLayout(B_VERTICAL, 0));
-
-	fFilesystemTranslationCheckbox = new BCheckBox("filesystemTranslation",
-		B_TRANSLATE("Translate application and folder names in Deskbar and Tracker."),
-		new BMessage(kMsgFilesystemTranslationChanged));
-
-	fFilesystemTranslationCheckbox->SetValue(
-		BLocaleRoster::Default()->IsFilesystemTranslationPreferred());
-
-	optionsTab->AddChild(BLayoutBuilder::Group<>(B_VERTICAL)
-		.Add(fFilesystemTranslationCheckbox)
-		.AddGlue()
-		.SetInsets(B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING,
-			B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING));
-
 	tabView->AddTab(languageTab);
-	tabView->AddTab(countryTab);
-	tabView->AddTab(optionsTab);
+	tabView->AddTab(formattingTab);
 
 	BButton* button
 		= new BButton(B_TRANSLATE("Defaults"), new BMessage(kMsgDefaults));
@@ -455,8 +436,9 @@ LocaleWindow::MessageReceived(BMessage* message)
 
 		case kMsgFilesystemTranslationChanged:
 		{
+			int32 value = message->FindInt32("be:value");
 			MutableLocaleRoster::Default()->SetFilesystemTranslationPreferred(
-				fFilesystemTranslationCheckbox->Value());
+				value == B_CONTROL_ON);
 
 			BAlert* alert = new BAlert(B_TRANSLATE("Locale"),
 				B_TRANSLATE("Deskbar and Tracker need to be restarted for this "
@@ -664,6 +646,4 @@ LocaleWindow::_Defaults()
 				fDefaultConventionsItem));
 		fConventionsListView->ScrollToSelection();
 	}
-
-	fFilesystemTranslationCheckbox->SetValue(true);
 }
