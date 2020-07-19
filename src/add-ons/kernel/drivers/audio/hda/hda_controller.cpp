@@ -725,6 +725,11 @@ hda_stream_start(hda_controller* controller, hda_stream* stream)
 		| CONTROL0_BUFFER_COMPLETED_INTR | CONTROL0_FIFO_ERROR_INTR
 		| CONTROL0_DESCRIPTOR_ERROR_INTR | CONTROL0_RUN);
 
+	if (!wait_for_bits<8>(stream, HDAC_STREAM_CONTROL0, CONTROL0_RUN, true)) {
+		dprintf("hda: unable to start stream\n");
+		return B_BUSY;
+	}
+
 	stream->running = true;
 	return B_OK;
 }
@@ -742,6 +747,11 @@ hda_stream_stop(hda_controller* controller, hda_stream* stream)
 			| CONTROL0_DESCRIPTOR_ERROR_INTR | CONTROL0_RUN));
 	controller->Write32(HDAC_INTR_CONTROL, controller->Read32(HDAC_INTR_CONTROL)
 		& ~(1 << (stream->offset / HDAC_STREAM_SIZE)));
+
+	if (!wait_for_bits<8>(stream, HDAC_STREAM_CONTROL0, CONTROL0_RUN, false)) {
+		dprintf("hda: unable to stop stream\n");
+		return B_BUSY;
+	}
 
 	stream->running = false;
 
