@@ -16,7 +16,8 @@ InputTextView::InputTextView(BRect frame, const char* name,
 							 uint32 resizingMode,
 							 uint32 flags)
 	: BTextView(frame, name, textRect, resizingMode, flags),
-	  fWasFocus(false)
+	  fWasFocus(false),
+	  fTextBeforeFocus("")
 {
 	SetWordWrap(false);
 }
@@ -116,51 +117,4 @@ InputTextView::Invoke(BMessage* message)
 		return BInvoker::Invoke(&copy);
 	}
 	return B_BAD_VALUE;
-}
-
-// #pragma mark -
-
-// Select
-void
-InputTextView::Select(int32 start, int32 finish)
-{
-	BTextView::Select(start, finish);
-
-	_CheckTextRect();
-}
-
-// InsertText
-void
-InputTextView::InsertText(const char* inText, int32 inLength, int32 inOffset,
-						  const text_run_array* inRuns)
-{
-	BTextView::InsertText(inText, inLength, inOffset, inRuns);
-
-	_CheckTextRect();
-}
-
-// DeleteText
-void
-InputTextView::DeleteText(int32 fromOffset, int32 toOffset)
-{
-	BTextView::DeleteText(fromOffset, toOffset);
-
-	_CheckTextRect();
-}
-
-// #pragma mark -
-
-// _CheckTextRect
-void
-InputTextView::_CheckTextRect()
-{
-	// update text rect and make sure
-	// the cursor/selection is in view
-	BRect textRect(TextRect());
-	float width = ceilf(StringWidth(Text()) + 2.0);
-	if (textRect.Width() != width) {
-		textRect.right = textRect.left + width;
-		SetTextRect(textRect);
-		ScrollToSelection();
-	}
 }

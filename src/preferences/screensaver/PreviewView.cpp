@@ -146,7 +146,8 @@ PreviewView::AddPreview()
 
 	fNoPreview->SetExplicitSize(BSize(previewWidth, previewHeight));
 	fNoPreview->ResizeTo(previewWidth, previewHeight);
-	fNoPreview->SetInsets(0, previewHeight / 3, 0 , 0);
+	fNoPreview->SetTextRect(BRect(0, 0, previewWidth, previewHeight));
+	fNoPreview->SetInsets(0, previewHeight / 3, 0, 0);
 
 	return fSaverView;
 }

@@ -34,21 +34,8 @@ class InputTextView : public BTextView,
 	virtual	void				ApplyChanges() = 0;
 
 protected:
-								// BTextView
-	virtual	void				Select(int32 start, int32 finish);
-
-	virtual	void				InsertText(const char* inText,
-										   int32 inLength,
-										   int32 inOffset,
-										   const text_run_array* inRuns);
-	virtual	void				DeleteText(int32 fromOffset,
-										   int32 toOffset);
-
-			void				_CheckTextRect();
-
 			bool				fWasFocus;
 			BString				fTextBeforeFocus;
-
 };
 
 #endif // INPUT_TEXT_VIEW_H

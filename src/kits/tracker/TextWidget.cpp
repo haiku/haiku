@@ -366,11 +366,14 @@ BTextWidget::StartEdit(BRect bounds, BPoseView* view, BPose* pose)
 		return;
 	}
 
+	// TODO fix text rect being off by a pixel on some files
+
 	// get bounds with full text length
 	BRect rect(bounds);
 	BRect textRect(bounds);
-	rect.OffsetBy(-2, -1);
-	rect.right += 1;
+
+	// label offset
+	rect.OffsetBy(1, -2);
 
 	BFont font;
 	view->GetFont(&font);
@@ -378,22 +381,21 @@ BTextWidget::StartEdit(BRect bounds, BPoseView* view, BPose* pose)
 		&font, 0, B_FOLLOW_ALL, B_WILL_DRAW);
 
 	textView->SetWordWrap(false);
+	textView->SetInsets(2, 2, 2, 2);
 	DisallowMetaKeys(textView);
 	fText->SetUpEditing(textView);
 
 	textView->AddFilter(new BMessageFilter(B_KEY_DOWN, TextViewFilter));
 
-	rect.right = rect.left + textView->LineWidth() + 3;
-	// center new width, if necessary
-	if (view->ViewMode() == kIconMode
-		|| (view->ViewMode() == kListMode && fAlignment == B_ALIGN_CENTER)) {
-		rect.OffsetBy(bounds.Width() / 2 - rect.Width() / 2, 0);
-	}
+	rect.right = rect.left + textView->LineWidth();
+	rect.bottom = rect.top + textView->LineHeight() - 1;
 
-	rect.bottom = rect.top + textView->LineHeight() + 1;
-	textRect = rect.OffsetToCopy(2, 1);
-	textRect.right -= 3;
-	textRect.bottom--;
+	// enlarge rect by inset amount
+	rect.InsetBy(-2, -2);
+
+	// undo label offset
+	textRect = rect.OffsetToCopy(-1, 2);
+
 	textView->SetTextRect(textRect);
 
 	BPoint origin = view->LeftTop();

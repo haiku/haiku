@@ -763,8 +763,6 @@ CalcView::FrameResized(float width, float height)
 	fExpressionTextView->SetFontAndColor(&font, B_FONT_ALL, &fontColor);
 
 	expressionRect.OffsetTo(B_ORIGIN);
-	float inset = (expressionRect.Height() - fExpressionTextView->LineHeight(0)) / 2;
-	expressionRect.InsetBy(0, inset);
 	fExpressionTextView->SetTextRect(expressionRect);
 	Invalidate();
 }

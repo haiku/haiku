@@ -502,20 +502,16 @@ StyledEditWindow::MessageReceived(BMessage* message)
 			break;
 		case WRAP_LINES:
 		{
-			BRect textRect(fTextView->Bounds());
-			textRect.OffsetTo(B_ORIGIN);
-			textRect.InsetBy(TEXT_INSET, TEXT_INSET);
+			// update wrap setting
 			if (fTextView->DoesWordWrap()) {
 				fTextView->SetWordWrap(false);
 				fWrapItem->SetMarked(false);
-				// the width comes from stylededit R5. TODO: find a better way
-				textRect.SetRightBottom(BPoint(1500.0, textRect.RightBottom().y));
 			} else {
 				fTextView->SetWordWrap(true);
 				fWrapItem->SetMarked(true);
 			}
-			fTextView->SetTextRect(textRect);
 
+			// update buttons
 			_UpdateCleanUndoRedoSaveRevert();
 			break;
 		}

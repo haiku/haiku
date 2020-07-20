@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku Inc. All rights reserved.
+ * Copyright 2001-2020 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -10,6 +10,7 @@
 
 #ifndef	_TEXT_CONTROLI_H
 #define	_TEXT_CONTROLI_H
+
 
 #include <TextView.h>
 
@@ -36,7 +37,6 @@ virtual	void			MakeFocus(bool focusState = true);
 
 virtual	BSize			MinSize();
 
-		void			AlignTextRect();
 		void			SetInitialText();
 
 virtual	void			Paste(BClipboard *clipboard);

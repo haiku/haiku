@@ -33,7 +33,7 @@ class ExpressionTextView : public InputTextView {
 	virtual	void				GetDragParameters(BMessage* dragMessage,
 									BBitmap** bitmap, BPoint* point,
 									BHandler** handler);
-			void 				SetTextRect(BRect rect);
+	virtual	void 				SetTextRect(BRect rect);
 
 	// InputTextView
 	virtual	void				RevertChanges();

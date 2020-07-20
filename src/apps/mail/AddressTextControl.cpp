@@ -48,7 +48,6 @@ public:
 	virtual						~TextView();
 
 	virtual	void				MessageReceived(BMessage* message);
-	virtual	void				FrameResized(float width, float height);
 	virtual	void				KeyDown(const char* bytes, int32 numBytes);
 	virtual	void				MakeFocus(bool focused = true);
 
@@ -65,9 +64,6 @@ protected:
 									int32 offset,
 									const text_run_array* runs);
 	virtual	void				DeleteText(int32 fromOffset, int32 toOffset);
-
-private:
-			void				_AlignTextRect();
 
 private:
 			AddressTextControl*	fAddressTextControl;
@@ -222,14 +218,6 @@ AddressTextControl::TextView::MessageReceived(BMessage* message)
 
 
 void
-AddressTextControl::TextView::FrameResized(float width, float height)
-{
-	BTextView::FrameResized(width, height);
-	_AlignTextRect();
-}
-
-
-void
 AddressTextControl::TextView::KeyDown(const char* bytes, int32 numBytes)
 {
 	switch (bytes[0]) {
@@ -380,25 +368,6 @@ AddressTextControl::TextView::DeleteText(int32 fromOffset,
 	fAutoCompleter->TextModified(fUpdateAutoCompleterChoices);
 	fAddressTextControl->InvokeNotify(fModificationMessage,
 		B_CONTROL_MODIFIED);
-}
-
-
-void
-AddressTextControl::TextView::_AlignTextRect()
-{
-	// Layout the text rect to be in the middle, normally this means there
-	// is one pixel spacing on each side.
-	BRect textRect(Bounds());
-	textRect.left = 0.0;
-	float vInset = max_c(1,
-		floorf((textRect.Height() - LineHeight(0)) / 2.0 + 0.5));
-
-	float hInset = 0;
-	if (be_control_look != NULL)
-		hInset = be_control_look->DefaultLabelSpacing();
-
-	textRect.InsetBy(hInset, vInset);
-	SetTextRect(textRect);
 }
 
 
@@ -888,6 +857,7 @@ void
 AddressTextControl::SetEditable(bool editable)
 {
 	fTextView->MakeEditable(IsEnabled() && editable);
+	fTextView->MakeSelectable(IsEnabled() && editable);
 	fEditable = editable;
 
 	if (editable && fPopUpButton->IsHidden(this))

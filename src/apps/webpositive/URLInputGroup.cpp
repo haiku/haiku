@@ -147,7 +147,6 @@ public:
 	virtual						~URLTextView();
 
 	virtual	void				MessageReceived(BMessage* message);
-	virtual	void				FrameResized(float width, float height);
 	virtual	void				MouseDown(BPoint where);
 	virtual	void				KeyDown(const char* bytes, int32 numBytes);
 	virtual	void				MakeFocus(bool focused = true);
@@ -162,9 +161,6 @@ protected:
 									int32 inOffset,
 									const text_run_array* inRuns);
 	virtual	void				DeleteText(int32 fromOffset, int32 toOffset);
-
-private:
-			void				_AlignTextRect();
 
 private:
 			URLInputGroup*		fURLInputGroup;
@@ -183,6 +179,7 @@ URLInputGroup::URLTextView::URLTextView(URLInputGroup* parent)
 {
 	MakeResizable(true);
 	SetStylable(true);
+	SetInsets(be_control_look->DefaultLabelSpacing(), 2, 0, 2);
 	fURLAutoCompleter->SetModificationsReported(true);
 }
 
@@ -205,14 +202,6 @@ URLInputGroup::URLTextView::MessageReceived(BMessage* message)
 			BTextView::MessageReceived(message);
 			break;
 	}
-}
-
-
-void
-URLInputGroup::URLTextView::FrameResized(float width, float height)
-{
-	BTextView::FrameResized(width, height);
-	_AlignTextRect();
 }
 
 
@@ -408,25 +397,6 @@ URLInputGroup::URLTextView::DeleteText(int32 fromOffset, int32 toOffset)
 	BTextView::DeleteText(fromOffset, toOffset);
 
 	fURLAutoCompleter->TextModified(fUpdateAutoCompleterChoices);
-}
-
-
-void
-URLInputGroup::URLTextView::_AlignTextRect()
-{
-	// Layout the text rect to be in the middle, normally this means there
-	// is one pixel spacing on each side.
-	BRect textRect(Bounds());
-	textRect.left = 0.0;
-	float vInset = max_c(1,
-		floorf((textRect.Height() - LineHeight(0)) / 2.0 + 0.5));
-	float hInset = kHorizontalTextRectInset;
-
-	if (be_control_look)
-		hInset = be_control_look->DefaultLabelSpacing();
-
-	textRect.InsetBy(hInset, vInset);
-	SetTextRect(textRect);
 }
 
 
