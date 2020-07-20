@@ -147,7 +147,7 @@ ShortDirectory::GetNext(char* name, size_t* length, xfs_ino_t* ino)
 		uint16 curOffset = B_BENDIAN_TO_HOST_INT16(entry->offset.i);
 		if (curOffset > fLastEntryOffset) {
 
-			if (entry->namelen > *length)
+			if (entry->namelen + 1 > *length)
 				return B_BUFFER_OVERFLOW;
 
 			fLastEntryOffset = curOffset;

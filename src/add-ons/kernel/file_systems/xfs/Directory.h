@@ -9,6 +9,7 @@
 #include "Extent.h"
 #include "Inode.h"
 #include "LeafDirectory.h"
+#include "Node.h"
 #include "ShortDirectory.h"
 
 
@@ -36,6 +37,7 @@ private:
 				// TODO: Rename all to block type
 			LeafDirectory*		fLeafDir;
 				// Extent based leaf directory
+			NodeDirectory*		fNodeDir;
 };
 
 

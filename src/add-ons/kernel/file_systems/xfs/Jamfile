@@ -27,6 +27,7 @@ local xfsSources =
 	kernel_cpp.cpp
 	kernel_interface.cpp
 	LeafDirectory.cpp
+	Node.cpp
 	ShortDirectory.cpp
 	Volume.cpp
 	xfs.cpp

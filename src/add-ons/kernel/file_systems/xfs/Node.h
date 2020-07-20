@@ -2,48 +2,44 @@
  * Copyright 2020, Shubham Bhagat, shubhambhagat111@yahoo.com
  * All rights reserved. Distributed under the terms of the MIT License.
  */
-#ifndef _LEAFDIRECTORY_H_
-#define _LEAFDIRECTORY_H_
+#ifndef _NODE_H_
+#define _NODE_H_
 
 
 #include "Extent.h"
-#include "Inode.h"
-#include "system_dependencies.h"
+#include "LeafDirectory.h"
 
 
-#define HEADER_MAGIC 0x58443244
+#define XFS_DIR2_LEAFN_MAGIC (0xd2ff)
+#define XFS_DA_NODE_MAGIC (0xfebe)
 
 
-enum ContentType { DATA, LEAF };
-
-
-//xfs_dir2_leaf_hdr_t
-struct ExtentLeafHeader {
+//xfs_da_node_hdr
+struct NodeHeader {
 			BlockInfo			info;
 			uint16				count;
-			uint16				stale;
+			uint16				level;
 };
 
 
-// xfs_dir2_leaf_tail_t
-struct ExtentLeafTail {
-			uint32				bestcount;
-				// # of best free entries
+//xfs_da_node_entry
+struct NodeEntry {
+			uint32				hashval;
+			uint32				before;
 };
 
 
-class LeafDirectory {
+class NodeDirectory {
 public:
-								LeafDirectory(Inode* inode);
-								~LeafDirectory();
+								NodeDirectory(Inode* inode);
+								~NodeDirectory();
 			status_t			Init();
-			bool				IsLeafType();
+			bool				IsNodeType();
 			void				FillMapEntry(int num, ExtentMapEntry* map);
 			status_t			FillBuffer(int type, char* buffer,
 									int howManyBlocksFurthur);
 			void				SearchAndFillDataMap(int blockNo);
-			ExtentLeafEntry*	FirstLeaf();
-			xfs_ino_t			GetIno();
+			uint32				FindHashInNode(uint32 hashVal);
 			uint32				GetOffsetFromAddress(uint32 address);
 			int					EntrySize(int len) const;
 			status_t			GetNext(char* name, size_t* length,
@@ -59,7 +55,8 @@ private:
 				// This isn't inode data. It holds the directory block.
 			char*				fLeafBuffer;
 			uint32				fCurBlockNumber;
+			uint8				fCurLeafMapNumber;
+			uint8				fCurLeafBufferNumber;
 };
-
 
 #endif

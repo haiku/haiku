@@ -16,9 +16,13 @@
 #define XFS_DIR2_DATA_FD_COUNT 3
 #define EXTENT_REC_SIZE		128
 #define MASK(n) ((1UL << n) - 1)
-#define FSBLOCKS_TO_AGNO(n, volume) (n >> volume->AgBlocksLog())
-#define FSBLOCKS_TO_AGBLOCKNO(n, volume) (n & MASK(volume->AgBlocksLog()))
-
+#define FSBLOCKS_TO_AGNO(n, volume) ((n) >> volume->AgBlocksLog())
+#define FSBLOCKS_TO_AGBLOCKNO(n, volume) ((n) & MASK(volume->AgBlocksLog()))
+#define EXTENT_SIZE 16
+#define BLOCKNO_FROM_ADDRESS(n, volume) \
+	((n) >> (volume->BlockLog() + volume->DirBlockLog()))
+#define BLOCKOFFSET_FROM_ADDRESS(n, inode) ((n) & (inode->DirBlockSize() - 1))
+#define LEAF_STARTOFFSET(n) 1UL << (35 - (n))
 
 
 // xfs_exntst_t

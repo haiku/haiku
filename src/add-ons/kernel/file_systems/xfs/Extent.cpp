@@ -33,12 +33,8 @@ Extent::FillMapEntry(void* pointerToMap)
 	fMap->br_startblock = ((firstHalf & MASK(9)) << 43) | (secondHalf >> 21);
 	fMap->br_blockcount = (secondHalf & MASK(21));
 	TRACE("Extent::Init: startoff:(%ld), startblock:(%ld), blockcount:(%ld),"
-			"state:(%d)\n",
-		fMap->br_startoff,
-		fMap->br_startblock,
-		fMap->br_blockcount,
-		fMap->br_state
-		);
+		"state:(%d)\n", fMap->br_startoff, fMap->br_startblock,
+		fMap->br_blockcount, fMap->br_state);
 }
 
 
@@ -184,7 +180,7 @@ Extent::GetNext(char* name, size_t* length, xfs_ino_t* ino)
 			continue;
 		}
 
-		if (dataEntry->namelen > *length)
+		if (dataEntry->namelen + 1 > *length)
 				return B_BUFFER_OVERFLOW;
 
 		fOffset = currentOffset;

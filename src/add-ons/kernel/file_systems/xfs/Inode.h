@@ -38,6 +38,15 @@
 #define DIR_AFORK_EXIST(dir_ino_ptr) dir_ino_ptr->di_forkoff!=0
 
 
+// xfs_da_blkinfo_t
+struct BlockInfo {
+			uint32				forw;
+			uint32				back;
+			uint16				magic;
+			uint16				pad;
+};
+
+
 uint32
 hashfunction(const char* name, int length);
 
