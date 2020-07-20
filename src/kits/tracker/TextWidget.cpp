@@ -379,6 +379,7 @@ BTextWidget::StartEdit(BRect bounds, BPoseView* view, BPose* pose)
 
 	textView->SetWordWrap(false);
 	DisallowMetaKeys(textView);
+	textView->SetInsets(0, 0, 0, 0);
 	fText->SetUpEditing(textView);
 
 	textView->AddFilter(new BMessageFilter(B_KEY_DOWN, TextViewFilter));

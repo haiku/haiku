@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2007-2020 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _TEXTVIEW_H
@@ -416,6 +416,7 @@ private:
 			LineBuffer*			fLines;
 			StyleBuffer*		fStyles;
 			BRect				fTextRect;
+			BRect				fAlignedTextRect;
 			int32				fSelStart;
 			int32				fSelEnd;
 			bool				fCaretVisible;
@@ -463,7 +464,7 @@ private:
 			bool				fInstalledRemoveCommandWordwiseShortcuts : 1;
 			bool				fInstalledRemoveOptionWordwiseShortcuts : 1;
 
-			uint32				_reserved[6];
+			uint32				_reserved[2];
 };
 
 #endif	// _TEXTVIEW_H

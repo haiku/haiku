@@ -1,11 +1,12 @@
 /*
- * Copyright 2001-2015, Haiku Inc.
+ * Copyright 2001-2020 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Frans van Nispen (xlr8@tref.nl)
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Ingo Weinhold <bonefish@cs.tu-berlin.de>
+ *		John Scipione <jscipione@gmail.com>
  */
 
 
@@ -637,7 +638,6 @@ void
 BTextControl::SetAlignment(alignment labelAlignment, alignment textAlignment)
 {
 	fText->SetAlignment(textAlignment);
-	fText->AlignTextRect();
 
 	if (fLabelAlign != labelAlignment) {
 		fLabelAlign = labelAlignment;
@@ -911,6 +911,7 @@ BTextControl::DoLayout()
 	// place the text view and set the divider
 	textFrame.InsetBy(kFrameMargin, kFrameMargin);
 	BLayoutUtils::AlignInFrame(fText, textFrame);
+	fText->SetTextRect(textFrame.OffsetToCopy(B_ORIGIN));
 
 	fDivider = divider;
 
@@ -1115,7 +1116,6 @@ BTextControl::_InitText(const char* initialText, const BMessage* archive)
 
 		SetText(initialText);
 		fText->SetAlignment(B_ALIGN_LEFT);
-		fText->AlignTextRect();
 	}
 
 	// Although this is not strictly initializing the text view,
@@ -1171,7 +1171,6 @@ BTextControl::_LayoutTextView()
 	frame.InsetBy(kFrameMargin, kFrameMargin);
 	fText->MoveTo(frame.left, frame.top);
 	fText->ResizeTo(frame.Width(), frame.Height());
-	fText->AlignTextRect();
 
 	TRACE("width: %.2f, height: %.2f\n", Frame().Width(), Frame().Height());
 	TRACE("fDivider: %.2f\n", fDivider);

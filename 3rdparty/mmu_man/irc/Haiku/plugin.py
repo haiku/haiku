@@ -136,7 +136,7 @@ class Haiku(callbacks.Plugin):
         to = None
         if len(args) > 0:
             to = args[0]
-        t = "Current release: http://www.haiku-os.org/get-haiku - Nightly builds: http://haiku-files.org/haiku/development/"
+        t = "Current release: http://www.haiku-os.org/get-haiku - Nightly builds: http://download.haiku-os.org"
         irc.reply(t, to = to)
 
     def dl(self, irc, msg, args):
