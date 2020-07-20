@@ -17,6 +17,14 @@
 #include "mmu.h"
 
 
+//#define TRACE_MMU
+#ifdef TRACE_MMU
+#   define TRACE(x...) dprintf("efi/mmu: " x)
+#else
+#   define TRACE(x...) ;
+#endif
+
+
 struct allocated_memory_region {
 	allocated_memory_region *next;
 	uint64_t vaddr;
@@ -41,8 +49,12 @@ static allocated_memory_region *allocated_memory_regions = NULL;
 extern "C" uint64_t
 mmu_allocate_page()
 {
+	TRACE("%s: called\n", __func__);
+
 	efi_physical_addr addr;
-	efi_status s = kBootServices->AllocatePages(AllocateAnyPages, EfiLoaderData, 1, &addr);
+	efi_status s = kBootServices->AllocatePages(AllocateAnyPages,
+		EfiLoaderData, 1, &addr);
+
 	if (s != EFI_SUCCESS)
 		panic("Unabled to allocate memory: %li", s);
 
@@ -53,6 +65,8 @@ mmu_allocate_page()
 extern "C" addr_t
 get_next_virtual_address(size_t size)
 {
+	TRACE("%s: called. size: %" B_PRIuSIZE "\n", __func__, size);
+
 	addr_t address = sNextVirtualAddress;
 	sNextVirtualAddress += ROUNDUP(size, B_PAGE_SIZE);
 	return address;
@@ -62,6 +76,8 @@ get_next_virtual_address(size_t size)
 extern "C" addr_t
 get_current_virtual_address()
 {
+	TRACE("%s: called\n", __func__);
+
 	return sNextVirtualAddress;
 }
 
@@ -76,8 +92,11 @@ get_current_virtual_address()
 // addresses to kernel addresses.
 
 extern "C" status_t
-platform_allocate_region(void **_address, size_t size, uint8 /* protection */, bool exactAddress)
+platform_allocate_region(void **_address, size_t size, uint8 /* protection */,
+	bool exactAddress)
 {
+	TRACE("%s: called\n", __func__);
+
 	// We don't have any control over the page tables, give up right away if an
 	// exactAddress is wanted.
 	if (exactAddress)
@@ -131,13 +150,17 @@ platform_allocate_region(void **_address, size_t size, uint8 /* protection */, b
 extern "C" addr_t
 mmu_map_physical_memory(addr_t physicalAddress, size_t size, uint32 flags)
 {
+	TRACE("%s: called\n", __func__);
+
 	addr_t pageOffset = physicalAddress & (B_PAGE_SIZE - 1);
 
 	physicalAddress -= pageOffset;
 	size += pageOffset;
 
-	if (insert_physical_allocated_range(physicalAddress, ROUNDUP(size, B_PAGE_SIZE)) != B_OK)
+	if (insert_physical_allocated_range(physicalAddress,
+		ROUNDUP(size, B_PAGE_SIZE)) != B_OK) {
 		return B_NO_MEMORY;
+	}
 
 	return physicalAddress + pageOffset;
 }
@@ -146,6 +169,8 @@ mmu_map_physical_memory(addr_t physicalAddress, size_t size, uint32 flags)
 extern "C" void
 mmu_free(void *virtualAddress, size_t size)
 {
+	TRACE("%s: called\n", __func__);
+
 	addr_t physicalAddress = (addr_t)virtualAddress;
 	addr_t pageOffset = physicalAddress & (B_PAGE_SIZE - 1);
 
@@ -154,7 +179,8 @@ mmu_free(void *virtualAddress, size_t size)
 
 	size_t aligned_size = ROUNDUP(size, B_PAGE_SIZE);
 
-	for (allocated_memory_region *region = allocated_memory_regions; region; region = region->next) {
+	for (allocated_memory_region *region = allocated_memory_regions; region;
+		region = region->next) {
 		if (region->paddr == physicalAddress && region->size == aligned_size) {
 			region->released = true;
 			return;
@@ -166,7 +192,10 @@ mmu_free(void *virtualAddress, size_t size)
 static allocated_memory_region *
 get_region(void *address, size_t size)
 {
-	for (allocated_memory_region *region = allocated_memory_regions; region; region = region->next) {
+	TRACE("%s: called\n", __func__);
+
+	for (allocated_memory_region *region = allocated_memory_regions; region;
+		region = region->next) {
 		if (region->paddr == (uint64_t)address && region->size == size) {
 			return region;
 		}
@@ -176,19 +205,23 @@ get_region(void *address, size_t size)
 
 
 static void
-convert_physical_ranges() {
+convert_physical_ranges()
+{
+	TRACE("%s: called\n", __func__);
+
 	addr_range *range = gKernelArgs.physical_allocated_range;
 	uint32 num_ranges = gKernelArgs.num_physical_allocated_ranges;
 
 	for (uint32 i = 0; i < num_ranges; ++i) {
-		allocated_memory_region *region = new(std::nothrow) allocated_memory_region;
+		allocated_memory_region *region
+			= new(std::nothrow) allocated_memory_region;
 
 		if (!region)
 			panic("Couldn't add allocated region");
 
 		// Addresses above 512GB not supported.
-		// Memory map regions above 512GB can be ignored, but if EFI returns pages above
-		// that there's nothing that can be done to fix it.
+		// Memory map regions above 512GB can be ignored, but if EFI returns
+		// pages above that there's nothing that can be done to fix it.
 		if (range[i].start + range[i].size > (512ull * 1024 * 1024 * 1024))
 			panic("Can't currently support more than 512GB of RAM!");
 
@@ -208,14 +241,18 @@ convert_physical_ranges() {
 
 
 extern "C" status_t
-platform_bootloader_address_to_kernel_address(void *address, uint64_t *_result)
+platform_bootloader_address_to_kernel_address(void *address,
+	uint64_t *_result)
 {
+	TRACE("%s: called\n", __func__);
+
 	// Convert any physical ranges prior to looking up address
 	convert_physical_ranges();
 
 	uint64_t addr = (uint64_t)address;
 
-	for (allocated_memory_region *region = allocated_memory_regions; region; region = region->next) {
+	for (allocated_memory_region *region = allocated_memory_regions; region;
+		region = region->next) {
 		if (region->paddr <= addr && addr < region->paddr + region->size) {
 			// Lazily allocate virtual memory.
 			if (region->vaddr == 0) {
@@ -235,6 +272,8 @@ platform_bootloader_address_to_kernel_address(void *address, uint64_t *_result)
 extern "C" status_t
 platform_kernel_address_to_bootloader_address(uint64_t address, void **_result)
 {
+	TRACE("%s: called\n", __func__);
+
 	for (allocated_memory_region *region = allocated_memory_regions; region; region = region->next) {
 		if (region->vaddr != 0 && region->vaddr <= address && address < region->vaddr + region->size) {
 			*_result = (void *)(region->paddr + (address - region->vaddr));
@@ -251,7 +290,9 @@ platform_kernel_address_to_bootloader_address(uint64_t address, void **_result)
 extern "C" status_t
 platform_free_region(void *address, size_t size)
 {
-	//dprintf("Release region %p %lu\n", address, size);
+	TRACE("%s: called to release region %p (%" B_PRIuSIZE ")\n", __func__,
+		address, size);
+
 	allocated_memory_region *region = get_region(address, size);
 	if (!region)
 		panic("Unknown region??");
