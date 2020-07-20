@@ -29,7 +29,6 @@ class ApplicationTypeWindow : public BWindow {
 		ApplicationTypeWindow(BPoint position, const BEntry& entry);
 		virtual ~ApplicationTypeWindow();
 
-		virtual void FrameResized(float width, float height);
 		virtual void MessageReceived(BMessage* message);
 		virtual bool QuitRequested();
 

@@ -483,13 +483,13 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position,
 	// TODO: the same does not work when applied to the layout items
 	float width = be_plain_font->StringWidth("99") + 16;
 	fMajorVersionControl->TextView()->SetExplicitMinSize(
-		BSize(width, fMajorVersionControl->MinSize().height));
+		BSize(width, B_SIZE_UNSET));
 	fMiddleVersionControl->TextView()->SetExplicitMinSize(
-		BSize(width, fMiddleVersionControl->MinSize().height));
+		BSize(width, B_SIZE_UNSET));
 	fMinorVersionControl->TextView()->SetExplicitMinSize(
-		BSize(width, fMinorVersionControl->MinSize().height));
+		BSize(width, B_SIZE_UNSET));
 	fInternalVersionControl->TextView()->SetExplicitMinSize(
-		BSize(width, fInternalVersionControl->MinSize().height));
+		BSize(width, B_SIZE_UNSET));
 
 	BLayoutBuilder::Grid<>(versionBox, padding / 2, padding / 2)
 		.SetInsets(padding, padding * 2, padding, padding)
@@ -901,14 +901,6 @@ ApplicationTypeWindow::_VersionInfo() const
 
 
 // #pragma mark -
-
-
-void
-ApplicationTypeWindow::FrameResized(float width, float height)
-{
-	// This works around a flaw of BTextView
-	fLongDescriptionView->SetTextRect(fLongDescriptionView->Bounds());
-}
 
 
 void
