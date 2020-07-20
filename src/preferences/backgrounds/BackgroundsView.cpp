@@ -99,9 +99,15 @@ BackgroundsView::BackgroundsView()
 	fYPlacementText = new BTextControl(B_TRANSLATE("Y:"), NULL,
 		new BMessage(kMsgImagePlacement));
 
+	// right-align text view
+	fXPlacementText->TextView()->SetAlignment(B_ALIGN_RIGHT);
+	fYPlacementText->TextView()->SetAlignment(B_ALIGN_RIGHT);
+
+	// max 5 characters allowed
 	fXPlacementText->TextView()->SetMaxBytes(5);
 	fYPlacementText->TextView()->SetMaxBytes(5);
 
+	// limit to numbers only
 	for (int32 i = 0; i < 256; i++) {
 		if ((i < '0' || i > '9') && i != '-') {
 			fXPlacementText->TextView()->DisallowChar(i);
