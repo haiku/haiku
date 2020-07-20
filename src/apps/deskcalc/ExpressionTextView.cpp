@@ -41,6 +41,7 @@ ExpressionTextView::ExpressionTextView(BRect frame, CalcView* calcView)
 	SetDoesUndo(true);
 	SetColorSpace(B_RGB32);
 	SetFontAndColor(be_bold_font, B_FONT_ALL);
+	SetAlignment(B_ALIGN_RIGHT);
 }
 
 
