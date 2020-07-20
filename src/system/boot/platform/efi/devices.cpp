@@ -155,6 +155,13 @@ platform_add_boot_device(struct stage2_args *args, NodeList *devicesList)
 		if (!blockIo->Media->MediaPresent || blockIo->Media->LogicalPartition)
 			continue;
 
+		// The qemu flash device with a 256K block sizes sometime show up
+		// in edk2. If flash is unconfigured, bad things happen on arm.
+		// edk2 bug: https://bugzilla.tianocore.org/show_bug.cgi?id=2856
+		// We're not ready for flash devices in efi, so skip anything odd.
+		if (blockIo->Media->BlockSize > 8192)
+			continue;
+
 		EfiDevice *device = new(std::nothrow)EfiDevice(blockIo);
 		if (device == NULL)
 			panic("Can't allocate memory for block devices!");
