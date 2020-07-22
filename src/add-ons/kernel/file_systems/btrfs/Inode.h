@@ -46,7 +46,6 @@ public:
 							{ return S_ISLNK(Mode()); }
 			status_t	CheckPermissions(int accessMode) const;
 
-			btrfs_inode&	Node() { return fNode; }
 			mode_t		Mode() const { return fNode.Mode(); }
 			off_t		Size() const { return fNode.Size(); }
 			uid_t		UserID() const { return fNode.UserID(); }
