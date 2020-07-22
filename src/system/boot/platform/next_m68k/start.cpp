@@ -123,6 +123,7 @@ platform_exit(void)
 
 inline void dump_mg(struct mon_global *mg)
 {
+	int i;
 	dprintf("mg@ %p\n", (void*)mg);
 
 	dprintf("mg_flags\t%x\n", (unsigned char)mg->mg_flags);
@@ -132,7 +133,98 @@ inline void dump_mg(struct mon_global *mg)
 	dprintf("mg_vbr\t%x\n", mg->mg_vbr);
 	dprintf("mg_console_i\t%x\n", mg->mg_console_i);
 	dprintf("mg_console_o\t%x\n", mg->mg_console_o);
+
+	for (i = 0; i < N_SIMM; i++) {
+		dprintf("mg_region[%d] = {%08lx, %08lx}\n", i,
+				mg->mg_region[i].first_phys_addr,
+				mg->mg_region[i].last_phys_addr);
+	}
+
+	dprintf("mg_boot_dev\t%s\n", mg->mg_boot_dev);
+	dprintf("mg_boot_arg\t%s\n", mg->mg_boot_arg);
+	dprintf("mg_boot_info\t%s\n", mg->mg_boot_info);
+	dprintf("mg_boot_file\t%s\n", mg->mg_boot_file);
+	dprintf("mg_boot_dev\t%s\n", mg->mg_boot_dev);
+	dprintf("mg_boot_how\t%d\n", mg->mg_boot_how);
+
+	dprintf("mg_sddp\t%p\n", mg->mg_sddp);
+	dprintf("mg_dgp\t%p\n", mg->mg_dgp);
+		// "dlV3" (disk label signature ?) SCSI boot gives "@dlV3"
+	dprintf("mg_fdgp\t%p\n", mg->mg_fdgp);	// "A" ?? SCSI: "to become ready"
+	dprintf("mg_s5cp\t%p\n", mg->mg_s5cp);
+	dprintf("mg_odc\t%p\n", mg->mg_odc);
+	dprintf("mg_odd\t%p\n", mg->mg_odd);
+
+#if 0
+	for (int i = 0; i < sizeof(struct mon_global); i++) {
+		uint8 *p = ((uint8 *)mg)+i;
+		if (i % 32 == 0)
+			dprintf("%04x", i);
+		if (i % 4 == 0)
+			dprintf(" ");
+		if (i % 8 == 0)
+			dprintf(" ");
+		dprintf("%02x", *p);
+		if (i % 32 == 31 || i == sizeof(struct mon_global) - 1)
+			dprintf("\n");
+	}
+	//while(true);
+#endif
+
+
+	dprintf("mg_si\t%p\n", mg->mg_si);
+	/* XXX:the pointer seems completely random, sadly.
+	 * Possibly the kernel is supposed to set it?
+	 */
+#if 0
+	for (int i = 0; i < sizeof(struct sio); i++) {
+		uint8 *p = ((uint8 *)mg->mg_si)+i;
+		if (i % 32 == 0)
+			dprintf("%04x", i);
+		if (i % 4 == 0)
+			dprintf(" ");
+		if (i % 8 == 0)
+			dprintf(" ");
+		dprintf("%02x", *p);
+		if (i % 32 == 31 || i == sizeof(struct sio) - 1)
+			dprintf("\n");
+	}
+	for (i = 0; i < 5; i++) {
+		struct sio *s = &mg->mg_si[i];
+		dprintf("sio[%d] = {%08x, %u, %u, %u, %p, %u, %u, %p, %p, %p}\n", i,
+				s->si_args, s->si_ctrl, s->si_unit, s->si_part,
+				s->si_dev, s->si_blklen, s->si_lastlba,
+				s->si_sadmem, s->si_protomem, s->si_devmem);
+		s++;
+	}
+#endif
+
+	//dprintf("test_msg\t%p\n", mg->test_msg);
+	/* Framebuffer info */
+#if 1
+	dprintf("km_coni = {%d, %d, %d, %d, %d, ... %d, %d, %d, ...%d}\n",
+			mg->km_coni.pixels_per_word,
+			mg->km_coni.bytes_per_scanline,
+			mg->km_coni.dspy_w,
+			mg->km_coni.dspy_max_w,
+			mg->km_coni.dspy_h,
+			//...
+			mg->km_coni.slot_num,
+			mg->km_coni.fb_num,
+			mg->km_coni.byte_lane_id,
+			mg->km_coni.access_stack);
+	for (i = 0; i < KM_CON_MAP_ENTRIES; i++) {
+		dprintf("km_coni.map_addr[%d] = {%08lx, %08lx, %08lx}\n", i,
+				mg->km_coni.map_addr[i].phys_addr,
+				mg->km_coni.map_addr[i].virt_addr,
+				mg->km_coni.map_addr[i].size);
+	}
+#endif
+
+	//XXX: this one crashes on older ROMs
+	//dprintf("mg_cpu_clk\t%d\n", mg->mg_cpu_clk);
 }
+
 
 extern "C" void *
 start_next(const char *boot_args, struct mon_global *monitor)
@@ -144,7 +236,7 @@ start_next(const char *boot_args, struct mon_global *monitor)
 	//asm("cld");			// Ain't nothing but a GCC thang.
 	//asm("fninit");		// initialize floating point unit
 
-	clear_bss();
+	//clear_bss();
 	/* save monitor ROM entry */
 	mg = monitor;
 	// DEBUG
@@ -166,9 +258,9 @@ start_next(const char *boot_args, struct mon_global *monitor)
 	dump_mg(mg);
 	//while(1);
 	//return NULL;
+	cpu_init();
 #if 0
 	// TODO
-	cpu_init();
 	mmu_init();
 
 	// wait a bit to give the user the opportunity to press a key

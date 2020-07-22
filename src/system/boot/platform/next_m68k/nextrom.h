@@ -27,6 +27,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/* parts from NeXT headers */
+
 #include <sys/types.h>
 
 #ifdef __cplusplus
@@ -97,20 +99,60 @@ struct nvram_info {
 };
 
 struct mon_region {
-	char data[(232-200)/N_SIMM];
+	long	first_phys_addr;
+	long	last_phys_addr;
 };
 
 enum SIO_ARGS {
 	SIO_ARGS_max = 1
 };
 
+struct sio {
+	enum SIO_ARGS si_args;
+	unsigned int si_ctrl, si_unit, si_part;
+	struct device *si_dev;
+	unsigned int si_blklen;
+	unsigned int si_lastlba;
+	/*caddr_t*/void *si_sadmem;
+	/*caddr_t*/void *si_protomem;
+	/*caddr_t*/void *si_devmem;
+};
+
 struct km_mon {
 	char data[370-324];
 };
 
+struct km_console_info
+{
+	int	pixels_per_word;	/* Pixels per 32 bit word: 16, 4, 2, or 1 */
+	int	bytes_per_scanline;
+	int	dspy_w;			/* Visible display width in pixels */
+	int	dspy_max_w;		/* Display width in pixels */
+	int	dspy_h;			/* Visible display height in pixels */
+#define KM_CON_ON_NEXTBUS	1	/* flag_bits: Console is NextBus device */
+	int	flag_bits;		/* Vendor and NeXT flags */
+	int	color[4];		/* Bit pattern for white thru black */
+#define KM_HIGH_SLOT	6		/* highest possible console slot. */
+	char	slot_num;		/* Slot of console device */
+	char	fb_num;			/* Logical frame buffer in slot for console */
+	char	byte_lane_id;		/* A value of 1, 4, or 8 */
+	int	start_access_pfunc;	/* P-code run before each FB access */
+	int	end_access_pfunc;	/* P-code run after each FB access */
+	struct	{		/* Frame buffer related addresses to be mapped */
+			int	phys_addr;
+			int	virt_addr;
+			int	size;
+#define KM_CON_MAP_ENTRIES	6
+#define KM_CON_PCODE		0
+#define KM_CON_FRAMEBUFFER	1
+#define KM_CON_BACKINGSTORE	2
+		} map_addr[KM_CON_MAP_ENTRIES];
+	int	access_stack;
+};
+/*
 struct km_console_info {
 	char data[(936-4)-(788+16)];
-};
+};*/
 
 #pragma pack(push,2)
 
@@ -184,6 +226,11 @@ struct mon_global {
 	int (*mg_as_tune)();
 	int mg_flags2;
 #define	MGF2_PARITY	0x80000000
+	volatile struct bmap *mg_bmap_chip;
+	enum mg_pkg {PKG_CUBE, PKG_NS} mg_pkg;
+	enum mg_memory_system {MEMSYS_8, MEMSYS_32} mg_memory_system;
+	enum mg_video_system {VIDSYS_313, VIDSYS_W9C, VIDSYS_PC} mg_video_system;
+	int mg_cpu_clk;
 };
 
 #pragma pack(pop)
