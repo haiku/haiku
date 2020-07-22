@@ -39,6 +39,8 @@ UnitTestLib haikudepottest.so :
 
 	ListTest.cpp
 
+	Logger.cpp
+
 	StandardMetaData.cpp
 	StandardMetaDataJsonEventListener.cpp
 	StandardMetaDataJsonEventListenerTest.cpp
