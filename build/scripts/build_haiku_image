@@ -292,7 +292,7 @@ if [ -n "$updateAllPackages" ]; then
 	$mkdir -p "${tPrefix}system/packages"
 fi
 
-if [ ! $updateOnly ]; then
+if [ ! $updateOnly ] && [ ! $isCD ]; then
 echo "Creating filesystem indices..."
 	$mkindex -t string Audio:Album
 	$mkindex -t string Audio:Artist
