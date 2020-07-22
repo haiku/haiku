@@ -63,6 +63,7 @@ struct hda_controller {
 	uint32			irq;
 	bool			msi;
 	bool			dma_snooping;
+	bool			is_64_bit;
 
 	uint16			codec_status;
 	uint32			num_input_streams;

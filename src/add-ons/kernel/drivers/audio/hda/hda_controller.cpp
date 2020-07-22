@@ -547,7 +547,7 @@ init_corb_rirb_pos(hda_controller* controller, uint32 quirks)
 	// Allocate memory area
 	controller->corb_rirb_pos_area = create_area("hda corb/rirb/pos",
 		(void**)&controller->corb, B_ANY_KERNEL_ADDRESS, memSize,
-		B_CONTIGUOUS, 0);
+		controller->is_64_bit ? B_CONTIGUOUS : B_32_BIT_CONTIGUOUS, 0);
 	if (controller->corb_rirb_pos_area < 0)
 		return controller->corb_rirb_pos_area;
 
@@ -568,17 +568,24 @@ init_corb_rirb_pos(hda_controller* controller, uint32 quirks)
 
 	// Program CORB/RIRB for these locations
 	controller->Write32(HDAC_CORB_BASE_LOWER, (uint32)pe.address);
-	controller->Write32(HDAC_CORB_BASE_UPPER,
-		(uint32)((uint64)pe.address >> 32));
+	if (controller->is_64_bit) {
+		controller->Write32(HDAC_CORB_BASE_UPPER,
+			(uint32)((uint64)pe.address >> 32));
+	}
+
 	controller->Write32(HDAC_RIRB_BASE_LOWER, (uint32)pe.address + rirbOffset);
-	controller->Write32(HDAC_RIRB_BASE_UPPER,
-		(uint32)(((uint64)pe.address + rirbOffset) >> 32));
+	if (controller->is_64_bit) {
+		controller->Write32(HDAC_RIRB_BASE_UPPER,
+			(uint32)(((uint64)pe.address + rirbOffset) >> 32));
+	}
 
 	// Program DMA position update
 	controller->Write32(HDAC_DMA_POSITION_BASE_LOWER,
 		(uint32)pe.address + posOffset);
-	controller->Write32(HDAC_DMA_POSITION_BASE_UPPER,
-		(uint32)(((uint64)pe.address + posOffset) >> 32));
+	if (controller->is_64_bit) {
+		controller->Write32(HDAC_DMA_POSITION_BASE_UPPER,
+			(uint32)(((uint64)pe.address + posOffset) >> 32));
+	}
 
 	controller->stream_positions = (uint32*)
 		((uint8*)controller->corb + posOffset);
@@ -845,7 +852,9 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 	// Allocate memory for buffers
 	uint8* buffer;
 	stream->buffer_area = create_area("hda buffers", (void**)&buffer,
-		B_ANY_KERNEL_ADDRESS, alloc, B_CONTIGUOUS, B_READ_AREA | B_WRITE_AREA);
+		B_ANY_KERNEL_ADDRESS, alloc,
+		stream->controller->is_64_bit ? B_CONTIGUOUS : B_32_BIT_CONTIGUOUS,
+		B_READ_AREA | B_WRITE_AREA);
 	if (stream->buffer_area < B_OK)
 		return stream->buffer_area;
 
@@ -882,7 +891,7 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 	bdl_entry_t* bufferDescriptors;
 	stream->buffer_descriptors_area = create_area("hda buffer descriptors",
 		(void**)&bufferDescriptors, B_ANY_KERNEL_ADDRESS, alloc,
-		B_CONTIGUOUS, 0);
+		stream->controller->is_64_bit ? B_CONTIGUOUS : B_32_BIT_CONTIGUOUS, 0);
 	if (stream->buffer_descriptors_area < B_OK) {
 		delete_area(stream->buffer_area);
 		return stream->buffer_descriptors_area;
@@ -923,8 +932,11 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 	stream->Write16(HDAC_STREAM_FORMAT, format);
 	stream->Write32(HDAC_STREAM_BUFFERS_BASE_LOWER,
 		(uint32)stream->physical_buffer_descriptors);
-	stream->Write32(HDAC_STREAM_BUFFERS_BASE_UPPER,
-		(uint32)(stream->physical_buffer_descriptors >> 32));
+	if (stream->controller->is_64_bit) {
+		stream->Write32(HDAC_STREAM_BUFFERS_BASE_UPPER,
+			(uint32)((uint64)stream->physical_buffer_descriptors >> 32));
+	}
+
 	stream->Write16(HDAC_STREAM_LAST_VALID, fragments - 1);
 	// total cyclic buffer size in _bytes_
 	stream->Write32(HDAC_STREAM_BUFFER_SIZE, stream->buffer_size
@@ -1169,6 +1181,7 @@ hda_hw_init(hda_controller* controller)
 	controller->num_input_streams = GLOBAL_CAP_INPUT_STREAMS(capabilities);
 	controller->num_output_streams = GLOBAL_CAP_OUTPUT_STREAMS(capabilities);
 	controller->num_bidir_streams = GLOBAL_CAP_BIDIR_STREAMS(capabilities);
+	controller->is_64_bit = GLOBAL_CAP_64BIT(capabilities);
 
 	// show some hw features
 	dprintf("hda: HDA v%d.%d, O:%" B_PRIu32 "/I:%" B_PRIu32 "/B:%" B_PRIu32
@@ -1178,7 +1191,7 @@ hda_hw_init(hda_controller* controller)
 		controller->num_output_streams, controller->num_input_streams,
 		controller->num_bidir_streams,
 		GLOBAL_CAP_NUM_SDO(capabilities),
-		GLOBAL_CAP_64BIT(capabilities) ? "yes" : "no");
+		controller->is_64_bit ? "yes" : "no");
 
 	// Get controller into valid state
 	status = reset_controller(controller);
