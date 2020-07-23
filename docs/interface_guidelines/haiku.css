@@ -12,7 +12,7 @@
 }
 cmdsynopsis, code, command, computeroutput, envar, filename, keycode, keysym,
 literal, option, parameter, sgmltag, systemitem {
-	font-family: "Noto Mono", Courier, "Courier New", monospace, fixed;
+	font-family: "Noto Sans Mono", Courier, "Courier New", monospace, fixed;
 }
 term {
   font-weight: bold;
