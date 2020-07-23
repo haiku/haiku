@@ -19,7 +19,6 @@ public:
 
 	virtual	void				MessageReceived(BMessage* message);
 
-	virtual	void				AboutRequested();
 	virtual	void				ReadyToRun();
 	virtual	void				Quit();
 
