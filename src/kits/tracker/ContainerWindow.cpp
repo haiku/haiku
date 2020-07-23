@@ -999,22 +999,23 @@ BContainerWindow::Init(const BMessage* message)
 #endif
 
 	BKeymap keymap;
-	keymap.SetToCurrent();
-	BObjectList<const char> unmodified(3, true);
-	if (keymap.GetModifiedCharacters("+", B_SHIFT_KEY, 0, &unmodified)
-			== B_OK) {
-		int32 count = unmodified.CountItems();
-		for (int32 i = 0; i < count; i++) {
-			uint32 key = BUnicodeChar::FromUTF8(unmodified.ItemAt(i));
-			if (!HasShortcut(key, 0)) {
-				// Add semantic zoom in shortcut, bug #6692
-				BMessage* increaseSize = new BMessage(kIconMode);
+	if (keymap.SetToCurrent() == B_OK) {
+		BObjectList<const char> unmodified(3, true);
+		if (keymap.GetModifiedCharacters("+", B_SHIFT_KEY, 0, &unmodified)
+				== B_OK) {
+			int32 count = unmodified.CountItems();
+			for (int32 i = 0; i < count; i++) {
+				uint32 key = BUnicodeChar::FromUTF8(unmodified.ItemAt(i));
+				if (!HasShortcut(key, 0)) {
+					// Add semantic zoom in shortcut, bug #6692
+					BMessage* increaseSize = new BMessage(kIconMode);
 					increaseSize->AddInt32("scale", 1);
-				AddShortcut(key, B_COMMAND_KEY, increaseSize, PoseView());
+					AddShortcut(key, B_COMMAND_KEY, increaseSize, PoseView());
+				}
 			}
 		}
+		unmodified.MakeEmpty();
 	}
-	unmodified.MakeEmpty();
 
 	if (message != NULL)
 		RestoreState(*message);
