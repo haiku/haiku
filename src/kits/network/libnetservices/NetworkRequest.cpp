@@ -18,6 +18,8 @@
 using namespace BPrivate::Network;
 #endif
 
+
+#ifdef LIBNETAPI_DEPRECATED
 BNetworkRequest::BNetworkRequest(const BUrl& url, BUrlProtocolListener* listener,
 		BUrlContext* context, const char* threadName, const char* protocolName)
 	:
@@ -25,6 +27,18 @@ BNetworkRequest::BNetworkRequest(const BUrl& url, BUrlProtocolListener* listener
 	fSocket(NULL)
 {
 }
+
+#else
+
+BNetworkRequest::BNetworkRequest(const BUrl& url, BDataIO* output,
+	BUrlProtocolListener* listener, BUrlContext* context,
+	const char* threadName, const char* protocolName)
+	:
+	BUrlRequest(url, output, listener, context, threadName, protocolName),
+	fSocket(NULL)
+{
+}
+#endif // LIBNETAPI_DEPRECATED
 
 
 status_t

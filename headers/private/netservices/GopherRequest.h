@@ -29,16 +29,27 @@ public:
 private:
 			friend class BUrlProtocolRoster;
 
+#ifdef LIBNETAPI_DEPRECATED
 								BGopherRequest(const BUrl& url,
 									BUrlProtocolListener* listener = NULL,
 									BUrlContext* context = NULL);
+#else
+								BGopherRequest(const BUrl& url,
+									BDataIO* output,
+									BUrlProtocolListener* listener = NULL,
+									BUrlContext* context = NULL);
+#endif
 
 			status_t			_ProtocolLoop();
 			void				_SendRequest();
 
 			bool				_NeedsParsing();
 			bool				_NeedsLastDotStrip();
+#ifdef LIBNETAPI_DEPRECATED
 			void				_ParseInput(bool last);
+#else
+			status_t			_ParseInput(bool last);
+#endif
 
 			BString&			_HTMLEscapeString(BString &str);
 

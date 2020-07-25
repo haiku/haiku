@@ -27,10 +27,12 @@
 
 /*!
 	\fn static BUrlRequest* BUrlProtocolRoster::MakeRequest(const BUrl& url,
-		BUrlProtocolListener* listener = NULL, BUrlContext* context = NULL)
+		BDataIO* output, BUrlProtocolListener* listener = NULL,
+		BUrlContext* context = NULL)
 	\brief Create a BUrlRequest that can handle the given BUrl
 
 	\param url The URL to create a request for
+	\param output The BDataIO to output to
 	\param listener The BUrlProtocolListener to be registered with the created
 		BUrlRequest, can be \c NULL
 	\param context The BUrlContext to be registered with the created

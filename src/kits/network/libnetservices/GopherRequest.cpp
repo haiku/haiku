@@ -183,6 +183,7 @@ static const int32 kGopherBufferSize = 4096;
 static const bool kInlineImages = true;
 
 
+#ifdef LIBNETAPI_DEPRECATED
 BGopherRequest::BGopherRequest(const BUrl& url, BUrlProtocolListener* listener,
 	BUrlContext* context)
 	:
@@ -206,6 +207,34 @@ BGopherRequest::BGopherRequest(const BUrl& url, BUrlProtocolListener* listener,
 		fPath.Remove(0, 2);
 	}
 }
+
+#else
+
+BGopherRequest::BGopherRequest(const BUrl& url, BDataIO* output,
+	BUrlProtocolListener* listener, BUrlContext* context)
+	:
+	BNetworkRequest(url, output, listener, context, "BUrlProtocol.Gopher",
+		"gopher"),
+	fItemType(GOPHER_TYPE_NONE),
+	fPosition(0),
+	fResult()
+{
+	fSocket = new(std::nothrow) BSocket();
+
+	fUrl.UrlDecode();
+	// the first part of the path is actually the document type
+
+	fPath = Url().Path();
+	if (!Url().HasPath() || fPath.Length() == 0 || fPath == "/") {
+		// default entry
+		fItemType = GOPHER_TYPE_DIRECTORY;
+		fPath = "";
+	} else if (fPath.Length() > 1 && fPath[0] == '/') {
+		fItemType = fPath[1];
+		fPath.Remove(0, 2);
+	}
+}
+#endif // LIBNETAPI_DEPRECATED
 
 
 BGopherRequest::~BGopherRequest()
@@ -233,6 +262,165 @@ BGopherRequest::Result() const
 	return fResult;
 }
 
+
+#ifdef LIBNETAPI_DEPRECATED
+status_t
+BGopherRequest::_ProtocolLoop()
+{
+	if (fSocket == NULL)
+		return B_NO_MEMORY;
+
+	if (!_ResolveHostName(fUrl.Host(), fUrl.HasPort() ? fUrl.Port() : 70)) {
+		_EmitDebug(B_URL_PROTOCOL_DEBUG_ERROR,
+			"Unable to resolve hostname (%s), aborting.",
+				fUrl.Host().String());
+		return B_SERVER_NOT_FOUND;
+	}
+
+	_EmitDebug(B_URL_PROTOCOL_DEBUG_TEXT, "Connection to %s on port %d.",
+		fUrl.Authority().String(), fRemoteAddr.Port());
+	status_t connectError = fSocket->Connect(fRemoteAddr);
+
+	if (connectError != B_OK) {
+		_EmitDebug(B_URL_PROTOCOL_DEBUG_ERROR, "Socket connection error %s",
+			strerror(connectError));
+		return connectError;
+	}
+
+	//! ProtocolHook:ConnectionOpened
+	if (fListener != NULL)
+		fListener->ConnectionOpened(this);
+
+	_EmitDebug(B_URL_PROTOCOL_DEBUG_TEXT,
+		"Connection opened, sending request.");
+
+	_SendRequest();
+	_EmitDebug(B_URL_PROTOCOL_DEBUG_TEXT, "Request sent.");
+
+	// Receive loop
+	bool receiveEnd = false;
+	status_t readError = B_OK;
+	ssize_t bytesRead = 0;
+	//ssize_t bytesReceived = 0;
+	//ssize_t bytesTotal = 0;
+	bool dataValidated = false;
+	BStackOrHeapArray<char, 4096> chunk(kGopherBufferSize);
+
+	while (!fQuit && !receiveEnd) {
+		bytesRead = fSocket->Read(chunk, kGopherBufferSize);
+
+		if (bytesRead < 0) {
+			readError = bytesRead;
+			break;
+		} else if (bytesRead == 0)
+			receiveEnd = true;
+
+		fInputBuffer.AppendData(chunk, bytesRead);
+
+		if (!dataValidated) {
+			size_t i;
+			// on error (file doesn't exist, ...) the server sends
+			// a faked directory entry with an error message
+			if (fInputBuffer.Size() && fInputBuffer.Data()[0] == '3') {
+				int tabs = 0;
+				bool crlf = false;
+
+				// make sure the buffer only contains printable characters
+				// and has at least 3 tabs before a CRLF
+				for (i = 0; i < fInputBuffer.Size(); i++) {
+					char c = fInputBuffer.Data()[i];
+					if (c == '\t') {
+						if (!crlf)
+							tabs++;
+					} else if (c == '\r' || c == '\n') {
+						if (tabs < 3)
+							break;
+						crlf = true;
+					} else if (!isprint(fInputBuffer.Data()[i])) {
+						crlf = false;
+						break;
+					}
+				}
+				if (crlf && tabs > 2 && tabs < 5) {
+					// TODO:
+					//if enough data
+					// else continue
+					fItemType = GOPHER_TYPE_DIRECTORY;
+					readError = B_RESOURCE_NOT_FOUND;
+					// continue parsing the error text anyway
+				}
+			}
+			// special case for buggy(?) Gophernicus/1.5
+			static const char *buggy = "Error: File or directory not found!";
+			if (fInputBuffer.Size() > strlen(buggy)
+				&& !memcmp(fInputBuffer.Data(), buggy, strlen(buggy))) {
+				fItemType = GOPHER_TYPE_DIRECTORY;
+				readError = B_RESOURCE_NOT_FOUND;
+				// continue parsing the error text anyway
+				// but it won't look good
+			}
+
+			// now we probably have correct data
+			dataValidated = true;
+
+			//! ProtocolHook:ResponseStarted
+			if (fListener != NULL)
+				fListener->ResponseStarted(this);
+
+			// now we can assign MIME type if we know it
+			const char *mime = "application/octet-stream";
+			for (i = 0; gopher_type_map[i].type != GOPHER_TYPE_NONE; i++) {
+				if (gopher_type_map[i].type == fItemType) {
+					mime = gopher_type_map[i].mime;
+					break;
+				}
+			}
+			fResult.SetContentType(mime);
+
+			// we don't really have headers but well...
+			//! ProtocolHook:HeadersReceived
+			if (fListener != NULL)
+				fListener->HeadersReceived(this, fResult);
+		}
+
+		if (_NeedsParsing())
+			_ParseInput(receiveEnd);
+		else if (fInputBuffer.Size()) {
+			// send input directly
+			if (fListener != NULL) {
+				fListener->DataReceived(this, (const char *)fInputBuffer.Data(),
+					fPosition, fInputBuffer.Size());
+			}
+
+			fPosition += fInputBuffer.Size();
+
+			if (fListener != NULL)
+				fListener->DownloadProgress(this, fPosition, 0);
+
+			// XXX: this is plain stupid, we already copied the data
+			// and just want to drop it...
+			char *inputTempBuffer = new(std::nothrow) char[bytesRead];
+			if (inputTempBuffer == NULL) {
+				readError = B_NO_MEMORY;
+				break;
+			}
+			fInputBuffer.RemoveData(inputTempBuffer, fInputBuffer.Size());
+			delete[] inputTempBuffer;
+		}
+	}
+
+	if (fPosition > 0)
+		fResult.SetLength(fPosition);
+
+	fSocket->Disconnect();
+
+	if (readError != B_OK)
+		return readError;
+
+	return fQuit ? B_INTERRUPTED : B_OK;
+}
+
+# else
 
 status_t
 BGopherRequest::_ProtocolLoop()
@@ -350,20 +538,22 @@ BGopherRequest::_ProtocolLoop()
 			// we don't really have headers but well...
 			//! ProtocolHook:HeadersReceived
 			if (fListener != NULL)
-#ifdef LIBNETAPI_DEPRECATED
-				fListener->HeadersReceived(this, fResult);
-#else
 				fListener->HeadersReceived(this);
-#endif
 		}
 
 		if (_NeedsParsing())
-			_ParseInput(receiveEnd);
+			readError = _ParseInput(receiveEnd);
 		else if (fInputBuffer.Size()) {
 			// send input directly
-			if (fListener != NULL) {
-				fListener->DataReceived(this, (const char *)fInputBuffer.Data(),
-					fPosition, fInputBuffer.Size());
+			if (fOutput != NULL) {
+				size_t written = 0;
+				readError = fOutput->WriteExactly(
+					(const char*)fInputBuffer.Data(), fInputBuffer.Size(),
+					&written);
+				if (fListener != NULL && written > 0)
+					fListener->BytesWritten(this, written);
+				if (readError != B_OK)
+					break;
 			}
 
 			fPosition += fInputBuffer.Size();
@@ -393,6 +583,7 @@ BGopherRequest::_ProtocolLoop()
 
 	return fQuit ? B_INTERRUPTED : B_OK;
 }
+#endif // LIBNETAPI_DEPRECATED
 
 
 void
@@ -432,6 +623,7 @@ BGopherRequest::_NeedsLastDotStrip()
 }
 
 
+#ifdef LIBNETAPI_DEPRECATED
 void
 BGopherRequest::_ParseInput(bool last)
 {
@@ -718,6 +910,313 @@ BGopherRequest::_ParseInput(bool last)
 			fListener->DownloadProgress(this, fPosition, 0);
 	}
 }
+
+#else
+
+status_t
+BGopherRequest::_ParseInput(bool last)
+{
+	BString line;
+
+	while (_GetLine(line) == B_OK) {
+		char type = GOPHER_TYPE_NONE;
+		BStringList fields;
+
+		line.MoveInto(&type, 0, 1);
+
+		line.Split("\t", false, fields);
+
+		if (type != GOPHER_TYPE_ENDOFPAGE
+			&& fields.CountStrings() < FIELD_GPFLAG)
+			_EmitDebug(B_URL_PROTOCOL_DEBUG_TEXT,
+				"Unterminated gopher item (type '%c')", type);
+
+		BString pageTitle;
+		BString item;
+		BString title = fields.StringAt(FIELD_NAME);
+		BString link("gopher://");
+		BString user;
+		if (fields.CountStrings() > 3) {
+			link << fields.StringAt(FIELD_HOST);
+			if (fields.StringAt(FIELD_PORT).Length())
+				link << ":" << fields.StringAt(FIELD_PORT);
+			link << "/" << type;
+			//if (fields.StringAt(FIELD_SELECTOR).ByteAt(0) != '/')
+			//	link << "/";
+			link << fields.StringAt(FIELD_SELECTOR);
+		}
+		_HTMLEscapeString(title);
+		_HTMLEscapeString(link);
+
+		switch (type) {
+			case GOPHER_TYPE_ENDOFPAGE:
+				/* end of the page */
+				break;
+			case GOPHER_TYPE_TEXTPLAIN:
+				item << "<a href=\"" << link << "\">"
+						"<span class=\"text\">" << title << "</span></a>"
+						"<br/>\n";
+				break;
+			case GOPHER_TYPE_BINARY:
+			case GOPHER_TYPE_BINHEX:
+			case GOPHER_TYPE_BINARCHIVE:
+			case GOPHER_TYPE_UUENCODED:
+				item << "<a href=\"" << link << "\">"
+						"<span class=\"binary\">" << title << "</span></a>"
+						"<br/>\n";
+				break;
+			case GOPHER_TYPE_DIRECTORY:
+				/*
+				 * directory link
+				 */
+				item << "<a href=\"" << link << "\">"
+						"<span class=\"dir\">" << title << "</span></a>"
+						"<br/>\n";
+				break;
+			case GOPHER_TYPE_ERROR:
+				item << "<span class=\"error\">" << title << "</span>"
+						"<br/>\n";
+				if (fPosition == 0 && pageTitle.Length() == 0)
+					pageTitle << "Error: " << title;
+				break;
+			case GOPHER_TYPE_QUERY:
+				/* TODO: handle search better.
+				 * For now we use an unnamed input field and accept sending ?=foo
+				 * as it seems at least Veronica-2 ignores the = but it's unclean.
+				 */
+				item << "<form method=\"get\" action=\"" << link << "\" "
+							"onsubmit=\"window.location = this.action + '?' + "
+								"this.elements['q'].value; return false;\">"
+						"<span class=\"query\">"
+						"<label>" << title << " "
+						"<input id=\"q\" name=\"\" type=\"text\" align=\"right\" />"
+						"</label>"
+						"</span></form>"
+						"<br/>\n";
+				break;
+			case GOPHER_TYPE_TELNET:
+				/* telnet: links
+				 * cf. gopher://78.80.30.202/1/ps3
+				 * -> gopher://78.80.30.202:23/8/ps3/new -> new@78.80.30.202
+				 */
+				link = "telnet://";
+				user = fields.StringAt(FIELD_SELECTOR);
+				if (user.FindLast('/') > -1) {
+					user.Remove(0, user.FindLast('/'));
+					link << user << "@";
+				}
+				link << fields.StringAt(FIELD_HOST);
+				if (fields.StringAt(FIELD_PORT) != "23")
+					link << ":" << fields.StringAt(FIELD_PORT);
+
+				item << "<a href=\"" << link << "\">"
+						"<span class=\"telnet\">" << title << "</span></a>"
+						"<br/>\n";
+				break;
+			case GOPHER_TYPE_TN3270:
+				/* tn3270: URI scheme, cf. http://tools.ietf.org/html/rfc6270 */
+				link = "tn3270://";
+				user = fields.StringAt(FIELD_SELECTOR);
+				if (user.FindLast('/') > -1) {
+					user.Remove(0, user.FindLast('/'));
+					link << user << "@";
+				}
+				link << fields.StringAt(FIELD_HOST);
+				if (fields.StringAt(FIELD_PORT) != "23")
+					link << ":" << fields.StringAt(FIELD_PORT);
+
+				item << "<a href=\"" << link << "\">"
+						"<span class=\"telnet\">" << title << "</span></a>"
+						"<br/>\n";
+				break;
+			case GOPHER_TYPE_CSO_SEARCH:
+				/* CSO search.
+				 * At least Lynx supports a cso:// URI scheme:
+				 * http://lynx.isc.org/lynx2.8.5/lynx2-8-5/lynx_help/lynx_url_support.html
+				 */
+				link = "cso://";
+				user = fields.StringAt(FIELD_SELECTOR);
+				if (user.FindLast('/') > -1) {
+					user.Remove(0, user.FindLast('/'));
+					link << user << "@";
+				}
+				link << fields.StringAt(FIELD_HOST);
+				if (fields.StringAt(FIELD_PORT) != "105")
+					link << ":" << fields.StringAt(FIELD_PORT);
+
+				item << "<a href=\"" << link << "\">"
+						"<span class=\"cso\">" << title << "</span></a>"
+						"<br/>\n";
+				break;
+			case GOPHER_TYPE_GIF:
+			case GOPHER_TYPE_IMAGE:
+			case GOPHER_TYPE_PNG:
+			case GOPHER_TYPE_BITMAP:
+				/* quite dangerous, cf. gopher://namcub.accela-labs.com/1/pics */
+				if (kInlineImages) {
+					item << "<a href=\"" << link << "\">"
+							"<span class=\"img\">" << title << " "
+							"<img src=\"" << link << "\" "
+								"alt=\"" << title << "\"/>"
+							"</span></a>"
+							"<br/>\n";
+					break;
+				}
+				/* fallback to default, link them */
+				item << "<a href=\"" << link << "\">"
+						"<span class=\"img\">" << title << "</span></a>"
+						"<br/>\n";
+				break;
+			case GOPHER_TYPE_HTML:
+				/* cf. gopher://pineapple.vg/1 */
+				if (fields.StringAt(FIELD_SELECTOR).StartsWith("URL:")) {
+					link = fields.StringAt(FIELD_SELECTOR);
+					link.Remove(0, 4);
+				}
+				/* cf. gopher://sdf.org/1/sdf/classes/ */
+
+				item << "<a href=\"" << link << "\">"
+						"<span class=\"html\">" << title << "</span></a>"
+						"<br/>\n";
+				break;
+			case GOPHER_TYPE_INFO:
+				// TITLE resource, cf.
+				// gopher://gophernicus.org/0/doc/gopher/gopher-title-resource.txt
+				if (fPosition == 0 && pageTitle.Length() == 0
+					&& fields.StringAt(FIELD_SELECTOR) == "TITLE") {
+						pageTitle = title;
+						break;
+				}
+				item << "<span class=\"info\">" << title << "</span>"
+						"<br/>\n";
+				break;
+			case GOPHER_TYPE_AUDIO:
+			case GOPHER_TYPE_SOUND:
+				item << "<a href=\"" << link << "\">"
+						"<span class=\"audio\">" << title << "</span></a>"
+						"<audio src=\"" << link << "\" "
+							//TODO:Fix crash in WebPositive with these
+							//"controls=\"controls\" "
+							//"width=\"300\" height=\"50\" "
+							"alt=\"" << title << "\"/>"
+						"<span>[player]</span></audio>"
+						"<br/>\n";
+				break;
+			case GOPHER_TYPE_PDF:
+			case GOPHER_TYPE_DOC:
+				/* generic case for known-to-work items */
+				item << "<a href=\"" << link << "\">"
+						"<span class=\"document\">" << title << "</span></a>"
+						"<br/>\n";
+				break;
+			case GOPHER_TYPE_MOVIE:
+				item << "<a href=\"" << link << "\">"
+						"<span class=\"video\">" << title << "</span></a>"
+						"<video src=\"" << link << "\" "
+							//TODO:Fix crash in WebPositive with these
+							//"controls=\"controls\" "
+							//"width=\"300\" height=\"300\" "
+							"alt=\"" << title << "\"/>"
+						"<span>[player]</span></audio>"
+						"<br/>\n";
+				break;
+			default:
+				_EmitDebug(B_URL_PROTOCOL_DEBUG_TEXT,
+					"Unknown gopher item (type 0x%02x '%c')", type, type);
+				item << "<a href=\"" << link << "\">"
+						"<span class=\"unknown\">" << title << "</span></a>"
+						"<br/>\n";
+				break;
+		}
+
+		if (fPosition == 0) {
+			if (pageTitle.Length() == 0)
+				pageTitle << "Index of " << Url();
+
+			const char *uplink = ".";
+			if (fPath.EndsWith("/"))
+				uplink = "..";
+
+			// emit header
+			BString header;
+			header <<
+				"<html>\n"
+				"<head>\n"
+				"<meta http-equiv=\"Content-Type\""
+					" content=\"text/html; charset=UTF-8\" />\n"
+				//FIXME: fix links
+				//"<link rel=\"icon\" type=\"image/png\""
+				//	" href=\"resource:icons/directory.png\">\n"
+				"<style type=\"text/css\">\n" << kStyleSheet << "</style>\n"
+				"<title>" << pageTitle << "</title>\n"
+				"</head>\n"
+				"<body id=\"gopher\">\n"
+				"<div class=\"uplink dontprint\">\n"
+				"<a href=" << uplink << ">[up]</a>\n"
+				"<a href=\"/\">[top]</a>\n"
+				"</div>\n"
+				"<h1>" << pageTitle << "</h1>\n";
+
+			if (fOutput != NULL) {
+				size_t written = 0;
+				status_t error = fOutput->WriteExactly(header.String(),
+					header.Length(), &written);
+				if (fListener != NULL && written > 0)
+					fListener->BytesWritten(this, written);
+				if (error != B_OK)
+					return error;
+			}
+
+			fPosition += header.Length();
+
+			if (fListener != NULL)
+				fListener->DownloadProgress(this, fPosition, 0);
+		}
+
+		if (item.Length()) {
+			if (fOutput != NULL) {
+				size_t written = 0;
+				status_t error = fOutput->WriteExactly(item.String(),
+					item.Length(), &written);
+				if (fListener != NULL && written > 0)
+					fListener->BytesWritten(this, written);
+				if (error != B_OK)
+					return error;
+			}
+
+			fPosition += item.Length();
+
+			if (fListener != NULL)
+				fListener->DownloadProgress(this, fPosition, 0);
+		}
+	}
+
+	if (last) {
+		// emit footer
+		BString footer =
+			"</div>\n"
+			"</body>\n"
+			"</html>\n";
+
+		if (fListener != NULL) {
+			size_t written = 0;
+			status_t error = fOutput->WriteExactly(footer.String(),
+				footer.Length(), &written);
+			if (fListener != NULL && written > 0)
+				fListener->BytesWritten(this, written);
+			if (error != B_OK)
+				return error;
+		}
+
+		fPosition += footer.Length();
+
+		if (fListener != NULL)
+			fListener->DownloadProgress(this, fPosition, 0);
+	}
+
+	return B_OK;
+}
+#endif
 
 
 BString&

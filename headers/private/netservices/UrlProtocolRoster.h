@@ -10,6 +10,7 @@
 #include <stdlib.h>
 
 
+class BDataIO;
 class BUrl;
 
 #ifndef LIBNETAPI_DEPRECATED
@@ -24,9 +25,15 @@ class BUrlRequest;
 
 class BUrlProtocolRoster {
 public:
-    static  BUrlRequest*    MakeRequest(const BUrl& url,
-		                        BUrlProtocolListener* listener = NULL,
-                                BUrlContext* context = NULL);
+#ifdef LIBNETAPI_DEPRECATED
+	static	BUrlRequest*	MakeRequest(const BUrl& url,
+								BUrlProtocolListener* listener = NULL,
+								BUrlContext* context = NULL);
+#else
+	static	BUrlRequest*	MakeRequest(const BUrl& url, BDataIO* output,
+								BUrlProtocolListener* listener = NULL,
+								BUrlContext* context = NULL);
+#endif
 };
 
 #ifndef LIBNETAPI_DEPRECATED

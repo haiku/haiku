@@ -16,6 +16,7 @@
 using namespace BPrivate::Network;
 #endif
 
+#ifdef LIBNETAPI_DEPRECATED
 BUrlSynchronousRequest::BUrlSynchronousRequest(BUrlRequest& request)
 	:
 	BUrlRequest(request.Url(), NULL, request.Context(),
@@ -24,6 +25,18 @@ BUrlSynchronousRequest::BUrlSynchronousRequest(BUrlRequest& request)
 	fWrappedRequest(request)
 {
 }
+
+#else
+
+BUrlSynchronousRequest::BUrlSynchronousRequest(BUrlRequest& request)
+	:
+	BUrlRequest(request.Url(), request.Output(), NULL, request.Context(),
+		"BUrlSynchronousRequest", request.Protocol()),
+	fRequestComplete(false),
+	fWrappedRequest(request)
+{
+}
+#endif // LIBNETAPI_DEPRECATED
 
 
 status_t
@@ -80,15 +93,6 @@ BUrlSynchronousRequest::HeadersReceived(BUrlRequest*, const BUrlResult& result)
 	PRINT(("SynchronousRequest::HeadersReceived()\n"));
 }
 
-#else
-
-void
-BUrlSynchronousRequest::HeadersReceived(BUrlRequest*)
-{
-	PRINT(("SynchronousRequest::HeadersReceived()\n"));
-}
-#endif // LIBNETAPI_DEPRECATED
-
 
 void
 BUrlSynchronousRequest::DataReceived(BUrlRequest*, const char*,
@@ -98,7 +102,6 @@ BUrlSynchronousRequest::DataReceived(BUrlRequest*, const char*,
 }
 
 
-#ifdef LIBNETAPI_DEPRECATED
 void
 BUrlSynchronousRequest::DownloadProgress(BUrlRequest*,
 	ssize_t bytesReceived, ssize_t bytesTotal)
@@ -116,8 +119,21 @@ BUrlSynchronousRequest::UploadProgress(BUrlRequest*, ssize_t bytesSent,
 		bytesTotal));
 }
 
-
 #else
+
+void
+BUrlSynchronousRequest::HeadersReceived(BUrlRequest*)
+{
+	PRINT(("SynchronousRequest::HeadersReceived()\n"));
+}
+
+
+void
+BUrlSynchronousRequest::BytesWritten(BUrlRequest* caller, size_t bytesWritten)
+{
+	PRINT(("SynchronousRequest::BytesWritten(%" B_PRIdSSIZE ")\n",
+		bytesWritten));
+}
 
 
 void

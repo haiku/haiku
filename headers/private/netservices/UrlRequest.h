@@ -22,11 +22,20 @@ namespace Network {
 
 class BUrlRequest {
 public:
+#ifdef LIBNETAPI_DEPRECATED
 									BUrlRequest(const BUrl& url,
 										BUrlProtocolListener* listener,
 										BUrlContext* context,
 										const char* threadName,
 										const char* protocolName);
+#else
+									BUrlRequest(const BUrl& url,
+										BDataIO* output,
+										BUrlProtocolListener* listener,
+										BUrlContext* context,
+										const char* threadName,
+										const char* protocolName);
+#endif
 	virtual							~BUrlRequest();
 
 	// URL protocol thread management
@@ -40,12 +49,18 @@ public:
 			status_t				SetUrl(const BUrl& url);
 			status_t				SetContext(BUrlContext* context);
 			status_t				SetListener(BUrlProtocolListener* listener);
+#ifndef LIBNETAPI_DEPRECATED
+			status_t				SetOutput(BDataIO* output);
+#endif
 
 	// URL protocol parameters access
 			const BUrl&				Url() const;
 			BUrlContext*			Context() const;
 			BUrlProtocolListener*	Listener() const;
 			const BString&			Protocol() const;
+#ifndef LIBNETAPI_DEPRECATED
+			BDataIO*				Output() const;
+#endif
 
 	// URL protocol informations
 			bool					IsRunning() const;
@@ -63,6 +78,9 @@ protected:
 			BUrl					fUrl;
 			BReference<BUrlContext>	fContext;
 			BUrlProtocolListener*	fListener;
+#ifndef LIBNETAPI_DEPRECATED
+			BDataIO*				fOutput;
+#endif
 
 			bool					fQuit;
 			bool					fRunning;

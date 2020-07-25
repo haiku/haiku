@@ -23,11 +23,20 @@ namespace Network {
 class BNetworkRequest: public BUrlRequest
 {
 public:
+#ifdef LIBNETAPI_DEPRECATED
 								BNetworkRequest(const BUrl& url,
 									BUrlProtocolListener* listener,
 									BUrlContext* context,
 									const char* threadName,
 									const char* protocolName);
+#else
+								BNetworkRequest(const BUrl& url,
+									BDataIO* output,
+									BUrlProtocolListener* listener,
+									BUrlContext* context,
+									const char* threadName,
+									const char* protocolName);
+#endif
 
 	virtual	status_t			Stop();
 	virtual void				SetTimeout(bigtime_t timeout);

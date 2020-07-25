@@ -29,9 +29,16 @@ public:
 private:
 			friend class BUrlProtocolRoster;
 
+#ifdef LIBNETAPI_DEPRECATED
 								BFileRequest(const BUrl& url,
 									BUrlProtocolListener* listener = NULL,
 									BUrlContext* context = NULL);
+#else
+								BFileRequest(const BUrl& url,
+									BDataIO* output,
+									BUrlProtocolListener* listener = NULL,
+									BUrlContext* context = NULL);
+#endif
 
 			status_t			_ProtocolLoop();
 private:

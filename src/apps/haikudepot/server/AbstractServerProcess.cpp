@@ -11,6 +11,7 @@
 #include <string.h>
 
 #include <AutoDeleter.h>
+#include <File.h>
 #include <FileIO.h>
 #include <HttpTime.h>
 #include <UrlProtocolRoster.h>
@@ -24,7 +25,7 @@
 #include "ServerSettings.h"
 #include "StandardMetaDataJsonEventListener.h"
 #include "StorageUtils.h"
-#include "ToFileUrlProtocolListener.h"
+#include "LoggingUrlProtocolListener.h"
 
 
 using namespace BPrivate::Network;
@@ -330,8 +331,11 @@ AbstractServerProcess::DownloadToLocalFile(const BPath& targetFilePath,
 	HDINFO("[%s] will stream '%s' to [%s]", Name(), url.UrlString().String(),
 		targetFilePath.Path());
 
-	ToFileUrlProtocolListener listener(targetFilePath, Name(),
-		Logger::IsTraceEnabled());
+	LoggingUrlProtocolListener listener(Name(), Logger::IsTraceEnabled());
+	BFile targetFile(targetFilePath.Path(), O_WRONLY | O_CREAT);
+	status_t err = targetFile.InitCheck();
+	if (err != B_OK)
+		return err;
 
 	BHttpHeaders headers;
 	ServerSettings::AugmentHeaders(headers);
@@ -347,7 +351,8 @@ AbstractServerProcess::DownloadToLocalFile(const BPath& targetFilePath,
 
 	thread_id thread;
 
-	BUrlRequest* request = BUrlProtocolRoster::MakeRequest(url, &listener);
+	BUrlRequest* request = BUrlProtocolRoster::MakeRequest(url, &targetFile,
+		&listener);
 	if (request == NULL)
 		return B_NO_MEMORY;
 
@@ -359,6 +364,7 @@ AbstractServerProcess::DownloadToLocalFile(const BPath& targetFilePath,
 	fRequest->SetHeaders(headers);
 	fRequest->SetMaxRedirections(0);
 	fRequest->SetTimeout(TIMEOUT_MICROSECONDS);
+	fRequest->SetStopOnError(true);
 	thread = fRequest->Run();
 
 	wait_for_thread(thread, NULL);

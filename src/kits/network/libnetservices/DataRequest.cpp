@@ -20,6 +20,7 @@ using namespace BPrivate::Network;
 #endif
 
 
+#ifdef LIBNETAPI_DEPRECATED
 BDataRequest::BDataRequest(const BUrl& url, BUrlProtocolListener* listener,
 		BUrlContext* context)
 	: BUrlRequest(url, listener, context, "data URL parser", "data"),
@@ -27,6 +28,19 @@ BDataRequest::BDataRequest(const BUrl& url, BUrlProtocolListener* listener,
 {
 	fResult.SetContentType("text/plain");
 }
+
+#else
+
+BDataRequest::BDataRequest(const BUrl& url, BDataIO* output,
+	BUrlProtocolListener* listener,
+	BUrlContext* context)
+	:
+	BUrlRequest(url, output, listener, context, "data URL parser", "data"),
+	fResult()
+{
+	fResult.SetContentType("text/plain");
+}
+#endif // LIBNETAPI_DEPRECATED
 
 
 const BUrlResult&
@@ -122,17 +136,30 @@ BDataRequest::_ProtocolLoop()
 
 	fResult.SetLength(length);
 
-	if (fListener != NULL) {
 #ifdef LIBNETAPI_DEPRECATED
+	if (fListener != NULL) {
 		fListener->HeadersReceived(this, fResult);
-#else
-		fListener->HeadersReceived(this);
-#endif
 		if (length > 0) {
 			fListener->DataReceived(this, payload, 0, length);
 			fListener->DownloadProgress(this, length, length);
 		}
 	}
+#else
+	if (fListener != NULL)
+		fListener->HeadersReceived(this);
+	if (length > 0) {
+		if (fOutput != NULL) {
+			size_t written = 0;
+			status_t err = fOutput->WriteExactly(payload, length, &written);
+			if (fListener != NULL && written > 0)
+				fListener->BytesWritten(this, written);
+			if (err != B_OK)
+				return err;
+			if (fListener != NULL)
+				fListener->DownloadProgress(this, written, written);
+		}
+	}
+#endif // LIBNETAPI_DEPRECATED
 
 	return B_OK;
 }

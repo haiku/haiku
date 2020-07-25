@@ -7,6 +7,7 @@
 #include "DataTest.h"
 
 #include <AutoDeleter.h>
+#include <DataIO.h>
 #include <DataRequest.h>
 #include <UrlProtocolRoster.h>
 
@@ -125,13 +126,6 @@ DataTest::UrlDecodeTest()
 }
 
 
-void
-DataTest::DataReceived(BUrlRequest*, const char* data, off_t, ssize_t size)
-{
-	fReceivedData.insert(fReceivedData.end(), data, data + size);
-}
-
-
 /* static */ void
 DataTest::AddTests(BTestSuite& parent)
 {
@@ -160,17 +154,17 @@ DataTest::_RunTest(BString url, const char* expected, size_t expectedLength)
 	NextSubTest();
 
 	BUrl testUrl(url);
+	BMallocIO buffer;
 	ObjectDeleter<BUrlRequest> requestDeleter(
-		BUrlProtocolRoster::MakeRequest(testUrl, this));
+		BUrlProtocolRoster::MakeRequest(testUrl, &buffer));
 	BDataRequest* request = dynamic_cast<BDataRequest*>(requestDeleter.Get());
 	CPPUNIT_ASSERT(request != NULL);
-	fReceivedData.clear();
 	request->Run();
 
 	while(request->IsRunning())
 		snooze(1000);
 
-	CPPUNIT_ASSERT_EQUAL(expectedLength, fReceivedData.size());
-	CPPUNIT_ASSERT(memcmp(&fReceivedData.front(), expected, expectedLength) == 0);
+	CPPUNIT_ASSERT_EQUAL(expectedLength, buffer.BufferLength());
+	CPPUNIT_ASSERT(memcmp(buffer.Buffer(), expected, expectedLength) == 0);
 }
 

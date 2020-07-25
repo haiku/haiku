@@ -116,11 +116,6 @@ BUrlProtocolAsynchronousListener::MessageReceived(BMessage* message)
 				HeadersReceived(caller, *result);
 				delete result;
 			}
-#else
-		case B_URL_PROTOCOL_HEADERS_RECEIVED:
-			HeadersReceived(caller);
-			break;
-#endif
 
 		case B_URL_PROTOCOL_DATA_RECEIVED:
 			{
@@ -139,7 +134,6 @@ BUrlProtocolAsynchronousListener::MessageReceived(BMessage* message)
 			}
 			break;
 
-#ifdef LIBNETAPI_DEPRECATED
 		case B_URL_PROTOCOL_DOWNLOAD_PROGRESS:
 			{
 				int32 bytesReceived;
@@ -162,6 +156,18 @@ BUrlProtocolAsynchronousListener::MessageReceived(BMessage* message)
 			}
 			break;
 #else
+		case B_URL_PROTOCOL_HEADERS_RECEIVED:
+			HeadersReceived(caller);
+			break;
+
+		case B_URL_PROTOCOL_BYTES_WRITTEN:
+			{
+				size_t bytesWritten = message->FindInt32("url:bytesWritten");
+
+				BytesWritten(caller, bytesWritten);
+			}
+			break;
+
 		case B_URL_PROTOCOL_DOWNLOAD_PROGRESS:
 			{
 				off_t bytesReceived;

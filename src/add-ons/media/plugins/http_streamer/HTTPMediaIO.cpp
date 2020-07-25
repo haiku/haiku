@@ -19,7 +19,7 @@
 using namespace BPrivate::Network;
 
 
-class FileListener : public BUrlProtocolListener {
+class FileListener : public BUrlProtocolListener, public BDataIO {
 public:
 		FileListener(HTTPMediaIO* owner)
 			:
@@ -51,32 +51,12 @@ public:
 
 		void HeadersReceived(BUrlRequest* request)
 		{
-			fAdapterIO->UpdateSize();
-		}
-
-		void DataReceived(BUrlRequest* request, const char* data,
-			off_t position, ssize_t size)
-		{
 			if (request != fRequest) {
 				delete request;
 				return;
 			}
 
-			BHttpRequest* httpReq = dynamic_cast<BHttpRequest*>(request);
-			if (httpReq != NULL) {
-				const BHttpResult& httpRes
-					= (const BHttpResult&)httpReq->Result();
-				int32 status = httpRes.StatusCode();
-				if (BHttpRequest::IsClientErrorStatusCode(status)
-						|| BHttpRequest::IsServerErrorStatusCode(status)) {
-					fRunning = false;
-				} else if (BHttpRequest::IsRedirectionStatusCode(status))
-					return;
-			}
-
-			_ReleaseInit();
-
-			fInputAdapter->Write(data, size);
+			fAdapterIO->UpdateSize();
 		}
 
 		void RequestCompleted(BUrlRequest* request, bool success)
@@ -87,6 +67,13 @@ public:
 				return;
 
 			fRequest = NULL;
+		}
+
+		ssize_t Write(const void* data, size_t size)
+		{
+			_ReleaseInit();
+
+			return fInputAdapter->Write(data, size);
 		}
 
 		status_t LockOnInit(bigtime_t timeout)
@@ -174,10 +161,14 @@ HTTPMediaIO::Open()
 
 	fListener = new FileListener(this);
 
-	fReq = BUrlProtocolRoster::MakeRequest(fUrl, fListener);
+	fReq = BUrlProtocolRoster::MakeRequest(fUrl, fListener, fListener);
 
 	if (fReq == NULL)
 		return B_ERROR;
+
+	BHttpRequest* httpReq = dynamic_cast<BHttpRequest*>(fReq);
+	if (httpReq != NULL)
+		httpReq->SetStopOnError(true);
 
 	fReqThread = fReq->Run();
 	if (fReqThread < 0)

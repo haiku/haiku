@@ -40,17 +40,11 @@ class GeolocationListener: public BUrlProtocolListener
 			pthread_mutex_lock(&fLock);
 		}
 
-		void DataReceived(BUrlRequest*, const char* data, off_t position,
-					ssize_t size) {
-			fResult.WriteAt(position, data, size);
-		}
-
 		void RequestCompleted(BUrlRequest* caller, bool success) {
 			pthread_cond_signal(&fCompletion);
 			pthread_mutex_unlock(&fLock);
 		}
 
-		BMallocIO fResult;
 		pthread_cond_t fCompletion;
 		pthread_mutex_t fLock;
 };
@@ -117,10 +111,11 @@ BGeolocation::LocateSelf(float& latitude, float& longitude)
 		return B_DEVICE_NOT_FOUND;
 
 	GeolocationListener listener;
+	BMallocIO resultBuffer;
 
 	// Send Request (POST JSON message)
 	BUrlRequest* request = BUrlProtocolRoster::MakeRequest(fGeolocationService,
-		&listener);
+		&resultBuffer, &listener);
 	if (request == NULL)
 		return B_BAD_DATA;
 
@@ -153,7 +148,7 @@ BGeolocation::LocateSelf(float& latitude, float& longitude)
 	}
 
 	BMessage data;
-	result = BJson::Parse((char*)listener.fResult.Buffer(), data);
+	result = BJson::Parse((char*)resultBuffer.Buffer(), data);
 	delete http;
 	if (result != B_OK) {
 		return result;
@@ -192,8 +187,9 @@ BGeolocation::Country(const float latitude, const float longitude,
 	url.SetRequest(requestString);
 
 	GeolocationListener listener;
+	BMallocIO resultBuffer;
 	BUrlRequest* request = BUrlProtocolRoster::MakeRequest(url,
-		&listener);
+		&resultBuffer, &listener);
 	if (request == NULL)
 		return B_BAD_DATA;
 
@@ -223,9 +219,9 @@ BGeolocation::Country(const float latitude, const float longitude,
 	}
 
 	off_t length = 0;
-	listener.fResult.GetSize(&length);
+	resultBuffer.GetSize(&length);
 	length -= 2; // Remove \r\n from response
-	BString countryCode((char*)listener.fResult.Buffer(), (int32)length);
+	BString countryCode((char*)resultBuffer.Buffer(), (int32)length);
 	return country.SetTo(countryCode);
 }
 

@@ -35,7 +35,7 @@ namespace {
 typedef std::map<std::string, std::string> HttpHeaderMap;
 
 
-class TestListener : public BUrlProtocolListener {
+class TestListener : public BUrlProtocolListener, public BDataIO {
 public:
 	TestListener(const std::string& expectedResponseBody,
 				 const HttpHeaderMap& expectedResponseHeaders)
@@ -45,16 +45,15 @@ public:
 	{
 	}
 
-	virtual void DataReceived(
-		BUrlRequest *caller,
-		const char *data,
-		off_t position,
-		ssize_t size)
+	virtual ssize_t Write(
+		const void *data,
+		size_t size)
 	{
 		std::copy_n(
-			data + position,
+			(const char*)data,
 			size,
 			std::back_inserter(fActualResponseBody));
+		return size;
 	}
 
 	virtual void HeadersReceived(
@@ -129,7 +128,8 @@ void SendAuthenticatedRequest(
 	TestListener listener(expectedResponseBody, expectedResponseHeaders);
 
 	ObjectDeleter<BUrlRequest> requestDeleter(
-		BUrlProtocolRoster::MakeRequest(testUrl, &listener, &context));
+		BUrlProtocolRoster::MakeRequest(testUrl, &listener, &listener,
+			&context));
 	BHttpRequest* request = dynamic_cast<BHttpRequest*>(requestDeleter.Get());
 	CPPUNIT_ASSERT(request != NULL);
 
@@ -243,7 +243,8 @@ HttpTest::ProxyTest()
 	TestListener listener(expectedResponseBody, expectedResponseHeaders);
 
 	ObjectDeleter<BUrlRequest> requestDeleter(
-		BUrlProtocolRoster::MakeRequest(testUrl, &listener, context));
+		BUrlProtocolRoster::MakeRequest(testUrl, &listener, &listener,
+			context));
 	BHttpRequest* request = dynamic_cast<BHttpRequest*>(requestDeleter.Get());
 	CPPUNIT_ASSERT(request != NULL);
 
@@ -335,7 +336,8 @@ HttpTest::UploadTest()
 	BUrlContext context;
 
 	ObjectDeleter<BUrlRequest> requestDeleter(
-		BUrlProtocolRoster::MakeRequest(testUrl, &listener, &context));
+		BUrlProtocolRoster::MakeRequest(testUrl, &listener, &listener,
+			&context));
 	BHttpRequest* request = dynamic_cast<BHttpRequest*>(requestDeleter.Get());
 	CPPUNIT_ASSERT(request != NULL);
 
@@ -530,7 +532,8 @@ HttpTest::_GetTest(const BString& path)
 	TestListener listener(expectedResponseBody, expectedResponseHeaders);
 
 	ObjectDeleter<BUrlRequest> requestDeleter(
-		BUrlProtocolRoster::MakeRequest(testUrl, &listener, context));
+		BUrlProtocolRoster::MakeRequest(testUrl, &listener, &listener,
+			context));
 	BHttpRequest* request = dynamic_cast<BHttpRequest*>(requestDeleter.Get());
 	CPPUNIT_ASSERT(request != NULL);
 

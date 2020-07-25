@@ -36,37 +36,35 @@ enum BUrlProtocolDebugMessage {
 class BUrlProtocolListener {
 public:
 	virtual	void				ConnectionOpened(BUrlRequest* caller);
-	virtual void				HostnameResolved(BUrlRequest* caller,
+	virtual	void				HostnameResolved(BUrlRequest* caller,
 									const char* ip);
-	virtual void				ResponseStarted(BUrlRequest* caller);
+	virtual	void				ResponseStarted(BUrlRequest* caller);
 #ifdef LIBNETAPI_DEPRECATED
-	virtual void				HeadersReceived(BUrlRequest* caller,
+	virtual	void				HeadersReceived(BUrlRequest* caller,
 									const BUrlResult& result);
-#else
-	virtual void				HeadersReceived(BUrlRequest* caller);
-#endif
-	virtual void				DataReceived(BUrlRequest* caller,
+	virtual	void				DataReceived(BUrlRequest* caller,
 									const char* data, off_t position,
 									ssize_t size);
-
-#ifdef LIBNETAPI_DEPRECATED
 	virtual	void				DownloadProgress(BUrlRequest* caller,
 									ssize_t bytesReceived, ssize_t bytesTotal);
-	virtual void				UploadProgress(BUrlRequest* caller,
+	virtual	void				UploadProgress(BUrlRequest* caller,
 									ssize_t bytesSent, ssize_t bytesTotal);
 #else
+	virtual	void				HeadersReceived(BUrlRequest* caller);
+	virtual	void				BytesWritten(BUrlRequest* caller,
+									size_t bytesWritten);
 	virtual	void				DownloadProgress(BUrlRequest* caller,
 									off_t bytesReceived, off_t bytesTotal);
 	virtual void				UploadProgress(BUrlRequest* caller,
 									off_t bytesSent, off_t bytesTotal);
 #endif
 
-	virtual void				RequestCompleted(BUrlRequest* caller,
+	virtual	void				RequestCompleted(BUrlRequest* caller,
 									bool success);
-	virtual void				DebugMessage(BUrlRequest* caller,
+	virtual	void				DebugMessage(BUrlRequest* caller,
 									BUrlProtocolDebugMessage type,
 									const char* text);
-	virtual bool				CertificateVerificationFailed(
+	virtual	bool				CertificateVerificationFailed(
 									BUrlRequest* caller,
 									BCertificate& certificate,
 									const char* message);

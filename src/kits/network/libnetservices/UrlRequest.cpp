@@ -19,6 +19,7 @@ using namespace BPrivate::Network;
 static BReference<BUrlContext> gDefaultContext = new(std::nothrow) BUrlContext();
 
 
+#ifdef LIBNETAPI_DEPRECATED
 BUrlRequest::BUrlRequest(const BUrl& url, BUrlProtocolListener* listener,
 	BUrlContext* context, const char* threadName, const char* protocolName)
 	:
@@ -35,6 +36,28 @@ BUrlRequest::BUrlRequest(const BUrl& url, BUrlProtocolListener* listener,
 	if (fContext == NULL)
 		fContext = gDefaultContext;
 }
+
+#else
+
+BUrlRequest::BUrlRequest(const BUrl& url, BDataIO* output,
+	BUrlProtocolListener* listener, BUrlContext* context,
+	const char* threadName, const char* protocolName)
+	:
+	fUrl(url),
+	fContext(context),
+	fListener(listener),
+	fOutput(output),
+	fQuit(false),
+	fRunning(false),
+	fThreadStatus(B_NO_INIT),
+	fThreadId(0),
+	fThreadName(threadName),
+	fProtocol(protocolName)
+{
+	if (fContext == NULL)
+		fContext = gDefaultContext;
+}
+#endif // LIBNETAPI_DEPRECATED
 
 
 BUrlRequest::~BUrlRequest()
@@ -139,6 +162,19 @@ BUrlRequest::SetListener(BUrlProtocolListener* listener)
 }
 
 
+#ifndef LIBNETAPI_DEPRECATED
+status_t
+BUrlRequest::SetOutput(BDataIO* output)
+{
+	if (IsRunning())
+		return B_ERROR;
+
+	fOutput = output;
+	return B_OK;
+}
+#endif
+
+
 // #pragma mark URL protocol parameters access
 
 
@@ -169,6 +205,14 @@ BUrlRequest::Protocol() const
 	return fProtocol;
 }
 
+
+#ifndef LIBNETAPI_DEPRECATED
+BDataIO*
+BUrlRequest::Output() const
+{
+	return fOutput;
+}
+#endif
 
 // #pragma mark URL protocol informations
 
