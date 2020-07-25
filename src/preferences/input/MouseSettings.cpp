@@ -147,8 +147,7 @@ MouseSettings::Dump()
 	printf("type:\t\t%" B_PRId32 " button mouse\n", fSettings.type);
 	printf("map:\t\tleft = %" B_PRIu32 " : middle = %" B_PRIu32 " : right = %"
 		B_PRIu32 "\n", fSettings.map.button[0], fSettings.map.button[2],
-		fSettings.map.button[1], fSettings.map.button[3],
-		fSettings.map.button[4]);
+		fSettings.map.button[1]);
 	printf("click speed:\t%" B_PRId64 "\n", fSettings.click_speed);
 	printf("accel:\t\t%s\n", fSettings.accel.enabled ? "enabled" : "disabled");
 	printf("accel factor:\t%" B_PRId32 "\n", fSettings.accel.accel_factor);

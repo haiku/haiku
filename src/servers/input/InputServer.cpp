@@ -87,7 +87,7 @@ InputDeviceListItem::Start()
 	PRINT(("  Starting: %s\n", fDevice.name));
 	status_t err = fServerDevice->Start(fDevice.name, fDevice.cookie);
 	if (err != B_OK) {
-		PRINTERR(("      error: %s (%lx)\n", strerror(err), err));
+		PRINTERR(("      error: %s (%" B_PRIx32 ")\n", strerror(err), err));
 	}
 	fRunning = err == B_OK;
 }
@@ -1014,14 +1014,15 @@ status_t
 InputServer::EnqueueMethodMessage(BMessage* message)
 {
 	CALLED();
-	PRINT(("%s what:%c%c%c%c\n", __PRETTY_FUNCTION__, (char)(message->what >> 24),
-		(char)(message->what >> 16), (char)(message->what >> 8), (char)message->what));
+	PRINT(("%s what:%c%c%c%c\n", __PRETTY_FUNCTION__,
+		(char)(message->what >> 24), (char)(message->what >> 16),
+		(char)(message->what >> 8), (char)message->what));
 
 #ifdef DEBUG
 	if (message->what == 'IMEV') {
 		int32 code;
 		message->FindInt32("be:opcode", &code);
-		PRINT(("%s be:opcode %li\n", __PRETTY_FUNCTION__, code));
+		PRINT(("%s be:opcode %" B_PRId32 "\n", __PRETTY_FUNCTION__, code));
 	}
 #endif
 
@@ -1362,7 +1363,7 @@ InputServer::_StartEventLoop()
 	CALLED();
 	fEventLooperPort = create_port(100, "input server events");
 	if (fEventLooperPort < 0) {
-		PRINTERR(("InputServer: create_port error: (0x%lx) %s\n",
+		PRINTERR(("InputServer: create_port error: (0x%" B_PRIx32 ") %s\n",
 			fEventLooperPort, strerror(fEventLooperPort)));
 		return fEventLooperPort;
 	}
@@ -1409,16 +1410,19 @@ InputServer::_EventLoop()
 		status_t err = read_port(fEventLooperPort, &code, buffer, length);
 		if (err != length) {
 			if (err >= 0) {
-				PRINTERR(("InputServer: failed to read full packet (read %lu of %lu)\n", err, length));
+				PRINTERR(("InputServer: failed to read full packet "
+					"(read %" B_PRIu32 " of %lu)\n", err, length));
 			} else {
-				PRINTERR(("InputServer: read_port error: (0x%lx) %s\n", err, strerror(err)));
+				PRINTERR(("InputServer: read_port error: (0x%" B_PRIx32
+					") %s\n", err, strerror(err)));
 			}
 			continue;
 		}
 
 		EventList events;
 		if (fEventQueueLock.Lock()) {
-			// move the items to our own list to block the event queue as short as possible
+			// move the items to our own list to block the event queue as short
+			// as possible
 			events.AddList(&fEventQueue);
 			fEventQueue.MakeEmpty();
 			fEventQueueLock.Unlock();
@@ -1428,7 +1432,8 @@ InputServer::_EventLoop()
 			BMessage* event = new BMessage;
 
 			if ((err = event->Unflatten(buffer)) < 0) {
-				PRINTERR(("[InputServer] Unflatten() error: (0x%lx) %s\n", err, strerror(err)));
+				PRINTERR(("[InputServer] Unflatten() error: (0x%" B_PRIx32
+					") %s\n", err, strerror(err)));
 				delete event;
 				continue;
 			}
@@ -1488,7 +1493,7 @@ InputServer::_UpdateMouseAndKeys(EventList& events)
 				// If there is only one input method, SetNextMethod will return
 				// B_BAD_INDEX and the event will be forwarded to the user.
 
-				PRINT(("SanitizeEvents: %lx, %x\n", fKeyInfo.modifiers,
+				PRINT(("SanitizeEvents: %" B_PRIx32 ", %x\n", fKeyInfo.modifiers,
 					fKeyInfo.key_states[KEY_Spacebar >> 3]));
 
 				uint8 byte;
@@ -1546,8 +1551,8 @@ InputServer::_SanitizeEvents(EventList& events)
 					event->AddInt32("be:delta_x", x);
 					event->AddInt32("be:delta_y", y);
 
-					PRINT(("new position: %f, %f, %ld, %ld\n",
-						where.x, where.y, x, y));
+					PRINT(("new position: %f, %f, %" B_PRId32 ", %" B_PRId32
+						"\n", where.x, where.y, x, y));
 				} else if (event->FindFloat("x", &absX) == B_OK
 					&& event->FindFloat("y", &absY) == B_OK) {
 					// The device gives us absolute screen coords in range 0..1;
