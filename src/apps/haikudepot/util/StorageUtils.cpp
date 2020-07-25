@@ -85,10 +85,10 @@ StorageUtils::RemoveDirectoryContents(BPath& path)
 			if (isDirectory)
 				RemoveDirectoryContents(directoryEntryPath);
 
-			if (remove(directoryEntryPath.Path()) == 0) {
-				HDDEBUG("did delete [%s]", directoryEntryPath.Path())
-			} else {
-				HDERROR("unable to delete [%s]", directoryEntryPath.Path())
+			if (remove(directoryEntryPath.Path()) == 0)
+				HDDEBUG("did delete [%s]", directoryEntryPath.Path());
+			else {
+				HDERROR("unable to delete [%s]", directoryEntryPath.Path());
 				result = B_ERROR;
 			}
 		}
@@ -164,12 +164,12 @@ StorageUtils::CheckCanWriteTo(const BPath& path)
 
 	if (result == B_OK && exists) {
 		HDTRACE("an object exists at the candidate path "
-			"[%s] - it will be deleted", path.Path())
+			"[%s] - it will be deleted", path.Path());
 
 		if (remove(path.Path()) == 0) {
-			HDTRACE("did delete the candidate file [%s]", path.Path())
+			HDTRACE("did delete the candidate file [%s]", path.Path());
 		} else {
-			HDERROR("unable to delete the candidate file [%s]", path.Path())
+			HDERROR("unable to delete the candidate file [%s]", path.Path());
 			result = B_ERROR;
 		}
 	}
@@ -178,7 +178,7 @@ StorageUtils::CheckCanWriteTo(const BPath& path)
 		BFile file(path.Path(), O_WRONLY | O_CREAT);
 		if (file.Write(buffer, 16) != 16) {
 			HDERROR("unable to write test data to candidate file [%s]",
-				path.Path())
+				path.Path());
 			result = B_ERROR;
 		}
 	}
@@ -188,14 +188,14 @@ StorageUtils::CheckCanWriteTo(const BPath& path)
 		uint8 readBuffer[16];
 		if (file.Read(readBuffer, 16) != 16) {
 			HDERROR("unable to read test data from candidate file [%s]",
-				path.Path())
+				path.Path());
 			result = B_ERROR;
 		}
 
 		for (int i = 0; result == B_OK && i < 16; i++) {
 			if (readBuffer[i] != buffer[i]) {
 				HDERROR("mismatched read..write check on candidate file [%s]",
-					path.Path())
+					path.Path());
 				result = B_ERROR;
 			}
 		}
@@ -238,7 +238,7 @@ StorageUtils::LocalWorkingFilesPath(const BString leaf, BPath& path,
 	else {
 		path.Unset();
 		HDERROR("unable to find the user cache file for "
-			"[%s] data; %s", leaf.String(), strerror(result))
+			"[%s] data; %s", leaf.String(), strerror(result));
 	}
 
 	return result;
@@ -273,7 +273,7 @@ StorageUtils::LocalWorkingDirectoryPath(const BString leaf, BPath& path,
 	else {
 		path.Unset();
 		HDERROR("unable to find the user cache directory for "
-			"[%s] data; %s", leaf.String(), strerror(result))
+			"[%s] data; %s", leaf.String(), strerror(result));
 	}
 
 	return result;

@@ -59,7 +59,7 @@ ProcessNode::_SpinUntilProcessState(
 
 		if (real_time_clock() - start > timeoutSeconds) {
 			HDERROR("[Node<%s>] timeout waiting for process state",
-				Process()->Name())
+				Process()->Name());
 			return B_ERROR;
 		}
 	}
@@ -75,7 +75,7 @@ ProcessNode::StartProcess()
 	if (fWorker != B_BAD_THREAD_ID)
 		return B_BUSY;
 
-	HDINFO("[Node<%s>] initiating", Process()->Name())
+	HDINFO("[Node<%s>] initiating", Process()->Name());
 
 	fWorker = spawn_thread(&_StartProcess, Process()->Name(),
 		B_NORMAL_PRIORITY, Process());
@@ -106,7 +106,7 @@ ProcessNode::StopProcess()
 
 	if (waitResult != B_OK) {
 		HDINFO("[%s] process did not stop within timeout - will be stopped "
-			"uncleanly", Process()->Name())
+			"uncleanly", Process()->Name());
 		kill_thread(fWorker);
 	}
 
@@ -129,7 +129,7 @@ ProcessNode::_StartProcess(void* cookie)
 {
 	AbstractProcess* process = static_cast<AbstractProcess*>(cookie);
 
-	HDINFO("[Node<%s>] starting process", process->Name())
+	HDINFO("[Node<%s>] starting process", process->Name());
 
 	process->Run();
 	return B_OK;

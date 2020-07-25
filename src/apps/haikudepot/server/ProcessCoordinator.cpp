@@ -142,7 +142,7 @@ ProcessCoordinator::Stop()
 	AutoLocker<BLocker> locker(&fLock);
 	if (!fWasStopped) {
 		fWasStopped = true;
-		HDINFO("[Coordinator] will stop process coordinator")
+		HDINFO("[Coordinator] will stop process coordinator");
 		for (int32 i = 0; i < fNodes.CountItems(); i++) {
 			ProcessNode* node = fNodes.ItemAt(i);
 			if (node->Process()->ErrorStatus() != B_OK) {
@@ -263,7 +263,7 @@ ProcessCoordinator::_CoordinateAndCallListener()
 ProcessCoordinatorState
 ProcessCoordinator::_Coordinate()
 {
-	HDTRACE("[Coordinator] will coordinate nodes")
+	HDTRACE("[Coordinator] will coordinate nodes");
 	AutoLocker<BLocker> locker(&fLock);
 	_StopSuccessorNodesToErroredOrStoppedNodes();
 
@@ -315,7 +315,7 @@ ProcessCoordinator::_StopSuccessorNodes(ProcessNode* predecessorNode)
 
 		if (process->ProcessState() == PROCESS_INITIAL) {
 			HDDEBUG("[Coordinator] [%s] (failed) --> [%s] (stopping)",
-				predecessorNode->Process()->Name(), process->Name())
+				predecessorNode->Process()->Name(), process->Name());
 			node->StopProcess();
 			_StopSuccessorNodes(node);
 		}

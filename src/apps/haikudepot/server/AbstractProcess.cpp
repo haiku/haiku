@@ -47,12 +47,12 @@ AbstractProcess::Run()
 		AutoLocker<BLocker> locker(&fLock);
 
 		if (ProcessState() != PROCESS_INITIAL) {
-			HDINFO("cannot start process as it is not idle")
+			HDINFO("cannot start process as it is not idle");
 			return B_NOT_ALLOWED;
 		}
 
 		if (fWasStopped) {
-			HDINFO("cannot start process as it was stopped")
+			HDINFO("cannot start process as it was stopped");
 			return B_CANCELED;
 		}
 
@@ -62,7 +62,7 @@ AbstractProcess::Run()
 	status_t runResult = RunInternal();
 
 	if (runResult != B_OK)
-		HDERROR("[%s] an error has arisen; %s", Name(), strerror(runResult))
+		HDERROR("[%s] an error has arisen; %s", Name(), strerror(runResult));
 
 	BReference<AbstractProcessListener> listener;
 

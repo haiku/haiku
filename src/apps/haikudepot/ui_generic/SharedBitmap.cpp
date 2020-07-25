@@ -101,7 +101,7 @@ SharedBitmap::SharedBitmap(BPositionIO& data)
 			fSize = 0;
 	} else {
 		HDERROR("SharedBitmap(): Stream too large: %" B_PRIi64
-			", max: %" B_PRIi64, fSize, kMaxSize)
+			", max: %" B_PRIi64, fSize, kMaxSize);
 	}
 
 	fBitmap[0] = NULL;

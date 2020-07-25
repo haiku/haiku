@@ -247,16 +247,14 @@ RatePackageWindow::RatePackageWindow(BWindow* parent, BRect frame,
 
 	{
 		AutoLocker<BLocker> locker(fModel.Lock());
-		fCommentLanguageCode = fModel.Language().PreferredLanguage()->Code();
+		fCommentLanguageCode = fModel.Language()->PreferredLanguage()->Code();
 
 		// Construct languages popup
 		BPopUpMenu* languagesMenu = new BPopUpMenu(B_TRANSLATE("Language"));
 		fCommentLanguageField = new BMenuField("language",
 			B_TRANSLATE("Comment language:"), languagesMenu);
 
-		LanguageMenuUtils::AddLanguagesToMenu(
-			fModel.Language().SupportedLanguages(),
-			languagesMenu);
+		LanguageMenuUtils::AddLanguagesToMenu(fModel.Language(), languagesMenu);
 		languagesMenu->SetTargetForItems(this);
 		LanguageMenuUtils::MarkLanguageInMenu(fCommentLanguageCode,
 			languagesMenu);
@@ -530,9 +528,8 @@ RatePackageWindow::_RelayServerDataToUI(BMessage& response)
 		fSendButton->SetLabel(B_TRANSLATE("Update"));
 
 		Unlock();
-	} else {
+	} else
 		HDERROR("unable to acquire lock to update the ui");
-	}
 }
 
 
@@ -568,7 +565,7 @@ RatePackageWindow::_QueryRatingThread()
 
 	if (repositoryCode.IsEmpty()) {
 		HDERROR("unable to obtain the repository code for depot; %s",
-			package->DepotName().String())
+			package->DepotName().String());
 		BMessenger(this).SendMessage(B_QUIT_REQUESTED);
 	} else {
 		status_t status = interface
@@ -587,7 +584,7 @@ RatePackageWindow::_QueryRatingThread()
 					if (info.FindMessage("result", &result) == B_OK) {
 						_RelayServerDataToUI(result);
 					} else {
-						HDERROR("bad response envelope missing 'result' entry")
+						HDERROR("bad response envelope missing 'result' entry");
 						ServerHelper::NotifyTransportError(B_BAD_VALUE);
 						BMessenger(this).SendMessage(B_QUIT_REQUESTED);
 					}
@@ -597,7 +594,7 @@ RatePackageWindow::_QueryRatingThread()
 						// an expected response
 					HDINFO("there was no previous rating for this"
 						" user on this version of this package so a new rating"
-						" will be added.")
+						" will be added.");
 					break;
 				default:
 					ServerHelper::NotifyServerJsonRpcError(info);
@@ -607,7 +604,7 @@ RatePackageWindow::_QueryRatingThread()
 		} else {
 			HDERROR("an error has arisen communicating with the"
 				" server to obtain data for an existing rating [%s]",
-				strerror(status))
+				strerror(status));
 			ServerHelper::NotifyTransportError(status);
 			BMessenger(this).SendMessage(B_QUIT_REQUESTED);
 		}
@@ -630,7 +627,7 @@ void
 RatePackageWindow::_SendRatingThread()
 {
 	if (!Lock()) {
-		HDERROR("upload rating: Failed to lock window")
+		HDERROR("upload rating: Failed to lock window");
 		return;
 	}
 
@@ -660,7 +657,7 @@ RatePackageWindow::_SendRatingThread()
 	if (repositoryCode.Length() == 0) {
 		HDERROR("unable to find the web app repository code for the local "
 			"depot %s",
-			fPackage->DepotName().String())
+			fPackage->DepotName().String());
 		return;
 	}
 
@@ -670,11 +667,11 @@ RatePackageWindow::_SendRatingThread()
 	status_t status;
 	BMessage info;
 	if (ratingID.Length() > 0) {
-		HDINFO("will update the existing user rating [%s]", ratingID.String())
+		HDINFO("will update the existing user rating [%s]", ratingID.String());
 		status = interface.UpdateUserRating(ratingID,
 			languageCode, comment, stability, rating, active, info);
 	} else {
-		HDINFO("will create a new user rating for pkg [%s]", package.String())
+		HDINFO("will create a new user rating for pkg [%s]", package.String());
 		status = interface.CreateUserRating(package, fPackage->Version(),
 			architecture, repositoryCode, languageCode, comment, stability,
 			rating, info);
@@ -699,7 +696,7 @@ RatePackageWindow::_SendRatingThread()
 	} else {
 		HDERROR("an error has arisen communicating with the"
 			" server to obtain data for an existing rating [%s]",
-			strerror(status))
+			strerror(status));
 		ServerHelper::NotifyTransportError(status);
 	}
 

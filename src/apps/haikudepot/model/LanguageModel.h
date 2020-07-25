@@ -5,15 +5,14 @@
 #ifndef LANGUAGE_MODEL_H
 #define LANGUAGE_MODEL_H
 
+#include <vector>
 
 #include <Referenceable.h>
 
-#include "List.h"
 #include "PackageInfo.h"
 
 
 typedef BReference<Language> LanguageRef;
-typedef List<LanguageRef, false> LanguageList;
 
 
 class LanguageModel {
@@ -21,14 +20,14 @@ public:
 								LanguageModel();
 	virtual						~LanguageModel();
 
-			const LanguageList&	SupportedLanguages() const
-									{ return fSupportedLanguages; }
-			void				AddSupportedLanguages(
-									const LanguageList& languages);
+	const	int32				CountSupportedLanguages() const;
+	const	LanguageRef			SupportedLanguageAt(int32 index) const;
+			void				AddSupportedLanguage(const LanguageRef& value);
 			int32				IndexOfSupportedLanguage(
 									const BString& languageCode) const;
+			void				SetPreferredLanguageToSystemDefault();
 
-			const LanguageRef	PreferredLanguage() const
+	const	LanguageRef			PreferredLanguage() const
 									{ return fPreferredLanguage; }
 
 private:
@@ -39,7 +38,8 @@ private:
 			void				_SetPreferredLanguage(const Language& language);
 
 private:
-			LanguageList		fSupportedLanguages;
+			std::vector<LanguageRef>
+								fSupportedLanguages;
 			LanguageRef			fPreferredLanguage;
 };
 

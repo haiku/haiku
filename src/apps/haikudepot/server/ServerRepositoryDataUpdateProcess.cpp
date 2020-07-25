@@ -108,12 +108,12 @@ DepotMatchingRepositoryListener::MapDepot(const DepotInfo& depot, void *context)
 			modifiedDepotInfo.URL().String(),
 			repositorySourceCode->String(),
 			repositoryAndRepositorySource
-				->repositorySource->Identifier()->String())
+				->repositorySource->Identifier()->String());
 	} else {
 		HDINFO("[DepotMatchingRepositoryListener] associated depot [%s] with "
 			"server repository source [%s]",
 			modifiedDepotInfo.Name().String(),
-			repositorySourceCode->String())
+			repositorySourceCode->String());
 	}
 
 	return modifiedDepotInfo;
@@ -206,7 +206,7 @@ ServerRepositoryDataUpdateProcess::UrlPathComponent()
 	BString result;
 	AutoLocker<BLocker> locker(fModel->Lock());
 	result.SetToFormat("/__repository/all-%s.json.gz",
-		fModel->Language().PreferredLanguage()->Code());
+		fModel->Language()->PreferredLanguage()->Code());
 	return result;
 }
 

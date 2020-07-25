@@ -16,7 +16,7 @@ class LanguageMenuUtils {
 
 public:
 	static	void			AddLanguagesToMenu(
-								const LanguageList& languages,
+								const LanguageModel* languagesModel,
 								BMenu* menu);
 	static	void			MarkLanguageInMenu(
 								const BString& languageCode,
@@ -29,7 +29,7 @@ private:
 	static	status_t		_GetLanguageAtIndexInMenu(BMenu* menu,
 								int32 index, BString* result);
 	static	int32			_AddLanguagesToMenu(
-								const LanguageList& languages,
+								const LanguageModel* languagesModel,
 								BMenu* menu, bool isPopular);
 	static	void			_AddLanguageToMenu(
 								const LanguageRef& language,

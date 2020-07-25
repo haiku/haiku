@@ -117,7 +117,7 @@ TarArchiveHeader::CreateFromBlock(const unsigned char* block)
 	if(actualChecksum != expectedChecksum) {
 		HDERROR("tar archive header has bad checksum;"
 			"expected %" B_PRIu32 " actual %" B_PRIu32,
-			expectedChecksum, actualChecksum)
+			expectedChecksum, actualChecksum);
 	} else {
 		return new TarArchiveHeader(
 			_ReadString(&block[OFFSET_FILENAME], LENGTH_FILENAME),

@@ -24,14 +24,13 @@ UserUsageConditions::UserUsageConditions(BMessage* from)
 	int16 minimumAge;
 
 	if (from->FindInt16(KEY_MINIMUM_AGE, &minimumAge) != B_OK)
-		HDERROR("expected key [%s] in the message data", KEY_MINIMUM_AGE)
+		HDERROR("expected key [%s] in the message data", KEY_MINIMUM_AGE);
 	fMinimumAge = (uint8) minimumAge;
 
 	if (from->FindString(KEY_CODE, &fCode) != B_OK)
-		HDERROR("expected key [%s] in the message data", KEY_CODE)
-
+		HDERROR("expected key [%s] in the message data", KEY_CODE);
 	if (from->FindString(KEY_COPY_MARKDOWN, &fCopyMarkdown) != B_OK)
-		HDERROR("expected key [%s] in the message data", KEY_COPY_MARKDOWN)
+		HDERROR("expected key [%s] in the message data", KEY_COPY_MARKDOWN);
 }
 
 

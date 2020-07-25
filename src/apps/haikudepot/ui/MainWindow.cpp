@@ -302,7 +302,7 @@ MainWindow::MessageReceived(BMessage* message)
 			if (message->FindInt64(KEY_ERROR_STATUS, &errorStatus64) == B_OK)
 				_BulkLoadCompleteReceived((status_t) errorStatus64);
 			else
-				HDERROR("expected [%s] value in message", KEY_ERROR_STATUS)
+				HDERROR("expected [%s] value in message", KEY_ERROR_STATUS);
 			break;
 		}
 		case B_SIMPLE_DATA:
@@ -414,7 +414,7 @@ MainWindow::MessageReceived(BMessage* message)
 				} else {
 					HDDEBUG("pkg [%s] is updated on the server, but is "
 						"not selected so will not be updated.",
-						name.String())
+						name.String());
 				}
 			}
         	break;
@@ -821,7 +821,7 @@ MainWindow::_AdoptModelControls()
 void
 MainWindow::_AdoptModel()
 {
-	HDTRACE("adopting model to main window ui")
+	HDTRACE("adopting model to main window ui");
 
 	if (fSinglePackageMode)
 		return;
@@ -1037,7 +1037,7 @@ MainWindow::_PopulatePackageAsync(bool forcePopulate)
 	release_sem_etc(fPackageToPopulateSem, 1, 0);
 
 	HDDEBUG("pkg [%s] will be updated from the server.",
-		fPackageToPopulate->Name().String())
+		fPackageToPopulate->Name().String());
 }
 
 
@@ -1070,7 +1070,7 @@ MainWindow::_PopulatePackageWorker(void* arg)
 
 			window->fModel.PopulatePackage(package, populateFlags);
 
-			HDDEBUG("populating package [%s]", package->Name().String())
+			HDDEBUG("populating package [%s]", package->Name().String());
 		}
 	}
 
@@ -1176,22 +1176,21 @@ MainWindow::_SelectedPackageHasWebAppRepositoryCode()
 	const BString depotName = package->DepotName();
 
 	if (depotName.IsEmpty()) {
-		HDDEBUG("the package [%s] has no depot name", package->Name().String())
+		HDDEBUG("the package [%s] has no depot name", package->Name().String());
 	} else {
 		const DepotInfo* depot = fModel.DepotForName(depotName);
 
 		if (depot == NULL) {
 			HDINFO("the depot [%s] was not able to be found",
-				depotName.String())
+				depotName.String());
 		} else {
 			BString repositoryCode = depot->WebAppRepositoryCode();
 
 			if (repositoryCode.IsEmpty()) {
 				HDINFO("the depot [%s] has no web app repository code",
-					depotName.String())
-			} else {
+					depotName.String());
+			} else
 				return true;
-			}
 		}
 	}
 
@@ -1301,7 +1300,7 @@ MainWindow::UserUsageConditionsNotLatest(const UserDetail& userDetail)
 	BMessage detailsMessage;
 	if (userDetail.Archive(&detailsMessage, true) != B_OK
 			|| message.AddMessage("userDetail", &detailsMessage) != B_OK) {
-		HDERROR("unable to archive the user detail into a message")
+		HDERROR("unable to archive the user detail into a message");
 	}
 	else
 		BMessenger(this).SendMessage(&message);
@@ -1327,7 +1326,7 @@ MainWindow::_AddProcessCoordinator(ProcessCoordinator* item)
 		if (acquire_sem(fCoordinatorRunningSem) != B_OK)
 			debugger("unable to acquire the process coordinator sem");
 		HDINFO("adding and starting a process coordinator [%s]",
-			item->Name().String())
+			item->Name().String());
 		fCoordinator = BReference<ProcessCoordinator>(item);
 		fCoordinator->Start();
 	}
@@ -1359,7 +1358,7 @@ MainWindow::_SpinUntilProcessCoordinatorComplete()
 void
 MainWindow::_StopProcessCoordinators()
 {
-	HDINFO("will stop all process coordinators")
+	HDINFO("will stop all process coordinators");
 
 	{
 		AutoLocker<BLocker> lock(&fCoordinatorLock);
@@ -1368,7 +1367,7 @@ MainWindow::_StopProcessCoordinators()
 			BReference<ProcessCoordinator> processCoordinator
 				= fCoordinatorQueue.front();
 			HDINFO("will drop queued process coordinator [%s]",
-				processCoordinator->Name().String())
+				processCoordinator->Name().String());
 			fCoordinatorQueue.pop();
 		}
 
@@ -1377,11 +1376,11 @@ MainWindow::_StopProcessCoordinators()
 		}
 	}
 
-	HDINFO("will wait until the process coordinator has stopped")
+	HDINFO("will wait until the process coordinator has stopped");
 
 	_SpinUntilProcessCoordinatorComplete();
 
-	HDINFO("did stop all process coordinators")
+	HDINFO("did stop all process coordinators");
 }
 
 
@@ -1401,7 +1400,7 @@ MainWindow::CoordinatorChanged(ProcessCoordinatorState& coordinatorState)
 			if (release_sem(fCoordinatorRunningSem) != B_OK)
 				debugger("unable to release the process coordinator sem");
 			HDINFO("process coordinator [%s] did complete",
-				fCoordinator->Name().String())
+				fCoordinator->Name().String());
 			// complete the last one that just finished
 			BMessage* message = fCoordinator->Message();
 
@@ -1435,9 +1434,8 @@ MainWindow::CoordinatorChanged(ProcessCoordinatorState& coordinatorState)
 				coordinatorState.Progress());
 				// show the progress to the user.
 		}
-	} else {
-		HDINFO("! unknown process coordinator changed")
-	}
+	} else
+		HDINFO("! unknown process coordinator changed");
 }
 
 

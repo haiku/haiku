@@ -124,7 +124,7 @@ AbstractServerProcess::IfModifiedSinceHeaderValue(BString& headerValue,
 	} else {
 		HDERROR("unable to parse the meta-data date and time from [%s]"
 			" - cannot set the 'If-Modified-Since' header",
-			metaDataPath.Path())
+			metaDataPath.Path());
 	}
 
 	return result;
@@ -149,7 +149,7 @@ AbstractServerProcess::PopulateMetaData(
 
 	if (!metaData.IsPopulated()) {
 		HDERROR("the meta data was read from [%s], but no values "
-			"were extracted", path.Path())
+			"were extracted", path.Path());
 		return B_BAD_DATA;
 	}
 
@@ -180,7 +180,7 @@ AbstractServerProcess::ParseJsonFromFileWithListener(
 
 	if (file == NULL) {
 		HDERROR("[%s] unable to find the meta data file at [%s]", Name(),
-			path.Path())
+			path.Path());
 		return B_FILE_NOT_FOUND;
 	}
 
@@ -241,7 +241,7 @@ AbstractServerProcess::DownloadToLocalFileAtomically(
 		if (result == B_OK && hasFile && size > 0) {
 			if (rename(temporaryFilePath.Path(), targetFilePath.Path()) != 0) {
 				HDINFO("[%s] did rename [%s] --> [%s]",
-					Name(), temporaryFilePath.Path(), targetFilePath.Path())
+					Name(), temporaryFilePath.Path(), targetFilePath.Path());
 				result = B_IO_ERROR;
 			}
 		}
@@ -260,17 +260,17 @@ AbstractServerProcess::DownloadToLocalFile(const BPath& targetFilePath,
 
 	if (redirects > MAX_REDIRECTS) {
 		HDINFO("[%s] exceeded %d redirects --> failure", Name(),
-			MAX_REDIRECTS)
+			MAX_REDIRECTS);
 		return B_IO_ERROR;
 	}
 
 	if (failures > MAX_FAILURES) {
-		HDINFO("[%s] exceeded %d failures", Name(), MAX_FAILURES)
+		HDINFO("[%s] exceeded %d failures", Name(), MAX_FAILURES);
 		return B_IO_ERROR;
 	}
 
 	HDINFO("[%s] will stream '%s' to [%s]", Name(), url.UrlString().String(),
-		targetFilePath.Path())
+		targetFilePath.Path());
 
 	ToFileUrlProtocolListener listener(targetFilePath, Name(),
 		Logger::IsTraceEnabled());
@@ -315,11 +315,11 @@ AbstractServerProcess::DownloadToLocalFile(const BPath& targetFilePath,
 
 	if (BHttpRequest::IsSuccessStatusCode(statusCode)) {
 		HDINFO("[%s] did complete streaming data [%"
-			B_PRIdSSIZE " bytes]", Name(), listener.ContentLength())
+			B_PRIdSSIZE " bytes]", Name(), listener.ContentLength());
 		return B_OK;
 	} else if (statusCode == B_HTTP_STATUS_NOT_MODIFIED) {
 		HDINFO("[%s] remote data has not changed since [%s]", Name(),
-			ifModifiedSinceHeader.String())
+			ifModifiedSinceHeader.String());
 		return HD_ERR_NOT_MODIFIED;
 	} else if (statusCode == B_HTTP_STATUS_PRECONDITION_FAILED) {
 		ServerHelper::NotifyClientTooOld(responseHeaders);
@@ -328,23 +328,23 @@ AbstractServerProcess::DownloadToLocalFile(const BPath& targetFilePath,
 		if (location.Length() != 0) {
 			BUrl redirectUrl(result.Url(), location);
 			HDINFO("[%s] will redirect to; %s",
-				Name(), redirectUrl.UrlString().String())
+				Name(), redirectUrl.UrlString().String());
 			return DownloadToLocalFile(targetFilePath, redirectUrl,
 				redirects + 1, 0);
 		}
 
-		HDERROR("[%s] unable to find 'Location' header for redirect", Name())
+		HDERROR("[%s] unable to find 'Location' header for redirect", Name());
 		return B_IO_ERROR;
 	} else {
 		if (statusCode == 0 || (statusCode / 100) == 5) {
 			HDERROR("error response from server [%" B_PRId32 "] --> retry...",
-				statusCode)
+				statusCode);
 			return DownloadToLocalFile(targetFilePath, url, redirects,
 				failures + 1);
 		}
 
 		HDERROR("[%s] unexpected response from server [%" B_PRId32 "]",
-			Name(), statusCode)
+			Name(), statusCode);
 		return B_IO_ERROR;
 	}
 }
@@ -378,12 +378,12 @@ AbstractServerProcess::MoveDamagedFileAside(const BPath& currentFilePath)
 
 	if (0 != rename(currentFilePath.Path(), damagedFilePath.Path())) {
 		HDERROR("[%s] unable to move damaged file [%s] aside to [%s]",
-			Name(), currentFilePath.Path(), damagedFilePath.Path())
+			Name(), currentFilePath.Path(), damagedFilePath.Path());
 		return B_IO_ERROR;
 	}
 
 	HDINFO("[%s] did move damaged file [%s] aside to [%s]",
-		Name(), currentFilePath.Path(), damagedFilePath.Path())
+		Name(), currentFilePath.Path(), damagedFilePath.Path());
 
 	return B_OK;
 }

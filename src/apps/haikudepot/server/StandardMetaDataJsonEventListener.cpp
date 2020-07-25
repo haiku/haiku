@@ -385,7 +385,7 @@ StandardMetaDataJsonEventListener::HandleError(status_t status, int32 line,
 	const char* message)
 {
 	HDERROR("an error has arisen processing the standard "
-		"meta data; %s", message)
+		"meta data; %s", message);
 	fErrorStatus = status;
 }
 

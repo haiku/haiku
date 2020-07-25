@@ -108,15 +108,14 @@ ProcessCoordinatorFactory::CreateBulkLoadCoordinator(
 			for (int32 i = 0; i < repoNames.CountStrings(); i++) {
 				ProcessNode* processNode = new ProcessNode(
 					new ServerPkgDataUpdateProcess(
-						model->Language().PreferredLanguage()->Code(),
+						model->Language()->PreferredLanguage()->Code(),
 						repoNames.StringAt(i), model, serverProcessOptions));
 				processNode->AddPredecessor(serverRepositoryDataUpdate);
 				processNode->AddPredecessor(serverReferenceDataUpdate);
 				processCoordinator->AddNode(processNode);
 			}
-		} else {
-			HDERROR("a problem has arisen getting the repository names.")
-		}
+		} else
+			HDERROR("a problem has arisen getting the repository names.");
 	}
 
 	return processCoordinator;
@@ -130,7 +129,7 @@ ProcessCoordinatorFactory::_CalculateServerProcessOptions()
 
 	if (ServerSettings::IsClientTooOld()) {
 		HDINFO("bulk load proceeding without network communications "
-			"because the client is too old")
+			"because the client is too old");
 		processOptions |= SERVER_PROCESS_NO_NETWORKING;
 	}
 

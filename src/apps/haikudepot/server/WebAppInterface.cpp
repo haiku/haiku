@@ -83,7 +83,7 @@ public:
 	virtual void DebugMessage(BUrlRequest* caller,
 		BUrlProtocolDebugMessage type, const char* text)
 	{
-		HDTRACE("jrpc: %s", text)
+		HDTRACE("jrpc: %s", text);
 	}
 
 	void SetDownloadIO(BDataIO* downloadIO)
@@ -400,7 +400,7 @@ WebAppInterface::RetrieveUserUsageConditions(const BString& code,
 
 	BMessage resultMessage;
 	if (responseEnvelopeMessage.FindMessage("result", &resultMessage) != B_OK) {
-		HDERROR("bad response envelope missing 'result' entry")
+		HDERROR("bad response envelope missing 'result' entry");
 		return B_BAD_DATA;
 	}
 
@@ -412,7 +412,7 @@ WebAppInterface::RetrieveUserUsageConditions(const BString& code,
 			|| (resultMessage.FindDouble(
 				"minimumAge", &metaDataMinimumAge) != B_OK) ) {
 		HDERROR("unexpected response from server with missing user usage "
-			"conditions data")
+			"conditions data");
 		return B_BAD_DATA;
 	}
 
@@ -806,27 +806,27 @@ WebAppInterface::_SendJsonRequest(const char* domain,
 	size_t requestDataSize, uint32 flags, BMessage& reply) const
 {
 	if (requestDataSize == 0) {
-		HDINFO("jrpc; empty request payload")
+		HDINFO("jrpc; empty request payload");
 		return B_ERROR;
 	}
 
 	if (!ServerHelper::IsNetworkAvailable()) {
 		HDDEBUG("jrpc; dropping request to ...[%s] as network is not"
-		 	" available", domain)
+		 	" available", domain);
 		delete requestData;
 		return HD_NETWORK_INACCESSIBLE;
 	}
 
 	if (ServerSettings::IsClientTooOld()) {
 		HDDEBUG("jrpc; dropping request to ...[%s] as client is too old",
-			domain)
+			domain);
 		delete requestData;
 		return HD_CLIENT_TOO_OLD;
 	}
 
 	BUrl url = ServerSettings::CreateFullUrl(BString("/__api/v1/") << domain);
 	bool isSecure = url.Protocol() == "https";
-	HDDEBUG("jrpc; will make request to [%s]", url.UrlString().String())
+	HDDEBUG("jrpc; will make request to [%s]", url.UrlString().String());
 
 	// If the request payload is logged then it must be copied to local memory
 	// from the stream.  This then requires that the request data is then
@@ -874,7 +874,7 @@ WebAppInterface::_SendJsonRequest(const char* domain,
 	int32 statusCode = result.StatusCode();
 
 	HDDEBUG("jrpc; did receive http-status [%" B_PRId32 "] from [%s]",
-		statusCode, url.UrlString().String())
+		statusCode, url.UrlString().String());
 
 	switch (statusCode) {
 		case B_HTTP_STATUS_OK:
@@ -886,7 +886,7 @@ WebAppInterface::_SendJsonRequest(const char* domain,
 
 		default:
 			HDERROR("jrpc request to endpoint [.../%s] failed with http "
-				"status [%" B_PRId32 "]\n", domain, statusCode)
+				"status [%" B_PRId32 "]\n", domain, statusCode);
 			return B_ERROR;
 	}
 
@@ -906,7 +906,7 @@ WebAppInterface::_SendJsonRequest(const char* domain,
 	if (Logger::IsTraceEnabled() && status == B_BAD_DATA) {
 		BString resultString(static_cast<const char *>(replyData.Buffer()),
 			replyData.BufferLength());
-		HDERROR("Parser choked on JSON:\n%s", resultString.String())
+		HDERROR("Parser choked on JSON:\n%s", resultString.String());
 	}
 	return status;
 }
@@ -954,7 +954,7 @@ WebAppInterface::_SendRawGetRequest(const BString urlPathComponents,
 		return B_OK;
 
 	HDERROR("failed to get data from '%s': %" B_PRIi32 "",
-		url.UrlString().String(), statusCode)
+		url.UrlString().String(), statusCode);
 	return B_ERROR;
 }
 

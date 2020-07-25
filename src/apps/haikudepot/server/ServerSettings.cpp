@@ -37,12 +37,12 @@ status_t
 ServerSettings::SetBaseUrl(const BUrl& value)
 {
 	if (!value.IsValid()) {
-		HDERROR("the url is not valid")
+		HDERROR("the url is not valid");
 		return B_BAD_VALUE;
 	}
 
 	if (value.Protocol() != "http" && value.Protocol() != "https") {
-		HDERROR("the url protocol must be 'http' or 'https'")
+		HDERROR("the url protocol must be 'http' or 'https'");
 		return B_BAD_VALUE;
 	}
 
@@ -83,7 +83,7 @@ ServerSettings::_GetUserAgentVersionString()
 	app_info info;
 
 	if (be_app->GetAppInfo(&info) != B_OK) {
-		HDERROR("Unable to get the application info")
+		HDERROR("Unable to get the application info");
 		be_app->Quit();
 		return BString(USERAGENT_FALLBACK_VERSION);
 	}
@@ -91,7 +91,7 @@ ServerSettings::_GetUserAgentVersionString()
 	BFile file(&info.ref, B_READ_ONLY);
 
 	if (file.InitCheck() != B_OK) {
-		HDERROR("Unable to access the application info file")
+		HDERROR("Unable to access the application info file");
 		be_app->Quit();
 		return BString(USERAGENT_FALLBACK_VERSION);
 	}
@@ -100,8 +100,8 @@ ServerSettings::_GetUserAgentVersionString()
 	version_info versionInfo;
 
 	if (appFileInfo.GetVersionInfo(
-		&versionInfo, B_APP_VERSION_KIND) != B_OK) {
-		HDERROR("Unable to establish the application version")
+			&versionInfo, B_APP_VERSION_KIND) != B_OK) {
+		HDERROR("Unable to establish the application version");
 		be_app->Quit();
 		return BString(USERAGENT_FALLBACK_VERSION);
 	}

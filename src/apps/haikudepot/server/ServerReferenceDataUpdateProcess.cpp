@@ -66,7 +66,7 @@ ServerReferenceDataUpdateProcess::UrlPathComponent()
 	BString result;
 	AutoLocker<BLocker> locker(fModel->Lock());
 	result.SetToFormat("/__reference/all-%s.json.gz",
-		fModel->Language().PreferredLanguage()->Code());
+		fModel->Language()->PreferredLanguage()->Code());
 	return result;
 }
 
@@ -122,29 +122,29 @@ ServerReferenceDataUpdateProcess::_ProcessNaturalLanguages(
 	DumpExportReference* data)
 {
 	HDINFO("[%s] will populate %" B_PRId32 " natural languages",
-		Name(), data->CountNaturalLanguages())
-
-	LanguageList result;
+		Name(), data->CountNaturalLanguages());
+	AutoLocker<BLocker> locker(fModel->Lock());
+	LanguageModel* languageModel = fModel->Language();
+	int32 count = 0;
 
 	for (int32 i = 0; i < data->CountNaturalLanguages(); i++) {
 		DumpExportReferenceNaturalLanguage* naturalLanguage =
 			data->NaturalLanguagesItemAt(i);
-		result.Add(LanguageRef(
+		languageModel->AddSupportedLanguage(LanguageRef(
 			new Language(
 				*(naturalLanguage->Code()),
 				*(naturalLanguage->Name()),
 				naturalLanguage->IsPopular()
 			),
-			true));
+			true)
+		);
+		count++;
 	}
 
-	{
-		AutoLocker<BLocker> locker(fModel->Lock());
-		fModel->Language().AddSupportedLanguages(result);
-	}
+	languageModel->SetPreferredLanguageToSystemDefault();
 
 	HDINFO("[%s] did add %" B_PRId32 " supported languages",
-		Name(), result.CountItems())
+		Name(), count);
 
 	return B_OK;
 }
@@ -155,7 +155,7 @@ ServerReferenceDataUpdateProcess::_ProcessPkgCategories(
 	DumpExportReference* data)
 {
 	HDINFO("[%s] will populate %" B_PRId32 " pkg categories",
-		Name(), data->CountPkgCategories())
+		Name(), data->CountPkgCategories());
 
 	CategoryList result;
 

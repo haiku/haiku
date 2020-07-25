@@ -1,6 +1,5 @@
 /*
  * Copyright 2019, Andrew Lindesay <apl@lindesay.co.nz>.
- *
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef CAPTCHA_H

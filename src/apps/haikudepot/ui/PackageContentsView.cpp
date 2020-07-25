@@ -383,7 +383,7 @@ PackageContentsView::_PopulatePackageContents(const PackageInfo& package)
 			}
 		} else {
 			HDINFO("PackageContentsView::_PopulatePackageContents(): "
-				"unknown install location")
+				"unknown install location");
 			return false;
 		}
 
@@ -398,7 +398,7 @@ PackageContentsView::_PopulatePackageContents(const PackageInfo& package)
 	if (status != B_OK) {
 		HDINFO("PackageContentsView::_PopulatePackageContents(): "
 			"failed to init BPackageReader(%s): %s",
-			packagePath.Path(), strerror(status))
+			packagePath.Path(), strerror(status));
 		return false;
 	}
 
@@ -408,7 +408,7 @@ PackageContentsView::_PopulatePackageContents(const PackageInfo& package)
 	status = reader.ParseContent(&contentHandler);
 	if (status != B_OK) {
 		HDINFO("PackageContentsView::_PopulatePackageContents(): "
-			"failed parse package contents: %s", strerror(status))
+			"failed parse package contents: %s", strerror(status));
 		// NOTE: Do not return false, since it taken to mean this
 		// is a remote package, but is it not, we simply want to stop
 		// populating the contents early.

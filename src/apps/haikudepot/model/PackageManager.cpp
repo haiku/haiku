@@ -164,17 +164,17 @@ public:
 			return ex.Error();
 		} catch (BAbortedByUserException& ex) {
 			HDINFO("Installation of package %s is aborted by user: %s",
-				packageNameString, ex.Message().String())
+				packageNameString, ex.Message().String());
 			_SetDownloadedPackagesState(NONE);
 			ref->SetState(state);
 			return B_OK;
 		} catch (BNothingToDoException& ex) {
 			HDINFO("Nothing to do while installing package %s: %s",
-				packageNameString, ex.Message().String())
+				packageNameString, ex.Message().String());
 			return B_OK;
 		} catch (BException& ex) {
 			HDERROR("Exception occurred while installing package %s: %s",
-				packageNameString, ex.Message().String())
+				packageNameString, ex.Message().String());
 			_SetDownloadedPackagesState(NONE);
 			ref->SetState(state);
 			return B_ERROR;
@@ -291,7 +291,7 @@ public:
 			return B_OK;
 		} catch (BException& ex) {
 			HDERROR("Exception occurred while uninstalling package %s: %s",
-				packageName, ex.Message().String())
+				packageName, ex.Message().String());
 			ref->SetState(state);
 			return B_ERROR;
 		}
@@ -391,7 +391,7 @@ public:
 		if (path.FindFirst("data/deskbar/menu") == 0
 				&& entry->SymlinkPath() != NULL) {
 			HDINFO("found deskbar entry: %s -> %s",
-				path.String(), entry->SymlinkPath())
+				path.String(), entry->SymlinkPath());
 			fDeskbarLinks.Add(DeskbarLink(path, entry->SymlinkPath()));
 		}
 		return B_OK;
@@ -463,7 +463,7 @@ public:
 		BPath path;
 		if (fDeskbarLink.link.FindFirst('/') == 0) {
 			status = path.SetTo(fDeskbarLink.link);
-			HDINFO("trying to launch (absolute link): %s", path.Path())
+			HDINFO("trying to launch (absolute link): %s", path.Path());
 		} else {
 			int32 location = InstallLocation();
 			if (location == B_PACKAGE_INSTALLATION_LOCATION_SYSTEM) {
@@ -483,7 +483,7 @@ public:
 				status = path.GetParent(&path);
 			if (status == B_OK) {
 				status = path.Append(fDeskbarLink.link, true);
-				HDINFO("trying to launch: %s", path.Path())
+				HDINFO("trying to launch: %s", path.Path());
 			}
 		}
 
@@ -518,7 +518,7 @@ public:
 			}
 		} else {
 			HDINFO("OpenPackageAction::FindAppToLaunch(): "
-				"unknown install location")
+				"unknown install location");
 			return false;
 		}
 
@@ -531,7 +531,7 @@ public:
 		if (status != B_OK) {
 			HDINFO("OpenPackageAction::FindAppToLaunch(): "
 				"failed to init BPackageReader(%s): %s",
-				packagePath.Path(), strerror(status))
+				packagePath.Path(), strerror(status));
 			return false;
 		}
 
@@ -541,7 +541,7 @@ public:
 		if (status != B_OK) {
 			HDINFO("OpenPackageAction::FindAppToLaunch(): "
 				"failed parse package contents (%s): %s",
-				packagePath.Path(), strerror(status))
+				packagePath.Path(), strerror(status));
 			return false;
 		}
 
@@ -635,11 +635,11 @@ PackageManager::RefreshRepository(const BRepositoryConfig& repoConfig)
 		result = BPackageManager::RefreshRepository(repoConfig);
 	} catch (BFatalErrorException& ex) {
 		HDERROR("Fatal error occurred while refreshing repository: "
-			"%s (%s)", ex.Message().String(), ex.Details().String())
+			"%s (%s)", ex.Message().String(), ex.Details().String());
 		result = ex.Error();
 	} catch (BException& ex) {
 		HDERROR("Exception occurred while refreshing "
-			"repository: %s\n", ex.Message().String())
+			"repository: %s\n", ex.Message().String());
 		result = B_ERROR;
 	}
 
@@ -658,11 +658,11 @@ PackageManager::DownloadPackage(const BString& fileURL,
 	} catch (BFatalErrorException& ex) {
 		HDERROR("Fatal error occurred while downloading package: "
 			"%s: %s (%s)", fileURL.String(), ex.Message().String(),
-			ex.Details().String())
+			ex.Details().String());
 		result = ex.Error();
 	} catch (BException& ex) {
 		HDERROR("Exception occurred while downloading package "
-			"%s: %s", fileURL.String(), ex.Message().String())
+			"%s: %s", fileURL.String(), ex.Message().String());
 		result = B_ERROR;
 	}
 

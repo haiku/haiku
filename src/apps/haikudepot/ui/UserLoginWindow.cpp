@@ -146,19 +146,18 @@ UserLoginWindow::UserLoginWindow(BWindow* parent, BRect frame, Model& model)
 
 	{
 		AutoLocker<BLocker> locker(fModel.Lock());
-		fPreferredLanguageCode = fModel.Language().PreferredLanguage()->Code();
+		fPreferredLanguageCode = fModel.Language()->PreferredLanguage()->Code();
 		// Construct languages popup
 		BPopUpMenu* languagesMenu = new BPopUpMenu(B_TRANSLATE("Language"));
 		fLanguageCodeField = new BMenuField("language",
 			B_TRANSLATE("Preferred language:"), languagesMenu);
 
 		LanguageMenuUtils::AddLanguagesToMenu(
-			fModel.Language().SupportedLanguages(),
-			languagesMenu);
+			fModel.Language(), languagesMenu);
 		languagesMenu->SetTargetForItems(this);
 
 		HDINFO("using preferred language code [%s]",
-			fPreferredLanguageCode.String())
+			fPreferredLanguageCode.String());
 		LanguageMenuUtils::MarkLanguageInMenu(fPreferredLanguageCode,
 			languagesMenu);
 	}
@@ -298,7 +297,7 @@ UserLoginWindow::MessageReceived(BMessage* message)
 		}
 
 		case MSG_CREATE_ACCOUNT_SETUP_ERROR:
-			HDERROR("failed to setup for account setup - window must quit")
+			HDERROR("failed to setup for account setup - window must quit");
 			BMessenger(this).SendMessage(B_QUIT_REQUESTED);
 			break;
 
@@ -369,9 +368,8 @@ UserLoginWindow::QuitRequested()
 	BAutolock locker(&fLock);
 
 	if (fWorkerThread >= 0) {
-		if (Logger::IsDebugEnabled())
-			HDINFO("quit requested while worker thread is operating -- will "
-				"try again once the worker thread has completed")
+		HDDEBUG("quit requested while worker thread is operating -- will "
+			"try again once the worker thread has completed");
 		fQuitRequestedDuringWorkerThread = true;
 		return false;
 	}
@@ -529,10 +527,12 @@ UserLoginWindow::_AuthenticateThread(UserCredentials& userCredentials)
 		userCredentials.SetIsSuccessful(!token.IsEmpty());
 
 		if (Logger::IsDebugEnabled()) {
-			if (token.IsEmpty())
-				HDINFO("authentication failed")
-			else
-				HDINFO("authentication successful")
+			if (token.IsEmpty()) {
+				HDINFO("authentication failed");
+			}
+			else {
+				HDINFO("authentication successful");
+			}
 		}
 
 		BMessenger messenger(this);
@@ -751,7 +751,7 @@ UserLoginWindow::_CreateAccountSetupThreadEntry(void* data)
 		}
 		if (result == B_OK) {
 			HDDEBUG("successfully completed collection of create account "
-				"data from the server in background thread")
+				"data from the server in background thread");
 			messenger.SendMessage(&message);
 		} else {
 			debugger("unable to configure the "
@@ -862,6 +862,8 @@ UserLoginWindow::_UnpackCaptcha(BMessage& responsePayload, Captcha& captcha)
 		if (decodedSize <= 0)
 			result = B_ERROR;
 	}
+	else
+		HDERROR("obtained a captcha with no image data");
 
 	char* buffer = NULL;
 	if (result == B_OK) {
@@ -876,6 +878,9 @@ UserLoginWindow::_UnpackCaptcha(BMessage& responsePayload, Captcha& captcha)
 			captcha.SetPngImageData(buffer, decodedSize);
 		}
 		delete[] buffer;
+
+		HDDEBUG("did obtain a captcha image of size %" B_PRIuSIZE " bytes",
+			decodedSize);
 	}
 
 	return result;
@@ -885,7 +890,7 @@ UserLoginWindow::_UnpackCaptcha(BMessage& responsePayload, Captcha& captcha)
 void
 UserLoginWindow::_HandleCreateAccountSetupSuccess(BMessage* message)
 {
-	HDDEBUG("handling account setup success")
+	HDDEBUG("handling account setup success");
 	BMessage captchaMessage;
 	BMessage userUsageConditionsMessage;
 
@@ -905,7 +910,7 @@ UserLoginWindow::_HandleCreateAccountSetupSuccess(BMessage* message)
 void
 UserLoginWindow::_SetCaptcha(Captcha* captcha)
 {
-	HDDEBUG("setting captcha")
+	HDDEBUG("setting captcha");
 	if (fCaptcha != NULL)
 		delete fCaptcha;
 	fCaptcha = captcha;
@@ -931,7 +936,7 @@ void
 UserLoginWindow::_SetUserUsageConditions(
 	UserUsageConditions* userUsageConditions)
 {
-	HDDEBUG("setting user usage conditions")
+	HDDEBUG("setting user usage conditions");
 	if (fUserUsageConditions != NULL)
 		delete fUserUsageConditions;
 	fUserUsageConditions = userUsageConditions;
@@ -1270,7 +1275,7 @@ UserLoginWindow::_CreateAccountThread(CreateUserDetail* detail)
 					_ValidationFailuresToString(validationFailures,
 						debugString);
 					HDDEBUG("create account validation issues; %s",
-						debugString.String())
+						debugString.String());
 				}
 				BMessage validationFailuresMessage;
 				validationFailures.Archive(&validationFailuresMessage);

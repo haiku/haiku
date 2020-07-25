@@ -29,7 +29,7 @@ AbstractSingleFileServerProcess::~AbstractSingleFileServerProcess()
 status_t
 AbstractSingleFileServerProcess::RunInternal()
 {
-	HDINFO("[%s] will fetch data", Name())
+	HDINFO("[%s] will fetch data", Name());
 	BPath localPath;
 	status_t result = GetLocalPath(localPath);
 
@@ -57,14 +57,12 @@ AbstractSingleFileServerProcess::RunInternal()
 		if (!IsSuccess(result)) {
 			if (hasData) {
 				HDINFO("[%s] failed to update data, but have old data "
-					"anyway so carry on with that", Name())
+					"anyway so carry on with that", Name());
 				result = B_OK;
-			} else {
-				HDERROR("[%s] failed to obtain data", Name())
-			}
-		} else {
-			HDINFO("[%s] did fetch data", Name())
-		}
+			} else
+				HDERROR("[%s] failed to obtain data", Name());
+		} else
+			HDINFO("[%s] did fetch data", Name());
 	}
 
 	if (IsSuccess(result)) {
@@ -78,12 +76,12 @@ AbstractSingleFileServerProcess::RunInternal()
 	}
 
 	if (IsSuccess(result)) {
-		HDINFO("[%s] will process data", Name())
+		HDINFO("[%s] will process data", Name());
 		result = ProcessLocalData();
 
 		switch (result) {
 			case B_OK:
-				HDINFO("[%s] did process data", Name())
+				HDINFO("[%s] did process data", Name());
 				break;
 			default:
 				MoveDamagedFileAside(localPath);

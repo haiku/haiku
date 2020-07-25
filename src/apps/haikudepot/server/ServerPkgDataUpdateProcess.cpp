@@ -144,7 +144,7 @@ PackageFillingPkgListener::ConsumePackage(const PackageInfoRef& package,
 
 		if (categoryIndex == -1) {
 			HDERROR("unable to find the category for [%s]",
-				categoryCode->String())
+				categoryCode->String());
 		} else {
 			package->AddCategory(
 				fCategories.ItemAtFast(categoryIndex));
@@ -177,7 +177,7 @@ PackageFillingPkgListener::ConsumePackage(const PackageInfoRef& package,
 	}
 
 	HDDEBUG("did populate data for [%s] (%s)", pkg->Name()->String(),
-			fDepotName.String())
+			fDepotName.String());
 
 	fCount++;
 
@@ -212,11 +212,11 @@ PackageFillingPkgListener::Handle(DumpExportPkg* pkg)
 			ConsumePackage(packageInfoRef, pkg);
 		} else {
 			HDINFO("[PackageFillingPkgListener] unable to find the pkg [%s]",
-				packageName.String())
+				packageName.String());
 		}
 	} else {
 		HDINFO("[PackageFillingPkgListener] unable to find the depot [%s]",
-			fDepotName.String())
+			fDepotName.String());
 	}
 
 	return !fStoppable->WasStopped();
@@ -321,7 +321,7 @@ ServerPkgDataUpdateProcess::ProcessLocalData()
 	if (Logger::IsInfoEnabled()) {
 		double secs = watch.ElapsedTime() / 1000000.0;
 		HDINFO("[%s] did process %" B_PRIi32 " packages' data "
-			"in  (%6.3g secs)", Name(), itemListener->Count(), secs)
+			"in  (%6.3g secs)", Name(), itemListener->Count(), secs);
 	}
 
 	return listener->ErrorStatus();
@@ -362,7 +362,7 @@ ServerPkgDataUpdateProcess::RunInternal()
 	if (_DeriveWebAppRepositorySourceCode().IsEmpty()) {
 		HDINFO("[%s] am not updating data for depot [%s] as there is no"
 			" web app repository source code available",
-			Name(), fDepotName.String())
+			Name(), fDepotName.String());
 		return B_OK;
 	}
 

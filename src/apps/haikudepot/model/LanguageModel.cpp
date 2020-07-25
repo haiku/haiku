@@ -4,6 +4,8 @@
  */
 #include "LanguageModel.h"
 
+#include <algorithm>
+
 #include <Collator.h>
 #include <Locale.h>
 #include <LocaleRoster.h>
@@ -14,7 +16,7 @@
 
 
 static int32
-LanguagesCompareFn(const LanguageRef& l1, const LanguageRef& l2)
+_LanguagesCompareFn(const LanguageRef& l1, const LanguageRef& l2)
 {
 	BCollator* collator = LocaleUtils::GetSharedCollator();
 	BString name1;
@@ -30,13 +32,19 @@ LanguagesCompareFn(const LanguageRef& l1, const LanguageRef& l2)
 }
 
 
+static bool
+_IsLanguageBefore(const LanguageRef& l1, const LanguageRef& l2)
+{
+	return _LanguagesCompareFn(l1, l2) < 0;
+}
+
+
 LanguageModel::LanguageModel()
 	:
-	fSupportedLanguages(LanguagesCompareFn, NULL),
 	fPreferredLanguage(LanguageRef(new Language(LANGUAGE_DEFAULT)))
 {
 	const Language defaultLanguage = _DeriveDefaultLanguage();
-	fSupportedLanguages.Add(LanguageRef(
+	fSupportedLanguages.push_back(LanguageRef(
 		new Language(defaultLanguage), true));
 	_SetPreferredLanguage(defaultLanguage);
 }
@@ -47,19 +55,55 @@ LanguageModel::~LanguageModel()
 }
 
 
-void
-LanguageModel::AddSupportedLanguages(const LanguageList& languages)
+const int32
+LanguageModel::CountSupportedLanguages() const
 {
-	for (int32 i = 0; i < languages.CountItems(); i++) {
-		const LanguageRef language = languages.ItemAt(i);
-		int32 index = IndexOfSupportedLanguage(language->Code());
+	return fSupportedLanguages.size();
+}
 
-		if (index == -1)
-			fSupportedLanguages.Add(language);
-		else
-			fSupportedLanguages.Replace(index, language);
+
+const LanguageRef
+LanguageModel::SupportedLanguageAt(int32 index) const
+{
+	return fSupportedLanguages[index];
+}
+
+
+int32
+LanguageModel::IndexOfSupportedLanguage(const BString& languageCode) const
+{
+	for (uint32 i = 0; i < fSupportedLanguages.size(); i++) {
+		if (fSupportedLanguages[i]->Code() == languageCode)
+			return i;
 	}
 
+	return -1;
+}
+
+
+void
+LanguageModel::AddSupportedLanguage(const LanguageRef& value)
+{
+	int32 index = IndexOfSupportedLanguage(value->Code());
+
+	if (-1 == index) {
+		std::vector<LanguageRef>::iterator itInsertionPt
+			= std::lower_bound(
+				fSupportedLanguages.begin(), fSupportedLanguages.end(),
+				value, &_IsLanguageBefore);
+		fSupportedLanguages.insert(itInsertionPt, value);
+		HDTRACE("did add the supported language [%s]" , value->Code());
+	}
+	else {
+		fSupportedLanguages[index] = value;
+		HDTRACE("did replace the supported language [%s]", value->Code());
+	}
+}
+
+
+void
+LanguageModel::SetPreferredLanguageToSystemDefault()
+{
 	// it could be that the preferred language does not exist in the
 	// list.  In this case it is necessary to choose one from the list.
 	_SetPreferredLanguage(_DeriveDefaultLanguage());
@@ -70,19 +114,7 @@ void
 LanguageModel::_SetPreferredLanguage(const Language& language)
 {
 	fPreferredLanguage = LanguageRef(new Language(language));
-	HDDEBUG("set preferred language [%s]", language.Code())
-}
-
-
-int32
-LanguageModel::IndexOfSupportedLanguage(const BString& languageCode) const
-{
-	for (int32 i = 0; i < fSupportedLanguages.CountItems(); i++) {
-		if (fSupportedLanguages.ItemAt(i)->Code() == languageCode)
-			return i;
-	}
-
-	return -1;
+	HDDEBUG("set preferred language [%s]", language.Code());
 }
 
 
@@ -97,14 +129,14 @@ Language
 LanguageModel::_DeriveDefaultLanguage() const
 {
 	Language defaultLanguage = _DeriveSystemDefaultLanguage();
-	HDDEBUG("derived system default language [%s]", defaultLanguage.Code())
+	HDDEBUG("derived system default language [%s]", defaultLanguage.Code());
 
 	// if there are no supported languages; as is the case to start with as the
 	// application starts, the default language from the system is used anyway.
 	// The data queried in HDS will handle the case where the language is not
 	// 'known' at the HDS end so it doesn't matter if it is invalid.
 
-	if (fSupportedLanguages.IsEmpty())
+	if (fSupportedLanguages.empty())
 		return defaultLanguage;
 
 	// if there are supported languages defined then the preferred language
@@ -115,15 +147,15 @@ LanguageModel::_DeriveDefaultLanguage() const
 
 	if (foundSupportedLanguage == NULL) {
 		HDERROR("unable to find the language [%s] - looking for app default",
-			defaultLanguage.Code())
+			defaultLanguage.Code());
 		foundSupportedLanguage = _FindSupportedLanguage(
 			LANGUAGE_DEFAULT.Code());
 	}
 
 	if (foundSupportedLanguage == NULL) {
 		HDERROR("unable to find the app default language - using the first "
-			"supported language")
-		foundSupportedLanguage = fSupportedLanguages.ItemAt(0);
+			"supported language");
+		foundSupportedLanguage = fSupportedLanguages[0];
 	}
 
 	return Language(*foundSupportedLanguage);
@@ -157,5 +189,5 @@ LanguageModel::_FindSupportedLanguage(const BString& code) const
 	int32 index = IndexOfSupportedLanguage(code);
 	if (-1 == index)
 		return NULL;
-	return fSupportedLanguages.ItemAt(index);
+	return fSupportedLanguages[index];
 }

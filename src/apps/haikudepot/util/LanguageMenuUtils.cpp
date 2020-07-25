@@ -21,23 +21,23 @@
 
 /* static */ void
 LanguageMenuUtils::AddLanguagesToMenu(
-	const LanguageList& languages, BMenu* menu)
+	const LanguageModel* languagesModel, BMenu* menu)
 {
-	if (languages.IsEmpty())
-		HDINFO("there are no languages defined")
+	if (languagesModel->CountSupportedLanguages() == 0)
+		HDINFO("there are no languages defined");
 
 	int32 addedPopular = LanguageMenuUtils::_AddLanguagesToMenu(
-		languages, menu, true);
+		languagesModel, menu, true);
 
 	if (addedPopular > 0)
 		menu->AddSeparatorItem();
 
 	int32 addedNonPopular = LanguageMenuUtils::_AddLanguagesToMenu(
-		languages, menu, false);
+		languagesModel, menu, false);
 
 	HDDEBUG("did add %" B_PRId32 " popular languages and %" B_PRId32
 		" non-popular languages to a menu", addedPopular,
-		addedNonPopular)
+		addedNonPopular);
 }
 
 
@@ -55,7 +55,7 @@ LanguageMenuUtils::MarkLanguageInMenu(
 
 	if (index == -1) {
 		HDINFO("unable to find the language [%s] in the menu",
-			languageCode.String())
+			languageCode.String());
 		menu->ItemAt(0)->SetMarked(true);
 	}
 	else
@@ -86,13 +86,13 @@ LanguageMenuUtils::_AddLanguageToMenu(
 
 
 /* static */ int32
-LanguageMenuUtils::_AddLanguagesToMenu(const LanguageList& languages,
+LanguageMenuUtils::_AddLanguagesToMenu(const LanguageModel* languageModel,
 	BMenu* menu, bool isPopular)
 {
 	int32 count = 0;
 
-	for (int32 i = 0; i < languages.CountItems(); i++) {
-		const LanguageRef language = languages.ItemAtFast(i);
+	for (int32 i = 0; i < languageModel->CountSupportedLanguages(); i++) {
+		const LanguageRef language = languageModel->SupportedLanguageAt(i);
 
 		if (language->IsPopular() == isPopular) {
 			LanguageMenuUtils::_AddLanguageToMenu(language, menu);

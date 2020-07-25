@@ -63,7 +63,7 @@ UserDetailVerifierProcess::RunInternal()
 			case B_OK:
 				if (!userDetail.Agreement().IsLatest()) {
 					HDINFO("the user has not agreed to the latest user usage"
-						" conditions.")
+						" conditions.");
 					fListener->UserUsageConditionsNotLatest(userDetail);
 				}
 				break;
@@ -80,7 +80,7 @@ bool
 UserDetailVerifierProcess::_ShouldVerify()
 {
 	if (!ServerHelper::IsNetworkAvailable()) {
-		HDINFO("no network --> will not verify user")
+		HDINFO("no network --> will not verify user");
 		return false;
 	}
 
@@ -106,7 +106,7 @@ UserDetailVerifierProcess::_TryFetchUserDetail(UserDetail& userDetail)
 	result = interface.RetrieveCurrentUserDetail(userDetailResponse);
 	if (result != B_OK) {
 		HDERROR("a problem has arisen retrieving the current user detail: %s",
-			strerror(result))
+			strerror(result));
 	}
 
 	if (result == B_OK) {
@@ -120,7 +120,7 @@ UserDetailVerifierProcess::_TryFetchUserDetail(UserDetail& userDetail)
 			default:
 				HDERROR("a problem has arisen retrieving the current user "
 					"detail for user [%s]: jrpc error code %" B_PRId32 "",
-					fModel->Nickname().String(), errorCode)
+					fModel->Nickname().String(), errorCode);
 				result = B_ERROR;
 				break;
 		}
@@ -134,7 +134,7 @@ UserDetailVerifierProcess::_TryFetchUserDetail(UserDetail& userDetail)
 
 		result = interface.UnpackUserDetail(userDetailResponse, userDetail);
 		if (result != B_OK)
-			HDERROR("it was not possible to unpack the user details.")
+			HDERROR("it was not possible to unpack the user details.");
 	}
 
 	return result;

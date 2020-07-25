@@ -39,7 +39,7 @@ ServerIconExportUpdateProcess::ServerIconExportUpdateProcess(
 {
 	AutoLocker<BLocker> locker(fModel->Lock());
 	if (fModel->IconStoragePath(fLocalIconStoragePath) != B_OK) {
-		HDINFO("[%s] unable to obtain the path for storing icons", Name())
+		HDINFO("[%s] unable to obtain the path for storing icons", Name());
 		fLocalIconStoragePath.Unset();
 		fLocalIconStore = NULL;
 	} else {
@@ -116,7 +116,7 @@ ServerIconExportUpdateProcess::Populate()
 	}
 
 	HDDEBUG("[%s] will populate icons for %" B_PRId32 " depots", Name(),
-		depots.CountItems())
+		depots.CountItems());
 
 	for (int32 i = 0;
 		(i < depots.CountItems()) && !WasStopped() && (result == B_OK);
@@ -129,7 +129,7 @@ ServerIconExportUpdateProcess::Populate()
 	if (Logger::IsInfoEnabled()) {
 		double secs = watch.ElapsedTime() / 1000000.0;
 		HDINFO("[%s] did populate %" B_PRId32 " packages' icons (%6.3g secs)",
-			Name(), fCountIconsSet, secs)
+			Name(), fCountIconsSet, secs);
 	}
 
 	return result;
@@ -142,7 +142,7 @@ status_t
 ServerIconExportUpdateProcess::PopulateForDepot(const DepotInfo& depot)
 {
 	HDINFO("[%s] will populate icons for depot [%s]",
-		Name(), depot.Name().String())
+		Name(), depot.Name().String());
 	status_t result = B_OK;
 	const PackageList& packages = depot.Packages();
 	for(int32 j = 0;
@@ -174,7 +174,7 @@ ServerIconExportUpdateProcess::PopulateForPkg(const PackageInfoRef& package)
 		package->SetIcon(bitmapRef);
 
 		HDDEBUG("[%s] have set the package icon for [%s] from [%s]",
-			Name(), package->Name().String(), bestIconPath.Path())
+			Name(), package->Name().String(), bestIconPath.Path());
 
 		fCountIconsSet++;
 
@@ -182,7 +182,7 @@ ServerIconExportUpdateProcess::PopulateForPkg(const PackageInfoRef& package)
 	}
 
 	HDDEBUG("[%s] did not set the package icon for [%s]; no data",
-		Name(), package->Name().String())
+		Name(), package->Name().String());
 
 	return B_FILE_NOT_FOUND;
 }
@@ -194,15 +194,14 @@ ServerIconExportUpdateProcess::_DownloadAndUnpack()
 	BPath tarGzFilePath(tmpnam(NULL));
 	status_t result = B_OK;
 
-	HDINFO("[%s] will start fetching icons", Name())
+	HDINFO("[%s] will start fetching icons", Name());
 
 	result = _Download(tarGzFilePath);
 
 	switch (result) {
 		case HD_ERR_NOT_MODIFIED:
-			HDINFO("[%s] icons not modified - will use existing", Name())
+			HDINFO("[%s] icons not modified - will use existing", Name());
 			return result;
-			break;
 		case B_OK:
 			return _Unpack(tarGzFilePath);
 		default:
@@ -225,13 +224,13 @@ ServerIconExportUpdateProcess::_HandleDownloadFailure()
 	if (result == B_OK) {
 		if (hasData) {
 			HDINFO("[%s] failed to update data, but have old data anyway "
-				"so will carry on with that", Name())
+				"so will carry on with that", Name());
 		} else {
-			HDINFO("[%s] failed to obtain data", Name())
+			HDINFO("[%s] failed to obtain data", Name());
 			result = HD_ERR_NO_DATA;
 		}
 	} else {
-		HDERROR("[%s] unable to detect if there is local data\n", Name())
+		HDERROR("[%s] unable to detect if there is local data\n", Name());
 	}
 
 	return result;
@@ -246,7 +245,7 @@ status_t
 ServerIconExportUpdateProcess::_Unpack(BPath& tarGzFilePath)
 {
 	status_t result;
-	HDINFO("[%s] delete any existing stored data", Name())
+	HDINFO("[%s] delete any existing stored data", Name());
 	StorageUtils::RemoveDirectoryContents(fLocalIconStoragePath);
 
 	BFile *tarGzFile = new BFile(tarGzFilePath.Path(), O_RDONLY);
@@ -269,17 +268,17 @@ ServerIconExportUpdateProcess::_Unpack(BPath& tarGzFilePath)
 
 		if (result == B_OK) {
 			double secs = watch.ElapsedTime() / 1000000.0;
-			HDINFO("[%s] did unpack icon tgz in (%6.3g secs)", Name(), secs)
+			HDINFO("[%s] did unpack icon tgz in (%6.3g secs)", Name(), secs);
 
 			if (0 != remove(tarGzFilePath.Path())) {
 				HDERROR("[%s] unable to delete the temporary tgz path; %s",
-					Name(), tarGzFilePath.Path())
+					Name(), tarGzFilePath.Path());
 			}
 		}
 	}
 
 	delete tarGzFile;
-	HDINFO("[%s] did complete unpacking icons", Name())
+	HDINFO("[%s] did complete unpacking icons", Name());
 	return result;
 }
 

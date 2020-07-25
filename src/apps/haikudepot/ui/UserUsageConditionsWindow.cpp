@@ -216,7 +216,7 @@ UserUsageConditionsWindow::QuitRequested()
 	if (fWorkerThread == -1)
 		return true;
 	HDINFO("unable to quit when the user usage "
-		"conditions window is still fetching data")
+		"conditions window is still fetching data");
 	return false;
 }
 
@@ -360,7 +360,7 @@ UserUsageConditionsWindow::_FetchUserUsageConditionsCodeForUserPerform(
 	} else {
 		HDERROR("an error has arisen communicating with the"
 			" server to obtain data for a user's user usage conditions"
-			" [%s]", strerror(result))
+			" [%s]", strerror(result));
 		ServerHelper::NotifyTransportError(result);
 	}
 
@@ -368,11 +368,11 @@ UserUsageConditionsWindow::_FetchUserUsageConditionsCodeForUserPerform(
 		BString userUsageConditionsCode = userDetail.Agreement().Code();
 		HDDEBUG("the user [%s] has agreed to uuc [%s]",
 			interface.Nickname().String(),
-			userUsageConditionsCode.String())
+			userUsageConditionsCode.String());
 		code.SetTo(userUsageConditionsCode);
 	} else {
 		HDDEBUG("unable to get details of the user [%s]",
-			interface.Nickname().String())
+			interface.Nickname().String());
 	}
 
 	return result;
@@ -393,9 +393,9 @@ UserUsageConditionsWindow::_NotifyFetchProblem()
 void
 UserUsageConditionsWindow::_SetWorkerThread(thread_id thread)
 {
-	if (!Lock()) {
-		HDERROR("failed to lock window")
-	} else {
+	if (!Lock())
+		HDERROR("failed to lock window");
+	else {
 		fWorkerThread = thread;
 		Unlock();
 	}

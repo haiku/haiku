@@ -334,10 +334,10 @@ Model::~Model()
 }
 
 
-LanguageModel&
+LanguageModel*
 Model::Language()
 {
-	return fLanguageModel;
+	return &fLanguageModel;
 }
 
 
@@ -645,16 +645,16 @@ Model::PopulatePackage(const PackageInfoRef& package, uint32 flags)
 					BString code;
 					if (item.FindString("code", &code) != B_OK) {
 						HDERROR("corrupt user rating at index %" B_PRIi32,
-							index)
+							index);
 						continue;
 					}
 
 					BString user;
 					BMessage userInfo;
 					if (item.FindMessage("user", &userInfo) != B_OK
-						|| userInfo.FindString("nickname", &user) != B_OK) {
+							|| userInfo.FindString("nickname", &user) != B_OK) {
 						HDERROR("ignored user rating [%s] without a user "
-							"nickname", code.String())
+							"nickname", code.String());
 						continue;
 					}
 
@@ -668,7 +668,7 @@ Model::PopulatePackage(const PackageInfoRef& package, uint32 flags)
 						rating = -1;
 					if (comment.Length() == 0 && rating == -1) {
 						HDERROR("rating [%s] has no comment or rating so will"
-							" be ignored", code.String())
+							" be ignored", code.String());
 						continue;
 					}
 
@@ -712,16 +712,15 @@ Model::PopulatePackage(const PackageInfoRef& package, uint32 flags)
 						comment, languageCode, versionString,
 						(uint64) createTimestamp);
 					package->AddUserRating(userRating);
-					HDDEBUG("rating [%s] retrieved from server", code.String())
+					HDDEBUG("rating [%s] retrieved from server", code.String());
 				}
 				HDDEBUG("did retrieve %" B_PRIi32 " user ratings for [%s]",
-						index - 1, packageName.String())
+						index - 1, packageName.String());
 			} else {
 				_MaybeLogJsonRpcError(info, "retrieve user ratings");
 			}
-		} else {
-			HDERROR("unable to retrieve user ratings")
-		}
+		} else
+			HDERROR("unable to retrieve user ratings");
 	}
 
 	if ((flags & POPULATE_SCREEN_SHOTS) != 0) {
@@ -761,16 +760,14 @@ Model::_PopulatePackageChangelog(const PackageInfoRef& package)
 				&& 0 != content.Length()) {
 				BAutolock locker(&fLock);
 				package->SetChangelog(content);
-				HDDEBUG("changelog populated for [%s]", packageName.String())
-			} else {
-				HDDEBUG("no changelog present for [%s]", packageName.String())
-			}
-		} else {
+				HDDEBUG("changelog populated for [%s]", packageName.String());
+			} else
+				HDDEBUG("no changelog present for [%s]", packageName.String());
+		} else
 			_MaybeLogJsonRpcError(info, "populate package changelog");
-		}
 	} else {
 		HDERROR("unable to obtain the changelog for the package [%s]",
-			packageName.String())
+			packageName.String());
 	}
 }
 
@@ -792,14 +789,14 @@ model_remove_key_for_user(const BString& nickname)
 			result = keyStore.RemoveKey(kHaikuDepotKeyring, key);
 			if (result != B_OK) {
 				HDERROR("error occurred when removing password for nickname "
-					"[%s] : %s", nickname.String(), strerror(result))
+					"[%s] : %s", nickname.String(), strerror(result));
 			}
 			break;
 		case B_ENTRY_NOT_FOUND:
 			return;
 		default:
 			HDERROR("error occurred when finding password for nickname "
-				"[%s] : %s", nickname.String(), strerror(result))
+				"[%s] : %s", nickname.String(), strerror(result));
 			break;
 	}
 }
@@ -884,11 +881,11 @@ Model::SetAuthorization(const BString& nickname, const BString& passwordClear,
 */
 
 status_t
-Model::DumpExportRepositoryDataPath(BPath& path) const
+Model::DumpExportRepositoryDataPath(BPath& path)
 {
 	BString leaf;
 	leaf.SetToFormat("repository-all_%s.json.gz",
-		LanguageModel().PreferredLanguage()->Code());
+		Language()->PreferredLanguage()->Code());
 	return StorageUtils::LocalWorkingFilesPath(leaf, path);
 }
 
@@ -899,11 +896,11 @@ Model::DumpExportRepositoryDataPath(BPath& path) const
 */
 
 status_t
-Model::DumpExportReferenceDataPath(BPath& path) const
+Model::DumpExportReferenceDataPath(BPath& path)
 {
 	BString leaf;
 	leaf.SetToFormat("reference-all_%s.json.gz",
-		LanguageModel().PreferredLanguage()->Code());
+		Language()->PreferredLanguage()->Code());
 	return StorageUtils::LocalWorkingFilesPath(leaf, path);
 }
 
@@ -917,11 +914,11 @@ Model::IconStoragePath(BPath& path) const
 
 status_t
 Model::DumpExportPkgDataPath(BPath& path,
-	const BString& repositorySourceCode) const
+	const BString& repositorySourceCode)
 {
 	BString leaf;
 	leaf.SetToFormat("pkg-all-%s-%s.json.gz", repositorySourceCode.String(),
-		LanguageModel().PreferredLanguage()->Code());
+		Language()->PreferredLanguage()->Code());
 	return StorageUtils::LocalWorkingFilesPath(leaf, path);
 }
 
@@ -938,7 +935,7 @@ Model::_PopulatePackageScreenshot(const PackageInfoRef& package,
 		"Screenshots", screenshotCachePath);
 
 	if (result != B_OK) {
-		HDERROR("unable to get the screenshot dir - unable to proceed")
+		HDERROR("unable to get the screenshot dir - unable to proceed");
 		return;
 	}
 
@@ -991,7 +988,7 @@ Model::_PopulatePackageScreenshot(const PackageInfoRef& package,
 	} else {
 		HDERROR("Failed to retrieve screenshot for code '%s' "
 			"at %" B_PRIi32 "x%" B_PRIi32 ".", info.Code().String(),
-			scaledWidth, scaledHeight)
+			scaledWidth, scaledHeight);
 	}
 }
 
@@ -1055,11 +1052,11 @@ Model::LogDepotsWithNoWebAppRepositoryCode() const
 			if (depot.URL().Length() > 0) {
 				HDINFO("depot [%s] (%s) correlates with no repository in the"
 					" the haiku depot server system", depot.Name().String(),
-					depot.URL().String())
+					depot.URL().String());
 			}
 			else {
 				HDINFO("depot [%s] correlates with no repository in the"
-					" the haiku depot server system", depot.Name().String())
+					" the haiku depot server system", depot.Name().String());
 			}
 		}
 	}
@@ -1078,10 +1075,9 @@ Model::_MaybeLogJsonRpcError(const BMessage &responsePayload,
 		&& error.FindString("message", &errorMessage) == B_OK
 		&& error.FindDouble("code", &errorCode) == B_OK) {
 		HDERROR("[%s] --> error : [%s] (%f)", sourceDescription,
-			errorMessage.String(), errorCode)
-	} else {
-		HDERROR("[%s] --> an undefined error has occurred", sourceDescription)
-	}
+			errorMessage.String(), errorCode);
+	} else
+		HDERROR("[%s] --> an undefined error has occurred", sourceDescription);
 }
 
 

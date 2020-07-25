@@ -70,7 +70,7 @@ public:
 								Model();
 	virtual						~Model();
 
-			LanguageModel&		Language();
+			LanguageModel*		Language();
 
 			BLocker*			Lock()
 									{ return &fLock; }
@@ -153,10 +153,10 @@ public:
 									void* context);
 
 			status_t			IconStoragePath(BPath& path) const;
-			status_t			DumpExportReferenceDataPath(BPath& path) const;
-			status_t			DumpExportRepositoryDataPath(BPath& path) const;
+			status_t			DumpExportReferenceDataPath(BPath& path);
+			status_t			DumpExportRepositoryDataPath(BPath& path);
 			status_t			DumpExportPkgDataPath(BPath& path,
-									const BString& repositorySourceCode) const;
+									const BString& repositorySourceCode);
 
 			void				LogDepotsWithNoWebAppRepositoryCode() const;
 

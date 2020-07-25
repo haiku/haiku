@@ -255,7 +255,7 @@ void
 ScreenshotWindow::_DownloadThread()
 {
 	if (!Lock()) {
-		HDERROR("failed to lock screenshot window")
+		HDERROR("failed to lock screenshot window");
 		return;
 	}
 
@@ -268,7 +268,7 @@ ScreenshotWindow::_DownloadThread()
 	Unlock();
 
 	if (screenshotInfos.CountItems() == 0) {
-		HDINFO("package has no screenshots")
+		HDINFO("package has no screenshots");
 		return;
 	}
 
@@ -295,14 +295,13 @@ ScreenshotWindow::_DownloadThread()
 	messenger.SendMessage(MSG_DOWNLOAD_STOP);
 
 	if (status == B_OK && Lock()) {
-		HDINFO("got screenshot")
+		HDINFO("got screenshot");
 		fScreenshot = BitmapRef(new(std::nothrow)SharedBitmap(buffer), true);
 		fScreenshotView->SetBitmap(fScreenshot);
 		_ResizeToFitAndCenter();
 		Unlock();
-	} else {
-		HDERROR("failed to download screenshot")
-	}
+	} else
+		HDERROR("failed to download screenshot");
 }
 
 

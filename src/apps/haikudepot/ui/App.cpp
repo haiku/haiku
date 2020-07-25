@@ -531,7 +531,7 @@ App::_CheckIsFirstRun()
 	status_t status = StorageUtils::LocalWorkingFilesPath("testfile.txt",
 		testFilePath, false);
 	if (status != B_OK) {
-		HDERROR("unable to establish the location of the test file")
+		HDERROR("unable to establish the location of the test file");
 	}
 	else
 		status = StorageUtils::ExistsObject(testFilePath, &exists, NULL, NULL);

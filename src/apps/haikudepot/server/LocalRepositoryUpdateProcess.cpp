@@ -66,7 +66,7 @@ LocalRepositoryUpdateProcess::RunInternal()
 {
 	BPackageRoster roster;
 	BStringList repoNames;
-	HDINFO("[%s] will update local repositories' caches", Name())
+	HDINFO("[%s] will update local repositories' caches", Name());
 
 	status_t result = roster.GetRepositoryNames(repoNames);
 
@@ -90,7 +90,7 @@ LocalRepositoryUpdateProcess::RunInternal()
 
 	if (result == B_OK) {
 		HDINFO("[%s] did update %" B_PRIi32 " local repositories' caches",
-			Name(), repoNames.CountStrings())
+			Name(), repoNames.CountStrings());
 	}
 
 	return result;
@@ -104,24 +104,24 @@ LocalRepositoryUpdateProcess::_ShouldRunForRepositoryName(
 {
 	if (fForce) {
 		HDINFO("[%s] am refreshing cache for repo [%s] as it was forced",
-			Name(), repoName.String())
+			Name(), repoName.String());
 		return true;
 	}
 
 	if (roster.GetRepositoryCache(repoName, cache) != B_OK) {
 		HDINFO("[%s] am updating cache for repo [%s] as there was no cache",
-			Name(), repoName.String())
+			Name(), repoName.String());
 		return true;
 	}
 
 	if (static_cast<App*>(be_app)->IsFirstRun()) {
 		HDINFO("[%s] am updating cache for repo [%s] as this is the first"
-			" time that the application has run", Name(), repoName.String())
+			" time that the application has run", Name(), repoName.String());
 		return true;
 	}
 
 	HDDEBUG("[%s] skipped update local repo [%s] cache", Name(),
-		repoName.String())
+		repoName.String());
 
 	return false;
 }
@@ -169,7 +169,7 @@ LocalRepositoryUpdateProcess::_NotifyError(const BString& error,
 	const BString& details) const
 {
 	HDINFO("an error has arisen updating the local repositories : %s",
-		error.String())
+		error.String());
 
 	BString alertText(B_TRANSLATE("An error occurred while refreshing the "
 		"repository: %error%"));

@@ -26,7 +26,7 @@ TarArchiveService::Unpack(BDataIO& tarDataIo, BPath& targetDirectory,
 	status_t result = B_OK;
 	uint32_t count_items_read = 0;
 
-	HDINFO("will unpack to [%s]", targetDirectory.Path())
+	HDINFO("will unpack to [%s]", targetDirectory.Path());
 
 	memset(zero_buffer, 0, sizeof zero_buffer);
 
@@ -37,14 +37,14 @@ TarArchiveService::Unpack(BDataIO& tarDataIo, BPath& targetDirectory,
 		count_items_read++;
 
 		if (0 == memcmp(zero_buffer, buffer, sizeof zero_buffer)) {
-			HDDEBUG("detected end of tar-ball")
+			HDDEBUG("detected end of tar-ball");
 			return B_OK; // end of tar-ball.
 		} else {
 			TarArchiveHeader* header = TarArchiveHeader::CreateFromBlock(
 				buffer);
 
 			if (NULL == header) {
-				HDERROR("unable to parse a tar header")
+				HDERROR("unable to parse a tar header");
 				result = B_ERROR;
 			}
 
@@ -55,10 +55,10 @@ TarArchiveService::Unpack(BDataIO& tarDataIo, BPath& targetDirectory,
 		}
 	}
 
-	HDERROR("did unpack %d tar items", count_items_read)
+	HDERROR("did unpack %d tar items", count_items_read);
 
 	if (B_OK != result) {
-		HDERROR("error occurred unpacking tar items; %s", strerror(result))
+		HDERROR("error occurred unpacking tar items; %s", strerror(result));
 	}
 
 	return result;
@@ -79,7 +79,7 @@ TarArchiveService::_EnsurePathToTarItemFile(
 		BString component = components.StringAt(i);
 
 		if (_ValidatePathComponent(component) != B_OK) {
-			HDERROR("malformed component; [%s]", component.String())
+			HDERROR("malformed component; [%s]", component.String());
 			return B_ERROR;
 		}
 	}
@@ -109,7 +109,7 @@ TarArchiveService::_UnpackItem(BDataIO& tarDataIo,
 	uint32 entryLength = header.GetLength();
 
 	HDDEBUG("will unpack item [%s] length [%" B_PRIu32 "]b",
-		entryFileName.String(), entryLength)
+		entryFileName.String(), entryLength);
 
 	// if the path ends in "/" then it is a directory and there's no need to
 	// unpack it although if there is a length, it will need to be skipped.
@@ -165,8 +165,9 @@ TarArchiveService::_UnpackItemData(BDataIO& tarDataIo,
 		remainingInItem -= writeFromBuffer;
 	}
 
-	if (result != B_OK)
-		HDERROR("unable to unpack item data to; [%s]", targetFilePath.Path())
+	if (result != B_OK) {
+		HDERROR("unable to unpack item data to; [%s]", targetFilePath.Path());
+	}
 
 	return result;
 }

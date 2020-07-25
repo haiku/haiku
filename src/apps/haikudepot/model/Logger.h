@@ -24,11 +24,11 @@
 
 #define HDLOGPREFIX(L) printf("{%c} ", toupper(Logger::NameForLevel(L)[0]));
 
-#define HDLOG(L, M...) if (Logger::IsLevelEnabled(L)) { \
+#define HDLOG(L, M...) do { if (Logger::IsLevelEnabled(L)) { \
 	HDLOGPREFIX(L) \
 	printf(M); \
 	putchar('\n'); \
-}
+} } while (0)
 
 #define HDINFO(M...) HDLOG(LOG_LEVEL_INFO, M)
 #define HDDEBUG(M...) HDLOG(LOG_LEVEL_DEBUG, M)

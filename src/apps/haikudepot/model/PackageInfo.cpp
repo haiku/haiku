@@ -1176,7 +1176,7 @@ DepotInfo::SyncPackages(const PackageList& otherPackages)
 		}
 		if (!found) {
 			HDINFO("%s: new package: '%s'", fName.String(),
-				otherPackage->Name().String())
+				otherPackage->Name().String());
 			fPackages.Add(otherPackage);
 		}
 	}
@@ -1184,7 +1184,7 @@ DepotInfo::SyncPackages(const PackageList& otherPackages)
 	for (int32 i = packages.CountItems() - 1; i >= 0; i--) {
 		const PackageInfoRef& package = packages.ItemAtFast(i);
 		HDINFO("%s: removing package: '%s'", fName.String(),
-			package->Name().String())
+			package->Name().String());
 		fPackages.Remove(package);
 	}
 }

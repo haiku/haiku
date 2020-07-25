@@ -81,9 +81,8 @@ public:
 			case MSG_UPDATE_PACKAGE:
 			{
 				BString name;
-				if (message->FindString("name", &name) != B_OK) {
-					HDINFO("expected 'name' key on package update message")
-				}
+				if (message->FindString("name", &name) != B_OK)
+					HDINFO("expected 'name' key on package update message");
 				else
 					_HandleUpdatePackage(name);
 				break;
@@ -654,7 +653,7 @@ FeaturedPackagesView::RemovePackage(const PackageInfoRef& package)
 void
 FeaturedPackagesView::Clear()
 {
-	HDINFO("did clear the featured packages view")
+	HDINFO("did clear the featured packages view");
 	fPackagesView->Clear();
 	_AdjustViews();
 }

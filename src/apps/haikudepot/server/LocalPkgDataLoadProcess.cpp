@@ -89,7 +89,7 @@ LocalPkgDataLoadProcess::Description() const
 status_t
 LocalPkgDataLoadProcess::RunInternal()
 {
- 	HDDEBUG("[%s] will refresh the package list", Name())
+ 	HDDEBUG("[%s] will refresh the package list", Name());
  	BPackageRoster roster;
  	BStringList repositoryNames;
 
@@ -110,11 +110,11 @@ LocalPkgDataLoadProcess::RunInternal()
  		if (getRepositoryConfigStatus == B_OK) {
  			depotInfo.SetURL(repoConfig.Identifier());
  			HDDEBUG("[%s] local repository [%s] identifier; [%s]",
- 				Name(), repoName.String(), repoConfig.Identifier().String())
+ 				Name(), repoName.String(), repoConfig.Identifier().String());
  		} else {
  			HDINFO("[%s] unable to obtain the repository config for local "
  				"repository '%s'; %s", Name(),
- 				repoName.String(), strerror(getRepositoryConfigStatus))
+ 				repoName.String(), strerror(getRepositoryConfigStatus));
  		}
 
  		depots[i] = depotInfo;
@@ -221,7 +221,7 @@ LocalPkgDataLoadProcess::RunInternal()
 
  			if (it == depots.end()) {
  				HDDEBUG("pkg [%s] repository [%s] not recognized --> ignored",
- 					modelInfo->Name().String(), repositoryName.String())
+ 					modelInfo->Name().String(), repositoryName.String());
  			} else {
  				it->AddPackage(modelInfo);
  				HDTRACE("pkg [%s] assigned to [%s]",
@@ -352,18 +352,18 @@ LocalPkgDataLoadProcess::RunInternal()
  		}
 	} catch (BFatalErrorException& ex) {
  		HDERROR("Fatal exception occurred while resolving system dependencies: "
- 			"%s, details: %s", strerror(ex.Error()), ex.Details().String())
+ 			"%s, details: %s", strerror(ex.Error()), ex.Details().String());
 	} catch (BNothingToDoException&) {
  		// do nothing
 	} catch (BException& ex) {
  		HDERROR("Exception occurred while resolving system dependencies: %s",
- 			ex.Message().String())
+ 			ex.Message().String());
  	} catch (...) {
  		HDERROR("Unknown exception occurred while resolving system "
- 			"dependencies.")
+ 			"dependencies.");
  	}
 
- 	HDDEBUG("did refresh the package list")
+ 	HDDEBUG("did refresh the package list");
 
  	return B_OK;
 }
@@ -373,7 +373,7 @@ void
 LocalPkgDataLoadProcess::_NotifyError(const BString& messageText) const
 {
 	HDERROR("an error has arisen loading data of packages from local : %s",
-		messageText.String())
+		messageText.String());
 	AppUtils::NotifySimpleError(
 		B_TRANSLATE("Local repository load error"),
 		messageText);

@@ -627,7 +627,7 @@ private:
 			HDERROR("Failed to schedule action: %s '%s': %s",
 				action->Label(),
 				action->Package()->Name().String(),
-				strerror(result))
+				strerror(result));
 			BString message(B_TRANSLATE("The package action "
 				"could not be scheduled: %Error%"));
 			message.ReplaceAll("%Error%", strerror(result));

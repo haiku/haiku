@@ -59,7 +59,7 @@ ToFileUrlProtocolListener::HeadersReceived(BUrlRequest* caller,
 
 	if (!BHttpRequest::IsSuccessStatusCode(statusCode)) {
 		HDINFO("received http status %" B_PRId32
-			" --> will not store download to file", statusCode)
+			" --> will not store download to file", statusCode);
 		fShouldDownload = false;
 	}
 
@@ -83,7 +83,7 @@ ToFileUrlProtocolListener::DataReceived(BUrlRequest* caller, const char* data,
 		} while (remaining > 0 && written > 0);
 
 		if (remaining > 0)
-			HDERROR("unable to write all of the data to the file")
+			HDERROR("unable to write all of the data to the file");
 	}
 }
 
@@ -112,7 +112,7 @@ void
 ToFileUrlProtocolListener::DebugMessage(BUrlRequest* caller,
 	BUrlProtocolDebugMessage type, const char* text)
 {
-	HDTRACE("url->file <%s>; %s", fTraceLoggingIdentifier.String(), text)
+	HDTRACE("url->file <%s>; %s", fTraceLoggingIdentifier.String(), text);
 }
 
 
