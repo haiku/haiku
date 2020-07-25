@@ -57,6 +57,7 @@ class SdhciBus {
 
 	private:
 		struct registers*	fRegisters;
+		uint32_t			fCommandResult;
 		uint8_t				fIrq;
 		sem_id				fSemaphore;
 		status_t			fStatus;
@@ -202,11 +203,12 @@ SdhciBus::ExecuteCommand(uint8_t command, uint32_t argument, uint32_t* response)
 		case 0:
 			replyType = Command::kNoReplyType;
 			break;
-		case 2:
-			replyType = Command::kR2Type;
-			break;
 		case 55:
 			replyType = Command::kR1Type;
+			break;
+		case 2:
+		case 9:
+			replyType = Command::kR2Type;
 			break;
 		case 41: // ACMD
 			replyType = Command::kR3Type;
@@ -225,9 +227,17 @@ SdhciBus::ExecuteCommand(uint8_t command, uint32_t argument, uint32_t* response)
 	fRegisters->command.SendCommand(command, replyType);
 	acquire_sem(fSemaphore);
 
-	if (fRegisters->interrupt_status & SDHCI_INT_ERROR) {
-		fRegisters->interrupt_status |= SDHCI_INT_ERROR;
-		ERROR("Command execution failed\n");
+	if (fCommandResult & SDHCI_INT_ERROR) {
+		fRegisters->interrupt_status |= fCommandResult;
+		if (fCommandResult & SDHCI_INT_TIMEOUT) {
+			ERROR("Command execution timed out\n");
+			return B_TIMED_OUT;
+		}
+		if (fCommandResult & SDHCI_INT_CRC) {
+			ERROR("CRC error\n");
+			return B_BAD_VALUE;
+		}
+		ERROR("Command execution failed %x\n", fCommandResult);
 		// TODO look at errors in interrupt_status register for more details
 		// and return a more appropriate error code
 		return B_ERROR;
@@ -465,13 +475,13 @@ SdhciBus::RecoverError()
 int32
 SdhciBus::HandleInterrupt()
 {
-	uint32_t intmask = fRegisters->slot_interrupt_status;
+	uint32_t intmask = fRegisters->interrupt_status;
 
 	if ((intmask == 0) || (intmask == 0xffffffff)) {
 		return B_UNHANDLED_INTERRUPT;
 	}
 
-	TRACE("interrupt function called\n");
+	TRACE("interrupt function called %x\n", intmask);
 
 	// FIXME use the global "slot interrupt" register to quickly decide if an
 	// interrupt is targetted to this slot
@@ -498,6 +508,8 @@ SdhciBus::HandleInterrupt()
 
 	// handling command interrupt
 	if (intmask & SDHCI_INT_CMD_MASK) {
+		fCommandResult = intmask;
+			// Save the status before clearing so the thhread can handle it
 		fRegisters->interrupt_status |= (intmask & SDHCI_INT_CMD_MASK);
 		// Notify the thread
 		release_sem_etc(fSemaphore, 1, B_DO_NOT_RESCHEDULE);
