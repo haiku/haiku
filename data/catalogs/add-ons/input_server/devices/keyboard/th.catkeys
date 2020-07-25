@@ -1,6 +1,8 @@
-1	thai	x-vnd.Haiku-KeyboardInputServerDevice	2228550365
+1	thai	x-vnd.Haiku-KeyboardInputServerDevice	131044710
 If the application will not quit you may have to kill it.	Team monitor		หากแอปพลิเคชันไม่หยุดการทำงานคุณอาจต้องสั่งหยุด
 Quit application	Team monitor		ออกจากแอปพลิเคชัน
+Open Terminal	Team monitor		เปิดเทอร์มินอล
+{0, plural,one{Hold CONTROL+ALT+DELETE for # second to reboot.}other{Hold CONTROL+ALT+DELETE for # seconds to reboot.}}	Team monitor		{0, plural,one{Hold CONTROL+ALT+DELETE for # second to reboot.}other{Hold CONTROL+ALT+DELETE for # seconds to reboot.}}
 Restart the desktop	Team monitor		เริ่มทำงานเดสก์ท็อปใหม่
 Force reboot	Team monitor		บังคับให้รีบูตใหม่
 Team monitor	Team monitor		ทีมตรวจสอบ

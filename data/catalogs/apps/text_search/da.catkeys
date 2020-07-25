@@ -25,8 +25,8 @@ Copy text to clipboard	GrepWindow		Kopiér tekst til udklipsholderen
 Show lines	GrepWindow		Vis linjer
 Failed to open errors pipe!	Grepper		Kunne ikke åbne fejlledning!
 The unselected files will be removed from the list.	GrepWindow		De ikke-valgte filer vil blive slettet fra listen.
-Skip folders starting with a dot	GrepWindow		Spring de mapper over der starter med et punktum
 Open files in code editor	GrepWindow		Åbn filer i kodeeditor
+Skip folders starting with a dot	GrepWindow		Spring de mapper over der starter med et punktum
 Failed to open output pipe!	Grepper		Kunne ikke åbne outputledning!
 Cancel	GrepWindow		Annuller
 History	GrepWindow		Historie

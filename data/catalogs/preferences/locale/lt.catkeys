@@ -1,31 +1,29 @@
-1	lithuanian	x-vnd.Haiku-Locale	1488345554
-Available languages	Locale Preflet Window		Galimos kalbos
-Negative:	TimeFormatSettings		Neigiami:
-already chosen	LanguageListView		jau pasirinkta
-Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Nepavyko rasti prieinamų kalbų! Šiuo valdymo skydeliu pasinaudoti nepavyks!
-Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Kad šis pakeitimas įsigaliotų, reikia perleisti užduočių juostą ir Pėdsekį. Ar norite juos perleisti dabar?
-Long format:	TimeFormatSettings		Ilgasis formatas:
-Currency	TimeFormatSettings		Valiuta
-Locale	System name		Lokalė
-Short format:	TimeFormatSettings		Trumpasis formatas:
-Language	Locale Preflet Window		Kalba
-Preferred languages	Locale Preflet Window		Pageidautinos kalbos
-Use month/day-names from preferred language	TimeFormatSettings		Mėnesių ir dienų pavadinimus rašyti pageidautina kalba
-Formatting	Locale Preflet Window		Formatai
-Locale	Locale Preflet Window		Lokalė
-Numbers	TimeFormatSettings		Skaičiai
-24 hour	TimeFormatSettings		24 valandų
-OK	Locale Preflet Window		Gerai
-Restart	Locale Preflet Window		Perleisti
-Full format:	TimeFormatSettings		Pilnasis formatas:
-Defaults	Locale Preflet Window		Numatytai
-Cancel	Locale Preflet Window		Atsisakyti
-Translate application and folder names in Deskbar and Tracker.	Locale Preflet Window		Užduočių juostoje ir Pėdsekyje rodyti išverstus programų ir aplankų pavadinimus.
-Revert	Locale Preflet Window		Atšaukti pakeitimus
+1	lithuanian	x-vnd.Haiku-Locale	288870027
 Medium format:	TimeFormatSettings		Vidutinis formatas:
-12 hour	TimeFormatSettings		12 valandų
+Negative:	TimeFormatSettings		Neigiami:
+Language	Locale Preflet Window		Kalba
+Short format:	TimeFormatSettings		Trumpasis formatas:
+24 hour	TimeFormatSettings		24 valandų
+Locale	Locale Preflet Window		Lokalė
 Time	TimeFormatSettings		Laikas
+Defaults	Locale Preflet Window		Numatytai
+Locale	System name		Lokalė
 Date	TimeFormatSettings		Data
-Positive:	TimeFormatSettings		Teigiami:
+OK	Locale Preflet Window		Gerai
+Long format:	TimeFormatSettings		Ilgasis formatas:
+Numbers	TimeFormatSettings		Skaičiai
+Available languages	Locale Preflet Window		Galimos kalbos
 Locale	Locale Preflet		Lokalė
-Options	Locale Preflet Window		Parinktys
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Nepavyko rasti prieinamų kalbų! Šiuo valdymo skydeliu pasinaudoti nepavyks!
+Formatting	Locale Preflet Window		Formatai
+Use month/day-names from preferred language	TimeFormatSettings		Mėnesių ir dienų pavadinimus rašyti pageidautina kalba
+already chosen	LanguageListView		jau pasirinkta
+Preferred languages	Locale Preflet Window		Pageidautinos kalbos
+Full format:	TimeFormatSettings		Pilnasis formatas:
+Cancel	Locale Preflet Window		Atsisakyti
+Revert	Locale Preflet Window		Atšaukti pakeitimus
+12 hour	TimeFormatSettings		12 valandų
+Positive:	TimeFormatSettings		Teigiami:
+Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Kad šis pakeitimas įsigaliotų, reikia perleisti užduočių juostą ir Pėdsekį. Ar norite juos perleisti dabar?
+Restart	Locale Preflet Window		Perleisti
+Currency	TimeFormatSettings		Valiuta

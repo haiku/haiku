@@ -1,31 +1,29 @@
-1	belarusian	x-vnd.Haiku-Locale	1488345554
-Available languages	Locale Preflet Window		Наяўныя мовы
-Negative:	TimeFormatSettings		Адмоўна:
-already chosen	LanguageListView		ужо выбрана
-Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Спіс наяўных моваў не знойдзены! Немагчыма запусціць канфігурацыйную праграму!
-Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Дзеля таго, каб выкарыстаць гэтыя наладки Дэскбар і Тракер павінны быць перазапушчаны. Жадаеце перазапусціць іх зараз жа?
-Long format:	TimeFormatSettings		Доўгі фармат:
-Currency	TimeFormatSettings		Валюта
-Locale	System name		Лакаль
-Short format:	TimeFormatSettings		Скарочаны фармат:
-Language	Locale Preflet Window		Мова
-Preferred languages	Locale Preflet Window		Пажаданыя мовы
-Use month/day-names from preferred language	TimeFormatSettings		Ужываць імены месяцоў і дзён з пажаданай мовы
-Formatting	Locale Preflet Window		Фарматаванне
-Locale	Locale Preflet Window		Лакаль
-Numbers	TimeFormatSettings		Лічбы
-24 hour	TimeFormatSettings		24 гадзіны
-OK	Locale Preflet Window		ОК
-Restart	Locale Preflet Window		Перазапусціць
-Full format:	TimeFormatSettings		Поўны фармат:
-Defaults	Locale Preflet Window		Прадвызначаныя
-Cancel	Locale Preflet Window		Скасаваць
-Translate application and folder names in Deskbar and Tracker.	Locale Preflet Window		Выкарыстоўваць лакалізаваныя імёны праграм і папак у Дэскбары і Тракеры.
-Revert	Locale Preflet Window		Вярнуць
+1	belarusian	x-vnd.Haiku-Locale	288870027
 Medium format:	TimeFormatSettings		Сярэдні фармат:
-12 hour	TimeFormatSettings		12 гадзін
+Negative:	TimeFormatSettings		Адмоўна:
+Language	Locale Preflet Window		Мова
+Short format:	TimeFormatSettings		Скарочаны фармат:
+24 hour	TimeFormatSettings		24 гадзіны
+Locale	Locale Preflet Window		Лакаль
 Time	TimeFormatSettings		Час
+Defaults	Locale Preflet Window		Прадвызначаныя
+Locale	System name		Лакаль
 Date	TimeFormatSettings		Дата
-Positive:	TimeFormatSettings		Станоўча:
+OK	Locale Preflet Window		ОК
+Long format:	TimeFormatSettings		Доўгі фармат:
+Numbers	TimeFormatSettings		Лічбы
+Available languages	Locale Preflet Window		Наяўныя мовы
 Locale	Locale Preflet		Лакаль
-Options	Locale Preflet Window		Наладкі
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Спіс наяўных моваў не знойдзены! Немагчыма запусціць канфігурацыйную праграму!
+Formatting	Locale Preflet Window		Фарматаванне
+Use month/day-names from preferred language	TimeFormatSettings		Ужываць імены месяцоў і дзён з пажаданай мовы
+already chosen	LanguageListView		ужо выбрана
+Preferred languages	Locale Preflet Window		Пажаданыя мовы
+Full format:	TimeFormatSettings		Поўны фармат:
+Cancel	Locale Preflet Window		Скасаваць
+Revert	Locale Preflet Window		Вярнуць
+12 hour	TimeFormatSettings		12 гадзін
+Positive:	TimeFormatSettings		Станоўча:
+Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Дзеля таго, каб выкарыстаць гэтыя наладки Дэскбар і Тракер павінны быць перазапушчаны. Жадаеце перазапусціць іх зараз жа?
+Restart	Locale Preflet Window		Перазапусціць
+Currency	TimeFormatSettings		Валюта

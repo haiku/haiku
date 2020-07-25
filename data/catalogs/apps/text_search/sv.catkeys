@@ -25,8 +25,8 @@ Copy text to clipboard	GrepWindow		Kopiera text till urklipp
 Show lines	GrepWindow		Visa rader
 Failed to open errors pipe!	Grepper		Misslyckades med att öppna feldataenhet!
 The unselected files will be removed from the list.	GrepWindow		De omarkerade filerna kommer att tas bort från listan.
-Skip folders starting with a dot	GrepWindow		Hoppa över dolda mappar
 Open files in code editor	GrepWindow		Öppna filer i kodeditor
+Skip folders starting with a dot	GrepWindow		Hoppa över dolda mappar
 Failed to open output pipe!	Grepper		Misslyckades med att öppna utdataenhet!
 Cancel	GrepWindow		Avbryt
 History	GrepWindow		Historik

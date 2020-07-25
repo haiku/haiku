@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-CharacterMap	3116961068
+1	thai	x-vnd.Haiku-CharacterMap	819222825
 Tirhuta	UnicodeBlocks		Tirhuta
 Miscellaneous mathematical symbols B	UnicodeBlocks		สัญลักษณ์ทางคณิตศาสตร์เบ็ดเตล็ด B
 Latin extended E	UnicodeBlocks		Latin ขยาย E
@@ -151,7 +151,9 @@ Ideographic description characters	UnicodeBlocks		อักขระคำอธ
 Supplemental arrows A	UnicodeBlocks		ลูกศร A เพิ่มเติม
 Rejang	UnicodeBlocks		Rejang
 Number forms	UnicodeBlocks		รูปแบบตัวเลข
+Avestan	UnicodeBlocks		อเวสตะ
 Latin extended A	UnicodeBlocks		ละติน ขยาย A
+Zanabazar Square	UnicodeBlocks		Zanabazar Square
 Sundanese	UnicodeBlocks		ซูดาน
 Geometric shapes	UnicodeBlocks		รูปทรงเรขาคณิต
 Clear	CharacterWindow		ใส

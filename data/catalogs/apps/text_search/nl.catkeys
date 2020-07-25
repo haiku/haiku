@@ -25,8 +25,8 @@ Copy text to clipboard	GrepWindow		Kopieer de tekst naar het klembord
 Show lines	GrepWindow		Toon regels
 Failed to open errors pipe!	Grepper		Het openen van de foutpijp is mislukt!
 The unselected files will be removed from the list.	GrepWindow		De niet-geselecteerde bestanden zullen van de lijst verwijderd worden.
-Skip folders starting with a dot	GrepWindow		Mappen overslaan die met een punt (.) beginnen
 Open files in code editor	GrepWindow		Bestanden in codebewerker openen
+Skip folders starting with a dot	GrepWindow		Mappen overslaan die met een punt (.) beginnen
 Failed to open output pipe!	Grepper		Het openen van de uitvoerpijp is mislukt!
 Cancel	GrepWindow		Annuleren
 History	GrepWindow		Geschiedenis

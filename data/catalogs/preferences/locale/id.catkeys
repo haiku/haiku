@@ -1,31 +1,29 @@
-1	indonesian	x-vnd.Haiku-Locale	1488345554
-Available languages	Locale Preflet Window		Bahasa yang tersedia
-Negative:	TimeFormatSettings		Negatif:
-already chosen	LanguageListView		sudah dipilih
-Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Tidak dapat menemukan bahasa yang tersedia! Anda tidak dapat menggunakan preflet ini
-Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Deskbar dan Tracker perlu di-restart agar perubahan ini berlaku. Apakah Anda ingin me-restart mereka sekarang?
-Long format:	TimeFormatSettings		Format panjang:
-Currency	TimeFormatSettings		Mata uang
-Locale	System name		Lokal
-Short format:	TimeFormatSettings		Format pendek:
-Language	Locale Preflet Window		Bahasa
-Preferred languages	Locale Preflet Window		Bahasa yang diinginkan
-Use month/day-names from preferred language	TimeFormatSettings		Gunakan nama bulan/hari dari bahasa yang diinginkan
-Formatting	Locale Preflet Window		Memformat
-Locale	Locale Preflet Window		Lokal
-Numbers	TimeFormatSettings		Angka-angka
-24 hour	TimeFormatSettings		24 jam
-OK	Locale Preflet Window		OK
-Restart	Locale Preflet Window		Restart
-Full format:	TimeFormatSettings		Format lengkap:
-Defaults	Locale Preflet Window		Defaults
-Cancel	Locale Preflet Window		Batal
-Translate application and folder names in Deskbar and Tracker.	Locale Preflet Window		Menerjemahkan aplikasi dan nama folder di Deskbar dan Tracker.
-Revert	Locale Preflet Window		Kembali
+1	indonesian	x-vnd.Haiku-Locale	288870027
 Medium format:	TimeFormatSettings		Format sedang:
-12 hour	TimeFormatSettings		12 jam
+Negative:	TimeFormatSettings		Negatif:
+Language	Locale Preflet Window		Bahasa
+Short format:	TimeFormatSettings		Format pendek:
+24 hour	TimeFormatSettings		24 jam
+Locale	Locale Preflet Window		Lokal
 Time	TimeFormatSettings		Jam
+Defaults	Locale Preflet Window		Defaults
+Locale	System name		Lokal
 Date	TimeFormatSettings		Tanggal
-Positive:	TimeFormatSettings		Positif:
+OK	Locale Preflet Window		OK
+Long format:	TimeFormatSettings		Format panjang:
+Numbers	TimeFormatSettings		Angka-angka
+Available languages	Locale Preflet Window		Bahasa yang tersedia
 Locale	Locale Preflet		Lokal
-Options	Locale Preflet Window		Pilihan
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Tidak dapat menemukan bahasa yang tersedia! Anda tidak dapat menggunakan preflet ini
+Formatting	Locale Preflet Window		Memformat
+Use month/day-names from preferred language	TimeFormatSettings		Gunakan nama bulan/hari dari bahasa yang diinginkan
+already chosen	LanguageListView		sudah dipilih
+Preferred languages	Locale Preflet Window		Bahasa yang diinginkan
+Full format:	TimeFormatSettings		Format lengkap:
+Cancel	Locale Preflet Window		Batal
+Revert	Locale Preflet Window		Kembali
+12 hour	TimeFormatSettings		12 jam
+Positive:	TimeFormatSettings		Positif:
+Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Deskbar dan Tracker perlu di-restart agar perubahan ini berlaku. Apakah Anda ingin me-restart mereka sekarang?
+Restart	Locale Preflet Window		Restart
+Currency	TimeFormatSettings		Mata uang

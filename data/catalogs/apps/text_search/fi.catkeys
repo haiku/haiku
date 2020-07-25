@@ -25,8 +25,8 @@ Copy text to clipboard	GrepWindow		Kopioi teksti leikepöydälle
 Show lines	GrepWindow		Näytä rivit
 Failed to open errors pipe!	Grepper		Virheputken avaaminen epäonnistui!
 The unselected files will be removed from the list.	GrepWindow		Valitsemattomat tiedostot poistetaan luettelosta.
-Skip folders starting with a dot	GrepWindow		Ohita kansiot, joiden nimet alkavat pisteellä
 Open files in code editor	GrepWindow		Avaa tiedostot koodieditorissa
+Skip folders starting with a dot	GrepWindow		Ohita kansiot, joiden nimet alkavat pisteellä
 Failed to open output pipe!	Grepper		Tulostusputken avaaminen epäonnistui!
 Cancel	GrepWindow		Peru
 History	GrepWindow		Historia

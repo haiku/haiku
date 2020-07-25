@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-FirstBootPrompt	2670843542
+1	esperanto	x-vnd.Haiku-FirstBootPrompt	2813539172
 Japanese	KeymapNames		Japana
 US	KeymapNames		Usona
 Esperanto	KeymapNames		Esperanta
@@ -30,7 +30,6 @@ Thai (TIS-820.2538)	KeymapNames		Taja (TIS-820.2538)
 Colemak	KeymapNames		Colemak
 Dvorak (programmer's)	KeymapNames		Dvorak (por programistoj)
 Russian (Mac)	KeymapNames		Rusa (Makintoŝa)
-Thank you for trying out Haiku! We hope you'll like it!\n\nYou can select your preferred language and keyboard layout from the list on the left which will then be used instantly. You can easily change both settings from the Desktop later on on the fly.\n\nDo you wish to run the Installer or continue booting to the Desktop?\n	BootPromptWindow	For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	Ni dankas vin pro vi provas Haiku-on! Ni esperas ke vi ŝatos ĝin!\n\nVi povas elekti vian preferatan lingvon kaj klavaran aranĝon el la maldekstra listo, kiuj estos tuj uzataj. Vi povos facile ŝanĝi ambaŭ opciojn el la Laborstrio pli malfrue dinamike.\n\nĈu vi volas lanĉi la Instalilon aŭ daŭre praŝargi en medion de labortablo?\n\nNoto: Tradukado de Hakiu-aj programoj kaj aliaj eroj estas daŭranta klopodo. Vi ofte renkontos netradukitajn ĉenojn, sed se vi volus, vi povus partopreni la laboron ĉe <www.haiku-os.org>.\n
 German (Mac)	KeymapNames		Germana (Makintoŝa)
 Arabic (102)	KeymapNames		Araba (102)
 Belarusian (Latin)	KeymapNames		Belorusa (Latina)

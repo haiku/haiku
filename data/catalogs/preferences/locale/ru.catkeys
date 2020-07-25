@@ -1,31 +1,29 @@
-1	russian	x-vnd.Haiku-Locale	1488345554
-Available languages	Locale Preflet Window		Доступные языки
-Negative:	TimeFormatSettings		Отрицательные:
-already chosen	LanguageListView		уже выбран
-Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Не удаётся найти доступные языки! Вы не можете использовать данные настройки!
-Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Чтобы изменения вступили в силу необходимо перезапустить Deskbar и Tracker. Перезапустить их сейчас?
-Long format:	TimeFormatSettings		Длинный формат:
-Currency	TimeFormatSettings		Валюта
-Locale	System name		Локаль
-Short format:	TimeFormatSettings		Короткий формат:
-Language	Locale Preflet Window		Язык
-Preferred languages	Locale Preflet Window		Предпочитаемые языки
-Use month/day-names from preferred language	TimeFormatSettings		Использовать названия месяцев/дней из предпочитаемого языка
-Formatting	Locale Preflet Window		Форматирование
-Locale	Locale Preflet Window		Локаль
-Numbers	TimeFormatSettings		Числа
-24 hour	TimeFormatSettings		24 часовой формат
-OK	Locale Preflet Window		ОК
-Restart	Locale Preflet Window		Перезапустить
-Full format:	TimeFormatSettings		Полный формат:
-Defaults	Locale Preflet Window		По умолчанию
-Cancel	Locale Preflet Window		Отмена
-Translate application and folder names in Deskbar and Tracker.	Locale Preflet Window		Переводить имена приложений и папок в Deskbar и Tracker.
-Revert	Locale Preflet Window		Вернуть
+1	russian	x-vnd.Haiku-Locale	288870027
 Medium format:	TimeFormatSettings		Средний формат:
-12 hour	TimeFormatSettings		12 часовой формат
+Negative:	TimeFormatSettings		Отрицательные:
+Language	Locale Preflet Window		Язык
+Short format:	TimeFormatSettings		Короткий формат:
+24 hour	TimeFormatSettings		24 часовой формат
+Locale	Locale Preflet Window		Локаль
 Time	TimeFormatSettings		Время
+Defaults	Locale Preflet Window		По умолчанию
+Locale	System name		Локаль
 Date	TimeFormatSettings		Дата
-Positive:	TimeFormatSettings		Положительные:
+OK	Locale Preflet Window		ОК
+Long format:	TimeFormatSettings		Длинный формат:
+Numbers	TimeFormatSettings		Числа
+Available languages	Locale Preflet Window		Доступные языки
 Locale	Locale Preflet		Локаль
-Options	Locale Preflet Window		Настройки
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Не удаётся найти доступные языки! Вы не можете использовать данные настройки!
+Formatting	Locale Preflet Window		Форматирование
+Use month/day-names from preferred language	TimeFormatSettings		Использовать названия месяцев/дней из предпочитаемого языка
+already chosen	LanguageListView		уже выбран
+Preferred languages	Locale Preflet Window		Предпочитаемые языки
+Full format:	TimeFormatSettings		Полный формат:
+Cancel	Locale Preflet Window		Отмена
+Revert	Locale Preflet Window		Вернуть
+12 hour	TimeFormatSettings		12 часовой формат
+Positive:	TimeFormatSettings		Положительные:
+Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Чтобы изменения вступили в силу необходимо перезапустить Deskbar и Tracker. Перезапустить их сейчас?
+Restart	Locale Preflet Window		Перезапустить
+Currency	TimeFormatSettings		Валюта

@@ -25,8 +25,8 @@ Copy text to clipboard	GrepWindow		Copiază text la clipboard
 Show lines	GrepWindow		Afișează linii
 Failed to open errors pipe!	Grepper		Nu s-a putut deschide canalul de erori!
 The unselected files will be removed from the list.	GrepWindow		Fișierele neselectate vor fi eliminate din listă.
-Skip folders starting with a dot	GrepWindow		Omite dosarele care încep cu un punct
 Open files in code editor	GrepWindow		Deschide fișierele în editorul de cod
+Skip folders starting with a dot	GrepWindow		Omite dosarele care încep cu un punct
 Failed to open output pipe!	Grepper		Nu s-a putut deschide canalul de ieșire!
 Cancel	GrepWindow		Anulează
 History	GrepWindow		Istoric

@@ -1,31 +1,29 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Locale	1488345554
-Available languages	Locale Preflet Window		Διαθέσιμες γλώσσες
-Negative:	TimeFormatSettings		Αρνητικό:
-already chosen	LanguageListView		ήδη επιλεγμένο
-Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Αδύνατο να βρεθούν διαθέσιμες γλώσσες! Δεν μπορείτε να χρησιμοποιήσετε αυτό το βοηθητικό πρόγραμμα!
-Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Για να εφαρμοστούν οι αλλαγές, χρειάζεται η επανεκκίνηση της Γραμμής Εργασιών και του Tracker. Θέλετε να γίνει η επανεκκίνηση τώρα;
-Long format:	TimeFormatSettings		Μεγάλη διάταξη:
-Currency	TimeFormatSettings		Νόμισμα
-Locale	System name		Γλώσσα
-Short format:	TimeFormatSettings		Μικρή διάταξη:
-Language	Locale Preflet Window		Γλώσσα
-Preferred languages	Locale Preflet Window		Προτεινόμενες γλώσσες
-Use month/day-names from preferred language	TimeFormatSettings		Χρήση ονομάτων μηνών/μερών από την προτιμούμενη γλώσσα
-Formatting	Locale Preflet Window		Μορφοποίηση
-Locale	Locale Preflet Window		Γλώσσα
-Numbers	TimeFormatSettings		Νούμερα
-24 hour	TimeFormatSettings		24 ωρη μορφή
-OK	Locale Preflet Window		Εντάξει
-Restart	Locale Preflet Window		Επανεκκίνηση
-Full format:	TimeFormatSettings		Πλήρη μορφή:
-Defaults	Locale Preflet Window		Προεπιλογές
-Cancel	Locale Preflet Window		Άκυρο
-Translate application and folder names in Deskbar and Tracker.	Locale Preflet Window		Μετάφραση ονομάτων εφαρμογών και φακέλων σε Γραμμή Εργασιών και Tracker.
-Revert	Locale Preflet Window		Επαναφορά
+1	greek, modern (1453-)	x-vnd.Haiku-Locale	288870027
 Medium format:	TimeFormatSettings		Μερική μορφή:
-12 hour	TimeFormatSettings		12-ωρη μορφή
+Negative:	TimeFormatSettings		Αρνητικό:
+Language	Locale Preflet Window		Γλώσσα
+Short format:	TimeFormatSettings		Μικρή διάταξη:
+24 hour	TimeFormatSettings		24 ωρη μορφή
+Locale	Locale Preflet Window		Γλώσσα
 Time	TimeFormatSettings		Ώρα
+Defaults	Locale Preflet Window		Προεπιλογές
+Locale	System name		Γλώσσα
 Date	TimeFormatSettings		Ημερομηνία
-Positive:	TimeFormatSettings		Θετικό:
+OK	Locale Preflet Window		Εντάξει
+Long format:	TimeFormatSettings		Μεγάλη διάταξη:
+Numbers	TimeFormatSettings		Νούμερα
+Available languages	Locale Preflet Window		Διαθέσιμες γλώσσες
 Locale	Locale Preflet		Τοποθεσία
-Options	Locale Preflet Window		Επιλογές
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Αδύνατο να βρεθούν διαθέσιμες γλώσσες! Δεν μπορείτε να χρησιμοποιήσετε αυτό το βοηθητικό πρόγραμμα!
+Formatting	Locale Preflet Window		Μορφοποίηση
+Use month/day-names from preferred language	TimeFormatSettings		Χρήση ονομάτων μηνών/μερών από την προτιμούμενη γλώσσα
+already chosen	LanguageListView		ήδη επιλεγμένο
+Preferred languages	Locale Preflet Window		Προτεινόμενες γλώσσες
+Full format:	TimeFormatSettings		Πλήρη μορφή:
+Cancel	Locale Preflet Window		Άκυρο
+Revert	Locale Preflet Window		Επαναφορά
+12 hour	TimeFormatSettings		12-ωρη μορφή
+Positive:	TimeFormatSettings		Θετικό:
+Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Για να εφαρμοστούν οι αλλαγές, χρειάζεται η επανεκκίνηση της Γραμμής Εργασιών και του Tracker. Θέλετε να γίνει η επανεκκίνηση τώρα;
+Restart	Locale Preflet Window		Επανεκκίνηση
+Currency	TimeFormatSettings		Νόμισμα

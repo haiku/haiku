@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-WebPositive	55235296
+1	catalan; valencian	x-vnd.Haiku-WebPositive	1591513524
 Authentication required	Authentication Panel		Cal autenticació
 Previous	WebPositive Window		Anterior
 (Finish: %date)	Download Window		(Acabament: %date)
@@ -129,6 +129,7 @@ Double-click or middle-click to open new tab.	Tab Manager		Feu clic doble o feu 
 Next	WebPositive Window		Següent
 Bookmark error	WebPositive Window		Error d'adreça d'interès
 OK	WebPositive Window		D'acord
+(%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% de %expectedSize%, %rate%/s)
 WebPositive	Download Window		WebPositive
 Zoom text only	WebPositive Window		Amplia només el text
 Save page as…	WebPositive Window		Desa la pàgina com a...

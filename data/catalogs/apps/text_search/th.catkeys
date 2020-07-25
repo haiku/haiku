@@ -25,8 +25,8 @@ Copy text to clipboard	GrepWindow		คัดลอกข้อความไป
 Show lines	GrepWindow		แสดงบรรทัด
 Failed to open errors pipe!	Grepper		ไม่สามารถเปิดเชื่อมโยงสองโปรแกรมมีข้อผิดพลาด!
 The unselected files will be removed from the list.	GrepWindow		ไฟล์ที่ไม่ได้เลือกจะถูกลบออกจากรายการ
-Skip folders starting with a dot	GrepWindow		ข้ามโฟลเดอร์ที่ขึ้นต้นด้วยจุด
 Open files in code editor	GrepWindow		เปิดไฟล์ในโปรแกรมแก้ไขรหัส
+Skip folders starting with a dot	GrepWindow		ข้ามโฟลเดอร์ที่ขึ้นต้นด้วยจุด
 Failed to open output pipe!	Grepper		ไม่สามารถเปิดเอาท์พุธเชื่อมโยงสองโปรแกรม!
 Cancel	GrepWindow		ยกเลิก
 History	GrepWindow		ประวัติ

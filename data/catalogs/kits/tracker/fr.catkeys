@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	841158492
+1	french	x-vnd.Haiku-libtracker	2992815268
 Created	ContainerWindow		Créé
 Icon	AttributesView		Icône
 Open and make preferred	OpenWithWindow		Ouvrir et en faire la préférence
@@ -40,6 +40,7 @@ Small bitmap icon	AttributesView		Petite icône bitmap
 Would you like to find a suitable application to open the file?	FSUtils		Souhaitez-vous rechercher une application appropriée pour ouvrir le fichier ?
 64 x 64	ContainerWindow		64 x 64
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Vous ne pouvez pas remplacer un dossier ou un lien symbolique par un fichier.
+{0, plural, other{<# dates>}}	AttributesView		{0, plural, one{<# date>} other{<# dates>}}
 Trailing \\.	libtracker		Les \\ à la fin.
 At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Dans %func\nfind_directory() a échoué.\nMotif : %error
 Handles any file	OpenWithWindow		Manipule n’importe quel fichier
@@ -92,6 +93,7 @@ Atom	AttributesView		Atomique
 %SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%SizeProcessed sur %TotalSize, %BytesPerSecond/s
 Preparing to restore items…	StatusWindow		Restauration des éléments en préparation...
 Mount	ContainerWindow		Monter
+{0, plural, other{<# rectangles>}}	AttributesView		{0, plural, one{<# rectangle>} other{<# rectangles>}}
 Desktop	B_DESKTOP_DIRECTORY		Bureau
 Corrupted pointers.	libtracker		Pointeurs corrompus.
 Link to:	InfoWindow		Lier à :
@@ -179,6 +181,7 @@ MIME Type	AttributesView		Type MIME
 Show folder location in title tab	SettingsView		Afficher l’emplacement du dossier dans la barre de titre
 There was an error resolving the link.	Tracker		Une erreur est survenue lors de la résolution du lien.
 There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Un problème est survenu lors de l’enregistrement dans le dossier que vous avez indiqué. Veuillez en essayer un autre.
+{0, plural, other{<# values>}}	AttributesView		{0, plural, one{<# valeur>} other{<# valeurs>}}
 Desktop	TrackerSettingsWindow		Bureau
 Nested *?+.	libtracker		Les *?+ imbriqués.
 Move	FSUtils	button label	Déplacer
@@ -342,6 +345,7 @@ Save	FilePanelPriv		Sauvegarder
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Impossible d’ouvrir « %document » avec l’application « %app » (Il manque la bibliothèque : %library).\n
 Finish: %time	StatusWindow		Fin : %time
 after	FindPanel		après
+{0, plural, one{<# data byte>} other{<# bytes of data>}}	AttributesView		{0, plural, one{<# octet de données>} other{<# octets de données>}}
 Version	OpenWithWindow		Version
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Certains des éléments sélectionnés ne peuvent pas être envoyés à la Corbeille. Voulez vous les supprimer ? (Cette opération est irrémédiable.)
 Add printer…	ContainerWindow		Ajouter une imprimante…

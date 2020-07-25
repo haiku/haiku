@@ -25,8 +25,8 @@ Copy text to clipboard	GrepWindow		Copier le texte dans le presse-papier
 Show lines	GrepWindow		Montrer les lignes
 Failed to open errors pipe!	Grepper		Impossible d’ouvrir le flux d’erreur !
 The unselected files will be removed from the list.	GrepWindow		Les fichiers non-sélectionnés seront retirés de la liste.
-Skip folders starting with a dot	GrepWindow		Ignorer les dossiers commençant par un point
 Open files in code editor	GrepWindow		Ouvrir les fichiers dans l’éditeur de code
+Skip folders starting with a dot	GrepWindow		Ignorer les dossiers commençant par un point
 Failed to open output pipe!	Grepper		Impossible d’ouvrir le flux de sortie !
 Cancel	GrepWindow		Annuler
 History	GrepWindow		Historique

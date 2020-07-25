@@ -25,8 +25,8 @@ Copy text to clipboard	GrepWindow		Copie il test tes notis
 Show lines	GrepWindow		Mostre riis
 Failed to open errors pipe!	Grepper		No si è rivâts a vierzi il condot/pipe dai erôrs!
 The unselected files will be removed from the list.	GrepWindow		I file no selezionâts a vignaran gjavâts de liste.
-Skip folders starting with a dot	GrepWindow		Salte lis cartelis che a tachin cuntun pont
 Open files in code editor	GrepWindow		Vierç i file tal editôr di codiç
+Skip folders starting with a dot	GrepWindow		Salte lis cartelis che a tachin cuntun pont
 Failed to open output pipe!	Grepper		No si è rivâts a vierzi il condot/pipe di jessude!
 Cancel	GrepWindow		Anule
 History	GrepWindow		Cronologjie

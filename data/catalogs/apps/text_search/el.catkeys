@@ -25,8 +25,8 @@ Copy text to clipboard	GrepWindow		Αντιγραφή κειμένου στο π
 Show lines	GrepWindow		Εμφάνιση γραμμών
 Failed to open errors pipe!	Grepper		Απέτυχε το άνοιγμα σωλήνα σφαλμάτων!
 The unselected files will be removed from the list.	GrepWindow		Τα αρχεία που δεν έχουν επιλεχθεί θα διαγραφούν από τη λίστα.
-Skip folders starting with a dot	GrepWindow		Παρέκαμψε τους φακέλους που ξεκινούν με μια τελεία
 Open files in code editor	GrepWindow		Άνοιγμα αρχείων σε επεξεργαστή κώδικα
+Skip folders starting with a dot	GrepWindow		Παρέκαμψε τους φακέλους που ξεκινούν με μια τελεία
 Failed to open output pipe!	Grepper		Απέτυχε το άνοιγμα σωλήνα εξόδου!
 Cancel	GrepWindow		Άκυρο
 History	GrepWindow		Ιστορικό

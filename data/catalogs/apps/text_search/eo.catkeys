@@ -25,8 +25,8 @@ Copy text to clipboard	GrepWindow		Kopii tekston en tondujon
 Show lines	GrepWindow		Montri linojn
 Failed to open errors pipe!	Grepper		Malsukcesis uzi la dukton de eraroj!
 The unselected files will be removed from the list.	GrepWindow		La malelektata dosieroj estos forigata for la listo.
-Skip folders starting with a dot	GrepWindow		Malatenti dosierujon antaŭatajn per punkto
 Open files in code editor	GrepWindow		Uzi dosierojn per la koda redaktilo.
+Skip folders starting with a dot	GrepWindow		Malatenti dosierujon antaŭatajn per punkto
 Failed to open output pipe!	Grepper		Malsukcesis uzi la eligan dukton!
 Cancel	GrepWindow		Nuligi
 History	GrepWindow		Historio

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-WebPositive	55235296
+1	japanese	x-vnd.Haiku-WebPositive	1591513524
 Authentication required	Authentication Panel		認証が必要です
 Previous	WebPositive Window		前へ
 (Finish: %date)	Download Window		(完了: %date)
@@ -129,6 +129,7 @@ Double-click or middle-click to open new tab.	Tab Manager		ダブルクリック
 Next	WebPositive Window		次へ
 Bookmark error	WebPositive Window		ブックマークエラー
 OK	WebPositive Window		OK
+(%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% / %expectedSize%, %rate%/s)
 WebPositive	Download Window		WebPositive
 Zoom text only	WebPositive Window		文字サイズのみ変更
 Save page as…	WebPositive Window		名前を付けてページを保存…

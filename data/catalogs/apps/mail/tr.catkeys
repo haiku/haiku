@@ -116,14 +116,14 @@ Leave as '%s'	Mail		'%s' olarak bırak
 Print…	Mail		Yazdır…
 Settings…	Mail		Ayarlar…
 Warn unencodable:	Mail		Kodlanamayanları uyar:
-Trash	Mail		Çöp
+Trash	Mail		Sil
 Show raw message	Mail		Ham iletiyi göster
 Find…	Mail		Bul…
 Select all	Mail		Tümünü seç
 Show header	Mail		Başlığı göster
 Reply account:	Mail		Yanıtlama hesabı:
 Sorry	Mail		Üzgünüm
-Forward	Mail		İleri
+Forward	Mail		İlet
 Open attachment	Mail		Eki aç
 mail	B_USER_DIRECTORY/mail		posta
 Save this message as a draft before closing?	Mail		Kapatmadan önce bu ileti taslak olarak kaydedilsin mi?

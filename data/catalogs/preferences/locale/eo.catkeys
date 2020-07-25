@@ -1,31 +1,29 @@
-1	esperanto	x-vnd.Haiku-Locale	1488345554
-Available languages	Locale Preflet Window		Haveblaj lingvoj
-Negative:	TimeFormatSettings		Negativa:
-already chosen	LanguageListView		antaŭe elektita
-Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Ne povas trovi la disponeblajn lingvojn! Vi ne povas uzi ĉi preferileto!
-Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		La Laborstrio kaj la Spurilo bezonas relanĉon por efektiviĝi ĉi ŝanĝon. Ĉu vi deziras relanĉi ilin nun?
-Long format:	TimeFormatSettings		Longa formato:
-Currency	TimeFormatSettings		Valuto
-Locale	System name		Lokaĵaro
-Short format:	TimeFormatSettings		Mallonga formato:
-Language	Locale Preflet Window		Lingvo
-Preferred languages	Locale Preflet Window		Preferataj lingvoj
-Use month/day-names from preferred language	TimeFormatSettings		Uzi nomojn de monatoj/tagoj el preferata lingvo
-Formatting	Locale Preflet Window		Formatigo
-Locale	Locale Preflet Window		Lokaĵaro
-Numbers	TimeFormatSettings		Nombroj
-24 hour	TimeFormatSettings		24 hora
-OK	Locale Preflet Window		Bone
-Restart	Locale Preflet Window		Relanĉi
-Full format:	TimeFormatSettings		Plena formato:
-Defaults	Locale Preflet Window		Defaŭltoj
-Cancel	Locale Preflet Window		Nuligi
-Translate application and folder names in Deskbar and Tracker.	Locale Preflet Window		Traduki nomojn de programoj kaj dosierujoj en la Laborstrio kaj la Spurilo.
-Revert	Locale Preflet Window		Malfari
+1	esperanto	x-vnd.Haiku-Locale	288870027
 Medium format:	TimeFormatSettings		Meza formato:
-12 hour	TimeFormatSettings		12 hora
+Negative:	TimeFormatSettings		Negativa:
+Language	Locale Preflet Window		Lingvo
+Short format:	TimeFormatSettings		Mallonga formato:
+24 hour	TimeFormatSettings		24 hora
+Locale	Locale Preflet Window		Lokaĵaro
 Time	TimeFormatSettings		Horo
+Defaults	Locale Preflet Window		Defaŭltoj
+Locale	System name		Lokaĵaro
 Date	TimeFormatSettings		Dato
-Positive:	TimeFormatSettings		Pozitiva:
+OK	Locale Preflet Window		Bone
+Long format:	TimeFormatSettings		Longa formato:
+Numbers	TimeFormatSettings		Nombroj
+Available languages	Locale Preflet Window		Haveblaj lingvoj
 Locale	Locale Preflet		Lokaĵaro
-Options	Locale Preflet Window		Opcioj
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Ne povas trovi la disponeblajn lingvojn! Vi ne povas uzi ĉi preferileto!
+Formatting	Locale Preflet Window		Formatigo
+Use month/day-names from preferred language	TimeFormatSettings		Uzi nomojn de monatoj/tagoj el preferata lingvo
+already chosen	LanguageListView		antaŭe elektita
+Preferred languages	Locale Preflet Window		Preferataj lingvoj
+Full format:	TimeFormatSettings		Plena formato:
+Cancel	Locale Preflet Window		Nuligi
+Revert	Locale Preflet Window		Malfari
+12 hour	TimeFormatSettings		12 hora
+Positive:	TimeFormatSettings		Pozitiva:
+Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		La Laborstrio kaj la Spurilo bezonas relanĉon por efektiviĝi ĉi ŝanĝon. Ĉu vi deziras relanĉi ilin nun?
+Restart	Locale Preflet Window		Relanĉi
+Currency	TimeFormatSettings		Valuto

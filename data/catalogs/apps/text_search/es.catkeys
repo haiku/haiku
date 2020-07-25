@@ -25,8 +25,8 @@ Copy text to clipboard	GrepWindow		Copiar texto al portapapeles
 Show lines	GrepWindow		Mostrar líneas
 Failed to open errors pipe!	Grepper		¡Falló al abrir el conducto de errores!
 The unselected files will be removed from the list.	GrepWindow		Los archivos no seleccionados serán eliminados de la lista.
-Skip folders starting with a dot	GrepWindow		Saltar carpertas con un punto
 Open files in code editor	GrepWindow		Abrir archivos con editor de código
+Skip folders starting with a dot	GrepWindow		Saltar carpertas con un punto
 Failed to open output pipe!	Grepper		¡Falló al abrir el conducto de salida!
 Cancel	GrepWindow		Cancelar
 History	GrepWindow		Historia

@@ -25,8 +25,8 @@ Copy text to clipboard	GrepWindow		Kopiuj tekst do schowka
 Show lines	GrepWindow		Pokaż linie
 Failed to open errors pipe!	Grepper		Nie udało się otworzyć strumienia błędów!
 The unselected files will be removed from the list.	GrepWindow		Niezaznaczone pliki zostaną usunięte z listy.
-Skip folders starting with a dot	GrepWindow		Pomiń katalogi zaczynające się od kropki
 Open files in code editor	GrepWindow		Otwórz pliki w edytorze kodu
+Skip folders starting with a dot	GrepWindow		Pomiń katalogi zaczynające się od kropki
 Failed to open output pipe!	Grepper		Nie udało się otworzyć strumienia wyjściowego!
 Cancel	GrepWindow		Anuluj
 History	GrepWindow		Historia

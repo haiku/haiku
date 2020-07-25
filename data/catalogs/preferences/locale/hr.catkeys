@@ -1,28 +1,27 @@
-1	croatian	x-vnd.Haiku-Locale	295849354
-Available languages	Locale Preflet Window		Dostupni jezici
+1	croatian	x-vnd.Haiku-Locale	225657701
+Medium format:	TimeFormatSettings		Srednji format:
 Negative:	TimeFormatSettings		Negativno:
-already chosen	LanguageListView		već izabran
-Long format:	TimeFormatSettings		Dugi format:
-Currency	TimeFormatSettings		Valuta
-Locale	System name		Jezik
-Short format:	TimeFormatSettings		Kratki format:
 Language	Locale Preflet Window		Jezik
-Preferred languages	Locale Preflet Window		Poželjni jezici
-Use month/day-names from preferred language	TimeFormatSettings		Koristi mjesec/dan-imena iz poželjnih jezika
-Formatting	Locale Preflet Window		Formatiram
-Locale	Locale Preflet Window		Jezik
-Numbers	TimeFormatSettings		Brojevi
+Short format:	TimeFormatSettings		Kratki format:
 24 hour	TimeFormatSettings		24 sata
-OK	Locale Preflet Window		U redu
-Restart	Locale Preflet Window		Ponovno pokretanje
-Full format:	TimeFormatSettings		Puni format:
+Locale	Locale Preflet Window		Jezik
+Time	TimeFormatSettings		Vrijeme
 Defaults	Locale Preflet Window		Zadano
+Locale	System name		Jezik
+Date	TimeFormatSettings		Datum
+OK	Locale Preflet Window		U redu
+Long format:	TimeFormatSettings		Dugi format:
+Numbers	TimeFormatSettings		Brojevi
+Available languages	Locale Preflet Window		Dostupni jezici
+Locale	Locale Preflet		Jezik
+Formatting	Locale Preflet Window		Formatiram
+Use month/day-names from preferred language	TimeFormatSettings		Koristi mjesec/dan-imena iz poželjnih jezika
+already chosen	LanguageListView		već izabran
+Preferred languages	Locale Preflet Window		Poželjni jezici
+Full format:	TimeFormatSettings		Puni format:
 Cancel	Locale Preflet Window		Otkaži
 Revert	Locale Preflet Window		Vrati
-Medium format:	TimeFormatSettings		Srednji format:
 12 hour	TimeFormatSettings		12 sati
-Time	TimeFormatSettings		Vrijeme
-Date	TimeFormatSettings		Datum
 Positive:	TimeFormatSettings		Pozitivno:
-Locale	Locale Preflet		Jezik
-Options	Locale Preflet Window		Opcije
+Restart	Locale Preflet Window		Ponovno pokretanje
+Currency	TimeFormatSettings		Valuta
