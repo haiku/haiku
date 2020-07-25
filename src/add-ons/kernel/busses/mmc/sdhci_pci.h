@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2019 Haiku, Inc. All rights reserved.
+ * Copyright 2018-2020 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -30,12 +30,24 @@ class Command {
 			fBits = (command << 8) | type;
 		}
 
+		static const uint8_t kDataPresent = 0x20;
+		static const uint8_t kCheckIndex = 0x10;
+		static const uint8_t kCRCEnable = 0x8;
+		static const uint8_t kSubCommand = 0x4;
+		static const uint8_t kReplySizeMask = 0x3;
+		static const uint8_t k32BitResponse = 0x2;
+		static const uint8_t k128BitResponse = 0x1;
+
+		// For simplicity pre-define the standard response types from the SD
+		// card specification
 		static const uint8_t kNoReplyType = 0;
-		static const uint8_t kR1Type = 0x1C;
-		static const uint8_t kR2Type = 0x09;
-		static const uint8_t kR3Type = 0x02;
-		static const uint8_t kR6Type = 0x1C;
-		static const uint8_t kR7Type = 0x3C;
+		static const uint8_t kR1Type = kCheckIndex | kCRCEnable
+			| k32BitResponse;
+		static const uint8_t kR2Type = kCRCEnable | k128BitResponse;
+		static const uint8_t kR3Type = k32BitResponse;
+		static const uint8_t kR6Type = kCheckIndex | k32BitResponse;
+		static const uint8_t kR7Type = kDataPresent | kCheckIndex | kCRCEnable
+			| k32BitResponse;
 
 	private:
 		volatile uint16_t fBits;

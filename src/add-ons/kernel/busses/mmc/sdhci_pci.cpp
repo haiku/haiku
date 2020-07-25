@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2019 Haiku, Inc. All rights reserved.
+ * Copyright 2018-2020 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -240,17 +240,19 @@ SdhciBus::ExecuteCommand(uint8_t command, uint32_t argument, uint32_t* response)
 		return B_ERROR;
 	}
 
-	if (replyType == Command::kNoReplyType) {
-		// No response
-	} else if (replyType == Command::kR2Type) {
-		// 128 bit response
-		response[0] = fRegisters->response[0];
-		response[1] = fRegisters->response[1];
-		response[2] = fRegisters->response[2];
-		response[3] = fRegisters->response[3];
-	} else {
-		// 32 bit response
-		*response = fRegisters->response[0];
+	switch (replyType & Command::kReplySizeMask) {
+		case Command::k32BitResponse:
+			*response = fRegisters->response[0];
+			break;
+		case Command::k128BitResponse:
+			response[0] = fRegisters->response[0];
+			response[1] = fRegisters->response[1];
+			response[2] = fRegisters->response[2];
+			response[3] = fRegisters->response[3];
+			break;
+		default:
+			// No response
+			break;
 	}
 
 	ERROR("Command execution complete\n");
