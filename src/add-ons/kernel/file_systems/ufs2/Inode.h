@@ -44,18 +44,7 @@ struct ufs2_inode {
 	int64_t		extendedBklPtr1;
 	int64_t		extendedBklPtr2;
 	/* 12 direct block pointers */
-	int64_t		directBlkPtr1;
-	int64_t		directBlkPtr2;
-	int64_t		directBlkPtr3;
-	int64_t		directBlkPtr4;
-	int64_t		directBlkPtr5;
-	int64_t		directBlkPtr6;
-	int64_t		directBlkPtr7;
-	int64_t		directBlkPtr8;
-	int64_t		directBlkPtr9;
-	int64_t		directBlkPtr10;
-	int64_t		directBlkPtr11;
-	int64_t		directBlkPtr12;
+	int64_t		directBlkPtr[12];
 	int64_t		indirectBlkPtr;  /* 1 Indirect block pointer */
 	int64_t		doubleIndriectBlkPtr; // 1 Double Indirect block pointer
 	int64_t		tripleIndriectBlkPtr; // 1 Triple Indirect block pointer
@@ -118,12 +107,22 @@ class Inode {
 
 			Volume*		GetVolume() const { return fVolume; }
 
-			int64_t		GetBlockPointer() { return fNode.directBlkPtr1; }
+			int64_t		GetBlockPointer(int ptrNumber)
+							{ return fNode.directBlkPtr[ptrNumber]; }
+
+			int64_t 	GetIndirectBlockPointer()
+							{ return fNode.indirectBlkPtr; }
+
+			int64_t 	GetDoubleIndirectBlockPtr()
+							{ return fNode.doubleIndriectBlkPtr; }
+
+			int64_t 	GetTripleIndirectBlockPtr()
+							{ return fNode.tripleIndriectBlkPtr; }
+
 			ino_t		Parent();
 
-//			status_t	FindBlock(off_t logical, off_t& physical,
-//							off_t* _length = NULL);
-//			status_t	ReadAt(off_t pos, uint8* buffer, size_t* length);
+			off_t   	FindBlock(off_t block_number, off_t block_offset);
+			status_t	ReadAt(off_t pos, uint8* buffer, size_t* length);
 //			status_t	FillGapWithZeros(off_t start, off_t end);
 
 			void*		FileCache() const { return fCache; }

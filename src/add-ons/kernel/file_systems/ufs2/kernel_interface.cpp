@@ -3,7 +3,6 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
-
 #include "DirectoryIterator.h"
 #include "Inode.h"
 #include "system_dependencies.h"
@@ -26,6 +25,7 @@ struct identify_cookie
 };
 
 
+#if 0
 //!	ufs2_io() callback hook
 static status_t
 iterative_io_get_vecs_hook(void *cookie, io_request *request, off_t offset,
@@ -42,6 +42,7 @@ iterative_io_finished_hook(void *cookie, io_request *request, status_t status,
 {
 	return B_NOT_SUPPORTED;
 }
+#endif
 
 
 //	#pragma mark - Scanning
@@ -196,7 +197,6 @@ static status_t
 ufs2_lookup(fs_volume *_volume, fs_vnode *_directory, const char *name,
 		   ino_t *_vnodeID)
 {
-	TRACE("UFS2_LOOKUP: %p (%s)\n", name, name);
 	Volume* volume = (Volume*)_volume->private_volume;
 	Inode* directory = (Inode*)_directory->private_node;
 
@@ -207,7 +207,6 @@ ufs2_lookup(fs_volume *_volume, fs_vnode *_directory, const char *name,
 		return status;
 
 	status = get_vnode(volume->FSVolume(), *_vnodeID, NULL);
-	TRACE("get_vnode status: %s\n", strerror(status));
 	return status;
 }
 
@@ -223,11 +222,9 @@ ufs2_ioctl(fs_volume *_volume, fs_vnode *_node, void *_cookie, uint32 cmd,
 static status_t
 ufs2_read_stat(fs_volume *_volume, fs_vnode *_node, struct stat *stat)
 {
-	TRACE("Reading stat...\n");
 	Inode* inode = (Inode*)_node->private_node;
 	stat->st_dev = inode->GetVolume()->ID();
 	stat->st_ino = inode->ID();
-	TRACE("stat->st_ino %ld\n",stat->st_ino);
 //	TODO handle hardlinks which will have nlink > 1. Maybe linkCount in inode
 //	structure may help?
 	stat->st_nlink = 1;
@@ -251,10 +248,27 @@ ufs2_read_stat(fs_volume *_volume, fs_vnode *_node, struct stat *stat)
 
 
 static status_t
-ufs2_open(fs_volume * /*_volume*/, fs_vnode *_node, int openMode,
+ufs2_open(fs_volume * _volume, fs_vnode *_node, int openMode,
 		 void **_cookie)
 {
-	return B_NOT_SUPPORTED;
+	//Volume* volume = (Volume*)_volume->private_volume;
+	Inode* inode = (Inode*)_node->private_node;
+	TRACE("in open %d \n", openMode);
+	if (inode->IsDirectory())
+		return B_IS_A_DIRECTORY;
+
+	file_cookie* cookie = new(std::nothrow) file_cookie;
+	if (cookie == NULL)
+		return B_NO_MEMORY;
+	ObjectDeleter<file_cookie> cookieDeleter(cookie);
+
+	cookie->last_size = inode->Size();
+	cookie->last_notification = system_time();
+
+//	fileCacheEnabler.Detach();
+	cookieDeleter.Detach();
+	*_cookie = cookie;
+	return B_OK;
 }
 
 
@@ -262,7 +276,14 @@ static status_t
 ufs2_read(fs_volume *_volume, fs_vnode *_node, void *_cookie, off_t pos,
 		 void *buffer, size_t *_length)
 {
-	return B_NOT_SUPPORTED;
+	Inode* inode = (Inode*)_node->private_node;
+
+	if (!inode->IsFile()) {
+		*_length = 0;
+		return inode->IsDirectory() ? B_IS_A_DIRECTORY : B_BAD_VALUE;
+	}
+
+	return inode->ReadAt(pos, (uint8*)buffer, _length);
 }
 
 
@@ -340,14 +361,13 @@ static status_t
 ufs2_read_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 			 struct dirent *dirent, size_t bufferSize, uint32 *_num)
 {
-	TRACE("read dir \n");
 	DirectoryIterator* iterator = (DirectoryIterator*)_cookie;
 	Volume* volume = (Volume*)_volume->private_volume;
 
 	uint32 maxCount = *_num;
 	uint32 count = 0;
 
-	while (count < maxCount and (bufferSize > sizeof(struct dirent))) {
+	while (count < maxCount && (bufferSize > sizeof(struct dirent))) {
 		size_t length = bufferSize - sizeof(struct dirent) + 1;
 		ino_t iNodeNo;
 
@@ -371,7 +391,6 @@ ufs2_read_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 	}
 
 	*_num = count;
-	TRACE("count is %d\n", count);
 	return B_OK;
 
 }
