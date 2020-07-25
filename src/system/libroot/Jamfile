@@ -101,6 +101,8 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			[ TargetLibgcc ]
 			;
 
+		# These are defined in POSIX for c99 support, so fake'em
+		StaticLibrary [ MultiArchDefaultGristFiles libc.a ] : empty.c ;
 		StaticLibrary [ MultiArchDefaultGristFiles libm.a ] : empty.c ;
 		StaticLibrary [ MultiArchDefaultGristFiles libpthread.a ] : empty.c ;
 

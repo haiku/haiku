@@ -39,7 +39,7 @@ for lib in [ HaikuImageGetSystemLibs ] $(developmentLibs) {
 
 # static libraries
 AddFilesToPackage develop lib :
-	libcolumnlistview.a
+	libc.a libcolumnlistview.a
 	<$(architecture)>liblocalestub.a
 	libm.a libpthread.a
 	libprint.a libprintutils.a
