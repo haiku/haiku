@@ -62,6 +62,7 @@ TimeComputer::AddTimeStamp(bigtime_t realTime, uint64 frames)
 		fFrameBase = frames;
 		fResetTimeBase = false;
 		_AddEntry(fRealTime, fPerformanceTime);
+		fFirstEntry = fLastEntry;
 		return;
 	}
 
