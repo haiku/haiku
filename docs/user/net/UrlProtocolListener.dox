@@ -130,16 +130,19 @@
 /*!
 	\fn virtual void BUrlProtocolListener::DownloadProgress(BUrlRequest* caller,
 		ssize_t bytesReceived, ssize_t bytesTotal)
-	\brief Called each time a block of data is received.
+	\brief Called each time a block of data is downloaded.
 
-	This callback will be called after DataReceived().
+	This callback will usually be called after DataReceived().
 
 	\b Frequency: Once or more
 
 	\param caller The BUrlRequest that invoked this callback.
-	\param bytesReceived Number of data bytes received.
-	\param bytesTotal Total number of data bytes expected. This value is not
-		guaranteed to be meaningful.
+	\param bytesReceived Number of data bytes received. This is the number of
+		bytes received prior to any processing and can be smaller than the
+		size of the data block sent to DataReceived() as the transport might
+		be compressed.
+	\param bytesTotal Total number of data bytes expected. \c 0 will be passed
+		if the total number of data bytes is not available.
 */
 
 /*!
