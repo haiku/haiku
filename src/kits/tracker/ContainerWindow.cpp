@@ -1070,8 +1070,13 @@ BContainerWindow::InitLayout()
 			forFilePanel ? 0 : -1);
 		fCountContainer->GroupLayout()->AddView(hScrollBarContainer);
 
-		fPoseView->CountView()->SetExplicitMinSize(
-			fPoseView->HScrollBar()->MinSize());
+		BSize size = fPoseView->HScrollBar()->MinSize();
+		if (forFilePanel) {
+			// Count view height is 1px smaller than scroll bar because it has
+			// no upper border.
+			size.height -= 1;
+		}
+		fPoseView->CountView()->SetExplicitMinSize(size);
 	}
 }
 
