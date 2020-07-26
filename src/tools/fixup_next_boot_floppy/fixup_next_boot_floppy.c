@@ -39,15 +39,17 @@ static uint16_t checksum_16(uint16_t *p, int count)
 int main(int argc, char **argv)
 {
 	int fd;
-	unsigned int i;
 	uint16_t sum;
+	int labelOffsets[] = { 0, 15, 30, 45 };
+	int numLabels = sizeof(labelOffsets) / sizeof(int);
+
 	struct disk_label disklabel = {
 		H2B32(DL_V3),
 		H2B32(0),
 		H2B32(0),
-		"NextBoot",//"HaikuBoot",
+		"HaikuBoot",//"NextBoot",
 		H2B32(0),
-		H2B32(0xa991637a), //H2B32(0x4841494b), // dl_tag: 'HAIK'
+		H2B32(0x4841494b),//H2B32(0xa991637a), // dl_tag: 'HAIK'
 		"Sony MPX-111N 2880-512", // same as NS image, not sure it matters
 		"removable_rw_floppy",
 		H2B32(1024), // !! 1024 bytes / sector !!
@@ -61,14 +63,17 @@ int main(int argc, char **argv)
 		H2B16(0),
 		H2B16(0),
 		H2B16(0),
-		H2B32(0x20),H2B32(0xffffffff),	// boot block locations XXX: move it closer to start?
-		"fdmach", //"haiku_loader",
-		"silly", //"schredder",
+		H2B32(0x20),H2B32(0xffffffff),	// boot blocks in 1024 bytes sectors
+		// XXX: move it closer to start?
+		"haiku_loader",//"fdmach"
+		"schredder",//"silly"
 		'a', 'b',
 		// partitions
 		{
 			// Nextstep uses this:
-			{ H2B32(0), H2B32(0x540), H2B16(0x2000), H2B16(0x400), 't', H2B16(0x20), H2B16(0x800), 0, 1, "", 1, "4.3BSD"},
+			//{ H2B32(0), H2B32(0x540), H2B16(0x2000), H2B16(0x400), 't', H2B16(0x20), H2B16(0x800), 0, 1, "", 1, "4.3BSD"},
+			// XXX: should we fake an fs anyway?
+			{ H2B32(-1), H2B32(-1), H2B16(-1), H2B16(-1), 0, H2B16(-1), H2B16(-1), -1, 0, "", 0, ""},
 			{ H2B32(-1), H2B32(-1), H2B16(-1), H2B16(-1), 0, H2B16(-1), H2B16(-1), -1, 0, "", 0, ""},
 			{ H2B32(-1), H2B32(-1), H2B16(-1), H2B16(-1), 0, H2B16(-1), H2B16(-1), -1, 0, "", 0, ""},
 			{ H2B32(-1), H2B32(-1), H2B16(-1), H2B16(-1), 0, H2B16(-1), H2B16(-1), -1, 0, "", 0, ""},
@@ -76,23 +81,37 @@ int main(int argc, char **argv)
 			{ H2B32(-1), H2B32(-1), H2B16(-1), H2B16(-1), 0, H2B16(-1), H2B16(-1), -1, 0, "", 0, ""},
 			{ H2B32(-1), H2B32(-1), H2B16(-1), H2B16(-1), 0, H2B16(-1), H2B16(-1), -1, 0, "", 0, ""},
 			{ H2B32(-1), H2B32(-1), H2B16(-1), H2B16(-1), 0, H2B16(-1), H2B16(-1), -1, 0, "", 0, ""}
-		}
+		},
+		{ 0 },
+		0
 	};
 	fd = open(argv[1], O_RDWR);
 	if (fd < 0) {
 		return 1;
 	}
-	//XXX: implement support simple checksum of existing label?
+	//XXX: support simple checksum of existing label?
 	/*
 	if (read(fd, bootblock, DL_SIZE) < DL_SIZE) {
 		perror("read");
 		return 1;
 	}
 	*/
+
+	// TODO: update boot block offsets!
+
 	sum = checksum_16((uint16_t *)&disklabel, SUM_CNT);
 	fprintf(stderr, "checksum: 0x%04x\n", sum);
 	disklabel.dl_un.DL_v3_checksum = H2B16(sum);
-	lseek(fd, 0LL, SEEK_SET);
-	write(fd, &disklabel, DL_SIZE);
+
+	for (unsigned int i = 0; i < numLabels; i++) {
+		/* also write copies elsewhere, note we don't update the checksum */
+		disklabel.dl_label_blkno = H2B32(labelOffsets[i]);
+		/* oddly this field seems to use 512 bytes sectors */
+		lseek(fd, labelOffsets[i] * 0x200LL, SEEK_SET);
+		write(fd, &disklabel, DL_SIZE);
+	}
+
+	// TODO: patch the bootblock text segment to include the tgz
+
 	return 0;
 }
