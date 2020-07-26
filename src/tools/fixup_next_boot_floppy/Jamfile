@@ -1,0 +1,16 @@
+SubDir HAIKU_TOP src tools fixup_next_boot_floppy ;
+
+#UseHeaders [ FDirName $(HAIKU_TOP) headers build ] : true ;
+
+#if ! $(HOST_PLATFORM_HAIKU_COMPATIBLE) {
+#	UseHeaders [ FDirName $(HAIKU_TOP) headers build os ] : true ;
+#	UseHeaders [ FDirName $(HAIKU_TOP) headers build os support ] : true ;
+#}
+
+#UsePrivateHeaders kernel ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers private kernel platform next_m68k ] : true ;
+
+BuildPlatformMain <build>fixup_next_boot_floppy
+	: fixup_next_boot_floppy.c
+	:
+;
