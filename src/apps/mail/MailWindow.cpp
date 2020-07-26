@@ -383,7 +383,7 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 	menu->AddSeparatorItem();
 	menu->AddItem(item = new BMenuItem(
 		B_TRANSLATE("Settings" B_UTF8_ELLIPSIS),
-		new BMessage(M_PREFS)));
+		new BMessage(M_PREFS), ','));
 	item->SetTarget(be_app);
 	fMenuBar->AddItem(menu);
 	menu->AddItem(item = new BMenuItem(
