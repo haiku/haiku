@@ -136,11 +136,11 @@ MMCBus::WorkerThread(void* cookie)
 		// ones. So ACMD41 should be moved inside the probing loop below?
 		uint8_t cardType = CARD_TYPE_SD;
 
-		if (ocr & hcs != 0)
+		if ((ocr & hcs) != 0)
 			cardType = CARD_TYPE_SDHC;
-		if (ocr & (1 << 29) != 0)
+		if ((ocr & (1 << 29)) != 0)
 			cardType = CARD_TYPE_UHS2;
-		if (ocr & (1 << 24) != 0)
+		if ((ocr & (1 << 24)) != 0)
 			TRACE("Card supports 1.8v");
 		TRACE("Voltage range: %x\n", ocr & 0xFFFFFF);
 
@@ -166,8 +166,8 @@ MMCBus::WorkerThread(void* cookie)
 			// mmc_disk driver.
 			
 			uint32_t vendor = cid[3] & 0xFFFFFF;
-			char name[6] = {cid[2] >> 24, cid[2] >> 16, cid[2] >> 8, cid[2],
-				cid[1] >> 24, 0};
+			char name[6] = {(char)(cid[2] >> 24), (char)(cid[2] >> 16),
+				(char)(cid[2] >> 8), (char)cid[2], (char)(cid[1] >> 24), 0};
 			uint32_t serial = (cid[1] << 16) | (cid[0] >> 16);
 			uint16_t revision = (cid[1] >> 20) & 0xF;
 			revision *= 100;

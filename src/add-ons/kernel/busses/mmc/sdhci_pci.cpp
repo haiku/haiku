@@ -167,8 +167,8 @@ SdhciBus::DumpRegisters(uint8_t slot)
 		fRegisters->interrupt_status, fRegisters->interrupt_status_enable,
 		fRegisters->interrupt_signal_enable);
 	TRACE("auto_cmd12_error_status: %d\n", fRegisters->auto_cmd12_error_status);
-	TRACE("capabilities: %lld\n", fRegisters->capabilities.Bits());
-	TRACE("max_current_capabilities: %lld\n",
+	TRACE("capabilities: %" B_PRId64 "\n", fRegisters->capabilities.Bits());
+	TRACE("max_current_capabilities: %" B_PRId64 "\n",
 		fRegisters->max_current_capabilities);
 	TRACE("slot_interrupt_status: %d\n", fRegisters->slot_interrupt_status);
 	TRACE("host_controller_version spec %x vendor %x\n",
@@ -322,13 +322,6 @@ SdhciBus::SetClock(int kilohertz)
 
 	// Finally, route the clock to the SD card
 	fRegisters->clock_control.EnableSD();
-}
-
-
-static void
-sdhci_stop_clock(struct registers* regs)
-{
-	regs->clock_control.DisableSD();
 }
 
 
@@ -615,7 +608,6 @@ supports_device(device_node* parent)
 	CALLED();
 	const char* bus;
 	uint16 type, subType;
-	uint8 pciSubDeviceId;
 	uint16 vendorId, deviceId;
 
 	// make sure parent is a PCI SDHCI device node
@@ -660,7 +652,6 @@ supports_device(device_node* parent)
 		pci_device* device;
 		gDeviceManager->get_driver(parent, (driver_module_info**)&pci,
 			(void**)&device);
-		pciSubDeviceId = pci->read_pci_config(device, PCI_revision, 1);
 		TRACE("SDHCI Device found! Subtype: 0x%04x, type: 0x%04x\n",
 			subType, type);
 		return 0.8f;

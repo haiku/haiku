@@ -234,6 +234,37 @@ mmc_block_free(void* cookie)
 
 
 static status_t
+mmc_block_read(void* cookie, off_t position, void* buffer, size_t* length)
+{
+	CALLED();
+	mmc_disk_handle* handle = (mmc_disk_handle*)cookie;
+
+	return B_NOT_SUPPORTED;
+}
+
+
+static status_t
+mmc_block_write(void* cookie, off_t position, const void* buffer,
+	size_t* length)
+{
+	CALLED();
+	mmc_disk_handle* handle = (mmc_disk_handle*)cookie;
+
+	return B_NOT_SUPPORTED;
+}
+
+
+static status_t
+mmc_block_io(void* cookie, io_request* request)
+{
+	CALLED();
+	mmc_disk_handle* handle = (mmc_disk_handle*)cookie;
+
+	return B_NOT_SUPPORTED;
+}
+
+
+static status_t
 mmc_block_get_geometry(mmc_disk_handle* handle, device_geometry* geometry)
 {
 	struct mmc_disk_csd csd;
@@ -267,7 +298,7 @@ mmc_block_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 	mmc_disk_handle* handle = (mmc_disk_handle*)cookie;
 	mmc_disk_driver_info* info = handle->info;
 
-	TRACE("ioctl(op = %ld)\n", op);
+	TRACE("ioctl(op = %" B_PRId32 ")\n", op);
 
 	switch (op) {
 		case B_GET_MEDIA_STATUS:
@@ -276,7 +307,8 @@ mmc_block_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 				return B_BAD_VALUE;
 
 			*(status_t *)buffer = B_OK;
-			TRACE("B_GET_MEDIA_STATUS: 0x%08lx\n", *(status_t *)buffer);
+			TRACE("B_GET_MEDIA_STATUS: 0x%08" B_PRIx32 "\n",
+				*(status_t *)buffer);
 			return B_OK;
 			break;
 		}
@@ -356,9 +388,9 @@ struct device_module_info sMMCBlockDevice = {
 	mmc_block_open,
 	mmc_block_close,
 	mmc_block_free,
-	NULL, //mmc_block_read,
-	NULL, //mmc_block_write,
-	NULL, //mmc_block_io,
+	mmc_block_read,
+	mmc_block_write,
+	mmc_block_io,
 	mmc_block_ioctl,
 
 	NULL,	// select
