@@ -10,6 +10,8 @@
 #include "mmu.h"
 //#include "images.h"
 
+#include <algorithm>
+
 #include <arch/cpu.h>
 #include <boot/stage2.h>
 #include <boot/platform.h>
@@ -90,6 +92,25 @@ platform_switch_to_logo(void)
 	// in debug mode, we'll never show the logo
 	if ((platform_boot_options() & BOOT_OPTION_DEBUG_OUTPUT) != 0)
 		return;
+
+	// I believe we should use mg->km_coni.fb_num but turbo color has 0 here !?
+	char fb_num = KM_CON_FRAMEBUFFER;
+
+	gKernelArgs.frame_buffer.width = mg->km_coni.dspy_w;
+	gKernelArgs.frame_buffer.height = mg->km_coni.dspy_h;
+	gKernelArgs.frame_buffer.bytes_per_row = mg->km_coni.bytes_per_scanline;
+	// we fake 2bpp as 4bpp for simplicity
+	gKernelArgs.frame_buffer.depth =
+		std::max(4, 32 / mg->km_coni.pixels_per_word);
+	gKernelArgs.frame_buffer.physical_buffer.size =
+		mg->km_coni.map_addr[fb_num].size;
+	gKernelArgs.frame_buffer.physical_buffer.start =
+		mg->km_coni.map_addr[fb_num].phys_addr;
+
+	//TODO: pass a custom color_space in the KMessage?
+
+	gKernelArgs.frame_buffer.enabled = true;
+	video_display_splash(mg->km_coni.map_addr[fb_num].virt_addr);
 }
 
 
@@ -100,15 +121,15 @@ platform_switch_to_text_mode(void)
 		return;
 	}
 
-	gKernelArgs.frame_buffer.enabled = 0;
+	gKernelArgs.frame_buffer.enabled = false;
 }
 
 
 extern "C" status_t
 platform_init_video(void)
 {
-	gKernelArgs.frame_buffer.enabled = 0;
-	
+	gKernelArgs.frame_buffer.enabled = false;
+
 	return B_OK;
 }
 
