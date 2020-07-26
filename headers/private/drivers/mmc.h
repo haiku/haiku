@@ -35,4 +35,13 @@ typedef struct mmc_bus_interface {
 } mmc_bus_interface;
 
 
+// Interface between mmc device driver (mmc_disk, sdio drivers, ...) and mmc_bus
+typedef struct mmc_device_interface {
+	driver_module_info info;
+
+	status_t (*execute_command)(device_node* node, uint8_t command,
+		uint32_t argument, uint32_t* result);
+} mmc_device_interface;
+
+
 #endif /* _MMC_H */

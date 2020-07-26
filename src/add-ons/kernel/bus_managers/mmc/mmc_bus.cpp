@@ -178,6 +178,7 @@ MMCBus::WorkerThread(void* cookie)
 			
 			device_attr attrs[] = {
 				{ B_DEVICE_BUS, B_STRING_TYPE, {string: "mmc" }},
+				{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {string: "mmc device" }},
 				{ B_DEVICE_VENDOR_ID, B_UINT32_TYPE, {ui32: vendor}},
 				{ B_DEVICE_ID, B_STRING_TYPE, {string: name}},
 				{ B_DEVICE_UNIQUE_ID, B_UINT32_TYPE, {ui32: serial}},

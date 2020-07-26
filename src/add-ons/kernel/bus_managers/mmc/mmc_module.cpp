@@ -79,6 +79,27 @@ mmc_bus_added_device(device_node* parent)
 
 
 static status_t
+mmc_bus_execute_command(device_node* node, uint8_t command, uint32_t argument,
+	uint32_t* result)
+{
+	// FIXME store these in the bus cookie or something instead of
+	// getting/putting the parents each time.
+	mmc_bus_interface* sdhci;
+	void* cookie;
+
+	TRACE("In mmc_bus_execute_command\n");
+	device_node* parent = gDeviceManager->get_parent_node(node);
+	device_node* grandparent = gDeviceManager->get_parent_node(parent);
+	gDeviceManager->get_driver(grandparent, (driver_module_info**)&sdhci,
+		&cookie);
+	gDeviceManager->put_node(grandparent);
+	gDeviceManager->put_node(parent);
+
+	return sdhci->execute_command(cookie, command, argument, result);
+}
+
+
+static status_t
 std_ops(int32 op, ...)
 {
 	switch (op) {
@@ -113,18 +134,21 @@ driver_module_info mmc_bus_device_module = {
 };
 
 
-driver_module_info mmc_bus_controller_module = {
+mmc_device_interface mmc_bus_controller_module = {
 	{
-		MMC_BUS_MODULE_NAME,
-		0,
-		&std_ops
-	},
+		{
+			MMC_BUS_MODULE_NAME,
+			0,
+			&std_ops
+		},
 
-	NULL, // supported devices
-	mmc_bus_added_device,
-	NULL,
-	NULL,
-	NULL
+		NULL, // supported devices
+		mmc_bus_added_device,
+		NULL,
+		NULL,
+		NULL
+	},
+	mmc_bus_execute_command
 };
 
 
