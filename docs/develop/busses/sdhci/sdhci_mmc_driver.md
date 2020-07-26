@@ -26,8 +26,22 @@ After building the image, we will emulate the hardware and host haiku on top of 
 #### Emulation
 For emulating a sdhci-pci device
 
-    qemu-img create sd-card.img 10G
-    qemu-system-x86_64 ~/haiku/generated.x86_64/haiku.image -hdd haiku_drive_2.img -device sdhci-pci -device sd-card,drive=mydrive -drive if=sd,index=0,file=sd.img,format=raw,id=mydrive -m 512M -enable-kvm
+    qemu-img create sd-card.img 32M
+    qemu-system-x86_64 -drive index=0,file=haiku-nightly-anyboot.iso,format=raw \
+        -device sdhci-pci -device sd-card,drive=mydrive \
+        -drive if=sd,index=1,file=sd-card.img,format=raw,id=mydrive
+        -m 512M -enable-kvm -usbdevice tablet -machine q35
+
+This does the following:
+ - Create an SD card image of 32MB
+ - Run qemu with a bootable image in an IDE disk, and an SDHCI bus with an SD card in it
+ - Have enough memory to boot Haiku, use KVM mode for speed, and a tablet for ease of use
+ - Use the Q35 chipset so the mouse and SDHCI controllers don't share an interrupt (not strictly
+   required, but it avoids calls to the SDHCI interrupt handler on every mouse move).
+
+Tracing of SD operations can also be added to see how qemu is interpreting our commands:
+
+    -trace sdhci* -trace sdbus* -trace sdcard*
 
 ### Testing and loading the driver
 The code is merged but not part of the default build
@@ -37,27 +51,61 @@ to the image and load them, we need to adjust some buildfiles.
 The required changes are in [this changeset](https://review.haiku-os.org/c/haiku/+/448/8).
 
 ## Insight into the code and future tasks
-### Directory and files where all the code related to the project resides
 
-#### MMC Bus
-*    src/add-ons/kernel/busses/mmc
-    *    sdhci-pci.cpp
-    *    sdhci-pci.h
-    *    Jamfile
-#### The Bus Manager
-* src/add-ons/kernel/bus_managers/mmc
-    * mmc_bus.cpp
-    * mmc_module.cpp
-    * mmc_bus.h
-    * Jamfile
-#### Disk Driver
-* src/add-ons/kernel/drivers/disk/mmc
-    * mmc_disk.cpp
-    * mmc_disk.h
-    * Jamfile
-#### Hardcoding the driver
-* src/system/kernel/device_manager
-    * device_manager.cpp
+### Bus, bus manager, and drivers
+
+The MMC stack is a device manager based "new style" driver. This requires splitting the driver
+in different parts but allow easy reuse of each part (for example to support eMMC or SDIO with a
+large part of the code in common with plain SD/MMC).
+
+#### MMC Bus drivers (src/add-ons/kernel/busses/mmc)
+
+The bus driver provides the low level aspects: interrupts management, DMA transfer, accessing the
+hardware registers. It acts as a platform abstraction layer so that the bus manager and disk driver
+can be written independently of the underlying hardare.
+
+Currently there is a single implementation for SDHCI (MMC bus over PCI). Later on, other drivers
+will be added for other ways to access the MMC bus (for example on ARM devices where it does not
+live on a PCI bus, and may have a different register layout).
+
+For this reason, the bus drivers should only do the most low-level things, trying to keep as
+much code as possible in the upper layers.
+
+One slightly confusing thing about SDHCI is that it allows a single PCI device to implement
+multiple separate MMC busses (each of which could have multiple devices attached).
+
+#### The Bus Manager (src/add-ons/kernel/bus_managers/mmc)
+
+The bus manager is responsible for enumerating devices on the bus, assigning them addresses,
+and keeping track of which card is active at any given time.
+
+Essentially it has everything that requires collaboration between multiple MMC devices, as well
+as things that are not specific to a device type (common to SDIO, SD and MMC cards, for example)
+
+#### Disk Driver (src/add-ons/kernel/drivers/disk/mmc)
+
+This is a mass storage driver for MMC, SD and SDHC cards. Currently only SD is tested, SDHC, MMC
+and eMMC will have to be added (they are similar but there are some differences).
+
+#### Wiring the driver in the device manager (src/system/kernel/device_manager/device_manager.cpp)
+
+(note: possibly not accurate documentation, I did not check how things in the device manager are
+actually implemented, but this is my understanding of it).
+
+The device manager attempts to implement lazy, on-demand scanning of the devices. The idea is to
+speed up booting by not spending a lot of time scanning everything first, and only scanning
+small parts of the device tree as they are needed.
+
+The trigger is accesses to the devfs. For example, when an application opens /dev/disk, the device
+manager will start looking for disks so it can populate it. This means the device manager needs to
+know which branches of the device tree to explore. Currently this knowledge is hardcoded into the
+device tree sourcecode, and there's a TODO item about moving that knowledge to drivers instead. But
+it's tricky, since the whole point is to avoid loading all the drivers.
+
+Anyway, currently, the device manager is hardcoded to look for mass storage devices under SDHCI
+busses, both standard ones and some non-standard ones (for example, Ricoh provides SDHCI implenentations
+that are conform to the spec, except they don't have the right device type in the PCI registers).
+
 ### Insight into the code
 #### MMC Bus management overview
 
