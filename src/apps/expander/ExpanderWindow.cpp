@@ -818,6 +818,7 @@ ExpanderWindow::StartListing()
 	text.ReplaceFirst("%s", path.Leaf());
 	fStatusView->SetStatus(text.String());
 	fListingText->SetText("");
+	fListingText->MakeSelectable(false);
 
 	fListingThread = new ExpanderThread(&message, new BMessenger(this));
 	fListingThread->Start();
@@ -836,6 +837,7 @@ ExpanderWindow::StopListing(void)
 
 	fListingStarted = false;
 
+	fListingText->MakeSelectable(true);
 	fShowContents->SetEnabled(true);
 	fSourceItem->SetEnabled(true);
 	fDestItem->SetEnabled(true);
