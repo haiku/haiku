@@ -277,16 +277,16 @@ TestPageView::AttachedToWindow()
 	font.SetSize(font.Size() * 1.7);
 	statusView->SetFontAndColor(0, strlen(title), &font);
 
-	BGridLayoutBuilder gradiants(2.0);
-	gradiants.View()->SetViewColor(B_TRANSPARENT_COLOR);
+	BGridLayoutBuilder gradients(2.0);
+	gradients.View()->SetViewColor(B_TRANSPARENT_COLOR);
 
 	for (int i = 0; i < kNumColorGradients; ++i) {
 		BStringView* label = new BStringView(
 			kColorGradients[i].name,
 			B_TRANSLATE(kColorGradients[i].name));
 		// label->SetAlignment(B_ALIGN_RIGHT);
-		gradiants.Add(label, 0, i);
-		gradiants.Add(new ColorGradientView(kColorGradients[i].color), 1, i);
+		gradients.Add(label, 0, i);
+		gradients.Add(new ColorGradientView(kColorGradients[i].color), 1, i);
 	}
 
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
@@ -296,7 +296,7 @@ TestPageView::AttachedToWindow()
 			.Add(new LeafView())
 		)
 		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 0)
-			.Add(gradiants, 0.60)
+			.Add(gradients, 0.60)
 			.Add(new RadialLinesView(), 0.40)
 		)
 		.AddGlue()
