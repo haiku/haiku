@@ -30,7 +30,7 @@ SYSTEM_ADD_ONS_BUS_MANAGERS = [ FFilterByBuildFeatures
 	isa@x86,x86_64 scsi $(USB_ONLY)usb fdt@arm
 ] ;
 SYSTEM_ADD_ONS_FILE_SYSTEMS =
-	attribute_overlay bfs iso9660 packagefs write_overlay
+	attribute_overlay@!m68k bfs iso9660@!m68k packagefs write_overlay@!m68k
 	;
 
 # modules
