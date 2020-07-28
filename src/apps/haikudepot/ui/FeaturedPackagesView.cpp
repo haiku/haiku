@@ -55,12 +55,13 @@ static BitmapRef sInstalledIcon(new(std::nothrow)
 
 class StackedFeaturedPackagesView : public BView {
 public:
-	StackedFeaturedPackagesView()
+	StackedFeaturedPackagesView(Model& model)
 		:
 		BView("stacked featured packages view", B_WILL_DRAW | B_FRAME_EVENTS),
+		fModel(model),
+		fSelectedIndex(-1),
 		fPackageListener(
-			new(std::nothrow) OnePackageMessagePackageListener(this)),
-		fSelectedIndex(-1)
+			new(std::nothrow) OnePackageMessagePackageListener(this))
 	{
 		SetEventMask(B_POINTER_EVENTS);
 		Clear();
@@ -376,17 +377,20 @@ public:
 	void _DrawPackageIcon(BRect updateRect, PackageInfoRef pkg, float y,
 		bool selected)
 	{
-		BitmapRef icon = pkg->Icon();
+		BitmapRef icon;
+		status_t iconResult = fModel.GetPackageIconRepository().GetIcon(
+			pkg->Name(), BITMAP_SIZE_64, icon);
 
-		if (icon.Get() != NULL) {
-			float inset = (HEIGHT_PACKAGE - SIZE_ICON) / 2.0;
-			BRect sourceRect = BRect(0, 0, SIZE_ICON, SIZE_ICON);
-			BRect targetRect = BRect(inset, y + inset, SIZE_ICON + inset,
-				y + SIZE_ICON + inset);
-			const BBitmap* bitmap = icon->Bitmap(SharedBitmap::SIZE_64);
-			SetDrawingMode(B_OP_ALPHA);
-			DrawBitmap(bitmap, bitmap->Bounds(), targetRect,
-				B_FILTER_BITMAP_BILINEAR);
+		if (iconResult == B_OK) {
+			if (icon.Get() != NULL) {
+				float inset = (HEIGHT_PACKAGE - SIZE_ICON) / 2.0;
+				BRect targetRect = BRect(inset, y + inset, SIZE_ICON + inset,
+					y + SIZE_ICON + inset);
+				const BBitmap* bitmap = icon->Bitmap(BITMAP_SIZE_64);
+				SetDrawingMode(B_OP_ALPHA);
+				DrawBitmap(bitmap, bitmap->Bounds(), targetRect,
+					B_FILTER_BITMAP_BILINEAR);
+			}
 		}
 	}
 
@@ -415,7 +419,7 @@ public:
 
 		if (pkg->State() == ACTIVATED) {
 			const BBitmap* bitmap = sInstalledIcon->Bitmap(
-				SharedBitmap::SIZE_16);
+				BITMAP_SIZE_16);
 			float stringWidth = StringWidth(pkg->Title());
 			float offsetX = pt.x + stringWidth + PADDING;
 			BRect targetRect(offsetX, pt.y - 16, offsetX + 16, pt.y);
@@ -599,10 +603,10 @@ public:
 
 
 private:
+			Model&				fModel;
 			std::vector<PackageInfoRef>
 								fPackages;
 			int32				fSelectedIndex;
-
 			OnePackageMessagePackageListener*
 								fPackageListener;
 };
@@ -611,11 +615,12 @@ private:
 // #pragma mark - FeaturedPackagesView
 
 
-FeaturedPackagesView::FeaturedPackagesView()
+FeaturedPackagesView::FeaturedPackagesView(Model& model)
 	:
-	BView(B_TRANSLATE("Featured packages"), 0)
+	BView(B_TRANSLATE("Featured packages"), 0),
+	fModel(model)
 {
-	fPackagesView = new StackedFeaturedPackagesView();
+	fPackagesView = new StackedFeaturedPackagesView(fModel);
 
 	fScrollView = new BScrollView("featured packages scroll view",
 		fPackagesView, 0, false, true, B_FANCY_BORDER);

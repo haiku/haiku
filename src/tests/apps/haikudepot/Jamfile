@@ -15,6 +15,7 @@ local sourceDirs =
 	server
 	server/dumpexportrepository
 	util
+	tar
 	textview
 	edits_generic
 ;
@@ -31,6 +32,8 @@ SEARCH_SOURCE += [ FDirName $(HAIKUDEPOT_GENERATED_SOURCES_DIRECTORY)
 UnitTestLib haikudepottest.so :
 	HaikuDepotTestAddon.cpp
 
+	DataIOUtils.cpp
+
 	DumpExportRepositorySource.cpp
 	DumpExportRepositorySourceMirror.cpp
 	DumpExportRepository.cpp
@@ -44,6 +47,13 @@ UnitTestLib haikudepottest.so :
 	StandardMetaData.cpp
 	StandardMetaDataJsonEventListener.cpp
 	StandardMetaDataJsonEventListenerTest.cpp
+
+	StorageUtils.cpp
+	StorageUtilsTest.cpp
+
+	TarArchiveHeader.cpp
+	TarArchiveService.cpp
+	TarArchiveServiceTest.cpp
 
 	ValidationFailure.cpp
 	ValidationFailureTest.cpp

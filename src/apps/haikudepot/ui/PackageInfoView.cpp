@@ -266,9 +266,10 @@ private:
 
 class TitleView : public BGroupView {
 public:
-	TitleView()
+	TitleView(PackageIconRepository& packageIconRepository)
 		:
-		BGroupView("title view", B_HORIZONTAL)
+		BGroupView("title view", B_HORIZONTAL),
+		fPackageIconRepository(packageIconRepository)
 	{
 		fIconView = new BitmapView("package icon view");
 		fTitleView = new BStringView("package title view", "");
@@ -393,8 +394,12 @@ public:
 
 	void SetPackage(const PackageInfo& package)
 	{
-		if (package.Icon().Get() != NULL)
-			fIconView->SetBitmap(package.Icon(), SharedBitmap::SIZE_32);
+		BitmapRef bitmap;
+		status_t iconResult = fPackageIconRepository.GetIcon(
+			package.Name(), BITMAP_SIZE_64, bitmap);
+
+		if (iconResult == B_OK)
+			fIconView->SetBitmap(bitmap, BITMAP_SIZE_32);
 		else
 			fIconView->UnsetBitmap();
 
@@ -447,6 +452,8 @@ public:
 	}
 
 private:
+	PackageIconRepository&			fPackageIconRepository;
+
 	BitmapView*						fIconView;
 
 	BStringView*					fTitleView;
@@ -811,9 +818,9 @@ public:
 		fDescriptionView->SetText(package.ShortDescription(),
 			package.FullDescription());
 
-		fEmailIconView->SetBitmap(&fEmailIcon, SharedBitmap::SIZE_16);
+		fEmailIconView->SetBitmap(&fEmailIcon, BITMAP_SIZE_16);
 		_SetContactInfo(fEmailLinkView, package.Publisher().Email());
-		fWebsiteIconView->SetBitmap(&fWebsiteIcon, SharedBitmap::SIZE_16);
+		fWebsiteIconView->SetBitmap(&fWebsiteIcon, BITMAP_SIZE_16);
 		_SetContactInfo(fWebsiteLinkView, package.Publisher().Website());
 
 		bool hasScreenshot = false;
@@ -1281,11 +1288,11 @@ private:
 // #pragma mark - PackageInfoView
 
 
-PackageInfoView::PackageInfoView(BLocker* modelLock,
+PackageInfoView::PackageInfoView(Model* model,
 		PackageActionHandler* handler)
 	:
 	BView("package info view", 0),
-	fModelLock(modelLock),
+	fModel(model),
 	fPackageListener(new(std::nothrow) OnePackageMessagePackageListener(this))
 {
 	fCardLayout = new BCardLayout();
@@ -1310,7 +1317,7 @@ PackageInfoView::PackageInfoView(BLocker* modelLock,
 
 	fCardLayout->SetVisibleItem((int32)0);
 
-	fTitleView = new TitleView();
+	fTitleView = new TitleView(fModel->GetPackageIconRepository());
 	fPackageActionView = new PackageActionView(handler);
 	fPackageActionView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED,
 		B_SIZE_UNSET));
@@ -1364,7 +1371,7 @@ PackageInfoView::MessageReceived(BMessage* message)
 			if (package->Name() != name)
 				break;
 
-			BAutolock _(fModelLock);
+			BAutolock _(fModel->Lock());
 
 			if ((changes & PKG_CHANGED_SUMMARY) != 0
 				|| (changes & PKG_CHANGED_DESCRIPTION) != 0
@@ -1396,7 +1403,7 @@ PackageInfoView::MessageReceived(BMessage* message)
 void
 PackageInfoView::SetPackage(const PackageInfoRef& packageRef)
 {
-	BAutolock _(fModelLock);
+	BAutolock _(fModel->Lock());
 
 	if (packageRef.Get() == NULL) {
 		Clear();
@@ -1441,7 +1448,7 @@ PackageInfoView::SetPackage(const PackageInfoRef& packageRef)
 void
 PackageInfoView::Clear()
 {
-	BAutolock _(fModelLock);
+	BAutolock _(fModel->Lock());
 
 	fTitleView->Clear();
 	fPackageActionView->Clear();

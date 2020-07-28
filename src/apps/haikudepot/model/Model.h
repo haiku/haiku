@@ -9,8 +9,8 @@
 #include <Locker.h>
 
 #include "AbstractProcess.h"
+#include "PackageIconTarRepository.h"
 #include "LanguageModel.h"
-#include "LocalIconStore.h"
 #include "PackageInfo.h"
 #include "WebAppInterface.h"
 
@@ -71,6 +71,9 @@ public:
 	virtual						~Model();
 
 			LanguageModel*		Language();
+			PackageIconRepository&
+								GetPackageIconRepository();
+			status_t			InitPackageIconRepository();
 
 			BLocker*			Lock()
 									{ return &fLock; }
@@ -152,7 +155,7 @@ public:
 									DepotMapper* depotMapper,
 									void* context);
 
-			status_t			IconStoragePath(BPath& path) const;
+			status_t			IconTarPath(BPath& path) const;
 			status_t			DumpExportReferenceDataPath(BPath& path);
 			status_t			DumpExportRepositoryDataPath(BPath& path);
 			status_t			DumpExportPkgDataPath(BPath& path,
@@ -206,6 +209,8 @@ private:
 			bool				fShowDevelopPackages;
 
 			LanguageModel		fLanguageModel;
+			PackageIconTarRepository
+								fPackageIconRepository;
 			WebAppInterface		fWebAppInterface;
 
 			ModelListenerList	fListeners;

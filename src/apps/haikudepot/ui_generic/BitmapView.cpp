@@ -118,7 +118,7 @@ BitmapView::MaxSize()
 
 
 void
-BitmapView::SetBitmap(SharedBitmap* bitmap, SharedBitmap::Size bitmapSize)
+BitmapView::SetBitmap(SharedBitmap* bitmap, BitmapSize bitmapSize)
 {
 	if (bitmap == fReference && bitmapSize == fBitmapSize)
 		return;

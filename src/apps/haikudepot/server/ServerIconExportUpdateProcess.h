@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef SERVER_ICON_EXPORT_UPDATE_PROCESS_H
@@ -11,15 +11,14 @@
 #include <String.h>
 #include <Url.h>
 
-#include "AbstractServerProcess.h"
-#include "LocalIconStore.h"
+#include "AbstractSingleFileServerProcess.h"
 #include "Model.h"
 
 
 class DumpExportPkg;
 
 
-class ServerIconExportUpdateProcess : public AbstractServerProcess {
+class ServerIconExportUpdateProcess : public AbstractSingleFileServerProcess {
 public:
 
 								ServerIconExportUpdateProcess(
@@ -29,26 +28,27 @@ public:
 			const char*			Name() const;
 			const char*			Description() const;
 
-			status_t			RunInternal();
+	virtual status_t			ProcessLocalData();
+
+	virtual	status_t			GetLocalPath(BPath& path) const;
+	virtual	status_t			IfModifiedSinceHeaderValue(
+									BString& headerValue) const;
+
+
+	virtual	status_t			GetStandardMetaDataPath(BPath& path) const;
+	virtual	void				GetStandardMetaDataJsonPath(
+									BString& jsonPath) const;
 
 protected:
-			status_t			PopulateForPkg(const PackageInfoRef& package);
-			status_t			PopulateForDepot(const DepotInfo& depot);
-			status_t			Populate();
-			status_t			HasLocalData(bool* result) const;
-			status_t			GetStandardMetaDataPath(BPath& path) const;
-			void				GetStandardMetaDataJsonPath(
-									BString& jsonPath) const;
-private:
-			status_t			_Unpack(BPath& tarGzFilePath);
-			status_t			_HandleDownloadFailure();
-			status_t			_DownloadAndUnpack();
-			status_t			_Download(BPath& tarGzFilePath);
+	virtual	BString				UrlPathComponent();
 
+private:
+			void				_NotifyPackagesWithIconsInDepots() const;
+			void				_NotifyPackagesWithIconsInDepot(
+									const DepotInfo& depotInfo) const;
+
+private:
 			Model*				fModel;
-			BPath				fLocalIconStoragePath;
-			LocalIconStore*		fLocalIconStore;
-			int32				fCountIconsSet;
 
 };
 

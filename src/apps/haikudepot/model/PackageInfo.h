@@ -283,10 +283,6 @@ public:
 			const PublisherInfo& Publisher() const
 									{ return fPublisher; }
 
-			void				SetIcon(const BitmapRef& icon);
-			const BitmapRef&	Icon() const
-									{ return fIcon; }
-
 			void				SetHasChangelog(bool value);
 			bool				HasChangelog() const
 									{ return fHasChangelog; }
@@ -367,17 +363,15 @@ public:
 			void				RemoveListener(
 									const PackageInfoListenerRef& listener);
 
-	static	void				CleanupDefaultIcon();
-
 			void				StartCollatingChanges();
 			void				EndCollatingChanges();
+			void				NotifyChangedIcon();
 
 private:
 			void				_NotifyListeners(uint32 changes);
 			void				_NotifyListenersImmediate(uint32 changes);
 
 private:
-			BitmapRef			fIcon;
 			BString				fName;
 			BString				fTitle;
 			BPackageVersion		fVersion;
@@ -407,8 +401,6 @@ private:
 
 			bool				fIsCollatingChanges;
 			uint32				fCollatedChanges;
-
-	static	BitmapRef			sDefaultIcon;
 };
 
 

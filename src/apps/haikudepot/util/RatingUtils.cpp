@@ -22,9 +22,9 @@ RatingUtils::Draw(BView* target, BPoint at, float value)
 	const BBitmap* star;
 
 	if (value < RATING_MIN)
-		star = sStarGrayBitmap->Bitmap(SharedBitmap::SIZE_16);
+		star = sStarGrayBitmap->Bitmap(BITMAP_SIZE_16);
 	else
-		star = sStarBlueBitmap->Bitmap(SharedBitmap::SIZE_16);
+		star = sStarBlueBitmap->Bitmap(BITMAP_SIZE_16);
 
 	if (star == NULL) {
 		debugger("no star icon found in application resources.");

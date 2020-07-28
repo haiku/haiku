@@ -341,6 +341,24 @@ Model::Language()
 }
 
 
+PackageIconRepository&
+Model::GetPackageIconRepository()
+{
+	return fPackageIconRepository;
+}
+
+
+status_t
+Model::InitPackageIconRepository()
+{
+	BPath tarPath;
+	status_t result = IconTarPath(tarPath);
+	if (result == B_OK)
+		result = fPackageIconRepository.Init(tarPath);
+	return result;
+}
+
+
 bool
 Model::AddListener(const ModelListenerRef& listener)
 {
@@ -906,9 +924,9 @@ Model::DumpExportReferenceDataPath(BPath& path)
 
 
 status_t
-Model::IconStoragePath(BPath& path) const
+Model::IconTarPath(BPath& path) const
 {
-	return StorageUtils::LocalWorkingDirectoryPath("__allicons", path);
+	return StorageUtils::LocalWorkingFilesPath("pkgicon-all.tar", path);
 }
 
 

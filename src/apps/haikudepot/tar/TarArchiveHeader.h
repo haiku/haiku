@@ -1,8 +1,7 @@
 /*
- * Copyright 2017, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
-
 #ifndef TAR_ARCHIVE_HEADER_H
 #define TAR_ARCHIVE_HEADER_H
 
@@ -21,28 +20,20 @@ enum tar_file_type {
 
 class TarArchiveHeader {
 public:
-									TarArchiveHeader(const BString& fileName,
-										uint64 length, tar_file_type fileType);
+									TarArchiveHeader();
+	virtual							~TarArchiveHeader();
 
-		static TarArchiveHeader*	CreateFromBlock(const unsigned char *block);
+	const	BString&				FileName() const;
+			size_t					Length() const;
+			tar_file_type			FileType() const;
 
-			const BString&			GetFileName() const;
-			size_t					GetLength() const;
-			tar_file_type			GetFileType() const;
-
+			void					SetFileName(const BString& value);
+			void					SetLength(size_t value);
+			void					SetFileType(tar_file_type value);
 private:
-		static uint32				_CalculateChecksum(
-										const unsigned char* data);
-		static const BString		_ReadString(const unsigned char* data,
-										size_t dataLength);
-		static uint32				_ReadNumeric(const unsigned char* data,
-										size_t dataLength);
-		static tar_file_type		_ReadFileType(unsigned char data);
-
-			const BString			fFileName;
+			BString					fFileName;
 			uint64					fLength;
 			tar_file_type			fFileType;
-
 };
 
 #endif // TAR_ARCHIVE_HEADER_H

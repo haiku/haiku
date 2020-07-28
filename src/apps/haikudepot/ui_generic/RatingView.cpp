@@ -47,8 +47,8 @@ const BBitmap*
 RatingView::StarBitmap()
 {
 	if (fRating < RATING_MIN)
-		return fStarGrayBitmap->Bitmap(SharedBitmap::SIZE_16);
-	return fStarBlueBitmap->Bitmap(SharedBitmap::SIZE_16);
+		return fStarGrayBitmap->Bitmap(BITMAP_SIZE_16);
+	return fStarBlueBitmap->Bitmap(BITMAP_SIZE_16);
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018, Andrew Lindesay, <apl@lindesay.co.nz>.
+ * Copyright 2018-2020, Andrew Lindesay, <apl@lindesay.co.nz>.
  * Copyright 2017, Julian Harnath, <julian.harnath@rwth-aachen.de>.
  * Copyright 2015, Axel Dörfler, <axeld@pinc-software.de>.
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
@@ -63,24 +63,18 @@ package_state_to_string(PackageInfoRef ref)
 }
 
 
-// A field type displaying both a bitmap and a string so that the
-// tree display looks nicer (both text and bitmap are indented)
-class SharedBitmapStringField : public BStringField {
+class PackageIconAndTitleField : public BStringField {
 	typedef BStringField Inherited;
 public:
-								SharedBitmapStringField(SharedBitmap* bitmap,
-									SharedBitmap::Size size,
+								PackageIconAndTitleField(
+									const char* packageName,
 									const char* string);
-	virtual						~SharedBitmapStringField();
+	virtual						~PackageIconAndTitleField();
 
-			void				SetBitmap(SharedBitmap* bitmap,
-									SharedBitmap::Size size);
-			const BBitmap*		Bitmap() const
-									{ return fBitmap; }
-
+			const BString		PackageName() const
+									{ return fPackageName; }
 private:
-			BitmapRef			fReference;
-			const BBitmap*		fBitmap;
+			const BString		fPackageName;
 };
 
 
@@ -111,12 +105,12 @@ private:
 
 
 // BColumn for PackageListView which knows how to render
-// a SharedBitmapStringField
-// TODO: Code-duplication with DriveSetup PartitionList.h
+// a PackageIconAndTitleField
 class PackageColumn : public BTitledColumn {
 	typedef BTitledColumn Inherited;
 public:
-								PackageColumn(const char* title,
+								PackageColumn(Model* model,
+									const char* title,
 									float width, float minWidth,
 									float maxWidth, uint32 truncateMode,
 									alignment align = B_ALIGN_LEFT);
@@ -132,6 +126,7 @@ public:
 	static	void				InitTextMargin(BView* parent);
 
 private:
+			Model*				fModel;
 			uint32				fTruncateMode;
 	static	float				sTextMargin;
 };
@@ -141,14 +136,15 @@ private:
 class PackageRow : public BRow {
 	typedef BRow Inherited;
 public:
-								PackageRow(const PackageInfoRef& package,
+								PackageRow(
+									const PackageInfoRef& package,
 									PackageListener* listener);
 	virtual						~PackageRow();
 
 			const PackageInfoRef& Package() const
 									{ return fPackage; }
 
-			void				UpdateTitle();
+			void				UpdateIconAndTitle();
 			void				UpdateSummary();
 			void				UpdateState();
 			void				UpdateRating();
@@ -161,7 +157,8 @@ public:
 
 private:
 			PackageInfoRef		fPackage;
-			PackageInfoListenerRef fPackageListener;
+			PackageInfoListenerRef
+								fPackageListener;
 
 			PackageRow*			fNextInHash;
 				// link for BOpenHashTable
@@ -208,28 +205,17 @@ private:
 // #pragma mark - SharedBitmapStringField
 
 
-SharedBitmapStringField::SharedBitmapStringField(SharedBitmap* bitmap,
-		SharedBitmap::Size size, const char* string)
+PackageIconAndTitleField::PackageIconAndTitleField(const char* packageName,
+	const char* string)
 	:
 	Inherited(string),
-	fBitmap(NULL)
-{
-	SetBitmap(bitmap, size);
-}
-
-
-SharedBitmapStringField::~SharedBitmapStringField()
+	fPackageName(packageName)
 {
 }
 
 
-void
-SharedBitmapStringField::SetBitmap(SharedBitmap* bitmap,
-	SharedBitmap::Size size)
+PackageIconAndTitleField::~PackageIconAndTitleField()
 {
-	fReference = bitmap;
-	fBitmap = bitmap != NULL ? bitmap->Bitmap(size) : NULL;
-	// TODO: cause a redraw?
 }
 
 
@@ -312,10 +298,11 @@ SizeField::SetSize(double size)
 float PackageColumn::sTextMargin = 0.0;
 
 
-PackageColumn::PackageColumn(const char* title, float width, float minWidth,
-		float maxWidth, uint32 truncateMode, alignment align)
+PackageColumn::PackageColumn(Model* model, const char* title, float width,
+		float minWidth, float maxWidth, uint32 truncateMode, alignment align)
 	:
 	Inherited(title, width, minWidth, maxWidth, align),
+	fModel(model),
 	fTruncateMode(truncateMode)
 {
 	SetWantsEvents(true);
@@ -325,14 +312,12 @@ PackageColumn::PackageColumn(const char* title, float width, float minWidth,
 void
 PackageColumn::DrawField(BField* field, BRect rect, BView* parent)
 {
-	SharedBitmapStringField* bitmapField
-		= dynamic_cast<SharedBitmapStringField*>(field);
+	PackageIconAndTitleField* packageIconAndTitleField
+		= dynamic_cast<PackageIconAndTitleField*>(field);
 	BStringField* stringField = dynamic_cast<BStringField*>(field);
 	RatingField* ratingField = dynamic_cast<RatingField*>(field);
 
-	if (bitmapField != NULL) {
-		const BBitmap* bitmap = bitmapField->Bitmap();
-
+	if (packageIconAndTitleField != NULL) {
 		// Scale the bitmap to 16x16
 		BRect r = BRect(0, 0, 15, 15);
 
@@ -357,23 +342,33 @@ PackageColumn::DrawField(BField* field, BRect rect, BView* parent)
 				break;
 		}
 
-		if (width != bitmapField->Width()) {
-			BString truncatedString(bitmapField->String());
+		if (width != packageIconAndTitleField->Width()) {
+			BString truncatedString(packageIconAndTitleField->String());
 			parent->TruncateString(&truncatedString, fTruncateMode, width + 2);
-			bitmapField->SetClippedString(truncatedString.String());
-			bitmapField->SetWidth(width);
+			packageIconAndTitleField->SetClippedString(truncatedString.String());
+			packageIconAndTitleField->SetWidth(width);
 		}
 
 		// draw the bitmap
-		if (bitmap != NULL) {
-			parent->SetDrawingMode(B_OP_ALPHA);
-			BRect viewRect(x, y, x + 15, y + 15);
-			parent->DrawBitmap(bitmap, bitmap->Bounds(), viewRect);
-			parent->SetDrawingMode(B_OP_OVER);
+		BitmapRef bitmapRef;
+		status_t bitmapResult;
+
+		bitmapResult = fModel->GetPackageIconRepository().GetIcon(
+			packageIconAndTitleField->PackageName(), BITMAP_SIZE_16,
+			bitmapRef);
+
+		if (bitmapResult == B_OK) {
+			if (bitmapRef.Get() != NULL) {
+				const BBitmap* bitmap = bitmapRef->Bitmap(BITMAP_SIZE_16);
+				parent->SetDrawingMode(B_OP_ALPHA);
+				BRect viewRect(x, y, x + 15, y + 15);
+				parent->DrawBitmap(bitmap, bitmap->Bounds(), viewRect);
+				parent->SetDrawingMode(B_OP_OVER);
+			}
 		}
 
 		// draw the string
-		DrawString(bitmapField->ClippedString(), parent, r);
+		DrawString(packageIconAndTitleField->ClippedString(), parent, r);
 
 	} else if (stringField != NULL) {
 
@@ -487,22 +482,20 @@ PackageColumn::CompareFields(BField* field1, BField* field2)
 float
 PackageColumn::GetPreferredWidth(BField *_field, BView* parent) const
 {
-	SharedBitmapStringField* bitmapField
-		= dynamic_cast<SharedBitmapStringField*>(_field);
+	PackageIconAndTitleField* packageIconAndTitleField
+		= dynamic_cast<PackageIconAndTitleField*>(_field);
 	BStringField* stringField = dynamic_cast<BStringField*>(_field);
 
 	float parentWidth = Inherited::GetPreferredWidth(_field, parent);
 	float width = 0.0;
 
-	if (bitmapField) {
-		const BBitmap* bitmap = bitmapField->Bitmap();
+	if (packageIconAndTitleField) {
 		BFont font;
 		parent->GetFont(&font);
-		width = font.StringWidth(bitmapField->String()) + 3 * sTextMargin;
-		if (bitmap)
-			width += bitmap->Bounds().Width();
-		else
-			width += 16;
+		width = font.StringWidth(packageIconAndTitleField->String())
+			+ 3 * sTextMargin;
+		width += 16;
+			// for the icon; always 16px
 	} else if (stringField) {
 		BFont font;
 		parent->GetFont(&font);
@@ -558,7 +551,7 @@ PackageRow::PackageRow(const PackageInfoRef& packageRef,
 
 	// Package icon and title
 	// NOTE: The icon BBitmap is referenced by the fPackage member.
-	UpdateTitle();
+	UpdateIconAndTitle();
 
 	// Rating
 	UpdateRating();
@@ -590,13 +583,13 @@ PackageRow::~PackageRow()
 
 
 void
-PackageRow::UpdateTitle()
+PackageRow::UpdateIconAndTitle()
 {
 	if (fPackage.Get() == NULL)
 		return;
 
-	SetField(new SharedBitmapStringField(fPackage->Icon(),
-			SharedBitmap::SIZE_16, fPackage->Title()), kTitleColumn);
+	SetField(new PackageIconAndTitleField(
+		fPackage->Name(), fPackage->Title()), kTitleColumn);
 }
 
 
@@ -785,10 +778,10 @@ struct PackageListView::RowByNameHashDefinition {
 // #pragma mark - PackageListView
 
 
-PackageListView::PackageListView(BLocker* modelLock)
+PackageListView::PackageListView(Model* model)
 	:
 	BColumnListView(B_TRANSLATE("All packages"), 0, B_FANCY_BORDER, true),
-	fModelLock(modelLock),
+	fModel(model),
 	fPackageListener(new(std::nothrow) PackageListener(this)),
 	fRowByNameTable(new RowByNameTable()),
 	fWorkStatusView(NULL)
@@ -796,29 +789,33 @@ PackageListView::PackageListView(BLocker* modelLock)
 	float scale = be_plain_font->Size() / 12.f;
 	float spacing = be_control_look->DefaultItemSpacing() * 2;
 
-	AddColumn(new PackageColumn(B_TRANSLATE("Name"), 150 * scale, 50 * scale,
-		300 * scale, B_TRUNCATE_MIDDLE), kTitleColumn);
-	AddColumn(new PackageColumn(B_TRANSLATE("Rating"), 80 * scale, 50 * scale,
-		100 * scale, B_TRUNCATE_MIDDLE), kRatingColumn);
-	AddColumn(new PackageColumn(B_TRANSLATE("Description"), 300 * scale,
-		80 * scale, 1000 * scale,
+	AddColumn(new PackageColumn(fModel, B_TRANSLATE("Name"),
+		150 * scale, 50 * scale, 300 * scale,
+		B_TRUNCATE_MIDDLE), kTitleColumn);
+	AddColumn(new PackageColumn(fModel, B_TRANSLATE("Rating"),
+		80 * scale, 50 * scale, 100 * scale,
+		B_TRUNCATE_MIDDLE), kRatingColumn);
+	AddColumn(new PackageColumn(fModel, B_TRANSLATE("Description"),
+		300 * scale, 80 * scale, 1000 * scale,
 		B_TRUNCATE_MIDDLE), kDescriptionColumn);
-	PackageColumn* sizeColumn = new PackageColumn(B_TRANSLATE("Size"),
+	PackageColumn* sizeColumn = new PackageColumn(fModel, B_TRANSLATE("Size"),
 		spacing + StringWidth(B_TRANSLATE("9999.99 KiB")), 50 * scale,
 		140 * scale, B_TRUNCATE_END);
 	sizeColumn->SetAlignment(B_ALIGN_RIGHT);
 	AddColumn(sizeColumn, kSizeColumn);
-	AddColumn(new PackageColumn(B_TRANSLATE("Status"),
+	AddColumn(new PackageColumn(fModel, B_TRANSLATE("Status"),
 		spacing + StringWidth(B_TRANSLATE("Available")), 60 * scale,
 		140 * scale, B_TRUNCATE_END), kStatusColumn);
 
-	AddColumn(new PackageColumn(B_TRANSLATE("Repository"), 120 * scale,
-		50 * scale, 200 * scale, B_TRUNCATE_MIDDLE), kRepositoryColumn);
+	AddColumn(new PackageColumn(fModel, B_TRANSLATE("Repository"),
+		120 * scale, 50 * scale, 200 * scale,
+		B_TRUNCATE_MIDDLE), kRepositoryColumn);
 	SetColumnVisible(kRepositoryColumn, false);
 		// invisible by default
 
-	AddColumn(new PackageColumn(B_TRANSLATE("Version"), 50 * scale,
-		50 * scale, 200 * scale, B_TRUNCATE_MIDDLE), kVersionColumn);
+	AddColumn(new PackageColumn(fModel, B_TRANSLATE("Version"),
+		50 * scale, 50 * scale, 200 * scale,
+		B_TRUNCATE_MIDDLE), kVersionColumn);
 
 	fItemCountView = new ItemCountView();
 	AddStatusView(fItemCountView);
@@ -864,11 +861,11 @@ PackageListView::MessageReceived(BMessage* message)
 				break;
 			}
 
-			BAutolock _(fModelLock);
+			BAutolock _(fModel->Lock());
 			PackageRow* row = _FindRow(name);
 			if (row != NULL) {
 				if ((changes & PKG_CHANGED_TITLE) != 0)
-					row->UpdateTitle();
+					row->UpdateIconAndTitle();
 				if ((changes & PKG_CHANGED_SUMMARY) != 0)
 					row->UpdateSummary();
 				if ((changes & PKG_CHANGED_RATINGS) != 0)
@@ -878,7 +875,7 @@ PackageListView::MessageReceived(BMessage* message)
 				if ((changes & PKG_CHANGED_SIZE) != 0)
 					row->UpdateSize();
 				if ((changes & PKG_CHANGED_ICON) != 0)
-					row->UpdateTitle();
+					row->UpdateIconAndTitle();
 				if ((changes & PKG_CHANGED_DEPOT) != 0)
 					row->UpdateRepository();
 				if ((changes & PKG_CHANGED_VERSION) != 0)
@@ -927,7 +924,7 @@ PackageListView::AddPackage(const PackageInfoRef& package)
 	if (packageRow != NULL)
 		return;
 
-	BAutolock _(fModelLock);
+	BAutolock _(fModel->Lock());
 
 	// create the row for this package
 	packageRow = new PackageRow(package, fPackageListener);

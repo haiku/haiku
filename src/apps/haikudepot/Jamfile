@@ -119,8 +119,8 @@ local applicationSources =
 	DecisionProvider.cpp
 	FeaturedPackagesView.cpp
 	FilterView.cpp
+	IconTarPtr.cpp
 	JobStateListener.cpp
-	LocalIconStore.cpp
 	LanguageModel.cpp
 	LinkView.cpp
 	LinkedBitmapView.cpp
@@ -133,6 +133,7 @@ local applicationSources =
 	PackageAction.cpp
 	PackageActionHandler.cpp
 	PackageContentsView.cpp
+	PackageIconTarRepository.cpp
 	PackageInfo.cpp
 	PackageInfoListener.cpp
 	PackageInfoView.cpp

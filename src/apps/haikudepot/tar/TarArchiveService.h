@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef TAR_ARCHIVE_SERVICE_H
@@ -12,24 +12,37 @@
 #include <Path.h>
 
 
+class TarEntryListener {
+public:
+	virtual status_t			Handle(
+									const TarArchiveHeader& header,
+									size_t offset,
+									BDataIO* data) = 0;
+};
+
+
 class TarArchiveService {
 public:
-		static status_t			Unpack(BDataIO& tarDataIo,
-									BPath& targetDirectoryPath,
-									Stoppable* stoppable);
+	static	status_t			ForEachEntry(BPositionIO& tarIo,
+									TarEntryListener* listener);
+	static	status_t			GetEntry(BPositionIO& tarIo,
+									TarArchiveHeader& header);
 
 private:
-		static status_t			_EnsurePathToTarItemFile(
-									BPath& targetDirectoryPath,
-									BString &tarItemPath);
-		static status_t			_ValidatePathComponent(
+	static	status_t			_ValidatePathComponent(
 									const BString& component);
-		static status_t			_UnpackItem(BDataIO& tarDataIo,
-									BPath& targetDirectory,
-									TarArchiveHeader& header);
-		static status_t			_UnpackItemData(BDataIO& tarDataIo,
-									BPath& targetFilePath,
-									uint32 length);
+
+	static	off_t				_BytesRoundedToBlocks(off_t value);
+	static	uint32				_CalculateBlockChecksum(
+									const unsigned char* data);
+
+	static	status_t			_ReadHeader(const uint8* data,
+										TarArchiveHeader& header);
+	static	const BString		_ReadHeaderString(const uint8* data,
+									size_t dataLength);
+	static uint32				_ReadHeaderNumeric(const uint8* data,
+									size_t dataLength);
+	static tar_file_type		_ReadHeaderFileType(uint8 data);
 
 };
 

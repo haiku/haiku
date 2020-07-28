@@ -1,9 +1,7 @@
 /*
- * Copyright 2017-2018, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
-
-
 #ifndef ABSTRACT_SERVER_PROCESS_H
 #define ABSTRACT_SERVER_PROCESS_H
 
@@ -39,12 +37,15 @@ protected:
 	virtual	void				GetStandardMetaDataJsonPath(
 									BString& jsonPath) const = 0;
 
-			status_t			IfModifiedSinceHeaderValue(
+	virtual	status_t			IfModifiedSinceHeaderValue(
 									BString& headerValue) const;
 			status_t			IfModifiedSinceHeaderValue(
 									BString& headerValue,
 									const BPath& metaDataPath,
 									const BString& jsonPath) const;
+	static	void				SetIfModifiedSinceHeaderValueFromMetaData(
+									BString& headerValue,
+									const StandardMetaData& metaData);
 
 			status_t			PopulateMetaData(
 									StandardMetaData& metaData,
@@ -55,7 +56,7 @@ protected:
 									BJsonEventListener *listener,
 									const BPath& path) const;
 
-			status_t			DownloadToLocalFileAtomically(
+	virtual	status_t			DownloadToLocalFileAtomically(
 									const BPath& targetFilePath,
 									const BUrl& url);
 
@@ -72,17 +73,18 @@ protected:
 	virtual status_t			StopInternal();
 
 private:
-			uint32				fOptions;
-
-			BHttpRequest*		fRequest;
-
 			status_t			DownloadToLocalFile(
 									const BPath& targetFilePath,
 									const BUrl& url,
 									uint32 redirects, uint32 failures);
 
-	static bool					LooksLikeGzip(const char *pathStr);
+	static bool					_LooksLikeGzip(const char *pathStr);
+	static status_t				_DeGzipInSitu(const BPath& path);
 
+private:
+			uint32				fOptions;
+
+			BHttpRequest*		fRequest;
 };
 
 #endif // ABSTRACT_SERVER_PROCESS_H

@@ -9,6 +9,7 @@
 
 #include <View.h>
 
+#include "Model.h"
 #include "PackageInfo.h"
 #include "PackageInfoListener.h"
 
@@ -18,7 +19,7 @@ class StackedFeaturedPackagesView;
 
 class FeaturedPackagesView : public BView {
 public:
-								FeaturedPackagesView();
+								FeaturedPackagesView(Model& model);
 	virtual						~FeaturedPackagesView();
 
 	virtual	void				DoLayout();
@@ -33,10 +34,10 @@ public:
 	static	void				CleanupIcons();
 
 private:
-			void			_AdjustViews();
+			void				_AdjustViews();
 
 private:
-
+			Model&				fModel;
 			BScrollView*		fScrollView;
 			StackedFeaturedPackagesView*
 								fPackagesView;

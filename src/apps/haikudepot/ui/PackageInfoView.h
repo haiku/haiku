@@ -1,5 +1,6 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2020, Andrew Lindesay <apl@lindesay.co.nz>
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef PACKAGE_INFO_VIEW_H
@@ -7,6 +8,7 @@
 
 #include <GroupView.h>
 
+#include "Model.h"
 #include "PackageInfo.h"
 #include "PackageInfoListener.h"
 
@@ -27,7 +29,7 @@ enum {
 
 class PackageInfoView : public BView {
 public:
-								PackageInfoView(BLocker* modelLock,
+								PackageInfoView(Model* model,
 									PackageActionHandler* handler);
 	virtual						~PackageInfoView();
 
@@ -40,7 +42,7 @@ public:
 			void				Clear();
 
 private:
-			BLocker*			fModelLock;
+			Model*				fModel;
 
 			BCardLayout*		fCardLayout;
 			TitleView*			fTitleView;

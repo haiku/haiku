@@ -57,10 +57,10 @@ ScreenshotWindow::ScreenshotWindow(BWindow* parent, BRect frame)
 
 	fToolBar = new BToolBar();
 	fToolBar->AddAction(MSG_PREVIOUS_SCREENSHOT, this,
-		sNextButtonIcon->Bitmap(SharedBitmap::SIZE_22),
+		sNextButtonIcon->Bitmap(BITMAP_SIZE_22),
 		NULL, NULL);
 	fToolBar->AddAction(MSG_NEXT_SCREENSHOT, this,
-		sPreviousButtonIcon->Bitmap(SharedBitmap::SIZE_22),
+		sPreviousButtonIcon->Bitmap(BITMAP_SIZE_22),
 		NULL, NULL);
 	fToolBar->AddView(fIndexView);
 	fToolBar->AddGlue();

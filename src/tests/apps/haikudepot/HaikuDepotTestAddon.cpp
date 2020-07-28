@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019, Andrew Lindesay, apl@lindesay.co.nz
+ * Copyright 2017-2020, Andrew Lindesay, apl@lindesay.co.nz
  * Distributed under the terms of the MIT License.
  */
 
@@ -10,6 +10,8 @@
 #include "DumpExportRepositoryJsonListenerTest.h"
 #include "ValidationFailureTest.h"
 #include "ValidationUtilsTest.h"
+#include "StorageUtilsTest.h"
+#include "TarArchiveServiceTest.h"
 #include "ListTest.h"
 
 BTestSuite*
@@ -22,6 +24,8 @@ getTestSuite()
 	ValidationFailureTest::AddTests(*suite);
 	ValidationUtilsTest::AddTests(*suite);
 	ListTest::AddTests(*suite);
+	StorageUtilsTest::AddTests(*suite);
+	TarArchiveServiceTest::AddTests(*suite);
 
 	return suite;
 }

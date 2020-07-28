@@ -17,6 +17,7 @@
 
 #include <support/ZlibCompressionAlgorithm.h>
 
+#include "DataIOUtils.h"
 #include "HaikuDepotConstants.h"
 #include "Logger.h"
 #include "ServerHelper.h"
@@ -112,22 +113,29 @@ AbstractServerProcess::IfModifiedSinceHeaderValue(BString& headerValue,
 	StandardMetaData metaData;
 	status_t result = PopulateMetaData(metaData, metaDataPath, jsonPath);
 
-	if (result == B_OK) {
-
-		// An example of this output would be; 'Fri, 24 Oct 2014 19:32:27 +0000'
-
-		BDateTime modifiedDateTime = metaData
-			.GetDataModifiedTimestampAsDateTime();
-		BPrivate::BHttpTime modifiedHttpTime(modifiedDateTime);
-		headerValue.SetTo(modifiedHttpTime
-			.ToString(BPrivate::B_HTTP_TIME_FORMAT_COOKIE));
-	} else {
+	if (result == B_OK)
+		SetIfModifiedSinceHeaderValueFromMetaData(headerValue, metaData);
+	else {
 		HDERROR("unable to parse the meta-data date and time from [%s]"
 			" - cannot set the 'If-Modified-Since' header",
 			metaDataPath.Path());
 	}
 
 	return result;
+}
+
+
+/*static*/ void
+AbstractServerProcess::SetIfModifiedSinceHeaderValueFromMetaData(
+	BString& headerValue,
+	const StandardMetaData& metaData)
+{
+	// An example of this output would be; 'Fri, 24 Oct 2014 19:32:27 +0000'
+	BDateTime modifiedDateTime = metaData
+		.GetDataModifiedTimestampAsDateTime();
+	BPrivate::BHttpTime modifiedHttpTime(modifiedDateTime);
+	headerValue.SetTo(modifiedHttpTime
+		.ToString(BPrivate::B_HTTP_TIME_FORMAT_COOKIE));
 }
 
 
@@ -158,7 +166,7 @@ AbstractServerProcess::PopulateMetaData(
 
 
 /* static */ bool
-AbstractServerProcess::LooksLikeGzip(const char *pathStr)
+AbstractServerProcess::_LooksLikeGzip(const char *pathStr)
 {
 	int l = strlen(pathStr);
 	return l > 4 && 0 == strncmp(&pathStr[l - 3], ".gz", 3);
@@ -190,7 +198,7 @@ AbstractServerProcess::ParseJsonFromFileWithListener(
 		// compressed and the algorithm needs to decompress the data as
 		// it is parsed.
 
-	if (LooksLikeGzip(pathStr)) {
+	if (_LooksLikeGzip(pathStr)) {
 		BDataIO* gzDecompressedInput = NULL;
 		BZlibDecompressionParameters* zlibDecompressionParameters
 			= new BZlibDecompressionParameters();
@@ -226,10 +234,18 @@ AbstractServerProcess::DownloadToLocalFileAtomically(
 	status_t result = DownloadToLocalFile(
 		temporaryFilePath, url, 0, 0);
 
+	// if the data is coming in as .gz, but is not stored as .gz then
+	// the data should be decompressed in the temporary file location
+	// before being shifted into place.
+
+	if (result == B_OK
+			&& _LooksLikeGzip(url.Path())
+			&& !_LooksLikeGzip(targetFilePath.Path()))
+		result = _DeGzipInSitu(temporaryFilePath);
+
 		// not copying if the data has not changed because the data will be
 		// zero length.  This is if the result is APP_ERR_NOT_MODIFIED.
 	if (result == B_OK) {
-
 			// if the file is zero length then assume that something has
 			// gone wrong.
 		off_t size;
@@ -245,6 +261,45 @@ AbstractServerProcess::DownloadToLocalFileAtomically(
 				result = B_IO_ERROR;
 			}
 		}
+	}
+
+	return result;
+}
+
+
+/*static*/ status_t
+AbstractServerProcess::_DeGzipInSitu(const BPath& path)
+{
+	const char* tmpPath = tmpnam(NULL);
+	status_t result = B_OK;
+
+	{
+		BFile file(path.Path(), O_RDONLY);
+		BFile tmpFile(tmpPath, O_WRONLY | O_CREAT);
+
+		BDataIO* gzDecompressedInput = NULL;
+		BZlibDecompressionParameters* zlibDecompressionParameters
+			= new BZlibDecompressionParameters();
+
+		result = BZlibCompressionAlgorithm()
+			.CreateDecompressingInputStream(&file,
+				zlibDecompressionParameters, gzDecompressedInput);
+
+		if (result == B_OK) {
+			ObjectDeleter<BDataIO> gzDecompressedInputDeleter(
+				gzDecompressedInput);
+			result = DataIOUtils::CopyAll(&tmpFile, gzDecompressedInput);
+		}
+	}
+
+	if (result == B_OK) {
+		if (rename(tmpPath, path.Path()) != 0) {
+			HDERROR("unable to move the uncompressed data into place");
+			result = B_ERROR;
+		}
+	}
+	else {
+		HDERROR("it was not possible to decompress the data");
 	}
 
 	return result;

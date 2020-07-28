@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef STANDARD_META_DATA_H
@@ -23,19 +23,22 @@ class StandardMetaData {
 public:
 										StandardMetaData();
 
-			uint64_t					GetCreateTimestamp();
-			BDateTime					GetCreateTimestampAsDateTime();
+			uint64_t					GetCreateTimestamp() const;
+			BDateTime					GetCreateTimestampAsDateTime() const;
 			void						SetCreateTimestamp(uint64_t value);
 
-			uint64_t					GetDataModifiedTimestamp();
-			BDateTime					GetDataModifiedTimestampAsDateTime();
+			uint64_t					GetDataModifiedTimestamp() const;
+			BDateTime					GetDataModifiedTimestampAsDateTime()
+											const;
 			void						SetDataModifiedTimestamp(
 											uint64_t value);
 
-			bool						IsPopulated();
+			bool						IsPopulated() const;
 private:
-			BDateTime					_CreateDateTime(
+	static	BDateTime					_CreateDateTime(
 											uint64_t millisSinceEpoc);
+
+private:
 			uint64_t					fCreateTimestamp;
 			uint64_t					fDataModifiedTimestamp;
 };

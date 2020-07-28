@@ -25,14 +25,13 @@ public:
 	virtual	BSize				MaxSize();
 
 			void				SetBitmap(SharedBitmap* bitmap,
-									SharedBitmap::Size bitmapSize
-										= SharedBitmap::SIZE_ANY);
+									BitmapSize bitmapSize = BITMAP_SIZE_ANY);
 			void				UnsetBitmap();
 			void				SetScaleBitmap(bool scaleBitmap);
 
 private:
 			BitmapRef			fReference;
-			SharedBitmap::Size	fBitmapSize;
+			BitmapSize			fBitmapSize;
 			const BBitmap*		fBitmap;
 			bool				fScaleBitmap;
 };

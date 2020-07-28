@@ -278,3 +278,31 @@ StorageUtils::LocalWorkingDirectoryPath(const BString leaf, BPath& path,
 
 	return result;
 }
+
+
+/*static*/ status_t
+StorageUtils::SwapExtensionOnPath(BPath& path, const char* extension)
+{
+	BPath parent;
+	status_t result = path.GetParent(&parent);
+	if (result == B_OK) {
+		path.SetTo(parent.Path(),
+			SwapExtensionOnPathComponent(path.Leaf(), extension).String());
+	}
+	return result;
+}
+
+
+/*static*/ BString
+StorageUtils::SwapExtensionOnPathComponent(const char* pathComponent,
+	const char* extension)
+{
+	BString result(pathComponent);
+	int32 lastDot = result.FindLast(".");
+	if (lastDot != B_ERROR) {
+		result.Truncate(lastDot);
+	}
+	result.Append(".");
+	result.Append(extension);
+	return result;
+}

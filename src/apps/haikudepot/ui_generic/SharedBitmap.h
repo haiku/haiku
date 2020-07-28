@@ -1,5 +1,6 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2020, Andrew Lindesay <apl@lindesay.co.nz>
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef SHARED_BITMAP_H
@@ -9,32 +10,28 @@
 #include <Referenceable.h>
 #include <String.h>
 
+#include "HaikuDepotConstants.h"
 #include "List.h"
 
 
 class BBitmap;
+class BDataIO;
 class BPositionIO;
 
 
 class SharedBitmap : public BReferenceable {
 public:
-		enum Size {
-			SIZE_ANY = -1,
-			SIZE_16 = 0,
-			SIZE_22 = 1,
-			SIZE_32 = 2,
-			SIZE_64 = 3
-		};
-
 								SharedBitmap(BBitmap* bitmap);
 								SharedBitmap(int32 resourceID);
 								SharedBitmap(const char* mimeType);
 								SharedBitmap(BPositionIO& data);
+								SharedBitmap(BDataIO& data, size_t size);
 								~SharedBitmap();
 
-			const BBitmap*		Bitmap(Size which);
+			const BBitmap*		Bitmap(BitmapSize which);
 
 private:
+			void				_InitWithData(BDataIO& data, size_t size);
 			BBitmap*			_CreateBitmapFromResource(int32 size) const;
 			BBitmap*			_CreateBitmapFromBuffer(int32 size) const;
 			BBitmap*			_CreateBitmapFromMimeType(int32 size) const;

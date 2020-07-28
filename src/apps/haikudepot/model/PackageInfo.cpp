@@ -456,14 +456,8 @@ ScreenshotInfo::operator!=(const ScreenshotInfo& other) const
 // #pragma mark - PackageInfo
 
 
-BitmapRef
-PackageInfo::sDefaultIcon(new(std::nothrow) SharedBitmap(
-	"application/x-vnd.haiku-package"), true);
-
-
 PackageInfo::PackageInfo()
 	:
-	fIcon(sDefaultIcon),
 	fName(),
 	fTitle(),
 	fVersion(),
@@ -494,7 +488,6 @@ PackageInfo::PackageInfo()
 
 PackageInfo::PackageInfo(const BPackageInfo& info)
 	:
-	fIcon(sDefaultIcon),
 	fName(info.Name()),
 	fTitle(),
 	fVersion(info.Version()),
@@ -541,7 +534,6 @@ PackageInfo::PackageInfo(const BString& name,
 		const BString& shortDescription, const BString& fullDescription,
 		int32 flags, const char* architecture)
 	:
-	fIcon(sDefaultIcon),
 	fName(name),
 	fTitle(),
 	fVersion(version),
@@ -573,7 +565,6 @@ PackageInfo::PackageInfo(const BString& name,
 
 PackageInfo::PackageInfo(const PackageInfo& other)
 	:
-	fIcon(other.fIcon),
 	fName(other.fName),
 	fTitle(other.fTitle),
 	fVersion(other.fVersion),
@@ -607,7 +598,6 @@ PackageInfo::PackageInfo(const PackageInfo& other)
 PackageInfo&
 PackageInfo::operator=(const PackageInfo& other)
 {
-	fIcon = other.fIcon;
 	fName = other.fName;
 	fTitle = other.fTitle;
 	fVersion = other.fVersion;
@@ -639,8 +629,7 @@ PackageInfo::operator=(const PackageInfo& other)
 bool
 PackageInfo::operator==(const PackageInfo& other) const
 {
-	return fIcon == other.fIcon
-		&& fName == other.fName
+	return fName == other.fName
 		&& fTitle == other.fTitle
 		&& fVersion == other.fVersion
 		&& fPublisher == other.fPublisher
@@ -705,16 +694,6 @@ PackageInfo::SetFullDescription(const BString& description)
 	if (fFullDescription != description) {
 		fFullDescription = description;
 		_NotifyListeners(PKG_CHANGED_DESCRIPTION);
-	}
-}
-
-
-void
-PackageInfo::SetIcon(const BitmapRef& icon)
-{
-	if (fIcon != icon) {
-		fIcon = icon;
-		_NotifyListeners(PKG_CHANGED_ICON);
 	}
 }
 
@@ -991,9 +970,9 @@ PackageInfo::RemoveListener(const PackageInfoListenerRef& listener)
 
 
 void
-PackageInfo::CleanupDefaultIcon()
+PackageInfo::NotifyChangedIcon()
 {
-	sDefaultIcon.Unset();
+	_NotifyListeners(PKG_CHANGED_ICON);
 }
 
 

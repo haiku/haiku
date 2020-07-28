@@ -153,9 +153,9 @@ MainWindow::MainWindow(const BMessage& settings)
 		menuBar->MaxSize().height));
 
 	fFilterView = new FilterView();
-	fFeaturedPackagesView = new FeaturedPackagesView();
-	fPackageListView = new PackageListView(fModel.Lock());
-	fPackageInfoView = new PackageInfoView(fModel.Lock(), this);
+	fFeaturedPackagesView = new FeaturedPackagesView(fModel);
+	fPackageListView = new PackageListView(&fModel);
+	fPackageInfoView = new PackageInfoView(&fModel, this);
 
 	fSplitView = new BSplitView(B_VERTICAL, 5.0f);
 
@@ -236,7 +236,7 @@ MainWindow::MainWindow(const BMessage& settings, const PackageInfoRef& package)
 		debugger("unable to create the process coordinator semaphore");
 
 	fFilterView = new FilterView();
-	fPackageInfoView = new PackageInfoView(fModel.Lock(), this);
+	fPackageInfoView = new PackageInfoView(&fModel, this);
 	fWorkStatusView = new WorkStatusView("work status");
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
