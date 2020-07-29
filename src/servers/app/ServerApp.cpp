@@ -1590,11 +1590,11 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 					LockedDesktopSettings settings(fDesktop);
 
 					// TODO: Should we also update our internal copies now?
-					if (!strcmp(type, "plain"))
+					if (strcmp(type, "plain") == 0)
 						settings.SetDefaultPlainFont(font);
-					else if (!strcmp(type, "bold"))
+					else if (strcmp(type, "bold") == 0)
 						settings.SetDefaultBoldFont(font);
-					else if (!strcmp(type, "fixed"))
+					else if (strcmp(type, "fixed") == 0)
 						settings.SetDefaultFixedFont(font);
 				} else
 					gFontManager->Unlock();
