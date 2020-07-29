@@ -176,7 +176,8 @@ DesktopSettingsPrivate::_Load()
 				&& settings.FindString("fixed style", &style) == B_OK
 				&& settings.FindFloat("fixed size", &size) == B_OK) {
 				FontStyle* fontStyle = gFontManager->GetStyle(family, style);
-				if (fontStyle != NULL && fontStyle->IsFixedWidth())
+				if (fontStyle != NULL && (fontStyle->IsFixedWidth()
+						|| fontStyle->IsFullAndHalfFixed()))
 					fFixedFont.SetStyle(fontStyle);
 				fFixedFont.SetSize(size);
 			}
