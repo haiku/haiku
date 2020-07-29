@@ -211,7 +211,6 @@ private:
 			BBuffer*	 		_FillNextBuffer(multi_buffer_info& info,
 									node_output& output);
 			void				_UpdateTimeSource(multi_buffer_info& info,
-									multi_buffer_info& oldInfo,
 									node_input& input);
 
 			node_output*	 	_FindOutput(media_source source);

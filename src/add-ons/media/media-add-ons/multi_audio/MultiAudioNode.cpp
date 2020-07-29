@@ -46,7 +46,7 @@ public:
 	media_format 		fPreferredFormat;
 	media_format		fFormat;
 	volatile uint32		fBufferCycle;
-	multi_buffer_info	fOldBufferInfo;
+	int32				fOldBufferCycle;
 	BBuffer*			fBuffer;
 	Resampler			*fResampler;
 };
@@ -67,7 +67,7 @@ public:
 	bool 				fOutputEnabled;
 	uint64 				fSamplesSent;
 	volatile uint32 	fBufferCycle;
-	multi_buffer_info	fOldBufferInfo;
+	int32				fOldBufferCycle;
 	Resampler*			fResampler;
 };
 
@@ -131,6 +131,7 @@ node_input::node_input(media_input& input, media_format format)
 	fInput = input;
 	fPreferredFormat = format;
 	fBufferCycle = 1;
+	fOldBufferCycle = -1;
 	fBuffer = NULL;
 	fResampler = NULL;
 }
@@ -154,6 +155,7 @@ node_output::node_output(media_output& output, media_format format)
 	fOutput = output;
 	fPreferredFormat = format;
 	fBufferCycle = 1;
+	fOldBufferCycle = -1;
 	fResampler = NULL;
 }
 
@@ -1837,8 +1839,7 @@ MultiAudioNode::_OutputThread()
 			if (bufferInfo.playback_buffer_cycle >= 0
 				&& bufferInfo.playback_buffer_cycle
 						< fDevice->BufferList().return_playback_buffers
-				&& (input->fOldBufferInfo.playback_buffer_cycle
-						!= bufferInfo.playback_buffer_cycle
+				&& (input->fOldBufferCycle != bufferInfo.playback_buffer_cycle
 					|| fDevice->BufferList().return_playback_buffers == 1)
 				&& (input->fInput.source != media_source::null
 					|| input->fChannelId == 0)) {
@@ -1851,11 +1852,10 @@ MultiAudioNode::_OutputThread()
 				// update the timesource
 				if (input->fChannelId == 0) {
 					//PRINT(("updating timesource\n"));
-					_UpdateTimeSource(bufferInfo, input->fOldBufferInfo,
-						*input);
+					_UpdateTimeSource(bufferInfo, *input);
 				}
 
-				input->fOldBufferInfo = bufferInfo;
+				input->fOldBufferCycle = bufferInfo.playback_buffer_cycle;
 
 				if (input->fBuffer != NULL) {
 					_FillNextBuffer(*input, input->fBuffer);
@@ -1889,7 +1889,7 @@ MultiAudioNode::_OutputThread()
 				if (bufferInfo.record_buffer_cycle >= 0
 					&& bufferInfo.record_buffer_cycle
 							< fDevice->BufferList().return_record_buffers
-					&& (output->fOldBufferInfo.record_buffer_cycle
+					&& (output->fOldBufferCycle
 							!= bufferInfo.record_buffer_cycle
 						|| fDevice->BufferList().return_record_buffers == 1)) {
 					//PRINT(("record_buffer_cycle ok\n"));
@@ -1919,7 +1919,7 @@ MultiAudioNode::_OutputThread()
 						}
 					}
 
-					output->fOldBufferInfo = bufferInfo;
+					output->fOldBufferCycle = bufferInfo.record_buffer_cycle;
 				} else {
 					//PRINT(("record_buffer_cycle non ok\n"));
 				}
@@ -2119,11 +2119,10 @@ MultiAudioNode::_AllocateBuffers(node_output &channel)
 
 
 void
-MultiAudioNode::_UpdateTimeSource(multi_buffer_info& info,
-	multi_buffer_info& oldInfo, node_input& input)
+MultiAudioNode::_UpdateTimeSource(multi_buffer_info& info, node_input& input)
 {
 	//CALLED();
-	if (!fTimeSourceStarted || oldInfo.played_real_time == 0)
+	if (!fTimeSourceStarted)
 		return;
 
 	fTimeComputer.AddTimeStamp(info.played_real_time,
