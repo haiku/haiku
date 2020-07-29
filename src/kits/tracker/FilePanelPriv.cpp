@@ -909,24 +909,6 @@ TFilePanel::RestoreState()
 
 	// Finish UI creation now that the PoseView is initialized
 	InitLayout();
-
-#if 1
-	// The Be Book gives the names for some of these views so that apps could
-	// move them around if they needed to, but we have them here in layouts,
-	// so we need to change their names and add dummy views for compatibility.
-	// (The same is done for the PoseView above.)
-	fPoseView->TitleView()->SetName("ActualTitleView");
-	fPoseView->CountView()->SetName("ActualCountView");
-	fPoseView->HScrollBar()->SetName("ActualHScrollBar");
-	fPoseView->VScrollBar()->SetName("ActualVScrollBar");
-
-	const char* views[] = {"TitleView", "HScrollBar", "VScrollBar", "CountVw", NULL};
-	for (int i = 0; views[i] != NULL; i++) {
-		BView* dummy = new BView(BRect(), views[i], B_FOLLOW_NONE, 0);
-		fBackView->AddChild(dummy);
-		dummy->Hide();
-	}
-#endif
 }
 
 

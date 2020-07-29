@@ -116,6 +116,16 @@ BFilePanel::Show()
 		fWindow->Show();
 
 	fWindow->Activate();
+
+#if 1
+	// The Be Book gives the names for some of the child views so that apps
+	// could move them around if they needed to, but we have most in layouts,
+	// so once the window has been opened, we have to forcibly resize "PoseView"
+	// (fBackView) to fully invalidate its layout in case any of the controls
+	// in it have been moved.
+	fWindow->FindView("PoseView")->ResizeBy(1, 1);
+	fWindow->FindView("PoseView")->ResizeBy(-1, -1);
+#endif
 }
 
 
