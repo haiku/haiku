@@ -206,9 +206,9 @@ BScrollView::AttachedToWindow()
 	}
 
 	if (fHorizontalScrollBar != NULL)
-		fHorizontalScrollBar->ResizeBy(-fHorizontalScrollBar->Frame().Width(), 0);
+		fHorizontalScrollBar->ResizeBy(-B_V_SCROLL_BAR_WIDTH, 0);
 	else if (fVerticalScrollBar != NULL)
-		fVerticalScrollBar->ResizeBy(0, -fHorizontalScrollBar->Frame().Height());
+		fVerticalScrollBar->ResizeBy(0, -B_H_SCROLL_BAR_HEIGHT);
 }
 
 
