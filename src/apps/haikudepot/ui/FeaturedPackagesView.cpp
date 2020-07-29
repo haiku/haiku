@@ -619,7 +619,7 @@ FeaturedPackagesView::FeaturedPackagesView()
 	fPackagesView = new StackedFeaturedPackagesView();
 
 	fScrollView = new BScrollView("featured packages scroll view",
-		fPackagesView, B_FOLLOW_ALL_SIDES, 0, false, true, B_FANCY_BORDER);
+		fPackagesView, 0, false, true, B_FANCY_BORDER);
 
 	BLayoutBuilder::Group<>(this)
 		.Add(fScrollView, 1.0f);
@@ -683,36 +683,10 @@ FeaturedPackagesView::DoLayout()
 
 
 void
-FeaturedPackagesView::FrameResized(float width, float height)
-{
-	BView::FrameResized(width, height);
-	_AdjustViews();
-}
-
-
-void
 FeaturedPackagesView::_AdjustViews()
 {
-	BScrollBar* scrollBar = fScrollView->ScrollBar(B_VERTICAL);
-	BSize scrollViewSize = fScrollView->Frame().Size();
-	float width = scrollViewSize.Width() - (B_V_SCROLL_BAR_WIDTH + 4.0f);
-		// +2 for border; both sides
-	float height = scrollViewSize.Height() - 4.0;
-		// +2 for border; top and bottom
-
-	fPackagesView->ResizeTo(width, height);
-
-	if (fPackagesView->IsEmpty()) {
-		scrollBar->SetRange(0, 0);
-		scrollBar->SetProportion(1);
-	}
-	else {
-		float packagesHeight = fPackagesView->PreferredSize().Height();
-		float packagesActualHeight = fmaxf(packagesHeight, height);
-		scrollBar->SetRange(0, packagesActualHeight - scrollViewSize.Height());
-		scrollBar->SetProportion(
-			scrollViewSize.Height() / packagesActualHeight);
-	}
+	fScrollView->FrameResized(fScrollView->Frame().Width(),
+		fScrollView->Frame().Height());
 }
 
 

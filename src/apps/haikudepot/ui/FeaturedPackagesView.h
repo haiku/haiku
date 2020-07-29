@@ -21,7 +21,6 @@ public:
 								FeaturedPackagesView();
 	virtual						~FeaturedPackagesView();
 
-	virtual	void				FrameResized(float width, float height);
 	virtual	void				DoLayout();
 
 			void				AddPackage(const PackageInfoRef& package);
