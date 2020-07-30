@@ -17,6 +17,9 @@ BootMergeObject boot_platform_u-boot_arm.o :
 	# must come first to have _start_* at correct locations
 	shell.S
 
+	# Kernel entry calls
+	arch_start_kernel.S
+
 	# Framebuffer drivers
 	arch_framebuffer_920.cpp
 	arch_framebuffer_bcm2835.cpp

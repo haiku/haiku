@@ -73,7 +73,7 @@ arch_start_kernel(addr_t kernelEntry)
 		efi_memory_descriptor *entry
 			= (efi_memory_descriptor *)(addr + i * descriptor_size);
 		dprintf("  %#lx-%#lx  %#lx %#x %#lx\n", entry->PhysicalStart,
-			entry->PhysicalStart + entry->NumberOfPages * 4096,
+			entry->PhysicalStart + entry->NumberOfPages * B_PAGE_SIZE,
 			entry->VirtualStart, entry->Type, entry->Attribute);
 	}
 

@@ -39,7 +39,6 @@ for platform in [ MultiBootSubDirSetup u-boot efi ] {
 			$(kernelArchSources)
 
 			arch_cpu.cpp
-			arch_start_kernel.S
 
 			# Reuse a subset of kernel debugging.
 			kernel_stubs.cpp
