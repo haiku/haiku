@@ -84,6 +84,9 @@ convert_preloaded_image(preloaded_elf64_image* image)
 static void
 convert_kernel_args()
 {
+	if (gKernelArgs.kernel_image->elf_class != ELFCLASS64)
+		return;
+
 	fix_address(gKernelArgs.boot_volume);
 	fix_address(gKernelArgs.vesa_modes);
 	fix_address(gKernelArgs.edid_info);
@@ -121,22 +124,34 @@ convert_kernel_args()
 }
 
 
+static addr_t
+get_kernel_entry(void)
+{
+	if (gKernelArgs.kernel_image->elf_class == ELFCLASS64) {
+		preloaded_elf64_image *image = static_cast<preloaded_elf64_image *>(
+			gKernelArgs.kernel_image.Pointer());
+		return image->elf_header.e_entry;
+	} else if (gKernelArgs.kernel_image->elf_class == ELFCLASS32) {
+		preloaded_elf32_image *image = static_cast<preloaded_elf32_image *>(
+			gKernelArgs.kernel_image.Pointer());
+		return image->elf_header.e_entry;
+	}
+	panic("Unknown kernel format! Not 32-bit or 64-bit!");
+	return 0;
+}
+
+
 extern "C" void
 platform_start_kernel(void)
 {
-	if (gKernelArgs.kernel_image->elf_class != ELFCLASS64)
-		panic("32-bit kernels not supported with EFI");
-
 	smp_init_other_cpus();
 
-	preloaded_elf64_image *image = static_cast<preloaded_elf64_image *>(
-		gKernelArgs.kernel_image.Pointer());
+	addr_t kernelEntry = get_kernel_entry();
 
 	arch_mmu_init();
 	convert_kernel_args();
 
 	// Save the kernel entry point address.
-	addr_t kernelEntry = image->elf_header.e_entry;
 	dprintf("kernel entry at %#lx\n", kernelEntry);
 
 	// map in a kernel stack
