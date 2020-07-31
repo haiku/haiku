@@ -696,6 +696,7 @@ free_io_interrupt_vectors(long count, long startVector)
 	if (startVector + count > NUM_IO_VECTORS) {
 		panic("invalid start vector %ld or count %ld supplied to "
 			"free_io_interrupt_vectors\n", startVector, count);
+		return;
 	}
 
 	dprintf("free_io_interrupt_vectors: freeing %ld vectors starting "
