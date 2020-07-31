@@ -60,10 +60,10 @@ SECTIONS
 
 	. = ALIGN(0x4);
 	__ctor_list = .;
-	.ctors : { *(.ctors) }
+	.ctors : { *(.init_array) *(.ctors) }
 	__ctor_end = .;
 	__dtor_list = .;
-	.dtors : { *(.dtors) }
+	.dtors : { *(.fini_array) *(.dtors) }
 	__dtor_end = .;
 	.got : { *(.got.plt) *(.got) }
 	.dynamic : { *(.dynamic) } :dynamic :data
