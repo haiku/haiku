@@ -1313,6 +1313,9 @@ hda_hw_uninit(hda_controller* controller)
 	// Disable interrupts, and remove interrupt handler
 	controller->Write32(HDAC_INTR_CONTROL, 0);
 
+	remove_io_interrupt_handler(controller->irq,
+		(interrupt_handler)hda_interrupt_handler, controller);
+
 	if (controller->msi) {
 		// Disable MSI
 		gPCIx86Module->disable_msi(controller->pci_info.bus,
@@ -1320,9 +1323,6 @@ hda_hw_uninit(hda_controller* controller)
 		gPCIx86Module->unconfigure_msi(controller->pci_info.bus,
 			controller->pci_info.device, controller->pci_info.function);
 	}
-
-	remove_io_interrupt_handler(controller->irq,
-		(interrupt_handler)hda_interrupt_handler, controller);
 
 	// Delete corb/rirb area
 	if (controller->corb_rirb_pos_area >= 0) {
