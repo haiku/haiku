@@ -841,24 +841,12 @@ void MediaNodePanel::_prepareLabel()
 	}
 
 	// truncate the label to fit in the panel
+	m_label = m_fullLabel;
 	float maxWidth = m_labelRect.Width() - (2.0 * M_LABEL_H_MARGIN) - 2.0;
 	if (be_plain_font->StringWidth(m_fullLabel.String()) > maxWidth)
 	{
-		char *truncatedLabel[1];
-		truncatedLabel[0] = new char[B_MEDIA_NAME_LENGTH];
-		const char *originalLabel[1];
-		originalLabel[0] = new char[B_MEDIA_NAME_LENGTH];
-		m_fullLabel.CopyInto(const_cast<char *>(originalLabel[0]), 0, B_MEDIA_NAME_LENGTH);
-		be_plain_font->GetTruncatedStrings(originalLabel, 1, B_TRUNCATE_END, maxWidth, (char **) truncatedLabel);
-		m_label = truncatedLabel[0];
+		be_plain_font->TruncateString(&m_label, B_TRUNCATE_END, maxWidth);
 		m_labelTruncated = true;
-		delete [] originalLabel[0];
-		delete [] truncatedLabel[0];
-	}
-	else
-	{
-		m_label = m_fullLabel;
-		m_labelTruncated = false;
 	}
 
 	// Construct labelOffset
