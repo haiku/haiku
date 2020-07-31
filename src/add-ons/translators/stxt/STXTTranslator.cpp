@@ -222,7 +222,7 @@ identify_stxt_header(const TranslatorStyledTextStreamHeader &header,
 */
 status_t
 identify_text(uint8* data, int32 bytesRead, BPositionIO* source,
-	translator_info* outInfo, uint32 outType, const char*& encoding)
+	translator_info* outInfo, uint32 outType, BString& encoding)
 {
 	ssize_t readLater = source->Read(data + bytesRead, DATA_BUFFER_SIZE - bytesRead);
 	if (readLater < B_OK)
@@ -232,7 +232,7 @@ identify_text(uint8* data, int32 bytesRead, BPositionIO* source,
 
 	BPrivate::BTextEncoding textEncoding((char*)data, (size_t)bytesRead);
 	encoding = textEncoding.GetName();
-	if (strlen(encoding) == 0) {
+	if (encoding.IsEmpty()) {
 		/* No valid character encoding found! */
 		return B_NO_TRANSLATOR;
 	}
@@ -474,7 +474,7 @@ output_styles(BPositionIO *outDestination, uint32 text_size,
 	styled text in outDestination
 */
 status_t
-translate_from_text(BPositionIO* source, const char* outEncoding, bool forceEncoding,
+translate_from_text(BPositionIO* source, BString encoding, bool forceEncoding,
 	BPositionIO* destination, uint32 outType)
 {
 	if (outType != B_TRANSLATOR_TEXT && outType != B_STYLED_TEXT_FORMAT)
@@ -523,7 +523,6 @@ translate_from_text(BPositionIO* source, const char* outEncoding, bool forceEnco
 	} encodingBuffer;
 
 	BNode* node = dynamic_cast<BNode*>(source);
-	BString encoding(outEncoding);
 	if (node != NULL) {
 		// determine encoding, if available
 		bool hasAttribute = false;
@@ -731,7 +730,7 @@ STXTTranslator::Identify(BPositionIO *inSource,
 	}
 
 	// if the data is not styled text, check if it is plain text
-	const char* encoding;
+	BString encoding;
 	return identify_text(buffer, nread, inSource, outInfo, outType, encoding);
 }
 
@@ -779,7 +778,7 @@ STXTTranslator::Translate(BPositionIO* source, const translator_info* info,
 
 	// if the data is not styled text, check if it is ASCII text
 	bool forceEncoding = false;
-	const char* encoding = NULL;
+	BString encoding;
 	result = identify_text(buffer, bytesRead, source, &outInfo, outType, encoding);
 	if (result != B_OK)
 		return result;
