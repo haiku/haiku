@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Installer	2971371102
+1	japanese	x-vnd.Haiku-Installer	1874975245
 Performing installation.	InstallProgress		インストールを実行しています。
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		メニューからインストールディスクを選択し、次に\"開始\"ボタンをクリックしてください。
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		インストーラーを閉じる前に、DriveSetup を終了してください。
@@ -59,7 +59,6 @@ Show optional packages	InstallerWindow		オプショナルパッケージを表�
 No partitions have been found that are suitable for installation. Please set up partitions and format at least one partition with the Be File System.	InstallerWindow		インストールに適したパーティションが見つかりません。パーティションを構成して少なくとも1つのパーティションをBeファイルシステムでフォーマットしてください。
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		インストール先ディスクの空き容量が不足している可能性があります。他のディスクを選択するか、インストールするオプションを減らしてください。
 Installation canceled.	InstallProgress		インストールが中断されました。
-OK	InstallerApp		OK
 Are you sure you want to abort the installation?	InstallerWindow		本当にインストールを中断しますか?
 Stop	InstallerWindow		中断
 Cancel	InstallerWindow		中止
@@ -79,7 +78,6 @@ Are you sure you want to install onto the current boot disk? The Installer will 
 Onto:	InstallerWindow		インストール先:
 Quit Boot Manager and DriveSetup	InstallerWindow		ブートマネージャーと DriveSetup を終了
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"Userguide\" and take the \"Quick Tour\". There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   初回のHaikuのブートが成功したら、忘れずに\"Userguide\"を読んで、\"Quick Tour\"を手に取ってください。 これらはデスクトップ上のリンクまたはWebPositiveのブックマーク中にあります。\n\n
-Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Haikuインストーラー\n\tJérôme DuvalおよびStephan Aßmus 作\n\tCopyright 2005-2010, Haiku.\n\n
 Tools	InstallerWindow		ツール
 scanning…	InstallerWindow		ディスクを検出しています…
 Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be formatted with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		DriveSetupを起動して、利用可能なハードディスクや\nその他のメディアのパーティションを切ります。\nパーティションはHaikuブートパーティションに\n必要なBeファイルシステムでフォーマットできます。

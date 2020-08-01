@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Installer	2971371102
+1	turkish	x-vnd.Haiku-Installer	1874975245
 Performing installation.	InstallProgress		Kuruluyor…
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Açılır menüden kaynak diski seçin ve \"Başla\"ya tıklayın.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Yükleyici penceresini kapatmadan önce Disk İzlencesi penceresini kapatın.
@@ -59,7 +59,6 @@ Show optional packages	InstallerWindow		İsteğe bağlı paketleri göster
 No partitions have been found that are suitable for installation. Please set up partitions and format at least one partition with the Be File System.	InstallerWindow		Yükleme için uygun bir disk bölümü bulunamadı. Lütfen bölümlerinizi ayarlayın ve en az bir bölümü Be Dosya Sistemi ile biçimleyin.
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Hedef diskte yeteri kadar boş alan olmayabilir. Başka bir disk seçin veya isteğe bağlı yüklemeleri gözden geçirin.
 Installation canceled.	InstallProgress		Kurulum iptal edildi.
-OK	InstallerApp		Tamam
 Are you sure you want to abort the installation?	InstallerWindow		Kurulumu durdurmak istediğinizden emin misiniz?
 Stop	InstallerWindow		Durdur
 Cancel	InstallerWindow		İptal
@@ -79,7 +78,6 @@ Are you sure you want to install onto the current boot disk? The Installer will 
 Onto:	InstallerWindow		Şuraya:
 Quit Boot Manager and DriveSetup	InstallerWindow		Önyükleme Yöneticisi'nden ve Disk İzlencesi'nden çık
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"Userguide\" and take the \"Quick Tour\". There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Haiku yüklemesi tamamlandığında \"Userguide (Kullanıcı kılavuzu)\" ve \"Quick Tour (Hızlı Tur)\" belgelerini okumayı unutmayın. Masaüstünde ve WebPositive yer imleri içinde bağlantılar bulabilirsiniz.\n\n
-Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Yükleyici\n\tYazanlar: Jérôme Duval ve Stephan Aßmus\n\tCopyright 2005-2020, Haiku.\n\n
 Tools	InstallerWindow		Araçlar
 scanning…	InstallerWindow		taranıyor…
 Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be formatted with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Kullanılabilir sabit diskleri ve diğer ortamları\nbölümlendirmek için Disk İzlencesi'ni açın.\nHaiku önyüklemek için kullanılacak bölümler\nBe Dosya Sistemi ile biçimlendirilmelidir.\n

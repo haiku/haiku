@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-FirstBootPrompt	2813539172
+1	catalan; valencian	x-vnd.Haiku-FirstBootPrompt	1158596356
 Japanese	KeymapNames		Japonès
 US	KeymapNames		EUA
 Esperanto	KeymapNames		Esperanto
@@ -16,6 +16,7 @@ Bulgarian (Cyrillic)	KeymapNames		Búlgar (ciríl·lic)
 Belgian (point)	KeymapNames		Belga (punt)
 Finnish	KeymapNames		Finès
 Swedish	KeymapNames		Suec
+Thank you for trying out Haiku! We hope you'll like it!\n\nSelect your preferred language and keymap from the list on the left which will then be used instantly. Both settings can be changed from the Desktop later on on the fly.\n\nDo you wish to run the Installer or continue booting to the Desktop?	BootPromptWindow	For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	Gràcies per provar el Haiku! Esperem que us agradi!\n\nSeleccioneu la llengua i la disposició de teclat preferides de la llista de l'esquerra i s'usaran immediatament. Ambdues configuracions es poden canviar des de l'escriptori més endavant.\n\nVoleu executar l'instal·lador o continuar i arrencar l'escriptori?
 Svorak	KeymapNames		Svorak
 German	KeymapNames		Alemany
 Swiss-German	KeymapNames		Alemany suís

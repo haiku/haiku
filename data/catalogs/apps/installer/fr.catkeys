@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Installer	2971371102
+1	french	x-vnd.Haiku-Installer	1874975245
 Performing installation.	InstallProgress		Installation en cours.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Choisir le disque source dans la liste déroulante, puis cliquer sur « Commencer ».
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Veuillez fermer la fenêtre du Gestionnaire de Disques avant celle de l’Installeur.
@@ -59,7 +59,6 @@ Show optional packages	InstallerWindow		Montrer les paquets optionnels
 No partitions have been found that are suitable for installation. Please set up partitions and format at least one partition with the Be File System.	InstallerWindow		Aucune partition adaptée à l’installation n’a été trouvée. Veuillez configurer les partitions et en formater au moins une avec le système de fichiers Be.
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Le disque de destination pourrait ne pas avoir assez de place. Sélectionnez un autre disque ou retirez certains objets optionnels.
 Installation canceled.	InstallProgress		Installation annulée.
-OK	InstallerApp		OK
 Are you sure you want to abort the installation?	InstallerWindow		Êtes-vous sûr de vouloir abandonner l’installation ?
 Stop	InstallerWindow		Arrêter
 Cancel	InstallerWindow		Annuler
@@ -79,7 +78,6 @@ Are you sure you want to install onto the current boot disk? The Installer will 
 Onto:	InstallerWindow		Vers :
 Quit Boot Manager and DriveSetup	InstallerWindow		Quitter le gestionnaire d’amorçage et le gestionnaire de disques
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"Userguide\" and take the \"Quick Tour\". There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Lorsque vous démarrez Haiku pour la première fois, vous êtes invité à lire notre « Guide utilisateur » la « présentation rapide ». Vous trouverez des liens sur Bureau et dans les signets de WebPositive.\n\n
-Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installeur\n\técrit par Jérôme Duval et Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 Tools	InstallerWindow		Outils
 scanning…	InstallerWindow		recherche…
 Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be formatted with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Lancez l’utilitaire DriveSetup pour partitionner\nles disques durs et autres supports disponibles.\nLa partition Haiku requière d’être formaté avec\nle système de fichiers Be afin d’être amorçable.

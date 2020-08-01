@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-Notifications	3906219317
+1	danish	x-vnd.Haiku-Notifications	4196496676
 Lower left	GeneralView		Nederst til venstre
 Application does not have a valid signature	NotificationView	Alert message	Programmet har ikke en gyldig signatur
 Status	NotificationView		Status
@@ -10,12 +10,16 @@ OK	PrefletWin		OK
 Notifications	PrefletWin		Underretninger
 Notifications preflet sample	PrefletWin		Prøve for underretningspreflet
 Mute notifications from this application	NotificationView		Sæt underretninger fra programmet på lydløst
+wide	GeneralView	Window width: Slider high text	bred
+narrow	GeneralView	Window width: Slider low text	smal
 Revert	PrefletWin		Tilbagefør
 Applications	PrefletView		Programmer
+{0, plural, =1{Timeout: # second}other{Timeout: # seconds}}	GeneralView		{0, plural, =1{Timeout: # sekund}other{Timeout: # sekunder}}
 Upper right	GeneralView		Øverst til højre
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Der opstod en fejl ved gemning af præferencerne.\nDu er muligvis løbet tør for diskplads.
 Defaults	PrefletWin		Standarder
 Upper left	GeneralView		Øverst til venstre
+Window width	GeneralView		Vinduesbredde
 Applications	NotificationView		Programmer
 General	PrefletView		Generelt
 OK	NotificationView		OK

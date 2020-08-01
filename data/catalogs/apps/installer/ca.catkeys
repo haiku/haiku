@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Installer	2971371102
+1	catalan; valencian	x-vnd.Haiku-Installer	1874975245
 Performing installation.	InstallProgress		Es fa la instal·lació.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Trieu el disc d'origen des del menú emergent. Llavors cliqueu a Comença.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Si us plau, tanqueu la finestra del Gestor de discs abans de tancar la finestra de l'instal·lador.
@@ -59,7 +59,6 @@ Show optional packages	InstallerWindow		Mostra els paquets opcionals
 No partitions have been found that are suitable for installation. Please set up partitions and format at least one partition with the Be File System.	InstallerWindow		No s'ha trobat cap partició adequada per a la instal·lació. Si us plau, establiu particions i formateu-ne com a mínim una amb el sistema de fitxers Be.
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Pot ser que el disc de destinació no tingui prou espai lliure. Intenteu triar un altre disc o no instal·leu alguns elements opcionals.
 Installation canceled.	InstallProgress		S'ha cancel·lat la instal·lació.
-OK	InstallerApp		D'acord
 Are you sure you want to abort the installation?	InstallerWindow		Segur que voleu avortar la instal·lació?
 Stop	InstallerWindow		Interromp
 Cancel	InstallerWindow		Cancel·la
@@ -79,7 +78,6 @@ Are you sure you want to install onto the current boot disk? The Installer will 
 Onto:	InstallerWindow		Cap a:
 Quit Boot Manager and DriveSetup	InstallerWindow		Surt del Gestor d'arrencada i del Gestor de discs
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"Userguide\" and take the \"Quick Tour\". There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Quan arrenqueu correctament el Haiku per primer cop, assegureu-vos de llegir la \"Guia de l'usuari\" i feu-ne la \"Visita ràpida\". N'hi ha enllaços a l'escriptori i a les adreces d'interès del WebPositive.\n\n
-Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Instal·lador\n\tEscrit per Jérôme Duval i Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 Tools	InstallerWindow		Eines
 scanning…	InstallerWindow		s'escaneja...
 Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be formatted with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Useu la utilitat DriveSetup per fer particions\nals discs durs disponibles i a altres mitjans.\nLes particions es poden formatar amb el sistema\nde fitxers Be, necessari per a la partició\nd'arrencada del Haiku.

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku.TextSearch	2224690775
+1	german	x-vnd.Haiku.TextSearch	123061032
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Bitte die Dateien auswählen, die im Tracker markiert werden sollen.
 %appname% : %path%	GrepWindow		%appname% : %path%
 Failed to start xargs program!	Grepper		Konnte xargs Program nicht starten!
@@ -6,6 +6,7 @@ Open selection	GrepWindow		Auswahl öffnen
 Actions	GrepWindow		Aktionen
 New window	GrepWindow		Neues Fenster
 Encoding	GrepWindow		Kodierung
+Set target to parent folder	GrepWindow		Ziel auf übergeordneten Order ändern
 OK	GrepWindow		OK
 %appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
 Close	GrepWindow		Schließen

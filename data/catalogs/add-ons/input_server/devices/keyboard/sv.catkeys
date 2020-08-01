@@ -1,6 +1,8 @@
-1	swedish	x-vnd.Haiku-KeyboardInputServerDevice	2228550365
+1	swedish	x-vnd.Haiku-KeyboardInputServerDevice	131044710
 If the application will not quit you may have to kill it.	Team monitor		Om programmet inte avslutas kan du behöva döda den.
 Quit application	Team monitor		Avsluta program
+Open Terminal	Team monitor		Öppen Terminal
+{0, plural,one{Hold CONTROL+ALT+DELETE for # second to reboot.}other{Hold CONTROL+ALT+DELETE for # seconds to reboot.}}	Team monitor		{0, plural,one{Hold CONTROL+ALT+DELETE for # second to reboot.}other{Hold CONTROL+ALT+DELETE for # seconds to reboot.}}
 Restart the desktop	Team monitor		Starta om Skrivbordet
 Force reboot	Team monitor		Framtvinga omstart
 Team monitor	Team monitor		Grupp Monitor

@@ -1,4 +1,4 @@
-1	russian	x-vnd.haiku-icon_o_matic	2424331018
+1	russian	x-vnd.haiku-icon_o_matic	1805671130
 None	Icon-O-Matic-Properties		Ничего
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Повернуть направление контура
 Add empty	Icon-O-Matic-ShapesList		Добавить пустую
@@ -164,6 +164,7 @@ Untitled	Icon-O-Matic-Main		Новый значок
 Max LOD	Icon-O-Matic-PropertyNames		Макс. LOD
 Add Path	Icon-O-Matic-AddPathsCmd		Добавить контур
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Сохранить изменения теущего значка перед закрытием?
+Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		Не удалось открыть файл '%s' как документ SVG.\n\n
 load error	Icon-O-Matic-SVGImport		ошибка загрузки
 Transformation	Icon-O-Matic-TransformersList		Изменение
 Save as…	Icon-O-Matic-Menu-File		Сохранить как…

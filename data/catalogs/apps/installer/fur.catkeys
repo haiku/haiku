@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-Installer	3880503748
+1	friulian	x-vnd.Haiku-Installer	2784107891
 Performing installation.	InstallProgress		Esecuzion de instalazion.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Sielç il disc sorzint dal menù a tende. Daspò fâs clic su \"Scomence\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Par plasê siere il barcon di Gjestion disc prime di sierâ chel dal Instaladôr.
@@ -56,7 +56,6 @@ Collecting copy information.	InstallProgress		Daûr a dâ dongje lis informazion
 Show optional packages	InstallerWindow		Mostre pachets opzionâi
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Il disc di destinazion al podarès no vê vonde spazi. Prove a sielzi un disc diferent o sielç di no instalâ elements opzionâi.
 Installation canceled.	InstallProgress		Instalazion anulade.
-OK	InstallerApp		Va ben
 Are you sure you want to abort the installation?	InstallerWindow		Interompi pardabon la instalazion?
 Stop	InstallerWindow		Ferme
 Cancel	InstallerWindow		Anule
@@ -75,7 +74,6 @@ Running Boot Manager and DriveSetup…\n\nClose both applications to continue wi
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Instalâ pardabon sul disc di inviament atuâl? Se si continue, l'instaladôr al varà di tornâ a inviâ la machine.
 Onto:	InstallerWindow		Su:
 Quit Boot Manager and DriveSetup	InstallerWindow		Jes dal Gjestôr di inviament e di Gjestion disc
-Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Instaladôr\n\tscrit di Jérôme Duval e Stephan Aßmus\n\tCopyright©2005-2010, Haiku.\n\n
 Tools	InstallerWindow		Struments
 scanning…	InstallerWindow		scansion…
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Userguide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2)   L'Instaladôr al viodarà di rindi inviabile la partizion di Haiku, ma nol integrarà Haiku suntun menù di inviament esistent. Se si à GRUB instalât, si pues zontâ Haiku di lì\nPar vê plui detais, par plasê consultait la vuide sul inviament di Haiku su https://www.haiku-os.org/guides/booting.\nOpûr si pues creâ un menù di inviament dal menù \"Struments\" dal program di instalazion, consultait la Vuide pal Utent al argoment che al rivuarde la aplicazion \"BootManager\"(Gjestôr di inviament).\n\n\n

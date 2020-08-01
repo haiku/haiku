@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-libtracker	858481545
+1	danish	x-vnd.Haiku-libtracker	3510417168
 Created	ContainerWindow		Oprettet
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Åbn og lav foretrukket
@@ -93,6 +93,7 @@ Atom	AttributesView		Atom
 %SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%SizeProcessed af %TotalSize, %BytesPerSecond/s
 Preparing to restore items…	StatusWindow		Forbereder gendannelse af elementerne…
 Mount	ContainerWindow		Monter
+{0, plural, other{<# rectangles>}}	AttributesView		{0, plural, other{<# rektangler>}}
 Desktop	B_DESKTOP_DIRECTORY		Skrivebord
 Corrupted pointers.	libtracker		Beskadigede pointere.
 Link to:	InfoWindow		Lænke til:
@@ -348,6 +349,7 @@ Could not open \"%document\" with application \"%app\" (Missing libraries: %libr
 Finish: %time	StatusWindow		Færdig: %time
 Messenger	AttributesView		Messenger
 after	FindPanel		efter
+{0, plural, one{<# data byte>} other{<# bytes of data>}}	AttributesView		{0, plural, one{<# byte med data>} other{<# bytes med data>}}
 Version	OpenWithWindow		Version
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Nogle af de valgte elementer kan ikke blive flyttet til papirkurven. Vil du slette dem i stedet? (Handlingen kan ikke fortrydes).
 Add printer…	ContainerWindow		Tilføj printer…

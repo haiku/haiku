@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Locale	288870027
+1	japanese	x-vnd.Haiku-Locale	1081217032
 Medium format:	TimeFormatSettings		中位の形式:
 Negative:	TimeFormatSettings		負表記:
 Language	Locale Preflet Window		言語
@@ -22,6 +22,7 @@ Preferred languages	Locale Preflet Window		言語の優先順位
 Full format:	TimeFormatSettings		完全な形式:
 Cancel	Locale Preflet Window		中止
 Revert	Locale Preflet Window		戻す
+Translate application and folder names	TimeFormatSettings		アプリケーション名とフォルダー名を翻訳
 12 hour	TimeFormatSettings		12 時間
 Positive:	TimeFormatSettings		正表記:
 Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		変更を有効にするために、DeskbarとTrackerを再起動する必要があります。今すぐ再起動してよいですか?

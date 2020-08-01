@@ -9,7 +9,7 @@ Or	FindPanel		Aŭ
 before	FindPanel		antaŭ
 Volume icons	TrackerSettingsWindow		Piktogramoj de volumoj
 Ignore case	SelectionWindow		Malatenti usklecon
-Current folder	ContainerWindow		Nuna doiserujo
+Current folder	ContainerWindow		Nuna dosierujo
 Finish: %time - Over %finishtime left	StatusWindow		Fino: %time - Ĉirkaŭ %finishtime restis
 Mount all disks now	AutoMounterSettings		Surmeti ĉiujn diskojn nun
 Location:	InfoWindow		Loko:
@@ -21,7 +21,7 @@ contains	FindPanel		enhavas
 Open	FilePanelPriv		Uzi
 Bitmap icon	AttributesView		Bitmapa piktogramo
 You can't replace a folder with one of its sub-folders.	FSUtils		Vi ne povas anstataŭigi dosierujon per ĝia propra subdosierujo.
-Select…	VirtualDirectoryWindow		Elekti...
+Select…	VirtualDirectoryWindow		Elekti…
 Name	Default Query Columns		Nomo
 Unmount	ContainerWindow		Demeti
 Eject when unmounting	AutoMounterSettings		Elĵeti post demeto
@@ -35,7 +35,7 @@ Size	QueryPoseView		Grando
 Disk mount	TrackerSettingsWindow		Surmeti diskon
 Type	AttributesView		Tipo
 Prompt	FSUtils		Invito
-Error in regular expression:\n\n'%errstring'	PoseView		Eraris en regula esprimo:\n\n'%errstring'
+Error in regular expression:\n\n'%errstring'	PoseView		Eraro en regula esprimo:\n\n'%errstring'
 Small bitmap icon	AttributesView		Malgranda bitmapa piktogramo
 Would you like to find a suitable application to open the file?	FSUtils		Ĉu vi volas serĉi taŭgan programon por uzi la dosieron?
 64 x 64	ContainerWindow		64 x 64
@@ -43,7 +43,7 @@ You cannot replace a folder or a symbolic link with a file.	FSUtils		Vi ne povas
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# datoj>}}
 Trailing \\.	libtracker		Vosta \\.
 At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Je %func \nfind_directory() malsukcesis. \nKaŭzo: %error
-Handles any file	OpenWithWindow		Tenas ajnan dosieron
+Handles any file	OpenWithWindow		Taŭgas ajna dosiero
 save text	FilePanelPriv		konservi tekston
 Raw data	AttributesView		Kruda datumo
 Preparing to move items…	StatusWindow		Preparante movi elementojn...
@@ -90,7 +90,7 @@ Name	Person Query Columns		Nomo
 Skip all	FSUtils		Transsalti ĉion
 Corrupted opcode.	libtracker		Koruptita aparata kodo.
 Atom	AttributesView		Atomo
-%SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%SizeProcessed de %TotalSize, %BytesPerSecond/s
+%SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%SizeProcessed el %TotalSize, %BytesPerSecond/s
 Preparing to restore items…	StatusWindow		Preparante restaŭri elementojn…
 Mount	ContainerWindow		Surmeti
 {0, plural, other{<# rectangles>}}	AttributesView		{0, plural, other{<# rektanguloj>}}
@@ -121,7 +121,7 @@ New folder%ld	FSUtils		Nova dosierujo%Id
 Location	OpenWithWindow		Loko
 %Ld B	WidgetAttributeText		%Ld B
 Resize to fit	QueryContainerWindow		Adapti laŭ grando
-List folders first	SettingsView		Listi dosierujojn unue
+List folders first	SettingsView		Listigi dosierujojn unue
 Find	FSUtils		Serĉi
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Elemento nomita \"%name\" jam ekzistas en ĉi tiu dosierujo. Ĉu vi volas anstataŭi ĝin per la simbola ligilo kiun vi kreas?
 List view	ContainerWindow		Lista vido
@@ -404,7 +404,7 @@ When	Email Query Columns		Kiam
 Object	AttributesView		Objekto
 Paste	FilePanelPriv		Alglui
 Paste	ContainerWindow		Alglui
-An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Elemento nomita \"%name\" jam ekzistas en ĉi tiu dosierujo, kaj eble\nenhavas elementojn samnomitajn. Ĉu vi volus anstataŭigi ilin per tiuj enhavataj de la dosierujo kiun vi %verb? 
+An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Elemento nomita \"%name\" jam ekzistas en ĉi tiu dosierujo, kaj eble\nenhavas elementojn samnomitajn. Ĉu vi volus anstataŭigi ilin per tiuj enhavataj de la dosierujo kiun vi %verb?
 Cannot unmount the boot volume \"%name\".	FSUtils		Neeblas demeti la praŝarĝan portilon \"%name\".
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Malsukcesis uzi \"%document\"-on per la programo \"%app\" (Mankas simbolo: %symbol). \n
 Reference	AttributesView		Referenco

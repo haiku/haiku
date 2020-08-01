@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	1358760392
+1	swedish	x-vnd.Haiku-libtracker	3510417168
 Created	ContainerWindow		Skapad
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Öppna och gör till förval
@@ -40,6 +40,7 @@ Small bitmap icon	AttributesView		Liten bitmappsikon
 Would you like to find a suitable application to open the file?	FSUtils		Vill du hitta ett passande program att öppna filen med?
 64 x 64	ContainerWindow		64 x 64
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Du kan inte ersätta en mapp eller en mjuk länk med en fil.
+{0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# datum>}}
 Trailing \\.	libtracker		Efterföljande \\.
 At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		I %func \nfind_directory() misslyckades. \nOrsak: %error
 Handles any file	OpenWithWindow		Hanterar alla filtyper
@@ -92,6 +93,7 @@ Atom	AttributesView		Atom
 %SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%SizeProcessed av %TotalSize, %BytesPerSecond/s
 Preparing to restore items…	StatusWindow		Förbereder återställning av objekt...
 Mount	ContainerWindow		Montera
+{0, plural, other{<# rectangles>}}	AttributesView		{0, plural, other{<# rektanglar>}}
 Desktop	B_DESKTOP_DIRECTORY		Skrivbord
 Corrupted pointers.	libtracker		Korrupta pekare.
 Link to:	InfoWindow		Länka till:
@@ -181,6 +183,7 @@ MIME Type	AttributesView		MIME-typ
 Show folder location in title tab	SettingsView		Visa katalogplats i fönsterfliken
 There was an error resolving the link.	Tracker		Det uppstod ett fel vid uppslag av länk.
 There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Det gick inte att spara i mappen. Vänligen prova en annan mapp.
+{0, plural, other{<# values>}}	AttributesView		{0, plural, other{<# värden>}}
 Desktop	TrackerSettingsWindow		Skrivbord
 Nested *?+.	libtracker		Nästad *?+.
 Move	FSUtils	button label	Flytta
@@ -346,6 +349,7 @@ Could not open \"%document\" with application \"%app\" (Missing libraries: %libr
 Finish: %time	StatusWindow		Slutförd: %time
 Messenger	AttributesView		Budbärare
 after	FindPanel		efter
+{0, plural, one{<# data byte>} other{<# bytes of data>}}	AttributesView		{0, plural, one{<# data byte>} other{<# bytes av data>}}
 Version	OpenWithWindow		Version
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Vissa av de markerade objekten kan inte flyttas till Papperskorgen. Vill du ta bort dem istället? (Denna operation kan inte ångras.)
 Add printer…	ContainerWindow		Lägg till skrivare...

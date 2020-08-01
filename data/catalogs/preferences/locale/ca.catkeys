@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Locale	288870027
+1	catalan; valencian	x-vnd.Haiku-Locale	1081217032
 Medium format:	TimeFormatSettings		Format mitjà:
 Negative:	TimeFormatSettings		Negatiu:
 Language	Locale Preflet Window		Llengua
@@ -22,6 +22,7 @@ Preferred languages	Locale Preflet Window		Llengües preferides
 Full format:	TimeFormatSettings		Formatat complet:
 Cancel	Locale Preflet Window		Cancel·la
 Revert	Locale Preflet Window		Reverteix
+Translate application and folder names	TimeFormatSettings		Tradueix l'aplicació i els noms de les carpetes
 12 hour	TimeFormatSettings		12 hores
 Positive:	TimeFormatSettings		Positiu:
 Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Cal reiniciar la barra d'escriptori i el Rastrejador perquè aquest canvi tingui efecte. Els voleu reiniciar ara?

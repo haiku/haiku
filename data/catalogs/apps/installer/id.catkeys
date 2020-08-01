@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-Installer	3880503748
+1	indonesian	x-vnd.Haiku-Installer	2784107891
 Performing installation.	InstallProgress		Melakukan instalasi.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Pilih disk sumber dari menu pop-up. Lalu klik \"Begin\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Silakan tutup jendela DriveSetup sebelum menutup jendela Installer.
@@ -56,7 +56,6 @@ Collecting copy information.	InstallProgress		Mengumpulkan informasi salinan.
 Show optional packages	InstallerWindow		Tampilkan paket opsional
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Disk tujuan mungkin tidak memiliki cukup ruang. Coba pilih disk yang berbeda atau pilih untuk tidak memasang item opsional.
 Installation canceled.	InstallProgress		Instalasi dibatalkan.
-OK	InstallerApp		OKE
 Are you sure you want to abort the installation?	InstallerWindow		Anda yakin ingin membatalkan instalasi?
 Stop	InstallerWindow		Berhenti
 Cancel	InstallerWindow		Batal
@@ -75,7 +74,6 @@ Running Boot Manager and DriveSetup…\n\nClose both applications to continue wi
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Apakah Anda yakin ingin menginstal ke disk boot saat ini? Installer harus me-reboot komputer Anda jika Anda melanjutkan.
 Onto:	InstallerWindow		Keatas:
 Quit Boot Manager and DriveSetup	InstallerWindow		Keluar dari Boot Manager dan DriveSetup
-Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installer\n\tditulis oleh Jérôme Duval dan Stephan Aßmus\n\tHakcipta 2005-2010, Haiku.\n\n
 Tools	InstallerWindow		Alat
 scanning…	InstallerWindow		pemindaian…
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Userguide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2)   Installer akan membuat partisi Haiku dapat di-boot, tetapi tidak melangkah untuk mengintegrasikan Haiku ke dalam menu boot yang ada. Jika Anda sudah menginstal GRUB, Anda dapat menambahkan Haiku ke sana.\nUntuk detailnya, silakan baca panduan tentang mem-boot Haiku di situs web kami di https://www.haiku-os.org/guides/booting.\nAtau Anda dapat mengatur menu boot dari menu Installer \"Tools \", lihat topik Panduan pengguna pada aplikasi \"BootManager\".\n\n\n

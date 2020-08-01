@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-Installer	2971371102
+1	esperanto	x-vnd.Haiku-Installer	1874975245
 Performing installation.	InstallProgress		Instalante.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Elektu la elan diskon el la ŝpruca menuo. Poste alklaku \"Ek\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Bonvolu fermi la fenestron de la Diskagordilo antaŭ fermi la fenestron de al Instalilo.
@@ -59,7 +59,6 @@ Show optional packages	InstallerWindow		Montri malneprajn pakaĵojn
 No partitions have been found that are suitable for installation. Please set up partitions and format at least one partition with the Be File System.	InstallerWindow		Subdisko taŭga por instali forestas. Kreu subdiskojn kaj formatigu almenaŭ unuan per dosiersistemo Be.
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		La spaco de la ala disko ne sufiĉas. Bonvolu elekti alian diskon aŭ elekti ne instali nedevigajn pakaĵojn.
 Installation canceled.	InstallProgress		Instalado estis nuligita.
-OK	InstallerApp		Bone
 Are you sure you want to abort the installation?	InstallerWindow		Ĉu vi certas, ke vi volas ĉesigi la instaladon?
 Stop	InstallerWindow		Halti
 Cancel	InstallerWindow		Nuligi
@@ -79,7 +78,6 @@ Are you sure you want to install onto the current boot disk? The Installer will 
 Onto:	InstallerWindow		En:
 Quit Boot Manager and DriveSetup	InstallerWindow		Ĉesigi Praŝargan Administrilon kaj DiskAgordilon
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"Userguide\" and take the \"Quick Tour\". There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Kiam vi sukcese lanĉos la Hajkon unuan fojon nepre legu nian \"Gvidlibron\" kaj \"Rapidan ekondukon\". Ĝiaj ligiloj lokiĝas en labortablo kaj en legosignoj de la Retprospero.\n\n
-Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Instalilo\n\tskribita per Jérôme Duval kaj Stephan Aßmus\n\tKopirajto 2005-2010, Haiku.\n\n
 Tools	InstallerWindow		Iloj
 scanning…	InstallerWindow		skanado…
 Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be formatted with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Uzu la Diskagordilon por prepari \ndisponedlajn diskojn kaj aliajn aparatojn.\nSubdiskojn vi povas formatigi per\ndosiersistemo Be bezonata por lanĉa subdisko\nde la Hajko.

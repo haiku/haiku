@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Installer	2971371102
+1	italian	x-vnd.Haiku-Installer	1874975245
 Performing installation.	InstallProgress		Esecuzione dell'installazione.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Scegli il disco d'origine dal menu a pop-up. Quindi fai click su \"Inizia\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Chiudi la finestra di Gestione Disco prima di chiudere quella del programma di installazione.
@@ -59,7 +59,6 @@ Show optional packages	InstallerWindow		Mostra pacchetti opzionali
 No partitions have been found that are suitable for installation. Please set up partitions and format at least one partition with the Be File System.	InstallerWindow		Non è stata trovata alcuna partizione adatta per l'installazione. Per favore, crea e formatta almeno una partizione con il formato Be File System.
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Il disco di destinazione potrebbe non avere abbastanza spazio. Prova a scegliere un disco differente oppure non installare elementi opzionali.
 Installation canceled.	InstallProgress		Installazione annullata.
-OK	InstallerApp		OK
 Are you sure you want to abort the installation?	InstallerWindow		Sei sicuro di voler annullare l'installazione?
 Stop	InstallerWindow		Interrompi
 Cancel	InstallerWindow		Annulla
@@ -79,7 +78,6 @@ Are you sure you want to install onto the current boot disk? The Installer will 
 Onto:	InstallerWindow		Su:
 Quit Boot Manager and DriveSetup	InstallerWindow		Esci dal Boot Manager e da Gestione Disco
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"Userguide\" and take the \"Quick Tour\". There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Al tuo primo avvio di Hasiku, non dimenticarti di leggere la nostra \"Guida Utente\" e la \"Guida Rapida\". Troverai i collegamenti sulla Scrivania e tra i segnalibri di WebPositive.\n\n
-Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installazione di Haiku\n\ta cura di Jérôme Duval e Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 Tools	InstallerWindow		Strumenti
 scanning…	InstallerWindow		scansione…
 Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be formatted with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Avvia Gestione Disco per partizionare\ndischi rigidi e altri media.\nLe partizioni possono essere formattate nel formato\nBe File System, necessario affinché Haiku\npossa avviarsi.

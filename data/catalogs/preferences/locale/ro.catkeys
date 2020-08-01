@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Locale	288870027
+1	romanian	x-vnd.Haiku-Locale	1081217032
 Medium format:	TimeFormatSettings		Format mediu:
 Negative:	TimeFormatSettings		Negativ:
 Language	Locale Preflet Window		Limbă
@@ -22,6 +22,7 @@ Preferred languages	Locale Preflet Window		Limbă preferată
 Full format:	TimeFormatSettings		Format complet:
 Cancel	Locale Preflet Window		Anulează
 Revert	Locale Preflet Window		Revenire
+Translate application and folder names	TimeFormatSettings		Traduce numele aplicațiilor și dosarelor
 12 hour	TimeFormatSettings		12 ore
 Positive:	TimeFormatSettings		Pozitiv:
 Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Deskbar și Tracker trebuie repornite pentru ca această modificare să aibă efect. Dorești să le repornești acum?

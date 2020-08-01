@@ -359,7 +359,7 @@ Size:	InfoWindow		Dimensione:
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		L'elemento selezionato non può essere spostato nel Cestino. Desideri eliminarlo definitivamente? (Gli elementi non potranno essere recuperati.)
 Copy	ContainerWindow		Copia
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Spiacenti, l'attributo 'Character' non può contenere un glifo multi-byte.
-Open parent	VirtualDirectoryWindow		Apri livello superiore
+Open parent	VirtualDirectoryWindow		Apri cartella di livello superiore
 And	FindPanel		E
 Palette-indexed picture	AttributesView		Immagine con palette indicizzata
 multiple disks	FindPanel		più dischi

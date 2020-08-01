@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Installer	4181741427
+1	lithuanian	x-vnd.Haiku-Installer	3085345570
 Performing installation.	InstallProgress		Diegiama.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Pasirinkite šaltinio diską iš išskleidžiamojo meniu. Tada spustelėkite mygtuką „Pradėti“.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Prieš užverdami įdiegimo programos langą, užverkite Diskų ženklintuvo langą.
@@ -49,7 +49,6 @@ Collecting copy information.	InstallProgress		Renkami duomenys kopijavimui.
 Show optional packages	InstallerWindow		Rodyti papildomus paketus
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Paskirties diske nepakanka vietos. Išsirinkite kitą diską arba pašalinkite žymėjimą nuo papildomų paketų, kad šie nebūtų diegiami.
 Installation canceled.	InstallProgress		Diegimo atsisakyta.
-OK	InstallerApp		Gerai
 Are you sure you want to abort the installation?	InstallerWindow		Ar tikrai norite nutraukti diegimą?
 Stop	InstallerWindow		Nutraukti
 Cancel	InstallerWindow		Atsisakyti
@@ -67,7 +66,6 @@ Running Boot Manager and DriveSetup…\n\nClose both applications to continue wi
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Ar tikrai norite įdiegti į dabartinį paleidimo diską? Jeigu tęsite, įdiegimo programa turės paleisti kompiuterį iš naujo.
 Onto:	InstallerWindow		Į:
 Quit Boot Manager and DriveSetup	InstallerWindow		Užbaikite Paleidyklės ir Diskų ženklintuvo darbą
-Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		„Haiku“ įdiegimo programa\n\tsukurta Jérôme'o Duval'io ir Stephan'o Aßmus'o\n\t© 2005-2010, Haiku.\n\n
 Tools	InstallerWindow		Priemonės
 scanning…	InstallerWindow		žvalgoma…
 Set up boot menu	InstallerWindow		Įdiegti paleidyklės meniu

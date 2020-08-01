@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Installer	2673178451
+1	english	x-vnd.Haiku-Installer	1576782594
 Performing installation.	InstallProgress		执行安装。
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		从弹出菜单中选择源磁盘。然后点击\"开始\"。
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		请在关闭系统安装器前关闭磁盘管理器。
@@ -51,7 +51,6 @@ Collecting copy information.	InstallProgress		收集复制信息。
 Show optional packages	InstallerWindow		显示附加软件包
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		目标磁盘可能没有足够的空间。尝试选择其他的磁盘或者选择不安装附加项目。
 Installation canceled.	InstallProgress		安装已取消。
-OK	InstallerApp		确定
 Are you sure you want to abort the installation?	InstallerWindow		您确定要取消安装吗？
 Stop	InstallerWindow		停止
 Cancel	InstallerWindow		取消
@@ -70,7 +69,6 @@ Running Boot Manager and DriveSetup…\n\nClose both applications to continue wi
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		您确定安装 Haiku 到当前引导磁盘？如果您继续安装，系统安装器将会重启您的计算机。
 Onto:	InstallerWindow		安装到：
 Quit Boot Manager and DriveSetup	InstallerWindow		退出引导管理器和磁盘管理器
-Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		系统安装器\n\t编写者：Jérôme Duval 和 Stephan Aßmus \n\t版权所有 2005-2001 Haiku, Inc.\n\n
 Tools	InstallerWindow		工具
 scanning…	InstallerWindow		扫描...
 Set up boot menu	InstallerWindow		设置引导菜单

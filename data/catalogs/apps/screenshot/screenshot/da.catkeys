@@ -1,2 +1,24 @@
-1	danish	x-vnd.haiku-screenshot-cli	721864121
+1	danish	x-vnd.haiku-screenshot-cli	1522864996
+Overwrite	ScreenshotWindow		Overskriv
+Save in:	ScreenshotWindow		Gem i:
+Error saving \"%s\":\n\t%s	ScreenshotWindow		Fejl ved gemning af \"%s\":\n\t%s
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Filen findes allerede.\n Er du sikker på, at du vil overskrive den?
+OK	ScreenshotWindow		OK
+Select	ScreenshotWindow		Vælg
+Save as:	ScreenshotWindow		Gem som:
+seconds	ScreenshotWindow		sekunder
+New screenshot	ScreenshotWindow		Nyt skærmbillede
+Screenshot	System name		Skærmbillede
+Desktop	ScreenshotWindow		Skrivebord
+overwrite	ScreenshotWindow		overskriv
+Settings…	ScreenshotWindow		Indstillinger …
+Choose folder	ScreenshotWindow		Vælg mappe
+Name:	ScreenshotWindow		Navn:
+Choose folder…	ScreenshotWindow		Vælg mappe …
+Please select	ScreenshotWindow		Vælg venligst
+Cancel	ScreenshotWindow		Annuller
+Delay:	ScreenshotWindow		Forsinkelse:
+Copy to clipboard	ScreenshotWindow		Kopiér til udklipsholder
 screenshot	Screenshot	Base filename of screenshot files	skærmbillede
+Home folder	ScreenshotWindow		Hjemmemappe
+Save	ScreenshotWindow		Gem

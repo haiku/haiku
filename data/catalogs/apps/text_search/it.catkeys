@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku.TextSearch	3859480651
+1	italian	x-vnd.Haiku.TextSearch	1757850908
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Scegli i file che desideri che vengano selezionati per te nel Tracker.
 %appname% : %path%	GrepWindow		%appname% : %path%
 Failed to start xargs program!	Grepper		Impossibile avviare applicativo xargs!
@@ -6,6 +6,7 @@ Open selection	GrepWindow		Apri quanto selezionato
 Actions	GrepWindow		Azioni
 New window	GrepWindow		Nuova finestra
 Encoding	GrepWindow		Codifica
+Set target to parent folder	GrepWindow		Cerca su cartella di livello superiore
 OK	GrepWindow		OK
 %appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
 Close	GrepWindow		Chiudi
@@ -26,7 +27,7 @@ Show lines	GrepWindow		Mostra righe
 Failed to open errors pipe!	Grepper		Impossibile aprire la pipe degli errori!
 The unselected files will be removed from the list.	GrepWindow		I file non selezionati verranno rimossi dalla lista.
 Open files in code editor	GrepWindow		Apri file nell'editor di codice
-Skip folders starting with a dot	GrepWindow		Tralascia le cartelle che iniziano con un punto
+Skip folders starting with a dot	GrepWindow		Ignora le cartelle che iniziano con un punto
 Failed to open output pipe!	Grepper		Impossibile aprire la connessione di uscita!
 Cancel	GrepWindow		Annulla
 History	GrepWindow		Cronologia

@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku.TextSearch	3859480651
+1	turkish	x-vnd.Haiku.TextSearch	1757850908
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Lütfen sizin için İzleyici'de seçilmesini dilediğiniz dosyaları seçin.
 %appname% : %path%	GrepWindow		%appname% : %path%
 Failed to start xargs program!	Grepper		xargs programı başlatılamadı!
@@ -6,6 +6,7 @@ Open selection	GrepWindow		Seçimi aç
 Actions	GrepWindow		Eylemler
 New window	GrepWindow		Yeni pencere
 Encoding	GrepWindow		Kodlama
+Set target to parent folder	GrepWindow		Hedefi üst klasöre ayarla
 OK	GrepWindow		Tamam
 %appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
 Close	GrepWindow		Kapat

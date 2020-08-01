@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Input	1910113385
+1	swedish	x-vnd.Haiku-Input	1950274171
 Defaults	InputMouse		Förvalt
 Scrolling	TouchpadPrefView		Rulla
 Long	KeyboardView		Lång
@@ -9,12 +9,13 @@ Warp	SettingsView		Varp
 Device List	InputWindow		Enhetslista
 Double-click speed	SettingsView		Dubbelklicks hastighet
 5-Button	SettingsView		5-Knappar
-Typing test area	KeyboardView		Test skrivnings område
+Typing test area	KeyboardView		Testskrivningsområde
 Fast	KeyboardView		Snabb
 Please confirm	TouchpadPrefView		Var god bekräfta
 Mouse speed	SettingsView		Mushastighet
 Horizontal scrolling	TouchpadPrefView		Horisontell rullning
 Input	System name		Inmatning
+Quick	TouchpadPrefView		Snabbt
 Short	KeyboardView		Kort
 Revert	InputMouse		Återställ
 Slow	KeyboardView		Långsam
@@ -26,15 +27,19 @@ Focus follows mouse	SettingsView		Fokus följer musen
 Focus mode:	SettingsView		Fokuserat läge:
 Revert	TouchpadPrefView		Återställ
 4-Button	SettingsView		4-Knappa
+Tapping sensitivity	TouchpadPrefView		Tappningskänslighet
 Instant warp	SettingsView		Omedelbar varp
 Revert	InputKeyboard		Återställ
 Mouse type:	SettingsView		Mus typ:
 Off	TouchpadPrefView		Av
+Never	TouchpadPrefView		Aldrig
 Fast	TouchpadPrefView		Snabb
+6-Button	SettingsView		6-Knapp
 Click to focus	SettingsView		Klicka för att fokusera
 Acceleration	TouchpadPrefView		Acceleration
 Accept first click	SettingsView		Acceptera vid första klickningen
 OK	TouchpadPrefView		OK
+Keyboard Lock Delay	TouchpadPrefView		Fördröjning av tangentbordslås
 Delay until key repeat	KeyboardView		Fördröjning tills upprepning av tangent
 Two finger scrolling	TouchpadPrefView		Rulla med två fingrar
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Den nya rullnings området är stort och kommer påverka vanliga mus operationer. Vill du verkligen ändra den?

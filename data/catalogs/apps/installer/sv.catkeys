@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Installer	2357341034
+1	swedish	x-vnd.Haiku-Installer	1874975245
 Performing installation.	InstallProgress		Verkställer installationen.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Välj källdisk från menyn. Klicka sedan på \"Starta\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Var god stäng Diskhanteringsfönstret innan du stänger fönstret för Installeraren.
@@ -25,6 +25,7 @@ Welcome to the Haiku Installer!\n\n	InstallerApp		Välkommen till Haikus install
 Quit Boot Manager	InstallerWindow		Avsluta Starthanteraren
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Starthanteraren körs.\n\nStäng Starthanteraren för att fortsätta med installationen.
 Quit DriveSetup	InstallerWindow		Avsluta DiskHantering
+The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume while the existing 'settings' folder is retained. All other folders will be merged, in which files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Målvolymen är inte tom. Är du säker på att du vill installera ändå?\n\nObs: "System" -mappen kommer att vara en ren kopia från källvolymen medan den befintliga mappen "inställningar" bevaras. Alla andra mappar slås samman, där filer och länkar som finns på både käll- och målvolym skrivs över med källvolymversionen.
 Write boot sector	InstallerWindow		Skriv bootsektor
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld av %2ld
 Finishing installation.	InstallProgress		Slutför installationen.
@@ -55,9 +56,9 @@ The disk can't be mounted. Please choose a different disk.	InstallProgress		Disk
 Begin	InstallerWindow		Börja
 Collecting copy information.	InstallProgress		Förbereder inför kopiering.
 Show optional packages	InstallerWindow		Visa valbara paket
+No partitions have been found that are suitable for installation. Please set up partitions and format at least one partition with the Be File System.	InstallerWindow		Inga partitioner har hittats som är lämpliga för installation. Ställ in partitioner och formatera minst en partition med Be File System.
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Måldisken kan ha för lite ledigt utrymme. Försök att välja en annan disk eller välj att installera färre valbara paket.
 Installation canceled.	InstallProgress		Installationen avbröts.
-OK	InstallerApp		OK
 Are you sure you want to abort the installation?	InstallerWindow		Är du säker på att du vill stoppa installationen?
 Stop	InstallerWindow		Stopp
 Cancel	InstallerWindow		Avbryt
@@ -77,9 +78,9 @@ Are you sure you want to install onto the current boot disk? The Installer will 
 Onto:	InstallerWindow		Till:
 Quit Boot Manager and DriveSetup	InstallerWindow		Avsluta Starthanteraren och DiskHantering
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"Userguide\" and take the \"Quick Tour\". There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3) När du lyckas starta upp i Haiku för första gången, se till att du läser vår \"Användarguide\" och tar vår \"Snabbtur\". Det finns länkar på skrivbordet och i WebPositive's bokmärken.\n\n
-Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installerare\n\tskriven av Jérôme Duval och Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 Tools	InstallerWindow		Verktyg
 scanning…	InstallerWindow		skannar…
+Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be formatted with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Starta DriveSetup-verktyget till partitionen\ntillgängliga hårddiskar och andra media.\nPartitioner kan formateras med\nBe filsystem som behövs för en Haiku-start\ndela.
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Userguide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2)   Installeraren gör själva Haiku-partitionen startbar men tar inga steg för att integrera Haiku i en befintlig startmeny. Om du redan har GRUB installerat kan du lägga till Haiku i GRUB's meny.\nFör detaljer, se guiden om att starta Haiku på adressen https://www.haiku-os.org/guides/booting.\n\nDu kan även ställa in startmenyn från installationsprogrammets verktygsmeny. Se användarhandbokens ämne på programmet \"BootManager\".\n\n\n
 Set up boot menu	InstallerWindow		Ställ in startmeny
 Continue	InstallerApp		Fortsätt

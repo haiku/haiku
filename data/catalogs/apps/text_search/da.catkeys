@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku.TextSearch	2224690775
+1	danish	x-vnd.Haiku.TextSearch	1757850908
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Vælg venligst de filer du vil have valgt til dig i Trackeren.
 %appname% : %path%	GrepWindow		%appname% : %path%
 Failed to start xargs program!	Grepper		Kunne ikke starte xargs-program!
@@ -6,6 +6,7 @@ Open selection	GrepWindow		Åbn valgte
 Actions	GrepWindow		Handlinger
 New window	GrepWindow		Nyt vindue
 Encoding	GrepWindow		Kodning
+Set target to parent folder	GrepWindow		Indstil mål til ophavsmappe
 OK	GrepWindow		OK
 %appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
 Close	GrepWindow		Luk
@@ -30,6 +31,7 @@ Skip folders starting with a dot	GrepWindow		Spring de mapper over der starter m
 Failed to open output pipe!	Grepper		Kunne ikke åbne outputledning!
 Cancel	GrepWindow		Annuller
 History	GrepWindow		Historie
+TextSearch	System name		Tekstsøgning
 File	GrepWindow		Fil
 Case-sensitive	GrepWindow		Versalfølsom
 Select all	GrepWindow		Vælg alt

@@ -1,6 +1,5 @@
-1	english (united kingdom)	x-vnd.Haiku-Installer	4005061638
+1	english (united kingdom)	x-vnd.Haiku-Installer	1427733806
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Choose the source and destination disc from the pop-up menus. Then click \"Begin\".
 OK	InstallerWindow		Alright
 Installation canceled.	InstallProgress		Installation cancelled.
-OK	InstallerApp		Alright
 OK	InstallProgress		Alright

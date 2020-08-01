@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Installer	4181741427
+1	belarusian	x-vnd.Haiku-Installer	3085345570
 Performing installation.	InstallProgress		Выконваецца ўсталёўка.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Выберыце зыходны дыск з усплывальнага меню. Потым націсніце \"Пачаць\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Калі ласка, закройце вакно DriveSetup перад тым як закрыць Усталёўшчык.
@@ -49,7 +49,6 @@ Collecting copy information.	InstallProgress		Збіраецца інфарма�
 Show optional packages	InstallerWindow		Паказваць дадатковыя пакункі
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Дыск прызначэння, пэўна, не мае патрэбнага месца. Паспрабуйце выбраць іншы дыск або адмяніце ўсталёўку дадатковых пунктаў.
 Installation canceled.	InstallProgress		Усталёўка адмененая.
-OK	InstallerApp		ОК
 Are you sure you want to abort the installation?	InstallerWindow		Вы насамрэч жадаеце перарваць усталёўку?
 Stop	InstallerWindow		Стоп
 Cancel	InstallerWindow		Адмена
@@ -67,7 +66,6 @@ Running Boot Manager and DriveSetup…\n\nClose both applications to continue wi
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Сапрауды жадаеце усталяваць на цяперашні загрузачны дыск? Калі так, Усталёшчык перазапусціць ваш кампутар.
 Onto:	InstallerWindow		На:
 Quit Boot Manager and DriveSetup	InstallerWindow		Выйсці з Менеджэра Запуску і DriveSetup
-Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installer\n\tАўтары: Jérôme Duval, Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 Tools	InstallerWindow		Прылады
 scanning…	InstallerWindow		сканіраванне…
 Set up boot menu	InstallerWindow		Наладзіць меню запуску

@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Installer	2971371102
+1	romanian	x-vnd.Haiku-Installer	1874975245
 Performing installation.	InstallProgress		Se execută instalarea.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Alege discul sursă din meniul contextual. Apoi apasă \"Începe\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Alegeți fereastra ConfigurareDrive înainte de a închide fereastra Programului de instalare.
@@ -59,7 +59,6 @@ Show optional packages	InstallerWindow		Afișează pachete opționale
 No partitions have been found that are suitable for installation. Please set up partitions and format at least one partition with the Be File System.	InstallerWindow		Nu s-au găsit partiții care sunt potrivite pentru instalare. Stabiliți partițiile și formatați cel puțin o partiție cu sistemul de fișiere Be.
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		E posibil ca discul de destinație să nu dețină destul spațiu. Încercați să alegeți un disc diferit sau alegeți să nu instalați elementele opționale.
 Installation canceled.	InstallProgress		Instalare anulată.
-OK	InstallerApp		OK
 Are you sure you want to abort the installation?	InstallerWindow		Sigur dorești să renunți la instalare?
 Stop	InstallerWindow		Oprește
 Cancel	InstallerWindow		Anulează
@@ -79,7 +78,6 @@ Are you sure you want to install onto the current boot disk? The Installer will 
 Onto:	InstallerWindow		Pe:
 Quit Boot Manager and DriveSetup	InstallerWindow		Închide Boot Manager și DriveSetup
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"Userguide\" and take the \"Quick Tour\". There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3) Când porniți Haiku cu succes pentru prima dată, asigurați-vă că citiți \„Ghidul utilizatorului\” și că luați \„Turul rapid\”. Există legături pe Desktop și în marcajele WebPositive.\n\n
-Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Program de instalare\n\tscris de Jérôme Duval și Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 Tools	InstallerWindow		Unelte
 scanning…	InstallerWindow		se scanează…
 Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be formatted with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Lansați utilitatea DriveSetup pentru a partiționa\nunitățile hard disponibile și alte media.\nPartițiile pot fi formatate cu\nsistemul de fișiere Be necesar pentru o partiție de\npornire Haiku.

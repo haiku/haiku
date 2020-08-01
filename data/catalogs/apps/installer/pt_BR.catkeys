@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-Installer	2469864484
+1	portuguese (brazil)	x-vnd.Haiku-Installer	4187503948
 Performing installation.	InstallProgress		Fazendo a instalação.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Escolha o disco de origem no menu pop-up. Então clique em \"Iniciar\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Por favor feche o Configurador de Disco antes de fechar o Instalador.
@@ -50,7 +50,6 @@ Collecting copy information.	InstallProgress		Coletando informações para cópi
 Show optional packages	InstallerWindow		Mostrar items opcionais
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		O disco destino não tem espaço suficiente. Tente escolher um disco diferente ou escolha não instalar os items opcionais.
 Installation canceled.	InstallProgress		Instalação cancelada.
-OK	InstallerApp		OK
 Are you sure you want to abort the installation?	InstallerWindow		Está seguro de que quer cancelar a instalação?
 Stop	InstallerWindow		Parar
 Cancel	InstallerWindow		Cancelar
