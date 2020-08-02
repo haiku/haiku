@@ -55,6 +55,7 @@ public:
 
 	// BWindow interface
 	virtual	void				MessageReceived(BMessage* message);
+	virtual	void				Show();
 	virtual	bool				QuitRequested();
 	virtual	void				WorkspaceActivated(int32 workspace,
 									bool active);

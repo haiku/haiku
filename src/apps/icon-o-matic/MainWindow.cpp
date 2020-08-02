@@ -542,6 +542,15 @@ case MSG_SHAPE_SELECTED: {
 }
 
 
+void
+MainWindow::Show()
+{
+	BWindow::Show();
+	BMenuBar* bar = static_cast<BMenuBar*>(FindView("main menu"));
+	SetKeyMenuBar(bar);
+}
+
+
 bool
 MainWindow::QuitRequested()
 {
@@ -975,7 +984,8 @@ MainWindow::_CreateGUI()
 	layout->AddView(leftTopView, 0, 0);
 
 	// views along the left side
-	leftTopView->AddChild(_CreateMenuBar());
+	BMenuBar* mainMenuBar = _CreateMenuBar();
+	leftTopView->AddChild(mainMenuBar);
 
 	float splitWidth = 13 * be_plain_font->Size();
 	BSize minSize = leftTopView->MinSize();
@@ -1130,6 +1140,7 @@ MainWindow::_CreateGUI()
 	topSideView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED,
 		swatchGroupView->MinSize().height));
 }
+
 
 BMenuBar*
 MainWindow::_CreateMenuBar()
