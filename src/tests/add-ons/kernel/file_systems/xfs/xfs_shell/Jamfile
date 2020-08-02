@@ -39,6 +39,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) headers private ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) src tools fs_shell ] ;
 
 local xfsSource =
+	BPlusTree.cpp
 	DeviceOpener.cpp
 	Directory.cpp
 	Extent.cpp

@@ -5,136 +5,115 @@
 #ifndef _BPLUS_TREE_H_
 #define _BPLUS_TREE_H_
 
+
+#include "Extent.h"
+#include "Inode.h"
+#include "LeafDirectory.h"
+#include "Node.h"
 #include "system_dependencies.h"
 
 
-/* Allocation B+ Tree Format */
-#define XFS_ABTB_MAGICNUM 0x41425442
-	// For block offset B+Tree
-#define XFS_ABTC_MAGICNUM 0x41425443
-	// For block count B+ Tree
 #define XFS_BTREE_SBLOCK_SIZE	18
 	// Header for Short Format btree
 #define XFS_BTREE_LBLOCK_SIZE	24
 	// Header for Long Format btree
+#define XFS_KEY_SIZE sizeof(xfs_fileoff_t)
+#define XFS_PTR_SIZE sizeof(xfs_fsblock_t)
+#define XFS_BMAP_MAGIC 0x424d4150
+
+
+typedef xfs_fileoff_t TreeKey;
+typedef xfs_fsblock_t TreePointer;
 
 
 /*
- * Headers are the "nodes" really and are called "blocks". The records, keys
- * and ptrs are calculated using helpers
+ * Headers(here, the LongBlock) are the "nodes" really and are called "blocks".
+ * The records, keys and ptrs are calculated using helpers
  */
-struct bplustree_short_block {
-			void				SwapEndian();
+struct LongBlock {
 
 			uint32				Magic()
-								{ return bb_magic; }
+								{ return B_BENDIAN_TO_HOST_INT32(bb_magic); }
 
 			uint16				Level()
-								{ return bb_level; }
+								{ return B_BENDIAN_TO_HOST_INT16(bb_level); }
 
 			uint16				NumRecs()
-								{ return bb_numrecs; }
+								{ return B_BENDIAN_TO_HOST_INT16(bb_numrecs); }
 
-			xfs_alloc_ptr_t		Left()
-								{ return bb_leftsib; }
+			TreePointer			Left()
+								{ return B_BENDIAN_TO_HOST_INT64(bb_leftsib); }
 
-			xfs_alloc_ptr_t		Right()
-								{ return bb_rightsib;}
-
-			uint32				bb_magic;
-			uint16				bb_level;
-			uint16				bb_numrecs;
-			uint32				bb_leftsib;
-			uint32				bb_rightsib;
-}
-
-
-struct bplustree_long_block {
-			void				SwapEndian();
-
-			uint32				Magic()
-								{ return bb_magic; }
-
-			uint16				Level()
-								{ return bb_level; }
-
-			uint16				NumRecs()
-								{ return bb_numrecs; }
-
-			xfs_alloc_ptr_t		Left()
-								{ return bb_leftsib; }
-
-			xfs_alloc_ptr_t		Right()
-								{ return bb_rightsib;}
+			TreePointer			Right()
+								{ return B_BENDIAN_TO_HOST_INT64(bb_rightsib); }
 
 			uint32				bb_magic;
 			uint16				bb_level;
 			uint16				bb_numrecs;
 			uint64				bb_leftsib;
 			uint64				bb_rightsib;
-}
+};
 
 
-/* Array of these records in the leaf node along with above headers */
-#define XFS_ALLOC_REC_SIZE	8
-typedef struct xfs_alloc_rec {
-			void				SwapEndian();
-
-			uint32				StartBlock()
-								{ return ar_startblock; }
-
-			uint32				BlockCount()
-								{ return ar_blockcount; }
-
-			uint32				ar_startblock;
-			uint32				ar_blockcount;
-
-} xfs_alloc_rec_t, xfs_alloc_key_t;
+/* We have an array of extent records in
+ * the leaf node along with above headers
+ * The behaviour is very much like node directories.
+ */
 
 
-typedef uint32 xfs_alloc_ptr_t;
-	//  Node pointers, AG relative block pointer
-
-#define ALLOC_FLAG 0x1
-#define LONG_BLOCK_FLAG 0x1
-#define SHORT_BLOCK_FLAG 0x2
-
-union btree_ptr {
-	bplustree_long_block fLongBlock;
-	bplustree_short_block fShortBlock;
-}
-
-
-union btree_key {
-	xfs_alloc_key_t fAlloc;
-}
+//xfs_bmdr_block
+struct BlockInDataFork {
+			uint16				Levels()
+									{ return
+										B_BENDIAN_TO_HOST_INT16(bb_level); }
+			uint16				NumRecords()
+									{ return
+										B_BENDIAN_TO_HOST_INT16(bb_numrecs); }
+			uint16				bb_level;
+			uint16				bb_numrecs;
+};
 
 
-union btree_rec {
-	xfs_alloc_rec_t fAlloc;
-}
+struct ExtentMapUnwrap {
+			uint64				first;
+			uint64				second;
+};
 
 
-class BPlusTree {
+/*
+ * This class should handle B+Tree based directories
+ */
+class TreeDirectory {
 public:
-			uint32				BlockSize();
-			int					RecordSize();
-			int					MaxRecords(bool leaf);
-			int					KeyLen();
+								TreeDirectory(Inode* inode);
+								~TreeDirectory();
+			status_t			InitCheck();
+			status_t			GetNext(char* name, size_t* length,
+									xfs_ino_t* ino);
+			status_t			Lookup(const char* name, size_t length,
+									xfs_ino_t* id);
+			int					EntrySize(int len) const;
 			int					BlockLen();
-			int					PtrLen();
-			int					RecordOffset(int pos); // get the pos'th record
-			int					KeyOffset(int pos); // get the pos'th key
-			int					PtrOffset(int pos); // get the pos'th ptr
+			size_t				PtrSize();
+			size_t				KeySize();
+			TreeKey				GetKey(int pos);
+									// get the pos'th key
+			TreePointer*		GetPtr(int pos, LongBlock* pointer);
+									// get the pos'th pointer
+			status_t			GetAllExtents();
+			size_t				MaxRecordsPossible(size_t len);
 
 private:
-			Volume*				fVolume;
-			xfs_agnumber_t		fAgnumber;
-			btree_ptr*			fRoot;
-			int					fRecType;
-			int					fKeyType;
-			int					fPtrType;
-}
+	inline	status_t			UnWrapExtents(ExtentMapUnwrap* extentsWrapped);
+
+private:
+			Inode*				fInode;
+			status_t			fInitStatus;
+			BlockInDataFork*	fRoot;
+			ExtentMapEntry*		fExtents;
+			uint32				fCountOfFilledExtents;
+			char*				fSingleDirBlock;
+};
 
 
 #endif

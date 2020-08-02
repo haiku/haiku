@@ -6,6 +6,7 @@
 #define _DIRECTORY_H_
 
 
+#include "BPlusTree.h"
 #include "Extent.h"
 #include "Inode.h"
 #include "LeafDirectory.h"
@@ -38,6 +39,7 @@ private:
 			LeafDirectory*		fLeafDir;
 				// Extent based leaf directory
 			NodeDirectory*		fNodeDir;
+			TreeDirectory*		fTreeDir;
 };
 
 

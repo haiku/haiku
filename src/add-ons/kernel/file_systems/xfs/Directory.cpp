@@ -13,7 +13,8 @@ DirectoryIterator::DirectoryIterator(Inode* inode)
 	fShortDir(NULL),
 	fExtentDir(NULL),
 	fLeafDir(NULL),
-	fNodeDir(NULL)
+	fNodeDir(NULL),
+	fTreeDir(NULL)
 {
 }
 
@@ -24,6 +25,7 @@ DirectoryIterator::~DirectoryIterator()
 	delete fLeafDir;
 	delete fExtentDir;
 	delete fNodeDir;
+	delete fTreeDir;
 }
 
 
@@ -75,16 +77,13 @@ DirectoryIterator::Init()
 	 * we can atleast still list the shortform directory
 	 */
 
-	//TODO: Reading from extent based directories
-	if (fInode->Format() == XFS_DINODE_FMT_EXTENTS) {
-		TRACE("Iterator:GetNext: EXTENTS");
-		return B_OK;
-	}
-
 	//TODO: Reading from B+Trees based directories
 	if (fInode->Format() == XFS_DINODE_FMT_BTREE) {
 		TRACE("Iterator:GetNext: B+TREE");
-		return B_OK;
+		fTreeDir = new(std::nothrow) TreeDirectory(fInode);
+		if (fTreeDir == NULL)
+			return B_NO_MEMORY;
+		return fTreeDir->InitCheck();
 	}
 
 	return B_BAD_VALUE;
