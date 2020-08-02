@@ -190,8 +190,8 @@ RemotePackageRepository HaikuPorts
 	gmp_x86-6.1.2-3
 	haikuwebkit_x86-1.7.0-1
 	haikuwebkit_x86_devel-1.7.0-1
-	icu_x86-57.2-2
-	icu_x86_devel-57.2-2
+	icu66_x86-66.1-1
+	icu66_x86_devel-66.1-1
 	jasper_x86-2.0.16-4
 	jasper_x86_devel-2.0.16-4
 	lame_x86-3.100-3
