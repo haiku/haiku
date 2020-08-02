@@ -49,18 +49,11 @@ Extent::FillBlockBuffer()
 	if (fBlockBuffer == NULL)
 		return B_NO_MEMORY;
 
-	Volume* volume = fInode->GetVolume();
-	xfs_agblock_t numberOfBlocksInAg = volume->AgBlocks();
+	xfs_daddr_t readPos =
+		fInode->FileSystemBlockToAddr(fMap->br_startblock);
 
-	uint64 agNo = FSBLOCKS_TO_AGNO(fMap->br_startblock, volume);
-	uint64 agBlockNo = FSBLOCKS_TO_AGBLOCKNO(fMap->br_startblock, volume);
-	xfs_fsblock_t blockToRead = FSBLOCKS_TO_BASICBLOCKS(volume->BlockLog(),
-		((uint64)(agNo * numberOfBlocksInAg) + agBlockNo));
-
-	xfs_daddr_t readPos = blockToRead * BASICBLOCKSIZE;
-
-	TRACE("blockToRead: (%ld), readPos: (%ld)\n", blockToRead, readPos);
-	if (read_pos(volume->Device(), readPos, fBlockBuffer, len) != len) {
+	if (read_pos(fInode->GetVolume()->Device(), readPos, fBlockBuffer, len)
+		!= len) {
 		ERROR("Extent::FillBlockBuffer(): IO Error");
 		return B_IO_ERROR;
 	}
@@ -157,6 +150,7 @@ Extent::GetNext(char* name, size_t* length, xfs_ino_t* ino)
 
 	int numberOfEntries = B_BENDIAN_TO_HOST_INT32(BlockTail()->count);
 	TRACE("numberOfEntries:(%d)\n", numberOfEntries);
+	uint16 currentOffset = (char*)entry - fBlockBuffer;
 
 	for (int i = 0; i < numberOfEntries; i++) {
 		TRACE("EntryNumber:(%d)\n", i);
@@ -164,19 +158,19 @@ Extent::GetNext(char* name, size_t* length, xfs_ino_t* ino)
 
 		if (B_BENDIAN_TO_HOST_INT16(unusedEntry->freetag) == DIR2_FREE_TAG) {
 			TRACE("Unused entry found\n");
-			i--;
+			currentOffset += B_BENDIAN_TO_HOST_INT16(unusedEntry->length);
 			entry = (void*)
 				((char*)entry + B_BENDIAN_TO_HOST_INT16(unusedEntry->length));
 			continue;
 		}
 		ExtentDataEntry* dataEntry = (ExtentDataEntry*) entry;
 
-		uint16 currentOffset = (char*)dataEntry - fBlockBuffer;
 		TRACE("GetNext: fOffset:(%d), currentOffset:(%d)\n",
 			fOffset, currentOffset);
 
 		if (fOffset >= currentOffset) {
 			entry = (void*)((char*)entry + EntrySize(dataEntry->namelen));
+			currentOffset += EntrySize(dataEntry->namelen);
 			continue;
 		}
 

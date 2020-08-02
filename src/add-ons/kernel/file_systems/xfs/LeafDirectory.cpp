@@ -115,21 +115,11 @@ LeafDirectory::FillBuffer(int type, char* blockBuffer, int howManyBlocksFurthur)
 			return B_NO_MEMORY;
 	}
 
-	Volume* volume = fInode->GetVolume();
-	xfs_agblock_t numberOfBlocksInAg = volume->AgBlocks();
+	xfs_daddr_t readPos =
+		fInode->FileSystemBlockToAddr(map->br_startblock + howManyBlocksFurthur);
 
-	uint64 agNo =
-		FSBLOCKS_TO_AGNO(map->br_startblock + howManyBlocksFurthur, volume);
-	uint64 agBlockNo =
-		FSBLOCKS_TO_AGBLOCKNO(map->br_startblock + howManyBlocksFurthur, volume);
-
-	xfs_fsblock_t blockToRead = FSBLOCKS_TO_BASICBLOCKS(volume->BlockLog(),
-		(agNo * numberOfBlocksInAg + agBlockNo));
-
-	xfs_daddr_t readPos = blockToRead * BASICBLOCKSIZE;
-
-	TRACE("blockToRead: (%ld), readPos: (%ld)\n", blockToRead, readPos);
-	if (read_pos(volume->Device(), readPos, blockBuffer, len) != len) {
+	if (read_pos(fInode->GetVolume()->Device(), readPos, blockBuffer, len)
+		!= len) {
 		ERROR("Extent::FillBlockBuffer(): IO Error");
 		return B_IO_ERROR;
 	}
@@ -146,7 +136,8 @@ LeafDirectory::FillBuffer(int type, char* blockBuffer, int howManyBlocksFurthur)
 	} else if (type == LEAF) {
 		fLeafBuffer = blockBuffer;
 		ExtentLeafHeader* header = (ExtentLeafHeader*) fLeafBuffer;
-		TRACE("NumberOfEntries in leaf: (%d)\n", B_BENDIAN_TO_HOST_INT16(header->count));
+		TRACE("NumberOfEntries in leaf: (%d)\n",
+			B_BENDIAN_TO_HOST_INT16(header->count));
 	}
 	return B_OK;
 }

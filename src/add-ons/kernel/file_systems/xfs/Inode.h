@@ -32,10 +32,13 @@
 	// Gets the offset into the block from the inode number
 #define DIR_DFORK_PTR(dir_ino_ptr) (void*) \
 		((char*) dir_ino_ptr + DATA_FORK_OFFSET)
-#define DIR_AFORK_PTR(dir_ino_ptr) \
-					(void*)((char*)XFS_DFORK_PTR + \
-					((uint32)dir_ino_ptr->di_forkoff<<3))
+#define DIR_AFORK_PTR(dir_ino_ptr, forkoff) \
+					(void*)((char*)DIR_DFORK_PTR(dir_ino_ptr) + \
+					(((uint32)forkoff)<<3))
 #define DIR_AFORK_EXIST(dir_ino_ptr) dir_ino_ptr->di_forkoff!=0
+#define MASK(n) ((1UL << n) - 1)
+#define FSBLOCKS_TO_AGNO(n, volume) ((n) >> volume->AgBlocksLog())
+#define FSBLOCKS_TO_AGBLOCKNO(n, volume) ((n) & MASK(volume->AgBlocksLog()))
 
 
 // xfs_da_blkinfo_t
@@ -92,7 +95,7 @@ struct xfs_inode_t {
 			uint32				UserId() const;
 			uint32				GroupId() const;
 			xfs_extnum_t		DataExtentsCount() const;
-
+			uint8				ForkOffset() const;
 			uint16				di_magic;
 			uint16				di_mode;
 				// uses standard S_Ixxx
@@ -191,6 +194,9 @@ public:
 			bool				HasFileTypeField() const;
 			xfs_extnum_t		DataExtentsCount() const
 									{ return fNode->DataExtentsCount(); }
+			uint64				FileSystemBlockToAddr(uint64 block);
+			uint8				ForkOffset() const
+									{ return fNode->ForkOffset(); }
 
 private:
 			status_t			GetFromDisk();

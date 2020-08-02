@@ -37,6 +37,13 @@ xfs_inode_t::SwapEndian()
 }
 
 
+uint8
+xfs_inode_t::ForkOffset() const
+{
+	return di_forkoff;
+}
+
+
 xfs_rfsblock_t
 xfs_inode_t::BlockCount() const
 {
@@ -213,6 +220,24 @@ Inode::GetFromDisk()
 	fNode->SwapEndian();
 
 	return B_OK;
+}
+
+
+uint64
+Inode::FileSystemBlockToAddr(uint64 block)
+{
+	xfs_agblock_t numberOfBlocksInAg = fVolume->AgBlocks();
+
+	uint64 agNo = FSBLOCKS_TO_AGNO(block, fVolume);
+	uint64 agBlockNo = FSBLOCKS_TO_AGBLOCKNO(block, fVolume);
+
+	xfs_fsblock_t actualBlockToRead =
+		FSBLOCKS_TO_BASICBLOCKS(fVolume->BlockLog(),
+			((uint64)(agNo * numberOfBlocksInAg) + agBlockNo));
+	TRACE("blockToRead:(%d)\n", actualBlockToRead);
+
+	uint64 readPos = actualBlockToRead * (BASICBLOCKSIZE);
+	return readPos;
 }
 
 
