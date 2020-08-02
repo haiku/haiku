@@ -18,9 +18,11 @@
 #include <Entry.h>
 #include <File.h>
 #include <fs_attr.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <Menu.h>
 #include <MenuBar.h>
+#include <MenuField.h>
 #include <MenuItem.h>
 #include <Message.h>
 #include <Screen.h>
@@ -1030,53 +1032,42 @@ MainWindow::_CreateGUI()
 	layout->AddView(leftSideView, 0, 1);
 	leftSideView->SetExplicitMaxSize(BSize(splitWidth, B_SIZE_UNSET));
 
-	// path menu and list view
-	BMenuBar* menuBar = new BMenuBar("path menu bar");
-	menuBar->AddItem(fPathMenu);
-	leftSideView->AddChild(menuBar);
-
 	fPathListView = new PathListView(BRect(0, 0, splitWidth, 100),
 		"path list view", new BMessage(MSG_PATH_SELECTED), this);
-
-	BView* scrollView = new BScrollView("path list scroll view",
-		fPathListView, B_FOLLOW_NONE, 0, false, true, B_NO_BORDER);
-	leftSideView->AddChild(scrollView);
-
-	// shape list view
-	menuBar = new BMenuBar("shape menu bar");
-	menuBar->AddItem(fShapeMenu);
-	leftSideView->AddChild(menuBar);
-
 	fShapeListView = new ShapeListView(BRect(0, 0, splitWidth, 100),
 		"shape list view", new BMessage(MSG_SHAPE_SELECTED), this);
-	scrollView = new BScrollView("shape list scroll view",
-		fShapeListView, B_FOLLOW_NONE, 0, false, true, B_NO_BORDER);
-	leftSideView->AddChild(scrollView);
-
-	// transformer list view
-	menuBar = new BMenuBar("transformer menu bar");
-	menuBar->AddItem(fTransformerMenu);
-	leftSideView->AddChild(menuBar);
-
 	fTransformerListView = new TransformerListView(BRect(0, 0, splitWidth, 100),
 		"transformer list view");
-	scrollView = new BScrollView("transformer list scroll view",
-		fTransformerListView, B_FOLLOW_NONE, 0, false, true, B_NO_BORDER);
-	leftSideView->AddChild(scrollView);
-
-	// property list view
-	menuBar = new BMenuBar("property menu bar");
-	menuBar->AddItem(fPropertyMenu);
-	leftSideView->AddChild(menuBar);
-
 	fPropertyListView = new IconObjectListView();
 
-	// scroll view around property list view
-	ScrollView* propScrollView = new ScrollView(fPropertyListView,
-		SCROLL_VERTICAL, BRect(0, 0, splitWidth, 100), "property scroll view",
-		B_FOLLOW_NONE, B_WILL_DRAW | B_FRAME_EVENTS, B_PLAIN_BORDER,
-		BORDER_RIGHT);
-	leftSideView->AddChild(propScrollView);
+	BLayoutBuilder::Group<>(leftSideView)
+		.AddGroup(B_VERTICAL, 0)
+			.SetInsets(-2, -1, -1, -1)
+			.Add(new BMenuField(NULL, fPathMenu))
+		.End()
+		.Add(new BScrollView("path scroll view", fPathListView,
+			B_FOLLOW_NONE, 0, false, true, B_NO_BORDER))
+		.AddGroup(B_VERTICAL, 0)
+			.SetInsets(-2, -2, -1, -1)
+			.Add(new BMenuField(NULL, fShapeMenu))
+		.End()
+		.Add(new BScrollView("shape scroll view", fShapeListView,
+			B_FOLLOW_NONE, 0, false, true, B_NO_BORDER))
+		.AddGroup(B_VERTICAL, 0)
+			.SetInsets(-2, -2, -1, -1)
+			.Add(new BMenuField(NULL, fTransformerMenu))
+		.End()
+		.Add(new BScrollView("transformer scroll view",
+			fTransformerListView, B_FOLLOW_NONE, 0, false, true, B_NO_BORDER))
+		.AddGroup(B_VERTICAL, 0)
+			.SetInsets(-2, -2, -1, -1)
+			.Add(new BMenuField(NULL, fPropertyMenu))
+		.End()
+		.Add(new ScrollView(fPropertyListView, SCROLL_VERTICAL,
+			BRect(0, 0, splitWidth, 100), "property scroll view",
+			B_FOLLOW_NONE, B_WILL_DRAW | B_FRAME_EVENTS, B_PLAIN_BORDER,
+			BORDER_RIGHT))
+	.End();
 
 	BGroupLayout* topSide = new BGroupLayout(B_HORIZONTAL);
 	topSide->SetSpacing(0);
@@ -1098,21 +1089,23 @@ MainWindow::_CreateGUI()
 
 	// views along the top
 
-	BGroupLayout* styleGroup = new BGroupLayout(B_VERTICAL, 0);
-	BView* styleGroupView = new BView("style group", 0, styleGroup);
+	BGroupView* styleGroupView = new BGroupView(B_VERTICAL, 0);
 	topSide->AddView(styleGroupView);
-
-	// style list view
-	menuBar = new BMenuBar("style menu bar");
-	menuBar->AddItem(fStyleMenu);
-	styleGroup->AddView(menuBar);
 
 	fStyleListView = new StyleListView(BRect(0, 0, splitWidth, 100),
 		"style list view", new BMessage(MSG_STYLE_SELECTED), this);
-	scrollView = new BScrollView("style list scroll view", fStyleListView,
-		B_FOLLOW_NONE, 0, false, true, B_NO_BORDER);
+
+	BScrollView* scrollView = new BScrollView("style list scroll view",
+		fStyleListView, B_FOLLOW_NONE, 0, false, true, B_NO_BORDER);
 	scrollView->SetExplicitMaxSize(BSize(splitWidth, B_SIZE_UNLIMITED));
-	styleGroup->AddView(scrollView);
+
+	BLayoutBuilder::Group<>(styleGroupView)
+		.AddGroup(B_VERTICAL, 0)
+			.SetInsets(-2, -2, -1, -1)
+			.Add(new BMenuField(NULL, fStyleMenu))
+		.End()
+		.Add(scrollView)
+	.End();
 
 	// style view
 	fStyleView = new StyleView(BRect(0, 0, 200, 100));
@@ -1124,7 +1117,7 @@ MainWindow::_CreateGUI()
 	BView* swatchGroupView = new BView("swatch group", 0, swatchGroup);
 	topSide->AddView(swatchGroupView);
 
-	menuBar = new BMenuBar("swatches menu bar");
+	BMenuBar* menuBar = new BMenuBar("swatches menu bar");
 	menuBar->AddItem(fSwatchMenu);
 	swatchGroup->AddView(menuBar);
 
