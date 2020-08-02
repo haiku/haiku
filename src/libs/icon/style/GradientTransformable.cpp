@@ -70,9 +70,11 @@ Gradient::Gradient(BMessage* archive)
 	// color steps
 	BGradient::ColorStop step;
 	for (int32 i = 0; archive->FindFloat("offset", i, &step.offset) >= B_OK; i++) {
-		if (archive->FindInt32("color", i, (int32*)&step.color) >= B_OK)
-			AddColor(step, i);
-		else
+		if (archive->FindInt32("color", i, (int32*)&step.color) >= B_OK) {
+			// Use the slower method of adding by offset in case the gradient
+			// was not stored with steps in the correct order
+			AddColor(step.color, step.offset);
+		} else
 			break;
 	}
 	if (archive->FindInt32("type", (int32*)&fType) < B_OK)
