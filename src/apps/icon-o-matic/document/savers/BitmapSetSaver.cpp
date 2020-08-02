@@ -10,7 +10,10 @@
 
 #include <stdio.h>
 
+#include <String.h>
+
 #include "BitmapExporter.h"
+
 
 // constructor
 BitmapSetSaver::BitmapSetSaver(const entry_ref& ref)
@@ -18,39 +21,29 @@ BitmapSetSaver::BitmapSetSaver(const entry_ref& ref)
 {
 }
 
+
 // destructor
 BitmapSetSaver::~BitmapSetSaver()
 {
 }
+
 
 // Save
 status_t
 BitmapSetSaver::Save(Document* document)
 {
 	entry_ref actualRef(fRef);
-	char name[B_OS_NAME_LENGTH];
+	BString name;
 
-	// 64x64
-	snprintf(name, sizeof(name), "%s_64.png", fRef.name);
-	actualRef.set_name(name);
-	Exporter* exporter = new BitmapExporter(64);
-	exporter->SetSelfDestroy(true);
-	exporter->Export(document, actualRef);
+	int sizes[] = { 64, 32, 16 };
 
-	// 16x16
-	snprintf(name, sizeof(name), "%s_16.png", fRef.name);
-	actualRef.set_name(name);
-	exporter = new BitmapExporter(16);
-	exporter->SetSelfDestroy(true);
-	exporter->Export(document, actualRef);
-
-	// 32x32
-	snprintf(name, sizeof(name), "%s_32.png", fRef.name);
-	actualRef.set_name(name);
-	exporter = new BitmapExporter(32);
-	exporter->SetSelfDestroy(true);
-	exporter->Export(document, actualRef);
+	for (size_t i = 0; i < B_COUNT_OF(sizes); i++) {
+		name.SetToFormat("%s_%d.png", fRef.name, sizes[i]);
+		actualRef.set_name(name.String());
+		Exporter* exporter = new BitmapExporter(sizes[i]);
+		exporter->SetSelfDestroy(true);
+		exporter->Export(document, actualRef);
+	}
 
 	return B_OK;
 }
-
