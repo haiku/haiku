@@ -22,6 +22,9 @@
 #include <TimeZonePrivate.h>
 
 
+U_NAMESPACE_USE
+
+
 // maps our unit element to the corresponding ICU unit
 static const UCalendarDateFields skUnitMap[] = {
 	UCAL_YEAR,

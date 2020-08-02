@@ -43,6 +43,7 @@
 
 using BPrivate::CatalogAddOnInfo;
 using BPrivate::MutableLocaleRoster;
+U_NAMESPACE_USE
 
 
 /*

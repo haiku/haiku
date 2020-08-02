@@ -31,19 +31,22 @@ public:
 
 			void				Initialize(LocaleTimeDataBridge* dataBridge);
 
-	virtual	status_t			SetTo(const Locale& locale,
+	virtual	status_t			SetTo(const U_NAMESPACE_QUALIFIER Locale&
+										locale,
 									const char* posixLocaleName);
 	virtual	status_t			SetToPosix();
 
 			const char*			GetLanginfo(int index);
 
-			const Locale&		ICULocaleForStrings() const;
+			const U_NAMESPACE_QUALIFIER Locale&	ICULocaleForStrings() const;
 
 private:
-			status_t			_SetLCTimeEntries(const UnicodeString* strings,
+			status_t			_SetLCTimeEntries(const U_NAMESPACE_QUALIFIER
+										UnicodeString* strings,
 									char* destination, int entrySize,
 									int count, int maxCount);
-			status_t			_SetLCTimePattern(DateFormat* format,
+			status_t			_SetLCTimePattern(U_NAMESPACE_QUALIFIER
+										DateFormat* format,
 									char* destination, int destinationSize);
 
 			char				fMon[12][24];

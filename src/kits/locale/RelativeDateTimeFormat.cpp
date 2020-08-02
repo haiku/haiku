@@ -25,6 +25,9 @@
 #include <TimeUnitFormat.h>
 
 
+U_NAMESPACE_USE
+
+
 static const URelativeDateTimeUnit kTimeUnitToRelativeDateTime[] = {
 	UDAT_REL_UNIT_YEAR,
 	UDAT_REL_UNIT_MONTH,

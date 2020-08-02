@@ -23,6 +23,10 @@
 #include <Locale.h>
 #include <LocaleRoster.h>
 
+
+U_NAMESPACE_USE
+
+
 // maps our unit element to the corresponding ICU unit
 static const TimeUnit::UTimeUnitFields skUnitMap[] = {
 	TimeUnit::UTIMEUNIT_YEAR,

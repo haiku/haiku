@@ -28,6 +28,9 @@
 #include <stdlib.h>
 
 
+U_NAMESPACE_USE
+
+
 BCountry::BCountry(const char* countryCode)
 	:
 	fICULocale(NULL)

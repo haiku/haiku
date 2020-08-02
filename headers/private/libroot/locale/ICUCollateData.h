@@ -22,8 +22,9 @@ public:
 								ICUCollateData(pthread_key_t tlsKey);
 	virtual						~ICUCollateData();
 
-	virtual	status_t			SetTo(const Locale& locale,
-										const char* posixLocaleName);
+	virtual	status_t			SetTo(const U_NAMESPACE_QUALIFIER Locale&
+										locale,
+									const char* posixLocaleName);
 	virtual	status_t			SetToPosix();
 
 			status_t			Strcoll(const char* a, const char* b, int& out);
@@ -36,9 +37,9 @@ public:
 
 private:
 			status_t			_ToUnicodeString(const char* in,
-									UnicodeString& out);
+									U_NAMESPACE_QUALIFIER UnicodeString& out);
 
-			Collator*			fCollator;
+			U_NAMESPACE_QUALIFIER Collator*	fCollator;
 };
 
 

@@ -21,6 +21,9 @@
 #include <unicode/numfmt.h>
 
 
+U_NAMESPACE_USE
+
+
 class BNumberFormatImpl {
 public:
 					BNumberFormatImpl();

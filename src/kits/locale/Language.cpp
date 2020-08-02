@@ -26,6 +26,9 @@
 #include <unicode/locid.h>
 
 
+U_NAMESPACE_USE
+
+
 BLanguage::BLanguage()
 	:
 	fDirection(B_LEFT_TO_RIGHT),

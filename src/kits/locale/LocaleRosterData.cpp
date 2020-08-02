@@ -36,6 +36,9 @@
 #include <unicode/timezone.h>
 
 
+U_NAMESPACE_USE
+
+
 namespace BPrivate {
 
 

@@ -32,7 +32,8 @@ public:
 			void				Initialize(
 									LocaleMonetaryDataBridge* dataBridge);
 
-	virtual	status_t			SetTo(const Locale& locale,
+	virtual	status_t			SetTo(const U_NAMESPACE_QUALIFIER Locale&
+										locale,
 									const char* posixLocaleName);
 	virtual	status_t			SetToPosix();
 
@@ -43,15 +44,23 @@ private:
 	static	const int32			kSepBySpaceFlag = 1 << 1;
 
 			int32				_DetermineCurrencyPosAndSeparator(
-									const UnicodeString& prefix,
-									const UnicodeString& suffix,
-									const UnicodeString& signSymbol,
-									const UnicodeString& currencySymbol,
+									const U_NAMESPACE_QUALIFIER
+										UnicodeString& prefix,
+									const U_NAMESPACE_QUALIFIER
+										UnicodeString& suffix,
+									const U_NAMESPACE_QUALIFIER
+										UnicodeString& signSymbol,
+									const U_NAMESPACE_QUALIFIER
+										UnicodeString& currencySymbol,
 									UChar& currencySeparatorChar);
-			int32				_DetermineSignPos(const UnicodeString& prefix,
-									const UnicodeString& suffix,
-									const UnicodeString& signSymbol,
-									const UnicodeString& currencySymbol);
+			int32				_DetermineSignPos(const U_NAMESPACE_QUALIFIER
+										UnicodeString& prefix,
+									const U_NAMESPACE_QUALIFIER
+										UnicodeString& suffix,
+									const U_NAMESPACE_QUALIFIER
+										UnicodeString& signSymbol,
+									const U_NAMESPACE_QUALIFIER
+										UnicodeString& currencySymbol);
 
 			char				fDecimalPoint[skLCBufSize];
 			char				fThousandsSep[skLCBufSize];

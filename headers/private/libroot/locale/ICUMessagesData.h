@@ -20,7 +20,8 @@ class ICUMessagesData : public ICUCategoryData {
 public:
 								ICUMessagesData(pthread_key_t tlsKey);
 
-	virtual	status_t			SetTo(const Locale& locale,
+	virtual	status_t			SetTo(const U_NAMESPACE_QUALIFIER Locale&
+										locale,
 									const char* posixLocaleName);
 	virtual	status_t			SetToPosix();
 

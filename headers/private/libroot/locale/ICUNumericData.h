@@ -23,7 +23,8 @@ public:
 
 			void				Initialize(LocaleNumericDataBridge* dataBridge);
 
-	virtual	status_t			SetTo(const Locale& locale,
+	virtual	status_t			SetTo(const U_NAMESPACE_QUALIFIER Locale&
+										locale,
 									const char* posixLocaleName);
 	virtual	status_t			SetToPosix();
 

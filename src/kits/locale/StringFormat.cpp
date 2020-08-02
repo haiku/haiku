@@ -19,6 +19,9 @@
 #include <unicode/msgfmt.h>
 
 
+U_NAMESPACE_USE
+
+
 BStringFormat::BStringFormat(const BLanguage& language, const BString pattern)
 	: BFormat(language, BFormattingConventions())
 {

@@ -20,6 +20,9 @@
 #include <Language.h>
 
 
+U_NAMESPACE_USE
+
+
 const char* BTimeZone::kNameOfGmtZone = "GMT";
 
 

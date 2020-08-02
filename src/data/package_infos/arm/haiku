@@ -66,8 +66,6 @@ requires {
 	lib:libicudata
 	lib:libicui18n
 	lib:libicuio
-	lib:libicule
-	lib:libiculx
 	lib:libicutest
 	lib:libicutu
 	lib:libicuuc

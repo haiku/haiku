@@ -24,6 +24,9 @@
 #include <vector>
 
 
+U_NAMESPACE_USE
+
+
 BTimeFormat::BTimeFormat()
 	: BFormat()
 {

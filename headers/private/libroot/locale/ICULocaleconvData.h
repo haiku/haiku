@@ -15,7 +15,8 @@ namespace BPrivate {
 namespace Libroot {
 
 
-typedef DecimalFormatSymbols::ENumberFormatSymbol FormatSymbol;
+typedef U_NAMESPACE_QUALIFIER DecimalFormatSymbols::ENumberFormatSymbol
+	FormatSymbol;
 
 class ICULocaleconvData : public ICUCategoryData {
 	typedef	ICUCategoryData		inherited;
@@ -24,7 +25,8 @@ protected:
 								ICULocaleconvData(pthread_key_t tlsKey);
 
 			status_t			_SetLocaleconvEntry(
-									const DecimalFormatSymbols* formatSymbols,
+									const U_NAMESPACE_QUALIFIER
+										DecimalFormatSymbols* formatSymbols,
 									char* destination, FormatSymbol symbol,
 									const char* defaultValue = "");
 };

@@ -11,6 +11,9 @@
 #include <unicode/uchar.h>
 
 
+U_NAMESPACE_USE
+
+
 namespace BPrivate {
 namespace Libroot {
 

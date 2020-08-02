@@ -13,6 +13,9 @@
 #include <unicode/gregocal.h>
 
 
+U_NAMESPACE_USE
+
+
 namespace BPrivate {
 namespace Libroot {
 

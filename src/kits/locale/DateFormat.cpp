@@ -27,6 +27,9 @@
 #include <vector>
 
 
+U_NAMESPACE_USE
+
+
 static const DateFormatSymbols::DtWidthType kDateFormatStyleToWidth[] = {
 	DateFormatSymbols::WIDE,
 	DateFormatSymbols::ABBREVIATED,

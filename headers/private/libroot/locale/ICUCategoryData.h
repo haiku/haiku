@@ -24,18 +24,20 @@ public:
 								ICUCategoryData(pthread_key_t tlsKey);
 	virtual 					~ICUCategoryData();
 
-	virtual	status_t			SetTo(const Locale& locale,
+	virtual	status_t			SetTo(const U_NAMESPACE_QUALIFIER Locale&
+										locale,
 									const char* posixLocaleName);
 	virtual	status_t			SetToPosix();
 
 			const char*			PosixLocaleName()
 									{ return fPosixLocaleName; }
 
-			const Locale&		ICULocale() const;
+			const U_NAMESPACE_QUALIFIER Locale&	ICULocale() const;
 
 protected:
 			status_t			_ConvertUnicodeStringToLocaleconvEntry(
-									const UnicodeString& string,
+									const U_NAMESPACE_QUALIFIER UnicodeString&
+										string,
 									char* destination, int destinationSize,
 									const char* defaultValue = "");
 
@@ -45,7 +47,7 @@ protected:
 	static	const size_t		skLCBufSize = 16;
 
 			pthread_key_t		fThreadLocalStorageKey;
-			Locale				fLocale;
+			U_NAMESPACE_QUALIFIER Locale	fLocale;
 			char				fPosixLocaleName[skMaxPosixLocaleNameLen];
 			char				fGivenCharset[UCNV_MAX_CONVERTER_NAME_LENGTH];
 
@@ -55,7 +57,7 @@ private:
 
 
 inline
-const Locale&
+const U_NAMESPACE_QUALIFIER Locale&
 ICUCategoryData::ICULocale() const
 {
 	return fLocale;

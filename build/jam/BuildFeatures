@@ -104,8 +104,22 @@ if [ IsPackageAvailable icu_devel ] {
 				$(developLibDir)/libicudata.so
 				$(developLibDir)/libicui18n.so
 				$(developLibDir)/libicuio.so
-				$(developLibDir)/libicule.so
-				$(developLibDir)/libiculx.so
+				$(developLibDir)/libicutu.so
+				$(developLibDir)/libicuuc.so
+			headers: $(developHeadersDir)
+		;
+
+	EnableBuildFeatures icu ;
+} else if [ IsPackageAvailable icu66_devel ] {
+	ExtractBuildFeatureArchives icu :
+		file: base icu66
+			runtime: lib
+		file: devel icu66_devel
+			depends: base
+			libraries:
+				$(developLibDir)/libicudata.so
+				$(developLibDir)/libicui18n.so
+				$(developLibDir)/libicuio.so
 				$(developLibDir)/libicutu.so
 				$(developLibDir)/libicuuc.so
 			headers: $(developHeadersDir)

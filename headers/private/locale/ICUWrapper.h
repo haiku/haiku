@@ -16,7 +16,7 @@
 
 
 /* Convert UnicodeString to BString needs an ICU ByteSink to do the work */
-class BStringByteSink : public ByteSink {
+class BStringByteSink : public U_NAMESPACE_QUALIFIER ByteSink {
 public:
 	BStringByteSink(BString* dest)
 		: fDest(dest)

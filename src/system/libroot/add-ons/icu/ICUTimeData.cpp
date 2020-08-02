@@ -18,6 +18,10 @@
 
 #include "ICUMessagesData.h"
 
+
+U_NAMESPACE_USE
+
+
 namespace BPrivate {
 namespace Libroot {
 

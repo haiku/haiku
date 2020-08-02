@@ -22,6 +22,9 @@
 #include <unicode/smpdtfmt.h>
 
 
+U_NAMESPACE_USE
+
+
 BDateTimeFormat::BDateTimeFormat(const BLocale* locale)
 	: BFormat(locale)
 {

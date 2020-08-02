@@ -22,6 +22,9 @@
 #include <unicode/tblcoll.h>
 
 
+U_NAMESPACE_USE
+
+
 BCollator::BCollator()
 	:
 	fIgnorePunctuation(true)
