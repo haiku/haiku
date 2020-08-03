@@ -37,7 +37,7 @@ public:
 			bool				IsNodeType();
 			void				FillMapEntry(int num, ExtentMapEntry* map);
 			status_t			FillBuffer(int type, char* buffer,
-									int howManyBlocksFurthur);
+									int howManyBlocksFurther);
 			void				SearchAndFillDataMap(int blockNo);
 			uint32				FindHashInNode(uint32 hashVal);
 			uint32				GetOffsetFromAddress(uint32 address);

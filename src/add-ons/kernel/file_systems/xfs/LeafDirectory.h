@@ -11,7 +11,7 @@
 #include "system_dependencies.h"
 
 
-#define HEADER_MAGIC 0x58443244
+#define DATA_HEADER_MAGIC 0x58443244
 
 
 enum ContentType { DATA, LEAF };

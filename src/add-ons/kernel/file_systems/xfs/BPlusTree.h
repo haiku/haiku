@@ -20,6 +20,7 @@
 #define XFS_KEY_SIZE sizeof(xfs_fileoff_t)
 #define XFS_PTR_SIZE sizeof(xfs_fsblock_t)
 #define XFS_BMAP_MAGIC 0x424d4150
+#define MAX_TREE_DEPTH 5
 
 
 typedef xfs_fileoff_t TreeKey;
@@ -61,7 +62,7 @@ struct LongBlock {
  */
 
 
-//xfs_bmdr_block
+// xfs_bmdr_block
 struct BlockInDataFork {
 			uint16				Levels()
 									{ return
@@ -81,6 +82,22 @@ struct ExtentMapUnwrap {
 
 
 /*
+ * Using the structure to prevent re-reading of already read blocks during
+ * a traversal of tree.
+ *
+ * type:
+ * 0, if its an unused node, 1 if blockData size is a single block,
+ * 2 if blockData size is directory block size.
+ */
+struct PathNode {
+			int					type;
+			char*				blockData;
+			uint32				blockNumber;
+				// This is the file system block number
+};
+
+
+/*
  * This class should handle B+Tree based directories
  */
 class TreeDirectory {
@@ -96,13 +113,29 @@ public:
 			int					BlockLen();
 			size_t				PtrSize();
 			size_t				KeySize();
-			TreeKey				GetKey(int pos);
-									// get the pos'th key
-			TreePointer*		GetPtr(int pos, LongBlock* pointer);
-									// get the pos'th pointer
+			TreeKey*			GetKeyFromNode(int pos, void* buffer);
+			TreePointer*		GetPtrFromNode(int pos, void* buffer);
+			TreeKey*			GetKeyFromRoot(int pos);
+			TreePointer*		GetPtrFromRoot(int pos);
+			status_t			SearchMapInAllExtent(int blockNo,
+									uint32& mapIndex);
 			status_t			GetAllExtents();
-			size_t				MaxRecordsPossible(size_t len);
-
+			size_t				MaxRecordsPossibleRoot();
+			size_t				MaxRecordsPossibleNode();
+			void				FillMapEntry(int num, ExtentMapEntry** map,
+									int type, int pathIndex);
+			status_t			FillBuffer(char* blockBuffer,
+									int howManyBlocksFurther,
+									ExtentMapEntry* targetMap = NULL);
+			size_t				GetPtrOffsetIntoNode(int pos);
+			size_t				GetPtrOffsetIntoRoot(int pos);
+			status_t			SearchAndFillPath(uint32 offset, int type);
+			status_t			SearchOffsetInTreeNode (uint32 offset,
+									TreePointer** pointer, int pathIndex);
+			void				SearchForMapInDirectoryBlock (int blockNo,
+									int entries, ExtentMapEntry** map,
+									int type, int pathIndex);
+			uint32				SearchForHashInNodeBlock(uint32 hashVal);
 private:
 	inline	status_t			UnWrapExtents(ExtentMapUnwrap* extentsWrapped);
 
@@ -113,6 +146,12 @@ private:
 			ExtentMapEntry*		fExtents;
 			uint32				fCountOfFilledExtents;
 			char*				fSingleDirBlock;
+			uint32				fOffsetOfSingleDirBlock;
+			uint32				fCurMapIndex;
+			uint64				fOffset;
+			uint32				fCurBlockNumber;
+			PathNode			fPathForLeaves[MAX_TREE_DEPTH];
+			PathNode			fPathForData[MAX_TREE_DEPTH];
 };
 
 

@@ -106,14 +106,14 @@ NodeDirectory::FillBuffer(int type, char* blockBuffer, int howManyBlocksFurthur)
 
 	if (read_pos(fInode->GetVolume()->Device(), readPos, blockBuffer, len)
 		!= len) {
-		ERROR("Extent::FillBlockBuffer(): IO Error");
+		ERROR("NodeDirectory::FillBlockBuffer(): IO Error");
 		return B_IO_ERROR;
 	}
 
 	if (type == DATA) {
 		fDataBuffer = blockBuffer;
 		ExtentDataHeader* header = (ExtentDataHeader*) fDataBuffer;
-		if (B_BENDIAN_TO_HOST_INT32(header->magic) == HEADER_MAGIC) {
+		if (B_BENDIAN_TO_HOST_INT32(header->magic) == DATA_HEADER_MAGIC) {
 			TRACE("DATA BLOCK VALID\n");
 		} else {
 			TRACE("DATA BLOCK INVALID\n");

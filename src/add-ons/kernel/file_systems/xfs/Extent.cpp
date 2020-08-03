@@ -149,6 +149,10 @@ Extent::GetNext(char* name, size_t* length, xfs_ino_t* ino)
 		// This could be an unused entry so we should check
 
 	int numberOfEntries = B_BENDIAN_TO_HOST_INT32(BlockTail()->count);
+	int numberOfStaleEntries = B_BENDIAN_TO_HOST_INT32(BlockTail()->stale);
+
+	// We don't read stale entries.
+	numberOfEntries -= numberOfStaleEntries;
 	TRACE("numberOfEntries:(%d)\n", numberOfEntries);
 	uint16 currentOffset = (char*)entry - fBlockBuffer;
 
@@ -161,6 +165,7 @@ Extent::GetNext(char* name, size_t* length, xfs_ino_t* ino)
 			currentOffset += B_BENDIAN_TO_HOST_INT16(unusedEntry->length);
 			entry = (void*)
 				((char*)entry + B_BENDIAN_TO_HOST_INT16(unusedEntry->length));
+			i--;
 			continue;
 		}
 		ExtentDataEntry* dataEntry = (ExtentDataEntry*) entry;
