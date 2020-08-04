@@ -85,8 +85,8 @@ MouseSettings::_RetrieveSettings()
 		fprintf(stderr, "error when get_mouse_speed\n");
 	if (get_mouse_acceleration(&fSettings.accel.accel_factor) != B_OK)
 		fprintf(stderr, "error when get_mouse_acceleration\n");
-	if (get_mouse_type(&fSettings.type) != B_OK)
-		fprintf(stderr, "error when get_mouse_type\n");
+	if (get_mouse_type_by_name(fname, &fSettings.type) != B_OK)
+		fprintf(stderr, "error when get_multiple_mouse_type\n");
 
 	fMode = mouse_mode();
 	fFocusFollowsMouseMode = focus_follows_mouse_mode();
@@ -238,7 +238,7 @@ MouseSettings::IsRevertable()
 void
 MouseSettings::SetMouseType(int32 type)
 {
-	if (set_mouse_type(type) == B_OK)
+	if (set_mouse_type_by_name(fname, type) == B_OK)
 		fSettings.type = type;
 }
 
@@ -345,7 +345,6 @@ MultipleMouseSettings::MultipleMouseSettings()
 #ifdef DEBUG
 	Dump();
 #endif
-
 }
 
 

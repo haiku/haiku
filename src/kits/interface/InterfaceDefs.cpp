@@ -505,6 +505,38 @@ set_mouse_type(int32 type)
 
 
 status_t
+get_mouse_type_by_name(BString mouse_name, int32 *type)
+{
+	BMessage command(IS_GET_MOUSE_TYPE);
+	BMessage reply;
+
+	status_t err = _control_input_server_(&command, &reply);
+	if (err != B_OK)
+		return err;
+
+	return reply.FindInt32("mouse_type", type);
+}
+
+
+status_t
+set_mouse_type_by_name(BString mouse_name, int32 type)
+{
+	BMessage command(IS_SET_MOUSE_TYPE);
+	BMessage reply;
+
+	status_t err_mouse_name = command.AddString("mouse_name",
+		mouse_name.String());
+	if (err_mouse_name != B_OK)
+		return err_mouse_name;
+
+    status_t err = command.AddInt32("mouse_type", type);
+	if (err != B_OK)
+		return err;
+	return _control_input_server_(&command, &reply);
+}
+
+
+status_t
 get_mouse_map(mouse_map *map)
 {
 	BMessage command(IS_GET_MOUSE_MAP);
