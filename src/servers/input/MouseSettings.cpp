@@ -30,10 +30,9 @@ static const bool kDefaultAcceptFirstClick = true;
 MouseSettings::MouseSettings()
 {
 	Defaults();
-	RetrieveSettings();
 
 #ifdef DEBUG
-        Dump();
+	Dump();
 #endif
 
 	fOriginalSettings = fSettings;
@@ -43,9 +42,27 @@ MouseSettings::MouseSettings()
 }
 
 
+MouseSettings::MouseSettings(mouse_settings* originalSettings)
+{
+	Defaults();
+	fMode = mouse_mode();
+	fAcceptFirstClick = accept_first_click();
+
+	fOriginalSettings = *originalSettings;
+	fSettings = *originalSettings;
+
+#ifdef DEBUG
+	Dump();
+#endif
+
+	fOriginalMode = fMode;
+	fOriginalFocusFollowsMouseMode = fFocusFollowsMouseMode;
+	fOriginalAcceptFirstClick = fAcceptFirstClick;
+}
+
+
 MouseSettings::~MouseSettings()
 {
-	SaveSettings();
 }
 
 
@@ -89,31 +106,6 @@ MouseSettings::RetrieveSettings()
 		|| (fSettings.type == 0)) {
 		Defaults();
 	}
-}
-
-
-status_t
-MouseSettings::SaveSettings()
-{
-#ifdef DEBUG
-	Dump();
-#endif
-
-	BPath path;
-	status_t status = GetSettingsPath(path);
-	if (status < B_OK)
-		return status;
-
-	BFile file(path.Path(), B_READ_WRITE | B_CREATE_FILE);
-	status = file.InitCheck();
-	if (status != B_OK)
-		return status;
-
-	file.Write(&fSettings, sizeof(fSettings));
-
-	// who is responsible for saving the mouse mode and accept_first_click?
-
-	return B_OK;
 }
 
 
@@ -268,5 +260,188 @@ MouseSettings::SetAcceptFirstClick(bool acceptFirstClick)
 {
 	fAcceptFirstClick = acceptFirstClick;
 }
+
+
+/* MultiMouseSettings functions */
+
+MultipleMouseSettings::MultipleMouseSettings()
+{
+	fDeprecatedMouseSettings = NULL;
+	RetrieveSettings();
+
+#ifdef DEBUG
+	Dump();
+#endif
+}
+
+
+MultipleMouseSettings::~MultipleMouseSettings()
+{
+	SaveSettings();
+
+#ifdef DEBUG
+	Dump();
+#endif
+
+	std::map<BString, MouseSettings*>::iterator itr;
+	for (itr = fMouseSettingsObject.begin(); itr != fMouseSettingsObject.end();
+		++itr)
+		delete itr->second;
+
+	delete fDeprecatedMouseSettings;
+}
+
+
+status_t
+MultipleMouseSettings::GetSettingsPath(BPath &path)
+{
+	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
+	if (status < B_OK)
+		return status;
+
+	path.Append(mouse_settings_file);
+	return B_OK;
+}
+
+
+void
+MultipleMouseSettings::RetrieveSettings()
+{
+	BPath path;
+	if (GetSettingsPath(path) < B_OK)
+		return;
+
+	BFile file(path.Path(), B_READ_ONLY);
+	if (file.InitCheck() < B_OK)
+		return;
+
+	BMessage message;
+
+	if (message.Unflatten(&file) == B_OK) {
+		int i = 0;
+		BString deviceName;
+		mouse_settings* settings;
+		ssize_t size = 0;
+
+		while (message.FindString("mouseDevice", i, &deviceName) == B_OK) {
+			message.FindData("mouseSettings", B_ANY_TYPE, i,
+				(const void**)&settings, &size);
+			MouseSettings* mouseSettings = new MouseSettings(settings);
+			fMouseSettingsObject.insert(std::pair<BString, MouseSettings*>
+				(deviceName, mouseSettings));
+			i++;
+		}
+	} else {
+		fDeprecatedMouseSettings = new MouseSettings();
+		fDeprecatedMouseSettings->RetrieveSettings();
+	}
+}
+
+
+status_t
+MultipleMouseSettings::Archive(BMessage* into, bool deep) const
+{
+	std::map<BString, MouseSettings*>::const_iterator itr;
+	for (itr = fMouseSettingsObject.begin(); itr != fMouseSettingsObject.end();
+		++itr) {
+		into->AddString("mouseDevice", itr->first);
+		into->AddData("mouseSettings", B_ANY_TYPE, itr->second->GetSettings(),
+			sizeof(*(itr->second->GetSettings())));
+	}
+
+	return B_OK;
+}
+
+
+status_t
+MultipleMouseSettings::SaveSettings()
+{
+	BPath path;
+	status_t status = GetSettingsPath(path);
+	if (status < B_OK)
+		return status;
+
+	BFile file(path.Path(), B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
+	status = file.InitCheck();
+	if (status != B_OK)
+		return status;
+
+	BMessage message;
+	Archive(&message, true);
+	message.Flatten(&file);
+
+	return B_OK;
+}
+
+
+void
+MultipleMouseSettings::Defaults()
+{
+	std::map<BString, MouseSettings*>::iterator itr;
+	for (itr = fMouseSettingsObject.begin(); itr != fMouseSettingsObject.end();
+		++itr) {
+		itr->second->Defaults();
+	}
+}
+
+
+#ifdef DEBUG
+void
+MultipleMouseSettings::Dump()
+{
+	std::map<const char*, mouse_settings>::iterator itr;
+	for (itr = fMultipleMouseSettings.begin();
+		itr != fMultipleMouseSettings.end(); ++itr) {
+		printf("mouse_name:\t%ld\n", itr->first);
+		itr->second->Dump();
+		printf("\n");
+	}
+
+}
+#endif
+
+
+MouseSettings*
+MultipleMouseSettings::AddMouseSettings(BString mouse_name)
+{
+	if(fDeprecatedMouseSettings != NULL) {
+		MouseSettings* RetrievedSettings = new (std::nothrow) MouseSettings
+			(*fDeprecatedMouseSettings);
+
+		if (RetrievedSettings != NULL) {
+			fMouseSettingsObject.insert(std::pair<BString, MouseSettings*>
+				(mouse_name, RetrievedSettings));
+
+			return RetrievedSettings;
+		}
+	}
+
+	std::map<BString, MouseSettings*>::iterator itr;
+	itr = fMouseSettingsObject.find(mouse_name);
+
+	if (itr != fMouseSettingsObject.end())
+		return GetMouseSettings(mouse_name);
+
+	MouseSettings* settings = new (std::nothrow) MouseSettings();
+
+	if(settings !=NULL) {
+		fMouseSettingsObject.insert(std::pair<BString, MouseSettings*>
+			(mouse_name, settings));
+		return settings;
+	}
+	return B_OK;
+}
+
+
+MouseSettings*
+MultipleMouseSettings::GetMouseSettings(BString mouse_name)
+{
+	std::map<BString, MouseSettings*>::iterator itr;
+	itr = fMouseSettingsObject.find(mouse_name);
+
+	if (itr != fMouseSettingsObject.end())
+		return itr->second;
+	return NULL;
+ }
 
 
