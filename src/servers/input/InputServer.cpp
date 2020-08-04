@@ -857,6 +857,7 @@ status_t
 InputServer::HandleGetSetMouseSpeed(BMessage* message, BMessage* reply)
 {
 	BString mouseName;
+
 	MouseSettings* settings = NULL;
 	if (message->FindString("mouse_name", &mouseName) == B_OK) {
 		settings = fMouseSettings.GetMouseSettings(mouseName);
@@ -869,9 +870,12 @@ InputServer::HandleGetSetMouseSpeed(BMessage* message, BMessage* reply)
 		if (settings != NULL)
 			settings->SetMouseSpeed(speed);
 		else {
-			// TODO if no mouse_name was specified, apply the setting to
-			// all mouses
-			return B_NOT_SUPPORTED;
+			std::map<BString, MouseSettings*>::iterator itr;
+			for (itr = fMouseSettingsObject.begin();
+				itr != fMouseSettingsObject.end(); ++itr) {
+				itr->second->SetMouseSpeed(speed);
+			}
+			return B_OK;
 		}
 		be_app_messenger.SendMessage(IS_SAVE_SETTINGS);
 
@@ -884,8 +888,7 @@ InputServer::HandleGetSetMouseSpeed(BMessage* message, BMessage* reply)
 	if (settings != NULL)
 		return reply->AddInt32("speed", settings->MouseSpeed());
 	else {
-		// TODO return type of the "first" mouse?
-		return B_NOT_SUPPORTED;
+		return B_OK;
 	}
 }
 

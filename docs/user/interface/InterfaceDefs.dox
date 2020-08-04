@@ -350,3 +350,65 @@
 
 	\since BeOS R3
 */
+
+
+/*!
+	\fn status_t get_mouse_type(int32* type)
+	\brief Get the number of buttons of the mouse.
+
+	If there are multiple mouses connected, the number of buttons for one of
+	them picked at random will be returned.
+*/
+
+
+/*!
+	\fn status_t set_mouse_type(int32 type)
+	\brief Set the number of buttons of the mouse.
+	\deprecated use set_mouse_type_by_name instead.
+*/
+
+
+/*!
+	\fn status_t get_mouse_type_by_name(BString mouse_name, int32* type)
+	\brief Get the number of buttons for a specific mouse.
+
+	Mouse names can be known from BInputDevice.
+*/
+
+
+/*!
+	\fn status_t set_mouse_type_by_name(BString mouse_name, int32* type)
+	\brief Configure the number of buttons for a specific mouse.
+
+	The setting is saved and persists accross reboots.
+*/
+
+
+/*!
+	\fn status_t get_mouse_speed(int32* speed)
+	\brief Get the mouse speed
+
+	If there are multiple mouses connected, this function return the speed
+	from a random one.
+*/
+
+
+/*!
+	\fn status_t set_mouse_speed(int32 speed)
+	\brief Set the mouse speed
+	\deprecated use set_mouse_speed_by_name instead.
+*/
+
+
+/*!
+	\fn status_t get_mouse_speed_by_name(BString mouse_name, int32* speed)
+	\brief Get the mouse speed setting for a specific mouse
+*/
+
+
+/*!
+	\fn status_t set_mouse_speed_by_name(BString mouse_name, int32 speed)
+	\brief Set the mouse speed for a specific mouse.
+
+	The setting is saved and persists accross reboots.
+*/

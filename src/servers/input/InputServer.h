@@ -241,6 +241,9 @@ class InputServer : public BApplication {
 		team_id			fAppServerTeam;
 		area_id			fCursorArea;
 		shared_cursor*	fCursorBuffer;
+
+		typedef std::map<BString, MouseSettings*> mouse_settings_object;
+		mouse_settings_object  fMouseSettingsObject;
 };
 
 extern InputServer* gInputServer;

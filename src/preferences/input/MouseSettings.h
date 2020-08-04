@@ -18,6 +18,7 @@
 #include <InterfaceDefs.h>
 #include <Point.h>
 #include <SupportDefs.h>
+#include <String.h>
 
 #include "kb_mouse_settings.h"
 
@@ -26,8 +27,8 @@ class BPath;
 
 class MouseSettings {
 public:
-		MouseSettings();
-		MouseSettings(mouse_settings settings);
+		MouseSettings(BString name);
+		MouseSettings(mouse_settings settings, BString name);
 		~MouseSettings();
 
 		void Revert();
@@ -63,17 +64,21 @@ public:
 
 		bool AcceptFirstClick() const { return fAcceptFirstClick; }
 		void SetAcceptFirstClick(bool accept_first_click);
-		void _RetrieveSettings();
+		status_t _RetrieveSettings();
+		status_t _LoadLegacySettings();
 
 		mouse_settings* GetSettings();
 
 private:
 		static status_t _GetSettingsPath(BPath &path);
 
-		mode_mouse		fMode, fOriginalMode;
+private:
+		BString						fName;
+		mode_mouse					fMode, fOriginalMode;
 		mode_focus_follows_mouse	fFocusFollowsMouseMode;
 		mode_focus_follows_mouse	fOriginalFocusFollowsMouseMode;
-		bool			fAcceptFirstClick, fOriginalAcceptFirstClick;
+		bool						fAcceptFirstClick
+		bool						fOriginalAcceptFirstClick;
 
 		mouse_settings	fSettings, fOriginalSettings;
 };

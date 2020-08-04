@@ -515,7 +515,6 @@ void
 MouseDevice::_UpdateSettings()
 {
 	MD_CALLED();
-
 	// retrieve current values
 
 	if (get_mouse_map(&fSettings.map) != B_OK)
@@ -530,7 +529,7 @@ MouseDevice::_UpdateSettings()
 	else
 		ioctl(fDevice, MS_SET_CLICKSPEED, &fSettings.click_speed);
 
-	if (get_mouse_speed(&fSettings.accel.speed) != B_OK)
+	if (get_mouse_speed_by_name(fDeviceRef.name, &fSettings.accel.speed) != B_OK)
 		LOG_ERR("error when get_mouse_speed\n");
 	else {
 		if (get_mouse_acceleration(&fSettings.accel.accel_factor) != B_OK)

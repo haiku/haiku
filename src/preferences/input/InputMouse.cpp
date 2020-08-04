@@ -94,6 +94,8 @@ InputMouse::MessageReceived(BMessage* message)
 		{
 			int32 type;
 			if (message->FindInt32("be:value", &type) == B_OK) {
+				if (type > 6)
+					debugger("Mouse type is invalid");
 				fSettings->SetMouseType(type);
 				fSettingsView->SetMouseType(type);
 				fDefaultsButton->SetEnabled(fSettings->IsDefaultable());

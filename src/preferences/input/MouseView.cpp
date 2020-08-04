@@ -113,6 +113,8 @@ MouseView::MouseMapUpdated()
 void
 MouseView::UpdateFromSettings()
 {
+	if (fSettings.MouseType() > 6)
+		debugger("Mouse type is invalid");
 	SetMouseType(fSettings.MouseType());
 }
 

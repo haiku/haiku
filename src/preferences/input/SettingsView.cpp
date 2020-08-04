@@ -226,6 +226,8 @@ SettingsView::AttachedToWindow()
 void
 SettingsView::SetMouseType(int32 type)
 {
+	if (type > 6)
+		debugger("Mouse type is invalid");
 	fMouseView->SetMouseType(type);
 }
 
@@ -253,6 +255,8 @@ SettingsView::UpdateFromSettings()
 	fAccelerationSlider->SetValue(value);
 
 	fTypeMenu->SelectOptionFor(fSettings.MouseType());
+	if (fSettings.MouseType() > 6)
+		debugger("Mouse type is invalid");
 	fMouseView->SetMouseType(fSettings.MouseType());
 
 	BMenuItem* item = fFocusMenu->ItemAt(
