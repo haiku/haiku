@@ -273,6 +273,15 @@ AVCodecEncoder::_Setup()
 
 	if (fInputFormat.type == B_MEDIA_RAW_VIDEO) {
 		TRACE("  B_MEDIA_RAW_VIDEO\n");
+
+		// Check input parameters
+		AVPixelFormat pixFmt = colorspace_to_pixfmt(
+			fInputFormat.u.raw_video.display.format);
+		if (pixFmt == AV_PIX_FMT_NONE) {
+			TRACE("Invalid input colorspace");
+			return B_BAD_DATA;
+		}
+
 		// frame rate
 		fCodecContext->time_base = (AVRational){1, (int)fInputFormat.u.raw_video.field_rate};
 		fCodecContext->framerate = (AVRational){(int)fInputFormat.u.raw_video.field_rate, 1};
@@ -336,8 +345,8 @@ AVCodecEncoder::_Setup()
 		fFrame->linesize[2] = fDstFrame.linesize[2];
 		fFrame->linesize[3] = fDstFrame.linesize[3];
 
-		fSwsContext = sws_getContext(fCodecContext->width, fCodecContext->height,
-			colorspace_to_pixfmt(fInputFormat.u.raw_video.display.format),
+		fSwsContext = sws_getContext(fCodecContext->width,
+			fCodecContext->height, pixFmt,
 			fCodecContext->width, fCodecContext->height,
 			fCodecContext->pix_fmt, SWS_FAST_BILINEAR, NULL, NULL, NULL);
 
