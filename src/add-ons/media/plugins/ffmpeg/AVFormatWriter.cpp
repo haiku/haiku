@@ -401,6 +401,7 @@ AVFormatWriter::Init(const media_file_format* fileFormat)
 	fIOContext = avio_alloc_context(buffer, kIOBufferSize, 1, this,
 			0, _Write, _Seek);
 	if (fIOContext == NULL) {
+		av_free(buffer);
 		TRACE("av_alloc_put_byte() failed!\n");
 		return B_ERROR;
 	}
