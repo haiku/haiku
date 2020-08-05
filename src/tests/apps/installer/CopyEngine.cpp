@@ -56,34 +56,6 @@ CopyEngine::SetStatusMessage(char *status)
 
 
 void
-CopyEngine::LaunchInitScript(BPath &path)
-{
-	BPath bootPath;
-	find_directory(B_BEOS_BOOT_DIRECTORY, &bootPath);
-	BString command("/bin/sh ");
-	command += bootPath.Path();
-	command += "/InstallerInitScript ";
-	command += path.Path();
-	SetStatusMessage("Starting Installation.");	
-	system(command.String());
-}
-
-
-void
-CopyEngine::LaunchFinishScript(BPath &path)
-{
-	BPath bootPath;
-	find_directory(B_BEOS_BOOT_DIRECTORY, &bootPath);
-	BString command("/bin/sh ");
-	command += bootPath.Path();
-	command += "/InstallerFinishScript ";
-	command += path.Path();
-	SetStatusMessage("Finishing Installation.");	
-	system(command.String());
-}
-
-
-void
 CopyEngine::Start(BMenu *srcMenu, BMenu *targetMenu)
 {
 	CALLED();

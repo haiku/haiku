@@ -39,7 +39,7 @@ public:
 			void				WriteBootSector(BMenu* dstMenu);
 
 private:
-			status_t			_LaunchInitScript(BPath& path);
+			status_t			_WriteBootSector(BPath& path);
 			status_t			_LaunchFinishScript(BPath& path);
 
 			status_t			_PerformInstall(partition_id sourcePartitionID,

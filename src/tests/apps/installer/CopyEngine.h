@@ -26,8 +26,6 @@ public:
 	void SetPackagesList(BList *list);
 	void SetSpaceRequired(off_t bytes) { fSpaceRequired = bytes; };
 private:
-	void LaunchInitScript(BPath &path);
-	void LaunchFinishScript(BPath &path);
 	void CopyFolder(BDirectory &srcDir, BDirectory &targetDir);
 	
 	InstallerWindow *fWindow;

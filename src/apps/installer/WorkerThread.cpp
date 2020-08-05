@@ -227,7 +227,7 @@ WorkerThread::MessageReceived(BMessage* message)
 				}
 			}
 
-			if (_LaunchFinishScript(targetDirectory) != B_OK) {
+			if (_WriteBootSector(targetDirectory) != B_OK) {
 				_SetStatusMessage(
 					B_TRANSLATE("Error writing boot sector."));
 				break;
@@ -304,17 +304,13 @@ WorkerThread::WriteBootSector(BMenu* targetMenu)
 
 
 status_t
-WorkerThread::_LaunchInitScript(BPath &path)
+WorkerThread::_WriteBootSector(BPath &path)
 {
 	BPath bootPath;
 	find_directory(B_BEOS_BOOT_DIRECTORY, &bootPath);
-	BString command("/bin/sh ");
-	command += bootPath.Path();
-	command += "/InstallerInitScript ";
-	command += "\"";
-	command += path.Path();
-	command += "\"";
-	_SetStatusMessage(B_TRANSLATE("Starting installation."));
+	BString command;
+	command.SetToFormat("makebootable \"%s\"", path.Path());
+	_SetStatusMessage(B_TRANSLATE("Writing bootsector."));
 	return system(command.String());
 }
 
@@ -322,15 +318,14 @@ WorkerThread::_LaunchInitScript(BPath &path)
 status_t
 WorkerThread::_LaunchFinishScript(BPath &path)
 {
-	BPath bootPath;
-	find_directory(B_BEOS_BOOT_DIRECTORY, &bootPath);
-	BString command("/bin/sh ");
-	command += bootPath.Path();
-	command += "/InstallerFinishScript ";
-	command += "\"";
-	command += path.Path();
-	command += "\"";
 	_SetStatusMessage(B_TRANSLATE("Finishing installation."));
+
+	BString command;
+	command.SetToFormat("mkdir -p \"%s/system/cache/tmp\"", path.Path());
+	if (system(command.String()) != 0)
+		return B_ERROR;
+
+	command.SetToFormat("rm -f \"%s/home/Desktop/Installer\"", path.Path());
 	return system(command.String());
 }
 
@@ -489,10 +484,6 @@ WorkerThread::_PerformInstall(partition_id sourcePartitionID,
 	CopyEngine engine(&reporter, &entryFilter);
 	BList unzipEngines;
 
-	err = _LaunchInitScript(targetDirectory);
-	if (err != B_OK)
-		return _InstallationError(err);
-
 	// Create the default indices which should always be present on a proper
 	// boot volume. We don't care if the source volume does not have them.
 	// After all, the user might be re-installing to another drive and may
@@ -576,6 +567,10 @@ WorkerThread::_PerformInstall(partition_id sourcePartitionID,
 			err = engine->UnzipPackage();
 		delete engine;
 	}
+	if (err != B_OK)
+		return _InstallationError(err);
+
+	err = _WriteBootSector(targetDirectory);
 	if (err != B_OK)
 		return _InstallationError(err);
 

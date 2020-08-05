@@ -115,8 +115,7 @@ AddSymlinkToPackage bin : trash : untrash ;
 AddSymlinkToPackage bin : less : more ;
 
 # scripts and data files
-local bootScripts = PostInstallScript SetupEnvironment
-	InstallerInitScript InstallerFinishScript ;
+local bootScripts = PostInstallScript SetupEnvironment ;
 SEARCH on $(bootScripts) = [ FDirName $(HAIKU_TOP) data system boot ] ;
 AddFilesToPackage boot : $(bootScripts) ;
 
