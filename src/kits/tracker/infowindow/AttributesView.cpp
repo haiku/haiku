@@ -472,4 +472,14 @@ AttributesView::AttributesView(Model* model)
 		}
 		fListView->AddRow(row);
 	}
+
+	int32 rows = fListView->CountRows(NULL);
+	if (rows < 5)
+		rows = 5;
+	BRow* first = fListView->RowAt(0, NULL);
+	if (first != NULL) {
+		float height = first->Height() * (rows + 2);
+		SetExplicitMaxSize(BSize(B_SIZE_UNSET, height));
+	}
+
 }
