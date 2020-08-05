@@ -8,7 +8,6 @@
 
 
 #include "PowerStatus.h"
-#include "PowerStatusWindow.h"
 
 #include <Alert.h>
 #include <Application.h>
@@ -19,6 +18,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "ACPIDriverInterface.h"
+#include "APMDriverInterface.h"
+#include "PowerStatusWindow.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -73,6 +76,22 @@ PowerStatus::ReadyToRun()
 {
 	bool isInstalled = false;
 	bool isDeskbarRunning = true;
+
+	PowerStatusDriverInterface* interface;
+	interface = new ACPIDriverInterface;
+	if (interface->Connect() != B_OK) {
+		delete interface;
+		interface = new APMDriverInterface;
+		if (interface->Connect() != B_OK) {
+			BAlert* alert = new BAlert("", 
+				B_TRANSLATE("No supported battery detected. PowerStatus "
+				"cannot be used on your system."), B_TRANSLATE("Too bad!"),
+				NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			alert->Go();
+			Quit();
+		}
+	}
+	delete interface;
 
 	{
 		// if the Deskbar is not alive at this point, it might be after having
