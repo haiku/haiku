@@ -212,7 +212,7 @@ class InputServer : public BApplication {
 		BLocker 		fInputDeviceListLocker;
 
 		KeyboardSettings fKeyboardSettings;
-		MouseSettings	fMouseSettings;
+		MultipleMouseSettings	fMouseSettings;
 
 		BPoint			fMousePos;		// current mouse position
 		key_info		fKeyInfo;		// current key info
