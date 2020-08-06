@@ -95,7 +95,6 @@ NormalPulseView::NormalPulseView(BRect rect)
 
 NormalPulseView::~NormalPulseView()
 {
-	delete fCpuLogo;
 	delete fBrandLogo;
 	delete[] fCpuButtons;
 	delete[] fProgressBars;
@@ -122,9 +121,6 @@ NormalPulseView::DetermineVendorAndProcessor()
 	get_system_info(&sys_info);
 
 	// Initialize logo
-
-	fCpuLogo = new BBitmap(BRect(0, 0, 63, 62), B_CMAP8);
-	fCpuLogo->SetBits(BlankLogo, fCpuLogo->BitsLength(), 0, B_CMAP8);
 
 	const unsigned char* logo = NULL;
 	size_t logoSize = 0;
@@ -188,13 +184,80 @@ NormalPulseView::DetermineVendorAndProcessor()
 
 
 void
+NormalPulseView::DrawChip(BRect r)
+{
+	SetDrawingMode(B_OP_COPY);
+	BRect innerRect = r.InsetByCopy(7, 7);
+	SetHighColor(0x20, 0x20, 0x20);
+	FillRect(innerRect);
+
+	innerRect.InsetBy(-1, -1);
+	SetHighColor(0x40, 0x40, 0x40);
+	SetLowColor(0x48, 0x48, 0x48);
+	StrokeRect(innerRect, B_MIXED_COLORS);
+
+	innerRect.InsetBy(-1, -1);
+	SetHighColor(0x78, 0x78, 0x78);
+	StrokeRect(innerRect);
+
+	innerRect.InsetBy(-1, -1);
+	SetHighColor(0x08, 0x08, 0x08);
+	SetLowColor(0x20, 0x20, 0x20);
+	StrokeLine(BPoint(innerRect.left, innerRect.top + 1),
+		BPoint(innerRect.left, innerRect.bottom - 1), B_MIXED_COLORS);
+	StrokeLine(BPoint(innerRect.right, innerRect.top + 1),
+		BPoint(innerRect.right, innerRect.bottom - 1), B_MIXED_COLORS);
+	StrokeLine(BPoint(innerRect.left + 1, innerRect.top),
+		BPoint(innerRect.right - 1, innerRect.top), B_MIXED_COLORS);
+	StrokeLine(BPoint(innerRect.left + 1, innerRect.bottom),
+		BPoint(innerRect.right - 1, innerRect.bottom), B_MIXED_COLORS);
+
+	innerRect.InsetBy(-1, -1);
+	SetLowColor(0xff, 0xff, 0xff);
+	SetHighColor(0x20, 0x20, 0x20);
+	StrokeLine(BPoint(innerRect.left, innerRect.top + 6),
+		BPoint(innerRect.left, innerRect.bottom - 6), B_MIXED_COLORS);
+	StrokeLine(BPoint(innerRect.right, innerRect.top + 6),
+		BPoint(innerRect.right, innerRect.bottom - 6), B_MIXED_COLORS);
+	StrokeLine(BPoint(innerRect.left + 6, innerRect.top),
+		BPoint(innerRect.right - 6, innerRect.top), B_MIXED_COLORS);
+	StrokeLine(BPoint(innerRect.left + 6, innerRect.bottom),
+		BPoint(innerRect.right - 6, innerRect.bottom), B_MIXED_COLORS);
+
+	innerRect.InsetBy(-1, -1);
+	SetHighColor(0xa8, 0xa8, 0xa8);
+	SetLowColor(0x20, 0x20, 0x20);
+	StrokeLine(BPoint(innerRect.left, innerRect.top + 7),
+		BPoint(innerRect.left, innerRect.bottom - 7), B_MIXED_COLORS);
+	StrokeLine(BPoint(innerRect.right, innerRect.top + 7),
+		BPoint(innerRect.right, innerRect.bottom - 7), B_MIXED_COLORS);
+	StrokeLine(BPoint(innerRect.left + 7, innerRect.top),
+		BPoint(innerRect.right - 7, innerRect.top), B_MIXED_COLORS);
+	StrokeLine(BPoint(innerRect.left + 7, innerRect.bottom),
+		BPoint(innerRect.right - 7, innerRect.bottom), B_MIXED_COLORS);
+
+	innerRect.InsetBy(-1, -1);
+	SetLowColor(0x58, 0x58, 0x58);
+	SetHighColor(0x20, 0x20, 0x20);
+	StrokeLine(BPoint(innerRect.left, innerRect.top + 8),
+		BPoint(innerRect.left, innerRect.bottom - 8), B_MIXED_COLORS);
+	StrokeLine(BPoint(innerRect.right, innerRect.top + 8),
+		BPoint(innerRect.right, innerRect.bottom - 8), B_MIXED_COLORS);
+	StrokeLine(BPoint(innerRect.left + 8, innerRect.top),
+		BPoint(innerRect.right - 8, innerRect.top), B_MIXED_COLORS);
+	StrokeLine(BPoint(innerRect.left + 8, innerRect.bottom),
+		BPoint(innerRect.right - 8, innerRect.bottom), B_MIXED_COLORS);
+}
+
+
+void
 NormalPulseView::Draw(BRect rect)
 {
 	PushState();
 
 	SetDrawingMode(B_OP_OVER);
 	// Processor picture
-	DrawBitmap(fCpuLogo, BPoint(10, 10));
+	DrawChip(BRect(10, 10, 74, 74));
 
 	if (fBrandLogo != NULL) {
 		DrawBitmap(fBrandLogo, BPoint(18, 17));

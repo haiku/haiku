@@ -30,12 +30,12 @@ class NormalPulseView : public PulseView {
 	private:
 		void DetermineVendorAndProcessor();
 		void CalculateFontSizes();
+		void DrawChip(BRect);
 
 		char fVendor[32], fProcessor[32];
 		bigtime_t fPreviousTime;
 		ProgressBar **fProgressBars;
 		CPUButton **fCpuButtons;
-		BBitmap *fCpuLogo;
 		int32 fCpuCount;
 		BBitmap* fBrandLogo;
 
