@@ -19,6 +19,7 @@
 #include <IconUtils.h>
 #include <Window.h>
 
+#include <algorithm>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -29,28 +30,11 @@
 #define B_TRANSLATION_CONTEXT "NormalPulseView"
 
 
-float
-max_font_size(BFont font, const char* text, float maxSize, float maxWidth)
-{
-	const float steps = 0.5f;
-
-	for (float size = maxSize; size > 4; size -= steps) {
-		font.SetSize(size);
-		if (font.StringWidth(text) <= maxWidth)
-			return size;
-	}
-
-	return 4;
-}
-
-
-//	#pragma mark -
-
-
 NormalPulseView::NormalPulseView(BRect rect)
 	: PulseView(rect, "NormalPulseView"),
 	fBrandLogo(NULL)
 {
+	SetResizingMode(B_NOT_RESIZABLE);
 	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	SetLowUIColor(ViewUIColor());
 
@@ -60,6 +44,15 @@ NormalPulseView::NormalPulseView(BRect rect)
 	mode2->SetMessage(new BMessage(PV_DESKBAR_MODE));
 
 	DetermineVendorAndProcessor();
+	BFont font(be_plain_font);
+	font.SetSize(8);
+	SetFont(&font);
+
+	float width = std::max(StringWidth(fProcessor), 48.0f);
+	fChipRect = BRect(10, (rect.Height() - width - 15) / 2, 25 + width,
+		(rect.Height() + width + 15) / 2);
+	float progressLeft = fChipRect.right + 29;
+	float cpuLeft = fChipRect.right + 5;
 
 	// Allocate progress bars and button pointers
 	system_info systemInfo;
@@ -70,15 +63,15 @@ NormalPulseView::NormalPulseView(BRect rect)
 
 	// Set up the CPU activity bars and buttons
 	for (int x = 0; x < fCpuCount; x++) {
-		BRect r(PROGRESS_MLEFT, PROGRESS_MTOP + ITEM_OFFSET * x,
-			PROGRESS_MLEFT + ProgressBar::PROGRESS_WIDTH,
+		BRect r(progressLeft, PROGRESS_MTOP + ITEM_OFFSET * x,
+			progressLeft + ProgressBar::PROGRESS_WIDTH,
 			PROGRESS_MTOP + ITEM_OFFSET * x + ProgressBar::PROGRESS_HEIGHT);
 		char* str2 = (char *)B_TRANSLATE("CPU progress bar");
 		fProgressBars[x] = new ProgressBar(r, str2);
 		AddChild(fProgressBars[x]);
 
-		r.Set(CPUBUTTON_MLEFT, CPUBUTTON_MTOP + ITEM_OFFSET * x,
-			CPUBUTTON_MLEFT + CPUBUTTON_WIDTH + 7,
+		r.Set(cpuLeft, CPUBUTTON_MTOP + ITEM_OFFSET * x,
+			cpuLeft + CPUBUTTON_WIDTH + 7,
 			CPUBUTTON_MTOP + ITEM_OFFSET * x + CPUBUTTON_HEIGHT + 7);
 		char temp[4];
 		snprintf(temp, sizeof(temp), "%hhd", int8(x + 1));
@@ -90,6 +83,8 @@ NormalPulseView::NormalPulseView(BRect rect)
 		fProgressBars[0]->MoveBy(-3, 12);
 		fCpuButtons[0]->Hide();
 	}
+
+	ResizeTo(progressLeft + ProgressBar::PROGRESS_WIDTH + 10, rect.Height());
 }
 
 
@@ -98,19 +93,6 @@ NormalPulseView::~NormalPulseView()
 	delete fBrandLogo;
 	delete[] fCpuButtons;
 	delete[] fProgressBars;
-}
-
-
-void
-NormalPulseView::CalculateFontSizes()
-{
-	BFont font;
-	GetFont(&font);
-
-	fProcessorFontSize = max_font_size(font, fProcessor, 11.0f, 46.0f);
-
-	if (fBrandLogo == NULL)
-		fVendorFontSize = max_font_size(font, fVendor, 13.0f, 46.0f);
 }
 
 
@@ -247,6 +229,8 @@ NormalPulseView::DrawChip(BRect r)
 		BPoint(innerRect.right - 8, innerRect.top), B_MIXED_COLORS);
 	StrokeLine(BPoint(innerRect.left + 8, innerRect.bottom),
 		BPoint(innerRect.right - 8, innerRect.bottom), B_MIXED_COLORS);
+
+	SetDrawingMode(B_OP_OVER);
 }
 
 
@@ -257,25 +241,24 @@ NormalPulseView::Draw(BRect rect)
 
 	SetDrawingMode(B_OP_OVER);
 	// Processor picture
-	DrawChip(BRect(10, 10, 74, 74));
+	DrawChip(fChipRect);
 
 	if (fBrandLogo != NULL) {
-		DrawBitmap(fBrandLogo, BPoint(18, 17));
+		DrawBitmap(fBrandLogo, BPoint(
+			9 + (fChipRect.Width() - fBrandLogo->Bounds().Width()) / 2,
+			fChipRect.top + 8));
 	} else {
 		SetHighColor(240, 240, 240);
-		SetFontSize(fVendorFontSize);
-
 		float width = StringWidth(fVendor);
-		MovePenTo(10 + (32 - width / 2), 30);
+		MovePenTo(10 + (fChipRect.Width() - width) / 2, fChipRect.top + 20);
 		DrawString(fVendor);
 	}
 
 	// Draw processor type and speed
 	SetHighColor(240, 240, 240);
 
-	SetFontSize(fProcessorFontSize);
 	float width = StringWidth(fProcessor);
-	MovePenTo(10 + (32 - width / 2), 55);
+	MovePenTo(10 + (fChipRect.Width() - width) / 2, fChipRect.top + 48);
 	DrawString(fProcessor);
 
 	char buffer[64];
@@ -287,11 +270,8 @@ NormalPulseView::Draw(BRect rect)
 
 	// We can't assume anymore that a CPU clock speed is always static.
 	// Let's compute the best font size for the CPU speed string each time...
-	BFont font;
-	GetFont(&font);
-	SetFontSize(max_font_size(font, buffer, fProcessorFontSize, 46.0f));
 	width = StringWidth(buffer);
-	MovePenTo(10 + (32 - width / 2), 64);
+	MovePenTo(10 + (fChipRect.Width() - width) / 2, fChipRect.top + 58);
 	DrawString(buffer);
 
 	PopState();
@@ -320,9 +300,6 @@ NormalPulseView::Pulse()
 void
 NormalPulseView::AttachedToWindow()
 {
-	SetFont(be_bold_font);
-	CalculateFontSizes();
-
 	fPreviousTime = system_time();
 
 	BMessenger messenger(Window());
