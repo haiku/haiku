@@ -22,14 +22,14 @@ public:
 
 protected:
 	virtual Decorator*			_AllocateDecorator(DesktopSettings& settings,
-									BRect rect,	Desktop* desktop);
+									BRect rect, Desktop* desktop);
 };
 
 
 class MacDecorator: public SATDecorator {
 public:
 								MacDecorator(DesktopSettings& settings,
-									BRect frame,	Desktop* desktop);
+									BRect frame, Desktop* desktop);
 	virtual						~MacDecorator();
 
 			void				Draw(BRect updateRect);

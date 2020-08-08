@@ -148,16 +148,19 @@ MacDecorator::SetRegionHighlight(Region region, uint8 highlight,
 				if (highlight != RegionHighlight(region))
 					memset(&tab->closeBitmaps, 0, sizeof(tab->closeBitmaps));
 				break;
+
 			case REGION_MINIMIZE_BUTTON:
 				if (highlight != RegionHighlight(region)) {
 					memset(&tab->minimizeBitmaps, 0,
 						sizeof(tab->minimizeBitmaps));
 				}
 				break;
+
 			case REGION_ZOOM_BUTTON:
 				if (highlight != RegionHighlight(region))
 					memset(&tab->zoomBitmaps, 0, sizeof(tab->zoomBitmaps));
 				break;
+
 			default:
 				break;
 		}
@@ -184,21 +187,22 @@ MacDecorator::_DoLayout()
 			case B_MODAL_WINDOW_LOOK:
 				fBorderWidth = kDefaultBorderWidth;
 				break;
-	
+
 			case B_TITLED_WINDOW_LOOK:
 			case B_DOCUMENT_WINDOW_LOOK:
 				hasTab = true;
 				fBorderWidth = kDefaultBorderWidth;
 				break;
+
 			case B_FLOATING_WINDOW_LOOK:
 				hasTab = true;
 				fBorderWidth = 3;
 				break;
-	
+
 			case B_BORDERED_WINDOW_LOOK:
 				fBorderWidth = 1;
 				break;
-	
+
 			default:
 				fBorderWidth = 0;
 		}
@@ -352,7 +356,7 @@ MacDecorator::_DrawFrame(BRect invalid)
 				if (fTopTab->look == B_MODAL_WINDOW_LOOK) {
 					offset = r.LeftTop();
 					pt2 = r.RightTop();
-					
+
 					fDrawingEngine->StrokeLine(offset, pt2, fFrameLowerColor);
 					offset.x++;
 					offset.y++;
@@ -364,25 +368,25 @@ MacDecorator::_DrawFrame(BRect invalid)
 					offset.y++;
 					pt2.x--;
 					pt2.y++;
-					
+
 					fDrawingEngine->StrokeLine(offset, pt2, fFrameMidColor);
 					offset.x++;
 					offset.y++;
 					pt2.x--;
 					pt2.y++;
-					
+
 					fDrawingEngine->StrokeLine(offset, pt2, fFrameMidColor);
 					offset.x++;
 					offset.y++;
 					pt2.x--;
 					pt2.y++;
-					
+
 					fDrawingEngine->StrokeLine(offset, pt2, fFrameLowColor);
 					offset.x++;
 					offset.y++;
 					pt2.x--;
 					pt2.y++;
-					
+
 					fDrawingEngine->StrokeLine(offset, pt2, fFrameLowerColor);
 				} else {
 					// Some odd stuff here where the title bar is melded into the
@@ -390,12 +394,12 @@ MacDecorator::_DrawFrame(BRect invalid)
 					// so we draw this bottom up 
 					offset = topleftpt;
 					pt2 = toprightpt;
-					
+
 					fDrawingEngine->StrokeLine(offset, pt2, fFrameLowerColor);
 					offset.y--;
 					offset.x++;
 					pt2.y--;
-					
+
 					fDrawingEngine->StrokeLine(offset, pt2, fFrameLowColor);
 				}
 
