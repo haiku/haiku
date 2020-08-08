@@ -144,6 +144,30 @@ CopyEngine::Copy(const char* _source, const char* _destination,
 
 
 status_t
+CopyEngine::RemoveFolder(BEntry& entry)
+{
+	BDirectory directory(&entry);
+	status_t ret = directory.InitCheck();
+	if (ret != B_OK)
+		return ret;
+
+	BEntry subEntry;
+	while (directory.GetNextEntry(&subEntry) == B_OK) {
+		if (subEntry.IsDirectory()) {
+			ret = CopyEngine::RemoveFolder(subEntry);
+			if (ret != B_OK)
+				return ret;
+		} else {
+			ret = subEntry.Remove();
+			if (ret != B_OK)
+				return ret;
+		}
+	}
+	return entry.Remove();
+}
+
+
+status_t
 CopyEngine::_CopyData(const BEntry& _source, const BEntry& _destination,
 	sem_id cancelSemaphore)
 {
@@ -335,16 +359,10 @@ CopyEngine::_Copy(BEntry &source, BEntry &destination,
 
 		if (destination.Exists()) {
 			if (destination.IsDirectory()) {
-				if (fEntryFilter
-					&& fEntryFilter->ShouldClobberFolder(source,
-						relativeSourcePath, sourceInfo)) {
-					ret = _RemoveFolder(destination);
-				} else {
-					// Do not overwrite attributes on folders that exist.
-					// This should work better when the install target
-					// already contains a Haiku installation.
-					copyAttributesToTarget = false;
-				}
+				// Do not overwrite attributes on folders that exist.
+				// This should work better when the install target
+				// already contains a Haiku installation.
+				copyAttributesToTarget = false;
 			} else {
 				ret = destination.Remove();
 			}
@@ -354,13 +372,15 @@ CopyEngine::_Copy(BEntry &source, BEntry &destination,
 					"%s\n", sourcePath.Path(), strerror(ret));
 				return ret;
 			}
-		} else {
-			ret = create_directory(destPath.Path(), 0777);
-			if (ret != B_OK && ret != B_FILE_EXISTS) {
-				fprintf(stderr, "Could not create '%s': %s\n", destPath.Path(),
-					strerror(ret));
-				return ret;
-			}
+		}
+
+		ret = create_directory(destPath.Path(), 0777);
+			// Make sure the target path exists, it may have been deleted if
+			// the existing destination was a file instead of a directory.
+		if (ret != B_OK && ret != B_FILE_EXISTS) {
+			fprintf(stderr, "Could not create '%s': %s\n", destPath.Path(),
+				strerror(ret));
+			return ret;
 		}
 
 		BDirectory destDirectory(&destination);
@@ -381,7 +401,7 @@ CopyEngine::_Copy(BEntry &source, BEntry &destination,
 	} else {
 		if (destination.Exists()) {
 			if (destination.IsDirectory())
-				ret = _RemoveFolder(destination);
+				ret = CopyEngine::RemoveFolder(destination);
 			else
 				ret = destination.Remove();
 			if (ret != B_OK) {
@@ -463,30 +483,6 @@ CopyEngine::_Copy(BEntry &source, BEntry &destination,
 	}
 
 	return B_OK;
-}
-
-
-status_t
-CopyEngine::_RemoveFolder(BEntry& entry)
-{
-	BDirectory directory(&entry);
-	status_t ret = directory.InitCheck();
-	if (ret != B_OK)
-		return ret;
-
-	BEntry subEntry;
-	while (directory.GetNextEntry(&subEntry) == B_OK) {
-		if (subEntry.IsDirectory()) {
-			ret = _RemoveFolder(subEntry);
-			if (ret != B_OK)
-				return ret;
-		} else {
-			ret = subEntry.Remove();
-			if (ret != B_OK)
-				return ret;
-		}
-	}
-	return entry.Remove();
 }
 
 
