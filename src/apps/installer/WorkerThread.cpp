@@ -113,7 +113,7 @@ public:
 	}
 
 	virtual bool ShouldCopyEntry(const BEntry& entry, const char* path,
-		const struct stat& statInfo, int32 level) const
+		const struct stat& statInfo) const
 	{
 		if (S_ISBLK(statInfo.st_mode) || S_ISCHR(statInfo.st_mode)
 				|| S_ISFIFO(statInfo.st_mode) || S_ISSOCK(statInfo.st_mode)) {
@@ -138,10 +138,9 @@ public:
 	}
 
 	virtual bool ShouldClobberFolder(const BEntry& entry, const char* path,
-		const struct stat& statInfo, int32 level) const
+		const struct stat& statInfo) const
 	{
-		if (level == 2 && S_ISDIR(statInfo.st_mode)
-				&& strncmp("system/", path, 7) == 0
+		if (S_ISDIR(statInfo.st_mode) && strncmp("system/", path, 7) == 0
 				&& strcmp("system/settings", path) != 0) {
 			// Replace everything in "system" besides "settings"
 			printf("clobbering '%s'.\n", path);

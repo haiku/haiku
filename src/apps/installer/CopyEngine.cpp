@@ -113,10 +113,9 @@ CopyEngine::ResetTargets(const char* source)
 status_t
 CopyEngine::CollectTargets(const char* source, sem_id cancelSemaphore)
 {
-	int32 level = 0;
 	off_t bytesToCopy = 0;
 	uint64 itemsToCopy = 0;
-	status_t ret = _CollectCopyInfo(source, level, cancelSemaphore, bytesToCopy,
+	status_t ret = _CollectCopyInfo(source, cancelSemaphore, bytesToCopy,
 			itemsToCopy);
 	if (ret == B_OK && fProgressReporter != NULL)
 		fProgressReporter->AddItems(itemsToCopy, bytesToCopy);
@@ -128,7 +127,6 @@ status_t
 CopyEngine::Copy(const char* _source, const char* _destination,
 	sem_id cancelSemaphore, bool copyAttributes)
 {
-	int32 level = 0;
 	status_t ret;
 
 	BEntry source(_source);
@@ -141,7 +139,7 @@ CopyEngine::Copy(const char* _source, const char* _destination,
 	if (ret != B_OK)
 		return ret;
 
-	return _Copy(source, destination, level, cancelSemaphore, copyAttributes);
+	return _Copy(source, destination, cancelSemaphore, copyAttributes);
 }
 
 
@@ -230,11 +228,9 @@ CopyEngine::_CopyData(const BEntry& _source, const BEntry& _destination,
 
 
 status_t
-CopyEngine::_CollectCopyInfo(const char* _source, int32& level,
-	sem_id cancelSemaphore, off_t& bytesToCopy, uint64& itemsToCopy)
+CopyEngine::_CollectCopyInfo(const char* _source, sem_id cancelSemaphore,
+	off_t& bytesToCopy, uint64& itemsToCopy)
 {
-	level++;
-
 	BEntry source(_source);
 	status_t ret = source.InitCheck();
 	if (ret < B_OK)
@@ -253,7 +249,7 @@ CopyEngine::_CollectCopyInfo(const char* _source, int32& level,
 
 	if (fEntryFilter != NULL
 		&& !fEntryFilter->ShouldCopyEntry(source,
-			_RelativeEntryPath(_source), statInfo, level)) {
+			_RelativeEntryPath(_source), statInfo)) {
 		// Skip this entry
 		return B_OK;
 	}
@@ -274,8 +270,8 @@ CopyEngine::_CollectCopyInfo(const char* _source, int32& level,
 			if (ret < B_OK)
 				return ret;
 
-			ret = _CollectCopyInfo(entryPath.Path(), level,
-					cancelSemaphore, bytesToCopy, itemsToCopy);
+			ret = _CollectCopyInfo(entryPath.Path(), cancelSemaphore,
+					bytesToCopy, itemsToCopy);
 			if (ret < B_OK)
 				return ret;
 		}
@@ -286,17 +282,14 @@ CopyEngine::_CollectCopyInfo(const char* _source, int32& level,
 	}
 
 	itemsToCopy++;
-	level--;
 	return B_OK;
 }
 
 
 status_t
 CopyEngine::_Copy(BEntry &source, BEntry &destination,
-	int32& level, sem_id cancelSemaphore, bool copyAttributes)
+	sem_id cancelSemaphore, bool copyAttributes)
 {
-	level++;
-
 	struct stat sourceInfo;
 	status_t ret = source.GetStat(&sourceInfo);
 	if (ret != B_OK)
@@ -321,7 +314,7 @@ CopyEngine::_Copy(BEntry &source, BEntry &destination,
 	const char *relativeSourcePath = _RelativeEntryPath(sourcePath.Path());
 	if (fEntryFilter != NULL
 		&& !fEntryFilter->ShouldCopyEntry(source, relativeSourcePath,
-			sourceInfo, level)) {
+			sourceInfo)) {
 		// Silently skip the filtered entry.
 		return B_OK;
 	}
@@ -344,7 +337,7 @@ CopyEngine::_Copy(BEntry &source, BEntry &destination,
 			if (destination.IsDirectory()) {
 				if (fEntryFilter
 					&& fEntryFilter->ShouldClobberFolder(source,
-						relativeSourcePath, sourceInfo, level)) {
+						relativeSourcePath, sourceInfo)) {
 					ret = _RemoveFolder(destination);
 				} else {
 					// Do not overwrite attributes on folders that exist.
@@ -381,8 +374,7 @@ CopyEngine::_Copy(BEntry &source, BEntry &destination,
 			ret = dest.InitCheck();
 			if (ret != B_OK)
 				return ret;
-			ret = _Copy(entry, dest, level,
-					cancelSemaphore, copyAttributes);
+			ret = _Copy(entry, dest, cancelSemaphore, copyAttributes);
 			if (ret != B_OK)
 				return ret;
 		}
@@ -470,7 +462,6 @@ CopyEngine::_Copy(BEntry &source, BEntry &destination,
 		destination.SetCreationTime(sourceInfo.st_crtime);
 	}
 
-	level--;
 	return B_OK;
 }
 

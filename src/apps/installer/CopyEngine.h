@@ -39,11 +39,10 @@ public:
 
 private:
 			status_t			_CollectCopyInfo(const char* source,
-									int32& level, sem_id cancelSemaphore,
-									off_t& bytesToCopy, uint64& itemsToCopy);
-			status_t			_Copy(BEntry& source,
-									BEntry& destination,
-									int32& level, sem_id cancelSemaphore,
+									sem_id cancelSemaphore, off_t& bytesToCopy,
+									uint64& itemsToCopy);
+			status_t			_Copy(BEntry& source, BEntry& destination,
+									sem_id cancelSemaphore,
 									bool copyAttributes);
 			status_t			_CopyData(const BEntry& entry,
 									const BEntry& destination,
@@ -118,12 +117,10 @@ public:
 
 	virtual	bool				ShouldCopyEntry(const BEntry& entry,
 									const char* path,
-									const struct stat& statInfo,
-									int32 level) const = 0;
+									const struct stat& statInfo) const = 0;
 	virtual	bool				ShouldClobberFolder(const BEntry& entry,
 									const char* path,
-									const struct stat& statInfo,
-									int32 level) const = 0;
+									const struct stat& statInfo) const = 0;
 };
 
 
