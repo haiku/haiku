@@ -129,6 +129,7 @@ private:
 			TTeamMenuItem*	fPreviousDragTargetItem;
 			BMenuItem*		fLastMousedOverItem;
 			BMenuItem*		fLastClickedItem;
+			bigtime_t		fLastClickTime;
 			BList			fTeamList;
 
 	static	bool			sDoMonitor;

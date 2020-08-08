@@ -96,7 +96,8 @@ TExpandoMenuBar::TExpandoMenuBar(menu_layout layout, TBarView* barView)
 	fFirstBuild(true),
 	fPreviousDragTargetItem(NULL),
 	fLastMousedOverItem(NULL),
-	fLastClickedItem(NULL)
+	fLastClickedItem(NULL),
+	fLastClickTime(0)
 {
 	SetItemMargins(0.0f, 0.0f, 0.0f, 0.0f);
 	SetFont(be_plain_font);
@@ -333,13 +334,22 @@ TExpandoMenuBar::MouseDown(BPoint where)
 
 	// double-click on an item brings the team to front
 	int32 clicks;
+	bigtime_t clickSpeed = 0;
+	get_click_speed(&clickSpeed);
+	bigtime_t delta = system_time() - fLastClickTime;
 	if (message->FindInt32("clicks", &clicks) == B_OK && clicks > 1
-		&& item == menuItem && item == fLastClickedItem) {
+		&& item == menuItem && item == fLastClickedItem
+		&& delta <= clickSpeed) {
 		be_roster->ActivateApp((addr_t)item->Teams()->ItemAt(0));
 			// activate this team
 		return;
 			// absorb the message
 	}
+
+	// Update fLastClickTime only if we are not already triggering the
+	// double-click action. Otherwise the delay is renewed at every subsequent
+	// click and they keep triggering the double click action
+	fLastClickTime = system_time();
 
 	BMenuBar::MouseDown(where);
 }
