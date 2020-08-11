@@ -49,6 +49,7 @@ public:
 
 public:
 								BGradient();
+								BGradient(const BGradient& other);
 								BGradient(BMessage* archive);
 	virtual						~BGradient();
 

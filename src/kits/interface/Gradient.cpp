@@ -100,6 +100,14 @@ BGradient::BGradient()
 }
 
 
+BGradient::BGradient(const BGradient& other)
+	: BArchivable(),
+	fColorStops(std::max((int32)4, other.CountColorStops()))
+{
+	*this = other;
+}
+
+
 // constructor
 BGradient::BGradient(BMessage* archive)
 	: BArchivable(archive),
@@ -250,8 +258,30 @@ BGradient::Archive(BMessage* into, bool deep) const
 BGradient&
 BGradient::operator=(const BGradient& other)
 {
+	if (&other == this)
+		return *this;
+
 	SetColorStops(other);
 	fType = other.fType;
+	switch (fType) {
+		case TYPE_LINEAR:
+			fData.linear = other.fData.linear;
+			break;
+		case TYPE_RADIAL:
+			fData.radial = other.fData.radial;
+			break;
+		case TYPE_RADIAL_FOCUS:
+			fData.radial_focus = other.fData.radial_focus;
+			break;
+		case TYPE_DIAMOND:
+			fData.diamond = other.fData.diamond;
+			break;
+		case TYPE_CONIC:
+			fData.conic = other.fData.conic;
+			break;
+		case TYPE_NONE:
+			break;
+	}
 	return *this;
 }
 
