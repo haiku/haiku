@@ -104,7 +104,7 @@ for platform in [ MultiBootSubDirSetup ] {
 
 
 		BootStaticLibrary [ MultiBootGristFiles boot_loader ] :
-			PathBlacklist.cpp
+			PathBlocklist.cpp
 			elf.cpp
 			heap.cpp
 			kernel_args.cpp

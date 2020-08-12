@@ -4,17 +4,17 @@
  */
 
 
-#include <boot/PathBlacklist.h>
+#include <boot/PathBlocklist.h>
 
 #include <stdlib.h>
 
 #include <algorithm>
 
 
-// #pragma mark - BlacklistedPath
+// #pragma mark - BlockedPath
 
 
-BlacklistedPath::BlacklistedPath()
+BlockedPath::BlockedPath()
 	:
 	fPath(NULL),
 	fLength(0),
@@ -23,14 +23,14 @@ BlacklistedPath::BlacklistedPath()
 }
 
 
-BlacklistedPath::~BlacklistedPath()
+BlockedPath::~BlockedPath()
 {
 	free(fPath);
 }
 
 
 bool
-BlacklistedPath::SetTo(const char* path)
+BlockedPath::SetTo(const char* path)
 {
 	size_t length = strlen(path);
 	if (length > 0 && path[length - 1] == '/')
@@ -49,7 +49,7 @@ BlacklistedPath::SetTo(const char* path)
 
 
 bool
-BlacklistedPath::Append(const char* component)
+BlockedPath::Append(const char* component)
 {
 	size_t componentLength = strlen(component);
 	if (componentLength > 0 && component[componentLength - 1] == '/')
@@ -70,7 +70,7 @@ BlacklistedPath::Append(const char* component)
 
 
 bool
-BlacklistedPath::_Resize(size_t length, bool keepData)
+BlockedPath::_Resize(size_t length, bool keepData)
 {
 	if (length == 0) {
 		free(fPath);
@@ -109,71 +109,71 @@ BlacklistedPath::_Resize(size_t length, bool keepData)
 }
 
 
-// #pragma mark - PathBlacklist
+// #pragma mark - PathBlocklist
 
 
-PathBlacklist::PathBlacklist()
+PathBlocklist::PathBlocklist()
 {
 }
 
 
-PathBlacklist::~PathBlacklist()
+PathBlocklist::~PathBlocklist()
 {
 	MakeEmpty();
 }
 
 
 bool
-PathBlacklist::Add(const char* path)
+PathBlocklist::Add(const char* path)
 {
-	BlacklistedPath* blacklistedPath = _FindPath(path);
-	if (blacklistedPath != NULL)
+	BlockedPath* blockedPath = _FindPath(path);
+	if (blockedPath != NULL)
 		return true;
 
-	blacklistedPath = new(std::nothrow) BlacklistedPath;
-	if (blacklistedPath == NULL || !blacklistedPath->SetTo(path)) {
-		delete blacklistedPath;
+	blockedPath = new(std::nothrow) BlockedPath;
+	if (blockedPath == NULL || !blockedPath->SetTo(path)) {
+		delete blockedPath;
 		return false;
 	}
 
-	fPaths.Add(blacklistedPath);
+	fPaths.Add(blockedPath);
 	return true;
 }
 
 
 void
-PathBlacklist::Remove(const char* path)
+PathBlocklist::Remove(const char* path)
 {
-	BlacklistedPath* blacklistedPath = _FindPath(path);
-	if (blacklistedPath != NULL) {
-		fPaths.Remove(blacklistedPath);
-		delete blacklistedPath;
+	BlockedPath* blockedPath = _FindPath(path);
+	if (blockedPath != NULL) {
+		fPaths.Remove(blockedPath);
+		delete blockedPath;
 	}
 }
 
 
 bool
-PathBlacklist::Contains(const char* path) const
+PathBlocklist::Contains(const char* path) const
 {
 	return _FindPath(path) != NULL;
 }
 
 
 void
-PathBlacklist::MakeEmpty()
+PathBlocklist::MakeEmpty()
 {
-	while (BlacklistedPath* blacklistedPath = fPaths.RemoveHead())
-		delete blacklistedPath;
+	while (BlockedPath* blockedPath = fPaths.RemoveHead())
+		delete blockedPath;
 }
 
 
-BlacklistedPath*
-PathBlacklist::_FindPath(const char* path) const
+BlockedPath*
+PathBlocklist::_FindPath(const char* path) const
 {
 	for (PathList::Iterator it = fPaths.GetIterator(); it.HasNext();) {
-		BlacklistedPath* blacklistedPath = it.Next();
-		if (*blacklistedPath == path)
-			return blacklistedPath;
+		BlockedPath* blockedPath = it.Next();
+		if (*blockedPath == path)
+			return blockedPath;
 	}
 
 	return NULL;

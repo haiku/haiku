@@ -12,7 +12,7 @@
 #include <boot/vfs.h>
 #include <boot/platform.h>
 #include <boot/heap.h>
-#include <boot/PathBlacklist.h>
+#include <boot/PathBlocklist.h>
 #include <boot/stdio.h>
 #include <boot/net/NetStack.h>
 
@@ -62,7 +62,7 @@ main(stage2_args *args)
 	bool mountedAllVolumes = false;
 
 	BootVolume bootVolume;
-	PathBlacklist pathBlacklist;
+	PathBlocklist pathBlocklist;
 
 	if (get_boot_file_system(args, bootVolume) != B_OK
 		|| (platform_boot_options() & BOOT_OPTION_MENU) != 0) {
@@ -79,7 +79,7 @@ main(stage2_args *args)
 
 		mountedAllVolumes = true;
 
-		if (user_menu(bootVolume, pathBlacklist) < B_OK) {
+		if (user_menu(bootVolume, pathBlocklist) < B_OK) {
 			// user requested to quit the loader
 			goto out;
 		}
@@ -103,7 +103,7 @@ main(stage2_args *args)
 				mountedAllVolumes = true;
 			}
 
-			if (user_menu(bootVolume, pathBlacklist) != B_OK
+			if (user_menu(bootVolume, pathBlocklist) != B_OK
 				|| !bootVolume.IsValid()) {
 				// user requested to quit the loader
 				goto out;
@@ -115,8 +115,8 @@ main(stage2_args *args)
 		// know our boot volume, too
 		if (status == B_OK) {
 			if (bootVolume.IsPackaged()) {
-				packagefs_apply_path_blacklist(bootVolume.SystemDirectory(),
-					pathBlacklist);
+				packagefs_apply_path_blocklist(bootVolume.SystemDirectory(),
+					pathBlocklist);
 			}
 
 			register_boot_file_system(bootVolume);
