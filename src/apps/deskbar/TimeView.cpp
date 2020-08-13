@@ -532,6 +532,5 @@ TTimeView::Vertical()
 	if (fBarView == NULL)
 		return true;
 
-	return fBarView->Vertical()
-		&& (fBarView->ExpandoState() || fBarView->FullState());
+	return fBarView->Vertical();
 }

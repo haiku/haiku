@@ -136,7 +136,7 @@ TBarMenuTitle::DrawContent()
 
 	// cut-off the leaf
 	bool isLeafMenu = dynamic_cast<TDeskbarMenu*>(fMenu) != NULL;
-	if (fBarView->Vertical() && isLeafMenu)
+	if (isLeafMenu)
 		iconRect.OffsetBy(widthOffset, frame.Height() - iconRect.Height() + 2);
 	else
 		iconRect.OffsetBy(widthOffset, heightOffset);

@@ -231,10 +231,16 @@ private:
 	BPoint fPreviousPosition;
 	int32 fDragLocation;
 
-	BRegion fTopLeft;
-	BRegion fTopRight;
-	BRegion fBottomLeft;
-	BRegion fBottomRight;
+	BRegion fTopLeftVertical;
+	BRegion fTopRightVertical;
+	BRegion fBottomLeftVertical;
+	BRegion fBottomRightVertical;
+
+	BRegion fTopLeftHorizontal;
+	BRegion fTopRightHorizontal;
+	BRegion fBottomLeftHorizontal;
+	BRegion fBottomRightHorizontal;
+
 	BRegion fMiddleLeft;
 	BRegion fMiddleRight;
 #ifdef FULL_MODE

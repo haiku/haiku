@@ -244,7 +244,7 @@ TBarWindow::Minimize(bool minimize)
 void
 TBarWindow::FrameResized(float width, float height)
 {
-	if (fBarView->MiniState() || !fBarView->Vertical())
+	if (!fBarView->Vertical())
 		return BWindow::FrameResized(width, height);
 
 	bool setToHiddenSize = fBarApp->Settings()->autoHide
@@ -686,19 +686,34 @@ TBarWindow::SetSizeLimits()
 				0, kHiddenDimension);
 		}
 	} else {
-		if (fBarView->Vertical()) {
-			float minHeight = 0;
-			float maxHeight = B_SIZE_UNLIMITED;
-			float minWidth = gMinimumWindowWidth;
-			float maxWidth = fBarView->MiniState() ? B_SIZE_UNLIMITED
-				: gMaximumWindowWidth;
-			BWindow::SetSizeLimits(minWidth, maxWidth, minHeight, maxHeight);
-		} else {
-			BWindow::SetSizeLimits(screenFrame.Width(), screenFrame.Width(),
-				kMenuBarHeight - 1, kMaximumIconSize + 4);
-		}
-	}
+		float minHeight;
+		float maxHeight;
+		float minWidth;
+		float maxWidth;
 
+		if (fBarView->Vertical()) {
+			minHeight = fBarView->TabHeight();
+			maxHeight = B_SIZE_UNLIMITED;
+			minWidth = gMinimumWindowWidth;
+			maxWidth = gMaximumWindowWidth;
+		} else {
+			// horizontal
+			if (fBarView->MiniState()) {
+				minWidth = gMinimumWindowWidth;
+				maxWidth = B_SIZE_UNLIMITED;
+				minHeight = fBarView->TabHeight();
+				maxHeight = std::max(fBarView->TabHeight(), kGutter
+					+ fBarView->ReplicantTray()->MaxReplicantHeight()
+					+ kGutter);
+			} else {
+				minWidth = maxWidth = screenFrame.Width();
+				minHeight = kMenuBarHeight - 1;
+				maxHeight = kMaximumIconSize + 4;
+			}
+		}
+
+		BWindow::SetSizeLimits(minWidth, maxWidth, minHeight, maxHeight);
+	}
 }
 
 

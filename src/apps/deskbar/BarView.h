@@ -106,9 +106,10 @@ public:
 			bool			Vertical() const { return fVertical; };
 			bool			Left() const { return fLeft; };
 			bool			Top() const { return fTop; };
-			bool			AcrossTop() const { return fTop && !fVertical; };
-			bool			AcrossBottom() const
-								{ return !fTop && !fVertical; };
+			bool			AcrossTop() const { return fTop && !fVertical
+								&& fState != kMiniState; };
+			bool			AcrossBottom() const { return !fTop && !fVertical
+								&& fState != kMiniState; };
 
 	// window state methods
 			bool			ExpandoState() const
