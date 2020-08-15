@@ -669,7 +669,7 @@ gethostbyname_internal(const char *name, int af, res_state res)
 }
 
 struct hostent *
-gethostbyaddr(const char *addr,	/* XXX should have been def'd as u_char! */
+gethostbyaddr(const void *addr,
     socklen_t len, int af)
 {
 	const u_char *uaddr = (const u_char *)addr;
@@ -694,7 +694,6 @@ gethostbyaddr(const char *addr,	/* XXX should have been def'd as u_char! */
 	    (IN6_IS_ADDR_V4MAPPED((const struct in6_addr *)(const void *)uaddr) ||
 	     IN6_IS_ADDR_V4COMPAT((const struct in6_addr *)(const void *)uaddr))) {
 		/* Unmap. */
-		addr += IN6ADDRSZ - INADDRSZ;
 		uaddr += IN6ADDRSZ - INADDRSZ;
 		af = AF_INET;
 		len = INADDRSZ;
