@@ -195,7 +195,7 @@ void			endnetent(void);
 void			endprotoent(void);
 void			endservent(void);
 void			freehostent(struct hostent *host);
-struct hostent	*gethostbyaddr(const char *address, socklen_t length, int type);
+struct hostent	*gethostbyaddr(const void *address, socklen_t length, int type);
 struct hostent	*gethostbyname(const char *name);
 struct hostent	*gethostbyname2(const char *name, int type);
 struct hostent	*gethostent(void);
