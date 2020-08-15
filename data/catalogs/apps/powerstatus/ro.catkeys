@@ -1,46 +1,46 @@
 1	romanian	x-vnd.Haiku-PowerStatus	3173765686
-Design capacity low warning: 	PowerStatus		Avertisment de capacitate redusă model: 
-Show percent	PowerStatus		Afișează procentaj
-Design capacity: 	PowerStatus		Capacitate model: 
- mW	PowerStatus		 mW
-The battery level is getting low, please plug in the device.	PowerStatus		Nivelul bateriei devine scăzut, puneți în priză dispozitivul.
-Battery low	PowerStatus		Baterie scăzută
-Type: 	PowerStatus		Tip: 
-non-rechargeable	PowerStatus		nu este reîncărcabilă
-Empty battery slot	PowerStatus		Fantă liberă de baterie
- mV	PowerStatus		 mV
 Run in window	PowerStatus		Rulează în fereastră
-PowerStatus	System name		StareConsum
- mWh	PowerStatus		 mWh
-Battery info…	PowerStatus		Info baterie…
-Damaged battery	PowerStatus		Baterie deteriorată
-Show time	PowerStatus		Afișează oră
-Last full charge: 	PowerStatus		Ultima încărcate completă: 
-Battery unused	PowerStatus		Baterie neutilizată
 Extended battery info	PowerStatus		Info extins baterie
- mA	PowerStatus		 mA
+Show status icon	PowerStatus		Afișează pictogramă de stare
+Battery charging	PowerStatus		Se încarcă bateria
+Design capacity low warning: 	PowerStatus		Avertisment de capacitate redusă model: 
+The battery level is critical, please plug in the device immediately.	PowerStatus		Nivelul bateriei este critic, puneți în priză dispozitivul acum.
+non-rechargeable	PowerStatus		nu este reîncărcabilă
+Last full charge: 	PowerStatus		Ultima încărcate completă: 
+ mV	PowerStatus		 mV
 Current rate: 	PowerStatus		Cotă curentă: 
-discharging	PowerStatus		se descarcă
 Show text label	PowerStatus		Afișează etichetă text
-About…	PowerStatus		Despre…
+Quit	PowerStatus		Închidere
+Battery low	PowerStatus		Baterie scăzută
 Model number: 	PowerStatus		Număr model: 
-Install in Deskbar	PowerStatus		Instalează pe bara de desktop
+Battery unused	PowerStatus		Baterie neutilizată
+Type: 	PowerStatus		Tip: 
+Damaged battery	PowerStatus		Baterie deteriorată
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Puteți să rulați StareConsum într-o ferestră sau să îl instalați pe bara de desktop.
  mAh	PowerStatus		 mAh
-Capacity: 	PowerStatus		Capacitate: 
 Battery discharging	PowerStatus		Se descarcă bateria
+Design voltage: 	PowerStatus		Voltaj model: 
+discharging	PowerStatus		se descarcă
+rechargeable	PowerStatus		reîncărcabilă
+Battery info…	PowerStatus		Info baterie…
+Show time	PowerStatus		Afișează oră
+ mA	PowerStatus		 mA
+About…	PowerStatus		Despre…
 Serial number: 	PowerStatus		Număr de serie: 
 Battery critical	PowerStatus		Baterie critică
+Capacity: 	PowerStatus		Capacitate: 
+ mW	PowerStatus		 mW
+Show percent	PowerStatus		Afișează procentaj
 Capacity granularity 1: 	PowerStatus		Capacitate de granulozitate 1: 
-OEM info: 	PowerStatus		Info OEM: 
-Design voltage: 	PowerStatus		Voltaj model: 
-Battery charging	PowerStatus		Se încarcă bateria
-The battery level is critical, please plug in the device immediately.	PowerStatus		Nivelul bateriei este critic, puneți în priză dispozitivul acum.
+The battery level is getting low, please plug in the device.	PowerStatus		Nivelul bateriei devine scăzut, puneți în priză dispozitivul.
 Design capacity warning: 	PowerStatus		Avertisment capacitate model: 
-Quit	PowerStatus		Închidere
-rechargeable	PowerStatus		reîncărcabilă
-charging	PowerStatus		se încarcă
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Puteți să rulați StareConsum într-o ferestră sau să îl instalați pe bara de desktop.
-Show status icon	PowerStatus		Afișează pictogramă de stare
 Capacity granularity 2: 	PowerStatus		Capacitate de granulozitate 2: 
 Technology: 	PowerStatus		Tehnologie: 
+ mWh	PowerStatus		 mWh
+PowerStatus	System name		StareConsum
+Design capacity: 	PowerStatus		Capacitate model: 
+OEM info: 	PowerStatus		Info OEM: 
 no battery	PowerStatus		fără baterie
+Empty battery slot	PowerStatus		Fantă liberă de baterie
+Install in Deskbar	PowerStatus		Instalează pe bara de desktop
+charging	PowerStatus		se încarcă

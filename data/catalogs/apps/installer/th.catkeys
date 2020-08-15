@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-Installer	2784107891
+1	thai	x-vnd.Haiku-Installer	4193079864
 Performing installation.	InstallProgress		กำลังทำการติดตั้ง
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		เลือกดิสก์ต้นทางจากเมนูป๊อปอัป จากนั้นคลิก \"เริ่มต้น\"
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		โปรดปิดหน้าต่าง DriveSetup ก่อนที่จะปิดหน้าต่างตัวติดตั้ง
@@ -38,7 +38,6 @@ Hide optional packages	InstallerWindow		ซ่อนแพ็คเกจเส�
 ???	InstallerWindow	Unknown partition name	???
 Have fun and thanks for trying out Haiku!	InstallerApp		ขอให้สนุกและขอบคุณสำหรับการลองใช้ Haiku!
 Quit	InstallerApp		ออก
-Starting installation.	InstallProgress		เริ่มการติดตั้ง
 Error writing boot sector.	InstallProgress		เกิดข้อผิดพลาดในการเขียนบูตเซกเตอร์
 OK	InstallerWindow		ตกลง
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		โปรดปิดหน้าต่าง Boot Manager และ DriveSetup ก่อนที่จะปิดหน้าต่างตัวติดตั้ง

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Notifications	2448665344
+1	french	x-vnd.Haiku-Notifications	4196496676
 Lower left	GeneralView		Inférieur gauche
 Application does not have a valid signature	NotificationView	Alert message	L’application n’a pas de signature valide
 Status	NotificationView		État
@@ -10,6 +10,8 @@ OK	PrefletWin		OK
 Notifications	PrefletWin		Notifications
 Notifications preflet sample	PrefletWin		Exemple de notification d’un preflet
 Mute notifications from this application	NotificationView		Ignorer les notifications de cette application
+wide	GeneralView	Window width: Slider high text	large
+narrow	GeneralView	Window width: Slider low text	resserré
 Revert	PrefletWin		Rétablir
 Applications	PrefletView		Applications
 {0, plural, =1{Timeout: # second}other{Timeout: # seconds}}	GeneralView		{0, plural, =1{Timeout: # seconde}other{Timeout: # secondes}}

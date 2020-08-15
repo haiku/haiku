@@ -1,46 +1,46 @@
 1	english	x-vnd.Haiku-PowerStatus	3173765686
-Design capacity low warning: 	PowerStatus		设计低容量警告：
-Show percent	PowerStatus		显示百分比
-Design capacity: 	PowerStatus		设计容量：
- mW	PowerStatus		毫瓦
-The battery level is getting low, please plug in the device.	PowerStatus		电池剩余电量不足，请连接充电电源。
-Battery low	PowerStatus		电池电量低
-Type: 	PowerStatus		输入：
-non-rechargeable	PowerStatus		不可再充电
-Empty battery slot	PowerStatus		清理电池接口槽
- mV	PowerStatus		毫伏
 Run in window	PowerStatus		在窗口中运行
-PowerStatus	System name		电源状态
- mWh	PowerStatus		兆瓦时
-Battery info…	PowerStatus		电池信息...
-Damaged battery	PowerStatus		电池损坏
-Show time	PowerStatus		显示时间
-Last full charge: 	PowerStatus		最近完全用完：
-Battery unused	PowerStatus		未使用电池
 Extended battery info	PowerStatus		附加电池信息
- mA	PowerStatus		毫安
+Show status icon	PowerStatus		显示状态图标
+Battery charging	PowerStatus		电池充电
+Design capacity low warning: 	PowerStatus		设计低容量警告：
+The battery level is critical, please plug in the device immediately.	PowerStatus		电池电量严重不足，请及时连接充电电源。
+non-rechargeable	PowerStatus		不可再充电
+Last full charge: 	PowerStatus		最近完全用完：
+ mV	PowerStatus		毫伏
 Current rate: 	PowerStatus		当前速度：
-discharging	PowerStatus		放电
 Show text label	PowerStatus		显示文字标签
-About…	PowerStatus		关于...
+Quit	PowerStatus		退出
+Battery low	PowerStatus		电池电量低
 Model number: 	PowerStatus		型号：
-Install in Deskbar	PowerStatus		安装到桌面栏
+Battery unused	PowerStatus		未使用电池
+Type: 	PowerStatus		输入：
+Damaged battery	PowerStatus		电池损坏
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		您可以在窗口中运行 PowerStatus 或将其安装到桌面栏。
  mAh	PowerStatus		mAh
-Capacity: 	PowerStatus		容量：
 Battery discharging	PowerStatus		电池供电
+Design voltage: 	PowerStatus		设计电压：
+discharging	PowerStatus		放电
+rechargeable	PowerStatus		可再充电
+Battery info…	PowerStatus		电池信息...
+Show time	PowerStatus		显示时间
+ mA	PowerStatus		毫安
+About…	PowerStatus		关于...
 Serial number: 	PowerStatus		编号：
 Battery critical	PowerStatus		电池电量严重不足
+Capacity: 	PowerStatus		容量：
+ mW	PowerStatus		毫瓦
+Show percent	PowerStatus		显示百分比
 Capacity granularity 1: 	PowerStatus		容量粒度1：
-OEM info: 	PowerStatus		OEM 信息：
-Design voltage: 	PowerStatus		设计电压：
-Battery charging	PowerStatus		电池充电
-The battery level is critical, please plug in the device immediately.	PowerStatus		电池电量严重不足，请及时连接充电电源。
+The battery level is getting low, please plug in the device.	PowerStatus		电池剩余电量不足，请连接充电电源。
 Design capacity warning: 	PowerStatus		设计低容量警告：
-Quit	PowerStatus		退出
-rechargeable	PowerStatus		可再充电
-charging	PowerStatus		充电中
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		您可以在窗口中运行 PowerStatus 或将其安装到桌面栏。
-Show status icon	PowerStatus		显示状态图标
 Capacity granularity 2: 	PowerStatus		容量粒度2：
 Technology: 	PowerStatus		技术支持：
+ mWh	PowerStatus		兆瓦时
+PowerStatus	System name		电源状态
+Design capacity: 	PowerStatus		设计容量：
+OEM info: 	PowerStatus		OEM 信息：
 no battery	PowerStatus		无电池
+Empty battery slot	PowerStatus		清理电池接口槽
+Install in Deskbar	PowerStatus		安装到桌面栏
+charging	PowerStatus		充电中

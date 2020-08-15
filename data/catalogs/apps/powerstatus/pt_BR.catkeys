@@ -1,46 +1,46 @@
 1	portuguese (brazil)	x-vnd.Haiku-PowerStatus	3173765686
-Design capacity low warning: 	PowerStatus		Aviso de design de baixa capacidade 
-Show percent	PowerStatus		Mostrar porcentagem
-Design capacity: 	PowerStatus		Capacidade de design:
- mW	PowerStatus		 mW
-The battery level is getting low, please plug in the device.	PowerStatus		O nível da bateria estáficando baixo, por favor ligue o dispositivo.
-Battery low	PowerStatus		Bateria fraca
-Type: 	PowerStatus		Tipo:
-non-rechargeable	PowerStatus		não-recarregável
-Empty battery slot	PowerStatus		Slot de bateria vazio
- mV	PowerStatus		 mV
 Run in window	PowerStatus		Em modo janela
-PowerStatus	System name		Estado de Força
- mWh	PowerStatus		 mWh
-Battery info…	PowerStatus		Informação da bateria...
-Damaged battery	PowerStatus		Bateria danificada
-Show time	PowerStatus		Mostrar tempo
-Last full charge: 	PowerStatus		Última carga completa:
-Battery unused	PowerStatus		Bateria sem uso
 Extended battery info	PowerStatus		Informação da reserva de bateria
- mA	PowerStatus		 mA
+Show status icon	PowerStatus		Mostrar ícone de status
+Battery charging	PowerStatus		Carregando bateria
+Design capacity low warning: 	PowerStatus		Aviso de design de baixa capacidade 
+The battery level is critical, please plug in the device immediately.	PowerStatus		O nível de bateria é crítico, por favor conecte no dispositivo imediatamente.
+non-rechargeable	PowerStatus		não-recarregável
+Last full charge: 	PowerStatus		Última carga completa:
+ mV	PowerStatus		 mV
 Current rate: 	PowerStatus		Índice
-discharging	PowerStatus		descarregando
 Show text label	PowerStatus		Mostrar rótulos de texto
-About…	PowerStatus		Sobre...
+Quit	PowerStatus		Sair
+Battery low	PowerStatus		Bateria fraca
 Model number: 	PowerStatus		Número do modelo
-Install in Deskbar	PowerStatus		Instalar na Deskbar
+Battery unused	PowerStatus		Bateria sem uso
+Type: 	PowerStatus		Tipo:
+Damaged battery	PowerStatus		Bateria danificada
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Você pode rodar o Estado de Força numa janela ou instalá-lo na Deskbar
  mAh	PowerStatus		 mAh
-Capacity: 	PowerStatus		Capacidade
 Battery discharging	PowerStatus		Descarregando bateria
+Design voltage: 	PowerStatus		Design de voltagem:
+discharging	PowerStatus		descarregando
+rechargeable	PowerStatus		recarregável
+Battery info…	PowerStatus		Informação da bateria...
+Show time	PowerStatus		Mostrar tempo
+ mA	PowerStatus		 mA
+About…	PowerStatus		Sobre...
 Serial number: 	PowerStatus		Número de série:
 Battery critical	PowerStatus		Bateria crítica
+Capacity: 	PowerStatus		Capacidade
+ mW	PowerStatus		 mW
+Show percent	PowerStatus		Mostrar porcentagem
 Capacity granularity 1: 	PowerStatus		Capacidade granularidade 1
-OEM info: 	PowerStatus		Informação do fabricante
-Design voltage: 	PowerStatus		Design de voltagem:
-Battery charging	PowerStatus		Carregando bateria
-The battery level is critical, please plug in the device immediately.	PowerStatus		O nível de bateria é crítico, por favor conecte no dispositivo imediatamente.
+The battery level is getting low, please plug in the device.	PowerStatus		O nível da bateria estáficando baixo, por favor ligue o dispositivo.
 Design capacity warning: 	PowerStatus		Design de advertência de capacidade:
-Quit	PowerStatus		Sair
-rechargeable	PowerStatus		recarregável
-charging	PowerStatus		carregando
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Você pode rodar o Estado de Força numa janela ou instalá-lo na Deskbar
-Show status icon	PowerStatus		Mostrar ícone de status
 Capacity granularity 2: 	PowerStatus		Capacidade granularidade 2
 Technology: 	PowerStatus		Tecnologia:
+ mWh	PowerStatus		 mWh
+PowerStatus	System name		Estado de Força
+Design capacity: 	PowerStatus		Capacidade de design:
+OEM info: 	PowerStatus		Informação do fabricante
 no battery	PowerStatus		sem bateria
+Empty battery slot	PowerStatus		Slot de bateria vazio
+Install in Deskbar	PowerStatus		Instalar na Deskbar
+charging	PowerStatus		carregando

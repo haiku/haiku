@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-Installer	2784107891
+1	indonesian	x-vnd.Haiku-Installer	4193079864
 Performing installation.	InstallProgress		Melakukan instalasi.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Pilih disk sumber dari menu pop-up. Lalu klik \"Begin\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Silakan tutup jendela DriveSetup sebelum menutup jendela Installer.
@@ -38,7 +38,6 @@ Hide optional packages	InstallerWindow		Sembunyikan paket opsional
 ???	InstallerWindow	Unknown partition name	???
 Have fun and thanks for trying out Haiku!	InstallerApp		Bersenang-senanglah dan terima kasih telah mencoba Haiku!
 Quit	InstallerApp		Keluar
-Starting installation.	InstallProgress		Memulai instalasi.
 Error writing boot sector.	InstallProgress		Ada kesalahan saat menulis sektor boot.
 OK	InstallerWindow		OKE
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Harap tutup jendela Boot Manager dan DriveSetup sebelum menutup jendela Installer.

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Input	1056687510
+1	hungarian	x-vnd.Haiku-Input	1847308736
 Defaults	InputMouse		Alapértékek
 Scrolling	TouchpadPrefView		Görgetés
 Long	KeyboardView		Hosszú
@@ -14,6 +14,7 @@ Please confirm	TouchpadPrefView		Kérlek erősítsd meg
 Mouse speed	SettingsView		Egér sebessége
 Horizontal scrolling	TouchpadPrefView		Vízszintes görgetés
 Input	System name		Bemenet
+Quick	TouchpadPrefView		Gyors
 Short	KeyboardView		Rövid
 Revert	InputMouse		Visszaállít
 Slow	KeyboardView		Lassú
@@ -25,10 +26,13 @@ Focus follows mouse	SettingsView		A fókusz kövesse az egeret
 Focus mode:	SettingsView		Fókusz-mód
 Revert	TouchpadPrefView		Visszaállít
 4-Button	SettingsView		4 gombos
+Tapping sensitivity	TouchpadPrefView		Érintés érzékenység
 Revert	InputKeyboard		Visszaállít
 Mouse type:	SettingsView		Egér típusa
 Off	TouchpadPrefView		Ki
+Never	TouchpadPrefView		Soha
 Fast	TouchpadPrefView		Gyors
+6-Button	SettingsView		6 gombos
 Click to focus	SettingsView		Fókusz kattintásra
 Acceleration	TouchpadPrefView		Gyorsítás
 Accept first click	SettingsView		Érvényesítés első kattintásra

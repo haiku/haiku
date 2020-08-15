@@ -13,7 +13,7 @@ Fixed font:	Font view		Sabit yazıtipi:
 Appearance	System name		Görünüm
 Reduce colored edges filter strength:	AntialiasingSettingsView		Renklendirilmiş uç ışıma düzeyi:
 Glyph hinting:	AntialiasingSettingsView		Glif düzgünleştirme:
-Default Haiku ControlLook	DecorSettingsView		Öntanımlı Haiku ControlLook
+Default Haiku ControlLook	DecorSettingsView		Öntanımlı Haiku Görünüm Denetimcisi
 Menu item text	Colors tab		Menü ögesi metni
 About decorator	DecorSettingsView		Dekorcu hakkında
 Antialiasing menu	AntialiasingSettingsView		Yumuşatma menüsü
@@ -49,7 +49,7 @@ LCD subpixel	AntialiasingSettingsView		LCD altpiksel
 Window tab	Colors tab		Pencere sekmesi
 Link text	Colors tab		Bağlantı metni
 Tooltip background	Colors tab		Araç ipucu arka planı
-ControlLook:	DecorSettingsView		ControlLook:
+ControlLook:	DecorSettingsView		Görünüm Denetimci:
 Scroll bar thumb	Colors tab		Kaydırma çubuğu başı
 Default	DecorSettingsView		Öntanımlı
 Link visited	Colors tab		Ziyaret edilmiş bağlantı
@@ -67,12 +67,12 @@ Antialiasing type:	AntialiasingSettingsView		Yumuşatma türü:
 Panel text	Colors tab		Panel metni
 Hinting menu	AntialiasingSettingsView		Düzgünleştirme menüsü
 Scroll bar:	DecorSettingsView		Kaydırma çubuğu:
-Choose ControlLook	DecorSettingsView		ControlLook seç
+Choose ControlLook	DecorSettingsView		Görünüm Denetimci seç
 Monospaced fonts only	AntialiasingSettingsView		Yalnızca sabit genişlikli yazıtipleri
 Document text	Colors tab		Belge metni
 Inactive window border	Colors tab		Etkin olmayan pencere kenarlığı
 Colors	APRWindow		Renkler
-About control look	DecorSettingsView		ControlLook hakkında
+About control look	DecorSettingsView		Görünüm Denetimci hakkında
 Control highlight	Colors tab		Denetim vurgulaması
 Status bar	Colors tab		Durum çubuğu
 Link hover	Colors tab		İmleç bağlantı üzerinde

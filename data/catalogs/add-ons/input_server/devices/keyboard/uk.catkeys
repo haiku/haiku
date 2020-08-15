@@ -1,9 +1,10 @@
-1	ukrainian	x-vnd.Haiku-KeyboardInputServerDevice	2228550365
+1	ukrainian	x-vnd.Haiku-KeyboardInputServerDevice	1085266673
 If the application will not quit you may have to kill it.	Team monitor		Якщо Ви не можете вийти з програми, Ви можете знищити її.
 Quit application	Team monitor		Вийти з програми
+Open Terminal	Team monitor		Відкрити Terminal
 Restart the desktop	Team monitor		Перезагрузити робочий стіл
 Force reboot	Team monitor		Перезавантажити примусово
 Team monitor	Team monitor		Монітор 'Команд'
 Kill application	Team monitor		Знищити програму
 Cancel	Team monitor		Скасувати
-(This team is a system component)	Team monitor		(Ця 'команда' є системним компонентом)
+(This team is a system component)	Team monitor		(Ця "команда" є системним компонентом)

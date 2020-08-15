@@ -1,46 +1,46 @@
 1	dutch; flemish	x-vnd.Haiku-PowerStatus	3173765686
-Design capacity low warning: 	PowerStatus		Waarschuwing lage ontwerpcapaciteit:
-Show percent	PowerStatus		Toon percentage
-Design capacity: 	PowerStatus		Ontwerpcapaciteit
- mW	PowerStatus		mW
-The battery level is getting low, please plug in the device.	PowerStatus		De accu is bijna leeg. Sluit alstublieft het apparaat aan op een spanningsbron.
-Battery low	PowerStatus		Accu bijna leeg
-Type: 	PowerStatus		Type:
-non-rechargeable	PowerStatus		Niet-oplaadbaar
-Empty battery slot	PowerStatus		Accuvak is leeg
- mV	PowerStatus		mV
 Run in window	PowerStatus		Actief in venster
-PowerStatus	System name		PowerStatus
- mWh	PowerStatus		mWh
-Battery info…	PowerStatus		Accu-info...
-Damaged battery	PowerStatus		Beschadigde batterij
-Show time	PowerStatus		Toon de tijd
-Last full charge: 	PowerStatus		Laatst compleet opgeladen:
-Battery unused	PowerStatus		Accu ongebruikt
 Extended battery info	PowerStatus		Uitgebreide accu-informatie
- mA	PowerStatus		mA
+Show status icon	PowerStatus		Toon status-icoon
+Battery charging	PowerStatus		Accu laadt
+Design capacity low warning: 	PowerStatus		Waarschuwing lage ontwerpcapaciteit:
+The battery level is critical, please plug in the device immediately.	PowerStatus		Het accu-niveau is kritisch laag. Sluit alstublieft het apparaat onmiddelijk aan op een spanningsbron.
+non-rechargeable	PowerStatus		Niet-oplaadbaar
+Last full charge: 	PowerStatus		Laatst compleet opgeladen:
+ mV	PowerStatus		mV
 Current rate: 	PowerStatus		Huidige stroom:
-discharging	PowerStatus		Bezig met ontladen
 Show text label	PowerStatus		Toon tekstlabel
-About…	PowerStatus		Over...
+Quit	PowerStatus		Afsluiten
+Battery low	PowerStatus		Accu bijna leeg
 Model number: 	PowerStatus		Modelnummer
-Install in Deskbar	PowerStatus		Installeer in Deskbar
+Battery unused	PowerStatus		Accu ongebruikt
+Type: 	PowerStatus		Type:
+Damaged battery	PowerStatus		Beschadigde batterij
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		U kunt PowerStatus in een venster in actie hebben of in Deskbar installeren.
  mAh	PowerStatus		mAh
-Capacity: 	PowerStatus		Capaciteit
 Battery discharging	PowerStatus		Accu bezig met ontladen
+Design voltage: 	PowerStatus		Ontwerpvoltage:
+discharging	PowerStatus		Bezig met ontladen
+rechargeable	PowerStatus		oplaadbaar
+Battery info…	PowerStatus		Accu-info...
+Show time	PowerStatus		Toon de tijd
+ mA	PowerStatus		mA
+About…	PowerStatus		Over...
 Serial number: 	PowerStatus		Serienummer:
 Battery critical	PowerStatus		Accu-niveau kritisch laag
+Capacity: 	PowerStatus		Capaciteit
+ mW	PowerStatus		mW
+Show percent	PowerStatus		Toon percentage
 Capacity granularity 1: 	PowerStatus		Capaciteit van granulariteit 1:
-OEM info: 	PowerStatus		OEM-info:
-Design voltage: 	PowerStatus		Ontwerpvoltage:
-Battery charging	PowerStatus		Accu laadt
-The battery level is critical, please plug in the device immediately.	PowerStatus		Het accu-niveau is kritisch laag. Sluit alstublieft het apparaat onmiddelijk aan op een spanningsbron.
+The battery level is getting low, please plug in the device.	PowerStatus		De accu is bijna leeg. Sluit alstublieft het apparaat aan op een spanningsbron.
 Design capacity warning: 	PowerStatus		Waarschuwing ontwerpcapaciteit:
-Quit	PowerStatus		Afsluiten
-rechargeable	PowerStatus		oplaadbaar
-charging	PowerStatus		bezig met laden
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		U kunt PowerStatus in een venster in actie hebben of in Deskbar installeren.
-Show status icon	PowerStatus		Toon status-icoon
 Capacity granularity 2: 	PowerStatus		Capaciteit van granulariteit 2:
 Technology: 	PowerStatus		Techniek:
+ mWh	PowerStatus		mWh
+PowerStatus	System name		PowerStatus
+Design capacity: 	PowerStatus		Ontwerpcapaciteit
+OEM info: 	PowerStatus		OEM-info:
 no battery	PowerStatus		geen accu
+Empty battery slot	PowerStatus		Accuvak is leeg
+Install in Deskbar	PowerStatus		Installeer in Deskbar
+charging	PowerStatus		bezig met laden

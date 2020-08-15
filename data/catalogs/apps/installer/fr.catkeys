@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Installer	1874975245
+1	french	x-vnd.Haiku-Installer	3283947218
 Performing installation.	InstallProgress		Installation en cours.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Choisir le disque source dans la liste déroulante, puis cliquer sur « Commencer ».
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Veuillez fermer la fenêtre du Gestionnaire de Disques avant celle de l’Installeur.
@@ -40,7 +40,6 @@ Hide optional packages	InstallerWindow		Cacher les paquets optionnels
 ???	InstallerWindow	Unknown partition name	???
 Have fun and thanks for trying out Haiku!	InstallerApp		Amusez-vous et merci d’expérimenter Haiku !
 Quit	InstallerApp		Quitter
-Starting installation.	InstallProgress		Démarrage de l’installation.
 Error writing boot sector.	InstallProgress		Erreur d’écriture du secteur d’amorce.
 OK	InstallerWindow		OK
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Veuillez fermer les fenêtres du gestionnaire de démarrage et du gestionnaire de disques avant de quitter l’Installeur.

@@ -1,46 +1,46 @@
 1	swedish	x-vnd.Haiku-PowerStatus	3173765686
-Design capacity low warning: 	PowerStatus		Varning för låg tillverkningskapacitet:
-Show percent	PowerStatus		Visa procent
-Design capacity: 	PowerStatus		Tillverkningskapacitet:
- mW	PowerStatus		 mW
-The battery level is getting low, please plug in the device.	PowerStatus		Du börjat få lite ström i ditt batteri, anslut en laddkabel för att inte datorn ska få slut på batteri.
-Battery low	PowerStatus		Batterikapaciteten är låg
-Type: 	PowerStatus		Typ:
-non-rechargeable	PowerStatus		Ej uppladdningsbar
-Empty battery slot	PowerStatus		Tomt batterifack
- mV	PowerStatus		 mV
 Run in window	PowerStatus		Kör i fönster
-PowerStatus	System name		BatteriStatus
- mWh	PowerStatus		 mWh
-Battery info…	PowerStatus		Batteriinformation...
-Damaged battery	PowerStatus		Skadat batteri
-Show time	PowerStatus		Visa tid
-Last full charge: 	PowerStatus		Senast fulladdad:
-Battery unused	PowerStatus		Batteri oanvänt
 Extended battery info	PowerStatus		Ytterligare batteriinformation
- mA	PowerStatus		 mA
+Show status icon	PowerStatus		Visa statusikon
+Battery charging	PowerStatus		Laddar batteri
+Design capacity low warning: 	PowerStatus		Varning för låg tillverkningskapacitet:
+The battery level is critical, please plug in the device immediately.	PowerStatus		Batteri nivån är kritisk, sätt i laddkabel nu.
+non-rechargeable	PowerStatus		Ej uppladdningsbar
+Last full charge: 	PowerStatus		Senast fulladdad:
+ mV	PowerStatus		 mV
 Current rate: 	PowerStatus		Nuvarande värde:
-discharging	PowerStatus		laddar ur
 Show text label	PowerStatus		Visa textetikett
-About…	PowerStatus		Om...
+Quit	PowerStatus		Avsluta
+Battery low	PowerStatus		Batterikapaciteten är låg
 Model number: 	PowerStatus		Modellnummer:
-Install in Deskbar	PowerStatus		Installera i Deskbar
+Battery unused	PowerStatus		Batteri oanvänt
+Type: 	PowerStatus		Typ:
+Damaged battery	PowerStatus		Skadat batteri
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Du kan köra BatteriStatus i ett fönster eller i Deskbar.
  mAh	PowerStatus		 mAh
-Capacity: 	PowerStatus		Kapacitet:
 Battery discharging	PowerStatus		Laddar ur batteriet
+Design voltage: 	PowerStatus		Tillverkningsspänning:
+discharging	PowerStatus		laddar ur
+rechargeable	PowerStatus		uppladdningsbart
+Battery info…	PowerStatus		Batteriinformation...
+Show time	PowerStatus		Visa tid
+ mA	PowerStatus		 mA
+About…	PowerStatus		Om...
 Serial number: 	PowerStatus		Serienummer:
 Battery critical	PowerStatus		Kritiskt batteri
+Capacity: 	PowerStatus		Kapacitet:
+ mW	PowerStatus		 mW
+Show percent	PowerStatus		Visa procent
 Capacity granularity 1: 	PowerStatus		Kapacitetskornighet 1:
-OEM info: 	PowerStatus		OEM information:
-Design voltage: 	PowerStatus		Tillverkningsspänning:
-Battery charging	PowerStatus		Laddar batteri
-The battery level is critical, please plug in the device immediately.	PowerStatus		Batteri nivån är kritisk, sätt i laddkabel nu.
+The battery level is getting low, please plug in the device.	PowerStatus		Du börjat få lite ström i ditt batteri, anslut en laddkabel för att inte datorn ska få slut på batteri.
 Design capacity warning: 	PowerStatus		Varning för låg tillverkningskapacitet:
-Quit	PowerStatus		Avsluta
-rechargeable	PowerStatus		uppladdningsbart
-charging	PowerStatus		laddar
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Du kan köra BatteriStatus i ett fönster eller i Deskbar.
-Show status icon	PowerStatus		Visa statusikon
 Capacity granularity 2: 	PowerStatus		Kapacitetskornighet 2:
 Technology: 	PowerStatus		Teknik:
+ mWh	PowerStatus		 mWh
+PowerStatus	System name		BatteriStatus
+Design capacity: 	PowerStatus		Tillverkningskapacitet:
+OEM info: 	PowerStatus		OEM information:
 no battery	PowerStatus		inget batteri
+Empty battery slot	PowerStatus		Tomt batterifack
+Install in Deskbar	PowerStatus		Installera i Deskbar
+charging	PowerStatus		laddar

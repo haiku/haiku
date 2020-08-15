@@ -1,40 +1,40 @@
 1	croatian	x-vnd.Haiku-PowerStatus	1386106721
-Show percent	PowerStatus		Prikaži prostotke
- mW	PowerStatus		 mW
-The battery level is getting low, please plug in the device.	PowerStatus		Razina baterije postaje niska, molim priključite uređaj.
-Battery low	PowerStatus		Razina baterije niska
-Type: 	PowerStatus		Tip: 
-non-rechargeable	PowerStatus		nepunjivo
-Empty battery slot	PowerStatus		Prazano ležište baterije
- mV	PowerStatus		 mV
 Run in window	PowerStatus		Pokreni u prozoru
-PowerStatus	System name		Stanjeenergije
- mWh	PowerStatus		 mWh
-Battery info…	PowerStatus		Informacije o bateriji...
-Damaged battery	PowerStatus		Oštećena baterija
-Show time	PowerStatus		Prikaži vrijeme
-Last full charge: 	PowerStatus		Zadnje potpuno punjenje: 
-Battery unused	PowerStatus		Baterija nekorištena
 Extended battery info	PowerStatus		Proširene informacije o bateriji
- mA	PowerStatus		 mA
-discharging	PowerStatus		pražnjenje
-Show text label	PowerStatus		Prikaži tekst naljepnice
-About…	PowerStatus		O programu...
-Model number: 	PowerStatus		Broj modela: 
- mAh	PowerStatus		 mAh
-Capacity: 	PowerStatus		Kapacitet: 
-Battery discharging	PowerStatus		Pražnjenje baterije
-Serial number: 	PowerStatus		Serijski broj: 
-Battery critical	PowerStatus		Razina baterije kritična
-Capacity granularity 1: 	PowerStatus		Granulacija kapaciteta 1: 
-OEM info: 	PowerStatus		OEM info: 
+Show status icon	PowerStatus		Prikaži statusnu ikonu
 Battery charging	PowerStatus		Baterija se puni
 The battery level is critical, please plug in the device immediately.	PowerStatus		Razina baterije je kritična, molim priključite uređaj odmah.
+non-rechargeable	PowerStatus		nepunjivo
+Last full charge: 	PowerStatus		Zadnje potpuno punjenje: 
+ mV	PowerStatus		 mV
+Show text label	PowerStatus		Prikaži tekst naljepnice
 Quit	PowerStatus		Izađi
-rechargeable	PowerStatus		punjivo
-charging	PowerStatus		punjenje
+Battery low	PowerStatus		Razina baterije niska
+Model number: 	PowerStatus		Broj modela: 
+Battery unused	PowerStatus		Baterija nekorištena
+Type: 	PowerStatus		Tip: 
+Damaged battery	PowerStatus		Oštećena baterija
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Možete pokrenuti PowerStatus u prozoru ili ga instalirati u Deskbaru.
-Show status icon	PowerStatus		Prikaži statusnu ikonu
+ mAh	PowerStatus		 mAh
+Battery discharging	PowerStatus		Pražnjenje baterije
+discharging	PowerStatus		pražnjenje
+rechargeable	PowerStatus		punjivo
+Battery info…	PowerStatus		Informacije o bateriji...
+Show time	PowerStatus		Prikaži vrijeme
+ mA	PowerStatus		 mA
+About…	PowerStatus		O programu...
+Serial number: 	PowerStatus		Serijski broj: 
+Battery critical	PowerStatus		Razina baterije kritična
+Capacity: 	PowerStatus		Kapacitet: 
+ mW	PowerStatus		 mW
+Show percent	PowerStatus		Prikaži prostotke
+Capacity granularity 1: 	PowerStatus		Granulacija kapaciteta 1: 
+The battery level is getting low, please plug in the device.	PowerStatus		Razina baterije postaje niska, molim priključite uređaj.
 Capacity granularity 2: 	PowerStatus		Granulacija kapaciteta 2: 
 Technology: 	PowerStatus		Tehnologija: 
+ mWh	PowerStatus		 mWh
+PowerStatus	System name		Stanjeenergije
+OEM info: 	PowerStatus		OEM info: 
 no battery	PowerStatus		nema baterije
+Empty battery slot	PowerStatus		Prazano ležište baterije
+charging	PowerStatus		punjenje

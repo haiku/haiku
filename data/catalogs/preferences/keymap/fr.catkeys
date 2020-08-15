@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Keymap	2011801468
+1	french	x-vnd.Haiku-Keymap	1239258664
 Key	Modifier keys window	As in a computer keyboard key	Touche
 Japanese	KeymapNames		Japonais
 US	KeymapNames		US
@@ -103,6 +103,7 @@ Swiss-German	KeymapNames		Suisse-Allemand
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Touche contrôle
 Czech	KeymapNames		Tchèque
 Russian (Udmurt, Komi, Mari)	KeymapNames		Russe (Udmurt, Komi, Mari)
+Thai (TIS-820.2538)	KeymapNames		Thaï (TIS-820.2538)
 Control:	Modifier keys window	Control key role name	Contrôle :
 Generic 105-key International	KeyboardLayoutNames		Générique 105 touches International
 Disabled	Modifier keys window	Do nothing	Désactivé

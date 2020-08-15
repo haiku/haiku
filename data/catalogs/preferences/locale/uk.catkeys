@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Locale	288870027
+1	ukrainian	x-vnd.Haiku-Locale	1081217032
 Medium format:	TimeFormatSettings		Середній формат:
 Negative:	TimeFormatSettings		Від'ємний:
 Language	Locale Preflet Window		Мова
@@ -22,6 +22,7 @@ Preferred languages	Locale Preflet Window		Мови за вподобанням
 Full format:	TimeFormatSettings		Повний формат:
 Cancel	Locale Preflet Window		Скасувати
 Revert	Locale Preflet Window		Без змін
+Translate application and folder names	TimeFormatSettings		Перекладати назви програм та папок
 12 hour	TimeFormatSettings		12 годин
 Positive:	TimeFormatSettings		Додатній:
 Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Щоб застосувати зміни Deskbar і Tracker потребують перезапуску. Ви бажаєте зробити це зараз?

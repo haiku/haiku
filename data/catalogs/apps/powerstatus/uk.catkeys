@@ -1,46 +1,46 @@
 1	ukrainian	x-vnd.Haiku-PowerStatus	3173765686
-Design capacity low warning: 	PowerStatus		Попередження про зниження проектної ємності: 
-Show percent	PowerStatus		Показати процент
-Design capacity: 	PowerStatus		Паспортна ємність: 
- mW	PowerStatus		 мВт
-The battery level is getting low, please plug in the device.	PowerStatus		Рівень заряда батареї знижується, будь-ласка, під'єднайте пристрій до електромережі.
-Battery low	PowerStatus		Батарея розряджена
-Type: 	PowerStatus		Тип: 
-non-rechargeable	PowerStatus		не підлягає зарядці
-Empty battery slot	PowerStatus		Слот підключення батареї пустий
- mV	PowerStatus		 мВ
 Run in window	PowerStatus		Виконувати у вікні
-PowerStatus	System name		PowerStatus
- mWh	PowerStatus		 мВт·год
-Battery info…	PowerStatus		Дані батареї…
-Damaged battery	PowerStatus		Батарея пошкоджена
-Show time	PowerStatus		Показати час
-Last full charge: 	PowerStatus		Остання повна зарядка: 
-Battery unused	PowerStatus		Батарея не використовується
 Extended battery info	PowerStatus		Розширені дані батареї
- mA	PowerStatus		 мА
+Show status icon	PowerStatus		Показати значок стану
+Battery charging	PowerStatus		Батарея заряджається
+Design capacity low warning: 	PowerStatus		Попередження про зниження проектної ємності: 
+The battery level is critical, please plug in the device immediately.	PowerStatus		Розряд батареї критичний, негайно починайте її зарядку.
+non-rechargeable	PowerStatus		не підлягає зарядці
+Last full charge: 	PowerStatus		Остання повна зарядка: 
+ mV	PowerStatus		 мВ
 Current rate: 	PowerStatus		Біжучий розряд: 
-discharging	PowerStatus		розрядка
 Show text label	PowerStatus		Показати текстові мітки
-About…	PowerStatus		Про це…
+Quit	PowerStatus		Вийти
+Battery low	PowerStatus		Батарея розряджена
 Model number: 	PowerStatus		Номер моделі: 
-Install in Deskbar	PowerStatus		Встановити в Deskbar
+Battery unused	PowerStatus		Батарея не використовується
+Type: 	PowerStatus		Тип: 
+Damaged battery	PowerStatus		Батарея пошкоджена
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Ви можете запустити PowerStatus у вікні або встановити його у Deskbar.
  mAh	PowerStatus		 мА·год
-Capacity: 	PowerStatus		Ємність: 
 Battery discharging	PowerStatus		Батарея розряджена
+Design voltage: 	PowerStatus		Паспортна напруга: 
+discharging	PowerStatus		розрядка
+rechargeable	PowerStatus		заряджувана
+Battery info…	PowerStatus		Дані батареї…
+Show time	PowerStatus		Показати час
+ mA	PowerStatus		 мА
+About…	PowerStatus		Про це…
 Serial number: 	PowerStatus		Серійний номер: 
 Battery critical	PowerStatus		Розряд батареї критичний
+Capacity: 	PowerStatus		Ємність: 
+ mW	PowerStatus		 мВт
+Show percent	PowerStatus		Показати процент
 Capacity granularity 1: 	PowerStatus		Градація ємності 1: 
-OEM info: 	PowerStatus		Дані OEM: 
-Design voltage: 	PowerStatus		Паспортна напруга: 
-Battery charging	PowerStatus		Батарея заряджається
-The battery level is critical, please plug in the device immediately.	PowerStatus		Розряд батареї критичний, негайно починайте її зарядку.
+The battery level is getting low, please plug in the device.	PowerStatus		Рівень заряда батареї знижується, будь-ласка, під'єднайте пристрій до електромережі.
 Design capacity warning: 	PowerStatus		Попередження про проектну ємність: 
-Quit	PowerStatus		Вийти
-rechargeable	PowerStatus		заряджувана
-charging	PowerStatus		зарядка
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Ви можете запустити PowerStatus у вікні або встановити його у Deskbar.
-Show status icon	PowerStatus		Показати значок стану
 Capacity granularity 2: 	PowerStatus		Градація ємності 2: 
 Technology: 	PowerStatus		Технологія: 
+ mWh	PowerStatus		 мВт·год
+PowerStatus	System name		PowerStatus
+Design capacity: 	PowerStatus		Паспортна ємність: 
+OEM info: 	PowerStatus		Дані OEM: 
 no battery	PowerStatus		батарея відсутня
+Empty battery slot	PowerStatus		Слот підключення батареї пустий
+Install in Deskbar	PowerStatus		Встановити в Deskbar
+charging	PowerStatus		зарядка

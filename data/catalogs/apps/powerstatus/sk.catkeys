@@ -1,46 +1,46 @@
 1	slovak	x-vnd.Haiku-PowerStatus	3173765686
-Design capacity low warning: 	PowerStatus		Upozornenie na nízku navrhnutú kapacitu: 
-Show percent	PowerStatus		Zobrazovať percentá
-Design capacity: 	PowerStatus		Navrhnutá kapacita: 
- mW	PowerStatus		 mW
-The battery level is getting low, please plug in the device.	PowerStatus		Úroveň nabitia batérie je nízka. Prosím, pripojte zariadenie do elektrickej siete.
-Battery low	PowerStatus		Nízka úroveň batérie
-Type: 	PowerStatus		Typ: 
-non-rechargeable	PowerStatus		nedobíjateľná
-Empty battery slot	PowerStatus		Prázdne miesto na batériu
- mV	PowerStatus		 mV
 Run in window	PowerStatus		Spúšťať v okne
-PowerStatus	System name		Stav napájania
- mWh	PowerStatus		 mWh
-Battery info…	PowerStatus		Info o batérii…
-Damaged battery	PowerStatus		Poškodená batéria
-Show time	PowerStatus		Zobraziť čas
-Last full charge: 	PowerStatus		Naposledy celkom nabitá: 
-Battery unused	PowerStatus		Batéria nepoužitá
 Extended battery info	PowerStatus		Rozšírené info o batérii
- mA	PowerStatus		 mA
+Show status icon	PowerStatus		Zobrazovať stavovú ikonu
+Battery charging	PowerStatus		Batéria sa nabíja
+Design capacity low warning: 	PowerStatus		Upozornenie na nízku navrhnutú kapacitu: 
+The battery level is critical, please plug in the device immediately.	PowerStatus		Úroveň nabitia batérie je kritická. Prosím, ihneď pripojte zariadenie do elektrickej siete.
+non-rechargeable	PowerStatus		nedobíjateľná
+Last full charge: 	PowerStatus		Naposledy celkom nabitá: 
+ mV	PowerStatus		 mV
 Current rate: 	PowerStatus		Prúd: 
-discharging	PowerStatus		vybíja sa
 Show text label	PowerStatus		Zobraziť textové návestie
-About…	PowerStatus		O aplikácii…
+Quit	PowerStatus		Ukončiť
+Battery low	PowerStatus		Nízka úroveň batérie
 Model number: 	PowerStatus		Číslo modelu: 
-Install in Deskbar	PowerStatus		Nainštalovať do Panelu
+Battery unused	PowerStatus		Batéria nepoužitá
+Type: 	PowerStatus		Typ: 
+Damaged battery	PowerStatus		Poškodená batéria
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Stav napájania môžete spúšťať v okne alebo ho nainštalovať do Panelu.
  mAh	PowerStatus		 mAh
-Capacity: 	PowerStatus		Kapacita: 
 Battery discharging	PowerStatus		Batéria sa vybíja
+Design voltage: 	PowerStatus		Návrhové napätie: 
+discharging	PowerStatus		vybíja sa
+rechargeable	PowerStatus		dobíjateľná
+Battery info…	PowerStatus		Info o batérii…
+Show time	PowerStatus		Zobraziť čas
+ mA	PowerStatus		 mA
+About…	PowerStatus		O aplikácii…
 Serial number: 	PowerStatus		Sériové číslo: 
 Battery critical	PowerStatus		Kritická úroveň batérie
+Capacity: 	PowerStatus		Kapacita: 
+ mW	PowerStatus		 mW
+Show percent	PowerStatus		Zobrazovať percentá
 Capacity granularity 1: 	PowerStatus		Granularita kapacity 1: 
-OEM info: 	PowerStatus		Info OEM: 
-Design voltage: 	PowerStatus		Návrhové napätie: 
-Battery charging	PowerStatus		Batéria sa nabíja
-The battery level is critical, please plug in the device immediately.	PowerStatus		Úroveň nabitia batérie je kritická. Prosím, ihneď pripojte zariadenie do elektrickej siete.
+The battery level is getting low, please plug in the device.	PowerStatus		Úroveň nabitia batérie je nízka. Prosím, pripojte zariadenie do elektrickej siete.
 Design capacity warning: 	PowerStatus		Upozornenie navrhnutej kapacity: 
-Quit	PowerStatus		Ukončiť
-rechargeable	PowerStatus		dobíjateľná
-charging	PowerStatus		nabíja sa
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Stav napájania môžete spúšťať v okne alebo ho nainštalovať do Panelu.
-Show status icon	PowerStatus		Zobrazovať stavovú ikonu
 Capacity granularity 2: 	PowerStatus		Granularita kapacity 2: 
 Technology: 	PowerStatus		Technológia: 
+ mWh	PowerStatus		 mWh
+PowerStatus	System name		Stav napájania
+Design capacity: 	PowerStatus		Navrhnutá kapacita: 
+OEM info: 	PowerStatus		Info OEM: 
 no battery	PowerStatus		bez batérie
+Empty battery slot	PowerStatus		Prázdne miesto na batériu
+Install in Deskbar	PowerStatus		Nainštalovať do Panelu
+charging	PowerStatus		nabíja sa

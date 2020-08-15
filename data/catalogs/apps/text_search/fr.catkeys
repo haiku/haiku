@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku.TextSearch	2224690775
+1	french	x-vnd.Haiku.TextSearch	1757850908
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Veuillez choisir les fichiers qui seront sélectionnés pour vous dans le Tracker.
 %appname% : %path%	GrepWindow		%appname% : %path%
 Failed to start xargs program!	Grepper		Impossible de démarrer le programme xargs !
@@ -6,6 +6,7 @@ Open selection	GrepWindow		Ouvrir la sélection
 Actions	GrepWindow		Actions
 New window	GrepWindow		Nouvelle fenêtre
 Encoding	GrepWindow		Encodage
+Set target to parent folder	GrepWindow		Définir le dossier parent pour cible
 OK	GrepWindow		OK
 %appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
 Close	GrepWindow		Fermer
@@ -30,6 +31,7 @@ Skip folders starting with a dot	GrepWindow		Ignorer les dossiers commençant pa
 Failed to open output pipe!	Grepper		Impossible d’ouvrir le flux de sortie !
 Cancel	GrepWindow		Annuler
 History	GrepWindow		Historique
+TextSearch	System name		RechercheTexte
 File	GrepWindow		Fichier
 Case-sensitive	GrepWindow		Sensible à la casse
 Select all	GrepWindow		Tout sélectionner

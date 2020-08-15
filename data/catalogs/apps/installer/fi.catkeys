@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Installer	1950949181
+1	finnish	x-vnd.Haiku-Installer	3359921154
 Performing installation.	InstallProgress		Suoritetaan asennus.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Valitse lähdelevy ponnahdusvalikosta. Napsauta sitten ”Aloita”.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Sulje ”Levyasema-asetukset”-ikkuna ennen Asennusohjelman ikkunan sulkemista.
@@ -40,7 +40,6 @@ Hide optional packages	InstallerWindow		Piilota valinnaiset pakkaukset
 ???	InstallerWindow	Unknown partition name	???
 Have fun and thanks for trying out Haiku!	InstallerApp		Pidä hauskaa ja kiitos, että kokeilet Haikua!
 Quit	InstallerApp		Lopeta
-Starting installation.	InstallProgress		Aloitetaan asennus.
 Error writing boot sector.	InstallProgress		Käynnistyssektorin kirjoitusvirhe.
 OK	InstallerWindow		Valmis
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Sulje ensin Käynnistyshallinta- ja Levyasema-asetusikkunat ennen asennusohjelman ikkunan sulkemista.

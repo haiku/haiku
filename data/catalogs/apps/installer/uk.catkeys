@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Installer	2784107891
+1	ukrainian	x-vnd.Haiku-Installer	4193079864
 Performing installation.	InstallProgress		Виконання інсталяції.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Виберіть джерело з випадаючого меню. Потім натисніть кнопку \"Почати\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Закрийте вікно DriveSetup перед тим як закрити вікно Installer.
@@ -38,7 +38,6 @@ Hide optional packages	InstallerWindow		Сховати опціональні п
 ???	InstallerWindow	Unknown partition name	???
 Have fun and thanks for trying out Haiku!	InstallerApp		Удачі та дякую, що випробували Haiku!
 Quit	InstallerApp		Вийти
-Starting installation.	InstallProgress		Починається інсталяція.
 Error writing boot sector.	InstallProgress		Помилка запису завантажувального сектору.
 OK	InstallerWindow		ОК
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Закрийте Boot Manager та DriveSetup перед тим як закрити вікно Installer.

@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-Installer	3634316706
+1	danish	x-vnd.Haiku-Installer	748321383
 Performing installation.	InstallProgress		Udfører installation.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Vælg en oprindelsesdisk fra popup-menuen. Tryk dernæst på \"Begynd\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Luk venligst vinduet for drevopsætning, før du lukker installationsvinduet.
@@ -39,7 +39,6 @@ Hide optional packages	InstallerWindow		Skjul valgfri pakker
 ???	InstallerWindow	Unknown partition name	???
 Have fun and thanks for trying out Haiku!	InstallerApp		Hav det sjovt og tak fordi du prøver Haiku!
 Quit	InstallerApp		Afslut
-Starting installation.	InstallProgress		Starter installationen.
 Error writing boot sector.	InstallProgress		Fejl ved skrivning af opstartssektor.
 OK	InstallerWindow		OK
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Luk venligst vinduerne for opstartsmanager og drevopsætning, før du lukker vinduet for installationen.

@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Installer	2784107891
+1	dutch; flemish	x-vnd.Haiku-Installer	4193079864
 Performing installation.	InstallProgress		Uitvoering installatie.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Kies de bronschijf in de pop-up-menu's. Klik daarna \"Begin\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Sluit alstublieft het DriveSetup-venster voordat u het Installer-venster sluit.
@@ -38,7 +38,6 @@ Hide optional packages	InstallerWindow		Optionele paketten niet tonen
 ???	InstallerWindow	Unknown partition name	???
 Have fun and thanks for trying out Haiku!	InstallerApp		Veel plezier en bedankt voor het uitproberen van Haiku!
 Quit	InstallerApp		Afsluiten
-Starting installation.	InstallProgress		Bezig met het starten van de installatie.
 Error writing boot sector.	InstallProgress		Fout bij het schrijven van de bootsector.
 OK	InstallerWindow		Oké
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Sluit alstublieft de vensters van Boot Manager en DriveSetup, voordat u het Installer-venster sluit.

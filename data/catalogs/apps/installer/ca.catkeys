@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Installer	1874975245
+1	catalan; valencian	x-vnd.Haiku-Installer	3283947218
 Performing installation.	InstallProgress		Es fa la instal·lació.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Trieu el disc d'origen des del menú emergent. Llavors cliqueu a Comença.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Si us plau, tanqueu la finestra del Gestor de discs abans de tancar la finestra de l'instal·lador.
@@ -40,7 +40,6 @@ Hide optional packages	InstallerWindow		Amaga els paquets opcionals
 ???	InstallerWindow	Unknown partition name	???
 Have fun and thanks for trying out Haiku!	InstallerApp		Divertiu-vos i gràcies per provar el Haiku!
 Quit	InstallerApp		Surt
-Starting installation.	InstallProgress		Comença la instal·lació.
 Error writing boot sector.	InstallProgress		Error en escriure el sector d'arrencada.
 OK	InstallerWindow		D'acord
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Si us plau, tanqueu les finestres del Gestor d'arrencada i del Gestor de discs abans de tancar la finestra de l'instal·lador.

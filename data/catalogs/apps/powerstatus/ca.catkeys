@@ -1,46 +1,46 @@
 1	catalan; valencian	x-vnd.Haiku-PowerStatus	3173765686
-Design capacity low warning: 	PowerStatus		Avís de capacitat de disseny baixa: 
-Show percent	PowerStatus		Mostra'n el percentatge
-Design capacity: 	PowerStatus		Capacitat del disseny: 
- mW	PowerStatus		 mW
-The battery level is getting low, please plug in the device.	PowerStatus		El nivell de bateria comença a ser baix; si us plau, endolleu el dispositiu.
-Battery low	PowerStatus		Bateria baixa
-Type: 	PowerStatus		Tipus: 
-non-rechargeable	PowerStatus		no recarregable
-Empty battery slot	PowerStatus		Ranura buida de bateria
- mV	PowerStatus		 mV
 Run in window	PowerStatus		Executa en una finestra
-PowerStatus	System name		Estat de l'energia
- mWh	PowerStatus		 mWh
-Battery info…	PowerStatus		Informació de la bateria...
-Damaged battery	PowerStatus		Bateria malmesa
-Show time	PowerStatus		Mostra'n el temps
-Last full charge: 	PowerStatus		Darrera càrrega completa: 
-Battery unused	PowerStatus		Bateria no usada
 Extended battery info	PowerStatus		Informació ampliada de la bateria
- mA	PowerStatus		 mA
+Show status icon	PowerStatus		Mostra la icona de l'estat
+Battery charging	PowerStatus		La bateria es carrega.
+Design capacity low warning: 	PowerStatus		Avís de capacitat de disseny baixa: 
+The battery level is critical, please plug in the device immediately.	PowerStatus		El nivell de la bateria és crític. Si us plau, endolleu el dispositiu immediatament.
+non-rechargeable	PowerStatus		no recarregable
+Last full charge: 	PowerStatus		Darrera càrrega completa: 
+ mV	PowerStatus		 mV
 Current rate: 	PowerStatus		Freqüència actual: 
-discharging	PowerStatus		es descarrega
 Show text label	PowerStatus		Mostra l'etiqueta de text
-About…	PowerStatus		Quant a...
+Quit	PowerStatus		Surt
+Battery low	PowerStatus		Bateria baixa
 Model number: 	PowerStatus		Número del model: 
-Install in Deskbar	PowerStatus		Instal·la-ho a la barra d'escriptori
+Battery unused	PowerStatus		Bateria no usada
+Type: 	PowerStatus		Tipus: 
+Damaged battery	PowerStatus		Bateria malmesa
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Podeu executar l'Estat de l'energia en una finestra o instal·lar-lo a la barra d’escriptori.
  mAh	PowerStatus		 mAh
-Capacity: 	PowerStatus		Capacitat: 
 Battery discharging	PowerStatus		La bateria es descarrega.
+Design voltage: 	PowerStatus		Voltatge de disseny: 
+discharging	PowerStatus		es descarrega
+rechargeable	PowerStatus		recarregable
+Battery info…	PowerStatus		Informació de la bateria...
+Show time	PowerStatus		Mostra'n el temps
+ mA	PowerStatus		 mA
+About…	PowerStatus		Quant a...
 Serial number: 	PowerStatus		Número de sèrie: 
 Battery critical	PowerStatus		Bateria crítica
+Capacity: 	PowerStatus		Capacitat: 
+ mW	PowerStatus		 mW
+Show percent	PowerStatus		Mostra'n el percentatge
 Capacity granularity 1: 	PowerStatus		Granularitat de la capacitat 1: 
-OEM info: 	PowerStatus		Informació d'OEM: 
-Design voltage: 	PowerStatus		Voltatge de disseny: 
-Battery charging	PowerStatus		La bateria es carrega.
-The battery level is critical, please plug in the device immediately.	PowerStatus		El nivell de la bateria és crític. Si us plau, endolleu el dispositiu immediatament.
+The battery level is getting low, please plug in the device.	PowerStatus		El nivell de bateria comença a ser baix; si us plau, endolleu el dispositiu.
 Design capacity warning: 	PowerStatus		Avís de la capacitat de disseny: 
-Quit	PowerStatus		Surt
-rechargeable	PowerStatus		recarregable
-charging	PowerStatus		es carrega
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Podeu executar l'Estat de l'energia en una finestra o instal·lar-lo a la barra d’escriptori.
-Show status icon	PowerStatus		Mostra la icona de l'estat
 Capacity granularity 2: 	PowerStatus		Granularitat de la capacitat 2: 
 Technology: 	PowerStatus		Tecnologia: 
+ mWh	PowerStatus		 mWh
+PowerStatus	System name		Estat de l'energia
+Design capacity: 	PowerStatus		Capacitat del disseny: 
+OEM info: 	PowerStatus		Informació d'OEM: 
 no battery	PowerStatus		sense bateria
+Empty battery slot	PowerStatus		Ranura buida de bateria
+Install in Deskbar	PowerStatus		Instal·la-ho a la barra d'escriptori
+charging	PowerStatus		es carrega

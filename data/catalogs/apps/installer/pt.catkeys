@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-Installer	2784107891
+1	portuguese	x-vnd.Haiku-Installer	4193079864
 Performing installation.	InstallProgress		A executar a instalação.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Escolha o disco de origem usando o menu de pop-up. Depois clique em \"Iniciar\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Feche a janela do Gestor de Discos antes de fechar a janela do Instalador.
@@ -38,7 +38,6 @@ Hide optional packages	InstallerWindow		Ocultar pacotes opcionais
 ???	InstallerWindow	Unknown partition name	???
 Have fun and thanks for trying out Haiku!	InstallerApp		Divirta-se, e obrigado por experimentar o Haiku!
 Quit	InstallerApp		Sair
-Starting installation.	InstallProgress		A iniciar a instalação.
 Error writing boot sector.	InstallProgress		Erro ao escrever no setor de arranque.
 OK	InstallerWindow		OK
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Feche as janelas do Gestor de Arranque e do Gestor de Discos antes de fechar a janela do Instalador.

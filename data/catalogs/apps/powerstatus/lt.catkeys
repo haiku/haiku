@@ -1,42 +1,42 @@
 1	lithuanian	x-vnd.Haiku-PowerStatus	2428503748
-Design capacity low warning: 	PowerStatus		Numatytasis įspėjimas apie sumažėjusią talpą: 
-Show percent	PowerStatus		Rodyti procentais
-Design capacity: 	PowerStatus		Numatytoji talpa: 
- mW	PowerStatus		 mW
-Type: 	PowerStatus		Tipas: 
-non-rechargeable	PowerStatus		neįkraunama
-Empty battery slot	PowerStatus		Baterijos lizdas tuščias
- mV	PowerStatus		 mV
 Run in window	PowerStatus		Paleisti lange
-PowerStatus	System name		Maitinimo būsena
- mWh	PowerStatus		 mWh
-Battery info…	PowerStatus		Baterijos savybės…
-Damaged battery	PowerStatus		Baterija pažeista
-Show time	PowerStatus		Rodyti laiką
-Last full charge: 	PowerStatus		Paskiausioji pilna įkrova: 
-Battery unused	PowerStatus		Baterija nenaudojama
 Extended battery info	PowerStatus		Išsamesni baterijos duomenys
- mA	PowerStatus		 mA
-Current rate: 	PowerStatus		Dabartinė vertė: 
-discharging	PowerStatus		iškraunama
-Show text label	PowerStatus		Rodyti etiketę
-About…	PowerStatus		Apie programą…
-Model number: 	PowerStatus		Modelio numeris: 
-Install in Deskbar	PowerStatus		Patalpinti pranešimų srityje
- mAh	PowerStatus		 mAh
-Capacity: 	PowerStatus		Talpa: 
-Battery discharging	PowerStatus		Baterija iškraunama
-Serial number: 	PowerStatus		Serijinis numeris: 
-Capacity granularity 1: 	PowerStatus		Talpos detalizavimas 1: 
-OEM info: 	PowerStatus		OĮG informacija: 
-Design voltage: 	PowerStatus		Numatytoji įtampa: 
-Battery charging	PowerStatus		Baterija įkraunama
-Design capacity warning: 	PowerStatus		Numatytasis įspėjimas apie talpą: 
-Quit	PowerStatus		Baigti darbą
-rechargeable	PowerStatus		įkraunama
-charging	PowerStatus		įkraunama
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Šią programą galite paleisti atskirame lange arba patalpinti pranešimų srityje.
 Show status icon	PowerStatus		Rodyti būsenos piktogramą
+Battery charging	PowerStatus		Baterija įkraunama
+Design capacity low warning: 	PowerStatus		Numatytasis įspėjimas apie sumažėjusią talpą: 
+non-rechargeable	PowerStatus		neįkraunama
+Last full charge: 	PowerStatus		Paskiausioji pilna įkrova: 
+ mV	PowerStatus		 mV
+Current rate: 	PowerStatus		Dabartinė vertė: 
+Show text label	PowerStatus		Rodyti etiketę
+Quit	PowerStatus		Baigti darbą
+Model number: 	PowerStatus		Modelio numeris: 
+Battery unused	PowerStatus		Baterija nenaudojama
+Type: 	PowerStatus		Tipas: 
+Damaged battery	PowerStatus		Baterija pažeista
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Šią programą galite paleisti atskirame lange arba patalpinti pranešimų srityje.
+ mAh	PowerStatus		 mAh
+Battery discharging	PowerStatus		Baterija iškraunama
+Design voltage: 	PowerStatus		Numatytoji įtampa: 
+discharging	PowerStatus		iškraunama
+rechargeable	PowerStatus		įkraunama
+Battery info…	PowerStatus		Baterijos savybės…
+Show time	PowerStatus		Rodyti laiką
+ mA	PowerStatus		 mA
+About…	PowerStatus		Apie programą…
+Serial number: 	PowerStatus		Serijinis numeris: 
+Capacity: 	PowerStatus		Talpa: 
+ mW	PowerStatus		 mW
+Show percent	PowerStatus		Rodyti procentais
+Capacity granularity 1: 	PowerStatus		Talpos detalizavimas 1: 
+Design capacity warning: 	PowerStatus		Numatytasis įspėjimas apie talpą: 
 Capacity granularity 2: 	PowerStatus		Talpos detalizavimas 2: 
 Technology: 	PowerStatus		Technologija: 
+ mWh	PowerStatus		 mWh
+PowerStatus	System name		Maitinimo būsena
+Design capacity: 	PowerStatus		Numatytoji talpa: 
+OEM info: 	PowerStatus		OĮG informacija: 
 no battery	PowerStatus		be baterijos
+Empty battery slot	PowerStatus		Baterijos lizdas tuščias
+Install in Deskbar	PowerStatus		Patalpinti pranešimų srityje
+charging	PowerStatus		įkraunama

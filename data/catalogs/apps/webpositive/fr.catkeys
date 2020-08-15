@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-WebPositive	55235296
+1	french	x-vnd.Haiku-WebPositive	1591513524
 Authentication required	Authentication Panel		Authentification requise
 Previous	WebPositive Window		Précédent
 (Finish: %date)	Download Window		(Fin : %date)
@@ -129,6 +129,7 @@ Double-click or middle-click to open new tab.	Tab Manager		Double-cliquez ou cli
 Next	WebPositive Window		Suivant
 Bookmark error	WebPositive Window		Erreur de signet
 OK	WebPositive Window		OK
+(%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% sur %expectedSize%, %rate%/s)
 WebPositive	Download Window		WebPositive
 Zoom text only	WebPositive Window		Grossir uniquement le texte
 Save page as…	WebPositive Window		Enregistrer la page sous…

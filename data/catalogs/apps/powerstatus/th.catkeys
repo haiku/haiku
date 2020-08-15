@@ -1,46 +1,46 @@
 1	thai	x-vnd.Haiku-PowerStatus	3173765686
-Design capacity low warning: 	PowerStatus		คำเตือนพื้นที่ความจุที่กำหนดต่ำ:
-Show percent	PowerStatus		แสดงเปอร์เซ็นต์
-Design capacity: 	PowerStatus		ปริมาณที่กำหนด:
- mW	PowerStatus		mW
-The battery level is getting low, please plug in the device.	PowerStatus		ระดับแบตเตอรี่ใกล้หมดโปรดเสียบอุปกรณ์เครื่องชาร์จแบตเตอรี่
-Battery low	PowerStatus		แบตเตอรี่ต่ำ
-Type: 	PowerStatus		ชนิด:
-non-rechargeable	PowerStatus		ไม่สามารถชาร์จได้
-Empty battery slot	PowerStatus		ช่องเสียบแบตเตอรี่ว่างเปล่า
- mV	PowerStatus		mV
 Run in window	PowerStatus		ทำงานในหน้าต่าง
-PowerStatus	System name		สถานะพลังงาน
- mWh	PowerStatus		mWh
-Battery info…	PowerStatus		ข้อมูลแบตเตอรี่
-Damaged battery	PowerStatus		แบตเตอรี่เสียหาย
-Show time	PowerStatus		แสดงเวลา
-Last full charge: 	PowerStatus		ประจุเต็มครั้งล่าสุด:
-Battery unused	PowerStatus		ไม่ได้ใช้แบตเตอรี่
 Extended battery info	PowerStatus		ข้อมูลแบตเตอรี่เพิ่มเติม
- mA	PowerStatus		mA
+Show status icon	PowerStatus		แสดงไอคอนสถานะ
+Battery charging	PowerStatus		กำลังชาร์จแบตเตอรี่
+Design capacity low warning: 	PowerStatus		คำเตือนพื้นที่ความจุที่กำหนดต่ำ:
+The battery level is critical, please plug in the device immediately.	PowerStatus		ระดับแบตเตอรี่ต่ำมากโปรดเสียบเข้ากับอุปกรณ์ชาร์จแบตเตอรี่ทันที
+non-rechargeable	PowerStatus		ไม่สามารถชาร์จได้
+Last full charge: 	PowerStatus		ประจุเต็มครั้งล่าสุด:
+ mV	PowerStatus		mV
 Current rate: 	PowerStatus		อัตรากระแสไฟฟ้า:
-discharging	PowerStatus		ถอดออก
 Show text label	PowerStatus		แสดงป้ายข้อความ
-About…	PowerStatus		เกี่ยวกับ
+Quit	PowerStatus		ออก
+Battery low	PowerStatus		แบตเตอรี่ต่ำ
 Model number: 	PowerStatus		เลขโมเดล:
-Install in Deskbar	PowerStatus		ติดตั้งในเดสก์บาร์
+Battery unused	PowerStatus		ไม่ได้ใช้แบตเตอรี่
+Type: 	PowerStatus		ชนิด:
+Damaged battery	PowerStatus		แบตเตอรี่เสียหาย
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		คุณสามารถเรียกใช้งานแสดงสถานะพลังงานในหน้าต่างหรือติดตั้งในเดสก์บาร์
  mAh	PowerStatus		mAh
-Capacity: 	PowerStatus		ความจุ:
 Battery discharging	PowerStatus		กำลังถอดแบตเตอรี่ออก
+Design voltage: 	PowerStatus		แรงดันไฟฟ้าที่กำหนด:
+discharging	PowerStatus		ถอดออก
+rechargeable	PowerStatus		สามารถชาร์จได้
+Battery info…	PowerStatus		ข้อมูลแบตเตอรี่
+Show time	PowerStatus		แสดงเวลา
+ mA	PowerStatus		mA
+About…	PowerStatus		เกี่ยวกับ
 Serial number: 	PowerStatus		หมายเลขซีเรียล:
 Battery critical	PowerStatus		แบตเตอรี่ต่ำมาก
+Capacity: 	PowerStatus		ความจุ:
+ mW	PowerStatus		mW
+Show percent	PowerStatus		แสดงเปอร์เซ็นต์
 Capacity granularity 1: 	PowerStatus		รายละเอียดความจู 1:
-OEM info: 	PowerStatus		ข้อมูล OEM
-Design voltage: 	PowerStatus		แรงดันไฟฟ้าที่กำหนด:
-Battery charging	PowerStatus		กำลังชาร์จแบตเตอรี่
-The battery level is critical, please plug in the device immediately.	PowerStatus		ระดับแบตเตอรี่ต่ำมากโปรดเสียบเข้ากับอุปกรณ์ชาร์จแบตเตอรี่ทันที
+The battery level is getting low, please plug in the device.	PowerStatus		ระดับแบตเตอรี่ใกล้หมดโปรดเสียบอุปกรณ์เครื่องชาร์จแบตเตอรี่
 Design capacity warning: 	PowerStatus		คำเตือนความสามารถในการกำหนด:
-Quit	PowerStatus		ออก
-rechargeable	PowerStatus		สามารถชาร์จได้
-charging	PowerStatus		กำลังชาร์จ
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		คุณสามารถเรียกใช้งานแสดงสถานะพลังงานในหน้าต่างหรือติดตั้งในเดสก์บาร์
-Show status icon	PowerStatus		แสดงไอคอนสถานะ
 Capacity granularity 2: 	PowerStatus		รายละเอียดความจุ 2:
 Technology: 	PowerStatus		เทคโนโลยี:
+ mWh	PowerStatus		mWh
+PowerStatus	System name		สถานะพลังงาน
+Design capacity: 	PowerStatus		ปริมาณที่กำหนด:
+OEM info: 	PowerStatus		ข้อมูล OEM
 no battery	PowerStatus		ไม่มีแบตเตอรี่
+Empty battery slot	PowerStatus		ช่องเสียบแบตเตอรี่ว่างเปล่า
+Install in Deskbar	PowerStatus		ติดตั้งในเดสก์บาร์
+charging	PowerStatus		กำลังชาร์จ

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Locale	288870027
+1	french	x-vnd.Haiku-Locale	1081217032
 Medium format:	TimeFormatSettings		Format moyen :
 Negative:	TimeFormatSettings		Négatif :
 Language	Locale Preflet Window		Langue
@@ -22,6 +22,7 @@ Preferred languages	Locale Preflet Window		Langues préférées
 Full format:	TimeFormatSettings		Format détaillé :
 Cancel	Locale Preflet Window		Annuler
 Revert	Locale Preflet Window		Rétablir
+Translate application and folder names	TimeFormatSettings		Traduire les applications et les noms de dossiers
 12 hour	TimeFormatSettings		12 heures
 Positive:	TimeFormatSettings		Positif :
 Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Le Tracker et la Deskbar ont besoin d’être redémarrés pour prendre en compte cette modification. Souhaitez-vous les redémarrer maintenant ?

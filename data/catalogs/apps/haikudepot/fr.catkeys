@@ -1,5 +1,6 @@
-1	french	x-vnd.Haiku-HaikuDepot	3833361367
+1	french	x-vnd.Haiku-HaikuDepot	1546691996
 Repository update error	LocalRepositoryUpdateProcess		Erreur à l’actualisation du dépôt
+Network error	ServerHelper		Erreur réseau
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Une erreur est survenue lors du rafraîchissement : %error%
 User Created	UserLoginWindow		Utilisateur créé
 Check for updates…	MainWindow		Vérifier les mises à jour…
@@ -19,6 +20,7 @@ You have successfully authenticated as user %Nickname%.	UserLoginWindow		Vous ê
 No user ratings available.	PackageInfoView		Aucun avis d’utilisateurs.
 Downloading package '%name%'	WorkStatusView		Téléchargement du paquet « %name% »
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Il n’a pas été possible d’extraire les informations Captcha nécessaires depuis les données renvoyées par le serveur.
+A network transport error has arisen communicating with the server system: %s	ServerHelper		Une erreur de transport réseau est survenue lors de la communication avec le serveur : %s
 Rating	PackageListView		Évaluation
 Synchronizing icons	ServerIconExportUpdateProcess		Synchronisation des icônes
 Does not start	RatePackageWindow		Ne démarre pas
@@ -75,6 +77,7 @@ Reboot required	PackageManager		Redémarrage nécessaire
 Very unstable	RatePackageWindow		Très instable
 Password:	UserLoginWindow		Mot de passe :
 All packages	PackageListView		Tous les paquets
+This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Cette application est trop ancienne pour communiquer avec le serveur. Obtenez une version plus récente de cette application en mettant à jour votre système. La version minimale requise de cette application est « %s ».
 Stability	RatePackageWindow		Stabilité
 Send	RatePackageWindow		Envoyer
 Start package daemon	App		Démarrer le serveur de paquets
@@ -98,6 +101,7 @@ Repository	PackageListView		Dépôt
 The email is malformed.	UserLoginWindow		L’adresse mail est malformée.
 Close	UserLoginWindow		Fermer
 Close	RatePackageWindow		Fermer
+An unexpected error has been sent from the server [%i]	ServerHelper		Le serveur a retourné une erreur inattendue [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synchronisation des données de paquets depuis le dépôt "%REPO_NAME%".
 View the usage conditions	UserLoginWindow		Voir les conditions d’utilisation
 Login issue	MainWindow		Problème d’authentification
@@ -122,6 +126,7 @@ Log out	MainWindow		Déconnexion
 Comment language:	RatePackageWindow		Langue du commentaire :
 Status	PackageListView		État
 The password has been incorrectly repeated.	UserLoginWindow		Le mot de passe a été répété de manière incorrecte.
+Network transport error	ServerHelper		Erreur de transport réseau
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		Le mot de passe précédemment fourni pour l’utilisateur [%Nickname%] n’est plus valable. L’utilisateur sera déconnecté de cette application et vous devrez vous reconnecter avec votre nouveau mot de passe.
 Update	RatePackageWindow		Mettre à jour
 OK	ServerHelper		OK
@@ -137,6 +142,7 @@ The nickname is required.	UserLoginWindow		Le surnom est requis.
 Source packages	MainWindow		Paquets sources
 -	no package size		-
 Problem with working files	App		Problème avec les fichiers de travail
+Server error	ServerHelper		Erreur du serveur
 Try again	App		Essayer à nouveau
 Rate package	RatePackageWindow		Évaluer le paquet
 Unknown	PackageListView		Inconnu

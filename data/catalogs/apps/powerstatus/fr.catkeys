@@ -1,46 +1,46 @@
 1	french	x-vnd.Haiku-PowerStatus	3173765686
-Design capacity low warning: 	PowerStatus		Alerte de capacité nominale faible : 
-Show percent	PowerStatus		Afficher les pourcentages
-Design capacity: 	PowerStatus		Capacité nominale : 
- mW	PowerStatus		 mW
-The battery level is getting low, please plug in the device.	PowerStatus		La charge de la batterie devient faible. Veuillez brancher l’alimentation.
-Battery low	PowerStatus		Batterie faible
-Type: 	PowerStatus		Type : 
-non-rechargeable	PowerStatus		non-rechargeable
-Empty battery slot	PowerStatus		Emplacement libre de batterie
- mV	PowerStatus		 mV
 Run in window	PowerStatus		Exécuter en fenêtre
-PowerStatus	System name		État d’énergie
- mWh	PowerStatus		 mWh
-Battery info…	PowerStatus		Informations batteries…
-Damaged battery	PowerStatus		Batterie endommagée
-Show time	PowerStatus		Monter le temps
-Last full charge: 	PowerStatus		Dernière charge complète : 
-Battery unused	PowerStatus		Batterie inutilisée
 Extended battery info	PowerStatus		Informations additionnelles
- mA	PowerStatus		 mA
+Show status icon	PowerStatus		Afficher l’icône d’état
+Battery charging	PowerStatus		Batterie en charge
+Design capacity low warning: 	PowerStatus		Alerte de capacité nominale faible : 
+The battery level is critical, please plug in the device immediately.	PowerStatus		La batterie est épuisée. Veuillez brancher l’alimentation immédiatement.
+non-rechargeable	PowerStatus		non-rechargeable
+Last full charge: 	PowerStatus		Dernière charge complète : 
+ mV	PowerStatus		 mV
 Current rate: 	PowerStatus		Consommation actuelle : 
-discharging	PowerStatus		sur batteries
 Show text label	PowerStatus		Afficher l’étiquette texte
-About…	PowerStatus		À propos…
+Quit	PowerStatus		Quitter
+Battery low	PowerStatus		Batterie faible
 Model number: 	PowerStatus		Numéro de modèle : 
-Install in Deskbar	PowerStatus		Installer dans la Deskbar
+Battery unused	PowerStatus		Batterie inutilisée
+Type: 	PowerStatus		Type : 
+Damaged battery	PowerStatus		Batterie endommagée
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Vous pouvez exécuter « État d’énergie » dans une fenêtre ou l’installer dans la Deskbar.
  mAh	PowerStatus		 mAh
-Capacity: 	PowerStatus		Capacité : 
 Battery discharging	PowerStatus		Consommation des batteries
+Design voltage: 	PowerStatus		Voltage nominal : 
+discharging	PowerStatus		sur batteries
+rechargeable	PowerStatus		rechargeable
+Battery info…	PowerStatus		Informations batteries…
+Show time	PowerStatus		Monter le temps
+ mA	PowerStatus		 mA
+About…	PowerStatus		À propos…
 Serial number: 	PowerStatus		Numéro de série : 
 Battery critical	PowerStatus		Batterie épuisée
+Capacity: 	PowerStatus		Capacité : 
+ mW	PowerStatus		 mW
+Show percent	PowerStatus		Afficher les pourcentages
 Capacity granularity 1: 	PowerStatus		Granularité de charge 1 : 
-OEM info: 	PowerStatus		Informations fabricant : 
-Design voltage: 	PowerStatus		Voltage nominal : 
-Battery charging	PowerStatus		Batterie en charge
-The battery level is critical, please plug in the device immediately.	PowerStatus		La batterie est épuisée. Veuillez brancher l’alimentation immédiatement.
+The battery level is getting low, please plug in the device.	PowerStatus		La charge de la batterie devient faible. Veuillez brancher l’alimentation.
 Design capacity warning: 	PowerStatus		Avertissement de capacité nominale : 
-Quit	PowerStatus		Quitter
-rechargeable	PowerStatus		rechargeable
-charging	PowerStatus		en charge
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Vous pouvez exécuter « État d’énergie » dans une fenêtre ou l’installer dans la Deskbar.
-Show status icon	PowerStatus		Afficher l’icône d’état
 Capacity granularity 2: 	PowerStatus		Granularité de charge 2 : 
 Technology: 	PowerStatus		Technologie : 
+ mWh	PowerStatus		 mWh
+PowerStatus	System name		État d’énergie
+Design capacity: 	PowerStatus		Capacité nominale : 
+OEM info: 	PowerStatus		Informations fabricant : 
 no battery	PowerStatus		pas de batterie
+Empty battery slot	PowerStatus		Emplacement libre de batterie
+Install in Deskbar	PowerStatus		Installer dans la Deskbar
+charging	PowerStatus		en charge

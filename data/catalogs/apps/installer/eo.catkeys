@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-Installer	1874975245
+1	esperanto	x-vnd.Haiku-Installer	3283947218
 Performing installation.	InstallProgress		Instalante.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Elektu la elan diskon el la ŝpruca menuo. Poste alklaku \"Ek\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Bonvolu fermi la fenestron de la Diskagordilo antaŭ fermi la fenestron de al Instalilo.
@@ -40,7 +40,6 @@ Hide optional packages	InstallerWindow		Kaŝi malneprajn pakaĵojn
 ???	InstallerWindow	Unknown partition name	???
 Have fun and thanks for trying out Haiku!	InstallerApp		Amuziĝu, kaj dankon pro provi Haiku-on!
 Quit	InstallerApp		Ĉesi
-Starting installation.	InstallProgress		Komencas instaladon.
 Error writing boot sector.	InstallProgress		Eraro okazis dum skribado de praŝarga sektoro.
 OK	InstallerWindow		Bone
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Bonvolu fermi la fenestrojn de la Praŝarga Administrilo kaj  de la Diskagordilo antaŭ fermi la fenestron de la Instalilo.

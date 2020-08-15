@@ -1,45 +1,45 @@
 1	german	x-vnd.Haiku-PowerStatus	3250907196
-Design capacity low warning: 	PowerStatus		Kapazitätswarnung (Herstellerangabe):
-Show percent	PowerStatus		Prozent anzeigen
-Design capacity: 	PowerStatus		Kapazität (lt. Hersteller):
- mW	PowerStatus		mW
-The battery level is getting low, please plug in the device.	PowerStatus		Der Akku ist ziemlich leer; er sollte demnächst geladen werden.
-Battery low	PowerStatus		Ladezustand niedrig
-Type: 	PowerStatus		Typ:
-non-rechargeable	PowerStatus		nicht aufladbar
-Empty battery slot	PowerStatus		Akkufach ist leer
- mV	PowerStatus		mV
 Run in window	PowerStatus		Im Fenster ausführen
- mWh	PowerStatus		mWh
-Battery info…	PowerStatus		Akku-Infos…
-Damaged battery	PowerStatus		Akku defekt
-Show time	PowerStatus		Zeit anzeigen
-Last full charge: 	PowerStatus		Letzte vollständige Ladung:
-Battery unused	PowerStatus		Akku unbenutzt
 Extended battery info	PowerStatus		Erweiterte Akku-Infos
- mA	PowerStatus		 mA
+Show status icon	PowerStatus		Statusicon anzeigen
+Battery charging	PowerStatus		Akku wird geladen
+Design capacity low warning: 	PowerStatus		Kapazitätswarnung (Herstellerangabe):
+The battery level is critical, please plug in the device immediately.	PowerStatus		Der Akku ist beinahe leer; er sollte sofort geladen werden.
+non-rechargeable	PowerStatus		nicht aufladbar
+Last full charge: 	PowerStatus		Letzte vollständige Ladung:
+ mV	PowerStatus		mV
 Current rate: 	PowerStatus		Aktueller Wert:
-discharging	PowerStatus		wird entladen
 Show text label	PowerStatus		Beschriftung anzeigen
-About…	PowerStatus		Über…
+Quit	PowerStatus		Beenden
+Battery low	PowerStatus		Ladezustand niedrig
 Model number: 	PowerStatus		Modellnummer:
-Install in Deskbar	PowerStatus		In Deskbar installieren
+Battery unused	PowerStatus		Akku unbenutzt
+Type: 	PowerStatus		Typ:
+Damaged battery	PowerStatus		Akku defekt
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Die Akku-Anzeige kann im Fenster dargestellt oder in der Deskbar installiert werden.
  mAh	PowerStatus		 mAh
-Capacity: 	PowerStatus		Kapazität:
 Battery discharging	PowerStatus		Akku wird entladen
+Design voltage: 	PowerStatus		Spannung (lt. Hersteller):
+discharging	PowerStatus		wird entladen
+rechargeable	PowerStatus		wiederaufladbar
+Battery info…	PowerStatus		Akku-Infos…
+Show time	PowerStatus		Zeit anzeigen
+ mA	PowerStatus		 mA
+About…	PowerStatus		Über…
 Serial number: 	PowerStatus		Seriennummer:
 Battery critical	PowerStatus		Ladezustand kritisch
+Capacity: 	PowerStatus		Kapazität:
+ mW	PowerStatus		mW
+Show percent	PowerStatus		Prozent anzeigen
 Capacity granularity 1: 	PowerStatus		Kapazitätsgenauigkeit 1:
-OEM info: 	PowerStatus		OEM-Info:
-Design voltage: 	PowerStatus		Spannung (lt. Hersteller):
-Battery charging	PowerStatus		Akku wird geladen
-The battery level is critical, please plug in the device immediately.	PowerStatus		Der Akku ist beinahe leer; er sollte sofort geladen werden.
+The battery level is getting low, please plug in the device.	PowerStatus		Der Akku ist ziemlich leer; er sollte demnächst geladen werden.
 Design capacity warning: 	PowerStatus		Kapazitätswarnung (lt. Hersteller):
-Quit	PowerStatus		Beenden
-rechargeable	PowerStatus		wiederaufladbar
-charging	PowerStatus		wird geladen
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Die Akku-Anzeige kann im Fenster dargestellt oder in der Deskbar installiert werden.
-Show status icon	PowerStatus		Statusicon anzeigen
 Capacity granularity 2: 	PowerStatus		Kapazitätsgenauigkeit 2:
 Technology: 	PowerStatus		Technologie:
+ mWh	PowerStatus		mWh
+Design capacity: 	PowerStatus		Kapazität (lt. Hersteller):
+OEM info: 	PowerStatus		OEM-Info:
 no battery	PowerStatus		kein Akku
+Empty battery slot	PowerStatus		Akkufach ist leer
+Install in Deskbar	PowerStatus		In Deskbar installieren
+charging	PowerStatus		wird geladen

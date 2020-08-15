@@ -1,46 +1,46 @@
 1	finnish	x-vnd.Haiku-PowerStatus	3173765686
-Design capacity low warning: 	PowerStatus		Suunnittelukapasiteetti alhainen -varoitus: 
-Show percent	PowerStatus		Näytä prosenttiluku
-Design capacity: 	PowerStatus		Suunnittelukapasiteetti:
- mW	PowerStatus		 mW
-The battery level is getting low, please plug in the device.	PowerStatus		Akkutaso on alhainen, kytke laite sähköverkkoon.
-Battery low	PowerStatus		Akku lähes tyhjä
-Type: 	PowerStatus		Tyyppi: 
-non-rechargeable	PowerStatus		ei-uudelleenladattava
-Empty battery slot	PowerStatus		Tyhjä akkulokero
- mV	PowerStatus		 mV
 Run in window	PowerStatus		Suorita ikkunassa
-PowerStatus	System name		Virtatila
- mWh	PowerStatus		mWh
-Battery info…	PowerStatus		Akkutiedot...
-Damaged battery	PowerStatus		Vaurioitunut akku
-Show time	PowerStatus		Näytä aika
-Last full charge: 	PowerStatus		Viimeinen täysi lataus:
-Battery unused	PowerStatus		Akku käyttämätön
 Extended battery info	PowerStatus		Laajennetut akkutiedot
- mA	PowerStatus		 mA
+Show status icon	PowerStatus		Näytä tilakuvake
+Battery charging	PowerStatus		Akkulataus
+Design capacity low warning: 	PowerStatus		Suunnittelukapasiteetti alhainen -varoitus: 
+The battery level is critical, please plug in the device immediately.	PowerStatus		Akkutaso on kriittinen, kytke laite heti sähköverkkoon.
+non-rechargeable	PowerStatus		ei-uudelleenladattava
+Last full charge: 	PowerStatus		Viimeinen täysi lataus:
+ mV	PowerStatus		 mV
 Current rate: 	PowerStatus		Virtamäärä: 
-discharging	PowerStatus		puretaan latausta
 Show text label	PowerStatus		Näytä tekstinimiö
-About…	PowerStatus		Ohjelmasta...
+Quit	PowerStatus		Lopeta
+Battery low	PowerStatus		Akku lähes tyhjä
 Model number: 	PowerStatus		Mallinumero: 
-Install in Deskbar	PowerStatus		Asenna Työpöytäpalkkiin
+Battery unused	PowerStatus		Akku käyttämätön
+Type: 	PowerStatus		Tyyppi: 
+Damaged battery	PowerStatus		Vaurioitunut akku
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Voit suorittaa Virtatilan ikkunassa tai asentaa sen Työpöytäpalkkiin.
  mAh	PowerStatus		 mAh
-Capacity: 	PowerStatus		Kapasiteetti: 
 Battery discharging	PowerStatus		Akkulatauksen purkaminen
+Design voltage: 	PowerStatus		Suunnittelujännite: 
+discharging	PowerStatus		puretaan latausta
+rechargeable	PowerStatus		uudelleenladattava
+Battery info…	PowerStatus		Akkutiedot...
+Show time	PowerStatus		Näytä aika
+ mA	PowerStatus		 mA
+About…	PowerStatus		Ohjelmasta...
 Serial number: 	PowerStatus		Sarjanumero: 
 Battery critical	PowerStatus		Akku kriittisellä tasolla
+Capacity: 	PowerStatus		Kapasiteetti: 
+ mW	PowerStatus		 mW
+Show percent	PowerStatus		Näytä prosenttiluku
 Capacity granularity 1: 	PowerStatus		Kapasiteettirakeisuus 1: 
-OEM info: 	PowerStatus		OEM-tiedot: 
-Design voltage: 	PowerStatus		Suunnittelujännite: 
-Battery charging	PowerStatus		Akkulataus
-The battery level is critical, please plug in the device immediately.	PowerStatus		Akkutaso on kriittinen, kytke laite heti sähköverkkoon.
+The battery level is getting low, please plug in the device.	PowerStatus		Akkutaso on alhainen, kytke laite sähköverkkoon.
 Design capacity warning: 	PowerStatus		Suunnittelukapasiteettivaroitus: 
-Quit	PowerStatus		Lopeta
-rechargeable	PowerStatus		uudelleenladattava
-charging	PowerStatus		ladataan
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Voit suorittaa Virtatilan ikkunassa tai asentaa sen Työpöytäpalkkiin.
-Show status icon	PowerStatus		Näytä tilakuvake
 Capacity granularity 2: 	PowerStatus		Kapasiteettirakeisuus 2: 
 Technology: 	PowerStatus		Teknologia: 
+ mWh	PowerStatus		mWh
+PowerStatus	System name		Virtatila
+Design capacity: 	PowerStatus		Suunnittelukapasiteetti:
+OEM info: 	PowerStatus		OEM-tiedot: 
 no battery	PowerStatus		ei akkua
+Empty battery slot	PowerStatus		Tyhjä akkulokero
+Install in Deskbar	PowerStatus		Asenna Työpöytäpalkkiin
+charging	PowerStatus		ladataan

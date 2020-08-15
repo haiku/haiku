@@ -1,46 +1,46 @@
 1	italian	x-vnd.Haiku-PowerStatus	3173765686
-Design capacity low warning: 	PowerStatus		Avviso di batteria scarica (di fabbrica): 
-Show percent	PowerStatus		Mostra percentuale
-Design capacity: 	PowerStatus		Capacità (in base al costruttore): 
- mW	PowerStatus		 mW
-The battery level is getting low, please plug in the device.	PowerStatus		Il livello della batteria sta scendendo, per favore connetti l'alimentazione.
-Battery low	PowerStatus		Livello batteria basso
-Type: 	PowerStatus		Tipo: 
-non-rechargeable	PowerStatus		non ricaricabile
-Empty battery slot	PowerStatus		Slot della batteria vuoto
- mV	PowerStatus		 mV
 Run in window	PowerStatus		Esegui in una finestra
-PowerStatus	System name		Stato Batteria
- mWh	PowerStatus		 mWh
-Battery info…	PowerStatus		Informazioni batteria...
-Damaged battery	PowerStatus		Batteria danneggiata
-Show time	PowerStatus		Mostra il tempo
-Last full charge: 	PowerStatus		Ultima carica completa: 
-Battery unused	PowerStatus		Batteria non usata
 Extended battery info	PowerStatus		Informazioni batteria estese
- mA	PowerStatus		 mA
+Show status icon	PowerStatus		Mostra l'icona di stato
+Battery charging	PowerStatus		Batteria in carica
+Design capacity low warning: 	PowerStatus		Avviso di batteria scarica (di fabbrica): 
+The battery level is critical, please plug in the device immediately.	PowerStatus		La batteria è al livello critico, per favore connetti l'alimentazione immediatamente.
+non-rechargeable	PowerStatus		non ricaricabile
+Last full charge: 	PowerStatus		Ultima carica completa: 
+ mV	PowerStatus		 mV
 Current rate: 	PowerStatus		Valore attuale: 
-discharging	PowerStatus		in scarica
 Show text label	PowerStatus		Mostra etichette di testo
-About…	PowerStatus		Informazioni...
+Quit	PowerStatus		Esci
+Battery low	PowerStatus		Livello batteria basso
 Model number: 	PowerStatus		Numero modello: 
-Install in Deskbar	PowerStatus		Installa nella Deskbar
+Battery unused	PowerStatus		Batteria non usata
+Type: 	PowerStatus		Tipo: 
+Damaged battery	PowerStatus		Batteria danneggiata
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Stato Batteria può essere eseguito in una finestra o installato nella Deskbar.
  mAh	PowerStatus		 mAh
-Capacity: 	PowerStatus		Capacità: 
 Battery discharging	PowerStatus		Batteria in scarica
+Design voltage: 	PowerStatus		Voltaggio di progettazione: 
+discharging	PowerStatus		in scarica
+rechargeable	PowerStatus		ricaricabile
+Battery info…	PowerStatus		Informazioni batteria...
+Show time	PowerStatus		Mostra il tempo
+ mA	PowerStatus		 mA
+About…	PowerStatus		Informazioni...
 Serial number: 	PowerStatus		Numero seriale: 
 Battery critical	PowerStatus		Livello batteria critico
+Capacity: 	PowerStatus		Capacità: 
+ mW	PowerStatus		 mW
+Show percent	PowerStatus		Mostra percentuale
 Capacity granularity 1: 	PowerStatus		Granularità della capacità 1: 
-OEM info: 	PowerStatus		Informazioni OEM: 
-Design voltage: 	PowerStatus		Voltaggio di progettazione: 
-Battery charging	PowerStatus		Batteria in carica
-The battery level is critical, please plug in the device immediately.	PowerStatus		La batteria è al livello critico, per favore connetti l'alimentazione immediatamente.
+The battery level is getting low, please plug in the device.	PowerStatus		Il livello della batteria sta scendendo, per favore connetti l'alimentazione.
 Design capacity warning: 	PowerStatus		Avviso di capacità (di fabbrica): 
-Quit	PowerStatus		Esci
-rechargeable	PowerStatus		ricaricabile
-charging	PowerStatus		in carica
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Stato Batteria può essere eseguito in una finestra o installato nella Deskbar.
-Show status icon	PowerStatus		Mostra l'icona di stato
 Capacity granularity 2: 	PowerStatus		Granularità della capacità 2: 
 Technology: 	PowerStatus		Tecnologia: 
+ mWh	PowerStatus		 mWh
+PowerStatus	System name		Stato Batteria
+Design capacity: 	PowerStatus		Capacità (in base al costruttore): 
+OEM info: 	PowerStatus		Informazioni OEM: 
 no battery	PowerStatus		nessuna batteria
+Empty battery slot	PowerStatus		Slot della batteria vuoto
+Install in Deskbar	PowerStatus		Installa nella Deskbar
+charging	PowerStatus		in carica

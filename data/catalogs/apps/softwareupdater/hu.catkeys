@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.haiku-softwareupdater	1515642756
+1	hungarian	x-vnd.haiku-softwareupdater	1642797078
 Updating version	SoftwareUpdaterWindow	List item text	Jelenlegi:
 Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Kattints ide {0, plural, one{# friss csomag} other{# friss csomag}} telepítéséhez.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Eltávolítandó csomagok
@@ -26,6 +26,7 @@ Cancel	SoftwareUpdaterWindow	Alert button label	Mégse
 There were no updates found.	UpdateAction		Nem találtam frissíteni valót.
 OK	SoftwareUpdaterWindow		Rendben
 The following changes will be made:	SoftwareUpdaterWindow		Elvégzendő változtatások:
+Argument variables are no longer accepted\n	SoftwareUpdaterApp		A megadott paraméterek már nem használhatóak\n
 Fatal error while checking for updates: %s\n	CheckAction		Hiba történt a frissítések keresésekor: %s\n
 SoftwareUpdater	System name		Frissítéskezelő
 No active network connection was found.\n	CheckManager		Nincs internetkapcsolat.\n
@@ -39,6 +40,7 @@ Exception occurred while checking for updates: %s\n	CheckAction		Hiba történt 
 Packages are being updated	UpdateManager		Frissítendő csomagok
 Cancel	SoftwareUpdaterWindow		Mégse
 Don't quit	SoftwareUpdaterWindow		Ne lépjen ki
+Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Kattints ide a Frissítéskezelő indításához. Néhány frissítéshez problémamegoldás is kellhet.
 Checking for updates	SoftwareUpdaterWindow		Frissítések keresése
 Updates completed	UpdateManager		Sikeres frissítés
 Reboot	SoftwareUpdaterWindow		Újraindítás

@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-Installer	784205712
+1	croatian	x-vnd.Haiku-Installer	2193177685
 Performing installation.	InstallProgress		Vršim instalaciju.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Izaberite disk izvora iz poo-up izbornika. Zatim kliknite \"Počni\".
 Restart system	InstallerWindow		Ponovo pokreni sustav
@@ -26,7 +26,6 @@ Hide optional packages	InstallerWindow		Sakrij neobavezne pakete.
 ???	InstallerWindow	Unknown partition name	???
 Have fun and thanks for trying out Haiku!	InstallerApp		Uživajte i hvala Vam što isprobavate Haiku!
 Quit	InstallerApp		Isključi
-Starting installation.	InstallProgress		Početak instalacije.
 OK	InstallerWindow		Uredu
 Failed to launch Boot Manager	InstallerWindow		Neuspjelo pokretanje upravitelja podizanjem sustava
 Try installing anyway	InstallProgress		Ipak pokušaj instalirati

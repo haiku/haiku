@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-MediaPlayer	1313616492
+1	russian	x-vnd.Haiku-MediaPlayer	1961774506
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Переместить запись в корзину
 Close	MediaPlayer-PlaylistWindow		Закрыть
 Volume of background clips	MediaPlayer-SettingsWindow		Проигрывать фоновые клипы
@@ -35,6 +35,7 @@ Full volume	MediaPlayer-SettingsWindow		На полной громкости
 Start media server	MediaPlayer-Main		Запустить медиа сервер
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Похоже, что медиа сервер не запущен\nВы хотите его запустить?
 Location	MediaPlayer-InfoWin		Путь
+Opening '%s'.	MediaPlayer-Main		Открытие '%s'.
 Medium	MediaPlayer-SettingsWindow		cредний
 Play mode	MediaPlayer-SettingsWindow		Режим проигрывания
 Playlist	MediaPlayer-PlaylistWindow		Плейлист

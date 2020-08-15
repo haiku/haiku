@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Input	1910113385
+1	ukrainian	x-vnd.Haiku-Input	1840852675
 Defaults	InputMouse		За замовчуванням
 Scrolling	TouchpadPrefView		Прокрутка
 Long	KeyboardView		Більше
@@ -31,6 +31,7 @@ Revert	InputKeyboard		Без змін
 Mouse type:	SettingsView		Тип миші:
 Off	TouchpadPrefView		Вимкнути
 Fast	TouchpadPrefView		Швидко
+6-Button	SettingsView		6 кнопок
 Click to focus	SettingsView		Натиснути для фокусу
 Acceleration	TouchpadPrefView		Прискорення
 Accept first click	SettingsView		Прийняти перший клік

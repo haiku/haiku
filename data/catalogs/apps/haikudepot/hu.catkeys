@@ -1,5 +1,6 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	1161209988
+1	hungarian	x-vnd.Haiku-HaikuDepot	1237265940
 Repository update error	LocalRepositoryUpdateProcess		Tároló frissítési hiba
+Network error	ServerHelper		Hálózati hiba
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Hiba történt a tároló frissítésekor: %error%
 User Created	UserLoginWindow		Felhasználó létrehozva
 Check for updates…	MainWindow		Frissítések keresése…
@@ -112,6 +113,7 @@ Log out	MainWindow		Kijelentkezés
 Comment language:	RatePackageWindow		Hozzászólás nyelve:
 Status	PackageListView		Állapot
 The password has been incorrectly repeated.	UserLoginWindow		A megismételt jelszó téves.
+Network transport error	ServerHelper		Hálózati átviteli hiba
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		A felhasználó [%Nickname%] előzőleg megadott jelszava évrénytelen. A felhasználó ki lesz léptetve az alkalmazásból majd újra be kell jelentkezni az érvényes jelszóval.
 Update	RatePackageWindow		Frissítés
 OK	ServerHelper		Rendben
@@ -125,6 +127,7 @@ The nickname is required.	UserLoginWindow		Felhasználói név szükséges.
 Source packages	MainWindow		Forráskód csomagok
 -	no package size		-
 Problem with working files	App		Nem tudok a fájlokkal dolgozni
+Server error	ServerHelper		Mentési hiba
 Try again	App		Próbáld újra
 Rate package	RatePackageWindow		Csomag értékelése
 Unknown	PackageListView		Ismeretlen

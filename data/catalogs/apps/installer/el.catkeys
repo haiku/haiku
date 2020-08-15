@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Installer	2784107891
+1	greek, modern (1453-)	x-vnd.Haiku-Installer	4193079864
 Performing installation.	InstallProgress		Η εγκατάσταση είναι σε εξέλιξη.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Επιλέξτε το δίσκο προέλευσης από το αναδυόμενο μενού. Στη συνέχεια, κάντε κλικ στην \"Έναρξη\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Παρακαλώ κλείστε το παράθυρο Διαχειριστή Δίσκου, πριν κλείσετε το Πρόγραμμα Εγκατάστασης.
@@ -38,7 +38,6 @@ Hide optional packages	InstallerWindow		Απόκρυψη προαιρετικώ�
 ???	InstallerWindow	Unknown partition name	???
 Have fun and thanks for trying out Haiku!	InstallerApp		Καλή διασκέδαση και σας ευχαριστούμε που επιλέξατε το Haiku!
 Quit	InstallerApp		Έξοδος
-Starting installation.	InstallProgress		Ξεκίνημα εγκατάστασης.
 Error writing boot sector.	InstallProgress		Σφάλμα εγγραφής τομέα εκκίνησης.
 OK	InstallerWindow		Εντάξει
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Παρακαλώ κλείστε τον Διαχειριστή Εκκίνησης και τη Διαχείρηση Δίσκου, πριν κλείσετε το Πρόγραμμα Εγκατάστασης.

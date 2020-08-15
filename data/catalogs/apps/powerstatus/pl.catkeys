@@ -1,46 +1,46 @@
 1	polish	x-vnd.Haiku-PowerStatus	3173765686
-Design capacity low warning: 	PowerStatus		Ostrzeżenie o niskiej pojemności nominalnej: 
-Show percent	PowerStatus		Pokaż procent
-Design capacity: 	PowerStatus		Pojemność nominalna: 
- mW	PowerStatus		 mW
-The battery level is getting low, please plug in the device.	PowerStatus		Poziom naładowania baterii jest niski, podłącz urządzenie do prądu.
-Battery low	PowerStatus		Niski poziom naładowania baterii
-Type: 	PowerStatus		Typ: 
-non-rechargeable	PowerStatus		jednorazowa
-Empty battery slot	PowerStatus		Gniazdo na baterie jest puste
- mV	PowerStatus		 mV
 Run in window	PowerStatus		Uruchom w oknie
-PowerStatus	System name		PowerStatus
- mWh	PowerStatus		 mWh
-Battery info…	PowerStatus		Informacje o baterii…
-Damaged battery	PowerStatus		Uszkodzona bateria
-Show time	PowerStatus		Pokaż czas
-Last full charge: 	PowerStatus		Ostatnie pełne ładowanie: 
-Battery unused	PowerStatus		Bateria nieużywana
 Extended battery info	PowerStatus		Szczegółowe informacje o baterii
- mA	PowerStatus		 mA
+Show status icon	PowerStatus		Pokaż ikonę statusu
+Battery charging	PowerStatus		Ładowanie baterii
+Design capacity low warning: 	PowerStatus		Ostrzeżenie o niskiej pojemności nominalnej: 
+The battery level is critical, please plug in the device immediately.	PowerStatus		Poziom naładowania baterii jest krytycznie niski, natychmiast podłącz urządzenie do prądu.
+non-rechargeable	PowerStatus		jednorazowa
+Last full charge: 	PowerStatus		Ostatnie pełne ładowanie: 
+ mV	PowerStatus		 mV
 Current rate: 	PowerStatus		Aktualne tempo: 
-discharging	PowerStatus		rozładowywanie
 Show text label	PowerStatus		Pokaż etykietę tekstu
-About…	PowerStatus		O programie…
+Quit	PowerStatus		Zakończ
+Battery low	PowerStatus		Niski poziom naładowania baterii
 Model number: 	PowerStatus		Numer modelu: 
-Install in Deskbar	PowerStatus		Zainstaluj w Deskbarze
+Battery unused	PowerStatus		Bateria nieużywana
+Type: 	PowerStatus		Typ: 
+Damaged battery	PowerStatus		Uszkodzona bateria
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Możesz uruchomić PowerStatus w oknie lub zainstalować go w Deskbarze.
  mAh	PowerStatus		 mAh
-Capacity: 	PowerStatus		Pojemność: 
 Battery discharging	PowerStatus		Rozładowywanie baterii
+Design voltage: 	PowerStatus		Napięcie nominalne: 
+discharging	PowerStatus		rozładowywanie
+rechargeable	PowerStatus		akumulator
+Battery info…	PowerStatus		Informacje o baterii…
+Show time	PowerStatus		Pokaż czas
+ mA	PowerStatus		 mA
+About…	PowerStatus		O programie…
 Serial number: 	PowerStatus		Numer seryjny: 
 Battery critical	PowerStatus		Krytycznie niski poziom naładowania akumulatora
+Capacity: 	PowerStatus		Pojemność: 
+ mW	PowerStatus		 mW
+Show percent	PowerStatus		Pokaż procent
 Capacity granularity 1: 	PowerStatus		Jednostka pojemności 1: 
-OEM info: 	PowerStatus		Informacje OEM: 
-Design voltage: 	PowerStatus		Napięcie nominalne: 
-Battery charging	PowerStatus		Ładowanie baterii
-The battery level is critical, please plug in the device immediately.	PowerStatus		Poziom naładowania baterii jest krytycznie niski, natychmiast podłącz urządzenie do prądu.
+The battery level is getting low, please plug in the device.	PowerStatus		Poziom naładowania baterii jest niski, podłącz urządzenie do prądu.
 Design capacity warning: 	PowerStatus		Ostrzeżenie o pojemności nominalnej: 
-Quit	PowerStatus		Zakończ
-rechargeable	PowerStatus		akumulator
-charging	PowerStatus		ładowanie
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Możesz uruchomić PowerStatus w oknie lub zainstalować go w Deskbarze.
-Show status icon	PowerStatus		Pokaż ikonę statusu
 Capacity granularity 2: 	PowerStatus		Jednostka pojemności 2: 
 Technology: 	PowerStatus		Technologia: 
+ mWh	PowerStatus		 mWh
+PowerStatus	System name		PowerStatus
+Design capacity: 	PowerStatus		Pojemność nominalna: 
+OEM info: 	PowerStatus		Informacje OEM: 
 no battery	PowerStatus		brak baterii
+Empty battery slot	PowerStatus		Gniazdo na baterie jest puste
+Install in Deskbar	PowerStatus		Zainstaluj w Deskbarze
+charging	PowerStatus		ładowanie

@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Installer	1874975245
+1	turkish	x-vnd.Haiku-Installer	3283947218
 Performing installation.	InstallProgress		Kuruluyor…
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Açılır menüden kaynak diski seçin ve \"Başla\"ya tıklayın.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Yükleyici penceresini kapatmadan önce Disk İzlencesi penceresini kapatın.
@@ -40,7 +40,6 @@ Hide optional packages	InstallerWindow		İsteğe bağlı paketleri gizle
 ???	InstallerWindow	Unknown partition name	???
 Have fun and thanks for trying out Haiku!	InstallerApp		Haiku'yu denediğiniz için teşekkür ederiz!
 Quit	InstallerApp		Çık
-Starting installation.	InstallProgress		Kurulum başlatılıyor…
 Error writing boot sector.	InstallProgress		Önyükleme alanı yazılırken hata.
 OK	InstallerWindow		Tamam
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Yükleyici penceresini kapatmadan önce Önyükleme Yöneticisi ve Disk İzlencesi pencerelerini kapatın.

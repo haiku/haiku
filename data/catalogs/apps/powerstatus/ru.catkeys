@@ -1,46 +1,46 @@
 1	russian	x-vnd.Haiku-PowerStatus	3173765686
-Design capacity low warning: 	PowerStatus		Уровень полного разряда: 
-Show percent	PowerStatus		Показать в процентах
-Design capacity: 	PowerStatus		Штатная емкость: 
- mW	PowerStatus		 мВт
-The battery level is getting low, please plug in the device.	PowerStatus		Заряд батареи становится слишком низким, пожалуйста, подключите устройство к сети.
-Battery low	PowerStatus		Низкий заряд батареи
-Type: 	PowerStatus		Тип: 
-non-rechargeable	PowerStatus		неперезаряжаемая
-Empty battery slot	PowerStatus		Пустой слот батареи
- mV	PowerStatus		 мВ
 Run in window	PowerStatus		Запустить в окне
-PowerStatus	System name		Электропитание
- mWh	PowerStatus		 мВтч
-Battery info…	PowerStatus		Информация о батарее…
-Damaged battery	PowerStatus		Поврежденная батарея
-Show time	PowerStatus		Показать время
-Last full charge: 	PowerStatus		Последняя полная зарядка: 
-Battery unused	PowerStatus		Батарея не используется
 Extended battery info	PowerStatus		Расширенная информация о батарее
- mA	PowerStatus		 мА
+Show status icon	PowerStatus		Показать значок статуса
+Battery charging	PowerStatus		Батарея заряжается
+Design capacity low warning: 	PowerStatus		Уровень полного разряда: 
+The battery level is critical, please plug in the device immediately.	PowerStatus		Критический уровень заряда батареи, пожалуйста, подключите устройство к сети прямо сейчас.
+non-rechargeable	PowerStatus		неперезаряжаемая
+Last full charge: 	PowerStatus		Последняя полная зарядка: 
+ mV	PowerStatus		 мВ
 Current rate: 	PowerStatus		Текущее значение: 
-discharging	PowerStatus		разрядка
 Show text label	PowerStatus		Показать текстовую метку
-About…	PowerStatus		О программе…
+Quit	PowerStatus		Выход
+Battery low	PowerStatus		Низкий заряд батареи
 Model number: 	PowerStatus		Номер модели: 
-Install in Deskbar	PowerStatus		Установить в Deskbar
+Battery unused	PowerStatus		Батарея не используется
+Type: 	PowerStatus		Тип: 
+Damaged battery	PowerStatus		Поврежденная батарея
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Вы можете запустить состояние электропитания в окне или установить его в Deskbar.
  mAh	PowerStatus		 мАч
-Capacity: 	PowerStatus		Емкость: 
 Battery discharging	PowerStatus		Батарея разряжается
+Design voltage: 	PowerStatus		Штатное напряжение: 
+discharging	PowerStatus		разрядка
+rechargeable	PowerStatus		перезаряжаемая
+Battery info…	PowerStatus		Информация о батарее…
+Show time	PowerStatus		Показать время
+ mA	PowerStatus		 мА
+About…	PowerStatus		О программе…
 Serial number: 	PowerStatus		Серийный номер: 
 Battery critical	PowerStatus		Критический заряд батареи
+Capacity: 	PowerStatus		Емкость: 
+ mW	PowerStatus		 мВт
+Show percent	PowerStatus		Показать в процентах
 Capacity granularity 1: 	PowerStatus		Детализация ёмкости 1: 
-OEM info: 	PowerStatus		Изготовитель: 
-Design voltage: 	PowerStatus		Штатное напряжение: 
-Battery charging	PowerStatus		Батарея заряжается
-The battery level is critical, please plug in the device immediately.	PowerStatus		Критический уровень заряда батареи, пожалуйста, подключите устройство к сети прямо сейчас.
+The battery level is getting low, please plug in the device.	PowerStatus		Заряд батареи становится слишком низким, пожалуйста, подключите устройство к сети.
 Design capacity warning: 	PowerStatus		Уровень низкого заряда: 
-Quit	PowerStatus		Выход
-rechargeable	PowerStatus		перезаряжаемая
-charging	PowerStatus		зарядка
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Вы можете запустить состояние электропитания в окне или установить его в Deskbar.
-Show status icon	PowerStatus		Показать значок статуса
 Capacity granularity 2: 	PowerStatus		Детализация ёмкости 2: 
 Technology: 	PowerStatus		Технология: 
+ mWh	PowerStatus		 мВтч
+PowerStatus	System name		Электропитание
+Design capacity: 	PowerStatus		Штатная емкость: 
+OEM info: 	PowerStatus		Изготовитель: 
 no battery	PowerStatus		без батареи
+Empty battery slot	PowerStatus		Пустой слот батареи
+Install in Deskbar	PowerStatus		Установить в Deskbar
+charging	PowerStatus		зарядка

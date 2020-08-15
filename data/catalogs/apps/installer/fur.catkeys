@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-Installer	2784107891
+1	friulian	x-vnd.Haiku-Installer	4193079864
 Performing installation.	InstallProgress		Esecuzion de instalazion.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Sielç il disc sorzint dal menù a tende. Daspò fâs clic su \"Scomence\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Par plasê siere il barcon di Gjestion disc prime di sierâ chel dal Instaladôr.
@@ -38,7 +38,6 @@ Hide optional packages	InstallerWindow		Plate pachets opzionâi
 ???	InstallerWindow	Unknown partition name	???
 Have fun and thanks for trying out Haiku!	InstallerApp		Bon divertiment e graciis pal vuestri interessament par Haiku!
 Quit	InstallerApp		Jes
-Starting installation.	InstallProgress		Daûr a tacâ la instalazion.
 Error writing boot sector.	InstallProgress		Erôr tal scrivi il setôr di inviament.
 OK	InstallerWindow		Va ben
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Par plasê siere i barcons di Gjestôr di inviament e Gjestion disc prime di sierâ chel dal Instaladôr.
