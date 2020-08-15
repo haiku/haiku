@@ -1,11 +1,12 @@
 /*
- * Copyright (c) 2001-2011, Haiku, Inc.
+ * Copyright (c) 2001-2020 Haiku, Inc. All right reserved.
  * Distributed under the terms of the MIT license.
  *
  * Author:
  *		DarkWyrm <bpmagic@columbus.rr.com>
  *		Clemens Zeidler <haiku@clemens-zeidler.de>
  *		Joseph Groover <looncraz@satx.rr.com>
+ *		John Scipione <jscipione@gmail.com>
  */
 
 #include "DecorManager.h"
@@ -341,6 +342,7 @@ DecorManager::_LoadSettingsFromDisk()
 			DecorAddOn* decor = _LoadDecor(itemPath, error);
 			if (decor != NULL) {
 				fCurrentDecor = decor;
+				fCurrentDecorPath = itemPath;
 				return true;
 			} else {
 				//TODO: do something with the reported error
