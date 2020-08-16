@@ -177,8 +177,8 @@ es1370_stream_get_nth_buffer(es1370_stream *stream, uint8 chan, uint8 buf,
 	sample_size = stream->b16 + 1;
 	frame_size = sample_size * stream->channels;
 	
-	*buffer = stream->buffer->log_base + (buf * stream->bufframes * frame_size)
-		+ chan * sample_size;
+	*buffer = (char *)stream->buffer->log_base
+		+ (buf * stream->bufframes * frame_size) + chan * sample_size;
 	*stride = frame_size;
 	
 	return B_OK;
