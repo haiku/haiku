@@ -90,7 +90,7 @@ alloc_mem(void **phy, void **log, size_t size, const char *name)
 		PRINT(("couldn't map %s\n", name));
 		return B_ERROR;
 	}
-	memset(logadr, 0, size);
+	user_memset(logadr, 0, size);
 	if (log)
 		*log = logadr;
 	if (phy)
