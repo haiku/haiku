@@ -182,6 +182,18 @@ Inode::HasFileTypeField() const
 
 
 status_t
+Inode::CheckPermissions(int accessMode) const
+{
+	// you never have write access to a read-only volume
+	if ((accessMode & W_OK) != 0 && fVolume->IsReadOnly())
+		return B_READ_ONLY_DEVICE;
+
+	return check_access_permissions(accessMode, Mode(),
+		(uint32)fNode->GroupId(), (uint32)fNode->UserId());
+}
+
+
+status_t
 Inode::GetFromDisk()
 {
 	xfs_agnumber_t agNo = INO_TO_AGNO(fId, fVolume);

@@ -211,14 +211,16 @@ xfs_lookup(fs_volume *_volume, fs_vnode *_directory, const char *name,
 	if (!directory->IsDirectory())
 		return B_NOT_A_DIRECTORY;
 
-	//TODO: pretend everything is accessible. We should actually checking
-	//for permission here.
+	status_t status = directory->CheckPermissions(X_OK);
+	if (status < B_OK)
+		return status;
+
 	DirectoryIterator* iterator =
 		new(std::nothrow) DirectoryIterator(directory);
 	if (iterator == NULL)
 		return B_NO_MEMORY;
 
-	status_t status = iterator->Init();
+	status = iterator->Init();
 	if (status != B_OK) {
 		delete iterator;
 		return status;
@@ -308,9 +310,8 @@ xfs_free_cookie(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 static status_t
 xfs_access(fs_volume *_volume, fs_vnode *_node, int accessMode)
 {
-	//TODO: pretend everything is accessible. We should actually checking
-	//for permission here.
-	return B_OK;
+	Inode* inode = (Inode*)_node->private_node;
+	return inode->CheckPermissions(accessMode);
 }
 
 
@@ -353,6 +354,10 @@ xfs_open_dir(fs_volume * /*_volume*/, fs_vnode *_node, void **_cookie)
 	Inode* inode = (Inode*)_node->private_node;
 	TRACE("XFS_OPEN_DIR: (%ld)\n", inode->ID());
 
+	status_t status = inode->CheckPermissions(R_OK);
+	if (status < B_OK)
+		return status;
+
 	if (!inode->IsDirectory())
 		return B_NOT_A_DIRECTORY;
 
@@ -361,7 +366,7 @@ xfs_open_dir(fs_volume * /*_volume*/, fs_vnode *_node, void **_cookie)
 		delete iterator;
 		return B_NO_MEMORY;
 	}
-	status_t status = iterator->Init();
+	status = iterator->Init();
 	*_cookie = iterator;
 	return status;
 }
