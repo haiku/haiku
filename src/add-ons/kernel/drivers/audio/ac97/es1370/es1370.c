@@ -452,7 +452,9 @@ es1370_setup(es1370_dev * card)
 
 	cmd = (*pci->read_pci_config)(card->info.bus, card->info.device, card->info.function, PCI_command, 2);
 	PRINT(("PCI command before: %x\n", cmd));
-	(*pci->write_pci_config)(card->info.bus, card->info.device, card->info.function, PCI_command, 2, cmd | PCI_command_io);
+	(*pci->write_pci_config)(card->info.bus, card->info.device,
+		card->info.function, PCI_command, 2,
+		cmd | PCI_command_master | PCI_command_io);
 	cmd = (*pci->read_pci_config)(card->info.bus, card->info.device, card->info.function, PCI_command, 2);
 	PRINT(("PCI command after: %x\n", cmd));
 	
