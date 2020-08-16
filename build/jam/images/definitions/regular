@@ -194,7 +194,7 @@ SYSTEM_ADD_ONS_SCREENSAVERS += [ FFilterByBuildFeatures
 
 SYSTEM_ADD_ONS_DRIVERS_AUDIO +=
 	auich auvia
-	echo3g emuxki
+	echo3g emuxki es1370
 	hda
 	ice1712
 	sis7018
