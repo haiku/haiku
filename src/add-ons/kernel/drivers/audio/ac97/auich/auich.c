@@ -676,6 +676,7 @@ auich_setup(auich_dev * card)
 	cmd = (*pci->read_pci_config)(card->info.bus, card->info.device,
 		card->info.function, PCI_command, 2);
 	PRINT(("PCI command before: %x\n", cmd));
+	cmd |= PCI_command_master;
 	if (IS_ICH4(&card->config)) {
 		(*pci->write_pci_config)(card->info.bus, card->info.device,
 			card->info.function, PCI_command, 2, cmd | PCI_command_memory);
