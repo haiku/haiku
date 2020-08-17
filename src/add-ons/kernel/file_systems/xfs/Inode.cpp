@@ -141,9 +141,10 @@ xfs_inode_t::DataExtentsCount() const
 Inode::Inode(Volume* volume, xfs_ino_t id)
 	:
 	fVolume(volume),
-	fId(id)
+	fId(id),
+	fBuffer(NULL),
+	fExtents(NULL)
 {
-
 }
 
 
@@ -174,6 +175,14 @@ Inode::Init()
 }
 
 
+Inode::~Inode()
+{
+	delete fNode;
+	delete[] fBuffer;
+	delete[] fExtents;
+}
+
+
 bool
 Inode::HasFileTypeField() const
 {
@@ -190,6 +199,138 @@ Inode::CheckPermissions(int accessMode) const
 
 	return check_access_permissions(accessMode, Mode(),
 		(uint32)fNode->GroupId(), (uint32)fNode->UserId());
+}
+
+
+void
+Inode::UnWrapExtentFromWrappedEntry(uint64 wrappedExtent[2],
+	ExtentMapEntry* entry)
+{
+		uint64 first = B_BENDIAN_TO_HOST_INT64(wrappedExtent[0]);
+		uint64 second = B_BENDIAN_TO_HOST_INT64(wrappedExtent[1]);
+		entry->br_state = first >> 63;
+		entry->br_startoff = (first & MASK(63)) >> 9;
+		entry->br_startblock = ((first & MASK(9)) << 43) | (second >> 21);
+		entry->br_blockcount = second & MASK(21);
+}
+
+
+status_t
+Inode::ReadExtents()
+{
+	if (Format() != XFS_DINODE_FMT_EXTENTS)
+		return B_NOT_SUPPORTED;
+	fExtents = new(std::nothrow) ExtentMapEntry[DataExtentsCount()];
+	char* dataStart = (char*) DIR_DFORK_PTR(Buffer());
+	uint64 wrappedExtent[2];
+	for (int i = 0; i < DataExtentsCount(); i++) {
+		wrappedExtent[0] = *(uint64*)(dataStart);
+		wrappedExtent[1] = *(uint64*)(dataStart + sizeof(uint64));
+		dataStart += 2 * sizeof(uint64);
+		UnWrapExtentFromWrappedEntry(wrappedExtent, &fExtents[i]);
+	}
+	return B_OK;
+}
+
+
+int
+Inode::SearchMapInAllExtent(int blockNo)
+{
+	for (int i = 0; i < DataExtentsCount(); i++) {
+		if (fExtents[i].br_startoff <= blockNo
+			&& (blockNo <= fExtents[i].br_startoff
+				+ fExtents[i].br_blockcount - 1)) {
+			// Map found
+			return i;
+		}
+	}
+	return -1;
+}
+
+
+status_t
+Inode::ReadAt(off_t pos, uint8* buffer, size_t* length)
+{
+	TRACE("Inode::ReadAt: pos:(%ld), *length:(%ld)\n", pos, *length);
+	status_t status;
+	if (fExtents == NULL) {
+		status = ReadExtents();
+		if (status != B_OK)
+			return status;
+	}
+
+	// set/check boundaries for pos/length
+	if (pos < 0) {
+		ERROR("inode %" B_PRIdINO ": ReadAt failed(pos %" B_PRIdOFF
+			", length %lu)\n", ID(), pos, length);
+		return B_BAD_VALUE;
+	}
+
+	if (pos >= Size() || length == 0) {
+		TRACE("inode %" B_PRIdINO ": ReadAt 0 (pos %" B_PRIdOFF
+			", length %lu)\n", ID(), pos, length);
+		*length = 0;
+		return B_NO_ERROR;
+	}
+
+	uint32 blockNo = BLOCKNO_FROM_POSITION(pos, GetVolume());
+	uint32 offsetIntoBlock = BLOCKOFFSET_FROM_POSITION(pos, this);
+
+	size_t lengthOfBlock = BlockSize();
+	char* block = new(std::nothrow) char[lengthOfBlock];
+	if (block == NULL)
+		return B_NO_MEMORY;
+
+	ArrayDeleter<char> blockDeleter(block);
+
+	size_t lengthRead = 0;
+	size_t lengthLeftInFile;
+	size_t lengthLeftInBlock;
+	size_t lengthToRead;
+	TRACE("What is blockLen:(%d)\n", lengthOfBlock);
+	while (*length > 0) {
+		TRACE("Inode::ReadAt: pos:(%ld), *length:(%ld)\n", pos, *length);
+		// As long as you can read full blocks, read.
+		lengthLeftInFile = Size() - pos;
+		lengthLeftInBlock = lengthOfBlock - offsetIntoBlock;
+
+		// We could be almost at the end of the file
+		if (lengthLeftInFile <= lengthLeftInBlock)
+			lengthToRead = lengthLeftInFile;
+		else lengthToRead = lengthLeftInBlock;
+
+		// But we might not be able to read all of the
+		// data because of less buffer length
+		if (lengthToRead > *length)
+			lengthToRead = *length;
+
+		int indexForMap = SearchMapInAllExtent(blockNo);
+		if (indexForMap == -1)
+			return B_BAD_VALUE;
+
+		xfs_daddr_t readPos
+			= FileSystemBlockToAddr(fExtents[indexForMap].br_startblock
+				+ blockNo - fExtents[indexForMap].br_startoff);
+
+		if (read_pos(GetVolume()->Device(), readPos, block, lengthOfBlock)
+			!= lengthOfBlock) {
+			ERROR("TreeDirectory::FillBlockBuffer(): IO Error");
+			return B_IO_ERROR;
+		}
+
+
+		memcpy((void*) (buffer + lengthRead),
+			(void*)(block + offsetIntoBlock), lengthToRead);
+
+		pos += lengthToRead;
+		*length -= lengthToRead;
+		lengthRead += lengthToRead;
+		blockNo = BLOCKNO_FROM_POSITION(pos, GetVolume());
+		offsetIntoBlock = BLOCKOFFSET_FROM_POSITION(pos, this);
+	}
+	TRACE("lengthRead:(%d)\n", lengthRead);
+	*length = lengthRead;
+	return B_OK;
 }
 
 
@@ -253,13 +394,6 @@ Inode::FileSystemBlockToAddr(uint64 block)
 }
 
 
-Inode::~Inode()
-{
-	delete fBuffer;
-	delete fNode;
-}
-
-
 /*
  * Basically take 4 characters at a time as long as you can, and xor with
  * previous hashVal after rotating 4 bits of hashVal. Likewise, continue
@@ -272,22 +406,22 @@ hashfunction(const char* name, int length)
 	int lengthCovered = 0;
 	int index = 0;
 	if (length >= 4) {
-		for (;index < length && (length - index) >= 4; index += 4)
+		for (; index < length && (length - index) >= 4; index += 4)
 		{
 			lengthCovered += 4;
-			hashVal = (name[index] << 21) ^ (name[index+1] << 14)
-				^ (name[index+2] << 7) ^ (name[index+3] << 0)
-				^ ((hashVal << 28) | (hashVal >> (4)));
+			hashVal = (name[index] << 21) ^ (name[index + 1] << 14)
+				^ (name[index + 2] << 7) ^ (name[index + 3] << 0)
+				^ ((hashVal << 28) | (hashVal >> 4));
 		}
 	}
 
 	int leftToCover = length - lengthCovered;
 	if (leftToCover == 3) {
-		hashVal = (name[index] << 14) ^ (name[index+1] << 7)
-			^ (name[index+2] << 0) ^ ((hashVal << 21) | (hashVal >> (11)));
+		hashVal = (name[index] << 14) ^ (name[index + 1] << 7)
+			^ (name[index + 2] << 0) ^ ((hashVal << 21) | (hashVal >> 11));
 	}
 	if (leftToCover == 2) {
-		hashVal = (name[index] << 7) ^ (name[index+1] << 0)
+		hashVal = (name[index] << 7) ^ (name[index + 1] << 0)
 			^ ((hashVal << 14) | (hashVal >> (32 - 14)));
 	}
 	if (leftToCover == 1) {

@@ -8,6 +8,7 @@
 #include "system_dependencies.h"
 #include "Directory.h"
 #include "Inode.h"
+#include "Utility.h"
 #include "Volume.h"
 
 
@@ -281,7 +282,33 @@ static status_t
 xfs_open(fs_volume * /*_volume*/, fs_vnode *_node, int openMode,
 	void **_cookie)
 {
-	return B_NOT_SUPPORTED;
+	TRACE("XFS_OPEN:\n");
+	Inode* inode = (Inode*)_node->private_node;
+
+	// opening a directory read-only is allowed, although you can't read
+	// any data from it.
+	if (inode->IsDirectory() && (openMode & O_RWMASK) != 0)
+		return B_IS_A_DIRECTORY;
+
+	status_t status =  inode->CheckPermissions(open_mode_to_access(openMode)
+		| (openMode & O_TRUNC ? W_OK : 0));
+	if (status != B_OK)
+		return status;
+
+	// Prepare the cookie
+	file_cookie* cookie = new(std::nothrow) file_cookie;
+	if (cookie == NULL)
+		return B_NO_MEMORY;
+	ObjectDeleter<file_cookie> cookieDeleter(cookie);
+
+	cookie->open_mode = openMode & XFS_OPEN_MODE_USER_MASK;
+	cookie->last_size = inode->Size();
+	cookie->last_notification = system_time();
+
+	cookieDeleter.Detach();
+	*_cookie = cookie;
+
+	return B_OK;
 }
 
 
@@ -289,21 +316,38 @@ static status_t
 xfs_read(fs_volume *_volume, fs_vnode *_node, void *_cookie, off_t pos,
 	void *buffer, size_t *_length)
 {
-	return B_NOT_SUPPORTED;
+	TRACE("Inode::ReadAt: pos:(%ld), *length:(%ld)\n", pos, *_length);
+	Inode* inode = (Inode*)_node->private_node;
+
+	if (!inode->IsFile()) {
+		*_length = 0;
+		return inode->IsDirectory() ? B_IS_A_DIRECTORY : B_BAD_VALUE;
+	}
+
+	return inode->ReadAt(pos, (uint8*)buffer, _length);
 }
 
 
 static status_t
 xfs_close(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 {
-	return B_NOT_SUPPORTED;
+	return B_OK;
 }
 
 
 static status_t
 xfs_free_cookie(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 {
-	return B_NOT_SUPPORTED;
+	TRACE("XFS_FREE_COOKIE:\n");
+	file_cookie* cookie = (file_cookie*)_cookie;
+	Volume* volume = (Volume*)_volume->private_volume;
+	Inode* inode = (Inode*)_node->private_node;
+
+	if (inode->Size() != cookie->last_size)
+		notify_stat_changed(volume->ID(), -1, inode->ID(), B_STAT_SIZE);
+
+	delete cookie;
+	return B_OK;
 }
 
 
@@ -423,13 +467,14 @@ static status_t
 xfs_close_dir(fs_volume * /*_volume*/, fs_vnode * /*node*/,
 	void * /*_cookie*/)
 {
-	return B_NOT_SUPPORTED;
+	return B_OK;
 }
 
 
 static status_t
 xfs_free_dir_cookie(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 {
+	delete (DirectoryIterator*)_cookie;
 	return B_NOT_SUPPORTED;
 }
 

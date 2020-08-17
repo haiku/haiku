@@ -1,4 +1,5 @@
 /*
+ * Copyright 2001-2017, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2020, Shubham Bhagat, shubhambhagat111@yahoo.com
  * All rights reserved. Distributed under the terms of the MIT License.
  */
@@ -29,6 +30,14 @@ extern fs_volume_ops gxfsVolumeOps;
 	// Log of block size should be 9
 #define BASICBLOCKSIZE (1 << BASICBLOCKLOG)
 	// The size of a basic block should be 512
+#define XFS_OPEN_MODE_USER_MASK 0x7fffffff
+
+
+struct file_cookie {
+	bigtime_t last_notification;
+	off_t	last_size;
+	int		open_mode;
+};
 
 
 /*	Version 4 superblock definition	*/

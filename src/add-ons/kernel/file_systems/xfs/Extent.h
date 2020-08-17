@@ -82,18 +82,6 @@ struct ExtentBlockTail {
 };
 
 
-struct ExtentMapEntry {
-			xfs_fileoff_t		br_startoff;
-				// logical file block offset
-			xfs_fsblock_t		br_startblock;
-				// absolute block number
-			xfs_filblks_t		br_blockcount;
-				// # of blocks
-			uint8				br_state;
-				// state of the extent
-};
-
-
 class Extent
 {
 public:

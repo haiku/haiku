@@ -5,6 +5,7 @@
 #ifndef _INODE_H_
 #define _INODE_H_
 
+
 #include "system_dependencies.h"
 #include "Volume.h"
 #include "xfs_types.h"
@@ -39,6 +40,9 @@
 #define MASK(n) ((1UL << n) - 1)
 #define FSBLOCKS_TO_AGNO(n, volume) ((n) >> volume->AgBlocksLog())
 #define FSBLOCKS_TO_AGBLOCKNO(n, volume) ((n) & MASK(volume->AgBlocksLog()))
+#define BLOCKNO_FROM_POSITION(n, volume) \
+	((n) >> (volume->BlockLog()))
+#define BLOCKOFFSET_FROM_POSITION(n, inode) ((n) & (inode->BlockSize() - 1))
 
 
 // xfs_da_blkinfo_t
@@ -47,6 +51,18 @@ struct BlockInfo {
 			uint32				back;
 			uint16				magic;
 			uint16				pad;
+};
+
+
+struct ExtentMapEntry {
+			xfs_fileoff_t		br_startoff;
+				// logical file block offset
+			xfs_fsblock_t		br_startblock;
+				// absolute block number
+			xfs_filblks_t		br_blockcount;
+				// # of blocks
+			uint8				br_state;
+				// state of the extent
 };
 
 
@@ -80,7 +96,6 @@ enum xfs_dinode_fmt_t {
 struct xfs_inode_t {
 			void				SwapEndian();
 			int8				Version() const;
-				//TODO: Check
 			mode_t				Mode() const;
 			void				GetModificationTime(struct timespec&
 									timestamp);
@@ -179,6 +194,9 @@ public:
 			uint32				DirBlockSize() const
 									{ return fVolume->DirBlockSize(); }
 
+			uint32				BlockSize() const
+									{ return fVolume->BlockSize(); }
+
 			void				GetChangeTime(struct timespec& timestamp) const
 								{ fNode->GetChangeTime(timestamp); }
 
@@ -198,7 +216,11 @@ public:
 			uint64				FileSystemBlockToAddr(uint64 block);
 			uint8				ForkOffset() const
 									{ return fNode->ForkOffset(); }
-
+			status_t			ReadExtents();
+			status_t			ReadAt(off_t pos, uint8* buffer, size_t* length);
+			int					SearchMapInAllExtent(int blockNo);
+			void				UnWrapExtentFromWrappedEntry(
+									uint64 wrappedExtent[2], ExtentMapEntry* entry);
 private:
 			status_t			GetFromDisk();
 			xfs_inode_t*		fNode;
@@ -206,6 +228,7 @@ private:
 			Volume*				fVolume;
 			char*				fBuffer;
 				// Contains the disk inode in BE format
+			ExtentMapEntry*		fExtents;
 };
 
 #endif
