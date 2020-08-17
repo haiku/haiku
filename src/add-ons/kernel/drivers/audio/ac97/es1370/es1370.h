@@ -40,7 +40,7 @@
 typedef struct _es1370_mem {
 	LIST_ENTRY(_es1370_mem) next;
 	void	*log_base;
-	void	*phy_base;
+	phys_addr_t	phy_base;
 	area_id area;
 	size_t	size;
 } es1370_mem;

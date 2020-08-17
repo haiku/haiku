@@ -65,9 +65,8 @@ round_to_pagesize(uint32 size)
 
 
 area_id
-alloc_mem(void **phy, void **log, size_t size, const char *name)
+alloc_mem(phys_addr_t *phy, void **log, size_t size, const char *name)
 {
-// TODO: phy should be phys_addr_t*!
 	physical_entry pe;
 	void * logadr;
 	area_id areaid;
@@ -94,7 +93,7 @@ alloc_mem(void **phy, void **log, size_t size, const char *name)
 	if (log)
 		*log = logadr;
 	if (phy)
-		*phy = (void*)(addr_t)pe.address;
+		*phy = pe.address;
 	LOG(("area = %d, size = %d, log = %#08X, phy = %#08X\n", areaid, size,
 		logadr, pe.address));
 	return areaid;
@@ -107,10 +106,10 @@ alloc_mem(void **phy, void **log, size_t size, const char *name)
  * below does work, and I can't test if using B_ANY_KERNEL_ADDRESS also works.
  */
 area_id
-map_mem(void **log, void *phy, size_t size, const char *name)
+map_mem(void **log, phys_addr_t phy, size_t size, const char *name)
 {
 	uint32 offset;
-	void *phyadr;
+	phys_addr_t phyadr;
 	void *mapadr;
 	area_id area;
 
@@ -119,9 +118,9 @@ map_mem(void **log, void *phy, size_t size, const char *name)
 	offset = (uint32)phy & (B_PAGE_SIZE - 1);
 	phyadr = phy - offset;
 	size = round_to_pagesize(size + offset);
-	area = map_physical_memory(name, (addr_t)phyadr, size,
-		B_ANY_KERNEL_BLOCK_ADDRESS, B_READ_AREA | B_WRITE_AREA, &mapadr);
-	*log = mapadr + offset;
+	area = map_physical_memory(name, phyadr, size, B_ANY_KERNEL_BLOCK_ADDRESS,
+		B_READ_AREA | B_WRITE_AREA, &mapadr);
+	*log = (uint8 *)mapadr + offset;
 
 	LOG(("physical = %p, logical = %p, offset = %#x, phyadr = %p, mapadr = %p, size = %#x, area = %#x\n",
 		phy, *log, offset, phyadr, mapadr, size, area));
