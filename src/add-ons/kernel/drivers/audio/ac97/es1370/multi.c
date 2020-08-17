@@ -177,7 +177,7 @@ static status_t
 es1370_create_controls_list(multi_dev *multi)
 {
 	multi->control_count = 0;
-	PRINT(("multi->control_count %lu\n", multi->control_count));
+	PRINT(("multi->control_count %" B_PRIu32 "\n", multi->control_count));
 	return B_OK;
 }
 
@@ -189,7 +189,8 @@ es1370_get_mix(es1370_dev *card, multi_mix_value_info * mmvi)
 	for (i = 0; i < mmvi->item_count; i++) {
 		id = mmvi->values[i].id - EMU_MULTI_CONTROL_FIRSTID;
 		if (id < 0 || id >= card->multi.control_count) {
-			PRINT(("es1370_get_mix : invalid control id requested : %li\n", id));
+			PRINT(("es1370_get_mix : invalid control id requested : %" B_PRId32
+				"\n", id));
 			continue;
 		}
 		control = &card->multi.controls[id];
@@ -228,7 +229,8 @@ es1370_set_mix(es1370_dev *card, multi_mix_value_info * mmvi)
 	for (i = 0; i < mmvi->item_count; i++) {
 		id = mmvi->values[i].id - EMU_MULTI_CONTROL_FIRSTID;
 		if (id < 0 || id >= card->multi.control_count) {
-			PRINT(("es1370_set_mix : invalid control id requested : %li\n", id));
+			PRINT(("es1370_set_mix : invalid control id requested : %" B_PRId32
+				"\n", id));
 			continue;
 		}
 		control = &card->multi.controls[id];
@@ -238,7 +240,8 @@ es1370_set_mix(es1370_dev *card, multi_mix_value_info * mmvi)
 			if (i+1<mmvi->item_count) {
 				id = mmvi->values[i + 1].id - EMU_MULTI_CONTROL_FIRSTID;
 				if (id < 0 || id >= card->multi.control_count) {
-					PRINT(("es1370_set_mix : invalid control id requested : %li\n", id));
+					PRINT(("es1370_set_mix : invalid control id requested : %"
+						B_PRId32 "\n", id));
 				} else {
 					control2 = &card->multi.controls[id];
 					if (control2->mix_control.master != control->mix_control.id)
@@ -453,7 +456,8 @@ es1370_get_description(es1370_dev *card, multi_description *data)
 	// channel, second, third, ..., followed by output bus
 	// channels and input bus channels and finally auxillary channels, 
 
-	LOG(("request_channel_count = %d\n",data->request_channel_count));
+	LOG(("request_channel_count = %" B_PRId32 "\n",
+		data->request_channel_count));
 	if (data->request_channel_count >= size) {
 		LOG(("copying data\n"));
 		memcpy(data->channels, card->multi.chans, size * sizeof(card->multi.chans[0]));
@@ -534,13 +538,19 @@ es1370_get_buffers(es1370_dev *card, multi_buffer_list *data)
 {
 	uint8 i, j, pchannels, rchannels, bufcount;
 	
-	LOG(("flags = %#x\n",data->flags));
-	LOG(("request_playback_buffers = %#x\n",data->request_playback_buffers));
-	LOG(("request_playback_channels = %#x\n",data->request_playback_channels));
-	LOG(("request_playback_buffer_size = %#x\n",data->request_playback_buffer_size));
-	LOG(("request_record_buffers = %#x\n",data->request_record_buffers));
-	LOG(("request_record_channels = %#x\n",data->request_record_channels));
-	LOG(("request_record_buffer_size = %#x\n",data->request_record_buffer_size));
+	LOG(("flags = %#" B_PRIx32 "\n",data->flags));
+	LOG(("request_playback_buffers = %" B_PRId32 "\n",
+		data->request_playback_buffers));
+	LOG(("request_playback_channels = %" B_PRId32 "\n",
+		data->request_playback_channels));
+	LOG(("request_playback_buffer_size = %#" B_PRIx32 "\n",
+		data->request_playback_buffer_size));
+	LOG(("request_record_buffers = %" B_PRId32 "\n",
+		data->request_record_buffers));
+	LOG(("request_record_channels = %" B_PRId32 "\n",
+		data->request_record_channels));
+	LOG(("request_record_buffer_size = %#" B_PRIx32 "\n",
+		data->request_record_buffer_size));
 	
 	pchannels = card->pstream->channels;
 	rchannels = card->rstream->channels;

@@ -72,7 +72,7 @@ alloc_mem(phys_addr_t *phy, void **log, size_t size, const char *name)
 	area_id areaid;
 	status_t rv;
 
-	LOG(("allocating %d bytes for %s\n",size,name));
+	LOG(("allocating %" B_PRIuSIZE " bytes for %s\n", size, name));
 
 	size = round_to_pagesize(size);
 	areaid = create_area(name, &logadr, B_ANY_KERNEL_ADDRESS, size,
@@ -94,8 +94,8 @@ alloc_mem(phys_addr_t *phy, void **log, size_t size, const char *name)
 		*log = logadr;
 	if (phy)
 		*phy = pe.address;
-	LOG(("area = %d, size = %d, log = %#08X, phy = %#08X\n", areaid, size,
-		logadr, pe.address));
+	LOG(("area = %" B_PRId32 ", size = %" B_PRIuSIZE ", log = %p, phy = %#08"
+		B_PRIxPHYSADDR "\n", areaid, size, logadr, pe.address));
 	return areaid;
 }
 
@@ -113,7 +113,8 @@ map_mem(void **log, phys_addr_t phy, size_t size, const char *name)
 	void *mapadr;
 	area_id area;
 
-	LOG(("mapping physical address %p with %#x bytes for %s\n",phy,size,name));
+	LOG(("mapping physical address %" B_PRIxPHYSADDR " with %" B_PRIxSIZE
+		" bytes for %s\n", phy, size, name));
 
 	offset = (uint32)phy & (B_PAGE_SIZE - 1);
 	phyadr = phy - offset;
@@ -122,8 +123,10 @@ map_mem(void **log, phys_addr_t phy, size_t size, const char *name)
 		B_READ_AREA | B_WRITE_AREA, &mapadr);
 	*log = (uint8 *)mapadr + offset;
 
-	LOG(("physical = %p, logical = %p, offset = %#x, phyadr = %p, mapadr = %p, size = %#x, area = %#x\n",
-		phy, *log, offset, phyadr, mapadr, size, area));
+	LOG(("physical = %" B_PRIxPHYSADDR ", logical = %p, offset = %" B_PRIu32
+		", phyadr = %" B_PRIxPHYSADDR ", mapadr = %p, size = %" B_PRIxSIZE
+		", area = %" B_PRId32 "\n", phy, *log, offset, phyadr, mapadr, size,
+		area));
 
 	return area;
 }
