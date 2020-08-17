@@ -302,6 +302,7 @@ HeaderView::Draw(BRect)
 	// Font information
 	font_height fontMetrics;
 	BFont currentFont;
+	float lineHeight = 0;
 	float lineBase = 0;
 
 	// Draw the main title if the user is not currently editing it
@@ -310,6 +311,7 @@ HeaderView::Draw(BRect)
 		SetFontSize(be_bold_font->Size());
 		GetFont(&currentFont);
 		currentFont.GetHeight(&fontMetrics);
+		lineHeight = CurrentFontHeight() + 5;
 		lineBase = fTitleRect.bottom - fontMetrics.descent;
 		SetHighColor(labelColor);
 		MovePenTo(BPoint(fIconRect.right + 6, lineBase));
