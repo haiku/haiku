@@ -352,6 +352,7 @@
 
 // cr4 flags
 #define IA32_CR4_PAE			(1UL << 5)
+#define IA32_CR4_MCE			(1UL << 6)
 #define IA32_CR4_GLOBAL_PAGES	(1UL << 7)
 #define CR4_OS_FXSR				(1UL << 9)
 #define CR4_OS_XMM_EXCEPTION	(1UL << 10)

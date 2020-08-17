@@ -1350,6 +1350,9 @@ arch_cpu_init_percpu(kernel_args* args, int cpu)
 			gCpuIdleFunc = halt_idle;
 	}
 
+	if (x86_check_feature(IA32_FEATURE_MCE, FEATURE_COMMON))
+		x86_write_cr4(x86_read_cr4() | IA32_CR4_MCE);
+
 #ifdef __x86_64__
 	// if RDTSCP is available write cpu number in TSC_AUX
 	if (x86_check_feature(IA32_FEATURE_AMD_EXT_RDTSCP, FEATURE_EXT_AMD))
