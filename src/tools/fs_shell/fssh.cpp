@@ -691,7 +691,7 @@ command_chmod(int argc, const char* const* argv)
 static fssh_status_t
 command_cat(int argc, const char* const* argv)
 {
-	size_t numBytes = 10;
+	size_t numBytes = 4096;
 	int fileStart = 1;
 	if (argc < 2 || strcmp(argv[1], "--help") == 0) {
 		printf("Usage: %s [ -n ] [FILE]...\n"
@@ -700,9 +700,11 @@ command_cat(int argc, const char* const* argv)
 		return FSSH_B_OK;
 	}
 
+	bool isReadLengthGiven = false;
 	if (argc > 3 && strcmp(argv[1], "-n") == 0) {
 		fileStart += 2;
 		numBytes = strtol(argv[2], NULL, 10);
+		isReadLengthGiven = true;
 	}
 
 	const char* const* files = argv + fileStart;
@@ -713,23 +715,37 @@ command_cat(int argc, const char* const* argv)
 			fprintf(stderr, "error: %s\n", fssh_strerror(fd));
 			return FSSH_B_BAD_VALUE;
 		}
+		struct fssh_stat st;
+		fssh_status_t error = _kern_read_stat(-1, file, false, &st, sizeof(st));
+		if (error != FSSH_B_OK) {
+			fprintf(stderr, "Error: Failed to stat() \"%s\": %s\n", file,
+				fssh_strerror(error));
+			return error;
+		}
+		size_t fileLengthToRead;
+		if (!isReadLengthGiven) {
+			fileLengthToRead = st.fssh_st_size;
+			numBytes = 4096;
+		} else
+			fileLengthToRead = numBytes;
+		size_t pos = 0;
 
 		char buffer[numBytes + 1];
-		if (buffer == NULL) {
-			fprintf(stderr, "error: No memory\n");
-			_kern_close(fd);
-			return FSSH_B_NO_MEMORY;
+		while (fileLengthToRead > 0) {
+			if (fileLengthToRead < numBytes)
+				numBytes = fileLengthToRead;
+			if (_kern_read(fd, pos, buffer, numBytes) != (ssize_t)numBytes) {
+				fprintf(stderr, "error reading: %s\n", fssh_strerror(fd));
+				_kern_close(fd);
+				return FSSH_B_BAD_VALUE;
+			}
+			buffer[numBytes] = '\0';
+			printf("%s", buffer);
+			pos += numBytes;
+			fileLengthToRead -= numBytes;
 		}
-
-		if (_kern_read(fd, 0, buffer, numBytes) != (ssize_t)numBytes) {
-			fprintf(stderr, "error reading: %s\n", fssh_strerror(fd));
-			_kern_close(fd);
-			return FSSH_B_BAD_VALUE;
-		}
-
+		printf("\n");
 		_kern_close(fd);
-		buffer[numBytes] = '\0';
-		printf("%s\n", buffer);
 	}
 
 	return FSSH_B_OK;
