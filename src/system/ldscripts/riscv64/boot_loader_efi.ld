@@ -26,6 +26,10 @@ SECTIONS
 	_text_size = . - _text;
 	.dynamic  : { *(.dynamic) }
 	.data : {
+		__ctor_list = .;
+		*(.init_array)
+		*(.ctors)
+		__ctor_end = .;
 		_data = .;
 		*(.sdata)
 		*(.data)

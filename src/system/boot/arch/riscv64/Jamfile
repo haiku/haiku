@@ -22,7 +22,6 @@ local kernelDebugSources =
 
 local kernelArchDriverSources =
 	arch_elf.cpp
-	arch_cpu.cpp
 
 	# Serial UART Drivers
 	#arch_uart_8250.cpp
@@ -42,6 +41,8 @@ for platform in [ MultiBootSubDirSetup u-boot efi ] {
 			$(kernelDebugSources)
 			$(kernelArchDriverSources)
 			$(kernelGenericDriverSources)
+			arch_cpu.cpp
+			kernel_stubs.cpp
 			: # additional flags
 			:
 			$(kernelArchObjects)
