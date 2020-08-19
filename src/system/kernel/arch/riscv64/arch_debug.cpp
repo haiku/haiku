@@ -1,5 +1,5 @@
 /*
- * Copyright 2019, Haiku, Inc. All rights reserved.
+ * Copyright 2019-2020, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -92,6 +92,13 @@ arch_debug_get_interrupt_pc(bool* _isSyscall)
 }
 
 
+void
+arch_debug_unset_current_thread(void)
+{
+	// TODO: Implement!
+}
+
+
 status_t
 arch_debug_init(kernel_args *args)
 {
@@ -103,4 +110,3 @@ arch_debug_init(kernel_args *args)
 
 	return B_NO_ERROR;
 }
-
