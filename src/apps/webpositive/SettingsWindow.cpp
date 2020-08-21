@@ -261,6 +261,7 @@ SettingsWindow::_CreateGeneralPage(float spacing)
 		new BMessage(MSG_SEARCH_PAGE_CHANGED));
 	fSearchPageControl->SetModificationMessage(
 		new BMessage(MSG_SEARCH_PAGE_CHANGED));
+	fSearchPageControl->SetToolTip(B_TRANSLATE("%s - Search term"));
 	BString searchURL = fSettings->GetValue(kSettingsKeySearchPageURL,
 		kDefaultSearchPageURL);
 	if (searchURL == "http://www.google.com") {
