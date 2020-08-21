@@ -337,10 +337,7 @@ for platform in [ MultiBootSubDirSetup ] {
 			case efi :
 				BuildEFILoader haiku_loader.$(TARGET_BOOT_PLATFORM) : boot_loader_$(TARGET_BOOT_PLATFORM) ;
 				if $(TARGET_ARCH) = arm || $(TARGET_ARCH) = arm64 {
-					# These platforms sometimes need u-boot to get them going
-					BuildUImage haiku-floppyboot.tgz.$(TARGET_BOOT_PLATFORM) : haiku-floppyboot.tgz :
-						-A $(TARGET_ARCH) -O linux -T ramdisk -C none
-						-n 'Haiku $(TARGET_KERNEL_ARCH) floppyboot' ;
+					# These EFI platforms need u-boot to get them going
 					BuildUImageScript boot.scr
 						: [ FDirName $(HAIKU_TOP) data boot u-boot boot-$(TARGET_ARCH).scr.txt ] ;
 				}

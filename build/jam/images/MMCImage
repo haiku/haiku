@@ -38,6 +38,7 @@ rule BuildSDImage image : files
 	}
 }
 
+# Usage: image : loader floppyboot everything_else
 actions BuildUBootSDImage1
 {
 	$(RM) $(1)
@@ -81,7 +82,7 @@ actions BuildUBootSDImage1
 	cat $(2[0]) >> $(1)
 }
 
-
+# Usage: image : loader everything_else
 actions BuildEfiSDImage1
 {
 	$(RM) $(1)
@@ -110,9 +111,7 @@ actions BuildEfiSDImage1
 	MTOOLSRC=$(1).mtools mmd i:/EFI
 	MTOOLSRC=$(1).mtools mmd i:/EFI/BOOT
 	MTOOLSRC=$(1).mtools mcopy $(2[2-2]) i:/EFI/BOOT/$(EFINAME)
-	# Not really needed on EFI since we use EFI runtime services.
-	#MTOOLSRC=$(1).mtools mcopy $(2[3-3]) i:/haiku_floppyboot.ub
-	MTOOLSRC=$(1).mtools mcopy $(2[4-]) i:
+	MTOOLSRC=$(1).mtools mcopy $(2[3-]) i:
 	MTOOLSRC=$(1).mtools mcopy uEnv.txt i:
 	# populate fdts
 	MTOOLSRC=$(1).mtools mmd i:/fdt
@@ -133,8 +132,15 @@ for platform in [ MultiBootSubDirSetup ] {
 	on $(platform) {
 		# SD/mmc image targets
 		if $(TARGET_BOOT_PLATFORM) = efi {
-			BuildSDImage $(HAIKU_MMC_NAME) :
-				$(HAIKU_IMAGE) haiku_loader.$(TARGET_BOOT_PLATFORM) haiku-floppyboot.tgz.$(TARGET_BOOT_PLATFORM) boot.scr ;
+			if $(TARGET_ARCH) = arm || $(TARGET_ARCH) = arm64 {
+				# These EFI platforms need u-boot to get them going
+				BuildSDImage $(HAIKU_MMC_NAME) : $(HAIKU_IMAGE)
+					haiku_loader.$(TARGET_BOOT_PLATFORM)
+					boot.scr ;
+			} else {
+				BuildSDImage $(HAIKU_MMC_NAME) : $(HAIKU_IMAGE)
+					haiku_loader.$(TARGET_BOOT_PLATFORM) ;
+			}
 		} else {
 			BuildSDImage $(HAIKU_MMC_NAME) :
 				$(HAIKU_IMAGE) haiku_loader.$(TARGET_BOOT_PLATFORM) haiku-floppyboot.tgz.$(TARGET_BOOT_PLATFORM) boot.scr ;
