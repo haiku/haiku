@@ -24,7 +24,7 @@ Gamma	Application Type Window		Гамма
 Cancel	Application Type Window		Скасувати
 Attribute	Attribute Window		Атрибут
 Multiple launch	Application Type Window		Багаторазовий запуск
-{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, one{# Application type could be removed}, other{# Application types could be removed}}
+{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, one{# тип програми вилучено} few{# типи програм вилучено} other{# типів програм вилучено}}
 Edit…	Application Types Window		Редагувати…
 Could not set preferred application	FileTypes Window		Неможливо встановити пріоритетну програму
 Description	FileTypes Window		Опис
@@ -92,7 +92,7 @@ Select preferred application	FileTypes Window		Вибрати пріоритет
 Path:	Application Types Window		Шлях:
 rating	Attribute ListView		рейтинг
 Could not install file type	New File Type Window		Неможливо встановити тип файла
-Same as…	FileTypes Window		Такий як…
+Same as…	FileTypes Window		Така як…
 Golden master	Application Type Window		Золотий майстер
 Checkbox	Attribute ListView		Чек-бокс
 FileTypes request	Preferred App Menu		Запит Типів файлів

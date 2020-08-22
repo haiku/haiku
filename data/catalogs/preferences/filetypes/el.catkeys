@@ -85,7 +85,7 @@ Editable	Attribute Window	If Tracker allows to edit this attribute.	Επεξερ
 New resource file…	FileTypes Window		Νέο αρχείο πόρων…
 [Multiple files] file types	FileType Window		[Πολλαπλά αρχεία] τύποι αρχείων
 Application type	Application Type Window		Τύπος εφαρμογής
-Show in Tracker…	Application Types Window		Προβολή στο Tracker…
+Show in Tracker…	Application Types Window		Προβολή στον Ιχνηλάτη…
 Type name:	FileTypes Window		Όνομα τύπου:
 Visible	Attribute Window		Ορατό
 Select preferred application	FileTypes Window		Επιλογή προτεινόμενης εφαρμογής
@@ -159,7 +159,7 @@ Close	Application Type Window		Κλείσιμο
 Integer 16 bit	Attribute ListView		Ακέραιος αριθμός 16-bit
 Extension	Extension Window		Επέκταση
 Rule:	FileTypes Window		Κανόνας:
-FileTypes	System name		Τύποι αρχείων
+FileTypes	System name		Τύποι Αρχείων
 Version	Application Types Window		ΈΚδοση
 Quit	FileTypes Window		Έξοδος
 File type	FileType Window		Τύπος αρχείου

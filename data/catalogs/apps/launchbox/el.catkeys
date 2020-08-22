@@ -32,5 +32,5 @@ Remove button	LaunchBox		Αφαίρεση κουμπιού
 Quit	LaunchBox		Έξοδος
 Horizontal layout	LaunchBox		Οριζόντια διάταξη
 New	LaunchBox		Νέο
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Η εντολή `ανοιχτός φάκελος` στο Tracker απέτυχε.\n\nΣφάλμα: 
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Η εντολή `άνοιγμα φακέλου` στον Ιχνηλάτη απέτυχε.\n\nΣφάλμα: 
 Pad %1	LaunchBox		Pad %1

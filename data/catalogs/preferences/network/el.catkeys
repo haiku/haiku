@@ -17,7 +17,7 @@ DHCP	IntefaceAddressView		DHCP
 Netmask:	IntefaceAddressView		Μάσκα δικτύου:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Υπηρεσίες
-Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Η εγκατάσταση του NetworkStatus στην Γραμμή Εργασιών απέτυχε: %s
+Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Η προσθήκη της εφαρμογής Κατάστασης Δικτύου στην Γραμμή Εργασιών απέτυχε: %s
 Revert	NetworkWindow		Επαναφορά
 off	ServiceListItem		κλειστό
 WEP	WEP protected network		WEP

@@ -13,7 +13,7 @@ Quit	SudokuWindow		Έξοδος
 Redo	SudokuWindow		Επαναφορά
 Could not open \"%s\":\n%s\n	SudokuWindow		Δεν ήταν δυνατό το άνοιγμα του \"%s\":\n%s\n
 Blank	SudokuWindow		Κενό
-Sudoku solved - congratulations!\n	SudokuWindow		Λύσατε το Sudoku - συγχαρητήρια!\n
+Sudoku solved - congratulations!\n	SudokuWindow		Λύσατε το Σουντόκου - συγχαρητήρια!\n
 Text	SudokuWindow		Κείμενο
 Copy	SudokuWindow		Αντιγραφή
 Solve	SudokuWindow		Λύση
@@ -22,14 +22,14 @@ Advanced	SudokuWindow		Προχωρημένο
 Set all hints	SudokuWindow		Τοποθέτηση όλων των βοηθητικών στοιχείων
 Searching for removable values	SudokuGenerator		Γίνεται αναζήτηση αφαιρούμενων τιμών
 Abort	ProgressWindow		Ματαίωση
-Could not set Sudoku:\n%s\n	SudokuWindow		Αδυναμία ορισμού του Sudoku:\n%s\n
+Could not set Sudoku:\n%s\n	SudokuWindow		Αδυναμία δημιουργίας Σουντόκου:\n%s\n
 Help	SudokuWindow		Βοήθεια
 OK	SudokuWindow		Εντάξει
-Sudoku	System name		Sudoku
+Sudoku	System name		Σουντόκου
 Progress monitor	ProgressWindow		Ελεγκης προόδου
 Creating solvable field	SudokuGenerator		Δημιουργία επιλύσιμου πεδίου
 View	SudokuWindow		Προβολή
 Snapshot current	SudokuWindow		Λήψη στιγμιοτύπου
 Mark valid hints	SudokuWindow		Σημείωση έγκυρων συμβουλών
-Sudoku request	SudokuWindow		Αίτηση Sudoku
+Sudoku request	SudokuWindow		Αίτηση Σουντόκου
 Open file…	SudokuWindow		Άνοιγμα αρχείου…

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Installer	4193079864
+1	ukrainian	x-vnd.Haiku-Installer	1099509143
 Performing installation.	InstallProgress		Виконання інсталяції.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Виберіть джерело з випадаючого меню. Потім натисніть кнопку \"Почати\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Закрийте вікно DriveSetup перед тим як закрити вікно Installer.
@@ -25,6 +25,7 @@ Welcome to the Haiku Installer!\n\n	InstallerApp		Вітаємо у програ
 Quit Boot Manager	InstallerWindow		Вийти з Boot Manager
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Boot Manager виконується…\n\nЗакрийте його для продовження інсталяції.
 Quit DriveSetup	InstallerWindow		Вийти з DriveSetup
+The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume while the existing 'settings' folder is retained. All other folders will be merged, in which files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Цільовий том не порожній. Ви впевнені, що хочете провести інсталяцію в будь-якому випадку?\n\nПримітка: папка 'system' буде чистою копією з вихідного тому, в той час як існуюча папка 'settings' буде збережена. Всі інші папки будуть об'єднані. Файли і посилання, існуючі як на вихідному, так і на цільовому томі, будуть перезаписані версією з вихідного тому.
 Write boot sector	InstallerWindow		Записати завантажувальний сектор
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld з %2ld
 Finishing installation.	InstallProgress		Завершення інсталяції.
@@ -32,11 +33,12 @@ Install from:	InstallerWindow		Інсталяція з:
 Additional disk space required: 0.0 KiB	InstallerWindow		Потрібен додатковий дисковий простір: 0.0 Кб
 This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Це програмне забезпечення для бета-тестування! Це означає, що існує ризик втрати важливих даних. Частіше робіть резервні копії, попереджаємо Вас!\n\n\n
 ???	InstallerWindow	Unknown currently copied item	???
+Install anyway	InstallProgress		Встановити в будь-якому випадку
 1)   If you are installing Haiku onto real hardware (not inside an emulator), you may want to prepare a hard disk partition from another OS (you could, for example, use a GParted Live-CD, which can also resize existing partitions to make room).\nYou can also set up partitions by launching DriveSetup from Installer, but you won't be able to resize existing partitions with it. While DriveSetup has been quite thoroughly tested over the years, it's recommended to have up-to-date backups of the other partitions on your system. Just in case…	InstallerApp		1)  Якщо Ви встановлююте Haiku на реальний комп'ютер (не емулятор), то можете підготувати розділ жорсткого диска за допомогою іншої ОС (скористайтесь, наприклад, GParted Live-CD, який також уміє змінювати розмір існуючих розділів для створення потрібного місця під систему).\nДля створення розділу можна скористатись програмою DriveSetup прямо в Installer, але він не вміє міняти розміри існуючих розділів. Хоча протягом багатьох років DriveSetup було досить ретельно протестовано, рекомендуємо зробити резервні копії інших розділів у Вашій системі. На всякий випадок…
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Виберіть джерело і цільовий диск з випадаючого меню. Після чого натисніть \"Почати\".
 Hide optional packages	InstallerWindow		Сховати опціональні пакети
 ???	InstallerWindow	Unknown partition name	???
-Have fun and thanks for trying out Haiku!	InstallerApp		Удачі та дякую, що випробували Haiku!
+Have fun and thanks for trying out Haiku!	InstallerApp		Дякуємо за те, що вибрали систему Haiku! Отримуйте задоволення від її роботи.
 Quit	InstallerApp		Вийти
 Error writing boot sector.	InstallProgress		Помилка запису завантажувального сектору.
 OK	InstallerWindow		ОК
@@ -47,12 +49,14 @@ IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		ВАЖЛИВА �
 Additional disk space required: %s	InstallerWindow		Є потреба в додатковому дисковому просторі: %s
 Stop	InstallerWindow	In alert after pressing Stop	Зупинити
 Boot sector successfully written.	InstallProgress		Завантажувальний сектор успішно записаний.
+Writing bootsector.	InstallProgress		Записується бут-сектор.
 An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Сталася помилка і інсталяція неповна:\n\nПомилка: %s
 Restart	InstallerWindow		Перезапуск
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Диск неможливо підключити. Виберіть інший.
 Begin	InstallerWindow		Почати
 Collecting copy information.	InstallProgress		Збір інформації для копіювання.
 Show optional packages	InstallerWindow		Показати опціональні пакети
+No partitions have been found that are suitable for installation. Please set up partitions and format at least one partition with the Be File System.	InstallerWindow		Відсутні розділи, які придатні для інсталяції. Будь ласка, проведіть розмітку/настройку розділів і відформатуйте хоча б один розділ під файлову систему Be (BFS).
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Поточний диск має недостатньо місця. Виберіть інший диск або не встановлюйте необов’язкові елементи.
 Installation canceled.	InstallProgress		Інсталяція скасована.
 Are you sure you want to abort the installation?	InstallerWindow		Ви дійсно бажаєте відмінити інсталяцію?
@@ -73,8 +77,10 @@ Running Boot Manager and DriveSetup…\n\nClose both applications to continue wi
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Ви впевнені що, хочете встановлювати на поточний завантажувальний диск? Installer перезавантажить машину, якщо Ви продовжите.
 Onto:	InstallerWindow		На:
 Quit Boot Manager and DriveSetup	InstallerWindow		Вийти з Boot Manager та DriveSetup
+3)   When you successfully boot into Haiku for the first time, make sure to read our \"Userguide\" and take the \"Quick Tour\". There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Коли Ви успішно завантажите Haiku перший раз, обов'язково прочитайте наш \"Userguide\" і здолайте \"Quick Tour\". Відповідні посилання є на Робочому столі та в закладках WebPositive.\n\n
 Tools	InstallerWindow		Інструменти
 scanning…	InstallerWindow		сканування…
+Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be formatted with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Запустіть утиліту DriveSetup, щоб розмітити\nдоступні жорсткі диски та інші носії на розділи.\nРозділи необхідно відформатувати під\nфайлову систему Be (BFS), необхідну для\nзавантажувального розділу Haiku.
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Userguide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2)   Installer власне зробить розділ Haiku завантажувальним, але не зробить жодного кроку щоб додати Haiku до існуючого меню загрузки. Якщо Ви маєте встановлений GRUB, то можете додати Haiku в його меню.\nЗа деталями зверніться до настанови з завантаження Haiku на нашому вебсайті - https://www.haiku-os.org/guides/booting.\nАбо налаштуйте це меню за допомогою меню \"Інструменти\" Installer, дивитись у розділі про програму \"BootManager\".\n\n\n
 Set up boot menu	InstallerWindow		Встановити меню загрузки
 Continue	InstallerApp		Продовжити

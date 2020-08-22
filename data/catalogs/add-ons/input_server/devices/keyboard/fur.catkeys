@@ -1,6 +1,8 @@
-1	friulian	x-vnd.Haiku-KeyboardInputServerDevice	2228550365
+1	friulian	x-vnd.Haiku-KeyboardInputServerDevice	131044710
 If the application will not quit you may have to kill it.	Team monitor		Se la aplicazion no si siere tu podaressis vê bisugne di copâle.
 Quit application	Team monitor		Jes de aplicazion
+Open Terminal	Team monitor		Vierç Terminâl
+{0, plural,one{Hold CONTROL+ALT+DELETE for # second to reboot.}other{Hold CONTROL+ALT+DELETE for # seconds to reboot.}}	Team monitor		{0, plural,one{Ten fracât CONTROL+ALT+CANC par # secont par tornâ a inviâ.}other{Ten fracât CONTROL+ALT+CANC par # seconts par tornâ a inviâ.}}
 Restart the desktop	Team monitor		Torne invie il scritori
 Force reboot	Team monitor		Sfuarce il tornâ a inviâ
 Team monitor	Team monitor		Monitor dai Team

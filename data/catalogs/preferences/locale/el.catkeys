@@ -24,6 +24,6 @@ Cancel	Locale Preflet Window		Άκυρο
 Revert	Locale Preflet Window		Επαναφορά
 12 hour	TimeFormatSettings		12-ωρη μορφή
 Positive:	TimeFormatSettings		Θετικό:
-Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Για να εφαρμοστούν οι αλλαγές, χρειάζεται η επανεκκίνηση της Γραμμής Εργασιών και του Tracker. Θέλετε να γίνει η επανεκκίνηση τώρα;
+Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Για να εφαρμοστούν οι αλλαγές, απαιτείται η επανεκκίνηση της Γραμμής Εργασιών και του Ιχνηλάτη. Θέλετε να γίνει η επανεκκίνηση τώρα;
 Restart	Locale Preflet Window		Επανεκκίνηση
 Currency	TimeFormatSettings		Νόμισμα

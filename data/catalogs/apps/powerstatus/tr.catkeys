@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-PowerStatus	3173765686
+1	turkish	x-vnd.Haiku-PowerStatus	1085070685
 Run in window	PowerStatus		Pencere içinde çalış
 Extended battery info	PowerStatus		Ek pil bilgisi
 Show status icon	PowerStatus		Durum simgesini göster
@@ -30,11 +30,13 @@ Serial number: 	PowerStatus		Seri numarası:
 Battery critical	PowerStatus		Pil düzeyi kritik
 Capacity: 	PowerStatus		Kapasite: 
  mW	PowerStatus		 mW
+No supported battery detected. PowerStatus cannot be used on your system.	PowerStatus		Desteklenen bir pil algılanamadı. Güç Durumu sisteminizde kullanılamıyor.
 Show percent	PowerStatus		Yüzdeyi göster
 Capacity granularity 1: 	PowerStatus		Kapasite tanecikliği 1: 
 The battery level is getting low, please plug in the device.	PowerStatus		Pil düzeyi düşük, lütfen aygıtınızı fişe takın.
 Design capacity warning: 	PowerStatus		Fabrika çıkış kapasite uyarısı: 
 Capacity granularity 2: 	PowerStatus		Kapasite tanecikliği 2: 
+Too bad!	PowerStatus		Pek fena!
 Technology: 	PowerStatus		Teknoloji: 
  mWh	PowerStatus		 mWh
 PowerStatus	System name		Güç Durumu

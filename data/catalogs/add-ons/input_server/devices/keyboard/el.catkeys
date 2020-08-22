@@ -1,6 +1,7 @@
-1	greek, modern (1453-)	x-vnd.Haiku-KeyboardInputServerDevice	2228550365
+1	greek, modern (1453-)	x-vnd.Haiku-KeyboardInputServerDevice	1085266673
 If the application will not quit you may have to kill it.	Team monitor		Αν η εφαρμογή δεν κλείσει, θα πρέπει ενδεχομένως να την τερματίσετε εξαναγκαστικά.
 Quit application	Team monitor		Κλείσιμο εφαρμογής
+Open Terminal	Team monitor		Άνοιγμα Τερματικού
 Restart the desktop	Team monitor		Επαννεκίνηση
 Force reboot	Team monitor		Εξαναγκαστική επανεκκίνηση
 Team monitor	Team monitor		Οθόνη ομάδας

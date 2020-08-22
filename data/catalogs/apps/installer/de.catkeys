@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Installer	3283947218
+1	german	x-vnd.Haiku-Installer	1099509143
 Performing installation.	InstallProgress		Installation läuft.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Bitte Quelllaufwerk aus dem Menü wählen. Danach auf \"Start\" klicken.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Das DriveSetup-Fenster muss geschlossen werden, bevor der Installer verlassen werden kann.
@@ -49,6 +49,7 @@ IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		WICHTIGE INFORMA
 Additional disk space required: %s	InstallerWindow		Zusätzlich benötigter Speicherplatz: %s
 Stop	InstallerWindow	In alert after pressing Stop	Installation abbrechen
 Boot sector successfully written.	InstallProgress		Der Bootsektor wurde erfolgreich geschrieben.
+Writing bootsector.	InstallProgress		Bootsektor wird geschrieben.
 An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Es trat ein Fehler auf und die Installation konnte nicht abgeschlossen werden:\n\nFehler:  %s
 Restart	InstallerWindow		Neustarten
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Das Laufwerk konnte nicht eingehängt werden. Bitte ein anderes Laufwerk wählen.

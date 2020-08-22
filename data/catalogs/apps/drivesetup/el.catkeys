@@ -67,7 +67,7 @@ Cancel	AbstractParametersPanel		Άκυρο
 Format	MainWindow		Διαμόρφωση
 <empty or unknown>	DiskView		<άδειο ή άγνωστο>
 OK	MainWindow		Εντάξει
-Open with DiskProbe	MainWindow		Άνοιγμα με Διαχειριστή Δίσκου
+Open with DiskProbe	MainWindow		Άνοιγμα με Ελεγχτή Δίσκου
 Could not delete the selected partition.	MainWindow		Αδυναμία διαγραφής της επιλεγμένης κατάτμησης.
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Είστε σίγουρος ότι θέλετε να αρχικοποιήσετε τον επιλεγμένο δίσκο; Όλα τα δεδομένα θα διαγραφούν. Θα ρωτηθείτε ξανά πριν εγγραφούν οι αλλαγές στον δίσκο.\n
 There was an error preparing the disk for modifications.	MainWindow		Υπήρξε ένα σφάλμα κατά την προετοιμασία του δίσκου για τροποποιήσεις.

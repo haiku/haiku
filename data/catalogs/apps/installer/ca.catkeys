@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Installer	3283947218
+1	catalan; valencian	x-vnd.Haiku-Installer	1099509143
 Performing installation.	InstallProgress		Es fa la instal·lació.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Trieu el disc d'origen des del menú emergent. Llavors cliqueu a Comença.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Si us plau, tanqueu la finestra del Gestor de discs abans de tancar la finestra de l'instal·lador.
@@ -49,6 +49,7 @@ IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		INFORMACIÓ IMPO
 Additional disk space required: %s	InstallerWindow		Espai de disc addicional necessari: %s
 Stop	InstallerWindow	In alert after pressing Stop	Interromp
 Boot sector successfully written.	InstallProgress		S'ha escrit correctament el sector d'arrencada.
+Writing bootsector.	InstallProgress		S'escriu el sector d'arrencada.
 An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		S'ha trobat un error i la instal·lació no s'ha acabat:\n\nError:  %s
 Restart	InstallerWindow		Reinicia
 The disk can't be mounted. Please choose a different disk.	InstallProgress		No es pot muntar el disc. Si us plau, trieu-ne un altre.

@@ -1,9 +1,31 @@
-1	ukrainian	x-vnd.haiku-screenshot-cli	2650150283
+1	ukrainian	x-vnd.haiku-screenshot-cli	3958461128
+Include window border	ScreenshotWindow		Включаючи рамку вікна
+Overwrite	ScreenshotWindow		Перезаписати
+Save in:	ScreenshotWindow		Зберегти в:
+Error saving \"%s\":\n\t%s	ScreenshotWindow		Помилка при збереженні \"%s\":\n\t%s
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Цей файл вже існує.\n Ви впевнені, що хочете його перезаписати?
 OK	ScreenshotWindow		ОК
+The destination path exists but is not a folder.	ScreenshotWindow		Кінцевий шлях призначення існує, але це не папка.
+Select	ScreenshotWindow		Вибрати
 Save as:	ScreenshotWindow		Зберегти як:
 seconds	ScreenshotWindow		секунд
+New screenshot	ScreenshotWindow		Новий знімок екрана
+Screenshot	System name		Screenshot
+Desktop	ScreenshotWindow		Робочий стіл
+Artwork folder	ScreenshotWindow		Папка Artwork
+Translator Settings	ScreenshotWindow		Налаштування транслятора
+Include mouse pointer	ScreenshotWindow		Включаючи курсор
+overwrite	ScreenshotWindow		перезаписати
+Settings…	ScreenshotWindow		Налаштування…
+Choose folder	ScreenshotWindow		Вибрати папку
 Name:	ScreenshotWindow		Ім'я:
+Choose folder…	ScreenshotWindow		Виберіть папку…
+Please select	ScreenshotWindow		Будь ласка виберіть
+Failed to save screenshot	ScreenshotWindow		Не вдалося зберегти знімок екрана
 Cancel	ScreenshotWindow		Скасувати
 Delay:	ScreenshotWindow		Затримка:
+Copy to clipboard	ScreenshotWindow		Копіювати до буфера обміну
 screenshot	Screenshot	Base filename of screenshot files	знімок екрана
+Home folder	ScreenshotWindow		Папка Home
 Save	ScreenshotWindow		Зберегти
+Capture active window	ScreenshotWindow		Захопити активне вікно

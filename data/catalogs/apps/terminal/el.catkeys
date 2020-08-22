@@ -32,7 +32,7 @@ Slate	Terminal colors scheme		Αβάκιο
 Defaults	Terminal PrefWindow		Προεπιλογές
 Cancel	Terminal TermView		Άκυρο
 Revert	Terminal PrefWindow		Επαναφορά
-Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
+Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Τερματικό
 Use selection	Terminal FindWindow		Χρήση επιλεγμένου
 Find next	Terminal TermWindow		Εύρεση επόμενου
 Copy link location	Terminal TermView		Αντιγραφή υπερσυνδέσμου
@@ -43,7 +43,7 @@ Window title…	Terminal TermWindow		Τίτλος παραθύρου…
 Blue	Terminal colors scheme		Μπλε
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Δεν μπορεί να εκτελεστεί \"%command\":\n\t%error
 Open path	Terminal TermView		Άνοιγμα διαδρομής
-Terminal	System name		Terminal
+Terminal	System name		Τερματικό
 Font size	Terminal TermWindow		Μέγεθος γραμματοσειράς
 Custom	Terminal colors scheme		Προσαρμοσμένο
 Really close?	Terminal TermWindow		Να κλείσει σίγουρα;
@@ -111,7 +111,7 @@ Set window title	Terminal TermWindow		Ορισμός τίτλου παραθύρ
 Increase	Terminal TermWindow		Άυξηση
 OK	Terminal TermWindow		Εντάξει
 Close window	Terminal TermWindow		Κλείσιμο παραθύρου
-Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nΠνευματική ιδιοκτησία 2001-2019 Haiku, Inc.\nΠνευματική ιδιοκτησία(C) 1999 Kazuho Okui και Takashi Murai.\n\nΧρήση: %s [ΕΠΙΛΟΦΗ] [ΚΕΛΥΦΟΣ]\n
+Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Τερματικό Haiku\nΠνευματική ιδιοκτησία 2001-2019 Haiku, Inc.\nΠνευματική ιδιοκτησία(C) 1999 Kazuho Okui και Takashi Murai.\n\nΧρήση: %s [ΕΠΙΛΟΦΗ] [ΚΕΛΥΦΟΣ]\n
 Solarized Light	Terminal colors scheme		Έκλειψη Ηλίου
 Clear all	Terminal TermWindow		Καθαρισμός όλων
 Search forward	Terminal FindWindow		Αναζήτηση μπροστά

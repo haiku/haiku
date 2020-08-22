@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-FirstBootPrompt	2813539172
+1	ukrainian	x-vnd.Haiku-FirstBootPrompt	1158596356
 Japanese	KeymapNames		Японська
 US	KeymapNames		US - Амер.
 Esperanto	KeymapNames		Есперанто
@@ -16,6 +16,7 @@ Bulgarian (Cyrillic)	KeymapNames		Болгарська (Кирилиця)
 Belgian (point)	KeymapNames		Бельгійська (Крапка)
 Finnish	KeymapNames		Фінська
 Swedish	KeymapNames		Шведська
+Thank you for trying out Haiku! We hope you'll like it!\n\nSelect your preferred language and keymap from the list on the left which will then be used instantly. Both settings can be changed from the Desktop later on on the fly.\n\nDo you wish to run the Installer or continue booting to the Desktop?	BootPromptWindow	For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	Дякуємо за те, що вибрали систему Haiku! Сподіваємось, Вам сподобається!\n\nУ списку зліва виберіть мову за вподобанням та розкладку клавіатури, які будуть негайно задіяні. Обидві настройки можна дуже просто змінити в подальшому.\n\nВи хочете запустити Installer або продовжити завантажувати Робочий стіл?
 Svorak	KeymapNames		Сворак
 German	KeymapNames		Німецька
 Swiss-German	KeymapNames		Швейцарська (Нім.)

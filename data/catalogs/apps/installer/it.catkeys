@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Installer	3283947218
+1	italian	x-vnd.Haiku-Installer	1099509143
 Performing installation.	InstallProgress		Esecuzione dell'installazione.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Scegli il disco d'origine dal menu a pop-up. Quindi fai click su \"Inizia\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Chiudi la finestra di Gestione Disco prima di chiudere quella del programma di installazione.
@@ -49,6 +49,7 @@ IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		INFORMAZIONI DA 
 Additional disk space required: %s	InstallerWindow		Spazio addizionale richiesto sul disco: %s
 Stop	InstallerWindow	In alert after pressing Stop	Interrompi
 Boot sector successfully written.	InstallProgress		Settore d'avvio scritto con successo.
+Writing bootsector.	InstallProgress		Scrittura del settore di avvio.
 An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		È stato riscontrato un errore e l'installazione non è stata completata:\n\nErrore:  %s
 Restart	InstallerWindow		Riavvia
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Il disco non può essere montato. Scegli un disco differente.

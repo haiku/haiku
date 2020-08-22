@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-PowerStatus	3173765686
+1	ukrainian	x-vnd.Haiku-PowerStatus	1085070685
 Run in window	PowerStatus		Виконувати у вікні
 Extended battery info	PowerStatus		Розширені дані батареї
 Show status icon	PowerStatus		Показати значок стану
@@ -30,11 +30,13 @@ Serial number: 	PowerStatus		Серійний номер:
 Battery critical	PowerStatus		Розряд батареї критичний
 Capacity: 	PowerStatus		Ємність: 
  mW	PowerStatus		 мВт
+No supported battery detected. PowerStatus cannot be used on your system.	PowerStatus		Не знайдено акумулятора який підтримуєтья. PowerStatus не можна використовувати у Вашій системі.
 Show percent	PowerStatus		Показати процент
 Capacity granularity 1: 	PowerStatus		Градація ємності 1: 
 The battery level is getting low, please plug in the device.	PowerStatus		Рівень заряда батареї знижується, будь-ласка, під'єднайте пристрій до електромережі.
 Design capacity warning: 	PowerStatus		Попередження про проектну ємність: 
 Capacity granularity 2: 	PowerStatus		Градація ємності 2: 
+Too bad!	PowerStatus		Дуже погано!
 Technology: 	PowerStatus		Технологія: 
  mWh	PowerStatus		 мВт·год
 PowerStatus	System name		PowerStatus

@@ -6,7 +6,7 @@ Hide clock	TimeView		Απόκρυψη ρολογιού
 Applications	PreferencesWindow		Εφαρμογές
 Time preferences…	TimeView		Προτιμήσεις ώρας…
 About Haiku	DeskbarMenu		Σχετικά με το Haiku
-Edit in Tracker…	PreferencesWindow		Επεξεργασία στο Tracker…
+Edit in Tracker…	PreferencesWindow		Επεξεργασία στον Ιχνηλάτη…
 Recent documents:	PreferencesWindow		Πρόσφατα έγγραφα:
 Recent applications	DeskbarMenu		Πρόσφατες εφαρμογές
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Εφαρμογές
@@ -16,7 +16,7 @@ Window	PreferencesWindow		Παράθυρο
 Defaults	PreferencesWindow		Προεπιλεγμένα
 Menu	PreferencesWindow		Μενού
 Recent documents	DeskbarMenu		Πρόσφατα έγγραφα
-Auto-hide	PreferencesWindow		Αυτόματη Απόκρυψη
+Auto-hide	PreferencesWindow		Αυτόματη απόκρυψη
 Always on top	PreferencesWindow		Πάντα στην κορυφή
 <Deskbar folder is empty>	DeskbarMenu		<Ο φάκελος γραμμής εργασιών είναι άδειος>
 Show all	WindowMenu		Εμφάνιση όλων
@@ -24,7 +24,7 @@ No windows	WindowMenu		Χωρίς παράθυρα
 Deskbar	System name		Γραμμή Εργασιών
 Restart system	DeskbarMenu		Επανεκκίνηση συστήματος
 Large	PreferencesWindow		Μεγάλο
-Auto-raise	PreferencesWindow		Αυτόματη-ανύψωση
+Auto-raise	PreferencesWindow		Αυτόματη ανύψωση
 Recent folders:	PreferencesWindow		Πρόσφατοι φάκελοι:
 Show application expander	PreferencesWindow		Εμφάνιση της εφαρμογής Αποσυμπιεστής
 Close all	WindowMenu		Κλείσιμο όλων
@@ -34,7 +34,7 @@ Revert	PreferencesWindow		Επαναφορά
 Small	PreferencesWindow		Μικρό
 Recent applications:	PreferencesWindow		Πρόσφατες εφαρμογές:
 Shutdown…	DeskbarMenu		Κλείσιμο…
-Tracker always first	PreferencesWindow		Ο Tracker πάντα πρώτος
+Tracker always first	PreferencesWindow		Να βρίσκεται ο Ιχνηλάτης πάντα στην κορυφή
 Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Προτιμήσεις
 Recent folders	DeskbarMenu		Πρόσφατοι φάκελοι
 About this system	DeskbarMenu		Πληροφορίες συστήματος

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-PowerStatus	3250907196
+1	german	x-vnd.Haiku-PowerStatus	1162212195
 Run in window	PowerStatus		Im Fenster ausführen
 Extended battery info	PowerStatus		Erweiterte Akku-Infos
 Show status icon	PowerStatus		Statusicon anzeigen
@@ -30,11 +30,13 @@ Serial number: 	PowerStatus		Seriennummer:
 Battery critical	PowerStatus		Ladezustand kritisch
 Capacity: 	PowerStatus		Kapazität:
  mW	PowerStatus		mW
+No supported battery detected. PowerStatus cannot be used on your system.	PowerStatus		Es wurde kein unterstützter Akku gefunden. Daher funktioniert PowerStatus auf diesem Rechner nicht.
 Show percent	PowerStatus		Prozent anzeigen
 Capacity granularity 1: 	PowerStatus		Kapazitätsgenauigkeit 1:
 The battery level is getting low, please plug in the device.	PowerStatus		Der Akku ist ziemlich leer; er sollte demnächst geladen werden.
 Design capacity warning: 	PowerStatus		Kapazitätswarnung (lt. Hersteller):
 Capacity granularity 2: 	PowerStatus		Kapazitätsgenauigkeit 2:
+Too bad!	PowerStatus		Schade!
 Technology: 	PowerStatus		Technologie:
  mWh	PowerStatus		mWh
 Design capacity: 	PowerStatus		Kapazität (lt. Hersteller):

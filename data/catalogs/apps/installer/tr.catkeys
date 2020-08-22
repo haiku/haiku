@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Installer	3283947218
+1	turkish	x-vnd.Haiku-Installer	1099509143
 Performing installation.	InstallProgress		Kuruluyor…
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Açılır menüden kaynak diski seçin ve \"Başla\"ya tıklayın.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Yükleyici penceresini kapatmadan önce Disk İzlencesi penceresini kapatın.
@@ -49,6 +49,7 @@ IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		HAİKU'YU YÜKLE
 Additional disk space required: %s	InstallerWindow		Gereken ek disk alanı: %s
 Stop	InstallerWindow	In alert after pressing Stop	Durdur
 Boot sector successfully written.	InstallProgress		Önyükleme alanı başarıyla yazıldı.
+Writing bootsector.	InstallProgress		Önyükleme alanı yazılıyor.
 An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Bir hatadan dolayı kurulum tamamlanamadı:\n\nHata:  %s
 Restart	InstallerWindow		Yeniden başlat
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Disk bağlanamıyor. Lütfen başka bir disk seçin.

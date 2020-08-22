@@ -4,9 +4,9 @@ Quit	NetworkStatusView		Έξοδος
 Unknown	NetworkStatusView		Άγνωστο
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Η εκκίνηση του βοηθητικού προγράμματος δικτύου απέτυχε.\n\nΣφάλμα: 
 Install in Deskbar	NetworkStatus		Εγκατάσταση στην Γραμμή Εργασιών
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		Ρυθμίσεις NetworkStatus :\n\t--deskbar\tαυτόματη προσθήκη ρέπλικας στην γραμμή εργασιών\n\t--help\t\tεκτύπωση του μηνύματος αυτού και έξοδος
-Open network preferences…	NetworkStatusView		Άνοιγμα προτιμήσεων δικτύου…
-NetworkStatus	System name		NetworkStatus
+NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		Ρυθμίσεις Κατάστασης Δικτύου :\n\t--deskbar\tαυτόματη προσθήκη ρέπλικας στην γραμμή εργασιών\n\t--help\t\tεκτύπωση του μηνύματος αυτού και έξοδος
+Open network preferences…	NetworkStatusView		Άνοιγμα ρυθμίσεων δικτύου…
+NetworkStatus	System name		Κατάσταση Δικτύου
 OK	NetworkStatusView		Εντάξει
 No link	NetworkStatusView		Χωρίς σύνδεσμο
 Could not join wireless network:\n	NetworkStatusView		Αδυναμία σύνδεσης στο ασύρματο δίκτυο:\n
@@ -15,7 +15,7 @@ Network Status	NetworkStatusView		Κατάσταση Δικτύου
 Address	NetworkStatusView		Διεύθυνση
 Deskbar is not running, giving up.	NetworkStatus		Η Γραμμή Εργασιών δεν εκτελείται, δεν είναι δυνατή η λειτουργία αυτή.
 No stateful configuration	NetworkStatusView		Καμία stateful ρύθμιση
-You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Μπορείτε να εκτελέσετε το NetworkStatus σε ένα παράθυρο ή να το τοποθετήσετε στην Γραμμή Εργασιών.
+You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Μπορείτε να εκτελέσετε την εφαρμογή Κατάστασης Δικτύου σε ένα παράθυρο ή να το τοποθετήσετε στην Γραμμή Εργασιών.
 Broadcast	NetworkStatusView		Αναμετάδοση
 %ifaceName information:\n	NetworkStatusView		%ifaceΠληροφορίες ονόματος:\n
 Run in window	NetworkStatus		Εκτέλεση σε παράθυρο

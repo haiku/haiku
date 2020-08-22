@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-PowerStatus	3173765686
+1	catalan; valencian	x-vnd.Haiku-PowerStatus	1085070685
 Run in window	PowerStatus		Executa en una finestra
 Extended battery info	PowerStatus		Informació ampliada de la bateria
 Show status icon	PowerStatus		Mostra la icona de l'estat
@@ -30,11 +30,13 @@ Serial number: 	PowerStatus		Número de sèrie:
 Battery critical	PowerStatus		Bateria crítica
 Capacity: 	PowerStatus		Capacitat: 
  mW	PowerStatus		 mW
+No supported battery detected. PowerStatus cannot be used on your system.	PowerStatus		S'ha detectat una bateria no compatible. L'Estat de l'energia no es pot usar al vostre sistema.
 Show percent	PowerStatus		Mostra'n el percentatge
 Capacity granularity 1: 	PowerStatus		Granularitat de la capacitat 1: 
 The battery level is getting low, please plug in the device.	PowerStatus		El nivell de bateria comença a ser baix; si us plau, endolleu el dispositiu.
 Design capacity warning: 	PowerStatus		Avís de la capacitat de disseny: 
 Capacity granularity 2: 	PowerStatus		Granularitat de la capacitat 2: 
+Too bad!	PowerStatus		Quina manxiula!
 Technology: 	PowerStatus		Tecnologia: 
  mWh	PowerStatus		 mWh
 PowerStatus	System name		Estat de l'energia

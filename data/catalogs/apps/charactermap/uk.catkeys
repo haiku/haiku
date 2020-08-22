@@ -1,20 +1,27 @@
-1	ukrainian	x-vnd.Haiku-CharacterMap	124574598
+1	ukrainian	x-vnd.Haiku-CharacterMap	1171328616
+Tirhuta	UnicodeBlocks		Тірхута
 Miscellaneous mathematical symbols B	UnicodeBlocks		Різні математичні символи В
+Latin extended E	UnicodeBlocks		Розширена латиниця E
 Saurashtra	UnicodeBlocks		Саураштра
 Arabic supplement	UnicodeBlocks		Доповнення до арабської
 Hanunoo	UnicodeBlocks		Хануну
 Ogham	UnicodeBlocks		Огамічна
+Inscriptional Pahlavi	UnicodeBlocks		Письмо Пахлаві
 Hebrew	UnicodeBlocks		Іврит
 Katakana	UnicodeBlocks		Катакана
 Mongolian	UnicodeBlocks		Монгольська
 Linear B ideograms	UnicodeBlocks		Ідеограми лінійного письма Б
+Caucasian Albanian	UnicodeBlocks		Агванська
+CJK unified ideographs extension D	UnicodeBlocks		Уніфіковані ієрогліфи CJK розширення D
 Multani	UnicodeBlocks		Multani
 CJK compatibility ideographs Supplement	UnicodeBlocks		Доповнення CJK суміснісних ієрогліфів
 Bopomofo extended	UnicodeBlocks		Бопомофо розширена
+Georgian extended	UnicodeBlocks		Розширена грузинська
 Mathematical alphanumeric symbols	UnicodeBlocks		Математичні буквено-цифрові символи
 Coptic	UnicodeBlocks		Коптська
 Cuneiform numbers and punctuation	UnicodeBlocks		Клинописні цифри і знаки пунктуації
 Miscellaneous symbols	UnicodeBlocks		Різноманітні символи
+Enclosed ideographic supplement	UnicodeBlocks		Додатки ідеографічного письма в лапках
 Vertical forms	UnicodeBlocks		Вертикальні форми
 Miscellaneous mathematical symbols A	UnicodeBlocks		Різні математичні символи А
 CharacterMap	System name		CharacterMap
@@ -30,9 +37,11 @@ Cham	UnicodeBlocks		Cham
 Cyrillic	UnicodeBlocks		Кирилиця
 Shavian	UnicodeBlocks		Шавіанська
 Tangut	UnicodeBlocks		Tangut
+CJK unified ideographs extension C	UnicodeBlocks		Уніфіковані ієрогліфи CJK розширення C
 Ancient Greek musical notation	UnicodeBlocks		Давньогрецький нотний запис
 Thai	UnicodeBlocks		Тайська
 Ethiopic supplement	UnicodeBlocks		Ефіопські додатки
+Chess symbols	UnicodeBlocks		Шахматні символи
 Yijing hexagram symbols	UnicodeBlocks		Гексаграми Іцзін
 Ideographic symbols and punctuation	UnicodeBlocks		Ідеографічні символи та розділові знаки
 File	CharacterWindow		Файл
@@ -47,7 +56,10 @@ N'Ko	UnicodeBlocks		Н'ко
 Cherokee supplement	UnicodeBlocks		Доповнення Cherokee
 Halfwidth and fullwidth forms	UnicodeBlocks		Напівширинні і повноширинні форми
 Counting rod numerals	UnicodeBlocks		Лічильні палички
+Alchemical symbols	UnicodeBlocks		Алхімічні символи
 Latin extended C	UnicodeBlocks		Розширена латиниця C
+Old Turkic	UnicodeBlocks		Старотюркські мови
+Meroitic hieroglyphs	UnicodeBlocks		Мероїтська ієрогліфічна
 Combining diacritical marks for symbols	UnicodeBlocks		Об'єднуючі діакритичні знаки для символів
 Osage	UnicodeBlocks		Osage
 Combining diacritical marks supplement	UnicodeBlocks		Додаткові комбіновані діакритичні знаки
@@ -57,6 +69,7 @@ Georgian	UnicodeBlocks		Грузинська
 CJK compatibility forms	UnicodeBlocks		Форми CJK сумісності
 Old Hungarian	UnicodeBlocks		Староугорська
 CJK unified ideographs extension B	UnicodeBlocks		CJK об'єднані ієроглифи розширення В
+Meroitic cursive	UnicodeBlocks		Мероїтська курсивна
 Ahom	UnicodeBlocks		Ahom
 Early Dynastic Cuneiform	UnicodeBlocks		Клинопис ранніх династій
 Arabic presentation forms A	UnicodeBlocks		Форма подання А арабською
@@ -72,10 +85,12 @@ Latin extended B	UnicodeBlocks		Розширена латиниця В
 Phonetic extensions	UnicodeBlocks		Фонетичні розширення
 Code	CharacterWindow		Код
 Block elements	UnicodeBlocks		Блочні елементи
+Ethiopic extended A	UnicodeBlocks		Ефіопська розширена А
 Mahjong tiles	UnicodeBlocks		Маджонг плитки
 Carian	UnicodeBlocks		Каріанська
 Gothic	UnicodeBlocks		Готична
 Specials	UnicodeBlocks		Спеціальні символи
+Sinhala Archaic numbers	UnicodeBlocks		Числові символи Сингальського письма
 Syloti Nagri	UnicodeBlocks		Сілоті Нагрі
 Latin-1 supplement	UnicodeBlocks		Додаток латиниці 1
 CJK unified ideographs extension A	UnicodeBlocks		Уніфіковані ієрогліфи CJK розширення А
@@ -157,6 +172,7 @@ Tags	UnicodeBlocks		Теги
 Khmer	UnicodeBlocks		Кхмерська
 Georgian supplement	UnicodeBlocks		Грузинські додатки
 Tagalog	UnicodeBlocks		Тагальська
+CJK unified ideographs extension F	UnicodeBlocks		Уніфіковані ієрогліфи CJK розширення F
 Supplemental Symbols and Pictographs	UnicodeBlocks		Додаткові символи та піктограми
 Devanagari	UnicodeBlocks		Деванагарі
 Runic	UnicodeBlocks		Рунічні

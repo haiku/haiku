@@ -7,27 +7,27 @@ Revert to saved	ShortcutsWindow		Επαναφορά στο αποθηκευμέ�
 Don't save	ShortcutsWindow		Χωρίς αποθήκευση
 *MouseDown	ShortcutsWindow		*Ποντίκι Κάτω
 *Beep	ShortcutsWindow		*Μπιπ
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Οι συντομέυσεις δεν ήταν δυνατό να αποθηκευτούν στο σετ πλήκτρων.
+Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Η εφαρμογή συντομεύσεων δεν μπόρεσε να αποθηκεύσει το σετ πλήκτρων σας.
 Save	ShortcutsWindow		Αποθήκευση
 Either	ShortcutsSpec		Όλα
 Oh no	ShortcutsWindow		Ώχ όχι
 Key	ShortcutsWindow		Κλειδί
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*Αποστολή μηνύματος application/x-vnd.Be-TRAK 'Tfnd'
 Select	ShortcutsWindow		Επιλογή
-Shortcuts	System name		Shortcuts
+Shortcuts	System name		Συντομεύσεις
 Quit	ShortcutsWindow		Έξοδος
 (Choose application with file requester)	ShortcutsWindow		(Επιλέξτε εφαρμογή με τον file requester)
 Cancel	ShortcutsWindow		Άκυρο
 *MoveMouse +20 +0	ShortcutsWindow		*Μετακίνηση ποντικιού στο +20 +0
 Control	ShortcutsSpec	Name for modifier on keyboard	Έλεγχος
 Left	ShortcutsSpec		Αριστερό
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Οι συντομέυσεις δεν ήταν δυνατό να αναλυθούν στο αρχείο του σετ πλήκτρων!
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Οι συντομέυσεις δεν ήταν δυνατό να αποθηκευτούν στο αρχείο του σετ πλήκτρων!
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Η εφαρμογή συντομεύσεων δεν μπόρεσε να αναλύσει το αρχείο του σετ πλήκτρων σας.
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Η εφαρμογή συντομεύσεων δεν μπόρεσε να αποθηκεύσει το αρχείο του σετ πλήκτρων σας!
 *InsertString \"Your Text Here\"	ShortcutsWindow		*Εισάγετε συμβολοσεια \"Το Κείμενο σας Εδώ\"
 Remove selected shortcut	ShortcutsWindow		Αφαίρεσε την επιλεγμένη συντόμευση
 Error, NULL state description?	ShortcutsSpec		Σφάλμα, φαίνεται ότι το πλαίσιο πληροφοριών έχει την τιμή NULL;
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
-Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Το Shortcuts δε μπόρεσε να ανοίξει το αρχείο του σετ πλήκτρων!
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Η εφαρμογή συντομεύσεων δεν μπόρεσε να ανοίξει το αρχείο του σετ πλήκτρων!
 Save & apply	ShortcutsWindow		Αποθήκευση & εφαρμογή
 Open	ShortcutsWindow		Άνοιγμα
 Append	ShortcutsWindow		Προσάρτηση
