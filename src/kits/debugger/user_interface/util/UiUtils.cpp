@@ -229,6 +229,7 @@ UiUtils::AreaProtectionFlagsToString(uint32 protection, BString& _output)
 	ADD_AREA_FLAG_IF_PRESENT(B_KERNEL_STACK_AREA, protection, "s", _output, "");
 	ADD_AREA_FLAG_IF_PRESENT(B_OVERCOMMITTING_AREA, protection, _output, "o",
 		"");
+	ADD_AREA_FLAG_IF_PRESENT(B_CLONEABLE_AREA, protection, "c", _output, "");
 	ADD_AREA_FLAG_IF_PRESENT(B_SHARED_AREA, protection, "S", _output, "");
 	ADD_AREA_FLAG_IF_PRESENT(B_KERNEL_AREA, protection, "k", _output, "");
 
