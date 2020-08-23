@@ -3708,12 +3708,6 @@ BTextView::_RecalculateLineBreaks(int32* startLine, int32* endLine)
 {
 	CALLED();
 
-	float width = fTextRect.Width();
-
-	// Don't try to compute anything if the text rect is not set
-	if (width <= 0)
-		return;
-
 	// are we insane?
 	*startLine = (*startLine < 0) ? 0 : *startLine;
 	*endLine = (*endLine > fLines->NumLines() - 1) ? fLines->NumLines() - 1
@@ -3722,6 +3716,13 @@ BTextView::_RecalculateLineBreaks(int32* startLine, int32* endLine)
 	int32 textLength = fText->Length();
 	int32 lineIndex = (*startLine > 0) ? *startLine - 1 : 0;
 	int32 recalThreshold = (*fLines)[*endLine + 1]->offset;
+	float width = max_c(fTextRect.Width(), 10);
+		// TODO: The minimum width of 10 is a work around for the following
+		// problem: If the text rect is too small, we are not calculating any
+		// line heights, not even for the first line. Maybe this is a bug
+		// in the algorithm, but other places in the class rely on at least
+		// the first line to return a valid height. Maybe "10" should really
+		// be the width of the very first glyph instead.
 	STELine* curLine = (*fLines)[lineIndex];
 	STELine* nextLine = curLine + 1;
 
