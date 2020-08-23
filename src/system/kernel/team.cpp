@@ -2138,7 +2138,7 @@ fork_team(void)
 		} else {
 			void* address;
 			area_id area = vm_copy_area(team->address_space->ID(), info.name,
-				&address, B_CLONE_ADDRESS, info.protection, info.area);
+				&address, B_CLONE_ADDRESS, info.area);
 			if (area < B_OK) {
 				status = area;
 				break;

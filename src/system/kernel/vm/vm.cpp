@@ -2535,17 +2535,8 @@ vm_copy_on_write_area(VMCache* lowerCache,
 
 area_id
 vm_copy_area(team_id team, const char* name, void** _address,
-	uint32 addressSpec, uint32 protection, area_id sourceID)
+	uint32 addressSpec, area_id sourceID)
 {
-	bool writableCopy = (protection & (B_KERNEL_WRITE_AREA | B_WRITE_AREA)) != 0;
-
-	if ((protection & B_KERNEL_PROTECTION) == 0) {
-		// set the same protection for the kernel as for userland
-		protection |= B_KERNEL_READ_AREA;
-		if (writableCopy)
-			protection |= B_KERNEL_WRITE_AREA;
-	}
-
 	// Do the locking: target address space, all address spaces associated with
 	// the source cache, and the cache itself.
 	MultiAddressSpaceLocker locker;
@@ -2618,6 +2609,30 @@ vm_copy_area(team_id team, const char* name, void** _address,
 		vm_page_reservation*	fReservation;
 	} pagesUnreserver(wiredPages > 0 ? &wiredPagesReservation : NULL);
 
+	bool writableCopy
+		= (source->protection & (B_KERNEL_WRITE_AREA | B_WRITE_AREA)) != 0;
+	uint8* targetPageProtections = NULL;
+
+	if (source->page_protections != NULL) {
+		size_t bytes = (source->Size() / B_PAGE_SIZE + 1) / 2;
+		targetPageProtections = (uint8*)malloc_etc(bytes,
+			HEAP_DONT_LOCK_KERNEL_SPACE);
+		if (targetPageProtections == NULL)
+			return B_NO_MEMORY;
+
+		memcpy(targetPageProtections, source->page_protections, bytes);
+
+		if (!writableCopy) {
+			for (size_t i = 0; i < bytes; i++) {
+				if ((targetPageProtections[i]
+						& (B_WRITE_AREA | B_WRITE_AREA << 4)) != 0) {
+					writableCopy = true;
+					break;
+				}
+			}
+		}
+	}
+
 	if (addressSpec == B_CLONE_ADDRESS) {
 		addressSpec = B_EXACT_ADDRESS;
 		*_address = (void*)source->Base();
@@ -2631,12 +2646,17 @@ vm_copy_area(team_id team, const char* name, void** _address,
 	addressRestrictions.address = *_address;
 	addressRestrictions.address_specification = addressSpec;
 	status = map_backing_store(targetAddressSpace, cache, source->cache_offset,
-		name, source->Size(), source->wiring, protection,
+		name, source->Size(), source->wiring, source->protection,
 		sharedArea ? REGION_NO_PRIVATE_MAP : REGION_PRIVATE_MAP,
 		writableCopy ? 0 : CREATE_AREA_DONT_COMMIT_MEMORY,
 		&addressRestrictions, true, &target, _address);
-	if (status < B_OK)
+	if (status < B_OK) {
+		free_etc(targetPageProtections, HEAP_DONT_LOCK_KERNEL_SPACE);
 		return status;
+	}
+
+	if (targetPageProtections != NULL)
+		target->page_protections = targetPageProtections;
 
 	if (sharedArea) {
 		// The new area uses the old area's cache, but map_backing_store()
@@ -2647,7 +2667,7 @@ vm_copy_area(team_id team, const char* name, void** _address,
 	// If the source area is writable, we need to move it one layer up as well
 
 	if (!sharedArea) {
-		if ((source->protection & (B_KERNEL_WRITE_AREA | B_WRITE_AREA)) != 0) {
+		if (writableCopy) {
 			// TODO: do something more useful if this fails!
 			if (vm_copy_on_write_area(cache,
 					wiredPages > 0 ? &wiredPagesReservation : NULL) < B_OK) {
