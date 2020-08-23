@@ -45,6 +45,19 @@
 #define BLOCKOFFSET_FROM_POSITION(n, inode) ((n) & (inode->BlockSize() - 1))
 
 
+// xfs_bmdr_block
+struct BlockInDataFork {
+			uint16				Levels()
+									{ return
+										B_BENDIAN_TO_HOST_INT16(bb_level); }
+			uint16				NumRecords()
+									{ return
+										B_BENDIAN_TO_HOST_INT16(bb_numrecs); }
+			uint16				bb_level;
+			uint16				bb_numrecs;
+};
+
+
 // xfs_da_blkinfo_t
 struct BlockInfo {
 			uint32				forw;
@@ -146,7 +159,6 @@ struct xfs_inode_t {
 			uint16				di_dmstate;
 			uint16				di_flags;
 			uint32				di_gen;
-
 			uint32				di_next_unlinked;
 };
 
@@ -218,9 +230,21 @@ public:
 									{ return fNode->ForkOffset(); }
 			status_t			ReadExtents();
 			status_t			ReadAt(off_t pos, uint8* buffer, size_t* length);
+			status_t			GetNodefromTree(uint16& levelsInTree,
+									Volume* volume, size_t& len,
+									size_t DirBlockSize, char* block);
 			int					SearchMapInAllExtent(int blockNo);
 			void				UnWrapExtentFromWrappedEntry(
-									uint64 wrappedExtent[2], ExtentMapEntry* entry);
+									uint64 wrappedExtent[2],
+									ExtentMapEntry* entry);
+			status_t			ReadExtentsFromExtentBasedInode();
+			status_t			ReadExtentsFromTreeInode();
+			size_t				MaxRecordsPossibleInTreeRoot();
+			size_t				MaxRecordsPossibleNode();
+			TreePointer*		GetPtrFromRoot(int pos);
+			TreePointer*		GetPtrFromNode(int pos, void* buffer);
+			size_t				GetPtrOffsetIntoRoot(int pos);
+			size_t				GetPtrOffsetIntoNode(int pos);
 private:
 			status_t			GetFromDisk();
 			xfs_inode_t*		fNode;

@@ -38,7 +38,6 @@ TreeDirectory::TreeDirectory(Inode* inode)
 		fPathForLeaves[i].blockData = NULL;
 		fPathForData[i].blockData = NULL;
 	}
-
 }
 
 
@@ -46,7 +45,7 @@ TreeDirectory::~TreeDirectory()
 {
 	delete fRoot;
 	delete[] fExtents;
-	delete fSingleDirBlock;
+	delete[] fSingleDirBlock;
 }
 
 
@@ -285,50 +284,21 @@ TreeDirectory::GetAllExtents()
 
 	ArrayDeleter<ExtentMapUnwrap> extentsWrappedDeleter(extentsWrapped);
 
-	Volume* volume = fInode->GetVolume();
-	uint16 levelsInTree = fRoot->Levels();
-
 	size_t maxRecords = MaxRecordsPossibleRoot();
 	TRACE("Maxrecords: (%d)\n", maxRecords);
-	TreePointer* ptrToNode = GetPtrFromRoot(1);
 
+	Volume* volume = fInode->GetVolume();
 	size_t len = volume->BlockSize();
-	char node[len];
-		// This isn't for a directory block but for one of the tree nodes
 
-	TRACE("levels:(%d)\n", levelsInTree);
-	TRACE("Numrecs:(%d)\n", fRoot->NumRecords());
-
-	// Go down the tree by taking the leftest pointer to go to the first leaf
-	uint64 fileSystemBlockNo = B_BENDIAN_TO_HOST_INT64(*ptrToNode);
-	uint64 readPos = fInode->FileSystemBlockToAddr(fileSystemBlockNo);
-	while (levelsInTree != 1) {
-		fileSystemBlockNo = B_BENDIAN_TO_HOST_INT64(*ptrToNode);
-			// The fs block that contains node at next lower level. Now read.
-		readPos = fInode->FileSystemBlockToAddr(fileSystemBlockNo);
-		if (read_pos(volume->Device(), readPos, node, len) != len) {
-			ERROR("Extent::FillBlockBuffer(): IO Error");
-			return B_IO_ERROR;
-		}
-		LongBlock* curLongBlock = (LongBlock*)node;
-		ASSERT(curLongBlock->Magic() == XFS_BMAP_MAGIC);
-		ptrToNode = GetPtrFromNode(1, (void*)curLongBlock);
-			// Get's the first pointer. This points to next node.
-		levelsInTree--;
-	}
-
-	// Next level wil contain leaf nodes. Now Read Directory Buffer
-	len = fInode->DirBlockSize();
-	if (read_pos(volume->Device(), readPos, fSingleDirBlock, len)
-		!= len) {
-		ERROR("Extent::FillBlockBuffer(): IO Error");
-		return B_IO_ERROR;
-	}
-	levelsInTree--;
-	ASSERT(levelsInTree == 0);
+	uint16 levelsInTree = fRoot->Levels();
+	status_t status = fInode->GetNodefromTree(levelsInTree, volume, len,
+		fInode->DirBlockSize(), fSingleDirBlock);
+	if (status != B_OK)
+		return status;
 
 	// We should be at the left most leaf node.
 	// This could be a multilevel node type directory
+	uint64 fileSystemBlockNo;
 	while (1) {
 		// Run till you have leaf blocks to checkout
 		char* leafBuffer = fSingleDirBlock;
@@ -358,7 +328,7 @@ TreeDirectory::GetAllExtents()
 	}
 	TRACE("Total covered: (%d)\n", fCountOfFilledExtents);
 
-	status_t status = UnWrapExtents(extentsWrapped);
+	status = UnWrapExtents(extentsWrapped);
 
 	return status;
 }

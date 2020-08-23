@@ -13,20 +13,6 @@
 #include "system_dependencies.h"
 
 
-#define XFS_BTREE_SBLOCK_SIZE	18
-	// Header for Short Format btree
-#define XFS_BTREE_LBLOCK_SIZE	24
-	// Header for Long Format btree
-#define XFS_KEY_SIZE sizeof(xfs_fileoff_t)
-#define XFS_PTR_SIZE sizeof(xfs_fsblock_t)
-#define XFS_BMAP_MAGIC 0x424d4150
-#define MAX_TREE_DEPTH 5
-
-
-typedef xfs_fileoff_t TreeKey;
-typedef xfs_fsblock_t TreePointer;
-
-
 /*
  * Headers(here, the LongBlock) are the "nodes" really and are called "blocks".
  * The records, keys and ptrs are calculated using helpers
@@ -60,19 +46,6 @@ struct LongBlock {
  * the leaf node along with above headers
  * The behaviour is very much like node directories.
  */
-
-
-// xfs_bmdr_block
-struct BlockInDataFork {
-			uint16				Levels()
-									{ return
-										B_BENDIAN_TO_HOST_INT16(bb_level); }
-			uint16				NumRecords()
-									{ return
-										B_BENDIAN_TO_HOST_INT16(bb_numrecs); }
-			uint16				bb_level;
-			uint16				bb_numrecs;
-};
 
 
 struct ExtentMapUnwrap {
