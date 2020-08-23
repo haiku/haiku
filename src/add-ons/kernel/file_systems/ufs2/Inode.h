@@ -43,11 +43,16 @@ struct ufs2_inode {
 	/* 2 Direct extended attribute block pointers */
 	int64_t		extendedBklPtr1;
 	int64_t		extendedBklPtr2;
-	/* 12 direct block pointers */
-	int64_t		directBlkPtr[12];
-	int64_t		indirectBlkPtr;  /* 1 Indirect block pointer */
-	int64_t		doubleIndriectBlkPtr; // 1 Double Indirect block pointer
-	int64_t		tripleIndriectBlkPtr; // 1 Triple Indirect block pointer
+
+	union {
+		struct {
+			int64_t		directBlockPointer[12];
+			int64_t		indirectBlockPointer;
+			int64_t		doubleIndriectBlockPointer;
+			int64_t		tripleIndriectBlockPointer;
+		};
+		char	symlinkpath[120];
+	};
 	/* Unused but need to figure out what are they */
 	int64_t		unused1;
 	int64_t		unused2;
@@ -107,22 +112,11 @@ class Inode {
 
 			Volume*		GetVolume() const { return fVolume; }
 
-			int64_t		GetBlockPointer(int ptrNumber)
-							{ return fNode.directBlkPtr[ptrNumber]; }
-
-			int64_t 	GetIndirectBlockPointer()
-							{ return fNode.indirectBlkPtr; }
-
-			int64_t 	GetDoubleIndirectBlockPtr()
-							{ return fNode.doubleIndriectBlkPtr; }
-
-			int64_t 	GetTripleIndirectBlockPtr()
-							{ return fNode.tripleIndriectBlkPtr; }
-
 			ino_t		Parent();
 
 			off_t   	FindBlock(off_t block_number, off_t block_offset);
 			status_t	ReadAt(off_t pos, uint8* buffer, size_t* length);
+			status_t	ReadLink(char* buffer, size_t *_bufferSize);
 //			status_t	FillGapWithZeros(off_t start, off_t end);
 
 			void*		FileCache() const { return fCache; }
@@ -134,6 +128,17 @@ private:
 						Inode(Volume* volume);
 						Inode(const Inode&);
 						Inode& operator=(const Inode&);
+			int64_t		GetBlockPointer(int ptrNumber) {
+						return fNode.directBlockPointer[ptrNumber]; }
+
+			int64_t 	GetIndirectBlockPointer() {
+						return fNode.indirectBlockPointer; }
+
+			int64_t 	GetDoubleIndirectBlockPtr() {
+						return fNode.doubleIndriectBlockPointer; }
+
+			int64_t 	GetTripleIndirectBlockPtr() {
+						return fNode.tripleIndriectBlockPointer; }
 
 //			uint64		_NumBlocks();
 private:

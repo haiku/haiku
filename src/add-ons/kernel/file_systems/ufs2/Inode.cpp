@@ -215,3 +215,11 @@ Inode::FindBlock(off_t blockNumber, off_t blockOffset)
 
 	return B_BAD_VALUE;
 }
+
+
+status_t
+Inode::ReadLink(char* buffer, size_t *_bufferSize)
+{
+	strlcpy(buffer, fNode.symlinkpath, *_bufferSize);
+	return B_OK;
+}

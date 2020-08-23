@@ -312,7 +312,9 @@ static status_t
 ufs2_read_link(fs_volume *_volume, fs_vnode *_node, char *buffer,
 			  size_t *_bufferSize)
 {
-	return B_NOT_SUPPORTED;
+	Inode* inode = (Inode*)_node->private_node;
+
+	return inode->ReadLink(buffer, _bufferSize);
 }
 
 
