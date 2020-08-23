@@ -462,7 +462,7 @@ allocate_area_page_protections(VMArea* area)
 {
 	// In the page protections we store only the three user protections,
 	// so we use 4 bits per page.
-	uint32 bytes = (area->Size() / B_PAGE_SIZE + 1) / 2;
+	size_t bytes = (area->Size() / B_PAGE_SIZE + 1) / 2;
 	area->page_protections = (uint8*)malloc_etc(bytes,
 		HEAP_DONT_LOCK_KERNEL_SPACE);
 	if (area->page_protections == NULL)
@@ -481,7 +481,7 @@ static inline void
 set_area_page_protection(VMArea* area, addr_t pageAddress, uint32 protection)
 {
 	protection &= B_READ_AREA | B_WRITE_AREA | B_EXECUTE_AREA;
-	uint32 pageIndex = (pageAddress - area->Base()) / B_PAGE_SIZE;
+	addr_t pageIndex = (pageAddress - area->Base()) / B_PAGE_SIZE;
 	uint8& entry = area->page_protections[pageIndex / 2];
 	if (pageIndex % 2 == 0)
 		entry = (entry & 0xf0) | protection;
@@ -5228,7 +5228,7 @@ vm_resize_area(area_id areaID, size_t newSize, bool kernel)
 	if (status == B_OK) {
 		// Shrink or grow individual page protections if in use.
 		if (area->page_protections != NULL) {
-			uint32 bytes = (newSize / B_PAGE_SIZE + 1) / 2;
+			size_t bytes = (newSize / B_PAGE_SIZE + 1) / 2;
 			uint8* newProtections
 				= (uint8*)realloc(area->page_protections, bytes);
 			if (newProtections == NULL)
