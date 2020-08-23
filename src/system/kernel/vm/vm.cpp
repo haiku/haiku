@@ -3435,6 +3435,7 @@ dump_area_struct(VMArea* area, bool mappings)
 	kprintf("base:\t\t0x%lx\n", area->Base());
 	kprintf("size:\t\t0x%lx\n", area->Size());
 	kprintf("protection:\t0x%" B_PRIx32 "\n", area->protection);
+	kprintf("page_protection:%p\n", area->page_protections);
 	kprintf("wiring:\t\t0x%x\n", area->wiring);
 	kprintf("memory_type:\t%#" B_PRIx32 "\n", area->MemoryType());
 	kprintf("cache:\t\t%p\n", area->cache);
