@@ -58,6 +58,9 @@ const char *DefaultCatalog::kCatMimeType
 static int16 kCatArchiveVersion = 1;
 	// version of the catalog archive structure, bump this if you change it!
 
+const uint8 DefaultCatalog::kDefaultCatalogAddOnPriority = 1;
+	// give highest priority to our embedded catalog-add-on
+
 
 /*!	Constructs a DefaultCatalog with given signature and language and reads
 	the catalog from disk.
@@ -86,9 +89,6 @@ DefaultCatalog::DefaultCatalog(entry_ref *appOrAddOnRef)
 	HashMapCatalog("", "", 0)
 {
 	fInitCheck = ReadFromResource(*appOrAddOnRef);
-	// fprintf(stderr,
-	//	"trying to load embedded catalog from resources results in %s",
-	//	strerror(fInitCheck));
 }
 
 
@@ -179,16 +179,6 @@ DefaultCatalog::ReadFromFile(const char *path)
 }
 
 
-/*!	This method is not currently being used, but it may be useful in the
-	future...
-*/
-status_t
-DefaultCatalog::ReadFromAttribute(const entry_ref &appOrAddOnRef)
-{
-	return B_NOT_SUPPORTED;
-}
-
-
 status_t
 DefaultCatalog::ReadFromResource(const entry_ref &appOrAddOnRef)
 {
@@ -225,16 +215,6 @@ DefaultCatalog::WriteToFile(const char *path)
 	UpdateAttributes(catalogFile);
 
 	return B_OK;
-}
-
-
-/*!	This method is not currently being used, but it may be useful in the
-	future...
-*/
-status_t
-DefaultCatalog::WriteToAttribute(const entry_ref &appOrAddOnRef)
-{
-	return B_NOT_SUPPORTED;
 }
 
 
@@ -288,7 +268,7 @@ DefaultCatalog::Flatten(BDataIO *dataIO)
 
 	status_t res;
 	BMessage archive;
-	uint32 count = fCatMap.Size();
+	int32 count = fCatMap.Size();
 	res = archive.AddString("class", "DefaultCatalog");
 	if (res == B_OK)
 		res = archive.AddInt32("c:sz", count);
@@ -320,6 +300,7 @@ DefaultCatalog::Flatten(BDataIO *dataIO)
 		if (res == B_OK)
 			res = archive.Flatten(dataIO);
 	}
+
 	return res;
 }
 
@@ -365,7 +346,8 @@ DefaultCatalog::Unflatten(BDataIO *dataIO)
 		const char *translated;
 
 		// fCatMap.resize(count);
-			// There is no resize method in Haiku Hash Map to prealloc space
+			// There is no resize method in Haiku's HashMap to preallocate
+			// memory.
 		for (int i=0; res == B_OK && i < count; ++i) {
 			res = archiveMsg.Unflatten(dataIO);
 			if (res == B_OK)
@@ -425,10 +407,6 @@ DefaultCatalog::Create(const char *signature, const char *language)
 	}
 	return catalog;
 }
-
-
-const uint8 DefaultCatalog::kDefaultCatalogAddOnPriority = 1;
-	// give highest priority to our embedded catalog-add-on
 
 
 } // namespace BPrivate

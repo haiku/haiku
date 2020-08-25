@@ -24,6 +24,9 @@ public:
 								BCatalog(const entry_ref& catalogOwner,
 									const char* language = NULL,
 									uint32 fingerprint = 0);
+								BCatalog(const char* signature,
+									const char* language = NULL);
+
 	virtual						~BCatalog();
 
 			const char*			GetString(const char* string,
@@ -41,6 +44,8 @@ public:
 			status_t			SetTo(const entry_ref& catalogOwner,
 									const char* language = NULL,
 									uint32 fingerprint = 0);
+			status_t			SetTo(const char* signature,
+									const char* language = NULL);
 
 			status_t			InitCheck() const;
 			int32				CountItems() const;

@@ -52,6 +52,8 @@ public:
 			BCatalogData*		LoadCatalog(const entry_ref& catalogOwner,
 									const char* language = NULL,
 									int32 fingerprint = 0) const;
+			BCatalogData*		LoadCatalog(const char* signature,
+									const char* language = NULL) const;
 			status_t			UnloadCatalog(BCatalogData* catalogData);
 
 			BCatalogData*		CreateCatalog(const char* type,

@@ -8,8 +8,8 @@
  *		Oliver Tappe, zooey@hirschkaefer.de
  *
  * Corresponds to:
- *		headers/os/locale/Catalog.h	 hrev45083
- *		src/kits/locale/Catalog.cpp	 hrev45083
+ *		headers/os/locale/Catalog.h	 hrev54533
+ *		src/kits/locale/Catalog.cpp	 hrev54533
  */
 
 
@@ -109,12 +109,36 @@
 	different versions of your application, it may be useful to separate their
 	catalogs.
 
-	\param catalogOwner entry_ref for which to load a catalog.
+	\param catalogOwner entry_ref or application, add-on or library for which
+	       to load a catalog.
 	\param language The language of the catalog to load. If \c NULL, the user
 	       settings will be used.
 	\param fingerprint The fingerprint version-info for the catalog to load.
 	       If \c 0, the fingerprint will not be checked,and any version of the
 	       catalog will be loaded.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BCatalog::BCatalog(const char* signature, const char* language)
+	\brief Construct a BCatalog object for the given application \a signqture.
+
+	If you don't specify a language, the system default list will be used.
+	The language is passed here as a 2 letter ISO code.
+
+	This constructor is used to load catalogs that are not related to an
+	executable or library file (so there is no entry_ref usable to identify the
+	catalog). As it uses only the MIME signature, it cannot load catalogs from
+	application resources or a catalog file located next to the application.
+	Only the catalogs in the standard system directories (data/locale/catalogs)
+	are checked. Moreover, only the default catalog format is available, not
+	custom formats from catalog add-ons.
+
+	\param catalogOwner entry_ref for which to load a catalog.
+	\param language The language of the catalog to load. If \c NULL, the user
+	       settings will be used.
 
 	\since Haiku R1
 */
@@ -269,12 +293,30 @@
 		const char* language, uint32 fingerprint)
 	\brief Reload the string data.
 
-	This method reloads the data for the given signature and fingerprint.
+	This method reloads the data for the given file, language and fingerprint.
 
-	\param catalogOwner The \c entry_ref of the catalog that you want to load.
+	\param catalogOwner The \c entry_ref of the application, add-on or library
+	       for which you want to load a catalog.
 	\param language The language of the catalog to load. If \c NULL, the user
 	       settings will be used.
 	\param fingerprint The fingerprint of the catalog you want to load.
+
+	\returns A status code, \c B_OK on success, \c B_ERROR on error.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BCatalog::SetTo(const char* signature,
+		const char* language, uint32 fingerprint)
+	\brief Reload the string data.
+
+	This method reloads the data for the given signature and language.
+
+	\param signature The MIME signature identifying the catalog to load.
+	\param language The language of the catalog to load. If \c NULL, the user
+	       settings will be used.
 
 	\returns A status code, \c B_OK on success, \c B_ERROR on error.
 

@@ -38,10 +38,14 @@
 // Support Kit
 #include <String.h>
 
+#include <Catalog.h>
+
 __USE_CORTEX_NAMESPACE
 
 #include <Debug.h>
 #define D_METHOD(x) //PRINT (x)
+
+static BCatalog sCatalog("application/Haiku-cortex-support");
 
 // -------------------------------------------------------- //
 // *** media_node strings (public)
@@ -57,96 +61,96 @@ BString	MediaString::getStringFor(
 
 	if (kinds & B_BUFFER_PRODUCER) {
 		if (first) {
-			list = "Buffer producer";
+			list = sCatalog.GetString(B_TRANSLATE_MARK("Buffer producer"));
 			first = false;
 		}
 	}
 	if (kinds & B_BUFFER_CONSUMER) {
 		if (first) {
-			list = "Buffer consumer";
+			list = sCatalog.GetString(B_TRANSLATE_MARK("Buffer consumer"));
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "Buffer consumer";
+			last = sCatalog.GetString(B_TRANSLATE_MARK("Buffer consumer"));
 		}
 	}
 	if (kinds & B_TIME_SOURCE) {
 		if (first) {
-			list = "Time source";
+			list = sCatalog.GetString(B_TRANSLATE_MARK("Time source"));
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "Time source";
+			last = sCatalog.GetString(B_TRANSLATE_MARK("Time source"));
 		}
 	}
 	if (kinds & B_CONTROLLABLE) {
 		if (first) {
-			list = "Controllable";
+			list = sCatalog.GetString(B_TRANSLATE_MARK("Controllable"));
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "Controllable";
+			last = sCatalog.GetString(B_TRANSLATE_MARK("Controllable"));
 		}
 	}
 	if (kinds & B_FILE_INTERFACE) {
 		if (first) {
-			list = "File interface";
+			list = sCatalog.GetString(B_TRANSLATE_MARK("File interface"));
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "File interface";
+			last = sCatalog.GetString(B_TRANSLATE_MARK("File interface"));
 		}
 	}
 	if (kinds & B_ENTITY_INTERFACE) {
 		if (first) {
-			list = "Entity interface";
+			list = sCatalog.GetString(B_TRANSLATE_MARK("Entity interface"));
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "Entity interface";
+			last = sCatalog.GetString(B_TRANSLATE_MARK("Entity interface"));
 		}
 	}
 	if (kinds & B_PHYSICAL_INPUT) {
 		if (first) {
-			list = "Physical input";
+			list = sCatalog.GetString(B_TRANSLATE_MARK("Physical input"));
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "Physical input";
+			last = sCatalog.GetString(B_TRANSLATE_MARK("Physical input"));
 		}
 	}
 	if (kinds & B_PHYSICAL_OUTPUT) {
 		if (first) {
-			list = "Physical output";
+			list = sCatalog.GetString(B_TRANSLATE_MARK("Physical output"));
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "Physical output";
+			last = sCatalog.GetString(B_TRANSLATE_MARK("Physical output"));
 		}
 	}
 	if (kinds & B_SYSTEM_MIXER) {
 		if (first) {
-			list = "System mixer";
+			list = sCatalog.GetString(B_TRANSLATE_MARK("System mixer"));
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "System mixer";
+			last = sCatalog.GetString(B_TRANSLATE_MARK("System mixer"));
 		}
 	}
 
@@ -162,12 +166,18 @@ BString MediaString::getStringFor(
 	D_METHOD(("MediaString::getStringFor(run_mode)\n"));
 
 	switch (runMode) {
-		case BMediaNode::B_OFFLINE:				return "Offline";
-		case BMediaNode::B_RECORDING:			return "Recording";
-		case BMediaNode::B_DECREASE_PRECISION:	return "Decrease precision";
-		case BMediaNode::B_INCREASE_LATENCY:	return "Increase latency";
-		case BMediaNode::B_DROP_DATA:			return "Drop data";
-		default:								return "(unknown run mode)";
+		case BMediaNode::B_OFFLINE:
+			return sCatalog.GetString(B_TRANSLATE_MARK("Offline"));
+		case BMediaNode::B_RECORDING:
+			return sCatalog.GetString(B_TRANSLATE_MARK("Recording"));
+		case BMediaNode::B_DECREASE_PRECISION:
+			return sCatalog.GetString(B_TRANSLATE_MARK("Decrease precision"));
+		case BMediaNode::B_INCREASE_LATENCY:
+			return sCatalog.GetString(B_TRANSLATE_MARK("Increase latency"));
+		case BMediaNode::B_DROP_DATA:
+			return sCatalog.GetString(B_TRANSLATE_MARK("Drop data"));
+		default:
+			return sCatalog.GetString(B_TRANSLATE_MARK("(unknown run mode)"));
 	}
 }
 
@@ -181,24 +191,41 @@ BString	MediaString::getStringFor(
 	D_METHOD(("MediaString::getStringFor(media_type)\n"));
 
 	switch (type) {
-		case B_MEDIA_NO_TYPE:			return "Typeless media";
-		case B_MEDIA_UNKNOWN_TYPE:		return "Unknown media type";
-		case B_MEDIA_RAW_AUDIO:			return "Raw audio";
-		case B_MEDIA_RAW_VIDEO:			return "Raw video";
-		case B_MEDIA_VBL:				return "Raw data from VBL area";
-		case B_MEDIA_TIMECODE:			return "Timecode";
-		case B_MEDIA_MIDI:				return "MIDI";
-		case B_MEDIA_TEXT:				return "Text";
-		case B_MEDIA_HTML:				return "HTML";
-		case B_MEDIA_MULTISTREAM:		return "Multistream media";
-		case B_MEDIA_PARAMETERS:		return "Parameters";
-		case B_MEDIA_ENCODED_AUDIO:		return "Encoded audio";
-		case B_MEDIA_ENCODED_VIDEO:		return "Encoded video";
+		case B_MEDIA_NO_TYPE:
+			return sCatalog.GetString(B_TRANSLATE_MARK("Typeless media"));
+		case B_MEDIA_UNKNOWN_TYPE:
+			return sCatalog.GetString(B_TRANSLATE_MARK("Unknown media type"));
+		case B_MEDIA_RAW_AUDIO:
+			return sCatalog.GetString(B_TRANSLATE_MARK("Raw audio"));
+		case B_MEDIA_RAW_VIDEO:
+			return sCatalog.GetString(B_TRANSLATE_MARK("Raw video"));
+		case B_MEDIA_VBL:
+			return sCatalog.GetString(B_TRANSLATE_MARK("Raw data from VBL area"));
+		case B_MEDIA_TIMECODE:
+			return sCatalog.GetString(B_TRANSLATE_MARK("Timecode"));
+		case B_MEDIA_MIDI:
+			return sCatalog.GetString(B_TRANSLATE_MARK("MIDI"));
+		case B_MEDIA_TEXT:
+			return sCatalog.GetString(B_TRANSLATE_MARK("Text"));
+		case B_MEDIA_HTML:
+			return sCatalog.GetString(B_TRANSLATE_MARK("HTML"));
+		case B_MEDIA_MULTISTREAM:
+			return sCatalog.GetString(B_TRANSLATE_MARK("Multistream media"));
+		case B_MEDIA_PARAMETERS:
+			return sCatalog.GetString(B_TRANSLATE_MARK("Parameters"));
+		case B_MEDIA_ENCODED_AUDIO:
+			return sCatalog.GetString(B_TRANSLATE_MARK("Encoded audio"));
+		case B_MEDIA_ENCODED_VIDEO:
+			return sCatalog.GetString(B_TRANSLATE_MARK("Encoded video"));
 		default: {
-			if (type >= B_MEDIA_FIRST_USER_TYPE)
-				return "User-defined media type";
-			if (type >= B_MEDIA_PRIVATE)
-				return "Private Be media type";
+			if (type >= B_MEDIA_FIRST_USER_TYPE) {
+				return sCatalog.GetString(B_TRANSLATE_MARK(
+					"User-defined media type"));
+			}
+			if (type >= B_MEDIA_PRIVATE) {
+				return sCatalog.GetString(B_TRANSLATE_MARK(
+					"Private Be media type"));
+			}
 		}
 	}
 	return "Unknown Media Type";
@@ -210,15 +237,24 @@ BString	MediaString::getStringFor(
 	D_METHOD(("MediaString::getStringFor(media_format_family)\n"));
 
 	switch (family) {
-		case B_ANY_FORMAT_FAMILY:		return "Any format family";
-		case B_BEOS_FORMAT_FAMILY:		return "BeOS format family";
-		case B_QUICKTIME_FORMAT_FAMILY:	return "QuickTime format family";
-		case B_AVI_FORMAT_FAMILY:		return "AVI format family";
-		case B_ASF_FORMAT_FAMILY:		return "ASF format family";
-		case B_MPEG_FORMAT_FAMILY:		return "MPEG format family";
-		case B_WAV_FORMAT_FAMILY:		return "WAV format family";
-		case B_AIFF_FORMAT_FAMILY:		return "AIFF format family";
-		default:						return "Miscellaneous format family";
+		case B_ANY_FORMAT_FAMILY:
+			return sCatalog.GetString(B_TRANSLATE_MARK("Any format family"));
+		case B_BEOS_FORMAT_FAMILY:
+			return sCatalog.GetString(B_TRANSLATE_MARK("BeOS format family"));
+		case B_QUICKTIME_FORMAT_FAMILY:
+			return sCatalog.GetString(B_TRANSLATE_MARK("QuickTime format family"));
+		case B_AVI_FORMAT_FAMILY:
+			return sCatalog.GetString(B_TRANSLATE_MARK("AVI format family"));
+		case B_ASF_FORMAT_FAMILY:
+			return sCatalog.GetString(B_TRANSLATE_MARK("ASF format family"));
+		case B_MPEG_FORMAT_FAMILY:
+			return sCatalog.GetString(B_TRANSLATE_MARK("MPEG format family"));
+		case B_WAV_FORMAT_FAMILY:
+			return sCatalog.GetString(B_TRANSLATE_MARK("WAV format family"));
+		case B_AIFF_FORMAT_FAMILY:
+			return sCatalog.GetString(B_TRANSLATE_MARK("AIFF format family"));
+		default:
+			return sCatalog.GetString(B_TRANSLATE_MARK("Miscellaneous format family"));
 	}
 }
 
@@ -488,10 +524,11 @@ BString MediaString::getStringFor(
 	BString s;
 	if ((source.port != media_source::null.port)
 	 && (source.id != media_source::null.id)) {
-		s << "Port " << source.port << ", ID " << source.id;
+		s << sCatalog.GetString(B_TRANSLATE_MARK("Port ")) << source.port
+			<< sCatalog.GetString(B_TRANSLATE_MARK(", ID ")) << source.id;
 	}
 	else {
-		s = "(none)";
+		s = sCatalog.GetString(B_TRANSLATE_MARK("(none)"));
 	}
 	return s;
 }
@@ -504,10 +541,11 @@ BString MediaString::getStringFor(
 	BString s;
 	if ((destination.port != media_destination::null.port)
 	 && (destination.id != media_destination::null.id)) {
-		s << "Port " << destination.port << ", ID " << destination.id;
+		s << sCatalog.GetString(B_TRANSLATE_MARK("Port ")) << destination.port
+			<< sCatalog.GetString(B_TRANSLATE_MARK(", ID ")) << destination.id;
 	}
 	else {
-		s = "(none)";
+		s = sCatalog.GetString(B_TRANSLATE_MARK("(none)"));
 	}
 	return s;
 }
@@ -528,25 +566,25 @@ BString MediaString::forAudioFormat(
 
 	switch (format) {
 		case media_raw_audio_format::B_AUDIO_UCHAR: {
-			return "8 bit integer";
+			return sCatalog.GetString(B_TRANSLATE_MARK("8 bit integer"));
 		}
 		case media_raw_audio_format::B_AUDIO_SHORT:	{
-			return "16 bit integer";
+			return sCatalog.GetString(B_TRANSLATE_MARK("16 bit integer"));
 		}
 		case media_raw_audio_format::B_AUDIO_FLOAT:	{
-			return "32 bit float";
+			return sCatalog.GetString(B_TRANSLATE_MARK("32 bit float"));
 		}
 		case media_raw_audio_format::B_AUDIO_INT: {
 			BString s = "";
 			if (validBits != media_multi_audio_format::wildcard.valid_bits)
-				s << validBits << " bit ";
+				s << validBits << sCatalog.GetString(B_TRANSLATE_MARK(" bit "));
 			else
-				s << "32 bit ";
-			s << "integer";
+				s << sCatalog.GetString(B_TRANSLATE_MARK("32 bit "));
+			s << sCatalog.GetString(B_TRANSLATE_MARK("integer"));
 			return s;
 		}
 		default: {
-			return "(unknown format)";
+			return sCatalog.GetString(B_TRANSLATE_MARK("(unknown format)"));
 		}
 	}
 }
@@ -561,7 +599,7 @@ BString MediaString::forAudioFrameRate(
 	}
 	
 	BString s;
-	s << (frameRate / 1000) << " kHz";
+	s << (frameRate / 1000) << sCatalog.GetString(B_TRANSLATE_MARK(" kHz"));
 	return s;
 }
 
@@ -576,14 +614,15 @@ BString MediaString::forAudioChannelCount(
 	
 	switch (channelCount) {
 		case 1: {
-			return "Mono";
+			return sCatalog.GetString(B_TRANSLATE_MARK("Mono"));
 		}
 		case 2: {
-			return "Stereo";
+			return sCatalog.GetString(B_TRANSLATE_MARK("Stereo"));
 		}
 		default: {
 			BString s = "";
-			s << channelCount << " Channels";
+			s << channelCount
+				<< sCatalog.GetString(B_TRANSLATE_MARK(" Channels"));
 			return s;
 		}	
 	}
@@ -600,13 +639,13 @@ BString MediaString::forAudioByteOrder(
 
 	switch (byteOrder) {
 		case B_MEDIA_BIG_ENDIAN: {
-			return "Big endian";
+			return sCatalog.GetString(B_TRANSLATE_MARK("Big endian"));
 		}
 		case B_MEDIA_LITTLE_ENDIAN: {
-			return "Little endian";
+			return sCatalog.GetString(B_TRANSLATE_MARK("Little endian"));
 		}
 		default: {
-			return "(unknown byte order)";
+			return sCatalog.GetString(B_TRANSLATE_MARK("(unknown byte order)"));
 		}
 	}
 }
@@ -621,7 +660,7 @@ BString MediaString::forAudioBufferSize(
 	}
 
 	BString s = "";
-	s << bufferSize << " bytes per buffer";
+	s << bufferSize << sCatalog.GetString(B_TRANSLATE_MARK(" bytes per buffer"));
 	return s;
 }
 
@@ -634,202 +673,202 @@ BString MediaString::forAudioChannelMask(
 
 	if (channelMask & B_CHANNEL_LEFT) {
 		if (first) {
-			list = "Left";
+			list = sCatalog.GetString(B_TRANSLATE_MARK("Left"));
 			first = false;
 		}
 	}
 	if (channelMask & B_CHANNEL_RIGHT) {
 		if (first) {
-			list = "Right";
+			list = sCatalog.GetString(B_TRANSLATE_MARK("Right"));
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "Right";
+			last = sCatalog.GetString(B_TRANSLATE_MARK("Right"));
 		}
 	}
 	if (channelMask & B_CHANNEL_CENTER) {
 		if (first) {
-			list = "Center";
+			list = sCatalog.GetString(B_TRANSLATE_MARK("Center"));
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "Center";
+			last = sCatalog.GetString(B_TRANSLATE_MARK("Center"));
 		}
 	}
 	if (channelMask & B_CHANNEL_SUB) {
 		if (first) {
-			list = "Sub";
+			list = sCatalog.GetString(B_TRANSLATE_MARK("Sub"));
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "Sub";
+			last = sCatalog.GetString(B_TRANSLATE_MARK("Sub"));
 		}
 	}
 	if (channelMask & B_CHANNEL_REARLEFT) {
 		if (first) {
-			list = "Rear-left";
+			list = sCatalog.GetString(B_TRANSLATE_MARK("Rear-left"));
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "Rear-left";
+			last = sCatalog.GetString(B_TRANSLATE_MARK("Rear-left"));
 		}
 	}
 	if (channelMask & B_CHANNEL_REARRIGHT) {
 		if (first) {
-			list = "Rear-right";
+			list = sCatalog.GetString(B_TRANSLATE_MARK("Rear-right"));
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "Rear-right";
+			last = sCatalog.GetString(B_TRANSLATE_MARK("Rear-right"));
 		}
 	}
 	if (channelMask & B_CHANNEL_FRONT_LEFT_CENTER) {
 		if (first) {
-			list = "Front-left-center";
+			list = sCatalog.GetString(B_TRANSLATE_MARK("Front-left-center"));
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "Front-left-center";
+			last = sCatalog.GetString(B_TRANSLATE_MARK("Front-left-center"));
 		}
 	}
 	if (channelMask & B_CHANNEL_FRONT_RIGHT_CENTER) {
 		if (first) {
-			list = "Front-right-center";
+			list = sCatalog.GetString(B_TRANSLATE_MARK("Front-right-center"));
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "Front-right-center";
+			last = sCatalog.GetString(B_TRANSLATE_MARK("Front-right-center"));
 		}
 	}
 	if (channelMask & B_CHANNEL_BACK_CENTER) {
 		if (first) {
-			list = "Back-center";
+			list = sCatalog.GetString(B_TRANSLATE_MARK("Back-center"));
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "Back-center";
+			last = sCatalog.GetString(B_TRANSLATE_MARK("Back-center"));
 		}
 	}
 	if (channelMask & B_CHANNEL_SIDE_LEFT) {
 		if (first) {
-			list = "Side-left";
+			list = sCatalog.GetString(B_TRANSLATE_MARK("Side-left"));
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "Side-left";
+			last = sCatalog.GetString(B_TRANSLATE_MARK("Side-left"));
 		}
 	}
 	if (channelMask & B_CHANNEL_SIDE_RIGHT) {
 		if (first) {
-			list = "Side-right";
+			list = sCatalog.GetString(B_TRANSLATE_MARK("Side-right"));
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "Side-right";
+			last = sCatalog.GetString(B_TRANSLATE_MARK("Side-right"));
 		}
 	}
 	if (channelMask & B_CHANNEL_TOP_CENTER) {
 		if (first) {
-			list = "Top-center";
+			list = sCatalog.GetString(B_TRANSLATE_MARK("Top-center"));
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "Top-center";
+			last = sCatalog.GetString(B_TRANSLATE_MARK("Top-center"));
 		}
 	}
 	if (channelMask & B_CHANNEL_TOP_FRONT_LEFT) {
 		if (first) {
-			list = "Top-Front-left";
+			list = sCatalog.GetString(B_TRANSLATE_MARK("Top-Front-left"));
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "Top-Front-left";
+			last = sCatalog.GetString(B_TRANSLATE_MARK("Top-Front-left"));
 		}
 	}
 	if (channelMask & B_CHANNEL_TOP_FRONT_CENTER) {
 		if (first) {
-			list = "Top-Front-center";
+			list = sCatalog.GetString(B_TRANSLATE_MARK("Top-Front-center"));
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "Top-Front-center";
+			last = sCatalog.GetString(B_TRANSLATE_MARK("Top-Front-center"));
 		}
 	}
 	if (channelMask & B_CHANNEL_TOP_FRONT_RIGHT) {
 		if (first) {
-			list = "Top-Front-right";
+			list = sCatalog.GetString(B_TRANSLATE_MARK("Top-Front-right"));
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "Top-Front-right";
+			last = sCatalog.GetString(B_TRANSLATE_MARK("Top-Front-right"));
 		}
 	}
 	if (channelMask & B_CHANNEL_TOP_BACK_LEFT) {
 		if (first) {
-			list = "Top-Back-left";
+			list = sCatalog.GetString(B_TRANSLATE_MARK("Top-Back-left"));
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "Top-Back-left";
+			last = sCatalog.GetString(B_TRANSLATE_MARK("Top-Back-left"));
 		}
 	}
 	if (channelMask & B_CHANNEL_TOP_BACK_CENTER) {
 		if (first) {
-			list = "Top-Back-center";
+			list = sCatalog.GetString(B_TRANSLATE_MARK("Top-Back-center"));
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "Top-Back-center";
+			last = sCatalog.GetString(B_TRANSLATE_MARK("Top-Back-center"));
 		}
 	}
 	if (channelMask & B_CHANNEL_TOP_BACK_RIGHT) {
 		if (first) {
-			list = "Top-Back-right";
+			list = sCatalog.GetString(B_TRANSLATE_MARK("Top-Back-right"));
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "Top-Back-right";
+			last = sCatalog.GetString(B_TRANSLATE_MARK("Top-Back-right"));
 		}
 	}
 	if (last != "") {
 		list << " & " << last;
 	}
 	if (list == "") {
-		list = "(none)";
+		list = sCatalog.GetString(B_TRANSLATE_MARK("(none)"));
 	}
 
 	return list;
@@ -840,10 +879,14 @@ BString MediaString::forAudioMatrixMask(
 	D_METHOD(("MediaString::forAudioMatrixMask()\n"));
 
 	switch (matrixMask) {
-		case 0:									return "(none)";
-		case B_MATRIX_PROLOGIC_LR:				return "ProLogic LR";
-		case B_MATRIX_AMBISONIC_WXYZ:			return "Ambisonic WXYZ";
-		default:								return "(unknown matrix mask)";
+		case 0:
+			return sCatalog.GetString(B_TRANSLATE_MARK("(none)"));
+		case B_MATRIX_PROLOGIC_LR:
+			return sCatalog.GetString(B_TRANSLATE_MARK("ProLogic LR"));
+		case B_MATRIX_AMBISONIC_WXYZ:
+			return sCatalog.GetString(B_TRANSLATE_MARK("Ambisonic WXYZ"));
+		default:
+			return sCatalog.GetString(B_TRANSLATE_MARK("(unknown matrix mask)"));
 	}
 }
 
@@ -862,7 +905,7 @@ BString MediaString::forAudioBitRate(
 	}
 
 	BString s = "";
-	s << bitRate / 1000.0f << " kb/s";
+	s << bitRate / 1000.0f << sCatalog.GetString(B_TRANSLATE_MARK(" kb/s"));
 	return s;
 }
 
@@ -876,7 +919,7 @@ BString MediaString::forAudioFrameSize(
 	}
 
 	BString s = "";
-	s << frameSize << " bytes per frame";
+	s << frameSize << sCatalog.GetString(B_TRANSLATE_MARK(" bytes per frame"));
 	return s;
 }
 
@@ -896,51 +939,89 @@ BString MediaString::forVideoFormat(
 
 	switch (format) {
 		case B_RGB32:
-		case B_RGB32_BIG: 		return "32 bit RGB";
+		case B_RGB32_BIG:
+			return sCatalog.GetString(B_TRANSLATE_MARK("32 bit RGB"));
 		case B_RGBA32:
-		case B_RGBA32_BIG:		return "32 bit RGBA";
+		case B_RGBA32_BIG:
+			return sCatalog.GetString(B_TRANSLATE_MARK("32 bit RGBA"));
 		case B_RGB24:
-		case B_RGB24_BIG:		return "24 bit RGB";
+		case B_RGB24_BIG:
+			return sCatalog.GetString(B_TRANSLATE_MARK("24 bit RGB"));
 		case B_RGB16:
-		case B_RGB16_BIG:		return "16 bit RGB";
+		case B_RGB16_BIG:
+			return sCatalog.GetString(B_TRANSLATE_MARK("16 bit RGB"));
 		case B_RGB15:
-		case B_RGB15_BIG:		return "15 bit RGB";
+		case B_RGB15_BIG:
+			return sCatalog.GetString(B_TRANSLATE_MARK("15 bit RGB"));
 		case B_RGBA15:
-		case B_RGBA15_BIG:		return "15 bit RGBA";
-		case B_CMAP8:			return "8 bit color-index";
-		case B_GRAY8:			return "8 bit grayscale-index";
-		case B_GRAY1:			return "Monochrome";
-		case B_YUV422:			return "YUV422";
-		case B_YUV411:			return "YUV411";
-		case B_YUV420:			return "YUV420";
-		case B_YUV444:			return "YUV444";
-		case B_YUV9:			return "YUV9";
-		case B_YUV12:			return "YUV12";
-		case B_YCbCr422:		return "YCbCr422";
-		case B_YCbCr411:		return "YCbCr411";
-		case B_YCbCr444:		return "YCbCr444";
-		case B_YCbCr420:		return "YCbCr420";
-		case B_UVL24:			return "24 bit UVL";
-		case B_UVL32:			return "32 bit UVL";
-		case B_UVLA32:			return "32 bit UVLA";
-		case B_LAB24:			return "24 bit LAB";
-		case B_LAB32:			return "32 bit LAB";
-		case B_LABA32:			return "32 bit LABA";
-		case B_HSI24:			return "24 bit HSI";
-		case B_HSI32:			return "32 bit HSI";
-		case B_HSIA32:			return "32 bit HSIA";
-		case B_HSV24:			return "24 bit HSV";
-		case B_HSV32:			return "32 bit HSV";
-		case B_HSVA32:			return "32 bit HSVA";
-		case B_HLS24:			return "24 bit HLS";
-		case B_HLS32:			return "32 bit HLS";
-		case B_HLSA32:			return "32 bit HLSA";
-		case B_CMY24:			return "24 bit CMY";
-		case B_CMY32:			return "32 bit CMY";
-		case B_CMYA32:			return "32 bit CMYA";
-		case B_CMYK32:			return "32 bit CMYK";
+		case B_RGBA15_BIG:
+			return sCatalog.GetString(B_TRANSLATE_MARK("15 bit RGBA"));
+		case B_CMAP8:
+			return sCatalog.GetString(B_TRANSLATE_MARK("8 bit color-index"));
+		case B_GRAY8:
+			return sCatalog.GetString(B_TRANSLATE_MARK("8 bit grayscale-index"));
+		case B_GRAY1:
+			return sCatalog.GetString(B_TRANSLATE_MARK("Monochrome"));
+		case B_YUV422:
+			return sCatalog.GetString(B_TRANSLATE_MARK("YUV422"));
+		case B_YUV411:
+			return sCatalog.GetString(B_TRANSLATE_MARK("YUV411"));
+		case B_YUV420:
+			return sCatalog.GetString(B_TRANSLATE_MARK("YUV420"));
+		case B_YUV444:
+			return sCatalog.GetString(B_TRANSLATE_MARK("YUV444"));
+		case B_YUV9:
+			return sCatalog.GetString(B_TRANSLATE_MARK("YUV9"));
+		case B_YUV12:
+			return sCatalog.GetString(B_TRANSLATE_MARK("YUV12"));
+		case B_YCbCr422:
+			return sCatalog.GetString(B_TRANSLATE_MARK("YCbCr422"));
+		case B_YCbCr411:
+			return sCatalog.GetString(B_TRANSLATE_MARK("YCbCr411"));
+		case B_YCbCr444:
+			return sCatalog.GetString(B_TRANSLATE_MARK("YCbCr444"));
+		case B_YCbCr420:
+			return sCatalog.GetString(B_TRANSLATE_MARK("YCbCr420"));
+		case B_UVL24:
+			return sCatalog.GetString(B_TRANSLATE_MARK("24 bit UVL"));
+		case B_UVL32:
+			return sCatalog.GetString(B_TRANSLATE_MARK("32 bit UVL"));
+		case B_UVLA32:
+			return sCatalog.GetString(B_TRANSLATE_MARK("32 bit UVLA"));
+		case B_LAB24:
+			return sCatalog.GetString(B_TRANSLATE_MARK("24 bit LAB"));
+		case B_LAB32:
+			return sCatalog.GetString(B_TRANSLATE_MARK("32 bit LAB"));
+		case B_LABA32:
+			return sCatalog.GetString(B_TRANSLATE_MARK("32 bit LABA"));
+		case B_HSI24:
+			return sCatalog.GetString(B_TRANSLATE_MARK("24 bit HSI"));
+		case B_HSI32:
+			return sCatalog.GetString(B_TRANSLATE_MARK("32 bit HSI"));
+		case B_HSIA32:
+			return sCatalog.GetString(B_TRANSLATE_MARK("32 bit HSIA"));
+		case B_HSV24:
+			return sCatalog.GetString(B_TRANSLATE_MARK("24 bit HSV"));
+		case B_HSV32:
+			return sCatalog.GetString(B_TRANSLATE_MARK("32 bit HSV"));
+		case B_HSVA32:
+			return sCatalog.GetString(B_TRANSLATE_MARK("32 bit HSVA"));
+		case B_HLS24:
+			return sCatalog.GetString(B_TRANSLATE_MARK("24 bit HLS"));
+		case B_HLS32:
+			return sCatalog.GetString(B_TRANSLATE_MARK("32 bit HLS"));
+		case B_HLSA32:
+			return sCatalog.GetString(B_TRANSLATE_MARK("32 bit HLSA"));
+		case B_CMY24:
+			return sCatalog.GetString(B_TRANSLATE_MARK("24 bit CMY"));
+		case B_CMY32:
+			return sCatalog.GetString(B_TRANSLATE_MARK("32 bit CMY"));
+		case B_CMYA32:
+			return sCatalog.GetString(B_TRANSLATE_MARK("32 bit CMYA"));
+		case B_CMYK32:
+			return sCatalog.GetString(B_TRANSLATE_MARK("32 bit CMYK"));
 		default: {
-			return "(unknown video format)";
+			return sCatalog.GetString(B_TRANSLATE_MARK("(unknown video format)"));
 		}
 	}
 }
@@ -973,18 +1054,18 @@ BString MediaString::forVideoFieldRate(
 
 	BString s = "";
 	if (interlace == 1) {
-		s << "Non-interlaced ";
+		s << sCatalog.GetString(B_TRANSLATE_MARK("Non-interlaced "));
 	}
 	else {
-		s << "Interlaced ";
+		s << sCatalog.GetString(B_TRANSLATE_MARK("Interlaced "));
 	}
-	s << fieldRate << " Hz";
+	s << fieldRate << sCatalog.GetString(B_TRANSLATE_MARK(" Hz"));
 	if ((fieldRate > 49.9) && (fieldRate < 50.1)) {
-		s << " (PAL)";
+		s << sCatalog.GetString(B_TRANSLATE_MARK(" (PAL)"));
 	}
 	else if (((interlace == 2) && (fieldRate > 59.9) && (fieldRate < 60.0))
 		  || ((interlace == 1) && (fieldRate > 29.9) && (fieldRate < 30.0))) {
-		s << " (NTSC)";
+		s << sCatalog.GetString(B_TRANSLATE_MARK(" (NTSC)"));
 	}
 
 	return s;	
@@ -1001,13 +1082,16 @@ BString MediaString::forVideoOrientation(
 
 	switch (orientation) {
 		case B_VIDEO_TOP_LEFT_RIGHT: {
-			return "Top to bottom, left to right";
+			return sCatalog.GetString(B_TRANSLATE_MARK(
+				"Top to bottom, left to right"));
 		}
 		case B_VIDEO_BOTTOM_LEFT_RIGHT: {
-			return "Bottom to top, left to right";
+			return sCatalog.GetString(B_TRANSLATE_MARK(
+				"Bottom to top, left to right"));
 		}
 		default: {
-			return "(unkown video orientation)";
+			return sCatalog.GetString(B_TRANSLATE_MARK(
+				"(unkown video orientation)"));
 		}
 	}
 }
@@ -1040,9 +1124,9 @@ BString MediaString::forVideoActiveLines(
 	 	return "*";
 	}
 
-	BString s = "Video data between";
-	s << " line " << firstActive;
-	s << " and " << lastActive;
+	BString s = sCatalog.GetString(B_TRANSLATE_MARK("Video data between"));
+	s << sCatalog.GetString(B_TRANSLATE_MARK(" line ")) << firstActive;
+	s << sCatalog.GetString(B_TRANSLATE_MARK(" and ")) << lastActive;
 	return s;
 }
 
@@ -1056,7 +1140,7 @@ BString MediaString::forVideoBytesPerRow(
 	}
 
 	BString s = "";
-	s << bytesPerRow << " bytes per row";
+	s << bytesPerRow << sCatalog.GetString(B_TRANSLATE_MARK(" bytes per row"));
 	return s;
 }
 
@@ -1068,13 +1152,13 @@ BString MediaString::forVideoOffset(
 
 	BString s = "";
 	if (pixelOffset != media_video_display_info::wildcard.pixel_offset) {
-		s << pixelOffset << " pixels";
+		s << pixelOffset << sCatalog.GetString(B_TRANSLATE_MARK(" pixels"));
 	}
 	if (lineOffset != media_video_display_info::wildcard.line_offset) {
 		if (s != "") {
 			s << ", ";
 		}
-		s << pixelOffset << " lines";
+		s << pixelOffset << sCatalog.GetString(B_TRANSLATE_MARK(" lines"));
 	}
 	if (s == "") {
 		s = "*";
@@ -1095,13 +1179,13 @@ BString MediaString::forVideoBitRate(
 
 	BString s = "";
 	if (avgBitRate != media_encoded_video_format::wildcard.avg_bit_rate) {
-		s << avgBitRate / 1000.0f << " kb/s (avg)";
+		s << avgBitRate / 1000.0f << sCatalog.GetString(B_TRANSLATE_MARK(" kb/s (avg)"));
 	}
 	if (maxBitRate != media_encoded_video_format::wildcard.max_bit_rate) {
 		if (s != "") {
 			s << ", ";
 		}
-		s << maxBitRate / 1000.0f << " kb/s (max)";
+		s << maxBitRate / 1000.0f << sCatalog.GetString(B_TRANSLATE_MARK(" kb/s (max)"));
 	}
 	if (s == "") {
 		s = "*";
@@ -1119,7 +1203,7 @@ BString MediaString::forVideoFrameSize(
 	}
 
 	BString s = "";
-	s << frameSize << " bytes per frame";
+	s << frameSize << sCatalog.GetString(B_TRANSLATE_MARK(" bytes per frame"));
 	return s;
 }
 
@@ -1131,13 +1215,15 @@ BString MediaString::forVideoHistory(
 
 	BString s = "";
 	if (forwardHistory != media_encoded_video_format::wildcard.forward_history) {
-		s << static_cast<int32>(forwardHistory) << " frames forward";
+		s << static_cast<int32>(forwardHistory)
+			<< sCatalog.GetString(B_TRANSLATE_MARK(" frames forward"));
 	}
 	if (backwardHistory != media_encoded_video_format::wildcard.backward_history) {
 		if (s != "") {
 			s << ", ";
 		}
-		s << static_cast<int32>(backwardHistory) << " frames backward";
+		s << static_cast<int32>(backwardHistory)
+			<< sCatalog.GetString(B_TRANSLATE_MARK(" frames backward"));
 	}
 	if (s == "") {
 		s = "*";
@@ -1160,12 +1246,18 @@ BString MediaString::forMultistreamFormat(
 	}
 
 	switch (format) {
-		case media_multistream_format::B_VID:		return "BeOS video";
-		case media_multistream_format::B_AVI:		return "AVI";
-		case media_multistream_format::B_MPEG1:		return "MPEG1";
-		case media_multistream_format::B_MPEG2:		return "MPEG2";
-		case media_multistream_format::B_QUICKTIME:	return "QuickTime";
-		default:									return "(unknown multistream format)";
+		case media_multistream_format::B_VID:
+			return sCatalog.GetString(B_TRANSLATE_MARK("BeOS video"));
+		case media_multistream_format::B_AVI:
+			return sCatalog.GetString(B_TRANSLATE_MARK("AVI"));
+		case media_multistream_format::B_MPEG1:
+			return sCatalog.GetString(B_TRANSLATE_MARK("MPEG1"));
+		case media_multistream_format::B_MPEG2:
+			return sCatalog.GetString(B_TRANSLATE_MARK("MPEG2"));
+		case media_multistream_format::B_QUICKTIME:
+			return sCatalog.GetString(B_TRANSLATE_MARK("QuickTime"));
+		default:
+			return sCatalog.GetString(B_TRANSLATE_MARK("(unknown multistream format)"));
 	}
 }
 
@@ -1177,13 +1269,13 @@ BString MediaString::forMultistreamBitRate(
 
 	BString s = "";
 	if (avgBitRate != media_multistream_format::wildcard.avg_bit_rate) {
-		s << avgBitRate / 1000.0f << " kb/s (avg)";
+		s << avgBitRate / 1000.0f << sCatalog.GetString(B_TRANSLATE_MARK(" kb/s (avg)"));
 	}
 	if (maxBitRate != media_multistream_format::wildcard.max_bit_rate) {
 		if (s != "") {
 			s << ", ";
 		}
-		s << maxBitRate / 1000.0f << " kb/s (max)";
+		s << maxBitRate / 1000.0f << sCatalog.GetString(B_TRANSLATE_MARK(" kb/s (max)"));
 	}
 	if (s == "") {
 		s = "*";
@@ -1199,13 +1291,13 @@ BString MediaString::forMultistreamChunkSize(
 
 	BString s = "";
 	if (avgChunkSize != media_multistream_format::wildcard.avg_chunk_size) {
-		s << avgChunkSize << " bytes (avg)";
+		s << avgChunkSize << sCatalog.GetString(B_TRANSLATE_MARK(" bytes (avg)"));
 	}
 	if (maxChunkSize != media_multistream_format::wildcard.max_chunk_size) {
 		if (s != "") {
 			s << ", ";
 		}
-		s << maxChunkSize << " bytes (max)";
+		s << maxChunkSize << sCatalog.GetString(B_TRANSLATE_MARK(" bytes (max)"));
 	}
 	if (s == "") {
 		s = "*";
@@ -1223,30 +1315,30 @@ BString MediaString::forMultistreamFlags(
 
 	if (flags & media_multistream_format::B_HEADER_HAS_FLAGS) {
 		if (first) {
-			list = "Header has flags";
+			list = sCatalog.GetString(B_TRANSLATE_MARK("Header has flags"));
 			first = false;
 		}
 	}
 	if (flags & media_multistream_format::B_CLEAN_BUFFERS) {
 		if (first) {
-			list = "Clean buffers";
+			list = sCatalog.GetString(B_TRANSLATE_MARK("Clean buffers"));
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "Clean buffers";
+			last = sCatalog.GetString(B_TRANSLATE_MARK("Clean buffers"));
 		}
 	}
 	if (flags & media_multistream_format::B_HOMOGENOUS_BUFFERS) {
 		if (first) {
-			list = "Homogenous buffers";
+			list = sCatalog.GetString(B_TRANSLATE_MARK("Homogenous buffers"));
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "Homogenous buffers";
+			last = sCatalog.GetString(B_TRANSLATE_MARK("Homogenous buffers"));
 		}
 	}
 
@@ -1254,7 +1346,7 @@ BString MediaString::forMultistreamFlags(
 		list << " & " << last;
 
 	if (list == "")
-		list = "(none)";
+		list = sCatalog.GetString(B_TRANSLATE_MARK("(none)"));
 
 	return list;
 }

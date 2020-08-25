@@ -65,8 +65,8 @@ const uint8 DefaultCatalog::kDefaultCatalogAddOnPriority = 1;
 	InitCheck() will be B_OK if catalog could be loaded successfully, it will
 	give an appropriate error-code otherwise.
 */
-DefaultCatalog::DefaultCatalog(const entry_ref &catalogOwner, const char *language,
-	uint32 fingerprint)
+DefaultCatalog::DefaultCatalog(const entry_ref &catalogOwner,
+	const char *language, uint32 fingerprint)
 	:
 	HashMapCatalog("", language, fingerprint)
 {
@@ -87,30 +87,10 @@ DefaultCatalog::DefaultCatalog(const entry_ref &catalogOwner, const char *langua
 	BPath catalogPath(&appDir, catalogName.String());
 	status = ReadFromFile(catalogPath.Path());
 
-	if (status != B_OK) {
-		// search in data folders
-
-		directory_which which[] = {
-			B_USER_NONPACKAGED_DATA_DIRECTORY,
-			B_USER_DATA_DIRECTORY,
-			B_SYSTEM_NONPACKAGED_DATA_DIRECTORY,
-			B_SYSTEM_DATA_DIRECTORY
-		};
-
-		for (size_t i = 0; i < sizeof(which) / sizeof(which[0]); i++) {
-			BPath path;
-			if (find_directory(which[i], &path) == B_OK) {
-				BString catalogName(path.Path());
-				catalogName << "/locale/" << kCatFolder
-					<< "/" << fSignature
-					<< "/" << fLanguageName
-					<< kCatExtension;
-				status = ReadFromFile(catalogName.String());
-				if (status == B_OK)
-					break;
-			}
-		}
-	}
+	// search for catalogs in the standard ../data/locale/ directories
+	// (packaged/non-packaged and system/home)
+	if (status != B_OK)
+		status = ReadFromStandardLocations();
 
 	if (status != B_OK) {
 		// give lowest priority to catalog embedded as resource in application
@@ -188,6 +168,38 @@ DefaultCatalog::SetRawString(const CatKey& key, const char *translated)
 
 
 status_t
+DefaultCatalog::ReadFromStandardLocations()
+{
+	// search in data folders
+
+	directory_which which[] = {
+		B_USER_NONPACKAGED_DATA_DIRECTORY,
+		B_USER_DATA_DIRECTORY,
+		B_SYSTEM_NONPACKAGED_DATA_DIRECTORY,
+		B_SYSTEM_DATA_DIRECTORY
+	};
+
+	status_t status = B_ENTRY_NOT_FOUND;
+
+	for (size_t i = 0; i < sizeof(which) / sizeof(which[0]); i++) {
+		BPath path;
+		if (find_directory(which[i], &path) == B_OK) {
+			BString catalogName(path.Path());
+			catalogName << "/locale/" << kCatFolder
+				<< "/" << fSignature
+				<< "/" << fLanguageName
+				<< kCatExtension;
+			status = ReadFromFile(catalogName.String());
+			if (status == B_OK)
+				break;
+		}
+	}
+
+	return status;
+}
+
+
+status_t
 DefaultCatalog::ReadFromFile(const char *path)
 {
 	if (!path)
@@ -223,40 +235,6 @@ DefaultCatalog::ReadFromFile(const char *path)
 		// when creating the catalog, we make sure that they exist there:
 		UpdateAttributes(catalogFile);
 	}
-
-	return res;
-}
-
-
-/*
- * this method is not currently being used, but it may be useful in the future...
- */
-status_t
-DefaultCatalog::ReadFromAttribute(const entry_ref &appOrAddOnRef)
-{
-	BNode node;
-	status_t res = node.SetTo(&appOrAddOnRef);
-	if (res != B_OK)
-		return B_ENTRY_NOT_FOUND;
-
-	attr_info attrInfo;
-	res = node.GetAttrInfo(BLocaleRoster::kEmbeddedCatAttr, &attrInfo);
-	if (res != B_OK)
-		return B_NAME_NOT_FOUND;
-	if (attrInfo.type != B_MESSAGE_TYPE)
-		return B_BAD_TYPE;
-
-	size_t size = attrInfo.size;
-	BStackOrHeapArray<char, 0> buf(size);
-	if (!buf.IsValid())
-		return B_NO_MEMORY;
-	res = node.ReadAttr(BLocaleRoster::kEmbeddedCatAttr, B_MESSAGE_TYPE, 0,
-		buf, size);
-	if (res < (ssize_t)size)
-		return res < B_OK ? res : B_BAD_DATA;
-
-	BMemoryIO memIO(buf, size);
-	res = Unflatten(&memIO);
 
 	return res;
 }
@@ -313,36 +291,6 @@ DefaultCatalog::WriteToFile(const char *path)
 	}
 	if (res == B_OK)
 		UpdateAttributes(catalogFile);
-	return res;
-}
-
-
-/*
- * this method is not currently being used, but it may be useful in the
- * future...
- */
-status_t
-DefaultCatalog::WriteToAttribute(const entry_ref &appOrAddOnRef)
-{
-	BNode node;
-	status_t res = node.SetTo(&appOrAddOnRef);
-	if (res != B_OK)
-		return res;
-
-	BMallocIO mallocIO;
-	mallocIO.SetBlockSize(max(fCatMap.Size() * 20, (int32)256));
-		// set a largish block-size in order to avoid reallocs
-	res = Flatten(&mallocIO);
-
-	if (res == B_OK) {
-		ssize_t wsz;
-		wsz = node.WriteAttr(BLocaleRoster::kEmbeddedCatAttr, B_MESSAGE_TYPE, 0,
-			mallocIO.Buffer(), mallocIO.BufferLength());
-		if (wsz < B_OK)
-			res = wsz;
-		else if (wsz != (ssize_t)mallocIO.BufferLength())
-			res = B_ERROR;
-	}
 	return res;
 }
 

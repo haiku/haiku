@@ -37,11 +37,11 @@ class DefaultCatalog : public HashMapCatalog {
 
 		// implementation for editor-interface:
 		status_t ReadFromFile(const char *path = NULL);
-		status_t ReadFromAttribute(const entry_ref &appOrAddOnRef);
 		status_t ReadFromResource(const entry_ref &appOrAddOnRef);
 		status_t WriteToFile(const char *path = NULL);
-		status_t WriteToAttribute(const entry_ref &appOrAddOnRef);
 		status_t WriteToResource(const entry_ref &appOrAddOnRef);
+
+		status_t ReadFromStandardLocations();
 
 		status_t SetRawString(const CatKey& key, const char *translated);
 		void SetSignature(const entry_ref &catalogOwner);
