@@ -154,35 +154,3 @@ DeviceListItemView::SetRenderParameters(Renderer& renderer)
 	else if (fInputType == KEYBOARD_TYPE)
 		renderer.AddIcon(&Icons()->keyboardIcon);
 }
-
-
-DeviceListView::DeviceListView(const char* name)
-	:
-	BView(name, B_WILL_DRAW)
-{
-	fDeviceList = new BListView("Device Names");
-
-	fScrollView = new BScrollView("ScrollView",fDeviceList,
-					0 , false, B_FANCY_BORDER);
-
-	SetExplicitMinSize(BSize(StringWidth("M") * 10, B_SIZE_UNSET));
-	SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
-
-	BLayoutBuilder::Group<>(this, B_VERTICAL)
-		.Add(fScrollView)
-		.End();
-	fDeviceList->SetSelectionMessage(new BMessage(ITEM_SELECTED));
-}
-
-DeviceListView::~DeviceListView()
-{
-}
-
-void
-DeviceListView::AttachedToWindow()
-{
-	fDeviceList->SetTarget(this);
-
-	fDeviceList->Select(0);
-	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
-}

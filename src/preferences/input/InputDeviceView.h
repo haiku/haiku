@@ -44,7 +44,7 @@ enum input_type {
 
 class DeviceListItemView : public BListItem {
 public:
-					DeviceListItemView(BString title, input_type type);
+						DeviceListItemView(BString title, input_type type);
 
 	void				Update(BView* owner, const BFont* font);
 	void				DrawItem(BView* owner, BRect frame,
@@ -53,8 +53,8 @@ public:
 	const char*			Label() { return fTitle.String();}
 
 
-	static	InputIcons*		Icons() {return sIcons;}
-	static	void			SetIcons(InputIcons* icons) {sIcons = icons;}
+	static	InputIcons*	Icons() {return sIcons;}
+	static	void		SetIcons(InputIcons* icons) {sIcons = icons;}
 
 protected:
 	struct Renderer;
@@ -63,21 +63,10 @@ protected:
 
 private:
 
-	static InputIcons*		sIcons;
+	static InputIcons*	sIcons;
 	BString				fTitle;
 	input_type			fInputType;
 };
 
-
-class DeviceListView: public BView {
-public:
-					DeviceListView(const char *name);
-	virtual				~DeviceListView();
-	virtual	void			AttachedToWindow();
-	BListView*			fDeviceList;
-
-private:
-	BScrollView*			fScrollView;
-};
 
 #endif	// _INPUT_DEVICE_VIEW_H */

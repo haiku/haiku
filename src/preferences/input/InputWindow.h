@@ -48,17 +48,18 @@ class TouchpadView;
 class InputWindow : public BWindow
 {
 public:
-						InputWindow(BRect rect);
+							InputWindow(BRect rect);
 		void				MessageReceived(BMessage* message);
 		void				Show();
 		void				Hide();
 
+private:
 		status_t			FindDevice();
 		void				AddDevice(BInputDevice* device);
 private:
 
-	DeviceListView*				fDeviceListView;
-	BCardView*				fCardView;
+		BListView*			fDeviceListView;
+		BCardView*			fCardView;
 };
 
 #endif /* INPUT_WINDOW_H */

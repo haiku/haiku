@@ -41,14 +41,22 @@ InputWindow::InputWindow(BRect rect)
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS
 		| B_AUTO_UPDATE_SIZE_LIMITS | B_QUIT_ON_WINDOW_CLOSE)
 {
-	FindDevice();
+	fDeviceListView = new BListView(B_TRANSLATE("Device List"));
+	fDeviceListView->SetSelectionMessage(new BMessage(ITEM_SELECTED));
+	fDeviceListView->SetExplicitMinSize(
+		BSize(32 + fDeviceListView->StringWidth("Extended PS/2 Mouse 1"),
+			B_SIZE_UNSET));
+
+	BScrollView* scrollView = new BScrollView("scrollView", fDeviceListView,
+		0, false, B_FANCY_BORDER);
+	fCardView = new BCardView();
 
 	BLayoutBuilder::Group<>(this, B_HORIZONTAL, 10)
 		.SetInsets(B_USE_WINDOW_SPACING)
-		.Add(fDeviceListView)
-		.AddGroup(B_VERTICAL, 0)
-			.Add(fCardView)
-		.End();
+		.Add(scrollView, 1)
+		.Add(fCardView, 3);
+
+	FindDevice();
 }
 
 void
@@ -105,12 +113,12 @@ InputWindow::MessageReceived(BMessage* message)
 				if (device)
 					AddDevice(device);
 			} else {
-				for (int i = 0; i < fDeviceListView->fDeviceList->CountItems();
+				for (int i = 0; i < fDeviceListView->CountItems();
 					i++) {
 					BStringItem* item = dynamic_cast<BStringItem*>(
-						fDeviceListView->fDeviceList->ItemAt(i));
+						fDeviceListView->ItemAt(i));
 					if (item->Text() == name) {
-						fDeviceListView->fDeviceList->RemoveItem(i);
+						fDeviceListView->RemoveItem(i);
 						BView* settings = fCardView->ChildAt(i);
 						fCardView->RemoveChild(settings);
 						delete settings;
@@ -156,9 +164,6 @@ InputWindow::FindDevice()
 
 	int32 i = 0;
 
-	fDeviceListView = new DeviceListView(B_TRANSLATE("Device List"));
-	fCardView = new BCardView();
-
 	while (true) {
 		BInputDevice* dev = (BInputDevice*)devList.ItemAt(i);
 		if (dev == NULL) {
@@ -185,19 +190,19 @@ InputWindow::AddDevice(BInputDevice* dev)
 		fCardView->AddChild(view);
 		DeviceListItemView* touchpad = new DeviceListItemView(
 			name, TOUCHPAD_TYPE);
-		fDeviceListView->fDeviceList->AddItem(touchpad);
+		fDeviceListView->AddItem(touchpad);
 	} else if (dev->Type() == B_POINTING_DEVICE) {
 		InputMouse* view = new InputMouse(dev);
 		fCardView->AddChild(view);
 		DeviceListItemView* mouse = new DeviceListItemView(
 			name, MOUSE_TYPE);
-		fDeviceListView->fDeviceList->AddItem(mouse);
+		fDeviceListView->AddItem(mouse);
 	} else if (dev->Type() == B_KEYBOARD_DEVICE) {
 		InputKeyboard* view = new InputKeyboard(dev);
 		fCardView->AddChild(view);
 		DeviceListItemView* keyboard = new DeviceListItemView(
 			name, KEYBOARD_TYPE);
-		fDeviceListView->fDeviceList->AddItem(keyboard);
+		fDeviceListView->AddItem(keyboard);
 	} else {
 		delete dev;
 	}
