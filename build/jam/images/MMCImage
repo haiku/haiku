@@ -132,7 +132,7 @@ for platform in [ MultiBootSubDirSetup ] {
 	on $(platform) {
 		# SD/mmc image targets
 		if $(TARGET_BOOT_PLATFORM) = efi {
-			if $(TARGET_ARCH) = arm || $(TARGET_ARCH) = arm64 {
+			if $(TARGET_ARCH) = arm || $(TARGET_ARCH) = arm64 || $(TARGET_ARCH) = riscv64 {
 				# These EFI platforms need u-boot to get them going
 				BuildSDImage $(HAIKU_MMC_NAME) : $(HAIKU_IMAGE)
 					haiku_loader.$(TARGET_BOOT_PLATFORM)

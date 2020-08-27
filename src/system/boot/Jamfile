@@ -167,13 +167,19 @@ rule BuildUImageScript script : source
 	LocalClean clean : $(script) ;
 	SCRIPTNAME on $(script) = $(script) ;
 	FAKEOS on $(script) = "linux" ;
+	ARCH on $(script) = $(TARGET_ARCH) ;
+
+	if $(TARGET_ARCH) = "riscv64" || $(TARGET_ARCH) = "riscv32" {
+		ARCH on $(script) = "riscv" ;
+	}
+
 	BuildUImageScript1 $(script) : $(source) ;
 }
 
 actions BuildUImageScript1
 {
 	rm -f $(1)
-	mkimage -A $(TARGET_ARCH) -O $(FAKEOS) -T script -C none -n $(SCRIPTNAME) \
+	mkimage -A $(ARCH) -O $(FAKEOS) -T script -C none -n $(SCRIPTNAME) \
 		-d $(2) $(1)
 }
 
@@ -336,7 +342,7 @@ for platform in [ MultiBootSubDirSetup ] {
 		switch $(TARGET_BOOT_PLATFORM) {
 			case efi :
 				BuildEFILoader haiku_loader.$(TARGET_BOOT_PLATFORM) : boot_loader_$(TARGET_BOOT_PLATFORM) ;
-				if $(TARGET_ARCH) = arm || $(TARGET_ARCH) = arm64 {
+				if $(TARGET_ARCH) = arm || $(TARGET_ARCH) = arm64 || $(TARGET_ARCH) = riscv64 {
 					# These EFI platforms need u-boot to get them going
 					BuildUImageScript boot.scr
 						: [ FDirName $(HAIKU_TOP) data boot u-boot boot-$(TARGET_ARCH).scr.txt ] ;

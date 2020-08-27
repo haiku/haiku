@@ -45,7 +45,7 @@ coff_header:
 	.short	2				// nr_sections
 	.long	0 				// TimeDateStamp
 	.long	0				// PointerToSymbolTable
-	.long	1				// NumberOfSymbols
+	.long	0				// NumberOfSymbols
 	.short	section_table - optional_header	// SizeOfOptionalHeader
 	.short	0x206			// Characteristics.
 							// IMAGE_FILE_DEBUG_STRIPPED |
@@ -135,22 +135,23 @@ section_table:
 	.globl _start
 _start:
 	/* Save boot parameters to the stack */
-	addi		sp, sp, -16
+	addi		sp, sp, -24
 	sd			a0, 0(sp)
 	sd			a1, 8(sp)
+	sd			ra, 16(sp)
 
 	/* Run relocation */
 	lla			a0, ImageBase
-	lla			a1, .L_DYNAMIC
+	lla			a1, _DYNAMIC
 	call		_relocate
+	bne			a0, zero, 0f
 
 	/* Call EFI code */
 	ld			a1, 8(sp)
 	ld			a0, 0(sp)
-	tail		efi_main
+	call		efi_main
 
-2:	wfi
-	j			2b
+	ld			ra, 16(sp)
 
-.L_DYNAMIC:
-	.word		_DYNAMIC - .
+0:	addi		sp, sp, 24
+	ret
