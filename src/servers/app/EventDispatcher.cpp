@@ -247,7 +247,6 @@ EventDispatcher::EventDispatcher()
 	fLastButtons(0),
 	fLastUpdate(system_time()),
 	fDraggingMessage(false),
-	fDragBitmap(NULL),
 	fCursorLock("cursor loop lock"),
 	fHWInterface(NULL),
 	fDesktop(NULL)
@@ -612,19 +611,7 @@ EventDispatcher::SetDragMessage(BMessage& message,
 
 	if (fLastButtons == 0) {
 		// mouse buttons has already been released or was never pressed
-		if (bitmap != NULL)
-			bitmap->ReleaseReference();
 		return;
-	}
-
-	if (fDragBitmap != bitmap) {
-		if (fDragBitmap)
-			fDragBitmap->ReleaseReference();
-
-		fDragBitmap = bitmap;
-
-		if (fDragBitmap != NULL)
-			fDragBitmap->AcquireReference();
 	}
 
 	fHWInterface->SetDragBitmap(bitmap, offsetFromCursor);
@@ -757,10 +744,6 @@ EventDispatcher::_DeliverDragMessage()
 	fDraggingMessage = false;
 
 	fHWInterface->SetDragBitmap(NULL, B_ORIGIN);
-	if (fDragBitmap != NULL) {
-		fDragBitmap->ReleaseReference();
-		fDragBitmap = NULL;
-	}
 }
 
 

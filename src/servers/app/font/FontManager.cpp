@@ -408,7 +408,7 @@ FontManager::_RemoveStyle(font_directory& directory, FontStyle* style)
 
 	fStyleHashTable.Remove(FontKey(style->Family()->ID(), style->ID()));
 
-	style->Release();
+	style->ReleaseReference();
 }
 
 

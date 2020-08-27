@@ -97,8 +97,11 @@ CursorManager::CursorManager()
 //! Does all the teardown
 CursorManager::~CursorManager()
 {
-	for (int32 i = 0; i < fCursorList.CountItems(); i++)
-		delete (ServerCursor*)fCursorList.ItemAtFast(i);
+	for (int32 i = 0; i < fCursorList.CountItems(); i++) {
+		ServerCursor* cursor = ((ServerCursor*)fCursorList.ItemAtFast(i));
+		cursor->fManager = NULL;
+		cursor->ReleaseReference();
+	}
 }
 
 
@@ -108,23 +111,20 @@ CursorManager::CreateCursor(team_id clientTeam, const uint8* cursorData)
 	if (!Lock())
 		return NULL;
 
-	ServerCursor* cursor = _FindCursor(clientTeam, cursorData);
+	ServerCursorReference cursor(_FindCursor(clientTeam, cursorData), false);
 
 	if (!cursor) {
-		cursor = new (std::nothrow) ServerCursor(cursorData);
+		cursor.SetTo(new (std::nothrow) ServerCursor(cursorData), true);
 		if (cursor) {
 			cursor->SetOwningTeam(clientTeam);
-			if (AddCursor(cursor) < B_OK) {
-				delete cursor;
+			if (AddCursor(cursor) < B_OK)
 				cursor = NULL;
-			}
 		}
-	} else
-		cursor->AcquireReference();
+	}
 
 	Unlock();
 
-	return cursor;
+	return cursor.Detach();
 }
 
 
@@ -408,7 +408,7 @@ CursorManager::_LoadCursor(ServerCursor*& cursorMember, const CursorSet& set,
 	if (set.FindCursor(id, &cursor) == B_OK) {
 		int32 index = fCursorList.IndexOf(cursorMember);
 		if (index >= 0) {
-			ServerCursor* items = reinterpret_cast<ServerCursor*>(
+			ServerCursor** items = reinterpret_cast<ServerCursor**>(
 				fCursorList.Items());
 			items[index] = cursor;
 		}

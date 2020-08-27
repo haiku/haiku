@@ -195,7 +195,7 @@ ServerCursor::AttachedToManager(CursorManager* manager)
 void
 ServerCursor::LastReferenceReleased()
 {
-	if (fManager != NULL && fManager->RemoveCursor(this))
+	if (fManager == NULL || fManager->RemoveCursor(this))
 		delete this;
 }
 

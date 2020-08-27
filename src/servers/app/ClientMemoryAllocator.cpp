@@ -327,7 +327,7 @@ ClientMemory::~ClientMemory()
 	if (fAllocator != NULL) {
 		if (fBlock != NULL)
 			fAllocator->Free(fBlock);
-		fAllocator->ReleaseReference();
+		fAllocator.Unset();
 	}
 }
 
@@ -336,8 +336,7 @@ void*
 ClientMemory::Allocate(ClientMemoryAllocator* allocator, size_t size,
 	bool& newArea)
 {
-	fAllocator = allocator;
-	fAllocator->AcquireReference();
+	fAllocator.SetTo(allocator, false);
 
 	return fAllocator->Allocate(size, &fBlock, newArea);
 }

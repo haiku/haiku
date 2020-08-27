@@ -19,10 +19,12 @@
 #include "Canvas.h"
 #include "IntRect.h"
 
+#include <AutoDeleter.h>
 #include <GraphicsDefs.h>
 #include <InterfaceDefs.h>
 #include <ObjectList.h>
 #include <Region.h>
+#include <Referenceable.h>
 #include <String.h>
 
 class BList;
@@ -208,9 +210,9 @@ public:
 	inline	bool			IsScreenClippingValid() const
 								{
 									return fScreenClippingValid
-										&& (fUserClipping == NULL
-										|| (fUserClipping != NULL
-										&& fScreenAndUserClipping != NULL));
+										&& (fUserClipping.Get() == NULL
+										|| (fUserClipping.Get() != NULL
+										&& fScreenAndUserClipping.Get() != NULL));
 								}
 
 			// debugging
@@ -243,7 +245,8 @@ protected:
 			rgb_color		fViewColor;
 			color_which		fWhichViewColor;
 			float			fWhichViewColorTint;
-			ServerBitmap*	fViewBitmap;
+			BReference<ServerBitmap>
+							fViewBitmap;
 			IntRect			fBitmapSource;
 			IntRect			fBitmapDestination;
 			int32			fBitmapResizingMode;
@@ -267,8 +270,10 @@ protected:
 			View*			fNextSibling;
 			View*			fLastChild;
 
-			ServerCursor*	fCursor;
-			ServerPicture*	fPicture;
+			BReference<ServerCursor>
+							fCursor;
+			BReference<ServerPicture>
+							fPicture;
 
 			// clipping
 			BRegion			fLocalClipping;
@@ -276,8 +281,10 @@ protected:
 	mutable	BRegion			fScreenClipping;
 	mutable	bool			fScreenClippingValid;
 
-			BRegion*		fUserClipping;
-	mutable	BRegion*		fScreenAndUserClipping;
+			ObjectDeleter<BRegion>
+							fUserClipping;
+	mutable	ObjectDeleter<BRegion>
+							fScreenAndUserClipping;
 };
 
 #endif	// VIEW_H

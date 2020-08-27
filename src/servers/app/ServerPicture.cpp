@@ -590,7 +590,7 @@ draw_picture(void* _canvas, const BPoint& where, int32 token)
 {
 	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
 
-	ServerPicture* picture = canvas->GetPicture(token);
+	BReference<ServerPicture> picture(canvas->GetPicture(token), true);
 	if (picture != NULL) {
 		canvas->PushState();
 		canvas->SetDrawingOrigin(where);
@@ -600,7 +600,6 @@ draw_picture(void* _canvas, const BPoint& where, int32 token)
 		canvas->PopState();
 
 		canvas->PopState();
-		picture->ReleaseReference();
 	}
 }
 
@@ -630,19 +629,15 @@ clip_to_picture(void* _canvas, int32 pictureToken, const BPoint& where,
 {
 	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
 
-	ServerPicture* picture = canvas->GetPicture(pictureToken);
+	BReference<ServerPicture> picture(canvas->GetPicture(pictureToken), true);
 	if (picture == NULL)
 		return;
-	AlphaMask* mask = new(std::nothrow) PictureAlphaMask(canvas->GetAlphaMask(),
-		picture, *canvas->CurrentState(), where, clipToInverse);
+	BReference<AlphaMask> mask(new(std::nothrow) PictureAlphaMask(canvas->GetAlphaMask(),
+		picture, *canvas->CurrentState(), where, clipToInverse), true);
 	canvas->SetAlphaMask(mask);
 	canvas->CurrentState()->GetAlphaMask()->SetCanvasGeometry(BPoint(0, 0),
 		canvas->Bounds());
 	canvas->ResyncDrawState();
-	if (mask != NULL)
-		mask->ReleaseReference();
-
-	picture->ReleaseReference();
 }
 
 
@@ -1082,14 +1077,12 @@ static const BPrivate::picture_player_callbacks kPicturePlayerCallbacks = {
 ServerPicture::ServerPicture()
 	:
 	fFile(NULL),
-	fPictures(NULL),
-	fPushed(NULL),
 	fOwner(NULL)
 {
 	fToken = gTokenSpace.NewToken(kPictureToken, this);
-	fData = new(std::nothrow) BMallocIO();
+	fData.SetTo(new(std::nothrow) BMallocIO());
 
-	PictureDataWriter::SetTo(fData);
+	PictureDataWriter::SetTo(fData.Get());
 }
 
 
@@ -1097,8 +1090,6 @@ ServerPicture::ServerPicture(const ServerPicture& picture)
 	:
 	fFile(NULL),
 	fData(NULL),
-	fPictures(NULL),
-	fPushed(NULL),
 	fOwner(NULL)
 {
 	fToken = gTokenSpace.NewToken(kPictureToken, this);
@@ -1107,7 +1098,7 @@ ServerPicture::ServerPicture(const ServerPicture& picture)
 	if (mallocIO == NULL)
 		return;
 
-	fData = mallocIO;
+	fData.SetTo(mallocIO);
 
 	const off_t size = picture.DataLength();
 	if (mallocIO->SetSize(size) < B_OK)
@@ -1116,7 +1107,7 @@ ServerPicture::ServerPicture(const ServerPicture& picture)
 	picture.fData->ReadAt(0, const_cast<void*>(mallocIO->Buffer()),
 		size);
 
-	PictureDataWriter::SetTo(fData);
+	PictureDataWriter::SetTo(fData.Get());
 }
 
 
@@ -1124,26 +1115,24 @@ ServerPicture::ServerPicture(const char* fileName, int32 offset)
 	:
 	fFile(NULL),
 	fData(NULL),
-	fPictures(NULL),
-	fPushed(NULL),
 	fOwner(NULL)
 {
 	fToken = gTokenSpace.NewToken(kPictureToken, this);
 
-	fFile = new(std::nothrow) BFile(fileName, B_READ_WRITE);
-	if (fFile == NULL)
+	fFile.SetTo(new(std::nothrow) BFile(fileName, B_READ_WRITE));
+	if (fFile.Get() == NULL)
 		return;
 
 	BPrivate::Storage::OffsetFile* offsetFile
-		= new(std::nothrow) BPrivate::Storage::OffsetFile(fFile, offset);
+		= new(std::nothrow) BPrivate::Storage::OffsetFile(fFile.Get(), offset);
 	if (offsetFile == NULL || offsetFile->InitCheck() != B_OK) {
 		delete offsetFile;
 		return;
 	}
 
-	fData = offsetFile;
+	fData.SetTo(offsetFile);
 
-	PictureDataWriter::SetTo(fData);
+	PictureDataWriter::SetTo(fData.Get());
 }
 
 
@@ -1151,24 +1140,18 @@ ServerPicture::~ServerPicture()
 {
 	ASSERT(fOwner == NULL);
 
-	delete fData;
-	delete fFile;
 	gTokenSpace.RemoveToken(fToken);
 
-	if (fPictures != NULL) {
+	if (fPictures.Get() != NULL) {
 		for (int32 i = fPictures->CountItems(); i-- > 0;) {
 			ServerPicture* picture = fPictures->ItemAt(i);
 			picture->SetOwner(NULL);
 			picture->ReleaseReference();
 		}
-
-		delete fPictures;
 	}
 
-	if (fPushed != NULL) {
+	if (fPushed != NULL)
 		fPushed->SetOwner(NULL);
-		fPushed->ReleaseReference();
-	}
 }
 
 
@@ -1288,12 +1271,12 @@ ServerPicture::Play(Canvas* target)
 {
 	// TODO: for now: then change PicturePlayer
 	// to accept a BPositionIO object
-	BMallocIO* mallocIO = dynamic_cast<BMallocIO*>(fData);
+	BMallocIO* mallocIO = dynamic_cast<BMallocIO*>(fData.Get());
 	if (mallocIO == NULL)
 		return;
 
 	BPrivate::PicturePlayer player(mallocIO->Buffer(),
-		mallocIO->BufferLength(), PictureList::Private(fPictures).AsBList());
+		mallocIO->BufferLength(), PictureList::Private(fPictures.Get()).AsBList());
 	player.Play(kPicturePlayerCallbacks, sizeof(kPicturePlayerCallbacks),
 		target);
 }
@@ -1307,8 +1290,7 @@ ServerPicture::PushPicture(ServerPicture* picture)
 	if (fPushed != NULL)
 		debugger("already pushed a picture");
 
-	fPushed = picture;
-	fPushed->AcquireReference();
+	fPushed.SetTo(picture, false);
 }
 
 
@@ -1317,9 +1299,7 @@ ServerPicture::PushPicture(ServerPicture* picture)
 ServerPicture*
 ServerPicture::PopPicture()
 {
-	ServerPicture* old = fPushed;
-	fPushed = NULL;
-	return old;
+	return fPushed.Detach();
 }
 
 
@@ -1334,10 +1314,10 @@ ServerPicture::AppendPicture(ServerPicture* picture)
 bool
 ServerPicture::NestPicture(ServerPicture* picture)
 {
-	if (fPictures == NULL)
-		fPictures = new(std::nothrow) PictureList;
+	if (fPictures.Get() == NULL)
+		fPictures.SetTo(new(std::nothrow) PictureList);
 
-	if (fPictures == NULL || !fPictures->AddItem(picture))
+	if (fPictures.Get() == NULL || !fPictures->AddItem(picture))
 		return false;
 
 	picture->AcquireReference();
@@ -1348,7 +1328,7 @@ ServerPicture::NestPicture(ServerPicture* picture)
 off_t
 ServerPicture::DataLength() const
 {
-	if (fData == NULL)
+	if (fData.Get() == NULL)
 		return 0;
 	off_t size;
 	fData->GetSize(&size);
@@ -1389,7 +1369,7 @@ ServerPicture::ExportData(BPrivate::PortLink& link)
 	fData->Seek(0, SEEK_SET);
 
 	int32 subPicturesCount = 0;
-	if (fPictures != NULL)
+	if (fPictures.Get() != NULL)
 		subPicturesCount = fPictures->CountItems();
 	link.Attach<int32>(subPicturesCount);
 	if (subPicturesCount > 0) {

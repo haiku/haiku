@@ -237,15 +237,16 @@ Canvas::ScreenToPenTransform() const GCC_2_NRV(transform)
 
 
 void
-Canvas::BlendLayer(Layer* layer)
+Canvas::BlendLayer(Layer* layerPtr)
 {
+	BReference<Layer> layer(layerPtr, true);
+
 	if (layer->Opacity() == 255) {
 		layer->Play(this);
-		layer->ReleaseReference();
 		return;
 	}
 
-	UtilityBitmap* layerBitmap = layer->RenderToBitmap(this);
+	BReference <UtilityBitmap> layerBitmap(layer->RenderToBitmap(this), true);
 	if (layerBitmap == NULL)
 		return;
 
@@ -259,15 +260,11 @@ Canvas::BlendLayer(Layer* layer)
 	fDrawState->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_COMPOSITE);
 	fDrawState->SetTransformEnabled(false);
 
-	AlphaMask* mask = new(std::nothrow) UniformAlphaMask(layer->Opacity());
-	if (mask == NULL) {
-		layerBitmap->ReleaseReference();
-		layer->ReleaseReference();
+	BReference<AlphaMask> mask(new(std::nothrow) UniformAlphaMask(layer->Opacity()), true);
+	if (mask == NULL)
 		return;
-	}
 
 	SetAlphaMask(mask);
-	mask->ReleaseReference();
 	ResyncDrawState();
 
 	GetDrawingEngine()->DrawBitmap(layerBitmap, layerBitmap->Bounds(),
@@ -277,9 +274,6 @@ Canvas::BlendLayer(Layer* layer)
 
 	PopState();
 	ResyncDrawState();
-
-	layerBitmap->ReleaseReference();
-	layer->ReleaseReference();
 }
 
 

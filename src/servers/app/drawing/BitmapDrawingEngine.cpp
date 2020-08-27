@@ -48,29 +48,23 @@ BitmapDrawingEngine::SetSize(int32 newWidth, int32 newHeight)
 	}
 
 	SetHWInterface(NULL);
-	if (fHWInterface != NULL) {
+	if (fHWInterface.Get() != NULL) {
 		fHWInterface->LockExclusiveAccess();
 		fHWInterface->Shutdown();
 		fHWInterface->UnlockExclusiveAccess();
-		delete fHWInterface;
-		fHWInterface = NULL;
-	}
-
-	if (fBitmap != NULL) {
-		fBitmap->ReleaseReference();
-		fBitmap = NULL;
+		fHWInterface.Unset();
 	}
 
 	if (newWidth <= 0 || newHeight <= 0)
 		return B_OK;
 
-	fBitmap = new(std::nothrow) UtilityBitmap(BRect(0, 0, newWidth - 1,
-		newHeight - 1), fColorSpace, 0);
-	if (fBitmap == NULL)
+	fBitmap.SetTo(new(std::nothrow) UtilityBitmap(BRect(0, 0, newWidth - 1,
+		newHeight - 1), fColorSpace, 0));
+	if (fBitmap.Get() == NULL)
 		return B_NO_MEMORY;
 
-	fHWInterface = new(std::nothrow) BitmapHWInterface(fBitmap);
-	if (fHWInterface == NULL)
+	fHWInterface.SetTo(new(std::nothrow) BitmapHWInterface(fBitmap));
+	if (fHWInterface.Get() == NULL)
 		return B_NO_MEMORY;
 
 	status_t result = fHWInterface->Initialize();
@@ -80,7 +74,7 @@ BitmapDrawingEngine::SetSize(int32 newWidth, int32 newHeight)
 	// we have to set a valid clipping first
 	fClipping.Set(fBitmap->Bounds());
 	ConstrainClippingRegion(&fClipping);
-	SetHWInterface(fHWInterface);
+	SetHWInterface(fHWInterface.Get());
 	return B_OK;
 }
 

@@ -2021,7 +2021,7 @@ fDesktop->LockSingleWindow();
 			rgb_color colorKey = {0};
 
 			if (status == B_OK) {
-				ServerBitmap* bitmap = fServerApp->GetBitmap(bitmapToken);
+				BReference<ServerBitmap> bitmap(fServerApp->GetBitmap(bitmapToken), true);
 				if (bitmapToken == -1 || bitmap != NULL) {
 					bool wasOverlay = fCurrentView->ViewBitmap() != NULL
 						&& fCurrentView->ViewBitmap()->Overlay() != NULL;
@@ -2045,9 +2045,6 @@ fDesktop->LockSingleWindow();
 						bitmap->Overlay()->SetFlags(options);
 						colorKey = bitmap->Overlay()->Color();
 					}
-
-					if (bitmap != NULL)
-						bitmap->ReleaseReference();
 				} else
 					status = B_BAD_VALUE;
 			}
@@ -2093,20 +2090,16 @@ fDesktop->LockSingleWindow();
 			if (link.Read<bool>(&inverse) != B_OK)
 				break;
 
-			ServerPicture* picture = fServerApp->GetPicture(pictureToken);
+			BReference<ServerPicture> picture(fServerApp->GetPicture(pictureToken), true);
 			if (picture == NULL)
 				break;
 
-			AlphaMask* const mask = new(std::nothrow) PictureAlphaMask(
+			BReference<AlphaMask> const mask(new(std::nothrow) PictureAlphaMask(
 				fCurrentView->GetAlphaMask(), picture,
-				*fCurrentView->CurrentState(), where, inverse);
+				*fCurrentView->CurrentState(), where, inverse), true);
 			fCurrentView->SetAlphaMask(mask);
-			if (mask != NULL)
-				mask->ReleaseReference();
 
 			_UpdateDrawState(fCurrentView);
-
-			picture->ReleaseReference();
 			break;
 		}
 
@@ -2306,15 +2299,13 @@ fDesktop->LockSingleWindow();
 				BMessage dragMessage;
 				if (link.Read(buffer, bufferSize) == B_OK
 					&& dragMessage.Unflatten(buffer) == B_OK) {
-						ServerBitmap* bitmap
-							= fServerApp->GetBitmap(bitmapToken);
+						BReference<ServerBitmap> bitmap(
+							fServerApp->GetBitmap(bitmapToken), true);
 						// TODO: possible deadlock
 fDesktop->UnlockSingleWindow();
 						fDesktop->EventDispatcher().SetDragMessage(dragMessage,
 							bitmap, offset);
 fDesktop->LockSingleWindow();
-						if (bitmap != NULL)
-							bitmap->ReleaseReference();
 				}
 				delete[] buffer;
 			}
@@ -2380,7 +2371,7 @@ fDesktop->LockSingleWindow();
 		{
 			DTRACE(("ServerWindow %s: Message AS_VIEW_BEGIN_PICTURE\n",
 				Title()));
-			ServerPicture* picture = App()->CreatePicture();
+			BReference<ServerPicture> picture(App()->CreatePicture(), true);
 			if (picture != NULL) {
 				picture->SyncState(fCurrentView);
 				fCurrentView->SetPicture(picture);
@@ -2396,14 +2387,12 @@ fDesktop->LockSingleWindow();
 			int32 token;
 			link.Read<int32>(&token);
 
-			ServerPicture* picture = App()->GetPicture(token);
+			BReference<ServerPicture> picture(App()->GetPicture(token), true);
 			if (picture != NULL)
 				picture->SyncState(fCurrentView);
 
 			fCurrentView->SetPicture(picture);
 
-			if (picture != NULL)
-				picture->ReleaseReference();
 			break;
 		}
 
@@ -2630,7 +2619,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 				info.options |= B_FILTER_BITMAP_BILINEAR;
 #endif
 
-			ServerBitmap* bitmap = fServerApp->GetBitmap(info.bitmapToken);
+			BReference<ServerBitmap> bitmap(fServerApp->GetBitmap(info.bitmapToken), true);
 			if (bitmap != NULL) {
 				DTRACE(("ServerWindow %s: Message AS_VIEW_DRAW_BITMAP: "
 					"View: %s, bitmap: %" B_PRId32 " (size %" B_PRId32 " x "
@@ -2651,8 +2640,6 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 
 				drawingEngine->DrawBitmap(bitmap, info.bitmapRect,
 					info.viewRect, info.options);
-
-				bitmap->ReleaseReference();
 			}
 			break;
 		}
@@ -3162,7 +3149,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 
 			BPoint where;
 			if (link.Read<BPoint>(&where) == B_OK) {
-				ServerPicture* picture = App()->GetPicture(token);
+				BReference<ServerPicture> picture(App()->GetPicture(token), true);
 				if (picture != NULL) {
 					// Setting the drawing origin outside of the
 					// state makes sure that everything the picture
@@ -3175,8 +3162,6 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 					fCurrentView->PopState();
 
 					fCurrentView->PopState();
-
-					picture->ReleaseReference();
 				}
 			}
 			break;
@@ -3902,7 +3887,7 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver& link)
 			ViewDrawBitmapInfo info;
 			link.Read<ViewDrawBitmapInfo>(&info);
 
-			ServerBitmap* bitmap = App()->GetBitmap(info.bitmapToken);
+			BReference<ServerBitmap> bitmap(App()->GetBitmap(info.bitmapToken), true);
 			if (bitmap == NULL)
 				break;
 
@@ -3911,7 +3896,6 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver& link)
 				bitmap->ColorSpace(), info.options, bitmap->Bits(),
 				bitmap->BitsLength());
 
-			bitmap->ReleaseReference();
 			break;
 		}
 
@@ -3922,15 +3906,13 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			BPoint where;
 			if (link.Read<BPoint>(&where) == B_OK) {
-				ServerPicture* pictureToDraw = App()->GetPicture(token);
+				BReference<ServerPicture> pictureToDraw(App()->GetPicture(token), true);
 				if (pictureToDraw != NULL) {
 					// We need to make a copy of the picture, since it can
 					// change after it has been drawn
-					ServerPicture* copy = App()->CreatePicture(pictureToDraw);
+					BReference<ServerPicture> copy(App()->CreatePicture(pictureToDraw), true);
 					picture->NestPicture(copy);
 					picture->WriteDrawPicture(where, copy->Token());
-
-					pictureToDraw->ReleaseReference();
 				}
 			}
 			break;
@@ -3975,15 +3957,13 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver& link)
 			if (link.Read<bool>(&inverse) != B_OK)
 				break;
 
-			ServerPicture* pictureToClip = fServerApp->GetPicture(pictureToken);
+			BReference<ServerPicture> pictureToClip(fServerApp->GetPicture(pictureToken), true);
 			if (pictureToClip != NULL) {
 				// We need to make a copy of the picture, since it can
 				// change after it has been drawn
-				ServerPicture* copy = App()->CreatePicture(pictureToClip);
+				BReference<ServerPicture> copy(App()->CreatePicture(pictureToClip), true);
 				picture->NestPicture(copy);
 				picture->WriteClipToPicture(copy->Token(), where, inverse);
-
-				pictureToClip->ReleaseReference();
 			}
 			break;
 		}
@@ -4024,7 +4004,7 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver& link)
 
 		case AS_VIEW_BEGIN_PICTURE:
 		{
-			ServerPicture* newPicture = App()->CreatePicture();
+			BReference <ServerPicture> newPicture(App()->CreatePicture(), true);
 			if (newPicture != NULL) {
 				newPicture->PushPicture(picture);
 				newPicture->SyncState(fCurrentView);
@@ -4038,7 +4018,7 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver& link)
 			int32 token;
 			link.Read<int32>(&token);
 
-			ServerPicture* appendPicture = App()->GetPicture(token);
+			BReference<ServerPicture> appendPicture(App()->GetPicture(token), true);
 			if (appendPicture != NULL) {
 				//picture->SyncState(fCurrentView);
 				appendPicture->AppendPicture(picture);
@@ -4046,17 +4026,13 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			fCurrentView->SetPicture(appendPicture);
 
-			if (appendPicture != NULL)
-				appendPicture->ReleaseReference();
 			break;
 		}
 
 		case AS_VIEW_END_PICTURE:
 		{
-			ServerPicture* poppedPicture = picture->PopPicture();
+			BReference<ServerPicture> poppedPicture(picture->PopPicture(), true);
 			fCurrentView->SetPicture(poppedPicture);
-			if (poppedPicture != NULL)
-				poppedPicture->ReleaseReference();
 
 			fLink.StartMessage(B_OK);
 			fLink.Attach<int32>(picture->Token());
@@ -4095,7 +4071,7 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver& link)
 			if (layer == NULL)
 				break;
 
-			Layer* previousLayer = layer->PopLayer();
+			BReference<Layer> previousLayer(layer->PopLayer(), true);
 			if (previousLayer == NULL) {
 				// End last layer
 				return false;

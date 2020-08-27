@@ -9,6 +9,7 @@
 #define HW_INTERFACE_H
 
 
+#include <AutoDeleter.h>
 #include <Accelerant.h>
 #include <GraphicsCard.h>
 #include <List.h>
@@ -209,8 +210,7 @@ protected:
 
 			IntRect				_CursorFrame() const;
 			void				_RestoreCursorArea() const;
-			void				_AdoptDragBitmap(const ServerBitmap* bitmap,
-									const BPoint& offset);
+			void				_AdoptDragBitmap();
 
 			void				_NotifyFrameBufferChanged();
 			void				_NotifyScreenChanged();
@@ -250,13 +250,17 @@ protected:
 				bool			cursor_hidden;
 			};
 
-			buffer_clip*		fCursorAreaBackup;
+			ObjectDeleter<buffer_clip>
+								fCursorAreaBackup;
 	mutable	BLocker				fFloatingOverlaysLock;
 
-			ServerCursor*		fCursor;
-			const ServerBitmap*	fDragBitmap;
+			ServerCursorReference
+								fCursor;
+			BReference<ServerBitmap>
+								fDragBitmap;
 			BPoint				fDragBitmapOffset;
-			ServerCursor*		fCursorAndDragBitmap;
+			ServerCursorReference
+								fCursorAndDragBitmap;
 			bool				fCursorVisible;
 			bool				fCursorObscured;
 			bool				fHardwareCursorEnabled;
@@ -268,7 +272,8 @@ protected:
 			int					fVGADevice;
 
 private:
-			UpdateQueue*		fUpdateExecutor;
+			ObjectDeleter<UpdateQueue>
+								fUpdateExecutor;
 
 			BList				fListeners;
 };

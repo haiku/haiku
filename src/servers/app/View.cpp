@@ -126,26 +126,13 @@ View::View(IntRect frame, IntPoint scrollingOffset, const char* name,
 	fUserClipping(NULL),
 	fScreenAndUserClipping(NULL)
 {
-	if (fDrawState)
+	if (fDrawState.Get() != NULL)
 		fDrawState->SetSubPixelPrecise(fFlags & B_SUBPIXEL_PRECISE);
 }
 
 
 View::~View()
 {
-	if (fViewBitmap != NULL)
-		fViewBitmap->ReleaseReference();
-
-	delete fScreenAndUserClipping;
-	delete fUserClipping;
-	delete fDrawState;
-
-//	if (fWindow && this == fWindow->TopView())
-//		fWindow->SetTopView(NULL);
-
-	if (fCursor)
-		fCursor->ReleaseReference();
-
 	// iterate over children and delete each one
 	View* view = fFirstChild;
 	while (view) {
@@ -517,15 +504,9 @@ View::SetViewBitmap(ServerBitmap* bitmap, IntRect sourceRect,
 				newOverlay->TakeOverToken(overlay);
 		} else if (overlay != NULL)
 			overlay->Hide();
-
-		fViewBitmap->ReleaseReference();
 	}
 
-	// the caller is allowed to delete the bitmap after setting the background
-	if (bitmap != NULL)
-		bitmap->AcquireReference();
-
-	fViewBitmap = bitmap;
+	fViewBitmap.SetTo(bitmap, false);
 	fBitmapSource = sourceRect;
 	fBitmapDestination = destRect;
 	fBitmapResizingMode = resizingMode;
@@ -985,15 +966,17 @@ View::ViewUIColor(float* tint)
 void
 View::PushState()
 {
-	DrawState* newState = fDrawState->PushState();
-	if (newState) {
-		fDrawState = newState;
-		// In BeAPI, B_SUBPIXEL_PRECISE is a view flag, and not affected by the
-		// view state. Our implementation moves it to the draw state, but let's
-		// be compatible with the API here and make it survive accross state
-		// changes.
-		fDrawState->SetSubPixelPrecise(fFlags & B_SUBPIXEL_PRECISE);
-	}
+	DrawState* previousState = fDrawState.Detach();
+	DrawState* newState = previousState->PushState();
+	if (newState == NULL)
+		newState = previousState;
+
+	fDrawState.SetTo(newState);
+	// In BeAPI, B_SUBPIXEL_PRECISE is a view flag, and not affected by the
+	// view state. Our implementation moves it to the draw state, but let's
+	// be compatible with the API here and make it survive accross state
+	// changes.
+	fDrawState->SetSubPixelPrecise(fFlags & B_SUBPIXEL_PRECISE);
 }
 
 
@@ -1008,7 +991,7 @@ View::PopState()
 
 	bool rebuildClipping = fDrawState->HasAdditionalClipping();
 
-	fDrawState = fDrawState->PopState();
+	fDrawState.SetTo(fDrawState->PopState());
 	fDrawState->SetSubPixelPrecise(fFlags & B_SUBPIXEL_PRECISE);
 
 	// rebuild clipping
@@ -1035,13 +1018,7 @@ View::SetCursor(ServerCursor* cursor)
 	if (cursor == fCursor)
 		return;
 
-	if (fCursor)
-		fCursor->ReleaseReference();
-
-	fCursor = cursor;
-
-	if (fCursor)
-		fCursor->AcquireReference();
+	fCursor.SetTo(cursor, false);
 }
 
 
@@ -1051,13 +1028,7 @@ View::SetPicture(ServerPicture* picture)
 	if (picture == fPicture)
 		return;
 
-	if (fPicture != NULL)
-		fPicture->ReleaseReference();
-
-	fPicture = picture;
-
-	if (fPicture != NULL)
-		fPicture->AcquireReference();
+	fPicture.SetTo(picture, false);
 }
 
 
@@ -1066,7 +1037,7 @@ View::BlendAllLayers()
 {
 	if (fPicture == NULL)
 		return;
-	Layer* layer = dynamic_cast<Layer*>(fPicture);
+	Layer* layer = dynamic_cast<Layer*>(fPicture.Get());
 	if (layer == NULL)
 		return;
 	BlendLayer(layer);
@@ -1378,13 +1349,13 @@ View::PrintToStream() const
 	printf("  valid:            %d\n", fScreenClippingValid);
 
 	printf("  fUserClipping:\n");
-	if (fUserClipping != NULL)
+	if (fUserClipping.Get() != NULL)
 		fUserClipping->PrintToStream();
 	else
 		printf("  none\n");
 
 	printf("  fScreenAndUserClipping:\n");
-	if (fScreenAndUserClipping != NULL)
+	if (fScreenAndUserClipping.Get() != NULL)
 		fScreenAndUserClipping->PrintToStream();
 	else
 		printf("  invalid\n");
@@ -1438,20 +1409,18 @@ View::RebuildClipping(bool deep)
 		// hand, views for which this feature is actually used will
 		// probably not have any children, so it is not that expensive
 		// after all
-		if (fUserClipping == NULL) {
-			fUserClipping = new (nothrow) BRegion;
-			if (fUserClipping == NULL)
+		if (fUserClipping.Get() == NULL) {
+			fUserClipping.SetTo(new (nothrow) BRegion);
+			if (fUserClipping.Get() == NULL)
 				return;
 		}
 
-		fDrawState->GetCombinedClippingRegion(fUserClipping);
+		fDrawState->GetCombinedClippingRegion(fUserClipping.Get());
 	} else {
-		delete fUserClipping;
-		fUserClipping = NULL;
+		fUserClipping.SetTo(NULL);
 	}
 
-	delete fScreenAndUserClipping;
-	fScreenAndUserClipping = NULL;
+	fScreenAndUserClipping.SetTo(NULL);
 	fScreenClippingValid = false;
 }
 
@@ -1460,22 +1429,22 @@ BRegion&
 View::ScreenAndUserClipping(BRegion* windowContentClipping, bool force) const
 {
 	// no user clipping - return screen clipping directly
-	if (fUserClipping == NULL)
+	if (fUserClipping.Get() == NULL)
 		return _ScreenClipping(windowContentClipping, force);
 
 	// combined screen and user clipping already valid
-	if (fScreenAndUserClipping != NULL)
-		return *fScreenAndUserClipping;
+	if (fScreenAndUserClipping.Get() != NULL)
+		return *fScreenAndUserClipping.Get();
 
 	// build a new combined user and screen clipping
-	fScreenAndUserClipping = new (nothrow) BRegion(*fUserClipping);
-	if (fScreenAndUserClipping == NULL)
+	fScreenAndUserClipping.SetTo(new (nothrow) BRegion(*fUserClipping.Get()));
+	if (fScreenAndUserClipping.Get() == NULL)
 		return fScreenClipping;
 
-	LocalToScreenTransform().Apply(fScreenAndUserClipping);
+	LocalToScreenTransform().Apply(fScreenAndUserClipping.Get());
 	fScreenAndUserClipping->IntersectWith(
 		&_ScreenClipping(windowContentClipping, force));
-	return *fScreenAndUserClipping;
+	return *fScreenAndUserClipping.Get();
 }
 
 
@@ -1498,8 +1467,7 @@ View::InvalidateScreenClipping()
 //	if (!fScreenClippingValid)
 //		return;
 
-	delete fScreenAndUserClipping;
-	fScreenAndUserClipping = NULL;
+	fScreenAndUserClipping.SetTo(NULL);
 	fScreenClippingValid = false;
 	// invalidate the childrens screen clipping as well
 	for (View* child = FirstChild(); child; child = child->NextSibling()) {
@@ -1539,8 +1507,7 @@ View::_MoveScreenClipping(int32 x, int32 y, bool deep)
 {
 	if (fScreenClippingValid) {
 		fScreenClipping.OffsetBy(x, y);
-		delete fScreenAndUserClipping;
-		fScreenAndUserClipping = NULL;
+		fScreenAndUserClipping.SetTo(NULL);
 	}
 
 	if (deep) {

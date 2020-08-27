@@ -78,7 +78,6 @@ FontFamily::~FontFamily()
 		// we remove us before deleting the style, so that the font manager
 		// is not contacted to remove the style from us
 		style->_SetFontFamily(NULL, -1);
-		delete style;
 	}
 }
 

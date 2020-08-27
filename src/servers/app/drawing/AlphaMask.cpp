@@ -338,13 +338,13 @@ VectorAlphaMask<VectorMaskType>::_RenderSource(const IntRect& canvasBounds)
 
 	// Render the picture to the bitmap
 	BitmapHWInterface interface(bitmap);
-	DrawingEngine* engine = interface.CreateDrawingEngine();
-	if (engine == NULL)
+	ObjectDeleter<DrawingEngine> engine(interface.CreateDrawingEngine());
+	if (engine.Get() == NULL)
 		return NULL;
 
 	engine->SetRendererOffset(fBounds.left, fBounds.top);
 
-	OffscreenCanvas canvas(engine,
+	OffscreenCanvas canvas(engine.Get(),
 		static_cast<VectorMaskType*>(this)->GetDrawState(), fBounds);
 
 	DrawState* const drawState = canvas.CurrentState();
@@ -364,7 +364,6 @@ VectorAlphaMask<VectorMaskType>::_RenderSource(const IntRect& canvasBounds)
 	}
 
 	canvas.PopState();
-	delete engine;
 
 	return bitmap.Detach();
 }

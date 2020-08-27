@@ -197,19 +197,17 @@ BitmapManager::CloneFromClient(area_id clientArea, int32 areaOffset,
 	BAutolock locker(fLock);
 	if (!locker.IsLocked())
 		return NULL;
-	ServerBitmap* bitmap = new(std::nothrow) ServerBitmap(bounds, space, flags,
-		bytesPerRow);
+	BReference<ServerBitmap> bitmap(new(std::nothrow) ServerBitmap(bounds, space, flags,
+		bytesPerRow), true);
 	if (bitmap == NULL)
 		return NULL;
 
 	ClonedAreaMemory* memory = new(std::nothrow) ClonedAreaMemory;
 	if (memory == NULL) {
-		delete bitmap;
 		return NULL;
 	}
 	int8* buffer = (int8*)memory->Clone(clientArea, areaOffset);
 	if (buffer == NULL) {
-		delete bitmap;
 		delete memory;
 		return NULL;
 	}
@@ -217,7 +215,7 @@ BitmapManager::CloneFromClient(area_id clientArea, int32 areaOffset,
 	bitmap->fMemory = memory;
 	bitmap->fBuffer = memory->Address();
 	bitmap->fToken = gTokenSpace.NewToken(kBitmapToken, bitmap);
-	return bitmap;
+	return bitmap.Detach();
 }
 
 

@@ -25,6 +25,7 @@
 #include "View.h"
 #include "Window.h"
 
+#include <AutoDeleter.h>
 #include <Bitmap.h>
 #include <Debug.h>
 #include <List.h>
@@ -60,25 +61,27 @@ public:
 
 	~State()
 	{
-		delete fDrawState;
 	}
 
 	DrawState* GetDrawState()
 	{
-		return fDrawState;
+		return fDrawState.Get();
 	}
 
 	void PushDrawState()
 	{
-		DrawState* nextState = fDrawState->PushState();
-		if (nextState != NULL)
-			fDrawState = nextState;
+		DrawState* previousState = fDrawState.Detach();
+		DrawState* newState = previousState->PushState();
+		if (newState == NULL)
+			newState = previousState;
+
+		fDrawState.SetTo(newState);
 	}
 
 	void PopDrawState()
 	{
 		if (fDrawState->PreviousState() != NULL)
-			fDrawState = fDrawState->PopState();
+			fDrawState.SetTo(fDrawState->PopState());
 	}
 
 	SimpleTransform PenToLocalTransform() const
@@ -130,7 +133,8 @@ private:
 
 
 private:
-	DrawState*	fDrawState;
+	ObjectDeleter<DrawState>
+				fDrawState;
 	BRect*		fBoundingBox;
 };
 
@@ -841,13 +845,13 @@ PictureBoundingBoxPlayer::Play(ServerPicture* picture,
 {
 	State state(drawState, outBoundingBox);
 
-	BMallocIO* mallocIO = dynamic_cast<BMallocIO*>(picture->fData);
+	BMallocIO* mallocIO = dynamic_cast<BMallocIO*>(picture->fData.Get());
 	if (mallocIO == NULL)
 		return;
 
 	BPrivate::PicturePlayer player(mallocIO->Buffer(),
 		mallocIO->BufferLength(), ServerPicture::PictureList::Private(
-			picture->fPictures).AsBList());
+			picture->fPictures.Get()).AsBList());
 	player.Play(kPictureBoundingBoxPlayerCallbacks,
 		sizeof(kPictureBoundingBoxPlayerCallbacks), &state);
 }

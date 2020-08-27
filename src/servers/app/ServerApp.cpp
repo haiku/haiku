@@ -105,7 +105,7 @@ ServerApp::ServerApp(Desktop* desktop, port_id clientReplyPort,
 	fViewCursor(NULL),
 	fCursorHideLevel(0),
 	fIsActive(false),
-	fMemoryAllocator(new (std::nothrow) ClientMemoryAllocator(this))
+	fMemoryAllocator(new (std::nothrow) ClientMemoryAllocator(this), true)
 {
 	if (fSignature == "")
 		fSignature = "application/no-signature";
@@ -205,8 +205,6 @@ ServerApp::~ServerApp()
 		fPictureMap.begin()->second->SetOwner(NULL);
 
 	fDesktop->GetCursorManager().DeleteCursors(fClientTeam);
-	if (fMemoryAllocator != NULL)
-		fMemoryAllocator->ReleaseReference();
 
 	STRACE(("ServerApp %s::~ServerApp(): Exiting\n", Signature()));
 }
@@ -294,15 +292,7 @@ ServerApp::Activate(bool value)
 void
 ServerApp::SetCurrentCursor(ServerCursor* cursor)
 {
-	if (fViewCursor != cursor) {
-		if (fViewCursor)
-			fViewCursor->ReleaseReference();
-
-		fViewCursor = cursor;
-
-		if (fViewCursor)
-			fViewCursor->AcquireReference();
-	}
+	fViewCursor.SetTo(cursor, false);
 
 	fDesktop->SetCursor(CurrentCursor());
 }
@@ -417,16 +407,16 @@ ServerApp::GetBitmap(int32 token) const
 ServerPicture*
 ServerApp::CreatePicture(const ServerPicture* original)
 {
-	ServerPicture* picture;
+	BReference<ServerPicture> picture;
 	if (original != NULL)
-		picture = new(std::nothrow) ServerPicture(*original);
+		picture.SetTo(new(std::nothrow) ServerPicture(*original), true);
 	else
-		picture = new(std::nothrow) ServerPicture();
+		picture.SetTo(new(std::nothrow) ServerPicture(), true);
 
 	if (picture != NULL && !picture->SetOwner(this))
-		picture->ReleaseReference();
+		return NULL;
 
-	return picture;
+	return picture.Detach();
 }
 
 
@@ -457,7 +447,7 @@ ServerApp::AddPicture(ServerPicture* picture)
 	ASSERT(picture->Owner() == NULL);
 
 	try {
-		fPictureMap.insert(std::make_pair(picture->Token(), picture));
+		fPictureMap.insert(std::make_pair(picture->Token(), BReference<ServerPicture>(picture, false)));
 	} catch (std::bad_alloc& exception) {
 		return false;
 	}
@@ -475,7 +465,6 @@ ServerApp::RemovePicture(ServerPicture* picture)
 	ASSERT(picture->Owner() == this);
 
 	fPictureMap.erase(picture->Token());
-	picture->ReleaseReference();
 }
 
 
@@ -750,7 +739,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			//	3) int32 area pointer offset used to calculate fBasePtr
 
 			// First, let's attempt to allocate the bitmap
-			ServerBitmap* bitmap = NULL;
+			BReference<ServerBitmap> bitmap;
 			uint8 allocationFlags = kAllocator;
 
 			BRect frame;
@@ -766,9 +755,9 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			if (link.Read<int32>(&screenID) == B_OK) {
 				// TODO: choose the right HWInterface with regards to the
 				// screenID
-				bitmap = gBitmapManager->CreateBitmap(fMemoryAllocator,
+				bitmap.SetTo(gBitmapManager->CreateBitmap(fMemoryAllocator,
 					*fDesktop->HWInterface(), frame, colorSpace, flags,
-					bytesPerRow, screenID, &allocationFlags);
+					bytesPerRow, screenID, &allocationFlags), true);
 			}
 
 			STRACE(("ServerApp %s: Create Bitmap (%.1fx%.1f)\n",
@@ -785,9 +774,6 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				if ((allocationFlags & kFramebuffer) != 0)
 					fLink.Attach<int32>(bitmap->BytesPerRow());
 			} else {
-				if (bitmap != NULL)
-					bitmap->ReleaseReference();
-
 				fLink.StartMessage(B_NO_MEMORY);
 			}
 
@@ -828,15 +814,13 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			if (link.Read<int32>(&token) != B_OK)
 				break;
 
-			ServerBitmap* bitmap = GetBitmap(token);
+			BReference<ServerBitmap> bitmap(GetBitmap(token), true);
 			if (bitmap != NULL) {
 				STRACE(("ServerApp %s: Get overlay restrictions for bitmap "
 					"%" B_PRId32 "\n", Signature(), token));
 
 				status = fDesktop->HWInterface()->GetOverlayRestrictions(
 					bitmap->Overlay(), &restrictions);
-
-				bitmap->ReleaseReference();
 			}
 
 			fLink.StartMessage(status);
@@ -866,7 +850,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		case AS_RECONNECT_BITMAP:
 		{
 			// First, let's attempt to allocate the bitmap
-			ServerBitmap* bitmap = NULL;
+			BReference<ServerBitmap> bitmap;
 
 			BRect frame;
 			color_space colorSpace;
@@ -885,8 +869,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			if (link.Read<int32>(&areaOffset) == B_OK) {
 				// TODO: choose the right HWInterface with regards to the
 				// screenID
-				bitmap = gBitmapManager->CloneFromClient(clientArea, areaOffset,
-					frame, colorSpace, flags, bytesPerRow);
+				bitmap.SetTo(gBitmapManager->CloneFromClient(clientArea, areaOffset,
+					frame, colorSpace, flags, bytesPerRow), true);
 			}
 
 			if (bitmap != NULL && _AddBitmap(bitmap)) {
@@ -896,9 +880,6 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				fLink.Attach<area_id>(bitmap->Area());
 
 			} else {
-				if (bitmap != NULL)
-					bitmap->ReleaseReference();
-
 				fLink.StartMessage(B_NO_MEMORY);
 			}
 
@@ -914,7 +895,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			STRACE(("ServerApp %s: Create Picture\n", Signature()));
 			status_t status = B_NO_MEMORY;
 
-			ServerPicture* picture = CreatePicture();
+			BReference<ServerPicture> picture(CreatePicture());
 			if (picture != NULL) {
 				int32 subPicturesCount = 0;
 				link.Read<int32>(&subPicturesCount);
@@ -956,19 +937,17 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		{
 			STRACE(("ServerApp %s: Clone Picture\n", Signature()));
 			int32 token;
-			ServerPicture* original = NULL;
+			BReference<ServerPicture> original;
 			if (link.Read<int32>(&token) == B_OK)
-				original = GetPicture(token);
+				original.SetTo(GetPicture(token), true);
 
 			if (original != NULL) {
-				ServerPicture* cloned = CreatePicture(original);
+				BReference<ServerPicture> cloned(CreatePicture(original), true);
 				if (cloned != NULL) {
 					fLink.StartMessage(B_OK);
 					fLink.Attach<int32>(cloned->Token());
 				} else
 					fLink.StartMessage(B_NO_MEMORY);
-
-				original->ReleaseReference();
 			} else
 				fLink.StartMessage(B_BAD_VALUE);
 
@@ -981,11 +960,10 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			STRACE(("ServerApp %s: Download Picture\n", Signature()));
 			int32 token;
 			link.Read<int32>(&token);
-			ServerPicture* picture = GetPicture(token);
+			BReference<ServerPicture> picture(GetPicture(token), true);
 			if (picture != NULL) {
 				picture->ExportData(fLink);
 					// ExportData() calls StartMessage() already
-				picture->ReleaseReference();
 			} else
 				fLink.StartMessage(B_ERROR);
 
@@ -1110,16 +1088,10 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			if (!fDesktop->GetCursorManager().Lock())
 				break;
 
-			ServerCursor* oldCursor = fAppCursor;
-			fAppCursor = fDesktop->GetCursorManager().FindCursor(token);
-			if (fAppCursor != NULL)
-				fAppCursor->AcquireReference();
+			fAppCursor.SetTo(fDesktop->GetCursorManager().FindCursor(token), false);
 
 			if (_HasWindowUnderMouse())
 				fDesktop->SetCursor(CurrentCursor());
-
-			if (oldCursor != NULL)
-				oldCursor->ReleaseReference();
 
 			fDesktop->GetCursorManager().Unlock();
 
@@ -1140,13 +1112,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				break;
 
 			if (fDesktop->GetCursorManager().Lock()) {
-				ServerCursor* cursor = fDesktop->GetCursorManager().FindCursor(
-					info.cursorToken);
-				// If we found a cursor, make sure it doesn't go away. If we
-				// get a NULL cursor, it probably means we are supposed to use
-				// the system default cursor.
-				if (cursor != NULL)
-					cursor->AcquireReference();
+				BReference<ServerCursor> cursor(fDesktop->GetCursorManager().FindCursor(
+					info.cursorToken), false);
 
 				fDesktop->GetCursorManager().Unlock();
 
@@ -1174,10 +1141,6 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				}
 
 				fDesktop->UnlockAllWindows();
-
-				// Release the temporary reference.
-				if (cursor != NULL)
-					cursor->ReleaseReference();
 			}
 
 			if (info.sync) {
@@ -3190,14 +3153,13 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			bool success = false;
 
-			ServerBitmap* bitmap = GetBitmap(token);
+			BReference<ServerBitmap> bitmap(GetBitmap(token), true);
 			if (bitmap != NULL) {
 				if (fDesktop->GetDrawingEngine()->LockExclusiveAccess()) {
 					success = fDesktop->GetDrawingEngine()->ReadBitmap(bitmap,
 						drawCursor, bounds) == B_OK;
 					fDesktop->GetDrawingEngine()->UnlockExclusiveAccess();
 				}
-				bitmap->ReleaseReference();
 			}
 
 			if (success)
@@ -3552,7 +3514,7 @@ ServerApp::_AddBitmap(ServerBitmap* bitmap)
 	BAutolock _(fMapLocker);
 
 	try {
-		fBitmapMap.insert(std::make_pair(bitmap->Token(), bitmap));
+		fBitmapMap.insert(std::make_pair(bitmap->Token(), BReference<ServerBitmap>(bitmap, false)));
 	} catch (std::bad_alloc& exception) {
 		return false;
 	}
@@ -3569,8 +3531,6 @@ ServerApp::_DeleteBitmap(ServerBitmap* bitmap)
 
 	gBitmapManager->BitmapRemoved(bitmap);
 	fBitmapMap.erase(bitmap->Token());
-
-	bitmap->ReleaseReference();
 }
 
 
