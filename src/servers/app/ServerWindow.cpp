@@ -163,7 +163,6 @@ ServerWindow::ServerWindow(const char* title, ServerApp* app,
 	fTitle(NULL),
 	fDesktop(app->GetDesktop()),
 	fServerApp(app),
-	fWindow(NULL),
 	fWindowAddedToDesktop(false),
 
 	fClientTeam(app->ClientTeam()),
@@ -178,7 +177,6 @@ ServerWindow::ServerWindow(const char* title, ServerApp* app,
 	fCurrentDrawingRegion(),
 	fCurrentDrawingRegionValid(false),
 
-	fDirectWindowInfo(NULL),
 	fIsDirectlyAccessing(false)
 {
 	STRACE(("ServerWindow(%s)::ServerWindow()\n", title));
@@ -206,7 +204,7 @@ ServerWindow::~ServerWindow()
 
 	if (!fWindow->IsOffscreenWindow()) {
 		fWindowAddedToDesktop = false;
-		fDesktop->RemoveWindow(fWindow);
+		fDesktop->RemoveWindow(fWindow.Get());
 	}
 
 	if (App() != NULL) {
@@ -214,14 +212,14 @@ ServerWindow::~ServerWindow()
 		fServerApp = NULL;
 	}
 
-	delete fWindow;
+	fWindow.Unset(); // TODO: is it really needed?
 
 	free(fTitle);
 	delete_port(fMessagePort);
 
 	BPrivate::gDefaultTokens.RemoveToken(fServerToken);
 
-	delete fDirectWindowInfo;
+	fDirectWindowInfo.Unset(); // TODO: is it really needed?
 	STRACE(("ServerWindow(%p) will exit NOW\n", this));
 
 	delete_sem(fDeathSemaphore);
@@ -281,15 +279,14 @@ ServerWindow::Init(BRect frame, window_look look, window_feel feel,
 
 	// We cannot call MakeWindow in the constructor, since it
 	// is a virtual function!
-	fWindow = MakeWindow(frame, fTitle, look, feel, flags, workspace);
-	if (!fWindow || fWindow->InitCheck() != B_OK) {
-		delete fWindow;
-		fWindow = NULL;
+	fWindow.SetTo(MakeWindow(frame, fTitle, look, feel, flags, workspace));
+	if (fWindow.Get() == NULL || fWindow->InitCheck() != B_OK) {
+		fWindow.Unset();
 		return B_NO_MEMORY;
 	}
 
 	if (!fWindow->IsOffscreenWindow()) {
-		fDesktop->AddWindow(fWindow);
+		fDesktop->AddWindow(fWindow.Get());
 		fWindowAddedToDesktop = true;
 	}
 
@@ -308,7 +305,7 @@ ServerWindow::Window() const
 	if (!fWindowAddedToDesktop)
 		return NULL;
 
-	return fWindow;
+	return fWindow.Get();
 }
 
 
@@ -351,8 +348,8 @@ ServerWindow::_Show()
 	// TODO: Maybe we need to dispatch a message to the desktop to show/hide us
 	// instead of doing it from this thread.
 	fDesktop->UnlockSingleWindow();
-	fDesktop->ShowWindow(fWindow);
-	if (fDirectWindowInfo && fDirectWindowInfo->IsFullScreen())
+	fDesktop->ShowWindow(fWindow.Get());
+	if (fDirectWindowInfo.Get() != NULL && fDirectWindowInfo->IsFullScreen())
 		_ResizeToFullScreen();
 
 	fDesktop->LockSingleWindow();
@@ -371,7 +368,7 @@ ServerWindow::_Hide()
 		return;
 
 	fDesktop->UnlockSingleWindow();
-	fDesktop->HideWindow(fWindow);
+	fDesktop->HideWindow(fWindow.Get());
 	fDesktop->LockSingleWindow();
 }
 
@@ -411,8 +408,8 @@ ServerWindow::SetTitle(const char* newTitle)
 		rename_thread(Thread(), name);
 	}
 
-	if (fWindow != NULL)
-		fDesktop->SetWindowTitle(fWindow, newTitle);
+	if (fWindow.Get() != NULL)
+		fDesktop->SetWindowTitle(fWindow.Get(), newTitle);
 }
 
 
@@ -627,7 +624,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 					"minimize: %d\n", Title(), minimize));
 
 				fDesktop->UnlockSingleWindow();
-				fDesktop->MinimizeWindow(fWindow, minimize);
+				fDesktop->MinimizeWindow(fWindow.Get(), minimize);
 				fDesktop->LockSingleWindow();
 			}
 			break;
@@ -645,9 +642,9 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			fDesktop->UnlockSingleWindow();
 
 			if (activate)
-				fDesktop->SelectWindow(fWindow);
+				fDesktop->SelectWindow(fWindow.Get());
 			else
-				fDesktop->SendWindowBehind(fWindow, NULL);
+				fDesktop->SendWindowBehind(fWindow.Get(), NULL);
 
 			fDesktop->LockSingleWindow();
 			break;
@@ -668,7 +665,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 					Title(), behindOf != NULL ? behindOf->Title() : "NULL"));
 
 				if (behindOf != NULL || token == -1) {
-					fDesktop->SendWindowBehind(fWindow, behindOf);
+					fDesktop->SendWindowBehind(fWindow.Get(), behindOf);
 					status = B_OK;
 				} else
 					status = B_NAME_NOT_FOUND;
@@ -730,7 +727,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				if (window == NULL || window->Feel() != B_NORMAL_WINDOW_FEEL) {
 					status = B_BAD_VALUE;
 				} else {
-					status = fDesktop->AddWindowToSubset(fWindow, window)
+					status = fDesktop->AddWindowToSubset(fWindow.Get(), window)
 						? B_OK : B_NO_MEMORY;
 				}
 			}
@@ -750,7 +747,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				::Window* window = fDesktop->FindWindowByClientToken(token,
 					App()->ClientTeam());
 				if (window != NULL) {
-					fDesktop->RemoveWindowFromSubset(fWindow, window);
+					fDesktop->RemoveWindowFromSubset(fWindow.Get(), window);
 					status = B_OK;
 				} else
 					status = B_BAD_VALUE;
@@ -775,7 +772,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			}
 
 			if (status == B_OK && !fWindow->IsOffscreenWindow())
-				fDesktop->SetWindowLook(fWindow, (window_look)look);
+				fDesktop->SetWindowLook(fWindow.Get(), (window_look)look);
 
 			fLink.StartMessage(status);
 			fLink.Flush();
@@ -795,7 +792,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			}
 
 			if (status == B_OK && !fWindow->IsOffscreenWindow())
-				fDesktop->SetWindowFeel(fWindow, (window_feel)feel);
+				fDesktop->SetWindowFeel(fWindow.Get(), (window_feel)feel);
 
 			fLink.StartMessage(status);
 			fLink.Flush();
@@ -815,7 +812,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			}
 
 			if (status == B_OK && !fWindow->IsOffscreenWindow())
-				fDesktop->SetWindowFlags(fWindow, flags);
+				fDesktop->SetWindowFlags(fWindow.Get(), flags);
 
 			fLink.StartMessage(status);
 			fLink.Flush();
@@ -839,7 +836,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 #endif
 		case AS_IS_FRONT_WINDOW:
 		{
-			bool isFront = fDesktop->FrontWindow() == fWindow;
+			bool isFront = fDesktop->FrontWindow() == fWindow.Get();
 			DTRACE(("ServerWindow %s: Message AS_IS_FRONT_WINDOW: %d\n",
 				Title(), isFront));
 			fLink.StartMessage(isFront ? B_OK : B_ERROR);
@@ -866,7 +863,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			DTRACE(("ServerWindow %s: Message AS_SET_WORKSPACES %" B_PRIx32 "\n",
 				Title(), newWorkspaces));
 
-			fDesktop->SetWindowWorkspaces(fWindow, newWorkspaces);
+			fDesktop->SetWindowWorkspaces(fWindow.Get(), newWorkspaces);
 			break;
 		}
 		case AS_WINDOW_RESIZE:
@@ -888,7 +885,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				// pragmatically set window bounds
 //				fLink.StartMessage(B_BUSY);
 //			} else {
-				fDesktop->ResizeWindowBy(fWindow,
+				fDesktop->ResizeWindowBy(fWindow.Get(),
 					xResizeTo - fWindow->Frame().Width(),
 					yResizeTo - fWindow->Frame().Height());
 				fLink.StartMessage(B_OK);
@@ -913,7 +910,8 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				// pragmatically set window positions
 				fLink.StartMessage(B_BUSY);
 			} else {
-				fDesktop->MoveWindowBy(fWindow, xMoveTo - fWindow->Frame().left,
+				fDesktop->MoveWindowBy(fWindow.Get(),
+					xMoveTo - fWindow->Frame().left,
 					yMoveTo - fWindow->Frame().top);
 				fLink.StartMessage(B_OK);
 			}
@@ -962,7 +960,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			fLink.Flush();
 
-			fDesktop->NotifySizeLimitsChanged(fWindow, minWidth, maxWidth,
+			fDesktop->NotifySizeLimitsChanged(fWindow.Get(), minWidth, maxWidth,
 				minHeight, maxHeight);
 			break;
 		}
@@ -974,12 +972,13 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				Title()));
 
 			int32 size;
-			if (fWindow && link.Read<int32>(&size) == B_OK) {
+			if (fWindow.Get() != NULL && link.Read<int32>(&size) == B_OK) {
 				char buffer[size];
 				if (link.Read(buffer, size) == B_OK) {
 					BMessage settings;
 					if (settings.Unflatten(buffer) == B_OK)
-						fDesktop->SetWindowDecoratorSettings(fWindow, settings);
+						fDesktop->SetWindowDecoratorSettings(
+							fWindow.Get(), settings);
 				}
 			}
 			break;
@@ -1014,7 +1013,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		case AS_SYSTEM_FONT_CHANGED:
 		{
 			// Has the all-window look
-			fDesktop->FontsChanged(fWindow);
+			fDesktop->FontsChanged(fWindow.Get());
 			break;
 		}
 
@@ -1097,7 +1096,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			link.Read<bool>(&enable);
 
 			status_t status = B_OK;
-			if (fDirectWindowInfo != NULL)
+			if (fDirectWindowInfo.Get() != NULL)
 				_DirectWindowSetFullScreen(enable);
 			else
 				status = B_BAD_TYPE;
@@ -1170,7 +1169,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 		case AS_TALK_TO_DESKTOP_LISTENER:
 		{
-			if (fDesktop->MessageForListener(fWindow, fLink.Receiver(),
+			if (fDesktop->MessageForListener(fWindow.Get(), fLink.Receiver(),
 				fLink.Sender()))
 				break;
 			// unhandled message at least send an error if needed
@@ -1352,7 +1351,7 @@ fDesktop->UnlockSingleWindow();
 				// TODO: possible deadlock
 				if (eventMask != 0 || options != 0) {
 					if (options & B_LOCK_WINDOW_FOCUS)
-						fDesktop->SetFocusLocked(fWindow);
+						fDesktop->SetFocusLocked(fWindow.Get());
 					fDesktop->EventDispatcher().AddTemporaryListener(EventTarget(),
 						fCurrentView->Token(), eventMask, options);
 				} else {
@@ -4290,7 +4289,7 @@ ServerWindow::ScreenChanged(const BMessage* message)
 {
 	SendMessageToClient(message);
 
-	if (fDirectWindowInfo != NULL && fDirectWindowInfo->IsFullScreen())
+	if (fDirectWindowInfo.Get() != NULL && fDirectWindowInfo->IsFullScreen())
 		_ResizeToFullScreen();
 }
 
@@ -4324,7 +4323,7 @@ ServerWindow::HandleDirectConnection(int32 bufferState, int32 driverState)
 {
 	ASSERT_MULTI_LOCKED(fDesktop->WindowLocker());
 
-	if (fDirectWindowInfo == NULL)
+	if (fDirectWindowInfo.Get() == NULL)
 		return;
 
 	STRACE(("HandleDirectConnection(bufferState = %" B_PRId32 ", driverState = "
@@ -4345,8 +4344,7 @@ ServerWindow::HandleDirectConnection(int32 bufferState, int32 driverState)
 		// The client application didn't release the semaphore
 		// within the given timeout. Or something else went wrong.
 		// Deleting this member should make it crash.
-		delete fDirectWindowInfo;
-		fDirectWindowInfo = NULL;
+		fDirectWindowInfo.Unset();
 	} else if ((bufferState & B_DIRECT_MODE_MASK) == B_DIRECT_START)
 		fIsDirectlyAccessing = true;
 	else if ((bufferState & B_DIRECT_MODE_MASK) == B_DIRECT_STOP)
@@ -4465,10 +4463,10 @@ ServerWindow::_ResizeToFullScreen()
 		screenFrame = fWindow->Screen()->Frame();
 	}
 
-	fDesktop->MoveWindowBy(fWindow,
+	fDesktop->MoveWindowBy(fWindow.Get(),
 		screenFrame.left - fWindow->Frame().left,
 		screenFrame.top - fWindow->Frame().top);
-	fDesktop->ResizeWindowBy(fWindow,
+	fDesktop->ResizeWindowBy(fWindow.Get(),
 		screenFrame.Width() - fWindow->Frame().Width(),
 		screenFrame.Height() - fWindow->Frame().Height());
 }
@@ -4477,7 +4475,7 @@ ServerWindow::_ResizeToFullScreen()
 status_t
 ServerWindow::_EnableDirectWindowMode()
 {
-	if (fDirectWindowInfo != NULL) {
+	if (fDirectWindowInfo.Get() != NULL) {
 		// already in direct window mode
 		return B_ERROR;
 	}
@@ -4487,14 +4485,13 @@ ServerWindow::_EnableDirectWindowMode()
 		return B_UNSUPPORTED;
 	}
 
-	fDirectWindowInfo = new(std::nothrow) DirectWindowInfo;
-	if (fDirectWindowInfo == NULL)
+	fDirectWindowInfo.SetTo(new(std::nothrow) DirectWindowInfo);
+	if (fDirectWindowInfo.Get() == NULL)
 		return B_NO_MEMORY;
 
 	status_t status = fDirectWindowInfo->InitCheck();
 	if (status != B_OK) {
-		delete fDirectWindowInfo;
-		fDirectWindowInfo = NULL;
+		fDirectWindowInfo.Unset();
 
 		return status;
 	}
@@ -4519,15 +4516,15 @@ ServerWindow::_DirectWindowSetFullScreen(bool enable)
 		fDirectWindowInfo->DisableFullScreen();
 
 		// Resize window back to its original size
-		fDesktop->MoveWindowBy(fWindow,
+		fDesktop->MoveWindowBy(fWindow.Get(),
 			originalFrame.left - fWindow->Frame().left,
 			originalFrame.top - fWindow->Frame().top);
-		fDesktop->ResizeWindowBy(fWindow,
+		fDesktop->ResizeWindowBy(fWindow.Get(),
 			originalFrame.Width() - fWindow->Frame().Width(),
 			originalFrame.Height() - fWindow->Frame().Height());
 
 		fDesktop->HWInterface()->SetCursorVisible(true);
 	}
 
-	fDesktop->SetWindowFeel(fWindow, feel);
+	fDesktop->SetWindowFeel(fWindow.Get(), feel);
 }

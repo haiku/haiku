@@ -11,6 +11,7 @@
 #define SCREEN_H
 
 
+#include <AutoDeleter.h>
 #include <Accelerant.h>
 #include <GraphicsDefs.h>
 #include <Point.h>
@@ -50,9 +51,9 @@ public:
 			color_space			ColorSpace() const;
 
 	inline	DrawingEngine*		GetDrawingEngine() const
-									{ return fDriver; }
+									{ return fDriver.Get(); }
 	inline	::HWInterface*		HWInterface() const
-									{ return fHWInterface; }
+									{ return fHWInterface.Get(); }
 
 private:
 			int32				_FindBestMode(const display_mode* modeList,
@@ -60,8 +61,10 @@ private:
 									uint32 colorspace, float frequency) const;
 
 			int32				fID;
-			DrawingEngine*		fDriver;
-			::HWInterface*		fHWInterface;
+			ObjectDeleter<DrawingEngine>
+								fDriver;
+			ObjectDeleter< ::HWInterface>
+								fHWInterface;
 };
 
 #endif	/* SCREEN_H */

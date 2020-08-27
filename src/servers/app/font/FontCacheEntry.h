@@ -27,6 +27,7 @@
 #define FONT_CACHE_ENTRY_H
 
 
+#include <AutoDeleter.h>
 #include <Locker.h>
 
 #include <agg_conv_curve.h>
@@ -144,7 +145,8 @@ class FontCacheEntry : public MultiLocker, public BReferenceable {
 
 			class GlyphCachePool;
 
-			GlyphCachePool*		fGlyphCache;
+			ObjectDeleter<GlyphCachePool>
+								fGlyphCache;
 			FontEngine			fEngine;
 
 	static	BLocker				sUsageUpdateLock;

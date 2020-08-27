@@ -15,12 +15,14 @@
 #define DESKTOP_H
 
 
+#include <AutoDeleter.h>
 #include <Autolock.h>
 #include <InterfaceDefs.h>
 #include <List.h>
 #include <Menu.h>
 #include <ObjectList.h>
 #include <Region.h>
+#include <String.h>
 #include <Window.h>
 
 #include <ServerProtocolStructs.h>
@@ -326,7 +328,8 @@ private:
 			uid_t				fUserID;
 			char*				fTargetScreen;
 			::VirtualScreen		fVirtualScreen;
-			DesktopSettingsPrivate*	fSettings;
+			ObjectDeleter<DesktopSettingsPrivate>
+								fSettings;
 			port_id				fMessagePort;
 			::EventDispatcher	fEventDispatcher;
 			area_id				fSharedReadOnlyArea;

@@ -10,6 +10,7 @@
 #define FONT_MANAGER_H
 
 
+#include <AutoDeleter.h>
 #include <HashMap.h>
 #include <Looper.h>
 #include <ObjectList.h>
@@ -143,9 +144,12 @@ private:
 
 			HashMap<FontKey, BReference<FontStyle> > fStyleHashTable;
 
-			ServerFont*			fDefaultPlainFont;
-			ServerFont*			fDefaultBoldFont;
-			ServerFont*			fDefaultFixedFont;
+			ObjectDeleter<ServerFont>
+								fDefaultPlainFont;
+			ObjectDeleter<ServerFont>
+								fDefaultBoldFont;
+			ObjectDeleter<ServerFont>
+								fDefaultFixedFont;
 
 			bool				fScanned;
 			int32				fNextID;

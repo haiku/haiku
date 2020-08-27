@@ -685,7 +685,6 @@ DefaultWindowBehaviour::DefaultWindowBehaviour(Window* window)
 	:
 	fWindow(window),
 	fDesktop(window->Desktop()),
-	fState(NULL),
 	fLastModifiers(0)
 {
 }
@@ -693,7 +692,6 @@ DefaultWindowBehaviour::DefaultWindowBehaviour(Window* window)
 
 DefaultWindowBehaviour::~DefaultWindowBehaviour()
 {
-	delete fState;
 }
 
 
@@ -726,7 +724,7 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where,
 	}
 
 	// if a state is active, let it do the job
-	if (fState != NULL) {
+	if (fState.Get() != NULL) {
 		bool unhandled = false;
 		bool result = fState->MouseDown(message, where, unhandled);
 		if (!unhandled)
@@ -919,7 +917,7 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where,
 void
 DefaultWindowBehaviour::MouseUp(BMessage* message, BPoint where)
 {
-	if (fState != NULL)
+	if (fState.Get() != NULL)
 		fState->MouseUp(message, where);
 }
 
@@ -927,7 +925,7 @@ DefaultWindowBehaviour::MouseUp(BMessage* message, BPoint where)
 void
 DefaultWindowBehaviour::MouseMoved(BMessage* message, BPoint where, bool isFake)
 {
-	if (fState != NULL) {
+	if (fState.Get() != NULL) {
 		fState->MouseMoved(message, where, isFake);
 	} else {
 		// If the window modifiers are hold, enter the window management state.
@@ -954,7 +952,7 @@ DefaultWindowBehaviour::ModifiersChanged(int32 modifiers)
 	int32 buttons;
 	fDesktop->GetLastMouseState(&where, &buttons);
 
-	if (fState != NULL) {
+	if (fState.Get() != NULL) {
 		fState->ModifiersChanged(where, modifiers);
 	} else {
 		// If the window modifiers are hold, enter the window management state.
@@ -1166,21 +1164,19 @@ void
 DefaultWindowBehaviour::_NextState(State* state)
 {
 	// exit the old state
-	if (fState != NULL)
+	if (fState.Get() != NULL)
 		fState->ExitState(state);
 
 	// set and enter the new state
-	State* oldState = fState;
-	fState = state;
+	ObjectDeleter<State> oldState(fState.Detach());
+	fState.SetTo(state);
 
-	if (fState != NULL) {
-		fState->EnterState(oldState);
+	if (fState.Get() != NULL) {
+		fState->EnterState(oldState.Get());
 		fDesktop->SetMouseEventWindow(fWindow);
-	} else if (oldState != NULL) {
+	} else if (oldState.Get() != NULL) {
 		// no state anymore -- reset the mouse event window, if it's still us
 		if (fDesktop->MouseEventWindow() == fWindow)
 			fDesktop->SetMouseEventWindow(NULL);
 	}
-
-	delete oldState;
 }

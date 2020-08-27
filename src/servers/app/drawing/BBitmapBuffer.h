@@ -5,6 +5,8 @@
 
 #include "RenderingBuffer.h"
 
+#include <AutoDeleter.h>
+
 class BBitmap;
 
 class BBitmapBuffer : public RenderingBuffer {
@@ -22,10 +24,11 @@ class BBitmapBuffer : public RenderingBuffer {
 
 								// BBitmapBuffer
 			const BBitmap*		Bitmap() const
-									{ return fBitmap; }
+									{ return fBitmap.Get(); }
  private:
 
-			BBitmap*			fBitmap;
+			ObjectDeleter<BBitmap>
+								fBitmap;
 };
 
 #endif // B_BITMAP_BUFFER_H

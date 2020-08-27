@@ -50,9 +50,7 @@ Screen::Screen(::HWInterface *interface, int32 id)
 
 Screen::Screen()
 	:
-	fID(-1),
-	fDriver(NULL),
-	fHWInterface(NULL)
+	fID(-1)
 {
 }
 
@@ -60,8 +58,6 @@ Screen::Screen()
 Screen::~Screen()
 {
 	Shutdown();
-	delete fDriver;
-	delete fHWInterface;
 }
 
 
@@ -71,7 +67,7 @@ Screen::~Screen()
 status_t
 Screen::Initialize()
 {
-	if (fHWInterface) {
+	if (fHWInterface.Get() != NULL) {
 		// init the graphics hardware
 		return fHWInterface->Initialize();
 	}
@@ -83,7 +79,7 @@ Screen::Initialize()
 void
 Screen::Shutdown()
 {
-	if (fHWInterface)
+	if (fHWInterface.Get() != NULL)
 		fHWInterface->Shutdown();
 }
 

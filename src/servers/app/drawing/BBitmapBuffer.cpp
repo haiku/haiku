@@ -13,7 +13,6 @@ BBitmapBuffer::BBitmapBuffer(BBitmap* bitmap)
 // destructor
 BBitmapBuffer::~BBitmapBuffer()
 {
-	delete fBitmap;
 }
 
 // InitCheck
@@ -21,7 +20,7 @@ status_t
 BBitmapBuffer::InitCheck() const
 {
 	status_t ret = B_NO_INIT;
-	if (fBitmap)
+	if (fBitmap.Get() != NULL)
 		ret = fBitmap->InitCheck();
 	return ret;
 }

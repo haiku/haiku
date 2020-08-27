@@ -13,6 +13,7 @@
 #define SERVER_WINDOW_H
 
 
+#include <AutoDeleter.h>
 #include <GraphicsDefs.h>
 #include <Locker.h>
 #include <Message.h>
@@ -106,7 +107,7 @@ public:
 			void				HandleDirectConnection(int32 bufferState,
 									int32 driverState = 0);
 			bool				HasDirectFrameBufferAccess() const
-									{ return fDirectWindowInfo != NULL; }
+									{ return fDirectWindowInfo.Get() != NULL; }
 			bool				IsDirectlyAccessing() const
 									{ return fIsDirectlyAccessing; }
 
@@ -152,7 +153,8 @@ private:
 
 			::Desktop*			fDesktop;
 			ServerApp*			fServerApp;
-			::Window*			fWindow;
+			ObjectDeleter< ::Window>
+								fWindow;
 			bool				fWindowAddedToDesktop;
 
 			team_id				fClientTeam;
@@ -173,7 +175,8 @@ private:
 			BRegion				fCurrentDrawingRegion;
 			bool				fCurrentDrawingRegionValid;
 
-			DirectWindowInfo*	fDirectWindowInfo;
+			ObjectDeleter<DirectWindowInfo>
+								fDirectWindowInfo;
 			bool				fIsDirectlyAccessing;
 };
 

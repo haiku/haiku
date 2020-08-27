@@ -637,7 +637,7 @@ Tab::Tab(SATGroup* group, Variable* variable, orientation_t orientation)
 	fVariable(variable),
 	fOrientation(orientation)
 {
-	
+
 }
 
 
@@ -647,8 +647,6 @@ Tab::~Tab()
 		fGroup->_RemoveVerticalTab(this);
 	else
 		fGroup->_RemoveHorizontalTab(this);
-
-	delete fVariable;
 }
 
 
@@ -806,7 +804,7 @@ SATGroup::~SATGroup()
 		debugger("Deleting a SATGroup which is not empty");
 	//while (fSATWindowList.CountItems() > 0)
 	//	RemoveWindow(fSATWindowList.ItemAt(0));
-	
+
 	fLinearSpec->ReleaseReference();
 }
 

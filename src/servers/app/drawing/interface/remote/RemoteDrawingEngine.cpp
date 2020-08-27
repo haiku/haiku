@@ -49,8 +49,6 @@ RemoteDrawingEngine::~RemoteDrawingEngine()
 	message.Add(fToken);
 	message.Flush();
 
-	delete fBitmapDrawingEngine;
-
 	if (fCallbackAdded)
 		fHWInterface->RemoveCallback(fToken);
 	if (fResultNotify >= 0)
@@ -1109,10 +1107,10 @@ RemoteDrawingEngine::_ExtractBitmapRegions(ServerBitmap& bitmap, uint32 options,
 				* (int32)(sourceRect.Height() + 1.5))) {
 			// the target bitmap is smaller than the source, scale it locally
 			// and send over the smaller version to avoid sending any extra data
-			if (fBitmapDrawingEngine == NULL) {
-				fBitmapDrawingEngine
-					= new(std::nothrow) BitmapDrawingEngine(B_RGBA32);
-				if (fBitmapDrawingEngine == NULL)
+			if (fBitmapDrawingEngine.Get() == NULL) {
+				fBitmapDrawingEngine.SetTo(
+					new(std::nothrow) BitmapDrawingEngine(B_RGBA32));
+				if (fBitmapDrawingEngine.Get() == NULL)
 					result = B_NO_MEMORY;
 			}
 

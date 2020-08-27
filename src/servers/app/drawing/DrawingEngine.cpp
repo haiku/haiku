@@ -116,7 +116,6 @@ DrawingEngine::DrawingEngine(HWInterface* interface)
 DrawingEngine::~DrawingEngine()
 {
 	SetHWInterface(NULL);
-	delete fPainter;
 }
 
 

@@ -41,7 +41,7 @@ NetReceiver::NetReceiver(BNetEndpoint *listener, StreamingRingBuffer *target,
 NetReceiver::~NetReceiver()
 {
 	fStopThread = true;
-	delete fEndpoint;
+	fEndpoint.Unset();
 
 	suspend_thread(fReceiverThread);
 	resume_thread(fReceiverThread);
@@ -69,14 +69,8 @@ NetReceiver::_Listen()
 	}
 
 	while (!fStopThread) {
-		if (fEndpoint != NULL) {
-			TRACE("closing previous connection\n");
-			delete fEndpoint;
-			fEndpoint = NULL;
-		}
-
-		fEndpoint = fListener->Accept(5000);
-		if (fEndpoint == NULL) {
+		fEndpoint.SetTo(fListener->Accept(5000));
+		if (fEndpoint.Get() == NULL) {
 			TRACE("got NULL endpoint from accept\n");
 			continue;
 		}
@@ -84,7 +78,8 @@ NetReceiver::_Listen()
 		TRACE("new endpoint connection: %p\n", fEndpoint);
 
 		if (fNewConnectionCallback != NULL
-			&& fNewConnectionCallback(fNewConnectionCookie, *fEndpoint) != B_OK)
+			&& fNewConnectionCallback(
+				fNewConnectionCookie, *fEndpoint.Get()) != B_OK)
 		{
 			TRACE("connection callback rejected connection\n");
 			continue;

@@ -143,14 +143,13 @@ FontCacheEntry::FontCacheEntry()
 FontCacheEntry::~FontCacheEntry()
 {
 //printf("~FontCacheEntry()\n");
-	delete fGlyphCache;
 }
 
 
 bool
 FontCacheEntry::Init(const ServerFont& font, bool forceVector)
 {
-	if (fGlyphCache == NULL)
+	if (fGlyphCache.Get() == NULL)
 		return false;
 
 	glyph_rendering renderingType = _RenderTypeFor(font, forceVector);

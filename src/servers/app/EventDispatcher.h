@@ -9,6 +9,7 @@
 #define EVENT_DISPATCHER_H
 
 
+#include <AutoDeleter.h>
 #include <Locker.h>
 #include <Message.h>
 #include <MessageFilter.h>
@@ -137,8 +138,10 @@ class EventDispatcher : public BLocker {
 		EventTarget*	fFocus;
 		bool			fSuspendFocus;
 
-		EventFilter*	fMouseFilter;
-		EventFilter*	fKeyboardFilter;
+		ObjectDeleter <EventFilter>
+						fMouseFilter;
+		ObjectDeleter<EventFilter>
+						fKeyboardFilter;
 
 		BObjectList<EventTarget> fTargets;
 

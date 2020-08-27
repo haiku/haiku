@@ -356,8 +356,6 @@ DWindowHWInterface::~DWindowHWInterface()
 	delete[] fRectParams;
 	delete[] fBlitParams;
 
-	delete fFrontBuffer;
-
 	be_app->Lock();
 	be_app->Quit();
 	delete be_app;
@@ -655,7 +653,7 @@ DWindowHWInterface::SetMode(const display_mode& mode)
 
 	status_t ret = B_OK;
 	// prevent from doing the unnecessary
-	if (fFrontBuffer
+	if (fFrontBuffer.Get() != NULL
 		&& fDisplayMode.virtual_width == mode.virtual_width
 		&& fDisplayMode.virtual_height == mode.virtual_height
 		&& fDisplayMode.space == mode.space)
@@ -709,7 +707,7 @@ DWindowHWInterface::SetMode(const display_mode& mode)
 			return ret;
 
 		fWindow = new DWindow(frame.OffsetByCopy(fXOffset, fYOffset), this,
-			fFrontBuffer);
+			fFrontBuffer.Get());
 
 		// fire up the window thread but don't show it on screen yet
 		fWindow->Hide();
@@ -774,7 +772,7 @@ DWindowHWInterface::GetDeviceInfo(accelerant_device_info* info)
 status_t
 DWindowHWInterface::GetFrameBufferConfig(frame_buffer_config& config)
 {
-	if (fFrontBuffer == NULL)
+	if (fFrontBuffer.Get() == NULL)
 		return B_ERROR;
 
 	config.frame_buffer = fFrontBuffer->Bits();
@@ -1071,14 +1069,14 @@ DWindowHWInterface::Sync()
 RenderingBuffer*
 DWindowHWInterface::FrontBuffer() const
 {
-	return fFrontBuffer;
+	return fFrontBuffer.Get();
 }
 
 
 RenderingBuffer*
 DWindowHWInterface::BackBuffer() const
 {
-	return fFrontBuffer;
+	return fFrontBuffer.Get();
 }
 
 

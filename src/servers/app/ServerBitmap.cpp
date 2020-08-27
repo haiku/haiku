@@ -111,9 +111,6 @@ ServerBitmap::~ServerBitmap()
 			delete fMemory;
 	} else
 		delete[] fBuffer;
-
-	delete fOverlay;
-		// deleting the overlay will also free the overlay buffer
 }
 
 
@@ -181,14 +178,14 @@ ServerBitmap::AreaOffset() const
 void
 ServerBitmap::SetOverlay(::Overlay* overlay)
 {
-	fOverlay = overlay;
+	fOverlay.SetTo(overlay);
 }
 
 
 ::Overlay*
 ServerBitmap::Overlay() const
 {
-	return fOverlay;
+	return fOverlay.Get();
 }
 
 

@@ -394,7 +394,6 @@ PictureAlphaMask::PictureAlphaMask(AlphaMask* previousMask,
 
 PictureAlphaMask::~PictureAlphaMask()
 {
-	delete fDrawState;
 }
 
 
@@ -409,7 +408,7 @@ BRect
 PictureAlphaMask::DetermineBoundingBox() const
 {
 	BRect boundingBox;
-	PictureBoundingBoxPlayer::Play(fPicture, fDrawState, &boundingBox);
+	PictureBoundingBoxPlayer::Play(fPicture, fDrawState.Get(), &boundingBox);
 
 	if (!boundingBox.IsValid())
 		return boundingBox;
@@ -428,7 +427,7 @@ PictureAlphaMask::DetermineBoundingBox() const
 const DrawState&
 PictureAlphaMask::GetDrawState() const
 {
-	return *fDrawState;
+	return *fDrawState.Get();
 }
 
 

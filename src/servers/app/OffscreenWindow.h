@@ -11,6 +11,8 @@
 
 #include "Window.h"
 
+#include <AutoDeleter.h>
+
 
 class BitmapHWInterface;
 class ServerBitmap;
@@ -26,7 +28,8 @@ public:
 
 private:
 	ServerBitmap*			fBitmap;
-	BitmapHWInterface*		fHWInterface;
+	ObjectDeleter<BitmapHWInterface>
+							fHWInterface;
 };
 
 #endif	// OFFSCREEN_WINDOW_H

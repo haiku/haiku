@@ -12,6 +12,7 @@
 #define DRAWING_ENGINE_H_
 
 
+#include <AutoDeleter.h>
 #include <Accelerant.h>
 #include <Font.h>
 #include <Locker.h>
@@ -206,7 +207,8 @@ private:
 
 	inline	void			_CopyToFront(const BRect& frame);
 
-			Painter*		fPainter;
+			ObjectDeleter<Painter>
+							fPainter;
 			HWInterface*	fGraphicsCard;
 			uint32			fAvailableHWAccleration;
 			int32			fSuspendSyncLevel;

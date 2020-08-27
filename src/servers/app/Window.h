@@ -19,6 +19,7 @@
 #include "View.h"
 #include "WindowList.h"
 
+#include <AutoDeleter.h>
 #include <ObjectList.h>
 #include <Referenceable.h>
 #include <Region.h>
@@ -53,7 +54,8 @@ public:
 			bool				MoveToTopLayer(Window* window);
 			bool				Move(int32 from, int32 to);
 private:
-			::Decorator*		fDecorator;
+			ObjectDeleter< ::Decorator>
+								fDecorator;
 
 			StackWindows		fWindowList;
 			StackWindows		fWindowLayerOrder;
@@ -133,7 +135,7 @@ public:
 			void				ScrollViewBy(View* view, int32 dx, int32 dy);
 
 			void				SetTopView(View* topView);
-			View*				TopView() const { return fTopView; }
+			View*				TopView() const { return fTopView.Get(); }
 			View*				ViewAt(const BPoint& where);
 
 	virtual	bool				IsOffscreenWindow() const { return false; }
@@ -167,7 +169,7 @@ public:
 									{ return fUpdateRequested; }
 
 			DrawingEngine*		GetDrawingEngine() const
-									{ return fDrawingEngine; }
+									{ return fDrawingEngine.Get(); }
 
 			// managing a region pool
 			::RegionPool*		RegionPool()
@@ -362,10 +364,12 @@ protected:
 
 			BObjectList<Window> fSubsets;
 
-			WindowBehaviour*	fWindowBehaviour;
-			View*				fTopView;
+			ObjectDeleter<WindowBehaviour>
+								fWindowBehaviour;
+			ObjectDeleter<View>	fTopView;
 			::ServerWindow*		fWindow;
-			DrawingEngine*		fDrawingEngine;
+			ObjectDeleter<DrawingEngine>
+								fDrawingEngine;
 			::Desktop*			fDesktop;
 
 			// The synchronization, which client drawing commands

@@ -85,8 +85,6 @@ ScreenManager::~ScreenManager()
 	for (int32 i = 0; i < fScreenList.CountItems(); i++) {
 		screen_item* item = fScreenList.ItemAt(i);
 
-		delete item->screen;
-		delete item->listener;
 		delete item;
 	}
 }
@@ -100,7 +98,7 @@ ScreenManager::ScreenAt(int32 index) const
 
 	screen_item* item = fScreenList.ItemAt(index);
 	if (item != NULL)
-		return item->screen;
+		return item->screen.Get();
 
 	return NULL;
 }
@@ -128,7 +126,7 @@ ScreenManager::AcquireScreens(ScreenOwner* owner, int32* wishList,
 	for (int32 i = 0; i < fScreenList.CountItems(); i++) {
 		screen_item* item = fScreenList.ItemAt(i);
 
-		if (item->owner == NULL && list.AddItem(item->screen)) {
+		if (item->owner == NULL && list.AddItem(item->screen.Get())) {
 			item->owner = owner;
 			added++;
 		}
@@ -146,7 +144,7 @@ ScreenManager::AcquireScreens(ScreenOwner* owner, int32* wishList,
 #endif
 		if (interface != NULL) {
 			screen_item* item = _AddHWInterface(interface);
-			if (item != NULL && list.AddItem(item->screen)) {
+			if (item != NULL && list.AddItem(item->screen.Get())) {
 				item->owner = owner;
 				added++;
 			}
@@ -168,7 +166,7 @@ ScreenManager::ReleaseScreens(ScreenList& list)
 		for (int32 j = 0; j < list.CountItems(); j++) {
 			Screen* screen = list.ItemAt(j);
 
-			if (item->screen == screen)
+			if (item->screen.Get() == screen)
 				item->owner = NULL;
 		}
 	}
@@ -182,7 +180,7 @@ ScreenManager::ScreenChanged(Screen* screen)
 
 	for (int32 i = 0; i < fScreenList.CountItems(); i++) {
 		screen_item* item = fScreenList.ItemAt(i);
-		if (item->screen == screen)
+		if (item->screen.Get() == screen)
 			item->owner->ScreenChanged(screen);
 	}
 }
@@ -232,18 +230,18 @@ ScreenManager::_AddHWInterface(HWInterface* interface)
 		screen_item* item = new(nothrow) screen_item;
 
 		if (item != NULL) {
-			item->screen = screen;
+			item->screen.SetTo(screen);
 			item->owner = NULL;
-			item->listener = new(nothrow) ScreenChangeListener(*this, screen);
-			if (item->listener != NULL
-				&& interface->AddListener(item->listener)) {
+			item->listener.SetTo(
+				new(nothrow) ScreenChangeListener(*this, screen));
+			if (item->listener.Get() != NULL
+				&& interface->AddListener(item->listener.Get())) {
 				if (fScreenList.AddItem(item))
 					return item;
 
-				interface->RemoveListener(item->listener);
+				interface->RemoveListener(item->listener.Get());
 			}
 
-			delete item->listener;
 			delete item;
 		}
 	}

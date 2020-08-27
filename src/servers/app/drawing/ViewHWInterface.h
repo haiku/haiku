@@ -11,6 +11,7 @@
 
 #include "HWInterface.h"
 
+#include <AutoDeleter.h>
 
 class BBitmap;
 class BBitmapBuffer;
@@ -63,8 +64,10 @@ public:
 	virtual	status_t			CopyBackToFront(const BRect& frame);
 
 private:
-			BBitmapBuffer*		fBackBuffer;
-			BBitmapBuffer*		fFrontBuffer;
+			ObjectDeleter<BBitmapBuffer>
+								fBackBuffer;
+			ObjectDeleter<BBitmapBuffer>
+								fFrontBuffer;
 
 			CardWindow*			fWindow;
 

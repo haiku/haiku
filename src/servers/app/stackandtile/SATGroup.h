@@ -12,6 +12,7 @@
 
 #include <Rect.h>
 
+#include <AutoDeleter.h>
 #include "ObjectList.h"
 #include "Referenceable.h"
 
@@ -107,7 +108,7 @@ public:
 			float				Position() const;
 			void				SetPosition(float position);
 			orientation_t		Orientation() const;
-			Variable*			Var() {	return fVariable;	}
+			Variable*			Var() {	return fVariable.Get(); }
 
 			//! Caller takes ownership of the constraint.
 			Constraint*			Connect(Variable* variable);
@@ -126,7 +127,8 @@ public:
 
 private:
 			SATGroup*			fGroup;
-			Variable*			fVariable;
+			ObjectDeleter<Variable>
+								fVariable;
 			orientation_t		fOrientation;
 
 			CrossingList		fCrossingList;

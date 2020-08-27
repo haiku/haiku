@@ -90,8 +90,6 @@ Window::Window(const BRect& frame, const char *name,
 
 	fRegionPool(),
 
-	fWindowBehaviour(NULL),
-	fTopView(NULL),
 	fWindow(window),
 	fDrawingEngine(drawingEngine),
 	fDesktop(window->Desktop()),
@@ -140,7 +138,7 @@ Window::Window(const BRect& frame, const char *name,
 		}
 	}
 	if (fFeel != kOffscreenWindowFeel)
-		fWindowBehaviour = gDecorManager.AllocateWindowBehaviour(this);
+		fWindowBehaviour.SetTo(gDecorManager.AllocateWindowBehaviour(this));
 
 	// do we need to change our size to let the decorator fit?
 	// _ResizeBy() will adapt the frame for validity before resizing
@@ -169,15 +167,11 @@ Window::Window(const BRect& frame, const char *name,
 
 Window::~Window()
 {
-	if (fTopView) {
+	if (fTopView.Get() != NULL) {
 		fTopView->DetachedFromWindow();
-		delete fTopView;
 	}
 
 	DetachFromWindowStack(false);
-
-	delete fWindowBehaviour;
-	delete fDrawingEngine;
 
 	gDecorManager.CleanupForWindow(this);
 }
@@ -186,8 +180,8 @@ Window::~Window()
 status_t
 Window::InitCheck() const
 {
-	if (fDrawingEngine == NULL
-		|| (fFeel != kOffscreenWindowFeel && fWindowBehaviour == NULL))
+	if (GetDrawingEngine() == NULL
+		|| (fFeel != kOffscreenWindowFeel && fWindowBehaviour.Get() == NULL))
 		return B_NO_MEMORY;
 	// TODO: anything else?
 	return B_OK;
@@ -304,7 +298,7 @@ Window::MoveBy(int32 x, int32 y, bool moveStack)
 
 	fEffectiveDrawingRegionValid = false;
 
-	if (fTopView != NULL) {
+	if (fTopView.Get() != NULL) {
 		fTopView->MoveBy(x, y, NULL);
 		fTopView->UpdateOverlay();
 	}
@@ -371,7 +365,7 @@ Window::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion, bool resizeStack)
 	fContentRegionValid = false;
 	fEffectiveDrawingRegionValid = false;
 
-	if (fTopView != NULL) {
+	if (fTopView.Get() != NULL) {
 		fTopView->ResizeBy(x, y, dirtyRegion);
 		fTopView->UpdateOverlay();
 	}
@@ -405,7 +399,7 @@ Window::ScrollViewBy(View* view, int32 dx, int32 dy)
 	// this is executed in ServerWindow with the Readlock
 	// held
 
-	if (!view || view == fTopView || (dx == 0 && dy == 0))
+	if (!view || view == fTopView.Get() || (dx == 0 && dy == 0))
 		return;
 
 	BRegion* dirty = fRegionPool.GetRegion();
@@ -521,9 +515,13 @@ Window::CopyContents(BRegion* region, int32 xOffset, int32 yOffset)
 void
 Window::SetTopView(View* topView)
 {
-	fTopView = topView;
+	if (fTopView.Get() != NULL) {
+		fTopView->DetachedFromWindow();
+	}
 
-	if (fTopView) {
+	fTopView.SetTo(topView);
+
+	if (fTopView.Get() != NULL) {
 		// the top view is special, it has a coordinate system
 		// as if it was attached directly to the desktop, therefor,
 		// the coordinate conversion through the view tree works
@@ -621,8 +619,7 @@ Window::ReloadDecor()
 
 	stack->SetDecorator(decorator);
 
-	delete fWindowBehaviour;
-	fWindowBehaviour = windowBehaviour;
+	fWindowBehaviour.SetTo(windowBehaviour);
 
 	// set the correct focus and top layer tab
 	for (int32 i = 0; i < stack->CountWindows(); i++) {
@@ -1121,7 +1118,7 @@ Window::IsVisible() const
 bool
 Window::IsDragging() const
 {
-	if (!fWindowBehaviour)
+	if (fWindowBehaviour.Get() == NULL)
 		return false;
 	return fWindowBehaviour->IsDragging();
 }
@@ -1130,7 +1127,7 @@ Window::IsDragging() const
 bool
 Window::IsResizing() const
 {
-	if (!fWindowBehaviour)
+	if (fWindowBehaviour.Get() == NULL)
 		return false;
 	return fWindowBehaviour->IsResizing();
 }
@@ -1917,7 +1914,7 @@ Window::BeginUpdate(BPrivate::PortLink& link)
 	if (fDrawingEngine->LockParallelAccess()) {
 		fDrawingEngine->SuspendAutoSync();
 
-		fTopView->Draw(fDrawingEngine, dirty, &fContentRegion, true);
+		fTopView->Draw(GetDrawingEngine(), dirty, &fContentRegion, true);
 
 		fDrawingEngine->Sync();
 		fDrawingEngine->UnlockParallelAccess();
@@ -2108,7 +2105,7 @@ Window::DetachFromWindowStack(bool ownStackNeeded)
 	Window* remainingTop = fCurrentStack->TopLayerWindow();
 	if (remainingTop != NULL) {
 		if (decorator != NULL)
-			decorator->SetDrawingEngine(remainingTop->fDrawingEngine);
+			decorator->SetDrawingEngine(remainingTop->GetDrawingEngine());
 		// propagate focus to the decorator
 		remainingTop->SetFocus(remainingTop->IsFocus());
 		remainingTop->SetLook(remainingTop->Look(), NULL);
@@ -2220,7 +2217,7 @@ Window::MoveToTopStackLayer()
 	::Decorator* decorator = Decorator();
 	if (decorator == NULL)
 		return false;
-	decorator->SetDrawingEngine(fDrawingEngine);
+	decorator->SetDrawingEngine(GetDrawingEngine());
 	SetLook(Look(), NULL);
 	decorator->SetTopTab(PositionInStack());
 	return fCurrentStack->MoveToTopLayer(this);
@@ -2277,22 +2274,20 @@ WindowStack::WindowStack(::Decorator* decorator)
 
 WindowStack::~WindowStack()
 {
-	delete fDecorator;
 }
 
 
 void
 WindowStack::SetDecorator(::Decorator* decorator)
 {
-	delete fDecorator;
-	fDecorator = decorator;
+	fDecorator.SetTo(decorator);
 }
 
 
 ::Decorator*
 WindowStack::Decorator()
 {
-	return fDecorator;
+	return fDecorator.Get();
 }
 
 

@@ -66,8 +66,8 @@ RemoteHWInterface::RemoteHWInterface(const char* target)
 		return;
 	}
 
-	fListenEndpoint = new(std::nothrow) BNetEndpoint();
-	if (fListenEndpoint == NULL) {
+	fListenEndpoint.SetTo(new(std::nothrow) BNetEndpoint());
+	if (fListenEndpoint.Get() == NULL) {
 		fInitStatus = B_NO_MEMORY;
 		return;
 	}
@@ -76,8 +76,8 @@ RemoteHWInterface::RemoteHWInterface(const char* target)
 	if (fInitStatus != B_OK)
 		return;
 
-	fSendBuffer = new(std::nothrow) StreamingRingBuffer(16 * 1024);
-	if (fSendBuffer == NULL) {
+	fSendBuffer.SetTo(new(std::nothrow) StreamingRingBuffer(16 * 1024));
+	if (fSendBuffer.Get() == NULL) {
 		fInitStatus = B_NO_MEMORY;
 		return;
 	}
@@ -86,8 +86,8 @@ RemoteHWInterface::RemoteHWInterface(const char* target)
 	if (fInitStatus != B_OK)
 		return;
 
-	fReceiveBuffer = new(std::nothrow) StreamingRingBuffer(16 * 1024);
-	if (fReceiveBuffer == NULL) {
+	fReceiveBuffer.SetTo(new(std::nothrow) StreamingRingBuffer(16 * 1024));
+	if (fReceiveBuffer.Get() == NULL) {
 		fInitStatus = B_NO_MEMORY;
 		return;
 	}
@@ -96,15 +96,15 @@ RemoteHWInterface::RemoteHWInterface(const char* target)
 	if (fInitStatus != B_OK)
 		return;
 
-	fReceiver = new(std::nothrow) NetReceiver(fListenEndpoint, fReceiveBuffer,
-		_NewConnectionCallback, this);
-	if (fReceiver == NULL) {
+	fReceiver.SetTo(new(std::nothrow) NetReceiver(fListenEndpoint.Get(), fReceiveBuffer.Get(),
+		_NewConnectionCallback, this));
+	if (fReceiver.Get() == NULL) {
 		fInitStatus = B_NO_MEMORY;
 		return;
 	}
 
-	fEventStream = new(std::nothrow) RemoteEventStream();
-	if (fEventStream == NULL) {
+	fEventStream.SetTo(new(std::nothrow) RemoteEventStream());
+	if (fEventStream.Get() == NULL) {
 		fInitStatus = B_NO_MEMORY;
 		return;
 	}
@@ -122,15 +122,16 @@ RemoteHWInterface::RemoteHWInterface(const char* target)
 
 RemoteHWInterface::~RemoteHWInterface()
 {
-	delete fReceiver;
-	delete fReceiveBuffer;
+	//TODO: check order
+	fReceiver.Unset();
+	fReceiveBuffer.Unset();
 
-	delete fSendBuffer;
-	delete fSender;
+	fSendBuffer.Unset();
+	fSender.Unset();
 
-	delete fListenEndpoint;
+	fListenEndpoint.Unset();
 
-	delete fEventStream;
+	fEventStream.Unset();
 }
 
 
@@ -159,7 +160,7 @@ RemoteHWInterface::CreateDrawingEngine()
 EventStream*
 RemoteHWInterface::CreateEventStream()
 {
-	return fEventStream;
+	return fEventStream.Get();
 }
 
 
@@ -230,7 +231,7 @@ RemoteHWInterface::_EventThreadEntry(void* data)
 status_t
 RemoteHWInterface::_EventThread()
 {
-	RemoteMessage message(fReceiveBuffer, NULL);
+	RemoteMessage message(fReceiveBuffer.Get(), NULL);
 	while (true) {
 		uint16 code;
 		status_t result = message.NextMessage(code);
@@ -252,7 +253,7 @@ RemoteHWInterface::_EventThread()
 		switch (code) {
 			case RP_INIT_CONNECTION:
 			{
-				RemoteMessage reply(NULL, fSendBuffer);
+				RemoteMessage reply(NULL, fSendBuffer.Get());
 				reply.Start(RP_INIT_CONNECTION);
 				status_t result = reply.Flush();
 				(void)result;
@@ -280,7 +281,7 @@ RemoteHWInterface::_EventThread()
 
 			case RP_GET_SYSTEM_PALETTE:
 			{
-				RemoteMessage reply(NULL, fSendBuffer);
+				RemoteMessage reply(NULL, fSendBuffer.Get());
 				reply.Start(RP_GET_SYSTEM_PALETTE_RESULT);
 
 				const color_map *map = SystemColorMap();
@@ -325,10 +326,7 @@ RemoteHWInterface::_NewConnectionCallback(void *cookie, BNetEndpoint &endpoint)
 status_t
 RemoteHWInterface::_NewConnection(BNetEndpoint &endpoint)
 {
-	if (fSender != NULL) {
-		delete fSender;
-		fSender = NULL;
-	}
+	fSender.Unset();
 
 	fSendBuffer->MakeEmpty();
 
@@ -336,8 +334,8 @@ RemoteHWInterface::_NewConnection(BNetEndpoint &endpoint)
 	if (sendEndpoint == NULL)
 		return B_NO_MEMORY;
 
-	fSender = new(std::nothrow) NetSender(sendEndpoint, fSendBuffer);
-	if (fSender == NULL) {
+	fSender.SetTo(new(std::nothrow) NetSender(sendEndpoint, fSendBuffer.Get()));
+	if (fSender.Get() == NULL) {
 		delete sendEndpoint;
 		return B_NO_MEMORY;
 	}
@@ -350,13 +348,13 @@ void
 RemoteHWInterface::_Disconnect()
 {
 	if (fIsConnected) {
-		RemoteMessage message(NULL, fSendBuffer);
+		RemoteMessage message(NULL, fSendBuffer.Get());
 		message.Start(RP_CLOSE_CONNECTION);
 		message.Flush();
 		fIsConnected = false;
 	}
 
-	if (fListenEndpoint != NULL)
+	if (fListenEndpoint.Get() != NULL)
 		fListenEndpoint->Close();
 }
 
@@ -517,7 +515,7 @@ void
 RemoteHWInterface::SetCursor(ServerCursor* cursor)
 {
 	HWInterface::SetCursor(cursor);
-	RemoteMessage message(NULL, fSendBuffer);
+	RemoteMessage message(NULL, fSendBuffer.Get());
 	message.Start(RP_SET_CURSOR);
 	message.AddCursor(CursorAndDragBitmap().Get());
 }
@@ -527,7 +525,7 @@ void
 RemoteHWInterface::SetCursorVisible(bool visible)
 {
 	HWInterface::SetCursorVisible(visible);
-	RemoteMessage message(NULL, fSendBuffer);
+	RemoteMessage message(NULL, fSendBuffer.Get());
 	message.Start(RP_SET_CURSOR_VISIBLE);
 	message.Add(visible);
 }
@@ -537,7 +535,7 @@ void
 RemoteHWInterface::MoveCursorTo(float x, float y)
 {
 	HWInterface::MoveCursorTo(x, y);
-	RemoteMessage message(NULL, fSendBuffer);
+	RemoteMessage message(NULL, fSendBuffer.Get());
 	message.Start(RP_MOVE_CURSOR_TO);
 	message.Add(x);
 	message.Add(y);
@@ -549,7 +547,7 @@ RemoteHWInterface::SetDragBitmap(const ServerBitmap* bitmap,
 	const BPoint& offsetFromCursor)
 {
 	HWInterface::SetDragBitmap(bitmap, offsetFromCursor);
-	RemoteMessage message(NULL, fSendBuffer);
+	RemoteMessage message(NULL, fSendBuffer.Get());
 	message.Start(RP_SET_CURSOR);
 	message.AddCursor(CursorAndDragBitmap().Get());
 }
@@ -579,7 +577,7 @@ RemoteHWInterface::IsDoubleBuffered() const
 status_t
 RemoteHWInterface::InvalidateRegion(BRegion& region)
 {
-	RemoteMessage message(NULL, fSendBuffer);
+	RemoteMessage message(NULL, fSendBuffer.Get());
 	message.Start(RP_INVALIDATE_REGION);
 	message.AddRegion(region);
 	return B_OK;
@@ -589,7 +587,7 @@ RemoteHWInterface::InvalidateRegion(BRegion& region)
 status_t
 RemoteHWInterface::Invalidate(const BRect& frame)
 {
-	RemoteMessage message(NULL, fSendBuffer);
+	RemoteMessage message(NULL, fSendBuffer.Get());
 	message.Start(RP_INVALIDATE_RECT);
 	message.Add(frame);
 	return B_OK;

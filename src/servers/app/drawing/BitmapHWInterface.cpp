@@ -33,8 +33,6 @@ BitmapHWInterface::BitmapHWInterface(ServerBitmap* bitmap)
 
 BitmapHWInterface::~BitmapHWInterface()
 {
-	delete fBackBuffer;
-	delete fFrontBuffer;
 }
 
 
@@ -56,12 +54,11 @@ BitmapHWInterface::Initialize()
 		&& fFrontBuffer->ColorSpace() != B_RGBA32) {
 		BBitmap* backBitmap = new BBitmap(fFrontBuffer->Bounds(),
 			B_BITMAP_NO_SERVER_LINK, B_RGBA32);
-		fBackBuffer = new BBitmapBuffer(backBitmap);
+		fBackBuffer.SetTo(new BBitmapBuffer(backBitmap));
 
 		ret = fBackBuffer->InitCheck();
 		if (ret < B_OK) {
-			delete fBackBuffer;
-			fBackBuffer = NULL;
+			fBackBuffer.Unset();
 		} else {
 			// import the current contents of the bitmap
 			// into the back bitmap
@@ -193,14 +190,14 @@ BitmapHWInterface::GetBrightness(float*)
 RenderingBuffer*
 BitmapHWInterface::FrontBuffer() const
 {
-	return fFrontBuffer;
+	return fFrontBuffer.Get();
 }
 
 
 RenderingBuffer*
 BitmapHWInterface::BackBuffer() const
 {
-	return fBackBuffer;
+	return fBackBuffer.Get();
 }
 
 
@@ -208,8 +205,8 @@ bool
 BitmapHWInterface::IsDoubleBuffered() const
 {
 	// overwrite double buffered preference
-	if (fFrontBuffer)
-		return fBackBuffer != NULL;
+	if (fFrontBuffer.Get() != NULL)
+		return fBackBuffer.Get() != NULL;
 
 	return HWInterface::IsDoubleBuffered();
 }
