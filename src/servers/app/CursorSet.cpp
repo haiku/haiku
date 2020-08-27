@@ -132,12 +132,11 @@ CursorSet::AddCursor(BCursorID which, uint8 *data)
 	if (data == NULL)
 		return B_BAD_VALUE;
 
-	BBitmap *bitmap = _CursorDataToBitmap(data);
+	ObjectDeleter<BBitmap> bitmap(_CursorDataToBitmap(data));
 	BPoint hotspot(data[2], data[3]);
 
-	status_t result = AddCursor(which, bitmap, hotspot);
+	status_t result = AddCursor(which, bitmap.Get(), hotspot);
 
-	delete bitmap;
 	return result;
 }
 
