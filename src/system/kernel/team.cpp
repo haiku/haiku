@@ -470,7 +470,6 @@ Team::Team(team_id id, bool kernel)
 
 	// dead threads
 	list_init(&dead_threads);
-	dead_threads_count = 0;
 
 	// dead children
 	dead_children.count = 0;

@@ -96,8 +96,6 @@ struct team_watcher {
 
 #define MAX_DEAD_CHILDREN	32
 	// this is a soft limit for the number of child death entries in a team
-#define MAX_DEAD_THREADS	32
-	// this is a soft limit for the number of thread death entries in a team
 
 
 struct job_control_entry : DoublyLinkedListLinkImpl<job_control_entry> {
@@ -238,7 +236,6 @@ struct Team : TeamThreadIteratorEntry<team_id>, KernelReferenceable,
 	struct xsi_sem_context *xsi_sem_context;
 	struct team_death_entry *death_entry;	// protected by fLock
 	struct list		dead_threads;
-	int				dead_threads_count;
 
 	// protected by the team's fLock
 	team_dead_children dead_children;

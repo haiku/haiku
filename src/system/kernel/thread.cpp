@@ -2139,17 +2139,8 @@ thread_exit(void)
 				threadDeathEntry->thread = thread->id;
 				threadDeathEntry->status = thread->exit.status;
 
-				// add entry -- remove an old one, if we hit the limit
+				// add entry to dead thread list
 				list_add_item(&team->dead_threads, threadDeathEntry);
-				team->dead_threads_count++;
-				threadDeathEntry = NULL;
-
-				if (team->dead_threads_count > MAX_DEAD_THREADS) {
-					threadDeathEntry
-						= (thread_death_entry*)list_remove_head_item(
-							&team->dead_threads);
-					team->dead_threads_count--;
-				}
 			}
 
 			threadCreationLocker.Unlock();
@@ -2163,8 +2154,6 @@ thread_exit(void)
 		TRACE(("thread_exit: thread %" B_PRId32 " now a kernel thread!\n",
 			thread->id));
 	}
-
-	free(threadDeathEntry);
 
 	// delete the team if we're its main thread
 	if (deleteTeam) {
@@ -2505,7 +2494,6 @@ wait_for_thread_etc(thread_id id, uint32 flags, bigtime_t timeout,
 					&team->dead_threads, threadDeathEntry)) != NULL) {
 				if (threadDeathEntry->thread == id) {
 					list_remove_item(&team->dead_threads, threadDeathEntry);
-					team->dead_threads_count--;
 					death.status = threadDeathEntry->status;
 					free(threadDeathEntry);
 					break;
