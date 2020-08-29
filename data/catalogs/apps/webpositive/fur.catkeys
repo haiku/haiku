@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-WebPositive	55235296
+1	friulian	x-vnd.Haiku-WebPositive	1591513524
 Authentication required	Authentication Panel		Autenticazion necessarie
 Previous	WebPositive Window		Precedent
 (Finish: %date)	Download Window		(Terminât: %date)
@@ -129,6 +129,7 @@ Double-click or middle-click to open new tab.	Tab Manager		Dopli clic o clic cen
 Next	WebPositive Window		Prossim
 Bookmark error	WebPositive Window		Erôr di segnelibri
 OK	WebPositive Window		Va ben
+(%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% di %expectedSize%, %rate%/s)
 WebPositive	Download Window		WebPositive
 Zoom text only	WebPositive Window		Ingrandìs dome il test
 Save page as…	WebPositive Window		Salve pagjine come…

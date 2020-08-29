@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-Locale	288870027
+1	friulian	x-vnd.Haiku-Locale	1081217032
 Medium format:	TimeFormatSettings		Formât medi:
 Negative:	TimeFormatSettings		Negatîf:
 Language	Locale Preflet Window		Lenghe
@@ -22,6 +22,7 @@ Preferred languages	Locale Preflet Window		Lenghis preferidis
 Full format:	TimeFormatSettings		Formât complet:
 Cancel	Locale Preflet Window		Anule
 Revert	Locale Preflet Window		Torne indaûr
+Translate application and folder names	TimeFormatSettings		Volte i nons di cartelis e aplicazions
 12 hour	TimeFormatSettings		12 oris
 Positive:	TimeFormatSettings		Positîf:
 Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Si scugne tornâ a inviâ il Deskbar e il Tracker par vê aplicadis lis modifichis. Ju Tornio a inviâ cumò?

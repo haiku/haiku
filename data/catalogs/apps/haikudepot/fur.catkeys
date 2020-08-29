@@ -1,5 +1,6 @@
-1	friulian	x-vnd.Haiku-HaikuDepot	3833361367
+1	friulian	x-vnd.Haiku-HaikuDepot	1546691996
 Repository update error	LocalRepositoryUpdateProcess		Erôr di inzornament dal dipuesit
+Network error	ServerHelper		Erôr di rêt
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Si è verificât un erôr intal inzornâ il dipuesit: %error%
 User Created	UserLoginWindow		Utent creât
 Check for updates…	MainWindow		Controle inzornaments…
@@ -19,6 +20,7 @@ You have successfully authenticated as user %Nickname%.	UserLoginWindow		Tu ti s
 No user ratings available.	PackageInfoView		Nissune valutazion dai utents disponibile.
 Downloading package '%name%'	WorkStatusView		Daûr a discjariâ il pachet '%name%'
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Nol è stât pussibil tirâ fûr lis informazions captcha necessaris dai dâts restituîts dal servidôr.
+A network transport error has arisen communicating with the server system: %s	ServerHelper		Al è vignût fûr un erôr di traspuart de rêt tal comunicâ cul servidôr: %s
 Rating	PackageListView		Valutazion
 Synchronizing icons	ServerIconExportUpdateProcess		Sincronizazion iconis
 Does not start	RatePackageWindow		No si invie
@@ -75,6 +77,7 @@ Reboot required	PackageManager		Tornâ a inviâ necessari
 Very unstable	RatePackageWindow		Une vore instabil
 Password:	UserLoginWindow		Peraule d'ordin:
 All packages	PackageListView		Ducj i pachets
+This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Cheste aplicazion e je masse vecje par comunicâ cul servidôr. Oten une version plui resinte inzornant il sisteme. La version minime domandade e je la \"%s\".
 Stability	RatePackageWindow		Stabilitât
 Send	RatePackageWindow		Invie
 Start package daemon	App		Invie demoni dai pachets
@@ -98,6 +101,7 @@ Repository	PackageListView		Dipuesit
 The email is malformed.	UserLoginWindow		La direzion e-mail e je malformade.
 Close	UserLoginWindow		Siere
 Close	RatePackageWindow		Siere
+An unexpected error has been sent from the server [%i]	ServerHelper		Al è stât inviât dal servidôr [%i] un erôr inspietât
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Sincronizazion dâts pachet pal dipuesit '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Viôt lis condizions di ûs
 Login issue	MainWindow		Probleme di acès
@@ -122,6 +126,7 @@ Log out	MainWindow		Termine session
 Comment language:	RatePackageWindow		Lenghe dal coment:
 Status	PackageListView		Stât
 The password has been incorrectly repeated.	UserLoginWindow		La peraule d'ordin e je stade ripetude sbaliade.
+Network transport error	ServerHelper		Erôr di traspuart de rêt
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		La peraule d'ordin furnide in precedence pal utent [%Nickname%] no je pal moment valide. L'utent al vignarà disconetût di cheste aplicazion e tu varâs di jentrâ di gnûf cu la peraule d'ordin inzornade.
 Update	RatePackageWindow		Inzorne
 OK	ServerHelper		Va ben
@@ -137,6 +142,7 @@ The nickname is required.	UserLoginWindow		Il sorenon al è necessari.
 Source packages	MainWindow		Pachets sorzint
 -	no package size		-
 Problem with working files	App		Probleme cui file di lavôr de aplicazion
+Server error	ServerHelper		Erôr dal servidôr
 Try again	App		Torne prove
 Rate package	RatePackageWindow		Valute pachet
 Unknown	PackageListView		No cognossût

@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-MediaPlayer	1313616492
+1	friulian	x-vnd.Haiku-MediaPlayer	1961774506
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Sposte element te Scovacere
 Close	MediaPlayer-PlaylistWindow		Siere
 Volume of background clips	MediaPlayer-SettingsWindow		Volum des riproduzions di sotfont
@@ -35,6 +35,7 @@ Full volume	MediaPlayer-SettingsWindow		Volum massim
 Start media server	MediaPlayer-Main		Invie servidôr multimediâl
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Al semee che il servidôr multimediâl nol sedi in esecuzion.\nInviâlu?
 Location	MediaPlayer-InfoWin		Lûc
+Opening '%s'.	MediaPlayer-Main		Daûr a vierzi '%s'.
 Medium	MediaPlayer-SettingsWindow		Medi
 Play mode	MediaPlayer-SettingsWindow		Modalitât di riproduzion
 Playlist	MediaPlayer-PlaylistWindow		Liste di riproduzion

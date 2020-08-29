@@ -5,7 +5,7 @@ There was an error refreshing the repository cache for %name%	TaskLooper	Error m
 There was an error disabling the repository %name%	TaskLooper	Error message, do not translate %name%	Сталася помилка відімкнення репозитарія %name%
 Unknown	Constants	Unknown repository name	Невідомо
 Remove all	RepositoriesView	Button label	Вилучити всі
-Enable repositories to use with package management:	RepositoriesView	Label text	Доступні репозиторії для роботи з менеджером пакетів:
+Enable repositories to use with package management:	RepositoriesView	Label text	Доступні репозитарії для роботи з менеджером пакетів:
 Disable	RepositoriesView	Button label	Відімкнути
 Cancel task	TaskTimer	Button label	Скасувати завдання
 Changes completed	RepositoriesView	Status view text	Зміни проведені
@@ -18,9 +18,9 @@ The task for repository %name% is taking a long time to complete.	TaskTimer	Aler
 Completed	TaskLooper	Completed task status message	Завершено
 OK	Constants	Button label	ОК
 Status	RepositoriesView	Column title	Статус
-Name	RepositoriesView	Column title	Ім'я
+Name	RepositoriesView	Column title	Назва
 Add	AddRepoWindow	Button label	Додати
-Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	Не вдалося отримати імена під'єднаних в даний час репозиторіїв.
+Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	Не вдалося отримати імена під'єднаних в даний час репозитаріїв.
 Enable all	RepositoriesView	Button label	Під'єднати всі
 Aborted	TaskLooper	Aborted task status message	Перервано
 URL	RepositoriesView	Column title	URL адреса
@@ -34,7 +34,7 @@ This repository URL already exists.	RepositoriesView	Error message	URL адре�
 Repositories	System name		Repositories
 Changes pending:	RepositoriesView	Status view text	Очікування змін:
 Remove	RepositoriesView	Button label	Вилучити
-Remove these repositories?	RepositoriesView	Removal alert confirmation message	Вилучити ці репозиторії?
+Remove these repositories?	RepositoriesView	Removal alert confirmation message	Вилучити ці репозитарії?
 Keep trying	TaskTimer	Button label	Спробувати ще
 Cancel	Constants	Button label	Скасувати
 Only one URL for each repository can be enabled. Please change your selections.	RepositoriesView	Error message	Може бути включений тільки один URL для репозитарія. Будь-ласка змініть вибір.

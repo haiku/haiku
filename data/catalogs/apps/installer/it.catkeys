@@ -77,7 +77,7 @@ Running Boot Manager and DriveSetup…\n\nClose both applications to continue wi
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Sei sicuro di voler installare sul disco d'avvio corrente? Se procedi il programma di installazione riavvierà la tua macchina.
 Onto:	InstallerWindow		Su:
 Quit Boot Manager and DriveSetup	InstallerWindow		Esci dal Boot Manager e da Gestione Disco
-3)   When you successfully boot into Haiku for the first time, make sure to read our \"Userguide\" and take the \"Quick Tour\". There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Al tuo primo avvio di Hasiku, non dimenticarti di leggere la nostra \"Guida Utente\" e la \"Guida Rapida\". Troverai i collegamenti sulla Scrivania e tra i segnalibri di WebPositive.\n\n
+3)   When you successfully boot into Haiku for the first time, make sure to read our \"Userguide\" and take the \"Quick Tour\". There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Al tuo primo avvio di Haiku, non dimenticarti di leggere la nostra \"Guida Utente\" e la \"Guida Rapida\". Troverai i collegamenti sulla Scrivania e tra i segnalibri di WebPositive.\n\n
 Tools	InstallerWindow		Strumenti
 scanning…	InstallerWindow		scansione…
 Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be formatted with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Avvia Gestione Disco per partizionare\ndischi rigidi e altri media.\nLe partizioni possono essere formattate nel formato\nBe File System, necessario affinché Haiku\npossa avviarsi.

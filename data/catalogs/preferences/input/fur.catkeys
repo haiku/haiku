@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-Input	1910113385
+1	friulian	x-vnd.Haiku-Input	1950274171
 Defaults	InputMouse		Predefinîts
 Scrolling	TouchpadPrefView		Scoriment
 Long	KeyboardView		Lunc
@@ -15,6 +15,7 @@ Please confirm	TouchpadPrefView		Par plasê conferme
 Mouse speed	SettingsView		Velocitât dal mouse
 Horizontal scrolling	TouchpadPrefView		Scoriment orizontâl
 Input	System name		Input
+Quick	TouchpadPrefView		Veloç
 Short	KeyboardView		Curt
 Revert	InputMouse		Torne indaûr
 Slow	KeyboardView		Lente
@@ -26,15 +27,19 @@ Focus follows mouse	SettingsView		Focalizazion daûr dal mouse
 Focus mode:	SettingsView		Mût par meti a fûc:
 Revert	TouchpadPrefView		Torne indaûr
 4-Button	SettingsView		4-Botons
+Tapping sensitivity	TouchpadPrefView		Sensibilitât dal batuçâ
 Instant warp	SettingsView		Deformazion istantanie
 Revert	InputKeyboard		Torne indaûr
 Mouse type:	SettingsView		Gjenar di mouse:
 Off	TouchpadPrefView		Distudât
+Never	TouchpadPrefView		Mai
 Fast	TouchpadPrefView		Svelte
+6-Button	SettingsView		6 Botons
 Click to focus	SettingsView		Clic par meti a fûc
 Acceleration	TouchpadPrefView		Acelerazion
 Accept first click	SettingsView		Acete il prin clic
 OK	TouchpadPrefView		VA BEN
+Keyboard Lock Delay	TouchpadPrefView		Ritart bloc tastiere
 Delay until key repeat	KeyboardView		Ritart pe ripetizion dal tast
 Two finger scrolling	TouchpadPrefView		Scoriment cun doi dêts
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		La gnove aree di scorimetn e je une vore largje e e podarès impedî il normâl funzionament dal mouse. Cambiâle pardabon?

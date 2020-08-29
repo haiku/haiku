@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-PowerStatus	3173765686
+1	friulian	x-vnd.Haiku-PowerStatus	1085070685
 Run in window	PowerStatus		Eseguìs tal barcon
 Extended battery info	PowerStatus		Infomazions batarie estesis
 Show status icon	PowerStatus		Mostre icone di stât
@@ -30,11 +30,13 @@ Serial number: 	PowerStatus		Numar seriâl:
 Battery critical	PowerStatus		Nivel critic de batarie
 Capacity: 	PowerStatus		Capacitât: 
  mW	PowerStatus		 mW
+No supported battery detected. PowerStatus cannot be used on your system.	PowerStatus		No je stade rilevade nissune batarie supuartade. Stât de Batarie nol pues jessi doprât sul to computer.
 Show percent	PowerStatus		Mostre percentuâl
 Capacity granularity 1: 	PowerStatus		Granularitât de capacitât 1: 
 The battery level is getting low, please plug in the device.	PowerStatus		Il nivel de batarie al sta lant jù, par plasê tache il dispositîf ae prese.
 Design capacity warning: 	PowerStatus		Avîs capacitât di fabriche: 
 Capacity granularity 2: 	PowerStatus		Granularitât de capacitât 2: 
+Too bad!	PowerStatus		Pecjât!
 Technology: 	PowerStatus		Tecnologjie: 
  mWh	PowerStatus		 mWh
 PowerStatus	System name		Stât de Batarie

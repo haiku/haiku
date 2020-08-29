@@ -447,7 +447,7 @@ Select all	VirtualDirectoryWindow		Seleziona tutto
 Rename	FSUtils	button label	Rinomina
 Clean up all	ContainerWindow		Ordina tutte le icone
 Add current folder	FilePanelPriv		Aggiungi cartella corrente
-Description:	InfoWindow		Descizione:
+Description:	InfoWindow		Descrizione:
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Sei sicuro di voler eliminare gli elementi selezionati? Questa operazione non può essere annullata.
 Grayscale picture	AttributesView		Immagine in scala di grigio
 Mount	DeskWindow		Monta

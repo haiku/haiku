@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-ActivityMonitor	3672498538
+1	friulian	x-vnd.Haiku-ActivityMonitor	2601047281
 Teams	DataSource		Team
 Semaphores	DataSource		Semafars
 TX	DataSource	Shorter version for Sending	TX
@@ -17,6 +17,7 @@ Remove graph	ActivityView		Gjave grafic
 Swap space	DataSource		Spazi memorie di scambi
 CPU	DataSource		CPU
 ActivityMonitor	System name		VisôrAtivitâts
+CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		Interval di inzornament:
 RX	DataSource	Shorter version for Receiving.	RX
 Settings…	ActivityWindow		Impostazions…
@@ -30,6 +31,7 @@ Used memory	DataSource		Memorie doprade
 %.1f faults/s	DataSource		%.1f erôrs/s
 Show legend	ActivityView		Mostre liende
 Cached memory	DataSource		Memorie cache
+CPU %d usage	DataSource		CPU %d doprade
 File	ActivityWindow		File
 Ports	DataSource		Puartis
 Page faults	DataSource		Erôrs di pagjine
