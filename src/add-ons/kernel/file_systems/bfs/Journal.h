@@ -36,6 +36,8 @@ public:
 			bool			CurrentTransactionTooLarge() const;
 
 			status_t		FlushLogAndBlocks();
+			status_t		FlushLogAndLockJournal();
+
 			Volume*			GetVolume() const { return fVolume; }
 			int32			TransactionID() const { return fTransactionID; }
 
@@ -52,7 +54,7 @@ private:
 								{ return fHasSubtransaction; }
 
 			status_t		_FlushLog(bool canWait, bool flushBlocks,
-								bool movingLog = false);
+								bool alreadyLocked = false);
 			uint32			_TransactionSize() const;
 			status_t		_WriteTransactionToLog();
 			status_t		_CheckRunArray(const run_array* array);

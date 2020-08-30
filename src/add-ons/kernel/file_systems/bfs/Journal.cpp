@@ -924,18 +924,18 @@ Journal::_WriteTransactionToLog()
 
 
 /*!	Flushes the current log entry to disk. If \a flushBlocks is \c true it will
-	also write back all dirty blocks for this volume. If \a movingLog is \c
+	also write back all dirty blocks for this volume. If \a alreadyLocked is \c
 	true, we allow the lock to be held when the function is called.
 */
 status_t
-Journal::_FlushLog(bool canWait, bool flushBlocks, bool movingLog)
+Journal::_FlushLog(bool canWait, bool flushBlocks, bool alreadyLocked)
 {
 	status_t status = canWait ? recursive_lock_lock(&fLock)
 		: recursive_lock_trylock(&fLock);
 	if (status != B_OK)
 		return status;
 
-	int32 allowedLocks = movingLog ? 2 : 1;
+	int32 allowedLocks = alreadyLocked ? 2 : 1;
 	if (recursive_lock_get_recursion(&fLock) > allowedLocks) {
 		// whoa, FlushLogAndBlocks() was called from inside a transaction
 		recursive_lock_unlock(&fLock);
@@ -965,6 +965,26 @@ status_t
 Journal::FlushLogAndBlocks()
 {
 	return _FlushLog(true, true);
+}
+
+
+/*!	Locks the journal, in addition to flushing the log and blocks. A return
+	value of \c B_OK indicates that the operation was successful, and that
+	the journal is locked.
+*/
+status_t
+Journal::FlushLogAndLockJournal()
+{
+	status_t status = Lock(NULL, true);
+	if (status != B_OK)
+		return status;
+
+	status = _FlushLog(true, true, true);
+
+	if (status != B_OK)
+		recursive_lock_unlock(&fLock);
+
+	return status;
 }
 
 
@@ -1147,19 +1167,19 @@ Journal::MoveLog(block_run newLog)
 			return status;
 	}
 
-	RecursiveLocker locker(fLock);
+	MutexLocker volumeLock(fVolume->Lock());
 
-	status = _FlushLog(true, true, true);
+	status = FlushLogAndLockJournal();
 	if (status != B_OK)
 		return status;
-
-	MutexLocker volumeLock(fVolume->Lock());
 
 	// update references to the log location and size
 	fVolume->SuperBlock().log_blocks = newLog;
 	status = fVolume->WriteSuperBlock();
 	if (status != B_OK) {
 		fVolume->SuperBlock().log_blocks = oldLog;
+
+		Unlock(NULL, true);
 
 		// if we had to allocate some blocks, try to free them
 		if (!allocatedRun.IsZero()) {
@@ -1179,8 +1199,8 @@ Journal::MoveLog(block_run newLog)
 	fLogSize = newLog.Length();
 	fMaxTransactionSize = fLogSize / 2 - 5;
 
+	Unlock(NULL, true);
 	volumeLock.Unlock();
-	locker.Unlock();
 
 	// at this point, the log is moved and functional in its new location
 
