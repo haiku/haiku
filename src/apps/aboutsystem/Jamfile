@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src apps aboutsystem ;
 
-UsePrivateHeaders app libroot shared ;
+UsePrivateHeaders app interface libroot shared ;
 
 Application AboutSystem :
 	AboutSystem.cpp
