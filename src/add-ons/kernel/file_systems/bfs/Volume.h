@@ -143,6 +143,7 @@ public:
 			Journal*		GetJournal(off_t refBlock) const;
 
 			void*			BlockCache() { return fBlockCache; }
+			status_t		ResizeBlockCache(off_t numBlocks);
 
 	static	status_t		CheckSuperBlock(const uint8* data,
 								uint32* _offset = NULL);
