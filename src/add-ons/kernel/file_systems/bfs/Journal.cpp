@@ -465,7 +465,7 @@ Journal::_CheckRunArray(const run_array* array)
 			return B_ERROR;
 	}
 
-	PRINT(("Log entry has %ld entries\n", array->CountRuns()));
+	PRINT(("Log entry has %" B_PRId32 " entries\n", array->CountRuns()));
 	return B_OK;
 }
 
@@ -477,7 +477,7 @@ Journal::_CheckRunArray(const run_array* array)
 status_t
 Journal::_ReplayRunArray(int32* _start)
 {
-	PRINT(("ReplayRunArray(start = %ld)\n", *_start));
+	PRINT(("ReplayRunArray(start = %" B_PRId32 ")\n", *_start));
 
 	off_t logOffset = fVolume->ToBlock(fVolume->Log());
 	off_t firstBlockNumber = *_start % fLogSize;
@@ -645,8 +645,8 @@ Journal::_TransactionWritten(int32 transactionID, int32 event, void* _logEntry)
 {
 	LogEntry* logEntry = (LogEntry*)_logEntry;
 
-	PRINT(("Log entry %p has been finished, transaction ID = %ld\n", logEntry,
-		transactionID));
+	PRINT(("Log entry %p has been finished, transaction ID = %" B_PRId32 "\n",
+		logEntry, transactionID));
 
 	Journal* journal = logEntry->GetJournal();
 	disk_super_block& superBlock = journal->fVolume->SuperBlock();

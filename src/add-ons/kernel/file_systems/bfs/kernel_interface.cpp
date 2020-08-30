@@ -241,7 +241,7 @@ bfs_read_fs_stat(fs_volume* _volume, struct fs_info* info)
 static status_t
 bfs_write_fs_stat(fs_volume* _volume, const struct fs_info* info, uint32 mask)
 {
-	FUNCTION_START(("mask = %ld\n", mask));
+	FUNCTION_START(("mask = %" B_PRId32 "\n", mask));
 
 	Volume* volume = (Volume*)_volume->private_volume;
 	if (volume->IsReadOnly())
@@ -635,8 +635,8 @@ static status_t
 bfs_ioctl(fs_volume* _volume, fs_vnode* _node, void* _cookie, uint32 cmd,
 	void* buffer, size_t bufferLength)
 {
-	FUNCTION_START(("node = %p, cmd = %lu, buf = %p, len = %ld\n", _node, cmd,
-		buffer, bufferLength));
+	FUNCTION_START(("node = %p, cmd = %" B_PRIu32 ", buf = %p"
+		", len = %" B_PRIuSIZE "\n", _node, cmd, buffer, bufferLength));
 
 	Volume* volume = (Volume*)_volume->private_volume;
 
@@ -802,8 +802,10 @@ bfs_ioctl(fs_volume* _volume, fs_vnode* _node, void* _cookie, uint32 cmd,
 			block_run run;
 			while (allocator.AllocateBlocks(transaction, 8, 0, 64, 1, run)
 					== B_OK) {
-				PRINT(("write block_run(%ld, %d, %d)\n", run.allocation_group,
-					run.start, run.length));
+				PRINT(("write block_run(%" B_PRId32 ", %" B_PRIu16
+					", %" B_PRIu16 ")\n", run.allocation_group, run.start,
+					run.length));
+
 				for (int32 i = 0;i < run.length;i++) {
 					status_t status = cached.SetToWritable(transaction, run);
 					if (status == B_OK)
@@ -934,8 +936,8 @@ bfs_write_stat(fs_volume* _volume, fs_vnode* _node, const struct stat* stat,
 		// only the user or root can do that
 		if (!isOwnerOrRoot)
 			RETURN_ERROR(B_NOT_ALLOWED);
-		PRINT(("original mode = %ld, stat->st_mode = %d\n", node.Mode(),
-			stat->st_mode));
+		PRINT(("original mode = %u, stat->st_mode = %u\n",
+			(unsigned int)node.Mode(), (unsigned int)stat->st_mode));
 		node.mode = HOST_ENDIAN_TO_BFS_INT32((node.Mode() & ~S_IUMSK)
 			| (stat->st_mode & S_IUMSK));
 		updateTime = true;
@@ -2039,8 +2041,8 @@ bfs_create_special_node(fs_volume* _volume, fs_vnode* _directory,
 	if (name == NULL)
 		return B_UNSUPPORTED;
 
-	FUNCTION_START(("name = \"%s\", mode = %d, flags = 0x%lx, subVnode: %p\n",
-		name, mode, flags, subVnode));
+	FUNCTION_START(("name = \"%s\", mode = %u, flags = 0x%" B_PRIx32
+		", subVnode: %p\n", name, (unsigned int)mode, flags, subVnode));
 
 	Volume* volume = (Volume*)_volume->private_volume;
 	Inode* directory = (Inode*)_directory->private_node;
@@ -2168,7 +2170,8 @@ static status_t
 bfs_create_index(fs_volume* _volume, const char* name, uint32 type,
 	uint32 flags)
 {
-	FUNCTION_START(("name = \"%s\", type = %ld, flags = %ld\n", name, type, flags));
+	FUNCTION_START(("name = \"%s\", type = %" B_PRIu32
+		", flags = %" B_PRIu32 "\n", name, type, flags));
 
 	Volume* volume = (Volume*)_volume->private_volume;
 
@@ -2258,7 +2261,8 @@ static status_t
 bfs_open_query(fs_volume* _volume, const char* queryString, uint32 flags,
 	port_id port, uint32 token, void** _cookie)
 {
-	FUNCTION_START(("bfs_open_query(\"%s\", flags = %lu, port_id = %ld, token = %ld)\n",
+	FUNCTION_START(("bfs_open_query(\"%s\", flags = %" B_PRIu32
+		", port_id = %" B_PRId32 ", token = %" B_PRIu32 ")\n",
 		queryString, flags, port, token));
 
 	Volume* volume = (Volume*)_volume->private_volume;

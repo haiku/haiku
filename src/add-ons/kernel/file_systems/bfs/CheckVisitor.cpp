@@ -608,7 +608,7 @@ CheckVisitor::_CheckAllocated(block_run run, const char* type)
 	BlockAllocator& allocator = GetVolume()->Allocator();
 
 	// make sure the block run is valid
-	if (!allocator.IsValidBlockRun(run)) {
+	if (!allocator.IsValidBlockRun(run, type)) {
 		Control().errors |= BFS_INVALID_BLOCK_RUN;
 		return B_OK;
 	}
@@ -637,8 +637,9 @@ CheckVisitor::_CheckAllocated(block_run run, const char* type)
 		else if (status != B_BAD_DATA)
 			return status;
 
-		PRINT(("%s: block_run(%ld, %u, %u): blocks %Ld - %Ld are "
-			"not allocated!\n", type, run.AllocationGroup(), run.Start(),
+		PRINT(("%s: block_run(%" B_PRId32 ", %" B_PRIu16 ", %" B_PRIu16 ")"
+			": blocks %" B_PRIdOFF " - %" B_PRIdOFF " are not allocated!\n",
+			type, run.AllocationGroup(), run.Start(),
 			run.Length(), firstMissing, afterLastMissing - 1));
 
 		Control().stats.missing += afterLastMissing - firstMissing;

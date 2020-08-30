@@ -346,7 +346,8 @@ Inode::Inode(Volume* volume, ino_t id)
 	fCache(NULL),
 	fMap(NULL)
 {
-	PRINT(("Inode::Inode(volume = %p, id = %Ld) @ %p\n", volume, id, this));
+	PRINT(("Inode::Inode(volume = %p, id = %" B_PRIdINO ") @ %p\n",
+		volume, id, this));
 
 	rw_lock_init(&fLock, "bfs inode");
 	recursive_lock_init(&fSmallDataLock, "bfs inode small data");
@@ -379,8 +380,8 @@ Inode::Inode(Volume* volume, Transaction& transaction, ino_t id, mode_t mode,
 	fCache(NULL),
 	fMap(NULL)
 {
-	PRINT(("Inode::Inode(volume = %p, transaction = %p, id = %Ld) @ %p\n",
-		volume, &transaction, id, this));
+	PRINT(("Inode::Inode(volume = %p, transaction = %p, id = %" B_PRIdINO
+		") @ %p\n", volume, &transaction, id, this));
 
 	rw_lock_init(&fLock, "bfs inode");
 	recursive_lock_init(&fSmallDataLock, "bfs inode small data");
@@ -2152,8 +2153,9 @@ status_t
 Inode::_FreeStreamArray(Transaction& transaction, block_run* array,
 	uint32 arrayLength, off_t size, off_t& offset, off_t& max)
 {
-	PRINT(("FreeStreamArray: arrayLength %lu, size %Ld, offset %Ld, max %Ld\n",
-		arrayLength, size, offset, max));
+	PRINT(("FreeStreamArray: arrayLength %" B_PRId32 ", size %" B_PRIdOFF
+		", offset %" B_PRIdOFF ", max %" B_PRIdOFF "\n", arrayLength, size,
+		offset, max));
 
 	off_t newOffset = offset;
 	uint32 i = 0;
@@ -2619,7 +2621,7 @@ Inode::Create(Transaction& transaction, Inode* parent, const char* name,
 	int32 mode, int openMode, uint32 type, bool* _created, ino_t* _id,
 	Inode** _inode, fs_vnode_ops* vnodeOps, uint32 publishFlags)
 {
-	FUNCTION_START(("name = %s, mode = %ld\n", name, mode));
+	FUNCTION_START(("name = %s, mode = %" B_PRId32 "\n", name, mode));
 
 	block_run parentRun = parent ? parent->BlockRun() : block_run::Run(0, 0, 0);
 	Volume* volume = transaction.GetVolume();

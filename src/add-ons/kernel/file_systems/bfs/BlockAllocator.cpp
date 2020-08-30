@@ -49,8 +49,8 @@ public:
 
 	virtual void AddDump(TraceOutput& out)
 	{
-		out.Print("bfs:alloc %lu.%u.%u", fRun.AllocationGroup(),
-			fRun.Start(), fRun.Length());
+		out.Print("bfs:alloc %" B_PRId32 ".%" B_PRIu16 ".%" B_PRIu16,
+			fRun.AllocationGroup(), fRun.Start(), fRun.Length());
 	}
 
 	const block_run& Run() const { return fRun; }
@@ -71,8 +71,8 @@ public:
 
 	virtual void AddDump(TraceOutput& out)
 	{
-		out.Print("bfs:free %lu.%u.%u", fRun.AllocationGroup(),
-			fRun.Start(), fRun.Length());
+		out.Print("bfs:free %" B_PRId32 ".%" B_PRIu16 ".%" B_PRIu16,
+			fRun.AllocationGroup(), fRun.Start(), fRun.Length());
 	}
 
 	const block_run& Run() const { return fRun; }
@@ -730,7 +730,8 @@ BlockAllocator::AllocateBlocks(Transaction& transaction, int32 groupIndex,
 	if (maximum == 0)
 		return B_BAD_VALUE;
 
-	FUNCTION_START(("group = %ld, start = %u, maximum = %u, minimum = %u\n",
+	FUNCTION_START(("group = %" B_PRId32 ", start = %" B_PRIu16
+		", maximum = %" B_PRIu16 ", minimum = %" B_PRIu16 "\n",
 		groupIndex, start, maximum, minimum));
 
 	AllocationBlock cached(fVolume);
@@ -998,8 +999,8 @@ BlockAllocator::Free(Transaction& transaction, block_run run)
 	uint16 start = run.Start();
 	uint16 length = run.Length();
 
-	FUNCTION_START(("group = %ld, start = %u, length = %u\n", group, start,
-		length));
+	FUNCTION_START(("group = %" B_PRId32 ", start = %" B_PRIu16
+		", length = %" B_PRIu16 "\n", group, start, length))
 	T(Free(run));
 
 	// doesn't use Volume::IsValidBlockRun() here because it can check better
@@ -1008,8 +1009,9 @@ BlockAllocator::Free(Transaction& transaction, block_run run)
 		|| start > fGroups[group].NumBits()
 		|| uint32(start + length) > fGroups[group].NumBits()
 		|| length == 0) {
-		FATAL(("tried to free an invalid block_run (%d, %u, %u)\n", (int)group,
-			start, length));
+		FATAL(("tried to free an invalid block_run"
+			" (%" B_PRId32 ", %" B_PRIu16 ", %" B_PRIu16")\n",
+			group, start, length));
 		DEBUGGER(("tried to free invalid block_run"));
 		return B_BAD_VALUE;
 	}
@@ -1017,8 +1019,9 @@ BlockAllocator::Free(Transaction& transaction, block_run run)
 	// drive
 	if (group == 0
 		&& start < uint32(fVolume->Log().Start() + fVolume->Log().Length())) {
-		FATAL(("tried to free a reserved block_run (%d, %u, %u)\n", (int)group,
-			start, length));
+		FATAL(("tried to free a reserved block_run"
+			" (%" B_PRId32 ", %" B_PRIu16 ", %" B_PRIu16")\n",
+			group, start, length));
 		DEBUGGER(("tried to free reserved block"));
 		return B_BAD_VALUE;
 	}
@@ -1244,8 +1247,9 @@ BlockAllocator::CheckBlocks(off_t start, off_t length, bool allocated,
 		for (; blockOffset < cached.NumBlockBits() && length > 0;
 				blockOffset++, length--, block++) {
 			if (cached.IsUsed(blockOffset) != allocated) {
-				PRINT(("CheckBlocks: Erroneous block (group = %ld, "
-					"groupBlock = %ld, blockOffset = %ld)!\n",
+				PRINT(("CheckBlocks: Erroneous block (group = %" B_PRId32
+					", groupBlock = %" B_PRIu32
+					", blockOffset = %" B_PRIu32 ")!\n",
 					group, groupBlock, blockOffset));
 
 				if (firstError)
@@ -1268,15 +1272,16 @@ BlockAllocator::CheckBlocks(off_t start, off_t length, bool allocated,
 
 
 bool
-BlockAllocator::IsValidBlockRun(block_run run)
+BlockAllocator::IsValidBlockRun(block_run run, const char* type)
 {
 	if (run.AllocationGroup() < 0 || run.AllocationGroup() >= fNumGroups
 		|| run.Start() > fGroups[run.AllocationGroup()].fNumBits
 		|| uint32(run.Start() + run.Length())
 				> fGroups[run.AllocationGroup()].fNumBits
 		|| run.length == 0) {
-		PRINT(("%s: block_run(%ld, %u, %u) is invalid!\n", type,
-			run.AllocationGroup(), run.Start(), run.Length()));
+		PRINT(("%s: block_run(%" B_PRId32 ", %" B_PRIu16 ", %" B_PRIu16")"
+			" is invalid!\n", type, run.AllocationGroup(), run.Start(),
+			run.Length()));
 		return false;
 	}
 	return true;
@@ -1286,14 +1291,15 @@ BlockAllocator::IsValidBlockRun(block_run run)
 status_t
 BlockAllocator::CheckBlockRun(block_run run, const char* type, bool allocated)
 {
-	if (!IsValidBlockRun(run))
+	if (!IsValidBlockRun(run, type))
 		return B_BAD_DATA;
 
 	status_t status = CheckBlocks(fVolume->ToBlock(run), run.Length(),
 		allocated);
 	if (status != B_OK) {
-		PRINT(("%s: block_run(%ld, %u, %u) is only partially allocated!\n",
-			type, run.AllocationGroup(), run.Start(), run.Length()));
+		PRINT(("%s: block_run(%" B_PRId32 ", %" B_PRIu16 ", %" B_PRIu16")"
+			" is only partially allocated!\n", type, run.AllocationGroup(),
+			run.Start(), run.Length()));
 	}
 
 	return status;
