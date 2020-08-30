@@ -143,6 +143,7 @@ is_type_swapped(type_code type)
 		case B_POINT_TYPE:
 		case B_RECT_TYPE:
 		case B_REF_TYPE:
+		case B_NODE_REF_TYPE:
 		case B_RGB_32_BIT_TYPE:
 		case B_RGB_COLOR_TYPE:
 		case B_SIZE_T_TYPE:

@@ -94,6 +94,7 @@ Demangler::Demangle(const BString& mangledName)
 				demangledName << "void*";
 				break;
 			case B_REF_TYPE:
+			case B_NODE_REF_TYPE:
 				// TODO: use length as hint on reference type
 				demangledName << "&";
 				break;

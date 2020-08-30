@@ -46,7 +46,7 @@ entry_ref_flatten(char *buffer, size_t *size, const entry_ref *ref)
 	memcpy((void *)buffer, (const void *)&ref->device, sizeof(ref->device));
 	buffer += sizeof(ref->device);
 	memcpy((void *)buffer, (const void *)&ref->directory, sizeof(ref->directory));
-	buffer += sizeof (ref->directory);
+	buffer += sizeof(ref->directory);
 	*size -= sizeof(ref->device) + sizeof(ref->directory);
 
 	size_t nameLength = 0;
@@ -59,6 +59,7 @@ entry_ref_flatten(char *buffer, size_t *size, const entry_ref *ref)
 	}
 
 	*size = sizeof(ref->device) + sizeof(ref->directory) + nameLength;
+
 	return B_OK;
 }
 
@@ -71,9 +72,10 @@ entry_ref_unflatten(entry_ref *ref, const char *buffer, size_t size)
 		return B_BAD_VALUE;
 	}
 
-	memcpy((void  *)&ref->device, (const void *)buffer, sizeof(ref->device));
-	buffer += sizeof (ref->device);
-	memcpy((void *)&ref->directory, (const void *)buffer, sizeof(ref->directory));
+	memcpy((void *)&ref->device, (const void *)buffer, sizeof(ref->device));
+	buffer += sizeof(ref->device);
+	memcpy((void *)&ref->directory, (const void *)buffer,
+		sizeof(ref->directory));
 	buffer += sizeof(ref->directory);
 
 	if (ref->device != ~(dev_t)0 && size > sizeof(ref->device)
@@ -92,6 +94,56 @@ entry_ref_unflatten(entry_ref *ref, const char *buffer, size_t size)
 
 status_t
 entry_ref_swap(char *buffer, size_t size)
+{
+	if (size < sizeof(dev_t) + sizeof(ino_t))
+		return B_BAD_VALUE;
+
+	dev_t *dev = (dev_t *)buffer;
+	*dev = B_SWAP_INT32(*dev);
+	buffer += sizeof(dev_t);
+
+	ino_t *ino = (ino_t *)buffer;
+	*ino = B_SWAP_INT64(*ino);
+
+	return B_OK;
+}
+
+
+/* node_ref support functions */
+status_t
+node_ref_flatten(char *buffer, size_t *size, const node_ref *ref)
+{
+	if (*size < sizeof(dev_t) + sizeof(ino_t))
+		return B_BUFFER_OVERFLOW;
+
+	memcpy((void *)buffer, (const void *)&ref->device, sizeof(ref->device));
+	buffer += sizeof(ref->device);
+	memcpy((void *)buffer, (const void *)&ref->node, sizeof(ref->node));
+	buffer += sizeof(ref->node);
+
+	return B_OK;
+}
+
+
+status_t
+node_ref_unflatten(node_ref *ref, const char *buffer, size_t size)
+{
+	if (size < sizeof(dev_t) + sizeof(ino_t)) {
+		*ref = node_ref();
+		return B_BAD_VALUE;
+	}
+
+	memcpy((void *)&ref->device, (const void *)buffer, sizeof(dev_t));
+	buffer += sizeof(dev_t);
+	memcpy((void *)&ref->node, (const void *)buffer, sizeof(ino_t));
+	buffer += sizeof(ino_t);
+
+	return B_OK;
+}
+
+
+status_t
+node_ref_swap(char *buffer, size_t size)
 {
 	if (size < sizeof(dev_t) + sizeof(ino_t))
 		return B_BAD_VALUE;

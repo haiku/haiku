@@ -5,14 +5,21 @@
 #include <DataIO.h>
 #include <Entry.h>
 #include <Message.h>
+#include <Node.h>
 #include <SupportDefs.h>
 
 
 namespace BPrivate {	// Only putting these here because Be did
 
+// entry_ref
 status_t entry_ref_flatten(char* buffer, size_t* size, const entry_ref* ref);
 status_t entry_ref_unflatten(entry_ref* ref, const char* buffer, size_t size);
 status_t entry_ref_swap(char* buffer, size_t size);
+
+// node_ref
+status_t node_ref_flatten(char* buffer, size_t* size, const node_ref* ref);
+status_t node_ref_unflatten(node_ref* ref, const char* buffer, size_t size);
+status_t node_ref_swap(char* buffer, size_t size);
 
 uint32 CalculateChecksum(const uint8 *buffer, int32 size);
 

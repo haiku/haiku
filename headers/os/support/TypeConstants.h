@@ -46,6 +46,7 @@ enum {
 	B_RAW_TYPE						= 'RAWT',
 	B_RECT_TYPE						= 'RECT',
 	B_REF_TYPE						= 'RREF',
+	B_NODE_REF_TYPE					= 'NREF',
 	B_RGB_32_BIT_TYPE				= 'RGBB',
 	B_RGB_COLOR_TYPE				= 'RGBC',
 	B_SIZE_TYPE						= 'SIZE',

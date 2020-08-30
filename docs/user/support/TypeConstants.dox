@@ -221,6 +221,14 @@
 
 
 /*!
+	\var B_NODE_REF_TYPE
+	\brief Represents a \c node_ref structure.
+
+	\since Haiku R1
+*/
+
+
+/*!
 	\var B_RGB_COLOR_TYPE
 	\brief Represents an \c rgb_color structure.
 

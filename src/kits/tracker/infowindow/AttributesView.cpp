@@ -394,7 +394,11 @@ AttributesView::AttributesView(Model* model)
 					kTypeColumn);
 				break;
 			case B_REF_TYPE:
-				row->SetField(new BStringField(B_TRANSLATE("Reference")),
+				row->SetField(new BStringField(B_TRANSLATE("Entry ref")),
+					kTypeColumn);
+				break;
+			case B_NODE_REF_TYPE:
+				row->SetField(new BStringField(B_TRANSLATE("Node ref")),
 					kTypeColumn);
 				break;
 			case B_RGB_32_BIT_TYPE:

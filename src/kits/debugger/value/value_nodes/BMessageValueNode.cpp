@@ -478,6 +478,11 @@ BMessageValueNode::_GetTypeForTypeCode(TeamTypeInformation* info,
 			constraints.SetTypeKind(TYPE_COMPOUND);
 			break;
 
+		case B_NODE_REF_TYPE:
+			typeName = "node_ref";
+			constraints.SetTypeKind(TYPE_COMPOUND);
+			break;
+
 		case B_RGB_COLOR_TYPE:
 			typeName = "rgb_color";
 			constraints.SetTypeKind(TYPE_COMPOUND);
