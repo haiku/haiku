@@ -66,7 +66,7 @@
 	#define PRINT(x) ;
 	#define REPORT_ERROR(status) \
 		__out("bfs: %s:%d: %s\n", __FUNCTION__, __LINE__, strerror(status));
-	#define RETURN_ERROR(err) { status_t _status = err; if (_status < B_OK) REPORT_ERROR(_status); return _status;}
+	#define RETURN_ERROR(err) { return err; }
 //	#define FATAL(x) { panic x; }
 	#define FATAL(x) { __out("bfs: "); __out x; }
 	#define INFORM(x) { __out("bfs: "); __out x; }
