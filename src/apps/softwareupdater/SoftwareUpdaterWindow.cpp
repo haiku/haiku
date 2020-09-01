@@ -329,7 +329,7 @@ SoftwareUpdaterWindow::MessageReceived(BMessage* message)
 
 			BRoster roster;
 			BRoster::Private rosterPrivate(roster);
-			status_t error = rosterPrivate.ShutDown(true, true, false);
+			status_t error = rosterPrivate.ShutDown(true, false, false);
 			if (error != B_OK) {
 				BAlert* alert = new BAlert("reboot request", B_TRANSLATE(
 					"For some reason, we could not reboot your computer."),
