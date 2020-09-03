@@ -187,6 +187,7 @@ class InputServer : public BApplication {
 		status_t _LoadSystemKeymap();
 		status_t _SaveKeymap(bool isDefault = false);
 		void _InitKeyboardMouseStates();
+		MouseSettings* _GetSettingsForMouse(BString mouseName);
 
 		status_t _StartEventLoop();
 		void _EventLoop();

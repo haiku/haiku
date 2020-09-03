@@ -200,8 +200,10 @@ MouseView::MouseDown(BPoint where)
 			menu.AddItem(new BMenuItem(tmp, new BMessage(message)));
 		}
 
-		menu.ItemAt(getMappingNumber(fSettings.Mapping(button)))
-			->SetMarked(true);
+		int32 mapping = fSettings.Mapping(button);
+		BMenuItem* item = menu.ItemAt(getMappingNumber(mapping));
+		if (item)
+			item->SetMarked(true);
 		menu.SetTargetForItems(Window());
 
 		ConvertToScreen(&where);
@@ -297,14 +299,14 @@ MouseView::Draw(BRect updateFrame)
 		if (i == fType - 1)
 			border.right -= fScaling * 4;
 
-		char number[2] = {0};
-		number[0] = getMappingNumber(map.button[_ConvertFromVisualOrder(i)])
-			+ '1';
+		char label[2] = {0};
+		int32 number = getMappingNumber(map.button[_ConvertFromVisualOrder(i)]);
+		label[0] = number + '1';
 
 		SetDrawingMode(B_OP_OVER);
 		SetHighColor(kButtonTextColor);
-		DrawString(number, BPoint(
-			border.left + (border.Width() - StringWidth(number)) / 2,
+		DrawString(label, BPoint(
+			border.left + (border.Width() - StringWidth(label)) / 2,
 			border.top + fDigitBaseline
 				+ (border.IntegerHeight() - fDigitHeight) / 2));
 	}

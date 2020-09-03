@@ -71,6 +71,9 @@ SettingsView::SettingsView(MouseSettings& settings)
 	: BBox("main_view"),
 	fSettings(settings)
 {
+	if (fSettings.MouseType() > 6)
+		debugger("Mouse type is invalid");
+
 	// Add the "Mouse Type" pop up menu
 	fTypeMenu = new BOptionPopUp("type", B_TRANSLATE("Mouse type:"),
 		new BMessage(kMsgMouseType));
@@ -255,8 +258,6 @@ SettingsView::UpdateFromSettings()
 	fAccelerationSlider->SetValue(value);
 
 	fTypeMenu->SelectOptionFor(fSettings.MouseType());
-	if (fSettings.MouseType() > 6)
-		debugger("Mouse type is invalid");
 	fMouseView->SetMouseType(fSettings.MouseType());
 
 	BMenuItem* item = fFocusMenu->ItemAt(

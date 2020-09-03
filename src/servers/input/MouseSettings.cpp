@@ -171,10 +171,8 @@ MouseSettings::Defaults()
 	SetFocusFollowsMouseMode(B_NORMAL_FOCUS_FOLLOWS_MOUSE);
 	SetAcceptFirstClick(kDefaultAcceptFirstClick);
 
-	fSettings.map.button[0] = B_PRIMARY_MOUSE_BUTTON;
-	fSettings.map.button[1] = B_SECONDARY_MOUSE_BUTTON;
-	fSettings.map.button[2] = B_TERTIARY_MOUSE_BUTTON;
-
+	for (int i = 0; i < B_MAX_MOUSE_BUTTONS; i++)
+		fSettings.map.button[i] = B_MOUSE_BUTTON(i + 1);
 }
 
 

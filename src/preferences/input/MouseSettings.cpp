@@ -33,7 +33,8 @@ MouseSettings::MouseSettings(BString name)
 	:
 	fName(name)
 {
-	_RetrieveSettings();
+	if (_RetrieveSettings() != B_OK) {
+		Defaults();
 
 	fOriginalSettings = fSettings;
 	fOriginalMode = fMode;
@@ -180,15 +181,16 @@ MouseSettings::Defaults()
 	SetAcceptFirstClick(kDefaultAcceptFirstClick);
 
 	mouse_map map;
-	if (get_mouse_map(&map) == B_OK) {
+	if (get_mouse_map(&map) != B_OK) {
+		// Set some default values
 		map.button[0] = B_PRIMARY_MOUSE_BUTTON;
 		map.button[1] = B_SECONDARY_MOUSE_BUTTON;
 		map.button[2] = B_TERTIARY_MOUSE_BUTTON;
 		map.button[3] = B_MOUSE_BUTTON(4);
 		map.button[4] = B_MOUSE_BUTTON(5);
 		map.button[5] = B_MOUSE_BUTTON(6);
-		SetMapping(map);
 	}
+	SetMapping(map);
 }
 
 
@@ -424,7 +426,10 @@ MultipleMouseSettings::RetrieveSettings()
 	} else {
 		// Does not look like a BMessage, try loading using the old format
 		fDeprecatedMouseSettings = new MouseSettings("");
-		fDeprecatedMouseSettings->_RetrieveSettings();
+		if (fDeprecatedMouseSettings->_LoadLegacySettings() != B_OK) {
+			delete fDeprecatedMouseSettings;
+			fDeprecatedMouseSettings = NULL;
+		}
 	}
 }
 
@@ -509,20 +514,17 @@ MultipleMouseSettings::AddMouseSettings(BString mouse_name)
 		}
 	}
 
-	std::map<BString, MouseSettings*>::iterator itr;
-	itr = fMouseSettingsObject.find(mouse_name);
+	MouseSettings* settings = GetMouseSettings(mouse_name);
+	if (settings)
+		return settings;
 
-	if (itr != fMouseSettingsObject.end())
-		return GetMouseSettings(mouse_name);
+	settings = new (std::nothrow) MouseSettings(mouse_name);
+	if (settings == NULL)
+		return NULL;
 
-	MouseSettings* settings = new (std::nothrow) MouseSettings(mouse_name);
-
-	if(settings !=NULL) {
-		fMouseSettingsObject.insert(std::pair<BString, MouseSettings*>
-			(mouse_name, settings));
-			return settings;
-	}
-	return B_OK;
+	fMouseSettingsObject.insert(std::pair<BString, MouseSettings*>
+		(mouse_name, settings));
+	return settings;
 }
 
 
