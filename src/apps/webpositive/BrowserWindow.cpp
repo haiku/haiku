@@ -2528,11 +2528,12 @@ BrowserWindow::_VisitSearchEngine(const BString& search)
 	for (int i = 0; i < kSearchEngineCount; i++) {
 		if (search.StartsWith(fSearchEngines[i].shortcut)) {
 			engine = fSearchEngines[i].url;
+			search = searchQuery;
 			break;
 		}
 	}
 	
-	engine.ReplaceAll("%s", _EncodeURIComponent(searchQuery));
+	engine.ReplaceAll("%s", _EncodeURIComponent(search));
 	_VisitURL(engine);
 }
 
