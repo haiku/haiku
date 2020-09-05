@@ -93,6 +93,7 @@ AVFormatWriter::StreamCookie::StreamCookie(AVFormatContext* context,
 
 AVFormatWriter::StreamCookie::~StreamCookie()
 {
+	// fStream is freed automatically when the codec context is closed
 }
 
 
@@ -392,22 +393,24 @@ AVFormatWriter::Init(const media_file_format* fileFormat)
 {
 	TRACE("AVFormatWriter::Init()\n");
 
-	uint8* buffer = static_cast<uint8*>(av_malloc(kIOBufferSize));
-	if (buffer == NULL)
-		return B_NO_MEMORY;
-
-	// Allocate I/O context and initialize it with buffer
-	// and hook functions, pass ourself as cookie.
-	fIOContext = avio_alloc_context(buffer, kIOBufferSize, 1, this,
-			0, _Write, _Seek);
 	if (fIOContext == NULL) {
-		av_free(buffer);
-		TRACE("av_alloc_put_byte() failed!\n");
-		return B_ERROR;
-	}
+		uint8* buffer = static_cast<uint8*>(av_malloc(kIOBufferSize));
+		if (buffer == NULL)
+			return B_NO_MEMORY;
 
-	// Setup I/O hooks. This seems to be enough.
-	fFormatContext->pb = fIOContext;
+		// Allocate I/O context and initialize it with buffer
+		// and hook functions, pass ourself as cookie.
+		fIOContext = avio_alloc_context(buffer, kIOBufferSize, 1, this,
+				0, _Write, _Seek);
+		if (fIOContext == NULL) {
+			av_free(buffer);
+			TRACE("av_alloc_put_byte() failed!\n");
+			return B_ERROR;
+		}
+
+		// Setup I/O hooks. This seems to be enough.
+		fFormatContext->pb = fIOContext;
+	}
 
 	// Set the AVOutputFormat according to fileFormat...
 	fFormatContext->oformat = av_guess_format(fileFormat->short_name,
