@@ -43,7 +43,7 @@ AVCodecEncoder::AVCodecEncoder(uint32 codecID, int bitRateScale)
 	fBitRateScale(bitRateScale),
 	fCodecID((CodecID)codecID),
 	fCodec(NULL),
-	fCodecContext(avcodec_alloc_context3(NULL)),
+	fCodecContext(NULL),
 	fCodecInitStatus(CODEC_INIT_NEEDED),
 	fFrame(av_frame_alloc()),
 	fSwsContext(NULL),
@@ -110,7 +110,10 @@ AVCodecEncoder::~AVCodecEncoder()
 		av_frame_free(&fFrame);
 	}
 
-	avcodec_free_context(&fCodecContext);
+	if (fCodecContext != NULL) {
+		avcodec_close(fCodecContext);
+		avcodec_free_context(&fCodecContext);
+	}
 
 	delete[] fChunkBuffer;
 }
@@ -139,9 +142,6 @@ status_t
 AVCodecEncoder::SetUp(const media_format* inputFormat)
 {
 	TRACE("AVCodecEncoder::SetUp()\n");
-
-	if (fCodecContext == NULL)
-		return B_NO_INIT;
 
 	if (inputFormat == NULL)
 		return B_BAD_VALUE;
@@ -271,6 +271,10 @@ AVCodecEncoder::_Setup()
 
 	int rawBitRate;
 
+	fCodecContext = avcodec_alloc_context3(fCodec);
+	if (fCodecContext == NULL)
+		return B_NO_INIT;
+
 	if (fInputFormat.type == B_MEDIA_RAW_VIDEO) {
 		TRACE("  B_MEDIA_RAW_VIDEO\n");
 
@@ -278,7 +282,7 @@ AVCodecEncoder::_Setup()
 		AVPixelFormat pixFmt = colorspace_to_pixfmt(
 			fInputFormat.u.raw_video.display.format);
 		if (pixFmt == AV_PIX_FMT_NONE) {
-			TRACE("Invalid input colorspace");
+			TRACE("Invalid input colorspace\n");
 			return B_BAD_DATA;
 		}
 
