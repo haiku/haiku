@@ -2516,9 +2516,8 @@ void
 BrowserWindow::_VisitSearchEngine(const BString& search)
 {
 	BString searchQuery = search;
-	searchQuery.Remove(0, 2);
+
 	BString searchPrefix;
-	
 	search.CopyCharsInto(searchPrefix, 0, 2);
 	
 	// Default search URL
@@ -2526,14 +2525,14 @@ BrowserWindow::_VisitSearchEngine(const BString& search)
 
 	// Check if the string starts with one of the search engine shortcuts
 	for (int i = 0; i < kSearchEngineCount; i++) {
-		if (search.StartsWith(fSearchEngines[i].shortcut)) {
+		if (fSearchEngines[i].shortcut == searchPrefix) {
 			engine = fSearchEngines[i].url;
-			search = searchQuery;
+			searchQuery.Remove(0, 2);
 			break;
 		}
 	}
 	
-	engine.ReplaceAll("%s", _EncodeURIComponent(search));
+	engine.ReplaceAll("%s", _EncodeURIComponent(searchQuery));
 	_VisitURL(engine);
 }
 
