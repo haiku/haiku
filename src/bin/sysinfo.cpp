@@ -458,7 +458,7 @@ print_processor_signature(enum cpu_vendor vendor, cpuid_info *info)
 		"%1" B_PRIx32 "%1" B_PRIx32 "; ", info->eax_1.extended_family,
 		info->eax_1.extended_model, info->eax_1.family,
 		info->eax_1.model, info->eax_1.stepping);
-	if (vendor == B_CPU_VENDOR_AMD) {
+	if (vendor == B_CPU_VENDOR_AMD || vendor == B_CPU_VENDOR_HYGON) {
 		printf("Type %" B_PRIu32 ", family %" B_PRIu32 ", model %" B_PRIu32
 			", stepping %" B_PRIu32 "\n",
 			info->eax_1.type,
@@ -596,14 +596,15 @@ dump_cpu(enum cpu_vendor vendor, uint32 model, int32 cpu)
 	/* Extended CPUID Information */
 	if (maxExtendedFunction >= 1) {
 		get_cpuid(&cpuInfo, 0x80000001, cpu);
-		if (vendor == B_CPU_VENDOR_INTEL || vendor == B_CPU_VENDOR_AMD) {
+		if (vendor == B_CPU_VENDOR_INTEL || vendor == B_CPU_VENDOR_AMD
+			|| vendor == B_CPU_VENDOR_HYGON) {
 			// 0x80000001 EDX has overlap of 64,ED,SY/SE between amd and intel
 			printf("\tExtended Features (0x80000001): 0x%08" B_PRIx32 "\n",
 				cpuInfo.eax_1.features);
 			print_features(kAMDExtFeatures, cpuInfo.regs.edx);
 		}
 
-		if (vendor == B_CPU_VENDOR_AMD) {
+		if (vendor == B_CPU_VENDOR_AMD || vendor == B_CPU_VENDOR_HYGON) {
 			if (maxExtendedFunction >= 7) {
 				get_cpuid(&cpuInfo, 0x80000007, cpu);
 				printf("\tExtended Features (0x80000007): 0x%08" B_PRIx32 "\n",

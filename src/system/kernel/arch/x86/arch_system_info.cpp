@@ -87,6 +87,9 @@ arch_system_info_init(struct kernel_args *args)
 		case VENDOR_TRANSMETA:
 			sCPUVendor = B_CPU_VENDOR_TRANSMETA;
 			break;
+		case VENDOR_HYGON:
+			sCPUVendor = B_CPU_VENDOR_HYGON;
+			break;
 		default:
 			sCPUVendor = B_CPU_VENDOR_UNKNOWN;
 			break;

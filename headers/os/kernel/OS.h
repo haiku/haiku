@@ -499,7 +499,8 @@ enum cpu_vendor {
 	B_CPU_VENDOR_VIA,
 	B_CPU_VENDOR_IBM,
 	B_CPU_VENDOR_MOTOROLA,
-	B_CPU_VENDOR_NEC
+	B_CPU_VENDOR_NEC,
+	B_CPU_VENDOR_HYGON
 };
 
 typedef struct {

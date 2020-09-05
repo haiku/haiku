@@ -60,6 +60,7 @@ static const struct cpu_vendor_info vendor_info[VENDOR_NUM] = {
 	{ "Rise", { "RiseRiseRise" } },
 	{ "Transmeta", { "GenuineTMx86", "TransmetaCPU" } },
 	{ "NSC", { "Geode by NSC" } },
+	{ "Hygon", { "HygonGenuine" } },
 };
 
 #define K8_SMIONCMPHALT			(1ULL << 27)
@@ -860,7 +861,8 @@ detect_cpu_topology(int currentCPU, cpu_ent* cpu, uint32 maxBasicLeaf,
 
 		status_t result = B_UNSUPPORTED;
 		if (x86_check_feature(IA32_FEATURE_HTT, FEATURE_COMMON)) {
-			if (cpu->arch.vendor == VENDOR_AMD) {
+			if (cpu->arch.vendor == VENDOR_AMD
+				|| cpu->arch.vendor == VENDOR_HYGON) {
 				result = detect_amd_cpu_topology(maxBasicLeaf, maxExtendedLeaf);
 
 				if (result == B_OK)

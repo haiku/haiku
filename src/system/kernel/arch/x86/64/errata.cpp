@@ -99,7 +99,9 @@ status_t
 __x86_patch_errata_percpu(int currentCPU)
 {
 	const cpu_ent* cpu = get_cpu_struct();
-	if (cpu->arch.vendor == VENDOR_AMD)
+	if (cpu->arch.vendor == VENDOR_AMD
+		|| cpu->arch.vendor == VENDOR_HYGON) {
 		return patch_errata_percpu_amd(currentCPU, cpu);
+	}
 	return B_OK;
 }
