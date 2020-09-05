@@ -495,6 +495,32 @@ dump_feature_string(int currentCPU, cpu_ent* cpu)
 		strlcat(features, "ecmd ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_6_EAX] & IA32_FEATURE_PTM)
 		strlcat(features, "ptm ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_6_EAX] & IA32_FEATURE_HWP)
+		strlcat(features, "hwp ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_6_EAX] & IA32_FEATURE_HWP_NOTIFY)
+		strlcat(features, "hwp_notify ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_6_EAX] & IA32_FEATURE_HWP_ACTWIN)
+		strlcat(features, "hwp_actwin ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_6_EAX] & IA32_FEATURE_HWP_EPP)
+		strlcat(features, "hwp_epp ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_6_EAX] & IA32_FEATURE_HWP_PLR)
+		strlcat(features, "hwp_plr ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_6_EAX] & IA32_FEATURE_HDC)
+		strlcat(features, "hdc ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_6_EAX] & IA32_FEATURE_TBMT3)
+		strlcat(features, "tbmt3 ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_6_EAX] & IA32_FEATURE_HWP_CAP)
+		strlcat(features, "hwp_cap ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_6_EAX] & IA32_FEATURE_HWP_PECI)
+		strlcat(features, "hwp_peci ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_6_EAX] & IA32_FEATURE_HWP_FLEX)
+		strlcat(features, "hwp_flex ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_6_EAX] & IA32_FEATURE_HWP_FAST)
+		strlcat(features, "hwp_fast ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_6_EAX] & IA32_FEATURE_HW_FEEDBACK)
+		strlcat(features, "hw_feedback ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_6_EAX] & IA32_FEATURE_HWP_IGNIDL)
+		strlcat(features, "hwp_ignidl ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_6_ECX] & IA32_FEATURE_APERFMPERF)
 		strlcat(features, "aperfmperf ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_6_ECX] & IA32_FEATURE_EPB)

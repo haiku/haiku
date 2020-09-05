@@ -222,13 +222,26 @@
 #define IA32_FEATURE_INTERRUPT_MWAIT	(1 << 1)
 
 // x86 defined features from cpuid eax 6, eax register
-// reference http://www.intel.com/Assets/en_US/PDF/appnote/241618.pdf (Table 5-11)
+// reference https://software.intel.com/content/dam/develop/public/us/en/documents/253666-sdm-vol-2a.pdf (Table 3-8)
 #define IA32_FEATURE_DTS	(1 << 0) // Digital Thermal Sensor
 #define IA32_FEATURE_ITB	(1 << 1) // Intel Turbo Boost Technology
 #define IA32_FEATURE_ARAT	(1 << 2) // Always running APIC Timer
 #define IA32_FEATURE_PLN	(1 << 4) // Power Limit Notification
 #define IA32_FEATURE_ECMD	(1 << 5) // Extended Clock Modulation Duty
 #define IA32_FEATURE_PTM	(1 << 6) // Package Thermal Management
+#define IA32_FEATURE_HWP	(1 << 7) // Hardware P-states
+#define IA32_FEATURE_HWP_NOTIFY	(1 << 8) // HWP Notification
+#define IA32_FEATURE_HWP_ACTWIN	(1 << 9) // HWP Activity Window
+#define IA32_FEATURE_HWP_EPP	(1 << 10) // HWP Energy Performance Preference
+#define IA32_FEATURE_HWP_PLR	(1 << 11) // HWP Package Level Request
+#define IA32_FEATURE_HDC	(1 << 13) // Hardware Duty Cycling
+#define IA32_FEATURE_TBMT3	(1 << 14) // Turbo Boost Max Technology 3.0
+#define IA32_FEATURE_HWP_CAP	(1 << 15) // HWP Capabilities
+#define IA32_FEATURE_HWP_PECI	(1 << 16) // HWP PECI override
+#define IA32_FEATURE_HWP_FLEX	(1 << 17) // Flexible HWP
+#define IA32_FEATURE_HWP_FAST	(1 << 18) // Fast access for HWP_REQUEST MSR
+#define IA32_FEATURE_HW_FEEDBACK	(1 << 19) // HW_FEEDBACK*, PACKAGE_THERM*
+#define IA32_FEATURE_HWP_IGNIDL	(1 << 20) // Ignore Idle Logical Processor HWP
 
 // x86 defined features from cpuid eax 6, ecx register
 // reference http://www.intel.com/Assets/en_US/PDF/appnote/241618.pdf (Table 5-11)
