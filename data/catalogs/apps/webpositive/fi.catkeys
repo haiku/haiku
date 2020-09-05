@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-WebPositive	55235296
+1	finnish	x-vnd.Haiku-WebPositive	1976607515
 Authentication required	Authentication Panel		Vaaditaan todentamista
 Previous	WebPositive Window		Edellinen
 (Finish: %date)	Download Window		(Päättyi: %date)
@@ -53,6 +53,7 @@ Cookies for %s	Cookie Manager		Evästeet kohteelle %s
 The download could not be opened.	Download Window		Latauksen avaaminen epäonnistui.
 Close	Download Window		Sulje
 WebPositive	System name		WebPositive
+%s - Search term	Settings Window		%s - Hakutermi
 Reload	WebPositive Window		Lataa uudelleen
 Expiration	Cookie Manager		Erääntymisaika
 Download finished	Download Window		Lataus päättyi
@@ -129,6 +130,7 @@ Double-click or middle-click to open new tab.	Tab Manager		Avaa uusi välilehti 
 Next	WebPositive Window		Seuraava
 Bookmark error	WebPositive Window		Kirjanmerkkivirhe
 OK	WebPositive Window		Valmis
+(%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% / %expectedSize%, %rate%/s)
 WebPositive	Download Window		WebPositive
 Zoom text only	WebPositive Window		Kavenna tai avarra vain tekstiä
 Save page as…	WebPositive Window		Tallenna sivu nimellä...

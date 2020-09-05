@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku.TextSearch	3859480651
+1	finnish	x-vnd.Haiku.TextSearch	1757850908
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Valitse tiedostot, jotka haluat valittaviksi Seuraajassa.
 %appname% : %path%	GrepWindow		%appname% : %path%
 Failed to start xargs program!	Grepper		Xargs-ohjelman käynnistäminen epäonnistui!
@@ -6,6 +6,7 @@ Open selection	GrepWindow		Avaa valinta
 Actions	GrepWindow		Toiminnot
 New window	GrepWindow		Uusi ikkuna
 Encoding	GrepWindow		Koodaus
+Set target to parent folder	GrepWindow		Aseta kohde ylimmän tason kansiolle
 OK	GrepWindow		Valmis
 %appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
 Close	GrepWindow		Sulje

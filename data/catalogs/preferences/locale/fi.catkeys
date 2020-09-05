@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Locale	288870027
+1	finnish	x-vnd.Haiku-Locale	1081217032
 Medium format:	TimeFormatSettings		Keskikokoinen muoto:
 Negative:	TimeFormatSettings		Negatiivinen:
 Language	Locale Preflet Window		Kieli
@@ -22,6 +22,7 @@ Preferred languages	Locale Preflet Window		Toivotut kielet
 Full format:	TimeFormatSettings		Kokonainen muoto:
 Cancel	Locale Preflet Window		Peru
 Revert	Locale Preflet Window		Palauta
+Translate application and folder names	TimeFormatSettings		Suomenna sovellus- ja kansionimet
 12 hour	TimeFormatSettings		12 tuntia
 Positive:	TimeFormatSettings		Positiivinen:
 Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Työpöytäpalkki ja Seuraaja on käynnistettävä uudelleen, jotta nämä muutokset tulevat voimaan. Haluatko käynnistää ne nyt?

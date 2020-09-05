@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-WebPositive	1591513524
+1	catalan; valencian	x-vnd.Haiku-WebPositive	1976607515
 Authentication required	Authentication Panel		Cal autenticació
 Previous	WebPositive Window		Anterior
 (Finish: %date)	Download Window		(Acabament: %date)
@@ -53,6 +53,7 @@ Cookies for %s	Cookie Manager		Galetes per a %s
 The download could not be opened.	Download Window		La baixada no s'ha pogut obrir.
 Close	Download Window		Tanca
 WebPositive	System name		WebPositive
+%s - Search term	Settings Window		%s - terme de cerca
 Reload	WebPositive Window		Torna a carregar
 Expiration	Cookie Manager		Venciment
 Download finished	Download Window		Baixada acabada

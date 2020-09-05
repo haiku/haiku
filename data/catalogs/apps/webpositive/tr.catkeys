@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-WebPositive	1591513524
+1	turkish	x-vnd.Haiku-WebPositive	1976607515
 Authentication required	Authentication Panel		Kimlik doğrulaması gerekli
 Previous	WebPositive Window		Önceki
 (Finish: %date)	Download Window		(Bitiş: %date)
@@ -53,6 +53,7 @@ Cookies for %s	Cookie Manager		%s için çerezler
 The download could not be opened.	Download Window		İndirilen öge açılamadı.
 Close	Download Window		Kapat
 WebPositive	System name		WebPositive
+%s - Search term	Settings Window		%s - Arama terimi
 Reload	WebPositive Window		Yeniden yükle
 Expiration	Cookie Manager		Son kullanım süresi
 Download finished	Download Window		İndirme bitti

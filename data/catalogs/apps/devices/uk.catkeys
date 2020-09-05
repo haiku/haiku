@@ -38,7 +38,7 @@ ACPI System Indicator	DeviceACPI		Індикатор системи ACPI
 ACPI System Bus	DeviceACPI		Шина системи ACPI
 PCI Information	DevicePCI		Інформація PCI
 Tape Drive	DeviceSCSI		Стример
-Changer	DeviceSCSI		Changer
+Changer	DeviceSCSI		Чейнджер
 Serial bus controller	Device		Контроллер послідовної шини
 Refresh devices	DevicesView		Оновити список пристроїв
 Category	DevicesView		Категорії

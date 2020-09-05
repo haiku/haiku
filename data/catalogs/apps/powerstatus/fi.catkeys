@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-PowerStatus	3173765686
+1	finnish	x-vnd.Haiku-PowerStatus	1085070685
 Run in window	PowerStatus		Suorita ikkunassa
 Extended battery info	PowerStatus		Laajennetut akkutiedot
 Show status icon	PowerStatus		Näytä tilakuvake
@@ -30,11 +30,13 @@ Serial number: 	PowerStatus		Sarjanumero:
 Battery critical	PowerStatus		Akku kriittisellä tasolla
 Capacity: 	PowerStatus		Kapasiteetti: 
  mW	PowerStatus		 mW
+No supported battery detected. PowerStatus cannot be used on your system.	PowerStatus		Tuettua akkua ei havaittu. Virtatila-sovelmaa ei voida käyttää järjestelmässäsi.
 Show percent	PowerStatus		Näytä prosenttiluku
 Capacity granularity 1: 	PowerStatus		Kapasiteettirakeisuus 1: 
 The battery level is getting low, please plug in the device.	PowerStatus		Akkutaso on alhainen, kytke laite sähköverkkoon.
 Design capacity warning: 	PowerStatus		Suunnittelukapasiteettivaroitus: 
 Capacity granularity 2: 	PowerStatus		Kapasiteettirakeisuus 2: 
+Too bad!	PowerStatus		Liian huono!
 Technology: 	PowerStatus		Teknologia: 
  mWh	PowerStatus		mWh
 PowerStatus	System name		Virtatila
