@@ -349,7 +349,7 @@ intel_set_display_mode(display_mode* mode)
 			set_frame_buffer_base();
 		}
 
-		TRACE("%s: Failed to allocate framebuffer !\n", __func__);
+		ERROR("%s: Failed to allocate framebuffer !\n", __func__);
 		return B_NO_MEMORY;
 	}
 
@@ -504,8 +504,6 @@ intel_get_display_mode(display_mode* _currentMode)
 status_t
 intel_get_edid_info(void* info, size_t size, uint32* _version)
 {
-	CALLED();
-
 	if (!gInfo->has_edid)
 		return B_ERROR;
 	if (size < sizeof(struct edid1_info))
