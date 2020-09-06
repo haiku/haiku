@@ -38,7 +38,7 @@ iterative_io_get_vecs_hook(void *cookie, io_request *request, off_t offset,
 //!	ufs2_io() callback hook
 static status_t
 iterative_io_finished_hook(void *cookie, io_request *request, status_t status,
-						   bool partialTransfer, size_t bytesTransferred)
+	bool partialTransfer, size_t bytesTransferred)
 {
 	return B_NOT_SUPPORTED;
 }
@@ -49,14 +49,14 @@ iterative_io_finished_hook(void *cookie, io_request *request, status_t status,
 static float
 ufs2_identify_partition(int fd, partition_data *partition, void **_cookie)
 {
-		ufs2_super_block superBlock;
-		status_t status = Volume::Identify(fd, &superBlock);
-		if (status != B_OK)
-			return -1;
+	ufs2_super_block superBlock;
+	status_t status = Volume::Identify(fd, &superBlock);
+	if (status != B_OK)
+		return -1;
 
-		identify_cookie* cookie = new identify_cookie;
-		memcpy(&cookie->super_block, &superBlock, sizeof(ufs2_super_block));
-		*_cookie = cookie;
+	identify_cookie* cookie = new identify_cookie;
+	memcpy(&cookie->super_block, &superBlock, sizeof(ufs2_super_block));
+	*_cookie = cookie;
 
 	return 0.8f;
 }
@@ -65,14 +65,26 @@ ufs2_identify_partition(int fd, partition_data *partition, void **_cookie)
 static status_t
 ufs2_scan_partition(int fd, partition_data *partition, void *_cookie)
 {
-	return B_NOT_SUPPORTED;
+	identify_cookie* cookie = (identify_cookie*)_cookie;
+
+	partition->status = B_PARTITION_VALID;
+	partition->flags |= B_PARTITION_FILE_SYSTEM | B_PARTITION_READ_ONLY;
+	partition->block_size = cookie->super_block.fs_bsize;
+	partition->content_size = partition->block_size
+		* cookie->super_block.fs_size;
+	partition->content_name = strdup(cookie->super_block.fs_volname);
+	if (partition->content_name == NULL)
+		return B_NO_MEMORY;
+
+	return B_OK;
 }
 
 
 static void
 ufs2_free_identify_partition_cookie(partition_data *partition, void *_cookie)
 {
-	dprintf("Unsupported in ufs2 currently.\n");
+	identify_cookie* cookie = (identify_cookie*)_cookie;
+	delete cookie;
 	return;
 }
 
