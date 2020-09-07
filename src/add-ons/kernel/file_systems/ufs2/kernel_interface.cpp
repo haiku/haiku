@@ -265,7 +265,6 @@ ufs2_open(fs_volume * _volume, fs_vnode *_node, int openMode,
 {
 	//Volume* volume = (Volume*)_volume->private_volume;
 	Inode* inode = (Inode*)_node->private_node;
-	TRACE("in open %d \n", openMode);
 	if (inode->IsDirectory())
 		return B_IS_A_DIRECTORY;
 
@@ -315,7 +314,6 @@ ufs2_free_cookie(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 static status_t
 ufs2_access(fs_volume *_volume, fs_vnode *_node, int accessMode)
 {
-	TRACE("In access\n");
 	return B_OK;
 }
 
@@ -381,8 +379,9 @@ ufs2_read_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 	uint32 maxCount = *_num;
 	uint32 count = 0;
 
-	while (count < maxCount && (bufferSize > sizeof(struct dirent))) {
-		size_t length = bufferSize - sizeof(struct dirent) + 1;
+	while (count < maxCount
+		&& (bufferSize >= sizeof(struct dirent) + B_FILE_NAME_LENGTH)) {
+		size_t length = bufferSize;
 		ino_t iNodeNo;
 
 		status_t status = iterator->GetNext(dirent->d_name, &length, &iNodeNo);
@@ -398,7 +397,7 @@ ufs2_read_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 
 		dirent->d_dev = volume->ID();
 		dirent->d_ino = iNodeNo;
-		dirent->d_reclen = sizeof(dirent) + length;
+		dirent->d_reclen = sizeof(struct dirent) + length;
 		bufferSize -= dirent->d_reclen;
 		dirent = (struct dirent*)((uint8*)dirent + dirent->d_reclen);
 		count++;
