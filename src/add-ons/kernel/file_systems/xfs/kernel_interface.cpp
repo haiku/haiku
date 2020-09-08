@@ -369,7 +369,7 @@ xfs_open_dir(fs_volume * /*_volume*/, fs_vnode *_node, void **_cookie)
 
 static status_t
 xfs_read_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
-	struct dirent *dirent, size_t bufferSize, uint32 *_num)
+	struct dirent *buffer, size_t bufferSize, uint32 *_num)
 {
 	TRACE("XFS_READ_DIR\n");
 	DirectoryIterator* iterator = (DirectoryIterator*)_cookie;
@@ -378,11 +378,11 @@ xfs_read_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 	uint32 maxCount = *_num;
 	uint32 count = 0;
 
-	while (count < maxCount and (bufferSize > sizeof(struct dirent))) {
+	while (count < maxCount && (bufferSize > sizeof(struct dirent))) {
 		size_t length = bufferSize - sizeof(struct dirent) + 1;
 		xfs_ino_t ino;
 
-		status_t status = iterator->GetNext(dirent->d_name, &length, &ino);
+		status_t status = iterator->GetNext(buffer->d_name, &length, &ino);
 		if (status == B_ENTRY_NOT_FOUND)
 			break;
 		if (status == B_BUFFER_OVERFLOW) {
@@ -393,11 +393,11 @@ xfs_read_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 		if (status != B_OK)
 			return status;
 
-		dirent->d_dev = volume->ID();
-		dirent->d_ino = ino;
-		dirent->d_reclen = sizeof(dirent) + length;
-		bufferSize -= dirent->d_reclen;
-		dirent = (struct dirent*)((uint8*)dirent + dirent->d_reclen);
+		buffer->d_dev = volume->ID();
+		buffer->d_ino = ino;
+		buffer->d_reclen = sizeof(struct dirent) + length;
+		bufferSize -= buffer->d_reclen;
+		buffer = (struct dirent*)((uint8*)buffer + buffer->d_reclen);
 		count++;
 	}
 
