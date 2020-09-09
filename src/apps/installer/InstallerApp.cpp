@@ -1,4 +1,5 @@
 /*
+ * Copyright 2020, Panagiotis Vasilopoulos <hello@alwayslivid.com>
  * Copyright 2015, Axel Dörfler <axeld@pinc-software.de>
  * Copyright 2009, Stephan Aßmus <superstippi@gmx.de>
  * Copyright 2005, Jérôme DUVAL.
@@ -77,17 +78,23 @@ InstallerApp::Quit()
 	BApplication::Quit();
 
 	if (!be_roster->IsRunning(kDeskbarSignature)) {
-		// Synchronize disks, and reboot the system
-		sync();
+		if (fInstallStatus == kFinished) {
+			// Synchronize disks
+			sync();
 
-		if (Utility::IsReadOnlyVolume("/boot")) {
-			// Unblock CD tray, and eject the CD
-			Utility::BlockMedia("/boot", false);
-			Utility::EjectMedia("/boot");
+			if (Utility::IsReadOnlyVolume("/boot")) {
+				// Unblock CD tray, and eject the CD
+				Utility::BlockMedia("/boot", false);
+				Utility::EjectMedia("/boot");
+			}
+
+			// Quickly reboot without touching anything
+			// on disk (which we might just have ejected)
+			_kern_shutdown(true);
+		} else {
+			// Return to FirstBootPrompt if the user hasn't
+			// installed Haiku yet
+			BLaunchRoster().Target("firstbootprompt");
 		}
-
-		// Quickly reboot without possibly touching anything on disk
-		// (which we might just have ejected)
-		_kern_shutdown(true);
 	}
 }
