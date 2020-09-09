@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2014 Haiku, Inc. All rights reserved.
+ * Copyright 2007-2020 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,7 +7,7 @@
  *		John Scipione, jscipione@gmail.com
  *
  * Corresponds to:
- *		headers/os/support/TypeConstants.h	rev 43506
+ *		headers/os/support/TypeConstants.h	hrev54549
  */
 
 
@@ -15,20 +15,20 @@
 	\file TypeConstants.h
 	\ingroup support
 	\ingroup libbe
-	\brief Represents type codes that are used in various part of the Haiku API.
+	\brief Represents type codes that are used by parts of the Haiku API.
 
-	The type codes all refer to a specified type, except one. B_ANY_TYPE can
-	refer to literally any type. This type could be used in case you send or receive
-	data of which you don't know the type, but you want to send or receive it
-	anyway.
+	The type codes all refer to a specified type, except one: \c B_ANY_TYPE
+	can refer to literally any type. This type could be used in case you send
+	or receive data of which you don't know the type, but you want to send or
+	receive it anyway.
 */
 
 
 /*!
 	\var B_ANY_TYPE
-	\brief General type when the exact contents is not yet known.
+	\brief General type when the exact contents are not yet known.
 
-	\since Haiku R1
+	\since BeOS R3
 */
 
 
@@ -56,7 +56,7 @@
 	\var B_BOOL_TYPE
 	\brief Boolean value.
 
-	\since Haiku R1
+	\since BeOS R3
 */
 
 
@@ -64,63 +64,7 @@
 	\var B_CHAR_TYPE
 	\brief Represents the \c char type.
 
-	\since Haiku R1
-*/
-
-
-/*!
-	\var B_COLOR_8_BIT_TYPE
-	\brief Represents a one-byte color.
-
-	\since Haiku R1
-*/
-
-
-/*!
-	\var B_DOUBLE_TYPE
-	\brief Represents the \c double type.
-
-	\since Haiku R1
-*/
-
-
-/*!
-	\var B_FLOAT_TYPE
-	\brief Represents the \c float type.
-
-	\since Haiku R1
-*/
-
-
-/*!
-	\var B_GRAYSCALE_8_BIT_TYPE
-	\brief Represents a byte-long grayscale value.
-
-	\since Haiku R1
-*/
-
-
-/*!
-	\var B_INT16_TYPE
-	\brief Represents a \c short type.
-
-	\since Haiku R1
-*/
-
-
-/*!
-	\var B_INT32_TYPE
-	\brief Represents a \c long type.
-
-	\since Haiku R1
-*/
-
-
-/*!
-	\var B_INT64_TYPE
-	\brief Represents a \c long \c long type.
-
-	\since Haiku R1
+	\since BeOS R3
 */
 
 
@@ -128,45 +72,125 @@
 	\var B_INT8_TYPE
 	\brief Represents a \c char type used for integer storage.
 
-	\since Haiku R1
+	\since BeOS R3
 */
 
 
 /*!
-	\var B_LARGE_ICON_TYPE
-	\brief Represents a large icon.
+	\var B_INT16_TYPE
+	\brief Represents a \c short type.
 
-	\since Haiku R1
+	\since BeOS R3
 */
 
 
 /*!
-	\var B_MEDIA_PARAMETER_GROUP_TYPE
-	\brief Represents the BParameterGroup type from the media kit.
+	\var B_INT32_TYPE
+	\brief Represents a \c long type.
 
-	\since Haiku R1
+	\since BeOS R3
 */
 
 
 /*!
-	\var B_MEDIA_PARAMETER_TYPE
-	\brief Represents the BParameter type from the media kit.
+	\var B_INT64_TYPE
+	\brief Represents a \c long \c long type.
 
-	\since Haiku R1
+	\since BeOS R3
 */
 
 
 /*!
-	\var B_MEDIA_PARAMETER_WEB_TYPE
-	\brief Represents the BParameterWeb type from the media kit.
+	\var B_UINT8_TYPE
+	\brief Represents an unsigned \c char type used for integer storage.
 
-	\since Haiku R1
+	\since BeOS R3
+*/
+
+
+/*!
+	\var B_UINT16_TYPE
+	\brief Represents an unsigned \c short type.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var B_UINT32_TYPE
+	\brief Represents an unsigned \c long type.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var B_UINT64_TYPE
+	\brief Represents an unsigned \c long \c long type.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var B_FLOAT_TYPE
+	\brief Represents the \c float type.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var B_DOUBLE_TYPE
+	\brief Represents the \c double type.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var B_OFF_T_TYPE
+	\brief Represents the \c off_t type.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var B_SIZE_T_TYPE
+	\brief Represents the unsigned \c size_t type.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var B_SSIZE_T_TYPE
+	\brief Represents the signed \c ssize_t type.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var B_POINTER_TYPE
+	\brief Represents a pointer type, including \c void*.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var B_OBJECT_TYPE
+	\brief Represents an object pointer type such as BMessage*.
+
+	\since BeOS R3
 */
 
 
 /*!
 	\var B_MESSAGE_TYPE
-	\brief Represents a BMessage type.
+	\brief Represents a BMessage object.
 
 	\since Haiku R1
 */
@@ -174,13 +198,161 @@
 
 /*!
 	\var B_MESSENGER_TYPE
-	\brief Represents a BMessenger type.
+	\brief Represents a BMessenger object.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var B_RECT_TYPE
+	\brief Represents a BRect object.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var B_REF_TYPE
+	\brief Represents an entry_ref structure.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var B_RGB_COLOR_TYPE
+	\brief Represents an \c rgb_color structure.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var B_PATTERN_TYPE
+	\brief Represents a \c pattern structure.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var B_ASCII_TYPE
+	\brief Represents a text string in ASCII format.
+
+	\warning Deprecated, do not use, use \c B_STRING_TYPE instead.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var B_STRING_TYPE
+	\brief Represents a \c NUL terminated character array.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var B_MONOCHROME_1_BIT_TYPE
+	\brief Represents raw bitmap data in the \c B_MONOCHROME_1_BIT color space
+	       (1 bit per pixel.)
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var B_GRAYSCALE_8_BIT_TYPE
+	\brief Represents bitmap data in the \c B_GRAYSCALE_8_BIT color space
+	       (8-bits per pixel.)
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var B_COLOR_8_BIT_TYPE
+	\brief Represents raw bitmap data in the \c B_COLOR_8_BIT color space
+	       (8-bits per pixel.)
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var B_RGB_32_BIT_TYPE
+	\brief Represents raw bitmap data in the \c B_RGB_32_BIT color space
+	       (32-bits per pixel.)
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var B_TIME_TYPE
+	\brief Represents 32-bit \c time_t data on 32-bit or 64-bit \c time_t data
+	       on 64-bit.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var B_RAW_TYPE
+	\brief Represents untyped raw data, a stream of bytes.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var B_MIME_TYPE
+	\brief Represents a MIME string of the data type.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var B_MEDIA_PARAMETER_TYPE
+	\brief Represents the BParameter type from the media kit.
+
+	\since BeOS R5
+*/
+
+
+/*!
+	\var B_MEDIA_PARAMETER_WEB_TYPE
+	\brief Represents the BParameterWeb type from the media kit.
+
+	\since BeOS R5
+*/
+
+
+/*!
+	\var B_MEDIA_PARAMETER_GROUP_TYPE
+	\brief Represents the BParameterGroup type from the media kit.
+
+	\since BeOS R5
+*/
+
+
+/*!
+	\var B_MINI_ICON_TYPE
+	\brief Represents a 16x16 icon.
 
 	\since Haiku R1
 */
 
 
-// Todo: the rest of the types
+/*!
+	\var B_LARGE_ICON_TYPE
+	\brief Represents a 32x32 icon.
+
+	\since Haiku R1
+*/
 
 
 /*!
@@ -195,7 +367,7 @@
 	\var B_URL_HTTP
 	\brief application/x-vnd.Be.URL.http
 
-	\since Haiku R1
+	\since BeOS R5
 */
 
 
@@ -203,7 +375,7 @@
 	\var B_URL_HTTPS
 	\brief application/x-vnd.Be.URL.https
 
-	\since Haiku R1
+	\since BeOS R5
 */
 
 
@@ -211,7 +383,7 @@
 	\var B_URL_FTP
 	\brief application/x-vnd.Be.URL.ftp
 
-	\since Haiku R1
+	\since BeOS R5
 */
 
 
@@ -219,7 +391,7 @@
 	\var B_URL_GOPHER
 	\brief application/x-vnd.Be.URL.gopher
 
-	\since Haiku R1
+	\since BeOS R5
 */
 
 
@@ -227,7 +399,7 @@
 	\var B_URL_MAILTO
 	\brief application/x-vnd.Be.URL.mailto
 
-	\since Haiku R1
+	\since BeOS R5
 */
 
 
@@ -235,7 +407,7 @@
 	\var B_URL_NEWS
 	\brief application/x-vnd.Be.URL.news
 
-	\since Haiku R1
+	\since BeOS R5
 */
 
 
@@ -243,7 +415,7 @@
 	\var B_URL_NNTP
 	\brief application/x-vnd.Be.URL.nntp
 
-	\since Haiku R1
+	\since BeOS R5
 */
 
 
@@ -251,7 +423,7 @@
 	\var B_URL_TELNET
 	\brief application/x-vnd.Be.URL.telnet
 
-	\since Haiku R1
+	\since BeOS R5
 */
 
 
@@ -259,7 +431,7 @@
 	\var B_URL_RLOGIN
 	\brief application/x-vnd.Be.URL.rlogin
 
-	\since Haiku R1
+	\since BeOS R5
 */
 
 
@@ -267,7 +439,7 @@
 	\var B_URL_TN3270
 	\brief application/x-vnd.Be.URL.tn3270
 
-	\since Haiku R1
+	\since BeOS R5
 */
 
 
@@ -275,7 +447,7 @@
 	\var B_URL_WAIS
 	\brief application/x-vnd.Be.URL.wais
 
-	\since Haiku R1
+	\since BeOS R5
 */
 
 
@@ -283,7 +455,7 @@
 	\var B_URL_FILE
 	\brief application/x-vnd.Be.URL.file
 
-	\since Haiku R1
+	\since BeOS R5
 */
 
 

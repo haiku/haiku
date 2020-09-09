@@ -1345,8 +1345,7 @@
 
 /*!
 	\fn status_t BMessage::AddRef(const char* name, const entry_ref* ref)
-	\brief Convenience method to add an \c entry_ref to the label
-	       \a name.
+	\brief Convenience method to add an \c entry_ref to the label \a name.
 
 	This method calls AddData() with the \c B_REF_TYPE \a type.
 
@@ -4423,7 +4422,8 @@ bool enabled = GetBool("enabled", false);
 
 
 /*!
-	\fn rgb_color BMessage::GetColor(const char* name, rgb_color defaultValue) const
+	\fn rgb_color BMessage::GetColor(const char* name,
+		rgb_color defaultValue) const
 	\brief Return the rgb_color value from message with \a name, or
 	       \a defaultValue if not found.
 
@@ -4440,8 +4440,8 @@ bool enabled = GetBool("enabled", false);
 /*!
 	\fn rgb_color BMessage::GetColor(const char* name, int32 index,
 		rgb_color defaultValue) const
-	\brief Return the rgb_color value from message with \a name and \a index, or
-	       \a defaultValue if not found.
+	\brief Return the rgb_color value from message with \a name and \a index,
+	       or \a defaultValue if not found.
 
 	\param name The name of the item to retrieve.
 	\param index The index of the item to retrieve if there is more than one.
@@ -4554,7 +4554,8 @@ bool enabled = GetBool("enabled", false);
 
 
 /*!
-	\fn BRect BMessage::GetRect(const char* name, const BRect& defaultValue) const
+	\fn BRect BMessage::GetRect(const char* name,
+		const BRect& defaultValue) const
 	\brief Return the BRect object from message with \a name, or
 	       \a defaultValue if not found.
 
@@ -4686,7 +4687,7 @@ bool enabled = GetBool("enabled", false);
 	exist yet, and ReplaceBool(const char*, bool) in case it does.
 
 	\returns A status code, \c B_OK in case of success and \c B_BAD_TYPE in
-		case the item already exists with a different data type.
+	         case the item already exists with a different data type.
 
 	\since Haiku R1
 */
@@ -4703,7 +4704,7 @@ bool enabled = GetBool("enabled", false);
 	exist yet, and ReplaceInt8(const char*, int8) in case it does.
 
 	\returns A status code, \c B_OK in case of success and \c B_BAD_TYPE in
-		case the item already exists with a different data type.
+	         case the item already exists with a different data type.
 
 	\since Haiku R1
 */
@@ -4720,7 +4721,7 @@ bool enabled = GetBool("enabled", false);
 	exist yet, and ReplaceUInt8(const char*, uint8) in case it does.
 
 	\returns A status code, \c B_OK in case of success and \c B_BAD_TYPE in
-		case the item already exists with a different data type.
+	         case the item already exists with a different data type.
 
 	\since Haiku R1
 */
@@ -4737,7 +4738,7 @@ bool enabled = GetBool("enabled", false);
 	exist yet, and ReplaceInt16(const char*, int16) in case it does.
 
 	\returns A status code, \c B_OK in case of success and \c B_BAD_TYPE in
-		case the item already exists with a different data type.
+	         case the item already exists with a different data type.
 
 	\since Haiku R1
 */
@@ -4750,11 +4751,11 @@ bool enabled = GetBool("enabled", false);
 	\param name The name of the item.
 	\param value The value to set the item to.
 
-	This function calls AddUInt16(const char*, uint16) in case the item does not
-	exist yet, and ReplaceUInt16(const char*, uint16) in case it does.
+	This function calls AddUInt16(const char*, uint16) in case the item does
+	not exist yet, and ReplaceUInt16(const char*, uint16) in case it does.
 
 	\returns A status code, \c B_OK in case of success and \c B_BAD_TYPE in
-		case the item already exists with a different data type.
+	         case the item already exists with a different data type.
 
 	\since Haiku R1
 */
@@ -4771,7 +4772,7 @@ bool enabled = GetBool("enabled", false);
 	exist yet, and ReplaceInt32(const char*, int32) in case it does.
 
 	\returns A status code, \c B_OK in case of success and \c B_BAD_TYPE in
-		case the item already exists with a different data type.
+	         case the item already exists with a different data type.
 
 	\since Haiku R1
 */
@@ -4788,7 +4789,7 @@ bool enabled = GetBool("enabled", false);
 	exist yet, and ReplaceUInt32(const char*, uint32) in case it does.
 
 	\returns A status code, \c B_OK in case of success and \c B_BAD_TYPE in
-		case the item already exists with a different data type.
+	         case the item already exists with a different data type.
 
 	\since Haiku R1
 */
@@ -4805,7 +4806,7 @@ bool enabled = GetBool("enabled", false);
 	exist yet, and ReplaceInt64(const char*, int64) in case it does.
 
 	\returns A status code, \c B_OK in case of success and \c B_BAD_TYPE in
-		case the item already exists with a different data type.
+	         case the item already exists with a different data type.
 
 	\since Haiku R1
 */
@@ -4818,11 +4819,11 @@ bool enabled = GetBool("enabled", false);
 	\param name The name of the item.
 	\param value The value to set the item to.
 
-	This function calls AddUInt64(const char*, uint64) in case the item does not
-	exist yet, and ReplaceUInt64(const char*, uint64) in case it does.
+	This function calls AddUInt64(const char*, uint64) in case the item does
+	not exist yet, and ReplaceUInt64(const char*, uint64) in case it does.
 
 	\returns A status code, \c B_OK in case of success and \c B_BAD_TYPE in
-		case the item already exists with a different data type.
+	         case the item already exists with a different data type.
 
 	\since Haiku R1
 */
@@ -4835,11 +4836,11 @@ bool enabled = GetBool("enabled", false);
 	\param name The name of the item.
 	\param value The value to set the item to.
 
-	This function calls AddColor(const char*, rgb_color) in case the item does not
-	exist yet, and ReplaceColor(const char*, rgb_color) in case it does.
+	This function calls AddColor(const char*, rgb_color) in case the item does
+	not exist yet, and ReplaceColor(const char*, rgb_color) in case it does.
 
 	\returns A status code, \c B_OK in case of success and \c B_BAD_TYPE in
-		case the item already exists with a different data type.
+	         case the item already exists with a different data type.
 
 	\since Haiku R1
 */
@@ -4852,11 +4853,12 @@ bool enabled = GetBool("enabled", false);
 	\param name The name of the item.
 	\param value The value to set the item to.
 
-	This function calls AddPointer(const char*, const void*) in case the item does not
-	exist yet, and ReplacePointer(const char*, const void*) in case it does.
+	This function calls AddPointer(const char*, const void*) in case the item
+	does not exist yet, and ReplacePointer(const char*, const void*) in case
+	it does.
 
 	\returns A status code, \c B_OK in case of success and \c B_BAD_TYPE in
-		case the item already exists with a different data type.
+	         case the item already exists with a different data type.
 
 	\since Haiku R1
 */
@@ -4869,11 +4871,12 @@ bool enabled = GetBool("enabled", false);
 	\param name The name of the item.
 	\param string The value to set the item to.
 
-	This function calls AddString(const char*, const char*) in case the item does not
-	exist yet, and ReplaceString(const char*, const char*) in case it does.
+	This function calls AddString(const char*, const char*) in case the item
+	does not exist yet, and ReplaceString(const char*, const char*) in case
+	it does.
 
 	\returns A status code, \c B_OK in case of success and \c B_BAD_TYPE in
-		case the item already exists with a different data type.
+	         case the item already exists with a different data type.
 
 	\since Haiku R1
 */
@@ -4886,11 +4889,12 @@ bool enabled = GetBool("enabled", false);
 	\param name The name of the item.
 	\param string The value to set the item to.
 
-	This function calls AddString(const char*, const BString&) in case the item does not
-	exist yet, and ReplaceString(const char*, const BString&) in case it does.
+	This function calls AddString(const char*, const BString&) in case the item
+	does not exist yet, and ReplaceString(const char*, const BString&) in case
+	it does.
 
 	\returns A status code, \c B_OK in case of success and \c B_BAD_TYPE in
-		case the item already exists with a different data type.
+	         case the item already exists with a different data type.
 
 	\since Haiku R1
 */
@@ -4907,7 +4911,7 @@ bool enabled = GetBool("enabled", false);
 	exist yet, and ReplaceFloat(const char*, float) in case it does.
 
 	\returns A status code, \c B_OK in case of success and \c B_BAD_TYPE in
-		case the item already exists with a different data type.
+	         case the item already exists with a different data type.
 
 	\since Haiku R1
 */
@@ -4924,7 +4928,7 @@ bool enabled = GetBool("enabled", false);
 	exist yet, and ReplaceDouble(const char*, double) in case it does.
 
 	\returns A status code, \c B_OK in case of success and \c B_BAD_TYPE in
-		case the item already exists with a different data type.
+	         case the item already exists with a different data type.
 
 	\since Haiku R1
 */
@@ -4943,7 +4947,7 @@ bool enabled = GetBool("enabled", false);
 	ReplaceAlignment(const char*, const BAlignment &) in case it does.
 
 	\returns A status code, \c B_OK in case of success and \c B_BAD_TYPE in
-		case the item already exists with a different data type.
+	         case the item already exists with a different data type.
 
 	\since Haiku R1
 */
@@ -4961,7 +4965,7 @@ bool enabled = GetBool("enabled", false);
 	it does.
 
 	\returns A status code, \c B_OK in case of success and \c B_BAD_TYPE in
-		case the item already exists with a different data type.
+	         case the item already exists with a different data type.
 
 	\since Haiku R1
 */
@@ -4979,7 +4983,7 @@ bool enabled = GetBool("enabled", false);
 	it does.
 
 	\returns A status code, \c B_OK in case of success and \c B_BAD_TYPE in
-		case the item already exists with a different data type.
+	         case the item already exists with a different data type.
 
 	\since Haiku R1
 */
@@ -4997,7 +5001,7 @@ bool enabled = GetBool("enabled", false);
 	it does.
 
 	\returns A status code, \c B_OK in case of success and \c B_BAD_TYPE in
-		case the item already exists with a different data type.
+	         case the item already exists with a different data type.
 
 	\since Haiku R1
 */
@@ -5012,7 +5016,7 @@ bool enabled = GetBool("enabled", false);
 	This method is used internally. Use the Set* methods above. 
 
 	\returns A status code, \c B_OK in case of success and \c B_BAD_TYPE in
-		case the item already exists with a different data type.
+	         case the item already exists with a different data type.
 
 	\since Haiku R1
 */
