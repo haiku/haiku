@@ -640,6 +640,7 @@ static const Translation kTranslations[] = {
 	"Atsushi Takamatsu\n" \
 	"James Urquhart\n" \
 	"Jason Vandermark\n" \
+	"Panagiotis Vasilopoulos (AlwaysLivid)\n" \
 	"Sandor Vroemisse\n" \
 	"Jürgen Wall\n" \
 	"Denis Washington\n" \
