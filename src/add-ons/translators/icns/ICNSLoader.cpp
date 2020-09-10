@@ -9,11 +9,11 @@
 
 static int compareTypes(const void *a, const void *b)
 {
-	icns_type_t typeItemA = *((icns_type_t*)(*((icns_type_t*)a)));
-	icns_type_t typeItemB = *((icns_type_t*)(*((icns_type_t*)b)));
-	
-	icns_icon_info_t imageInfoA = icns_get_image_info_for_type(typeItemA);
-	icns_icon_info_t imageInfoB = icns_get_image_info_for_type(typeItemB);
+	icns_type_t **typeItemA = (icns_type_t**)a;
+	icns_type_t **typeItemB = (icns_type_t**)b;
+
+	icns_icon_info_t imageInfoA = icns_get_image_info_for_type(**typeItemA);
+	icns_icon_info_t imageInfoB = icns_get_image_info_for_type(**typeItemB);
 
 	return imageInfoB.iconWidth - imageInfoA.iconWidth;
 }
