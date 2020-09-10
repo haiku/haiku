@@ -12,6 +12,7 @@
 
 #include <cpu.h>
 #include <arch/cpu.h>
+#include <arch/system_info.h>
 
 #include <string.h>
 
@@ -168,6 +169,17 @@ cpu_get_active_time(int32 cpu)
 	} while (!release_read_seqlock(&gCPU[cpu].active_time_lock, count));
 
 	return activeTime;
+}
+
+
+uint64
+cpu_frequency(int32 cpu)
+{
+	if (cpu < 0 || cpu >= smp_get_num_cpus())
+		return 0;
+	uint64 frequency = 0;
+	arch_get_frequency(&frequency, cpu);
+	return frequency;
 }
 
 

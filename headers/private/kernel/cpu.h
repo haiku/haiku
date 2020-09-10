@@ -102,6 +102,7 @@ status_t cpu_init_percpu(struct kernel_args *ka, int curr_cpu);
 status_t cpu_init_post_vm(struct kernel_args *args);
 status_t cpu_init_post_modules(struct kernel_args *args);
 bigtime_t cpu_get_active_time(int32 cpu);
+uint64 cpu_frequency(int32 cpu);
 
 cpu_ent *get_cpu_struct(void);
 extern inline cpu_ent *get_cpu_struct(void) { return &gCPU[smp_get_current_cpu()]; }

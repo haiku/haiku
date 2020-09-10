@@ -131,6 +131,38 @@ arch_fill_topology_node(cpu_topology_node_info* node, int32 cpu)
 }
 
 
+static void
+get_frequency_for(void *_frequency, int /*cpu*/)
+{
+	uint64 *frequency = (uint64*)_frequency;
+	uint64 mperf = x86_read_msr(IA32_MSR_MPERF);
+	uint64 aperf = x86_read_msr(IA32_MSR_APERF);
+
+	for (int i = 0; i < 1000; i++)
+		arch_cpu_pause();
+
+	uint64 mperf2 = x86_read_msr(IA32_MSR_MPERF);
+	uint64 aperf2 = x86_read_msr(IA32_MSR_APERF);
+
+	if (mperf2 == mperf)
+		*frequency = 0;
+	else
+		*frequency = (aperf2 - aperf) * sCPUClockSpeed / (mperf2 - mperf);
+}
+
+
+status_t
+arch_get_frequency(uint64 *frequency, int32 cpu)
+{
+	if (x86_check_feature(IA32_FEATURE_APERFMPERF, FEATURE_6_ECX))
+		call_single_cpu_sync(cpu, get_frequency_for, frequency);
+	else
+		*frequency = sCPUClockSpeed;
+
+	return B_OK;
+}
+
+
 //	#pragma mark -
 
 

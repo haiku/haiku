@@ -19,6 +19,8 @@ extern "C" {
 
 status_t arch_system_info_init(struct kernel_args *args);
 void arch_fill_topology_node(cpu_topology_node_info* node, int32 cpu);
+status_t arch_get_frequency(uint64 *frequency, int32 cpu);
+
 
 #ifdef __cplusplus
 }

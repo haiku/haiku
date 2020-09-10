@@ -110,3 +110,11 @@ arch_system_info_init(struct kernel_args *args)
 
 	return B_OK;
 }
+
+
+status_t
+arch_get_frequency(uint64 *frequency, int32 cpu)
+{
+	*frequency = sCPUClockFrequency;
+	return B_OK;
+}
