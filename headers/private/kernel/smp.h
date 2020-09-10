@@ -91,6 +91,11 @@ int32 smp_get_current_cpu(void);
 
 int smp_intercpu_int_handler(int32 cpu);
 
+void call_single_cpu(uint32 targetCPU, void (*func)(void*, int), void* cookie);
+void call_single_cpu_sync(uint32 targetCPU, void (*func)(void*, int),
+	void* cookie);
+
+
 #ifdef __cplusplus
 }
 #endif
