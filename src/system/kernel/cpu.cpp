@@ -89,6 +89,8 @@ load_cpufreq_module()
 
 	if (sCPUPerformanceModule == NULL)
 		dprintf("no valid cpufreq module found\n");
+	else
+		scheduler_update_policy();
 }
 
 

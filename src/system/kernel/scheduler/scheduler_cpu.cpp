@@ -326,7 +326,9 @@ CPUEntry::_RequestPerformanceLevel(ThreadData* threadData)
 	}
 
 	int32 load = std::max(threadData->GetLoad(), fCore->GetLoad());
-	ASSERT(load >= 0 && load <= kMaxLoad);
+	ASSERT_PRINT(load >= 0 && load <= kMaxLoad, "load is out of range %"
+		B_PRId32 " (max of %" B_PRId32 " %" B_PRId32 ")", load,
+		threadData->GetLoad(), fCore->GetLoad());
 
 	if (load < kTargetLoad) {
 		int32 delta = kTargetLoad - load;
