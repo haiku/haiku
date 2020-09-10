@@ -77,7 +77,7 @@ private:
 		mode_mouse					fMode, fOriginalMode;
 		mode_focus_follows_mouse	fFocusFollowsMouseMode;
 		mode_focus_follows_mouse	fOriginalFocusFollowsMouseMode;
-		bool						fAcceptFirstClick
+		bool						fAcceptFirstClick;
 		bool						fOriginalAcceptFirstClick;
 
 		mouse_settings	fSettings, fOriginalSettings;

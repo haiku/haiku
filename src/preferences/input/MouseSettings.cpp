@@ -33,7 +33,7 @@ MouseSettings::MouseSettings(BString name)
 	:
 	fName(name)
 {
-	if (_RetrieveSettings() != B_OK) {
+	if (_RetrieveSettings() != B_OK)
 		Defaults();
 
 	fOriginalSettings = fSettings;
@@ -503,10 +503,9 @@ MultipleMouseSettings::AddMouseSettings(BString mouse_name)
 {
 	if(fDeprecatedMouseSettings != NULL) {
 		MouseSettings* RetrievedSettings = new (std::nothrow) MouseSettings
-			(*fDeprecatedMouseSettings);
+			(*(fDeprecatedMouseSettings->GetSettings()), mouse_name);
 
 		if (RetrievedSettings != NULL) {
-			RetrievedSettings->fName = mouse_name;
 			fMouseSettingsObject.insert(std::pair<BString, MouseSettings*>
 				(mouse_name, RetrievedSettings));
 
