@@ -1,5 +1,6 @@
 /*
  * Copyright 2010, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2020, Panagiotis Vasilopoulos <hello@alwayslivid.com>
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef BOOT_PROMPT_WINDOW_H
@@ -7,6 +8,12 @@
 
 
 #include <Window.h>
+
+
+enum {
+	MSG_LANGUAGE_SELECTED	= 'lngs',
+	MSG_KEYMAP_SELECTED	= 'kmps',
+};
 
 
 class BButton;
@@ -22,6 +29,7 @@ class BootPromptWindow : public BWindow {
 public:
 								BootPromptWindow();
 
+			bool				QuitRequested();
 	virtual	void				MessageReceived(BMessage* message);
 
 private:

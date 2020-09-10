@@ -2,6 +2,7 @@
  * Copyright 2010, Stephan Aßmus <superstippi@gmx.de>
  * Copyright 2010, Adrien Destugues <pulkomandy@pulkomandy.ath.cx>
  * Copyright 2011, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2020, Panagiotis Vasilopoulos <hello@alwayslivid.com>
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -11,6 +12,7 @@
 #include <new>
 #include <stdio.h>
 
+#include <Alert.h>
 #include <Bitmap.h>
 #include <Button.h>
 #include <Catalog.h>
@@ -30,6 +32,7 @@
 #include <MutableLocaleRoster.h>
 #include <ObjectList.h>
 #include <Path.h>
+#include <Roster.h>
 #include <Screen.h>
 #include <ScrollView.h>
 #include <SeparatorView.h>
@@ -44,12 +47,6 @@
 
 
 using BPrivate::MutableLocaleRoster;
-
-
-enum {
-	MSG_LANGUAGE_SELECTED	= 'lngs',
-	MSG_KEYMAP_SELECTED		= 'kmps'
-};
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -138,9 +135,8 @@ compare_void_menu_items(const void* _a, const void* _b)
 BootPromptWindow::BootPromptWindow()
 	:
 	BWindow(BRect(0, 0, 530, 400), "",
-		B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_NOT_CLOSABLE
-			| B_NOT_RESIZABLE | B_AUTO_UPDATE_SIZE_LIMITS,
-		B_ALL_WORKSPACES),
+		B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_NOT_RESIZABLE
+			| B_AUTO_UPDATE_SIZE_LIMITS, B_ALL_WORKSPACES),
 	fDefaultKeymapItem(NULL)
 {
 	SetSizeLimits(450, 16384, 350, 16384);
@@ -255,6 +251,13 @@ BootPromptWindow::BootPromptWindow()
 	fInfoTextView->SetText("x\n\n\n\n\n\n\n\n\n\n\n\n\n\nx");
 	ResizeToPreferred();
 
+	// Minimizing will not be possible, unless if the user is
+	// able to bring the window back up. That means that the
+	// Desktop must be running, in order for the window to be
+	// minimizable.
+	if (!be_roster->IsRunning(kDeskbarSignature))
+		SetFlags(Flags() | B_NOT_MINIMIZABLE);
+
 	_UpdateStrings();
 	CenterOnScreen();
 	Show();
@@ -296,6 +299,44 @@ BootPromptWindow::MessageReceived(BMessage* message)
 		default:
 			BWindow::MessageReceived(message);
 	}
+}
+
+
+bool
+BootPromptWindow::QuitRequested()
+{
+	if (!be_roster->IsRunning(kDeskbarSignature) &&
+		!CurrentMessage()->GetBool("dont_reboot"))
+	{
+		// If the Deskbar is not running, then FirstBootPrompt is
+		// is the only thing visible on the screen and that we won't
+		// have anything else to show. In that case, it would make
+		// sense to reboot the machine instead, but doing so without
+		// a warning could be confusing.
+		//
+		// Rebooting is managed by BootPrompt.cpp.
+
+		BAlert* alert = new BAlert(B_TRANSLATE_SYSTEM_NAME("Quit Haiku"),
+			B_TRANSLATE("Are you sure you want to close this window? This will "
+				"restart your system!"),
+			B_TRANSLATE("Cancel"), B_TRANSLATE("Restart system"), NULL,
+			B_WIDTH_AS_USUAL, B_STOP_ALERT);
+		alert->SetShortcut(0, B_ESCAPE);
+
+		if (alert->Go() == 0) {
+			return false;
+		}
+
+		be_app->PostMessage(MSG_REBOOT_REQUESTED);
+
+	} else {
+		// The aforementioned warning is only shown if the condition
+		// is true, because if FirstBootPrompt is running on the Desktop,
+		// the system will not reboot upon closing the window.
+		be_app->PostMessage(B_QUIT_REQUESTED);
+	}
+
+	return true;
 }
 
 
