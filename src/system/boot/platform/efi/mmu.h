@@ -34,18 +34,18 @@ extern addr_t get_current_virtual_address();
 
 extern void mmu_init();
 
-extern uint64_t mmu_allocate_page();
+extern phys_addr_t mmu_allocate_page();
 
 extern addr_t mmu_map_physical_memory(addr_t physicalAddress, size_t size,
 	uint32 flags);
 
 extern void mmu_free(void *virtualAddress, size_t size);
 
-extern status_t platform_kernel_address_to_bootloader_address(uint64_t address,
+extern status_t platform_kernel_address_to_bootloader_address(addr_t address,
 	void **_result);
 
 extern status_t platform_bootloader_address_to_kernel_address(void *address,
-	uint64_t *_result);
+	addr_t *_result);
 
 #ifdef __cplusplus
 }
@@ -53,10 +53,10 @@ extern status_t platform_bootloader_address_to_kernel_address(void *address,
 
 
 /*! Convert a 32-bit address to a 64-bit address. */
-inline uint64
-fix_address(uint64 address)
+inline addr_t
+fix_address(addr_t address)
 {
-	uint64 result;
+	addr_t result;
 	if (platform_bootloader_address_to_kernel_address((void *)address, &result)
 		!= B_OK) {
 		return address;

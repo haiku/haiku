@@ -27,8 +27,8 @@
 
 struct allocated_memory_region {
 	allocated_memory_region *next;
-	uint64_t vaddr;
-	uint64_t paddr;
+	addr_t vaddr;
+	phys_addr_t paddr;
 	size_t size;
 	bool released;
 };
@@ -46,7 +46,7 @@ static addr_t sNextVirtualAddress = KERNEL_LOAD_BASE + 32 * 1024 * 1024;
 static allocated_memory_region *allocated_memory_regions = NULL;
 
 
-extern "C" uint64_t
+extern "C" phys_addr_t
 mmu_allocate_page()
 {
 	TRACE("%s: called\n", __func__);
@@ -130,7 +130,7 @@ platform_allocate_region(void **_address, size_t size, uint8 /* protection */,
 	region->released = false;
 
 	if (*_address != NULL) {
-		region->vaddr = (uint64_t)*_address;
+		region->vaddr = (addr_t)*_address;
 	}
 
 	//dprintf("Allocated region %#lx (requested %p) %#lx %lu\n", region->vaddr, *_address, region->paddr, region->size);
@@ -196,7 +196,7 @@ get_region(void *address, size_t size)
 
 	for (allocated_memory_region *region = allocated_memory_regions; region;
 		region = region->next) {
-		if (region->paddr == (uint64_t)address && region->size == size) {
+		if (region->paddr == (phys_addr_t)address && region->size == size) {
 			return region;
 		}
 	}
@@ -241,15 +241,14 @@ convert_physical_ranges()
 
 
 extern "C" status_t
-platform_bootloader_address_to_kernel_address(void *address,
-	uint64_t *_result)
+platform_bootloader_address_to_kernel_address(void *address, addr_t *_result)
 {
 	TRACE("%s: called\n", __func__);
 
 	// Convert any physical ranges prior to looking up address
 	convert_physical_ranges();
 
-	uint64_t addr = (uint64_t)address;
+	phys_addr_t addr = (phys_addr_t)address;
 
 	for (allocated_memory_region *region = allocated_memory_regions; region;
 		region = region->next) {
@@ -270,7 +269,7 @@ platform_bootloader_address_to_kernel_address(void *address,
 
 
 extern "C" status_t
-platform_kernel_address_to_bootloader_address(uint64_t address, void **_result)
+platform_kernel_address_to_bootloader_address(addr_t address, void **_result)
 {
 	TRACE("%s: called\n", __func__);
 

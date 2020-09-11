@@ -161,7 +161,7 @@ platform_start_kernel(void)
 		!= B_OK) {
 		panic("Unabled to allocate a stack");
 	}
-	gKernelArgs.cpu_kstack[0].start = fix_address((uint64_t)stack_address);
+	gKernelArgs.cpu_kstack[0].start = fix_address((addr_t)stack_address);
 	gKernelArgs.cpu_kstack[0].size = KERNEL_STACK_SIZE
 		+ KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE;
 	dprintf("Kernel stack at %#lx\n", gKernelArgs.cpu_kstack[0].start);
