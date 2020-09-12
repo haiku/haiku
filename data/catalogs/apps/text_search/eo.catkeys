@@ -1,5 +1,5 @@
 1	esperanto	x-vnd.Haiku.TextSearch	1757850908
-Please select the files you wish to have selected for you in Tracker.	GrepWindow		Bonvolu elekti la dosierojn, kiuj por via deziro estus elektitaj en la Spurilo.
+Please select the files you wish to have selected for you in Tracker.	GrepWindow		Bonvolu elekti la dosierojn, kiuj por via deziro estus elektitaj en Spurilo.
 %appname% : %path%	GrepWindow		%appname% : %path%
 Failed to start xargs program!	Grepper		La programa xargs ne eblas komenciĝi!
 Open selection	GrepWindow		Uzi elektaĵon
@@ -16,7 +16,7 @@ Follow symbolic links	GrepWindow		Sekvi simbolajn ligilojn
 Regular expression	GrepWindow		Regula esprimo
 Text files only	GrepWindow		Nur tekstaj dosieroj
 Quit	GrepWindow		Ĉesi
-Show files in Tracker	GrepWindow		Montri dosierojn en la Spurilo
+Show files in Tracker	GrepWindow		Montri dosierojn en Spurilo
 Please select the files you wish to keep searching.	GrepWindow		Bonvolu elekti la dosierojn, por kiuj vi volus daŭrigi serĉadon.
 Trim to selection	GrepWindow		Stuci ĝis selekto
 Set target…	GrepWindow		Atribui celon…

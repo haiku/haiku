@@ -10,7 +10,7 @@ Document background	Colors tab		Dokumenta fono
 List background	Colors tab		Fono de listoj
 No effect on running applications	DecorSettingsView		Neniu efekto por rulanta programo
 Fixed font:	Font view		Fiksitlarĝa tiparo:
-Appearance	System name		Aspekto (Appearance)
+Appearance	System name		Aspekto
 Reduce colored edges filter strength:	AntialiasingSettingsView		Intenseco de filtro por kolorigitaj randoj:
 Glyph hinting:	AntialiasingSettingsView		Signobilda polurado:
 Default Haiku ControlLook	DecorSettingsView		Antaŭfiksita ControlLook de Haiku

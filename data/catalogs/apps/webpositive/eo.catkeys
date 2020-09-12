@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-WebPositive	1591513524
+1	esperanto	x-vnd.Haiku-WebPositive	1976607515
 Authentication required	Authentication Panel		Aŭtentigo nepra
 Previous	WebPositive Window		Antaŭa
 (Finish: %date)	Download Window		(Fino: %date)
@@ -53,6 +53,7 @@ Cookies for %s	Cookie Manager		Retkuketo por %s
 The download could not be opened.	Download Window		La elŝutito ne povas esti uzata.
 Close	Download Window		Fermi
 WebPositive	System name		La Retprospero (WebPositive)
+%s - Search term	Settings Window		%s - Serĉvorto
 Reload	WebPositive Window		Reŝargi
 Expiration	Cookie Manager		Eksvalidiĝo
 Download finished	Download Window		Ŝargado finiĝis
@@ -73,7 +74,7 @@ Password:	Authentication Panel		Pasvorto:
 Forward	WebPositive Window		Antaŭen
 Clear	Console Window		Viŝi
 Cut	URL Bar		Eltondi
-View	WebPositive Window		Aspekto
+View	WebPositive Window		Vido
 Paste	URL Bar		Alglui
 Find next	WebPositive Window		Pluserĉi
 Open search page	Settings Window		Uzi paĝon de serĉado
@@ -93,7 +94,7 @@ OK	Download Window		Bone
 Proxy username:	Settings Window		Usantnomo ĉe prokurilo:
 Manage bookmarks	WebPositive Window		Administri legosignojn
 /s)	Download Window	...as in 'per second'	/s)
-Restart	Download Window		Relanĉi
+Restart	Download Window		Restartigi
 Serif font:	Settings Window		Serifa tiparo:
 Apply	Settings Window		Apliki
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Eraro dum montrado de dosierujo de legosignoj.\n\nEraro: %error

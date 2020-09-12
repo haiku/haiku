@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-CharacterMap	2768977330
+1	catalan; valencian	x-vnd.Haiku-CharacterMap	2410613018
 Tirhuta	UnicodeBlocks		Tirhuta
 Miscellaneous mathematical symbols B	UnicodeBlocks		Símbols matemàtics diversos - B
 Latin extended E	UnicodeBlocks		Llatí ampliat E
@@ -238,6 +238,7 @@ Supplementary private use area A	UnicodeBlocks		Àrea d'ús privat suplementari 
 Armenian	UnicodeBlocks		Armeni
 Miscellaneous symbols and pictographs	UnicodeBlocks		Símbols i pictogrames diversos
 Phags-pa	UnicodeBlocks		Phags-pa
+Nabataean	UnicodeBlocks		Nabateu
 Meetei Mayek	UnicodeBlocks		Meetei Mayek
 CJK compatibility ideographs	UnicodeBlocks		Idiogrames de compatibilitat CJK
 Show private blocks	CharacterWindow		Mostra els bloqueigs privats
@@ -289,6 +290,7 @@ Elbasan	UnicodeBlocks		Elbasan
 Hangul compatibility Jamo	UnicodeBlocks		Jamo de compatibilitat Hangul
 Phonetic extensions supplement	UnicodeBlocks		Suplement d'extensions fonètiques
 CJK unified ideographs extension E	UnicodeBlocks		Extensió d'ideografies unificades per a CJK E
+Nüshu	UnicodeBlocks		Nü Shu
 Old Persian	UnicodeBlocks		Persa antic
 Malayalam	UnicodeBlocks		Malaiàlam
 CJK radicals supplement	UnicodeBlocks		Suplement de radicals CJK

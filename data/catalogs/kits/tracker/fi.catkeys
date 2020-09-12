@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	3510417168
+1	finnish	x-vnd.Haiku-libtracker	3669766136
 Created	ContainerWindow		Luotu
 Icon	AttributesView		Kuvake
 Open and make preferred	OpenWithWindow		Avaa ja tee ensisijaiseksi
@@ -407,7 +407,6 @@ Paste	ContainerWindow		Liitä
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Kohde nimellä ”%name” on jo olemassa tässä kansiossa, ja saattaa sisältää\nsamannimisiä kohteita. Haluaisitko korvata ne kansiossa, johon %verb?
 Cannot unmount the boot volume \"%name\".	FSUtils		Et voi irrottaa käynnistystaltiota ”%name”.
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Asiakirjan ”%document” avaus sovelluksella ”%app” epäonnistui (Puuttuva symboli: %symbol). \n
-Reference	AttributesView		Viite
 New folder	ContainerWindow		Uusi kansio
 Name	OpenWithWindow		Nimi
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Kohteen ”%name” korvaaminen epäonnistui. Kohde on ehkä avattu tai se on varattu.

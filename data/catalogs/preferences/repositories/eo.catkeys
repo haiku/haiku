@@ -20,7 +20,7 @@ OK	Constants	Button label	Bone
 Status	RepositoriesView	Column title	Stato
 Name	RepositoriesView	Column title	Nomo
 Add	AddRepoWindow	Button label	Aldoni
-Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	La Deponejoj ne povas ricevi nomojn de nun ŝaltitaj deponejoj.
+Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	Deponejoj ne povis ricevi nomojn de nun ŝaltitaj deponejoj.
 Enable all	RepositoriesView	Button label	Ŝalti ĉion
 Aborted	TaskLooper	Aborted task status message	Ĉesigita
 URL	RepositoriesView	Column title	URL
@@ -31,7 +31,7 @@ Failed	TaskLooper	Failed task status message	Malsukceso
 Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	Bona novaĵo! La tasko por deponejo %name% estas plenumita.
 Some tasks are still running. Stop these tasks and quit?	RepositoriesWindow	Application quit alert message	Iuj taskoj ankoraŭ daŭras ruli. Ĉu vi volas halti ilin kaj forlasi?
 This repository URL already exists.	RepositoriesView	Error message	Ĉi tiu deponeja URL jam ekzistas.
-Repositories	System name		La Deponejoj (Repositories)
+Repositories	System name		Deponejoj
 Changes pending:	RepositoriesView	Status view text	Atendataj ŝanĝoj:
 Remove	RepositoriesView	Button label	Forigi
 Remove these repositories?	RepositoriesView	Removal alert confirmation message	Forigi ĉi tiujn deponejojn?

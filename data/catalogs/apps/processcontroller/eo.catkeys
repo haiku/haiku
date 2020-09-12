@@ -5,10 +5,10 @@ That's no Fun!	ProcessController		Tio ne estas ŝerco!
 What do you want to do with the team \"%s\"?	ProcessController		Kion vi volas fari kun la procezaro \"%s\"?
 Your setting file could not be saved!\n(%s)	ProcessController		Ne povas konservi vian dosieron de agordo!\n(%s)
 Processor %d	ProcessController		Procesoro %d
-Live in the Deskbar	ProcessController		Montri en la Laborstrio
+Live in the Deskbar	ProcessController		Montri Laborstrie
 Kill this team!	ProcessController		Ĉesigi la procezaron!
 OK	ProcessController		Bone
-You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Vi povas lanĉi la Taskadministrilon en fenestro aŭ instali ĝin en la Laborstrion.
+You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Vi povas ruli Procezostirilon fenestre aŭ instali ĝin Laborstrie.
 Real-time priority	ProcessController		Realtempa prioritato
 Custom priority	ProcessController		Propra prioritato
 Debug this thread!	ProcessController		Sencimigi la procezon!
@@ -17,8 +17,8 @@ Urgent display priority	ProcessController		Prioritato de urĝa montrado
 Memory usage	ProcessController		Konsumo de memoro
 Ok!	ProcessController		Bone!
 Normal priority	ProcessController		Norma prioritato
-Restart Deskbar	ProcessController		Relanĉi la Laborstrion
-About ProcessController…	ProcessController		Pri la Taskadministrilo…
+Restart Deskbar	ProcessController		Restartigi Laborstrion
+About ProcessController…	ProcessController		Pri Procezostirilo…
 Usage: %s [-deskbar]\n	ProcessController		Uzado: %s [-deskbar]\n
 Please confirm	ProcessController		Konfirmu
 Urgent priority	ProcessController		Urĝa prioritato
@@ -34,16 +34,16 @@ This team is already gone…	ProcessController		Ĉi procezaro jam estas ĉesigit
 Gone teams…	ProcessController		Ĉesigitaj procezaroj…
 Quit an application	ProcessController		Ĉesigi programon
 Cancel	ProcessController		Nuligi
-Install in Deskbar	ProcessController		Instali en la Laborstrion
+Install in Deskbar	ProcessController		Instali Laborstrie
 Debug this team!	ProcessController		Sencimigi ĉi procezaron!
-ProcessController	System name		La Taskadministrilo (ProcessController)
+ProcessController	System name		Procezostirilo
 Lowest active priority	ProcessController		La plej malgranda prioritato
-Restart Tracker	ProcessController		Relanĉi la Spurilon
+Restart Tracker	ProcessController		Restartigi Spurilon
 System resources & caches…	ProcessController		Sistemaj risurcoj & kaŝmemoroj…
 Damned!	ProcessController		Damne!
 New Terminal	ProcessController		Nova la Terminalo
 Power saving	ProcessController		Ŝparado de energio
-ProcessController is already installed in Deskbar.	ProcessController		La Taskadministrilo jam estas instalita en la Laborstrion.
+ProcessController is already installed in Deskbar.	ProcessController		Procezostirilo jam estas instalita Laborstrie.
 This is the last active processor…\nYou can't turn it off!	ProcessController		Ĉi tio estas la lasta aktiva procesoro...\nVi ne povas malŝalti ĝin!!
 This thread is already gone…	ProcessController		Ĉi procezo jam estas ĉesigita…
 Run in window	ProcessController		Ruli en fenestro

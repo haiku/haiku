@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-CharacterMap	2768977330
+1	turkish	x-vnd.Haiku-CharacterMap	2410613018
 Tirhuta	UnicodeBlocks		Tirhuta
 Miscellaneous mathematical symbols B	UnicodeBlocks		Karışık matematik sembolleri B
 Latin extended E	UnicodeBlocks		Latin genişletilmiş E
@@ -238,6 +238,7 @@ Supplementary private use area A	UnicodeBlocks		Ek özel kullanım alanı A
 Armenian	UnicodeBlocks		Ermenice
 Miscellaneous symbols and pictographs	UnicodeBlocks		Çeşitli semboller ve resimyazılar
 Phags-pa	UnicodeBlocks		Phags-pa
+Nabataean	UnicodeBlocks		Nebatî
 Meetei Mayek	UnicodeBlocks		Meetei Mayek
 CJK compatibility ideographs	UnicodeBlocks		ÇJK uyumluluk ideografları
 Show private blocks	CharacterWindow		Özel blokları göster
@@ -289,6 +290,7 @@ Elbasan	UnicodeBlocks		Elbasan
 Hangul compatibility Jamo	UnicodeBlocks		Hangul Jamo uyumluluk
 Phonetic extensions supplement	UnicodeBlocks		Fonetik uzantılar ek
 CJK unified ideographs extension E	UnicodeBlocks		ÇJK birleşik ideograflar uzantısı E
+Nüshu	UnicodeBlocks		Nüşu
 Old Persian	UnicodeBlocks		Eski Persçe
 Malayalam	UnicodeBlocks		Malayalam dili
 CJK radicals supplement	UnicodeBlocks		ÇJK kökler ek

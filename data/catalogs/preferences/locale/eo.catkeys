@@ -25,6 +25,6 @@ Revert	Locale Preflet Window		Malfari
 Translate application and folder names	TimeFormatSettings		Traduki nomojn de programoj kaj dosierujoj
 12 hour	TimeFormatSettings		12 hora
 Positive:	TimeFormatSettings		Pozitiva:
-Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		La Laborstrio kaj la Spurilo bezonas relanĉon por efektiviĝi ĉi ŝanĝon. Ĉu vi deziras relanĉi ilin nun?
-Restart	Locale Preflet Window		Relanĉi
+Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Laborstrio kaj Spurilo devas retstartiĝi pro efektiviĝi ĉi ŝanĝon. Ĉu vi deziras restartigi ilin nun?
+Restart	Locale Preflet Window		Restartigi
 Currency	TimeFormatSettings		Valuto

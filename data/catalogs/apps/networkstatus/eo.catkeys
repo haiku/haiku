@@ -3,8 +3,8 @@ Netmask	NetworkStatusView		Retmasko
 Quit	NetworkStatusView		Ĉesi
 Unknown	NetworkStatusView		Nekonata
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Lanĉado de agordilo por reto malsukcesis.\n\nEraro: 
-Install in Deskbar	NetworkStatus		Instaliĝi en Laborstrio
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		Opcioj de la Retstato:\n\t--deskbar\taŭtomate aldoni replikilon en la Laborstrion\n\t--help\t\tmontri ĉi informon kaj fini
+Install in Deskbar	NetworkStatus		Instaliĝi Laborstrie
+NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		Opcioj de la Retstato:\n\t--deskbar\taŭtomate aldoni replikilon al Laborstrio\n\t--help\t\tmontri ĉi informon kaj fini
 Open network preferences…	NetworkStatusView		Agordi reton…
 NetworkStatus	System name		Retstato
 OK	NetworkStatusView		Bone
@@ -13,11 +13,11 @@ Could not join wireless network:\n	NetworkStatusView		Ne povas konekti sendratan
 Ready	NetworkStatusView		Preta
 Network Status	NetworkStatusView		Stato de reto
 Address	NetworkStatusView		Adreso
-Deskbar is not running, giving up.	NetworkStatus		Laborstrio ne laboras, mi kapitulacas.
+Deskbar is not running, giving up.	NetworkStatus		Laborstrio ne estas rulata, mi rezignas.
 No stateful configuration	NetworkStatusView		La agordo ne estas kompleta
-You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Vi povas lanĉi al Retstaton en fenestro aŭ instali en la Laborstrion.
+You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Vi povas ruli Retstaton fenestre aŭ instali Laborstrie.
 Broadcast	NetworkStatusView		Dissendado
 %ifaceName information:\n	NetworkStatusView		Informo pri %ifaceName:\n
-Run in window	NetworkStatus		Lanĉi en fenestro
+Run in window	NetworkStatus		Ekruli fenestre
 <no wireless networks found>	NetworkStatusView		<neniu sendrata reto estas trovita>
 Configuring	NetworkStatusView		Agordo

@@ -28,7 +28,7 @@ Create PoorMan log	PoorMan		Krei protokolon de Purmano
 Max. simultaneous connections:	PoorMan		Maksimumo de samtempaj konektoj:
 Done	PoorMan		Farite
 Site	PoorMan		Retejo
-Cannot start the server	PoorMan		Ne povas lanĉi la servilon
+Cannot start the server	PoorMan		Neeblas ekruli la servilon
 Create log file	PoorMan		Krei dosieron de protokolo
 Create public_html	PoorMan		Krei dosierujon "public_html"
 Clear hit counter	PoorMan		Nuligi nombrilon de vizitoj
@@ -44,7 +44,7 @@ Copy	PoorMan		Kopii
 Logging	PoorMan		Protokolado
 PoorMan	System name		Purmano
 Clear console log	PoorMan		Nuligi konzolan protokolon
-Run server	PoorMan		Lanĉi servilon
+Run server	PoorMan		Ekruli servilon
 Create	PoorMan		Krei
 {0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# konekto} other{# konektoj}}
 done.\n	PoorMan		farite.\n

@@ -47,7 +47,7 @@ PASS <suppressed>  (real password sent)\n	FtpClient		PASS <subpremita>  (reala p
 SFTP	CodyCam		SFTP
 Output	CodyCam		Eligo
 server address expected	CodyCam		atendis adreson de servilo
-Cannot start the video window	CodyCam		Ne povas lanĉi la videan fenestron
+Cannot start the video window	CodyCam		Ne povas krei la videan fenestron
 reply: %d, %d\n	FtpClient		respondo: %d, %d\n
 Cannot set the time source for the video window	CodyCam		Ne povas atribui la fonton de tempo por la fenestro de video
 Every 15 minutes	CodyCam		Kvaronhore

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-WebPositive	1591513524
+1	japanese	x-vnd.Haiku-WebPositive	1976607515
 Authentication required	Authentication Panel		認証が必要です
 Previous	WebPositive Window		前へ
 (Finish: %date)	Download Window		(完了: %date)
@@ -53,6 +53,7 @@ Cookies for %s	Cookie Manager		%s 用の Cookie
 The download could not be opened.	Download Window		ダウンロードファイルを開けませんでした。
 Close	Download Window		閉じる
 WebPositive	System name		WebPositive
+%s - Search term	Settings Window		%s - 検索語
 Reload	WebPositive Window		再読み込み
 Expiration	Cookie Manager		有効期限
 Download finished	Download Window		ダウンロードが完了しました

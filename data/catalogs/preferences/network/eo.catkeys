@@ -17,7 +17,7 @@ DHCP	IntefaceAddressView		DHCP
 Netmask:	IntefaceAddressView		Retmasko:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Servoj
-Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Instaligo de la Retstato en la Laborstrion malsukcesis: %s
+Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Instaligo de la Retstato en Laborstrion malsukcesis: %s
 Revert	NetworkWindow		Malfari
 off	ServiceListItem		malŝaltita
 WEP	WEP protected network		WEP
@@ -27,7 +27,7 @@ connected	IntefaceView		konektita
 Apply	IntefaceAddressView		Apliki
 Disable	ServiceView		Malebligi
 WPA2	WPA2 protected network		WPA2
-Show network status in Deskbar	NetworkWindow		Montri retan staton en la Laborstrio
+Show network status in Deskbar	NetworkWindow		Montri retan staton en Laborstrio
 Mode:	IntefaceAddressView		Reĝimo:
 connected	InterfaceListItem		konektita
 OK	NetworkWindow		Bone

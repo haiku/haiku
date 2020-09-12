@@ -80,7 +80,7 @@ All packages	PackageListView		Ĉiuj pakaĵoj
 This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		La programo estas tro malnova por komuniki kun la servilo. Akiru pli novan version de la programo per ĝisdatigo de via sistemo. La minimuma necesa versio de la programo estas \"%s\".
 Stability	RatePackageWindow		Stabileco
 Send	RatePackageWindow		Sendi
-Start package daemon	App		Lanĉi pakaĵan demonon
+Start package daemon	App		Ekruli pakaĵan demonon
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		La pasvorto devas esti ripetiĝita pro averti pasvortajn mistajpojn.
 The package action could not be scheduled: %Error%	PackageInfoView		La pakaĵa ago ne povis esti planita: %Error%
 Cancel	RatePackageWindow		Nuligi
@@ -152,7 +152,7 @@ Logged in as %User%	MainWindow		Ensalutis kiel %User%
 Email address:	UserLoginWindow		Retpoŝtadreso:
 Screenshot	ScreenshotWindow		Ekrankopio
 HaikuDepot	System name		HaikuTenejo
-A reboot is necessary to complete the installation process.	PackageManager		Restartigo estas necesa por daŭrigi la instaladan procedon.
+A reboot is necessary to complete the installation process.	PackageManager		Restartigo estas necesa por kompletigi la instalon.
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{Mi havas malpleje unu jaron}other{Mi havas # jarojn aŭ pli}}
 View latest usage conditions…	MainWindow		Vidi plej novan kondiĉojn de uzado…
 Quit	App		Forlasi

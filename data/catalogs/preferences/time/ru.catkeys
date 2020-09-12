@@ -23,7 +23,7 @@ Local time (Windows compatible)	Time		Местное время (совмест�
 Hardware clock set to:	Time		Часы настроены на:
 Arctic	Time		Арктика
 Antarctica	Time		Антарктида
-GMT (UNIX compatible)	Time		По Гринвичу (совместимо с UNIX)
+GMT (UNIX compatible)	Time		Время по Гринвичу (совместимо с UNIX)
 Africa	Time		Африка
 Stop	Time		Остановить
 Time zone	Time		Часовой пояс

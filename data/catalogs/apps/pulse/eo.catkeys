@@ -13,36 +13,36 @@ Defaults	PrefsWindow		Defaŭltoj
 Mini mode	PrefsWindow		Eta reĝimo
 CPU progress bar	NormalPulseView		Panelo de progreso de CPU
 Fade colors	ConfigView		Fadigi kolorojn
-About Pulse…	PulseView		Pri la Pulso…
-Pulse	NormalPulseView		La Pulso
-Deskbar mode	NormalPulseView		Reĝimo de la Laborstrio
-Pulse settings	PulseApp		Agordo de la Pulso
+About Pulse…	PulseView		Pri Pulso…
+Pulse	NormalPulseView		Pulso
+Deskbar mode	NormalPulseView		Reĝimo de Laborstrio
+Pulse settings	PulseApp		Agordoj de Pulso
 Remove replicant	CPUButton		Forigi replikilon
 You can't disable the last active CPU.	PulseView		Vi ne povas malŝalti la lastan aktivan CPU-on.
 Width of icon:	ConfigView		Larĝo de piktogramo:
-Deskbar mode	MiniPulseView		Reĝimo de la Laborstrio
+Deskbar mode	MiniPulseView		Reĝimo de Laborstrio
 OK	PulseView		Bone
 %s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nDe David Ramsey kaj Arve Hjønnevåg\nReviziite per Daniel Switkin\n
 OK	PrefsWindow		Bone
-Pulse	PulseApp		La Pulso
-Removing from Deskbar failed.\n%s	DeskbarPulseView		Forigo el la Laborstrio malsukcesis.\n%s
+Pulse	PulseApp		Pulso
+Removing from Deskbar failed.\n%s	DeskbarPulseView		Forigo el Laborstrio malsukcesis.\n%s
 OK	PulseApp		Bone
-About Pulse…	CPUButton		Pri la Pulso…
-Deskbar mode	PrefsWindow		Reĝimo de la Laborstrio
+About Pulse…	CPUButton		Pri Pulso…
+Deskbar mode	PrefsWindow		Reĝimo de Laborstrio
 Mini mode	DeskbarPulseView		Eta reĝimo
 You can't disable the last active CPU.	CPUButton		Vi ne povas malŝalti la lastan aktivan CPU-on.
 OK	CPUButton		Bone
-Deskbar	CPUButton		La Laborstrio
+Deskbar	CPUButton		Laborstrio
 Settings…	PulseView		Agordo…
-Deskbar menu	CPUButton		Menuo de la Laborstrio
+Deskbar menu	CPUButton		Menuo de Laborstrio
 Mini mode	NormalPulseView		Eta reĝimo
 Quit	MiniPulseView		Ĉesi
 Info	PulseView		Informo
 Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]	PulseApp		Uzado: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]
 OK	DeskbarPulseView		Bone
 Info	PulseApp		Informo
-Pulse	System name		La Pulso
+Pulse	System name		Pulso
 Active color	ConfigView		Koloro por aktiva stato
-Installing in Deskbar failed\n%s	PulseApp		Instaligo en la Laborstrion malsukcesis\n%s
+Installing in Deskbar failed\n%s	PulseApp		Instaligo al Laborstrio malsukcesis\n%s
 Idle color	ConfigView		Koloro por senokupa stato
 Normal mode	PrefsWindow		Norma reĝimo

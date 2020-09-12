@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-CharacterMap	2768977330
+1	ukrainian	x-vnd.Haiku-CharacterMap	2410613018
 Tirhuta	UnicodeBlocks		Тірхута
 Miscellaneous mathematical symbols B	UnicodeBlocks		Різні математичні символи В
 Latin extended E	UnicodeBlocks		Розширена латиниця E
@@ -238,6 +238,7 @@ Supplementary private use area A	UnicodeBlocks		Додаткова област�
 Armenian	UnicodeBlocks		Вірменська
 Miscellaneous symbols and pictographs	UnicodeBlocks		Різні символи та піктограми
 Phags-pa	UnicodeBlocks		Фагс-па
+Nabataean	UnicodeBlocks		Набатейська мова
 Meetei Mayek	UnicodeBlocks		Маніпурі
 CJK compatibility ideographs	UnicodeBlocks		Сумісні ієрогліфи CJK
 Show private blocks	CharacterWindow		Відображати приватні блоки
@@ -289,6 +290,7 @@ Elbasan	UnicodeBlocks		Ельбасанське письмо
 Hangul compatibility Jamo	UnicodeBlocks		Хангиль сумісність з Джамо
 Phonetic extensions supplement	UnicodeBlocks		Додаткові фонетичні розширення
 CJK unified ideographs extension E	UnicodeBlocks		Розширення уніфікованих ідеограм CJK E
+Nüshu	UnicodeBlocks		Нюй-шу
 Old Persian	UnicodeBlocks		Староперсидська
 Malayalam	UnicodeBlocks		Малайялам
 CJK radicals supplement	UnicodeBlocks		Додаткові ієрогліфічні ключі CJK

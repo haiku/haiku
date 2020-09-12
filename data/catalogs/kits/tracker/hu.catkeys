@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	3510417168
+1	hungarian	x-vnd.Haiku-libtracker	3669766136
 Created	ContainerWindow		Létrehozva
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Megnyitás és előnyben részesítés
@@ -407,7 +407,6 @@ Paste	ContainerWindow		Beillesztés
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Már van a mappában egy ilyen nevű elem: %name, és lehet, hogy\nugyanilyen nevű elemeket tartalmaz. Szeretnéd felülírni őket azzal a mappával amit %verb akarsz?
 Cannot unmount the boot volume \"%name\".	FSUtils		Nem sikerült a lemez (%name) leválasztása.
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Nem sikerült megnyitni a dokumentumot (%document) a programmal (%app):\n\tHiányzik egy szimbólum: %symbol\n
-Reference	AttributesView		Referencia
 New folder	ContainerWindow		Új mappa
 Name	OpenWithWindow		Név
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Hiba történt a felülírás közben: %name. Lehet, hogy az elem épp használatban van.

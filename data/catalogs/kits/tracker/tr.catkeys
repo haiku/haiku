@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-libtracker	889321368
+1	turkish	x-vnd.Haiku-libtracker	1048670336
 Created	ContainerWindow		Oluşturulma
 Icon	AttributesView		Simge
 Open and make preferred	OpenWithWindow		Aç ve tercih edilen yap
@@ -407,7 +407,6 @@ Paste	ContainerWindow		Yapıştır
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		\"%name\" adındaki bir öge bu klasörde hâlihazırda var ve aynı adlı ögeler\niçeriyor olabilir. Bu ögeleri %verb ögelerle değiştirmek ister misiniz?
 Cannot unmount the boot volume \"%name\".	FSUtils		\"%name\" önyükleme diskinin bağlantısı kesilemez.
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		\"%document\" \"%app\" uygulaması ile açılamadı (Eksik sembol: %symbol). \n
-Reference	AttributesView		Başvuru
 New folder	ContainerWindow		Yeni klasör
 Name	OpenWithWindow		Ad
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		\"%name\" ögesi değiştirilmeye çalışılırken bir sorun çıktı. Öge açık veya meşgul olabilir.

@@ -13,7 +13,7 @@ Transport: %transport% %transport_address%	PrinterListView		Peranto: %transport%
 Failed	JobListView		Malsukcesis
 Blue	TestPageView		Blua
 Waiting	JobListView		Atendado
-Processing	JobListView		Prilaborado
+Processing	JobListView		Traktante
 Cancel	AddPrinterDialog		Nuligi
 Unknown status	JobListView		Nekonta stato
 Print jobs for %printer_name%	PrintersWindow		Presaj taskoj por %printer_name%
@@ -35,7 +35,7 @@ Printers	System name		Presiloj
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Presilo: %printer_name%\nPelilo: %driver%\n
 Green	TestPageView		Verda
 Print test page	PrintersWindow		Presi testan paĝon
-Restart job	PrintersWindow		Relanĉi taskon
+Restart job	PrintersWindow		Restartigi taskon
 Driver: %driver%	PrinterListView		Pelilo: %driver%
 Cancel job	PrintersWindow		Ĉesi taskon
 %.2f KB	JobListView		%.2f KB

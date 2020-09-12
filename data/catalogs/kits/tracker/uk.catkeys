@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libtracker	3510417168
+1	ukrainian	x-vnd.Haiku-libtracker	3669766136
 Created	ContainerWindow		Cтворений
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Відкрити і зробити пріоритетним
@@ -407,7 +407,6 @@ Paste	ContainerWindow		Вставити
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Елемент з назвою \"%name\" вже існує у цій папці, і може містити\nелементи з такими ж іменами. Ви дійсно бажаєте перемістити його разом з вмістом у теку де Ви є %verb?
 Cannot unmount the boot volume \"%name\".	FSUtils		Неможливо відключити завантажувальний том \"%name\".
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Не вдалося відкрити \"%document\" програмою \"%app\" (Відсутній символ: %symbol). \n
-Reference	AttributesView		Посилання
 New folder	ContainerWindow		Нова папка
 Name	OpenWithWindow		Ім'я
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Виникла проблема при спробі перемістити \"%name\". Елемент може бути відкритим або зайнятим.

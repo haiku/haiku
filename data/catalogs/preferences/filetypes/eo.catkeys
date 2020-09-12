@@ -2,10 +2,10 @@
 Left	Attribute Window	Attribute column alignment in Tracker	Maldekstra
 Float	Attribute ListView		Flosilantapunkto
 Final	Application Types Window		Fina
-FileTypes request	FileTypes Window		Informpeto de la Dosierspeco
-This file type already exists	New File Type Window		Ĉi tiu dosiertipo estas jam ekzistanta
+FileTypes request	FileTypes Window		Informpeto de Dosierspeco
+This file type already exists	New File Type Window		Ĉi tiu dosierspeco estas jam ekzistanta
 Preferred application	FileTypes Window		Preferata aplikaĵo
-Launch	Application Types Window		Lanĉi
+Launch	Application Types Window		Ekruli
 Removing uninstalled application types	Application Types Window		Forigas malinstalajn aplikajn tipojn
 Width:	Attribute Window	Default column width in Tracker for this attribute.	Larĝeco:
 Same as…	FileType Window	The same TYPE as ...	Sama kiel…
@@ -18,7 +18,7 @@ Attribute name:	Attribute Window		Atribunomo:
 Long description:	Application Type Window		Longa priskribo:
 Cancel	Preferred App Menu		Nuligi
 Remove	FileTypes Window		Forigi
-The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		La aplikaĵo \"%s\" ne subtenas ĉi tiun dosiertipon.\nĈu vi certas, ke vi volas atribui ĝin?
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		La aplikaĵo \"%s\" ne subtenas ĉi tiun dosierspecon.\nĈu vi certas, ke vi volas atribui ĝin?
 Remove	Application Type Window		Forigi
 Gamma	Application Type Window		Gamao
 Cancel	Application Type Window		Nuligi
@@ -30,7 +30,7 @@ Could not set preferred application	FileTypes Window		Ne povas atribui preferata
 Description	FileTypes Window		Priskribo
 Signature:	Application Types Window		Subskribo:
 None	FileTypes Window		Nenio
-Exclusive launch	Application Type Window		Ekskluzive lanĉi
+Exclusive launch	Application Type Window		Ekskluzive ekruligo
 Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		Forigo de dosiera speco ne povas esti malfarebla.\nĈu vi certas ke vi volas forigi ĝin?
 Integer 64 bit	Attribute ListView		Entjero 64 bita
 Cancel	New File Type Window		Nuligi
@@ -64,7 +64,7 @@ Select…	FileType Window		Elekti…
 Information	Application Types Window		Informo
 Settings	FileTypes Window		Agordo
 Done	Attribute Window		Farite
-FileTypes request	FileTypes		Informpeto de la Dosierspeco
+FileTypes request	FileTypes		Informpeto de Dosierspeco
 Select same type as	FileType Window		Elekti specon same kiel
 Version:	Application Types Window		Versio:
 (from application)	FileTypes Window		(de programo)
@@ -85,7 +85,7 @@ Editable	Attribute Window	If Tracker allows to edit this attribute.	Redaktebla
 New resource file…	FileTypes Window		Nova dosiero de risurcoj…
 [Multiple files] file types	FileType Window		[Pluropaj dosieroj] dosieraj specoj
 Application type	Application Type Window		Speco de programo
-Show in Tracker…	Application Types Window		Montri en la Spurilo…
+Show in Tracker…	Application Types Window		Montri en Spurilo…
 Type name:	FileTypes Window		Tajpu nomon:
 Visible	Attribute Window		Videbla
 Select preferred application	FileTypes Window		Elektu preferatan programon
@@ -95,7 +95,7 @@ Could not install file type	New File Type Window		Ne povas instali dosieran spec
 Same as…	FileTypes Window		Same kiel…
 Golden master	Application Type Window		Ora mastro
 Checkbox	Attribute ListView		Elektobutono
-FileTypes request	Preferred App Menu		Informpeto de la Dosierspeco
+FileTypes request	Preferred App Menu		Informpeto de Dosierspeco
 no icon	FileTypes Window		piktogramo forestas
 Single launch	Application Type Window		Solrulado
 %s file type	FileType Window		%s dosiera speco
@@ -144,7 +144,7 @@ Open file	FileTypes		Uzi dosieron
 Version info	Application Type Window		Informo pri versio
 Final	Application Type Window		Fina
 Preferred application	FileType Window		Preferataj programoj
-FileTypes	FileTypes		La Dosierspeco
+FileTypes	FileTypes		Dosierspecoj
 Set preferred application	Preferred App Menu		Atribui preferatan programon
 New file type	New File Type Window		Nova dosiera speco
 Short description:	Application Type Window		Mallonga priskribo:
@@ -159,7 +159,7 @@ Close	Application Type Window		Fermi
 Integer 16 bit	Attribute ListView		Entjero 16 bita
 Extension	Extension Window		Kromaĵo
 Rule:	FileTypes Window		Regulo:
-FileTypes	System name		La Dosierspeco
+FileTypes	System name		Dosierspecoj
 Version	Application Types Window		Versio
 Quit	FileTypes Window		Ĉesi
 File type	FileType Window		Dosiera speco

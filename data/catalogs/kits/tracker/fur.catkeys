@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-libtracker	3510417168
+1	friulian	x-vnd.Haiku-libtracker	3669766136
 Created	ContainerWindow		Creât
 Icon	AttributesView		Icone
 Open and make preferred	OpenWithWindow		Vierç e rint preferît
@@ -407,7 +407,6 @@ Paste	ContainerWindow		Tache
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Un element clamât \"%name\" al esist za in cheste cartele e al podarès contignî\nelements cui stes nons. Sostituîju cun chei contignûts te cartele che si sta %verb?
 Cannot unmount the boot volume \"%name\".	FSUtils		Impussibil dismontâ il volum di inviament \"%name\".
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Nol è stât pussibil \"%document\" cu la aplicazion \"%app\" (Al mancje il simbul: %symbol). \n
-Reference	AttributesView		Riferiment
 New folder	ContainerWindow		Gnove cartele
 Name	OpenWithWindow		Non
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Si è presentât un probleme cirint di sostituî \"%name\". L'element al podarès jessi viert o ocupât.

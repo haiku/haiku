@@ -1,9 +1,9 @@
 1	esperanto	x-vnd.Haiku-KeyboardInputServerDevice	131044710
 If the application will not quit you may have to kill it.	Team monitor		Se la programo ne malfermiĝos, vi eble devas mortigi ĝin.
 Quit application	Team monitor		Ĉesi programon
-Open Terminal	Team monitor		Lanĉi terminalon
+Open Terminal	Team monitor		Malfermi terminalon
 {0, plural,one{Hold CONTROL+ALT+DELETE for # second to reboot.}other{Hold CONTROL+ALT+DELETE for # seconds to reboot.}}	Team monitor		{0, plural,one{Premu STIRKLAVON+ALTERNATIVKLAVON+FORIGKLAVON dum # sekundo por restarti.}other{Premu STIRKLAVON+ALTERNATIVKLAVON+FORIGKLAVON dum # sekundoj por restarti.}}
-Restart the desktop	Team monitor		Relanĉi la labortablon
+Restart the desktop	Team monitor		Restartigi la labortablon
 Force reboot	Team monitor		Perforte restartigi
 Team monitor	Team monitor		La Procezarobservilo
 Kill application	Team monitor		Ĉesigi programon

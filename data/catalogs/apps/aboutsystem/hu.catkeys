@@ -16,7 +16,7 @@ Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Copyright © 19
 Past website & marketing:\n	AboutView		Előző weboldal illetve marketing:\n
 Copyright © 2003 Peter Hanappe and others.	AboutView		Copyright © 2003 Peter Hanappe és mások.
 Testing and bug triaging:\n	AboutView		Tesztelés és hibakeresés:\n
-{0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{Processzor:} other{# processzor:}}
+{0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{Processzor:} other{#Processzor:}}
 %d MiB total	AboutView		%d MiB összesen
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Minden egyedi kód a Haikuban, különösen a kernel és azon kódrészletek, amelyek csatolva vannak programokhoz, az <MIT licenc> alatt érhetőek el. Néhány funkciótár tartalmaz harmadik féltől származó kódot, ezek az <LGPL licenc> alatt érhetőek el. A harmadik felekre vonatkozó szerzői jogok alább találhatóak.\n\n
 Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Copyright © 1996-1997 Jeff Prosise. Minden jog fenntartva.

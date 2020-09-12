@@ -1,4 +1,4 @@
 1	hungarian	x-vnd.Haiku-SystemLogger	57960782
 Syslog Daemon	SyslogDaemon		Syslog Daemon
 OK	SyslogDaemon		Rendben
-%s\n\nThis daemon is responsible for collecting all system messages and write them to the system-wide log at \"%s\".\n\n	SyslogDaemon		%s\n\nEz a szolgáltatás felelős a rendszerüzenetek összegyűjtéséért, és azok központi naplóba (%s) írásáért.\n\n
+%s\n\nThis daemon is responsible for collecting all system messages and write them to the system-wide log at \"%s\".\n\n	SyslogDaemon		%s\n\nEz a szolgáltatás felelős a rendszerüzenetek összegyűjtéséért, és azok a \"%s\" központi naplóba való írásáért.\n\n

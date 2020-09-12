@@ -1,6 +1,6 @@
 1	esperanto	x-vnd.Haiku-bluetooth_server	3418434903
 Stopping the Bluetooth server failed.	BluetoothReplicant		Fiasksis ĉesi la bludentan servilon.
-Bluetooth error	BluetoothReplicant		Bludento eraris.
+Bluetooth error	BluetoothReplicant		Bludento eraris
 Settings…	BluetoothReplicant		Agordo…
 OK	BluetoothReplicant		Bone
 Error: %status%	BluetoothReplicant		Eraris: %status%

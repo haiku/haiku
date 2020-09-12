@@ -7,7 +7,7 @@ Show window border	Workspaces		Montri fenestran borderon
 Show window tab	Workspaces		Montri fenestran titiollangeton
 Auto-raise	Workspaces		Aŭtomate suprenigi
 Remove replicant	Workspaces		Forigi replikilon
-Live in the Deskbar	Workspaces		Montri en la Laborstrio
+Live in the Deskbar	Workspaces		Montri Laborstrie
 Usage: %s [options] [workspace]\nwhere \"options\" are:\n  --notitle\t\ttitle bar removed, border and resize kept\n  --noborder\t\ttitle, border, and resize removed\n  --avoidfocus\t\tprevents the window from being the target of keyboard events\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when it's at the screen edge\n  --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n	Workspaces		Uzado: %s [opcioj] [laborspaco]\nkie \"opcioj\" estas:\n  --notitle\t\ttitola langeto forestas, bordero kaj ampleksŝanĝilo ĉeestas\n  --noborder\t\ttitola langeto, bordero, kaj ampleksŝanĝilo forestas\n  --avoidfocus\t\teventoj de klavaro ne trafu al la fenestro\n  --alwaysontop\t\tla fenestro estu ĉiam supre\n  --notmovable\t\tla fenestro estu nemovebla\n  --autoraise\t\taŭtomate suprenigi fenestron de laborspacoj atingante ekranan limon\n  --help\t\tmontri ĉi helpon kaj ĉesi\nkaj \"laborspaco\" estas numero da la laborspaco por transiri (0-31)\n
 Switch on mouse wheel	Workspaces		Ŝanĝi per musa rado
-Workspaces	System name		La Laborspacoj
+Workspaces	System name		Laborspacoj

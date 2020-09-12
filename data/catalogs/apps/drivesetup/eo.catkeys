@@ -20,7 +20,7 @@ Partition size	CreateParametersPanel		Subdiska grandeco
 Validation of the given parameters failed.	MainWindow		Validigo de la donitaj parametroj malsukcesis.
 The partition %s is currently mounted.	MainWindow		La subdisko %s nuntempe estas surmetita.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Ĉu vi certas, ke vi volas strukturi la subdiskon \"%s\"? Ni ankoraŭ demandos vin antaŭ ŝanĝoj estos konservitaj al la disko.
-DriveSetup	System name		La Diskagordilo
+DriveSetup	System name		Diskagordilo
 Mounted at	PartitionList		Surmetita ĉe
 Create…	MainWindow		Krei…
 Write changes	MainWindow		Registri la ŝanĝojn

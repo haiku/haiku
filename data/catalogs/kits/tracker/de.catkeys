@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	2449459098
+1	german	x-vnd.Haiku-libtracker	2608808066
 Created	ContainerWindow		Erstellt
 Icon	AttributesView		Icon
 Open and make preferred	OpenWithWindow		Öffnen und zur Bevorzugten machen
@@ -402,7 +402,6 @@ Paste	ContainerWindow		Einfügen
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Ein Objekt mit dem Namen \"%name\" existiert bereits in diesem Ordner und könnte\nObjekte mit gleichen Namen enthalten. Sollen sie mit denen des Ordners ersetzt werden, der %verb werden soll?
 Cannot unmount the boot volume \"%name\".	FSUtils		Das Boot-Laufwerk \"%name\" kann nicht ausgehängt werden.
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		\"%document\" konnte nicht mit der Anwendung \"%app\" geöffnet werden (Fehlendes Symbol: %symbol).\n
-Reference	AttributesView		Referenz
 New folder	ContainerWindow		Neuer Ordner
 Name	OpenWithWindow		Name
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Es ist ein Problem beim Ersetzen von \"%name\" aufgetreten. Das Objekt könnte geöffnet oder gerade in Benutzung sein.

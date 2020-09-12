@@ -23,7 +23,7 @@ Window width	GeneralView		Fenestra larĝo
 Applications	NotificationView		Programoj
 General	PrefletView		Ĝenerala
 OK	NotificationView		Bone
-Follow Deskbar	GeneralView		Sekvi la Laborstrion
+Follow Deskbar	GeneralView		Sekvi Laborstrion
 Notifications	System name		Sciigoj
 Allowed	NotificationView		Permesita
 Duration:	GeneralView		Daŭro:

@@ -5,25 +5,25 @@ OK	LaunchBox		Bone
 Ignore double-click	LaunchBox		Malatenti duoblan alklakon
 Show on all workspaces	LaunchBox		Montri ĉe ĉiuj laborspacoj
 Name Panel	LaunchBox		Nomi Panelon
-Autostart	LaunchBox		Aŭtomate lanĉi
+Autostart	LaunchBox		Aŭtomate ruli
 Clone	LaunchBox		Kloni
 Description for '%3'	LaunchBox		Priskribo por '%3'
 Show window border	LaunchBox		Montri fenestran borderon
-\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nMalsukcesis lanĉi programon kun subskribo '%2'.\n\nEraro:
-Failed to launch 'something', error in Pad data.	LaunchBox		Malsukcesis lanĉi 'ion', estas eraro en panela datumo.
-LaunchBox	System name		La Lanĉujo (LaunchBox)
+\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nMalsukcesis ekruli programon kun subskribo '%2'.\n\nEraro:
+Failed to launch 'something', error in Pad data.	LaunchBox		Malsukcesis ekruli 'ion', estas eraro en panela datumo.
+LaunchBox	System name		Lanĉujo
 Auto-raise	LaunchBox		Aŭtomate suprenigi
 Icon size	LaunchBox		Piktograma grando
 Open containing folder	LaunchBox		Uzi la enhavatan dosierujon
 Add button here	LaunchBox		Aldoni butonon ĉi tie
 Cancel	LaunchBox		Nuligi
-launch popup	LaunchBox		Lanĉi ŝprucfenestron
+launch popup	LaunchBox		ekruli ŝprucfenestron
 Clear button	LaunchBox		Malplenigi butonon
 Bummer	LaunchBox		Ho ve!
 last chance	LaunchBox		lasta ŝanco
 You can drag an icon here.	LaunchBox		Vi povas treni piktogramon ĉi tien.
 Pad 1	LaunchBox		Panelo 1
-Failed to launch '%1'.\n\nError:	LaunchBox		Malsukcesis lanĉi '%1'.\n\nEraro:
+Failed to launch '%1'.\n\nError:	LaunchBox		Malsukcesis ekruli '%1'.\n\nEraro:
 Settings	LaunchBox		Agordo
 Vertical layout	LaunchBox		Vertikala aranĝo
 Pad	LaunchBox		Panelo
@@ -32,5 +32,5 @@ Remove button	LaunchBox		Forigi butonon
 Quit	LaunchBox		Ĉesi
 Horizontal layout	LaunchBox		Horizontala aranĝo
 New	LaunchBox		Krei
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Malsukcesis sendi la komandon 'uzi dosierujon' al la Spurilo.\n\nEraro: 
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Malsukcesis sendi la komandon 'uzi dosierujon' al Spurilo.\n\nEraro: 
 Pad %1	LaunchBox		Panelo %1

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	3510417168
+1	swedish	x-vnd.Haiku-libtracker	3669766136
 Created	ContainerWindow		Skapad
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Öppna och gör till förval
@@ -407,7 +407,6 @@ Paste	ContainerWindow		Klistra in
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Ett objekt \"%name\" finns redan i katalogen och kan innehålla\nobjekt med samma namn. Vill du byta dem med de objekt i katalogen du %verb?
 Cannot unmount the boot volume \"%name\".	FSUtils		Kan inte avmontera startvolymen \"%name\.
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Kunde inte öppna \"%document\" med programmet \"%app\" (Saknar symbol: %symbol). \n
-Reference	AttributesView		Referens
 New folder	ContainerWindow		Ny mapp
 Name	OpenWithWindow		Namn
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Kunde inte ersätta \"%name\". Filen kan vara öppen eller upptagen.

@@ -6,7 +6,7 @@ Hide clock	TimeView		Kaŝi la horloĝon
 Applications	PreferencesWindow		Programoj
 Time preferences…	TimeView		Agordo de tempo…
 About Haiku	DeskbarMenu		Pri Haiku
-Edit in Tracker…	PreferencesWindow		Redakti per la Spurilo…
+Edit in Tracker…	PreferencesWindow		Redakti per Spurilo…
 Recent documents:	PreferencesWindow		Ĵusaj dokumentoj:
 Recent applications	DeskbarMenu		Ĵusaj programoj
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Programoj
@@ -18,28 +18,28 @@ Menu	PreferencesWindow		Menuo
 Recent documents	DeskbarMenu		Ĵusaj dokumentoj
 Auto-hide	PreferencesWindow		Aŭtomate kaŝi
 Always on top	PreferencesWindow		Ĉiam videbla
-<Deskbar folder is empty>	DeskbarMenu		<Dosierujo de la Laborstrio estas malplena>
+<Deskbar folder is empty>	DeskbarMenu		<Dosierujo de Laborstrio malplenas>
 Show all	WindowMenu		Montri ĉiujn
 No windows	WindowMenu		Neniu fenestro
-Deskbar	System name		La Laborstrio (Deskbar)
+Deskbar	System name		Laborstrio
 Restart system	DeskbarMenu		Restartigi la sistemon
 Large	PreferencesWindow		Granda
 Auto-raise	PreferencesWindow		Aŭtomate antaŭigi
 Recent folders:	PreferencesWindow		Ĵusaj dosierujoj:
 Show application expander	PreferencesWindow		Montri liston de programaj fenestroj
 Close all	WindowMenu		Fermi ĉiujn
-Deskbar preferences	PreferencesWindow		Agordo de la Laborstrio
+Deskbar preferences	PreferencesWindow		Agordoj de Laborstrio
 Mount	DeskbarMenu		Surmeti
 Revert	PreferencesWindow		Malfari
 Small	PreferencesWindow		Malgranda
 Recent applications:	PreferencesWindow		Ĵusaj programoj:
 Shutdown…	DeskbarMenu		Ĉesi laboron…
-Tracker always first	PreferencesWindow		La Spurilo ĉiam unua
+Tracker always first	PreferencesWindow		Spurilo ĉiam unua
 Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Agordo
 Recent folders	DeskbarMenu		Ĵusaj dosierujoj
 About this system	DeskbarMenu		Pri ĉi tiu sistemo
 Show calendar…	TimeView		Montri kalendaron…
-Deskbar preferences…	DeskbarMenu		Agordo de la Laborstrio…
+Deskbar preferences…	DeskbarMenu		Agordo de Laborstrio…
 Expand new applications	PreferencesWindow		Disvolvi la liston dum lanĉo
 Show replicants	DeskbarMenu		Montri replikilojn
 Hide application names	PreferencesWindow		Kaŝi nomojn de programoj

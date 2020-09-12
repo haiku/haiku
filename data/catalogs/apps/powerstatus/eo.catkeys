@@ -1,5 +1,5 @@
-1	esperanto	x-vnd.Haiku-PowerStatus	3173765686
-Run in window	PowerStatus		Lanĉi en fenestro
+1	esperanto	x-vnd.Haiku-PowerStatus	1085070685
+Run in window	PowerStatus		Ekruli fenestre
 Extended battery info	PowerStatus		Plia informo pri akumulilo
 Show status icon	PowerStatus		Montri piktogramon de stato
 Battery charging	PowerStatus		Ŝargado de akumulilo
@@ -16,7 +16,7 @@ Model number: 	PowerStatus		Numero de modelo:
 Battery unused	PowerStatus		Akumulilo ne estas uzata
 Type: 	PowerStatus		Speco: 
 Damaged battery	PowerStatus		Akumulilo estas rompita
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Vi povas lanĉi la Povumstaton en fenestro aŭ instali en la Laborstrion.
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Vi povas ruli Bateriostato fenestre aŭ instali Laborstrie.
  mAh	PowerStatus		 mAh
 Battery discharging	PowerStatus		Malŝargado de akumulilo
 Design voltage: 	PowerStatus		Konstrukcia tensio: 
@@ -30,17 +30,19 @@ Serial number: 	PowerStatus		Numero de serio:
 Battery critical	PowerStatus		Kriza stato de akumulilo
 Capacity: 	PowerStatus		Kapacito: 
  mW	PowerStatus		 mW
+No supported battery detected. PowerStatus cannot be used on your system.	PowerStatus		Neniu subtenata baterio troviĝis. Bateriostato neuzeblas viasisteme.
 Show percent	PowerStatus		Montri procentojn
 Capacity granularity 1: 	PowerStatus		Proksimuma valoro de 1/100 de plena ŝargkapacito:
 The battery level is getting low, please plug in the device.	PowerStatus		La akumulilo malpleniĝas, konektu elektroreton.
 Design capacity warning: 	PowerStatus		Konstrukcia ŝrargnivelo por averto: 
 Capacity granularity 2: 	PowerStatus		Proksimuma valoro de 1/400 de plena ŝargkapacito
+Too bad!	PowerStatus		Diable!
 Technology: 	PowerStatus		Teknologio: 
  mWh	PowerStatus		 mWh
-PowerStatus	System name		La Povumstato
+PowerStatus	System name		Bateriostato
 Design capacity: 	PowerStatus		Konstrukcia kapacito: 
 OEM info: 	PowerStatus		Informo pri origina aparata produktanto: 
 no battery	PowerStatus		akumulilo forestas
 Empty battery slot	PowerStatus		Akumulilingo estas malplena
-Install in Deskbar	PowerStatus		Instali en la Laborstrion
+Install in Deskbar	PowerStatus		Instali Laborstrie
 charging	PowerStatus		ŝargado

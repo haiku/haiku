@@ -29,7 +29,7 @@ Please choose from these update options:\n\nUpdate:\n\tUpdates all installed pac
 The following changes will be made:	SoftwareUpdaterWindow		Sekvaj ŝanĝoj estos faritaj:
 Argument variables are no longer accepted\n	SoftwareUpdaterApp		Argumentaj variabloj plu ne estas akceptataj\n
 Fatal error while checking for updates: %s\n	CheckAction		Fatala eraro dum determinado de ĝisdatigoj: %s\n
-SoftwareUpdater	System name		Programĝisdatigilo (SoftwareUpdater)
+SoftwareUpdater	System name		Ĝisdatigilo
 No active network connection was found.\n	CheckManager		Efektivaj retaj konektoj forestas.\n
 Applying changes	UpdateManager		Aplikado de ŝanĝoj
 Full sync	SoftwareUpdaterWindow	Alert button label	Plena sinkronigo
@@ -41,7 +41,7 @@ Exception occurred while checking for updates: %s\n	CheckAction		Escepto okazis 
 Packages are being updated	UpdateManager		Ĝisdatigotaj pakaĵoj
 Cancel	SoftwareUpdaterWindow		Nuligi
 Don't quit	SoftwareUpdaterWindow		Ne ĉesi
-Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Alklaku tie por lanĉi la Parogramĝisdatigilon. Iuj ĝisdatigoj bezonas elekti solvilon de problemoj,
+Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Alklaku jene por ruli Ĝisdatigilon. Iom da ĝisdatigoj bezonos ke solivgo elektiĝi.
 Checking for updates	SoftwareUpdaterWindow		Determinado de ĝisdatigoj
 Updates completed	UpdateManager		Ĝisdatigo estas kompletigita
 Reboot	SoftwareUpdaterWindow		Restartigi
@@ -60,5 +60,5 @@ Uninstalling version	SoftwareUpdaterWindow	List item text	Malinstalado de versio
 Quit	SoftwareUpdaterWindow		Ĉesi
 No updates available	CheckManager		Ĝisdatigoj forestas
 Usage:  SoftwareUpdater <command> [ <option> ]\nUpdates installed packages.\n\nCommands:\n  update     - Search repositories for updates on all packages.\n  check      - Check for available updates but only display a notification with results.\n  full-sync  - Synchronize the installed packages with the repositories.\n\nOptions:\n  -h or --help       Print this usage help\n  -v or --verbose    Output verbose information\n	SoftwareUpdaterApp	Command line usage help	Uzado:  SoftwareUpdater <komando> [ <opcio> ]\nĜisdatigas instalitajn pakaĵojn.\n\nKomandoj:\n  update     - Serĉi en deponejoj ĝisdatigojn por ĉiuj pakaĵoj.\n  check      - Determini disponeblecon sed nur sciigi pri rezultoj.\n  full-sync  - Sinkronigi la instalitajn pakaĵojn kun la deponejoj.\n\nOpcioj:\n  -h or --help       Montri ĉi helpon\n  -v or --verbose    Informi detale\n
-No remote repositories are available. Please verify that some repositories are enabled using the Repositories preflet or the 'pkgman' command.	SoftwareUpdaterWindow	Error message	Foraj deponejoj forestas. Kontrolu ke eĉ iuj deponejoj estas ŝaltitaj per preferileto la Deponejoj aŭ per la komando "pkgman".
+No remote repositories are available. Please verify that some repositories are enabled using the Repositories preflet or the 'pkgman' command.	SoftwareUpdaterWindow	Error message	Foraj deponejoj forestas. Kontrolu ke eĉ iuj deponejoj estas ŝaltitaj per preferileto Deponejoj aŭ per la komando "pkgman".
 Downloading packages	UpdateManager		Ŝargado de pakaĵoj

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-CharacterMap	2768977330
+1	japanese	x-vnd.Haiku-CharacterMap	2410613018
 Tirhuta	UnicodeBlocks		ティルフータ文字
 Miscellaneous mathematical symbols B	UnicodeBlocks		各種数学記号 B
 Latin extended E	UnicodeBlocks		ラテン文字拡張 E
@@ -238,6 +238,7 @@ Supplementary private use area A	UnicodeBlocks		補助私用領域 A
 Armenian	UnicodeBlocks		アルメニア文字
 Miscellaneous symbols and pictographs	UnicodeBlocks		その他の記号及び絵記号
 Phags-pa	UnicodeBlocks		パスパ文字
+Nabataean	UnicodeBlocks		ナバテア文字
 Meetei Mayek	UnicodeBlocks		メイテイ・マイェック文字
 CJK compatibility ideographs	UnicodeBlocks		CJK 互換漢字
 Show private blocks	CharacterWindow		プライベートブロックを表示
@@ -289,6 +290,7 @@ Elbasan	UnicodeBlocks		エルバサン文字
 Hangul compatibility Jamo	UnicodeBlocks		ハングル互換字母
 Phonetic extensions supplement	UnicodeBlocks		発音拡張補助
 CJK unified ideographs extension E	UnicodeBlocks		CJK 統合漢字拡張 E
+Nüshu	UnicodeBlocks		女書
 Old Persian	UnicodeBlocks		古ペルシャ文字
 Malayalam	UnicodeBlocks		マラヤーラム文字
 CJK radicals supplement	UnicodeBlocks		CJK 部首補助

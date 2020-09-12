@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	3510417168
+1	romanian	x-vnd.Haiku-libtracker	3669766136
 Created	ContainerWindow		Creat
 Icon	AttributesView		Iconiță
 Open and make preferred	OpenWithWindow		Deschide sau fixează ca preferat
@@ -407,7 +407,6 @@ Paste	ContainerWindow		Lipește
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Un element \"%name\" există deja în acest dosar, și ar putea să conțină\nelemente cu aceleași nume. Doriți să le înlocuiți cu cele conținute în dosarul pe care îl %verb?
 Cannot unmount the boot volume \"%name\".	FSUtils		Nu se poate demonta volumul de pornine \"%name\".
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Nu s-a putut deschide \"%document\" cu aplicația \"%app\" (Simbol lipsă: %symbol). \n
-Reference	AttributesView		Referință
 New folder	ContainerWindow		Dosar nou
 Name	OpenWithWindow		Nume
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		A apărut o problemă încercând să se înlocuiască \"%name\". Elementul ar putea fi deschis sau ocupat.

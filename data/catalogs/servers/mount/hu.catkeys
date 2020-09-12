@@ -6,9 +6,9 @@ OK	AutoMounter		Rendben
 Unmount error	AutoMounter		Leválasztási hiba
 The file system on this volume is not the Be file system. It is recommended to mount it in read-only mode, to prevent unintentional data loss because of bugs in Haiku.	AutoMounter		A lemezen lévő fájlrendszer nem Be file System típusú. ajánlott csak olvasható módban csatolni, hogy megelőzzük a Haiku esetleges hibáiból adódó adatvesztést.
 Mount read/write	AutoMounter		Írhatóként is
-Could not unmount disk \"%s\":\n\t%s	AutoMounter		Nem sikerült leválasztani a lemezt (%s)\n\t%s
+Could not unmount disk \"%s\":\n\t%s	AutoMounter		Nem sikerült leválasztani a lemezt \"%s\":\n\t%s
 Mounting volume '%s'\n\n	AutoMounter		Lemez (%s) csatolása\n\n
-Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Nem sikerült leválasztani a lemezt (%s):\n\t%s\n\nKényszerítsük a leválasztást?\n\nMegjegyzés: Ha egy program épp ír a lemezre, adatvesztés következhet be.\n
+Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Nem sikerült leválasztani a lemezt \"%s\":\n\t%s\n\nKényszerítsük a leválasztást?\n\nMegjegyzés: Ha egy program épp ír a lemezre, adatvesztés következhet be.\n
 Force unmount	AutoMounter		Leválasztás kényszerítése
 Mount error	AutoMounter		Csatolási hiba
 Mounting volume <unnamed volume>\n\n	AutoMounter		<Névtelen lemez> csatolása folyamatban\n\n

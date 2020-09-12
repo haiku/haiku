@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	2570961103
+1	russian	x-vnd.Haiku-libtracker	2730310071
 Created	ContainerWindow		Создан
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Открыть и сделать предпочтительным
@@ -402,7 +402,6 @@ Paste	ContainerWindow		Вставить
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Папка \"%name\" уже существует.\nЗаменить существующие файлы при совпадении имён?
 Cannot unmount the boot volume \"%name\".	FSUtils		Невозможно отключить загрузочный раздел \"%name\".
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Невозможно открыть \"%document\" приложением \"%app\" (Отсутствует символ: %symbol). \n
-Reference	AttributesView		Ссылочный
 New folder	ContainerWindow		Новая папка
 Name	OpenWithWindow		Имя
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Ошибка при замене \"%name\". Возможно файл открыт или занят.

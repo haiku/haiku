@@ -4,10 +4,10 @@ OK	ShutdownProcess		Rendben
 Do you really want to shut down the system?	ShutdownProcess		Biztos, hogy le kívánod állítani a rendszert?
 Shutdown status	ShutdownProcess		Leállítás állapota
 Shut down	ShutdownProcess		Leállítás
-The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		A program (%appName%) lehet, hogy blokkolva van egy modális panelen.
+The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		A program \"%appName%\" lehet, hogy blokkolva van egy modális panelen.
 System is shut down	ShutdownProcess		A rendszer leállt
 Restart system	ShutdownProcess		Rendszer újraindítása
-Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Egy program (%appName%) megszakította a rendszer leállítását.
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Egy program \"%appName%\" megszakította a rendszer leállítását.
 Asking background applications to quit.	ShutdownProcess		Háttérprogramok megkérése a leállásra.
 Do you really want to restart the system?	ShutdownProcess		Biztos, hogy újra kívánod indítani a rendszert?
 Restart	ShutdownProcess		Újraindítás
@@ -20,4 +20,4 @@ Tidying things up a bit.	ShutdownProcess		Rendrakás.
 Kill application	ShutdownProcess		Program leállítása
 Shutdown aborted	ShutdownProcess		Leállítás megszakítva
 Shutting down…	ShutdownProcess		Leállás…
-Asking \"%appName%\" to quit.	ShutdownProcess		%appName% megkérése a leállásra.
+Asking \"%appName%\" to quit.	ShutdownProcess		\"%appName%\" megkérése a leállásra.

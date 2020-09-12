@@ -32,8 +32,8 @@ View options	MediaPlayer-SettingsWindow		Rigardi opciojn
 %d kHz	MediaPlayer-InfoWin		%d kHz
 Full volume	MediaPlayer-SettingsWindow		Plena laŭteco
 <untitled>	PlaylistItem-title		<sentitola>
-Start media server	MediaPlayer-Main		Lanĉi la plurmedian servilon
-It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Aspektas ke la plurmedia servilo ne funkcias.\nĈu vi volas lanĉi ĝin?
+Start media server	MediaPlayer-Main		Ekruli la plurmedian servilon
+It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Aspektas ke la plurmedia servilo ne funkcias.\nĈu vi volas ekruli ĝin?
 Location	MediaPlayer-InfoWin		Loko
 Opening '%s'.	MediaPlayer-Main		Ekuzado de '%s'.
 Medium	MediaPlayer-SettingsWindow		Meza

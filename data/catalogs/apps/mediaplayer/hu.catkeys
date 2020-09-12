@@ -83,7 +83,7 @@ All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Nem siker
 Total duration: %s	MediaPlayer-PlaylistWindow		Teljes időtartam: %s
 %.3f kHz	MediaPlayer-InfoWin		%.3f kHz
 Move into trash error	MediaPlayer-RemovePLItemsCmd		Szemetesbe helyezési hiba
-50% scale	MediaPlayer-Main		50%-os méret
+50% scale	MediaPlayer-Main		50% méret
 Drop files to play	MediaPlayer-Main		Húzzon ide fájlokat a lejátszáshoz
 Copy Entry	MediaPlayer-CopyPLItemsCmd		Bejegyzés másolása
 Close window after playing audio	MediaPlayer-SettingsWindow		Hangfájl lejátszása után zárja be az ablakot

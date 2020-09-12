@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-libtracker	3510417168
+1	esperanto	x-vnd.Haiku-libtracker	3669766136
 Created	ContainerWindow		Kreita
 Icon	AttributesView		Piktogramo
 Open and make preferred	OpenWithWindow		Uzi kaj igi preferata
@@ -159,8 +159,8 @@ The target disk does not support creating links.	FSUtils		La cela disko ne subte
 develop	B_SYSTEM_DEVELOP_DIRECTORY		disvolvo
 64-bit integer	AttributesView		64-bita entjero
 Cut more	ContainerWindow		Tondi pli
-The Tracker must be running to see Info windows.	PoseView		La Spurilo devas funkcii por vidi Informajn fenestrojn.
-Tracker preferences	TrackerSettingsWindow		Agordo de la Spurilo
+The Tracker must be running to see Info windows.	PoseView		Spurilo devas esti rulata por vidi Informajn fenestrojn.
+Tracker preferences	TrackerSettingsWindow		Agordoj de Spurilo
 Read	FilePermissionsView		Legi
 There was an error writing the attribute.	WidgetAttributeText		Eraris skribante la atributon.
 Path	Default Query Columns		Itinero
@@ -255,7 +255,7 @@ Delete	FilePanelPriv		Forigi
 <No recent items>	FavoritesMenu		<Neniu ĵusa elemento>
 Formula %formula	FindPanel	FindResultTitle	Formulo %formula
 Preparing to create links…	StatusWindow		Preparante krei ligilojn...
-Tracker status	StatusWindow		Stato de la Spurilo
+Tracker status	StatusWindow		Stato de Spurilo
 Handles any %type	OpenWithWindow		Traktas ajnan %type
 The mount server could not be contacted.	AutoMounterSettings		Neeblis kontakti la surmetan servilon.
 Query template	FindPanel		Serĉmenda ŝablono
@@ -267,7 +267,7 @@ Finish: after several years	StatusWindow		Fino: post kelkaj jaroj
 Favorites	FilePanelPriv		Preferaĵoj
 Point	AttributesView		Montrilo
 home	B_USER_DIRECTORY		hejmo
-Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Novaj Ŝablonoj de la Spurilo
+Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Novaj Ŝablonoj de Spurilo
 Disk mounting during boot	AutoMounterSettings		Surmetado dum praŝargo
 Don't automount	AutoMounterSettings		Ne surmeti aŭtomate
 Could not find application \"%appname\"	OpenWithWindow		Netroviĝis programo \"%appname\"
@@ -288,7 +288,7 @@ Error creating link to \"%name\".	FSUtils		Eraris kreante ligilon al \"%name\".
 Unknown	FilePermissionsView		Nekonata
 Paste links	ContainerWindow		Alglui ligilojn
 Restoring: 	StatusWindow		Restaŭrante: 
-The Tracker must be running to set the default printer.	PoseView		La Spurilo devas esti rulata por atribui la defaŭltan presilon.
+The Tracker must be running to set the default printer.	PoseView		Spurilo devas esti rulata por agordi la defaŭltan presilon.
 calculating…	InfoWindow		kalkulante…
 Preferred for file	OpenWithWindow		Preferata por dosiero
 OK	AutoMounterSettings		Bone
@@ -407,7 +407,6 @@ Paste	ContainerWindow		Alglui
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Elemento nomita \"%name\" jam ekzistas en ĉi tiu dosierujo, kaj eble\nenhavas elementojn samnomitajn. Ĉu vi volus anstataŭigi ilin per tiuj enhavataj de la dosierujo kiun vi %verb?
 Cannot unmount the boot volume \"%name\".	FSUtils		Neeblas demeti la praŝarĝan portilon \"%name\".
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Malsukcesis uzi \"%document\"-on per la programo \"%app\" (Mankas simbolo: %symbol). \n
-Reference	AttributesView		Referenco
 New folder	ContainerWindow		Nova dosierujo
 Name	OpenWithWindow		Nomo
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Okazis problemo penante anstataŭigi \"%name\"-on. La elemento povas esti uzata aŭ okupata.

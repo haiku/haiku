@@ -24,11 +24,11 @@ Disconnect	Remote devices		Malkonekti
 Identify us as…	Settings view		Identigi nin kiel…
 From all devices	Settings view		De ĉiuj aparatoj
 Defaults	Window		Defaŭltoj
-Start bluetooth services…	Window		Lanĉi servilojn de Bludento…
+Start bluetooth services…	Window		Ekruli servilojn de Bludento…
 Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Certiĝu, ke kapabloj de via fora Bludenta aparato estas ŝaltitaj. Klaku al 'Informmendo' por ekskani. La tempo bezonata por ricevi nomojn ne estas konata, sed tio ne devas daŭri pli ol 3 sekundoj po aparato. Poste vi povos aldoni ilin al via ĉefa listo, kie vi povos pariĝi kun ili.
 Scanning progress	Inquiry panel		Skanada progreso
-Bluetooth	System name		Bludento (Bluetooth)
-Launch now	main		Lanĉi nun
+Bluetooth	System name		Bludento
+Launch now	main		Ekruli nun
 Remove	Remote devices		Forigi
 Pick device…	Settings view		Elekti aparaton…
 Always ask	Settings view		Ĉiam demandi

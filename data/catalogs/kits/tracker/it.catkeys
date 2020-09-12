@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-libtracker	3510417168
+1	italian	x-vnd.Haiku-libtracker	3669766136
 Created	ContainerWindow		Creato
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Apri e rendi preferito
@@ -407,7 +407,6 @@ Paste	ContainerWindow		Incolla
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Esiste già in questa cartella un elemento chiamato \"%name\", e potrebbe contenere\nelementi con gli stessi nomi. Sostituirli con quelli contenuti nella cartella che si sta %verb?
 Cannot unmount the boot volume \"%name\".	FSUtils		Non è stato possibile smontare il volume di boot \"%name\".
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Non è stato possibile aprire \"%document\" con l'applicazione \"%app\" (Simbolo mancante: %symbol). \n
-Reference	AttributesView		Riferimento
 New folder	ContainerWindow		Nuova cartella
 Name	OpenWithWindow		Nome
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Si è presentato un problema sostituendo \"%name\". L'elemento potrebbe essere già stato aperto o occupato.

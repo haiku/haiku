@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	3510417168
+1	japanese	x-vnd.Haiku-libtracker	3669766136
 Created	ContainerWindow		作成日時
 Icon	AttributesView		アイコン
 Open and make preferred	OpenWithWindow		関連付けて開く
@@ -407,7 +407,6 @@ Paste	ContainerWindow		貼り付け
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		このフォルダーに\"%name\"という項目がすでに存在して、中に同じ名前の項目が入っている可能性もあります。%verbしようとしている項目と置き換えますか?
 Cannot unmount the boot volume \"%name\".	FSUtils		起動ボリューム \"%name\" をマウント解除できません。
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		\"%document\" を \"%app\" で開けませんでした (シンボル %symbol が見つかりません)。\n
-Reference	AttributesView		リファレンス
 New folder	ContainerWindow		新規フォルダー
 Name	OpenWithWindow		名前
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		\"%name\"を置き換えようとしたら不具合が発生しました。項目は開いた状態か使用中かもしれません。

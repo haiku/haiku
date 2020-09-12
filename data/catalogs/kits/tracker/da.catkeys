@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-libtracker	3510417168
+1	danish	x-vnd.Haiku-libtracker	3669766136
 Created	ContainerWindow		Oprettet
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Åbn og lav foretrukket
@@ -407,7 +407,6 @@ Paste	ContainerWindow		Sæt ind
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Et element ved navn \"%name\" eksisterer allerede i mappen, og indeholder\nelementer med de samme navne. Vil du erstatte dem med de filer i den mappe du %verb?
 Cannot unmount the boot volume \"%name\".	FSUtils		Kunne ikke afmontere opstartsdiskområdet \"%name\".
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Kunne ikke åbne \"%document\" med programmet \"%app\" (Manglende symbol: %symbol). \n
-Reference	AttributesView		Reference
 New folder	ContainerWindow		Ny mappe
 Name	OpenWithWindow		Navn
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Der opstod et problem ved erstatning af \"%name\". Elementet er måske åben eller optaget.
