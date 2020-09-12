@@ -25,12 +25,11 @@ options:
                               out HaikuPorts cross-compilation repository.
                               <HaikuPorts repo> is the path to a checked out
                               HaikuPorts repository.
-  --build-cross-tools <arch> [ <build tools dir> ]
-                              Assume cross compilation. <build tools dir>
-                              defines the location of the build tools sources.
-                              They will be compiled and placed in the output
-                              directory under "cross-tools". The HAIKU_* tools
-                              variables will be set accordingly.
+  --build-cross-tools <arch>
+                              Assume cross compilation.
+                              Toolchain will be compiled and placed in the
+                              output directory under "cross-tools". The
+                              HAIKU_* tools variables will be set accordingly.
                               <arch> specifies the target architecture, either
                               "x86_gcc2", "x86", "x86_64", "ppc", "m68k",
                               "arm", "arm64", "riscv64", "sparc"
@@ -38,15 +37,16 @@ options:
                               specified multiple times. The first cross tools
                               specify the primary tools, the subsequent ones the
                               secondary tools (for "hybrid" images).
-                              For the first --build-cross-tools the
-                              <build tools dir> argument must be specified and
-                              for the subsequent ones it must be omitted.
   --cross-tools-prefix <prefix>
                               Assume cross compilation. <prefix> should be a
                               path to the directory where the cross
                               compilation tools are located, plus the platform
                               prefix, e.g. "/path/to/tools/i586-pc-haiku-".
                               This overrides the HAIKU_* tool variables.
+  --cross-tools-source <buildtools dir>
+                              Toolchain sources for cross compilation.
+                              <buildtools dir> defines the location of the
+                              buildtools sources.
   --distro-compatibility <level>
                               The distribution's level of compatibility with
                               the official Haiku distribution. The generated
@@ -683,17 +683,15 @@ while [ $# -gt 0 ] ; do
 			)
 			shift 4
 			;;
+		--cross-tools-source)
+			assertparam "$1" $#
+			buildCrossTools=$2
+			shift 2
+			;;
 		--build-cross-tools)
-			if [ -z "$buildCrossTools" ]; then
-				assertparams "$1" 2 $#
-				targetArch=$2
-				buildCrossTools=$3
-				shift 3
-			else
-				assertparam "$1" $#
-				targetArch=$2
-				shift 2
-			fi
+			assertparam "$1" $#
+			targetArch=$2
+			shift 2
 			case "$targetArch" in
 				x86_gcc2)	targetMachine=i586-pc-haiku;;
 				x86)		targetMachine=i586-pc-haiku;;
