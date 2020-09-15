@@ -640,15 +640,12 @@ InstallerWindow::QuitRequested()
 
 	_QuitCopyEngine(false);
 
-	BMessage* quitWithInstallStatus = new BMessage(B_QUIT_REQUESTED);
+	BMessage quitWithInstallStatus(B_QUIT_REQUESTED);
+	quitWithInstallStatus.AddBool("install_complete",
+		fInstallStatus == kFinished);
 
-	if (fInstallStatus == kFinished)
-		quitWithInstallStatus->AddBool("install_complete", true);
-	else
-		quitWithInstallStatus->AddBool("install_compelte", false);
-
-	fWorkerThread->PostMessage(quitWithInstallStatus);
-	be_app->PostMessage(quitWithInstallStatus);
+	fWorkerThread->PostMessage(&quitWithInstallStatus);
+	be_app->PostMessage(&quitWithInstallStatus);
 	return true;
 }
 
