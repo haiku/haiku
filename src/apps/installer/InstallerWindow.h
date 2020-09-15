@@ -43,7 +43,6 @@ public:
 
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	bool				QuitRequested();
-
 private:
 			void				_ShowOptionalPackages();
 			void				_LaunchDriveSetup();

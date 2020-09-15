@@ -78,7 +78,7 @@ InstallerApp::Quit()
 	BApplication::Quit();
 
 	if (!be_roster->IsRunning(kDeskbarSignature)) {
-		if (fInstallStatus == kFinished) {
+		if (CurrentMessage()->GetBool("install_complete")) {
 			// Synchronize disks
 			sync();
 
@@ -94,7 +94,7 @@ InstallerApp::Quit()
 		} else {
 			// Return to FirstBootPrompt if the user hasn't
 			// installed Haiku yet
-			BLaunchRoster().Target("firstbootprompt");
+			be_roster->Launch("application/x-vnd.Haiku-FirstBootPrompt");
 		}
 	}
 }

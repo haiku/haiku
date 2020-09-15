@@ -516,6 +516,7 @@ InstallerWindow::MessageReceived(BMessage *msg)
 
 			_SetStatusMessage(status.String());
 			fInstallStatus = kFinished;
+
 			_DisableInterface(false);
 			fProgressLayoutItem->SetVisible(false);
 			fPkgSwitchLayoutItem->SetVisible(true);
@@ -638,8 +639,16 @@ InstallerWindow::QuitRequested()
 	}
 
 	_QuitCopyEngine(false);
-	fWorkerThread->PostMessage(B_QUIT_REQUESTED);
-	be_app->PostMessage(B_QUIT_REQUESTED);
+
+	BMessage* quitWithInstallStatus = new BMessage(B_QUIT_REQUESTED);
+
+	if (fInstallStatus == kFinished)
+		quitWithInstallStatus->AddBool("install_complete", true);
+	else
+		quitWithInstallStatus->AddBool("install_compelte", false);
+
+	fWorkerThread->PostMessage(quitWithInstallStatus);
+	be_app->PostMessage(quitWithInstallStatus);
 	return true;
 }
 
