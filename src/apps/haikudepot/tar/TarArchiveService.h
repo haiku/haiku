@@ -38,8 +38,10 @@ private:
 
 	static	status_t			_ReadHeader(const uint8* data,
 										TarArchiveHeader& header);
-	static	const BString		_ReadHeaderString(const uint8* data,
-									size_t dataLength);
+	static	int32				_ReadHeaderStringLength(const uint8* data,
+									size_t maxStringLength);
+	static	void				_ReadHeaderString(const uint8* data,
+									size_t dataLength, BString& result);
 	static uint32				_ReadHeaderNumeric(const uint8* data,
 									size_t dataLength);
 	static tar_file_type		_ReadHeaderFileType(uint8 data);

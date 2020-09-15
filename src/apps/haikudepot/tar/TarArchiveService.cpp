@@ -116,13 +116,23 @@ TarArchiveService::_ReadHeaderFileType(unsigned char data) {
 }
 
 
-/*const*/ const BString
-TarArchiveService::_ReadHeaderString(const uint8 *data, size_t dataLength)
+/*static*/ int32
+TarArchiveService::_ReadHeaderStringLength(const uint8* data,
+	size_t maxStringLength)
 {
-	uint32 actualLength = 0;
-	while (actualLength < dataLength && 0 != data[actualLength])
+	int32 actualLength = 0;
+	while (actualLength < (int32) maxStringLength && data[actualLength] != 0)
 		actualLength++;
-	return BString((const char *) data, actualLength);
+	return actualLength;
+}
+
+
+void
+TarArchiveService::_ReadHeaderString(const uint8 *data, size_t maxStringLength,
+	BString& result)
+{
+	result.SetTo((const char *) data,
+		_ReadHeaderStringLength(data, maxStringLength));
 }
 
 
@@ -198,8 +208,10 @@ TarArchiveService::_ReadHeader(const uint8* block, TarArchiveHeader& header)
 		return B_BAD_DATA;
 	}
 
-	header.SetFileName(
-		_ReadHeaderString(&block[OFFSET_FILENAME], LENGTH_FILENAME));
+	BString fileName;
+	_ReadHeaderString(&block[OFFSET_FILENAME], LENGTH_FILENAME, fileName);
+
+	header.SetFileName(fileName);
 	header.SetLength(
 		_ReadHeaderNumeric(&block[OFFSET_LENGTH], LENGTH_LENGTH));
 	header.SetFileType(

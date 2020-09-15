@@ -28,11 +28,11 @@ enum {
 };
 
 enum BitmapSize {
-	BITMAP_SIZE_16							= 1,
-	BITMAP_SIZE_22							= 2,
-	BITMAP_SIZE_32							= 3,
-	BITMAP_SIZE_64							= 4,
-	BITMAP_SIZE_ANY							= 5
+	BITMAP_SIZE_16							= 0,
+	BITMAP_SIZE_22							= 1,
+	BITMAP_SIZE_32							= 2,
+	BITMAP_SIZE_64							= 3,
+	BITMAP_SIZE_ANY							= 4
 };
 
 // when somebody rates a package, there is a numerical
