@@ -8,6 +8,8 @@
 #include "Model.h"
 
 #include <ctime>
+#include <vector>
+
 #include <stdarg.h>
 #include <time.h>
 
@@ -371,12 +373,12 @@ Model::AddListener(const ModelListenerRef& listener)
 PackageInfoRef
 Model::PackageForName(const BString& name)
 {
-	DepotList depots = Depots();
-	for (int32 d = 0; d < depots.CountItems(); d++) {
-		const DepotInfo& depot = depots.ItemAtFast(d);
-		int32 packageIndex = depot.PackageIndexByName(name);
+	std::vector<DepotInfoRef>::iterator it;
+	for (it = fDepots.begin(); it != fDepots.end(); it++) {
+		DepotInfoRef depotInfoRef = *it;
+		int32 packageIndex = depotInfoRef->PackageIndexByName(name);
 		if (packageIndex >= 0)
-			return depot.Packages().ItemAtFast(packageIndex);
+			return depotInfoRef->Packages().ItemAtFast(packageIndex);
 	}
 	return PackageInfoRef();
 }
@@ -395,53 +397,63 @@ Model::MatchesFilter(const PackageInfoRef& package) const
 }
 
 
-bool
-Model::AddDepot(const DepotInfo& depot)
+void
+Model::MergeOrAddDepot(const DepotInfoRef depot)
 {
-	return fDepots.Add(depot);
+	BString depotName = depot->Name();
+	for(int32 i = 0; i < fDepots.size(); i++) {
+		if (fDepots[i]->Name() == depotName) {
+			DepotInfoRef ersatzDepot(new DepotInfo(*(fDepots[i].Get())), true);
+			ersatzDepot->SyncPackages(depot->Packages());
+			fDepots[i] = ersatzDepot;
+			return;
+		}
+	}
+	fDepots.push_back(depot);
 }
 
 
 bool
 Model::HasDepot(const BString& name) const
 {
-	return NULL != DepotForName(name);
+	return NULL != DepotForName(name).Get();
 }
 
 
-const DepotInfo*
+const DepotInfoRef
 Model::DepotForName(const BString& name) const
 {
-	for (int32 i = fDepots.CountItems() - 1; i >= 0; i--) {
-		if (fDepots.ItemAtFast(i).Name() == name)
-			return &fDepots.ItemAtFast(i);
+	std::vector<DepotInfoRef>::const_iterator it;
+	for (it = fDepots.begin(); it != fDepots.end(); it++) {
+		DepotInfoRef aDepot = *it;
+		if (aDepot->Name() == name)
+			return aDepot;
 	}
-	return NULL;
+	return DepotInfoRef();
 }
 
 
-bool
-Model::SyncDepot(const DepotInfo& depot)
+int32
+Model::CountDepots() const
 {
-	for (int32 i = fDepots.CountItems() - 1; i >= 0; i--) {
-		const DepotInfo& existingDepot = fDepots.ItemAtFast(i);
-		if (existingDepot.Name() == depot.Name()) {
-			DepotInfo mergedDepot(existingDepot);
-			mergedDepot.SyncPackages(depot.Packages());
-			fDepots.Replace(i, mergedDepot);
-			return true;
-		}
-	}
-	return false;
+	return fDepots.size();
+}
+
+
+DepotInfoRef
+Model::DepotAtIndex(int32 index) const
+{
+	return fDepots[index];
 }
 
 
 bool
 Model::HasAnyProminentPackages()
 {
-	for (int32 i = fDepots.CountItems() - 1; i >= 0; i--) {
-		const DepotInfo& existingDepot = fDepots.ItemAtFast(i);
-		if (existingDepot.HasAnyProminentPackages())
+	std::vector<DepotInfoRef>::iterator it;
+	for (it = fDepots.begin(); it != fDepots.end(); it++) {
+		DepotInfoRef aDepot = *it;
+		if (aDepot->HasAnyProminentPackages())
 			return true;
 	}
 	return false;
@@ -451,7 +463,7 @@ Model::HasAnyProminentPackages()
 void
 Model::Clear()
 {
-	fDepots.Clear();
+	fDepots.clear();
 }
 
 
@@ -1032,51 +1044,6 @@ Model::_NotifyCategoryListChanged()
 		const ModelListenerRef& listener = fListeners.ItemAtFast(i);
 		if (listener.Get() != NULL)
 			listener->CategoryListChanged();
-	}
-}
-
-
-
-/*! This method will find the stored 'DepotInfo' that correlates to the
-    supplied 'identifier' and will invoke the mapper function in order
-    to get a replacement for the 'DepotInfo'.  The 'identifier' holds
-    across mirrors.
-*/
-
-void
-Model::ReplaceDepotByIdentifier(const BString& identifier,
-	DepotMapper* depotMapper, void* context)
-{
-	for (int32 i = 0; i < fDepots.CountItems(); i++) {
-		DepotInfo depotInfo = fDepots.ItemAtFast(i);
-
-		if (identifier == depotInfo.URL()) {
-			BAutolock locker(&fLock);
-			fDepots.Replace(i, depotMapper->MapDepot(depotInfo, context));
-		}
-	}
-}
-
-
-void
-Model::LogDepotsWithNoWebAppRepositoryCode() const
-{
-	int32 i;
-
-	for (i = 0; i < fDepots.CountItems(); i++) {
-		const DepotInfo& depot = fDepots.ItemAt(i);
-
-		if (depot.WebAppRepositoryCode().Length() == 0) {
-			if (depot.URL().Length() > 0) {
-				HDINFO("depot [%s] (%s) correlates with no repository in the"
-					" the haiku depot server system", depot.Name().String(),
-					depot.URL().String());
-			}
-			else {
-				HDINFO("depot [%s] correlates with no repository in the"
-					" the haiku depot server system", depot.Name().String());
-			}
-		}
 	}
 }
 

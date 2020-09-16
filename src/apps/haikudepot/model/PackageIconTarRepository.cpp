@@ -280,8 +280,7 @@ PackageIconTarRepository::_ToIconCacheKeySuffix(BitmapSize size)
 		case BITMAP_SIZE_ANY:
 			return "any";
 		default:
-			HDERROR("unsupported bitmap size");
-			exit(1);
+			HDFATAL("unsupported bitmap size");
 			break;
 	}
 }

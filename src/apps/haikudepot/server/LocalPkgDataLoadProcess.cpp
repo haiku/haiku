@@ -98,17 +98,21 @@ LocalPkgDataLoadProcess::RunInternal()
  	if (result != B_OK)
  		return result;
 
- 	std::vector<DepotInfo> depots(repositoryNames.CountStrings());
+ 	std::vector<DepotInfoRef> depots(repositoryNames.CountStrings());
  	for (int32 i = 0; i < repositoryNames.CountStrings(); i++) {
  		const BString& repoName = repositoryNames.StringAt(i);
- 		DepotInfo depotInfo = DepotInfo(repoName);
+ 		DepotInfoRef depotInfoRef = DepotInfoRef(
+ 			new(std::nothrow) DepotInfo(repoName), true);
+
+		if (depotInfoRef.Get() == NULL)
+			HDFATAL("unable to create new depot info - memory exhaustion");
 
  		BRepositoryConfig repoConfig;
  		status_t getRepositoryConfigStatus = roster.GetRepositoryConfig(
  			repoName, &repoConfig);
 
  		if (getRepositoryConfigStatus == B_OK) {
- 			depotInfo.SetURL(repoConfig.Identifier());
+ 			depotInfoRef->SetURL(repoConfig.Identifier());
  			HDDEBUG("[%s] local repository [%s] identifier; [%s]",
  				Name(), repoName.String(), repoConfig.Identifier().String());
  		} else {
@@ -117,7 +121,7 @@ LocalPkgDataLoadProcess::RunInternal()
  				repoName.String(), strerror(getRepositoryConfigStatus));
  		}
 
- 		depots[i] = depotInfo;
+ 		depots[i] = depotInfoRef;
  	}
 
  	PackageManager manager(B_PACKAGE_INSTALLATION_LOCATION_HOME);
@@ -210,11 +214,11 @@ LocalPkgDataLoadProcess::RunInternal()
 
  		if (remoteRepository != NULL) {
 
- 			std::vector<DepotInfo>::iterator it;
+ 			std::vector<DepotInfoRef>::iterator it;
 
  			for (it = depots.begin(); it != depots.end(); it++) {
  				if (RepositoryUrlUtils::EqualsNormalized(
- 					it->URL(), remoteRepository->Config().Identifier())) {
+ 					(*it)->URL(), remoteRepository->Config().Identifier())) {
  					break;
  				}
  			}
@@ -223,7 +227,7 @@ LocalPkgDataLoadProcess::RunInternal()
  				HDDEBUG("pkg [%s] repository [%s] not recognized --> ignored",
  					modelInfo->Name().String(), repositoryName.String());
  			} else {
- 				it->AddPackage(modelInfo);
+ 				(*it)->AddPackage(modelInfo);
  				HDTRACE("pkg [%s] assigned to [%s]",
  					modelInfo->Name().String(), repositoryName.String());
  			}
@@ -264,22 +268,23 @@ LocalPkgDataLoadProcess::RunInternal()
 
  	if (!foundPackages.empty()) {
  		BString repoName = B_TRANSLATE("Local");
- 		depots.push_back(DepotInfo(repoName));
+ 		DepotInfoRef depotInfoRef(new(std::nothrow) DepotInfo(repoName), true);
+
+ 		if (depotInfoRef.Get() == NULL)
+ 			HDFATAL("unable to create a new depot info - memory exhaustion");
+
+ 		depots.push_back(depotInfoRef);
 
  		for (PackageInfoMap::iterator it = foundPackages.begin();
  				it != foundPackages.end(); ++it) {
- 			depots.back().AddPackage(it->second);
+ 			depotInfoRef->AddPackage(it->second);
  		}
  	}
 
  	{
- 		std::vector<DepotInfo>::iterator it;
-
+ 		std::vector<DepotInfoRef>::iterator it;
  		for (it = depots.begin(); it != depots.end(); it++) {
- 			if (fModel->HasDepot(it->Name()))
- 				fModel->SyncDepot(*it);
- 			else
- 				fModel->AddDepot(*it);
+ 			fModel->MergeOrAddDepot(*it);
  		}
  	}
 

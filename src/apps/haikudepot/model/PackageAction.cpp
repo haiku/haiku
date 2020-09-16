@@ -1,6 +1,7 @@
 /*
  * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2013, Rene Gollent, <rene@gollent.com>
+ * Copyright 2020, Andrew Lindesay <apl@lindesay.co.nz>
  *
  * All rights reserved. Distributed under the terms of the MIT License.
  */
@@ -42,11 +43,10 @@ PackageInfoRef
 PackageAction::FindPackageByName(const BString& name)
 {
 	Model* model = GetModel();
-	const DepotList& depots = model->Depots();
 	// TODO: optimize!
-	for (int32 i = 0; i < depots.CountItems(); i++) {
-		const DepotInfo& depot = depots.ItemAtFast(i);
-		const PackageList& packages = depot.Packages();
+	for (int32 i = 0; i < model->CountDepots(); i++) {
+		const DepotInfoRef depotInfoRef = model->DepotAtIndex(i);
+		const PackageList& packages = depotInfoRef->Packages();
 		for (int32 j = 0; j < packages.CountItems(); j++) {
 			PackageInfoRef info = packages.ItemAtFast(j);
 			if (info->Name() == name)

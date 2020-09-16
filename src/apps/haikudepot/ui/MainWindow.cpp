@@ -826,13 +826,11 @@ MainWindow::_AdoptModel()
 	if (fSinglePackageMode)
 		return;
 
-	fModel.Lock()->Lock();
-	const DepotList& depots = fModel.Depots();
-	fModel.Lock()->Unlock();
-
-	for (int32 d = 0; d < depots.CountItems(); d++) {
-		const DepotInfo& depot = depots.ItemAtFast(d);
-		const PackageList& packages = depot.Packages();
+	std::vector<DepotInfoRef> depots = _CreateSnapshotOfDepots();
+	std::vector<DepotInfoRef>::iterator it;
+	for (it = depots.begin(); it != depots.end(); it++) {
+		DepotInfoRef depotInfoRef = *it;
+		const PackageList& packages = depotInfoRef->Packages();
 		for (int32 p = 0; p < packages.CountItems(); p++)
 			_AddRemovePackageFromLists(packages.ItemAtFast(p));
 	}
@@ -1147,17 +1145,23 @@ MainWindow::_UpdateAvailableRepositories()
 	fRepositoryMenu->AddItem(new BSeparatorItem());
 
 	bool foundSelectedDepot = false;
-	const DepotList& depots = fModel.Depots();
-	for (int i = 0; i < depots.CountItems(); i++) {
-		const DepotInfo& depot = depots.ItemAtFast(i);
+	std::vector<DepotInfoRef> depots = _CreateSnapshotOfDepots();
+	std::vector<DepotInfoRef>::iterator it;
 
-		if (depot.Name().Length() != 0) {
+	for (it = depots.begin(); it != depots.end(); it++) {
+		DepotInfoRef depot = *it;
+
+		if (depot->Name().Length() != 0) {
 			BMessage* message = new BMessage(MSG_DEPOT_SELECTED);
-			message->AddString("name", depot.Name());
-			BMenuItem* item = new BMenuItem(depot.Name(), message);
+			message->AddString("name", depot->Name());
+			BMenuItem* item = new(std::nothrow) BMenuItem(depot->Name(), message);
+
+			if (item == NULL)
+				HDFATAL("memory exhaustion");
+
 			fRepositoryMenu->AddItem(item);
 
-			if (depot.Name() == fModel.Depot()) {
+			if (depot->Name() == fModel.Depot()) {
 				item->SetMarked(true);
 				foundSelectedDepot = true;
 			}
@@ -1459,4 +1463,16 @@ MainWindow::_HandleChangePackageListViewMode()
 		BAutolock locker(fModel.Lock());
 		fModel.SetPackageListViewMode(tabMode);
 	}
+}
+
+
+std::vector<DepotInfoRef>
+MainWindow::_CreateSnapshotOfDepots()
+{
+	std::vector<DepotInfoRef> result;
+	BAutolock locker(fModel.Lock());
+	int32 countDepots = fModel.CountDepots();
+	for(int32 i = 0; i < countDepots; i++)
+		result.push_back(fModel.DepotAtIndex(i));
+	return result;
 }

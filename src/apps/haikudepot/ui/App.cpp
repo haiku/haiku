@@ -490,7 +490,7 @@ App::_CheckPackageDaemonRuns()
 		alert->SetShortcut(0, B_ESCAPE);
 
 		if (alert->Go() == 0)
-			exit(1);
+			HDFATAL("unable to start without the package daemon running");
 
 		if (!_LaunchPackageDaemon())
 			break;

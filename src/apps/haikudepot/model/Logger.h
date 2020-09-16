@@ -35,6 +35,13 @@
 #define HDTRACE(M...) HDLOG(LOG_LEVEL_TRACE, M)
 #define HDERROR(M...) HDLOG(LOG_LEVEL_ERROR, M)
 
+#define HDFATAL(M...) do { \
+	printf("{!} (failed @ %s:%d) ", __FILE__, __LINE__); \
+	printf(M); \
+	putchar('\n'); \
+	exit(EXIT_FAILURE); \
+} while (0)
+
 typedef enum log_level {
 	LOG_LEVEL_OFF		= 1,
 	LOG_LEVEL_ERROR		= 2,

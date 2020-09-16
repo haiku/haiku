@@ -6,6 +6,8 @@
 #ifndef MODEL_H
 #define MODEL_H
 
+#include <vector>
+
 #include <Locker.h>
 
 #include "AbstractProcess.h"
@@ -46,13 +48,6 @@ public:
 };
 
 
-class DepotMapper {
-public:
-	virtual DepotInfo			MapDepot(const DepotInfo& depot,
-									void* context) = 0;
-};
-
-
 class PackageConsumer {
 public:
 	virtual	bool				ConsumePackage(
@@ -84,12 +79,11 @@ public:
 			bool				MatchesFilter(
 									const PackageInfoRef& package) const;
 
-			bool				AddDepot(const DepotInfo& depot);
+			void				MergeOrAddDepot(const DepotInfoRef depot);
 			bool				HasDepot(const BString& name) const;
-			const DepotList&	Depots() const
-									{ return fDepots; }
-			const DepotInfo*	DepotForName(const BString& name) const;
-			bool				SyncDepot(const DepotInfo& depot);
+			int32				CountDepots() const;
+			DepotInfoRef		DepotAtIndex(int32 index) const;
+			const DepotInfoRef	DepotForName(const BString& name) const;
 			bool				HasAnyProminentPackages();
 
 			void				Clear();
@@ -150,18 +144,11 @@ public:
 								GetWebAppInterface() const
 									{ return fWebAppInterface; }
 
-			void				ReplaceDepotByIdentifier(
-									const BString& identifier,
-									DepotMapper* depotMapper,
-									void* context);
-
 			status_t			IconTarPath(BPath& path) const;
 			status_t			DumpExportReferenceDataPath(BPath& path);
 			status_t			DumpExportRepositoryDataPath(BPath& path);
 			status_t			DumpExportPkgDataPath(BPath& path,
 									const BString& repositorySourceCode);
-
-			void				LogDepotsWithNoWebAppRepositoryCode() const;
 
 private:
 			void				_AddCategory(const CategoryRef& category);
@@ -186,7 +173,8 @@ private:
 private:
 			BLocker				fLock;
 
-			DepotList			fDepots;
+			std::vector<DepotInfoRef>
+								fDepots;
 
 			CategoryList		fCategories;
 

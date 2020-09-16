@@ -236,21 +236,19 @@ ServerIconExportUpdateProcess::UrlPathComponent()
 void
 ServerIconExportUpdateProcess::_NotifyPackagesWithIconsInDepots() const
 {
-	const DepotList& depots = fModel->Depots();
-	for (int32 d = 0; d < depots.CountItems(); d++) {
-		const DepotInfo& depot = depots.ItemAtFast(d);
-		_NotifyPackagesWithIconsInDepot(depot);
+	for (int32 d = 0; d < fModel->CountDepots(); d++) {
+		_NotifyPackagesWithIconsInDepot(fModel->DepotAtIndex(d));
 	}
 }
 
 
 void
 ServerIconExportUpdateProcess::_NotifyPackagesWithIconsInDepot(
-	const DepotInfo& depot) const
+	const DepotInfoRef& depot) const
 {
 	PackageIconRepository& packageIconRepository
 		= fModel->GetPackageIconRepository();
-	const PackageList& packages = depot.Packages();
+	const PackageList& packages = depot->Packages();
 	for (int32 p = 0; p < packages.CountItems(); p++) {
 		AutoLocker<BLocker> locker(fModel->Lock());
 		const PackageInfoRef& packageInfoRef = packages.ItemAtFast(p);

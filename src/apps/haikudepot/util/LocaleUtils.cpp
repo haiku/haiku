@@ -13,6 +13,8 @@
 #include <LocaleRoster.h>
 #include <StringFormat.h>
 
+#include "Logger.h"
+
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "LocaleUtils"
@@ -38,10 +40,8 @@ LocaleUtils::GetCollator(BCollator* collator)
 {
 	const BLocale* locale = BLocaleRoster::Default()->GetDefaultLocale();
 
-	if (B_OK != locale->GetCollator(collator)) {
-		debugger("unable to get the locale's collator");
-		exit(EXIT_FAILURE);
-	}
+	if (locale->GetCollator(collator) != B_OK)
+		HDFATAL("unable to get the locale's collator");
 }
 
 

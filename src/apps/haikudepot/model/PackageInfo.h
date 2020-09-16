@@ -410,7 +410,7 @@ typedef BReference<PackageInfo> PackageInfoRef;
 typedef List<PackageInfoRef, false> PackageList;
 
 
-class DepotInfo {
+class DepotInfo : public BReferenceable {
 public:
 								DepotInfo();
 								DepotInfo(const BString& name);
@@ -458,7 +458,7 @@ private:
 };
 
 
-typedef List<DepotInfo, false> DepotList;
+typedef BReference<DepotInfo> DepotInfoRef;
 
 
 #endif // PACKAGE_INFO_H

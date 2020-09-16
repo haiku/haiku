@@ -71,6 +71,9 @@ private:
 	virtual	Model*				GetModel();
 
 private:
+			std::vector<DepotInfoRef>
+								_CreateSnapshotOfDepots();
+
 			void				_AddProcessCoordinator(
 									ProcessCoordinator* item);
 			void				_StopProcessCoordinators();
