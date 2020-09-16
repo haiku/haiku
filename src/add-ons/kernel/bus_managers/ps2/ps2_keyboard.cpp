@@ -5,7 +5,7 @@
  * Authors (in chronological order):
  *		Stefano Ceccherini (burton666@libero.it)
  *		Axel Dörfler, axeld@pinc-software.de
- *      Marcus Overhagen <marcus@overhagen.de>
+ *		Marcus Overhagen <marcus@overhagen.de>
  */
 
 
@@ -37,12 +37,14 @@ enum {
 };
 
 enum {
-	EXTENDED_KEY	= 0xe0,
+	EXTENDED_KEY_0	= 0xe0,
+	EXTENDED_KEY_1	= 0xe1,
 
 	LEFT_ALT_KEY	= 0x38,
 	RIGHT_ALT_KEY	= 0xb8,
 	SYS_REQ_KEY		= 0x54,
 	PRNT_SCRN_KEY	= 0x80 | 0x37,
+	PAUSE_KEY		= 0x80 | 0x46,
 };
 
 
@@ -58,7 +60,9 @@ static bool sHasKeyboardReader = false;
 static bool sHasDebugReader = false;
 static sem_id sKeyboardSem;
 static struct packet_buffer *sKeyBuffer;
-static bool sIsExtended = false;
+static bool sIsExtended0 = false;
+static bool sIsExtended1 = false;
+static uint8 sPauseSequenceRead = 0;
 
 static int32 sKeyboardRepeatRate;
 static bigtime_t sKeyboardRepeatDelay;
@@ -126,6 +130,8 @@ keyboard_handle_int(ps2_dev *dev)
 		EMERGENCY_RIGHT_ALT	= 0x02,
 		EMERGENCY_SYS_REQ	= 0x04,
 	};
+
+	static const uint8 pauseSequence[] = { 0x1D, 0x45 };
 	static int emergencyKeyStatus = 0;
 	raw_key_info keyInfo;
 	uint8 scancode = dev->history[0].data;
@@ -133,15 +139,17 @@ keyboard_handle_int(ps2_dev *dev)
 	if (atomic_get(&sKeyboardOpenCount) == 0)
 		return B_HANDLED_INTERRUPT;
 
-	// TODO: Handle braindead "pause" key special case
-
-	if (scancode == EXTENDED_KEY) {
-		sIsExtended = true;
-//		TRACE("Extended key\n");
+	if (scancode == EXTENDED_KEY_0) {
+		sIsExtended0 = true;
+		//TRACE("Extended key 0\n");
 		return B_HANDLED_INTERRUPT;
 	}
 
-//	TRACE("scancode: %x\n", scancode);
+	if (scancode == EXTENDED_KEY_1) {
+		sIsExtended1 = true;
+		//TRACE("Extended key 1\n");
+		return B_HANDLED_INTERRUPT;
+	}
 
 	if ((scancode & 0x80) != 0) {
 		keyInfo.is_keydown = false;
@@ -149,9 +157,23 @@ keyboard_handle_int(ps2_dev *dev)
 	} else
 		keyInfo.is_keydown = true;
 
-	if (sIsExtended) {
+	//	TRACE("scancode: %x\n", scancode);
+
+	// Handle braindead "pause" key special case
+	if (sIsExtended1 && scancode == pauseSequence[sPauseSequenceRead]) {
+		sPauseSequenceRead++;
+		if (sPauseSequenceRead == 2) {
+			sIsExtended1 = false;
+			sPauseSequenceRead = 0;
+			scancode = PAUSE_KEY;
+		} else {
+			return B_HANDLED_INTERRUPT;
+		}
+	}
+
+	if (sIsExtended0) {
 		scancode |= 0x80;
-		sIsExtended = false;
+		sIsExtended0 = false;
 	}
 
 	// Handle emergency keys

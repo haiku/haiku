@@ -11,7 +11,7 @@
 
 
 const static uint32 kATKeycodeMap[] = {
-	0x1,	// Esc
+	0x1,	// Esc			1
 	0x12, 	// 1
 	0x13,	// 2
 	0x14,	// 3
@@ -20,7 +20,7 @@ const static uint32 kATKeycodeMap[] = {
 	0x17,	// 6
 	0x18,	// 7
 	0x19,	// 8
-	0x1a,	// 9
+	0x1a,	// 9			10
 	0x1b,	// 0
 	0x1c,	// -
 	0x1d,	// =
@@ -30,7 +30,7 @@ const static uint32 kATKeycodeMap[] = {
 	0x28,	// W
 	0x29,	// E
 	0x2a,	// R
-	0x2b,	// T
+	0x2b,	// T			20
 	0x2c,	// Y
 	0x2d,	// U
 	0x2e,	// I
@@ -40,7 +40,7 @@ const static uint32 kATKeycodeMap[] = {
 	0x32,	// ]
 	0x47,	// ENTER
 	0x5c,	// Left Control
-	0x3c,	// A
+	0x3c,	// A			30
 	0x3d,	// S
 	0x3e,	// D
 	0x3f,	// F
@@ -50,7 +50,7 @@ const static uint32 kATKeycodeMap[] = {
 	0x43,	// K
 	0x44,	// L
 	0x45,	// ;
-	0x46,	// '
+	0x46,	// '			40
 	0x11,	// `
 	0x4b,	// Left Shift
 	0x33, 	// \ (backslash -- note: don't remove non-white-space after BS char)
@@ -60,7 +60,7 @@ const static uint32 kATKeycodeMap[] = {
 	0x4f,	// V
 	0x50,	// B
 	0x51,	// N
-	0x52,	// M
+	0x52,	// M			50
 	0x53,	// ,
 	0x54,	// .
 	0x55,	// /
@@ -70,7 +70,7 @@ const static uint32 kATKeycodeMap[] = {
 	0x5e,	// Space
 	0x3b,	// Caps
 	0x02,	// F1
-	0x03,	// F2
+	0x03,	// F2			60
 	0x04,	// F3
 	0x05,	// F4
 	0x06,	// F5
@@ -80,7 +80,7 @@ const static uint32 kATKeycodeMap[] = {
 	0x0a,	// F9
 	0x0b,	// F10
 	0x22,	// Num
-	0x0f,	// Scroll
+	0x0f,	// Scroll		70
 	0x37,	// KP 7
 	0x38,	// KP 8
 	0x39,	// KP 9
@@ -90,11 +90,11 @@ const static uint32 kATKeycodeMap[] = {
 	0x4a,	// KP 6
 	0x3a,	// KP +
 	0x58,	// KP 1
-	0x59,	// KP 2
+	0x59,	// KP 2			80
 	0x5a,	// KP 3
 	0x64,	// KP 0
 	0x65,	// KP .
-	0x00,	// UNMAPPED
+	0x7e,	// SystReq
 	0x00,	// UNMAPPED
 	0x69,	// <
 	0x0c,	// F11
@@ -208,7 +208,7 @@ const static uint32 kATKeycodeMap[] = {
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
-	0x7f,   // Break
+	0x10,   // Pause
 	0x20,   // Home
 	0x57,	// Up Arrow		200
 	0x21,   // Page Up
