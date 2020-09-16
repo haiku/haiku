@@ -194,6 +194,7 @@ if $(HAIKU_HOST_USE_32BIT) = 1 {
 
 # save jam's variables for the build platform
 HOST_AR				?= $(AR) ;
+HOST_ARFLAGS		?= $(ARFLAGS) ;
 HOST_CC				?= $(CC) ;
 HOST_C++			?= $(HOST_CC) ;
 HOST_LINK			?= $(HOST_CC) ;
@@ -210,7 +211,7 @@ HOST_HDRS			?= $(HDRS) ;
 # split up HOST_AR into the command name and flags
 HOST_AR				= [ Match "([^ ]*) *(.*)" : $(HOST_AR[1]) ]
 					  $(HOST_AR[2-]) ;
-HOST_ARFLAGS		= $(HOST_AR[2-]) ;
+HOST_ARFLAGS		= $(HOST_AR[2-]) $(HOST_ARFLAGS) ;
 HOST_AR				= $(HOST_AR[1]) ;
 HOST_UNARFLAGS		?= x ;
 
