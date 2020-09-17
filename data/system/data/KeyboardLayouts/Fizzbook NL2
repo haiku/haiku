@@ -1,0 +1,32 @@
+name = Zoostorm Fizzbook  NL2
+
+# Size shortcuts
+default-size = 16,15
+$a = 8,10
+$b = 13,10
+$c = 12,15
+$d = 28,15
+$e = l23,30,17
+$f = 21,15
+$g = 13,15
+$h = 18,10
+
+[205,0; c$a:led-caps; c$a:led-num]
+# Key rows
+#Functions
+[ 0,13; d$h:0x01; $b:+8; d$b:+4; d$b:0x10; d$b:0x0e;  d$b:0x1f;  d19,10:0x34
+]
+#Numbers
+[ 0,23; d$c:0x11; d:+12; d$d:+1;
+]
+#Azerty
+[ 0,38; d$f:0x26; d:+11; d$c:+1; d$e:0x47;
+]
+#Qsdf
+[ 0,53; d25,15:0x3b; d:+11; d$c:0x33;
+]
+#Wxcv
+[ 0,68; d$f:0x4b; d$c:0x69; d:0x4c+8; d13,15:+1; d:+1; $g:+1; $g:0x00]
+#space
+[ 0,83; d$f:0x5c; :0x00; d:0x66; d:0x5d; d76,15:+1; d:+1; d:0x68;
+d:0x60; $g:+3; ]

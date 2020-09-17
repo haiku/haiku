@@ -35,6 +35,7 @@ actions GenerateKeyboardLayoutLocalizationHeader1
 local keyboardLayoutsDir
 	= [ FDirName $(HAIKU_TOP) data system data KeyboardLayouts ] ;
 HAIKU_KEYBOARD_LAYOUT_FILES =
+	"Fizzbook NL2"
 	"Generic 104-key"
 	"Generic 105-key International"
 	"Kinesis Advantage"
