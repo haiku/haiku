@@ -98,9 +98,14 @@ enum UserUsageConditionsSelectionMode {
 
 #define STR_MDASH "\xE2\x80\x94"
 
-#define ALERT_MSG_LOGS_USER_GUIDE "\nInformation about how to view the logs is " \
-	"available in the HaikuDepot section of the user guide."
+#define ALERT_MSG_LOGS_USER_GUIDE "\nInformation about how to view the logs " \
+	"is available in the HaikuDepot section of the user guide."
 
 #define CACHE_DIRECTORY_APP "HaikuDepot"
+
+#define PROMINANCE_ORDERING_PROMINENT_MAX	200
+	// any prominence ordering value greater than this is not prominent.
+#define PROMINANCE_ORDERING_MAX				1000
+	// this is the highest prominence value possible.
 
 #endif // HAIKU_DEPOT_CONSTANTS_H

@@ -22,8 +22,6 @@ class BDataIO;
 class BMessage;
 using BPackageKit::BPackageVersion;
 
-typedef List<BString, false>	StringList;
-
 
 /*! These are error codes that are sent back to the client from the server */
 

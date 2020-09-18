@@ -333,11 +333,11 @@ public:
 			void				SetRatingSummary(const RatingSummary& summary);
 			RatingSummary		CalculateRatingSummary() const;
 
-			void				SetProminence(float prominence);
-			float				Prominence() const
+			void				SetProminence(int64 prominence);
+			int64				Prominence() const
 									{ return fProminence; }
 			bool				HasProminence() const
-									{ return fProminence != 0.0f; }
+									{ return fProminence != 0; }
 			bool				IsProminent() const;
 
 			void				ClearScreenshotInfos();
@@ -383,7 +383,7 @@ private:
 			CategoryList		fCategories;
 			UserRatingList		fUserRatings;
 			RatingSummary		fCachedRatingSummary;
-			float				fProminence;
+			int64				fProminence;
 			ScreenshotInfoList	fScreenshotInfos;
 			BitmapList			fScreenshots;
 			PackageState		fState;
@@ -459,9 +459,6 @@ private:
 
 
 typedef List<DepotInfo, false> DepotList;
-
-
-typedef List<BString, false> StringList;
 
 
 #endif // PACKAGE_INFO_H

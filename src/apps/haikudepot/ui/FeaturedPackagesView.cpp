@@ -224,6 +224,20 @@ public:
 	}
 
 
+	static int _CmpProminences(int64 a, int64 b)
+	{
+		if (a <= 0)
+			a = PROMINANCE_ORDERING_MAX;
+		if (b <= 0)
+			b = PROMINANCE_ORDERING_MAX;
+		if (a == b)
+			return 0;
+		if (a > b)
+			return 1;
+		return -1;
+	}
+
+
 	/*! This method will return true if the packageA is ordered before
 		packageB.
 	*/
@@ -233,11 +247,14 @@ public:
 	{
 		if (packageA.Get() == NULL || packageB.Get() == NULL)
 			debugger("unexpected NULL reference in a referencable");
-		int c = packageA->Title().ICompare(packageB->Title());
+		int c = _CmpProminences(packageA->Prominence(), packageB->Prominence());
+		if (c == 0)
+			c = packageA->Title().ICompare(packageB->Title());
 		if (c == 0)
 			c = packageA->Name().Compare(packageB->Name());
 		return c < 0;
 	}
+
 
 	void AddPackage(const PackageInfoRef& package)
 	{

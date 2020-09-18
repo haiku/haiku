@@ -241,8 +241,8 @@ public:
 		if (package.Get() == NULL)
 			return false;
 		// Every search term must be found in one of the package texts
-		for (int32 i = fSearchTerms.CountItems() - 1; i >= 0; i--) {
-			const BString& term = fSearchTerms.ItemAtFast(i);
+		for (int32 i = fSearchTerms.CountStrings() - 1; i >= 0; i--) {
+			const BString& term = fSearchTerms.StringAt(i);
 			if (!_TextContains(package->Name(), term)
 				&& !_TextContains(package->Title(), term)
 				&& !_TextContains(package->Publisher().Name(), term)
@@ -257,8 +257,8 @@ public:
 	BString SearchTerms() const
 	{
 		BString searchTerms;
-		for (int32 i = 0; i < fSearchTerms.CountItems(); i++) {
-			const BString& term = fSearchTerms.ItemAtFast(i);
+		for (int32 i = 0; i < fSearchTerms.CountStrings(); i++) {
+			const BString& term = fSearchTerms.StringAt(i);
 			if (term.IsEmpty())
 				continue;
 			if (!searchTerms.IsEmpty())
@@ -277,7 +277,7 @@ private:
 	}
 
 private:
-	StringList fSearchTerms;
+	BStringList fSearchTerms;
 };
 
 

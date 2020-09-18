@@ -883,7 +883,7 @@ PackageInfo::CalculateRatingSummary() const
 
 
 void
-PackageInfo::SetProminence(float prominence)
+PackageInfo::SetProminence(int64 prominence)
 {
 	if (fProminence != prominence) {
 		fProminence = prominence;
@@ -895,7 +895,7 @@ PackageInfo::SetProminence(float prominence)
 bool
 PackageInfo::IsProminent() const
 {
-	return HasProminence() && Prominence() <= 200;
+	return HasProminence() && Prominence() <= PROMINANCE_ORDERING_PROMINENT_MAX;
 }
 
 
