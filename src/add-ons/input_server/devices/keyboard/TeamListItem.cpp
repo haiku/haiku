@@ -66,26 +66,23 @@ TeamListItem::CacheLocalizedName()
 void
 TeamListItem::DrawItem(BView* owner, BRect frame, bool complete)
 {
-	rgb_color kHighlight = { 140, 140, 140, 0 };
-	rgb_color kBlack = { 0, 0, 0, 0 };
-	rgb_color kBlue = { 0, 0, 255, 0 };
-	rgb_color kRed = { 255, 0, 0, 0 };
+	rgb_color kHighlight = ui_color(B_LIST_SELECTED_BACKGROUND_COLOR);
+	rgb_color kHighlightText = ui_color(B_LIST_SELECTED_ITEM_TEXT_COLOR);
+	rgb_color kText = ui_color(B_LIST_ITEM_TEXT_COLOR);
+
+	rgb_color kIdealRed = { 255, 0, 0, 0 };
+	rgb_color kIdealBlue = { 0, 0, 255, 0 };
+	rgb_color kRed = mix_color(kIdealRed, kText, 191);
+	rgb_color kBlue = mix_color(kIdealBlue, kText, 191);
+	rgb_color kHighlightRed = mix_color(kIdealRed, kHighlightText, 191);
+	rgb_color kHighlightBlue = mix_color(kIdealBlue, kHighlightText, 191);
 
 	BRect r(frame);
 
 	if (IsSelected() || complete) {
-		rgb_color color;
-		if (IsSelected())
-			color = kHighlight;
-		else
-			color = owner->ViewColor();
-
-		owner->SetHighColor(color);
-		owner->SetLowColor(color);
+		owner->SetHighColor(kHighlight);
+		owner->SetLowColor(kHighlight);
 		owner->FillRect(r);
-		owner->SetHighColor(kBlack);
-	} else {
-		owner->SetLowColor(owner->ViewColor());
 	}
 
 	frame.left += 4;
@@ -99,10 +96,13 @@ TeamListItem::DrawItem(BView* owner, BRect frame, bool complete)
 
 	frame.left += 16;
 	if (fRefusingToQuit)
-		owner->SetHighColor(kRed);
-	else
-		owner->SetHighColor(IsSystemServer() ? kBlue : kBlack);
-
+		owner->SetHighColor(IsSelected() ? kHighlightRed : kRed);
+	else {
+		if (IsSystemServer())
+			owner->SetHighColor(IsSelected() ? kHighlightBlue : kBlue);
+		else
+			owner->SetHighColor(IsSelected() ? kHighlightText : kText);
+	}
 	BFont font = be_plain_font;
 	font_height	finfo;
 	font.GetHeight(&finfo);
@@ -150,19 +150,19 @@ TeamListItem::IsSystemServer()
 	static BPath systemServersPath;
 	static BPath trackerPath;
 	static BPath deskbarPath;
-	
+
 	if (firstCall) {
 		find_directory(B_SYSTEM_SERVERS_DIRECTORY, &systemServersPath);
 
 		find_directory(B_SYSTEM_DIRECTORY, &trackerPath);
 		trackerPath.Append("Tracker");
-		
+
 		find_directory(B_SYSTEM_DIRECTORY, &deskbarPath);
 		deskbarPath.Append("Deskbar");
-		
+
 		firstCall = false;
 	}
-	
+
 	if (strncmp(systemServersPath.Path(), fTeamInfo.args,
 			strlen(systemServersPath.Path())) == 0)
 		return true;
@@ -174,8 +174,8 @@ TeamListItem::IsSystemServer()
 	if (strncmp(deskbarPath.Path(), fTeamInfo.args,
 			strlen(deskbarPath.Path())) == 0)
 		return true;
-	
-	return false;		
+
+	return false;
 }
 
 
