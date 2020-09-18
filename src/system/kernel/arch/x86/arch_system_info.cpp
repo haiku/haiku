@@ -135,22 +135,31 @@ arch_fill_topology_node(cpu_topology_node_info* node, int32 cpu)
 
 
 static void
-get_frequency_for(void *_frequency, int /*cpu*/)
+get_frequency_for(void *_frequency, int cpu)
 {
 	uint64 *frequency = (uint64*)_frequency;
-	uint64 mperf = x86_read_msr(IA32_MSR_MPERF);
-	uint64 aperf = x86_read_msr(IA32_MSR_APERF);
 
-	for (int i = 0; i < 1000; i++)
-		arch_cpu_pause();
+	bigtime_t timestamp = gCPU[cpu].arch.perf_timestamp;
+	bigtime_t timestamp2 = system_time();
+	if (timestamp2 - timestamp < 100) {
+		*frequency = gCPU[cpu].arch.frequency;
+		return;
+	}
 
+	uint64 mperf = gCPU[cpu].arch.mperf_prev;
+	uint64 aperf = gCPU[cpu].arch.aperf_prev;
 	uint64 mperf2 = x86_read_msr(IA32_MSR_MPERF);
 	uint64 aperf2 = x86_read_msr(IA32_MSR_APERF);
 
 	if (mperf2 == mperf)
 		*frequency = 0;
-	else
+	else {
 		*frequency = (aperf2 - aperf) * sCPUClockSpeed / (mperf2 - mperf);
+		gCPU[cpu].arch.mperf_prev = mperf2;
+		gCPU[cpu].arch.aperf_prev = aperf2;
+		gCPU[cpu].arch.perf_timestamp = timestamp2;
+		gCPU[cpu].arch.frequency = *frequency;
+	}
 }
 
 

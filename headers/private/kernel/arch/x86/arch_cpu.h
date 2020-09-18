@@ -518,6 +518,11 @@ typedef struct arch_cpu_info {
 
 	uint32				logical_apic_id;
 
+	uint64				mperf_prev;
+	uint64				aperf_prev;
+	bigtime_t			perf_timestamp;
+	uint64				frequency;
+
 	struct X86PagingStructures* active_paging_structures;
 
 	size_t				dr6;	// temporary storage for debug registers (cf.
