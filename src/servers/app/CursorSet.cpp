@@ -11,6 +11,7 @@
 #include "ServerCursor.h"
 
 #include <AppServerLink.h>
+#include <AutoDeleter.h>
 #include <PortLink.h>
 #include <ServerProtocol.h>
 
