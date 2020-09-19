@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	3669766136
+1	swedish	x-vnd.Haiku-libtracker	2498612740
 Created	ContainerWindow		Skapad
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Öppna och gör till förval
@@ -270,6 +270,7 @@ home	B_USER_DIRECTORY		hem
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Tracker Nya Mallar
 Disk mounting during boot	AutoMounterSettings		Diskmontering under uppstart
 Don't automount	AutoMounterSettings		Automontera inte
+Node ref	AttributesView		Nod ref
 Could not find application \"%appname\"	OpenWithWindow		Kunde inte hitta programmet \"%appname\"
 Unmatched parenthesis.	libtracker		Ojämförlig parentes.
 Extended attribute	AttributesView		Utökat attribut
@@ -520,6 +521,7 @@ Create a Query	FindPanel		Skapa en sökning
 Close	QueryContainerWindow		Stäng
 I know what I'm doing	FSUtils	button label	Jag vet vad jag håller på med
 Preparing to copy items…	StatusWindow		Förbereder kopiering av objekt...
+Entry ref	AttributesView		Inträdes ref
 Icon view	ContainerWindow		Ikonvy
 Name	ContainerWindow		Namn
 Preferred for %type	OpenWithWindow		Föredras för %type

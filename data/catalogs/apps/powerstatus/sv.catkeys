@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-PowerStatus	3173765686
+1	swedish	x-vnd.Haiku-PowerStatus	1085070685
 Run in window	PowerStatus		Kör i fönster
 Extended battery info	PowerStatus		Ytterligare batteriinformation
 Show status icon	PowerStatus		Visa statusikon
@@ -30,11 +30,13 @@ Serial number: 	PowerStatus		Serienummer:
 Battery critical	PowerStatus		Kritiskt batteri
 Capacity: 	PowerStatus		Kapacitet:
  mW	PowerStatus		 mW
+No supported battery detected. PowerStatus cannot be used on your system.	PowerStatus		Inget batteri som stöds upptäcktes. PowerStatus kan inte användas på ditt system.
 Show percent	PowerStatus		Visa procent
 Capacity granularity 1: 	PowerStatus		Kapacitetskornighet 1:
 The battery level is getting low, please plug in the device.	PowerStatus		Du börjat få lite ström i ditt batteri, anslut en laddkabel för att inte datorn ska få slut på batteri.
 Design capacity warning: 	PowerStatus		Varning för låg tillverkningskapacitet:
 Capacity granularity 2: 	PowerStatus		Kapacitetskornighet 2:
+Too bad!	PowerStatus		Synd!
 Technology: 	PowerStatus		Teknik:
  mWh	PowerStatus		 mWh
 PowerStatus	System name		BatteriStatus

@@ -1,9 +1,8 @@
-1	dutch; flemish	x-vnd.Haiku-Installer	4193079864
+1	dutch; flemish	x-vnd.Haiku-Installer	1157374200
 Performing installation.	InstallProgress		Uitvoering installatie.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Kies de bronschijf in de pop-up-menu's. Klik daarna \"Begin\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Sluit alstublieft het DriveSetup-venster voordat u het Installer-venster sluit.
 No optional packages available.	PackagesView		Geen optionele paketten beschikbaar.
-Restart system	InstallerWindow		Herstart systeem
 The mount point could not be retrieved.	InstallProgress		Het betrekpunt kon niet worden opgehaald.
 <none>	InstallerWindow	No partition available	<geen>
 Please choose target	InstallerWindow		Kies alstublieft een doel
@@ -19,10 +18,10 @@ README	InstallerApp		LEESMIJ
 Quit	InstallerWindow		Afsluiten
 Write boot sector to '%s'	InstallerWindow		Schrijf opstartsector naar '%s'
 Boot sector not written because of an internal error.	InstallProgress		De Boot sector werd niet geschreven vanwege een interne fout.
-DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		DriveSetup, het programma om schijfpartities mee te configureren, kon niet gestart worden.
 Welcome to the Haiku Installer!\n\n	InstallerApp		Welkom bij Haiku's Installer!\n\n
 ?? of ??	InstallerWindow	Unknown progress	?? van ??
 Quit Boot Manager	InstallerWindow		Boot Manager afsluiten
+DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		DriveSetup, het programma om schijfpartities mee te configureren, kon niet gestart worden.
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Boot Manager is bezig...\n\nSluit Boot Manager om verder te gaan met de installatie.
 Quit DriveSetup	InstallerWindow		DriveSetup afsluiten
 Write boot sector	InstallerWindow		Schrijf opstartsector
@@ -55,13 +54,11 @@ Collecting copy information.	InstallProgress		Verzamelt kopie-informatie.
 Show optional packages	InstallerWindow		Toon optionele paketten
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		De doelschijf heeft mogelijk niet genoeg ruimte. Probeer een andere schijf te kiezen, of kies ervoor om geen optionele items te installeren.
 Installation canceled.	InstallProgress		Installatie geannuleerd.
-Are you sure you want to abort the installation?	InstallerWindow		Bent u zeker dat u de installatie wilt stoppen?
 Stop	InstallerWindow		Stop
 Cancel	InstallerWindow		Annuleren
 Continue	InstallerWindow	In alert after pressing Stop	Doorgaan
 Scanning for disks…	InstallerWindow		Zoekt naar schijven…
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		DriveSetup is actief…\n\nSluit DriveSetup om door te gaan met de installatie.
-Abort	InstallerWindow		Afbreken
 The partition can't be mounted. Please choose a different partition.	InstallProgress		De partitie kan niet worden betrokken. Kies alstublieft een andere partitie.
 Set up partitions…	InstallerWindow		Instellen van partities…
 Install progress:  	InstallerWindow		Voortgang installatie:  
@@ -78,4 +75,3 @@ scanning…	InstallerWindow		Scant…
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Userguide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2)   De Installer zal de Haikupartities zelf opstartbaar maken, maar het zal verder niets doen om Haiku in bestaande opstartmenu's te integreren. Als u GRUB reeds geïnstalleerd heeft, kan u Haiku daaraan toevoegen.\nVoor details, raadpleeg de gids over het starten van Haiku op onze website op https://www.haiku-os.org/guides/booting.\nOf u kan het opstartmenu vanuit het \'Hulpmiddelen\'-menu van de Installer instellen, zie het onderwerp \"BootManager\" in de gebruikersgids.\n\n\n
 Set up boot menu	InstallerWindow		Boot-menu opzetten
 Continue	InstallerApp		Doorgaan
-Are you sure you want to abort the installation and restart the system?	InstallerWindow		Bent u zeker dat u de installatie wilt afbreken en het systeem wilt herstarten?

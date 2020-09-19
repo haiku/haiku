@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-CharacterMap	2768977330
+1	swedish	x-vnd.Haiku-CharacterMap	2410613018
 Tirhuta	UnicodeBlocks		Tirhuta
 Miscellaneous mathematical symbols B	UnicodeBlocks		Diverse matematiska symboler B
 Latin extended E	UnicodeBlocks		Latin förlängd E
@@ -238,6 +238,7 @@ Supplementary private use area A	UnicodeBlocks		Extra privatanvändningsområde 
 Armenian	UnicodeBlocks		Armeniska
 Miscellaneous symbols and pictographs	UnicodeBlocks		Diverse symboler och piktogram
 Phags-pa	UnicodeBlocks		Phags-pa
+Nabataean	UnicodeBlocks		Nabataean
 Meetei Mayek	UnicodeBlocks		Meetei Mayek
 CJK compatibility ideographs	UnicodeBlocks		CJK kompatibilitetsideogram
 Show private blocks	CharacterWindow		Visa privata block
@@ -289,6 +290,7 @@ Elbasan	UnicodeBlocks		Elbasan
 Hangul compatibility Jamo	UnicodeBlocks		Hangul-kompatibilitet Jamo
 Phonetic extensions supplement	UnicodeBlocks		Fonetiska utökningar (tillägg)
 CJK unified ideographs extension E	UnicodeBlocks		CJK enhetliga ideogram A (utökad)
+Nüshu	UnicodeBlocks		Nüshu
 Old Persian	UnicodeBlocks		Fornpersiska
 Malayalam	UnicodeBlocks		Malayalam
 CJK radicals supplement	UnicodeBlocks		CJK radikaltillägg

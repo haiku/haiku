@@ -1,9 +1,8 @@
-1	swedish	x-vnd.Haiku-Installer	3283947218
+1	swedish	x-vnd.Haiku-Installer	2358770775
 Performing installation.	InstallProgress		Verkställer installationen.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Välj källdisk från menyn. Klicka sedan på \"Starta\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Var god stäng Diskhanteringsfönstret innan du stänger fönstret för Installeraren.
 No optional packages available.	PackagesView		Inga installationspaket fanns att välja.
-Restart system	InstallerWindow		Starta om systemet
 The mount point could not be retrieved.	InstallProgress		Monteringspunkt kunde inte läsas av.
 <none>	InstallerWindow	No partition available	<ingen>
 Please choose target	InstallerWindow		Välj mål
@@ -19,10 +18,10 @@ README	InstallerApp		LÄS MIG
 Quit	InstallerWindow		Avsluta
 Write boot sector to '%s'	InstallerWindow		Skriv startsektor till '%s'
 Boot sector not written because of an internal error.	InstallProgress		Det gick inte att skriva till bootsektorn på grund av ett internt fel.
-DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		DriveSetup, applikationen för att konfigurera disk partitioner kunde inte startas.
 Welcome to the Haiku Installer!\n\n	InstallerApp		Välkommen till Haikus installationsprogram!\n\n
 ?? of ??	InstallerWindow	Unknown progress	?? av ??
 Quit Boot Manager	InstallerWindow		Avsluta Starthanteraren
+DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		DriveSetup, applikationen för att konfigurera disk partitioner kunde inte startas.
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Starthanteraren körs.\n\nStäng Starthanteraren för att fortsätta med installationen.
 Quit DriveSetup	InstallerWindow		Avsluta DiskHantering
 The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume while the existing 'settings' folder is retained. All other folders will be merged, in which files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Målvolymen är inte tom. Är du säker på att du vill installera ändå?\n\nObs: "System" -mappen kommer att vara en ren kopia från källvolymen medan den befintliga mappen "inställningar" bevaras. Alla andra mappar slås samman, där filer och länkar som finns på både käll- och målvolym skrivs över med källvolymversionen.
@@ -49,6 +48,7 @@ IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		VIKTIG INFORMATI
 Additional disk space required: %s	InstallerWindow		Ytterligare diskutrymme behövs: %s
 Stop	InstallerWindow	In alert after pressing Stop	Stopp
 Boot sector successfully written.	InstallProgress		Skrivning av startsektorn lyckades.
+Writing bootsector.	InstallProgress		Skriver till bootsektor.
 An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Ett fel uppstod och installationen slutfördes inte:\n\nFel:  %s
 Restart	InstallerWindow		Starta om
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Disken kan inte monteras. Var god välj en annan disk.
@@ -58,13 +58,11 @@ Show optional packages	InstallerWindow		Visa valbara paket
 No partitions have been found that are suitable for installation. Please set up partitions and format at least one partition with the Be File System.	InstallerWindow		Inga partitioner har hittats som är lämpliga för installation. Ställ in partitioner och formatera minst en partition med Be File System.
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Måldisken kan ha för lite ledigt utrymme. Försök att välja en annan disk eller välj att installera färre valbara paket.
 Installation canceled.	InstallProgress		Installationen avbröts.
-Are you sure you want to abort the installation?	InstallerWindow		Är du säker på att du vill stoppa installationen?
 Stop	InstallerWindow		Stopp
 Cancel	InstallerWindow		Avbryt
 Continue	InstallerWindow	In alert after pressing Stop	Fortsätt
 Scanning for disks…	InstallerWindow		Skannar efter diskar…
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Kör DriveSetup…\n\nStäng DriveSetup för att fortsätta med installationen.
-Abort	InstallerWindow		Avbryt
 The partition can't be mounted. Please choose a different partition.	InstallProgress		Partitionen kan inte monteras. Var god välj en annan partition.
 Set up partitions…	InstallerWindow		Ställ in partitioner...
 Install progress:  	InstallerWindow		Installationsförlopp:  
@@ -83,4 +81,3 @@ Launch the DriveSetup utility to partition\navailable hard drives and other medi
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Userguide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2)   Installeraren gör själva Haiku-partitionen startbar men tar inga steg för att integrera Haiku i en befintlig startmeny. Om du redan har GRUB installerat kan du lägga till Haiku i GRUB's meny.\nFör detaljer, se guiden om att starta Haiku på adressen https://www.haiku-os.org/guides/booting.\n\nDu kan även ställa in startmenyn från installationsprogrammets verktygsmeny. Se användarhandbokens ämne på programmet \"BootManager\".\n\n\n
 Set up boot menu	InstallerWindow		Ställ in startmeny
 Continue	InstallerApp		Fortsätt
-Are you sure you want to abort the installation and restart the system?	InstallerWindow		Är du säker på att du vill avbryta installationen och starta om systemet?

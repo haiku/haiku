@@ -1,9 +1,8 @@
-1	catalan; valencian	x-vnd.Haiku-Installer	1099509143
+1	catalan; valencian	x-vnd.Haiku-Installer	2358770775
 Performing installation.	InstallProgress		Es fa la instal·lació.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Trieu el disc d'origen des del menú emergent. Llavors cliqueu a Comença.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Si us plau, tanqueu la finestra del Gestor de discs abans de tancar la finestra de l'instal·lador.
 No optional packages available.	PackagesView		No hi ha paquets opcionals disponibles.
-Restart system	InstallerWindow		Reinicia el sistema
 The mount point could not be retrieved.	InstallProgress		No se n'ha pogut obtenir el punt de muntatge.
 <none>	InstallerWindow	No partition available	<cap>
 Please choose target	InstallerWindow		Si us plau, trieu una destinació.
@@ -19,10 +18,10 @@ README	InstallerApp		LLEGEIX-ME
 Quit	InstallerWindow		Surt
 Write boot sector to '%s'	InstallerWindow		Escriu el sector d'arrencada a %s
 Boot sector not written because of an internal error.	InstallProgress		No s'ha escrit el sector d'arrencada degut a un error intern.
-DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		No s'ha pogut executar el Gestor de discs, l'aplicació que configura les particions del disc.
 Welcome to the Haiku Installer!\n\n	InstallerApp		Benvingut/da a l'Instal·lador del Haiku!\n\n
 ?? of ??	InstallerWindow	Unknown progress	?? de ??
 Quit Boot Manager	InstallerWindow		Surt del Gestor d'arrencada
+DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		No s'ha pogut executar el Gestor de discs, l'aplicació que configura les particions del disc.
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		S'executa el Gestor d'arrencada…\n\nPer tal de continuar la instal·lació heu de tancar el Gestor d'arrencada.
 Quit DriveSetup	InstallerWindow		Surt del Gestor de discs
 The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume while the existing 'settings' folder is retained. All other folders will be merged, in which files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		El volum de destinació no és buit. Segur que voleu fer la instal·lació tanmateix?\n\nNota: a carpeta del sistema serà una còpia neta del volum d'origen mentre es conserva la carpeta de configuració existent. Es combinarà la resta de carpetes, i els fitxers i enllaços que existeixin tant al volum d'origen com al de destinació se sobreescriuran amb la versió del volum d'origen.
@@ -59,13 +58,11 @@ Show optional packages	InstallerWindow		Mostra els paquets opcionals
 No partitions have been found that are suitable for installation. Please set up partitions and format at least one partition with the Be File System.	InstallerWindow		No s'ha trobat cap partició adequada per a la instal·lació. Si us plau, establiu particions i formateu-ne com a mínim una amb el sistema de fitxers Be.
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Pot ser que el disc de destinació no tingui prou espai lliure. Intenteu triar un altre disc o no instal·leu alguns elements opcionals.
 Installation canceled.	InstallProgress		S'ha cancel·lat la instal·lació.
-Are you sure you want to abort the installation?	InstallerWindow		Segur que voleu avortar la instal·lació?
 Stop	InstallerWindow		Interromp
 Cancel	InstallerWindow		Cancel·la
 Continue	InstallerWindow	In alert after pressing Stop	Continua
 Scanning for disks…	InstallerWindow		Se cerquen els discs...
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		S'executa el Gestor de discs…\n\nPer tal de continuar la instal·lació heu de tancar el Gestor de discs.
-Abort	InstallerWindow		Avorta
 The partition can't be mounted. Please choose a different partition.	InstallProgress		No es pot muntar la partició. Si us plau, trieu-ne una altra.
 Set up partitions…	InstallerWindow		Configura les particions...
 Install progress:  	InstallerWindow		Progrés de la instal·lació:  
@@ -84,4 +81,3 @@ Launch the DriveSetup utility to partition\navailable hard drives and other medi
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Userguide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2)   L’instal·lador farà que la partició del Haiku sigui arrencable, però no fa cap pas per integrar el Haiku al menú d’arrencada existent. Si ja heu instal·lat el GRUB, podeu afegir-hi el Haiku.\nPer obtenir més informació, consulteu la guia d’arrencada del Haiku al nostre lloc web https://www.haiku-os.org/guides/booting.\nO bé podeu configurar un menú d'arrencada des del menú \"Eines\" de l'instal·lador, consulteu el tema de la guia de l'usuari sobre l'aplicació \"Gestor d'arrencada\".\n\n\n
 Set up boot menu	InstallerWindow		Opcions del menú d'arrencada
 Continue	InstallerApp		Continua
-Are you sure you want to abort the installation and restart the system?	InstallerWindow		Segur que voleu avortar la instal·lació i reiniciar el sistema?

@@ -1,5 +1,6 @@
-1	danish	x-vnd.Haiku-HaikuDepot	3833361367
+1	danish	x-vnd.Haiku-HaikuDepot	1546691996
 Repository update error	LocalRepositoryUpdateProcess		Fejl ved opdatering af softwarekilde
+Network error	ServerHelper		Fejl ved netværk
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Der opstod en fejl under opdatering af softwarekilden: %error%
 User Created	UserLoginWindow		Bruger oprettet
 Check for updates…	MainWindow		Søg efter opdateringer…
@@ -19,6 +20,7 @@ You have successfully authenticated as user %Nickname%.	UserLoginWindow		Det lyk
 No user ratings available.	PackageInfoView		Ingen tilgængelige brugerbedømmelser.
 Downloading package '%name%'	WorkStatusView		Downloader pakken '%name%'
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Det var ikke muligt at udtrække den nødvendige captcha-information fra den data som serveren sendte tilbage.
+A network transport error has arisen communicating with the server system: %s	ServerHelper		Der opstod en fejl ved netværkstransport med kommunikation med serversystemet: %s
 Rating	PackageListView		Bedømmelse
 Synchronizing icons	ServerIconExportUpdateProcess		Synkroniserer ikoner
 Does not start	RatePackageWindow		Starter ikke
@@ -75,6 +77,7 @@ Reboot required	PackageManager		Kræver genstart
 Very unstable	RatePackageWindow		Meget ustabil
 Password:	UserLoginWindow		Adgangskode:
 All packages	PackageListView		Alle pakker
+This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Programmet er for gammelt til at kommunikere med serversystemet. Hent en nyere version af programmet ved at opdatere dit system. Den laveste version som kræves af programmet er \"%s\".
 Stability	RatePackageWindow		Stabilitet
 Send	RatePackageWindow		Send
 Start package daemon	App		Start pakkedæmon
@@ -98,6 +101,7 @@ Repository	PackageListView		Softwarekilde
 The email is malformed.	UserLoginWindow		E-mailen er forkert udformet.
 Close	UserLoginWindow		Luk
 Close	RatePackageWindow		Luk
+An unexpected error has been sent from the server [%i]	ServerHelper		Der blev sendt en uventet fejl fra serveren [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synkroniserer pakkedata for softwarekilden '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Vis anvendelsesbetingelserne
 Login issue	MainWindow		Problem med at logge ind
@@ -122,6 +126,7 @@ Log out	MainWindow		Log ud
 Comment language:	RatePackageWindow		Kommentarsprog:
 Status	PackageListView		Status
 The password has been incorrectly repeated.	UserLoginWindow		Adgangskoden blev gentaget forkert.
+Network transport error	ServerHelper		Fejl ved netværkstransport
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		Den adgangskode som tidligere blev angivet til brugeren [%Nickname%] er ikke gyldig på nuværende tidspunkt. Brugeren vil blive logge ud af programmet og du bør logge ind igen med din opdaterede adgangskode.
 Update	RatePackageWindow		Opdater
 OK	ServerHelper		OK
@@ -137,6 +142,7 @@ The nickname is required.	UserLoginWindow		Kaldenavnet kræves.
 Source packages	MainWindow		Kildepakker
 -	no package size		-
 Problem with working files	App		Problem med arbejdsfiler
+Server error	ServerHelper		Fejl ved server
 Try again	App		Prøv igen
 Rate package	RatePackageWindow		Bedøm pakke
 Unknown	PackageListView		Ukendt

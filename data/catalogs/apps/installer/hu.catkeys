@@ -1,9 +1,8 @@
-1	hungarian	x-vnd.Haiku-Installer	2913441850
+1	hungarian	x-vnd.Haiku-Installer	4172703482
 Performing installation.	InstallProgress		A telepítés folyamatban…
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Válassza ki a felugró menüből a lemezt melyről telepíteni szeretne, majd kattintson a \"Mehet\" gombra.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		A telepítőablak bezárása előtt kérlek zárd be a Lemezkezelő ablakot!
 No optional packages available.	PackagesView		Nincsenek választható csomagok.
-Restart system	InstallerWindow		Számítógép újraindítása
 The mount point could not be retrieved.	InstallProgress		A csatolási pontot nem lehet meghatározni.
 <none>	InstallerWindow	No partition available	<nincs>
 Please choose target	InstallerWindow		Válaszd ki, hogy hová szeretnéd telepíteni
@@ -19,10 +18,10 @@ README	InstallerApp		OLVASSEL
 Quit	InstallerWindow		Kilépés
 Write boot sector to '%s'	InstallerWindow		Bootszektor írása: „%s”
 Boot sector not written because of an internal error.	InstallProgress		A Boot szektorba egy belső hiba miatt nem lehetett írni.
-DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		A Lemezkezelőt, mellyel a merevlemez partícióit lehet módosítani, nem sikerült elindítani.
 Welcome to the Haiku Installer!\n\n	InstallerApp		Üdvözöllek a Haiku Telepítőjében!\n\n
 ?? of ??	InstallerWindow	Unknown progress	?? / ??
 Quit Boot Manager	InstallerWindow		Kilépés a Rendszerválasztóból
+DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		A Lemezkezelőt, mellyel a merevlemez partícióit lehet módosítani, nem sikerült elindítani.
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Fut a Rendszerválasztó…\n\nA telepítés folytatásához zárja be azt.
 Quit DriveSetup	InstallerWindow		Kilépés a Lemezkezelőből
 Write boot sector	InstallerWindow		Rendszerbetöltő írása
@@ -55,13 +54,11 @@ Collecting copy information.	InstallProgress		Másolás információinak összeg
 Show optional packages	InstallerWindow		Választható csomagok megjelenítése
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		A céllemezen nincs elég hely a telepítéshez. Válassz egy másik lemezt vagy csak a szükséges rendszerelemeket telepítsd!
 Installation canceled.	InstallProgress		A telepítés félbeszakadt.
-Are you sure you want to abort the installation?	InstallerWindow		Biztos meg kívánod szakítani a telepítést?
 Stop	InstallerWindow		Leállítás
 Cancel	InstallerWindow		Mégse
 Continue	InstallerWindow	In alert after pressing Stop	Folytatás
 Scanning for disks…	InstallerWindow		Lemezek keresése…
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		A Lemezkezelő fut.\n\nHa végzett, zárja be a lemezbeállítót a telepítés folytatásához!
-Abort	InstallerWindow		Megszakítás
 The partition can't be mounted. Please choose a different partition.	InstallProgress		A partíciót nem lehetett csatolni. Kérlek válassz egy másik partíciót.
 Set up partitions…	InstallerWindow		Partíciók szerkesztése…
 Install progress:  	InstallerWindow		Másolás:  
@@ -77,4 +74,3 @@ Tools	InstallerWindow		Eszközök
 scanning…	InstallerWindow		keresés…
 Set up boot menu	InstallerWindow		Rendszerválasztó beállítása
 Continue	InstallerApp		Folytatás
-Are you sure you want to abort the installation and restart the system?	InstallerWindow		Biztosan meg szeretnéd szakítani a telepítést? A számítógép újra fog indulni!

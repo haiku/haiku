@@ -1,9 +1,8 @@
-1	slovak	x-vnd.Haiku-Installer	4187503948
+1	slovak	x-vnd.Haiku-Installer	1151798284
 Performing installation.	InstallProgress		Prebieha inštalácia.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Zvoľte zdrojový disk z roletového menu. Potom kliknite na „Začať“.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Prosím, zatvorte okno Nastavenie diskových oblastí pred zatvorením okna Inštalátora.
 No optional packages available.	PackagesView		Nie sú dostupné žiadne voliteľné balíky.
-Restart system	InstallerWindow		Reštartovať systém
 The mount point could not be retrieved.	InstallProgress		Nie je možné ziskať prípojný bod.
 <none>	InstallerWindow	No partition available	<žiadna>
 Please choose target	InstallerWindow		Prosím, vyberte cieľ
@@ -19,10 +18,10 @@ README	InstallerApp		README
 Quit	InstallerWindow		Ukončiť
 Write boot sector to '%s'	InstallerWindow		Zapísať zavádzací sektor na „%s“
 Boot sector not written because of an internal error.	InstallProgress		Zavádzací sektor nebol zapísaný z dôvodu vnútornej chyby.
-DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Nastavenie diskových oblastí, aplikáciu na konfiguráciu diskových oblastí, nebolo možné spustiť.
 Welcome to the Haiku Installer!\n\n	InstallerApp		Vitajte v Inštalátore Haiku!\n\n
 ?? of ??	InstallerWindow	Unknown progress	?? z ??
 Quit Boot Manager	InstallerWindow		Ukončiť Správcu zavádzania
+DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Nastavenie diskových oblastí, aplikáciu na konfiguráciu diskových oblastí, nebolo možné spustiť.
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Spúšťa sa Správca zavádzania…\n\nInštalácia bude pokračovať, keď zatvoríte Správcu zavádzania.
 Quit DriveSetup	InstallerWindow		Ukončiť Nastavenie diskových oblastí
 Write boot sector	InstallerWindow		Zapísať zavádzací sektor
@@ -50,13 +49,11 @@ Collecting copy information.	InstallProgress		Zhromažďujú sa informácie o ko
 Show optional packages	InstallerWindow		Zobraziť voliteľné balíky
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Cieľový disk nemusí mať dostatok miesta. Skúste zvoliť iný disk alebo zvoľte neinštalovať voliteľné položky.
 Installation canceled.	InstallProgress		Inštalácia zrušená.
-Are you sure you want to abort the installation?	InstallerWindow		Ste si istí, že chcete prerušiť inštaláciu?
 Stop	InstallerWindow		Zastaviť
 Cancel	InstallerWindow		Zrušiť
 Continue	InstallerWindow	In alert after pressing Stop	Pokračovať
 Scanning for disks…	InstallerWindow		Zisťujú sa disky…
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Spúšťa sa Nastavenie diskových oblastí…\n\nInštalácia bude pokračovať, keď zatvoríte Nastavenie diskových oblastí.
-Abort	InstallerWindow		Prerušiť
 The partition can't be mounted. Please choose a different partition.	InstallProgress		Oblasť nie je možné pripojiť. Prosím, zvoľte inú oblasť.
 Set up partitions…	InstallerWindow		Nastaviť oblasti…
 Install progress:  	InstallerWindow		Priebeh inštalácie:  
@@ -72,4 +69,3 @@ Tools	InstallerWindow		Nástroje
 scanning…	InstallerWindow		zisťuje sa…
 Set up boot menu	InstallerWindow		Nastaviť zavádzacie menu
 Continue	InstallerApp		Pokračovať
-Are you sure you want to abort the installation and restart the system?	InstallerWindow		Ste si istí, že chcete zrušiť inštaláciu a reštartovať systém?

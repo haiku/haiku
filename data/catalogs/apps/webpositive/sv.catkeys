@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-WebPositive	1591513524
+1	swedish	x-vnd.Haiku-WebPositive	1976607515
 Authentication required	Authentication Panel		Autentisiering krävs
 Previous	WebPositive Window		Tidigare
 (Finish: %date)	Download Window		(Avsluta: %date)
@@ -53,6 +53,7 @@ Cookies for %s	Cookie Manager		Kakor för %s
 The download could not be opened.	Download Window		Nedladdningen kunde inte öppnas.
 Close	Download Window		Stäng
 WebPositive	System name		WebPositive
+%s - Search term	Settings Window		%s - Sökterm
 Reload	WebPositive Window		Ladda om
 Expiration	Cookie Manager		Upphör
 Download finished	Download Window		Nedladdning avslutad

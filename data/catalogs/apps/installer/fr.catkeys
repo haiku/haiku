@@ -1,9 +1,8 @@
-1	french	x-vnd.Haiku-Installer	3283947218
+1	french	x-vnd.Haiku-Installer	248241554
 Performing installation.	InstallProgress		Installation en cours.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Choisir le disque source dans la liste déroulante, puis cliquer sur « Commencer ».
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Veuillez fermer la fenêtre du Gestionnaire de Disques avant celle de l’Installeur.
 No optional packages available.	PackagesView		Pas de paquets optionnels disponibles.
-Restart system	InstallerWindow		Redémarrer le système
 The mount point could not be retrieved.	InstallProgress		Le point de montage n’a pu être récupéré.
 <none>	InstallerWindow	No partition available	<aucun>
 Please choose target	InstallerWindow		Veuillez sélectionner la destination
@@ -19,10 +18,10 @@ README	InstallerApp		LISEZ-MOI
 Quit	InstallerWindow		Quitter
 Write boot sector to '%s'	InstallerWindow		Écrire le secteur d’amorce sur « %s »
 Boot sector not written because of an internal error.	InstallProgress		Le secteur d’amorçage n’a pas été écrit à cause d’une erreur interne.
-DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Le gestionnaire de disques, qui permet de configurer les partitions sur le disque, n’a pas pu être lancé.
 Welcome to the Haiku Installer!\n\n	InstallerApp		Bienvenue dans l’installateur Haiku !\n\n
 ?? of ??	InstallerWindow	Unknown progress	?? sur ??
 Quit Boot Manager	InstallerWindow		Quitter le gestionnaire de démarrage
+DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Le gestionnaire de disques, qui permet de configurer les partitions sur le disque, n’a pas pu être lancé.
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Lancement du gestionnaire d’amorçage…\n\nFermez le gestionnaire d’amorçage pour poursuivre l’installation.
 Quit DriveSetup	InstallerWindow		Quitter le Gestionnaire de Disques
 The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume while the existing 'settings' folder is retained. All other folders will be merged, in which files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Le volume cible n’est pas vide. Souhaitez-vous quand même procéder à l’installation ?\n\nNote : Le dossier « system » sera une copie propre du volume source tandis que le dossier « settings » existant sera conservé. Tous les autres dossiers seront fusionnés. Si des fichiers ou des liens existent à la fois sur le volume source et sur le volume cible, ils seront écrasés par la version du volume source.
@@ -58,13 +57,11 @@ Show optional packages	InstallerWindow		Montrer les paquets optionnels
 No partitions have been found that are suitable for installation. Please set up partitions and format at least one partition with the Be File System.	InstallerWindow		Aucune partition adaptée à l’installation n’a été trouvée. Veuillez configurer les partitions et en formater au moins une avec le système de fichiers Be.
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Le disque de destination pourrait ne pas avoir assez de place. Sélectionnez un autre disque ou retirez certains objets optionnels.
 Installation canceled.	InstallProgress		Installation annulée.
-Are you sure you want to abort the installation?	InstallerWindow		Êtes-vous sûr de vouloir abandonner l’installation ?
 Stop	InstallerWindow		Arrêter
 Cancel	InstallerWindow		Annuler
 Continue	InstallerWindow	In alert after pressing Stop	Continuer
 Scanning for disks…	InstallerWindow		Recherche des disques…
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Le Gestionnaire de Disques est lancé…\n\nFermer le Gestionnaire de Disques pour continuer l’installation.
-Abort	InstallerWindow		Abandonner
 The partition can't be mounted. Please choose a different partition.	InstallProgress		Impossible de monter la partition. Veuillez en choisir une autre.
 Set up partitions…	InstallerWindow		Ajuster les partitions…
 Install progress:  	InstallerWindow		Avancement de l’installation :  
@@ -83,4 +80,3 @@ Launch the DriveSetup utility to partition\navailable hard drives and other medi
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Userguide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2)   L’Installeur rendra la partition Haiku amorçable, mais ne fera rien pour intégrer Haiku au menu de démarrage existant. Si GRUB est déjà installé, vous pouvez y ajouter Haiku.\nPour plus de détails, veuillez consulter le guide sur le démarrage d’Haiku sur notre site Web à https://www.haiku-os.org/guides/booting.\nAutrement, vous pouvez configurer le menu de démarrage à partir du menu « Outils » de l’installeur, voir la rubrique « Guide de l’utilisateur » de l’application « Gestionnaire d’amorçage ».\n\n\n
 Set up boot menu	InstallerWindow		Mettre en place le menu de démarrage
 Continue	InstallerApp		Continuer
-Are you sure you want to abort the installation and restart the system?	InstallerWindow		Êtes-vous sûr de vouloir abandonner l’installation et redémarrer le système ?

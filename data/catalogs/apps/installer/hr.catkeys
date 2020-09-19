@@ -1,7 +1,6 @@
-1	croatian	x-vnd.Haiku-Installer	2193177685
+1	croatian	x-vnd.Haiku-Installer	3452439317
 Performing installation.	InstallProgress		Vršim instalaciju.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Izaberite disk izvora iz poo-up izbornika. Zatim kliknite \"Počni\".
-Restart system	InstallerWindow		Ponovo pokreni sustav
 <none>	InstallerWindow	No partition available	<nijedan>
 Please choose target	InstallerWindow		Molim izaberite metu
 Cancel	InstallProgress		Odustani
@@ -40,12 +39,10 @@ Begin	InstallerWindow		Počni
 Show optional packages	InstallerWindow		Pokaži neobavezne pakete
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Odredišni direktorij možda nema dovoljno prostara. Probajte izabrati drugi disk ili izaberite neinstaliranje neobaveznih stavki.
 Installation canceled.	InstallProgress		Instalacija opozvana.
-Are you sure you want to abort the installation?	InstallerWindow		Jeste li sigurni da želite prekinuti instalaciju?
 Stop	InstallerWindow		Stop
 Cancel	InstallerWindow		Odustani
 Continue	InstallerWindow	In alert after pressing Stop	Nastavi
 Scanning for disks…	InstallerWindow		Skeniram za diskove...
-Abort	InstallerWindow		Prekini
 The partition can't be mounted. Please choose a different partition.	InstallProgress		Particija se ne može montirati. Molim izaberite drugu particiju.
 Set up partitions…	InstallerWindow		Postavi particije...
 Install progress:  	InstallerWindow		Napredak instalacije:  
@@ -57,4 +54,3 @@ Tools	InstallerWindow		Alati
 scanning…	InstallerWindow		skeniram...
 Set up boot menu	InstallerWindow		Postavljanje izbornika podizanja sustava
 Continue	InstallerApp		Nastavi
-Are you sure you want to abort the installation and restart the system?	InstallerWindow		Jeste li sigurni da želite prekinuti instalaciju i ponovno pokrenuti sustav?

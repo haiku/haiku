@@ -1,9 +1,8 @@
-1	esperanto	x-vnd.Haiku-Installer	1099509143
+1	esperanto	x-vnd.Haiku-Installer	2358770775
 Performing installation.	InstallProgress		Instalante.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Elektu la elan diskon el la ŝpruca menuo. Poste alklaku \"Ek\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Bonvolu fermi la fenestron de la Diskagordilo antaŭ fermi la fenestron de al Instalilo.
 No optional packages available.	PackagesView		Malnepraj pakaĵoj ne estas haveblaj.
-Restart system	InstallerWindow		Restartigi sistemon
 The mount point could not be retrieved.	InstallProgress		La surmetingo ne povis esti ricevita
 <none>	InstallerWindow	No partition available	<neniu>
 Please choose target	InstallerWindow		Bonvolu elekti celon
@@ -19,10 +18,10 @@ README	InstallerApp		LEGU_MIN
 Quit	InstallerWindow		Ĉesi
 Write boot sector to '%s'	InstallerWindow		Skribi la startsektoron al '%s'
 Boot sector not written because of an internal error.	InstallProgress		Praŝarga sektoro ne estis skribita pro interna eraro.
-DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Diskagordilo, la programo por agordi subdiskojn, ne povas esti rulita.
 Welcome to the Haiku Installer!\n\n	InstallerApp		Bonvenon ĉe la Haiku Instalilo!\n\n
 ?? of ??	InstallerWindow	Unknown progress	?? de ??
 Quit Boot Manager	InstallerWindow		Forlasi Praŝargan Administrilon
+DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Diskagordilo, la programo por agordi subdiskojn, ne povas esti rulita.
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Lanĉas Praŝargan Administrilon…\n\nFermu Praŝargan Administrilon por daŭrigi la instaladon.
 Quit DriveSetup	InstallerWindow		Ĉesi la Diskagordilon
 The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume while the existing 'settings' folder is retained. All other folders will be merged, in which files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		La cela volumo ne estas malplena. Ĉu vi certas ke vi volas instali senkondiĉe?\n\nNoto: La dosierujo 'system' estos tute kopiita el fonta volumo tamen ekzistanta dosierujo 'settings' estos lasita. Ĉiuj aliaj dosierujoj estos kunigitaj, kie dosieroj kaj ligiloj ekzistantaj ambaŭloke, en fonta kaj cela volumoj, estos uzita el fonta volumo.
@@ -59,13 +58,11 @@ Show optional packages	InstallerWindow		Montri malneprajn pakaĵojn
 No partitions have been found that are suitable for installation. Please set up partitions and format at least one partition with the Be File System.	InstallerWindow		Subdisko taŭga por instali forestas. Kreu subdiskojn kaj formatigu almenaŭ unuan per dosiersistemo Be.
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		La spaco de la ala disko ne sufiĉas. Bonvolu elekti alian diskon aŭ elekti ne instali nedevigajn pakaĵojn.
 Installation canceled.	InstallProgress		Instalado estis nuligita.
-Are you sure you want to abort the installation?	InstallerWindow		Ĉu vi certas, ke vi volas ĉesigi la instaladon?
 Stop	InstallerWindow		Halti
 Cancel	InstallerWindow		Nuligi
 Continue	InstallerWindow	In alert after pressing Stop	Daŭrigi
 Scanning for disks…	InstallerWindow		Serĉante diskojn…
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Lanĉas la Diskagordilon…\n\nFermu la Diskagordilon por daŭrigi la instaladon.
-Abort	InstallerWindow		Ĉesigi
 The partition can't be mounted. Please choose a different partition.	InstallProgress		La subdisko ne povas esti surmetita. Bonvolu elekti alian subdiskon.
 Set up partitions…	InstallerWindow		Agordi subdiskojn…
 Install progress:  	InstallerWindow		Instalada progreso:  
@@ -84,4 +81,3 @@ Launch the DriveSetup utility to partition\navailable hard drives and other medi
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Userguide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2)   La Instalilo praŝargebligos la Haiku-an subdiskon mem, sed ne klopodos integritigi Haiku-on en ekzistanta praŝarga menuo. Se vi jam havas instalitan GRUB-on, vi povas aldoni Haiku-on al ĝi.\nPor detaloj, bonvolu konsiliĝi kun la gvido pri la praŝargado de Haiku-o en nia retpaĝaro: https://www.haiku-os.org/guides/booting.\nAŭ vi povas agordi praŝargan menuon el la \"Iloj\" menuo de Instalilo. Rigardu la temon pri la programo \"Praŝarga Administrilo\" en la manlibro por uzantoj.\n\n\n
 Set up boot menu	InstallerWindow		Agordi praŝargan menuon
 Continue	InstallerApp		Daŭrigi
-Are you sure you want to abort the installation and restart the system?	InstallerWindow		Ĉu vi certas, ke vi volas ĉesigi la instaladon kaj restarti la sistemon?

@@ -60,7 +60,7 @@ Start video	CodyCam		Videoyu başlat
 Connected…	VideoConsumer.cpp		Bağlandı…
 upload client name expected	CodyCam		yüklenecek istemci adı bekleniyordu
 Every 15 seconds	CodyCam		Her 15 saniyede bir
-Error getting initial latency for the capture node	CodyCam		Yakalama ucu için ilk gecikme alınırken hata
+Error getting initial latency for the capture node	CodyCam		Yakalama düğümü için ilk gecikme alınırken hata
 password	CodyCam		parola
 Local	CodyCam		Yerel
 Stop video	CodyCam		Videoyu durdur

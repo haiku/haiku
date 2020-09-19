@@ -1,9 +1,8 @@
-1	german	x-vnd.Haiku-Installer	1099509143
+1	german	x-vnd.Haiku-Installer	2358770775
 Performing installation.	InstallProgress		Installation läuft.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Bitte Quelllaufwerk aus dem Menü wählen. Danach auf \"Start\" klicken.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Das DriveSetup-Fenster muss geschlossen werden, bevor der Installer verlassen werden kann.
 No optional packages available.	PackagesView		Keine optionalen Pakete verfügbar.
-Restart system	InstallerWindow		Rechner neustarten
 The mount point could not be retrieved.	InstallProgress		Der Einhängeort wurde nicht gefunden.
 <none>	InstallerWindow	No partition available	<kein>
 Please choose target	InstallerWindow		Bitte Zielpartition auswählen
@@ -19,10 +18,10 @@ README	InstallerApp		LIESMICH
 Quit	InstallerWindow		Beenden
 Write boot sector to '%s'	InstallerWindow		Bootsektor auf '%s' schreiben
 Boot sector not written because of an internal error.	InstallProgress		Der Bootsektor konnte aufgrund eines internen Fehlers nicht geschrieben werden.
-DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		DriveSetup, die Anwendung zur Konfiguration von Partitionen, konnte nicht gestartet werden.
 Welcome to the Haiku Installer!\n\n	InstallerApp		Herzlich Willkommen zum Haiku-Installer!\n\n
 ?? of ??	InstallerWindow	Unknown progress	?? von ??
 Quit Boot Manager	InstallerWindow		BootManager beenden
+DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		DriveSetup, die Anwendung zur Konfiguration von Partitionen, konnte nicht gestartet werden.
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		BootManager läuft...\n\nBootManager muss beendet werden, um mit der Installation fortzufahren.
 Quit DriveSetup	InstallerWindow		DriveSetup beenden
 The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume while the existing 'settings' folder is retained. All other folders will be merged, in which files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Die Zielpartition ist nicht leer. Soll trotzdem installiert werden?\n\nZur Info: Der 'System' Ordner wird eine saubere Kopie der Quelle, während der 'settings' Ordner beibehalten wird. Alle anderen Ordner werden zusammengeführt, wobei Dateien und Verknüpfungen, die sowohl auf der Quell- als auch der Zielpartition existieren, mit der Quell-Version überschrieben werden.
@@ -59,13 +58,11 @@ Show optional packages	InstallerWindow		Optionale Pakete einblenden
 No partitions have been found that are suitable for installation. Please set up partitions and format at least one partition with the Be File System.	InstallerWindow		Für die Installation wurden keine brauchbaren Partitionen gefunden. Bitte Partitionen erstellen und zumindest eine mit dem 'Be File System' formatieren.
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Auf der Zielpartition ist anscheinend nicht genügend Platz. Entweder eine andere Partition wählen oder einige optionale Pakete deaktivieren.
 Installation canceled.	InstallProgress		Installation abgebrochen.
-Are you sure you want to abort the installation?	InstallerWindow		Soll die Installation wirklich abgebrochen werden?
 Stop	InstallerWindow		Anhalten
 Cancel	InstallerWindow		Abbrechen
 Continue	InstallerWindow	In alert after pressing Stop	Fortsetzen
 Scanning for disks…	InstallerWindow		Es wird nach Laufwerken gesucht…
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		DriveSetup läuft…\n\nDriveSetup schließen, um mit der Installation fortzufahren.
-Abort	InstallerWindow		Abbrechen
 The partition can't be mounted. Please choose a different partition.	InstallProgress		Die Partition konnte nicht eingehangen werden. Bitte eine andere Partition auswählen.
 Set up partitions…	InstallerWindow		Partitionen einrichten…
 Install progress:  	InstallerWindow		Installationsverlauf: 
@@ -84,4 +81,3 @@ Launch the DriveSetup utility to partition\navailable hard drives and other medi
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Userguide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2)    Der Installer wird die Haiku-Partition selbst bootfähig machen, aber nichts unternehmen, um Haiku in ein bestehendes Bootmenü zu integrieren. Ist GRUB bereits installiert, kann man Haiku zu dessen Bootmenü hinzufügen.\nNäheres dazu steht im Booting Guide auf unserer Website unter https://www.haiku-os.org/guides/booting.\nAus Installers \"Werkzeug\" Menü lässt sich auch ein Bootmenü einrichten, siehe das Kapitel zum \"BootManager\" im Userguide.\n\n\n
 Set up boot menu	InstallerWindow		Bootmenü einrichten
 Continue	InstallerApp		Weiter
-Are you sure you want to abort the installation and restart the system?	InstallerWindow		Soll die Installation tatsächlich abgebrochen und der Rechner neu gestartet werden?

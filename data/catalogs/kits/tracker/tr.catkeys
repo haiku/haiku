@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-libtracker	1048670336
+1	turkish	x-vnd.Haiku-libtracker	4172484236
 Created	ContainerWindow		Oluşturulma
 Icon	AttributesView		Simge
 Open and make preferred	OpenWithWindow		Aç ve tercih edilen yap
@@ -270,6 +270,7 @@ home	B_USER_DIRECTORY		ev
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Yeni İzleyici şablonları
 Disk mounting during boot	AutoMounterSettings		Önyükleme sırasında bağlama
 Don't automount	AutoMounterSettings		Otomatik bağlama yok
+Node ref	AttributesView		Düğüm başvurusu
 Could not find application \"%appname\"	OpenWithWindow		\"%appname\" uygulaması bulunamıyor
 Unmatched parenthesis.	libtracker		Eşleşmeyen parantezler.
 Extended attribute	AttributesView		Genişletilmiş öznitelik
@@ -519,6 +520,7 @@ Create a Query	FindPanel		Sorgu oluştur
 Close	QueryContainerWindow		Kapat
 I know what I'm doing	FSUtils	button label	Ne yaptığımı biliyorum
 Preparing to copy items…	StatusWindow		Ögeleri kopyalamaya hazırlanıyor…
+Entry ref	AttributesView		Girdi başvurusu
 Icon view	ContainerWindow		Simge görünümü
 Name	ContainerWindow		Ad
 Preferred for %type	OpenWithWindow		%type için tercih edilen

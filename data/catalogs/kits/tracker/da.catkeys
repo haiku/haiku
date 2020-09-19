@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-libtracker	3669766136
+1	danish	x-vnd.Haiku-libtracker	2498612740
 Created	ContainerWindow		Oprettet
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Åbn og lav foretrukket
@@ -270,6 +270,7 @@ home	B_USER_DIRECTORY		hjem
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Tracker nye skabeloner
 Disk mounting during boot	AutoMounterSettings		Diskmontering under opstart
 Don't automount	AutoMounterSettings		Automonter ikke
+Node ref	AttributesView		Knudepunktsreference
 Could not find application \"%appname\"	OpenWithWindow		Kunne ikke finde programmet \"%appname\"
 Unmatched parenthesis.	libtracker		Ikke-matchede parenteser.
 Extended attribute	AttributesView		Udvidet attribut
@@ -520,6 +521,7 @@ Create a Query	FindPanel		Lav en forespørgsel
 Close	QueryContainerWindow		Luk
 I know what I'm doing	FSUtils	button label	Jeg ved hvad jeg gør
 Preparing to copy items…	StatusWindow		Forbereder kopiering af elementerne…
+Entry ref	AttributesView		Postreference
 Icon view	ContainerWindow		Ikonvisning
 Name	ContainerWindow		Navn
 Preferred for %type	OpenWithWindow		Anbefalet for %type

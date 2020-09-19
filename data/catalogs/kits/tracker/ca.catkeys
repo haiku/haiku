@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-libtracker	3669766136
+1	catalan; valencian	x-vnd.Haiku-libtracker	2498612740
 Created	ContainerWindow		Creat
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Obre-ho i fes-ho preferit
@@ -270,6 +270,7 @@ home	B_USER_DIRECTORY		inici
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Plantilles noves del Rastrejador
 Disk mounting during boot	AutoMounterSettings		Muntatge de disc a l'arrencada
 Don't automount	AutoMounterSettings		No el muntis automàticament
+Node ref	AttributesView		Ref. del node
 Could not find application \"%appname\"	OpenWithWindow		No s'ha pogut trobar l'aplicació \"%appname\".
 Unmatched parenthesis.	libtracker		Parèntesis no coincidents.
 Extended attribute	AttributesView		Atribut ampliat
@@ -520,6 +521,7 @@ Create a Query	FindPanel		Consulta nova
 Close	QueryContainerWindow		Tanca
 I know what I'm doing	FSUtils	button label	Sé el que faig
 Preparing to copy items…	StatusWindow		Es prepara la còpia d'elements...
+Entry ref	AttributesView		Ref. de l'entrada
 Icon view	ContainerWindow		Mostra les icones
 Name	ContainerWindow		Nom
 Preferred for %type	OpenWithWindow		Preferit per a %type

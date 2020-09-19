@@ -1,9 +1,8 @@
-1	russian	x-vnd.Haiku-Installer	4193079864
+1	russian	x-vnd.Haiku-Installer	1157374200
 Performing installation.	InstallProgress		Выполняется установка…
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Выберите источник из выпадающего меню. Затем нажмите кнопку \"Установить\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Пожалуйста, закройте окно разметки диска перед закрытием окна Установщика.
 No optional packages available.	PackagesView		Опциональные пакеты недоступны.
-Restart system	InstallerWindow		Перезагрузить компьютер
 The mount point could not be retrieved.	InstallProgress		Невозможно определить точку подключения.
 <none>	InstallerWindow	No partition available	<нет>
 Please choose target	InstallerWindow		Пожалуйста, выберите раздел для установки
@@ -19,10 +18,10 @@ README	InstallerApp		Cопроводительная инструкция
 Quit	InstallerWindow		Выход
 Write boot sector to '%s'	InstallerWindow		Записать загрузочный сектор на раздел '%s'
 Boot sector not written because of an internal error.	InstallProgress		Загрузочный сектор не был записан из-за внутренней ошибки.
-DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Невозможно запустить Разметку диска - приложение для настройки диска.
 Welcome to the Haiku Installer!\n\n	InstallerApp		Добро пожаловать в Установщик Haiku!\n\n
 ?? of ??	InstallerWindow	Unknown progress	?? из ??
 Quit Boot Manager	InstallerWindow		Закройте Менеджер Загрузки
+DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Невозможно запустить Разметку диска - приложение для настройки диска.
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Запущен Менеджер загрузки…\n\nЗакройте Менеджер загрузки для продолжения установки.
 Quit DriveSetup	InstallerWindow		Закройте Разметку диска
 Write boot sector	InstallerWindow		Записать загрузочный сектор
@@ -55,13 +54,11 @@ Collecting copy information.	InstallProgress		Сбор иформации для
 Show optional packages	InstallerWindow		Показать опциональные пакеты
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		На выбранном диске недостаточно места. Попробуйте выбрать другой диск или не устанавливайте опциональные пакеты.
 Installation canceled.	InstallProgress		Установка отменена.
-Are you sure you want to abort the installation?	InstallerWindow		Вы уверены, что хотите прервать установку?
 Stop	InstallerWindow		Остановить
 Cancel	InstallerWindow		Отмена
 Continue	InstallerWindow	In alert after pressing Stop	Продолжить
 Scanning for disks…	InstallerWindow		Сканирование дисков…
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Запущена утилита разметки диска (DriveSetup)…\n\nЗакройте ее для продолжения установки.
-Abort	InstallerWindow		Прервать
 The partition can't be mounted. Please choose a different partition.	InstallProgress		Раздел не может быть подключен. Пожалуйста, выберите другой раздел.
 Set up partitions…	InstallerWindow		Настройка разделов…
 Install progress:  	InstallerWindow		Прогресс установки:  
@@ -78,4 +75,3 @@ scanning…	InstallerWindow		сканирование…
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Userguide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2) Установщик сделает раздел с Haiku загрузочным, но не предпримет никаких действий для интеграции Haiku в существующее загрузочное меню. Если у вас уже установлен GRUB, то вы можете добавить Haiku в его загрузочное меню.\nДля дополнительной информации обратитесь к руководству по загрузке Haiku на нашем сайте https://www.haiku-os.org/guides/booting.\nИли вы можете установить загрузочное меню из меню Установщика \"Инструменты\", смотрите руководство по приложению \"Загрузчик\".\n\n\n
 Set up boot menu	InstallerWindow		Установить загрузочное меню
 Continue	InstallerApp		Продолжить
-Are you sure you want to abort the installation and restart the system?	InstallerWindow		Вы уверены, что хотите прервать установку и перезагрузить компьютер?

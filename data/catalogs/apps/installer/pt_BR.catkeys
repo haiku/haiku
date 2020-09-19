@@ -1,9 +1,8 @@
-1	portuguese (brazil)	x-vnd.Haiku-Installer	4187503948
+1	portuguese (brazil)	x-vnd.Haiku-Installer	1151798284
 Performing installation.	InstallProgress		Fazendo a instalação.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Escolha o disco de origem no menu pop-up. Então clique em \"Iniciar\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Por favor feche o Configurador de Disco antes de fechar o Instalador.
 No optional packages available.	PackagesView		Nenhum pacote opcional disponível.
-Restart system	InstallerWindow		Reiniciar o sistema
 The mount point could not be retrieved.	InstallProgress		O ponto de montagem não pôde ser recuperado.
 <none>	InstallerWindow	No partition available	<nenhum>
 Please choose target	InstallerWindow		Por favor, escolha um alvo
@@ -19,10 +18,10 @@ README	InstallerApp		LEIAME
 Quit	InstallerWindow		Sair
 Write boot sector to '%s'	InstallerWindow		Escrever setor de inicialização para '%s'
 Boot sector not written because of an internal error.	InstallProgress		Setor de inicialização não gravado por causa de um erro interno.
-DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Configurador de Unidade, o aplicativo para configurar partições de disco, não pôde ser carregado. 
 Welcome to the Haiku Installer!\n\n	InstallerApp		Bem vindo ao Instalador do Haiku!\n\n
 ?? of ??	InstallerWindow	Unknown progress	?? de ??
 Quit Boot Manager	InstallerWindow		Sair do Gerenciador de Inicialização
+DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Configurador de Unidade, o aplicativo para configurar partições de disco, não pôde ser carregado. 
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Executando o Gerenciador de Inicialização...\n\nFeche o Gerenciador de Inicialização para continuar com a instalação.
 Quit DriveSetup	InstallerWindow		Sair do Configurador de Drive
 Write boot sector	InstallerWindow		Gravar o setor de inicialização
@@ -50,13 +49,11 @@ Collecting copy information.	InstallProgress		Coletando informações para cópi
 Show optional packages	InstallerWindow		Mostrar items opcionais
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		O disco destino não tem espaço suficiente. Tente escolher um disco diferente ou escolha não instalar os items opcionais.
 Installation canceled.	InstallProgress		Instalação cancelada.
-Are you sure you want to abort the installation?	InstallerWindow		Está seguro de que quer cancelar a instalação?
 Stop	InstallerWindow		Parar
 Cancel	InstallerWindow		Cancelar
 Continue	InstallerWindow	In alert after pressing Stop	Continuar
 Scanning for disks…	InstallerWindow		Analisando os discos…
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Executando Configuração de Unidade…\n\nFechar Configuração de Unidade para continuar com a instalação.
-Abort	InstallerWindow		Cancelar
 The partition can't be mounted. Please choose a different partition.	InstallProgress		A partição não pode ser montada. Por favor escolha uma partição diferente.
 Set up partitions…	InstallerWindow		Configurar as partições...
 Install progress:  	InstallerWindow		Progresso na instalação:  
@@ -72,4 +69,3 @@ Tools	InstallerWindow		Ferramentas
 scanning…	InstallerWindow		analisando…
 Set up boot menu	InstallerWindow		Configurar o menu de inicialização
 Continue	InstallerApp		Continuar
-Are you sure you want to abort the installation and restart the system?	InstallerWindow		Você tem certeza que deseja abortar a instalação e reiniciar o sistema?

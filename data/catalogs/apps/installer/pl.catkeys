@@ -1,9 +1,8 @@
-1	polish	x-vnd.Haiku-Installer	4193079864
+1	polish	x-vnd.Haiku-Installer	1157374200
 Performing installation.	InstallProgress		Wykonywanie instalacji.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Wybierz dysk źródłowy z menu podręcznego i naciśnij „Instaluj”.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Zamknij okno DriveSetup przed zamknięciem okna instalatora.
 No optional packages available.	PackagesView		Brak dostępnych opcjonalnych pakietów.
-Restart system	InstallerWindow		Uruchom ponownie
 The mount point could not be retrieved.	InstallProgress		Punkt montowania nie mógł zostać odczytany.
 <none>	InstallerWindow	No partition available	<brak>
 Please choose target	InstallerWindow		Wybierz cel
@@ -19,10 +18,10 @@ README	InstallerApp		README
 Quit	InstallerWindow		Zakończ
 Write boot sector to '%s'	InstallerWindow		Zapisz sektor rozruchowy do „%s”
 Boot sector not written because of an internal error.	InstallProgress		Sektor rozruchowy nie został zapisany z powodu błędu wewnętrznego.
-DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		DriveSetup, aplikacja do konfiguracji partycji, nie mogła zostać uruchomiona.
 Welcome to the Haiku Installer!\n\n	InstallerApp		Witaj w Instalatorze Haiku!\n\n
 ?? of ??	InstallerWindow	Unknown progress	?? z ??
 Quit Boot Manager	InstallerWindow		Zakończ Menedżera Rozruchu
+DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		DriveSetup, aplikacja do konfiguracji partycji, nie mogła zostać uruchomiona.
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Menedżer Rozruchu uruchomiony…\n\nZamknij Menedżera Rozruchu, aby kontynuować instalację.
 Quit DriveSetup	InstallerWindow		Wyjdź z DriveSetup
 Write boot sector	InstallerWindow		Zapisz sektor rozruchowy
@@ -55,13 +54,11 @@ Collecting copy information.	InstallProgress		Zbieranie informacji dotyczących 
 Show optional packages	InstallerWindow		Wyświetl pakiety opcjonalne
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Dysk docelowy może nie mieć wystarczającej ilości wolnego miejsca. Proszę wybrać inny dysk lub odznaczyć pakiety dodatkowe.
 Installation canceled.	InstallProgress		Instalacja anulowana.
-Are you sure you want to abort the installation?	InstallerWindow		Czy na pewno chcesz przerwać instalację?
 Stop	InstallerWindow		Zatrzymaj
 Cancel	InstallerWindow		Anuluj
 Continue	InstallerWindow	In alert after pressing Stop	Kontynuuj
 Scanning for disks…	InstallerWindow		Skanowanie w poszukiwaniu dysków…
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		DriveSetup uruchomiony…\n\nZamknij DriveSetup, aby kontynuować instalację.
-Abort	InstallerWindow		Przerwij
 The partition can't be mounted. Please choose a different partition.	InstallProgress		Partycja nie może zostać zamontowana. Wybierz inną partycję.
 Set up partitions…	InstallerWindow		Konfiguruj partycje…
 Install progress:  	InstallerWindow		Postęp instalacji:  
@@ -78,4 +75,3 @@ scanning…	InstallerWindow		skanowanie…
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Userguide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2)    Instalator ustawi partycję Haiku jako rozruchową, ale nie poczyni żadnych kroków w celu integracji Haiku z istniejącym menu rozruchu. Jeśli masz zainstalowane menu GRUB możesz dodać do niego Haiku.\nJeśli chcesz dowiedzieć się więcej na temat uruchamiania komputera z Haiku zajrzyj do poradnika na naszej stronie https://www.haiku-os.org/guides/booting\nEwentualnie możesz zainstalować menu rozruchu poprzez menu „Narzędzia” w Instalatorze, zajrzyj do artykułu na temat aplikacji „BootManager” w Poradniku Użytkownika.\n\n\n
 Set up boot menu	InstallerWindow		Konfiguruj menu rozruchu
 Continue	InstallerApp		Kontynuuj
-Are you sure you want to abort the installation and restart the system?	InstallerWindow		Na pewno chcesz przerwać instalację i uruchomić system ponownie?

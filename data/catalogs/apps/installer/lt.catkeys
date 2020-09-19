@@ -1,9 +1,8 @@
-1	lithuanian	x-vnd.Haiku-Installer	3085345570
+1	lithuanian	x-vnd.Haiku-Installer	49639906
 Performing installation.	InstallProgress		Diegiama.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Pasirinkite šaltinio diską iš išskleidžiamojo meniu. Tada spustelėkite mygtuką „Pradėti“.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Prieš užverdami įdiegimo programos langą, užverkite Diskų ženklintuvo langą.
 No optional packages available.	PackagesView		Papildomų paketų nėra.
-Restart system	InstallerWindow		Paleisti kompiuterį iš naujo
 The mount point could not be retrieved.	InstallProgress		Prijungimo taško nustatyti nepavyko.
 <none>	InstallerWindow	No partition available	<nieko>
 Please choose target	InstallerWindow		Pasirinkite paskirties vietą
@@ -19,10 +18,10 @@ README	InstallerApp		Lydimoji instrukcija
 Quit	InstallerWindow		Baigti darbą
 Write boot sector to '%s'	InstallerWindow		Įrašyti paleidimo sektorių į „%s“
 Boot sector not written because of an internal error.	InstallProgress		Paleidimo sektoriaus nepavyko įrašyti dėl vidinės klaidos.
-DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Diskų ženklintuvo – priemonės skaidiniams tvarkyti – paleisti nepavyko.
 Welcome to the Haiku Installer!\n\n	InstallerApp		Sveiki! Tai – „Haiku“ įdiegimo programa!\n\n
 ?? of ??	InstallerWindow	Unknown progress	?? iš ??
 Quit Boot Manager	InstallerWindow		Užbaikite Paleidyklės darbą.
+DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Diskų ženklintuvo – priemonės skaidiniams tvarkyti – paleisti nepavyko.
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Vykdoma Paleidyklė…\n\nUžvėrę Paleidyklę, galėsite tęsti diegimą.
 Quit DriveSetup	InstallerWindow		Užbaikite Diskų ženklintuvo darbą
 Write boot sector	InstallerWindow		Įrašyti paleidimo sektorių
@@ -49,13 +48,11 @@ Collecting copy information.	InstallProgress		Renkami duomenys kopijavimui.
 Show optional packages	InstallerWindow		Rodyti papildomus paketus
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Paskirties diske nepakanka vietos. Išsirinkite kitą diską arba pašalinkite žymėjimą nuo papildomų paketų, kad šie nebūtų diegiami.
 Installation canceled.	InstallProgress		Diegimo atsisakyta.
-Are you sure you want to abort the installation?	InstallerWindow		Ar tikrai norite nutraukti diegimą?
 Stop	InstallerWindow		Nutraukti
 Cancel	InstallerWindow		Atsisakyti
 Continue	InstallerWindow	In alert after pressing Stop	Tęsti
 Scanning for disks…	InstallerWindow		Apžvelgiami kaupikliai…
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Vykdomas Diskų ženklintuvas…\n\nUžvėrę Diskų ženklintuvą, galėsite tęsti diegimą.
-Abort	InstallerWindow		Nutraukti
 The partition can't be mounted. Please choose a different partition.	InstallProgress		Šio skaidinio prijungti negalima. Pasirinkite kitą skaidinį.
 Set up partitions…	InstallerWindow		Tvarkyti skaidinius…
 Install progress:  	InstallerWindow		Įdiegiama: 
@@ -70,4 +67,3 @@ Tools	InstallerWindow		Priemonės
 scanning…	InstallerWindow		žvalgoma…
 Set up boot menu	InstallerWindow		Įdiegti paleidyklės meniu
 Continue	InstallerApp		Tęsti
-Are you sure you want to abort the installation and restart the system?	InstallerWindow		Ar tikrai norite nutraukti diegimą ir paleisti kompiuterį iš naujo?

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	3669766136
+1	japanese	x-vnd.Haiku-libtracker	2498612740
 Created	ContainerWindow		作成日時
 Icon	AttributesView		アイコン
 Open and make preferred	OpenWithWindow		関連付けて開く
@@ -270,6 +270,7 @@ home	B_USER_DIRECTORY		ホーム
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		新規 Tracker テンプレート
 Disk mounting during boot	AutoMounterSettings		起動時の設定
 Don't automount	AutoMounterSettings		自動マウントを使わない
+Node ref	AttributesView		Node ref
 Could not find application \"%appname\"	OpenWithWindow		アプリケーション \"%appname\" が見つかりませんでした
 Unmatched parenthesis.	libtracker		括弧が不一致です。
 Extended attribute	AttributesView		拡張属性
@@ -520,6 +521,7 @@ Create a Query	FindPanel		クエリを作成
 Close	QueryContainerWindow		閉じる
 I know what I'm doing	FSUtils	button label	私はなにをするか理解しています
 Preparing to copy items…	StatusWindow		コピーの準備をしています…
+Entry ref	AttributesView		Entry ref
 Icon view	ContainerWindow		アイコン表示
 Name	ContainerWindow		名前
 Preferred for %type	OpenWithWindow		%type対応優先アプリ
