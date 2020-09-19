@@ -182,7 +182,7 @@ btrfs_write_fs_info(fs_volume* _volume, const struct fs_info* info, uint32 mask)
 	if (volume->IsReadOnly())
 		return B_READ_ONLY_DEVICE;
 
-	if (mask & ~FS_WFITE_FSINFO_NAME != 0)
+	if (mask & ~FS_WRITE_FSINFO_NAME != 0)
 		return B_NOT_SUPPORTED;
 
 	MutexLocker locker(volume->GetLock());
