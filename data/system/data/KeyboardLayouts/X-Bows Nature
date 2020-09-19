@@ -1,6 +1,6 @@
 # X-Bows Nature 86 key compact mechanical keyboard Layout
 # ANSI layout
-name = X-Bows Nature 86
+name = X-Bows Nature
 
 # Needed doc to create keyboard layouts:
 # https://www.haiku-os.org/docs/api/keyboard.html
@@ -69,4 +69,3 @@ $hdis:-; :+1; $hdis:-; :+1; $hdis:-+3; :+1; :-; :0x57; :-;]
 [0,85; :0x5c; :0x66;  $wide:0x5d; $wide:0x5e; $hdis:-; $andhalf:0x5c;
 $andhalf:0x56; $hdis:-; 
 $wide:0x5e; $wide:0x5f; d:0x99; :0x60+3;]
-
