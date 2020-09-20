@@ -14,6 +14,7 @@
 
 
 #include <assert.h>
+#include <stdio.h>
 
 #include <GraphicsDefs.h>
 
@@ -44,13 +45,15 @@ inline void
 ConvertAVCodecContextToVideoAspectWidthAndHeight(AVCodecContext& contextIn,
 	uint16& pixelWidthAspectOut, uint16& pixelHeightAspectOut)
 {
-	assert(contextIn.sample_aspect_ratio.num >= 0);
-	assert(contextIn.width > 0);
-	assert(contextIn.height > 0);
+	if (contextIn.width <= 0 || contextIn.height <= 0) {
+		fprintf(stderr, "Cannot compute video aspect ratio correctly\n");
+		pixelWidthAspectOut = 1;
+		pixelHeightAspectOut = 1;
+		return;
+	}
 
-	// The following code is based on code originally located in
-	// AVFormatReader::Stream::Init() and thus should be copyrighted to Stephan
-	// Aßmus
+	assert(contextIn.sample_aspect_ratio.num >= 0);
+
 	AVRational pixelAspectRatio;
 
 	if (contextIn.sample_aspect_ratio.num == 0
@@ -80,13 +83,15 @@ inline void
 ConvertAVCodecParametersToVideoAspectWidthAndHeight(AVCodecParameters& parametersIn,
 	uint16& pixelWidthAspectOut, uint16& pixelHeightAspectOut)
 {
-	assert(parametersIn.sample_aspect_ratio.num >= 0);
-	assert(parametersIn.width > 0);
-	assert(parametersIn.height > 0);
+	if (parametersIn.width <= 0 || parametersIn.height <= 0) {
+		fprintf(stderr, "Cannot compute video aspect ratio correctly\n");
+		pixelWidthAspectOut = 1;
+		pixelHeightAspectOut = 1;
+		return;
+	}
 
-	// The following code is based on code originally located in
-	// AVFormatReader::Stream::Init() and thus should be copyrighted to Stephan
-	// Aßmus
+	assert(parametersIn.sample_aspect_ratio.num >= 0);
+
 	AVRational pixelAspectRatio;
 
 	if (parametersIn.sample_aspect_ratio.num == 0
@@ -136,10 +141,16 @@ inline void
 ConvertVideoAspectWidthAndHeightToAVCodecContext(uint16 pixelWidthAspectIn,
 	uint16 pixelHeightAspectIn, AVCodecContext& contextInOut)
 {
+	if (contextInOut.width <= 0 || contextInOut.height <= 0) {
+		fprintf(stderr, "Cannot compute video aspect ratio correctly\n");
+		// We can't do anything, set the aspect ratio to 'ignore'.
+		contextInOut.sample_aspect_ratio.num = 0;
+		contextInOut.sample_aspect_ratio.den = 1;
+		return;
+	}
+
 	assert(pixelWidthAspectIn > 0);
 	assert(pixelHeightAspectIn > 0);
-	assert(contextInOut.width > 0);
-	assert(contextInOut.height > 0);
 
 	AVRational pureVideoDimensionAspectRatio;
 	av_reduce(&pureVideoDimensionAspectRatio.num,
