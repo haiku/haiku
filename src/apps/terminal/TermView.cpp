@@ -977,7 +977,8 @@ void
 TermView::_Activate()
 {
 	fActive = true;
-	SwitchCursorBlinking(fCursorBlinking);
+	bool blink = PrefHandler::Default()->getBool(PREF_BLINK_CURSOR);
+	SwitchCursorBlinking(blink);
 }
 
 
