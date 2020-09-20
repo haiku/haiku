@@ -305,8 +305,13 @@ BootPromptWindow::MessageReceived(BMessage* message)
 bool
 BootPromptWindow::QuitRequested()
 {
-	if (!be_roster->IsRunning(kDeskbarSignature) &&
-		!CurrentMessage()->GetBool("dont_reboot"))
+	BMessage* message = CurrentMessage();
+	bool dont_reboot = false;
+
+	if (message != NULL)
+		dont_reboot = message->GetBool("dont_reboot");
+
+	if (!be_roster->IsRunning(kDeskbarSignature) && !dont_reboot)
 	{
 		// If the Deskbar is not running, then FirstBootPrompt is
 		// is the only thing visible on the screen and that we won't
@@ -316,15 +321,18 @@ BootPromptWindow::QuitRequested()
 		//
 		// Rebooting is managed by BootPrompt.cpp.
 
-		BAlert* alert = new BAlert(B_TRANSLATE_SYSTEM_NAME("Quit Haiku"),
+		BAlert* alert = new(std::nothrow) BAlert(
+			B_TRANSLATE_SYSTEM_NAME("Quit Haiku"),
 			B_TRANSLATE("Are you sure you want to close this window? This will "
 				"restart your system!"),
 			B_TRANSLATE("Cancel"), B_TRANSLATE("Restart system"), NULL,
 			B_WIDTH_AS_USUAL, B_STOP_ALERT);
-		alert->SetShortcut(0, B_ESCAPE);
+		if (alert != NULL) {
+			alert->SetShortcut(0, B_ESCAPE);
 
-		if (alert->Go() == 0) {
-			return false;
+			if (alert->Go() == 0) {
+				return false;
+			}
 		}
 
 		be_app->PostMessage(MSG_REBOOT_REQUESTED);
