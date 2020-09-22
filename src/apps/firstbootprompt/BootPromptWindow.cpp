@@ -327,16 +327,18 @@ BootPromptWindow::QuitRequested()
 				"restart your system!"),
 			B_TRANSLATE("Cancel"), B_TRANSLATE("Restart system"), NULL,
 			B_WIDTH_AS_USUAL, B_STOP_ALERT);
+		// If there is not enough memory to create the alert here, we may as
+		// well try to reboot. There probably isn't much else to do anyway.
 		if (alert != NULL) {
 			alert->SetShortcut(0, B_ESCAPE);
 
-			if (alert->Go() == 0) {
+			if (alert->Go() == 0)
 				return false;
-			}
 		}
 
 		be_app->PostMessage(MSG_REBOOT_REQUESTED);
-
+		// Don't quit, instead let the app run and handle the reboot request
+		return false;
 	} else {
 		// The aforementioned warning is only shown if the condition
 		// is true, because if FirstBootPrompt is running on the Desktop,
