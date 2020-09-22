@@ -7,6 +7,7 @@
 
 #include "Model.h"
 
+#include <algorithm>
 #include <ctime>
 #include <vector>
 
@@ -15,7 +16,6 @@
 
 #include <Autolock.h>
 #include <Catalog.h>
-#include <Collator.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
@@ -107,9 +107,8 @@ public:
 		if (package.Get() == NULL)
 			return false;
 
-		const CategoryList& categories = package->Categories();
-		for (int i = categories.CountItems() - 1; i >= 0; i--) {
-			const CategoryRef& category = categories.ItemAtFast(i);
+		for (int i = package->CountCategories() - 1; i >= 0; i--) {
+			const CategoryRef& category = package->CategoryAtIndex(i);
 			if (category.Get() == NULL)
 				continue;
 			if (category->Code() == fCategory)
@@ -303,22 +302,10 @@ is_develop_package(const PackageInfoRef& package)
 // #pragma mark - Model
 
 
-static int32
-PackageCategoryCompareFn(const CategoryRef& c1, const CategoryRef& c2)
-{
-	BCollator* collator = LocaleUtils::GetSharedCollator();
-	int32 result = collator->Compare(c1->Name().String(),
-		c2->Name().String());
-	if (result == 0)
-		result = c1->Code().Compare(c2->Code());
-	return result;
-}
-
-
 Model::Model()
 	:
 	fDepots(),
-	fCategories(&PackageCategoryCompareFn, NULL),
+	fCategories(),
 	fCategoryFilter(PackageFilterRef(new AnyFilter(), true)),
 	fDepotFilter(""),
 	fSearchTermsFilter(PackageFilterRef(new AnyFilter(), true)),
@@ -1066,26 +1053,123 @@ Model::_MaybeLogJsonRpcError(const BMessage &responsePayload,
 }
 
 
-void
-Model::AddCategories(const CategoryList& categories)
+// #pragma mark - Rating Stabilities
+
+
+int32
+Model::CountRatingStabilities() const
 {
-	int32 i;
-	for (i = 0; i < categories.CountItems(); i++)
-		_AddCategory(categories.ItemAt(i));
-	_NotifyCategoryListChanged();
+	return fRatingStabilities.size();
+}
+
+
+RatingStabilityRef
+Model::RatingStabilityByCode(BString& code) const
+{
+	std::vector<RatingStabilityRef>::const_iterator it;
+	for (it = fRatingStabilities.begin(); it != fRatingStabilities.end();
+			it++) {
+		RatingStabilityRef aRatingStability = *it;
+		if (aRatingStability->Code() == code)
+			return aRatingStability;
+	}
+	return RatingStabilityRef();
+}
+
+
+RatingStabilityRef
+Model::RatingStabilityAtIndex(int32 index) const
+{
+	return fRatingStabilities[index];
 }
 
 
 void
-Model::_AddCategory(const CategoryRef& category)
+Model::AddRatingStabilities(std::vector<RatingStabilityRef>& values)
 {
-	int32 i;
-	for (i = 0; i < fCategories.CountItems(); i++) {
-		if (fCategories.ItemAt(i)->Code() == category->Code()) {
-			fCategories.Replace(i, category);
-			return;
-		}
+	std::vector<RatingStabilityRef>::const_iterator it;
+	for (it = values.begin(); it != values.end(); it++)
+		_AddRatingStability(*it);
+}
+
+
+void
+Model::_AddRatingStability(const RatingStabilityRef& value)
+{
+	std::vector<RatingStabilityRef>::const_iterator itInsertionPt
+		= std::lower_bound(
+			fRatingStabilities.begin(),
+			fRatingStabilities.end(),
+			value,
+			&IsRatingStabilityBefore);
+
+	if (itInsertionPt != fRatingStabilities.end()
+		&& (*itInsertionPt)->Code() == value->Code()) {
+		itInsertionPt = fRatingStabilities.erase(itInsertionPt);
+			// replace the one with the same code.
 	}
 
-	fCategories.Add(category);
+	fRatingStabilities.insert(itInsertionPt, value);
+}
+
+
+// #pragma mark - Categories
+
+
+int32
+Model::CountCategories() const
+{
+	return fCategories.size();
+}
+
+
+CategoryRef
+Model::CategoryByCode(BString& code) const
+{
+	std::vector<CategoryRef>::const_iterator it;
+	for (it = fCategories.begin(); it != fCategories.end(); it++) {
+		CategoryRef aCategory = *it;
+		if (aCategory->Code() == code)
+			return aCategory;
+	}
+	return CategoryRef();
+}
+
+
+CategoryRef
+Model::CategoryAtIndex(int32 index) const
+{
+	return fCategories[index];
+}
+
+
+void
+Model::AddCategories(std::vector<CategoryRef>& values)
+{
+	std::vector<CategoryRef>::iterator it;
+	for (it = values.begin(); it != values.end(); it++)
+		_AddCategory(*it);
+	_NotifyCategoryListChanged();
+}
+
+/*! This will insert the category in order.
+ */
+
+void
+Model::_AddCategory(const CategoryRef& category)
+{
+	std::vector<CategoryRef>::const_iterator itInsertionPt
+		= std::lower_bound(
+			fCategories.begin(),
+			fCategories.end(),
+			category,
+			&IsPackageCategoryBefore);
+
+	if (itInsertionPt != fCategories.end()
+		&& (*itInsertionPt)->Code() == category->Code()) {
+		itInsertionPt = fCategories.erase(itInsertionPt);
+			// replace the one with the same code.
+	}
+
+	fCategories.insert(itInsertionPt, category);
 }

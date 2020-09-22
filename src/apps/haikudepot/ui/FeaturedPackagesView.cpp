@@ -246,7 +246,7 @@ public:
 		const PackageInfoRef& packageB)
 	{
 		if (packageA.Get() == NULL || packageB.Get() == NULL)
-			debugger("unexpected NULL reference in a referencable");
+			HDFATAL("unexpected NULL reference in a referencable");
 		int c = _CmpProminences(packageA->Prominence(), packageB->Prominence());
 		if (c == 0)
 			c = packageA->Title().ICompare(packageB->Title());

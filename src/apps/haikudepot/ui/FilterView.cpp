@@ -1,6 +1,6 @@
 /*
  * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2019, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2019-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -25,19 +25,6 @@
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "FilterView"
-
-
-static void
-add_categories_to_menu(const CategoryList& categories, BMenu* menu)
-{
-	for (int i = 0; i < categories.CountItems(); i++) {
-		const CategoryRef& category = categories.ItemAtFast(i);
-		BMessage* message = new BMessage(MSG_CATEGORY_SELECTED);
-		message->AddString("code", category->Code());
-		BMenuItem* item = new BMenuItem(category->Name(), message);
-		menu->AddItem(item);
-	}
-}
 
 
 FilterView::FilterView()
@@ -124,14 +111,14 @@ FilterView::AdoptModel(Model& model)
 		new BMessage(MSG_CATEGORY_SELECTED)));
 
 	AutoLocker<BLocker> locker(model.Lock());
-	CategoryList categories = model.Categories();
+	int32 categoryCount = model.CountCategories();
 
-	if (!categories.IsEmpty()) {
+	if (categoryCount > 0) {
 		showMenu->AddItem(new BSeparatorItem());
-		add_categories_to_menu(categories, showMenu);
+		_AddCategoriesToMenu(model, showMenu);
 	}
 
-	showMenu->SetEnabled(!categories.IsEmpty());
+	showMenu->SetEnabled(categoryCount > 0);
 
 	if (!_SelectCategoryCode(showMenu, model.Category()))
 		showMenu->ItemAt(0)->SetMarked(true);
@@ -166,4 +153,18 @@ FilterView::_MatchesCategoryCode(BMenuItem* item, const BString& code)
 	BString itemCode;
 	message->FindString("code", &itemCode);
 	return itemCode == code;
+}
+
+
+/*static*/ void
+FilterView::_AddCategoriesToMenu(Model& model, BMenu* menu)
+{
+	int count = model.CountCategories();
+	for (int i = 0; i < count; i++) {
+		const CategoryRef& category = model.CategoryAtIndex(i);
+		BMessage* message = new BMessage(MSG_CATEGORY_SELECTED);
+		message->AddString("code", category->Code());
+		BMenuItem* item = new BMenuItem(category->Name(), message);
+		menu->AddItem(item);
+	}
 }

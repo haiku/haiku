@@ -18,10 +18,10 @@
 #include <LayoutBuilder.h>
 #include <MenuField.h>
 #include <MenuItem.h>
-#include <PopUpMenu.h>
 #include <ScrollView.h>
 #include <StringView.h>
 
+#include "AppUtils.h"
 #include "HaikuDepotConstants.h"
 #include "LanguageMenuUtils.h"
 #include "Logger.h"
@@ -169,19 +169,6 @@ private:
 };
 
 
-static void
-add_stabilities_to_menu(const StabilityRatingList& stabilities, BMenu* menu)
-{
-	for (int i = 0; i < stabilities.CountItems(); i++) {
-		const StabilityRating& stability = stabilities.ItemAtFast(i);
-		BMessage* message = new BMessage(MSG_STABILITY_SELECTED);
-		message->AddString("name", stability.Name());
-		BMenuItem* item = new BMenuItem(stability.Label(), message);
-		menu->AddItem(item);
-	}
-}
-
-
 RatePackageWindow::RatePackageWindow(BWindow* parent, BRect frame,
 	Model& model)
 	:
@@ -224,41 +211,13 @@ RatePackageWindow::RatePackageWindow(BWindow* parent, BRect frame,
 	BPopUpMenu* stabilityMenu = new BPopUpMenu(B_TRANSLATE("Stability"));
 	fStabilityField = new BMenuField("stability",
 		B_TRANSLATE("Stability:"), stabilityMenu);
+	_InitStabilitiesMenu(stabilityMenu);
 
-	fStabilityCodes.Add(StabilityRating(
-		B_TRANSLATE("Not specified"), "unspecified"));
-	fStabilityCodes.Add(StabilityRating(
-		B_TRANSLATE("Stable"), "stable"));
-	fStabilityCodes.Add(StabilityRating(
-		B_TRANSLATE("Mostly stable"), "mostlystable"));
-	fStabilityCodes.Add(StabilityRating(
-		B_TRANSLATE("Unstable but usable"), "unstablebutusable"));
-	fStabilityCodes.Add(StabilityRating(
-		B_TRANSLATE("Very unstable"), "veryunstable"));
-	fStabilityCodes.Add(StabilityRating(
-		B_TRANSLATE("Does not start"), "nostart"));
-
-	add_stabilities_to_menu(fStabilityCodes, stabilityMenu);
-	stabilityMenu->SetTargetForItems(this);
-
-	fStability = fStabilityCodes.ItemAt(0).Name();
-	stabilityMenu->ItemAt(0)->SetMarked(true);
-
-
-	{
-		AutoLocker<BLocker> locker(fModel.Lock());
-		fCommentLanguageCode = fModel.Language()->PreferredLanguage()->Code();
-
-		// Construct languages popup
-		BPopUpMenu* languagesMenu = new BPopUpMenu(B_TRANSLATE("Language"));
-		fCommentLanguageField = new BMenuField("language",
-			B_TRANSLATE("Comment language:"), languagesMenu);
-
-		LanguageMenuUtils::AddLanguagesToMenu(fModel.Language(), languagesMenu);
-		languagesMenu->SetTargetForItems(this);
-		LanguageMenuUtils::MarkLanguageInMenu(fCommentLanguageCode,
-			languagesMenu);
-	}
+	// Construct languages popup
+	BPopUpMenu* languagesMenu = new BPopUpMenu(B_TRANSLATE("Language"));
+	fCommentLanguageField = new BMenuField("language",
+		B_TRANSLATE("Comment language:"), languagesMenu);
+	_InitLanguagesMenu(languagesMenu);
 
 	fRatingActiveCheckBox = new BCheckBox("rating active",
 		B_TRANSLATE("This rating is visible to other users"),
@@ -308,6 +267,46 @@ RatePackageWindow::~RatePackageWindow()
 
 
 void
+RatePackageWindow::_InitLanguagesMenu(BPopUpMenu* menu)
+{
+	AutoLocker<BLocker> locker(fModel.Lock());
+	fCommentLanguageCode = fModel.Language()->PreferredLanguage()->Code();
+
+	LanguageMenuUtils::AddLanguagesToMenu(fModel.Language(), menu);
+	menu->SetTargetForItems(this);
+	LanguageMenuUtils::MarkLanguageInMenu(fCommentLanguageCode, menu);
+}
+
+
+void
+RatePackageWindow::_InitStabilitiesMenu(BPopUpMenu* menu)
+{
+	AutoLocker<BLocker> locker(fModel.Lock());
+	int32 countStabilities = fModel.CountRatingStabilities();
+
+	menu->SetTargetForItems(this);
+
+	if (0 == countStabilities) {
+		menu->SetEnabled(false);
+		return;
+	}
+
+	for (int32 i = 0; i < countStabilities; i++) {
+		const RatingStabilityRef stability = fModel.RatingStabilityAtIndex(i);
+		BMessage* message = new BMessage(MSG_STABILITY_SELECTED);
+		message->AddString("code", stability->Code());
+		BMenuItem* item = new BMenuItem(stability->Name(), message);
+		menu->AddItem(item);
+
+		if (i == 0) {
+			fStabilityCode = stability->Code();
+			item->SetMarked(true);
+		}
+	}
+}
+
+
+void
 RatePackageWindow::DispatchMessage(BMessage* message, BHandler *handler)
 {
 	if (message->what == B_KEY_DOWN) {
@@ -336,7 +335,7 @@ RatePackageWindow::MessageReceived(BMessage* message)
 			break;
 
 		case MSG_STABILITY_SELECTED:
-			message->FindString("name", &fStability);
+			message->FindString("code", &fStabilityCode);
 			break;
 
 		case MSG_LANGUAGE_SELECTED:
@@ -491,19 +490,9 @@ RatePackageWindow::_RelayServerDataToUI(BMessage& response)
 			fTextView->SetTextDocument(fRatingText);
 		}
 		if (response.FindString("userRatingStabilityCode",
-			&fStability) == B_OK) {
-			int32 index = 0;
-			for (int32 i = fStabilityCodes.CountItems() - 1; i >= 0; i--) {
-				const StabilityRating& stability
-					= fStabilityCodes.ItemAtFast(i);
-				if (stability.Name() == fStability) {
-					index = i;
-					break;
-				}
-			}
-			BMenuItem* item = fStabilityField->Menu()->ItemAt(index);
-			if (item != NULL)
-				item->SetMarked(true);
+				&fStabilityCode) == B_OK) {
+			BMenu* menu = fStabilityField->Menu();
+			AppUtils::MarkItemWithCodeInMenu(fStabilityCode, menu);
 		}
 		if (response.FindString("naturalLanguageCode",
 			&fCommentLanguageCode) == B_OK) {
@@ -570,8 +559,8 @@ RatePackageWindow::_QueryRatingThread()
 	} else {
 		status_t status = interface
 			.RetreiveUserRatingForPackageAndVersionByUser(package->Name(),
-			package->Version(), package->Architecture(), repositoryCode,
-			nickname, info);
+				package->Version(), package->Architecture(), repositoryCode,
+				nickname, info);
 
 		if (status == B_OK) {
 				// could be an error or could be a valid response envelope
@@ -636,7 +625,7 @@ RatePackageWindow::_SendRatingThread()
 	BString architecture = fPackage->Architecture();
 	BString repositoryCode;
 	int rating = (int)fRating;
-	BString stability = fStability;
+	BString stability = fStabilityCode;
 	BString comment = fRatingText->Text();
 	BString languageCode = fCommentLanguageCode;
 	BString ratingID = fRatingID;

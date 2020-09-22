@@ -8,6 +8,7 @@
 
 
 #include <set>
+#include <vector>
 
 #include <Language.h>
 #include <Referenceable.h>
@@ -121,31 +122,6 @@ public:
 };
 
 
-class StabilityRating {
-public:
-								StabilityRating();
-								StabilityRating(
-									const BString& label,
-									const BString& name);
-								StabilityRating(const StabilityRating& other);
-
-			StabilityRating&	operator=(const StabilityRating& other);
-			bool				operator==(const StabilityRating& other) const;
-			bool				operator!=(const StabilityRating& other) const;
-
-			const BString&		Label() const
-									{ return fLabel; }
-			const BString&		Name() const
-									{ return fName; }
-private:
-			BString				fLabel;
-			BString				fName;
-};
-
-
-typedef List<StabilityRating, false> StabilityRatingList;
-
-
 class PublisherInfo {
 public:
 								PublisherInfo();
@@ -191,6 +167,9 @@ public:
 									{ return fCode; }
 			const BString&		Name() const
 									{ return fName; }
+
+			int					Compare(const PackageCategory& other) const;
+
 private:
 			BString				fCode;
 			BString				fName;
@@ -198,7 +177,10 @@ private:
 
 
 typedef BReference<PackageCategory> CategoryRef;
-typedef List<CategoryRef, false> CategoryList;
+
+
+extern bool IsPackageCategoryBefore(const CategoryRef& c1,
+	const CategoryRef& c2);
 
 
 class ScreenshotInfo {
@@ -323,8 +305,8 @@ public:
 
 			void				ClearCategories();
 			bool				AddCategory(const CategoryRef& category);
-			const CategoryList&	Categories() const
-									{ return fCategories; }
+			int32				CountCategories() const;
+			CategoryRef			CategoryAtIndex(int32 index) const;
 
 			void				ClearUserRatings();
 			bool				AddUserRating(const UserRating& rating);
@@ -380,7 +362,8 @@ private:
 			BString				fFullDescription;
 			bool				fHasChangelog;
 			BString				fChangelog;
-			CategoryList		fCategories;
+			std::vector<CategoryRef>
+								fCategories;
 			UserRatingList		fUserRatings;
 			RatingSummary		fCachedRatingSummary;
 			int64				fProminence;

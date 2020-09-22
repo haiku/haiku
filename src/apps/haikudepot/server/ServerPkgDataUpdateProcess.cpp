@@ -51,14 +51,12 @@ public:
 
 private:
 			int32				IndexOfPackageByName(const BString& name) const;
-			int32				IndexOfCategoryByName(
-									const BString& name) const;
-			int32				IndexOfCategoryByCode(
-									const BString& code) const;
 
+private:
 			BString				fDepotName;
 			Model*				fModel;
-			CategoryList		fCategories;
+			std::vector<CategoryRef>
+								fCategories;
 			Stoppable*			fStoppable;
 			uint32				fCount;
 			bool				fDebugEnabled;
@@ -74,32 +72,11 @@ PackageFillingPkgListener::PackageFillingPkgListener(Model* model,
 	fCount(0),
 	fDebugEnabled(Logger::IsDebugEnabled())
 {
-	fCategories = model->Categories();
 }
 
 
 PackageFillingPkgListener::~PackageFillingPkgListener()
 {
-}
-
-
-	// TODO; performance could be improved by not needing the linear search
-
-inline int32
-PackageFillingPkgListener::IndexOfCategoryByCode(
-	const BString& code) const
-{
-	int32 i;
-	int32 categoryCount = fCategories.CountItems();
-
-	for (i = 0; i < categoryCount; i++) {
-		const CategoryRef categoryRef = fCategories.ItemAtFast(i);
-
-		if (categoryRef->Code() == code)
-			return i;
-	}
-
-	return -1;
 }
 
 
@@ -140,15 +117,13 @@ PackageFillingPkgListener::ConsumePackage(const PackageInfoRef& package,
 
 	for (i = 0; i < countPkgCategories; i++) {
 		BString* categoryCode = pkg->PkgCategoriesItemAt(i)->Code();
-		int categoryIndex = IndexOfCategoryByCode(*(categoryCode));
+		CategoryRef category = fModel->CategoryByCode(*categoryCode);
 
-		if (categoryIndex == -1) {
+		if (category.Get() == NULL) {
 			HDERROR("unable to find the category for [%s]",
 				categoryCode->String());
-		} else {
-			package->AddCategory(
-				fCategories.ItemAtFast(categoryIndex));
-		}
+		} else
+			package->AddCategory(category);
 	}
 
 	RatingSummary summary;

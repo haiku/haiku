@@ -14,6 +14,7 @@
 #include "PackageIconTarRepository.h"
 #include "LanguageModel.h"
 #include "PackageInfo.h"
+#include "RatingStability.h"
 #include "WebAppInterface.h"
 
 
@@ -88,9 +89,17 @@ public:
 
 			void				Clear();
 
-			void				AddCategories(const CategoryList& categories);
-			const CategoryList&	Categories() const
-									{ return fCategories; }
+			int32				CountCategories() const;
+			CategoryRef			CategoryByCode(BString& code) const;
+			CategoryRef			CategoryAtIndex(int32 index) const;
+			void				AddCategories(
+									std::vector<CategoryRef>& values);
+
+			int32				CountRatingStabilities() const;
+			RatingStabilityRef	RatingStabilityByCode(BString& code) const;
+			RatingStabilityRef	RatingStabilityAtIndex(int32 index) const;
+			void				AddRatingStabilities(
+									std::vector<RatingStabilityRef>& values);
 
 			void				SetPackageState(
 									const PackageInfoRef& package,
@@ -153,6 +162,9 @@ public:
 private:
 			void				_AddCategory(const CategoryRef& category);
 
+			void				_AddRatingStability(
+									const RatingStabilityRef& value);
+
 			void				_MaybeLogJsonRpcError(
 									const BMessage &responsePayload,
 									const char *sourceDescription) const;
@@ -175,8 +187,10 @@ private:
 
 			std::vector<DepotInfoRef>
 								fDepots;
-
-			CategoryList		fCategories;
+			std::vector<CategoryRef>
+								fCategories;
+			std::vector<RatingStabilityRef>
+								fRatingStabilities;
 
 			PackageList			fInstalledPackages;
 			PackageList			fActivatedPackages;

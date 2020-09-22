@@ -7,11 +7,15 @@
 
 #include "PackageInfo.h"
 
+#include <algorithm>
+
+#include <Collator.h>
 #include <FindDirectory.h>
 #include <package/PackageDefs.h>
 #include <package/PackageFlags.h>
 #include <Path.h>
 
+#include "LocaleUtils.h"
 #include "Logger.h"
 
 // #pragma mark - Language
@@ -224,58 +228,6 @@ RatingSummary::operator!=(const RatingSummary& other) const
 }
 
 
-// #pragma mark - StabilityRating
-
-
-StabilityRating::StabilityRating()
-	:
-	fLabel(),
-	fName()
-{
-}
-
-
-StabilityRating::StabilityRating(const BString& label,
-		const BString& name)
-	:
-	fLabel(label),
-	fName(name)
-{
-}
-
-
-StabilityRating::StabilityRating(const StabilityRating& other)
-	:
-	fLabel(other.fLabel),
-	fName(other.fName)
-{
-}
-
-
-StabilityRating&
-StabilityRating::operator=(const StabilityRating& other)
-{
-	fLabel = other.fLabel;
-	fName = other.fName;
-	return *this;
-}
-
-
-bool
-StabilityRating::operator==(const StabilityRating& other) const
-{
-	return fLabel == other.fLabel
-		&& fName == other.fName;
-}
-
-
-bool
-StabilityRating::operator!=(const StabilityRating& other) const
-{
-	return !(*this == other);
-}
-
-
 // #pragma mark - PublisherInfo
 
 
@@ -388,6 +340,27 @@ bool
 PackageCategory::operator!=(const PackageCategory& other) const
 {
 	return !(*this == other);
+}
+
+
+int
+PackageCategory::Compare(const PackageCategory& other) const
+{
+	BCollator* collator = LocaleUtils::GetSharedCollator();
+	int32 result = collator->Compare(Name().String(),
+		other.Name().String());
+	if (result == 0)
+		result = Code().Compare(other.Code());
+	return result;
+}
+
+
+bool IsPackageCategoryBefore(const CategoryRef& c1,
+	const CategoryRef& c2)
+{
+	if (c1.Get() == NULL || c2.Get() == NULL)
+		HDFATAL("unexpected NULL reference in a referencable");
+	return c1.Get()->Compare(*(c2.Get())) < 0;
 }
 
 
@@ -722,11 +695,25 @@ PackageInfo::IsSystemPackage() const
 }
 
 
+int32
+PackageInfo::CountCategories() const
+{
+	return fCategories.size();
+}
+
+
+CategoryRef
+PackageInfo::CategoryAtIndex(int32 index) const
+{
+	return fCategories[index];
+}
+
+
 void
 PackageInfo::ClearCategories()
 {
-	if (!fCategories.IsEmpty()) {
-		fCategories.Clear();
+	if (!fCategories.empty()) {
+		fCategories.clear();
 		_NotifyListeners(PKG_CHANGED_CATEGORIES);
 	}
 }
@@ -735,7 +722,15 @@ PackageInfo::ClearCategories()
 bool
 PackageInfo::AddCategory(const CategoryRef& category)
 {
-	if (fCategories.Add(category)) {
+	std::vector<CategoryRef>::const_iterator itInsertionPt
+		= std::lower_bound(
+			fCategories.begin(),
+			fCategories.end(),
+			category,
+			&IsPackageCategoryBefore);
+
+	if (itInsertionPt == fCategories.end()) {
+		fCategories.push_back(category);
 		_NotifyListeners(PKG_CHANGED_CATEGORIES);
 		return true;
 	}

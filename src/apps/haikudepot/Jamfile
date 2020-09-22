@@ -141,6 +141,7 @@ local applicationSources =
 	PackageManager.cpp
 	RatePackageWindow.cpp
 	RatingView.cpp
+	RatingStability.cpp
 	RatingUtils.cpp
 	support.cpp
 	ScreenshotWindow.cpp
