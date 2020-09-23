@@ -104,7 +104,6 @@ private:
 									entry_ref* ref = NULL);
 
 private:
-			BMenuBar*			fMenuBar;
 			BMessage*			fPrintSettings;
 			BMessage*			fSaveMessage;
 
