@@ -377,7 +377,7 @@
 
 
 /*!
-	\fn status_t set_mouse_type_by_name(BString mouse_name, int32* type)
+	\fn status_t set_mouse_type_by_name(BString mouse_name, int32 type)
 	\brief Configure the number of buttons for a specific mouse.
 
 	The setting is saved and persists accross reboots.
