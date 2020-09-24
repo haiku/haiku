@@ -45,11 +45,6 @@ class ServerPicture;
 class DirectWindowInfo;
 struct window_info;
 
-#define AS_UPDATE_DECORATOR 'asud'
-#define AS_UPDATE_COLORS 'asuc'
-#define AS_UPDATE_FONTS 'asuf'
-
-
 class ServerWindow : public MessageLooper {
 public:
 								ServerWindow(const char *title, ServerApp *app,
