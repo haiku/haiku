@@ -59,6 +59,8 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			NavMenu.cpp
 			NodePreloader.cpp
 			NodeWalker.cpp
+			OpenRelationsMenu.cpp
+			OpenRelationTargetsMenu.cpp
 			OpenWithWindow.cpp
 			OverrideAlert.cpp
 			PendingNodeMonitorCache.cpp

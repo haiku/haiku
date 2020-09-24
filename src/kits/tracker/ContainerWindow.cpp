@@ -34,6 +34,7 @@ All rights reserved.
 
 
 #include "ContainerWindow.h"
+#include "OpenRelationsMenu.h"
 
 #include <Alert.h>
 #include <Application.h>
@@ -573,6 +574,7 @@ BContainerWindow::BContainerWindow(LockingList<BWindow>* list,
 	fCopyToItem(NULL),
 	fCreateLinkItem(NULL),
 	fOpenWithItem(NULL),
+	fOpenRelationsItem(NULL),
 	fNavigationItem(NULL),
 	fMenuBar(NULL),
 	fDraggableIcon(NULL),
@@ -734,6 +736,11 @@ BContainerWindow::Quit()
 		fOpenWithItem = NULL;
 	}
 
+	if (fOpenRelationsItem != NULL && fOpenRelationsItem->Menu() == NULL) {
+		delete fOpenRelationsItem;
+		fOpenRelationsItem = NULL;
+	}
+
 	if (fMoveToItem != NULL && fMoveToItem->Menu() == NULL) {
 		delete fMoveToItem;
 		fMoveToItem = NULL;
@@ -883,6 +890,12 @@ BContainerWindow::RepopulateMenus()
 		fOpenWithItem = NULL;
 	}
 
+	if (fOpenRelationsItem != NULL && fOpenRelationsItem->Menu() != NULL) {
+		fOpenRelationsItem->Menu()->RemoveItem(fOpenRelationsItem);
+		delete fOpenRelationsItem;
+		fOpenRelationsItem = NULL;
+	}
+
 	if (fNavigationItem != NULL) {
 		BMenu* menu = fNavigationItem->Menu();
 		if (menu != NULL) {
@@ -929,6 +942,8 @@ BContainerWindow::RepopulateMenus()
 		int32 selectCount = PoseView()->SelectionList()->CountItems();
 
 		SetupOpenWithMenu(fFileMenu);
+		SetupOpenRelationsMenu(fFileMenu);
+		
 		SetupMoveCopyMenus(selectCount ? PoseView()->SelectionList()
 				->FirstItem()->TargetModel()->EntryRef() : NULL,
 			fFileMenu);
@@ -2252,6 +2267,8 @@ BContainerWindow::AddShortcuts()
 		new BMessage(kOpenParentDir), PoseView());
 	AddShortcut('O', B_COMMAND_KEY | B_CONTROL_KEY,
 		new BMessage(kOpenSelectionWith), PoseView());
+	AddShortcut('R', B_COMMAND_KEY | B_CONTROL_KEY,
+		new BMessage(kOpenRelations), PoseView());
 
 	BMessage* decreaseSize = new BMessage(kIconMode);
 	decreaseSize->AddInt32("scale", 0);
@@ -2279,6 +2296,8 @@ BContainerWindow::MenusBeginning()
 	int32 selectCount = PoseView()->SelectionList()->CountItems();
 
 	SetupOpenWithMenu(fFileMenu);
+	SetupOpenRelationsMenu(fFileMenu);
+	
 	SetupMoveCopyMenus(selectCount
 		? PoseView()->SelectionList()->FirstItem()->TargetModel()->EntryRef()
 		: NULL, fFileMenu);
@@ -2327,6 +2346,7 @@ BContainerWindow::MenusEnded()
 	DeleteSubmenu(fCopyToItem);
 	DeleteSubmenu(fCreateLinkItem);
 	DeleteSubmenu(fOpenWithItem);
+	DeleteSubmenu(fOpenRelationsItem);	
 }
 
 
@@ -2457,7 +2477,8 @@ BContainerWindow::SetupOpenWithMenu(BMenu* parent)
 		fOpenWithItem = 0;
 	}
 
-	if (PoseView()->SelectionList()->CountItems() == 0) {
+	int32 count = PoseView()->SelectionList()->CountItems();
+	if (count == 0) {
 		// no selection, nothing to open
 		return;
 	}
@@ -2473,10 +2494,6 @@ BContainerWindow::SetupOpenWithMenu(BMenu* parent)
 
 	// add after "Open"
 	BMenuItem* item = parent->FindItem(kOpenSelection);
-
-	int32 count = PoseView()->SelectionList()->CountItems();
-	if (count == 0)
-		return;
 
 	// build a list of all refs to open
 	BMessage message(B_REFS_RECEIVED);
@@ -2496,6 +2513,57 @@ BContainerWindow::SetupOpenWithMenu(BMenu* parent)
 	fOpenWithItem->SetShortcut('O', B_COMMAND_KEY | B_CONTROL_KEY);
 
 	item->Menu()->AddItem(fOpenWithItem, index + 1);
+}
+
+
+void
+BContainerWindow::SetupOpenRelationsMenu(BMenu* parent)
+{
+	PRINT(("Open Relations..."));
+	
+	// remove existing item from old menu
+	if (fOpenRelationsItem) {
+		BMenu* menu = fOpenRelationsItem->Menu();
+		if (menu != NULL)
+			menu->RemoveItem(fOpenRelationsItem);
+
+		delete fOpenRelationsItem;
+		fOpenRelationsItem = 0;
+	}
+	
+	int32 count = PoseView()->SelectionList()->CountItems();
+	if (count == 0) {
+		// no selection, nothing to open
+		return;
+	}
+
+	if (TargetModel()->IsRoot()) {
+		// don't add ourselves if we are root
+		return;
+	}
+	
+	// add after "Open With"
+	BMenuItem* item = parent->FindItem(kOpenSelectionWith);
+	ASSERT(item != NULL);
+	
+	// build a list of all selected files to show relations for (intersection of supported sources and types)
+	BMessage message(B_REFS_RECEIVED);
+	for (int32 index = 0; index < count; index++) {
+		BPose* pose = PoseView()->SelectionList()->ItemAt(index);
+		message.AddRef("refs", pose->TargetModel()->EntryRef());
+	}
+
+	// add Tracker token so that refs received recipients can script us
+	message.AddMessenger("TrackerViewToken", BMessenger(PoseView()));
+
+	int32 index = item->Menu()->IndexOf(item);
+	fOpenRelationsItem = new BMenuItem(
+		new OpenRelationsMenu(B_TRANSLATE("Open related" B_UTF8_ELLIPSIS), &message, this, be_app),
+        new BMessage(kOpenRelations));
+	fOpenRelationsItem->SetTarget(PoseView());
+	fOpenRelationsItem->SetShortcut('R', B_COMMAND_KEY | B_CONTROL_KEY);
+
+	item->Menu()->AddItem(fOpenRelationsItem, index + 1);
 }
 
 
@@ -2854,6 +2922,7 @@ BContainerWindow::ShowContextMenu(BPoint loc, const entry_ref* ref, BView*)
 				if (!showAsVolume && !isFilePanel) {
 					SetupMoveCopyMenus(ref, fContextMenu);
 					SetupOpenWithMenu(fContextMenu);
+					SetupOpenRelationsMenu(fContextMenu);
 				}
 
 				UpdateMenu(fContextMenu, kPosePopUpContext);
@@ -2888,8 +2957,6 @@ BContainerWindow::AddFileContextMenus(BMenu* menu)
 {
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Open"),
 		new BMessage(kOpenSelection), 'O'));
-	menu->AddItem(new BMenuItem(B_TRANSLATE("Open related" B_UTF8_ELLIPSIS),
-		new BMessage(kOpenSelection), 'R'));
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Get info"),
 		new BMessage(kGetInfo), 'I'));
 	

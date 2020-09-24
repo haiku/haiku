@@ -255,6 +255,7 @@ protected:
 		const entry_ref*, bool);
 
 	virtual void SetupOpenWithMenu(BMenu*);
+	virtual void SetupOpenRelationsMenu(BMenu*);
 	virtual void SetUpEditQueryItem(BMenu*);
 	virtual void SetUpDiskMenu(BMenu*);
 
@@ -298,6 +299,7 @@ protected:
 	BMenuItem* fCopyToItem;
 	BMenuItem* fCreateLinkItem;
 	BMenuItem* fOpenWithItem;
+	BMenuItem* fOpenRelationsItem;
 	ModelMenuItem* fNavigationItem;
 	BMenuBar* fMenuBar;
 	DraggableContainerIcon* fDraggableIcon;
