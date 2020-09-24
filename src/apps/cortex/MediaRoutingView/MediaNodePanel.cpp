@@ -341,8 +341,7 @@ void MediaNodePanel::updateIOJacks()
 		ref->getFreeInputs(freeInputs);
 		for (uint32 i = 0; i < freeInputs.size(); i++)
 		{
-			MediaJack *jack;
-			AddItem(jack = new MediaJack(freeInputs[i]));
+			AddItem(new MediaJack(freeInputs[i]));
 		}
 	}
 
@@ -353,8 +352,7 @@ void MediaNodePanel::updateIOJacks()
 		ref->getFreeOutputs(freeOutputs);
 		for (uint32 i = 0; i < freeOutputs.size(); i++)
 		{
-			MediaJack *jack;
-			AddItem(jack = new MediaJack(freeOutputs[i]));
+			AddItem(new MediaJack(freeOutputs[i]));
 		}
 	}
 

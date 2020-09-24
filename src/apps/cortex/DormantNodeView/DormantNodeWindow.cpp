@@ -86,8 +86,7 @@ DormantNodeWindow::DormantNodeWindow(
 	r.left = r.right + 1.0;
 	r.right = r.left + B_V_SCROLL_BAR_WIDTH;
 	r.InsetBy(0.0, -1.0);
-	BScrollBar *scrollBar;
-	AddChild(scrollBar = new BScrollBar(r, "", m_listView, 0.0, 0.0, B_VERTICAL));
+	AddChild(new BScrollBar(r, "", m_listView, 0.0, 0.0, B_VERTICAL));
 
 	// Add the ListView
 	AddChild(m_listView);

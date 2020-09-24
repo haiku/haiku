@@ -322,7 +322,7 @@ void MediaWire::showContextMenu(
 	BMessage *message = new BMessage(InfoWindowManager::M_INFO_WINDOW_REQUESTED);
 	message->AddData("connection", B_RAW_TYPE, 
 					 reinterpret_cast<const void *>(&output), sizeof(output));
-	menu->AddItem(item = new BMenuItem("Get info", message, 'I'));
+	menu->AddItem(new BMenuItem("Get info", message, 'I'));
 
 	// add the "Disconnect" item
 	menu->AddItem(item = new BMenuItem("Disconnect", new BMessage(MediaRoutingView::M_DELETE_SELECTION), 'T'));
