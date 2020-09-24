@@ -123,7 +123,7 @@
 
 /*!
 	\fn BCatalog::BCatalog(const char* signature, const char* language)
-	\brief Construct a BCatalog object for the given application \a signqture.
+	\brief Construct a BCatalog object for the given application \a signature.
 
 	If you don't specify a language, the system default list will be used.
 	The language is passed here as a 2 letter ISO code.
@@ -136,7 +136,7 @@
 	are checked. Moreover, only the default catalog format is available, not
 	custom formats from catalog add-ons.
 
-	\param catalogOwner entry_ref for which to load a catalog.
+	\param signature MIME signature for which to load a catalog.
 	\param language The language of the catalog to load. If \c NULL, the user
 	       settings will be used.
 
@@ -309,7 +309,7 @@
 
 /*!
 	\fn status_t BCatalog::SetTo(const char* signature,
-		const char* language, uint32 fingerprint)
+		const char* language = \c NULL)
 	\brief Reload the string data.
 
 	This method reloads the data for the given signature and language.
