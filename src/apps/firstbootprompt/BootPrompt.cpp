@@ -63,9 +63,7 @@ BootPromptApp::MessageReceived(BMessage* message)
 			BLaunchRoster().Target("desktop");
 			sExitValue = 1;
 
-			BMessage* newMessage = new BMessage(B_QUIT_REQUESTED);
-			newMessage->AddBool("dont_reboot", true);
-			PostMessage(newMessage);
+			PostMessage(B_QUIT_REQUESTED);
 			break;
 		}
 		case MSG_RUN_INSTALLER:
@@ -73,9 +71,7 @@ BootPromptApp::MessageReceived(BMessage* message)
 			BLaunchRoster().Target("installer");
 			sExitValue = 0;
 
-			BMessage* newMessage = new BMessage(B_QUIT_REQUESTED);
-			newMessage->AddBool("dont_reboot", true);
-			PostMessage(newMessage);
+			PostMessage(B_QUIT_REQUESTED);
 			break;
 		}
 		case MSG_REBOOT_REQUESTED:
@@ -98,3 +94,14 @@ BootPromptApp::ReadyToRun()
 	new BootPromptWindow();
 }
 
+
+bool
+BootPromptApp::QuitRequested()
+{
+	// Override the default QuitRequested because we don't want to ask the
+	// window. The window QuitRequested is used when closing the window, and
+	// offers to reboot the system. When we get here, it means we got the
+	// message from one of the Desktop/Installer buttons and we should just
+	// exit.
+	return true;
+}

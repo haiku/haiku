@@ -25,6 +25,7 @@ public:
 								BootPromptApp();
 
 	virtual	void				MessageReceived(BMessage* message);
+			bool				QuitRequested();
 	virtual	void				ReadyToRun();
 };
 
