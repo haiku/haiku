@@ -4424,6 +4424,11 @@ BTextView::_DrawLine(BView* view, const int32 &lineNum,
 				view->PopState();
 			}
 
+			int32 size = tabChars;
+			const char* stringToDraw = fText->GetString(offset, &size);
+			view->SetDrawingMode(textRenderingMode);
+			view->DrawString(stringToDraw, size);
+
 			if (foundTab) {
 				float penPos = PenLocation().x - fTextRect.left;
 				switch (fAlignment) {
@@ -4451,11 +4456,6 @@ BTextView::_DrawLine(BView* view, const int32 &lineNum,
 				// move pen by tab(s) width
 				view->MovePenBy(tabWidth, 0.0);
 				tabChars += numTabs;
-			} else {
-				int32 size = tabChars;
-				const char* stringToDraw = fText->GetString(offset, &size);
-				view->SetDrawingMode(textRenderingMode);
-				view->DrawString(stringToDraw, size);
 			}
 
 			offset += tabChars;
