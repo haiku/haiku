@@ -629,7 +629,7 @@ InstallerWindow::QuitRequested()
 		}
 	} else if (fInstallStatus == kInstalling) {
 			BAlert* alert = new BAlert(B_TRANSLATE_SYSTEM_NAME("Installer"),
-				B_TRANSLATE("The installation is not complete yet!"
+				B_TRANSLATE("The installation is not complete yet!\n"
                                 "Are you sure you want to stop it?"),
 				B_TRANSLATE("Cancel"), B_TRANSLATE("Stop"), NULL,
 				B_WIDTH_AS_USUAL, B_STOP_ALERT);
