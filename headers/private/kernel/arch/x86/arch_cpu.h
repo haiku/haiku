@@ -391,15 +391,29 @@
 #define CR0_FPU_EMULATION		(1UL << 2)
 #define CR0_MONITOR_FPU			(1UL << 1)
 
-// cr4 flags
+// Control Register CR4 flags §2.5
+// https://www.intel.com/content/dam/www/public/us/en/documents/manuals/64-ia-32-architectures-software-developer-vol-3a-part-1-manual.pdf
+#define IA32_CR4_VME			(1UL << 0)
+#define IA32_CR4_PVI			(1UL << 1)
+#define IA32_CR4_TSD			(1UL << 2)
+#define IA32_CR4_DE				(1UL << 3)
+#define IA32_CR4_PSE			(1UL << 4)
 #define IA32_CR4_PAE			(1UL << 5)
 #define IA32_CR4_MCE			(1UL << 6)
 #define IA32_CR4_GLOBAL_PAGES	(1UL << 7)
+#define IA32_CR4_PCE			(1UL << 8)
 #define CR4_OS_FXSR				(1UL << 9)
 #define CR4_OS_XMM_EXCEPTION	(1UL << 10)
+#define IA32_CR4_UMIP			(1UL << 11)
+#define IA32_CR4_LA57			(1UL << 12)
+#define IA32_CR4_VMXE			(1UL << 13)
+#define IA32_CR4_SMXE			(1UL << 14)
+#define IA32_CR4_FSGSBASE		(1UL << 16)
+#define IA32_CR4_PCIDE			(1UL << 17)
 #define IA32_CR4_OSXSAVE		(1UL << 18)
 #define IA32_CR4_SMEP			(1UL << 20)
 #define IA32_CR4_SMAP			(1UL << 21)
+#define IA32_CR4_PKE			(1UL << 22)
 
 // Extended Control Register XCR0 flags §13.3
 // https://software.intel.com/content/dam/develop/public/us/en/documents/253665-sdm-vol-1.pdf
