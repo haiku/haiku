@@ -584,6 +584,34 @@ dump_feature_string(int currentCPU, cpu_ent* cpu)
 		strlcat(features, "avx512bw ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_AVX512VI)
 		strlcat(features, "avx512vi ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_AVX512VMBI)
+		strlcat(features, "avx512vmbi ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_UMIP)
+		strlcat(features, "umip ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_PKU)
+		strlcat(features, "pku ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_OSPKE)
+		strlcat(features, "ospke ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_AVX512VMBI2)
+		strlcat(features, "avx512vmbi2 ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_GFNI)
+		strlcat(features, "gfni ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_VAES)
+		strlcat(features, "vaes ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_VPCLMULQDQ)
+		strlcat(features, "vpclmulqdq ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_AVX512_VNNI)
+		strlcat(features, "avx512vnni ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_AVX512_BITALG)
+		strlcat(features, "avx512bitalg ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_AVX512_VPOPCNTDQ)
+		strlcat(features, "avx512vpopcntdq ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_LA57)
+		strlcat(features, "la57 ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_RDPID)
+		strlcat(features, "rdpid ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_SGX_LC)
+		strlcat(features, "sgx_lc ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_7_EDX] & IA32_FEATURE_IBRS)
 		strlcat(features, "ibrs ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_7_EDX] & IA32_FEATURE_STIBP)
