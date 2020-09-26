@@ -1,6 +1,7 @@
-1	turkish	x-vnd.Haiku-FirstBootPrompt	1158596356
+1	turkish	x-vnd.Haiku-FirstBootPrompt	2704155482
 Japanese	KeymapNames		Japonca
 US	KeymapNames		ABD
+Cancel	BootPromptWindow		İptal
 Esperanto	KeymapNames		Esperanto
 Belarusian	KeymapNames		Beyaz Rusça
 Brazilian	KeymapNames		Brezilya
@@ -10,6 +11,7 @@ Latin-American	KeymapNames		Latin Amerika
 Ukrainian	KeymapNames		Ukraynaca
 Russian (Yawert)	KeymapNames		Rusça (Yawert)
 United-Kingdom	KeymapNames		Birleşik Krallık
+Quit Haiku	System name		Haiku'dan çık
 Serbian (Cyrillic)	KeymapNames		Sırpça (Kiril)
 Turkish (Type-F)	KeymapNames		Türkçe (F)
 Bulgarian (Cyrillic)	KeymapNames		Bulgarca (Kiril)
@@ -46,6 +48,7 @@ Spanish	KeymapNames		İspanyolca
 Ukrainian (Mac)	KeymapNames		Ukraynaca (Mac)
 Estonian	KeymapNames		Estonca
 French (Bépo)	KeymapNames		Fransızca (Bépo)
+Restart system	BootPromptWindow		Sistemi yeniden başlat
 Serbian (Latin)	KeymapNames		Sırpça (Latin)
 Russian (Typewriter)	KeymapNames		Rusça (Daktilo)
 French	KeymapNames		Fransızca
@@ -71,6 +74,7 @@ Russian	KeymapNames		Rusça
 Hungarian	KeymapNames		Macarca
 Irish	KeymapNames		İrlandaca
 Romanian	KeymapNames		Romence
+Are you sure you want to close this window? This will restart your system!	BootPromptWindow		Bu pencereyi kapatmak istediğinizden emin misiniz? Sisteminiz yeniden başlatılacaktır.
 Macedonian	KeymapNames		Makedonca
 Czech (Mac)	KeymapNames		Çekçe (Mac)
 Brazilian (ABNT2)	KeymapNames		Brezilya (ABNT2)

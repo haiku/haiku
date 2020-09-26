@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Installer	1157374200
+1	dutch; flemish	x-vnd.Haiku-Installer	737606382
 Performing installation.	InstallProgress		Uitvoering installatie.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Kies de bronschijf in de pop-up-menu's. Klik daarna \"Begin\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Sluit alstublieft het DriveSetup-venster voordat u het Installer-venster sluit.
@@ -14,6 +14,7 @@ Unknown Type	InstallProgress	Partition content type	Onbekend Type
 Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Klik op de Begin-knop om van  '%1s' naar '%2s' te installeren.
 Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Kies de schijf waarop u wilt installeren uit het pop-up-menu. Klik daarna op \"Begin\".
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Installatie is afgerond. De opstartsector werd naar '%s' geschreven. Klik op Afsluiten om de Installer te verlaten of kies een nieuwe gegevensdrager als doel voor nog een installatie.
+Are you sure you want to stop the installation?	InstallerWindow		Ben je zeker dat je het installeren wil annuleren?
 README	InstallerApp		LEESMIJ
 Quit	InstallerWindow		Afsluiten
 Write boot sector to '%s'	InstallerWindow		Schrijf opstartsector naar '%s'
@@ -24,6 +25,7 @@ Quit Boot Manager	InstallerWindow		Boot Manager afsluiten
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		DriveSetup, het programma om schijfpartities mee te configureren, kon niet gestart worden.
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Boot Manager is bezig...\n\nSluit Boot Manager om verder te gaan met de installatie.
 Quit DriveSetup	InstallerWindow		DriveSetup afsluiten
+The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume while the existing 'settings' folder is retained. All other folders will be merged, in which files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Het doel volume is niet leeg. Ben je zeker dat je toch wil installeren?\n\nNota: De map 'systeem' is een schone kopie van het bronvolume terwijl de bestaande map 'instellingen' behouden blijft. Alle andere mappen worden samengevoegd, waarin bestanden en koppelingen die aanwezig zijn op zowel het bron- als het doelvolume, worden overschreven door de versie van het bronvolume.
 Write boot sector	InstallerWindow		Schrijf opstartsector
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld van %2ld
 Finishing installation.	InstallProgress		Installatie afronden.
@@ -31,6 +33,7 @@ Install from:	InstallerWindow		Installeer vanaf:
 Additional disk space required: 0.0 KiB	InstallerWindow		Meer schijfruimte vereist: 0.0 KiB
 This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Dit is bèta kwaliteits-software! Dit betekend dat er een risico is bij het verlies van belangrijke data. Maak geregeld back-ups!U bent gewaarschuwd.\n\n\n
 ???	InstallerWindow	Unknown currently copied item	???
+Install anyway	InstallProgress		Toch installeren
 1)   If you are installing Haiku onto real hardware (not inside an emulator), you may want to prepare a hard disk partition from another OS (you could, for example, use a GParted Live-CD, which can also resize existing partitions to make room).\nYou can also set up partitions by launching DriveSetup from Installer, but you won't be able to resize existing partitions with it. While DriveSetup has been quite thoroughly tested over the years, it's recommended to have up-to-date backups of the other partitions on your system. Just in case…	InstallerApp		1)   Als u Haiku op echte hardware installeert - dus niet in een emulator- kan u ervoor kiezen om de partitie vanuit een ander besturingssysteem in te stellen. U kunt bijvoorbeeld een GParted Live-CD gebruiken, waarmee u ook de grootte van bestaande partities aan kunt passen.\nU kan de partities ook instellen door het starten van DriveSetup vanuit de Installer, maar u kunt daarmee niet de grootte van bestaande partities aanpassen. DriveSetup is de afgelopen jaren veelvuldig getest, maar toch blijft het aangeraden om recente backups van andere partities op uw systeem te hebben. Voor het geval dat…
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Kies bron- en doelschijf in de pop-up-menu's. Klik daarna \"Begin\".
 Hide optional packages	InstallerWindow		Optionele paketten niet tonen
@@ -46,12 +49,14 @@ IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		BELANGRIJKE INFO
 Additional disk space required: %s	InstallerWindow		Benodigde aanvullende schijfruimte: %s
 Stop	InstallerWindow	In alert after pressing Stop	Stop
 Boot sector successfully written.	InstallProgress		Schrijven opstartsector geslaagd.
+Writing bootsector.	InstallProgress		Bootsector schrijven
 An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Er heeft zich een fout voorgedaan en de installatie werd niet afgemaakt:\n\nFout:  %s
 Restart	InstallerWindow		Herstarten
 The disk can't be mounted. Please choose a different disk.	InstallProgress		De schijf kan niet betrokken worden. Kies alstublieft een andere schijf.
 Begin	InstallerWindow		Begin
 Collecting copy information.	InstallProgress		Verzamelt kopie-informatie.
 Show optional packages	InstallerWindow		Toon optionele paketten
+No partitions have been found that are suitable for installation. Please set up partitions and format at least one partition with the Be File System.	InstallerWindow		Er zijn geen bruikbare partities gevonden voor een installatie. Maak partities aan en formatteer ten minste een partitie met het Be bestandssysteem.
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		De doelschijf heeft mogelijk niet genoeg ruimte. Probeer een andere schijf te kiezen, of kies ervoor om geen optionele items te installeren.
 Installation canceled.	InstallProgress		Installatie geannuleerd.
 Stop	InstallerWindow		Stop
@@ -70,8 +75,10 @@ Running Boot Manager and DriveSetup…\n\nClose both applications to continue wi
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Bent u zeker dat u op de huidige opstartschijf wilt installeren? Als u doorgaat zal Installer uw computer moeten heropstarten.
 Onto:	InstallerWindow		Naar:
 Quit Boot Manager and DriveSetup	InstallerWindow		Boot Manager en DriveSetup afsluiten
+3)   When you successfully boot into Haiku for the first time, make sure to read our \"Userguide\" and take the \"Quick Tour\". There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3) Als je installatie gelukt is en Haiku opgestart de eerste keer, kijk dan ook naar onze \"Userguide\" En neem de \"Quick Tour\". Er zijn links op het bureaublad en in WebPositive's bladwijzers.\n\n
 Tools	InstallerWindow		Gereedschap
 scanning…	InstallerWindow		Scant…
+Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be formatted with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Start de DriveSetup toepassing om partities\naan te maken in de beschikbare schijven en andere media.\nPartities kunnen geformatteerd worden met\nhet Be bestandssysteem nodig om een Haiku\npartitie op te starten.
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Userguide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2)   De Installer zal de Haikupartities zelf opstartbaar maken, maar het zal verder niets doen om Haiku in bestaande opstartmenu's te integreren. Als u GRUB reeds geïnstalleerd heeft, kan u Haiku daaraan toevoegen.\nVoor details, raadpleeg de gids over het starten van Haiku op onze website op https://www.haiku-os.org/guides/booting.\nOf u kan het opstartmenu vanuit het \'Hulpmiddelen\'-menu van de Installer instellen, zie het onderwerp \"BootManager\" in de gebruikersgids.\n\n\n
 Set up boot menu	InstallerWindow		Boot-menu opzetten
 Continue	InstallerApp		Doorgaan

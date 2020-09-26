@@ -1,6 +1,7 @@
-1	german	x-vnd.Haiku-FirstBootPrompt	1158596356
+1	german	x-vnd.Haiku-FirstBootPrompt	2704155482
 Japanese	KeymapNames		Japanisch
 US	KeymapNames		US-amerikanisch
+Cancel	BootPromptWindow		Abbrechen
 Esperanto	KeymapNames		Esperanto
 Belarusian	KeymapNames		Weißrussisch
 Brazilian	KeymapNames		Brasilianisch
@@ -10,6 +11,7 @@ Latin-American	KeymapNames		Latein-amerikanisch
 Ukrainian	KeymapNames		Ukrainisch
 Russian (Yawert)	KeymapNames		Russisch (Yawert)
 United-Kingdom	KeymapNames		GB-englisch
+Quit Haiku	System name		Haiku beenden
 Serbian (Cyrillic)	KeymapNames		Serbisch (kyrillisch)
 Turkish (Type-F)	KeymapNames		Türkisch (Typ-F)
 Bulgarian (Cyrillic)	KeymapNames		Bulgarisch (kyrillisch)
@@ -46,6 +48,7 @@ Spanish	KeymapNames		Spanisch
 Ukrainian (Mac)	KeymapNames		Ukrainisch (Mac)
 Estonian	KeymapNames		Estnisch
 French (Bépo)	KeymapNames		Französisch (Bépo)
+Restart system	BootPromptWindow		Neustarten
 Serbian (Latin)	KeymapNames		Serbisch (Latein)
 Russian (Typewriter)	KeymapNames		Russisch (Schreibmaschine)
 French	KeymapNames		Französisch
@@ -71,6 +74,7 @@ Russian	KeymapNames		Russisch
 Hungarian	KeymapNames		Ungarisch
 Irish	KeymapNames		Irisch
 Romanian	KeymapNames		Romänisch
+Are you sure you want to close this window? This will restart your system!	BootPromptWindow		Soll dieses Fenster tatsächlich geschlossen werden? Dadurch wird das System neu gestartet!
 Macedonian	KeymapNames		Mazedonisch
 Czech (Mac)	KeymapNames		Tschechisch (Mac)
 Brazilian (ABNT2)	KeymapNames		Brasilianisch (ABNT2)

@@ -1,6 +1,7 @@
-1	danish	x-vnd.Haiku-FirstBootPrompt	1158596356
+1	danish	x-vnd.Haiku-FirstBootPrompt	2704155482
 Japanese	KeymapNames		Japansk
 US	KeymapNames		USA
+Cancel	BootPromptWindow		Annuller
 Esperanto	KeymapNames		Esperanto
 Belarusian	KeymapNames		Hviderussisk
 Brazilian	KeymapNames		Brasiliansk
@@ -10,6 +11,7 @@ Latin-American	KeymapNames		Latinamerikansk
 Ukrainian	KeymapNames		Ukrainsk
 Russian (Yawert)	KeymapNames		Russisk (Yawert)
 United-Kingdom	KeymapNames		Storbritannien
+Quit Haiku	System name		Afslut Haiku
 Serbian (Cyrillic)	KeymapNames		Serbisk (kyrillisk)
 Turkish (Type-F)	KeymapNames		Tyrkisk (Type-F)
 Bulgarian (Cyrillic)	KeymapNames		Bulgarsk (kyrillisk)
@@ -46,6 +48,7 @@ Spanish	KeymapNames		Spansk
 Ukrainian (Mac)	KeymapNames		Ukrainsk (Mac)
 Estonian	KeymapNames		Estonisk
 French (Bépo)	KeymapNames		Fransk (Bépo)
+Restart system	BootPromptWindow		Genstart systemet
 Serbian (Latin)	KeymapNames		Serbisk (Latin)
 Russian (Typewriter)	KeymapNames		Russisk (skrivemaskine)
 French	KeymapNames		Fransk
@@ -71,6 +74,7 @@ Russian	KeymapNames		Russisk
 Hungarian	KeymapNames		Ungarsk
 Irish	KeymapNames		Irsk
 Romanian	KeymapNames		Rumænsk
+Are you sure you want to close this window? This will restart your system!	BootPromptWindow		Er du sikker på, at du vil lukke vinduet? Det genstarter dit system!
 Macedonian	KeymapNames		Makedonsk
 Czech (Mac)	KeymapNames		Tjekkisk (Mac)
 Brazilian (ABNT2)	KeymapNames		Brasiliansk (ABNT2)

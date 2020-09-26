@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-ActivityMonitor	4123759361
+1	portuguese	x-vnd.Haiku-ActivityMonitor	2601047281
 Teams	DataSource		Equipas
 Semaphores	DataSource		Semáforos
 TX	DataSource	Shorter version for Sending	TX
@@ -31,6 +31,7 @@ Used memory	DataSource		Memória utilizada
 %.1f faults/s	DataSource		%.1f falhas/s
 Show legend	ActivityView		Mostrar legenda
 Cached memory	DataSource		Memória em cache
+CPU %d usage	DataSource		Utilização da CPU %d
 File	ActivityWindow		Ficheiro
 Ports	DataSource		Portas
 Page faults	DataSource		Falhas de página

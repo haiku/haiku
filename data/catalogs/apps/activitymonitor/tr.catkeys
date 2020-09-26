@@ -31,7 +31,7 @@ Used memory	DataSource		Kullanılan bellek
 %.1f faults/s	DataSource		%.1f hata/s
 Show legend	ActivityView		Göstergeleri aç
 Cached memory	DataSource		Önbellekteki dosya
-CPU %d usage	DataSource		CPU %d kullanımı
+CPU %d usage	DataSource		%d. CPU kullanımı
 File	ActivityWindow		Dosya
 Ports	DataSource		Portlar
 Page faults	DataSource		Sayfa hataları

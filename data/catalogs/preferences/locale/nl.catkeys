@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Locale	288870027
+1	dutch; flemish	x-vnd.Haiku-Locale	1081217032
 Medium format:	TimeFormatSettings		Medium-formaat:
 Negative:	TimeFormatSettings		Negatief:
 Language	Locale Preflet Window		Taal
@@ -22,6 +22,7 @@ Preferred languages	Locale Preflet Window		Voorkeurstalen
 Full format:	TimeFormatSettings		Volledig formaat:
 Cancel	Locale Preflet Window		Annuleren
 Revert	Locale Preflet Window		Herstellen
+Translate application and folder names	TimeFormatSettings		Vertaal toepassingen en map namen
 12 hour	TimeFormatSettings		12-uurs
 Positive:	TimeFormatSettings		Positief:
 Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Deskbar en Tracker moeten herstart worden om deze wijziging toe te passen. Wil je ze nu herstarten?

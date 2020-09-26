@@ -1,5 +1,6 @@
-1	dutch; flemish	x-vnd.Haiku-HaikuDepot	3833361367
+1	dutch; flemish	x-vnd.Haiku-HaikuDepot	1546691996
 Repository update error	LocalRepositoryUpdateProcess		Fout bij updaten softwarebronnen
+Network error	ServerHelper		Netwerk fout
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Er is een fout opgetreden bij het verversen van de softwarebronnen: %error%
 User Created	UserLoginWindow		Gebruiker Aangemaakt
 Check for updates…	MainWindow		Controleer op updates…
@@ -19,6 +20,7 @@ You have successfully authenticated as user %Nickname%.	UserLoginWindow		U bent 
 No user ratings available.	PackageInfoView		Geen beoordelingen beschikbaar.
 Downloading package '%name%'	WorkStatusView		Downloading pakket '%name%'
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Het was niet mogelijk om de vereiste captcha-informatie uit de data afkomstig van de server te halen.
+A network transport error has arisen communicating with the server system: %s	ServerHelper		Een netwerk transport fout is opgetreden bij het communiceren met het server systeem: %s
 Rating	PackageListView		Beoordeling
 Synchronizing icons	ServerIconExportUpdateProcess		Iconen synchroniseren
 Does not start	RatePackageWindow		Start niet
@@ -75,6 +77,7 @@ Reboot required	PackageManager		Herstart vereist
 Very unstable	RatePackageWindow		Erg instabiel
 Password:	UserLoginWindow		Wachtwoord:
 All packages	PackageListView		Alle pakketten
+This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Deze toepassing is te oud om te communiceren met de server. Update naar een nieuwere versie van deze toepassing door het systeem te updaten. De minimum versie vereist voor deze toepassing is \"%s\".
 Stability	RatePackageWindow		Stabiliteit
 Send	RatePackageWindow		Versturen
 Start package daemon	App		Start pakket-daemon
@@ -98,6 +101,7 @@ Repository	PackageListView		Pakketbron
 The email is malformed.	UserLoginWindow		Het e-mailadres is ongeldig.
 Close	UserLoginWindow		Sluiten
 Close	RatePackageWindow		Sluiten
+An unexpected error has been sent from the server [%i]	ServerHelper		Een onverwachte fout is ontvangen van de server [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synchroniseer pakketdata voor pakketbron '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Bekijk de gebruiksvoorwaarden
 Login issue	MainWindow		Inlogprobleem
@@ -122,6 +126,7 @@ Log out	MainWindow		Uitloggen
 Comment language:	RatePackageWindow		Commentaartaal:
 Status	PackageListView		Status
 The password has been incorrectly repeated.	UserLoginWindow		De ingevulde wachtwoordvelden komen niet overeen.
+Network transport error	ServerHelper		Netwerk transport fout
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		Het wachtwoord eerder ingevoerd voor gebruiker [%Nickname%] is momenteel niet geldig. De gebruiker wordt uitgelogd en u moet opnieuw inloggen met uw bijgewerkte wachtwoord.
 Update	RatePackageWindow		Bijwerken
 OK	ServerHelper		OK
@@ -137,6 +142,7 @@ The nickname is required.	UserLoginWindow		De gebruikersnaam is vereist.
 Source packages	MainWindow		Broncodepakketten
 -	no package size		-
 Problem with working files	App		Probleem met de werkbestanden
+Server error	ServerHelper		Server fout
 Try again	App		Opnieuw proberen
 Rate package	RatePackageWindow		Beoordeel pakket
 Unknown	PackageListView		Onbekend

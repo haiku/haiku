@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-WebPositive	55235296
+1	dutch; flemish	x-vnd.Haiku-WebPositive	440329287
 Authentication required	Authentication Panel		Aanmelding is vereist
 Previous	WebPositive Window		Vorige
 (Finish: %date)	Download Window		(Voltooid: %date)
@@ -53,6 +53,7 @@ Cookies for %s	Cookie Manager		Cookies voor %s
 The download could not be opened.	Download Window		De download kan niet worden geöpend.
 Close	Download Window		Sluiten
 WebPositive	System name		WebPositive
+%s - Search term	Settings Window		%s - Zoek term
 Reload	WebPositive Window		Herladen
 Expiration	Cookie Manager		Vervaldatum
 Download finished	Download Window		Download gereed

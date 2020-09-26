@@ -1,2 +1,30 @@
-1	dutch; flemish	x-vnd.haiku-screenshot-cli	721864121
+1	dutch; flemish	x-vnd.haiku-screenshot-cli	1618937837
+Include window border	ScreenshotWindow		Vensterrand insluiten
+Overwrite	ScreenshotWindow		Overschrijven
+Save in:	ScreenshotWindow		Opslaan in:
+Error saving \"%s\":\n\t%s	ScreenshotWindow		Fout opslaan \"%s\":\n\t%s
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Bestand bestaat reeds.\nDeze overschrijven?
+OK	ScreenshotWindow		Ok
+The destination path exists but is not a folder.	ScreenshotWindow		Het doel bestaat reeds maar is geen map.
+Select	ScreenshotWindow		Selecteer
+Save as:	ScreenshotWindow		Opslaan als:
+seconds	ScreenshotWindow		seconden
+New screenshot	ScreenshotWindow		Nieuwe schermafdruk
+Screenshot	System name		Schermafdruk
+Desktop	ScreenshotWindow		Bureaublad
+Translator Settings	ScreenshotWindow		Instellingen vertaler
+Include mouse pointer	ScreenshotWindow		Muis aanwijzer insluiten
+overwrite	ScreenshotWindow		overschrijven
+Settings…	ScreenshotWindow		Instellingen…
+Choose folder	ScreenshotWindow		Kies map
+Name:	ScreenshotWindow		Naam:
+Choose folder…	ScreenshotWindow		Kies map...
+Please select	ScreenshotWindow		Selecteer aub
+Failed to save screenshot	ScreenshotWindow		Fout bij het opslaan van het schermafdruk
+Cancel	ScreenshotWindow		Annuleer
+Delay:	ScreenshotWindow		Vertraag:
+Copy to clipboard	ScreenshotWindow		Kopieer naar klembord
 screenshot	Screenshot	Base filename of screenshot files	schermafbeelding
+Home folder	ScreenshotWindow		Home map
+Save	ScreenshotWindow		Opslaan
+Capture active window	ScreenshotWindow		Actief venster selecteren

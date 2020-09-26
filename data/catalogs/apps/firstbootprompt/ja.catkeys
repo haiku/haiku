@@ -1,6 +1,7 @@
-1	japanese	x-vnd.Haiku-FirstBootPrompt	1158596356
+1	japanese	x-vnd.Haiku-FirstBootPrompt	2704155482
 Japanese	KeymapNames		日本語
 US	KeymapNames		英語 (US)
+Cancel	BootPromptWindow		キャンセル
 Esperanto	KeymapNames		エスペラント語
 Belarusian	KeymapNames		ベラルーシ語
 Brazilian	KeymapNames		ブラジル語
@@ -10,6 +11,7 @@ Latin-American	KeymapNames		ラテンアメリカ言語
 Ukrainian	KeymapNames		ウクライナ語
 Russian (Yawert)	KeymapNames		ロシア語 (Yawert)
 United-Kingdom	KeymapNames		英語 (United-Kingdom)
+Quit Haiku	System name		Haiku を終了
 Serbian (Cyrillic)	KeymapNames		セルビア語 (Cyrillic)
 Turkish (Type-F)	KeymapNames		トルコ語 (Type-F)
 Bulgarian (Cyrillic)	KeymapNames		ブルガリア語 (Cyrillic)
@@ -46,6 +48,7 @@ Spanish	KeymapNames		スペイン語
 Ukrainian (Mac)	KeymapNames		ウクライナ語 (Mac)
 Estonian	KeymapNames		エストニア語
 French (Bépo)	KeymapNames		フランス語 (Bépo)
+Restart system	BootPromptWindow		システムを再起動
 Serbian (Latin)	KeymapNames		セルビア語 (Latin)
 Russian (Typewriter)	KeymapNames		ロシア語 (Typewriter)
 French	KeymapNames		フランス語
@@ -71,6 +74,7 @@ Russian	KeymapNames		ロシア語
 Hungarian	KeymapNames		ハンガリー語
 Irish	KeymapNames		アイルランド語
 Romanian	KeymapNames		ルーマニア語
+Are you sure you want to close this window? This will restart your system!	BootPromptWindow		本当にこのウィンドウを閉じてもいいですか? システムが再起動します!
 Macedonian	KeymapNames		マケドニア語
 Czech (Mac)	KeymapNames		チェコ語 (Mac)
 Brazilian (ABNT2)	KeymapNames		ブラジル語 (ABNT2)

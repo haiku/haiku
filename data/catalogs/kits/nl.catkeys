@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-libbe	3337473349
+1	dutch; flemish	x-vnd.Haiku-libbe	3538150900
 {0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# byte} other{# bytes}}
 All Rights Reserved.	AboutWindow		Alle rechten voorbehouden.
 gold master	AboutWindow		gold master
@@ -17,11 +17,13 @@ beta	AboutWindow		beta
 OK	ZombieReplicantView		OK
 Cut	TextView		Knippen
 %3.2f GiB	StringForSize		%3.2f GiB
+Default	Default decorator about box		Standaard
 Can't delete this replicant from its original application. Life goes on.	Dragger		De replica van de originele applicatie kan niet verwijderd worden. Het leven gaat voort.
 Error	ZombieReplicantView		Fout
 Paste	TextView		Plakken
 OK	AboutWindow		OK
 Special Thanks:	AboutWindow		Speciale dank aan:
+Default Haiku window decorator.	Default decorator about box		Standaard Haiku venster decoratie.
 %.2f TiB	StringForSize		%.2f TiB
 Remove replicant	Dragger		Replica verwijderen
 Version	AboutWindow		Versie

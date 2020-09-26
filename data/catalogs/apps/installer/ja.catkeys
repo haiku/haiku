@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Installer	2358770775
+1	japanese	x-vnd.Haiku-Installer	737606382
 Performing installation.	InstallProgress		インストールを実行しています。
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		メニューからインストールディスクを選択し、次に\"開始\"ボタンをクリックしてください。
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		インストーラーを閉じる前に、DriveSetup を終了してください。
@@ -14,6 +14,7 @@ Unknown Type	InstallProgress	Partition content type	パーティション種別�
 Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		'%1s'から'%2s'へのインストールを開始するには、開始ボタンを押してください。
 Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		ポップアップメニューからインストール先を選択し、次に\"開始\"ボタンをクリックしてください。
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		インストールが完了し、ブートセクターが'%s'に書き込まれました。終了ボタンでインストーラーを終了するか、他にHaikuをインストールするボリュームを選択してください。
+Are you sure you want to stop the installation?	InstallerWindow		本当にインストールを中止しますか?
 README	InstallerApp		README
 Quit	InstallerWindow		終了
 Write boot sector to '%s'	InstallerWindow		ブートセクターを'%s'に書き込む

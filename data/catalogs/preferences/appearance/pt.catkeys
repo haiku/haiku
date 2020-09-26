@@ -38,7 +38,7 @@ Bold font:	Font view		Tipo de letra negrito:
 Choose Decorator	DecorSettingsView		Escolher Decorador
 Strong	AntialiasingSettingsView		Intenso
 Failure	Colors tab		Falha
-Double:	DecorSettingsView		Duplo:
+Double:	DecorSettingsView		Dupla:
 Selected menu item text	Colors tab		Texto do item de menu seleccionado
 Size:	Font Selection view		Tamanho:
 Panel background	Colors tab		Fundo do painel
@@ -51,7 +51,7 @@ Link text	Colors tab		Texto de ligação
 Tooltip background	Colors tab		Fundo da descrição
 ControlLook:	DecorSettingsView		Controlador de aspeto:
 Scroll bar thumb	Colors tab		Barra de deslocamento
-Default	DecorSettingsView		Pré-definido
+Default	DecorSettingsView		Predefinido
 Link visited	Colors tab		Ligação visitada
 Selected menu item border	Colors tab		Limite do item de menu seleccionado
 Tooltip text	Colors tab		Texto da descrição
@@ -76,4 +76,4 @@ About control look	DecorSettingsView		Acerca do controlador de aspeto
 Control highlight	Colors tab		Realce do controlo
 Status bar	Colors tab		Barra de estado
 Link hover	Colors tab		Realce de hiperligação ao passar por cima
-Single:	DecorSettingsView		Único:
+Single:	DecorSettingsView		Única:

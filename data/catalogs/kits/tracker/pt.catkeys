@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-libtracker	2730310071
+1	portuguese	x-vnd.Haiku-libtracker	3669766136
 Created	ContainerWindow		Criado
 Icon	AttributesView		Ícone
 Open and make preferred	OpenWithWindow		Abrir e tornar preferida
@@ -40,6 +40,7 @@ Small bitmap icon	AttributesView		Ícone pequeno em mapa de bits
 Would you like to find a suitable application to open the file?	FSUtils		Gostaria de procurar uma aplicação adequada para abrir o ficheiro?
 64 x 64	ContainerWindow		64 x 64
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Não pode substituir uma pasta ou uma ligação simbólica por um ficheiro.
+{0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# datas>}}
 Trailing \\.	libtracker		\\ no final.
 At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Em %func \nfind_directory() falhou. \nMotivo: %error
 Handles any file	OpenWithWindow		Suporta qualquer ficheiro
@@ -92,6 +93,7 @@ Atom	AttributesView		Atom
 %SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%SizeProcessed de %TotalSize, %BytesPerSecond/s
 Preparing to restore items…	StatusWindow		A preparar para restaurar itens…
 Mount	ContainerWindow		Montar
+{0, plural, other{<# rectangles>}}	AttributesView		{0, plural, other{<# retângulos>}}
 Desktop	B_DESKTOP_DIRECTORY		Área de Trabalho
 Corrupted pointers.	libtracker		Apontadores corrompidos.
 Link to:	InfoWindow		Atalho para:
@@ -109,6 +111,7 @@ Edit templates…	TemplatesMenu		Editar modelos…
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# byte} other{# bytes}}
 8-bit integer	AttributesView		Inteiro de 8 bits
 8-bit unsigned integer	AttributesView		Inteiro sem sinal de 8 bits
+%s info	InfoWindow	window title	Informações de %s
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used utilizados -- %free livres)
 Hide dotfiles	SettingsView		Esconder ficheiros com nome iniciando por ponto
 Trash	Model		Lixo
@@ -180,6 +183,7 @@ MIME Type	AttributesView		Tipo MIME
 Show folder location in title tab	SettingsView		Mostrar localização da pasta na barra de título
 There was an error resolving the link.	Tracker		Ocorreu um erro ao tentar resolver o atalho.
 There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Ocorreu um problema ao tentar guardar na pasta especificada. Por favor tente com outra.
+{0, plural, other{<# values>}}	AttributesView		{0, plural, other{<# valores>}}
 Desktop	TrackerSettingsWindow		Área de Trabalho
 Nested *?+.	libtracker		*?+ aninhados.
 Move	FSUtils	button label	Mover
@@ -345,6 +349,7 @@ Could not open \"%document\" with application \"%app\" (Missing libraries: %libr
 Finish: %time	StatusWindow		Fim: %time
 Messenger	AttributesView		Messenger
 after	FindPanel		após
+{0, plural, one{<# data byte>} other{<# bytes of data>}}	AttributesView		{0, plural, one{<# byte de dados>} other{<# bytes de dados>}}
 Version	OpenWithWindow		Versão
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Alguns dos itens selecionados não podem ser movidos para o Lixo. Pretende, em vez disso, apagá-los diretamente? (Esta operação não poderá ser anulada.)
 Add printer…	ContainerWindow		Adicionar impressora…

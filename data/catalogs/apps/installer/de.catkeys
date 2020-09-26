@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Installer	2358770775
+1	german	x-vnd.Haiku-Installer	737606382
 Performing installation.	InstallProgress		Installation läuft.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Bitte Quelllaufwerk aus dem Menü wählen. Danach auf \"Start\" klicken.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Das DriveSetup-Fenster muss geschlossen werden, bevor der Installer verlassen werden kann.
@@ -14,6 +14,7 @@ Unknown Type	InstallProgress	Partition content type	Unbekannter Typ
 Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		'Start' klicken, um die Installation von '%1s' nach '%2s' durchzuführen.
 Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Bitte die Zielpartition aus dem Menü wählen. Danach auf \"Start\" klicken.
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Installation abgeschlossen. Der Bootsektor wurde nach '%s' geschrieben. 'Beenden' klicken, um das Installationsprogramm zu verlassen, oder eine andere Zielpartition für eine weitere Installation auswählen.
+Are you sure you want to stop the installation?	InstallerWindow		Soll die Installation tatsächlich gestoppt werden?
 README	InstallerApp		LIESMICH
 Quit	InstallerWindow		Beenden
 Write boot sector to '%s'	InstallerWindow		Bootsektor auf '%s' schreiben

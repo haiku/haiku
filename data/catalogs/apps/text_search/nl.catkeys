@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku.TextSearch	2224690775
+1	dutch; flemish	x-vnd.Haiku.TextSearch	1757850908
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Kies alstublieft de bestanden die u in Tracker geselecteerd wilt hebben.
 %appname% : %path%	GrepWindow		%appname% : %path%
 Failed to start xargs program!	Grepper		Het starten van de xargs-toepassing is mislukt!
@@ -6,6 +6,7 @@ Open selection	GrepWindow		Selectie openen
 Actions	GrepWindow		Acties
 New window	GrepWindow		Nieuw venster
 Encoding	GrepWindow		Codering
+Set target to parent folder	GrepWindow		Doel instellen naar bovenliggende map
 OK	GrepWindow		Oké
 %appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
 Close	GrepWindow		Sluiten
@@ -30,6 +31,7 @@ Skip folders starting with a dot	GrepWindow		Mappen overslaan die met een punt (
 Failed to open output pipe!	Grepper		Het openen van de uitvoerpijp is mislukt!
 Cancel	GrepWindow		Annuleren
 History	GrepWindow		Geschiedenis
+TextSearch	System name		Tekst zoeken
 File	GrepWindow		Bestand
 Case-sensitive	GrepWindow		Hoofdlettergevoelig
 Select all	GrepWindow		Alles selecteren
