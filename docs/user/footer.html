@@ -1,9 +1,18 @@
-<footer>
-<hr />
-
-$projectname $projectnumber - $title<br />
-Generated on $datetime, by Doxygen $doxygenversion
-</footer>
-
+<!-- start footer part -->
+<!--BEGIN GENERATE_TREEVIEW-->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+    <ul>
+      $navpath
+      <li class="footer">$projectname $projectnumber - $title</li>
+      <li class="footer">Generated on $datetime by <a href="http://www.doxygen.org/index.html">Doxygen</a> $doxygenversion</li>
+    </ul>
+  </div>
+  <!--END GENERATE_TREEVIEW-->
+  <!--BEGIN !GENERATE_TREEVIEW-->
+  <hr class="footer"/><address class="footer"><small>
+    $projectname $projectnumber - $title<br />
+    Generated on $datetime by <a href="http://www.doxygen.org/index.html">Doxygen</a> $doxygenversion
+  </small></address>
+  <!--END !GENERATE_TREEVIEW-->
 </body>
 </html>
