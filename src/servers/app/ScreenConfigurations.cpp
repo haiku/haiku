@@ -153,6 +153,14 @@ ScreenConfigurations::SetBrightness(int32 id, float brightness)
 }
 
 
+float
+ScreenConfigurations::Brightness(int32 id)
+{
+	screen_configuration* configuration = fConfigurations.ItemAt(0);
+	return configuration->brightness;
+}
+
+
 void
 ScreenConfigurations::Remove(screen_configuration* configuration)
 {

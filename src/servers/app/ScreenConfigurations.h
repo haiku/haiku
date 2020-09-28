@@ -39,6 +39,7 @@ public:
 									const BRect& frame,
 									const display_mode& mode);
 			void				SetBrightness(int32 id, float brightness);
+			float				Brightness(int32 id);
 			void				Remove(screen_configuration* configuration);
 
 			status_t			Store(BMessage& settings) const;

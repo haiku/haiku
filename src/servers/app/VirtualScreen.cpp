@@ -142,13 +142,6 @@ VirtualScreen::AddScreen(Screen* screen, ScreenConfigurations& configurations)
 	fFrame = screen->Frame();
 	item->frame = fFrame;
 
-	screen_configuration* config = configurations.CurrentByID(screen->ID());
-	if (config) {
-		float brightness = config->brightness;
-		if (brightness > 0)
-			fHWInterface->SetBrightness(brightness);
-	}
-
 	fScreenList.AddItem(item);
 
 	return B_OK;
