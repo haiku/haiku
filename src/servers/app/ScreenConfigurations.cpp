@@ -157,6 +157,10 @@ float
 ScreenConfigurations::Brightness(int32 id)
 {
 	screen_configuration* configuration = fConfigurations.ItemAt(0);
+
+	if (configuration == NULL)
+		return -1;
+
 	return configuration->brightness;
 }
 
