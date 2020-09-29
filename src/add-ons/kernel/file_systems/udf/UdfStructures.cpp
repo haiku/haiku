@@ -458,8 +458,8 @@ void
 extent_address::dump() const
 {
 	DUMP_INIT("extent_address");
-	PRINT(("length:   %ld\n", length()));
-	PRINT(("location: %ld\n", location()));
+	PRINT(("length:   %" B_PRIu32 "\n", length()));
+	PRINT(("location: %" B_PRIu32 "\n", location()));
 }
 
 //----------------------------------------------------------------------
@@ -470,7 +470,7 @@ void
 logical_block_address::dump() const
 {
 	DUMP_INIT("logical_block_address");
-	PRINT(("block:     %ld\n", block()));
+	PRINT(("block:     %" B_PRIu32 "\n", block()));
 	PRINT(("partition: %d\n", partition()));
 }
 
@@ -498,8 +498,8 @@ void
 long_address::dump() const
 {
 	DUMP_INIT("long_address");
-	PRINT(("length:   %ld\n", length()));
-	PRINT(("block:    %ld\n", block()));
+	PRINT(("length:   %" B_PRIu32 "\n", length()));
+	PRINT(("block:    %" B_PRIu32 "\n", block()));
 	PRINT(("partition: %d\n", partition()));
 	PRINT(("implementation_use:\n"));
 	DUMP(implementation_use());
@@ -519,7 +519,7 @@ descriptor_tag::dump() const
 	PRINT(("serial_number: %d\n", serial_number()));
 	PRINT(("crc:           %d\n", crc()));
 	PRINT(("crc_length:    %d\n", crc_length()));
-	PRINT(("location:      %ld\n", location()));
+	PRINT(("location:      %" B_PRIu32 "\n", location()));
 }
 
 
@@ -545,10 +545,11 @@ descriptor_tag::dump() const
 status_t 
 descriptor_tag::init_check(uint32 block, bool calculateCrc)
 {
-	DEBUG_INIT_ETC("descriptor_tag", ("location: %ld, calculateCrc: %s",
-	               block, bool_to_string(calculateCrc)));
-	PRINT(("location   (parameter)    == %ld\n", block));
-	PRINT(("location   (in structure) == %ld\n", location()));
+	DEBUG_INIT_ETC("descriptor_tag", ("location: %" B_PRIu32 ", "
+			"calculateCrc: %s",
+		block, bool_to_string(calculateCrc)));
+	PRINT(("location   (parameter)    == %" B_PRIu32 "\n", block));
+	PRINT(("location   (in structure) == %" B_PRIu32 "\n", location()));
 	if (calculateCrc) {
 		PRINT(("crc        (calculated)   == %d\n",
 		       calculate_crc(reinterpret_cast<uint8*>(this)+sizeof(descriptor_tag),
@@ -591,16 +592,19 @@ primary_volume_descriptor::dump() const
 	
 	PRINT(("tag:\n"));
 	DUMP(tag());
-	PRINT(("vds_number:                       %ld\n", vds_number()));
-	PRINT(("primary_volume_descriptor_number: %ld\n", primary_volume_descriptor_number()));
+	PRINT(("vds_number:                       %" B_PRIu32 "\n", vds_number()));
+	PRINT(("primary_volume_descriptor_number: %" B_PRIu32 "\n",
+		primary_volume_descriptor_number()));
 	string = volume_identifier();
 	PRINT(("volume_identifier:                `%s'\n", string.Utf8()));
 	PRINT(("volume_sequence_number:           %d\n", volume_sequence_number()));
 	PRINT(("max_volume_sequence_number:       %d\n", max_volume_sequence_number()));
 	PRINT(("interchange_level:                %d\n", interchange_level()));
 	PRINT(("max_interchange_level:            %d\n", max_interchange_level()));
-	PRINT(("character_set_list:               %ld\n", character_set_list()));
-	PRINT(("max_character_set_list:           %ld\n", max_character_set_list()));
+	PRINT(("character_set_list:               %" B_PRIu32 "\n",
+		character_set_list()));
+	PRINT(("max_character_set_list:           %" B_PRIu32 "\n",
+		max_character_set_list()));
 	string = volume_set_identifier();
 	PRINT(("volume_set_identifier:            `%s'\n", string.Utf8()));
 	PRINT(("descriptor_character_set:\n"));
@@ -619,8 +623,8 @@ primary_volume_descriptor::dump() const
 	DUMP(implementation_id());
 	PRINT(("implementation_use:\n"));
 	DUMP(implementation_use());
-	PRINT(("predecessor_vds_location:         %ld\n",
-	       predecessor_volume_descriptor_sequence_location()));
+	PRINT(("predecessor_vds_location:         %" B_PRIu32 "\n",
+		predecessor_volume_descriptor_sequence_location()));
 	PRINT(("flags:                            %d\n", flags()));       
 }
 
@@ -656,7 +660,7 @@ logical_volume_info::dump() const
 	PRINT(("logical_volume_id: `%s'\n", string.Utf8()));
 	for (uint32 i = 0; i < _logical_volume_info.length(); i++) {
 		string = _logical_volume_info[i];
-		PRINT(("logical_volume_info #%ld: %s\n", i, string.Utf8()));
+		PRINT(("logical_volume_info #%" B_PRIu32 ": %s\n", i, string.Utf8()));
 	}
 	PRINT(("implementation_id:\n"));
 	DUMP(implementation_id());
@@ -674,7 +678,7 @@ implementation_use_descriptor::dump() const
 	DUMP_INIT("implementation_use_descriptor");
 	PRINT(("tag:\n"));
 	DUMP(tag());
-	PRINT(("vds_number: %ld\n", vds_number()));
+	PRINT(("vds_number: %" B_PRIu32 "\n", vds_number()));
 	PRINT(("implementation_id:\n"));
 	DUMP(implementation_id());
 	PRINT(("implementation_use: XXX\n"));
@@ -691,7 +695,7 @@ partition_descriptor::dump() const
 	DUMP_INIT("partition_descriptor");
 	PRINT(("tag:\n"));
 	DUMP(tag());
-	PRINT(("vds_number:                %ld\n", vds_number()));
+	PRINT(("vds_number:                %" B_PRIu32 "\n", vds_number()));
 	PRINT(("partition_flags:           %d\n", partition_flags()));
 	PRINT(("partition_flags.allocated: %s\n", allocated() ? "true" : "false"));
 	PRINT(("partition_number:          %d\n", partition_number()));
@@ -699,9 +703,9 @@ partition_descriptor::dump() const
 	DUMP(partition_contents());
 	PRINT(("partition_contents_use:    XXX\n"));
 	DUMP(partition_contents_use());
-	PRINT(("access_type:               %ld\n", access_type()));
-	PRINT(("start:                     %ld\n", start()));
-	PRINT(("length:                    %ld\n", length()));
+	PRINT(("access_type:               %" B_PRIu32 "\n", access_type()));
+	PRINT(("start:                     %" B_PRIu32 "\n", start()));
+	PRINT(("length:                    %" B_PRIu32 "\n", length()));
 	PRINT(("implementation_id:\n"));
 	DUMP(implementation_id());
 	PRINT(("implementation_use:        XXX\n"));
@@ -718,20 +722,22 @@ logical_volume_descriptor::dump() const
 	DUMP_INIT("logical_volume_descriptor");
 	PRINT(("tag:\n"));
 	DUMP(tag());
-	PRINT(("vds_number:                %ld\n", vds_number()));
+	PRINT(("vds_number:                %" B_PRIu32 "\n", vds_number()));
 	PRINT(("character_set:\n"));
 	DUMP(character_set());
 	UdfString string(logical_volume_identifier());
 	PRINT(("logical_volume_identifier: `%s'\n", string.Utf8()));
-	PRINT(("logical_block_size:        %ld\n", logical_block_size()));
+	PRINT(("logical_block_size:        %" B_PRIu32 "\n",
+		logical_block_size()));
 	PRINT(("domain_id:\n"));
 	DUMP(domain_id());
 	PRINT(("logical_volume_contents_use:\n"));
 	DUMP(logical_volume_contents_use());
 	PRINT(("file_set_address:\n"));
 	DUMP(file_set_address());
-	PRINT(("map_table_length:          %ld\n", map_table_length()));
-	PRINT(("partition_map_count:       %ld\n", partition_map_count()));
+	PRINT(("map_table_length:          %" B_PRIu32 "\n", map_table_length()));
+	PRINT(("partition_map_count:       %" B_PRIu32 "\n",
+		partition_map_count()));
 	PRINT(("implementation_id:\n"));
 	DUMP(implementation_id());
 	PRINT(("implementation_use:\n"));
@@ -824,10 +830,10 @@ sparable_partition_map::dump()
 	PRINT(("volume_sequence_number: %d\n", volume_sequence_number()));
 	PRINT(("partition_number: %d\n", partition_number()));
 	PRINT(("sparing_table_count: %d\n", sparing_table_count()));
-	PRINT(("sparing_table_size: %ld\n", sparing_table_size()));
+	PRINT(("sparing_table_size: %" B_PRIu32 "\n", sparing_table_size()));
 	PRINT(("sparing_table_locations:"));
 	for (uint8 i = 0; i < sparing_table_count(); i++)
-		PRINT(("  %d: %ld\n", i, sparing_table_location(i)));
+		PRINT(("  %d: %" B_PRIu32 "\n", i, sparing_table_location(i)));
 }
 
 //----------------------------------------------------------------------
@@ -840,8 +846,9 @@ unallocated_space_descriptor::dump() const
 	DUMP_INIT("unallocated_space_descriptor");
 	PRINT(("tag:\n"));
 	DUMP(tag());
-	PRINT(("vds_number:                  %ld\n", vds_number()));
-	PRINT(("allocation_descriptor_count: %ld\n", allocation_descriptor_count()));
+	PRINT(("vds_number:                  %" B_PRIu32 "\n", vds_number()));
+	PRINT(("allocation_descriptor_count: %" B_PRIu32 "\n",
+		allocation_descriptor_count()));
 	// \todo dump alloc_descriptors
 }
 
@@ -872,10 +879,12 @@ file_set_descriptor::dump() const
 	DUMP(recording_date_and_time());
 	PRINT(("interchange_level: %d\n", interchange_level()));
 	PRINT(("max_interchange_level: %d\n", max_interchange_level()));
-	PRINT(("character_set_list: %ld\n", character_set_list()));
-	PRINT(("max_character_set_list: %ld\n", max_character_set_list()));
-	PRINT(("file_set_number: %ld\n", file_set_number()));
-	PRINT(("file_set_descriptor_number: %ld\n", file_set_descriptor_number()));
+	PRINT(("character_set_list: %" B_PRIu32 "\n", character_set_list()));
+	PRINT(("max_character_set_list: %" B_PRIu32 "\n",
+		max_character_set_list()));
+	PRINT(("file_set_number: %" B_PRIu32 "\n", file_set_number()));
+	PRINT(("file_set_descriptor_number: %" B_PRIu32 "\n",
+		file_set_descriptor_number()));
 	PRINT(("logical_volume_id_character_set:\n"));
 	DUMP(logical_volume_id_character_set());
 	PRINT(("logical_volume_id:\n"));
@@ -919,32 +928,37 @@ logical_volume_integrity_descriptor::dump() const
 			SIMPLE_PRINT(("closed\n"));
 			break;
 		default:
-			SIMPLE_PRINT(("invalid integrity type (%ld)", integrity_type()));
+			SIMPLE_PRINT(("invalid integrity type (%" B_PRIu32 ")",
+				integrity_type()));
 			break;
 	}
 	PRINT(("next_integrity_extent:\n"));
 	DUMP(next_integrity_extent());
 	PRINT(("logical_volume_contents_use:\n"));
 	DUMP(logical_volume_contents_use());
-	PRINT(("next_unique_id:             %Ld\n", next_unique_id()));
-	PRINT(("partition_count:            %ld\n", partition_count()));
-	PRINT(("implementation_use_length:  %ld\n", implementation_use_length()));
+	PRINT(("next_unique_id:             %" B_PRIu64 "\n", next_unique_id()));
+	PRINT(("partition_count:            %" B_PRIu32 "\n", partition_count()));
+	PRINT(("implementation_use_length:  %" B_PRIu32 "\n",
+		implementation_use_length()));
 	if (partition_count() > 0) {
 		PRINT(("free_space_table:\n"));
 		for (uint32 i = 0; i < partition_count(); i++) {
-			PRINT(("partition %ld: %ld free blocks\n", i, free_space_table()[i]));
+			PRINT(("partition %" B_PRIu32 ": %" B_PRIu32 " free blocks\n",
+				i, free_space_table()[i]));
 		}
 		PRINT(("size_table:\n"));
 		for (uint32 i = 0; i < partition_count(); i++) {
-			PRINT(("partition %ld: %ld blocks large\n", i, size_table()[i]));
+			PRINT(("partition %" B_PRIu32 ": %" B_PRIu32 " blocks large\n",
+				i, size_table()[i]));
 		}
 	}
 		
 	if (implementation_use_length() >= minimum_implementation_use_length) {
 		PRINT(("implementation_id:\n"));
 		DUMP(implementation_id());
-		PRINT(("file_count:                 %ld\n", file_count()));
-		PRINT(("directory_count:            %ld\n", directory_count()));
+		PRINT(("file_count:                 %" B_PRIu32 "\n", file_count()));
+		PRINT(("directory_count:            %" B_PRIu32 "\n",
+			directory_count()));
 		PRINT(("minimum_udf_read_revision:  0x%04x\n", minimum_udf_read_revision()));
 		PRINT(("minimum_udf_write_revision: 0x%04x\n", minimum_udf_write_revision()));
 		PRINT(("maximum_udf_write_revision: 0x%04x\n", maximum_udf_write_revision()));	
@@ -986,7 +1000,8 @@ void
 icb_entry_tag::dump() const
 {
 	DUMP_INIT("icb_entry_tag");
-	PRINT(("prior_entries: %ld\n", prior_recorded_number_of_direct_entries()));
+	PRINT(("prior_entries: %" B_PRIu32 "\n",
+		prior_recorded_number_of_direct_entries()));
 	PRINT(("strategy_type: %d\n", strategy_type()));
 	PRINT(("strategy_parameters:\n"));
 	DUMP(strategy_parameters());
@@ -1059,31 +1074,38 @@ file_icb_entry::dump() const
 	PRINT(("icb_tag:\n"));
 	DUMP(icb_tag());
 	
-	PRINT(("uid:                       %lu, 0x%lx\n", uid(), uid()));
-	PRINT(("gid:                       %lu, 0x%lx\n", gid(), gid()));
-	PRINT(("permissions:               %ld, 0x%lx\n", permissions(), permissions()));
+	PRINT(("uid:                       %" B_PRIu32 ", 0x%" B_PRIx32 "\n",
+		uid(), uid()));
+	PRINT(("gid:                       %" B_PRIu32 ", 0x%" B_PRIx32 "\n",
+		gid(), gid()));
+	PRINT(("permissions:               %" B_PRIu32 ", 0x%" B_PRIx32 "\n",
+		permissions(), permissions()));
 	PRINT(("file_link_count:           %d\n", file_link_count()));
 	PRINT(("record_format:             %d\n", record_format()));
 	PRINT(("record_display_attributes: %d\n", record_display_attributes()));
 	PRINT(("record_length:             %d\n", record_length()));
-	PRINT(("information_length:        %Ld\n", information_length()));
-	PRINT(("logical_blocks_recorded:   %Ld\n", logical_blocks_recorded()));
+	PRINT(("information_length:        %" B_PRIu64 "\n",
+		information_length()));
+	PRINT(("logical_blocks_recorded:   %" B_PRIu64 "\n",
+		logical_blocks_recorded()));
 	PRINT(("access_date_and_time:\n"));
 	DUMP(access_date_and_time());
 	PRINT(("modification_date_and_time:\n"));
 	DUMP(modification_date_and_time());
 	PRINT(("attribute_date_and_time:\n"));
 	DUMP(attribute_date_and_time());
-	PRINT(("checkpoint:                %ld\n", checkpoint()));
+	PRINT(("checkpoint:                %" B_PRIu32 "\n", checkpoint()));
 	
 	PRINT(("extended_attribute_icb:\n"));
 	DUMP(extended_attribute_icb());
 	PRINT(("implementation_id:\n"));
 	DUMP(implementation_id());
 
-	PRINT(("unique_id: %Ld\n", unique_id()));
-	PRINT(("extended_attributes_length:    %ld\n", extended_attributes_length()));
-	PRINT(("allocation_descriptors_length: %ld\n", allocation_descriptors_length()));
+	PRINT(("unique_id: %" B_PRIu64 "\n", unique_id()));
+	PRINT(("extended_attributes_length:    %" B_PRIu32 "\n",
+		extended_attributes_length()));
+	PRINT(("allocation_descriptors_length: %" B_PRIu32 "\n",
+		allocation_descriptors_length()));
 
 	PRINT(("allocation_descriptors:\n"));
 	switch (icb_tag().descriptor_flags()) {
@@ -1127,15 +1149,20 @@ extended_file_icb_entry::dump() const
 	PRINT(("icb_tag:\n"));
 	DUMP(icb_tag());
 	
-	PRINT(("uid:                       %lu, 0x%lx\n", uid(), uid()));
-	PRINT(("gid:                       %lu, 0x%lx\n", gid(), gid()));
-	PRINT(("permissions:               %ld, 0x%lx\n", permissions(), permissions()));
+	PRINT(("uid:                       %" B_PRIu32 ", 0x%" B_PRIx32 "\n",
+		uid(), uid()));
+	PRINT(("gid:                       %" B_PRIu32 ", 0x%" B_PRIx32 "\n",
+		gid(), gid()));
+	PRINT(("permissions:               %" B_PRIu32 ", 0x%" B_PRIx32 "\n",
+		permissions(), permissions()));
 	PRINT(("file_link_count:           %d\n", file_link_count()));
 	PRINT(("record_format:             %d\n", record_format()));
 	PRINT(("record_display_attributes: %d\n", record_display_attributes()));
-	PRINT(("record_length:             %ld\n", record_length()));
-	PRINT(("information_length:        %Ld\n", information_length()));
-	PRINT(("logical_blocks_recorded:   %Ld\n", logical_blocks_recorded()));
+	PRINT(("record_length:             %" B_PRIu32 "\n", record_length()));
+	PRINT(("information_length:        %" B_PRIu64 "\n",
+		information_length()));
+	PRINT(("logical_blocks_recorded:   %" B_PRIu64 "\n",
+		logical_blocks_recorded()));
 	PRINT(("access_date_and_time:\n"));
 	DUMP(access_date_and_time());
 	PRINT(("modification_date_and_time:\n"));
@@ -1144,7 +1171,7 @@ extended_file_icb_entry::dump() const
 	DUMP(creation_date_and_time());
 	PRINT(("attribute_date_and_time:\n"));
 	DUMP(attribute_date_and_time());
-	PRINT(("checkpoint:                %ld\n", checkpoint()));
+	PRINT(("checkpoint:                %" B_PRIu32 "\n", checkpoint()));
 	
 	PRINT(("extended_attribute_icb:\n"));
 	DUMP(extended_attribute_icb());
@@ -1153,9 +1180,11 @@ extended_file_icb_entry::dump() const
 	PRINT(("implementation_id:\n"));
 	DUMP(implementation_id());
 
-	PRINT(("unique_id: %Ld\n", unique_id()));
-	PRINT(("extended_attributes_length:    %ld\n", extended_attributes_length()));
-	PRINT(("allocation_descriptors_length: %ld\n", allocation_descriptors_length()));
+	PRINT(("unique_id: %" B_PRIu64 "\n", unique_id()));
+	PRINT(("extended_attributes_length:    %" B_PRIu32 "\n",
+		extended_attributes_length()));
+	PRINT(("allocation_descriptors_length: %" B_PRIu32 "\n",
+		allocation_descriptors_length()));
 	
 	PRINT(("allocation_descriptors:\n"));
 	switch (icb_tag().descriptor_flags()) {

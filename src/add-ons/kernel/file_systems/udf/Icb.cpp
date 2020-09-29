@@ -303,7 +303,7 @@ Icb::Read(off_t pos, void *buffer, size_t *length, uint32 *block)
 	TRACE(("Icb::Read: pos = %" B_PRIdOFF ", buffer = %p, length = (%p)->%ld\n",
 		pos, buffer, length, (length ? *length : 0)));
 
-	DEBUG_INIT_ETC("Icb", ("pos: %lld, length: %ld", pos, *length));
+	DEBUG_INIT_ETC("Icb", ("pos: %" B_PRIdOFF " , length: %ld", pos, *length));
 
 	if (fFileCache != NULL)
 		return file_cache_read(fFileCache, NULL, pos, buffer, length);

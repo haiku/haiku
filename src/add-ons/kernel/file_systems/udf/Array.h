@@ -40,13 +40,14 @@ struct array<uint8, arrayLength> {
 	{
 		const uint8 bytesPerRow = 8;
 		char classname[40];
-		sprintf(classname, "array<uint8, %ld>", arrayLength);
+		sprintf(classname, "array<uint8, %" B_PRIu32 ">", arrayLength);
 		
 		DUMP_INIT(classname);
 		
 		for (uint32 i = 0; i < arrayLength; i++) {
 			if (i % bytesPerRow == 0)
-				PRINT(("[%ld:%ld]: ", i, i + bytesPerRow - 1));
+				PRINT(("[%" B_PRIu32 ":%" B_PRIu32 "]: ",
+					i, i + bytesPerRow - 1));
 			SIMPLE_PRINT(("0x%.2x ", data[i]));
 			if ((i + 1) % bytesPerRow == 0 || i + 1 == arrayLength)
 				SIMPLE_PRINT(("\n"));
@@ -66,13 +67,14 @@ struct array<char, arrayLength> {
 	{
 		const uint8 bytesPerRow = 8;
 		char classname[40];
-		sprintf(classname, "array<uint8, %ld>", arrayLength);
+		sprintf(classname, "array<uint8, %" B_PRIu32 ">", arrayLength);
 
 		DUMP_INIT(classname);
 
 		for (uint32 i = 0; i < arrayLength; i++) {
 			if (i % bytesPerRow == 0)
-				PRINT(("[%ld:%ld]: ", i, i + bytesPerRow - 1));
+				PRINT(("[%" B_PRIu32 ":%" B_PRIu32 "]: ",
+					i, i + bytesPerRow - 1));
 			SIMPLE_PRINT(("0x%.2x ", data[i]));
 			if ((i + 1) % bytesPerRow == 0 || i + 1 == arrayLength)
 				SIMPLE_PRINT(("\n"));

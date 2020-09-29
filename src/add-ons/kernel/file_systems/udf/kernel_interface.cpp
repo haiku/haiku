@@ -345,11 +345,13 @@ static status_t
 udf_read(fs_volume *volume, fs_vnode *vnode, void *cookie, off_t pos,
 	void *buffer, size_t *length)
 {
-	TRACE(("udf_read: ID = %ld, pos = %lld, length = %lu\n",
+	TRACE(("udf_read: ID = %" B_PRIdDEV ", pos = %" B_PRIdOFF ", "
+			"length = %lu\n",
 		((Volume *)volume->private_volume)->ID(), pos, *length));
 
 	Icb *icb = (Icb *)vnode->private_node;
-	DEBUG_INIT_ETC("udf_read", ("ID = %ld, pos = %lld, length = %lu",
+	DEBUG_INIT_ETC("udf_read", ("ID = %" B_PRIdDEV ", pos = %" B_PRIdOFF ", "
+			"length = %lu",
 		((Volume *)volume->private_volume)->ID(), pos, *length));
 
 //	if (!inode->HasUserAccessableStream()) {
@@ -393,7 +395,7 @@ static status_t
 udf_open_dir(fs_volume *volume, fs_vnode *vnode, void **cookie)
 {
 	TRACE(("udf_open_dir: volume = %p, vnode = %p\n", volume, vnode));
-	DEBUG_INIT_ETC("udf_open_dir", ("ID = %ld",
+	DEBUG_INIT_ETC("udf_open_dir", ("ID = %" B_PRIdDEV,
 		((Volume *)volume->private_volume)->ID()));
 
 	if (!volume || !vnode || !cookie)
@@ -453,7 +455,7 @@ udf_read_dir(fs_volume *_volume, fs_vnode *vnode, void *cookie,
 	Icb *dir = (Icb *)vnode->private_node;
 	DirectoryIterator *iterator = (DirectoryIterator *)cookie;
 
-	DEBUG_INIT_ETC("udf_read_dir", ("ID = %ld", volume->ID()));
+	DEBUG_INIT_ETC("udf_read_dir", ("ID = %" B_PRIdDEV , volume->ID()));
 
 	if (dir != iterator->Parent()) {
 		TRACE_ERROR(("udf_read_dir: Icb does not match parent Icb of given "
@@ -486,7 +488,7 @@ udf_rewind_dir(fs_volume *volume, fs_vnode *vnode, void *cookie)
 {
 	TRACE(("udf_rewind_dir: volume = %p, vnode = %p, cookie = %p\n",
 		volume, vnode, cookie));
-	DEBUG_INIT_ETC("udf_rewind_dir", ("ID = %ld",
+	DEBUG_INIT_ETC("udf_rewind_dir", ("ID = %" B_PRIdDEV,
 		((Volume *)volume->private_volume)->ID()));
 
 	if (!volume || !vnode || !cookie)

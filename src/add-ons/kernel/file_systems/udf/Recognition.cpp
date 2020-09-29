@@ -194,21 +194,22 @@ walk_anchor_volume_descriptor_sequences(int device, off_t offset, off_t length,
 			ssize_t bytesRead = read_pos(device, address, chunk.Data(), blockSize);
 			anchorErr = bytesRead == (ssize_t)blockSize ? B_OK : B_IO_ERROR;
 			if (anchorErr) {
-				PRINT(("block %Ld: read_pos(pos:%Ld, len:%ld) failed with error 0x%lx\n",
-				       block, address, blockSize, bytesRead));
+				PRINT(("block %" B_PRIdOFF ": read_pos(pos:%" B_PRIdOFF ", "
+						"len:%" PRIu32 ") failed with error 0x%lx\n",
+					block, address, blockSize, bytesRead));
 			}
 		}
 		if (!anchorErr) {
 			anchor = reinterpret_cast<anchor_volume_descriptor*>(chunk.Data());
 			anchorErr = anchor->tag().init_check(block + offset);
 			if (anchorErr) {
-				PRINT(("block %Ld: invalid anchor\n", block));
+				PRINT(("block %" B_PRIdOFF ": invalid anchor\n", block));
 			} else {
-				PRINT(("block %Ld: valid anchor\n", block));
+				PRINT(("block %" B_PRIdOFF ": valid anchor\n", block));
 			}
 		}
 		if (!anchorErr) {
-			PRINT(("block %Ld: anchor:\n", block));
+			PRINT(("block %" B_PRIdOFF ": anchor:\n", block));
 			PDUMP(anchor);
 			// Found an avds, so try the main sequence first, then
 			// the reserve sequence if the main one fails.
@@ -224,12 +225,14 @@ walk_anchor_volume_descriptor_sequences(int device, off_t offset, off_t length,
 					partitionDescriptorCount);				
 		}
 		if (!anchorErr) {
-			PRINT(("block %Ld: found valid vds\n", avds_locations[i]));
+			PRINT(("block %" B_PRIdOFF ": found valid vds\n",
+				avds_locations[i]));
 			found_vds = true;
 			break;
 		} else {
 			// Both failed, so loop around and try another avds
-			PRINT(("block %Ld: vds search failed\n", avds_locations[i]));
+			PRINT(("block %" B_PRIdOFF ": vds search failed\n",
+				avds_locations[i]));
 		}
 	}
 	status_t error = found_vds ? B_OK : B_ERROR;
@@ -245,8 +248,9 @@ walk_volume_descriptor_sequence(extent_address descriptorSequence,
 	partition_descriptor partitionDescriptors[],
 	uint8 &partitionDescriptorCount)
 {
-	DEBUG_INIT_ETC(NULL, ("descriptorSequence.loc:%ld, descriptorSequence.len:%ld",
-	           descriptorSequence.location(), descriptorSequence.length()));
+	DEBUG_INIT_ETC(NULL, ("descriptorSequence.loc:%" PRIu32 ", "
+			"descriptorSequence.len:%" PRIu32,
+		descriptorSequence.location(), descriptorSequence.length()));
 	uint32 count = descriptorSequence.length() >> blockShift;
 		
 	bool foundLogicalVolumeDescriptor = false;
@@ -261,15 +265,16 @@ walk_volume_descriptor_sequence(extent_address descriptorSequence,
 		MemoryChunk chunk(blockSize);
 		descriptor_tag  *tag = NULL;
 
-		PRINT(("descriptor #%ld (block %Ld):\n", i, block));
+		PRINT(("descriptor #%" PRIu32 " (block %" B_PRIdOFF "):\n", i, block));
 
 		status_t loopError = chunk.InitCheck();
 		if (!loopError) {
 			ssize_t bytesRead = read_pos(device, address, chunk.Data(), blockSize);
 			loopError = bytesRead == (ssize_t)blockSize ? B_OK : B_IO_ERROR;
 			if (loopError) {
-				PRINT(("block %Ld: read_pos(pos:%Ld, len:%ld) failed with error 0x%lx\n",
-				       block, address, blockSize, bytesRead));
+				PRINT(("block %" B_PRIdOFF ": read_pos(pos:%" B_PRIdOFF ", "
+						"len:%" B_PRIu32 ") failed with error 0x%lx\n",
+					block, address, blockSize, bytesRead));
 			}
 		}
 		if (!loopError) {
@@ -326,8 +331,10 @@ walk_volume_descriptor_sequence(extent_address descriptorSequence,
 								if (partitionDescriptors[num].vds_number()
 								    < partition->vds_number()) {
 									partitionDescriptors[num] = *partition;		
-									PRINT(("Replacing previous partition #%d (vds_number: %ld) with "
-									       "new partition #%d (vds_number: %ld)\n",
+									PRINT(("Replacing previous partition #%d "
+												"(vds_number: %" B_PRIu32 ") "
+												"with new partition #%d "
+												"(vds_number: %" B_PRIu32 ")\n",
 									       partitionDescriptors[num].partition_number(),
 									       partitionDescriptors[num].vds_number(),
 									       partition->partition_number(),
@@ -343,7 +350,8 @@ walk_volume_descriptor_sequence(extent_address descriptorSequence,
 								// At least one more partition descriptor allowed
 								partitionDescriptors[num] = *partition;
 								uniquePartitions++;
-								PRINT(("Adding partition #%d (vds_number: %ld)\n",
+								PRINT(("Adding partition #%d (vds_number: %" B_PRIu32
+								       ")\n",
 								       partition->partition_number(),
 								       partition->vds_number()));
 							} else {
@@ -359,8 +367,10 @@ walk_volume_descriptor_sequence(extent_address descriptorSequence,
 									    < partition->vds_number()) {
 										foundReplacement = true;
 										partitionDescriptors[j] = *partition;
-										PRINT(("Replacing partition #%d (vds_number: %ld) "
-										       "with partition #%d (vds_number: %ld)\n",
+										PRINT(("Replacing partition #%d "
+													"(vds_number: %" B_PRIu32 ") "
+													"with partition #%d "
+													"(vds_number: %" B_PRIu32 ")\n",
 										       partitionDescriptors[j].partition_number(),
 										       partitionDescriptors[j].vds_number(),
 										       partition->partition_number(),
@@ -455,7 +465,9 @@ static status_t
 walk_integrity_sequence(int device, uint32 blockSize, uint32 blockShift,
                         extent_address descriptorSequence, uint32 sequenceNumber)
 {
-	DEBUG_INIT_ETC(NULL, ("descriptorSequence.loc:%ld, descriptorSequence.len:%ld",
+	DEBUG_INIT_ETC(NULL,
+	           ("descriptorSequence.loc:%" B_PRIu32 ", "
+	           "descriptorSequence.len:%" B_PRIu32 ,
 	           descriptorSequence.location(), descriptorSequence.length()));
 	uint32 count = descriptorSequence.length() >> blockShift;
 		
@@ -468,14 +480,17 @@ walk_integrity_sequence(int device, uint32 blockSize, uint32 blockShift,
 		MemoryChunk chunk(blockSize);
 		descriptor_tag *tag = NULL;
 
-		PRINT(("integrity descriptor #%ld:%ld (block %Ld):\n", sequenceNumber, i, block));
+		PRINT(("integrity descriptor #%" B_PRIu32 ":%" B_PRIu32
+			" (block %" B_PRIdOFF "):\n",
+			sequenceNumber, i, block));
 
 		status_t loopError = chunk.InitCheck();
 		if (!loopError) {
 			ssize_t bytesRead = read_pos(device, address, chunk.Data(), blockSize);
 			loopError = check_size_error(bytesRead, blockSize);
 			if (loopError) {
-				PRINT(("block %Ld: read_pos(pos:%Ld, len:%ld) failed with error 0x%lx\n",
+				PRINT(("block %" B_PRIdOFF": read_pos(pos:%" B_PRIdOFF
+				       ", len:%" B_PRIu32 ") failed with error 0x%lx\n",
 				       block, address, blockSize, bytesRead));
 			}
 		}
