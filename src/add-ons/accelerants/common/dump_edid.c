@@ -17,8 +17,6 @@
 
 #include <KernelExport.h>
 
-#include <stdio.h>
-
 
 void
 edid_dump(edid1_info *edid)
