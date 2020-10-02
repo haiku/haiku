@@ -194,7 +194,7 @@ Inode::UpdateNodeFromDisk()
 		} else
 			checksum &= 0xffff;
 		if (provided != checksum) {
-			ERROR("Inode::UpdateNodeFromDisk(%" B_PRIu32 "): "
+			ERROR("Inode::UpdateNodeFromDisk(%" B_PRIdOFF "): "
 			"verification failed\n", blockNum);
 			return B_BAD_DATA;
 		}
