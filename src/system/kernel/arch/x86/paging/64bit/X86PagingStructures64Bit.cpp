@@ -18,23 +18,24 @@
 
 X86PagingStructures64Bit::X86PagingStructures64Bit()
 	:
-	fVirtualPML4(NULL)
+	fVirtualPMLTop(NULL)
 {
 }
 
 
 X86PagingStructures64Bit::~X86PagingStructures64Bit()
 {
-	// Free the PML4.
-	free(fVirtualPML4);
+	// Free the PMLTop.
+	free(fVirtualPMLTop);
 }
 
 
 void
-X86PagingStructures64Bit::Init(uint64* virtualPML4, phys_addr_t physicalPML4)
+X86PagingStructures64Bit::Init(uint64* virtualPMLTop,
+	phys_addr_t physicalPMLTop)
 {
-	fVirtualPML4 = virtualPML4;
-	pgdir_phys = physicalPML4;
+	fVirtualPMLTop = virtualPMLTop;
+	pgdir_phys = physicalPMLTop;
 }
 
 

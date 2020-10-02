@@ -27,7 +27,7 @@ struct vm_page_reservation;
 
 class X86PagingMethod64Bit final : public X86PagingMethod {
 public:
-								X86PagingMethod64Bit();
+								X86PagingMethod64Bit(bool la57);
 	virtual						~X86PagingMethod64Bit();
 
 	virtual	status_t			Init(kernel_args* args,
@@ -51,10 +51,10 @@ public:
 	inline	TranslationMapPhysicalPageMapper* KernelPhysicalPageMapper() const
 									{ return fKernelPhysicalPageMapper; }
 
-	inline	uint64*				KernelVirtualPML4() const
-									{ return fKernelVirtualPML4; }
-	inline	phys_addr_t			KernelPhysicalPML4() const
-									{ return fKernelPhysicalPML4; }
+	inline	uint64*				KernelVirtualPMLTop() const
+									{ return fKernelVirtualPMLTop; }
+	inline	phys_addr_t			KernelPhysicalPMLTop() const
+									{ return fKernelPhysicalPMLTop; }
 
 	static	X86PagingMethod64Bit* Method();
 
@@ -103,11 +103,13 @@ public:
 private:
 	static	void				_EnableExecutionDisable(void* dummy, int cpu);
 
-			phys_addr_t			fKernelPhysicalPML4;
-			uint64*				fKernelVirtualPML4;
+			phys_addr_t			fKernelPhysicalPMLTop;
+			uint64*				fKernelVirtualPMLTop;
 
 			X86PhysicalPageMapper* fPhysicalPageMapper;
 			TranslationMapPhysicalPageMapper* fKernelPhysicalPageMapper;
+
+	static	bool				la57;
 };
 
 

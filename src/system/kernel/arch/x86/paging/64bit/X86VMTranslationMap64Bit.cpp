@@ -35,9 +35,10 @@
 // #pragma mark - X86VMTranslationMap64Bit
 
 
-X86VMTranslationMap64Bit::X86VMTranslationMap64Bit()
+X86VMTranslationMap64Bit::X86VMTranslationMap64Bit(bool la57)
 	:
-	fPagingStructures(NULL)
+	fPagingStructures(NULL),
+	fLA57(la57)
 {
 }
 
@@ -53,8 +54,8 @@ X86VMTranslationMap64Bit::~X86VMTranslationMap64Bit()
 		phys_addr_t address;
 		vm_page* page;
 
-		// Free all structures in the bottom half of the PML4 (user memory).
-		uint64* virtualPML4 = fPagingStructures->VirtualPML4();
+		// Free all structures in the bottom half of the PMLTop (user memory).
+		uint64* virtualPML4 = fPagingStructures->VirtualPMLTop();
 		for (uint32 i = 0; i < 256; i++) {
 			if ((virtualPML4[i] & X86_64_PML4E_PRESENT) == 0)
 				continue;
@@ -128,9 +129,9 @@ X86VMTranslationMap64Bit::Init(bool kernel)
 		// Get the page mapper.
 		fPageMapper = method->KernelPhysicalPageMapper();
 
-		// Kernel PML4 is already mapped.
-		fPagingStructures->Init(method->KernelVirtualPML4(),
-			method->KernelPhysicalPML4());
+		// Kernel PMLTop is already mapped.
+		fPagingStructures->Init(method->KernelVirtualPMLTop(),
+			method->KernelPhysicalPMLTop());
 	} else {
 		// Allocate a physical page mapper.
 		status_t error = method->PhysicalPageMapper()
@@ -138,28 +139,28 @@ X86VMTranslationMap64Bit::Init(bool kernel)
 		if (error != B_OK)
 			return error;
 
-		// Assuming that only the top 2 PML4 entries are occupied for the
+		// Assuming that only the top 2 PMLTop entries are occupied for the
 		// kernel.
 		STATIC_ASSERT(KERNEL_PMAP_BASE == 0xffffff0000000000);
 		STATIC_ASSERT(KERNEL_BASE == 0xffffff0000000000);
 
-		// Allocate and clear the PML4.
-		uint64* virtualPML4 = (uint64*)memalign(B_PAGE_SIZE, B_PAGE_SIZE);
-		if (virtualPML4 == NULL)
+		// Allocate and clear the PMLTop.
+		uint64* virtualPMLTop = (uint64*)memalign(B_PAGE_SIZE, B_PAGE_SIZE);
+		if (virtualPMLTop == NULL)
 			return B_NO_MEMORY;
-		memset(virtualPML4, 0, B_PAGE_SIZE);
+		memset(virtualPMLTop, 0, B_PAGE_SIZE);
 
-		// Copy the top 2 PML4 entries.
-		virtualPML4[510] = method->KernelVirtualPML4()[510];
-		virtualPML4[511] = method->KernelVirtualPML4()[511];
+		// Copy the top 2 PMLTop entries.
+		virtualPMLTop[510] = method->KernelVirtualPMLTop()[510];
+		virtualPMLTop[511] = method->KernelVirtualPMLTop()[511];
 
-		// Look up the PML4 physical address.
-		phys_addr_t physicalPML4;
-		vm_get_page_mapping(VMAddressSpace::KernelID(), (addr_t)virtualPML4,
-			&physicalPML4);
+		// Look up the PMLTop physical address.
+		phys_addr_t physicalPMLTop;
+		vm_get_page_mapping(VMAddressSpace::KernelID(), (addr_t)virtualPMLTop,
+			&physicalPMLTop);
 
 		// Initialize the paging structures.
-		fPagingStructures->Init(virtualPML4, physicalPML4);
+		fPagingStructures->Init(virtualPMLTop, physicalPMLTop);
 	}
 
 	return B_OK;
@@ -171,12 +172,17 @@ X86VMTranslationMap64Bit::MaxPagesNeededToMap(addr_t start, addr_t end) const
 {
 	// If start == 0, the actual base address is not yet known to the caller and
 	// we shall assume the worst case, which is where the start address is the
-	// last page covered by a PDPT.
+	// last page covered by a PDPT or PML4.
 	if (start == 0) {
-		start = k64BitPDPTRange - B_PAGE_SIZE;
+		start = (fLA57 ? k64BitPML4TRange : k64BitPDPTRange) - B_PAGE_SIZE;
 		end += start;
 	}
 
+	size_t requiredPML4s = 0;
+	if (fLA57) {
+		requiredPML4s = end / k64BitPML4TRange + 1
+			- start / k64BitPML4TRange;
+	}
 	size_t requiredPDPTs = end / k64BitPDPTRange + 1
 		- start / k64BitPDPTRange;
 	size_t requiredPageDirs = end / k64BitPageDirectoryRange + 1
@@ -184,7 +190,8 @@ X86VMTranslationMap64Bit::MaxPagesNeededToMap(addr_t start, addr_t end) const
 	size_t requiredPageTables = end / k64BitPageTableRange + 1
 		- start / k64BitPageTableRange;
 
-	return requiredPDPTs + requiredPageDirs + requiredPageTables;
+	return requiredPML4s + requiredPDPTs + requiredPageDirs
+		+ requiredPageTables;
 }
 
 
@@ -200,7 +207,7 @@ X86VMTranslationMap64Bit::Map(addr_t virtualAddress, phys_addr_t physicalAddress
 	// Look up the page table for the virtual address, allocating new tables
 	// if required. Shouldn't fail.
 	uint64* entry = X86PagingMethod64Bit::PageTableEntryForAddress(
-		fPagingStructures->VirtualPML4(), virtualAddress, fIsKernelMap,
+		fPagingStructures->VirtualPMLTop(), virtualAddress, fIsKernelMap,
 		true, reservation, fPageMapper, fMapCount);
 	ASSERT(entry != NULL);
 
@@ -236,7 +243,7 @@ X86VMTranslationMap64Bit::Unmap(addr_t start, addr_t end)
 
 	do {
 		uint64* pageTable = X86PagingMethod64Bit::PageTableForAddress(
-			fPagingStructures->VirtualPML4(), start, fIsKernelMap, false,
+			fPagingStructures->VirtualPMLTop(), start, fIsKernelMap, false,
 			NULL, fPageMapper, fMapCount);
 		if (pageTable == NULL) {
 			// Move on to the next page table.
@@ -286,7 +293,7 @@ X86VMTranslationMap64Bit::DebugMarkRangePresent(addr_t start, addr_t end,
 
 	do {
 		uint64* pageTable = X86PagingMethod64Bit::PageTableForAddress(
-			fPagingStructures->VirtualPML4(), start, fIsKernelMap, false,
+			fPagingStructures->VirtualPMLTop(), start, fIsKernelMap, false,
 			NULL, fPageMapper, fMapCount);
 		if (pageTable == NULL) {
 			// Move on to the next page table.
@@ -336,7 +343,7 @@ X86VMTranslationMap64Bit::UnmapPage(VMArea* area, addr_t address,
 
 	// Look up the page table for the virtual address.
 	uint64* entry = X86PagingMethod64Bit::PageTableEntryForAddress(
-		fPagingStructures->VirtualPML4(), address, fIsKernelMap,
+		fPagingStructures->VirtualPMLTop(), address, fIsKernelMap,
 		false, NULL, fPageMapper, fMapCount);
 	if (entry == NULL)
 		return B_ENTRY_NOT_FOUND;
@@ -403,7 +410,7 @@ X86VMTranslationMap64Bit::UnmapPages(VMArea* area, addr_t base, size_t size,
 
 	do {
 		uint64* pageTable = X86PagingMethod64Bit::PageTableForAddress(
-			fPagingStructures->VirtualPML4(), start, fIsKernelMap, false,
+			fPagingStructures->VirtualPMLTop(), start, fIsKernelMap, false,
 			NULL, fPageMapper, fMapCount);
 		if (pageTable == NULL) {
 			// Move on to the next page table.
@@ -536,7 +543,7 @@ X86VMTranslationMap64Bit::UnmapArea(VMArea* area, bool deletingAddressSpace,
 				+ ((page->cache_offset * B_PAGE_SIZE) - area->cache_offset);
 
 			uint64* entry = X86PagingMethod64Bit::PageTableEntryForAddress(
-				fPagingStructures->VirtualPML4(), address, fIsKernelMap,
+				fPagingStructures->VirtualPMLTop(), address, fIsKernelMap,
 				false, NULL, fPageMapper, fMapCount);
 			if (entry == NULL) {
 				panic("page %p has mapping for area %p (%#" B_PRIxADDR "), but "
@@ -607,7 +614,7 @@ X86VMTranslationMap64Bit::Query(addr_t virtualAddress,
 	// large pages here. Look up the page directory entry for the virtual
 	// address.
 	uint64* pde = X86PagingMethod64Bit::PageDirectoryEntryForAddress(
-		fPagingStructures->VirtualPML4(), virtualAddress, fIsKernelMap,
+		fPagingStructures->VirtualPMLTop(), virtualAddress, fIsKernelMap,
 		false, NULL, fPageMapper, fMapCount);
 	if (pde == NULL || (*pde & X86_64_PDE_PRESENT) == 0)
 		return B_OK;
@@ -684,7 +691,7 @@ X86VMTranslationMap64Bit::Protect(addr_t start, addr_t end, uint32 attributes,
 
 	do {
 		uint64* pageTable = X86PagingMethod64Bit::PageTableForAddress(
-			fPagingStructures->VirtualPML4(), start, fIsKernelMap, false,
+			fPagingStructures->VirtualPMLTop(), start, fIsKernelMap, false,
 			NULL, fPageMapper, fMapCount);
 		if (pageTable == NULL) {
 			// Move on to the next page table.
@@ -741,7 +748,7 @@ X86VMTranslationMap64Bit::ClearFlags(addr_t address, uint32 flags)
 	ThreadCPUPinner pinner(thread_get_current_thread());
 
 	uint64* entry = X86PagingMethod64Bit::PageTableEntryForAddress(
-		fPagingStructures->VirtualPML4(), address, fIsKernelMap,
+		fPagingStructures->VirtualPMLTop(), address, fIsKernelMap,
 		false, NULL, fPageMapper, fMapCount);
 	if (entry == NULL)
 		return B_OK;
@@ -772,7 +779,7 @@ X86VMTranslationMap64Bit::ClearAccessedAndModified(VMArea* area, addr_t address,
 	ThreadCPUPinner pinner(thread_get_current_thread());
 
 	uint64* entry = X86PagingMethod64Bit::PageTableEntryForAddress(
-		fPagingStructures->VirtualPML4(), address, fIsKernelMap,
+		fPagingStructures->VirtualPMLTop(), address, fIsKernelMap,
 		false, NULL, fPageMapper, fMapCount);
 	if (entry == NULL)
 		return false;
