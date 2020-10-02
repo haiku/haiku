@@ -21,6 +21,7 @@
 #include <boot/stage2.h>
 #include <boot/stdio.h>
 #include <kernel.h>
+#include <safemode.h>
 
 #include "debug.h"
 #include "mmu.h"
@@ -35,7 +36,8 @@ static const uint64 kPageMappingFlags = 0x103;
 extern "C" void long_enter_kernel(int currentCPU, uint64 stackTop);
 
 extern uint64 gLongGDT;
-extern uint32 gLongPhysicalPML4;
+extern uint32 gLongPhysicalPMLTop;
+extern bool gLongLA57;
 extern uint64 gLongKernelEntry;
 
 
@@ -88,16 +90,11 @@ long_gdt_init()
 static void
 long_mmu_init()
 {
-	uint64* pml4;
-	uint64* pdpt;
-	uint64* pageDir;
-	uint64* pageTable;
-	addr_t physicalAddress;
-
-	// Allocate the top level PML4.
-	pml4 = (uint64*)mmu_allocate_page(&gKernelArgs.arch_args.phys_pgdir);
-	memset(pml4, 0, B_PAGE_SIZE);
-	gKernelArgs.arch_args.vir_pgdir = fix_address((uint64)(addr_t)pml4);
+	uint64* pmlTop;
+	// Allocate the top level PMLTop.
+	pmlTop = (uint64*)mmu_allocate_page(&gKernelArgs.arch_args.phys_pgdir);
+	memset(pmlTop, 0, B_PAGE_SIZE);
+	gKernelArgs.arch_args.vir_pgdir = fix_address((uint64)(addr_t)pmlTop);
 
 	// Store the virtual memory usage information.
 	gKernelArgs.virtual_allocated_range[0].start = KERNEL_LOAD_BASE_64_BIT;
@@ -127,6 +124,29 @@ long_mmu_init()
 	if (maxAddress / 0x40000000 > 512)
 		panic("Can't currently support more than 512GB of RAM!");
 
+	uint64* pml4 = pmlTop;
+	addr_t physicalAddress;
+	cpuid_info info;
+	if (get_current_cpuid(&info, 7, 0) == B_OK
+		&& (info.regs.ecx & IA32_FEATURE_LA57) != 0) {
+
+		if (get_safemode_boolean(B_SAFEMODE_256_TB_MEMORY_LIMIT, false)) {
+			// LA57 has been disabled!
+			dprintf("la57 disabled per safemode setting\n");
+		} else {
+			dprintf("la57 enabled\n");
+			gLongLA57 = true;
+			pml4 = (uint64*)mmu_allocate_page(&physicalAddress);
+			memset(pml4, 0, B_PAGE_SIZE);
+			pmlTop[511] = physicalAddress | kTableMappingFlags;
+			pmlTop[0] = physicalAddress | kTableMappingFlags;
+		}
+	}
+
+	uint64* pdpt;
+	uint64* pageDir;
+	uint64* pageTable;
+
 	// Create page tables for the physical map area. Also map this PDPT
 	// temporarily at the bottom of the address space so that we are identity
 	// mapped.
@@ -151,7 +171,6 @@ long_mmu_init()
 	mmu_free(pdpt, B_PAGE_SIZE);
 
 	// Allocate tables for the kernel mappings.
-
 	pdpt = (uint64*)mmu_allocate_page(&physicalAddress);
 	memset(pdpt, 0, B_PAGE_SIZE);
 	pml4[511] = physicalAddress | kTableMappingFlags;
@@ -186,6 +205,8 @@ long_mmu_init()
 		mmu_free(pageTable, B_PAGE_SIZE);
 	mmu_free(pageDir, B_PAGE_SIZE);
 	mmu_free(pdpt, B_PAGE_SIZE);
+	if (pml4 != pmlTop)
+		mmu_free(pml4, B_PAGE_SIZE);
 
 	// Sort the address ranges.
 	sort_address_ranges(gKernelArgs.physical_memory_range,
@@ -216,7 +237,7 @@ long_mmu_init()
 			gKernelArgs.virtual_allocated_range[i].size);
 	}
 
-	gLongPhysicalPML4 = gKernelArgs.arch_args.phys_pgdir;
+	gLongPhysicalPMLTop = gKernelArgs.arch_args.phys_pgdir;
 }
 
 
