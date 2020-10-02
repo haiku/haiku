@@ -28,7 +28,7 @@
 
 // define the PANIC macro
 #ifndef PANIC
-#	ifdef _KERNEL_MODE
+#	if defined(_KERNEL_MODE) || defined(_BOOT_MODE)
 #		define PANIC(str)	panic(str)
 #	else
 #		define PANIC(str)	debugger(str)
