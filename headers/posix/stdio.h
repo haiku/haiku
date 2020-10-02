@@ -170,6 +170,9 @@ extern ssize_t	getline(char **_line, size_t *_length, FILE *stream);
 
 /* formatted I/O */
 extern int		printf(char const *format, ...) __PRINTFLIKE(1,2);
+#if !defined(_KERNEL_MODE) && !defined(_BOOT_MODE) && !defined(_LOADER_MODE)
+extern int		dprintf(int fd, char const *format, ...) __PRINTFLIKE(2,3);
+#endif
 extern int		fprintf(FILE *stream, char const *format, ...) __PRINTFLIKE(2,3);
 extern int		sprintf(char *string, char const *format, ...) __PRINTFLIKE(2,3);
 extern int		snprintf(char *string, size_t size, char const *format, ...) __PRINTFLIKE(3,4);

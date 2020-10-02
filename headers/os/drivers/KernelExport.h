@@ -197,7 +197,9 @@ extern area_id		map_physical_memory(const char *areaName,
 						uint32 protection, void **_mappedAddress);
 
 /* kernel debugging facilities */
+#if defined(_KERNEL_MODE) || defined(_BOOT_MODE)
 extern void			dprintf(const char *format, ...) _PRINTFLIKE(1, 2);
+#endif
 extern void			dvprintf(const char *format, va_list args);
 extern void			kprintf(const char *fmt, ...) _PRINTFLIKE(1, 2);
 
