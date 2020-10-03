@@ -464,7 +464,7 @@ FDILink::_SnbTrain(uint32 lanes)
 		tmp &= ~FDI_LINK_TRAIN_NONE;
 		tmp |= FDI_LINK_TRAIN_PATTERN_1;
 	}
-	write32(rxControl, rxControl);
+	write32(rxControl, tmp);
 	Receiver().Enable();
 
 	uint32 iirControl = Receiver().Base() + PCH_FDI_RX_IIR;
