@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Installer	737606382
+1	turkish	x-vnd.Haiku-Installer	3982017613
 Performing installation.	InstallProgress		Kuruluyor…
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Açılır menüden kaynak diski seçin ve \"Başla\"ya tıklayın.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Yükleyici penceresini kapatmadan önce Disk İzlencesi penceresini kapatın.
@@ -64,6 +64,7 @@ Cancel	InstallerWindow		İptal
 Continue	InstallerWindow	In alert after pressing Stop	Sürdür
 Scanning for disks…	InstallerWindow		Diskler taranıyor…
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Disk İzlencesi çalışıyor…\n\nKurulumu sürdürmek için Disk İzlencesi'ni kapatın.
+The installation is not complete yet!\nAre you sure you want to stop it?	InstallerWindow		Kurulum henüz tamamlanmadı!\nDurdurmak istediğinizden emin misiniz?
 The partition can't be mounted. Please choose a different partition.	InstallProgress		Bölüm bağlanamıyor. Lütfen başka bir bölüm seçin.
 Set up partitions…	InstallerWindow		Bölümleri ayarla…
 Install progress:  	InstallerWindow		Kurulum ilerlemesi:  

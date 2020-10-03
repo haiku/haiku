@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Keymap	1075970008
+1	japanese	x-vnd.Haiku-Keymap	2700190052
 Key	Modifier keys window	As in a computer keyboard key	キー
 Japanese	KeymapNames		日本語
 US	KeymapNames		英語 (US)
@@ -89,6 +89,7 @@ Esperanto	KeymapNames		エスペラント語
 Belarusian	KeymapNames		ベラルーシ語
 Warning: left and right key roles do not match	Modifier keys window		警告: 左右のキーの機能が一致しません
 Circumflex trigger	Keymap window		サーカムフレックスのトリガー
+Fizzbook NL2	KeyboardLayoutNames		Fizzbook NL2
 Caps lock	Keyboard Layout View		Caps lock
 Left shift	Keyboard Layout View		左 Shift キー
 Russian (Yawert)	KeymapNames		ロシア語 (Yawert)

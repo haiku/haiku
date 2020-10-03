@@ -1,6 +1,7 @@
-1	catalan; valencian	x-vnd.Haiku-FirstBootPrompt	1158596356
+1	catalan; valencian	x-vnd.Haiku-FirstBootPrompt	2704155482
 Japanese	KeymapNames		Japonès
 US	KeymapNames		EUA
+Cancel	BootPromptWindow		Cancel·la
 Esperanto	KeymapNames		Esperanto
 Belarusian	KeymapNames		Bielorús
 Brazilian	KeymapNames		Brasiler
@@ -10,6 +11,7 @@ Latin-American	KeymapNames		Llatinoamericà
 Ukrainian	KeymapNames		Ucraïnès
 Russian (Yawert)	KeymapNames		Rus (Yawert)
 United-Kingdom	KeymapNames		Regne Unit
+Quit Haiku	System name		Surt del Haiku
 Serbian (Cyrillic)	KeymapNames		Serbi (ciríl·lic)
 Turkish (Type-F)	KeymapNames		Turc (tipus F)
 Bulgarian (Cyrillic)	KeymapNames		Búlgar (ciríl·lic)
@@ -46,6 +48,7 @@ Spanish	KeymapNames		Castellà
 Ukrainian (Mac)	KeymapNames		Ucraïnès (Mac)
 Estonian	KeymapNames		Estonià
 French (Bépo)	KeymapNames		Francès (Bépo)
+Restart system	BootPromptWindow		Reinicia el sistema
 Serbian (Latin)	KeymapNames		Serbi (llatí)
 Russian (Typewriter)	KeymapNames		Rus (màquina d'escriure)
 French	KeymapNames		Francès
@@ -71,6 +74,7 @@ Russian	KeymapNames		Rus
 Hungarian	KeymapNames		Hongarès
 Irish	KeymapNames		Irlandès
 Romanian	KeymapNames		Romanès
+Are you sure you want to close this window? This will restart your system!	BootPromptWindow		Segur que voleu tancar aquesta finestra? Això reiniciarà el sistema!
 Macedonian	KeymapNames		Macedoni
 Czech (Mac)	KeymapNames		Txec (Mac)
 Brazilian (ABNT2)	KeymapNames		Brasiler (ABNT2)

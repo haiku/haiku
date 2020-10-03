@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Keymap	1075970008
+1	turkish	x-vnd.Haiku-Keymap	2700190052
 Key	Modifier keys window	As in a computer keyboard key	Düğme
 Japanese	KeymapNames		Japonca
 US	KeymapNames		ABD
@@ -89,6 +89,7 @@ Esperanto	KeymapNames		Esperanto
 Belarusian	KeymapNames		Beyaz Rusça
 Warning: left and right key roles do not match	Modifier keys window		Uyarı: Sol ve sağ düğme rolleri eşleşmiyor
 Circumflex trigger	Keymap window		Düzeltme imi tetikleyicisi
+Fizzbook NL2	KeyboardLayoutNames		Fizzbook NL2
 Caps lock	Keyboard Layout View		Caps lock
 Left shift	Keyboard Layout View		Sol Shift
 Russian (Yawert)	KeymapNames		Rusça (Yawert)

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Installer	248241554
+1	french	x-vnd.Haiku-Installer	3982017613
 Performing installation.	InstallProgress		Installation en cours.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Choisir le disque source dans la liste déroulante, puis cliquer sur « Commencer ».
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Veuillez fermer la fenêtre du Gestionnaire de Disques avant celle de l’Installeur.
@@ -14,6 +14,7 @@ Unknown Type	InstallProgress	Partition content type	Type inconnu
 Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Cliquer sur Commencer pour installer de « %1s » vers « %2s ».
 Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Sélectionner le disque de destination dans la liste déroulante, puis cliquer sur « Commencer ».
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		L’installation est terminée. Le secteur d’amorce a été écrit sur « %s ». Cliquer sur Quitter pour sortir de l’Installeur ou choisir un nouveau volume cible pour faire une autre installation.
+Are you sure you want to stop the installation?	InstallerWindow		Voulez-vous vraiment interrompre l’installation ?
 README	InstallerApp		LISEZ-MOI
 Quit	InstallerWindow		Quitter
 Write boot sector to '%s'	InstallerWindow		Écrire le secteur d’amorce sur « %s »
@@ -48,6 +49,7 @@ IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		INFORMATIONS IMP
 Additional disk space required: %s	InstallerWindow		Espace disque requis supplémentaire : %s
 Stop	InstallerWindow	In alert after pressing Stop	Arrêt
 Boot sector successfully written.	InstallProgress		Écriture du secteur d’amorce réussie.
+Writing bootsector.	InstallProgress		Écriture du secteur d’amorce.
 An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Une erreur a empêché l’installation de se terminer :\n\nErreur : %s
 Restart	InstallerWindow		Redémarrer
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Impossible de monter ce disque. Veuillez en choisir un autre.
@@ -62,6 +64,7 @@ Cancel	InstallerWindow		Annuler
 Continue	InstallerWindow	In alert after pressing Stop	Continuer
 Scanning for disks…	InstallerWindow		Recherche des disques…
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Le Gestionnaire de Disques est lancé…\n\nFermer le Gestionnaire de Disques pour continuer l’installation.
+The installation is not complete yet!\nAre you sure you want to stop it?	InstallerWindow		L’installation n’est pas encore achevée !\nÊtes-vous sûr de vouloir l’interrompre ?
 The partition can't be mounted. Please choose a different partition.	InstallProgress		Impossible de monter la partition. Veuillez en choisir une autre.
 Set up partitions…	InstallerWindow		Ajuster les partitions…
 Install progress:  	InstallerWindow		Avancement de l’installation :  

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Keymap	1075970008
+1	german	x-vnd.Haiku-Keymap	2700190052
 Key	Modifier keys window	As in a computer keyboard key	Taste
 Japanese	KeymapNames		Japanisch
 US	KeymapNames		US
@@ -89,6 +89,7 @@ Esperanto	KeymapNames		Esperanto
 Belarusian	KeymapNames		Weißrussisch
 Warning: left and right key roles do not match	Modifier keys window		Achtung: linke und rechte Tasten-Funktion passen nicht zusammen
 Circumflex trigger	Keymap window		^ Zirkumflex
+Fizzbook NL2	KeyboardLayoutNames		Fizzbook NL2
 Caps lock	Keyboard Layout View		Shift-Feststelltaste
 Left shift	Keyboard Layout View		Shift links
 Russian (Yawert)	KeymapNames		Russisch (Yawert)

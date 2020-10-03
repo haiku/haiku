@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Keymap	1075970008
+1	catalan; valencian	x-vnd.Haiku-Keymap	2700190052
 Key	Modifier keys window	As in a computer keyboard key	Tecla
 Japanese	KeymapNames		Japonès
 US	KeymapNames		EUA
@@ -89,6 +89,7 @@ Esperanto	KeymapNames		Esperanto
 Belarusian	KeymapNames		Bielorús
 Warning: left and right key roles do not match	Modifier keys window		Avís: les funcions de la tecla esquerra i dreta no coincideixen.
 Circumflex trigger	Keymap window		Accent circumflex
+Fizzbook NL2	KeyboardLayoutNames		Fizzbook NL2
 Caps lock	Keyboard Layout View		Bloqueig de majúscules
 Left shift	Keyboard Layout View		Maj. de l'esquerra
 Russian (Yawert)	KeymapNames		Rus (Yawert)

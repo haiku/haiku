@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Installer	737606382
+1	japanese	x-vnd.Haiku-Installer	3982017613
 Performing installation.	InstallProgress		インストールを実行しています。
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		メニューからインストールディスクを選択し、次に\"開始\"ボタンをクリックしてください。
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		インストーラーを閉じる前に、DriveSetup を終了してください。
@@ -64,6 +64,7 @@ Cancel	InstallerWindow		中止
 Continue	InstallerWindow	In alert after pressing Stop	続ける
 Scanning for disks…	InstallerWindow		ディスクを検出しています…
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		DriveSetupは実行中です。\n\nDriveSetupを終了させてからインストールを続行してください。
+The installation is not complete yet!\nAre you sure you want to stop it?	InstallerWindow		インストールがまだ完了していません!\n本当に中止しますか?
 The partition can't be mounted. Please choose a different partition.	InstallProgress		このパーティションをマウントできません。他のパーティションを選択してください。
 Set up partitions…	InstallerWindow		パーティションを設定…
 Install progress:  	InstallerWindow		進行状況:

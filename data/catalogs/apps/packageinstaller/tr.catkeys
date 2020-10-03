@@ -53,7 +53,7 @@ Continue	PackageInfo		Sürdür
 No package selected.	PackageInfo		Hiçbir paket seçilmedi.
 Error! \"%s\" is not a valid path.\n	Packageinstaller main		Hata! \"%s\" geçerli bir yol değil.\n
 The directory named '%s' already exists in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Verilen yolda '%s' adlı dizin zaten var.\nBu dizin paketteki ile değiştirilsin mi?
-LegacyPackageInstaller	System name		Eski Paket Yükleyicisi
+LegacyPackageInstaller	System name		Eski Paket Yükleyici
 Ask again	PackageView		Yeniden sor
 Begin	PackageView		Başla
 OK	PackageView		Tamam

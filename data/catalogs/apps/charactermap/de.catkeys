@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-CharacterMap	2398786418
+1	german	x-vnd.Haiku-CharacterMap	2040422106
 Tirhuta	UnicodeBlocks		Tirhuta
 Miscellaneous mathematical symbols B	UnicodeBlocks		Diverse mathematische Symbole B
 Latin extended E	UnicodeBlocks		Lateinisch (Erweiterung E)
@@ -237,6 +237,7 @@ Supplementary private use area A	UnicodeBlocks		Ergänzender privater Bereich A
 Armenian	UnicodeBlocks		Armenisch
 Miscellaneous symbols and pictographs	UnicodeBlocks		Diverse Symbole und Piktogramme
 Phags-pa	UnicodeBlocks		Phags-pa
+Nabataean	UnicodeBlocks		Nabatäisch
 Meetei Mayek	UnicodeBlocks		Meetei Mayek
 CJK compatibility ideographs	UnicodeBlocks		CJK: Kompatibilitätsideogramme
 Show private blocks	CharacterWindow		Private Blöcke zeigen
@@ -288,6 +289,7 @@ Elbasan	UnicodeBlocks		Elbasisch
 Hangul compatibility Jamo	UnicodeBlocks		Hangul Kompatiblität Jamo
 Phonetic extensions supplement	UnicodeBlocks		Phonetische Erweiterungen (Ergänzung)
 CJK unified ideographs extension E	UnicodeBlocks		CJK: Vereinheitlichte Ideogramme (Erweiterung E)
+Nüshu	UnicodeBlocks		Nüshu
 Old Persian	UnicodeBlocks		Alt-Persisch
 Malayalam	UnicodeBlocks		Malayalam
 CJK radicals supplement	UnicodeBlocks		CJK: Wortstämme (Ergänzung)

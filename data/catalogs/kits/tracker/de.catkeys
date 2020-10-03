@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	2608808066
+1	german	x-vnd.Haiku-libtracker	1437654670
 Created	ContainerWindow		Erstellt
 Icon	AttributesView		Icon
 Open and make preferred	OpenWithWindow		Öffnen und zur Bevorzugten machen
@@ -267,6 +267,7 @@ home	B_USER_DIRECTORY		Home
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Tracker Neue Vorlagen
 Disk mounting during boot	AutoMounterSettings		Einhängen beim Systemstart
 Don't automount	AutoMounterSettings		Nicht automatisch einhängen
+Node ref	AttributesView		Node ref
 Could not find application \"%appname\"	OpenWithWindow		Die Anwendung \"%appname\" wurde nicht gefunden.
 Unmatched parenthesis.	libtracker		Öffnende Klammer ohne schließende Klammer.
 Extended attribute	AttributesView		Erweitertes Attribut
@@ -515,6 +516,7 @@ Create a Query	FindPanel		Query erstellen
 Close	QueryContainerWindow		Schließen
 I know what I'm doing	FSUtils	button label	Ich bin sicher
 Preparing to copy items…	StatusWindow		Kopieren wird vorbereitet…
+Entry ref	AttributesView		Entry ref
 Icon view	ContainerWindow		Icon-Ansicht
 Name	ContainerWindow		Name
 Preferred for %type	OpenWithWindow		Bevorzugt für %type

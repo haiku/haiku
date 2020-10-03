@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Installer	2358770775
+1	catalan; valencian	x-vnd.Haiku-Installer	3982017613
 Performing installation.	InstallProgress		Es fa la instal·lació.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Trieu el disc d'origen des del menú emergent. Llavors cliqueu a Comença.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Si us plau, tanqueu la finestra del Gestor de discs abans de tancar la finestra de l'instal·lador.
@@ -14,6 +14,7 @@ Unknown Type	InstallProgress	Partition content type	Tipus desconegut
 Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Premeu el botó Comença per instal·lar des de %1s a %2s.
 Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Trieu el disc on voleu fer la instal·lació des del menú emergent. Llavors cliqueu a Comença.
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		S'ha acabat la instal·lació. El sector d'arrencada s'ha desat a %s. Premeu Surt per abandonar l'instal·lador o trieu un altre volum per fer una altra instal·lació.
+Are you sure you want to stop the installation?	InstallerWindow		Segur que voleu interrompre la instal·lació?
 README	InstallerApp		LLEGEIX-ME
 Quit	InstallerWindow		Surt
 Write boot sector to '%s'	InstallerWindow		Escriu el sector d'arrencada a %s
@@ -63,6 +64,7 @@ Cancel	InstallerWindow		Cancel·la
 Continue	InstallerWindow	In alert after pressing Stop	Continua
 Scanning for disks…	InstallerWindow		Se cerquen els discs...
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		S'executa el Gestor de discs…\n\nPer tal de continuar la instal·lació heu de tancar el Gestor de discs.
+The installation is not complete yet!\nAre you sure you want to stop it?	InstallerWindow		La instal·lació encara no s'ha completat!\nSegur la que voleu interrompre?
 The partition can't be mounted. Please choose a different partition.	InstallProgress		No es pot muntar la partició. Si us plau, trieu-ne una altra.
 Set up partitions…	InstallerWindow		Configura les particions...
 Install progress:  	InstallerWindow		Progrés de la instal·lació:  

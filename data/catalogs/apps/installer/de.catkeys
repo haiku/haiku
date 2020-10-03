@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Installer	737606382
+1	german	x-vnd.Haiku-Installer	3982017613
 Performing installation.	InstallProgress		Installation läuft.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Bitte Quelllaufwerk aus dem Menü wählen. Danach auf \"Start\" klicken.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Das DriveSetup-Fenster muss geschlossen werden, bevor der Installer verlassen werden kann.
@@ -64,6 +64,7 @@ Cancel	InstallerWindow		Abbrechen
 Continue	InstallerWindow	In alert after pressing Stop	Fortsetzen
 Scanning for disks…	InstallerWindow		Es wird nach Laufwerken gesucht…
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		DriveSetup läuft…\n\nDriveSetup schließen, um mit der Installation fortzufahren.
+The installation is not complete yet!\nAre you sure you want to stop it?	InstallerWindow		Die Installation läuft noch!\nSoll die Installation tatsächlich abgebrochen werden?
 The partition can't be mounted. Please choose a different partition.	InstallProgress		Die Partition konnte nicht eingehangen werden. Bitte eine andere Partition auswählen.
 Set up partitions…	InstallerWindow		Partitionen einrichten…
 Install progress:  	InstallerWindow		Installationsverlauf: 
