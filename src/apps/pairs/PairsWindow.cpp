@@ -100,13 +100,13 @@ PairsWindow::_MakeMenuBar()
 	difficultyMessage = new BMessage(MENU_DIFFICULTY);
 	difficultyMessage->AddInt32("rows", 6);
 	difficultyMessage->AddInt32("cols", 6);
-	newMenu->AddItem(new BMenuItem(
-		B_TRANSLATE("Intermediate (6x6)"), difficultyMessage));
+	newMenu->AddItem(new BMenuItem(B_TRANSLATE("Intermediate (6x6)"),
+		difficultyMessage));
 
 	difficultyMessage = new BMessage(MENU_DIFFICULTY);
 	difficultyMessage->AddInt32("rows", 8);
 	difficultyMessage->AddInt32("cols", 8);
-	newMenu->AddItem(menuItem = new BMenuItem(B_TRANSLATE("Expert (8x8)"),
+	newMenu->AddItem(new BMenuItem(B_TRANSLATE("Expert (8x8)"),
 		difficultyMessage));
 
 	menuItem = new BMenuItem(newMenu, new BMessage(MENU_NEW));
