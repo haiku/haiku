@@ -54,7 +54,7 @@ struct AttributeName {
 				typeString[3] = typeBytes[3];
 				typeString[4] = '\0';
 			} else
-				sprintf(typeString, "%08lx", type);
+				sprintf(typeString, "%08" B_PRIx32 , type);
 
 			snprintf(name, sizeof(name), "%s%s#%s", kXattrNamespace,
 				haikuName, typeString);
