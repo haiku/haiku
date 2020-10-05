@@ -1115,12 +1115,14 @@ get_mouse_bitmap(BBitmap** bitmap, BPoint* hotspot)
 	uint32 size = 0;
 	uint32 cursorWidth = 0;
 	uint32 cursorHeight = 0;
+	color_space colorspace = B_RGBA32;
 
 	// if link.Read() returns an error, the same error will be returned on
 	// subsequent calls, so we'll check only the return value of the last call
 	link.Read<uint32>(&size);
 	link.Read<uint32>(&cursorWidth);
 	link.Read<uint32>(&cursorHeight);
+	link.Read<color_space>(&colorspace);
 	if (hotspot == NULL) {
 		BPoint dummy;
 		link.Read<BPoint>(&dummy);
@@ -1140,7 +1142,7 @@ get_mouse_bitmap(BBitmap** bitmap, BPoint* hotspot)
 	}
 
 	BBitmap* cursorBitmap = new (std::nothrow) BBitmap(BRect(0, 0,
-		cursorWidth - 1, cursorHeight - 1), B_RGBA32);
+		cursorWidth - 1, cursorHeight - 1), colorspace);
 
 	if (cursorBitmap == NULL) {
 		free(data);
@@ -1148,7 +1150,7 @@ get_mouse_bitmap(BBitmap** bitmap, BPoint* hotspot)
 	}
 	status = cursorBitmap->InitCheck();
 	if (status == B_OK)
-		cursorBitmap->SetBits(data, size, 0, B_RGBA32);
+		cursorBitmap->SetBits(data, size, 0, colorspace);
 
 	free(data);
 

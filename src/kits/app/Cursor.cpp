@@ -15,7 +15,9 @@
 			to see a nice shadowes one, we will need to extend this one.
  */
 
+
 #include <AppDefs.h>
+#include <Bitmap.h>
 #include <Cursor.h>
 
 #include <AppServerLink.h>
@@ -86,9 +88,51 @@ BCursor::BCursor(BMessage *data)
 }
 
 
+BCursor::BCursor(const BBitmap* bitmap, const BPoint& hotspot)
+	:
+	fServerToken(-1),
+	fNeedToFree(false)
+{
+	if (bitmap == NULL)
+		return;
+
+	int32 size = bitmap->BitsLength();
+	BRect bounds = bitmap->Bounds();
+	color_space colorspace = bitmap->ColorSpace();
+	void* bits = bitmap->Bits();
+	if (bits == NULL || size <= 0)
+		return;
+
+	// Send data directly to server
+	BPrivate::AppServerLink link;
+	link.StartMessage(AS_CREATE_CURSOR_BITMAP);
+	link.Attach<int32>(size);
+	link.Attach<BRect>(bounds);
+	link.Attach<color_space>(colorspace);
+	link.Attach<BPoint>(hotspot);
+	link.Attach(bits, size);
+
+	status_t status;
+	if (link.FlushWithReply(status) == B_OK) {
+		if (status == B_OK) {
+			link.Read<int32>(&fServerToken);
+			fNeedToFree = true;
+		} else
+			fServerToken = status;
+	}
+}
+
+
 BCursor::~BCursor()
 {
 	_FreeCursorData();
+}
+
+
+status_t
+BCursor::InitCheck() const
+{
+	return fServerToken >= 0 ? B_OK : fServerToken;
 }
 
 

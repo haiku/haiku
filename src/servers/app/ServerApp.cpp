@@ -1235,6 +1235,49 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			break;
 		}
 
+		case AS_CREATE_CURSOR_BITMAP:
+		{
+			STRACE(("ServerApp %s: Create Cursor bitmap\n", Signature()));
+
+			status_t status = B_ERROR;
+
+			int32 size = 0;
+			BRect cursorRect;
+			color_space colorspace = B_RGBA32;
+			BPoint hotspot;
+			ServerCursor* cursor = NULL;
+
+			if (link.Read<int32>(&size) == B_OK
+				&& link.Read<BRect>(&cursorRect) == B_OK
+				&& link.Read<color_space>(&colorspace) == B_OK
+				&& link.Read<BPoint>(&hotspot) == B_OK
+				&& size > 0) {
+
+				BStackOrHeapArray<uint8, 256> byteArray(size);
+				if (!byteArray.IsValid()) {
+					status = B_NO_MEMORY;
+				} else if (link.Read(byteArray, size) == B_OK) {
+					cursor = fDesktop->GetCursorManager().CreateCursor(
+						fClientTeam, cursorRect, colorspace, 0, hotspot);
+					if (cursor == NULL)
+						status = B_NO_MEMORY;
+					else
+						memcpy(cursor->Bits(), byteArray, size);
+				}
+			}
+
+			if (cursor != NULL) {
+				// Synchronous message - BApplication is waiting on the
+				// cursor's ID
+				fLink.StartMessage(B_OK);
+				fLink.Attach<int32>(cursor->Token());
+			} else
+				fLink.StartMessage(status);
+
+			fLink.Flush();
+			break;
+		}
+
 		case AS_REFERENCE_CURSOR:
 		{
 			STRACE(("ServerApp %s: Reference BCursor\n", Signature()));
@@ -1320,6 +1363,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				fLink.Attach<uint32>(size);
 				fLink.Attach<uint32>(cursor->Width());
 				fLink.Attach<uint32>(cursor->Height());
+				fLink.Attach<color_space>(cursor->ColorSpace());
 				fLink.Attach<BPoint>(cursor->GetHotSpot());
 				fLink.Attach(cursor->Bits(), size);
 			} else

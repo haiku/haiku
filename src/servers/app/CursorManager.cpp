@@ -128,6 +128,29 @@ CursorManager::CreateCursor(team_id clientTeam, const uint8* cursorData)
 }
 
 
+ServerCursor*
+CursorManager::CreateCursor(team_id clientTeam, BRect r, color_space format,
+	int32 flags, BPoint hotspot, int32 bytesPerRow)
+{
+	if (!Lock())
+		return NULL;
+
+	ServerCursor* cursor = new (std::nothrow) ServerCursor(r, format, flags,
+		hotspot, bytesPerRow);
+	if (cursor != NULL) {
+		cursor->SetOwningTeam(clientTeam);
+		if (AddCursor(cursor) < B_OK) {
+			delete cursor;
+			cursor = NULL;
+		}
+	}
+
+	Unlock();
+
+	return cursor;
+}
+
+
 /*!	\brief Registers a cursor with the manager.
 	\param cursor ServerCursor object to register
 	\return The token assigned to the cursor or B_ERROR if cursor is NULL

@@ -6,8 +6,8 @@
  *		John Scipione, jscipione@gmail.com
  * 
  * Corresponds to:
- *		headers/os/app/Cursor.h	 hrev47355
- *		src/kits/app/Cursor.cpp	 hrev47355
+ *		headers/os/app/Cursor.h	 hrev54621
+ *		src/kits/app/Cursor.cpp	 hrev54621
  */
 
 
@@ -316,10 +316,33 @@
 
 
 /*!
+	\fn BCursor::BCursor(const BBitmap* bitmap, const BPoint& hotspot)
+	\brief Initializes a new cursor object from a bitmap object and a point
+           object.
+
+	\param bitmap The bitmap object to initialize from.
+	\param hotspot The cursor hotspot.
+
+	\since Haiku R1
+*/
+
+
+/*!
 	\fn BCursor::~BCursor()
 	\brief Destroy the cursor and free its memory.
 
 	\since BeOS R5
+*/
+
+
+/*!
+	\fn status_t BCursor::InitCheck() const
+	\brief Returns the initialization status.
+
+	\return \c B_OK if the object was properly initialized or an error code
+	        otherwise.
+
+	\since Haiku R1
 */
 
 

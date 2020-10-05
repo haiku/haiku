@@ -50,7 +50,11 @@ public:
 								BCursor(const BCursor& other);
 								BCursor(BCursorID id);
 								BCursor(BMessage* data);
+								BCursor(const BBitmap* bitmap,
+									const BPoint& hotspot);
 	virtual	~BCursor();
+
+			status_t			InitCheck() const;
 
 	virtual	status_t			Archive(BMessage* archive,
 									bool deep = true) const;
