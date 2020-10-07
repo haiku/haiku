@@ -278,9 +278,9 @@ main(int argc, char** argv)
 			else
 				name = info.args;
 
-			printf("%ld/%s\n", stat.owner, name);
+			printf("%" B_PRId32 "/%s\n", stat.owner, name);
 		} else
-			printf("%ld\n", stat.owner);
+			printf("%" B_PRId32 "\n", stat.owner);
 	}
 
 	return 0;
