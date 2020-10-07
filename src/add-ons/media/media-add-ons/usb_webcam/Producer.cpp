@@ -913,17 +913,18 @@ VideoProducer::FrameGenerator()
 						((fFrame - fFrameBase) *
 						(1000000 / fConnectedFormat.field_rate)) -
 				fProcessingLatency;
-PRINT(("PS: %Ld\n", fProcessingLatency));
+		PRINT(("PS: %" B_PRIdBIGTIME "\n", fProcessingLatency));
 
 		/* Drop frame if it's at least a frame late */
 		if (wait_until < system_time())
 			continue;
 
-		PRINTF(1, ("FrameGenerator: wait until %Ld, %ctimed out, %crunning, %cenabled.\n",
-					wait_until,
-					(err == B_OK)?'!':' ',
-					(fRunning)?' ':'!',
-					(fEnabled)?' ':'!'));
+		PRINTF(1, ("FrameGenerator: wait until %" B_PRIdBIGTIME ", "
+			"%ctimed out, %crunning, %cenabled.\n",
+			wait_until,
+			(err == B_OK)?'!':' ',
+			(fRunning)?' ':'!',
+			(fEnabled)?' ':'!'));
 
 		/* If the semaphore was acquired successfully, it means something
 		 * changed the timing information (see VideoProducer::Connect()) and

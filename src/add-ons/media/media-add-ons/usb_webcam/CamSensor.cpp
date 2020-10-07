@@ -134,7 +134,7 @@ CamSensor::ProbeByIICSignature(const uint8 *regList, const uint8 *matchList,
 		uint8 value = 0;
 		ssize_t len;
 		len = Device()->ReadIIC8(regList[i], &value);
-		PRINT((CH ": ReadIIC8 = %d val = %d" CT, len, value));
+		PRINT((CH ": ReadIIC8 = %" B_PRIdSSIZE " val = %d" CT, len, value));
 		if (len < 1)
 			return ENODEV;
 		if (value != matchList[i])

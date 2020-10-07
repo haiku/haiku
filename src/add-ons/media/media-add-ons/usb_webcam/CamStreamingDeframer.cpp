@@ -48,7 +48,8 @@ CamStreamingDeframer::Write(const void *buffer, size_t size)
 		if (fFrames.CountItems() < MAXFRAMEBUF)
 			fCurrentFrame = AllocFrame();
 		else {
-			PRINT((CH "DROPPED %d bytes! (too many queued frames)" CT, size));
+			PRINT((CH "DROPPED %" B_PRIuSIZE " bytes! "
+				"(too many queued frames)" CT, size));
 			return size; // drop XXX
 		}
 	}
@@ -130,7 +131,8 @@ CamStreamingDeframer::Write(const void *buffer, size_t size)
 			PRINT((CH ": EOF? %02x [%02x %02x %02x %02x] %02x" CT, buf[i-1], buf[i], buf[i+1], buf[i+2], buf[i+3], buf[i+4]));
 			while ((j = FindEOF(buf + i, bufsize - i, &which)) > -1) {
 				i += j;
-				PRINT((CH "| EOF[%d] at offset %d; pos %Ld" CT, which, i, fCurrentFrame->Position()));
+				PRINT((CH "| EOF[%d] at offset %d; pos %" B_PRIdOFF CT,
+					which, i, fCurrentFrame->Position()));
 				if (fCurrentFrame->Position()+i >= fMaxFrameSize) {
 					// too big: discard
 					//i = -1;
@@ -163,7 +165,9 @@ CamStreamingDeframer::Write(const void *buffer, size_t size)
 		}
 		if (detach) {
 			BAutolock f(fLocker);
-			PRINT((CH ": Detaching a frame (%d bytes, end = %d, )" CT, (size_t)fCurrentFrame->Position(), end));
+			PRINT((CH ": Detaching a frame "
+				"(%" B_PRIuSIZE " bytes, end = %d, )" CT,
+				(size_t)fCurrentFrame->Position(), end));
 			fCurrentFrame->Seek(0LL, SEEK_SET);
 			if (discard) {
 				delete fCurrentFrame;

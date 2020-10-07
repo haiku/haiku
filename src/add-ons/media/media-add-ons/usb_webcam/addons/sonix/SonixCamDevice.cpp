@@ -289,10 +289,11 @@ SonixCamDevice::PowerOnSensor(bool on)
 ssize_t
 SonixCamDevice::WriteReg(uint16 address, uint8 *data, size_t count)
 {
-	PRINT((CH "(%u, @%p, %u)" CT, address, data, count));
+	PRINT((CH "(%u, @%p, %" B_PRIuSIZE ")" CT, address, data, count));
 	status_t err;
 	if (address + count > SN9C102_REG_COUNT) {
-		PRINT((CH ": Invalid register range [%u;%u]" CT, address, address+count));
+		PRINT((CH ": Invalid register range [%u;%" B_PRIuSIZE "]" CT, address,
+			address + count));
 		return EINVAL;
 	}
 	memcpy(&fCachedRegs[address], data, count);
@@ -306,10 +307,12 @@ SonixCamDevice::WriteReg(uint16 address, uint8 *data, size_t count)
 ssize_t
 SonixCamDevice::ReadReg(uint16 address, uint8 *data, size_t count, bool cached)
 {
-	PRINT((CH "(%u, @%p, %u, %d)" CT, address, data, count, cached));
+	PRINT((CH "(%u, @%p, %" B_PRIuSIZE ", %d)" CT, address, data, count,
+		cached));
 	status_t err;
 	if (address + count > SN9C102_REG_COUNT) {
-		PRINT((CH ": Invalid register range [%u;%u]" CT, address, address+count));
+		PRINT((CH ": Invalid register range [%u;%" B_PRIuSIZE "]" CT, address,
+			address + count));
 		return EINVAL;
 	}
 	if (cached) {
@@ -361,7 +364,7 @@ SonixCamDevice::WriteIIC(uint8 address, uint8 *data, size_t count)
 {
 	status_t err;
 	uint8 buffer[8];
-	PRINT((CH "(%u, @%p, %u)" CT, address, data, count));
+	PRINT((CH "(%u, @%p, %" B_PRIuSIZE ")" CT, address, data, count));
 
 	if (!Sensor())
 		return B_NO_INIT;
@@ -655,7 +658,7 @@ SonixCamDevice::ValidateStartOfFrameTag(const uint8 *tag, size_t taglen)
 	// SOF come with an 00, 40, 80, C0 sequence,
 	// supposedly corresponding with an equal byte in the end tag
 	fFrameTagState = tag[7] & 0xC0;
-	PRINT((CH "(, %d) state %x" CT, taglen, fFrameTagState));
+	PRINT((CH "(, %" B_PRIuSIZE ") state %x" CT, taglen, fFrameTagState));
 
 	// which seems to be the same as of the EOF tag
 	return true;
@@ -696,7 +699,7 @@ SonixCamDevice::GetFrameBitmap(BBitmap **bm, bigtime_t *stamp /* = NULL */)
 	long int w = (long)(VideoFrame().right - VideoFrame().left + 1);
 	long int h = (long)(VideoFrame().bottom - VideoFrame().top + 1);
 	b = new BBitmap(VideoFrame().OffsetToSelf(0,0), 0, B_RGB32, w*4);
-	PRINT((CH ": Frame: %dx%d" CT, w, h));
+	PRINT((CH ": Frame: %ldx%ld" CT, w, h));
 
 	bayer2rgb24((unsigned char *)b->Bits(), (unsigned char *)f->Buffer(), w, h);
 
@@ -726,17 +729,20 @@ SonixCamDevice::FillFrameBuffer(BBuffer *buffer, bigtime_t *stamp)
 
 	long int w = (long)(VideoFrame().right - VideoFrame().left + 1);
 	long int h = (long)(VideoFrame().bottom - VideoFrame().top + 1);
-	PRINT((CH ": VideoFrame = %fx%f,%fx%f Frame: %dx%d" CT, VideoFrame().left, VideoFrame().top, VideoFrame().right, VideoFrame().bottom, w, h));
+	PRINT((CH ": VideoFrame = %fx%f,%fx%f Frame: %ldx%ld" CT,
+		VideoFrame().left, VideoFrame().top, VideoFrame().right,
+		VideoFrame().bottom, w, h));
 
 	if (buffer->SizeAvailable() >= (size_t)w*h*4)
 		bayer2rgb32le((unsigned char *)buffer->Data(), (unsigned char *)f->Buffer(), w, h);
 
 	delete f;
 
-	PRINT((CH ": available %d, required %d" CT, buffer->SizeAvailable(), w*h*4));
+	PRINT((CH ": available %" B_PRIuSIZE ", required %ld" CT,
+		buffer->SizeAvailable(), w*h*4));
 	if (buffer->SizeAvailable() < (size_t)w*h*4)
 		return E2BIG;
-	PRINT((CH ": got 1 frame (len %d)" CT, buffer->SizeUsed()));
+	PRINT((CH ": got 1 frame (len %" B_PRIuSIZE ")" CT, buffer->SizeUsed()));
 	return B_OK;
 }
 

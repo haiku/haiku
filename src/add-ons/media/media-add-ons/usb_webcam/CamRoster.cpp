@@ -53,7 +53,7 @@ CamRoster::DeviceAdded(BUSBDevice* _device)
 			fAddon->CameraAdded(cam);
 			return B_OK;
 		}
-		PRINT((CH " error 0x%08lx" CT, err));
+		PRINT((CH " error 0x%08" B_PRIx32 CT, err));
 	}
 	return B_ERROR;
 }
@@ -83,7 +83,7 @@ CamRoster::CountCameras()
 {
 	int32 count;
 	fLocker.Lock();
-	PRINT((CH "(): %ld cameras" CT, fCameras.CountItems()));
+	PRINT((CH "(): %" B_PRId32 " cameras" CT, fCameras.CountItems()));
 	count = fCameras.CountItems();
 	fLocker.Unlock();
 	return count;
@@ -157,7 +157,9 @@ CamRoster::LoadExternalAddons()
 //		if (sclass != B_SYMBOL_TYPE_TEXT)
 //			continue;
 		err = (*get_webcam_addon_func)(fAddon, &addon);
-		PRINT((CH ": Loaded addon '%s' with error 0x%08lx" CT, (err>0)?NULL:addon->BrandName(), err));
+		PRINT((CH ": Loaded addon '%s' with error 0x%08" B_PRIx32 CT,
+			(err > 0) ? NULL : addon->BrandName(),
+			err));
 	}
 	return B_OK;
 }

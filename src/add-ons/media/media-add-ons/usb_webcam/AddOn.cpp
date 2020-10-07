@@ -84,7 +84,7 @@ WebCamMediaAddOn::CountFlavors()
 status_t
 WebCamMediaAddOn::GetFlavorAt(int32 n, const flavor_info **out_info)
 {
-	PRINT((CH "(%d, ) roster %p is %lx" CT, n, fRoster, fInitStatus));
+	PRINT((CH "(%d, ) roster %p is %" B_PRIx32 CT, n, fRoster, fInitStatus));
 	int32 count;
 	CamDevice* cam;
 	if (!fRoster)
