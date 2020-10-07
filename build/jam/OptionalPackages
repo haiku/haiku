@@ -41,11 +41,10 @@ if [ IsOptionalHaikuImagePackageAdded BeBook ] {
 
 # BeOSCompatibility
 if [ IsOptionalHaikuImagePackageAdded BeOSCompatibility ] {
-	if $(TARGET_ARCH) != x86 {
+	if $(TARGET_ARCH) != x86
+			|| $(TARGET_CC_IS_LEGACY_GCC_$(TARGET_PACKAGING_ARCH)) != 1 {
 		Echo "No optional package BeOSCompatibility available for"
 			"$(TARGET_ARCH)" ;
-	} else if $(TARGET_GCC_VERSION_$(TARGET_PACKAGING_ARCH)[1]) >= 4 {
-		Echo "No optional package BeOSCompatibility available for gcc4" ;
 	} else {
 		Echo "Warning: Adding BeOS compatibility symlinks. This will go away."
 			"Please fix your apps!" ;

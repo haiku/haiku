@@ -7,18 +7,13 @@ rule ArchitectureSetup architecture
 	# architecture), if this is the first invocation of the rule, and adds
 	# the architecture to HAIKU_ARCHS, if not yet contained.
 
-	# analyze GCC version
-	local gccVersion
-		= [ FAnalyzeGCCVersion HAIKU_GCC_RAW_VERSION_$(architecture) ] ;
-	HAIKU_GCC_VERSION_$(architecture) = $(gccVersion) ;
-
 	# enable GCC -pipe option, if requested
 	local ccBaseFlags ;
 	if $(HAIKU_USE_GCC_PIPE) = 1 {
 		ccBaseFlags = -pipe ;
 	}
 
-	if $(gccVersion[1]) >= 3 {
+	if $(HAIKU_CC_IS_LEGACY_GCC_$(architecture)) != 1 {
 		# disable strict aliasing on anything newer than gcc 2 as it may lead to
 		# unexpected results.
 		# TODO: remove the -fno-strict-aliasing option when all code has been
@@ -122,7 +117,7 @@ rule ArchitectureSetup architecture
 
 	HAIKU_WERROR_FLAGS_$(architecture) = ;
 
-	if $(gccVersion[1]) >= 4 {
+	if $(HAIKU_CC_IS_LEGACY_GCC_$(architecture)) != 1 {
 		# TODO: Remove all these.
 		HAIKU_WERROR_FLAGS_$(architecture) += -Wno-error=unused-but-set-variable
 			-Wno-error=deprecated -Wno-error=deprecated-declarations
@@ -149,7 +144,7 @@ rule ArchitectureSetup architecture
 	# TODO: Temporary work-around. Should be defined in the compiler specs
 	HAIKU_LINKFLAGS_$(architecture) += -Xlinker --no-undefined ;
 
-	if $(gccVersion[1]) < 3 {
+	if $(HAIKU_CC_IS_LEGACY_GCC_$(architecture)) = 1 {
 		HAIKU_DEFINES_$(architecture) += _BEOS_R5_COMPATIBLE_ ;
 	}
 
@@ -222,7 +217,6 @@ rule KernelArchitectureSetup architecture
 
 	HAIKU_KERNEL_ARCH = $(HAIKU_ARCH) ;
 
-	local gccVersion = $(HAIKU_GCC_VERSION_$(architecture)) ;
 	local cpu = $(HAIKU_CPU_$(architecture)) ;
 
 	switch $(cpu) {
@@ -352,8 +346,8 @@ rule KernelArchitectureSetup architecture
 	# C/C++ flags
 	local ccBaseFlags = -finline -fno-builtin ;
 
-	if $(gccVersion[1]) >= 4 {
-		if $(HAIKU_CC_IS_CLANG_$(architecture)) != 1 {
+	if $(HAIKU_CC_IS_LEGACY_GCC_$(architecture)) != 1 {
+		if ! $(HAIKU_CC_IS_CLANG_$(architecture)) {
 			# Clang does not yet understand this flag.
 			ccBaseFlags += -fno-semantic-interposition ;
 		}
@@ -363,7 +357,8 @@ rule KernelArchitectureSetup architecture
 
 	local c++BaseFlags = $(ccBaseFlags) -fno-exceptions ;
 
-	if $(gccVersion[1]) >= 3 && $(HAIKU_CC_IS_CLANG_$(architecture)) != 1 {
+	if $(HAIKU_CC_IS_LEGACY_GCC_$(architecture)) != 1
+			&& $(HAIKU_CC_IS_CLANG_$(architecture)) != 1 {
 		c++BaseFlags += -fno-use-cxa-atexit ;
 	}
 
@@ -501,7 +496,7 @@ rule KernelArchitectureSetup architecture
 				} else {
 					HAIKU_BOOT_$(bootTarget:U)_LDFLAGS += -m elf_i386_haiku ;
 				}
-				if $(gccVersion[1]) >= 3 {
+				if $(HAIKU_CC_IS_LEGACY_GCC_$(architecture)) != 1 {
 					HAIKU_BOOT_$(bootTarget:U)_CCFLAGS += -Wno-error=main -m32 ;
 					HAIKU_BOOT_$(bootTarget:U)_C++FLAGS += -Wno-error=main -m32 ;
 				}
@@ -514,7 +509,7 @@ rule KernelArchitectureSetup architecture
 				} else {
 					HAIKU_BOOT_$(bootTarget:U)_LDFLAGS += -m elf_i386_haiku ;
 				}
-				if $(gccVersion[1]) >= 3 {
+				if $(HAIKU_CC_IS_LEGACY_GCC_$(architecture)) != 1 {
 					HAIKU_BOOT_$(bootTarget:U)_CCFLAGS += -Wno-error=main -m32 ;
 					HAIKU_BOOT_$(bootTarget:U)_C++FLAGS += -Wno-error=main -m32 ;
 				}
@@ -606,8 +601,7 @@ rule ArchitectureSetupWarnings architecture
 	# Work-around for GCC 2 problem -- despite -Wno-multichar it reports
 	# multichar warnings in headers/private/kernel/debugger_keymaps.h included
 	# by src/system/kernel/arch/x86/arch_debug_console.cpp.
-	local gccVersion = $(HAIKU_GCC_VERSION_$(architecture)) ;
-	if $(gccVersion[1]) = 2 {
+	if $(HAIKU_CC_IS_LEGACY_GCC_$(architecture)) = 1 {
 		local file = <src!system!kernel!arch!x86>arch_debug_console.o ;
 		WARNINGS on $(file) = $(WARNINGS) ;
 	}

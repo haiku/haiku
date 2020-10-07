@@ -250,7 +250,7 @@ actions AtariBootPrgLd
 
 
 local extraSources = ;
-if $(TARGET_GCC_VERSION_$(TARGET_PACKAGING_ARCH)[1]) = 2 {
+if $(TARGET_CC_IS_LEGACY_GCC_$(TARGET_PACKAGING_ARCH)) = 1 {
 	extraSources += atomic.S ;
 }
 

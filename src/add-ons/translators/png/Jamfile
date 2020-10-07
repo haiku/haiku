@@ -4,7 +4,7 @@ SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
 AddResources PNGTranslator : PNGTranslator.rdef ;
 
-if $(TARGET_GCC_VERSION_$(TARGET_PACKAGING_ARCH)[1]) = 2 {
+if $(TARGET_CC_IS_LEGACY_GCC_$(TARGET_PACKAGING_ARCH)) = 1 {
 	SubDirCcFlags -DPNG_NO_PEDANTIC_WARNINGS ;
 }
 
@@ -17,7 +17,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		Includes [ FGristFiles PNGTranslator.cpp PNGView.cpp ]
 			: [ BuildFeatureAttribute libpng : headers ] ;
 
-		Translator [ MultiArchDefaultGristFiles PNGTranslator ] : 
+		Translator [ MultiArchDefaultGristFiles PNGTranslator ] :
 			PNGMain.cpp
 			PNGTranslator.cpp
 			PNGView.cpp

@@ -20,7 +20,7 @@ DEFINES += HAIKU_BUILD_COMPATIBILITY_H __STRICT_ANSI__ ;
 	defines = [ FDefines $(defines) ] ;
 
 	local c++flags = ;
-	if $(HOST_GCC_VERSION[1]) >= 3 {
+	if $(HOST_CC_IS_LEGACY_GCC) != 1 {
 		c++flags += -std=c++11 ;
 	}
 

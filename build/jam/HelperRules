@@ -208,40 +208,12 @@ rule SetPlatformCompatibilityFlagVariables
 		?= $($(varPrefix)_PLATFORM_HAIKU_COMPATIBLE) ;
 }
 
-rule FAnalyzeGCCVersion
-{
-	# FAnalyzeGCCVersion <rawVersionVariable> ;
-	#
-	local varName = $(1) ;
-	local rawVersion = $($(varName)) ;
-
-	if ! $(rawVersion) {
-		ECHO "Variable $(varName) not set. Please run ./configure or" ;
-		EXIT "specify it manually." ;
-	}
-
-	local version = ;
-	# split the raw version string at `.' and `-' characters
-	while $(rawVersion) {
-		local split = [ Match "([^.-]*)[.-](.*)" : $(rawVersion) ] ;
-		if $(split) {
-			version += $(split[1]) ;
-			rawVersion = $(split[2]) ;
-		} else {
-			version += $(rawVersion) ;
-			rawVersion = ;
-		}
-	}
-
-	return $(version) ;
-}
-
 rule SetIncludePropertiesVariables prefix : suffix
 {
 	# SetIncludePropertiesVariables <prefix> : <suffix> ;
 	#
 	suffix = $(suffix:E=) ;
-	if $($(prefix)_GCC_VERSION$(suffix)[1]) < 4 {
+	if $($(prefix)_CC_IS_LEGACY_GCC$(suffix)) {
 		$(prefix)_INCLUDES_SEPARATOR$(suffix) = -I- ;
 		$(prefix)_LOCAL_INCLUDES_OPTION$(suffix) = -I ;
 		$(prefix)_SYSTEM_INCLUDES_OPTION$(suffix) = -I ;

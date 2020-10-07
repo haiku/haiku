@@ -239,6 +239,19 @@ valid_toolchain()
 	return 1
 }
 
+# is_legacy_gcc
+#
+# Determines if the specified GCC version is a "legacy" (i.e. GCC < 4) one.
+#
+is_legacy_gcc()
+{
+	if [ `echo $1 | cut -d'.' -f1` -lt 4 ]; then
+		echo 1
+	else
+		echo 0
+	fi
+}
+
 # standard_gcc_settings
 #
 # Sets the variables for a GCC platform.
@@ -331,6 +344,8 @@ standard_gcc_settings()
 	set_variable HAIKU_CPU_$targetArch $targetCpu
 
 	get_build_tool_path CC_$targetArch "$gcc"
+	set_variable HAIKU_CC_IS_LEGACY_GCC_$targetArch \
+		`is_legacy_gcc $gccRawVersion`
 	set_variable HAIKU_CC_IS_CLANG_$targetArch $useClang
 	set_variable HAIKU_GCC_RAW_VERSION_$targetArch $gccRawVersion
 	set_variable HAIKU_GCC_MACHINE_$targetArch $gccMachine
@@ -608,6 +623,7 @@ fi
 # exported (BuildSetup) default parameter values
 #
 HOST_GCC_RAW_VERSION=`$CC -dumpversion`
+HOST_CC_IS_LEGACY_GCC=`is_legacy_gcc $HOST_GCC_RAW_VERSION`
 HOST_GCC_MACHINE=`$CC -dumpmachine`
 HAIKU_INCLUDE_SOURCES=0
 HAIKU_INCLUDE_3RDPARTY=0
@@ -1082,7 +1098,7 @@ HAIKU_HOST_BUILD_ONLY		?= "${HAIKU_HOST_BUILD_ONLY}" ;
 JAMSHELL					?= ${JAMSHELL} -c ;
 
 HOST_CC						?= ${CC} ;
-HOST_GCC_RAW_VERSION		?= ${HOST_GCC_RAW_VERSION} ;
+HOST_CC_IS_LEGACY_GCC		?= ${HOST_CC_IS_LEGACY_GCC} ;
 HOST_GCC_MACHINE			?= ${HOST_GCC_MACHINE} ;
 HOST_LD						?= ${HOST_GCC_LD} ;
 HOST_OBJCOPY				?= ${HOST_GCC_OBJCOPY} ;
@@ -1103,11 +1119,11 @@ EOF
 for targetArch in $HAIKU_PACKAGING_ARCHS; do
 	variables="
 		HAIKU_CC					HAIKU_CC
+		HAIKU_CC_IS_LEGACY_GCC		HAIKU_CC_IS_LEGACY_GCC
 		HAIKU_CC_IS_CLANG			HAIKU_CC_IS_CLANG
 		HAIKU_USE_GCC_GRAPHITE		HAIKU_USE_GCC_GRAPHITE
 		HAIKU_CPU					HAIKU_CPU
 		HAIKU_GCC_MACHINE			HAIKU_GCC_MACHINE
-		HAIKU_GCC_RAW_VERSION		HAIKU_GCC_RAW_VERSION
 		HAIKU_GCC_LIB_DIR			HAIKU_GCC_LIB_DIR
 		HAIKU_BOOT_LIBGCC			HAIKU_BOOT_LIBGCC
 		HAIKU_BOOT_LIBSUPC++		HAIKU_BOOT_LIBSUPCXX
