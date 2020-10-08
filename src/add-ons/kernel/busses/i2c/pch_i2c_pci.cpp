@@ -361,6 +361,20 @@ supports_device(device_node* parent)
 			case 0xa369:
 			case 0xa36a:
 			case 0xa36b:
+
+			case 0xa3e0:
+			case 0xa3e1:
+			case 0xa3e2:
+			case 0xa3e3:
+
+			case 0x43ad:
+			case 0x43ae:
+			case 0x43d8:
+
+			case 0x43e8:
+			case 0x43e9:
+			case 0x43ea:
+			case 0x43eb:
 				break;
 			default:
 				return 0.0f;
