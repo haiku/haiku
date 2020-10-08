@@ -838,14 +838,14 @@ INPUT                  = . \
                          support \
                          translation \
                          ../../headers/os/app \
-                         ../../headers/private/app \
+                         ../../headers/private/app/LaunchRoster.h \
                          ../../headers/os/device/Joystick.h \
                          ../../headers/os/drivers/fs_interface.h \
                          ../../headers/os/drivers/USB3.h \
                          ../../headers/os/drivers/USB_spec.h \
                          ../../headers/os/game \
                          ../../headers/os/interface \
-                         ../../headers/private/interface \
+                         ../../headers/private/interface/ToolTip.h \
                          ../../headers/os/locale \
                          ../../headers/os/mail \
                          ../../headers/os/media \

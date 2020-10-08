@@ -13,6 +13,9 @@
  */
 
 
+//! \cond INTERNAL
+
+
 /*!
 	\file ToolTip.h
 	\ingroup interface
@@ -149,3 +152,125 @@
 
 	\since Haiku R1
 */
+
+
+/*!
+	\fn virtual void BToolTip::AttachedToWindow()
+	\brief Undocumented public method
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual void BToolTip::DetachedFromWindow()
+	\brief Undocumented public method
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual BView* BToolTip::View() const =0
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\class BTextToolTip
+	\ingroup interface
+	\ingroup libbe
+	\brief Undocumented class.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BTextToolTip::BTextToolTip(BMessage *archive)
+	\brief Undocumented public method
+
+	\param archive Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BTextToolTip::BTextToolTip(const char *text)
+	\brief Undocumented public method
+
+	\param text Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual BTextToolTip::~BTextToolTip()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BTextToolTip::SetText(const char *text)
+	\brief Undocumented public method
+
+	\param text Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const char* BTextToolTip::Text() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual BView* BTextToolTip::View() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn static BTextToolTip* BTextToolTip::Instantiate(BMessage *archive)
+	\brief Undocumented public method
+
+	\param archive Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+//! \endcond INTERNAL
