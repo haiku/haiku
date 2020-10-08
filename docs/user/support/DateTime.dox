@@ -1,0 +1,1328 @@
+/*
+ * Copyright 2020 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Name, email@email.com
+ *
+ * Corresponds to:
+ *		headers/os/<kitname>/<filename>.h	 hrev*****
+ *		src/kits/<kitname>/<filename>.cpp	 hrev*****
+ */
+
+
+//! \cond INTERNAL
+
+
+/*!
+	\file DateTime.h
+	\ingroup support
+	\brief Undocumented file.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\enum BPrivate::time_type
+	\brief Undocumented enum
+*/
+
+
+/*!
+	\var time_type BPrivate::B_GMT_TIME
+	\brief Undocumented
+*/
+
+
+/*!
+	\var time_type BPrivate::B_LOCAL_TIME
+	\brief Undocumented
+*/
+
+
+/*!
+	\enum BPrivate::diff_type
+	\brief Undocumented enum
+*/
+
+
+/*!
+	\var diff_time BPrivate::B_HOURS_DIFF
+	\brief Undocumented
+*/
+
+
+/*!
+	\var diff_time BPrivate::B_MINUTES_DIFF
+	\brief Undocumented
+*/
+
+
+/*!
+	\var diff_time BPrivate::B_SECONDS_DIFF
+	\brief Undocumented
+*/
+
+
+/*!
+	\var diff_time BPrivate::B_MILLISECONDS_DIFF
+	\brief Undocumented
+*/
+
+
+/*!
+	\var diff_time BPrivate::B_MICROSECONDS_DIFF
+	\brief Undocumented
+*/
+
+
+/*!
+	\class BPrivate::BTime
+	\ingroup support
+	\ingroup libbe
+	\brief Undocumented class.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BPrivate::BTime::BTime()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BPrivate::BTime::BTime(const BMessage *archive)
+	\brief Undocumented public method
+
+	\param archive Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BPrivate::BTime::BTime(const BTime &other)
+	\brief Undocumented public method
+
+	\param other Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BPrivate::BTime::BTime(int32 hour, int32 minute, int32 second, int32 microsecond=0)
+	\brief Undocumented public method
+
+	\param hour Undocumented
+	\param minute Undocumented
+	\param second Undocumented
+	\param microsecond Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BPrivate::BTime::~BTime()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BTime& BPrivate::BTime::AddHours(int32 hours)
+	\brief Undocumented public method
+
+	\param hours Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BTime& BPrivate::BTime::AddMicroseconds(int32 microseconds)
+	\brief Undocumented public method
+
+	\param microseconds Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BTime& BPrivate::BTime::AddMilliseconds(int32 milliseconds)
+	\brief Undocumented public method
+
+	\param milliseconds Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BTime& BPrivate::BTime::AddMinutes(int32 minutes)
+	\brief Undocumented public method
+
+	\param minutes Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BTime& BPrivate::BTime::AddSeconds(int32 seconds)
+	\brief Undocumented public method
+
+	\param seconds Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BPrivate::BTime::Archive(BMessage *into) const
+	\brief Undocumented public method
+
+	\param into Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bigtime_t BPrivate::BTime::Difference(const BTime &time, diff_type type) const
+	\brief Undocumented public method
+
+	\param time Undocumented
+	\param type Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn int32 BPrivate::BTime::Hour() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BPrivate::BTime::IsValid() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn int32 BPrivate::BTime::Microsecond() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn int32 BPrivate::BTime::Millisecond() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn int32 BPrivate::BTime::Minute() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BPrivate::BTime::operator!=(const BTime &time) const
+	\brief Undocumented public method
+
+	\param time Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BPrivate::BTime::operator<(const BTime &time) const
+	\brief Undocumented public method
+
+	\param time Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BPrivate::BTime::operator<=(const BTime &time) const
+	\brief Undocumented public method
+
+	\param time Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BPrivate::BTime::operator==(const BTime &time) const
+	\brief Undocumented public method
+
+	\param time Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BPrivate::BTime::operator>(const BTime &time) const
+	\brief Undocumented public method
+
+	\param time Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BPrivate::BTime::operator>=(const BTime &time) const
+	\brief Undocumented public method
+
+	\param time Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn int32 BPrivate::BTime::Second() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BPrivate::BTime::SetTime(const BTime &time)
+	\brief Undocumented public method
+
+	\param time Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BPrivate::BTime::SetTime(int32 hour, int32 minute, int32 second, int32 microsecond=0)
+	\brief Undocumented public method
+
+	\param hour Undocumented
+	\param minute Undocumented
+	\param second Undocumented
+	\param microsecond Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BTime BPrivate::BTime::Time() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn static BTime BPrivate::BTime::CurrentTime(time_type type)
+	\brief Undocumented public method
+
+	\param type Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn static bool BPrivate::BTime::IsValid(const BTime &time)
+	\brief Undocumented public method
+
+	\param time Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn static bool BPrivate::BTime::IsValid(int32 hour, int32 minute, int32 second, int32 microsecond=0)
+	\brief Undocumented public method
+
+	\param hour Undocumented
+	\param minute Undocumented
+	\param second Undocumented
+	\param microsecond Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\class BPrivate::BDate
+	\ingroup support
+	\ingroup libbe
+	\brief Undocumented class.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BPrivate::BDate::BDate()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BPrivate::BDate::BDate(const BDate &other)
+	\brief Undocumented public method
+
+	\param other Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BPrivate::BDate::BDate(const BMessage *archive)
+	\brief Undocumented public method
+
+	\param archive Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BPrivate::BDate::BDate(int32 year, int32 month, int32 day)
+	\brief Undocumented public method
+
+	\param year Undocumented
+	\param month Undocumented
+	\param day Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BPrivate::BDate::BDate(time_t time, time_type type=B_LOCAL_TIME)
+	\brief Undocumented public method
+
+	\param time Undocumented
+	\param type Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BPrivate::BDate::~BDate()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BPrivate::BDate::AddDays(int32 days)
+	\brief Undocumented public method
+
+	\param days Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BPrivate::BDate::AddMonths(int32 months)
+	\brief Undocumented public method
+
+	\param months Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BPrivate::BDate::AddYears(int32 years)
+	\brief Undocumented public method
+
+	\param years Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BPrivate::BDate::Archive(BMessage *into) const
+	\brief Undocumented public method
+
+	\param into Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BDate BPrivate::BDate::Date() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn int32 BPrivate::BDate::DateToJulianDay() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn int32 BPrivate::BDate::Day() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn int32 BPrivate::BDate::DayOfWeek() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn int32 BPrivate::BDate::DayOfYear() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn int32 BPrivate::BDate::DaysInMonth() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn int32 BPrivate::BDate::DaysInYear() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn int32 BPrivate::BDate::Difference(const BDate &date) const
+	\brief Undocumented public method
+
+	\param date Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BPrivate::BDate::GetDate(int32 *year, int32 *month, int32 *day) const
+	\brief Undocumented public method
+
+	\param year Undocumented
+	\param month Undocumented
+	\param day Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BPrivate::BDate::IsLeapYear() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BPrivate::BDate::IsValid() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BString BPrivate::BDate::LongDayName() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BString BPrivate::BDate::LongMonthName() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn int32 BPrivate::BDate::Month() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BPrivate::BDate::operator!=(const BDate &date) const
+	\brief Undocumented public method
+
+	\param date Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BPrivate::BDate::operator<(const BDate &date) const
+	\brief Undocumented public method
+
+	\param date Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BPrivate::BDate::operator<=(const BDate &date) const
+	\brief Undocumented public method
+
+	\param date Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BPrivate::BDate::operator==(const BDate &date) const
+	\brief Undocumented public method
+
+	\param date Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BPrivate::BDate::operator>(const BDate &date) const
+	\brief Undocumented public method
+
+	\param date Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BPrivate::BDate::operator>=(const BDate &date) const
+	\brief Undocumented public method
+
+	\param date Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BPrivate::BDate::SetDate(const BDate &date)
+	\brief Undocumented public method
+
+	\param date Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BPrivate::BDate::SetDate(int32 year, int32 month, int32 day)
+	\brief Undocumented public method
+
+	\param year Undocumented
+	\param month Undocumented
+	\param day Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BPrivate::BDate::SetDay(int32 day)
+	\brief Undocumented public method
+
+	\param day Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BPrivate::BDate::SetMonth(int32 month)
+	\brief Undocumented public method
+
+	\param month Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BPrivate::BDate::SetYear(int32 year)
+	\brief Undocumented public method
+
+	\param year Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BString BPrivate::BDate::ShortDayName() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BString BPrivate::BDate::ShortMonthName() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn int32 BPrivate::BDate::WeekNumber() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn int32 BPrivate::BDate::Year() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn static BDate BPrivate::BDate::CurrentDate(time_type type)
+	\brief Undocumented public method
+
+	\param type Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn static bool BPrivate::BDate::IsLeapYear(int32 year)
+	\brief Undocumented public method
+
+	\param year Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn static bool BPrivate::BDate::IsValid(const BDate &date)
+	\brief Undocumented public method
+
+	\param date Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn static bool BPrivate::BDate::IsValid(int32 year, int32 month, int32 day)
+	\brief Undocumented public method
+
+	\param year Undocumented
+	\param month Undocumented
+	\param day Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn static BDate BPrivate::BDate::JulianDayToDate(int32 julianDay)
+	\brief Undocumented public method
+
+	\param julianDay Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn static BString BPrivate::BDate::LongDayName(int32 day)
+	\brief Undocumented public method
+
+	\param day Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn static BString BPrivate::BDate::LongMonthName(int32 month)
+	\brief Undocumented public method
+
+	\param month Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn static BString BPrivate::BDate::ShortDayName(int32 day)
+	\brief Undocumented public method
+
+	\param day Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn static BString BPrivate::BDate::ShortMonthName(int32 month)
+	\brief Undocumented public method
+
+	\param month Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\class BPrivate::BDateTime
+	\ingroup support
+	\ingroup libbe
+	\brief Undocumented class.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BPrivate::BDateTime::BDateTime()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BPrivate::BDateTime::BDateTime(const BDate &date, const BTime &time)
+	\brief Undocumented public method
+
+	\param date Undocumented
+	\param time Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BPrivate::BDateTime::BDateTime(const BMessage *archive)
+	\brief Undocumented public method
+
+	\param archive Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BPrivate::BDateTime::~BDateTime()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BPrivate::BDateTime::Archive(BMessage *into) const
+	\brief Undocumented public method
+
+	\param into Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BDate& BPrivate::BDateTime::Date()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BDate& BPrivate::BDateTime::Date() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BPrivate::BDateTime::IsValid() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BPrivate::BDateTime::operator!=(const BDateTime &dateTime) const
+	\brief Undocumented public method
+
+	\param dateTime Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BPrivate::BDateTime::operator<(const BDateTime &dateTime) const
+	\brief Undocumented public method
+
+	\param dateTime Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BPrivate::BDateTime::operator<=(const BDateTime &dateTime) const
+	\brief Undocumented public method
+
+	\param dateTime Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BPrivate::BDateTime::operator==(const BDateTime &dateTime) const
+	\brief Undocumented public method
+
+	\param dateTime Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BPrivate::BDateTime::operator>(const BDateTime &dateTime) const
+	\brief Undocumented public method
+
+	\param dateTime Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BPrivate::BDateTime::operator>=(const BDateTime &dateTime) const
+	\brief Undocumented public method
+
+	\param dateTime Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BPrivate::BDateTime::SetDate(const BDate &date)
+	\brief Undocumented public method
+
+	\param date Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BPrivate::BDateTime::SetDateTime(const BDate &date, const BTime &time)
+	\brief Undocumented public method
+
+	\param date Undocumented
+	\param time Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BPrivate::BDateTime::SetTime(const BTime &time)
+	\brief Undocumented public method
+
+	\param time Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BPrivate::BDateTime::SetTime_t(time_t seconds)
+	\brief Undocumented public method
+
+	\param seconds Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BTime& BPrivate::BDateTime::Time()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BTime& BPrivate::BDateTime::Time() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn time_t BPrivate::BDateTime::Time_t() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn static BDateTime BPrivate::BDateTime::CurrentDateTime(time_type type)
+	\brief Undocumented public method
+
+	\param type Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+//! \endcond INTERNAL

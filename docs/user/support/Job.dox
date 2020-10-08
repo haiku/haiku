@@ -1,0 +1,385 @@
+/*
+ * Copyright 2020 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Name, email@email.com
+ *
+ * Corresponds to:
+ *		headers/os/support/Job.h	 hrev49696
+ *		src/kits/support/Job.cpp	 hrev49696
+ */
+
+
+//! \cond INTERNAL
+
+
+/*!
+	\file Job.h
+	\ingroup support
+	\brief Undocumented file.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\struct BSupportKit::BJobStateListener
+	\ingroup support
+	\ingroup libbe
+	\brief Undocumented class.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual BSupportKit::BJobStateListener::~BJobStateListener()
+	\brief Undocumented destructor
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual void BSupportKit::BJobStateListener::JobAborted(BJob *job)
+	\brief Undocumented public method
+
+	\param job Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual void BSupportKit::BJobStateListener::JobFailed(BJob *job)
+	\brief Undocumented public method
+
+	\param job Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual void BSupportKit::BJobStateListener::JobProgress(BJob *job)
+	\brief Undocumented public method
+
+	\param job Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual void BSupportKit::BJobStateListener::JobStarted(BJob *job)
+	\brief Undocumented public method
+
+	\param job Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual void BSupportKit::BJobStateListener::JobSucceeded(BJob *job)
+	\brief Undocumented public method
+
+	\param job Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\enum BSupportKit::BJobState
+	\brief Undocumented enum
+*/
+
+
+/*!
+	\var BJobState BSupportKit::B_JOB_STATE_WAITING_TO_RUN
+	\brief Undocumented
+*/
+
+
+/*!
+	\var BJobState BSupportKit::B_JOB_STATE_STARTED
+	\brief Undocumented
+*/
+
+
+/*!
+	\var BJobState BSupportKit::B_JOB_STATE_IN_PROGRESS
+	\brief Undocumented
+*/
+
+
+/*!
+	\var BJobState BSupportKit::B_JOB_STATE_SUCCEEDED
+	\brief Undocumented
+*/
+
+
+
+/*!
+	\var BJobState BSupportKit::B_JOB_STATE_FAILED
+	\brief Undocumented
+*/
+
+
+/*!
+	\var BJobState BSupportKit::B_JOB_STATE_ABORTED
+	\brief Undocumented
+*/
+
+
+/*!
+	\class BSupportKit::BJob
+	\ingroup support
+	\ingroup libbe
+	\brief Undocumented class.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BSupportKit::BJob::BJob(const BString &title)
+	\brief Undocumented constructor
+
+	\param title Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual BSupportKit::BJob::~BJob()
+	\brief Undocumented destructor
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BSupportKit::BJob::AddDependency(BJob *job)
+	\brief Undocumented public method
+
+	\param job Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BSupportKit::BJob::AddStateListener(BJobStateListener *listener)
+	\brief Undocumented public method
+
+	\param listener Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn int32 BSupportKit::BJob::CountDependencies() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BJob* BSupportKit::BJob::DependantJobAt(int32 index) const
+	\brief Undocumented public method
+
+	\param index Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BString& BSupportKit::BJob::ErrorString() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BSupportKit::BJob::InitCheck() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BSupportKit::BJob::IsRunnable() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BSupportKit::BJob::RemoveDependency(BJob *job)
+	\brief Undocumented public method
+
+	\param job Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BSupportKit::BJob::RemoveStateListener(BJobStateListener *listener)
+	\brief Undocumented public method
+
+	\param listener Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BSupportKit::BJob::Result() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual status_t BSupportKit::BJob::Run()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BJobState BSupportKit::BJob::State() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn uint32 BSupportKit::BJob::TicketNumber() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BString& BSupportKit::BJob::Title() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual void BSupportKit::BJob::Cleanup(status_t jobResult)
+	\brief Undocumented protected method
+
+	\param jobResult Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual status_t BSupportKit::BJob::Execute()=0
+	\brief Undocumented protected method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BSupportKit::BJob::NotifyStateListeners()
+	\brief Undocumented protected method
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BSupportKit::BJob::SetErrorString(const BString &)
+	\brief Undocumented protected method
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BSupportKit::BJob::SetState(BJobState state)
+	\brief Undocumented protected method
+
+	\param state Undocumented
+
+	\since Haiku R1
+*/
+
+
+//! \endcond INTERNAL
