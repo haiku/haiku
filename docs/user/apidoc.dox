@@ -1,6 +1,6 @@
 /*
  * Copyright 2007 Niels Sascha Reedijk. All rights reserved.
- * Copyright 2008-2013 Haiku, Inc. All rights reserved.
+ * Copyright 2008-2013, 2020 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -184,6 +184,29 @@
 
 	\note This is only for the source files and for you as documenter. It will
 		not show up in the actual generated documentation!
+
+	\subsection formalrequirements_internal Internal documentation
+
+	It is possible that there is documentation for parts of the API that are
+	not (yet) part of the public API. It could either be that the documentation
+	is part of the public header file (usually hidden behind a namespace like
+	\c BPrivate), or it is part of a private header file.
+
+	In case you are in the situation where you need to store private API docs,
+	you should put the entirety of the documentation in a conditional block,
+	with the \c INTERNAL identifier. You open the block with the command
+	<tt>//! \\cond INTERNAL</tt> and end the block with the command
+	<tt>//! \\endcond INTERNAL</tt>.
+
+	There are two different cases where you must or could use these blocks:
+
+	1. For non-public API of a <em>public header file</em>, you must always
+		add the classes and other elements to the documentation (even if they)
+		are placeholders, and put them in the conditional block.
+	2. For parts of the non-public API that is in a <em>private header
+		file</em>, you could put the documentation in a conditional block. If
+		you choose to do so, you must document all elements in that header
+		file.
 
 	\section commands Doxygen Commands
 
