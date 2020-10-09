@@ -6,12 +6,12 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -51,14 +51,15 @@ using std::nothrow;
 
 // constructor
 BlockCache::BlockCache()
-	: fDevice(-1),
-	  fBlockSize(0),
-	  fBlockCount(0),
-	  fLock(),
-	  fBlocks(),
-	  fReads(0),
-	  fBlockGets(0),
-	  fBlockReleases(0)
+	:
+	fDevice(-1),
+	fBlockSize(0),
+	fBlockCount(0),
+	fLock(),
+	fBlocks(),
+	fReads(0),
+	fBlockGets(0),
+	fBlockReleases(0)
 {
 }
 
@@ -73,9 +74,9 @@ BlockCache::~BlockCache()
 		}
 		delete block;
 	}
-	PRINT(("statistics: %Ld block reads\n", fReads));
-	PRINT(("statistics: %Ld block gets\n", fBlockGets));
-	PRINT(("statistics: %Ld block releases\n", fBlockReleases));
+	PRINT(("statistics: %" B_PRId64 " block reads\n", fReads));
+	PRINT(("statistics: %" B_PRId64 " block gets\n", fBlockGets));
+	PRINT(("statistics: %" B_PRId64 " block releases\n", fBlockReleases));
 	if (fCacheHandle)
 		block_cache_delete(fCacheHandle, false);
 	fLock.Unlock();

@@ -57,9 +57,9 @@ public:
 	void Dump()
 	{
 		PRINT(("  dir entry\n"));
-		PRINT(("    offset:    %lu\n", GetOffset()));
-		PRINT(("    dir ID:    %lu\n", GetDirID()));
-		PRINT(("    object ID: %lu\n", GetObjectID()));
+		PRINT(("    offset:    %" B_PRIu32 "\n", GetOffset()));
+		PRINT(("    dir ID:    %" B_PRIu32 "\n", GetDirID()));
+		PRINT(("    object ID: %" B_PRIu32 "\n", GetObjectID()));
 		PRINT(("    location:  %hu\n", GetLocation()));
 		PRINT(("    state:     %hx\n", GetState()));
 	}
