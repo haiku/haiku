@@ -1,21 +1,7 @@
 /*
-	ProcessController © 2000, Georges-Edouard Berenger, All Rights Reserved.
-	Copyright (C) 2004 beunited.org 
-
-	This library is free software; you can redistribute it and/or 
-	modify it under the terms of the GNU Lesser General Public 
-	License as published by the Free Software Foundation; either 
-	version 2.1 of the License, or (at your option) any later version. 
-
-	This library is distributed in the hope that it will be useful, 
-	but WITHOUT ANY WARRANTY; without even the implied warranty of 
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-	Lesser General Public License for more details. 
-
-	You should have received a copy of the GNU Lesser General Public 
-	License along with this library; if not, write to the Free Software 
-	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA	
-*/
+ * Copyright 2000, Georges-Edouard Berenger. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "TeamBarMenu.h"
@@ -161,8 +147,8 @@ TeamBarMenu::Pulse()
 	if (item) {
 		RemoveItem(item);
 		delete item;
-	}		
-	
+	}
+
 	// Delete the items that haven't been recycled.
 	if (firstRecycle < lastRecycle)
 		RemoveItems(IndexOf(fRecycleList[firstRecycle].item), lastRecycle - firstRecycle, true);
@@ -180,7 +166,7 @@ TeamBarMenu::Pulse()
 			noiseItem->SetLost(0);
 		noiseItem->DrawBar(false);
 	}
-	
+
 	if (gCurrentThreadBarMenu && gCurrentThreadBarMenu->LockLooperWithTimeout(25000) == B_OK) {
 		gCurrentThreadBarMenu->Window()->BeginViewTransaction();
 		gCurrentThreadBarMenu->Update();
