@@ -347,7 +347,7 @@ rule KernelArchitectureSetup architecture
 	local ccBaseFlags = -finline -fno-builtin ;
 
 	if $(HAIKU_CC_IS_LEGACY_GCC_$(architecture)) != 1 {
-		if ! $(HAIKU_CC_IS_CLANG_$(architecture)) {
+		if $(HAIKU_CC_IS_CLANG_$(architecture)) != 1 {
 			# Clang does not yet understand this flag.
 			ccBaseFlags += -fno-semantic-interposition ;
 		}
