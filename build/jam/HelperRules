@@ -213,7 +213,7 @@ rule SetIncludePropertiesVariables prefix : suffix
 	# SetIncludePropertiesVariables <prefix> : <suffix> ;
 	#
 	suffix = $(suffix:E=) ;
-	if $($(prefix)_CC_IS_LEGACY_GCC$(suffix)) {
+	if $($(prefix)_CC_IS_LEGACY_GCC$(suffix)) = 1 {
 		$(prefix)_INCLUDES_SEPARATOR$(suffix) = -I- ;
 		$(prefix)_LOCAL_INCLUDES_OPTION$(suffix) = -I ;
 		$(prefix)_SYSTEM_INCLUDES_OPTION$(suffix) = -I ;
