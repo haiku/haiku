@@ -422,12 +422,12 @@ MultipleMouseSettings::AddMouseSettings(BString mouse_name)
 
 	MouseSettings* settings = new (std::nothrow) MouseSettings();
 
-	if(settings !=NULL) {
+	if(settings != NULL) {
 		fMouseSettingsObject.insert(std::pair<BString, MouseSettings*>
 			(mouse_name, settings));
 		return settings;
 	}
-	return B_OK;
+	return NULL;
 }
 
 
