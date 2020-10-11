@@ -6,10 +6,7 @@
 
 #include <stdint.h>
 
-//#include <x86intrin.h>
-#define _X86INTRIN_H_INCLUDED
-#include <ia32intrin.h>
-
+#include <x86intrin.h>
 
 
 static uint64_t cv_factor;
