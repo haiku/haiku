@@ -255,7 +255,7 @@
 
 	This method draws the tab, then draws the tab's title by calling
 	DrawLabel(). The \a position of the tab may affect how the tab is
-	rendered -- for example the first tab may have a differene appearance
+	rendered -- for example the first tab may have a different appearance
 	than the other tabs. You may override this method to draw tabs
 	differently in your BTab subclass.
 
