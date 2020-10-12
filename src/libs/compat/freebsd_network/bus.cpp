@@ -62,18 +62,6 @@ struct internal_intr {
 static int32 intr_wrapper(void *data);
 
 
-static int
-fls(int mask)
-{
-	int bit;
-	if (mask == 0)
-		return (0);
-	for (bit = 1; mask != 1; bit++)
-		mask = (unsigned int)mask >> 1;
-	return (bit);
-}
-
-
 static area_id
 map_mem(void **virtualAddr, phys_addr_t _phy, size_t size, uint32 protection,
 	const char *name)
