@@ -36,10 +36,8 @@ i586-*)
 	gdbConfigureArgs="--disable-multilib"
 	;;
 x86_64-*)
-	# GCC's default is to enable multilib, but there is a bug when
-	# explicitly using --enable-multilib that causes a build
-	# failure
-	binutilsConfigureArgs=""
+	binutilsConfigureArgs="--enable-multilib"
+	gccConfigureArgs="--enable-multilib"
 	binutilsTargets="$binutilsTargets,i386-efi-pe,x86_64-efi-pe"
 	gdbConfigureArgs="--disable-multilib"
 	;;
