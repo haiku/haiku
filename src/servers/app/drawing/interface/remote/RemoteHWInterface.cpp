@@ -402,9 +402,9 @@ RemoteHWInterface::GetDeviceInfo(accelerant_device_info* info)
 	info->version = fProtocolVersion;
 	info->dac_speed = fConnectionSpeed;
 	info->memory = 33554432; // 32MB
-	snprintf(info->name, sizeof(info->name), "Haiku, Inc. RemoteHWInterface");
-	snprintf(info->chipset, sizeof(info->chipset), "Haiku, Inc. Chipset");
-	snprintf(info->serial_no, sizeof(info->serial_no), fTarget);
+	strlcpy(info->name, "Haiku, Inc. RemoteHWInterface", sizeof(info->name));
+	strlcpy(info->chipset, "Haiku, Inc. Chipset", sizeof(info->chipset));
+	strlcpy(info->serial_no, fTarget, sizeof(info->serial_no));
 
 	ReadUnlock();
 	return B_OK;
