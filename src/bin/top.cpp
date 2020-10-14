@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 1996 Be, Inc.
  * All Rights Reserved
- * 
+ *
  * This source code was published by Be, Inc. in the file gnu_x86.tar.gz for R3,
  * a mirror is at http://linux.inf.elte.hu/ftp/beos/development/gnu/r3.0/
  * needs to link to termcap.
@@ -72,8 +72,8 @@ winch_handler(int notused)
 static void
 sigint_handler(int)
 {
-	printf(exit_ca_mode);
-	printf(restore_cursor);
+	tputs(exit_ca_mode, 1, putchar);
+	tputs(restore_cursor, 1, putchar);
 	exit(1);
 }
 
@@ -92,9 +92,9 @@ init_term()
 	restore_cursor = tgetstr("rc", &entries);
 	save_cursor = tgetstr("sc", &entries);
 
-	printf(save_cursor);
-	printf(enter_ca_mode);
-	printf(clear_string);
+	tputs(save_cursor, 1, putchar);
+	tputs(enter_ca_mode, 1, putchar);
+	tputs(clear_string, 1, putchar);
 }
 
 
@@ -187,8 +187,8 @@ compare(
 	 */
 	times.sort();
 
-	printf("%6s %7s %7s %7s %4s %16s %-16s \n", "THID", "TOTAL", "USER", "KERNEL",
-		"%CPU", "TEAM NAME", "THREAD NAME");
+	printf("%6s %7s %7s %7s %4s %16s %-16s \n", "THID", "TOTAL", "USER",
+		"KERNEL", "%CPU", "TEAM NAME", "THREAD NAME");
 	linecount = 1;
 	idletime = 0;
 	gtotal = 0;
@@ -241,7 +241,8 @@ compare(
 		}
 	}
 
-	printf("------ %7.2f %7.2f %7.2f %4.1f%% TOTAL (%4.1f%% idle time, %4.1f%% unknown)", 
+	printf("------ %7.2f %7.2f %7.2f %4.1f%% "
+		"TOTAL (%4.1f%% idle time, %4.1f%% unknown)",
 		(double) (gtotal / 1000),
 		(double) (utotal / 1000),
 		(double) (ktotal / 1000),
@@ -249,8 +250,8 @@ compare(
 		cpu_perc(idletime, uinterval),
 		cpu_perc(cpus * uinterval - (gtotal + idletime), uinterval));
 	fflush(stdout);
-	printf(clear_string);
-	printf(cursor_home);
+	tputs(clear_string, 1, putchar);
+	tputs(cursor_home, 1, putchar);
 }
 
 
@@ -409,8 +410,8 @@ main(int argc, char **argv)
 		baseline = gather(&baseline, refresh);
 	}
 
-	printf(exit_ca_mode);
-	printf(restore_cursor);
+	tputs(exit_ca_mode, 1, putchar);
+	tputs(restore_cursor, 1, putchar);
 
 	exit(0);
 }
