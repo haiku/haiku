@@ -142,16 +142,16 @@ WebPTranslator::DerivedIdentify(BPositionIO* stream,
 	ssize_t size = sizeof(buf);
 	if (stream->Read(buf, size) != size)
 		return B_IO_ERROR;
-		
+
 	// Check it's a valid WebP format
 	if (!WebPGetInfo((const uint8_t*)buf, size, NULL, NULL))
 		return B_ILLEGAL_DATA;
-		
+
 	info->type = WEBP_IMAGE_FORMAT;
 	info->group = B_TRANSLATOR_BITMAP;
 	info->quality = WEBP_IN_QUALITY;
 	info->capability = WEBP_IN_CAPABILITY;
-	snprintf(info->name, sizeof(info->name), B_TRANSLATE("WebP image"));
+	strlcpy(info->name, B_TRANSLATE("WebP image"), sizeof(info->name));
 	strcpy(info->MIME, "image/webp");
 
 	return B_OK;
@@ -340,7 +340,7 @@ WebPTranslator::_TranslateFromWebP(BPositionIO* stream, BMessage* ioExtension,
 
 	FreeAllocation _(out);
 
- 	uint32 dataSize = width * 4 * height;
+	uint32 dataSize = width * 4 * height;
 
 	TranslatorBitmap bitmapHeader;
 	bitmapHeader.magic = B_TRANSLATOR_BITMAP;
