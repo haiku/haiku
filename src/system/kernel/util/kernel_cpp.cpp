@@ -392,7 +392,10 @@ extern "C"
 void
 debugger(const char *message)
 {
+// this is a wrapper, disable format diagnostics.
+#pragma GCC diagnostic ignored "-Wformat-security"
 	kernel_debugger(message);
+#pragma GCC diagnostic pop
 }
 
 #endif	// #ifndef _BOOT_MODE
