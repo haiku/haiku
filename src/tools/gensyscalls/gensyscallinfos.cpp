@@ -48,7 +48,7 @@ const char* kUsage =
 static void
 print_usage(bool error)
 {
-	fprintf((error ? stderr : stdout), kUsage);
+	fputs(kUsage, (error ? stderr : stdout));
 }
 
 
