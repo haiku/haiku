@@ -82,20 +82,43 @@ static status_t
 mmc_bus_execute_command(device_node* node, uint8_t command, uint32_t argument,
 	uint32_t* result)
 {
-	// FIXME store these in the bus cookie or something instead of
-	// getting/putting the parents each time.
-	mmc_bus_interface* sdhci;
+	// FIXME store the parent cookie in the bus cookie or something instead of
+	// getting/putting the parent each time.
+	driver_module_info* mmc;
 	void* cookie;
 
 	TRACE("In mmc_bus_execute_command\n");
 	device_node* parent = gDeviceManager->get_parent_node(node);
-	device_node* grandparent = gDeviceManager->get_parent_node(parent);
-	gDeviceManager->get_driver(grandparent, (driver_module_info**)&sdhci,
-		&cookie);
-	gDeviceManager->put_node(grandparent);
+	gDeviceManager->get_driver(parent, &mmc, &cookie);
 	gDeviceManager->put_node(parent);
 
-	return sdhci->execute_command(cookie, command, argument, result);
+	MMCBus* bus = (MMCBus*)cookie;
+
+	bus->AcquireBus();
+	status_t error = bus->ExecuteCommand(command, argument, result);
+	bus->ReleaseBus();
+	return error;
+}
+
+
+static status_t
+mmc_bus_read_naive(device_node* node, uint16_t rca, off_t pos, void* buffer,
+	size_t* _length)
+{
+	// FIXME store the parent cookie in the bus cookie or something instead of
+	// getting/putting the parent each time.
+	driver_module_info* mmc;
+	void* cookie;
+
+	device_node* parent = gDeviceManager->get_parent_node(node);
+	gDeviceManager->get_driver(parent, &mmc, &cookie);
+	gDeviceManager->put_node(parent);
+
+	MMCBus* bus = (MMCBus*)cookie;
+	bus->AcquireBus();
+	status_t result = bus->Read(rca, pos, buffer, _length);
+	bus->ReleaseBus();
+	return result;
 }
 
 
@@ -148,7 +171,8 @@ mmc_device_interface mmc_bus_controller_module = {
 		NULL,
 		NULL
 	},
-	mmc_bus_execute_command
+	mmc_bus_execute_command,
+	mmc_bus_read_naive
 };
 
 

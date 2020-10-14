@@ -19,6 +19,36 @@
 
 #define SDHCI_BUS_TYPE_NAME 							"bus/sdhci/v1"
 
+class TransferMode {
+	public:
+		uint16_t Bits() { return fBits; }
+
+		// TODO response interrupt
+		// TODO response check
+
+		static const uint8_t kR1 = 0 << 6;
+		static const uint8_t kR5 = 1 << 6;
+
+		static const uint8_t kMulti = 1 << 5;
+		static const uint8_t kSingle = 0 << 5;
+
+		static const uint8_t kRead = 1 << 4;
+		static const uint8_t kWrite = 0 << 4;
+
+		static const uint8_t kAutoCmdDisabled = 0 << 2;
+		static const uint8_t kAutoCmd12Enable = 1 << 2;
+		static const uint8_t kAutoCmd23Enable = 2 << 2;
+		static const uint8_t kAutoCmdAutoSelect = 
+			kAutoCmd23Enable | kAutoCmd12Enable;
+
+		// TODO block count enable
+
+		static const uint8_t kDmaEnable = 1;
+		static const uint8_t kNoDmaOrNoData = 0;
+		
+	private:
+		volatile uint16_t fBits;
+} __attribute__((packed));
 
 class Command {
 	public:
@@ -35,14 +65,17 @@ class Command {
 		static const uint8_t kSubCommand = 0x4;
 		static const uint8_t kReplySizeMask = 0x3;
 		static const uint8_t k32BitResponse = 0x2;
-		static const uint8_t k128BitResponse = 0x1;
+		static const uint8_t k128BitResponse = 0x1; 
+		static const uint8_t k32BitResponseCheckBusy = 0x3;
 
 		// For simplicity pre-define the standard response types from the SD
 		// card specification
 		static const uint8_t kNoReplyType = 0;
 		static const uint8_t kR1Type = kCheckIndex | kCRCEnable
 			| k32BitResponse;
-		static const uint8_t kR2Type = kCRCEnable | k128BitResponse;
+		static const uint8_t kR1bType = (kCheckIndex | kCRCEnable 
+			| k32BitResponseCheckBusy) & (~ kDataPresent);
+ 		static const uint8_t kR2Type = kCRCEnable | k128BitResponse;
 		static const uint8_t kR3Type = k32BitResponse;
 		static const uint8_t kR6Type = kCheckIndex | k32BitResponse;
 		static const uint8_t kR7Type = kDataPresent | kCheckIndex | kCRCEnable
@@ -62,6 +95,7 @@ class PresentState {
 
 		bool IsCardInserted() { return fBits & (1 << 16); }
 		bool CommandInhibit() { return fBits & (1 << 0); }
+		bool DataInhibit() { return fBits & (1 << 1); }
 
 	private:
 		volatile uint32_t fBits;
@@ -134,24 +168,25 @@ class SoftwareReset {
 } __attribute__((packed));
 
 
-/* Interrupt registers */
-#define SDHCI_INT_CMD_CMP		0x00000001 		// command complete enable
-#define SDHCI_INT_TRANS_CMP		0x00000002		// transfer complete enable
-#define SDHCI_INT_CARD_INS 		0x00000040 		// card insertion enable
-#define SDHCI_INT_CARD_REM 		0x00000080 		// card removal enable
-#define SDHCI_INT_ERROR         0x00008000      // error
-#define SDHCI_INT_TIMEOUT		0x00010000 		// Timeout error
-#define SDHCI_INT_CRC			0x00020000 		// CRC error
-#define SDHCI_INT_END_BIT		0x00040000 		// end bit error
-#define SDHCI_INT_INDEX 		0x00080000		// index error
-#define SDHCI_INT_BUS_POWER		0x00800000 		// power fail
+// #pragma mark Interrupt registers 
+#define SDHCI_INT_CMD_CMP			0x00000001	// command complete enable
+#define SDHCI_INT_TRANS_CMP			0x00000002	// transfer complete enable
+#define SDHCI_INT_BUF_READ_READY	0x00000020  // buffer read ready enable
+#define SDHCI_INT_CARD_INS 			0x00000040	// card insertion enable
+#define SDHCI_INT_CARD_REM 			0x00000080	// card removal enable
+#define SDHCI_INT_ERROR         	0x00008000	// error
+#define SDHCI_INT_TIMEOUT			0x00010000	// Timeout error
+#define SDHCI_INT_CRC				0x00020000	// CRC error
+#define SDHCI_INT_END_BIT			0x00040000	// end bit error
+#define SDHCI_INT_INDEX 			0x00080000	// index error
+#define SDHCI_INT_BUS_POWER			0x00800000	// power fail
 
 #define	 SDHCI_INT_CMD_ERROR_MASK	(SDHCI_INT_TIMEOUT | \
 		SDHCI_INT_CRC | SDHCI_INT_END_BIT | SDHCI_INT_INDEX)
 
 #define SDHCI_INT_CMD_MASK 	(SDHCI_INT_CMD_CMP | SDHCI_INT_CMD_ERROR_MASK)
 
-
+// #pragma mark -
 class Capabilities
 {
 	public:
@@ -175,7 +210,7 @@ class HostControllerVersion {
 		const uint8_t vendorVersion;
 } __attribute__((packed));
 
-
+// #pragma mark -
 struct registers {
 	// SD command generation
 	volatile uint32_t system_address;

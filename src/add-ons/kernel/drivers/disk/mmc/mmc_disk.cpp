@@ -1,5 +1,6 @@
 /*
  * Copyright 2018-2020 Haiku, Inc. All rights reserved.
+ * Copyright 2020, Viveris Technologies.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -200,7 +201,7 @@ mmc_block_open(void* _info, const char* path, int openMode, void** _cookie)
 	CALLED();
 	mmc_disk_driver_info* info = (mmc_disk_driver_info*)_info;
 
-	// TODO allocate cookie
+	// allocate cookie
 	mmc_disk_handle* handle = new(std::nothrow) mmc_disk_handle;
 	*_cookie = handle;
 	if (handle == NULL) {
@@ -233,13 +234,13 @@ mmc_block_free(void* cookie)
 }
 
 
-static status_t
-mmc_block_read(void* cookie, off_t position, void* buffer, size_t* length)
+static status_t 
+mmc_block_read(void* cookie, off_t pos, void* buffer, size_t* _length)
 {
 	CALLED();
 	mmc_disk_handle* handle = (mmc_disk_handle*)cookie;
-
-	return B_NOT_SUPPORTED;
+	TRACE("Ready to execute %p\n", handle->info->mmc->read_naive);
+	return handle->info->mmc->read_naive(handle->info->parent, handle->info->rca, pos, buffer, _length);
 }
 
 
@@ -269,7 +270,7 @@ mmc_block_get_geometry(mmc_disk_handle* handle, device_geometry* geometry)
 {
 	struct mmc_disk_csd csd;
 	TRACE("Ready to execute %p\n", handle->info->mmc->execute_command);
-	handle->info->mmc->execute_command(handle->info->parent, 9,
+	handle->info->mmc->execute_command(handle->info->parent, SD_SEND_CSD,
 		handle->info->rca << 16, (uint32_t*)&csd);
 
 	TRACE("CSD: %lx %lx\n", csd.bits[0], csd.bits[1]);
