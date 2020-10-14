@@ -30,7 +30,8 @@ read_password(const char* prompt, char* password, size_t bufferSize,
 // TODO: Open tty with O_NOCTTY!
 		tty = fopen("/dev/tty", "w+");
 		if (tty == NULL) {
-			fprintf(stderr, "Error: Failed to open tty: %s\n", strerror(errno));
+			fprintf(stderr, "Error: Failed to open tty: %s\n",
+				strerror(errno));
 			return errno;
 		}
 
@@ -60,11 +61,12 @@ read_password(const char* prompt, char* password, size_t bufferSize,
 	status_t error = B_OK;
 
 	// prompt and read pwd
-	fprintf(out, prompt);
+	fputs(prompt, out);
 	fflush(out);
 
 	if (fgets(password, bufferSize, in) == NULL) {
-		fprintf(out, "\nError: Failed to read from tty: %s\n", strerror(errno));
+		fprintf(out, "\nError: Failed to read from tty: %s\n",
+			strerror(errno));
 		error = errno != 0 ? errno : B_ERROR;
 	} else
 		fputc('\n', out);
