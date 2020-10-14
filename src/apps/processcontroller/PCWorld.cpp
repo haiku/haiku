@@ -139,8 +139,8 @@ PCApplication::ArgvReceived(int32 argc, char **argv)
 	} else if (argc > 1) {
 		// print a simple usage string
 		printf(B_TRANSLATE("Usage: %s [-deskbar]\n"), argv[0]);
-		printf(B_TRANSLATE("(c) 1996-2001 Georges-Edouard Berenger, "
-		"berenger@francenet.fr\n"));
+		puts(B_TRANSLATE("(c) 1996-2001 Georges-Edouard Berenger, "
+		"berenger@francenet.fr"));
 	}
 
 	Quit();
