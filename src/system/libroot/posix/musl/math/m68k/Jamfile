@@ -4,11 +4,6 @@ SubDirCcFlags -Wno-unused-but-set-variable ;
 
 SubDirSysHdrs [ FDirName $(SUBDIR) .. .. include ] ;
 UseHeaders [ FDirName $(SUBDIR) .. .. internal ] ;
-
-local arch ;
-for arch in $(TARGET_ARCHS) {
-	UseHeaders [ FDirName $(SUBDIR) .. .. arch $(arch) ] ;
-}
 UseHeaders [ FDirName $(SUBDIR) .. .. arch generic ] ;
 
 local generics =
@@ -83,9 +78,11 @@ local generics =
 	;
 
 local architectureObject ;
-for architectureObject in [ MultiArchSubDirSetup ] {
+for architectureObject in [ MultiArchSubDirSetup m68k ] {
 	on $(architectureObject) {
 		local architecture = $(TARGET_PACKAGING_ARCH) ;
+
+		UseHeaders [ FDirName $(SUBDIR) .. .. arch $(architecture) ] ;
 
 		MergeObject <$(architecture)>posix_musl_math.o :
 
