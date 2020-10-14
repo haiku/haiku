@@ -69,7 +69,7 @@ status_t
 FileMapDisk::Open(void **_cookie, int mode)
 {
 	TRACE(("FileMapDisk::Open(, 0x%08x)\n", mode));
-	if (!fNode)
+	if (fNode == NULL)
 		return B_NO_INIT;
 
 	return fNode->Open(_cookie, mode);
@@ -80,7 +80,7 @@ status_t
 FileMapDisk::Close(void *cookie)
 {
 	TRACE(("FileMapDisk::Close(%p)\n", cookie));
-	if (!fNode)
+	if (fNode == NULL)
 		return B_NO_INIT;
 
 	return fNode->Close(cookie);
@@ -93,7 +93,7 @@ FileMapDisk::ReadAt(void *cookie, off_t pos, void *_buffer,
 	size_t bufferSize)
 {
 	TRACE(("FileMapDisk::ReadAt(%p, %lld, , %ld)\n", cookie, pos, bufferSize));
-	if (!fNode)
+	if (fNode == NULL)
 		return B_NO_INIT;
 
 	return fNode->ReadAt(cookie, pos, _buffer, bufferSize);
@@ -114,10 +114,10 @@ status_t
 FileMapDisk::GetName(char *nameBuffer, size_t bufferSize) const
 {
 	const char *prefix = "FileMapDisk:";
-	if (!nameBuffer)
+	if (nameBuffer == NULL)
 		return B_BAD_VALUE;
 
-	snprintf(nameBuffer, bufferSize, prefix);
+	strlcpy(nameBuffer, prefix, bufferSize);
 	if (bufferSize > strlen(prefix) && fNode)
 		return fNode->GetName(nameBuffer + strlen(prefix),
 			bufferSize - strlen(prefix));
@@ -136,7 +136,7 @@ FileMapDisk::GetFileMap(struct file_map_run *runs, int32 *count)
 off_t
 FileMapDisk::Size() const
 {
-	if (!fNode)
+	if (fNode == NULL)
 		return B_NO_INIT;
 	return fNode->Size();
 }
@@ -149,23 +149,23 @@ FileMapDisk::FindAnyFileMapDisk(Directory *volume)
 	Node *node;
 	status_t error;
 
-	if (!volume)
+	if (volume == NULL)
 		return NULL;
 
 	//XXX: check lower/mixed case as well
 	Node *dirnode;
 	Directory *dir;
 	dirnode = volume->Lookup(FMAP_FOLDER_NAME, true);
-	if (!dirnode || !S_ISDIR(dirnode->Type()))
+	if (dirnode == NULL || !S_ISDIR(dirnode->Type()))
 		return NULL;
 	dir = (Directory *)dirnode;
 	node = dir->Lookup(FMAP_IMAGE_NAME, true);
-	if (!node)
+	if (node == NULL)
 		return NULL;
 
 	// create a FileMapDisk object
 	FileMapDisk *disk = new(nothrow) FileMapDisk;
-	if (disk) {
+	if (disk != NULL) {
 		error = disk->Init(node);
 		if (error != B_OK) {
 			delete disk;
