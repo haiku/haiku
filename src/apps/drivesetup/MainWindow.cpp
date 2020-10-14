@@ -823,7 +823,7 @@ MainWindow::_DisplayPartitionError(BString _message,
 		snprintf(message, sizeof(message), _message.String(), name.String());
 	} else {
 		_message.ReplaceAll("%s", "");
-		snprintf(message, sizeof(message), _message.String());
+		strlcpy(message, _message.String(), sizeof(message));
 	}
 
 	if (error < B_OK) {
@@ -985,46 +985,44 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 		}
 	}
 
-	char message[512];
-
 	if (!found) {
-		snprintf(message, sizeof(message), B_TRANSLATE("Disk system \"%s\" "
-			"not found!"));
-		_DisplayPartitionError(message);
+		_DisplayPartitionError(B_TRANSLATE("Disk system \"%s\" not found!"));
 		return;
 	}
+
+	BString message;
 
 	if (diskSystem.IsFileSystem()) {
 		BString intelExtendedPartition = "Intel Extended Partition";
 		if (disk->ID() == selectedPartition) {
-			snprintf(message, sizeof(message), B_TRANSLATE("Are you sure you "
+			message = B_TRANSLATE("Are you sure you "
 				"want to format a raw disk? (Most people initialize the disk "
 				"with a partitioning system first) You will be asked "
-				"again before changes are written to the disk."));
+				"again before changes are written to the disk.");
 		} else if (partition->ContentName()
 			&& strlen(partition->ContentName()) > 0) {
-			snprintf(message, sizeof(message), B_TRANSLATE("Are you sure you "
+			message = B_TRANSLATE("Are you sure you "
 				"want to format the partition \"%s\"? You will be asked "
-				"again before changes are written to the disk."),
-				partition->ContentName());
+				"again before changes are written to the disk.");
+			message.ReplaceFirst("%s", partition->ContentName());
 		} else if (partition->Type() == intelExtendedPartition) {
-			snprintf(message, sizeof(message), B_TRANSLATE("Are you sure you "
+			message = B_TRANSLATE("Are you sure you "
 				"want to format the Intel Extended Partition? Any "
 				"subpartitions it contains will be overwritten if you "
 				"continue. You will be asked again before changes are "
-				"written to the disk."));
+				"written to the disk.");
 		} else {
-			snprintf(message, sizeof(message), B_TRANSLATE("Are you sure you "
+			message = B_TRANSLATE("Are you sure you "
 				"want to format the partition? You will be asked again "
-				"before changes are written to the disk."));
+				"before changes are written to the disk.");
 		}
 	} else {
-		snprintf(message, sizeof(message), B_TRANSLATE("Are you sure you "
+		message = B_TRANSLATE("Are you sure you "
 			"want to initialize the selected disk? All data will be lost. "
 			"You will be asked again before changes are written to the "
-			"disk.\n"));
+			"disk.\n");
 	}
-	BAlert* alert = new BAlert("first notice", message,
+	BAlert* alert = new BAlert("first notice", message.String(),
 		B_TRANSLATE("Continue"), B_TRANSLATE("Cancel"), NULL,
 		B_WIDTH_FROM_WIDEST, B_WARNING_ALERT);
 	alert->SetShortcut(1, B_ESCAPE);
@@ -1081,30 +1079,32 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 	// Warn the user one more time...
 	if (previousName.Length() > 0) {
 		if (partition->IsDevice()) {
-			snprintf(message, sizeof(message), B_TRANSLATE("Are you sure you "
+			message = B_TRANSLATE("Are you sure you "
 				"want to write the changes back to disk now?\n\n"
 				"All data on the disk %s will be irretrievably lost if you "
-				"do so!"), previousName.String());
+				"do so!");
+			message.ReplaceFirst("%s", previousName.String());
 		} else {
-			snprintf(message, sizeof(message), B_TRANSLATE("Are you sure you "
+			message = B_TRANSLATE("Are you sure you "
 				"want to write the changes back to disk now?\n\n"
 				"All data on the partition %s will be irretrievably lost if you "
-				"do so!"), previousName.String());
+				"do so!");
+			message.ReplaceFirst("%s", previousName.String());
 		}
 	} else {
 		if (partition->IsDevice()) {
-			snprintf(message, sizeof(message), B_TRANSLATE("Are you sure you "
+			message = B_TRANSLATE("Are you sure you "
 				"want to write the changes back to disk now?\n\n"
 				"All data on the selected disk will be irretrievably lost if "
-				"you do so!"));
+				"you do so!");
 		} else {
-			snprintf(message, sizeof(message), B_TRANSLATE("Are you sure you "
+			message = B_TRANSLATE("Are you sure you "
 				"want to write the changes back to disk now?\n\n"
 				"All data on the selected partition will be irretrievably lost "
-				"if you do so!"));
+				"if you do so!");
 		}
 	}
-	alert = new BAlert("final notice", message,
+	alert = new BAlert("final notice", message.String(),
 		B_TRANSLATE("Write changes"), B_TRANSLATE("Cancel"), NULL,
 		B_WIDTH_FROM_WIDEST, B_WARNING_ALERT);
 	alert->SetShortcut(1, B_ESCAPE);
