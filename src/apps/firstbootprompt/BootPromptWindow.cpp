@@ -359,25 +359,38 @@ BootPromptWindow::_InitCatalog(bool saveSettings)
 void
 BootPromptWindow::_UpdateStrings()
 {
-	SetTitle(B_TRANSLATE("Welcome to Haiku!"));
+#ifdef HAIKU_DISTRO_COMPATIBILITY_OFFICIAL
+	BString name("Haiku");
+#else
+	BString name("*Distroname*");
+#endif
 
-	fInfoTextView->SetText(B_TRANSLATE_COMMENT(
-		"Thank you for trying out Haiku! We hope you'll like it!\n\n"
-		"Select your preferred language and keymap from the list on "
-		"the left which will then be used instantly. Both settings can be "
-		"changed from the Desktop later on on the fly.\n\n"
+	BString text(B_TRANSLATE("Welcome to %distroname%!"));
+	text.ReplaceFirst("%distroname%", name);
+	SetTitle(text);
 
-		"Do you wish to run the Installer or continue booting to the "
-		"Desktop?",
+	text = B_TRANSLATE_COMMENT(
+		"Thank you for trying out %distroname%! We hope you'll like it!\n\n"
+		"Please select your preferred language and keymap. Both settings can "
+		"also be changed later when running %distroname%.\n\n"
+
+		"Do you wish to install %distroname% now, or try it out first?",
 
 		"For other languages, a note could be added: \""
 		"Note: Localization of Haiku applications and other components is "
 		"an on-going effort. You will frequently encounter untranslated "
 		"strings, but if you like, you can join in the work at "
-		"<www.haiku-os.org>.\""));
+		"<www.haiku-os.org>.\"");
+	text.ReplaceAll("%distroname%", name);
+	fInfoTextView->SetText(text);
 
-	fDesktopButton->SetLabel(B_TRANSLATE("Boot to Desktop"));
-	fInstallerButton->SetLabel(B_TRANSLATE("Run Installer"));
+	text = B_TRANSLATE("Try out %distroname%");
+	text.ReplaceFirst("%distroname%", name);
+	fDesktopButton->SetLabel(text);
+
+	text = B_TRANSLATE("Install %distroname%");
+	text.ReplaceFirst("%distroname%", name);
+	fInstallerButton->SetLabel(text);
 
 	fLanguagesLabelView->SetText(B_TRANSLATE("Language"));
 	fKeymapsMenuLabel->SetText(B_TRANSLATE("Keymap"));
