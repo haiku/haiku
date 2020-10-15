@@ -223,8 +223,8 @@ PackageView::MessageReceived(BMessage* message)
 					"distributor."),
 				B_TRANSLATE("OK"),
 				NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-			fprintf(stderr,
-				B_TRANSLATE("Error while installing the package\n"));
+			fputs(B_TRANSLATE("Error while installing the package\n"),
+				stderr);
 			notify->SetFlags(notify->Flags() | B_CLOSE_ON_ESCAPE);
 			notify->Go();
 			fStatusWindow->Hide();
@@ -390,7 +390,7 @@ PackageView::ItemExists(PackageItem& item, BPath& path, int32& policy)
 				// TODO: Maybe add 'No, but ask again' type of choice as well?
 				alertString = B_TRANSLATE("Do you want to remember this "
 					"decision for the rest of this installation?\n");
-				
+
 				BString actionString;
 				if (choice == P_EXISTS_OVERWRITE) {
 					alertString << B_TRANSLATE(
@@ -645,7 +645,7 @@ PackageView::_InstallTypeChanged(int32 index)
 
 			char volumeName[B_FILE_NAME_LENGTH];
 			volume.GetName(volumeName);
-	
+
 			BMenuItem* item = _AddDestinationMenuItem(volumeName,
 				volume.FreeBytes(), path.Path());
 
