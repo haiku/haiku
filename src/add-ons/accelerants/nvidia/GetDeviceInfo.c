@@ -15,9 +15,9 @@ status_t GET_ACCELERANT_DEVICE_INFO(accelerant_device_info * adi)
 	/* no info on version is provided, so presumably this is for my info */
 	adi->version = 1;
 
-	sprintf(adi->name, si->adi.name);
-	sprintf(adi->chipset, si->adi.chipset);
-	sprintf(adi->serial_no, "unknown");
+	strcpy(adi->name, si->adi.name);
+	strcpy(adi->chipset, si->adi.chipset);
+	strcpy(adi->serial_no, "unknown");
 	adi->memory = si->ps.memory_size;
 	adi->dac_speed = si->ps.max_dac1_clock;
 
