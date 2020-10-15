@@ -44,8 +44,7 @@ EditableCatalog *catalog = NULL;
 void
 usage()
 {
-	fprintf(stderr,
-		"usage: collectcatkeys [-pvw] [-r <regex>] [-o <outfile>] "
+	fputs("usage: collectcatkeys [-pvw] [-r <regex>] [-o <outfile>] "
 		"[-l <catalogLanguage>]\n"
 		"                      -s <catalogSig> <prepCppFile>\n"
 		"options:\n"
@@ -55,12 +54,12 @@ usage()
 		"  -p\t\t\tprint keys as they are found\n"
 		"  -r <regex>\t\tchanges the regex used by the key-scanner to the one "
 		"given,\n"
-		"      \t\t\tthe default is:   ");
-		fprintf(stderr, rxString.String());
-		fprintf(stderr,"\n  -s <catalogSig>\tsignature of the target-catalog\n"
+		"      \t\t\tthe default is:   ", stderr);
+	fputs(rxString.String(), stderr);
+	fputs("\n  -s <catalogSig>\tsignature of the target-catalog\n"
 		"  -v\t\t\tbe verbose, show summary\n"
 		"  -w\t\t\tshow warnings about catalog-accesses that couldn't be "
-		" resolved completely\n");
+		" resolved completely\n", stderr);
 	exit(-1);
 }
 
