@@ -217,8 +217,8 @@ UserlandRequestHandler::HandleRequest(Request* request)
 		case NODE_MONITORING_EVENT_REQUEST:
 			return _HandleRequest((NodeMonitoringEventRequest*)request);
 	}
-PRINT(("UserlandRequestHandler::HandleRequest(): unexpected request: %lu\n",
-request->GetType()));
+	PRINT(("UserlandRequestHandler::HandleRequest(): unexpected request: %"
+		B_PRIu32 "\n", request->GetType()));
 	return B_BAD_DATA;
 }
 
@@ -1494,15 +1494,17 @@ UserlandRequestHandler::_HandleRequest(ReadDirRequest* request)
 			&countRead);
 	}
 
-D(
-if (result == B_OK && countRead > 0) {
-	dirent* entry = (dirent*)buffer;
-	PRINT(("  entry: d_dev: %ld, d_pdev: %ld, d_ino: %Ld, d_pino: %Ld, "
-		"d_reclen: %hu, d_name: %.32s\n",
-		entry->d_dev, entry->d_pdev, entry->d_ino, entry->d_pino,
-		entry->d_reclen, entry->d_name));
-}
-)
+	D(
+		if (result == B_OK && countRead > 0) {
+			dirent* entry = (dirent*)buffer;
+			PRINT(("  entry: d_dev: %" B_PRIdDEV ", d_pdev: %" B_PRIdDEV ", "
+				"d_ino: %" B_PRIdINO ", d_pino: %" B_PRIdINO ", "
+				"d_reclen: %hu, d_name: %.32s\n",
+			entry->d_dev, entry->d_pdev,
+			entry->d_ino, entry->d_pino,
+			entry->d_reclen, entry->d_name));
+		}
+	)
 
 	// reconstruct the reply, in case it has been overwritten
 	reply = new(reply) ReadDirReply;
