@@ -51,13 +51,33 @@ status_t submit_nbuffer(hci_id hid, net_buffer* nbuf);
 usb_support_descriptor supported_devices[] = {
 	// Generic Bluetooth USB device
 	// Class, SubClass, and Protocol codes that describe a Bluetooth device
-	{ UDCLASS_WIRELESS, UDSUBCLASS_RF, UDPROTO_BLUETOOTH , 0 , 0 },
+	{ UDCLASS_WIRELESS, UDSUBCLASS_RF, UDPROTO_BLUETOOTH, 0, 0 },
 
 	// Broadcom BCM2035
 	{ 0, 0, 0, 0x0a5c, 0x200a },
 	{ 0, 0, 0, 0x0a5c, 0x2009 },
 
 	// Devices taken from the linux Driver
+	// MediaTek MT76x0E
+	{ 0, 0, 0, 0x0e8d, 0x763f },
+	// Broadcom SoftSailing reporting vendor specific
+	{ 0, 0, 0, 0x0a5c, 0x21e1 },
+
+	// Apple MacBookPro 7,1
+	{ 0, 0, 0, 0x05ac, 0x8213 },
+	// Apple iMac11,1
+	{ 0, 0, 0, 0x05ac, 0x8215 },
+	// Apple MacBookPro6,2
+	{ 0, 0, 0, 0x05ac, 0x8218 },
+	// Apple MacBookAir3,1, MacBookAir3,2
+	{ 0, 0, 0, 0x05ac, 0x821b },
+	// Apple MacBookAir4,1
+	{ 0, 0, 0, 0x05ac, 0x821f },
+	// Apple MacBookPro8,2
+	{ 0, 0, 0, 0x05ac, 0x821a },
+	// Apple MacMini5,1
+	{ 0, 0, 0, 0x05ac, 0x8281 },
+
 	// AVM BlueFRITZ! USB v2.0
 	{ 0, 0, 0, 0x057c, 0x3800 },
 	// Bluetooth Ultraport Module from IBM
@@ -66,7 +86,14 @@ usb_support_descriptor supported_devices[] = {
 	{ 0, 0, 0, 0x044e, 0x3001 },
 	{ 0, 0, 0, 0x044e, 0x3002 },
 	// Ericsson with non-standard id
-	{ 0, 0, 0, 0x0bdb, 0x1002 }
+	{ 0, 0, 0, 0x0bdb, 0x1002 },
+
+	// Canyon CN-BTU1 with HID interfaces
+	{ 0, 0, 0, 0x0c10, 0x0000 },
+
+	// Broadcom BCM20702A0
+	{ 0, 0, 0, 0x413c, 0x8197 },
+
 };
 
 /* add a device to the list of connected devices */
