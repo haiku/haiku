@@ -16,8 +16,6 @@ _type AutoRaiseSettings::_name()\
 CONF_ADDPROP(bool, Active)
 CONF_ADDPROP(bigtime_t, Delay)
 CONF_ADDPROP(int32, Mode)
-//CONF_ADDPROP(BPath, AppPath)
-CONF_ADDPROP(entry_ref, AppPath)
 #undef CONF_ADDPROP
 
 AutoRaiseSettings::AutoRaiseSettings()
@@ -42,12 +40,6 @@ AutoRaiseSettings::AutoRaiseSettings()
 
 		if (_settingsMessage.FindInt32(AR_MODE, &_confMode) != B_OK)
 			printf("AutoRaiseSettings::AutoRaiseSettings();\tFailed to load mode from settings file. Using default\n");
-
-//		if (_settingsMessage.FindFlat(AR_APP_PATH, (BFlattenable *) &_appPath) != B_OK)
-//			printf("AutoRaiseSettings::AutoRaiseSettings();\tFailed to load application path.\n");
-
-		if (_settingsMessage.FindRef(AR_APP_PATH, &_confAppPath) != B_OK)
-			printf("AutoRaiseSettings::AutoRaiseSettings();\tFailed to load application path.\n");
 	}
 	else
 	{
@@ -73,8 +65,6 @@ AutoRaiseSettings::~AutoRaiseSettings()
 	_settingsMessage.AddBool(AR_ACTIVE, _confActive);
 	_settingsMessage.AddInt64(AR_DELAY, _confDelay);
 	_settingsMessage.AddInt32(AR_MODE, _confMode);
-//	_settingsMessage.AddFlat(AR_APP_PATH, &_appPath);
-	_settingsMessage.AddRef(AR_APP_PATH, &_confAppPath);
 
 	//write message to settings file
 	if (_settingsMessage.Flatten(&_settingsFile) != B_OK)

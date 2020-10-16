@@ -36,7 +36,6 @@ class TrayView:public BView{
 	private:
 
 		BBitmap *_activeIcon, *_inactiveIcon;
-		entry_ref _appPath;
 		bool watching;
 
 		void _init(void); //initialization common to all constructors

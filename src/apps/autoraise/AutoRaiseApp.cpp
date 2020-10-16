@@ -15,16 +15,6 @@ AutoRaiseApp::AutoRaiseApp()
 	removeFromDeskbar(NULL);
 	fPersist = true;
 	fDone = false;
-
-	//since the tray item shows an icon, and the class TrayView needs to be
-	//able to know the location of the executing binary, we write into the
-	//settings file this critical information when the app is fired up
-	app_info info;
-	be_app->GetAppInfo(&info);
-
-	//now, put the path into the settings file
-	AutoRaiseSettings settings;
-	settings.SetAppPath(info.ref);
 }
 
 AutoRaiseApp::~AutoRaiseApp()

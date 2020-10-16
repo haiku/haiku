@@ -40,8 +40,6 @@ class AutoRaiseSettings
 {
 	protected:
 		BFile _settingsFile;
-//		BPath _appPath;
-
 		BMessage _settingsMessage;
 		
 
@@ -56,13 +54,9 @@ class AutoRaiseSettings
 CONF_ADDPROP(bool, Active)
 CONF_ADDPROP(bigtime_t, Delay)
 CONF_ADDPROP(int32, Mode)
-//CONF_ADDPROP(BPath, AppPath)
-CONF_ADDPROP(entry_ref, AppPath)
 
 };
 
 #undef CONF_ADDPROP
-
-#define AR_APP_PATH "ar:app_path"
 
 #endif
