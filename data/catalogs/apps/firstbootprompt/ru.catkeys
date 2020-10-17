@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-FirstBootPrompt	2813539172
+1	russian	x-vnd.Haiku-FirstBootPrompt	585808223
 Japanese	KeymapNames		Японский
 US	KeymapNames		США
 Esperanto	KeymapNames		Эсперанто
@@ -37,7 +37,6 @@ Belarusian (Mac)	KeymapNames		Белорусская (Mac)
 Hebrew	KeymapNames		Иврит
 Greek	KeymapNames		Греческая
 Croatian	KeymapNames		Хорватская
-Run Installer	BootPromptWindow		Запустить Установщик
 Faeroese	KeymapNames		Фарерская
 Polish (Typewriter)	KeymapNames		Польская (Печатная)
 French (Mac)	KeymapNames		Французская (Mac)
@@ -62,10 +61,8 @@ Belgian (comma)	KeymapNames		Бельгийская (comma)
 Custom	BootPromptWindow		Пользовательская
 Norwegian	KeymapNames		Норвежская
 Danish	KeymapNames		Датская
-Boot to Desktop	BootPromptWindow		Загрузить рабочий стол
 Bulgarian (Phonetic)	KeymapNames		Болгарская (Фонетическая)
 Canadian-French	KeymapNames		Канадо-Французская
-Welcome to Haiku!	BootPromptWindow		Добро пожаловать в Haiku!
 Russian	KeymapNames		Русская
 Hungarian	KeymapNames		Венгерская
 Irish	KeymapNames		Ирландская

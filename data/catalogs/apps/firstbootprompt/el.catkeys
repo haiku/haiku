@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-FirstBootPrompt	2813539172
+1	greek, modern (1453-)	x-vnd.Haiku-FirstBootPrompt	585808223
 Japanese	KeymapNames		Ιαπωνικό
 US	KeymapNames		ΗΠΑ
 Esperanto	KeymapNames		Εσπεράντο
@@ -37,7 +37,6 @@ Belarusian (Mac)	KeymapNames		Λευκορώσικο (Mac)
 Hebrew	KeymapNames		Εβραϊκό
 Greek	KeymapNames		Ελληνικό
 Croatian	KeymapNames		Κροατικό
-Run Installer	BootPromptWindow		Έναρξη Εγκατάστασης
 Faeroese	KeymapNames		Φεροϊκό
 Polish (Typewriter)	KeymapNames		Πολωνικό (Γραφομηχανής)
 French (Mac)	KeymapNames		Γαλλικό (Mac)
@@ -62,10 +61,8 @@ Belgian (comma)	KeymapNames		Βελγικό (κόμμα)
 Custom	BootPromptWindow		Προσαρμοσμένο
 Norwegian	KeymapNames		Νορβηγικό
 Danish	KeymapNames		Δανικό
-Boot to Desktop	BootPromptWindow		Μετάβαση σε Επιφάνεια Εργασίας
 Bulgarian (Phonetic)	KeymapNames		Βουλγαρικό (Φωνητικό)
 Canadian-French	KeymapNames		Καναδικό-Γαλλικό
-Welcome to Haiku!	BootPromptWindow		Καλωσορίσατε στο Haiku!
 Russian	KeymapNames		Ρώσικο
 Hungarian	KeymapNames		Ουγγρικό
 Irish	KeymapNames		Ιρλανδικό

@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-FirstBootPrompt	3341815780
+1	croatian	x-vnd.Haiku-FirstBootPrompt	1114084831
 Japanese	KeymapNames		Japanski
 Esperanto	KeymapNames		Esperanto
 Belarusian	KeymapNames		Bjeloruski
@@ -32,7 +32,6 @@ Belarusian (Mac)	KeymapNames		Bjeloruski (Mac)
 Hebrew	KeymapNames		Hebrejski
 Greek	KeymapNames		Grčki
 Croatian	KeymapNames		Hrvatski
-Run Installer	BootPromptWindow		Pokreni instalacijski program
 Faeroese	KeymapNames		Farski
 Polish (Typewriter)	KeymapNames		Poljski (strojopis)
 French (Mac)	KeymapNames		Francuski (Mac)
@@ -56,10 +55,8 @@ Lithuanian (Standard)	KeymapNames		Litvanski (standardni)
 Custom	BootPromptWindow		Prilagođeno
 Norwegian	KeymapNames		Norveški
 Danish	KeymapNames		Danski
-Boot to Desktop	BootPromptWindow		Boot u radnu površinu
 Bulgarian (Phonetic)	KeymapNames		Bugarski (fonetski)
 Canadian-French	KeymapNames		Kanadski francuski
-Welcome to Haiku!	BootPromptWindow		Dobro došli u Haiku!
 Russian	KeymapNames		Ruski
 Hungarian	KeymapNames		Mađarski
 Irish	KeymapNames		Irski

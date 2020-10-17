@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Keymap	1075970008
+1	hungarian	x-vnd.Haiku-Keymap	2700190052
 Key	Modifier keys window	As in a computer keyboard key	Billentyű
 Japanese	KeymapNames		Japán
 US	KeymapNames		Egyesült Államok
@@ -89,6 +89,7 @@ Esperanto	KeymapNames		Eszperantó
 Belarusian	KeymapNames		Belorusz
 Warning: left and right key roles do not match	Modifier keys window		Figyelem: a bal és a jobb szabály nem egyezik
 Circumflex trigger	Keymap window		Kalap kapcsoló
+Fizzbook NL2	KeyboardLayoutNames		Fizzbook NL2
 Caps lock	Keyboard Layout View		Caps lock
 Left shift	Keyboard Layout View		Bal Shift
 Russian (Yawert)	KeymapNames		Orosz (Yawert)

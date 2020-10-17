@@ -4,7 +4,7 @@ Mount all	MainWindow		Hepsini bağla
 Disk	MainWindow		Disk
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Değişiklikleri diske şimdi yazmak istediğinizden emin misiniz?\n\nSeçili bölüm üzerindeki tüm veri geri getirilemeyecek bir biçimde kaybolacak!
 Device	PartitionList		Aygıt
-Initialize	MainWindow		İlkçalıştır
+Initialize	MainWindow		İlklendir
 Could not change the parameters of the selected partition.	MainWindow		Seçili bölümün parametreleri değiştirilemedi.
 PGP encrypted	Encryption utils		PGP şifreli
 Delete partition	MainWindow		Bölümü sil

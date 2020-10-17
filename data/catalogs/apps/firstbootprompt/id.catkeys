@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-FirstBootPrompt	2813539172
+1	indonesian	x-vnd.Haiku-FirstBootPrompt	585808223
 Japanese	KeymapNames		Jepang
 US	KeymapNames		AS
 Esperanto	KeymapNames		Esperanto
@@ -37,7 +37,6 @@ Belarusian (Mac)	KeymapNames		Belarusia (Mac)
 Hebrew	KeymapNames		Ibrani
 Greek	KeymapNames		Yunani
 Croatian	KeymapNames		Kroasia
-Run Installer	BootPromptWindow		Jalankan Installer
 Faeroese	KeymapNames		Faero
 Polish (Typewriter)	KeymapNames		Polandia (Typewriter)
 French (Mac)	KeymapNames		Perancis (Mac)
@@ -62,10 +61,8 @@ Belgian (comma)	KeymapNames		Belgia (koma)
 Custom	BootPromptWindow		Gubahan
 Norwegian	KeymapNames		Norwegia
 Danish	KeymapNames		Denmark
-Boot to Desktop	BootPromptWindow		Boot ke Desktop
 Bulgarian (Phonetic)	KeymapNames		Bulgaria (Fonetik)
 Canadian-French	KeymapNames		Kanada-Perancis
-Welcome to Haiku!	BootPromptWindow		Selamat datang di Haiku!
 Russian	KeymapNames		Rusia
 Hungarian	KeymapNames		Hunggaria
 Irish	KeymapNames		Irlandia

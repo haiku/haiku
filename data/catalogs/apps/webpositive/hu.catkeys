@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-WebPositive	1591513524
+1	hungarian	x-vnd.Haiku-WebPositive	1976607515
 Authentication required	Authentication Panel		Azonosítás szükséges
 Previous	WebPositive Window		Előző
 (Finish: %date)	Download Window		(Befejezés: %date)
@@ -53,6 +53,7 @@ Cookies for %s	Cookie Manager		%s sütik
 The download could not be opened.	Download Window		A letöltött fájl nem nyitható meg.
 Close	Download Window		Bezár
 WebPositive	System name		WebPositive
+%s - Search term	Settings Window		%s - Keresési feltétel
 Reload	WebPositive Window		Újratöltés
 Expiration	Cookie Manager		Érvényesség
 Download finished	Download Window		Elkészült a letöltés

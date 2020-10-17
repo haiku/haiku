@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-FirstBootPrompt	2813539172
+1	hungarian	x-vnd.Haiku-FirstBootPrompt	585808223
 Japanese	KeymapNames		Japán
 US	KeymapNames		Egyesült Államok
 Esperanto	KeymapNames		Eszperantó
@@ -37,7 +37,6 @@ Belarusian (Mac)	KeymapNames		Belorusz (Mac)
 Hebrew	KeymapNames		Héber
 Greek	KeymapNames		Görög
 Croatian	KeymapNames		Horvát
-Run Installer	BootPromptWindow		Telepítő
 Faeroese	KeymapNames		Feröeri
 Polish (Typewriter)	KeymapNames		Lengyel (írógép)
 French (Mac)	KeymapNames		Francia (Mac)
@@ -62,10 +61,8 @@ Belgian (comma)	KeymapNames		Belga (vessző)
 Custom	BootPromptWindow		Egyéni
 Norwegian	KeymapNames		Norvég
 Danish	KeymapNames		Dán
-Boot to Desktop	BootPromptWindow		Az Asztalt
 Bulgarian (Phonetic)	KeymapNames		Belga (fonetikus)
 Canadian-French	KeymapNames		Kanadai-Francia
-Welcome to Haiku!	BootPromptWindow		A Haiku üdvözli Önt!
 Russian	KeymapNames		Orosz
 Hungarian	KeymapNames		Magyar
 Irish	KeymapNames		Ír

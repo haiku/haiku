@@ -1,7 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-FirstBootPrompt	2791747426
+1	portuguese (brazil)	x-vnd.Haiku-FirstBootPrompt	564016477
 Keymap	BootPromptWindow		Mapa de Teclas
-Run Installer	BootPromptWindow		Executar Instalador
 Language	BootPromptWindow		Linguagem
 Custom	BootPromptWindow		Personalizado
-Boot to Desktop	BootPromptWindow		Inicializar a Área de Trabalho
-Welcome to Haiku!	BootPromptWindow		Bem vindo ao Haiku!

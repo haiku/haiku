@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Keymap	1075970008
+1	swedish	x-vnd.Haiku-Keymap	2700190052
 Key	Modifier keys window	As in a computer keyboard key	Tangent
 Japanese	KeymapNames		Japanska
 US	KeymapNames		US
@@ -89,6 +89,7 @@ Esperanto	KeymapNames		Esperanto
 Belarusian	KeymapNames		Vitryska
 Warning: left and right key roles do not match	Modifier keys window		Warning: Höger och vänster roller matchar inte varandra
 Circumflex trigger	Keymap window		Circumflex trigger
+Fizzbook NL2	KeyboardLayoutNames		Fizzbook NL2
 Caps lock	Keyboard Layout View		Caps Lock
 Left shift	Keyboard Layout View		Vänster skift
 Russian (Yawert)	KeymapNames		Ryska (yawert)

@@ -1,9 +1,24 @@
-1	hungarian	x-vnd.Haiku-GLInfo	3678488342
+1	hungarian	x-vnd.Haiku-GLInfo	2211760527
+Maximum clipping planes	Capabilities		Maximális vágási síkok (clipping)
+Maximum 2D texture size	Capabilities		Maximális 2D-s textúra méret
+Auxiliary buffer(s)	Capabilities		Másodlagos puffer(ek)
+Maximum evaluators equation order	Capabilities		Maximális kiértékelő egyenetek sorrendje
+Texture stack size	Capabilities		Textúra halmaz mérete
 GL Info	System name		GL Info
 Information	InfoView		Információ
-Maximum convolution	Capabilities		Maximum konvolúciós
+Maximum convolution	Capabilities		Maximum tekeredés
+Attributes stack size	Capabilities		Attribútumok halmaz mérete
+Maximum lights	Capabilities		Maximális fények
+Maximum 3D texture size	Capabilities		Maximális 3D textúra méret
 Extensions	Extensions		Kiterjesztések
+Maximum recommended index elements	Capabilities		Maximális ajánott index elem
 Available extensions	Extensions		Elérhető kiterjesztések
+Maximum recommended vertex elements	Capabilities		Maximális ajánlott vertex elem
 Value	Capabilities		Érték
+Maximum texture units	Capabilities		Maximális textúra egység
 Capabilities	Capabilities		Képességek
+Name stack size	Capabilities		Névhalmaz méret
+List stack size	Capabilities		Lista halmaz méret
+Projection stack size	Capabilities		Vetület halmaz méret
+Model stack size	Capabilities		Modell halmaz méret
 Capability	Capabilities		Képesség

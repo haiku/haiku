@@ -2,7 +2,7 @@
 If the application will not quit you may have to kill it.	Team monitor		Om programmet inte avslutas kan du behöva döda den.
 Quit application	Team monitor		Avsluta program
 Open Terminal	Team monitor		Öppen Terminal
-{0, plural,one{Hold CONTROL+ALT+DELETE for # second to reboot.}other{Hold CONTROL+ALT+DELETE for # seconds to reboot.}}	Team monitor		{0, plural,one{Hold CONTROL+ALT+DELETE for # second to reboot.}other{Hold CONTROL+ALT+DELETE for # seconds to reboot.}}
+{0, plural,one{Hold CONTROL+ALT+DELETE for # second to reboot.}other{Hold CONTROL+ALT+DELETE for # seconds to reboot.}}	Team monitor		{0, plural,one{Håll nere CONTROL+ALT+DELETE i # sekund för att starta om.}other{Håll nere CONTROL+ALT+DELETE i # sekunder för att starta om.}}
 Restart the desktop	Team monitor		Starta om Skrivbordet
 Force reboot	Team monitor		Framtvinga omstart
 Team monitor	Team monitor		Grupp Monitor

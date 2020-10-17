@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-FirstBootPrompt	1158596356
+1	romanian	x-vnd.Haiku-FirstBootPrompt	585808223
 Japanese	KeymapNames		Japoneză
 US	KeymapNames		US
 Esperanto	KeymapNames		Esperanto
@@ -16,7 +16,6 @@ Bulgarian (Cyrillic)	KeymapNames		Bulgară (Chirilică)
 Belgian (point)	KeymapNames		Belgiană (punct)
 Finnish	KeymapNames		Finlandeză
 Swedish	KeymapNames		Suedeză
-Thank you for trying out Haiku! We hope you'll like it!\n\nSelect your preferred language and keymap from the list on the left which will then be used instantly. Both settings can be changed from the Desktop later on on the fly.\n\nDo you wish to run the Installer or continue booting to the Desktop?	BootPromptWindow	For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	Vă mulțumim pentru că ați încercat Haiku! Sperăm că o să vă placă!\n\nSelectați limba străină preferată și harta de taste din lista din stânga care vor fi apoi utilizate instant. Amândouă configurările pot fi modificate de la Desktop mai târziu pe fugă.\n\nDoriți să rulați Installer sau să continuați să bootați la Desktop?
 Svorak	KeymapNames		Svorak
 German	KeymapNames		Germană
 Swiss-German	KeymapNames		Germană Elvețiană
@@ -38,7 +37,6 @@ Belarusian (Mac)	KeymapNames		Belarusă (Mac)
 Hebrew	KeymapNames		Ebraică
 Greek	KeymapNames		Greacă
 Croatian	KeymapNames		Croată
-Run Installer	BootPromptWindow		Rulează Installer
 Faeroese	KeymapNames		Feroeză
 Polish (Typewriter)	KeymapNames		Poloneză (Mașină de scris)
 French (Mac)	KeymapNames		Franceză (Mac)
@@ -63,10 +61,8 @@ Belgian (comma)	KeymapNames		Belgiană (virgulă)
 Custom	BootPromptWindow		Personalizat
 Norwegian	KeymapNames		Norvegiană
 Danish	KeymapNames		Daneză
-Boot to Desktop	BootPromptWindow		Bootează la Desktop
 Bulgarian (Phonetic)	KeymapNames		Bulgară (Fonetică)
 Canadian-French	KeymapNames		Franceză-Canadiană
-Welcome to Haiku!	BootPromptWindow		Bun venit la Haiku!
 Russian	KeymapNames		Rusă
 Hungarian	KeymapNames		Ungară
 Irish	KeymapNames		Irlandeză

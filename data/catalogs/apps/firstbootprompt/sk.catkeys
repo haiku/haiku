@@ -1,7 +1,4 @@
-1	slovak	x-vnd.Haiku-FirstBootPrompt	2791747426
+1	slovak	x-vnd.Haiku-FirstBootPrompt	564016477
 Keymap	BootPromptWindow		Mapa klávesov
-Run Installer	BootPromptWindow		Spustiť inštalátor
 Language	BootPromptWindow		Jazyk
 Custom	BootPromptWindow		Vlastná
-Boot to Desktop	BootPromptWindow		Spustiť pracovné prostredie
-Welcome to Haiku!	BootPromptWindow		Vitajte v Haiku!

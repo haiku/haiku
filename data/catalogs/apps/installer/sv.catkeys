@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Installer	2358770775
+1	swedish	x-vnd.Haiku-Installer	3982017613
 Performing installation.	InstallProgress		Verkställer installationen.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Välj källdisk från menyn. Klicka sedan på \"Starta\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Var god stäng Diskhanteringsfönstret innan du stänger fönstret för Installeraren.
@@ -14,6 +14,7 @@ Unknown Type	InstallProgress	Partition content type	Okänd Typ
 Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Klicka på Kör för att installera från '%1s' till '%2s'.
 Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Välj den disk du vill installera till. Klicka sedan på \"Starta\".
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Installationen är klar. Startsektorn har skrivits på volymen %s. Klicka på Avsluta för att lämna installationsprogrammet eller välj en ny volym att installera på.
+Are you sure you want to stop the installation?	InstallerWindow		Är du säker på att du vill stoppa installationen?
 README	InstallerApp		LÄS MIG
 Quit	InstallerWindow		Avsluta
 Write boot sector to '%s'	InstallerWindow		Skriv startsektor till '%s'
@@ -63,6 +64,7 @@ Cancel	InstallerWindow		Avbryt
 Continue	InstallerWindow	In alert after pressing Stop	Fortsätt
 Scanning for disks…	InstallerWindow		Skannar efter diskar…
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Kör DriveSetup…\n\nStäng DriveSetup för att fortsätta med installationen.
+The installation is not complete yet!\nAre you sure you want to stop it?	InstallerWindow		Installationen är inte klar än!\nÄr du säker på att du vill stoppa?
 The partition can't be mounted. Please choose a different partition.	InstallProgress		Partitionen kan inte monteras. Var god välj en annan partition.
 Set up partitions…	InstallerWindow		Ställ in partitioner...
 Install progress:  	InstallerWindow		Installationsförlopp:  
