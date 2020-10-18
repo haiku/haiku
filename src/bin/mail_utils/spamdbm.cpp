@@ -3676,7 +3676,8 @@ status_t ABSApp::LoadSaveDatabase (bool DoLoad, char *ErrorMessage)
 
     TabPntr = LineString;
     for (StringPntr = TabPntr; *TabPntr != 0 && *TabPntr != '\t'; TabPntr++)
-      ; if (*TabPntr == '\t') *TabPntr++ = 0; /* Stringify up to next tab. */
+      ;
+    if (*TabPntr == '\t') *TabPntr++ = 0; /* Stringify up to next tab. */
 
     if (strncmp (StringPntr, "Classifications", 15) != 0)
       goto ErrorExit;
@@ -3684,26 +3685,30 @@ status_t ABSApp::LoadSaveDatabase (bool DoLoad, char *ErrorMessage)
     /* Look for the Genuine class and count. */
 
     for (StringPntr = TabPntr; *TabPntr != 0 && *TabPntr != '\t'; TabPntr++)
-      ; if (*TabPntr == '\t') *TabPntr++ = 0; /* Stringify up to next tab. */
+      ;
+    if (*TabPntr == '\t') *TabPntr++ = 0; /* Stringify up to next tab. */
 
     if (strcmp (StringPntr, g_ClassifiedGenuine) != 0)
       goto ErrorExit;
 
     for (StringPntr = TabPntr; *TabPntr != 0 && *TabPntr != '\t'; TabPntr++)
-      ; if (*TabPntr == '\t') *TabPntr++ = 0; /* Stringify up to next tab. */
+      ;
+    if (*TabPntr == '\t') *TabPntr++ = 0; /* Stringify up to next tab. */
 
     m_TotalGenuineMessages = atoll (StringPntr);
 
     /* Look for the Spam class and count. */
 
     for (StringPntr = TabPntr; *TabPntr != 0 && *TabPntr != '\t'; TabPntr++)
-      ; if (*TabPntr == '\t') *TabPntr++ = 0; /* Stringify up to next tab. */
+      ;
+    if (*TabPntr == '\t') *TabPntr++ = 0; /* Stringify up to next tab. */
 
     if (strcmp (StringPntr, g_ClassifiedSpam) != 0)
       goto ErrorExit;
 
     for (StringPntr = TabPntr; *TabPntr != 0 && *TabPntr != '\t'; TabPntr++)
-      ; if (*TabPntr == '\t') *TabPntr++ = 0; /* Stringify up to next tab. */
+      ;
+    if (*TabPntr == '\t') *TabPntr++ = 0; /* Stringify up to next tab. */
 
     m_TotalSpamMessages = atoll (StringPntr);
   }
@@ -3747,26 +3752,30 @@ status_t ABSApp::LoadSaveDatabase (bool DoLoad, char *ErrorMessage)
 
       TabPntr = LineString;
       for (WordPntr = TabPntr; *TabPntr != 0 && *TabPntr != '\t'; TabPntr++)
-        ; if (*TabPntr == '\t') *TabPntr++ = 0; /* Stringify up to next tab. */
+        ;
+      if (*TabPntr == '\t') *TabPntr++ = 0; /* Stringify up to next tab. */
 
       /* Get the date stamp.  Actually a sequence number, not a date. */
 
       for (StringPntr = TabPntr; *TabPntr != 0 && *TabPntr != '\t'; TabPntr++)
-        ; if (*TabPntr == '\t') *TabPntr++ = 0; /* Stringify up to next tab. */
+        ;
+      if (*TabPntr == '\t') *TabPntr++ = 0; /* Stringify up to next tab. */
 
       Statistics.age = atoll (StringPntr);
 
       /* Get the Genuine count. */
 
       for (StringPntr = TabPntr; *TabPntr != 0 && *TabPntr != '\t'; TabPntr++)
-        ; if (*TabPntr == '\t') *TabPntr++ = 0; /* Stringify up to next tab. */
+        ;
+      if (*TabPntr == '\t') *TabPntr++ = 0; /* Stringify up to next tab. */
 
       Statistics.genuineCount = atoll (StringPntr);
 
       /* Get the Spam count. */
 
       for (StringPntr = TabPntr; *TabPntr != 0 && *TabPntr != '\t'; TabPntr++)
-        ; if (*TabPntr == '\t') *TabPntr++ = 0; /* Stringify up to next tab. */
+        ;
+      if (*TabPntr == '\t') *TabPntr++ = 0; /* Stringify up to next tab. */
 
       Statistics.spamCount = atoll (StringPntr);
 
