@@ -32,9 +32,9 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 
-	char *subject = "No subject";
-	char *cc = "";
-	char *bcc = "";
+	const char *subject = "No subject";
+	const char *cc = "";
+	const char *bcc = "";
 	BString to;
 	bool verbose = false;
 
