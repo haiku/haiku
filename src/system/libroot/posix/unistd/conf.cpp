@@ -87,6 +87,8 @@ __sysconf(int name)
 			return STREAM_MAX;
 		case _SC_SYMLOOP_MAX:
 			return SYMLOOP_MAX;
+		case _SC_TTY_NAME_MAX:
+			return TTY_NAME_MAX;
 		case _SC_TZNAME_MAX:
 			return TZNAME_MAX;
 		case _SC_VERSION:

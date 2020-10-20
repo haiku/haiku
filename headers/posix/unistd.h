@@ -135,6 +135,7 @@
 #define _SC_REGEXP						62
 #define _SC_SYMLOOP_MAX					63
 #define _SC_SHELL						64
+#define _SC_TTY_NAME_MAX				65
 
 
 /* confstr() constants */
