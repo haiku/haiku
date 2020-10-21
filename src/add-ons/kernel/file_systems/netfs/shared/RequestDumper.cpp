@@ -69,43 +69,43 @@ RequestDumper::Visit(RequestMember* member, uint16& data)
 void
 RequestDumper::Visit(RequestMember* member, int32& data)
 {
-	PRINT("%sint32:  %ld\n", _Indentation(), data);
+	PRINT("%sint32:  %" B_PRId32 "\n", _Indentation(), data);
 }
 
 // Visit
 void
 RequestDumper::Visit(RequestMember* member, uint32& data)
 {
-	PRINT("%suint32: %lu\n", _Indentation(), data);
+	PRINT("%suint32: %" B_PRIu32 "\n", _Indentation(), data);
 }
 
 // Visit
 void
 RequestDumper::Visit(RequestMember* member, int64& data)
 {
-	PRINT("%sint64:  %lld\n", _Indentation(), data);
+	PRINT("%sint64:  %" B_PRId64 "\n", _Indentation(), data);
 }
 
 // Visit
 void
 RequestDumper::Visit(RequestMember* member, uint64& data)
 {
-	PRINT("%suint64: %llu\n", _Indentation(), data);
+	PRINT("%suint64: %" B_PRIu64 "\n", _Indentation(), data);
 }
 
 // Visit
 void
 RequestDumper::Visit(RequestMember* member, Data& data)
 {
-	PRINT("%sdata:    %p (%ld bytes)\n", _Indentation(), data.GetData(),
-		data.GetSize());
+	PRINT("%sdata:    %p (%" B_PRId32 " bytes)\n", _Indentation(),
+		data.GetData(), data.GetSize());
 }
 
 // Visit
 void
 RequestDumper::Visit(RequestMember* member, StringData& data)
 {
-	PRINT("%sstring: \"%s\" (%p, %ld bytes)\n", _Indentation(),
+	PRINT("%sstring: \"%s\" (%p, %" B_PRId32 " bytes)\n", _Indentation(),
 		data.GetString(), data.GetString(), data.GetSize());
 }
 

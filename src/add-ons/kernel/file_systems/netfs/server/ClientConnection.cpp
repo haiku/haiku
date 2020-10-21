@@ -1608,12 +1608,13 @@ ClientConnection::VisitOpenDirRequest(OpenDirRequest* request)
 	if (result == B_OK) {
 		_GetNodeInfo(directory, &reply.nodeInfo);
 		reply.cookie = handle->GetCookie();
+	} else {
+		if (directory != NULL) {
+			PRINT("OpenDir() failed: client volume: %" B_PRId32 ", "
+				"node: (%" B_PRIdDEV ", %" B_PRIdINO ")\n",
+				volume->GetID(), directory->GetVolumeID(), directory->GetID());
+		}
 	}
-else {
-if (directory)
-PRINT("OpenDir() failed: client volume: %ld, node: (%ld, %lld)\n",
-volume->GetID(), directory->GetVolumeID(), directory->GetID());
-}
 
 	managerLocker.Unlock();
 
@@ -1677,9 +1678,10 @@ ClientConnection::VisitReadDirRequest(ReadDirRequest* request)
 			result = B_PERMISSION_DENIED;
 	}
 
-if (result == B_OK) {
-	PRINT("ReadDir: (%ld, %lld)\n", request->volumeID, directory->GetID());
-}
+	if (result == B_OK) {
+		PRINT("ReadDir: (%" B_PRId32 ", %" B_PRIdINO ")\n", request->volumeID,
+			directory->GetID());
+	}
 
 	// rewind, if requested
 	if (result == B_OK && request->rewind)
@@ -1711,11 +1713,13 @@ if (result == B_OK) {
 //directoryID, reply.error, reply.entryInfos.CountElements(),
 //reply.entryInfo.directoryID,
 //reply.entryInfo.nodeID, reply.entryInfo.name.GetString()));
-if (directory) {
-PRINT("ReadDir done: volume: %ld, (%ld, %lld) -> (%lx, %ld)\n",
-volume->GetID(), directory->GetVolumeID(), directory->GetID(), result,
-reply.entryInfos.CountElements());
-}
+	if (directory != NULL) {
+		PRINT("ReadDir done: volume: %" B_PRId32 ", "
+			"(%" B_PRIdDEV ", %" B_PRIdINO ") -> "
+			"(%" B_PRIx32 ", %" B_PRId32 ")\n",
+			volume->GetID(), directory->GetVolumeID(), directory->GetID(),
+			result, reply.entryInfos.CountElements());
+	}
 
 	managerLocker.Unlock();
 
@@ -1788,7 +1792,8 @@ ClientConnection::VisitWalkRequest(WalkRequest* request)
 
 	// send the reply
 	reply.error = result;
-	PRINT("Walk: (%ld, %lld, `%s') -> (%lx, (%ld, %lld), `%s')\n",
+	PRINT("Walk: (%" B_PRIdDEV ", %" B_PRIdINO ", `%s') -> "
+		"(%" B_PRIx32 ", (%" B_PRIdDEV ", %" B_PRIdINO "), `%s')\n",
 		request->nodeID.volumeID, request->nodeID.nodeID,
 		request->name.GetString(), result,
 		reply.entryInfo.nodeInfo.st.st_dev,
@@ -1854,7 +1859,8 @@ ClientConnection::VisitMultiWalkRequest(MultiWalkRequest* request)
 
 	// send the reply
 	reply.error = result;
-	PRINT("MultiWalk: (%ld, %lld, %ld) -> (%lx, %ld)\n",
+	PRINT("MultiWalk: (%" B_PRIdDEV ", %" B_PRIdINO ", %" B_PRId32 ") -> "
+		"(%" B_PRIx32 ", %" B_PRId32 ")\n",
 		request->nodeID.volumeID, request->nodeID.nodeID, count,
 		result, reply.entryInfos.CountElements());
 	return GetChannel()->SendRequest(&reply);
@@ -2432,7 +2438,7 @@ ClientConnection::VisitReadQueryRequest(ReadQueryRequest* request)
 			break;
 		if (countRead == 0)
 			break;
-		PRINT("  query entry: %ld, %lld, \"%s\"\n",
+		PRINT("  query entry: %" B_PRIdDEV ", %" B_PRIdINO ", \"%s\"\n",
 			dirEntry->d_pdev, dirEntry->d_pino, dirEntry->d_name);
 
 		VolumeManagerLocker managerLocker;
@@ -2460,9 +2466,8 @@ ClientConnection::VisitReadQueryRequest(ReadQueryRequest* request)
 				_GetNodeInfo(entry->GetDirectory(), &reply.dirInfo);
 				_GetEntryInfo(entry, &reply.entryInfo);
 				break;
-			}
-else
-PRINT(("  -> no client volumes\n"));
+			} else
+				PRINT(("  -> no client volumes\n"));
 		}
 
 		// entry is not in the volume: next round...
@@ -2472,8 +2477,10 @@ PRINT(("  -> no client volumes\n"));
 	// send the reply
 	reply.error = result;
 	reply.count = countRead;
-	PRINT("ReadQuery: (%lx, %ld, dir: (%ld, %lld), node: (%ld, %lld, `%s')"
-		"\n", reply.error, reply.count,
+	PRINT("ReadQuery: (%" B_PRIx32 ", %" B_PRId32 ", "
+		"dir: (%" B_PRIdDEV ", %" B_PRIdINO "), "
+		"node: (%" B_PRIdDEV ", %" B_PRIdINO ", `%s')\n",
+		reply.error, reply.count,
 		reply.entryInfo.directoryID.volumeID,
 		reply.entryInfo.directoryID.nodeID,
 		reply.entryInfo.nodeInfo.st.st_dev,
@@ -2573,8 +2580,8 @@ ClientConnection::ProcessQueryEvent(NodeMonitoringEvent* event)
 		return;
 	}
 	PRINT("ClientConnection::ProcessQueryEvent(): event: %p, type: %s:"
-		" directory: (%ld, %lld)\n", event, typeid(event).name(),
-		volumeID, directoryID);
+		" directory: (%" B_PRIdDEV ", %" B_PRIdINO ")\n",
+		event, typeid(event).name(), volumeID, directoryID);
 
 	// create an array for the IDs of the client volumes a found entry may
 	// reside on
