@@ -388,7 +388,7 @@ void
 Model::MergeOrAddDepot(const DepotInfoRef depot)
 {
 	BString depotName = depot->Name();
-	for(int32 i = 0; i < fDepots.size(); i++) {
+	for(uint32 i = 0; i < fDepots.size(); i++) {
 		if (fDepots[i]->Name() == depotName) {
 			DepotInfoRef ersatzDepot(new DepotInfo(*(fDepots[i].Get())), true);
 			ersatzDepot->SyncPackages(depot->Packages());
@@ -1096,12 +1096,15 @@ Model::AddRatingStabilities(std::vector<RatingStabilityRef>& values)
 void
 Model::_AddRatingStability(const RatingStabilityRef& value)
 {
-	std::vector<RatingStabilityRef>::const_iterator itInsertionPt
+	std::vector<RatingStabilityRef>::const_iterator itInsertionPtConst
 		= std::lower_bound(
 			fRatingStabilities.begin(),
 			fRatingStabilities.end(),
 			value,
 			&IsRatingStabilityBefore);
+	std::vector<RatingStabilityRef>::iterator itInsertionPt =
+		fRatingStabilities.begin()
+			+ (itInsertionPtConst - fRatingStabilities.begin());
 
 	if (itInsertionPt != fRatingStabilities.end()
 		&& (*itInsertionPt)->Code() == value->Code()) {
@@ -1158,12 +1161,14 @@ Model::AddCategories(std::vector<CategoryRef>& values)
 void
 Model::_AddCategory(const CategoryRef& category)
 {
-	std::vector<CategoryRef>::const_iterator itInsertionPt
+	std::vector<CategoryRef>::const_iterator itInsertionPtConst
 		= std::lower_bound(
 			fCategories.begin(),
 			fCategories.end(),
 			category,
 			&IsPackageCategoryBefore);
+	std::vector<CategoryRef>::iterator itInsertionPt =
+		fCategories.begin() + (itInsertionPtConst - fCategories.begin());
 
 	if (itInsertionPt != fCategories.end()
 		&& (*itInsertionPt)->Code() == category->Code()) {

@@ -11,6 +11,7 @@
 
 #include <ctype.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 
 // These macros allow for standardized logging to be output.
