@@ -18,6 +18,8 @@
 
 #include <Autolock.h>
 #include <Debug.h>
+#include <ObjectList.h>
+#include <SupportDefs.h>
 
 #include <ctype.h>
 
@@ -35,16 +37,46 @@ public:
 		Unset();
 	}
 
-	void SetTo(FontCacheEntry* entry, bool writeLocked)
+	bool SetTo(FontCacheEntry* entry, bool writeLock)
 	{
-		// NOTE: If the semantics are changed such
-		// that the reference to a previous entry
-		// is properly released, then don't forget
-		// to adapt existing which transfers
-		// responsibility of entries between
-		// references!
+		ASSERT(entry != NULL);
+
+		if (entry == fCacheEntry) {
+			if (writeLock == fWriteLocked)
+				return true;
+			UnlockAndDisown();
+		} else if (fCacheEntry != NULL)
+			Unset();
+
+		if (writeLock) {
+			if (!entry->WriteLock()) {
+				FontCache::Default()->Recycle(entry);
+				return false;
+			}
+		} else if (!entry->ReadLock()) {
+			FontCache::Default()->Recycle(entry);
+			return false;
+		}
+
 		fCacheEntry = entry;
-		fWriteLocked = writeLocked;
+		fWriteLocked = writeLock;
+		return true;
+	}
+
+	FontCacheEntry* UnlockAndDisown()
+	{
+		if (fCacheEntry == NULL)
+			return NULL;
+
+		if (fWriteLocked)
+			fCacheEntry->WriteUnlock();
+		else
+			fCacheEntry->ReadUnlock();
+
+		FontCacheEntry* entry = fCacheEntry;
+		fCacheEntry = NULL;
+		fWriteLocked = false;
+		return entry;
 	}
 
 	void Unset()
@@ -52,12 +84,7 @@ public:
 		if (fCacheEntry == NULL)
 			return;
 
-		if (fWriteLocked)
-			fCacheEntry->WriteUnlock();
-		else
-			fCacheEntry->ReadUnlock();
-
-		FontCache::Default()->Recycle(fCacheEntry);
+		FontCache::Default()->Recycle(UnlockAndDisown());
 	}
 
 	inline FontCacheEntry* Entry() const
@@ -81,11 +108,7 @@ public:
 	static	bool				IsWhiteSpace(uint32 glyphCode);
 
 	static	FontCacheEntry*		FontCacheEntryFor(const ServerFont& font,
-									bool forceVector,
-									const FontCacheEntry* disallowedEntry,
-									uint32 glyphCode,
-									FontCacheReference& cacheReference,
-									bool needsWriteLock);
+									bool forceVector);
 
 			template<class GlyphConsumer>
 	static	bool				LayoutGlyphs(GlyphConsumer& consumer,
@@ -98,13 +121,15 @@ public:
 									FontCacheReference* cacheReference = NULL);
 
 private:
-	static	bool				_WriteLockAndAcquireFallbackEntry(
+	static	const GlyphCache*	_CreateGlyph(
 									FontCacheReference& cacheReference,
-									FontCacheEntry* entry,
+									BObjectList<FontCacheReference>& fallbacks,
 									const ServerFont& font, bool needsVector,
-									uint32 glyphCode,
-									FontCacheReference& fallbackCacheReference,
-									FontCacheEntry*& fallbackEntry);
+									uint32 glyphCode);
+
+	static	void				_PopulateAndLockFallbacks(
+									BObjectList<FontCacheReference>& fallbacks,
+									const ServerFont& font, bool forceVector);
 
 								GlyphLayoutEngine();
 	virtual						~GlyphLayoutEngine();
@@ -132,44 +157,10 @@ GlyphLayoutEngine::IsWhiteSpace(uint32 charCode)
 
 
 inline FontCacheEntry*
-GlyphLayoutEngine::FontCacheEntryFor(const ServerFont& font, bool forceVector,
-	const FontCacheEntry* disallowedEntry, uint32 glyphCode,
-	FontCacheReference& cacheReference, bool needsWriteLock)
+GlyphLayoutEngine::FontCacheEntryFor(const ServerFont& font, bool forceVector)
 {
-	ASSERT(cacheReference.Entry() == NULL);
-
 	FontCache* cache = FontCache::Default();
 	FontCacheEntry* entry = cache->FontCacheEntryFor(font, forceVector);
-	if (entry == NULL)
-		return NULL;
-
-	if (entry == disallowedEntry) {
-		cache->Recycle(entry);
-		return NULL;
-	}
-
-	if (glyphCode != 0 && !entry->CanCreateGlyph(glyphCode)) {
-		cache->Recycle(entry);
-		return NULL;
-	}
-
-	if (needsWriteLock) {
-		if (!entry->WriteLock()) {
-			cache->Recycle(entry);
-			return NULL;
-		}
-	} else {
-		if (!entry->ReadLock()) {
-			cache->Recycle(entry);
-			return NULL;
-		}
-	}
-
-	// At this point, we have a valid FontCacheEntry and it is locked in the
-	// proper mode. We can setup the FontCacheReference so it takes care of
-	// the locking and recycling from now and return the entry.
-	cacheReference.SetTo(entry, needsWriteLock);
-
 	return entry;
 }
 
@@ -184,10 +175,12 @@ GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 {
 	// TODO: implement spacing modes
 	FontCacheEntry* entry = NULL;
+	FontCacheReference* pCacheReference;
 	FontCacheReference cacheReference;
-	FontCacheEntry* fallbackEntry = NULL;
-	FontCacheReference fallbackCacheReference;
+	BObjectList<FontCacheReference> fallbacksList(21, true);
+
 	if (_cacheReference != NULL) {
+		pCacheReference = _cacheReference;
 		entry = _cacheReference->Entry();
 		// When there is already a cacheReference, it means there was already
 		// an iteration over the glyphs. The use-case is for example to do
@@ -196,13 +189,15 @@ GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 		// This means that the fallback entry mechanism will not do any good
 		// for the second pass, since the fallback glyphs have been stored in
 		// the original entry.
-	}
+	} else
+		pCacheReference = &cacheReference;
 
 	if (entry == NULL) {
-		entry = FontCacheEntryFor(font, consumer.NeedsVector(), NULL, 0,
-			cacheReference, false);
+		entry = FontCacheEntryFor(font, consumer.NeedsVector());
 
 		if (entry == NULL)
+			return false;
+		if (!pCacheReference->SetTo(entry, false))
 			return false;
 	} // else the entry was already used and is still locked
 
@@ -222,7 +217,6 @@ GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 	uint32 lastCharCode = 0; // Needed for kerning in B_STRING_SPACING mode
 	uint32 charCode;
 	int32 index = 0;
-	bool writeLocked = false;
 	const char* start = utf8String;
 	while (maxChars-- > 0 && (charCode = UTF8ToCharCode(&utf8String)) != 0) {
 
@@ -241,18 +235,12 @@ GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 
 		const GlyphCache* glyph = entry->CachedGlyph(charCode);
 		if (glyph == NULL) {
-			// The glyph has not been cached yet, switch to a write lock,
-			// acquire the fallback entry and create the glyph. Note that
-			// the write lock will persist (in the cacheReference) so that
-			// we only have to do this switch once for the whole string.
-			if (!writeLocked) {
-				writeLocked = _WriteLockAndAcquireFallbackEntry(cacheReference,
-					entry, font, consumer.NeedsVector(), charCode,
-					fallbackCacheReference, fallbackEntry);
-			}
+			glyph = _CreateGlyph(*pCacheReference, fallbacksList, font,
+				consumer.NeedsVector(), charCode);
 
-			if (writeLocked)
-				glyph = entry->CreateGlyph(charCode, fallbackEntry);
+			// Something may have gone wrong while reacquiring the entry lock
+			if (pCacheReference->Entry() == NULL)
+				return false;
 		}
 
 		if (glyph == NULL) {
@@ -292,39 +280,54 @@ GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 	y += advanceY;
 	consumer.Finish(x, y);
 
-	if (_cacheReference != NULL && _cacheReference->Entry() == NULL) {
-		// The caller passed a FontCacheReference, but this is the first
-		// iteration -> switch the ownership from the stack allocated
-		// FontCacheReference to the one passed by the caller. The fallback
-		// FontCacheReference is not affected by this, since it is never used
-		// during a second iteration.
-		_cacheReference->SetTo(entry, cacheReference.WriteLocked());
-		cacheReference.SetTo(NULL, false);
-	}
 	return true;
 }
 
 
-inline bool
-GlyphLayoutEngine::_WriteLockAndAcquireFallbackEntry(
-	FontCacheReference& cacheReference, FontCacheEntry* entry,
-	const ServerFont& font, bool forceVector, uint32 charCode,
-	FontCacheReference& fallbackCacheReference,
-	FontCacheEntry*& fallbackEntry)
+inline const GlyphCache*
+GlyphLayoutEngine::_CreateGlyph(FontCacheReference& cacheReference,
+	BObjectList<FontCacheReference>& fallbacks,
+	const ServerFont& font, bool forceVector, uint32 charCode)
 {
-	// We need a fallback font, since potentially, we have to obtain missing
-	// glyphs from it. We need to obtain the fallback font while we have not
-	// locked anything, since locking the FontManager with the write-lock held
-	// can obvisouly lead to a deadlock.
+	FontCacheEntry* entry = cacheReference.Entry();
 
-	bool writeLocked = entry->IsWriteLocked();
-
-	if (writeLocked) {
-		entry->WriteUnlock();
-	} else {
-		cacheReference.SetTo(NULL, false);
-		entry->ReadUnlock();
+	// Avoid loading and locking the fallbacks if our font can create the glyph.
+	if (entry->CanCreateGlyph(charCode)) {
+		if (cacheReference.SetTo(entry, true))
+			return entry->CreateGlyph(charCode);
+		return NULL;
 	}
+
+	if (fallbacks.IsEmpty()) {
+		// We need to create new glyphs with the engine of the fallback font
+		// and store them in the main font cache (not just transfer them from
+		// one cache to the other). So we need both to be write-locked.
+		// The main font is unlocked first, in case it is also in the fallback
+		// list, so that we always keep the same order to avoid deadlocks.
+		cacheReference.UnlockAndDisown();
+		_PopulateAndLockFallbacks(fallbacks, font, forceVector);
+		if (!cacheReference.SetTo(entry, true)) {
+			return NULL;
+		}
+	}
+
+	int32 count = fallbacks.CountItems();
+	for (int32 index = 0; index < count; index++) {
+		FontCacheEntry* fallbackEntry = fallbacks.ItemAt(index)->Entry();
+		if (fallbackEntry->CanCreateGlyph(charCode))
+			return entry->CreateGlyph(charCode, fallbackEntry);
+	}
+
+	return NULL;
+}
+
+
+inline void
+GlyphLayoutEngine::_PopulateAndLockFallbacks(
+	BObjectList<FontCacheReference>& fallbacksList,
+	const ServerFont& font, bool forceVector)
+{
+	ASSERT(fallbacksList.IsEmpty());
 
 	// TODO: We always get the fallback glyphs from the Noto family, but of
 	// course the fallback font should a) contain the missing glyphs at all
@@ -334,14 +337,18 @@ GlyphLayoutEngine::_WriteLockAndAcquireFallbackEntry(
 		"Noto Sans Display",
 		"Noto Sans Thai",
 		"Noto Sans CJK JP",
-		"Noto Sans Symbols",
-		NULL
+		"Noto Sans Symbols"
 	};
 
-	fallbackEntry = NULL;
+	if (!gFontManager->Lock())
+		return;
 
-	// Try to get the glyph from the fallback fonts.
-	for (int c = 0; c < 3; c++) {
+	static const int nStyles = 3;
+	static const int nFallbacks = B_COUNT_OF(fallbacks);
+	FontCacheEntry* fallbackCacheEntries[nStyles * nFallbacks];
+	int entries = 0;
+
+	for (int c = 0; c < nStyles; c++) {
 		const char* fontStyle;
 		if (c == 0)
 			fontStyle = font.Style();
@@ -350,10 +357,7 @@ GlyphLayoutEngine::_WriteLockAndAcquireFallbackEntry(
 		else
 			fontStyle = NULL;
 
-		for (int i = 0; fallbacks[i] != NULL; i++) {
-			BAutolock locker(gFontManager);
-			if (!locker.IsLocked())
-				continue;
+		for (int i = 0; i < nFallbacks; i++) {
 
 			FontStyle* fallbackStyle = gFontManager->GetStyle(fallbacks[i],
 				fontStyle, 0xffff, 0);
@@ -362,41 +366,34 @@ GlyphLayoutEngine::_WriteLockAndAcquireFallbackEntry(
 				continue;
 
 			ServerFont fallbackFont(*fallbackStyle, font.Size());
-			locker.Unlock();
 
-			// Force the write-lock on the fallback entry, since we
-			// don't transfer or copy GlyphCache objects from one cache
-			// to the other, but create new glyphs which are stored in
-			// "entry" in any case, which requires the write cache for
-			// sure (used FontEngine of fallbackEntry).
-			FontCacheEntry* candidateFallbackEntry = FontCacheEntryFor(
-				fallbackFont, forceVector, entry, charCode,
-				fallbackCacheReference, true);
+			FontCacheEntry* entry = FontCacheEntryFor(
+				fallbackFont, forceVector);
 
-			// Stop when we find a font that indeed has the glyph we need.
-			if (candidateFallbackEntry != NULL) {
-				fallbackEntry = candidateFallbackEntry;
-				break;
-			}
+			if (entry == NULL)
+				continue;
+
+			fallbackCacheEntries[entries++] = entry;
+
 		}
 
-		if (fallbackEntry != NULL)
-			break;
 	}
 
-	// NOTE: We don't care if fallbackEntry is still NULL, fetching
-	// alternate glyphs will simply not work.
+	gFontManager->Unlock();
 
-	if (!entry->WriteLock()) {
-		FontCache::Default()->Recycle(entry);
-		return false;
+	// Finally lock the entries and save their references
+	for (int i = 0; i < entries; i++) {
+		FontCacheReference* cacheReference =
+			new(std::nothrow) FontCacheReference();
+		if (cacheReference != NULL) {
+			if (cacheReference->SetTo(fallbackCacheEntries[i], true))
+				fallbacksList.AddItem(cacheReference);
+			else
+				delete cacheReference;
+		}
 	}
 
-	if (!writeLocked) {
-		// Update the FontCacheReference, since the locking kind changed.
-		cacheReference.SetTo(entry, true);
-	}
-	return true;
+	return;
 }
 
 
