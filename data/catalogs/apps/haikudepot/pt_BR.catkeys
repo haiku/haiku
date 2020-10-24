@@ -1,19 +1,15 @@
-1	portuguese (brazil)	x-vnd.Haiku-HaikuDepot	1649805476
+1	portuguese (brazil)	x-vnd.Haiku-HaikuDepot	875972952
 Uninstall	PackageManager		Desinstalar
 Uninstalled	PackageListView		Não instalado
 Available packages	MainWindow		Pacotes disponíveis
 Create account	UserLoginWindow		Criar conta
-Mostly stable	RatePackageWindow		Na maior parte estável
 Develop packages	MainWindow		Desenvolver pacotes
 Rate package…	PackageInfoView		Avaliar pacote...
 Starting the package daemon failed:\n\n%Error%	App		A inicialização do daemon de pacote falhou:\n\n%Error%
 <no info>	PackageInfoView		<sem informação>
 No user ratings available.	PackageInfoView		Nenhuma avaliação de usuário disponível.
 Rating	PackageListView		Avaliação
-Does not start	RatePackageWindow		Não iniciar
 Show	MainWindow		Exibir
-Unstable but usable	RatePackageWindow		Instável mas utilizável
-Not specified	RatePackageWindow		Não especificado
 Active	PackageListView		Ativo
 Login or Create account	MainWindow		Autenticar-se ou Criar conta
 <Package contents not available for remote packages>	PackageContentsView		<Conteúdos de pacote não disponíveis para pacotes remotos>
@@ -25,7 +21,6 @@ Rate %Package%	RatePackageWindow		Avaliar %Package%
 Quit HaikuDepot	App		Fechar o Depósito Haiku
 Category	FilterView		Categoria
 Installed packages	MainWindow		Pacotes instalados
-Stable	RatePackageWindow		Estável
 Fatal error	PackageManager		Erro fatal
 Package action failed	PackageInfoView		Ação do pacote falhou
 No changelog available.	PackageInfoView		Nenhum relatório de mudanças disponível.
@@ -40,7 +35,6 @@ Contents	PackageInfoView		Conteúdo
 Close	PackageManager		Fechar
 Changelog	PackageInfoView		Registro de alterações
 About	PackageInfoView		Sobre
-Very unstable	RatePackageWindow		Muito instável
 Stability	RatePackageWindow		Estabilidade
 Send	RatePackageWindow		Enviar
 Start package daemon	App		Iniciar daemon de pacote

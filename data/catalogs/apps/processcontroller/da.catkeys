@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-ProcessController	2280875657
+1	danish	x-vnd.Haiku-ProcessController	3123774187
 Error saving file	ProcessController		Fejl ved gemning af fil
 Display priority	ProcessController		Visningsprioritet
 That's no Fun!	ProcessController		Det var kedeligt!
@@ -23,7 +23,6 @@ Usage: %s [-deskbar]\n	ProcessController		Anvendelse: %s [-deskbar]\n
 Please confirm	ProcessController		Bekræft venligst
 Urgent priority	ProcessController		Vigtig prioritet
 What do you want to do with the thread \"%s\"?	ProcessController		Hvad vil du gøre med tråden \"%s\"?
-(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
 Idle priority	ProcessController		Inaktivitetsprioritet
 Real-time display priority	ProcessController		Realtidsvisning prioritet
 Threads and CPU usage	ProcessController		Tråde- og CPU-forbrud

@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-CodyCam	3040889653
+1	lithuanian	x-vnd.Haiku-CodyCam	488251126
 destination directory expected	CodyCam		reikalingas paskirties aplankas
 reply: '%s'\n	SftpClient		atsakas: „%s“\n
 JPEG image	CodyCam		JPEG paveikslas
@@ -40,7 +40,6 @@ Directory:	CodyCam		Aplankas:
 Error setting type of output file	VideoConsumer.cpp		Klaida nustatant išvesties failo tipą
 Cannot find an available video stream	CodyCam		Nepavyko rasti laisvo vaizdo srauto
 password expected	CodyCam		reikalingas slaptažodis
-PASS <suppressed>  (real password sent)\n	FtpClient		PASS <nerodomas>  (nusiųstas tikras slaptažodis)\n
 SFTP	CodyCam		SFTP
 Output	CodyCam		Paskirtis
 server address expected	CodyCam		reikalingas serverio adresas

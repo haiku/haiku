@@ -16,7 +16,7 @@ Available languages	Locale Preflet Window		Verfügbare Sprachen
 Locale	Locale Preflet		Land & Sprache
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Es wurden keine verfügbaren Sprachen gefunden. Dieses Preflet kann daher nicht verwendet werden!
 Formatting	Locale Preflet Window		Formatierung
-Use month/day-names from preferred language	TimeFormatSettings		Monats-/Tagesnamen aus bevorzugter Sprache verwenden
+Use month/day-names from preferred language	TimeFormatSettings		Monats-/Tagesnamen aus bevorzugter Sprache
 already chosen	LanguageListView		bereits ausgewählt
 Preferred languages	Locale Preflet Window		Bevorzugte Sprache
 Full format:	TimeFormatSettings		Volles Format:

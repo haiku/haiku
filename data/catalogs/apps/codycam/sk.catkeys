@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-CodyCam	1770279704
+1	slovak	x-vnd.Haiku-CodyCam	3512608473
 destination directory expected	CodyCam		očakával sa cieľový adresár
 reply: '%s'\n	SftpClient		odpoveď: „%s“\n
 JPEG image	CodyCam		Obrázok JPEG
@@ -41,7 +41,6 @@ Error setting type of output file	VideoConsumer.cpp		Chyba pri nastavovaní typu
 Cannot find an available video stream	CodyCam		Nenájdený dostupný video stream
 Upload…	VideoConsumer.cpp		Nahrať…
 password expected	CodyCam		očakávalo sa heslo
-PASS <suppressed>  (real password sent)\n	FtpClient		PASS <skryté>  (skutočné odoslané heslo)\n
 SFTP	CodyCam		SFTP
 Output	CodyCam		Výstup
 server address expected	CodyCam		očakávala sa adresa servera

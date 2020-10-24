@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-HaikuDepot	1546691996
+1	italian	x-vnd.Haiku-HaikuDepot	772859472
 Repository update error	LocalRepositoryUpdateProcess		Errore nell'aggiornamento del Repository
 Network error	ServerHelper		Errore di rete
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Si è verificato un errore nell'aggiornamento del repository: %error%
@@ -9,7 +9,6 @@ Uninstalled	PackageListView		Disinstallato
 It was not possible to create the new user.	UserLoginWindow		Non è stato possble creare il nuovo utente.
 Available packages	MainWindow		Pacchetti disponibili
 Create account	UserLoginWindow		Crea account
-Mostly stable	RatePackageWindow		Tendenzialmente stabile
 OK	App		OK
 The response to the captcha was incorrect.	ServerHelper		Il captcha inserito non è corretto.
 Develop packages	MainWindow		Sviluppo
@@ -23,11 +22,8 @@ It was not possible to extract necessary captcha information from the data sent 
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Si è verificato un errore di rete nel tentativo di connettersi al server: %s
 Rating	PackageListView		Valutazione
 Synchronizing icons	ServerIconExportUpdateProcess		Sincronizzazione icone
-Does not start	RatePackageWindow		Non si avvia
 Show	MainWindow		Mostra
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Si è verificato un errore nello scaricamento della lista dei pachetti: %message%
-Unstable but usable	RatePackageWindow		Instabile, ma utilizzabile
-Not specified	RatePackageWindow		Non specificato
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Questa applicazione per il suo corretto funzionamento legge e scrive alcuni file sul tuo computer. Sembrerebbe esserci stato un problema nella scrittura di un file di test su [%TestFilePath%]. Per favore, controlla che non ci siano problemi sul tuo disco o che siano impostati dei permessi che impediscono all'applicazione di scrivere file su quella posizione. Puoi decidere di non risolvere il problema e di continuare per adesso, ma alcune funzionalità dell'applicazione potrebbero essere disabilitate.
 Active	PackageListView		Attivo
 Login or Create account	MainWindow		Accedi o Registrati
@@ -48,7 +44,6 @@ Category	FilterView		Categoria
 User rating	RatePackageWindow		Valutazione utenti
 Installed packages	MainWindow		Pacchetti installati
 A requested object or an object involved in the request was not found on the server.	ServerHelper		L'elemento richiesto o uno ad esso collegato non è stato trovato sul server.
-Stable	RatePackageWindow		Stabile
 Fatal error	PackageManager		Errore fatale
 Package action failed	PackageInfoView		Azione sul pacchetto non riuscita
 No changelog available.	PackageInfoView		Nessun registro modifiche disponibile.
@@ -74,7 +69,6 @@ Package update error	MainWindow		Errore nell'aggiornamento del pacchetto
 About	PackageInfoView		Informazioni su…
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# processo} other{# processi}}
 Reboot required	PackageManager		È richiesto il riavvio
-Very unstable	RatePackageWindow		Molto instabile
 Password:	UserLoginWindow		Password:
 All packages	PackageListView		Tutti i pacchetti
 This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Questa applicazione è troppo obsoleta per poter comunicare con il server. Aggiornala ad una versione più nuova attraverso l'aggiornamento del sistema. La versione minima richiesta è \"%s\".

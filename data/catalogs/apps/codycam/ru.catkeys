@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-CodyCam	2593355250
+1	russian	x-vnd.Haiku-CodyCam	40716723
 destination directory expected	CodyCam		укажите папку назначения
 reply: '%s'\n	SftpClient		ответ: '%s'\n
 JPEG image	CodyCam		JPEG изображение
@@ -43,7 +43,6 @@ Locking the window	VideoConsumer.cpp		Блокируем окно
 Cannot find an available video stream	CodyCam		Невозможно найти видео поток
 Upload…	VideoConsumer.cpp		Загрузить…
 password expected	CodyCam		укажите пароль
-PASS <suppressed>  (real password sent)\n	FtpClient		ПАРОЛЬ <скрыт> (реальный пароль отослан)\n
 SFTP	CodyCam		SFTP
 Output	CodyCam		Вывод
 server address expected	CodyCam		укажите адрес сервера

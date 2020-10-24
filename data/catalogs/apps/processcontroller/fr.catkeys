@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-ProcessController	2280875657
+1	french	x-vnd.Haiku-ProcessController	3123774187
 Error saving file	ProcessController		Erreur à l’enregistrement du fichier
 Display priority	ProcessController		Priorité affichage
 That's no Fun!	ProcessController		C’est pas fun !
@@ -23,7 +23,6 @@ Usage: %s [-deskbar]\n	ProcessController		Utilisation : %s [-deskbar]\n
 Please confirm	ProcessController		Veuillez confirmer
 Urgent priority	ProcessController		Priorité urgente
 What do you want to do with the thread \"%s\"?	ProcessController		Que voulez vous faire de la tâche « %s » ?
-(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		©1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
 Idle priority	ProcessController		Priorité inactive
 Real-time display priority	ProcessController		Priorité affichage temps-réel
 Threads and CPU usage	ProcessController		Tâches et activité CPU

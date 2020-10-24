@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-CodyCam	249960869
+1	english	x-vnd.Haiku-CodyCam	1992289638
 destination directory expected	CodyCam		预期目标目录
 reply: '%s'\n	SftpClient		回复：‘%s’\n
 JPEG image	CodyCam		JPEG 图像
@@ -41,7 +41,6 @@ Error setting type of output file	VideoConsumer.cpp		设置输出文件类型出
 Cannot find an available video stream	CodyCam		未发现可用视频流
 Upload…	VideoConsumer.cpp		上传…
 password expected	CodyCam		预期密码
-PASS <suppressed>  (real password sent)\n	FtpClient		通过 <suppressed> （发送真实密码）\n
 SFTP	CodyCam		SFTP
 Output	CodyCam		输出
 server address expected	CodyCam		预期服务器地址

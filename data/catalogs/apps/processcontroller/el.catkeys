@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-ProcessController	2280875657
+1	greek, modern (1453-)	x-vnd.Haiku-ProcessController	3123774187
 Error saving file	ProcessController		Σφάλμα αποθήκευσης αρχείου
 Display priority	ProcessController		Προτεραιότητα εμφάνισης
 That's no Fun!	ProcessController		Αυτό δεν έχει πλάκα!
@@ -23,7 +23,6 @@ Usage: %s [-deskbar]\n	ProcessController		Χρήση: %s [-deskbar]\n
 Please confirm	ProcessController		Παρακαλώ επιβεβαιώστε
 Urgent priority	ProcessController		Επείγουσα προτεραιότητα
 What do you want to do with the thread \"%s\"?	ProcessController		Τι θέλετε να κάνετε με το νήμα \"%s\";
-(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
 Idle priority	ProcessController		Ανενεργή προτεραιότητα
 Real-time display priority	ProcessController		Προτεραιότητα εμφάνισης πραγματικού χρόνου
 Threads and CPU usage	ProcessController		Νήματα και χρήση ΚΜΕ

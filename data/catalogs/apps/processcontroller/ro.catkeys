@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-ProcessController	2280875657
+1	romanian	x-vnd.Haiku-ProcessController	3123774187
 Error saving file	ProcessController		Eroare la salvarea fișierului
 Display priority	ProcessController		Prioritate afișaj
 That's no Fun!	ProcessController		Nu e amuzant!
@@ -23,7 +23,6 @@ Usage: %s [-deskbar]\n	ProcessController		Utilizare: %s [-deskbar]\n
 Please confirm	ProcessController		Confirmați
 Urgent priority	ProcessController		Prioritate urgentă
 What do you want to do with the thread \"%s\"?	ProcessController		Ce doriți să faceți cu firul de execuție \"%s\"?
-(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
 Idle priority	ProcessController		Prioritate în așteptare
 Real-time display priority	ProcessController		Prioritate afișaj în timp real
 Threads and CPU usage	ProcessController		Utilizare fire de execuție și CPU

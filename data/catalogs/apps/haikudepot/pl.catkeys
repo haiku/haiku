@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-HaikuDepot	3833361367
+1	polish	x-vnd.Haiku-HaikuDepot	3059528843
 Repository update error	LocalRepositoryUpdateProcess		Błąd podczas odświeżania repozytorium
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Wystąpił błąd podczas odświeżania repozytorium: %error%
 User Created	UserLoginWindow		Użytkownik utworzony
@@ -8,7 +8,6 @@ Uninstalled	PackageListView		Niezainstalowany
 It was not possible to create the new user.	UserLoginWindow		Nie udało się utworzyć nowego użytkownika.
 Available packages	MainWindow		Dostępne pakiety
 Create account	UserLoginWindow		Utwórz konto
-Mostly stable	RatePackageWindow		Całkiem stabilny
 OK	App		OK
 The response to the captcha was incorrect.	ServerHelper		Odpowiedź na test CAPTCHA była nieprawidłowa.
 Develop packages	MainWindow		Pakiety deweloperskie
@@ -21,11 +20,8 @@ Downloading package '%name%'	WorkStatusView		Pobieranie pakietu „%name%”
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Nie udało się uzyskać niezbędnych informacji o teście CAPTCHA z danych przesłanych przez serwer.
 Rating	PackageListView		Ocena
 Synchronizing icons	ServerIconExportUpdateProcess		Synchronizowanie ikon
-Does not start	RatePackageWindow		Nie uruchamia się
 Show	MainWindow		Pokaż
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Wystąpił błąd podczas pobierania listy pakietów: %message%
-Unstable but usable	RatePackageWindow		Niestabilny, ale używalny
-Not specified	RatePackageWindow		Nieokreślony
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Ta aplikacja zapisuje i odczytuje niektóre pliki robocze na twoim komputerze w celu funkcjonowania. Wygląda na to, że są problemy z zapisaniem testowego pliku w [%TestFilePath%]. Sprawdź czy nie ma problemów z dyskiem lub uprawnieniami, które mogą uniemożliwiać tej aplikacji zapisywanie plików w tym katalogu. Możesz zaakceptować ten problem i kontynuować, ale część funkcjonalności może być wyłączona.
 Active	PackageListView		Aktywny
 Login or Create account	MainWindow		Zaloguj lub utwórz konto
@@ -46,7 +42,6 @@ Category	FilterView		Kategoria
 User rating	RatePackageWindow		Ocena użytkowników
 Installed packages	MainWindow		Zainstalowane pakiety
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Żądany obiekt lub obiekt zależny nie został znaleziony na serwerze.
-Stable	RatePackageWindow		Stabilny
 Fatal error	PackageManager		Błąd krytyczny
 Package action failed	PackageInfoView		Akcja dla pakietu nie powiodła się
 No changelog available.	PackageInfoView		Dziennik zmian nie jest dostępny.
@@ -72,7 +67,6 @@ Package update error	MainWindow		Błąd aktualizacji pakietu
 About	PackageInfoView		O pakiecie
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# proces} few{# procesy} many{# procesów} other{# procesu}}
 Reboot required	PackageManager		Wymagane ponowne uruchomienie
-Very unstable	RatePackageWindow		Bardzo niestabilny
 Password:	UserLoginWindow		Hasło:
 All packages	PackageListView		Wszystkie pakiety
 Stability	RatePackageWindow		Stabilność

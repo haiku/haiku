@@ -29,7 +29,7 @@ Abort	PackageView		İptal et
 Disclaimer	PackageTextViewer		Sorumluluk Belgesi
 Preparing package	PackageInstall		Paket hazırlanıyor
 The package you requested has been successfully installed on your system.	PackageView		İstediğiniz paket sisteminize başarıyla kuruldu.
-Installation progress	PackageView		Kurulum ilerlemesi
+Installation progress	PackageView		Kurulum durumu
 Decline	PackageTextViewer		Reddet
 Continue	PackageTextViewer		Sürdür
 Installing package	PackageStatus		Paket yükleniyor

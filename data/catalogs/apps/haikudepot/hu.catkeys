@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	1237265940
+1	hungarian	x-vnd.Haiku-HaikuDepot	463433416
 Repository update error	LocalRepositoryUpdateProcess		Tároló frissítési hiba
 Network error	ServerHelper		Hálózati hiba
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Hiba történt a tároló frissítésekor: %error%
@@ -9,7 +9,6 @@ Uninstalled	PackageListView		Eltávolítva
 It was not possible to create the new user.	UserLoginWindow		Nem sikerült létrehozni a felhasználót.
 Available packages	MainWindow		Elérhető csomagok
 Create account	UserLoginWindow		Felhasználói fiók létrehozása
-Mostly stable	RatePackageWindow		Nagyrészt stabil
 OK	App		Rendben
 The response to the captcha was incorrect.	ServerHelper		Hibás válasz a captcha-kódra.
 Develop packages	MainWindow		Fejlesztői csomagok
@@ -22,11 +21,8 @@ Downloading package '%name%'	WorkStatusView		Csomag letöltése: '%name%'
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Nem sikerült kinyerni a captcha információt az elküldött adatokból.
 Rating	PackageListView		Értékelés
 Synchronizing icons	ServerIconExportUpdateProcess		Ikonok szinkronizálása
-Does not start	RatePackageWindow		Nem indul el
 Show	MainWindow		Megjelenítés
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Nem sikerült a csomaglista betöltése: %message%.
-Unstable but usable	RatePackageWindow		Instabil, de használható
-Not specified	RatePackageWindow		Nincs megadva
 Active	PackageListView		Aktív
 Login or Create account	MainWindow		Belépés vagy fiók létrehozása
 <Package contents not available for remote packages>	PackageContentsView		<Távoli csomagok esetében a csomag tartalma nem érhető el>
@@ -43,7 +39,6 @@ A response to the captcha question must be provided.	UserLoginWindow		Szüksége
 Category	FilterView		Kategória
 User rating	RatePackageWindow		Felhasználói értékelés
 Installed packages	MainWindow		Telepített csomagok
-Stable	RatePackageWindow		Stabil
 Fatal error	PackageManager		Végzetes hiba
 Package action failed	PackageInfoView		A csomag telepítése sikertelen
 No changelog available.	PackageInfoView		Nincs módosítás-előzmény
@@ -67,7 +62,6 @@ Package update error	MainWindow		Csomag frissítési hiba
 About	PackageInfoView		Névjegy
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# folyamat} other{# folyamat}}
 Reboot required	PackageManager		Újraindítás szükséges
-Very unstable	RatePackageWindow		Nagyon instabil
 Password:	UserLoginWindow		Jelszó:
 All packages	PackageListView		Minden csomag
 Stability	RatePackageWindow		Stabilitás

@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-HaikuDepot	3833361367
+1	indonesian	x-vnd.Haiku-HaikuDepot	3059528843
 Repository update error	LocalRepositoryUpdateProcess		Kesalahan pembaruan repositori
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Terjadi kesalahan saat menyegarkan repositori: %error%
 User Created	UserLoginWindow		Pengguna Dibuat
@@ -8,7 +8,6 @@ Uninstalled	PackageListView		Telah dilepas
 It was not possible to create the new user.	UserLoginWindow		Tadi tidak mungkin untuk membuat pengguna baru.
 Available packages	MainWindow		Paket yang tersedia
 Create account	UserLoginWindow		Membuat akun
-Mostly stable	RatePackageWindow		Sebagian besar stabil
 OK	App		OKE
 The response to the captcha was incorrect.	ServerHelper		Respons terhadap captcha salah.
 Develop packages	MainWindow		Paket pengembangan
@@ -21,11 +20,8 @@ Downloading package '%name%'	WorkStatusView		Paket pengunduhan '%name%'
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Tadi tidak mungkin mengekstraksi informasi captcha yang diperlukan dari data yang dikirim kembali dari server.
 Rating	PackageListView		Penilaian
 Synchronizing icons	ServerIconExportUpdateProcess		Ikon sinkronisasi
-Does not start	RatePackageWindow		Tidak memulai
 Show	MainWindow		Menunjukkan
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Terjadi kesalahan saat mendapatkan daftar paket:%message%
-Unstable but usable	RatePackageWindow		Tidak stabil tapi bisa digunakan
-Not specified	RatePackageWindow		Tidak ditentukan
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Aplikasi ini menulis dan membaca beberapa file yang berfungsi di komputer Anda agar berfungsi. Tampaknya ada masalah saat menulis file uji di [%TestFilePath%].Periksa bahwa tidak ada masalah dengan disk lokal Anda atau izin yang dapat mencegah aplikasi ini dari menulis file ke lokasi direktori itu. Anda dapat memilih untuk mengakui masalah ini dan melanjutkan, tetapi beberapa fungsi mungkin dinonaktifkan.
 Active	PackageListView		Aktif
 Login or Create account	MainWindow		Masuk atau Buat akun
@@ -46,7 +42,6 @@ Category	FilterView		Kategori
 User rating	RatePackageWindow		Peringkat pengguna
 Installed packages	MainWindow		Paket-paket yang terpasang
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Objek yang diminta atau objek yang terlibat dalam permintaan tidak ditemukan di server.
-Stable	RatePackageWindow		Stabil
 Fatal error	PackageManager		Kesalahan fatal
 Package action failed	PackageInfoView		Tindakan paket gagal
 No changelog available.	PackageInfoView		Tak ada log perubahan tersedia.
@@ -72,7 +67,6 @@ Package update error	MainWindow		Kesalahan pembaruan paket
 About	PackageInfoView		Tentang
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# proses}}
 Reboot required	PackageManager		Diperlukan boot ulang
-Very unstable	RatePackageWindow		Amat tak-stabil
 Password:	UserLoginWindow		Kata sandi:
 All packages	PackageListView		Semua paket
 Stability	RatePackageWindow		Kestabilan

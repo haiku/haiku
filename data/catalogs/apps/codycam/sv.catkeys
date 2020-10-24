@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-CodyCam	2593355250
+1	swedish	x-vnd.Haiku-CodyCam	40716723
 destination directory expected	CodyCam		Målkatalog förväntas
 reply: '%s'\n	SftpClient		svar: '%s'\n
 JPEG image	CodyCam		JPEG-bild
@@ -43,7 +43,6 @@ Locking the window	VideoConsumer.cpp		Låser fönstret
 Cannot find an available video stream	CodyCam		Kan inte hitta någon tillgänglig videoström
 Upload…	VideoConsumer.cpp		Ladda upp...
 password expected	CodyCam		lösenord förväntas
-PASS <suppressed>  (real password sent)\n	FtpClient		PASS <upphävt>  (riktigt lösenord skickat)\n
 SFTP	CodyCam		SFTP
 Output	CodyCam		Utdata
 server address expected	CodyCam		serveradress förväntad

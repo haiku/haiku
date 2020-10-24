@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-CodyCam	2593355250
+1	dutch; flemish	x-vnd.Haiku-CodyCam	40716723
 destination directory expected	CodyCam		doelmap verwacht
 reply: '%s'\n	SftpClient		antwoord: '%s'\n
 JPEG image	CodyCam		JPEG-afbeelding
@@ -43,7 +43,6 @@ Locking the window	VideoConsumer.cpp		Venster vergrendelen
 Cannot find an available video stream	CodyCam		Kan geen beschikbare videostream vinden
 Upload…	VideoConsumer.cpp		Uploaden…
 password expected	CodyCam		wachtwoord verwacht
-PASS <suppressed>  (real password sent)\n	FtpClient		PASS <onderdrukt> (echt wachtwoord verstuurd)\n
 SFTP	CodyCam		SFTP
 Output	CodyCam		Uitvoer
 server address expected	CodyCam		serveradres verwacht

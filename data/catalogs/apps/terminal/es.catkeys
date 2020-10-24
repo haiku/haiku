@@ -1,11 +1,10 @@
-1	spanish; castilian	x-vnd.Haiku-Terminal	2664488407
+1	spanish; castilian	x-vnd.Haiku-Terminal	2277843400
 Close other tabs	Terminal TermWindow		Cerrar otras pestañas
 Insert path	Terminal TermView		Insertar la ruta de acceso
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Lo sentimos, pero el Terminal no pudo iniciar la shell.
 Text encoding	Terminal TermWindow		Codificación de texto
 OK	Terminal SetTitleWindow		Aceptar
 Edit	Terminal TermWindow		Editar
-  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory\n	Terminal TermApp		  -h,     --help              imprime en pantalla esta ayuda\n  -t,     --title              establece el título de la ventana\n  -f,     --fullscreen         comienza en pantalla completa\n  -w,     --working-directory  establece la carpeta de trabajo inicial\n
 Select all	Terminal TermWindow		Seleccionar todo
 Confirm exit if active programs exist	Terminal AppearancePrefView		Confirmar la salida si existen programas activos
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tEl directorio de trabajo del proceso activo en la pestaña actual.\n\t\t\tOpcionalmente puede especificarse el número máximo de\n\t\t\tcomponentes de ruta. P.ej. '%2d' para al menos dos componentes.\n\t%T\t-\tEl nombre en Terminal de la aplicación para el local actual.\n\t%e\t-\tLa codificación de la pestaña actual. No mostrado para UTF-8.\n\t%i\t-\tEl índice de la ventana.\n\t%p\t-\tEl nombre del proceso activo en la pestaña actual.\n\t%t\t-\tEl nombre de la pestaña actual.

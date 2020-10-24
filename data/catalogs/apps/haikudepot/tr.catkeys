@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-HaikuDepot	1546691996
+1	turkish	x-vnd.Haiku-HaikuDepot	772859472
 Repository update error	LocalRepositoryUpdateProcess		Depo güncelleme hatası
 Network error	ServerHelper		Ağ hatası
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Depo güncellenirken bir hata oluştu: %error%
@@ -9,7 +9,6 @@ Uninstalled	PackageListView		Kaldırıldı
 It was not possible to create the new user.	UserLoginWindow		Yeni kullanıcı oluşturulamadı.
 Available packages	MainWindow		Kullanılabilir paketler
 Create account	UserLoginWindow		Hesap oluştur
-Mostly stable	RatePackageWindow		Genelde kararlı
 OK	App		Tamam
 The response to the captcha was incorrect.	ServerHelper		CAPTCHA yanıtı yanlış.
 Develop packages	MainWindow		Geliştirme paketleri
@@ -23,11 +22,8 @@ It was not possible to extract necessary captcha information from the data sent 
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Sunucu sistemi ile iletişim kurarken bir ağ ulaşım hatası oluştu: %s
 Rating	PackageListView		Derecelendirme
 Synchronizing icons	ServerIconExportUpdateProcess		Simgeler eşitleniyor
-Does not start	RatePackageWindow		Başlamıyor
 Show	MainWindow		Göster
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Paket listesi alınırken bir hata oluştu: %message%
-Unstable but usable	RatePackageWindow		Kararlı değil ancak kullanılabilir
-Not specified	RatePackageWindow		Belirtilmemiş
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Bu uygulama çalışabilmek için bilgisayarınızda dosya işlemleri yapmaya gereksinim duyar. Görünüşe göre [%TestFilePath%] konumuna bir sınama dosyası yazımında sorunlar var. Lütfen bu uygulamanın dosya yazmasına engel olabilecek disk veya dosya izinleri sıkıntıları olup olmadığını denetleyin. Bu sorunu göz ardı edip işlemi sürdürebilirsiniz, ancak bazı işlevler devre dışı kalabilir.
 Active	PackageListView		Etkin
 Login or Create account	MainWindow		Giriş yap veya hesap oluştur
@@ -48,7 +44,6 @@ Category	FilterView		Kategori
 User rating	RatePackageWindow		Kullanıcı oyları
 Installed packages	MainWindow		Yüklü paketler
 A requested object or an object involved in the request was not found on the server.	ServerHelper		İstenen nesne veya istekle ilgili bir nesne sunucuda bulunamadı.
-Stable	RatePackageWindow		Kararlı
 Fatal error	PackageManager		Onulmaz hata
 Package action failed	PackageInfoView		Paket eylemi başarısız oldu
 No changelog available.	PackageInfoView		Değişiklik günlüğü mevcut değil
@@ -74,7 +69,6 @@ Package update error	MainWindow		Paket güncelleme hatası
 About	PackageInfoView		Hakkında
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, other{# işlem}}
 Reboot required	PackageManager		Yeniden başlatma gerekli
-Very unstable	RatePackageWindow		Kararlı değil
 Password:	UserLoginWindow		Parola:
 All packages	PackageListView		Tüm paketler
 This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Bu uygulama sunucu sistemi ile iletişim kurmak için çok eski. Sisteminizi güncelleyerek bu uygulamanın yeni bir sürümünü edinin. Gerekli en düşük sürüm: \"%s\".

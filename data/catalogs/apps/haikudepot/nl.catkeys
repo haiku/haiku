@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-HaikuDepot	1546691996
+1	dutch; flemish	x-vnd.Haiku-HaikuDepot	772859472
 Repository update error	LocalRepositoryUpdateProcess		Fout bij updaten softwarebronnen
 Network error	ServerHelper		Netwerk fout
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Er is een fout opgetreden bij het verversen van de softwarebronnen: %error%
@@ -9,7 +9,6 @@ Uninstalled	PackageListView		Verwijderd
 It was not possible to create the new user.	UserLoginWindow		Het was niet mogelijk om een nieuwe gebruiker aan te maken.
 Available packages	MainWindow		Beschikbare pakketten
 Create account	UserLoginWindow		Registreren
-Mostly stable	RatePackageWindow		Meestal stabiel
 OK	App		OK
 The response to the captcha was incorrect.	ServerHelper		De ingevoerde captcha is foutief.
 Develop packages	MainWindow		Ontwikkelaarspakketten
@@ -23,11 +22,8 @@ It was not possible to extract necessary captcha information from the data sent 
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Een netwerk transport fout is opgetreden bij het communiceren met het server systeem: %s
 Rating	PackageListView		Beoordeling
 Synchronizing icons	ServerIconExportUpdateProcess		Iconen synchroniseren
-Does not start	RatePackageWindow		Start niet
 Show	MainWindow		Toon
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Een fout is opgetreden bij het ophalen van de pakket lijst: %message%
-Unstable but usable	RatePackageWindow		Instabiel maar bruikbaar
-Not specified	RatePackageWindow		Niet gespecificeerd
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Deze applicatie leest en schrijft wat werkbestanden op uw computer om te functioneren. Het lijkt erop dat er problemen zijn met het schrijven van een testbestand op [%TestFilePath%]. Controleer dat er geen problemen zijn met uw lokale schijf of met de rechten van mappen en bestanden, die er voor zouden kunnen zorgen dat deze toepassing geen bestanden in die map kan schrijven. U kan ervoor kiezen om het probleem te erkennen en door te gaan, maar dan wordt sommige functionaliteit uitgeschakeld.
 Active	PackageListView		Actief
 Login or Create account	MainWindow		Inloggen of registreren
@@ -48,7 +44,6 @@ Category	FilterView		Categorie
 User rating	RatePackageWindow		Beoordeling
 Installed packages	MainWindow		Geïnstalleerde pakketten
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Een gevraagd object of een object verbonden in het verzoek werd niet gevonden op de server.
-Stable	RatePackageWindow		Stabiel
 Fatal error	PackageManager		Fatale fout
 Package action failed	PackageInfoView		Pakketactie mislukt
 No changelog available.	PackageInfoView		Geen changelog beschikbaar.
@@ -74,7 +69,6 @@ Package update error	MainWindow		Pakket verversing fout
 About	PackageInfoView		Over
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# proces} other{# processen}}
 Reboot required	PackageManager		Herstart vereist
-Very unstable	RatePackageWindow		Erg instabiel
 Password:	UserLoginWindow		Wachtwoord:
 All packages	PackageListView		Alle pakketten
 This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Deze toepassing is te oud om te communiceren met de server. Update naar een nieuwere versie van deze toepassing door het systeem te updaten. De minimum versie vereist voor deze toepassing is \"%s\".

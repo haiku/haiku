@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	1546691996
+1	japanese	x-vnd.Haiku-HaikuDepot	772859472
 Repository update error	LocalRepositoryUpdateProcess		リポジトリアップデートエラー
 Network error	ServerHelper		ネットワークエラー
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		リポジトリの更新中に次のエラーが発生しました: %error%
@@ -9,7 +9,6 @@ Uninstalled	PackageListView		アンインストール済
 It was not possible to create the new user.	UserLoginWindow		新規ユーザーを作成できませんでした。
 Available packages	MainWindow		使用可能なパッケージ
 Create account	UserLoginWindow		アカウントの作成
-Mostly stable	RatePackageWindow		ほとんど安定
 OK	App		OK
 The response to the captcha was incorrect.	ServerHelper		キャプチャの回答が間違っていました
 Develop packages	MainWindow		開発用パッケージ
@@ -23,11 +22,8 @@ It was not possible to extract necessary captcha information from the data sent 
 A network transport error has arisen communicating with the server system: %s	ServerHelper		サーバーシステムと通信中にネットワーク転送エラーが発生しました: %s
 Rating	PackageListView		評価
 Synchronizing icons	ServerIconExportUpdateProcess		アイコンを同期しています。
-Does not start	RatePackageWindow		起動しない
 Show	MainWindow		表示
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		パッケージリストの取得中にエラーが発生しました: %message%
-Unstable but usable	RatePackageWindow		不安定であるが使用できる
-Not specified	RatePackageWindow		指定なし
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		このアプリケーションは動作するためにあなたのコンピューター上のいくつかの作業ファイルを読み書きします。テストファイルの [%TestFilePath%] への書込みに問題があるようです。ローカルディスクに問題がないことや、そのディレクトリにアプリケーションが書込みできない権限になっているかをチェックしてください。この問題を認識して続行することもできますが、いくつかの機能が無効となるかもしれません。
 Active	PackageListView		有効
 Login or Create account	MainWindow		ログインまたはアカウントの作成
@@ -48,7 +44,6 @@ Category	FilterView		分類
 User rating	RatePackageWindow		ユーザーによる評価
 Installed packages	MainWindow		インストール済パッケージ
 A requested object or an object involved in the request was not found on the server.	ServerHelper		要求されたオブジェクトまたはリクエストに関連するオブジェクトがサーバー上に見つかりませんでした。　　
-Stable	RatePackageWindow		安定
 Fatal error	PackageManager		致命的なエラー
 Package action failed	PackageInfoView		パッケージアクションに失敗しました
 No changelog available.	PackageInfoView		変更記録はありません。
@@ -74,7 +69,6 @@ Package update error	MainWindow		パッケージアップデートエラー
 About	PackageInfoView		パッケージについて
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# プロセス} other{# プロセス}}
 Reboot required	PackageManager		再起動が必要です
-Very unstable	RatePackageWindow		非常に不安定
 Password:	UserLoginWindow		パスワード:
 All packages	PackageListView		すべてのパッケージ
 This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		このアプリケーションはサーバーシステムと通信するには古すぎます。システムをアップデートして新しいバージョンを入手してください。必要な最小限のバージョンは\"%s\"です。

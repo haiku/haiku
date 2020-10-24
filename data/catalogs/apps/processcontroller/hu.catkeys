@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-ProcessController	2280875657
+1	hungarian	x-vnd.Haiku-ProcessController	3123774187
 Error saving file	ProcessController		Hiba történt a fájl mentése során
 Display priority	ProcessController		Kijelzési prioritás
 That's no Fun!	ProcessController		Ez nem vicces!
@@ -23,7 +23,6 @@ Usage: %s [-deskbar]\n	ProcessController		Használat: %s [-deskbar]\n
 Please confirm	ProcessController		Jóváhagyás
 Urgent priority	ProcessController		Magas prioritás
 What do you want to do with the thread \"%s\"?	ProcessController		Mit kíván tenni a szállal: \"%s\"?
-(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
 Idle priority	ProcessController		Üresjárat prioritás
 Real-time display priority	ProcessController		Valós idejű kijelzési prioritás
 Threads and CPU usage	ProcessController		Szálak és processzorhasználat

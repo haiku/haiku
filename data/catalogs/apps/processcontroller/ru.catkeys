@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-ProcessController	2280875657
+1	russian	x-vnd.Haiku-ProcessController	3123774187
 Error saving file	ProcessController		Ошибка при сохранении файла
 Display priority	ProcessController		Приоритет отображения
 That's no Fun!	ProcessController		Это не смешно!
@@ -23,7 +23,6 @@ Usage: %s [-deskbar]\n	ProcessController		Использование: %s [-deskb
 Please confirm	ProcessController		Пожалуйста, подтвердите
 Urgent priority	ProcessController		Срочный приоритет
 What do you want to do with the thread \"%s\"?	ProcessController		Что вы хотите сделать с потоком \"%s\"?
-(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
 Idle priority	ProcessController		Приоритет бездействия
 Real-time display priority	ProcessController		Приоритет отображения реального времени
 Threads and CPU usage	ProcessController		Потоки и загрузка ЦПУ

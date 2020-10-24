@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-HaikuDepot	1546691996
+1	catalan; valencian	x-vnd.Haiku-HaikuDepot	772859472
 Repository update error	LocalRepositoryUpdateProcess		Error d'actualització del repositori
 Network error	ServerHelper		Error de xarxa
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Hi ha hagut un error en actualitzar el repositori: %error%
@@ -9,7 +9,6 @@ Uninstalled	PackageListView		Desinstal·lat
 It was not possible to create the new user.	UserLoginWindow		No s'ha pogut crear l'usuari nou.
 Available packages	MainWindow		Paquets disponibles
 Create account	UserLoginWindow		Creeu un compte
-Mostly stable	RatePackageWindow		Majoritàriament estable
 OK	App		D'acord
 The response to the captcha was incorrect.	ServerHelper		La resposta al CAPTCHA ha estat incorrecta.
 Develop packages	MainWindow		Paquets de desenvolupament
@@ -23,11 +22,8 @@ It was not possible to extract necessary captcha information from the data sent 
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Hi ha hagut un error de transport de xarxa en comunicar-se amb el sistema del servidor: %s
 Rating	PackageListView		Puntuació
 Synchronizing icons	ServerIconExportUpdateProcess		Sincronització de les icones
-Does not start	RatePackageWindow		No s'inicia.
 Show	MainWindow		Mostra...
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Hi ha hagut un error en obtenir la llista de paquets: %message%
-Unstable but usable	RatePackageWindow		Inestable però usable
-Not specified	RatePackageWindow		Sense especificar
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Aquesta aplicació escriu i llegeix alguns fitxers de treball de l'ordinador per tal de funcionar. Sembla que hi ha problemes per escriure un fitxer de prova a [%TestFilePath%]. Comproveu que no hi ha cap problema amb el disc local o els permisos que pugui evitar que aquesta aplicació escrigui fitxers a la ubicació del directori. Podeu optar per reconèixer aquest problema i continuar, però és possible que alguna funcionalitat estigui inhabilitada.
 Active	PackageListView		Actiu
 Login or Create account	MainWindow		Entreu o creeu-ne un compte
@@ -48,7 +44,6 @@ Category	FilterView		Categoria
 User rating	RatePackageWindow		Puntuació de l'usuari
 Installed packages	MainWindow		Paquets instal·lats
 A requested object or an object involved in the request was not found on the server.	ServerHelper		No s'ha trobat al servidor un objecte sol·licitat o un objecte implicat en la sol·licitud.
-Stable	RatePackageWindow		Estable
 Fatal error	PackageManager		Error greu
 Package action failed	PackageInfoView		Ha fallat l'acció del paquet.
 No changelog available.	PackageInfoView		No hi ha cap registre de canvis disponible.
@@ -74,7 +69,6 @@ Package update error	MainWindow		Error d'actualització de paquet
 About	PackageInfoView		Quant a
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# procés} other{# processos}}
 Reboot required	PackageManager		Cal reiniciar
-Very unstable	RatePackageWindow		Molt inestable
 Password:	UserLoginWindow		Contrasenya:
 All packages	PackageListView		Tots els paquets
 This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Aquesta aplicació és massa antiga per comunicar-se amb el sistema del servidor. Obtingueu-ne una versió més recent actualitzant el sistema. La versió mínima requerida d’aquesta aplicació és \"%s\".

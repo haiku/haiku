@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-HaikuDepot	3833361367
+1	russian	x-vnd.Haiku-HaikuDepot	3059528843
 Repository update error	LocalRepositoryUpdateProcess		Ошибка обновления репозитория
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Произошла ошибка при обновлении репозитория: %error%
 User Created	UserLoginWindow		Пользователь создан
@@ -8,7 +8,6 @@ Uninstalled	PackageListView		Удаленные
 It was not possible to create the new user.	UserLoginWindow		Не удалось создать нового пользователя.
 Available packages	MainWindow		Доступные пакеты
 Create account	UserLoginWindow		Создать учётную запись
-Mostly stable	RatePackageWindow		В основном стабилен
 OK	App		OK
 The response to the captcha was incorrect.	ServerHelper		Ответ на капчу был неверным.
 Develop packages	MainWindow		Пакеты для разработчиков
@@ -21,11 +20,8 @@ Downloading package '%name%'	WorkStatusView		Загрузка пакета '%nam
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Не удалось извлечь необходимую информацию о капче из данных, полученных с сервера.
 Rating	PackageListView		Оценка
 Synchronizing icons	ServerIconExportUpdateProcess		Синхронизация значков
-Does not start	RatePackageWindow		Не запускается
 Show	MainWindow		Показывать
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Произошла ошибка при получении списка пакетов: %message%
-Unstable but usable	RatePackageWindow		Нестабилен, но пригодный для использования
-Not specified	RatePackageWindow		Не указана
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Во время работы это приложение записывает и читает некоторые рабочие файлы на вашем компьютере. Похоже есть проблема с записью тестового файла в папку [%TestFilePath%]. Проверьте нет ли каких-то проблем с локальным диском или правами доступа к этой папке. Вы можете продолжить пользоваться этим приложением, но часть функционала будет отключена.
 Active	PackageListView		Активирован
 Login or Create account	MainWindow		Войти или создать учетную запись
@@ -46,7 +42,6 @@ Category	FilterView		Все категории
 User rating	RatePackageWindow		Пользовательский рейтинг
 Installed packages	MainWindow		Установленные пакеты
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Запрашиваемый объект или объект, указанный в запросе, не найден на сервере.
-Stable	RatePackageWindow		Стабилен
 Fatal error	PackageManager		Неисправимая ошибка
 Package action failed	PackageInfoView		Действие с пакетом не удалось.
 No changelog available.	PackageInfoView		История изменений недоступна.
@@ -72,7 +67,6 @@ Package update error	MainWindow		Ошибка обновления пакета
 About	PackageInfoView		О программе
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# процесс} few{# процесса} other{# процессов}}
 Reboot required	PackageManager		Требуется перезагрузка
-Very unstable	RatePackageWindow		Очень нестабилен 
 Password:	UserLoginWindow		Пароль:
 All packages	PackageListView		Все пакеты
 Stability	RatePackageWindow		Стабильность

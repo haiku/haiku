@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-CodyCam	2593355250
+1	spanish; castilian	x-vnd.Haiku-CodyCam	40716723
 destination directory expected	CodyCam		se esperaba directorio de destino
 reply: '%s'\n	SftpClient		responder '%s\n
 JPEG image	CodyCam		Imagen JPEG
@@ -43,7 +43,6 @@ Locking the window	VideoConsumer.cpp		Bloquear la ventana
 Cannot find an available video stream	CodyCam		No se encuentra flujo de vídeo disponible
 Upload…	VideoConsumer.cpp		Subir…
 password expected	CodyCam		contraseña prevista
-PASS <suppressed>  (real password sent)\n	FtpClient		PASE <suppressed> (contraseña verdadera enviada)\n
 SFTP	CodyCam		SFTP
 Output	CodyCam		Salida
 server address expected	CodyCam		se esperaba dirección de servidor

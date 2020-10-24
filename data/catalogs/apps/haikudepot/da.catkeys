@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-HaikuDepot	1546691996
+1	danish	x-vnd.Haiku-HaikuDepot	772859472
 Repository update error	LocalRepositoryUpdateProcess		Fejl ved opdatering af softwarekilde
 Network error	ServerHelper		Fejl ved netværk
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Der opstod en fejl under opdatering af softwarekilden: %error%
@@ -9,7 +9,6 @@ Uninstalled	PackageListView		Afinstalleret
 It was not possible to create the new user.	UserLoginWindow		Det var ikke muligt at oprette den nye bruger.
 Available packages	MainWindow		Tilgængelige pakker
 Create account	UserLoginWindow		Opret konto
-Mostly stable	RatePackageWindow		Hovedsageligt stabil
 OK	App		OK
 The response to the captcha was incorrect.	ServerHelper		Svaret på captchaen var forkert.
 Develop packages	MainWindow		Udviklingspakker
@@ -23,11 +22,8 @@ It was not possible to extract necessary captcha information from the data sent 
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Der opstod en fejl ved netværkstransport med kommunikation med serversystemet: %s
 Rating	PackageListView		Bedømmelse
 Synchronizing icons	ServerIconExportUpdateProcess		Synkroniserer ikoner
-Does not start	RatePackageWindow		Starter ikke
 Show	MainWindow		Vis
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Der opstod en fejl ved indhentning af pakkelisten: %message%
-Unstable but usable	RatePackageWindow		Ustabil men anvendelig
-Not specified	RatePackageWindow		Ikke angivet
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Programmet skriver og læser nogle arbejdsfiler på din computer for at kunne fungere. Det ser ud til at der ved problemer med at skrive en testfil i [%TestFilePath%]. Tjek at der ikke er nogen problemer med din lokale disk eller tilladelser som kan forhindre programmer i at skrive filerne i mappens placering. Du kan vælge at være bekendt med problemet og fortsætte, men nogle funktionaliteter kan være deaktiveret.
 Active	PackageListView		Aktiv
 Login or Create account	MainWindow		Log ind eller opret konto
@@ -48,7 +44,6 @@ Category	FilterView		Kategori
 User rating	RatePackageWindow		Brugerbedømmelse
 Installed packages	MainWindow		Installerede pakker
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Et anmodet objekt eller et objekt som er involveret i anmodningen blev ikke fundet på serveren.
-Stable	RatePackageWindow		Stabil
 Fatal error	PackageManager		Fatal fejl
 Package action failed	PackageInfoView		Pakkehandling mislykkedes
 No changelog available.	PackageInfoView		Ingen ændringslog tilgængelig.
@@ -74,7 +69,6 @@ Package update error	MainWindow		Fejl ved opdatering af pakke
 About	PackageInfoView		Om
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# proces} other{# processer}}
 Reboot required	PackageManager		Kræver genstart
-Very unstable	RatePackageWindow		Meget ustabil
 Password:	UserLoginWindow		Adgangskode:
 All packages	PackageListView		Alle pakker
 This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Programmet er for gammelt til at kommunikere med serversystemet. Hent en nyere version af programmet ved at opdatere dit system. Den laveste version som kræves af programmet er \"%s\".

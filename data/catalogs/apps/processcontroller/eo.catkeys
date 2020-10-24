@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-ProcessController	2280875657
+1	esperanto	x-vnd.Haiku-ProcessController	3123774187
 Error saving file	ProcessController		Eraro dum konservado de dosiero
 Display priority	ProcessController		Prioritaton de montrado
 That's no Fun!	ProcessController		Tio ne estas ŝerco!
@@ -23,7 +23,6 @@ Usage: %s [-deskbar]\n	ProcessController		Uzado: %s [-deskbar]\n
 Please confirm	ProcessController		Konfirmu
 Urgent priority	ProcessController		Urĝa prioritato
 What do you want to do with the thread \"%s\"?	ProcessController		Kion vi volas fari kun la procezo \"%s\"?
-(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
 Idle priority	ProcessController		Senokupa prioritato
 Real-time display priority	ProcessController		Prioritato de realtempa montrado
 Threads and CPU usage	ProcessController		Procezoj kaj okupo de CPU

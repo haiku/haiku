@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-ProcessController	2280875657
+1	dutch; flemish	x-vnd.Haiku-ProcessController	3123774187
 Error saving file	ProcessController		Fout bij bestandsopslag
 Display priority	ProcessController		Weergave prioriteit
 That's no Fun!	ProcessController		Da's niet Leuk!
@@ -23,7 +23,6 @@ Usage: %s [-deskbar]\n	ProcessController		Gebruik: %s [-deskbar]\n
 Please confirm	ProcessController		Gelieve te bevestigen
 Urgent priority	ProcessController		Dringende prioriteit
 What do you want to do with the thread \"%s\"?	ProcessController		Wat wilt u met de thread \"%s\" doen?
-(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
 Idle priority	ProcessController		Inactieve prioriteit
 Real-time display priority	ProcessController		Real-time weergave prioriteit
 Threads and CPU usage	ProcessController		Threads en CPU-gebruik

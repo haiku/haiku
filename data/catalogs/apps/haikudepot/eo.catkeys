@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-HaikuDepot	1546691996
+1	esperanto	x-vnd.Haiku-HaikuDepot	772859472
 Repository update error	LocalRepositoryUpdateProcess		Eraro dum ĝisdatigo de deponejo
 Network error	ServerHelper		Eraro de reto
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Eraro okazis dum aktualigo de la deponejo: %error%
@@ -9,7 +9,6 @@ Uninstalled	PackageListView		Malinstalita
 It was not possible to create the new user.	UserLoginWindow		Krei la novan uzanton ne estis ebla.
 Available packages	MainWindow		Disponeblaj pakaĵoj
 Create account	UserLoginWindow		Krei konton
-Mostly stable	RatePackageWindow		Plejparte stabila
 OK	App		Bone
 The response to the captcha was incorrect.	ServerHelper		La respondo al la kapĉo estis malĝusta.
 Develop packages	MainWindow		Programistaj pakaĵoj
@@ -23,11 +22,8 @@ It was not possible to extract necessary captcha information from the data sent 
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Eraro de reta transporto dum konversacio kun servilo: %s
 Rating	PackageListView		Takso
 Synchronizing icons	ServerIconExportUpdateProcess		Sinkronigas piktogramojn
-Does not start	RatePackageWindow		Ne komencas
 Show	MainWindow		Montri
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Eraro okazis dum akirado de la listo de pakaĵoj: %message%
-Unstable but usable	RatePackageWindow		Nestabila sed uzebla
-Not specified	RatePackageWindow		Ne estas difinita
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Ĉi tiu programo konservas kaj prenas laborajn dosierojn je via komputilo por funkcii. Ŝajnas, ke okazis problemoj skribante provizoran dosieron en [%TestFilePath%]-on. Kontrolu, ke forestas problemoj de via disko aŭ permesoj, kiuj povus malhelpi al ĉi programo skribi en tiu loko. Vi rajtas malatenti ĉi problemon kaj malgraŭe daŭri, sed iuj kapabloj povas malŝaltiĝi.
 Active	PackageListView		Aktiva
 Login or Create account	MainWindow		Ensaluti aŭ Krei konton
@@ -48,7 +44,6 @@ Category	FilterView		Kategorio
 User rating	RatePackageWindow		Uzanta takso
 Installed packages	MainWindow		Instalitaj pakaĵoj
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Petita objekto aŭ objekto de la peto ne troviĝis en la servilo.
-Stable	RatePackageWindow		Stabila
 Fatal error	PackageManager		Neriparebla eraro
 Package action failed	PackageInfoView		Pakaĵa ago malsukcesis
 No changelog available.	PackageInfoView		Ŝanĝoprotokolo ne estas disponebla.
@@ -74,7 +69,6 @@ Package update error	MainWindow		Pakaĵa ĝisdatigado eraro
 About	PackageInfoView		Pri
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# procezo} other{# procezoj}}
 Reboot required	PackageManager		Restartigo estas deviga
-Very unstable	RatePackageWindow		Nestabilega
 Password:	UserLoginWindow		Pasvorto:
 All packages	PackageListView		Ĉiuj pakaĵoj
 This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		La programo estas tro malnova por komuniki kun la servilo. Akiru pli novan version de la programo per ĝisdatigo de via sistemo. La minimuma necesa versio de la programo estas \"%s\".

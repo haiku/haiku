@@ -1,19 +1,15 @@
-1	slovak	x-vnd.Haiku-HaikuDepot	1991884741
+1	slovak	x-vnd.Haiku-HaikuDepot	1218052217
 Uninstall	PackageManager		Odinštalovať
 Uninstalled	PackageListView		Odinštalované
 Available packages	MainWindow		Dostupné balíky
 Create account	UserLoginWindow		Vytvoriť účet
-Mostly stable	RatePackageWindow		Prevažne stabilný
 Develop packages	MainWindow		Vývoj balíkov
 Rate package…	PackageInfoView		Ohodnotiť balík…
 Starting the package daemon failed:\n\n%Error%	App		Spustenie démona balíkov zlyhalo:\n\n%Error%
 <no info>	PackageInfoView		<žiadne info>
 No user ratings available.	PackageInfoView		Používateľské hodnotenie nie je dostupné.
 Rating	PackageListView		Hodnotenie
-Does not start	RatePackageWindow		Nespúšťa sa
 Show	MainWindow		Zobraziť
-Unstable but usable	RatePackageWindow		Nestabilný, ale použiteľný
-Not specified	RatePackageWindow		Neuvedené
 Active	PackageListView		Aktívny
 Login or Create account	MainWindow		Prihlásiť sa alebo Vytvoriť účet
 <Package contents not available for remote packages>	PackageContentsView		<Pri vzdialených balíkoch obsah balíka nie je k dispozícii>
@@ -25,7 +21,6 @@ Rate %Package%	RatePackageWindow		Ohodnotiť %Package%
 Quit HaikuDepot	App		Ukončiť HaikuDepot
 Category	FilterView		Kategória
 Installed packages	MainWindow		Nainštalované balíky
-Stable	RatePackageWindow		Stabilný
 Fatal error	PackageManager		Kritická chyba
 Package action failed	PackageInfoView		Operácia s balíkom zlyhala
 No changelog available.	PackageInfoView		Záznam zmien nie je dostupný.
@@ -40,7 +35,6 @@ Contents	PackageInfoView		Obsah
 Close	PackageManager		Zatvoriť
 Changelog	PackageInfoView		Záznam zmien
 About	PackageInfoView		O aplikácii
-Very unstable	RatePackageWindow		Veľmi nestabilný
 Stability	RatePackageWindow		Stabilita
 Send	RatePackageWindow		Poslať
 Start package daemon	App		Spustiť démona balíkov

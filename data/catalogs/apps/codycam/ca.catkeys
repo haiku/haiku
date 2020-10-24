@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-CodyCam	2593355250
+1	catalan; valencian	x-vnd.Haiku-CodyCam	40716723
 destination directory expected	CodyCam		s'espera un directori de destinació
 reply: '%s'\n	SftpClient		resposta: %s\n
 JPEG image	CodyCam		Imatge JPEG
@@ -43,7 +43,6 @@ Locking the window	VideoConsumer.cpp		Es bloca la finestra
 Cannot find an available video stream	CodyCam		No es pot trobar el flux de vídeo
 Upload…	VideoConsumer.cpp		Carrega...
 password expected	CodyCam		s'esperava la contrasenya
-PASS <suppressed>  (real password sent)\n	FtpClient		CONTRASENYA <suppressed>  (s'ha enviat la contrasenya real)\n
 SFTP	CodyCam		SFTP
 Output	CodyCam		Sortida
 server address expected	CodyCam		s'esperava l'adreça del servidor

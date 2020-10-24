@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-CodyCam	2593355250
+1	turkish	x-vnd.Haiku-CodyCam	40716723
 destination directory expected	CodyCam		hedef dizin bekleniyordu
 reply: '%s'\n	SftpClient		yanıtla: '%s'\n
 JPEG image	CodyCam		JPEG görseli
@@ -43,7 +43,6 @@ Locking the window	VideoConsumer.cpp		Pencere kilitleniyor
 Cannot find an available video stream	CodyCam		Uygun bir video akışı bulunamıyor
 Upload…	VideoConsumer.cpp		Yükle…
 password expected	CodyCam		parola bekleniyordu
-PASS <suppressed>  (real password sent)\n	FtpClient		PASS <suppressed>  (gerçek parola gönderildi)\n
 SFTP	CodyCam		SFTP
 Output	CodyCam		Çıktı
 server address expected	CodyCam		sunucu adresi bekleniyordu

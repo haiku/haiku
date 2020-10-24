@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-HaikuDepot	1546691996
+1	romanian	x-vnd.Haiku-HaikuDepot	772859472
 Repository update error	LocalRepositoryUpdateProcess		Eroare la actualizarea depozitului
 Network error	ServerHelper		Eroare de rețea
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		A apărut o eroare în timpul reîmprospătării depozitului: %error%
@@ -9,7 +9,6 @@ Uninstalled	PackageListView		Dezinstalat
 It was not possible to create the new user.	UserLoginWindow		Nu a fost posibil să se creeze utilizatorul nou.
 Available packages	MainWindow		Pachete disponibile
 Create account	UserLoginWindow		Creează cont
-Mostly stable	RatePackageWindow		Majoritatea stabile
 OK	App		OK
 The response to the captcha was incorrect.	ServerHelper		Răspunsul la captcha nu a fost corect.
 Develop packages	MainWindow		Dezvoltă pachete
@@ -23,11 +22,8 @@ It was not possible to extract necessary captcha information from the data sent 
 A network transport error has arisen communicating with the server system: %s	ServerHelper		A apărut o eroare de transport de rețea în timpul comunicării cu sistemul de servere: %s
 Rating	PackageListView		Evaluare
 Synchronizing icons	ServerIconExportUpdateProcess		Se sincronizează iconițele
-Does not start	RatePackageWindow		Nu pornește
 Show	MainWindow		Arată
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		A apărut o eroare în timpul obținerii listei de pachete: %message%
-Unstable but usable	RatePackageWindow		Instabil dar utilizabil
-Not specified	RatePackageWindow		Nespecificat
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Această aplicație scrie și citește unele fișiere care lucrează pe calculator pentru a funcționa. Se pare că există probleme la scrierea unui fișier test la [%TestFilePath%]. Verificați dacă nu sunt probleme cu discul local sau cu permisiunile care ar putea preveni acestei aplicații să scrie fișiere în locația aceea de director. Puteți alege să admiteți această problemă și să continuați, dar unele funcționalități pot fi dezactivate.
 Active	PackageListView		Activ
 Login or Create account	MainWindow		Autentificare sau Creare cont
@@ -48,7 +44,6 @@ Category	FilterView		Categorie
 User rating	RatePackageWindow		Evaluarea utilizatorului
 Installed packages	MainWindow		Pachete instalate
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Un obiect cerut sau un obiect implicat în cerere nu a fost găsit pe server.
-Stable	RatePackageWindow		Stabil
 Fatal error	PackageManager		Eroare fatală
 Package action failed	PackageInfoView		Acțiune pachet eșuată
 No changelog available.	PackageInfoView		Nu există jurnal de modificări disponibil.
@@ -74,7 +69,6 @@ Package update error	MainWindow		Eroare la actualizarea pachetului
 About	PackageInfoView		Despre
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}
 Reboot required	PackageManager		Repornire necesară
-Very unstable	RatePackageWindow		Foarte instabil
 Password:	UserLoginWindow		Parolă:
 All packages	PackageListView		Toate pachetele
 This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Această aplicație este prea veche pentru a comunica cu sistemul de servere. Obțineți o versiune nouă a acestei aplicații prin actualizarea sistemului. Versiunea necesară minimă a acestei aplicații este \„%s\”.

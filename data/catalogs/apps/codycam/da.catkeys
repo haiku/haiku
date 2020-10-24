@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-CodyCam	2593355250
+1	danish	x-vnd.Haiku-CodyCam	40716723
 destination directory expected	CodyCam		destination folder forventet
 reply: '%s'\n	SftpClient		svar: '%s'\n
 JPEG image	CodyCam		JPEG billede
@@ -43,7 +43,6 @@ Locking the window	VideoConsumer.cpp		Låser vinduet
 Cannot find an available video stream	CodyCam		Kunne ikke finde tilgængelig video strøm
 Upload…	VideoConsumer.cpp		Upload…
 password expected	CodyCam		adgangskode forventet
-PASS <suppressed>  (real password sent)\n	FtpClient		PASS <skjult>  (rigtige adgangskode sendt)\n
 SFTP	CodyCam		SFTP
 Output	CodyCam		Output
 server address expected	CodyCam		server adresse forventet

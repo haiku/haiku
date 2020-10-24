@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-ProcessController	2280875657
+1	turkish	x-vnd.Haiku-ProcessController	3123774187
 Error saving file	ProcessController		Dosya kaydedilirken hata
 Display priority	ProcessController		Görüntüleme önceliği
 That's no Fun!	ProcessController		O da nesi öyle!
@@ -23,7 +23,6 @@ Usage: %s [-deskbar]\n	ProcessController		Kullanım: %s [-deskbar]\n
 Please confirm	ProcessController		Lütfen onaylayın
 Urgent priority	ProcessController		İvedi öncelik
 What do you want to do with the thread \"%s\"?	ProcessController		\"%s\" iş parçacığı ile ne yapmak istiyorsanız?
-(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
 Idle priority	ProcessController		Boştaki öncelik
 Real-time display priority	ProcessController		Gerçek zamanlı görüntüleme önceliği
 Threads and CPU usage	ProcessController		İş parçacıkları ve CPU kullanımı

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-HaikuDepot	1546691996
+1	finnish	x-vnd.Haiku-HaikuDepot	772859472
 Repository update error	LocalRepositoryUpdateProcess		Tietovaraston päivitysvirhe
 Network error	ServerHelper		Verkkovirhe
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Tietovaraston päivityksen yhteydessä tapahtui virhe: %error%
@@ -9,7 +9,6 @@ Uninstalled	PackageListView		Poistetut asennukset
 It was not possible to create the new user.	UserLoginWindow		Uuden käyttäjän luominen epäonnistui.
 Available packages	MainWindow		Saatavilla olevat pakkaukset
 Create account	UserLoginWindow		Luo tili
-Mostly stable	RatePackageWindow		Äärimmäisen stabiili
 OK	App		Valmis
 The response to the captcha was incorrect.	ServerHelper		Captcha-vastaus oli virheellinen.
 Develop packages	MainWindow		Kehityspaketit
@@ -23,11 +22,8 @@ It was not possible to extract necessary captcha information from the data sent 
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Verkkosiirtovirhe syntyi palvelinjärjestelmäviestinnässä: %s 
 Rating	PackageListView		Arvosana
 Synchronizing icons	ServerIconExportUpdateProcess		Synkronoidaan kuvakkeet
-Does not start	RatePackageWindow		Ei käynnisty
 Show	MainWindow		Näytä
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Pakkausluettelon hankkimisessa tapahtui virhe: %message%
-Unstable but usable	RatePackageWindow		Epävakaa, mutta käyttökelpoinen
-Not specified	RatePackageWindow		Ei määritelty
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Tämä sovellus kirjoittaa ja lukee joitakin työtiedostoja tietokoneellasi toiminnan tarkistamiseksi. Näyttää, että testaustiedoston kirjoittamisessa  osoitteeseen [%TestFilePath%] on pulmia. Tarkista, että paikallisella levyasemallasi ei ole pulmia tai että käyttöoikeudet eivät estä tätä sovellusta kirjoittamasta tuohon hakemistosijaintiin. Voit kuitata tämän pulman ja jatkaa, mutta joku toiminnallisuus on poissa käytöstä.
 Active	PackageListView		Käytössä
 Login or Create account	MainWindow		Kirjaudu tai luo tili
@@ -48,7 +44,6 @@ Category	FilterView		Luokka
 User rating	RatePackageWindow		Käyttäjäarvosanat
 Installed packages	MainWindow		Asennetut paketit
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Pyydettyä objektia tai pyyntöön liittyvää objektia ei löytynyt palvelimelta.
-Stable	RatePackageWindow		Vakaa
 Fatal error	PackageManager		Kriittinen virhe
 Package action failed	PackageInfoView		Pakettitoiminta epäonnistui
 No changelog available.	PackageInfoView		Mitään muutoslokia ei ole saatavilla.
@@ -74,7 +69,6 @@ Package update error	MainWindow		Pakkauksen päivitysvirhe
 About	PackageInfoView		Ohjelmasta
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# prosessi} other{# prosessia}}
 Reboot required	PackageManager		Tarvitaan uudelleenkäynnistys
-Very unstable	RatePackageWindow		Hyvin epävakaa
 Password:	UserLoginWindow		Salasana:
 All packages	PackageListView		Kaikki pakkaukset
 This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Tämä sovellus on liian vanha palvelinjärjestelmän kanssa viestimiseen. Hanki tämän sovelluksen uudempi versio päivittämällä järjestelmääsi. Sovelluksen vaadittu minimiversio on \"%s\".

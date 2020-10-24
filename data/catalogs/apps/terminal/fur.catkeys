@@ -1,11 +1,10 @@
-1	friulian	x-vnd.Haiku-Terminal	2664488407
+1	friulian	x-vnd.Haiku-Terminal	2277843400
 Close other tabs	Terminal TermWindow		Siere altris schedis
 Insert path	Terminal TermView		Inserìs percors
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Scuse, ma Terminâl nol à podût inviâ la shell.
 Text encoding	Terminal TermWindow		Codifiche dal test
 OK	Terminal SetTitleWindow		Va ben
 Edit	Terminal TermWindow		Modifiche
-  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory\n	Terminal TermApp		  -h,     --help               mostre chest jutori\n  -t,     --title              stabilìs titul dal barcon\n  -f,     --fullscreen         invie a plen visôr\n  -w,     --working-directory  stabilìs cartele di vore iniziâl\n
 Select all	Terminal TermWindow		Selezione dut
 Confirm exit if active programs exist	Terminal AppearancePrefView		Domande conferme pe jessude se a esistin programs atîfs
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tLa cartele di lavôr atuâl dal procès atîf te\n\t\t\tschede atuâl. In mût opzionâl, il massim numar di components di percors\n\t\t\tal pues jessi specificât. P.e. '%2d' par massim doi components.\n\t%T\t-\tIl non de aplicazion Terminal te localizazion atuâl.\n\t%e\t-\tLa codifiche de schede atuâl. No mostrât se UTF-8.\n\t%i\t-\tL'indicadôr dal barcon.\n\t%p\t-\tIl non dal procès atîf te schede atuâl .\n\t%t\t-\tIl titul de schede atuâl.

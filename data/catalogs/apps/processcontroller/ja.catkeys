@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-ProcessController	2280875657
+1	japanese	x-vnd.Haiku-ProcessController	3123774187
 Error saving file	ProcessController		ファイル保存中にエラーが発生しました
 Display priority	ProcessController		表示優先度
 That's no Fun!	ProcessController		そんなのおもしろくない!
@@ -23,7 +23,6 @@ Usage: %s [-deskbar]\n	ProcessController		Usage: %s [-deskbar]\n
 Please confirm	ProcessController		確認してください。
 Urgent priority	ProcessController		緊急優先度
 What do you want to do with the thread \"%s\"?	ProcessController		スレッド \"%s\" に対してなにをしますか?
-(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
 Idle priority	ProcessController		アイドル優先度
 Real-time display priority	ProcessController		リアルタイム表示優先度
 Threads and CPU usage	ProcessController		スレッドと CPU の使用率

@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-CodyCam	2593355250
+1	romanian	x-vnd.Haiku-CodyCam	40716723
 destination directory expected	CodyCam		dosar de destinație așteptat
 reply: '%s'\n	SftpClient		răspuns: '%s'\n
 JPEG image	CodyCam		Imagine JPEG
@@ -43,7 +43,6 @@ Locking the window	VideoConsumer.cpp		Se blochează fereastra
 Cannot find an available video stream	CodyCam		Nu se poate găsi un flux video disponibil
 Upload…	VideoConsumer.cpp		Încărcare…
 password expected	CodyCam		parolă așteptată
-PASS <suppressed>  (real password sent)\n	FtpClient		PASS <suppressed>  (parolă reală trimisă)\n
 SFTP	CodyCam		SFTP
 Output	CodyCam		Ieșire
 server address expected	CodyCam		adresă de server așteptată

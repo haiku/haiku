@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-HaikuDepot	3833361367
+1	thai	x-vnd.Haiku-HaikuDepot	3059528843
 Repository update error	LocalRepositoryUpdateProcess		ข้อผิดพลาดการอัพเดตที่เก็บ
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		เกิดข้อผิดพลาดขณะรีเฟรชที่เก็บ: %error%
 User Created	UserLoginWindow		ผู้ใช้ถูกสร้างแล้ว
@@ -8,7 +8,6 @@ Uninstalled	PackageListView		ยกเลิกการติดตั้งแ
 It was not possible to create the new user.	UserLoginWindow		ไม่สามารถสร้างผู้ใช้ใหม่ได้
 Available packages	MainWindow		แพ็คเกจที่มี
 Create account	UserLoginWindow		สร้างบัญชี
-Mostly stable	RatePackageWindow		ค่อนข้างเสถียร
 OK	App		ตกลง
 The response to the captcha was incorrect.	ServerHelper		การตอบกลับไปที่ captcha ไม่ถูกต้อง
 Develop packages	MainWindow		แพ็คเกจสำหรับการพัฒนา
@@ -21,11 +20,8 @@ Downloading package '%name%'	WorkStatusView		กำลังดาวน์โ�
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		ไม่สามารถดึงข้อมูล captcha ที่จำเป็นจากข้อมูลที่ส่งกลับจากเซิร์ฟเวอร์
 Rating	PackageListView		อัตรา
 Synchronizing icons	ServerIconExportUpdateProcess		การซิงโครไนซ์ไอคอน
-Does not start	RatePackageWindow		ไม่เริ่ม
 Show	MainWindow		แสดง
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		เกิดข้อผิดพลาดขณะรับรายการแพ็กเกจ: %message%
-Unstable but usable	RatePackageWindow		ไม่เสถียร แต่ใช้งานได้
-Not specified	RatePackageWindow		ไม่ได้ระบุ
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		แอปพลิเคชันนี้เขียนและอ่านไฟล์ทำงานบางไฟล์ในคอมพิวเตอร์ของคุณเพื่อให้สามารถใช้งานได้ ดูเหมือนว่ามีปัญหาในการเขียนไฟล์ทดสอบที่ [%TestFilePath%] ตรวจสอบว่าไม่มีปัญหากับดิสก์ภายในเครื่องหรือการอนุญาตที่อาจป้องกันไม่ให้แอปพลิเคชันนี้เขียนไฟล์ลงในตำแหน่งไดเรกทอรีนั้น คุณอาจเลือกที่จะรับทราบปัญหานี้และดำเนินการต่อ แต่ฟังก์ชั่นบางอย่างอาจถูกปิดการใช้งาน
 Active	PackageListView		เปิดใช้
 Login or Create account	MainWindow		เข้าสู่ระบบหรือสร้างบัญชี
@@ -46,7 +42,6 @@ Category	FilterView		หมวดหมู่
 User rating	RatePackageWindow		คะแนนจากผู้ใช้
 Installed packages	MainWindow		แพคเกจที่ติดตั้ง
 A requested object or an object involved in the request was not found on the server.	ServerHelper		ไม่พบวัตถุที่ร้องขอหรือวัตถุที่เกี่ยวข้องในคำขอบนเซิร์ฟเวอร์
-Stable	RatePackageWindow		เสถียร
 Fatal error	PackageManager		ข้อผิดพลาดร้ายแรง
 Package action failed	PackageInfoView		การกระทำของแพคเกจล้มเหลว
 No changelog available.	PackageInfoView		ไม่มีการเปลี่ยนแปลง
@@ -72,7 +67,6 @@ Package update error	MainWindow		ข้อผิดพลาดในการ�
 About	PackageInfoView		เกี่ยวกับ
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}
 Reboot required	PackageManager		ต้องรีบูต
-Very unstable	RatePackageWindow		ไม่เสถียรมากๆ
 Password:	UserLoginWindow		รหัส:
 All packages	PackageListView		แพ็คเกจทั้งหมด
 Stability	RatePackageWindow		ความเสถียร

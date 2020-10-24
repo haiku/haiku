@@ -1,11 +1,10 @@
-1	thai	x-vnd.Haiku-Terminal	2664488407
+1	thai	x-vnd.Haiku-Terminal	2277843400
 Close other tabs	Terminal TermWindow		ปิดแท็บอื่น ๆ
 Insert path	Terminal TermView		แทรกเส้นทาง
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		เทอร์มินัลไม่สามารถเริ่มเชลล์ ขอโทษ
 Text encoding	Terminal TermWindow		การเข้ารหัสข้อความ
 OK	Terminal SetTitleWindow		ตกลง
 Edit	Terminal TermWindow		แก้ไข
-  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory\n	Terminal TermApp		-h, --help พิมพ์ความช่วยเหลือนี้\n-t, --title ตั้งชื่อหน้าต่าง\n-f, --fullscreen เริ่มแบบเต็มหน้าจอ\n-w, --working-directory ตั้งไดเรกทอรีทำงานเริ่มต้น\n
 Select all	Terminal TermWindow		เลือกทั้งหมด
 Confirm exit if active programs exist	Terminal AppearancePrefView		ยืนยันการออกหากมีโปรแกรมที่ใช้งานอยู่
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tไดเรกทอรีการทำงานปัจจุบันของกระบวนการที่ใช้งานอยู่ใน\n\t\t\tแท็บปัจจุบัน เลือกจำนวนคอมโพเนนต์พาธสูงสุด\n\t\t\tได้. ตัวอย่าง '%2d' สำหรับส่วนประกอบได้มากที่สุดสองรายการ\n\t%T\t-\tชื่อแอปพลิเคชันเทอร์มินัลสำหรับสถานที่ปัจจุบัน\n\t%e\t-\tการเข้ารหัสของแท็บปัจจุบัน ไม่แสดงสำหรับ UTF-8\n\t%i\t-\tดัชนีของหน้าต่าง\n\t%p\t-\tชื่อของกระบวนการที่ใช้งานอยู่ในแท็บปัจจุบัน\n\t%t\t-\tชื่อของแท็บปัจจุบัน

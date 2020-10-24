@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-HaikuDepot	1546691996
+1	friulian	x-vnd.Haiku-HaikuDepot	772859472
 Repository update error	LocalRepositoryUpdateProcess		Erôr di inzornament dal dipuesit
 Network error	ServerHelper		Erôr di rêt
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Si è verificât un erôr intal inzornâ il dipuesit: %error%
@@ -9,7 +9,6 @@ Uninstalled	PackageListView		Disinstalât
 It was not possible to create the new user.	UserLoginWindow		Nol è stât pussibil creâ il gnûf utent.
 Available packages	MainWindow		Pachets disponibii
 Create account	UserLoginWindow		Cree account
-Mostly stable	RatePackageWindow		Pal plui stabil
 OK	App		Va ben
 The response to the captcha was incorrect.	ServerHelper		La rispueste al captcha e jere sbaliade.
 Develop packages	MainWindow		Pachets di svilup
@@ -23,11 +22,8 @@ It was not possible to extract necessary captcha information from the data sent 
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Al è vignût fûr un erôr di traspuart de rêt tal comunicâ cul servidôr: %s
 Rating	PackageListView		Valutazion
 Synchronizing icons	ServerIconExportUpdateProcess		Sincronizazion iconis
-Does not start	RatePackageWindow		No si invie
 Show	MainWindow		Mostre
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Si è verificât un erôr intal otignî la liste dai pachets: %message%
-Unstable but usable	RatePackageWindow		Instabil, ma che si pues doprâ
-Not specified	RatePackageWindow		No specificât
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Cheste aplicazion, par funzionâ ben, e scrîf e e lei cualchi file di lavôr tal to computer. Al semee che a sedin problemis tal scrivi un file di prove su [%TestFilePath%]. Controle di no vê fastidis cul to disc locâl o cun permès che a impedissin a cheste aplicazion di scrivi file in chê posizion. Tu puedis sielzi di no risolvi il probleme e di continuâ, ma cualchi funzionalitât e podarès jessi disabilitade.
 Active	PackageListView		Atîf
 Login or Create account	MainWindow		Jentre o Regjistriti
@@ -48,7 +44,6 @@ Category	FilterView		Categorie
 User rating	RatePackageWindow		Valutazion utents
 Installed packages	MainWindow		Pachets instalâts
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Un ogjet domandât o un ogjet che al centrave cu la richieste nol è stât cjatât sul servidôr.
-Stable	RatePackageWindow		Stabile
 Fatal error	PackageManager		Erôr fatâl
 Package action failed	PackageInfoView		Azion pachet falide
 No changelog available.	PackageInfoView		Nissun regjistri des modifichis disponibil.
@@ -74,7 +69,6 @@ Package update error	MainWindow		Erôr di inzornament dal pachet
 About	PackageInfoView		Informazions su
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# procès} other{# procès}}
 Reboot required	PackageManager		Tornâ a inviâ necessari
-Very unstable	RatePackageWindow		Une vore instabil
 Password:	UserLoginWindow		Peraule d'ordin:
 All packages	PackageListView		Ducj i pachets
 This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Cheste aplicazion e je masse vecje par comunicâ cul servidôr. Oten une version plui resinte inzornant il sisteme. La version minime domandade e je la \"%s\".

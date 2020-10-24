@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-CodyCam	2593355250
+1	esperanto	x-vnd.Haiku-CodyCam	40716723
 destination directory expected	CodyCam		atendita celdosierujo
 reply: '%s'\n	SftpClient		respondo: '%s'\n
 JPEG image	CodyCam		JPEG-a bildo
@@ -43,7 +43,6 @@ Locking the window	VideoConsumer.cpp		Ŝlosado de la fenestro
 Cannot find an available video stream	CodyCam		Ne eblas trovi disponeblan filmetafluon
 Upload…	VideoConsumer.cpp		Alŝuti…
 password expected	CodyCam		atendis pasvorton
-PASS <suppressed>  (real password sent)\n	FtpClient		PASS <subpremita>  (reala pasvorto sendiĝis)\n
 SFTP	CodyCam		SFTP
 Output	CodyCam		Eligo
 server address expected	CodyCam		atendis adreson de servilo

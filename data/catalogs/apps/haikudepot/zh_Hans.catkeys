@@ -1,20 +1,16 @@
-1	english	x-vnd.Haiku-HaikuDepot	2850854294
+1	english	x-vnd.Haiku-HaikuDepot	2077021770
 Check for updates…	MainWindow		检查更新…
 Uninstall	PackageManager		卸载
 Uninstalled	PackageListView		已卸载
 Available packages	MainWindow		可用软件包
 Create account	UserLoginWindow		创建账号
-Mostly stable	RatePackageWindow		基本稳定
 Develop packages	MainWindow		开发软件包
 Rate package…	PackageInfoView		软件包评分…
 Starting the package daemon failed:\n\n%Error%	App		包管理服务启动失败:\n\n%Error%
 <no info>	PackageInfoView		<无信息>
 No user ratings available.	PackageInfoView		未发现用户评分。
 Rating	PackageListView		评级
-Does not start	RatePackageWindow		未开始
 Show	MainWindow		显示
-Unstable but usable	RatePackageWindow		不稳定，但是可用
-Not specified	RatePackageWindow		未指定
 Active	PackageListView		激活
 Login or Create account	MainWindow		登录或者新建账户
 <Package contents not available for remote packages>	PackageContentsView		<软件包内容对于远程包不可用>
@@ -27,7 +23,6 @@ Quit HaikuDepot	App		退出 HaikuDepot
 Category	FilterView		分类
 User rating	RatePackageWindow		用户评分
 Installed packages	MainWindow		已安装软件包
-Stable	RatePackageWindow		稳定
 Fatal error	PackageManager		严重错误
 Package action failed	PackageInfoView		软件包操作失败
 No changelog available.	PackageInfoView		未发现更新记录。
@@ -44,7 +39,6 @@ Close	PackageManager		关闭
 Changelog	PackageInfoView		更新记录
 Rating not possible	MainWindow		无法评价
 About	PackageInfoView		关于
-Very unstable	RatePackageWindow		非常不稳定
 Stability	RatePackageWindow		稳定性
 Send	RatePackageWindow		发送
 Start package daemon	App		启动软件包管理后台

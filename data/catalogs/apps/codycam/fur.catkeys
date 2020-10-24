@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-CodyCam	2593355250
+1	friulian	x-vnd.Haiku-CodyCam	40716723
 destination directory expected	CodyCam		si spietave la cartele di destinazion
 reply: '%s'\n	SftpClient		rispuint: '%s'\n
 JPEG image	CodyCam		Imagjin JPEG
@@ -43,7 +43,6 @@ Locking the window	VideoConsumer.cpp		Daûr a blocâ il barcon
 Cannot find an available video stream	CodyCam		Impussibil cjatâ un flus video disponibil
 Upload…	VideoConsumer.cpp		Cjarie…
 password expected	CodyCam		si spietave la peraule di ordin
-PASS <suppressed>  (real password sent)\n	FtpClient		PASS <scartade>  (peraule di ordin reâl inviade)\n
 SFTP	CodyCam		SFTP
 Output	CodyCam		Jessude
 server address expected	CodyCam		si spietave la direzion dal servidôr
