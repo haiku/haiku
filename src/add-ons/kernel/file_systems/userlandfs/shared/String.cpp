@@ -5,22 +5,6 @@
 
 #include "String.h"
 
-// strnlen
-size_t
-strnlen(const char *str, size_t maxLen)
-{
-	if (str) {
-		size_t origMaxLen = maxLen;
-		while (maxLen > 0 && *str != '\0') {
-			maxLen--;
-			str++;
-		}
-		return origMaxLen - maxLen;
-	}
-	return 0;
-}
-
-
 /*!
 	\class String
 	\brief A very simple string class.
