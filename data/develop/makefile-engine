@@ -40,7 +40,7 @@ C++		:= $(CXX)
 
 # Set up CFLAGS.
 ifeq ($(strip $(TYPE)), DRIVER)
-	CFLAGS	+= -D_KERNEL_MODE=1 -fno-pic
+	CFLAGS	+= -D_KERNEL_MODE=1
 else
 	CFLAGS +=
 endif
@@ -93,6 +93,9 @@ else
 ifeq ($(strip $(TYPE)), DRIVER)
 	LDFLAGS += -nostdlib /boot/system/develop/lib/_KERNEL_ \
 				/boot/system/develop/lib/haiku_version_glue.o
+ifeq ($(CPU), x86_64)
+	LDFLAGS += -z max-page-size=0x1000
+endif
 endif
 endif
 endif
