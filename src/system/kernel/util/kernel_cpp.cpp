@@ -22,7 +22,7 @@
 #ifdef _LOADER_MODE
 #	define panic printf
 #	define dprintf printf
-#	define kernel_debugger printf
+#	define kernel_debugger(x) printf("%s", x)
 #endif
 
 
@@ -392,10 +392,7 @@ extern "C"
 void
 debugger(const char *message)
 {
-// this is a wrapper, disable format diagnostics.
-#pragma GCC diagnostic ignored "-Wformat-security"
 	kernel_debugger(message);
-#pragma GCC diagnostic pop
 }
 
 #endif	// #ifndef _BOOT_MODE
