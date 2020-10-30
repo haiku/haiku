@@ -2,6 +2,8 @@
  * Copyright 2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
+
+
 #include "PackageIconTarRepository.h"
 
 #include <Autolock.h>
@@ -11,6 +13,9 @@
 
 #include "Logger.h"
 #include "TarArchiveService.h"
+
+
+#define LIMIT_ICON_CACHE 50
 
 
 BitmapRef
@@ -123,7 +128,8 @@ IconTarPtrEntryListener::_LeafNameToBitmapSize(BString& leafName,
 
 PackageIconTarRepository::PackageIconTarRepository()
 	:
-	fTarIo(NULL)
+	fTarIo(NULL),
+	fIconCache(LIMIT_ICON_CACHE)
 {
 }
 

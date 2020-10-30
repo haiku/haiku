@@ -17,6 +17,7 @@
 #include "JsonTextWriterTest.h"
 #include "JsonToMessageTest.h"
 #include "KeymapTest.h"
+#include "LRUCacheTest.h"
 
 
 BTestSuite*
@@ -33,6 +34,7 @@ getTestSuite()
 	JsonTextWriterTest::AddTests(*suite);
 	JsonToMessageTest::AddTests(*suite);
 	KeymapTest::AddTests(*suite);
+	LRUCacheTest::AddTests(*suite);
 
 	return suite;
 }

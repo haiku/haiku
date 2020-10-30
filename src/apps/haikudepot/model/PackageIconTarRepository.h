@@ -5,6 +5,7 @@
 #ifndef PACKAGE_ICON_TAR_REPOSITORY_H
 #define PACKAGE_ICON_TAR_REPOSITORY_H
 
+
 #include <DataIO.h>
 #include <HashMap.h>
 #include <HashString.h>
@@ -12,8 +13,9 @@
 #include <Path.h>
 #include <Referenceable.h>
 
-#include "PackageIconRepository.h"
 #include "IconTarPtr.h"
+#include "LRUCache.h"
+#include "PackageIconRepository.h"
 
 typedef BReference<IconTarPtr> IconTarPtrRef;
 
@@ -54,7 +56,7 @@ private:
 private:
 			BLocker				fLock;
 			BPositionIO*		fTarIo;
-			HashMap<HashString, BitmapRef>
+			LRUCache<HashString, BitmapRef>
 								fIconCache;
 			HashMap<HashString, IconTarPtrRef>
 								fIconTarPtrs;
