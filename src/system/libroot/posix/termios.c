@@ -180,3 +180,15 @@ tcgetsid(int fd)
 	return -1;
 }
 
+
+int
+tcsetsid(int fd, pid_t pid)
+{
+	if (pid != getsid(0)) {
+		errno = EINVAL;
+		return -1;
+	}
+
+	return ioctl(fd, TIOCSCTTY, NULL);
+}
+

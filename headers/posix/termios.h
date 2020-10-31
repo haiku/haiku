@@ -235,6 +235,7 @@ extern int		tcdrain(int fd);
 extern int		tcflow(int fd, int action);
 extern int		tcflush(int fd, int queueSelector);
 extern pid_t	tcgetsid(int fd);
+extern int		tcsetsid(int fd, pid_t pid);
 
 #ifdef __cplusplus
 }
