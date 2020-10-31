@@ -167,3 +167,16 @@ cfmakeraw(struct termios *termios)
 	termios->c_cflag &= ~(CSIZE | PARENB);
 	termios->c_cflag |= CS8;
 }
+
+
+pid_t
+tcgetsid(int fd)
+{
+	int sid;
+
+	if (ioctl(fd, TIOCGSID, &sid) == 0)
+		return sid;
+
+	return -1;
+}
+

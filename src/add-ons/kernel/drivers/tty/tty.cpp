@@ -1679,6 +1679,15 @@ tty_ioctl(tty_cookie* cookie, uint32 op, void* buffer, size_t length)
 			return B_OK;
 		}
 
+		// get session leader process group ID
+
+		case TIOCGSID:
+		{
+			TRACE(("tty: get session_id\n"));
+			return user_memcpy(buffer, &tty->settings->session_id,
+				sizeof(pid_t));
+		}
+
 		// get and set window size
 
 		case TIOCGWINSZ:
