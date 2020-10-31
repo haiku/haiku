@@ -144,11 +144,6 @@ arch_thread_init(kernel_args* args)
 	// Save one global valid FPU state; it will be copied in the arch dependent
 	// part of each new thread.
 	if (gHasXsave || gHasXsavec) {
-		if (gFPUSaveLength > sizeof(sInitialState.fpu_state)) {
-			panic("XSAVE FPU context is larger than allowed "
-				"(need at least %" B_PRIu64 " bytes)", gFPUSaveLength);
-			return B_ERROR;
-		}
 		memset(sInitialState.fpu_state, 0, gFPUSaveLength);
 		if (gHasXsavec) {
 			asm volatile (
