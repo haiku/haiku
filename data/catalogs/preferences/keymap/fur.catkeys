@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-Keymap	1075970008
+1	friulian	x-vnd.Haiku-Keymap	2700190052
 Key	Modifier keys window	As in a computer keyboard key	Tast
 Japanese	KeymapNames		Gjaponês
 US	KeymapNames		Stâts Unîts
@@ -89,6 +89,7 @@ Esperanto	KeymapNames		Esperanto
 Belarusian	KeymapNames		Bielorùs
 Warning: left and right key roles do not match	Modifier keys window		Atenzion: i rûi dai tascj çampe e drete no corispuindin
 Circumflex trigger	Keymap window		Acent circonflès (^)
+Fizzbook NL2	KeyboardLayoutNames		Fizzbook NL2
 Caps lock	Keyboard Layout View		Bloc Maiusc
 Left shift	Keyboard Layout View		Maiusc a çampe
 Russian (Yawert)	KeymapNames		Rus (Yawert)

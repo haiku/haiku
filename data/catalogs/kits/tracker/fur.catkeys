@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-libtracker	3669766136
+1	friulian	x-vnd.Haiku-libtracker	2498612740
 Created	ContainerWindow		Creât
 Icon	AttributesView		Icone
 Open and make preferred	OpenWithWindow		Vierç e rint preferît
@@ -270,6 +270,7 @@ home	B_USER_DIRECTORY		home
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Gnûfs Modei Tracker
 Disk mounting during boot	AutoMounterSettings		Montaç discs dilunc l'inviament
 Don't automount	AutoMounterSettings		No sta montâ in automatic
+Node ref	AttributesView		Rif grop
 Could not find application \"%appname\"	OpenWithWindow		Nol è stât pussibil cjatâ la aplicazion \"%appname\"
 Unmatched parenthesis.	libtracker		Parentesis no imbinadis.
 Extended attribute	AttributesView		Atribût estês
@@ -520,6 +521,7 @@ Create a Query	FindPanel		Cree une interogazion
 Close	QueryContainerWindow		Siere
 I know what I'm doing	FSUtils	button label	O sai ce che o fâs
 Preparing to copy items…	StatusWindow		Daûr a prontâ la copie dai elements…
+Entry ref	AttributesView		Rif vôs
 Icon view	ContainerWindow		Viodude a iconis
 Name	ContainerWindow		Non
 Preferred for %type	OpenWithWindow		Preferît par %type

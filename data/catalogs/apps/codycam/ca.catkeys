@@ -1,6 +1,7 @@
-1	catalan; valencian	x-vnd.Haiku-CodyCam	40716723
+1	catalan; valencian	x-vnd.Haiku-CodyCam	12021044
 destination directory expected	CodyCam		s'espera un directori de destinació
 reply: '%s'\n	SftpClient		resposta: %s\n
+PASS <suppressed>  (real password sent)	FtpClient		Contrasenya <suppressed>  (contrasenya real enviada)
 JPEG image	CodyCam		Imatge JPEG
 Remote host has closed the connection.\n	FtpClient		El servidor remot ha tancat la connexió.\n
 image file format expected	CodyCam		s'espera un format de fitxer d'imatge

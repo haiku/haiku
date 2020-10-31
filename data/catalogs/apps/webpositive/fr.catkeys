@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-WebPositive	1591513524
+1	french	x-vnd.Haiku-WebPositive	1976607515
 Authentication required	Authentication Panel		Authentification requise
 Previous	WebPositive Window		Précédent
 (Finish: %date)	Download Window		(Fin : %date)
@@ -53,6 +53,7 @@ Cookies for %s	Cookie Manager		Cookies pour %s
 The download could not be opened.	Download Window		Impossible d’ouvrir l’objet téléchargé.
 Close	Download Window		Fermer
 WebPositive	System name		WebPositive
+%s - Search term	Settings Window		%s - Terme à rechercher
 Reload	WebPositive Window		Recharger
 Expiration	Cookie Manager		Expiration
 Download finished	Download Window		Téléchargement terminé

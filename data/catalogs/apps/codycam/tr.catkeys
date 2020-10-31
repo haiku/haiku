@@ -1,6 +1,7 @@
-1	turkish	x-vnd.Haiku-CodyCam	40716723
+1	turkish	x-vnd.Haiku-CodyCam	12021044
 destination directory expected	CodyCam		hedef dizin bekleniyordu
 reply: '%s'\n	SftpClient		yanıtla: '%s'\n
+PASS <suppressed>  (real password sent)	FtpClient		PAROLA <gizlenmiş>  (gönderilen gerçek parola)
 JPEG image	CodyCam		JPEG görseli
 Remote host has closed the connection.\n	FtpClient		Uzaktaki makine bağlantıyı kapattı.\n
 image file format expected	CodyCam		görsel dosya biçimi bekleniydu

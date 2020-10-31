@@ -1,6 +1,7 @@
-1	french	x-vnd.Haiku-CodyCam	40716723
+1	french	x-vnd.Haiku-CodyCam	12021044
 destination directory expected	CodyCam		dossier de destination attendu
 reply: '%s'\n	SftpClient		réponse : '%s'\n
+PASS <suppressed>  (real password sent)	FtpClient		PASS <caché> (envoi du mot de passe réel)
 JPEG image	CodyCam		Image JPEG
 Remote host has closed the connection.\n	FtpClient		L’hôte distant a fermé la connexion.\n
 image file format expected	CodyCam		un format de fichier image est attendu

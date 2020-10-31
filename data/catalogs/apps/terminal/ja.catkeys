@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Terminal	2277843400
+1	japanese	x-vnd.Haiku-Terminal	3117643489
 Close other tabs	Terminal TermWindow		他のタブを閉じる
 Insert path	Terminal TermView		パスを挿入
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		すみません、シェルを起動できませんでした。
@@ -10,6 +10,7 @@ Confirm exit if active programs exist	Terminal AppearancePrefView		実行中の�
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tタブで動作中のプロセスの作業中フォルダー\n\t\t\tオプションでパスの最大要素数を指定できます。\n\t\t\t例. '%2d' は最大 2 つの要素を示します。\n\t%T\t-\t現在のロケールでの Terminal アプリケーション名\n\t%e\t-\tタブの文字コード。UTF-8 の場合は非表示です。\n\t%i\t-\tウィンドウのインデックス\n\t%p\t-\tタブ内で実行中のプロセス名\n\t%t\t-\tタブのタイトル
 Solarized Dark	Terminal colors scheme		Solarized Dark
 Copy	Terminal TermWindow		コピー
+  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory	Terminal TermApp		  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory
 Retro	Terminal colors scheme		レトロ
 Edit tab title…	Terminal TermWindow		タブタイトルの編集…
 Print	Terminal TermWindow		印刷

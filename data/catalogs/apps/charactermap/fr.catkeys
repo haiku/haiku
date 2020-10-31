@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-CharacterMap	1115465063
+1	french	x-vnd.Haiku-CharacterMap	64213964
 Tirhuta	UnicodeBlocks		Tirhuta
 Miscellaneous mathematical symbols B	UnicodeBlocks		Divers symboles mathématiques B
 Latin extended E	UnicodeBlocks		Latin étendu E
@@ -46,6 +46,7 @@ Thai	UnicodeBlocks		Thaï
 Ethiopic supplement	UnicodeBlocks		Supplément éthiopien
 Chess symbols	UnicodeBlocks		Symboles d’échecs
 Yijing hexagram symbols	UnicodeBlocks		Hexagrammes du Yi Jing
+Ottoman Siyaq numbers	UnicodeBlocks		Chiffres Siyaq Ottoman
 Ideographic symbols and punctuation	UnicodeBlocks		Symboles idéographiques et ponctuation
 File	CharacterWindow		Fichier
 Sudanese supplement	UnicodeBlocks		Supplément soundanais
