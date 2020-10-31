@@ -49,6 +49,9 @@ extern void		*calloc(size_t numElements, size_t size);
 extern void		free(void *pointer);
 extern void		*malloc(size_t size);
 extern int		posix_memalign(void **_pointer, size_t alignment, size_t size);
+#ifdef _ISOC11_SOURCE
+extern void 	*aligned_alloc(size_t alignment, size_t size);
+#endif
 extern void		*realloc(void *oldPointer, size_t newSize);
 
 /* process termination */

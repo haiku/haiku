@@ -12,4 +12,9 @@
 #endif
 
 
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
+	#define _ISOC11_SOURCE
+#endif
+
+
 #endif // _FEATURES_H
