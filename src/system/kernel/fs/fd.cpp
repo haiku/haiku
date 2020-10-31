@@ -748,7 +748,7 @@ common_user_io(int fd, off_t pos, void* buffer, size_t length, bool write)
 	}
 
 	bool movePosition = false;
-	if (pos == -1) {
+	if (pos == -1 && (!write || (descriptor->open_mode & O_APPEND) == 0)) {
 		pos = descriptor->pos;
 		movePosition = true;
 	}
@@ -770,6 +770,8 @@ common_user_io(int fd, off_t pos, void* buffer, size_t length, bool write)
 
 	if (movePosition)
 		descriptor->pos = pos + length;
+	else if (pos == -1)
+		descriptor->pos = descriptor->ops->fd_seek(descriptor, 0, SEEK_END);
 
 	return length <= SSIZE_MAX ? (ssize_t)length : SSIZE_MAX;
 }
@@ -808,7 +810,7 @@ common_user_vector_io(int fd, off_t pos, const iovec* userVecs, size_t count,
 		return B_BAD_ADDRESS;
 
 	bool movePosition = false;
-	if (pos == -1) {
+	if (pos == -1 && (!write || (descriptor->open_mode & O_APPEND) == 0)) {
 		pos = descriptor->pos;
 		movePosition = true;
 	}
@@ -852,7 +854,8 @@ common_user_vector_io(int fd, off_t pos, const iovec* userVecs, size_t count,
 		else
 			bytesTransferred += (ssize_t)length;
 
-		pos += length;
+		if (pos > -1)
+			pos += length;
 
 		if (length < vecs[i].iov_len)
 			break;
@@ -860,6 +863,8 @@ common_user_vector_io(int fd, off_t pos, const iovec* userVecs, size_t count,
 
 	if (movePosition)
 		descriptor->pos = pos;
+	else if (pos == -1)
+		descriptor->pos = descriptor->ops->fd_seek(descriptor, 0, SEEK_END);
 
 	return bytesTransferred;
 }
