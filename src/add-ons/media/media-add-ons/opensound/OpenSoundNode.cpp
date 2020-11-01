@@ -9,6 +9,7 @@
 
 #include "OpenSoundNode.h"
 
+#include <AutoDeleter.h>
 #include <Autolock.h>
 #include <Buffer.h>
 #include <BufferGroup.h>
@@ -2232,7 +2233,10 @@ OpenSoundNode::_PlayThread(NodeInput* input)
 	}
 
 	// cache a silence buffer
-	uint8 silenceBuffer[bufferSize];
+	uint8* silenceBuffer = (uint8*)malloc(bufferSize);
+	if (silenceBuffer == NULL)
+		return B_NO_MEMORY;
+	MemoryDeleter deleter(silenceBuffer);
 	uint8 formatSilence = 0;
 	if (input->fInput.format.u.raw_audio.format
 			== media_raw_audio_format::B_AUDIO_UCHAR)
