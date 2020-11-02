@@ -1554,7 +1554,7 @@ arch_cpu_init_post_vm(kernel_args* args)
 		call_all_cpus_sync(&enable_xsavemask, NULL);
 		get_current_cpuid(&cpuid, 0xd, 0);
 		gFPUSaveLength = cpuid.regs.ebx;
-		if (gFPUSaveLength > sizeof(sInitialState.fpu_state))
+		if (gFPUSaveLength > sizeof(((struct arch_thread *)0)->fpu_state))
 			gFPUSaveLength = 832;
 
 		arch_altcodepatch_replace(ALTCODEPATCH_TAG_XSAVE,
