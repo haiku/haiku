@@ -451,7 +451,6 @@ Response::~Response()
 
 void
 Response::Parse(BDataIO& stream, LiteralHandler* handler)
-	throw(ParseException, StreamException)
 {
 	MakeEmpty();
 	fLiteralHandler = handler;
@@ -763,7 +762,6 @@ ResponseParser::SetLiteralHandler(LiteralHandler* handler)
 
 status_t
 ResponseParser::NextResponse(Response& response, bigtime_t timeout)
-	throw(ParseException, StreamException)
 {
 	response.Parse(*fStream, fLiteralHandler);
 	return B_OK;
