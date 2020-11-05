@@ -252,6 +252,7 @@ int			_user_dup(int fd);
 int			_user_dup2(int ofd, int nfd);
 status_t	_user_lock_node(int fd);
 status_t	_user_unlock_node(int fd);
+status_t	_user_preallocate(int fd, off_t offset, off_t length);
 
 /* socket user prototypes (implementation in socket.cpp) */
 int			_user_socket(int family, int type, int protocol);

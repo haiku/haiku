@@ -338,6 +338,7 @@ extern status_t		_kern_lock_node(int fd);
 extern status_t		_kern_unlock_node(int fd);
 extern status_t		_kern_get_next_fd_info(team_id team, uint32 *_cookie,
 						struct fd_info *info, size_t infoSize);
+extern status_t		_kern_preallocate(int fd, off_t offset, off_t length);
 
 // socket functions
 extern int			_kern_socket(int family, int type, int protocol);

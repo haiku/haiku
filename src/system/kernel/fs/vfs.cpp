@@ -6439,6 +6439,48 @@ common_unlock_node(int fd, bool kernel)
 
 
 static status_t
+common_preallocate(int fd, off_t offset, off_t length, bool kernel)
+{
+	struct file_descriptor* descriptor;
+	struct vnode* vnode;
+
+	if (offset < 0 || length == 0)
+		return B_BAD_VALUE;
+	if (offset > OFF_MAX - length)
+		return B_FILE_TOO_LARGE;
+
+	descriptor = get_fd_and_vnode(fd, &vnode, kernel);
+	if (descriptor == NULL || (descriptor->open_mode & O_RWMASK) == O_RDONLY)
+		return B_FILE_ERROR;
+
+	switch (vnode->Type() & S_IFMT) {
+		case S_IFIFO:
+		case S_IFSOCK:
+			return ESPIPE;
+
+		case S_IFBLK:
+		case S_IFCHR:
+		case S_IFDIR:
+		case S_IFLNK:
+			return B_DEVICE_NOT_FOUND;
+
+		case S_IFREG:
+			break;
+	}
+
+	status_t status = B_OK;
+	if (HAS_FS_CALL(vnode, preallocate)) {
+		status = FS_CALL(vnode, preallocate, offset, length);
+	} else {
+		status = HAS_FS_CALL(vnode, write)
+			? B_UNSUPPORTED : B_READ_ONLY_DEVICE;
+	}
+
+	return status;
+}
+
+
+static status_t
 common_read_link(int fd, char* path, char* buffer, size_t* _bufferSize,
 	bool kernel)
 {
@@ -8436,6 +8478,13 @@ _kern_unlock_node(int fd)
 
 
 status_t
+_kern_preallocate(int fd, off_t offset, off_t length)
+{
+	return common_preallocate(fd, offset, length, true);
+}
+
+
+status_t
 _kern_create_dir_entry_ref(dev_t device, ino_t inode, const char* name,
 	int perms)
 {
@@ -9316,6 +9365,13 @@ status_t
 _user_unlock_node(int fd)
 {
 	return common_unlock_node(fd, false);
+}
+
+
+status_t
+_user_preallocate(int fd, off_t offset, off_t length)
+{
+	return common_preallocate(fd, offset, length, false);
 }
 
 

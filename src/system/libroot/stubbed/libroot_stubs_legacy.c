@@ -2354,6 +2354,8 @@ void popen() {}
 void port_buffer_size() {}
 void port_buffer_size_etc() {}
 void port_count() {}
+void posix_fadvise() {}
+void posix_fallocate() {}
 void posix_madvise() {}
 void posix_memalign() {}
 void posix_openpt() {}

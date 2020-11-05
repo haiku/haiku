@@ -95,3 +95,12 @@ posix_fadvise(int fd, off_t offset, off_t len, int advice)
 	return 0;
 }
 
+
+int
+posix_fallocate(int fd, off_t offset, off_t len)
+{
+	if (len == 0 || offset < 0)
+		return EINVAL;
+
+	return _kern_preallocate(fd, offset, len);
+}

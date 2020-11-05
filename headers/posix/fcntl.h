@@ -99,6 +99,7 @@ extern int	openat(int fd, const char *path, int openMode, ...);
 extern int	fcntl(int fd, int op, ...);
 
 extern int	posix_fadvise(int fd, off_t offset, off_t len, int advice);
+extern int	posix_fallocate(int fd, off_t offset, off_t len);
 
 #ifdef __cplusplus
 }
