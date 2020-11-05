@@ -23,6 +23,9 @@ AddResources notify : notify.rdef ;
 AddResources setmime : setmime.rdef ;
 AddResources urlwrapper : urlwrapper.rdef ;
 
+ObjectSysHdrs listimage.c :
+	[ FDirName $(HAIKU_TOP) headers compatibility bsd ] ;
+
 # standard commands that don't need any additional library
 StdBinCommands
 	badblocks.cpp
@@ -66,6 +69,8 @@ StdBinCommands
 # standard commands that need libncurses.a
 Includes [ FGristFiles top.cpp watch.c ]
 	: [ BuildFeatureAttribute ncurses : headers ] ;
+
+ObjectSysHdrs watch.c : [ FDirName $(HAIKU_TOP) headers compatibility bsd ] ;
 
 StdBinCommands
 	watch.c

@@ -176,12 +176,10 @@ extern int		dprintf(int fd, char const *format, ...) __PRINTFLIKE(2,3);
 extern int		fprintf(FILE *stream, char const *format, ...) __PRINTFLIKE(2,3);
 extern int		sprintf(char *string, char const *format, ...) __PRINTFLIKE(2,3);
 extern int		snprintf(char *string, size_t size, char const *format, ...) __PRINTFLIKE(3,4);
-extern int		asprintf(char **ret, char const *format, ...) __PRINTFLIKE(2,3);
 extern int		vprintf(char const *format, va_list ap);
 extern int		vfprintf(FILE *stream, char const *format, va_list ap);
 extern int		vsprintf(char *string, char const *format, va_list ap);
 extern int		vsnprintf(char *string, size_t size, char const *format, va_list ap);
-extern int		vasprintf(char **ret, char const *format, va_list ap);
 
 extern int		scanf(char const *format, ...);
 extern int		fscanf(FILE *stream, char const *format, ...);

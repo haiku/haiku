@@ -33,6 +33,9 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		SEARCH_SOURCE += [ FDirName $(SUBDIR) textview_support ] ;
 		SEARCH_SOURCE += [ FDirName $(SUBDIR) layouter ] ;
 
+		ObjectSysHdrs DecimalSpinner.cpp :
+			[ FDirName $(HAIKU_TOP) headers compatibility bsd ] ;
+
 		MergeObject <libbe!$(architecture)>interface_kit.o :
 			AboutWindow.cpp
 			AbstractLayout.cpp
