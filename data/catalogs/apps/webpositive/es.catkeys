@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-WebPositive	55235296
+1	spanish; castilian	x-vnd.Haiku-WebPositive	1976607515
 Authentication required	Authentication Panel		Autenticación requerida
 Previous	WebPositive Window		Anterior
 (Finish: %date)	Download Window		(Finaliza: %date)
@@ -53,6 +53,7 @@ Cookies for %s	Cookie Manager		Cookies para %s
 The download could not be opened.	Download Window		No se pudo abrir la descarga.
 Close	Download Window		Cerrar
 WebPositive	System name		WebPositive
+%s - Search term	Settings Window		%s - Término de búsqueda
 Reload	WebPositive Window		Recargar
 Expiration	Cookie Manager		Caducidad
 Download finished	Download Window		Descarga finalizada
@@ -129,6 +130,7 @@ Double-click or middle-click to open new tab.	Tab Manager		Doble clic o clic med
 Next	WebPositive Window		Siguiente
 Bookmark error	WebPositive Window		Error de marcadores
 OK	WebPositive Window		Aceptar
+(%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% de %expectedSize%, %rate%/s)
 WebPositive	Download Window		WebPositive
 Zoom text only	WebPositive Window		Zoom en el texto únicamente
 Save page as…	WebPositive Window		Guardar página como...

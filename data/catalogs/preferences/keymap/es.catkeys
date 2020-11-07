@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Keymap	1075970008
+1	spanish; castilian	x-vnd.Haiku-Keymap	2700190052
 Key	Modifier keys window	As in a computer keyboard key	Tecla
 Japanese	KeymapNames		Japonés
 US	KeymapNames		Estados Unidos
@@ -89,6 +89,7 @@ Esperanto	KeymapNames		Esperanto
 Belarusian	KeymapNames		Bielorruso
 Warning: left and right key roles do not match	Modifier keys window		Advertencia: los roles de tecla izquierda y derecha no concuerdan
 Circumflex trigger	Keymap window		Desencadenador de acento circunflejo (^)
+Fizzbook NL2	KeyboardLayoutNames		Fizzbook NL2
 Caps lock	Keyboard Layout View		Bloqueo de mayúsculas
 Left shift	Keyboard Layout View		Mayús izquierda
 Russian (Yawert)	KeymapNames		Ruso (Yawert)

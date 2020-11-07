@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-ProcessController	3123774187
+1	swedish	x-vnd.Haiku-ProcessController	415082887
 Error saving file	ProcessController		Fel vid sparning av fil
 Display priority	ProcessController		Visningsprioritet
 That's no Fun!	ProcessController		Det var inte roligt!
@@ -21,6 +21,7 @@ Restart Deskbar	ProcessController		Starta om Deskbar
 About ProcessController…	ProcessController		Om ProcessKontroll...
 Usage: %s [-deskbar]\n	ProcessController		Hantering: %s [-deskbar]\n
 Please confirm	ProcessController		Vänligen bekräfta
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr
 Urgent priority	ProcessController		Brådskande prioritet
 What do you want to do with the thread \"%s\"?	ProcessController		Vad vill du göra med tråden \"%s\"?
 Idle priority	ProcessController		Overksam prioritet
