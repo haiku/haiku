@@ -12,4 +12,7 @@
 #define FIONBIO 	0xbe000000
 #define FIONREAD	0xbe000001
 
+#define FIOSEEKDATA	0xbe000002
+#define FIOSEEKHOLE	0xbe000003
+
 #endif	/* _SYS_IOCTL_H */

@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/file.h>
+#include <sys/ioctl.h>
 #include <sys/resource.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -5856,6 +5857,39 @@ file_seek(struct file_descriptor* descriptor, off_t pos, int seekType)
 				}
 			}
 
+			break;
+		}
+		case SEEK_DATA:
+		case SEEK_HOLE:
+		{
+			status_t status = B_BAD_VALUE;
+			if (HAS_FS_CALL(vnode, ioctl)) {
+				offset = pos;
+				status = FS_CALL(vnode, ioctl, descriptor->cookie,
+					seekType == SEEK_DATA ? FIOSEEKDATA : FIOSEEKHOLE,
+					&offset, sizeof(offset));
+				if (status == B_OK) {
+					if (offset > pos)
+						offset -= pos;
+					break;
+				}
+			}
+			if (status != B_BAD_VALUE && status != B_DEV_INVALID_IOCTL)
+				return status;
+
+			// basic implementation with stat() the node
+			if (!HAS_FS_CALL(vnode, read_stat) || isDevice)
+				return B_BAD_VALUE;
+
+			struct stat stat;
+			status = FS_CALL(vnode, read_stat, &stat);
+			if (status != B_OK)
+				return status;
+
+			off_t end = stat.st_size;
+			if (pos >= end)
+				return ENXIO;
+			offset = seekType == SEEK_HOLE ? end - pos : 0;
 			break;
 		}
 		default:
