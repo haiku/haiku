@@ -484,17 +484,18 @@ nfs_mount(fs_nspace *ns, const char *path, nfs_fhandle *fhandle)
 
 	fhstatus = XDRInPacketGetInt32(&reply);
 
-	if (fhstatus != 0) {
+	if (fhstatus != NFS_OK) {
 		XDRInPacketDestroy(&reply);
 		XDROutPacketDestroy(&call);
 		return map_nfs_to_system_error(fhstatus);
 	}
 
-	XDRInPacketGetFixed(&reply, fhandle->opaque, NFS_FHSIZE);
+	fhstatus = XDRInPacketGetFixed(&reply, fhandle->opaque, NFS_FHSIZE);
 
 	XDRInPacketDestroy(&reply);
 	XDROutPacketDestroy(&call);
-	return B_OK;
+
+	return map_nfs_to_system_error(fhstatus);
 }
 
 
@@ -538,7 +539,13 @@ nfs_lookup (fs_nspace *ns, const nfs_fhandle *dir, const char *filename,
 		return map_nfs_to_system_error(status);
 	}
 
-	XDRInPacketGetFixed(&reply, fhandle->opaque, NFS_FHSIZE);
+	status = XDRInPacketGetFixed(&reply, fhandle->opaque, NFS_FHSIZE);
+
+	if (status != NFS_OK) {
+		XDRInPacketDestroy(&reply);
+		XDROutPacketDestroy(&call);
+		return map_nfs_to_system_error(status);
+	}
 
 	if (st)
 		get_nfs_attr(&reply, st);
@@ -1002,7 +1009,11 @@ fs_readdir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 			vnid=XDRInPacketGetInt32(&reply);
 			filename=XDRInPacketGetString(&reply);
 
-			XDRInPacketGetFixed(&reply, newCookie.opaque, NFS_COOKIESIZE);
+			status = XDRInPacketGetFixed(&reply, newCookie.opaque,
+				NFS_COOKIESIZE);
+
+			if (status != NFS_OK)
+				return map_nfs_to_system_error(status);
 
 			//if (strcmp(".",filename)&&strcmp("..",filename))
 			//if ((ns->rootid != node->vnid) || (strcmp(".",filename)&&strcmp("..",filename)))
@@ -1810,7 +1821,13 @@ fs_create(fs_volume *_volume, fs_vnode *_dir, const char *name, int omode,
 			return map_nfs_to_system_error(status);
 		}
 
-		XDRInPacketGetFixed(&reply, fhandle.opaque, NFS_FHSIZE);
+		status = XDRInPacketGetFixed(&reply, fhandle.opaque, NFS_FHSIZE);
+
+		if (status != NFS_OK) {
+			XDRInPacketDestroy(&reply);
+			XDROutPacketDestroy(&call);
+			return map_nfs_to_system_error(status);
+		}
 
 		get_nfs_attr(&reply,&st);
 
@@ -2041,7 +2058,12 @@ fs_mkdir(fs_volume *_volume, fs_vnode *_dir, const char *name, int perms)
 		return map_nfs_to_system_error(status);
 	}
 
-	XDRInPacketGetFixed(&reply, fhandle.opaque, NFS_FHSIZE);
+	status = XDRInPacketGetFixed(&reply, fhandle.opaque, NFS_FHSIZE);
+
+	if (status != NFS_OK) {
+		XDROutPacketDestroy(&call);
+		return map_nfs_to_system_error(status);
+	}
 
 	get_nfs_attr(&reply, &st);
 
