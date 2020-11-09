@@ -7,6 +7,7 @@
 
 #include <algorithm>
 #include <dirent.h>
+#include <sys/ioctl.h>
 #include <util/kernel_cpp.h>
 #include <string.h>
 
@@ -573,6 +574,33 @@ ext2_ioctl(fs_volume* _volume, fs_vnode* _node, void* _cookie, uint32 cmd,
 			TRACE("ioctl: Done\n");
 
 			return B_OK;
+		}
+
+		case FIOSEEKDATA:
+		case FIOSEEKHOLE:
+		{
+			off_t* offset = (off_t*)buffer;
+			Inode* inode = (Inode*)_node->private_node;
+
+			if (*offset >= inode->Size())
+				return ENXIO;
+
+			while (*offset < inode->Size()) {
+				fsblock_t block;
+				uint32 count = 1;
+				status_t status = inode->FindBlock(*offset, block, &count);
+				if (status != B_OK)
+					return status;
+				if ((block != 0 && cmd == FIOSEEKDATA)
+					|| (block == 0 && cmd == FIOSEEKHOLE)) {
+					return B_OK;
+				}
+				*offset += count * volume->BlockSize();
+			}
+
+			if (*offset > inode->Size())
+				*offset = inode->Size();
+			return cmd == FIOSEEKDATA ? ENXIO : B_OK;
 		}
 	}
 
