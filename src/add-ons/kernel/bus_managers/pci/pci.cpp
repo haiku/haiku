@@ -147,6 +147,7 @@ pci_reserve_device(uchar virtualBus, uchar device, uchar function,
 	device_attr drvAttrs[] = {
 		// info about device
 		{B_DEVICE_BUS, B_STRING_TYPE, {string: "legacy_driver"}},
+		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {string: driverName}},
 		{"legacy_driver", B_STRING_TYPE, {string: driverName}},
 		{"legacy_driver_cookie", B_UINT64_TYPE, {ui64: (uint64)nodeCookie}},
 		{NULL}
