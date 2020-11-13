@@ -1737,8 +1737,10 @@ Menu<ParentBuilder>::AddItem(const char* label, BMessage* message,
 	char shortcut, uint32 modifiers)
 {
 	BMenuItem* item = new BMenuItem(label, message, shortcut, modifiers);
-	if (!fMenu->AddItem(item))
+	if (!fMenu->AddItem(item)) {
 		delete item;
+		item = NULL;
+	}
 
 	return MenuItem<ParentBuilder>(this->fParent, fMenu, item);
 }
@@ -1758,8 +1760,10 @@ Menu<ParentBuilder>::AddItem(const char* label, uint32 messageWhat,
 		throw;
 	}
 
-	if (!fMenu->AddItem(item))
+	if (!fMenu->AddItem(item)) {
 		delete item;
+		item = NULL;
+	}
 
 	return MenuItem<ParentBuilder>(this->fParent, fMenu, item);
 }
