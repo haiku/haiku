@@ -365,15 +365,7 @@ BSecureSocket::Private::_CreateContext()
 	SSL_CTX_set_cipher_list(sContext, "HIGH:!aNULL:!PSK:!SRP:!MD5:!RC4");
 
 	// Setup certificate verification
-	BPath certificateStore;
-	find_directory(B_SYSTEM_DATA_DIRECTORY, &certificateStore);
-	certificateStore.Append("ssl/CARootCertificates.pem");
-
-	BPath userCertificateStore;
-	find_directory(B_SYSTEM_NONPACKAGED_DATA_DIRECTORY, &userCertificateStore);
-	userCertificateStore.Append("ssl/certs/");
-	SSL_CTX_load_verify_locations(sContext, certificateStore.Path(), userCertificateStore.Path());
-	SSL_CTX_set_verify(sContext, SSL_VERIFY_PEER, VerifyCallback);
+	SSL_CTX_set_default_verify_file(sContext);
 
 	// OpenSSL 1.0.2 and later: use the alternate "trusted first" algorithm to
 	// validate certificate chains. This makes the validation stop as soon as a
