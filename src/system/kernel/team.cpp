@@ -1223,6 +1223,50 @@ dump_teams(int argc, char** argv)
 //	#pragma mark - Private functions
 
 
+/*! Get the parent of a given process.
+
+	Used in the implementation of getppid (where a process can get its own
+	parent, only) as well as in user_process_info where the information is
+	available to anyone (allowing to display a tree of running processes)
+*/
+static pid_t
+_getppid(pid_t id)
+{
+	if (id < 0) {
+		errno = EINVAL;
+		return -1;
+	}
+
+	if (id == 0) {
+		Team* team = thread_get_current_thread()->team;
+		TeamLocker teamLocker(team);
+		if (team->parent == NULL) {
+			errno = EINVAL;
+			return -1;
+		}
+		return team->parent->id;
+	}
+
+	Team* team = Team::GetAndLock(id);
+	if (team == NULL) {
+		errno = ESRCH;
+		return -1;
+	}
+
+	pid_t parentID;
+
+	if (team->parent == NULL) {
+		errno = EINVAL;
+		parentID = -1;
+	} else
+		parentID = team->parent->id;
+
+	team->UnlockAndReleaseReference();
+
+	return parentID;
+}
+
+
 /*!	Inserts team \a team into the child list of team \a parent.
 
 	The caller must hold the lock of both \a parent and \a team.
@@ -3857,13 +3901,9 @@ getpid(void)
 
 
 pid_t
-getppid(void)
+getppid()
 {
-	Team* team = thread_get_current_thread()->team;
-
-	TeamLocker teamLocker(team);
-
-	return team->parent->id;
+	return _getppid(0);
 }
 
 
@@ -3998,11 +4038,6 @@ _user_wait_for_child(thread_id child, uint32 flags, siginfo_t* userInfo,
 pid_t
 _user_process_info(pid_t process, int32 which)
 {
-	// we only allow to return the parent of the current process
-	if (which == PARENT_ID
-		&& process != 0 && process != thread_get_current_thread()->team->id)
-		return B_BAD_VALUE;
-
 	pid_t result;
 	switch (which) {
 		case SESSION_ID:
@@ -4012,7 +4047,7 @@ _user_process_info(pid_t process, int32 which)
 			result = getpgid(process);
 			break;
 		case PARENT_ID:
-			result = getppid();
+			result = _getppid(process);
 			break;
 		default:
 			return B_BAD_VALUE;
