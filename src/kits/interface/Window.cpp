@@ -1234,7 +1234,7 @@ FrameMoved(origin);
 					_AdoptResize();
 					FrameResized(width, height);
 				}
-				
+
 				// draw
 				int32 count = infos.CountItems();
 				for (int32 i = 0; i < count; i++) {
@@ -1517,13 +1517,11 @@ BWindow::SetZoomLimits(float maxWidth, float maxHeight)
 	// TODO: What about locking?!?
 	if (maxWidth > fMaxWidth)
 		maxWidth = fMaxWidth;
-	else
-		fMaxZoomWidth = maxWidth;
+	fMaxZoomWidth = maxWidth;
 
 	if (maxHeight > fMaxHeight)
 		maxHeight = fMaxHeight;
-	else
-		fMaxZoomHeight = maxHeight;
+	fMaxZoomHeight = maxHeight;
 }
 
 
