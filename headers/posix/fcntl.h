@@ -53,9 +53,9 @@
 #define O_RSYNC			0x00020000	/* read synchronized I/O file integrity */
 #define O_DSYNC			0x00040000	/* write synchronized I/O data integrity */
 #define O_NOFOLLOW		0x00080000	/* fail on symlinks */
-#define O_NOCACHE		0x00100000	/* do not use the file system cache if */
+#define O_DIRECT		0x00100000	/* do not use the file system cache if */
 									/* possible */
-#define O_DIRECT		O_NOCACHE
+#define O_NOCACHE		O_DIRECT
 #define O_DIRECTORY		0x00200000	/* fail if not a directory */
 
 /* flags for the *at() functions */
