@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Haiku, Inc. All rights reserved.
+ * Copyright 2012-2020 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -17,8 +17,31 @@
 #include "Cookie.h"
 
 
+#define ERROR(x...) dprintf("nfs4: " x)
+
+#ifdef DEBUG
+#define TRACE(x...) dprintf("nfs4: " x)
+#define CALLED() dprintf("nfs4: called %s", __func__)
+#else
+#define TRACE(x...)
+#define CALLED()
+#endif
+
+
+static status_t
+ProcessStream(RPC::Reply* reply, const char* callName)
+{
+	status_t result = reply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
+	if (result != B_OK)
+		TRACE("call %s failed!\n", callName);
+	return result;
+}
+
+
 FSLocation::~FSLocation()
 {
+	CALLED();
+
 	if (fRootPath != NULL) {
 		for (uint32 i = 0; fRootPath[i] != NULL; i++)
 			free(const_cast<char*>(fRootPath[i]));
@@ -33,6 +56,8 @@ FSLocation::~FSLocation()
 
 FSLocations::~FSLocations()
 {
+	CALLED();
+
 	if (fRootPath != NULL) {
 		for (uint32 i = 0; fRootPath[i] != NULL; i++)
 			free(const_cast<char*>(fRootPath[i]));
@@ -53,6 +78,8 @@ AttrValue::AttrValue()
 
 AttrValue::~AttrValue()
 {
+	CALLED();
+
 	if (fFreePointer)
 		free(fData.fPointer);
 	if (fAttribute == FATTR4_FS_LOCATIONS)
@@ -82,6 +109,8 @@ ReplyInterpreter::ReplyInterpreter(RPC::Reply* reply)
 	fDecodeError(false),
 	fReply(reply)
 {
+	CALLED();
+
 	if (reply != NULL)
 		_ParseHeader();
 }
@@ -96,6 +125,8 @@ ReplyInterpreter::~ReplyInterpreter()
 void
 ReplyInterpreter::_ParseHeader()
 {
+	CALLED();
+
 	fNFS4Error = fReply->Stream().GetUInt();
 	fReply->Stream().GetOpaque(NULL);
 	fReply->Stream().GetUInt();
@@ -105,6 +136,8 @@ ReplyInterpreter::_ParseHeader()
 status_t
 ReplyInterpreter::Access(uint32* supported, uint32* allowed)
 {
+	CALLED();
+
 	status_t res = _OperationError(OpAccess);
 	if (res != B_OK)
 		return res;
@@ -117,13 +150,15 @@ ReplyInterpreter::Access(uint32* supported, uint32* allowed)
 	if (allowed != NULL)
 		*allowed = allow;
 
-	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
+	return ProcessStream(fReply, __func__);
 }
 
 
 status_t
 ReplyInterpreter::Close()
 {
+	CALLED();
+
 	status_t res = _OperationError(OpClose);
 	if (res != B_OK)
 		return res;
@@ -133,26 +168,30 @@ ReplyInterpreter::Close()
 	fReply->Stream().GetUInt();
 	fReply->Stream().GetUInt();
 
-	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
+	return ProcessStream(fReply, __func__);
 }
 
 
 status_t
 ReplyInterpreter::Commit()
 {
+	CALLED();
+
 	status_t res = _OperationError(OpCommit);
 	if (res != B_OK)
 		return res;
 
 	fReply->Stream().GetOpaque(NULL);
 
-	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
+	return ProcessStream(fReply, __func__);
 }
 
 
 status_t
 ReplyInterpreter::Create(uint64* before, uint64* after, bool& atomic)
 {
+	CALLED();
+
 	status_t res = _OperationError(OpCreate);
 	if (res != B_OK)
 		return res;
@@ -165,7 +204,7 @@ ReplyInterpreter::Create(uint64* before, uint64* after, bool& atomic)
 	for (uint32 i = 0; i < count; i++)
 		fReply->Stream().GetUInt();
 
-	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
+	return ProcessStream(fReply, __func__);
 }
 
 
@@ -173,6 +212,8 @@ ReplyInterpreter::Create(uint64* before, uint64* after, bool& atomic)
 // http://graphics.stanford.edu/~seander/bithacks.html
 static inline uint32 CountBits(uint32 v)
 {
+	CALLED();
+
 	v = v - ((v >> 1) & 0x55555555);
 	v = (v & 0x33333333) + ((v >> 2) & 0x33333333);
 	return (((v + (v >> 4)) & 0xF0F0F0F) * 0x1010101) >> 24;
@@ -182,6 +223,8 @@ static inline uint32 CountBits(uint32 v)
 status_t
 ReplyInterpreter::GetAttr(AttrValue** attrs, uint32* count)
 {
+	CALLED();
+
 	status_t res = _OperationError(OpGetAttr);
 	if (res != B_OK)
 		return res;
@@ -193,27 +236,33 @@ ReplyInterpreter::GetAttr(AttrValue** attrs, uint32* count)
 status_t
 ReplyInterpreter::GetFH(FileHandle* fh)
 {
+	CALLED();
+
 	status_t res = _OperationError(OpGetFH);
 	if (res != B_OK)
 		return res;
 
 	uint32 size;
 	const void* ptr = fReply->Stream().GetOpaque(&size);
-	if (ptr == NULL || size > NFS4_FHSIZE)
+	if (ptr == NULL || size > NFS4_FHSIZE) {
+		ERROR("Unable to %s!\n", __func__);
 		return B_BAD_VALUE;
+	}
 
 	if (fh != NULL) {
 		fh->fSize = size;
 		memcpy(fh->fData, ptr, size);
 	}
 
-	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
+	return ProcessStream(fReply, __func__);
 }
 
 
 status_t
 ReplyInterpreter::Link(uint64* before, uint64* after, bool& atomic)
 {
+	CALLED();
+
 	status_t res = _OperationError(OpLink);
 	if (res != B_OK)
 		return res;
@@ -222,13 +271,15 @@ ReplyInterpreter::Link(uint64* before, uint64* after, bool& atomic)
 	*before = fReply->Stream().GetUHyper();
 	*after = fReply->Stream().GetUHyper();
 
-	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
+	return ProcessStream(fReply, __func__);
 }
 
 
 status_t
 ReplyInterpreter::Lock(LockInfo* linfo)
 {
+	CALLED();
+
 	status_t res = _OperationError(OpLock);
 	if (res != B_OK)
 		return res;
@@ -238,13 +289,15 @@ ReplyInterpreter::Lock(LockInfo* linfo)
 	linfo->fOwner->fStateId[1] = fReply->Stream().GetUInt();
 	linfo->fOwner->fStateId[2] = fReply->Stream().GetUInt();
 
-	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
+	return ProcessStream(fReply, __func__);
 }
 
 
 status_t
 ReplyInterpreter::LockT(uint64* pos, uint64* len, LockType* type)
 {
+	CALLED();
+
 	status_t res = _OperationError(OpLockT);
 	if (res != B_WOULD_BLOCK || NFS4Error() != NFS4ERR_DENIED)
 		return res;
@@ -256,13 +309,15 @@ ReplyInterpreter::LockT(uint64* pos, uint64* len, LockType* type)
 	fReply->Stream().GetUHyper();
 	fReply->Stream().GetOpaque(NULL);
 
-	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
+	return ProcessStream(fReply, __func__);
 }
 
 
 status_t
 ReplyInterpreter::LockU(LockInfo* linfo)
 {
+	CALLED();
+
 	status_t res = _OperationError(OpLockU);
 	if (res != B_OK)
 		return res;
@@ -272,7 +327,7 @@ ReplyInterpreter::LockU(LockInfo* linfo)
 	linfo->fOwner->fStateId[1] = fReply->Stream().GetUInt();
 	linfo->fOwner->fStateId[2] = fReply->Stream().GetUInt();
 
-	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
+	return ProcessStream(fReply, __func__);
 }
 
 
@@ -280,6 +335,8 @@ status_t
 ReplyInterpreter::Open(uint32* id, uint32* seq, bool* confirm,
 	OpenDelegationData* delegData, ChangeInfo* changeInfo)
 {
+	CALLED();
+
 	status_t res = _OperationError(OpOpen);
 	if (res != B_OK)
 		return res;
@@ -315,7 +372,7 @@ ReplyInterpreter::Open(uint32* id, uint32* seq, bool* confirm,
 
 	if (delegation == OPEN_DELEGATE_NONE) {
 		delegData->fType = OPEN_DELEGATE_NONE;
-		return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
+		return ProcessStream(fReply, __func__);
 	}
 
 	delegData->fStateSeq = fReply->Stream().GetUInt();
@@ -348,13 +405,15 @@ ReplyInterpreter::Open(uint32* id, uint32* seq, bool* confirm,
 	fReply->Stream().GetUInt();
 	fReply->Stream().GetOpaque(NULL);
 
-	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
+	return ProcessStream(fReply, __func__);
 }
 
 
 status_t
 ReplyInterpreter::OpenConfirm(uint32* stateSeq)
 {
+	CALLED();
+
 	status_t res = _OperationError(OpOpenConfirm);
 	if (res != B_OK)
 		return res;
@@ -364,13 +423,15 @@ ReplyInterpreter::OpenConfirm(uint32* stateSeq)
 	fReply->Stream().GetUInt();
 	fReply->Stream().GetUInt();
 
-	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
+	return ProcessStream(fReply, __func__);
 }
 
 
 status_t
 ReplyInterpreter::Read(void* buffer, uint32* size, bool* eof)
 {
+	CALLED();
+
 	status_t res = _OperationError(OpRead);
 	if (res != B_OK)
 		return res;
@@ -379,7 +440,7 @@ ReplyInterpreter::Read(void* buffer, uint32* size, bool* eof)
 	const void* ptr = fReply->Stream().GetOpaque(size);
 	memcpy(buffer, ptr, *size);
 
-	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
+	return ProcessStream(fReply, __func__);
 }
 
 
@@ -387,6 +448,8 @@ status_t
 ReplyInterpreter::ReadDir(uint64* cookie, uint64* cookieVerf,
 	DirEntry** dirents, uint32* _count,	bool* eof)
 {
+	CALLED();
+
 	status_t res = _OperationError(OpReadDir);
 	if (res != B_OK)
 		return res;
@@ -439,6 +502,7 @@ ReplyInterpreter::ReadDir(uint64* cookie, uint64* cookieVerf,
 
 	if (fReply->Stream().IsEOF()) {
 		delete[] entries;
+		ERROR("Unable to %s!\n", __func__);
 		return B_BAD_VALUE;
 	}
 
@@ -449,6 +513,8 @@ ReplyInterpreter::ReadDir(uint64* cookie, uint64* cookieVerf,
 status_t
 ReplyInterpreter::ReadLink(void* buffer, uint32* size, uint32 maxSize)
 {
+	CALLED();
+
 	status_t res = _OperationError(OpReadLink);
 	if (res != B_OK)
 		return res;
@@ -456,13 +522,15 @@ ReplyInterpreter::ReadLink(void* buffer, uint32* size, uint32 maxSize)
 	const void* ptr = fReply->Stream().GetOpaque(size);
 	memcpy(buffer, ptr, min_c(*size, maxSize));
 
-	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
+	return ProcessStream(fReply, __func__);
 }
 
 
 status_t
 ReplyInterpreter::Remove(uint64* before, uint64* after, bool& atomic)
 {
+	CALLED();
+
 	status_t res = _OperationError(OpRemove);
 	if (res != B_OK)
 		return res;
@@ -471,7 +539,7 @@ ReplyInterpreter::Remove(uint64* before, uint64* after, bool& atomic)
 	*before = fReply->Stream().GetUHyper();
 	*after = fReply->Stream().GetUHyper();
 
-	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
+	return ProcessStream(fReply, __func__);
 }
 
 
@@ -479,6 +547,8 @@ status_t
 ReplyInterpreter::Rename(uint64* fromBefore, uint64* fromAfter,
 	bool& fromAtomic, uint64* toBefore, uint64* toAfter, bool& toAtomic)
 {
+	CALLED();
+
 	status_t res = _OperationError(OpRename);
 	if (res != B_OK)
 		return res;
@@ -490,13 +560,16 @@ ReplyInterpreter::Rename(uint64* fromBefore, uint64* fromAfter,
 	toAtomic = fReply->Stream().GetBoolean();
 	*toBefore = fReply->Stream().GetUHyper();
 	*toAfter = fReply->Stream().GetUHyper();
-	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
+
+	return ProcessStream(fReply, __func__);
 }
 
 
 status_t
 ReplyInterpreter::SetAttr()
 {
+	CALLED();
+
 	status_t res = _OperationError(OpSetAttr);
 	if (res != B_OK)
 		return res;
@@ -505,13 +578,15 @@ ReplyInterpreter::SetAttr()
 	for (uint32 i = 0; i < bcount; i++)
 		fReply->Stream().GetUInt();
 
-	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
+	return ProcessStream(fReply, __func__);
 }
 
 
 status_t
 ReplyInterpreter::SetClientID(uint64* clientid, uint64* verifier)
 {
+	CALLED();
+
 	status_t res = _OperationError(OpSetClientID);
 	if (res != B_OK)
 		return res;
@@ -519,13 +594,15 @@ ReplyInterpreter::SetClientID(uint64* clientid, uint64* verifier)
 	*clientid = fReply->Stream().GetUHyper();
 	*verifier = fReply->Stream().GetUHyper();
 
-	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
+	return ProcessStream(fReply, __func__);
 }
 
 
 status_t
 ReplyInterpreter::Write(uint32* size)
 {
+	CALLED();
+
 	status_t res = _OperationError(OpWrite);
 	if (res != B_OK)
 		return res;
@@ -534,13 +611,15 @@ ReplyInterpreter::Write(uint32* size)
 	fReply->Stream().GetInt();
 	fReply->Stream().GetUHyper();
 
-	return fReply->Stream().IsEOF() ? B_BAD_VALUE : B_OK;
+	return ProcessStream(fReply, __func__);
 }
 
 
 const char**
 ReplyInterpreter::_GetPath(XDR::ReadStream& stream)
 {
+	CALLED();
+
 	uint32 count = stream.GetUInt();
 	char** path = new char*[count + 1];
 	if (path == NULL)
@@ -568,6 +647,8 @@ status_t
 ReplyInterpreter::_DecodeAttrs(XDR::ReadStream& str, AttrValue** attrs,
 	uint32* count)
 {
+	CALLED();
+
 	uint32 bcount = fReply->Stream().GetUInt();
 	uint32* bitmap = new(std::nothrow) uint32[bcount];
 	if (bitmap == NULL)
@@ -584,8 +665,10 @@ ReplyInterpreter::_DecodeAttrs(XDR::ReadStream& str, AttrValue** attrs,
 		*attrs = NULL;
 		*count = 0;
 		return B_OK;
-	} else if (attr_count > FATTR4_MAXIMUM_ATTR_ID)
+	} else if (attr_count > FATTR4_MAXIMUM_ATTR_ID) {
+		ERROR("too many attr!\n");
 		return B_BAD_VALUE;
+	}
 
 	uint32 size;
 	const void* ptr = str.GetOpaque(&size);
@@ -795,6 +878,7 @@ ReplyInterpreter::_DecodeAttrs(XDR::ReadStream& str, AttrValue** attrs,
 	*attrs = values;
 	if (str.IsEOF()) {
 		delete[] values;
+		ERROR("call %s failed!\n", __func__);
 		return B_BAD_VALUE;
 	}
 	return B_OK;
@@ -804,25 +888,31 @@ ReplyInterpreter::_DecodeAttrs(XDR::ReadStream& str, AttrValue** attrs,
 status_t
 ReplyInterpreter::_OperationError(Opcode op)
 {
-	if (fDecodeError)
+	if (fDecodeError) {
+		ERROR("Decode Error!\n");
 		return B_BAD_VALUE;
+	}
 
 	if (fReply == NULL)
 		return B_NOT_INITIALIZED;
 
 	if (fReply->Error() != B_OK || fReply->Stream().IsEOF()) {
+		ERROR("Error not B_OK or empty stream!\n");
 		fDecodeError = true;
 		return fReply->Error();
 	}
 
 	if (fReply->Stream().GetInt() != op) {
+		ERROR("Stream GetInt != op!\n");
 		fDecodeError = true;
 		return B_BAD_VALUE;
 	}
 
 	status_t result = _NFS4ErrorToHaiku(fReply->Stream().GetUInt());
-	if (result != B_OK)
+	if (result != B_OK) {
+		ERROR("NFS Error: %s\n", strerror(result));
 		fDecodeError = true;
+	}
 	return result;
 }
 
