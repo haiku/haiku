@@ -278,7 +278,7 @@ BPoseView::BPoseView(Model* model, uint32 viewMode)
 	fDeskbarFrame(0, 0, -1, -1),
 	fTextWidgetToCheck(NULL)
 {
-	fListElemHeight = be_plain_font->Size() * 1.65f;
+	fListElemHeight = ceilf(be_plain_font->Size() * 1.65f);
 
 	fViewState->SetViewMode(viewMode);
 	fShowSelectionWhenInactive
