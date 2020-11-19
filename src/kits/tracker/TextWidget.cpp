@@ -373,12 +373,12 @@ BTextWidget::StartEdit(BRect bounds, BPoseView* view, BPose* pose)
 	BRect textRect(bounds);
 
 	// label offset
-	rect.OffsetBy(1, -2);
+	float hOffset = 0;
+	float vOffset = view->ViewMode() == kListMode ? -1 : -2;
+	rect.OffsetBy(hOffset, vOffset);
 
-	BFont font;
-	view->GetFont(&font);
 	BTextView* textView = new BTextView(rect, "WidgetTextView", textRect,
-		&font, 0, B_FOLLOW_ALL, B_WILL_DRAW);
+		be_plain_font, 0, B_FOLLOW_ALL, B_WILL_DRAW);
 
 	textView->SetWordWrap(false);
 	textView->SetInsets(2, 2, 2, 2);
@@ -394,7 +394,7 @@ BTextWidget::StartEdit(BRect bounds, BPoseView* view, BPose* pose)
 	rect.InsetBy(-2, -2);
 
 	// undo label offset
-	textRect = rect.OffsetToCopy(-1, 2);
+	textRect = rect.OffsetToCopy(-hOffset, -vOffset);
 
 	textView->SetTextRect(textRect);
 
@@ -436,6 +436,10 @@ BTextWidget::StartEdit(BRect bounds, BPoseView* view, BPose* pose)
 		// for widget
 
 	textView->SelectAll();
+	textView->ScrollToSelection();
+		// scroll to beginning so that text is visible
+	textView->ScrollBy(-1, -2);
+		// scroll in rect to center text
 	textView->MakeFocus();
 
 	// make this text widget invisible while we edit it
