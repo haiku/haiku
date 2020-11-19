@@ -1,11 +1,12 @@
 /*
- * Copyright 2010-2015 Haiku Inc. All rights reserved.
+ * Copyright 2010-2021 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Christophe Huriaux, c.huriaux@gmail.com
  *		Niels Sascha Reedijk, niels.reedijk@gmail.com
  *		Adrien Destugues, pulkomandy@pulkomandy.tk
+ *		Stephan Aßmus, superstippi@gmx.de
  */
 
 
@@ -209,17 +210,36 @@ BHttpRequest::SetAutoReferrer(bool enable)
 
 
 void
-BHttpRequest::SetHeaders(const BHttpHeaders& headers)
+BHttpRequest::SetUserName(const BString& name)
 {
-	AdoptHeaders(new(std::nothrow) BHttpHeaders(headers));
+	fOptUsername = name;
 }
 
 
 void
-BHttpRequest::AdoptHeaders(BHttpHeaders* const headers)
+BHttpRequest::SetPassword(const BString& password)
 {
-	delete fOptHeaders;
-	fOptHeaders = headers;
+	fOptPassword = password;
+}
+
+
+void
+BHttpRequest::SetRangeStart(off_t position)
+{
+	// This field is used within the transfer loop, so only
+	// allow setting it before sending the request.
+	if (fRequestStatus == kRequestInitialState)
+		fOptRangeStart = position;
+}
+
+
+void
+BHttpRequest::SetRangeEnd(off_t position)
+{
+	// This field could be used in the transfer loop, so only
+	// allow setting it before sending the request.
+	if (fRequestStatus == kRequestInitialState)
+		fOptRangeEnd = position;
 }
 
 
@@ -227,6 +247,13 @@ void
 BHttpRequest::SetPostFields(const BHttpForm& fields)
 {
 	AdoptPostFields(new(std::nothrow) BHttpForm(fields));
+}
+
+
+void
+BHttpRequest::SetHeaders(const BHttpHeaders& headers)
+{
+	AdoptHeaders(new(std::nothrow) BHttpHeaders(headers));
 }
 
 
@@ -251,16 +278,10 @@ BHttpRequest::AdoptInputData(BDataIO* const data, const ssize_t size)
 
 
 void
-BHttpRequest::SetUserName(const BString& name)
+BHttpRequest::AdoptHeaders(BHttpHeaders* const headers)
 {
-	fOptUsername = name;
-}
-
-
-void
-BHttpRequest::SetPassword(const BString& password)
-{
-	fOptPassword = password;
+	delete fOptHeaders;
+	fOptHeaders = headers;
 }
 
 
@@ -740,17 +761,14 @@ BHttpRequest::_MakeRequest()
 						ssize_t size = decompressorStorage.Size();
 						BStackOrHeapArray<char, 4096> buffer(size);
 						size = decompressorStorage.Read(buffer, size);
-						if (size > 0) {
-							fListener->DataReceived(this, buffer, bytesUnpacked,
-								size);
-							bytesUnpacked += size;
-						}
+						_NotifyDataReceived(buffer, bytesUnpacked, size,
+							bytesReceived, bytesTotal);
+						bytesUnpacked += size;
 					} else if (bytesRead > 0) {
-						fListener->DataReceived(this, inputTempBuffer,
-							bytesReceived - bytesRead, bytesRead);
+						_NotifyDataReceived(inputTempBuffer,
+							bytesReceived - bytesRead, bytesRead,
+							bytesReceived, bytesTotal);
 					}
-					fListener->DownloadProgress(this, bytesReceived,
-						std::max((off_t)0, bytesTotal));
 				}
 
 				if (bytesTotal >= 0 && bytesReceived >= bytesTotal)
@@ -768,11 +786,9 @@ BHttpRequest::_MakeRequest()
 					ssize_t size = decompressorStorage.Size();
 					BStackOrHeapArray<char, 4096> buffer(size);
 					size = decompressorStorage.Read(buffer, size);
-					if (fListener != NULL && size > 0) {
-						fListener->DataReceived(this, buffer,
-							bytesUnpacked, size);
-						bytesUnpacked += size;
-					}
+					_NotifyDataReceived(buffer, bytesUnpacked, size,
+						bytesReceived, bytesTotal);
+					bytesUnpacked += size;
 				}
 			}
 		}
@@ -907,6 +923,20 @@ BHttpRequest::_SerializeHeaders()
 
 	if (fOptReferer.CountChars() > 0)
 		outputHeaders.AddHeader("Referer", fOptReferer.String());
+
+	// Optional range requests headers
+	if (fOptRangeStart != -1 || fOptRangeEnd != -1) {
+		if (fOptRangeStart == -1)
+			fOptRangeStart = 0;
+		BString range;
+		if (fOptRangeEnd != -1) {
+			range.SetToFormat("bytes=%" B_PRIdOFF "-%" B_PRIdOFF,
+				fOptRangeStart, fOptRangeEnd);
+		} else {
+			range.SetToFormat("bytes=%" B_PRIdOFF "-", fOptRangeStart);
+		}
+		outputHeaders.AddHeader("Range", range.String());
+	}
 
 	// Authentication
 	if (fContext != NULL) {
@@ -1158,3 +1188,29 @@ BHttpRequest::_IsDefaultPort()
 }
 
 
+void
+BHttpRequest::_NotifyDataReceived(const char* data, off_t pos, ssize_t size,
+	off_t bytesReceived, ssize_t bytesTotal)
+{
+	if (fListener == NULL || size <= 0)
+		return;
+	if (fOptRangeStart > 0) {
+		pos += fOptRangeStart;
+		// bytesReceived and bytesTotal refer to the requested range,
+		// so that should technically not be adjusted for the range start.
+		// For displaying progress to the user, this is not ideal, though.
+		// But only for the case where we request the remainder of a file.
+		// Range requests can also be used to request any portion of a
+		// resource, so not modifying them is technically more correct.
+		// We can use a little trick, though: We know when the remainder
+		// is requested, because then fOptRangeEnd is -1.
+		if (fOptRangeEnd == -1) {
+			bytesReceived += fOptRangeStart;
+			if (bytesTotal > 0)
+				bytesTotal += fOptRangeStart;
+		}
+	}
+	fListener->DataReceived(this, data, pos, size);
+	fListener->DownloadProgress(this, bytesReceived,
+		std::max((off_t)0, bytesTotal));
+}

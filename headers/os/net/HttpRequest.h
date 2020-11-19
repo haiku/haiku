@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2013 Haiku Inc. All rights reserved.
+ * Copyright 2010-2021 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _B_URL_PROTOCOL_HTTP_H_
@@ -94,6 +94,11 @@ private:
 
 	// Utility methods
 			bool				_IsDefaultPort();
+
+	// Listener notification
+			void				_NotifyDataReceived(const char* data,
+									off_t pos, ssize_t length,
+									off_t bytesReceived, ssize_t bytesTotal);
 
 private:
 			bool				fSSL;

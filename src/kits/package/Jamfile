@@ -84,6 +84,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			DownloadFileRequest.cpp
 			DropRepositoryRequest.cpp
 			FetchFileJob.cpp
+			FetchUtils.cpp
 			InstallationLocationInfo.cpp
 			Job.cpp
 			PackageInfo.cpp

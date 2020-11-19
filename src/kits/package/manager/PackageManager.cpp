@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015, Haiku, Inc. All Rights Reserved.
+ * Copyright 2013-2020, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,6 +9,8 @@
 
 
 #include <package/manager/PackageManager.h>
+
+#include <glob.h>
 
 #include <Catalog.h>
 #include <Directory.h>
@@ -31,6 +33,7 @@
 #include <package/ValidateChecksumJob.h>
 
 #include "FetchFileJob.h"
+#include "FetchUtils.h"
 #include "PackageManagerUtils.h"
 
 #undef B_TRANSLATION_CONTEXT
@@ -38,6 +41,7 @@
 
 
 using BPackageKit::BPrivate::FetchFileJob;
+using BPackageKit::BPrivate::FetchUtils;
 using BPackageKit::BPrivate::ValidateChecksumJob;
 
 
@@ -560,15 +564,40 @@ BPackageManager::_PreparePackageChanges(
 		RemoteRepository* remoteRepository
 			= dynamic_cast<RemoteRepository*>(package->Repository());
 		if (remoteRepository != NULL) {
-			// download the package
-			BString url = remoteRepository->Config().PackagesURL();
-			url << '/' << fileName;
+			// first check if the package already exists in a previous
+			// transaction
+			bool alreadyDownloaded = false;
+			BPath path(&transaction->TransactionDirectory());
+			BPath parent;
+			if (path.GetParent(&parent) == B_OK) {
+				BString globPath = parent.Path();
+				globPath << "/*/" << fileName;
+				glob_t globbuf;
+				if (glob(globPath.String(), 0, NULL, &globbuf) == 0) {
+					path.Append(fileName);
+					if (BCopyEngine().CopyEntry(globbuf.gl_pathv[0],
+							path.Path()) == B_OK) {
+						alreadyDownloaded = FetchUtils::IsDownloadCompleted(
+							path.Path());
+						printf("Re-using download '%s' from previous "
+							"transaction%s\n", globbuf.gl_pathv[0],
+							alreadyDownloaded ? "" : " (partial)");
+					}
+				}
+			}
 
-			status_t error = DownloadPackage(url, entry,
-				package->Info().Checksum());
-			if (error != B_OK)
-				DIE(error, "Failed to download package %s",
-					package->Info().Name().String());
+			if (!alreadyDownloaded) {
+				// download the package
+				BString url = remoteRepository->Config().PackagesURL();
+				url << '/' << fileName;
+
+				status_t error = DownloadPackage(url, entry,
+					package->Info().Checksum());
+				if (error != B_OK) {
+					DIE(error, "Failed to download package %s",
+						package->Info().Name().String());
+				}
+			}
 		} else if (package->Repository() != &installationRepository) {
 			// clone the existing package
 			LocalRepository* localRepository
