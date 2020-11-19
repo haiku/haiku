@@ -1,4 +1,5 @@
 /*
+ * Copyright 2020 Haiku, Inc. All rights reserved.
  * Copyright 2014, Jessica Hamilton, jessica.l.hamilton@gmail.com.
  * Copyright 2011, Rene Gollent, rene@gollent.com.
  * Copyright 2008, Dustin Howett, dustin.howett@gmail.com. All rights reserved.
@@ -69,7 +70,6 @@ acpi_validate_rsdp(acpi_rsdp* rsdp)
 }
 
 
-
 static status_t
 acpi_validate_rsdt(acpi_descriptor_header* rsdt)
 {
@@ -94,15 +94,11 @@ acpi_check_rsdt(acpi_rsdp* rsdp)
 		rsdp, rsdp->oem_id, rsdp->revision));
 	TRACE(("acpi: rsdp points to rsdt at 0x%x\n", rsdp->rsdt_address));
 
-	uint32 length = 0;
 	acpi_descriptor_header* rsdt = NULL;
 	if (rsdp->revision > 0) {
-		length = rsdp->xsdt_length;
-		rsdt = (acpi_descriptor_header*)mmu_map_physical_memory(
-			(uint32)rsdp->xsdt_address, rsdp->xsdt_length, kDefaultPageFlags);
+		rsdt = (acpi_descriptor_header*)(addr_t)rsdp->xsdt_address;
 		if (rsdt != NULL
 			&& strncmp(rsdt->signature, ACPI_XSDT_SIGNATURE, 4) != 0) {
-			mmu_free(rsdt, rsdp->xsdt_length);
 			rsdt = NULL;
 			TRACE(("acpi: invalid extended system description table\n"));
 		} else
@@ -112,33 +108,24 @@ acpi_check_rsdt(acpi_rsdp* rsdp)
 	// if we're ACPI v1 or we fail to map the XSDT for some reason,
 	// attempt to use the RSDT instead.
 	if (rsdt == NULL) {
-		// map and validate the root system description table
-		rsdt = (acpi_descriptor_header*)mmu_map_physical_memory(
-			rsdp->rsdt_address, sizeof(acpi_descriptor_header),
-			kDefaultPageFlags);
+		// validate the root system description table
+		rsdt = (acpi_descriptor_header*)(addr_t)rsdp->rsdt_address;
 		if (rsdt == NULL) {
 			TRACE(("acpi: couldn't map rsdt header\n"));
 			return B_ERROR;
 		}
 		if (strncmp(rsdt->signature, ACPI_RSDT_SIGNATURE, 4) != 0) {
-			mmu_free(rsdt, sizeof(acpi_descriptor_header));
 			rsdt = NULL;
 			TRACE(("acpi: invalid root system description table\n"));
 			return B_ERROR;
 		}
 
-		length = rsdt->length;
-		// Map the whole table, not just the header
-		TRACE(("acpi: rsdt length: %u\n", length));
-		mmu_free(rsdt, sizeof(acpi_descriptor_header));
-		rsdt = (acpi_descriptor_header*)mmu_map_physical_memory(
-			rsdp->rsdt_address, length, kDefaultPageFlags);
+		TRACE(("acpi: rsdt length: %u\n", rsdt->length));
 	}
 
 	if (rsdt != NULL) {
 		if (acpi_validate_rsdt(rsdt) != B_OK) {
 			TRACE(("acpi: rsdt failed checksum validation\n"));
-			mmu_free(rsdt, length);
 			return B_ERROR;
 		} else {
 			if (usingXsdt)
@@ -164,9 +151,8 @@ acpi_find_table_generic(const char* signature, acpi_descriptor_header* acpiSdt)
 
 	if (sNumEntries == -1) {
 		// if using the xsdt, our entries are 64 bits wide.
-		sNumEntries = (acpiSdt->length
-			- sizeof(acpi_descriptor_header))
-				/ sizeof(PointerType);
+		sNumEntries = (acpiSdt->length - sizeof(acpi_descriptor_header))
+			/ sizeof(PointerType);
 	}
 
 	if (sNumEntries <= 0) {
@@ -182,38 +168,19 @@ acpi_find_table_generic(const char* signature, acpi_descriptor_header* acpiSdt)
 
 	acpi_descriptor_header* header = NULL;
 	for (int32 j = 0; j < sNumEntries; j++, pointer++) {
-		header = (acpi_descriptor_header*)
-			mmu_map_physical_memory((uint32)*pointer,
-				sizeof(acpi_descriptor_header), kDefaultPageFlags);
-
-		if (header == NULL
-			|| strncmp(header->signature, signature, 4) != 0) {
-			// not interesting for us
-			TRACE(("acpi: Looking for '%.4s'. Skipping '%.4s'\n",
-				signature, header != NULL ? header->signature : "null"));
-
-			if (header != NULL) {
-				mmu_free(header, sizeof(acpi_descriptor_header));
-				header = NULL;
-			}
-
-			continue;
+		header = (acpi_descriptor_header*)(addr_t)*pointer;
+		if (header != NULL && strncmp(header->signature, signature, 4) == 0) {
+			TRACE(("acpi: Found '%.4s' @ %p\n", signature, pointer));
+			return header;
 		}
 
-		TRACE(("acpi: Found '%.4s' @ %p\n", signature, pointer));
-		break;
+		TRACE(("acpi: Looking for '%.4s'. Skipping '%.4s'\n",
+			signature, header != NULL ? header->signature : "null"));
+		header = NULL;
+		continue;
 	}
 
-
-	if (header == NULL)
-		return NULL;
-
-	// Map the whole table, not just the header
-	uint32 length = header->length;
-	mmu_free(header, sizeof(acpi_descriptor_header));
-
-	return (acpi_descriptor_header*)mmu_map_physical_memory(
-		(uint32)*pointer, length, kDefaultPageFlags);
+	return NULL;
 }
 
 
