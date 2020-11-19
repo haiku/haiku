@@ -514,14 +514,14 @@ Desktop::Init()
 	fVirtualScreen.SetConfiguration(*this,
 		fWorkspaces[0].CurrentScreenConfiguration());
 
-	float brightness = fWorkspaces[0].StoredScreenConfiguration().Brightness(0);
-	if (brightness > 0)
-		HWInterface()->SetBrightness(brightness);
-
 	if (fVirtualScreen.HWInterface() == NULL) {
 		debug_printf("Could not initialize graphics output. Exiting.\n");
 		return B_ERROR;
 	}
+
+	float brightness = fWorkspaces[0].StoredScreenConfiguration().Brightness(0);
+	if (brightness > 0)
+		HWInterface()->SetBrightness(brightness);
 
 	fVirtualScreen.HWInterface()->MoveCursorTo(
 		fVirtualScreen.Frame().Width() / 2,
