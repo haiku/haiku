@@ -39,8 +39,6 @@ extern phys_addr_t mmu_allocate_page();
 extern addr_t mmu_map_physical_memory(addr_t physicalAddress, size_t size,
 	uint32 flags);
 
-extern void mmu_free(void *virtualAddress, size_t size);
-
 extern status_t platform_kernel_address_to_bootloader_address(addr_t address,
 	void **_result);
 
