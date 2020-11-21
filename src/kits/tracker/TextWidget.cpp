@@ -540,15 +540,10 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, float, BPoseView* view,
 
 		// set high color
 		rgb_color highColor;
-		if (view->IsDesktopWindow()) {
-			if (selected)
-				highColor = ui_color(B_DOCUMENT_BACKGROUND_COLOR);
-			else
-				highColor = view->DeskTextColor();
-		} else if (selected && view->Window()->IsActive()) {
+		if (selected)
 			highColor = ui_color(B_DOCUMENT_BACKGROUND_COLOR);
-		} else
-			highColor = kBlack;
+		else
+			highColor = view->DeskTextColor();
 
 		if (clipboardMode == kMoveSelectionTo && !selected) {
 			drawView->SetDrawingMode(B_OP_ALPHA);
