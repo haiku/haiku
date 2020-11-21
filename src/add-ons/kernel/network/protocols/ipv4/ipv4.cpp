@@ -792,6 +792,19 @@ get_int_option(void* target, size_t length, int value)
 }
 
 
+static status_t
+get_char_int_option(void* target, size_t length, int value)
+{
+	if (length == sizeof(int))
+		return user_memcpy(target, &value, sizeof(int));
+	if (length == sizeof(unsigned char)) {
+		unsigned char uvalue = value;
+		return user_memcpy(target, &uvalue, sizeof(uvalue));
+	}
+	return B_BAD_VALUE;
+}
+
+
 template<typename Type> static status_t
 set_int_option(Type &target, const void* _value, size_t length)
 {
@@ -805,6 +818,30 @@ set_int_option(Type &target, const void* _value, size_t length)
 
 	target = value;
 	return B_OK;
+}
+
+
+template<typename Type> static status_t
+set_char_int_option(Type &target, const void* _value, size_t length)
+{
+	if (length == sizeof(int)) {
+		int value;
+		if (user_memcpy(&value, _value, sizeof(int)) != B_OK)
+			return B_BAD_ADDRESS;
+		if (value > 255)
+			return B_BAD_VALUE;
+		target = value;
+		return B_OK;
+	}
+	if (length == sizeof(unsigned char)) {
+		unsigned char value;
+		if (user_memcpy(&value, _value, sizeof(value)) != B_OK)
+			return B_BAD_ADDRESS;
+
+		target = value;
+		return B_OK;
+	}
+	return B_BAD_VALUE;
 }
 
 
@@ -1145,7 +1182,7 @@ ipv4_getsockopt(net_protocol* _protocol, int level, int option, void* value,
 		if (option == IP_TOS)
 			return get_int_option(value, *_length, protocol->service_type);
 		if (option == IP_MULTICAST_TTL) {
-			return get_int_option(value, *_length,
+			return get_char_int_option(value, *_length,
 				protocol->multicast_time_to_live);
 		}
 		if (option == IP_ADD_MEMBERSHIP
@@ -1253,7 +1290,7 @@ ipv4_setsockopt(net_protocol* _protocol, int level, int option,
 			return B_OK;
 		}
 		if (option == IP_MULTICAST_TTL) {
-			return set_int_option(protocol->multicast_time_to_live, value,
+			return set_char_int_option(protocol->multicast_time_to_live, value,
 				length);
 		}
 		if (option == IP_ADD_MEMBERSHIP || option == IP_DROP_MEMBERSHIP) {
