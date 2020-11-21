@@ -9035,20 +9035,32 @@ BPoseView::DrawPose(BPose* pose, int32 index, bool fullDraw)
 rgb_color
 BPoseView::DeskTextColor() const
 {
-	rgb_color color = ViewColor();
-	float thresh = color.red + (color.green * 1.25f) + (color.blue * 0.45f);
+	rgb_color textColor = ui_color(B_DOCUMENT_TEXT_COLOR);
+	rgb_color viewColor = ViewColor();
 
-	if (thresh >= 360) {
-		color.red = 0;
-		color.green = 0;
-		color.blue = 0;
- 	} else {
-		color.red = 255;
-		color.green = 255;
-		color.blue = 255;
+	float readabilityThreshold = abs(textColor.red - viewColor.red)
+		+ abs(textColor.green - viewColor.green)
+		+ abs(textColor.blue - viewColor.blue);
+	if (readabilityThreshold > 120) {
+		// The readability threshold is highly subjective, but 120 (out of 768)
+		// seems to be generally suitable for most circumstances.
+		return textColor;
+	} else {
+		float blackWhiteThreshold = viewColor.red
+			+ (viewColor.green * 1.25f) + (viewColor.blue * 0.45f);
+
+		if (blackWhiteThreshold >= 360) {
+			viewColor.red = 0;
+			viewColor.green = 0;
+			viewColor.blue = 0;
+		} else {
+			viewColor.red = 255;
+			viewColor.green = 255;
+			viewColor.blue = 255;
+		}
+
+		return viewColor;
 	}
-
-	return color;
 }
 
 
