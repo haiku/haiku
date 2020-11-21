@@ -61,6 +61,9 @@
 #define LOG_INFO		6
 #define LOG_DEBUG		7
 
+#define LOG_PRIMASK		(0x7)	/* mask to extract priority part */
+#define LOG_PRI(p)		((p) & LOG_PRIMASK)
+
 /* turns a priority into a mask usable for setlogmask() */
 #define LOG_MASK(pri)	(1 << (pri))
 #define LOG_UPTO(pri)	((1 << ((pri) + 1)) - 1)
