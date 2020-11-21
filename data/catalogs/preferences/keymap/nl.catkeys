@@ -99,8 +99,8 @@ Left control	Keyboard Layout View		Linker control
 CAPS	Keyboard Layout View	Very short for 'caps lock'	CAPS
 Role	Modifier keys window	As in the role of a modifier key	Rol
 Svorak	KeymapNames		Svorak
-ThinkPad X100e (US)	KeyboardLayoutNames		ThinkPad X100e (VS)
 German	KeymapNames		Duits
+ThinkPad X100e (US)	KeyboardLayoutNames		ThinkPad X100e (VS)
 Swiss-German	KeymapNames		Zwitsers-Duits
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Ctrl-toets
 Czech	KeymapNames		Tsjechisch

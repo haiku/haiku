@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-WebPositive	1591513524
+1	romanian	x-vnd.Haiku-WebPositive	1976607515
 Authentication required	Authentication Panel		Autentificare necesară
 Previous	WebPositive Window		Anterior
 (Finish: %date)	Download Window		(Terminare: %date)
@@ -53,6 +53,7 @@ Cookies for %s	Cookie Manager		Cookies pentru %s
 The download could not be opened.	Download Window		Nu s-a putut deschide descărcarea.
 Close	Download Window		Închide
 WebPositive	System name		WebPositive
+%s - Search term	Settings Window		%s - Element de căutare
 Reload	WebPositive Window		Reîncarcă
 Expiration	Cookie Manager		Expirare
 Download finished	Download Window		Descărcare terminată

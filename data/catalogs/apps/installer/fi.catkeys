@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Installer	2358770775
+1	finnish	x-vnd.Haiku-Installer	1668766771
 Performing installation.	InstallProgress		Suoritetaan asennus.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Valitse lähdelevy ponnahdusvalikosta. Napsauta sitten ”Aloita”.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Sulje ”Levyasema-asetukset”-ikkuna ennen Asennusohjelman ikkunan sulkemista.
@@ -24,7 +24,6 @@ Quit Boot Manager	InstallerWindow		Lopeta Käynnistyshallinta
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Levyasema-asetukset -sovelluksen käynnistäminen osioiden asettamiseksi epäonnistui.
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Suoritetaan Käynnistyshallintaa…\n\nSulje Käynnistyshallinta asennuksen jatkamiseksi.
 Quit DriveSetup	InstallerWindow		Poistu Levyasema-asetuksista
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume while the existing 'settings' folder is retained. All other folders will be merged, in which files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Kohdetaltio ei ole tyhjä. Oletko varma, että haluat käyttää sitä asentamiseen?\n\nHuomaa: Kansio 'system' on lähdetaltion puhdas kopio samalla kun olemassaoleva 'settings'-kansio säilytetään. Kaikki muut kansiot yhdistetään, jolloin molemmissa esiintyvät tiedostot ja linkit korvataan lähdetaltion versiolla.
 Write boot sector	InstallerWindow		Kirjoita käynnistyssektori
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld / %2ld
 Finishing installation.	InstallProgress		Päätetään asennus.

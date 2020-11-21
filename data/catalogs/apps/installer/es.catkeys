@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Installer	3982017613
+1	spanish; castilian	x-vnd.Haiku-Installer	3292013609
 Performing installation.	InstallProgress		Realizando instalación.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Elija el disco de origen del menú desplegable. Después haga clic en \"Empezar\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Por favor, cierre la ventana de DriveSetup antes de cerrar la ventana del Instalador.
@@ -25,7 +25,6 @@ Quit Boot Manager	InstallerWindow		Salir del administrador de arranque
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		DriveSetup, la aplicación para configurar particiones de disco, no pudo iniciarse.
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Funcionando Administrador de Arranque...\n\nCierre el Administrador de Arranque para continuar con la instalación.
 Quit DriveSetup	InstallerWindow		Salir de la configuración de la unidad
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume while the existing 'settings' folder is retained. All other folders will be merged, in which files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		El volumen seleccionado no está vacío. ¿Desea aún así instalarlo?\n\nNota: Se hará una copia limpia de la carpeta 'system' desde el volumen de origen, mientras que la carpeta 'settings' existente se mantendrá igual. Todas las demás carpetas se fusionarán, por lo que los archivos y enlaces que existan tanto en el volumen de origen como en el de destino serán sobrescritos con la versión del volumen de origen.
 Write boot sector	InstallerWindow		Escribir sector de arranque
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld de %2ld
 Finishing installation.	InstallProgress		Finalizando instalación.

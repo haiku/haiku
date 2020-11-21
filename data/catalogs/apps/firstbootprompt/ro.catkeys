@@ -1,6 +1,7 @@
-1	romanian	x-vnd.Haiku-FirstBootPrompt	585808223
+1	romanian	x-vnd.Haiku-FirstBootPrompt	3595268803
 Japanese	KeymapNames		Japoneză
 US	KeymapNames		US
+Cancel	BootPromptWindow		Anulează
 Esperanto	KeymapNames		Esperanto
 Belarusian	KeymapNames		Belarusă
 Brazilian	KeymapNames		Braziliană
@@ -10,6 +11,7 @@ Latin-American	KeymapNames		Latino-Americană
 Ukrainian	KeymapNames		Ucrainiană
 Russian (Yawert)	KeymapNames		Rusă (Yawert)
 United-Kingdom	KeymapNames		Regatul Unit
+Quit Haiku	System name		Ieșire din Haiku
 Serbian (Cyrillic)	KeymapNames		Sârbă (Chirilică)
 Turkish (Type-F)	KeymapNames		Turcă (Tip-F)
 Bulgarian (Cyrillic)	KeymapNames		Bulgară (Chirilică)
@@ -44,6 +46,7 @@ Spanish	KeymapNames		Spaniolă
 Ukrainian (Mac)	KeymapNames		Ucrainiană (Mac)
 Estonian	KeymapNames		Estoniană
 French (Bépo)	KeymapNames		Franceză (Bépo)
+Restart system	BootPromptWindow		Repornește sistemul
 Serbian (Latin)	KeymapNames		Sârbă (Latină)
 Russian (Typewriter)	KeymapNames		Rusă (Mașină de scris)
 French	KeymapNames		Franceză
@@ -53,24 +56,29 @@ Swiss-French	KeymapNames		Franceză Elvețiană
 Slovene	KeymapNames		Sloven
 Lithuanian	KeymapNames		Lituaniană
 French (NF Z71-300)	KeymapNames		Franceză (NF Z71-300)
+Thank you for trying out %distroname%! We hope you'll like it!\n\nPlease select your preferred language and keymap. Both settings can also be changed later when running %distroname%.\n\nDo you wish to install %distroname% now, or try it out first?	BootPromptWindow	For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	Vă mulțumim că ați încercat %distroname%! Sperăm să vă placă!\n\nSelectați limba și harta de tastatură preferate. Amândouă configurările pot fi de asemenea modificate mai târziu în timpul rulării %distroname%.\n\nDoriți să instalați %distroname% acum, sau să o încercați mai întâi?
 ISO-9995	KeymapNames		ISO-9995
 Kazakh	KeymapNames		Kazahă
 Language	BootPromptWindow		Limbă
+Welcome to %distroname%!	BootPromptWindow		Bine ați venit la %distroname%!
 Lithuanian (Standard)	KeymapNames		Lituaniană (Standard)
 Belgian (comma)	KeymapNames		Belgiană (virgulă)
 Custom	BootPromptWindow		Personalizat
 Norwegian	KeymapNames		Norvegiană
 Danish	KeymapNames		Daneză
 Bulgarian (Phonetic)	KeymapNames		Bulgară (Fonetică)
+Try out %distroname%	BootPromptWindow		Încercați %distroname%
 Canadian-French	KeymapNames		Franceză-Canadiană
 Russian	KeymapNames		Rusă
 Hungarian	KeymapNames		Ungară
 Irish	KeymapNames		Irlandeză
 Romanian	KeymapNames		Română
+Are you sure you want to close this window? This will restart your system!	BootPromptWindow		Sigur doriți să închideți această fereastră? Acest lucru vă va reporni sistemul!
 Macedonian	KeymapNames		Macedoniană
 Czech (Mac)	KeymapNames		Cehă (Mac)
 Brazilian (ABNT2)	KeymapNames		Braziliană (ABNT2)
 Albanian	KeymapNames		Albaneză
 Dutch	KeymapNames		Olandeză
+Install %distroname%	BootPromptWindow		Instalează %distroname%
 Friulian	KeymapNames		Friuliană
 Icelandic	KeymapNames		Islandeză

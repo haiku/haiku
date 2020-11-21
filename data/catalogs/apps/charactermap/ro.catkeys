@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-CharacterMap	2768977330
+1	romanian	x-vnd.Haiku-CharacterMap	2410613018
 Tirhuta	UnicodeBlocks		Tirhuta
 Miscellaneous mathematical symbols B	UnicodeBlocks		Simboluri matematice diverse B
 Latin extended E	UnicodeBlocks		Latină extinsă E
@@ -238,6 +238,7 @@ Supplementary private use area A	UnicodeBlocks		Zonă suplimentară A pentru uti
 Armenian	UnicodeBlocks		Armeniană
 Miscellaneous symbols and pictographs	UnicodeBlocks		Simboluri și pictograme diverse
 Phags-pa	UnicodeBlocks		Phags-pa
+Nabataean	UnicodeBlocks		Nabataeană
 Meetei Mayek	UnicodeBlocks		Meetei Mayek
 CJK compatibility ideographs	UnicodeBlocks		Ideografuri de compatibilitate CJK
 Show private blocks	CharacterWindow		Afișează blocurile personale
@@ -289,6 +290,7 @@ Elbasan	UnicodeBlocks		Elbasană
 Hangul compatibility Jamo	UnicodeBlocks		Hangul compatibilitate Jamo
 Phonetic extensions supplement	UnicodeBlocks		Supliment extensii fonetice
 CJK unified ideographs extension E	UnicodeBlocks		Ideografuri unificate CJK extensie E
+Nüshu	UnicodeBlocks		Nüshu
 Old Persian	UnicodeBlocks		Persiană veche
 Malayalam	UnicodeBlocks		Malayalam
 CJK radicals supplement	UnicodeBlocks		Supliment radicali CJK

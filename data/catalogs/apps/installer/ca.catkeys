@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Installer	3982017613
+1	catalan; valencian	x-vnd.Haiku-Installer	3292013609
 Performing installation.	InstallProgress		Es fa la instal·lació.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Trieu el disc d'origen des del menú emergent. Llavors cliqueu a Comença.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Si us plau, tanqueu la finestra del Gestor de discs abans de tancar la finestra de l'instal·lador.
@@ -25,7 +25,6 @@ Quit Boot Manager	InstallerWindow		Surt del Gestor d'arrencada
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		No s'ha pogut executar el Gestor de discs, l'aplicació que configura les particions del disc.
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		S'executa el Gestor d'arrencada…\n\nPer tal de continuar la instal·lació heu de tancar el Gestor d'arrencada.
 Quit DriveSetup	InstallerWindow		Surt del Gestor de discs
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume while the existing 'settings' folder is retained. All other folders will be merged, in which files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		El volum de destinació no és buit. Segur que voleu fer la instal·lació tanmateix?\n\nNota: a carpeta del sistema serà una còpia neta del volum d'origen mentre es conserva la carpeta de configuració existent. Es combinarà la resta de carpetes, i els fitxers i enllaços que existeixin tant al volum d'origen com al de destinació se sobreescriuran amb la versió del volum d'origen.
 Write boot sector	InstallerWindow		Escriu el sector d'arrencada
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld de %2ld
 Finishing installation.	InstallProgress		S'acaba la instal·lació.

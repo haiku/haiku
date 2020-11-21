@@ -99,8 +99,8 @@ Left control	Keyboard Layout View		Maldekstra strisklavo
 CAPS	Keyboard Layout View	Very short for 'caps lock'	MAJUSKLBASKULO
 Role	Modifier keys window	As in the role of a modifier key	Rolo
 Svorak	KeymapNames		Sveda (de Dvorak, alinome Svorak)
-ThinkPad X100e (US)	KeyboardLayoutNames		ThinkPad X100e (Usona)
 German	KeymapNames		Germana
+ThinkPad X100e (US)	KeyboardLayoutNames		ThinkPad X100e (Usona)
 Swiss-German	KeymapNames		Germana por Svislando
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Striklavo
 Czech	KeymapNames		Ĉeĥa

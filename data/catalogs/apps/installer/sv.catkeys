@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Installer	3982017613
+1	swedish	x-vnd.Haiku-Installer	3292013609
 Performing installation.	InstallProgress		Verkställer installationen.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Välj källdisk från menyn. Klicka sedan på \"Starta\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Var god stäng Diskhanteringsfönstret innan du stänger fönstret för Installeraren.
@@ -25,7 +25,6 @@ Quit Boot Manager	InstallerWindow		Avsluta Starthanteraren
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		DriveSetup, applikationen för att konfigurera disk partitioner kunde inte startas.
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Starthanteraren körs.\n\nStäng Starthanteraren för att fortsätta med installationen.
 Quit DriveSetup	InstallerWindow		Avsluta DiskHantering
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume while the existing 'settings' folder is retained. All other folders will be merged, in which files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Målvolymen är inte tom. Är du säker på att du vill installera ändå?\n\nObs: "System" -mappen kommer att vara en ren kopia från källvolymen medan den befintliga mappen "inställningar" bevaras. Alla andra mappar slås samman, där filer och länkar som finns på både käll- och målvolym skrivs över med källvolymversionen.
 Write boot sector	InstallerWindow		Skriv bootsektor
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld av %2ld
 Finishing installation.	InstallProgress		Slutför installationen.

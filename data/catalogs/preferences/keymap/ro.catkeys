@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Keymap	1075970008
+1	romanian	x-vnd.Haiku-Keymap	2700190052
 Key	Modifier keys window	As in a computer keyboard key	Tastă
 Japanese	KeymapNames		Japoneză
 US	KeymapNames		US
@@ -89,6 +89,7 @@ Esperanto	KeymapNames		Esperanto
 Belarusian	KeymapNames		Belarusă
 Warning: left and right key roles do not match	Modifier keys window		Avertisment: rolurile pentru tastele stânga și dreapta nu se potrivesc
 Circumflex trigger	Keymap window		Declanșator circumflex
+Fizzbook NL2	KeyboardLayoutNames		Fizzbook NL2
 Caps lock	Keyboard Layout View		Caps lock
 Left shift	Keyboard Layout View		Shift stânga
 Russian (Yawert)	KeymapNames		Rusă (Yawert)
@@ -99,8 +100,8 @@ Left control	Keyboard Layout View		Control stânga
 CAPS	Keyboard Layout View	Very short for 'caps lock'	CAPS
 Role	Modifier keys window	As in the role of a modifier key	Rol
 Svorak	KeymapNames		Svorak
-ThinkPad X100e (US)	KeyboardLayoutNames		ThinkPad X100e (US)
 German	KeymapNames		Germană
+ThinkPad X100e (US)	KeyboardLayoutNames		ThinkPad X100e (US)
 Swiss-German	KeymapNames		Germană elvețiană
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Tasta Ctrl
 Czech	KeymapNames		Cehă

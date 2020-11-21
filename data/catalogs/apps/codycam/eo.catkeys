@@ -1,6 +1,7 @@
-1	esperanto	x-vnd.Haiku-CodyCam	40716723
+1	esperanto	x-vnd.Haiku-CodyCam	12021044
 destination directory expected	CodyCam		atendita celdosierujo
 reply: '%s'\n	SftpClient		respondo: '%s'\n
+PASS <suppressed>  (real password sent)	FtpClient		PASS <kaŝita>  (vera pasvorto estas sendita)
 JPEG image	CodyCam		JPEG-a bildo
 Remote host has closed the connection.\n	FtpClient		Malloka gastanto fermis la konektadon.\n
 image file format expected	CodyCam		atendita bildodosiera formato

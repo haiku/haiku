@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Installer	2358770775
+1	ukrainian	x-vnd.Haiku-Installer	1668766771
 Performing installation.	InstallProgress		Виконання інсталяції.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Виберіть джерело з випадаючого меню. Потім натисніть кнопку \"Почати\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Закрийте вікно DriveSetup перед тим як закрити вікно Installer.
@@ -24,7 +24,6 @@ Quit Boot Manager	InstallerWindow		Вийти з Boot Manager
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Неможливо запустити утиліту DriveSetup для зміни конфігурації розділів.
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Boot Manager виконується…\n\nЗакрийте його для продовження інсталяції.
 Quit DriveSetup	InstallerWindow		Вийти з DriveSetup
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume while the existing 'settings' folder is retained. All other folders will be merged, in which files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Цільовий том не порожній. Ви впевнені, що хочете провести інсталяцію в будь-якому випадку?\n\nПримітка: папка 'system' буде чистою копією з вихідного тому, в той час як існуюча папка 'settings' буде збережена. Всі інші папки будуть об'єднані. Файли і посилання, існуючі як на вихідному, так і на цільовому томі, будуть перезаписані версією з вихідного тому.
 Write boot sector	InstallerWindow		Записати завантажувальний сектор
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld з %2ld
 Finishing installation.	InstallProgress		Завершення інсталяції.

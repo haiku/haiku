@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Installer	3982017613
+1	japanese	x-vnd.Haiku-Installer	3292013609
 Performing installation.	InstallProgress		インストールを実行しています。
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		メニューからインストールディスクを選択し、次に\"開始\"ボタンをクリックしてください。
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		インストーラーを閉じる前に、DriveSetup を終了してください。
@@ -25,7 +25,6 @@ Quit Boot Manager	InstallerWindow		ブートマネージャーを終了
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		パーティションを設定するDriveSetupアプリケーションが起動できません。
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		ブートマネージャー実行中…\n\nインストールを続けるには、ブートマネージャーを閉じてください。
 Quit DriveSetup	InstallerWindow		DriveSetup を終了
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume while the existing 'settings' folder is retained. All other folders will be merged, in which files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		インストール先は空ではありません。それでもインストールしますか?\n\n注: 'システム' フォルダーはインストール元からのクリーンなコピーになりますが、設定フォルダーは元のままです。ほかのすべてのフォルダーはマージされますが、一方両方にあるファイルやリンクはインストール元のバージョンに上書きされます。
 Write boot sector	InstallerWindow		ブートセクターを書き込む
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld / %2ld
 Finishing installation.	InstallProgress		インストールを終了しています。

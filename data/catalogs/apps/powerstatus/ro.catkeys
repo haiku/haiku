@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-PowerStatus	3173765686
+1	romanian	x-vnd.Haiku-PowerStatus	1085070685
 Run in window	PowerStatus		Rulează în fereastră
 Extended battery info	PowerStatus		Info extins baterie
 Show status icon	PowerStatus		Afișează pictogramă de stare
@@ -30,11 +30,13 @@ Serial number: 	PowerStatus		Număr de serie:
 Battery critical	PowerStatus		Baterie critică
 Capacity: 	PowerStatus		Capacitate: 
  mW	PowerStatus		 mW
+No supported battery detected. PowerStatus cannot be used on your system.	PowerStatus		Nu a fost detectată nicio baterie suportată. PowerStatus nu poate fi utilizat pe sistem.
 Show percent	PowerStatus		Afișează procentaj
 Capacity granularity 1: 	PowerStatus		Capacitate de granulozitate 1: 
 The battery level is getting low, please plug in the device.	PowerStatus		Nivelul bateriei devine scăzut, puneți în priză dispozitivul.
 Design capacity warning: 	PowerStatus		Avertisment capacitate model: 
 Capacity granularity 2: 	PowerStatus		Capacitate de granulozitate 2: 
+Too bad!	PowerStatus		Păcat!
 Technology: 	PowerStatus		Tehnologie: 
  mWh	PowerStatus		 mWh
 PowerStatus	System name		StareConsum

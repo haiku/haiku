@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Installer	3982017613
+1	turkish	x-vnd.Haiku-Installer	3292013609
 Performing installation.	InstallProgress		Kuruluyor…
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Açılır menüden kaynak diski seçin ve \"Başla\"ya tıklayın.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Yükleyici penceresini kapatmadan önce Disk İzlencesi penceresini kapatın.
@@ -25,7 +25,6 @@ Quit Boot Manager	InstallerWindow		Önyükleme Yöneticisi'nden çık
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Disk İzlencesi açılamadı.
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Önyükleme Yöneticisi çalışıyor…\n\nKurulumu sürdürmek için Önyükleme Yöneticisi'ni kapatın.
 Quit DriveSetup	InstallerWindow		Disk İzlencesi'nden çık
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume while the existing 'settings' folder is retained. All other folders will be merged, in which files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Hedef disk boş değil. Yine de yüklemek istiyor musunuz?\n\nNot: 'system' klasörü kaynak diskteki ile değiştirilecek ve mevcut 'settings' klasörü korunacaktır. Diğer tüm klasörler birleştirilecek ve hem kaynak hem hedef diskte bulunan tüm dosyalar ve bağlantılar kaynak sürümü ile değiştirilecektir.
 Write boot sector	InstallerWindow		Önyükleme alanını yaz
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld/%2ld
 Finishing installation.	InstallProgress		Kurulum tamamlanıyor…

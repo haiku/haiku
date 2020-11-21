@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Installer	737606382
+1	dutch; flemish	x-vnd.Haiku-Installer	47602378
 Performing installation.	InstallProgress		Uitvoering installatie.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Kies de bronschijf in de pop-up-menu's. Klik daarna \"Begin\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Sluit alstublieft het DriveSetup-venster voordat u het Installer-venster sluit.
@@ -25,7 +25,6 @@ Quit Boot Manager	InstallerWindow		Boot Manager afsluiten
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		DriveSetup, het programma om schijfpartities mee te configureren, kon niet gestart worden.
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Boot Manager is bezig...\n\nSluit Boot Manager om verder te gaan met de installatie.
 Quit DriveSetup	InstallerWindow		DriveSetup afsluiten
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume while the existing 'settings' folder is retained. All other folders will be merged, in which files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Het doel volume is niet leeg. Ben je zeker dat je toch wil installeren?\n\nNota: De map 'systeem' is een schone kopie van het bronvolume terwijl de bestaande map 'instellingen' behouden blijft. Alle andere mappen worden samengevoegd, waarin bestanden en koppelingen die aanwezig zijn op zowel het bron- als het doelvolume, worden overschreven door de versie van het bronvolume.
 Write boot sector	InstallerWindow		Schrijf opstartsector
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld van %2ld
 Finishing installation.	InstallProgress		Installatie afronden.

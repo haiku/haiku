@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Installer	2358770775
+1	italian	x-vnd.Haiku-Installer	1668766771
 Performing installation.	InstallProgress		Esecuzione dell'installazione.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Scegli il disco d'origine dal menu a pop-up. Quindi fai click su \"Inizia\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Chiudi la finestra di Gestione Disco prima di chiudere quella del programma di installazione.
@@ -24,7 +24,6 @@ Quit Boot Manager	InstallerWindow		Esci dal Boot Manager
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Impossibile lanciare Gestione Disco, l'applicazione per configurare le partizioni dei dischi.
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Avvio di Boot Manager…\n\nChiudi Boot Manager per continuare con l'installazione.
 Quit DriveSetup	InstallerWindow		Esci da Gestione Disco
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume while the existing 'settings' folder is retained. All other folders will be merged, in which files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Il volume di destinazione non è vuoto. Sei sicuro di voler continuare?\n\nNota: La cartella 'system' verrà sostituita con una copia pulita dal volume sorgente mentre la cartella 'settings' verrà preservata. Tutte le altre cartelle verranno aggiornate, con i file e i collegamenti che esistono sia nel volume sorgente che quello di destinazione saranno sovrascritti con la versione del volume sorgente.
 Write boot sector	InstallerWindow		Scrivi settore d'avvio
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld di %2ld
 Finishing installation.	InstallProgress		Completamento dell'installazione.

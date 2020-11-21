@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-Installer	2358770775
+1	esperanto	x-vnd.Haiku-Installer	3292013609
 Performing installation.	InstallProgress		Instalante.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Elektu la elan diskon el la ŝpruca menuo. Poste alklaku \"Ek\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Bonvolu fermi la fenestron de la Diskagordilo antaŭ fermi la fenestron de al Instalilo.
@@ -14,6 +14,7 @@ Unknown Type	InstallProgress	Partition content type	Nekonata Tipo
 Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Premu la Komenci butonon por instali el '%1s' al '%2s'.
 Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Elektu la diskon al kiu vi volas instali el la falmenuo. Poste alklaku \"Komenci\".
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		La instalado sukcesis. La startsektoro estas skribita al '%s'. Klaku al Ĉesi por forigi la Instalilon aŭ elektu novan celan volumon por denove instali.
+Are you sure you want to stop the installation?	InstallerWindow		Ĉu vi estas certe, ke vi volas halti la instaladon?
 README	InstallerApp		LEGU_MIN
 Quit	InstallerWindow		Ĉesi
 Write boot sector to '%s'	InstallerWindow		Skribi la startsektoron al '%s'
@@ -24,7 +25,6 @@ Quit Boot Manager	InstallerWindow		Forlasi Praŝargan Administrilon
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Diskagordilo, la programo por agordi subdiskojn, ne povas esti rulita.
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Lanĉas Praŝargan Administrilon…\n\nFermu Praŝargan Administrilon por daŭrigi la instaladon.
 Quit DriveSetup	InstallerWindow		Ĉesi la Diskagordilon
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume while the existing 'settings' folder is retained. All other folders will be merged, in which files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		La cela volumo ne estas malplena. Ĉu vi certas ke vi volas instali senkondiĉe?\n\nNoto: La dosierujo 'system' estos tute kopiita el fonta volumo tamen ekzistanta dosierujo 'settings' estos lasita. Ĉiuj aliaj dosierujoj estos kunigitaj, kie dosieroj kaj ligiloj ekzistantaj ambaŭloke, en fonta kaj cela volumoj, estos uzita el fonta volumo.
 Write boot sector	InstallerWindow		Skribi praŝargan sektoron
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld el %2ld
 Finishing installation.	InstallProgress		Finas instaladon.
@@ -63,6 +63,7 @@ Cancel	InstallerWindow		Nuligi
 Continue	InstallerWindow	In alert after pressing Stop	Daŭrigi
 Scanning for disks…	InstallerWindow		Serĉante diskojn…
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Lanĉas la Diskagordilon…\n\nFermu la Diskagordilon por daŭrigi la instaladon.
+The installation is not complete yet!\nAre you sure you want to stop it?	InstallerWindow		La instalado ankoraŭ ne estas kompleta!\nĈu vi certas, ke vi halti ĝin?
 The partition can't be mounted. Please choose a different partition.	InstallProgress		La subdisko ne povas esti surmetita. Bonvolu elekti alian subdiskon.
 Set up partitions…	InstallerWindow		Agordi subdiskojn…
 Install progress:  	InstallerWindow		Instalada progreso:  
@@ -78,6 +79,6 @@ Quit Boot Manager and DriveSetup	InstallerWindow		Ĉesigi Praŝargan Administril
 Tools	InstallerWindow		Iloj
 scanning…	InstallerWindow		skanado…
 Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be formatted with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Uzu la Diskagordilon por prepari \ndisponedlajn diskojn kaj aliajn aparatojn.\nSubdiskojn vi povas formatigi per\ndosiersistemo Be bezonata por lanĉa subdisko\nde la Hajko.
-2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Userguide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2)   La Instalilo praŝargebligos la Haiku-an subdiskon mem, sed ne klopodos integritigi Haiku-on en ekzistanta praŝarga menuo. Se vi jam havas instalitan GRUB-on, vi povas aldoni Haiku-on al ĝi.\nPor detaloj, bonvolu konsiliĝi kun la gvido pri la praŝargado de Haiku-o en nia retpaĝaro: https://www.haiku-os.org/guides/booting.\nAŭ vi povas agordi praŝargan menuon el la \"Iloj\" menuo de Instalilo. Rigardu la temon pri la programo \"Praŝarga Administrilo\" en la manlibro por uzantoj.\n\n\n
+2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Userguide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2)   La Instalilo praŝargebligos la Haiku-an subdiskon mem, sed ne klopodos aldoni Haiku-on en ekzistantan praŝargan menuon. Se vi jam havas instalitan GRUB-on, vi povas aldoni Haiku-on al ĝi.\nPor detaloj, bonvolu konsiliĝi kun la gvidilo pri la praŝargado de Haiku-o en nia retpaĝaro: https://www.haiku-os.org/guides/booting.\nAŭ vi povas agordi praŝargan menuon el la \"Iloj\" menuo de Instalilo. Rigardu la temon pri la programo \"Praŝarga Administrilo\" en la manlibro por uzantoj.\n\n\n
 Set up boot menu	InstallerWindow		Agordi praŝargan menuon
 Continue	InstallerApp		Daŭrigi

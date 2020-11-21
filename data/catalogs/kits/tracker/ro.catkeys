@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	3669766136
+1	romanian	x-vnd.Haiku-libtracker	2498612740
 Created	ContainerWindow		Creat
 Icon	AttributesView		Iconiță
 Open and make preferred	OpenWithWindow		Deschide sau fixează ca preferat
@@ -270,6 +270,7 @@ home	B_USER_DIRECTORY		acasă
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Modele noi Tracker
 Disk mounting during boot	AutoMounterSettings		Montare disc în timpul pornirii
 Don't automount	AutoMounterSettings		Nu automonta
+Node ref	AttributesView		Ref de nod
 Could not find application \"%appname\"	OpenWithWindow		Nu s-a putut găsi aplicația \"%appname\"
 Unmatched parenthesis.	libtracker		Paranteză fără potrivire.
 Extended attribute	AttributesView		Atribut extins
@@ -520,6 +521,7 @@ Create a Query	FindPanel		Creează o interogare
 Close	QueryContainerWindow		Închide
 I know what I'm doing	FSUtils	button label	Știu ce fac
 Preparing to copy items…	StatusWindow		Se pregătește copierea elementelor…
+Entry ref	AttributesView		Ref de intrare
 Icon view	ContainerWindow		Vizualizare pictogramă
 Name	ContainerWindow		Nume
 Preferred for %type	OpenWithWindow		Preferat pentru %type

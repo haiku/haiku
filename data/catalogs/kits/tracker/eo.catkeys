@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-libtracker	3669766136
+1	esperanto	x-vnd.Haiku-libtracker	2498612740
 Created	ContainerWindow		Kreita
 Icon	AttributesView		Piktogramo
 Open and make preferred	OpenWithWindow		Uzi kaj igi preferata
@@ -270,6 +270,7 @@ home	B_USER_DIRECTORY		hejmo
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Novaj Ŝablonoj de Spurilo
 Disk mounting during boot	AutoMounterSettings		Surmetado dum praŝargo
 Don't automount	AutoMounterSettings		Ne surmeti aŭtomate
+Node ref	AttributesView		Referenco al nodo
 Could not find application \"%appname\"	OpenWithWindow		Netroviĝis programo \"%appname\"
 Unmatched parenthesis.	libtracker		Nekompareblaj krampoj.
 Extended attribute	AttributesView		Etendita atributo
@@ -520,6 +521,7 @@ Create a Query	FindPanel		Krei Serĉmendon
 Close	QueryContainerWindow		Fermi
 I know what I'm doing	FSUtils	button label	Mi scias kion mi faras
 Preparing to copy items…	StatusWindow		Preparante kopii elementojn…
+Entry ref	AttributesView		Referenco al komencnodo
 Icon view	ContainerWindow		Piktograma vido
 Name	ContainerWindow		Nomo
 Preferred for %type	OpenWithWindow		Preferata por %type

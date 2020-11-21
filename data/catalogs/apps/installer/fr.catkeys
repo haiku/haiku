@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Installer	3982017613
+1	french	x-vnd.Haiku-Installer	3292013609
 Performing installation.	InstallProgress		Installation en cours.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Choisir le disque source dans la liste déroulante, puis cliquer sur « Commencer ».
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Veuillez fermer la fenêtre du Gestionnaire de Disques avant celle de l’Installeur.
@@ -25,7 +25,6 @@ Quit Boot Manager	InstallerWindow		Quitter le gestionnaire de démarrage
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Le gestionnaire de disques, qui permet de configurer les partitions sur le disque, n’a pas pu être lancé.
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Lancement du gestionnaire d’amorçage…\n\nFermez le gestionnaire d’amorçage pour poursuivre l’installation.
 Quit DriveSetup	InstallerWindow		Quitter le Gestionnaire de Disques
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume while the existing 'settings' folder is retained. All other folders will be merged, in which files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Le volume cible n’est pas vide. Souhaitez-vous quand même procéder à l’installation ?\n\nNote : Le dossier « system » sera une copie propre du volume source tandis que le dossier « settings » existant sera conservé. Tous les autres dossiers seront fusionnés. Si des fichiers ou des liens existent à la fois sur le volume source et sur le volume cible, ils seront écrasés par la version du volume source.
 Write boot sector	InstallerWindow		Écrire le secteur d’amorce
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld sur %2ld
 Finishing installation.	InstallProgress		Finalisation de l’installation.

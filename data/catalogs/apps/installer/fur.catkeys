@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-Installer	3982017613
+1	friulian	x-vnd.Haiku-Installer	3292013609
 Performing installation.	InstallProgress		Esecuzion de instalazion.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Sielç il disc sorzint dal menù a tende. Daspò fâs clic su \"Scomence\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Par plasê siere il barcon di Gjestion disc prime di sierâ chel dal Instaladôr.
@@ -25,7 +25,6 @@ Quit Boot Manager	InstallerWindow		Jes dal Gjestôr di inviament
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Impussibil inviâ Gjestion disc, la aplicazion par configurâ lis partizions dai discs.
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Esecuzion dal Gjestôr di inviament…\n\nSiere il Gjestôr di inviament par continuâ cu la instalazion.
 Quit DriveSetup	InstallerWindow		Jes di Gjestion disc
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume while the existing 'settings' folder is retained. All other folders will be merged, in which files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Il volum di destinazion nol è vueit. Continuâ pardabon?\n\nNote: la cartele 'system' e deventarà une copie nete dal volum sorzint, al contrari la cartele esistente 'settings' e vignarà preservade. Dutis lis altris cartelis a vignaran unidis; dulà che file e colegaments a esistin su ducj i doi i volums, chescj a vignaran sorescrits cu la version dal volum sorzint.
 Write boot sector	InstallerWindow		Scrîf setôr di inviament
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld di %2ld
 Finishing installation.	InstallProgress		Daûr a finî la instalazion.
