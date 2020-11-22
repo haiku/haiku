@@ -298,19 +298,16 @@ HaikuControlLook::DrawMenuBackground(BView* view, BRect& rect,
 	if (!rect.IsValid() || !rect.Intersects(updateRect))
 		return;
 
-	// surface top color
-	rgb_color background = tint_color(base, 0.75);
-
 	// inner bevel colors
 	rgb_color bevelLightColor;
 	rgb_color bevelShadowColor;
 
 	if ((flags & B_DISABLED) != 0) {
-		bevelLightColor = tint_color(background, 0.80);
-		bevelShadowColor = tint_color(background, 1.07);
+		bevelLightColor = tint_color(base, 0.80);
+		bevelShadowColor = tint_color(base, 1.07);
 	} else {
-		bevelLightColor = tint_color(background, 0.6);
-		bevelShadowColor = tint_color(background, 1.12);
+		bevelLightColor = tint_color(base, 0.6);
+		bevelShadowColor = tint_color(base, 1.12);
 	}
 
 	// draw inner bevel
@@ -320,7 +317,7 @@ HaikuControlLook::DrawMenuBackground(BView* view, BRect& rect,
 		borders);
 
 	// draw surface top
-	view->SetHighColor(background);
+	view->SetHighColor(base);
 	view->FillRect(rect);
 }
 
