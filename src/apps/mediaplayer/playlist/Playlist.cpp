@@ -417,7 +417,8 @@ Playlist::RemoveListener(Listener* listener)
 
 
 void
-Playlist::AppendItems(const BMessage* refsReceivedMessage, int32 appendIndex)
+Playlist::AppendItems(const BMessage* refsReceivedMessage, int32 appendIndex,
+					  bool sortItems)
 {
 	// the playlist is replaced by the refs in the message
 	// or the refs are appended at the appendIndex
@@ -434,7 +435,7 @@ Playlist::AppendItems(const BMessage* refsReceivedMessage, int32 appendIndex)
 
 	Playlist temporaryPlaylist;
 	Playlist* playlist = add ? &temporaryPlaylist : this;
-	bool sortPlaylist = true;
+	bool hasSavedPlaylist = false;
 
 	// TODO: This is not very fair, we should abstract from
 	// entry ref representation and support more URLs.
@@ -456,7 +457,7 @@ Playlist::AppendItems(const BMessage* refsReceivedMessage, int32 appendIndex)
 			AppendPlaylistToPlaylist(ref, &subPlaylist);
 			// Do not sort the whole playlist anymore, as that
 			// will screw up the ordering in the saved playlist.
-			sortPlaylist = false;
+			hasSavedPlaylist = true;
 		} else {
 			if (_IsQuery(type))
 				AppendQueryToPlaylist(ref, &subPlaylist);
@@ -470,7 +471,7 @@ Playlist::AppendItems(const BMessage* refsReceivedMessage, int32 appendIndex)
 
 			// At least sort this subsection of the playlist
 			// if the whole playlist is not sorted anymore.
-			if (!sortPlaylist)
+			if (sortItems && hasSavedPlaylist)
 				subPlaylist.Sort();
 		}
 
@@ -483,7 +484,8 @@ Playlist::AppendItems(const BMessage* refsReceivedMessage, int32 appendIndex)
 		AdoptPlaylist(subPlaylist, subAppendIndex);
 		subAppendIndex += subPlaylistCount;
 	}
-	if (sortPlaylist)
+
+	if (sortItems)
 		playlist->Sort();
 
 	if (add)

@@ -10,8 +10,11 @@
 #include <stdio.h>
 
 #include <Autolock.h>
+#include <Catalog.h>
 #include <GradientLinear.h>
+#include <MenuItem.h>
 #include <Message.h>
+#include <PopUpMenu.h>
 #include <ScrollBar.h>
 #include <ScrollView.h>
 #include <Shape.h>
@@ -32,13 +35,17 @@
 #include "RandomizePLItemsCommand.h"
 #include "RemovePLItemsCommand.h"
 
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "MediaPlayer-PlaylistListView"
 
 using std::nothrow;
 
 
 enum {
 	DISPLAY_NAME	= 0,
-	DISPLAY_PATH	= 1
+	DISPLAY_PATH	= 1,
+	M_ADD_SORTED,
+	M_ADD_UNSORTED
 };
 
 
@@ -237,6 +244,7 @@ PlaylistListView::PlaylistListView(BRect frame, Playlist* playlist,
 {
 	fPlaylist->AddListener(fPlaylistObserver);
 	fController->AddListener(fControllerObserver);
+	_AddDropContextMenu();
 
 	SetFlags(Flags() | B_SUBPIXEL_PRECISE);
 }
@@ -267,7 +275,6 @@ PlaylistListView::AttachedToWindow()
 void
 PlaylistListView::MessageReceived(BMessage* message)
 {
-//	message->PrintToStream();
 	switch (message->what) {
 		// PlaylistObserver messages
 		case MSG_PLAYLIST_ITEM_ADDED:
@@ -508,8 +515,18 @@ PlaylistListView::DrawListItem(BView* owner, int32 index, BRect frame) const
 void
 PlaylistListView::ItemsReceived(const BMessage* message, int32 appendIndex)
 {
+	BPoint dropPoint;
+	bool sorting = false;
+	entry_ref ref;
+
+	if (message->FindRef("refs", 1, &ref) == B_OK
+		&& message->FindPoint("_drop_point_", &dropPoint) == B_OK
+		&& message->GetInt32("buttons", 0) == 2)
+		if (_ShowDropContextMenu(dropPoint) == M_ADD_SORTED)
+			sorting = true;
+
 	if (fCommandStack->Perform(new (nothrow) ImportPLItemsCommand(fPlaylist,
-			message, appendIndex)) != B_OK) {
+			message, appendIndex, sorting)) != B_OK) {
 		fPlaylist->NotifyImportFailed();
 	}
 }
@@ -653,6 +670,30 @@ PlaylistListView::_SetPlaybackState(uint32 state)
 
 	fPlaybackState = state;
 	InvalidateItem(fCurrentPlaylistIndex);
+}
+
+
+void
+PlaylistListView::_AddDropContextMenu()
+{
+	fDropContextMenu = new BPopUpMenu("DropContext");
+
+	fDropContextMenu->AddItem(new BMenuItem(B_TRANSLATE("Add sorted"),
+		new BMessage(M_ADD_SORTED)));
+	fDropContextMenu->AddItem(new BMenuItem(B_TRANSLATE("Add unsorted"),
+		new BMessage(M_ADD_UNSORTED)));
+}
+
+
+uint32
+PlaylistListView::_ShowDropContextMenu(BPoint dropPoint)
+{
+	BMenuItem* item;
+
+	item = fDropContextMenu->Go(dropPoint, true, true);
+	if (item != NULL)
+		return item->Command();
+	return 0;
 }
 
 

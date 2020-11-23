@@ -15,7 +15,8 @@ public:
 								ImportPLItemsCommand(
 									Playlist* playlist,
 									const BMessage* refsMessage,
-									int32 toIndex);
+									int32 toIndex,
+									bool sortItems);
 	virtual						~ImportPLItemsCommand();
 
 	virtual	status_t			InitCheck();
