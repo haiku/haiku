@@ -249,12 +249,14 @@ BFileGameSound::FillBuffer(void* inBuffer, size_t inByteCount)
 	// Split or combine decoder buffers into mixer buffers
 	// fPlayPosition is where we got up to in the input buffer after last call
 
+	char* buffer = (char*)inBuffer;
 	size_t out_offset = 0;
 
 	while (inByteCount > 0 && !fPaused) {
 		if (!fPaused || fPausing) {
 			if (fPlayPosition == 0 || fPlayPosition >= fBufferSize) {
-				Load();
+				if (!Load())
+					break;
 			}
 
 			if (fPausing) {
@@ -268,7 +270,6 @@ BFileGameSound::FillBuffer(void* inBuffer, size_t inByteCount)
 				}
 
 				// Fill the requested buffer, stopping if the paused flag is set
-				char* buffer = (char*)inBuffer;
 
 				switch(Format().format) {
 					case gs_audio_format::B_GS_U8:
@@ -316,8 +317,6 @@ BFileGameSound::FillBuffer(void* inBuffer, size_t inByteCount)
 				Unlock();
 			} else {
 
-				char* buffer = (char*)inBuffer;
-
 				// Need to be able to stop asap when the pause flag is flipped.
 				while (fPlayPosition < fBufferSize && (!fPaused || fPausing)
 					&& (inByteCount > 0)) {
@@ -327,6 +326,10 @@ BFileGameSound::FillBuffer(void* inBuffer, size_t inByteCount)
 			}
 		}
 	}
+
+	// Fill the rest with silence
+	if (inByteCount > 0)
+		memset(&buffer[out_offset], 0, inByteCount);
 }
 
 
@@ -478,6 +481,7 @@ BFileGameSound::Load()
 			fAudioStream->stream->SeekToFrame(&frame);
 		} else {
 			StopPlaying();
+			return false;
 		}
 	}
 
