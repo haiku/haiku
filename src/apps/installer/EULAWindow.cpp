@@ -58,10 +58,11 @@ EULAWindow::EULAWindow()
 		"For details, please consult the guide on booting Haiku on our "
 		"website at https://www.haiku-os.org/guides/booting.\n"
 		"Or you can set up a boot menu from Installer's \"Tools\" menu, see "
-		"the Userguide's topic on the application \"BootManager\".\n\n\n");
+		"the Haiku User Guide's topic on the application \"BootManager\"."
+		"\n\n\n");
 	infoText << B_TRANSLATE(
 		"3)   When you successfully boot into Haiku for the first time, make "
-		"sure to read our \"Userguide\" and take the \"Quick Tour\". There "
+		"sure to read our \"User Guide\" and take the \"Quick Tour\". There "
 		"are links on the Desktop and in WebPositive's bookmarks.\n\n");
 	infoText << B_TRANSLATE(
 		"Have fun and thanks for trying out Haiku!");

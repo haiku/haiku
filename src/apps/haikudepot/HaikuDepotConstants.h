@@ -99,7 +99,7 @@ enum UserUsageConditionsSelectionMode {
 #define STR_MDASH "\xE2\x80\x94"
 
 #define ALERT_MSG_LOGS_USER_GUIDE "\nInformation about how to view the logs " \
-	"is available in the HaikuDepot section of the user guide."
+	"is available in the HaikuDepot section of the Haiku User Guide."
 
 #define CACHE_DIRECTORY_APP "HaikuDepot"
 
