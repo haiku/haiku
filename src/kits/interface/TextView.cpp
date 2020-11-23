@@ -509,6 +509,13 @@ BTextView::AttachedToWindow()
 	fDragOffset = -1;
 	fActive = false;
 
+	// text rect right must be greater than left
+	if (fTextRect.right <= fTextRect.left)
+		fTextRect.right = fTextRect.left + 1;
+	// text rect bottom must be greater than top
+	if (fTextRect.bottom <= fTextRect.top)
+		fTextRect.bottom = fTextRect.top + 1;
+
 	_AutoResize(true);
 
 	_UpdateScrollbars();
