@@ -125,7 +125,7 @@ platform_allocate_region(void **_address, size_t size, uint8 /* protection */,
 	memory_region *region = new(std::nothrow) memory_region {
 		next: allocated_regions,
 		vaddr: *_address == NULL ? 0 : (addr_t)*_address,
-		paddr: addr,
+		paddr: (phys_addr_t)addr,
 		size: size
 	};
 
@@ -182,8 +182,8 @@ convert_physical_ranges()
 		memory_region *region = new(std::nothrow) memory_region {
 			next: allocated_regions,
 			vaddr: 0,
-			paddr: range[i].start,
-			size: range[i].size
+			paddr: (phys_addr_t)range[i].start,
+			size: (size_t)range[i].size
 		};
 
 		if (!region)
