@@ -177,6 +177,7 @@ struct ipv4_protocol : net_protocol {
 	uint8				service_type;
 	uint8				time_to_live;
 	uint8				multicast_time_to_live;
+	bool				multicast_loopback;
 	uint32				flags;
 	struct sockaddr*	multicast_address; // for IP_MULTICAST_IF
 
@@ -190,6 +191,7 @@ struct ipv4_protocol : net_protocol {
 
 static const int kDefaultTTL = 254;
 static const int kDefaultMulticastTTL = 1;
+static const bool kDefaultMulticastLoopback = true;
 
 
 extern net_protocol_module_info gIPv4Module;
@@ -1062,6 +1064,7 @@ ipv4_init_protocol(net_socket* socket)
 	protocol->service_type = 0;
 	protocol->time_to_live = kDefaultTTL;
 	protocol->multicast_time_to_live = kDefaultMulticastTTL;
+	protocol->multicast_loopback = kDefaultMulticastLoopback;
 	protocol->flags = 0;
 	protocol->multicast_address = NULL;
 	return protocol;
@@ -1185,6 +1188,10 @@ ipv4_getsockopt(net_protocol* _protocol, int level, int option, void* value,
 			return get_char_int_option(value, *_length,
 				protocol->multicast_time_to_live);
 		}
+		if (option == IP_MULTICAST_LOOP) {
+			return get_char_int_option(value, *_length,
+				protocol->multicast_loopback ? 1 : 0);
+		}
 		if (option == IP_ADD_MEMBERSHIP
 			|| option == IP_DROP_MEMBERSHIP
 			|| option == IP_BLOCK_SOURCE
@@ -1292,6 +1299,14 @@ ipv4_setsockopt(net_protocol* _protocol, int level, int option,
 		if (option == IP_MULTICAST_TTL) {
 			return set_char_int_option(protocol->multicast_time_to_live, value,
 				length);
+		}
+		if (option == IP_MULTICAST_LOOP) {
+			uint8 multicast_loopback;
+			status_t status = set_char_int_option(multicast_loopback, value,
+				length);
+			if (status == B_OK)
+				protocol->multicast_loopback = multicast_loopback != 0;
+			return status;
 		}
 		if (option == IP_ADD_MEMBERSHIP || option == IP_DROP_MEMBERSHIP) {
 			ip_mreq mreq;
