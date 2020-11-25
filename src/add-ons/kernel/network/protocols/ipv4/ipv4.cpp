@@ -37,9 +37,10 @@
 //#define TRACE_IPV4
 #ifdef TRACE_IPV4
 #	define TRACE(format, args...) \
-		dprintf("IPv4 [%llu] " format "\n", system_time() , ##args)
+		dprintf("IPv4 [%" B_PRIdBIGTIME "] " format "\n", system_time() , \
+			##args)
 #	define TRACE_SK(protocol, format, args...) \
-		dprintf("IPv4 [%llu] %p " format "\n", system_time(), \
+		dprintf("IPv4 [%" B_PRIdBIGTIME "] %p " format "\n", system_time(), \
 			protocol , ##args)
 #	define TRACE_ONLY(x) x
 #else
@@ -605,7 +606,8 @@ static status_t
 send_fragments(ipv4_protocol* protocol, struct net_route* route,
 	net_buffer* buffer, uint32 mtu)
 {
-	TRACE_SK(protocol, "SendFragments(%lu bytes, mtu %lu)", buffer->size, mtu);
+	TRACE_SK(protocol, "SendFragments(%" B_PRIu32 " bytes, mtu %" B_PRIu32 ")",
+		buffer->size, mtu);
 
 	NetBufferHeaderReader<ipv4_header> originalHeader(buffer);
 	if (originalHeader.Status() != B_OK)
@@ -629,7 +631,8 @@ send_fragments(ipv4_protocol* protocol, struct net_route* route,
 	// this way)
 	mtu -= headerLength;
 	mtu &= ~7;
-	TRACE("  adjusted MTU to %ld, bytesLeft %ld", mtu, bytesLeft);
+	TRACE("  adjusted MTU to %" B_PRIu32 ", bytesLeft %" B_PRIu32, mtu,
+		bytesLeft);
 
 	while (bytesLeft > 0) {
 		uint32 fragmentLength = min_c(bytesLeft, mtu);
@@ -644,8 +647,8 @@ send_fragments(ipv4_protocol* protocol, struct net_route* route,
 			headerLength);
 			// TODO: compute the checksum only for those parts that changed?
 
-		TRACE("  send fragment of %ld bytes (%ld bytes left)", fragmentLength,
-			bytesLeft);
+		TRACE("  send fragment of %" B_PRIu32 " bytes (%" B_PRIu32 " bytes "
+			"left)", fragmentLength, bytesLeft);
 
 		net_buffer* fragmentBuffer;
 		if (!lastFragment) {
@@ -1460,8 +1463,8 @@ ipv4_send_routed_data(net_protocol* _protocol, struct net_route* route,
 	net_interface_address* interfaceAddress = route->interface_address;
 	net_interface* interface = interfaceAddress->interface;
 
-	TRACE_SK(protocol, "SendRoutedData(%p, %p [%ld bytes])", route, buffer,
-		buffer->size);
+	TRACE_SK(protocol, "SendRoutedData(%p, %p [%" B_PRIu32 " bytes])", route,
+		buffer, buffer->size);
 
 	sockaddr_in& source = *(sockaddr_in*)buffer->source;
 	sockaddr_in& destination = *(sockaddr_in*)buffer->destination;
@@ -1540,8 +1543,8 @@ ipv4_send_routed_data(net_protocol* _protocol, struct net_route* route,
 			sizeof(ipv4_header), true);
 	}
 
-	TRACE_SK(protocol, "  SendRoutedData(): header chksum: %ld, buffer "
-		"checksum: %ld",
+	TRACE_SK(protocol, "  SendRoutedData(): header chksum: %" B_PRIu32
+		", buffer checksum: %" B_PRIu32,
 		gBufferModule->checksum(buffer, 0, sizeof(ipv4_header), true),
 		gBufferModule->checksum(buffer, 0, buffer->size, true));
 
@@ -1563,7 +1566,8 @@ ipv4_send_data(net_protocol* _protocol, net_buffer* buffer)
 {
 	ipv4_protocol* protocol = (ipv4_protocol*)_protocol;
 
-	TRACE_SK(protocol, "SendData(%p [%ld bytes])", buffer, buffer->size);
+	TRACE_SK(protocol, "SendData(%p [%" B_PRIu32 " bytes])", buffer,
+		buffer->size);
 
 	if (protocol != NULL && (protocol->flags & IP_FLAG_HEADER_INCLUDED)) {
 		if (buffer->size < sizeof(ipv4_header))
@@ -1620,7 +1624,7 @@ ipv4_read_data(net_protocol* _protocol, size_t numBytes, uint32 flags,
 	if (raw == NULL)
 		return B_ERROR;
 
-	TRACE_SK(protocol, "ReadData(%lu, 0x%lx)", numBytes, flags);
+	TRACE_SK(protocol, "ReadData(%lu, 0x%" B_PRIx32 ")", numBytes, flags);
 
 	return raw->Dequeue(flags, _buffer);
 }
@@ -1666,7 +1670,7 @@ ipv4_get_mtu(net_protocol* protocol, const struct sockaddr* address)
 status_t
 ipv4_receive_data(net_buffer* buffer)
 {
-	TRACE("ipv4_receive_data(%p [%ld bytes])", buffer, buffer->size);
+	TRACE("ipv4_receive_data(%p [%" B_PRIu32 " bytes])", buffer, buffer->size);
 
 	NetBufferHeaderReader<ipv4_header> bufferHeader(buffer);
 	if (bufferHeader.Status() != B_OK)
@@ -1820,8 +1824,8 @@ ipv4_deliver_data(net_protocol* _protocol, net_buffer* buffer)
 status_t
 ipv4_error_received(net_error error, net_buffer* buffer)
 {
-	TRACE("  ipv4_error_received(error %d, buffer %p [%zu bytes])", (int)error,
-		buffer, buffer->size);
+	TRACE("  ipv4_error_received(error %d, buffer %p [%" B_PRIu32 " bytes])",
+		(int)error, buffer, buffer->size);
 
 	NetBufferHeaderReader<ipv4_header> bufferHeader(buffer);
 	if (bufferHeader.Status() != B_OK)
