@@ -1172,6 +1172,8 @@ ipv4_getsockopt(net_protocol* _protocol, int level, int option, void* value,
 	ipv4_protocol* protocol = (ipv4_protocol*)_protocol;
 
 	if (level == IPPROTO_IP) {
+		bool isDgramOrRaw = protocol->socket->type == SOCK_DGRAM
+			|| protocol->socket->type == SOCK_RAW;
 		if (option == IP_HDRINCL) {
 			return get_int_option(value, *_length,
 				(protocol->flags & IP_FLAG_HEADER_INCLUDED) != 0);
@@ -1187,6 +1189,8 @@ ipv4_getsockopt(net_protocol* _protocol, int level, int option, void* value,
 		if (option == IP_MULTICAST_IF) {
 			if (*_length != sizeof(struct in_addr))
 				return B_BAD_VALUE;
+			if (!isDgramOrRaw)
+				return B_NOT_SUPPORTED;
 			struct sockaddr_in defaultAddress;
 			defaultAddress.sin_addr.s_addr = htonl(INADDR_ANY);
 			struct sockaddr_in* address =
@@ -1200,10 +1204,14 @@ ipv4_getsockopt(net_protocol* _protocol, int level, int option, void* value,
 			return B_OK;
 		}
 		if (option == IP_MULTICAST_TTL) {
+			if (!isDgramOrRaw)
+				return B_NOT_SUPPORTED;
 			return get_char_int_option(value, *_length,
 				protocol->multicast_time_to_live);
 		}
 		if (option == IP_MULTICAST_LOOP) {
+			if (!isDgramOrRaw)
+				return B_NOT_SUPPORTED;
 			return get_char_int_option(value, *_length,
 				protocol->multicast_loopback ? 1 : 0);
 		}
@@ -1241,6 +1249,8 @@ ipv4_setsockopt(net_protocol* _protocol, int level, int option,
 	ipv4_protocol* protocol = (ipv4_protocol*)_protocol;
 
 	if (level == IPPROTO_IP) {
+		bool isDgramOrRaw = protocol->socket->type == SOCK_DGRAM
+			|| protocol->socket->type == SOCK_RAW;
 		if (option == IP_HDRINCL) {
 			int headerIncluded;
 			if (length != sizeof(int))
@@ -1278,6 +1288,8 @@ ipv4_setsockopt(net_protocol* _protocol, int level, int option,
 		if (option == IP_MULTICAST_IF) {
 			if (length != sizeof(struct in_addr))
 				return B_BAD_VALUE;
+			if (!isDgramOrRaw)
+				return B_NOT_SUPPORTED;
 
 			struct sockaddr_in* address = new (std::nothrow) sockaddr_in;
 			if (address == NULL)
@@ -1314,10 +1326,14 @@ ipv4_setsockopt(net_protocol* _protocol, int level, int option,
 			return B_OK;
 		}
 		if (option == IP_MULTICAST_TTL) {
+			if (!isDgramOrRaw)
+				return B_NOT_SUPPORTED;
 			return set_char_int_option(protocol->multicast_time_to_live, value,
 				length);
 		}
 		if (option == IP_MULTICAST_LOOP) {
+			if (!isDgramOrRaw)
+				return B_NOT_SUPPORTED;
 			uint8 multicast_loopback;
 			status_t status = set_char_int_option(multicast_loopback, value,
 				length);
@@ -1326,6 +1342,8 @@ ipv4_setsockopt(net_protocol* _protocol, int level, int option,
 			return status;
 		}
 		if (option == IP_ADD_MEMBERSHIP || option == IP_DROP_MEMBERSHIP) {
+			if (!isDgramOrRaw)
+				return B_NOT_SUPPORTED;
 			ip_mreq mreq;
 			if (length != sizeof(ip_mreq))
 				return B_BAD_VALUE;
@@ -1339,6 +1357,8 @@ ipv4_setsockopt(net_protocol* _protocol, int level, int option,
 			|| option == IP_UNBLOCK_SOURCE
 			|| option == IP_ADD_SOURCE_MEMBERSHIP
 			|| option == IP_DROP_SOURCE_MEMBERSHIP) {
+			if (!isDgramOrRaw)
+				return B_NOT_SUPPORTED;
 			ip_mreq_source mreq;
 			if (length != sizeof(ip_mreq_source))
 				return B_BAD_VALUE;
@@ -1349,6 +1369,8 @@ ipv4_setsockopt(net_protocol* _protocol, int level, int option,
 				&mreq.imr_multiaddr, &mreq.imr_sourceaddr);
 		}
 		if (option == MCAST_LEAVE_GROUP || option == MCAST_JOIN_GROUP) {
+			if (!isDgramOrRaw)
+				return B_NOT_SUPPORTED;
 			group_req greq;
 			if (length != sizeof(group_req))
 				return B_BAD_VALUE;
@@ -1362,6 +1384,8 @@ ipv4_setsockopt(net_protocol* _protocol, int level, int option,
 			|| option == MCAST_UNBLOCK_SOURCE
 			|| option == MCAST_JOIN_SOURCE_GROUP
 			|| option == MCAST_LEAVE_SOURCE_GROUP) {
+			if (!isDgramOrRaw)
+				return B_NOT_SUPPORTED;
 			group_source_req greq;
 			if (length != sizeof(group_source_req))
 				return B_BAD_VALUE;
