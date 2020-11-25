@@ -1184,6 +1184,21 @@ ipv4_getsockopt(net_protocol* _protocol, int level, int option, void* value,
 			return get_int_option(value, *_length, protocol->time_to_live);
 		if (option == IP_TOS)
 			return get_int_option(value, *_length, protocol->service_type);
+		if (option == IP_MULTICAST_IF) {
+			if (*_length != sizeof(struct in_addr))
+				return B_BAD_VALUE;
+			struct sockaddr_in defaultAddress;
+			defaultAddress.sin_addr.s_addr = htonl(INADDR_ANY);
+			struct sockaddr_in* address =
+				(struct sockaddr_in*)protocol->multicast_address;
+			if (address == NULL)
+				address = &defaultAddress;
+			if (user_memcpy(value, &address->sin_addr, sizeof(struct in_addr))
+					!= B_OK) {
+				return B_BAD_ADDRESS;
+			}
+			return B_OK;
+		}
 		if (option == IP_MULTICAST_TTL) {
 			return get_char_int_option(value, *_length,
 				protocol->multicast_time_to_live);
@@ -1268,11 +1283,13 @@ ipv4_setsockopt(net_protocol* _protocol, int level, int option,
 			if (address == NULL)
 				return B_NO_MEMORY;
 
-			if (user_memcpy(&address->sin_addr, value, sizeof(struct in_addr))
+			struct in_addr sin_addr;
+			if (user_memcpy(&sin_addr, value, sizeof(struct in_addr))
 					!= B_OK) {
 				delete address;
 				return B_BAD_ADDRESS;
 			}
+			fill_sockaddr_in(address, sin_addr.s_addr);
 
 			// Using INADDR_ANY to remove the previous setting.
 			if (address->sin_addr.s_addr == htonl(INADDR_ANY)) {
