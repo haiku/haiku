@@ -195,7 +195,8 @@ MulticastFilter<Addressing>::GetState(const AddressType &groupAddress,
 			return status;
 		}
 
-	}
+	} else if (create)
+		return EADDRINUSE;
 
 	return B_OK;
 }
