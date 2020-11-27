@@ -32,7 +32,7 @@ struct _gs_media_tracker {
 
 
 // Local utility functions -----------------------------------------------
-template<typename T>
+template<typename T, int middle = 0>
 bool
 FillBuffer(_gs_ramp* ramp, T* dest, const T* src, size_t* bytes)
 {
@@ -40,7 +40,7 @@ FillBuffer(_gs_ramp* ramp, T* dest, const T* src, size_t* bytes)
 
 	for (size_t sample = 0; sample < samples; sample++) {
 		float gain = *ramp->value;
-		dest[sample] = T(float(src[sample]) * gain);
+		dest[sample] = T(float(src[sample] - middle) * gain + middle);
 
 		if (ChangeRamp(ramp)) {
 			*bytes = sample * sizeof(T);
@@ -206,7 +206,7 @@ BFileGameSound::FillBuffer(void* inBuffer, size_t inByteCount)
 
 			switch(Format().format) {
 				case gs_audio_format::B_GS_U8:
-					rampDone = ::FillBuffer<uint8>(fPausing,
+					rampDone = ::FillBuffer<uint8, 128>(fPausing,
 						(uint8*)&buffer[out_offset],
 						(uint8*)&fBuffer[fPlayPosition], &bytes);
 					break;
@@ -245,8 +245,12 @@ BFileGameSound::FillBuffer(void* inBuffer, size_t inByteCount)
 	}
 
 	// Fill the rest with silence
-	if (inByteCount > 0)
-		memset(&buffer[out_offset], 0, inByteCount);
+	if (inByteCount > 0) {
+		int middle = 0;
+		if (Format().format == gs_audio_format::B_GS_U8)
+			middle = 128;
+		memset(&buffer[out_offset], middle, inByteCount);
+	}
 }
 
 
@@ -362,8 +366,11 @@ BFileGameSound::Init(BDataIO* data)
 		fBufferSize = dformat.buffer_size;
 
 	// create the buffer
+	int middle = 0;
+	if (gsformat.format == gs_audio_format::B_GS_U8)
+		middle = 128;
 	fBuffer = new char[fBufferSize * 2];
-	memset(fBuffer, 0, fBufferSize * 2);
+	memset(fBuffer, middle, fBufferSize * 2);
 
 	fFrameSize = gsformat.channel_count * get_sample_size(gsformat.format);
 	fAudioStream->frames = fAudioStream->stream->CountFrames();
