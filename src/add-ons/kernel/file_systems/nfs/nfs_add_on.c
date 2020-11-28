@@ -1854,8 +1854,8 @@ fs_create(fs_volume *_volume, fs_vnode *_dir, const char *name, int omode,
 		(*cookie)->original_size = st.st_size;
 		(*cookie)->st = st;
 
-		result = new_vnode(_volume, *vnid, newNode, &sNFSVnodeOps);
-
+		result = publish_vnode(_volume, *vnid, newNode, &sNFSVnodeOps,
+			S_IFREG, 0);
 		if (result < B_OK) {
 			XDRInPacketDestroy(&reply);
 			XDROutPacketDestroy(&call);
