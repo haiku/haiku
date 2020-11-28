@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Installer	1668766771
+1	ukrainian	x-vnd.Haiku-Installer	3959809598
 Performing installation.	InstallProgress		Виконання інсталяції.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Виберіть джерело з випадаючого меню. Потім натисніть кнопку \"Почати\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Закрийте вікно DriveSetup перед тим як закрити вікно Installer.
@@ -73,10 +73,8 @@ Running Boot Manager and DriveSetup…\n\nClose both applications to continue wi
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Ви впевнені що, хочете встановлювати на поточний завантажувальний диск? Installer перезавантажить машину, якщо Ви продовжите.
 Onto:	InstallerWindow		На:
 Quit Boot Manager and DriveSetup	InstallerWindow		Вийти з Boot Manager та DriveSetup
-3)   When you successfully boot into Haiku for the first time, make sure to read our \"Userguide\" and take the \"Quick Tour\". There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Коли Ви успішно завантажите Haiku перший раз, обов'язково прочитайте наш \"Userguide\" і здолайте \"Quick Tour\". Відповідні посилання є на Робочому столі та в закладках WebPositive.\n\n
 Tools	InstallerWindow		Інструменти
 scanning…	InstallerWindow		сканування…
 Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be formatted with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Запустіть утиліту DriveSetup, щоб розмітити\nдоступні жорсткі диски та інші носії на розділи.\nРозділи необхідно відформатувати під\nфайлову систему Be (BFS), необхідну для\nзавантажувального розділу Haiku.
-2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Userguide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2)   Installer власне зробить розділ Haiku завантажувальним, але не зробить жодного кроку щоб додати Haiku до існуючого меню загрузки. Якщо Ви маєте встановлений GRUB, то можете додати Haiku в його меню.\nЗа деталями зверніться до настанови з завантаження Haiku на нашому вебсайті - https://www.haiku-os.org/guides/booting.\nАбо налаштуйте це меню за допомогою меню \"Інструменти\" Installer, дивитись у розділі про програму \"BootManager\".\n\n\n
 Set up boot menu	InstallerWindow		Встановити меню загрузки
 Continue	InstallerApp		Продовжити

@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-Installer	4118112236
+1	danish	x-vnd.Haiku-Installer	4035783534
 Performing installation.	InstallProgress		Udfører installation.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Vælg en oprindelsesdisk fra popup-menuen. Tryk dernæst på \"Begynd\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Luk venligst vinduet for drevopsætning, før du lukker installationsvinduet.
@@ -74,6 +74,5 @@ Onto:	InstallerWindow		Til:
 Quit Boot Manager and DriveSetup	InstallerWindow		Afslut opstartsmanager og drevopsætning
 Tools	InstallerWindow		Værktøjer
 scanning…	InstallerWindow		leder…
-2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Userguide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2)   Installationsprogrammet gør selve Haiku-partitionen opstartsbar, men foretager ikke nogen trin til integrering af Haiku i en eksisterende opstartsmenu. Hvis du allerede har GRUB installeret, så kan du tilføje Haiku til den.\nSe venligst detaljerne i vejledningen til opstart af Haiku på vores websted på https://www.haiku-os.org/guides/booting.\nEller du kan opsætte en opstartsmenu fra installationsprogrammets \"Værktøjer\"-menu, se brugervejledningens emne om programmet \"BootManager\".\n\n\n
 Set up boot menu	InstallerWindow		Konfigurer bootmenuen
 Continue	InstallerApp		Fortsæt

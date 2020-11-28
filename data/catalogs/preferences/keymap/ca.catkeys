@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Keymap	2700190052
+1	catalan; valencian	x-vnd.Haiku-Keymap	2850776429
 Key	Modifier keys window	As in a computer keyboard key	Tecla
 Japanese	KeymapNames		Japonès
 US	KeymapNames		EUA
@@ -6,6 +6,7 @@ PG ↑	Keyboard Layout View	Very short for 'page up'	PÀG ↑
 Brazilian	KeymapNames		Brasiler
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (EUA)
 Right control	Keyboard Layout View		Control dret
+X-Bows Nature	KeyboardLayoutNames		X-Bows Natura
 Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Opció:
 Cancel	Modifier keys window		Cancel·la

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Installer	3292013609
+1	japanese	x-vnd.Haiku-Installer	1288089140
 Performing installation.	InstallProgress		インストールを実行しています。
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		メニューからインストールディスクを選択し、次に\"開始\"ボタンをクリックしてください。
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		インストーラーを閉じる前に、DriveSetup を終了してください。
@@ -75,10 +75,8 @@ Running Boot Manager and DriveSetup…\n\nClose both applications to continue wi
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		使用中の起動ディスクにインストールしますか?この場合、システムを再起動する必要があります。
 Onto:	InstallerWindow		インストール先:
 Quit Boot Manager and DriveSetup	InstallerWindow		ブートマネージャーと DriveSetup を終了
-3)   When you successfully boot into Haiku for the first time, make sure to read our \"Userguide\" and take the \"Quick Tour\". There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   初回のHaikuのブートが成功したら、忘れずに\"Userguide\"を読んで、\"Quick Tour\"を手に取ってください。 これらはデスクトップ上のリンクまたはWebPositiveのブックマーク中にあります。\n\n
 Tools	InstallerWindow		ツール
 scanning…	InstallerWindow		ディスクを検出しています…
 Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be formatted with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		DriveSetupを起動して、利用可能なハードディスクや\nその他のメディアのパーティションを切ります。\nパーティションはHaikuブートパーティションに\n必要なBeファイルシステムでフォーマットできます。
-2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Userguide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2)インストーラーは、Haikuのパーティションを起動可能にします。しかし、Haikuを既存のブートメニューに結合する機能はありません。すでにGRUBがインストールされている場合、Haikuを追加できます。\n詳しくは、Haikuウェブサイトのbooting Haiku onを参考にしてください ( https://www.haiku-os.org/guides/booting)。\nまたは、インストーラーの\"ツール\"メニューからブートメニューを設定できます。ユーザーガイドの\"ブートマネージャー\"のトピックを見てください。\n\n\n
 Set up boot menu	InstallerWindow		ブートメニューを設定
 Continue	InstallerApp		続ける

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-PowerStatus	3173765686
+1	hungarian	x-vnd.Haiku-PowerStatus	1085070685
 Run in window	PowerStatus		Futtatás ablakban
 Extended battery info	PowerStatus		Bővebb akku információ
 Show status icon	PowerStatus		Állapotikon megjelenítése
@@ -30,11 +30,13 @@ Serial number: 	PowerStatus		Szériaszám:
 Battery critical	PowerStatus		Veszélyesen alacsony töltés
 Capacity: 	PowerStatus		Kapacitás: 
  mW	PowerStatus		 mW
+No supported battery detected. PowerStatus cannot be used on your system.	PowerStatus		Nem találtam akkumulátort, az Energiaállapot így nem használható.
 Show percent	PowerStatus		Százalék megjelenítése
 Capacity granularity 1: 	PowerStatus		Kapacitás granularitás 1: 
 The battery level is getting low, please plug in the device.	PowerStatus		Az akkumulátor töltöttsége alacsony, kérlek csatlakoztasd a töltőt.
 Design capacity warning: 	PowerStatus		Tervezett kapacitás figyelmeztetés: 
 Capacity granularity 2: 	PowerStatus		Kapacitás granularitás 2: 
+Too bad!	PowerStatus		Kár...
 Technology: 	PowerStatus		Technológia:
  mWh	PowerStatus		 mWh
 PowerStatus	System name		Energiaállapot

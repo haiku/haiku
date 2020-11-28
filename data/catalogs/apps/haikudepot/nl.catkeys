@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-HaikuDepot	772859472
+1	dutch; flemish	x-vnd.Haiku-HaikuDepot	2792101273
 Repository update error	LocalRepositoryUpdateProcess		Fout bij updaten softwarebronnen
 Network error	ServerHelper		Netwerk fout
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Er is een fout opgetreden bij het verversen van de softwarebronnen: %error%
@@ -131,7 +131,6 @@ Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Synch
 Stability:	RatePackageWindow		Stabiliteit:
 The usage agreement must be agreed to and a confirmation should be made that the person creating the user meets the minimum age requirement.	UserLoginWindow		U moet met de gebruiksvoorwaarden instemmen, en u moet bevestigen dat de gebruiker voldoet aan de minimumleeftijd.
 A validation error has occurred	ServerHelper		Een validatie fout is opgetreden
-While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	MainWindow		Terwijl de pakketdata bijgewerkt werd, heeft zich een fout voorgedaan die ervoor kan zorgen dat gegevens op het scherm verouderd zijn of ontbreken. U kunt aanvullende informatie over dit probleem vinden in de logbestanden.\nInformatie over hoe u deze logbestanden kunt bekijken, is beschikbaar in het hoofdstuk over HaikuDepot in de handleiding.
 The nickname is required.	UserLoginWindow		De gebruikersnaam is vereist.
 Source packages	MainWindow		Broncodepakketten
 -	no package size		-
@@ -159,7 +158,6 @@ Captcha error	UserLoginWindow		Catcha-fout
 The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		De gebruikersnaam moet uniek zijn, maar de door u gekozen naam is reeds in gebruik. Kies een andere gebruikersnaam.
 Manage repositories…	MainWindow		Beheer pakketbronnen...
 Fetching remote repository data	LocalRepositoryUpdateProcess		Ophalen pakketbron data op afstand
-An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	UserLoginWindow		Er is een fout opgetreden van het downloaden van de gebruikersvoorwaarden. Dit is vereist bij het aanmaken vaneen nieuwe gebruiker. U kunt aanvullende informatie over dit probleem vinden in de logbestanden.\nInformatie over hoe u deze logbestanden kunt bekijken, is beschikbaar in het hoofdstuk over HaikuDepot in de handleiding.
 Description	PackageListView		Beschrijving
 Open %DeskbarLink%	PackageManager		Open %DeskbarLink%
 User creation error	UserLoginWindow		Fout bij het aanmaken van de gebruiker

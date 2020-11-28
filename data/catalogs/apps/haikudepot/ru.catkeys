@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-HaikuDepot	3059528843
+1	russian	x-vnd.Haiku-HaikuDepot	783803348
 Repository update error	LocalRepositoryUpdateProcess		Ошибка обновления репозитория
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Произошла ошибка при обновлении репозитория: %error%
 User Created	UserLoginWindow		Пользователь создан
@@ -126,7 +126,6 @@ Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Си�
 Stability:	RatePackageWindow		Стабильность:
 The usage agreement must be agreed to and a confirmation should be made that the person creating the user meets the minimum age requirement.	UserLoginWindow		Необходимо принять соглашение об использовании, а также подтвердить, что лицо, создающее пользователя, соответствует минимальному возрасту.
 A validation error has occurred	ServerHelper		Произошла ошибка валидации
-While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	MainWindow		При обновлении данных пакета возникла проблема, которая может привести к устареванию или отсутствию данных при отображении приложений в HaikuDepot. Дополнительные сведения об этой проблеме могут быть получены из журнала приложения.\nИнформация о том, как просматривать журнал, доступна в руководстве пользователя, в разделе Haiku Depot.
 The nickname is required.	UserLoginWindow		Имя пользователя обязательно.
 Source packages	MainWindow		Пакеты с исходным кодом
 -	no package size		-
@@ -153,7 +152,6 @@ Captcha error	UserLoginWindow		Ошибочная капча
 The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		Выбранное имя пользователя уже занято. Пожалуйста, выберите другое.
 Manage repositories…	MainWindow		Управление репозиториями…
 Fetching remote repository data	LocalRepositoryUpdateProcess		Получение данных удалённого репозитория
-An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	UserLoginWindow		Произошла ошибка при загрузке условий использования необходимых для создания нового пользователя. Проверьте журнал приложения для дополнительно информации и попробуйте снова. \nИнформация о том, как просматривать журнал, доступна в руководстве пользователя, в разделе HaikuDepot.
 Description	PackageListView		Описание
 Open %DeskbarLink%	PackageManager		Открыть %DeskbarLink%
 User creation error	UserLoginWindow		Ошибка создания пользователя

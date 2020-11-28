@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-HaikuDepot	772859472
+1	french	x-vnd.Haiku-HaikuDepot	2792101273
 Repository update error	LocalRepositoryUpdateProcess		Erreur à l’actualisation du dépôt
 Network error	ServerHelper		Erreur réseau
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Une erreur est survenue lors du rafraîchissement : %error%
@@ -131,7 +131,6 @@ Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Synch
 Stability:	RatePackageWindow		Stabilité :
 The usage agreement must be agreed to and a confirmation should be made that the person creating the user meets the minimum age requirement.	UserLoginWindow		L’accord d’utilisation doit être accepté et vous devrez confirmer que la personne qui crée l’utilisateur respecte l’âge minimum requis.
 A validation error has occurred	ServerHelper		Une erreur de validation est survenue
-While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	MainWindow		Un problème est survenu lors de la mise à jours des données de paquets qui peut entraîner l’affichage de données obsolètes ou manquantes dans l’application. Des détails supplémentaires concernant ce problème peuvent être obtenus à partir des journaux de l’application.\nDes informations sur la manière de consulter les journaux sont disponibles dans la section DépôtHaiku du guide utilisateur.
 The nickname is required.	UserLoginWindow		Le surnom est requis.
 Source packages	MainWindow		Paquets sources
 -	no package size		-
@@ -159,7 +158,6 @@ Captcha error	UserLoginWindow		Erreur de Captcha
 The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		Le surnom doit être unique, mais celui fourni est déjà pris. Veuillez choisir un autre surnom.
 Manage repositories…	MainWindow		Gérer les dépôts…
 Fetching remote repository data	LocalRepositoryUpdateProcess		Récupération des données du dépôt distant
-An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	UserLoginWindow		Une erreur s’est produite lors du téléchargement des conditions d’utilisation requises pour créer un nouvel utilisateur. Vérifiez les détails dans le journal et réessayez.\nDes informations sur la manière de consulter les journaux sont disponibles dans la section DépôtHaiku du guide utilisateur.
 Description	PackageListView		Description
 Open %DeskbarLink%	PackageManager		Ouvrir %DeskbarLink%
 User creation error	UserLoginWindow		Erreur à la création de l’utilisateur

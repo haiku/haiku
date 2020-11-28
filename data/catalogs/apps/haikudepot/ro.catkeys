@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-HaikuDepot	772859472
+1	romanian	x-vnd.Haiku-HaikuDepot	2792101273
 Repository update error	LocalRepositoryUpdateProcess		Eroare la actualizarea depozitului
 Network error	ServerHelper		Eroare de rețea
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		A apărut o eroare în timpul reîmprospătării depozitului: %error%
@@ -131,7 +131,6 @@ Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Se si
 Stability:	RatePackageWindow		Stabilitate:
 The usage agreement must be agreed to and a confirmation should be made that the person creating the user meets the minimum age requirement.	UserLoginWindow		Trebuie să fiți de acord cu acordul utilizatorului și o confirmare ar trebui să fie făcută cum că persoana care creează utilizatorul îndeplinește vârsta minimă necesară.
 A validation error has occurred	ServerHelper		A apărut o eroare de validare
-While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	MainWindow		În timpul actualizării datelor de pachete, a apărut o problemă care ar putea cauza datele să fie vechi sau să lipsească din afișajul aplicației. Detalii adiționale în legătură cu această problemă ar putea fi obținute din istoricul aplicației.\nInformații despre cum să vizualizați istoricul sunt disponibile în secțiunea HaikuDepot al ghidului de utilizare.
 The nickname is required.	UserLoginWindow		Pseudonimul este necesar.
 Source packages	MainWindow		Pachete sursă
 -	no package size		-
@@ -159,7 +158,6 @@ Captcha error	UserLoginWindow		Eroare captcha
 The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		Pseudonimul trebuie să fie unic, dar pseudonimul furnizat este deja luat. Alegeți un pseudonim diferit.
 Manage repositories…	MainWindow		Gestionare depozite...
 Fetching remote repository data	LocalRepositoryUpdateProcess		Se aduc datele depozitului de la distanță
-An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	UserLoginWindow		O eroare a apărut în timpul descărcării condițiilor de utilizare necesare pentru a crea un utilizator. Verificați istoricul pentru detalii și încercați mai târziu. \nInformații despre cum se poate vizualiza istoricul sunt disponibile în secțiunea HaikuDepot a ghidului de utilizare.
 Description	PackageListView		Descriere
 Open %DeskbarLink%	PackageManager		Deschide %DeskbarLink%
 User creation error	UserLoginWindow		Eroare la crearea utilizatorului

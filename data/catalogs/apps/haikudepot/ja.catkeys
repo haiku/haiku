@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	772859472
+1	japanese	x-vnd.Haiku-HaikuDepot	2792101273
 Repository update error	LocalRepositoryUpdateProcess		リポジトリアップデートエラー
 Network error	ServerHelper		ネットワークエラー
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		リポジトリの更新中に次のエラーが発生しました: %error%
@@ -131,7 +131,6 @@ Synchronizing reference data from server	ServerReferenceDataUpdateProcess		サ�
 Stability:	RatePackageWindow		安定度:
 The usage agreement must be agreed to and a confirmation should be made that the person creating the user meets the minimum age requirement.	UserLoginWindow		利用規約に同意する必要があります。次にユーザーを作成する人が最小年齢の要求を満たすか確認しなければなりません。
 A validation error has occurred	ServerHelper		検証エラーが発生しました
-While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	MainWindow		パッケージデータの更新中に問題が発生しました。その問題によりデータが期限切れに、つまり、アプリケーションの表示から消えてしまいます。この問題に関する追加のデータは、アプリケーションのログから得られるでしょう。\nログの見方についての情報は、ユーザーガイドのHaikuDepotの章で得られます。
 The nickname is required.	UserLoginWindow		ニックネームが必要です。
 Source packages	MainWindow		ソースパッケージ
 -	no package size		-
@@ -159,7 +158,6 @@ Captcha error	UserLoginWindow		キャプチャエラー
 The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		ニックネームはユニークである必要がありますが、入力されたニックネームはすでに取られています。別のニックネームを選んでください。
 Manage repositories…	MainWindow		リポジトリの管理…
 Fetching remote repository data	LocalRepositoryUpdateProcess		リモートリポジトリデータを取得中
-An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	UserLoginWindow		新規ユーザーを作成するための使用条件のダウンロード中にエラーが発生しました。詳細はログをチェックして、再度試してみてください。\nログの見方は、ユーザーガイドのHaikuDepotの章で得られます。
 Description	PackageListView		説明
 Open %DeskbarLink%	PackageManager		%DeskbarLink% を開く
 User creation error	UserLoginWindow		ユーザー作成エラー

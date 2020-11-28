@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-Installer	3292013609
+1	esperanto	x-vnd.Haiku-Installer	1288089140
 Performing installation.	InstallProgress		Instalante.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Elektu la elan diskon el la ŝpruca menuo. Poste alklaku \"Ek\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Bonvolu fermi la fenestron de la Diskagordilo antaŭ fermi la fenestron de al Instalilo.
@@ -75,10 +75,8 @@ Running Boot Manager and DriveSetup…\n\nClose both applications to continue wi
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Ĉu vi certas, ke vi volas instali en la aktualan startdiskon? La Instalilo devigos restarti la komputilon se vi daŭras.
 Onto:	InstallerWindow		En:
 Quit Boot Manager and DriveSetup	InstallerWindow		Ĉesigi Praŝargan Administrilon kaj DiskAgordilon
-3)   When you successfully boot into Haiku for the first time, make sure to read our \"Userguide\" and take the \"Quick Tour\". There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Kiam vi sukcese lanĉos la Hajkon unuan fojon nepre legu nian \"Gvidlibron\" kaj \"Rapidan ekondukon\". Ĝiaj ligiloj lokiĝas en labortablo kaj en legosignoj de la Retprospero.\n\n
 Tools	InstallerWindow		Iloj
 scanning…	InstallerWindow		skanado…
 Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be formatted with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Uzu la Diskagordilon por prepari \ndisponedlajn diskojn kaj aliajn aparatojn.\nSubdiskojn vi povas formatigi per\ndosiersistemo Be bezonata por lanĉa subdisko\nde la Hajko.
-2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Userguide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2)   La Instalilo praŝargebligos la Haiku-an subdiskon mem, sed ne klopodos aldoni Haiku-on en ekzistantan praŝargan menuon. Se vi jam havas instalitan GRUB-on, vi povas aldoni Haiku-on al ĝi.\nPor detaloj, bonvolu konsiliĝi kun la gvidilo pri la praŝargado de Haiku-o en nia retpaĝaro: https://www.haiku-os.org/guides/booting.\nAŭ vi povas agordi praŝargan menuon el la \"Iloj\" menuo de Instalilo. Rigardu la temon pri la programo \"Praŝarga Administrilo\" en la manlibro por uzantoj.\n\n\n
 Set up boot menu	InstallerWindow		Agordi praŝargan menuon
 Continue	InstallerApp		Daŭrigi

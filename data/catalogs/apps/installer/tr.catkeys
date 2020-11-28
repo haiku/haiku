@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Installer	3292013609
+1	turkish	x-vnd.Haiku-Installer	1288089140
 Performing installation.	InstallProgress		Kuruluyor…
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Açılır menüden kaynak diski seçin ve \"Başla\"ya tıklayın.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Yükleyici penceresini kapatmadan önce Disk İzlencesi penceresini kapatın.
@@ -75,10 +75,8 @@ Running Boot Manager and DriveSetup…\n\nClose both applications to continue wi
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Mevcut önyükleme diskine yüklemek istediğinizden emin misiniz? Yükleyici makinenizi yeniden başlatacaktır.
 Onto:	InstallerWindow		Şuraya:
 Quit Boot Manager and DriveSetup	InstallerWindow		Önyükleme Yöneticisi'nden ve Disk İzlencesi'nden çık
-3)   When you successfully boot into Haiku for the first time, make sure to read our \"Userguide\" and take the \"Quick Tour\". There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Haiku yüklemesi tamamlandığında \"Userguide (Kullanıcı kılavuzu)\" ve \"Quick Tour (Hızlı Tur)\" belgelerini okumayı unutmayın. Masaüstünde ve WebPositive yer imleri içinde bağlantılar bulabilirsiniz.\n\n
 Tools	InstallerWindow		Araçlar
 scanning…	InstallerWindow		taranıyor…
 Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be formatted with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Kullanılabilir sabit diskleri ve diğer ortamları\nbölümlendirmek için Disk İzlencesi'ni açın.\nHaiku önyüklemek için kullanılacak bölümler\nBe Dosya Sistemi ile biçimlendirilmelidir.\n
-2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Userguide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2).  Yükleyici Haiku bölümünü önyüklenebilir duruma getirecektir, ancak Haiku'yu mevcut önyükleme menüsüne eklemek için bir şey yapmaz. Eğer sisteminizde GRUB kurulu ise Haiku'yu buraya ekleyebilirsiniz.\nAyrıntılar için web sitemizdeki Haiku'yu önyükleme bölümüne bir göz atın: https://www.haiku-os.org/guides/booting.\nEğer isterseniz Yükleyici'nin \"Araçlar\" menüsünden bir önyükleme menüsü hazırlayabilirsiniz, bunun için Kullanıcı Kılavuzu'nun \"Önyükleme Yöneticisi\" konu başlığına başvurun.\n\n\n
 Set up boot menu	InstallerWindow		Önyükleme menüsünü ayarla
 Continue	InstallerApp		Sürdür

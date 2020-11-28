@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.haiku-screenshot-cli	1618937837
+1	hungarian	x-vnd.haiku-screenshot-cli	3958461128
 Include window border	ScreenshotWindow		Az ablak keretét is
 Overwrite	ScreenshotWindow		Írja felül
 Save in:	ScreenshotWindow		Mentés ide:
@@ -12,6 +12,7 @@ seconds	ScreenshotWindow		másodperc
 New screenshot	ScreenshotWindow		Új képernyőkép
 Screenshot	System name		Képernyőkép
 Desktop	ScreenshotWindow		Asztal
+Artwork folder	ScreenshotWindow		Művész-mappa
 Translator Settings	ScreenshotWindow		Értelmező beállításai
 Include mouse pointer	ScreenshotWindow		Az egér kurzort is
 overwrite	ScreenshotWindow		felülír

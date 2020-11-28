@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Installer	47602378
+1	dutch; flemish	x-vnd.Haiku-Installer	2338645205
 Performing installation.	InstallProgress		Uitvoering installatie.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Kies de bronschijf in de pop-up-menu's. Klik daarna \"Begin\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Sluit alstublieft het DriveSetup-venster voordat u het Installer-venster sluit.
@@ -74,10 +74,8 @@ Running Boot Manager and DriveSetup…\n\nClose both applications to continue wi
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Bent u zeker dat u op de huidige opstartschijf wilt installeren? Als u doorgaat zal Installer uw computer moeten heropstarten.
 Onto:	InstallerWindow		Naar:
 Quit Boot Manager and DriveSetup	InstallerWindow		Boot Manager en DriveSetup afsluiten
-3)   When you successfully boot into Haiku for the first time, make sure to read our \"Userguide\" and take the \"Quick Tour\". There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3) Als je installatie gelukt is en Haiku opgestart de eerste keer, kijk dan ook naar onze \"Userguide\" En neem de \"Quick Tour\". Er zijn links op het bureaublad en in WebPositive's bladwijzers.\n\n
 Tools	InstallerWindow		Gereedschap
 scanning…	InstallerWindow		Scant…
 Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be formatted with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Start de DriveSetup toepassing om partities\naan te maken in de beschikbare schijven en andere media.\nPartities kunnen geformatteerd worden met\nhet Be bestandssysteem nodig om een Haiku\npartitie op te starten.
-2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Userguide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2)   De Installer zal de Haikupartities zelf opstartbaar maken, maar het zal verder niets doen om Haiku in bestaande opstartmenu's te integreren. Als u GRUB reeds geïnstalleerd heeft, kan u Haiku daaraan toevoegen.\nVoor details, raadpleeg de gids over het starten van Haiku op onze website op https://www.haiku-os.org/guides/booting.\nOf u kan het opstartmenu vanuit het \'Hulpmiddelen\'-menu van de Installer instellen, zie het onderwerp \"BootManager\" in de gebruikersgids.\n\n\n
 Set up boot menu	InstallerWindow		Boot-menu opzetten
 Continue	InstallerApp		Doorgaan

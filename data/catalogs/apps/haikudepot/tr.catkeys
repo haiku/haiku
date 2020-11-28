@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-HaikuDepot	772859472
+1	turkish	x-vnd.Haiku-HaikuDepot	2792101273
 Repository update error	LocalRepositoryUpdateProcess		Depo güncelleme hatası
 Network error	ServerHelper		Ağ hatası
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Depo güncellenirken bir hata oluştu: %error%
@@ -131,7 +131,6 @@ Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Başv
 Stability:	RatePackageWindow		Kararlılık:
 The usage agreement must be agreed to and a confirmation should be made that the person creating the user meets the minimum age requirement.	UserLoginWindow		Kullanım koşullarını onaylamalı ve kullanıcıyı oluşturan kişinin en az yaş gerekliliğini sağladığını doğrulamalısınız.
 A validation error has occurred	ServerHelper		Bir doğrulama hatası oluştu
-While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	MainWindow		Paket verisi güncellenirken verinin uygulama görünümünden kaybolmasına veya eksik olmasına neden olan bir sorun oluştu. Sorun hakkında ayrıntılı bilgi uygulama günlüklerinden alınabilir.\nGünlüklerin görüntülenmesi ile ilgili bilgiye kullanıcı kılavuzunun Haiku Depo bölümünden ulaşılabilir.
 The nickname is required.	UserLoginWindow		Takma ad gerekli.
 Source packages	MainWindow		Kaynak paketleri
 -	no package size		-
@@ -159,7 +158,6 @@ Captcha error	UserLoginWindow		CAPTCHA hatası
 The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		Takma adınız daha önce başkası tarafından alınmış. Başka bir takma ad seçin.
 Manage repositories…	MainWindow		Depoları yönet…
 Fetching remote repository data	LocalRepositoryUpdateProcess		Uzak depo bilgisi alınıyor
-An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	UserLoginWindow		Yeni bir kullanıcı oluşturma için gerekli olan kullanım koşulları indirilirken bir hata oluştu. Ayrıntılar için günlüğü denetleyin ve yeniden deneyin.\nGünlüklerin görüntülenmesi ile ilgili bilgiye kullanıcı kılavuzunun Haiku Depo bölümünden ulaşılabilir.
 Description	PackageListView		Tanım
 Open %DeskbarLink%	PackageManager		Aç: %DeskbarLink%
 User creation error	UserLoginWindow		Kullanıcı oluşturma hatası

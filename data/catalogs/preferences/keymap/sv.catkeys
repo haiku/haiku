@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Keymap	2700190052
+1	swedish	x-vnd.Haiku-Keymap	2850776429
 Key	Modifier keys window	As in a computer keyboard key	Tangent
 Japanese	KeymapNames		Japanska
 US	KeymapNames		US
@@ -6,6 +6,7 @@ PG ↑	Keyboard Layout View	Very short for 'page up'	SU
 Brazilian	KeymapNames		Brasilianska
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (US)
 Right control	Keyboard Layout View		Höger kontroll
+X-Bows Nature	KeyboardLayoutNames		X-Bows Natur
 Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Alternativ:
 Cancel	Modifier keys window		Avbryt

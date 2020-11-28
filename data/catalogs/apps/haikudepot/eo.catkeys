@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-HaikuDepot	772859472
+1	esperanto	x-vnd.Haiku-HaikuDepot	2792101273
 Repository update error	LocalRepositoryUpdateProcess		Eraro dum ĝisdatigo de deponejo
 Network error	ServerHelper		Eraro de reto
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Eraro okazis dum aktualigo de la deponejo: %error%
@@ -131,7 +131,6 @@ Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Sinkr
 Stability:	RatePackageWindow		Stabileco:
 The usage agreement must be agreed to and a confirmation should be made that the person creating the user meets the minimum age requirement.	UserLoginWindow		La uza interkonsento devas esti alkonsentita, kun konfirmo, ke la persono faranta la uzanton plenumas la minimuman aĝan postulon.
 A validation error has occurred	ServerHelper		Valideca eraro okazis
-While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	MainWindow		Dum ĝisdatiĝo de datuma pakaĵo aperis problemo kiu povas kaŭzi eksdatiĝon aŭ mankon de la programa videbleco. Aldonajn detalojn pri la problemo vi povas trovi en la protokoloj de programa laboro.\nInformoj kiel rogardi protokolojn estas en la sekcio pri la HaikuTenejo de la manlibro por uzantoj.
 The nickname is required.	UserLoginWindow		La kromnomo estas deviga.
 Source packages	MainWindow		Fontaj pakaĵoj
 -	no package size		-
@@ -159,7 +158,6 @@ Captcha error	UserLoginWindow		Kapĉa eraro
 The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		La kromnomo devas esti unika, sed la donita kromnomo jam estas posedita. Elektu alian kromnomon.
 Manage repositories…	MainWindow		Administri deponejojn…
 Fetching remote repository data	LocalRepositoryUpdateProcess		Elŝutado de fora deponeja datumo
-An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	UserLoginWindow		Eraro estiĝis dum la elŝutado de uzkondiĉoj bezonata por farigi novan uzanton. Kontrolu la protokolon por detaloj kaj reprovu. \nInformoj pri vidi la protokolojn estas en la sekcio pri HaikuTenejo de la manlibro por uzantoj.
 Description	PackageListView		Priskribo
 Open %DeskbarLink%	PackageManager		Uzi %DeskbarLink%-on
 User creation error	UserLoginWindow		Uzanta kreada eraro

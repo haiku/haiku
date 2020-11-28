@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-HaikuDepot	772859472
+1	finnish	x-vnd.Haiku-HaikuDepot	2792101273
 Repository update error	LocalRepositoryUpdateProcess		Tietovaraston päivitysvirhe
 Network error	ServerHelper		Verkkovirhe
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Tietovaraston päivityksen yhteydessä tapahtui virhe: %error%
@@ -131,7 +131,6 @@ Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Synkr
 Stability:	RatePackageWindow		Stabiilisuus:
 The usage agreement must be agreed to and a confirmation should be made that the person creating the user meets the minimum age requirement.	UserLoginWindow		Käyttäjäehdot on hyväksyttävä ja on vahvistettava, että uuden käyttäjän luova henkilö täyttää alaikärajavaatimuksen.
 A validation error has occurred	ServerHelper		Tapahtui kelpuutusvirhe
-While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	MainWindow		Pakkaustietoja päivitettäessä syntyy pulma, joka voi aiheuttaa tietojen vanhentumisen tai puuttumisen sovelluksen näytöltä. Lisätietoja tästä pulmasta saatetaan saada sovelluksen lokitiedostoista.\nTietoja siitä kuinka katsotaan lokitiedostoja on saatavilla HaikuVaraston käyttöohjeesta.
 The nickname is required.	UserLoginWindow		Vaaditaan käyttäjätunnus.
 Source packages	MainWindow		Lähdekoodipakkaukset
 -	no package size		-
@@ -159,7 +158,6 @@ Captcha error	UserLoginWindow		Captcha-virhe
 The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		Käyttäjätunnuksen on oltava uniikki, mutta tarjottu käyttäjätunnus on jo käytössä. Valitse erilainen käyttäjätunnus.
 Manage repositories…	MainWindow		Hallinnoi tietovarastoja...
 Fetching remote repository data	LocalRepositoryUpdateProcess		Noudetaan etätietovaraston tietoja
-An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	UserLoginWindow		Uuden käyttäjän luomiseen tarvittavien käyttöehtojen lataaminen epäonnistui. Tarkista yksityiskohdat lokitiedostosta ja yritä uudelleen.\nTietoja siitä, kuinka katsotaan lokitiedostoja on saatavilla HaikuVaraston käyttöohjeesta.
 Description	PackageListView		Kuvaus
 Open %DeskbarLink%	PackageManager		Avaa %DeskbarLink%
 User creation error	UserLoginWindow		Käyttäjän luomisen virhe

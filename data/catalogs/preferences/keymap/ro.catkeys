@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Keymap	2700190052
+1	romanian	x-vnd.Haiku-Keymap	2850776429
 Key	Modifier keys window	As in a computer keyboard key	Tastă
 Japanese	KeymapNames		Japoneză
 US	KeymapNames		US
@@ -6,6 +6,7 @@ PG ↑	Keyboard Layout View	Very short for 'page up'	PG ↑
 Brazilian	KeymapNames		Brazilian
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (US)
 Right control	Keyboard Layout View		Control dreapta
+X-Bows Nature	KeyboardLayoutNames		Natura X-Bows
 Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Opțiune:
 Cancel	Modifier keys window		Anulează

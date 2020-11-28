@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-HaikuDepot	772859472
+1	german	x-vnd.Haiku-HaikuDepot	2792101273
 Repository update error	LocalRepositoryUpdateProcess		Fehler bei Paketquellenaktualisierung
 Network error	ServerHelper		Netzwerk Fehler
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Fehler bei der Aktualisierung der Paketquelle: %error%
@@ -131,7 +131,6 @@ Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Synch
 Stability:	RatePackageWindow		Stabilität:
 The usage agreement must be agreed to and a confirmation should be made that the person creating the user meets the minimum age requirement.	UserLoginWindow		Die Nutzungsbedingungen müssen akzeptiert werden und der anzulegende Benutzer muss das geforderte Mindestalter haben.
 A validation error has occurred	ServerHelper		Fehler bei der Validieren
-While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	MainWindow		Bei der Aktualisierung von Paketdaten trat ein Problem auf. Dadurch könnten die angezeigten Daten der Anwendung veraltet sein oder fehlen. Weitere Details zu diesem Problem können dem Anwendungs-Log entnommen werden.\nWie diese Logs angezeigt werden können, steht im Im Kapitel 'HaikuDepot ' des Userguide.
 The nickname is required.	UserLoginWindow		Der Benutzername wird benötigt.
 Source packages	MainWindow		Quellcode-Pakete
 -	no package size		-
@@ -159,7 +158,6 @@ Captcha error	UserLoginWindow		Captcha Fehler
 The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		Der Benutzername existiert bereits; bitte einen anderen probieren.
 Manage repositories…	MainWindow		Paketquellen verwalten…
 Fetching remote repository data	LocalRepositoryUpdateProcess		Abrufen von Paketquellendaten
-An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	UserLoginWindow		Beim Herunterladen der Nutzungsbedingungen für die Erstellung eines neuen Benutzerkontos ist ein Fehler aufgetreten. Bitte Log prüfen und nochmal probieren.\nWie diese Logs angezeigt werden können, steht im Im Kapitel 'HaikuDepot ' des Userguide.
 Description	PackageListView		Beschreibung
 Open %DeskbarLink%	PackageManager		%DeskbarLink% öffnen
 User creation error	UserLoginWindow		Fehler beim Erstellen des Benutzerkontos

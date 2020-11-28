@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-Installer	1157374200
+1	indonesian	x-vnd.Haiku-Installer	1075045498
 Performing installation.	InstallProgress		Melakukan instalasi.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Pilih disk sumber dari menu pop-up. Lalu klik \"Begin\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Silakan tutup jendela DriveSetup sebelum menutup jendela Installer.
@@ -72,6 +72,5 @@ Onto:	InstallerWindow		Keatas:
 Quit Boot Manager and DriveSetup	InstallerWindow		Keluar dari Boot Manager dan DriveSetup
 Tools	InstallerWindow		Alat
 scanning…	InstallerWindow		pemindaian…
-2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Userguide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2)   Installer akan membuat partisi Haiku dapat di-boot, tetapi tidak melangkah untuk mengintegrasikan Haiku ke dalam menu boot yang ada. Jika Anda sudah menginstal GRUB, Anda dapat menambahkan Haiku ke sana.\nUntuk detailnya, silakan baca panduan tentang mem-boot Haiku di situs web kami di https://www.haiku-os.org/guides/booting.\nAtau Anda dapat mengatur menu boot dari menu Installer \"Tools \", lihat topik Panduan pengguna pada aplikasi \"BootManager\".\n\n\n
 Set up boot menu	InstallerWindow		Atur menu boot
 Continue	InstallerApp		Lanjut

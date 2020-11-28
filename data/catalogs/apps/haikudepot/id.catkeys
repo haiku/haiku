@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-HaikuDepot	3059528843
+1	indonesian	x-vnd.Haiku-HaikuDepot	783803348
 Repository update error	LocalRepositoryUpdateProcess		Kesalahan pembaruan repositori
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Terjadi kesalahan saat menyegarkan repositori: %error%
 User Created	UserLoginWindow		Pengguna Dibuat
@@ -126,7 +126,6 @@ Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Menyi
 Stability:	RatePackageWindow		Kestabilan:
 The usage agreement must be agreed to and a confirmation should be made that the person creating the user meets the minimum age requirement.	UserLoginWindow		Perjanjian penggunaan harus disepakati dan konfirmasi harus dibuat bahwa orang yang membuat pengguna memenuhi persyaratan usia minimum.
 A validation error has occurred	ServerHelper		Kesalahan validasi telah terjadi
-While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	MainWindow		Saat memperbarui data paket, muncul masalah yang dapat menyebabkan data menjadi usang atau hilang dari tampilan aplikasi. Rincian tambahan tentang masalah ini mungkin dapat diperoleh dari log aplikasi.\nInformasi tentang cara melihat log tersedia di bagian HaikuDepot pada panduan pengguna.
 The nickname is required.	UserLoginWindow		Nama panggilan diperlukan.
 Source packages	MainWindow		Paket sumber
 -	no package size		-
@@ -153,7 +152,6 @@ Captcha error	UserLoginWindow		Kesalahan captcha
 The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		Nama panggilan harus unik, tetapi nama panggilan yang diberikan sudah diambil. Pilih nama panggilan yang berbeda.
 Manage repositories…	MainWindow		Kelola repositori…
 Fetching remote repository data	LocalRepositoryUpdateProcess		Mengambil data repositori jarak jauh
-An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	UserLoginWindow		Terjadi kesalahan saat mengunduh kondisi penggunaan yang diperlukan untuk membuat pengguna baru. Periksa log untuk detailnya dan coba lagi.\nInformasi tentang cara melihat log tersedia di bagian HaikuDepot pada panduan pengguna.
 Description	PackageListView		Deskripsi
 Open %DeskbarLink%	PackageManager		Buka %DeskbarLink%
 User creation error	UserLoginWindow		Kesalahan pembuatan pengguna

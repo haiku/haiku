@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-HaikuDepot	772859472
+1	portuguese	x-vnd.Haiku-HaikuDepot	2792101273
 Repository update error	LocalRepositoryUpdateProcess		Erro na atualização de repositório
 Network error	ServerHelper		Erro de rede
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Ocorreu um erro ao atualizar o repositório: %error%
@@ -131,7 +131,6 @@ Synchronizing reference data from server	ServerReferenceDataUpdateProcess		A sin
 Stability:	RatePackageWindow		Estabilidade:
 The usage agreement must be agreed to and a confirmation should be made that the person creating the user meets the minimum age requirement.	UserLoginWindow		É necessário ler e aceitar os termos de utilização, e confirmar que a pessoa que está a criar o utilizador preenche os requisitos mínimos de idade.
 A validation error has occurred	ServerHelper		Ocorreu um erro de validação
-While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	MainWindow		Durante a atualização dos dados de pacotes, surgiu um problema que pode fazer com que os dados apresentados na aplicação fiquem desatualizados ou em falta. Nos registos da aplicação poderá ser possível encontrar mais detalhes sobre este problema.\nNa secção do manual de utilizador sobre o HaikuDepot, poderá encontrar informação sobre como visualizar os registos.
 The nickname is required.	UserLoginWindow		É necessário introduzir a alcunha.
 Source packages	MainWindow		Pacotes de código-fonte
 -	no package size		-
@@ -159,7 +158,6 @@ Captcha error	UserLoginWindow		Erro de captcha
 The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		A alcunha deve ser única, mas a alcunha introduzida já existe. Por favor, escolha uma nova.
 Manage repositories…	MainWindow		Gerir repositórios…
 Fetching remote repository data	LocalRepositoryUpdateProcess		A obter dados do repositório remoto
-An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	UserLoginWindow		Oc ore um erro ao descarregar as condições de utilização necessárias para criar um novo utilizador. Verifique o registo para mais detalhes e tente novamente. \nNa secção do manual de utilizador sobre o HaikuDepot, poderá encontrar informação sobre como visualizar os registos.
 Description	PackageListView		Descrição
 Open %DeskbarLink%	PackageManager		Abrir %DeskbarLink%
 User creation error	UserLoginWindow		Erro ao criar utilizador

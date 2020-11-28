@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Keymap	2700190052
+1	hungarian	x-vnd.Haiku-Keymap	2850776429
 Key	Modifier keys window	As in a computer keyboard key	Billentyű
 Japanese	KeymapNames		Japán
 US	KeymapNames		Egyesült Államok
@@ -6,6 +6,7 @@ PG ↑	Keyboard Layout View	Very short for 'page up'	PG ↑
 Brazilian	KeymapNames		Brazil
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (Egyesült Államok)
 Right control	Keyboard Layout View		Jobb Ctrl
+X-Bows Nature	KeyboardLayoutNames		X-Bows Nature
 Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Opció billentyű
 Cancel	Modifier keys window		Mégse

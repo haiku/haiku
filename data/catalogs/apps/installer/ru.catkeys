@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Installer	1157374200
+1	russian	x-vnd.Haiku-Installer	1075045498
 Performing installation.	InstallProgress		Выполняется установка…
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Выберите источник из выпадающего меню. Затем нажмите кнопку \"Установить\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Пожалуйста, закройте окно разметки диска перед закрытием окна Установщика.
@@ -72,6 +72,5 @@ Onto:	InstallerWindow		На диск:
 Quit Boot Manager and DriveSetup	InstallerWindow		Закройте Менеджер загрузки и Разметку диска
 Tools	InstallerWindow		Инструменты
 scanning…	InstallerWindow		сканирование…
-2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Userguide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2) Установщик сделает раздел с Haiku загрузочным, но не предпримет никаких действий для интеграции Haiku в существующее загрузочное меню. Если у вас уже установлен GRUB, то вы можете добавить Haiku в его загрузочное меню.\nДля дополнительной информации обратитесь к руководству по загрузке Haiku на нашем сайте https://www.haiku-os.org/guides/booting.\nИли вы можете установить загрузочное меню из меню Установщика \"Инструменты\", смотрите руководство по приложению \"Загрузчик\".\n\n\n
 Set up boot menu	InstallerWindow		Установить загрузочное меню
 Continue	InstallerApp		Продолжить

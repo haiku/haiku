@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Keymap	2700190052
+1	turkish	x-vnd.Haiku-Keymap	2850776429
 Key	Modifier keys window	As in a computer keyboard key	Düğme
 Japanese	KeymapNames		Japonca
 US	KeymapNames		ABD
@@ -6,6 +6,7 @@ PG ↑	Keyboard Layout View	Very short for 'page up'	PG ↑
 Brazilian	KeymapNames		Brezilya
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (US)
 Right control	Keyboard Layout View		Sağ Ctrl
+X-Bows Nature	KeyboardLayoutNames		X-Bows Nature
 Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Seçenek:
 Cancel	Modifier keys window		İptal

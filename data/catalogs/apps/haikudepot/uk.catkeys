@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-HaikuDepot	772859472
+1	ukrainian	x-vnd.Haiku-HaikuDepot	2792101273
 Repository update error	LocalRepositoryUpdateProcess		Помилка оновлення репозитарія 
 Network error	ServerHelper		Помилка мережі
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Під час оновлення репозитарія сталася помилка: %error%
@@ -131,7 +131,6 @@ Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Си�
 Stability:	RatePackageWindow		Стабільність:
 The usage agreement must be agreed to and a confirmation should be made that the person creating the user meets the minimum age requirement.	UserLoginWindow		Угода про використання має бути узгоджена та має бути підтверджено, що особа, яка створює користувача, відповідає вимогам мінімального віку.
 A validation error has occurred	ServerHelper		Сталася помилка перевірки достовірності
-While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	MainWindow		Під час оновлення даних пакету виникла проблема, яка може призвести до відображення програмою застарілих даних або дані будуть відсутні. Додаткові відомості щодо цієї проблеми можуть бути отримані з журналів програми.\nІнформація про те, як переглянути журнали, доступна в розділі HaikuDepot посібника користувача.
 The nickname is required.	UserLoginWindow		Псевдонім обов'язковий.
 Source packages	MainWindow		Пакети з вихідними текстами
 -	no package size		-
@@ -159,7 +158,6 @@ Captcha error	UserLoginWindow		Помилкова капча
 The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		Псевдонім повинен бути унікальним, а запропонований псевдонім вже існує. Вигадайте інший нікнейм.
 Manage repositories…	MainWindow		Управління репозитаріями…
 Fetching remote repository data	LocalRepositoryUpdateProcess		Отримання даних з віддаленого репозитарія
-An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	UserLoginWindow		Виникла помилка при завантаженні Умов використання, необхідних для створення нового користувача. Перевірте журнал для отримання детальної інформації та спробуйте ще раз.\nІнформація про те, як переглянути журнали, доступна в розділі HaikuDepot посібника користувача.
 Description	PackageListView		Опис
 Open %DeskbarLink%	PackageManager		Відкрити %DeskbarLink%
 User creation error	UserLoginWindow		Помилка створення користувача

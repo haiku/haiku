@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Installer	1157374200
+1	greek, modern (1453-)	x-vnd.Haiku-Installer	1075045498
 Performing installation.	InstallProgress		Η εγκατάσταση είναι σε εξέλιξη.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Επιλέξτε το δίσκο προέλευσης από το αναδυόμενο μενού. Στη συνέχεια, κάντε κλικ στην \"Έναρξη\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Παρακαλώ κλείστε το παράθυρο Διαχειριστή Δίσκου, πριν κλείσετε το Πρόγραμμα Εγκατάστασης.
@@ -72,6 +72,5 @@ Onto:	InstallerWindow		Σε:
 Quit Boot Manager and DriveSetup	InstallerWindow		Έξοδος από το Διαχειριστή Εκκίνησης και από τη Διαχείρηση Δίσκου
 Tools	InstallerWindow		Εργαλεία
 scanning…	InstallerWindow		αναζήτηση…
-2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Userguide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2)   Το πρόγραμμα εγκατάστασης θα κάνει την κατάτμηση του Haiku εκκινήσημη, αλλά δεν θα προσπαθήσει να προσθέσει το Haiku σε ένα προϋπάρχον μενού εκκίνησης. Αν έχετε ήδη εγκαταστήσει το GRUB, μπορείτε να προσθέσετε το Haiku σε αυτό.\nΓια λεπτομέρειες, συμβουλευτείτε τον οδηγό για την εκκίνηση του Haiku στην ιστοσελίδα μας: https://www.haiku-os.org/guides/booting.\nΕναλλακτικά, μπορείτε να ρυθμίσετε ένα μενού εκκίνησης από το μενού \"Εργαλεία\" του Προγράμματος Εγκατάστασης, ανατρέξτε το λήμμα του Εγχειριδίου Χρήσης στην εφαρμογή \"Διαχειριστής Εκκίνησης\".\n\n\n
 Set up boot menu	InstallerWindow		Ρύθμιση μενού εκκίνησης
 Continue	InstallerApp		Συνέχεια

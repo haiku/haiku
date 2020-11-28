@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	3669766136
+1	hungarian	x-vnd.Haiku-libtracker	2498612740
 Created	ContainerWindow		Létrehozva
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Megnyitás és előnyben részesítés
@@ -270,6 +270,7 @@ home	B_USER_DIRECTORY		Saját mappa
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Új Nyomkövető sablon
 Disk mounting during boot	AutoMounterSettings		Lemezek csatolása bekapcsoláskor
 Don't automount	AutoMounterSettings		Ne csatoljon automatikusan
+Node ref	AttributesView		Node ref
 Could not find application \"%appname\"	OpenWithWindow		A program (%appname) nem található
 Unmatched parenthesis.	libtracker		Páratlan zárójel.
 Extended attribute	AttributesView		Kiegészített jellemzők
@@ -520,6 +521,7 @@ Create a Query	FindPanel		Keresési sablon létrehozása
 Close	QueryContainerWindow		Bezárás
 I know what I'm doing	FSUtils	button label	Tudom, mit csinálok
 Preparing to copy items…	StatusWindow		Felkészülés az elemek másolására…
+Entry ref	AttributesView		Entry ref
 Icon view	ContainerWindow		Ikon nézet
 Name	ContainerWindow		Név
 Preferred for %type	OpenWithWindow		Előnyben részesítve ehhez: %type

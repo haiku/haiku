@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Installer	3292013609
+1	catalan; valencian	x-vnd.Haiku-Installer	1288089140
 Performing installation.	InstallProgress		Es fa la instal·lació.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Trieu el disc d'origen des del menú emergent. Llavors cliqueu a Comença.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Si us plau, tanqueu la finestra del Gestor de discs abans de tancar la finestra de l'instal·lador.
@@ -75,10 +75,8 @@ Running Boot Manager and DriveSetup…\n\nClose both applications to continue wi
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Segur que voleu instal·lar al disc d'arrencada actual? L'Instal·lador haurà de reiniciar la màquina si continueu.
 Onto:	InstallerWindow		Cap a:
 Quit Boot Manager and DriveSetup	InstallerWindow		Surt del Gestor d'arrencada i del Gestor de discs
-3)   When you successfully boot into Haiku for the first time, make sure to read our \"Userguide\" and take the \"Quick Tour\". There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Quan arrenqueu correctament el Haiku per primer cop, assegureu-vos de llegir la \"Guia de l'usuari\" i feu-ne la \"Visita ràpida\". N'hi ha enllaços a l'escriptori i a les adreces d'interès del WebPositive.\n\n
 Tools	InstallerWindow		Eines
 scanning…	InstallerWindow		s'escaneja...
 Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be formatted with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Useu la utilitat DriveSetup per fer particions\nals discs durs disponibles i a altres mitjans.\nLes particions es poden formatar amb el sistema\nde fitxers Be, necessari per a la partició\nd'arrencada del Haiku.
-2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Userguide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2)   L’instal·lador farà que la partició del Haiku sigui arrencable, però no fa cap pas per integrar el Haiku al menú d’arrencada existent. Si ja heu instal·lat el GRUB, podeu afegir-hi el Haiku.\nPer obtenir més informació, consulteu la guia d’arrencada del Haiku al nostre lloc web https://www.haiku-os.org/guides/booting.\nO bé podeu configurar un menú d'arrencada des del menú \"Eines\" de l'instal·lador, consulteu el tema de la guia de l'usuari sobre l'aplicació \"Gestor d'arrencada\".\n\n\n
 Set up boot menu	InstallerWindow		Opcions del menú d'arrencada
 Continue	InstallerApp		Continua

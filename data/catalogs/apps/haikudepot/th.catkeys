@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-HaikuDepot	3059528843
+1	thai	x-vnd.Haiku-HaikuDepot	783803348
 Repository update error	LocalRepositoryUpdateProcess		ข้อผิดพลาดการอัพเดตที่เก็บ
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		เกิดข้อผิดพลาดขณะรีเฟรชที่เก็บ: %error%
 User Created	UserLoginWindow		ผู้ใช้ถูกสร้างแล้ว
@@ -126,7 +126,6 @@ Synchronizing reference data from server	ServerReferenceDataUpdateProcess		ก�
 Stability:	RatePackageWindow		ความเสถียร:
 The usage agreement must be agreed to and a confirmation should be made that the person creating the user meets the minimum age requirement.	UserLoginWindow		ข้อตกลงการใช้งานจะต้องได้รับการยอมรับและควรทำการยืนยันว่าบุคคลที่สร้างผู้ใช้เป็นไปตามข้อกำหนดอายุขั้นต่ำ
 A validation error has occurred	ServerHelper		เกิดข้อผิดพลาดในการตรวจสอบความถูกต้อง
-While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	MainWindow		ขณะอัปเดตข้อมูลแพ็คเกจมีปัญหาเกิดขึ้นซึ่งอาจทำให้ข้อมูลล้าสมัยหรือหายไปจากการแสดงผลของแอปพลิเคชัน รายละเอียดเพิ่มเติมเกี่ยวกับปัญหานี้อาจหาได้จากบันทึกของแอปพลิเคชัน\nข้อมูลเกี่ยวกับวิธีดูบันทึกมีอยู่ในส่วน HaikuDepot ของคู่มือผู้ใช้
 The nickname is required.	UserLoginWindow		ต้องระบุชื่อเล่น
 Source packages	MainWindow		แพ็คเกจต้นทาง
 -	no package size		-
@@ -153,7 +152,6 @@ Captcha error	UserLoginWindow		ข้อผิดพลาด Captcha
 The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		ชื่อเล่นจะต้องไม่ซ้ำกัน แต่ชื่อเล่นที่ให้มาได้ถูกใช้ไปแล้ว เลือกชื่อเล่นอื่น
 Manage repositories…	MainWindow		จัดการที่เก็บ
 Fetching remote repository data	LocalRepositoryUpdateProcess		กำลังดึงข้อมูลที่เก็บข้อมูลระยะไกล
-An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	UserLoginWindow		เกิดข้อผิดพลาดในการดาวน์โหลดเงื่อนไขการใช้งานที่จำเป็นในการสร้างผู้ใช้ใหม่ ตรวจสอบบันทึกเพื่อดูรายละเอียดแล้วลองอีกครั้ง \nข้อมูลเกี่ยวกับวิธีดูบันทึกมีอยู่ในส่วน HaikuDepot ของคู่มือผู้ใช้
 Description	PackageListView		ลักษณะ
 Open %DeskbarLink%	PackageManager		เปิด %DeskbarLink%
 User creation error	UserLoginWindow		ข้อผิดพลาดในการสร้างผู้ใช้
