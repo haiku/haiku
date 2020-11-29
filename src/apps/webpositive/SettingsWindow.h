@@ -14,6 +14,7 @@ class BCheckBox;
 class BMenu;
 class BMenuField;
 class BMenuItem;
+class BSeparatorItem;
 class BSpinner;
 class BTextControl;
 class FontSelectionView;
@@ -64,6 +65,8 @@ private:
 			BTextControl*		fSearchPageControl;
 			BTextControl*		fDownloadFolderControl;
 
+			BMenuField*			fSearchPageMenu;
+
 			BMenuField*			fNewWindowBehaviorMenu;
 			BMenuItem*			fNewWindowBehaviorOpenHomeItem;
 			BMenuItem*			fNewWindowBehaviorOpenSearchItem;
@@ -110,4 +113,3 @@ private:
 
 
 #endif // SETTINGS_WINDOW_H
-

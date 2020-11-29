@@ -48,6 +48,7 @@ enum {
 
 	MSG_START_PAGE_CHANGED						= 'hpch',
 	MSG_SEARCH_PAGE_CHANGED						= 'spch',
+	MSG_SEARCH_PAGE_CHANGED_MENU				= 'spcm',
 	MSG_DOWNLOAD_FOLDER_CHANGED					= 'dnfc',
 	MSG_NEW_WINDOWS_BEHAVIOR_CHANGED			= 'nwbc',
 	MSG_NEW_TABS_BEHAVIOR_CHANGED				= 'ntbc',
@@ -192,6 +193,23 @@ SettingsWindow::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case MSG_SEARCH_PAGE_CHANGED_MENU:
+		{
+			BString searchString;
+			BMenuItem* source;
+			if (message->FindString("searchstring", &searchString) == B_OK) {
+				fSearchPageControl->SetText(searchString);
+				fSearchPageControl->SetEnabled(false);
+			} else
+				fSearchPageControl->SetEnabled(true);
+
+			if (message->FindPointer("source", (void**)&source) == B_OK)
+				source->SetMarked(true);
+
+			_ValidateControlsEnabledStatus();
+			break;
+		}
+
 		case MSG_START_PAGE_CHANGED:
 		case MSG_SEARCH_PAGE_CHANGED:
 		case MSG_DOWNLOAD_FOLDER_CHANGED:
@@ -256,19 +274,12 @@ SettingsWindow::_CreateGeneralPage(float spacing)
 	fStartPageControl->SetText(
 		fSettings->GetValue(kSettingsKeyStartPageURL, kDefaultStartPageURL));
 
-	fSearchPageControl = new BTextControl("search page",
-		B_TRANSLATE("Search page:"), "",
+	fSearchPageControl = new BTextControl("search page", "", "",
 		new BMessage(MSG_SEARCH_PAGE_CHANGED));
 	fSearchPageControl->SetModificationMessage(
 		new BMessage(MSG_SEARCH_PAGE_CHANGED));
-	fSearchPageControl->SetToolTip(B_TRANSLATE("%s - Search term"));
 	BString searchURL = fSettings->GetValue(kSettingsKeySearchPageURL,
 		kDefaultSearchPageURL);
-	if (searchURL == "http://www.google.com") {
-		// Migrate old settings files.
-		searchURL = kDefaultSearchPageURL;
-		fSettings->SetValue(kSettingsKeySearchPageURL, kDefaultSearchPageURL);
-	}
 	fSearchPageControl->SetText(searchURL);
 
 	fDownloadFolderControl = new BTextControl("download folder",
@@ -314,6 +325,25 @@ SettingsWindow::_CreateGeneralPage(float spacing)
 	fNewWindowBehaviorOpenHomeItem->SetMarked(true);
 	fNewTabBehaviorOpenBlankItem->SetMarked(true);
 	fStartUpBehaviorResumePriorSession->SetMarked(true);
+
+	BMenuItem* searchPageCustom = new BMenuItem(B_TRANSLATE("Custom"),
+		new BMessage(MSG_SEARCH_PAGE_CHANGED_MENU));
+	searchPageCustom->SetMarked(true);
+
+	BPopUpMenu* searchPageMenu = new BPopUpMenu("Search page:");
+	searchPageMenu->SetRadioMode(true);
+
+	for (int i = 0; kSearchEngines[i].url != NULL; i++) {
+		BMessage* message = new BMessage(MSG_SEARCH_PAGE_CHANGED_MENU);
+		message->AddString("searchstring", kSearchEngines[i].url);
+		searchPageMenu->AddItem(new BMenuItem(kSearchEngines[i].name, message));
+
+	}
+	searchPageMenu->AddItem(new BSeparatorItem());
+	searchPageMenu->AddItem(searchPageCustom);
+	fSearchPageMenu = new BMenuField("search page",
+		B_TRANSLATE("Search page:"), searchPageMenu);
+	fSearchPageMenu->SetToolTip(B_TRANSLATE("%s - Search term"));
 
 	BPopUpMenu* startUpBehaviorMenu = new BPopUpMenu("Start up");
 	startUpBehaviorMenu->AddItem(fStartUpBehaviorResumePriorSession);
@@ -367,23 +397,26 @@ SettingsWindow::_CreateGeneralPage(float spacing)
 	BView* view = BGroupLayoutBuilder(B_VERTICAL, 0)
 		.Add(BGridLayoutBuilder(spacing / 2, spacing / 2)
 			.Add(fStartPageControl->CreateLabelLayoutItem(), 0, 0)
-			.Add(fStartPageControl->CreateTextViewLayoutItem(), 1, 0)
+			.Add(fStartPageControl->CreateTextViewLayoutItem(), 1, 0, 4)
 
-			.Add(fSearchPageControl->CreateLabelLayoutItem(), 0, 1)
-			.Add(fSearchPageControl->CreateTextViewLayoutItem(), 1, 1)
+			.Add(fSearchPageMenu->CreateLabelLayoutItem(), 0, 1)
+			.Add(fSearchPageMenu->CreateMenuBarLayoutItem(), 1, 1)
+
+			.Add(fSearchPageControl->CreateLabelLayoutItem(), 2, 1)
+			.Add(fSearchPageControl->CreateTextViewLayoutItem(), 3, 1, 2)
 
 			.Add(fStartUpBehaviorMenu->CreateLabelLayoutItem(), 0, 2)
-			.Add(fStartUpBehaviorMenu->CreateMenuBarLayoutItem(), 1, 2)
+			.Add(fStartUpBehaviorMenu->CreateMenuBarLayoutItem(), 1, 2, 4)
 
 			.Add(fNewWindowBehaviorMenu->CreateLabelLayoutItem(), 0, 3)
-			.Add(fNewWindowBehaviorMenu->CreateMenuBarLayoutItem(), 1, 3)
+			.Add(fNewWindowBehaviorMenu->CreateMenuBarLayoutItem(), 1, 3, 4)
 
 			.Add(fNewTabBehaviorMenu->CreateLabelLayoutItem(), 0, 4)
-			.Add(fNewTabBehaviorMenu->CreateMenuBarLayoutItem(), 1, 4)
+			.Add(fNewTabBehaviorMenu->CreateMenuBarLayoutItem(), 1, 4, 4)
 
 			.Add(fDownloadFolderControl->CreateLabelLayoutItem(), 0, 5)
-			.Add(fDownloadFolderControl->CreateTextViewLayoutItem(), 1, 5)
-			.Add(fChooseButton, 2, 5)
+			.Add(fDownloadFolderControl->CreateTextViewLayoutItem(), 1, 5, 3)
+			.Add(fChooseButton, 4, 5)
 		)
 		.Add(BSpaceLayoutItem::CreateVerticalStrut(spacing))
 		.Add(new BSeparatorView(B_HORIZONTAL, B_PLAIN_BORDER))
@@ -717,8 +750,27 @@ SettingsWindow::_RevertSettings()
 	fStartPageControl->SetText(
 		fSettings->GetValue(kSettingsKeyStartPageURL, kDefaultStartPageURL));
 
-	fSearchPageControl->SetText(
-		fSettings->GetValue(kSettingsKeySearchPageURL, kDefaultSearchPageURL));
+	BString searchPage = fSettings->GetValue(kSettingsKeySearchPageURL,
+		kDefaultSearchPageURL);
+	fSearchPageControl->SetText(searchPage);
+
+	bool found = false;
+	BMenu* searchMenu = fSearchPageMenu->Menu();
+	int32 itemCount = searchMenu->CountItems() - 2;
+		// Ignore the two last items: separator and "custom"
+	for (int i = 0; i < itemCount; i++) {
+		BMenuItem* item = searchMenu->ItemAt(i);
+		BMessage* message = item->Message();
+		if (message->FindString("searchstring") == searchPage) {
+			item->SetMarked(true);
+			fSearchPageControl->SetEnabled(false);
+			found = true;
+			break;
+		}
+	}
+
+	if (!found)
+		searchMenu->ItemAt(searchMenu->CountItems() - 1)->SetMarked(true);
 
 	fDownloadFolderControl->SetText(
 		fSettings->GetValue(kSettingsKeyDownloadPath, kDefaultDownloadPath));
@@ -935,5 +987,3 @@ SettingsWindow::_ProxyPort() const
 {
 	return atoul(fProxyPortControl->Text());
 }
-
-

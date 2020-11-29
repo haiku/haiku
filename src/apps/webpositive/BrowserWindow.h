@@ -194,8 +194,6 @@ private:
 			void				_SetPageIcon(BWebView* view,
 									const BBitmap* icon);
 
-			void				_InitSearchEngines();
-
 			void				_UpdateHistoryMenu();
 			void				_UpdateClipboardItems();
 
@@ -283,14 +281,6 @@ private:
 			BMenuItem*			fBookmarkBarMenuItem;
 			BookmarkBar*		fBookmarkBar;
 			BFilePanel*			fSavePanel;
-			int					kSearchEngineCount = 8;
-			struct SearchEngine {
-				const char* shortcut;
-				const char* url;
-			};
-
-			// FIXME use a BObjectList
-			SearchEngine*		fSearchEngines;
 };
 
 
