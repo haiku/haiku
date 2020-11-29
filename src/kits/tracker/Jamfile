@@ -52,6 +52,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			IconCache.cpp
 			IconMenuItem.cpp
 			InfoWindow.cpp
+			LiveMenu.cpp
 			MimeTypeList.cpp
 			MiniMenuField.cpp
 			Model.cpp

@@ -79,6 +79,7 @@ All rights reserved.
 #include "FavoritesMenu.h"
 #include "FindPanel.h"
 #include "IconMenuItem.h"
+#include "LiveMenu.h"
 #include "MimeTypes.h"
 #include "Model.h"
 #include "MountMenu.h"
@@ -634,13 +635,13 @@ void
 BContainerWindow::AddContextMenus()
 {
 	// create context sensitive menus
-	fPoseContextMenu = new BPopUpMenu("PoseContext", false, false);
+	fPoseContextMenu = new TLivePosePopUpMenu("PoseContext", this, false, false);
 	AddPoseContextMenu(fPoseContextMenu);
 
 	fVolumeContextMenu = new BPopUpMenu("VolumeContext", false, false);
 	AddVolumeContextMenu(fVolumeContextMenu);
 
-	fWindowContextMenu = new BPopUpMenu("WindowContext", false, false);
+	fWindowContextMenu = new TLiveWindowPopUpMenu("WindowContext", this, false, false);
 	AddWindowContextMenu(fWindowContextMenu);
 
 	fDropContextMenu = new BPopUpMenu("DropContext", false, false);
@@ -714,11 +715,11 @@ BContainerWindow::RepopulateMenus()
 	}
 
 	delete fPoseContextMenu;
-	fPoseContextMenu = new BPopUpMenu("PoseContext", false, false);
+	fPoseContextMenu = new TLivePosePopUpMenu("PoseContext", this, false, false);
 	AddPoseContextMenu(fPoseContextMenu);
 
 	delete fWindowContextMenu;
-	fWindowContextMenu = new BPopUpMenu("WindowContext", false, false);
+	fWindowContextMenu = new TLiveWindowPopUpMenu("WindowContext", this, false, false);
 	AddWindowContextMenu(fWindowContextMenu);
 }
 
@@ -1695,11 +1696,11 @@ BContainerWindow::IsShowing(const entry_ref* entry) const
 void
 BContainerWindow::AddMenus()
 {
-	fFileMenu = new BMenu(B_TRANSLATE("File"));
+	fFileMenu = new TLiveFileMenu(B_TRANSLATE("File"), this);
 	AddFileMenu(fFileMenu);
 	fMenuBar->AddItem(fFileMenu);
 
-	fWindowMenu = new BMenu(B_TRANSLATE("Window"));
+	fWindowMenu = new TLiveWindowMenu(B_TRANSLATE("Window"), this);
 	fMenuBar->AddItem(fWindowMenu);
 	AddWindowMenu(fWindowMenu);
 
@@ -3458,7 +3459,7 @@ BContainerWindow::NewArrangeByMenu()
 	ASSERT(fAttrMenu);
 
 	// create a new "Arrange by >" menu
-	BMenu* menu = new BMenu(Shortcuts()->ArrangeByLabel());
+	TLiveArrangeByMenu* menu = new TLiveArrangeByMenu(Shortcuts()->ArrangeByLabel(), this);
 
 	// add Attributes items to "Arrange by >"
 	BMenuItem* item;
