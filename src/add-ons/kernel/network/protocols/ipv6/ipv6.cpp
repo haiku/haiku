@@ -350,9 +350,9 @@ FragmentPacket::AddFragment(uint16 start, uint16 end, net_buffer* buffer,
 		gBufferModule->remove_header(buffer, previous->fragment.end - start);
 		start = previous->fragment.end;
 	}
-	if (next != NULL && next->fragment.start < end) {
-		TRACE("    remove trailer %d bytes", next->fragment.start - end);
-		gBufferModule->remove_trailer(buffer, next->fragment.start - end);
+	if (next != NULL && end > next->fragment.start) {
+		TRACE("    remove trailer %d bytes", end - next->fragment.start);
+		gBufferModule->remove_trailer(buffer, end - next->fragment.start);
 		end = next->fragment.start;
 	}
 
