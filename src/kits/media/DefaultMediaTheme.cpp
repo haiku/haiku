@@ -884,7 +884,8 @@ DefaultMediaTheme::MakeViewFor(BParameter *parameter)
 			}
 
 			BSlider *slider = new Slider(parameter->Name(),
-				parameter->Name(), 0, 100, continuous);
+				parameter->Name(), int32(continuous.MinValue() * 1000),
+				int32(continuous.MaxValue() * 1000), continuous);
 
 			return slider;
 		}
