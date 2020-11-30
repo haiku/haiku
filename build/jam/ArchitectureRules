@@ -401,21 +401,14 @@ rule KernelArchitectureSetup architecture
 
 	switch $(cpu) {
 		case arm :
-			# Workaround for ld using 32k for alignment despite forcing it in the config...
-			# should definitely not be needed!
-			HAIKU_KERNEL_LINKFLAGS +=
-				-Wl,-z -Wl,max-page-size=0x1000
-				-Wl,-z -Wl,common-page-size=0x1000 ;
+			HAIKU_KERNEL_PIC_LINKFLAGS += -z max-page-size=0x1000 ;
+			HAIKU_KERNEL_ADDON_LINKFLAGS += -z max-page-size=0x1000 ;
+			HAIKU_KERNEL_PIC_CCFLAGS = -fno-pic ;
 
 		case arm64 :
-			# Workaround for ld using 32k for alignment despite forcing it in the config...
-			# should definitely not be needed!
-			HAIKU_KERNEL_LINKFLAGS +=
-				-Wl,-z -Wl,max-page-size=0x1000
-				-Wl,-z -Wl,common-page-size=0x1000 ;
-
-			HAIKU_KERNEL_PIC_CCFLAGS = -fPIC ;
-			HAIKU_KERNEL_PIC_LINKFLAGS = -shared -fPIC ;
+			HAIKU_KERNEL_PIC_LINKFLAGS += -z max-page-size=0x1000 ;
+			HAIKU_KERNEL_ADDON_LINKFLAGS += -z max-page-size=0x1000 ;
+			HAIKU_KERNEL_PIC_CCFLAGS = -fno-pic ;
 
 		case ppc :
 			# Build a position independent PPC kernel. We need to be able to

@@ -8,14 +8,20 @@ UsePrivateHeaders [ FDirName kernel boot platform efi ] ;
 local platform ;
 for platform in [ MultiBootSubDirSetup efi ] {
     on $(platform) {
+	{
+		local defines = _BOOT_MODE _BOOT_PLATFORM_EFI ;
+		defines = [ FDefines $(defines) ] ;
+		SubDirCcFlags $(defines) ;
+		SubDirC++Flags $(defines) -fno-rtti ;
+	}
 
 	local arch_src =
 		crt0-efi-$(TARGET_ARCH).S
 		entry.S
 		relocation_func.cpp
+		arch_mmu.cpp
 		arch_smp.cpp
 		arch_start.cpp
-		arch_mmu.cpp
 		arch_timer.cpp
 		;
 
