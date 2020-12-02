@@ -82,8 +82,13 @@ typedef struct {
 	::virtio_queue			ctrlQueue;
 
 	bool					nonblocking;
+	bool					promiscuous;
 	uint32					maxframesize;
-	uint8					macaddr[6];
+	ether_address_t			macaddr;
+
+#define MAX_MULTI 128
+	uint32					multiCount;
+	ether_address_t			multi[MAX_MULTI];
 
 } virtio_net_driver_info;
 
@@ -208,6 +213,62 @@ virtio_net_rx_enqueue_buf(virtio_net_driver_info* info, BufInfo* buf)
 }
 
 
+static status_t
+virtio_net_ctrl_exec_cmd(virtio_net_driver_info* info, int cmd, int value)
+{
+	struct {
+		struct virtio_net_ctrl_hdr hdr;
+		uint8 pad1;
+		uint8 onoff;
+		uint8 pad2;
+		uint8 ack;
+	} s __attribute__((aligned(2)));
+
+	s.hdr.net_class = VIRTIO_NET_CTRL_RX;
+	s.hdr.cmd = cmd;
+	s.onoff = value == 0;
+	s.ack = VIRTIO_NET_ERR;
+
+	physical_entry entries[3];
+	status_t status = get_memory_map(&s.hdr, sizeof(s.hdr), &entries[0], 1);
+	if (status != B_OK)
+		return status;
+	status = get_memory_map(&s.onoff, sizeof(s.onoff), &entries[1], 1);
+	if (status != B_OK)
+		return status;
+	status = get_memory_map(&s.ack, sizeof(s.ack), &entries[2], 1);
+	if (status != B_OK)
+		return status;
+
+	if (!info->virtio->queue_is_empty(info->ctrlQueue))
+		return B_ERROR;
+
+	status = info->virtio->queue_request_v(info->ctrlQueue, entries, 2, 1,
+		NULL);
+	if (status != B_OK)
+		return status;
+
+	while (!info->virtio->queue_dequeue(info->ctrlQueue, NULL, NULL))
+		spin(10);
+
+	return s.ack == VIRTIO_NET_OK ? B_OK : B_IO_ERROR;
+}
+
+
+static status_t
+virtio_net_set_promisc(virtio_net_driver_info* info, int value)
+{
+	return virtio_net_ctrl_exec_cmd(info, VIRTIO_NET_CTRL_RX_PROMISC, value);
+}
+
+
+static int
+vtnet_set_allmulti(virtio_net_driver_info* info, int value)
+{
+	return virtio_net_ctrl_exec_cmd(info, VIRTIO_NET_CTRL_RX_ALLMULTI, value);
+}
+
+
 #define ROUND_TO_PAGE_SIZE(x) (((x) + (B_PAGE_SIZE) - 1) & ~((B_PAGE_SIZE) - 1))
 
 
@@ -227,7 +288,8 @@ virtio_net_init_device(void* _info, void** _cookie)
 
 	info->virtio->negotiate_features(info->virtio_device,
 		VIRTIO_NET_F_STATUS | VIRTIO_NET_F_MAC | VIRTIO_NET_F_MTU
-		/* VIRTIO_NET_F_CTRL_VQ | VIRTIO_NET_F_MQ */,
+		| VIRTIO_NET_F_CTRL_VQ | VIRTIO_NET_F_CTRL_RX
+		/* | VIRTIO_NET_F_MQ */,
 		 &info->features, &get_feature_name);
 
 	if ((info->features & VIRTIO_NET_F_MQ) != 0
@@ -675,8 +737,7 @@ virtio_net_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 	switch (op) {
 		case ETHER_GETADDR:
 			TRACE("ioctl: get macaddr\n");
-			memcpy(buffer, &info->macaddr, sizeof(info->macaddr));
-			return B_OK;
+			return user_memcpy(buffer, &info->macaddr, sizeof(info->macaddr));
 
 		case ETHER_INIT:
 			TRACE("ioctl: init\n");
@@ -684,26 +745,95 @@ virtio_net_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 
 		case ETHER_GETFRAMESIZE:
 			TRACE("ioctl: get frame size\n");
-			*(uint32*)buffer = info->maxframesize;
-			return B_OK;
+			if (length != sizeof(info->maxframesize))
+				return B_BAD_VALUE;
+
+			return user_memcpy(buffer, &info->maxframesize,
+				sizeof(info->maxframesize));
 
 		case ETHER_SETPROMISC:
+		{
 			TRACE("ioctl: set promisc\n");
-			break;
-
+			int32 value;
+			if (length != sizeof(value))
+				return B_BAD_VALUE;
+			if (user_memcpy(&value, buffer, sizeof(value)) != B_OK)
+				return B_BAD_ADDRESS;
+			if (info->promiscuous == value)
+				return B_OK;
+			info->promiscuous = value;
+			return virtio_net_set_promisc(info, value);
+		}
 		case ETHER_NONBLOCK:
-			info->nonblocking = *(int32*)buffer == 0;
-			TRACE("ioctl: non blocking ? %s\n", info->nonblocking ? "yes" : "no");
+		{
+			TRACE("ioctl: non blocking ? %s\n",
+				info->nonblocking ? "yes" : "no");
+			int32 value;
+			if (length != sizeof(value))
+				return B_BAD_VALUE;
+			if (user_memcpy(&value, buffer, sizeof(value)) != B_OK)
+				return B_BAD_ADDRESS;
+			info->nonblocking = value == 0;
 			return B_OK;
-
+		}
 		case ETHER_ADDMULTI:
+		{
+			uint32 i, multiCount = info->multiCount;
 			TRACE("ioctl: add multicast\n");
-			break;
 
+			if ((info->features & VIRTIO_NET_F_CTRL_RX) == 0)
+				return B_NOT_SUPPORTED;
+
+			if (multiCount == MAX_MULTI)
+				return B_ERROR;
+
+			for (i = 0; i < multiCount; i++) {
+				if (memcmp(&info->multi[i], buffer,
+					sizeof(info->multi[0])) == 0) {
+					break;
+				}
+			}
+
+			if (i == multiCount) {
+				memcpy(&info->multi[i], buffer, sizeof(info->multi[i]));
+				info->multiCount++;
+			}
+			if (info->multiCount == 1) {
+				TRACE("Enabling multicast\n");
+				vtnet_set_allmulti(info, 1);
+			}
+
+			return B_OK;
+		}
 		case ETHER_REMMULTI:
+		{
+			uint32 i, multiCount = info->multiCount;
 			TRACE("ioctl: remove multicast\n");
-			break;
 
+			if ((info->features & VIRTIO_NET_F_CTRL_RX) == 0)
+				return B_NOT_SUPPORTED;
+
+			for (i = 0; i < multiCount; i++) {
+				if (memcmp(&info->multi[i], buffer,
+					sizeof(info->multi[0])) == 0) {
+					break;
+				}
+			}
+
+			if (i != multiCount) {
+				if (i < multiCount - 1) {
+					memmove(&info->multi[i], &info->multi[i + 1],
+						sizeof(info->multi[i]) * (multiCount - i - 1));
+				}
+				info->multiCount--;
+				if (info->multiCount == 0) {
+					TRACE("Disabling multicast\n");
+					vtnet_set_allmulti(info, 0);
+				}
+				return B_OK;
+			}
+			return B_BAD_VALUE;
+		}
 		case ETHER_GET_LINK_STATE:
 		{
 			TRACE("ioctl: get link state\n");
