@@ -545,6 +545,12 @@ IOCache::_TransferPages(size_t firstPage, size_t pageCount, bool isWrite,
 		}
 	}
 
+	// Don't try to read past the end of the device just to fill a page;
+	// this makes sure that sum(fVecs[].length) == requestLength
+	generic_size_t padLength = B_PAGE_SIZE - requestLength % B_PAGE_SIZE;
+	if (vecCount > 0 && padLength != B_PAGE_SIZE)
+		fVecs[vecCount - 1].length -= padLength;
+
 	// create a request for the transfer
 	IORequest request;
 	status_t error = request.Init(firstPageOffset, fVecs, vecCount,
