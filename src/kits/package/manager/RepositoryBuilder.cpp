@@ -210,7 +210,7 @@ BRepositoryBuilder::AddPackagesDirectory(const char* path)
 	DIR* dir = opendir(path);
 	if (dir == NULL)
 		DIE(errno, "failed to open package directory \"%s\"", path);
-	CObjectDeleter<DIR, int> dirCloser(dir, &closedir);
+	CObjectDeleter<DIR, int, closedir> dirCloser(dir);
 
 	// iterate through directory entries
 	while (dirent* entry = readdir(dir)) {

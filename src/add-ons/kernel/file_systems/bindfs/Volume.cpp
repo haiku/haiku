@@ -51,8 +51,8 @@ Volume::Mount(const char* parameterString)
 {
 	const char* source = NULL;
 	void* parameterHandle = parse_driver_settings_string(parameterString);
-	CObjectDeleter<void, status_t> parameterDeleter(parameterHandle,
-		delete_driver_settings);
+	CObjectDeleter<void, status_t, delete_driver_settings>
+		parameterDeleter(parameterHandle);
 	if (parameterHandle != NULL)
 		source = get_driver_parameter(parameterHandle, "source", NULL, NULL);
 	if (source == NULL || source[0] == '\0') {

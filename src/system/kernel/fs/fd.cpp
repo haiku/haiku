@@ -497,7 +497,7 @@ dup_foreign_fd(team_id fromTeam, int fd, bool kernel)
 	file_descriptor* descriptor = get_fd(fromContext, fd);
 	if (descriptor == NULL)
 		return B_FILE_ERROR;
-	CObjectDeleter<file_descriptor> descriptorPutter(descriptor, put_fd);
+	CObjectDeleter<file_descriptor, void, put_fd> descriptorPutter(descriptor);
 
 	// create a new FD in the target I/O context
 	int result = new_fd(get_current_io_context(kernel), descriptor);

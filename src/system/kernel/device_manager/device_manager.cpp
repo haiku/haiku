@@ -767,7 +767,8 @@ unpublish_device(device_node *node, const char *path)
 	status_t error = devfs_get_device(path, baseDevice);
 	if (error != B_OK)
 		return error;
-	CObjectDeleter<BaseDevice> baseDevicePutter(baseDevice, &devfs_put_device);
+	CObjectDeleter<BaseDevice, void, devfs_put_device>
+		baseDevicePutter(baseDevice);
 
 	Device* device = dynamic_cast<Device*>(baseDevice);
 	if (device == NULL || device->Node() != node)

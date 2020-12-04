@@ -1463,7 +1463,7 @@ AboutView::_AddCopyrightsFromAttribute()
 		close(attrFD);
 		return;
 	}
-	CObjectDeleter<FILE, int> _(attrFile, fclose);
+	CObjectDeleter<FILE, int, fclose> _(attrFile);
 
 	// read and parse the copyrights
 	BMessage package;

@@ -216,8 +216,8 @@ PackageSettings::Load(dev_t mountPointDeviceID, ino_t mountPointNodeID,
 	void* settingsHandle = load_driver_settings(path.Path());
 	if (settingsHandle == NULL)
 		return B_ENTRY_NOT_FOUND;
-	CObjectDeleter<void, status_t> settingsDeleter(settingsHandle,
-		&unload_driver_settings);
+	CObjectDeleter<void, status_t, unload_driver_settings>
+		settingsDeleter(settingsHandle);
 
 	const driver_settings* settings = get_driver_settings(settingsHandle);
 	for (int i = 0; i < settings->parameter_count; i++) {

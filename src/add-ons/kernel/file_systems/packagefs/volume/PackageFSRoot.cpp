@@ -114,7 +114,7 @@ PackageFSRoot::RegisterVolume(Volume* volume)
 				relativeRootPath, strerror(error));
 			RETURN_ERROR(error);
 		}
-		CObjectDeleter<struct vnode> vnodePutter(vnode, &vfs_put_vnode);
+		CObjectDeleter<struct vnode, void, vfs_put_vnode> vnodePutter(vnode);
 
 		// stat it
 		struct stat st;

@@ -323,8 +323,9 @@ socket_receive_no_buffer(net_socket* socket, msghdr* header, void* data,
 	if (bytesRead < 0)
 		return bytesRead;
 
-	CObjectDeleter<ancillary_data_container> ancillaryDataDeleter(ancillaryData,
-		&delete_ancillary_data_container);
+	CObjectDeleter<
+		ancillary_data_container, void, delete_ancillary_data_container>
+		ancillaryDataDeleter(ancillaryData);
 
 	// process ancillary data
 	if (header != NULL) {
@@ -1346,8 +1347,9 @@ socket_send(net_socket* socket, msghdr* header, const void* data, size_t length,
 		return B_BAD_VALUE;
 
 	ancillary_data_container* ancillaryData = NULL;
-	CObjectDeleter<ancillary_data_container> ancillaryDataDeleter(NULL,
-		&delete_ancillary_data_container);
+	CObjectDeleter<
+		ancillary_data_container, void, delete_ancillary_data_container>
+		ancillaryDataDeleter;
 
 	if (header != NULL) {
 		address = (const sockaddr*)header->msg_name;

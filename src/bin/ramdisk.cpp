@@ -387,7 +387,7 @@ command_list(int argc, const char* const* argv)
 			strerror(errno));
 		return 1;
 	}
-	CObjectDeleter<DIR, int> dirCloser(dir, &closedir);
+	CObjectDeleter<DIR, int, closedir> dirCloser(dir);
 
 	TextTable table;
 	table.AddColumn("ID", B_ALIGN_RIGHT);

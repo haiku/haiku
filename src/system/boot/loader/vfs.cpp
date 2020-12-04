@@ -576,8 +576,8 @@ BootVolume::_OpenSystemPackage()
 	Node* packagesNode = fSystemDirectory->Lookup("packages", false);
 	if (packagesNode == NULL)
 		return -1;
-	MethodDeleter<Node, status_t> packagesNodeReleaser(packagesNode,
-		&Node::Release);
+	MethodDeleter<Node, status_t, &Node::Release>
+		packagesNodeReleaser(packagesNode);
 
 	if (!S_ISDIR(packagesNode->Type()))
 		return -1;
@@ -1172,7 +1172,7 @@ open_directory(Directory* baseDirectory, const char* path)
 		errno = error;
 		return NULL;
 	}
-	MethodDeleter<Node, status_t> nodeReleaser(node, &Node::Release);
+	MethodDeleter<Node, status_t, &Node::Release> nodeReleaser(node);
 
 	if (!S_ISDIR(node->Type())) {
 		errno = error;

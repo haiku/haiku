@@ -478,7 +478,7 @@ do_fd_io(int fd, io_request* request)
 		return B_FILE_ERROR;
 	}
 
-	CObjectDeleter<file_descriptor> descriptorPutter(descriptor, put_fd);
+	CObjectDeleter<file_descriptor, void, put_fd> descriptorPutter(descriptor);
 
 	return vfs_vnode_io(vnode, descriptor->cookie, request);
 }
@@ -500,7 +500,7 @@ do_iterative_fd_io(int fd, io_request* request, iterative_io_get_vecs getVecs,
 		return B_FILE_ERROR;
 	}
 
-	CObjectDeleter<file_descriptor> descriptorPutter(descriptor, put_fd);
+	CObjectDeleter<file_descriptor, void, put_fd> descriptorPutter(descriptor);
 
 	if (!HAS_FS_CALL(vnode, io)) {
 		// no io() call -- fall back to synchronous I/O

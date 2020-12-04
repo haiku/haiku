@@ -139,8 +139,8 @@ Settings::ReadSwapSettings()
 	void* settings = load_driver_settings(kVirtualMemorySettings);
 	if (settings == NULL)
 		return kErrorSettingsNotFound;
-	CObjectDeleter<void, status_t> settingDeleter(settings,
-		&unload_driver_settings);
+	CObjectDeleter<void, status_t, unload_driver_settings>
+		settingDeleter(settings);
 
 	const char* enabled = get_driver_parameter(settings, "vm", NULL, NULL);
 	const char* automatic = get_driver_parameter(settings, "swap_auto",

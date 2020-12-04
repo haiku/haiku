@@ -4426,8 +4426,8 @@ _user_get_extended_team_info(team_id teamID, uint32 flags, void* buffer,
 			ioContext = team->io_context;
 			vfs_get_io_context(ioContext);
 		}
-		CObjectDeleter<io_context> ioContextPutter(ioContext,
-			&vfs_put_io_context);
+		CObjectDeleter<io_context, void, vfs_put_io_context>
+			ioContextPutter(ioContext);
 
 		// add the basic data to the info message
 		if (info.AddInt32("id", teamClone.id) != B_OK

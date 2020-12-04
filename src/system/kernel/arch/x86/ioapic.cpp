@@ -706,8 +706,8 @@ ioapic_init(kernel_args* args)
 		dprintf("acpi module not available, not configuring io-apics\n");
 		return;
 	}
-	BPrivate::CObjectDeleter<const char, status_t>
-		acpiModulePutter(B_ACPI_MODULE_NAME, put_module);
+	BPrivate::CObjectDeleter<const char, status_t, put_module>
+		acpiModulePutter(B_ACPI_MODULE_NAME);
 
 	acpi_table_madt* madt = NULL;
 	if (acpiModule->get_table(ACPI_SIG_MADT, 0, (void**)&madt) != B_OK) {

@@ -1372,7 +1372,7 @@ bfs_open(fs_volume* _volume, fs_vnode* _node, int openMode, void** _cookie)
 	cookie->last_notification = system_time();
 
 	// Disable the file cache, if requested?
-	CObjectDeleter<void> fileCacheEnabler(file_cache_enable);
+	CObjectDeleter<void, void, file_cache_enable> fileCacheEnabler;
 	if ((openMode & O_NOCACHE) != 0 && inode->FileCache() != NULL) {
 		status = file_cache_disable(inode->FileCache());
 		if (status != B_OK)

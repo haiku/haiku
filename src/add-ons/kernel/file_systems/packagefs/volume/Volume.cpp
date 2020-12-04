@@ -329,8 +329,8 @@ Volume::Mount(const char* parameterString)
 			NULL);
 	}
 
-	CObjectDeleter<void, status_t> parameterHandleDeleter(parameterHandle,
-		&delete_driver_settings);
+	CObjectDeleter<void, status_t, delete_driver_settings>
+		parameterHandleDeleter(parameterHandle);
 
 	if (packages != NULL && packages[0] == '\0') {
 		FATAL("invalid package folder ('packages' parameter)!\n");
@@ -711,7 +711,7 @@ Volume::_LoadOldPackagesStates(const char* packagesState)
 		ERROR("Failed to open administrative directory: %s\n", strerror(errno));
 		RETURN_ERROR(errno);
 	}
-	CObjectDeleter<DIR, int> dirCloser(dir, closedir);
+	CObjectDeleter<DIR, int, closedir> dirCloser(dir);
 
 	while (dirent* entry = readdir(dir)) {
 		if (strncmp(entry->d_name, "state_", 6) != 0
@@ -903,7 +903,7 @@ Volume::_AddInitialPackagesFromDirectory()
 			fPackagesDirectory->Path(), strerror(errno));
 		RETURN_ERROR(errno);
 	}
-	CObjectDeleter<DIR, int> dirCloser(dir, closedir);
+	CObjectDeleter<DIR, int, closedir> dirCloser(dir);
 
 	while (dirent* entry = readdir(dir)) {
 		// skip "." and ".."
@@ -1778,7 +1778,7 @@ Volume::_PublishShineThroughDirectories()
 			_RemoveNode(directory);
 			continue;
 		}
-		CObjectDeleter<struct vnode> vnodePutter(vnode, &vfs_put_vnode);
+		CObjectDeleter<struct vnode, void, vfs_put_vnode> vnodePutter(vnode);
 
 		// stat it
 		struct stat st;

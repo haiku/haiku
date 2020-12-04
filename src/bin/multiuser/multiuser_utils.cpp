@@ -38,7 +38,7 @@ read_password(const char* prompt, char* password, size_t bufferSize,
 		in = tty;
 		out = tty;
 	}
-	CObjectDeleter<FILE, int> ttyCloser(tty, fclose);
+	CObjectDeleter<FILE, int, fclose> ttyCloser(tty);
 
 	// disable echo
 	int inFD = fileno(in);

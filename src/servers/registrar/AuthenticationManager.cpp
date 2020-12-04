@@ -568,14 +568,14 @@ public:
 			debug_printf("REG: Failed to open passwd file \"%s\" for "
 				"writing: %s\n", kPasswdFile, strerror(errno));
 		}
-		CObjectDeleter<FILE, int> _1(passwdFile, fclose);
+		CObjectDeleter<FILE, int, fclose> _1(passwdFile);
 
 		FILE* shadowFile = fopen(kShadowPwdFile, "w");
 		if (shadowFile == NULL) {
 			debug_printf("REG: Failed to open shadow passwd file \"%s\" for "
 				"writing: %s\n", kShadowPwdFile, strerror(errno));
 		}
-		CObjectDeleter<FILE, int> _2(shadowFile, fclose);
+		CObjectDeleter<FILE, int, fclose> _2(shadowFile);
 
 		// write users
 		for (map<uid_t, User*>::const_iterator it = fUsersByID.begin();
@@ -694,7 +694,7 @@ public:
 			debug_printf("REG: Failed to open group file \"%s\" for "
 				"writing: %s\n", kGroupFile, strerror(errno));
 		}
-		CObjectDeleter<FILE, int> _1(groupFile, fclose);
+		CObjectDeleter<FILE, int, fclose> _1(groupFile);
 
 		// write groups
 		for (map<gid_t, Group*>::const_iterator it = fGroupsByID.begin();
@@ -1245,7 +1245,7 @@ AuthenticationManager::_InitPasswdDB()
 			kPasswdFile, strerror(errno));
 		return errno;
 	}
-	CObjectDeleter<FILE, int> _(file, fclose);
+	CObjectDeleter<FILE, int, fclose> _(file);
 
 	char lineBuffer[LINE_MAX];
 	while (char* line = fgets(lineBuffer, sizeof(lineBuffer), file)) {
@@ -1294,7 +1294,7 @@ AuthenticationManager::_InitGroupDB()
 			kGroupFile, strerror(errno));
 		return errno;
 	}
-	CObjectDeleter<FILE, int> _(file, fclose);
+	CObjectDeleter<FILE, int, fclose> _(file);
 
 	char lineBuffer[LINE_MAX];
 	while (char* line = fgets(lineBuffer, sizeof(lineBuffer), file)) {
@@ -1342,7 +1342,7 @@ AuthenticationManager::_InitShadowPwdDB()
 			kShadowPwdFile, strerror(errno));
 		return errno;
 	}
-	CObjectDeleter<FILE, int> _(file, fclose);
+	CObjectDeleter<FILE, int, fclose> _(file);
 
 	char lineBuffer[LINE_MAX];
 	while (char* line = fgets(lineBuffer, sizeof(lineBuffer), file)) {

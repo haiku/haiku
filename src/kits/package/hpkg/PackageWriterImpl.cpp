@@ -1138,7 +1138,7 @@ PackageWriterImpl::_UpdateCheckEntryCollisions(Attribute* parentAttribute,
 
 		// first we check for colliding node attributes, though
 		if (DIR* attrDir = fs_fopen_attr_dir(fd)) {
-			CObjectDeleter<DIR, int> attrDirCloser(attrDir, fs_close_attr_dir);
+			CObjectDeleter<DIR, int, fs_close_attr_dir> attrDirCloser(attrDir);
 
 			while (dirent* entry = fs_read_attr_dir(attrDir)) {
 				attr_info attrInfo;
@@ -1184,7 +1184,7 @@ PackageWriterImpl::_UpdateCheckEntryCollisions(Attribute* parentAttribute,
 			close(clonedFD);
 			throw status_t(errno);
 		}
-		CObjectDeleter<DIR, int> dirCloser(dir, closedir);
+		CObjectDeleter<DIR, int, closedir> dirCloser(dir);
 
 		while (dirent* entry = readdir(dir)) {
 			// skip "." and ".."
@@ -1525,7 +1525,7 @@ PackageWriterImpl::_AddEntry(int dirFD, Entry* entry, const char* fileName,
 
 	// add attributes
 	if (DIR* attrDir = fs_fopen_attr_dir(fd)) {
-		CObjectDeleter<DIR, int> attrDirCloser(attrDir, fs_close_attr_dir);
+		CObjectDeleter<DIR, int, fs_close_attr_dir> attrDirCloser(attrDir);
 
 		while (dirent* entry = fs_read_attr_dir(attrDir)) {
 			attr_info attrInfo;
@@ -1586,7 +1586,7 @@ PackageWriterImpl::_AddDirectoryChildren(Entry* entry, int fd, char* pathBuffer)
 			close(clonedFD);
 			throw status_t(errno);
 		}
-		CObjectDeleter<DIR, int> dirCloser(dir, closedir);
+		CObjectDeleter<DIR, int, closedir> dirCloser(dir);
 
 		while (dirent* entry = readdir(dir)) {
 			// skip "." and ".."

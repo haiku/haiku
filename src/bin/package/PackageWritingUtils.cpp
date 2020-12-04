@@ -27,7 +27,7 @@ add_current_directory_entries(BPackageWriter& packageWriter,
 			strerror(errno));
 		return errno;
 	}
-	CObjectDeleter<DIR, int> dirCloser(dir, &closedir);
+	CObjectDeleter<DIR, int, closedir> dirCloser(dir);
 
 	while (dirent* entry = readdir(dir)) {
 		// skip "." and ".."
