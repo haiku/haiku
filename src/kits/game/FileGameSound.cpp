@@ -32,84 +32,20 @@ struct _gs_media_tracker {
 
 
 // Local utility functions -----------------------------------------------
+template<typename T>
 bool
-FillBuffer(_gs_ramp* ramp, uint8* data, uint8* buffer, size_t* bytes)
+FillBuffer(_gs_ramp* ramp, T* dest, const T* src, size_t* bytes)
 {
-	int32 samples = *bytes / sizeof(uint8);
+	size_t samples = *bytes / sizeof(T);
 
-	for (int32 byte = 0; byte < samples; byte++) {
+	for (size_t sample = 0; sample < samples; sample++) {
 		float gain = *ramp->value;
-		data[byte] = uint8(float(buffer[byte]) * gain);
+		dest[sample] = T(float(src[sample]) * gain);
 
 		if (ChangeRamp(ramp)) {
-			*bytes = byte * sizeof(uint8);
+			*bytes = sample * sizeof(T);
 			return true;
 		}
-	}
-
-	return false;
-}
-
-
-bool
-FillBuffer(_gs_ramp* ramp, int16* data, int16* buffer, size_t* bytes)
-{
-	int32 samples = *bytes / sizeof(int16);
-
-	for (int32 byte = 0; byte < samples; byte++) {
-		float gain = *ramp->value;
-		data[byte] = int16(float(buffer[byte]) * gain);
-
-		if (ChangeRamp(ramp)) {
-			*bytes = byte * sizeof(int16);
-			return true;
-		}
-	}
-
-	return false;
-}
-
-
-bool
-FillBuffer(_gs_ramp* ramp, int32* data, int32* buffer, size_t* bytes)
-{
-	size_t byte = 0;
-	bool bytesAreReady = (*bytes > 0);
-
-	while (bytesAreReady) {
-		float gain = *ramp->value;
-		data[byte] = int32(float(buffer[byte]) * gain);
-
-		if (ChangeRamp(ramp)) {
-			*bytes = byte;
-			return true;
-		}
-
-		byte++;
-		bytesAreReady = (byte >= *bytes);
-	}
-
-	return false;
-}
-
-
-bool
-FillBuffer(_gs_ramp* ramp, float* data, float* buffer, size_t* bytes)
-{
-	size_t byte = 0;
-	bool bytesAreReady = (*bytes > 0);
-
-	while (bytesAreReady) {
-		float gain = *ramp->value;
-		data[byte] = buffer[byte] * gain;
-
-		if (ChangeRamp(ramp)) {
-			*bytes = byte;
-			return true;
-		}
-
-		byte++;
-		bytesAreReady = (byte >= *bytes);
 	}
 
 	return false;
@@ -273,25 +209,25 @@ BFileGameSound::FillBuffer(void* inBuffer, size_t inByteCount)
 
 				switch(Format().format) {
 					case gs_audio_format::B_GS_U8:
-						rampDone = ::FillBuffer(fPausing,
+						rampDone = ::FillBuffer<uint8>(fPausing,
 							(uint8*)&buffer[out_offset],
 							(uint8*)&fBuffer[fPlayPosition], &bytes);
 						break;
 
 					case gs_audio_format::B_GS_S16:
-						rampDone = ::FillBuffer(fPausing,
+						rampDone = ::FillBuffer<int16>(fPausing,
 							(int16*)&buffer[out_offset],
 							(int16*)&fBuffer[fPlayPosition], &bytes);
 						break;
 
 					case gs_audio_format::B_GS_S32:
-						rampDone = ::FillBuffer(fPausing,
+						rampDone = ::FillBuffer<int32>(fPausing,
 							(int32*)&buffer[out_offset],
 							(int32*)&fBuffer[fPlayPosition], &bytes);
 						break;
 
 					case gs_audio_format::B_GS_F:
-						rampDone = ::FillBuffer(fPausing,
+						rampDone = ::FillBuffer<float>(fPausing,
 							(float*)&buffer[out_offset],
 							(float*)&fBuffer[fPlayPosition], &bytes);
 						break;
