@@ -11,24 +11,7 @@
 #include <vfs.h>
 
 
-using BPrivate::AutoDeleter;
-
-
-struct VnodePut
-{
-	inline void operator()(vnode* _vnode)
-	{
-		if (_vnode != NULL)
-			vfs_put_vnode(_vnode);
-	}
-};
-
-struct VnodePutter : AutoDeleter<vnode, VnodePut>
-{
-	VnodePutter() : AutoDeleter<vnode, VnodePut>() {}
-
-	VnodePutter(vnode* _vnode) : AutoDeleter<vnode, VnodePut>(_vnode) {}
-};
+typedef CObjectDeleter<vnode, void, vfs_put_vnode> VnodePutter;
 
 
 #endif	// UTILS_H

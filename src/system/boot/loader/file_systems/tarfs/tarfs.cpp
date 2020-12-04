@@ -52,19 +52,7 @@ struct RegionDelete {
 	}
 };
 
-struct RegionDeleter : BPrivate::AutoDeleter<void, RegionDelete> {
-	RegionDeleter()
-		:
-		BPrivate::AutoDeleter<void, RegionDelete>()
-	{
-	}
-
-	RegionDeleter(void* memory)
-		:
-		BPrivate::AutoDeleter<void, RegionDelete>(memory)
-	{
-	}
-};
+typedef BPrivate::AutoDeleter<void, RegionDelete> RegionDeleter;
 
 class Directory;
 
