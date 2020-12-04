@@ -51,7 +51,6 @@ class SdhciBus {
 		void				SetClock(int kilohertz);
 
 	private:
-		void				DumpRegisters(uint8_t slot);
 		bool				PowerOn();
 		void				RecoverError();
 
@@ -136,45 +135,6 @@ SdhciBus::~SdhciBus()
 
 	area_id regs_area = area_for(fRegisters);
 	delete_area(regs_area);
-}
-
-
-void
-SdhciBus::DumpRegisters(uint8_t slot)
-{
-#ifdef TRACE_SDHCI
-	TRACE("Register values for slot %d:\n", slot);
-	TRACE("system_address: %d\n", fRegisters->system_address);
-	TRACE("%d blocks of size %d\n", fRegisters->block_count,
-		fRegisters->block_size);
-	TRACE("argument: %x\n", fRegisters->argument);
-	TRACE("transfer_mode: %d\n", fRegisters->transfer_mode);
-	TRACE("command: %x\n", fRegisters->command.Bits());
-	TRACE("response:");
-	for (int i = 0; i < 4; i++)
-		dprintf(" %d", fRegisters->response[i]);
-	dprintf("\n");
-	TRACE("buffer_data_port: %d\n", fRegisters->buffer_data_port);
-	TRACE("present_state: %x\n", fRegisters->present_state.Bits());
-	TRACE("power_control: %d\n", fRegisters->power_control.Bits());
-	TRACE("host_control: %d\n", fRegisters->host_control);
-	TRACE("wakeup_control: %d\n", fRegisters->wakeup_control);
-	TRACE("block_gap_control: %d\n", fRegisters->block_gap_control);
-	TRACE("clock_control: %x\n", fRegisters->clock_control.Bits());
-	TRACE("software_reset: %d\n", fRegisters->software_reset.Bits());
-	TRACE("timeout_control: %d\n", fRegisters->timeout_control);
-	TRACE("interrupt_status: %x enable: %x signal: %x\n",
-		fRegisters->interrupt_status, fRegisters->interrupt_status_enable,
-		fRegisters->interrupt_signal_enable);
-	TRACE("auto_cmd12_error_status: %d\n", fRegisters->auto_cmd12_error_status);
-	TRACE("capabilities: %" B_PRId64 "\n", fRegisters->capabilities.Bits());
-	TRACE("max_current_capabilities: %" B_PRId64 "\n",
-		fRegisters->max_current_capabilities);
-	TRACE("slot_interrupt_status: %d\n", fRegisters->slot_interrupt_status);
-	TRACE("host_controller_version spec %x vendor %x\n",
-		fRegisters->host_controller_version.specVersion,
-		fRegisters->host_controller_version.vendorVersion);
-#endif
 }
 
 
