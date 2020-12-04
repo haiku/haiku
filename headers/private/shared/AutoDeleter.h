@@ -180,42 +180,32 @@ struct CObjectDeleter
 
 // MethodDeleter
 
-template<typename Type, typename DestructorReturnType>
+template<typename Type, typename DestructorReturnType,
+	DestructorReturnType (Type::*Destructor)()>
 struct MethodDelete
 {
 	inline void operator()(Type *object)
 	{
-		if (fDestructor && object != NULL)
-			(object->*fDestructor)();
+		if (object != NULL)
+			(object->*Destructor)();
 	}
-
-	template<typename Destructor>
-	inline void operator=(Destructor destructor)
-	{
-		fDestructor = destructor;
-	}
-
-private:
-	DestructorReturnType (Type::*fDestructor)();
 };
 
 
-template<typename Type, typename DestructorReturnType = void>
+template<typename Type, typename DestructorReturnType,
+	DestructorReturnType (Type::*Destructor)()>
 struct MethodDeleter
-	: AutoDeleter<Type, MethodDelete<Type, DestructorReturnType> >
+	: AutoDeleter<Type, MethodDelete<Type, DestructorReturnType, Destructor> >
 {
-	typedef AutoDeleter<Type, MethodDelete<Type, DestructorReturnType> > Base;
+	typedef AutoDeleter<Type,
+		MethodDelete<Type, DestructorReturnType, Destructor> > Base;
 
-	template<typename Destructor>
-	MethodDeleter(Destructor destructor) : Base()
+	MethodDeleter() : Base()
 	{
-		Base::fDelete = destructor;
 	}
 
-	template<typename Destructor>
-	MethodDeleter(Type *object, Destructor destructor) : Base(object)
+	MethodDeleter(Type *object) : Base(object)
 	{
-		Base::fDelete = destructor;
 	}
 };
 
