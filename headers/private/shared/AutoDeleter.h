@@ -39,13 +39,15 @@ public:
 
 	inline ~AutoDeleter()
 	{
-		fDelete(fObject);
+		DeleteFunc destructor;
+		destructor(fObject);
 	}
 
 	inline void SetTo(C *object)
 	{
 		if (object != fObject) {
-			fDelete(fObject);
+			DeleteFunc destructor;
+			destructor(fObject);
 			fObject = object;
 		}
 	}
@@ -79,7 +81,6 @@ public:
 
 protected:
 	C			*fObject;
-	DeleteFunc	fDelete;
 
 private:
 	AutoDeleter(const AutoDeleter&);
