@@ -685,6 +685,9 @@ send_fragments(ipv4_protocol* protocol, struct net_route* route,
 }
 
 
+status_t ipv4_receive_data(net_buffer* buffer);
+
+
 /*!	Delivers the provided \a buffer to all listeners of this multicast group.
 	Does not take over ownership of the buffer.
 */
@@ -692,17 +695,20 @@ static bool
 deliver_multicast(net_protocol_module_info* module, net_buffer* buffer,
 	bool deliverToRaw)
 {
+	TRACE("deliver_multicast(%p [%" B_PRIu32 " bytes])", buffer, buffer->size);
 	if (module->deliver_data == NULL)
 		return false;
 
-	// TODO: fix multicast!
-	return false;
 	MutexLocker _(sMulticastGroupsLock);
 
 	sockaddr_in* multicastAddr = (sockaddr_in*)buffer->destination;
 
+	uint32 index = buffer->index;
+	if (buffer->interface_address != NULL)
+		index = buffer->interface_address->interface->index;
+
 	MulticastState::ValueIterator it = sMulticastState->Lookup(std::make_pair(
-		&multicastAddr->sin_addr, buffer->interface_address->interface->index));
+		&multicastAddr->sin_addr, index));
 
 	size_t count = 0;
 
@@ -720,7 +726,7 @@ deliver_multicast(net_protocol_module_info* module, net_buffer* buffer,
 				// as multicast filters are installed with an IPv4 protocol
 				// reference, we need to go and find the appropriate instance
 				// related to the 'receiving protocol' with module 'module'.
-				net_protocol* protocol = ipProtocol->socket->first_protocol;
+				protocol = ipProtocol->socket->first_protocol;
 
 				while (protocol != NULL && protocol->module != module)
 					protocol = protocol->next;
@@ -1541,6 +1547,29 @@ ipv4_send_routed_data(net_protocol* _protocol, struct net_route* route,
 	if (checksumNeeded) {
 		*IPChecksumField(buffer) = gBufferModule->checksum(buffer, 0,
 			sizeof(ipv4_header), true);
+	}
+
+	if ((buffer->flags & MSG_MCAST) != 0
+		&& protocol->multicast_loopback) {
+		// copy an IP multicast packet to the input queue of the loopback
+		// interface
+		net_buffer *loopbackBuffer = gBufferModule->duplicate(buffer);
+
+		// get the IPv4 loopback address
+		struct sockaddr loopbackAddress;
+		gIPv4AddressModule.get_loopback_address(&loopbackAddress);
+
+		// get the matching interface address if any
+		net_interface_address* address =
+			sDatalinkModule->get_interface_address(&loopbackAddress);
+		if (address == NULL || (address->interface->flags & IFF_UP) == 0) {
+			sDatalinkModule->put_interface_address(address);
+		} else {
+			sDatalinkModule->put_interface_address(
+				loopbackBuffer->interface_address);
+			loopbackBuffer->interface_address = address;
+			ipv4_receive_data(loopbackBuffer);
+		}
 	}
 
 	TRACE_SK(protocol, "  SendRoutedData(): header chksum: %" B_PRIu32
