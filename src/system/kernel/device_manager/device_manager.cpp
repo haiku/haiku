@@ -1955,8 +1955,7 @@ device_node::Probe(const char* devicePath, uint32 updateCycle)
 	if (status < B_OK)
 		return status;
 
-	MethodDeleter<device_node, bool> uninit(this,
-		&device_node::UninitDriver);
+	MethodDeleter<device_node, bool, &device_node::UninitDriver> uninit(this);
 
 	if ((fFlags & B_FIND_CHILD_ON_DEMAND) != 0) {
 		bool matches = false;
@@ -2026,8 +2025,7 @@ device_node::Reprobe()
 	if (status < B_OK)
 		return status;
 
-	MethodDeleter<device_node, bool> uninit(this,
-		&device_node::UninitDriver);
+	MethodDeleter<device_node, bool, &device_node::UninitDriver> uninit(this);
 
 	// If this child has been probed already, probe it again
 	status = _Probe();
@@ -2054,8 +2052,7 @@ device_node::Rescan()
 	if (status < B_OK)
 		return status;
 
-	MethodDeleter<device_node, bool> uninit(this,
-		&device_node::UninitDriver);
+	MethodDeleter<device_node, bool, &device_node::UninitDriver> uninit(this);
 
 	if (DriverModule()->rescan_child_devices != NULL) {
 		status = DriverModule()->rescan_child_devices(DriverData());

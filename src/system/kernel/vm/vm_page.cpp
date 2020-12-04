@@ -2537,7 +2537,7 @@ free_cached_page(vm_page *page, bool dontWait)
 	VMCache* cache = page->Cache();
 
 	AutoLocker<VMCache> cacheLocker(cache, true);
-	MethodDeleter<VMCache> _2(cache, &VMCache::ReleaseRefLocked);
+	MethodDeleter<VMCache, void, &VMCache::ReleaseRefLocked> _2(cache);
 
 	// check again if that page is still a candidate
 	if (page->busy || page->State() != PAGE_STATE_CACHED)

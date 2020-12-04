@@ -1190,7 +1190,7 @@ ext2_open(fs_volume* _volume, fs_vnode* _node, int openMode, void** _cookie)
 	cookie->last_size = inode->Size();
 	cookie->last_notification = system_time();
 
-	MethodDeleter<Inode, status_t> fileCacheEnabler(&Inode::EnableFileCache);
+	MethodDeleter<Inode, status_t, &Inode::EnableFileCache> fileCacheEnabler;
 	if ((openMode & O_NOCACHE) != 0) {
 		status = inode->DisableFileCache();
 		if (status != B_OK)

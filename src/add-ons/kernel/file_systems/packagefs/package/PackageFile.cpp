@@ -148,8 +148,8 @@ PackageFile::VFSInit(dev_t deviceID, ino_t nodeID)
 	status_t error = PackageNode::VFSInit(deviceID, nodeID);
 	if (error != B_OK)
 		return error;
-	MethodDeleter<PackageNode> baseClassUninit(this,
-		&PackageNode::NonVirtualVFSUninit);
+	MethodDeleter<PackageNode, void, &PackageNode::NonVirtualVFSUninit>
+		baseClassUninit(this);
 
 	// open the package -- that's already done by PackageNode::VFSInit(), so it
 	// shouldn't fail here. We only need to do it again, since we need the FD.
