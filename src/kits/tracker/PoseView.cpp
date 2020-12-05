@@ -9041,8 +9041,8 @@ BPoseView::DeskTextColor() const
 	float readabilityThreshold = abs(textColor.red - viewColor.red)
 		+ abs(textColor.green - viewColor.green)
 		+ abs(textColor.blue - viewColor.blue);
-	if (readabilityThreshold > 120) {
-		// The readability threshold is highly subjective, but 120 (out of 768)
+	if (readabilityThreshold > 384) {
+		// The readability threshold is highly subjective, but 384 (out of 768)
 		// seems to be generally suitable for most circumstances.
 		return textColor;
 	} else {
