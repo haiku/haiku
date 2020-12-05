@@ -1426,7 +1426,7 @@ BMenu::DrawBackground(BRect updateRect)
 		borders |= BControlLook::B_TOP_BORDER
 			| BControlLook::B_BOTTOM_BORDER;
 	}
-	be_control_look->DrawMenuBackground(this, rect, updateRect, base, 0,
+	be_control_look->DrawMenuBackground(this, rect, updateRect, base, flags,
 		borders);
 }
 
