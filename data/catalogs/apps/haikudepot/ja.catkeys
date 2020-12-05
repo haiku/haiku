@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	2792101273
+1	japanese	x-vnd.Haiku-HaikuDepot	412302812
 Repository update error	LocalRepositoryUpdateProcess		リポジトリアップデートエラー
 Network error	ServerHelper		ネットワークエラー
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		リポジトリの更新中に次のエラーが発生しました: %error%
@@ -97,6 +97,7 @@ Close	UserLoginWindow		閉じる
 Close	RatePackageWindow		閉じる
 An unexpected error has been sent from the server [%i]	ServerHelper		サーバーから予期しないエラーが送信されました [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		リポジトリ '%REPO_NAME%' のパッケージデータを同期中
+An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		新規ユーザー作成に必要な使用条件のダウンロード中にエラーが発生しました。詳細はログをチェックして、再度試してみてください。\nログの見方は、HaikuユーザーガイドのHaikuDepotの章で得られます。
 View the usage conditions	UserLoginWindow		使用条件を見る
 Login issue	MainWindow		ログインに問題
 Size	PackageListView		サイズ
@@ -107,6 +108,7 @@ All categories	FilterView		すべての分類
 Repositories	MainWindow		リポジトリ
 n/a	PackageInfoView		利用不可
 This rating is visible to other users	RatePackageWindow		この評価はほかのユーザーからも見られます
+While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		パッケージデータの更新中に問題が発生しました。そのためデータが期限切れに、つまりアプリケーションの表示から消えてしまいます。この問題の詳細は、アプリケーションのログから得られるでしょう。\nログの見方についての情報は、HaikuユーザーガイドのHaikuDepotの章で得られます。
 View agreed usage conditions…	MainWindow		同意した使用条件を見る…
 Cancel	MainWindow		中止
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 個以上のダウンロード)}other{(# 個以上のダウンロード)}}

@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-HaikuDepot	2792101273
+1	romanian	x-vnd.Haiku-HaikuDepot	412302812
 Repository update error	LocalRepositoryUpdateProcess		Eroare la actualizarea depozitului
 Network error	ServerHelper		Eroare de rețea
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		A apărut o eroare în timpul reîmprospătării depozitului: %error%
@@ -97,6 +97,7 @@ Close	UserLoginWindow		Închidere
 Close	RatePackageWindow		Închidere
 An unexpected error has been sent from the server [%i]	ServerHelper		O eroare neașteptată a fost trimisă de la serverul [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Se sincronizează datele pachetelor pentru depozitul „%REPO_NAME%”
+An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		A apărut o eroare în timpul descărcării condițiilor de utilizare necesare pentru a crea un utilizator nou. Verificați istoricul pentru detalii și încercați din nou. \nInformații despre cum se vizualizează înregistrările sunt disponibile în secțiunea HaikuDepot a Ghidului Utilizatorului Haiku.
 View the usage conditions	UserLoginWindow		Vizualizați condițiile de utilizare
 Login issue	MainWindow		Problemă de autentificare
 Size	PackageListView		Mărime
@@ -107,6 +108,7 @@ All categories	FilterView		Toate categoriile
 Repositories	MainWindow		Depozite
 n/a	PackageInfoView		n/a
 This rating is visible to other users	RatePackageWindow		Această clasificare este vizibilă și altora
+While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		În timpul actualizării datelor pachetelor, a apărut o problemă care poate cauza datele să fie învechite sau să lipsească din afișajul aplicației. Detalii adiționale în legătură cu această problemă pot fi obținute din înregistrările aplicației.\nInformații despre cum se vizualizează înregistrările sunt disponibile în secțiunea HaikuDepot a Ghidului Utilizatorului Haiku.
 View agreed usage conditions…	MainWindow		Vizualizați condițiile de utilizare convenite…
 Cancel	MainWindow		Anulează
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 more to download)}other{(# more to download)}}

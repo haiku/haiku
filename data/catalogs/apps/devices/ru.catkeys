@@ -60,7 +60,7 @@ ACPI <unknown>	DeviceACPI		ACPI <unknown>
 Device name	DevicePCI		Название устройства
 Disk Drive	DeviceSCSI		Дисковод
 Other	DeviceSCSI		Другие
-Report compatibility	DevicesView		Отчет о совместимости
+Report compatibility	DevicesView		Отчёт о совместимости
 Computer	Device		Компьютер
 PCI bus	Device		Шина PCI
 Enclosure	DeviceSCSI		Enclosure

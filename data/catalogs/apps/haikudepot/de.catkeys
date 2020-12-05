@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-HaikuDepot	2792101273
+1	german	x-vnd.Haiku-HaikuDepot	412302812
 Repository update error	LocalRepositoryUpdateProcess		Fehler bei Paketquellenaktualisierung
 Network error	ServerHelper		Netzwerk Fehler
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Fehler bei der Aktualisierung der Paketquelle: %error%
@@ -97,6 +97,7 @@ Close	UserLoginWindow		Schließen
 Close	RatePackageWindow		Schließen
 An unexpected error has been sent from the server [%i]	ServerHelper		Vom Server wurde ein unerwarteter Fehler geschickt [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synchronisieren von Paketdaten für Paketquelle '%REPO_NAME%'
+An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Beim Herunterladen der Nutzungsbedingungen für die Erstellung eines neuen Benutzerkontos ist ein Fehler aufgetreten. Bitte Log prüfen und nochmal probieren.\nWie diese Logs angezeigt werden können, steht im Kapitel 'HaikuDepot ' des Haiku User Guide.
 View the usage conditions	UserLoginWindow		Nutzungsbedingungen lesen
 Login issue	MainWindow		Anmeldungsproblem
 Size	PackageListView		Größe
@@ -107,6 +108,7 @@ All categories	FilterView		Alle Kategorien
 Repositories	MainWindow		Paketquellen
 n/a	PackageInfoView		n.v.
 This rating is visible to other users	RatePackageWindow		Diese Bewertung is für andere Nutzer sichtbar
+While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		Bei der Aktualisierung von Paketdaten trat ein Problem auf. Dadurch könnten die angezeigten Daten der Anwendung veraltet sein oder fehlen. Weitere Details zu diesem Problem können dem Anwendungs-Log entnommen werden.\nWie diese Logs angezeigt werden können, steht im Kapitel 'HaikuDepot ' des Haiku User Guide.
 View agreed usage conditions…	MainWindow		Zugestimmte Nutzungsbedingungen lesen…
 Cancel	MainWindow		Abbrechen
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 weiterer Download)}other{(# weitere Downloads)}}

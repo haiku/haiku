@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	2792101273
+1	swedish	x-vnd.Haiku-HaikuDepot	412302812
 Repository update error	LocalRepositoryUpdateProcess		Fel vid uppdatering av repositorie
 Network error	ServerHelper		Nätverksfel
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Ett fel inträffade vid uppdatering av repositoriet: %error%
@@ -97,6 +97,7 @@ Close	UserLoginWindow		Stäng
 Close	RatePackageWindow		Stäng
 An unexpected error has been sent from the server [%i]	ServerHelper		Ett oväntat fel har skickats från servern [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synkroniserar paketdata för repositoriet '%REPO_NAME%'
+An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Ett fel har uppstått vid nedladdning av de användningsvillkor som krävs för att skapa en ny användare. Kontrollera loggen för mer information och försök igen. \nInformation om hur du ser loggarna finns i avsnittet HaikuDepot i Haiku användarhandbok.
 View the usage conditions	UserLoginWindow		Visa användarvillkor
 Login issue	MainWindow		Inloggnings problem
 Size	PackageListView		Storlek
@@ -107,6 +108,7 @@ All categories	FilterView		Alla kategorier
 Repositories	MainWindow		Repositorier
 n/a	PackageInfoView		oviktigt
 This rating is visible to other users	RatePackageWindow		Detta betyg är synligt för andra användare
+While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		Under uppdateringen av paketdata har ett problem uppstått som kan leda till att data är föråldrade eller saknas från programmets skärm. Ytterligare information om detta problem kan hämtas från applikationsloggarna.\nInformation om hur du ser loggarna finns i avsnittet HaikuDepot i Haiku användarhandbok.
 View agreed usage conditions…	MainWindow		Visa godkända användarvillkor…
 Cancel	MainWindow		Avbryt
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 kvar att ladda hem)}other{(# kvar att ladda hem)}}

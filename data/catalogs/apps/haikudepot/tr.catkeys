@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-HaikuDepot	2792101273
+1	turkish	x-vnd.Haiku-HaikuDepot	412302812
 Repository update error	LocalRepositoryUpdateProcess		Depo güncelleme hatası
 Network error	ServerHelper		Ağ hatası
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Depo güncellenirken bir hata oluştu: %error%
@@ -97,6 +97,7 @@ Close	UserLoginWindow		Kapat
 Close	RatePackageWindow		Kapat
 An unexpected error has been sent from the server [%i]	ServerHelper		Sunucudan beklenmedik bir hata gönderildi [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		'%REPO_NAME%' depo paket bilgisi eşitleniyor
+An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Yeni bir kullanıcı oluşturmak için gerekli kullanım koşulları indirilirken bir hata oluştu. Ayrıntılar için günlüğü denetleyin ve yeniden deneyin.\nGünlük görüntüleme üzerine bilgiyi Haiku Kullanıcı Kılavuzu'nun Haiku Depo bölümünde bulabilirsiniz.
 View the usage conditions	UserLoginWindow		Kullanım koşullarını görüntüle
 Login issue	MainWindow		Giriş sorunu
 Size	PackageListView		Boyut
@@ -107,6 +108,7 @@ All categories	FilterView		Tüm kategoriler
 Repositories	MainWindow		Depolar
 n/a	PackageInfoView		yok
 This rating is visible to other users	RatePackageWindow		Bu derecelendirme diğer kullanıcılar tarafından görüntülenebilir
+While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		Paket verisi güncellenirken verinin uygulamaya yansıtılamamasına neden olan bir sorun oluştu. Bu sorun hakkında ayrıntılı bilgiye uygulama günlüklerinden erişilebilir.\nGünlük görüntüleme üzerine bilgiyi Haiku Kullanıcı Kılavuzu'nun Haiku Depo bölümünde bulabilirsiniz.
 View agreed usage conditions…	MainWindow		Kabul edilen kullanım koşullarını görüntüle…
 Cancel	MainWindow		İptal
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 tane daha indirilecek)}other{(# tane daha indirilecek)}}

@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Installer	1288089140
+1	romanian	x-vnd.Haiku-Installer	2017577026
 Performing installation.	InstallProgress		Se execută instalarea.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Alege discul sursă din meniul contextual. Apoi apasă \"Începe\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Alegeți fereastra ConfigurareDrive înainte de a închide fereastra Programului de instalare.
@@ -23,6 +23,7 @@ Welcome to the Haiku Installer!\n\n	InstallerApp		Bine ați venit la Programul d
 ?? of ??	InstallerWindow	Unknown progress	?? din ??
 Quit Boot Manager	InstallerWindow		Închide Boot Manager
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		ConfigurareDrive, aplicația pentru configurarea partițiilor de disc, nu a putut fi pornită.
+The target volume is not empty. If it already contains a Haiku installation, it will be overwritten. This will remove all installed software.\n\nIf you want to upgrade your system without removing installed software, see the Haiku User Guide's topic on the application \"SoftwareUpdater\" for update instructions.\n\nAre you sure you want to continue the installation?	InstallProgress		Volumul țintă nu este gol. Dacă acesta conține deja o instalare Haiku, aceasta va fi suprascrisă. Acest lucru va elimina toate programele instalate.\n\nDacă doriți să actualizați sistemul fără să eliminați programele instalate, consultați subiectul din Ghidul Utilizatorului Haiku despre aplicația \„SoftwareUpdater\” pentru instrucțiuni de actualizare.\n\nSigur doriți să continuați instalarea?
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Se pornește Administratorul de boot...\n\nÎnchideți Administratorul de Boot pentru a continua cu instalarea.
 Quit DriveSetup	InstallerWindow		Închide DriveSetup
 Write boot sector	InstallerWindow		Scrie sectorul de boot
@@ -35,6 +36,7 @@ This is beta-quality software! It means there is a risk of losing important data
 Install anyway	InstallProgress		Instalează oricum
 1)   If you are installing Haiku onto real hardware (not inside an emulator), you may want to prepare a hard disk partition from another OS (you could, for example, use a GParted Live-CD, which can also resize existing partitions to make room).\nYou can also set up partitions by launching DriveSetup from Installer, but you won't be able to resize existing partitions with it. While DriveSetup has been quite thoroughly tested over the years, it's recommended to have up-to-date backups of the other partitions on your system. Just in case…	InstallerApp		1)   Dacă instalați Haiku pe hardware real (nu în interiorul unui emulator), poate doriți să pregătiți o partiție de hard disc de la alt OS (puteți, de exemplu, să utilizați un CD-Live GParted, care poate și să redimensioneze partițiile existente pentru a crea spațiu).\nPuteți configura partiții și prin lansarea DriveSetup din Installer, dar nu veți putea să redimensionați partiții existente cu acesta. Deși DriveSetup a fost destul de bine testat de-a lungul anilor, este recomandat să aveți copii de rezervă actualizate ale celorlalte partiții de pe sistem. Pentru orice eventualitate…
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Alege discul sursă și de destinație din meniurile contextuale. Apoi apasă \"Începe\".
+2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Haiku User Guide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2)   Installer va face partiția Haiku însăși capabilă să pornească sistemul, dar nu ia niciun pas să integreze Haiku într-un meniu de pornire existent. Dacă aveți GRUB deja instalat, puteți adăuga Haiku la acesta.\nPentru detalii, consultați ghidul pentru pornirea Haiku de pe pagina noastră web la https://www.haiku-os.org/guides/booting.\nSau puteți să stabiliți un meniu de pornire de la meniul \„Unelte\” al Installer, consultați subiectul Ghidului Utilizatorului Haiku despre aplicația \„BootManager\”.\n\n\n
 Hide optional packages	InstallerWindow		Ascunde pachetele opționale
 ???	InstallerWindow	Unknown partition name	???
 Have fun and thanks for trying out Haiku!	InstallerApp		Distracție plăcută și mulțumim că ați încercat Haiku!
@@ -43,6 +45,7 @@ Error writing boot sector.	InstallProgress		Eroare la scrierea sectorului de boo
 OK	InstallerWindow		OK
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Închideți Administratorul de boot și ConfigurareDrive înainte de a închide fereastra Programului de instalare.
 Failed to launch Boot Manager	InstallerWindow		Nu s-a putut lansa Managerul de Boot
+3)   When you successfully boot into Haiku for the first time, make sure to read our \"User Guide\" and take the \"Quick Tour\". There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Când porniți cu succes Haiku pentru prima dată, asigurați-vă că citiți \„Ghidul Utilizatorului\” și că faceți \„Turul Rapid\”. Există legături pe Desktop și în favoritele WebPositive.\n\n
 Try installing anyway	InstallProgress		Încearcă să instalezi oricum
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n
 Additional disk space required: %s	InstallerWindow		Spațiu de disc adițional necesar: %s

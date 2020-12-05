@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-HaikuDepot	2792101273
+1	catalan; valencian	x-vnd.Haiku-HaikuDepot	412302812
 Repository update error	LocalRepositoryUpdateProcess		Error d'actualització del repositori
 Network error	ServerHelper		Error de xarxa
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Hi ha hagut un error en actualitzar el repositori: %error%
@@ -97,6 +97,7 @@ Close	UserLoginWindow		Tanca
 Close	RatePackageWindow		Tanca
 An unexpected error has been sent from the server [%i]	ServerHelper		S'ha enviat un error inesperat des del servidor [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Se sincronitzen les dades de paquets per al repositori %REPO_NAME%.
+An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		S'ha produït un error en baixar les condicions d'ús necessàries per crear un usuari nou. Consulteu el registre per obtenir-ne més informació i torneu-ho a provar. \nHi ha informació sobre com visualitzar els registres a la secció del Dipòsit del Haiku de la Guia de l’usuari del Haiku.
 View the usage conditions	UserLoginWindow		Mostra'n les condicions d'ús
 Login issue	MainWindow		Problema d’inici de sessió
 Size	PackageListView		Mida
@@ -107,6 +108,7 @@ All categories	FilterView		Totes les categories
 Repositories	MainWindow		Repositoris
 n/a	PackageInfoView		n/d
 This rating is visible to other users	RatePackageWindow		Aquesta puntuació és visible per a altres usuaris.
+While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		En actualitzar les dades del paquet, s’ha produït un problema que pot fer que les dades quedin obsoletes o que faltin a la visualització de l’aplicació. És possible que es puguin obtenir detalls addicionals sobre aquest problema als registres de l'aplicació.\nHi ha informació sobre com visualitzar els registres a la secció del Dipòsit del Haiku de la Guia de l’usuari del Haiku.
 View agreed usage conditions…	MainWindow		Consulteu les condicions d’ús acordades...
 Cancel	MainWindow		Cancel·la
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 més per baixar)}other{(# més per baixar)}}

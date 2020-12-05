@@ -85,7 +85,7 @@ Clean up	ContainerWindow		アイコンの整列
 Modified	FindPanel		更新日時
 Select all	QueryContainerWindow		すべて選択
 Select…	FilePanelPriv		選択…
-preferences	B_PREFERENCES_DIRECTORY		設定
+preferences	B_PREFERENCES_DIRECTORY		環境設定
 Name	Person Query Columns		名前
 Skip all	FSUtils		すべてスキップ
 Corrupted opcode.	libtracker		オペコードが壊れています。
@@ -311,7 +311,7 @@ Edit name	ContainerWindow		名前の変更
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		\"%document\" を開けませんでした (シンボル %symbol が見つかりません)。\n
 ASCII Text	AttributesView		ASCIIテキスト
 Atom reference	AttributesView		Atomリファレンス
-config	B_USER_CONFIG_DIRECTORY		config
+config	B_USER_CONFIG_DIRECTORY		設定
 Error moving \"%name\".	FSUtils		\"%name\"を移動中にエラーが発生しました。
 Select…	QueryContainerWindow		選択…
 Open	ContainerWindow		開く
