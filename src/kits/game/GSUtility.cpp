@@ -19,7 +19,7 @@ _gs_ramp*
 InitRamp(float* value, float set, float frames, bigtime_t duration)
 {
 	float diff = (set > *value) ? set - *value : *value - set;
-	bigtime_t sec = bigtime_t(duration / 1000000.0);
+	float sec = float(duration) / 1000000.0;
 	float inc = diff * 200;
 
 	_gs_ramp* ramp = new (std::nothrow) _gs_ramp;
