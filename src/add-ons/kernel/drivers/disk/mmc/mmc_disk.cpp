@@ -10,10 +10,10 @@
 
 #include <new>
 
-#include <string.h>
+#include <ctype.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <ctype.h>
+#include <string.h>
 
 #include "mmc_disk.h"
 #include "mmc_icon.h"
@@ -99,8 +99,57 @@ mmc_disk_register_device(device_node* node)
 		{ NULL }
 	};
 
-	return sDeviceManager->register_node(node
-		, MMC_DISK_DRIVER_MODULE_NAME, attrs, NULL, NULL);
+	return sDeviceManager->register_node(node, MMC_DISK_DRIVER_MODULE_NAME,
+		attrs, NULL, NULL);
+}
+
+
+static status_t
+mmc_disk_execute_iorequest(void* data, IOOperation* operation)
+{
+	mmc_disk_driver_info* info = (mmc_disk_driver_info*)data;
+	status_t error;
+
+	error = info->mmc->do_io(info->parent, info->rca, operation);
+
+	if (error != B_OK) {
+		info->scheduler->OperationCompleted(operation, error, 0);
+		return error;
+	}
+
+	info->scheduler->OperationCompleted(operation, B_OK, operation->Length());
+	return B_OK;
+}
+
+
+static status_t
+mmc_block_get_geometry(mmc_disk_driver_info* info, device_geometry* geometry)
+{
+	struct mmc_disk_csd csd;
+	TRACE("Get geometry\n");
+	status_t error = info->mmc->execute_command(info->parent, SD_SEND_CSD,
+		info->rca << 16, (uint32_t*)&csd);
+	if (error != B_OK) {
+		TRACE("Could not get CSD! %s\n", strerror(error));
+		return error;
+	}
+
+	TRACE("CSD: %" PRIx64 " %" PRIx64 "\n", csd.bits[0], csd.bits[1]);
+
+	if (csd.structure_version() < 3) {
+		geometry->bytes_per_sector = 1 << csd.read_bl_len();
+		geometry->sectors_per_track = csd.c_size() + 1;
+		geometry->cylinder_count = 1 << (csd.c_size_mult() + 2);
+		geometry->head_count = 1;
+		geometry->device_type = B_DISK;
+		geometry->removable = true; // TODO detect eMMC which isn't
+		geometry->read_only = false; // TODO check write protect switch?
+		geometry->write_once = false;
+		return B_OK;
+	}
+
+	TRACE("unknown CSD version %d\n", csd.structure_version());
+	return B_NOT_SUPPORTED;
 }
 
 
@@ -131,8 +180,48 @@ mmc_disk_init_driver(device_node* node, void** cookie)
 		return B_BAD_DATA;
 	}
 
-	TRACE("MMC card device initialized for RCA %x\n", info->rca);
+	static const uint32 kBlockSize = 512; // FIXME get it from the CSD
+	status_t error;
 
+	static const uint32 kDMAResourceBufferCount			= 16;
+	static const uint32 kDMAResourceBounceBufferCount	= 16;
+
+	// TODO relax this when we have ADMA2
+	// TODO the restrictions depend on the SDHCI bus and should be read
+	// from there, not hardcoded in mmc_disk
+	const dma_restrictions restrictions = {
+		0, UINT32_MAX, /* Only 32bit address space in SDMA mode */
+		512, /* Align requests on sectors start and end */
+		B_PAGE_SIZE, /* Do not cross pages (SDMA can't do it) */
+		512, 1, 512};
+
+	error = info->dmaResource.Init(restrictions, kBlockSize,
+		kDMAResourceBufferCount, kDMAResourceBounceBufferCount);
+	if (error != B_OK) {
+		TRACE("Failed to init DMA resource");
+		free(info);
+		return error;
+	}
+
+	info->scheduler = new(std::nothrow) IOSchedulerSimple(&info->dmaResource);
+	if (info->scheduler == NULL) {
+		TRACE("Failed to allocate scheduler");
+		free(info);
+		return B_NO_MEMORY;
+	}
+
+	error = info->scheduler->Init("mmc storage");
+	if (error != B_OK) {
+		TRACE("Failed to init scheduler");
+		delete info->scheduler;
+		free(info);
+		return error;
+	}
+	info->scheduler->SetCallback(&mmc_disk_execute_iorequest, info);
+
+	memset(&info->geometry, 0, sizeof(info->geometry));
+
+	TRACE("MMC card device initialized for RCA %x\n", info->rca);
 	*cookie = info;
 	return B_OK;
 }
@@ -143,6 +232,7 @@ mmc_disk_uninit_driver(void* _cookie)
 {
 	CALLED();
 	mmc_disk_driver_info* info = (mmc_disk_driver_info*)_cookie;
+	delete info->scheduler;
 	sDeviceManager->put_node(info->parent);
 	free(info);
 }
@@ -216,7 +306,7 @@ mmc_block_open(void* _info, const char* path, int openMode, void** _cookie)
 static status_t
 mmc_block_close(void* cookie)
 {
-	mmc_disk_handle* handle = (mmc_disk_handle*)cookie;
+	//mmc_disk_handle* handle = (mmc_disk_handle*)cookie;
 	CALLED();
 
 	return B_OK;
@@ -234,24 +324,82 @@ mmc_block_free(void* cookie)
 }
 
 
-static status_t 
+static status_t
 mmc_block_read(void* cookie, off_t pos, void* buffer, size_t* _length)
 {
 	CALLED();
 	mmc_disk_handle* handle = (mmc_disk_handle*)cookie;
-	TRACE("Ready to execute %p\n", handle->info->mmc->read_naive);
-	return handle->info->mmc->read_naive(handle->info->parent, handle->info->rca, pos, buffer, _length);
+
+	size_t length = *_length;
+
+	if (handle->info->geometry.bytes_per_sector == 0) {
+		status_t error = mmc_block_get_geometry(handle->info,
+			&handle->info->geometry);
+		if (error != B_OK) {
+			TRACE("Failed to get disk capacity");
+			return error;
+		}
+	}
+
+	// Do not allow reading past device end
+	if (pos >= handle->info->DeviceSize())
+		return B_BAD_VALUE;
+	if (pos + (off_t)length > handle->info->DeviceSize())
+		length = handle->info->DeviceSize() - pos;
+
+	IORequest request;
+	status_t status = request.Init(pos, (addr_t)buffer, length, false, 0);
+	if (status != B_OK)
+		return status;
+
+	status = handle->info->scheduler->ScheduleRequest(&request);
+	if (status != B_OK)
+		return status;
+
+	status = request.Wait(0, 0);
+	if (status == B_OK)
+		*_length = length;
+	return status;
 }
 
 
 static status_t
 mmc_block_write(void* cookie, off_t position, const void* buffer,
-	size_t* length)
+	size_t* _length)
 {
 	CALLED();
 	mmc_disk_handle* handle = (mmc_disk_handle*)cookie;
 
-	return B_NOT_SUPPORTED;
+	size_t length = *_length;
+
+	if (handle->info->geometry.bytes_per_sector == 0) {
+		status_t error = mmc_block_get_geometry(handle->info,
+			&handle->info->geometry);
+		if (error != B_OK) {
+			TRACE("Failed to get disk capacity");
+			return error;
+		}
+	}
+
+	if (position >= handle->info->DeviceSize())
+		return B_BAD_VALUE;
+	if (position + (off_t)length > handle->info->DeviceSize())
+		length = handle->info->DeviceSize() - position;
+
+	IORequest request;
+	status_t status = request.Init(position, (addr_t)buffer, length, true, 0);
+	if (status != B_OK)
+		return status;
+
+	status = handle->info->scheduler->ScheduleRequest(&request);
+	if (status != B_OK)
+		return status;
+
+	status = request.Wait(0, 0);
+	if (status == B_OK)
+		*_length = length;
+
+	return status;
 }
 
 
@@ -261,34 +409,7 @@ mmc_block_io(void* cookie, io_request* request)
 	CALLED();
 	mmc_disk_handle* handle = (mmc_disk_handle*)cookie;
 
-	return B_NOT_SUPPORTED;
-}
-
-
-static status_t
-mmc_block_get_geometry(mmc_disk_handle* handle, device_geometry* geometry)
-{
-	struct mmc_disk_csd csd;
-	TRACE("Ready to execute %p\n", handle->info->mmc->execute_command);
-	handle->info->mmc->execute_command(handle->info->parent, SD_SEND_CSD,
-		handle->info->rca << 16, (uint32_t*)&csd);
-
-	TRACE("CSD: %lx %lx\n", csd.bits[0], csd.bits[1]);
-
-	if (csd.structure_version() == 0) {
-		geometry->bytes_per_sector = 1 << csd.read_bl_len();
-		geometry->sectors_per_track = csd.c_size() + 1;
-		geometry->cylinder_count = 1 << (csd.c_size_mult() + 2);
-		geometry->head_count = 1;
-		geometry->device_type = B_DISK;
-		geometry->removable = true; // TODO detect eMMC which isn't
-		geometry->read_only = true; // TODO add write support
-		geometry->write_once = false;
-		return B_OK;
-	}
-
-	TRACE("unknown CSD version %d\n", csd.structure_version());
-	return B_NOT_SUPPORTED;
+	return handle->info->scheduler->ScheduleRequest(request);
 }
 
 
@@ -316,9 +437,20 @@ mmc_block_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 
 		case B_GET_DEVICE_SIZE:
 		{
-			//size_t size = info->capacity * info->block_size;
-			//return user_memcpy(buffer, &size, sizeof(size_t));
-			return B_NOT_SUPPORTED;
+			// Legacy ioctl, use B_GET_GEOMETRY
+			if (info->geometry.bytes_per_sector == 0) {
+				status_t error = mmc_block_get_geometry(info, &info->geometry);
+				if (error != B_OK) {
+					TRACE("Failed to get disk capacity");
+					return error;
+				}
+			}
+
+			uint64_t size = info->DeviceSize();
+			if (size > SIZE_MAX)
+				return B_NOT_SUPPORTED;
+			size_t size32 = size;
+			return user_memcpy(buffer, &size32, sizeof(size_t));
 		}
 
 		case B_GET_GEOMETRY:
@@ -326,12 +458,16 @@ mmc_block_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 			if (buffer == NULL || length < sizeof(device_geometry))
 				return B_BAD_VALUE;
 
-		 	device_geometry geometry;
-			status_t status = mmc_block_get_geometry(handle, &geometry);
-			if (status != B_OK)
-				return status;
+			if (info->geometry.bytes_per_sector == 0) {
+				status_t error = mmc_block_get_geometry(info, &info->geometry);
+				if (error != B_OK) {
+					TRACE("Failed to get disk capacity");
+					return error;
+				}
+			}
 
-			return user_memcpy(buffer, &geometry, sizeof(device_geometry));
+			return user_memcpy(buffer, &info->geometry,
+				sizeof(device_geometry));
 		}
 
 		case B_GET_ICON_NAME:

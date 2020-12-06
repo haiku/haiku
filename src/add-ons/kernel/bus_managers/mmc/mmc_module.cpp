@@ -1,9 +1,10 @@
 /*
- * Copyright 2018 Haiku, Inc. All rights reserved.
+ * Copyright 2018-2021 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		B Krishnan Iyer, krishnaniyer97@gmail.com
+ *		Adrien Destugues, pulkomandy@pulkomandy.tk
  */
 #include "mmc_bus.h"
 
@@ -102,21 +103,23 @@ mmc_bus_execute_command(device_node* node, uint8_t command, uint32_t argument,
 
 
 static status_t
-mmc_bus_read_naive(device_node* node, uint16_t rca, off_t pos, void* buffer,
-	size_t* _length)
+mmc_bus_do_io(device_node* node, uint16_t rca, IOOperation* operation)
 {
-	// FIXME store the parent cookie in the bus cookie or something instead of
-	// getting/putting the parent each time.
 	driver_module_info* mmc;
 	void* cookie;
 
+	// FIXME store the parent cookie in the bus cookie or something instead of
+	// getting/putting the parent each time.
 	device_node* parent = gDeviceManager->get_parent_node(node);
 	gDeviceManager->get_driver(parent, &mmc, &cookie);
 	gDeviceManager->put_node(parent);
 
 	MMCBus* bus = (MMCBus*)cookie;
 	bus->AcquireBus();
-	status_t result = bus->Read(rca, pos, buffer, _length);
+	status_t result = B_OK;
+
+	result = bus->DoIO(rca, operation);
+
 	bus->ReleaseBus();
 	return result;
 }
@@ -172,7 +175,7 @@ mmc_device_interface mmc_bus_controller_module = {
 		NULL
 	},
 	mmc_bus_execute_command,
-	mmc_bus_read_naive
+	mmc_bus_do_io
 };
 
 

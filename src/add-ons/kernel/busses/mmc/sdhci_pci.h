@@ -38,8 +38,8 @@ class TransferMode {
 		static const uint8_t kAutoCmdDisabled = 0 << 2;
 		static const uint8_t kAutoCmd12Enable = 1 << 2;
 		static const uint8_t kAutoCmd23Enable = 2 << 2;
-		static const uint8_t kAutoCmdAutoSelect = 
-			kAutoCmd23Enable | kAutoCmd12Enable;
+		static const uint8_t kAutoCmdAutoSelect
+			= kAutoCmd23Enable | kAutoCmd12Enable;
 
 		// TODO block count enable
 
@@ -65,7 +65,7 @@ class Command {
 		static const uint8_t kSubCommand = 0x4;
 		static const uint8_t kReplySizeMask = 0x3;
 		static const uint8_t k32BitResponse = 0x2;
-		static const uint8_t k128BitResponse = 0x1; 
+		static const uint8_t k128BitResponse = 0x1;
 		static const uint8_t k32BitResponseCheckBusy = 0x3;
 
 		// For simplicity pre-define the standard response types from the SD

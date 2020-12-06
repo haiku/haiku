@@ -15,6 +15,9 @@
 #define MMC_BUS_MODULE_NAME "bus_managers/mmc/driver_v1"
 
 
+struct IOOperation;
+
+
 enum {
 	CARD_TYPE_MMC,
 	CARD_TYPE_SD,
@@ -64,8 +67,7 @@ typedef struct mmc_bus_interface {
 	status_t (*set_clock)(void* controller, uint32_t kilohertz);
 	status_t (*execute_command)(void* controller, uint8_t command,
 		uint32_t argument, uint32_t* result);
-	status_t (*read_naive)(void* controller, off_t pos,
-		void* buffer, size_t* _length);
+	status_t (*do_io)(void* controller, IOOperation* operation);
 } mmc_bus_interface;
 
 
@@ -74,8 +76,8 @@ typedef struct mmc_device_interface {
 	driver_module_info info;
 	status_t (*execute_command)(device_node* node, uint8_t command,
 		uint32_t argument, uint32_t* result);
-	status_t (*read_naive)(device_node* controller, uint16_t rca, off_t pos,
-		void* buffer, size_t* _length);
+	status_t (*do_io)(device_node* controller, uint16_t rca,
+		IOOperation* operation);
 } mmc_device_interface;
 
 

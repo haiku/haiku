@@ -86,12 +86,12 @@ MMCBus::ExecuteCommand(uint8_t command, uint32_t argument, uint32_t* response)
 
 
 status_t
-MMCBus::Read(uint16_t rca, off_t position, void* buffer, size_t* length)
+MMCBus::DoIO(uint16_t rca, IOOperation* operation)
 {
 	status_t status = _ActivateDevice(rca);
 	if (status != B_OK)
 		return status;
-	return fController->read_naive(fCookie, position, buffer, length);
+	return fController->do_io(fCookie, operation);
 }
 
 
