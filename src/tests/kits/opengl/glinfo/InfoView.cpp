@@ -37,17 +37,23 @@ InfoView::InfoView()
 	:
 	BGroupView(B_TRANSLATE("Information"), B_HORIZONTAL)
 {
-	BStringView* rendererView = new BStringView(NULL,
-		(const char*)glGetString(GL_RENDERER));
+	const char* glRenderer = (const char*)glGetString(GL_RENDERER);
+	if (glRenderer == NULL)
+		glRenderer = B_TRANSLATE("Unknown or missing OpenGL renderer.");
+	BStringView* rendererView = new BStringView(NULL, glRenderer);
 	rendererView->SetExplicitAlignment(kLabelAlignment);
 	rendererView->SetFont(be_bold_font);
 
-	BStringView* vendorNameView = new BStringView(NULL,
-		(const char*)glGetString(GL_VENDOR));
-		vendorNameView->SetExplicitAlignment(kLabelAlignment);
+	const char* glVendor = (const char*)glGetString(GL_VENDOR);
+	if (glVendor == NULL)
+		glVendor = B_TRANSLATE("Unknown vendor");
+	BStringView* vendorNameView = new BStringView(NULL, glVendor);
+	vendorNameView->SetExplicitAlignment(kLabelAlignment);
 
-	BStringView* glVersionView = new BStringView(NULL,
-		(const char*)glGetString(GL_VERSION));
+	const char* glVersion = (const char*)glGetString(GL_VERSION);
+	if (glVersion == NULL)
+		glVersion = B_TRANSLATE("Unknown version");
+	BStringView* glVersionView = new BStringView(NULL, glVersion);
 	glVersionView->SetExplicitAlignment(kLabelAlignment);
 
 	BString apiString("GLU ");
