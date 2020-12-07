@@ -45,10 +45,10 @@
 // Sound Buffer Utility functions ----------------------------------------
 template<typename T, int middle = 0>
 static inline void
-ApplyMod(T* data, T* buffer, int64 index, float * pan)
+ApplyMod(T* data, int64 index, float* pan)
 {
-	data[index * 2] += T(float(buffer[index * 2] - middle) * pan[0] + middle);
-	data[index * 2 + 1] += T(float(buffer[index * 2 + 1] - middle) * pan[1]
+	data[index * 2] = T(float(data[index * 2] - middle) * pan[0] + middle);
+	data[index * 2 + 1] = T(float(data[index * 2 + 1] - middle) * pan[1]
 							+ middle);
 }
 
@@ -256,15 +256,13 @@ GameSoundBuffer::Play(void * data, int64 frames)
 		pan[0] = fPanRight * fGain;
 		pan[1] = fPanLeft * fGain;
 
-		char * buffer = new char[fFrameSize * frames];
-
-		FillBuffer(buffer, frames);
+		FillBuffer(data, frames);
 
 		switch (fFormat.format) {
 			case gs_audio_format::B_GS_U8:
 			{
 				for (int64 i = 0; i < frames; i++) {
-					ApplyMod<uint8, 128>((uint8*)data, (uint8*)buffer, i, pan);
+					ApplyMod<uint8, 128>((uint8*)data, i, pan);
 					UpdateMods();
 				}
 
@@ -274,7 +272,7 @@ GameSoundBuffer::Play(void * data, int64 frames)
 			case gs_audio_format::B_GS_S16:
 			{
 				for (int64 i = 0; i < frames; i++) {
-					ApplyMod<int16>((int16*)data, (int16*)buffer, i, pan);
+					ApplyMod<int16>((int16*)data, i, pan);
 					UpdateMods();
 				}
 
@@ -284,7 +282,7 @@ GameSoundBuffer::Play(void * data, int64 frames)
 			case gs_audio_format::B_GS_S32:
 			{
 				for (int64 i = 0; i < frames; i++) {
-					ApplyMod<int32>((int32*)data, (int32*)buffer, i, pan);
+					ApplyMod<int32>((int32*)data, i, pan);
 					UpdateMods();
 				}
 
@@ -294,14 +292,13 @@ GameSoundBuffer::Play(void * data, int64 frames)
 			case gs_audio_format::B_GS_F:
 			{
 				for (int64 i = 0; i < frames; i++) {
-					ApplyMod<float>((float*)data, (float*)buffer, i, pan);
+					ApplyMod<float>((float*)data, i, pan);
 					UpdateMods();
 				}
 
 				break;
 			}
 		}
-		delete[] buffer;
 	} else if (fFormat.channel_count == 1) {
 		// FIXME the output should be stereo, and we could pan mono sounds
 		// here. But currently the output has the same number of channels as
