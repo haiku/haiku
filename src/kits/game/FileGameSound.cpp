@@ -32,7 +32,15 @@ struct _gs_media_tracker {
 
 
 // Local utility functions -----------------------------------------------
-template<typename T, int middle = 0>
+template<typename T>
+inline bool
+FillBuffer(_gs_ramp* ramp, T* dest, const T* src, size_t* bytes)
+{
+	return ::FillBuffer<T, 0>(ramp, dest, src, bytes);
+}
+
+
+template<typename T, int middle>
 bool
 FillBuffer(_gs_ramp* ramp, T* dest, const T* src, size_t* bytes)
 {

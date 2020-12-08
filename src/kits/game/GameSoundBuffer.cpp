@@ -43,7 +43,15 @@
 #include "GSUtility.h"
 
 // Sound Buffer Utility functions ----------------------------------------
-template<typename T, int middle = 0>
+template<typename T>
+static inline void
+ApplyMod(T* data, int64 index, float* pan)
+{
+	return ApplyMod<T, 0>(data, index, pan);
+}
+
+
+template<typename T, int middle>
 static inline void
 ApplyMod(T* data, int64 index, float* pan)
 {
