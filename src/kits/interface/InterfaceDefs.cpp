@@ -995,7 +995,7 @@ void
 set_focus_follows_mouse(bool follow)
 {
 	// obviously deprecated API
-	set_mouse_mode(B_FOCUS_FOLLOWS_MOUSE);
+	set_mouse_mode(follow ? B_FOCUS_FOLLOWS_MOUSE : B_NORMAL_MOUSE);
 }
 
 
