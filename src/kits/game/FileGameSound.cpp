@@ -32,14 +32,6 @@ struct _gs_media_tracker {
 
 
 // Local utility functions -----------------------------------------------
-template<typename T>
-inline bool
-FillBuffer(_gs_ramp* ramp, T* dest, const T* src, size_t* bytes)
-{
-	return ::FillBuffer<T, 0>(ramp, dest, src, bytes);
-}
-
-
 template<typename T, int middle>
 bool
 FillBuffer(_gs_ramp* ramp, T* dest, const T* src, size_t* bytes)
@@ -220,19 +212,19 @@ BFileGameSound::FillBuffer(void* inBuffer, size_t inByteCount)
 					break;
 
 				case gs_audio_format::B_GS_S16:
-					rampDone = ::FillBuffer<int16>(fPausing,
+					rampDone = ::FillBuffer<int16, 0>(fPausing,
 						(int16*)&buffer[out_offset],
 						(int16*)&fBuffer[fPlayPosition], &bytes);
 					break;
 
 				case gs_audio_format::B_GS_S32:
-					rampDone = ::FillBuffer<int32>(fPausing,
+					rampDone = ::FillBuffer<int32, 0>(fPausing,
 						(int32*)&buffer[out_offset],
 						(int32*)&fBuffer[fPlayPosition], &bytes);
 					break;
 
 				case gs_audio_format::B_GS_F:
-					rampDone = ::FillBuffer<float>(fPausing,
+					rampDone = ::FillBuffer<float, 0>(fPausing,
 						(float*)&buffer[out_offset],
 						(float*)&fBuffer[fPlayPosition], &bytes);
 					break;

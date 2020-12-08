@@ -43,14 +43,6 @@
 #include "GSUtility.h"
 
 // Sound Buffer Utility functions ----------------------------------------
-template<typename T>
-static inline void
-ApplyMod(T* data, int64 index, float* pan)
-{
-	return ApplyMod<T, 0>(data, index, pan);
-}
-
-
 template<typename T, int middle>
 static inline void
 ApplyMod(T* data, int64 index, float* pan)
@@ -280,7 +272,7 @@ GameSoundBuffer::Play(void * data, int64 frames)
 			case gs_audio_format::B_GS_S16:
 			{
 				for (int64 i = 0; i < frames; i++) {
-					ApplyMod<int16>((int16*)data, i, pan);
+					ApplyMod<int16, 0>((int16*)data, i, pan);
 					UpdateMods();
 				}
 
@@ -290,7 +282,7 @@ GameSoundBuffer::Play(void * data, int64 frames)
 			case gs_audio_format::B_GS_S32:
 			{
 				for (int64 i = 0; i < frames; i++) {
-					ApplyMod<int32>((int32*)data, i, pan);
+					ApplyMod<int32, 0>((int32*)data, i, pan);
 					UpdateMods();
 				}
 
@@ -300,7 +292,7 @@ GameSoundBuffer::Play(void * data, int64 frames)
 			case gs_audio_format::B_GS_F:
 			{
 				for (int64 i = 0; i < frames; i++) {
-					ApplyMod<float>((float*)data, i, pan);
+					ApplyMod<float, 0>((float*)data, i, pan);
 					UpdateMods();
 				}
 
