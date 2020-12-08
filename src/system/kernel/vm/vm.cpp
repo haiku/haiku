@@ -1347,6 +1347,11 @@ vm_create_anonymous_area(team_id team, const char *name, addr_t size,
 	if (!arch_vm_supports_protection(protection))
 		return B_NOT_SUPPORTED;
 
+	if (team == B_CURRENT_TEAM)
+		team = VMAddressSpace::CurrentID();
+	if (team < 0)
+		return B_BAD_TEAM_ID;
+
 	if (isStack || (protection & B_OVERCOMMITTING_AREA) != 0)
 		canOvercommit = true;
 
