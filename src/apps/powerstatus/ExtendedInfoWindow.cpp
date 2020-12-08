@@ -313,7 +313,7 @@ ExtPowerStatusView::IsCritical()
 
 
 void
-ExtPowerStatusView::Update(bool force)
+ExtPowerStatusView::Update(bool force, bool notify)
 {
 	PowerStatusView::Update(force);
 	if (!fSelected)

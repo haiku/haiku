@@ -382,7 +382,7 @@ PowerStatusView::_SetLabel(char* buffer, size_t bufferLength)
 
 
 void
-PowerStatusView::Update(bool force)
+PowerStatusView::Update(bool force, bool notify)
 {
 	int32 previousPercent = fPercent;
 	time_t previousTimeLeft = fTimeLeft;
@@ -479,7 +479,7 @@ PowerStatusView::Update(bool force)
 	}
 
 	if (!fOnline && fHasBattery && previousPercent > kLowBatteryPercentage
-			&& fPercent <= kLowBatteryPercentage) {
+			&& fPercent <= kLowBatteryPercentage && notify) {
 		_NotifyLowBattery();
 	}
 }
@@ -610,7 +610,7 @@ PowerStatusReplicant::PowerStatusReplicant(BRect frame, int32 resizingMode,
 			B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 		AddChild(dragger);
 	} else
-		Update();
+		Update(false,false);
 }
 
 

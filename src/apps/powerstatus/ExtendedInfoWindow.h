@@ -59,7 +59,7 @@ public:
 	virtual	bool				IsCritical();
 
 protected:
-	virtual void				Update(bool force = false);
+	virtual void				Update(bool force = false, bool notify = true);
 
 private:
 			ExtendedInfoWindow*	fExtendedInfoWindow;
