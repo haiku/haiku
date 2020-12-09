@@ -358,25 +358,29 @@ BRepositoryInfo::_SetTo(const BEntry& entry)
 	buffer[size] = '\0';
 	configString.UnlockBuffer(size);
 
-	void* settingsHandle = parse_driver_settings_string(configString.String());
-	if (settingsHandle == NULL)
+	DriverSettingsUnloader settingsHandle(
+		parse_driver_settings_string(configString.String()));
+	if (!settingsHandle.IsSet())
 		return B_BAD_DATA;
-	DriverSettingsUnloader settingsHandleDeleter(settingsHandle);
 
-	const char* name = get_driver_parameter(settingsHandle, "name", NULL, NULL);
-	const char* identifier = get_driver_parameter(settingsHandle, "identifier", NULL, NULL);
+	const char* name = get_driver_parameter(settingsHandle.Get(), "name", NULL,
+		NULL);
+	const char* identifier = get_driver_parameter(settingsHandle.Get(),
+		"identifier", NULL, NULL);
 	// Also handle the old name if the new one isn't found
 	if (identifier == NULL || *identifier == '\0')
-		identifier = get_driver_parameter(settingsHandle, "url", NULL, NULL);
-	const char* baseUrl = get_driver_parameter(settingsHandle, "baseurl", NULL, NULL);
-	const char* vendor
-		= get_driver_parameter(settingsHandle, "vendor", NULL, NULL);
-	const char* summary
-		= get_driver_parameter(settingsHandle, "summary", NULL, NULL);
-	const char* priorityString
-		= get_driver_parameter(settingsHandle, "priority", NULL, NULL);
-	const char* architectureString
-		= get_driver_parameter(settingsHandle, "architecture", NULL, NULL);
+		identifier = get_driver_parameter(settingsHandle.Get(),
+			"url", NULL, NULL);
+	const char* baseUrl = get_driver_parameter(settingsHandle.Get(),
+		"baseurl", NULL, NULL);
+	const char* vendor = get_driver_parameter(settingsHandle.Get(),
+		"vendor", NULL, NULL);
+	const char* summary = get_driver_parameter(settingsHandle.Get(),
+		"summary", NULL, NULL);
+	const char* priorityString = get_driver_parameter(settingsHandle.Get(),
+		"priority", NULL, NULL);
+	const char* architectureString = get_driver_parameter(settingsHandle.Get(),
+		"architecture", NULL, NULL);
 
 	if (name == NULL || *name == '\0'
 		|| identifier == NULL || *identifier == '\0'

@@ -226,11 +226,9 @@ BFSPartitionHandle::Repair(bool checkOnly)
 	BPath path;
 	path.SetTo(&directory, ".");
 
-	int fd = open(path.Path(), O_RDONLY);
-	if (fd < 0)
+	FileDescriptorCloser fd(open(path.Path(), O_RDONLY));
+	if (!fd.IsSet())
 	    return errno;
-
-	FileDescriptorCloser closer(fd);
 
 	struct check_control result;
 	memset(&result, 0, sizeof(result));
@@ -243,7 +241,7 @@ BFSPartitionHandle::Repair(bool checkOnly)
 	}
 
 	// start checking
-	if (ioctl(fd, BFS_IOCTL_START_CHECKING, &result, sizeof(result)) < 0)
+	if (ioctl(fd.Get(), BFS_IOCTL_START_CHECKING, &result, sizeof(result)) < 0)
 	    return errno;
 
 	uint64 attributeDirectories = 0, attributes = 0;
@@ -252,7 +250,7 @@ BFSPartitionHandle::Repair(bool checkOnly)
 	uint32 previousPass = result.pass;
 
 	// check all files and report errors
-	while (ioctl(fd, BFS_IOCTL_CHECK_NEXT_NODE, &result,
+	while (ioctl(fd.Get(), BFS_IOCTL_CHECK_NEXT_NODE, &result,
 			sizeof(result)) == 0) {
 		if (++counter % 50 == 0)
 			printf("%9" B_PRIu64 " nodes processed\x1b[1A\n", counter);
@@ -297,7 +295,7 @@ BFSPartitionHandle::Repair(bool checkOnly)
 	}
 
 	// stop checking
-	if (ioctl(fd, BFS_IOCTL_STOP_CHECKING, &result, sizeof(result)) != 0)
+	if (ioctl(fd.Get(), BFS_IOCTL_STOP_CHECKING, &result, sizeof(result)) != 0)
 		return errno;
 
 	printf("        %" B_PRIu64 " nodes checked,\n\t%" B_PRIu64 " blocks not "

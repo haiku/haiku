@@ -37,15 +37,13 @@ BNetworkRoster::Default()
 size_t
 BNetworkRoster::CountInterfaces() const
 {
-	int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
-	if (socket < 0)
+	FileDescriptorCloser socket(::socket(AF_INET, SOCK_DGRAM, 0));
+	if (!socket.IsSet())
 		return 0;
-
-	FileDescriptorCloser closer(socket);
 
 	ifconf config;
 	config.ifc_len = sizeof(config.ifc_value);
-	if (ioctl(socket, SIOCGIFCOUNT, &config, sizeof(struct ifconf)) != 0)
+	if (ioctl(socket.Get(), SIOCGIFCOUNT, &config, sizeof(struct ifconf)) != 0)
 		return 0;
 
 	return (size_t)config.ifc_value;
@@ -63,15 +61,13 @@ BNetworkRoster::GetNextInterface(uint32* cookie,
 
 	// get a list of all interfaces
 
-	int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
-	if (socket < 0)
+	FileDescriptorCloser socket (::socket(AF_INET, SOCK_DGRAM, 0));
+	if (!socket.IsSet())
 		return errno;
-
-	FileDescriptorCloser closer(socket);
 
 	ifconf config;
 	config.ifc_len = sizeof(config.ifc_value);
-	if (ioctl(socket, SIOCGIFCOUNT, &config, sizeof(struct ifconf)) < 0)
+	if (ioctl(socket.Get(), SIOCGIFCOUNT, &config, sizeof(struct ifconf)) < 0)
 		return errno;
 
 	size_t count = (size_t)config.ifc_value;
@@ -86,7 +82,7 @@ BNetworkRoster::GetNextInterface(uint32* cookie,
 
 	config.ifc_len = count * sizeof(struct ifreq);
 	config.ifc_buf = buffer;
-	if (ioctl(socket, SIOCGIFCONF, &config, sizeof(struct ifconf)) < 0)
+	if (ioctl(socket.Get(), SIOCGIFCONF, &config, sizeof(struct ifconf)) < 0)
 		return errno;
 
 	ifreq* interfaces = (ifreq*)buffer;
@@ -110,17 +106,15 @@ BNetworkRoster::GetNextInterface(uint32* cookie,
 status_t
 BNetworkRoster::AddInterface(const char* name)
 {
-	int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
-	if (socket < 0)
+	FileDescriptorCloser socket (::socket(AF_INET, SOCK_DGRAM, 0));
+	if (!socket.IsSet())
 		return errno;
-
-	FileDescriptorCloser closer(socket);
 
 	ifaliasreq request;
 	memset(&request, 0, sizeof(ifaliasreq));
 	strlcpy(request.ifra_name, name, IF_NAMESIZE);
 
-	if (ioctl(socket, SIOCAIFADDR, &request, sizeof(request)) != 0)
+	if (ioctl(socket.Get(), SIOCAIFADDR, &request, sizeof(request)) != 0)
 		return errno;
 
 	return B_OK;
@@ -137,18 +131,16 @@ BNetworkRoster::AddInterface(const BNetworkInterface& interface)
 status_t
 BNetworkRoster::RemoveInterface(const char* name)
 {
-	int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
-	if (socket < 0)
+	FileDescriptorCloser socket(::socket(AF_INET, SOCK_DGRAM, 0));
+	if (!socket.IsSet())
 		return errno;
-
-	FileDescriptorCloser closer(socket);
 
 	ifreq request;
 	strlcpy(request.ifr_name, name, IF_NAMESIZE);
 
 	request.ifr_addr.sa_family = AF_UNSPEC;
 
-	if (ioctl(socket, SIOCDIFADDR, &request, sizeof(request)) != 0)
+	if (ioctl(socket.Get(), SIOCDIFADDR, &request, sizeof(request)) != 0)
 		return errno;
 
 	return B_OK;

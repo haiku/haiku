@@ -41,8 +41,8 @@ static int
 scan_bus(const char *path)
 {
 	int err = EXIT_SUCCESS;
-	int fd = open(path, O_RDONLY);
-	if (fd < 0) {
+	FileDescriptorCloser fd(open(path, O_RDONLY));
+	if (!fd.IsSet()) {
 		fprintf(stderr, "%s: Could not access path: %s\n", kProgramName,
 			strerror(errno));
 		return EXIT_FAILURE;
@@ -50,7 +50,6 @@ scan_bus(const char *path)
 
 	setbuf(stdout, NULL);
 	printf("Scanning I2C bus: %s\n", path);
-	FileDescriptorCloser closer(fd);
 
 	printf("     0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f\n");
 	for (int i = 0; i < 128; i+=16) {
@@ -66,15 +65,13 @@ scan_bus(const char *path)
 			exec.cmdLength = sizeof(cmd);
 			exec.buffer = &data;
 			exec.bufferLength = sizeof(data);
-			if (ioctl(fd, I2CEXEC, &exec, sizeof(exec)) == 0)
+			if (ioctl(fd.Get(), I2CEXEC, &exec, sizeof(exec)) == 0)
 				printf("%02x ", addr);
 			else
 				printf("-- ");
 		}
 		printf("\n");
 	}
-
-	close(fd);
 
 	return err;
 }

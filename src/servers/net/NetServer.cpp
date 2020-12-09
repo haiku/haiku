@@ -117,11 +117,9 @@ static status_t
 set_80211(const char* name, int32 type, void* data,
 	int32 length = 0, int32 value = 0)
 {
-	int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
-	if (socket < 0)
+	FileDescriptorCloser socket(::socket(AF_INET, SOCK_DGRAM, 0));
+	if (!socket.IsSet())
 		return errno;
-
-	FileDescriptorCloser closer(socket);
 
 	struct ieee80211req ireq;
 	strlcpy(ireq.i_name, name, IF_NAMESIZE);
@@ -130,7 +128,8 @@ set_80211(const char* name, int32 type, void* data,
 	ireq.i_len = length;
 	ireq.i_data = data;
 
-	if (ioctl(socket, SIOCS80211, &ireq, sizeof(struct ieee80211req)) < 0)
+	if (ioctl(socket.Get(), SIOCS80211, &ireq, sizeof(struct ieee80211req))
+		< 0)
 		return errno;
 
 	return B_OK;

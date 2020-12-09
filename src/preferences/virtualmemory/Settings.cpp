@@ -137,22 +137,24 @@ Settings::WriteWindowSettings()
 status_t
 Settings::ReadSwapSettings()
 {
-	void* settings = load_driver_settings(kVirtualMemorySettings);
-	if (settings == NULL)
+	DriverSettingsUnloader settings(
+		load_driver_settings(kVirtualMemorySettings));
+	if (!settings.IsSet())
 		return kErrorSettingsNotFound;
-	DriverSettingsUnloader settingDeleter(settings);
 
-	const char* enabled = get_driver_parameter(settings, "vm", NULL, NULL);
-	const char* automatic = get_driver_parameter(settings, "swap_auto",
-		NULL, NULL);
-	const char* size = get_driver_parameter(settings, "swap_size", NULL, NULL);
-	const char* volume = get_driver_parameter(settings, "swap_volume_name",
-		NULL, NULL);
-	const char* device = get_driver_parameter(settings,
+	const char* enabled = get_driver_parameter(settings.Get(),
+		"vm", NULL, NULL);
+	const char* automatic = get_driver_parameter(settings.Get(),
+		"swap_auto", NULL, NULL);
+	const char* size = get_driver_parameter(settings.Get(),
+		"swap_size", NULL, NULL);
+	const char* volume = get_driver_parameter(settings.Get(),
+		"swap_volume_name", NULL, NULL);
+	const char* device = get_driver_parameter(settings.Get(),
 		"swap_volume_device", NULL, NULL);
-	const char* filesystem = get_driver_parameter(settings,
+	const char* filesystem = get_driver_parameter(settings.Get(),
 		"swap_volume_filesystem", NULL, NULL);
-	const char* capacity = get_driver_parameter(settings,
+	const char* capacity = get_driver_parameter(settings.Get(),
 		"swap_volume_capacity", NULL, NULL);
 
 	if (enabled == NULL	|| automatic == NULL || size == NULL || device == NULL
@@ -161,9 +163,9 @@ Settings::ReadSwapSettings()
 
 	off_t volCapacity = atoll(capacity);
 
-	SetSwapEnabled(get_driver_boolean_parameter(settings,
+	SetSwapEnabled(get_driver_boolean_parameter(settings.Get(),
 		"vm", true, false));
-	SetSwapAutomatic(get_driver_boolean_parameter(settings,
+	SetSwapAutomatic(get_driver_boolean_parameter(settings.Get(),
 		"swap_auto", true, false));
 	SetSwapSize(atoll(size));
 

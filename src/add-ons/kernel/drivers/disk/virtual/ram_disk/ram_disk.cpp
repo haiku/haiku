@@ -395,10 +395,9 @@ struct RawDevice : Device, DoublyLinkedListLinkImpl<RawDevice> {
 		static const size_t kPageCountPerIteration = 1024;
 		static const size_t kMaxGapSize = 15;
 
-		int fd = open(fFilePath, O_WRONLY);
-		if (fd < 0)
+		FileDescriptorCloser fd(open(fFilePath, O_WRONLY));
+		if (!fd.IsSet())
 			return errno;
-		FileDescriptorCloser fdCloser(fd);
 
 		vm_page** pages = new(std::nothrow) vm_page*[kPageCountPerIteration];
 		ArrayDeleter<vm_page*> pagesDeleter(pages);
@@ -491,7 +490,7 @@ struct RawDevice : Device, DoublyLinkedListLinkImpl<RawDevice> {
 
 			// write the buffer
 			if (error == B_OK) {
-				ssize_t bytesWritten = pwrite(fd, buffer,
+				ssize_t bytesWritten = pwrite(fd.Get(), buffer,
 					pagesToWrite * B_PAGE_SIZE, offset);
 				if (bytesWritten < 0) {
 					dprintf("ramdisk: error writing pages to file: %s\n",
@@ -817,21 +816,20 @@ private:
 	{
 		static const size_t kPageCountPerIteration = 1024;
 
-		int fd = open(fFilePath, O_RDONLY);
-		if (fd < 0)
+		FileDescriptorCloser fd(open(fFilePath, O_RDONLY));
+		if (!fd.IsSet())
 			return errno;
-		FileDescriptorCloser fdCloser(fd);
 
-		vm_page** pages = new(std::nothrow) vm_page*[kPageCountPerIteration];
-		ArrayDeleter<vm_page*> pagesDeleter(pages);
+		ArrayDeleter<vm_page*> pages(
+			new(std::nothrow) vm_page*[kPageCountPerIteration]);
 
-		uint8* buffer = (uint8*)malloc(kPageCountPerIteration * B_PAGE_SIZE);
-		MemoryDeleter bufferDeleter(buffer);
+		ArrayDeleter<uint8> buffer(
+			new(std::nothrow) uint8[kPageCountPerIteration * B_PAGE_SIZE]);
 			// TODO: Ideally we wouldn't use a buffer to read the file content,
 			// but read into the pages we allocated directly. Unfortunately
 			// there's no API to do that yet.
 
-		if (pages == NULL || buffer == NULL)
+		if (!pages.IsSet() || !buffer.IsSet())
 			return B_NO_MEMORY;
 
 		status_t error = B_OK;
@@ -860,7 +858,8 @@ private:
 
 			// read from the file
 			size_t bytesToRead = pagesToRead * B_PAGE_SIZE;
-			ssize_t bytesRead = pread(fd, buffer, bytesToRead, offset);
+			ssize_t bytesRead = pread(fd.Get(), buffer.Get(), bytesToRead,
+				offset);
 			if (bytesRead < 0) {
 				error = bytesRead;
 				break;
@@ -873,7 +872,7 @@ private:
 
 			// clear the last read page, if partial
 			if ((size_t)bytesRead < pagesRead * B_PAGE_SIZE) {
-				memset(buffer + bytesRead, 0,
+				memset(buffer.Get() + bytesRead, 0,
 					pagesRead * B_PAGE_SIZE - bytesRead);
 			}
 
@@ -882,7 +881,7 @@ private:
 				vm_page* page = pages[i];
 				error = vm_memcpy_to_physical(
 					page->physical_page_number * B_PAGE_SIZE,
-					buffer + i * B_PAGE_SIZE, B_PAGE_SIZE, false);
+					buffer.Get() + i * B_PAGE_SIZE, B_PAGE_SIZE, false);
 				if (error != B_OK)
 					break;
 			}
@@ -897,7 +896,7 @@ private:
 
 			size_t clearPages = 0;
 			for (size_t i = 0; i < pagesRead; i++) {
-				uint64* pageData = (uint64*)(buffer + i * B_PAGE_SIZE);
+				uint64* pageData = (uint64*)(buffer.Get() + i * B_PAGE_SIZE);
 				bool isClear = true;
 				for (size_t k = 0; isClear && k < B_PAGE_SIZE / 8; k++)
 					isClear = pageData[k] == 0;
@@ -916,7 +915,7 @@ private:
 			// and compute the new allocated pages count.
 			if (pagesRead < allocatedPages) {
 				size_t count = allocatedPages - pagesRead;
-				memcpy(pages + clearPages, pages + pagesRead,
+				memcpy(pages.Get() + clearPages, pages.Get() + pagesRead,
 					count * sizeof(vm_page*));
 				clearPages += count;
 			}

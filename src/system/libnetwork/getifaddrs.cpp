@@ -53,16 +53,15 @@ copy_address(const sockaddr& address)
 static int
 _getifaddrs(int domain, char* buffer, size_t len, struct ifaddrs** previous)
 {
-	int socket = ::socket(domain, SOCK_DGRAM, 0);
-	if (socket < 0)
+	FileDescriptorCloser socket (::socket(domain, SOCK_DGRAM, 0));
+	if (!socket.IsSet())
 		return -1;
-	FileDescriptorCloser closer(socket);
 
 	// Get interfaces configuration
 	ifconf config;
 	config.ifc_buf = buffer;
 	config.ifc_len = len;
-	if (ioctl(socket, SIOCGIFCONF, &config, sizeof(struct ifconf)) < 0)
+	if (ioctl(socket.Get(), SIOCGIFCONF, &config, sizeof(struct ifconf)) < 0)
 		return -1;
 
 	ifreq* interfaces = (ifreq*)buffer;
@@ -88,13 +87,14 @@ _getifaddrs(int domain, char* buffer, size_t len, struct ifaddrs** previous)
 		ifreq request;
 		strlcpy(request.ifr_name, interfaces[0].ifr_name, IF_NAMESIZE);
 
-		if (ioctl(socket, SIOCGIFFLAGS, &request, sizeof(struct ifreq)) == 0)
+		if (ioctl(socket.Get(), SIOCGIFFLAGS, &request, sizeof(struct ifreq))
+				== 0)
 			current->ifa_flags = request.ifr_flags;
-		if (ioctl(socket, SIOCGIFNETMASK, &request, sizeof(struct ifreq))
+		if (ioctl(socket.Get(), SIOCGIFNETMASK, &request, sizeof(struct ifreq))
 				== 0) {
 			current->ifa_netmask = copy_address(request.ifr_mask);
 		}
-		if (ioctl(socket, SIOCGIFDSTADDR, &request, sizeof(struct ifreq))
+		if (ioctl(socket.Get(), SIOCGIFDSTADDR, &request, sizeof(struct ifreq))
 				== 0) {
 			current->ifa_dstaddr = copy_address(request.ifr_dstaddr);
 		}
@@ -117,20 +117,17 @@ getifaddrs(struct ifaddrs** _ifaddrs)
 		return -1;
 	}
 
-	int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
-	if (socket < 0)
+	FileDescriptorCloser socket(::socket(AF_INET, SOCK_DGRAM, 0));
+	if (!socket.IsSet())
 		return -1;
-
-	FileDescriptorCloser closer(socket);
 
 	// Get interface count
 	ifconf config;
 	config.ifc_len = sizeof(config.ifc_value);
-	if (ioctl(socket, SIOCGIFCOUNT, &config, sizeof(struct ifconf)) < 0)
+	if (ioctl(socket.Get(), SIOCGIFCOUNT, &config, sizeof(struct ifconf)) < 0)
 		return -1;
 
-	socket = -1;
-	closer.Unset();
+	socket.Unset();
 
 	size_t count = (size_t)config.ifc_value;
 	if (count == 0) {
@@ -141,27 +138,25 @@ getifaddrs(struct ifaddrs** _ifaddrs)
 
 	// Allocate a buffer for ifreqs for all interfaces
 	size_t buflen = count * sizeof(struct ifreq);
-	char* buffer = (char*)malloc(buflen);
-	if (buffer == NULL) {
+	ArrayDeleter<char> buffer(new(std::nothrow) char[buflen]);
+	if (!buffer.IsSet()) {
 		errno = B_NO_MEMORY;
 		return -1;
 	}
 
-	MemoryDeleter deleter(buffer);
-
 	struct ifaddrs* previous = NULL;
 	int serrno = errno;
-	if (_getifaddrs(AF_INET, buffer, buflen, &previous) < 0 &&
+	if (_getifaddrs(AF_INET, buffer.Get(), buflen, &previous) < 0 &&
 		errno != B_UNSUPPORTED) {
 		freeifaddrs(previous);
 		return -1;
 	}
-	if (_getifaddrs(AF_INET6, buffer, buflen, &previous) < 0 &&
+	if (_getifaddrs(AF_INET6, buffer.Get(), buflen, &previous) < 0 &&
 		errno != B_UNSUPPORTED) {
 		freeifaddrs(previous);
 		return -1;
 	}
-	if (_getifaddrs(AF_LINK, buffer, buflen, &previous) < 0 &&
+	if (_getifaddrs(AF_LINK, buffer.Get(), buflen, &previous) < 0 &&
 		errno != B_UNSUPPORTED) {
 		freeifaddrs(previous);
 		return -1;

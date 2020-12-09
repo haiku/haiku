@@ -1138,10 +1138,9 @@ PackageWriterImpl::_UpdateCheckEntryCollisions(Attribute* parentAttribute,
 		// explicitly specified directory -- we need to read the directory
 
 		// first we check for colliding node attributes, though
-		if (DIR* attrDir = fs_fopen_attr_dir(fd)) {
-			AttrDirCloser attrDirCloser(attrDir);
-
-			while (dirent* entry = fs_read_attr_dir(attrDir)) {
+		AttrDirCloser attrDir(fs_fopen_attr_dir(fd));
+		if (attrDir.IsSet()) {
+			while (dirent* entry = fs_read_attr_dir(attrDir.Get())) {
 				attr_info attrInfo;
 				if (fs_stat_attr(fd, entry->d_name, &attrInfo) < 0) {
 					fListener->PrintError(
@@ -1177,17 +1176,16 @@ PackageWriterImpl::_UpdateCheckEntryCollisions(Attribute* parentAttribute,
 			throw status_t(errno);
 		}
 
-		DIR* dir = fdopendir(clonedFD);
-		if (dir == NULL) {
+		DirCloser dir(fdopendir(clonedFD));
+		if (!dir.IsSet()) {
 			fListener->PrintError(
 				"Failed to open directory \"%s\": %s\n", pathBuffer,
 				strerror(errno));
 			close(clonedFD);
 			throw status_t(errno);
 		}
-		DirCloser dirCloser(dir);
 
-		while (dirent* entry = readdir(dir)) {
+		while (dirent* entry = readdir(dir.Get())) {
 			// skip "." and ".."
 			if (strcmp(entry->d_name, ".") == 0
 				|| strcmp(entry->d_name, "..") == 0) {
@@ -1525,10 +1523,9 @@ PackageWriterImpl::_AddEntry(int dirFD, Entry* entry, const char* fileName,
 	}
 
 	// add attributes
-	if (DIR* attrDir = fs_fopen_attr_dir(fd)) {
-		AttrDirCloser attrDirCloser(attrDir);
-
-		while (dirent* entry = fs_read_attr_dir(attrDir)) {
+	AttrDirCloser attrDir(fs_fopen_attr_dir(fd));
+	if (attrDir.IsSet()) {
+		while (dirent* entry = fs_read_attr_dir(attrDir.Get())) {
 			attr_info attrInfo;
 			if (fs_stat_attr(fd, entry->d_name, &attrInfo) < 0) {
 				fListener->PrintError(
@@ -1579,17 +1576,16 @@ PackageWriterImpl::_AddDirectoryChildren(Entry* entry, int fd, char* pathBuffer)
 			throw status_t(errno);
 		}
 
-		DIR* dir = fdopendir(clonedFD);
-		if (dir == NULL) {
+		DirCloser dir(fdopendir(clonedFD));
+		if (!dir.IsSet()) {
 			fListener->PrintError(
 				"Failed to open directory \"%s\": %s\n", pathBuffer,
 				strerror(errno));
 			close(clonedFD);
 			throw status_t(errno);
 		}
-		DirCloser dirCloser(dir);
 
-		while (dirent* entry = readdir(dir)) {
+		while (dirent* entry = readdir(dir.Get())) {
 			// skip "." and ".."
 			if (strcmp(entry->d_name, ".") == 0
 				|| strcmp(entry->d_name, "..") == 0) {

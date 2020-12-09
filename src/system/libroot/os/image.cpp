@@ -43,17 +43,16 @@ struct EnvironmentFilter {
 
 	void Init(const char* path, const char* const* env, size_t envCount)
 	{
-		int fd = open(path, O_RDONLY);
-		if (fd < 0)
+		FileDescriptorCloser fd(open(path, O_RDONLY));
+		if (!fd.IsSet())
 			return;
-		FileDescriptorCloser fdCloser(fd);
 
 		static const char* const kEnvAttribute = "SYS:ENV";
 		attr_info info;
-		if (fs_stat_attr(fd, kEnvAttribute, &info) < 0)
+		if (fs_stat_attr(fd.Get(), kEnvAttribute, &info) < 0)
 			return;
 
-		_Init(fd, kEnvAttribute, info.size, env, envCount);
+		_Init(fd.Get(), kEnvAttribute, info.size, env, envCount);
 	}
 
 	size_t AdditionalSlotsNeeded() const

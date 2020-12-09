@@ -1863,18 +1863,17 @@ CommitTransactionHandler::_ChangePackageActivationIOCtl(
 	}
 
 	// issue the request
-	int fd = fVolume->OpenRootDirectory();
-	if (fd < 0) {
+	FileDescriptorCloser fd(fVolume->OpenRootDirectory());
+	if (!fd.IsSet()) {
 		throw Exception(B_TRANSACTION_FAILED_TO_OPEN_DIRECTORY)
 			.SetPath1(_GetPath(
 				FSUtils::Entry(fVolume->RootDirectoryRef()),
 				"<packagefs root>"))
-			.SetSystemError(fd);
+			.SetSystemError(fd.Get());
 	}
-	FileDescriptorCloser fdCloser(fd);
 
-	if (ioctl(fd, PACKAGE_FS_OPERATION_CHANGE_ACTIVATION, request, requestSize)
-			!= 0) {
+	if (ioctl(fd.Get(), PACKAGE_FS_OPERATION_CHANGE_ACTIVATION, request,
+		requestSize) != 0) {
 // TODO: We need more error information and error handling!
 		throw Exception(B_TRANSACTION_FAILED_TO_CHANGE_PACKAGE_ACTIVATION)
 			.SetSystemError(errno);

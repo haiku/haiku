@@ -208,13 +208,12 @@ BRepositoryBuilder&
 BRepositoryBuilder::AddPackagesDirectory(const char* path)
 {
 	// open directory
-	DIR* dir = opendir(path);
-	if (dir == NULL)
+	DirCloser dir(opendir(path));
+	if (!dir.IsSet())
 		DIE(errno, "failed to open package directory \"%s\"", path);
-	DirCloser dirCloser(dir);
 
 	// iterate through directory entries
-	while (dirent* entry = readdir(dir)) {
+	while (dirent* entry = readdir(dir.Get())) {
 		// skip "." and ".."
 		const char* name = entry->d_name;
 		if (strcmp(name, ".") == 0 || strcmp(name, "..") == 0)

@@ -318,20 +318,20 @@ Volume::Mount(const char* parameterString)
 	const char* shineThrough = NULL;
 	const char* packagesState = NULL;
 
-	void* parameterHandle = parse_driver_settings_string(parameterString);
-	if (parameterHandle != NULL) {
-		packages = get_driver_parameter(parameterHandle, "packages", NULL,
-			NULL);
-		volumeName = get_driver_parameter(parameterHandle, "volume-name", NULL,
-			NULL);
-		mountType = get_driver_parameter(parameterHandle, "type", NULL, NULL);
-		shineThrough = get_driver_parameter(parameterHandle, "shine-through",
+	DriverSettingsUnloader parameterHandle(
+		parse_driver_settings_string(parameterString));
+	if (parameterHandle.IsSet()) {
+		packages = get_driver_parameter(parameterHandle.Get(), "packages",
 			NULL, NULL);
-		packagesState = get_driver_parameter(parameterHandle, "state", NULL,
+		volumeName = get_driver_parameter(parameterHandle.Get(), "volume-name",
+			NULL, NULL);
+		mountType = get_driver_parameter(parameterHandle.Get(), "type", NULL,
 			NULL);
+		shineThrough = get_driver_parameter(parameterHandle.Get(),
+			"shine-through", NULL, NULL);
+		packagesState = get_driver_parameter(parameterHandle.Get(), "state",
+			NULL, NULL);
 	}
-
-	DriverSettingsUnloader parameterHandleDeleter(parameterHandle);
 
 	if (packages != NULL && packages[0] == '\0') {
 		FATAL("invalid package folder ('packages' parameter)!\n");
@@ -707,14 +707,13 @@ Volume::_LoadOldPackagesStates(const char* packagesState)
 	}
 
 	// iterate through the "administrative" dir
-	DIR* dir = fdopendir(fd);
-	if (dir == NULL) {
+	DirCloser dir(fdopendir(fd));
+	if (!dir.IsSet()) {
 		ERROR("Failed to open administrative directory: %s\n", strerror(errno));
 		RETURN_ERROR(errno);
 	}
-	DirCloser dirCloser(dir);
 
-	while (dirent* entry = readdir(dir)) {
+	while (dirent* entry = readdir(dir.Get())) {
 		if (strncmp(entry->d_name, "state_", 6) != 0
 			|| strcmp(entry->d_name, packagesState) < 0) {
 			continue;
@@ -813,20 +812,19 @@ Volume::_AddInitialPackagesFromActivationFile(
 	PackagesDirectory* packagesDirectory)
 {
 	// try reading the activation file
-	int fd = openat(packagesDirectory->DirectoryFD(),
+	FileDescriptorCloser fd(openat(packagesDirectory->DirectoryFD(),
 		packagesDirectory == fPackagesDirectory
 			? kActivationFilePath : kActivationFileName,
-		O_RDONLY);
-	if (fd < 0) {
+		O_RDONLY));
+	if (!fd.IsSet()) {
 		INFORM("Failed to open packages activation file: %s\n",
 			strerror(errno));
 		RETURN_ERROR(errno);
 	}
-	FileDescriptorCloser fdCloser(fd);
 
 	// read the whole file into memory to simplify things
 	struct stat st;
-	if (fstat(fd, &st) != 0) {
+	if (fstat(fd.Get(), &st) != 0) {
 		ERROR("Failed to stat packages activation file: %s\n",
 			strerror(errno));
 		RETURN_ERROR(errno);
@@ -842,7 +840,7 @@ Volume::_AddInitialPackagesFromActivationFile(
 		RETURN_ERROR(B_NO_MEMORY);
 	MemoryDeleter fileContentDeleter(fileContent);
 
-	ssize_t bytesRead = read(fd, fileContent, st.st_size);
+	ssize_t bytesRead = read(fd.Get(), fileContent, st.st_size);
 	if (bytesRead < 0) {
 		ERROR("Failed to read packages activation file: %s\n", strerror(errno));
 		RETURN_ERROR(errno);
@@ -898,15 +896,14 @@ Volume::_AddInitialPackagesFromDirectory()
 		RETURN_ERROR(errno);
 	}
 
-	DIR* dir = fdopendir(fd);
-	if (dir == NULL) {
+	DirCloser dir(fdopendir(fd));
+	if (!dir.IsSet()) {
 		ERROR("Failed to open packages directory \"%s\": %s\n",
 			fPackagesDirectory->Path(), strerror(errno));
 		RETURN_ERROR(errno);
 	}
-	DirCloser dirCloser(dir);
 
-	while (dirent* entry = readdir(dir)) {
+	while (dirent* entry = readdir(dir.Get())) {
 		// skip "." and ".."
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
 			continue;
