@@ -927,7 +927,7 @@ KeyboardLayoutView::_SpecialMappedKeySymbol(const char* bytes, size_t numBytes)
 	if (bytes[0] == B_TAB)
 		return "\xe2\x86\xb9";
 	if (bytes[0] == B_ENTER)
-		return "\xe2\x86\xb5";
+		return "\xe2\x8f\x8e";
 	if (bytes[0] == B_BACKSPACE)
 		return "\xe2\x8c\xab";
 

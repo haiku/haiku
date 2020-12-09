@@ -337,7 +337,8 @@ GlyphLayoutEngine::_PopulateAndLockFallbacks(
 		"Noto Sans Display",
 		"Noto Sans Thai",
 		"Noto Sans CJK JP",
-		"Noto Sans Symbols"
+		"Noto Sans Symbols",
+		"Noto Sans Symbols2"
 	};
 
 	if (!gFontManager->Lock())
