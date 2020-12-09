@@ -13,6 +13,8 @@
 
 #include <ScrollBar.h>
 
+#include <algorithm>
+
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -993,7 +995,7 @@ BScrollBar::SetBorderHighlighted(bool highlight)
 void
 BScrollBar::GetPreferredSize(float* _width, float* _height)
 {
-	const float scale = be_plain_font->Size() / 12.0f;
+	const float scale = std::max(be_plain_font->Size() / 12.0f, 1.0f);
 	if (fOrientation == B_VERTICAL) {
 		if (_width)
 			*_width = B_V_SCROLL_BAR_WIDTH * scale;
