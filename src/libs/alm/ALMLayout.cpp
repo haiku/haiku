@@ -373,7 +373,7 @@ BReference<YTab>
 BALMLayout::AddYTab()
 {
 	BReference<YTab> tab(new(std::nothrow) YTab(this), true);
-	if (tab.Get() == NULL)
+	if (!tab.IsSet())
 		return NULL;
 	if (!Solver()->AddVariable(tab))
 		return NULL;
@@ -862,16 +862,16 @@ BALMLayout::AddItem(BLayoutItem* item, XTab* _left, YTab* _top, XTab* _right,
 		debugger("Tab added to unfriendly layout!");
 
 	BReference<XTab> right = _right;
-	if (right.Get() == NULL)
+	if (!right.IsSet())
 		right = AddXTab();
 	BReference<YTab> bottom = _bottom;
-	if (bottom.Get() == NULL)
+	if (!bottom.IsSet())
 		bottom = AddYTab();
 	BReference<XTab> left = _left;
-	if (left.Get() == NULL)
+	if (!left.IsSet())
 		left = AddXTab();
 	BReference<YTab> top = _top;
-	if (top.Get() == NULL)
+	if (!top.IsSet())
 		top = AddYTab();
 
 	TabAddTransaction<XTab> leftTabAdd(this);

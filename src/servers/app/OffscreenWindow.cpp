@@ -31,7 +31,7 @@ OffscreenWindow::OffscreenWindow(ServerBitmap* bitmap,
 	fBitmap(bitmap),
 	fHWInterface(new (nothrow) BitmapHWInterface(fBitmap))
 {
-	if (fHWInterface.Get() == NULL || !GetDrawingEngine())
+	if (!fHWInterface.IsSet() || !GetDrawingEngine())
 		return;
 
 	fHWInterface->Initialize();
@@ -50,7 +50,7 @@ OffscreenWindow::~OffscreenWindow()
 	if (GetDrawingEngine())
 		GetDrawingEngine()->SetHWInterface(NULL);
 
-	if (fHWInterface.Get() != NULL) {
+	if (fHWInterface.IsSet()) {
 		fHWInterface->LockExclusiveAccess();
 		fHWInterface->Shutdown();
 		fHWInterface->UnlockExclusiveAccess();

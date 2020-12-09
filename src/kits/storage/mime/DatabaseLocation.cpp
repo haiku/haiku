@@ -832,7 +832,7 @@ DatabaseLocation::_CopyTypeNode(BNode& source, const char* type, BNode& _target)
 		// resize our buffer, if necessary
 		if (info.size > (off_t)bufferSize) {
 			bufferDeleter.SetTo(malloc(info.size));
-			if (bufferDeleter.Get() == NULL)
+			if (!bufferDeleter.IsSet())
 				return B_NO_MEMORY;
 			bufferSize = info.size;
 		}

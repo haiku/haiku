@@ -119,7 +119,7 @@ PackageFillingPkgListener::ConsumePackage(const PackageInfoRef& package,
 		BString* categoryCode = pkg->PkgCategoriesItemAt(i)->Code();
 		CategoryRef category = fModel->CategoryByCode(*categoryCode);
 
-		if (category.Get() == NULL) {
+		if (!category.IsSet()) {
 			HDERROR("unable to find the category for [%s]",
 				categoryCode->String());
 		} else

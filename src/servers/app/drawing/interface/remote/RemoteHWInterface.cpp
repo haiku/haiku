@@ -67,7 +67,7 @@ RemoteHWInterface::RemoteHWInterface(const char* target)
 	}
 
 	fListenEndpoint.SetTo(new(std::nothrow) BNetEndpoint());
-	if (fListenEndpoint.Get() == NULL) {
+	if (!fListenEndpoint.IsSet()) {
 		fInitStatus = B_NO_MEMORY;
 		return;
 	}
@@ -77,7 +77,7 @@ RemoteHWInterface::RemoteHWInterface(const char* target)
 		return;
 
 	fSendBuffer.SetTo(new(std::nothrow) StreamingRingBuffer(16 * 1024));
-	if (fSendBuffer.Get() == NULL) {
+	if (!fSendBuffer.IsSet()) {
 		fInitStatus = B_NO_MEMORY;
 		return;
 	}
@@ -87,7 +87,7 @@ RemoteHWInterface::RemoteHWInterface(const char* target)
 		return;
 
 	fReceiveBuffer.SetTo(new(std::nothrow) StreamingRingBuffer(16 * 1024));
-	if (fReceiveBuffer.Get() == NULL) {
+	if (!fReceiveBuffer.IsSet()) {
 		fInitStatus = B_NO_MEMORY;
 		return;
 	}
@@ -98,13 +98,13 @@ RemoteHWInterface::RemoteHWInterface(const char* target)
 
 	fReceiver.SetTo(new(std::nothrow) NetReceiver(fListenEndpoint.Get(), fReceiveBuffer.Get(),
 		_NewConnectionCallback, this));
-	if (fReceiver.Get() == NULL) {
+	if (!fReceiver.IsSet()) {
 		fInitStatus = B_NO_MEMORY;
 		return;
 	}
 
 	fEventStream.SetTo(new(std::nothrow) RemoteEventStream());
-	if (fEventStream.Get() == NULL) {
+	if (!fEventStream.IsSet()) {
 		fInitStatus = B_NO_MEMORY;
 		return;
 	}
@@ -335,7 +335,7 @@ RemoteHWInterface::_NewConnection(BNetEndpoint &endpoint)
 		return B_NO_MEMORY;
 
 	fSender.SetTo(new(std::nothrow) NetSender(sendEndpoint, fSendBuffer.Get()));
-	if (fSender.Get() == NULL) {
+	if (!fSender.IsSet()) {
 		delete sendEndpoint;
 		return B_NO_MEMORY;
 	}
@@ -354,7 +354,7 @@ RemoteHWInterface::_Disconnect()
 		fIsConnected = false;
 	}
 
-	if (fListenEndpoint.Get() != NULL)
+	if (fListenEndpoint.IsSet())
 		fListenEndpoint->Close();
 }
 

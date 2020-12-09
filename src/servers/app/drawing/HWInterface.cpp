@@ -235,7 +235,7 @@ HWInterface::MoveCursorTo(float x, float y)
 			// anything if the cursor is hidden
 			// (invalid cursor frame), but explicitly
 			// testing for it here saves us some cycles
-			if (fCursorAreaBackup.Get() != NULL) {
+			if (fCursorAreaBackup.IsSet()) {
 				// means we have a software cursor which we need to draw
 				_RestoreCursorArea();
 				_DrawCursor(_CursorFrame());
@@ -294,12 +294,12 @@ void
 HWInterface::SetAsyncDoubleBuffered(bool doubleBuffered)
 {
 	if (doubleBuffered) {
-		if (fUpdateExecutor.Get() != NULL)
+		if (fUpdateExecutor.IsSet())
 			return;
 		fUpdateExecutor.SetTo(new (nothrow) UpdateQueue(this));
 		AddListener(fUpdateExecutor.Get());
 	} else {
-		if (fUpdateExecutor.Get() == NULL)
+		if (!fUpdateExecutor.IsSet())
 			return;
 		RemoveListener(fUpdateExecutor.Get());
 		fUpdateExecutor.Unset();
@@ -480,7 +480,7 @@ HWInterface::HideFloatingOverlays(const BRect& area)
 		return false;
 	if (!fFloatingOverlaysLock.Lock())
 		return false;
-	if (fCursorAreaBackup.Get() != NULL && !fCursorAreaBackup->cursor_hidden) {
+	if (fCursorAreaBackup.IsSet() && !fCursorAreaBackup->cursor_hidden) {
 		BRect backupArea(fCursorAreaBackup->left, fCursorAreaBackup->top,
 			fCursorAreaBackup->right, fCursorAreaBackup->bottom);
 		if (area.Intersects(backupArea)) {
@@ -510,7 +510,7 @@ HWInterface::HideFloatingOverlays()
 void
 HWInterface::ShowFloatingOverlays()
 {
-	if (fCursorAreaBackup.Get() != NULL && fCursorAreaBackup->cursor_hidden)
+	if (fCursorAreaBackup.IsSet() && fCursorAreaBackup->cursor_hidden)
 		_DrawCursor(_CursorFrame());
 
 	fFloatingOverlaysLock.Unlock();
@@ -588,7 +588,7 @@ HWInterface::_DrawCursor(IntRect area) const
 
 		uint8* dst = buffer;
 
-		if (fCursorAreaBackup.Get() != NULL && fCursorAreaBackup->buffer
+		if (fCursorAreaBackup.IsSet() && fCursorAreaBackup->buffer
 			&& fFloatingOverlaysLock.Lock()) {
 			fCursorAreaBackup->cursor_hidden = false;
 			// remember which area the backup contains
@@ -885,7 +885,7 @@ HWInterface::_CursorFrame() const
 void
 HWInterface::_RestoreCursorArea() const
 {
-	if (fCursorAreaBackup.Get() != NULL && !fCursorAreaBackup->cursor_hidden) {
+	if (fCursorAreaBackup.IsSet() && !fCursorAreaBackup->cursor_hidden) {
 		_CopyToFront(fCursorAreaBackup->buffer, fCursorAreaBackup->bpr,
 			fCursorAreaBackup->left, fCursorAreaBackup->top,
 			fCursorAreaBackup->right, fCursorAreaBackup->bottom);

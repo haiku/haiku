@@ -724,7 +724,7 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where,
 	}
 
 	// if a state is active, let it do the job
-	if (fState.Get() != NULL) {
+	if (fState.IsSet()) {
 		bool unhandled = false;
 		bool result = fState->MouseDown(message, where, unhandled);
 		if (!unhandled)
@@ -917,7 +917,7 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where,
 void
 DefaultWindowBehaviour::MouseUp(BMessage* message, BPoint where)
 {
-	if (fState.Get() != NULL)
+	if (fState.IsSet())
 		fState->MouseUp(message, where);
 }
 
@@ -925,7 +925,7 @@ DefaultWindowBehaviour::MouseUp(BMessage* message, BPoint where)
 void
 DefaultWindowBehaviour::MouseMoved(BMessage* message, BPoint where, bool isFake)
 {
-	if (fState.Get() != NULL) {
+	if (fState.IsSet()) {
 		fState->MouseMoved(message, where, isFake);
 	} else {
 		// If the window modifiers are hold, enter the window management state.
@@ -952,7 +952,7 @@ DefaultWindowBehaviour::ModifiersChanged(int32 modifiers)
 	int32 buttons;
 	fDesktop->GetLastMouseState(&where, &buttons);
 
-	if (fState.Get() != NULL) {
+	if (fState.IsSet()) {
 		fState->ModifiersChanged(where, modifiers);
 	} else {
 		// If the window modifiers are hold, enter the window management state.
@@ -1164,17 +1164,17 @@ void
 DefaultWindowBehaviour::_NextState(State* state)
 {
 	// exit the old state
-	if (fState.Get() != NULL)
+	if (fState.IsSet())
 		fState->ExitState(state);
 
 	// set and enter the new state
 	ObjectDeleter<State> oldState(fState.Detach());
 	fState.SetTo(state);
 
-	if (fState.Get() != NULL) {
+	if (fState.IsSet()) {
 		fState->EnterState(oldState.Get());
 		fDesktop->SetMouseEventWindow(fWindow);
-	} else if (oldState.Get() != NULL) {
+	} else if (oldState.IsSet()) {
 		// no state anymore -- reset the mouse event window, if it's still us
 		if (fDesktop->MouseEventWindow() == fWindow)
 			fDesktop->SetMouseEventWindow(NULL);

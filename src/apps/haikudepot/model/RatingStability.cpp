@@ -15,9 +15,9 @@
 bool IsRatingStabilityBefore(const RatingStabilityRef& rs1,
 	const RatingStabilityRef& rs2)
 {
-	if (rs1.Get() == NULL || rs2.Get() == NULL)
+	if (!rs1.IsSet() || !rs2.IsSet())
 		HDFATAL("unexpected NULL reference in a referencable");
-	return rs1.Get()->Compare(*(rs2.Get())) < 0;
+	return rs1->Compare(*rs2) < 0;
 }
 
 

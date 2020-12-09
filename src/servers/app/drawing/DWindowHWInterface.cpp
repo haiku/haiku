@@ -653,7 +653,7 @@ DWindowHWInterface::SetMode(const display_mode& mode)
 
 	status_t ret = B_OK;
 	// prevent from doing the unnecessary
-	if (fFrontBuffer.Get() != NULL
+	if (fFrontBuffer.IsSet()
 		&& fDisplayMode.virtual_width == mode.virtual_width
 		&& fDisplayMode.virtual_height == mode.virtual_height
 		&& fDisplayMode.space == mode.space)
@@ -772,7 +772,7 @@ DWindowHWInterface::GetDeviceInfo(accelerant_device_info* info)
 status_t
 DWindowHWInterface::GetFrameBufferConfig(frame_buffer_config& config)
 {
-	if (fFrontBuffer.Get() == NULL)
+	if (!fFrontBuffer.IsSet())
 		return B_ERROR;
 
 	config.frame_buffer = fFrontBuffer->Bits();

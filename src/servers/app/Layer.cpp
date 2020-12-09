@@ -122,7 +122,7 @@ Layer::RenderToBitmap(Canvas* canvas)
 
 	BitmapHWInterface layerInterface(layerBitmap);
 	ObjectDeleter<DrawingEngine> const layerEngine(layerInterface.CreateDrawingEngine());
-	if (layerEngine.Get() == NULL)
+	if (!layerEngine.IsSet())
 		return NULL;
 
 	layerEngine->SetRendererOffset(boundingBox.left, boundingBox.top);

@@ -244,7 +244,7 @@ DrawState::ReadFromLink(BPrivate::LinkReceiver& link)
 	fAlphaFncMode = info.alphaFunctionMode;
 	fFontAliasing = info.fontAntialiasing;
 
-	if (fPreviousState.Get() != NULL) {
+	if (fPreviousState.IsSet()) {
 		fCombinedOrigin = fPreviousState->fCombinedOrigin + fOrigin;
 		fCombinedScale = fPreviousState->fCombinedScale * fScale;
 		fCombinedTransform = fPreviousState->fCombinedTransform * fTransform;
@@ -323,7 +323,7 @@ DrawState::WriteToLink(BPrivate::LinkSender& link) const
 
 	// TODO: Could be optimized, but is low prio, since most views do not
 	// use a custom clipping region...
-	if (fClippingRegion.Get() != NULL) {
+	if (fClippingRegion.IsSet()) {
 		int32 clippingRectCount = fClippingRegion->CountRects();
 		link.Attach<int32>(clippingRectCount);
 		for (int i = 0; i < clippingRectCount; i++)
@@ -342,7 +342,7 @@ DrawState::SetOrigin(BPoint origin)
 
 	// NOTE: the origins of earlier states are never expected to
 	// change, only the topmost state ever changes
-	if (fPreviousState.Get() != NULL) {
+	if (fPreviousState.IsSet()) {
 		fCombinedOrigin.x = fPreviousState->fCombinedOrigin.x
 			+ fOrigin.x * fPreviousState->fCombinedScale;
 		fCombinedOrigin.y = fPreviousState->fCombinedOrigin.y
@@ -363,7 +363,7 @@ DrawState::SetScale(float scale)
 
 	// NOTE: the scales of earlier states are never expected to
 	// change, only the topmost state ever changes
-	if (fPreviousState.Get() != NULL)
+	if (fPreviousState.IsSet())
 		fCombinedScale = fPreviousState->fCombinedScale * fScale;
 	else
 		fCombinedScale = fScale;
@@ -385,7 +385,7 @@ DrawState::SetTransform(BAffineTransform transform)
 
 	// NOTE: the transforms of earlier states are never expected to
 	// change, only the topmost state ever changes
-	if (fPreviousState.Get() != NULL)
+	if (fPreviousState.IsSet())
 		fCombinedTransform = fPreviousState->fCombinedTransform * fTransform;
 	else
 		fCombinedTransform = fTransform;
@@ -420,7 +420,7 @@ void
 DrawState::SetClippingRegion(const BRegion* region)
 {
 	if (region) {
-		if (fClippingRegion.Get() != NULL)
+		if (fClippingRegion.IsSet())
 			*fClippingRegion.Get() = *region;
 		else
 			fClippingRegion.SetTo(new(nothrow) BRegion(*region));
@@ -433,9 +433,9 @@ DrawState::SetClippingRegion(const BRegion* region)
 bool
 DrawState::HasClipping() const
 {
-	if (fClippingRegion.Get() != NULL)
+	if (fClippingRegion.IsSet())
 		return true;
-	if (fPreviousState.Get() != NULL)
+	if (fPreviousState.IsSet())
 		return fPreviousState->HasClipping();
 	return false;
 }
@@ -444,26 +444,26 @@ DrawState::HasClipping() const
 bool
 DrawState::HasAdditionalClipping() const
 {
-	return fClippingRegion.Get() != NULL;
+	return fClippingRegion.IsSet();
 }
 
 
 bool
 DrawState::GetCombinedClippingRegion(BRegion* region) const
 {
-	if (fClippingRegion.Get() != NULL) {
+	if (fClippingRegion.IsSet()) {
 		BRegion localTransformedClipping(*fClippingRegion.Get());
 		SimpleTransform penTransform;
 		Transform(penTransform);
 		penTransform.Apply(&localTransformedClipping);
-		if (fPreviousState.Get() != NULL
+		if (fPreviousState.IsSet()
 			&& fPreviousState->GetCombinedClippingRegion(region)) {
 			localTransformedClipping.IntersectWith(region);
 		}
 		*region = localTransformedClipping;
 		return true;
 	} else {
-		if (fPreviousState.Get() != NULL)
+		if (fPreviousState.IsSet())
 			return fPreviousState->GetCombinedClippingRegion(region);
 	}
 	return false;
@@ -506,7 +506,7 @@ DrawState::ClipToRect(BRect rect, bool inverse)
 	}
 
 	if (inverse) {
-		if (fClippingRegion.Get() == NULL) {
+		if (!fClippingRegion.IsSet()) {
 			fClippingRegion.SetTo(new(nothrow) BRegion(BRect(
 				-(1 << 16), -(1 << 16), (1 << 16), (1 << 16))));
 				// TODO: we should have a definition for a rect (or region)
@@ -514,7 +514,7 @@ DrawState::ClipToRect(BRect rect, bool inverse)
 		}
 		fClippingRegion->Exclude(rect);
 	} else {
-		if (fClippingRegion.Get() == NULL)
+		if (!fClippingRegion.IsSet())
 			fClippingRegion.SetTo(new(nothrow) BRegion(rect));
 		else {
 			BRegion rectRegion(rect);
@@ -827,7 +827,7 @@ DrawState::PrintToStream() const
 	printf("\t LineCap: %d\t LineJoin: %d\t MiterLimit: %.2f\n",
 		   (int16)fLineCapMode, (int16)fLineJoinMode, fMiterLimit);
 
-	if (fClippingRegion.Get() != NULL)
+	if (fClippingRegion.IsSet())
 		fClippingRegion->PrintToStream();
 
 	printf("\t ===== Font Data =====\n");

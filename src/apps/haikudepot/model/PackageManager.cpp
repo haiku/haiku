@@ -197,7 +197,7 @@ public:
 			tempName.Truncate(tempName.FindFirst('-'));
 				// strip version suffix off package filename
 			PackageInfoRef ref(FindPackageByName(tempName));
-			if (ref.Get() != NULL) {
+			if (ref.IsSet()) {
 				ref->SetDownloadProgress(progress);
 				fLastDownloadUpdate = now;
 			}
@@ -210,7 +210,7 @@ public:
 		tempName.Truncate(tempName.FindFirst('-'));
 			// strip version suffix off package filename
 		PackageInfoRef ref(FindPackageByName(tempName));
-		if (ref.Get() != NULL) {
+		if (ref.IsSet()) {
 			ref->SetDownloadProgress(1.0);
 			fDownloadedPackages.insert(ref);
 		}
@@ -225,7 +225,7 @@ public:
 		BSolverPackage* package = NULL;
 		for (int32 i = 0; (package = activationList.ItemAt(i)); i++) {
 			PackageInfoRef ref(FindPackageByName(package->Info().Name()));
-			if (ref.Get() != NULL)
+			if (ref.IsSet())
 				ref->SetState(PENDING);
 		}
 	}
@@ -311,7 +311,7 @@ public:
 		for (int32 i = 0; i < packages.CountItems(); i++) {
 			PackageInfoRef ref(FindPackageByName(packages.ItemAt(i)
 					->Name()));
-			if (ref.Get() != NULL)
+			if (ref.IsSet())
 				fRemovedPackages.Add(ref);
 		}
 	}
@@ -512,7 +512,7 @@ public:
 	static bool FindAppToLaunch(const PackageInfoRef& package,
 		std::vector<DeskbarLink>& foundLinks)
 	{
-		if (package.Get() == NULL)
+		if (!package.IsSet())
 			return false;
 
 		int32 installLocation = InstallLocation(package);

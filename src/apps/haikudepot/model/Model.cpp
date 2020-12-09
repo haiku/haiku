@@ -104,12 +104,12 @@ public:
 
 	virtual bool AcceptsPackage(const PackageInfoRef& package) const
 	{
-		if (package.Get() == NULL)
+		if (!package.IsSet())
 			return false;
 
 		for (int i = package->CountCategories() - 1; i >= 0; i--) {
 			const CategoryRef& category = package->CategoryAtIndex(i);
-			if (category.Get() == NULL)
+			if (!category.IsSet())
 				continue;
 			if (category->Code() == fCategory)
 				return true;
@@ -207,7 +207,7 @@ public:
 
 	virtual bool AcceptsPackage(const PackageInfoRef& package) const
 	{
-		if (package.Get() == NULL)
+		if (!package.IsSet())
 			return false;
 		// Every search term must be found in one of the package texts
 		for (int32 i = fSearchTerms.CountStrings() - 1; i >= 0; i--) {
@@ -990,7 +990,7 @@ Model::_NotifyAuthorizationChanged()
 	std::vector<ModelListenerRef>::const_iterator it;
 	for (it = fListeners.begin(); it != fListeners.end(); it++) {
 		const ModelListenerRef& listener = *it;
-		if (listener.Get() != NULL)
+		if (listener.IsSet())
 			listener->AuthorizationChanged();
 	}
 }
@@ -1002,7 +1002,7 @@ Model::_NotifyCategoryListChanged()
 	std::vector<ModelListenerRef>::const_iterator it;
 	for (it = fListeners.begin(); it != fListeners.end(); it++) {
 		const ModelListenerRef& listener = *it;
-		if (listener.Get() != NULL)
+		if (listener.IsSet())
 			listener->CategoryListChanged();
 	}
 }

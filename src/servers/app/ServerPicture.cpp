@@ -1120,7 +1120,7 @@ ServerPicture::ServerPicture(const char* fileName, int32 offset)
 	fToken = gTokenSpace.NewToken(kPictureToken, this);
 
 	fFile.SetTo(new(std::nothrow) BFile(fileName, B_READ_WRITE));
-	if (fFile.Get() == NULL)
+	if (!fFile.IsSet())
 		return;
 
 	BPrivate::Storage::OffsetFile* offsetFile
@@ -1142,7 +1142,7 @@ ServerPicture::~ServerPicture()
 
 	gTokenSpace.RemoveToken(fToken);
 
-	if (fPictures.Get() != NULL) {
+	if (fPictures.IsSet()) {
 		for (int32 i = fPictures->CountItems(); i-- > 0;) {
 			ServerPicture* picture = fPictures->ItemAt(i);
 			picture->SetOwner(NULL);
@@ -1314,10 +1314,10 @@ ServerPicture::AppendPicture(ServerPicture* picture)
 bool
 ServerPicture::NestPicture(ServerPicture* picture)
 {
-	if (fPictures.Get() == NULL)
+	if (!fPictures.IsSet())
 		fPictures.SetTo(new(std::nothrow) PictureList);
 
-	if (fPictures.Get() == NULL || !fPictures->AddItem(picture))
+	if (!fPictures.IsSet() || !fPictures->AddItem(picture))
 		return false;
 
 	picture->AcquireReference();
@@ -1328,7 +1328,7 @@ ServerPicture::NestPicture(ServerPicture* picture)
 off_t
 ServerPicture::DataLength() const
 {
-	if (fData.Get() == NULL)
+	if (!fData.IsSet())
 		return 0;
 	off_t size;
 	fData->GetSize(&size);
@@ -1369,7 +1369,7 @@ ServerPicture::ExportData(BPrivate::PortLink& link)
 	fData->Seek(0, SEEK_SET);
 
 	int32 subPicturesCount = 0;
-	if (fPictures.Get() != NULL)
+	if (fPictures.IsSet())
 		subPicturesCount = fPictures->CountItems();
 	link.Attach<int32>(subPicturesCount);
 	if (subPicturesCount > 0) {

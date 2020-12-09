@@ -568,7 +568,7 @@ BGradient::Unflatten(BGradient *&output, BDataIO* stream)
 		return status;
 
 	ObjectDeleter<BGradient> gradient(gradient_for_type(gradientType));
-	if (gradient.Get() == NULL)
+	if (!gradient.IsSet())
 		return B_NO_MEMORY;
 
 	if (colorsCount > 0) {

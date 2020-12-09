@@ -377,7 +377,7 @@ App::_Open(const BEntry& entry)
 
 	// Transfer information into PackageInfo
 	PackageInfoRef package(new(std::nothrow) PackageInfo(info), true);
-	if (package.Get() == NULL) {
+	if (!package.IsSet()) {
 		fprintf(stderr, "Could not allocate PackageInfo\n");
 		return;
 	}

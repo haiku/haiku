@@ -343,9 +343,9 @@ EventDispatcher::RemoveTarget(EventTarget& target)
 	if (fPreviousMouseTarget == &target)
 		fPreviousMouseTarget = NULL;
 
-	if (fKeyboardFilter.Get() != NULL)
+	if (fKeyboardFilter.IsSet())
 		fKeyboardFilter->RemoveTarget(&target);
-	if (fMouseFilter.Get() != NULL)
+	if (fMouseFilter.IsSet())
 		fMouseFilter->RemoveTarget(&target);
 
 	fTargets.RemoveItem(&target);
@@ -812,7 +812,7 @@ EventDispatcher::_EventLoop()
 #endif
 				pointerEvent = true;
 
-				if (fMouseFilter.Get() == NULL)
+				if (!fMouseFilter.IsSet())
 					break;
 
 				EventTarget* mouseTarget = fPreviousMouseTarget;
@@ -890,7 +890,7 @@ EventDispatcher::_EventLoop()
 			case B_INPUT_METHOD_EVENT:
 				ETRACE(("key event, focus = %p\n", fFocus));
 
-				if (fKeyboardFilter.Get() != NULL
+				if (fKeyboardFilter.IsSet()
 					&& fKeyboardFilter->Filter(event, &fFocus)
 						== B_SKIP_MESSAGE) {
 					break;

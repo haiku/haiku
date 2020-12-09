@@ -205,8 +205,8 @@ bool
 BitmapHWInterface::IsDoubleBuffered() const
 {
 	// overwrite double buffered preference
-	if (fFrontBuffer.Get() != NULL)
-		return fBackBuffer.Get() != NULL;
+	if (fFrontBuffer.IsSet())
+		return fBackBuffer.IsSet();
 
 	return HWInterface::IsDoubleBuffered();
 }

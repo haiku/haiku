@@ -656,7 +656,7 @@ Desktop::SetCursor(ServerCursor* newCursor)
 
 	fCursor = newCursor;
 
-	if (fManagementCursor.Get() == NULL)
+	if (!fManagementCursor.IsSet())
 		HWInterface()->SetCursor(newCursor);
 }
 
@@ -2563,7 +2563,7 @@ Desktop::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			ObjectDeleter<ServerApp> app(new (std::nothrow) ServerApp(this, clientReplyPort,
 				clientLooperPort, clientTeamID, htoken, appSignature));
 			status_t status = B_OK;
-			if (app.Get() == NULL)
+			if (!app.IsSet())
 				status = B_NO_MEMORY;
 			if (status == B_OK)
 				status = app->InitCheck();
@@ -3771,7 +3771,7 @@ Desktop::_SetWorkspace(int32 index, bool moveFocusWindow)
 			// window if they changed their order
 			ObjectDeleter<BRegion> region(new (std::nothrow)
 				BRegion(window->VisibleRegion()));
-			if (region.Get() != NULL) {
+			if (region.IsSet()) {
 				if (previousRegions.AddItem(region.Detach()))
 					windows.AddWindow(window);
 			}

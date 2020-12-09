@@ -129,7 +129,7 @@ Window::Window(const BRect& frame, const char *name,
 
 	SetFlags(flags, NULL);
 
-	if (fLook != B_NO_BORDER_WINDOW_LOOK && fCurrentStack.Get() != NULL) {
+	if (fLook != B_NO_BORDER_WINDOW_LOOK && fCurrentStack.IsSet()) {
 		// allocates a decorator
 		::Decorator* decorator = Decorator();
 		if (decorator != NULL) {
@@ -167,7 +167,7 @@ Window::Window(const BRect& frame, const char *name,
 
 Window::~Window()
 {
-	if (fTopView.Get() != NULL) {
+	if (fTopView.IsSet()) {
 		fTopView->DetachedFromWindow();
 	}
 
@@ -181,7 +181,7 @@ status_t
 Window::InitCheck() const
 {
 	if (GetDrawingEngine() == NULL
-		|| (fFeel != kOffscreenWindowFeel && fWindowBehaviour.Get() == NULL))
+		|| (fFeel != kOffscreenWindowFeel && !fWindowBehaviour.IsSet()))
 		return B_NO_MEMORY;
 	// TODO: anything else?
 	return B_OK;
@@ -298,7 +298,7 @@ Window::MoveBy(int32 x, int32 y, bool moveStack)
 
 	fEffectiveDrawingRegionValid = false;
 
-	if (fTopView.Get() != NULL) {
+	if (fTopView.IsSet()) {
 		fTopView->MoveBy(x, y, NULL);
 		fTopView->UpdateOverlay();
 	}
@@ -365,7 +365,7 @@ Window::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion, bool resizeStack)
 	fContentRegionValid = false;
 	fEffectiveDrawingRegionValid = false;
 
-	if (fTopView.Get() != NULL) {
+	if (fTopView.IsSet()) {
 		fTopView->ResizeBy(x, y, dirtyRegion);
 		fTopView->UpdateOverlay();
 	}
@@ -515,13 +515,13 @@ Window::CopyContents(BRegion* region, int32 xOffset, int32 yOffset)
 void
 Window::SetTopView(View* topView)
 {
-	if (fTopView.Get() != NULL) {
+	if (fTopView.IsSet()) {
 		fTopView->DetachedFromWindow();
 	}
 
 	fTopView.SetTo(topView);
 
-	if (fTopView.Get() != NULL) {
+	if (fTopView.IsSet()) {
 		// the top view is special, it has a coordinate system
 		// as if it was attached directly to the desktop, therefor,
 		// the coordinate conversion through the view tree works
@@ -572,7 +572,7 @@ Window::PreviousWindow(int32 index) const
 ::Decorator*
 Window::Decorator() const
 {
-	if (fCurrentStack.Get() == NULL)
+	if (!fCurrentStack.IsSet())
 		return NULL;
 	return fCurrentStack->Decorator();
 }
@@ -1118,7 +1118,7 @@ Window::IsVisible() const
 bool
 Window::IsDragging() const
 {
-	if (fWindowBehaviour.Get() == NULL)
+	if (!fWindowBehaviour.IsSet())
 		return false;
 	return fWindowBehaviour->IsDragging();
 }
@@ -1127,7 +1127,7 @@ Window::IsDragging() const
 bool
 Window::IsResizing() const
 {
-	if (fWindowBehaviour.Get() == NULL)
+	if (!fWindowBehaviour.IsSet())
 		return false;
 	return fWindowBehaviour->IsResizing();
 }
@@ -1261,7 +1261,7 @@ Window::SetLook(window_look look, BRegion* updateRegion)
 		// ...and therefor the drawing region is
 		// likely not valid anymore either
 
-	if (fCurrentStack.Get() == NULL)
+	if (!fCurrentStack.IsSet())
 		return;
 
 	int32 stackPosition = PositionInStack();
@@ -2073,7 +2073,7 @@ Window::UpdateSession::AddCause(uint8 cause)
 int32
 Window::PositionInStack() const
 {
-	if (fCurrentStack.Get() == NULL)
+	if (!fCurrentStack.IsSet())
 		return -1;
 	return fCurrentStack->WindowList().IndexOf(this);
 }
@@ -2085,7 +2085,7 @@ Window::DetachFromWindowStack(bool ownStackNeeded)
 	// The lock must normally be held but is not held when closing the window.
 	//ASSERT_MULTI_WRITE_LOCKED(fDesktop->WindowLocker());
 
-	if (fCurrentStack.Get() == NULL)
+	if (!fCurrentStack.IsSet())
 		return false;
 	if (fCurrentStack->CountWindows() == 1)
 		return true;
@@ -2196,7 +2196,7 @@ Window::StackedWindowAt(const BPoint& where)
 Window*
 Window::TopLayerStackWindow()
 {
-	if (fCurrentStack.Get() == NULL)
+	if (!fCurrentStack.IsSet())
 		return this;
 	return fCurrentStack->TopLayerWindow();
 }
@@ -2205,7 +2205,7 @@ Window::TopLayerStackWindow()
 WindowStack*
 Window::GetWindowStack()
 {
-	if (fCurrentStack.Get() == NULL)
+	if (!fCurrentStack.IsSet())
 		return _InitWindowStack();
 	return fCurrentStack;
 }
@@ -2227,7 +2227,7 @@ Window::MoveToTopStackLayer()
 bool
 Window::MoveToStackPosition(int32 to, bool isMoving)
 {
-	if (fCurrentStack.Get() == NULL)
+	if (!fCurrentStack.IsSet())
 		return false;
 	int32 index = PositionInStack();
 	if (fCurrentStack->Move(index, to) == false)

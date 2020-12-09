@@ -210,9 +210,9 @@ public:
 	inline	bool			IsScreenClippingValid() const
 								{
 									return fScreenClippingValid
-										&& (fUserClipping.Get() == NULL
-										|| (fUserClipping.Get() != NULL
-										&& fScreenAndUserClipping.Get() != NULL));
+										&& (!fUserClipping.IsSet()
+										|| (fUserClipping.IsSet()
+										&& fScreenAndUserClipping.IsSet()));
 								}
 
 			// debugging

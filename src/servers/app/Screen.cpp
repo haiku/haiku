@@ -67,7 +67,7 @@ Screen::~Screen()
 status_t
 Screen::Initialize()
 {
-	if (fHWInterface.Get() != NULL) {
+	if (fHWInterface.IsSet()) {
 		// init the graphics hardware
 		return fHWInterface->Initialize();
 	}
@@ -79,7 +79,7 @@ Screen::Initialize()
 void
 Screen::Shutdown()
 {
-	if (fHWInterface.Get() != NULL)
+	if (fHWInterface.IsSet())
 		fHWInterface->Shutdown();
 }
 

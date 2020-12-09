@@ -48,7 +48,7 @@ BitmapDrawingEngine::SetSize(int32 newWidth, int32 newHeight)
 	}
 
 	SetHWInterface(NULL);
-	if (fHWInterface.Get() != NULL) {
+	if (fHWInterface.IsSet()) {
 		fHWInterface->LockExclusiveAccess();
 		fHWInterface->Shutdown();
 		fHWInterface->UnlockExclusiveAccess();
@@ -60,11 +60,11 @@ BitmapDrawingEngine::SetSize(int32 newWidth, int32 newHeight)
 
 	fBitmap.SetTo(new(std::nothrow) UtilityBitmap(BRect(0, 0, newWidth - 1,
 		newHeight - 1), fColorSpace, 0));
-	if (fBitmap.Get() == NULL)
+	if (!fBitmap.IsSet())
 		return B_NO_MEMORY;
 
 	fHWInterface.SetTo(new(std::nothrow) BitmapHWInterface(fBitmap));
-	if (fHWInterface.Get() == NULL)
+	if (!fHWInterface.IsSet())
 		return B_NO_MEMORY;
 
 	status_t result = fHWInterface->Initialize();

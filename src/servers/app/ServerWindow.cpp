@@ -280,7 +280,7 @@ ServerWindow::Init(BRect frame, window_look look, window_feel feel,
 	// We cannot call MakeWindow in the constructor, since it
 	// is a virtual function!
 	fWindow.SetTo(MakeWindow(frame, fTitle, look, feel, flags, workspace));
-	if (fWindow.Get() == NULL || fWindow->InitCheck() != B_OK) {
+	if (!fWindow.IsSet() || fWindow->InitCheck() != B_OK) {
 		fWindow.Unset();
 		return B_NO_MEMORY;
 	}
@@ -349,7 +349,7 @@ ServerWindow::_Show()
 	// instead of doing it from this thread.
 	fDesktop->UnlockSingleWindow();
 	fDesktop->ShowWindow(fWindow.Get());
-	if (fDirectWindowInfo.Get() != NULL && fDirectWindowInfo->IsFullScreen())
+	if (fDirectWindowInfo.IsSet() && fDirectWindowInfo->IsFullScreen())
 		_ResizeToFullScreen();
 
 	fDesktop->LockSingleWindow();
@@ -408,7 +408,7 @@ ServerWindow::SetTitle(const char* newTitle)
 		rename_thread(Thread(), name);
 	}
 
-	if (fWindow.Get() != NULL)
+	if (fWindow.IsSet())
 		fDesktop->SetWindowTitle(fWindow.Get(), newTitle);
 }
 
@@ -972,7 +972,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				Title()));
 
 			int32 size;
-			if (fWindow.Get() != NULL && link.Read<int32>(&size) == B_OK) {
+			if (fWindow.IsSet() && link.Read<int32>(&size) == B_OK) {
 				char buffer[size];
 				if (link.Read(buffer, size) == B_OK) {
 					BMessage settings;
@@ -1096,7 +1096,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			link.Read<bool>(&enable);
 
 			status_t status = B_OK;
-			if (fDirectWindowInfo.Get() != NULL)
+			if (fDirectWindowInfo.IsSet())
 				_DirectWindowSetFullScreen(enable);
 			else
 				status = B_BAD_TYPE;
@@ -3650,7 +3650,7 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			ArrayDeleter<uint32> opList(new(std::nothrow) uint32[opCount]);
 			ArrayDeleter<BPoint> ptList(new(std::nothrow) BPoint[ptCount]);
-			if (opList.Get() == NULL || ptList.Get() == NULL
+			if (!opList.IsSet() || !ptList.IsSet()
 				|| link.Read(opList.Get(), opCount * sizeof(uint32)) != B_OK
 				|| link.Read(ptList.Get(), ptCount * sizeof(BPoint)) != B_OK)
 				break;
@@ -4289,7 +4289,7 @@ ServerWindow::ScreenChanged(const BMessage* message)
 {
 	SendMessageToClient(message);
 
-	if (fDirectWindowInfo.Get() != NULL && fDirectWindowInfo->IsFullScreen())
+	if (fDirectWindowInfo.IsSet() && fDirectWindowInfo->IsFullScreen())
 		_ResizeToFullScreen();
 }
 
@@ -4323,7 +4323,7 @@ ServerWindow::HandleDirectConnection(int32 bufferState, int32 driverState)
 {
 	ASSERT_MULTI_LOCKED(fDesktop->WindowLocker());
 
-	if (fDirectWindowInfo.Get() == NULL)
+	if (!fDirectWindowInfo.IsSet())
 		return;
 
 	STRACE(("HandleDirectConnection(bufferState = %" B_PRId32 ", driverState = "
@@ -4475,7 +4475,7 @@ ServerWindow::_ResizeToFullScreen()
 status_t
 ServerWindow::_EnableDirectWindowMode()
 {
-	if (fDirectWindowInfo.Get() != NULL) {
+	if (fDirectWindowInfo.IsSet()) {
 		// already in direct window mode
 		return B_ERROR;
 	}
@@ -4486,7 +4486,7 @@ ServerWindow::_EnableDirectWindowMode()
 	}
 
 	fDirectWindowInfo.SetTo(new(std::nothrow) DirectWindowInfo);
-	if (fDirectWindowInfo.Get() == NULL)
+	if (!fDirectWindowInfo.IsSet())
 		return B_NO_MEMORY;
 
 	status_t status = fDirectWindowInfo->InitCheck();

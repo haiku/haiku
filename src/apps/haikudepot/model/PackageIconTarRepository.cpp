@@ -235,7 +235,7 @@ PackageIconTarRepository::GetIcon(const BString& pkgName, BitmapSize size,
 	off_t iconDataTarOffset = -1;
 	const IconTarPtrRef tarPtrRef = _GetIconTarPtr(pkgName);
 
-	if (tarPtrRef.Get() != NULL) {
+	if (tarPtrRef.IsSet()) {
 		iconDataTarOffset = _OffsetToBestRepresentation(tarPtrRef, size,
 			&actualSize);
 	}

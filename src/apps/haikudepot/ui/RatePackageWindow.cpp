@@ -538,7 +538,7 @@ RatePackageWindow::_QueryRatingThread()
 	BString nickname = fModel.Nickname();
 	locker.Unlock();
 
-	if (package.Get() == NULL) {
+	if (!package.IsSet()) {
 		HDERROR("rating query: No package");
 		_SetWorkerThread(-1);
 		return;

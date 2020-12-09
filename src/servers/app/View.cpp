@@ -126,7 +126,7 @@ View::View(IntRect frame, IntPoint scrollingOffset, const char* name,
 	fUserClipping(NULL),
 	fScreenAndUserClipping(NULL)
 {
-	if (fDrawState.Get() != NULL)
+	if (fDrawState.IsSet())
 		fDrawState->SetSubPixelPrecise(fFlags & B_SUBPIXEL_PRECISE);
 }
 
@@ -1349,13 +1349,13 @@ View::PrintToStream() const
 	printf("  valid:            %d\n", fScreenClippingValid);
 
 	printf("  fUserClipping:\n");
-	if (fUserClipping.Get() != NULL)
+	if (fUserClipping.IsSet())
 		fUserClipping->PrintToStream();
 	else
 		printf("  none\n");
 
 	printf("  fScreenAndUserClipping:\n");
-	if (fScreenAndUserClipping.Get() != NULL)
+	if (fScreenAndUserClipping.IsSet())
 		fScreenAndUserClipping->PrintToStream();
 	else
 		printf("  invalid\n");
@@ -1409,9 +1409,9 @@ View::RebuildClipping(bool deep)
 		// hand, views for which this feature is actually used will
 		// probably not have any children, so it is not that expensive
 		// after all
-		if (fUserClipping.Get() == NULL) {
+		if (!fUserClipping.IsSet()) {
 			fUserClipping.SetTo(new (nothrow) BRegion);
-			if (fUserClipping.Get() == NULL)
+			if (!fUserClipping.IsSet())
 				return;
 		}
 
@@ -1429,16 +1429,16 @@ BRegion&
 View::ScreenAndUserClipping(BRegion* windowContentClipping, bool force) const
 {
 	// no user clipping - return screen clipping directly
-	if (fUserClipping.Get() == NULL)
+	if (!fUserClipping.IsSet())
 		return _ScreenClipping(windowContentClipping, force);
 
 	// combined screen and user clipping already valid
-	if (fScreenAndUserClipping.Get() != NULL)
+	if (fScreenAndUserClipping.IsSet())
 		return *fScreenAndUserClipping.Get();
 
 	// build a new combined user and screen clipping
 	fScreenAndUserClipping.SetTo(new (nothrow) BRegion(*fUserClipping.Get()));
-	if (fScreenAndUserClipping.Get() == NULL)
+	if (!fScreenAndUserClipping.IsSet())
 		return fScreenClipping;
 
 	LocalToScreenTransform().Apply(fScreenAndUserClipping.Get());

@@ -358,7 +358,7 @@ PackageColumn::DrawField(BField* field, BRect rect, BView* parent)
 			bitmapRef);
 
 		if (bitmapResult == B_OK) {
-			if (bitmapRef.Get() != NULL) {
+			if (bitmapRef.IsSet()) {
 				const BBitmap* bitmap = bitmapRef->Bitmap(BITMAP_SIZE_16);
 				parent->SetDrawingMode(B_OP_ALPHA);
 				BRect viewRect(x, y, x + 15, y + 15);
@@ -544,7 +544,7 @@ PackageRow::PackageRow(const PackageInfoRef& packageRef,
 	fPackageListener(packageListener),
 	fNextInHash(NULL)
 {
-	if (packageRef.Get() == NULL)
+	if (!packageRef.IsSet())
 		return;
 
 	PackageInfo& package = *packageRef.Get();
@@ -577,7 +577,7 @@ PackageRow::PackageRow(const PackageInfoRef& packageRef,
 
 PackageRow::~PackageRow()
 {
-	if (fPackage.Get() != NULL)
+	if (fPackage.IsSet())
 		fPackage->RemoveListener(fPackageListener);
 }
 
@@ -585,7 +585,7 @@ PackageRow::~PackageRow()
 void
 PackageRow::UpdateIconAndTitle()
 {
-	if (fPackage.Get() == NULL)
+	if (!fPackage.IsSet())
 		return;
 
 	SetField(new PackageIconAndTitleField(
@@ -596,7 +596,7 @@ PackageRow::UpdateIconAndTitle()
 void
 PackageRow::UpdateState()
 {
-	if (fPackage.Get() == NULL)
+	if (!fPackage.IsSet())
 		return;
 
 	SetField(new BStringField(package_state_to_string(fPackage)),
@@ -607,7 +607,7 @@ PackageRow::UpdateState()
 void
 PackageRow::UpdateSummary()
 {
-	if (fPackage.Get() == NULL)
+	if (!fPackage.IsSet())
 		return;
 
 	SetField(new BStringField(fPackage->ShortDescription()),
@@ -618,7 +618,7 @@ PackageRow::UpdateSummary()
 void
 PackageRow::UpdateRating()
 {
-	if (fPackage.Get() == NULL)
+	if (!fPackage.IsSet())
 		return;
 	RatingSummary summary = fPackage->CalculateRatingSummary();
 	SetField(new RatingField(summary.averageRating), kRatingColumn);
@@ -628,7 +628,7 @@ PackageRow::UpdateRating()
 void
 PackageRow::UpdateSize()
 {
-	if (fPackage.Get() == NULL)
+	if (!fPackage.IsSet())
 		return;
 
 	SetField(new SizeField(fPackage->Size()), kSizeColumn);
@@ -638,7 +638,7 @@ PackageRow::UpdateSize()
 void
 PackageRow::UpdateRepository()
 {
-	if (fPackage.Get() == NULL)
+	if (!fPackage.IsSet())
 		return;
 
 	SetField(new BStringField(fPackage->DepotName()), kRepositoryColumn);
@@ -648,7 +648,7 @@ PackageRow::UpdateRepository()
 void
 PackageRow::UpdateVersion()
 {
-	if (fPackage.Get() == NULL)
+	if (!fPackage.IsSet())
 		return;
 
 	SetField(new BStringField(fPackage->Version().ToString()), kVersionColumn);
@@ -983,7 +983,7 @@ PackageListView::AttachWorkStatusView(WorkStatusView* view)
 PackageRow*
 PackageListView::_FindRow(const PackageInfoRef& package)
 {
-	if (package.Get() == NULL)
+	if (!package.IsSet())
 		return NULL;
 	return fRowByNameTable->Lookup(package->Name().String());
 }

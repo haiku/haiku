@@ -20,7 +20,7 @@ status_t
 BBitmapBuffer::InitCheck() const
 {
 	status_t ret = B_NO_INIT;
-	if (fBitmap.Get() != NULL)
+	if (fBitmap.IsSet())
 		ret = fBitmap->InitCheck();
 	return ret;
 }

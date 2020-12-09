@@ -76,7 +76,7 @@ AbstractProcess::Run()
 	// this process may be part of a larger bulk-load process and
 	// if so, the process orchestration needs to know when this
 	// process has completed.
-	if (listener.Get() != NULL)
+	if (listener.IsSet())
 		listener->ProcessExited();
 
 	return runResult;
@@ -126,7 +126,7 @@ AbstractProcess::Stop()
 		}
 	}
 
-	if (listener.Get() != NULL)
+	if (listener.IsSet())
 		listener->ProcessExited();
 
 	return result;

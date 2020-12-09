@@ -726,7 +726,7 @@ MainWin::MessageReceived(BMessage* msg)
 				|| index != fPlaylist->CurrentItemIndex())
 				break;
 			PlaylistItemRef item(fPlaylist->ItemAt(index));
-			if (item.Get() != NULL) {
+			if (item.IsSet()) {
 				printf("open playlist item: %s\n", item->Name().String());
 				OpenPlaylistItem(item);
 				_MarkPlaylistItem(index);

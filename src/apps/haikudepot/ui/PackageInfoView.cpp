@@ -635,7 +635,7 @@ private:
 			return;
 
 		const PackageActionRef& action = fPackageActions[index];
-		if (action.Get() == NULL)
+		if (!action.IsSet())
 			return;
 
 		PackageActionList actions;
@@ -842,7 +842,7 @@ public:
 		bool hasScreenshot = false;
 		if (countScreenshots > 0) {
 			const BitmapRef& bitmapRef = package.ScreenshotAtIndex(0);
-			if (bitmapRef.Get() != NULL) {
+			if (bitmapRef.IsSet()) {
 				HDDEBUG("did find screenshot for package [%s]",
 					package.Name().String());
 				hasScreenshot = true;
@@ -1274,9 +1274,9 @@ public:
 			Select(TAB_ABOUT);
 
 		TabAt(TAB_CHANGELOG)->SetEnabled(
-			package.Get() != NULL && package->HasChangelog());
+			package.IsSet() && package->HasChangelog());
 		TabAt(TAB_CONTENTS)->SetEnabled(
-			package.Get() != NULL
+			package.IsSet()
 				&& (package->State() == ACTIVATED || package->IsLocalFile()));
 		Invalidate(TabFrame(TAB_CHANGELOG));
 		Invalidate(TabFrame(TAB_CONTENTS));
@@ -1375,7 +1375,7 @@ PackageInfoView::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case MSG_UPDATE_PACKAGE:
 		{
-			if (fPackageListener->Package().Get() == NULL)
+			if (!fPackageListener->Package().IsSet())
 				break;
 
 			BString name;
@@ -1423,7 +1423,7 @@ PackageInfoView::SetPackage(const PackageInfoRef& packageRef)
 {
 	BAutolock _(fModel->Lock());
 
-	if (packageRef.Get() == NULL) {
+	if (!packageRef.IsSet()) {
 		Clear();
 		return;
 	}
@@ -1433,7 +1433,7 @@ PackageInfoView::SetPackage(const PackageInfoRef& packageRef)
 		// When asked to display the already showing package ref,
 		// don't switch to the default tab.
 		switchToDefaultTab = false;
-	} else if (fPackage.Get() != NULL && packageRef.Get() != NULL
+	} else if (fPackage.IsSet() && packageRef.IsSet()
 		&& fPackage->Name() == packageRef->Name()) {
 		// When asked to display a different PackageInfo instance,
 		// but it has the same package title as the already showing

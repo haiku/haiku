@@ -149,7 +149,7 @@ FontCacheEntry::~FontCacheEntry()
 bool
 FontCacheEntry::Init(const ServerFont& font, bool forceVector)
 {
-	if (fGlyphCache.Get() == NULL)
+	if (!fGlyphCache.IsSet())
 		return false;
 
 	glyph_rendering renderingType = _RenderTypeFor(font, forceVector);

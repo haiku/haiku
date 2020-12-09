@@ -281,7 +281,7 @@ PackageContentsView::SetPackage(const PackageInfoRef& package)
 	// to read contents where we previously could not. (For example, the
 	// package has been installed.)
 	if (fPackage == package
-		&& (package.Get() == NULL || package->State() == fLastPackageState)) {
+		&& (!package.IsSet() || package->State() == fLastPackageState)) {
 		return;
 	}
 
@@ -290,13 +290,13 @@ PackageContentsView::SetPackage(const PackageInfoRef& package)
 	{
 		BAutolock lock(&fPackageLock);
 		fPackage = package;
-		fLastPackageState = package.Get() != NULL ? package->State() : NONE;
+		fLastPackageState = package.IsSet() ? package->State() : NONE;
 	}
 
 	// if the package is not installed and is not a local file on disk then
 	// there is no point in attempting to populate data for it.
 
-	if (package.Get() != NULL
+	if (package.IsSet()
 			&& (package->State() == ACTIVATED || package->IsLocalFile())) {
 		release_sem_etc(fContentPopulatorSem, 1, 0);
 	}
@@ -344,7 +344,7 @@ PackageContentsView::_ContentPopulatorThread(void* arg)
 			package = view->fPackage;
 		}
 
-		if (package.Get() != NULL) {
+		if (package.IsSet()) {
 			if (!view->_PopulatePackageContents(*package.Get())) {
 				if (view->LockLooperWithTimeout(1000000) == B_OK) {
 					view->fContentListView->AddItem(

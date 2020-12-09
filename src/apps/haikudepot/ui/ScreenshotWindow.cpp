@@ -172,7 +172,7 @@ ScreenshotWindow::SetPackage(const PackageInfoRef& package)
 	fPackage = package;
 
 	BString title = B_TRANSLATE("Screenshot");
-	if (package.Get() != NULL) {
+	if (package.IsSet()) {
 		title = package->Title();
 		_DownloadScreenshot();
 	}
@@ -263,7 +263,7 @@ ScreenshotWindow::_DownloadThread()
 
 	fScreenshotView->UnsetBitmap();
 
-	if (fPackage.Get() == NULL)
+	if (!fPackage.IsSet())
 		HDINFO("package not set");
 	else {
 		if (fPackage->CountScreenshotInfos() == 0)
@@ -276,7 +276,7 @@ ScreenshotWindow::_DownloadThread()
 
 	Unlock();
 
-	if (info.Get() == NULL) {
+	if (!info.IsSet()) {
 		HDINFO("screenshot not set");
 		return;
 	}
@@ -314,7 +314,7 @@ ScreenshotWindow::_MaxWidthAndHeightOfAllScreenshots()
 	BSize size(0, 0);
 
 	// Find out dimensions of the largest screenshot of this package
-	if (fPackage.Get() != NULL) {
+	if (fPackage.IsSet()) {
 		int count = fPackage->CountScreenshotInfos();
 		for(int32 i = 0; i < count; i++) {
 			const ScreenshotInfoRef& info = fPackage->ScreenshotInfoAtIndex(i);

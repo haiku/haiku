@@ -101,7 +101,7 @@ AlphaMask::AlphaMask(uint8 backgroundOpacity)
 
 AlphaMask::~AlphaMask()
 {
-	if (fPreviousMask.Get() != NULL)
+	if (fPreviousMask.IsSet())
 		atomic_add(&fPreviousMask->fNextMaskCount, -1);
 
 	recursive_lock_destroy(&fLock);
@@ -339,7 +339,7 @@ VectorAlphaMask<VectorMaskType>::_RenderSource(const IntRect& canvasBounds)
 	// Render the picture to the bitmap
 	BitmapHWInterface interface(bitmap);
 	ObjectDeleter<DrawingEngine> engine(interface.CreateDrawingEngine());
-	if (engine.Get() == NULL)
+	if (!engine.IsSet())
 		return NULL;
 
 	engine->SetRendererOffset(fBounds.left, fBounds.top);

@@ -128,7 +128,7 @@ TextDocument::Replace(int32 textOffset, int32 length, const BString& text,
 {
 	TextDocumentRef document = NormalizeText(text, characterStyle,
 		paragraphStyle);
-	if (document.Get() == NULL || document->Length() != text.CountChars())
+	if (!document.IsSet() || document->Length() != text.CountChars())
 		return B_NO_MEMORY;
 	return Replace(textOffset, length, document);
 }
@@ -312,7 +312,7 @@ TextDocument::SubDocument(int32 start, int32 length) const
 	TextDocumentRef result(new(std::nothrow) TextDocument(
 		fDefaultCharacterStyle, fEmptyLastParagraph.Style()), true);
 
-	if (result.Get() == NULL)
+	if (!result.IsSet())
 		return result;
 
 	if (start < 0)
@@ -373,7 +373,7 @@ TextDocument::NormalizeText(const BString& text,
 {
 	TextDocumentRef document(new(std::nothrow) TextDocument(characterStyle,
 			paragraphStyle), true);
-	if (document.Get() == NULL)
+	if (!document.IsSet())
 		throw B_NO_MEMORY;
 
 	Paragraph paragraph(paragraphStyle);
@@ -679,7 +679,7 @@ TextDocument::_NotifyTextChanging(TextChangingEvent& event) const
 	int32 count = listeners.CountItems();
 	for (int32 i = 0; i < count; i++) {
 		const TextListenerRef& listener = listeners.ItemAtFast(i);
-		if (listener.Get() == NULL)
+		if (!listener.IsSet())
 			continue;
 		listener->TextChanging(event);
 		if (event.IsCanceled())
@@ -697,7 +697,7 @@ TextDocument::_NotifyTextChanged(const TextChangedEvent& event) const
 	int32 count = listeners.CountItems();
 	for (int32 i = 0; i < count; i++) {
 		const TextListenerRef& listener = listeners.ItemAtFast(i);
-		if (listener.Get() == NULL)
+		if (!listener.IsSet())
 			continue;
 		listener->TextChanged(event);
 	}
@@ -713,7 +713,7 @@ TextDocument::_NotifyUndoableEditHappened(const UndoableEditRef& edit) const
 	int32 count = listeners.CountItems();
 	for (int32 i = 0; i < count; i++) {
 		const UndoableEditListenerRef& listener = listeners.ItemAtFast(i);
-		if (listener.Get() == NULL)
+		if (!listener.IsSet())
 			continue;
 		listener->UndoableEditHappened(this, edit);
 	}

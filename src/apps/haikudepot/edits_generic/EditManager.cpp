@@ -41,7 +41,7 @@ EditManager::Perform(UndoableEdit* edit, EditContext& context)
 status_t
 EditManager::Perform(const UndoableEditRef& edit, EditContext& context)
 {
-	status_t ret = edit.Get() != NULL ? B_OK : B_BAD_VALUE;
+	status_t ret = edit.IsSet() ? B_OK : B_BAD_VALUE;
 	if (ret == B_OK)
 		ret = edit->InitCheck();
 
@@ -150,7 +150,7 @@ bool
 EditManager::IsSaved()
 {
 	bool saved = fUndoHistory.IsEmpty();
-	if (fEditAtSave.Get() != NULL && !saved) {
+	if (fEditAtSave.IsSet() && !saved) {
 		if (fEditAtSave == fUndoHistory.Top())
 			saved = true;
 	}

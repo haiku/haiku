@@ -469,7 +469,7 @@ FontManager::_SetDefaultFonts()
 
 	fDefaultPlainFont.SetTo(new (std::nothrow) ServerFont(*style,
 		DEFAULT_PLAIN_FONT_SIZE));
-	if (fDefaultPlainFont.Get() == NULL)
+	if (!fDefaultPlainFont.IsSet())
 		return B_NO_MEMORY;
 
 	// bold font
@@ -478,7 +478,7 @@ FontManager::_SetDefaultFonts()
 
 	fDefaultBoldFont.SetTo(new (std::nothrow) ServerFont(*style,
 		DEFAULT_BOLD_FONT_SIZE));
-	if (fDefaultBoldFont.Get() == NULL)
+	if (!fDefaultBoldFont.IsSet())
 		return B_NO_MEMORY;
 
 	// fixed font
@@ -487,7 +487,7 @@ FontManager::_SetDefaultFonts()
 
 	fDefaultFixedFont.SetTo(new (std::nothrow) ServerFont(*style,
 		DEFAULT_FIXED_FONT_SIZE));
-	if (fDefaultFixedFont.Get() == NULL)
+	if (!fDefaultFixedFont.IsSet())
 		return B_NO_MEMORY;
 
 	fDefaultFixedFont->SetSpacing(B_FIXED_SPACING);

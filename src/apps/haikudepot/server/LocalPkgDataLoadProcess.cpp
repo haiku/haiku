@@ -104,7 +104,7 @@ LocalPkgDataLoadProcess::RunInternal()
  		DepotInfoRef depotInfoRef = DepotInfoRef(
  			new(std::nothrow) DepotInfo(repoName), true);
 
-		if (depotInfoRef.Get() == NULL)
+		if (!depotInfoRef.IsSet())
 			HDFATAL("unable to create new depot info - memory exhaustion");
 
  		BRepositoryConfig repoConfig;
@@ -186,10 +186,10 @@ LocalPkgDataLoadProcess::RunInternal()
  			modelInfo.SetTo(it->second);
  		else {
  			// Add new package info
- 			modelInfo.SetTo(new(std::nothrow) PackageInfo(repoPackageInfo),
+			modelInfo.SetTo(new(std::nothrow) PackageInfo(repoPackageInfo),
  				true);
 
- 			if (modelInfo.Get() == NULL)
+			if (!modelInfo.IsSet())
  				return B_ERROR;
 
  			foundPackages[repoPackageInfo.Name()] = modelInfo;
@@ -270,7 +270,7 @@ LocalPkgDataLoadProcess::RunInternal()
  		BString repoName = B_TRANSLATE("Local");
  		DepotInfoRef depotInfoRef(new(std::nothrow) DepotInfo(repoName), true);
 
- 		if (depotInfoRef.Get() == NULL)
+		if (!depotInfoRef.IsSet())
  			HDFATAL("unable to create a new depot info - memory exhaustion");
 
  		depots.push_back(depotInfoRef);

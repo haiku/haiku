@@ -67,7 +67,7 @@ TextDocumentRef
 MarkupParser::CreateDocumentFromMarkup(const BString& text)
 {
 	TextDocumentRef document(new(std::nothrow) TextDocument(), true);
-	if (document.Get() == NULL)
+	if (!document.IsSet())
 		return document;
 
 	AppendMarkup(document, text);

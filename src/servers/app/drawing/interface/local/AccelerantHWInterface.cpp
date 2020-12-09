@@ -564,7 +564,7 @@ AccelerantHWInterface::SetMode(const display_mode& mode)
 	// error.
 
 	// prevent from doing the unnecessary
-	if (fModeCount > 0 && fFrontBuffer.Get() != NULL && fDisplayMode == mode) {
+	if (fModeCount > 0 && fFrontBuffer.IsSet() && fDisplayMode == mode) {
 		// TODO: better comparison of display modes
 		return B_OK;
 	}
@@ -574,7 +574,7 @@ AccelerantHWInterface::SetMode(const display_mode& mode)
 	if (!_IsValidMode(mode))
 		return B_BAD_VALUE;
 
-	if (fFrontBuffer.Get() == NULL)
+	if (!fFrontBuffer.IsSet())
 		return B_NO_INIT;
 
 	// just try to set the mode - we let the graphics driver
@@ -680,11 +680,11 @@ AccelerantHWInterface::SetMode(const display_mode& mode)
 		fOffscreenBackBuffer = false;
 
 	// update backbuffer if neccessary
-	if (fBackBuffer.Get() == NULL
+	if (!fBackBuffer.IsSet()
 		|| fBackBuffer->Width() != fFrontBuffer->Width()
 		|| fBackBuffer->Height() != fFrontBuffer->Height()
 		|| fOffscreenBackBuffer
-		|| (fFrontBuffer->ColorSpace() == B_RGB32 && fBackBuffer.Get() != NULL
+		|| (fFrontBuffer->ColorSpace() == B_RGB32 && fBackBuffer.IsSet()
 			&& !HWInterface::IsDoubleBuffered())) {
 		// NOTE: backbuffer is always B_RGBA32, this simplifies the
 		// drawing backend implementation tremendously for the time
@@ -713,7 +713,7 @@ AccelerantHWInterface::SetMode(const display_mode& mode)
 					fFrontBuffer->Width(), fFrontBuffer->Height()));
 			}
 
-			status = fBackBuffer.Get() != NULL
+			status = fBackBuffer.IsSet()
 				? fBackBuffer->InitCheck() : B_NO_MEMORY;
 			if (status < B_OK) {
 				fBackBuffer.Unset();
@@ -1530,7 +1530,7 @@ AccelerantHWInterface::BackBuffer() const
 bool
 AccelerantHWInterface::IsDoubleBuffered() const
 {
-	return fBackBuffer.Get() != NULL;
+	return fBackBuffer.IsSet();
 }
 
 

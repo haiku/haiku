@@ -80,7 +80,7 @@ TextDocumentLayout::TextDocumentLayout(const TextDocumentLayout& other)
 	fTextListener(new(std::nothrow) LayoutTextListener(this), true),
 	fParagraphLayouts(other.fParagraphLayouts)
 {
-	if (fDocument.Get() != NULL)
+	if (fDocument.IsSet())
 		fDocument->AddListener(fTextListener);
 }
 
@@ -97,14 +97,14 @@ TextDocumentLayout::SetTextDocument(const TextDocumentRef& document)
 	if (fDocument == document)
 		return;
 
-	if (fDocument.Get() != NULL)
+	if (fDocument.IsSet())
 		fDocument->RemoveListener(fTextListener);
 
 	fDocument = document;
 	_Init();
 	fLayoutValid = false;
 
-	if (fDocument.Get() != NULL)
+	if (fDocument.IsSet())
 		fDocument->AddListener(fTextListener);
 }
 
@@ -112,7 +112,7 @@ TextDocumentLayout::SetTextDocument(const TextDocumentRef& document)
 void
 TextDocumentLayout::Invalidate()
 {
-	if (fDocument.Get() != NULL)
+	if (fDocument.IsSet())
 		InvalidateParagraphs(0, fDocument->Paragraphs().CountItems());
 }
 
@@ -120,7 +120,7 @@ TextDocumentLayout::Invalidate()
 void
 TextDocumentLayout::InvalidateParagraphs(int32 start, int32 count)
 {
-	if (start < 0 || count == 0 || fDocument.Get() == NULL)
+	if (start < 0 || count == 0 || !fDocument.IsSet())
 		return;
 
 	fLayoutValid = false;
@@ -134,7 +134,7 @@ TextDocumentLayout::InvalidateParagraphs(int32 start, int32 count)
 		if (start >= fParagraphLayouts.CountItems()) {
 			ParagraphLayoutRef layout(new(std::nothrow) ParagraphLayout(
 				paragraph), true);
-			if (layout.Get() == NULL
+			if (!layout.IsSet()
 				|| !fParagraphLayouts.Add(ParagraphLayoutInfo(0.0f, layout))) {
 				fprintf(stderr, "TextDocumentLayout::InvalidateParagraphs() - "
 					"out of memory\n");
@@ -345,7 +345,7 @@ TextDocumentLayout::_Init()
 {
 	fParagraphLayouts.Clear();
 
-	if (fDocument.Get() == NULL)
+	if (!fDocument.IsSet())
 		return;
 
 	const ParagraphList& paragraphs = fDocument->Paragraphs();
@@ -355,7 +355,7 @@ TextDocumentLayout::_Init()
 		const Paragraph& paragraph = paragraphs.ItemAtFast(i);
 		ParagraphLayoutRef layout(new(std::nothrow) ParagraphLayout(paragraph),
 			true);
-		if (layout.Get() == NULL
+		if (!layout.IsSet()
 			|| !fParagraphLayouts.Add(ParagraphLayoutInfo(0.0f, layout))) {
 			fprintf(stderr, "TextDocumentLayout::_Layout() - out of memory\n");
 			return;

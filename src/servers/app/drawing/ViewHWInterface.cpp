@@ -437,7 +437,7 @@ ViewHWInterface::SetMode(const display_mode& mode)
 
 	status_t ret = B_OK;
 	// prevent from doing the unnecessary
-	if (fBackBuffer.Get() != NULL && fFrontBuffer.Get() != NULL
+	if (fBackBuffer.IsSet() && fFrontBuffer.IsSet()
 		&& fDisplayMode.virtual_width == mode.virtual_width
 		&& fDisplayMode.virtual_height == mode.virtual_height
 		&& fDisplayMode.space == mode.space)
@@ -549,7 +549,7 @@ ViewHWInterface::SetMode(const display_mode& mode)
 		if (ret >= B_OK) {
 			// clear out buffers, alpha is 255 this way
 			// TODO: maybe this should handle different color spaces in different ways
-			if (fBackBuffer.Get() != NULL)
+			if (fBackBuffer.IsSet())
 				memset(fBackBuffer->Bits(), 255, fBackBuffer->BitsLength());
 			memset(fFrontBuffer->Bits(), 255, fFrontBuffer->BitsLength());
 
@@ -603,7 +603,7 @@ ViewHWInterface::GetDeviceInfo(accelerant_device_info* info)
 status_t
 ViewHWInterface::GetFrameBufferConfig(frame_buffer_config& config)
 {
-	if (fFrontBuffer.Get() == NULL)
+	if (!fFrontBuffer.IsSet())
 		return B_ERROR;
 
 	config.frame_buffer = fFrontBuffer->Bits();
@@ -777,8 +777,8 @@ ViewHWInterface::BackBuffer() const
 bool
 ViewHWInterface::IsDoubleBuffered() const
 {
-	if (fFrontBuffer.Get() != NULL)
-		return fBackBuffer.Get() != NULL;
+	if (fFrontBuffer.IsSet())
+		return fBackBuffer.IsSet();
 
 	return HWInterface::IsDoubleBuffered();
 }

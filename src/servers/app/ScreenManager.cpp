@@ -234,7 +234,7 @@ ScreenManager::_AddHWInterface(HWInterface* interface)
 			item->owner = NULL;
 			item->listener.SetTo(
 				new(nothrow) ScreenChangeListener(*this, screen));
-			if (item->listener.Get() != NULL
+			if (item->listener.IsSet()
 				&& interface->AddListener(item->listener.Get())) {
 				if (fScreenList.AddItem(item))
 					return item;

@@ -107,7 +107,7 @@ public:
 			void				HandleDirectConnection(int32 bufferState,
 									int32 driverState = 0);
 			bool				HasDirectFrameBufferAccess() const
-									{ return fDirectWindowInfo.Get() != NULL; }
+									{ return fDirectWindowInfo.IsSet(); }
 			bool				IsDirectlyAccessing() const
 									{ return fIsDirectlyAccessing; }
 

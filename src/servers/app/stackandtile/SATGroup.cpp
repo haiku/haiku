@@ -914,7 +914,7 @@ SATGroup::RemoveWindow(SATWindow* window, bool stayBelowMouse)
 	// We need the area a little bit longer because the area could hold the
 	// last reference to the group.
 	BReference<WindowArea> area = window->GetWindowArea();
-	if (area.Get() != NULL)
+	if (area.IsSet())
 		area->_RemoveWindow(window);
 
 	window->RemovedFromGroup(this, stayBelowMouse);

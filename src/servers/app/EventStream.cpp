@@ -264,7 +264,7 @@ InputServerStream::_MessageFromPort(BMessage** _message, bigtime_t timeout)
 	// we have the message, now let's unflatten it
 
 	ObjectDeleter<BMessage> message(new BMessage(code));
-	if (message.Get() == NULL)
+	if (!message.IsSet())
 		return B_NO_MEMORY;
 
 	if (buffer == NULL) {

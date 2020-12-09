@@ -70,7 +70,7 @@ NetReceiver::_Listen()
 
 	while (!fStopThread) {
 		fEndpoint.SetTo(fListener->Accept(5000));
-		if (fEndpoint.Get() == NULL) {
+		if (!fEndpoint.IsSet()) {
 			TRACE("got NULL endpoint from accept\n");
 			continue;
 		}

@@ -429,7 +429,7 @@ MainWindow::MessageReceived(BMessage* message)
 					BAutolock locker(fModel.Lock());
 					package = fModel.PackageForName(name);
 				}
-				if (package.Get() == NULL)
+				if (!package.IsSet())
 					debugger("unable to find the named package");
 				else
 					_AdoptPackage(package);
@@ -494,7 +494,7 @@ MainWindow::MessageReceived(BMessage* message)
 				}
 				_AddRemovePackageFromLists(ref);
 				if ((changes & PKG_CHANGED_STATE) != 0
-						&& fCoordinator.Get() == NULL) {
+						&& !fCoordinator.IsSet()) {
 					fWorkStatusView->PackageStatusChanged(ref);
 				}
 			}
@@ -998,7 +998,7 @@ MainWindow::_PackageActionWorker(void* arg)
 		{
 			AutoLocker<BLocker> lock(&window->fPendingActionsLock);
 			ref = window->fPendingActions.ItemAt(0);
-			if (ref.Get() == NULL)
+			if (!ref.IsSet())
 				break;
 			window->fPendingActions.Remove(0);
 		}
@@ -1058,7 +1058,7 @@ MainWindow::_PopulatePackageWorker(void* arg)
 			force = window->fForcePopulatePackage;
 		}
 
-		if (package.Get() != NULL) {
+		if (package.IsSet()) {
 			uint32 populateFlags = Model::POPULATE_USER_RATINGS
 				| Model::POPULATE_SCREEN_SHOTS
 				| Model::POPULATE_CHANGELOG;
@@ -1326,7 +1326,7 @@ MainWindow::_AddProcessCoordinator(ProcessCoordinator* item)
 {
 	AutoLocker<BLocker> lock(&fCoordinatorLock);
 
-	if (fCoordinator.Get() == NULL) {
+	if (!fCoordinator.IsSet()) {
 		if (acquire_sem(fCoordinatorRunningSem) != B_OK)
 			debugger("unable to acquire the process coordinator sem");
 		HDINFO("adding and starting a process coordinator [%s]",
@@ -1352,7 +1352,7 @@ MainWindow::_SpinUntilProcessCoordinatorComplete()
 			debugger("unable to release the process coordinator sem");
 		{
 			AutoLocker<BLocker> lock(&fCoordinatorLock);
-			if (fCoordinator.Get() == NULL)
+			if (!fCoordinator.IsSet())
 				return;
 		}
 	}
@@ -1375,7 +1375,7 @@ MainWindow::_StopProcessCoordinators()
 			fCoordinatorQueue.pop();
 		}
 
-		if (fCoordinator.Get() != NULL) {
+		if (fCoordinator.IsSet()) {
 			fCoordinator->Stop();
 		}
 	}

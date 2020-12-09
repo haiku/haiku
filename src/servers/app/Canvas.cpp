@@ -57,7 +57,7 @@ Canvas::~Canvas()
 status_t
 Canvas::InitCheck() const
 {
-	if (fDrawState.Get() == NULL)
+	if (!fDrawState.IsSet())
 		return B_NO_MEMORY;
 
 	return B_OK;

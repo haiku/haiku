@@ -245,7 +245,7 @@ public:
 	static bool _IsPackageBefore(const PackageInfoRef& packageA,
 		const PackageInfoRef& packageB)
 	{
-		if (packageA.Get() == NULL || packageB.Get() == NULL)
+		if (!packageA.IsSet() || !packageB.IsSet())
 			HDFATAL("unexpected NULL reference in a referencable");
 		int c = _CmpProminences(packageA->Prominence(), packageB->Prominence());
 		if (c == 0)
@@ -399,7 +399,7 @@ public:
 			pkg->Name(), BITMAP_SIZE_64, icon);
 
 		if (iconResult == B_OK) {
-			if (icon.Get() != NULL) {
+			if (icon.IsSet()) {
 				float inset = (HEIGHT_PACKAGE - SIZE_ICON) / 2.0;
 				BRect targetRect = BRect(inset, y + inset, SIZE_ICON + inset,
 					y + SIZE_ICON + inset);
@@ -559,7 +559,7 @@ public:
 
 	float TopOfPackage(const PackageInfoRef& package)
 	{
-		if (package.Get() != NULL) {
+		if (package.IsSet()) {
 			int index = _IndexOfPackage(package);
 			if (-1 != index)
 				return _YOfIndex(index);
