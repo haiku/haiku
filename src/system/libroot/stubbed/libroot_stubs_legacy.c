@@ -1798,7 +1798,6 @@ void debug_thread() {}
 void debug_vprintf() {}
 void debugger() {}
 void delete_area() {}
-void delete_driver_settings() {}
 void delete_port() {}
 void delete_sem() {}
 void dev_for_path() {}

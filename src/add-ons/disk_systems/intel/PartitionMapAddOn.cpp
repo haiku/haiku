@@ -257,7 +257,7 @@ PartitionMapHandle::GetNextSupportedType(const BMutablePartition* child,
 		index++;
 		if (nextType->used)
 			break;
-	}
+}
 
 	if (!nextType)
 		return B_ENTRY_NOT_FOUND;
@@ -305,7 +305,7 @@ PartitionMapHandle::ValidateSetParameters(const BMutablePartition* child,
 	if (handle == NULL)
 		return B_BAD_DATA;
 
-	delete_driver_settings(handle);
+	unload_driver_settings(handle);
 
 	return B_OK;
 }
@@ -320,7 +320,7 @@ PartitionMapHandle::SetParameters(BMutablePartition* child,
 		return B_BAD_DATA;
 
 	bool active = get_driver_boolean_parameter(handle, "active", false, true);
-	delete_driver_settings(handle);
+	unload_driver_settings(handle);
 
 	// Update our local state
 	PrimaryPartition* partition = (PrimaryPartition*)child->ChildCookie();
@@ -373,7 +373,7 @@ PartitionMapHandle::ValidateCreateChild(off_t* _offset, off_t* _size,
 	if (handle == NULL)
 		return B_ERROR;
 	get_driver_boolean_parameter(handle, "active", false, true);
-	delete_driver_settings(handle);
+	unload_driver_settings(handle);
 
 	// do we have a spare primary partition?
 	if (fPartitionMap.CountNonEmptyPrimaryPartitions() == 4)
@@ -489,7 +489,7 @@ PartitionMapHandle::CreateChild(off_t offset, off_t size,
 		return B_ERROR;
 
 	bool active = get_driver_boolean_parameter(handle, "active", false, true);
-	delete_driver_settings(handle);
+	unload_driver_settings(handle);
 
 	// get a spare primary partition
 	PrimaryPartition* primary = NULL;

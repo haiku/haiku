@@ -236,7 +236,7 @@ SettingsParser::Parse(const char* text, BMessage& settings)
 	status_t status = adapter.ConvertFromDriverSettings(
 		*get_driver_settings(driverSettings), kSettingsTemplate, settings);
 
-	delete_driver_settings(driverSettings);
+	unload_driver_settings(driverSettings);
 	return status;
 }
 

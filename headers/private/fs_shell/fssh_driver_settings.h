@@ -31,7 +31,6 @@ extern void*			fssh_parse_driver_settings_string(
 							const char *settingsString);
 extern fssh_status_t	fssh_get_driver_settings_string(void *_handle,
 							char *buffer, fssh_size_t *_bufferSize, bool flat);
-extern fssh_status_t	fssh_delete_driver_settings(void *handle);
 
 extern const char*		fssh_get_driver_parameter(void *handle, const char *key,
 							const char *unknownValue,	/* key not present */

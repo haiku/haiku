@@ -862,10 +862,3 @@ fssh_get_driver_settings(void *handle)
 
 	return &((settings_handle *)handle)->settings;
 }
-
-
-fssh_status_t
-fssh_delete_driver_settings(void *handle)
-{
-	return fssh_unload_driver_settings(handle);
-}

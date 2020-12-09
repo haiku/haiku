@@ -29,7 +29,6 @@ extern status_t		unload_driver_settings(void *handle);
 extern void			*parse_driver_settings_string(const char *settingsString);
 extern status_t		get_driver_settings_string(void *_handle, char *buffer,
 						size_t *_bufferSize, bool flat);
-extern status_t		delete_driver_settings(void *handle);
 
 extern const char	*get_driver_parameter(void *handle, const char *key,
 						const char *unknownValue,	/* key not present */

@@ -387,7 +387,6 @@
 #define unload_driver_settings			fssh_unload_driver_settings
 #define parse_driver_settings_string	fssh_parse_driver_settings_string
 #define get_driver_settings_string		fssh_get_driver_settings_string
-#define delete_driver_settings			fssh_delete_driver_settings
 #define get_driver_parameter			fssh_get_driver_parameter
 #define get_driver_boolean_parameter	fssh_get_driver_boolean_parameter
 #define get_driver_settings				fssh_get_driver_settings

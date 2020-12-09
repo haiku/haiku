@@ -57,7 +57,7 @@ parse_initialize_parameters(const char* parameterString,
 	if (string != NULL)
 		fatBits = strtoul(string, NULL, 0);
 
-	delete_driver_settings(handle);
+	unload_driver_settings(handle);
 
 	if (fatBits != 0 && fatBits != 12 && fatBits != 16 && fatBits != 32) {
 		dprintf("mkdos error: fat must be 12, 16, or 32 bits\n");

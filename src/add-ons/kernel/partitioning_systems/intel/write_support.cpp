@@ -1283,7 +1283,7 @@ pm_set_parameters(int fd, partition_id partitionID, const char* parameters,
 		return B_ERROR;
 
 	bool active = get_driver_boolean_parameter(handle, "active", false, true);
-	delete_driver_settings(handle);
+	unload_driver_settings(handle);
 
 	// if the old type is the same, there is nothing to do
 	if (primary->Active() == active) {
@@ -1450,7 +1450,7 @@ pm_create_child(int fd, partition_id partitionID, off_t offset, off_t size,
 		return B_ERROR;
 
 	bool active = get_driver_boolean_parameter(handle, "active", false, true);
-	delete_driver_settings(handle);
+	unload_driver_settings(handle);
 
 	// set the active flags to false
 	if (active) {
@@ -2226,10 +2226,10 @@ ep_create_child(int fd, partition_id partitionID, off_t offset, off_t size,
 	if (buffer != NULL)
 		ptsOffset = strtoull(buffer, NULL, 10);
 	else {
-		delete_driver_settings(handle);
+		unload_driver_settings(handle);
 		return B_BAD_VALUE;
 	}
-	delete_driver_settings(handle);
+	unload_driver_settings(handle);
 
 	// check the partition location
 	if (!check_partition_location_ep(partition, offset, size, ptsOffset))

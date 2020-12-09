@@ -352,7 +352,7 @@ PartitionListRow::PartitionListRow(BPartition* partition)
 				true);
 			appendParameter(parameters, active, B_TRANSLATE("Active"));
 
-			delete_driver_settings(handle);
+			unload_driver_settings(handle);
 		}
 	}
 
