@@ -18,6 +18,7 @@
 
 #include <stdlib.h>
 #include <unistd.h>
+#include <SupportDefs.h>
 
 
 namespace BPrivate {
@@ -61,6 +62,11 @@ public:
 	inline void Delete()
 	{
 		SetTo(NULL);
+	}
+
+	inline bool IsSet() const
+	{
+		return fObject != NULL;
 	}
 
 	inline C *Get() const
@@ -214,8 +220,17 @@ struct MethodDeleter
 
 // HandleDeleter
 
+struct StatusHandleChecker
+{
+	inline bool operator()(status_t handle)
+	{
+		return handle >= B_OK;
+	}
+};
+
 template<typename C, typename DestructorResult,
-	DestructorResult (*Destructor)(C), C nullValue = -1>
+	DestructorResult (*Destructor)(C), C nullValue = -1,
+	typename Checker = StatusHandleChecker>
 class HandleDeleter {
 public:
 	inline HandleDeleter()
@@ -230,13 +245,15 @@ public:
 
 	inline ~HandleDeleter()
 	{
-		Destructor(fHandle);
+		if (IsSet())
+			Destructor(fHandle);
 	}
 
 	inline void SetTo(C handle)
 	{
 		if (handle != fHandle) {
-			Destructor(fHandle);
+			if (IsSet())
+				Destructor(fHandle);
 			fHandle = handle;
 		}
 	}
@@ -249,6 +266,12 @@ public:
 	inline void Delete()
 	{
 		SetTo(nullValue);
+	}
+
+	inline bool IsSet() const
+	{
+		Checker isHandleSet;
+		return isHandleSet(fHandle);
 	}
 
 	inline C Get() const
