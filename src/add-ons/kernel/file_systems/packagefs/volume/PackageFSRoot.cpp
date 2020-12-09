@@ -6,7 +6,7 @@
 
 #include "PackageFSRoot.h"
 
-#include <AutoDeleter.h>
+#include <AutoDeleterDrivers.h>
 
 #include <vfs.h>
 
@@ -114,7 +114,7 @@ PackageFSRoot::RegisterVolume(Volume* volume)
 				relativeRootPath, strerror(error));
 			RETURN_ERROR(error);
 		}
-		CObjectDeleter<struct vnode, void, vfs_put_vnode> vnodePutter(vnode);
+		VnodePutter vnodePutter(vnode);
 
 		// stat it
 		struct stat st;

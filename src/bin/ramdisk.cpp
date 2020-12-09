@@ -17,6 +17,7 @@
 #include <String.h>
 
 #include <AutoDeleter.h>
+#include <AutoDeleterPosix.h>
 #include <StringForSize.h>
 #include <TextTable.h>
 
@@ -387,7 +388,7 @@ command_list(int argc, const char* const* argv)
 			strerror(errno));
 		return 1;
 	}
-	CObjectDeleter<DIR, int, closedir> dirCloser(dir);
+	DirCloser dirCloser(dir);
 
 	TextTable table;
 	table.AddColumn("ID", B_ALIGN_RIGHT);

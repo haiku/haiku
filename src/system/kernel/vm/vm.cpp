@@ -21,7 +21,7 @@
 #include <OS.h>
 #include <KernelExport.h>
 
-#include <AutoDeleter.h>
+#include <AutoDeleterDrivers.h>
 
 #include <symbol_versioning.h>
 
@@ -2054,7 +2054,7 @@ _vm_map_file(team_id team, const char* name, void** _address,
 	status_t status = vfs_get_vnode_from_fd(fd, kernel, &vnode);
 	if (status < B_OK)
 		return status;
-	CObjectDeleter<struct vnode, void, vfs_put_vnode> vnodePutter(vnode);
+	VnodePutter vnodePutter(vnode);
 
 	// If we're going to pre-map pages, we need to reserve the pages needed by
 	// the mapping backend upfront.

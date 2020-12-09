@@ -19,6 +19,7 @@
 #include <Message.h>
 
 #include <AutoDeleter.h>
+#include <AutoDeleterDrivers.h>
 #include <package/PackageInfo.h>
 
 
@@ -360,8 +361,7 @@ BRepositoryInfo::_SetTo(const BEntry& entry)
 	void* settingsHandle = parse_driver_settings_string(configString.String());
 	if (settingsHandle == NULL)
 		return B_BAD_DATA;
-	CObjectDeleter<void, status_t, unload_driver_settings>
-		settingsHandleDeleter(settingsHandle);
+	DriverSettingsUnloader settingsHandleDeleter(settingsHandle);
 
 	const char* name = get_driver_parameter(settingsHandle, "name", NULL, NULL);
 	const char* identifier = get_driver_parameter(settingsHandle, "identifier", NULL, NULL);

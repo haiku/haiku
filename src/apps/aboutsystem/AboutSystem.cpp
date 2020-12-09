@@ -51,6 +51,7 @@
 
 #include <AppMisc.h>
 #include <AutoDeleter.h>
+#include <AutoDeleterPosix.h>
 #include <cpu_type.h>
 #include <parsedate.h>
 #include <system_revision.h>
@@ -1463,7 +1464,7 @@ AboutView::_AddCopyrightsFromAttribute()
 		close(attrFD);
 		return;
 	}
-	CObjectDeleter<FILE, int, fclose> _(attrFile);
+	FileCloser _(attrFile);
 
 	// read and parse the copyrights
 	BMessage package;

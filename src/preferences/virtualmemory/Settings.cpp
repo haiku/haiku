@@ -18,6 +18,7 @@
 #include <string.h>
 
 #include <AutoDeleter.h>
+#include <AutoDeleterDrivers.h>
 #include <File.h>
 #include <FindDirectory.h>
 #include <Path.h>
@@ -139,8 +140,7 @@ Settings::ReadSwapSettings()
 	void* settings = load_driver_settings(kVirtualMemorySettings);
 	if (settings == NULL)
 		return kErrorSettingsNotFound;
-	CObjectDeleter<void, status_t, unload_driver_settings>
-		settingDeleter(settings);
+	DriverSettingsUnloader settingDeleter(settings);
 
 	const char* enabled = get_driver_parameter(settings, "vm", NULL, NULL);
 	const char* automatic = get_driver_parameter(settings, "swap_auto",

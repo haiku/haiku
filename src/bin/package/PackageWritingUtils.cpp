@@ -14,6 +14,7 @@
 #include <package/hpkg/HPKGDefs.h>
 
 #include <AutoDeleter.h>
+#include <AutoDeleterPosix.h>
 
 
 status_t
@@ -27,7 +28,7 @@ add_current_directory_entries(BPackageWriter& packageWriter,
 			strerror(errno));
 		return errno;
 	}
-	CObjectDeleter<DIR, int, closedir> dirCloser(dir);
+	DirCloser dirCloser(dir);
 
 	while (dirent* entry = readdir(dir)) {
 		// skip "." and ".."

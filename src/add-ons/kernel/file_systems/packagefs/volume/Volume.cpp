@@ -22,6 +22,8 @@
 #include <package/PackageInfoAttributes.h>
 
 #include <AutoDeleter.h>
+#include <AutoDeleterPosix.h>
+#include <AutoDeleterDrivers.h>
 #include <PackagesDirectoryDefs.h>
 
 #include <vfs.h>
@@ -329,8 +331,7 @@ Volume::Mount(const char* parameterString)
 			NULL);
 	}
 
-	CObjectDeleter<void, status_t, delete_driver_settings>
-		parameterHandleDeleter(parameterHandle);
+	DriverSettingsUnloader parameterHandleDeleter(parameterHandle);
 
 	if (packages != NULL && packages[0] == '\0') {
 		FATAL("invalid package folder ('packages' parameter)!\n");
@@ -711,7 +712,7 @@ Volume::_LoadOldPackagesStates(const char* packagesState)
 		ERROR("Failed to open administrative directory: %s\n", strerror(errno));
 		RETURN_ERROR(errno);
 	}
-	CObjectDeleter<DIR, int, closedir> dirCloser(dir);
+	DirCloser dirCloser(dir);
 
 	while (dirent* entry = readdir(dir)) {
 		if (strncmp(entry->d_name, "state_", 6) != 0
@@ -903,7 +904,7 @@ Volume::_AddInitialPackagesFromDirectory()
 			fPackagesDirectory->Path(), strerror(errno));
 		RETURN_ERROR(errno);
 	}
-	CObjectDeleter<DIR, int, closedir> dirCloser(dir);
+	DirCloser dirCloser(dir);
 
 	while (dirent* entry = readdir(dir)) {
 		// skip "." and ".."
@@ -1778,7 +1779,7 @@ Volume::_PublishShineThroughDirectories()
 			_RemoveNode(directory);
 			continue;
 		}
-		CObjectDeleter<struct vnode, void, vfs_put_vnode> vnodePutter(vnode);
+		VnodePutter vnodePutter(vnode);
 
 		// stat it
 		struct stat st;

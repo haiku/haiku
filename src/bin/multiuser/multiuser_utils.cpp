@@ -12,7 +12,7 @@
 #include <termios.h>
 #include <unistd.h>
 
-#include <AutoDeleter.h>
+#include <AutoDeleterPosix.h>
 
 #include <user_group.h>
 
@@ -38,7 +38,7 @@ read_password(const char* prompt, char* password, size_t bufferSize,
 		in = tty;
 		out = tty;
 	}
-	CObjectDeleter<FILE, int, fclose> ttyCloser(tty);
+	FileCloser ttyCloser(tty);
 
 	// disable echo
 	int inFD = fileno(in);

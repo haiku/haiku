@@ -19,11 +19,11 @@
 #include <vfs.h>
 
 #include <AutoDeleter.h>
+#include <AutoDeleterDrivers.h>
 
 #include "DebugSupport.h"
 #include "kernel_interface.h"
 #include "Node.h"
-#include "Utils.h"
 
 
 // #pragma mark - Volume
@@ -51,8 +51,7 @@ Volume::Mount(const char* parameterString)
 {
 	const char* source = NULL;
 	void* parameterHandle = parse_driver_settings_string(parameterString);
-	CObjectDeleter<void, status_t, delete_driver_settings>
-		parameterDeleter(parameterHandle);
+	DriverSettingsUnloader parameterDeleter(parameterHandle);
 	if (parameterHandle != NULL)
 		source = get_driver_parameter(parameterHandle, "source", NULL, NULL);
 	if (source == NULL || source[0] == '\0') {
