@@ -41,7 +41,7 @@ ParagraphStyle::operator==(const ParagraphStyle& other) const
 		return true;
 
 	if (fStyleData.IsSet() && other.fStyleData.IsSet())
-		return *fStyleData.Get() == *other.fStyleData.Get();
+		return *fStyleData == *other.fStyleData;
 
 	return false;
 }
