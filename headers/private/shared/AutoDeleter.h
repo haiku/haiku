@@ -11,6 +11,7 @@
 	ArrayDeleter   - deletes an array
 	MemoryDeleter  - free()s malloc()ed memory
 	CObjectDeleter - calls an arbitrary specified destructor function
+	MethodObjectDeleter - calls an arbitrary object function in given struct ptr
 	HandleDeleter  - use arbitrary handle type and destructor function
 	FileDescriptorCloser - closes a file descriptor, based on HandleDeleter
 */
@@ -218,6 +219,31 @@ struct MethodDeleter
 };
 
 
+// MethodObjectDeleter
+
+template<typename Type, typename Table, Table **table,
+	void (*Table::*Deleter)(Type*)>
+struct MethodObjectDelete {
+	inline void operator()(Type *object)
+	{
+		if (object != NULL)
+			((**table).*Deleter)(object);
+	}
+};
+
+template<typename Type, typename Table, Table **table,
+	typename DestructorResult, DestructorResult (*Table::*Deleter)(Type*)>
+struct MethodObjectDeleter
+	: AutoDeleter<Type, MethodObjectDelete<Type, Table, table, Deleter> >
+{
+	typedef AutoDeleter<Type,
+		MethodObjectDelete<Type, Table, table, Deleter> > Base;
+
+	MethodObjectDeleter() : Base() {}
+	MethodObjectDeleter(Type *object) : Base(object) {}
+};
+
+
 // HandleDeleter
 
 struct StatusHandleChecker
@@ -308,6 +334,7 @@ using ::BPrivate::ArrayDeleter;
 using ::BPrivate::MemoryDeleter;
 using ::BPrivate::CObjectDeleter;
 using ::BPrivate::MethodDeleter;
+using ::BPrivate::MethodObjectDeleter;
 using ::BPrivate::HandleDeleter;
 using ::BPrivate::FileDescriptorCloser;
 
