@@ -19,6 +19,8 @@
 #include <syslog.h>
 #include <unistd.h>
 
+#include <AutoDeleterOS.h>
+
 #include "accelerant_protos.h"
 
 #include "bios.h"
@@ -46,53 +48,6 @@ connector_info* gConnector[ATOM_MAX_SUPPORTED_DEVICE];
 gpio_info* gGPIOInfo[MAX_GPIO_PINS];
 
 
-class AreaCloner {
-public:
-								AreaCloner();
-								~AreaCloner();
-
-			area_id				Clone(const char* name, void** _address,
-									uint32 spec, uint32 protection,
-									area_id sourceArea);
-			status_t			InitCheck()
-									{return fArea < 0 ? (status_t)fArea : B_OK;}
-			void				Keep();
-
-private:
-			area_id				fArea;
-};
-
-
-AreaCloner::AreaCloner()
-	:
-	fArea(-1)
-{
-}
-
-
-AreaCloner::~AreaCloner()
-{
-	if (fArea >= 0)
-		delete_area(fArea);
-}
-
-
-area_id
-AreaCloner::Clone(const char* name, void** _address, uint32 spec,
-	uint32 protection, area_id sourceArea)
-{
-	fArea = clone_area(name, _address, spec, protection, sourceArea);
-	return fArea;
-}
-
-
-void
-AreaCloner::Keep()
-{
-	fArea = -1;
-}
-
-
 //	#pragma mark -
 
 
@@ -105,6 +60,7 @@ init_common(int device, bool isClone)
 	// initialize global accelerant info structure
 
 	gInfo = (accelerant_info*)malloc(sizeof(accelerant_info));
+	MemoryDeleter infoDeleter(gInfo);
 
 	if (gInfo == NULL)
 		return B_NO_MEMORY;
@@ -161,24 +117,20 @@ init_common(int device, bool isClone)
 		return B_ERROR;
 	}
 
-	AreaCloner sharedCloner;
-	gInfo->shared_info_area = sharedCloner.Clone("radeon hd shared info",
+	AreaDeleter sharedDeleter(clone_area("radeon hd shared info",
 		(void**)&gInfo->shared_info, B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA,
-		data.shared_info_area);
-	status_t status = sharedCloner.InitCheck();
+		data.shared_info_area));
+	status_t status = gInfo->shared_info_area = sharedDeleter.Get();
 	if (status < B_OK) {
-		free(gInfo);
 		TRACE("%s, failed to create shared area\n", __func__);
 		return status;
 	}
 
-	AreaCloner regsCloner;
-	gInfo->regs_area = regsCloner.Clone("radeon hd regs",
+	AreaDeleter regsDeleter(clone_area("radeon hd regs",
 		(void**)&gInfo->regs, B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA,
-		gInfo->shared_info->registers_area);
-	status = regsCloner.InitCheck();
+		gInfo->shared_info->registers_area));
+	status = gInfo->regs_area = regsDeleter.Get();
 	if (status < B_OK) {
-		free(gInfo);
 		TRACE("%s, failed to create mmio area\n", __func__);
 		return status;
 	}
@@ -195,8 +147,9 @@ init_common(int device, bool isClone)
 	if (gInfo->rom[0] != 0x55 || gInfo->rom[1] != 0xAA)
 		TRACE("%s: didn't find a VGA bios in cloned region!\n", __func__);
 
-	sharedCloner.Keep();
-	regsCloner.Keep();
+	infoDeleter.Detach();
+	sharedDeleter.Detach();
+	regsDeleter.Detach();
 
 	return B_OK;
 }

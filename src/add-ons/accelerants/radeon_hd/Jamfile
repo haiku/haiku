@@ -6,6 +6,7 @@ UseHeaders [ FDirName $(SUBDIR) atombios ] ;
 UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics radeon_hd ] ;
 UsePrivateHeaders [ FDirName graphics common ] ;
+UsePrivateHeaders shared ;
 
 Addon radeon_hd.accelerant :
 	accelerant.cpp
