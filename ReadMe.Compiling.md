@@ -128,14 +128,15 @@ haiku/generated.x86gcc2
 ### Configure an x86_64 (GCC 8) build
 ```bash
 cd haiku/generated.x86_64
-../configure --build-cross-tools x86_64 ../../buildtools/
+../configure --cross-tools-source ../../buildtools --build-cross-tools x86_64
 ```
 
 ### Configure a 32-bit GCC 2.95/GCC 8 Hybrid, from a non-Haiku platform
 ```bash
 cd haiku/generated.x86gcc2
 ../configure \
-	--build-cross-tools x86_gcc2 ../../buildtools/ \
+	--cross-tools-source ../../buildtools/ \
+	--build-cross-tools x86_gcc2 
 	--build-cross-tools x86
 ```
 
