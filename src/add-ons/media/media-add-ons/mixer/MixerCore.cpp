@@ -501,8 +501,8 @@ MixerCore::_MixThread()
 		fOutput->MediaOutput().format.u.raw_audio) / 2;
 
 	TRACE("MixerCore: starting _MixThread at %Ld with latency %Ld and "
-		"downstream latency %Ld, bufferRequestTimeout %Ld\n", start, latency,
-		fDownstreamLatency, bufferRequestTimeout);
+		"downstream latency %Ld, bufferRequestTimeout %Ld\n", start,
+		fEventLatency, fDownstreamLatency, bufferRequestTimeout);
 
 	// We must read from the input buffer at a position (pos) that is always
 	// a multiple of fMixBufferFrameCount.
