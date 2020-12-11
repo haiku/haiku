@@ -168,7 +168,7 @@ public:
 	virtual	bool				IsDoubleBuffered() const;
 
 	// Invalidate is used for scheduling an area for updating
-	virtual	status_t			InvalidateRegion(BRegion& region);
+	virtual	status_t			InvalidateRegion(const BRegion& region);
 	virtual	status_t			Invalidate(const BRect& frame);
 	// while as CopyBackToFront() actually performs the operation
 	// either directly or asynchronously by the UpdateQueue thread

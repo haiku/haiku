@@ -76,7 +76,7 @@ virtual	RenderingBuffer*			FrontBuffer() const;
 virtual	RenderingBuffer*			BackBuffer() const;
 virtual	bool						IsDoubleBuffered() const;
 
-virtual	status_t					InvalidateRegion(BRegion& region);
+virtual	status_t					InvalidateRegion(const BRegion& region);
 virtual	status_t					Invalidate(const BRect& frame);
 virtual	status_t					CopyBackToFront(const BRect& frame);
 

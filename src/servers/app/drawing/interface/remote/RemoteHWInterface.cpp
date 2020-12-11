@@ -575,7 +575,7 @@ RemoteHWInterface::IsDoubleBuffered() const
 
 
 status_t
-RemoteHWInterface::InvalidateRegion(BRegion& region)
+RemoteHWInterface::InvalidateRegion(const BRegion& region)
 {
 	RemoteMessage message(NULL, fSendBuffer.Get());
 	message.Start(RP_INVALIDATE_REGION);

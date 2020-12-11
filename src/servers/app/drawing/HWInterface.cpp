@@ -317,7 +317,7 @@ HWInterface::IsDoubleBuffered() const
 /*! The object needs to be already locked!
 */
 status_t
-HWInterface::InvalidateRegion(BRegion& region)
+HWInterface::InvalidateRegion(const BRegion& region)
 {
 	int32 count = region.CountRects();
 	for (int32 i = 0; i < count; i++) {

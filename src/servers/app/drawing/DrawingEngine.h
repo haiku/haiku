@@ -201,11 +201,11 @@ public:
 			void			SetRendererOffset(int32 offsetX, int32 offsetY);
 
 private:
+	friend class DrawTransaction;
+
 			void			_CopyRect(uint8* bits, uint32 width,
 								uint32 height, uint32 bytesPerRow,
 								int32 xOffset, int32 yOffset) const;
-
-	inline	void			_CopyToFront(const BRect& frame);
 
 			ObjectDeleter<Painter>
 							fPainter;
