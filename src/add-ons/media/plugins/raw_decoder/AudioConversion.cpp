@@ -106,7 +106,7 @@ public:
 	inline operator uint8() const { int32 v = (int32)(data * 127.0f) + 128; if (v > 255) v = 255; else if (v < 0) v = 0; return v; }
 	inline operator int8()  const { int32 v = (int32)(data * 127.0f); if (v > 127) v = 127; else if (v < -127) v = -127; return v; }
 	inline operator int16() const { int32 v = (int32)(data * 32767.0f); if (v > 32767) v = 32767; else if (v < -32767) v = -32767; return v; }
-	inline operator int32() const { float32 v; if (data < -1.0f) v = -1.0f; else if (data > 1.0f) v = 1.0f; else v = data; return (int32)(v * 2147483647.0f); }
+	inline operator int32() const { if (data <= -1.0f) return INT32_MIN; if (data >= 1.0f) return INT32_MAX; return (int32)(data * INT32_MAX); }
 	inline operator float() const { return data; }
 private:
 	float32 data;
@@ -118,7 +118,7 @@ public:
 	inline operator uint8() const { int32 v = (int32)(data * 127.0f) + 128; if (v > 255) v = 255; else if (v < 0) v = 0; return v; }
 	inline operator int8()  const { int32 v = (int32)(data * 127.0f); if (v > 127) v = 127; else if (v < -127) v = -127; return v; }
 	inline operator int16() const { int32 v = (int32)(data * 32767.0f); if (v > 32767) v = 32767; else if (v < -32767) v = -32767; return v; }
-	inline operator int32() const { float64 v; if (data < -1.0) v = -1.0; else if (data > 1.0) v = 1.0; else v = data; return (int32)(v * 2147483647.0f); }
+	inline operator int32() const { float64 v; if (data < -1.0) v = -1.0; else if (data > 1.0) v = 1.0; else v = data; return (int32)(v * INT32_MAX); }
 	inline operator float() const { return data; }
 private:
 	float64 data;

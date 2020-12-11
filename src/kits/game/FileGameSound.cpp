@@ -32,7 +32,7 @@ struct _gs_media_tracker {
 
 
 // Local utility functions -----------------------------------------------
-template<typename T, int middle>
+template<typename T, int32 min, int32 middle, int32 max>
 bool
 FillBuffer(_gs_ramp* ramp, T* dest, const T* src, size_t* bytes)
 {
@@ -40,7 +40,8 @@ FillBuffer(_gs_ramp* ramp, T* dest, const T* src, size_t* bytes)
 
 	for (size_t sample = 0; sample < samples; sample++) {
 		float gain = *ramp->value;
-		dest[sample] = T(float(src[sample] - middle) * gain + middle);
+		dest[sample] = clamp<T, min, max>(float(src[sample] - middle) * gain
+			+ middle);
 
 		if (ChangeRamp(ramp)) {
 			*bytes = sample * sizeof(T);
@@ -206,26 +207,26 @@ BFileGameSound::FillBuffer(void* inBuffer, size_t inByteCount)
 
 			switch(Format().format) {
 				case gs_audio_format::B_GS_U8:
-					rampDone = ::FillBuffer<uint8, 128>(fPausing,
-						(uint8*)&buffer[out_offset],
+					rampDone = ::FillBuffer<uint8, 0, 128, UINT8_MAX>(
+						fPausing, (uint8*)&buffer[out_offset],
 						(uint8*)&fBuffer[fPlayPosition], &bytes);
 					break;
 
 				case gs_audio_format::B_GS_S16:
-					rampDone = ::FillBuffer<int16, 0>(fPausing,
-						(int16*)&buffer[out_offset],
+					rampDone = ::FillBuffer<int16, INT16_MIN, 0, INT16_MAX>(
+						fPausing, (int16*)&buffer[out_offset],
 						(int16*)&fBuffer[fPlayPosition], &bytes);
 					break;
 
 				case gs_audio_format::B_GS_S32:
-					rampDone = ::FillBuffer<int32, 0>(fPausing,
-						(int32*)&buffer[out_offset],
+					rampDone = ::FillBuffer<int32, INT32_MIN, 0, INT32_MAX>(
+						fPausing, (int32*)&buffer[out_offset],
 						(int32*)&fBuffer[fPlayPosition], &bytes);
 					break;
 
 				case gs_audio_format::B_GS_F:
-					rampDone = ::FillBuffer<float, 0>(fPausing,
-						(float*)&buffer[out_offset],
+					rampDone = ::FillBuffer<float, -1, 0, 1>(
+						fPausing, (float*)&buffer[out_offset],
 						(float*)&fBuffer[fPlayPosition], &bytes);
 					break;
 			}

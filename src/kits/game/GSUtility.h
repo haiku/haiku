@@ -54,4 +54,13 @@ void media_to_gs_format(gs_audio_format* dest,
 	media_raw_audio_format* source);
 
 
+template<typename T, int32 min, int32 max>
+static inline T clamp(float value)
+{
+	if (value <= min)
+		return min;
+	if (value >= max)
+		return max;
+	return T(value);
+}
 #endif

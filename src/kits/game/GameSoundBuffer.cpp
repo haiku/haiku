@@ -43,13 +43,14 @@
 #include "GSUtility.h"
 
 // Sound Buffer Utility functions ----------------------------------------
-template<typename T, int middle>
+template<typename T, int32 min, int32 middle, int32 max>
 static inline void
 ApplyMod(T* data, int64 index, float* pan)
 {
-	data[index * 2] = T(float(data[index * 2] - middle) * pan[0] + middle);
-	data[index * 2 + 1] = T(float(data[index * 2 + 1] - middle) * pan[1]
-							+ middle);
+	data[index * 2] = clamp<T, min, max>(float(data[index * 2] - middle)
+		* pan[0] + middle);
+	data[index * 2 + 1] = clamp<T, min, max>(float(data[index * 2 + 1] - middle)
+		* pan[1] + middle);
 }
 
 
@@ -262,7 +263,7 @@ GameSoundBuffer::Play(void * data, int64 frames)
 			case gs_audio_format::B_GS_U8:
 			{
 				for (int64 i = 0; i < frames; i++) {
-					ApplyMod<uint8, 128>((uint8*)data, i, pan);
+					ApplyMod<uint8, 0, 128, UINT8_MAX>((uint8*)data, i, pan);
 					UpdateMods();
 				}
 
@@ -272,7 +273,8 @@ GameSoundBuffer::Play(void * data, int64 frames)
 			case gs_audio_format::B_GS_S16:
 			{
 				for (int64 i = 0; i < frames; i++) {
-					ApplyMod<int16, 0>((int16*)data, i, pan);
+					ApplyMod<int16, INT16_MIN, 0, INT16_MAX>((int16*)data, i,
+						pan);
 					UpdateMods();
 				}
 
@@ -282,7 +284,8 @@ GameSoundBuffer::Play(void * data, int64 frames)
 			case gs_audio_format::B_GS_S32:
 			{
 				for (int64 i = 0; i < frames; i++) {
-					ApplyMod<int32, 0>((int32*)data, i, pan);
+					ApplyMod<int32, INT32_MIN, 0, INT32_MAX>((int32*)data, i,
+						pan);
 					UpdateMods();
 				}
 
@@ -292,7 +295,7 @@ GameSoundBuffer::Play(void * data, int64 frames)
 			case gs_audio_format::B_GS_F:
 			{
 				for (int64 i = 0; i < frames; i++) {
-					ApplyMod<float, 0>((float*)data, i, pan);
+					ApplyMod<float, -1, 0, 1>((float*)data, i, pan);
 					UpdateMods();
 				}
 

@@ -34,9 +34,12 @@ kernel(Resampler* object, const void *_src, int32 srcSampleOffset,
 		// optimized case for no resampling
 		while (count--) {
 			float tmp = ((*(const inType*)src) - inMiddle) * gain + outMiddle;
-			if (tmp < min) tmp = min;
-			if (tmp > max) tmp = max;
-			*(outType *)dest = (outType)tmp;
+			if (tmp <= min)
+				*(outType *)dest = min;
+			else if (tmp >= max)
+				*(outType *)dest = max;
+			else
+				*(outType *)dest = (outType)tmp;
 			src += srcSampleOffset;
 			dest += destSampleOffset;
 		}
@@ -49,9 +52,12 @@ kernel(Resampler* object, const void *_src, int32 srcSampleOffset,
 	// downsample
 	while (count--) {
 		float tmp = ((*(const inType*)src) - inMiddle) * gain + outMiddle;
-		if (tmp < min) tmp = min;
-		if (tmp > max) tmp = max;
-		*(outType *)dest = (outType)tmp;
+		if (tmp <= min)
+			*(outType *)dest = min;
+		else if (tmp >= max)
+			*(outType *)dest = max;
+		else
+			*(outType *)dest = (outType)tmp;
 
 		dest += destSampleOffset;
 		current += delta;
