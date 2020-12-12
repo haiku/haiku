@@ -1,24 +1,24 @@
 1	portuguese	x-vnd.Haiku-GLInfo	2211760527
 Maximum clipping planes	Capabilities		Planos de recorte máximo
-Maximum 2D texture size	Capabilities		Tamanho máximo de textura 2D
-Auxiliary buffer(s)	Capabilities		Buffer(s) auxiliar(es)
 Maximum evaluators equation order	Capabilities		Ordem de equação de avaliadores máximos
 Texture stack size	Capabilities		Tamanho da pilha de texturas
 GL Info	System name		Informação GL
 Information	InfoView		Informação
-Maximum convolution	Capabilities		Convolução máxima
 Attributes stack size	Capabilities		Tamanho da pilha de atributos
 Maximum lights	Capabilities		Máximo de luzes
-Maximum 3D texture size	Capabilities		Tamanho máximo de textura 3D
 Extensions	Extensions		Extensões
-Maximum recommended index elements	Capabilities		Máximo recomendado de elementos índice
 Available extensions	Extensions		Extensões disponíveis
 Maximum recommended vertex elements	Capabilities		Máximo recomendado de elementos vértice
 Value	Capabilities		Valor
-Maximum texture units	Capabilities		Máximo de unidades de textura
-Capabilities	Capabilities		Capacidades
 Name stack size	Capabilities		Tamanho da pilha de nomes
-List stack size	Capabilities		Tamanho da pilha de listas
-Projection stack size	Capabilities		Tamanho a pilha de projeção
-Model stack size	Capabilities		Tamanho da pilha de modelo
+Capabilities	Capabilities		Capacidades
+Maximum texture units	Capabilities		Máximo de unidades de textura
 Capability	Capabilities		Capacidade
+Maximum 2D texture size	Capabilities		Tamanho máximo de textura 2D
+Auxiliary buffer(s)	Capabilities		Buffer(s) auxiliar(es)
+Maximum convolution	Capabilities		Convolução máxima
+Maximum 3D texture size	Capabilities		Tamanho máximo de textura 3D
+Maximum recommended index elements	Capabilities		Máximo recomendado de elementos índice
+List stack size	Capabilities		Tamanho da pilha de listas
+Model stack size	Capabilities		Tamanho da pilha de modelo
+Projection stack size	Capabilities		Tamanho a pilha de projeção

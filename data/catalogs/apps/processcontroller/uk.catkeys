@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-ProcessController	3123774187
+1	ukrainian	x-vnd.Haiku-ProcessController	415082887
 Error saving file	ProcessController		Помилка при збереженні файлу
 Display priority	ProcessController		Пріоритет відображення
 That's no Fun!	ProcessController		Це не жарт!
@@ -21,6 +21,7 @@ Restart Deskbar	ProcessController		Перезапустити Deskbar
 About ProcessController…	ProcessController		Про Контролер процесів…
 Usage: %s [-deskbar]\n	ProcessController		Використання: %s [-deskbar]\n
 Please confirm	ProcessController		Підтвердити
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr
 Urgent priority	ProcessController		Терміновий пріоритет
 What do you want to do with the thread \"%s\"?	ProcessController		Що Ви бажаєте зробити з потоком \"%s\"?
 Idle priority	ProcessController		Пріоритет простою

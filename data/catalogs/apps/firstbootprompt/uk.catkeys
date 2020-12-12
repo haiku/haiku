@@ -1,6 +1,7 @@
-1	ukrainian	x-vnd.Haiku-FirstBootPrompt	585808223
+1	ukrainian	x-vnd.Haiku-FirstBootPrompt	3607479623
 Japanese	KeymapNames		Японська
 US	KeymapNames		US - Амер.
+Cancel	BootPromptWindow		Скасувати
 Esperanto	KeymapNames		Есперанто
 Belarusian	KeymapNames		Бiлоруська
 Brazilian	KeymapNames		Бразiльська
@@ -10,6 +11,7 @@ Latin-American	KeymapNames		Латино-американська
 Ukrainian	KeymapNames		Українська
 Russian (Yawert)	KeymapNames		Російська (фонетична)
 United-Kingdom	KeymapNames		Британська
+Quit Haiku	System name		Вийти з Haiku
 Serbian (Cyrillic)	KeymapNames		Сербська (Кирилиця)
 Turkish (Type-F)	KeymapNames		Турецька (Type-F)
 Bulgarian (Cyrillic)	KeymapNames		Болгарська (Кирилиця)
@@ -44,6 +46,7 @@ Spanish	KeymapNames		Іспанська
 Ukrainian (Mac)	KeymapNames		Українська (Mac)
 Estonian	KeymapNames		Естонська
 French (Bépo)	KeymapNames		Французька (Bépo)
+Restart system	BootPromptWindow		Перезапустити систему
 Serbian (Latin)	KeymapNames		Сербська (Латина)
 Russian (Typewriter)	KeymapNames		Російська (Typewriter)
 French	KeymapNames		Французька

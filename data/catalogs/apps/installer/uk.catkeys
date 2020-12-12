@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Installer	3959809598
+1	ukrainian	x-vnd.Haiku-Installer	2338645205
 Performing installation.	InstallProgress		Виконання інсталяції.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Виберіть джерело з випадаючого меню. Потім натисніть кнопку \"Почати\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Закрийте вікно DriveSetup перед тим як закрити вікно Installer.
@@ -14,6 +14,7 @@ Unknown Type	InstallProgress	Partition content type	Невідомий тип
 Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Натисніть 'Почати' для інсталяції з '%1s' на '%2s'.
 Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Виберіть диск для інсталяції з випадаючого меню. Після чого натисніть \"Почати\".
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Інсталяція завершена. Завантажувальний сектор записано до '%s'. Натисніть 'Вийти' щоб закрити Installer або виберіть інший цільовий том для виконання іншої інсталяції.
+Are you sure you want to stop the installation?	InstallerWindow		Ви впевнені, що хочете зупинити інсталяцію?
 README	InstallerApp		ПРОЧИТАЙ
 Quit	InstallerWindow		Вийти
 Write boot sector to '%s'	InstallerWindow		Записати завантажувальний сектор до '%s'

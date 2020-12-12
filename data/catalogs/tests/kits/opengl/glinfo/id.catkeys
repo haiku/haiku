@@ -1,24 +1,24 @@
 1	indonesian	x-vnd.Haiku-GLInfo	2211760527
 Maximum clipping planes	Capabilities		Clipping plana maksimum
-Maximum 2D texture size	Capabilities		Ukuran tekstur 2D maksimum
-Auxiliary buffer(s)	Capabilities		Tambahan buffer
 Maximum evaluators equation order	Capabilities		Urutan persamaan evaluator maksimum
 Texture stack size	Capabilities		Ukuran tumpukan tekstur
 GL Info	System name		Info GL
 Information	InfoView		Informasi
-Maximum convolution	Capabilities		Konvolusi maksimum
 Attributes stack size	Capabilities		Ukuran tumpukan atribut
 Maximum lights	Capabilities		Cahaya maksimum
-Maximum 3D texture size	Capabilities		Ukuran tekstur 3D maksimum
 Extensions	Extensions		Ekstensi
-Maximum recommended index elements	Capabilities		Elemen indeks maksimum yang disarankan
 Available extensions	Extensions		Ketersediaan ekstensi
 Maximum recommended vertex elements	Capabilities		Elemen vertex maksimum yang disarankan
 Value	Capabilities		Nilai
-Maximum texture units	Capabilities		Unit tekstur maksimum
-Capabilities	Capabilities		Kemampuan
 Name stack size	Capabilities		Ukuran tumpukan nama
-List stack size	Capabilities		Ukuran tumpukan daftar
-Projection stack size	Capabilities		Ukuran tumpukan proyeksi
-Model stack size	Capabilities		Ukuran tumpukan model
+Capabilities	Capabilities		Kemampuan
+Maximum texture units	Capabilities		Unit tekstur maksimum
 Capability	Capabilities		Kemampuan
+Maximum 2D texture size	Capabilities		Ukuran tekstur 2D maksimum
+Auxiliary buffer(s)	Capabilities		Tambahan buffer
+Maximum convolution	Capabilities		Konvolusi maksimum
+Maximum 3D texture size	Capabilities		Ukuran tekstur 3D maksimum
+Maximum recommended index elements	Capabilities		Elemen indeks maksimum yang disarankan
+List stack size	Capabilities		Ukuran tumpukan daftar
+Model stack size	Capabilities		Ukuran tumpukan model
+Projection stack size	Capabilities		Ukuran tumpukan proyeksi

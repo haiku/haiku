@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Terminal	2277843400
+1	ukrainian	x-vnd.Haiku-Terminal	3117643489
 Close other tabs	Terminal TermWindow		Закрити інші вкладки
 Insert path	Terminal TermView		Введіть шлях
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Термінал не зміг запустити оболонку. Прикро.
@@ -10,6 +10,7 @@ Confirm exit if active programs exist	Terminal AppearancePrefView		Підтве�
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tПоточна робоча папка активного процесу в поточній вкладці.\n\t\t\tПри необхідності можна вказати максимальне число компонентів\n\t\t\tдля відображення. Наприклад '%2d' для більш ніж двох компонентів.\n\t%T\t-\tНазва програми Terminal для поточної локалі.\n\t%e\t-\tКодування поточної локалі. Для UTF-8 не відображається.\n\t%i\t-\tІндекс вікна.\n\t%p\t-\tНазва активного процесу у поточній вкладці.\n\t%t\t-\tЗаголовок поточної вкладки.
 Solarized Dark	Terminal colors scheme		Сяючий морок
 Copy	Terminal TermWindow		Копіювати
+  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory	Terminal TermApp		  -h,     --help               показати довідку\n  -t,     --title              установити заголовок вікна\n  -f,     --fullscreen         повноекранний режим\n  -w,     --working-directory  установити робочий каталог
 Retro	Terminal colors scheme		Ретро
 Edit tab title…	Terminal TermWindow		Редагувати заголовок вкладки…
 Print	Terminal TermWindow		Друк
