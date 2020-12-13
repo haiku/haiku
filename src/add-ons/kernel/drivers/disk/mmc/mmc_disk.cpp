@@ -191,26 +191,26 @@ mmc_disk_init_driver(device_node* node, void** cookie)
 	static const uint32 kDMAResourceBufferCount			= 16;
 	static const uint32 kDMAResourceBounceBufferCount	= 16;
 
-	// TODO relax this when we have ADMA2
-	// TODO the restrictions depend on the SDHCI bus and should be read
-	// from there, not hardcoded in mmc_disk
-	const dma_restrictions restrictions = {
-		0, UINT32_MAX, /* Only 32bit address space in SDMA mode */
-		512, /* Align requests on sectors start and end */
-		B_PAGE_SIZE, /* Do not cross pages (SDMA can't do it) */
-		512, 1, 512};
+	info->dmaResource = new(std::nothrow) DMAResource;
+	if (info->dmaResource == NULL) {
+		TRACE("Failed to allocate DMA resource");
+		free(info);
+		return B_NO_MEMORY;
+	}
 
-	error = info->dmaResource.Init(restrictions, kBlockSize,
+	error = info->dmaResource->Init(info->node, kBlockSize,
 		kDMAResourceBufferCount, kDMAResourceBounceBufferCount);
 	if (error != B_OK) {
 		TRACE("Failed to init DMA resource");
+		delete info->dmaResource;
 		free(info);
 		return error;
 	}
 
-	info->scheduler = new(std::nothrow) IOSchedulerSimple(&info->dmaResource);
+	info->scheduler = new(std::nothrow) IOSchedulerSimple(info->dmaResource);
 	if (info->scheduler == NULL) {
 		TRACE("Failed to allocate scheduler");
+		delete info->dmaResource;
 		free(info);
 		return B_NO_MEMORY;
 	}
@@ -219,6 +219,7 @@ mmc_disk_init_driver(device_node* node, void** cookie)
 	if (error != B_OK) {
 		TRACE("Failed to init scheduler");
 		delete info->scheduler;
+		delete info->dmaResource;
 		free(info);
 		return error;
 	}
@@ -238,6 +239,7 @@ mmc_disk_uninit_driver(void* _cookie)
 	CALLED();
 	mmc_disk_driver_info* info = (mmc_disk_driver_info*)_cookie;
 	delete info->scheduler;
+	delete info->dmaResource;
 	sDeviceManager->put_node(info->parent);
 	free(info);
 }

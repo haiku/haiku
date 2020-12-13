@@ -41,7 +41,7 @@ class TransferMode {
 		static const uint8_t kAutoCmdAutoSelect
 			= kAutoCmd23Enable | kAutoCmd12Enable;
 
-		// TODO block count enable
+		static const uint8_t kBlockCountEnable = 1 << 1;
 
 		static const uint8_t kDmaEnable = 1;
 		static const uint8_t kNoDmaOrNoData = 0;
@@ -210,11 +210,50 @@ class HostControllerVersion {
 		const uint8_t vendorVersion;
 } __attribute__((packed));
 
+
+class HostControl {
+	public:
+		void SetDMAMode(uint8_t dmaMode)
+		{
+			value = (value & ~kDmaMask) | dmaMode;
+		}
+
+		static const uint8_t kDmaMask = 3 << 3;
+		static const uint8_t kSdma = 0 << 3;
+		static const uint8_t kAdma32 = 2 << 3;
+		static const uint8_t kAdma64 = 3 << 3;
+	private:
+		volatile uint8_t value;
+} __attribute__((packed));
+
+
+class BlockSize {
+	public:
+		void ConfigureTransfer(uint16_t transferBlockSize,
+			uint16_t dmaBoundary)
+		{
+			value = transferBlockSize | dmaBoundary << 12;
+		}
+
+		static const uint16_t kDmaBoundary4K = 0;
+		static const uint16_t kDmaBoundary8K = 1;
+		static const uint16_t kDmaBoundary16K = 2;
+		static const uint16_t kDmaBoundary32K = 3;
+		static const uint16_t kDmaBoundary64K = 4;
+		static const uint16_t kDmaBoundary128K = 5;
+		static const uint16_t kDmaBoundary256K = 6;
+		static const uint16_t kDmaBoundary512K = 7;
+
+	private:
+		volatile uint16_t value;
+} __attribute__((packed));
+
+
 // #pragma mark -
 struct registers {
 	// SD command generation
 	volatile uint32_t system_address;
-	volatile uint16_t block_size;
+	BlockSize block_size;
 	volatile uint16_t block_count;
 	volatile uint32_t argument;
 	volatile uint16_t transfer_mode;
@@ -227,14 +266,14 @@ struct registers {
 	volatile uint32_t buffer_data_port;
 
 	// Host control 1
-	PresentState present_state;
-	volatile uint8_t host_control;
-	PowerControl power_control;
-	volatile uint8_t block_gap_control;
-	volatile uint8_t wakeup_control;
-	ClockControl clock_control;
-	volatile uint8_t timeout_control;
-	SoftwareReset software_reset;
+	PresentState		present_state;
+	HostControl			host_control;
+	PowerControl		power_control;
+	volatile uint8_t	block_gap_control;
+	volatile uint8_t	wakeup_control;
+	ClockControl		clock_control;
+	volatile uint8_t	timeout_control;
+	SoftwareReset		software_reset;
 
 	// Interrupt control
 	volatile uint32_t interrupt_status;

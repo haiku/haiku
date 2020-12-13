@@ -29,7 +29,7 @@ typedef struct {
 
 	device_geometry geometry;
 
-	DMAResource dmaResource;
+	DMAResource* dmaResource;
 	IOScheduler* scheduler;
 
 	off_t DeviceSize() const {

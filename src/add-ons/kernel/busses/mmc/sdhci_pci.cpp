@@ -359,15 +359,34 @@ SdhciBus::DoIO(uint8_t command, IOOperation* operation)
 	const generic_io_vec* vecs = operation->Vecs();
 	generic_size_t vecOffset = 0;
 
-	// Must always be 512 (on SD cards it can be changed, but not on SDHC)
 	// FIXME can this be moved to the init function instead?
-	fRegisters->block_size = kBlockSize;
+	//
+	// For simplicity we use a transfer size equal to the sector size. We could
+	// go up to 2K here if the length to read in each individual vec is a
+	// multiple of 2K, but we have no easy way to know this (we would need to
+	// iterate through the IOOperation vecs and check the size of each of them).
+	// We could also do smaller transfers, but it is not possible to start a
+	// transfer anywhere else than the start of a sector, so it's a lot simpler
+	// to always work in complete sectors. We set the B_DMA_ALIGNMENT device
+	// node property accordingly, making sure that we don't get asked to do
+	// transfers that are not aligned with sectors.
+	//
+	// Additionnally, set SDMA buffer boundary aligment to 512K. This is the
+	// largest possible size. We also set the B_DMA_BOUNDARY property on the
+	// published device node, so that the DMA resource manager knows that it
+	// must respect this boundary. As a result, we will never be asked to
+	// do a transfer that crosses this boundary, and we don't need to handle
+	// the DMA boundary interrupt (the transfer will be split in two at an
+	// upper layer).
+	fRegisters->block_size.ConfigureTransfer(kBlockSize,
+		BlockSize::kDmaBoundary512K);
 	status_t result = B_OK;
 
 	while (length > 0) {
 		size_t toCopy = std::min((generic_size_t)length,
 			vecs->length - vecOffset);
-		TRACE("Reading loop %ld bytes from position %ld\n", toCopy, offset);
+		TRACE("Loop %ld bytes from position %ld to %p\n", toCopy, offset,
+			vecs->base + vecOffset);
 
 		// If the current vec is empty, we can move to the next
 		if (toCopy == 0) {
@@ -390,7 +409,8 @@ SdhciBus::DoIO(uint8_t command, IOOperation* operation)
 		else
 			direction = TransferMode::kRead;
 		fRegisters->transfer_mode = TransferMode::kMulti | direction
-			| TransferMode::kAutoCmd12Enable | TransferMode::kDmaEnable;
+			| TransferMode::kAutoCmd12Enable
+			| TransferMode::kBlockCountEnable | TransferMode::kDmaEnable;
 
 		uint32_t response;
 		result = ExecuteCommand(command, offset, &response);
@@ -668,11 +688,23 @@ register_child_devices(void* cookie)
 		bar = bar + slot;
 		sprintf(prettyName, "SDHC bus %" B_PRIu8, slot);
 		device_attr attrs[] = {
-			// properties of this controller for SDHCI bus manager
+			// properties of this controller for mmc bus manager
 			{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { string: prettyName } },
 			{ B_DEVICE_FIXED_CHILD, B_STRING_TYPE,
 				{string: MMC_BUS_MODULE_NAME} },
 			{ B_DEVICE_BUS, B_STRING_TYPE, {string: "mmc"} },
+
+			// DMA properties
+			// The high alignment is to force access only to complete sectors
+			// These constraints could be removed by using ADMA which allows
+			// use of the full 64bit address space and can do scatter-gather.
+			{ B_DMA_ALIGNMENT, B_UINT32_TYPE, { ui32: 511 }},
+			{ B_DMA_HIGH_ADDRESS, B_UINT64_TYPE, { ui64: 0x100000000LL }},
+			{ B_DMA_BOUNDARY, B_UINT32_TYPE, { ui32: (1 << 19) - 1 }},
+			{ B_DMA_MAX_SEGMENT_COUNT, B_UINT32_TYPE, { ui32: 1 }},
+			{ B_DMA_MAX_SEGMENT_BLOCKS, B_UINT32_TYPE, { ui32: (1 << 10) - 1 }},
+
+			// private data to identify device
 			{ SLOT_NUMBER, B_UINT8_TYPE, { ui8: slot} },
 			{ BAR_INDEX, B_UINT8_TYPE, { ui8: bar} },
 			{ NULL }
