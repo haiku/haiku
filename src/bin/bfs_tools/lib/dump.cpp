@@ -240,7 +240,7 @@ dump_bplustree_node(const bplustree_node* node, const bplustree_header* header,
 			break;
 		}
 
-		char buffer[256];
+		char buffer[BPLUSTREE_MAX_KEY_LENGTH + 1];
 		memcpy(buffer, key, length);
 		buffer[length] = '\0';
 
