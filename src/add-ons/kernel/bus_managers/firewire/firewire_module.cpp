@@ -190,7 +190,8 @@ fw_module_init(void)
 			}
 			memset(fw_sc, 0, sizeof(struct firewire_softc));
 			gFirewire_softc[found] = fw_sc;
-			gFirewire_softc[found+1] = NULL;
+			if (found < MAX_CARDS - 1)
+				gFirewire_softc[found + 1] = NULL;
 
 			found++;
 			info = (pci_info*)malloc(sizeof(pci_info));
@@ -240,7 +241,7 @@ fw_module_uninit(void)
 
 	terminate_timer();
 
-	for (i = 0; gFirewire_softc[i] != NULL; i++) {
+	for (i = 0; i < MAX_CARDS && gFirewire_softc[i] != NULL; i++) {
 		fwohci_pci_detach(i);
 		free(gFirewire_softc[i]);
 		free(gFwohci_softc[i]);
