@@ -88,8 +88,10 @@ public:
 			if (node == NULL)
 				return B_NO_MEMORY;
 			status_t result = fMap.Put(key, node);
-			if (result != B_OK)
+			if (result != B_OK) {
+				delete node;
 				return result;
+			}
 			_SetNewestNode(node);
 			_PurgeExcess();
 		}
