@@ -103,7 +103,8 @@ mmc_bus_execute_command(device_node* node, uint8_t command, uint32_t argument,
 
 
 static status_t
-mmc_bus_do_io(device_node* node, uint16_t rca, IOOperation* operation)
+mmc_bus_do_io(device_node* node, uint16_t rca, uint8_t command,
+	IOOperation* operation)
 {
 	driver_module_info* mmc;
 	void* cookie;
@@ -118,7 +119,7 @@ mmc_bus_do_io(device_node* node, uint16_t rca, IOOperation* operation)
 	bus->AcquireBus();
 	status_t result = B_OK;
 
-	result = bus->DoIO(rca, operation);
+	result = bus->DoIO(rca, command, operation);
 
 	bus->ReleaseBus();
 	return result;

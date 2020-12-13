@@ -42,9 +42,12 @@ enum SD_COMMANDS {
 	SD_SEND_CSD				= 9,
 	SD_STOP_TRANSMISSION	= 12,
 
-	// Block oriented read commands, class 2
+	// Block oriented read and write commands, class 2
 	SD_READ_SINGLE_BLOCK = 17,
 	SD_READ_MULTIPLE_BLOCKS = 18,
+
+	SD_WRITE_SINGLE_BLOCK = 24,
+	SD_WRITE_MULTIPLE_BLOCKS = 25,
 
 	// Application specific commands, class 8
 	SD_APP_CMD = 55,
@@ -65,19 +68,32 @@ typedef struct mmc_bus_interface {
 	driver_module_info info;
 
 	status_t (*set_clock)(void* controller, uint32_t kilohertz);
+		// Configure the bus clock. The bus is initialized with a slow clock
+		// that allows device enumeration in all cases, but after enumeration
+		// the mmc_bus knows how fast each card can go, and configures the bus
+		// accordingly.
 	status_t (*execute_command)(void* controller, uint8_t command,
 		uint32_t argument, uint32_t* result);
-	status_t (*do_io)(void* controller, IOOperation* operation);
+		// Execute a command with no I/O phase
+	status_t (*do_io)(void* controller, uint8_t command,
+		IOOperation* operation);
+		// Execute a command that involves a data transfer.
 } mmc_bus_interface;
 
 
 // Interface between mmc device driver (mmc_disk, sdio drivers, ...) and mmc_bus
+// This interface is rather generic as it allows implementation of drivers for
+// different type of cards, which will use different commands. The bus
+// provides a generic interface for all of them, and is not specific to any
+// type of card.
 typedef struct mmc_device_interface {
 	driver_module_info info;
 	status_t (*execute_command)(device_node* node, uint8_t command,
 		uint32_t argument, uint32_t* result);
+		// Execute a command with no I/O phase
 	status_t (*do_io)(device_node* controller, uint16_t rca,
-		IOOperation* operation);
+		uint8_t command, IOOperation* operation);
+		// Execute a command that involves a data transfer.
 } mmc_device_interface;
 
 

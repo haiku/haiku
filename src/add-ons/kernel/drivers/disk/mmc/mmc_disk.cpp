@@ -110,7 +110,12 @@ mmc_disk_execute_iorequest(void* data, IOOperation* operation)
 	mmc_disk_driver_info* info = (mmc_disk_driver_info*)data;
 	status_t error;
 
-	error = info->mmc->do_io(info->parent, info->rca, operation);
+	uint8_t command;
+	if (operation->IsWrite())
+		command = SD_WRITE_MULTIPLE_BLOCKS;
+	else
+		command = SD_READ_MULTIPLE_BLOCKS;
+	error = info->mmc->do_io(info->parent, info->rca, command, operation);
 
 	if (error != B_OK) {
 		info->scheduler->OperationCompleted(operation, error, 0);

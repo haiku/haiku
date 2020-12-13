@@ -52,7 +52,7 @@ class SdhciBus {
 		status_t			InitCheck();
 		void				Reset();
 		void				SetClock(int kilohertz);
-		status_t			DoIO(IOOperation* operation);
+		status_t			DoIO(uint8_t command, IOOperation* operation);
 		
 	private:
 		bool				PowerOn();
@@ -196,6 +196,8 @@ SdhciBus::ExecuteCommand(uint8_t command, uint32_t argument, uint32_t* response)
 			break;
 		case SD_READ_SINGLE_BLOCK:
 		case SD_READ_MULTIPLE_BLOCKS:
+		case SD_WRITE_SINGLE_BLOCK:
+		case SD_WRITE_MULTIPLE_BLOCKS:
 			replyType = Command::kR1Type | Command::kDataPresent;
 			break;
 		case SD_APP_CMD:
@@ -338,11 +340,9 @@ SdhciBus::SetClock(int kilohertz)
 
 
 status_t
-SdhciBus::DoIO(IOOperation* operation)
+SdhciBus::DoIO(uint8_t command, IOOperation* operation)
 {
 	bool isWrite = operation->IsWrite();
-	if (isWrite)
-		return B_NOT_SUPPORTED;
 
 	static const uint32 kBlockSize = 512;
 	off_t offset = operation->Offset();
@@ -384,11 +384,16 @@ SdhciBus::DoIO(IOOperation* operation)
 
 		fRegisters->block_count = toCopy / kBlockSize;
 
-		fRegisters->transfer_mode = TransferMode::kSingle | TransferMode::kRead
+		uint16 direction;
+		if (isWrite)
+			direction = TransferMode::kWrite;
+		else
+			direction = TransferMode::kRead;
+		fRegisters->transfer_mode = TransferMode::kMulti | direction
 			| TransferMode::kAutoCmd12Enable | TransferMode::kDmaEnable;
 
 		uint32_t response;
-		result = ExecuteCommand(SD_READ_MULTIPLE_BLOCKS, offset, &response);
+		result = ExecuteCommand(command, offset, &response);
 		if (result != B_OK)
 			break;
 
@@ -780,12 +785,12 @@ execute_command(void* controller, uint8_t command, uint32_t argument,
 
 
 static status_t
-do_io(void* controller, IOOperation* operation)
+do_io(void* controller, uint8_t command, IOOperation* operation)
 {
 	CALLED();
 	
 	SdhciBus* bus = (SdhciBus*)controller;
-	return bus->DoIO(operation);
+	return bus->DoIO(command, operation);
 }
 
 
