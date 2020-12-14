@@ -19,8 +19,7 @@ main(int argc, char* argv[])
 	if (argc > 2
 		|| (argc == 2 && argv[1][0] == '-')) {
 		fprintf(stdout, "usage: beep [ eventname ]\n");
-		fprintf(stdout, "Event names are found in the "
-			"Sounds preferences panel.\n");
+		fprintf(stdout, "Event names are found in the Sounds preferences panel.\n");
 		fflush(stdout);
 		return B_OK;
 	}
