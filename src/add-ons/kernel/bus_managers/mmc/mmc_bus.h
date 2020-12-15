@@ -44,7 +44,8 @@ public:
 				status_t		ExecuteCommand(uint8_t command,
 									uint32_t argument, uint32_t* response);
 				status_t		DoIO(uint16_t rca, uint8_t command,
-									IOOperation* operation);
+									IOOperation* operation,
+									bool offsetAsSectors);
 
 				void			AcquireBus() { acquire_sem(fLockSemaphore); }
 				void			ReleaseBus() { release_sem(fLockSemaphore); }

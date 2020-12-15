@@ -43,15 +43,29 @@ static device_manager_info* sDeviceManager;
 
 
 struct mmc_disk_csd {
+	// The content of this register is described in Physical Layer Simplified
+	// Specification Version 8.00, section 5.3
 	uint64 bits[2];
 
-	uint8 structure_version() { return bits[1] >> 60; }
+	uint8 structure_version() { return bits[1] >> 54; }
 	uint8 read_bl_len() { return (bits[1] >> 8) & 0xF; }
-	uint16 c_size()
+	uint32 c_size()
 	{
-		return ((bits[0] >> 54) & 0x3FF) | ((bits[1] & 0x3) << 10);
+		if (structure_version() == 0)
+			return ((bits[0] >> 54) & 0x3FF) | ((bits[1] & 0x3) << 10);
+		if (structure_version() == 1)
+			return (bits[0] >> 40) & 0x3FFFFF;
+		return ((bits[0] >> 40) & 0xFFFFFF) | ((bits[1] & 0xF) << 24);
 	}
-	uint8 c_size_mult() { return (bits[0] >> 39) & 0x7; }
+
+	uint8 c_size_mult()
+	{
+		if (structure_version() == 0)
+			return (bits[0] >> 39) & 0x7;
+		// In later versions this field is not present in the structure and a
+		// fixed value is used.
+		return 8;
+	}
 };
 
 
@@ -115,7 +129,8 @@ mmc_disk_execute_iorequest(void* data, IOOperation* operation)
 		command = SD_WRITE_MULTIPLE_BLOCKS;
 	else
 		command = SD_READ_MULTIPLE_BLOCKS;
-	error = info->mmc->do_io(info->parent, info->rca, command, operation);
+	error = info->mmc->do_io(info->parent, info->rca, command, operation,
+		(info->flags & kIoCommandOffsetAsSectors) != 0);
 
 	if (error != B_OK) {
 		info->scheduler->OperationCompleted(operation, error, 0);
@@ -184,6 +199,21 @@ mmc_disk_init_driver(device_node* node, void** cookie)
 		free(info);
 		return B_BAD_DATA;
 	}
+
+	uint8_t deviceType;
+	if (sDeviceManager->get_attr_uint8(info->parent, kMmcTypeAttribute,
+			&deviceType, true) != B_OK) {
+		ERROR("Could not get device type\n");
+		free(info);
+		return B_BAD_DATA;
+	}
+
+	// SD and MMC cards use byte offsets for IO commands, later ones (SDHC,
+	// SDXC, ...) use sectors.
+	if (deviceType == CARD_TYPE_SD || deviceType == CARD_TYPE_MMC)
+		info->flags = 0;
+	else
+		info->flags = kIoCommandOffsetAsSectors;
 
 	static const uint32 kBlockSize = 512; // FIXME get it from the CSD
 	status_t error;

@@ -20,12 +20,19 @@
 #include "IOSchedulerSimple.h"
 
 
+enum MMCDiskFlags {
+	kIoCommandOffsetAsSectors = 1,
+		// IO commands use sector offsets instead of byte offsets
+};
+
+
 // This is the device info structure, allocated once per device
 typedef struct {
 	device_node* node;
 	device_node* parent;
 	mmc_device_interface* mmc;
 	uint16_t rca;
+	uint32_t flags;
 
 	device_geometry geometry;
 

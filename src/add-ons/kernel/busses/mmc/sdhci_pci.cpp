@@ -52,7 +52,8 @@ class SdhciBus {
 		status_t			InitCheck();
 		void				Reset();
 		void				SetClock(int kilohertz);
-		status_t			DoIO(uint8_t command, IOOperation* operation);
+		status_t			DoIO(uint8_t command, IOOperation* operation,
+								bool offsetAsSectors);
 		
 	private:
 		bool				PowerOn();
@@ -340,7 +341,7 @@ SdhciBus::SetClock(int kilohertz)
 
 
 status_t
-SdhciBus::DoIO(uint8_t command, IOOperation* operation)
+SdhciBus::DoIO(uint8_t command, IOOperation* operation, bool offsetAsSectors)
 {
 	bool isWrite = operation->IsWrite();
 
@@ -385,8 +386,6 @@ SdhciBus::DoIO(uint8_t command, IOOperation* operation)
 	while (length > 0) {
 		size_t toCopy = std::min((generic_size_t)length,
 			vecs->length - vecOffset);
-		TRACE("Loop %ld bytes from position %ld to %p\n", toCopy, offset,
-			vecs->base + vecOffset);
 
 		// If the current vec is empty, we can move to the next
 		if (toCopy == 0) {
@@ -413,7 +412,8 @@ SdhciBus::DoIO(uint8_t command, IOOperation* operation)
 			| TransferMode::kBlockCountEnable | TransferMode::kDmaEnable;
 
 		uint32_t response;
-		result = ExecuteCommand(command, offset, &response);
+		result = ExecuteCommand(command,
+			offset / (offsetAsSectors ? kBlockSize : 1), &response);
 		if (result != B_OK)
 			break;
 
@@ -817,12 +817,13 @@ execute_command(void* controller, uint8_t command, uint32_t argument,
 
 
 static status_t
-do_io(void* controller, uint8_t command, IOOperation* operation)
+do_io(void* controller, uint8_t command, IOOperation* operation,
+	bool offsetAsSectors)
 {
 	CALLED();
 	
 	SdhciBus* bus = (SdhciBus*)controller;
-	return bus->DoIO(command, operation);
+	return bus->DoIO(command, operation, offsetAsSectors);
 }
 
 

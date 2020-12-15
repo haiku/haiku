@@ -76,7 +76,7 @@ typedef struct mmc_bus_interface {
 		uint32_t argument, uint32_t* result);
 		// Execute a command with no I/O phase
 	status_t (*do_io)(void* controller, uint8_t command,
-		IOOperation* operation);
+		IOOperation* operation, bool offsetAsSectors);
 		// Execute a command that involves a data transfer.
 } mmc_bus_interface;
 
@@ -92,7 +92,7 @@ typedef struct mmc_device_interface {
 		uint32_t argument, uint32_t* result);
 		// Execute a command with no I/O phase
 	status_t (*do_io)(device_node* controller, uint16_t rca,
-		uint8_t command, IOOperation* operation);
+		uint8_t command, IOOperation* operation, bool offsetAsSectors);
 		// Execute a command that involves a data transfer.
 } mmc_device_interface;
 

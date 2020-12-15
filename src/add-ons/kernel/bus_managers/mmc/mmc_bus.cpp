@@ -86,12 +86,13 @@ MMCBus::ExecuteCommand(uint8_t command, uint32_t argument, uint32_t* response)
 
 
 status_t
-MMCBus::DoIO(uint16_t rca, uint8_t command, IOOperation* operation)
+MMCBus::DoIO(uint16_t rca, uint8_t command, IOOperation* operation,
+	bool offsetAsSectors)
 {
 	status_t status = _ActivateDevice(rca);
 	if (status != B_OK)
 		return status;
-	return fController->do_io(fCookie, command, operation);
+	return fController->do_io(fCookie, command, operation, offsetAsSectors);
 }
 
 
