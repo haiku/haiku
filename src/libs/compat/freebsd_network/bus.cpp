@@ -1002,8 +1002,8 @@ pci_set_powerstate(device_t dev, int newPowerState)
 	}
 
 	TRACE_PCI(dev, "%s: D%i -> D%i\n", __func__, oldPowerState, newPowerState);
-	pci_write_config(dev, capabilityRegister + PCIR_POWER_STATUS, newPowerState,
-		2);
+	pci_write_config(dev, capabilityRegister + PCIR_POWER_STATUS,
+		newPowerManagementStatus, 2);
 	if (stateTransitionDelayInUs != 0)
 		snooze(stateTransitionDelayInUs);
 
