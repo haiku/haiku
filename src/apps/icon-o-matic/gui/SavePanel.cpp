@@ -83,10 +83,8 @@ SavePanel::SavePanel(const char* name,
 	BButton* cancel = dynamic_cast<BButton*>(
 		background->FindView("cancel button"));
 	BView* textview = background->FindView("text view");
-	BScrollBar* hscrollbar = dynamic_cast<BScrollBar*>(
-		background->FindView("HScrollBar"));
 
-	if (!cancel || !textview || !hscrollbar) {
+	if (!cancel || !textview) {
 		printf("SavePanel::SavePanel() - couldn't find necessary controls.\n");
 		return;
 	}
@@ -114,10 +112,6 @@ SavePanel::SavePanel(const char* name,
 	// move up them up the height of the menu field
 	BView *poseview = background->FindView("PoseView");
 	if (poseview) poseview->ResizeBy(0, -height);
-	BButton *insert = (BButton *)background->FindView("default button");
-	if (hscrollbar) hscrollbar->MoveBy(0, -height);
-	BScrollBar *vscrollbar = (BScrollBar *)background->FindView("VScrollBar");
-	if (vscrollbar) vscrollbar->ResizeBy(0, -height);
 	BView *countvw = (BView *)background->FindView("CountVw");
 	if (countvw) countvw->MoveBy(0, -height);
 	textview->MoveBy(0, -height);
@@ -144,6 +138,8 @@ SavePanel::SavePanel(const char* name,
 
 	textview->ResizeTo(fSettingsB->Frame().right - fFormatMF->Frame().left,
 					   textview->Frame().Height());
+
+	BButton *insert = (BButton *)background->FindView("default button");
 
 	// Make sure the smallest window won't draw the "Settings" button over
 	// anything else
