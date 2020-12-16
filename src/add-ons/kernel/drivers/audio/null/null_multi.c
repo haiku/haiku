@@ -344,7 +344,7 @@ buffer_force_stop(device_t* device)
 {
 	dprintf("null_audio: %s\n" , __func__ );
 
-	if (device  == NULL)
+	if (device == NULL)
 		return B_ERROR;
 
 	if (device->running)
