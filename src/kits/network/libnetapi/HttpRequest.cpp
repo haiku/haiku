@@ -1038,7 +1038,7 @@ BHttpRequest::_SendPostData()
 								B_READ_ONLY);
 							char readBuffer[kHttpBufferSize];
 							ssize_t readSize;
-							ssize_t totalSize;
+							off_t totalSize;
 
 							if (upFile.GetSize(&totalSize) != B_OK)
 								ASSERT(0);
