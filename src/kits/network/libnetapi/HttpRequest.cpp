@@ -1038,6 +1038,10 @@ BHttpRequest::_SendPostData()
 								B_READ_ONLY);
 							char readBuffer[kHttpBufferSize];
 							ssize_t readSize;
+							ssize_t totalSize;
+
+							if (upFile.GetSize(&totalSize) != B_OK)
+								ASSERT(0);
 
 							readSize = upFile.Read(readBuffer,
 								sizeof(readBuffer));
@@ -1045,6 +1049,8 @@ BHttpRequest::_SendPostData()
 								fSocket->Write(readBuffer, readSize);
 								readSize = upFile.Read(readBuffer,
 									sizeof(readBuffer));
+								fListener->UploadProgress(this, readSize,
+									std::max((off_t)0, totalSize));
 							}
 
 							break;
