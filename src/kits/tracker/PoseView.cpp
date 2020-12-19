@@ -51,6 +51,7 @@ All rights reserved.
 #include <Application.h>
 #include <Catalog.h>
 #include <Clipboard.h>
+#include <ColorConversion.h>
 #include <Debug.h>
 #include <Dragger.h>
 #include <fs_attr.h>
@@ -9035,31 +9036,33 @@ BPoseView::DrawPose(BPose* pose, int32 index, bool fullDraw)
 rgb_color
 BPoseView::DeskTextColor() const
 {
+	// The desktop color is chosen independently for the desktop.
+	// The text color is chosen globally for all directories.
+	// It's fairly easy to get something unreadable (even with the default
+	// settings, it's expected that text will be black on white in Tracker
+	// folders, but white on blue on the desktop).
+	// So here we check if the colors are different enough, and otherwise,
+	// force the text to be either white or black.
 	rgb_color textColor = ui_color(B_DOCUMENT_TEXT_COLOR);
 	rgb_color viewColor = ViewColor();
 
-	float readabilityThreshold = abs(textColor.red - viewColor.red)
-		+ abs(textColor.green - viewColor.green)
-		+ abs(textColor.blue - viewColor.blue);
-	if (readabilityThreshold > 384) {
-		// The readability threshold is highly subjective, but 384 (out of 768)
-		// seems to be generally suitable for most circumstances.
+	int textBrightness = BPrivate::perceptual_brightness(textColor);
+	int viewBrightness = BPrivate::perceptual_brightness(viewColor);
+	if (abs(viewBrightness - textBrightness) > 127) {
+		// The colors are different enough, we can use them as is
 		return textColor;
 	} else {
-		float blackWhiteThreshold = viewColor.red
-			+ (viewColor.green * 1.25f) + (viewColor.blue * 0.45f);
-
-		if (blackWhiteThreshold >= 360) {
-			viewColor.red = 0;
-			viewColor.green = 0;
-			viewColor.blue = 0;
+		if (viewBrightness > 127) {
+			textColor.red = 0;
+			textColor.green = 0;
+			textColor.blue = 0;
 		} else {
-			viewColor.red = 255;
-			viewColor.green = 255;
-			viewColor.blue = 255;
+			textColor.red = 255;
+			textColor.green = 255;
+			textColor.blue = 255;
 		}
 
-		return viewColor;
+		return textColor;
 	}
 }
 
