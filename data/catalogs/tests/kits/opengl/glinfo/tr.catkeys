@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-GLInfo	2211760527
+1	turkish	x-vnd.Haiku-GLInfo	1282327690
 Maximum clipping planes	Capabilities		En büyük kırpma alanı
 Maximum evaluators equation order	Capabilities		Değerlendicilerin en büyük eşitlik düzeni
 Texture stack size	Capabilities		Desen yığın boyutu
@@ -13,12 +13,15 @@ Value	Capabilities		Değer
 Name stack size	Capabilities		Ad yığın boyutu
 Capabilities	Capabilities		Yetenekler
 Maximum texture units	Capabilities		En çok desen birimleri
+Unknown or missing OpenGL renderer.	InfoView		Bilinmeyen veya kayıp OpenGL işleyicisi.
 Capability	Capabilities		Kabiliyet
 Maximum 2D texture size	Capabilities		En büyük 2B desen boyutu
 Auxiliary buffer(s)	Capabilities		Yedek arabellek(ler)
+Unknown vendor	InfoView		Bilinmeyen sağlayıcı
 Maximum convolution	Capabilities		En yüksek kıvrılma
 Maximum 3D texture size	Capabilities		En büyük 3B desen boyutu
 Maximum recommended index elements	Capabilities		Önerilen en çok dizin ögeleri
+Unknown version	InfoView		Bilinmeyen sürüm
 List stack size	Capabilities		Liste yığın boyutu
 Model stack size	Capabilities		Model yığın boyutu
 Projection stack size	Capabilities		Yansıtma yığın boyutu

@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-GLInfo	2211760527
+1	catalan; valencian	x-vnd.Haiku-GLInfo	1282327690
 Maximum clipping planes	Capabilities		Màxim de plans de retall
 Maximum evaluators equation order	Capabilities		Màxim d'ordre d'equació d'avaluadors
 Texture stack size	Capabilities		Mida de la pila de textura
@@ -13,12 +13,15 @@ Value	Capabilities		Valor
 Name stack size	Capabilities		Mida de la pila de noms
 Capabilities	Capabilities		Funcionalitats
 Maximum texture units	Capabilities		Màxim d'unitats de textura
+Unknown or missing OpenGL renderer.	InfoView		Falta el renderitzador d'OpenGL o es desconeix.
 Capability	Capabilities		Capacitat
 Maximum 2D texture size	Capabilities		Mida màxima de textura en 2D
 Auxiliary buffer(s)	Capabilities		Memòria intermèdia auxiliar
+Unknown vendor	InfoView		Proveïdor desconegut
 Maximum convolution	Capabilities		Convolució màxima
 Maximum 3D texture size	Capabilities		Mida màxima de textura en 3D
 Maximum recommended index elements	Capabilities		Màxim recomanat d'elements d’índex
+Unknown version	InfoView		Versió desconeguda
 List stack size	Capabilities		Mida de la pila de llista
 Model stack size	Capabilities		Mida de la pila de model
 Projection stack size	Capabilities		Mida de la pila de projecció
