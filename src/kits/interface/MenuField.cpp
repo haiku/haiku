@@ -163,7 +163,7 @@ struct BMenuField::LayoutData {
 
 // #pragma mark - MouseDownFilter
 
-namespace BPrivate {
+namespace {
 
 class MouseDownFilter : public BMessageFilter
 {
@@ -1025,7 +1025,7 @@ BMenuField::InitObject(const char* label)
 	fFixedSizeMB = false;
 	fMenuTaskID = -1;
 	fLayoutData = new LayoutData;
-	fMouseDownFilter = new BPrivate::MouseDownFilter();
+	fMouseDownFilter = new MouseDownFilter();
 
 	SetLabel(label);
 
