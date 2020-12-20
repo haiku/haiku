@@ -113,11 +113,11 @@ InputWindow::MessageReceived(BMessage* message)
 				if (device)
 					AddDevice(device);
 			} else {
-				for (int i = 0; i < fDeviceListView->CountItems();
-					i++) {
-					BStringItem* item = dynamic_cast<BStringItem*>(
-						fDeviceListView->ItemAt(i));
-					if (item->Text() == name) {
+				for (int i = 0; i < fDeviceListView->CountItems(); i++) {
+					DeviceListItemView* item =
+						dynamic_cast<DeviceListItemView*>(
+							fDeviceListView->ItemAt(i));
+					if (item != NULL && item->Label() == name) {
 						fDeviceListView->RemoveItem(i);
 						BView* settings = fCardView->ChildAt(i);
 						fCardView->RemoveChild(settings);
