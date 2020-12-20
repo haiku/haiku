@@ -214,7 +214,7 @@ PoorManWindow::MessageReceived(BMessage* message)
 				break;
 
 			time_t time;
-			in_addr_t address;
+			const char* address;
 			rgb_color color;
 			const void* pointer;
 			ssize_t size;
@@ -228,10 +228,8 @@ PoorManWindow::MessageReceived(BMessage* message)
 			else
 				time = *static_cast<const time_t*>(pointer);
 
-			if (message->FindData("in_addr_t", B_ANY_TYPE, &pointer, &size) != B_OK)
-				address = INADDR_NONE;
-			else
-				address = *static_cast<const in_addr_t*>(pointer);
+			if (message->FindString("addr", &address) != B_OK)
+				address = NULL;
 
 			if (message->FindData("rgb_color", B_RGB_COLOR_TYPE, &pointer, &size) != B_OK)
 				color = BLACK;
@@ -246,13 +244,8 @@ PoorManWindow::MessageReceived(BMessage* message)
 				}
 			}
 
-			if (address != INADDR_NONE) {
-				char addr[INET_ADDRSTRLEN];
-				struct in_addr sin_addr;
-				sin_addr.s_addr = address;
-				if (inet_ntop(AF_INET, &sin_addr, addr, sizeof(addr)) != NULL) {
-					line << '(' << addr << ") ";
-				}
+			if (address != NULL) {
+				line << '(' << address << ") ";
 			}
 
 			line << msg;
@@ -711,7 +704,7 @@ PoorManWindow::StartServer()
 
 	fStatus = true;
 	UpdateStatusLabelAndMenuItem();
-	poorman_log(B_TRANSLATE("done.\n"), false, INADDR_NONE, GREEN);
+	poorman_log(B_TRANSLATE("done.\n"), false, NULL, GREEN);
 
 	return B_OK;
 }

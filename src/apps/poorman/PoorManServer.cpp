@@ -15,6 +15,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <poll.h>
 
 #include <File.h>
 #include <Debug.h>
@@ -85,7 +86,7 @@ PoorManServer::~PoorManServer()
 status_t PoorManServer::Run()
 {
 	if (chdir(fHttpdServer->cwd) == -1) {
-		poorman_log("no web directory, can't start up.\n", false, INADDR_NONE, RED);
+		poorman_log("no web directory, can't start up.\n", false, NULL, RED);
 		return B_ERROR;
 	}
 	
@@ -95,7 +96,15 @@ status_t PoorManServer::Run()
 	sa4.sa_in.sin_port = htons(80);
 	sa4.sa_in.sin_addr.s_addr = htonl(INADDR_ANY);
 	fHttpdServer->listen4_fd = httpd_initialize_listen_socket(&sa4);
-	if (fHttpdServer->listen4_fd == -1)
+
+	httpd_sockaddr sa6;
+	memset(&sa6, 0, sizeof(httpd_sockaddr));
+	sa6.sa_in.sin_family = AF_INET6;
+	sa6.sa_in.sin_port = htons(80);
+	sa6.sa_in.sin_addr.s_addr = htonl(INADDR_ANY);
+	fHttpdServer->listen6_fd = httpd_initialize_listen_socket(&sa6);
+
+	if (fHttpdServer->listen4_fd == -1 && fHttpdServer->listen6_fd == -1)
 		return B_ERROR;
 
 	fListenerTid = spawn_thread(
@@ -105,7 +114,7 @@ status_t PoorManServer::Run()
 		static_cast<void*>(this)
 	);
 	if (fListenerTid < B_OK) {
-		poorman_log("can't create listener thread.\n", false, INADDR_NONE, RED);
+		poorman_log("can't create listener thread.\n", false, NULL, RED);
 		return B_ERROR;
 	}
 	fIsRunning = true;
@@ -204,55 +213,79 @@ int32 PoorManServer::_Listener(void* data)
 	thread_id tid;
 	httpd_conn* hc;
 	PoorManServer* s = static_cast<PoorManServer*>(data);
-	
+	const int nfds = 2;
+	pollfd fds[nfds];
+
+	// N.B. these fds could be -1, which poll() should skip
+	memset(&fds, 0, sizeof(fds));
+	fds[0].fd = s->fHttpdServer->listen4_fd;
+	fds[0].events = POLLIN;
+	fds[1].fd = s->fHttpdServer->listen6_fd;
+	fds[1].events = POLLIN;
+
 	while (s->fIsRunning) {
-		hc = new httpd_conn;
-		hc->initialized = 0;
-		PRINT(("calling httpd_get_conn()\n"));
-		retval = //accept(), blocked here
-			httpd_get_conn(s->fHttpdServer, s->fHttpdServer->listen4_fd, hc);
-		switch (retval) {
-			case GC_OK:
-				break;
-			case GC_FAIL:
-				httpd_destroy_conn(hc);
-				delete hc;
-				s->fIsRunning = false;
-				return -1;
-			case GC_NO_MORE:
-				//should not happen, since we have a blocking socket
-				httpd_destroy_conn(hc);
-				continue;
-				break;
-			default: 
-				//shouldn't happen
-				continue;
-				break;
+		// Wait for listen4_fd or listen6_fd (or both!) to become ready:
+		retval = poll(fds, nfds, -1);
+		if (retval < 1) {
+			return -1; // fds no longer available
 		}
 		
-		if (s->fCurConns > s->fMaxConns) {
-			httpd_send_err(hc, 503,
-				httpd_err503title, (char *)"", httpd_err503form, (char *)"");
-			httpd_write_response(hc);
-			continue;
-		}
-		
-		tid = spawn_thread(
-			PoorManServer::_Worker,
-			"www connection",
-			B_NORMAL_PRIORITY,
-			static_cast<void*>(s)
-		);
-		if (tid < B_OK) {
-			continue;
-		}
-		/*We don't check the return code here.
-		 *As we can't kill a thread that doesn't receive the
-		 *httpd_conn, we simply let it die itself.
-		 */
-		send_data(tid, 512, &hc, sizeof(httpd_conn*));
-		atomic_add(&s->fCurConns, 1);
-		resume_thread(tid);
+		for (int fdi = 0; fdi < nfds; fdi++) {
+			if (fds[fdi].fd < 0) {
+				continue; // fd is disabled, e.g. ipv4-only
+			}
+			if ((fds[fdi].revents & POLLIN) != POLLIN) {
+				continue; // fd is unavailable, try next fd
+			}
+
+			hc = new httpd_conn;
+			hc->initialized = 0;
+			
+			PRINT(("calling httpd_get_conn()\n"));
+			retval = httpd_get_conn(s->fHttpdServer, fds[fdi].fd, hc);
+			switch (retval) {
+				case GC_OK:
+					break;
+				case GC_FAIL:
+					httpd_destroy_conn(hc);
+					delete hc;
+					s->fIsRunning = false;
+					return -1;
+				case GC_NO_MORE:
+					//should not happen, since we have a blocking socket
+					httpd_destroy_conn(hc);
+					continue;
+					break;
+				default: 
+					//shouldn't happen
+					continue;
+					break;
+			}
+			
+			if (s->fCurConns > s->fMaxConns) {
+				httpd_send_err(hc, 503,
+					httpd_err503title, (char *)"", httpd_err503form, (char *)"");
+				httpd_write_response(hc);
+				continue;
+			}
+			
+			tid = spawn_thread(
+				PoorManServer::_Worker,
+				"www connection",
+				B_NORMAL_PRIORITY,
+				static_cast<void*>(s)
+			);
+			if (tid < B_OK) {
+				continue;
+			}
+			/*We don't check the return code here.
+			 *As we can't kill a thread that doesn't receive the
+			 *httpd_conn, we simply let it die itself.
+			 */
+			send_data(tid, 512, &hc, sizeof(httpd_conn*));
+			atomic_add(&s->fCurConns, 1);
+			resume_thread(tid);
+		}//for
 	}//while
 	return 0;
 }
@@ -374,7 +407,7 @@ status_t PoorManServer::_HandleGet(httpd_conn* hc)
 		pthread_rwlock_unlock(&fWebDirLock);
 	}
 	log << '/' << hc->expnfilename << '\n';
-	poorman_log(log.String(), true, hc->client_addr.sa_in.sin_addr.s_addr);
+	poorman_log(log.String(), true, &hc->client_addr);
 	
 	//send mime headers
 	if (send(hc->conn_fd, hc->response, hc->responselen, 0) < 0) {
@@ -398,7 +431,7 @@ status_t PoorManServer::_HandleGet(httpd_conn* hc)
 				pthread_rwlock_unlock(&fWebDirLock);
 			}
 			log << '/' << hc->expnfilename << '\n';
-			poorman_log(log.String(), true, hc->client_addr.sa_in.sin_addr.s_addr, RED);
+			poorman_log(log.String(), true, &hc->client_addr, RED);
 			delete [] buf;
 			return B_ERROR;
 		}

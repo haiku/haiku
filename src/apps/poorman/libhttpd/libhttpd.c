@@ -394,7 +394,7 @@ httpd_initialize_listen_socket( httpd_sockaddr* saP )
 	if ( listen_fd < 0 )
 	{
 //	syslog( LOG_CRIT, "socket %.80s - %m", httpd_ntoa( saP ) );
-		poorman_log("can't create socket.\n", false, INADDR_NONE, RED);
+		poorman_log("can't create socket.\n", false, NULL, RED);
 		return -1;
 	}
 	(void) fcntl( listen_fd, F_SETFD, 1 );
@@ -411,7 +411,7 @@ httpd_initialize_listen_socket( httpd_sockaddr* saP )
 	{
 		//	syslog(
 		//	    LOG_CRIT, "bind %.80s - %m", httpd_ntoa( saP ) );
-		poorman_log("can't bind to socket.\n", false, INADDR_NONE, RED);
+		poorman_log("can't bind to socket.\n", false, NULL, RED);
 		(void) close( listen_fd );
 		return -1;
 	}
@@ -420,7 +420,7 @@ httpd_initialize_listen_socket( httpd_sockaddr* saP )
 	if ( listen( listen_fd, LISTEN_BACKLOG ) < 0 )
 	{
 		//	syslog( LOG_CRIT, "listen - %m" );
-		poorman_log("can't listen to socket.\n", false, INADDR_NONE, RED);
+		poorman_log("can't listen to socket.\n", false, NULL, RED);
 		(void) close( listen_fd );
 		return -1;
 	}
@@ -2695,7 +2695,7 @@ ls( httpd_conn* hc )
 	{
 	char logString[27+B_PATH_NAME_LENGTH+1];
 	sprintf(logString, "Error 404 File not found: %s\n", hc->decodedurl+1);
-	poorman_log(logString, true, hc->client_addr.sa_in.sin_addr.s_addr, RED);
+	poorman_log(logString, true, &hc->client_addr, RED);
 //	syslog( LOG_ERR, "opendir %.80s - %m", hc->expnfilename );
 	httpd_send_err( hc, 404, err404title, "", err404form, hc->encodedurl );
 	free(de);
@@ -2735,7 +2735,7 @@ ls( httpd_conn* hc )
 				strcat(logString, "index file");
 			
 			strcat(logString, ".  Sending directory listing.\n");
-			poorman_log(logString, true, hc->client_addr.sa_in.sin_addr.s_addr, BLACK);
+			poorman_log(logString, true, &hc->client_addr, BLACK);
 		}
 		
 	    send_mime(
@@ -3049,7 +3049,7 @@ really_start_request( httpd_conn* hc, struct timeval* nowP )
 	    {
 	    char logString[27+B_PATH_NAME_LENGTH+1];
 		sprintf(logString, "Error 404 File not found: %s\n", hc->decodedurl+1);
-		poorman_log(logString, true, hc->client_addr.sa_in.sin_addr.s_addr, RED);
+		poorman_log(logString, true, &hc->client_addr, RED);
 	    httpd_send_err( hc, 404, err404title, "", err404form, hc->encodedurl );
 	    return -1;
 	    }
