@@ -13,6 +13,7 @@
 //#include <arch_platform.h>
 #include <arch/debug_console.h>
 #include <arch/generic/debug_uart.h>
+#include <arch/arm/arch_uart_pl011.h>
 #include <boot/kernel_args.h>
 #include <kernel.h>
 #include <vm/vm.h>
@@ -62,6 +63,9 @@ arch_debug_serial_try_getchar(void)
 char
 arch_debug_serial_getchar(void)
 {
+	if (gArchDebugUART == NULL)
+		return NULL;
+
 	return gArchDebugUART->GetChar(false);
 }
 
@@ -69,6 +73,9 @@ arch_debug_serial_getchar(void)
 void
 arch_debug_serial_putchar(const char c)
 {
+	if (gArchDebugUART == NULL)
+		return;
+
 	gArchDebugUART->PutChar(c);
 }
 
@@ -95,12 +102,14 @@ status_t
 arch_debug_console_init(kernel_args *args)
 {
 	// first try with hints from the FDT
-	// TODO: Use UEFI somehow
-
+	// TODO: Use UEFI somehow to get fdt
 	//gArchDebugUART = debug_uart_from_fdt(args->platform_args.fdt);
 
-	// Do we can some kind of direct fallback here
-	// (aka, guess arch_get_uart_pl011 or arch_get_uart_8250?)
+	// As a last try, lets assume qemu's pl011 at a sane address
+	if (gArchDebugUART == NULL)
+		gArchDebugUART = arch_get_uart_pl011(0x9000000, 0x16e3600);
+
+	// Oh well.
 	if (gArchDebugUART == NULL)
 		return B_ERROR;
 
