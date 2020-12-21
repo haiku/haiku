@@ -23,6 +23,7 @@ local platform_src =
 	mmu.cpp
 	heap.cpp
 	acpi.cpp
+	dtb.cpp
 	timer.cpp
 	menu.cpp
 	devices.cpp

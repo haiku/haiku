@@ -24,6 +24,7 @@
 #include "acpi.h"
 #include "console.h"
 #include "cpu.h"
+#include "dtb.h"
 #include "efi_platform.h"
 #include "mmu.h"
 #include "quirks.h"
@@ -213,6 +214,7 @@ efi_main(efi_handle image, efi_system_table *systemTable)
 
 	cpu_init();
 	acpi_init();
+	dtb_init();
 	timer_init();
 	smp_init();
 
