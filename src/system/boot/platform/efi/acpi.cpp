@@ -205,22 +205,16 @@ acpi_init()
 
 	// Try to find the ACPI RSDP.
 	for (uint32 i = 0; i < entries; i++) {
-		acpi_rsdp *rsdp = NULL;
+		if (!table[i].VendorGuid.equals(acpi))
+			continue;
 
-		efi_guid vendor = table[i].VendorGuid;
+		acpi_rsdp *rsdp = (acpi_rsdp *)(table[i].VendorTable);
+		if (strncmp((char *)rsdp, ACPI_RSDP_SIGNATURE, 8) == 0)
+			TRACE(("acpi_init: found ACPI RSDP signature at %p\n", rsdp));
 
-		if (vendor.data1 == acpi.data1
-			&& vendor.data2 == acpi.data2
-			&& vendor.data3 == acpi.data3
-			&& strncmp((char *)vendor.data4, (char *)acpi.data4, 8) == 0) {
-			rsdp = (acpi_rsdp *)(table[i].VendorTable);
-			if (strncmp((char *)rsdp, ACPI_RSDP_SIGNATURE, 8) == 0)
-				TRACE(("acpi_init: found ACPI RSDP signature at %p\n", rsdp));
-
-			if (rsdp != NULL && acpi_check_rsdt(rsdp) == B_OK) {
-				gKernelArgs.arch_args.acpi_root = rsdp;
-				break;
-			}
+		if (rsdp != NULL && acpi_check_rsdt(rsdp) == B_OK) {
+			gKernelArgs.arch_args.acpi_root = rsdp;
+			break;
 		}
 	}
 }

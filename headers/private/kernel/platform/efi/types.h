@@ -82,6 +82,14 @@ typedef struct efi_guid {
     uint16_t data2;
     uint16_t data3;
     uint8_t data4[8];
+
+	bool equals(const efi_guid& other) const {
+		bool matches = data1 == other.data1 && data2 == other.data2
+			&& data3 == other.data3;
+		for (auto i = 0; matches && i < 8; i++)
+			matches = data4[i] == other.data4[i];
+		return matches;
+	}
 } efi_guid;
 
 typedef void* efi_handle;
