@@ -888,8 +888,16 @@ NetServer::_ConfigureIPv6LinkLocal(const char* name)
 	addressRaw.s6_addr[15] = mac[5];
 
 	BNetworkAddress localLinkAddress(addressRaw, 0);
-	BNetworkAddress localLinkMask("ffff:ffff:ffff:ffff::"); // 64
-	BNetworkAddress localLinkBroadcast("fe80::ffff:ffff:ffff:ffff");
+	BNetworkAddress localLinkMask(
+		AF_INET6,
+		"ffff:ffff:ffff:ffff::", // 64
+		(uint16)0,
+		B_UNCONFIGURED_ADDRESS_FAMILIES);
+	BNetworkAddress localLinkBroadcast(
+		AF_INET6,
+		"fe80::ffff:ffff:ffff:ffff",
+		(uint16)0,
+		B_UNCONFIGURED_ADDRESS_FAMILIES);
 
 	if (interface.FindAddress(localLinkAddress) >= 0) {
 		// uhoh... already has a local link address
