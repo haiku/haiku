@@ -329,8 +329,8 @@ public:
 
 			void				ClearScreenshots();
 			bool				AddScreenshot(const BitmapRef& screenshot);
-			const BitmapList&	Screenshots() const
-									{ return fScreenshots; }
+			int32				CountScreenshots() const;
+			const BitmapRef		ScreenshotAtIndex(int32 index) const;
 
 			void				SetSize(int64 size);
 			int64				Size() const
@@ -353,6 +353,8 @@ private:
 			void				_NotifyListeners(uint32 changes);
 			void				_NotifyListenersImmediate(uint32 changes);
 
+			bool				_HasScreenshot(const BitmapRef& screenshot);
+
 private:
 			BString				fName;
 			BString				fTitle;
@@ -368,7 +370,8 @@ private:
 			RatingSummary		fCachedRatingSummary;
 			int64				fProminence;
 			ScreenshotInfoList	fScreenshotInfos;
-			BitmapList			fScreenshots;
+			std::vector<BitmapRef>
+								fScreenshots;
 			PackageState		fState;
 			PackageInstallationLocationSet
 								fInstallationLocations;

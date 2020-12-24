@@ -21,7 +21,6 @@
 
 #include "DataIOUtils.h"
 #include "HaikuDepotConstants.h"
-#include "List.h"
 #include "Logger.h"
 #include "ServerSettings.h"
 #include "ServerHelper.h"

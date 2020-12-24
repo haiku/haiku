@@ -11,7 +11,6 @@
 #include <String.h>
 
 #include "HaikuDepotConstants.h"
-#include "List.h"
 
 
 class BBitmap;
@@ -55,7 +54,6 @@ private:
 
 
 typedef BReference<SharedBitmap> BitmapRef;
-typedef List<BitmapRef, false> BitmapList;
 
 
 #endif // SHARED_BITMAP_H

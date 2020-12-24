@@ -12,7 +12,6 @@
 #include <String.h>
 #include <package/PackageVersion.h>
 
-#include "List.h"
 #include "UserCredentials.h"
 #include "UserDetail.h"
 #include "UserUsageConditions.h"

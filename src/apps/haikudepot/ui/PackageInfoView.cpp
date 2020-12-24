@@ -823,14 +823,20 @@ public:
 		fWebsiteIconView->SetBitmap(&fWebsiteIcon, BITMAP_SIZE_16);
 		_SetContactInfo(fWebsiteLinkView, package.Publisher().Website());
 
+		int32 countScreenshots = package.CountScreenshots();
 		bool hasScreenshot = false;
-		const BitmapList& screenShots = package.Screenshots();
-		if (screenShots.CountItems() > 0) {
-			const BitmapRef& bitmapRef = screenShots.ItemAtFast(0);
+		if (countScreenshots > 0) {
+			const BitmapRef& bitmapRef = package.ScreenshotAtIndex(0);
 			if (bitmapRef.Get() != NULL) {
+				HDDEBUG("did find screenshot for package [%s]",
+					package.Name().String());
 				hasScreenshot = true;
 				fScreenshotView->SetBitmap(bitmapRef);
 			}
+		}
+		else {
+			HDTRACE("did not find screenshots for package [%s]",
+				package.Name().String());
 		}
 
 		if (!hasScreenshot)

@@ -911,22 +911,46 @@ PackageInfo::AddScreenshotInfo(const ScreenshotInfo& info)
 void
 PackageInfo::ClearScreenshots()
 {
-	if (!fScreenshots.IsEmpty()) {
-		fScreenshots.Clear();
+	if (!fScreenshots.empty()) {
+		fScreenshots.clear();
 		_NotifyListeners(PKG_CHANGED_SCREENSHOTS);
 	}
 }
 
 
 bool
+PackageInfo::_HasScreenshot(const BitmapRef& screenshot)
+{
+	std::vector<BitmapRef>::iterator it = std::find(
+		fScreenshots.begin(), fScreenshots.end(), screenshot);
+	return it != fScreenshots.end();
+}
+
+
+bool
 PackageInfo::AddScreenshot(const BitmapRef& screenshot)
 {
-	if (!fScreenshots.Add(screenshot))
+	if (_HasScreenshot(screenshot))
 		return false;
 
+	fScreenshots.push_back(screenshot);
 	_NotifyListeners(PKG_CHANGED_SCREENSHOTS);
 
 	return true;
+}
+
+
+int32
+PackageInfo::CountScreenshots() const
+{
+	return fScreenshots.size();
+}
+
+
+const BitmapRef
+PackageInfo::ScreenshotAtIndex(int32 index) const
+{
+	return fScreenshots[index];
 }
 
 
