@@ -342,18 +342,35 @@ NetworkStatusView::_ShowConfiguration(BMessage* message)
 	if (!networkInterface.Exists())
 		return;
 
-	BNetworkInterfaceAddress address;
-	networkInterface.GetAddressAt(0, address);
-		// TODO: We should get all addresses,
-		// not just the first one.
 	BString text(B_TRANSLATE("%ifaceName information:\n"));
 	text.ReplaceFirst("%ifaceName", name);
 
 	size_t boldLength = text.Length();
 
-	text << "\n" << B_TRANSLATE("Address") << ": " << address.Address().ToString();
-	text << "\n" << B_TRANSLATE("Broadcast") << ": " << address.Broadcast().ToString();
-	text << "\n" << B_TRANSLATE("Netmask") << ": " << address.Mask().ToString();
+	int32 numAddrs = networkInterface.CountAddresses();
+	for (int32 i = 0; i < numAddrs; i++) {
+		BNetworkInterfaceAddress address;
+		networkInterface.GetAddressAt(i, address);
+		switch (address.Address().Family()) {
+			case AF_INET:
+				text << "\n" << B_TRANSLATE("IPv4 Address: ")
+					<< address.Address().ToString()
+					<< "\n" << B_TRANSLATE("Broadcast: ")
+					<< address.Broadcast().ToString()
+					<< "\n" << B_TRANSLATE("Netmask: ")
+					<< address.Mask().ToString()
+					<< "\n";
+				break;
+			case AF_INET6:
+				text << "\n" << B_TRANSLATE("IPv6 Address: ")
+					<< address.Address().ToString();
+					<< "/" << address.Mask().PrefixLength();
+					<< "\n";
+				break;
+			default:
+				break;
+		}
+	}
 
 	BAlert* alert = new BAlert(name, text.String(), B_TRANSLATE("OK"));
 	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
