@@ -4,8 +4,8 @@ Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Rétablissement impos
 Cut	Menus		Couper
 Center	Menus		Centré
 Increase size	Menus		Augmenter la taille
-Wrap-around search	FindandReplaceWindow		Recherche en boucle
 Page setup…	Menus		Mise en page…
+Wrap-around search	FindandReplaceWindow		Recherche en boucle
 Untitled 	StyledEditWindow		Sans titre
 OK	Statistics		OK
 Find	FindandReplaceWindow		Trouver
@@ -29,8 +29,8 @@ Italic	Menus		Italique
 Can't undo	Menus		Impossible d’annuler
 Replace…	Menus		Remplacer…
 File	Menus		Fichier
-Bold	Menus		Gras
 Paste	Menus		Coller
+Bold	Menus		Gras
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Le fichier « %file% » a été modifié par une autre application, voulez-vous le recharger ?
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Le fichier « %file% » a été supprimé par une autre application, voulez-vous le restaurer ?
 Lines:	Statistics		Lignes :
@@ -68,23 +68,23 @@ OK	LoadAlert		OK
 Save	QuitAlert		Sauvegarder
 Case-sensitive	FindandReplaceWindow		Sensible à la casse
 Find selection	Menus		Chercher la sélection
-Cancel	SaveAlert		Annuler
 Find…	Menus		Chercher…
+Cancel	SaveAlert		Annuler
 Revert	RevertToSavedAlert		Rétablir
-Decrease size	Menus		Diminuer la taille
 Size	Menus		Taille
+Decrease size	Menus		Diminuer la taille
 Autodetect	Menus		Détection automatique
 Replace next	Menus		Remplacer le suivant
 OK	QuitAlert		OK
-Replace with:	FindandReplaceWindow		Remplacer par :
 Edit	Menus		Édition
+Replace with:	FindandReplaceWindow		Remplacer par :
 Open…	Menus		Ouvrir…
 Save as…	Menus		Enregistrer sous…
 Replace	FindandReplaceWindow		Remplacer
 Characters:	Statistics		Caractères :
 Don't save	QuitAlert		Ne pas enregistrer
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Ce fichier est en lecture seule. Voulez-vous sauvegarder les modifications dans le document « %s » ? 
-Align	Menus		Aligner
 Font	Menus		Police
+Align	Menus		Aligner
 Select all	Menus		Selectionner tout
 Right	Menus		À droite

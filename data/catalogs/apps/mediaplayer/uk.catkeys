@@ -103,7 +103,7 @@ Overlay	MediaPlayer-InfoWin		Накладання
 Rating	MediaPlayer-Main		Рейтинг
 Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Внутрішня помилка (нестача памяті). Збій збереження списку відтворення.
 Video	MediaPlayer-Main		Відео
-There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Не встановлено декодера для підтримки файла цього формату, або у декодера є проблема з спеціальною версією формату.
+There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Відсутній декодер для обробки файлів такого типу, або декодер не розпізнає конкретну версію формату.
 Lock Peaks	MediaPlayer-PeakView		Блокувати піки
 none	Audio track menu		пусто
 Open network stream	MediaPlayer-NetworkStream		Відкрити мережевий потік
@@ -117,15 +117,15 @@ min	MediaPlayer-InfoWin	Minutes	хв
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Збій збереження списку відтворення:\n\nПомилка: 
 Video	MediaPlayer-InfoWin		Відео
 File info…	MediaPlayer-Main		Інформація про файл…
-1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Амер.)
+1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Американський)
 <unnamed>	PlaylistItem-name		<неназваний>
 Track	Video Track Menu		Трек
-Full screen	MediaPlayer-Main		Повний екран
+Full screen	MediaPlayer-Main		На весь екран
 OK	MediaPlayer-NetworkStream		ОК
 Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Внутрішня помилка (збій блокування). Збій збереження списку відтворення.
 100% scale	MediaPlayer-Main		Масштаб 100%
 <nothing to redo>	MediaPlayer-PlaylistWindow		<нічого повторити>
-Bad URL	MediaPlayer-NetworkStream		Невірний URL
+Bad URL	MediaPlayer-NetworkStream		Недійсний URL
 Save	MediaPlayer-Main		Зберегти
 Close window after playing video	MediaPlayer-SettingsWindow		Закрити вікно після відтворення відео
 Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Масштаб зображення зглажений (без режиму накладання)
@@ -135,7 +135,7 @@ None of the files you wanted to play appear to be media files.	MediaPlayer-Main	
 Remove Entry	MediaPlayer-RemovePLItemsCmd		Видалити запис
 Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Вилучити записи до смітника
 Subtitle size:	MediaPlayer-SettingsWindow		Розмір субтитрів:
-No aspect correction	MediaPlayer-Main		Немає корекції погляду
+No aspect correction	MediaPlayer-Main		Без корекції формату
 raw video	MediaPlayer-InfoWin		необроблене відео
 Container	MediaPlayer-InfoWin		Контейнер
 none	MediaPlayer-Main		пусто

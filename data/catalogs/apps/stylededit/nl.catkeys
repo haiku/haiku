@@ -4,8 +4,8 @@ Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Kan niet herstellen, 
 Cut	Menus		Knippen
 Center	Menus		Centreren
 Increase size	Menus		Vergroten
-Wrap-around search	FindandReplaceWindow		Rondgaand zoeken
 Page setup…	Menus		Pagina-configuratie...
+Wrap-around search	FindandReplaceWindow		Rondgaand zoeken
 Untitled 	StyledEditWindow		Naamloos
 OK	Statistics		Oké
 Find	FindandReplaceWindow		Zoeken
@@ -29,8 +29,8 @@ Italic	Menus		Cursief
 Can't undo	Menus		Kan niet ongedaan maken
 Replace…	Menus		Vervangen...
 File	Menus		Bestand
-Bold	Menus		Vet
 Paste	Menus		Plakken
+Bold	Menus		Vet
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Bestand \"%file%\" was gewijzigd door een andere toepassing. Bestand herladen?
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Bestand \"%file%\" was verwijderd door een andere toepassing. Bestand herstellen?
 Lines:	Statistics		Regels:
@@ -68,23 +68,23 @@ OK	LoadAlert		Oké
 Save	QuitAlert		Opslaan
 Case-sensitive	FindandReplaceWindow		Hoofdlettergevoelig
 Find selection	Menus		Selectie vinden
-Cancel	SaveAlert		Annuleren
 Find…	Menus		Zoeken...
+Cancel	SaveAlert		Annuleren
 Revert	RevertToSavedAlert		Herstellen
-Decrease size	Menus		Verkleinen
 Size	Menus		Grootte
+Decrease size	Menus		Verkleinen
 Autodetect	Menus		Automatisch detecteren
 Replace next	Menus		Volgende vervangen
 OK	QuitAlert		Oké
-Replace with:	FindandReplaceWindow		Vervangen door:
 Edit	Menus		Bewerken
+Replace with:	FindandReplaceWindow		Vervangen door:
 Open…	Menus		Openen…
 Save as…	Menus		Opslaan als...
 Replace	FindandReplaceWindow		Vervangen
 Characters:	Statistics		Karakters:
 Don't save	QuitAlert		Niet opslaan
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Dit bestand is aangeduid als alleen-lezen. Wijzigingen opslaan in document \"%s\"? 
-Align	Menus		Uitlijnen
 Font	Menus		Lettertype
+Align	Menus		Uitlijnen
 Select all	Menus		Alles selecteren
 Right	Menus		Rechts

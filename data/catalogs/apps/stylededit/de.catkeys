@@ -4,8 +4,8 @@ Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Rückgängig machen u
 Cut	Menus		Ausschneiden
 Center	Menus		Zentriert
 Increase size	Menus		Vergrößern
-Wrap-around search	FindandReplaceWindow		Gesamtes Dokument durchsuchen
 Page setup…	Menus		Seite einrichten…
+Wrap-around search	FindandReplaceWindow		Gesamtes Dokument durchsuchen
 Untitled 	StyledEditWindow		Unbenannt
 OK	Statistics		OK
 Find	FindandReplaceWindow		Suchen
@@ -29,8 +29,8 @@ Italic	Menus		Kursiv
 Can't undo	Menus		Rückgängig nicht möglich
 Replace…	Menus		Ersetzen…
 File	Menus		Datei
-Bold	Menus		Fett
 Paste	Menus		Einfügen
+Bold	Menus		Fett
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Die Datei \"%file%\" wurde von einer anderen Anwendung verändert.\nSoll sie neu geladen werden?
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Die Datei \"%file%\" wurde von einer anderen Anwendung entfernt. Soll sie wiederhergestellt werden?
 Lines:	Statistics		Zeilen:
@@ -67,23 +67,23 @@ OK	LoadAlert		OK
 Save	QuitAlert		Speichern
 Case-sensitive	FindandReplaceWindow		Groß-/Kleinschreibung beachten
 Find selection	Menus		Auswahl suchen
-Cancel	SaveAlert		Abbrechen
 Find…	Menus		Suchen…
+Cancel	SaveAlert		Abbrechen
 Revert	RevertToSavedAlert		Wiederherstellen
-Decrease size	Menus		Verkleinern
 Size	Menus		Größe
+Decrease size	Menus		Verkleinern
 Autodetect	Menus		Automatisch
 Replace next	Menus		Weiter ersetzen
 OK	QuitAlert		OK
-Replace with:	FindandReplaceWindow		Ersetzen durch:
 Edit	Menus		Bearbeiten
+Replace with:	FindandReplaceWindow		Ersetzen durch:
 Open…	Menus		Öffnen…
 Save as…	Menus		Speichern unter…
 Replace	FindandReplaceWindow		Ersetzen
 Characters:	Statistics		Zeichen:
 Don't save	QuitAlert		Verwerfen
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Diese Datei ist als schreibgeschützt gekennzeichnet. Änderungen am Dokument \"%s\" speichern?
-Align	Menus		Ausrichtung
 Font	Menus		Schrift
+Align	Menus		Ausrichtung
 Select all	Menus		Alles auswählen
 Right	Menus		Rechts

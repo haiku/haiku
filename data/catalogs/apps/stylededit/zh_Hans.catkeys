@@ -3,8 +3,8 @@ Document statistics	Statistics		文档统计
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		无法恢复，文件未找到：\"%s\"。
 Cut	Menus		剪切
 Center	Menus		居中
-Wrap-around search	FindandReplaceWindow		循环搜索
 Page setup…	Menus		页面设置…
+Wrap-around search	FindandReplaceWindow		循环搜索
 Untitled 	StyledEditWindow		未命名
 OK	Statistics		确定
 Find	FindandReplaceWindow		查找
@@ -28,8 +28,8 @@ Italic	Menus		斜体
 Can't undo	Menus		无法撤销
 Replace…	Menus		替换…
 File	Menus		文件
-Bold	Menus		粗体
 Paste	Menus		粘贴
+Bold	Menus		粗体
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		文件 \"%file%\" 已由其他程序修改，是否重新载入？
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		\"%file%\" 文件已被其他应用删除，是否恢复该文件？
 Lines:	Statistics		行数：
@@ -67,22 +67,22 @@ OK	LoadAlert		确定
 Save	QuitAlert		保存
 Case-sensitive	FindandReplaceWindow		区分大小写
 Find selection	Menus		搜索选中
-Cancel	SaveAlert		取消
 Find…	Menus		查找…
+Cancel	SaveAlert		取消
 Revert	RevertToSavedAlert		取消
 Size	Menus		大小
 Autodetect	Menus		自动删除
 Replace next	Menus		替换文本
 OK	QuitAlert		确定
-Replace with:	FindandReplaceWindow		替换为：
 Edit	Menus		编辑
+Replace with:	FindandReplaceWindow		替换为：
 Open…	Menus		打开…
 Save as…	Menus		保存为...
 Replace	FindandReplaceWindow		替换
 Characters:	Statistics		字符数：
 Don't save	QuitAlert		不保存
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		文件标记为只读。是否将修改保存到文档 \"%s\" ?
-Align	Menus		对齐
 Font	Menus		字体
+Align	Menus		对齐
 Select all	Menus		全选
 Right	Menus		居右

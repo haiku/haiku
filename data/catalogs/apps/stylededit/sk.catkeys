@@ -3,8 +3,8 @@ Document statistics	Statistics		Štatistika dokumentu
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nie je možné vrátiť späť, súbor nebol nájdený: „%s“.
 Cut	Menus		Vystrihnúť
 Center	Menus		Stred
-Wrap-around search	FindandReplaceWindow		Pokračovať v hľadaní od začiatku
 Page setup…	Menus		Nastavenie stránky…
+Wrap-around search	FindandReplaceWindow		Pokračovať v hľadaní od začiatku
 Untitled 	StyledEditWindow		Bez názvu 
 OK	Statistics		OK
 Find	FindandReplaceWindow		Nájsť
@@ -28,8 +28,8 @@ Italic	Menus		Kurzíva
 Can't undo	Menus		Nie je možné vrátiť späť
 Replace…	Menus		Nahradiť…
 File	Menus		Súbor
-Bold	Menus		Hrubé
 Paste	Menus		Vložiť
+Bold	Menus		Hrubé
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Súbor „%file%“ zmenila iná aplikácia. Chcete ho znovu načítať?
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Súbor „%file%“ odstránila iná aplikácia. Chcete ho obnoviť?
 Lines:	Statistics		Riadkov:
@@ -67,22 +67,22 @@ OK	LoadAlert		OK
 Save	QuitAlert		Uložiť
 Case-sensitive	FindandReplaceWindow		Rozlišovať veľkosť písmen
 Find selection	Menus		Nájsť výber
-Cancel	SaveAlert		Zrušiť
 Find…	Menus		Nájsť…
+Cancel	SaveAlert		Zrušiť
 Revert	RevertToSavedAlert		Vrátiť späť
 Size	Menus		Veľkosť
 Autodetect	Menus		Zistiť automaticky
 Replace next	Menus		Nahradiť ďalší
 OK	QuitAlert		OK
-Replace with:	FindandReplaceWindow		Nahradiť čím:
 Edit	Menus		Upraviť
+Replace with:	FindandReplaceWindow		Nahradiť čím:
 Open…	Menus		Otvoriť…
 Save as…	Menus		Uložiť ako…
 Replace	FindandReplaceWindow		Nahradiť
 Characters:	Statistics		Znakov:
 Don't save	QuitAlert		Neukladať
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Tento súbor je označený iba na čítanie. Uložiť zmeny v dokumente „%s“? 
-Align	Menus		Zarovnať
 Font	Menus		Písmo
+Align	Menus		Zarovnať
 Select all	Menus		Vybrať všetky
 Right	Menus		Vpravo

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-GLInfo	2211760527
+1	ukrainian	x-vnd.Haiku-GLInfo	1282327690
 Maximum clipping planes	Capabilities		Максимум площин відсікання
 Maximum evaluators equation order	Capabilities		Максимальний порядок рівнянь оцінювачів
 Texture stack size	Capabilities		Розмір стека текстур
@@ -13,12 +13,15 @@ Value	Capabilities		Значення
 Name stack size	Capabilities		Розмір стека імен
 Capabilities	Capabilities		Спроможність
 Maximum texture units	Capabilities		Максимум текстурних одиниць
+Unknown or missing OpenGL renderer.	InfoView		Невідомий або відсутній рендерер OpenGL
 Capability	Capabilities		Спромога
 Maximum 2D texture size	Capabilities		Максимальний розмір 2D текстур
 Auxiliary buffer(s)	Capabilities		Допоміжний буфер
+Unknown vendor	InfoView		Невідомий вендор
 Maximum convolution	Capabilities		Максимальне згортання
 Maximum 3D texture size	Capabilities		Максимальний розмір 3D текстур
 Maximum recommended index elements	Capabilities		Максимум рекомендованих індексних елементів
+Unknown version	InfoView		Невідома версія
 List stack size	Capabilities		Розмір стека списку
 Model stack size	Capabilities		Розмір стека моделі
 Projection stack size	Capabilities		Розмір стека проекцій

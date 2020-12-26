@@ -4,8 +4,8 @@ Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Geri alınamıyor, do
 Cut	Menus		Kes
 Center	Menus		Ortala
 Increase size	Menus		Büyüt
-Wrap-around search	FindandReplaceWindow		Tüm dosyada ara
 Page setup…	Menus		Sayfa yapısı…
+Wrap-around search	FindandReplaceWindow		Tüm dosyada ara
 Untitled 	StyledEditWindow		Adsız 
 OK	Statistics		Tamam
 Find	FindandReplaceWindow		Bul
@@ -29,8 +29,8 @@ Italic	Menus		Eğik
 Can't undo	Menus		Değişiklik yok
 Replace…	Menus		Değiştir…
 File	Menus		Dosya
-Bold	Menus		Kalın
 Paste	Menus		Yapıştır
+Bold	Menus		Kalın
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		\"%file%\" başka bir uygulama tarafından değiştirilmiş, yeniden yüklensin mi?
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		\"%file%\" başka bir uygulama tarafından kaldırılmış, kurtarılsın mı?
 Lines:	Statistics		Satır:
@@ -68,23 +68,23 @@ OK	LoadAlert		Tamam
 Save	QuitAlert		Kaydet
 Case-sensitive	FindandReplaceWindow		BÜYÜK/küçük harf duyarlı
 Find selection	Menus		Seçimi bul
-Cancel	SaveAlert		İptal
 Find…	Menus		Bul…
+Cancel	SaveAlert		İptal
 Revert	RevertToSavedAlert		Eski haline döndür
-Decrease size	Menus		Küçült
 Size	Menus		Boyut
+Decrease size	Menus		Küçült
 Autodetect	Menus		Kendiliğinden algıla
 Replace next	Menus		Sonrakini değiştir
 OK	QuitAlert		Tamam
-Replace with:	FindandReplaceWindow		Şununla değiştir:
 Edit	Menus		Düzen
+Replace with:	FindandReplaceWindow		Şununla değiştir:
 Open…	Menus		Aç…
 Save as…	Menus		Farklı kaydet…
 Replace	FindandReplaceWindow		Değiştir
 Characters:	Statistics		Karakter:
 Don't save	QuitAlert		Kaydetme
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Bu dosya saltokunur olarak imlenmiş. \"%s\" belgesindeki değişiklikler kaydedilsin mi? 
-Align	Menus		Hizalama
 Font	Menus		Yazıtipi
+Align	Menus		Hizalama
 Select all	Menus		Tümünü seç
 Right	Menus		Sağ

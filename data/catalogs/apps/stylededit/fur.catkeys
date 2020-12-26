@@ -4,8 +4,8 @@ Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Impussibil ripristin�
 Cut	Menus		Taie
 Center	Menus		Centre
 Increase size	Menus		Aumente dimension
-Wrap-around search	FindandReplaceWindow		Cîr tor ator tal document
 Page setup…	Menus		Configure pagjine…
+Wrap-around search	FindandReplaceWindow		Cîr tor ator tal document
 Untitled 	StyledEditWindow		Cence non 
 OK	Statistics		Va ben
 Find	FindandReplaceWindow		Cjate
@@ -29,8 +29,8 @@ Italic	Menus		Corsîf
 Can't undo	Menus		Impussibil disfâ
 Replace…	Menus		Sostituìs…
 File	Menus		File
-Bold	Menus		Neret
 Paste	Menus		Tache
+Bold	Menus		Neret
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Il file \"%file%\" al è stât modificât di une altre aplicazion, tornâ a cjariâlu?
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Il file \"%file%\" al è stât gjavât di une altre aplicazion, recuperâlu?
 Lines:	Statistics		Riis:
@@ -68,23 +68,23 @@ OK	LoadAlert		Va ben
 Save	QuitAlert		Salve
 Case-sensitive	FindandReplaceWindow		Sensibil maiusculis/minusculis
 Find selection	Menus		Cjate selezion
-Cancel	SaveAlert		Anule
 Find…	Menus		Cjate…
+Cancel	SaveAlert		Anule
 Revert	RevertToSavedAlert		Torne indaûr
-Decrease size	Menus		Diminuìs dimension
 Size	Menus		Dimension
+Decrease size	Menus		Diminuìs dimension
 Autodetect	Menus		Rilevament automatic
 Replace next	Menus		Sostituì prossim
 OK	QuitAlert		Va ben
-Replace with:	FindandReplaceWindow		Sostituìs cun:
 Edit	Menus		Modifiche
+Replace with:	FindandReplaceWindow		Sostituìs cun:
 Open…	Menus		Vierç…
 Save as…	Menus		Salve come…
 Replace	FindandReplaceWindow		Sostituìs
 Characters:	Statistics		Caratars:
 Don't save	QuitAlert		No sta salvâ
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Chest file al è di dome-leture. Salvâ lis modifichis al document \"%s\"? 
-Align	Menus		Inlineâ
 Font	Menus		Caratar
+Align	Menus		Inlineâ
 Select all	Menus		Selezione dut
 Right	Menus		Diestre

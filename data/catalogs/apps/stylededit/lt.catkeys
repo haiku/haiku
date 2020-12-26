@@ -3,8 +3,8 @@ Document statistics	Statistics		Dokumento statistika
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Negrįžtama, failas nerastas: „%s“.
 Cut	Menus		Iškirpti
 Center	Menus		Centrinė
-Wrap-around search	FindandReplaceWindow		Tęsti paiešką nuo dokumento pradžios
 Page setup…	Menus		Puslapio nuostatos…
+Wrap-around search	FindandReplaceWindow		Tęsti paiešką nuo dokumento pradžios
 Untitled 	StyledEditWindow		Bevardis 
 OK	Statistics		Gerai
 Find	FindandReplaceWindow		Ieškoti
@@ -28,8 +28,8 @@ Italic	Menus		Kursyvas
 Can't undo	Menus		Atšaukti negalima
 Replace…	Menus		Pakeisti…
 File	Menus		Failas
-Bold	Menus		Pastorintas
 Paste	Menus		Įdėti
+Bold	Menus		Pastorintas
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Failą „%file%“ modifikavo kita programa. Ar įkelti jį iš naujo?
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Failą „%file%“ pašalino kita programa. Ar atkurti?
 Lines:	Statistics		Eilučių:
@@ -67,22 +67,22 @@ OK	LoadAlert		Gerai
 Save	QuitAlert		Įrašyti
 Case-sensitive	FindandReplaceWindow		Paisyti raidžių registro
 Find selection	Menus		Ieškoti pažymėto teksto
-Cancel	SaveAlert		Atsisakyti
 Find…	Menus		Ieškoti…
+Cancel	SaveAlert		Atsisakyti
 Revert	RevertToSavedAlert		Atšaukti pakeitimus
 Size	Menus		Dydis
 Autodetect	Menus		Nustatyti automatiškai
 Replace next	Menus		Pakeisti kitą
 OK	QuitAlert		Gerai
-Replace with:	FindandReplaceWindow		Keisti į:
 Edit	Menus		Taisa
+Replace with:	FindandReplaceWindow		Keisti į:
 Open…	Menus		Atverti…
 Save as…	Menus		Įrašyti kaip…
 Replace	FindandReplaceWindow		Pakeisti
 Characters:	Statistics		Simbolių:
 Don't save	QuitAlert		Neįrašyti
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Šis failas pažymėtas kaip skirtas tik skaitymui. Ar įrašyti dokumento „%s“ pakeitimus? 
-Align	Menus		Lygiuotė
 Font	Menus		Šriftas
+Align	Menus		Lygiuotė
 Select all	Menus		Pažymėti viską
 Right	Menus		Dešininė

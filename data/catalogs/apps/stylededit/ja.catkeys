@@ -4,8 +4,8 @@ Cannot revert, file not found: \"%s\".	RevertToSavedAlert		ファイル \"%s\" �
 Cut	Menus		切り取り
 Center	Menus		中央揃え
 Increase size	Menus		拡大
-Wrap-around search	FindandReplaceWindow		折り返し検索
 Page setup…	Menus		ページ設定…
+Wrap-around search	FindandReplaceWindow		折り返し検索
 Untitled 	StyledEditWindow		無題
 OK	Statistics		OK
 Find	FindandReplaceWindow		検索
@@ -29,8 +29,8 @@ Italic	Menus		イタリック
 Can't undo	Menus		元に戻せません
 Replace…	Menus		置換…
 File	Menus		ファイル
-Bold	Menus		太字
 Paste	Menus		貼り付け
+Bold	Menus		太字
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		ファイル \"%file%\" はほかのアプリケーションにより変更されています。再読み込みしますか?
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		ファイル \"%file%\" はほかのアプリケーションにより削除されました。回復しますか?
 Lines:	Statistics		行数:
@@ -68,23 +68,23 @@ OK	LoadAlert		OK
 Save	QuitAlert		保存
 Case-sensitive	FindandReplaceWindow		大文字小文字を区別
 Find selection	Menus		選択範囲を検索
-Cancel	SaveAlert		中止
 Find…	Menus		検索…
+Cancel	SaveAlert		中止
 Revert	RevertToSavedAlert		戻す
-Decrease size	Menus		縮小
 Size	Menus		サイズ
+Decrease size	Menus		縮小
 Autodetect	Menus		自動判別
 Replace next	Menus		次を置換
 OK	QuitAlert		OK
-Replace with:	FindandReplaceWindow		置換:
 Edit	Menus		編集
+Replace with:	FindandReplaceWindow		置換:
 Open…	Menus		開く…
 Save as…	Menus		名前を付けて保存…
 Replace	FindandReplaceWindow		置換
 Characters:	Statistics		文字数:
 Don't save	QuitAlert		保存しない
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		このファイルは読み取り専用です。変更をドキュメント\"%s\"に保存しますか?
-Align	Menus		配置
 Font	Menus		フォント
+Align	Menus		配置
 Select all	Menus		すべて選択
 Right	Menus		右揃え

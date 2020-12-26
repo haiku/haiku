@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-WebPositive	1591513524
+1	ukrainian	x-vnd.Haiku-WebPositive	1976607515
 Authentication required	Authentication Panel		Потрібна авторизація
 Previous	WebPositive Window		Попереднє
 (Finish: %date)	Download Window		(Завершення: %date)
@@ -18,7 +18,7 @@ Delete	Cookie Manager		Видалити
 (Finish: %date - Over %duration left)	Download Window		(Завершення: %date - Понад %duration залишилось)
 Open containing folder	Download Window		Відкрити папку, що містить
 Find previous	WebPositive Window		Знайти попереднє
-Full screen	WebPositive Window		Повний екран
+Full screen	WebPositive Window		На весь екран
 Downloads in progress	WebPositive		Завантаження триває
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Ви бажаєте відкрити всі закладки %addedCount одразу?
 Copy URL to clipboard	Download Window		Копіювати до буферу обміну
@@ -53,6 +53,7 @@ Cookies for %s	Cookie Manager		Cookies для %s
 The download could not be opened.	Download Window		Неможливо відкрити завантажене.
 Close	Download Window		Закрити
 WebPositive	System name		WebPositive
+%s - Search term	Settings Window		%s - Параметри пошуку
 Reload	WebPositive Window		Перезавантажити
 Expiration	Cookie Manager		Термін дії
 Download finished	Download Window		Завантаження завершене
@@ -92,7 +93,7 @@ There was an error creating the bookmark file.\n\nError: %error	WebPositive Wind
 OK	Download Window		ОК
 Proxy username:	Settings Window		Користувач проксі:
 Manage bookmarks	WebPositive Window		Управління закладками
-/s)	Download Window	...as in 'per second'	/s)
+/s)	Download Window	...as in 'per second'	/с)
 Restart	Download Window		Перезапустити
 Serif font:	Settings Window		Шрифт Serif:
 Apply	Settings Window		Застосувати
@@ -105,9 +106,9 @@ Show tabs if only one page is open	Settings Window		Показати вклад�
 Close tab	WebPositive Window		Закрити вкладку
 Remove	Download Window		Вилучити
 About	WebPositive Window		Про програму
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Триває завантаження, Ви дійсно бажаєте покинути WebPositive зараз?
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Триває завантаження, Ви дійсно бажаєте вийти з WebPositive зараз?
 Continue downloads	WebPositive		Продовжити завантаження
-Proxy server requires authentication	Settings Window		Проксі-сервер вимагає аутентифікації
+Proxy server requires authentication	Settings Window		Проксі-сервер потребує автентифікації
 Cancel	Settings Window		Скасувати
 History	WebPositive Window		Історія
 Reset size	WebPositive Window		Скинути розмір
@@ -119,10 +120,10 @@ Find previous occurrence of search terms	WebPositive Window	find bar previous bu
 Remember username and password for this site	Authentication Panel		Запам'ятати логін та пароль для цього сайту
 (Finish: %date - %duration left)	Download Window		(Завершення: %date - %duration залишилось)
 Cookie manager	Cookie Manager		Менеджер coookie
-Show home button	Settings Window		Показати домашню кнопку
+Show home button	Settings Window		Показати кнопку Додому
 Start new session	Settings Window		Запуск нового сеансу
 The cookie jar is empty!	Cookie Manager		Архів cookie порожній!
-Value	Cookie Manager		Величина
+Value	Cookie Manager		Значення
 Remove missing	Download Window		Вилучити відсутні
 Paste	WebPositive Window		Вставити
 Double-click or middle-click to open new tab.	Tab Manager		Подвійний або середній клік для відкриття нової вкладки.
@@ -153,7 +154,7 @@ Downloads	Download Window		Завантаження
 Open blank page	Settings Window		Відкрити порожню сторінку
 Clear history	WebPositive Window		Очистити історію
 Cancel	WebPositive Window		Скасувати
-Bookmark info	WebPositive Window		Про Закладки
+Bookmark info	WebPositive Window		Інформація про закладку
 Script console	Console Window		Консоль сценаріїв
 Copy	URL Bar		Копіювати
 Open start page	Settings Window		Відкрити стартову сторінку

@@ -4,8 +4,8 @@ Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Tidak dapat mengembal
 Cut	Menus		Potong
 Center	Menus		Tengah
 Increase size	Menus		Tambah ukuran
-Wrap-around search	FindandReplaceWindow		Pencarian menyeluruh
 Page setup…	Menus		Pengaturan halaman…
+Wrap-around search	FindandReplaceWindow		Pencarian menyeluruh
 Untitled 	StyledEditWindow		Tanpa judul 
 OK	Statistics		OKE
 Find	FindandReplaceWindow		Cari
@@ -29,8 +29,8 @@ Italic	Menus		Miring
 Can't undo	Menus		Tidak dapat membatalkan
 Replace…	Menus		Ganti…
 File	Menus		Berkas
-Bold	Menus		Tebal
 Paste	Menus		Tempel
+Bold	Menus		Tebal
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Berkas \"%file%\" telah dimodifikasi oleh aplikasi lain, muat ulang?
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Berkas \"%file%\" telah dihapus oleh aplikasi lain, pulihkan?
 Lines:	Statistics		Baris:
@@ -68,23 +68,23 @@ OK	LoadAlert		OKE
 Save	QuitAlert		Simpan
 Case-sensitive	FindandReplaceWindow		bedakan huruf besar-kecil
 Find selection	Menus		Temukan pilihan
-Cancel	SaveAlert		Batal
 Find…	Menus		Cari…
+Cancel	SaveAlert		Batal
 Revert	RevertToSavedAlert		Pulihkan
-Decrease size	Menus		Kurangi ukuran
 Size	Menus		Ukuran
+Decrease size	Menus		Kurangi ukuran
 Autodetect	Menus		Otodeteksi
 Replace next	Menus		Ganti selanjutnya
 OK	QuitAlert		OKE
-Replace with:	FindandReplaceWindow		Ganti dengan:
 Edit	Menus		Edit
+Replace with:	FindandReplaceWindow		Ganti dengan:
 Open…	Menus		Buka…
 Save as…	Menus		Simpan sebagai…
 Replace	FindandReplaceWindow		Ganti
 Characters:	Statistics		Karakter:
 Don't save	QuitAlert		Jangan simpan
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Berkas ini ditandai hanya baca. Simpan perubahan ke dokumen \"%s\"? 
-Align	Menus		Rata
 Font	Menus		Fon
+Align	Menus		Rata
 Select all	Menus		Pilih semua
 Right	Menus		Kanan

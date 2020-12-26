@@ -4,8 +4,8 @@ Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nu se poate reveni, n
 Cut	Menus		Taie
 Center	Menus		Centru
 Increase size	Menus		Crește dimensiunea
-Wrap-around search	FindandReplaceWindow		Căutare încadrează împrejur
 Page setup…	Menus		Configurări pagină…
+Wrap-around search	FindandReplaceWindow		Căutare încadrează împrejur
 Untitled 	StyledEditWindow		Fără titlu 
 OK	Statistics		OK
 Find	FindandReplaceWindow		Găsește
@@ -29,8 +29,8 @@ Italic	Menus		Cursiv
 Can't undo	Menus		Nu se poate reface
 Replace…	Menus		Înlocuiește…
 File	Menus		Fișier
-Bold	Menus		Aldin
 Paste	Menus		Lipește
+Bold	Menus		Aldin
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Fișierul \"%file%\" a fost modificat de altă aplicație, îl reîncărcați?
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Fișierul \"%file%\" a fost eliminat de altă aplicație, îl recuperați?
 Lines:	Statistics		Linii:
@@ -68,23 +68,23 @@ OK	LoadAlert		OK
 Save	QuitAlert		Salvează
 Case-sensitive	FindandReplaceWindow		Sensibil la majuscule
 Find selection	Menus		Găsește selecție
-Cancel	SaveAlert		Anulează
 Find…	Menus		Găsește…
+Cancel	SaveAlert		Anulează
 Revert	RevertToSavedAlert		Revenire
-Decrease size	Menus		Scade dimensiunea
 Size	Menus		Dimensiune
+Decrease size	Menus		Scade dimensiunea
 Autodetect	Menus		Detectează automat
 Replace next	Menus		Înlocuiește următorul
 OK	QuitAlert		OK
-Replace with:	FindandReplaceWindow		Înlocuiește cu:
 Edit	Menus		Editează
+Replace with:	FindandReplaceWindow		Înlocuiește cu:
 Open…	Menus		Deschide…
 Save as…	Menus		Salvează ca…
 Replace	FindandReplaceWindow		Înlocuiește
 Characters:	Statistics		Caractere:
 Don't save	QuitAlert		Nu salva
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Acest fișier este marcat ca protejat la scriere. Salvați modificările la documentul \"%s\"? 
-Align	Menus		Aliniază
 Font	Menus		Font
+Align	Menus		Aliniază
 Select all	Menus		Selectează tot
 Right	Menus		Dreapta

@@ -4,8 +4,8 @@ Cannot revert, file not found: \"%s\".	RevertToSavedAlert		ไม่สามา
 Cut	Menus		ตัด
 Center	Menus		ศุนย์กลาง
 Increase size	Menus		เพิ่มขนาด
-Wrap-around search	FindandReplaceWindow		ค้นหาแบบครอบคลุม
 Page setup…	Menus		ตั้งค่าหน้า
+Wrap-around search	FindandReplaceWindow		ค้นหาแบบครอบคลุม
 Untitled 	StyledEditWindow		ไม่ได้ตั้งชื่อ
 OK	Statistics		ตกลง
 Find	FindandReplaceWindow		ค้นหา
@@ -29,8 +29,8 @@ Italic	Menus		ตัวเอียง
 Can't undo	Menus		ไม่สามารถเลิกทำ
 Replace…	Menus		แทนที่
 File	Menus		ไฟล์
-Bold	Menus		ตัวหนา
 Paste	Menus		วาง
+Bold	Menus		ตัวหนา
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		ไฟล์ \"%file%\" ถูกแก้ไขโดยแอปพลิเคชันอื่น โหลดใหม่หรือไม่
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		ไฟล์ \"%file%\" ถูกลบโดยแอปพลิเคชันอื่น กู้คืนหรือไม่
 Lines:	Statistics		บรรทัด:
@@ -68,23 +68,23 @@ OK	LoadAlert		ตกลง
 Save	QuitAlert		บันทึก
 Case-sensitive	FindandReplaceWindow		เป็นกรณี ๆ ไป
 Find selection	Menus		ค้นหาตัวเลือก
-Cancel	SaveAlert		ยกเลิก
 Find…	Menus		ค้นหา
+Cancel	SaveAlert		ยกเลิก
 Revert	RevertToSavedAlert		เปลี่ยนกลับ
-Decrease size	Menus		ลดขนาด
 Size	Menus		ขนาด
+Decrease size	Menus		ลดขนาด
 Autodetect	Menus		ตรวจจับอัตโนมัติ
 Replace next	Menus		แทนที่ถัดไป
 OK	QuitAlert		ตกลง
-Replace with:	FindandReplaceWindow		แทนที่ด้วย:
 Edit	Menus		แก้ไข:
+Replace with:	FindandReplaceWindow		แทนที่ด้วย:
 Open…	Menus		เปิด
 Save as…	Menus		บันทึกเป็น
 Replace	FindandReplaceWindow		แทนที่
 Characters:	Statistics		ตัวอักษร:
 Don't save	QuitAlert		ไม่บันทึก
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		ไฟล์นี้ถูกทำเครื่องหมายว่าอ่านอย่างเดียว บันทึกการเปลี่ยนแปลงเอกสาร \"%s\" หรือไม่?
-Align	Menus		ตําแหน่ง
 Font	Menus		ตัวอักษร
+Align	Menus		ตําแหน่ง
 Select all	Menus		เลือกทั้งหมด
 Right	Menus		ขวา:

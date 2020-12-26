@@ -4,8 +4,8 @@ Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Невозможно 
 Cut	Menus		Вырезать
 Center	Menus		По центру
 Increase size	Menus		Увеличить размер
-Wrap-around search	FindandReplaceWindow		Поиск по всему документу
 Page setup…	Menus		Настройка печати…
+Wrap-around search	FindandReplaceWindow		Поиск по всему документу
 Untitled 	StyledEditWindow		Новый документ 
 OK	Statistics		ОК
 Find	FindandReplaceWindow		Найти
@@ -29,8 +29,8 @@ Italic	Menus		Наклонный
 Can't undo	Menus		Невозможно отменить
 Replace…	Menus		Заменить…
 File	Menus		Файл
-Bold	Menus		Жирный
 Paste	Menus		Вставить
+Bold	Menus		Жирный
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Файл \"%file%\" был изменен другой программой, перезагрузить его?
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Файл \"%file%\" был удален другой программой, восстановить его?
 Lines:	Statistics		Строк:
@@ -68,23 +68,23 @@ OK	LoadAlert		ОК
 Save	QuitAlert		Сохранить
 Case-sensitive	FindandReplaceWindow		Учитывать регистр
 Find selection	Menus		Найти выделенное
-Cancel	SaveAlert		Отмена
 Find…	Menus		Найти…
+Cancel	SaveAlert		Отмена
 Revert	RevertToSavedAlert		Вернуть
-Decrease size	Menus		Уменьшить размер
 Size	Menus		Размер
+Decrease size	Menus		Уменьшить размер
 Autodetect	Menus		Автоопределение
 Replace next	Menus		Заменить далее
 OK	QuitAlert		ОК
-Replace with:	FindandReplaceWindow		Заменить на:
 Edit	Menus		Изменить
+Replace with:	FindandReplaceWindow		Заменить на:
 Open…	Menus		Открыть…
 Save as…	Menus		Сохранить как…
 Replace	FindandReplaceWindow		Заменить
 Characters:	Statistics		Символов:
 Don't save	QuitAlert		Не сохранять
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Этот файл отмечен только для чтения. Сохранить изменения в документе \"%s\"? 
-Align	Menus		Выровнять
 Font	Menus		Шрифт
+Align	Menus		Выровнять
 Select all	Menus		Выделить всё
 Right	Menus		По правому краю

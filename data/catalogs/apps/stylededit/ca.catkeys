@@ -4,8 +4,8 @@ Cannot revert, file not found: \"%s\".	RevertToSavedAlert		No es pot revertir: e
 Cut	Menus		Retalla
 Center	Menus		Centrat
 Increase size	Menus		Augmenta'n la mida
-Wrap-around search	FindandReplaceWindow		Cerca cíclica
 Page setup…	Menus		Configuració de la pàgina...
+Wrap-around search	FindandReplaceWindow		Cerca cíclica
 Untitled 	StyledEditWindow		Sense títol 
 OK	Statistics		D'acord
 Find	FindandReplaceWindow		Troba
@@ -29,8 +29,8 @@ Italic	Menus		Cursiva
 Can't undo	Menus		No es pot refer
 Replace…	Menus		Reemplaça...
 File	Menus		Fitxer
-Bold	Menus		Negreta
 Paste	Menus		Enganxa
+Bold	Menus		Negreta
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		El fitxer \"%file%\" ha estat modificat per una altra aplicació. El torno a carregar?
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		El fitxer \"%file%\" ha estat suprimit per una altra aplicació. El recupero?
 Lines:	Statistics		Línies:
@@ -68,23 +68,23 @@ OK	LoadAlert		D'acord
 Save	QuitAlert		Desa
 Case-sensitive	FindandReplaceWindow		Distingeix majúscules
 Find selection	Menus		Troba la selecció
-Cancel	SaveAlert		Cancel·la
 Find…	Menus		Troba...
+Cancel	SaveAlert		Cancel·la
 Revert	RevertToSavedAlert		Reverteix
-Decrease size	Menus		Redueix-ne la mida
 Size	Menus		Mida
+Decrease size	Menus		Redueix-ne la mida
 Autodetect	Menus		Detecta-ho automàticament
 Replace next	Menus		Reemplaça'n el següent
 OK	QuitAlert		D'acord
-Replace with:	FindandReplaceWindow		Reemplaça-ho per:
 Edit	Menus		Edita
+Replace with:	FindandReplaceWindow		Reemplaça-ho per:
 Open…	Menus		Obre...
 Save as…	Menus		Desa com a...
 Replace	FindandReplaceWindow		Reemplaça
 Characters:	Statistics		Caràcters:
 Don't save	QuitAlert		No ho desis
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Aquest fitxer és només de lectura. Voleu desar els canvis al document \"%s\"? 
-Align	Menus		Alinea
 Font	Menus		Lletra
+Align	Menus		Alinea
 Select all	Menus		Selecciona-ho tot
 Right	Menus		Dreta

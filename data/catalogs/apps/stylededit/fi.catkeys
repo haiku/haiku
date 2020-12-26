@@ -4,8 +4,8 @@ Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Palauttaminen epäonn
 Cut	Menus		Leikkaa
 Center	Menus		Keskitä
 Increase size	Menus		Kasvata kokoa
-Wrap-around search	FindandReplaceWindow		Kierrätä haku alkuun
 Page setup…	Menus		Sivuasetus...
+Wrap-around search	FindandReplaceWindow		Kierrätä haku alkuun
 Untitled 	StyledEditWindow		Otsikoton 
 OK	Statistics		Valmis
 Find	FindandReplaceWindow		Haku
@@ -29,8 +29,8 @@ Italic	Menus		Kursivointi
 Can't undo	Menus		Ei voi perua
 Replace…	Menus		Korvaa…
 File	Menus		Tiedosto
-Bold	Menus		Lihavointi
 Paste	Menus		Liitä
+Bold	Menus		Lihavointi
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Jokin toinen sovellus muokkasi tiedostoa ”%file%”, ladataanko se uudelleen?
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Jokin muu sovellus poisti tiedoston ”%file%”, palautetaanko se?
 Lines:	Statistics		Rivejä:
@@ -68,23 +68,23 @@ OK	LoadAlert		Valmis
 Save	QuitAlert		Tallenna
 Case-sensitive	FindandReplaceWindow		Kirjainkoosta riippuva
 Find selection	Menus		Hakuvalinta
-Cancel	SaveAlert		Peru
 Find…	Menus		Hae…
+Cancel	SaveAlert		Peru
 Revert	RevertToSavedAlert		Palauta
-Decrease size	Menus		Pienennä kokoa
 Size	Menus		Koko
+Decrease size	Menus		Pienennä kokoa
 Autodetect	Menus		Automaattinen tunnistus
 Replace next	Menus		Korvaa seuraava
 OK	QuitAlert		Valmis
-Replace with:	FindandReplaceWindow		Korvaa sisällöllä:
 Edit	Menus		Muokkaa
+Replace with:	FindandReplaceWindow		Korvaa sisällöllä:
 Open…	Menus		Avaa…
 Save as…	Menus		Tallenna nimellä...
 Replace	FindandReplaceWindow		Korvaa
 Characters:	Statistics		Merkkejä:
 Don't save	QuitAlert		Älä tallenna
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Tämä tiedosto on merkitty kirjoitussuojatuksi. Tallennetaanko muutokset asiakirjaan ”%s”? 
-Align	Menus		Tasaa
 Font	Menus		Kirjasin
+Align	Menus		Tasaa
 Select all	Menus		Valitse kaikki
 Right	Menus		Oikea

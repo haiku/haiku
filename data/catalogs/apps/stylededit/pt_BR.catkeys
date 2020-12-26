@@ -3,8 +3,8 @@ Document statistics	Statistics		Estatísticas do documento
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Impossível reverter, arquivo não encontrado: \"%s\".
 Cut	Menus		Recortar
 Center	Menus		Centralizado
-Wrap-around search	FindandReplaceWindow		Localizar em torno de
 Page setup…	Menus		Configurar página…
+Wrap-around search	FindandReplaceWindow		Localizar em torno de
 Untitled 	StyledEditWindow		Sem título
 OK	Statistics		OK
 Find	FindandReplaceWindow		Localizar
@@ -28,8 +28,8 @@ Italic	Menus		Itálico
 Can't undo	Menus		Impossível desfazer
 Replace…	Menus		Substituir…
 File	Menus		Arquivo
-Bold	Menus		Negrito
 Paste	Menus		Colar
+Bold	Menus		Negrito
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Arquivo \"%file\" foi modificado por outro aplicativo, recarregar?
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Arquivo \"%file%\" foi removido por outro aplicativo, recuperar?
 Lines:	Statistics		Linhas:
@@ -67,22 +67,22 @@ OK	LoadAlert		OK
 Save	QuitAlert		Salvar
 Case-sensitive	FindandReplaceWindow		Diferenciar maiúsculas/minúsculas
 Find selection	Menus		Localizar seleção
-Cancel	SaveAlert		Cancelar
 Find…	Menus		Localizar…
+Cancel	SaveAlert		Cancelar
 Revert	RevertToSavedAlert		Reverter
 Size	Menus		Tamanho
 Autodetect	Menus		Auto-detectar
 Replace next	Menus		Substituir próximo
 OK	QuitAlert		OK
-Replace with:	FindandReplaceWindow		Substituir com:
 Edit	Menus		Editar
+Replace with:	FindandReplaceWindow		Substituir com:
 Open…	Menus		Abrir...
 Save as…	Menus		Salvar como...
 Replace	FindandReplaceWindow		Substituir
 Characters:	Statistics		Caracteres:
 Don't save	QuitAlert		Não salvar
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Este arquivo está marcado como somente leitura. Salvar alterações para o documento \"%s\"?
-Align	Menus		Alinhar
 Font	Menus		Fonte
+Align	Menus		Alinhar
 Select all	Menus		Selecionar tudo
 Right	Menus		Direito
