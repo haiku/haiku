@@ -10,7 +10,7 @@
 #include <features.h>
 
 
-#ifdef _DEFAULT_SOURCE
+#if defined(_DEFAULT_SOURCE) || defined(_GNU_SOURCE)
 
 
 #ifdef __cplusplus
