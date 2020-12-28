@@ -23,30 +23,30 @@ using std::nothrow;
 
 
 MovePLItemsCommand::MovePLItemsCommand(Playlist* playlist,
-		 const int32* indices, int32 count, int32 toIndex)
+		 BList indices, int32 toIndex)
 	:
 	PLItemsCommand(),
 	fPlaylist(playlist),
-	fItems(count > 0 ? new (nothrow) PlaylistItem*[count] : NULL),
-	fIndices(count > 0 ? new (nothrow) int32[count] : NULL),
-	fToIndex(toIndex),
-	fCount(count)
+	fCount(indices.CountItems()),
+	fItems(fCount > 0 ? new (nothrow) PlaylistItem*[fCount] : NULL),
+	fIndices(fCount > 0 ? new (nothrow) int32[fCount] : NULL),
+	fToIndex(toIndex)
 {
-	if (!indices || !fPlaylist || !fItems || !fIndices) {
+	if (indices.IsEmpty()) {
 		// indicate a bad object state
-		delete[] fItems;
+		delete fItems;
 		fItems = NULL;
 		return;
 	}
 
 	memset(fItems, 0, sizeof(PlaylistItem*) * fCount);
-	memcpy(fIndices, indices, fCount * sizeof(int32));
 
 	// init original entry indices and
 	// adjust toIndex compensating for items that
 	// are removed before that index
 	int32 itemsBeforeIndex = 0;
 	for (int32 i = 0; i < fCount; i++) {
+		fIndices[i] = (int32)(addr_t)indices.ItemAt(i);
 		fItems[i] = fPlaylist->ItemAt(fIndices[i]);
 		if (fItems[i] == NULL) {
 			// indicate a bad object state

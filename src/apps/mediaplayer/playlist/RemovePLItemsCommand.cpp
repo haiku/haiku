@@ -24,29 +24,29 @@ using std::nothrow;
 
 
 RemovePLItemsCommand::RemovePLItemsCommand(Playlist* playlist,
-		 const int32* indices, int32 count, bool moveFilesToTrash)
+		 BList indices, bool moveFilesToTrash)
 	:
 	PLItemsCommand(),
 	fPlaylist(playlist),
-	fItems(count > 0 ? new (nothrow) PlaylistItem*[count] : NULL),
-	fIndices(count > 0 ? new (nothrow) int32[count] : NULL),
-	fCount(count),
+	fCount(indices.CountItems()),
+	fItems(fCount > 0 ? new (nothrow) PlaylistItem*[fCount] : NULL),
+	fIndices(fCount > 0 ? new (nothrow) int32[fCount] : NULL),
 	fMoveFilesToTrash(moveFilesToTrash),
 	fMoveErrorShown(false),
 	fItemsRemoved(false)
 {
-	if (!indices || !fPlaylist || !fItems || !fIndices) {
+	if (indices.IsEmpty()) {
 		// indicate a bad object state
 		delete[] fItems;
 		fItems = NULL;
 		return;
 	}
 
-	memcpy(fIndices, indices, fCount * sizeof(int32));
 	memset(fItems, 0, fCount * sizeof(PlaylistItem*));
 
 	// init original entry indices
 	for (int32 i = 0; i < fCount; i++) {
+		fIndices[i] = (int32)(addr_t)indices.ItemAt(i);
 		fItems[i] = fPlaylist->ItemAt(fIndices[i]);
 		if (fItems[i] == NULL) {
 			delete[] fItems;

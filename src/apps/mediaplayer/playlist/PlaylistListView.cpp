@@ -483,7 +483,7 @@ void
 PlaylistListView::MoveItems(const BList& indices, int32 toIndex)
 {
 	fCommandStack->Perform(new (nothrow) MovePLItemsCommand(fPlaylist,
-		(int32*)indices.Items(), indices.CountItems(), toIndex));
+		indices, toIndex));
 }
 
 
@@ -491,7 +491,7 @@ void
 PlaylistListView::CopyItems(const BList& indices, int32 toIndex)
 {
 	fCommandStack->Perform(new (nothrow) CopyPLItemsCommand(fPlaylist,
-		(int32*)indices.Items(), indices.CountItems(), toIndex));
+		indices, toIndex));
 }
 
 
@@ -563,7 +563,7 @@ PlaylistListView::Randomize()
 	}
 
 	fCommandStack->Perform(new (nothrow) RandomizePLItemsCommand(fPlaylist,
-		(int32*)indices.Items(), indices.CountItems()));
+		indices));
 }
 
 
@@ -589,7 +589,7 @@ void
 PlaylistListView::RemoveItemList(const BList& indices, bool intoTrash)
 {
 	fCommandStack->Perform(new (nothrow) RemovePLItemsCommand(fPlaylist,
-		(int32*)indices.Items(), indices.CountItems(), intoTrash));
+		indices, intoTrash));
 }
 
 

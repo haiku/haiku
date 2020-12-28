@@ -6,14 +6,16 @@
 #define MOVE_PL_ITEMS_COMMAND_H
 
 
+#include <List.h>
+
 #include "PLItemsCommand.h"
+
 
 class MovePLItemsCommand : public PLItemsCommand {
  public:
 								MovePLItemsCommand(
 									Playlist* playlist,
-									const int32* indices,
-									int32 count,
+									BList indices,
 									int32 toIndex);
 	virtual						~MovePLItemsCommand();
 
@@ -26,10 +28,10 @@ class MovePLItemsCommand : public PLItemsCommand {
 
  private:
 			Playlist*			fPlaylist;
+			int32				fCount;
 			PlaylistItem**		fItems;
 			int32*				fIndices;
 			int32				fToIndex;
-			int32				fCount;
 };
 
 #endif // MOVE_PL_ITEMS_COMMAND_H

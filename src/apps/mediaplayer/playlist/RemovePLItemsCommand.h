@@ -6,14 +6,16 @@
 #define REMOVE_PL_ITEMS_COMMAND_H
 
 
+#include <List.h>
+
 #include "PLItemsCommand.h"
+
 
 class RemovePLItemsCommand : public PLItemsCommand {
 public:
 								RemovePLItemsCommand(
 									Playlist* playlist,
-									const int32* indices,
-									int32 count,
+									BList indices,
 									bool moveFilesToTrash = false);
 	virtual						~RemovePLItemsCommand();
 
@@ -26,9 +28,9 @@ public:
 
 private:
 			Playlist*			fPlaylist;
+			int32				fCount;
 			PlaylistItem**		fItems;
 			int32*				fIndices;
-			int32				fCount;
 			bool				fMoveFilesToTrash;
 			bool				fMoveErrorShown;
 			bool				fItemsRemoved;

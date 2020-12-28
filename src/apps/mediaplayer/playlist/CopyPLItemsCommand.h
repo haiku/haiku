@@ -6,14 +6,16 @@
 #define COPY_PL_ITEMS_COMMAND_H
 
 
+#include <List.h>
+
 #include "PLItemsCommand.h"
+
 
 class CopyPLItemsCommand : public PLItemsCommand {
 public:
 								CopyPLItemsCommand(
 									Playlist* playlist,
-									const int32* indices,
-									int32 count,
+									BList indices,
 									int32 toIndex);
 	virtual						~CopyPLItemsCommand();
 
@@ -26,9 +28,9 @@ public:
 
 private:
 			Playlist*			fPlaylist;
+			int32				fCount;
 			PlaylistItem**		fItems;
 			int32				fToIndex;
-			int32				fCount;
 			bool				fItemsCopied;
 };
 
