@@ -118,7 +118,7 @@
 	notification.SetGroup("Group");
 	notification.SetTitle("Title");
 	notification.SetContent("This is the content");
-	notification.SetMessageID("mainwindow_progress")
+	notification.SetMessageID("mainwindow_progress");
 	notification.SetProgress(0.5);
 	notification.Send();
 	\endcode
