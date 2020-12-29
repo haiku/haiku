@@ -5,7 +5,7 @@
 #ifndef _DOSFS_ATTR_H_
 #define _DOSFS_ATTR_H_
 
-#include <fs_attr.h>
+#include "system_dependencies.h"
 
 status_t set_mime_type(vnode *node, const char *filename);
 

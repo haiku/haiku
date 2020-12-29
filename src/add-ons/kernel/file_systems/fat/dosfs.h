@@ -6,9 +6,7 @@
 #define _DOSFS_H_
 
 
-#include <KernelExport.h>
-#include <fs_interface.h>
-#include <lock.h>
+#include "system_dependencies.h"
 
 
 //#define DEBUG 1
@@ -94,9 +92,7 @@ typedef struct vnode {
 
 	bool		dirty;			// track if vnode had been written to
 
-#if TRACK_FILENAME
 	char		*filename;
-#endif
 } vnode;
 
 // mode bits

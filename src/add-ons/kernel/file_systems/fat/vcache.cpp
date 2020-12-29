@@ -39,11 +39,7 @@ purpose.
 
 #include "vcache.h"
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-
-#include <KernelExport.h>
+#include "system_dependencies.h"
 
 #include "dosfs.h"
 #include "util.h"
@@ -101,14 +97,14 @@ init_vcache(nspace *vol)
 	vol->vcache.cache_size = 512; /* must be power of 2 */
 #endif
 
-	vol->vcache.by_vnid = calloc(sizeof(struct vache_entry *),
+	vol->vcache.by_vnid = (vcache_entry**)calloc(sizeof(struct vache_entry *),
 		vol->vcache.cache_size);
 	if (vol->vcache.by_vnid == NULL) {
 		dprintf("init_vcache: out of memory\n");
 		return ENOMEM;
 	}
 
-	vol->vcache.by_loc = calloc(sizeof(struct vache_entry *),
+	vol->vcache.by_loc = (vcache_entry**)calloc(sizeof(struct vache_entry *),
 		vol->vcache.cache_size);
 	if (vol->vcache.by_loc == NULL) {
 		dprintf("init_vcache: out of memory\n");
@@ -177,7 +173,7 @@ _add_to_vcache_(nspace *vol, ino_t vnid, ino_t loc)
 
 	ASSERT(vnid != loc);
 
-	e = malloc(sizeof(struct vcache_entry));
+	e = (vcache_entry*)malloc(sizeof(struct vcache_entry));
 	if (e == NULL)
 		return ENOMEM;
 

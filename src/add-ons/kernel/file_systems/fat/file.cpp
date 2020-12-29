@@ -3,17 +3,7 @@
 	This file may be used under the terms of the Be Sample Code License.
 */
 
-#include <stdlib.h>
-#include <string.h>
-#include <sys/stat.h>
-
-#include <fs_cache.h>
-#include <fs_info.h>
-#include <Drivers.h>
-#include <KernelExport.h>
-#include <NodeMonitor.h>
-
-#include <time.h>
+#include "system_dependencies.h"
 
 #include "iter.h"
 #include "dosfs.h"
@@ -144,9 +134,7 @@ dosfs_release_vnode(fs_volume *_vol, fs_vnode *_node, bool reenter)
 			UNLOCK_VOL(vol);
 		}
 
-#if TRACK_FILENAME
 		if (node->filename) free(node->filename);
-#endif
 
 		if (node->vnid != vol->root_vnode.vnid) {
 			file_cache_delete(node->cache);
@@ -331,7 +319,7 @@ dosfs_open(fs_volume *_vol, fs_vnode *_node, int omode, void **_cookie)
 		node->iteration++;
 	}
 
-	if ((cookie = calloc(sizeof(filecookie), 1)) == NULL) {
+	if ((cookie = (filecookie*)calloc(sizeof(filecookie), 1)) == NULL) {
 		result = ENOMEM;
 		goto error;
 	}
@@ -497,9 +485,9 @@ dosfs_close(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 status_t
 dosfs_free_cookie(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 {
-	nspace *vol = _vol->private_volume;
-	vnode *node = _node->private_node;
-	filecookie *cookie = _cookie;
+	nspace *vol = (nspace *)_vol->private_volume;
+	vnode *node = (vnode *)_node->private_node;
+	filecookie *cookie = (filecookie *)_cookie;
 	LOCK_VOL(vol);
 
 	DPRINTF(0, ("dosfs_free_cookie (vnode id %" B_PRIdINO ")\n", node->vnid));
@@ -554,7 +542,7 @@ dosfs_create(fs_volume *_vol, fs_vnode *_dir, const char *name, int omode,
 	}
 
 	// create file cookie; do it here to make cleaning up easier
-	if ((cookie = calloc(sizeof(filecookie), 1)) == NULL) {
+	if ((cookie = (filecookie *)calloc(sizeof(filecookie), 1)) == NULL) {
 		result = ENOMEM;
 		goto bi;
 	}
@@ -717,7 +705,7 @@ dosfs_mkdir(fs_volume *_vol, fs_vnode *_dir, const char *name, int perms)
 		goto bi3;
 	}
 
-	buffer = malloc(vol->bytes_per_sector);
+	buffer = (uchar *)malloc(vol->bytes_per_sector);
 	if (!buffer) {
 		result = ENOMEM;
 		goto bi4;
@@ -1006,11 +994,9 @@ dosfs_rename(fs_volume *_vol, fs_vnode *_odir, const char *oldname,
 		diri_free(&diri);
 	}
 
-#if TRACK_FILENAME
 	if (file->filename) free(file->filename);
-	file->filename = malloc(strlen(newname) + 1);
+	file->filename = (char*)malloc(strlen(newname) + 1);
 	if (file->filename) strcpy(file->filename, newname);
-#endif
 
 	notify_entry_moved(vol->id, odir->vnid, oldname, ndir->vnid, newname,
 		file->vnid);
@@ -1374,7 +1360,7 @@ dosfs_get_file_map(fs_volume *_vol, fs_vnode *_node, off_t position,
 		off_t block = csi_to_block(&iter);
 		uint32 sectors = 1;
 
-		length -= min(length, vol->bytes_per_sector - offset);
+		length -= min_c(length, vol->bytes_per_sector - offset);
 
 		while (length > 0) {
 			result = iter_csi(&iter, 1);
@@ -1389,7 +1375,7 @@ dosfs_get_file_map(fs_volume *_vol, fs_vnode *_node, off_t position,
 				break;
 			}
 
-			length -= min(length, vol->bytes_per_sector);
+			length -= min_c(length, vol->bytes_per_sector);
 			sectors++;
 		}
 

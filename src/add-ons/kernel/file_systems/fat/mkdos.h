@@ -26,7 +26,7 @@ THE SOFTWARE.
 
 */
 
-#include <fs_interface.h>
+#include "system_dependencies.h"
 
 
 struct initialize_parameters {
@@ -124,7 +124,7 @@ struct fsinfosector32 {
 
 
 // a FAT directory entry
-struct dirent {
+struct fatdirent {
 	uint8 Name[11];
 	uint8 Attr;
 	uint8 NTRes;

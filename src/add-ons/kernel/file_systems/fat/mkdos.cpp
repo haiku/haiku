@@ -6,18 +6,7 @@
  */
 
 
-#include <ByteOrder.h>
-#include <Drivers.h>
-#include <driver_settings.h>
-#include <KernelExport.h>
-#include <OS.h>
-#include <errno.h>
-#include <getopt.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <strings.h>
-#include <unistd.h>
+#include "system_dependencies.h"
 
 #define MKDOS
 #include "mkdos.h"
@@ -71,7 +60,7 @@ parse_initialize_parameters(const char* parameterString,
 	delete_driver_settings(handle);
 
 	if (fatBits != 0 && fatBits != 12 && fatBits != 16 && fatBits != 32) {
-		printf("mkdos error: fat must be 12, 16, or 32 bits\n");
+		dprintf("mkdos error: fat must be 12, 16, or 32 bits\n");
 		return B_BAD_VALUE;
 	}
 
@@ -747,7 +736,7 @@ void CreateVolumeLabel(void *sector, const char *label)
 	// XXX this could be changed to use long file name entrys,
 	// XXX but the dosfs would have to be updated, too
 	
-	dirent *d = (dirent *)sector;
+	fatdirent *d = (fatdirent *)sector;
 	memset(d, 0, sizeof(*d));
 	memset(d->Name, 0x20, 11);
 	memcpy(d->Name, label, min_c(11, strlen(label)));

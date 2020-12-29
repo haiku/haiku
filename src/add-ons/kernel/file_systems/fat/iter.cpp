@@ -6,11 +6,7 @@
 
 #include "iter.h"
 
-#include <string.h>
-
-#include <fs_cache.h>
-#include <fs_info.h>
-#include <KernelExport.h>
+#include "system_dependencies.h"
 
 #include "dosfs.h"
 #include "fat.h"
@@ -222,7 +218,7 @@ csi_write_blocks(struct csi *csi, uint8 *buffer, ssize_t len)
 	for (i = block; i < block + sectors; i++) {
 		char *blockData;
 		status_t status = block_cache_get_writable_etc(csi->vol->fBlockCache,
-			i, 0, 1, -1, &blockData);
+			i, 0, 1, -1, (void**)&blockData);
 		if (status != B_OK)
 			return status;
 
@@ -254,7 +250,7 @@ csi_write_block(struct csi *csi, uint8 *buffer)
 		return EINVAL;
 
 	status = block_cache_get_writable_etc(csi->vol->fBlockCache, block, 0, 1,
-		-1, &blockData);
+		-1, (void**)&blockData);
 	if (status != B_OK)
 		return status;
 

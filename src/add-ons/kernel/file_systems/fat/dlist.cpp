@@ -19,10 +19,7 @@ TODO:
 
 #define DPRINTF(a,b) if (debug_dlist > (a)) dprintf b
 
-#include <KernelExport.h>
-
-#include <stdlib.h>
-#include <string.h>
+#include "system_dependencies.h"
 
 #include "dosfs.h"
 #include "dlist.h"
@@ -43,7 +40,7 @@ dlist_init(nspace *vol)
 
 	vol->dlist.entries = 0;
 	vol->dlist.allocated = DLIST_ENTRY_QUANTUM;
-	vol->dlist.vnid_list = malloc(sizeof(ino_t) * vol->dlist.allocated);
+	vol->dlist.vnid_list = (ino_t *)malloc(sizeof(ino_t) * vol->dlist.allocated);
 	if (vol->dlist.vnid_list == NULL) {
 		vol->dlist.allocated = 0;
 		dprintf("dlist_init: out of core\n");
@@ -79,7 +76,7 @@ dlist_realloc(nspace *vol, uint32 allocate)
 	ASSERT(allocate != vol->dlist.allocated);
 	ASSERT(allocate > vol->dlist.entries);
 
-	vnid_list = malloc(sizeof(ino_t) * allocate);
+	vnid_list = (ino_t *)malloc(sizeof(ino_t) * allocate);
 	if (vnid_list == NULL) {
 		dprintf("dlist_realloc: out of core\n");
 		return ENOMEM;

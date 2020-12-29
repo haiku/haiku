@@ -6,22 +6,7 @@
 
 #include "dosfs.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/stat.h>
-#include <time.h>
-
-#include <KernelExport.h>
-#include <Drivers.h>
-#include <driver_settings.h>
-
-#include <scsi.h>
-
-#include <fs_info.h>
-#include <fs_interface.h>
-#include <fs_cache.h>
-#include <fs_volume.h>
+#include "system_dependencies.h"
 
 #include "attr.h"
 #include "dir.h"
@@ -109,9 +94,8 @@ debug_dvnode(int argc, char **argv)
 		if (!n) continue;
 
 		kprintf("vnode @ %p", n);
-#if TRACK_FILENAME
+
 		kprintf(" (%s)", n->filename);
-#endif
 		kprintf("\nvnid %" B_PRIdINO ", dir vnid %" B_PRIdINO "\n", n->vnid,
 			n->dir_vnid);
 		kprintf("iteration %" B_PRIu32 ", si=%" B_PRIu32 ", ei=%" B_PRIu32
@@ -498,13 +482,6 @@ volume_count_free_cluster(nspace *vol)
 }
 
 
-static int
-lock_removable_device(int fd, bool state)
-{
-	return ioctl(fd, B_SCSI_PREVENT_ALLOW, &state, sizeof(state));
-}
-
-
 static status_t
 mount_fat_disk(const char *path, fs_volume *_vol, const int flags,
 	nspace** newVol, int fs_flags, int op_sync_mode)
@@ -564,10 +541,6 @@ mount_fat_disk(const char *path, fs_volume *_vol, const int flags,
 				strerror(err));
 			goto error0;
 		}
-
-		if ((vol_flags & B_FS_IS_REMOVABLE)
-			&& (fs_flags & FS_FLAGS_LOCK_DOOR))
-			lock_removable_device(fd, true);
 	}
 
 	// see if we need to go into op sync mode
@@ -685,11 +658,6 @@ mount_fat_disk(const char *path, fs_volume *_vol, const int flags,
 error3:
 	uninit_vcache(vol);
 error2:
-	if (!(vol->flags & B_FS_IS_READONLY) && (vol->flags & B_FS_IS_REMOVABLE)
-		&& (vol->fs_flags & FS_FLAGS_LOCK_DOOR)) {
-		lock_removable_device(fd, false);
-	}
-
 	volume_uninit(vol);
 error1:
 	close(fd);
@@ -941,14 +909,14 @@ update_fsinfo(nspace *vol)
 static status_t
 get_fsinfo(nspace *vol, uint32 *free_count, uint32 *last_allocated)
 {
-	uchar *buffer;
+	char *buffer;
 	status_t result;
 
 	if ((vol->fat_bits != 32) || (vol->fsinfo_sector == 0xffff))
 		return B_ERROR;
 
 	result = block_cache_get_etc(vol->fBlockCache, vol->fsinfo_sector, 0,
-		vol->bytes_per_sector, &buffer);
+		vol->bytes_per_sector, (const void**)&buffer);
 	if (result != B_OK) {
 		dprintf("get_fsinfo: error getting fsinfo sector %x: %s\n",
 			vol->fsinfo_sector, strerror(result));
@@ -999,8 +967,6 @@ dosfs_unmount(fs_volume *_vol)
 	dlist_uninit(vol);
 	uninit_vcache(vol);
 
-	if (!(vol->flags & B_FS_IS_READONLY) && (vol->flags & B_FS_IS_REMOVABLE) && (vol->fs_flags & FS_FLAGS_LOCK_DOOR))
-		lock_removable_device(vol->fd, false);
 	result = close(vol->fd);
 	recursive_lock_destroy(&(vol->vlock));
 	free(vol);
@@ -1083,11 +1049,10 @@ dosfs_write_fs_stat(fs_volume *_vol, const struct fs_info * fss, uint32 mask)
 		memset(name, ' ', 11);
 		DPRINTF(1, ("wfsstat: setting name to %s\n", fss->volume_name));
 		for (i=j=0;(i<11)&&(fss->volume_name[j]);j++) {
-			static char acceptable[] = "!#$%&'()-0123456789@ABCDEFGHIJKLMNOPQRSTUVWXYZ^_`{}~";
 			char c = fss->volume_name[j];
 			if ((c >= 'a') && (c <= 'z')) c += 'A' - 'a';
 			// spaces acceptable in volume names
-			if (strchr(acceptable, c) || (c == ' '))
+			if (strchr(sAcceptable, c) || (c == ' '))
 				name[i++] = c;
 		}
 		if (i == 0) { // bad name, kiddo

@@ -1402,6 +1402,8 @@
 #define index		fssh_index
 #define rindex		fssh_rindex
 
+/* SMAP-specific functions */
+#define user_strlcpy	fssh_strlcpy
 
 ////////////////////////////////////////////////////////////////////////////////
 // #pragma mark - fssh_time.h

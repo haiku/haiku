@@ -6,7 +6,11 @@
 #define _DOSFS_ITER_H_
 
 
-#include <SupportDefs.h>
+#ifdef FS_SHELL
+#	include "system_dependencies.h"
+#else
+#	include <SupportDefs.h>
+#endif
 
 
 struct _nspace;

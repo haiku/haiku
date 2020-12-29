@@ -11,10 +11,8 @@
 #include <string.h>
 
 #include "encodings.h"
-extern "C" {
 #include "util.h"
 extern int debug_encodings;
-}
 
 #define TOUCH(x) ((void)(x))
 
@@ -1148,10 +1146,6 @@ status_t unicode_to_utf8(const uchar *uni, uint32 unilen, uint8 *utf8,
 }
 
 // from dir.c
-extern "C" {
-	extern const char acceptable[];
-	extern const char illegal[];
-}
 const char underbar[] = "+,;=[]"
 		"\x83\x85\x88\x89\x8A\x8B\x8C\x8D"
 		"\x93\x95\x96\x97\x98"
@@ -1180,7 +1174,7 @@ bool requires_long_name(const char *utf8, const uchar *unicode)
 		if (utf8[i] == '.') break;
 		/* XXX: should also check for upper-ascii stuff (requires matching
 		 * unicode with msdostou table, but doesn't hurt for now */
-		if (!strchr(acceptable, utf8[i])) return true;
+		if (!strchr(sAcceptable, utf8[i])) return true;
 	}
 
 	if (utf8[i] == 0) return false;
@@ -1191,7 +1185,7 @@ bool requires_long_name(const char *utf8, const uchar *unicode)
 	for (j=0;j<3;j++,i++) {
 		if (utf8[i] == 0) return false;
 		/* XXX: same here */
-		if (!strchr(acceptable, utf8[i])) return true;
+		if (!strchr(sAcceptable, utf8[i])) return true;
 	}
 
 	return (utf8[i] == 0) ? false : true;
@@ -1339,7 +1333,7 @@ generate_short_name_msdos(const uchar *utf8, const uint16 *uni,
 				break;
 
 		if (c < 0x100) {
-			if (strchr(illegal, c)) return EINVAL;
+			if (strchr(sIllegal, c)) return EINVAL;
 
 			if ((c >= 'a') && (c <= 'z'))
 				nshort[i++] = c - 'a' + 'A';
@@ -1347,7 +1341,7 @@ generate_short_name_msdos(const uchar *utf8, const uint16 *uni,
 				nshort[i++] = '_';
 			else if ((cp = strchr(capitalize_from, c)) != NULL)
 				nshort[i++] = capitalize_to[(int)(cp - capitalize_from)];
-			else if (strchr(acceptable, c) || strchr(capitalize_to, c))
+			else if (strchr(sAcceptable, c) || strchr(capitalize_to, c))
 				nshort[i++] = c;
 		}
 	}
@@ -1373,7 +1367,7 @@ generate_short_name_msdos(const uchar *utf8, const uint16 *uni,
 				break;
 
 		if (c < 0x100) {
-			if (strchr(illegal, c)) return EINVAL;
+			if (strchr(sIllegal, c)) return EINVAL;
 
 			if ((c >= 'a') && (c <= 'z'))
 				nshort[i++] = c - 'a' + 'A';
@@ -1381,7 +1375,7 @@ generate_short_name_msdos(const uchar *utf8, const uint16 *uni,
 				nshort[i++] = '_';
 			else if ((cp = strchr(capitalize_from, c)) != NULL)
 				nshort[i++] = capitalize_to[(int)(cp - capitalize_from)];
-			else if (strchr(acceptable, c) || strchr(capitalize_to, c))
+			else if (strchr(sAcceptable, c) || strchr(capitalize_to, c))
 				nshort[i++] = c;
 		}
 	}

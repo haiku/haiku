@@ -6,12 +6,7 @@
 
 #include "fat.h"
 
-#include <stdlib.h>
-#include <string.h>
-
-#include <fs_cache.h>
-#include <ByteOrder.h>
-#include <KernelExport.h>
+#include "system_dependencies.h"
 
 #include "dosfs.h"
 #include "file.h"
@@ -42,7 +37,8 @@ mirror_fats(nspace *vol, uint32 sector, uint8 *buffer)
 			continue;
 
 		status = block_cache_get_writable_etc(vol->fBlockCache,
-			sector + i * vol->sectors_per_fat, 0, 1, -1, &blockData);
+			sector + i * vol->sectors_per_fat, 0, 1, -1,
+			(void**)&blockData);
 		if (status != B_OK)
 			return status;
 

@@ -5,6 +5,10 @@
 #ifndef _DOSFS_ENCODINGS_H_
 #define _DOSFS_ENCODINGS_H_
 
+
+#include "system_dependencies.h"
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif

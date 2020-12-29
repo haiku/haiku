@@ -1,0 +1,85 @@
+SubDir HAIKU_TOP src tools fat_shell ;
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems fat ] ;
+
+# prevent inclusion of HaikuBuildCompatibility.h and BSD headers
+DEFINES += HAIKU_BUILD_COMPATIBILITY_H __STRICT_ANSI__ ;
+
+# set some additional defines
+{
+	local defines =
+		FS_SHELL
+		;
+
+	if $(TARGET_PACKAGING_ARCH) = x86_gcc2 {
+		# GCC2 doesn't compile BFS correctly with -O2 or more
+		OPTIM = -O1 ;
+	}
+
+	defines = [ FDefines $(defines) ] ;
+
+	local c++flags = ;
+	if $(HOST_CC_IS_LEGACY_GCC) != 1 {
+		c++flags += -std=c++11 ;
+	}
+
+	SubDirCcFlags $(defines) -Wno-multichar ;
+	SubDirC++Flags $(defines) -Wno-multichar -fno-rtti ;
+	SubDirC++Flags $(defines) $(c++flags) -Wno-multichar -fno-rtti ;
+}
+
+# platform specific libraries
+local fsShellCommandLibs ;
+if ! $(HOST_PLATFORM_HAIKU_COMPATIBLE) {
+	fsShellCommandLibs = $(HOST_NETWORK_LIBS) ;
+}
+
+UseHeaders [ FDirName $(HAIKU_TOP) headers build ] : true ;
+
+if ! $(HOST_PLATFORM_HAIKU_COMPATIBLE) {
+	UseHeaders [ FDirName $(HAIKU_TOP) headers build os ] : true ;
+	UseHeaders [ FDirName $(HAIKU_TOP) headers build os drivers ] : true ;
+	UseHeaders [ FDirName $(HAIKU_TOP) headers build os kernel ] : true ;
+	UseHeaders [ FDirName $(HAIKU_TOP) headers build os storage ] : true ;
+	UseHeaders [ FDirName $(HAIKU_TOP) headers build os support ] : true ;
+}
+
+UsePrivateHeaders shared storage ;
+UsePrivateHeaders fs_shell ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers private ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src tools fs_shell ] ;
+
+local fatSource =
+	attr.cpp
+	dir.cpp
+	dlist.cpp
+	dosfs.cpp
+	encodings.cpp
+	fat.cpp
+	file.cpp
+	iter.cpp
+	mkdos.cpp
+	util.cpp
+	vcache.cpp
+	version.cpp
+;
+
+BuildPlatformMergeObject <build>fatfs.o : $(fatSource) ;
+
+BuildPlatformMain <build>fat_shell
+	: :
+	<build>fatfs.o
+	<build>fs_shell.a $(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
+	$(HOST_LIBROOT) $(fsShellCommandLibs)
+;
+
+BuildPlatformMain <build>fat_fuse
+	: :
+	<build>fatfs.o
+	<build>fuse_module.a
+	$(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
+	$(HOST_STATIC_LIBROOT) $(fsShellCommandLibs) fuse
+;
+
+SEARCH on [ FGristFiles DeviceOpener.cpp QueryParserUtils.cpp ]
+	+= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems shared ] ;

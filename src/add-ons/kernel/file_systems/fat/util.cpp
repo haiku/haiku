@@ -4,14 +4,11 @@
 */
 
 
-#include <SupportDefs.h>
-#include <KernelExport.h>
+#include "system_dependencies.h"
 
+#ifndef FS_SHELL
 #include <real_time_clock.h>
-
-#include <ctype.h>
-#include <string.h>
-#include <time.h>
+#endif
 
 #include "dosfs.h"
 #include "fat.h"
@@ -73,7 +70,12 @@ get_tzoffset()
 	if (tzoffset != -1)
 		return;
 
+	#ifdef FS_SHELL
+	// We just assume UTC ;-)
+	tzoffset = 0;
+	#else
 	tzoffset = get_timezone_offset() / 60;
+	#endif
 }
 
 

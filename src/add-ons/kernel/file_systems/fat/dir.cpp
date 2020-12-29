@@ -5,15 +5,7 @@
 
 #include "dir.h"
 
-#include <dirent.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <time.h>
-
-#include <fs_cache.h>
-#include <fs_info.h>
-#include <KernelExport.h>
+#include "system_dependencies.h"
 
 #include "iter.h"
 #include "dosfs.h"
@@ -28,9 +20,6 @@
 
 #define DPRINTF(a,b) if (debug_dir > (a)) dprintf b
 
-// used here and in encodings.cpp
-const char acceptable[]="!#$%&'()-0123456789@ABCDEFGHIJKLMNOPQRSTUVWXYZ^_`{}~";
-const char illegal[] = "\\/:*?\"<>|";
 
 typedef struct dircookie {
 	uint32		current_index;
@@ -826,7 +815,7 @@ is_filename_legal(const char *name)
 	for (i = 0; i < len; i++) {
 		if (name[i] & 0x80)
 			continue; //belongs to an utf8 char
-		if (strchr(illegal, name[i]))
+		if (strchr(sIllegal, name[i]))
 			return false;
 		if ((unsigned char)name[i] < 32)
 			return false;
@@ -937,7 +926,7 @@ status_t
 dosfs_read_vnode(fs_volume *_vol, ino_t vnid, fs_vnode *_node, int *_type,
 	uint32 *_flags, bool reenter)
 {
-	nspace *vol = (nspace*)_vol->private_volume;
+	nspace *vol = (nspace *)_vol->private_volume;
 	int result = B_NO_ERROR;
 	ino_t loc, dir_vnid;
 	vnode *entry;
@@ -1007,7 +996,7 @@ dosfs_read_vnode(fs_volume *_vol, ino_t vnid, fs_vnode *_node, int *_type,
 		}
 	}
 
-	if ((entry = calloc(sizeof(struct vnode), 1)) == NULL) {
+	if ((entry = (vnode *)calloc(sizeof(struct vnode), 1)) == NULL) {
 		DPRINTF(0, ("dosfs_read_vnode: out of memory\n"));
 		result = ENOMEM;
 		goto bi2;
@@ -1044,10 +1033,10 @@ dosfs_read_vnode(fs_volume *_vol, ino_t vnid, fs_vnode *_node, int *_type,
 		entry->end_cluster = 0;
 	entry->st_time = dos2time_t(info.time);
 	entry->st_crtim = dos2time_t(info.creation_time);
-#if TRACK_FILENAME
-	entry->filename = malloc(sizeof(filename) + 1);
+
+	entry->filename = (char *)malloc(sizeof(filename) + 1);
 	if (entry->filename) strcpy(entry->filename, filename);
-#endif
+
 	entry->cache = file_cache_create(vol->id, vnid, entry->st_size);
 	entry->file_map = file_map_create(vol->id, vnid, entry->st_size);
 	if (!(entry->mode & FAT_SUBDIR))
@@ -1073,8 +1062,8 @@ dosfs_walk(fs_volume *_vol, fs_vnode *_dir, const char *file, ino_t *_vnid)
 {
 	/* Starting at the base, find file in the subdir, and return path
 		string and vnode id of file. */
-	nspace	*vol = (nspace*)_vol->private_volume;
-	vnode	*dir = (vnode*)_dir->private_node;
+	nspace	*vol = (nspace *)_vol->private_volume;
+	vnode	*dir = (vnode *)_dir->private_node;
 	vnode	*vnode = NULL;
 	status_t result = ENOENT;
 
@@ -1141,8 +1130,8 @@ dosfs_readlink(fs_volume *_vol, fs_vnode *_node, char *buf, size_t *bufsize)
 status_t
 dosfs_opendir(fs_volume *_vol, fs_vnode *_node, void **_cookie)
 {
-	nspace *vol = (nspace*)_vol->private_volume;
-	vnode *node = (vnode*)_node->private_node;
+	nspace *vol = (nspace *)_vol->private_volume;
+	vnode *node = (vnode *)_node->private_node;
 	dircookie *cookie = NULL;
 	int result;
 
@@ -1173,7 +1162,7 @@ dosfs_opendir(fs_volume *_vol, fs_vnode *_node, void **_cookie)
 	result = B_NO_ERROR;
 
 bi:
-	*_cookie = (void*)cookie;
+	*_cookie = (void *)cookie;
 
 	if (result != B_OK)
 		DPRINTF(0, ("dosfs_opendir (%s)\n", strerror(result)));
@@ -1189,9 +1178,9 @@ dosfs_readdir(fs_volume *_vol, fs_vnode *_dir, void *_cookie,
 	struct dirent *entry, size_t bufsize, uint32 *num)
 {
 	int 		result = ENOENT;
-	nspace* 	vol = (nspace*)_vol->private_volume;
+	nspace* 	vol = (nspace *)_vol->private_volume;
 	vnode		*dir = (vnode *)_dir->private_node;
-	dircookie* 	cookie = (dircookie*)_cookie;
+	dircookie* 	cookie = (dircookie *)_cookie;
 	struct		diri diri;
 
 	LOCK_VOL(vol);
@@ -1265,7 +1254,7 @@ dosfs_rewinddir(fs_volume *_vol, fs_vnode *_node, void* _cookie)
 {
 	nspace		*vol = (nspace *)_vol->private_volume;
 	vnode		*node = (vnode *)_node->private_node;
-	dircookie	*cookie = (dircookie*)_cookie;
+	dircookie	*cookie = (dircookie *)_cookie;
 
 	LOCK_VOL(vol);
 
@@ -1295,7 +1284,7 @@ dosfs_free_dircookie(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 {
 	nspace *vol = (nspace *)_vol->private_volume;
 	vnode *node = (vnode *)_node->private_node;
-	dircookie *cookie = _cookie;
+	dircookie *cookie = (dircookie *)_cookie;
 
 	LOCK_VOL(vol);
 
