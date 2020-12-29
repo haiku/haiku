@@ -61,6 +61,7 @@
 
 	\section book_special_topics Special Topics
 
+	- \ref libroot
 	- \ref drivers
 	- \ref keyboard
 	- \ref json
@@ -583,6 +584,7 @@ snooze_until(time - Latency(), B_SYSTEM_TIMEBASE);
 
 
 	\defgroup libroot (libroot.so)
+	\brief Implements the C and POSIX standard libraries.
 */
 
 ///// Subgroups /////
