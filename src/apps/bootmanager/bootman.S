@@ -134,6 +134,10 @@
 ; Key codes
 %assign KEY_DOWN						0x50
 %assign KEY_UP							0x48
+%assign KEY_PAGE_DOWN					0x51
+%assign KEY_PAGE_UP						0x49
+%assign KEY_HOME						0x47
+%assign KEY_END							0x4f
 %assign KEY_RETURN						0x1C
 
 ; Modifier key bitmasks
@@ -431,8 +435,18 @@ inputLoop:
 	cmp		ah, KEY_DOWN
 	je		selectNextPartition
 
+	cmp		ah, KEY_PAGE_DOWN
+	je		selectLastPartition
+	cmp		ah, KEY_END
+	je		selectLastPartition
+
 	cmp		ah, KEY_UP
 	je		selectPreviousPartition
+
+	cmp		ah, KEY_PAGE_UP
+	je		selectFirstPartition
+	cmp		ah, KEY_HOME
+	je		selectFirstPartition
 
 	cmp		ah, KEY_RETURN
 	jne		inputLoop
@@ -448,6 +462,12 @@ selectNextPartition:
 	mov		[bp + selection], ax
 	jmp		mainLoop
 
+selectLastPartition:
+	mov		ax, [listItemCount]
+	dec		ax
+	mov		[bp + selection], ax
+	jmp		mainLoop
+
 selectPreviousPartition:
 	mov		ax, [bp + selection]
 	or		ax, ax
@@ -455,6 +475,11 @@ selectPreviousPartition:
 	mov		ax, [listItemCount]					; Then jump to last entry
 .done:
 	dec		ax
+	mov		[bp + selection], ax
+	jmp		mainLoop
+
+selectFirstPartition:
+	xor		ax, ax
 	mov		[bp + selection], ax
 	jmp		mainLoop
 
