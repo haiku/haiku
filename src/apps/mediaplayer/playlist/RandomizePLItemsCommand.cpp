@@ -24,7 +24,7 @@ using std::nothrow;
 
 
 RandomizePLItemsCommand::RandomizePLItemsCommand(Playlist* playlist,
-		 const int32* indices, int32 count)
+		 BList indices)
 	:
 	PLItemsCommand(),
 	fPlaylist(playlist),
@@ -46,7 +46,7 @@ RandomizePLItemsCommand::RandomizePLItemsCommand(Playlist* playlist,
 	// put the available indices into a "set"
 	BList indexSet;
 	for (int32 i = 0; i < fCount; i++) {
-		fIndices[i] = (int32)(addr_t)indices.ItemAt(i);
+		fListIndices[i] = (int32)(addr_t)indices.ItemAt(i);
 		fItems[i] = fPlaylist->ItemAt(fListIndices[i]);
 		if (fItems[i] == NULL || !indexSet.AddItem((void*)(addr_t)i)) {
 			// indicate a bad object state
