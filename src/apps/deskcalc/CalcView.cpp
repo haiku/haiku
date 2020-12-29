@@ -205,11 +205,7 @@ CalcView::CalcView(BRect frame, rgb_color rgbBaseColor, BMessage* settings)
 	fKeypadDescription(kKeypadDescriptionBasic),
 	fKeypad(NULL),
 
-#ifdef __HAIKU__
 	fCalcIcon(new BBitmap(BRect(0, 0, 15, 15), 0, B_RGBA32)),
-#else
-	fCalcIcon(new BBitmap(BRect(0, 0, 15, 15), 0, B_CMAP8)),
-#endif
 
 	fPopUpMenu(NULL),
 	fAutoNumlockItem(NULL),
@@ -243,11 +239,7 @@ CalcView::CalcView(BMessage* archive)
 	fKeypadDescription(kKeypadDescriptionBasic),
 	fKeypad(NULL),
 
-#ifdef __HAIKU__
 	fCalcIcon(new BBitmap(BRect(0, 0, 15, 15), 0, B_RGBA32)),
-#else
-	fCalcIcon(new BBitmap(BRect(0, 0, 15, 15), 0, B_CMAP8)),
-#endif
 
 	fPopUpMenu(NULL),
 	fAutoNumlockItem(NULL),
@@ -496,12 +488,8 @@ CalcView::Draw(BRect updateRect)
 				FillRect(updateRect & expressionRect);
 			}
 
-			if (fCalcIcon->ColorSpace() == B_RGBA32) {
-				SetDrawingMode(B_OP_ALPHA);
-				SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
-			} else {
-				SetDrawingMode(B_OP_OVER);
-			}
+			SetDrawingMode(B_OP_ALPHA);
+			SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
 
 			BPoint iconPos;
 			iconPos.x = expressionRect.right - (expressionRect.Width()
