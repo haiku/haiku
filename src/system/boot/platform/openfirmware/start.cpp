@@ -126,8 +126,7 @@ start(void *openFirmwareEntry)
 	if (boot_arch_cpu_init() != B_OK)
 		of_exit();
 
-	if (init_real_time_clock() != B_OK)
-		of_exit();
+	init_real_time_clock();
 
 	// check for key presses once
 	sBootOptions = 0;
