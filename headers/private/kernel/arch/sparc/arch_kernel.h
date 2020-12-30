@@ -9,7 +9,11 @@
 #include <arch/cpu.h>
 
 // memory layout
-#define KERNEL_LOAD_BASE_64_BIT 0xffffffff80000000ll
+// FIXME: On sparc, the kernel should live in an independent address space,
+// and does not share addresses with userspace. So, a lot of this doesn't
+// really make sense. See #19597 for discussion.
+// The consequence is that IS_USER_MEMORY cannot work in the way we need.
+#define KERNEL_LOAD_BASE_64_BIT 0x80000000ll
 
 // Base of the kernel address space.
 // KERNEL_BASE is the base of the kernel address space. This differs from the

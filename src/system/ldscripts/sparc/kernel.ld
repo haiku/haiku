@@ -13,7 +13,7 @@ PHDRS
 
 SECTIONS
 {
-	. = 0xFFFFFFFF80000000 + SIZEOF_HEADERS;
+	. = 0x80000000 + SIZEOF_HEADERS;
 
 	.interp : { *(.interp) } : text
 	.hash : { *(.hash) }
