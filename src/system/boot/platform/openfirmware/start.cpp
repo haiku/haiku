@@ -45,13 +45,27 @@ call_ctors(void)
 }
 
 
+static addr_t
+get_kernel_entry(void)
+{
+	if (gKernelArgs.kernel_image->elf_class == ELFCLASS64) {
+		preloaded_elf64_image *image = static_cast<preloaded_elf64_image *>(
+			gKernelArgs.kernel_image.Pointer());
+		return image->elf_header.e_entry;
+	} else if (gKernelArgs.kernel_image->elf_class == ELFCLASS32) {
+		preloaded_elf32_image *image = static_cast<preloaded_elf32_image *>(
+			gKernelArgs.kernel_image.Pointer());
+		return image->elf_header.e_entry;
+	}
+	panic("Unknown kernel format! Not 32-bit or 64-bit!");
+	return 0;
+}
+
+
 extern "C" void
 platform_start_kernel(void)
 {
-	preloaded_elf32_image* image = static_cast<preloaded_elf32_image*>(
-		gKernelArgs.kernel_image.Pointer());
-
-	addr_t kernelEntry = image->elf_header.e_entry;
+	addr_t kernelEntry = get_kernel_entry();
 	addr_t stackTop = gKernelArgs.cpu_kstack[0].start
 		+ gKernelArgs.cpu_kstack[0].size;
 
