@@ -7,15 +7,30 @@
 #include <boot/platform.h>
 #include <boot/menu.h>
 #include <boot/platform/generic/text_menu.h>
+#include <platform/openfirmware/openfirmware.h>
+
+
+static bool
+of_exit_hook(Menu *menu, MenuItem *item)
+{
+	of_exit();
+	return true;
+}
 
 
 void
 platform_add_menus(Menu *menu)
 {
-	// ToDo: implement me!
+	MenuItem* item;
 
 	switch (menu->Type()) {
 		case MAIN_MENU:
+			item = new(std::nothrow) MenuItem("Exit to OpenFirmware");
+			if (item != NULL) {
+				menu->AddItem(item);
+				item->SetTarget(of_exit_hook);
+				item->SetShortcut('q');
+			}
 			break;
 		case SAFE_MODE_MENU:
 			break;
