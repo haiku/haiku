@@ -178,6 +178,12 @@ StyledEditWindow::MessageReceived(BMessage* message)
 	}
 
 	switch (message->what) {
+		case MENU_NEW:
+			 // this is because of the layout menu change,
+			 // it is too early to connect to a different looper there
+			 // so either have to redirect it here, or change the invocation
+			be_app->PostMessage(message);
+			break;
 		// File menu
 		case MENU_SAVE:
 			if (!fSaveMessage)
