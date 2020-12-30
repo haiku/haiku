@@ -272,10 +272,11 @@ ELFLoader<Class>::Load(int fd, preloaded_image* _image)
 			B_PAGE_SIZE);
 		region->delta = -region->start;
 
-		TRACE(("segment %ld: start = 0x%llx, size = %llu, delta = %llx\n", i,
-			(uint64)region->start, (uint64)region->size,
-			(int64)(AddrType)region->delta));
+		TRACE(("segment %" B_PRId32 ": start = 0x%" B_PRIx64 ", size = %"
+			B_PRIu64 ", delta = %" B_PRIx64 "\n", i, (uint64)region->start,
+			(uint64)region->size, (int64)(AddrType)region->delta));
 	}
+
 
 	// found both, text and data?
 	if (image->data_region.size == 0 || image->text_region.size == 0) {
@@ -311,11 +312,13 @@ ELFLoader<Class>::Load(int fd, preloaded_image* _image)
 	image->data_region.delta += image->data_region.start;
 	image->text_region.delta += image->text_region.start;
 
-	TRACE(("text: start 0x%llx, size 0x%llx, delta 0x%llx\n",
-		(uint64)image->text_region.start, (uint64)image->text_region.size,
+	TRACE(("text: start 0x%" B_PRIx64 ", size 0x%" B_PRIx64 ", delta 0x%"
+		B_PRIx64 "\n", (uint64)image->text_region.start,
+		(uint64)image->text_region.size,
 		(int64)(AddrType)image->text_region.delta));
-	TRACE(("data: start 0x%llx, size 0x%llx, delta 0x%llx\n",
-		(uint64)image->data_region.start, (uint64)image->data_region.size,
+	TRACE(("data: start 0x%" B_PRIx64 ", size 0x%" B_PRIx64 ", delta 0x%"
+		B_PRIx64 "\n", (uint64)image->data_region.start,
+		(uint64)image->data_region.size,
 		(int64)(AddrType)image->data_region.delta));
 
 	// load program data
@@ -334,8 +337,8 @@ ELFLoader<Class>::Load(int fd, preloaded_image* _image)
 		else
 			continue;
 
-		TRACE(("load segment %ld (%llu bytes) mapped at %p...\n", i,
-			(uint64)header.p_filesz, Class::Map(region->start)));
+		TRACE(("load segment %" PRId32 " (%" PRIu64 " bytes) mapped at %p...\n",
+			i, (uint64)header.p_filesz, Class::Map(region->start)));
 
 		length = read_pos(fd, header.p_offset,
 			Class::Map(region->start + (header.p_vaddr % B_PAGE_SIZE)),
@@ -540,7 +543,7 @@ ELFLoader<Class>::_LoadSymbolTable(int fd, ImageType* image)
 		goto error3;
 	}
 
-	TRACE(("loaded %ld debug symbols\n", numSymbols));
+	TRACE(("loaded %" B_PRIu32 " debug symbols\n", numSymbols));
 
 	// insert tables into image
 	image->debug_symbols = symbolTable;
