@@ -8,7 +8,6 @@
 
 
 #include <arch/riscv64/arch_thread_types.h>
-//#include <arch/riscv64/cpu.h>
 #include <kernel.h>
 
 

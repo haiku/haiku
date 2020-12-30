@@ -8,7 +8,6 @@
 
 
 #include <arch/sparc/arch_thread_types.h>
-#include <arch/sparc/cpu.h>
 #include <kernel.h>
 
 
