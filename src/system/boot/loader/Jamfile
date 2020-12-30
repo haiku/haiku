@@ -58,7 +58,10 @@ for platform in [ MultiBootSubDirSetup ] {
 							_BOOT_PLATFORM_EFI
 						;
 					} else {
-						DEFINES += BOOT_SUPPORT_ELF32 ;
+						DEFINES +=
+							_BOOT_PLATFORM_BIOS
+							BOOT_SUPPORT_ELF32
+						;
 					}
 				}
 				case "sparc" :
