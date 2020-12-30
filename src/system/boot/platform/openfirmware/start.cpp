@@ -23,7 +23,7 @@
 #include "real_time_clock.h"
 
 
-#define HEAP_SIZE 65536
+#define HEAP_SIZE (512 * 1024)
 
 
 // GCC defined globals
