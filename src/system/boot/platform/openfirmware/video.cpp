@@ -15,7 +15,7 @@
 //#define TRACE_VIDEO
 
 
-static int sScreen;
+static intptr_t sScreen;
 
 
 void
@@ -58,10 +58,10 @@ platform_switch_to_logo(void)
 	if (sScreen == OF_FAILED)
 		return;
 
-	int package = of_instance_to_package(sScreen);
+	intptr_t package = of_instance_to_package(sScreen);
 	if (package == OF_FAILED)
 		return;
-	uint32 width, height;
+	uintptr_t width, height;
 	if (of_call_method(sScreen, "dimensions", 0, 2, &height, &width)
 			== OF_FAILED) {
 		if (of_getprop(package, "width", &width, sizeof(int32)) == OF_FAILED)
