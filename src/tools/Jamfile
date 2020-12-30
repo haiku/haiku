@@ -106,6 +106,7 @@ SubInclude HAIKU_TOP src tools hvif2png ;
 SubInclude HAIKU_TOP src tools keymap ;
 SubInclude HAIKU_TOP src tools locale ;
 SubInclude HAIKU_TOP src tools makebootable ;
+SubInclude HAIKU_TOP src tools mbrtool ;
 SubInclude HAIKU_TOP src tools opd_to_package_info ;
 SubInclude HAIKU_TOP src tools package ;
 SubInclude HAIKU_TOP src tools package_repo ;
