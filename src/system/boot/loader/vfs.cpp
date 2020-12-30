@@ -250,20 +250,30 @@ Directory::Lookup(const char* name, bool traverseLinks)
 		return node;
 
 	// the node is a symbolic link, so we have to resolve the path
-	char linkPath[B_PATH_NAME_LENGTH];
-	status_t error = node->ReadLink(linkPath, sizeof(linkPath));
+	char* linkPath = (char*)malloc(B_PATH_NAME_LENGTH);
+	if (linkPath == NULL) {
+		node->Release();
+		return NULL;
+	}
+
+	status_t error = node->ReadLink(linkPath, B_PATH_NAME_LENGTH);
 
 	node->Release();
 		// we don't need this one anymore
 
-	if (error != B_OK)
+	if (error != B_OK) {
+		free(linkPath);
 		return NULL;
+	}
 
 	// let open_from() do the real work
 	int fd = open_from(this, linkPath, O_RDONLY);
-	if (fd < 0)
+	if (fd < 0) {
+		free(linkPath);
 		return NULL;
+	}
 
+	free(linkPath);
 	node = get_node_from(fd);
 	if (node != NULL)
 		node->Acquire();
@@ -1039,34 +1049,48 @@ open_from(Directory *directory, const char *name, int mode, mode_t permissions)
 		name++;
 	}
 
-	char path[B_PATH_NAME_LENGTH];
-	if (strlcpy(path, name, sizeof(path)) >= sizeof(path))
+	char* path = (char*)malloc(B_PATH_NAME_LENGTH);
+	if (path == NULL)
+		return B_NO_MEMORY;
+
+	if (strlcpy(path, name, B_PATH_NAME_LENGTH) >= B_PATH_NAME_LENGTH) {
+		free(path);
 		return B_NAME_TOO_LONG;
+	}
 
 	Node *node;
 	status_t error = get_node_for_path(directory, path, &node);
 	if (error != B_OK) {
-		if (error != B_ENTRY_NOT_FOUND)
+		if (error != B_ENTRY_NOT_FOUND) {
+			free(path);
 			return error;
+		}
 
-		if ((mode & O_CREAT) == 0)
+		if ((mode & O_CREAT) == 0) {
+			free(path);
 			return B_ENTRY_NOT_FOUND;
+		}
 
 		// try to resolve the parent directory
-		strlcpy(path, name, sizeof(path));
+		strlcpy(path, name, B_PATH_NAME_LENGTH);
 		if (char* lastSlash = strrchr(path, '/')) {
-			if (lastSlash[1] == '\0')
+			if (lastSlash[1] == '\0') {
+				free(path);
 				return B_ENTRY_NOT_FOUND;
+			}
 
 			*lastSlash = '\0';
 			name = lastSlash + 1;
 
 			// resolve the directory
-			if (get_node_for_path(directory, path, &node) != B_OK)
+			if (get_node_for_path(directory, path, &node) != B_OK) {
+				free(path);
 				return B_ENTRY_NOT_FOUND;
+			}
 
 			if (node->Type() != S_IFDIR) {
 				node->Release();
+				free(path);
 				return B_NOT_A_DIRECTORY;
 			}
 
@@ -1078,16 +1102,20 @@ open_from(Directory *directory, const char *name, int mode, mode_t permissions)
 		error = directory->CreateFile(name, permissions, &node);
 		directory->Release();
 
-		if (error != B_OK)
+		if (error != B_OK) {
+			free(path);
 			return error;
+		}
 	} else if ((mode & O_EXCL) != 0) {
 		node->Release();
+		free(path);
 		return B_FILE_EXISTS;
 	}
 
 	int fd = open_node(node, mode);
 
 	node->Release();
+	free(path);
 	return fd;
 }
 
