@@ -28,6 +28,22 @@ platform_allocate_region(void **_address, size_t size, uint8 protection,
 }
 
 
+extern "C" status_t
+platform_bootloader_address_to_kernel_address(void *address, addr_t *_result)
+{
+	*_result = (addr_t)address;
+	return B_OK;
+}
+
+
+extern "C" status_t
+platform_kernel_address_to_bootloader_address(addr_t address, void **_result)
+{
+	*_result = (void*)address;
+	return B_OK;
+}
+
+
 status_t
 platform_free_region(void *address, size_t size)
 {

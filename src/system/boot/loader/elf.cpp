@@ -152,7 +152,7 @@ struct ELF64Class {
 #else
 		void *result;
 		if (platform_kernel_address_to_bootloader_address(address, &result) != B_OK) {
-			panic("Couldn't convert address %#lx", address);
+			panic("Couldn't convert address %#" PRIx64, address);
 		}
 		return result;
 #endif
