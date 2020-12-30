@@ -909,7 +909,7 @@ update_fsinfo(nspace *vol)
 static status_t
 get_fsinfo(nspace *vol, uint32 *free_count, uint32 *last_allocated)
 {
-	char *buffer;
+	uchar *buffer;
 	status_t result;
 
 	if ((vol->fat_bits != 32) || (vol->fsinfo_sector == 0xffff))
