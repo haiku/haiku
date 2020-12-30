@@ -296,10 +296,14 @@ ELFLoader<Class>::Load(int fd, preloaded_image* _image)
 	// can automatically allocate an address, but shall prefer the specified
 	// base address.
 	totalSize = secondRegion->start + secondRegion->size - firstRegion->start;
-	if (Class::AllocateRegion(&firstRegion->start, totalSize,
-			B_READ_AREA | B_WRITE_AREA, &mappedRegion) != B_OK) {
-		status = B_NO_MEMORY;
-		goto error1;
+	{
+		AddrType address = firstRegion->start;
+		if (Class::AllocateRegion(&address, totalSize,
+				B_READ_AREA | B_WRITE_AREA, &mappedRegion) != B_OK) {
+			status = B_NO_MEMORY;
+			goto error1;
+		}
+		firstRegion->start = address;
 	}
 
 	// initialize the region pointers to the allocated region
