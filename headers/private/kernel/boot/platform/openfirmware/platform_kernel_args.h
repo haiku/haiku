@@ -13,8 +13,8 @@
 #define SMP_MAX_CPUS 1
 	// TODO: Until inline kernel atomic code for ppc is fixed
 
-#define MAX_PHYSICAL_MEMORY_RANGE 4
-#define MAX_PHYSICAL_ALLOCATED_RANGE 8
+#define MAX_PHYSICAL_MEMORY_RANGE 32
+#define MAX_PHYSICAL_ALLOCATED_RANGE 32
 #define MAX_VIRTUAL_ALLOCATED_RANGE 32
 
 
