@@ -89,7 +89,7 @@ boot_arch_cpu_init(void)
 
 	// allocate the kernel stacks (the memory stuff is already initialized
 	// at this point)
-	addr_t stack = (addr_t)arch_mmu_allocate((void*)0x80000000,
+	addr_t stack = (addr_t)arch_mmu_allocate(NULL,
 		cpuCount * (KERNEL_STACK_SIZE + KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE),
 		B_READ_AREA | B_WRITE_AREA, false);
 	if (!stack) {
