@@ -16,17 +16,11 @@
 extern "C" {
 #endif
 
-void ppc_push_iframe(struct iframe_stack *stack, struct iframe *frame);
-void ppc_pop_iframe(struct iframe_stack *stack);
-struct iframe *ppc_get_user_iframe(void);
-
-
 static inline Thread *
 arch_thread_get_current_thread(void)
 {
     Thread *t;
-    //asm volatile("mfsprg2 %0" : "=r"(t));
-	t = NULL;
+    asm volatile("mov %%g7, %0" : "=r"(t));
     return t;
 }
 
@@ -34,7 +28,7 @@ arch_thread_get_current_thread(void)
 static inline void
 arch_thread_set_current_thread(Thread *t)
 {
-    //asm volatile("mtsprg2 %0" : : "r"(t));
+    asm volatile("mov %0,%%g7" : : "r"(t));
 }
 
 
