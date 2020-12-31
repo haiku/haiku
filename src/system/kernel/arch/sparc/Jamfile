@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src system kernel arch sparc ;
 
+UsePrivateKernelHeaders ;
+
 KernelMergeObject kernel_arch_sparc.o :
 	arch_asm.S
 	arch_commpage.cpp
