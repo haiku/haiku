@@ -410,6 +410,12 @@ rule KernelArchitectureSetup architecture
 			HAIKU_KERNEL_ADDON_LINKFLAGS += -z max-page-size=0x1000 ;
 			HAIKU_KERNEL_PIC_CCFLAGS = -fno-pic ;
 
+		case m68k :
+			# We don't want to have to handle emulating missing FPU opcodes for
+			# 040 and 060 in the kernel.
+			HAIKU_KERNEL_CCFLAGS += -m68020-60 ;
+			HAIKU_KERNEL_C++FLAGS += -m68020-60 ;
+
 		case ppc :
 			# Build a position independent PPC kernel. We need to be able to
 			# relocate the kernel, since the virtual address space layout at
@@ -417,17 +423,24 @@ rule KernelArchitectureSetup architecture
 			HAIKU_KERNEL_PIC_CCFLAGS = -fPIE ;
 			HAIKU_KERNEL_PIC_LINKFLAGS = -shared -fPIE ;
 
-		case m68k :
-			# We don't want to have to handle emulating missing FPU opcodes for
-			# 040 and 060 in the kernel.
-			HAIKU_KERNEL_CCFLAGS += -m68020-60 ;
-			HAIKU_KERNEL_C++FLAGS += -m68020-60 ;
-
 		case riscv64 :
 			# Kernel lives within any single 2 GiB address space.
 			# Default is medlow (-2GiB / +2GiB)
 			HAIKU_KERNEL_CCFLAGS += -mcmodel=medany ;
 			HAIKU_KERNEL_C++FLAGS += -mcmodel=medany ;
+
+		case sparc :
+			# The medlow code model is enough (64-bit addresses, programs must
+			# be linked in the low 32 bits of memory. Programs can be
+			# statically or dynamically linked.)
+			HAIKU_KERNEL_CCFLAGS += -mcmodel=medlow ;
+			HAIKU_KERNEL_C++FLAGS += -mcmodel=medlow ;
+
+			# Unfortunately it's not easy to make the kernel be
+			# position-independant, on sparc, that requires relocation support
+			# in the ELF loader to fill in the plt section.
+			HAIKU_KERNEL_PIC_CCFLAGS = -fPIE ;
+			HAIKU_KERNEL_PIC_LINKFLAGS = -shared -fPIE ;
 
 		case x86 :
 			HAIKU_KERNEL_PIC_CCFLAGS = -fno-pic ;
