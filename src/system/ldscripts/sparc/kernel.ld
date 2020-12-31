@@ -6,7 +6,7 @@ ENTRY(_start)
 PHDRS
 {
 	headers PT_PHDR PHDRS ;
-	text PT_LOAD FILEHDR PHDRS ;
+	text PT_LOAD FILEHDR PHDRS FLAGS(5) ;
 	data PT_LOAD ;
 	dynamic PT_DYNAMIC ;
 }
@@ -42,8 +42,8 @@ SECTIONS
 	.altcodepatch : { *(.altcodepatch) }
 	altcodepatch_end = .;
 
-	/* writable data */
-	. = ALIGN (0x1000);
+	/* writable data - in a separate page for memory protection purposes */
+	. = ALIGN (0x2000);
 	__data_start = .;
 	.data : { *(.data .data.* .gnu.linkonce.d.*) } :data
 
@@ -58,10 +58,12 @@ SECTIONS
 	.dynamic : { *(.dynamic) } :dynamic :data
 	
 	/* uninitialized data (in same segment as writable data) */
+	. = ALIGN(0x8);
 	__bss_start = .;
 	.bss : { *(.bss .bss.* .gnu.linkonce.b.*) } :data
 
-	. = ALIGN(0x1000);
+	/* make sure to end on a page boundary */
+	. = ALIGN(0x2000);
 	_end = . ;
 
 	/* Strip unnecessary stuff */
