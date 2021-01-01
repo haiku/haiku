@@ -7,6 +7,7 @@
 
 #include <boot/platform.h>
 #include <boot/stage2.h>
+#include <boot/platform/generic/text_console.h>
 #include <boot/platform/generic/video.h>
 #include <edid.h>
 #include <platform/openfirmware/openfirmware.h>
@@ -86,6 +87,10 @@ platform_switch_to_logo(void)
 	gKernelArgs.frame_buffer.height = height;
 	gKernelArgs.frame_buffer.depth = depth;
 	gKernelArgs.frame_buffer.bytes_per_row = lineBytes;
+
+	// Move text to top of display so we don't scroll the boot logo out as soon
+	// as we display some text
+	console_set_cursor(0, 0);
 
 	dprintf("video mode: %ux%ux%u\n", gKernelArgs.frame_buffer.width,
 		gKernelArgs.frame_buffer.height, gKernelArgs.frame_buffer.depth);
