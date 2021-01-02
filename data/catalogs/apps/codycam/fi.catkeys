@@ -1,6 +1,7 @@
-1	finnish	x-vnd.Haiku-CodyCam	40716723
+1	finnish	x-vnd.Haiku-CodyCam	12021044
 destination directory expected	CodyCam		odotettiin kohdehakemistoa
 reply: '%s'\n	SftpClient		vastaus: ’%s’\n
+PASS <suppressed>  (real password sent)	FtpClient		SALASANA <salattu>  (oikea salasana lähetetty)
 JPEG image	CodyCam		JPEG-kuva
 Remote host has closed the connection.\n	FtpClient		Etäpää sulki yhteyden.\n
 image file format expected	CodyCam		odotettiin kuvatiedostomuotoa

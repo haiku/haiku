@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	3669766136
+1	finnish	x-vnd.Haiku-libtracker	2498612740
 Created	ContainerWindow		Luotu
 Icon	AttributesView		Kuvake
 Open and make preferred	OpenWithWindow		Avaa ja tee ensisijaiseksi
@@ -270,6 +270,7 @@ home	B_USER_DIRECTORY		koti
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Seuraajan uudet mallinteet
 Disk mounting during boot	AutoMounterSettings		Levyn liittäminen käynnistyksen aikana
 Don't automount	AutoMounterSettings		Älä liitä automaattisesti
+Node ref	AttributesView		Solmuviite
 Could not find application \"%appname\"	OpenWithWindow		Sovelluksen ”%appname” löytäminen epäonnistui
 Unmatched parenthesis.	libtracker		Parittomat sulkeet.
 Extended attribute	AttributesView		Laajennettu attribuutti
@@ -520,6 +521,7 @@ Create a Query	FindPanel		Luo kysely
 Close	QueryContainerWindow		Sulje
 I know what I'm doing	FSUtils	button label	Tiedän, mitä olen tekemässä
 Preparing to copy items…	StatusWindow		Valmistaudutaan kopioimaan kohteita...
+Entry ref	AttributesView		Aloitusviite
 Icon view	ContainerWindow		Kuvakenäkymä
 Name	ContainerWindow		Nimi
 Preferred for %type	OpenWithWindow		Ensisijainen tyypille %type

@@ -6,8 +6,8 @@ Use hardware video overlays if available	MediaPlayer-SettingsWindow		Апара�
 Audio	MediaPlayer-InfoWin		Аудіо
 Subtitle placement:	MediaPlayer-SettingsWindow		Розміщення субтитрів:
 MediaPlayer	System name		MediaPlayer
-Audio track	MediaPlayer-Main		Аудіо трек
-Muted	MediaPlayer-SettingsWindow		Приглушений
+Audio track	MediaPlayer-Main		Аудіотрек
+Muted	MediaPlayer-SettingsWindow		Без звуку
 OK	MediaPlayer-RemovePLItemsCmd		ОК
 Open Playlist	MediaPlayer-PlaylistWindow		Відкрити список відтворення
 Subtitles	MediaPlayer-Main		Субтитри
@@ -27,13 +27,13 @@ Import Entries	MediaPlayer-ImportPLItemsCmd		Імпортувати записи
 Open network stream	MediaPlayer-Main		Відкрити мережевий потік
 Move file to Trash	MediaPlayer-PlaylistWindow		Перемістити до смітника
 Open file…	MediaPlayer-Main		Відкрити файл…
-Scale controls in full screen mode	MediaPlayer-SettingsWindow		Управління маштабом в повноекранному режимі
+Scale controls in full screen mode	MediaPlayer-SettingsWindow		Масштабувати кнопки керування в повноекранному режимі
 View options	MediaPlayer-SettingsWindow		Опції перегляду
 %d kHz	MediaPlayer-InfoWin		%d кГц
 Full volume	MediaPlayer-SettingsWindow		Повна гучність
 <untitled>	PlaylistItem-title		<без імені>
 Start media server	MediaPlayer-Main		Запустити Медіа сервер
-It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Схоже медіа сервер не працює.\nБажаєте запустити його?
+It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Схоже, медіа сервер не працює.\nБажаєте запустити його?
 Location	MediaPlayer-InfoWin		Шлях
 Opening '%s'.	MediaPlayer-Main		Відкриття '%s'.
 Medium	MediaPlayer-SettingsWindow		Середній
@@ -50,10 +50,10 @@ Copyright	MediaPlayer-InfoWin		Авторське право
 Invalid URL inserted!	MediaPlayer-NetworkStream		Помилка введення URL!
 Aspect ratio	MediaPlayer-Main		Співідношення сторін
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Збій збереження списку відтворення.\n\nПомилка: 
-<no media>	MediaPlayer-InfoWin		<немає даних>
+<no media>	MediaPlayer-InfoWin		<відсутні медіа>
 Hide interface	MediaPlayer-Main		Приховати інтерфейс
 Error: 	MediaPlayer-Main		Помилка: 
-Video track	MediaPlayer-Main		Відео трек
+Video track	MediaPlayer-Main		Відеокліп
 Playlist…	MediaPlayer-Main		Список відтворення…
 <unnamed media>	MediaPlayer-InfoWin		<неназване медіа>
 Save	MediaPlayer-PlaylistWindow		Зберегти
@@ -84,7 +84,7 @@ Total duration: %s	MediaPlayer-PlaylistWindow		Загальна триваліс
 %.3f kHz	MediaPlayer-InfoWin		%.3f кГц
 Move into trash error	MediaPlayer-RemovePLItemsCmd		Помилка переміщення до смітника
 50% scale	MediaPlayer-Main		Масштаб 50%
-Drop files to play	MediaPlayer-Main		Скинути файли для відтворення
+Drop files to play	MediaPlayer-Main		Перетягніть файли для відтворення
 Copy Entry	MediaPlayer-CopyPLItemsCmd		Копіювати запис
 Close window after playing audio	MediaPlayer-SettingsWindow		Закрити вікно після відтворення звуку
 Edit	MediaPlayer-PlaylistWindow		Редагувати
@@ -128,10 +128,10 @@ Internal error (locking failed). Saving the playlist failed.	MediaPlayer-Playlis
 Bad URL	MediaPlayer-NetworkStream		Недійсний URL
 Save	MediaPlayer-Main		Зберегти
 Close window after playing video	MediaPlayer-SettingsWindow		Закрити вікно після відтворення відео
-Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Масштаб зображення зглажений (без режиму накладання)
+Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Плавно масштабувати відео (без режиму накладання)
 200% scale	MediaPlayer-Main		Масштаб 200%
 The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Файл '%filename' неможливо відкрити.\n\n
-None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Жоден з файлів, які Ви хотіли відкрити не є медіа файлом.
+None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Жоден із файлів, які Ви хотіли відтворити не є файлом медіа.
 Remove Entry	MediaPlayer-RemovePLItemsCmd		Видалити запис
 Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Вилучити записи до смітника
 Subtitle size:	MediaPlayer-SettingsWindow		Розмір субтитрів:

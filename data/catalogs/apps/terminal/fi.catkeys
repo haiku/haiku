@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Terminal	2277843400
+1	finnish	x-vnd.Haiku-Terminal	3117643489
 Close other tabs	Terminal TermWindow		Sulje muut välilehdet
 Insert path	Terminal TermView		Lisää polku
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Komentotulkin käynnistäminen Pääteikkunassa epäonnistui.
@@ -10,6 +10,7 @@ Confirm exit if active programs exist	Terminal AppearancePrefView		Vahvista pois
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tAktiivin prosessin nykyinen työhakemisto nykyisessä\n\t\t\tvälilehdessä. Valinnaisesti määriteltävien polkukomponenttien\n\t\t\tenimmäismäärä. Esim.: '%2d' enintään kahdelle komponentille.\n\t%T\t-\tPääteikkunasovelluksen nimi nykyisessä paikallisasetuksessa.\n\t%e\t-\tNykyisen välilehden koodaus. Ei näytetä UTF-8-koodaukselle.\n\t%i\t-\tIkkunahakemisto.\n\t%p\t-\tAktiivin prosessin nimi nykyisessä välilehdessä.\n\t%t\t-\tNykyisen välilehden otsikko.
 Solarized Dark	Terminal colors scheme		Käänteisen tumma
 Copy	Terminal TermWindow		Kopioi
+  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory	Terminal TermApp		  -h,     --help               tulosta tämä ohje\n  -t,     --title              asta ikkunan otsikko\n  -f,     --fullscreen         käynnistä kokonäyttö\n  -w,     --working-directory  aseta alustaa työhakemisto
 Retro	Terminal colors scheme		Retro
 Edit tab title…	Terminal TermWindow		Muokkaa välilehtiotsikkoa...
 Print	Terminal TermWindow		Tulosta

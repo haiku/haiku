@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	463433416
+1	hungarian	x-vnd.Haiku-HaikuDepot	364897767
 Repository update error	LocalRepositoryUpdateProcess		Tároló frissítési hiba
 Network error	ServerHelper		Hálózati hiba
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Hiba történt a tároló frissítésekor: %error%
@@ -19,6 +19,7 @@ You have successfully authenticated as user %Nickname%.	UserLoginWindow		Sikeres
 No user ratings available.	PackageInfoView		Felhasználói értékelés nem áll rendelkezésre.
 Downloading package '%name%'	WorkStatusView		Csomag letöltése: '%name%'
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Nem sikerült kinyerni a captcha információt az elküldött adatokból.
+A network transport error has arisen communicating with the server system: %s	ServerHelper		Hálózati hiba lépett fel a szerverrel való kommunikáció során: %s
 Rating	PackageListView		Értékelés
 Synchronizing icons	ServerIconExportUpdateProcess		Ikonok szinkronizálása
 Show	MainWindow		Megjelenítés

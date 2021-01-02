@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Keymap	1075970008
+1	finnish	x-vnd.Haiku-Keymap	2850776429
 Key	Modifier keys window	As in a computer keyboard key	Näppäin
 Japanese	KeymapNames		Japanilainen
 US	KeymapNames		US
@@ -6,6 +6,7 @@ PG ↑	Keyboard Layout View	Very short for 'page up'	PG ↑
 Brazilian	KeymapNames		Brasilialainen
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (US)
 Right control	Keyboard Layout View		Oikea control-näppäin
+X-Bows Nature	KeyboardLayoutNames		X-Bows Nature
 Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Valitsin:
 Cancel	Modifier keys window		Peru
@@ -89,6 +90,7 @@ Esperanto	KeymapNames		Esperantolainen
 Belarusian	KeymapNames		Valkovenäläinen
 Warning: left and right key roles do not match	Modifier keys window		Varoitus: vasemman ja oikean näppäimen roolit eivät täsmää
 Circumflex trigger	Keymap window		Sirkumfleksiliipaisin
+Fizzbook NL2	KeyboardLayoutNames		Fizzbook NL2
 Caps lock	Keyboard Layout View		Vaihtolukko
 Left shift	Keyboard Layout View		Vasen vaihtonäppäin
 Russian (Yawert)	KeymapNames		Venäläinen (Yawert)

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-CharacterMap	2768977330
+1	finnish	x-vnd.Haiku-CharacterMap	2410613018
 Tirhuta	UnicodeBlocks		Tirhuta
 Miscellaneous mathematical symbols B	UnicodeBlocks		Sekalaiset matemaattiset symbolit B
 Latin extended E	UnicodeBlocks		Latinalainen laajennettu E
@@ -238,6 +238,7 @@ Supplementary private use area A	UnicodeBlocks		Lisäyksityiskäyttöalue A
 Armenian	UnicodeBlocks		Armenian kieli
 Miscellaneous symbols and pictographs	UnicodeBlocks		Sekalaiset symbolit ja piktografit
 Phags-pa	UnicodeBlocks		Phags-pa
+Nabataean	UnicodeBlocks		Nabataean
 Meetei Mayek	UnicodeBlocks		Meetei Mayek
 CJK compatibility ideographs	UnicodeBlocks		CJK-yhteesopivuusideogrammit
 Show private blocks	CharacterWindow		Näytä yksityislohkot
@@ -289,6 +290,7 @@ Elbasan	UnicodeBlocks		Elbasan
 Hangul compatibility Jamo	UnicodeBlocks		Hangul-yhteensopiva Jamo
 Phonetic extensions supplement	UnicodeBlocks		Foneettinen laajennustäydennys
 CJK unified ideographs extension E	UnicodeBlocks		CJK-yhtenäinen ideografilaajennus E
+Nüshu	UnicodeBlocks		Nüshu
 Old Persian	UnicodeBlocks		Vanha persia
 Malayalam	UnicodeBlocks		Malayalam
 CJK radicals supplement	UnicodeBlocks		CJK-perustäydennys

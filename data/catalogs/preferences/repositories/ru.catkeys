@@ -31,7 +31,7 @@ Failed	TaskLooper	Failed task status message	Ошибка
 Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	Хорошие новости! Задача для репозитория %name% завершена.
 Some tasks are still running. Stop these tasks and quit?	RepositoriesWindow	Application quit alert message	Некоторые задачи еще выполняются. Остановить их и выйти?
 This repository URL already exists.	RepositoriesView	Error message	URL-адрес этого репозитория уже существует.
-Repositories	System name		Репозиториии
+Repositories	System name		Репозитории
 Changes pending:	RepositoriesView	Status view text	Ожидаются изменения:
 Remove	RepositoriesView	Button label	Удалить
 Remove these repositories?	RepositoriesView	Removal alert confirmation message	Удалить эти репозитории?

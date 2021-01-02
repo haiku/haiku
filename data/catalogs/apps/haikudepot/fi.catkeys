@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-HaikuDepot	2792101273
+1	finnish	x-vnd.Haiku-HaikuDepot	412302812
 Repository update error	LocalRepositoryUpdateProcess		Tietovaraston päivitysvirhe
 Network error	ServerHelper		Verkkovirhe
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Tietovaraston päivityksen yhteydessä tapahtui virhe: %error%
@@ -97,6 +97,7 @@ Close	UserLoginWindow		Sulje
 Close	RatePackageWindow		Sulje
 An unexpected error has been sent from the server [%i]	ServerHelper		Palvelin [%i] lähetti odottamattoman virheen
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synkronoidaan pakkaustietoja tietovarastolle '%REPO_NAME%'
+An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Ilmeni virhe ladattaessa käyttöehtoja, jotka vaaditaan uuden käyttäjän luomiseksi. Tarkista yksityiskohdat lokitiedostosta ja yritä uudelleen. \nTieto siitä, kuinka lokitiedostoa katsotaan, on saatavilla Haiku-käyttöohjeen HaikuVarasto-osasta.
 View the usage conditions	UserLoginWindow		Katso käyttöehtoja
 Login issue	MainWindow		Kirjautumispulma
 Size	PackageListView		Koko
@@ -107,6 +108,7 @@ All categories	FilterView		Kaikki luokat
 Repositories	MainWindow		Tietovarastot
 n/a	PackageInfoView		–
 This rating is visible to other users	RatePackageWindow		Tämä arvosana näkyy muille käyttäjille
+While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		Pakkaustietoja päivitettäessä ilmeni pulma, joka voi aiheuttaa tietojen olevan vanhentuneita tai niiden puuttuvan sovelluksen näytöltä. Lisätietoja koskien tätä pulmaa on saatavilla sovelluksen lokitiedostosta.\nTieto lokitiedostojen katselemista on saatavilla Haikun käyttöohjeen HaikuVarasto-osasta.
 View agreed usage conditions…	MainWindow		Katso hyväksyttyjä käyttöehtoja…
 Cancel	MainWindow		Peru
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 lisää ladattavaksi)}other{(# lisää ladattavaksi)}}

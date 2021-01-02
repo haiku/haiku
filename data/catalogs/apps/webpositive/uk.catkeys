@@ -10,17 +10,17 @@ Script console	WebPositive Window		Консоль сценаріїв
 Fonts	Settings Window		Шрифти
 Path	Cookie Manager		Шлях
 Bookmarks	WebPositive Window		Закладки
-Use proxy server to connect to the internet	Settings Window		Використовувати проксі-сервер для під'єднання
+Use proxy server to connect to the internet	Settings Window		Використовувати проксі-сервер для підключення до інтернету
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url завантажився
-Auto-hide interface in full screen mode	Settings Window		Автоматично ховати інтерфейс в режимі повного екрану
+Auto-hide interface in full screen mode	Settings Window		Автоматично приховувати інтерфейс в повноекранному режимі
 There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Сталася помилка під час завантаження папки закладок.\n\nПомилка: %error
 Delete	Cookie Manager		Видалити
 (Finish: %date - Over %duration left)	Download Window		(Завершення: %date - Понад %duration залишилось)
-Open containing folder	Download Window		Відкрити папку, що містить
+Open containing folder	Download Window		Відкрити папку з файлом
 Find previous	WebPositive Window		Знайти попереднє
 Full screen	WebPositive Window		На весь екран
 Downloads in progress	WebPositive		Завантаження триває
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Ви бажаєте відкрити всі закладки %addedCount одразу?
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Ви бажаєте відкрити відразу %addedCount закладок?
 Copy URL to clipboard	Download Window		Копіювати до буферу обміну
 Clone current page	Settings Window		Клонувати поточну сторінку
 Start page:	Settings Window		Стартова сторінка:
@@ -39,7 +39,7 @@ Error opening downloads folder	Download Window		Помилка відкритт�
 Show bookmark bar	WebPositive Window		Показати панель закладок
 Find	WebPositive Window		Знайти
 Standard font:	Settings Window		Стандартний шрифт:
-Open download error	Download Window		Помилка відкриття завантаження
+Open download error	Download Window		Помилка відкриття завантаженого файлу
 General	Settings Window		Загальні
 New tabs:	Settings Window		Нові вкладки:
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url невдало
@@ -135,7 +135,7 @@ WebPositive	Download Window		WebPositive
 Zoom text only	WebPositive Window		Збільшити тільки текст
 Save page as…	WebPositive Window		Зберегти сторінку як…
 Page source error	WebPositive Window		Помилка в коді сторінки
-Auto-hide mouse pointer	Settings Window		Автоматично ховати курсор
+Auto-hide mouse pointer	Settings Window		Автоматично приховувати курсор
 Requesting %url	WebPositive Window		Запит %url
 Flags	Cookie Manager		Прапори
 Window	WebPositive Window		Вікно
@@ -145,7 +145,7 @@ Settings	WebPositive Window		Налаштування
 Clear	URL Bar		Очистити
 Loading %url	WebPositive Window		Завантаження %url
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Факт ґринджол: бій псюг вщух, з’їм шче яєць.
-Start up:	Settings Window		При старті:
+Start up:	Settings Window		При запуску:
 Confirmation	WebPositive Window		Підтвердження
 Session cookie	Cookie Manager		Сесійний файл cookie
 Open all	WebPositive Window		Відкрити всі

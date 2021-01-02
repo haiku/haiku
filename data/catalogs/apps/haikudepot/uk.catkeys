@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-HaikuDepot	2792101273
+1	ukrainian	x-vnd.Haiku-HaikuDepot	412302812
 Repository update error	LocalRepositoryUpdateProcess		Помилка оновлення репозитарія 
 Network error	ServerHelper		Помилка мережі
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Під час оновлення репозитарія сталася помилка: %error%
@@ -97,6 +97,7 @@ Close	UserLoginWindow		Закрити
 Close	RatePackageWindow		Закрити
 An unexpected error has been sent from the server [%i]	ServerHelper		Сервер надіслав у відповідь непередбачену помилку [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Синхронізую дані пакета з репозитарієм '%REPO_NAME%'
+An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		При завантаженні Умов використання, необхідних для створення нового користувача, виникла помилка. Ознайомтеся з даними журналу та повторіть спробу. \nІнформація про те, як переглядати журнали, доступна в розділі програми HaikuDepot посібника користувача Haiku.
 View the usage conditions	UserLoginWindow		Переглянути Умови користування
 Login issue	MainWindow		Проблема входу в систему
 Size	PackageListView		Розмір
@@ -107,6 +108,7 @@ All categories	FilterView		Всі категорії
 Repositories	MainWindow		Репозитарії
 n/a	PackageInfoView		немає
 This rating is visible to other users	RatePackageWindow		Цей рейтинг видно і іншим користувачам
+While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		Під час оновлення даних пакета виникла проблема, яка може призвести до відображення програмою недостовірних даних. Додаткові відомості про цю проблему можна отримати в журналах програми.\nІнформація про те, як переглядати журнали, доступна в розділі програми HaikuDepot посібника користувача Haiku.
 View agreed usage conditions…	MainWindow		Погоджені Умови користування…
 Cancel	MainWindow		Скасувати
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 більше для завантаження)}other{(# більше для завантаження)}}

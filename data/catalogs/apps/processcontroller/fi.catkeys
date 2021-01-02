@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-ProcessController	3123774187
+1	finnish	x-vnd.Haiku-ProcessController	415082887
 Error saving file	ProcessController		Virhe tallennettaessa tiedostoa
 Display priority	ProcessController		Näyttöprioriteetti
 That's no Fun!	ProcessController		Se ei ole hauskaa!
@@ -21,6 +21,7 @@ Restart Deskbar	ProcessController		Käynnistä Työpöytäpalkki uudelleen
 About ProcessController…	ProcessController		Ohjelmasta Prosessiohjain...
 Usage: %s [-deskbar]\n	ProcessController		Käyttö: %s [-deskbar]\n
 Please confirm	ProcessController		Vahvista
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr
 Urgent priority	ProcessController		Kiireellinen prioriteetti
 What do you want to do with the thread \"%s\"?	ProcessController		Mitä haluat tehdä säikeelle ”%s”?
 Idle priority	ProcessController		Joutokäyntiprioriteetti

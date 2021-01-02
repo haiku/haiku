@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-WebPositive	55235296
+1	russian	x-vnd.Haiku-WebPositive	1591513524
 Authentication required	Authentication Panel		Требуется авторизация
 Previous	WebPositive Window		Ранее
 (Finish: %date)	Download Window		(Завершение: %date)
@@ -129,6 +129,7 @@ Double-click or middle-click to open new tab.	Tab Manager		Нажатие сре
 Next	WebPositive Window		Далее
 Bookmark error	WebPositive Window		Ошибка закладки
 OK	WebPositive Window		OK
+(%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% из %expectedSize%, %rate%/s)
 WebPositive	Download Window		WebPositive
 Zoom text only	WebPositive Window		Масштабировать только текст
 Save page as…	WebPositive Window		Сохранить страницу как…
