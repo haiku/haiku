@@ -590,6 +590,22 @@ CommitTransactionHandler::_AddPackagesToActivate()
 		fAddedPackages.insert(package);
 
 		error = entry.MoveTo(&packagesDirectory);
+		if (error == B_FILE_EXISTS) {
+			error = _AssertEntriesAreEqual(entry, &packagesDirectory);
+			if (error == B_OK) {
+				// Packages are identical, no need to move.
+				// If the entry is not removed however, it will prevent
+				// the transaction directory from being removed later.
+				// We ignore failure to Remove() here, though.
+				entry.Remove();
+			} else if (error != B_FILE_EXISTS) {
+				ERROR("Failed to compare new package %s to existing file in "
+					"packages directory: %s\n", package->FileName().String(),
+					strerror(error));
+				// Restore original error to avoid confusion
+				error = B_FILE_EXISTS;
+			}
+		}
 		if (error != B_OK) {
 			fAddedPackages.erase(package);
 			ERROR("Failed to move new package %s to packages directory: %s\n",
@@ -1915,4 +1931,52 @@ CommitTransactionHandler::_TagPackageEntriesRecursively(BDirectory& directory,
 				nonDirectoriesOnly);
 		}
 	}
+}
+
+
+/*static*/ status_t
+CommitTransactionHandler::_AssertEntriesAreEqual(const BEntry& entry,
+	const BDirectory* directory)
+{
+	BFile a;
+	status_t status = a.SetTo(&entry, B_READ_ONLY);
+	if (status != B_OK)
+		return status;
+
+	BFile b;
+	status = b.SetTo(directory, entry.Name(), B_READ_ONLY);
+	if (status != B_OK)
+		return status;
+
+	off_t aSize;
+	status = a.GetSize(&aSize);
+	if (status != B_OK)
+		return status;
+
+	off_t bSize;
+	status = b.GetSize(&bSize);
+	if (status != B_OK)
+		return status;
+
+	if (aSize != bSize)
+		return B_FILE_EXISTS;
+
+	const size_t bufferSize = 4096;
+	uint8 aBuffer[bufferSize];
+	uint8 bBuffer[bufferSize];
+
+	while (aSize > 0) {
+		ssize_t aRead = a.Read(aBuffer, bufferSize);
+		ssize_t bRead = b.Read(bBuffer, bufferSize);
+		if (aRead < 0 || aRead != bRead)
+			return B_FILE_EXISTS;
+		if (memcmp(aBuffer, bBuffer, aRead) != 0)
+			return B_FILE_EXISTS;
+		aSize -= aRead;
+	}
+
+	INFORM("CommitTransactionHandler::_AssertEntriesAreEqual(): "
+		"Package file '%s' already exists in target folder "
+		"with equal contents\n", entry.Name());
+	return B_OK;
 }

@@ -156,6 +156,9 @@ private:
 									BDirectory& directory, const BString& value,
 									bool nonDirectoriesOnly);
 
+	static	status_t			_AssertEntriesAreEqual(const BEntry& entry,
+									const BDirectory* directory);
+
 private:
 			Volume*				fVolume;
 			PackageFileManager*	fPackageFileManager;
