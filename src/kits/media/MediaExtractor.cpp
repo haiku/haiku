@@ -14,17 +14,16 @@
 #include <string.h>
 
 #include <Autolock.h>
+#include <InterfacePrivate.h>
 
 #include "ChunkCache.h"
 #include "MediaDebug.h"
+#include "MediaMisc.h"
 #include "PluginManager.h"
 
 
 // should be 0, to disable the chunk cache set it to 1
 #define DISABLE_CHUNK_CACHE 0
-
-
-static const size_t kMaxCacheBytes = 3 * 1024 * 1024;
 
 
 class MediaExtractorChunkProvider : public ChunkProvider {
@@ -93,15 +92,9 @@ MediaExtractor::_Init(BDataIO* source, int32 flags)
 		fStreamInfo[i].hasCookie = false;
 		fStreamInfo[i].infoBuffer = 0;
 		fStreamInfo[i].infoBufferSize = 0;
-		fStreamInfo[i].chunkCache
-			= new ChunkCache(fExtractorWaitSem, kMaxCacheBytes);
 		fStreamInfo[i].lastChunk = NULL;
+		fStreamInfo[i].chunkCache = NULL;
 		fStreamInfo[i].encodedFormat.Clear();
-
-		if (fStreamInfo[i].chunkCache->InitCheck() != B_OK) {
-			fInitStatus = B_NO_MEMORY;
-			return;
-		}
 	}
 
 	// create all stream cookies
@@ -130,6 +123,15 @@ MediaExtractor::_Init(BDataIO* source, int32 flags)
 			fStreamInfo[i].status = B_ERROR;
 			ERROR("MediaExtractor::MediaExtractor: GetStreamInfo for "
 				"stream %" B_PRId32 " failed\n", i);
+		}
+
+		// Allocate our ChunkCache
+		size_t chunkCacheMaxBytes = _CalculateChunkBuffer(i);
+		fStreamInfo[i].chunkCache
+			= new ChunkCache(fExtractorWaitSem, chunkCacheMaxBytes);
+		if (fStreamInfo[i].chunkCache->InitCheck() != B_OK) {
+			fInitStatus = B_NO_MEMORY;
+			return;
 		}
 	}
 
@@ -430,6 +432,21 @@ MediaExtractor::_ExtractorEntry(void* extractor)
 {
 	static_cast<MediaExtractor*>(extractor)->_ExtractorThread();
 	return B_OK;
+}
+
+
+size_t
+MediaExtractor::_CalculateChunkBuffer(int32 stream)
+{
+	const media_format* format = EncodedFormat(stream);
+	size_t cacheSize = 3 * 1024 * 1024;
+	int32 rowSize = BPrivate::get_bytes_per_row(format->ColorSpace(),
+		format->Width());
+	if (rowSize > 0) {
+		// Frame size, multipled by 2 for good measure
+		cacheSize = rowSize * format->Height() * 2;
+	}
+	return ROUND_UP_TO_PAGE(cacheSize);
 }
 
 
