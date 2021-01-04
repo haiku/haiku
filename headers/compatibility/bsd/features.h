@@ -8,11 +8,13 @@
 
 #if defined(_BSD_SOURCE) \
 	|| (!defined(__STRICT_ANSI__) && !defined(_POSIX_C_SOURCE))
+	#undef _DEFAULT_SOURCE
 	#define _DEFAULT_SOURCE
 #endif
 
 
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
+	#undef _ISOC11_SOURCE
 	#define _ISOC11_SOURCE
 #endif
 
