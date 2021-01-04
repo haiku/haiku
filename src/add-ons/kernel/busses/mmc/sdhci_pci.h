@@ -17,6 +17,13 @@
 #define SDHCI_PCI_SLOTS(x) 								((( x >> 4) & 7))
 #define SDHCI_PCI_SLOT_INFO_FIRST_BASE_INDEX(x)			(( x ) & 7)
 
+// Ricoh specific PCI registers
+// Ricoh devices start in a vendor-specific mode but can be switched
+// to standard sdhci using these PCI registers
+#define SDHCI_PCI_RICOH_MODE_KEY						0xf9
+#define SDHCI_PCI_RICOH_MODE							0x150
+#define SDHCI_PCI_RICOH_MODE_SD20						0x10
+
 #define SDHCI_BUS_TYPE_NAME 							"bus/sdhci/v1"
 
 class TransferMode {
@@ -78,7 +85,7 @@ class Command {
  		static const uint8_t kR2Type = kCRCEnable | k128BitResponse;
 		static const uint8_t kR3Type = k32BitResponse;
 		static const uint8_t kR6Type = kCheckIndex | k32BitResponse;
-		static const uint8_t kR7Type = kDataPresent | kCheckIndex | kCRCEnable
+		static const uint8_t kR7Type = kCheckIndex | kCRCEnable
 			| k32BitResponse;
 
 	private:

@@ -163,6 +163,9 @@ SdhciBus::ExecuteCommand(uint8_t command, uint32_t argument, uint32_t* response)
 {
 	TRACE("ExecuteCommand(%d, %x)\n", command, argument);
 
+	// First of all clear the result
+	fCommandResult = 0;
+
 	// Check if it's possible to send a command right now.
 	// It is not possible to send a command as long as the command line is busy.
 	// The spec says we should wait, but we can't do that on kernel side, since
@@ -208,7 +211,7 @@ SdhciBus::ExecuteCommand(uint8_t command, uint32_t argument, uint32_t* response)
 			replyType = Command::kR3Type;
 			break;
 		default:
-			ERROR("Unknown command\n");
+			ERROR("Unknown command %x\n", command);
 			return B_BAD_DATA;
 	}
 
@@ -220,25 +223,38 @@ SdhciBus::ExecuteCommand(uint8_t command, uint32_t argument, uint32_t* response)
 			return B_BUSY;
 		}
 	}
-	
-	//FIXME : Assign only at this point, if needed :
-	// -32 bit block count/SDMA system address
-	// -block size
-	// -16-bit block count
-	// -transfer mode
 
+	if (fRegisters->present_state.CommandInhibit())
+		panic("Command line busy at start of execute command\n");
+
+	if (replyType == Command::kR1bType)
+		fRegisters->transfer_mode = 0;
+	
 	fRegisters->argument = argument;
 	fRegisters->command.SendCommand(command, replyType);
 
 	// Wait for command response to be available ("command complete" interrupt)
 	TRACE("Wait for command complete...");
-	acquire_sem(fSemaphore);
-	TRACE("command complete OK\n");
+	while (fRegisters->present_state.CommandInhibit()
+		&& (fCommandResult == 0)) {
+		acquire_sem(fSemaphore);
+		TRACE("command complete sem acquired, status: %x\n", fCommandResult);
+		TRACE("real status = %x command line busy: %d\n",
+			fRegisters->interrupt_status,
+			fRegisters->present_state.CommandInhibit());
+	}
+
+	TRACE("Command response available\n");
 
 	if (fCommandResult & SDHCI_INT_ERROR) {
 		fRegisters->interrupt_status |= fCommandResult;
 		if (fCommandResult & SDHCI_INT_TIMEOUT) {
 			ERROR("Command execution timed out\n");
+			if (fRegisters->present_state.CommandInhibit()) {
+				TRACE("Command line is still busy, clearing it\n");
+				// Clear the stall
+				fRegisters->software_reset.ResetCommandLine();
+			}
 			return B_TIMED_OUT;
 		}
 		if (fCommandResult & SDHCI_INT_CRC) {
@@ -277,7 +293,10 @@ SdhciBus::ExecuteCommand(uint8_t command, uint32_t argument, uint32_t* response)
 	if (replyType == Command::kR1bType) {
 		// R1b commands may use the data line so we must wait for the
 		// "transfer complete" interrupt here.
-		acquire_sem(fSemaphore);
+		TRACE("Waiting for data...\n");
+		while (fRegisters->present_state.DataInhibit())
+			acquire_sem(fSemaphore);
+		TRACE("Got data.\n");
 	}
 
 	ERROR("Command execution %d complete\n", command);
@@ -643,7 +662,7 @@ SdhciBus::HandleInterrupt()
 
 	// Check that all interrupts have been cleared (we check all the ones we
 	// enabled, so that should always be the case)
-	intmask = fRegisters->slot_interrupt_status;
+	intmask = fRegisters->interrupt_status;
 	if (intmask != 0) {
 		ERROR("Remaining interrupts at end of handler: %x\n", intmask);
 	}
@@ -742,7 +761,6 @@ register_device(device_node* parent)
 static float
 supports_device(device_node* parent)
 {
-	CALLED();
 	const char* bus;
 	uint16 type, subType;
 	uint16 vendorId, deviceId;
@@ -765,7 +783,7 @@ supports_device(device_node* parent)
 		return 0.0f;
 	}
 
-	TRACE("Probe device %p (%04x:%04x)\n", parent, vendorId, deviceId);
+	TRACE("supports_device(vid:%04x pid:%04x)\n", vendorId, deviceId);
 
 	if (gDeviceManager->get_attr_uint16(parent, B_DEVICE_SUB_TYPE, &subType,
 			false) < B_OK
@@ -779,7 +797,8 @@ supports_device(device_node* parent)
 		if (subType != PCI_sd_host) {
 			// Also accept some compliant devices that do not advertise
 			// themselves as such.
-			if (vendorId != 0x1180 && deviceId != 0xe823) {
+			if (vendorId != 0x1180
+				|| (deviceId != 0xe823 && deviceId != 0xe822)) {
 				TRACE("Not the right subclass, and not a Ricoh device\n");
 				return 0.0f;
 			}
@@ -791,6 +810,21 @@ supports_device(device_node* parent)
 			(void**)&device);
 		TRACE("SDHCI Device found! Subtype: 0x%04x, type: 0x%04x\n",
 			subType, type);
+
+		if (vendorId == 0x1180 && deviceId == 0xe823) {
+			// Switch the device to SD2.0 mode
+			// This should change its device id to 0xe822 if succesful.
+			// The device then remains in SD2.0 mode even after reboot.
+			pci->write_pci_config(device, SDHCI_PCI_RICOH_MODE_KEY, 1, 0xfc);
+			pci->write_pci_config(device, SDHCI_PCI_RICOH_MODE, 1,
+				SDHCI_PCI_RICOH_MODE_SD20);
+			pci->write_pci_config(device, SDHCI_PCI_RICOH_MODE_KEY, 1, 0);
+
+			deviceId = pci->read_pci_config(device, 2, 2);
+
+			TRACE("Device ID after Ricoh quirk: %x\n", deviceId);
+		}
+
 		return 0.8f;
 	}
 
