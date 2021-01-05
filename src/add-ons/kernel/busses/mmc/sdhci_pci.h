@@ -26,6 +26,7 @@
 
 #define SDHCI_BUS_TYPE_NAME 							"bus/sdhci/v1"
 
+
 class TransferMode {
 	public:
 		uint16_t Bits() { return fBits; }
@@ -56,6 +57,7 @@ class TransferMode {
 	private:
 		volatile uint16_t fBits;
 } __attribute__((packed));
+
 
 class Command {
 	public:
@@ -91,9 +93,6 @@ class Command {
 	private:
 		volatile uint16_t fBits;
 } __attribute__((packed));
-#define SDHCI_RESPONSE_R1                               2
-#define SDHCI_CMD_CRC_EN                                1 << 3
-#define SDHCI_CMD_INDEX_EN                              1 << 4
 
 
 class PresentState {

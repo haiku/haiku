@@ -54,7 +54,7 @@ class SdhciBus {
 		void				SetClock(int kilohertz);
 		status_t			DoIO(uint8_t command, IOOperation* operation,
 								bool offsetAsSectors);
-		
+
 	private:
 		bool				PowerOn();
 		void				RecoverError();
@@ -65,6 +65,13 @@ class SdhciBus {
 		uint8_t				fIrq;
 		sem_id				fSemaphore;
 		status_t			fStatus;
+};
+
+
+class SdhciDevice {
+	public:
+		device_node* fNode;
+		uint8_t fRicohOriginalMode;
 };
 
 
@@ -480,6 +487,97 @@ SdhciBus::PowerOn()
 }
 
 
+void
+SdhciBus::RecoverError()
+{
+	fRegisters->interrupt_signal_enable &= ~(SDHCI_INT_CMD_CMP
+		| SDHCI_INT_TRANS_CMP | SDHCI_INT_CARD_INS | SDHCI_INT_CARD_REM);
+
+	if (fRegisters->interrupt_status & 7)
+		fRegisters->software_reset.ResetCommandLine();
+
+	int16_t error_status = fRegisters->interrupt_status;
+	fRegisters->interrupt_status &= ~(error_status);
+}
+
+
+int32
+SdhciBus::HandleInterrupt()
+{
+#if 0
+	// We could use the slot register to quickly see for which slot the
+	// interrupt is. But since we have an interrupt handler call for each slot
+	// anyway, it's just as simple to let each of them scan its own interrupt
+	// status register.
+	if ( !(fRegisters->slot_interrupt_status & (1 << fSlot)) ) {
+		TRACE("interrupt not for me.\n");
+		return B_UNHANDLED_INTERRUPT;
+	}
+#endif
+	
+	uint32_t intmask = fRegisters->interrupt_status;
+
+	// Shortcut: exit early if there is no interrupt or if the register is
+	// clearly invalid.
+	if ((intmask == 0) || (intmask == 0xffffffff)) {
+		return B_UNHANDLED_INTERRUPT;
+	}
+
+	TRACE("interrupt function called %x\n", intmask);
+
+	// handling card presence interrupt
+	if (intmask & (SDHCI_INT_CARD_INS | SDHCI_INT_CARD_REM)) {
+		uint32_t card_present = ((intmask & SDHCI_INT_CARD_INS) != 0);
+		fRegisters->interrupt_status_enable &= ~(SDHCI_INT_CARD_INS
+			| SDHCI_INT_CARD_REM);
+		fRegisters->interrupt_signal_enable &= ~(SDHCI_INT_CARD_INS
+			| SDHCI_INT_CARD_REM);
+
+		fRegisters->interrupt_status_enable |= card_present
+		 	? SDHCI_INT_CARD_REM : SDHCI_INT_CARD_INS;
+		fRegisters->interrupt_signal_enable |= card_present
+			? SDHCI_INT_CARD_REM : SDHCI_INT_CARD_INS;
+
+		fRegisters->interrupt_status |= (intmask &
+			(SDHCI_INT_CARD_INS | SDHCI_INT_CARD_REM));
+		TRACE("Card presence interrupt handled\n");
+	}
+
+	// handling command interrupt
+	if (intmask & SDHCI_INT_CMD_MASK) {
+		fCommandResult = intmask;
+			// Save the status before clearing so the thread can handle it
+		fRegisters->interrupt_status |= (intmask & SDHCI_INT_CMD_MASK);
+
+		// Notify the thread
+		release_sem_etc(fSemaphore, 1, B_DO_NOT_RESCHEDULE);
+		TRACE("Command complete interrupt handled\n");
+	}
+
+	if (intmask & SDHCI_INT_TRANS_CMP) {
+		fRegisters->interrupt_status |= SDHCI_INT_TRANS_CMP;
+		release_sem_etc(fSemaphore, 1, B_DO_NOT_RESCHEDULE);
+		TRACE("Transfer complete interrupt handled\n");
+	}
+
+	// handling bus power interrupt
+	if (intmask & SDHCI_INT_BUS_POWER) {
+		fRegisters->interrupt_status |= SDHCI_INT_BUS_POWER;
+		TRACE("card is consuming too much power\n");
+	}
+
+	// Check that all interrupts have been cleared (we check all the ones we
+	// enabled, so that should always be the case)
+	intmask = fRegisters->interrupt_status;
+	if (intmask != 0) {
+		ERROR("Remaining interrupts at end of handler: %x\n", intmask);
+	}
+
+	return B_HANDLED_INTERRUPT;
+}
+// #pragma mark -
+
+
 static status_t
 init_bus(device_node* node, void** bus_cookie)
 {
@@ -581,97 +679,6 @@ uninit_bus(void* bus_cookie)
 }
 
 
-void
-SdhciBus::RecoverError()
-{
-	fRegisters->interrupt_signal_enable &= ~(SDHCI_INT_CMD_CMP
-		| SDHCI_INT_TRANS_CMP | SDHCI_INT_CARD_INS | SDHCI_INT_CARD_REM);
-
-	if (fRegisters->interrupt_status & 7)
-		fRegisters->software_reset.ResetCommandLine();
-
-	int16_t error_status = fRegisters->interrupt_status;
-	fRegisters->interrupt_status &= ~(error_status);
-}
-
-
-int32
-SdhciBus::HandleInterrupt()
-{
-#if 0
-	// We could use the slot register to quickly see for which slot the
-	// interrupt is. But since we have an interrupt handler call for each slot
-	// anyway, it's just as simple to let each of them scan its own interrupt
-	// status register.
-	if ( !(fRegisters->slot_interrupt_status & (1 << fSlot)) ) {
-		TRACE("interrupt not for me.\n");
-		return B_UNHANDLED_INTERRUPT;
-	}
-#endif
-	
-	uint32_t intmask = fRegisters->interrupt_status;
-
-	// Shortcut: exit early if there is no interrupt or if the register is
-	// clearly invalid.
-	if ((intmask == 0) || (intmask == 0xffffffff)) {
-		return B_UNHANDLED_INTERRUPT;
-	}
-
-	TRACE("interrupt function called %x\n", intmask);
-
-	// handling card presence interrupt
-	if (intmask & (SDHCI_INT_CARD_INS | SDHCI_INT_CARD_REM)) {
-		uint32_t card_present = ((intmask & SDHCI_INT_CARD_INS) != 0);
-		fRegisters->interrupt_status_enable &= ~(SDHCI_INT_CARD_INS
-			| SDHCI_INT_CARD_REM);
-		fRegisters->interrupt_signal_enable &= ~(SDHCI_INT_CARD_INS
-			| SDHCI_INT_CARD_REM);
-
-		fRegisters->interrupt_status_enable |= card_present
-		 	? SDHCI_INT_CARD_REM : SDHCI_INT_CARD_INS;
-		fRegisters->interrupt_signal_enable |= card_present
-			? SDHCI_INT_CARD_REM : SDHCI_INT_CARD_INS;
-
-		fRegisters->interrupt_status |= (intmask &
-			(SDHCI_INT_CARD_INS | SDHCI_INT_CARD_REM));
-		TRACE("Card presence interrupt handled\n");
-	}
-
-	// handling command interrupt
-	if (intmask & SDHCI_INT_CMD_MASK) {
-		fCommandResult = intmask;
-			// Save the status before clearing so the thread can handle it
-		fRegisters->interrupt_status |= (intmask & SDHCI_INT_CMD_MASK);
-
-		// Notify the thread
-		release_sem_etc(fSemaphore, 1, B_DO_NOT_RESCHEDULE);
-		TRACE("Command complete interrupt handled\n");
-	}
-
-	if (intmask & SDHCI_INT_TRANS_CMP) {
-		fRegisters->interrupt_status |= SDHCI_INT_TRANS_CMP;
-		release_sem_etc(fSemaphore, 1, B_DO_NOT_RESCHEDULE);
-		TRACE("Transfer complete interrupt handled\n");
-	}
-
-	// handling bus power interrupt
-	if (intmask & SDHCI_INT_BUS_POWER) {
-		fRegisters->interrupt_status |= SDHCI_INT_BUS_POWER;
-		TRACE("card is consuming too much power\n");
-	}
-
-	// Check that all interrupts have been cleared (we check all the ones we
-	// enabled, so that should always be the case)
-	intmask = fRegisters->interrupt_status;
-	if (intmask != 0) {
-		ERROR("Remaining interrupts at end of handler: %x\n", intmask);
-	}
-
-	return B_HANDLED_INTERRUPT;
-}
-// #pragma mark -
-
-
 static void
 bus_removed(void* bus_cookie)
 {
@@ -683,8 +690,8 @@ static status_t
 register_child_devices(void* cookie)
 {
 	CALLED();
-	device_node* node = (device_node*)cookie;
-	device_node* parent = gDeviceManager->get_parent_node(node);
+	SdhciDevice* context = (SdhciDevice*)cookie;
+	device_node* parent = gDeviceManager->get_parent_node(context->fNode);
 	pci_device_module_info* pci;
 	pci_device* device;
 	uint8 slots_count, bar, slotsInfo;
@@ -728,8 +735,10 @@ register_child_devices(void* cookie)
 			{ BAR_INDEX, B_UINT8_TYPE, { ui8: bar} },
 			{ NULL }
 		};
-		if (gDeviceManager->register_node(node, SDHCI_PCI_MMC_BUS_MODULE_NAME,
-				attrs, NULL, &node) != B_OK)
+		device_node* node;
+		if (gDeviceManager->register_node(context->fNode,
+				SDHCI_PCI_MMC_BUS_MODULE_NAME, attrs, NULL,
+				&node) != B_OK)
 			return B_BAD_VALUE;
 	}
 	return B_OK;
@@ -740,8 +749,80 @@ static status_t
 init_device(device_node* node, void** device_cookie)
 {
 	CALLED();
-	*device_cookie = node;
+
+	// Get the PCI driver and device
+	pci_device_module_info* pci;
+	pci_device* device;
+	uint16 vendorId, deviceId;
+
+	device_node* pciParent = gDeviceManager->get_parent_node(node);
+	gDeviceManager->get_driver(pciParent, (driver_module_info**)&pci,
+	        (void**)&device);
+	gDeviceManager->put_node(pciParent);
+
+	SdhciDevice* context = new(std::nothrow)SdhciDevice;
+	if (context == NULL)
+		return B_NO_MEMORY;
+	context->fNode = node;
+	*device_cookie = context;
+
+	if (gDeviceManager->get_attr_uint16(node, B_DEVICE_VENDOR_ID, &vendorId,
+			false) != B_OK
+		|| gDeviceManager->get_attr_uint16(node, B_DEVICE_ID, &deviceId,
+			false) != B_OK) {
+		TRACE("No vendor or device id attribute\n");
+		return B_OK; // Let's hope it didn't need the quirk?
+	}
+
+	if (vendorId == 0x1180 && deviceId == 0xe823) {
+		// Switch the device to SD2.0 mode
+		// This should change its device id to 0xe822 if succesful.
+		// The device then remains in SD2.0 mode even after reboot.
+		pci->write_pci_config(device, SDHCI_PCI_RICOH_MODE_KEY, 1, 0xfc);
+		context->fRicohOriginalMode = pci->read_pci_config(device,
+			SDHCI_PCI_RICOH_MODE, 1);
+		pci->write_pci_config(device, SDHCI_PCI_RICOH_MODE, 1,
+			SDHCI_PCI_RICOH_MODE_SD20);
+		pci->write_pci_config(device, SDHCI_PCI_RICOH_MODE_KEY, 1, 0);
+
+		deviceId = pci->read_pci_config(device, 2, 2);
+		TRACE("Device ID after Ricoh quirk: %x\n", deviceId);
+	}
+
 	return B_OK;
+}
+
+
+static void
+uninit_device(void* device_cookie)
+{
+	// Get the PCI driver and device
+	pci_device_module_info* pci;
+	pci_device* device;
+	uint16 vendorId, deviceId;
+
+	SdhciDevice* context = (SdhciDevice*)device_cookie;
+	device_node* pciParent = gDeviceManager->get_parent_node(context->fNode);
+	gDeviceManager->get_driver(pciParent, (driver_module_info**)&pci,
+	        (void**)&device);
+	gDeviceManager->put_node(pciParent);
+
+	if (gDeviceManager->get_attr_uint16(context->fNode, B_DEVICE_VENDOR_ID,
+			&vendorId, false) != B_OK
+		|| gDeviceManager->get_attr_uint16(context->fNode, B_DEVICE_ID,
+			&deviceId, false) != B_OK) {
+		TRACE("No vendor or device id attribute\n");
+		delete context;
+		return;
+	}
+
+	if (vendorId == 0x1180 && deviceId == 0xe823) {
+		pci->write_pci_config(device, SDHCI_PCI_RICOH_MODE_KEY, 1, 0xfc);
+		pci->write_pci_config(device, SDHCI_PCI_RICOH_MODE, 1,
+			context->fRicohOriginalMode);
+		pci->write_pci_config(device, SDHCI_PCI_RICOH_MODE_KEY, 1, 0);
+	}
+	delete context;
 }
 
 
@@ -810,20 +891,6 @@ supports_device(device_node* parent)
 			(void**)&device);
 		TRACE("SDHCI Device found! Subtype: 0x%04x, type: 0x%04x\n",
 			subType, type);
-
-		if (vendorId == 0x1180 && deviceId == 0xe823) {
-			// Switch the device to SD2.0 mode
-			// This should change its device id to 0xe822 if succesful.
-			// The device then remains in SD2.0 mode even after reboot.
-			pci->write_pci_config(device, SDHCI_PCI_RICOH_MODE_KEY, 1, 0xfc);
-			pci->write_pci_config(device, SDHCI_PCI_RICOH_MODE, 1,
-				SDHCI_PCI_RICOH_MODE_SD20);
-			pci->write_pci_config(device, SDHCI_PCI_RICOH_MODE_KEY, 1, 0);
-
-			deviceId = pci->read_pci_config(device, 2, 2);
-
-			TRACE("Device ID after Ricoh quirk: %x\n", deviceId);
-		}
 
 		return 0.8f;
 	}
@@ -903,7 +970,7 @@ static driver_module_info sSDHCIDevice = {
 	supports_device,
 	register_device,
 	init_device,
-	NULL,	// uninit
+	uninit_device,
 	register_child_devices,
 	NULL,	// rescan
 	NULL,	// device removed
