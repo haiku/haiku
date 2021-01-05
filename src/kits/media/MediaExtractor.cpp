@@ -125,6 +125,7 @@ MediaExtractor::_Init(BDataIO* source, int32 flags)
 				"stream %" B_PRId32 " failed\n", i);
 		}
 
+#if !DISABLE_CHUNK_CACHE
 		// Allocate our ChunkCache
 		size_t chunkCacheMaxBytes = _CalculateChunkBuffer(i);
 		fStreamInfo[i].chunkCache
@@ -133,6 +134,7 @@ MediaExtractor::_Init(BDataIO* source, int32 flags)
 			fInitStatus = B_NO_MEMORY;
 			return;
 		}
+#endif
 	}
 
 #if !DISABLE_CHUNK_CACHE
@@ -264,14 +266,18 @@ MediaExtractor::Seek(int32 stream, uint32 seekTo, int64* _frame,
 	if (info.status != B_OK)
 		return info.status;
 
+#if !DISABLE_CHUNK_CACHE
 	BAutolock _(info.chunkCache);
+#endif
 
 	status_t status = fReader->Seek(info.cookie, seekTo, _frame, _time);
 	if (status != B_OK)
 		return status;
 
+#if !DISABLE_CHUNK_CACHE
 	// clear buffered chunks after seek
 	info.chunkCache->MakeEmpty();
+#endif
 
 	return B_OK;
 }
