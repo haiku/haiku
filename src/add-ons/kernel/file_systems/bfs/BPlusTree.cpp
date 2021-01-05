@@ -1055,7 +1055,7 @@ BPlusTree::_FindKey(const bplustree_node* node, const uint8* key,
 		return B_ENTRY_NOT_FOUND;
 	}
 
-	off_t* values = node->Values();
+	Unaligned<off_t>* values = node->Values();
 	int16 saveIndex = -1;
 
 	// binary search in the key array
@@ -2934,7 +2934,7 @@ bplustree_node::KeyAt(int32 index, uint16* keyLength) const
 		return NULL;
 
 	uint8* keyStart = Keys();
-	uint16* keyLengths = KeyLengths();
+	Unaligned<uint16>* keyLengths = KeyLengths();
 
 	*keyLength = BFS_ENDIAN_TO_HOST_INT16(keyLengths[index])
 		- (index != 0 ? BFS_ENDIAN_TO_HOST_INT16(keyLengths[index - 1]) : 0);
@@ -3008,7 +3008,7 @@ bplustree_node::CheckIntegrity(uint32 nodeSize) const
 		}
 		if (Values()[i] == -1) {
 			dprintf("invalid node %p, value %d: %" B_PRIdOFF ": values "
-				"corrupted\n", this, (int)i, Values()[i]);
+				"corrupted\n", this, (int)i, Values()[i].value);
 			return B_BAD_DATA;
 		}
 	}
