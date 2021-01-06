@@ -438,13 +438,20 @@ MediaExtractor::_ExtractorEntry(void* extractor)
 size_t
 MediaExtractor::_CalculateChunkBuffer(int32 stream)
 {
-	const media_format* format = EncodedFormat(stream);
 	size_t cacheSize = 3 * 1024 * 1024;
-	int32 rowSize = BPrivate::get_bytes_per_row(format->ColorSpace(),
-		format->Width());
-	if (rowSize > 0) {
-		// Frame size, multipled by 2 for good measure
-		cacheSize = rowSize * format->Height() * 2;
+
+	const media_format* format = EncodedFormat(stream);
+	if (format->IsVideo()) {
+		// For video, have space for at least two frames
+		int32 rowSize = BPrivate::get_bytes_per_row(format->ColorSpace(),
+			format->Width());
+		if (rowSize > 0) {
+			cacheSize = rowSize * format->Height() * 2;
+		}
+	} else if (format->IsAudio()) {
+		// For audio, have space for 2000 "frames" (that's 2000/44100 = 45ms
+		// at 44100Hz for example)
+		cacheSize = format->AudioFrameSize() * 2000;
 	}
 	return ROUND_UP_TO_PAGE(cacheSize);
 }
