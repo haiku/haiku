@@ -121,7 +121,8 @@ BasicTerminalBuffer::BasicTerminalBuffer()
 	fSavedOriginMode(false),
 	fTabStops(NULL),
 	fEncoding(M_UTF8),
-	fCaptureFile(-1)
+	fCaptureFile(-1),
+	fLast()
 {
 }
 
@@ -625,6 +626,7 @@ BasicTerminalBuffer::InsertChar(UTF8Char c)
 {
 //debug_printf("BasicTerminalBuffer::InsertChar('%.*s' (%d), %#lx)\n",
 //(int)c.ByteCount(), c.bytes, c.bytes[0], attributes);
+	fLast = c;
 	int32 width = c.IsFullWidth() ? FULL_WIDTH : HALF_WIDTH;
 
 	if (fSoftWrappedCursor || (fCursor.x + width) > fWidth)
@@ -1855,6 +1857,13 @@ BasicTerminalBuffer::CaptureChar(char ch)
 {
 	if (fCaptureFile >= 0)
 		write(fCaptureFile, &ch, 1);
+}
+
+
+void
+BasicTerminalBuffer::InsertLastChar()
+{
+	InsertChar(fLast);
 }
 
 #endif

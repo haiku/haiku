@@ -141,6 +141,7 @@ public:
 			void				SetInsertMode(int flag);
 			void				InsertSpace(int32 num);
 			void				InsertLines(int32 numLines);
+			void				InsertLastChar();
 
 			// delete chars/lines
 	inline	void				EraseChars(int32 numChars);
@@ -249,6 +250,8 @@ protected:
 
 			int					fEncoding;
 			int					fCaptureFile;
+
+			UTF8Char			fLast;
 
 			// listener/dirty region management
 			TerminalBufferDirtyInfo fDirtyInfo;

@@ -101,3 +101,4 @@
 #define CASE_CFT 98
 #define CASE_INDEX 99
 #define CASE_NEXT_LINE 100
+#define CASE_REP 101

@@ -1213,6 +1213,18 @@ TermParse::EscParse()
 					fBuffer->MoveCursorUp(row);
 					parsestate = groundtable;
 					break;
+
+				case CASE_REP:		// ESC [...b repeat last graphic char
+				{
+					int repetitions = param[0];
+					int maxRepetitions = fBuffer->Width() * fBuffer->Height();
+					if (repetitions > maxRepetitions)
+						repetitions = maxRepetitions;
+					for (int i = 0; i < repetitions; i++)
+						fBuffer->InsertLastChar();
+					parsestate = groundtable;
+					break;
+				}
 				default:
 					break;
 			}
