@@ -85,7 +85,8 @@ bs_printf(BString* string, const char* format, ...)
 
 StyledEditWindow::StyledEditWindow(BRect frame, int32 id, uint32 encoding)
 	:
-	BWindow(frame, "untitled", B_DOCUMENT_WINDOW, B_ASYNCHRONOUS_CONTROLS),
+	BWindow(frame, "untitled", B_DOCUMENT_WINDOW, B_ASYNCHRONOUS_CONTROLS
+		| B_AUTO_UPDATE_SIZE_LIMITS),
 	fFindWindow(NULL),
 	fReplaceWindow(NULL)
 {
@@ -101,7 +102,8 @@ StyledEditWindow::StyledEditWindow(BRect frame, int32 id, uint32 encoding)
 
 StyledEditWindow::StyledEditWindow(BRect frame, entry_ref* ref, uint32 encoding)
 	:
-	BWindow(frame, "untitled", B_DOCUMENT_WINDOW, B_ASYNCHRONOUS_CONTROLS),
+	BWindow(frame, "untitled", B_DOCUMENT_WINDOW, B_ASYNCHRONOUS_CONTROLS
+		| B_AUTO_UPDATE_SIZE_LIMITS),
 	fFindWindow(NULL),
 	fReplaceWindow(NULL)
 {
@@ -1324,11 +1326,14 @@ StyledEditWindow::_InitWindow(uint32 encoding)
 	fSavePanel = NULL;
 	fSavePanelEncodingMenu = NULL;
 
-	BGroupLayout* layout = new BGroupLayout(B_VERTICAL, 0);
-	SetLayout(layout);
-	layout->AddView(mainMenu);
-	layout->AddView(fScrollView);
-	layout->SetInsets(0, 0, -1, -1);
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.Add(mainMenu)
+		.AddGroup(B_VERTICAL, 0)
+			.SetInsets(-1)
+			.Add(fScrollView)
+		.End()
+	.End();
+
 	SetKeyMenuBar(mainMenu);
 
 }
