@@ -363,8 +363,8 @@ NetworkStatusView::_ShowConfiguration(BMessage* message)
 				break;
 			case AF_INET6:
 				text << "\n" << B_TRANSLATE("IPv6 Address: ")
-					<< address.Address().ToString();
-					<< "/" << address.Mask().PrefixLength();
+					<< address.Address().ToString()
+					<< "/" << address.Mask().PrefixLength()
 					<< "\n";
 				break;
 			default:
