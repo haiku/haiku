@@ -44,11 +44,7 @@ Tracing of SD operations can also be added to see how qemu is interpreting our c
     -trace sdhci* -trace sdbus* -trace sdcard*
 
 ### Testing and loading the driver
-The code is merged but not part of the default build
-because it's not useful for end users currently. In order to add the drivers
-to the image and load them, we need to adjust some buildfiles.
-
-The required changes are in [this changeset](https://review.haiku-os.org/c/haiku/+/448/8).
+The code is merged and part of the default Haiku build.
 
 ## Insight into the code and future tasks
 
@@ -72,7 +68,10 @@ For this reason, the bus drivers should only do the most low-level things, tryin
 much code as possible in the upper layers.
 
 One slightly confusing thing about SDHCI is that it allows a single PCI device to implement
-multiple separate MMC busses (each of which could have multiple devices attached).
+multiple separate MMC busses (each of which could have multiple devices attached). For this reason
+there is an SDHCI "device" that attaches to the PCI device node for the controller, and then
+publishes multiple device nodes for each available bus. The nodes then work independently of each
+other.
 
 #### The Bus Manager (src/add-ons/kernel/bus_managers/mmc)
 
@@ -84,8 +83,8 @@ as things that are not specific to a device type (common to SDIO, SD and MMC car
 
 #### Disk Driver (src/add-ons/kernel/drivers/disk/mmc)
 
-This is a mass storage driver for MMC, SD and SDHC cards. Currently only SD is tested, SDHC, MMC
-and eMMC will have to be added (they are similar but there are some differences).
+This is a mass storage driver for MMC, SD and SDHC cards. Currently only SD and SDHC are tested,
+MMC and eMMC will have to be added (they are similar but there are some differences).
 
 #### Wiring the driver in the device manager (src/system/kernel/device_manager/device_manager.cpp)
 
@@ -116,13 +115,13 @@ The device tree for MMC support looks like this:
   * SDHCI controller
     * SDHCI bus
       * MMC bus manager
-	    * MMC device
+        * MMC device
           * mmc\_disk device
-		* MMC device
+        * MMC device
           * (other SDIO driver)
       * MMC bus manager (second MMC bus)
-	    * MMC device
-		  * mmc\_disk device
+        * MMC device
+          * mmc\_disk device
 
 At the first level, the PCI bus manager publishes a device node for each device
 found. One of them is our SDHCI controller, identified either by the PCI device
@@ -213,11 +212,16 @@ The SDHCI driver is able to send and receive commands. However it does not
 handle card insertion and removal interrupts yet, so the card must be already
 inserted when the driver is loaded.
 
-As a proof of concept, the initialization sequence has been implemented up
-until assigning an RCA to a single card (SDHC only).
+The mmc_disk driver is complete and working, but was not tested for MMC and eMMC
+devices. Some changes may be needed.
 
-Once we get everything in place at the mmc bus level, we can proceed as
-documented in the GSoC project [third phase outline](https://www.haiku-os.org/blog/krish_iyer/2018-07-12_gsoc_2018_sdhci_mmc_driver_third_phase_plan/).
+There is also work to be done for better performance: making sure we switch to the
+high-speed clock when an SD card supports it, and use the 4-bit data transfer mode
+instead of the default 1-bit if possible.
+
+Drivers for SDIO devices should also be added. The mmc_bus and SDHCI drivers have
+been tested only with one card on the bus at a time (for lack of hardware allowing
+more complex setups).
 
 If you find it difficult to understand the driver development and it's
 functioning and role, please refer *docs/develop/kernel/device_manager_introduction.html*
