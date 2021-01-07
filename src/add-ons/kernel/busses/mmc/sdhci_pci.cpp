@@ -182,7 +182,11 @@ SdhciBus::ExecuteCommand(uint8_t command, uint32_t argument, uint32_t* response)
 	// only during command execution, and we don't leave this function with ac
 	// command running.
 	if (fRegisters->present_state.CommandInhibit()) {
-		ERROR("Execution aborted, command inhibit\n");
+		panic("Command execution impossible, command inhibit\n");
+		return B_BUSY;
+	}
+	if (fRegisters->present_state.DataInhibit()) {
+		panic("Command execution unwise, data inhibit\n");
 		return B_BUSY;
 	}
 
@@ -297,13 +301,15 @@ SdhciBus::ExecuteCommand(uint8_t command, uint32_t argument, uint32_t* response)
 			break;
 	}
 
-	if (replyType == Command::kR1bType) {
+	if (replyType == Command::kR1bType &&
+			(fCommandResult & SDHCI_INT_TRANS_CMP == 0)) {
 		// R1b commands may use the data line so we must wait for the
 		// "transfer complete" interrupt here.
-		TRACE("Waiting for data...\n");
-		while (fRegisters->present_state.DataInhibit())
+		TRACE("Waiting for data line...\n");
+		do {
 			acquire_sem(fSemaphore);
-		TRACE("Got data.\n");
+		} while (fRegisters->present_state.DataInhibit());
+		TRACE("Dataline is released.\n");
 	}
 
 	ERROR("Command execution %d complete\n", command);
@@ -555,6 +561,7 @@ SdhciBus::HandleInterrupt()
 	}
 
 	if (intmask & SDHCI_INT_TRANS_CMP) {
+		fCommandResult = intmask;
 		fRegisters->interrupt_status |= SDHCI_INT_TRANS_CMP;
 		release_sem_etc(fSemaphore, 1, B_DO_NOT_RESCHEDULE);
 		TRACE("Transfer complete interrupt handled\n");
@@ -766,11 +773,11 @@ init_device(device_node* node, void** device_cookie)
 	context->fNode = node;
 	*device_cookie = context;
 
-	if (gDeviceManager->get_attr_uint16(node, B_DEVICE_VENDOR_ID, &vendorId,
-			false) != B_OK
+	if (gDeviceManager->get_attr_uint16(node, B_DEVICE_VENDOR_ID,
+			&vendorId, true) != B_OK
 		|| gDeviceManager->get_attr_uint16(node, B_DEVICE_ID, &deviceId,
-			false) != B_OK) {
-		TRACE("No vendor or device id attribute\n");
+			true) != B_OK) {
+		panic("No vendor or device id attribute\n");
 		return B_OK; // Let's hope it didn't need the quirk?
 	}
 
@@ -805,23 +812,21 @@ uninit_device(void* device_cookie)
 	device_node* pciParent = gDeviceManager->get_parent_node(context->fNode);
 	gDeviceManager->get_driver(pciParent, (driver_module_info**)&pci,
 	        (void**)&device);
-	gDeviceManager->put_node(pciParent);
 
 	if (gDeviceManager->get_attr_uint16(context->fNode, B_DEVICE_VENDOR_ID,
-			&vendorId, false) != B_OK
+			&vendorId, true) != B_OK
 		|| gDeviceManager->get_attr_uint16(context->fNode, B_DEVICE_ID,
 			&deviceId, false) != B_OK) {
-		TRACE("No vendor or device id attribute\n");
-		delete context;
-		return;
-	}
-
-	if (vendorId == 0x1180 && deviceId == 0xe823) {
+		ERROR("No vendor or device id attribute\n");
+	} else if (vendorId == 0x1180 && deviceId == 0xe823) {
 		pci->write_pci_config(device, SDHCI_PCI_RICOH_MODE_KEY, 1, 0xfc);
 		pci->write_pci_config(device, SDHCI_PCI_RICOH_MODE, 1,
 			context->fRicohOriginalMode);
 		pci->write_pci_config(device, SDHCI_PCI_RICOH_MODE_KEY, 1, 0);
 	}
+
+	gDeviceManager->put_node(pciParent);
+
 	delete context;
 }
 
