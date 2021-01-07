@@ -17,7 +17,6 @@ rule BuildSDImage image : files
 	Depends $(image) : $(mbrtool) ;
 	Depends $(image) : $(fatshell) ;
 
-	SDIMAGE_OS_NAME on $(image) = $(HAIKU_IMAGE_NAME) ;
 	SDIMAGE_OS_SIZE on $(image) = $(HAIKU_IMAGE_SIZE) ;
 	SDIMAGE_BEGIN on $(image) = $(HAIKU_BOOT_SDIMAGE_BEGIN:E=63) ;
 
@@ -47,6 +46,8 @@ rule BuildSDImage image : files
 actions BuildUBootSDImage1
 {
 	$(RM) $(1)
+
+	export $(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
 
 	# in KiB
 	EFI_SIZE=32768
@@ -105,6 +106,8 @@ actions BuildUBootSDImage1
 actions BuildEfiSDImage1
 {
 	$(RM) $(1)
+
+	export $(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
 
 	# in KiB
 	EFI_SIZE=32768
