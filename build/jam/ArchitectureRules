@@ -240,9 +240,8 @@ rule KernelArchitectureSetup architecture
 			HAIKU_KERNEL_PLATFORM ?= efi ;
 			HAIKU_BOOT_TARGETS += efi ;
 
-			HAIKU_BOOT_SDIMAGE_SIZE ?= 32 ;
 			# SOC's like allwinner need an offset to skip the hardcoded initial loader
-			HAIKU_BOOT_SDIMAGE_BEGIN = 40950 ; # 512-byte sectors (divisible by 63)
+			HAIKU_BOOT_SDIMAGE_BEGIN = 20475 ; # in KiB
 
 			HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 1440 ;
 			# offset in floppy image (>= sizeof(haiku_loader))
@@ -253,9 +252,7 @@ rule KernelArchitectureSetup architecture
 			HAIKU_KERNEL_PLATFORM ?= efi ;
 			HAIKU_BOOT_TARGETS += efi ;
 
-			HAIKU_BOOT_SDIMAGE_SIZE ?= 32 ;
-			# SOC's like allwinner need an offset to skip the hardcoded initial loader
-			HAIKU_BOOT_SDIMAGE_BEGIN = 40950 ; # 512-byte sectors (divisible by 63)
+			HAIKU_BOOT_SDIMAGE_BEGIN = 0 ; # in KiB
 
 			HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 1440 ;
 			# offset in floppy image (>= sizeof(haiku_loader))
@@ -280,9 +277,7 @@ rule KernelArchitectureSetup architecture
 			HAIKU_KERNEL_PLATFORM ?= efi ;
 			HAIKU_BOOT_TARGETS += efi ;
 
-			HAIKU_BOOT_SDIMAGE_SIZE ?= 128 ;
-			# SOC's like allwinner need an offset to skip the hardcoded initial loader
-			HAIKU_BOOT_SDIMAGE_BEGIN = 40950 ; # 512-byte sectors (divisible by 63)
+			HAIKU_BOOT_SDIMAGE_BEGIN = 0 ; # KiB
 
 			HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 1440 ;
 			# offset in floppy image (>= sizeof(haiku_loader))

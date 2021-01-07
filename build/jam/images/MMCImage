@@ -5,16 +5,20 @@ HAIKU_MMC = $(HAIKU_MMC_NAME) ;
 HAIKU_MMC_LABEL ?= $(HAIKU_DEFAULT_MMC_LABEL) ;
 
 # SD/mmc image rule
-# requires mtools package on linux
-# Files must be in this order: loader floppyboot everything_else
+# Files must be in this order:
+#  out : mbrtool fatshell os_image loader floppyboot everything_else
 rule BuildSDImage image : files
 {
+	local mbrtool = <build>mbrtool ;
+	local fatshell = <build>fat_shell ;
+
 	Depends $(image) : $(files) $(TARGET_DEVICE_TREES) ;
-	SDIMAGE_BLOCK_SIZE on $(image) = 1048576 ; # 1MiB
-	SDIMAGE_MTOOLS_H on $(image) = 255 ;
-	SDIMAGE_MTOOLS_S on $(image) = 63 ;
-	SDIMAGE_MTOOLS_C on $(image) = 8 ;
-	SDIMAGE_SIZE on $(image) = $(HAIKU_BOOT_SDIMAGE_SIZE) ;
+	Depends $(image) : $(HAIKU_IMAGE_NAME) ;
+	Depends $(image) : $(mbrtool) ;
+	Depends $(image) : $(fatshell) ;
+
+	SDIMAGE_OS_NAME on $(image) = $(HAIKU_IMAGE_NAME) ;
+	SDIMAGE_OS_SIZE on $(image) = $(HAIKU_IMAGE_SIZE) ;
 	SDIMAGE_BEGIN on $(image) = $(HAIKU_BOOT_SDIMAGE_BEGIN:E=63) ;
 
 	if $(TARGET_BOOT_PLATFORM) = efi {
@@ -32,100 +36,128 @@ rule BuildSDImage image : files
 			case * :
 				Exit "Error: Unknown EFI architecture!" ;
 		}
-		BuildEfiSDImage1 $(image) : $(files) ;
+		BuildEfiSDImage1 $(image) : $(mbrtool) $(fatshell) $(files) ;
 	} else {
-		BuildUBootSDImage1 $(image) : $(files) ;
+		BuildUBootSDImage1 $(image) : $(mbrtool) $(fatshell) $(files) ;
 	}
 }
 
-# Usage: image : loader floppyboot everything_else
+# Usage:
+#  out : mbrtool fatshell os_image loader floppyboot everything_else
 actions BuildUBootSDImage1
 {
 	$(RM) $(1)
-	$(RM) $(1).mtools
 
-	# make an empty image
-	dd of=$(1) \
-		if=/dev/zero \
-		bs=$(SDIMAGE_BLOCK_SIZE) \
-		count=$(SDIMAGE_SIZE)
-	# generate mtools config
-	echo 'drive i: file="$(1)" partition=1 cylinders=$(SDIMAGE_MTOOLS_C)
-		heads=$(SDIMAGE_MTOOLS_H) sectors=$(SDIMAGE_MTOOLS_S)
-		mformat_only' > $(1).mtools
-	# partition it
-	MTOOLSRC=$(1).mtools mpartition -b$(SDIMAGE_BEGIN) -cI -T 0xc i:
-	# format the image
-	MTOOLSRC=$(1).mtools mformat -L 32 -v "HAIKU" i:
+	# in KiB
+	EFI_SIZE=32768
+	BOOT_SIZE=`expr ${EFI_SIZE} + $(SDIMAGE_BEGIN)`
+	MMC_SIZE=`expr $(SDIMAGE_OS_SIZE) \* 1024 + ${BOOT_SIZE}`
+
+	# Build "boot" disk
+	dd if=/dev/zero of=$(1) bs=1K count=${BOOT_SIZE}
 
 	# generate u-boot environment variables
 	echo 'os=haiku' > uEnv.txt
 	echo 'platform=u-boot' >> uEnv.txt
-	echo 'loader=haiku_loader.ub' >> uEnv.txt
+	echo "loader=haiku_loader.ub" >> uEnv.txt
+
+	# Lay down partition map
+	OS_LENGTH=`expr ${MMC_SIZE} - ${BOOT_SIZE}`
+
+	# EFI System Partition
+	$(2[1]) $(1) 0 0xef $(SDIMAGE_BEGIN) ${EFI_SIZE}
+	# OS Partition
+	$(2[1]) $(1) 1 0xeb ${BOOT_SIZE} ${OS_LENGTH}
+
+	FATFS="$(2[2]) --start-offset `expr $(SDIMAGE_BEGIN) \* 1024`"
+
+	# format the image
+	${FATFS} --end-offset `expr ${BOOT_SIZE} \* 1024` \
+		--initialize "$(1)" 'Haiku Boot'
 
 	# populate
-	MTOOLSRC=$(1).mtools mcopy $(2[2-2]) i:/haiku_loader.ub
-	MTOOLSRC=$(1).mtools mcopy $(2[3-3]) i:/haiku_floppyboot.ub
-	MTOOLSRC=$(1).mtools mcopy $(2[4-]) i:
-	MTOOLSRC=$(1).mtools mcopy uEnv.txt i:
-	# populate fdts
-	MTOOLSRC=$(1).mtools mmd i:/fdt
-	MTOOLSRC=$(1).mtools mcopy $(TARGET_DEVICE_TREES[1-]) i:/fdt/
+	for i in $(2[4-]) ; do
+		echo "cp :${i} myfs/" | ${FATFS} $(1)
+	done
+
+	echo "cp :uEnv.txt myfs/" | ${FATFS} $(1)
+
+	# lay down FDT's
+	echo "mkdir myfs/fdt" | ${FATFS} $(1)
+	for i in $(TARGET_DEVICE_TREES[1-]) ; do
+		echo "cp :${i} myfs/fdt/" | ${FATFS} $(1)
+	done
+
 	# list content
-	MTOOLSRC=$(1).mtools mdir i:
-	MTOOLSRC=$(1).mtools mdir i:/fdt
+	echo "ls myfs" | ${FATFS} $(1)
+
 	# cleanup
-	$(RM) $(1).mtools
 	$(RM) uEnv.txt
 	$(RM) boot.scr
-	# Add haiku bootstrap partition to MMC image
-	cat $(2[0]) >> $(1)
+
+	# Add haiku partition to MMC image
+	cat $(2[3-3]) >> $(1)
 }
 
-# Usage: image : loader everything_else
+
+# Usage:
+#  out : mbrtool fatshell os_image loader floppyboot everything_else
 actions BuildEfiSDImage1
 {
 	$(RM) $(1)
-	$(RM) $(1).mtools
 
-	# make an empty image
-	dd of=$(1) \
-		if=/dev/zero \
-		bs=$(SDIMAGE_BLOCK_SIZE) \
-		count=$(SDIMAGE_SIZE)
-	# generate mtools config
-	echo 'drive i: file="$(1)" partition=1 cylinders=$(SDIMAGE_MTOOLS_C)
-		heads=$(SDIMAGE_MTOOLS_H) sectors=$(SDIMAGE_MTOOLS_S)
-		mformat_only' > $(1).mtools
-	# partition it
-	MTOOLSRC=$(1).mtools mpartition -b$(SDIMAGE_BEGIN) -cI -T 0xc i:
-	# format the image
-	MTOOLSRC=$(1).mtools mformat -L 32 -v "HAIKU" i:
+	# in KiB
+	EFI_SIZE=32768
+	BOOT_SIZE=`expr ${EFI_SIZE} + $(SDIMAGE_BEGIN)`
+	MMC_SIZE=`expr $(SDIMAGE_OS_SIZE) \* 1024 + ${BOOT_SIZE}`
+
+	# Build "boot" disk
+	dd if=/dev/zero of=$(1) bs=1K count=${BOOT_SIZE}
 
 	# generate u-boot environment variables
 	echo 'os=haiku' > uEnv.txt
 	echo 'platform=efi' >> uEnv.txt
 	echo "loader=EFI/BOOT/$(EFINAME)" >> uEnv.txt
 
+	# Lay down partition map
+	OS_LENGTH=`expr ${MMC_SIZE} - ${BOOT_SIZE}`
+
+	# EFI System Partition
+	$(2[1]) $(1) 0 0xef $(SDIMAGE_BEGIN) ${EFI_SIZE}
+	# OS Partition
+	$(2[1]) $(1) 1 0xeb ${BOOT_SIZE} ${OS_LENGTH}
+
+	FATFS="$(2[2]) --start-offset `expr $(SDIMAGE_BEGIN) \* 1024`"
+
+	# format the image
+	${FATFS} --end-offset `expr ${BOOT_SIZE} \* 1024` \
+		--initialize "$(1)" 'Haiku Boot'
+
 	# populate
-	MTOOLSRC=$(1).mtools mmd i:/EFI
-	MTOOLSRC=$(1).mtools mmd i:/EFI/BOOT
-	MTOOLSRC=$(1).mtools mcopy $(2[2-2]) i:/EFI/BOOT/$(EFINAME)
-	MTOOLSRC=$(1).mtools mcopy $(2[3-]) i:
-	MTOOLSRC=$(1).mtools mcopy uEnv.txt i:
-	# populate fdts
-	MTOOLSRC=$(1).mtools mmd i:/fdt
-	MTOOLSRC=$(1).mtools mcopy $(TARGET_DEVICE_TREES[1-]) i:/fdt/
+	echo "mkdir -p myfs/EFI/BOOT" | ${FATFS} $(1)
+	echo "cp :$(2[4-4]) myfs/EFI/BOOT/$(EFINAME)" | ${FATFS} $(1)
+
+	# copy misc files
+	for i in $(2[5-]) ; do
+		echo "cp :${i} myfs/" | ${FATFS} $(1)
+	done
+	echo "cp :uEnv.txt myfs/" | ${FATFS} $(1)
+
+	# lay down FDT's
+	echo "mkdir myfs/fdt" | ${FATFS} $(1)
+	for i in $(TARGET_DEVICE_TREES[1-]) ; do
+		echo "cp :${i} myfs/fdt/" | ${FATFS} $(1)
+	done
+
 	# list content
-	MTOOLSRC=$(1).mtools mdir i:
-	MTOOLSRC=$(1).mtools mdir i:/fdt
-	MTOOLSRC=$(1).mtools mdir i:/EFI/BOOT
+	echo "ls myfs" | ${FATFS} $(1)
+
 	# cleanup
-	$(RM) $(1).mtools
 	$(RM) uEnv.txt
 	$(RM) boot.scr
-	# Add haiku bootstrap partition to MMC image
-	cat $(2[0]) >> $(1)
+
+	# Add haiku partition to MMC image
+	cat $(2[3-3]) >> $(1)
 }
 
 for platform in [ MultiBootSubDirSetup ] {
