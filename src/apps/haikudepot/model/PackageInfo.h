@@ -1,6 +1,6 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2016-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef PACKAGE_INFO_H
@@ -64,7 +64,7 @@ private:
 };
 
 
-class UserRating {
+class UserRating : public BReferenceable {
 public:
 								UserRating();
 								UserRating(const UserInfo& userInfo,
@@ -102,7 +102,7 @@ private:
 };
 
 
-typedef List<UserRating, false> UserRatingList;
+typedef BReference<UserRating> UserRatingRef;
 
 
 class RatingSummary {
@@ -183,7 +183,7 @@ extern bool IsPackageCategoryBefore(const CategoryRef& c1,
 	const CategoryRef& c2);
 
 
-class ScreenshotInfo {
+class ScreenshotInfo : public BReferenceable {
 public:
 								ScreenshotInfo();
 								ScreenshotInfo(const BString& code,
@@ -211,10 +211,9 @@ private:
 };
 
 
-typedef List<ScreenshotInfo, false, 2> ScreenshotInfoList;
+typedef BReference<ScreenshotInfo> ScreenshotInfoRef;
 
 
-typedef List<PackageInfoListenerRef, false, 2> PackageListenerList;
 typedef std::set<int32> PackageInstallationLocationSet;
 
 
@@ -309,9 +308,9 @@ public:
 			CategoryRef			CategoryAtIndex(int32 index) const;
 
 			void				ClearUserRatings();
-			bool				AddUserRating(const UserRating& rating);
-			const UserRatingList& UserRatings() const
-									{ return fUserRatings; }
+			void				AddUserRating(const UserRatingRef& rating);
+			int32				CountUserRatings() const;
+			UserRatingRef		UserRatingAtIndex(int32 index) const;
 			void				SetRatingSummary(const RatingSummary& summary);
 			RatingSummary		CalculateRatingSummary() const;
 
@@ -323,9 +322,10 @@ public:
 			bool				IsProminent() const;
 
 			void				ClearScreenshotInfos();
-			bool				AddScreenshotInfo(const ScreenshotInfo& info);
-			const ScreenshotInfoList& ScreenshotInfos() const
-									{ return fScreenshotInfos; }
+			void				AddScreenshotInfo(
+									const ScreenshotInfoRef& info);
+			int32				CountScreenshotInfos() const;
+			ScreenshotInfoRef	ScreenshotInfoAtIndex(int32 index) const;
 
 			void				ClearScreenshots();
 			bool				AddScreenshot(const BitmapRef& screenshot);
@@ -366,17 +366,20 @@ private:
 			BString				fChangelog;
 			std::vector<CategoryRef>
 								fCategories;
-			UserRatingList		fUserRatings;
+			std::vector<UserRatingRef>
+								fUserRatings;
 			RatingSummary		fCachedRatingSummary;
 			int64				fProminence;
-			ScreenshotInfoList	fScreenshotInfos;
+			std::vector<ScreenshotInfoRef>
+								fScreenshotInfos;
 			std::vector<BitmapRef>
 								fScreenshots;
 			PackageState		fState;
 			PackageInstallationLocationSet
 								fInstallationLocations;
 			float				fDownloadProgress;
-			PackageListenerList	fListeners;
+			std::vector<PackageInfoListenerRef>
+								fListeners;
 			int32				fFlags;
 			bool				fSystemDependency;
 			BString				fArchitecture;

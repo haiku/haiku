@@ -1,7 +1,7 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2014, Axel Dörfler <axeld@pinc-software.de>.
- * Copyright 2016-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -167,38 +167,6 @@ private:
 };
 
 
-class NotContainedInFilter : public PackageFilter {
-public:
-	NotContainedInFilter(const PackageList* packageList, ...)
-	{
-		va_list args;
-		va_start(args, packageList);
-		while (true) {
-			const PackageList* packageList = va_arg(args, const PackageList*);
-			if (packageList == NULL)
-				break;
-			fPackageLists.Add(packageList);
-		}
-		va_end(args);
-	}
-
-	virtual bool AcceptsPackage(const PackageInfoRef& package) const
-	{
-		if (package.Get() == NULL)
-			return false;
-
-		for (int32 i = 0; i < fPackageLists.CountItems(); i++) {
-			if (fPackageLists.ItemAtFast(i)->Contains(package))
-				return false;
-		}
-		return true;
-	}
-
-private:
-	List<const PackageList*, true>	fPackageLists;
-};
-
-
 class StateFilter : public PackageFilter {
 public:
 	StateFilter(PackageState state)
@@ -348,10 +316,10 @@ Model::InitPackageIconRepository()
 }
 
 
-bool
+void
 Model::AddListener(const ModelListenerRef& listener)
 {
-	return fListeners.Add(listener);
+	fListeners.push_back(listener);
 }
 
 
@@ -725,9 +693,10 @@ Model::PopulatePackage(const PackageInfoRef& package, uint32 flags)
 					item.FindDouble("createTimestamp", &createTimestamp);
 
 					// Add the rating to the PackageInfo
-					UserRating userRating = UserRating(UserInfo(user), rating,
+					UserRatingRef userRating(new UserRating(
+						UserInfo(user), rating,
 						comment, languageCode, versionString,
-						(uint64) createTimestamp);
+						(uint64) createTimestamp), true);
 					package->AddUserRating(userRating);
 					HDDEBUG("rating [%s] retrieved from server", code.String());
 				}
@@ -741,14 +710,16 @@ Model::PopulatePackage(const PackageInfoRef& package, uint32 flags)
 	}
 
 	if ((flags & POPULATE_SCREEN_SHOTS) != 0) {
-		ScreenshotInfoList screenshotInfos;
+		std::vector<ScreenshotInfoRef> screenshotInfos;
 		{
 			BAutolock locker(&fLock);
-			screenshotInfos = package->ScreenshotInfos();
+			for (int32 i = 0; i < package->CountScreenshotInfos(); i++)
+				screenshotInfos.push_back(package->ScreenshotInfoAtIndex(i));
 			package->ClearScreenshots();
 		}
-		for (int i = 0; i < screenshotInfos.CountItems(); i++) {
-			const ScreenshotInfo& info = screenshotInfos.ItemAtFast(i);
+		std::vector<ScreenshotInfoRef>::iterator it;
+		for (it = screenshotInfos.begin(); it != screenshotInfos.end(); it++) {
+			const ScreenshotInfoRef& info = *it;
 			_PopulatePackageScreenshot(package, info, 320, false);
 		}
 	}
@@ -942,7 +913,7 @@ Model::DumpExportPkgDataPath(BPath& path,
 
 void
 Model::_PopulatePackageScreenshot(const PackageInfoRef& package,
-	const ScreenshotInfo& info, int32 scaledWidth, bool fromCacheOnly)
+	const ScreenshotInfoRef& info, int32 scaledWidth, bool fromCacheOnly)
 {
 	// See if there is a cached screenshot
 	BFile screenshotFile;
@@ -957,7 +928,7 @@ Model::_PopulatePackageScreenshot(const PackageInfoRef& package,
 	}
 
 	bool fileExists = false;
-	BString screenshotName(info.Code());
+	BString screenshotName(info->Code());
 	screenshotName << "@" << scaledWidth;
 	screenshotName << ".png";
 	time_t modifiedTime;
@@ -989,9 +960,9 @@ Model::_PopulatePackageScreenshot(const PackageInfoRef& package,
 	// Retrieve screenshot from web-app
 	BMallocIO buffer;
 
-	int32 scaledHeight = scaledWidth * info.Height() / info.Width();
+	int32 scaledHeight = scaledWidth * info->Height() / info->Width();
 
-	status_t status = fWebAppInterface.RetrieveScreenshot(info.Code(),
+	status_t status = fWebAppInterface.RetrieveScreenshot(info->Code(),
 		scaledWidth, scaledHeight, &buffer);
 	if (status == B_OK) {
 		BitmapRef bitmapRef(new(std::nothrow)SharedBitmap(buffer), true);
@@ -1004,7 +975,7 @@ Model::_PopulatePackageScreenshot(const PackageInfoRef& package,
 		}
 	} else {
 		HDERROR("Failed to retrieve screenshot for code '%s' "
-			"at %" B_PRIi32 "x%" B_PRIi32 ".", info.Code().String(),
+			"at %" B_PRIi32 "x%" B_PRIi32 ".", info->Code().String(),
 			scaledWidth, scaledHeight);
 	}
 }
@@ -1016,8 +987,9 @@ Model::_PopulatePackageScreenshot(const PackageInfoRef& package,
 void
 Model::_NotifyAuthorizationChanged()
 {
-	for (int32 i = fListeners.CountItems() - 1; i >= 0; i--) {
-		const ModelListenerRef& listener = fListeners.ItemAtFast(i);
+	std::vector<ModelListenerRef>::const_iterator it;
+	for (it = fListeners.begin(); it != fListeners.end(); it++) {
+		const ModelListenerRef& listener = *it;
 		if (listener.Get() != NULL)
 			listener->AuthorizationChanged();
 	}
@@ -1027,8 +999,9 @@ Model::_NotifyAuthorizationChanged()
 void
 Model::_NotifyCategoryListChanged()
 {
-	for (int32 i = fListeners.CountItems() - 1; i >= 0; i--) {
-		const ModelListenerRef& listener = fListeners.ItemAtFast(i);
+	std::vector<ModelListenerRef>::const_iterator it;
+	for (it = fListeners.begin(); it != fListeners.end(); it++) {
+		const ModelListenerRef& listener = *it;
 		if (listener.Get() != NULL)
 			listener->CategoryListChanged();
 	}

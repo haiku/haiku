@@ -143,12 +143,12 @@ PackageFillingPkgListener::ConsumePackage(const PackageInfoRef& package,
 
 	for (i = 0; i < countPkgScreenshots; i++) {
 		DumpExportPkgScreenshot* screenshot = pkg->PkgScreenshotsItemAt(i);
-		package->AddScreenshotInfo(ScreenshotInfo(
+		package->AddScreenshotInfo(ScreenshotInfoRef(new ScreenshotInfo(
 			*(screenshot->Code()),
 			static_cast<int32>(screenshot->Width()),
 			static_cast<int32>(screenshot->Height()),
 			static_cast<int32>(screenshot->Length())
-		));
+		), true));
 	}
 
 	HDDEBUG("did populate data for [%s] (%s)", pkg->Name()->String(),

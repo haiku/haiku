@@ -1,7 +1,7 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2013, Rene Gollent <rene@gollent.com>.
- * Copyright 2016-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -792,22 +792,32 @@ PackageInfo::IsLocalFile() const
 void
 PackageInfo::ClearUserRatings()
 {
-	if (!fUserRatings.IsEmpty()) {
-		fUserRatings.Clear();
+	if (!fUserRatings.empty()) {
+		fUserRatings.clear();
 		_NotifyListeners(PKG_CHANGED_RATINGS);
 	}
 }
 
 
-bool
-PackageInfo::AddUserRating(const UserRating& rating)
+int32
+PackageInfo::CountUserRatings() const
 {
-	if (!fUserRatings.Add(rating))
-		return false;
+	return fUserRatings.size();
+}
 
+
+UserRatingRef
+PackageInfo::UserRatingAtIndex(int32 index) const
+{
+	return fUserRatings[index];
+}
+
+
+void
+PackageInfo::AddUserRating(const UserRatingRef& rating)
+{
+	fUserRatings.push_back(rating);
 	_NotifyListeners(PKG_CHANGED_RATINGS);
-
-	return true;
 }
 
 
@@ -826,11 +836,11 @@ PackageInfo::SetRatingSummary(const RatingSummary& summary)
 RatingSummary
 PackageInfo::CalculateRatingSummary() const
 {
-	if (fUserRatings.CountItems() == 0)
+	if (fUserRatings.empty())
 		return fCachedRatingSummary;
 
 	RatingSummary summary;
-	summary.ratingCount = fUserRatings.CountItems();
+	summary.ratingCount = fUserRatings.size();
 	summary.averageRating = 0.0f;
 	int starRatingCount = sizeof(summary.ratingCountByStar) / sizeof(int);
 	for (int i = 0; i < starRatingCount; i++)
@@ -843,7 +853,7 @@ PackageInfo::CalculateRatingSummary() const
 
 	int ratingsSpecified = summary.ratingCount;
 	for (int i = 0; i < summary.ratingCount; i++) {
-		float rating = fUserRatings.ItemAtFast(i).Rating();
+		float rating = fUserRatings[i]->Rating();
 
 		if (rating < 0.0f)
 			rating = -1.0f;
@@ -897,14 +907,28 @@ PackageInfo::IsProminent() const
 void
 PackageInfo::ClearScreenshotInfos()
 {
-	fScreenshotInfos.Clear();
+	fScreenshotInfos.clear();
 }
 
 
-bool
-PackageInfo::AddScreenshotInfo(const ScreenshotInfo& info)
+int32
+PackageInfo::CountScreenshotInfos() const
 {
-	return fScreenshotInfos.Add(info);
+	return fScreenshotInfos.size();
+}
+
+
+ScreenshotInfoRef
+PackageInfo::ScreenshotInfoAtIndex(int32 index) const
+{
+	return fScreenshotInfos[index];
+}
+
+
+void
+PackageInfo::AddScreenshotInfo(const ScreenshotInfoRef& info)
+{
+	fScreenshotInfos.push_back(info);
 }
 
 
@@ -977,14 +1001,15 @@ PackageInfo::SetDepotName(const BString& depotName)
 bool
 PackageInfo::AddListener(const PackageInfoListenerRef& listener)
 {
-	return fListeners.Add(listener);
+	fListeners.push_back(listener);
+	return true;
 }
 
 
 void
 PackageInfo::RemoveListener(const PackageInfoListenerRef& listener)
 {
-	fListeners.Remove(listener);
+	std::remove(fListeners.begin(), fListeners.end(), listener);
 }
 
 
@@ -1026,21 +1051,23 @@ PackageInfo::_NotifyListeners(uint32 changes)
 void
 PackageInfo::_NotifyListenersImmediate(uint32 changes)
 {
-	int count = fListeners.CountItems();
+	int count = fListeners.size();
 	if (count == 0)
 		return;
 
 	// Clone list to avoid listeners detaching themselves in notifications
 	// to screw up the list while iterating it.
-	PackageListenerList listeners(fListeners);
+	std::vector<PackageInfoListenerRef> listeners(fListeners);
+
 	// Check if it worked:
-	if (listeners.CountItems() != count)
+	if (listeners.size() != count)
 		return;
 
 	PackageInfoEvent event(PackageInfoRef(this), changes);
 
-	for (int i = 0; i < count; i++) {
-		const PackageInfoListenerRef& listener = listeners.ItemAtFast(i);
+	std::vector<PackageInfoListenerRef>::iterator it;
+	for (it = listeners.begin(); it != listeners.end(); it++) {
+		const PackageInfoListenerRef listener = *it;
 		if (listener.Get() != NULL)
 			listener->PackageChanged(event);
 	}

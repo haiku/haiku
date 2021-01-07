@@ -331,22 +331,23 @@ private:
 // #pragma mark - OpenPackageAction
 
 
-struct DeskbarLink {
+class DeskbarLink {
+public:
 	DeskbarLink()
 	{
 	}
 
 	DeskbarLink(const BString& path, const BString& link)
 		:
-		path(path),
-		link(link)
+		fPath(path),
+		fLink(link)
 	{
 	}
 
 	DeskbarLink(const DeskbarLink& other)
 		:
-		path(other.path),
-		link(other.link)
+		fPath(other.fPath),
+		fLink(other.fLink)
 	{
 	}
 
@@ -354,14 +355,24 @@ struct DeskbarLink {
 	{
 		if (this == &other)
 			return *this;
-		path = other.path;
-		link = other.link;
+		fPath = other.Path();
+		fLink = other.Link();
 		return *this;
+	}
+
+	const BString Path() const
+	{
+		return fPath;
+	}
+
+	const BString Link() const
+	{
+		return fLink;
 	}
 
 	bool operator==(const DeskbarLink& other)
 	{
-		return path == other.path && link == other.link;
+		return fPath == other.fPath && fLink == other.fLink;
 	}
 
 	bool operator!=(const DeskbarLink& other)
@@ -369,17 +380,18 @@ struct DeskbarLink {
 		return !(*this == other);
 	}
 
-	BString	path;
-	BString	link;
+private:
+			BString				fPath;
+			BString				fLink;
 };
 
 
-typedef List<DeskbarLink, false> DeskbarLinkList;
+typedef BReference<DeskbarLink> DeskbarLinkRef;
 
 
 class DeskbarLinkFinder : public BPackageContentHandler {
 public:
-	DeskbarLinkFinder(DeskbarLinkList& foundLinks)
+	DeskbarLinkFinder(std::vector<DeskbarLink>& foundLinks)
 		:
 		fDeskbarLinks(foundLinks)
 	{
@@ -392,7 +404,7 @@ public:
 				&& entry->SymlinkPath() != NULL) {
 			HDINFO("found deskbar entry: %s -> %s",
 				path.String(), entry->SymlinkPath());
-			fDeskbarLinks.Add(DeskbarLink(path, entry->SymlinkPath()));
+			fDeskbarLinks.push_back(DeskbarLink(path, entry->SymlinkPath()));
 		}
 		return B_OK;
 	}
@@ -431,7 +443,7 @@ public:
 	}
 
 private:
-	DeskbarLinkList&	fDeskbarLinks;
+	std::vector<DeskbarLink>	fDeskbarLinks;
 };
 
 
@@ -444,7 +456,7 @@ public:
 		fDeskbarLink(link),
 		fLabel(B_TRANSLATE("Open %DeskbarLink%"))
 	{
-		BString target = fDeskbarLink.link;
+		BString target = fDeskbarLink.Link();
 		int32 lastPathSeparator = target.FindLast('/');
 		if (lastPathSeparator > 0 && lastPathSeparator + 1 < target.Length())
 			target.Remove(0, lastPathSeparator + 1);
@@ -461,8 +473,8 @@ public:
 	{
 		status_t status;
 		BPath path;
-		if (fDeskbarLink.link.FindFirst('/') == 0) {
-			status = path.SetTo(fDeskbarLink.link);
+		if (fDeskbarLink.Link().FindFirst('/') == 0) {
+			status = path.SetTo(fDeskbarLink.Link());
 			HDINFO("trying to launch (absolute link): %s", path.Path());
 		} else {
 			int32 location = InstallLocation();
@@ -478,11 +490,11 @@ public:
 				return B_ERROR;
 			}
 
-			status = path.Append(fDeskbarLink.path);
+			status = path.Append(fDeskbarLink.Path());
 			if (status == B_OK)
 				status = path.GetParent(&path);
 			if (status == B_OK) {
-				status = path.Append(fDeskbarLink.link, true);
+				status = path.Append(fDeskbarLink.Link(), true);
 				HDINFO("trying to launch: %s", path.Path());
 			}
 		}
@@ -498,7 +510,7 @@ public:
 	}
 
 	static bool FindAppToLaunch(const PackageInfoRef& package,
-		DeskbarLinkList& foundLinks)
+		std::vector<DeskbarLink>& foundLinks)
 	{
 		if (package.Get() == NULL)
 			return false;
@@ -545,7 +557,7 @@ public:
 			return false;
 		}
 
-		return foundLinks.CountItems() > 0;
+		return !foundLinks.empty();
 	}
 
 private:
@@ -585,36 +597,50 @@ PackageManager::GetPackageState(const PackageInfo& package)
 }
 
 
-PackageActionList
-PackageManager::GetPackageActions(PackageInfoRef package, Model* model)
+void
+PackageManager::GetPackageActions(PackageInfoRef package, Model* model,
+		Collector<PackageActionRef>& actionList)
 {
-	PackageActionList actionList;
 	if (package->IsSystemPackage() || package->IsSystemDependency())
-		return actionList;
+		return;
 
-	int32 state = package->State();
-	if (state == ACTIVATED || state == INSTALLED) {
-		actionList.Add(PackageActionRef(new UninstallPackageAction(
-			package, model), true));
-
-		// Add OpenPackageActions for each deskbar link found in the
-		// package
-		DeskbarLinkList foundLinks;
-		if (OpenPackageAction::FindAppToLaunch(package, foundLinks)
-			&& foundLinks.CountItems() < 4) {
-			for (int32 i = 0; i < foundLinks.CountItems(); i++) {
-				const DeskbarLink& link = foundLinks.ItemAtFast(i);
-				actionList.Add(PackageActionRef(new OpenPackageAction(
-					package, model, link), true));
-			}
-		}
-	} else if (state == NONE || state == UNINSTALLED) {
-		actionList.Add(PackageActionRef(new InstallPackageAction(package,
-				model),	true));
+	switch (package->State()) {
+		case ACTIVATED:
+		case INSTALLED:
+			_GatherPackageActionsForActivatedOrInstalled(
+				package, model, actionList);
+			break;
+		case NONE:
+		case UNINSTALLED:
+			actionList.Add(PackageActionRef(
+				new InstallPackageAction(package, model), true));
+			break;
+		default:
+			break;
 	}
-	// TODO: activation status
+}
 
-	return actionList;
+
+void
+PackageManager::_GatherPackageActionsForActivatedOrInstalled(
+		PackageInfoRef package, Model* model,
+		Collector<PackageActionRef>& actionList)
+{
+	actionList.Add(PackageActionRef(new UninstallPackageAction(
+		package, model), true));
+
+	// Add OpenPackageActions for each deskbar link found in the
+	// package
+	std::vector<DeskbarLink> foundLinks;
+	if (OpenPackageAction::FindAppToLaunch(package, foundLinks)
+		&& foundLinks.size() < 4) {
+		std::vector<DeskbarLink>::const_iterator it;
+		for (it = foundLinks.begin(); it != foundLinks.end(); it++) {
+			const DeskbarLink& aLink = *it;
+			actionList.Add(PackageActionRef(new OpenPackageAction(
+				package, model, aLink), true));
+		}
+	}
 }
 
 

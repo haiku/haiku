@@ -14,6 +14,7 @@
 #include <package/DaemonClient.h>
 #include <package/manager/PackageManager.h>
 
+#include "Collector.h"
 #include "DecisionProvider.h"
 #include "JobStateListener.h"
 #include "PackageAction.h"
@@ -72,8 +73,9 @@ public:
 	virtual						~PackageManager();
 
 	virtual	PackageState		GetPackageState(const PackageInfo& package);
-	virtual	PackageActionList	GetPackageActions(PackageInfoRef package,
-									Model* model);
+	virtual	void				GetPackageActions(PackageInfoRef package,
+									Model* model,
+									Collector<PackageActionRef>& actionList);
 
 			void				SetCurrentActionPackage(
 									PackageInfoRef package,
@@ -120,6 +122,9 @@ private:
 									InstalledRepository& repository);
 
 private:
+			void				_GatherPackageActionsForActivatedOrInstalled(
+									PackageInfoRef package, Model* model,
+									Collector<PackageActionRef>& actionList);
 			bool				_AddResults(
 									BPackageManager::InstalledRepository&
 										repository,

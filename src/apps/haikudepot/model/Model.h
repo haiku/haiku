@@ -1,6 +1,6 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2016-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef MODEL_H
@@ -58,7 +58,6 @@ public:
 
 
 typedef BReference<ModelListener> ModelListenerRef;
-typedef List<ModelListenerRef, false> ModelListenerList;
 
 
 class Model {
@@ -74,7 +73,7 @@ public:
 			BLocker*			Lock()
 									{ return &fLock; }
 
-			bool				AddListener(const ModelListenerRef& listener);
+			void				AddListener(const ModelListenerRef& listener);
 
 			PackageInfoRef		PackageForName(const BString& name);
 			bool				MatchesFilter(
@@ -176,7 +175,7 @@ private:
 
 			void				_PopulatePackageScreenshot(
 									const PackageInfoRef& package,
-									const ScreenshotInfo& info,
+									const ScreenshotInfoRef& info,
 									int32 scaledWidth, bool fromCacheOnly);
 
 			void				_NotifyAuthorizationChanged();
@@ -215,7 +214,8 @@ private:
 								fPackageIconRepository;
 			WebAppInterface		fWebAppInterface;
 
-			ModelListenerList	fListeners;
+			std::vector<ModelListenerRef>
+								fListeners;
 };
 
 
