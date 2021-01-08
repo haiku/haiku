@@ -810,7 +810,7 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 
 		// Isochronous transfers use more specifically sized packets.
 		trbSize = transfer->DataLength() / isochronousData->packet_count;
-		if (trbSize > pipe->MaxPacketSize() || trbSize
+		if (trbSize == 0 || trbSize > pipe->MaxPacketSize() || trbSize
 				!= (size_t)isochronousData->packet_descriptors[0].request_length)
 			return B_BAD_VALUE;
 	}
@@ -2045,6 +2045,10 @@ XHCI::ConfigureEndpoint(xhci_endpoint* ep, uint8 slot, uint8 number, uint8 type,
 	// The Max Burst Payload is the number of bytes moved by a
 	// maximum sized burst. (XHCI 1.2 § 4.11.7.1 p236.)
 	ep->max_burst_payload = (maxBurst + 1) * maxPacketSize;
+	if (ep->max_burst_payload == 0) {
+		TRACE_ERROR("ConfigureEndpoint() failed invalid max_burst_payload\n");
+		return B_BAD_VALUE;
+	}
 
 	// Assign average TRB length.
 	if ((type & USB_OBJECT_CONTROL_PIPE) != 0) {
