@@ -21,6 +21,10 @@
 #include <arch/x86/arch_cpuasm.h>
 #include <arch/x86/descriptors.h>
 
+#ifdef __x86_64__
+#	include <arch/x86/64/cpu.h>
+#endif
+
 #endif	// !_ASSEMBLER
 
 
