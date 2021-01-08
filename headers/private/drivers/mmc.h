@@ -78,6 +78,8 @@ typedef struct mmc_bus_interface {
 	status_t (*do_io)(void* controller, uint8_t command,
 		IOOperation* operation, bool offsetAsSectors);
 		// Execute a command that involves a data transfer.
+	void (*set_scan_semaphore)(void* controller, sem_id sem);
+		// Pass the semaphore used for device rescan to the bus controller
 } mmc_bus_interface;
 
 

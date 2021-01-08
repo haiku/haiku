@@ -49,9 +49,7 @@ mmc_bus_uninit(void* _device)
 static status_t
 mmc_bus_register_child(void* _device)
 {
-	CALLED();
-	MMCBus* device = (MMCBus*)_device;
-	device->Rescan();
+	// Nothing to do, child devices are registered by the scanning thread
 	return B_OK;
 }
 

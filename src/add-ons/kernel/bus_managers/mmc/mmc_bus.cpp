@@ -40,6 +40,8 @@ MMCBus::MMCBus(device_node* node)
 	fWorkerThread = spawn_kernel_thread(_WorkerThread, "SD bus controller",
 		B_NORMAL_PRIORITY, this);
 	resume_thread(fWorkerThread);
+
+	fController->set_scan_semaphore(fCookie, fScanSemaphore);
 }
 
 
@@ -115,6 +117,14 @@ MMCBus::_ActivateDevice(uint16_t rca)
 }
 
 
+void MMCBus::_AcquireScanSemaphore()
+{
+	release_sem(fLockSemaphore);
+	acquire_sem(fScanSemaphore);
+	acquire_sem(fLockSemaphore);
+}
+
+
 status_t
 MMCBus::_WorkerThread(void* cookie)
 {
@@ -127,16 +137,22 @@ MMCBus::_WorkerThread(void* cookie)
 	// cards.
 
 	// Reset all cards on the bus
-	bus->ExecuteCommand(SD_GO_IDLE_STATE, 0, NULL);
+	// This does not work if the bus has not been powered on yet (the command
+	// will timeout), in that case we wait until asked to scan again when a
+	// card has been inserted and powered on.
+	status_t result;
+	do {
+		bus->_AcquireScanSemaphore();
+		TRACE("Reset the bus...\n");
+		result = bus->ExecuteCommand(SD_GO_IDLE_STATE, 0, NULL);
+		TRACE("CMD0 result: %s\n", strerror(result));
+	} while (result != B_OK);
+
+	// Need to wait at least 8 clock cycles after CMD0 before sending the next
+	// command
+	snooze(100000);
 
 	while (bus->fStatus != B_SHUTTING_DOWN) {
-		release_sem(bus->fLockSemaphore);
-		// wait for bus to signal a card is inserted
-		// Most of the time the thread will be waiting here, with
-		// fLockSemaphore released
-		acquire_sem(bus->fScanSemaphore);
-		acquire_sem(bus->fLockSemaphore);
-
 		TRACE("Scanning the bus\n");
 
 		// Probe the voltage range
@@ -162,10 +178,12 @@ MMCBus::_WorkerThread(void* cookie)
 		} else if (response != probe) {
 			ERROR("Card does not support voltage range (expected %x, "
 				"reply %x)\n", probe, response);
-			// TODO what now?
+			// TODO we should power off the bus in this case.
 		}
 
 		// Probe OCR, waiting for card to become ready
+		// We keep repeating ACMD41 until the card replies that it is
+		// initialized.
 		uint32_t ocr;
 		do {
 			uint32_t cardStatus;
@@ -259,6 +277,10 @@ MMCBus::_WorkerThread(void* cookie)
 		// FIXME we also need to unpublish devices that are gone. Probably need
 		// to "ping" all RCAs somehow? Or is there an interrupt we can look for
 		// to detect added/removed cards?
+
+		// Wait for the next scan request
+		// The thread will spend most of its time waiting here
+		bus->_AcquireScanSemaphore();
 	}
 
 	release_sem(bus->fLockSemaphore);

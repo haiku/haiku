@@ -46,6 +46,7 @@ class SdhciBus {
 							~SdhciBus();
 
 		void				EnableInterrupts(uint32_t mask);
+		void				DisableInterrupts();
 		status_t			ExecuteCommand(uint8_t command, uint32_t argument,
 								uint32_t* response);
 		int32				HandleInterrupt();
@@ -54,6 +55,7 @@ class SdhciBus {
 		void				SetClock(int kilohertz);
 		status_t			DoIO(uint8_t command, IOOperation* operation,
 								bool offsetAsSectors);
+		void				SetScanSemaphore(sem_id sem);
 
 	private:
 		bool				PowerOn();
@@ -64,6 +66,7 @@ class SdhciBus {
 		uint32_t			fCommandResult;
 		uint8_t				fIrq;
 		sem_id				fSemaphore;
+		sem_id				fScanSemaphore;
 		status_t			fStatus;
 };
 
@@ -117,16 +120,12 @@ SdhciBus::SdhciBus(struct registers* registers, uint8_t irq)
 	// Then we configure the clock to the frequency needed for initialization
 	SetClock(400);
 
-	// And we turn on the power supply to the card
-	// FIXME maybe this should only be done when a card is inserted?
-	if (!PowerOn()) {
-		ERROR("Failed to power on the card\n");
-		fStatus = B_NO_INIT;
-		return;
-	}
+	// Turn on the power supply to the card, if there is a card inserted
+	PowerOn();
 
-	EnableInterrupts(SDHCI_INT_CMD_CMP | SDHCI_INT_CARD_INS
-		| SDHCI_INT_CARD_REM | SDHCI_INT_TRANS_CMP);
+	// Finally, configure some useful interrupts
+	EnableInterrupts(SDHCI_INT_CMD_CMP | SDHCI_INT_CARD_REM
+		| SDHCI_INT_TRANS_CMP);
 
 	// We want to see the error bits in the status register, but not have an
 	// interrupt trigger on them (we get a "command complete" interrupt on
@@ -139,7 +138,7 @@ SdhciBus::SdhciBus(struct registers* registers, uint8_t irq)
 
 SdhciBus::~SdhciBus()
 {
-	EnableInterrupts(0);
+	DisableInterrupts();
 
 	if (fSemaphore != 0)
 		delete_sem(fSemaphore);
@@ -155,8 +154,16 @@ SdhciBus::~SdhciBus()
 void
 SdhciBus::EnableInterrupts(uint32_t mask)
 {
-	fRegisters->interrupt_status_enable = mask;
-	fRegisters->interrupt_signal_enable = mask;
+	fRegisters->interrupt_status_enable |= mask;
+	fRegisters->interrupt_signal_enable |= mask;
+}
+
+
+void
+SdhciBus::DisableInterrupts()
+{
+	fRegisters->interrupt_status_enable = 0;
+	fRegisters->interrupt_signal_enable = 0;
 }
 
 
@@ -468,6 +475,21 @@ SdhciBus::DoIO(uint8_t command, IOOperation* operation, bool offsetAsSectors)
 }
 
 
+void
+SdhciBus::SetScanSemaphore(sem_id sem)
+{
+	fScanSemaphore = sem;
+
+	// If there is already a card in, start a scan immediately
+	if (fRegisters->present_state.IsCardInserted())
+		release_sem(fScanSemaphore);
+
+	// We can now enable the card insertion interrupt for next time a card
+	// is inserted
+	EnableInterrupts(SDHCI_INT_CARD_INS);
+}
+
+
 bool
 SdhciBus::PowerOn()
 {
@@ -532,21 +554,19 @@ SdhciBus::HandleInterrupt()
 	TRACE("interrupt function called %x\n", intmask);
 
 	// handling card presence interrupt
-	if (intmask & (SDHCI_INT_CARD_INS | SDHCI_INT_CARD_REM)) {
-		uint32_t card_present = ((intmask & SDHCI_INT_CARD_INS) != 0);
-		fRegisters->interrupt_status_enable &= ~(SDHCI_INT_CARD_INS
-			| SDHCI_INT_CARD_REM);
-		fRegisters->interrupt_signal_enable &= ~(SDHCI_INT_CARD_INS
-			| SDHCI_INT_CARD_REM);
+	if ((intmask & SDHCI_INT_CARD_INS) != 0) {
+		PowerOn();
 
-		fRegisters->interrupt_status_enable |= card_present
-		 	? SDHCI_INT_CARD_REM : SDHCI_INT_CARD_INS;
-		fRegisters->interrupt_signal_enable |= card_present
-			? SDHCI_INT_CARD_REM : SDHCI_INT_CARD_INS;
+		release_sem_etc(fScanSemaphore, 1, B_DO_NOT_RESCHEDULE);
 
-		fRegisters->interrupt_status |= (intmask &
-			(SDHCI_INT_CARD_INS | SDHCI_INT_CARD_REM));
+		fRegisters->interrupt_status |= SDHCI_INT_CARD_INS;
 		TRACE("Card presence interrupt handled\n");
+	}
+
+	if ((intmask & SDHCI_INT_CARD_REM) != 0) {
+		fRegisters->power_control.PowerOff();
+		fRegisters->interrupt_status |= SDHCI_INT_CARD_REM;
+		TRACE("Card removal interrupt handled\n");
 	}
 
 	// handling command interrupt
@@ -927,9 +947,19 @@ do_io(void* controller, uint8_t command, IOOperation* operation,
 	bool offsetAsSectors)
 {
 	CALLED();
-	
+
 	SdhciBus* bus = (SdhciBus*)controller;
 	return bus->DoIO(command, operation, offsetAsSectors);
+}
+
+
+static void
+set_scan_semaphore(void* controller, sem_id sem)
+{
+	CALLED();
+
+	SdhciBus* bus = (SdhciBus*)controller;
+	return bus->SetScanSemaphore(sem);
 }
 
 
@@ -960,7 +990,8 @@ static mmc_bus_interface gSDHCIPCIDeviceModule = {
 
 	set_clock,
 	execute_command,
-	do_io
+	do_io,
+	set_scan_semaphore
 };
 
 

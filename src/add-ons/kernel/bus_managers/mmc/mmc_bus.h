@@ -51,6 +51,7 @@ public:
 				void			ReleaseBus() { release_sem(fLockSemaphore); }
 private:
 				status_t		_ActivateDevice(uint16_t rca);
+				void			_AcquireScanSemaphore();
 		static	status_t		_WorkerThread(void*);
 
 private:

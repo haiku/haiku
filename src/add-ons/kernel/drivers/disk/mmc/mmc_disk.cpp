@@ -453,11 +453,8 @@ mmc_block_io(void* cookie, io_request* request)
 static status_t
 mmc_block_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 {
-	CALLED();
 	mmc_disk_handle* handle = (mmc_disk_handle*)cookie;
 	mmc_disk_driver_info* info = handle->info;
-
-	TRACE("ioctl(op = %" B_PRId32 ")\n", op);
 
 	switch (op) {
 		case B_GET_MEDIA_STATUS:
@@ -466,8 +463,6 @@ mmc_block_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 				return B_BAD_VALUE;
 
 			*(status_t *)buffer = B_OK;
-			TRACE("B_GET_MEDIA_STATUS: 0x%08" B_PRIx32 "\n",
-				*(status_t *)buffer);
 			return B_OK;
 			break;
 		}
