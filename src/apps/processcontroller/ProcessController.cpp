@@ -117,14 +117,6 @@ layoutT layout[] = {
 	{ 3, 1, 4 },	// 2
 	{ 2, 1, 3 },
 	{ 2, 0, 3 },	// 4
-	{ 1, 1, 1 },
-	{ 1, 1, 2 },
-	{ 1, 1, 1 },
-	{ 1, 0, 3 },	// 8
-	{ 1, 1, 1 },
-	{ 1, 0, 3 },
-	{ 1, 0, 2 },
-	{ 1, 0, 1 }		// 12
 };
 
 
@@ -135,7 +127,23 @@ extern "C" _EXPORT BView*
 instantiate_deskbar_item(float maxWidth, float maxHeight)
 {
 	gInDeskbar = true;
-	return new ProcessController(maxHeight - 1, maxHeight - 1);
+
+	system_info info;
+	get_system_info(&info);
+	int width = 15;
+	if (info.cpu_count > 4)
+		width = info.cpu_count;
+	if (info.cpu_count <= 16)
+		width *= 2;
+
+	// For the memory bar
+	width += 8;
+
+	// Damn, you got a lot of CPU
+	if (width > maxWidth)
+		width = maxWidth;
+
+	return new ProcessController(width - 1, maxHeight - 1);
 }
 
 
@@ -600,8 +608,8 @@ ProcessController::DoDraw(bool force)
 	float barWidth;
 	float barGap;
 	float memWidth;
-	if (gCPUcount <= 12 && bounds.Width() == 15) {
-		// Use fixed sizes for small icon sizes
+	if (gCPUcount <= 4 && bounds.Width() == 15) {
+		// Use fixed sizes for small CPU counts
 		barWidth = layout[gCPUcount].cpu_width;
 		barGap = layout[gCPUcount].cpu_inter;
 		memWidth = layout[gCPUcount].mem_width;

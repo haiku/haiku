@@ -29,7 +29,17 @@ PCWindow::PCWindow()
 	preferences.SaveInt32(kCurrentVersion, kVersionName);
 	preferences.LoadWindowPosition(this, kPosPrefName);
 
-	SetSizeLimits(Bounds().Width(), Bounds().Width(), 31, 32767);
+        system_info info;
+        get_system_info(&info);
+        int width = 15;
+        if (info.cpu_count > 4)
+                width = info.cpu_count;
+        if (info.cpu_count <= 16)
+                width *= 2;
+
+        // For the memory bar
+        width += 8;
+
 	BRect rect = Bounds();
 
 	BView* topView = new BView(rect, NULL, B_FOLLOW_ALL, B_WILL_DRAW);
@@ -38,8 +48,11 @@ PCWindow::PCWindow()
 
 	// set up a rectangle && instantiate a new view
 	// view rect should be same size as window rect but with left top at (0, 0)
-	rect.Set(0, 0, 15, 15);
+	rect.Set(0, 0, width, 15);
+	SetSizeLimits(rect.Width() + 21, rect.Width() + 21, 15 + 21, 15 + 21);
+
 	rect.OffsetTo((Bounds().Width() - 16) / 2, (Bounds().Height() - 16) / 2);
+
 	topView->AddChild(new ProcessController(rect));
 
 	// make window visible
