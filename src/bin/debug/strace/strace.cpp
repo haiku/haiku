@@ -773,7 +773,7 @@ main(int argc, const char *const *argv)
 		if (message.origin.thread >= 0 && message.origin.nub_port >= 0) {
 			if (continue_thread(message.origin.nub_port,
 					message.origin.thread) != B_OK) {
-				exit(1);
+				// the team can already be gone
 			}
 		}
 	}
