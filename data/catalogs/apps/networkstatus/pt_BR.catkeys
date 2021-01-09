@@ -1,5 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-NetworkStatus	3823341665
-Netmask	NetworkStatusView		Máscara de rede
+1	portuguese (brazil)	x-vnd.Haiku-NetworkStatus	504030701
 Quit	NetworkStatusView		Sair
 Unknown	NetworkStatusView		Desconhecido
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Falha ao abrir as preferências de Rede.\n\nErro:
@@ -11,10 +10,8 @@ No link	NetworkStatusView		Nenhum vínculo
 Could not join wireless network:\n	NetworkStatusView		Não foi possível conectar à rede sem fio:\n
 Ready	NetworkStatusView		Pronto
 Network Status	NetworkStatusView		Status da rede
-Address	NetworkStatusView		Endereço
 No stateful configuration	NetworkStatusView		Nenhuma configuração definida
 You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Você pode executar NetworkStatus em uma janela ou instalá-lo na Deskbar.
-Broadcast	NetworkStatusView		Transmissão
 %ifaceName information:\n	NetworkStatusView		%ifaceName informação:\n
 Run in window	NetworkStatus		Executar em janela
 <no wireless networks found>	NetworkStatusView		<nenhuma rede sem fio encontrada>

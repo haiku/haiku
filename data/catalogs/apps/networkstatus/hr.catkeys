@@ -1,5 +1,4 @@
-1	croatian	x-vnd.Haiku-NetworkStatus	1543866787
-Netmask	NetworkStatusView		Mrežna maska
+1	croatian	x-vnd.Haiku-NetworkStatus	986440810
 Quit	NetworkStatusView		Isključi
 Unknown	NetworkStatusView		Nepoznato
 Open network preferences…	NetworkStatusView		Otvori osobitosti mreže...
@@ -9,7 +8,6 @@ No link	NetworkStatusView		Nema poveznice
 Could not join wireless network:\n	NetworkStatusView		Ne mogu sre priključiti bežičnoj mreži:\n
 Ready	NetworkStatusView		Spremno
 Network Status	NetworkStatusView		Status mreže
-Address	NetworkStatusView		Adresa
 Run in window	NetworkStatus		Pokreni u prozoru
 <no wireless networks found>	NetworkStatusView		<nijedna bežična mreža nije pronađena>
 Configuring	NetworkStatusView		Konfiguriram

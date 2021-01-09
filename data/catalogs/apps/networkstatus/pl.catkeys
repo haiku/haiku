@@ -1,5 +1,4 @@
-1	polish	x-vnd.Haiku-NetworkStatus	186344131
-Netmask	NetworkStatusView		Maska sieciowa
+1	polish	x-vnd.Haiku-NetworkStatus	1162000463
 Quit	NetworkStatusView		Zakończ
 Unknown	NetworkStatusView		Nieznany
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Uruchamianie panelu sieci nie powiodło się.\n\nBłąd: 
@@ -12,11 +11,9 @@ No link	NetworkStatusView		Brak połączenia
 Could not join wireless network:\n	NetworkStatusView		Nie można połączyć się z siecią bezprzewodową:\n
 Ready	NetworkStatusView		Gotowy
 Network Status	NetworkStatusView		Status sieci
-Address	NetworkStatusView		Adres
 Deskbar is not running, giving up.	NetworkStatus		Deskbar nie jest uruchomiony, anulowanie.
 No stateful configuration	NetworkStatusView		Brak pełnej konfiguracji
 You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Możesz uruchomić NetworkStatus w osobnym oknie lub w Deskbarze.
-Broadcast	NetworkStatusView		Nadawanie
 %ifaceName information:\n	NetworkStatusView		informacje o %ifaceName:\n
 Run in window	NetworkStatus		Uruchom w oknie
 <no wireless networks found>	NetworkStatusView		<nie odnaleziono sieci bezprzewodowych>

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-WebPositive	1976607515
+1	japanese	x-vnd.Haiku-WebPositive	250728390
 Authentication required	Authentication Panel		認証が必要です
 Previous	WebPositive Window		前へ
 (Finish: %date)	Download Window		(完了: %date)
@@ -101,6 +101,7 @@ There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPosi
 Revert	Settings Window		戻す
 Copy	WebPositive Window		コピー
 Default standard font size:	Settings Window		標準フォントサイズ:
+Custom	Settings Window		ユーザー設定
 Bookmark this page	WebPositive Window		このページをブックマーク
 Show tabs if only one page is open	Settings Window		ページがひとつだけでもタブを表示
 Close tab	WebPositive Window		タブを閉じる

@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-WebPositive	1976607515
+1	romanian	x-vnd.Haiku-WebPositive	250728390
 Authentication required	Authentication Panel		Autentificare necesară
 Previous	WebPositive Window		Anterior
 (Finish: %date)	Download Window		(Terminare: %date)
@@ -101,6 +101,7 @@ There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPosi
 Revert	Settings Window		Revenire
 Copy	WebPositive Window		Copiază
 Default standard font size:	Settings Window		Dimensiunea de font standard implicită:
+Custom	Settings Window		Personalizat
 Bookmark this page	WebPositive Window		Marchează această pagină
 Show tabs if only one page is open	Settings Window		Afișează taburile doar dacă este deschisă o singură pagină
 Close tab	WebPositive Window		Închide tabul

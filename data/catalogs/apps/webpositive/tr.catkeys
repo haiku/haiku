@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-WebPositive	1976607515
+1	turkish	x-vnd.Haiku-WebPositive	250728390
 Authentication required	Authentication Panel		Kimlik doğrulaması gerekli
 Previous	WebPositive Window		Önceki
 (Finish: %date)	Download Window		(Bitiş: %date)
@@ -101,6 +101,7 @@ There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPosi
 Revert	Settings Window		Eski haline döndür
 Copy	WebPositive Window		Kopyala
 Default standard font size:	Settings Window		Öntanımlı standart yazıtipi boyutu:
+Custom	Settings Window		Özel
 Bookmark this page	WebPositive Window		Bu sayfayı yer imlerine ekle
 Show tabs if only one page is open	Settings Window		Tek bir sayfa açıksa bile sekmeleri göster
 Close tab	WebPositive Window		Sekmeyi kapat

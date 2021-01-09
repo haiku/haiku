@@ -1,5 +1,4 @@
-1	portuguese	x-vnd.Haiku-NetworkStatus	186344131
-Netmask	NetworkStatusView		Máscara de rede
+1	portuguese	x-vnd.Haiku-NetworkStatus	1162000463
 Quit	NetworkStatusView		Sair
 Unknown	NetworkStatusView		Desconhecido
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Falha ao iniciar o preflet de rede.\n\nErro: 
@@ -12,11 +11,9 @@ No link	NetworkStatusView		Sem ligação
 Could not join wireless network:\n	NetworkStatusView		Não foi possível aceder à rede sem fios:\n
 Ready	NetworkStatusView		Pronto
 Network Status	NetworkStatusView		Estado da Rede
-Address	NetworkStatusView		Endereço
 Deskbar is not running, giving up.	NetworkStatus		A Deskbar não se encontra em execução, a desistir.
 No stateful configuration	NetworkStatusView		Sem configuração de monitorização de estado
 You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Pode executar a aplicação Estado da Rede numa janela ou instalá-la na Deskbar.
-Broadcast	NetworkStatusView		Difusão
 %ifaceName information:\n	NetworkStatusView		Informação sobre %ifaceName:\n
 Run in window	NetworkStatus		Executar em janela
 <no wireless networks found>	NetworkStatusView		<não foram encontradas redes sem fios>

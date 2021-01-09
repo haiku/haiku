@@ -1,5 +1,4 @@
-1	slovak	x-vnd.Haiku-NetworkStatus	3823341665
-Netmask	NetworkStatusView		Maska siete
+1	slovak	x-vnd.Haiku-NetworkStatus	504030701
 Quit	NetworkStatusView		Ukončiť
 Unknown	NetworkStatusView		Neznáme
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Spustenie nastavenia siete zlyhalo.\n\nChyba: 
@@ -11,10 +10,8 @@ No link	NetworkStatusView		Bez spojenia
 Could not join wireless network:\n	NetworkStatusView		Nebolo možné pridať sa do bezdrôtovej siete:\n
 Ready	NetworkStatusView		Pripravené
 Network Status	NetworkStatusView		Stav siete
-Address	NetworkStatusView		Adresa
 No stateful configuration	NetworkStatusView		Bez stavovej konfigurácie
 You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		StavSiete môžete spustiť buď v okne alebo ho nainštalovať do Panelu.
-Broadcast	NetworkStatusView		Broadcast
 %ifaceName information:\n	NetworkStatusView		Informácie %ifaceName:\n
 Run in window	NetworkStatus		Spustiť v okne
 <no wireless networks found>	NetworkStatusView		<nenájdené žiadne bezdrôtové siete>

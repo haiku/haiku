@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-GLInfo	2211760527
+1	japanese	x-vnd.Haiku-GLInfo	1282327690
 Maximum clipping planes	Capabilities		Maximum clipping planes
 Maximum evaluators equation order	Capabilities		Maximum evaluators equation order
 Texture stack size	Capabilities		Texture stack size
@@ -13,12 +13,15 @@ Value	Capabilities		値
 Name stack size	Capabilities		Name stack size
 Capabilities	Capabilities		機能
 Maximum texture units	Capabilities		Maximum texture units
+Unknown or missing OpenGL renderer.	InfoView		不明または存在しない OpenGL レンダラー。
 Capability	Capabilities		機能
 Maximum 2D texture size	Capabilities		Maximum 2D texture size
 Auxiliary buffer(s)	Capabilities		Auxiliary buffer(s)
+Unknown vendor	InfoView		不明な開発元
 Maximum convolution	Capabilities		Maximum convolution
 Maximum 3D texture size	Capabilities		Maximum 3D texture size
 Maximum recommended index elements	Capabilities		Maximum recommended index elements
+Unknown version	InfoView		不明なバージョン
 List stack size	Capabilities		List stack size
 Model stack size	Capabilities		Model stack size
 Projection stack size	Capabilities		Projection stack size

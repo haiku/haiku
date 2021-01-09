@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-WebPositive	1976607515
+1	catalan; valencian	x-vnd.Haiku-WebPositive	250728390
 Authentication required	Authentication Panel		Cal autenticació
 Previous	WebPositive Window		Anterior
 (Finish: %date)	Download Window		(Acabament: %date)
@@ -101,6 +101,7 @@ There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPosi
 Revert	Settings Window		Reverteix
 Copy	WebPositive Window		Copia
 Default standard font size:	Settings Window		Mida de la lletra estàndard per defecte:
+Custom	Settings Window		Personalitzat
 Bookmark this page	WebPositive Window		Afegeix aquesta pàgina a les adreces d'interès
 Show tabs if only one page is open	Settings Window		Mostra les pestanyes si només s’obre una pàgina.
 Close tab	WebPositive Window		Tanca la pestanya
