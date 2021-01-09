@@ -2969,10 +2969,16 @@ user_unblock_thread(thread_id threadID, status_t status)
 
 	InterruptsSpinLocker locker(thread->scheduler_lock);
 
-	set_ac();
-	if (thread->user_thread->wait_status > 0) {
-		thread->user_thread->wait_status = status;
-		clear_ac();
+	status_t waitStatus;
+	if (user_memcpy(&waitStatus, &thread->user_thread->wait_status,
+			sizeof(waitStatus)) < B_OK) {
+		return B_BAD_ADDRESS;
+	}
+	if (waitStatus > 0) {
+		if (user_memcpy(&thread->user_thread->wait_status, &status,
+				sizeof(status)) < B_OK) {
+			return B_BAD_ADDRESS;
+		}
 
 		// Even if the user_thread->wait_status was > 0, it may be the
 		// case that this thread is actually blocked on something else.
@@ -2980,9 +2986,7 @@ user_unblock_thread(thread_id threadID, status_t status)
 				&& thread->wait.type == THREAD_BLOCK_TYPE_USER) {
 			thread_unblock_locked(thread, status);
 		}
-	} else
-		clear_ac();
-
+	}
 	return B_OK;
 }
 
@@ -3709,13 +3713,13 @@ _user_block_thread(uint32 flags, bigtime_t timeout)
 	ThreadLocker threadLocker(thread);
 
 	// check, if already done
-	set_ac();
-	if (thread->user_thread->wait_status <= 0) {
-		status_t status = thread->user_thread->wait_status;
-		clear_ac();
-		return status;
+	status_t waitStatus;
+	if (user_memcpy(&waitStatus, &thread->user_thread->wait_status,
+			sizeof(waitStatus)) < B_OK) {
+		return B_BAD_ADDRESS;
 	}
-	clear_ac();
+	if (waitStatus <= 0)
+		return waitStatus;
 
 	// nope, so wait
 	thread_prepare_to_block(thread, flags, THREAD_BLOCK_TYPE_USER, NULL);
@@ -3729,13 +3733,17 @@ _user_block_thread(uint32 flags, bigtime_t timeout)
 	// Interruptions or timeouts can race with other threads unblocking us.
 	// Favor a wake-up by another thread, i.e. if someone changed the wait
 	// status, use that.
-	set_ac();
-	status_t oldStatus = thread->user_thread->wait_status;
+	status_t oldStatus;
+	if (user_memcpy(&oldStatus, &thread->user_thread->wait_status,
+		sizeof(oldStatus)) < B_OK) {
+		return B_BAD_ADDRESS;
+	}
 	if (oldStatus > 0) {
-		thread->user_thread->wait_status = status;
-		clear_ac();
+		if (user_memcpy(&thread->user_thread->wait_status, &status,
+				sizeof(status)) < B_OK) {
+			return B_BAD_ADDRESS;
+		}
 	} else {
-		clear_ac();
 		status = oldStatus;
 	}
 
