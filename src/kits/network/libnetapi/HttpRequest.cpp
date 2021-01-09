@@ -1212,5 +1212,5 @@ BHttpRequest::_NotifyDataReceived(const char* data, off_t pos, ssize_t size,
 	}
 	fListener->DataReceived(this, data, pos, size);
 	fListener->DownloadProgress(this, bytesReceived,
-		std::max((off_t)0, bytesTotal));
+		std::max((ssize_t)0, bytesTotal));
 }
