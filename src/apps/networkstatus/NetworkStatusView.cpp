@@ -353,16 +353,16 @@ NetworkStatusView::_ShowConfiguration(BMessage* message)
 		networkInterface.GetAddressAt(i, address);
 		switch (address.Address().Family()) {
 			case AF_INET:
-				text << "\n" << B_TRANSLATE("IPv4 Address: ")
+				text << "\n" << B_TRANSLATE("IPv4 address:") << " "
 					<< address.Address().ToString()
-					<< "\n" << B_TRANSLATE("Broadcast: ")
+					<< "\n" << B_TRANSLATE("Broadcast:") << " "
 					<< address.Broadcast().ToString()
-					<< "\n" << B_TRANSLATE("Netmask: ")
+					<< "\n" << B_TRANSLATE("Netmask:") << " "
 					<< address.Mask().ToString()
 					<< "\n";
 				break;
 			case AF_INET6:
-				text << "\n" << B_TRANSLATE("IPv6 Address: ")
+				text << "\n" << B_TRANSLATE("IPv6 address:") << " "
 					<< address.Address().ToString()
 					<< "/" << address.Mask().PrefixLength()
 					<< "\n";
