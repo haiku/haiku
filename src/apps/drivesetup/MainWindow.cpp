@@ -740,12 +740,11 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 
 		// Mount items
 		if (partition != NULL) {
-			bool notMountedAndWritable = !partition->IsMounted()
-				&& !partition->IsReadOnly()
+			bool writable = !partition->IsReadOnly()
 				&& partition->Device()->HasMedia();
+			bool notMountedAndWritable = !partition->IsMounted() && writable;
 
-			fFormatMenu->SetEnabled(notMountedAndWritable
-				&& fFormatMenu->CountItems() > 0);
+			fFormatMenu->SetEnabled(writable && fFormatMenu->CountItems() > 0);
 
 			fDiskInitMenu->SetEnabled(notMountedAndWritable
 				&& partition->IsDevice()
@@ -967,10 +966,13 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 	}
 
 	if (partition->IsMounted()) {
-		_DisplayPartitionError(
-			B_TRANSLATE("The partition %s is currently mounted."));
-		// TODO: option to unmount and continue on success to unmount
-		return;
+		if (partition->Unmount() != B_OK) {
+			// Probably it's the system partition
+			_DisplayPartitionError(
+				B_TRANSLATE("The partition cannot be unmounted."));
+
+			return;
+		}
 	}
 
 	BDiskSystem diskSystem;
