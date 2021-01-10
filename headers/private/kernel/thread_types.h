@@ -455,6 +455,10 @@ struct Thread : TeamThreadIteratorEntry<thread_id>, KernelReferenceable {
 		// non-0 after a return from _user_sigsuspend(), containing the inverted
 		// original signal mask, reset in handle_signals(); only accessed by
 		// this thread
+	sigset_t		old_sig_block_mask;
+		// the old sig_block_mask to be restored when returning to userland
+		// when THREAD_FLAGS_OLD_SIGMASK is set
+
 	ucontext_t*		user_signal_context;	// only accessed by this thread
 	addr_t			signal_stack_base;		// only accessed by this thread
 	size_t			signal_stack_size;		// only accessed by this thread
@@ -844,5 +848,7 @@ using BKernel::ProcessGroupList;
 #define	THREAD_FLAGS_COMPAT_MODE			0x2000
 	// the thread runs a compatibility mode (for instance IA32 on x86_64).
 #endif
+#define	THREAD_FLAGS_OLD_SIGMASK			0x4000
+	// the thread has an old sigmask to be restored
 
 #endif	/* _KERNEL_THREAD_TYPES_H */
