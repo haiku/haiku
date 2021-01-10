@@ -771,7 +771,12 @@ _user_xsi_semget(key_t key, int numberOfSemaphores, int flags)
 
 			MutexLocker _(sXsiSemaphoreSetLock);
 			semaphoreSet = sSemaphoreHashTable.Lookup(semaphoreSetID);
-			if (semaphoreSet == NULL || !semaphoreSet->HasPermission()) {
+			if (semaphoreSet == NULL) {
+				TRACE_ERROR(("xsi_semget: calling process has no semaphore, "
+					"key %d\n", (int)key));
+				return EINVAL;
+			}
+			if (!semaphoreSet->HasPermission()) {
 				TRACE_ERROR(("xsi_semget: calling process has no permission "
 					"on semaphore %d, key %d\n", semaphoreSet->ID(),
 					(int)key));
