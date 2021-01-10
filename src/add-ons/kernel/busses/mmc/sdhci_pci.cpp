@@ -308,8 +308,8 @@ SdhciBus::ExecuteCommand(uint8_t command, uint32_t argument, uint32_t* response)
 			break;
 	}
 
-	if (replyType == Command::kR1bType &&
-			(fCommandResult & SDHCI_INT_TRANS_CMP == 0)) {
+	if (replyType == Command::kR1bType
+			&& (fCommandResult & SDHCI_INT_TRANS_CMP) == 0) {
 		// R1b commands may use the data line so we must wait for the
 		// "transfer complete" interrupt here.
 		TRACE("Waiting for data line...\n");
