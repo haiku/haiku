@@ -101,7 +101,6 @@ FetchFileJob::Execute()
 	}
 
 	do {
-		printf("downloading %s\n", DownloadURL());
 		BUrlRequest* request = BUrlProtocolRoster::MakeRequest(DownloadURL(),
 			this);
 		if (request == NULL)
@@ -112,7 +111,6 @@ FetchFileJob::Execute()
 		BHttpRequest* http= dynamic_cast<BHttpRequest*>(request);
 		if (http != NULL && fTargetFile.GetSize(&currentPosition) == B_OK
 			&& currentPosition > 0) {
-			printf("requesting range start %" B_PRIdOFF "\n", currentPosition);
 			http->SetRangeStart(currentPosition);
 		}
 

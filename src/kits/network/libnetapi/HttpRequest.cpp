@@ -611,8 +611,20 @@ BHttpRequest::_MakeRequest()
 			if (bytesRead < 0) {
 				readError = bytesRead;
 				break;
-			} else if (bytesRead == 0)
+			} else if (bytesRead == 0) {
+				// Check if we got the expected number of bytes.
+				// Exceptions:
+				// - If the content-length is not known (bytesTotal is 0), for
+				//   example in the case of a chunked transfer, we can't know
+				// - If the request method is "HEAD" which explicitly asks the
+				//   server to not send any data (only the headers)
+				if (bytesTotal > 0 && bytesReceived != bytesTotal
+					&& fRequestMethod != B_HTTP_HEAD) {
+					readError = B_IO_ERROR;
+					break;
+				}
 				receiveEnd = true;
+			}
 
 			fInputBuffer.AppendData(chunk, bytesRead);
 		} else
