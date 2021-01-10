@@ -594,6 +594,11 @@ BPackageManager::_PreparePackageChanges(
 				status_t error = DownloadPackage(url, entry,
 					package->Info().Checksum());
 				if (error != B_OK) {
+					if (error == B_BAD_DATA) {
+						// B_BAD_DATA is returned when there is a checksum
+						// mismatch. Make sure this download is not re-used.
+						entry.Remove();
+					}
 					DIE(error, "Failed to download package %s",
 						package->Info().Name().String());
 				}
