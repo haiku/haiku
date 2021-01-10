@@ -1938,6 +1938,16 @@ dump_thread_list(int argc, char **argv)
 }
 
 
+static void
+update_thread_sigmask_on_exit(Thread* thread)
+{
+	if ((thread->flags & THREAD_FLAGS_OLD_SIGMASK) != 0) {
+		thread->flags &= ~THREAD_FLAGS_OLD_SIGMASK;
+		sigprocmask(SIG_SETMASK, &thread->old_sig_block_mask, NULL);
+	}
+}
+
+
 //	#pragma mark - private kernel API
 
 
@@ -2318,6 +2328,8 @@ thread_at_kernel_exit(void)
 
 	disable_interrupts();
 
+	update_thread_sigmask_on_exit(thread);
+
 	// track kernel time
 	bigtime_t now = system_time();
 	SpinLocker threadTimeLocker(thread->time_lock);
@@ -2338,6 +2350,8 @@ thread_at_kernel_exit_no_signals(void)
 
 	TRACE(("thread_at_kernel_exit_no_signals: exit thread %" B_PRId32 "\n",
 		thread->id));
+
+	update_thread_sigmask_on_exit(thread);
 
 	// track kernel time
 	bigtime_t now = system_time();
