@@ -31,7 +31,7 @@ PCWindow::PCWindow()
 
         system_info info;
         get_system_info(&info);
-        int width = 15;
+        int width = 4;
         if (info.cpu_count > 4)
                 width = info.cpu_count;
         if (info.cpu_count <= 16)
