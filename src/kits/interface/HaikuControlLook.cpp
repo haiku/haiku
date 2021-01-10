@@ -1874,26 +1874,31 @@ HaikuControlLook::DrawInactiveTab(BView* view, BRect& rect,
 	}
 
 	BRect background = rect;
+	bool isVertical;
 	switch (side) {
 		default:
-		case B_TOP_BORDER:
+		case BTabView::kTopSide:
 			rect.top += 4;
 			background.bottom = rect.top;
+			isVertical = false;
 			break;
 
-		case B_BOTTOM_BORDER:
+		case BTabView::kBottomSide:
 			rect.bottom -= 4;
 			background.top = rect.bottom;
+			isVertical = false;
 			break;
 
-		case B_LEFT_BORDER:
+		case BTabView::kLeftSide:
 			rect.left += 4;
 			background.right = rect.left;
+			isVertical = true;
 			break;
 
-		case B_RIGHT_BORDER:
+		case BTabView::kRightSide:
 			rect.right -= 4;
 			background.left = rect.right;
+			isVertical = true;
 			break;
 	}
 
@@ -1902,26 +1907,30 @@ HaikuControlLook::DrawInactiveTab(BView* view, BRect& rect,
 	view->FillRect(background);
 
 	// frame and fill
+	// Note that _DrawFrame also insets the rect, so each of the calls here
+	// operate on a smaller rect than the previous ones
 	_DrawFrame(view, rect, edgeShadowColor, edgeShadowColor, edgeLightColor,
 		edgeLightColor, borders);
 
 	_DrawFrame(view, rect, frameLightColor, frameLightColor, frameShadowColor,
 		frameShadowColor, borders);
 
-	if ((side == B_TOP_BORDER || side == B_BOTTOM_BORDER)
-		&& (borders & B_LEFT_BORDER) != 0) {
-		if (rect.IsValid()) {
-			_DrawFrame(view, rect, bevelShadowColor, bevelShadowColor,
-				bevelLightColor, bevelLightColor, B_LEFT_BORDER & ~borders);
-		} else if ((B_LEFT_BORDER & ~borders) != 0)
-			rect.left++;
-	} else if ((side == B_LEFT_BORDER || side == B_RIGHT_BORDER)
-		&& (borders & B_TOP_BORDER) != 0) {
-		if (rect.IsValid()) {
+	if (rect.IsValid()) {
+		if (isVertical) {
 			_DrawFrame(view, rect, bevelShadowColor, bevelShadowColor,
 				bevelLightColor, bevelLightColor, B_TOP_BORDER & ~borders);
-		} else if ((B_TOP_BORDER & ~borders) != 0)
-			rect.top++;
+		} else {
+			_DrawFrame(view, rect, bevelShadowColor, bevelShadowColor,
+				bevelLightColor, bevelLightColor, B_LEFT_BORDER & ~borders);
+		}
+	} else {
+		if (isVertical) {
+			if ((B_LEFT_BORDER & ~borders) != 0)
+				rect.left++;
+		} else {
+			if ((B_TOP_BORDER & ~borders) != 0)
+				rect.top++;
+		}
 	}
 
 	view->FillRect(rect, fillGradient);
