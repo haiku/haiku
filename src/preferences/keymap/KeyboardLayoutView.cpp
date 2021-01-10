@@ -735,7 +735,6 @@ KeyboardLayoutView::_DrawKey(BView* view, BRect updateRect, const Key* key,
 	_SetFontSize(view, keyKind);
 
 	uint32 flags = pressed ? BControlLook::B_ACTIVATED : 0;
-	flags |= BControlLook::B_FLAT;
 
 	if (secondDeadKey)
 		base = kSecondDeadKeyColor;
