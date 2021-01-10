@@ -540,7 +540,7 @@ BSecureSocket::Read(void* buffer, size_t size)
 	int retry;
 	do {
 		bytesRead = SSL_read(fPrivate->fSSL, buffer, size);
-		if (bytesRead >= 0)
+		if (bytesRead > 0)
 			return bytesRead;
 
 		if (errno != EINTR) {
