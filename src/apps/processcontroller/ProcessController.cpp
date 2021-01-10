@@ -141,7 +141,7 @@ instantiate_deskbar_item(float maxWidth, float maxHeight)
 
 	// Damn, you got a lot of CPU
 	if (width > maxWidth)
-		width = maxWidth;
+		width = (int)maxWidth;
 
 	return new ProcessController(width - 1, maxHeight - 1);
 }
