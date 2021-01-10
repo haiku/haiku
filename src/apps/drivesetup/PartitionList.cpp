@@ -305,8 +305,8 @@ PartitionListRow::PartitionListRow(BPartition* partition)
 		SetField(new BStringField(kUnavailableString), kVolumeNameColumn);
 	} else {
 		if (!partitionType.IsEmpty()) {
-			partitionType.Prepend("(");
-			partitionType.Append(")");
+			partitionType.SetToFormat(B_TRANSLATE("Not formatted (%s)"),
+				partitionType.String());
 			SetField(new BStringField(partitionType), kFilesystemColumn);
 		} else
 			SetField(new BStringField(kUnavailableString), kFilesystemColumn);
@@ -378,7 +378,7 @@ PartitionListRow::PartitionListRow(partition_id parentID, partition_id id,
 	// TODO: design icon for spaces on partitions
 	SetField(new BBitmapStringField(NULL, "-"), kDeviceColumn);
 
-	SetField(new BStringField(B_TRANSLATE("<empty or unknown>")),
+	SetField(new BStringField(B_TRANSLATE("Empty space")),
 		kFilesystemColumn);
 	SetField(new BStringField(kUnavailableString), kVolumeNameColumn);
 
