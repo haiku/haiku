@@ -13,6 +13,13 @@ UsePrivateHeaders kernel [ FDirName kernel arch $(TARGET_KERNEL_ARCH) ]
 
 SubDirC++Flags -fno-rtti ;
 
+# Things we borrow from the kernel due to lack of bios services
+local kernelArchDriverSources =
+	#arch_uart_8250.cpp
+	arch_uart_8250_omap.cpp
+	arch_uart_pl011.cpp
+;
+
 BootMergeObject boot_platform_u-boot_arm.o :
 	# must come first to have _start_* at correct locations
 	shell.S
@@ -26,6 +33,8 @@ BootMergeObject boot_platform_u-boot_arm.o :
 	arch_framebuffer_omap3.cpp
 	arch_framebuffer_pxa.cpp
 
+	$(kernelArchDriverSources)
+
 	# Mailbox drivers
 	arch_mailbox_bcm2835.cpp
 
@@ -33,5 +42,7 @@ BootMergeObject boot_platform_u-boot_arm.o :
 	arch_mmu.cpp
 ;
 
+SEARCH on [ FGristFiles $(kernelArchDriverSources) ]
+	= [ FDirName $(HAIKU_TOP) src system kernel arch $(TARGET_KERNEL_ARCH) ] ;
 #SEARCH on [ FGristFiles arch_cpu_asm.S ]
 #    = [ FDirName $(HAIKU_TOP) src system kernel arch $(TARGET_KERNEL_ARCH) ] ;

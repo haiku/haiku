@@ -22,11 +22,6 @@ local kernelDebugSources =
 
 local kernelArchDriverSources =
 	arch_elf.cpp
-
-	# Serial UART Drivers
-	#arch_uart_8250.cpp
-	#arch_uart_8250_omap.cpp
-	#arch_uart_pl011.cpp
 ;
 
 local kernelGenericDriverSources =
