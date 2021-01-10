@@ -9044,7 +9044,11 @@ BPoseView::DeskTextColor() const
 	// So here we check if the colors are different enough, and otherwise,
 	// force the text to be either white or black.
 	rgb_color textColor = ui_color(B_DOCUMENT_TEXT_COLOR);
-	rgb_color viewColor = ViewColor();
+	rgb_color viewColor;
+	if (IsDesktopWindow())
+		viewColor = ViewColor();
+	else
+		viewColor = ui_color(B_DOCUMENT_BACKGROUND_COLOR);
 
 	int textBrightness = BPrivate::perceptual_brightness(textColor);
 	int viewBrightness = BPrivate::perceptual_brightness(viewColor);

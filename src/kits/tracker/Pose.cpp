@@ -603,9 +603,9 @@ BPose::Draw(BRect rect, const BRect& updateRect, BPoseView* poseView,
 						&& windowActive;
 
 					if (index == 0 && selectDuringDraw) {
-						// draw with dark background to select text
+						// draw with "reverse video" to select text
 						drawView->PushState();
-						drawView->SetLowColor(0, 0, 0);
+						drawView->SetLowColor(ui_color(B_DOCUMENT_TEXT_COLOR));
 					}
 
 					if (index == 0) {
