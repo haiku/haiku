@@ -102,23 +102,6 @@ typedef struct {
 	time_t		totalTime;
 } Tdebug_thead_param;
 
-// Bar layout depending on number of CPUs
-// This is used only in case the replicant width is 16
-
-typedef struct {
-	float	cpu_width;
-	float	cpu_inter;
-	float	mem_width;
-} layoutT;
-
-layoutT layout[] = {
-	{ 1, 1, 1 },
-	{ 5, 1, 5 },	// 1
-	{ 3, 1, 4 },	// 2
-	{ 2, 1, 3 },
-	{ 2, 0, 3 },	// 4
-};
-
 
 extern "C" _EXPORT BView* instantiate_deskbar_item(float maxWidth,
 	float maxHeight);
@@ -131,15 +114,14 @@ instantiate_deskbar_item(float maxWidth, float maxHeight)
 	system_info info;
 	get_system_info(&info);
 
-	int width = 15;
-	// Over 4 cpus, flip to "dynamic size mode"
-	if (info.cpu_count > 4) {
-		width = info.cpu_count;
-		// For the memory bar
-		width += 4;
-		if (info.cpu_count <= 16)
-			width *= 2;
-	}
+	int width = info.cpu_count;
+	if (info.cpu_count <= 4)
+		width *= 4;
+	else if (info.cpu_count <= 16)
+		width *= 2;
+
+	// For the memory bar
+	width += 8;
 
 	// Damn, you got a lot of CPU
 	if (width > maxWidth)
@@ -610,17 +592,12 @@ ProcessController::DoDraw(bool force)
 	float barWidth;
 	float barGap;
 	float memWidth;
-	if (gCPUcount <= 4 && bounds.Width() == 15) {
-		// Use fixed sizes for small CPU counts
-		barWidth = layout[gCPUcount].cpu_width;
-		barGap = layout[gCPUcount].cpu_inter;
-		memWidth = layout[gCPUcount].mem_width;
-	} else {
-		memWidth = floorf((bounds.Height() + 1) / 8);
-		barGap = ((bounds.Width() + 1) / gCPUcount) > 3 ? 1 : 0;
-		barWidth = floorf((bounds.Width() - 1 - memWidth - barGap * gCPUcount)
-			/ gCPUcount);
-	}
+
+	memWidth = floorf((bounds.Height() + 1) / 8);
+	barGap = ((bounds.Width() + 1) / gCPUcount) > 3 ? 1 : 0;
+	barWidth = floorf((bounds.Width() - 1 - memWidth - barGap * gCPUcount)
+		/ gCPUcount);
+
 	// interspace
 	float right = left + gCPUcount * (barWidth + barGap) - barGap;
 	float leftMem = bounds.Width() - memWidth;

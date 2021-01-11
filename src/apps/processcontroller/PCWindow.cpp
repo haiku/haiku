@@ -32,15 +32,14 @@ PCWindow::PCWindow()
         system_info info;
         get_system_info(&info);
 
-	int width = 15;
-	// Over 4 cpus, flip to "dynamic size mode"
-	if (info.cpu_count > 4) {
-		width = info.cpu_count;
-		// For the memory bar
-		width += 4;
-		if (info.cpu_count <= 16)
-			width *= 2;
-	}
+	int width = info.cpu_count;
+	if (info.cpu_count <= 4)
+		width *= 4;
+	else if (info.cpu_count <= 16)
+		width *= 2;
+
+	// For the memory bar
+	width += 8;
 
 	BRect rect = Bounds();
 
