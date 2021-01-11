@@ -76,6 +76,9 @@ AttributesView::AttributesView(Model* model)
 		switch(info.type) {
 			case B_STRING_TYPE:
 			case B_MIME_STRING_TYPE:
+			case 'MSIG':
+			case 'MSDC':
+			case 'MPTH':
 			{
 				// Use a small buffer, long strings will be truncated
 				char buffer[64];
@@ -463,6 +466,18 @@ AttributesView::AttributesView(Model* model)
 				break;
 			case B_MIME_STRING_TYPE:
 				row->SetField(new BStringField(B_TRANSLATE("MIME String")),
+					kTypeColumn);
+				break;
+			case 'MSIG':
+				row->SetField(new BStringField(B_TRANSLATE("MIME Signature")),
+					kTypeColumn);
+				break;
+			case 'MSDC':
+				row->SetField(new BStringField(B_TRANSLATE("MIME Description")),
+					kTypeColumn);
+				break;
+			case 'MPTH':
+				row->SetField(new BStringField(B_TRANSLATE("MIME Path")),
 					kTypeColumn);
 				break;
 			case B_ASCII_TYPE:
