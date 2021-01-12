@@ -170,6 +170,7 @@ mmc_block_get_geometry(mmc_disk_driver_info* info, device_geometry* geometry)
 	geometry->read_only = false; // TODO check write protect switch?
 	geometry->write_once = false;
 
+#if 0
 	// This function will be called before all data transfers, so we use this
 	// opportunity to switch the card to 4-bit data transfers (instead of the
 	// default 1 bit mode)
@@ -179,6 +180,7 @@ mmc_block_get_geometry(mmc_disk_driver_info* info, device_geometry* geometry)
 		info->rca << 16, &cardStatus);
 	info->mmc->execute_command(info->parent, info->rca, SD_SET_BUS_WIDTH,
 		k4BitMode, &cardStatus);
+#endif
 
 	return B_OK;
 }
