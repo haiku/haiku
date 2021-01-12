@@ -78,9 +78,10 @@ MMCBus::Rescan()
 
 
 status_t
-MMCBus::ExecuteCommand(uint8_t command, uint32_t argument, uint32_t* response)
+MMCBus::ExecuteCommand(uint16_t rca, uint8_t command, uint32_t argument,
+	uint32_t* response)
 {
-	status_t status = _ActivateDevice(0);
+	status_t status = _ActivateDevice(rca);
 	if (status != B_OK)
 		return status;
 	return fController->execute_command(fCookie, command, argument, response);
@@ -95,6 +96,13 @@ MMCBus::DoIO(uint16_t rca, uint8_t command, IOOperation* operation,
 	if (status != B_OK)
 		return status;
 	return fController->do_io(fCookie, command, operation, offsetAsSectors);
+}
+
+
+void
+MMCBus::SetClock(int frequency)
+{
+	fController->set_clock(fCookie, frequency);
 }
 
 
@@ -144,16 +152,20 @@ MMCBus::_WorkerThread(void* cookie)
 	do {
 		bus->_AcquireScanSemaphore();
 		TRACE("Reset the bus...\n");
-		result = bus->ExecuteCommand(SD_GO_IDLE_STATE, 0, NULL);
+		result = bus->ExecuteCommand(0, SD_GO_IDLE_STATE, 0, NULL);
 		TRACE("CMD0 result: %s\n", strerror(result));
 	} while (result != B_OK);
 
 	// Need to wait at least 8 clock cycles after CMD0 before sending the next
-	// command
-	snooze(100000);
+	// command. With the default 400kHz clock that would be 20 microseconds,
+	// but apparently we need more.
+	snooze(20000);
 
 	while (bus->fStatus != B_SHUTTING_DOWN) {
 		TRACE("Scanning the bus\n");
+
+		// Use the low speed clock for scanning
+		bus->SetClock(400);
 
 		// Probe the voltage range
 		enum {
@@ -171,7 +183,7 @@ MMCBus::_WorkerThread(void* cookie)
 		// If ACMD41 also does not work, it may be an SDIO card, too
 		uint32_t probe = (HOST_27_36V << 8) | kVoltageCheckPattern;
 		uint32_t hcs = 1 << 30;
-		if (bus->ExecuteCommand(SD_SEND_IF_COND, probe, &response) != B_OK) {
+		if (bus->ExecuteCommand(0, SD_SEND_IF_COND, probe, &response) != B_OK) {
 			TRACE("Card does not implement CMD8, may be a V1 SD card\n");
 			// Do not check for SDHC support in this case
 			hcs = 0;
@@ -187,7 +199,7 @@ MMCBus::_WorkerThread(void* cookie)
 		uint32_t ocr;
 		do {
 			uint32_t cardStatus;
-			while (bus->ExecuteCommand(SD_APP_CMD, 0, &cardStatus)
+			while (bus->ExecuteCommand(0, SD_APP_CMD, 0, &cardStatus)
 					== B_BUSY) {
 				ERROR("Card locked after CMD8...\n");
 				snooze(1000000);
@@ -197,7 +209,7 @@ MMCBus::_WorkerThread(void* cookie)
 			if ((cardStatus & (1 << 5)) == 0)
 				ERROR("Card did not enter ACMD mode\n");
 
-			bus->ExecuteCommand(SD_SEND_OP_COND, hcs | 0xFF8000, &ocr);
+			bus->ExecuteCommand(0, SD_SEND_OP_COND, hcs | 0xFF8000, &ocr);
 
 			if ((ocr & (1 << 31)) == 0) {
 				TRACE("Card is busy\n");
@@ -228,8 +240,8 @@ MMCBus::_WorkerThread(void* cookie)
 		// (and a matching published device on our side).
 		uint32_t cid[4];
 		
-		while (bus->ExecuteCommand(SD_ALL_SEND_CID, 0, cid) == B_OK) {
-			bus->ExecuteCommand(SD_SEND_RELATIVE_ADDR, 0, &response);
+		while (bus->ExecuteCommand(0, SD_ALL_SEND_CID, 0, cid) == B_OK) {
+			bus->ExecuteCommand(0, SD_SEND_RELATIVE_ADDR, 0, &response);
 
 			TRACE("RCA: %x Status: %x\n", response >> 16, response & 0xFFFF);
 
@@ -273,6 +285,11 @@ MMCBus::_WorkerThread(void* cookie)
 			gDeviceManager->register_node(bus->fNode, MMC_BUS_MODULE_NAME,
 				attrs, NULL, NULL);
 		}
+
+		// TODO if there is a single card active, check if it supports CMD6
+		// (spec version 1.10 or later in SCR). If it does, check if CMD6 can
+		// enable high speed mode, use that to go to 50MHz instead of 25.
+		bus->SetClock(25000);
 
 		// FIXME we also need to unpublish devices that are gone. Probably need
 		// to "ping" all RCAs somehow? Or is there an interrupt we can look for

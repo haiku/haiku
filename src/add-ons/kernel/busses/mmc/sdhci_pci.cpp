@@ -223,9 +223,10 @@ SdhciBus::ExecuteCommand(uint8_t command, uint32_t argument, uint32_t* response)
 			replyType = Command::kR1Type | Command::kDataPresent;
 			break;
 		case SD_APP_CMD:
+		case SD_SET_BUS_WIDTH: // SD Application command
 			replyType = Command::kR1Type;
 			break;
-		case 41: // ACMD
+		case SD_SEND_OP_COND: // SD Application command
 			replyType = Command::kR3Type;
 			break;
 		default:
@@ -388,7 +389,8 @@ SdhciBus::DoIO(uint8_t command, IOOperation* operation, bool offsetAsSectors)
 	off_t offset = operation->Offset();
 	generic_size_t length = operation->Length();
 
-	TRACE("%s %ld bytes at %ld\n", isWrite ? "Write" : "Read", length, offset);
+	TRACE("%s %" B_PRIuSIZE " bytes at %" B_PRIdOFF "\n",
+		isWrite ? "Write" : "Read", length, offset);
 
 	// Check that the IO scheduler did its job in following our DMA restrictions
 	// We can start a read only at a sector boundary
@@ -468,10 +470,7 @@ SdhciBus::DoIO(uint8_t command, IOOperation* operation, bool offsetAsSectors)
 		offset += toCopy;
 	}
 
-	if (result != B_OK)
-		return result;
-
-	return B_OK;
+	return result;
 }
 
 

@@ -147,7 +147,7 @@ mmc_block_get_geometry(mmc_disk_driver_info* info, device_geometry* geometry)
 {
 	struct mmc_disk_csd csd;
 	TRACE("Get geometry\n");
-	status_t error = info->mmc->execute_command(info->parent, SD_SEND_CSD,
+	status_t error = info->mmc->execute_command(info->parent, 0, SD_SEND_CSD,
 		info->rca << 16, (uint32_t*)&csd);
 	if (error != B_OK) {
 		TRACE("Could not get CSD! %s\n", strerror(error));
@@ -156,20 +156,31 @@ mmc_block_get_geometry(mmc_disk_driver_info* info, device_geometry* geometry)
 
 	TRACE("CSD: %" PRIx64 " %" PRIx64 "\n", csd.bits[0], csd.bits[1]);
 
-	if (csd.structure_version() < 3) {
-		geometry->bytes_per_sector = 1 << csd.read_bl_len();
-		geometry->sectors_per_track = csd.c_size() + 1;
-		geometry->cylinder_count = 1 << (csd.c_size_mult() + 2);
-		geometry->head_count = 1;
-		geometry->device_type = B_DISK;
-		geometry->removable = true; // TODO detect eMMC which isn't
-		geometry->read_only = false; // TODO check write protect switch?
-		geometry->write_once = false;
-		return B_OK;
+	if (csd.structure_version() >= 3) {
+		TRACE("unknown CSD version %d\n", csd.structure_version());
+		return B_NOT_SUPPORTED;
 	}
 
-	TRACE("unknown CSD version %d\n", csd.structure_version());
-	return B_NOT_SUPPORTED;
+	geometry->bytes_per_sector = 1 << csd.read_bl_len();
+	geometry->sectors_per_track = csd.c_size() + 1;
+	geometry->cylinder_count = 1 << (csd.c_size_mult() + 2);
+	geometry->head_count = 1;
+	geometry->device_type = B_DISK;
+	geometry->removable = true; // TODO detect eMMC which isn't
+	geometry->read_only = false; // TODO check write protect switch?
+	geometry->write_once = false;
+
+	// This function will be called before all data transfers, so we use this
+	// opportunity to switch the card to 4-bit data transfers (instead of the
+	// default 1 bit mode)
+	uint32_t cardStatus;
+	const uint32 k4BitMode = 2;
+	info->mmc->execute_command(info->parent, info->rca, SD_APP_CMD,
+		info->rca << 16, &cardStatus);
+	info->mmc->execute_command(info->parent, info->rca, SD_SET_BUS_WIDTH,
+		k4BitMode, &cardStatus);
+
+	return B_OK;
 }
 
 
@@ -307,6 +318,9 @@ mmc_block_init_device(void* _info, void** _cookie)
 	// No additional context, so just reuse the same data as the disk device
 	mmc_disk_driver_info* info = (mmc_disk_driver_info*)_info;
 	*_cookie = info;
+
+	// Note: it is not possible to execute commands here, because this is called
+	// with the mmc_bus locked for enumeration (and still using slow clock).
 
 	return B_OK;
 }

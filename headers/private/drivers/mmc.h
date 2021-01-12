@@ -58,6 +58,7 @@ enum SD_COMMANDS {
 
 
 enum SDHCI_APPLICATION_COMMANDS {
+	SD_SET_BUS_WIDTH = 6,
 	SD_SEND_OP_COND = 41,
 };
 
@@ -90,8 +91,8 @@ typedef struct mmc_bus_interface {
 // type of card.
 typedef struct mmc_device_interface {
 	driver_module_info info;
-	status_t (*execute_command)(device_node* node, uint8_t command,
-		uint32_t argument, uint32_t* result);
+	status_t (*execute_command)(device_node* node, uint16_t rca,
+		uint8_t command, uint32_t argument, uint32_t* result);
 		// Execute a command with no I/O phase
 	status_t (*do_io)(device_node* controller, uint16_t rca,
 		uint8_t command, IOOperation* operation, bool offsetAsSectors);

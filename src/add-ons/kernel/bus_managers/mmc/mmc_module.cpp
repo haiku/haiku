@@ -78,8 +78,8 @@ mmc_bus_added_device(device_node* parent)
 
 
 static status_t
-mmc_bus_execute_command(device_node* node, uint8_t command, uint32_t argument,
-	uint32_t* result)
+mmc_bus_execute_command(device_node* node, uint16_t rca, uint8_t command,
+	uint32_t argument, uint32_t* result)
 {
 	// FIXME store the parent cookie in the bus cookie or something instead of
 	// getting/putting the parent each time.
@@ -94,7 +94,7 @@ mmc_bus_execute_command(device_node* node, uint8_t command, uint32_t argument,
 	MMCBus* bus = (MMCBus*)cookie;
 
 	bus->AcquireBus();
-	status_t error = bus->ExecuteCommand(command, argument, result);
+	status_t error = bus->ExecuteCommand(rca, command, argument, result);
 	bus->ReleaseBus();
 	return error;
 }
