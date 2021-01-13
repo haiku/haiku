@@ -444,6 +444,11 @@ MediaExtractor::_ExtractorEntry(void* extractor)
 size_t
 MediaExtractor::_CalculateChunkBuffer(int32 stream)
 {
+	// WARNING: magic
+	// Your A/V may skip frames, chunks or not play at all if the cache size
+	// is insufficient. Unfortunately there's currently no safe way to
+	// calculate it.
+
 	size_t cacheSize = 3 * 1024 * 1024;
 
 	const media_format* format = EncodedFormat(stream);
@@ -452,12 +457,8 @@ MediaExtractor::_CalculateChunkBuffer(int32 stream)
 		int32 rowSize = BPrivate::get_bytes_per_row(format->ColorSpace(),
 			format->Width());
 		if (rowSize > 0) {
-			cacheSize = rowSize * format->Height() * 2;
+			cacheSize = max_c(cacheSize, rowSize * format->Height() * 2);
 		}
-	} else if (format->IsAudio()) {
-		// For audio, have space for 2000 "frames" (that's 2000/44100 = 45ms
-		// at 44100Hz for example)
-		cacheSize = format->AudioFrameSize() * 2000;
 	}
 	return ROUND_UP_TO_PAGE(cacheSize);
 }
