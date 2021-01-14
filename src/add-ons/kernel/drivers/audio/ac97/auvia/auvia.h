@@ -2,7 +2,7 @@
  * Auvia BeOS Driver for Via VT82xx Southbridge audio
  *
  * Copyright (c) 2003, Jerome Duval (jerome.duval@free.fr)
- 
+
  * This code is derived from software contributed to The NetBSD Foundation
  * by Tyler C. Sarna
  *
@@ -34,7 +34,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
- 
+
 #ifndef _DEV_PCI_AUVIA_H_
 #define _DEV_PCI_AUVIA_H_
 
@@ -59,7 +59,7 @@
 #define VIATECH_8233_AC97_REV_8235		0x50
 #define VIATECH_8233_AC97_REV_8237		0x60	//this is the 5.1 Card in the new Athlon64 boards
 
-#define VERSION "Version alpha 2, Copyright (c) 2003 Jérôme Duval, compiled on " ## __DATE__ ## " " ## __TIME__ 
+#define VERSION "Version alpha 2, Copyright (c) 2003 Jérôme Duval, compiled on " __DATE__ " " __TIME__
 #define DRIVER_NAME "auvia"
 #define FRIENDLY_NAME "Auvia"
 #define FRIENDLY_NAME_686 FRIENDLY_NAME" 82C686"
@@ -91,7 +91,7 @@ typedef struct _auvia_mem {
 /*
  * Streams
  */
- 
+
 typedef struct _auvia_stream {
 	struct _auvia_dev 	*card;
 	uint8        		use;
@@ -101,23 +101,23 @@ typedef struct _auvia_stream {
 	uint8				channels;
 	uint32 				bufframes;
 	uint8 				bufcount;
-	
+
 	uint32				base;
-	
+
 	LIST_ENTRY(_auvia_stream)	next;
-	
+
 	void            	(*inth) (void *);
 	void           		*inthparam;
-	
+
 	void	*dmaops_log_base;
 	void	*dmaops_phy_base;
 	area_id dmaops_area;
-	
+
 	auvia_mem *buffer;
 	uint16       blksize;	/* in samples */
 	uint16       trigblk;	/* blk on which to trigger inth */
 	uint16       blkmod;	/* Modulo value to wrap trigblk */
-	
+
 	/* multi_audio */
 	volatile int64	frames_count;	// for play or record
 	volatile bigtime_t real_time;	// for play or record
@@ -134,22 +134,22 @@ typedef struct _auvia_dev {
 	char		name[DEVNAME];	/* used for resources */
 	pci_info	info;
 	device_config config;
-	
+
 	void	*ptb_log_base;
 	void	*ptb_phy_base;
 	area_id ptb_area;
-	
+
 	sem_id buffer_ready_sem;
-	
+
 	uint32			interrupt_mask;
-	
+
 	LIST_HEAD(, _auvia_stream) streams;
-	
+
 	LIST_HEAD(, _auvia_mem) mems;
-	
+
 	auvia_stream	*pstream;
 	auvia_stream	*rstream;
-	
+
 	/* multi_audio */
 	multi_dev	multi;
 } auvia_dev;
@@ -160,7 +160,7 @@ extern auvia_dev cards[NUM_CARDS];
 status_t auvia_stream_set_audioparms(auvia_stream *stream, uint8 channels,
 			     uint8 b16, uint32 sample_rate);
 status_t auvia_stream_commit_parms(auvia_stream *stream);
-status_t auvia_stream_get_nth_buffer(auvia_stream *stream, uint8 chan, uint8 buf, 
+status_t auvia_stream_get_nth_buffer(auvia_stream *stream, uint8 chan, uint8 buf,
 					char** buffer, size_t *stride);
 void auvia_stream_start(auvia_stream *stream, void (*inth) (void *), void *inthparam);
 void auvia_stream_halt(auvia_stream *stream);

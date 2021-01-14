@@ -64,7 +64,7 @@
 #define AMD_AMD8111_AC97_DEVICE_ID		0x764d
 #define AMD_AMD768_AC97_DEVICE_ID		0x7445
 
-#define VERSION "Version alpha 1, Copyright (c) 2003 Jérôme Duval, compiled on " ## __DATE__ ## " " ## __TIME__
+#define VERSION "Version alpha 1, Copyright (c) 2003 Jérôme Duval, compiled on " __DATE__ " " __TIME__
 #define DRIVER_NAME "auich"
 #define FRIENDLY_NAME "Auich"
 #define AUTHOR "Jérôme Duval"
