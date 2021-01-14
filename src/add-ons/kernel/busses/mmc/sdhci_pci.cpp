@@ -56,6 +56,7 @@ class SdhciBus {
 		status_t			DoIO(uint8_t command, IOOperation* operation,
 								bool offsetAsSectors);
 		void				SetScanSemaphore(sem_id sem);
+		void				SetBusWidth(int width);
 
 	private:
 		bool				PowerOn();
@@ -389,7 +390,7 @@ SdhciBus::DoIO(uint8_t command, IOOperation* operation, bool offsetAsSectors)
 	off_t offset = operation->Offset();
 	generic_size_t length = operation->Length();
 
-	TRACE("%s %" B_PRIuSIZE " bytes at %" B_PRIdOFF "\n",
+	TRACE("%s %"B_PRIu64 " bytes at %" B_PRIdOFF "\n",
 		isWrite ? "Write" : "Read", length, offset);
 
 	// Check that the IO scheduler did its job in following our DMA restrictions
@@ -486,6 +487,28 @@ SdhciBus::SetScanSemaphore(sem_id sem)
 	// We can now enable the card insertion interrupt for next time a card
 	// is inserted
 	EnableInterrupts(SDHCI_INT_CARD_INS);
+}
+
+
+void
+SdhciBus::SetBusWidth(int width)
+{
+	uint8_t widthBits;
+	switch(width) {
+		case 1:
+			widthBits = HostControl::kDataTransfer1Bit;
+			break;
+		case 4:
+			widthBits = HostControl::kDataTransfer4Bit;
+			break;
+		case 8:
+			widthBits = HostControl::kDataTransfer8Bit;
+			break;
+		default:
+			panic("Incorrect bitwidth value");
+			return;
+	}
+	fRegisters->host_control.SetDataTransferWidth(widthBits);
 }
 
 
@@ -962,6 +985,16 @@ set_scan_semaphore(void* controller, sem_id sem)
 }
 
 
+static void
+set_bus_width(void* controller, int width)
+{
+	CALLED();
+
+	SdhciBus* bus = (SdhciBus*)controller;
+	return bus->SetBusWidth(width);
+}
+
+
 module_dependency module_dependencies[] = {
 	{ MMC_BUS_MODULE_NAME, (module_info**)&gMMCBusController},
 	{ B_DEVICE_MANAGER_MODULE_NAME, (module_info**)&gDeviceManager },
@@ -990,7 +1023,8 @@ static mmc_bus_interface gSDHCIPCIDeviceModule = {
 	set_clock,
 	execute_command,
 	do_io,
-	set_scan_semaphore
+	set_scan_semaphore,
+	set_bus_width
 };
 
 

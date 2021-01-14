@@ -81,6 +81,8 @@ typedef struct mmc_bus_interface {
 		// Execute a command that involves a data transfer.
 	void (*set_scan_semaphore)(void* controller, sem_id sem);
 		// Pass the semaphore used for device rescan to the bus controller
+	void (*set_bus_width)(void* controller, int width);
+		// Set the data bus width to 1, 4 or 8 bit mode.
 } mmc_bus_interface;
 
 
@@ -97,6 +99,8 @@ typedef struct mmc_device_interface {
 	status_t (*do_io)(device_node* controller, uint16_t rca,
 		uint8_t command, IOOperation* operation, bool offsetAsSectors);
 		// Execute a command that involves a data transfer.
+	void (*set_bus_width)(device_node* controller, int width);
+		// Set the data bus width to 1, 4 or 8 bit mode.
 } mmc_device_interface;
 
 

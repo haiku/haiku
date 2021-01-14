@@ -224,10 +224,20 @@ class HostControl {
 			value = (value & ~kDmaMask) | dmaMode;
 		}
 
+		void SetDataTransferWidth(uint8_t width)
+		{
+			value = (value & ~kDataTransferWidthMask) | width;
+		}
+
 		static const uint8_t kDmaMask = 3 << 3;
 		static const uint8_t kSdma = 0 << 3;
 		static const uint8_t kAdma32 = 2 << 3;
 		static const uint8_t kAdma64 = 3 << 3;
+
+		static const uint8_t kDataTransferWidthMask = 0x22;
+		static const uint8_t kDataTransfer1Bit = 0;
+		static const uint8_t kDataTransfer4Bit = 2;
+		static const uint8_t kDataTransfer8Bit = 0x20;
 	private:
 		volatile uint8_t value;
 } __attribute__((packed));

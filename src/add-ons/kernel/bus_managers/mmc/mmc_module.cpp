@@ -124,6 +124,26 @@ mmc_bus_do_io(device_node* node, uint16_t rca, uint8_t command,
 }
 
 
+static void
+mmc_bus_set_width(device_node* node, int width)
+{
+	driver_module_info* mmc;
+	void* cookie;
+
+	// FIXME store the parent cookie in the bus cookie or something instead of
+	// getting/putting the parent each time.
+	device_node* parent = gDeviceManager->get_parent_node(node);
+	gDeviceManager->get_driver(parent, &mmc, &cookie);
+	gDeviceManager->put_node(parent);
+
+	MMCBus* bus = (MMCBus*)cookie;
+
+	bus->AcquireBus();
+	bus->SetBusWidth(width);
+	bus->ReleaseBus();
+}
+
+
 static status_t
 std_ops(int32 op, ...)
 {
@@ -174,7 +194,8 @@ mmc_device_interface mmc_bus_controller_module = {
 		NULL
 	},
 	mmc_bus_execute_command,
-	mmc_bus_do_io
+	mmc_bus_do_io,
+	mmc_bus_set_width
 };
 
 

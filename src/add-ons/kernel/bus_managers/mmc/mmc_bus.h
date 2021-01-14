@@ -48,6 +48,7 @@ public:
 									bool offsetAsSectors);
 
 				void			SetClock(int frequency);
+				void			SetBusWidth(int width);
 
 				void			AcquireBus() { acquire_sem(fLockSemaphore); }
 				void			ReleaseBus() { release_sem(fLockSemaphore); }
