@@ -41,6 +41,7 @@ rule ArchitectureSetup architecture
 		case ppc : archFlags += -mcpu=440fp ;
 		case arm : archFlags += -march=armv7-a -mfloat-abi=hard ;
 		case x86 : archFlags += -march=pentium ;
+		case riscv64 : archFlags += -march=rv64gc ;
 	}
 	if $(HAIKU_CC_IS_CLANG_$(architecture)) = 1 {
 		# TODO: These should be included in Clang's compiler specs.

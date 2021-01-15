@@ -62,13 +62,13 @@ arm-*)
 	gdbTarget="arm-unknown-elf"
 	;;
 riscv*-*)
-	binutilsConfigureArgs="--disable-multilib"
-	gccConfigureArgs="--disable-multilib"
-	gdbConfigureArgs="--disable-multilib"
+	binutilsConfigureArgs=" --with-arch=rv64gc"
+	gccConfigureArgs=" --with-arch=rv64gc"
+	gdbConfigureArgs=""
 
-	# TODO: Disable building with TLS support for riscv until implemented.
-	binutilsConfigureArgs="$binutilsConfigureArgs --disable-tls"
-	gccConfigureArgs="$gccConfigureArgs --disable-tls"
+	binutilsConfigureArgs="$binutilsConfigureArgs --disable-multilib"
+	gccConfigureArgs="$gccConfigureArgs --disable-multilib"
+	gdbConfigureArgs="$gdbConfigureArgs --disable-multilib"
 	;;
 powerpc-*)
 	binutilsConfigureArgs="--disable-multilib"

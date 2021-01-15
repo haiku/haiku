@@ -1,24 +1,25 @@
 /*
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the MIT License.
-*/
+ * Copyright 2019 Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
-// ToDo: this is a dummy implementation - I've not yet gained enough knowledge
-//	to decide how this should be done, so it's just broken now (okay for single
-//	threaded apps, though).
-
-// we don't want to have the inline assembly included here
-#ifndef _NO_INLINE_ASM
-#	define _NO_INLINE_ASM 1
-#endif
+#include <runtime_loader/runtime_loader.h>
 
 #include "support/TLS.h"
 #include "tls.h"
 
 
-static int32 gNextSlot = TLS_FIRST_FREE_SLOT;
-static void *gSlots[TLS_MAX_KEYS];
+struct tls_index {
+	unsigned long ti_module;
+	unsigned long ti_offset;
+};
 
+void* __tls_get_addr(struct tls_index* ti);
+
+static int32 gNextSlot = TLS_FIRST_FREE_SLOT;
+
+
+// TODO: RISCV64 has a dedicated (TP) register for TLS
 
 int32
 tls_allocate(void)
@@ -34,20 +35,28 @@ tls_allocate(void)
 void *
 tls_get(int32 index)
 {
-	return gSlots[index];
+	debugger("Implement TLS support before SMP");
+	return NULL;
 }
 
 
 void **
 tls_address(int32 index)
 {
-	return &gSlots[index];
+	debugger("Implement TLS support before SMP");
+	return NULL;
 }
 
 
 void
 tls_set(int32 index, void *value)
 {
-	gSlots[index] = value;
+	debugger("Implement TLS support before SMP");
 }
 
+
+void*
+__tls_get_addr(struct tls_index* ti)
+{
+	return __gRuntimeLoader->get_tls_address(ti->ti_module, ti->ti_offset);
+}
