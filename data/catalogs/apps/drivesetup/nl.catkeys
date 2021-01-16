@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-DriveSetup	1934767996
+1	dutch; flemish	x-vnd.Haiku-DriveSetup	598604797
 Could not unmount partition %s.	MainWindow		Kon partitie %s niet onttrekken.
 Mount all	MainWindow		Alles betrekken
 Disk	MainWindow		Schijf
@@ -18,7 +18,6 @@ Unmount	MainWindow		Onttrekken
 Failed to format the partition %s!\n	MainWindow		Formatteren van partitie %s is mislukt!\n
 Partition size	CreateParametersPanel		Partitiegrootte
 Validation of the given parameters failed.	MainWindow		Validatie van de opgegeven parameters mislukt.
-The partition %s is currently mounted.	MainWindow		De partitie %s is op dit moment gekoppeld.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Weet u zeker dat u de partitie \"%s\" wilt formatteren? U krijgt deze vraag nogmaals voordat de wijzigingen op de schijf weggeschreven worden.
 DriveSetup	System name		DriveSetup
 Mounted at	PartitionList		Betrokken bij
@@ -65,7 +64,6 @@ LUKS encrypted	Encryption utils		LUKS versleuteld
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Bent u zeker dat u de veranderingen nu wilt terugschrijven naar de schijf?\n\nU zult alle gegevens op de %s partitie onherroepelijk kwijt zijn als u dit doet!
 Cancel	AbstractParametersPanel		Annuleren
 Format	MainWindow		Formatteren
-<empty or unknown>	DiskView		<leeg of onbekend>
 OK	MainWindow		Oké
 Open with DiskProbe	MainWindow		Open met DiskProbe
 Could not delete the selected partition.	MainWindow		Kon de geselecteerde partitie niet verwijderen.
@@ -91,7 +89,6 @@ Cannot delete the selected partition.	MainWindow		Kan de geselecteerde partitie 
 Continue	MainWindow		Doorgaan
 Could not mount partition %s.	MainWindow		Kon partitie %s niet betrekken.
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Weet u zeker dat u de partitie wilt formatteren? U krijgt deze vraag nogmaals voordat de wijzigingen op de schijf weggeschreven worden.
-<empty or unknown>	PartitionList		<leeg of onbekend>
 The selected disk is read-only.	MainWindow		De geselecteerde schijf is alleen-lezen.
 The partition %s is already unmounted.	MainWindow		De partitie %s is al onttrokken.
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Weet u zeker dat u de parameters van de geselecteerde partitie wilt wijzigen?\n\nNa de wijziging kan de partitie mogelijk niet meer herkend worden door andere besturingssystemen!

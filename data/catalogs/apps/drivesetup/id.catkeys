@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-DriveSetup	1934767996
+1	indonesian	x-vnd.Haiku-DriveSetup	598604797
 Could not unmount partition %s.	MainWindow		Tidak dapat melepas partisi %s.
 Mount all	MainWindow		Pasang semua
 Disk	MainWindow		Diska
@@ -18,7 +18,6 @@ Unmount	MainWindow		Lepaskan kaitan
 Failed to format the partition %s!\n	MainWindow		Gagal memformat partisi %s!\n
 Partition size	CreateParametersPanel		Ukuran partisi
 Validation of the given parameters failed.	MainWindow		Validasi parameter yang diberikan gagal.
-The partition %s is currently mounted.	MainWindow		Partisi %s saat ini terpasang.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Anda yakin ingin memformat partisi \"%s\"? Anda akan ditanya lagi sebelum perubahan ditulis ke diska.
 DriveSetup	System name		DriveSetup
 Mounted at	PartitionList		Dipasang pada
@@ -65,7 +64,6 @@ LUKS encrypted	Encryption utils		Terenkripsi LUKS
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Anda yakin ingin menulis perubahan kembali ke disk sekarang?\n\nSemua data pada partisi %s akan hilang jika Anda melakukannya!
 Cancel	AbstractParametersPanel		Batalkan
 Format	MainWindow		Format
-<empty or unknown>	DiskView		<kosong atau tak-diketahui>
 OK	MainWindow		OKE
 Open with DiskProbe	MainWindow		Buka dengan DiskProbe
 Could not delete the selected partition.	MainWindow		Tidak dapat menghapus partisi yang dipilih.
@@ -91,7 +89,6 @@ Cannot delete the selected partition.	MainWindow		Tidak dapat menghapus partisi 
 Continue	MainWindow		Lanjutkan
 Could not mount partition %s.	MainWindow		Tidak bisa memasang partisi %s.
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Anda yakin ingin memformat partisi? Anda akan ditanya lagi sebelum perubahan ditulis ke diska.
-<empty or unknown>	PartitionList		<kosong atau tak-diketahui>
 The selected disk is read-only.	MainWindow		Disk yang dipilih hanya-baca.
 The partition %s is already unmounted.	MainWindow		Partisi %s sudah dilepas.
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Anda yakin ingin mengubah parameter dari partisi yang dipilih?\n\nPartisi mungkin tidak lagi dikenali oleh sistem operasi lain!

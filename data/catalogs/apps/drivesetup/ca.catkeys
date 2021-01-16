@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-DriveSetup	1934767996
+1	catalan; valencian	x-vnd.Haiku-DriveSetup	598604797
 Could not unmount partition %s.	MainWindow		No s'ha pogut desmuntar la partició %s.
 Mount all	MainWindow		Munta-ho tot
 Disk	MainWindow		Disc
@@ -18,7 +18,6 @@ Unmount	MainWindow		Desmunta
 Failed to format the partition %s!\n	MainWindow		No s'ha pogut formatar la partició %s!\n
 Partition size	CreateParametersPanel		Mida de la partició
 Validation of the given parameters failed.	MainWindow		Ha fallat validar els paràmetres indicats.
-The partition %s is currently mounted.	MainWindow		La partició %s ara està muntada.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Segur que voleu formatar la partició \"%s\"? Se us preguntarà un cop més abans d'escriure els canvis al disc.
 DriveSetup	System name		Gestor de discs
 Mounted at	PartitionList		Muntada a
@@ -65,7 +64,6 @@ LUKS encrypted	Encryption utils		Encriptat amb LUKS
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Segur que voleu escriure tots els canvis al disc ara?\n\nSi ho feu, es perdran irrecuperablement totes les dades de la partició %s!
 Cancel	AbstractParametersPanel		Cancel·la
 Format	MainWindow		Formata
-<empty or unknown>	DiskView		<buit o desconegut>
 OK	MainWindow		D'acord
 Open with DiskProbe	MainWindow		Obre amb DiskProbe
 Could not delete the selected partition.	MainWindow		No s'ha pogut suprimir la partició seleccionada.
@@ -91,7 +89,6 @@ Cannot delete the selected partition.	MainWindow		No es pot suprimir la partici�
 Continue	MainWindow		Continua
 Could not mount partition %s.	MainWindow		No s'ha pogut muntar la partició %s.
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Segur que voleu formatar la partició? Se us preguntarà un cop més abans d'escriure els canvis al disc.
-<empty or unknown>	PartitionList		<buit o desconegut>
 The selected disk is read-only.	MainWindow		El disc seleccionat és només de lectura.
 The partition %s is already unmounted.	MainWindow		La partició %s ja està desmuntada.
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Segur que voleu canviar els paràmetres de la partició seleccionada?\n\nEls altres sistemes operatius podrien no reconèixer més la partició!

@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-DriveSetup	1934767996
+1	polish	x-vnd.Haiku-DriveSetup	598604797
 Could not unmount partition %s.	MainWindow		Nie można odmontować partycji %s.
 Mount all	MainWindow		Zamontuj wszystko
 Disk	MainWindow		Dysk
@@ -18,7 +18,6 @@ Unmount	MainWindow		Odmontuj
 Failed to format the partition %s!\n	MainWindow		Błąd podczas formatowania partycji %s!\n
 Partition size	CreateParametersPanel		Rozmiar partycji
 Validation of the given parameters failed.	MainWindow		Sprawdzenie poprawności parametrów nie powiodło się.
-The partition %s is currently mounted.	MainWindow		Partycja %s jest już zamontowana.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Na pewno chcesz sformatować tę partycję „%s”? Ponowne pytanie padnie przed zapisaniem zmian na dysku.
 DriveSetup	System name		DriveSetup
 Mounted at	PartitionList		Zamontowana jako
@@ -65,7 +64,6 @@ LUKS encrypted	Encryption utils		Zaszyfrowana LUKS-em
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Czy na pewno chcesz zapisać zmiany na dysk?\n\nWszystkie dane na partycji %s zostaną utracone!
 Cancel	AbstractParametersPanel		Anuluj
 Format	MainWindow		Formatowanie
-<empty or unknown>	DiskView		<pusta lub nieznana>
 OK	MainWindow		OK
 Open with DiskProbe	MainWindow		Otwórz w DiskProbe
 Could not delete the selected partition.	MainWindow		Nie można usunąć wybranej partycji.
@@ -91,7 +89,6 @@ Cannot delete the selected partition.	MainWindow		Nie mozna usunąć wybranej pa
 Continue	MainWindow		Kontynuuj
 Could not mount partition %s.	MainWindow		Nie można zamontować partycji %s.
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Na pewno chcesz sformatować tę partycję? Ponowne pytanie padnie przed zapisaniem zmian na dysku.
-<empty or unknown>	PartitionList		<pusta lub nieznana>
 The selected disk is read-only.	MainWindow		Wybrany dysk jest w trybie tylko do odczytu.
 The partition %s is already unmounted.	MainWindow		Partycja %s została już odmontowana.
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Na pewno chcesz zmienić parametry wybranej partycji?\n\nPartycja może już nie być rozpoznawana przez inne systemy operacyjne!

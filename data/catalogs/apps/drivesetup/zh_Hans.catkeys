@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-DriveSetup	2981446742
+1	english	x-vnd.Haiku-DriveSetup	3504198957
 Could not unmount partition %s.	MainWindow		无法卸载分区 %s。
 Mount all	MainWindow		挂载所有磁盘
 Disk	MainWindow		磁盘
@@ -14,7 +14,6 @@ Unmount	MainWindow		卸载
 Failed to format the partition %s!\n	MainWindow		分区 %s 格式化失败！\n
 Partition size	CreateParametersPanel		分区大小
 Validation of the given parameters failed.	MainWindow		指定参数验证失败。
-The partition %s is currently mounted.	MainWindow		分区 %s 当前已挂载。
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		您是否确定格式化分区 \"%s\" ？在磁盘写入修改前，您将需要再次确认。
 DriveSetup	System name		磁盘管理器
 Mounted at	PartitionList		挂载于

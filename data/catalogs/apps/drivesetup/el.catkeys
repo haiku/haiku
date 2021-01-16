@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-DriveSetup	1934767996
+1	greek, modern (1453-)	x-vnd.Haiku-DriveSetup	598604797
 Could not unmount partition %s.	MainWindow		Δεν ήταν δυνατή η αποπροσάρτηση της κατάτμησης %s.
 Mount all	MainWindow		Προσάρτηση όλων
 Disk	MainWindow		Δίσκος
@@ -18,7 +18,6 @@ Unmount	MainWindow		Αποπροσάρτηση
 Failed to format the partition %s!\n	MainWindow		Η διαμόρφωση της κατάτμησης %s απέτυχε!\n
 Partition size	CreateParametersPanel		Μέγεθος κατάτμησης
 Validation of the given parameters failed.	MainWindow		Η επικύρωση των δοσμένων παραμέτρων απέτυχε.
-The partition %s is currently mounted.	MainWindow		Η κατάτμηση %s είναι τώρα προσαρτημένη.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Είστε σίγουρος ότι θέλετε να διαμορφώσετε την κατάτμηση \"%s\"; Θα ρωτηθείτε ξανά πριν εγγραφούν οι αλλαγές στον δίσκο.
 DriveSetup	System name		Διαχειριστής Δίσκου
 Mounted at	PartitionList		Προσαρτήθηκε στο
@@ -65,7 +64,6 @@ LUKS encrypted	Encryption utils		Κρυπτογραφημένη με LUKS
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Είστε σίγουρος πως θέλετε να εγγράψετε τις αλλαγές στον δίσκο τώρα;\n\nΌλα τα δεδομένα στην κατάτμηση %s θα διαγραφούν οριστικά!
 Cancel	AbstractParametersPanel		Άκυρο
 Format	MainWindow		Διαμόρφωση
-<empty or unknown>	DiskView		<άδειο ή άγνωστο>
 OK	MainWindow		Εντάξει
 Open with DiskProbe	MainWindow		Άνοιγμα με Ελεγχτή Δίσκου
 Could not delete the selected partition.	MainWindow		Αδυναμία διαγραφής της επιλεγμένης κατάτμησης.
@@ -91,7 +89,6 @@ Cannot delete the selected partition.	MainWindow		Δεν μπορείτε να �
 Continue	MainWindow		Συνέχεια
 Could not mount partition %s.	MainWindow		Αδυναμία προσάρτησης της κατάτμησης %s.
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Είστε σίγουρος ότι θέλετε να διαμορφώσετε την κατάτμηση; Θα ρωτηθείτε ξανά πριν εγγραφούν οι αλλαγές στον δίσκο.
-<empty or unknown>	PartitionList		<άδειο ή άγνωστο>
 The selected disk is read-only.	MainWindow		Ο επιλεγμένος δίσκος είναι μόνο για ανάγνωση.
 The partition %s is already unmounted.	MainWindow		Η κατάτμηση %s έχει ήδη αποπροσαρτηθεί.
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Είστε σίγουρος ότι θέλετε να αλλάξετε τις παραμέτρους της επιλεγμένης κατάτμησης;\n\nΗ κατάτμηση ενδέχεται να μην μπορέσει να αναγνωριστεί από άλλα λειτουργικά συστήματα!

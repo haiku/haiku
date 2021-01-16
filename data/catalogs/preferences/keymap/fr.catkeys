@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Keymap	1239258664
+1	french	x-vnd.Haiku-Keymap	2850776429
 Key	Modifier keys window	As in a computer keyboard key	Touche
 Japanese	KeymapNames		Japonais
 US	KeymapNames		US
@@ -6,6 +6,7 @@ PG ↑	Keyboard Layout View	Very short for 'page up'	PG ↑
 Brazilian	KeymapNames		Brésilien
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (US)
 Right control	Keyboard Layout View		Contrôle droit
+X-Bows Nature	KeyboardLayoutNames		X-Bows Ergonomique
 Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Option :
 Cancel	Modifier keys window		Annuler
@@ -56,6 +57,7 @@ Russian (Typewriter)	KeymapNames		Russe (Machine à écrire)
 Acute trigger	Keymap window		Accent aigu
 Italian	KeymapNames		Italien
 ThinkPad T400s International	KeyboardLayoutNames		ThinkPad T400s International
+Kinesis Ergo Elan International	KeyboardLayoutNames		Kinesis Ergo Elan International
 Apple Aluminum (US)	KeyboardLayoutNames		Apple Aluminium (US)
 French (NF Z71-300)	KeymapNames		Français (NF Z71-300)
 Modifier keys	Modifier keys window		Touches modificatrices
@@ -66,6 +68,7 @@ Lithuanian (Standard)	KeymapNames		Lituanien (Standard)
 Error: duplicate keys	Modifier keys window		Erreur : touches dupliquées
 NUM	Keyboard Layout View	Very short for 'num lock'	Num
 Bulgarian (Phonetic)	KeymapNames		Bulgare (phonétique)
+Kinesis Advantage	KeyboardLayoutNames		Kinesis Advantage
 Canadian-French	KeymapNames		Canadien-Français
 Hungarian	KeymapNames		Hongrois
 Control	Keyboard Layout View	Control key	Contrôle
@@ -87,6 +90,7 @@ Esperanto	KeymapNames		Espéranto
 Belarusian	KeymapNames		Biélorusse
 Warning: left and right key roles do not match	Modifier keys window		Attention : les rôles des touches gauche et droite ne correspondent pas
 Circumflex trigger	Keymap window		Accent circonflexe
+Fizzbook NL2	KeyboardLayoutNames		Fizzbook NL2
 Caps lock	Keyboard Layout View		Verr. Maj.
 Left shift	Keyboard Layout View		Majuscule gauche
 Russian (Yawert)	KeymapNames		Russe (Yawert)

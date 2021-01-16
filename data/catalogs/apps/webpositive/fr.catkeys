@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-WebPositive	1976607515
+1	french	x-vnd.Haiku-WebPositive	250728390
 Authentication required	Authentication Panel		Authentification requise
 Previous	WebPositive Window		Précédent
 (Finish: %date)	Download Window		(Fin : %date)
@@ -101,6 +101,7 @@ There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPosi
 Revert	Settings Window		Restaurer
 Copy	WebPositive Window		Copier
 Default standard font size:	Settings Window		Taille par défaut de la police standard :
+Custom	Settings Window		Personnalisation
 Bookmark this page	WebPositive Window		Placer un signet sur cette page
 Show tabs if only one page is open	Settings Window		Afficher les onglets même s’il n’y a qu’une page ouverte
 Close tab	WebPositive Window		Fermer l’onglet

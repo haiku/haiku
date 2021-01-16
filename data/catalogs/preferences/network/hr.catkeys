@@ -1,8 +1,7 @@
-1	croatian	x-vnd.Haiku-Network	96440294
+1	croatian	x-vnd.Haiku-Network	234678882
 Ethernet device	InterfaceListItem		Ethernet uređaj
 Link speed:	IntefaceView		Brzina poveznice:
 disconnected	IntefaceView		odspojeno
-IP Address:	IntefaceAddressView		IP adresa:
 WPA	WPA protected network		WPA
 Network:	IntefaceView		Mreža:
 Received:	IntefaceView		Primljeno:

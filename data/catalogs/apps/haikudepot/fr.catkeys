@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-HaikuDepot	2792101273
+1	french	x-vnd.Haiku-HaikuDepot	412302812
 Repository update error	LocalRepositoryUpdateProcess		Erreur à l’actualisation du dépôt
 Network error	ServerHelper		Erreur réseau
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Une erreur est survenue lors du rafraîchissement : %error%
@@ -97,6 +97,7 @@ Close	UserLoginWindow		Fermer
 Close	RatePackageWindow		Fermer
 An unexpected error has been sent from the server [%i]	ServerHelper		Le serveur a retourné une erreur inattendue [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synchronisation des données de paquets depuis le dépôt "%REPO_NAME%".
+An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Une erreur s’est produite lors du téléchargement des conditions d’utilisation requises pour créer un nouvel utilisateur. Vérifiez les détails dans le journal et réessayez.\nDes informations sur la manière de consulter les journaux sont disponibles dans la section DépôtHaiku du guide de l’utilisateur Haiku.
 View the usage conditions	UserLoginWindow		Voir les conditions d’utilisation
 Login issue	MainWindow		Problème d’authentification
 Size	PackageListView		Taille
@@ -107,6 +108,7 @@ All categories	FilterView		Toutes les catégories
 Repositories	MainWindow		Dépôts
 n/a	PackageInfoView		n/a
 This rating is visible to other users	RatePackageWindow		Cette note est visible par les autres utilisateurs
+While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		Lors de la mise à jour des données du paquet, un problème est apparu qui peut entraîner l’affichage de données obsolètes ou manquantes dans l’application. Des détails supplémentaires concernant ce problème peuvent être obtenus à partir des journaux d’application.\nDes informations sur la manière de consulter les journaux sont disponibles dans la section DépôtHaiku du guide de l’utilisateur Haiku.
 View agreed usage conditions…	MainWindow		Voir les conditions d’utilisation acceptées…
 Cancel	MainWindow		Annuler
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 de plus à télécharger)}other{(# de plus à télécharger)}}

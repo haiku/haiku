@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-DriveSetup	1934767996
+1	friulian	x-vnd.Haiku-DriveSetup	598604797
 Could not unmount partition %s.	MainWindow		Impussibil dismontâ la partizion %s.
 Mount all	MainWindow		Monte dut
 Disk	MainWindow		Disc
@@ -18,7 +18,6 @@ Unmount	MainWindow		Dismonte
 Failed to format the partition %s!\n	MainWindow		No si è rivâts a formatâ la partizion %s!\n
 Partition size	CreateParametersPanel		Dimension de partizion
 Validation of the given parameters failed.	MainWindow		Convalide dai parametris definîts falide.
-The partition %s is currently mounted.	MainWindow		La partizion %s e je stade za montade.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Formatâ pardabon la partizion \"%s\"? Prime di scrivi lis modifichis sul disc, e vignarà domandade di gnûf une conferme.
 DriveSetup	System name		Gjestion disc
 Mounted at	PartitionList		Montât su
@@ -65,7 +64,6 @@ LUKS encrypted	Encryption utils		Cifrât cun LUKS
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Scrivi pardabon lis modifichis sul disc cumò?\n\nSe si lu fâs, ducj i dâts su la partizion %s a laran pierdûts in mût irimediabil!
 Cancel	AbstractParametersPanel		Anule
 Format	MainWindow		Formate
-<empty or unknown>	DiskView		<vueit o no cognossût>
 OK	MainWindow		Va ben
 Open with DiskProbe	MainWindow		Vierç cun Scandai dal disc
 Could not delete the selected partition.	MainWindow		Impussibil eliminâ la partizion selezionade.
@@ -91,7 +89,6 @@ Cannot delete the selected partition.	MainWindow		Impussibil eliminâ la partizi
 Continue	MainWindow		Continue
 Could not mount partition %s.	MainWindow		Impussibil montâ la partizion %s.
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Formatâ pardabon la partizion? Prime di scrivi lis modifichis sul disc, e vignarà domandade di gnûf une conferme.
-<empty or unknown>	PartitionList		<vueit o no cognossût>
 The selected disk is read-only.	MainWindow		Il disc selezionât al è di dome-leture.
 The partition %s is already unmounted.	MainWindow		La partizion %s e je stade za dismontade.
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Cambiâ pardabon i parametris de partizion selezionade?\n\nAltris sistemis operatîfs a podaressin no ricognossi plui la partizion!

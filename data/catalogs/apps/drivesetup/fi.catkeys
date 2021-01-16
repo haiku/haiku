@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-DriveSetup	1934767996
+1	finnish	x-vnd.Haiku-DriveSetup	598604797
 Could not unmount partition %s.	MainWindow		Osion %s irrottaminen epäonnistui.
 Mount all	MainWindow		Liitä kaikki
 Disk	MainWindow		Levy
@@ -18,7 +18,6 @@ Unmount	MainWindow		Irrota
 Failed to format the partition %s!\n	MainWindow		Osion %s alustus epäonnistui!\n
 Partition size	CreateParametersPanel		Osiokoko
 Validation of the given parameters failed.	MainWindow		Annettujen parametrien todentaminen epäonnistui.
-The partition %s is currently mounted.	MainWindow		Osio %s on nykyisin liitetty.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Oletko varma, että haluat alustaa osion ”%s”? Samaa kysytään uudelleen ennen muutosten kirjoittamista levylle.
 DriveSetup	System name		Levyasema-asetukset
 Mounted at	PartitionList		Liittämispiste:
@@ -65,7 +64,6 @@ LUKS encrypted	Encryption utils		LUKS-salattu
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat nyt kirjoittaa muutokset takaisin levylle?\n\nKaikki osion %s tiedot kadotetaan palauttamattomasti, jos teet niin!
 Cancel	AbstractParametersPanel		Peru
 Format	MainWindow		Alusta
-<empty or unknown>	DiskView		<tyhjä tai tuntematon>
 OK	MainWindow		Valmis
 Open with DiskProbe	MainWindow		Avaa DiskProbe-ohjelmalla
 Could not delete the selected partition.	MainWindow		Valitun osion poistaminen epäonnistui.
@@ -91,7 +89,6 @@ Cannot delete the selected partition.	MainWindow		Valitun osion poistaminen epä
 Continue	MainWindow		Jatka
 Could not mount partition %s.	MainWindow		Osion %s liittäminen epäonnistui.
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Oletko varma, että haluat alustaa osion? Samaa kysytään uudelleen ennen muutosten kirjoittamista levylle.
-<empty or unknown>	PartitionList		<tyhjä tai tuntematon>
 The selected disk is read-only.	MainWindow		Valittu levy on kirjoitussuojattu.
 The partition %s is already unmounted.	MainWindow		Osio %s on jo liitetty.
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Oletko varma, että haluat vaihtaa valitun osion parametreja?\n\nMuut käyttöjärjestelmät eivät ehkä enää tunnista osiota!

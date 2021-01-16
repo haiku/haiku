@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-WebPositive	1976607515
+1	danish	x-vnd.Haiku-WebPositive	250728390
 Authentication required	Authentication Panel		Autentifikation kræves
 Previous	WebPositive Window		Forrige
 (Finish: %date)	Download Window		(færdig: %date)
@@ -101,6 +101,7 @@ There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPosi
 Revert	Settings Window		Tilbagefør
 Copy	WebPositive Window		Kopiér
 Default standard font size:	Settings Window		Standard standardskriftstørrelse:
+Custom	Settings Window		Tilpasset
 Bookmark this page	WebPositive Window		Sæt bogmærke for siden
 Show tabs if only one page is open	Settings Window		Vis faneblade hvis der kun er én side åben
 Close tab	WebPositive Window		Luk faneblad

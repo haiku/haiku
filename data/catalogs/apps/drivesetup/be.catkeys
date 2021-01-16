@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-DriveSetup	639226483
+1	belarusian	x-vnd.Haiku-DriveSetup	1161978698
 Could not unmount partition %s.	MainWindow		Не ўдалося змантаваць падзел %s.
 Mount all	MainWindow		Зманатаваць усё
 Disk	MainWindow		Дыск
@@ -14,7 +14,6 @@ Unmount	MainWindow		Размантаваць
 Failed to format the partition %s!\n	MainWindow		Не ўдалося фарматаваць падзел %s!\n
 Partition size	CreateParametersPanel		Памер падзела
 Validation of the given parameters failed.	MainWindow		Не удалася праверка дадзеных параметраў стварэння падзелу.
-The partition %s is currently mounted.	MainWindow		Падзел %s зараз змантаваны.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Вы упэўнены, што жадаеце фарматаваць падзел \"%s\"? Дадатковае пацвержанне спатрэбіцца і непасрэдна перад запісам на дыск.
 DriveSetup	System name		Рэдыктар дыскаў
 Mounted at	PartitionList		Змантавана ў

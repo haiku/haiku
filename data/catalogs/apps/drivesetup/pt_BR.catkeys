@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-DriveSetup	2960101368
+1	portuguese (brazil)	x-vnd.Haiku-DriveSetup	3482853583
 Could not unmount partition %s.	MainWindow		Não foi possível desmontar a partição %s.
 Mount all	MainWindow		Montar tudo
 Disk	MainWindow		Disco
@@ -14,7 +14,6 @@ Unmount	MainWindow		Desmontar
 Failed to format the partition %s!\n	MainWindow		Falha ao formatar a partição %s!\n
 Partition size	CreateParametersPanel		Tamanho da partição
 Validation of the given parameters failed.	MainWindow		A validação dos parâmetros dados falhou.
-The partition %s is currently mounted.	MainWindow		A partição %s está atualmente montada.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Deseja realmente formatar a partição \"%s\"? Você será consultado novamente antes que as alterações sejam gravadas no disco.
 DriveSetup	System name		Configuração de Unidade
 Mounted at	PartitionList		Montado em

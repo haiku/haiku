@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-DriveSetup	1934767996
+1	ukrainian	x-vnd.Haiku-DriveSetup	598604797
 Could not unmount partition %s.	MainWindow		Неможливо відключити розділ %s.
 Mount all	MainWindow		Підключити все
 Disk	MainWindow		Диск
@@ -18,7 +18,6 @@ Unmount	MainWindow		Відключити
 Failed to format the partition %s!\n	MainWindow		Не вдалося ініціалізувати розділ %s!\n
 Partition size	CreateParametersPanel		Розмір розділу
 Validation of the given parameters failed.	MainWindow		Збій при перевірці введених параметрів.
-The partition %s is currently mounted.	MainWindow		Розділ %s на даний момент підключений.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Ви впевнені, що бажаєте ініціалізувати розділ \"%s\"? Повторний запит буде видано безпосередньо перед записом змін на диск.
 DriveSetup	System name		DriveSetup
 Mounted at	PartitionList		Підключити як
@@ -65,7 +64,6 @@ LUKS encrypted	Encryption utils		Шифрування LUKS
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Ви впевнені, що бажаєте записати зміни на диск?\n\nВсі дані на розділі %s будуть безповоротно втрачені!
 Cancel	AbstractParametersPanel		Скасувати
 Format	MainWindow		Форматувати
-<empty or unknown>	DiskView		<пусто або невідомо>
 OK	MainWindow		ОК
 Open with DiskProbe	MainWindow		Відкрити у DiskProbe
 Could not delete the selected partition.	MainWindow		Неможливо видалити вибраний розділ.
@@ -91,7 +89,6 @@ Cannot delete the selected partition.	MainWindow		Неможливо видал�
 Continue	MainWindow		Продовжити
 Could not mount partition %s.	MainWindow		Неможливо підключити розділ %s.
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Ви впевнені, що бажаєте ініціалізувати розділ? Повторний запит буде видано безпосередньо перед записом змін на диск.
-<empty or unknown>	PartitionList		<пусто або невідомо>
 The selected disk is read-only.	MainWindow		Вибраний диск тільки для читання.
 The partition %s is already unmounted.	MainWindow		Розділ %s вже відключено.
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Ви впевнені, що бажаєте змінити параметри вибраного розділу?\n\nРозділ може більше не розпізнаватись іншими операційними системами!

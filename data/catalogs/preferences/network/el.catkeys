@@ -1,8 +1,7 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Network	2923905377
+1	greek, modern (1453-)	x-vnd.Haiku-Network	3062143965
 Ethernet device	InterfaceListItem		Συσκευή Ethernet
 Link speed:	IntefaceView		Ταχύτητα σύνδεσης:
 disconnected	IntefaceView		έγινε αποσύνδεση
-IP Address:	IntefaceAddressView		Διεύθυνση IP:
 WPA	WPA protected network		WPA
 Network:	IntefaceView		Δίκτυο:
 Received:	IntefaceView		Ελήφθη:

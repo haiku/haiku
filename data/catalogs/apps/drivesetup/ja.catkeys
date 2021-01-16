@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-DriveSetup	1934767996
+1	japanese	x-vnd.Haiku-DriveSetup	598604797
 Could not unmount partition %s.	MainWindow		パーティション %s をマウント解除できませんでした。
 Mount all	MainWindow		すべてマウント
 Disk	MainWindow		ディスク
@@ -18,7 +18,6 @@ Unmount	MainWindow		マウント解除
 Failed to format the partition %s!\n	MainWindow		パーティション %s のフォーマットに失敗しました。\n
 Partition size	CreateParametersPanel		パーティションサイズ
 Validation of the given parameters failed.	MainWindow		指定されたパラメーターの検証に失敗しました。
-The partition %s is currently mounted.	MainWindow		パーティション %s が現在マウントされています。
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		パーティション \"%s\" をフォーマットしますか? 変更をディスクに書き込む直前に再度確認します。
 DriveSetup	System name		DriveSetup
 Mounted at	PartitionList		マウント先
@@ -65,7 +64,6 @@ LUKS encrypted	Encryption utils		LUKS で暗号化された
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		変更をすぐにディスクに保存しますか?\n\nその場合、ディスク %s のデータがすべて失われます。
 Cancel	AbstractParametersPanel		中止
 Format	MainWindow		フォーマット
-<empty or unknown>	DiskView		<空または不明>
 OK	MainWindow		OK
 Open with DiskProbe	MainWindow		DiskProbe で開く
 Could not delete the selected partition.	MainWindow		選択されたパーティションを削除できませんでした。
@@ -91,7 +89,6 @@ Cannot delete the selected partition.	MainWindow		選択されたパーティシ
 Continue	MainWindow		続ける
 Could not mount partition %s.	MainWindow		パーティション %s をマウントできませんでした。
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		パーティションをフォーマットしますか? 変更をディスクに書き込む直前に再度確認します。
-<empty or unknown>	PartitionList		<空または不明>
 The selected disk is read-only.	MainWindow		選択されたディスクは読み取り専用です。
 The partition %s is already unmounted.	MainWindow		パーティション %s はすでにマウント解除されています。
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		選択したパーティションのパラメーターを変更しますか?\n\nパーティションはほかのオペレーティングシステムからはもう認識されないかもしれません。

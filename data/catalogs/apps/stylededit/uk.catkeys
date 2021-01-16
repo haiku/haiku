@@ -6,7 +6,7 @@ Center	Menus		Центр
 Increase size	Menus		Збільшити розмір
 Page setup…	Menus		Налаштування сторінки…
 Wrap-around search	FindandReplaceWindow		Шукати по всьому документу
-Untitled 	StyledEditWindow		Неназваний 
+Untitled 	StyledEditWindow		Без назви 
 OK	Statistics		ОК
 Find	FindandReplaceWindow		Знайти
 New	Menus		Новий
@@ -52,7 +52,7 @@ Color	Menus		Колір
 Save changes to the document \"%s\"? 	QuitAlert		Зберегти зміни в документі \"%s\" ? 
 StyledEdit	System name		StyledEdit
 Find:	FindandReplaceWindow		Знайти:
-Undo typing	QuitAlert		Відміна друку
+Undo typing	QuitAlert		Відмінити набір тексту
 Error loading \"%s\":\n\t%s	LoadAlert		Помилка завантаження \"%s\":\n\t%s
 Don't save	SaveAlert		Не зберігати
 Reload…	Menus		Перезавантажити…
@@ -83,7 +83,7 @@ Save as…	Menus		Зберегти як…
 Replace	FindandReplaceWindow		Замінити
 Characters:	Statistics		Символів:
 Don't save	QuitAlert		Не зберігати
-This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Цей файл помічений тільки для читання. Зберегти зміни в документі \"%s\"? 
+This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Для цього файлу встановлений атрибут тільки читання. Зберегти зміни в документі \"%s\"?  
 Font	Menus		Шрифт
 Align	Menus		Вирівняти
 Select all	Menus		Вибрати все

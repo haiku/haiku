@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-DriveSetup	1934767996
+1	esperanto	x-vnd.Haiku-DriveSetup	598604797
 Could not unmount partition %s.	MainWindow		Ne sukcesis demeti subdiskon %s.
 Mount all	MainWindow		Surmeti ĉiujn
 Disk	MainWindow		Disko
@@ -18,7 +18,6 @@ Unmount	MainWindow		Demeti
 Failed to format the partition %s!\n	MainWindow		Ne sukcesis strukturi la subdiskon %s!\n
 Partition size	CreateParametersPanel		Subdiska grandeco
 Validation of the given parameters failed.	MainWindow		Validigo de la donitaj parametroj malsukcesis.
-The partition %s is currently mounted.	MainWindow		La subdisko %s nuntempe estas surmetita.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Ĉu vi certas, ke vi volas strukturi la subdiskon \"%s\"? Ni ankoraŭ demandos vin antaŭ ŝanĝoj estos konservitaj al la disko.
 DriveSetup	System name		Diskagordilo
 Mounted at	PartitionList		Surmetita ĉe
@@ -65,7 +64,6 @@ LUKS encrypted	Encryption utils		Ĉifrita per LUKS
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Ĉu vi certas, ke vi volas konservi la ŝanĝojn al disko nun?\n\nĈiu datumo en la subdisko %s estos senespere perdita se vi farus tion!
 Cancel	AbstractParametersPanel		Nuligi
 Format	MainWindow		Strukturi
-<empty or unknown>	DiskView		<malplena aŭ nekonata>
 OK	MainWindow		Bone
 Open with DiskProbe	MainWindow		Uzi per la DiskSondilo
 Could not delete the selected partition.	MainWindow		Ne povis forigi la elektitan subdiskon.
@@ -91,7 +89,6 @@ Cannot delete the selected partition.	MainWindow		Ne povas forigi la elektitan s
 Continue	MainWindow		Daŭri
 Could not mount partition %s.	MainWindow		Ne povis surmeti subdiskon %s.
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Ĉu vi certas, ke vi volas strukturi la subdiskon? Ni ankoraŭ demandos vin antaŭ ŝanĝoj estos konservitaj al la disko. 
-<empty or unknown>	PartitionList		<malplena aŭ nekonata>
 The selected disk is read-only.	MainWindow		La elektita disko estas nurlegebla.
 The partition %s is already unmounted.	MainWindow		La subdisko %s jam estas surmetita.
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Ĉu vi certas, ke vi volas ŝanĝi la parametrojn de la elektita subdiskon?\n\nLa subdisko eble ne plu estos konata de aliaj operaciumoj!

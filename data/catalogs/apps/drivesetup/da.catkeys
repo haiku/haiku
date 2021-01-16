@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-DriveSetup	1934767996
+1	danish	x-vnd.Haiku-DriveSetup	598604797
 Could not unmount partition %s.	MainWindow		Kunne ikke afmontere partition %s.
 Mount all	MainWindow		Monter alle
 Disk	MainWindow		Disk
@@ -18,7 +18,6 @@ Unmount	MainWindow		Afmonter
 Failed to format the partition %s!\n	MainWindow		Kunne ikke formatere partitionen %s!\n
 Partition size	CreateParametersPanel		Partitionsstørrelse
 Validation of the given parameters failed.	MainWindow		Validering af de angivne parametre mislykkedes.
-The partition %s is currently mounted.	MainWindow		Partitionen %s er allerede monteret.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Er du sikker på, at du vil formatere partitionen \"%s\"? Du vil blive spurgt igen inden ændringerne skrives til disken.
 DriveSetup	System name		Drevopsætning
 Mounted at	PartitionList		Monteret på
@@ -65,7 +64,6 @@ LUKS encrypted	Encryption utils		LUKS-krypteret
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Er du sikker på, at du vil skrive ændringerne tilbage til disken nu?\n\nAl data på den valgte partition %s vil blive permanent slettet!
 Cancel	AbstractParametersPanel		Annuller
 Format	MainWindow		Format
-<empty or unknown>	DiskView		<tom eller ukendt>
 OK	MainWindow		OK
 Open with DiskProbe	MainWindow		Åbn med Disksondering
 Could not delete the selected partition.	MainWindow		Kunne ikke slette den valgte partition.
@@ -91,7 +89,6 @@ Cannot delete the selected partition.	MainWindow		Det er ikke muligt at slette d
 Continue	MainWindow		Fortsæt
 Could not mount partition %s.	MainWindow		Kunne ikke montere partition %s.
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Er du sikker på, at du vil formatere partitionen? Du vil blive spurgt igen inden ændringerne skrives til disken.
-<empty or unknown>	PartitionList		<tom eller ukendt>
 The selected disk is read-only.	MainWindow		Der kan kun læses fra den valgte disk.
 The partition %s is already unmounted.	MainWindow		Partitionen %s er allerede monteret.
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Er du sikker på, at du vil skifte parmeterne på den valgte partition?\n\nPartitionen vil måske ikke længere kunne genkendes af andre styresystemer!

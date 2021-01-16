@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-DriveSetup	1250478379
+1	croatian	x-vnd.Haiku-DriveSetup	4209282476
 Could not unmount partition %s.	MainWindow		Ne mogu odmontirati particiju %s.
 Mount all	MainWindow		Montiraj sve
 Disk	MainWindow		Disk
@@ -15,7 +15,6 @@ Are you sure you want to format the Intel Extended Partition? Any subpartitions 
 Unmount	MainWindow		Odmontiraj
 Failed to format the partition %s!\n	MainWindow		Neuspjelo formatiranje particije %s!\n
 Partition size	CreateParametersPanel		Veličina particije
-The partition %s is currently mounted.	MainWindow		Particija %s je trenutno montirana.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Jeste li sigurni da želite formatirati particiju \"%s\"? Biti ćete upitani ponovno prije nego se promjene zapišu na disk.
 Mounted at	PartitionList		Montirano na
 Create…	MainWindow		Napravi...
@@ -48,7 +47,6 @@ Partition name:	ChangeParametersPanel		Ime particije:
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Jeste li sigurni da želite sada zapisati promjene na disk?\n\nSvi podaci na particiji %s biti će nepovratno izgubljeni ako to učinite!
 Cancel	AbstractParametersPanel		Otkaži
 Format	MainWindow		Formatiraj
-<empty or unknown>	DiskView		<empty or unknown>
 OK	MainWindow		U redu
 Open with DiskProbe	MainWindow		Otvori pomoću DiskProbe
 Could not delete the selected partition.	MainWindow		Nisam mogao obrisati odabranu particiju.
@@ -70,7 +68,6 @@ Cannot delete the selected partition.	MainWindow		Ne mogu obrisati odabranu part
 Continue	MainWindow		Nastavi
 Could not mount partition %s.	MainWindow		Ne mogu montirati particiju %s.
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Jeste li sigurni da želite formatirati particiju? Biti ćete upitani ponovno prije nego promjene budu zapisane na disk.
-<empty or unknown>	PartitionList		<empty or unknown>
 The selected disk is read-only.	MainWindow		Odabrani disk je samo za čitanje.
 The partition %s is already unmounted.	MainWindow		Particija %s je već odmontirana.
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		jeste li digurn ida želite promjeniti parametre na odabranoj particiji?\n\nParticiju možda drugi operativni sustav ne može prepoznati!

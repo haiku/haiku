@@ -1,8 +1,7 @@
-1	turkish	x-vnd.Haiku-Network	2923905377
+1	turkish	x-vnd.Haiku-Network	3062143965
 Ethernet device	InterfaceListItem		Ethernet aygıtı
 Link speed:	IntefaceView		Bağlanma hızı:
 disconnected	IntefaceView		bağlantı kesildi
-IP Address:	IntefaceAddressView		IP adresi:
 WPA	WPA protected network		WPA
 Network:	IntefaceView		Ağ:
 Received:	IntefaceView		Alınan:

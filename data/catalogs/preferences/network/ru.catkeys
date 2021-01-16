@@ -1,8 +1,7 @@
-1	russian	x-vnd.Haiku-Network	2923905377
+1	russian	x-vnd.Haiku-Network	3062143965
 Ethernet device	InterfaceListItem		Проводное устройство
 Link speed:	IntefaceView		Скорость соединения:
 disconnected	IntefaceView		отключено
-IP Address:	IntefaceAddressView		IP-адрес:
 WPA	WPA protected network		WPA
 Network:	IntefaceView		Сеть
 Received:	IntefaceView		Получено:

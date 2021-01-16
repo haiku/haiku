@@ -1,6 +1,7 @@
-1	ukrainian	x-vnd.Haiku-CodyCam	40716723
+1	ukrainian	x-vnd.Haiku-CodyCam	12021044
 destination directory expected	CodyCam		вкажіть каталог призначення
 reply: '%s'\n	SftpClient		відповідь: '%s'\n
+PASS <suppressed>  (real password sent)	FtpClient		PASS <suppressed>  (відіслано справжній пароль)
 JPEG image	CodyCam		Зображення JPEG
 Remote host has closed the connection.\n	FtpClient		Сервер закрив з’єднання.\n
 image file format expected	CodyCam		вкажіть формат зображення

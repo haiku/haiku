@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-WebPositive	1976607515
+1	ukrainian	x-vnd.Haiku-WebPositive	250728390
 Authentication required	Authentication Panel		Потрібна авторизація
 Previous	WebPositive Window		Попереднє
 (Finish: %date)	Download Window		(Завершення: %date)
@@ -30,7 +30,7 @@ Downloads	WebPositive Window		Завантаження
 Browse…	Settings Window		Перегляд…
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Закладка цієї сторінки (%bookmarkName) вже існує.
 Resume prior session	Settings Window		Продовжити попередній сеанс
-Match case	WebPositive Window		Враховуючи регістр
+Match case	WebPositive Window		Враховувати регістр
 Proxy password:	Settings Window		Пароль проксі:
 Size:	Font Selection view		Розмір:
 Page source	WebPositive Window		Код сторінки
@@ -62,7 +62,7 @@ OK	Authentication Panel		ОК
 Hide password text	Authentication Panel		Приховати текст пароля
 Username:	Authentication Panel		Користувач:
 Name	Cookie Manager		Ім'я
-Remove finished	Download Window		Вилучення завершене
+Remove finished	Download Window		Вилучити завершене
 Earlier	WebPositive Window		Раніше
 Edit	WebPositive Window		Правка
 Back	WebPositive Window		Назад
@@ -101,6 +101,7 @@ There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPosi
 Revert	Settings Window		Без змін
 Copy	WebPositive Window		Копіювати
 Default standard font size:	Settings Window		Розмір шрифту за замовчуванням:
+Custom	Settings Window		Вибір користувача
 Bookmark this page	WebPositive Window		Додати до закладок
 Show tabs if only one page is open	Settings Window		Показати вкладки, якщо відкрито лише одну сторінку
 Close tab	WebPositive Window		Закрити вкладку
@@ -113,10 +114,10 @@ Cancel	Settings Window		Скасувати
 History	WebPositive Window		Історія
 Reset size	WebPositive Window		Скинути розмір
 Do you really want to clear the browsing history?	WebPositive Window		Ви дійсно бажаєте очистити історію перегляду?
-Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Знайти наступну появу умов пошуку
+Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Знайти наступне входження за умовами пошуку
 Fixed font:	Settings Window		Моноширинний шрифт:
 Quit	WebPositive Window		Вийти
-Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Знайти попередню появу пошукових запитів
+Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Знайти попереднє входження за умовами пошуку
 Remember username and password for this site	Authentication Panel		Запам'ятати логін та пароль для цього сайту
 (Finish: %date - %duration left)	Download Window		(Завершення: %date - %duration залишилось)
 Cookie manager	Cookie Manager		Менеджер coookie

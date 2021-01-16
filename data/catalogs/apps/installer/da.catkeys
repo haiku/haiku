@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-Installer	4035783534
+1	danish	x-vnd.Haiku-Installer	1364063076
 Performing installation.	InstallProgress		Udfører installation.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Vælg en oprindelsesdisk fra popup-menuen. Tryk dernæst på \"Begynd\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Luk venligst vinduet for drevopsætning, før du lukker installationsvinduet.
@@ -14,6 +14,7 @@ Unknown Type	InstallProgress	Partition content type	Ukendt Type
 Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Tryk på Begynd for at installere fra '%1s' på '%2s'.
 Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Vælg disken du ønsker at kopiere til fra menuen. Tryk dernæst på \"Begynd\".
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Installationen er færdig. Opstartssektoren er blevet skrevet til '%s'. Tryk på Afslut for at forlade installationsprogrammet eller vælg et nyt måldiskområde for at udføre endnu en installation.
+Are you sure you want to stop the installation?	InstallerWindow		Er du sikker på, at du vil stoppe installationen?
 README	InstallerApp		LÆSMIG
 Quit	InstallerWindow		Afslut
 Write boot sector to '%s'	InstallerWindow		Skriv opstartssektor til '%s'
@@ -61,6 +62,7 @@ Cancel	InstallerWindow		Annuller
 Continue	InstallerWindow	In alert after pressing Stop	Fortsæt
 Scanning for disks…	InstallerWindow		Leder efter diske…
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Kører drevopsætning…\n\nLuk vinduet for drevopsætning for at fortsætte installationen.
+The installation is not complete yet!\nAre you sure you want to stop it?	InstallerWindow		Installationen er ikke færdig endnu!\nEr du sikker på, at du vil stoppe den?
 The partition can't be mounted. Please choose a different partition.	InstallProgress		Partitionen kan ikke hentes ind i systemet. Vælg venligst en anden partition.
 Set up partitions…	InstallerWindow		Konfigurer partitioner…
 Install progress:  	InstallerWindow		Installationsfremgang:  

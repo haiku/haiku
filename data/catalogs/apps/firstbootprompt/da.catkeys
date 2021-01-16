@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-FirstBootPrompt	2131367349
+1	danish	x-vnd.Haiku-FirstBootPrompt	1620087918
 Japanese	KeymapNames		Japansk
 US	KeymapNames		USA
 Cancel	BootPromptWindow		Annuller
@@ -59,12 +59,14 @@ French (NF Z71-300)	KeymapNames		Fransk (NF Z71-300)
 ISO-9995	KeymapNames		ISO-9995
 Kazakh	KeymapNames		Kasakhisk
 Language	BootPromptWindow		Sprog
+Welcome to %distroname%!	BootPromptWindow		Velkommen til %distroname%!
 Lithuanian (Standard)	KeymapNames		Litauisk (standard)
 Belgian (comma)	KeymapNames		Belgisk (komma)
 Custom	BootPromptWindow		Tilpasset
 Norwegian	KeymapNames		Norsk
 Danish	KeymapNames		Dansk
 Bulgarian (Phonetic)	KeymapNames		Bulgarsk (fonetisk)
+Try out %distroname%	BootPromptWindow		Prøv %distroname%
 Canadian-French	KeymapNames		Fransk (canadisk)
 Russian	KeymapNames		Russisk
 Hungarian	KeymapNames		Ungarsk
@@ -76,5 +78,6 @@ Czech (Mac)	KeymapNames		Tjekkisk (Mac)
 Brazilian (ABNT2)	KeymapNames		Brasiliansk (ABNT2)
 Albanian	KeymapNames		Albansk
 Dutch	KeymapNames		Nederlandsk
+Install %distroname%	BootPromptWindow		Installer %distroname%
 Friulian	KeymapNames		Friulisk
 Icelandic	KeymapNames		Islandsk

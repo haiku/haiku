@@ -1,8 +1,7 @@
-1	spanish; castilian	x-vnd.Haiku-Network	2923905377
+1	spanish; castilian	x-vnd.Haiku-Network	3062143965
 Ethernet device	InterfaceListItem		Dispositivo Ethernet
 Link speed:	IntefaceView		Velocidad de conexión:
 disconnected	IntefaceView		desconectado
-IP Address:	IntefaceAddressView		Dirección IP:
 WPA	WPA protected network		WPA
 Network:	IntefaceView		Red:
 Received:	IntefaceView		Recibido:

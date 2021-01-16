@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-DriveSetup	1934767996
+1	hungarian	x-vnd.Haiku-DriveSetup	598604797
 Could not unmount partition %s.	MainWindow		Nem lehet leválasztani a partíciót (%s).
 Mount all	MainWindow		Összes csatolása
 Disk	MainWindow		Lemez
@@ -18,7 +18,6 @@ Unmount	MainWindow		Leválasztás
 Failed to format the partition %s!\n	MainWindow		Nem sikerült előkészíteni a partíciót: „%s”.\n
 Partition size	CreateParametersPanel		A partíció mérete
 Validation of the given parameters failed.	MainWindow		A megadott paramétereket nem sikerült érvényesíteni.
-The partition %s is currently mounted.	MainWindow		A partíció (%s) csatolva van.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Biztosan meg akarod formázni a partíciót \"%s\"? A végleges művelet előtt még egyszer meg kell ezt erősítened.
 DriveSetup	System name		Lemezkezelő
 Mounted at	PartitionList		Csatolási pont
@@ -65,7 +64,6 @@ LUKS encrypted	Encryption utils		LUKS-al kódolt
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Biztosan a lemezre szeretnéd írni a kijelölt változtatásokat?\n\nEz esetben a(z) „%s” partíció teljes tartalma visszavonhatatlanul meg fog semmisülni.
 Cancel	AbstractParametersPanel		Mégse
 Format	MainWindow		Formázás
-<empty or unknown>	DiskView		<üres vagy ismeretlen>
 OK	MainWindow		Rendben
 Open with DiskProbe	MainWindow		Megnyitás a Lemezfürkésszel
 Could not delete the selected partition.	MainWindow		A kiválasztott partíció nem törölhető.
@@ -91,7 +89,6 @@ Cannot delete the selected partition.	MainWindow		A kijelölt partíció nem tö
 Continue	MainWindow		Folytatás
 Could not mount partition %s.	MainWindow		A partíció (%s) nem csatolható.
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Biztosan formázod a partíciót? Ezt még egyszer meg kell majd erősítened a tényleges művelet előtt.
-<empty or unknown>	PartitionList		<üres vagy ismeretlen>
 The selected disk is read-only.	MainWindow		A kiválasztott lemez nem írható.
 The partition %s is already unmounted.	MainWindow		A partíció (%s) már le van választva!
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Biztosan módosítani szeretnéd a kijelölt partíció paramétereit?\n\nLehetséges, hogy a módosítás hatására a partíció nem lesz többé felismerhető a többi operációs rendszer számára!

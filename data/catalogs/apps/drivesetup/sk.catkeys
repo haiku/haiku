@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-DriveSetup	2981446742
+1	slovak	x-vnd.Haiku-DriveSetup	3504198957
 Could not unmount partition %s.	MainWindow		Nepodarilo sa odpojiť oblasť %s.
 Mount all	MainWindow		Pripojiť všetky
 Disk	MainWindow		Disk
@@ -14,7 +14,6 @@ Unmount	MainWindow		Odpojiť
 Failed to format the partition %s!\n	MainWindow		Nepodarilo sa naformátovať oblasť %s!\n
 Partition size	CreateParametersPanel		Veľkosť oblasti
 Validation of the given parameters failed.	MainWindow		Overenie zadaných parametrov zlyhalo.
-The partition %s is currently mounted.	MainWindow		Oblasť %s je momentálne pripojená.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Ste si istí, že chcete naformátovať oblasť „%s“? Pred zapísaním zmien na disk sa vás program znova spýta.
 DriveSetup	System name		Nastavenie diskových oblastí
 Mounted at	PartitionList		Pripojené na

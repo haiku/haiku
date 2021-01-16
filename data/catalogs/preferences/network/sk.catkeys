@@ -1,8 +1,7 @@
-1	slovak	x-vnd.Haiku-Network	2313714399
+1	slovak	x-vnd.Haiku-Network	2451952987
 Ethernet device	InterfaceListItem		Ethernetové zariadenie
 Link speed:	IntefaceView		Rýchlosť linky:
 disconnected	IntefaceView		odpojené
-IP Address:	IntefaceAddressView		Adresa IP:
 WPA	WPA protected network		WPA
 Network:	IntefaceView		Sieť:
 Received:	IntefaceView		Prijatých:

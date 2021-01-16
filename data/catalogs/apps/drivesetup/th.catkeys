@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-DriveSetup	1934767996
+1	thai	x-vnd.Haiku-DriveSetup	598604797
 Could not unmount partition %s.	MainWindow		ไม่สามารถยกเลิกการต่อเชื่อมพาร์ติชัน %s
 Mount all	MainWindow		เมานต์ทั้งหมด
 Disk	MainWindow		ดิสก์
@@ -18,7 +18,6 @@ Unmount	MainWindow		ยกเลิกการเชื่อมต่อ
 Failed to format the partition %s!\n	MainWindow		ไม่สามารถฟอร์แมตพาร์ติชันได้ %s!\n
 Partition size	CreateParametersPanel		ขนาดพาร์ติชัน
 Validation of the given parameters failed.	MainWindow		การตรวจสอบพารามิเตอร์ที่กำหนดล้มเหลว
-The partition %s is currently mounted.	MainWindow		พาร์ติชัน %s ถูกเชื่อมต่อในปัจจุบัน
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		คุณแน่ใจหรือไม่ว่าต้องการจัดรูปแบบพาร์ติชัน \"%s\" คุณจะถูกถามอีกครั้งก่อนที่การเปลี่ยนแปลงจะถูกเขียนไปยังดิสก์
 DriveSetup	System name		DriveSetup
 Mounted at	PartitionList		เชื่อมต่อที่
@@ -65,7 +64,6 @@ LUKS encrypted	Encryption utils		เข้ารหัส LUKS
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		คุณแน่ใจหรือไม่ว่าต้องการเขียนการเปลี่ยนแปลงกลับสู่ดิสก์ตอนนี้ \n\nข้อมูลทั้งหมดในพาร์ติชัน %s จะหายไปอย่างไม่สามารถกู้คืนได้หากคุณทำเช่นนั้น!
 Cancel	AbstractParametersPanel		ยกเลิก
 Format	MainWindow		Format
-<empty or unknown>	DiskView		<empty or unknown>
 OK	MainWindow		ตกลง
 Open with DiskProbe	MainWindow		เปิดด้วย DiskProbe
 Could not delete the selected partition.	MainWindow		ไม่สามารถลบพาร์ติชันที่เลือก
@@ -91,7 +89,6 @@ Cannot delete the selected partition.	MainWindow		ไม่สามารถล
 Continue	MainWindow		ต่อไป
 Could not mount partition %s.	MainWindow		ไม่สามารถเชื่อมต่อพาร์ติชัน %s
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		คุณแน่ใจหรือว่าต้องการฟอร์แมตพาร์ติชัน? คุณจะถูกถามอีกครั้งก่อนที่การเปลี่ยนแปลงจะถูกเขียนไปยังดิสก์
-<empty or unknown>	PartitionList		<empty or unknown>
 The selected disk is read-only.	MainWindow		ดิสก์ที่เลือกเป็นแบบอ่านอย่างเดียว
 The partition %s is already unmounted.	MainWindow		พาร์ติชัน %s ถูกถอนออกแล้ว
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		คุณแน่ใจหรือว่าต้องการเปลี่ยนพารามิเตอร์ของพาร์ติชั่นที่เลือก? \n\nพาร์ติชั่นอาจไม่ได้รับการรองรับจากระบบปฏิบัติการอื่นอีกต่อไป!

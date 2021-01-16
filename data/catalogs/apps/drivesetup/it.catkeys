@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-DriveSetup	1934767996
+1	italian	x-vnd.Haiku-DriveSetup	598604797
 Could not unmount partition %s.	MainWindow		Impossibile smontare la partizione %s.
 Mount all	MainWindow		Monta tutto
 Disk	MainWindow		Disco
@@ -18,7 +18,6 @@ Unmount	MainWindow		Smonta
 Failed to format the partition %s!\n	MainWindow		Non è stato possibile formattare la partizione %s!\n
 Partition size	CreateParametersPanel		Dimensione della partizione
 Validation of the given parameters failed.	MainWindow		Validazione dei parametri forniti fallita.
-The partition %s is currently mounted.	MainWindow		La partizione %s è stata già montata.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Sei sicuro di voler formattare la partizione \"%s\"? Ti sarà nuovamente chiesta conferma prima di salvare i cambiamenti sul disco.
 DriveSetup	System name		Gestione Disco
 Mounted at	PartitionList		Montato su
@@ -65,7 +64,6 @@ LUKS encrypted	Encryption utils		Crittogradia LUKS
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Sei sicuro di voler salvare le modifiche sul disco?\n\nProcedendo con l'operazione, tutti i dati sulla partizione %s saranno irrimediabilmente perduti!
 Cancel	AbstractParametersPanel		Annulla
 Format	MainWindow		Formatta
-<empty or unknown>	DiskView		<vuoto o sconosciuto>
 OK	MainWindow		OK
 Open with DiskProbe	MainWindow		Apri con Analizza Disco
 Could not delete the selected partition.	MainWindow		Impossibile rimuovere la partizione selezionata.
@@ -91,7 +89,6 @@ Cannot delete the selected partition.	MainWindow		La partizione selezionata non 
 Continue	MainWindow		Continua
 Could not mount partition %s.	MainWindow		Impossibile montare la partizione %s.
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Sei sicuro di voler formattare la partizione? Ti sarà chiesta nuovamente conferma prima di scrivere i cambiamenti sul disco.
-<empty or unknown>	PartitionList		<vuoto o sconosciuto>
 The selected disk is read-only.	MainWindow		Il disco selezionato è di sola lettura.
 The partition %s is already unmounted.	MainWindow		La partizione %s è stata già smontata.
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Sei sicuro di voler modificare i parametri della partizione selezionata?\n\nLa partizione potrebbe non essere più riconosciuta da altri sistemi operativi!

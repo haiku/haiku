@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-DeskCalc	2640162838
+1	french	x-vnd.Haiku-DeskCalc	2714719812
 cos	CalcView		cos
 3	CalcView		3
 (	CalcView		(
@@ -7,7 +7,9 @@ BS	CalcView		SUPPR
 acos	CalcView		acos
 /	CalcView		/
 8	CalcView		8
+ceil	CalcView		plafond
 -	CalcView		-
+cbrt	CalcView		∛
 BS	CalcView	Key label, 'BS' means backspace	SUPPR
 floor	CalcView		Ent
 sinh	CalcView		sinh

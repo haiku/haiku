@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-DriveSetup	1934767996
+1	russian	x-vnd.Haiku-DriveSetup	598604797
 Could not unmount partition %s.	MainWindow		Невозможно отключить раздел %s.
 Mount all	MainWindow		Подключить все
 Disk	MainWindow		Диск
@@ -18,7 +18,6 @@ Unmount	MainWindow		Отключить
 Failed to format the partition %s!\n	MainWindow		Не удалось инициализировать раздел %s!\n
 Partition size	CreateParametersPanel		Размер раздела
 Validation of the given parameters failed.	MainWindow		Проверка введённых параметров не удалась.
-The partition %s is currently mounted.	MainWindow		Раздел %s в данный момент подключен.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Вы уверены, что хотите инициализировать раздел \"%s\"?\nПовторный запрос будет выдан непосредственно перед записью изменений на диск.
 DriveSetup	System name		Разметка диска
 Mounted at	PartitionList		Подключен в
@@ -65,7 +64,6 @@ LUKS encrypted	Encryption utils		Зашифрован с LUKS
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Вы уверены, что хотите записать изменения на диск прямо сейчас?\n\nЕсли вы продолжите, то все данные на разделе %s будут безвозвратно потеряны!
 Cancel	AbstractParametersPanel		Отмена
 Format	MainWindow		Инициализировать
-<empty or unknown>	DiskView		<пустой или неизвестный>
 OK	MainWindow		ОК
 Open with DiskProbe	MainWindow		Открыть в Редакторе диска
 Could not delete the selected partition.	MainWindow		Невозможно удалить выбранный раздел.
@@ -91,7 +89,6 @@ Cannot delete the selected partition.	MainWindow		Невозможно удал�
 Continue	MainWindow		Продолжить
 Could not mount partition %s.	MainWindow		Невозможно подключить раздел %s.
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Вы уверены, что хотите инициализировать раздел?\nПовторный запрос будет выдан непосредственно перед записью изменений на диск.
-<empty or unknown>	PartitionList		<пустой или неизвестный>
 The selected disk is read-only.	MainWindow		Выбранный диск доступен только для чтения.
 The partition %s is already unmounted.	MainWindow		Раздел %s уже отключен.
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Вы уверены, что хотите изменить параметры выбранного раздела?\n\nРаздел может больше не распознаваться другими операционными системами!

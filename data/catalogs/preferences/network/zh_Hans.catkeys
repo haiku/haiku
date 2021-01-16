@@ -1,8 +1,7 @@
-1	english	x-vnd.Haiku-Network	2807941663
+1	english	x-vnd.Haiku-Network	2946180251
 Ethernet device	InterfaceListItem		以太网设备
 Link speed:	IntefaceView		连接速度：
 disconnected	IntefaceView		断开连接
-IP Address:	IntefaceAddressView		IP 地址：
 WPA	WPA protected network		WPA
 Network:	IntefaceView		网络：
 Received:	IntefaceView		收到：

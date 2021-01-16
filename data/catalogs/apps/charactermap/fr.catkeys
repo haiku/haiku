@@ -1,16 +1,22 @@
-1	french	x-vnd.Haiku-CharacterMap	64213964
+1	french	x-vnd.Haiku-CharacterMap	3830219275
 Tirhuta	UnicodeBlocks		Tirhuta
 Miscellaneous mathematical symbols B	UnicodeBlocks		Divers symboles mathématiques B
 Latin extended E	UnicodeBlocks		Latin étendu E
+Dogra	UnicodeBlocks		Dogra
 Javanese	UnicodeBlocks		Javanais
 Saurashtra	UnicodeBlocks		Saurâshtra
 Arabic supplement	UnicodeBlocks		Arabe supplémentaire
 Hanunoo	UnicodeBlocks		Hanounóo
 Ogham	UnicodeBlocks		Oġam
+Inscriptional Pahlavi	UnicodeBlocks		Écriture Pahlavi
 Hebrew	UnicodeBlocks		Hébreu
 Katakana	UnicodeBlocks		Katakana
+Miao	UnicodeBlocks		Miao
 Mongolian	UnicodeBlocks		Mongol
+Pau Cin Hau	UnicodeBlocks		Pau Cin Hau
+Yezidi	UnicodeBlocks		Yézidi
 Linear B ideograms	UnicodeBlocks		Idéogrammes du linéaire B
+Caucasian Albanian	UnicodeBlocks		Albanais caucasien
 CJK unified ideographs extension D	UnicodeBlocks		Supplément D aux idéogrammes unifiés CJC
 Multani	UnicodeBlocks		Multani
 Linear A	UnicodeBlocks		Linéaire A
@@ -135,6 +141,8 @@ Ethiopic extended	UnicodeBlocks		Éthiopien étendu
 CJK compatibility	UnicodeBlocks		Compatibilité CJC
 Tai Le	UnicodeBlocks		Taï-le
 Lao	UnicodeBlocks		Lao
+Shorthand format controls	UnicodeBlocks		Caractères de formatage sténographiques
+Inscriptional Parthian	UnicodeBlocks		Écriture Parthe
 Optical character recognition	UnicodeBlocks		Reconnaissance optique de caractères
 Tamil	UnicodeBlocks		Tamoul
 Greek extended	UnicodeBlocks		Grec étendu
@@ -147,10 +155,12 @@ Buhid	UnicodeBlocks		Bouhid
 Supplementary private use area B	UnicodeBlocks		Zone supplémentaire B à usage privé
 Cuneiform	UnicodeBlocks		Cunéiforme
 Alphabetic presentation forms	UnicodeBlocks		Formes de présentation alphabétiques
+Mayan numerals	UnicodeBlocks		Chiffres mayas
 Tangut components	UnicodeBlocks		Composants tangoutes
 Letterlike symbols	UnicodeBlocks		Symboles de type lettre
 Spacing modifier letters	UnicodeBlocks		Lettres modificatives d’espace
 Unified Canadian Aboriginal syllabics	UnicodeBlocks		Syllabaires unifiés des aborigènes Canadiens
+Hanifi Rohingya	UnicodeBlocks		Hanifi Rohingya
 Dingbats	UnicodeBlocks		Casseau
 Mathematical operators	UnicodeBlocks		Opérateurs mathématiques
 Bopomofo	UnicodeBlocks		Bopomofo
@@ -162,6 +172,7 @@ Bhaiksuki	UnicodeBlocks		Bhaïksuki
 Ugaritic	UnicodeBlocks		Ougaritique
 Geometric shapes extended	UnicodeBlocks		Formes géométriques étendues
 Transport and map symbols	UnicodeBlocks		Symboles de transport et de cartographie
+Tamil supplement	UnicodeBlocks		Supplément Tamoul
 Combining diacritical marks extended	UnicodeBlocks		Marques diacritiques d’association étendues
 Cyrillic extended C	UnicodeBlocks		Cyrillique étendu C
 Syriac	UnicodeBlocks		Syriaque
@@ -170,6 +181,7 @@ Supplement punctuation	UnicodeBlocks		Supplément de ponctuation
 Lycian	UnicodeBlocks		Lycien
 Myanmar extended A	UnicodeBlocks		Myanmar (Birman) étendu A
 Ancient symbols	UnicodeBlocks		Symboles anciens
+Arabic mathematical alphabetic symbols	UnicodeBlocks		Symboles alphabétiques mathématiques arabes
 Miscellaneous symbols and arrows	UnicodeBlocks		Divers symboles et flèches
 Kharoshthi	UnicodeBlocks		Kharochthî
 Buginese	UnicodeBlocks		Bougui
@@ -230,6 +242,7 @@ New Tai Lue	UnicodeBlocks		Nouveau taï lü
 Sutton SignWriting	UnicodeBlocks		Écriture des signes de Sutton
 Limbu	UnicodeBlocks		Limbu
 Kanbun	UnicodeBlocks		Kanboun
+Emoticons	UnicodeBlocks		Émoticônes
 CJK symbols and punctuation	UnicodeBlocks		Ponctuation CJC
 CJK strokes	UnicodeBlocks		Traits CJC
 Combining half marks	UnicodeBlocks		Demi-signes combinatoires
