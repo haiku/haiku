@@ -199,7 +199,7 @@ BSecureSocket::Private::ErrorCode(int returnValue)
 			return B_NO_ERROR;
 		case SSL_ERROR_ZERO_RETURN:
 			// Socket is closed
-			return B_CANCELED;
+			return B_IO_ERROR;
 		case SSL_ERROR_SSL:
 			// Probably no certificate
 			return B_NOT_ALLOWED;
