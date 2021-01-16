@@ -475,21 +475,15 @@ common_select(int numFDs, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
 
 	// set new signal mask
 	sigset_t oldSigMask;
-	if (sigMask != NULL) {
+	if (sigMask != NULL)
 		sigprocmask(SIG_SETMASK, sigMask, &oldSigMask);
-		if (!kernel) {
-			Thread *thread = thread_get_current_thread();
-			thread->old_sig_block_mask = oldSigMask;
-			thread->flags |= THREAD_FLAGS_OLD_SIGMASK;
-		}
-	}
 
 	// wait for something to happen
 	status = acquire_sem_etc(sync->sem, 1,
 		B_CAN_INTERRUPT | (timeout >= 0 ? B_ABSOLUTE_TIMEOUT : 0), timeout);
 
 	// restore the old signal mask
-	if (sigMask != NULL && kernel)
+	if (sigMask != NULL)
 		sigprocmask(SIG_SETMASK, &oldSigMask, NULL);
 
 	PRINT(("common_select(): acquire_sem_etc() returned: %lx\n", status));
@@ -933,6 +927,8 @@ _user_select(int numFDs, fd_set *userReadSet, fd_set *userWriteSet,
 	sigset_t sigMask;
 	int result;
 
+	syscall_restart_handle_timeout_pre(timeout);
+
 	if (numFDs < 0 || !check_max_fds(numFDs))
 		return B_BAD_VALUE;
 
@@ -998,7 +994,8 @@ _user_select(int numFDs, fd_set *userReadSet, fd_set *userWriteSet,
 			|| (errorSet != NULL
 				&& user_memcpy(userErrorSet, errorSet, bytes) < B_OK))) {
 		result = B_BAD_ADDRESS;
-	}
+	} else
+		syscall_restart_handle_timeout_post(result, timeout);
 
 err:
 	free(readSet);
@@ -1016,12 +1013,16 @@ _user_poll(struct pollfd *userfds, int numFDs, bigtime_t timeout)
 	size_t bytes;
 	int result;
 
+	syscall_restart_handle_timeout_pre(timeout);
+
 	if (numFDs < 0)
 		return B_BAD_VALUE;
 
 	if (numFDs == 0) {
 		// special case: no FDs
-		return common_poll(NULL, 0, timeout, false);
+		result = common_poll(NULL, 0, timeout, false);
+		return result < 0
+			? syscall_restart_handle_timeout_post(result, timeout) : result;
 	}
 
 	if (!check_max_fds(numFDs))
@@ -1046,7 +1047,9 @@ _user_poll(struct pollfd *userfds, int numFDs, bigtime_t timeout)
 	if (numFDs > 0 && user_memcpy(userfds, fds, bytes) != 0) {
 		if (result >= 0)
 			result = B_BAD_ADDRESS;
-	}
+	} else
+		syscall_restart_handle_timeout_post(result, timeout);
+
 err:
 	free(fds);
 
