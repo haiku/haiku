@@ -93,13 +93,13 @@ typedef struct mmc_bus_interface {
 // type of card.
 typedef struct mmc_device_interface {
 	driver_module_info info;
-	status_t (*execute_command)(device_node* node, uint16_t rca,
+	status_t (*execute_command)(device_node* node, void* cookie, uint16_t rca,
 		uint8_t command, uint32_t argument, uint32_t* result);
 		// Execute a command with no I/O phase
-	status_t (*do_io)(device_node* controller, uint16_t rca,
+	status_t (*do_io)(device_node* controller, void* cookie, uint16_t rca,
 		uint8_t command, IOOperation* operation, bool offsetAsSectors);
 		// Execute a command that involves a data transfer.
-	void (*set_bus_width)(device_node* controller, int width);
+	void (*set_bus_width)(device_node* controller, void* cookie, int width);
 		// Set the data bus width to 1, 4 or 8 bit mode.
 } mmc_device_interface;
 

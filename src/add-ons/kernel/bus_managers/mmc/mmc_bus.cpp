@@ -159,11 +159,6 @@ MMCBus::_WorkerThread(void* cookie)
 	do {
 		bus->_AcquireScanSemaphore();
 
-		// In case we just got a "card inserted", wait for things to settle
-		// a bit before continuing (there can be glitches while the card is
-		// being inserted)
-		snooze(30000);
-
 		TRACE("Reset the bus...\n");
 		result = bus->ExecuteCommand(0, SD_GO_IDLE_STATE, 0, NULL);
 		TRACE("CMD0 result: %s\n", strerror(result));
@@ -173,7 +168,7 @@ MMCBus::_WorkerThread(void* cookie)
 	// command. With the default 400kHz clock that would be 20 microseconds,
 	// but we need to wait at least 20ms here, otherwise the next command times
 	// out
-	snooze(20000);
+	snooze(30000);
 
 	while (bus->fStatus != B_SHUTTING_DOWN) {
 		TRACE("Scanning the bus\n");

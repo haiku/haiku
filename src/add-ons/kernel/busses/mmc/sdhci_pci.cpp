@@ -118,11 +118,12 @@ SdhciBus::SdhciBus(struct registers* registers, uint8_t irq)
 	// way is to reset everything.
 	Reset();
 
-	// Then we configure the clock to the frequency needed for initialization
-	SetClock(400);
-
 	// Turn on the power supply to the card, if there is a card inserted
-	PowerOn();
+	if (PowerOn()) {
+		// Then we configure the clock to the frequency needed for
+		// initialization
+		SetClock(400);
+	}
 
 	// Finally, configure some useful interrupts
 	EnableInterrupts(SDHCI_INT_CMD_CMP | SDHCI_INT_CARD_REM
@@ -575,20 +576,31 @@ SdhciBus::HandleInterrupt()
 
 	TRACE("interrupt function called %x\n", intmask);
 
-	// handling card presence interrupt
-	if ((intmask & SDHCI_INT_CARD_INS) != 0) {
-		PowerOn();
+	// handling card presence interrupts
+	if ((intmask & SDHCI_INT_CARD_REM) != 0) {
+		// We can get spurious interrupts as the card is inserted or removed,
+		// so check the actual state before acting
+		if (!fRegisters->present_state.IsCardInserted())
+			fRegisters->power_control.PowerOff();
+		else
+			TRACE("Card removed interrupt, but card is inserted\n");
 
-		release_sem_etc(fScanSemaphore, 1, B_DO_NOT_RESCHEDULE);
+		fRegisters->interrupt_status |= SDHCI_INT_CARD_REM;
+		TRACE("Card removal interrupt handled\n");
+	}
+
+	if ((intmask & SDHCI_INT_CARD_INS) != 0) {
+		// We can get spurious interrupts as the card is inserted or removed,
+		// so check the actual state before acting
+		if (fRegisters->present_state.IsCardInserted()) {
+			if (PowerOn())
+				SetClock(400);
+			release_sem_etc(fScanSemaphore, 1, B_DO_NOT_RESCHEDULE);
+		} else
+			TRACE("Card insertion interrupt, but card is removed\n");
 
 		fRegisters->interrupt_status |= SDHCI_INT_CARD_INS;
 		TRACE("Card presence interrupt handled\n");
-	}
-
-	if ((intmask & SDHCI_INT_CARD_REM) != 0) {
-		fRegisters->power_control.PowerOff();
-		fRegisters->interrupt_status |= SDHCI_INT_CARD_REM;
-		TRACE("Card removal interrupt handled\n");
 	}
 
 	// handling command interrupt

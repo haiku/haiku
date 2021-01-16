@@ -129,8 +129,8 @@ mmc_disk_execute_iorequest(void* data, IOOperation* operation)
 		command = SD_WRITE_MULTIPLE_BLOCKS;
 	else
 		command = SD_READ_MULTIPLE_BLOCKS;
-	error = info->mmc->do_io(info->parent, info->rca, command, operation,
-		(info->flags & kIoCommandOffsetAsSectors) != 0);
+	error = info->mmc->do_io(info->parent, info->parentCookie, info->rca,
+		command, operation, (info->flags & kIoCommandOffsetAsSectors) != 0);
 
 	if (error != B_OK) {
 		info->scheduler->OperationCompleted(operation, error, 0);
@@ -147,8 +147,8 @@ mmc_block_get_geometry(mmc_disk_driver_info* info, device_geometry* geometry)
 {
 	struct mmc_disk_csd csd;
 	TRACE("Get geometry\n");
-	status_t error = info->mmc->execute_command(info->parent, 0, SD_SEND_CSD,
-		info->rca << 16, (uint32_t*)&csd);
+	status_t error = info->mmc->execute_command(info->parent,
+		info->parentCookie, 0, SD_SEND_CSD, info->rca << 16, (uint32_t*)&csd);
 	if (error != B_OK) {
 		TRACE("Could not get CSD! %s\n", strerror(error));
 		return error;
@@ -175,13 +175,13 @@ mmc_block_get_geometry(mmc_disk_driver_info* info, device_geometry* geometry)
 	// default 1 bit mode)
 	uint32_t cardStatus;
 	const uint32 k4BitMode = 2;
-	info->mmc->execute_command(info->parent, info->rca, SD_APP_CMD,
-		info->rca << 16, &cardStatus);
-	info->mmc->execute_command(info->parent, info->rca, SD_SET_BUS_WIDTH,
-		k4BitMode, &cardStatus);
+	info->mmc->execute_command(info->parent, info->parentCookie, info->rca,
+		SD_APP_CMD, info->rca << 16, &cardStatus);
+	info->mmc->execute_command(info->parent, info->parentCookie, info->rca,
+		SD_SET_BUS_WIDTH, k4BitMode, &cardStatus);
 
 	// From now on we use 4 bit mode
-	info->mmc->set_bus_width(info->parent, 4);
+	info->mmc->set_bus_width(info->parent, info->parentCookie, 4);
 
 	return B_OK;
 }
@@ -199,11 +199,19 @@ mmc_disk_init_driver(device_node* node, void** cookie)
 
 	memset(info, 0, sizeof(*info));
 
-	void* unused;
+	void* unused2;
 	info->node = node;
 	info->parent = sDeviceManager->get_parent_node(info->node);
 	sDeviceManager->get_driver(info->parent, (driver_module_info **)&info->mmc,
-		&unused);
+		&unused2);
+
+	// We need to grab the bus cookie as well
+	// FIXME it would be easier if that was available from the get_driver call
+	// above directly, but currently it isn't.
+	device_node* busNode = sDeviceManager->get_parent_node(info->parent);
+	driver_module_info* unused;
+	sDeviceManager->get_driver(busNode, &unused, &info->parentCookie);
+	sDeviceManager->put_node(busNode);
 
 	TRACE("MMC bus handle: %p %s\n", info->mmc, info->mmc->info.info.name);
 

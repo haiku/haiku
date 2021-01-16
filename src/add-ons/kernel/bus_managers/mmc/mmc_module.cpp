@@ -78,64 +78,39 @@ mmc_bus_added_device(device_node* parent)
 
 
 static status_t
-mmc_bus_execute_command(device_node* node, uint16_t rca, uint8_t command,
-	uint32_t argument, uint32_t* result)
+mmc_bus_execute_command(device_node* node, void* cookie, uint16_t rca,
+	uint8_t command, uint32_t argument, uint32_t* result)
 {
-	// FIXME store the parent cookie in the bus cookie or something instead of
-	// getting/putting the parent each time.
-	driver_module_info* mmc;
-	void* cookie;
-
 	TRACE("In mmc_bus_execute_command\n");
-	device_node* parent = gDeviceManager->get_parent_node(node);
-	gDeviceManager->get_driver(parent, &mmc, &cookie);
-	gDeviceManager->put_node(parent);
 
 	MMCBus* bus = (MMCBus*)cookie;
 
 	bus->AcquireBus();
 	status_t error = bus->ExecuteCommand(rca, command, argument, result);
 	bus->ReleaseBus();
+
 	return error;
 }
 
 
 static status_t
-mmc_bus_do_io(device_node* node, uint16_t rca, uint8_t command,
+mmc_bus_do_io(device_node* node, void* cookie, uint16_t rca, uint8_t command,
 	IOOperation* operation, bool offsetAsSectors)
 {
-	driver_module_info* mmc;
-	void* cookie;
-
-	// FIXME store the parent cookie in the bus cookie or something instead of
-	// getting/putting the parent each time.
-	device_node* parent = gDeviceManager->get_parent_node(node);
-	gDeviceManager->get_driver(parent, &mmc, &cookie);
-	gDeviceManager->put_node(parent);
-
 	MMCBus* bus = (MMCBus*)cookie;
-	bus->AcquireBus();
 	status_t result = B_OK;
 
+	bus->AcquireBus();
 	result = bus->DoIO(rca, command, operation, offsetAsSectors);
-
 	bus->ReleaseBus();
+
 	return result;
 }
 
 
 static void
-mmc_bus_set_width(device_node* node, int width)
+mmc_bus_set_width(device_node* node, void* cookie, int width)
 {
-	driver_module_info* mmc;
-	void* cookie;
-
-	// FIXME store the parent cookie in the bus cookie or something instead of
-	// getting/putting the parent each time.
-	device_node* parent = gDeviceManager->get_parent_node(node);
-	gDeviceManager->get_driver(parent, &mmc, &cookie);
-	gDeviceManager->put_node(parent);
-
 	MMCBus* bus = (MMCBus*)cookie;
 
 	bus->AcquireBus();

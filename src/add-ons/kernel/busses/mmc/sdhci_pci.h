@@ -234,10 +234,15 @@ class HostControl {
 		static const uint8_t kAdma32 = 2 << 3;
 		static const uint8_t kAdma64 = 3 << 3;
 
-		static const uint8_t kDataTransferWidthMask = 0x22;
+		// It's convenient to think of this as a single "bit width" setting,
+		// but the bits for 4-bit and 8-bit modes were introduced at different
+		// times and are not next to each other in the register.
 		static const uint8_t kDataTransfer1Bit = 0;
-		static const uint8_t kDataTransfer4Bit = 2;
-		static const uint8_t kDataTransfer8Bit = 0x20;
+		static const uint8_t kDataTransfer4Bit = 1 << 1;
+		static const uint8_t kDataTransfer8Bit = 1 << 5;
+
+		static const uint8_t kDataTransferWidthMask
+			= kDataTransfer4Bit | kDataTransfer8Bit;
 	private:
 		volatile uint8_t value;
 } __attribute__((packed));

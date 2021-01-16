@@ -30,6 +30,7 @@ enum MMCDiskFlags {
 typedef struct {
 	device_node* node;
 	device_node* parent;
+	void* parentCookie;
 	mmc_device_interface* mmc;
 	uint16_t rca;
 	uint32_t flags;
