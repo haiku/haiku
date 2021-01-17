@@ -302,6 +302,7 @@ private:
 									int32 scrollTo = INT32_MIN);
 			void				_RecalculateLineBreaks(int32* startLine,
 									int32* endLine);
+			void				_ValidateTextRect();
 			int32				_FindLineBreak(int32 fromOffset,
 									float* _ascent, float* _descent,
 									float* inOutWidth);

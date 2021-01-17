@@ -107,6 +107,9 @@ public:
 	void CheckExpiration();
 	void CancelWait();
 
+	float MaxWidth() { return fMaxWidth; };
+	void SetMaxWidth(float maxWidth) { fMaxWidth = maxWidth; };
+
 private:
 	BRect CalcRectCommon(BPoint poseLoc, const BColumn*, const BPoseView*,
 		float width);
@@ -120,6 +123,8 @@ private:
 	bool fVisible : 1;
 	bool fActive : 1;
 	bool fSymLink : 1;
+
+	float fMaxWidth;
 
 	bigtime_t fLastClickedTime;
 	struct MouseUpParams fParams;

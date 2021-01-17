@@ -277,7 +277,8 @@ BPoseView::BPoseView(Model* model, uint32 viewMode)
 	fLastKeyTime(0),
 	fLastDeskbarFrameCheckTime(LONGLONG_MIN),
 	fDeskbarFrame(0, 0, -1, -1),
-	fTextWidgetToCheck(NULL)
+	fTextWidgetToCheck(NULL),
+	fActiveTextWidget(NULL)
 {
 	fListElemHeight = ceilf(be_plain_font->Size() * 1.65f);
 

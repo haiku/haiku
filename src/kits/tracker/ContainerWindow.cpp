@@ -1486,7 +1486,7 @@ BContainerWindow::MessageReceived(BMessage* message)
 				// The selected item is not a BTextView, so forward the
 				// message to the PoseView.
 				if (fPoseView != NULL)
-					fPoseView->MessageReceived(message);
+					PostMessage(message, fPoseView);
 			} else {
 				// Since we catch the generic clipboard shortcuts in a way that
 				// means the BTextView will never get them, we must
@@ -1497,7 +1497,7 @@ BContainerWindow::MessageReceived(BMessage* message)
 				// recursion.
 				if (message->what == B_CUT || message->what == B_COPY
 						|| message->what == B_PASTE) {
-					view->MessageReceived(message);
+					PostMessage(message, view);
 				}
 			}
 			break;

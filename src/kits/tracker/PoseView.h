@@ -414,6 +414,9 @@ public:
 
 	void SetTextWidgetToCheck(BTextWidget*, BTextWidget* = NULL);
 
+	BTextWidget* ActiveTextWidget() { return fActiveTextWidget; };
+	void SetActiveTextWidget(BTextWidget* w) { fActiveTextWidget = w; };
+
 protected:
 	// view setup
 	virtual void SetUpDefaultColumnsIfNeeded();
@@ -808,6 +811,7 @@ protected:
 	static OffscreenBitmap* sOffscreen;
 
 	BTextWidget* fTextWidgetToCheck;
+	BTextWidget* fActiveTextWidget;
 
 	typedef BView _inherited;
 };

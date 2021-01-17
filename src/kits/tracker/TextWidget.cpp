@@ -40,6 +40,7 @@ All rights reserved.
 
 #include <Alert.h>
 #include <Catalog.h>
+#include <Clipboard.h>
 #include <Debug.h>
 #include <Directory.h>
 #include <MessageFilter.h>
@@ -75,6 +76,7 @@ BTextWidget::BTextWidget(Model* model, BColumn* column, BPoseView* view)
 	fVisible(true),
 	fActive(false),
 	fSymLink(model->IsSymLink()),
+	fMaxWidth(0),
 	fLastClickedTime(0)
 {
 }
@@ -146,27 +148,31 @@ BTextWidget::CalcRectCommon(BPoint poseLoc, const BColumn* column,
 	const BPoseView* view, float textWidth)
 {
 	BRect result;
+	float viewWidth = textWidth;
+
 	if (view->ViewMode() == kListMode) {
+		viewWidth = std::min(column->Width(), textWidth);
+
 		poseLoc.x += column->Offset();
 
 		switch (fAlignment) {
 			case B_ALIGN_LEFT:
 				result.left = poseLoc.x;
-				result.right = result.left + textWidth + 1;
+				result.right = result.left + 1 + viewWidth;
 				break;
 
 			case B_ALIGN_CENTER:
-				result.left = poseLoc.x + (column->Width() / 2)
-					- (textWidth / 2);
+				result.left = poseLoc.x
+					+ roundf((column->Width() - viewWidth) / 2);
 				if (result.left < 0)
 					result.left = 0;
 
-				result.right = result.left + textWidth + 1;
+				result.right = result.left + 1 + viewWidth;
 				break;
 
 			case B_ALIGN_RIGHT:
 				result.right = poseLoc.x + column->Width();
-				result.left = result.right - textWidth - 1;
+				result.left = result.right - 1 - viewWidth;
 				if (result.left < 0)
 					result.left = 0;
 				break;
@@ -179,17 +185,22 @@ BTextWidget::CalcRectCommon(BPoint poseLoc, const BColumn* column,
 		result.bottom = poseLoc.y
 			+ roundf((view->ListElemHeight() + view->FontHeight()) / 2);
 	} else {
+		viewWidth = std::min(view->StringWidth("M") * 30, textWidth);
 		if (view->ViewMode() == kIconMode) {
-			// large/scaled icon mode
-			result.left = poseLoc.x + (view->IconSizeInt() - textWidth) / 2;
+			// icon mode
+			result.left = poseLoc.x
+				+ roundf((view->IconSizeInt() - viewWidth) / 2);
+			result.bottom = poseLoc.y + view->IconPoseHeight();
 		} else {
 			// mini icon mode
 			result.left = poseLoc.x + B_MINI_ICON + kMiniIconSeparator;
+			result.bottom = poseLoc.y
+				+ roundf((B_MINI_ICON + view->FontHeight()) / 2);
 		}
 
-		result.right = result.left + textWidth;
-		result.bottom = poseLoc.y + view->IconPoseHeight();
+		result.right = result.left + viewWidth;
 	}
+
 	result.top = result.bottom - view->FontHeight();
 
 	return result;
@@ -294,7 +305,7 @@ BTextWidget::MouseUp(BRect bounds, BPoseView* view, BPose* pose, BPoint)
 
 
 static filter_result
-TextViewFilter(BMessage* message, BHandler**, BMessageFilter* filter)
+TextViewKeyDownFilter(BMessage* message, BHandler**, BMessageFilter* filter)
 {
 	uchar key;
 	if (message->FindInt8("byte", (int8*)&key) != B_OK)
@@ -306,20 +317,20 @@ TextViewFilter(BMessage* message, BHandler**, BMessageFilter* filter)
 		filter->Looper());
 	ThrowOnAssert(window != NULL);
 
-	BPoseView* poseView = window->PoseView();
-	ThrowOnAssert(poseView != NULL);
+	BPoseView* view = window->PoseView();
+	ThrowOnAssert(view != NULL);
 
 	if (key == B_RETURN || key == B_ESCAPE) {
-		poseView->CommitActivePose(key == B_RETURN);
+		view->CommitActivePose(key == B_RETURN);
 		return B_SKIP_MESSAGE;
 	}
 
 	if (key == B_TAB) {
-		if (poseView->ActivePose()) {
+		if (view->ActivePose()) {
 			if (message->FindInt32("modifiers") & B_SHIFT_KEY)
-				poseView->ActivePose()->EditPreviousWidget(poseView);
+				view->ActivePose()->EditPreviousWidget(view);
 			else
-				poseView->ActivePose()->EditNextWidget(poseView);
+				view->ActivePose()->EditNextWidget(view);
 		}
 
 		return B_SKIP_MESSAGE;
@@ -329,23 +340,94 @@ TextViewFilter(BMessage* message, BHandler**, BMessageFilter* filter)
 	// we try to work-around this "bug" here.
 
 	// find the text editing view
-	BView* scrollView = poseView->FindView("BorderView");
+	BView* scrollView = view->FindView("BorderView");
 	if (scrollView != NULL) {
 		BTextView* textView = dynamic_cast<BTextView*>(
 			scrollView->FindView("WidgetTextView"));
 		if (textView != NULL) {
-			BRect textRect = textView->TextRect();
-			BRect rect = scrollView->Frame();
+			ASSERT(view->ActiveTextWidget() != NULL);
+			float maxWidth = view->ActiveTextWidget()->MaxWidth();
+			bool tooWide = textView->TextRect().Width() > maxWidth;
+			textView->MakeResizable(!tooWide, tooWide ? NULL : scrollView);
+		}
+	}
 
-			if (rect.right + 5 > poseView->Bounds().right
-				|| rect.left - 5 < 0)
-				textView->MakeResizable(true, NULL);
+	return B_DISPATCH_MESSAGE;
+}
 
-			if (textRect.Width() + 10 < rect.Width()) {
-				textView->MakeResizable(true, scrollView);
-				// make sure no empty white space stays on the right
-				textView->ScrollToOffset(0);
+
+static filter_result
+TextViewPasteFilter(BMessage* message, BHandler**, BMessageFilter* filter)
+{
+	ThrowOnAssert(filter != NULL);
+
+	BContainerWindow* window = dynamic_cast<BContainerWindow*>(
+		filter->Looper());
+	ThrowOnAssert(window != NULL);
+
+	BPoseView* view = window->PoseView();
+	ThrowOnAssert(view != NULL);
+
+	// the BTextView doesn't respect window borders when resizing itself;
+	// we try to work-around this "bug" here.
+
+	// find the text editing view
+	BView* scrollView = view->FindView("BorderView");
+	if (scrollView != NULL) {
+		BTextView* textView = dynamic_cast<BTextView*>(
+			scrollView->FindView("WidgetTextView"));
+		if (textView != NULL) {
+			float textWidth = textView->TextRect().Width();
+
+			// subtract out selected text region width
+			int32 start, finish;
+			textView->GetSelection(&start, &finish);
+			if (start != finish) {
+				BRegion selectedRegion;
+				textView->GetTextRegion(start, finish, &selectedRegion);
+				textWidth -= selectedRegion.Frame().Width();
 			}
+
+			// add pasted text width
+			if (be_clipboard->Lock()) {
+				BMessage* clip = be_clipboard->Data();
+				if (clip != NULL) {
+					const char* text = NULL;
+					ssize_t length = 0;
+
+					if (clip->FindData("text/plain", B_MIME_TYPE,
+							(const void**)&text, &length) == B_OK) {
+						textWidth += textView->StringWidth(text);
+					}
+				}	
+
+				be_clipboard->Unlock();
+			}
+
+			// check if pasted text is too wide
+			ASSERT(view->ActiveTextWidget() != NULL);
+			float maxWidth = view->ActiveTextWidget()->MaxWidth();
+			bool tooWide = textWidth > maxWidth;
+
+			if (tooWide) {
+				// resize text view to max width
+
+				// move scroll view if not left aligned
+				float oldWidth = textView->Bounds().Width();
+				float newWidth = maxWidth;
+				float right = oldWidth - newWidth;
+
+				if (textView->Alignment() == B_ALIGN_CENTER)
+					scrollView->MoveBy(roundf(right / 2), 0);
+				else if (textView->Alignment() == B_ALIGN_RIGHT)
+					scrollView->MoveBy(right, 0);
+
+				// resize scroll view
+				float grow = newWidth - oldWidth;
+				scrollView->ResizeBy(grow, 0);
+			}
+
+			textView->MakeResizable(!tooWide, tooWide ? NULL : scrollView);
 		}
 	}
 
@@ -366,18 +448,13 @@ BTextWidget::StartEdit(BRect bounds, BPoseView* view, BPose* pose)
 		return;
 	}
 
+	view->SetActiveTextWidget(this);
+
 	// TODO fix text rect being off by a pixel on some files
 
-	// get bounds with full text length
 	BRect rect(bounds);
-	BRect textRect(bounds);
-
-	// label offset
-	float hOffset = 0;
-	float vOffset = view->ViewMode() == kListMode ? -1 : -2;
-	rect.OffsetBy(hOffset, vOffset);
-
-	BTextView* textView = new BTextView(rect, "WidgetTextView", textRect,
+	rect.OffsetBy(view->ViewMode() == kListMode ? -1 : 1, -4);
+	BTextView* textView = new BTextView(rect, "WidgetTextView", rect,
 		be_plain_font, 0, B_FOLLOW_ALL, B_WILL_DRAW);
 
 	textView->SetWordWrap(false);
@@ -385,36 +462,34 @@ BTextWidget::StartEdit(BRect bounds, BPoseView* view, BPose* pose)
 	DisallowMetaKeys(textView);
 	fText->SetUpEditing(textView);
 
-	textView->AddFilter(new BMessageFilter(B_KEY_DOWN, TextViewFilter));
+	textView->AddFilter(new BMessageFilter(B_KEY_DOWN, TextViewKeyDownFilter));
+	textView->AddFilter(new BMessageFilter(B_PASTE, TextViewPasteFilter));
 
+	// get full text length
 	rect.right = rect.left + textView->LineWidth();
-	rect.bottom = rect.top + textView->LineHeight() - 1;
+	rect.bottom = rect.top + textView->LineHeight() - 1 + 4;
 
-	// enlarge rect by inset amount
-	rect.InsetBy(-2, -2);
+	if (view->ViewMode() == kListMode) {
+		// limit max width to column width in list mode
+		BColumn* column = view->ColumnFor(fAttrHash);
+		ASSERT(column != NULL);
+		fMaxWidth = column->Width();
+	} else {
+		// limit max width to 30em in icon and mini icon mode
+		fMaxWidth = textView->StringWidth("M") * 30;
 
-	// undo label offset
-	textRect = rect.OffsetToCopy(-hOffset, -vOffset);
+		if (textView->LineWidth() > fMaxWidth) {
+			// compensate for text going over right inset
+			rect.OffsetBy(-2, 0);
+		}
+	}
 
-	textView->SetTextRect(textRect);
-
-	BPoint origin = view->LeftTop();
-	textRect = view->Bounds();
-
-	bool hitBorder = false;
-	if (rect.left <= origin.x)
-		rect.left = origin.x + 1, hitBorder = true;
-	if (rect.right >= textRect.right)
-		rect.right = textRect.right - 1, hitBorder = true;
-
+	// resize textView
 	textView->MoveTo(rect.LeftTop());
-	textView->ResizeTo(rect.Width(), rect.Height());
+	textView->ResizeTo(std::min(fMaxWidth, rect.Width()), rect.Height());
+	textView->SetTextRect(rect);
 
-	BScrollView* scrollView = new BScrollView("BorderView", textView, 0, 0,
-		false, false, B_PLAIN_BORDER);
-	view->AddChild(scrollView);
-
-	// configure text view
+	// set alignment before adding textView so it doesn't redraw
 	switch (view->ViewMode()) {
 		case kIconMode:
 			textView->SetAlignment(B_ALIGN_CENTER);
@@ -428,7 +503,13 @@ BTextWidget::StartEdit(BRect bounds, BPoseView* view, BPose* pose)
 			textView->SetAlignment(fAlignment);
 			break;
 	}
-	textView->MakeResizable(true, hitBorder ? NULL : scrollView);
+
+	BScrollView* scrollView = new BScrollView("BorderView", textView, 0, 0,
+		false, false, B_PLAIN_BORDER);
+	view->AddChild(scrollView);
+
+	bool tooWide = textView->TextRect().Width() > fMaxWidth;
+	textView->MakeResizable(!tooWide, tooWide ? NULL : scrollView);
 
 	view->SetActivePose(pose);
 		// tell view about pose
@@ -438,8 +519,6 @@ BTextWidget::StartEdit(BRect bounds, BPoseView* view, BPose* pose)
 	textView->SelectAll();
 	textView->ScrollToSelection();
 		// scroll to beginning so that text is visible
-	textView->ScrollBy(-1, -2);
-		// scroll in rect to center text
 	textView->MakeFocus();
 
 	// make this text widget invisible while we edit it
@@ -459,6 +538,8 @@ void
 BTextWidget::StopEdit(bool saveChanges, BPoint poseLoc, BPoseView* view,
 	BPose* pose, int32 poseIndex)
 {
+	view->SetActiveTextWidget(NULL);
+
 	// find the text editing view
 	BView* scrollView = view->FindView("BorderView");
 	ASSERT(scrollView != NULL);
