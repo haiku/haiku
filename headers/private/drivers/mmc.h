@@ -49,6 +49,11 @@ enum SD_COMMANDS {
 	SD_WRITE_SINGLE_BLOCK = 24,
 	SD_WRITE_MULTIPLE_BLOCKS = 25,
 
+	// Erase commands, class 5
+	SD_ERASE_WR_BLK_START = 32,
+	SD_ERASE_WR_BLK_END = 33,
+	SD_ERASE = 38,
+
 	// Application specific commands, class 8
 	SD_APP_CMD = 55,
 

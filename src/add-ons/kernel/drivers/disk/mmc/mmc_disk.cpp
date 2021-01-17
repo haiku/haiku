@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020 Haiku, Inc. All rights reserved.
+ * Copyright 2018-2021 Haiku, Inc. All rights reserved.
  * Copyright 2020, Viveris Technologies.
  * Distributed under the terms of the MIT License.
  *
@@ -23,8 +23,10 @@
 #include <drivers/KernelExport.h>
 #include <drivers/Drivers.h>
 #include <kernel/OS.h>
+#include <util/fs_trim_support.h>
 
-// #include <fs/devfs.h>
+#include <AutoDeleter.h>
+
 
 #define TRACE_MMC_DISK
 #ifdef TRACE_MMC_DISK
@@ -38,6 +40,9 @@
 #define MMC_DISK_DRIVER_MODULE_NAME "drivers/disk/mmc/mmc_disk/driver_v1"
 #define MMC_DISK_DEVICE_MODULE_NAME "drivers/disk/mmc/mmc_disk/device_v1"
 #define MMC_DEVICE_ID_GENERATOR "mmc/device_id"
+
+
+static const uint32 kBlockSize = 512; // FIXME get it from the CSD
 
 static device_manager_info* sDeviceManager;
 
@@ -237,7 +242,6 @@ mmc_disk_init_driver(device_node* node, void** cookie)
 	else
 		info->flags = kIoCommandOffsetAsSectors;
 
-	static const uint32 kBlockSize = 512; // FIXME get it from the CSD
 	status_t error;
 
 	static const uint32 kDMAResourceBufferCount			= 16;
@@ -476,6 +480,73 @@ mmc_block_io(void* cookie, io_request* request)
 
 
 static status_t
+mmc_block_trim(mmc_disk_driver_info* info, fs_trim_data* trimData)
+{
+	enum {
+		kEraseModeErase = 0, // force to actually erase the data
+		kEraseModeDiscard = 1,
+			// just mark the data as unused for internal wear leveling
+			// algorithms
+		kEraseModeFullErase = 2, // erase the whole card
+	};
+	TRACE("trim_device()\n");
+
+	uint64 trimmedSize = 0;
+	status_t result = B_OK;
+	for (uint32 i = 0; i < trimData->range_count; i++) {
+		off_t offset = trimData->ranges[i].offset;
+		off_t length = trimData->ranges[i].size;
+
+		// Round up offset and length to multiple of the sector size
+		// The offset is rounded up, so some space may be left
+		// (not trimmed) at the start of the range.
+		offset = ROUNDUP(offset, kBlockSize);
+		// Adjust the length for the possibly skipped range
+		length -= trimData->ranges[i].offset - offset;
+		// The length is rounded down, so some space at the end may also
+		// be left (not trimmed).
+		length &= ~(kBlockSize - 1);
+
+		if (length == 0) {
+			trimmedSize += trimData->ranges[i].size;
+			continue;
+		}
+
+		TRACE("trim %" B_PRIdOFF " bytes from %" B_PRIdOFF "\n",
+			length, offset);
+
+		ASSERT(offset % kBlockSize == 0);
+		ASSERT(length % kBlockSize == 0);
+
+		if (info->flags & kIoCommandOffsetAsSectors) {
+			offset /= kBlockSize;
+			length /= kBlockSize;
+		}
+
+		uint32_t response;
+		result = info->mmc->execute_command(info->parent, info->parentCookie,
+			info->rca, SD_ERASE_WR_BLK_START, offset, &response);
+		if (result != B_OK)
+			break;
+		result = info->mmc->execute_command(info->parent, info->parentCookie,
+			info->rca, SD_ERASE_WR_BLK_END, offset + length, &response);
+		if (result != B_OK)
+			break;
+		result = info->mmc->execute_command(info->parent, info->parentCookie,
+			info->rca, SD_ERASE, kEraseModeDiscard, &response);
+		if (result != B_OK)
+			break;
+
+		trimmedSize += trimData->ranges[i].size;
+	}
+
+	trimData->trimmed_size = trimmedSize;
+
+	return result;
+}
+
+
+static status_t
 mmc_block_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 {
 	mmc_disk_handle* handle = (mmc_disk_handle*)cookie;
@@ -548,6 +619,13 @@ mmc_block_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 
 			iconData.icon_size = sizeof(kDriveIcon);
 			return user_memcpy(buffer, &iconData, sizeof(device_icon));
+		}
+
+		case B_TRIM_DEVICE:
+		{
+			// We know the buffer is kernel-side because it has been
+			// preprocessed in devfs
+			return mmc_block_trim(info, (fs_trim_data*)buffer);
 		}
 
 		/*case B_FLUSH_DRIVE_CACHE:

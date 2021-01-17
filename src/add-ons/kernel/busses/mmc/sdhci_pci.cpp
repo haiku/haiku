@@ -213,6 +213,7 @@ SdhciBus::ExecuteCommand(uint8_t command, uint32_t argument, uint32_t* response)
 			replyType = Command::kR6Type;
 			break;
 		case SD_SELECT_DESELECT_CARD:
+		case SD_ERASE:
 			replyType = Command::kR1bType;
 			break;
 		case SD_SEND_IF_COND:
@@ -225,6 +226,8 @@ SdhciBus::ExecuteCommand(uint8_t command, uint32_t argument, uint32_t* response)
 			replyType = Command::kR1Type | Command::kDataPresent;
 			break;
 		case SD_APP_CMD:
+		case SD_ERASE_WR_BLK_START:
+		case SD_ERASE_WR_BLK_END:
 		case SD_SET_BUS_WIDTH: // SD Application command
 			replyType = Command::kR1Type;
 			break;

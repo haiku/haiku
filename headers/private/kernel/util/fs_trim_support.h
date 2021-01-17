@@ -6,7 +6,9 @@
 #define _FS_TRIM_SUPPORT_H
 
 
+#include <AutoDeleter.h>
 #include <KernelExport.h>
+#include <SupportDefs.h>
 
 #include <kernel.h>
 #include <syscall_restart.h>
