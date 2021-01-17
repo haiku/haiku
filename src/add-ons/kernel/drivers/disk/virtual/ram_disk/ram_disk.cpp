@@ -1474,18 +1474,10 @@ ram_disk_raw_device_control(void* _cookie, uint32 op, void* buffer,
 
 		case B_TRIM_DEVICE:
 		{
-			fs_trim_data* trimData;
-			MemoryDeleter deleter;
-			status_t status = get_trim_data_from_user(buffer, length, deleter,
-				trimData);
-			if (status != B_OK)
-				return status;
-
-			status = device->Trim(trimData);
-			if (status != B_OK)
-				return status;
-
-			return copy_trim_data_to_user(buffer, trimData);
+			// We know the buffer is kernel-side because it has been
+			// preprocessed in devfs
+			ASSERT(IS_KERNEL_ADDRESS(buffer));
+			return device->Trim((fs_trim_data*)buffer);
 		}
 
 		case RAM_DISK_IOCTL_INFO:

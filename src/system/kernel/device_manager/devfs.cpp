@@ -33,6 +33,7 @@
 #include <lock.h>
 #include <Notifications.h>
 #include <util/AutoLock.h>
+#include <util/fs_trim_support.h>
 #include <vfs.h>
 #include <vm/vm.h>
 #include <wait_for_objects.h>
@@ -493,14 +494,14 @@ err1:
 }
 
 
-static inline void
+template<typename size_type> static inline void
 translate_partition_access(devfs_partition* partition, off_t& offset,
-	size_t& size)
+	size_type& size)
 {
 	ASSERT(offset >= 0);
 	ASSERT(offset < partition->info.size);
 
-	size = (size_t)min_c((off_t)size, partition->info.size - offset);
+	size = (size_type)min_c((off_t)size, partition->info.size - offset);
 	offset += partition->info.offset;
 }
 
@@ -1214,7 +1215,8 @@ devfs_read(fs_volume* _volume, fs_vnode* _vnode, void* _cookie, off_t pos,
 		if (pos >= vnode->stream.u.dev.partition->info.size)
 			return B_BAD_VALUE;
 
-		translate_partition_access(vnode->stream.u.dev.partition, pos, *_length);
+		translate_partition_access(vnode->stream.u.dev.partition, pos,
+			*_length);
 	}
 
 	if (*_length == 0)
@@ -1246,7 +1248,8 @@ devfs_write(fs_volume* _volume, fs_vnode* _vnode, void* _cookie, off_t pos,
 		if (pos >= vnode->stream.u.dev.partition->info.size)
 			return B_BAD_VALUE;
 
-		translate_partition_access(vnode->stream.u.dev.partition, pos, *_length);
+		translate_partition_access(vnode->stream.u.dev.partition, pos,
+			*_length);
 	}
 
 	if (*_length == 0)
@@ -1458,6 +1461,39 @@ devfs_ioctl(fs_volume* _volume, fs_vnode* _vnode, void* _cookie, uint32 op,
 					geometry.bytes_per_sector);
 
 				return user_memcpy(buffer, &geometry, sizeof(device_geometry));
+			}
+
+			case B_TRIM_DEVICE:
+			{
+				struct devfs_partition* partition
+					= vnode->stream.u.dev.partition;
+
+				fs_trim_data* trimData;
+				MemoryDeleter deleter;
+				status_t status = get_trim_data_from_user(buffer, length,
+					deleter, trimData);
+				if (status != B_OK)
+					return status;
+
+				if (partition != NULL) {
+					// If there is a partition, offset all ranges according
+					// to the partition start.
+					for (uint32 i = 0; i < trimData->range_count; i++) {
+						translate_partition_access(partition,
+							trimData->ranges[i].offset,
+							trimData->ranges[i].size);
+					}
+				}
+
+				status = vnode->stream.u.dev.device->Control(
+					cookie->device_cookie, op, trimData, length);
+
+				// Copy the data back to userland (it contains the number of
+				// trimmed bytes)
+				if (status == B_OK)
+					status = copy_trim_data_to_user(buffer, trimData);
+
+				return status;
 			}
 
 			case B_GET_DRIVER_FOR_DEVICE:

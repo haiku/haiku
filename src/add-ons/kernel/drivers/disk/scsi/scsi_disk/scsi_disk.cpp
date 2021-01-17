@@ -418,18 +418,10 @@ das_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 #if 0
 		case B_TRIM_DEVICE:
 		{
-			fs_trim_data* trimData;
-			MemoryDeleter deleter;
-			status_t status = get_trim_data_from_user(buffer, length, deleter,
-				trimData);
-			if (status != B_OK)
-				return status;
-
-			status = trim_device(info, trimData);
-			if (status != B_OK)
-				return status;
-
-			return copy_trim_data_to_user(buffer, trimData);
+			// We know the buffer is kernel-side because it has been
+			// preprocessed in devfs
+			ASSERT(IS_KERNEL_ADDRESS(buffer));
+			return trim_device(info, (fs_trim_data*)buffer);
 		}
 #endif
 
