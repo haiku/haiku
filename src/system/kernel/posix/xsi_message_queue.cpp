@@ -660,19 +660,21 @@ _user_xsi_msgget(key_t key, int flags)
 		// Check if key already exist, if it does it already has a message
 		// queue associated with it
 		ipcKey = sIpcHashTable.Lookup(key);
-		if (ipcKey == NULL) {
+		if (ipcKey == NULL || ipcKey->MessageQueueID() == -1) {
 			if (!(flags & IPC_CREAT)) {
 				TRACE_ERROR(("xsi_msgget: key %d does not exist, but the "
 					"caller did not ask for creation\n", (int)key));
 				return ENOENT;
 			}
-			ipcKey = new(std::nothrow) Ipc(key);
 			if (ipcKey == NULL) {
-				TRACE_ERROR(("xsi_msgget: failed to create new Ipc object "
-					"for key %d\n", (int)key));
-				return ENOMEM;
+				ipcKey = new(std::nothrow) Ipc(key);
+				if (ipcKey == NULL) {
+					TRACE_ERROR(("xsi_msgget: failed to create new Ipc object "
+						"for key %d\n", (int)key));
+					return ENOMEM;
+				}
+				sIpcHashTable.Insert(ipcKey);
 			}
-			sIpcHashTable.Insert(ipcKey);
 		} else {
 			// The IPC key exist and it already has a message queue
 			if ((flags & IPC_CREAT) && (flags & IPC_EXCL)) {
