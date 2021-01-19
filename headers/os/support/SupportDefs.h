@@ -47,7 +47,6 @@ typedef volatile unsigned short	vushort;
 typedef volatile unsigned char	vuchar;
 
 typedef unsigned char			uchar;
-typedef unsigned short			unichar;
 
 /* descriptive types */
 typedef int32					status_t;
