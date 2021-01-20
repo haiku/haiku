@@ -29,16 +29,16 @@ PCWindow::PCWindow()
 	preferences.SaveInt32(kCurrentVersion, kVersionName);
 	preferences.LoadWindowPosition(this, kPosPrefName);
 
-        system_info info;
-        get_system_info(&info);
-        int width = 4;
-        if (info.cpu_count > 4)
-                width = info.cpu_count;
-        if (info.cpu_count <= 16)
-                width *= 2;
+	system_info info;
+	get_system_info(&info);
+	int width = 4;
+	if (info.cpu_count > 4)
+		width = info.cpu_count;
+	if (info.cpu_count <= 16)
+		width *= 2;
 
-        // For the memory bar
-        width += 8;
+	// For the memory bar
+	width += 8;
 
 	BRect rect = Bounds();
 
@@ -48,7 +48,7 @@ PCWindow::PCWindow()
 
 	// set up a rectangle && instantiate a new view
 	// view rect should be same size as window rect but with left top at (0, 0)
-	rect.Set(0, 0, width, 15);
+	rect.Set(0, 0, width - 1, 15);
 	SetSizeLimits(rect.Width() + 21, rect.Width() + 21, 15 + 21, 15 + 21);
 
 	rect.OffsetTo((Bounds().Width() - 16) / 2, (Bounds().Height() - 16) / 2);
