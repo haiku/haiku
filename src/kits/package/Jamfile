@@ -5,6 +5,7 @@ AddResources libpackage.so : libpackage.rdef ;
 UsePrivateHeaders
 	app
 	kernel
+	netservices
 	shared
 	libroot
 	storage

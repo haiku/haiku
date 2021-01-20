@@ -6,7 +6,8 @@ SubDirC++Flags -Wno-error ;
 include [ FDirName $(HAIKU_TOP) src apps haikudepot build jam
 	HdsSchemaGenRules ] ;
 
-UsePrivateHeaders interface kernel net package shared storage support locale ;
+UsePrivateHeaders interface kernel net netservices package shared storage ;
+UsePrivateHeaders support locale ;
 
 HAIKUDEPOT_GENERATED_SOURCES_DIRECTORY = $(TARGET_COMMON_DEBUG_LOCATE_TARGET) ;
 

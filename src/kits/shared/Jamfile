@@ -28,6 +28,9 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		# for BKeymap
 		UsePrivateHeaders interface ;
 
+		# for BGeolocation
+		UsePrivateHeaders netservices ;
+
 		StaticLibrary <$(architecture)>libshared.a :
 			AboutMenuItem.cpp
 			ArgumentVector.cpp

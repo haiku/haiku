@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src add-ons media plugins http_streamer ;
 
-UsePrivateHeaders media shared ;
+UsePrivateHeaders media netservices shared ;
 UsePrivateHeaders [ FDirName media experimental ] ;
 
 local architectureObject ;
