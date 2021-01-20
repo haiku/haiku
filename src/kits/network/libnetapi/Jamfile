@@ -11,6 +11,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) headers os add-ons network_settings ]
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
 		local sslSources ;
 
 		UsePrivateSystemHeaders ;
@@ -41,8 +42,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 
 			NetworkAddress.cpp
 			NetworkAddressResolver.cpp
-			NetworkCookie.cpp
-			NetworkCookieJar.cpp
 			NetworkDevice.cpp
 			NetworkInterface.cpp
 			NetworkRoster.cpp
@@ -56,36 +55,10 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			Socket.cpp
 			SocketMessenger.cpp
 
-			# TODO: another add-on for file:// (a much simpler one)
-			FileRequest.cpp
-
-			# TODO: another add-on for gopher://
-			GopherRequest.cpp
-
-			# TODO: The HTTP stuff should all go into an add-on. It needs
-			# linking against libcrypto.so and only the add-on should link
-			# against it.
-			DataRequest.cpp
-			HttpAuthentication.cpp
-			HttpHeaders.cpp
-			HttpForm.cpp
-			HttpRequest.cpp
-			HttpResult.cpp
-			HttpTime.cpp
-
 			notifications.cpp
 
-			NetworkRequest.cpp
-			UrlContext.cpp
-			UrlProtocolAsynchronousListener.cpp
-			UrlProtocolDispatchingListener.cpp
-			UrlProtocolListener.cpp
-			UrlProtocolRoster.cpp
-			UrlRequest.cpp
-			UrlResult.cpp
-			UrlSynchronousRequest.cpp
-
 			:
+			<libnetapi!$(architecture)>netservices.o
 			be shared $(TARGET_NETWORK_LIBS) [ TargetLibstdc++ ]
 			[ TargetLibsupc++ ] [ BuildFeatureAttribute openssl : libraries ]
 			[ BuildFeatureAttribute icu : libraries ]
