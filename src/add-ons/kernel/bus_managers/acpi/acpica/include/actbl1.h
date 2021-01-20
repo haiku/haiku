@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2018, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2021, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -797,7 +797,7 @@ typedef struct acpi_dmar_hardware_unit
 #define ACPI_DMAR_INCLUDE_ALL       (1)
 
 
-/* 1: Reserved Memory Defininition */
+/* 1: Reserved Memory Definition */
 
 typedef struct acpi_dmar_reserved_memory
 {
@@ -1149,7 +1149,7 @@ enum AcpiErstInstructions
 
 enum AcpiErstCommandStatus
 {
-    ACPI_ERST_SUCESS                = 0,
+    ACPI_ERST_SUCCESS                = 0,
     ACPI_ERST_NO_SPACE              = 1,
     ACPI_ERST_NOT_AVAILABLE         = 2,
     ACPI_ERST_FAILURE               = 3,
@@ -1318,6 +1318,12 @@ typedef struct acpi_table_gtdt
 #define ACPI_GTDT_INTERRUPT_MODE        (1)
 #define ACPI_GTDT_INTERRUPT_POLARITY    (1<<1)
 #define ACPI_GTDT_ALWAYS_ON             (1<<2)
+
+typedef struct acpi_gtdt_el2
+{
+    UINT32                  VirtualEL2TimerGsiv;
+    UINT32                  VirtualEL2TimerFlags;
+} ACPI_GTDT_EL2;
 
 
 /* Common GTDT subtable header */
@@ -1761,8 +1767,7 @@ typedef struct acpi_hest_ia_deferred_check
 
 /*******************************************************************************
  *
- * HMAT - Heterogeneous Memory Attributes Table (ACPI 6.2)
- *        Version 1
+ * HMAT - Heterogeneous Memory Attributes Table (ACPI 6.3)
  *
  ******************************************************************************/
 
@@ -1778,7 +1783,7 @@ typedef struct acpi_table_hmat
 
 enum AcpiHmatType
 {
-    ACPI_HMAT_TYPE_ADDRESS_RANGE        = 0,   /* Memory subystem address range */
+    ACPI_HMAT_TYPE_ADDRESS_RANGE        = 0,   /* Memory subsystem address range */
     ACPI_HMAT_TYPE_LOCALITY             = 1,   /* System locality latency and bandwidth information */
     ACPI_HMAT_TYPE_CACHE                = 2,   /* Memory side cache information */
     ACPI_HMAT_TYPE_RESERVED             = 3    /* 3 and greater are reserved */
@@ -1797,26 +1802,24 @@ typedef struct acpi_hmat_structure
  * HMAT Structures, correspond to Type in ACPI_HMAT_STRUCTURE
  */
 
-/* 0: Memory subystem address range */
+/* 0: Memory proximity domain attributes */
 
-typedef struct acpi_hmat_address_range
+typedef struct acpi_hmat_proximity_domain
 {
     ACPI_HMAT_STRUCTURE     Header;
     UINT16                  Flags;
     UINT16                  Reserved1;
-    UINT32                  ProcessorPD;            /* Processor proximity domain */
+    UINT32                  InitiatorPD;            /* Attached Initiator proximity domain */
     UINT32                  MemoryPD;               /* Memory proximity domain */
     UINT32                  Reserved2;
-    UINT64                  PhysicalAddressBase;    /* Physical address range base */
-    UINT64                  PhysicalAddressLength;  /* Physical address range length */
+    UINT64                  Reserved3;
+    UINT64                  Reserved4;
 
-} ACPI_HMAT_ADDRESS_RANGE;
+} ACPI_HMAT_PROXIMITY_DOMAIN;
 
 /* Masks for Flags field above */
 
-#define ACPI_HMAT_PROCESSOR_PD_VALID    (1)     /* 1: ProcessorPD field is valid */
-#define ACPI_HMAT_MEMORY_PD_VALID       (1<<1)  /* 1: MemoryPD field is valid */
-#define ACPI_HMAT_RESERVATION_HINT      (1<<2)  /* 1: Reservation hint */
+#define ACPI_HMAT_INITIATOR_PD_VALID    (1)     /* 1: InitiatorPD field is valid */
 
 
 /* 1: System locality latency and bandwidth information */
@@ -1841,10 +1844,9 @@ typedef struct acpi_hmat_locality
 /* Values for Memory Hierarchy flag */
 
 #define ACPI_HMAT_MEMORY            0
-#define ACPI_HMAT_LAST_LEVEL_CACHE  1
-#define ACPI_HMAT_1ST_LEVEL_CACHE   2
-#define ACPI_HMAT_2ND_LEVEL_CACHE   3
-#define ACPI_HMAT_3RD_LEVEL_CACHE   4
+#define ACPI_HMAT_1ST_LEVEL_CACHE   1
+#define ACPI_HMAT_2ND_LEVEL_CACHE   2
+#define ACPI_HMAT_3RD_LEVEL_CACHE   3
 
 /* Values for DataType field above */
 

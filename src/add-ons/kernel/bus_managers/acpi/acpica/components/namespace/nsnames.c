@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2018, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2021, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -158,12 +158,6 @@
 #define _COMPONENT          ACPI_NAMESPACE
         ACPI_MODULE_NAME    ("nsnames")
 
-/* Local Prototypes */
-
-static void
-AcpiNsNormalizePathname (
-    char                    *OriginalPath);
-
 
 /*******************************************************************************
  *
@@ -273,8 +267,8 @@ AcpiNsHandleToName (
     /* Just copy the ACPI name from the Node and zero terminate it */
 
     NodeName = AcpiUtGetNodeName (Node);
-    ACPI_MOVE_NAME (Buffer->Pointer, NodeName);
-    ((char *) Buffer->Pointer) [ACPI_NAME_SIZE] = 0;
+    ACPI_COPY_NAMESEG (Buffer->Pointer, NodeName);
+    ((char *) Buffer->Pointer) [ACPI_NAMESEG_SIZE] = 0;
 
     ACPI_DEBUG_PRINT ((ACPI_DB_EXEC, "%4.4s\n", (char *) Buffer->Pointer));
     return_ACPI_STATUS (AE_OK);
@@ -336,7 +330,7 @@ AcpiNsHandleToPathname (
     /* Build the path in the caller buffer */
 
     (void) AcpiNsBuildNormalizedPath (Node, Buffer->Pointer,
-        RequiredSize, NoTrailing);
+        (UINT32) RequiredSize, NoTrailing);
 
     ACPI_DEBUG_PRINT ((ACPI_DB_EXEC, "%s [%X]\n",
         (char *) Buffer->Pointer, (UINT32) RequiredSize));
@@ -374,7 +368,7 @@ AcpiNsBuildNormalizedPath (
     BOOLEAN                 NoTrailing)
 {
     UINT32                  Length = 0, i;
-    char                    Name[ACPI_NAME_SIZE];
+    char                    Name[ACPI_NAMESEG_SIZE];
     BOOLEAN                 DoNoTrailing;
     char                    c, *Left, *Right;
     ACPI_NAMESPACE_NODE     *NextNode;
@@ -509,7 +503,7 @@ AcpiNsGetNormalizedPathname (
 
     /* Build the path in the allocated buffer */
 
-    (void) AcpiNsBuildNormalizedPath (Node, NameBuffer, Size, NoTrailing);
+    (void) AcpiNsBuildNormalizedPath (Node, NameBuffer, (UINT32) Size, NoTrailing);
 
     ACPI_DEBUG_PRINT_RAW ((ACPI_DB_NAMES, "%s: Path \"%s\"\n",
         ACPI_GET_FUNCTION_NAME, NameBuffer));
@@ -542,7 +536,7 @@ AcpiNsBuildPrefixedPathname (
     char                    *FullPath = NULL;
     char                    *ExternalPath = NULL;
     char                    *PrefixPath = NULL;
-    UINT32                  PrefixPathLength = 0;
+    ACPI_SIZE               PrefixPathLength = 0;
 
 
     /* If there is a prefix, get the pathname to it */
@@ -616,7 +610,7 @@ Cleanup:
  *
  ******************************************************************************/
 
-static void
+void
 AcpiNsNormalizePathname (
     char                    *OriginalPath)
 {
@@ -657,7 +651,7 @@ AcpiNsNormalizePathname (
     {
         /* Do one nameseg at a time */
 
-        for (i = 0; (i < ACPI_NAME_SIZE) && *InputPath; i++)
+        for (i = 0; (i < ACPI_NAMESEG_SIZE) && *InputPath; i++)
         {
             if ((i == 0) || (*InputPath != '_')) /* First char is allowed to be underscore */
             {

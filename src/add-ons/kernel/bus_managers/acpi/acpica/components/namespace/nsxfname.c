@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2018, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2021, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -611,7 +611,7 @@ AcpiGetObjectInfo (
 
     if (Cls)
     {
-        NextIdString = AcpiNsCopyDeviceId (&Info->ClassCode,
+       (void) AcpiNsCopyDeviceId (&Info->ClassCode,
             Cls, NextIdString);
     }
 
@@ -691,8 +691,8 @@ AcpiInstallMethod (
 
     /* Table must be a DSDT or SSDT */
 
-    if (!ACPI_COMPARE_NAME (Table->Signature, ACPI_SIG_DSDT) &&
-        !ACPI_COMPARE_NAME (Table->Signature, ACPI_SIG_SSDT))
+    if (!ACPI_COMPARE_NAMESEG (Table->Signature, ACPI_SIG_DSDT) &&
+        !ACPI_COMPARE_NAMESEG (Table->Signature, ACPI_SIG_SSDT))
     {
         return (AE_BAD_HEADER);
     }
@@ -714,7 +714,7 @@ AcpiInstallMethod (
 
     MethodFlags = *ParserState.Aml++;
     AmlStart = ParserState.Aml;
-    AmlLength = ACPI_PTR_DIFF (ParserState.PkgEnd, AmlStart);
+    AmlLength = (UINT32) ACPI_PTR_DIFF (ParserState.PkgEnd, AmlStart);
 
     /*
      * Allocate resources up-front. We don't want to have to delete a new

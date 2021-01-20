@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2018, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2021, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -156,7 +156,6 @@
 #include "acdispat.h"
 #include "acinterp.h"
 #include "acnamesp.h"
-
 #ifdef ACPI_ASL_COMPILER
 #include "acdisasm.h"
 #endif
@@ -376,7 +375,7 @@ AcpiDsLoad1BeginOp (
                 break;
             }
 
-            /*lint -fallthrough */
+            ACPI_FALLTHROUGH;
 
         default:
 
@@ -555,7 +554,6 @@ AcpiDsLoad1EndOp (
     ACPI_PARSE_OBJECT       *Op;
     ACPI_OBJECT_TYPE        ObjectType;
     ACPI_STATUS             Status = AE_OK;
-
 #ifdef ACPI_ASL_COMPILER
     UINT8                   ParamCount;
 #endif
@@ -566,6 +564,28 @@ AcpiDsLoad1EndOp (
 
     Op = WalkState->Op;
     ACPI_DEBUG_PRINT ((ACPI_DB_DISPATCH, "Op=%p State=%p\n", Op, WalkState));
+
+    /*
+     * Disassembler: handle create field operators here.
+     *
+     * CreateBufferField is a deferred op that is typically processed in load
+     * pass 2. However, disassembly of control method contents walk the parse
+     * tree with ACPI_PARSE_LOAD_PASS1 and AML_CREATE operators are processed
+     * in a later walk. This is a problem when there is a control method that
+     * has the same name as the AML_CREATE object. In this case, any use of the
+     * name segment will be detected as a method call rather than a reference
+     * to a buffer field.
+     *
+     * This earlier creation during disassembly solves this issue by inserting
+     * the named object in the ACPI namespace so that references to this name
+     * would be a name string rather than a method call.
+     */
+    if ((WalkState->ParseFlags & ACPI_PARSE_DISASSEMBLE) &&
+        (WalkState->OpInfo->Flags & AML_CREATE))
+    {
+        Status = AcpiDsCreateBufferField (Op, WalkState);
+        return_ACPI_STATUS (Status);
+    }
 
     /* We are only interested in opcodes that have an associated name */
 

@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2018, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2021, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -232,6 +232,11 @@ AcpiNsDeleteNode (
     ACPI_FUNCTION_NAME (NsDeleteNode);
 
 
+    if (!Node)
+    {
+        return_VOID;
+    }
+
     /* Detach an object if there is one */
 
     AcpiNsDetachObject (Node);
@@ -418,7 +423,7 @@ AcpiNsInstallNode (
     Node->Type = (UINT8) Type;
 
     ACPI_DEBUG_PRINT ((ACPI_DB_NAMES,
-        "%4.4s (%s) [Node %p Owner %X] added to %4.4s (%s) [Node %p]\n",
+        "%4.4s (%s) [Node %p Owner %3.3X] added to %4.4s (%s) [Node %p]\n",
         AcpiUtGetNodeName (Node), AcpiUtGetTypeName (Node->Type), Node, OwnerId,
         AcpiUtGetNodeName (ParentNode), AcpiUtGetTypeName (ParentNode->Type),
         ParentNode));
@@ -476,7 +481,7 @@ AcpiNsDeleteChildren (
         NodeToDelete = NextNode;
         NextNode = NextNode->Peer;
         AcpiNsDeleteNode (NodeToDelete);
-    };
+    }
 
     /* Clear the parent's child pointer */
 

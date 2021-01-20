@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2018, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2021, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -184,12 +184,12 @@ typedef struct acpi_exception_info
 {
     char                *Name;
 
-#ifdef ACPI_HELP_APP
+#if defined (ACPI_HELP_APP) || defined (ACPI_ASL_COMPILER)
     char                *Description;
 #endif
 } ACPI_EXCEPTION_INFO;
 
-#ifdef ACPI_HELP_APP
+#if defined (ACPI_HELP_APP) || defined (ACPI_ASL_COMPILER)
 #define EXCEP_TXT(Name,Description)     {Name, Description}
 #else
 #define EXCEP_TXT(Name,Description)     {Name}
@@ -204,11 +204,11 @@ typedef struct acpi_exception_info
 
 #define AE_OK                           (ACPI_STATUS) 0x0000
 
-#define ACPI_ENV_EXCEPTION(Status)      (Status & AE_CODE_ENVIRONMENTAL)
-#define ACPI_AML_EXCEPTION(Status)      (Status & AE_CODE_AML)
-#define ACPI_PROG_EXCEPTION(Status)     (Status & AE_CODE_PROGRAMMER)
-#define ACPI_TABLE_EXCEPTION(Status)    (Status & AE_CODE_ACPI_TABLES)
-#define ACPI_CNTL_EXCEPTION(Status)     (Status & AE_CODE_CONTROL)
+#define ACPI_ENV_EXCEPTION(Status)      (((Status) & AE_CODE_MASK) == AE_CODE_ENVIRONMENTAL)
+#define ACPI_AML_EXCEPTION(Status)      (((Status) & AE_CODE_MASK) == AE_CODE_AML)
+#define ACPI_PROG_EXCEPTION(Status)     (((Status) & AE_CODE_MASK) == AE_CODE_PROGRAMMER)
+#define ACPI_TABLE_EXCEPTION(Status)    (((Status) & AE_CODE_MASK) == AE_CODE_ACPI_TABLES)
+#define ACPI_CNTL_EXCEPTION(Status)     (((Status) & AE_CODE_MASK) == AE_CODE_CONTROL)
 
 
 /*
@@ -434,7 +434,7 @@ static const ACPI_EXCEPTION_INFO    AcpiGbl_ExceptionNames_Aml[] =
     EXCEP_TXT ("AE_AML_DIVIDE_BY_ZERO",         "During execution of AML Divide operator"),
     EXCEP_TXT ("AE_AML_BAD_NAME",               "An ACPI name contains invalid character(s)"),
     EXCEP_TXT ("AE_AML_NAME_NOT_FOUND",         "Could not resolve a named reference"),
-    EXCEP_TXT ("AE_AML_INTERNAL",               "An internal error within the interprete"),
+    EXCEP_TXT ("AE_AML_INTERNAL",               "An internal error within the interpreter"),
     EXCEP_TXT ("AE_AML_INVALID_SPACE_ID",       "An Operation Region SpaceID is invalid"),
     EXCEP_TXT ("AE_AML_STRING_LIMIT",           "String is longer than 200 characters"),
     EXCEP_TXT ("AE_AML_NO_RETURN_VALUE",        "A method did not return a required value"),
