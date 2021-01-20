@@ -38,6 +38,7 @@ AddFilesToPackage develop lib $(architecture) :
 	<$(architecture)>libcolumnlistview.a
 	<$(architecture)>liblocalestub.a
 	<$(architecture)>libm.a
+	<$(architecture)>libnetservices.a
 	<$(architecture)>libpthread.a
 	<$(architecture)>libshared.a ;
 

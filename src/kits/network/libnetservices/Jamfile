@@ -2,42 +2,50 @@ SubDir HAIKU_TOP src kits network libnetservices ;
 
 UsePrivateHeaders net netservices shared support ;
 
+local sources =
+	# FUTURE: The HTTP stuff should all go into an add-on. It needs
+	# linking against libcrypto.so and only the add-on should link
+	# against it.
+	DataRequest.cpp
+	HttpAuthentication.cpp
+	HttpHeaders.cpp
+	HttpForm.cpp
+	HttpRequest.cpp
+	HttpResult.cpp
+
+	# FUTURE: another add-on for file:// (a much simpler one)
+	FileRequest.cpp
+
+	# FUTURE: another add-on for gopher://
+	GopherRequest.cpp
+
+	HttpTime.cpp
+	NetworkCookie.cpp
+	NetworkCookieJar.cpp
+
+	NetworkRequest.cpp
+	UrlContext.cpp
+	UrlProtocolAsynchronousListener.cpp
+	UrlProtocolDispatchingListener.cpp
+	UrlProtocolListener.cpp
+	UrlProtocolRoster.cpp
+	UrlRequest.cpp
+	UrlResult.cpp
+	UrlSynchronousRequest.cpp
+	;
+
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
 		local architecture = $(TARGET_PACKAGING_ARCH) ;
 
 		MergeObject <libnetapi!$(architecture)>netservices.o :
-			# FUTURE: The HTTP stuff should all go into an add-on. It needs
-			# linking against libcrypto.so and only the add-on should link
-			# against it.
-			DataRequest.cpp
-			HttpAuthentication.cpp
-			HttpHeaders.cpp
-			HttpForm.cpp
-			HttpRequest.cpp
-			HttpResult.cpp
-
-			# FUTURE: another add-on for file:// (a much simpler one)
-			FileRequest.cpp
-
-			# FUTURE: another add-on for gopher://
-			GopherRequest.cpp
-
-			HttpTime.cpp
-			NetworkCookie.cpp
-			NetworkCookieJar.cpp
-
-			NetworkRequest.cpp
-			UrlContext.cpp
-			UrlProtocolAsynchronousListener.cpp
-			UrlProtocolDispatchingListener.cpp
-			UrlProtocolListener.cpp
-			UrlProtocolRoster.cpp
-			UrlRequest.cpp
-			UrlResult.cpp
-			UrlSynchronousRequest.cpp
+			$(sources)
 			: <$(architecture)>libshared.a
+			;
+
+		StaticLibrary <$(architecture)>libnetservices.a :
+			$(sources)
 			;
 	}
 }
