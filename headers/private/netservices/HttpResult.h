@@ -14,6 +14,12 @@
 #include <UrlResult.h>
 
 
+#ifndef LIBNETAPI_DEPRECATED
+namespace BPrivate {
+
+namespace Network {
+#endif
+
 class BUrlRequest;
 
 
@@ -55,5 +61,10 @@ private:
 			BString						fStatusString;
 };
 
+#ifndef LIBNETAPI_DEPRECATED
+} // namespace Network
+
+} // namespace BPrivate
+#endif
 
 #endif // _B_URL_RESULT_H_

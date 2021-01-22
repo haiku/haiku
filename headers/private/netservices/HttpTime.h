@@ -12,6 +12,10 @@
 
 namespace BPrivate {
 
+#ifndef LIBNETAPI_DEPRECATED
+namespace Network {
+#endif
+
 enum {
 	B_HTTP_TIME_FORMAT_PARSED = -1,
 	B_HTTP_TIME_FORMAT_RFC1123 = 0,
@@ -43,5 +47,9 @@ private:
 			int8		fDateFormat;
 };
 
-}
+#ifndef LIBNETAPI_DEPRECATED
+} // namespace Network
+#endif
+
+} // namespace BPrivate
 #endif // _B_HTTP_TIME_H_

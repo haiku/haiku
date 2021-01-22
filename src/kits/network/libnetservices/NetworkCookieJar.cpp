@@ -19,6 +19,10 @@
 #include "NetworkCookieJarPrivate.h"
 
 
+#ifndef LIBNETAPI_DEPRECATED
+using namespace BPrivate::Network;
+#endif
+
 // #define TRACE_COOKIE
 #ifdef TRACE_COOKIE
 #	define TRACE(x...) printf(x)

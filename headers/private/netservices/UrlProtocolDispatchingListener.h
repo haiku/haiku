@@ -10,6 +10,11 @@
 #include <Message.h>
 #include <UrlProtocolListener.h>
 
+#ifndef LIBNETAPI_DEPRECATED
+namespace BPrivate {
+
+namespace Network {
+#endif
 
 //! To be in AppTypes.h
 enum {
@@ -70,6 +75,12 @@ private:
 private:
 			BMessenger	 		fMessenger;
 };
+
+#ifndef LIBNETAPI_DEPRECATED
+} // namespace Network
+
+} // namespace BPrivate
+#endif
 
 #endif // _B_URL_PROTOCOL_DISPATCHING_LISTENER_H_
 

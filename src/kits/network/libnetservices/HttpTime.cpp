@@ -47,7 +47,11 @@ static const char* kDateFormats[] = {
 	"%a %d %b %H:%M:%S %Y"
 };
 
+#ifdef LIBNETAPI_DEPRECATED
 using namespace BPrivate;
+#else
+using namespace BPrivate::Network;
+#endif
 
 
 BHttpTime::BHttpTime()

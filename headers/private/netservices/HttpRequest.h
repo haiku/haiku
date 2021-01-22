@@ -23,6 +23,12 @@ namespace BPrivate {
 };
 
 
+#ifndef LIBNETAPI_DEPRECATED
+namespace BPrivate {
+
+namespace Network {
+#endif
+
 class BHttpRequest : public BNetworkRequest {
 public:
 	virtual						~BHttpRequest();
@@ -236,5 +242,11 @@ enum http_status_code {
 
 // HTTP default User-Agent
 #define B_HTTP_PROTOCOL_USER_AGENT_FORMAT "ServicesKit (%s)"
+
+#ifndef LIBNETAPI_DEPRECATED
+} // namespace Network
+
+} // namespace BPrivate
+#endif
 
 #endif // _B_URL_PROTOCOL_HTTP_H_

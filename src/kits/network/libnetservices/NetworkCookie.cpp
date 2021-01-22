@@ -20,9 +20,12 @@
 #include <HttpTime.h>
 #include <NetworkCookie.h>
 
-
+#ifdef LIBNETAPI_DEPRECATED
 using BPrivate::BHttpTime;
-
+using BPrivate::B_HTTP_TIME_FORMAT_COOKIE;
+#else
+using namespace BPrivate::Network;
+#endif
 
 static const char* kArchivedCookieName = "be:cookie.name";
 static const char* kArchivedCookieValue = "be:cookie.value";
@@ -380,7 +383,7 @@ BNetworkCookie::ExpirationString() const
 	BHttpTime date(fExpiration);
 
 	if (!fExpirationStringValid) {
-		fExpirationString = date.ToString(BPrivate::B_HTTP_TIME_FORMAT_COOKIE);
+		fExpirationString = date.ToString(B_HTTP_TIME_FORMAT_COOKIE);
 		fExpirationStringValid = true;
 	}
 

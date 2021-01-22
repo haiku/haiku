@@ -15,6 +15,11 @@
 #include <stdio.h>
 
 
+#ifndef LIBNETAPI_DEPRECATED
+using namespace BPrivate::Network;
+#endif
+
+
 BDataRequest::BDataRequest(const BUrl& url, BUrlProtocolListener* listener,
 		BUrlContext* context)
 	: BUrlRequest(url, listener, context, "data URL parser", "data"),

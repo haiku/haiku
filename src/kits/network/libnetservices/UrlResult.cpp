@@ -10,6 +10,10 @@
 #include <UrlResult.h>
 
 
+#ifndef LIBNETAPI_DEPRECATED
+using namespace BPrivate::Network;
+#endif
+
 BUrlResult::BUrlResult()
 	:
 	BArchivable(),

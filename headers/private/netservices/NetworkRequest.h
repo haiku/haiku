@@ -14,6 +14,12 @@
 class BAbstractSocket;
 
 
+#ifndef LIBNETAPI_DEPRECATED
+namespace BPrivate {
+
+namespace Network {
+#endif
+
 class BNetworkRequest: public BUrlRequest
 {
 public:
@@ -39,5 +45,10 @@ protected:
 			BNetBuffer			fInputBuffer;
 };
 
+#ifndef LIBNETAPI_DEPRECATED
+} // namespace Network
+
+} // namespace BPrivate
+#endif
 
 #endif

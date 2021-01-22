@@ -12,6 +12,12 @@
 #include <UrlProtocolRoster.h>
 
 
+#ifndef LIBNETAPI_DEPRECATED
+namespace BPrivate {
+
+namespace Network {
+#endif
+
 class BGopherRequest : public BNetworkRequest {
 public:
 	virtual						~BGopherRequest();
@@ -45,5 +51,10 @@ private:
 			BUrlResult			fResult;
 };
 
+#ifndef LIBNETAPI_DEPRECATED
+} // namespace Network
+
+} // namespace BPrivate
+#endif
 
 #endif // _B_GOPHER_REQUEST_H_

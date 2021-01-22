@@ -10,6 +10,12 @@
 #include <String.h>
 
 
+#ifndef LIBNETAPI_DEPRECATED
+namespace BPrivate {
+
+namespace Network {
+#endif
+
 class BUrlResult: public BArchivable {
 public:
 							BUrlResult();
@@ -30,5 +36,11 @@ private:
 			BString			fContentType;
 			size_t			fLength;
 };
+
+#ifndef LIBNETAPI_DEPRECATED
+} // namespace Network
+
+} // namespace BPrivate
+#endif
 
 #endif

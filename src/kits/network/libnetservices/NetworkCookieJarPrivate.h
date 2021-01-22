@@ -9,6 +9,13 @@
 #include <HashMap.h>
 
 
+#ifndef LIBNETAPI_DEPRECATED
+using BPrivate::Network::BNetworkCookie;
+using BPrivate::Network::BNetworkCookieJar;
+using BPrivate::Network::BNetworkCookieList;
+#endif
+
+
 typedef BPrivate::SynchronizedHashMap<HashString, BNetworkCookieList*>
 	BNetworkCookieHashMap;
 

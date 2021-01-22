@@ -14,6 +14,12 @@
 #include <Referenceable.h>
 
 
+#ifndef LIBNETAPI_DEPRECATED
+namespace BPrivate {
+
+namespace Network {
+#endif
+
 class BUrlRequest {
 public:
 									BUrlRequest(const BUrl& url,
@@ -66,5 +72,10 @@ protected:
 			BString					fProtocol;
 };
 
+#ifndef LIBNETAPI_DEPRECATED
+} // namespace Network
+
+} // namespace BPrivate
+#endif
 
 #endif // _B_URL_REQUEST_H_

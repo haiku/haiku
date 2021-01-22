@@ -15,6 +15,12 @@
 #include <UrlRequest.h>
 
 
+#ifndef LIBNETAPI_DEPRECATED
+namespace BPrivate {
+
+namespace Network {
+#endif
+
 class BDataRequest: public BUrlRequest {
 public:
 		const BUrlResult&	Result() const;
@@ -29,5 +35,11 @@ private:
 private:
 		BUrlResult			fResult;
 };
+
+#ifndef LIBNETAPI_DEPRECATED
+} // namespace Network
+
+} // namespace BPrivate
+#endif
 
 #endif

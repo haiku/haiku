@@ -15,6 +15,10 @@
 
 using std::ostream;
 
+#ifndef LIBNETAPI_DEPRECATED
+using namespace BPrivate::Network;
+#endif
+
 
 BHttpResult::BHttpResult(const BUrl& url)
 	:

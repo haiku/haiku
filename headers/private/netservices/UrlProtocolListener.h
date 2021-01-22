@@ -13,6 +13,13 @@
 
 
 class BCertificate;
+
+#ifndef LIBNETAPI_DEPRECATED
+namespace BPrivate {
+
+namespace Network {
+#endif
+
 class BUrlRequest;
 
 
@@ -51,5 +58,11 @@ public:
 									BCertificate& certificate,
 									const char* message);
 };
+
+#ifndef LIBNETAPI_DEPRECATED
+} // namespace Network
+
+} // namespace BPrivate
+#endif
 
 #endif // _B_URL_PROTOCOL_LISTENER_H_

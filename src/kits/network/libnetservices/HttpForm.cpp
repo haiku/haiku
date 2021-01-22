@@ -23,6 +23,9 @@ static int32 kBoundaryRandomSize = 16;
 
 using namespace std;
 
+#ifndef LIBNETAPI_DEPRECATED
+using namespace BPrivate::Network;
+#endif
 
 // #pragma mark - BHttpFormData
 

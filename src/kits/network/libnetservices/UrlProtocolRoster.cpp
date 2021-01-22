@@ -18,6 +18,9 @@
 #include <HttpRequest.h>
 #include <UrlRequest.h>
 
+#ifndef LIBNETAPI_DEPRECATED
+using namespace BPrivate::Network;
+#endif
 
 /* static */ BUrlRequest*
 BUrlProtocolRoster::MakeRequest(const BUrl& url,

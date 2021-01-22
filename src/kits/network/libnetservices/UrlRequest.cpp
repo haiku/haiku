@@ -12,6 +12,10 @@
 #include <stdio.h>
 
 
+#ifndef LIBNETAPI_DEPRECATED
+using namespace BPrivate::Network;
+#endif
+
 static BReference<BUrlContext> gDefaultContext = new(std::nothrow) BUrlContext();
 
 

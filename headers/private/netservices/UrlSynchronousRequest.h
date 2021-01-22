@@ -10,6 +10,12 @@
 #include <UrlProtocolListener.h>
 
 
+#ifndef LIBNETAPI_DEPRECATED
+namespace BPrivate {
+
+namespace Network {
+#endif
+
 class BUrlSynchronousRequest : public BUrlRequest, public BUrlProtocolListener {
 public:
 								BUrlSynchronousRequest(BUrlRequest& asynchronousRequest);
@@ -42,5 +48,11 @@ protected:
 			BUrlRequest&		fWrappedRequest;
 };
 
+
+#ifndef LIBNETAPI_DEPRECATED
+} // namespace Network
+
+} // namespace BPrivate
+#endif
 
 #endif // _B_URL_SYNCHRONOUS_REQUEST_H_

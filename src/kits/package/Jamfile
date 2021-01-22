@@ -13,6 +13,9 @@ UsePrivateHeaders
 	;
 UsePrivateSystemHeaders ;
 
+# Use the deprecated libnetapi.so classes
+SubDirC++Flags [ FDefines LIBNETAPI_DEPRECATED ] ;
+
 HPKG_SOURCES =
 	AttributeDataReader.cpp
 	BlockBufferPool.cpp

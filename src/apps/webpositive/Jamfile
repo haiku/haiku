@@ -3,6 +3,9 @@ SubDir HAIKU_TOP src apps webpositive ;
 SubDirC++Flags $(defines) -Wno-error=sequence-point -Wno-error=format-truncation ;
 SubDirCcFlags $(defines) -Wno-error=sequence-point -Wno-error=format-truncation ;
 
+# Use the deprecated libnetapi.so classes
+SubDirC++Flags [ FDefines LIBNETAPI_DEPRECATED ] ;
+
 # source directories
 local sourceDirs =
 	autocompletion

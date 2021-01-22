@@ -229,6 +229,9 @@ local generatedReferenceParserSourceFiles =
 	DumpExportReferenceJsonListener.cpp
 ;
 
+# Use the deprecated libnetapi.so network classes
+SubDirC++Flags [ FDefines LIBNETAPI_DEPRECATED ] ;
+
 Application HaikuDepot
 	:
 	$(applicationSources)

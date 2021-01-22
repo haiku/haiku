@@ -15,6 +15,11 @@
 #include <AutoLocker.h>
 
 
+#ifndef LIBNETAPI_DEPRECATED
+using namespace BPrivate::Network;
+#endif
+
+
 #if DEBUG > 0
 #define PRINT(x) printf x
 #else

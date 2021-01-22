@@ -9,6 +9,9 @@ if [ Glob $(SUBDIR) : DefaultGeolocationServiceKey.h ] {
 	SubDirC++Flags [ FDefines HAVE_DEFAULT_GEOLOCATION_SERVICE_KEY ] ;
 }
 
+# Use the deprecated libnetapi.so classes
+SubDirC++Flags [ FDefines LIBNETAPI_DEPRECATED ] ;
+
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {

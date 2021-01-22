@@ -17,6 +17,10 @@
 #include <Path.h>
 
 
+#ifndef LIBNETAPI_DEPRECATED
+using namespace BPrivate::Network;
+#endif
+
 BFileRequest::BFileRequest(const BUrl& url, BUrlProtocolListener* listener,
 	BUrlContext* context)
 	:

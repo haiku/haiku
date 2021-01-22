@@ -16,6 +16,12 @@
 #include <Url.h>
 
 
+#ifndef LIBNETAPI_DEPRECATED
+namespace BPrivate {
+
+namespace Network {
+#endif
+
 class BNetworkCookieList: public BObjectList<const BNetworkCookie> {
 public:
 								BNetworkCookieList();
@@ -157,5 +163,11 @@ private:
 
 			BUrl				fUrl;
 };
+
+#ifndef LIBNETAPI_DEPRECATED
+} // namespace Network
+
+} // namespace BPrivate
+#endif
 
 #endif // _B_NETWORK_COOKIE_JAR_

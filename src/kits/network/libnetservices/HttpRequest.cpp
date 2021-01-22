@@ -34,6 +34,11 @@
 static const int32 kHttpBufferSize = 4096;
 
 
+#ifndef LIBNETAPI_DEPRECATED
+using namespace BPrivate::Network;
+#endif
+
+
 namespace BPrivate {
 
 	class CheckedSecureSocket: public BSecureSocket

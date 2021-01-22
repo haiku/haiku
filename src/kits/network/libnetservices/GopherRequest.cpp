@@ -23,6 +23,11 @@
 #include <String.h>
 #include <StringList.h>
 
+
+#ifndef LIBNETAPI_DEPRECATED
+using namespace BPrivate::Network;
+#endif
+
 /*
  * TODO: fix '+' in selectors, cf. gopher://gophernicus.org/1/doc/gopher/
  * TODO: add proper favicon
