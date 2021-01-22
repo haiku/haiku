@@ -150,8 +150,7 @@ MutableLocaleRoster::CreateCatalog(const char* type, const char* signature,
 	for (int32 i = 0; i < count; ++i) {
 		CatalogAddOnInfo* info = (CatalogAddOnInfo*)
 			fData->fCatalogAddOnInfos.ItemAt(i);
-		if (info->fName.ICompare(type) != 0 || !info->MakeSureItsLoaded()
-			|| !info->fCreateFunc)
+		if (info->fName.ICompare(type) != 0 || !info->fCreateFunc)
 			continue;
 
 		BCatalogData* catalog = info->fCreateFunc(signature, language);
@@ -189,7 +188,7 @@ MutableLocaleRoster::LoadCatalog(const entry_ref& catalogOwner,
 		CatalogAddOnInfo* info = (CatalogAddOnInfo*)
 			fData->fCatalogAddOnInfos.ItemAt(i);
 
-		if (!info->MakeSureItsLoaded() || !info->fInstantiateFunc)
+		if (!info->fInstantiateFunc)
 			continue;
 		BMessage languages;
 		if (language != NULL) {
@@ -277,8 +276,7 @@ MutableLocaleRoster::LoadCatalog(const char* signature,
 	for (int32 i = 0; i < count; ++i) {
 		CatalogAddOnInfo* info = (CatalogAddOnInfo*)
 			fData->fCatalogAddOnInfos.ItemAt(i);
-		if (info->MakeSureItsLoaded()
-			&& info->fInstantiateFunc
+		if (info->fInstantiateFunc
 				== BPrivate::DefaultCatalog::Instantiate) {
 			defaultCatalogInfo = info;
 			break;
