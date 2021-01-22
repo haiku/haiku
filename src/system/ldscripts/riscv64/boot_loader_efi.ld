@@ -52,12 +52,13 @@ SECTIONS
 		*(COMMON)
 		. = ALIGN(16);
 		_bss_end = .;
-		_edata = .;
 	}
 	.rela.dyn : { *(.rela.dyn) }
 	.rela.plt : { *(.rela.plt) }
 	.rela.got : { *(.rela.got) }
 	.rela.data : { *(.rela.data) *(.rela.data*) }
+
+	_edata = .;
 	_data_size = . - _etext;
 
 	. = ALIGN(4096);
