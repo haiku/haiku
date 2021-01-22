@@ -14,6 +14,9 @@
 #include "StandardMetaData.h"
 
 
+using BPrivate::Network::BHttpRequest;
+
+
 typedef enum server_process_options {
 	SERVER_PROCESS_NO_NETWORKING	= 1 << 0,
 	SERVER_PROCESS_PREFER_CACHE		= 1 << 1,

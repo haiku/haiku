@@ -229,9 +229,6 @@ local generatedReferenceParserSourceFiles =
 	DumpExportReferenceJsonListener.cpp
 ;
 
-# Use the deprecated libnetapi.so network classes
-SubDirC++Flags [ FDefines LIBNETAPI_DEPRECATED ] ;
-
 Application HaikuDepot
 	:
 	$(applicationSources)
@@ -243,7 +240,7 @@ Application HaikuDepot
 	$(generatedRepositoryParserSourceFiles)
 	$(generatedReferenceParserSourceFiles)
 	:
-	be package bnetapi translation libcolumnlistview.a shared
+	be package bnetapi translation libnetservices.a libcolumnlistview.a shared
 	[ TargetLibstdc++ ] [ TargetLibsupc++ ] localestub
 	:
 	HaikuDepot.rdef

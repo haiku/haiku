@@ -10,6 +10,10 @@
 
 #include "Logger.h"
 
+
+using namespace BPrivate::Network;
+
+
 ToFileUrlProtocolListener::ToFileUrlProtocolListener(BPath path,
 	BString traceLoggingIdentifier, bool traceLogging)
 {

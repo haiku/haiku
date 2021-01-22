@@ -26,6 +26,9 @@
 #include "ServerHelper.h"
 
 
+using namespace BPrivate::Network;
+
+
 #define BASEURL_DEFAULT "https://depot.haiku-os.org"
 #define USERAGENT_FALLBACK_VERSION "0.0.0"
 #define LOG_PAYLOAD_LIMIT 8192

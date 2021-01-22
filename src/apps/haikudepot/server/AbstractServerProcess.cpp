@@ -27,6 +27,9 @@
 #include "ToFileUrlProtocolListener.h"
 
 
+using namespace BPrivate::Network;
+
+
 #define MAX_REDIRECTS 3
 #define MAX_FAILURES 2
 
@@ -133,9 +136,9 @@ AbstractServerProcess::SetIfModifiedSinceHeaderValueFromMetaData(
 	// An example of this output would be; 'Fri, 24 Oct 2014 19:32:27 +0000'
 	BDateTime modifiedDateTime = metaData
 		.GetDataModifiedTimestampAsDateTime();
-	BPrivate::BHttpTime modifiedHttpTime(modifiedDateTime);
+	BHttpTime modifiedHttpTime(modifiedDateTime);
 	headerValue.SetTo(modifiedHttpTime
-		.ToString(BPrivate::B_HTTP_TIME_FORMAT_COOKIE));
+		.ToString(B_HTTP_TIME_FORMAT_COOKIE));
 }
 
 

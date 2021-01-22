@@ -10,6 +10,8 @@
 #include "ValidationFailure.h"
 
 
+using BPrivate::Network::BHttpHeaders;
+
 class BMessage;
 
 

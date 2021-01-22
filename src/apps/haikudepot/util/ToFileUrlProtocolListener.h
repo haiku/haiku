@@ -6,6 +6,12 @@
 #include <UrlProtocolListener.h>
 #include <UrlRequest.h>
 
+
+using BPrivate::Network::BUrlProtocolDebugMessage;
+using BPrivate::Network::BUrlProtocolListener;
+using BPrivate::Network::BUrlRequest;
+using BPrivate::Network::BUrlResult;
+
 class ToFileUrlProtocolListener : public BUrlProtocolListener {
 public:
 								ToFileUrlProtocolListener(BPath path,
