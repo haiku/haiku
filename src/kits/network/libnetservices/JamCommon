@@ -36,6 +36,10 @@ local sources =
 	UrlSynchronousRequest.cpp
 	;
 
+if [ Glob $(SUBDIR) : DefaultGeolocationServiceKey.h ] {
+	SubDirC++Flags [ FDefines HAVE_DEFAULT_GEOLOCATION_SERVICE_KEY ] ;
+}
+
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
@@ -52,6 +56,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		} else {
 			StaticLibrary [ MultiArchDefaultGristFiles libnetservices.a ] :
 				$(sources)
+				Geolocation.cpp
 				;
 		}
 

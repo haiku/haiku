@@ -12,6 +12,7 @@
 
 namespace BPrivate {
 
+namespace Network {
 
 class BGeolocation {
 public:
@@ -36,6 +37,7 @@ private:
 	static const	char*	kDefaultGeocodingService;
 };
 
+}	// namespace Network
 
 }	// namespace BPrivate
 

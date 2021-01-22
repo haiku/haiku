@@ -19,6 +19,7 @@
 
 namespace BPrivate {
 
+namespace Network {
 
 class GeolocationListener: public BUrlProtocolListener
 {
@@ -248,5 +249,6 @@ const char* BGeolocation::kDefaultGeocodingService = "";
 
 #endif
 
+}	// namespace Network
 
 }	// namespace BPrivate

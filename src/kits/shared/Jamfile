@@ -5,13 +5,6 @@ AddSubDirSupportedPlatforms libbe_test ;
 UseLibraryHeaders agg ;
 UsePrivateHeaders shared locale ;
 
-if [ Glob $(SUBDIR) : DefaultGeolocationServiceKey.h ] {
-	SubDirC++Flags [ FDefines HAVE_DEFAULT_GEOLOCATION_SERVICE_KEY ] ;
-}
-
-# Use the deprecated libnetapi.so classes
-SubDirC++Flags [ FDefines LIBNETAPI_DEPRECATED ] ;
-
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
@@ -31,9 +24,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		# for BKeymap
 		UsePrivateHeaders interface ;
 
-		# for BGeolocation
-		UsePrivateHeaders netservices ;
-
 		StaticLibrary <$(architecture)>libshared.a :
 			AboutMenuItem.cpp
 			ArgumentVector.cpp
@@ -44,7 +34,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			CommandPipe.cpp
 			DragTrackingFilter.cpp
 			DriverSettingsMessageAdapter.cpp
-			Geolocation.cpp
 			HashString.cpp
 			IconButton.cpp
 			IconView.cpp
