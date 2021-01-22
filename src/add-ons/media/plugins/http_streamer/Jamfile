@@ -3,16 +3,14 @@ SubDir HAIKU_TOP src add-ons media plugins http_streamer ;
 UsePrivateHeaders media netservices shared ;
 UsePrivateHeaders [ FDirName media experimental ] ;
 
-# Use the deprecated libnetapi.so classes
-SubDirC++Flags [ FDefines LIBNETAPI_DEPRECATED ] ;
-
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
 		Addon [ MultiArchDefaultGristFiles http_streamer ] :
 			HTTPStreamerPlugin.cpp
 			HTTPMediaIO.cpp
-			: be media bnetapi shared
+			: [ MultiArchDefaultGristFiles libnetservices.a ]
+			be media bnetapi shared
 			[ TargetLibsupc++ ]
 		;
 	}

@@ -16,6 +16,8 @@
 // 10 seconds timeout
 #define HTTP_TIMEOUT 10000000
 
+using namespace BPrivate::Network;
+
 
 class FileListener : public BUrlProtocolListener {
 public:
