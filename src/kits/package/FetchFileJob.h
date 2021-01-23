@@ -18,6 +18,11 @@
 
 #include <package/Job.h>
 
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+using BPrivate::Network::BUrlProtocolListener;
+using BPrivate::Network::BUrlRequest;
+#endif
+
 
 namespace BPackageKit {
 
@@ -48,9 +53,10 @@ public:
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	virtual void	DataReceived(BUrlRequest*, const char* data,
 						off_t position, ssize_t size);
-	virtual void	DownloadProgress(BUrlRequest*, ssize_t bytesReceived,
-						ssize_t bytesTotal);
-	virtual void 	RequestCompleted(BUrlRequest* request, bool success);
+	virtual void	DownloadProgress(BUrlRequest*,
+						ssize_t bytesReceived, ssize_t bytesTotal);
+	virtual void 	RequestCompleted(BUrlRequest* request,
+						bool success);
 #endif
 
 protected:

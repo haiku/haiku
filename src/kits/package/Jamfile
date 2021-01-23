@@ -13,9 +13,6 @@ UsePrivateHeaders
 	;
 UsePrivateSystemHeaders ;
 
-# Use the deprecated libnetapi.so classes
-SubDirC++Flags [ FDefines LIBNETAPI_DEPRECATED ] ;
-
 HPKG_SOURCES =
 	AttributeDataReader.cpp
 	BlockBufferPool.cpp
@@ -134,6 +131,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			shared
 			bnetapi
 			be localestub
+			[ MultiArchDefaultGristFiles libnetservices.a ]
 			[ TargetLibstdc++ ]
 			$(TARGET_NETWORK_LIBS)
 			;

@@ -21,6 +21,7 @@
 #	include <HttpRequest.h>
 #	include <UrlRequest.h>
 #	include <UrlProtocolRoster.h>
+using namespace BPrivate::Network;
 #endif
 
 #include "FetchUtils.h"
