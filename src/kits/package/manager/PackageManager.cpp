@@ -564,30 +564,48 @@ BPackageManager::_PreparePackageChanges(
 		RemoteRepository* remoteRepository
 			= dynamic_cast<RemoteRepository*>(package->Repository());
 		if (remoteRepository != NULL) {
-			// first check if the package already exists in a previous
-			// transaction
 			bool alreadyDownloaded = false;
+
+			// Check for matching files in already existing transaction
+			// directories
 			BPath path(&transaction->TransactionDirectory());
 			BPath parent;
 			if (path.GetParent(&parent) == B_OK) {
 				BString globPath = parent.Path();
 				globPath << "/*/" << fileName;
 				glob_t globbuf;
-				if (glob(globPath.String(), 0, NULL, &globbuf) == 0) {
+				if (glob(globPath.String(), GLOB_NOSORT, NULL, &globbuf) == 0) {
+					off_t bestSize = 0;
+					const char* bestFile = NULL;
+
+					// If there are multiple matching files, pick the largest
+					// one (the others are most likely partial downloads)
+					for (size_t i = 0; i < globbuf.gl_pathc; i++) {
+						off_t size = 0;
+						BNode node(globbuf.gl_pathv[i]);
+						if (node.GetSize(&size) == B_OK && size > bestSize) {
+							bestSize = size;
+							bestFile = globbuf.gl_pathv[i];
+						}
+					}
+
+					// Copy the selected file into our own transaction directory
 					path.Append(fileName);
-					if (BCopyEngine().CopyEntry(globbuf.gl_pathv[0],
-							path.Path()) == B_OK) {
+					if (bestFile != NULL && BCopyEngine().CopyEntry(bestFile,
+						path.Path()) == B_OK) {
 						alreadyDownloaded = FetchUtils::IsDownloadCompleted(
 							path.Path());
 						printf("Re-using download '%s' from previous "
-							"transaction%s\n", globbuf.gl_pathv[0],
+							"transaction%s\n", bestFile,
 							alreadyDownloaded ? "" : " (partial)");
 					}
+					globfree(&globbuf);
 				}
 			}
 
 			if (!alreadyDownloaded) {
-				// download the package
+				// download the package (this will resume the download if the
+				// file already exists)
 				BString url = remoteRepository->Config().PackagesURL();
 				url << '/' << fileName;
 
