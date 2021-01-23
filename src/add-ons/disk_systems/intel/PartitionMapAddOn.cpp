@@ -140,6 +140,7 @@ PartitionMapAddOn::Initialize(BMutablePartition* partition, const char* name,
 	partition->SetContentParameters(NULL);
 	partition->SetContentSize(
 		sector_align(partition->Size(), partition->BlockSize()));
+	partition->Changed(B_PARTITION_CHANGED_INITIALIZATION);
 
 	*_handle = handleDeleter.Detach();
 
