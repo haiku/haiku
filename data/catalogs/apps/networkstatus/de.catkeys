@@ -1,4 +1,5 @@
-1	german	x-vnd.Haiku-NetworkStatus	1162000463
+1	german	x-vnd.Haiku-NetworkStatus	2828540217
+IPv6 address:	NetworkStatusView		IPv6 Adresse:
 Quit	NetworkStatusView		Beenden
 Unknown	NetworkStatusView		Unbekannt
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Starten der Netzwerkeinstellungen fehlgeschlagen.\n\nFehler:
@@ -6,14 +7,17 @@ Install in Deskbar	NetworkStatus		In Deskbar installieren
 NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		NetzwerkStatus Optionen:\n\t--deskbar\t den Replikanten automatisch der Deskbar hinzufügen\n\t--help\t\t diese Info ausgeben und beenden
 Open network preferences…	NetworkStatusView		Netzwerkeinstellungen öffnen…
 NetworkStatus	System name		Netzwerkstatus
+Broadcast:	NetworkStatusView		Broadcast:
 OK	NetworkStatusView		OK
 No link	NetworkStatusView		Nicht verbunden
 Could not join wireless network:\n	NetworkStatusView		Keine Verbindung zum Funknetzwerk:\n
 Ready	NetworkStatusView		Bereit
 Network Status	NetworkStatusView		Netzwerkstatus
 Deskbar is not running, giving up.	NetworkStatus		Deskbar läuft nicht, gebe auf.
+Netmask:	NetworkStatusView		Netzmaske:
 No stateful configuration	NetworkStatusView		Statusloser Zustand
 You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Netzwerkstatus kann im Fenster ausgeführt oder in der Deskbar installiert werden.
+IPv4 address:	NetworkStatusView		IPv4 Adresse:
 %ifaceName information:\n	NetworkStatusView		%ifaceName-Information:\n
 Run in window	NetworkStatus		Im Fenster ausführen
 <no wireless networks found>	NetworkStatusView		<Keine Funknetzwerke gefunden>

@@ -5,7 +5,7 @@ Close	ProbeView		Закрити
 Boolean value:	TypeEditors		Булево значення:
 File	ProbeView		Файл
 Block size	ProbeView	Menu item. This is in the same menu window than 'Base' and 'Font size'	Розмір блоку
-MIME type editor	TypeEditors		Редактор MIME типу
+MIME type editor	TypeEditors		Редактор MIME-типу
 Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Шістнадцятковий
 16 bit unsigned value:	TypeEditors		16 бітове беззнакове значення:
 8 bit signed value:	TypeEditors		8 бітове знакове значення:
@@ -85,7 +85,7 @@ Message	TypeEditors	This is the type of view	Повідомлення
 Message View	TypeEditors		Перегляд повідомлення
 Offset: 	ProbeView		Зміщення: 
 Swapped: 0x%0*Lx	ProbeView		Поміняти місцями: 0x%0*Lx
-MIME type:	TypeEditors		MIME тип:
+MIME type:	TypeEditors		MIME-тип:
 Fit	ProbeView	Size of fonts, fits to available room	Припасувати
 Type editor	ProbeView		Редактор типу
 File	FileWindow		Файл

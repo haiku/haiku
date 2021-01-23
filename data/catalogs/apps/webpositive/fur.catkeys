@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-WebPositive	1591513524
+1	friulian	x-vnd.Haiku-WebPositive	250728390
 Authentication required	Authentication Panel		Autenticazion necessarie
 Previous	WebPositive Window		Precedent
 (Finish: %date)	Download Window		(Terminât: %date)
@@ -53,6 +53,7 @@ Cookies for %s	Cookie Manager		Cookie par %s
 The download could not be opened.	Download Window		Nol è stât pussibil vierzi il file discjariât.
 Close	Download Window		Siere
 WebPositive	System name		WebPositive
+%s - Search term	Settings Window		%s - Tiermin di ricercje
 Reload	WebPositive Window		Torne cjarie
 Expiration	Cookie Manager		Scjadince
 Download finished	Download Window		Discjariament completât
@@ -100,6 +101,7 @@ There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPosi
 Revert	Settings Window		Torne indaûr
 Copy	WebPositive Window		Copie
 Default standard font size:	Settings Window		Dimension dal caratar standard predefinide:
+Custom	Settings Window		Personalizât
 Bookmark this page	WebPositive Window		Zonte cheste pagjine ai segnelibris
 Show tabs if only one page is open	Settings Window		Mostre schedis ancje se e je vierte dome une pagjine
 Close tab	WebPositive Window		Siere schede

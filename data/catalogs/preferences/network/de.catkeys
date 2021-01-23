@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Network	3062143965
+1	german	x-vnd.Haiku-Network	543099905
 Ethernet device	InterfaceListItem		Ethernet-Gerät
 Link speed:	IntefaceView		Geschwindigkeit:
 disconnected	IntefaceView		getrennt
@@ -13,6 +13,7 @@ Gateway:	IntefaceAddressView		Gateway:
 The netmask defines your local network	IntefaceAddressView		Die Netzmaske definiert das lokale Netzwerk
 Your IP address	IntefaceAddressView		IP-Adresse
 DHCP	IntefaceAddressView		DHCP
+IP address:	IntefaceAddressView		IP Adresse:
 Netmask:	IntefaceAddressView		Netzmaske:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Dienste

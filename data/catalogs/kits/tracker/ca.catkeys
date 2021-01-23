@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-libtracker	2498612740
+1	catalan; valencian	x-vnd.Haiku-libtracker	3380227078
 Created	ContainerWindow		Creat
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Obre-ho i fes-ho preferit
@@ -6,6 +6,7 @@ Kind	ContainerWindow		Tipus
 Open with…	ContainerWindow		Obre amb...
 Error moving \"%name\" to Trash. (%error)	FSUtils		Error en moure \"%name\" a la paperera. (%error)
 Or	FindPanel		O
+MIME Description	AttributesView		Descripció de MIME
 before	FindPanel		abans
 Volume icons	TrackerSettingsWindow		Icones dels volums
 Ignore case	SelectionWindow		Ignora les diferències de majúscules i minúscules
@@ -329,6 +330,7 @@ Recent folders	FavoritesMenu		Carpetes recents
 Signed memory size	AttributesView		Mida de memòria signada
 The specified name is illegal. Please choose another name.	FilePanelPriv		El nom especificat és il·legal. Si us plau, trieu-ne un altre.
 of %items	StatusWindow		de %items
+MIME Path	AttributesView		Camí de MIME
 less than	FindPanel		menys que
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Error en copiar el fitxer \"%name\":\n\t%error\n\nVoleu continuar?
 Creating links: 	StatusWindow		Es creen els enllaços: 
@@ -443,6 +445,7 @@ Sorry, saving more than one item is not allowed.	FilePanelPriv		Disculpeu, no es
 Move here	ContainerWindow		Mou aquí
 the config folder	FSUtils		la carpeta de configuració
 Sorry, could not create a new folder.	FSUtils		Disculpeu, no s'ha pogut preparar una carpeta nova.
+MIME Signature	AttributesView		Signatura de MIME
 Select all	VirtualDirectoryWindow		Selecciona-ho tot
 Rename	FSUtils	button label	Canvia'n el nom
 Clean up all	ContainerWindow		Neteja-ho tot

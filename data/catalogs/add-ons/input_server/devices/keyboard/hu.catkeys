@@ -2,7 +2,7 @@
 If the application will not quit you may have to kill it.	Team monitor		Ha a program nem lép ki magától, lehet, hogy meg kell szakítani a futását.
 Quit application	Team monitor		Program leállítása
 Open Terminal	Team monitor		Terminál megnyitása
-{0, plural,one{Hold CONTROL+ALT+DELETE for # second to reboot.}other{Hold CONTROL+ALT+DELETE for # seconds to reboot.}}	Team monitor		{0, plural,one{Tartsd lenyomva a CONTROL+ALT+DELETE-t # másodpercig az újraindításhoz.}other{Tartsd lenyomva a CONTROL+ALT+DELETE-t # másodpercig az újraindításhoz.}}
+{0, plural,one{Hold CONTROL+ALT+DELETE for # second to reboot.}other{Hold CONTROL+ALT+DELETE for # seconds to reboot.}}	Team monitor		{0, plural,one{CONTROL+ALT+DELETE lenyomása # másodpercig az újraindításhoz.}other{CONTROL+ALT+DELETE lenyomása # másodpercig az újraindításhoz.}}
 Restart the desktop	Team monitor		Asztal újraindítása
 Force reboot	Team monitor		Újraindítás mindenáron
 Team monitor	Team monitor		Folyamatfigyelő

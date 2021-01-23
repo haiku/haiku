@@ -1,6 +1,7 @@
-1	hungarian	x-vnd.Haiku-CodyCam	40716723
+1	hungarian	x-vnd.Haiku-CodyCam	12021044
 destination directory expected	CodyCam		nincs megadva célmappa
 reply: '%s'\n	SftpClient		válasz: '%s'\n
+PASS <suppressed>  (real password sent)	FtpClient		PASS <rejtett> (valódi jelszó elküldve)
 JPEG image	CodyCam		JPEG kép
 Remote host has closed the connection.\n	FtpClient		A távoli kiszolgáló megszakította a kapcsolatot.\n
 image file format expected	CodyCam		nincs megadva fájlformátum a képnek

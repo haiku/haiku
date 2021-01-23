@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-DriveSetup	598604797
+1	turkish	x-vnd.Haiku-DriveSetup	1714372400
 Could not unmount partition %s.	MainWindow		%s bölümü bağlantısı kesilemedi.
 Mount all	MainWindow		Hepsini bağla
 Disk	MainWindow		Disk
@@ -50,6 +50,7 @@ Are you sure you want to format a raw disk? (Most people initialize the disk wit
 Wipe (not implemented)	MainWindow		Sil (işlevsel değil)
 The currently selected partition does not have a parent partition.	MainWindow		Mevcut seçili disk bölümü ana bir disk bölümüne sahip değil.
 Validation of the given initialization parameters failed.	MainWindow		Verilen ilklendirme parametrelerinin doğrulanması başarısız oldu.
+Not formatted (%s)	PartitionList		Biçimlendirilmemiş (%s)
 Shared	PartitionList		Paylaşılan
 MIMEs	PartitionList		MIME'ler
 BitLocker encrypted	Encryption utils		BitLocker şifreli
@@ -62,9 +63,11 @@ Change	ChangeParametersPanel		Değiştir
 Partition name:	ChangeParametersPanel		Bölüm adı:
 LUKS encrypted	Encryption utils		LUKS şifreli
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Değişiklikleri diske şimdi yazmak istediğinizden emin misiniz?\n\n%s bölümü üzerindeki tüm veri geri alınamayacak bir biçimde kaybolacak!
+Empty space	PartitionList		Boş alan
 Cancel	AbstractParametersPanel		İptal
 Format	MainWindow		Biçimlendir
 OK	MainWindow		Tamam
+Empty space	DiskView		Boş alan
 Open with DiskProbe	MainWindow		DiskProbe ile aç
 Could not delete the selected partition.	MainWindow		Seçili bölüm silinemedi.
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Seçili diski ilklendirmek istediğinizden emin misiniz? Tüm veriler kaybolacak. Değişiklikler diske yazılmadan önce bir kez daha onayınız istenecektir.\n
@@ -81,6 +84,7 @@ Rescan	MainWindow		Yeniden tara
 There was an error acquiring the partition row.	MainWindow		Bölüm satırını alırken bir hata oluştu.
 Failed to initialize the disk %s!\n	MainWindow		%s diski ilklendirilemedi!\n
 Disk system \"%s\" not found!	MainWindow		\"%s\" disk sistemi bulunamadı!
+The partition cannot be unmounted.	MainWindow		Bölüm bağlantısı kesilemiyor.
 Delete	MainWindow		Sil
 Partition type:	ChangeParametersPanel		Bölüm türü:
 Parameters	PartitionList		Parametreler

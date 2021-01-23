@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-CharacterMap	3830219275
+1	french	x-vnd.Haiku-CharacterMap	430570386
 Tirhuta	UnicodeBlocks		Tirhuta
 Miscellaneous mathematical symbols B	UnicodeBlocks		Divers symboles mathématiques B
 Latin extended E	UnicodeBlocks		Latin étendu E
@@ -192,6 +192,7 @@ Supplementary private use area A	UnicodeBlocks		Zone supplémentaire A à usage 
 Armenian	UnicodeBlocks		Arménien
 Miscellaneous symbols and pictographs	UnicodeBlocks		Symboles et pictogrammes divers
 Phags-pa	UnicodeBlocks		Phags-pa
+Nabataean	UnicodeBlocks		Nabatéen
 CJK compatibility ideographs	UnicodeBlocks		Idéogrammes de compatibilité CJC
 Show private blocks	CharacterWindow		Montrer les zones privées
 Latin extended additional	UnicodeBlocks		Latin étendu additionnel

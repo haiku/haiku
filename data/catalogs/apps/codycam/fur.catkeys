@@ -3,7 +3,7 @@ destination directory expected	CodyCam		si spietave la cartele di destinazion
 reply: '%s'\n	SftpClient		rispuint: '%s'\n
 PASS <suppressed>  (real password sent)	FtpClient		PASS <suppressed>  (inviade peraule di ordin reâl)
 JPEG image	CodyCam		Imagjin JPEG
-Remote host has closed the connection.\n	FtpClient		L'host rimot al à sierât la conession.\n
+Remote host has closed the connection.\n	FtpClient		L'host esterni al à sierât la conession.\n
 image file format expected	CodyCam		si spietave il formât dal file imagjin
 Every 30 minutes	CodyCam		Ogni 30 minûts
 Capturing Image…	VideoConsumer.cpp		Acuisizion imagjin…

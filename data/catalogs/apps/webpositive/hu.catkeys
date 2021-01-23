@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-WebPositive	1976607515
+1	hungarian	x-vnd.Haiku-WebPositive	250728390
 Authentication required	Authentication Panel		Azonosítás szükséges
 Previous	WebPositive Window		Előző
 (Finish: %date)	Download Window		(Befejezés: %date)
@@ -101,6 +101,7 @@ There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPosi
 Revert	Settings Window		Visszaállít
 Copy	WebPositive Window		Másolás
 Default standard font size:	Settings Window		Alapértelmezett betűméret:
+Custom	Settings Window		Egyéni
 Bookmark this page	WebPositive Window		Könyvjelző az oldalhoz
 Show tabs if only one page is open	Settings Window		Fülek megjelenítése egy oldal esetén is
 Close tab	WebPositive Window		Fül bezárása

@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Network	3062143965
+1	turkish	x-vnd.Haiku-Network	543099905
 Ethernet device	InterfaceListItem		Ethernet aygıtı
 Link speed:	IntefaceView		Bağlanma hızı:
 disconnected	IntefaceView		bağlantı kesildi
@@ -13,6 +13,7 @@ Gateway:	IntefaceAddressView		Ağ geçidi:
 The netmask defines your local network	IntefaceAddressView		Ağ maskesi sizin yerel ağınızı tanımlar
 Your IP address	IntefaceAddressView		IP adresiniz
 DHCP	IntefaceAddressView		DHCP
+IP address:	IntefaceAddressView		IP adresi:
 Netmask:	IntefaceAddressView		Ağ maskesi:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Servisler

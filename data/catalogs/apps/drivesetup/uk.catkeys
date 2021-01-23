@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-DriveSetup	598604797
+1	ukrainian	x-vnd.Haiku-DriveSetup	1714372400
 Could not unmount partition %s.	MainWindow		Неможливо відключити розділ %s.
 Mount all	MainWindow		Підключити все
 Disk	MainWindow		Диск
@@ -50,6 +50,7 @@ Are you sure you want to format a raw disk? (Most people initialize the disk wit
 Wipe (not implemented)	MainWindow		Затерти (не реалізовано)
 The currently selected partition does not have a parent partition.	MainWindow		Поточний розділ не має батіківського розділу.
 Validation of the given initialization parameters failed.	MainWindow		Не вдалося застосувати параметри, введені при ініціалізації.
+Not formatted (%s)	PartitionList		Неформатований (%s)
 Shared	PartitionList		Спільний доступ
 MIMEs	PartitionList		MIME-типи
 BitLocker encrypted	Encryption utils		Шифрування BitLocker
@@ -62,9 +63,11 @@ Change	ChangeParametersPanel		Змінити
 Partition name:	ChangeParametersPanel		Назва розділу:
 LUKS encrypted	Encryption utils		Шифрування LUKS
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Ви впевнені, що бажаєте записати зміни на диск?\n\nВсі дані на розділі %s будуть безповоротно втрачені!
+Empty space	PartitionList		Без розмітки
 Cancel	AbstractParametersPanel		Скасувати
 Format	MainWindow		Форматувати
 OK	MainWindow		ОК
+Empty space	DiskView		Без розмітки
 Open with DiskProbe	MainWindow		Відкрити у DiskProbe
 Could not delete the selected partition.	MainWindow		Неможливо видалити вибраний розділ.
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Ви впевнені, що бажаєте ініціалізувати вибраний диск? Всі дані на цьому диску будуть втрачені. Повторний запит буде видано безпосередньо перед записом змін на диск.\n
@@ -81,6 +84,7 @@ Rescan	MainWindow		Пересканувати
 There was an error acquiring the partition row.	MainWindow		Сталася помилка при одержанні списка розділів.
 Failed to initialize the disk %s!\n	MainWindow		Не вдалося ініціалізувати розділ %s!\n
 Disk system \"%s\" not found!	MainWindow		Дискова система \"%s\" не знайдена!
+The partition cannot be unmounted.	MainWindow		Розділ не можна відключити.
 Delete	MainWindow		Видалити
 Partition type:	ChangeParametersPanel		Тип розділу:
 Parameters	PartitionList		Параметри

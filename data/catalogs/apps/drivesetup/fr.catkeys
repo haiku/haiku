@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-DriveSetup	598604797
+1	french	x-vnd.Haiku-DriveSetup	1714372400
 Could not unmount partition %s.	MainWindow		Impossible de démonter la partition %s.
 Mount all	MainWindow		Monter tout
 Disk	MainWindow		Disque
@@ -50,6 +50,7 @@ Are you sure you want to format a raw disk? (Most people initialize the disk wit
 Wipe (not implemented)	MainWindow		Effacer (non implémenté)
 The currently selected partition does not have a parent partition.	MainWindow		La partition sélectionnée n’a pas de partition parente.
 Validation of the given initialization parameters failed.	MainWindow		Le contrôle des paramètres d’initialisation donnés a échoué.
+Not formatted (%s)	PartitionList		Non formaté (%s)
 Shared	PartitionList		Partagé
 MIMEs	PartitionList		MIMEs
 BitLocker encrypted	Encryption utils		Chiffré avec BitLocker
@@ -62,9 +63,11 @@ Change	ChangeParametersPanel		Modifier
 Partition name:	ChangeParametersPanel		Label de partition :
 LUKS encrypted	Encryption utils		Chiffré avec LUKS
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Êtes-vous sûr de vouloir enregistrer les modifications sur le disque maintenant ?\n\nToutes les données sur la partition %s seront irrémédiablement perdues si vous le faites !
+Empty space	PartitionList		Espace libre
 Cancel	AbstractParametersPanel		Annuler
 Format	MainWindow		Formater
 OK	MainWindow		OK
+Empty space	DiskView		Espace libre
 Open with DiskProbe	MainWindow		Ouvrir avec DiskProbe
 Could not delete the selected partition.	MainWindow		Impossible de supprimer la partition sélectionnée.
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Êtes-vous sûr de vouloir initialiser le disque sélectionné ? Toutes les données seront perdues. Une confirmation vous sera à nouveau demandée avant que les changements ne soient écrits sur le disque.\n
@@ -81,6 +84,7 @@ Rescan	MainWindow		Analyser
 There was an error acquiring the partition row.	MainWindow		Erreur de lecture des informations de la partition.
 Failed to initialize the disk %s!\n	MainWindow		Impossible d’initialiser le disque %s !\n
 Disk system \"%s\" not found!	MainWindow		Le disque système « %s » est introuvable !
+The partition cannot be unmounted.	MainWindow		La partition ne peut pas être démontée.
 Delete	MainWindow		Supprimer
 Partition type:	ChangeParametersPanel		Type de la partition :
 Parameters	PartitionList		Paramètres

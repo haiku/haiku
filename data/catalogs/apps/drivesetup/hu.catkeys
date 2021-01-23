@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-DriveSetup	598604797
+1	hungarian	x-vnd.Haiku-DriveSetup	1714372400
 Could not unmount partition %s.	MainWindow		Nem lehet leválasztani a partíciót (%s).
 Mount all	MainWindow		Összes csatolása
 Disk	MainWindow		Lemez
@@ -50,6 +50,7 @@ Are you sure you want to format a raw disk? (Most people initialize the disk wit
 Wipe (not implemented)	MainWindow		Formázás (még nem működik)
 The currently selected partition does not have a parent partition.	MainWindow		A kiválasztott partíciónak nincs főpartíciója.
 Validation of the given initialization parameters failed.	MainWindow		Az előkészítéshez megadott paramétereket nem sikerült érvényesíteni.
+Not formatted (%s)	PartitionList		Formázatlan (%s)
 Shared	PartitionList		Megosztott
 MIMEs	PartitionList		MIME-támogatás
 BitLocker encrypted	Encryption utils		BitLocker-el kódolt
@@ -62,9 +63,11 @@ Change	ChangeParametersPanel		Módosítás
 Partition name:	ChangeParametersPanel		Partíció neve:
 LUKS encrypted	Encryption utils		LUKS-al kódolt
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Biztosan a lemezre szeretnéd írni a kijelölt változtatásokat?\n\nEz esetben a(z) „%s” partíció teljes tartalma visszavonhatatlanul meg fog semmisülni.
+Empty space	PartitionList		Üres terület
 Cancel	AbstractParametersPanel		Mégse
 Format	MainWindow		Formázás
 OK	MainWindow		Rendben
+Empty space	DiskView		Üres terület
 Open with DiskProbe	MainWindow		Megnyitás a Lemezfürkésszel
 Could not delete the selected partition.	MainWindow		A kiválasztott partíció nem törölhető.
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Biztosan elő szeretnéd készíteni a megadott lemezt? Az összes adat el fog veszni. Ezt majd még egyszer meg kell erősítened.\n
@@ -81,6 +84,7 @@ Rescan	MainWindow		Frissítés
 There was an error acquiring the partition row.	MainWindow		Hiba történt a partíció adatainak lekérdezésénél.
 Failed to initialize the disk %s!\n	MainWindow		Nem sikerült előkészíteni a partíciót: „%s”.\n
 Disk system \"%s\" not found!	MainWindow		\"%s\" lemez típus nem található!
+The partition cannot be unmounted.	MainWindow		A partíció nem választható le.
 Delete	MainWindow		Törlés
 Partition type:	ChangeParametersPanel		Partíció típusa:
 Parameters	PartitionList		Paraméterek

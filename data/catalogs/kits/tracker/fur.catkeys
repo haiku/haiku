@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-libtracker	2498612740
+1	friulian	x-vnd.Haiku-libtracker	3380227078
 Created	ContainerWindow		Creât
 Icon	AttributesView		Icone
 Open and make preferred	OpenWithWindow		Vierç e rint preferît
@@ -6,6 +6,7 @@ Kind	ContainerWindow		Gjenar
 Open with…	ContainerWindow		Vierç cun…
 Error moving \"%name\" to Trash. (%error)	FSUtils		Erôr tal spostâ \"%name\" te Scovacere. (%error)
 Or	FindPanel		O
+MIME Description	AttributesView		Descrizion MIME
 before	FindPanel		prime
 Volume icons	TrackerSettingsWindow		Iconis volums
 Ignore case	SelectionWindow		Ignore maiusculis/minusculis
@@ -329,6 +330,7 @@ Recent folders	FavoritesMenu		Cartelis resintis
 Signed memory size	AttributesView		Dimension memorie cun segn
 The specified name is illegal. Please choose another name.	FilePanelPriv		Il non specificât al è illegâl. Par plasê, sielç un altri non.
 of %items	StatusWindow		di %items
+MIME Path	AttributesView		Percors MIME
 less than	FindPanel		mancul di
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Erôr tal copiâ il file \"%name\":\n\t%error\n\nContinuâ?
 Creating links: 	StatusWindow		Creazion colegaments: 
@@ -443,6 +445,7 @@ Sorry, saving more than one item is not allowed.	FilePanelPriv		Mi displâs, sal
 Move here	ContainerWindow		Sposte chi
 the config folder	FSUtils		la cartele di configurazion
 Sorry, could not create a new folder.	FSUtils		Nol è stât pussibil creâ une gnove cartele
+MIME Signature	AttributesView		Firme MIME
 Select all	VirtualDirectoryWindow		Selezione dut
 Rename	FSUtils	button label	Cambie non
 Clean up all	ContainerWindow		Met a puest dut

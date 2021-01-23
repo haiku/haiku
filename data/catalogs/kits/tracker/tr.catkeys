@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-libtracker	4172484236
+1	turkish	x-vnd.Haiku-libtracker	759131278
 Created	ContainerWindow		Oluşturulma
 Icon	AttributesView		Simge
 Open and make preferred	OpenWithWindow		Aç ve tercih edilen yap
@@ -6,6 +6,7 @@ Kind	ContainerWindow		Tür
 Open with…	ContainerWindow		Birlikte aç…
 Error moving \"%name\" to Trash. (%error)	FSUtils		\"%name\" Çöp'e taşınırken hata (%error)
 Or	FindPanel		veya
+MIME Description	AttributesView		MIME Tanımı
 before	FindPanel		önce
 Volume icons	TrackerSettingsWindow		Disk simgeleri
 Ignore case	SelectionWindow		BÜYÜK/küçük harf yoksay
@@ -329,6 +330,7 @@ Recent folders	FavoritesMenu		Son kullanılan klasörler
 Signed memory size	AttributesView		İmzalı bellek boyutu
 The specified name is illegal. Please choose another name.	FilePanelPriv		Belirtilen ad kullanılamaz. Lütfen başka bir ad seçin.
 of %items	StatusWindow		/ %items
+MIME Path	AttributesView		MIME Yolu
 less than	FindPanel		daha az
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		\"%name\" dosyasını kopyalarken hata:\n\t%error\n\nİşlem sürdürülsün mü?
 Creating links: 	StatusWindow		Bağlantılar oluşturuluyor: 
@@ -443,6 +445,7 @@ Sorry, saving more than one item is not allowed.	FilePanelPriv		Üzgünüm, bird
 Move here	ContainerWindow		Buraya taşı
 the config folder	FSUtils		yapılandırma klasörü
 Sorry, could not create a new folder.	FSUtils		Üzgünüm, yeni bir klasör oluşturulamadı.
+MIME Signature	AttributesView		MIME İmzası
 Select all	VirtualDirectoryWindow		Tümünü seç
 Rename	FSUtils	button label	Yeniden adlandır
 Clean up all	ContainerWindow		Hepsini toparla

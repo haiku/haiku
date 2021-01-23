@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Network	3062143965
+1	ukrainian	x-vnd.Haiku-Network	543099905
 Ethernet device	InterfaceListItem		Мережева карта
 Link speed:	IntefaceView		Швидкість з'єднання:
 disconnected	IntefaceView		від'єднано
@@ -13,6 +13,7 @@ Gateway:	IntefaceAddressView		Шлюз:
 The netmask defines your local network	IntefaceAddressView		Маска підмережі визначає вашу локальну мережу
 Your IP address	IntefaceAddressView		Ваша IP адреса
 DHCP	IntefaceAddressView		DHCP
+IP address:	IntefaceAddressView		IP-адреса:
 Netmask:	IntefaceAddressView		Маска підмережі:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Служби

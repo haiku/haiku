@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	1437654670
+1	german	x-vnd.Haiku-libtracker	2319269008
 Created	ContainerWindow		Erstellt
 Icon	AttributesView		Icon
 Open and make preferred	OpenWithWindow		Öffnen und zur Bevorzugten machen
@@ -6,6 +6,7 @@ Kind	ContainerWindow		Art
 Open with…	ContainerWindow		Öffnen mit...
 Error moving \"%name\" to Trash. (%error)	FSUtils		Fehler beim Verschieben von \"%name\" in den Papierkorb. (%error)
 Or	FindPanel		Oder
+MIME Description	AttributesView		MIME Beschreibung
 before	FindPanel		vor
 Volume icons	TrackerSettingsWindow		Datenträger-Icons
 Ignore case	SelectionWindow		Ignoriere Groß-/Kleinschreibung
@@ -324,6 +325,7 @@ Recent folders	FavoritesMenu		Letzte Ordner
 Signed memory size	AttributesView		Vorzeichenbehaftete Speichergröße
 The specified name is illegal. Please choose another name.	FilePanelPriv		Der angegebene Name ist nicht gültig. Bitte einen anderen wählen.
 of %items	StatusWindow		von %items
+MIME Path	AttributesView		MIME Pfad
 less than	FindPanel		kleiner als
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Fehler beim Kopieren der Datei \"%name\":\n\t%error\n\nSoll fortgefahren werden?
 Creating links: 	StatusWindow		Erstelle Verknüpfungen:
@@ -438,6 +440,7 @@ Sorry, saving more than one item is not allowed.	FilePanelPriv		Es kann leider i
 Move here	ContainerWindow		Hierher verschieben
 the config folder	FSUtils		der Config Ordner
 Sorry, could not create a new folder.	FSUtils		Der neue Ordner konnte leider nicht erstellt werden.
+MIME Signature	AttributesView		MIME Signatur
 Select all	VirtualDirectoryWindow		Alles auswählen
 Rename	FSUtils	button label	Umbenennen
 Clean up all	ContainerWindow		Icons ordnen

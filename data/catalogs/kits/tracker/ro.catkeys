@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	2498612740
+1	romanian	x-vnd.Haiku-libtracker	3380227078
 Created	ContainerWindow		Creat
 Icon	AttributesView		Iconiță
 Open and make preferred	OpenWithWindow		Deschide sau fixează ca preferat
@@ -6,6 +6,7 @@ Kind	ContainerWindow		Fel
 Open with…	ContainerWindow		Deschide cu…
 Error moving \"%name\" to Trash. (%error)	FSUtils		Eroare la mutarea \"%name\" la Gunoi. (%error)
 Or	FindPanel		Sau
+MIME Description	AttributesView		Descriere MIME
 before	FindPanel		înainte
 Volume icons	TrackerSettingsWindow		Pictograme de volum
 Ignore case	SelectionWindow		Ignoră caz
@@ -329,6 +330,7 @@ Recent folders	FavoritesMenu		Dosare recente
 Signed memory size	AttributesView		Dimensiune de memorie cu semn
 The specified name is illegal. Please choose another name.	FilePanelPriv		Numele specificat nu e legal. Alegeți altul.
 of %items	StatusWindow		din %items
+MIME Path	AttributesView		Cale MIME
 less than	FindPanel		mai puțin decât
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Eroare la copierea fișierului \"%name\":\n\t%error\n\nDoriți să continuați?
 Creating links: 	StatusWindow		Se creează legăturile: 
@@ -443,6 +445,7 @@ Sorry, saving more than one item is not allowed.	FilePanelPriv		Îmi pare rău, 
 Move here	ContainerWindow		Mută aici
 the config folder	FSUtils		dosarul config
 Sorry, could not create a new folder.	FSUtils		Îmi pare rău, nu s-a putut crea un dosar nou.
+MIME Signature	AttributesView		Semnătură MIME
 Select all	VirtualDirectoryWindow		Selectează toate
 Rename	FSUtils	button label	Redenumește
 Clean up all	ContainerWindow		Curăță tot

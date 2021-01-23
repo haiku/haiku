@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-DriveSetup	4252171725
+1	german	x-vnd.Haiku-DriveSetup	1072972032
 Could not unmount partition %s.	MainWindow		Partition \"%s\" konnte nicht ausgehangen werden.
 Mount all	MainWindow		Alle einhängen
 Disk	MainWindow		Datenträger
@@ -49,6 +49,7 @@ Are you sure you want to format a raw disk? (Most people initialize the disk wit
 Wipe (not implemented)	MainWindow		Löschen (nicht implementiert)
 The currently selected partition does not have a parent partition.	MainWindow		Die ausgewählte Partition hat keine übergeordnete Partition.
 Validation of the given initialization parameters failed.	MainWindow		Die Überprüfung der zum Initialisieren angegebenen Parameter ist fehlgeschlagen.
+Not formatted (%s)	PartitionList		Nicht formatiert (%s)
 Shared	PartitionList		Netzwerk
 MIMEs	PartitionList		MIMEs
 BitLocker encrypted	Encryption utils		BitLocker verschlüsselt
@@ -61,9 +62,11 @@ Change	ChangeParametersPanel		Ändern
 Partition name:	ChangeParametersPanel		Partitionsname:
 LUKS encrypted	Encryption utils		LUKS verschlüsselt
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Sollen die Änderungen wirklich auf den Datenträger geschrieben werden?\n\nAlle Daten auf der Partition \"%s\" gehen dabei unwiderruflich verloren!
+Empty space	PartitionList		Freier Platz
 Cancel	AbstractParametersPanel		Abbrechen
 Format	MainWindow		Formatieren
 OK	MainWindow		OK
+Empty space	DiskView		Freier Platz
 Open with DiskProbe	MainWindow		Öffnen mit DiskProbe
 Could not delete the selected partition.	MainWindow		Die gewählte Partition konnte nicht gelöscht werden.
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Soll der ausgewählte Datenträger wirklich formatiert werden? Alle Daten werden verloren gehen. Die Änderungen werden erst nach einer weiteren Bestätigung geschrieben.\n
@@ -80,6 +83,7 @@ Rescan	MainWindow		Aktualisieren
 There was an error acquiring the partition row.	MainWindow		Es ist ein interner Fehler aufgetreten.
 Failed to initialize the disk %s!\n	MainWindow		Initialisierung der Partition \"%s\" fehlgeschlagen!\n
 Disk system \"%s\" not found!	MainWindow		Medienschema \"%s\" nicht gefunden!
+The partition cannot be unmounted.	MainWindow		Die Partition kann nicht ausgehangen werden.
 Delete	MainWindow		Löschen
 Partition type:	ChangeParametersPanel		Partitionstyp:
 Parameters	PartitionList		Parameter

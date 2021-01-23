@@ -48,7 +48,7 @@ Reboot	SoftwareUpdaterWindow		Torne invie
 Show more details	SoftwareUpdaterWindow		Mostre plui detais
 Installing version	SoftwareUpdaterWindow	List item text	Instalazion de version
 Checking for updates	CheckManager		Control presince inzornaments
-No remote repositories are available	UpdateManager	Error message	Nissun dipuesit rimot disponibil
+No remote repositories are available	UpdateManager	Error message	Nissun dipuesit lontan disponibil
 Software {0, plural, one{update} other{updates}} available	CheckManager		{0, plural, one{Inzornament software disponibil} other{Inzornaments software disponibii}}
 Reboot	SoftwareUpdaterWindow	Button label	Torne invie
 Update	SoftwareUpdaterWindow	Alert button label	Inzorne
@@ -60,5 +60,5 @@ Uninstalling version	SoftwareUpdaterWindow	List item text	Disinstalazion de vers
 Quit	SoftwareUpdaterWindow		Jes
 No updates available	CheckManager		Nissun inzornament disponibil
 Usage:  SoftwareUpdater <command> [ <option> ]\nUpdates installed packages.\n\nCommands:\n  update     - Search repositories for updates on all packages.\n  check      - Check for available updates but only display a notification with results.\n  full-sync  - Synchronize the installed packages with the repositories.\n\nOptions:\n  -h or --help       Print this usage help\n  -v or --verbose    Output verbose information\n	SoftwareUpdaterApp	Command line usage help	Ûs:  SoftwareUpdater <comant> [ <opzions> ]\nAl inzorne i pachets instalâts.\n\nComants:\n  update     - Cîr tai dipuesits inzornaments par ducj i pachets.\n  check      - Cîr inzornaments disponibii, ma mostre dome une notifiche cui risultâts.\n  full-sync  - Sincronize i pachets instalâts cui dipuesits.\n\nOpzions:\n  -h o --help       Mostre chest messaç di jutori\n  -v o --verbose    Mostre informazions plui prolissis\n
-No remote repositories are available. Please verify that some repositories are enabled using the Repositories preflet or the 'pkgman' command.	SoftwareUpdaterWindow	Error message	Nissun dipuesit rimot disponibil. Par plasê, controle che cualchi dipuesit al sedi abilitât, doprant la preflet Dipuesits o il comant 'pkgman'.
+No remote repositories are available. Please verify that some repositories are enabled using the Repositories preflet or the 'pkgman' command.	SoftwareUpdaterWindow	Error message	Nissun dipuesit lontan disponibil. Par plasê, controle che al sedi abilitât cualchi dipuesit, doprant la preflet Dipuesits o il comant 'pkgman'.
 Downloading packages	UpdateManager		Daûr a discjariâ i pachets

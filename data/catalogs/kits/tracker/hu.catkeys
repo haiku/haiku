@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	2498612740
+1	hungarian	x-vnd.Haiku-libtracker	3380227078
 Created	ContainerWindow		Létrehozva
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Megnyitás és előnyben részesítés
@@ -6,6 +6,7 @@ Kind	ContainerWindow		Típus
 Open with…	ContainerWindow		Megnyitás…
 Error moving \"%name\" to Trash. (%error)	FSUtils		Hiba történt a Szemetesbe mozgatásakor: \"%name\" (%error)
 Or	FindPanel		Vagy
+MIME Description	AttributesView		MIME leírása
 before	FindPanel		előtte
 Volume icons	TrackerSettingsWindow		Lemez ikonok
 Ignore case	SelectionWindow		Nem betűérzékeny
@@ -329,6 +330,7 @@ Recent folders	FavoritesMenu		Legutóbb használt mappák
 Signed memory size	AttributesView		Előjeles memória méret
 The specified name is illegal. Please choose another name.	FilePanelPriv		A megadott név szabálytalan. Kérlek válassz egy másik nevet.
 of %items	StatusWindow		/ %items
+MIME Path	AttributesView		MIME útvonala
 less than	FindPanel		kisebb, mint
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Hiba történt a másolás közben: %name\n\t%error\n\nSzeretnéd folytatni?
 Creating links: 	StatusWindow		Hivatkozások készítése:
@@ -443,6 +445,7 @@ Sorry, saving more than one item is not allowed.	FilePanelPriv		Sajnálom, de eg
 Move here	ContainerWindow		Mozgatás ide
 the config folder	FSUtils		a konfigurációs mappa
 Sorry, could not create a new folder.	FSUtils		Nem sikerült az új mappát létrehozni.
+MIME Signature	AttributesView		MIME azonosítója
 Select all	VirtualDirectoryWindow		Összes kijelölése
 Rename	FSUtils	button label	Átnevezés
 Clean up all	ContainerWindow		Összes rendezése

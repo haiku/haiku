@@ -1,4 +1,5 @@
-1	romanian	x-vnd.Haiku-NetworkStatus	1162000463
+1	romanian	x-vnd.Haiku-NetworkStatus	2828540217
+IPv6 address:	NetworkStatusView		Adresă IPv6:
 Quit	NetworkStatusView		Închidere
 Unknown	NetworkStatusView		Necunoscut
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Lansarea prefletului de rețea a eșuat.\n\nEroare: 
@@ -6,14 +7,17 @@ Install in Deskbar	NetworkStatus		Instalează în bara de desktop
 NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		Opțiuni NetworkStatus:\n\t--deskbar\tadaugă automat replicantul pe Deskbar\n\t--help\t\ttipărește aceste informații și ieși
 Open network preferences…	NetworkStatusView		Deschide preferințe de rețea…
 NetworkStatus	System name		StareRețea
+Broadcast:	NetworkStatusView		Broadcast:
 OK	NetworkStatusView		OK
 No link	NetworkStatusView		Nicio legătură
 Could not join wireless network:\n	NetworkStatusView		Nu s-a putut face legătura la rețeaua fără fir:\n
 Ready	NetworkStatusView		Gata
 Network Status	NetworkStatusView		Stare Rețea
 Deskbar is not running, giving up.	NetworkStatus		Deskbar nu rulează, se renunță.
+Netmask:	NetworkStatusView		Mască de rețea:
 No stateful configuration	NetworkStatusView		Nicio configurație de stare
 You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Poți rula StareRețea într-o fereastră sau să-l instalezi în Deskbar.
+IPv4 address:	NetworkStatusView		Adresă IPv4:
 %ifaceName information:\n	NetworkStatusView		%ifaceName info:\n
 Run in window	NetworkStatus		Rulează în fereastră
 <no wireless networks found>	NetworkStatusView		<nu s-au găsit rețele fără fir>

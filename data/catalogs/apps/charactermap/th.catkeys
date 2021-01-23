@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-CharacterMap	1505553464
+1	thai	x-vnd.Haiku-CharacterMap	2895648104
 Tirhuta	UnicodeBlocks		Tirhuta
 Miscellaneous mathematical symbols B	UnicodeBlocks		สัญลักษณ์ทางคณิตศาสตร์เบ็ดเตล็ด B
 Latin extended E	UnicodeBlocks		Latin ขยาย E
@@ -175,6 +175,7 @@ Lao	UnicodeBlocks		ลาว
 Chorasmian	UnicodeBlocks		Chorasmian
 Lisu supplement	UnicodeBlocks		อักษรเสริม ภาษาลีซอ
 Takri	UnicodeBlocks		ภาษาตะกรี
+Shorthand format controls	UnicodeBlocks		การควบคุมรูปแบบชวเลข
 Optical character recognition	UnicodeBlocks		การจดจำอักขระด้วยแสง
 Tamil	UnicodeBlocks		ทมิฬ
 Greek extended	UnicodeBlocks		กรีก เพิ่มเติม
