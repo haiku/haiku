@@ -64,12 +64,19 @@ EfiDevice::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 	off_t offset = pos % BlockSize();
 	pos /= BlockSize();
 
-	uint32 numBlocks = (offset + bufferSize + BlockSize()) / BlockSize();
-	char readBuffer[numBlocks * BlockSize()];
+	uint32 numBlocks = (offset + bufferSize + BlockSize() - 1) / BlockSize();
+
+	// TODO: We really should implement memalign and align all requests to
+	// fBlockIo->Media->IoAlign. This static alignment is large enough though
+	// to catch most required alignments.
+	char readBuffer[numBlocks * BlockSize()]
+		__attribute__((aligned(2048)));
 
 	if (fBlockIo->ReadBlocks(fBlockIo, fBlockIo->Media->MediaId,
-		pos, sizeof(readBuffer), readBuffer) != EFI_SUCCESS)
+		pos, sizeof(readBuffer), readBuffer) != EFI_SUCCESS) {
+		dprintf("%s: blockIo error reading from device!\n", __func__);
 		return B_ERROR;
+	}
 
 	memcpy(buffer, readBuffer + offset, bufferSize);
 
@@ -145,7 +152,7 @@ platform_add_boot_device(struct stage2_args *args, NodeList *devicesList)
 			panic("Cannot get block device handle!");
 
 		TRACE("%s: %p: present: %s, logical: %s, removeable: %s, "
-			"blocksize: %" B_PRIuSIZE ", lastblock: %" B_PRIu64 "\n",
+			"blocksize: %" B_PRIu32 ", lastblock: %" B_PRIu64 "\n",
 			__func__, blockIo,
 			blockIo->Media->MediaPresent ? "true" : "false",
 			blockIo->Media->LogicalPartition ? "true" : "false",
