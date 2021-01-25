@@ -39,7 +39,7 @@
 #ifdef EOF
 #	undef EOF
 #endif
-#define EOF -1
+#define EOF (-1)
 
 #ifndef SEEK_SET
 #	define SEEK_SET 0
