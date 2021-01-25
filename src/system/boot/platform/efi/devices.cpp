@@ -8,6 +8,9 @@
 #include <boot/platform.h>
 #include <boot/stage2.h>
 
+#include <boot/net/NetStack.h>
+#include <boot/net/RemoteDisk.h>
+
 #include "Header.h"
 
 #include "efi_platform.h"
@@ -181,6 +184,20 @@ platform_add_boot_device(struct stage2_args *args, NodeList *devicesList)
 	efi_block_io_protocol *blockIo;
 	size_t memSize = 0;
 
+	// If the bootloader was started from the network (net_stack_init will find
+	// the ip= parameter in the LoadOptions), add network booting as the first
+	// entry if available
+	status_t error = net_stack_init();
+	if (error != B_OK) {
+		TRACE("Can't init network...\n");
+	} else {
+		TRACE("Network is initialized! Search for remote disk...\n");
+		RemoteDisk *remoteDisk = RemoteDisk::FindAnyRemoteDisk();
+		if (remoteDisk != NULL) {
+			devicesList->Add(remoteDisk);
+		}
+	}
+
 	// Read to zero sized buffer to get memory needed for handles
 	if (kBootServices->LocateHandle(ByProtocol, &BlockIoGUID, 0, &memSize, 0)
 			!= EFI_BUFFER_TOO_SMALL)
@@ -225,6 +242,7 @@ platform_add_boot_device(struct stage2_args *args, NodeList *devicesList)
 			panic("Can't allocate memory for block devices!");
 		devicesList->Insert(device);
 	}
+
 	return devicesList->Count() > 0 ? B_OK : B_ENTRY_NOT_FOUND;
 }
 

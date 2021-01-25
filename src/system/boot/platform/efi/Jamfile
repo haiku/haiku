@@ -32,6 +32,7 @@ local platform_src =
 	video.cpp
 	debug.cpp
 	mmu.cpp
+	network.cpp
 	heap.cpp
 	acpi.cpp
 	timer.cpp

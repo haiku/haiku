@@ -13,7 +13,7 @@ extern efi_guid DevicePathProtocol;
 typedef struct efi_device_path_protocol {
     uint8_t Type;
     uint8_t SubType;
-    uint8_t Length[2];
+    uint16_t Length;
 } efi_device_path_protocol;
 
 #define DEVICE_PATH_HARDWARE       0x01
