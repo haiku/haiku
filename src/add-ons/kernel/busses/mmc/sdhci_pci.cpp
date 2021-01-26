@@ -672,13 +672,16 @@ init_bus(device_node* node, void** bus_cookie)
 		return -1;
 
 	// Ignore invalid bars
-	if (pciInfo.u.h0.base_register_sizes[bar] == 0)
-		return -1;
-
 	TRACE("Register SD bus at slot %d, using bar %d\n", slot + 1, bar);
 
 	pci_info pciInfo;
 	pci->get_pci_info(device, &pciInfo);
+
+	if (pciInfo.u.h0.base_register_sizes[bar] == 0) {
+		ERROR("No registers to map\n");
+		return -1;
+	}
+
 	int msiCount = sPCIx86Module->get_msi_count(pciInfo.bus,
 		pciInfo.device, pciInfo.function);
 	TRACE("interrupts count: %d\n",msiCount);
