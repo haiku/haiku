@@ -32,7 +32,9 @@ extern FILE *stderr;
 #	define SEEK_END 2
 #endif
 
-#define EOF -1
+#ifndef EOF
+#	define EOF (-1)
+#endif
 
 #define __PRINTFLIKE(a, b)
 
