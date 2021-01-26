@@ -671,6 +671,10 @@ init_bus(device_node* node, void** bus_cookie)
 		|| gDeviceManager->get_attr_uint8(node, BAR_INDEX, &bar, false) < B_OK)
 		return -1;
 
+	// Ignore invalid bars
+	if (pciInfo.u.h0.base_register_sizes[bar] == 0)
+		return -1;
+
 	TRACE("Register SD bus at slot %d, using bar %d\n", slot + 1, bar);
 
 	pci_info pciInfo;
