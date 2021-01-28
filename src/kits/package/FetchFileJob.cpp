@@ -140,8 +140,8 @@ FetchFileJob::DataReceived(BUrlRequest*, const char* data, off_t position,
 
 
 void
-FetchFileJob::DownloadProgress(BUrlRequest*, ssize_t bytesReceived,
-	ssize_t bytesTotal)
+FetchFileJob::DownloadProgress(BUrlRequest*, off_t bytesReceived,
+	off_t bytesTotal)
 {
 	if (bytesTotal != 0) {
 		fBytes = bytesReceived;
