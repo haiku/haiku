@@ -31,9 +31,9 @@ public:
 									const char* data, off_t position,
 									ssize_t size);
 			void				DownloadProgress(BUrlRequest* caller,
-									off_t bytesReceived, ssize_t bytesTotal);
+									off_t bytesReceived, off_t bytesTotal);
 			void				UploadProgress(BUrlRequest* caller,
-									off_t bytesSent, ssize_t bytesTotal);
+									off_t bytesSent, off_t bytesTotal);
 			void				RequestCompleted(BUrlRequest* caller,
 									bool success);
 			void				DebugMessage(BUrlRequest* caller,

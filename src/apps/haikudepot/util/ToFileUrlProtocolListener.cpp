@@ -94,14 +94,14 @@ ToFileUrlProtocolListener::DataReceived(BUrlRequest* caller, const char* data,
 
 void
 ToFileUrlProtocolListener::DownloadProgress(BUrlRequest* caller,
-	ssize_t bytesReceived, ssize_t bytesTotal)
+	off_t bytesReceived, off_t bytesTotal)
 {
 }
 
 
 void
 ToFileUrlProtocolListener::UploadProgress(BUrlRequest* caller,
-	ssize_t bytesSent, ssize_t bytesTotal)
+	off_t bytesSent, off_t bytesTotal)
 {
 }
 
