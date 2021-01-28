@@ -57,6 +57,7 @@ BUrlProtocolListener::DataReceived(BUrlRequest*, const char*, off_t, ssize_t)
 }
 
 
+#ifdef LIBNETAPI_DEPRECATED
 void
 BUrlProtocolListener::DownloadProgress(BUrlRequest*, ssize_t, ssize_t)
 {
@@ -67,6 +68,20 @@ void
 BUrlProtocolListener::UploadProgress(BUrlRequest*, ssize_t, ssize_t)
 {
 }
+
+#else
+
+void
+BUrlProtocolListener::DownloadProgress(BUrlRequest*, off_t, off_t)
+{
+}
+
+
+void
+BUrlProtocolListener::UploadProgress(BUrlRequest*, off_t, off_t)
+{
+}
+#endif // LIBNETAPI_DEPRECATED
 
 
 void

@@ -88,6 +88,7 @@ BUrlSynchronousRequest::DataReceived(BUrlRequest*, const char*,
 }
 
 
+#ifdef LIBNETAPI_DEPRECATED
 void
 BUrlSynchronousRequest::DownloadProgress(BUrlRequest*,
 	ssize_t bytesReceived, ssize_t bytesTotal)
@@ -104,6 +105,28 @@ BUrlSynchronousRequest::UploadProgress(BUrlRequest*, ssize_t bytesSent,
 	PRINT(("SynchronousRequest::UploadProgress(%zd, %zd)\n", bytesSent,
 		bytesTotal));
 }
+
+
+#else
+
+
+void
+BUrlSynchronousRequest::DownloadProgress(BUrlRequest*,
+	off_t bytesReceived, off_t bytesTotal)
+{
+	PRINT(("SynchronousRequest::DownloadProgress(%" B_PRIdOFF ", %" B_PRIdOFF
+		")\n", bytesReceived, bytesTotal));
+}
+
+
+void
+BUrlSynchronousRequest::UploadProgress(BUrlRequest*, off_t bytesSent,
+	off_t bytesTotal)
+{
+	PRINT(("SynchronousRequest::UploadProgress(%" B_PRIdOFF ", %" B_PRIdOFF
+		")\n", bytesSent, bytesTotal));
+}
+#endif // LIBNETAPI_DEPRECATED
 
 
 void

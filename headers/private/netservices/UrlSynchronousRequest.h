@@ -35,10 +35,19 @@ public:
 	virtual void				DataReceived(BUrlRequest* caller,
 									const char* data, off_t position,
 									ssize_t size);
+
+#ifdef LIBNETAPI_DEPRECATED
 	virtual	void				DownloadProgress(BUrlRequest* caller,
 									ssize_t bytesReceived, ssize_t bytesTotal);
 	virtual void				UploadProgress(BUrlRequest* caller,
 									ssize_t bytesSent, ssize_t bytesTotal);
+#else
+	virtual	void				DownloadProgress(BUrlRequest* caller,
+									off_t bytesReceived, off_t bytesTotal);
+	virtual void				UploadProgress(BUrlRequest* caller,
+									off_t bytesSent, off_t bytesTotal);
+#endif //LIBNETAPI_DEPRECATED
+
 	virtual void				RequestCompleted(BUrlRequest* caller,
 									bool success);
 									

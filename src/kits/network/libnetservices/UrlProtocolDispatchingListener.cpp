@@ -107,7 +107,7 @@ BUrlProtocolDispatchingListener::DataReceived(BUrlRequest* caller,
 #ifdef LIBNETAPI_DEPRECATED
 void
 BUrlProtocolDispatchingListener::DownloadProgress(BUrlRequest* caller,
-	size_t bytesReceived, size_t bytesTotal)
+	ssize_t bytesReceived, ssize_t bytesTotal)
 {
 	BMessage message(B_URL_PROTOCOL_NOTIFICATION);
 	message.AddInt32("url:bytesReceived", bytesReceived);
@@ -119,7 +119,7 @@ BUrlProtocolDispatchingListener::DownloadProgress(BUrlRequest* caller,
 
 void
 BUrlProtocolDispatchingListener::UploadProgress(BUrlRequest* caller,
-	size_t bytesSent, size_t bytesTotal)
+	ssize_t bytesSent, ssize_t bytesTotal)
 {
 	BMessage message(B_URL_PROTOCOL_NOTIFICATION);
 	message.AddInt32("url:bytesSent", bytesSent);
