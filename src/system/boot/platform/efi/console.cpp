@@ -249,7 +249,10 @@ console_control(bool graphics)
 status_t
 console_init(void)
 {
-	console_control(true);
+	// Solves video issues on Apple hardware. This is non-standard and
+	// deprecated and should not be used for anything else!
+	console_control(false);
+
 	update_screen_size();
 	console_hide_cursor();
 	console_clear_screen();
