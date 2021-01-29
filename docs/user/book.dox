@@ -65,6 +65,7 @@
 	- \ref drivers
 	- \ref keyboard
 	- \ref json
+	- \ref netservices
 */
 
 ///// Define main kits /////
@@ -606,4 +607,28 @@ snooze_until(time - Latency(), B_SYSTEM_TIMEBASE);
 
 	\defgroup json Json Handling
 	\brief Provides for parsing and writing of data in Json encoding.
+
+	\defgroup netservices Experimental Network Services Support
+	\brief Experimental API to do higher level network requests
+
+	This API currently is marked as experimental. It is part of the
+	<code>BPrivate::Network</code> namespace, the header files are found at
+	<code>headers\\private\\netservices</code>, and you have to link your
+	application to <code>libnetservices.a</code>.
 */
+
+
+///// Namespace Documentation /////
+
+
+//! \brief Internal or experimental API
+namespace BPrivate {
+	/*!
+		\brief Experimental Network Services API
+
+		See \ref netservices for more information.
+	*/
+	namespace Network {
+
+	}
+}

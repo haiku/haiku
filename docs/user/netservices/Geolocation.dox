@@ -4,23 +4,23 @@
  *
  * Authors:
  *		Adrien Destugues, pulkomandy@pulkomandy.tk
- * 
+ *
  * Corresponds to:
- *		headers/private/shared/Geolocation.h	hrev53611
- *		src/kits/shared/Geolocation.cpp			hrev53613S
+ *		headers/private/netservices/Geolocation.h		hrev54923
+ *		src/kits/network/libnetservices/Geolocation.cpp	hrev54923
  */
 
 
 /*!
 	\file Geolocation.h
-	\ingroup shared
+	\ingroup netservices
 	\brief Geolocation and geocoding services.
 */
 
 
 /*!
-	\class BGeolocation
-	\ingroup shared
+	\class BPrivate::Network::BGeolocation
+	\ingroup netservices
 	\brief Geolocation and geocoding services.
 
 	Geolocation allows to know where the computer is currently located.

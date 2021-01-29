@@ -6,19 +6,19 @@
  *		Adrien Destugues, pulkomandy@pulkomandy.tk
  *
  * Corresponds to:
- *		headers/os/net/HttpHeaders.h rev 39161
- *		src/kits/network/libnetapi/HttpHeaders.cpp rev 45253
+ *		headers/private/netservices/HttpHeaders.h		hrev54923
+ *		src/kits/network/libnetservices/HttpHeaders.cpp	hrev54923
  */
 
 /*!
 	\file HttpHeaders.h
-	\ingroup network
+	\ingroup netservices
 	\brief Management of HTTP headers
 */
 
 /*!
-	\class BHttpHeader
-	\ingroup network
+	\class BPrivate::Network::BHttpHeader
+	\ingroup netservices
 	\brief Represent a single header field for an HTTP connection
 
 	HTTP headers are key-value pairs, where both the key and the value are
@@ -110,8 +110,8 @@
 */
 
 /*!
-	\class BHttpHeaders
-	\ingroup network
+	\class BPrivate::Network::BHttpHeaders
+	\ingroup netservices
 	\brief Container for a set of HTTP headers.
 
 	This class allows management of the set of headers for a single HTTP

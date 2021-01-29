@@ -6,21 +6,21 @@
  *		Leorize, leorize+oss@disroot.org
  *
  * Corresponds to:
- *		headers/os/net/UrlProtocolAsynchronousListener.h hrev54280
- *		src/kits/network/libnetapi/UrlProtocolAsynchronousListener.cpp hrev54280
+ *		headers/private/netservices/UrlProtocolAsynchronousListener.h	hrev54923
+ *		src/kits/network/libnetapi/UrlProtocolAsynchronousListener.cpp	hrev54923
  */
 
 
 /*!
 	\file UrlProtocolAsynchronousListener.h
-	\ingroup network
+	\ingroup netservices
 	\brief Provides the BUrlProtocolAsynchronousListener interface.
 */
 
 
 /*!
-	\class BUrlProtocolAsynchronousListener
-	\ingroup network
+	\class BPrivate::Network::BUrlProtocolAsynchronousListener
+	\ingroup netservices
 	\brief Provides a handler for BUrlProtocolDispatchingListener.
 
 	BUrlProtocolAsynchronousListener transparently handles BMessage issued by

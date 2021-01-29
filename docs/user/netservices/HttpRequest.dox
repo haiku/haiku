@@ -7,21 +7,21 @@
  *		John Scipione, jscipione@gmail.com
  *
  * Corresponds to:
- *		headers/os/net/HttpRequest.h hrev46314
- *		src/kits/network/libnetapi/HttpRequest.cpp hrev46314
+ *		headers/private/netservices/HttpRequest.h		hrev54923
+ *		src/kits/network/libnetservices/HttpRequest.cpp	hrev54923
  */
 
 
 /*!
 	\file HttpRequest.h
-	\ingroup network
+	\ingroup netservices
 	\brief Management of HTTP or HTTPS protocol requests
 */
 
 
 /*!
-	\class BHttpRequest
-	\ingroup network
+	\class BPrivate::Network::BHttpRequest
+	\ingroup netservices
 	\brief Handles a request over HTTP or HTTPS.
 
 	Instances of ths class will be created by the BUrlProtocolRoster for

@@ -6,21 +6,21 @@
  *		Leorize, leorize+oss@disroot.org
  *
  * Corresponds to:
- *		headers/os/net/UrlProtocolRoster.h hrev54280
- *		src/kits/network/libnetapi/UrlProtocolRoster.cpp hrev54280
+ *		headers/private/netservices/UrlProtocolRoster.h			hrev54923
+ *		src/kits/network/libnetservices/UrlProtocolRoster.cpp	hrev54923
  */
 
 
 /*!
 	\file UrlProtocolRoster.h
-	\ingroup network
+	\ingroup netservices
 	\brief Provides the BUrlProtocolRoster interface.
 */
 
 
 /*!
-	\class BUrlProtocolRoster
-	\ingroup network
+	\class BPrivate::Network::BUrlProtocolRoster
+	\ingroup netservices
 	\brief Interfaces for protocol-agnostic operations.
 */
 

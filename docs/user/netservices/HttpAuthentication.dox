@@ -6,19 +6,19 @@
  *		Adrien Destugues, pulkomandy@pulkomandy.tk
  *
  * Corresponds to:
- *		headers/os/net/HttpAuthentication.h rev 39161
- *		src/kits/network/libnetapi/HttpAuthentication.cpp rev 45363
+ *		headers/private/netservices/HttpAuthentication.h		hrev54923
+ *		src/kits/network/libnetservices/HttpAuthentication.cpp	hrev54923
  */
 
 /*!
 	\file HttpAuthentication.h
-	\ingroup network
+	\ingroup netservices
 	\brief Authentication token for use in HTTP protocol communications.
 */
 
 /*!
-	\class BHttpAuthentication
-	\ingroup network
+	\class BPrivate::Network::BHttpAuthentication
+	\ingroup netservices
 	\brief Authentication token for the HTTP protocol.
 
 	This class allows managing of an authenticated http session. It stores the

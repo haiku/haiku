@@ -832,6 +832,7 @@ INPUT                  = . \
                          midi \
                          midi2 \
                          net \
+                         netservices \
                          posix \
                          shared \
                          storage \
@@ -856,7 +857,14 @@ INPUT                  = . \
                          ../../headers/os/translation \
                          ../../headers/posix/syslog.h \
                          ../../src/kits/game/GameProducer.h \
-                         ../../headers/private/shared/Geolocation.h
+                         ../../headers/private/netservices/Geolocation.h \
+                         ../../headers/private/netservices/HttpAuthentication.h \
+                         ../../headers/private/netservices/HttpForm.h \
+                         ../../headers/private/netservices/HttpHeaders.h \
+                         ../../headers/private/netservices/HttpRequest.h \
+                         ../../headers/private/netservices/UrlProtocolAsynchronousListener.h \
+                         ../../headers/private/netservices/UrlProtocolListener.h \
+                         ../../headers/private/netservices/UrlProtocolRoster.h
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses

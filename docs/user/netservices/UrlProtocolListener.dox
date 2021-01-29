@@ -6,20 +6,20 @@
  *		Leorize, leorize+oss@disroot.org
  *
  * Corresponds to:
- *		headers/os/net/UrlProtocolListener.h hrev54280
- *		src/kits/network/libnetapi/UrlProtocolListener.cpp hrev54280
+ *		headers/private/netservices/UrlProtocolListener.h	hrev54923
+ *		src/kits/network/libnetapi/UrlProtocolListener.cpp	hrev54923
  */
 
 
 /*!
 	\file UrlProtocolListener.h
-	\ingroup network
+	\ingroup netservices
 	\brief Provides the BUrlProtocolListener abstract interface.
 */
 
 
 /*!
-	\enum BUrlProtocolDebugMessage
+	\enum BPrivate::Network::BUrlProtocolDebugMessage
 	\brief The type of the debug message.
 */
 
@@ -61,8 +61,8 @@
 
 
 /*!
-	\class BUrlProtocolListener
-	\ingroup network
+	\class BPrivate::Network::BUrlProtocolListener
+	\ingroup netservices
 	\brief Abstract interface for handling BUrlRequest events.
 
 	BUrlProtocolListener is the base class for handling networking events from
@@ -129,7 +129,7 @@
 
 /*!
 	\fn virtual void BUrlProtocolListener::DownloadProgress(BUrlRequest* caller,
-		ssize_t bytesReceived, ssize_t bytesTotal)
+		off_t bytesReceived, off_t bytesTotal)
 	\brief Called each time a block of data is downloaded.
 
 	This callback will usually be called after DataReceived().
@@ -147,7 +147,7 @@
 
 /*!
 	\fn virtual void BUrlProtocolListener::UploadProgress(BUrlRequest* caller,
-		ssize_t bytesSent, ssize_t bytesTotal)
+		off_t bytesSent, off_t bytesTotal)
 	\brief Called each time a block of data is sent.
 
 	\note Currently this callback is never called.

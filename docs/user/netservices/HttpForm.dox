@@ -7,21 +7,21 @@
  *		John Scipione, jscipione@gmail.com
  *
  * Corresponds to:
- *		headers/os/net/HttpForm.h hrev46314
- *		src/kits/network/libnetapi/HttpForm.cpp hrev46314
+ *		headers/private/netservices/HttpForm.h			hrev54923
+ *		src/kits/network/libnetservices/HttpForm.cpp	hrev54923
  */
 
 
 /*!
 	\file HttpForm.h
-	\ingroup network
+	\ingroup netservices
 	\brief Management of HTTP form data
 */
 
 
 /*!
-	\enum form_type
-	\ingroup network
+	\enum BPrivate::Network::form_type
+	\ingroup netservices
 */
 
 
@@ -36,8 +36,8 @@
 
 
 /*!
-	\enum form_content_type
-	\ingroup network
+	\enum BPrivate::Network::form_content_type
+	\ingroup netservices
 */
 
 
@@ -62,8 +62,8 @@
 
 
 /*!
-	\class BHttpFormData
-	\ingroup network
+	\class BPrivate::Network::BHttpFormData
+	\ingroup netservices
 	\brief Stores a form data entry sent or received during an HTTP request.
 
 	Each element in a form is stored in an instance of this class. The values
@@ -81,7 +81,7 @@
 
 
 /*!
-	\fn BHttpFormData::BHttpFormData(const BString& name, const BPath& value)
+	\fn BHttpFormData::BHttpFormData(const BString& name, const BPath& file)
 	\brief Construct a BHttpFormData object which value is a file contents
 */
 
@@ -199,8 +199,8 @@
 
 
 /*!
-	\class BHttpForm
-	\ingroup network
+	\class BPrivate::Network::BHttpForm
+	\ingroup netservices
 	\brief Container for all the BHttpFormData instances making up an HTTP form contents.
 */
 
@@ -361,8 +361,8 @@
 
 
 /*!
-	\class BHttpForm::Iterator
-	\ingroup network
+	\class BPrivate::Network::BHttpForm::Iterator
+	\ingroup netservices
 	\brief Form Iterator.
 */
 
