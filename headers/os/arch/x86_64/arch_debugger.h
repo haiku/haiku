@@ -6,9 +6,6 @@
 #define _ARCH_X86_64_DEBUGGER_H
 
 
-#if __x86_64__
-
-
 #include <posix/arch/x86_64/signal.h>
 
 
@@ -42,9 +39,6 @@ struct x86_64_debug_cpu_state {
 	uint64	rsp;
 	uint64	ss;
 } __attribute__((aligned(16)));
-
-
-#endif
 
 
 #endif	// _ARCH_X86_64_DEBUGGER_H

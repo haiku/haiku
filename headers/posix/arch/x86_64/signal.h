@@ -2,15 +2,14 @@
  * Copyright 2002-2012 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
-#ifndef _ARCH_SIGNAL_H_
-#define _ARCH_SIGNAL_H_
+#ifndef _ARCH_X86_64_SIGNAL_H_
+#define _ARCH_X86_64_SIGNAL_H_
 
 
 /*
  * Architecture-specific structure passed to signal handlers
  */
 
-#if __x86_64__
 
 struct x86_64_fp_register {
 	unsigned char value[10];
@@ -62,6 +61,9 @@ struct savefpu {
 };
 
 
+#ifdef __x86_64__
+
+
 struct vregs {
 	unsigned long		rax;
 	unsigned long		rbx;
@@ -87,6 +89,7 @@ struct vregs {
 };
 
 
-#endif /* __x86_64__ */
+#endif
 
-#endif /* _ARCH_SIGNAL_H_ */
+
+#endif /* _ARCH_X86_64_SIGNAL_H_ */

@@ -2,8 +2,8 @@
  * Copyright 2019 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
-#ifndef _ARCH_SIGNAL_H_
-#define _ARCH_SIGNAL_H_
+#ifndef _ARCH_SPARC64_SIGNAL_H_
+#define _ARCH_SPARC64_SIGNAL_H_
 
 
 /*
@@ -52,4 +52,4 @@ struct vregs
 
 #endif /* __sparc64__ */
 
-#endif /* _ARCH_SIGNAL_H_ */
+#endif /* _ARCH_SPARC64_SIGNAL_H_ */

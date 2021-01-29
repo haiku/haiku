@@ -2,8 +2,8 @@
  * Copyright 2008-2012 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
-#ifndef _ARCH_SIGNAL_H_
-#define _ARCH_SIGNAL_H_
+#ifndef _ARCH_ARM_SIGNAL_H_
+#define _ARCH_ARM_SIGNAL_H_
 
 
 /*
@@ -35,4 +35,4 @@ struct vregs
 #endif /* defined(__arm__) */
 
 
-#endif /* _ARCH_SIGNAL_H_ */
+#endif /* _ARCH_ARM_SIGNAL_H_ */
