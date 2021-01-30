@@ -17,7 +17,7 @@ Locale	Locale Preflet		Yerel Ayarlar
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Kullanılabilir diller bulunamıyor! Bu preflet'i kullanamazsınız!
 Formatting	Locale Preflet Window		Biçimlendirme
 Use month/day-names from preferred language	TimeFormatSettings		Ay/gün adlarını tercih edilen dillerden al
-already chosen	LanguageListView		zaten seçilmiş
+already chosen	LanguageListView		halihazırda seçili
 Preferred languages	Locale Preflet Window		Tercih edilen diller
 Full format:	TimeFormatSettings		Tam biçim:
 Cancel	Locale Preflet Window		İptal

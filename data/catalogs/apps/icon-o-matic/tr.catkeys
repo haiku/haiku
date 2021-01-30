@@ -61,7 +61,7 @@ Snap to grid	Icon-O-Matic-Menu-Settings		Izgaraya hizala
 Opening the document failed!	Icon-O-Matic-Main		Belge açılamadı!
 Shape	Icon-O-Matic-Menus		Şekil
 Add with path & style	Icon-O-Matic-ShapesList		Yol ve biçem ile ekle
-<unavailable>	Icon-O-Matic-StyleTypes		<mevcut değil>
+<unavailable>	Icon-O-Matic-StyleTypes		<yok>
 Min LOD	Icon-O-Matic-PropertyNames		En düşük ayrıntı düzeyi
 Reverse Path	Icon-O-Matic-ReversePathCmd		Yolu tersine çevir
 Move Transformers	Icon-O-Matic-MoveTransformersCmd		Dönüştürücüleri taşı

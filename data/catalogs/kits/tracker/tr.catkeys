@@ -126,7 +126,7 @@ List folders first	SettingsView		Klasörleri ilk listele
 Find	FSUtils		Bul
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Bu klasörde \"%name\" adında bir öge hâlihazırda mevcut. Bu ögeyi oluşturduğunuz sembolik bağlantı ile değiştirmek istediğinizden emin misiniz?
 List view	ContainerWindow		Liste görünümü
-Temporary	FindPanel		Geçici dosyalar
+Temporary	FindPanel		Sorguyu kaydetme
 Modified	QueryPoseView		Değiştirilme
 Create relative link	ContainerWindow		Göreceli bağlantı oluştur
 Owner	FilePermissionsView		Sahibi
