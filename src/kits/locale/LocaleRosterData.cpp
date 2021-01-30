@@ -335,6 +335,7 @@ LocaleRosterData::_InitializeCatalogAddOns()
 	if (!defaultCatalogAddOnInfo)
 		return B_NO_MEMORY;
 
+	defaultCatalogAddOnInfo->MakeSureItsLoaded();
 	defaultCatalogAddOnInfo->fInstantiateFunc = DefaultCatalog::Instantiate;
 	defaultCatalogAddOnInfo->fCreateFunc = DefaultCatalog::Create;
 	fCatalogAddOnInfos.AddItem((void*)defaultCatalogAddOnInfo);
