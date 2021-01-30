@@ -100,7 +100,9 @@ cstates_idle(void)
 	bigtime_t delta = system_time() - start;
 	locker.Unlock();
 
-	sIdleTime[cpu] = (idleTime + delta) / 2;
+	// Negative delta shouldn't happen, but apparently it does...
+	if (delta >= 0)
+		sIdleTime[cpu] = (idleTime + delta) / 2;
 }
 
 
