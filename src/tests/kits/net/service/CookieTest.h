@@ -9,9 +9,14 @@
 #include <TestCase.h>
 #include <TestSuite.h>
 
-
-class BNetworkCookie;
-class BNetworkCookieJar;
+namespace BPrivate {
+	namespace Network {
+		class BNetworkCookie;
+		class BNetworkCookieJar;
+	}
+}
+using BPrivate::Network::BNetworkCookie;
+using BPrivate::Network::BNetworkCookieJar;
 class BUrl;
 
 

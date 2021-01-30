@@ -19,6 +19,9 @@
 #include "TestServer.h"
 
 
+using namespace BPrivate::Network;
+
+
 class StopTestListener : public BUrlProtocolListener {
 public:
 	StopTestListener() {}

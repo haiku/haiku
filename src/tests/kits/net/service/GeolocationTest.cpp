@@ -12,7 +12,7 @@
 #include <cppunit/TestSuite.h>
 
 
-using namespace BPrivate;
+using namespace BPrivate::Network;
 
 
 GeolocationTest::GeolocationTest()

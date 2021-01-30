@@ -17,6 +17,10 @@
 #include <cppunit/TestSuite.h>
 
 
+using BPrivate::Network::BUrlProtocolListener;
+using BPrivate::Network::BUrlRequest;
+
+
 class DataTest: public BTestCase, BUrlProtocolListener {
 public:
 								DataTest();

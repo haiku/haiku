@@ -10,7 +10,6 @@
 
 #include "CalendarViewTest.h"
 #include "DriverSettingsMessageAdapterTest.h"
-#include "GeolocationTest.h"
 #include "NaturalCompareTest.h"
 #include "JsonEndToEndTest.h"
 #include "JsonErrorHandlingTest.h"
@@ -27,7 +26,6 @@ getTestSuite()
 
 	CalendarViewTest::AddTests(*suite);
 	DriverSettingsMessageAdapterTest::AddTests(*suite);
-	GeolocationTest::AddTests(*suite);
 	NaturalCompareTest::AddTests(*suite);
 	JsonEndToEndTest::AddTests(*suite);
 	JsonErrorHandlingTest::AddTests(*suite);

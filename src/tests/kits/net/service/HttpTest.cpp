@@ -27,6 +27,9 @@
 #include "TestServer.h"
 
 
+using namespace BPrivate::Network;
+
+
 namespace {
 
 typedef std::map<std::string, std::string> HttpHeaderMap;

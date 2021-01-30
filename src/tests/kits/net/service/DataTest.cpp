@@ -13,6 +13,9 @@
 #include <cppunit/TestCaller.h>
 
 
+using namespace BPrivate::Network;
+
+
 // http://www-archive.mozilla.org/quality/networking/testing/datatests.html
 
 

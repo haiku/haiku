@@ -8,7 +8,7 @@ SubDirHdrs [ FDirName $(HAIKU_TOP) src apps haikudepot server ] ;
 SubDirHdrs [ FDirName $(HAIKU_TOP) src apps haikudepot server dumpexportrepository ] ;
 SubDirHdrs [ FDirName $(HAIKU_TOP) src apps haikudepot util ] ;
 
-UsePrivateHeaders shared interface ;
+UsePrivateHeaders interface netservices shared ;
 
 local sourceDirs =
 	model

@@ -17,6 +17,9 @@
 #include <cppunit/TestSuite.h>
 
 
+using namespace BPrivate::Network;
+
+
 CookieTest::CookieTest()
 {
 }
