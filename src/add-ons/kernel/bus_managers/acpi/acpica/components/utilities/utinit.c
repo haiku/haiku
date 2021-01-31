@@ -316,7 +316,7 @@ AcpiUtInitGlobals (
 
     /* Global Lock support */
 
-    AcpiGbl_GlobalLockSemaphore         = NULL;
+    AcpiGbl_GlobalLockSemaphore         = -1;
     AcpiGbl_GlobalLockMutex             = NULL;
     AcpiGbl_GlobalLockAcquired          = FALSE;
     AcpiGbl_GlobalLockHandle            = 0;
