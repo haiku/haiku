@@ -231,22 +231,23 @@ console_init(void)
 uint32
 console_check_boot_keys(void)
 {
-	efi_status status;
 	efi_input_key key;
 
-	// give the user a chance to press a key
-	kBootServices->Stall(500000);
+	for (int i = 0; i < 3; i++) {
+		// give the user a chance to press a key
+		kBootServices->Stall(100000);
 
-	status = kSystemTable->ConIn->ReadKeyStroke(kSystemTable->ConIn, &key);
+		efi_status status = kSystemTable->ConIn->ReadKeyStroke(
+			kSystemTable->ConIn, &key);
 
-	if (status != EFI_SUCCESS)
-		return 0;
+		if (status != EFI_SUCCESS)
+			continue;
 
-	if (key.UnicodeChar == 0 && key.ScanCode == SCAN_ESC)
-		return BOOT_OPTION_DEBUG_OUTPUT;
-	if (key.UnicodeChar == ' ')
-		return BOOT_OPTION_MENU;
-
+		if (key.UnicodeChar == 0 && key.ScanCode == SCAN_ESC)
+			return BOOT_OPTION_DEBUG_OUTPUT;
+		if (key.UnicodeChar == ' ')
+			return BOOT_OPTION_MENU;
+	}
 	return 0;
 }
 
