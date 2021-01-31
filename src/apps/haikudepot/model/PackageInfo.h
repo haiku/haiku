@@ -396,9 +396,6 @@ private:
 typedef BReference<PackageInfo> PackageInfoRef;
 
 
-typedef List<PackageInfoRef, false> PackageList;
-
-
 class DepotInfo : public BReferenceable {
 public:
 								DepotInfo();
@@ -412,15 +409,14 @@ public:
 			const BString&		Name() const
 									{ return fName; }
 
-			const PackageList&	Packages() const
-									{ return fPackages; }
+			int32				CountPackages() const;
+			PackageInfoRef		PackageAtIndex(int32 index);
+			void				AddPackage(PackageInfoRef& package);
+			PackageInfoRef		PackageByName(const BString& packageName);
+			bool				HasPackage(const BString& packageName);
 
-			bool				AddPackage(const PackageInfoRef& package);
-
-			int32				PackageIndexByName(const BString& packageName)
-									const;
-
-			void				SyncPackages(const PackageList& packages);
+			void				SyncPackagesFromDepot(
+									const BReference<DepotInfo>& other);
 
 			bool				HasAnyProminentPackages() const;
 
@@ -439,7 +435,8 @@ public:
 
 private:
 			BString				fName;
-			PackageList			fPackages;
+			std::vector<PackageInfoRef>
+								fPackages;
 			BString				fWebAppRepositoryCode;
 			BString				fWebAppRepositorySourceCode;
 			BString				fURL;

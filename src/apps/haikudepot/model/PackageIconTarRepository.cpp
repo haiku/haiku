@@ -1,5 +1,5 @@
 /*
- * Copyright 2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2020-2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -139,6 +139,13 @@ PackageIconTarRepository::~PackageIconTarRepository()
 }
 
 
+void
+PackageIconTarRepository::Clear() {
+	BAutolock locker(&fLock);
+	fIconCache.Clear();
+}
+
+
 /*!	This method will reconfigure itself using the data in the tar file supplied.
 	Any existing data will be flushed and the new tar will be scanned for
 	offsets to usable files.
@@ -195,10 +202,10 @@ PackageIconTarRepository::Init(BPath& tarPath)
 void
 PackageIconTarRepository::_Close()
 {
+	fIconCache.Clear();
 	delete fTarIo;
 	fTarIo = NULL;
 	fIconTarPtrs.Clear();
-	fIconCache.Clear();
 }
 
 

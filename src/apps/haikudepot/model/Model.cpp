@@ -65,35 +65,6 @@ public:
 };
 
 
-class DepotFilter : public PackageFilter {
-public:
-	DepotFilter(const DepotInfo& depot)
-		:
-		fDepot(depot)
-	{
-	}
-
-	virtual bool AcceptsPackage(const PackageInfoRef& package) const
-	{
-		// TODO: Maybe a PackageInfo ought to know the Depot it came from?
-		// But right now the same package could theoretically be provided
-		// from different depots and the filter would work correctly.
-		// Also the PackageList could actually contain references to packages
-		// instead of the packages as objects. The equal operator is quite
-		// expensive as is.
-		return fDepot.Packages().Contains(package);
-	}
-
-	const BString& Depot() const
-	{
-		return fDepot.Name();
-	}
-
-private:
-	DepotInfo	fDepot;
-};
-
-
 class CategoryFilter : public PackageFilter {
 public:
 	CategoryFilter(const BString& category)
@@ -124,46 +95,6 @@ public:
 
 private:
 	BString		fCategory;
-};
-
-
-class ContainedInFilter : public PackageFilter {
-public:
-	ContainedInFilter(const PackageList& packageList)
-		:
-		fPackageList(packageList)
-	{
-	}
-
-	virtual bool AcceptsPackage(const PackageInfoRef& package) const
-	{
-		return fPackageList.Contains(package);
-	}
-
-private:
-	const PackageList&	fPackageList;
-};
-
-
-class ContainedInEitherFilter : public PackageFilter {
-public:
-	ContainedInEitherFilter(const PackageList& packageListA,
-		const PackageList& packageListB)
-		:
-		fPackageListA(packageListA),
-		fPackageListB(packageListB)
-	{
-	}
-
-	virtual bool AcceptsPackage(const PackageInfoRef& package) const
-	{
-		return fPackageListA.Contains(package)
-			|| fPackageListB.Contains(package);
-	}
-
-private:
-	const PackageList&	fPackageListA;
-	const PackageList&	fPackageListB;
 };
 
 
@@ -331,9 +262,9 @@ Model::PackageForName(const BString& name)
 	std::vector<DepotInfoRef>::iterator it;
 	for (it = fDepots.begin(); it != fDepots.end(); it++) {
 		DepotInfoRef depotInfoRef = *it;
-		int32 packageIndex = depotInfoRef->PackageIndexByName(name);
-		if (packageIndex >= 0)
-			return depotInfoRef->Packages().ItemAtFast(packageIndex);
+		PackageInfoRef packageInfoRef = depotInfoRef->PackageByName(name);
+		if (packageInfoRef.Get() != NULL)
+			return packageInfoRef;
 	}
 	return PackageInfoRef();
 }
@@ -353,13 +284,13 @@ Model::MatchesFilter(const PackageInfoRef& package) const
 
 
 void
-Model::MergeOrAddDepot(const DepotInfoRef depot)
+Model::MergeOrAddDepot(const DepotInfoRef& depot)
 {
 	BString depotName = depot->Name();
 	for(uint32 i = 0; i < fDepots.size(); i++) {
 		if (fDepots[i]->Name() == depotName) {
 			DepotInfoRef ersatzDepot(new DepotInfo(*(fDepots[i].Get())), true);
-			ersatzDepot->SyncPackages(depot->Packages());
+			ersatzDepot->SyncPackagesFromDepot(depot);
 			fDepots[i] = ersatzDepot;
 			return;
 		}
@@ -418,41 +349,15 @@ Model::HasAnyProminentPackages()
 void
 Model::Clear()
 {
+	GetPackageIconRepository().Clear();
 	fDepots.clear();
+	fPopulatedPackageNames.MakeEmpty();
 }
 
 
 void
 Model::SetPackageState(const PackageInfoRef& package, PackageState state)
 {
-	switch (state) {
-		default:
-		case NONE:
-			fInstalledPackages.Remove(package);
-			fActivatedPackages.Remove(package);
-			fUninstalledPackages.Remove(package);
-			break;
-		case INSTALLED:
-			if (!fInstalledPackages.Contains(package))
-				fInstalledPackages.Add(package);
-			fActivatedPackages.Remove(package);
-			fUninstalledPackages.Remove(package);
-			break;
-		case ACTIVATED:
-			if (!fInstalledPackages.Contains(package))
-				fInstalledPackages.Add(package);
-			if (!fActivatedPackages.Contains(package))
-				fActivatedPackages.Add(package);
-			fUninstalledPackages.Remove(package);
-			break;
-		case UNINSTALLED:
-			fInstalledPackages.Remove(package);
-			fActivatedPackages.Remove(package);
-			if (!fUninstalledPackages.Contains(package))
-				fUninstalledPackages.Add(package);
-			break;
-	}
-
 	package->SetState(state);
 }
 
@@ -561,6 +466,28 @@ Model::SetShowDevelopPackages(bool show)
 
 // #pragma mark - information retrieval
 
+/*!	It may transpire that the package has no corresponding record on the
+	server side because the repository is not represented in the server.
+	In such a case, there is little point in communicating with the server
+	only to hear back that the package does not exist.
+*/
+
+bool
+Model::CanPopulatePackage(const PackageInfoRef& package)
+{
+	const BString& depotName = package->DepotName();
+
+	if (depotName.IsEmpty())
+		return false;
+
+	const DepotInfoRef& depot = DepotForName(depotName);
+
+	if (depot.Get() == NULL)
+		return false;
+
+	return !depot->WebAppRepositoryCode().IsEmpty();
+}
+
 
 /*! Initially only superficial data is loaded from the server into the data
     model of the packages.  When the package is viewed, additional data needs
@@ -570,6 +497,11 @@ Model::SetShowDevelopPackages(bool show)
 void
 Model::PopulatePackage(const PackageInfoRef& package, uint32 flags)
 {
+	if (!CanPopulatePackage(package)) {
+		HDINFO("unable to populate package [%s]", package->Name().String());
+		return;
+	}
+
 	// TODO: There should probably also be a way to "unpopulate" the
 	// package information. Maybe a cache of populated packages, so that
 	// packages loose their extra information after a certain amount of
@@ -578,11 +510,12 @@ Model::PopulatePackage(const PackageInfoRef& package, uint32 flags)
 	// Especially screen-shots will be a problem eventually.
 	{
 		BAutolock locker(&fLock);
-		bool alreadyPopulated = fPopulatedPackages.Contains(package);
+		bool alreadyPopulated = fPopulatedPackageNames.HasString(
+			package->Name());
 		if ((flags & POPULATE_FORCE) == 0 && alreadyPopulated)
 			return;
 		if (!alreadyPopulated)
-			fPopulatedPackages.Add(package);
+			fPopulatedPackageNames.Add(package->Name());
 	}
 
 	if ((flags & POPULATE_CHANGELOG) != 0 && package->HasChangelog()) {
@@ -703,7 +636,10 @@ Model::PopulatePackage(const PackageInfoRef& package, uint32 flags)
 				HDDEBUG("did retrieve %" B_PRIi32 " user ratings for [%s]",
 						index - 1, packageName.String());
 			} else {
-				_MaybeLogJsonRpcError(info, "retrieve user ratings");
+				BString message;
+				message.SetToFormat("failure to retrieve user ratings for [%s]",
+					packageName.String());
+				_MaybeLogJsonRpcError(info, message.String());
 			}
 		} else
 			HDERROR("unable to retrieve user ratings");

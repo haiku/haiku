@@ -312,19 +312,25 @@ public:
 			PackageInfoRef ref(FindPackageByName(packages.ItemAt(i)
 					->Name()));
 			if (ref.IsSet())
-				fRemovedPackages.Add(ref);
+				fRemovedPackages.push_back(ref);
 		}
 	}
 
 	void ApplyingChangesDone(
 		BPackageManager::InstalledRepository& repository)
 	{
-		for (int32 i = 0; i < fRemovedPackages.CountItems(); i++)
-			fRemovedPackages.ItemAt(i)->SetState(NONE);
+		std::vector<PackageInfoRef>::iterator it;
+		for (
+				it = fRemovedPackages.begin();
+				it != fRemovedPackages.end();
+				it++) {
+			PackageInfoRef packageInfoRef = *it;
+			packageInfoRef->SetState(NONE);
+		}
 	}
 
 private:
-	PackageList fRemovedPackages;
+	std::vector<PackageInfoRef> fRemovedPackages;
 };
 
 

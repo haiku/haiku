@@ -79,7 +79,7 @@ public:
 			bool				MatchesFilter(
 									const PackageInfoRef& package) const;
 
-			void				MergeOrAddDepot(const DepotInfoRef depot);
+			void				MergeOrAddDepot(const DepotInfoRef& depot);
 			bool				HasDepot(const BString& name) const;
 			int32				CountDepots() const;
 			DepotInfoRef		DepotAtIndex(int32 index) const;
@@ -139,6 +139,8 @@ public:
 	static	const uint32		POPULATE_CATEGORIES		= 1 << 5;
 	static	const uint32		POPULATE_FORCE			= 1 << 6;
 
+			bool				CanPopulatePackage(
+									const PackageInfoRef& package);
 			void				PopulatePackage(const PackageInfoRef& package,
 									uint32 flags);
 
@@ -191,12 +193,7 @@ private:
 			std::vector<RatingStabilityRef>
 								fRatingStabilities;
 
-			PackageList			fInstalledPackages;
-			PackageList			fActivatedPackages;
-			PackageList			fUninstalledPackages;
-			PackageList			fDownloadingPackages;
-			PackageList			fUpdateablePackages;
-			PackageList			fPopulatedPackages;
+			BStringList			fPopulatedPackageNames;
 
 			PackageFilterRef	fCategoryFilter;
 			BString				fDepotFilter;

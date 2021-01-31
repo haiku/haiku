@@ -1,7 +1,7 @@
 /*
  * Copyright 2013-214, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2017, Julian Harnath <julian.harnath@rwth-aachen.de>.
- * Copyright 2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2020-2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -124,11 +124,14 @@ public:
 		switch (key) {
 			case B_RIGHT_ARROW:
 			case B_DOWN_ARROW:
+			{
+				int32 lastIndex = static_cast<int32>(fPackages.size()) - 1;
 				if (!IsEmpty() && fSelectedIndex != -1
-						&& fSelectedIndex < fPackages.size() - 1) {
+						&& fSelectedIndex < lastIndex) {
 					_MessageSelectIndex(fSelectedIndex + 1);
 				}
 				break;
+			}
 			case B_LEFT_ARROW:
 			case B_UP_ARROW:
 				if (fSelectedIndex > 0)
@@ -165,7 +168,8 @@ public:
 	{
 		if (index != -1) {
 			BMessage message(MSG_PACKAGE_SELECTED);
-			message.AddString("name", fPackages[index]->Name());
+			BString packageName = fPackages[index]->Name();
+			message.AddString("name", packageName);
 			Window()->PostMessage(&message);
 		}
 	}
@@ -589,8 +593,8 @@ public:
 	{
 		if (fPackages.empty())
 			return -1;
-		int32 i = y / HEIGHT_PACKAGE;
-		if (i < 0 || i >= fPackages.size())
+		int32 i = static_cast<int32>(y / HEIGHT_PACKAGE);
+		if (i < 0 || i >= static_cast<int32>(fPackages.size()))
 			return -1;
 		return i;
 	}
@@ -606,7 +610,7 @@ public:
 	{
 		if (fPackages.empty())
 			return -1;
-		int32 i = y / HEIGHT_PACKAGE;
+		int32 i = static_cast<int32>(y / HEIGHT_PACKAGE);
 		if (i < 0)
 			return 0;
 		return std::min(i, (int32) (fPackages.size() - 1));

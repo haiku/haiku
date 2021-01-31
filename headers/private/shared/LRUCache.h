@@ -1,5 +1,5 @@
 /*
- * Copyright 2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2020-2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef LRU_CACHE_H
@@ -115,12 +115,11 @@ public:
 	void Clear()
 	{
 		fMap.Clear();
-		LRUNode* node = fNewestNode;
-		while (node != NULL) {
-			LRUNode *next = node->fOlder;
-			delete node;
-			node = next;
-		}
+			// this will delete the objects in map which are the nodes in the
+			// linked list; for this reason don't delete them here as well
+			// because this will lead to a double-free of the object.
+		fNewestNode = NULL;
+		fOldestNode = NULL;
 	}
 
 	Value Get(const Key& key)

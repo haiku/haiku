@@ -3,7 +3,7 @@
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Copyright 2013, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2016-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * Copyright 2017, Julian Harnath <julian.harnath@rwth-aachen.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
@@ -429,7 +429,7 @@ MainWindow::MessageReceived(BMessage* message)
 					BAutolock locker(fModel.Lock());
 					package = fModel.PackageForName(name);
 				}
-				if (!package.IsSet())
+				if (package.IsSet() || name != package->Name())
 					debugger("unable to find the named package");
 				else
 					_AdoptPackage(package);
@@ -830,9 +830,10 @@ MainWindow::_AdoptModel()
 	std::vector<DepotInfoRef>::iterator it;
 	for (it = depots.begin(); it != depots.end(); it++) {
 		DepotInfoRef depotInfoRef = *it;
-		const PackageList& packages = depotInfoRef->Packages();
-		for (int32 p = 0; p < packages.CountItems(); p++)
-			_AddRemovePackageFromLists(packages.ItemAtFast(p));
+		for (int i = 0; i < depotInfoRef->CountPackages(); i++) {
+			PackageInfoRef package = depotInfoRef->PackageAtIndex(i);
+			_AddRemovePackageFromLists(package);
+		}
 	}
 
 	_AdoptModelControls();

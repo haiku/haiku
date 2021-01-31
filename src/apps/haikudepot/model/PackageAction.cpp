@@ -42,19 +42,7 @@ PackageAction::~PackageAction()
 PackageInfoRef
 PackageAction::FindPackageByName(const BString& name)
 {
-	Model* model = GetModel();
-	// TODO: optimize!
-	for (int32 i = 0; i < model->CountDepots(); i++) {
-		const DepotInfoRef depotInfoRef = model->DepotAtIndex(i);
-		const PackageList& packages = depotInfoRef->Packages();
-		for (int32 j = 0; j < packages.CountItems(); j++) {
-			PackageInfoRef info = packages.ItemAtFast(j);
-			if (info->Name() == name)
-				return info;
-		}
-	}
-
-	return PackageInfoRef();
+	return GetModel()->PackageForName(name);
 }
 
 

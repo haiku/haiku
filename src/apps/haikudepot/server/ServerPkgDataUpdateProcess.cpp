@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -172,20 +172,15 @@ PackageFillingPkgListener::Count()
 bool
 PackageFillingPkgListener::Handle(DumpExportPkg* pkg)
 {
-	const DepotInfo* depotInfo = fModel->DepotForName(fDepotName);
+	AutoLocker<BLocker> locker(fModel->Lock());
+	DepotInfoRef depot = fModel->DepotForName(fDepotName);
 
-	if (depotInfo != NULL) {
+	if (depot.Get() != NULL) {
 		const BString packageName = *(pkg->Name());
-		int32 packageIndex = depotInfo->PackageIndexByName(packageName);
-
-		if (-1 != packageIndex) {
-			const PackageList& packages = depotInfo->Packages();
-			const PackageInfoRef& packageInfoRef =
-				packages.ItemAtFast(packageIndex);
-
-			AutoLocker<BLocker> locker(fModel->Lock());
-			ConsumePackage(packageInfoRef, pkg);
-		} else {
+		PackageInfoRef package = depot->PackageByName(packageName);
+		if (package.Get() != NULL)
+			ConsumePackage(package, pkg);
+		else {
 			HDINFO("[PackageFillingPkgListener] unable to find the pkg [%s]",
 				packageName.String());
 		}
