@@ -1204,7 +1204,7 @@ AcpiOsSignal(UINT32 function, void *info)
 #endif
 		case ACPI_SIGNAL_BREAKPOINT:
 			if (info != NULL)
-				AcpiOsPrintf("AcpiOsBreakpoint: %s ****\n", info);
+				AcpiOsPrintf("AcpiOsBreakpoint: %s ****\n", (const char*)info);
 			else
 				AcpiOsPrintf("At AcpiOsBreakpoint ****\n");
 			break;
