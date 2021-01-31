@@ -42,12 +42,12 @@ pch_i2c_scan_parse_callback(ACPI_RESOURCE *res, void *context)
 		crs->irq = res->Data.Irq.Interrupts[0];
 		crs->irq_triggering = res->Data.Irq.Triggering;
 		crs->irq_polarity = res->Data.Irq.Polarity;
-		crs->irq_sharable = res->Data.Irq.Sharable;
+		crs->irq_shareable = res->Data.Irq.Shareable;
 	} else if (res->Type == ACPI_RESOURCE_TYPE_EXTENDED_IRQ) {
 		crs->irq = res->Data.ExtendedIrq.Interrupts[0];
 		crs->irq_triggering = res->Data.ExtendedIrq.Triggering;
 		crs->irq_polarity = res->Data.ExtendedIrq.Polarity;
-		crs->irq_sharable = res->Data.ExtendedIrq.Sharable;
+		crs->irq_shareable = res->Data.ExtendedIrq.Shareable;
 	} else if (res->Type == ACPI_RESOURCE_TYPE_FIXED_MEMORY32) {
 		crs->addr_bas = res->Data.FixedMemory32.Address;
 		crs->addr_len = res->Data.FixedMemory32.AddressLength;

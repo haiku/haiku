@@ -911,7 +911,7 @@ read_irq_descriptor(acpi_module_info* acpi, acpi_handle device,
 					break;
 				}
 
-				descriptor.shareable = irq.Sharable != 0;
+				descriptor.shareable = irq.Shareable != 0;
 				descriptor.trigger_mode = irq.Triggering == 0
 					? B_LEVEL_TRIGGERED : B_EDGE_TRIGGERED;
 				descriptor.polarity = irq.Polarity == 0
@@ -933,7 +933,7 @@ read_irq_descriptor(acpi_module_info* acpi, acpi_handle device,
 					irq.Triggering == 0 ? "level" : "edge");
 				dprintf("\tpolarity: %s active\n",
 					irq.Polarity == 0 ? "high" : "low");
-				dprintf("\tsharable: %s\n", irq.Sharable != 0 ? "yes" : "no");
+				dprintf("\tshareable: %s\n", irq.Shareable != 0 ? "yes" : "no");
 				dprintf("\tcount: %u\n", irq.InterruptCount);
 				if (irq.InterruptCount > 0) {
 					dprintf("\tinterrupts:");
@@ -953,7 +953,7 @@ read_irq_descriptor(acpi_module_info* acpi, acpi_handle device,
 					break;
 				}
 
-				descriptor.shareable = irq.Sharable != 0;
+				descriptor.shareable = irq.Shareable != 0;
 				descriptor.trigger_mode = irq.Triggering == 0
 					? B_LEVEL_TRIGGERED : B_EDGE_TRIGGERED;
 				descriptor.polarity = irq.Polarity == 0
@@ -977,7 +977,7 @@ read_irq_descriptor(acpi_module_info* acpi, acpi_handle device,
 					irq.Triggering == 0 ? "level" : "edge");
 				dprintf("\tpolarity: %s active\n",
 					irq.Polarity == 0 ? "high" : "low");
-				dprintf("\tsharable: %s\n", irq.Sharable != 0 ? "yes" : "no");
+				dprintf("\tshareable: %s\n", irq.Shareable != 0 ? "yes" : "no");
 				dprintf("\tcount: %u\n", irq.InterruptCount);
 				if (irq.InterruptCount > 0) {
 					dprintf("\tinterrupts:");
@@ -1054,7 +1054,7 @@ set_current_irq(acpi_module_info* acpi, acpi_handle device,
 					= descriptor.trigger_mode == B_LEVEL_TRIGGERED ? 0 : 1;
 				irq.Polarity
 					= descriptor.polarity == B_HIGH_ACTIVE_POLARITY ? 0 : 1;
-				irq.Sharable = descriptor.shareable ? 0 : 1;
+				irq.Shareable = descriptor.shareable ? 0 : 1;
 				irq.InterruptCount = 1;
 				irq.Interrupts[0] = descriptor.irq;
 
@@ -1074,7 +1074,7 @@ set_current_irq(acpi_module_info* acpi, acpi_handle device,
 					= descriptor.trigger_mode == B_LEVEL_TRIGGERED ? 0 : 1;
 				irq.Polarity
 					= descriptor.polarity == B_HIGH_ACTIVE_POLARITY ? 0 : 1;
-				irq.Sharable = descriptor.shareable ? 0 : 1;
+				irq.Shareable = descriptor.shareable ? 0 : 1;
 				irq.InterruptCount = 1;
 				irq.Interrupts[0] = descriptor.irq;
 
