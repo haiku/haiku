@@ -25,7 +25,8 @@ additionalMakeArgs=$*
 gdbSourceDir="$HAIKU_USE_GDB"
 
 ccFlags="-O2"
-cxxFlags="-O2"
+#CLang needs c++14 to build ISL: https://dev.haiku-os.org/ticket/16434
+cxxFlags="-O2 -std=c++14"
 binutilsTargets="$haikuMachine"
 gdbTarget="$haikuMachine"
 case $haikuMachine in
