@@ -8,6 +8,7 @@
 
 #include "PoorManServer.h"
 
+#include <errno.h>
 #include <pthread.h>
 #include <string.h>
 #include <stdlib.h>
@@ -226,6 +227,8 @@ int32 PoorManServer::_Listener(void* data)
 	while (s->fIsRunning) {
 		// Wait for listen4_fd or listen6_fd (or both!) to become ready:
 		retval = poll(fds, nfds, -1);
+		if (retval == -1 && errno == EINTR)
+			continue;
 		if (retval < 1) {
 			return -1; // fds no longer available
 		}
