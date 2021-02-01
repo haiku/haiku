@@ -484,6 +484,8 @@ Services::_Listener()
 		fLock.Unlock();
 
 		if (select(fMaxSocket, &set, NULL, NULL, NULL) < 0) {
+			if (errno == EINTR)
+				continue;
 			// sleep a bit before trying again
 			snooze(1000000LL);
 		}
