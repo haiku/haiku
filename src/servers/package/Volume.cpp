@@ -332,9 +332,75 @@ Volume::InitPackages(Listener* listener)
 
 	// create the admin directory, if it doesn't exist yet
 	BDirectory packagesDirectory;
+	bool createdAdminDirectory = false;
 	if (packagesDirectory.SetTo(&PackagesDirectoryRef()) == B_OK) {
-		if (!BEntry(&packagesDirectory, kAdminDirectoryName).Exists())
+		if (!BEntry(&packagesDirectory, kAdminDirectoryName).Exists()) {
 			packagesDirectory.CreateDirectory(kAdminDirectoryName, NULL);
+			createdAdminDirectory = true;
+		}
+	}
+	BDirectory adminDirectory(&packagesDirectory, kAdminDirectoryName);
+	error = adminDirectory.InitCheck();
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	// First boot processing requested by a magic file left by the OS installer?
+	BEntry flagFileEntry(&adminDirectory, kFirstBootProcessingNeededFileName);
+	if (createdAdminDirectory || flagFileEntry.Exists()) {
+		INFORM("Volume::InitPackages Requesting delayed first boot processing "
+			"for packages dir %s.\n", BPath(&packagesDirectory).Path());
+		if (flagFileEntry.Exists())
+			flagFileEntry.Remove(); // Remove early on to avoid an error loop.
+
+		// Are there any packages needing processing?  Don't want to create an
+		// empty transaction directory and then never have it cleaned up when
+		// the empty transaction gets rejected.
+		bool anyPackages = false;
+		for (PackageNodeRefHashTable::Iterator it =
+				fActiveState->ByNodeRefIterator(); it.HasNext();) {
+			Package* package = it.Next();
+			if (package->IsActive()) {
+				anyPackages = true;
+				break;
+			}
+		}
+
+		if (anyPackages) {
+			// Create first boot processing special transaction for current
+			// volume, which also creates an empty transaction directory.
+			BPackageInstallationLocation location = Location();
+			BDirectory transactionDirectory;
+			BActivationTransaction transaction;
+			error = CreateTransaction(location, transaction,
+				transactionDirectory);
+			if (error != B_OK)
+				RETURN_ERROR(error);
+
+			// Add all package files in currently active state to transaction.
+			for (PackageNodeRefHashTable::Iterator it =
+					fActiveState->ByNodeRefIterator(); it.HasNext();) {
+				Package* package = it.Next();
+				if (package->IsActive()) {
+					if (!transaction.AddPackageToActivate(
+							package->FileName().String()))
+						RETURN_ERROR(B_NO_MEMORY);
+				}
+			}
+			transaction.SetFirstBootProcessing(true);
+
+			// Queue up the transaction as a BMessage for processing a bit
+			// later, once the package daemon has finished initialising.
+			BMessage commitMessage(B_MESSAGE_COMMIT_TRANSACTION);
+			error = transaction.Archive(&commitMessage);
+			if (error != B_OK)
+				RETURN_ERROR(error);
+			BLooper *myLooper = Looper() ;
+			if (myLooper == NULL)
+				RETURN_ERROR(B_NOT_INITIALIZED);
+			error = myLooper->PostMessage(&commitMessage);
+			if (error != B_OK)
+				RETURN_ERROR(error);
+		}
 	}
 
 	return B_OK;
@@ -1003,8 +1069,14 @@ Volume::_InitLatestStateFromActivatedPackages()
 	BFile file;
 	error = file.SetTo(&entryRef, B_READ_ONLY);
 	if (error != B_OK) {
-		INFORM("Failed to open packages activation file: %s\n",
-			strerror(error));
+		BEntry activationEntry(&entryRef);
+		BPath activationPath;
+		const char *activationFilePathName = "Unknown due to errors";
+		if (activationEntry.InitCheck() == B_OK &&
+		activationEntry.GetPath(&activationPath) == B_OK)
+			activationFilePathName = activationPath.Path();
+		INFORM("Failed to open packages activation file %s: %s\n",
+			activationFilePathName, strerror(error));
 		RETURN_ERROR(error);
 	}
 

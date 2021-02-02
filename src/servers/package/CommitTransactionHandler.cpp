@@ -126,6 +126,7 @@ CommitTransactionHandler::CommitTransactionHandler(Volume* volume,
 	fOldStateDirectoryRef(),
 	fOldStateDirectoryName(),
 	fTransactionDirectoryRef(),
+	fFirstBootProcessing(false),
 	fWritableFilesDirectory(),
 	fAddedGroups(),
 	fAddedUsers(),
@@ -182,6 +183,7 @@ void
 CommitTransactionHandler::HandleRequest(BMessage* request)
 {
 	status_t error;
+
 	BActivationTransaction transaction(request, &error);
 	if (error == B_OK)
 		error = transaction.InitCheck();
@@ -203,6 +205,8 @@ CommitTransactionHandler::HandleRequest(
 	if (transaction.ChangeCount() != fVolume->ChangeCount())
 		throw Exception(B_TRANSACTION_CHANGE_COUNT_MISMATCH);
 
+	fFirstBootProcessing = transaction.FirstBootProcessing();
+
 	// collect the packages to deactivate
 	_GetPackagesToDeactivate(transaction);
 
@@ -210,13 +214,30 @@ CommitTransactionHandler::HandleRequest(
 	_ReadPackagesToActivate(transaction);
 
 	// anything to do at all?
-	if (fPackagesToActivate.IsEmpty() &&  fPackagesToDeactivate.empty()) {
+	if (fPackagesToActivate.IsEmpty() && fPackagesToDeactivate.empty()) {
 		WARN("Bad package activation request: no packages to activate or"
 			" deactivate\n");
 		throw Exception(B_TRANSACTION_BAD_REQUEST);
 	}
 
 	_ApplyChanges();
+
+	// Clean up the unused empty transaction directory for first boot
+	// processing, since it's usually an internal to package_daemon
+	// operation and there is no external client to clean it up.
+	if (fFirstBootProcessing) {
+		RelativePath directoryPath(kAdminDirectoryName,
+			transaction.TransactionDirectoryName().String());
+		BDirectory transactionDir;
+		status_t error = _OpenPackagesSubDirectory(directoryPath, false,
+			transactionDir);
+		if (error == B_OK) {
+			BEntry transactionDirEntry;
+			error = transactionDir.GetEntry(&transactionDirEntry);
+			if (error == B_OK)
+				transactionDirEntry.Remove(); // Okay to fail when non-empty.
+		}
+	}
 }
 
 
@@ -336,21 +357,31 @@ CommitTransactionHandler::_ReadPackagesToActivate(
 	// read the packages
 	for (int32 i = 0; i < packagesToActivateCount; i++) {
 		BString packageName = packagesToActivate.StringAt(i);
-
-		// make sure it doesn't clash with an already existing package
+		// make sure it doesn't clash with an already existing package,
+		// except in first boot mode where it should always clash.
 		Package* package = fVolumeState->FindPackage(packageName);
-		if (package != NULL) {
-			if (fPackagesAlreadyAdded.find(package)
-					!= fPackagesAlreadyAdded.end()) {
-				if (!fPackagesToActivate.AddItem(package))
-					throw Exception(B_TRANSACTION_NO_MEMORY);
-				continue;
-			}
-
-			if (fPackagesToDeactivate.find(package)
-					== fPackagesToDeactivate.end()) {
-				throw Exception(B_TRANSACTION_PACKAGE_ALREADY_EXISTS)
+		if (fFirstBootProcessing) {
+			if (package == NULL) {
+				throw Exception(B_TRANSACTION_NO_SUCH_PACKAGE)
 					.SetPackageName(packageName);
+			}
+			if (!fPackagesToActivate.AddItem(package))
+				throw Exception(B_TRANSACTION_NO_MEMORY);
+			continue;
+		} else {
+			if (package != NULL) {
+				if (fPackagesAlreadyAdded.find(package)
+						!= fPackagesAlreadyAdded.end()) {
+					if (!fPackagesToActivate.AddItem(package))
+						throw Exception(B_TRANSACTION_NO_MEMORY);
+					continue;
+				}
+
+				if (fPackagesToDeactivate.find(package)
+						== fPackagesToDeactivate.end()) {
+					throw Exception(B_TRANSACTION_PACKAGE_ALREADY_EXISTS)
+						.SetPackageName(packageName);
+				}
 			}
 		}
 
@@ -382,27 +413,31 @@ CommitTransactionHandler::_ReadPackagesToActivate(
 void
 CommitTransactionHandler::_ApplyChanges()
 {
-	// create an old state directory
-	_CreateOldStateDirectory();
+	if (!fFirstBootProcessing)
+	{
+		// create an old state directory
+		_CreateOldStateDirectory();
 
-	// move packages to deactivate to old state directory
-	_RemovePackagesToDeactivate();
+		// move packages to deactivate to old state directory
+		_RemovePackagesToDeactivate();
 
-	// move packages to activate to packages directory
-	_AddPackagesToActivate();
+		// move packages to activate to packages directory
+		_AddPackagesToActivate();
 
-	// run pre-uninstall scripts, before their packages vanish.
-	_RunPreUninstallScripts();
+		// run pre-uninstall scripts, before their packages vanish.
+		_RunPreUninstallScripts();
 
-	// activate/deactivate packages
-	_ChangePackageActivation(fAddedPackages, fRemovedPackages);
+		// activate/deactivate packages and create users, groups, settings files.
+		_ChangePackageActivation(fAddedPackages, fRemovedPackages);
+	} else // FirstBootProcessing, skip several steps and just do package setup.
+		_PrepareFirstBootPackages();
 
-	// run post-installation scripts
-	if (fVolumeStateIsActive) {
+	// run post-install scripts now that the new packages are visible in the
+	// package file system.
+	if (fVolumeStateIsActive || fFirstBootProcessing) {
 		_RunPostInstallScripts();
 	} else {
-		// need to reboot to finish installation so queue up scripts as
-		// symbolic links in a work directory, which will run later.
+		// Do post-install scripts later after a reboot, for Haiku OS packages.
 		_QueuePostInstallScripts();
 	}
 
@@ -626,6 +661,31 @@ CommitTransactionHandler::_AddPackagesToActivate()
 		// also add the package to the volume
 		fVolumeState->AddPackage(package);
 
+		_PreparePackageToActivate(package);
+	}
+}
+
+
+void
+CommitTransactionHandler::_PrepareFirstBootPackages()
+{
+	int32 count = fPackagesToActivate.CountItems();
+
+	BDirectory transactionDir(&fTransactionDirectoryRef);
+	BEntry transactionEntry;
+	BPath transactionPath;
+	if (transactionDir.InitCheck() == B_OK &&
+			transactionDir.GetEntry(&transactionEntry) == B_OK &&
+			transactionEntry.GetPath(&transactionPath) == B_OK) {
+		INFORM("Starting First Boot Processing for %d packages in %s.\n",
+			(int) count, transactionPath.Path());
+	}
+
+	for (int32 i = 0; i < count; i++) {
+		Package* package = fPackagesToActivate.ItemAt(i);
+		fAddedPackages.insert(package);
+		INFORM("Doing first boot processing #%d for package %s.\n",
+			(int) i, package->FileName().String());
 		_PreparePackageToActivate(package);
 	}
 }
@@ -904,7 +964,8 @@ CommitTransactionHandler::_AddGlobalWritableFileRecurse(Package* package,
 	if (targetDirectory.GetStatFor(targetName, &targetStat) != B_OK) {
 		// target doesn't exist -- just copy
 		PRINT("Volume::CommitTransactionHandler::_AddGlobalWritableFile(): "
-			"couldn't get stat for writable file, copying...\n");
+			"couldn't get stat for writable file \"%s\", copying...\n",
+			targetName);
 		FSTransaction::CreateOperation copyOperation(&fFSTransaction,
 			FSUtils::Entry(targetDirectory, targetName));
 		status_t error = BCopyEngine(BCopyEngine::COPY_RECURSIVELY)
@@ -947,7 +1008,8 @@ CommitTransactionHandler::_AddGlobalWritableFileRecurse(Package* package,
 		// Source and target entry types don't match or this is an entry
 		// we cannot handle. The user must handle this manually.
 		PRINT("Volume::CommitTransactionHandler::_AddGlobalWritableFile(): "
-			"writable file exists, but type doesn't match previous type\n");
+			"writable file \"%s\" exists, but type doesn't match previous "
+			"type\n", targetName);
 		_AddIssue(TransactionIssueBuilder(
 				BTransactionIssue::B_WRITABLE_FILE_TYPE_MISMATCH)
 			.SetPath1(FSUtils::Entry(targetDirectory, targetName))
@@ -1003,7 +1065,9 @@ CommitTransactionHandler::_AddGlobalWritableFileRecurse(Package* package,
 		// Can't determine the original package. The user must handle this
 		// manually.
 		PRINT("Volume::CommitTransactionHandler::_AddGlobalWritableFile(): "
-			"failed to get SYS:PACKAGE attribute\n");
+			"failed to get SYS:PACKAGE attribute for \"%s\", can't tell if "
+			"file needs to be updated\n",
+			targetName);
 		if (updateType != B_WRITABLE_FILE_UPDATE_TYPE_KEEP_OLD) {
 			_AddIssue(TransactionIssueBuilder(
 					BTransactionIssue::B_WRITABLE_FILE_NO_PACKAGE_ATTRIBUTE)
@@ -1015,7 +1079,8 @@ CommitTransactionHandler::_AddGlobalWritableFileRecurse(Package* package,
 	// If that's our package, we're happy.
 	if (originalPackage == package->RevisionedNameThrows()) {
 		PRINT("Volume::CommitTransactionHandler::_AddGlobalWritableFile(): "
-			"file tagged with same package version we're activating\n");
+			"file \"%s\" tagged with same package version we're activating\n",
+			targetName);
 		return;
 	}
 
@@ -1073,8 +1138,8 @@ CommitTransactionHandler::_AddGlobalWritableFileRecurse(Package* package,
 			// handle this manually.
 			PRINT("Volume::CommitTransactionHandler::"
 				"_AddGlobalWritableFile(): "
-				"file comparison failed (%s) or files aren't equal\n",
-				strerror(error));
+				"file comparison \"%s\" failed (%s) or files aren't equal\n",
+				targetName, strerror(error));
 			if (updateType != B_WRITABLE_FILE_UPDATE_TYPE_KEEP_OLD) {
 				if (error != B_OK) {
 					_AddIssue(TransactionIssueBuilder(
@@ -1108,8 +1173,8 @@ CommitTransactionHandler::_AddGlobalWritableFileRecurse(Package* package,
 			// handle this manually.
 			PRINT("Volume::CommitTransactionHandler::"
 				"_AddGlobalWritableFile(): "
-				"symlink comparison failed (%s) or symlinks aren't equal\n",
-				strerror(error));
+				"symlink comparison \"%s\" failed (%s) or symlinks aren't "
+				"equal\n", targetName, strerror(error));
 			if (updateType != B_WRITABLE_FILE_UPDATE_TYPE_KEEP_OLD) {
 				if (error != B_OK) {
 					_AddIssue(TransactionIssueBuilder(
@@ -1189,7 +1254,7 @@ CommitTransactionHandler::_AddGlobalWritableFileRecurse(Package* package,
 void
 CommitTransactionHandler::_RevertAddPackagesToActivate()
 {
-	if (fAddedPackages.empty())
+	if (fAddedPackages.empty() || fFirstBootProcessing)
 		return;
 
 	// open transaction directory
@@ -1244,7 +1309,7 @@ CommitTransactionHandler::_RevertAddPackagesToActivate()
 void
 CommitTransactionHandler::_RevertRemovePackagesToDeactivate()
 {
-	if (fRemovedPackages.empty())
+	if (fRemovedPackages.empty() || fFirstBootProcessing)
 		return;
 
 	// open packages directory

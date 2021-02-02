@@ -21,8 +21,8 @@ namespace BPrivate {
 class BActivationTransaction : public BArchivable {
 public:
 								BActivationTransaction();
-                                BActivationTransaction(BMessage* archive,
-                                    status_t* _error = NULL);
+								BActivationTransaction(BMessage* archive,
+									status_t* _error = NULL);
 	virtual						~BActivationTransaction();
 
 			status_t			SetTo(BPackageInstallationLocation location,
@@ -52,6 +52,9 @@ public:
 									const BStringList& packages);
 			bool				AddPackageToDeactivate(const BString& package);
 
+			bool				FirstBootProcessing() const;
+			void				SetFirstBootProcessing(bool processingIsOn);
+
 	virtual	status_t			Archive(BMessage* archive,
 									bool deep = true) const;
 	static	BArchivable*		Instantiate(BMessage* archive);
@@ -66,6 +69,7 @@ private:
 			BString				fTransactionDirectoryName;
 			BStringList			fPackagesToActivate;
 			BStringList			fPackagesToDeactivate;
+			bool				fFirstBootProcessing;
 };
 
 

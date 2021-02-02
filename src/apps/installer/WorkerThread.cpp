@@ -312,6 +312,15 @@ WorkerThread::_LaunchFinishScript(BPath &path)
 	if (system(command.String()) != 0)
 		return B_ERROR;
 
+	// Ask for first boot processing of all the packages copied into the new
+	// installation, since by just copying them the normal package processing
+	// isn't done.  package_daemon will detect the magic file and do it.
+	command.SetToFormat("echo 'First Boot written by Installer.' > "
+		"\"%s/system/packages/administrative/FirstBootProcessingNeeded\"",
+		path.Path());
+	if (system(command.String()) != 0)
+		return B_ERROR;
+
 	command.SetToFormat("rm -f \"%s/home/Desktop/Installer\"", path.Path());
 	return system(command.String());
 }
