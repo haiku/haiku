@@ -1,9 +1,16 @@
-1	english	x-vnd.Haiku-GLInfo	3678488342
+1	english	x-vnd.Haiku-GLInfo	2330420379
+Maximum clipping planes	Capabilities		最大裁剪平面数
+Texture stack size	Capabilities		贴图堆栈大小
 GL Info	System name		GL 信息
 Information	InfoView		信息
+Attributes stack size	Capabilities		属性堆栈大小
+Maximum lights	Capabilities		最大光源数
 Extensions	Extensions		扩展
 Available extensions	Extensions		可用扩展
+Maximum recommended vertex elements	Capabilities		推荐的顶点元素最大数量
 Value	Capabilities		值
+Name stack size	Capabilities		名称堆栈大小
 Capabilities	Capabilities		性能
+Unknown or missing OpenGL renderer.	InfoView		未知或缺失的OpenGL渲染器。
 Capability	Capabilities		性能
 Maximum convolution	Capabilities		最大卷积

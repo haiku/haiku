@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libtracker	287843084
+1	english	x-vnd.Haiku-libtracker	1849664277
 Created	ContainerWindow		创建
 Icon	AttributesView		图标
 Open and make preferred	OpenWithWindow		打开并创建首选
@@ -6,6 +6,7 @@ Kind	ContainerWindow		种类
 Open with…	ContainerWindow		打开方式...
 Error moving \"%name\" to Trash. (%error)	FSUtils		移动 \"%name\" 到垃圾箱出错。（%error）
 Or	FindPanel		或者
+MIME Description	AttributesView		MIME描述
 before	FindPanel		之前
 Volume icons	TrackerSettingsWindow		卷图标
 Ignore case	SelectionWindow		忽略事件

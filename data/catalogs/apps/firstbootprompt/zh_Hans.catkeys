@@ -1,4 +1,6 @@
-1	english	x-vnd.Haiku-FirstBootPrompt	564016477
+1	english	x-vnd.Haiku-FirstBootPrompt	2477122091
+Cancel	BootPromptWindow		取消
 Keymap	BootPromptWindow		键盘映射
+Restart system	BootPromptWindow		重启系统
 Language	BootPromptWindow		语言
 Custom	BootPromptWindow		自定义
