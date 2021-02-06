@@ -156,7 +156,6 @@ MutableLocaleRoster::CreateCatalog(const char* type, const char* signature,
 		BCatalogData* catalog = info->fCreateFunc(signature, language);
 		if (catalog != NULL) {
 			info->fLoadedCatalogs.AddItem(catalog);
-			info->UnloadIfPossible();
 			return catalog;
 		}
 	}
@@ -234,7 +233,6 @@ MutableLocaleRoster::LoadCatalog(const entry_ref& catalogOwner,
 			if (catalog != NULL)
 				return catalog;
 		}
-		info->UnloadIfPossible();
 	}
 
 	return NULL;
@@ -347,7 +345,6 @@ MutableLocaleRoster::LoadCatalog(const char* signature,
 /*
  * unloads the given catalog (or rather: catalog-chain).
  * Every single catalog of the chain will be deleted automatically.
- * Add-ons that have no more current catalogs are unloaded, too.
  */
 status_t
 MutableLocaleRoster::UnloadCatalog(BCatalogData* catalog)
@@ -371,7 +368,6 @@ MutableLocaleRoster::UnloadCatalog(BCatalogData* catalog)
 			if (info->fLoadedCatalogs.HasItem(catalog)) {
 				info->fLoadedCatalogs.RemoveItem(catalog);
 				delete catalog;
-				info->UnloadIfPossible();
 				res = B_OK;
 				break;
 			}
