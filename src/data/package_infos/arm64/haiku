@@ -1,0 +1,86 @@
+name			haiku
+version			%HAIKU_VERSION%
+architecture		arm64
+summary			"The Haiku base system"
+
+description		"The Haiku base system includes all system core software, like
+boot loader, kernel, the system libraries, servers, and applications."
+
+packager		"The Haiku build system"
+vendor			"Haiku Project"
+
+copyrights		"2001-2021 Haiku, Inc. et al"
+licenses {
+	MIT
+	"GNU LGPL v2.1"
+}
+flags			system_package
+
+provides {
+	haiku=%HAIKU_VERSION% compat>=R1~beta1
+	cmd:arp
+	cmd:chop
+	cmd:clear
+	cmd:df
+	cmd:ftpd
+	cmd:hd
+	cmd:hey
+	cmd:login
+	cmd:more
+	cmd:passwd
+	cmd:ping
+	cmd:ping6
+	cmd:prio
+	cmd:ps
+	cmd:renice
+	cmd:resattr
+	cmd:su
+	cmd:telnet
+	cmd:telnetd
+	cmd:top
+	cmd:traceroute
+	cmd:trash
+	cmd:unchop
+	cmd:useradd
+	cmd:watch
+	cmd:xres
+}
+
+requires {
+	coreutils
+	cmd:sh
+#ifdef HAIKU_REGULAR_BUILD
+	cmd:bunzip2
+	cmd:gunzip
+	cmd:tar
+	cmd:unzip
+#endif
+#ifdef HAIKU_BUILD_FEATURE_ARM_LIBEDIT_ENABLED
+	lib:libedit
+#endif
+	lib:libfreetype
+#ifdef HAIKU_BUILD_FEATURE_ARM_FONTCONFIG_ENABLED
+	lib:libfontconfig
+#endif
+	lib:libgcc_s
+	lib:libicudata
+	lib:libicui18n
+	lib:libicuio
+	lib:libicutest
+	lib:libicutu
+	lib:libicuuc
+	lib:libncurses >= 6.0
+#ifdef HAIKU_REGULAR_BUILD
+	lib:libjpeg
+	lib:libpng >= 16.0
+#endif
+	lib:libsolv
+	lib:libsolvext
+	lib:libstdc++
+	lib:libsupc++
+	lib:libz
+	noto >= 2.7
+#ifdef HAIKU_REGULAR_BUILD
+	noto_sans_cjk_jp
+#endif
+}
