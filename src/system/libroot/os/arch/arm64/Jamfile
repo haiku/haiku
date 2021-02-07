@@ -13,11 +13,12 @@ for architectureObject in [ MultiArchSubDirSetup arm64 ] {
 		SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
 
 		MergeObject <$(architecture)>os_arch_$(TARGET_ARCH).o :
-			tls.c
-			thread.c
-			system_time.c
-			time.c
+			byteorder.S
 			get_stack_frame.S
+			system_time.c
+			thread.c
+			time.c
+			tls.c
 
 			generic_atomic.cpp
 			generic_stack_trace.cpp

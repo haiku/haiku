@@ -9,6 +9,7 @@ SEARCH_SOURCE += [ FDirName $(librootSources) os arch $(TARGET_ARCH) ] ;
 SEARCH_SOURCE += [ FDirName $(librootSources) os arch generic ] ;
 
 KernelMergeObject kernel_os_arch_$(TARGET_ARCH).o :
+	byteorder.S
 	generic_atomic.cpp
 	generic_system_time_nsecs.cpp
 
@@ -24,7 +25,7 @@ KernelMergeObject kernel_lib_posix_arch_$(TARGET_ARCH).o :
 	sigsetjmp.S
 	kernel_longjmp_return.c
 	kernel_setjmp_save_sigs.c
-	
+
 	arch_string.S
 	memset.c
 	memcpy.c
