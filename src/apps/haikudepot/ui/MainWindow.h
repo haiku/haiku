@@ -2,7 +2,7 @@
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2013, Rene Gollent <rene@gollent.com>.
  * Copyright 2017, Julian Harnath <julian.harnath@rwth-aachen.de>.
- * Copyright 2017-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef MAIN_WINDOW_H
@@ -66,8 +66,7 @@ private:
 
 private:
 	// PackageActionHandler
-	virtual	status_t			SchedulePackageActions(
-									PackageActionList& list);
+	virtual	status_t			SchedulePackageAction(PackageActionRef action);
 	virtual	Model*				GetModel();
 
 private:
@@ -168,7 +167,8 @@ private:
 			bool				fSinglePackageMode;
 
 			thread_id			fPendingActionsWorker;
-			PackageActionList	fPendingActions;
+			std::queue<PackageActionRef>
+								fPendingActions;
 			BLocker				fPendingActionsLock;
 			sem_id				fPendingActionsSem;
 

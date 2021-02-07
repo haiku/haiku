@@ -1,6 +1,6 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2018-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -638,10 +638,7 @@ private:
 		if (!action.IsSet())
 			return;
 
-		PackageActionList actions;
-		actions.Add(action);
-		status_t result
-			= fPackageActionHandler->SchedulePackageActions(actions);
+		status_t result = fPackageActionHandler->SchedulePackageAction(action);
 
 		if (result != B_OK) {
 			HDERROR("Failed to schedule action: %s '%s': %s",

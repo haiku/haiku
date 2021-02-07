@@ -1,6 +1,7 @@
 /*
  * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2013, Rene Gollent, <rene@gollent.com>
+ * Copyright 2021, Andrew Lindesay <apl@lindesay.co.nz>
  *
  * All rights reserved. Distributed under the terms of the MIT License.
  */
@@ -64,7 +65,6 @@ private:
 
 
 typedef BReference<PackageAction> PackageActionRef;
-typedef List<PackageActionRef, false> PackageActionList;
 
 
 #endif // PACKAGE_ACTION_H

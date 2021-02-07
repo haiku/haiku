@@ -429,7 +429,7 @@ MainWindow::MessageReceived(BMessage* message)
 					BAutolock locker(fModel.Lock());
 					package = fModel.PackageForName(name);
 				}
-				if (package.IsSet() || name != package->Name())
+				if (!package.IsSet() || name != package->Name())
 					debugger("unable to find the named package");
 				else
 					_AdoptPackage(package);
@@ -605,15 +605,11 @@ MainWindow::PackageChanged(const PackageInfoEvent& event)
 
 
 status_t
-MainWindow::SchedulePackageActions(PackageActionList& list)
+MainWindow::SchedulePackageAction(PackageActionRef action)
 {
 	AutoLocker<BLocker> lock(&fPendingActionsLock);
-	for (int32 i = 0; i < list.CountItems(); i++) {
-		if (!fPendingActions.Add(list.ItemAtFast(i)))
-			return B_NO_MEMORY;
-	}
-
-	return release_sem_etc(fPendingActionsSem, list.CountItems(), 0);
+	fPendingActions.push(action);
+	return release_sem_etc(fPendingActionsSem, 1, 0);
 }
 
 
@@ -989,7 +985,7 @@ MainWindow::_HandleWorkStatusChangeMessageReceived(const BMessage* message)
 }
 
 
-status_t
+/*static*/ status_t
 MainWindow::_PackageActionWorker(void* arg)
 {
 	MainWindow* window = reinterpret_cast<MainWindow*>(arg);
@@ -998,10 +994,10 @@ MainWindow::_PackageActionWorker(void* arg)
 		PackageActionRef ref;
 		{
 			AutoLocker<BLocker> lock(&window->fPendingActionsLock);
-			ref = window->fPendingActions.ItemAt(0);
+			ref = window->fPendingActions.front();
+			window->fPendingActions.pop();
 			if (!ref.IsSet())
 				break;
-			window->fPendingActions.Remove(0);
 		}
 
 		BMessenger messenger(window);
