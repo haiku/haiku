@@ -11,22 +11,15 @@
 #include <String.h>
 
 
-//static int32 sInstanceCount = 0;
-
-
 UndoableEdit::UndoableEdit()
 	:
 	fTimeStamp(system_time())
 {
-//	sInstanceCount++;
-//	printf("UndoableEdits: %ld\n", sInstanceCount);
 }
 
 
 UndoableEdit::~UndoableEdit()
 {
-//	sInstanceCount--;
-//	printf("UndoableEdits: %ld\n", sInstanceCount);
 }
 
 

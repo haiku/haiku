@@ -1,14 +1,16 @@
 /*
  * Copyright 2006-2112, Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2021, Andrew Lindesay <apl@lindesay.co.nz>
  * Distributed under the terms of the MIT License.
  */
 
 #ifndef COMPOUND_EDIT_H
 #define COMPOUND_EDIT_H
 
+#include <vector>
+
 #include <String.h>
 
-#include "List.h"
 #include "UndoableEdit.h"
 
 class CompoundEdit : public UndoableEdit {
@@ -24,12 +26,11 @@ public:
 
 	virtual void				GetName(BString& name);
 
-			bool				AppendEdit(const UndoableEditRef& edit);
+			void				AppendEdit(const UndoableEditRef& edit);
 
 private:
-			typedef List<UndoableEditRef, false, 2>	EditList;
-
-			EditList			fEdits;
+			std::vector<UndoableEditRef>
+								fEdits;
 			BString				fName;
 };
 

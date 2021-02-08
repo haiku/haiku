@@ -87,7 +87,6 @@ local textDocumentSources =
 	CompoundEdit.cpp
 	EditContext.cpp
 	EditManager.cpp
-	EditStack.cpp
 	UndoableEdit.cpp
 
 	# textview

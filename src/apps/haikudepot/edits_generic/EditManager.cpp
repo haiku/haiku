@@ -1,9 +1,12 @@
 /*
  * Copyright 2006-2012, Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2021, Andrew Lindesay <apl@lindesay.co.nz>
  * Distributed under the terms of the MIT License.
  */
 
 #include "EditManager.h"
+
+#include <algorithm>
 
 #include <stdio.h>
 #include <string.h>
@@ -64,14 +67,14 @@ status_t
 EditManager::Undo(EditContext& context)
 {
 	status_t status = B_ERROR;
-	if (!fUndoHistory.IsEmpty()) {
-		UndoableEditRef edit(fUndoHistory.Top());
-		fUndoHistory.Pop();
+	if (!fUndoHistory.empty()) {
+		UndoableEditRef edit(fUndoHistory.top());
+		fUndoHistory.pop();
 		status = edit->Undo(context);
 		if (status == B_OK)
-			fRedoHistory.Push(edit);
+			fRedoHistory.push(edit);
 		else
-			fUndoHistory.Push(edit);
+			fUndoHistory.push(edit);
 	}
 
 	_NotifyListeners();
@@ -84,14 +87,14 @@ status_t
 EditManager::Redo(EditContext& context)
 {
 	status_t status = B_ERROR;
-	if (!fRedoHistory.IsEmpty()) {
-		UndoableEditRef edit(fRedoHistory.Top());
-		fRedoHistory.Pop();
+	if (!fRedoHistory.empty()) {
+		UndoableEditRef edit(fRedoHistory.top());
+		fRedoHistory.pop();
 		status = edit->Redo(context);
 		if (status == B_OK)
-			fUndoHistory.Push(edit);
+			fUndoHistory.push(edit);
 		else
-			fRedoHistory.Push(edit);
+			fRedoHistory.push(edit);
 	}
 
 	_NotifyListeners();
@@ -103,9 +106,9 @@ EditManager::Redo(EditContext& context)
 bool
 EditManager::GetUndoName(BString& name)
 {
-	if (!fUndoHistory.IsEmpty()) {
+	if (!fUndoHistory.empty()) {
 		name << " ";
-		fUndoHistory.Top()->GetName(name);
+		fUndoHistory.top()->GetName(name);
 		return true;
 	}
 	return false;
@@ -115,9 +118,9 @@ EditManager::GetUndoName(BString& name)
 bool
 EditManager::GetRedoName(BString& name)
 {
-	if (!fRedoHistory.IsEmpty()) {
+	if (!fRedoHistory.empty()) {
 		name << " ";
-		fRedoHistory.Top()->GetName(name);
+		fRedoHistory.top()->GetName(name);
 		return true;
 	}
 	return false;
@@ -127,10 +130,10 @@ EditManager::GetRedoName(BString& name)
 void
 EditManager::Clear()
 {
-	while (!fUndoHistory.IsEmpty())
-		fUndoHistory.Pop();
-	while (!fRedoHistory.IsEmpty())
-		fRedoHistory.Pop();
+	while (!fUndoHistory.empty())
+		fUndoHistory.pop();
+	while (!fRedoHistory.empty())
+		fRedoHistory.pop();
 
 	_NotifyListeners();
 }
@@ -139,8 +142,8 @@ EditManager::Clear()
 void
 EditManager::Save()
 {
-	if (!fUndoHistory.IsEmpty())
-		fEditAtSave = fUndoHistory.Top();
+	if (!fUndoHistory.empty())
+		fEditAtSave = fUndoHistory.top();
 
 	_NotifyListeners();
 }
@@ -149,9 +152,9 @@ EditManager::Save()
 bool
 EditManager::IsSaved()
 {
-	bool saved = fUndoHistory.IsEmpty();
+	bool saved = fUndoHistory.empty();
 	if (fEditAtSave.IsSet() && !saved) {
-		if (fEditAtSave == fUndoHistory.Top())
+		if (fEditAtSave == fUndoHistory.top())
 			saved = true;
 	}
 	return saved;
@@ -161,17 +164,20 @@ EditManager::IsSaved()
 // #pragma mark -
 
 
-bool
+void
 EditManager::AddListener(Listener* listener)
 {
-	return fListeners.Add(listener);
+	return fListeners.push_back(listener);
 }
 
 
 void
 EditManager::RemoveListener(Listener* listener)
 {
-	fListeners.Remove(listener);
+	fListeners.erase(std::remove(
+		fListeners.begin(),
+		fListeners.end(),
+		listener), fListeners.end());
 }
 
 
@@ -184,24 +190,24 @@ EditManager::_AddEdit(const UndoableEditRef& edit)
 	status_t status = B_OK;
 
 	bool add = true;
-	if (!fUndoHistory.IsEmpty()) {
+	if (!fUndoHistory.empty()) {
 		// Try to collapse edits to a single edit
 		// or remove this and the previous edit if
 		// they reverse each other
-		const UndoableEditRef& top = fUndoHistory.Top();
+		const UndoableEditRef& top = fUndoHistory.top();
 		if (edit->UndoesPrevious(top.Get())) {
 			add = false;
-			fUndoHistory.Pop();
+			fUndoHistory.pop();
 		} else if (top->CombineWithNext(edit.Get())) {
 			add = false;
 			// After collapsing, the edit might
 			// have changed it's mind about InitCheck()
 			// (the commands reversed each other)
 			if (top->InitCheck() != B_OK) {
-				fUndoHistory.Pop();
+				fUndoHistory.pop();
 			}
 		} else if (edit->CombineWithPrevious(top.Get())) {
-			fUndoHistory.Pop();
+			fUndoHistory.pop();
 			// After collapsing, the edit might
 			// have changed it's mind about InitCheck()
 			// (the commands reversed each other)
@@ -210,16 +216,14 @@ EditManager::_AddEdit(const UndoableEditRef& edit)
 			}
 		}
 	}
-	if (add) {
-		if (!fUndoHistory.Push(edit))
-			status = B_NO_MEMORY;
-	}
+	if (add)
+		fUndoHistory.push(edit);
 
 	if (status == B_OK) {
 		// The redo stack needs to be empty
 		// as soon as an edit was added (also in case of collapsing)
-		while (!fRedoHistory.IsEmpty()) {
-			fRedoHistory.Pop();
+		while (!fRedoHistory.empty()) {
+			fRedoHistory.pop();
 		}
 	}
 
@@ -230,15 +234,14 @@ EditManager::_AddEdit(const UndoableEditRef& edit)
 void
 EditManager::_NotifyListeners()
 {
-	int32 count = fListeners.CountItems();
-	if (count == 0)
-		return;
 	// Iterate a copy of the list, so we don't crash if listeners
 	// detach themselves while being notified.
-	ListenerList listenersCopy(fListeners);
-	if (listenersCopy.CountItems() != count)
-		return;
-	for (int32 i = 0; i < count; i++)
-		listenersCopy.ItemAtFast(i)->EditManagerChanged(this);
+	std::vector<Listener*> listeners(fListeners);
+
+	std::vector<Listener*>::const_iterator it;
+	for (it = listeners.begin(); it != listeners.end(); it++) {
+		Listener* listener = *it;
+		listener->EditManagerChanged(this);
+	}
 }
 
