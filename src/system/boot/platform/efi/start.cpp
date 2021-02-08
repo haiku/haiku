@@ -180,6 +180,7 @@ platform_start_kernel(void)
 extern "C" void
 platform_exit(void)
 {
+	kRuntimeServices->ResetSystem(EfiResetCold, EFI_SUCCESS, 0, NULL);
 	return;
 }
 
