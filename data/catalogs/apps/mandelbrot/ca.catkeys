@@ -1,25 +1,25 @@
 1	catalan; valencian	x-vnd.Haiku-Mandelbrot	3875916167
-Burning Ship	MandelbrotWindow		Vaixell cremant
 Grassland	MandelbrotWindow		Prat
+Tricorn	MandelbrotWindow		Tricorni
+Orbit Trap	MandelbrotWindow		Trampa d’òrbita
+Deepfrost	MandelbrotWindow		Gel profund
+1 (none)	MandelbrotWindow		1 (cap)
+Quit	MandelbrotWindow		Surt
+Fire	MandelbrotWindow		Foc
+High contrast	MandelbrotWindow		Contrast alt
+Midnight	MandelbrotWindow		Mitjanit
+Burning Ship	MandelbrotWindow		Vaixell cremant
 Lightning	MandelbrotWindow		Llamp
 About	MandelbrotWindow		Quant a
 Palette	MandelbrotWindow		Paleta
 Set	MandelbrotWindow		Estableix
-Tricorn	MandelbrotWindow		Tricorni
 Royal	MandelbrotWindow		Reial
-Orbit Trap	MandelbrotWindow		Trampa d’òrbita
-Deepfrost	MandelbrotWindow		Gel profund
 Subsampling	MandelbrotWindow		Submostratge
-1 (none)	MandelbrotWindow		1 (cap)
-Quit	MandelbrotWindow		Surt
 File	MandelbrotWindow		Fitxer
 Julia	MandelbrotWindow		Júlia
 Frost	MandelbrotWindow		Gebre
-Fire	MandelbrotWindow		Foc
 Mandelbrot	System name		Mandelbrot
-Iterations	MandelbrotWindow		Iteracions
-High contrast	MandelbrotWindow		Contrast alt
 Multibrot	MandelbrotWindow		Multibrot
+Iterations	MandelbrotWindow		Iteracions
 Spring	MandelbrotWindow		Primavera
-Midnight	MandelbrotWindow		Mitjanit
 Mandelbrot	MandelbrotWindow		Mandelbrot

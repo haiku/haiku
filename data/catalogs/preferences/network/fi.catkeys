@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Network	3062143965
+1	finnish	x-vnd.Haiku-Network	543099905
 Ethernet device	InterfaceListItem		Ethernet-laite
 Link speed:	IntefaceView		Yhteysnopeus:
 disconnected	IntefaceView		katkaistu
@@ -13,6 +13,7 @@ Gateway:	IntefaceAddressView		Yhdyskäytävä:
 The netmask defines your local network	IntefaceAddressView		Verkkopeite määrittää paikallisen verkkosi
 Your IP address	IntefaceAddressView		IP-osoitteesi
 DHCP	IntefaceAddressView		DHCP
+IP address:	IntefaceAddressView		IP-osoite:
 Netmask:	IntefaceAddressView		Verkkopeite:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Palvelut

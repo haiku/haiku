@@ -1,25 +1,25 @@
 1	spanish; castilian	x-vnd.Haiku-Mandelbrot	3875916167
-Burning Ship	MandelbrotWindow		Nave Ardiendo
 Grassland	MandelbrotWindow		Pradera
+Tricorn	MandelbrotWindow		Tricornio
+Orbit Trap	MandelbrotWindow		Trampa Orbital
+Deepfrost	MandelbrotWindow		Helada profunda
+1 (none)	MandelbrotWindow		1 (ninguno)
+Quit	MandelbrotWindow		Salir
+Fire	MandelbrotWindow		Fuego
+High contrast	MandelbrotWindow		Alto contraste
+Midnight	MandelbrotWindow		Medianoche
+Burning Ship	MandelbrotWindow		Nave Ardiendo
 Lightning	MandelbrotWindow		Relámpago
 About	MandelbrotWindow		Acerca de
 Palette	MandelbrotWindow		Paleta
 Set	MandelbrotWindow		Establecer
-Tricorn	MandelbrotWindow		Tricornio
 Royal	MandelbrotWindow		Real
-Orbit Trap	MandelbrotWindow		Trampa Orbital
-Deepfrost	MandelbrotWindow		Helada profunda
 Subsampling	MandelbrotWindow		Sub muestreo
-1 (none)	MandelbrotWindow		1 (ninguno)
-Quit	MandelbrotWindow		Salir
 File	MandelbrotWindow		Archivo
 Julia	MandelbrotWindow		Julia
 Frost	MandelbrotWindow		Hielo
-Fire	MandelbrotWindow		Fuego
 Mandelbrot	System name		Mandelbrot
-Iterations	MandelbrotWindow		Iteraciones
-High contrast	MandelbrotWindow		Alto contraste
 Multibrot	MandelbrotWindow		Multibrot
+Iterations	MandelbrotWindow		Iteraciones
 Spring	MandelbrotWindow		Primavera
-Midnight	MandelbrotWindow		Medianoche
 Mandelbrot	MandelbrotWindow		Mandelbrot

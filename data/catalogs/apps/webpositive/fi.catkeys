@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-WebPositive	1976607515
+1	finnish	x-vnd.Haiku-WebPositive	250728390
 Authentication required	Authentication Panel		Vaaditaan todentamista
 Previous	WebPositive Window		Edellinen
 (Finish: %date)	Download Window		(Päättyi: %date)
@@ -101,6 +101,7 @@ There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPosi
 Revert	Settings Window		Palauta
 Copy	WebPositive Window		Kopioi
 Default standard font size:	Settings Window		Vakiokirjasimen oletuskoko:
+Custom	Settings Window		Mukautettu
 Bookmark this page	WebPositive Window		Merkitse tämä sivu kirjanmerkillä
 Show tabs if only one page is open	Settings Window		Näytä välilehdet jos vain yksi sivu on avoinna
 Close tab	WebPositive Window		Sulje välilehti

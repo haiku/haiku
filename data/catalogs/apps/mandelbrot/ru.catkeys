@@ -1,25 +1,25 @@
 1	russian	x-vnd.Haiku-Mandelbrot	3875916167
-Burning Ship	MandelbrotWindow		Горящий корабль
 Grassland	MandelbrotWindow		Луг
+Tricorn	MandelbrotWindow		Треуголка
+Orbit Trap	MandelbrotWindow		Орбитальная ловушка
+Deepfrost	MandelbrotWindow		Заморозка
+1 (none)	MandelbrotWindow		1 (ничего)
+Quit	MandelbrotWindow		Выход
+Fire	MandelbrotWindow		Огонь
+High contrast	MandelbrotWindow		Высокий контраст
+Midnight	MandelbrotWindow		Полночь
+Burning Ship	MandelbrotWindow		Горящий корабль
 Lightning	MandelbrotWindow		Молния
 About	MandelbrotWindow		О программе
 Palette	MandelbrotWindow		Палитра
 Set	MandelbrotWindow		Набор
-Tricorn	MandelbrotWindow		Треуголка
 Royal	MandelbrotWindow		Королевский
-Orbit Trap	MandelbrotWindow		Орбитальная ловушка
-Deepfrost	MandelbrotWindow		Заморозка
 Subsampling	MandelbrotWindow		Подвыборка
-1 (none)	MandelbrotWindow		1 (ничего)
-Quit	MandelbrotWindow		Выход
 File	MandelbrotWindow		Файл
 Julia	MandelbrotWindow		Жюлиа
 Frost	MandelbrotWindow		Мороз
-Fire	MandelbrotWindow		Огонь
 Mandelbrot	System name		Мандельброт
-Iterations	MandelbrotWindow		Итерации
-High contrast	MandelbrotWindow		Высокий контраст
 Multibrot	MandelbrotWindow		Мультиброт
+Iterations	MandelbrotWindow		Итерации
 Spring	MandelbrotWindow		Весна
-Midnight	MandelbrotWindow		Полночь
 Mandelbrot	MandelbrotWindow		Мандельброт

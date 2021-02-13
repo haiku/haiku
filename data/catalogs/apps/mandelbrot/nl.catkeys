@@ -1,25 +1,25 @@
 1	dutch; flemish	x-vnd.Haiku-Mandelbrot	3875916167
-Burning Ship	MandelbrotWindow		Brandend Schip
 Grassland	MandelbrotWindow		Grasland
+Tricorn	MandelbrotWindow		Driekantige Steek
+Orbit Trap	MandelbrotWindow		Baanval
+Deepfrost	MandelbrotWindow		Diepe Vorst
+1 (none)	MandelbrotWindow		1 (geen)
+Quit	MandelbrotWindow		Afsluiten
+Fire	MandelbrotWindow		Vuur
+High contrast	MandelbrotWindow		Hoog contrast
+Midnight	MandelbrotWindow		Middernacht
+Burning Ship	MandelbrotWindow		Brandend Schip
 Lightning	MandelbrotWindow		Onweer
 About	MandelbrotWindow		Over
 Palette	MandelbrotWindow		Palet
 Set	MandelbrotWindow		Set
-Tricorn	MandelbrotWindow		Driekantige Steek
 Royal	MandelbrotWindow		Koninkijk
-Orbit Trap	MandelbrotWindow		Baanval
-Deepfrost	MandelbrotWindow		Diepe Vorst
 Subsampling	MandelbrotWindow		Subsampling
-1 (none)	MandelbrotWindow		1 (geen)
-Quit	MandelbrotWindow		Afsluiten
 File	MandelbrotWindow		Bestand
 Julia	MandelbrotWindow		Julia
 Frost	MandelbrotWindow		Vorst
-Fire	MandelbrotWindow		Vuur
 Mandelbrot	System name		Mandelbrot
-Iterations	MandelbrotWindow		Iteraties
-High contrast	MandelbrotWindow		Hoog contrast
 Multibrot	MandelbrotWindow		Multibrot
+Iterations	MandelbrotWindow		Iteraties
 Spring	MandelbrotWindow		Lente
-Midnight	MandelbrotWindow		Middernacht
 Mandelbrot	MandelbrotWindow		Mandelbrot

@@ -1,25 +1,25 @@
 1	swedish	x-vnd.Haiku-Mandelbrot	3875916167
-Burning Ship	MandelbrotWindow		Brinnande skepp
 Grassland	MandelbrotWindow		Grässlätt
+Tricorn	MandelbrotWindow		Trekorn
+Orbit Trap	MandelbrotWindow		Omloppsbana
+Deepfrost	MandelbrotWindow		Djup frost
+1 (none)	MandelbrotWindow		1 (ingen)
+Quit	MandelbrotWindow		Avsluta
+Fire	MandelbrotWindow		Eld
+High contrast	MandelbrotWindow		Hög kontrast
+Midnight	MandelbrotWindow		Midnatt
+Burning Ship	MandelbrotWindow		Brinnande skepp
 Lightning	MandelbrotWindow		Blixten
 About	MandelbrotWindow		Om
 Palette	MandelbrotWindow		Palett
 Set	MandelbrotWindow		Sätt
-Tricorn	MandelbrotWindow		Trekorn
 Royal	MandelbrotWindow		Kunglig
-Orbit Trap	MandelbrotWindow		Omloppsbana
-Deepfrost	MandelbrotWindow		Djup frost
 Subsampling	MandelbrotWindow		Subsampling
-1 (none)	MandelbrotWindow		1 (ingen)
-Quit	MandelbrotWindow		Avsluta
 File	MandelbrotWindow		Arkiv
 Julia	MandelbrotWindow		Julia
 Frost	MandelbrotWindow		Frost
-Fire	MandelbrotWindow		Eld
 Mandelbrot	System name		Mandelbrot
-Iterations	MandelbrotWindow		Upprepningar
-High contrast	MandelbrotWindow		Hög kontrast
 Multibrot	MandelbrotWindow		Multibrot
+Iterations	MandelbrotWindow		Upprepningar
 Spring	MandelbrotWindow		Vår
-Midnight	MandelbrotWindow		Midnatt
 Mandelbrot	MandelbrotWindow		Mandelbrot

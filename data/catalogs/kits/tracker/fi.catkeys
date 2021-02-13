@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	2498612740
+1	finnish	x-vnd.Haiku-libtracker	3380227078
 Created	ContainerWindow		Luotu
 Icon	AttributesView		Kuvake
 Open and make preferred	OpenWithWindow		Avaa ja tee ensisijaiseksi
@@ -6,6 +6,7 @@ Kind	ContainerWindow		Tyyppi
 Open with…	ContainerWindow		Avaa sovelluksella...
 Error moving \"%name\" to Trash. (%error)	FSUtils		Virhe siirrettäessä kohdetta ”%name” roskakoriin. (%error)
 Or	FindPanel		tai
+MIME Description	AttributesView		MIME-kuvaus
 before	FindPanel		ennen
 Volume icons	TrackerSettingsWindow		Taltiokuvakkeet
 Ignore case	SelectionWindow		Ohita kirjainkoko
@@ -329,6 +330,7 @@ Recent folders	FavoritesMenu		Äskettäiset kansiot
 Signed memory size	AttributesView		Allekirjoitettu muistikoko
 The specified name is illegal. Please choose another name.	FilePanelPriv		Määritelty nimi on virheellinen. Valitse toinen nimi.
 of %items	StatusWindow		/ %items
+MIME Path	AttributesView		MIME-polku
 less than	FindPanel		pienempi kuin
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Virhe kopioitaessa tiedostoa ”%name”:\n\t%error\n\nHaluaisitko jatkaa?
 Creating links: 	StatusWindow		Luodaan linkit: 
@@ -443,6 +445,7 @@ Sorry, saving more than one item is not allowed.	FilePanelPriv		Useamman kuin yh
 Move here	ContainerWindow		Siirrä tänne
 the config folder	FSUtils		config-kansio
 Sorry, could not create a new folder.	FSUtils		Uuden kansion luominen epäonnistui.
+MIME Signature	AttributesView		MIME-allekirjoitus
 Select all	VirtualDirectoryWindow		Valitse kaikki
 Rename	FSUtils	button label	Nimeä uudelleen
 Clean up all	ContainerWindow		Tyhjennä kaikki

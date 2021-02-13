@@ -52,7 +52,7 @@ Writing bootsector.	InstallProgress		Skribante praŝarĝparton.
 An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Eraro estis rekonita kaj la instalado ne estis finita:\n\nEraro:  %s
 Restart	InstallerWindow		Restartigi
 The disk can't be mounted. Please choose a different disk.	InstallProgress		La disko ne eblas muntiĝi. Bonvolu elekti alian.
-Begin	InstallerWindow		Ek
+Begin	InstallerWindow		Komenci
 Collecting copy information.	InstallProgress		Kunigante kopiajn informojn.
 Show optional packages	InstallerWindow		Montri malneprajn pakaĵojn
 No partitions have been found that are suitable for installation. Please set up partitions and format at least one partition with the Be File System.	InstallerWindow		Subdisko taŭga por instali forestas. Kreu subdiskojn kaj formatigu almenaŭ unuan per dosiersistemo Be.
