@@ -368,7 +368,10 @@ decompose_ft_bitmap_subpix(const FT_Bitmap& bitmap, int x, int y,
 {
 	const uint8* buf = (const uint8*)bitmap.buffer;
 	int pitch = bitmap.pitch;
-	sl.reset(x, x + bitmap.width / 3);
+	if (bitmap.pixel_mode == FT_PIXEL_MODE_MONO)
+		sl.reset(x, x + bitmap.width);
+	else
+		sl.reset(x, x + bitmap.width / 3);
 	storage.prepare();
 
 	if (flip_y) {
