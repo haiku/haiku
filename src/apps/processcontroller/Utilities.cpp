@@ -67,6 +67,12 @@ get_team_name_and_icon(info_pack& infoPack, bool icon)
 				B_MINI_ICON) != B_OK) {
 			BMimeType genericAppType(B_APP_MIME_TYPE);
 			status = genericAppType.GetIcon(infoPack.team_icon, B_MINI_ICON);
+			// failed to get icon
+			if (status != B_OK) {
+				delete infoPack.team_icon;
+				infoPack.team_icon = NULL;
+				return false;
+			}
 		}
 	} else
 		infoPack.team_icon = NULL;

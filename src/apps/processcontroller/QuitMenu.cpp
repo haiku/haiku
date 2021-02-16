@@ -106,9 +106,10 @@ QuitMenu::AddTeam(team_id tmid)
 	else {
 		info_pack infos;
 		if (get_team_info(tmid, &infos.team_info) == B_OK
-			&& get_team_name_and_icon(infos, true))
+			&& get_team_name_and_icon(infos, true)) {
 			item = new QuitMenuItem(tmid, infos.team_icon, infos.team_name,
 				message, true);
+		}
 	}
 	if (item) {
 		item->SetTarget(gPCView);
