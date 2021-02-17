@@ -34,7 +34,7 @@ MovePLItemsCommand::MovePLItemsCommand(Playlist* playlist,
 {
 	if (indices.IsEmpty()) {
 		// indicate a bad object state
-		delete fItems;
+		delete[] fItems;
 		fItems = NULL;
 		return;
 	}
