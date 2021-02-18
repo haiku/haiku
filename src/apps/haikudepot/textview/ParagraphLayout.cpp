@@ -8,6 +8,7 @@
  *		Marc Flerackers, mflerackers@androme.be
  *		Hiroshi Lockheimer (BTextView is based on his STEEngine)
  *		Oliver Tappe, zooey@hirschkaefer.de
+ *      Andrew Lindesay, apl@lindesay.co.nz
  */
 
 #include "ParagraphLayout.h"
@@ -177,7 +178,7 @@ ParagraphLayout::ParagraphLayout()
 
 ParagraphLayout::ParagraphLayout(const Paragraph& paragraph)
 	:
-	fTextSpans(paragraph.TextSpans()),
+	fTextSpans(),
 	fParagraphStyle(paragraph.Style()),
 
 	fWidth(0.0f),
@@ -186,6 +187,7 @@ ParagraphLayout::ParagraphLayout(const Paragraph& paragraph)
 	fGlyphInfos(),
 	fLineInfos()
 {
+	_AppendTextSpans(paragraph);
 	_Init();
 }
 
@@ -212,7 +214,8 @@ ParagraphLayout::~ParagraphLayout()
 void
 ParagraphLayout::SetParagraph(const Paragraph& paragraph)
 {
-	fTextSpans = paragraph.TextSpans();
+	fTextSpans.clear();
+	_AppendTextSpans(paragraph);
 	fParagraphStyle = paragraph.Style();
 
 	_Init();
@@ -484,9 +487,9 @@ ParagraphLayout::_Init()
 {
 	fGlyphInfos.Clear();
 
-	int spanCount = fTextSpans.CountItems();
-	for (int i = 0; i < spanCount; i++) {
-		const TextSpan& span = fTextSpans.ItemAtFast(i);
+	std::vector<TextSpan>::const_iterator it;
+	for (it = fTextSpans.begin(); it != fTextSpans.end(); it++) {
+		const TextSpan& span = *it;
 		if (!_AppendGlyphInfos(span)) {
 			fprintf(stderr, "%p->ParagraphLayout::_Init() - Out of memory\n",
 				this);
@@ -852,27 +855,27 @@ ParagraphLayout::_FinalizeLine(int lineStart, int lineEnd, int lineIndex,
 
 		while (i >= spanEnd) {
 			spanIndex++;
-			const TextSpan& span = fTextSpans.ItemAt(spanIndex);
+			const TextSpan& span = fTextSpans[spanIndex];
 			spanStart = spanEnd;
 			spanEnd += span.CountChars();
 			addSpan = true;
 		}
 
 		if (addSpan) {
-			const TextSpan& span = fTextSpans.ItemAt(spanIndex);
+			const TextSpan& span = fTextSpans[spanIndex];
 			TextSpan subSpan = span.SubSpan(i - spanStart,
 				(lineEnd - spanStart + 1) - (i - spanStart));
-			line.layoutedSpans.Add(subSpan);
+			line.layoutedSpans.push_back(subSpan);
 			_IncludeStyleInLine(line, span.Style());
 		}
 	}
 
-	if (fGlyphInfos.CountItems() == 0 && fTextSpans.CountItems() > 0) {
+	if (fGlyphInfos.CountItems() == 0 && !fTextSpans.empty()) {
 		// When the layout contains no glyphs, but there is at least one
 		// TextSpan in the paragraph, use the font info from that span
 		// to calculate the height of the first LineInfo.
-		const TextSpan& span = fTextSpans.ItemAtFast(0);
-		line.layoutedSpans.Add(span);
+		const TextSpan& span = fTextSpans[0];
+		line.layoutedSpans.push_back(span);
 		_IncludeStyleInLine(line, span.Style());
 	}
 
@@ -908,9 +911,9 @@ ParagraphLayout::_DrawLine(BView* view, const BPoint& offset,
 	const LineInfo& line) const
 {
 	int textOffset = line.textOffset;
-	int spanCount = line.layoutedSpans.CountItems();
+	int spanCount = static_cast<int>(line.layoutedSpans.size());
 	for (int i = 0; i < spanCount; i++) {
-		const TextSpan& span = line.layoutedSpans.ItemAtFast(i);
+		const TextSpan& span = line.layoutedSpans[i];
 		_DrawSpan(view, offset, span, textOffset);
 		textOffset += span.CountChars();
 	}
@@ -972,4 +975,13 @@ ParagraphLayout::_GetEmptyLayoutBounds(float& x1, float& y1, float& x2,
 	const LineInfo& lineInfo = fLineInfos.ItemAt(0);
 	y1 = lineInfo.y;
 	y2 = lineInfo.y + lineInfo.height;
+}
+
+
+void
+ParagraphLayout::_AppendTextSpans(const Paragraph& paragraph)
+{
+	int32 countTextSpans = paragraph.CountTextSpans();
+	for (int32 i = 0; i< countTextSpans; i++)
+		fTextSpans.push_back(paragraph.TextSpanAtIndex(i));
 }

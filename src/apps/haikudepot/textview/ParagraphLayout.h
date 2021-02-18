@@ -1,16 +1,20 @@
 /*
  * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef PARAGRAPH_LAYOUT_H
 #define PARAGRAPH_LAYOUT_H
 
+#include <vector>
+
 #include <Font.h>
 #include <Referenceable.h>
 #include <String.h>
 
-#include "Paragraph.h"
 #include "CharacterStyle.h"
+#include "List.h"
+#include "Paragraph.h"
 
 
 class BView;
@@ -164,7 +168,8 @@ public:
 	float			extraGlyphSpacing;
 	float			extraWhiteSpacing;
 
-	TextSpanList	layoutedSpans;
+	std::vector<TextSpan>
+					layoutedSpans;
 };
 
 
@@ -234,8 +239,11 @@ private:
 			void				_GetEmptyLayoutBounds(float& x1, float& y1,
 									float& x2, float& y2) const;
 
+			void				_AppendTextSpans(const Paragraph& paragraph);
+
 private:
-			TextSpanList		fTextSpans;
+			std::vector<TextSpan>
+								fTextSpans;
 			ParagraphStyle		fParagraphStyle;
 
 			float				fWidth;

@@ -1,16 +1,15 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef PARAGRAPH_H
 #define PARAGRAPH_H
 
-#include "List.h"
+#include <vector>
+
 #include "ParagraphStyle.h"
 #include "TextSpan.h"
-
-
-typedef List<TextSpan, false>	TextSpanList;
 
 
 class Paragraph {
@@ -27,8 +26,8 @@ public:
 	inline	const ParagraphStyle& Style() const
 									{ return fStyle; }
 
-	inline	const TextSpanList&	TextSpans() const
-									{ return fTextSpans; }
+			int32				CountTextSpans() const;
+			const TextSpan&		TextSpanAtIndex(int32 index) const;
 
 			bool				Prepend(const TextSpan& span);
 			bool				Append(const TextSpan& span);
@@ -51,7 +50,8 @@ private:
 
 private:
 			ParagraphStyle		fStyle;
-			TextSpanList		fTextSpans;
+			std::vector<TextSpan>
+								fTextSpans;
 	mutable	int32				fCachedLength;
 };
 

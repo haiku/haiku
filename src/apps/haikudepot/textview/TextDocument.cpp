@@ -1,5 +1,6 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -7,6 +8,7 @@
 
 #include <algorithm>
 #include <stdio.h>
+#include <vector>
 
 
 TextDocument::TextDocument()
@@ -164,15 +166,14 @@ TextDocument::CharacterStyleAt(int32 textOffset) const
 	const Paragraph& paragraph = ParagraphAt(textOffset, paragraphOffset);
 
 	textOffset -= paragraphOffset;
-	const TextSpanList& spans = paragraph.TextSpans();
+	int32 index;
+	int32 count = paragraph.CountTextSpans();
 
-	int32 index = 0;
-	while (index < spans.CountItems()) {
-		const TextSpan& span = spans.ItemAtFast(index);
+	for (index = 0; index < count; index++) {
+		const TextSpan& span = paragraph.TextSpanAtIndex(index);
 		if (textOffset - span.CountChars() < 0)
 			return span.Style();
 		textOffset -= span.CountChars();
-		index++;
 	}
 
 	return fDefaultCharacterStyle;
@@ -468,10 +469,10 @@ TextDocument::_Insert(int32 textOffset, TextDocumentRef document,
 		Paragraph paragraph2(document->ParagraphAt(
 			document->CountParagraphs() - 1).Style());
 		{
-			const TextSpanList& textSpans = ParagraphAt(index).TextSpans();
-			int32 spanCount = textSpans.CountItems();
+			const Paragraph& paragraphAtIndex = ParagraphAt(index);
+			int32 spanCount = paragraphAtIndex.CountTextSpans();
 			for (int32 i = 0; i < spanCount; i++) {
-				const TextSpan& span = textSpans.ItemAtFast(i);
+				const TextSpan& span = paragraphAtIndex.TextSpanAtIndex(i);
 				int32 spanLength = span.CountChars();
 				if (textOffset >= spanLength) {
 					if (!paragraph1.Append(span))
@@ -499,10 +500,9 @@ TextDocument::_Insert(int32 textOffset, TextDocumentRef document,
 		// paragraph at insert position
 		{
 			const Paragraph& otherParagraph = document->ParagraphAt(0);
-			const TextSpanList& textSpans = otherParagraph.TextSpans();
-			int32 spanCount = textSpans.CountItems();
+			int32 spanCount = otherParagraph.CountTextSpans();
 			for (int32 i = 0; i < spanCount; i++) {
-				const TextSpan& span = textSpans.ItemAtFast(i);
+				const TextSpan& span = otherParagraph.TextSpanAtIndex(i);
 				// TODO: Import/map CharacterStyles
 				if (!paragraph1.Append(span))
 					return B_NO_MEMORY;
@@ -531,10 +531,9 @@ TextDocument::_Insert(int32 textOffset, TextDocumentRef document,
 				if (!fParagraphs.Add(otherParagraph, ++index))
 					return B_NO_MEMORY;
 			} else {
-				const TextSpanList& textSpans = otherParagraph.TextSpans();
-				int32 spanCount = textSpans.CountItems();
+				int32 spanCount = otherParagraph.CountTextSpans();
 				for (int32 i = 0; i < spanCount; i++) {
-					const TextSpan& span = textSpans.ItemAtFast(i);
+					const TextSpan& span = otherParagraph.TextSpanAtIndex(i);
 					// TODO: Import/map CharacterStyles
 					if (!paragraph2.Prepend(span))
 						return B_NO_MEMORY;
@@ -548,8 +547,8 @@ TextDocument::_Insert(int32 textOffset, TextDocumentRef document,
 			// if its empty. This handles the case of inserting a
 			// line-break at the end of the document. It than needs to
 			// have a new, empty paragraph at the end.
-			const TextSpanList& spans = paragraph1.TextSpans();
-			const TextSpan& span = spans.LastItem();
+			const int32 indexLastSpan = paragraph1.CountTextSpans() - 1;
+			const TextSpan& span = paragraph1.TextSpanAtIndex(indexLastSpan);
 			if (!paragraph2.Append(TextSpan("", span.Style())))
 				return B_NO_MEMORY;
 		}
@@ -562,10 +561,9 @@ TextDocument::_Insert(int32 textOffset, TextDocumentRef document,
 		Paragraph paragraph(ParagraphAt(index));
 		const Paragraph& otherParagraph = document->ParagraphAt(0);
 
-		const TextSpanList& textSpans = otherParagraph.TextSpans();
-		int32 spanCount = textSpans.CountItems();
+		int32 spanCount = otherParagraph.CountTextSpans();
 		for (int32 i = 0; i < spanCount; i++) {
-			const TextSpan& span = textSpans.ItemAtFast(i);
+			const TextSpan& span = otherParagraph.TextSpanAtIndex(i);
 			paragraph.Insert(textOffset, span);
 			textOffset += span.CountChars();
 		}
@@ -618,10 +616,10 @@ TextDocument::_Remove(int32 textOffset, int32 length, int32& index,
 		// Line break between paragraphs got removed. Shift the next
 		// paragraph's text spans into the resulting one.
 
-		const TextSpanList&	textSpans = ParagraphAt(index + 1).TextSpans();
-		int32 spanCount = textSpans.CountItems();
+		const Paragraph& paragraph = ParagraphAt(index + 1);
+		int32 spanCount = paragraph.CountTextSpans();
 		for (int32 i = 0; i < spanCount; i++) {
-			const TextSpan& span = textSpans.ItemAtFast(i);
+			const TextSpan& span = paragraph.TextSpanAtIndex(i);
 			resultParagraph.Append(span);
 		}
 		fParagraphs.Remove(index + 1);
@@ -650,10 +648,9 @@ TextDocument::_Remove(int32 textOffset, int32 length, int32& index,
 				return B_NO_MEMORY;
 
 			// Transfer remaining spans to resultParagraph
-			const TextSpanList&	textSpans = newParagraph.TextSpans();
-			int32 spanCount = textSpans.CountItems();
+			int32 spanCount = newParagraph.CountTextSpans();
 			for (int32 i = 0; i < spanCount; i++) {
-				const TextSpan& span = textSpans.ItemAtFast(i);
+				const TextSpan& span = newParagraph.TextSpanAtIndex(i);
 				resultParagraph.Append(span);
 			}
 
