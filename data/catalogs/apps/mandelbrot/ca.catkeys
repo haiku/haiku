@@ -1,12 +1,14 @@
-1	catalan; valencian	x-vnd.Haiku-Mandelbrot	3875916167
+1	catalan; valencian	x-vnd.Haiku-Mandelbrot	2302392624
 Grassland	MandelbrotWindow		Prat
 Tricorn	MandelbrotWindow		Tricorni
 Orbit Trap	MandelbrotWindow		Trampa d’òrbita
 Deepfrost	MandelbrotWindow		Gel profund
 1 (none)	MandelbrotWindow		1 (cap)
 Quit	MandelbrotWindow		Surt
+Save as image…	MandelbrotWindow		Desa-ho com a imatge...
 Fire	MandelbrotWindow		Foc
 High contrast	MandelbrotWindow		Contrast alt
+Full screen	MandelbrotWindow		Pantalla completa
 Midnight	MandelbrotWindow		Mitjanit
 Burning Ship	MandelbrotWindow		Vaixell cremant
 Lightning	MandelbrotWindow		Llamp
@@ -18,6 +20,7 @@ Subsampling	MandelbrotWindow		Submostratge
 File	MandelbrotWindow		Fitxer
 Julia	MandelbrotWindow		Júlia
 Frost	MandelbrotWindow		Gebre
+View	MandelbrotWindow		Vista
 Mandelbrot	System name		Mandelbrot
 Multibrot	MandelbrotWindow		Multibrot
 Iterations	MandelbrotWindow		Iteracions

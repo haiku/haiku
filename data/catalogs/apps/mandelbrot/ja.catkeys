@@ -1,12 +1,14 @@
-1	japanese	x-vnd.Haiku-Mandelbrot	3875916167
+1	japanese	x-vnd.Haiku-Mandelbrot	2302392624
 Grassland	MandelbrotWindow		グラスランド
 Tricorn	MandelbrotWindow		トリコーン
 Orbit Trap	MandelbrotWindow		オービットトラップ
 Deepfrost	MandelbrotWindow		ディープフロスト
 1 (none)	MandelbrotWindow		1 (無し)
 Quit	MandelbrotWindow		終了
+Save as image…	MandelbrotWindow		画像として保存…
 Fire	MandelbrotWindow		ファイアー
 High contrast	MandelbrotWindow		ハイコントラスト
+Full screen	MandelbrotWindow		全画面表示
 Midnight	MandelbrotWindow		ミッドナイト
 Burning Ship	MandelbrotWindow		バーニングシップ
 Lightning	MandelbrotWindow		ライトニング
@@ -18,6 +20,7 @@ Subsampling	MandelbrotWindow		サブサンプリング
 File	MandelbrotWindow		ファイル
 Julia	MandelbrotWindow		ジュリア
 Frost	MandelbrotWindow		フロスト
+View	MandelbrotWindow		ビュー
 Mandelbrot	System name		マンデルブロ
 Multibrot	MandelbrotWindow		マルチブロ
 Iterations	MandelbrotWindow		反復回数
