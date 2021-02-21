@@ -33,10 +33,11 @@ long timezone = 0;
 int daylight = 0;
 
 
-// These two functions are used as a fallback when the locale backend could not
+// These three functions are used as a fallback when the locale backend could not
 // be loaded. They are implemented in localtime_fading_out.c.
 extern "C" struct tm* __gmtime_r_fallback(const time_t* timep, struct tm* tmp);
 extern "C" time_t __mktime_fallback(struct tm* tmp);
+extern "C" time_t __timegm_fallback(struct tm* tmp);
 
 
 extern "C" void
@@ -142,4 +143,30 @@ mktime(struct tm* inTm)
 	// without a locale backend, we fall back to using a basic gmtime_r
 	// implementation.
 	return __mktime_fallback(inTm);
+}
+
+
+extern "C" time_t
+timegm(struct tm* inTm)
+{
+	if (inTm == NULL) {
+		__set_errno(EINVAL);
+		return -1;
+	}
+	tzset();
+	if (gLocaleBackend != NULL) {
+		time_t timeOut;
+		status_t status = gLocaleBackend->Timegm(inTm, timeOut);
+
+		if (status != B_OK) {
+			__set_errno(EOVERFLOW);
+			return -1;
+		}
+
+		return timeOut;
+	}
+
+	// without a locale backend, we fall back to using a basic timegm
+	// implementation.
+	return __timegm_fallback(inTm);
 }

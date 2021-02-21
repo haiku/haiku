@@ -73,6 +73,8 @@ public:
 
 	virtual status_t			Mktime(struct tm* inOutTm, time_t& timeOut);
 
+	virtual status_t			Timegm(struct tm* inOutTm, time_t& timeOut);
+
 private:
 			const char*			_QueryLocale(int category);
 			const char*			_SetPosixLocale(int category);

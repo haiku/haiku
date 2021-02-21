@@ -157,6 +157,8 @@ public:
 									struct tm* tmOut) = 0;
 	virtual status_t			Mktime(struct tm* inOutTm, time_t& timeOut) = 0;
 
+	virtual status_t			Timegm(struct tm* inOutTm, time_t& timeOut) = 0;
+
 	virtual void				Initialize(LocaleDataBridge* dataBridge) = 0;
 
 	static	status_t			LoadBackend();

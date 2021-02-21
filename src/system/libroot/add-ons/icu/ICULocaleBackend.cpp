@@ -353,6 +353,15 @@ ICULocaleBackend::Mktime(struct tm* inOutTm, time_t& timeOut)
 }
 
 
+status_t
+ICULocaleBackend::Timegm(struct tm* inOutTm, time_t& timeOut)
+{
+	ErrnoMaintainer errnoMaintainer;
+
+	return fTimeConversion.Timegm(inOutTm, timeOut);
+}
+
+
 const char*
 ICULocaleBackend::_QueryLocale(int category)
 {
