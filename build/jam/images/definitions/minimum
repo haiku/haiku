@@ -277,11 +277,6 @@ SEARCH on $(networkSettingsFiles)
 	= [ FDirName $(HAIKU_TOP) data settings network ] ;
 AddFilesToHaikuImage system settings network : $(networkSettingsFiles) ;
 
-# fresh install indicator file for the post install scripts
-SEARCH on <post-install>fresh_install
-	= [ FDirName $(HAIKU_TOP) data system settings ] ;
-AddFilesToHaikuImage system settings : <post-install>fresh_install ;
-
 # repository config and cache files
 local repository ;
 for repository in $(HAIKU_REPOSITORIES) {

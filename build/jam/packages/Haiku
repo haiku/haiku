@@ -135,13 +135,7 @@ local userLaunchScripts = <data!launch>user ;
 SEARCH on $(userLaunchScripts) = [ FDirName $(HAIKU_TOP) data launch ] ;
 AddFilesToPackage data user_launch : $(userLaunchScripts) ;
 
-# post install + first login scripts
-local postInstallFiles = add_catalog_entry_attributes.sh ;
-postInstallFiles = $(postInstallFiles:G=post-install) ;
-SEARCH on $(postInstallFiles)
-	= [ FDirName $(HAIKU_TOP) data system boot post_install ] ;
-AddFilesToPackage boot post-install : $(postInstallFiles) ;
-
+# first login scripts
 local firstLoginFiles = default_deskbar_items.sh ;
 firstLoginFiles = $(firstLoginFiles:G=first-login) ;
 SEARCH on $(firstLoginFiles)
@@ -275,21 +269,27 @@ AddDirectoryToPackage preferences : system-preferences.rdef ;
 
 # Deskbar menu symlinks
 
-# "Applications" links
 local linkTarget ;
+
+# "Applications" links
+AddDirectoryToPackage data deskbar menu Applications
+	: deskbar-applications.rdef ;
 for linkTarget in $(DESKBAR_APPLICATIONS) {
 	AddSymlinkToPackage data deskbar menu Applications
 		: ../../../../apps/$(linkTarget) : $(linkTarget) ;
 }
 
 # "Desktop applets" links
+AddDirectoryToPackage data deskbar menu Desktop\ applets
+	: deskbar-applets.rdef ;
 for linkTarget in $(DESKBAR_DESKTOP_APPLETS) {
 	AddSymlinkToPackage data deskbar menu Desktop\ applets
 		: ../../../../apps/$(linkTarget) : $(linkTarget) ;
 }
 
 # "Preferences" links
-AddDirectoryToPackage data deskbar menu Preferences ;
+AddDirectoryToPackage data deskbar menu Preferences
+	: deskbar-preferences.rdef ;
 DESKBAR_PREFERENCES = $(SYSTEM_PREFERENCES:B) ;
 for linkTarget in $(DESKBAR_PREFERENCES) {
 	AddSymlinkToPackage data deskbar menu Preferences
@@ -298,7 +298,8 @@ for linkTarget in $(DESKBAR_PREFERENCES) {
 }
 
 # "Demo" links
-AddDirectoryToPackage data deskbar menu Demos ;
+AddDirectoryToPackage data deskbar menu Demos
+	: deskbar-demos.rdef ;
 for linkTarget in $(SYSTEM_DEMOS) {
 	AddSymlinkToPackage data deskbar menu Demos
 		: ../../../../demos/$(linkTarget) : $(linkTarget) ;

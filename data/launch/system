@@ -73,11 +73,6 @@ job x-vnd.Haiku-cddb_lookup {
 	on volume_mounted
 }
 
-job post-install {
-	launch /bin/sh /system/boot/PostInstallScript "post install" /boot/system/settings/fresh_install /boot/system/boot/post-install
-	if file_exists /boot/system/settings/fresh_install
-}
-
 target login {
 	job x-vnd.Haiku-autologin {
 		launch /system/bin/autologin

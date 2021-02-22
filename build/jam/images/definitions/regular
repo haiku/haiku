@@ -250,9 +250,13 @@ SYSTEM_ADD_ONS_FILE_SYSTEMS +=
 ;
 
 # Mailbox folders and symlink
-AddDirectoryToHaikuImage home mail draft ;
-AddDirectoryToHaikuImage home mail in ;
-AddDirectoryToHaikuImage home mail out ;
+AddDirectoryToHaikuImage home mail : home-mail.rdef ;
+AddDirectoryToHaikuImage home mail draft : home-mail-draft.rdef ;
+AddDirectoryToHaikuImage home mail in : home-mail-in.rdef ;
+AddDirectoryToHaikuImage home mail out : home-mail-out.rdef ;
+AddDirectoryToHaikuImage home mail queries : home-mail-queries.rdef ;
+AddDirectoryToHaikuImage home mail sent : home-mail-sent.rdef ;
+AddDirectoryToHaikuImage home mail spam : home-mail-spam.rdef ;
 
 # Add boot launch directory
 AddDirectoryToHaikuImage home config settings boot launch ;
@@ -262,6 +266,8 @@ AddFilesToHaikuImage home config settings Mail ProviderInfo :
 	$(HAIKU_PROVIDER_INFOS) ;
 
 # Add Tracker New Templates
+AddDirectoryToHaikuImage home config settings Tracker "Tracker New Templates"
+	:  tracker-new-templates.rdef ;
 AddFilesToHaikuImage home config settings Tracker "Tracker New Templates"
 	:
 	"<tracker-new-templates>C++ header"

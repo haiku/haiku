@@ -3,7 +3,7 @@
 
 # create directories that may remain empty
 AddDirectoryToHaikuImage home : home.rdef ;
-AddDirectoryToHaikuImage home Desktop ;
+AddDirectoryToHaikuImage home Desktop : home-desktop.rdef ;
 AddDirectoryToHaikuImage home mail ;
 AddDirectoryToHaikuImage home config : home-config.rdef ;
 AddDirectoryToHaikuImage home config cache ;
@@ -42,6 +42,7 @@ AddDirectoryToHaikuImage system non-packaged add-ons Screen\ Savers ;
 AddDirectoryToHaikuImage system non-packaged add-ons Translators ;
 AddDirectoryToHaikuImage system var empty ;
 AddDirectoryToHaikuImage system var log ;
+AddDirectoryToHaikuImage trash : trash.rdef ;
 
 
 #pragma mark - Optional Packages
