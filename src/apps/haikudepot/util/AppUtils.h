@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef APP_UTILS_H
@@ -22,6 +22,8 @@ public:
 	static	int32			IndexOfCodeInMenu(const BString& code, BMenu* menu);
 	static	status_t		GetCodeAtIndexInMenu(BMenu* menu, int32 index,
 								BString* result);
+
+	static	status_t		GetAppVersionString(BString& result);
 };
 
 

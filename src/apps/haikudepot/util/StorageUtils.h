@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef PATH_UTILS_H
@@ -22,8 +22,12 @@ public:
 
 	static status_t			CheckCanWriteTo(const BPath& path);
 
+	static status_t			AppendToString(const BPath& path, BString& result);
+	static status_t			AppendToFile(const BString& input,
+								const BPath& path);
+
+	static status_t			RemoveWorkingDirectoryContents();
 	static status_t			RemoveDirectoryContents(BPath& path);
-	static status_t			AppendToString(BPath& path, BString& result);
 	static status_t			ExistsObject(const BPath& path,
 								bool* exists,
 								bool* isDirectory,

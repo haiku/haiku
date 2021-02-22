@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -8,8 +8,10 @@
 
 #include <string.h>
 
+#include <AppFileInfo.h>
 #include <Application.h>
 #include <MenuItem.h>
+#include <Roster.h>
 #include <String.h>
 
 #include "HaikuDepotConstants.h"
@@ -85,4 +87,37 @@ AppUtils::GetCodeAtIndexInMenu(BMenu* menu, int32 index, BString* result)
 	if (itemMessage == NULL)
 		return B_ERROR;
 	return itemMessage->FindString("code", result);
+}
+
+
+/*static*/ status_t
+AppUtils::GetAppVersionString(BString& result)
+{
+	app_info info;
+
+	if (be_app->GetAppInfo(&info) != B_OK) {
+		HDERROR("Unable to get the application info");
+		return B_ERROR;
+	}
+
+	BFile file(&info.ref, B_READ_ONLY);
+
+	if (file.InitCheck() != B_OK) {
+		HDERROR("Unable to access the application info file");
+		return B_ERROR;
+	}
+
+	BAppFileInfo appFileInfo(&file);
+	version_info versionInfo;
+
+	if (appFileInfo.GetVersionInfo(
+			&versionInfo, B_APP_VERSION_KIND) != B_OK) {
+		HDERROR("Unable to establish the application version");
+		return B_ERROR;
+	}
+
+	result.SetToFormat("%" B_PRId32 ".%" B_PRId32 ".%" B_PRId32,
+		versionInfo.major, versionInfo.middle, versionInfo.minor);
+
+	return B_OK;
 }

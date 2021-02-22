@@ -1,6 +1,6 @@
 /*
  * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2017-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -23,6 +23,7 @@
 
 #include "support.h"
 
+#include "AppUtils.h"
 #include "FeaturedPackagesView.h"
 #include "Logger.h"
 #include "MainWindow.h"
@@ -87,11 +88,12 @@ App::ReadyToRun()
 	BMessage settings;
 	_LoadSettings(settings);
 
-	if (!_CheckTestFile())
-	{
+	if (!_CheckTestFile()) {
 		Quit();
 		return;
 	}
+
+	_ClearCacheOnVersionChange();
 
 	fMainWindow = new MainWindow(settings);
 	_ShowWindow(fMainWindow);
@@ -581,4 +583,63 @@ App::_CheckTestFile()
 	}
 
 	return true;
+}
+
+
+/*!	This method will check to see if the version of the application has changed.
+	If it has changed then it will delete all of the contents of the cache
+	directory.  This will mean that when application logic changes, it need not
+	bother to migrate the cached files.  Also any old cached files will be
+	cleared out that no longer serve any purpose.
+
+	Errors arising in this logic need not prevent the application from failing
+	to start as this is just a clean-up.
+*/
+
+void
+App::_ClearCacheOnVersionChange()
+{
+	BString version;
+
+	if (AppUtils::GetAppVersionString(version) != B_OK) {
+		HDERROR("clear cache; unable to get the application version");
+		return;
+	}
+
+	BPath lastVersionPath;
+	if (StorageUtils::LocalWorkingFilesPath(
+			"version.txt", lastVersionPath) != B_OK) {
+		HDERROR("clear cache; unable to get version file path");
+		return;
+	}
+
+	bool exists;
+	off_t size;
+
+	if (StorageUtils::ExistsObject(
+		lastVersionPath, &exists, NULL, &size) != B_OK) {
+		HDERROR("clear cache; unable to check version file exists");
+		return;
+	}
+
+	BString lastVersion;
+
+	if (exists && StorageUtils::AppendToString(lastVersionPath, lastVersion)
+			!= B_OK) {
+		HDERROR("clear cache; unable to read the version from [%s]",
+			lastVersionPath.Path());
+		return;
+	}
+
+	if (lastVersion != version) {
+		HDINFO("last version [%s] and current version [%s] do not match"
+			" -> will flush cache", lastVersion.String(), version.String());
+		StorageUtils::RemoveWorkingDirectoryContents();
+		HDINFO("will write version [%s] to [%s]",
+			version.String(), lastVersionPath.Path());
+		StorageUtils::AppendToFile(version, lastVersionPath);
+	} else {
+		HDINFO("last version [%s] and current version [%s] match"
+		 	" -> cache retained", lastVersion.String(), version.String());
+	}
 }
