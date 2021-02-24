@@ -861,6 +861,7 @@ WebAppInterface::_SendJsonRequest(const char* domain,
 
 	BHttpHeaders headers;
 	headers.AddHeader("Content-Type", "application/json");
+	headers.AddHeader("Accept", "application/json");
 	ServerSettings::AugmentHeaders(headers);
 
 	BHttpRequest* request = make_http_request(url, &listener, &context);
