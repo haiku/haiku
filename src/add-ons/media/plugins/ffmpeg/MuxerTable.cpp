@@ -471,6 +471,20 @@ const media_file_format gMuxerTable[] = {
 		"med",
 		{ 0 }
 	},
+	{
+		media_file_format::B_READABLE
+			| media_file_format::B_KNOWS_RAW_AUDIO
+			| media_file_format::B_KNOWS_ENCODED_AUDIO,
+		{ 0 },
+		B_MISC_FORMAT_FAMILY,
+		100,
+		{ 0 },
+		"audio/x-wavpack",
+		"WavPack Lossless Audio",
+		"wv",
+		"wv",
+		{ 0 }
+	},
 };
 
 const size_t gMuxerCount = sizeof(gMuxerTable) / sizeof(media_file_format);
