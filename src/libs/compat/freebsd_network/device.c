@@ -198,6 +198,12 @@ device_get_children(device_t dev, device_t **devlistp, int *devcountp)
 		count++;
 	}
 
+	if (count == 0) {
+		*devlistp = NULL;
+		*devcountp = 0;
+		return (0);
+	}
+
 	list = malloc(count * sizeof(device_t));
 	if (!list)
 		return (ENOMEM);
