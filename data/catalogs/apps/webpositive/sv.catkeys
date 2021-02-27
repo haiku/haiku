@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-WebPositive	1976607515
+1	swedish	x-vnd.Haiku-WebPositive	250728390
 Authentication required	Authentication Panel		Autentisiering krävs
 Previous	WebPositive Window		Tidigare
 (Finish: %date)	Download Window		(Avsluta: %date)
@@ -101,6 +101,7 @@ There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPosi
 Revert	Settings Window		Återgå
 Copy	WebPositive Window		Kopiera
 Default standard font size:	Settings Window		Förinställd storlek för standardtypsnitt:
+Custom	Settings Window		Egen inställning
 Bookmark this page	WebPositive Window		Bokmärk den här sidan
 Show tabs if only one page is open	Settings Window		Visa flikar om endast en sida är öppen
 Close tab	WebPositive Window		Stäng flik

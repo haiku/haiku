@@ -1,12 +1,14 @@
-1	swedish	x-vnd.Haiku-Mandelbrot	3875916167
+1	swedish	x-vnd.Haiku-Mandelbrot	2302392624
 Grassland	MandelbrotWindow		Grässlätt
 Tricorn	MandelbrotWindow		Trekorn
 Orbit Trap	MandelbrotWindow		Omloppsbana
 Deepfrost	MandelbrotWindow		Djup frost
 1 (none)	MandelbrotWindow		1 (ingen)
 Quit	MandelbrotWindow		Avsluta
+Save as image…	MandelbrotWindow		Spara som bild...
 Fire	MandelbrotWindow		Eld
 High contrast	MandelbrotWindow		Hög kontrast
+Full screen	MandelbrotWindow		Fullskärm
 Midnight	MandelbrotWindow		Midnatt
 Burning Ship	MandelbrotWindow		Brinnande skepp
 Lightning	MandelbrotWindow		Blixten
@@ -18,6 +20,7 @@ Subsampling	MandelbrotWindow		Subsampling
 File	MandelbrotWindow		Arkiv
 Julia	MandelbrotWindow		Julia
 Frost	MandelbrotWindow		Frost
+View	MandelbrotWindow		Vy
 Mandelbrot	System name		Mandelbrot
 Multibrot	MandelbrotWindow		Multibrot
 Iterations	MandelbrotWindow		Upprepningar

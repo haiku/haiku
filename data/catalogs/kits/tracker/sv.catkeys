@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	2498612740
+1	swedish	x-vnd.Haiku-libtracker	3380227078
 Created	ContainerWindow		Skapad
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Öppna och gör till förval
@@ -6,6 +6,7 @@ Kind	ContainerWindow		Sort
 Open with…	ContainerWindow		Öppna med...
 Error moving \"%name\" to Trash. (%error)	FSUtils		Fel vid flytt av \"%name\" till Papperskorgen. (%error)
 Or	FindPanel		Eller
+MIME Description	AttributesView		MIME-beskrivning
 before	FindPanel		före
 Volume icons	TrackerSettingsWindow		Volymikoner
 Ignore case	SelectionWindow		Ignorera skiftesläge
@@ -329,6 +330,7 @@ Recent folders	FavoritesMenu		Senaste mapparna
 Signed memory size	AttributesView		Signerad minnesstorlek
 The specified name is illegal. Please choose another name.	FilePanelPriv		Det valda namnet är otillåtet. Var god välj ett annat namn.
 of %items	StatusWindow		av %items
+MIME Path	AttributesView		MIME-sökväg
 less than	FindPanel		mindre än
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Fel vid kopiering av filen \"%name\":\n\t%error\n\nVill du fortsätta?
 Creating links: 	StatusWindow		Skapar länkar:
@@ -443,6 +445,7 @@ Sorry, saving more than one item is not allowed.	FilePanelPriv		Ledsen, att spar
 Move here	ContainerWindow		Flytta hit
 the config folder	FSUtils		konfigurationsmappen
 Sorry, could not create a new folder.	FSUtils		Kan inte skapa en ny mapp.
+MIME Signature	AttributesView		MIME-signatur
 Select all	VirtualDirectoryWindow		Välj alla
 Rename	FSUtils	button label	Döp om
 Clean up all	ContainerWindow		Sortera om
