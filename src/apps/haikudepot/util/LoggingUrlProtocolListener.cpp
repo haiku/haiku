@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -19,6 +19,11 @@ LoggingUrlProtocolListener::LoggingUrlProtocolListener(
 	fTraceLogging(traceLogging),
 	fTraceLoggingIdentifier(traceLoggingIdentifier),
 	fContentLength(0)
+{
+}
+
+
+LoggingUrlProtocolListener::~LoggingUrlProtocolListener()
 {
 }
 

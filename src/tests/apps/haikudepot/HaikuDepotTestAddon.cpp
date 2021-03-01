@@ -13,7 +13,6 @@
 #include "ValidationUtilsTest.h"
 #include "StorageUtilsTest.h"
 #include "TarArchiveServiceTest.h"
-#include "ListTest.h"
 
 
 BTestSuite*
@@ -25,7 +24,6 @@ getTestSuite()
 	DumpExportRepositoryJsonListenerTest::AddTests(*suite);
 	ValidationFailureTest::AddTests(*suite);
 	ValidationUtilsTest::AddTests(*suite);
-	ListTest::AddTests(*suite);
 	StorageUtilsTest::AddTests(*suite);
 	TarArchiveServiceTest::AddTests(*suite);
 

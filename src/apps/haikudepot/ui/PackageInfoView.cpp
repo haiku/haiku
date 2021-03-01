@@ -591,9 +591,9 @@ private:
 			return true;
 		if (actions.size() != fPackageActions.size())
 			return true;
-		if (fButtons.CountItems() != actions.size())
+		if (fButtons.CountItems() != static_cast<int32>(actions.size()))
 			return true;
-		for (int i = 0; (i < actions.size()); i++) {
+		for (int i = 0; i < static_cast<int32>(actions.size()); i++) {
 			if (actions[i]->Type() != fPackageActions[i]->Type())
 				return true;
 		}

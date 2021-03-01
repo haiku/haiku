@@ -252,16 +252,13 @@ PackageIconTarRepository::GetIcon(const BString& pkgName, BitmapSize size,
 	else {
 		HashString key = _ToIconCacheKey(pkgName, actualSize);
 
-		// TODO; need to implement an LRU cache so that not too many icons are
-		// in memory at the same time.
-
 		if (!fIconCache.ContainsKey(key)) {
 			result = _CreateIconFromTarOffset(iconDataTarOffset, bitmap);
 			if (result == B_OK)
 				fIconCache.Put(key, bitmap);
 			else {
 				HDERROR("failure to read image for package [%s] at offset %"
-					B_PRIdSSIZE, pkgName.String(), iconDataTarOffset);
+					B_PRIdOFF, pkgName.String(), iconDataTarOffset);
 				fIconCache.Put(key, sDefaultIcon);
 			}
 		}

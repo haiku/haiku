@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2019-2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -484,7 +484,6 @@ UserUsageConditionsWindow::_ExpectedIntroductionTextHeight(
 	float insetBottom;
 	introductionTextView->GetInsets(NULL, &insetTop, NULL, &insetBottom);
 
-	BSize introductionSize;
 	font_height fh;
 	be_plain_font->GetHeight(&fh);
 	return ((fh.ascent + fh.descent + fh.leading) * LINES_INTRODUCTION_TEXT)

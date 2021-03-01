@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -16,6 +16,7 @@ public:
 								LoggingUrlProtocolListener(
 									BString traceLoggingIdentifier,
 									bool traceLogging);
+	virtual						~LoggingUrlProtocolListener();
 
 			size_t				ContentLength();
 

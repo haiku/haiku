@@ -40,8 +40,6 @@ UnitTestLib haikudepottest.so :
 	DumpExportRepositoryJsonListener.cpp
 	DumpExportRepositoryJsonListenerTest.cpp
 
-	ListTest.cpp
-
 	Logger.cpp
 
 	StandardMetaData.cpp

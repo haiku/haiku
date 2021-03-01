@@ -81,9 +81,6 @@ public:
 };
 
 
-typedef List<GlyphInfo, false> GlyphInfoList;
-
-
 class LineInfo {
 public:
 	LineInfo()
@@ -173,9 +170,6 @@ public:
 };
 
 
-typedef List<LineInfo, false> LineInfoList;
-
-
 class ParagraphLayout : public BReferenceable {
 public:
 								ParagraphLayout();
@@ -249,8 +243,10 @@ private:
 			float				fWidth;
 			bool				fLayoutValid;
 
-			GlyphInfoList		fGlyphInfos;
-			LineInfoList		fLineInfos;
+			std::vector<GlyphInfo>
+								fGlyphInfos;
+			std::vector<LineInfo>
+								fLineInfos;
 };
 
 

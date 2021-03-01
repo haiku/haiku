@@ -113,7 +113,7 @@ void
 TextDocumentLayout::Invalidate()
 {
 	if (fDocument.IsSet())
-		InvalidateParagraphs(0, fDocument->Paragraphs().CountItems());
+		InvalidateParagraphs(0, fDocument->CountParagraphs());
 }
 
 
@@ -125,24 +125,28 @@ TextDocumentLayout::InvalidateParagraphs(int32 start, int32 count)
 
 	fLayoutValid = false;
 
-	const ParagraphList& paragraphs = fDocument->Paragraphs();
-
 	while (count > 0) {
-		if (start >= paragraphs.CountItems())
+		const int32 paragraphCount = fDocument->CountParagraphs();
+		if (start >= paragraphCount)
 			break;
-		const Paragraph& paragraph = paragraphs.ItemAtFast(start);
-		if (start >= fParagraphLayouts.CountItems()) {
+		const Paragraph& paragraph = fDocument->ParagraphAtIndex(start);
+		if (start >= static_cast<int32>(fParagraphLayouts.size())) {
 			ParagraphLayoutRef layout(new(std::nothrow) ParagraphLayout(
 				paragraph), true);
-			if (!layout.IsSet()
-				|| !fParagraphLayouts.Add(ParagraphLayoutInfo(0.0f, layout))) {
+			if (!layout.IsSet()) {
 				fprintf(stderr, "TextDocumentLayout::InvalidateParagraphs() - "
 					"out of memory\n");
 				return;
 			}
+			try {
+				fParagraphLayouts.push_back(ParagraphLayoutInfo(0.0f, layout));
+			}
+			catch (std::bad_alloc& ba) {
+				fprintf(stderr, "bad_alloc when invalidating paragraphs\n");
+				return;
+			}
 		} else {
-			const ParagraphLayoutInfo& info = fParagraphLayouts.ItemAtFast(
-				start);
+			const ParagraphLayoutInfo& info = fParagraphLayouts[start];
 			info.layout->SetParagraph(paragraph);
 		}
 
@@ -151,8 +155,9 @@ TextDocumentLayout::InvalidateParagraphs(int32 start, int32 count)
 	}
 
 	// Remove any extra paragraph layouts
-	while (paragraphs.CountItems() < fParagraphLayouts.CountItems())
-		fParagraphLayouts.Remove(fParagraphLayouts.CountItems() - 1);
+	while (fDocument->CountParagraphs()
+			< static_cast<int32>(fParagraphLayouts.size()))
+		fParagraphLayouts.erase(fParagraphLayouts.end() - 1);
 }
 
 
@@ -173,8 +178,9 @@ TextDocumentLayout::Height()
 
 	float height = 0.0f;
 
-	if (fParagraphLayouts.CountItems() > 0) {
-		const ParagraphLayoutInfo& lastLayout = fParagraphLayouts.LastItem();
+	if (fParagraphLayouts.size() > 0) {
+		const ParagraphLayoutInfo& lastLayout
+			= fParagraphLayouts[fParagraphLayouts.size() - 1];
 		height = lastLayout.y + lastLayout.layout->Height();
 	}
 
@@ -188,9 +194,9 @@ TextDocumentLayout::Draw(BView* view, const BPoint& offset,
 {
 	_ValidateLayout();
 
-	int layoutCount = fParagraphLayouts.CountItems();
+	int layoutCount = fParagraphLayouts.size();
 	for (int i = 0; i < layoutCount; i++) {
-		const ParagraphLayoutInfo& layout = fParagraphLayouts.ItemAtFast(i);
+		const ParagraphLayoutInfo& layout = fParagraphLayouts[i];
 		BPoint location(offset.x, offset.y + layout.y);
 		if (location.y > updateRect.bottom)
 			break;
@@ -207,10 +213,10 @@ TextDocumentLayout::LineIndexForOffset(int32 textOffset)
 	if (index >= 0) {
 		int32 lineIndex = 0;
 		for (int32 i = 0; i < index; i++) {
-			lineIndex += fParagraphLayouts.ItemAtFast(i).layout->CountLines();
+			lineIndex += fParagraphLayouts[i].layout->CountLines();
 		}
 
-		const ParagraphLayoutInfo& info = fParagraphLayouts.ItemAtFast(index);
+		const ParagraphLayoutInfo& info = fParagraphLayouts[index];
 		return lineIndex + info.layout->LineIndexForOffset(textOffset);
 	}
 
@@ -224,7 +230,7 @@ TextDocumentLayout::FirstOffsetOnLine(int32 lineIndex)
 	int32 paragraphOffset;
 	int32 index = _ParagraphLayoutIndexForLineIndex(lineIndex, paragraphOffset);
 	if (index >= 0) {
-		const ParagraphLayoutInfo& info = fParagraphLayouts.ItemAtFast(index);
+		const ParagraphLayoutInfo& info = fParagraphLayouts[index];
 		return info.layout->FirstOffsetOnLine(lineIndex) + paragraphOffset;
 	}
 
@@ -238,7 +244,7 @@ TextDocumentLayout::LastOffsetOnLine(int32 lineIndex)
 	int32 paragraphOffset;
 	int32 index = _ParagraphLayoutIndexForLineIndex(lineIndex, paragraphOffset);
 	if (index >= 0) {
-		const ParagraphLayoutInfo& info = fParagraphLayouts.ItemAtFast(index);
+		const ParagraphLayoutInfo& info = fParagraphLayouts[index];
 		return info.layout->LastOffsetOnLine(lineIndex) + paragraphOffset;
 	}
 
@@ -253,9 +259,9 @@ TextDocumentLayout::CountLines()
 
 	int32 lineCount = 0;
 
-	int32 count = fParagraphLayouts.CountItems();
+	int32 count = fParagraphLayouts.size();
 	for (int32 i = 0; i < count; i++) {
-		const ParagraphLayoutInfo& info = fParagraphLayouts.ItemAtFast(i);
+		const ParagraphLayoutInfo& info = fParagraphLayouts[i];
 		lineCount += info.layout->CountLines();
 	}
 
@@ -270,7 +276,7 @@ TextDocumentLayout::GetLineBounds(int32 lineIndex, float& x1, float& y1,
 	int32 paragraphOffset;
 	int32 index = _ParagraphLayoutIndexForLineIndex(lineIndex, paragraphOffset);
 	if (index >= 0) {
-		const ParagraphLayoutInfo& info = fParagraphLayouts.ItemAtFast(index);
+		const ParagraphLayoutInfo& info = fParagraphLayouts[index];
 		info.layout->GetLineBounds(lineIndex, x1, y1, x2, y2);
 		y1 += info.y;
 		y2 += info.y;
@@ -290,7 +296,7 @@ TextDocumentLayout::GetTextBounds(int32 textOffset, float& x1, float& y1,
 {
 	int32 index = _ParagraphLayoutIndexForOffset(textOffset);
 	if (index >= 0) {
-		const ParagraphLayoutInfo& info = fParagraphLayouts.ItemAtFast(index);
+		const ParagraphLayoutInfo& info = fParagraphLayouts[index];
 		info.layout->GetTextBounds(textOffset, x1, y1, x2, y2);
 		y1 += info.y;
 		y2 += info.y;
@@ -312,9 +318,9 @@ TextDocumentLayout::TextOffsetAt(float x, float y, bool& rightOfCenter)
 	int32 textOffset = 0;
 	rightOfCenter = false;
 
-	int32 paragraphs = fParagraphLayouts.CountItems();
+	int32 paragraphs = fParagraphLayouts.size();
 	for (int32 i = 0; i < paragraphs; i++) {
-		const ParagraphLayoutInfo& info = fParagraphLayouts.ItemAtFast(i);
+		const ParagraphLayoutInfo& info = fParagraphLayouts[i];
 		if (y > info.y + info.layout->Height()) {
 			textOffset += info.layout->CountGlyphs();
 			continue;
@@ -343,21 +349,26 @@ TextDocumentLayout::_ValidateLayout()
 void
 TextDocumentLayout::_Init()
 {
-	fParagraphLayouts.Clear();
+	fParagraphLayouts.clear();
 
 	if (!fDocument.IsSet())
 		return;
 
-	const ParagraphList& paragraphs = fDocument->Paragraphs();
-
-	int paragraphCount = paragraphs.CountItems();
+	int paragraphCount = fDocument->CountParagraphs();
 	for (int i = 0; i < paragraphCount; i++) {
-		const Paragraph& paragraph = paragraphs.ItemAtFast(i);
+		const Paragraph& paragraph = fDocument->ParagraphAtIndex(i);
 		ParagraphLayoutRef layout(new(std::nothrow) ParagraphLayout(paragraph),
 			true);
-		if (!layout.IsSet()
-			|| !fParagraphLayouts.Add(ParagraphLayoutInfo(0.0f, layout))) {
+		if (!layout.IsSet()) {
 			fprintf(stderr, "TextDocumentLayout::_Layout() - out of memory\n");
+			return;
+		}
+		try {
+			fParagraphLayouts.push_back(ParagraphLayoutInfo(0.0f, layout));
+		}
+		catch (std::bad_alloc& ba) {
+			fprintf(stderr, "bad_alloc when inititalizing the text document "
+				"layout\n");
 			return;
 		}
 	}
@@ -369,15 +380,15 @@ TextDocumentLayout::_Layout()
 {
 	float y = 0.0f;
 
-	int layoutCount = fParagraphLayouts.CountItems();
+	int layoutCount = fParagraphLayouts.size();
 	for (int i = 0; i < layoutCount; i++) {
-		ParagraphLayoutInfo info = fParagraphLayouts.ItemAtFast(i);
+		ParagraphLayoutInfo info = fParagraphLayouts[i];
 		const ParagraphStyle& style = info.layout->Style();
 
 		if (i > 0)
 			y += style.SpacingTop();
 
-		fParagraphLayouts.Replace(i, ParagraphLayoutInfo(y, info.layout));
+		fParagraphLayouts[i] = ParagraphLayoutInfo(y, info.layout);
 
 		info.layout->SetWidth(fWidth);
 		y += info.layout->Height() + style.SpacingBottom();
@@ -390,9 +401,9 @@ TextDocumentLayout::_ParagraphLayoutIndexForOffset(int32& textOffset)
 {
 	_ValidateLayout();
 
-	int32 paragraphs = fParagraphLayouts.CountItems();
+	int32 paragraphs = fParagraphLayouts.size();
 	for (int32 i = 0; i < paragraphs - 1; i++) {
-		const ParagraphLayoutInfo& info = fParagraphLayouts.ItemAtFast(i);
+		const ParagraphLayoutInfo& info = fParagraphLayouts[i];
 
 		int32 length = info.layout->CountGlyphs();
 		if (textOffset >= length) {
@@ -404,7 +415,8 @@ TextDocumentLayout::_ParagraphLayoutIndexForOffset(int32& textOffset)
 	}
 
 	if (paragraphs > 0) {
-		const ParagraphLayoutInfo& info = fParagraphLayouts.LastItem();
+		const ParagraphLayoutInfo& info
+			= fParagraphLayouts[fParagraphLayouts.size() - 1];
 
 		// Return last paragraph if the textOffset is still within or
 		// exactly behind the last valid offset in that paragraph.
@@ -423,9 +435,9 @@ TextDocumentLayout::_ParagraphLayoutIndexForLineIndex(int32& lineIndex,
 	_ValidateLayout();
 
 	paragraphOffset = 0;
-	int32 paragraphs = fParagraphLayouts.CountItems();
+	int32 paragraphs = fParagraphLayouts.size();
 	for (int32 i = 0; i < paragraphs; i++) {
-		const ParagraphLayoutInfo& info = fParagraphLayouts.ItemAtFast(i);
+		const ParagraphLayoutInfo& info = fParagraphLayouts[i];
 
 		int32 lineCount = info.layout->CountLines();
 		if (lineIndex >= lineCount) {

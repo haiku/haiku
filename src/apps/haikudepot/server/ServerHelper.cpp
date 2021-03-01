@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -247,8 +247,6 @@ ServerHelper::GetFailuresFromJsonRpcError(
 	ValidationFailures& failures, BMessage& responseEnvelopeMessage)
 {
 	BMessage errorMessage;
-	int32 errorCode = WebAppInterface::ErrorCodeFromResponse(
-		responseEnvelopeMessage);
 
 	if (responseEnvelopeMessage.FindMessage("error", &errorMessage) == B_OK) {
 		BMessage dataMessage;
