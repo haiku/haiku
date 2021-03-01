@@ -32,10 +32,10 @@ Bitmap::Bitmap(int bitCount)
 	if (fBits == NULL) {
 		fSize = 0;
 		fInitStatus = B_NO_MEMORY;
+	} else {
+		fElementsCount = count;
+		memset(fBits, 0, sizeof(addr_t) * count);
 	}
-
-	fElementsCount = count;
-	memset(fBits, 0, sizeof(addr_t) * count);
 }
 
 
