@@ -94,10 +94,31 @@ FetchFileJob::Execute()
 	if (result != B_OK)
 		return result;
 
-	BUrlRequest* request = BUrlProtocolRoster::MakeRequest(fFileURL.String(),
-		&fTargetFile, this);
-	if (request == NULL)
-		return B_BAD_VALUE;
+	result = FetchUtils::SetFileType(fTargetFile,
+		"application/x-vnd.haiku-package");
+	if (result != B_OK) {
+		fprintf(stderr, "failed to set file type for '%s': %s\n",
+			DownloadFileName(), strerror(result));
+	}
+
+	do {
+		BUrlRequest* request = BUrlProtocolRoster::MakeRequest(fFileURL.String(),
+			&fTargetFile, this);
+		if (request == NULL)
+			return B_BAD_VALUE;
+
+		// Try to resume the download where we left off
+		off_t currentPosition;
+		BHttpRequest* http = dynamic_cast<BHttpRequest*>(request);
+		if (http != NULL && fTargetFile.GetSize(&currentPosition) == B_OK
+			&& currentPosition > 0) {
+			http->SetRangeStart(currentPosition);
+			fTargetFile.Seek(0, SEEK_END);
+		}
+
+		thread_id thread = request->Run();
+		wait_for_thread(thread, NULL);
+	} while (fError == B_IO_ERROR || fError == B_DEV_TIMEOUT);
 
 	if (fError == B_OK) {
 		result = FetchUtils::MarkDownloadComplete(fTargetFile);
