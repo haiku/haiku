@@ -199,8 +199,8 @@
 
 /*!
 	\enum input_device_type
-	\ingroup <kit name>
-	\brief Undocumented enum.
+	\ingroup interface
+	\brief Device types that the Input Server can recognize.
 
 	\since Haiku R1
 */
@@ -208,7 +208,10 @@
 
 /*!
 	\var input_device_type B_POINTING_DEVICE
-	\brief Undocumented enum value.
+	\brief Pointing devices like mice, drawing tablets, touch screens, etc.
+
+	These devices generate \c B_MOUSE_MOVED, \c B_MOUSE_UP, and \c B_MOUSE_DOWN
+	messages.
 
 	\since Haiku R1
 */
@@ -216,7 +219,10 @@
 
 /*!
 	\var input_device_type B_KEYBOARD_DEVICE
-	\brief Undocumented enum value.
+	\brief Key-based input devices like a keyboard, number pad, etc.
+
+	These devices generate \c B_KEY_DOWN, \c B_UNMAPPED_KEY_DOWN, \c B_KEY_UP,
+	\c B_UNMAPPED_KEY_UP, and \c B_MODIFIERS_CHANGED messages.
 
 	\since Haiku R1
 */
@@ -224,7 +230,7 @@
 
 /*!
 	\var input_device_type B_UNDEFINED_DEVICE
-	\brief Undocumented enum value.
+	\brief An undefined/unknown type of input device.
 
 	\since Haiku R1
 */
@@ -232,8 +238,12 @@
 
 /*!
 	\enum input_device_notification
-	\ingroup <kit name>
-	\brief Undocumented enum.
+	\ingroup interface
+	\brief Constants for the \c be:opcode field of a \c B_INPUT_DEVICES_CHANGED
+		   message.
+
+	These message constants reflect changes in the state of input devices that
+	the Input Server is aware of.
 
 	\since Haiku R1
 */
@@ -241,7 +251,7 @@
 
 /*!
 	\var input_device_notification B_INPUT_DEVICE_ADDED
-	\brief Undocumented enum value.
+	\brief An input device was added to the system.
 
 	\since Haiku R1
 */
@@ -249,7 +259,7 @@
 
 /*!
 	\var input_device_notification B_INPUT_DEVICE_STARTED
-	\brief Undocumented enum value.
+	\brief An input device was started.
 
 	\since Haiku R1
 */
@@ -257,7 +267,7 @@
 
 /*!
 	\var input_device_notification B_INPUT_DEVICE_STOPPED
-	\brief Undocumented enum value.
+	\brief An input device was stopped.
 
 	\since Haiku R1
 */
@@ -265,7 +275,7 @@
 
 /*!
 	\var input_device_notification B_INPUT_DEVICE_REMOVED
-	\brief Undocumented enum value.
+	\brief An input device was removed from the system.
 
 	\since Haiku R1
 */
@@ -299,13 +309,29 @@
 
 /*!
 	\fn status_t watch_input_devices(BMessenger target, bool start)
-	\brief Undocumented function
+	\brief Start/stop watching input devices for state changes.
 
-	\param target Undocumented
-	\param start Undocumented
+	Informs the Input Server that \a target would like to start/stop receiving
+	\c B_INPUT_DEVICES_CHANGED messages, reflecting the state of input devices
+	the Input Server is aware of.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	The \c B_INPUT_DEVICES_CHANGED message contains:
+		- \c be:opcode An \c input_device_notifcation constant that identifies
+			 which event occured.
+		- \c be:device_name A string containing the device's name.
+		- \c be:device_type An \c input_device_type constant representing the
+			 device's type.
+
+	\param target Where the device state change messages should or should not be
+		   sent.
+	\param start Whether \a target should start/stop receiving device state
+		   change messages.
+
+	\return A status code.
+	\retval B_OK Watching has successfully been started or stopped.
+	\retval B_BAD_VALUE \a target never started watching for device state
+			changes, though a request was made to stop watching for changes.
+	\retval Other errors depending on the state of the Input Server.
 
 	\since Haiku R1
 */

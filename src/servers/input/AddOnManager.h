@@ -21,6 +21,8 @@
 #include <AddOnMonitor.h>
 #include <AddOnMonitorHandler.h>
 
+#include <set>
+
 #include "PathList.h"
 
 
@@ -125,7 +127,7 @@ private:
 			PathList			fDevicePaths;
 
 			MonitorHandler*		fHandler;
-			BMessenger			fWatcherMessenger;
+			std::set<BMessenger> fWatcherMessengerList;
 
 			bool				fSafeMode;
 };

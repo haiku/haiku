@@ -1250,7 +1250,8 @@ InputServer::UnregisterDevices(BInputServerDevice& serverDevice,
 					if (fInputDeviceList.RemoveItem(j)) {
 						BMessage message(IS_NOTIFY_DEVICE);
 						message.AddBool("added", false);
-						message.AddString("name", device->name);
+						message.AddString("name", item->Name());
+						message.AddInt32("type", item->Type());
 						fAddOnManager->PostMessage(&message);
 						delete item;
 					}
@@ -1313,7 +1314,8 @@ debug_printf("InputServer::RegisterDevices() device_ref already exists: %s\n", d
 				item->Start();
 				BMessage message(IS_NOTIFY_DEVICE);
 				message.AddBool("added", true);
-				message.AddString("name", device->name);
+				message.AddString("name", item->Name());
+				message.AddInt32("type", item->Type());
 				fAddOnManager->PostMessage(&message);
 			} else {
 				delete item;
@@ -1352,6 +1354,12 @@ InputServer::StartStopDevices(const char* name, input_device_type type,
 			else
 				item->Stop();
 
+			BMessage message(IS_NOTIFY_DEVICE);
+			message.AddBool("started", doStart);
+			message.AddString("name", item->Name());
+			message.AddInt32("type", item->Type());
+			fAddOnManager->PostMessage(&message);
+
 			if (name)
 				return B_OK;
 		}
@@ -1386,6 +1394,12 @@ InputServer::StartStopDevices(BInputServerDevice& serverDevice, bool doStart)
 			item->Start();
 		else
 			item->Stop();
+
+		BMessage message(IS_NOTIFY_DEVICE);
+		message.AddBool("started", doStart);
+		message.AddString("name", item->Name());
+		message.AddInt32("type", item->Type());
+		fAddOnManager->PostMessage(&message);
 	}
 
 	return B_OK;
