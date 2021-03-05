@@ -74,9 +74,9 @@ _thread_do_exit_work(void)
 
 	tls_set(TLS_ON_EXIT_THREAD_SLOT, NULL);
 
-	__gRuntimeLoader->destroy_thread_tls();
-
 	__pthread_destroy_thread();
+
+	__gRuntimeLoader->destroy_thread_tls();
 }
 
 
