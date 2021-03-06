@@ -449,7 +449,7 @@ public:
 	}
 
 private:
-	std::vector<DeskbarLink>	fDeskbarLinks;
+	std::vector<DeskbarLink>&	fDeskbarLinks;
 };
 
 
