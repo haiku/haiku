@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-libtracker	3669766136
+1	portuguese	x-vnd.Haiku-libtracker	936620033
 Created	ContainerWindow		Criado
 Icon	AttributesView		Ícone
 Open and make preferred	OpenWithWindow		Abrir e tornar preferida
@@ -6,6 +6,7 @@ Kind	ContainerWindow		Tipo
 Open with…	ContainerWindow		Abrir com…
 Error moving \"%name\" to Trash. (%error)	FSUtils		Erro ao mover \"%name\" para o Lixo. (%error)
 Or	FindPanel		Ou
+MIME Description	AttributesView		Descrição MIME
 before	FindPanel		antes
 Volume icons	TrackerSettingsWindow		Ícones dos volumes
 Ignore case	SelectionWindow		Ignorar maiúsculas/minúsculas

@@ -1,4 +1,4 @@
-1	russian	x-vnd.mmu_man.filepanel	1802971238
+1	russian	x-vnd.mmu_man.filepanel	3326046391
 display a load/save file panel\n	FilePanelApp		открывает панель сохранения/открытия файлов\n
 short\tlong\tdescription\n	FilePanelApp		короткое\tдлинное\tописание\n
 %s not a valid option\n	FilePanelApp		%s неправильная опция\n
@@ -8,13 +8,8 @@ short\tlong\tdescription\n	FilePanelApp		короткое\tдлинное\tоп�
 -l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tиспользовать диалог открытия файловой панели (по-умолчанию)\n
 -n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tуказать имя по умолчанию для сохранения\n
 -k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\tвид записей, которые могут быть открыты (flavour): любая комбинация f, d, s (файл (по умолчанию), каталог, ссылка)\n
-%s: UNIMPLEMENTED\n	FilePanelApp		%s: НЕ РЕАЛИЗОВАНО\n
 -t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\tустанавить заголовок файловой панели\n
--f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\tне реализовано\n
-usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n	FilePanelApp		использование: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n
 -1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\tразрешить выбор только 1 файл\n
--a\t--allow\tunimplemented\n	FilePanelApp		-a\t--allow\tне реализовано\n
 -m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\tсделать файловую панель модальнойl\n
 options:\n	FilePanelApp		опции:\n
 -d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\tоткрыть в <папке>\n
-usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		использование: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n

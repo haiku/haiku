@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-CharacterMap	2895648104
+1	thai	x-vnd.Haiku-CharacterMap	3632238193
 Tirhuta	UnicodeBlocks		Tirhuta
 Miscellaneous mathematical symbols B	UnicodeBlocks		สัญลักษณ์ทางคณิตศาสตร์เบ็ดเตล็ด B
 Latin extended E	UnicodeBlocks		Latin ขยาย E
@@ -176,28 +176,40 @@ Chorasmian	UnicodeBlocks		Chorasmian
 Lisu supplement	UnicodeBlocks		อักษรเสริม ภาษาลีซอ
 Takri	UnicodeBlocks		ภาษาตะกรี
 Shorthand format controls	UnicodeBlocks		การควบคุมรูปแบบชวเลข
+Inscriptional Parthian	UnicodeBlocks		จารึก Parthian
 Optical character recognition	UnicodeBlocks		การจดจำอักขระด้วยแสง
 Tamil	UnicodeBlocks		ทมิฬ
+Lisu	UnicodeBlocks		ลีซอ
+Nandingari	UnicodeBlocks		เทวนาครี
 Greek extended	UnicodeBlocks		กรีก เพิ่มเติม
+Myanmar extended B	UnicodeBlocks		พม่า ขยาย บี
+Mahajani	UnicodeBlocks		มหาจานี
 Lepcha	UnicodeBlocks		Lepcha
+Mandaic	UnicodeBlocks		มันดาอิก
 Old italic	UnicodeBlocks		Old italic
 Quit	CharacterWindow		ยกเลิก
+Playing cards	UnicodeBlocks		เล่นไพ่
+Chakma	UnicodeBlocks		จักม่า
 Buhid	UnicodeBlocks		Buhid
 Supplementary private use area B	UnicodeBlocks		พื้นที่ใช้งานส่วนตัวเพิ่มเติม B
 Cuneiform	UnicodeBlocks		Cuneiform
 Alphabetic presentation forms	UnicodeBlocks		แบบฟอร์มการนำเสนอตามตัวอักษร
+Mayan numerals	UnicodeBlocks		ตัวเลขมายัน
 Tangut components	UnicodeBlocks		ส่วนประกอบ Tangut
 Letterlike symbols	UnicodeBlocks		สัญลักษณ์เหมือนอักษร
 Spacing modifier letters	UnicodeBlocks		ตัวอักษรปรับปรุงเว้นระยะ
 Unified Canadian Aboriginal syllabics	UnicodeBlocks		พยางค์ดั้งเดิมของแคนาดา
+Hanifi Rohingya	UnicodeBlocks		โรฮิงยา
 Dingbats	UnicodeBlocks		Dingbats
 Mathematical operators	UnicodeBlocks		ตัวดำเนินการทางคณิตศาสตร์
 Bopomofo	UnicodeBlocks		Bopomofo
 Variation selectors	UnicodeBlocks		ตัวเลือกชุดรูปแบบ
 Variation selectors supplement	UnicodeBlocks		ตัวเลือกชุดรูปแบบเพิ่มเติม
+Old Permic	UnicodeBlocks		เปอร์มิก เก่า
 Supplemental mathematical operators	UnicodeBlocks		ตัวดำเนินการทางคณิตศาสตร์เพิ่มเติม
 Sinhala	UnicodeBlocks		สิงหล
 Bhaiksuki	UnicodeBlocks		Bhaiksuki
+Dives Akuru	UnicodeBlocks		ดิเวส อกุรุ
 Ugaritic	UnicodeBlocks		Ugaritic
 Cyrillic extended C	UnicodeBlocks		Cyrillic extended C
 Syriac	UnicodeBlocks		Syriac
