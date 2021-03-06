@@ -61,7 +61,8 @@ public:
 		fModel(model),
 		fSelectedIndex(-1),
 		fPackageListener(
-			new(std::nothrow) OnePackageMessagePackageListener(this))
+			new(std::nothrow) OnePackageMessagePackageListener(this)),
+		fLowestIndexAddedOrRemoved(-1)
 	{
 		SetEventMask(B_POINTER_EVENTS);
 		Clear();
@@ -260,6 +261,26 @@ public:
 	}
 
 
+	void BeginAddRemove()
+	{
+		fLowestIndexAddedOrRemoved = INT32_MAX;
+	}
+
+
+	void EndAddRemove()
+	{
+		if (fLowestIndexAddedOrRemoved < INT32_MAX) {
+			if (fPackages.empty())
+				Invalidate();
+			else {
+				BRect invalidRect = Bounds();
+				invalidRect.top = _YOfIndex(fLowestIndexAddedOrRemoved);
+				Invalidate(invalidRect);
+			}
+		}
+	}
+
+
 	void AddPackage(const PackageInfoRef& package)
 	{
 		// fPackages is sorted and for this reason it is possible to find the
@@ -278,9 +299,9 @@ public:
 			if (fSelectedIndex >= insertionIndex)
 				fSelectedIndex++;
 			fPackages.insert(itInsertionPt, package);
-			Invalidate(_RectOfIndex(insertionIndex)
-				| _RectOfIndex(fPackages.size() - 1));
 			package->AddListener(fPackageListener);
+			if (insertionIndex < fLowestIndexAddedOrRemoved)
+				fLowestIndexAddedOrRemoved = insertionIndex;
 		}
 	}
 
@@ -295,12 +316,8 @@ public:
 				fSelectedIndex--;
 			fPackages[index]->RemoveListener(fPackageListener);
 			fPackages.erase(fPackages.begin() + index);
-			if (fPackages.empty())
-				Invalidate();
-			else {
-				Invalidate(_RectOfIndex(index)
-					| _RectOfIndex(fPackages.size() - 1));
-			}
+			if (index < fLowestIndexAddedOrRemoved)
+				fLowestIndexAddedOrRemoved = index;
 		}
 	}
 
@@ -630,6 +647,7 @@ private:
 			int32				fSelectedIndex;
 			OnePackageMessagePackageListener*
 								fPackageListener;
+			int32				fLowestIndexAddedOrRemoved;
 };
 
 
@@ -656,6 +674,21 @@ FeaturedPackagesView::~FeaturedPackagesView()
 }
 
 
+void
+FeaturedPackagesView::BeginAddRemove()
+{
+	fPackagesView->BeginAddRemove();
+}
+
+
+void
+FeaturedPackagesView::EndAddRemove()
+{
+	fPackagesView->EndAddRemove();
+	_AdjustViews();
+}
+
+
 /*! This method will add the package into the list to be displayed.  The
     insertion will occur in alphabetical order.
 */
@@ -664,7 +697,6 @@ void
 FeaturedPackagesView::AddPackage(const PackageInfoRef& package)
 {
 	fPackagesView->AddPackage(package);
-	_AdjustViews();
 }
 
 
@@ -672,7 +704,6 @@ void
 FeaturedPackagesView::RemovePackage(const PackageInfoRef& package)
 {
 	fPackagesView->RemovePackage(package);
-	_AdjustViews();
 }
 
 

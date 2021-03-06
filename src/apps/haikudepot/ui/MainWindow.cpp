@@ -492,7 +492,11 @@ MainWindow::MessageReceived(BMessage* message)
 					BAutolock locker(fModel.Lock());
 					fModel.SetPackageState(ref, ref->State());
 				}
+
+				fFeaturedPackagesView->BeginAddRemove();
 				_AddRemovePackageFromLists(ref);
+				fFeaturedPackagesView->EndAddRemove();
+
 				if ((changes & PKG_CHANGED_STATE) != 0
 						&& !fCoordinator.IsSet()) {
 					fWorkStatusView->PackageStatusChanged(ref);
@@ -824,6 +828,9 @@ MainWindow::_AdoptModel()
 
 	std::vector<DepotInfoRef> depots = _CreateSnapshotOfDepots();
 	std::vector<DepotInfoRef>::iterator it;
+
+	fFeaturedPackagesView->BeginAddRemove();
+
 	for (it = depots.begin(); it != depots.end(); it++) {
 		DepotInfoRef depotInfoRef = *it;
 		for (int i = 0; i < depotInfoRef->CountPackages(); i++) {
@@ -831,6 +838,8 @@ MainWindow::_AdoptModel()
 			_AddRemovePackageFromLists(package);
 		}
 	}
+
+	fFeaturedPackagesView->EndAddRemove();
 
 	_AdoptModelControls();
 }
