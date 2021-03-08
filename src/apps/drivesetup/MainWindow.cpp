@@ -664,7 +664,7 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 	fUnmountContextMenuItem->SetEnabled(false);
 	fFormatContextMenuItem->SetEnabled(false);
 
-	if (!disk) {
+	if (disk == NULL) {
 		fWipeMenuItem->SetEnabled(false);
 		fEjectMenuItem->SetEnabled(false);
 		fSurfaceTestMenuItem->SetEnabled(false);
@@ -694,9 +694,9 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 		fDeleteMenuItem->SetEnabled(prepared);
 		fChangeMenuItem->SetEnabled(prepared);
 
-		fChangeContextMenuItem->SetEnabled(prepared);
-		fDeleteContextMenuItem->SetEnabled(prepared);
 		fFormatContextMenuItem->SetEnabled(prepared);
+		fDeleteContextMenuItem->SetEnabled(prepared);
+		fChangeContextMenuItem->SetEnabled(prepared);
 
 		BPartition* partition = disk->FindDescendant(selectedPartition);
 
@@ -750,19 +750,21 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 				&& partition->IsDevice()
 				&& fDiskInitMenu->CountItems() > 0);
 
-			fChangeMenuItem->SetEnabled(notMountedAndWritable);
+			fChangeMenuItem->SetEnabled(writable
+				&& partition->CanEditParameters());
+			fChangeContextMenuItem->SetEnabled(writable
+				&& partition->CanEditParameters());
 
 			fDeleteMenuItem->SetEnabled(notMountedAndWritable
 				&& !partition->IsDevice());
+			fDeleteContextMenuItem->SetEnabled(notMountedAndWritable
+				&& !partition->IsDevice());
 
 			fMountMenuItem->SetEnabled(!partition->IsMounted());
+			fMountContextMenuItem->SetEnabled(!partition->IsMounted());
 
 			fFormatContextMenuItem->SetEnabled(notMountedAndWritable
 				&& fFormatContextMenuItem->CountItems() > 0);
-			fChangeContextMenuItem->SetEnabled(notMountedAndWritable);
-			fDeleteContextMenuItem->SetEnabled(notMountedAndWritable
-				&& !partition->IsDevice());
-			fMountContextMenuItem->SetEnabled(notMountedAndWritable);
 
 			bool unMountable = false;
 			if (partition->IsMounted()) {
@@ -790,11 +792,11 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 			fFormatContextMenuItem->SetEnabled(false);
 		}
 
-		fOpenDiskProbeMenuItem->SetEnabled(true);
-		fOpenDiskProbeContextMenuItem->SetEnabled(true);
-
 		if (prepared)
 			disk->CancelModifications();
+
+		fOpenDiskProbeMenuItem->SetEnabled(true);
+		fOpenDiskProbeContextMenuItem->SetEnabled(true);
 
 		fMountAllMenuItem->SetEnabled(true);
 	}
@@ -1378,9 +1380,6 @@ MainWindow::_ChangeParameters(BDiskDevice* disk, partition_id selectedPartition)
 			_DisplayPartitionError(B_TRANSLATE("The panel experienced a "
 				"problem!"), NULL, status);
 		}
-		// TODO: disk systems without an editor and support for name/type
-		// changing will return B_CANCELED here -- we need to check this
-		// before, and disable the menu entry instead
 		return;
 	}
 
