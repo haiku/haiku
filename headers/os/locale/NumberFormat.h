@@ -19,7 +19,7 @@ class BNumberFormatImpl;
 
 class BNumberFormat : public BFormat {
 public:
-								BNumberFormat();
+								BNumberFormat(const BLocale* locale = NULL);
 								~BNumberFormat();
 
 			ssize_t				Format(char* string, size_t maxSize,
@@ -34,9 +34,14 @@ public:
 			status_t			FormatMonetary(BString& string,
 									const double value);
 
+			ssize_t				FormatPercent(char* string, size_t maxSize,
+									const double value);
+			status_t			FormatPercent(BString& string,
+									const double value);
+
 			status_t			Parse(const BString& string, double& value);
 
-			BString			GetSeparator(BNumberElement element);
+			BString				GetSeparator(BNumberElement element);
 
 private:
 								BNumberFormat(const BNumberFormat &other);

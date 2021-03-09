@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020, Andrew Lindesay, <apl@lindesay.co.nz>.
+ * Copyright 2018-2021, Andrew Lindesay, <apl@lindesay.co.nz>.
  * Copyright 2017, Julian Harnath, <julian.harnath@rwth-aachen.de>.
  * Copyright 2015, Axel Dörfler, <axeld@pinc-software.de>.
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
@@ -15,12 +15,14 @@
 #include <Autolock.h>
 #include <Catalog.h>
 #include <ControlLook.h>
+#include <NumberFormat.h>
 #include <ScrollBar.h>
 #include <StringFormat.h>
 #include <StringForSize.h>
 #include <package/hpkg/Strings.h>
 #include <Window.h>
 
+#include "Logger.h"
 #include "MainWindow.h"
 #include "WorkStatusView.h"
 
@@ -40,6 +42,8 @@ static const char* skPackageStatePending = B_TRANSLATE_MARK(
 inline BString
 package_state_to_string(PackageInfoRef ref)
 {
+	static BNumberFormat numberFormat;
+
 	switch (ref->State()) {
 		case NONE:
 			return B_TRANSLATE(skPackageStateAvailable);
@@ -52,7 +56,11 @@ package_state_to_string(PackageInfoRef ref)
 		case DOWNLOADING:
 		{
 			BString data;
-			data.SetToFormat("%3.2f%%", ref->DownloadProgress() * 100.0);
+			float fraction = ref->DownloadProgress();
+			if (numberFormat.FormatPercent(data, fraction) != B_OK) {
+				HDERROR("unable to format the percentage");
+				data = "???";
+			}
 			return data;
 		}
 		case PENDING:

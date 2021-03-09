@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Haiku, inc.
+ * Copyright 2014-2021 Haiku, inc.
  * Distributed under the terms of the MIT License.
  */
 
@@ -9,6 +9,7 @@
 
 
 #include <Url.h>
+#include <UrlProtocolListener.h>
 
 #include <TestCase.h>
 #include <TestSuite.h>
