@@ -236,7 +236,6 @@ PartitionMapHandle::SupportedChildOperations(const BMutablePartition* child,
 {
 	return B_DISK_SYSTEM_SUPPORTS_RESIZING_CHILD
 		| B_DISK_SYSTEM_SUPPORTS_MOVING_CHILD
-		| B_DISK_SYSTEM_SUPPORTS_SETTING_TYPE
 		| B_DISK_SYSTEM_SUPPORTS_SETTING_PARAMETERS
 		| B_DISK_SYSTEM_SUPPORTS_DELETING_CHILD;
 }
@@ -292,6 +291,44 @@ PartitionMapHandle::GetPartitioningInfo(BPartitioningInfo* info)
 	}
 
 	return B_OK;
+}
+
+
+status_t
+PartitionMapHandle::ValidateSetParameters(const BMutablePartition* child,
+	const char* parameters)
+{
+	if (child == NULL || parameters == NULL)
+		return B_NO_INIT;
+
+	void* handle = parse_driver_settings_string(parameters);
+	if (handle == NULL)
+		return B_BAD_DATA;
+
+	delete_driver_settings(handle);
+
+	return B_OK;
+}
+
+
+status_t
+PartitionMapHandle::SetParameters(BMutablePartition* child,
+	const char* parameters)
+{
+	void* handle = parse_driver_settings_string(parameters);
+	if (handle == NULL)
+		return B_BAD_DATA;
+
+	bool active = get_driver_boolean_parameter(handle, "active", false, true);
+	delete_driver_settings(handle);
+
+	// Update our local state
+	PrimaryPartition* partition = (PrimaryPartition*)child->ChildCookie();
+	partition->SetActive(active);
+
+	// Forward the request to the BMutablePartition so it can be committed to
+	// disk
+	return child->SetParameters(parameters);
 }
 
 

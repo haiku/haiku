@@ -6,6 +6,7 @@
 #include "DiskDeviceJobQueue.h"
 
 #include <stdio.h>
+#include <string.h>
 
 #include <typeinfo>
 
@@ -54,7 +55,8 @@ DiskDeviceJobQueue::Execute()
 
 		status_t error = job->Do();
 		if (error != B_OK) {
-			TRACE("DiskDeviceJobQueue::Execute(): executing job failed\n");
+			TRACE("DiskDeviceJobQueue::Execute(): executing job failed: %s\n",
+				strerror(error));
 			return error;
 		}
 	}

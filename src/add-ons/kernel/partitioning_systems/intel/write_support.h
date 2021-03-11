@@ -46,6 +46,8 @@ status_t	pm_move_child(int fd, partition_id partitionID,
 				partition_id childID, off_t offset, disk_job_id job);
 status_t	pm_set_type(int fd, partition_id partitionID, const char* type,
 				disk_job_id job);
+status_t	pm_set_parameters(int fd, partition_id partitionID,
+				const char* parameters, disk_job_id job);
 status_t	pm_initialize(int fd, partition_id partitionID, const char* name,
 				const char* parameters, off_t partitionSize, disk_job_id job);
 status_t	pm_uninitialize(int fd, partition_id partitionID,
