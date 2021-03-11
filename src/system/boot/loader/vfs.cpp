@@ -986,11 +986,14 @@ write(int fd, const void *buffer, size_t bufferSize)
 
 
 ssize_t
-writev(int fd, const struct iovec* vecs, size_t count)
+writev(int fd, const struct iovec* vecs, int count)
 {
 	size_t totalWritten = 0;
 
-	for (size_t i = 0; i < count; i++) {
+	if (count < 0)
+		RETURN_AND_SET_ERRNO(B_BAD_VALUE);
+
+	for (int i = 0; i < count; i++) {
 		ssize_t written = write(fd, vecs[i].iov_base, vecs[i].iov_len);
 		if (written < 0)
 			return totalWritten == 0 ? written : totalWritten;

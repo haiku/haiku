@@ -20,13 +20,13 @@ extern "C" {
 #endif
 
 fssh_ssize_t fssh_readv(int fd, const struct fssh_iovec *vector,
-					fssh_size_t count);
+					int count);
 fssh_ssize_t fssh_readv_pos(int fd, fssh_off_t pos, const struct
-					fssh_iovec *vec, fssh_size_t count);
+					fssh_iovec *vec, int count);
 fssh_ssize_t fssh_writev(int fd, const struct fssh_iovec *vector,
-					fssh_size_t count);
+					int count);
 fssh_ssize_t fssh_writev_pos(int fd, fssh_off_t pos,
-					const struct fssh_iovec *vec, fssh_size_t count);
+					const struct fssh_iovec *vec, int count);
 
 #ifdef __cplusplus
 }

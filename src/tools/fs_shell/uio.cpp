@@ -19,19 +19,19 @@
 #include "partition_support.h"
 
 
-static const fssh_size_t kMaxIOVecs = 1024;
+static const int kMaxIOVecs = 1024;
 
 
 bool
-prepare_iovecs(const struct fssh_iovec *vecs, fssh_size_t count,
+prepare_iovecs(const struct fssh_iovec *vecs, int count,
 	struct iovec* systemVecs)
 {
-	if (count > kMaxIOVecs) {
+	if (count < 0 || count > kMaxIOVecs) {
 		errno = B_BAD_VALUE;
 		return false;
 	}
 
-	for (fssh_size_t i = 0; i < count; i++) {
+	for (int i = 0; i < count; i++) {
 		systemVecs[i].iov_base = vecs[i].iov_base;
 		systemVecs[i].iov_len = vecs[i].iov_len;
 	}
@@ -41,7 +41,7 @@ prepare_iovecs(const struct fssh_iovec *vecs, fssh_size_t count,
 
 
 fssh_ssize_t
-fssh_readv(int fd, const struct fssh_iovec *vector, fssh_size_t count)
+fssh_readv(int fd, const struct fssh_iovec *vector, int count)
 {
 	struct iovec systemVecs[kMaxIOVecs];
 	if (!prepare_iovecs(vector, count, systemVecs))
@@ -62,7 +62,7 @@ fssh_readv(int fd, const struct fssh_iovec *vector, fssh_size_t count)
 
 fssh_ssize_t
 fssh_readv_pos(int fd, fssh_off_t pos, const struct fssh_iovec *vec,
-	fssh_size_t count)
+	int count)
 {
 	struct iovec systemVecs[kMaxIOVecs];
 	if (!prepare_iovecs(vec, count, systemVecs))
@@ -77,7 +77,7 @@ fssh_readv_pos(int fd, fssh_off_t pos, const struct fssh_iovec *vec,
 
 
 fssh_ssize_t
-fssh_writev(int fd, const struct fssh_iovec *vector, fssh_size_t count)
+fssh_writev(int fd, const struct fssh_iovec *vector, int count)
 {
 	struct iovec systemVecs[kMaxIOVecs];
 	if (!prepare_iovecs(vector, count, systemVecs))
@@ -98,7 +98,7 @@ fssh_writev(int fd, const struct fssh_iovec *vector, fssh_size_t count)
 
 fssh_ssize_t
 fssh_writev_pos(int fd, fssh_off_t pos, const struct fssh_iovec *vec,
-				fssh_size_t count)
+				int count)
 {
 	struct iovec systemVecs[kMaxIOVecs];
 	if (!prepare_iovecs(vec, count, systemVecs))
