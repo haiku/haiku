@@ -3241,6 +3241,9 @@ BMessage::ReplaceMessage(const char* name, int32 index, const BMessage* message)
 		return B_BAD_VALUE;
 
 	ssize_t size = message->FlattenedSize();
+	if (size < 0)
+		return B_BAD_VALUE;
+
 	char buffer[size];
 
 	status_t error = message->Flatten(buffer, size);
@@ -3266,6 +3269,9 @@ BMessage::ReplaceFlat(const char* name, int32 index, BFlattenable* object)
 		return B_BAD_VALUE;
 
 	ssize_t size = object->FlattenedSize();
+	if (size < 0)
+		return B_BAD_VALUE;
+
 	char buffer[size];
 
 	status_t error = object->Flatten(buffer, size);
