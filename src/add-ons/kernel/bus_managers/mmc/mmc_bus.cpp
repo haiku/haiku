@@ -49,16 +49,20 @@ MMCBus::~MMCBus()
 {
 	CALLED();
 
-	// stop worker thread
+	// Tell the worker thread we want to stop
 	fStatus = B_SHUTTING_DOWN;
 
+	// Delete the semaphores (this will unlock the worker thread if it was
+	// waiting on them)
+	delete_sem(fScanSemaphore);
+	delete_sem(fLockSemaphore);
+
+	// Wait for the worker thread to terminate
 	status_t result;
 	if (fWorkerThread != 0)
 		wait_for_thread(fWorkerThread, &result);
-	// TODO power off cards, stop clock, etc if needed.
 
-	delete_sem(fLockSemaphore);
-	delete_sem(fScanSemaphore);
+	// TODO power off cards, stop clock, etc if needed.
 }
 
 
@@ -158,6 +162,13 @@ MMCBus::_WorkerThread(void* cookie)
 	status_t result;
 	do {
 		bus->_AcquireScanSemaphore();
+
+		// Check if we need to exit early (possible if the parent device did
+		// not manage initialize itself correctly)
+		if (bus->fStatus == B_SHUTTING_DOWN) {
+			release_sem(bus->fLockSemaphore);
+			return B_OK;
+		}
 
 		TRACE("Reset the bus...\n");
 		result = bus->ExecuteCommand(0, SD_GO_IDLE_STATE, 0, NULL);

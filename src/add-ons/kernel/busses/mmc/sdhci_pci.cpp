@@ -663,13 +663,13 @@ init_bus(device_node* node, void** bus_cookie)
 	    sPCIx86Module = NULL;
 		ERROR("PCIx86Module not loaded\n");
 		// FIXME try probing FDT as well
-		return -1;
+		return B_NO_MEMORY;
 	}
 
 	uint8_t bar, slot;
 	if (gDeviceManager->get_attr_uint8(node, SLOT_NUMBER, &slot, false) < B_OK
 		|| gDeviceManager->get_attr_uint8(node, BAR_INDEX, &bar, false) < B_OK)
-		return -1;
+		return B_BAD_TYPE;
 
 	// Ignore invalid bars
 	TRACE("Register SD bus at slot %d, using bar %d\n", slot + 1, bar);
@@ -679,7 +679,7 @@ init_bus(device_node* node, void** bus_cookie)
 
 	if (pciInfo.u.h0.base_register_sizes[bar] == 0) {
 		ERROR("No registers to map\n");
-		return -1;
+		return B_IO_ERROR;
 	}
 
 	int msiCount = sPCIx86Module->get_msi_count(pciInfo.bus,
