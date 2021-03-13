@@ -68,7 +68,7 @@ ScreenChangeListener::ScreenChanged(HWInterface* interface)
 ScreenManager::ScreenManager()
 	:
 	BLooper("screen manager"),
-	fScreenList(4)
+	fScreenList(4, true)
 {
 	_ScanDrivers();
 
@@ -82,11 +82,6 @@ ScreenManager::ScreenManager()
 
 ScreenManager::~ScreenManager()
 {
-	for (int32 i = 0; i < fScreenList.CountItems(); i++) {
-		screen_item* item = fScreenList.ItemAt(i);
-
-		delete item;
-	}
 }
 
 
@@ -218,8 +213,9 @@ ScreenManager::_ScanDrivers()
 ScreenManager::screen_item*
 ScreenManager::_AddHWInterface(HWInterface* interface)
 {
-	Screen* screen = new(nothrow) Screen(interface, fScreenList.CountItems());
-	if (screen == NULL) {
+	ObjectDeleter<Screen> screen(
+		new(nothrow) Screen(interface, fScreenList.CountItems()));
+	if (!screen.IsSet()) {
 		delete interface;
 		return NULL;
 	}
@@ -230,10 +226,10 @@ ScreenManager::_AddHWInterface(HWInterface* interface)
 		screen_item* item = new(nothrow) screen_item;
 
 		if (item != NULL) {
-			item->screen.SetTo(screen);
+			item->screen.SetTo(screen.Detach());
 			item->owner = NULL;
 			item->listener.SetTo(
-				new(nothrow) ScreenChangeListener(*this, screen));
+				new(nothrow) ScreenChangeListener(*this, item->screen.Get()));
 			if (item->listener.IsSet()
 				&& interface->AddListener(item->listener.Get())) {
 				if (fScreenList.AddItem(item))
@@ -246,7 +242,6 @@ ScreenManager::_AddHWInterface(HWInterface* interface)
 		}
 	}
 
-	delete screen;
 	return NULL;
 }
 
@@ -263,4 +258,3 @@ ScreenManager::MessageReceived(BMessage* message)
 			BHandler::MessageReceived(message);
 	}
 }
-
