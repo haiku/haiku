@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.mmu_man.filepanel	3326046391
+1	catalan; valencian	x-vnd.mmu_man.filepanel	1996091223
 display a load/save file panel\n	FilePanelApp		mostra un quadre per carregar o desar un fitxer\n
 short\tlong\tdescription\n	FilePanelApp		descripció\t curta\tllarga\n
 %s not a valid option\n	FilePanelApp		%s no és una opció vàlida\n
@@ -8,6 +8,8 @@ short\tlong\tdescription\n	FilePanelApp		descripció\t curta\tllarga\n
 -l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tusa un quadre de càrrega del FilePanel (per defecte)\n
 -n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\testableix el nom per defecte per desar-ho\n
 -k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\ttipus d'entrades que es poden obrir (essència): qualsevol combinació de f, d, s (fitxer (per defecte), carpeta, enllaç simbòlic)\n
+usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]	FilePanelApp		ús: %s [-h]     [-d carpeta]              [-l|-s]     [-t ttl]      [-1]       [-m]
+usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal]\n	FilePanelApp		ús: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal]\n
 -t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\tiestableix el títol de finestra del FilePanel\n
 -1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\tpermet seleccionar 1 sol fitxer\n
 -m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\tfa que el FilePanel sigui modal\n

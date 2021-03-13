@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	3152164236
+1	french	x-vnd.Haiku-libtracker	4248806631
 Created	ContainerWindow		Créé
 Icon	AttributesView		Icône
 Open and make preferred	OpenWithWindow		Ouvrir et en faire la préférence
@@ -438,6 +438,7 @@ Sorry, saving more than one item is not allowed.	FilePanelPriv		Désolé, il n�
 Move here	ContainerWindow		Déplacer ici
 the config folder	FSUtils		le dossier de configuration
 Sorry, could not create a new folder.	FSUtils		Désolé, impossible de créer un nouveau dossier.
+MIME Signature	AttributesView		Signature MIME
 Select all	VirtualDirectoryWindow		Sélectionner tout
 Rename	FSUtils	button label	Renommer
 Clean up all	ContainerWindow		Nettoyer tout
