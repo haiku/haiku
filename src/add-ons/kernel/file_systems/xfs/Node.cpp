@@ -40,7 +40,7 @@ NodeDirectory::Init()
 	if (fDataMap == NULL)
 		return B_NO_MEMORY;
 
-	FillMapEntry(fInode->DataExtentsCount()-3, fLeafMap);
+	FillMapEntry(fInode->DataExtentsCount() - 3, fLeafMap);
 	fCurLeafMapNumber = 1;
 	FillMapEntry(0, fDataMap);
 	return B_OK;
@@ -54,7 +54,8 @@ NodeDirectory::IsNodeType()
 		FillMapEntry(fInode->DataExtentsCount() - 3, fLeafMap);
 		fCurLeafMapNumber = 1;
 	}
-	return fLeafMap->br_startoff == LEAF_STARTOFFSET(fInode->GetVolume()->BlockLog());
+	return fLeafMap->br_startoff
+		== LEAF_STARTOFFSET(fInode->GetVolume()->BlockLog());
 }
 
 
@@ -91,7 +92,7 @@ NodeDirectory::FillBuffer(int type, char* blockBuffer, int howManyBlocksFurthur)
 	else
 		return B_BAD_VALUE;
 
-	if (map->br_state !=0)
+	if (map->br_state != 0)
 		return B_BAD_VALUE;
 
 	size_t len = fInode->DirBlockSize();
@@ -101,8 +102,8 @@ NodeDirectory::FillBuffer(int type, char* blockBuffer, int howManyBlocksFurthur)
 			return B_NO_MEMORY;
 	}
 
-	xfs_daddr_t readPos =
-		fInode->FileSystemBlockToAddr(map->br_startblock + howManyBlocksFurthur);
+	xfs_daddr_t readPos = fInode->FileSystemBlockToAddr(map->br_startblock
+		+ howManyBlocksFurthur);
 
 	if (read_pos(fInode->GetVolume()->Device(), readPos, blockBuffer, len)
 		!= len) {
@@ -160,12 +161,12 @@ NodeDirectory::FindHashInNode(uint32 hashVal)
 int
 NodeDirectory::EntrySize(int len) const
 {
-	int entrySize= sizeof(xfs_ino_t) + sizeof(uint8) + len + sizeof(uint16);
+	int entrySize = sizeof(xfs_ino_t) + sizeof(uint8) + len + sizeof(uint16);
 			// uint16 is for the tag
 	if (fInode->HasFileTypeField())
 		entrySize += sizeof(uint8);
 
-	return (entrySize + 7) & -8;
+	return ROUNDUP(entrySize, 8);
 			// rounding off to closest multiple of 8
 }
 
@@ -202,9 +203,11 @@ NodeDirectory::GetNext(char* name, size_t* length, xfs_ino_t* ino)
 		// This could be an unused entry so we should check
 
 	uint32 blockNoFromAddress = BLOCKNO_FROM_ADDRESS(fOffset, volume);
-	if (fOffset != 0 && blockNoFromAddress == fCurBlockNumber)
-		entry = (void*)(fDataBuffer + BLOCKOFFSET_FROM_ADDRESS(fOffset, fInode));
+	if (fOffset != 0 && blockNoFromAddress == fCurBlockNumber) {
+		entry = (void*)(fDataBuffer
+			+ BLOCKOFFSET_FROM_ADDRESS(fOffset, fInode));
 		// This gets us a little faster to the next entry
+	}
 
 	uint32 curDirectorySize = fInode->Size();
 
@@ -306,7 +309,8 @@ NodeDirectory::Lookup(const char* name, size_t length, xfs_ino_t* ino)
 
 	FillMapEntry(fInode->DataExtentsCount() - 2, fLeafMap);
 	fCurLeafMapNumber = 2;
-	status = FillBuffer(LEAF, fLeafBuffer, rightMapOffset - fLeafMap->br_startoff);
+	status = FillBuffer(LEAF, fLeafBuffer,
+		rightMapOffset - fLeafMap->br_startoff);
 	if (status != B_OK)
 		return status;
 	fCurLeafBufferNumber = 2;
@@ -330,14 +334,14 @@ NodeDirectory::Lookup(const char* name, size_t length, xfs_ino_t* ino)
 	* instance of hashValueOfRequest and not any instance.
 	*/
 	while (left < right) {
-		mid = (left+right)/2;
+		mid = (left + right) / 2;
 		uint32 hashval = B_BENDIAN_TO_HOST_INT32(leafEntry[mid].hashval);
 		if (hashval >= hashValueOfRequest) {
 			right = mid;
 			continue;
 		}
 		if (hashval < hashValueOfRequest) {
-			left = mid+1;
+			left = mid + 1;
 		}
 	}
 	TRACE("left:(%d), right:(%d)\n", left, right);

@@ -98,8 +98,8 @@ size_t
 TreeDirectory::GetPtrOffsetIntoRoot(int pos)
 {
 	size_t maxRecords = MaxRecordsPossibleRoot();
-	return (sizeof(BlockInDataFork)
-			+ maxRecords * KeySize() + (pos - 1) * PtrSize());
+	return sizeof(BlockInDataFork) + maxRecords * KeySize()
+		+ (pos - 1) * PtrSize();
 }
 
 
@@ -814,8 +814,8 @@ TreeDirectory::Lookup(const char* name, size_t length, xfs_ino_t* ino)
 
 			FillBuffer(fSingleDirBlock,
 				nextLeaf - targetMap->br_startoff, targetMap);
-
 			fOffsetOfSingleDirBlock = nextLeaf;
+
 			continue;
 		} else {
 			break;
