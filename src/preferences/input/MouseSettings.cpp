@@ -53,6 +53,14 @@ MouseSettings::MouseSettings(mouse_settings settings, BString name)
 	Dump();
 #endif
 
+	// These are not stored in mouse_settings, get the current values from
+	// app_server
+	// FIXME these should be moved out of the MouseSettings class, since they
+	// are not specific to each mouse, but are global settings.
+	fMode = mouse_mode();
+	fFocusFollowsMouseMode = focus_follows_mouse_mode();
+	fAcceptFirstClick = accept_first_click();
+
 	fOriginalSettings = fSettings;
 	fOriginalMode = fMode;
 	fOriginalFocusFollowsMouseMode = fFocusFollowsMouseMode;

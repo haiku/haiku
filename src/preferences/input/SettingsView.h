@@ -37,7 +37,6 @@ class SettingsView : public BBox {
 
 	public:
 				// FIXME use proper getters/setters for this?
-				BPopUpMenu*		fFocusFollowsMouseMenu;
 				BCheckBox*		fAcceptFirstClickBox;
 
 	private:
@@ -46,7 +45,7 @@ class SettingsView : public BBox {
 		const	MouseSettings&	fSettings;
 
 				BOptionPopUp*	fTypeMenu;
-				BPopUpMenu*		fFocusMenu;
+				BOptionPopUp*	fFocusMenu;
 				MouseView*		fMouseView;
 				BSlider*		fClickSpeedSlider;
 				BSlider*		fMouseSpeedSlider;

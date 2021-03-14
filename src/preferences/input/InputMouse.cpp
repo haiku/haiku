@@ -107,12 +107,10 @@ InputMouse::MessageReceived(BMessage* message)
 		case kMsgMouseFocusMode:
 		{
 			int32 mode;
-			if (message->FindInt32("mode", &mode) == B_OK) {
+			if (message->FindInt32("be:value", &mode) == B_OK) {
 				fSettings->SetMouseMode((mode_mouse)mode);
 				fDefaultsButton->SetEnabled(fSettings->IsDefaultable());
 				fRevertButton->SetEnabled(fSettings->IsRevertable());
-				fSettingsView->fFocusFollowsMouseMenu->SetEnabled(
-					mode == B_FOCUS_FOLLOWS_MOUSE);
 				fSettingsView->fAcceptFirstClickBox->SetEnabled(
 					mode != B_FOCUS_FOLLOWS_MOUSE);
 			}
