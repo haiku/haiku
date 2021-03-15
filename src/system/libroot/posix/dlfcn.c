@@ -25,7 +25,9 @@ void *
 dlopen(char const *name, int mode)
 {
 	void* handle;
-	image_id imageID = __gRuntimeLoader->load_library(name, mode, &handle);
+	void* caller = __builtin_return_address(0);
+	image_id imageID = __gRuntimeLoader->load_library(name, mode, caller,
+		&handle);
 
 	sStatus = imageID >= 0 ? B_OK : imageID;
 

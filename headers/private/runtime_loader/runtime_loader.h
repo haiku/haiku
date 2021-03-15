@@ -28,7 +28,8 @@ struct rld_export {
 	// runtime loader API export
 	image_id (*load_add_on)(char const *path, uint32 flags);
 	status_t (*unload_add_on)(image_id imageID);
-	image_id (*load_library)(char const *path, uint32 flags, void **_handle);
+	image_id (*load_library)(char const *path, uint32 flags, void* caller,
+		void **_handle);
 	status_t (*unload_library)(void* handle);
 	status_t (*get_image_symbol)(image_id imageID, char const *symbolName,
 		int32 symbolType, bool recursive, image_id *_inImage, void **_location);

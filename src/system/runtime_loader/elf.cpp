@@ -600,11 +600,14 @@ err:
 
 
 image_id
-load_library(char const *path, uint32 flags, bool addOn, void** _handle)
+load_library(char const *path, uint32 flags, bool addOn, void* caller,
+	void** _handle)
 {
 	image_t *image = NULL;
 	image_type type = (addOn ? B_ADD_ON_IMAGE : B_LIBRARY_IMAGE);
 	status_t status;
+	const char* rpath = NULL;
+	const char* requestingObjectPath = NULL;
 
 	if (path == NULL && addOn)
 		return B_BAD_VALUE;
@@ -634,9 +637,24 @@ load_library(char const *path, uint32 flags, bool addOn, void** _handle)
 			*_handle = image;
 			return image->id;
 		}
+
+		// First of all, find the caller image.
+		image_t* callerImage = get_loaded_images().head;
+		for (; callerImage != NULL; callerImage = callerImage->next) {
+			elf_region_t& text = callerImage->regions[0];
+			if ((addr_t)caller >= text.vmstart
+				&& (addr_t)caller < text.vmstart + text.vmsize) {
+				// found the image
+				break;
+			}
+		}
+		if (callerImage != NULL) {
+			rpath = find_dt_rpath(callerImage);
+			requestingObjectPath = callerImage->path;
+		}
 	}
 
-	status = load_image(path, type, NULL, NULL, &image);
+	status = load_image(path, type, rpath, requestingObjectPath, &image);
 	if (status < B_OK) {
 		KTRACE("rld: load_library(\"%s\") failed to load container: %s", path,
 			strerror(status));
