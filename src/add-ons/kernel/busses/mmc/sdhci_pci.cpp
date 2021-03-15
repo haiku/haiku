@@ -35,7 +35,6 @@
 #define SDHCI_PCI_DEVICE_MODULE_NAME "busses/mmc/sdhci_pci/driver_v1"
 #define SDHCI_PCI_MMC_BUS_MODULE_NAME "busses/mmc/sdhci_pci/device/v1"
 
-#define SLOTS_COUNT				"device/slots_count"
 #define SLOT_NUMBER				"device/slot"
 #define BAR_INDEX				"device/bar"
 
@@ -781,8 +780,6 @@ register_child_devices(void* cookie)
 	}
 
 	for (uint8_t slot = 0; slot <= slots_count; slot++) {
-
-		bar = bar + slot;
 		sprintf(prettyName, "SDHC bus %" B_PRIu8, slot);
 		device_attr attrs[] = {
 			// properties of this controller for mmc bus manager
@@ -803,7 +800,7 @@ register_child_devices(void* cookie)
 
 			// private data to identify device
 			{ SLOT_NUMBER, B_UINT8_TYPE, { ui8: slot} },
-			{ BAR_INDEX, B_UINT8_TYPE, { ui8: bar} },
+			{ BAR_INDEX, B_UINT8_TYPE, { ui8: bar + slot} },
 			{ NULL }
 		};
 		device_node* node;
