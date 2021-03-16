@@ -94,7 +94,7 @@ SettingsView::SettingsView(MouseSettings& settings)
 	const mode_mouse focusModes[] = {B_NORMAL_MOUSE, B_CLICK_TO_FOCUS_MOUSE,
 		B_FOCUS_FOLLOWS_MOUSE};
 
-	for (int i = 0; i < B_COUNT_OF(focusModes); i++) {
+	for (size_t i = 0; i < B_COUNT_OF(focusModes); i++) {
 		fFocusMenu->AddOption(B_TRANSLATE_NOCOLLECT(focusLabels[i]),
 			focusModes[i]);
 	}
