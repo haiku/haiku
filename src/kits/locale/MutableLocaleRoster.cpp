@@ -289,16 +289,16 @@ MutableLocaleRoster::LoadCatalog(const char* signature,
 	for (int32 l = 0; languages.FindString("language", l, &lang) == B_OK; ++l) {
 		catalog = new (std::nothrow) BPrivate::DefaultCatalog(NULL, signature,
 			lang);
-		if (catalog == NULL)
-			continue;
 
-		if (catalog->InitCheck() != B_OK
-			|| catalog->ReadFromStandardLocations() != B_OK) {
-			delete catalog;
-			continue;
+		if (catalog != NULL) {
+			if (catalog->InitCheck() != B_OK
+				|| catalog->ReadFromStandardLocations() != B_OK) {
+				delete catalog;
+				catalog = NULL;
+			} else {
+				defaultCatalogInfo->fLoadedCatalogs.AddItem(catalog);
+			}
 		}
-
-		defaultCatalogInfo->fLoadedCatalogs.AddItem(catalog);
 
 		// Chain-load catalogs for languages that depend on
 		// other languages.
