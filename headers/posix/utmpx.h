@@ -17,7 +17,8 @@ struct utmpx {
 	pid_t			ut_pid;			/* process ID */
 	char			ut_user[32];	/* user login name */
 	char			ut_line[16];	/* device name */
-	char			__ut_reserved[192];
+	char			ut_host[128];	/* remote hostname */
+	char			__ut_reserved[64];
 };
 
 
