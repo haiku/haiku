@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -14,6 +14,7 @@
 
 #include "AbstractServerProcess.h"
 #include "HaikuDepotConstants.h"
+#include "IncrementViewCounterProcess.h"
 #include "LocalPkgDataLoadProcess.h"
 #include "LocalRepositoryUpdateProcess.h"
 #include "Logger.h"
@@ -32,6 +33,21 @@
 
 
 using namespace BPackageKit;
+
+
+/*static*/ ProcessCoordinator*
+ProcessCoordinatorFactory::CreateIncrementViewCounter(
+	ProcessCoordinatorListener* processCoordinatorListener,
+	Model* model, const PackageInfoRef package)
+{
+	ProcessCoordinator* processCoordinator = new ProcessCoordinator(
+		"IncrementViewCounter",
+		processCoordinatorListener);
+	ProcessNode* node = new ProcessNode(
+		new IncrementViewCounterProcess(model, package));
+	processCoordinator->AddNode(node);
+	return processCoordinator;
+}
 
 
 /*static*/ ProcessCoordinator*

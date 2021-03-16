@@ -1,6 +1,6 @@
 /*
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2016-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef WEB_APP_INTERFACE_H
@@ -12,6 +12,7 @@
 #include <String.h>
 #include <package/PackageVersion.h>
 
+#include "PackageInfo.h"
 #include "UserCredentials.h"
 #include "UserDetail.h"
 #include "UserUsageConditions.h"
@@ -118,6 +119,11 @@ public:
 
 			status_t			AuthenticateUser(const BString& nickName,
 									const BString& passwordClear,
+									BMessage& message);
+
+			status_t			IncrementViewCounter(
+									const PackageInfoRef package,
+									const DepotInfoRef depot,
 									BMessage& message);
 
 	static	int32				ErrorCodeFromResponse(

@@ -1,6 +1,6 @@
 /*
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2016-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -753,6 +753,61 @@ WebAppInterface::AuthenticateUser(const BString& nickName,
 	requestEnvelopeWriter.WriteObjectEnd();
 
 	return _SendJsonRequest("user", requestEnvelopeData,
+		_LengthAndSeekToZero(requestEnvelopeData), 0,
+		message);
+}
+
+
+status_t
+WebAppInterface::IncrementViewCounter(const PackageInfoRef package,
+	const DepotInfoRef depot, BMessage& message)
+{
+	BMallocIO* requestEnvelopeData = new BMallocIO();
+		// BHttpRequest later takes ownership of this.
+	BJsonTextWriter requestEnvelopeWriter(requestEnvelopeData);
+
+	requestEnvelopeWriter.WriteObjectStart();
+	_WriteStandardJsonRpcEnvelopeValues(requestEnvelopeWriter,
+		"incrementViewCounter");
+	requestEnvelopeWriter.WriteObjectName("params");
+	requestEnvelopeWriter.WriteArrayStart();
+	requestEnvelopeWriter.WriteObjectStart();
+
+	requestEnvelopeWriter.WriteObjectName("architectureCode");
+	requestEnvelopeWriter.WriteString(package->Architecture());
+	requestEnvelopeWriter.WriteObjectName("repositoryCode");
+	requestEnvelopeWriter.WriteString(depot->WebAppRepositoryCode());
+	requestEnvelopeWriter.WriteObjectName("name");
+	requestEnvelopeWriter.WriteString(package->Name());
+
+	const BPackageVersion version = package->Version();
+	if (!version.Major().IsEmpty()) {
+		requestEnvelopeWriter.WriteObjectName("major");
+		requestEnvelopeWriter.WriteString(version.Major());
+	}
+	if (!version.Minor().IsEmpty()) {
+		requestEnvelopeWriter.WriteObjectName("minor");
+		requestEnvelopeWriter.WriteString(version.Minor());
+	}
+	if (!version.Micro().IsEmpty()) {
+		requestEnvelopeWriter.WriteObjectName("micro");
+		requestEnvelopeWriter.WriteString(version.Micro());
+	}
+	if (!version.PreRelease().IsEmpty()) {
+		requestEnvelopeWriter.WriteObjectName("preRelease");
+		requestEnvelopeWriter.WriteString(version.PreRelease());
+	}
+	if (version.Revision() != 0) {
+		requestEnvelopeWriter.WriteObjectName("revision");
+		requestEnvelopeWriter.WriteInteger(
+			static_cast<int64>(version.Revision()));
+	}
+
+	requestEnvelopeWriter.WriteObjectEnd();
+	requestEnvelopeWriter.WriteArrayEnd();
+	requestEnvelopeWriter.WriteObjectEnd();
+
+	return _SendJsonRequest("pkg", requestEnvelopeData,
 		_LengthAndSeekToZero(requestEnvelopeData), 0,
 		message);
 }

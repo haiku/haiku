@@ -129,6 +129,9 @@ public:
 			void				SetShowDevelopPackages(bool show);
 			bool				ShowDevelopPackages() const
 									{ return fShowDevelopPackages; }
+			void				SetCanShareAnonymousUsageData(bool value);
+			bool				CanShareAnonymousUsageData() const
+									{ return fCanShareAnonymousUsageData; }
 
 			// Retrieve package information
 	static	const uint32		POPULATE_CACHED_RATING	= 1 << 0;
@@ -150,8 +153,8 @@ public:
 									const BString& passwordClear,
 									bool storePassword);
 
-			const WebAppInterface&
-								GetWebAppInterface() const
+			WebAppInterface&
+								GetWebAppInterface()
 									{ return fWebAppInterface; }
 
 			status_t			IconTarPath(BPath& path) const;
@@ -205,6 +208,7 @@ private:
 			bool				fShowInstalledPackages;
 			bool				fShowSourcePackages;
 			bool				fShowDevelopPackages;
+			bool				fCanShareAnonymousUsageData;
 
 			LanguageModel		fLanguageModel;
 			PackageIconTarRepository

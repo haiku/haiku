@@ -453,6 +453,7 @@ PackageInfo::PackageInfo()
 	fFileName(),
 	fSize(0),
 	fDepotName(""),
+	fViewed(false),
 	fIsCollatingChanges(false),
 	fCollatedChanges(0)
 {
@@ -483,6 +484,7 @@ PackageInfo::PackageInfo(const BPackageInfo& info)
 	fFileName(info.FileName()),
 	fSize(0), // TODO: Retrieve local file size
 	fDepotName(""),
+	fViewed(false),
 	fIsCollatingChanges(false),
 	fCollatedChanges(0)
 {
@@ -529,6 +531,7 @@ PackageInfo::PackageInfo(const BString& name,
 	fFileName(),
 	fSize(0),
 	fDepotName(""),
+	fViewed(false),
 	fIsCollatingChanges(false),
 	fCollatedChanges(0)
 {
@@ -561,6 +564,7 @@ PackageInfo::PackageInfo(const PackageInfo& other)
 	fFileName(other.fFileName),
 	fSize(other.fSize),
 	fDepotName(other.fDepotName),
+	fViewed(other.fViewed),
 	fIsCollatingChanges(false),
 	fCollatedChanges(0)
 {
@@ -593,6 +597,8 @@ PackageInfo::operator=(const PackageInfo& other)
 	fLocalFilePath = other.fLocalFilePath;
 	fFileName = other.fFileName;
 	fSize = other.fSize;
+	fDepotName = other.fDepotName;
+	fViewed = other.fViewed;
 
 	return *this;
 }
@@ -984,6 +990,13 @@ PackageInfo::SetSize(int64 size)
 		fSize = size;
 		_NotifyListeners(PKG_CHANGED_SIZE);
 	}
+}
+
+
+void
+PackageInfo::SetViewed()
+{
+	fViewed = true;
 }
 
 

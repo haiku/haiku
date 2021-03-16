@@ -120,6 +120,7 @@ local applicationSources =
 	FeaturedPackagesView.cpp
 	FilterView.cpp
 	IconTarPtr.cpp
+	IncrementViewCounterProcess.cpp
 	JobStateListener.cpp
 	LanguageModel.cpp
 	LinkView.cpp
@@ -146,6 +147,7 @@ local applicationSources =
 	support.cpp
 	ScreenshotWindow.cpp
 	ScrollableGroupView.cpp
+	SettingsWindow.cpp
 	SharedBitmap.cpp
 	ToLatestUserUsageConditionsWindow.cpp
 	UserCredentials.cpp

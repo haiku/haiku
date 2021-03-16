@@ -212,7 +212,8 @@ Model::Model()
 	fShowAvailablePackages(true),
 	fShowInstalledPackages(true),
 	fShowSourcePackages(false),
-	fShowDevelopPackages(false)
+	fShowDevelopPackages(false),
+	fCanShareAnonymousUsageData(false)
 {
 }
 
@@ -433,6 +434,13 @@ void
 Model::SetPackageListViewMode(package_list_view_mode mode)
 {
 	fPackageListViewMode = mode;
+}
+
+
+void
+Model::SetCanShareAnonymousUsageData(bool value)
+{
+	fCanShareAnonymousUsageData = value;
 }
 
 

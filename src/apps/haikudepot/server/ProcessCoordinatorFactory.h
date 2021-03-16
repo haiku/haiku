@@ -1,5 +1,5 @@
 /*
- * Copyright 2018, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -8,6 +8,8 @@
 #define PROCESS_COORDINATOR_FACTORY_H
 
 #include <SupportDefs.h>
+
+#include "PackageInfo.h"
 
 class Model;
 class PackageInfoListener;
@@ -21,6 +23,11 @@ class UserDetailVerifierListener;
 
 class ProcessCoordinatorFactory {
 public:
+	static	ProcessCoordinator*	CreateIncrementViewCounter(
+									ProcessCoordinatorListener*
+										processCoordinatorListener,
+									Model* model, const PackageInfoRef package);
+
 	static	ProcessCoordinator*	CreateBulkLoadCoordinator(
 									PackageInfoListener *packageInfoListener,
 									ProcessCoordinatorListener*

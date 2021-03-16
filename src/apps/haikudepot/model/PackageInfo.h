@@ -253,7 +253,8 @@ public:
 									{ return fName; }
 			void				SetTitle(const BString& title);
 			const BString&		Title() const;
-			const BPackageVersion& Version() const
+			const BPackageVersion&
+								Version() const
 									{ return fVersion; }
 			void				SetShortDescription(const BString& description);
 			const BString&		ShortDescription() const
@@ -336,6 +337,10 @@ public:
 			int64				Size() const
 									{ return fSize; }
 
+			void				SetViewed();
+			bool				Viewed() const
+									{ return fViewed; }
+
 			void				SetDepotName(const BString& depotName);
 			const BString&		DepotName() const
 									{ return fDepotName; }
@@ -387,6 +392,7 @@ private:
 			BString				fFileName;
 			int64				fSize;
 			BString				fDepotName;
+			bool				fViewed;
 
 			bool				fIsCollatingChanges;
 			uint32				fCollatedChanges;

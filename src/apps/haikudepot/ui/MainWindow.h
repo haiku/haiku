@@ -88,6 +88,10 @@ private:
 			void				_RestoreWindowFrame(const BMessage& settings);
 			void				_RestoreModelSettings(const BMessage& settings);
 
+			void				_MaybePromptCanShareAnonymousUserData(
+									const BMessage& settings);
+			void				_PromptCanShareAnonymousUserData();
+
 			void				_InitWorkerThreads();
 			void				_AdoptModelControls();
 			void				_AdoptModel();
@@ -96,6 +100,9 @@ private:
 
 			void				_AdoptPackage(const PackageInfoRef& package);
 			void				_ClearPackage();
+
+			void				_IncrementViewCounter(
+									const PackageInfoRef& package);
 
 			void				_PopulatePackageAsync(bool forcePopulate);
 			void				_StartBulkLoad(bool force = false);
@@ -118,6 +125,7 @@ private:
 
 			void				_OpenLoginWindow(
 									const BMessage& onSuccessMessage);
+			void				_OpenSettingsWindow();
 			void				_StartUserVerify();
 			void				_UpdateAuthorization();
 			void				_UpdateAvailableRepositories();

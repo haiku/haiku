@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef HAIKU_DEPOT_CONSTANTS_H
@@ -71,6 +71,15 @@ enum BitmapSize {
 #define KEY_WORK_STATUS_PROGRESS		"work_status_progress"
 #define KEY_WINDOW_SETTINGS				"window_settings"
 #define KEY_MAIN_SETTINGS				"main_settings"
+
+
+#define SETTING_SHOW_AVAILABLE_PACKAGES			"show available packages"
+#define SETTING_SHOW_INSTALLED_PACKAGES			"show installed packages"
+#define SETTING_SHOW_DEVELOP_PACKAGES			"show develop packages"
+#define SETTING_SHOW_SOURCE_PACKAGES			"show source packages"
+#define SETTING_CAN_SHARE_ANONYMOUS_USER_DATA	"can share anonymous usage data"
+#define SETTING_PACKAGE_LIST_VIEW_MODE			"packageListViewMode"
+	// unfortunately historical difference in casing.
 
 
 // These constants reference resources in 'HaikuDepot.ref'

@@ -47,6 +47,7 @@
 #include "RatePackageWindow.h"
 #include "support.h"
 #include "ScreenshotWindow.h"
+#include "SettingsWindow.h"
 #include "ToLatestUserUsageConditionsWindow.h"
 #include "UserLoginWindow.h"
 #include "UserUsageConditionsWindow.h"
@@ -61,6 +62,7 @@ enum {
 	MSG_REFRESH_REPOS						= 'mrrp',
 	MSG_MANAGE_REPOS						= 'mmrp',
 	MSG_SOFTWARE_UPDATER					= 'mswu',
+	MSG_SETTINGS							= 'stgs',
 	MSG_LOG_IN								= 'lgin',
 	MSG_AUTHORIZATION_CHANGED				= 'athc',
 	MSG_CATEGORIES_LIST_CHANGED				= 'clic',
@@ -76,7 +78,6 @@ enum {
 };
 
 #define KEY_ERROR_STATUS				"errorStatus"
-#define KEY_PACKAGE_LIST_VIEW_MODE		"packageListViewMode"
 
 #define TAB_PROMINENT_PACKAGES	0
 #define TAB_ALL_PACKAGES		1
@@ -195,6 +196,7 @@ MainWindow::MainWindow(const BMessage& settings)
 		fPackageListView->LoadState(&columnSettings);
 
 	_RestoreModelSettings(settings);
+	_MaybePromptCanShareAnonymousUserData(settings);
 
 	if (fModel.PackageListViewMode() == PROMINENT)
 		fListTabs->Select(TAB_PROMINENT_PACKAGES);
@@ -343,6 +345,10 @@ MainWindow::MessageReceived(BMessage* message)
 			_OpenLoginWindow(BMessage());
 			break;
 
+		case MSG_SETTINGS:
+			_OpenSettingsWindow();
+			break;
+
 		case MSG_LOG_OUT:
 			fModel.SetNickname("");
 			break;
@@ -431,8 +437,10 @@ MainWindow::MessageReceived(BMessage* message)
 				}
 				if (!package.IsSet() || name != package->Name())
 					debugger("unable to find the named package");
-				else
+				else {
 					_AdoptPackage(package);
+					_IncrementViewCounter(package);
+				}
 			} else {
 				_ClearPackage();
 			}
@@ -577,15 +585,19 @@ MainWindow::StoreSettings(BMessage& settings) const
 
 		settings.AddMessage("column settings", &columnSettings);
 
-		settings.AddString(KEY_PACKAGE_LIST_VIEW_MODE,
+		settings.AddString(SETTING_PACKAGE_LIST_VIEW_MODE,
 			main_window_package_list_view_mode_str(
 				fModel.PackageListViewMode()));
-		settings.AddBool("show available packages",
+		settings.AddBool(SETTING_SHOW_AVAILABLE_PACKAGES,
 			fModel.ShowAvailablePackages());
-		settings.AddBool("show installed packages",
+		settings.AddBool(SETTING_SHOW_INSTALLED_PACKAGES,
 			fModel.ShowInstalledPackages());
-		settings.AddBool("show develop packages", fModel.ShowDevelopPackages());
-		settings.AddBool("show source packages", fModel.ShowSourcePackages());
+		settings.AddBool(SETTING_SHOW_DEVELOP_PACKAGES,
+			fModel.ShowDevelopPackages());
+		settings.AddBool(SETTING_SHOW_SOURCE_PACKAGES,
+			fModel.ShowSourcePackages());
+		settings.AddBool(SETTING_CAN_SHARE_ANONYMOUS_USER_DATA,
+			fModel.CanShareAnonymousUsageData());
 	}
 
 	settings.AddString("username", fModel.Nickname());
@@ -627,6 +639,14 @@ MainWindow::GetModel()
 void
 MainWindow::_BuildMenu(BMenuBar* menuBar)
 {
+	BMenu* windowMenu = new BMenu(B_TRANSLATE("Window"));
+	windowMenu->AddItem(new BMenuItem(B_TRANSLATE("Settings" B_UTF8_ELLIPSIS),
+		new BMessage(MSG_SETTINGS)));
+	windowMenu->AddSeparatorItem();
+	windowMenu->AddItem(new BMenuItem(B_TRANSLATE("Quit" B_UTF8_ELLIPSIS),
+		new BMessage(B_QUIT_REQUESTED), 'Q'));
+	menuBar->AddItem(windowMenu);
+
 	BMenu* menu = new BMenu(B_TRANSLATE("Tools"));
 	fRefreshRepositoriesItem = new BMenuItem(
 		B_TRANSLATE("Refresh repositories"), new BMessage(MSG_REFRESH_REPOS));
@@ -635,7 +655,6 @@ MainWindow::_BuildMenu(BMenuBar* menuBar)
 		B_UTF8_ELLIPSIS), new BMessage(MSG_MANAGE_REPOS)));
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Check for updates"
 		B_UTF8_ELLIPSIS), new BMessage(MSG_SOFTWARE_UPDATER)));
-
 	menuBar->AddItem(menu);
 
 	fRepositoryMenu = new BMenu(B_TRANSLATE("Repositories"));
@@ -756,21 +775,52 @@ void
 MainWindow::_RestoreModelSettings(const BMessage& settings)
 {
 	BString packageListViewMode;
-	if (settings.FindString(KEY_PACKAGE_LIST_VIEW_MODE,
+	if (settings.FindString(SETTING_PACKAGE_LIST_VIEW_MODE,
 			&packageListViewMode) == B_OK) {
 		fModel.SetPackageListViewMode(
 			main_window_str_to_package_list_view_mode(packageListViewMode));
 	}
 
 	bool showOption;
-	if (settings.FindBool("show available packages", &showOption) == B_OK)
+	if (settings.FindBool(SETTING_SHOW_AVAILABLE_PACKAGES, &showOption) == B_OK)
 		fModel.SetShowAvailablePackages(showOption);
-	if (settings.FindBool("show installed packages", &showOption) == B_OK)
+	if (settings.FindBool(SETTING_SHOW_INSTALLED_PACKAGES, &showOption) == B_OK)
 		fModel.SetShowInstalledPackages(showOption);
-	if (settings.FindBool("show develop packages", &showOption) == B_OK)
+	if (settings.FindBool(SETTING_SHOW_DEVELOP_PACKAGES, &showOption) == B_OK)
 		fModel.SetShowDevelopPackages(showOption);
-	if (settings.FindBool("show source packages", &showOption) == B_OK)
+	if (settings.FindBool(SETTING_SHOW_SOURCE_PACKAGES, &showOption) == B_OK)
 		fModel.SetShowSourcePackages(showOption);
+	if (settings.FindBool(SETTING_CAN_SHARE_ANONYMOUS_USER_DATA,
+			&showOption) == B_OK) {
+		fModel.SetCanShareAnonymousUsageData(showOption);
+	}
+}
+
+
+void
+MainWindow::_MaybePromptCanShareAnonymousUserData(const BMessage& settings)
+{
+	bool showOption;
+	if (settings.FindBool(SETTING_CAN_SHARE_ANONYMOUS_USER_DATA,
+			&showOption) == B_NAME_NOT_FOUND) {
+		_PromptCanShareAnonymousUserData();
+	}
+}
+
+
+void
+MainWindow::_PromptCanShareAnonymousUserData()
+{
+	BAlert* alert = new(std::nothrow) BAlert(
+		B_TRANSLATE("Sending anonymous usage data"),
+		B_TRANSLATE("Would it be acceptable to send anonymous usage data to the"
+			" HaikuDepotServer system from this computer?  You can change your"
+			" preference in the \"Settings\" window later."),
+		B_TRANSLATE("No"),
+		B_TRANSLATE("Yes"));
+
+	int32 result = alert->Go();
+	fModel.SetCanShareAnonymousUsageData(1 == result);
 }
 
 
@@ -862,6 +912,31 @@ MainWindow::_AddRemovePackageFromLists(const PackageInfoRef& package)
 	} else {
 		fFeaturedPackagesView->RemovePackage(package);
 		fPackageListView->RemovePackage(package);
+	}
+}
+
+
+void
+MainWindow::_IncrementViewCounter(const PackageInfoRef& package)
+{
+	bool shouldIncrementViewCounter = false;
+
+	{
+		AutoLocker<BLocker> modelLocker(fModel.Lock());
+		bool canShareAnonymousUsageData = fModel.CanShareAnonymousUsageData();
+		if (canShareAnonymousUsageData && !package->Viewed()) {
+			package->SetViewed();
+			shouldIncrementViewCounter = true;
+		}
+	}
+
+	if (shouldIncrementViewCounter) {
+		ProcessCoordinator* bulkLoadCoordinator =
+			ProcessCoordinatorFactory::CreateIncrementViewCounter(
+				this,
+					// ProcessCoordinatorListener
+				&fModel, package);
+		_AddProcessCoordinator(bulkLoadCoordinator);
 	}
 }
 
@@ -1079,6 +1154,14 @@ MainWindow::_PopulatePackageWorker(void* arg)
 	}
 
 	return 0;
+}
+
+
+void
+MainWindow::_OpenSettingsWindow()
+{
+	SettingsWindow* window = new SettingsWindow(this, &fModel);
+	window->Show();
 }
 
 
