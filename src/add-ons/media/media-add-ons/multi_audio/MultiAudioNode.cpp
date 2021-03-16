@@ -210,6 +210,11 @@ MultiAudioNode::MultiAudioNode(BMediaAddOn* addon, const char* name,
 		// measured in Hertz
 	fOutputPreferredFormat.u.raw_audio.byte_order = B_MEDIA_HOST_ENDIAN;
 
+	if (fOutputPreferredFormat.u.raw_audio.format == 0) {
+		fInitStatus = B_BAD_VALUE;
+		return;
+	}
+
 	// we'll use the consumer's preferred buffer size, if any
 	fOutputPreferredFormat.u.raw_audio.buffer_size
 		= fDevice->BufferList().return_playback_buffer_size
@@ -229,6 +234,11 @@ MultiAudioNode::MultiAudioNode(BMediaAddOn* addon, const char* name,
 		= MultiAudio::convert_to_sample_rate(fDevice->FormatInfo().input.rate);
 		// measured in Hertz
 	fInputPreferredFormat.u.raw_audio.byte_order = B_MEDIA_HOST_ENDIAN;
+
+	if (fInputPreferredFormat.u.raw_audio.format == 0) {
+		fInitStatus = B_BAD_VALUE;
+		return;
+	}
 
 	// we'll use the consumer's preferred buffer size, if any
 	fInputPreferredFormat.u.raw_audio.buffer_size
@@ -721,6 +731,12 @@ MultiAudioNode::Connected(const media_source& producer,
 		fprintf(stderr, "<- B_MEDIA_BAD_DESTINATION\n");
 		return B_MEDIA_BAD_DESTINATION;
 	}
+
+	if (with_format.u.raw_audio.frame_rate <= 0
+		|| with_format.u.raw_audio.channel_count <= 0
+		|| ((with_format.u.raw_audio.format
+			& media_raw_audio_format::B_AUDIO_SIZE_MASK) == 0))
+		return B_BAD_VALUE;
 
 	_UpdateInternalLatency(with_format);
 
@@ -2322,6 +2338,9 @@ MultiAudioNode::_SetNodeInputFrameRate(float frameRate)
 	if (error != B_OK)
 		return error;
 
+	if (frameRate <= 0)
+		return B_BAD_VALUE;
+
 	// it went fine -- update all formats
 	fOutputPreferredFormat.u.raw_audio.frame_rate = frameRate;
 	fOutputPreferredFormat.u.raw_audio.buffer_size
@@ -2373,6 +2392,12 @@ MultiAudioNode::_SetNodeOutputFrameRate(float frameRate)
 	status_t error = fDevice->SetInputFrameRate(multiAudioRate);
 	if (error != B_OK)
 		return error;
+
+	if (frameRate <= 0
+		|| fInputPreferredFormat.u.raw_audio.channel_count <= 0
+		|| ((fInputPreferredFormat.u.raw_audio.format
+			& media_raw_audio_format::B_AUDIO_SIZE_MASK) == 0))
+		return B_BAD_VALUE;
 
 	// it went fine -- update all formats
 	fInputPreferredFormat.u.raw_audio.frame_rate = frameRate;
