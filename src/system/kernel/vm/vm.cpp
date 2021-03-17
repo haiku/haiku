@@ -274,7 +274,7 @@ static status_t vm_soft_fault(VMAddressSpace* addressSpace, addr_t address,
 	bool isWrite, bool isExecute, bool isUser, vm_page** wirePage);
 static status_t map_backing_store(VMAddressSpace* addressSpace,
 	VMCache* cache, off_t offset, const char* areaName, addr_t size, int wiring,
-	int protection, int mapping, uint32 flags,
+	int protection, int protectionMax, int mapping, uint32 flags,
 	const virtual_address_restrictions* addressRestrictions, bool kernel,
 	VMArea** _area, void** _virtualAddress);
 static void fix_protection(uint32* protection);
@@ -773,7 +773,7 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 			// Map the second area.
 			error = map_backing_store(addressSpace, secondCache,
 				area->cache_offset, area->name, secondSize, area->wiring,
-				area->protection, REGION_NO_PRIVATE_MAP, 0,
+				area->protection, area->protection_max, REGION_NO_PRIVATE_MAP, 0,
 				&addressRestrictions, kernel, &secondArea, NULL);
 		}
 
@@ -807,8 +807,8 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 		error = map_backing_store(addressSpace, cache, area->cache_offset
 			+ (secondBase - area->Base()),
 			area->name, secondSize, area->wiring, area->protection,
-			REGION_NO_PRIVATE_MAP, 0, &addressRestrictions, kernel, &secondArea,
-			NULL);
+			area->protection_max, REGION_NO_PRIVATE_MAP, 0,
+			&addressRestrictions, kernel, &secondArea, NULL);
 		if (error != B_OK) {
 			addressSpace->ShrinkAreaTail(area, oldSize, allocationFlags);
 			return error;
@@ -921,16 +921,17 @@ discard_address_range(VMAddressSpace* addressSpace, addr_t address, addr_t size,
 */
 static status_t
 map_backing_store(VMAddressSpace* addressSpace, VMCache* cache, off_t offset,
-	const char* areaName, addr_t size, int wiring, int protection, int mapping,
+	const char* areaName, addr_t size, int wiring, int protection,
+	int protectionMax, int mapping,
 	uint32 flags, const virtual_address_restrictions* addressRestrictions,
 	bool kernel, VMArea** _area, void** _virtualAddress)
 {
 	TRACE(("map_backing_store: aspace %p, cache %p, virtual %p, offset 0x%"
 		B_PRIx64 ", size %" B_PRIuADDR ", addressSpec %" B_PRIu32 ", wiring %d"
-		", protection %d, area %p, areaName '%s'\n", addressSpace, cache,
-		addressRestrictions->address, offset, size,
+		", protection %d, protectionMax %d, area %p, areaName '%s'\n",
+		addressSpace, cache, addressRestrictions->address, offset, size,
 		addressRestrictions->address_specification, wiring, protection,
-		_area, areaName));
+		protectionMax, _area, areaName));
 	cache->AssertLocked();
 
 	if (size == 0) {
@@ -954,6 +955,8 @@ map_backing_store(VMAddressSpace* addressSpace, VMCache* cache, off_t offset,
 
 	VMArea* area = addressSpace->CreateArea(areaName, wiring, protection,
 		allocationFlags);
+	if (mapping != REGION_PRIVATE_MAP)
+		area->protection_max = protectionMax & B_USER_PROTECTION;
 	if (area == NULL)
 		return B_NO_MEMORY;
 
@@ -1270,7 +1273,7 @@ vm_block_address_range(const char* name, void* address, addr_t size)
 	addressRestrictions.address = address;
 	addressRestrictions.address_specification = B_EXACT_ADDRESS;
 	status = map_backing_store(addressSpace, cache, 0, name, size,
-		B_ALREADY_WIRED, 0, REGION_NO_PRIVATE_MAP, 0, &addressRestrictions,
+		B_ALREADY_WIRED, 0, REGION_NO_PRIVATE_MAP, 0, 0, &addressRestrictions,
 		true, &area, NULL);
 	if (status != B_OK) {
 		cache->ReleaseRefAndUnlock();
@@ -1540,8 +1543,8 @@ vm_create_anonymous_area(team_id team, const char *name, addr_t size,
 	cache->Lock();
 
 	status = map_backing_store(addressSpace, cache, 0, name, size, wiring,
-		protection, REGION_NO_PRIVATE_MAP, flags, virtualAddressRestrictions,
-		kernel, &area, _address);
+		protection, 0, REGION_NO_PRIVATE_MAP, flags,
+		virtualAddressRestrictions, kernel, &area, _address);
 
 	if (status != B_OK) {
 		cache->ReleaseRefAndUnlock();
@@ -1742,7 +1745,7 @@ vm_map_physical_memory(team_id team, const char* name, void** _address,
 	addressRestrictions.address = *_address;
 	addressRestrictions.address_specification = addressSpec & ~B_MTR_MASK;
 	status = map_backing_store(locker.AddressSpace(), cache, 0, name, size,
-		B_FULL_LOCK, protection, REGION_NO_PRIVATE_MAP, 0, &addressRestrictions,
+		B_FULL_LOCK, protection, 0, REGION_NO_PRIVATE_MAP, 0, &addressRestrictions,
 		true, &area, _address);
 
 	if (status < B_OK)
@@ -1858,7 +1861,7 @@ vm_map_physical_memory_vecs(team_id team, const char* name, void** _address,
 	addressRestrictions.address = *_address;
 	addressRestrictions.address_specification = addressSpec & ~B_MTR_MASK;
 	result = map_backing_store(locker.AddressSpace(), cache, 0, name,
-		size, B_FULL_LOCK, protection, REGION_NO_PRIVATE_MAP, 0,
+		size, B_FULL_LOCK, protection, 0, REGION_NO_PRIVATE_MAP, 0,
 		&addressRestrictions, true, &area, _address);
 
 	if (result != B_OK)
@@ -1943,7 +1946,8 @@ vm_create_null_area(team_id team, const char* name, void** address,
 	addressRestrictions.address = *address;
 	addressRestrictions.address_specification = addressSpec;
 	status = map_backing_store(locker.AddressSpace(), cache, 0, name, size,
-		B_LAZY_LOCK, B_KERNEL_READ_AREA, REGION_NO_PRIVATE_MAP, flags,
+		B_LAZY_LOCK, B_KERNEL_READ_AREA, B_KERNEL_READ_AREA,
+		REGION_NO_PRIVATE_MAP, flags,
 		&addressRestrictions, true, &area, address);
 
 	if (status < B_OK) {
@@ -2049,6 +2053,13 @@ _vm_map_file(team_id team, const char* name, void** _address,
 		return EACCES;
 	}
 
+	uint32 protectionMax = 0;
+	if (mapping != REGION_PRIVATE_MAP) {
+		protectionMax = protection | B_READ_AREA;
+		if ((openMode & O_ACCMODE) == O_RDWR)
+			protectionMax |= B_WRITE_AREA;
+	}
+
 	// get the vnode for the object, this also grabs a ref to it
 	struct vnode* vnode = NULL;
 	status_t status = vfs_get_vnode_from_fd(fd, kernel, &vnode);
@@ -2115,7 +2126,7 @@ _vm_map_file(team_id team, const char* name, void** _address,
 	addressRestrictions.address = *_address;
 	addressRestrictions.address_specification = addressSpec;
 	status = map_backing_store(locker.AddressSpace(), cache, offset, name, size,
-		0, protection, mapping,
+		0, protection, protectionMax, mapping,
 		unmapAddressRange ? CREATE_AREA_UNMAP_ADDRESS_RANGE : 0,
 		&addressRestrictions, kernel, &area, _address);
 
@@ -2257,7 +2268,8 @@ vm_clone_area(team_id team, const char* name, void** address,
 		addressRestrictions.address_specification = addressSpec;
 		status = map_backing_store(targetAddressSpace, cache,
 			sourceArea->cache_offset, name, sourceArea->Size(),
-			sourceArea->wiring, protection, mapping, 0, &addressRestrictions,
+			sourceArea->wiring, protection, sourceArea->protection_max,
+			mapping, 0, &addressRestrictions,
 			kernel, &newArea, address);
 	}
 	if (status == B_OK && mapping != REGION_PRIVATE_MAP) {
@@ -2652,6 +2664,7 @@ vm_copy_area(team_id team, const char* name, void** _address,
 	addressRestrictions.address_specification = addressSpec;
 	status = map_backing_store(targetAddressSpace, cache, source->cache_offset,
 		name, source->Size(), source->wiring, source->protection,
+		source->protection_max,
 		sharedArea ? REGION_NO_PRIVATE_MAP : REGION_PRIVATE_MAP,
 		writableCopy ? 0 : CREATE_AREA_DONT_COMMIT_MEMORY,
 		&addressRestrictions, true, &target, _address);
@@ -2725,6 +2738,15 @@ vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection,
 			dprintf("vm_set_area_protection: team %" B_PRId32 " tried to "
 				"set protection %#" B_PRIx32 " on kernel area %" B_PRId32
 				" (%s)\n", team, newProtection, areaID, area->name);
+			return B_NOT_ALLOWED;
+		}
+		if (!kernel && area->protection_max != 0
+			&& (newProtection & area->protection_max)
+				!= (newProtection & B_USER_PROTECTION)) {
+			dprintf("vm_set_area_protection: team %" B_PRId32 " tried to "
+				"set protection %#" B_PRIx32 " (max %#" B_PRIx32 ") on kernel "
+				"area %" B_PRId32 " (%s)\n", team, newProtection,
+				area->protection_max, areaID, area->name);
 			return B_NOT_ALLOWED;
 		}
 
@@ -6627,10 +6649,10 @@ _user_set_memory_protection(void* _address, size_t size, uint32 protection)
 
 			if ((area->protection & B_KERNEL_AREA) != 0)
 				return B_NOT_ALLOWED;
-
-			// TODO: For (shared) mapped files we should check whether the new
-			// protections are compatible with the file permissions. We don't
-			// have a way to do that yet, though.
+			if (area->protection_max != 0
+				&& (protection & area->protection_max) != protection) {
+				return B_NOT_ALLOWED;
+			}
 
 			addr_t offset = currentAddress - area->Base();
 			size_t rangeSize = min_c(area->Size() - offset, sizeLeft);

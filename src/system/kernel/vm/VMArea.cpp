@@ -29,6 +29,7 @@ static area_id sNextAreaID = 1;
 VMArea::VMArea(VMAddressSpace* addressSpace, uint32 wiring, uint32 protection)
 	:
 	protection(protection),
+	protection_max(0),
 	wiring(wiring),
 	memory_type(0),
 	cache(NULL),
