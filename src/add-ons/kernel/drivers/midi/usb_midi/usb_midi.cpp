@@ -102,7 +102,7 @@ create_device(const usb_device* dev, uint16 ifno)
 	sprintf(area_name, DRIVER_NAME "_buffer%d", number);
 	midiDevice->buffer_area = area = create_area(area_name,
 		(void**)&midiDevice->buffer, B_ANY_KERNEL_ADDRESS,
-		B_PAGE_SIZE, B_CONTIGUOUS, B_READ_AREA | B_WRITE_AREA);
+		B_PAGE_SIZE, B_CONTIGUOUS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	if (area < 0) {
 		DPRINTF_ERR((MY_ID "create_area() failed 0x%" B_PRIx32 "\n", area));
 		delete_sem(midiDevice->sem_lock);
@@ -628,7 +628,9 @@ usb_midi_write(driver_cookie* cookie, off_t position,
 	const void* buf, size_t* num_bytes)
 {
 	uint8* midiseq = (uint8*)buf;
-	uint8 midicode = midiseq[0];	/* preserved for reference */
+	uint8 midicode;	/* preserved for reference */
+	if (user_memcpy(&midicode, midiseq, sizeof(midicode)) != B_OK)
+		return B_BAD_ADDRESS;
 	status_t status;
 	size_t buff_lim;
 	uint8 cin = ((midicode & 0xF0) == 0xF0) ? CINcode[midicode & 0x0F]
@@ -680,7 +682,8 @@ usb_midi_write(driver_cookie* cookie, off_t position,
 			DPRINTF_DEBUG((MY_ID "using packet data (code %x -- %d bytes)"
 				" %x %x %x\n", pkt->cin, CINbytes[pkt->cin],
 				midiseq[0], midiseq[1], midiseq[2]));
-			memcpy(pkt->midi, midiseq, pkt_bytes);
+			if (user_memcpy(pkt->midi, midiseq, pkt_bytes) != B_OK)
+				return B_BAD_ADDRESS;
 			DPRINTF_DEBUG((MY_ID "built packet %p %x:%d %x %x %x\n",
 				pkt, pkt->cin, pkt->cn,
 				pkt->midi[0], pkt->midi[1], pkt->midi[2]));
