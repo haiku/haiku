@@ -1392,7 +1392,7 @@ cdda_identify_partition(int fd, partition_data* partition, void** _cookie)
 {
 	scsi_toc_toc* toc = (scsi_toc_toc*)malloc(2048);
 	if (toc == NULL)
-		return B_NO_MEMORY;
+		return -1;
 
 	status_t status = read_table_of_contents(fd, toc, 2048);
 
@@ -1432,7 +1432,7 @@ cdda_identify_partition(int fd, partition_data* partition, void** _cookie)
 
 	if (status != B_OK) {
 		free(toc);
-		return status;
+		return -1;
 	}
 
 	*_cookie = toc;
