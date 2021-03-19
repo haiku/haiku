@@ -186,15 +186,15 @@ BNumberFormatImpl::ApplyFormatter(NumberFormat* formatter, BString& string,
 }
 
 
-BNumberFormat::BNumberFormat(const BLocale* locale)
-	: BFormat(locale)
+BNumberFormat::BNumberFormat()
+	: BFormat()
 {
 	fPrivateData = new BNumberFormatImpl();
 }
 
 
-BNumberFormat::BNumberFormat()
-	: BFormat()
+BNumberFormat::BNumberFormat(const BLocale* locale)
+	: BFormat(locale)
 {
 	fPrivateData = new BNumberFormatImpl();
 }

@@ -19,7 +19,8 @@ class BNumberFormatImpl;
 
 class BNumberFormat : public BFormat {
 public:
-								BNumberFormat(const BLocale* locale = NULL);
+								BNumberFormat();
+								BNumberFormat(const BLocale* locale);
 								~BNumberFormat();
 
 			ssize_t				Format(char* string, size_t maxSize,
@@ -44,7 +45,6 @@ public:
 			BString				GetSeparator(BNumberElement element);
 
 private:
-								BNumberFormat();
 								BNumberFormat(const BNumberFormat &other);
 
 private:
