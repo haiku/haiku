@@ -16,7 +16,7 @@
 #	define	TRACE(args...)	UNIX_DEBUG_PRINT(args)
 #	define	PRINT_ERROR(error)										\
 		do {														\
-			UNIX_DEBUG_PRINT("[%ld] l. %d: %s: %s\n",				\
+			UNIX_DEBUG_PRINT("[%" B_PRId32 "] l. %d: %s: %s\n",		\
 				find_thread(NULL), __LINE__, __PRETTY_FUNCTION__,	\
 				strerror(error));									\
 		} while (false)
