@@ -44,6 +44,7 @@ public:
 			BString				GetSeparator(BNumberElement element);
 
 private:
+								BNumberFormat();
 								BNumberFormat(const BNumberFormat &other);
 
 private:

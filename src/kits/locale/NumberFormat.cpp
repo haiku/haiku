@@ -193,6 +193,13 @@ BNumberFormat::BNumberFormat(const BLocale* locale)
 }
 
 
+BNumberFormat::BNumberFormat()
+	: BFormat()
+{
+	fPrivateData = new BNumberFormatImpl();
+}
+
+
 BNumberFormat::BNumberFormat(const BNumberFormat &other)
 	: BFormat(other)
 {
