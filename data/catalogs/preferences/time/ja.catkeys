@@ -9,7 +9,7 @@ Could not resolve server address	Time		サーバーアドレスを解決でき�
 Set time zone	Time		タイムゾーンを設定
 Waiting for answer failed	Time		返答待ちに失敗しました
 <Other>	Time		<その他>
-Received invalid time	Time		不正な時刻を受け取りました
+Received invalid time	Time		無効な時刻を受け取りました
 Remove	Time		削除
 Synchronize again	Time		再同期
 Asia	Time		アジア

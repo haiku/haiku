@@ -64,7 +64,7 @@ OK	MediaPlayer-SettingsWindow		OK
 Remove Entries	MediaPlayer-RemovePLItemsCmd		項目の削除
 never	MediaPlayer-SettingsWindow		行わない
 Loop audio	MediaPlayer-SettingsWindow		オーディオを繰り返し再生
-Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		内部エラー (不正なメッセージ)。プレイリストの保存に失敗しました。
+Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		内部エラー (無効なメッセージ)。プレイリストの保存に失敗しました。
 Open…	MediaPlayer-PlaylistWindow		開く…
 Revert	MediaPlayer-SettingsWindow		戻す
 Low volume	MediaPlayer-SettingsWindow		低音量

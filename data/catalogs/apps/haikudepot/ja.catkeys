@@ -92,7 +92,7 @@ Package daemon problem	App		パッケージデーモンの問題
 (%Votes%)	PackageInfoView		(%Votes%)
 Repository	PackageListView		リポジトリ
 %hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (バージョン %hd.version%)
-The email is malformed.	UserLoginWindow		メールアドレスが不正です。
+The email is malformed.	UserLoginWindow		メールアドレスの形式が正しくありません。
 Close	UserLoginWindow		閉じる
 Close	RatePackageWindow		閉じる
 An unexpected error has been sent from the server [%i]	ServerHelper		サーバーから予期しないエラーが送信されました [%i]
@@ -153,7 +153,7 @@ View latest usage conditions…	MainWindow		最新の使用条件を見る…
 Quit	App		終了
 Search terms:	FilterView		検索:
 Pending…	PackageListView		保留中…
-The nickname is malformed. The nickname may only contain digits and lower case latin characters. The nickname must be between four and sixteen characters in length.	UserLoginWindow		ニックネームが不正な形式です。ニックネームは数字と英小文字しか含みません。また長さは 4 から 16 文字の間である必要があります。
+The nickname is malformed. The nickname may only contain digits and lower case latin characters. The nickname must be between four and sixteen characters in length.	UserLoginWindow		ニックネームの形式が正しくありません。ニックネームは数字と英小文字しか含めません。また長さは 4 から 16 文字の間である必要があります。
 Category:	FilterView		分類:
 Authentication failed	UserLoginWindow		認証に失敗しました
 Captcha error	UserLoginWindow		キャプチャエラー

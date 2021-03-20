@@ -1,53 +1,50 @@
-1	japanese	x-vnd.Haiku-Input	1950274171
-Defaults	InputMouse		デフォルト
+1	japanese	x-vnd.Haiku-Input	3312605348
 Scrolling	TouchpadPrefView		スクロール
+Defaults	InputMouse		デフォルト
 Long	KeyboardView		長い
-Normal	SettingsView		標準
 Cancel	TouchpadPrefView		中止
+4-Button	SettingsView		4 ボタン
 Slow	TouchpadPrefView		遅い
-Warp	SettingsView		ワープ
+Tapping sensitivity	TouchpadPrefView		タップ感度
 Device List	InputWindow		デバイス一覧
 Double-click speed	SettingsView		ダブルクリック速度
 5-Button	SettingsView		5 ボタン
 Typing test area	KeyboardView		タイピングテスト用エリア
-Fast	KeyboardView		速い
-Please confirm	TouchpadPrefView		確認してください
-Mouse speed	SettingsView		マウスの速度
-Horizontal scrolling	TouchpadPrefView		水平スクロール
-Input	System name		入力機器
-Quick	TouchpadPrefView		素早い
-Short	KeyboardView		短い
-Revert	InputMouse		戻す
-Slow	KeyboardView		遅い
-2-Button	SettingsView		2 ボタン
-Click to focus and raise	SettingsView		クリックでフォーカスと最前面へ
-Vertical	TouchpadPrefView		垂直方向
-Double-click test area	SettingsView		ダブルクリックテスト領域
-Focus follows mouse	SettingsView		フォーカスをマウス位置に合わせる
-Focus mode:	SettingsView		フォーカスモード:
-Revert	TouchpadPrefView		戻す
-4-Button	SettingsView		4 ボタン
-Tapping sensitivity	TouchpadPrefView		タップ感度
-Instant warp	SettingsView		インスタントワープ
-Revert	InputKeyboard		戻す
 Mouse type:	SettingsView		マウスの種類:
+Revert	InputKeyboard		戻す
+Fast	KeyboardView		速い
 Off	TouchpadPrefView		オフ
 Never	TouchpadPrefView		反応なし
 Fast	TouchpadPrefView		速い
 6-Button	SettingsView		6 ボタン
+Please confirm	TouchpadPrefView		確認してください
 Click to focus	SettingsView		クリックでフォーカスのみ
 Acceleration	TouchpadPrefView		加速度
+Mouse speed	SettingsView		マウスの速度
 Accept first click	SettingsView		最初のクリックを受け入れる
 OK	TouchpadPrefView		OK
-Keyboard Lock Delay	TouchpadPrefView		キーボードをロックするまでの時間
+Horizontal scrolling	TouchpadPrefView		水平スクロール
 Delay until key repeat	KeyboardView		キーリピートの開始までの時間
+Keyboard Lock Delay	TouchpadPrefView		キーボードをロックするまでの時間
 Two finger scrolling	TouchpadPrefView		2本指スクロール
-The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		新しいスクロール範囲はとても広いので、通常のマウス操作を妨害するかもしれません。本当に変更しますか?
+Input	System name		入力機器
 Mouse acceleration	SettingsView		マウス加速度
-Defaults	TouchpadPrefView		デフォルト
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		新しいスクロール範囲はとても広いので、通常のマウス操作を妨害するかもしれません。本当に変更しますか?
 High	TouchpadPrefView		高い
+Defaults	TouchpadPrefView		デフォルト
 1-Button	SettingsView		1 ボタン
 Defaults	InputKeyboard		デフォルト
+Quick	TouchpadPrefView		素早い
+Short	KeyboardView		短い
+Slow	KeyboardView		遅い
+Revert	InputMouse		戻す
 Key repeat rate	KeyboardView		キーリピートの速度
+2-Button	SettingsView		2 ボタン
+Click to focus and raise	SettingsView		クリックでフォーカスと最前面へ
+Vertical	TouchpadPrefView		垂直方向
 Horizontal	TouchpadPrefView		水平方向
+Focus follows mouse	SettingsView		フォーカスをマウス位置に合わせる
+Focus mode:	SettingsView		フォーカスモード:
+Double-click test area	SettingsView		ダブルクリックテスト領域
 3-Button	SettingsView		3 ボタン
+Revert	TouchpadPrefView		戻す

@@ -1,12 +1,14 @@
-1	friulian	x-vnd.Haiku-Mandelbrot	3875916167
+1	friulian	x-vnd.Haiku-Mandelbrot	2302392624
 Grassland	MandelbrotWindow		Pradarie
 Tricorn	MandelbrotWindow		Cjapiel a trê vints
 Orbit Trap	MandelbrotWindow		Trapule orbitâl
 Deepfrost	MandelbrotWindow		Profonditâts glaçadis
 1 (none)	MandelbrotWindow		1 (nissun)
 Quit	MandelbrotWindow		Jes
+Save as image…	MandelbrotWindow		Salve come imagjin…
 Fire	MandelbrotWindow		Fûc
 High contrast	MandelbrotWindow		Contrast elevât
+Full screen	MandelbrotWindow		A plen visôr
 Midnight	MandelbrotWindow		Miezegnot
 Burning Ship	MandelbrotWindow		Nâf in fûc
 Lightning	MandelbrotWindow		Folc
@@ -18,6 +20,7 @@ Subsampling	MandelbrotWindow		Sot-campionament
 File	MandelbrotWindow		File
 Julia	MandelbrotWindow		Julie
 Frost	MandelbrotWindow		Criùre
+View	MandelbrotWindow		Visualize
 Mandelbrot	System name		Mandelbrot
 Multibrot	MandelbrotWindow		Multibrot
 Iterations	MandelbrotWindow		Iterazions

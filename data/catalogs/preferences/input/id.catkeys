@@ -1,48 +1,45 @@
-1	indonesian	x-vnd.Haiku-Input	1910113385
-Defaults	InputMouse		Bawaan
+1	indonesian	x-vnd.Haiku-Input	3272444562
 Scrolling	TouchpadPrefView		Menggulung
+Defaults	InputMouse		Bawaan
 Long	KeyboardView		Panjang
-Normal	SettingsView		Normal
 Cancel	TouchpadPrefView		Batalkan
+4-Button	SettingsView		4-Tombol
 Slow	TouchpadPrefView		Lambat
-Warp	SettingsView		Melengkung
 Device List	InputWindow		Daftar perangkat
 Double-click speed	SettingsView		Kecepatan klik dua kali
 5-Button	SettingsView		5-Tombol
 Typing test area	KeyboardView		Area tes pengetikan
+Mouse type:	SettingsView		Jenis mouse:
+Revert	InputKeyboard		Pulihkan
 Fast	KeyboardView		Cepat
+Off	TouchpadPrefView		Mati
+Fast	TouchpadPrefView		Cepat
 Please confirm	TouchpadPrefView		Mohon konfirmasi
+Click to focus	SettingsView		Klik untuk fokus
+Acceleration	TouchpadPrefView		Percepatan
 Mouse speed	SettingsView		Kecepatan mouse
+Accept first click	SettingsView		Terima klik pertama
+OK	TouchpadPrefView		Oke
 Horizontal scrolling	TouchpadPrefView		Pengguliran horizontal
+Delay until key repeat	KeyboardView		Tunda hingga tombol berulang
+Two finger scrolling	TouchpadPrefView		Pengguliran dua jari
 Input	System name		Masukan
+Mouse acceleration	SettingsView		Akselerasi mouse
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Area gulir baru sangat besar dan dapat menghambat operasi mouse normal. Apakah anda benar-benar ingin mengubahnya?
+High	TouchpadPrefView		Tinggi
+Defaults	TouchpadPrefView		Bawaan
+1-Button	SettingsView		1-Tombol
+Defaults	InputKeyboard		Bawaan
 Short	KeyboardView		Cepat
-Revert	InputMouse		Pulihkan
 Slow	KeyboardView		Lambat
+Revert	InputMouse		Pulihkan
+Key repeat rate	KeyboardView		Rasio pengulangan tombol
 2-Button	SettingsView		2-Tombol
 Click to focus and raise	SettingsView		Klik untuk fokus dan naikkan
 Vertical	TouchpadPrefView		Vertikal
-Double-click test area	SettingsView		Area pengujian klik dua kali
+Horizontal	TouchpadPrefView		Horisontal
 Focus follows mouse	SettingsView		Fokus mengikuti mouse
 Focus mode:	SettingsView		Mode fokus:
-Revert	TouchpadPrefView		Pulihkan
-4-Button	SettingsView		4-Tombol
-Instant warp	SettingsView		Lengkungan instan
-Revert	InputKeyboard		Pulihkan
-Mouse type:	SettingsView		Jenis mouse:
-Off	TouchpadPrefView		Mati
-Fast	TouchpadPrefView		Cepat
-Click to focus	SettingsView		Klik untuk fokus
-Acceleration	TouchpadPrefView		Percepatan
-Accept first click	SettingsView		Terima klik pertama
-OK	TouchpadPrefView		Oke
-Delay until key repeat	KeyboardView		Tunda hingga tombol berulang
-Two finger scrolling	TouchpadPrefView		Pengguliran dua jari
-The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Area gulir baru sangat besar dan dapat menghambat operasi mouse normal. Apakah anda benar-benar ingin mengubahnya?
-Mouse acceleration	SettingsView		Akselerasi mouse
-Defaults	TouchpadPrefView		Bawaan
-High	TouchpadPrefView		Tinggi
-1-Button	SettingsView		1-Tombol
-Defaults	InputKeyboard		Bawaan
-Key repeat rate	KeyboardView		Rasio pengulangan tombol
-Horizontal	TouchpadPrefView		Horisontal
+Double-click test area	SettingsView		Area pengujian klik dua kali
 3-Button	SettingsView		3-Tombol
+Revert	TouchpadPrefView		Pulihkan
