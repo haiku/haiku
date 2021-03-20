@@ -119,6 +119,7 @@ private:
 	sem_id							fAcceptSemaphore;
 	ucred							fCredentials;
 	bool							fIsChild;
+	bool							fWasConnected;
 };
 
 #endif	// UNIX_ENDPOINT_H

@@ -48,7 +48,8 @@ UnixEndpoint::UnixEndpoint(net_socket* socket)
 	fReceiveFifo(NULL),
 	fState(UNIX_ENDPOINT_CLOSED),
 	fAcceptSemaphore(-1),
-	fIsChild(false)
+	fIsChild(false),
+	fWasConnected(false)
 {
 	TRACE("[%" B_PRId32 "] %p->UnixEndpoint::UnixEndpoint()\n",
 		find_thread(NULL), this);
@@ -383,6 +384,7 @@ UnixEndpoint::Connect(const struct sockaddr *_address)
 	peerFifoDeleter.Detach();
 
 	fState = UNIX_ENDPOINT_CONNECTED;
+	fWasConnected = true;
 
 	gSocketModule->set_connected(newSocket);
 
@@ -802,7 +804,7 @@ UnixEndpoint::_LockConnectedEndpoints(UnixEndpointLocker& locker,
 	UnixEndpointLocker& peerLocker)
 {
 	if (fState != UNIX_ENDPOINT_CONNECTED)
-		RETURN_ERROR(ENOTCONN);
+		RETURN_ERROR(fWasConnected ? EPIPE : ENOTCONN);
 
 	// We need to lock the peer, too. Get a reference -- we might need to
 	// unlock ourselves to get the locking order right.
