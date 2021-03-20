@@ -52,6 +52,7 @@ struct console_info {
 	int32	rows;
 	int32	cursor_x;
 	int32	cursor_y;
+	FramebufferFont* font;
 };
 
 // Palette is (white and black are exchanged):
@@ -120,8 +121,19 @@ get_palette_entry(uint8 index)
 }
 
 
+static uint16
+get_font_data(uint8 glyph, int y)
+{
+	if (sConsole.font->glyphWidth > 8) {
+		uint16* data = (uint16*)sConsole.font->data;
+		return data[sConsole.font->glyphHeight * glyph + y];
+	} else
+		return sConsole.font->data[sConsole.font->glyphHeight * glyph + y];
+}
+
+
 static void
-render_glyph(int32 x, int32 y, uint8 glyph, uint8 attr)
+render_glyph(int32 column, int32 row, uint8 glyph, uint8 attr)
 {
 	// we're ASCII only
 	if (glyph > 127)
@@ -129,15 +141,15 @@ render_glyph(int32 x, int32 y, uint8 glyph, uint8 attr)
 
 	if (sConsole.depth >= 8) {
 		uint8* base = (uint8*)(sConsole.frame_buffer
-			+ sConsole.bytes_per_row * y * CHAR_HEIGHT
-			+ x * CHAR_WIDTH * sConsole.bytes_per_pixel);
+			+ sConsole.bytes_per_row * row * sConsole.font->glyphHeight
+			+ column * sConsole.font->glyphWidth * sConsole.bytes_per_pixel);
 		uint8* color = get_palette_entry(foreground_color(attr));
 		uint8* backgroundColor = get_palette_entry(background_color(attr));
 
 		set_ac();
-		for (y = 0; y < CHAR_HEIGHT; y++) {
-			uint8 bits = FONT[CHAR_HEIGHT * glyph + y];
-			for (x = 0; x < CHAR_WIDTH; x++) {
+		for (int y = 0; y < sConsole.font->glyphHeight; y++) {
+			uint16_t bits = get_font_data(glyph, y);
+			for (int x = 0; x < sConsole.font->glyphWidth; x++) {
 				for (int32 i = 0; i < sConsole.bytes_per_pixel; i++) {
 					if (bits & 1)
 						base[x * sConsole.bytes_per_pixel + i] = color[i];
@@ -158,16 +170,17 @@ render_glyph(int32 x, int32 y, uint8 glyph, uint8 attr)
 		// (ie. only the first plane will be used)
 
 		uint8* base = (uint8*)(sConsole.frame_buffer
-			+ sConsole.bytes_per_row * y * CHAR_HEIGHT + x * CHAR_WIDTH / 8);
-		uint8 baseOffset =  (x * CHAR_WIDTH) & 0x7;
+			+ sConsole.bytes_per_row * row * sConsole.font->glyphHeight
+			+ column * sConsole.font->glyphWidth / 8);
+		uint8 baseOffset =  (column * sConsole.font->glyphWidth) & 0x7;
 
 		set_ac();
-		for (y = 0; y < CHAR_HEIGHT; y++) {
-			uint8 bits = FONT[CHAR_HEIGHT * glyph + y];
+		for (int y = 0; y < sConsole.font->glyphHeight; y++) {
+			uint16_t bits = get_font_data(glyph, y);
 			uint8 offset = baseOffset;
 			uint8 mask = 1 << (7 - baseOffset);
 
-			for (x = 0; x < CHAR_WIDTH; x++) {
+			for (int x = 0; x < sConsole.font->glyphWidth; x++) {
 				if (mask == 0)
 					mask = 128;
 
@@ -195,10 +208,10 @@ draw_cursor(int32 x, int32 y)
 	if (x < 0 || y < 0)
 		return;
 
-	x *= CHAR_WIDTH * sConsole.bytes_per_pixel;
-	y *= CHAR_HEIGHT;
-	int32 endX = x + CHAR_WIDTH * sConsole.bytes_per_pixel;
-	int32 endY = y + CHAR_HEIGHT;
+	x *= sConsole.font->glyphWidth * sConsole.bytes_per_pixel;
+	y *= sConsole.font->glyphHeight;
+	int32 endX = x + sConsole.font->glyphWidth * sConsole.bytes_per_pixel;
+	int32 endY = y + sConsole.font->glyphHeight;
 	uint8* base = (uint8*)(sConsole.frame_buffer + y * sConsole.bytes_per_row);
 
 	if (sConsole.depth < 8) {
@@ -283,19 +296,19 @@ console_blit(int32 srcx, int32 srcy, int32 width, int32 height, int32 destx,
 	if (!frame_buffer_console_available())
 		return;
 
-	height *= CHAR_HEIGHT;
-	srcy *= CHAR_HEIGHT;
-	desty *= CHAR_HEIGHT;
+	height *= sConsole.font->glyphHeight;
+	srcy *= sConsole.font->glyphHeight;
+	desty *= sConsole.font->glyphHeight;
 
 	if (sConsole.depth >= 8) {
-		width *= CHAR_WIDTH * sConsole.bytes_per_pixel;
-		srcx *= CHAR_WIDTH * sConsole.bytes_per_pixel;
-		destx *= CHAR_WIDTH * sConsole.bytes_per_pixel;
+		width *= sConsole.font->glyphWidth * sConsole.bytes_per_pixel;
+		srcx *= sConsole.font->glyphWidth * sConsole.bytes_per_pixel;
+		destx *= sConsole.font->glyphWidth * sConsole.bytes_per_pixel;
 	} else {
 		// monochrome mode
-		width = width * CHAR_WIDTH / 8;
-		srcx = srcx * CHAR_WIDTH / 8;
-		destx = destx * CHAR_WIDTH / 8;
+		width = width * sConsole.font->glyphWidth / 8;
+		srcx = srcx * sConsole.font->glyphWidth / 8;
+		destx = destx * sConsole.font->glyphWidth / 8;
 	}
 
 	set_ac();
@@ -401,15 +414,20 @@ frame_buffer_update(addr_t baseAddress, int32 width, int32 height, int32 depth,
 
 	mutex_lock(&sConsole.lock);
 
+	if (width <= 1920 || height <= 1080) {
+		sConsole.font = &smallFont;
+	} else {
+		sConsole.font = &spleen12Font;
+	}
+
 	sConsole.frame_buffer = baseAddress;
 	sConsole.width = width;
 	sConsole.height = height;
 	sConsole.depth = depth;
 	sConsole.bytes_per_pixel = (depth + 7) / 8;
 	sConsole.bytes_per_row = bytesPerRow;
-	sConsole.columns = sConsole.width / CHAR_WIDTH;
-	sConsole.rows = sConsole.height / CHAR_HEIGHT;
-
+	sConsole.columns = sConsole.width / sConsole.font->glyphWidth;
+	sConsole.rows = sConsole.height / sConsole.font->glyphHeight;
 	// initially, the cursor is hidden
 	sConsole.cursor_x = -1;
 	sConsole.cursor_y = -1;

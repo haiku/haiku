@@ -1220,6 +1220,13 @@ AboutView::_CreateCreditsView()
 		.SetLicense("SIL Open Font Licence v1.1")
 		.SetURL("http://www.google.com/get/noto/"));
 
+	_AddPackageCredit(PackageCredit("Spleen font")
+		.SetCopyrights(B_TRANSLATE(COPYRIGHT_STRING
+			"Copyright (c) 2018-2021, Frederic Cambus"),
+			NULL)
+		.SetLicense(kBSDTwoClause)
+		.SetURL("https://www.cambus.net/spleen-monospaced-bitmap-fonts/"));
+
 	// expat copyrights
 	_AddPackageCredit(PackageCredit("expat")
 		.SetCopyrights(B_TRANSLATE(COPYRIGHT_STRING "1998-2000 Thai "
