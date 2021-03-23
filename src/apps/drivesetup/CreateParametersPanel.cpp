@@ -157,7 +157,7 @@ CreateParametersPanel::_CreateCreateControls(BPartition* parent, off_t offset,
 	fSizeTextControl->SetModificationMessage(
 		new BMessage(MSG_SIZE_TEXTCONTROL));
 
-	CreateChangeControls(parent);
+	CreateChangeControls(NULL, parent);
 
 	fOkButton->SetLabel(B_TRANSLATE("Create"));
 }

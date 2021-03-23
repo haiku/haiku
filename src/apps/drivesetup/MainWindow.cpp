@@ -1254,7 +1254,7 @@ MainWindow::_Create(BDiskDevice* disk, partition_id selectedPartition)
 	status = modificationPreparer.CommitModifications();
 
 	if (status != B_OK) {
-		_DisplayPartitionError(B_TRANSLATE("Failed to format the "
+		_DisplayPartitionError(B_TRANSLATE("Failed to create the "
 			"partition. No changes have been written to disk."), NULL, status);
 		return;
 	}
