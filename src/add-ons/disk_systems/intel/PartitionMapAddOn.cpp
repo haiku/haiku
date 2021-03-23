@@ -357,11 +357,11 @@ PartitionMapHandle::ValidateCreateChild(off_t* _offset, off_t* _size,
 	// check type
 	PartitionType type;
 	if (!type.SetType(typeString) || type.IsEmpty())
-		return B_BAD_VALUE;
+		return B_BAD_TYPE;
 
 	if (type.IsExtended() && fPartitionMap.ExtendedPartitionIndex() >= 0) {
 		// There can only be a single extended partition
-		return B_BAD_VALUE;
+		return B_NAME_IN_USE;
 	}
 
 	// check name
@@ -377,7 +377,7 @@ PartitionMapHandle::ValidateCreateChild(off_t* _offset, off_t* _size,
 
 	// do we have a spare primary partition?
 	if (fPartitionMap.CountNonEmptyPrimaryPartitions() == 4)
-		return B_BAD_VALUE;
+		return B_BAD_INDEX;
 
 	// check the free space situation
 	BPartitioningInfo info;
@@ -388,7 +388,7 @@ PartitionMapHandle::ValidateCreateChild(off_t* _offset, off_t* _size,
 	// any space in the partition at all?
 	int32 spacesCount = info.CountPartitionableSpaces();
 	if (spacesCount == 0)
-		return B_BAD_VALUE;
+		return B_DEVICE_FULL;
 
 	// check offset and size
 	off_t offset = sector_align(*_offset, Partition()->BlockSize());
