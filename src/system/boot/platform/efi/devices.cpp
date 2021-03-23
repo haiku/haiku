@@ -37,7 +37,6 @@ class EfiDevice : public Node
 			return (fBlockIo->Media->LastBlock + 1) * BlockSize(); }
 
 		uint32 BlockSize() const { return fBlockIo->Media->BlockSize; }
-		bool ReadOnly() const { return fBlockIo->Media->ReadOnly; }
 	private:
 		efi_block_io_protocol*		fBlockIo;
 };
@@ -215,9 +214,8 @@ platform_register_boot_device(Node *device)
 			offset);
 	}
 
-	gBootVolume.SetInt32(BOOT_METHOD, efiDevice->ReadOnly() ? BOOT_METHOD_CD:
-		BOOT_METHOD_HARD_DISK);
-	gBootVolume.SetBool(BOOT_VOLUME_BOOTED_FROM_IMAGE, efiDevice->ReadOnly());
+	// ...HARD_DISK, as we pick partition and have checksum (no need to use _CD)
+	gBootVolume.SetInt32(BOOT_METHOD, BOOT_METHOD_HARD_DISK);
 	gBootVolume.SetData(BOOT_VOLUME_DISK_IDENTIFIER, B_RAW_TYPE,
 		&identifier, sizeof(disk_identifier));
 
