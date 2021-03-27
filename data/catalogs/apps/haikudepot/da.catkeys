@@ -99,8 +99,8 @@ An unexpected error has been sent from the server [%i]	ServerHelper		Der blev se
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synkroniserer pakkedata for softwarekilden '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Vis anvendelsesbetingelserne
 Login issue	MainWindow		Problem med at logge ind
-Size	PackageListView		Størrelse
 Your rating:	RatePackageWindow		Din bedømmelse:
+Size	PackageListView		Størrelse
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		Brugeren %Nickname% er blevet oprettet i Haikudepotserver-systemet. Du kan administrere dine brugerdetaljer ved at bruge webgrænsefladen. Du er nu logget ind som den nye bruger.
 Your rating was updated.	RatePackageWindow		Din bedømmelse blev opdateret.
 All categories	FilterView		Alle kategorier
@@ -136,16 +136,16 @@ Source packages	MainWindow		Kildepakker
 -	no package size		-
 Problem with working files	App		Problem med arbejdsfiler
 Server error	ServerHelper		Fejl ved server
-Try again	App		Prøv igen
 Rate package	RatePackageWindow		Bedøm pakke
+Try again	App		Prøv igen
 Unknown	PackageListView		Ukendt
 I agree to the usage conditions	UserLoginWindow		Jeg accepterer anvendelsesbetingelserne
 Log in	UserLoginWindow		Log ind
 Logged in as %User%	MainWindow		Logger ind som %User%
 Email address:	UserLoginWindow		E-mailadresse:
 Screenshot	ScreenshotWindow		Skærmbillede
-HaikuDepot	System name		Haikudepot
 A reboot is necessary to complete the installation process.	PackageManager		Der kræves en genstart for at fuldføre installationsprocessen.
+HaikuDepot	System name		Haikudepot
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{Jeg er mindst et år gammel}other{Jeg er # år eller ældre}}
 View latest usage conditions…	MainWindow		Vis seneste anvendelsesbetingelser…
 Quit	App		Afslut

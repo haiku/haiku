@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-DriveSetup	598604797
+1	greek, modern (1453-)	x-vnd.Haiku-DriveSetup	2942313478
 Could not unmount partition %s.	MainWindow		Δεν ήταν δυνατή η αποπροσάρτηση της κατάτμησης %s.
 Mount all	MainWindow		Προσάρτηση όλων
 Disk	MainWindow		Δίσκος
@@ -100,7 +100,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Select a partition from the list below.	DiskView		Επιλέξτε μία κατάτμηση από την παρακάτω λίστα.
 Active	PartitionList		Ενεργό
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Είστε σίγουρος ότι θέλετε να διαγράψετε την επιλεγμένη κατάτμηση;\n\nΌλα τα δεδομένα στη κατάτμηση θα χαθούν οριστικά αν το κάνετε αυτό!
-Failed to format the partition. No changes have been written to disk.	MainWindow		Η διαμόρφωση της κατάτμησης απέτυχε. Δεν έχει γίνει καμία αλλαγή στον δίσκο.
 The partition %s has been successfully formatted.\n	MainWindow		Η κατάτμηση %s διαμορφώθηκε με επιτυχία.\n
 The partition %s is already mounted.	MainWindow		Η κατάτμηση %s είναι ήδη προσαρτημένη.
 Size	PartitionList		Μέγεθος

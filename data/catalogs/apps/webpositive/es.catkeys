@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-WebPositive	1976607515
+1	spanish; castilian	x-vnd.Haiku-WebPositive	250728390
 Authentication required	Authentication Panel		Autenticación requerida
 Previous	WebPositive Window		Anterior
 (Finish: %date)	Download Window		(Finaliza: %date)
@@ -101,6 +101,7 @@ There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPosi
 Revert	Settings Window		Revertir
 Copy	WebPositive Window		Copiar
 Default standard font size:	Settings Window		Tamaño de texto predeterminado:
+Custom	Settings Window		Personalizado
 Bookmark this page	WebPositive Window		Agregar esta página a marcadores
 Show tabs if only one page is open	Settings Window		Mostrar pestañas si sólo hay una página abierta
 Close tab	WebPositive Window		Cerrar pestaña

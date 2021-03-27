@@ -100,8 +100,8 @@ Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProce
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Ilmeni virhe ladattaessa käyttöehtoja, jotka vaaditaan uuden käyttäjän luomiseksi. Tarkista yksityiskohdat lokitiedostosta ja yritä uudelleen. \nTieto siitä, kuinka lokitiedostoa katsotaan, on saatavilla Haiku-käyttöohjeen HaikuVarasto-osasta.
 View the usage conditions	UserLoginWindow		Katso käyttöehtoja
 Login issue	MainWindow		Kirjautumispulma
-Size	PackageListView		Koko
 Your rating:	RatePackageWindow		Arvosanasi:
+Size	PackageListView		Koko
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		Käyttäjä %Nickname% on luotu onnistuneesti HaikuVarastoPalvelin-järjestelmään. Voit hallinnoida käyttäjätietojen yksityiskohtai webbikäyttöliittymän kautta. Olet nyt kirjautunut sisään tällä käyttäjätunnuksella uutena käyttäjänä.
 Your rating was updated.	RatePackageWindow		Arvosanasi päivitettiin.
 All categories	FilterView		Kaikki luokat
@@ -138,16 +138,16 @@ Source packages	MainWindow		Lähdekoodipakkaukset
 -	no package size		-
 Problem with working files	App		Pulma työtiedostoissa
 Server error	ServerHelper		Palvelinvirhe
-Try again	App		Yritä uudelleen
 Rate package	RatePackageWindow		Anna pakkaukselle arvosana
+Try again	App		Yritä uudelleen
 Unknown	PackageListView		Tuntematon
 I agree to the usage conditions	UserLoginWindow		Hyväksyn käyttöehdot
 Log in	UserLoginWindow		Kirjaudu
 Logged in as %User%	MainWindow		Kirjautuneena tunnuksella %User%
 Email address:	UserLoginWindow		Sähköpostiosoite:
 Screenshot	ScreenshotWindow		Kuvakaappaus
-HaikuDepot	System name		HaikuVarasto
 A reboot is necessary to complete the installation process.	PackageManager		Asennusprosessin päättäminen vaatii uudelleenkäynnistämisen.
+HaikuDepot	System name		HaikuVarasto
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{Olen vähintään vuoden ikäinen}other{Olen # vuotias tai vanhempi}}
 View latest usage conditions…	MainWindow		Katso viimeisimmät käyttöehdot…
 Quit	App		Poistu

@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-DriveSetup	598604797
+1	esperanto	x-vnd.Haiku-DriveSetup	2942313478
 Could not unmount partition %s.	MainWindow		Ne sukcesis demeti subdiskon %s.
 Mount all	MainWindow		Surmeti ĉiujn
 Disk	MainWindow		Disko
@@ -100,7 +100,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Select a partition from the list below.	DiskView		Elektu subdiskon el la suba listo.
 Active	PartitionList		Aktiva
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Ĉu vi certas, ke vi volas forigi la elektitan subdiskon?\n\nĈiu datumo en la subdisko estos senespere perdita se vi farus tion!
-Failed to format the partition. No changes have been written to disk.	MainWindow		Ne sukcesis strukturi la subdiskon. Ŝanĝoj ne estis konservitaj al la disko.
 The partition %s has been successfully formatted.\n	MainWindow		La subdisko %s estis sukcese strukturita.\n
 The partition %s is already mounted.	MainWindow		La subdisko %s jam estas surmetita.
 Size	PartitionList		Grandeco

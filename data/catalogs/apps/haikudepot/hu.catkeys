@@ -90,8 +90,8 @@ Close	RatePackageWindow		Bezárás
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Csomagadatok szinkronizálása a tárolóból: '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Felhasználási feltételek
 Login issue	MainWindow		Belépési hiba
-Size	PackageListView		Méret
 Your rating:	RatePackageWindow		Saját értékelés:
+Size	PackageListView		Méret
 Your rating was updated.	RatePackageWindow		Az értékelés módosítása sikerült.
 All categories	FilterView		Minden kategória
 Repositories	MainWindow		Tárolók
@@ -123,16 +123,16 @@ Source packages	MainWindow		Forráskód csomagok
 -	no package size		-
 Problem with working files	App		Nem tudok a fájlokkal dolgozni
 Server error	ServerHelper		Mentési hiba
-Try again	App		Próbáld újra
 Rate package	RatePackageWindow		Csomag értékelése
+Try again	App		Próbáld újra
 Unknown	PackageListView		Ismeretlen
 I agree to the usage conditions	UserLoginWindow		Elfogadom a felhasználási feltételeket
 Log in	UserLoginWindow		Bejelentkezés
 Logged in as %User%	MainWindow		Bejelentkezett mint %User%
 Email address:	UserLoginWindow		E-mail cím:
 Screenshot	ScreenshotWindow		Képernyőkép
-HaikuDepot	System name		Raktár
 A reboot is necessary to complete the installation process.	PackageManager		Újraindítás szükséges a telepítés befejezéséhez.
+HaikuDepot	System name		Raktár
 View latest usage conditions…	MainWindow		Felhasználási feltételek…
 Quit	App		Kilépés
 Search terms:	FilterView		Keresési feltétel:

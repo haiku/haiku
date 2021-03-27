@@ -73,8 +73,8 @@ Stability:	RatePackageWindow		Stabilnost:
 The nickname is required.	UserLoginWindow		Potreban je nadimak.
 Source packages	MainWindow		Izvorni paketi
 -	no package size		-
-Try again	App		Pokušaj ponovno
 Rate package	RatePackageWindow		Ocijeni paket
+Try again	App		Pokušaj ponovno
 Unknown	PackageListView		Nepoznato
 I agree to the usage conditions	UserLoginWindow		Slažem se sa uvjetima korištenja
 Log in	UserLoginWindow		Prijava

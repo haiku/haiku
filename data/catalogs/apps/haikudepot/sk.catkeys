@@ -48,8 +48,8 @@ Success	UserLoginWindow		Úspech
 (%Votes%)	PackageInfoView		(%Votes%)
 Close	UserLoginWindow		Zatvoriť
 Close	RatePackageWindow		Zatvoriť
-Size	PackageListView		Veľkosť
 Your rating:	RatePackageWindow		Vaše hodnotenie:
+Size	PackageListView		Veľkosť
 All categories	FilterView		Všetky kategórie
 n/a	PackageInfoView		n/a
 Cancel	MainWindow		Zrušiť
@@ -65,8 +65,8 @@ OK	UserLoginWindow		OK
 Stability:	RatePackageWindow		Stabilita:
 Source packages	MainWindow		Zdrojové balíky
 -	no package size		-
-Try again	App		Skúsiť znova
 Rate package	RatePackageWindow		Ohodnotiť balík
+Try again	App		Skúsiť znova
 Unknown	PackageListView		Neznámy
 Log in	UserLoginWindow		Prihlásiť sa
 Logged in as %User%	MainWindow		Prihlásený ako %User%

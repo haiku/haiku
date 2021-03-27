@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Keymap	2700190052
+1	spanish; castilian	x-vnd.Haiku-Keymap	2850776429
 Key	Modifier keys window	As in a computer keyboard key	Tecla
 Japanese	KeymapNames		Japonés
 US	KeymapNames		Estados Unidos
@@ -6,12 +6,13 @@ PG ↑	Keyboard Layout View	Very short for 'page up'	PG ↑
 Brazilian	KeymapNames		Brasileño
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (US)
 Right control	Keyboard Layout View		Control derecha
+X-Bows Nature	KeyboardLayoutNames		X-Bows Nature
 Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Opción:
 Cancel	Modifier keys window		Cancelar
 Sample and clipboard:	Keymap window		Muestra y portapapeles:
 Polish	KeymapNames		Polaco
-Latin-American	KeymapNames		Latinoaméricano
+Latin-American	KeymapNames		Latinoamericano
 Ukrainian	KeymapNames		Ucraniano
 PAGE ↓	Keyboard Layout View		PÁGINA ↓
 DEL	Keyboard Layout View		SUPR

@@ -47,8 +47,8 @@ Success	UserLoginWindow		Sucesso
 (%Votes%)	PackageInfoView		(%Votes%)
 Close	UserLoginWindow		Fechar
 Close	RatePackageWindow		Fechar
-Size	PackageListView		Tamanho
 Your rating:	RatePackageWindow		Sua avaliação:
+Size	PackageListView		Tamanho
 All categories	FilterView		Todas as categorias
 n/a	PackageInfoView		n/a
 Cancel	MainWindow		Cancelar
@@ -63,8 +63,8 @@ OK	UserLoginWindow		OK
 Stability:	RatePackageWindow		Estabilidade:
 Source packages	MainWindow		Pacotes fonte
 -	no package size		-
-Try again	App		Tente novamente
 Rate package	RatePackageWindow		Avaliar pacote…
+Try again	App		Tente novamente
 Unknown	PackageListView		Desconhecido
 Log in	UserLoginWindow		Entrar
 Logged in as %User%	MainWindow		Autenticado como %User%

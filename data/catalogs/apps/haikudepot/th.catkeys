@@ -95,8 +95,8 @@ Close	RatePackageWindow		ปิด
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		การซิงโครไนซ์ข้อมูลแพ็คเกจสำหรับที่เก็บ '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		ดูเงื่อนไขการใช้งาน
 Login issue	MainWindow		ปัญหาการเข้าสู่ระบบ
-Size	PackageListView		ขนาด
 Your rating:	RatePackageWindow		คะแนนของคุณ:
+Size	PackageListView		ขนาด
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		ผู้ใช้ %Nickname% ถูกสร้างขึ้นสำเร็จในระบบ Haiku Depot Server คุณสามารถจัดการรายละเอียดผู้ใช้ของคุณโดยใช้เว็บอินเตอร์เฟส ตอนนี้คุณเข้าสู่ระบบในฐานะผู้ใช้ใหม่นี้
 Your rating was updated.	RatePackageWindow		คะแนนของคุณได้รับการอัพเดท
 All categories	FilterView		ทุกประเภท
@@ -130,16 +130,16 @@ The nickname is required.	UserLoginWindow		ต้องระบุชื่อ�
 Source packages	MainWindow		แพ็คเกจต้นทาง
 -	no package size		-
 Problem with working files	App		ปัญหาเกี่ยวกับไฟล์ทำงาน
-Try again	App		ลองใหม่อีกครั้ง
 Rate package	RatePackageWindow		Rate package
+Try again	App		ลองใหม่อีกครั้ง
 Unknown	PackageListView		ไม่ทราบ
 I agree to the usage conditions	UserLoginWindow		ฉันเห็นด้วยกับเงื่อนไขการใช้งาน
 Log in	UserLoginWindow		เข้าสู่ระบบ
 Logged in as %User%	MainWindow		เข้าสู่ระบบในฐานะ %User%
 Email address:	UserLoginWindow		ที่อยู่อีเมล:
 Screenshot	ScreenshotWindow		ภาพหน้าจอ
-HaikuDepot	System name		HaikuDepot
 A reboot is necessary to complete the installation process.	PackageManager		จำเป็นต้องรีบูตเครื่องเพื่อให้กระบวนการติดตั้งเสร็จสมบูรณ์
+HaikuDepot	System name		HaikuDepot
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{I am at least one year old}อื่นๆ{I am # years of age or older}}
 View latest usage conditions…	MainWindow		ดูเงื่อนไขการใช้งานล่าสุด
 Quit	App		ปิด

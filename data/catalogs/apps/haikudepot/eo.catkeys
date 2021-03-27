@@ -99,8 +99,8 @@ An unexpected error has been sent from the server [%i]	ServerHelper		La servilo 
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Sinkronigado de pakaĵa datumo por la deponejo '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Vidi la kondiĉojn de uzado
 Login issue	MainWindow		Ensaluta eraro
-Size	PackageListView		Grandeco
 Your rating:	RatePackageWindow		Via takso:
+Size	PackageListView		Grandeco
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		La uzanto %Nickname% fariĝis sukcese en la sistemo de HaikuTenejoServilo. Vi povas administri viajn uzantajn informojn per la reta interfaco. Vi nun estas ensalutinta laŭ ĉi tiu uzanto.
 Your rating was updated.	RatePackageWindow		Via takso estis ĝisdatigita
 All categories	FilterView		Ĉiaj kategorioj
@@ -136,16 +136,16 @@ Source packages	MainWindow		Fontaj pakaĵoj
 -	no package size		-
 Problem with working files	App		Problemo kun kurantaj dosieroj
 Server error	ServerHelper		Eraro de servilo
-Try again	App		Provi denove
 Rate package	RatePackageWindow		Taksi pakaĵon
+Try again	App		Provi denove
 Unknown	PackageListView		Nekonata
 I agree to the usage conditions	UserLoginWindow		Mi konsentas la kondiĉojn de uzado
 Log in	UserLoginWindow		Ensaluti
 Logged in as %User%	MainWindow		Ensalutis kiel %User%
 Email address:	UserLoginWindow		Retpoŝtadreso:
 Screenshot	ScreenshotWindow		Ekrankopio
-HaikuDepot	System name		HaikuTenejo
 A reboot is necessary to complete the installation process.	PackageManager		Restartigo estas necesa por kompletigi la instalon.
+HaikuDepot	System name		HaikuTenejo
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{Mi havas malpleje unu jaron}other{Mi havas # jarojn aŭ pli}}
 View latest usage conditions…	MainWindow		Vidi plej novan kondiĉojn de uzado…
 Quit	App		Forlasi

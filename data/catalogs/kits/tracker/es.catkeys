@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-libtracker	2498612740
+1	spanish; castilian	x-vnd.Haiku-libtracker	3380227078
 Created	ContainerWindow		Creado
 Icon	AttributesView		Icono
 Open and make preferred	OpenWithWindow		Abrir y hacer preferido
@@ -6,6 +6,7 @@ Kind	ContainerWindow		Tipo
 Open with…	ContainerWindow		Abrir con…
 Error moving \"%name\" to Trash. (%error)	FSUtils		Error moviendo \"%name\" a la Papelera. (%error)
 Or	FindPanel		O
+MIME Description	AttributesView		Descripción MIME
 before	FindPanel		Antes
 Volume icons	TrackerSettingsWindow		Iconos de volumenes
 Ignore case	SelectionWindow		Ignorar supuesto
@@ -329,6 +330,7 @@ Recent folders	FavoritesMenu		Carpetas recientes
 Signed memory size	AttributesView		Tamaño de memoria firmado
 The specified name is illegal. Please choose another name.	FilePanelPriv		El nombre especificado es ilegal. Elije otro nombre
 of %items	StatusWindow		de %items
+MIME Path	AttributesView		Ubicación MIME
 less than	FindPanel		menos que
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Error copiando el archivo \"%name\":\n\t%error\n\n¿Quieres continuar ?
 Creating links: 	StatusWindow		Creando enlaces:
@@ -443,6 +445,7 @@ Sorry, saving more than one item is not allowed.	FilePanelPriv		Lo sentimos, el 
 Move here	ContainerWindow		Mover aquí
 the config folder	FSUtils		la carpeta config
 Sorry, could not create a new folder.	FSUtils		Lo sentimos, no puedes crear una nueva carpeta
+MIME Signature	AttributesView		Firma MIME
 Select all	VirtualDirectoryWindow		Seleccionar todo
 Rename	FSUtils	button label	Renombrar
 Clean up all	ContainerWindow		Limpiar todo

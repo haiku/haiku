@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-DriveSetup	3482853583
+1	portuguese (brazil)	x-vnd.Haiku-DriveSetup	1531594968
 Could not unmount partition %s.	MainWindow		Não foi possível desmontar a partição %s.
 Mount all	MainWindow		Montar tudo
 Disk	MainWindow		Disco
@@ -75,7 +75,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Select a partition from the list below.	DiskView		Selecione a partição a partir da lista abaixo.
 Active	PartitionList		Ativo
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Deseja apagar a partição selecionada?\n\nTodos os dados na partição serão perdidos pra sempre se continuar!
-Failed to format the partition. No changes have been written to disk.	MainWindow		Falha ao formatar a partição. Nenhuma alteração foi gravada no disco.
 The partition %s has been successfully formatted.\n	MainWindow		A partição %s foi formatada com sucesso.\n
 The partition %s is already mounted.	MainWindow		A partição %s já está montada.
 Size	PartitionList		Tamanho

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-DriveSetup	1714372400
+1	hungarian	x-vnd.Haiku-DriveSetup	4058081081
 Could not unmount partition %s.	MainWindow		Nem lehet leválasztani a partíciót (%s).
 Mount all	MainWindow		Összes csatolása
 Disk	MainWindow		Lemez
@@ -104,7 +104,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Select a partition from the list below.	DiskView		Válassz partíciót a lenti listából!
 Active	PartitionList		Aktív
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Biztosan törölni szeretnéd a kiválasztott partíciót?\n\nEz esetben a partíció teljes tartalma visszavonhatatlanul meg fog semmisülni.
-Failed to format the partition. No changes have been written to disk.	MainWindow		Nem sikerült törölni a partíciót, a lemez tartalma érintetlen maradt.
 The partition %s has been successfully formatted.\n	MainWindow		A partíció (%s) hiba nélkül elő lett készítve.\n
 The partition %s is already mounted.	MainWindow		A partíció (%s) már csatolva van.
 Size	PartitionList		Méret

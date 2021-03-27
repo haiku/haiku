@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-DriveSetup	1072972032
+1	german	x-vnd.Haiku-DriveSetup	3416680713
 Could not unmount partition %s.	MainWindow		Partition \"%s\" konnte nicht ausgehangen werden.
 Mount all	MainWindow		Alle einhängen
 Disk	MainWindow		Datenträger
@@ -103,7 +103,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Select a partition from the list below.	DiskView		Bitte eine Partition aus der unten stehenden Liste wählen.
 Active	PartitionList		Aktiv
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Sollen die gewählte Partition wirklich gelöscht werden?\n\nAlle dort vorhandenen Daten gehen dabei unwiderruflich verloren!
-Failed to format the partition. No changes have been written to disk.	MainWindow		Das Formatieren der Partition ist fehlgeschlagen. Der Datenträger blieb unverändert.
 The partition %s has been successfully formatted.\n	MainWindow		Die Partition \"%s\" wurde erfolgreich formatiert.\n
 The partition %s is already mounted.	MainWindow		Die Partition \"%s\" ist bereits eingehangen.
 Size	PartitionList		Größe

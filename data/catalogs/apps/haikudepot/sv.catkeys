@@ -100,8 +100,8 @@ Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProce
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Ett fel har uppstått vid nedladdning av de användningsvillkor som krävs för att skapa en ny användare. Kontrollera loggen för mer information och försök igen. \nInformation om hur du ser loggarna finns i avsnittet HaikuDepot i Haiku användarhandbok.
 View the usage conditions	UserLoginWindow		Visa användarvillkor
 Login issue	MainWindow		Inloggnings problem
-Size	PackageListView		Storlek
 Your rating:	RatePackageWindow		Dina betyg:
+Size	PackageListView		Storlek
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		Användaren %Nickname% har framgångsrikt skapats i HaikuDepotServer-systemet. Du kan administrera dina användarinformation genom att använda webbgränssnittet. Du är nu inloggad som den här nya användaren.
 Your rating was updated.	RatePackageWindow		Ditt betyg ändrades.
 All categories	FilterView		Alla kategorier
@@ -138,16 +138,16 @@ Source packages	MainWindow		Källkodspaket
 -	no package size		-
 Problem with working files	App		Problem med att arbeta filer
 Server error	ServerHelper		Serverfel
-Try again	App		Försök igen
 Rate package	RatePackageWindow		Betygsatt paket
+Try again	App		Försök igen
 Unknown	PackageListView		Okänd
 I agree to the usage conditions	UserLoginWindow		Jag godkänner användarvillkoren
 Log in	UserLoginWindow		Logga in
 Logged in as %User%	MainWindow		Inloggad som %User%
 Email address:	UserLoginWindow		E-postadress:
 Screenshot	ScreenshotWindow		Skärmdump
-HaikuDepot	System name		HaikuDepot
 A reboot is necessary to complete the installation process.	PackageManager		En omstart är nödvändig för att slutföra installationsprocessen.
+HaikuDepot	System name		HaikuDepot
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{I am at least one year old}other{I am # years of age or older}}
 View latest usage conditions…	MainWindow		Se de senaste användarvillkoren…
 Quit	App		Avsluta

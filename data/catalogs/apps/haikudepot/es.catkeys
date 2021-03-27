@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-HaikuDepot	2792101273
+1	spanish; castilian	x-vnd.Haiku-HaikuDepot	412302812
 Repository update error	LocalRepositoryUpdateProcess		Error de actualización de repositorio
 Network error	ServerHelper		Error de red
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Ocurrió un error al actualizar el repositorio: %error%
@@ -97,16 +97,18 @@ Close	UserLoginWindow		Cerrar
 Close	RatePackageWindow		Cerrar
 An unexpected error has been sent from the server [%i]	ServerHelper		El servidor ha enviado un error inesperado [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Sincronizando datos de paquetes para el repositorio '%REPO_NAME%'
+An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Ha ocurrido un error al descargar las condiciones de uso requeridas para crear un nuevo usuario. Revise los archivos de registro para obtener el detalle del error e intente de nuevo. \nLa información sobre como acceder a los archivos de registro está disponible en la sección HaikuDepot de la Guía de Usuario de Haiku.
 View the usage conditions	UserLoginWindow		Ver las condiciones de uso
 Login issue	MainWindow		Problema de inicio de sesión
-Size	PackageListView		Tamaño
 Your rating:	RatePackageWindow		Su puntuación:
+Size	PackageListView		Tamaño
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		El usuario %Nickname% ha sido creado en el sistema de HaikuDepotServer. Usted puede administratar los detalles de su usuario usando la interface web. Usted ahora puede iniciar con este nuevo usuario.
 Your rating was updated.	RatePackageWindow		Su evaluación ha sido actualizada.
 All categories	FilterView		Todas las categorías
 Repositories	MainWindow		Repositorios
 n/a	PackageInfoView		n/d
 This rating is visible to other users	RatePackageWindow		Esta calificación es visible para otros usuarios.
+While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		Hubo un error al actualizar la información del paquete que puede causar que la misma no se muestre, o se muestre desactualizada.  Pueden obtenerse detalles adicionales sobre este problema consultando los archivos de registro de la aplicación. \nLa información sobre como acceder a los archivos de registro está disponible en la sección HaikuDepot de la Guía de Usuario de Haiku.
 View agreed usage conditions…	MainWindow		Ver acuerdo de uso de condiciones...
 Cancel	MainWindow		Cancelar
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 more to download)}other{(# more to download)}}
@@ -136,16 +138,16 @@ Source packages	MainWindow		Paquetes fuente
 -	no package size		-
 Problem with working files	App		Hubo un problema con los archivos de trabajo
 Server error	ServerHelper		Error del servidor
-Try again	App		Volver a intentar
 Rate package	RatePackageWindow		Puntuar paquete
+Try again	App		Volver a intentar
 Unknown	PackageListView		Desconocido
 I agree to the usage conditions	UserLoginWindow		Acepto las condiciones de uso
 Log in	UserLoginWindow		Iniciar sesión
 Logged in as %User%	MainWindow		Sesión iniciada como %User%
 Email address:	UserLoginWindow		Dirección de correo electrónico:
 Screenshot	ScreenshotWindow		Captura de pantalla
-HaikuDepot	System name		HaikuDepot
 A reboot is necessary to complete the installation process.	PackageManager		Es necesario un reinicio para completar el proceso de instalación.
+HaikuDepot	System name		HaikuDepot
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{I am at least one year old}other{I am # years of age or older}}
 View latest usage conditions…	MainWindow		Ver las últimas condiciones de uso…
 Quit	App		Salir

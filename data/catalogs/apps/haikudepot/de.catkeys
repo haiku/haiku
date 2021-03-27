@@ -100,8 +100,8 @@ Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProce
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Beim Herunterladen der Nutzungsbedingungen für die Erstellung eines neuen Benutzerkontos ist ein Fehler aufgetreten. Bitte Log prüfen und nochmal probieren.\nWie diese Logs angezeigt werden können, steht im Kapitel 'HaikuDepot ' des Haiku User Guide.
 View the usage conditions	UserLoginWindow		Nutzungsbedingungen lesen
 Login issue	MainWindow		Anmeldungsproblem
-Size	PackageListView		Größe
 Your rating:	RatePackageWindow		Eigene Bewertung:
+Size	PackageListView		Größe
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		Der Nutzer %Nickname% wurde erfolgreich im HaikuDepotServer System angelegt. Nutzerdaten können im Webinterface verwaltet werden. Der neu angelegte Nutzer ist jetzt angemeldet.
 Your rating was updated.	RatePackageWindow		Die Bewertung wurde aktualisiert.
 All categories	FilterView		Alle Kategorien
@@ -138,16 +138,16 @@ Source packages	MainWindow		Quellcode-Pakete
 -	no package size		-
 Problem with working files	App		Problem mit Arbeitsdateien
 Server error	ServerHelper		Server Fehler
-Try again	App		Nochmal versuchen
 Rate package	RatePackageWindow		Paket bewerten
+Try again	App		Nochmal versuchen
 Unknown	PackageListView		Unbekannt
 I agree to the usage conditions	UserLoginWindow		I stimme den Nutzungsbedingungen zu
 Log in	UserLoginWindow		Anmelden
 Logged in as %User%	MainWindow		Angemeldet als %User%
 Email address:	UserLoginWindow		E-Mail-Adresse:
 Screenshot	ScreenshotWindow		Bildschirmfoto
-HaikuDepot	System name		HaikuDepot
 A reboot is necessary to complete the installation process.	PackageManager		Um die Installation abzuschließen, muss Haiku neu gestartet werden.
+HaikuDepot	System name		HaikuDepot
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{Ich bin mindestens 1 Jahr alt}other{Ich bin # Jahre oder älter}}
 View latest usage conditions…	MainWindow		Aktuelle Nutzungsbedingungen lesen…
 Quit	App		Beenden

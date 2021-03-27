@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.mmu_man.filepanel	3326046391
+1	spanish; castilian	x-vnd.mmu_man.filepanel	1996091223
 display a load/save file panel\n	FilePanelApp		Despliega un panel Cargar/Guardar archivo\n
 short\tlong\tdescription\n	FilePanelApp		Corto\tlargo\tdescripción\n
 %s not a valid option\n	FilePanelApp		%s opción inválida\n
@@ -8,6 +8,8 @@ short\tlong\tdescription\n	FilePanelApp		Corto\tlargo\tdescripción\n
 -l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-1\t--load\t(cargar) usar un panel cargar del tipo FilePanel (predeterminado)\n
 -n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\t(nombre) fija el nombre predeterminado para guardar\n
 -k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\tkind (clase o tclase) de entradas que se pueden abrir (sabor): cualquier combinación de "f,d,s" (archivo (predeterminado), directorio, enlace simbólico)\n
+usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]	FilePanelApp		uso: %s [-h]     [-d carpeta]              [-l|-s]     [-t ttl]      [-1]       [-m]
+usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal]\n	FilePanelApp		uso: %s [--help] [--directory carpeta] [--load|--save] [--title ttl] [--single] [--modal]\n
 -t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\t(titulo) establece el título de la ventana FilePanel\n
 -1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\t(solo) permitir que solo se pueda seleccionar 1 archivo\n
 -m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\thace modal al FilePanel\n

@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-DriveSetup	4209282476
+1	croatian	x-vnd.Haiku-DriveSetup	2258023861
 Could not unmount partition %s.	MainWindow		Ne mogu odmontirati particiju %s.
 Mount all	MainWindow		Montiraj sve
 Disk	MainWindow		Disk
@@ -76,7 +76,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Select a partition from the list below.	DiskView		Odaberite particiju sa donje liste.
 Active	PartitionList		Aktivan
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Jeste li sigurni da želite obrisati odabranu particiju?\n\nSvi podaci na particiji biti će nepovratno izgubljeni ako to učinite!
-Failed to format the partition. No changes have been written to disk.	MainWindow		Neuspjelo formatiranje particije. Promjene neće biti zapisane na disk.
 The partition %s has been successfully formatted.\n	MainWindow		Particija %s je uspješno formatirana.\n
 The partition %s is already mounted.	MainWindow		Particija %s je već montirana.
 Size	PartitionList		Veličina

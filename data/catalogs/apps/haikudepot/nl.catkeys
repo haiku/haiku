@@ -99,8 +99,8 @@ An unexpected error has been sent from the server [%i]	ServerHelper		Een onverwa
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synchroniseer pakketdata voor pakketbron '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Bekijk de gebruiksvoorwaarden
 Login issue	MainWindow		Inlogprobleem
-Size	PackageListView		Grootte
 Your rating:	RatePackageWindow		Uw beoordeling:
+Size	PackageListView		Grootte
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		De gebuiker %Nickname% is succesvol aangemaakt op het HaikuDepotServer-systeem. U kan uw gebruikersgegevens beheren in de web-interface. U bent nu ingelogd als de nieuwe gebruiker.
 Your rating was updated.	RatePackageWindow		Uw beoordeling is bijgewerkt.
 All categories	FilterView		Alle categorieën
@@ -136,16 +136,16 @@ Source packages	MainWindow		Broncodepakketten
 -	no package size		-
 Problem with working files	App		Probleem met de werkbestanden
 Server error	ServerHelper		Server fout
-Try again	App		Opnieuw proberen
 Rate package	RatePackageWindow		Beoordeel pakket
+Try again	App		Opnieuw proberen
 Unknown	PackageListView		Onbekend
 I agree to the usage conditions	UserLoginWindow		Ik aanvaard de gebruiksvoorwaarden
 Log in	UserLoginWindow		Inloggen
 Logged in as %User%	MainWindow		Ingelogd als %User%
 Email address:	UserLoginWindow		E-mailadres:
 Screenshot	ScreenshotWindow		Schermafbeelding
-HaikuDepot	System name		HaikuDepot
 A reboot is necessary to complete the installation process.	PackageManager		Een herstart is vereist om het installatie proces te voltooien.
+HaikuDepot	System name		HaikuDepot
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{Ik ben tenminste één jaar oud}other{Ik ben # jaar of ouder}}
 View latest usage conditions…	MainWindow		Bekijk laatste gebruiksvoorwaarden...
 Quit	App		Afsluiten

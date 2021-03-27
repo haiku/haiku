@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-DriveSetup	1714372400
+1	finnish	x-vnd.Haiku-DriveSetup	4058081081
 Could not unmount partition %s.	MainWindow		Osion %s irrottaminen epäonnistui.
 Mount all	MainWindow		Liitä kaikki
 Disk	MainWindow		Levy
@@ -104,7 +104,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Select a partition from the list below.	DiskView		Valitse osio alapuolella olevasta luettelosta.
 Active	PartitionList		Aktiivinen
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat poistaa valitun osion?\n\nKaikki osion tiedot katoavat palauttamattomasti, jos teet niin!
-Failed to format the partition. No changes have been written to disk.	MainWindow		Osion alustaminen epäonnistui. Mitään muutoksia ei ole kirjoitettu levylle.
 The partition %s has been successfully formatted.\n	MainWindow		Osion %s alustus onnistui.\n
 The partition %s is already mounted.	MainWindow		Osio %s on jo liitetty.
 Size	PartitionList		Koko

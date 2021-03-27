@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-DriveSetup	598604797
+1	thai	x-vnd.Haiku-DriveSetup	2942313478
 Could not unmount partition %s.	MainWindow		ไม่สามารถยกเลิกการต่อเชื่อมพาร์ติชัน %s
 Mount all	MainWindow		เมานต์ทั้งหมด
 Disk	MainWindow		ดิสก์
@@ -100,7 +100,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Select a partition from the list below.	DiskView		เลือกพาร์ติชันจากรายการด้านล่าง
 Active	PartitionList		ใช้งาน
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		คุณแน่ใจหรือไม่ว่าต้องการลบพาร์ติชันที่เลือกไว้ \n\nข้อมูลทั้งหมดในพาร์ติชั่นจะหายไปอย่างถาวรหากคุณทำเช่นนั้น!
-Failed to format the partition. No changes have been written to disk.	MainWindow		ไม่สามารถฟอร์แมตพาร์ติชันได้ ไม่มีการเปลี่ยนแปลงที่เขียนลงดิสก์
 The partition %s has been successfully formatted.\n	MainWindow		ฟอร์แมตพาร์ติชัน %s เรียบร้อยแล้ว \n
 The partition %s is already mounted.	MainWindow		พาร์ติชัน%s ถูกเชื่อมต่อแล้ว
 Size	PartitionList		ขนาด

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-DriveSetup	1714372400
+1	ukrainian	x-vnd.Haiku-DriveSetup	4058081081
 Could not unmount partition %s.	MainWindow		Неможливо відключити розділ %s.
 Mount all	MainWindow		Підключити все
 Disk	MainWindow		Диск
@@ -104,7 +104,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Select a partition from the list below.	DiskView		Виберіть розділ зі списку нижче.
 Active	PartitionList		Активний
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Ви впевнені, що бажаєте видалити вибраний розділ?\n\nВсі дані на цьому розділі будуть безпозворотно втрачені, якщо Ви продовжите!
-Failed to format the partition. No changes have been written to disk.	MainWindow		Не вдалось форматувати розділ. Жодні зміни не були записані на диск.
 The partition %s has been successfully formatted.\n	MainWindow		Розділ %s був успішно ініціалізований.\n
 The partition %s is already mounted.	MainWindow		Розділ %s вже підключено.
 Size	PartitionList		Розмір

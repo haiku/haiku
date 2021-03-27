@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-DriveSetup	598604797
+1	dutch; flemish	x-vnd.Haiku-DriveSetup	2942313478
 Could not unmount partition %s.	MainWindow		Kon partitie %s niet onttrekken.
 Mount all	MainWindow		Alles betrekken
 Disk	MainWindow		Schijf
@@ -100,7 +100,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Select a partition from the list below.	DiskView		Selecteer een partitie uit onderstaande lijst.
 Active	PartitionList		Actief
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Bent u zeker dat u de geselecteerde partitie wilt verwijderen?\n\nU zult alle gegevens op de partitie onherroepelijk kwijt zijn als u dit doet!
-Failed to format the partition. No changes have been written to disk.	MainWindow		Kon de partitie niet formatteren. Er werden geen veranderingen naar de schijf geschreven.
 The partition %s has been successfully formatted.\n	MainWindow		De partitie %s werd met succes geformatteerd.\n
 The partition %s is already mounted.	MainWindow		De partitie %s is al betrokken.
 Size	PartitionList		Grootte

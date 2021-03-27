@@ -100,8 +100,8 @@ Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProce
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Al è vignût fûr un erôr discjariant lis condizions di ûs necessaris par creâ un gnûf utent. Controle il regjistri pai detais e torne prove. \nLis informazions su ce mût viodi i regjistris a son disponibilis inte sezion di HaikuDepot  de Vuide utent di Haiku.
 View the usage conditions	UserLoginWindow		Viôt lis condizions di ûs
 Login issue	MainWindow		Probleme di acès
-Size	PackageListView		Dimension
 Your rating:	RatePackageWindow		La tô valutazion:
+Size	PackageListView		Dimension
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		L'utent %Nickname% al è stât creât cun sucès tal sisteme di HaikuDepotServer. Tu puedis gjestî i tiei detais-utent doprant la interface web. Tu sês cumò jentrât come chest utent gnûf.
 Your rating was updated.	RatePackageWindow		La tô valutazion e je stade inzornade.
 All categories	FilterView		Dutis lis categoriis
@@ -138,16 +138,16 @@ Source packages	MainWindow		Pachets sorzint
 -	no package size		-
 Problem with working files	App		Probleme cui file di lavôr de aplicazion
 Server error	ServerHelper		Erôr dal servidôr
-Try again	App		Torne prove
 Rate package	RatePackageWindow		Valute pachet
+Try again	App		Torne prove
 Unknown	PackageListView		No cognossût
 I agree to the usage conditions	UserLoginWindow		O aceti lis condizions di ûs
 Log in	UserLoginWindow		Jentre
 Logged in as %User%	MainWindow		Jentrât come %User%
 Email address:	UserLoginWindow		Direzion email:
 Screenshot	ScreenshotWindow		Istantanie
-HaikuDepot	System name		HaikuDepot
 A reboot is necessary to complete the installation process.	PackageManager		Al covente tornâ a inviâ il sisteme par completâ la instalazion.
+HaikuDepot	System name		HaikuDepot
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{O ai almancul un an}other{O ai # agns di etât o plui}}
 View latest usage conditions…	MainWindow		Viôt lis ultimis condizions di ûs…
 Quit	App		Siere

@@ -100,8 +100,8 @@ Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProce
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Yeni bir kullanıcı oluşturmak için gerekli kullanım koşulları indirilirken bir hata oluştu. Ayrıntılar için günlüğü denetleyin ve yeniden deneyin.\nGünlük görüntüleme üzerine bilgiyi Haiku Kullanıcı Kılavuzu'nun Haiku Depo bölümünde bulabilirsiniz.
 View the usage conditions	UserLoginWindow		Kullanım koşullarını görüntüle
 Login issue	MainWindow		Giriş sorunu
-Size	PackageListView		Boyut
 Your rating:	RatePackageWindow		Derecelendirmeniz:
+Size	PackageListView		Boyut
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		HaikuDepotServer sisteminde %Nickname% kullanıcısı başarıyla oluşturuldu. Kullanıcı bilgilerinizi web arayüzünü kullanarak yönetebilirsiniz. Şu anda bu kullanıcı ile giriş yapmış bulunmaktasınız.
 Your rating was updated.	RatePackageWindow		Derecelendirmeniz güncellendi.
 All categories	FilterView		Tüm kategoriler
@@ -138,16 +138,16 @@ Source packages	MainWindow		Kaynak paketleri
 -	no package size		-
 Problem with working files	App		Çalışma dosyalarında sorun
 Server error	ServerHelper		Sunucu hatası
-Try again	App		Yeniden dene
 Rate package	RatePackageWindow		Paketi derecelendir
+Try again	App		Yeniden dene
 Unknown	PackageListView		Bilinmeyen
 I agree to the usage conditions	UserLoginWindow		Kullanım koşullarını kabul ediyorum
 Log in	UserLoginWindow		Giriş yap
 Logged in as %User%	MainWindow		%User% olarak giriş yapıldı
 Email address:	UserLoginWindow		E-posta adresi:
 Screenshot	ScreenshotWindow		Ekran görüntüsü
-HaikuDepot	System name		Haiku Depo
 A reboot is necessary to complete the installation process.	PackageManager		Yükleme işlemini tamamlamak için bilgisayarı yeniden başlatmalısınız.
+HaikuDepot	System name		Haiku Depo
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{Bir yaşından büyüğüm}other{# yaşından büyüğüm}}
 View latest usage conditions…	MainWindow		Güncel kullanım koşullarını görüntüle…
 Quit	App		Çık

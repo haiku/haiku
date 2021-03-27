@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-DriveSetup	1714372400
+1	friulian	x-vnd.Haiku-DriveSetup	4058081081
 Could not unmount partition %s.	MainWindow		Impussibil dismontâ la partizion %s.
 Mount all	MainWindow		Monte dut
 Disk	MainWindow		Disc
@@ -104,7 +104,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Select a partition from the list below.	DiskView		Selezione une partizion de liste chi sot.
 Active	PartitionList		Atîf
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Eliminâ pardabon la partizion selezionade?\n\nSe si lu fâs, ducj i dâts su la partizion a laran pierdûts in mût irimediabil!
-Failed to format the partition. No changes have been written to disk.	MainWindow		No si è rivâts a formatâ la partizion. Nissune modifiche e je stade scrite sul disc.
 The partition %s has been successfully formatted.\n	MainWindow		La partizion %s e je stade formatade cun sucès.\n
 The partition %s is already mounted.	MainWindow		La partizion %s e je za stade montade.
 Size	PartitionList		Dimension

@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-DriveSetup	1714372400
+1	catalan; valencian	x-vnd.Haiku-DriveSetup	4058081081
 Could not unmount partition %s.	MainWindow		No s'ha pogut desmuntar la partició %s.
 Mount all	MainWindow		Munta-ho tot
 Disk	MainWindow		Disc
@@ -104,7 +104,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Select a partition from the list below.	DiskView		Seleccioneu una partició de la llista següent.
 Active	PartitionList		Activa
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Segur que voleu suprimir la partició seleccionada?\n\nSi ho feu, es perdran irrecuperablement totes les dades de la partició!
-Failed to format the partition. No changes have been written to disk.	MainWindow		Ha fallat formatar la partició. No s'ha escrit cap canvi al disc.
 The partition %s has been successfully formatted.\n	MainWindow		La partició %s s'ha formatat correctament.\n
 The partition %s is already mounted.	MainWindow		La partició %s ja està muntada.
 Size	PartitionList		Mida

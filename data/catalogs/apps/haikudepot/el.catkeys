@@ -95,8 +95,8 @@ Close	RatePackageWindow		Κλείσιμο
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Γίνεται συγχρονισμός πληροφοριών πακέτων για το αποθετήριο '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Προβολή όρων χρήσης
 Login issue	MainWindow		Σφάλμα εισόδου
-Size	PackageListView		Μέγεθος
 Your rating:	RatePackageWindow		Η αξιολόγησή σας:
+Size	PackageListView		Μέγεθος
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		Η δημιουργία του χρήστη %Nickname% στο σύστημα HaikuDepotServer ήταν επιτυχής. Μπορείτε να διαχειριστείτε τα στοιχεία σας μέσω της ιστοσελίδας μας. Έχετε εισέλθει ως ο νέος χρήστης.
 Your rating was updated.	RatePackageWindow		Η αξιολόγησή σας ενημερώθηκε.
 All categories	FilterView		Όλες οι κατηγορίες
@@ -130,16 +130,16 @@ The nickname is required.	UserLoginWindow		Απαιτείται ψευδώνυμ
 Source packages	MainWindow		Πηγαία πακέτα
 -	no package size		-
 Problem with working files	App		Πρόβλημα με τα επεξεργαζόμενα αρχεία
-Try again	App		Προσπάθεια ξανά
 Rate package	RatePackageWindow		Αξιολόγηση πακέτου
+Try again	App		Προσπάθεια ξανά
 Unknown	PackageListView		Άγνωστο
 I agree to the usage conditions	UserLoginWindow		Συμφωνώ στους όρους χρήσης
 Log in	UserLoginWindow		Είσοδος
 Logged in as %User%	MainWindow		Έχετε συνδεθεί ως %User%
 Email address:	UserLoginWindow		Διεύθυνση ηλεκτρονικού ταχυδρομείου:
 Screenshot	ScreenshotWindow		Στιγμιότυπο οθόνης
-HaikuDepot	System name		HaikuDepot
 A reboot is necessary to complete the installation process.	PackageManager		Είναι απαραίτητη μία επανεκκίνηση για την ολοκλήρωση της εγκατάστασης.
+HaikuDepot	System name		HaikuDepot
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{Είμαι τουλάχιστον ενός έτους}other{Είμαι # ετών ή μεγαλύτερος}}
 View latest usage conditions…	MainWindow		Προβολή των πιο πρόσφατων όρων χρήσεις…
 Quit	App		Έξοδος

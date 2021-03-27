@@ -82,7 +82,7 @@ Case sensitive	FindWindow		Враховувати регістр
 Remove from file	AttributeWindow		Вилучити з файла
 Attributes	ProbeView		Атрибути
 Message	TypeEditors	This is the type of view	Повідомлення
-Message View	TypeEditors		Перегляд повідомлення
+Message View	TypeEditors		Повідомлення
 Offset: 	ProbeView		Зміщення: 
 Swapped: 0x%0*Lx	ProbeView		Поміняти місцями: 0x%0*Lx
 MIME type:	TypeEditors		MIME-тип:
@@ -113,7 +113,7 @@ Find	FindWindow		Знайти
 Attribute: 	ProbeView		Атрибут: 
 Block	ProbeView		Блок
 Find again	ProbeView		Знайти далі
-View	ProbeView	This is the last menubar item 'File Edit Block View'	Вид
+View	ProbeView	This is the last menubar item 'File Edit Block View'	Режим перегляду
 Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Не вдалося прочитати образ
 DiskProbe request	ProbeView		Запит DiskProbe
 Double precision floating-point value:	TypeEditors		Значення з рухомою комою подвійної точності
@@ -128,6 +128,6 @@ Device offset: 	ProbeView		Зміщення пристрою:
 Find…	ProbeView		Знайти…
 8 bit palette	TypeEditors		8 бітова палітра
 Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Десятковий
-Image view	TypeEditors	Image means here a picture file, not a disk image.	Перегляд зображення
+Image view	TypeEditors	Image means here a picture file, not a disk image.	Зображення
 Paste	ProbeView		Вставити
 32 bit unsigned size:	TypeEditors		32 бітовий беззнаковий розмір:

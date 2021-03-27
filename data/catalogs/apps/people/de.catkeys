@@ -1,5 +1,6 @@
-1	german	x-vnd.Be-PEPL	4016947960
+1	german	x-vnd.Be-PEPL	24693630
 Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Der Start der Dateityp-Einstellungen zum Konfigurieren der Person-Attribute ist fehlgeschlagen.\n\nFehler:
+Mobile phone	People		Mobiltelefon
 Unnamed person	People		Unbenannte Person
 New person…	People		Neue Person…
 Address	People		Adresse

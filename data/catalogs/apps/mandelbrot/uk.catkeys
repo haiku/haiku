@@ -1,12 +1,14 @@
-1	ukrainian	x-vnd.Haiku-Mandelbrot	3875916167
+1	ukrainian	x-vnd.Haiku-Mandelbrot	2302392624
 Grassland	MandelbrotWindow		Газон
 Tricorn	MandelbrotWindow		Tricorn
 Orbit Trap	MandelbrotWindow		Orbit Trap
 Deepfrost	MandelbrotWindow		Глибока заморозка
 1 (none)	MandelbrotWindow		1 (пусто)
 Quit	MandelbrotWindow		Вийти
+Save as image…	MandelbrotWindow		Зберегти як зображення…
 Fire	MandelbrotWindow		Вогонь
 High contrast	MandelbrotWindow		Високий контраст
+Full screen	MandelbrotWindow		Повний екран
 Midnight	MandelbrotWindow		Північ
 Burning Ship	MandelbrotWindow		Палаючий корабель
 Lightning	MandelbrotWindow		Свічення
@@ -18,6 +20,7 @@ Subsampling	MandelbrotWindow		Підгрупування
 File	MandelbrotWindow		Файл
 Julia	MandelbrotWindow		Жуліа
 Frost	MandelbrotWindow		Мороз
+View	MandelbrotWindow		Режим перегляду
 Mandelbrot	System name		Mandelbrot
 Multibrot	MandelbrotWindow		Multibrot
 Iterations	MandelbrotWindow		Ітерації

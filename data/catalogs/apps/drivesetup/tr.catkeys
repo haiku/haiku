@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-DriveSetup	1714372400
+1	turkish	x-vnd.Haiku-DriveSetup	4058081081
 Could not unmount partition %s.	MainWindow		%s bölümü bağlantısı kesilemedi.
 Mount all	MainWindow		Hepsini bağla
 Disk	MainWindow		Disk
@@ -104,7 +104,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Select a partition from the list below.	DiskView		Aşağıdaki listeden bir bölüm seçin.
 Active	PartitionList		Etkin
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Seçili bölümü silmek istediğinizden emin misiniz?\n\nBölüm üzerindeki tüm veri geri getirilemeyecek bir biçimde kaybolacak!
-Failed to format the partition. No changes have been written to disk.	MainWindow		Bölüm biçimlendirilemedi. Değişiklikler diske yazılmadı.
 The partition %s has been successfully formatted.\n	MainWindow		%s bölümü başarıyla biçimlendirildi.\n
 The partition %s is already mounted.	MainWindow		%s bölümü zaten bağlı.
 Size	PartitionList		Boyut

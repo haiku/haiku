@@ -100,8 +100,8 @@ Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProce
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		S'ha produït un error en baixar les condicions d'ús necessàries per crear un usuari nou. Consulteu el registre per obtenir-ne més informació i torneu-ho a provar. \nHi ha informació sobre com visualitzar els registres a la secció del Dipòsit del Haiku de la Guia de l’usuari del Haiku.
 View the usage conditions	UserLoginWindow		Mostra'n les condicions d'ús
 Login issue	MainWindow		Problema d’inici de sessió
-Size	PackageListView		Mida
 Your rating:	RatePackageWindow		La vostra puntuació:
+Size	PackageListView		Mida
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		L'usuari %Nickname% s'ha creat correctament al sistema del servidor del Dipòsit del Haiku. Podeu administrar les dades de l'usuari mitjançant la interfície web. Ara hi heu entrat com a usuari nou.
 Your rating was updated.	RatePackageWindow		S'ha actualitzat la puntuació.
 All categories	FilterView		Totes les categories
@@ -138,16 +138,16 @@ Source packages	MainWindow		Paquets font
 -	no package size		-
 Problem with working files	App		Problema amb els fitxers de treball
 Server error	ServerHelper		Error de servidor
-Try again	App		Torneu-ho a provar
 Rate package	RatePackageWindow		Puntueu el paquet
+Try again	App		Torneu-ho a provar
 Unknown	PackageListView		Desconegut
 I agree to the usage conditions	UserLoginWindow		Estic d’acord en les condicions d’ús.
 Log in	UserLoginWindow		Entreu
 Logged in as %User%	MainWindow		Heu entrat com a %User%.
 Email address:	UserLoginWindow		Adreça electrònica:
 Screenshot	ScreenshotWindow		Captura de pantalla
-HaikuDepot	System name		Dipòsit del Haiku
 A reboot is necessary to complete the installation process.	PackageManager		Cal reiniciar per completar el procés d’instal·lació.
+HaikuDepot	System name		Dipòsit del Haiku
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{Tinc com a mínim un any.}other{Tinc # anys o més.}}
 View latest usage conditions…	MainWindow		Consulteu les darreres condicions d'ús...
 Quit	App		Surt

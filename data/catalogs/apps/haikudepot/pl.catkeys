@@ -95,8 +95,8 @@ Close	RatePackageWindow		Zamknij
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synchronizacja danych pakietów dla repozytorium „%REPO_NAME%”
 View the usage conditions	UserLoginWindow		Zobacz warunki korzystania
 Login issue	MainWindow		Problem z logowaniem
-Size	PackageListView		Rozmiar
 Your rating:	RatePackageWindow		Twoja ocena:
+Size	PackageListView		Rozmiar
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		Użytkownik %Nickname% został pomyślnie utworzony na serwerze HaikuDepot. Możesz zarządzać ustawieniami korzystając z interfejsu w przeglądarce internetowej. Zalogowano cię jako ten nowy użytkownik.
 Your rating was updated.	RatePackageWindow		Zaktualizowano twoją ocenę.
 All categories	FilterView		Wszystkie kategorie
@@ -130,16 +130,16 @@ The nickname is required.	UserLoginWindow		Pseudonim jest wymagany.
 Source packages	MainWindow		Pakiety źródłowe
 -	no package size		-
 Problem with working files	App		Problem z plikami roboczymi
-Try again	App		Spróbuj ponownie
 Rate package	RatePackageWindow		Oceń pakiet
+Try again	App		Spróbuj ponownie
 Unknown	PackageListView		Nieznany
 I agree to the usage conditions	UserLoginWindow		Zgadzam się na warunki korzystania
 Log in	UserLoginWindow		Zaloguj
 Logged in as %User%	MainWindow		Zalogowano jako %User%
 Email address:	UserLoginWindow		Adres e-mail:
 Screenshot	ScreenshotWindow		Zrzut ekranu
-HaikuDepot	System name		HaikuDepot
 A reboot is necessary to complete the installation process.	PackageManager		Ponowne uruchomienie jest wymagane aby zakończyć proces instalacji.
+HaikuDepot	System name		HaikuDepot
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural, one{Mam co najmniej rok} few{Mam ukończone # lata lub więcej} many{Mam ukończone # lat lub więcej} other{Mam ukończone # roku lub więcej}}
 View latest usage conditions…	MainWindow		Zobacz najnowsze warunki korzystania…
 Quit	App		Zakończ

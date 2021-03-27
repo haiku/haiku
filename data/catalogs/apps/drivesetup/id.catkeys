@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-DriveSetup	598604797
+1	indonesian	x-vnd.Haiku-DriveSetup	2942313478
 Could not unmount partition %s.	MainWindow		Tidak dapat melepas partisi %s.
 Mount all	MainWindow		Pasang semua
 Disk	MainWindow		Diska
@@ -100,7 +100,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Select a partition from the list below.	DiskView		Pilih partisi dari daftar di bawah ini.
 Active	PartitionList		Aktif
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Anda yakin ingin menghapus partisi yang dipilih?\n\nSemua data pada partisi akan hilang jika anda melakukannya!
-Failed to format the partition. No changes have been written to disk.	MainWindow		Gagal memformat partisi. Tidak ada perubahan yang ditulis ke diska.
 The partition %s has been successfully formatted.\n	MainWindow		Partisi %s telah berhasil diformat.\n
 The partition %s is already mounted.	MainWindow		Partisi %s sudah terpasang.
 Size	PartitionList		Ukuran

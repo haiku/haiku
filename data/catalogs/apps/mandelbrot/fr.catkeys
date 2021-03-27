@@ -1,12 +1,14 @@
-1	french	x-vnd.Haiku-Mandelbrot	3875916167
+1	french	x-vnd.Haiku-Mandelbrot	2302392624
 Grassland	MandelbrotWindow		Prairie
 Tricorn	MandelbrotWindow		Tricorne
 Orbit Trap	MandelbrotWindow		Piège Orbital
 Deepfrost	MandelbrotWindow		Gel
 1 (none)	MandelbrotWindow		1 (aucun)
 Quit	MandelbrotWindow		Quitter
+Save as image…	MandelbrotWindow		Sauvegarder l’image…
 Fire	MandelbrotWindow		Feu
 High contrast	MandelbrotWindow		Contraste élevé
+Full screen	MandelbrotWindow		Plein écran
 Midnight	MandelbrotWindow		Minuit
 Burning Ship	MandelbrotWindow		Bateau Enflammé
 Lightning	MandelbrotWindow		Éclairs
@@ -18,6 +20,7 @@ Subsampling	MandelbrotWindow		Sous-échantillonnage
 File	MandelbrotWindow		Fichier
 Julia	MandelbrotWindow		Julia
 Frost	MandelbrotWindow		Givre
+View	MandelbrotWindow		Vue
 Mandelbrot	System name		Mandelbrot
 Multibrot	MandelbrotWindow		Multibrot
 Iterations	MandelbrotWindow		Itérations

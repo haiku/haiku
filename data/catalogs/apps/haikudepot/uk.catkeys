@@ -100,8 +100,8 @@ Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProce
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		При завантаженні Умов використання, необхідних для створення нового користувача, виникла помилка. Ознайомтеся з даними журналу та повторіть спробу. \nІнформація про те, як переглядати журнали, доступна в розділі програми HaikuDepot посібника користувача Haiku.
 View the usage conditions	UserLoginWindow		Переглянути Умови користування
 Login issue	MainWindow		Проблема входу в систему
-Size	PackageListView		Розмір
 Your rating:	RatePackageWindow		Ваш рейтинг:
+Size	PackageListView		Розмір
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		Користувач %Nickname% був успішно створений в системі HaikuDepotServer. Ви можете адмініструвати дані цього користувача за допомогою веб-інтерфейсу. Зараз Ви увійшли в систему під його ім'ям, як новий користувач.
 Your rating was updated.	RatePackageWindow		Ваш рейтинг оновлений.
 All categories	FilterView		Всі категорії
@@ -138,16 +138,16 @@ Source packages	MainWindow		Пакети з вихідними текстами
 -	no package size		-
 Problem with working files	App		Проблеми з робочими файлами
 Server error	ServerHelper		Помилка серверу
-Try again	App		Спробувати знову
 Rate package	RatePackageWindow		Оцінка пакета
+Try again	App		Спробувати знову
 Unknown	PackageListView		Невідомо
 I agree to the usage conditions	UserLoginWindow		З Умовами користування погоджуюсь
 Log in	UserLoginWindow		Авторизуватись
 Logged in as %User%	MainWindow		Авторизований як %User%
 Email address:	UserLoginWindow		Адреса Email:
 Screenshot	ScreenshotWindow		Знімок екрана
-HaikuDepot	System name		HaikuDepot
 A reboot is necessary to complete the installation process.	PackageManager		Для завершення інсталяції потрібне перезавантаження.
+HaikuDepot	System name		HaikuDepot
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural, one{Мені # рік або більше} few{Мені # роки або більше} other{Мені # років або більше}}
 View latest usage conditions…	MainWindow		Перегляд останніх Умов користування…
 Quit	App		Вийти

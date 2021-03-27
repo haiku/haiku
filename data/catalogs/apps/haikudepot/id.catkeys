@@ -95,8 +95,8 @@ Close	RatePackageWindow		Tutup
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Menyinkronkan data paket untuk repositori '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Lihat kondisi penggunaan
 Login issue	MainWindow		Masalah masukc
-Size	PackageListView		Ukuran
 Your rating:	RatePackageWindow		Penilaianmu:
+Size	PackageListView		Ukuran
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		Pengguna %Nickname% telah berhasil dibuat di sistem HaikuDepotServer. Anda dapat mengelola detail pengguna Anda dengan menggunakan antarmuka web. Anda sekarang masuk sebagai pengguna baru ini.
 Your rating was updated.	RatePackageWindow		Peringkat anda telah diperbarui.
 All categories	FilterView		Semua kategori
@@ -130,16 +130,16 @@ The nickname is required.	UserLoginWindow		Nama panggilan diperlukan.
 Source packages	MainWindow		Paket sumber
 -	no package size		-
 Problem with working files	App		Masalah dengan file yang berkaitan
-Try again	App		Coba lagi
 Rate package	RatePackageWindow		Nilai paket
+Try again	App		Coba lagi
 Unknown	PackageListView		Tidak dikenal
 I agree to the usage conditions	UserLoginWindow		Saya menyetujui ketentuan penggunaan
 Log in	UserLoginWindow		Masuk
 Logged in as %User%	MainWindow		Masuk sebagai %User%
 Email address:	UserLoginWindow		Alamat email:
 Screenshot	ScreenshotWindow		Screenshot
-HaikuDepot	System name		HaikuDepot
 A reboot is necessary to complete the installation process.	PackageManager		Boot ulang diperlukan untuk menyelesaikan proses pemasangan.
+HaikuDepot	System name		HaikuDepot
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{I am at least one year old}other{I am # tahun lebih tua}}
 View latest usage conditions…	MainWindow		Lihat ketentuan penggunaan terbaru…
 Quit	App		Berhenti

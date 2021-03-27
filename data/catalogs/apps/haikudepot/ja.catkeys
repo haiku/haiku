@@ -100,8 +100,8 @@ Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProce
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		新規ユーザー作成に必要な使用条件のダウンロード中にエラーが発生しました。詳細はログをチェックして、再度試してみてください。\nログの見方は、HaikuユーザーガイドのHaikuDepotの章で得られます。
 View the usage conditions	UserLoginWindow		使用条件を見る
 Login issue	MainWindow		ログインに問題
-Size	PackageListView		サイズ
 Your rating:	RatePackageWindow		評価:
+Size	PackageListView		サイズ
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		ユーザー %Nickname% が、HaikuDepotServer システム内に正常に作成されました。ユーザーの詳細をウェブインターフェースで管理できます。あなたは現在新規ユーザーとしてログインしています。
 Your rating was updated.	RatePackageWindow		評価が更新されました。
 All categories	FilterView		すべての分類
@@ -138,16 +138,16 @@ Source packages	MainWindow		ソースパッケージ
 -	no package size		-
 Problem with working files	App		作業用ファイルに問題があります
 Server error	ServerHelper		サーバーエラー
-Try again	App		再試行
 Rate package	RatePackageWindow		パッケージを評価
+Try again	App		再試行
 Unknown	PackageListView		不明
 I agree to the usage conditions	UserLoginWindow		使用条件に同意します
 Log in	UserLoginWindow		ログイン
 Logged in as %User%	MainWindow		%User% としてログイン
 Email address:	UserLoginWindow		メールアドレス:
 Screenshot	ScreenshotWindow		スクリーンショット
-HaikuDepot	System name		HaikuDepot
 A reboot is necessary to complete the installation process.	PackageManager		インストールプロセスを完了するには再起動が必要です。
+HaikuDepot	System name		HaikuDepot
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{私は少なくとも 1 歳です}other{私は # 歳以上です}}
 View latest usage conditions…	MainWindow		最新の使用条件を見る…
 Quit	App		終了

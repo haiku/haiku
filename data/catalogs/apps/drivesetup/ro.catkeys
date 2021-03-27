@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-DriveSetup	1714372400
+1	romanian	x-vnd.Haiku-DriveSetup	4058081081
 Could not unmount partition %s.	MainWindow		Nu se poate demonta partiția %s.
 Mount all	MainWindow		Montează tot
 Disk	MainWindow		Disc
@@ -104,7 +104,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Select a partition from the list below.	DiskView		Selectați o partiție din lista de mai jos.
 Active	PartitionList		Activ
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Sigur doriți să ștergeți partiția selectată?\n\nToate datele de pe partiție vor fi pierdute fără posibilitatea de a le recupera dacă faceți acest lucru!
-Failed to format the partition. No changes have been written to disk.	MainWindow		Formatarea partiției a eșuat. Fără modificări scrise pe disc.
 The partition %s has been successfully formatted.\n	MainWindow		Partiția %s a fost formatată cu succes.\n
 The partition %s is already mounted.	MainWindow		Partiția %s este deja montată.
 Size	PartitionList		Dimensiune

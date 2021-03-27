@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-DriveSetup	1714372400
+1	japanese	x-vnd.Haiku-DriveSetup	4058081081
 Could not unmount partition %s.	MainWindow		パーティション %s をマウント解除できませんでした。
 Mount all	MainWindow		すべてマウント
 Disk	MainWindow		ディスク
@@ -104,7 +104,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Select a partition from the list below.	DiskView		下記の一覧からパーティションを一つ選択してください。
 Active	PartitionList		アクティブ
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		選択されたパーティションを削除しますか?\n\nその場合、パーティションのすべてのデータが失われます。
-Failed to format the partition. No changes have been written to disk.	MainWindow		パーティションのフォーマットに失敗しました。変更はディスクに書きこまれていません。
 The partition %s has been successfully formatted.\n	MainWindow		パーティション %s は正常にフォーマットされました。\n
 The partition %s is already mounted.	MainWindow		パーティション %s はすでにマウントされています。
 Size	PartitionList		サイズ

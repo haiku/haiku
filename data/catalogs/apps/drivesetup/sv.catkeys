@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-DriveSetup	1714372400
+1	swedish	x-vnd.Haiku-DriveSetup	4058081081
 Could not unmount partition %s.	MainWindow		Kunde inte avmontera partition %s.
 Mount all	MainWindow		Montera alla
 Disk	MainWindow		Disk
@@ -104,7 +104,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Select a partition from the list below.	DiskView		Välj en partition från listan nedan.
 Active	PartitionList		Aktiv
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Är du säker på att du vill ta bort partitionen?\n\nAll data på partitionen kommer att gå förlorad!
-Failed to format the partition. No changes have been written to disk.	MainWindow		Kunde inte formatera partitionen. Inga ändringar har skrivits till disken.
 The partition %s has been successfully formatted.\n	MainWindow		Partitionen %s har initierats.\n
 The partition %s is already mounted.	MainWindow		Partitionen %s är redan monterad.
 Size	PartitionList		Storlek

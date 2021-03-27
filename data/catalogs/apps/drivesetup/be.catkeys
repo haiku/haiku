@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-DriveSetup	1161978698
+1	belarusian	x-vnd.Haiku-DriveSetup	3505687379
 Could not unmount partition %s.	MainWindow		Не ўдалося змантаваць падзел %s.
 Mount all	MainWindow		Зманатаваць усё
 Disk	MainWindow		Дыск
@@ -79,7 +79,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Select a partition from the list below.	DiskView		Абярыце падзел са спісу нішэй.
 Active	PartitionList		Актыўны
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Сапрўды жадаеце выдаліць абраны падзел?\n\nУсе данные на абраным падзеле будуць беззваротна згублены!
-Failed to format the partition. No changes have been written to disk.	MainWindow		Не ўдалося фарматаваць падзел. Змены не былі запісаны на дыск.
 The partition %s has been successfully formatted.\n	MainWindow		Падзел %s паспяхова фарматаваны.\n
 The partition %s is already mounted.	MainWindow		Падзел %s ужо змантаваны.
 Size	PartitionList		Памер

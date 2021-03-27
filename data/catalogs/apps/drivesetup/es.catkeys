@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-DriveSetup	598604797
+1	spanish; castilian	x-vnd.Haiku-DriveSetup	4058081081
 Could not unmount partition %s.	MainWindow		No se pudo desmontar la partición %s.
 Mount all	MainWindow		Montar todo
 Disk	MainWindow		Disco
@@ -50,6 +50,7 @@ Are you sure you want to format a raw disk? (Most people initialize the disk wit
 Wipe (not implemented)	MainWindow		Limpiar (no implementado)
 The currently selected partition does not have a parent partition.	MainWindow		La partición seleccionada no tiene una partición padre.
 Validation of the given initialization parameters failed.	MainWindow		La validación de los parámetros de inicialización proporcionados falló.
+Not formatted (%s)	PartitionList		Sin formato (%s)
 Shared	PartitionList		Compartida
 MIMEs	PartitionList		MIMEs
 BitLocker encrypted	Encryption utils		Cifrado BitLocker
@@ -62,9 +63,11 @@ Change	ChangeParametersPanel		Cambiar
 Partition name:	ChangeParametersPanel		Nombre de la partición:
 LUKS encrypted	Encryption utils		Cifrado LUKS
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		¿Está seguro que desea escribir los cambios de regreso al disco ahora?\n\nToda la información de la partición %s se perderá irremediablemente si lo hace!
+Empty space	PartitionList		Espacio vacío
 Cancel	AbstractParametersPanel		Cancelar
 Format	MainWindow		Formato
 OK	MainWindow		Aceptar
+Empty space	DiskView		Espacio vacío
 Open with DiskProbe	MainWindow		Abrir con DiskProbe
 Could not delete the selected partition.	MainWindow		No se pudo borrar la partición seleccionada.
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		¿Está seguro que desea inicializar el disco seleccionado? Toda la información se perderá. Se le preguntará de nuevo antes que los cambios se escriban al disco.\n
@@ -81,6 +84,7 @@ Rescan	MainWindow		Actualizar lista de dispositivos
 There was an error acquiring the partition row.	MainWindow		Hubo un error adquiriendo la fila de partición.
 Failed to initialize the disk %s!\n	MainWindow		¡Fallo al inicializar el disco %s!\n
 Disk system \"%s\" not found!	MainWindow		¡No se encuentra el disco de sistema \"%s\"!
+The partition cannot be unmounted.	MainWindow		No se puede desmontar la partición.
 Delete	MainWindow		Eliminar
 Partition type:	ChangeParametersPanel		Tipo de partición:
 Parameters	PartitionList		Parámetros
@@ -100,7 +104,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Select a partition from the list below.	DiskView		Elija una partición de la lista inferior.
 Active	PartitionList		Activa
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		¿Está seguro que quiere borrar la partición seleccionada?\n\n¡Toda la información en la partición se perderán irremisiblemente si lo hace!
-Failed to format the partition. No changes have been written to disk.	MainWindow		Falló el formato de la partición. No se han escrito cambios en el disco.
 The partition %s has been successfully formatted.\n	MainWindow		La partición %s ha sido formateada con éxito.\n
 The partition %s is already mounted.	MainWindow		La partición %s ya está montada.
 Size	PartitionList		Tamaño

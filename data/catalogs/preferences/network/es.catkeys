@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Network	3062143965
+1	spanish; castilian	x-vnd.Haiku-Network	543099905
 Ethernet device	InterfaceListItem		Dispositivo Ethernet
 Link speed:	IntefaceView		Velocidad de conexión:
 disconnected	IntefaceView		desconectado
@@ -13,6 +13,7 @@ Gateway:	IntefaceAddressView		Puerta de enlace:
 The netmask defines your local network	IntefaceAddressView		La máscara de red define su red local
 Your IP address	IntefaceAddressView		Su dirección IP:
 DHCP	IntefaceAddressView		DHCP
+IP address:	IntefaceAddressView		Dirección IP:
 Netmask:	IntefaceAddressView		Máscara de red:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Servicios

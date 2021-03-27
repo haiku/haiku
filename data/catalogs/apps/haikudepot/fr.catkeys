@@ -100,8 +100,8 @@ Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProce
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Une erreur s’est produite lors du téléchargement des conditions d’utilisation requises pour créer un nouvel utilisateur. Vérifiez les détails dans le journal et réessayez.\nDes informations sur la manière de consulter les journaux sont disponibles dans la section DépôtHaiku du guide de l’utilisateur Haiku.
 View the usage conditions	UserLoginWindow		Voir les conditions d’utilisation
 Login issue	MainWindow		Problème d’authentification
-Size	PackageListView		Taille
 Your rating:	RatePackageWindow		Votre évaluation :
+Size	PackageListView		Taille
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		L’utilisateur %Nickname% a été créé avec succès dans le système du Serveur de dépôt Haiku. Vous pouvez gérer votre profil utilisateur en utilisant l’interface web. Vous êtes maintenant connecté sous ce nouveau profil utilisateur.
 Your rating was updated.	RatePackageWindow		Votre évaluation a été mise à jour.
 All categories	FilterView		Toutes les catégories
@@ -138,16 +138,16 @@ Source packages	MainWindow		Paquets sources
 -	no package size		-
 Problem with working files	App		Problème avec les fichiers de travail
 Server error	ServerHelper		Erreur du serveur
-Try again	App		Essayer à nouveau
 Rate package	RatePackageWindow		Évaluer le paquet
+Try again	App		Essayer à nouveau
 Unknown	PackageListView		Inconnu
 I agree to the usage conditions	UserLoginWindow		J’accepte les conditions d’utilisation
 Log in	UserLoginWindow		Connexion
 Logged in as %User%	MainWindow		Connecté en tant que %User%
 Email address:	UserLoginWindow		Adresse e-mail :
 Screenshot	ScreenshotWindow		Capture d’écran
-HaikuDepot	System name		DépôtHaiku
 A reboot is necessary to complete the installation process.	PackageManager		Un redémarrage est nécessaire pour terminer le processus d’installation.
+HaikuDepot	System name		DépôtHaiku
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{Je suis âgé d’au moins un an}other{j’ai plus de # ans}}
 View latest usage conditions…	MainWindow		Voir les dernières conditions d’utilisation…
 Quit	App		Quitter

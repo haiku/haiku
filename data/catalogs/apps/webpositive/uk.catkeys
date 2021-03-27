@@ -18,7 +18,7 @@ Delete	Cookie Manager		Видалити
 (Finish: %date - Over %duration left)	Download Window		(Завершення: %date - Понад %duration залишилось)
 Open containing folder	Download Window		Відкрити папку з файлом
 Find previous	WebPositive Window		Знайти попереднє
-Full screen	WebPositive Window		На весь екран
+Full screen	WebPositive Window		Повний екран
 Downloads in progress	WebPositive		Завантаження триває
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Ви бажаєте відкрити відразу %addedCount закладок?
 Copy URL to clipboard	Download Window		Копіювати до буферу обміну
@@ -27,7 +27,7 @@ Start page:	Settings Window		Стартова сторінка:
 Cancel	Download Window		Скасувати
 Settings	Settings Window		Налаштування
 Downloads	WebPositive Window		Завантаження
-Browse…	Settings Window		Перегляд…
+Browse…	Settings Window		Переглянути…
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Закладка цієї сторінки (%bookmarkName) вже існує.
 Resume prior session	Settings Window		Продовжити попередній сеанс
 Match case	WebPositive Window		Враховувати регістр
@@ -74,7 +74,7 @@ Password:	Authentication Panel		Пароль:
 Forward	WebPositive Window		Вперед
 Clear	Console Window		Очистити
 Cut	URL Bar		Вирізати
-View	WebPositive Window		Вигляд
+View	WebPositive Window		Режим перегляду
 Paste	URL Bar		Вставити
 Find next	WebPositive Window		Знайти далі
 Open search page	Settings Window		Відкрити сторінку пошуку

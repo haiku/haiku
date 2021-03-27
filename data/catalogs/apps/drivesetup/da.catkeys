@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-DriveSetup	598604797
+1	danish	x-vnd.Haiku-DriveSetup	2942313478
 Could not unmount partition %s.	MainWindow		Kunne ikke afmontere partition %s.
 Mount all	MainWindow		Monter alle
 Disk	MainWindow		Disk
@@ -100,7 +100,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Select a partition from the list below.	DiskView		Vælg en partition fra liste nedenunder.
 Active	PartitionList		Aktiv
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Er du sikker på, at du vil slette den valgte partition?\n\nData på den valgte partition vil blive permanent slettet!
-Failed to format the partition. No changes have been written to disk.	MainWindow		Kunne ikke formatere partitionen. Der blev ikke skrevet nogen ændringer til disken.
 The partition %s has been successfully formatted.\n	MainWindow		Partitionen %s blev formateret.\n
 The partition %s is already mounted.	MainWindow		Partitionen %s er allerede monteret.
 Size	PartitionList		Størrelse

@@ -50,7 +50,7 @@ Default	Menus		По умолчанию
 OK	SaveAlert		ОК
 Color	Menus		Цвет
 Save changes to the document \"%s\"? 	QuitAlert		Сохранить изменения в файле \"%s\"? 
-StyledEdit	System name		Стильный редактор
+StyledEdit	System name		StyledEdit
 Find:	FindandReplaceWindow		Найти:
 Undo typing	QuitAlert		Отменить ввод
 Error loading \"%s\":\n\t%s	LoadAlert		Ошибка загрузки \"%s\":\n\t%s

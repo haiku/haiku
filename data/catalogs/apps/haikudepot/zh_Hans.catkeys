@@ -55,8 +55,8 @@ Repository	PackageListView		仓库
 %hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp%（版本 %hd.version%）
 Close	UserLoginWindow		关闭
 Close	RatePackageWindow		关闭
-Size	PackageListView		大小
 Your rating:	RatePackageWindow		您的评分:
+Size	PackageListView		大小
 Your rating was updated.	RatePackageWindow		您的评价已被更新。
 All categories	FilterView		所有分类
 Repositories	MainWindow		仓库
@@ -75,8 +75,8 @@ OK	UserLoginWindow		确定
 Stability:	RatePackageWindow		稳定性:
 Source packages	MainWindow		源代码包
 -	no package size		-
-Try again	App		请重试
 Rate package	RatePackageWindow		软件包评分
+Try again	App		请重试
 Unknown	PackageListView		未知
 Log in	UserLoginWindow		登陆
 Logged in as %User%	MainWindow		登录 as %User%

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-DriveSetup	598604797
+1	russian	x-vnd.Haiku-DriveSetup	2942313478
 Could not unmount partition %s.	MainWindow		Невозможно отключить раздел %s.
 Mount all	MainWindow		Подключить все
 Disk	MainWindow		Диск
@@ -100,7 +100,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Select a partition from the list below.	DiskView		Выберите раздел из списка ниже
 Active	PartitionList		Загрузочный
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Вы уверены, что хотите удалить выбранный раздел?\n\nВсе данные на этом разделе будут безвозвратно потеряны, если вы продолжите!
-Failed to format the partition. No changes have been written to disk.	MainWindow		Не удалось инициализировать раздел. Изменения не были записаны на диск.
 The partition %s has been successfully formatted.\n	MainWindow		Раздел %s был успешно инициализирован.\n
 The partition %s is already mounted.	MainWindow		Раздел %s уже отключен.
 Size	PartitionList		Размер
