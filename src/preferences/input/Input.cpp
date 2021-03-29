@@ -36,6 +36,7 @@ InputApplication::InputApplication()
 	window->Show();
 }
 
+
 void
 InputApplication::MessageReceived(BMessage* message)
 {
@@ -69,8 +70,8 @@ InputApplication::MessageReceived(BMessage* message)
 			fWindow->PostMessage(message);
 			break;
 		}
-	default:
-		BApplication::MessageReceived(message);
+		default:
+			BApplication::MessageReceived(message);
 	}
 };
 

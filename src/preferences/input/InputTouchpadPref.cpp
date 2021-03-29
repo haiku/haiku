@@ -4,14 +4,14 @@
  *
  * Author:
  *		Preetpal Kaur <preetpalok123@gmail.com>
-*/
+ */
 
 
 #include "InputTouchpadPref.h"
 
 #include <Entry.h>
-#include <FindDirectory.h>
 #include <File.h>
+#include <FindDirectory.h>
 #include <List.h>
 #include <String.h>
 
@@ -53,8 +53,8 @@ TouchpadPref::UpdateSettings()
 {
 	BMessage msg;
 	msg.AddBool("scroll_twofinger", fSettings.scroll_twofinger);
-	msg.AddBool("scroll_twofinger_horizontal",
-		fSettings.scroll_twofinger_horizontal);
+	msg.AddBool(
+		"scroll_twofinger_horizontal", fSettings.scroll_twofinger_horizontal);
 	msg.AddFloat("scroll_rightrange", fSettings.scroll_rightrange);
 	msg.AddFloat("scroll_bottomrange", fSettings.scroll_bottomrange);
 	msg.AddInt16("scroll_xstepsize", fSettings.scroll_xstepsize);
@@ -75,7 +75,7 @@ TouchpadPref::Defaults()
 
 
 status_t
-TouchpadPref::GetSettingsPath(BPath &path)
+TouchpadPref::GetSettingsPath(BPath& path)
 {
 	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
 	if (status < B_OK)
@@ -99,13 +99,12 @@ TouchpadPref::LoadSettings()
 		return status;
 
 	if (settingsFile.Read(&fSettings, sizeof(touchpad_settings))
-			!= sizeof(touchpad_settings)) {
+		!= sizeof(touchpad_settings)) {
 		LOG("failed to load settings\n");
 		return B_ERROR;
 	}
 
-	if (settingsFile.Read(&fWindowPosition, sizeof(BPoint))
-			!= sizeof(BPoint)) {
+	if (settingsFile.Read(&fWindowPosition, sizeof(BPoint)) != sizeof(BPoint)) {
 		LOG("failed to load settings\n");
 		return B_ERROR;
 	}
@@ -128,13 +127,13 @@ TouchpadPref::SaveSettings()
 		return status;
 
 	if (settingsFile.Write(&fSettings, sizeof(touchpad_settings))
-			!= sizeof(touchpad_settings)) {
+		!= sizeof(touchpad_settings)) {
 		LOG("can't save settings\n");
 		return B_ERROR;
 	}
 
 	if (settingsFile.Write(&fWindowPosition, sizeof(BPoint))
-			!= sizeof(BPoint)) {
+		!= sizeof(BPoint)) {
 		LOG("can't save window position\n");
 		return B_ERROR;
 	}

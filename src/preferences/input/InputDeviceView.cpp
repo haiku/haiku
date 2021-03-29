@@ -4,7 +4,7 @@
  *
  * Author:
  *		Preetpal Kaur <preetpalok123@gmail.com>
-*/
+ */
 
 
 #include "InputDeviceView.h"
@@ -86,13 +86,14 @@ struct DeviceListItemView::Renderer {
 		onto->SetDrawingMode(B_OP_COPY);
 
 		BFont font = be_plain_font;
-		font_height	fontInfo;
+		font_height fontInfo;
 		font.GetHeight(&fontInfo);
 
 		onto->SetFont(&font);
-		onto->MovePenTo(point.x + 8, frame.top
-			+ fontInfo.ascent + (frame.Height()
-			- ceilf(fontInfo.ascent + fontInfo.descent)) / 2.0f);
+		onto->MovePenTo(point.x + 8,
+			frame.top + fontInfo.ascent
+				+ (frame.Height() - ceilf(fontInfo.ascent + fontInfo.descent))
+					/ 2.0f);
 		onto->DrawString(fTitle);
 
 		onto->SetHighColor(highColor);
@@ -105,6 +106,7 @@ struct DeviceListItemView::Renderer {
 		width += be_plain_font->StringWidth(fTitle) + 16.0f;
 		return width;
 	}
+
 private:
 
 	BString		fTitle;
@@ -119,9 +121,8 @@ DeviceListItemView::Update(BView* owner, const BFont* font)
 	BListItem::Update(owner, font);
 
 	float iconHeight = InputIcons::sBounds.Height() + 1;
-	if ((Height() < iconHeight + kITEM_MARGIN * 2)) {
+	if ((Height() < iconHeight + kITEM_MARGIN * 2))
 		SetHeight(iconHeight + kITEM_MARGIN * 2);
-	}
 
 	Renderer renderer;
 	renderer.SetTitle(Label());

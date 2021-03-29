@@ -1,4 +1,4 @@
- /*
+/*
  * Copyright 2020, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
@@ -64,7 +64,6 @@ InputIcons::_LoadBitmap(BResources* resources)
 		keyboardIcon = new BBitmap(sBounds, 0, B_RGBA32);
 		BIconUtils::GetVectorIcon(keyboard, size, &keyboardIcon);
 	}
-
 }
 
 
