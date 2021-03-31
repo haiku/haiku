@@ -1,8 +1,11 @@
 /*
  * Copyright 2008-2009, Oliver Ruiz Dorantes, <oliver.ruiz.dorantes@gmail.com>
  * Copyright 2012-2013, Tri-Edge AI <triedgeai@gmail.com>
+ * Copyright 2021, Haiku, Inc.
+ * Distributed under the terms of the MIT License.
  *
- * All rights reserved. Distributed under the terms of the MIT license.
+ * Authors:
+ * 		Fredrik Modéen <fredrik_at_modeen.se>
  */
 
 #ifndef BLUETOOTH_SETTINGS_H
@@ -21,6 +24,8 @@ public:
 	struct {
 		bdaddr_t 			PickedDevice;
 		DeviceClass			LocalDeviceClass;
+		int32				Policy;
+		int32				InquiryTime;
 	} Data;
 
 							BluetoothSettings();

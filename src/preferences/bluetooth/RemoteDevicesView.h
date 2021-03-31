@@ -43,8 +43,8 @@ protected:
 	BButton*		removeButton;
 	BButton*		pairButton;
 	BButton*		disconnectButton;
-	BButton*		blockButton;
-	BButton*		availButton;
+//	BButton*		blockButton;
+//	BButton*		availButton;
 	BListView*		fDeviceList;
 	BScrollView*	fScrollView;
 

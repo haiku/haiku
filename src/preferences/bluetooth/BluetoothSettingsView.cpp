@@ -1,8 +1,11 @@
 /*
  * Copyright 2008-2009, Oliver Ruiz Dorantes <oliver.ruiz.dorantes@gmail.com>
  * Copyright 2012-2013, Tri-Edge AI, <triedgeai@gmail.com>
+ * Copyright 2021, Haiku, Inc.
+ * Distributed under the terms of the MIT License.
  *
- * All rights reserved. Distributed under the terms of the MIT License.
+ * Authors:
+ * 		Fredrik Modéen <fredrik_at_modeen.se>
  */
 
 #include "BluetoothSettingsView.h"
@@ -20,6 +23,7 @@
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <PopUpMenu.h>
+#include <OptionPopUp.h>
 #include <Slider.h>
 #include <SpaceLayoutItem.h>
 #include <String.h>
@@ -30,11 +34,6 @@
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Settings view"
-
-static const int32 kMsgSetConnectionPolicy = 'sCpo';
-static const int32 kMsgSetDeviceClass = 'sDC0';
-static const int32 kMsgSetInquiryTime = 'afEa';
-static const int32 kMsgLocalSwitched = 'lDsW';
 
 static const char* kAllLabel = B_TRANSLATE_MARK("From all devices");
 static const char* kTrustedLabel =
@@ -56,18 +55,25 @@ BluetoothSettingsView::BluetoothSettingsView(const char* name)
 {
 	fSettings.Load();
 
-	_BuildConnectionPolicy();
-	fPolicyMenuField = new BMenuField("policy",
-		B_TRANSLATE("Incoming connections policy:"), fPolicyMenu);
+	fPolicyMenu = new BOptionPopUp("policy",
+		B_TRANSLATE("Incoming connections policy:"),
+		new BMessage(kMsgSetConnectionPolicy));
+	fPolicyMenu->AddOption(B_TRANSLATE_NOCOLLECT(kAllLabel), 1);
+	fPolicyMenu->AddOption(B_TRANSLATE_NOCOLLECT(kTrustedLabel), 2);
+	fPolicyMenu->AddOption(B_TRANSLATE_NOCOLLECT(kAlwaysLabel), 3);
 
-	fInquiryTimeControl = new BSlider("time",
-		B_TRANSLATE("Default inquiry time:"), new BMessage(kMsgSetInquiryTime),
-		0, 255, B_HORIZONTAL);
+	fPolicyMenu->SetValue(fSettings.Data.Policy);
+
+	BString label(B_TRANSLATE("Default inquiry time:"));
+	label <<  " " << fSettings.Data.InquiryTime;
+	fInquiryTimeControl = new BSlider("time", label.String()
+		, new BMessage(kMsgSetInquiryTime), 15, 61, B_HORIZONTAL);
 	fInquiryTimeControl->SetLimitLabels(B_TRANSLATE("15 secs"),
 		B_TRANSLATE("61 secs"));
 	fInquiryTimeControl->SetHashMarks(B_HASH_MARKS_BOTTOM);
-	fInquiryTimeControl->SetHashMarkCount(255 / 15);
+	fInquiryTimeControl->SetHashMarkCount(20);
 	fInquiryTimeControl->SetEnabled(true);
+	fInquiryTimeControl->SetValue(fSettings.Data.InquiryTime);
 
 	fExtDeviceView = new ExtendedLocalDeviceView(NULL);
 
@@ -87,18 +93,20 @@ BluetoothSettingsView::BluetoothSettingsView(const char* name)
 			fSettings.Data.LocalDeviceClass = rememberedClass;
 	}
 
-	// hinting menu
-	_BuildClassMenu();
-	fClassMenuField = new BMenuField("class", B_TRANSLATE("Identify host as:"),
-		fClassMenu);
+	fClassMenu = new BOptionPopUp("DeviceClass", B_TRANSLATE("Identify host as:"),
+		new BMessage(kMsgSetDeviceClass));
+	fClassMenu->AddOption(B_TRANSLATE_NOCOLLECT(kDesktopLabel), 1);
+	fClassMenu->AddOption(B_TRANSLATE_NOCOLLECT(kServerLabel), 2);
+	fClassMenu->AddOption(B_TRANSLATE_NOCOLLECT(kLaptopLabel), 3);
+	fClassMenu->AddOption(B_TRANSLATE_NOCOLLECT(kHandheldLabel), 4);
+	fClassMenu->AddOption(B_TRANSLATE_NOCOLLECT(kPhoneLabel), 5);
+
+	fClassMenu->SetValue(_GetClassForMenu());
 
 	BLayoutBuilder::Grid<>(this, 0)
 		.SetInsets(10)
-		.Add(fClassMenuField->CreateLabelLayoutItem(), 0, 0)
-		.Add(fClassMenuField->CreateMenuBarLayoutItem(), 1, 0)
-
-		.Add(fPolicyMenuField->CreateLabelLayoutItem(), 0, 1)
-		.Add(fPolicyMenuField->CreateMenuBarLayoutItem(), 1, 1)
+		.Add(fClassMenu, 0, 0)
+		.Add(fPolicyMenu, 0, 1)
 
 		.Add(fInquiryTimeControl, 0, 2, 2)
 
@@ -124,8 +132,6 @@ BluetoothSettingsView::AttachedToWindow()
 	else
 		SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
-	fPolicyMenu->SetTargetForItems(this);
-	fClassMenu->SetTargetForItems(this);
 	fLocalDevicesMenu->SetTargetForItems(this);
 	fInquiryTimeControl->SetTarget(this);
 }
@@ -134,7 +140,9 @@ BluetoothSettingsView::AttachedToWindow()
 void
 BluetoothSettingsView::MessageReceived(BMessage* message)
 {
+	//message->PrintToStream();
 	switch (message->what) {
+
 		case kMsgLocalSwitched:
 		{
 			LocalDevice* lDevice;
@@ -147,27 +155,33 @@ BluetoothSettingsView::MessageReceived(BMessage* message)
 
 			break;
 		}
-		// TODO: To be fixed. :)
 
-		/*
 		case kMsgSetConnectionPolicy:
 		{
-			//uint8 Policy;
-			//if (message->FindInt8("Policy", (int8*)&Policy) == B_OK)
+			int32 policy;
+			if (message->FindInt32("be:value", (int32*)&policy) == B_OK) {
+				fSettings.Data.Policy = policy;
+				printf("Policy = %d\n", fSettings.Data.Policy);
+			}
 			break;
 		}
 
 		case kMsgSetInquiryTime:
 		{
+			fSettings.Data.InquiryTime = fInquiryTimeControl->Value();
+			BString label(B_TRANSLATE("Default inquiry time:"));
+			label <<  " " << fInquiryTimeControl->Value();
+			fInquiryTimeControl->SetLabel(label.String());
 			break;
 		}
-		*/
+
 		case kMsgSetDeviceClass:
 		{
-			uint8 deviceClass;
+			int32 deviceClass;
+			if (message->FindInt32("be:value",
+				(int32*)&deviceClass) == B_OK) {
 
-			if (message->FindInt8("DeviceClass",
-				(int8*)&deviceClass) == B_OK) {
+				printf("deviceClass = %d\n", deviceClass);
 
 				if (deviceClass == 5)
 					_SetDeviceClass(2, 3, 0x72);
@@ -205,85 +219,6 @@ BluetoothSettingsView::_SetDeviceClass(uint8 major, uint8 minor,
 		haveRun = false;
 
 	return haveRun;
-}
-
-
-void
-BluetoothSettingsView::_BuildConnectionPolicy()
-{
-	BMessage* message = NULL;
-	BMenuItem* item = NULL;
-
-	fPolicyMenu = new BPopUpMenu(B_TRANSLATE("Policy" B_UTF8_ELLIPSIS));
-
-	message = new BMessage(kMsgSetConnectionPolicy);
-	message->AddInt8("Policy", 1);
-	item = new BMenuItem(B_TRANSLATE_NOCOLLECT(kAllLabel), message);
-	fPolicyMenu->AddItem(item);
-
-	message = new BMessage(kMsgSetConnectionPolicy);
-	message->AddInt8("Policy", 2);
-	item = new BMenuItem(B_TRANSLATE_NOCOLLECT(kTrustedLabel), message);
-	fPolicyMenu->AddItem(item);
-
-	message = new BMessage(kMsgSetConnectionPolicy);
-	message->AddInt8("Policy", 3);
-	item = new BMenuItem(B_TRANSLATE_NOCOLLECT(kAlwaysLabel), NULL);
-	fPolicyMenu->AddItem(item);
-}
-
-void
-BluetoothSettingsView::_BuildClassMenu()
-{
-	BMessage* message = NULL;
-	BMenuItem* item = NULL;
-
-	fClassMenu = new BPopUpMenu(B_TRANSLATE("Identify us as" B_UTF8_ELLIPSIS));
-
-	message = new BMessage(kMsgSetDeviceClass);
-	message->AddInt8("DeviceClass", 1);
-	item = new BMenuItem(B_TRANSLATE_NOCOLLECT(kDesktopLabel), message);
-	fClassMenu->AddItem(item);
-
-	if (fSettings.Data.LocalDeviceClass.MajorDeviceClass() == 1 &&
-		fSettings.Data.LocalDeviceClass.MinorDeviceClass() == 1)
-			item->SetMarked(true);
-
-	message = new BMessage(kMsgSetDeviceClass);
-	message->AddInt8("DeviceClass", 2);
-	item = new BMenuItem(B_TRANSLATE_NOCOLLECT(kServerLabel), message);
-	fClassMenu->AddItem(item);
-
-	if (fSettings.Data.LocalDeviceClass.MajorDeviceClass() == 1 &&
-		fSettings.Data.LocalDeviceClass.MinorDeviceClass() == 2)
-			item->SetMarked(true);
-
-	message = new BMessage(kMsgSetDeviceClass);
-	message->AddInt8("DeviceClass", 3);
-	item = new BMenuItem(B_TRANSLATE_NOCOLLECT(kLaptopLabel), message);
-	fClassMenu->AddItem(item);
-
-	if (fSettings.Data.LocalDeviceClass.MajorDeviceClass() == 1 &&
-		fSettings.Data.LocalDeviceClass.MinorDeviceClass() == 3)
-			item->SetMarked(true);
-
-	message = new BMessage(kMsgSetDeviceClass);
-	message->AddInt8("DeviceClass", 4);
-	item = new BMenuItem(B_TRANSLATE_NOCOLLECT(kHandheldLabel), message);
-	fClassMenu->AddItem(item);
-
-	if (fSettings.Data.LocalDeviceClass.MajorDeviceClass() == 1 &&
-		fSettings.Data.LocalDeviceClass.MinorDeviceClass() == 4)
-			item->SetMarked(true);
-
-	message = new BMessage(kMsgSetDeviceClass);
-	message->AddInt8("DeviceClass", 5);
-	item = new BMenuItem(B_TRANSLATE_NOCOLLECT(kPhoneLabel), message);
-	fClassMenu->AddItem(item);
-
-	if (fSettings.Data.LocalDeviceClass.MajorDeviceClass() == 2 &&
-		fSettings.Data.LocalDeviceClass.MinorDeviceClass() == 3)
-			item->SetMarked(true);
 }
 
 
@@ -337,4 +272,23 @@ BluetoothSettingsView::_MarkLocalDevice(LocalDevice* lDevice)
 	fExtDeviceView->SetEnabled(true);
 	ActiveLocalDevice = lDevice;
 	fSettings.Data.PickedDevice = lDevice->GetBluetoothAddress();
+}
+
+
+int
+BluetoothSettingsView::_GetClassForMenu()
+{
+	int deviceClass = fSettings.Data.LocalDeviceClass.MajorDeviceClass() +
+		fSettings.Data.LocalDeviceClass.MinorDeviceClass()-1;
+
+	// As of now we only support MajorDeviceClass = 1 and MinorDeviceClass 1-4
+	// and MajorDeviceClass = 2 and MinorDeviceClass 3.
+	if ((fSettings.Data.LocalDeviceClass.MajorDeviceClass() == 1
+		&& (fSettings.Data.LocalDeviceClass.MinorDeviceClass() > 0
+			&& fSettings.Data.LocalDeviceClass.MinorDeviceClass() < 5))
+		|| (fSettings.Data.LocalDeviceClass.MajorDeviceClass() == 2 &&
+			fSettings.Data.LocalDeviceClass.MinorDeviceClass() == 3))
+			return deviceClass; //No other wil have the same number.
+	else
+		return 0;
 }

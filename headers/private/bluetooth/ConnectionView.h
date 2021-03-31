@@ -1,10 +1,10 @@
 /*
+ * Copyright 2007-2008 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
  * Copyright 2021, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  * 		Tri-Edge AI <triedgeai@gmail.com>
- *		Oliver Ruiz Dorantes <oliver.ruiz.dorantes@gmail.com>
  */
 
 #ifndef _CONNECTION_VIEW_H_

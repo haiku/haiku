@@ -1,7 +1,12 @@
 /*
- * Copyright 2008-09, Oliver Ruiz Dorantes, <oliver.ruiz.dorantes_at_gmail.com>
- * All rights reserved. Distributed under the terms of the MIT License.
+ * Copyright 2008-2009, Oliver Ruiz Dorantes, <oliver.ruiz.dorantes@gmail.com>
+ * Copyright 2021, Haiku, Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ * 		Fredrik Modéen <fredrik_at_modeen.se>
  */
+
 #include <stdio.h>
 
 #include <Alert.h>
@@ -33,8 +38,8 @@ static const uint32 kMsgAddDevices = 'ddDv';
 static const uint32 kMsgRemoveDevice = 'rmDv';
 static const uint32 kMsgPairDevice = 'trDv';
 static const uint32 kMsgDisconnectDevice = 'dsDv';
-static const uint32 kMsgBlockDevice = 'blDv';
-static const uint32 kMsgRefreshDevices = 'rfDv';
+//static const uint32 kMsgBlockDevice = 'blDv';
+//static const uint32 kMsgRefreshDevices = 'rfDv';
 
 using namespace Bluetooth;
 
@@ -52,14 +57,13 @@ RemoteDevicesView::RemoteDevicesView(const char* name, uint32 flags)
 
 	disconnectButton = new BButton("disconnect", B_TRANSLATE("Disconnect"),
 		new BMessage(kMsgDisconnectDevice));
-
+/*
 	blockButton = new BButton("block", B_TRANSLATE("As blocked"),
 		new BMessage(kMsgBlockDevice));
 
-
 	availButton = new BButton("check", B_TRANSLATE("Refresh" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgRefreshDevices));
-
+*/
 	// Set up device list
 	fDeviceList = new BListView("DeviceList", B_SINGLE_SELECTION_LIST);
 
@@ -74,11 +78,11 @@ RemoteDevicesView::RemoteDevicesView(const char* name, uint32 flags)
 			.Add(addButton)
 			.Add(removeButton)
 			.AddGlue()
-			.Add(availButton)
-			.AddGlue()
+//			.Add(availButton)
+	//		.AddGlue()
 			.Add(pairButton)
 			.Add(disconnectButton)
-			.Add(blockButton)
+//			.Add(blockButton)
 			.AddGlue()
 		.End()
 	.End();
@@ -101,8 +105,8 @@ RemoteDevicesView::AttachedToWindow(void)
 	removeButton->SetTarget(this);
 	pairButton->SetTarget(this);
 	disconnectButton->SetTarget(this);
-	blockButton->SetTarget(this);
-	availButton->SetTarget(this);
+//	blockButton->SetTarget(this);
+//	availButton->SetTarget(this);
 
 	LoadSettings();
 	fDeviceList->Select(0);
@@ -122,8 +126,6 @@ RemoteDevicesView::MessageReceived(BMessage* message)
 		}
 
 		case kMsgRemoveDevice:
-			printf("kMsgRemoveDevice: %" B_PRId32 "\n",
-				fDeviceList->CurrentSelection(0));
 			fDeviceList->RemoveItem(fDeviceList->CurrentSelection(0));
 			break;
 		case kMsgAddToRemoteList:

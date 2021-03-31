@@ -8,7 +8,6 @@
 
 #include <bluetooth/bdaddrUtils.h>
 #include <bluetooth/BluetoothDevice.h>
-/*#include "../media/iconfile.h"*/
 
 #include "DeviceListItem.h"
 
