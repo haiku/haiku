@@ -154,7 +154,7 @@ KUndoBuffer::AddUndo(const char* text, int32 length, int32 offset,
 			int32 c_offset = CurrentUndoItem->Offset;
 			undo_type c_history = CurrentUndoItem->History;
 			if (c_history == history) {
-				switch(c_history) {
+				switch (c_history) {
 					case K_INSERTED:
 					case K_REPLACED:
 						if ((c_offset + c_length) == offset)
