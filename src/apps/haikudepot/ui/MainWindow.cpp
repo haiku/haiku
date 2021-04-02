@@ -639,15 +639,7 @@ MainWindow::GetModel()
 void
 MainWindow::_BuildMenu(BMenuBar* menuBar)
 {
-	BMenu* windowMenu = new BMenu(B_TRANSLATE("Window"));
-	windowMenu->AddItem(new BMenuItem(B_TRANSLATE("Settings" B_UTF8_ELLIPSIS),
-		new BMessage(MSG_SETTINGS)));
-	windowMenu->AddSeparatorItem();
-	windowMenu->AddItem(new BMenuItem(B_TRANSLATE("Quit" B_UTF8_ELLIPSIS),
-		new BMessage(B_QUIT_REQUESTED), 'Q'));
-	menuBar->AddItem(windowMenu);
-
-	BMenu* menu = new BMenu(B_TRANSLATE("Tools"));
+	BMenu* menu = new BMenu(B_TRANSLATE_SYSTEM_NAME("HaikuDepot"));
 	fRefreshRepositoriesItem = new BMenuItem(
 		B_TRANSLATE("Refresh repositories"), new BMessage(MSG_REFRESH_REPOS));
 	menu->AddItem(fRefreshRepositoriesItem);
@@ -655,6 +647,11 @@ MainWindow::_BuildMenu(BMenuBar* menuBar)
 		B_UTF8_ELLIPSIS), new BMessage(MSG_MANAGE_REPOS)));
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Check for updates"
 		B_UTF8_ELLIPSIS), new BMessage(MSG_SOFTWARE_UPDATER)));
+	menu->AddSeparatorItem();
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Settings" B_UTF8_ELLIPSIS),
+		new BMessage(MSG_SETTINGS)));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Quit"),
+		new BMessage(B_QUIT_REQUESTED), 'Q'));
 	menuBar->AddItem(menu);
 
 	fRepositoryMenu = new BMenu(B_TRANSLATE("Repositories"));

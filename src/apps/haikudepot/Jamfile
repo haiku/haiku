@@ -270,6 +270,7 @@ DoCatalogs HaikuDepot :
 	ServerPkgDataUpdateProcess.cpp
 	ServerReferenceDataUpdateProcess.cpp
 	ServerRepositoryDataUpdateProcess.cpp
+	SettingsWindow.cpp
 	UserLoginWindow.cpp
 	WorkStatusView.cpp
 ;
