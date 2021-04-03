@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-HaikuDepot	2792101273
+1	esperanto	x-vnd.Haiku-HaikuDepot	2848501228
 Repository update error	LocalRepositoryUpdateProcess		Eraro dum ĝisdatigo de deponejo
 Network error	ServerHelper		Eraro de reto
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Eraro okazis dum aktualigo de la deponejo: %error%
@@ -111,7 +111,6 @@ View agreed usage conditions…	MainWindow		Vidi konsentitajn uzkondiĉojn…
 Cancel	MainWindow		Nuligi
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 plu por elŝuti)}other{(# plu por elŝuti)}}
 Refresh repositories	MainWindow		Aktualigi deponejojn
-Tools	MainWindow		Iloj
 Continue	App		Daŭrigi
 A password is required.	UserLoginWindow		Pasvorto estas deviga.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Ĉi tiu pakaĵo ne ŝajnas esti en la HaikuTeneja Servilo, do krei novan takson aŭ redakti ekzistantan tenejon ne estas ebla.

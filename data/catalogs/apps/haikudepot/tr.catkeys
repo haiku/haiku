@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-HaikuDepot	412302812
+1	turkish	x-vnd.Haiku-HaikuDepot	908828196
 Repository update error	LocalRepositoryUpdateProcess		Depo güncelleme hatası
 Network error	ServerHelper		Ağ hatası
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Depo güncellenirken bir hata oluştu: %error%
@@ -24,6 +24,7 @@ Rating	PackageListView		Derecelendirme
 Synchronizing icons	ServerIconExportUpdateProcess		Simgeler eşitleniyor
 Show	MainWindow		Göster
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Paket listesi alınırken bir hata oluştu: %message%
+Settings…	MainWindow		Ayarlar…
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Bu uygulama çalışabilmek için bilgisayarınızda dosya işlemleri yapmaya gereksinim duyar. Görünüşe göre [%TestFilePath%] konumuna bir sınama dosyası yazımında sorunlar var. Lütfen bu uygulamanın dosya yazmasına engel olabilecek disk veya dosya izinleri sıkıntıları olup olmadığını denetleyin. Bu sorunu göz ardı edip işlemi sürdürebilirsiniz, ancak bazı işlevler devre dışı kalabilir.
 Active	PackageListView		Etkin
 Login or Create account	MainWindow		Giriş yap veya hesap oluştur
@@ -77,6 +78,7 @@ Send	RatePackageWindow		Gönder
 Start package daemon	App		Paket hizmetini başlat
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Yanlış girme olasılığını ortadan kaldırmak için parolanız bir kez daha girilmelidir.
 The package action could not be scheduled: %Error%	PackageInfoView		Paket eylemi zamanlanamadı: %Error%
+Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer?  You can change your preference in the \"Settings\" window later.	MainWindow		Anonim kullanım verilerini Haiku Depo sunucusu ile paylaşmak ister misiniz? Tercihlerinizi daha sonra \"Ayarlar\" penceresinden değiştirebilirsiniz.
 Cancel	RatePackageWindow		İptal
 Inactive	PackageListView		Etkin değil
 Nickname:	UserLoginWindow		Takma ad:
@@ -88,6 +90,7 @@ Usage conditions download problem	UserLoginWindow		Kullanım koşulları indiril
 OK	PackageInfoView		Tamam
 Downloading:	PackageInfoView		İndiriliyor:
 Success	UserLoginWindow		Başarılı
+No	MainWindow		Hayır
 Package daemon problem	App		Paket hizmeti sorunu
 (%Votes%)	PackageInfoView		(%Votes%)
 Repository	PackageListView		Depo
@@ -113,7 +116,6 @@ View agreed usage conditions…	MainWindow		Kabul edilen kullanım koşulların�
 Cancel	MainWindow		İptal
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 tane daha indirilecek)}other{(# tane daha indirilecek)}}
 Refresh repositories	MainWindow		Depoları yenile
-Tools	MainWindow		Araçlar
 Continue	App		Sürdür
 A password is required.	UserLoginWindow		Bir parola gerekli.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Bu paket Haiku Depo sunucusunda değil gibi görünüyor, bu yüzden bir derecelendirme yapmak veya mevcut derecelendirmeyi değiştirmek olanaklı değil.
@@ -143,11 +145,13 @@ Try again	App		Yeniden dene
 Unknown	PackageListView		Bilinmeyen
 I agree to the usage conditions	UserLoginWindow		Kullanım koşullarını kabul ediyorum
 Log in	UserLoginWindow		Giriş yap
+Sending anonymous usage data	MainWindow		Anonim kullanım verisi gönder
 Logged in as %User%	MainWindow		%User% olarak giriş yapıldı
 Email address:	UserLoginWindow		E-posta adresi:
 Screenshot	ScreenshotWindow		Ekran görüntüsü
 A reboot is necessary to complete the installation process.	PackageManager		Yükleme işlemini tamamlamak için bilgisayarı yeniden başlatmalısınız.
 HaikuDepot	System name		Haiku Depo
+Yes	MainWindow		Evet
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{Bir yaşından büyüğüm}other{# yaşından büyüğüm}}
 View latest usage conditions…	MainWindow		Güncel kullanım koşullarını görüntüle…
 Quit	App		Çık

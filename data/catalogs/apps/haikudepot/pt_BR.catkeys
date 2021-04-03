@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-HaikuDepot	875972952
+1	portuguese (brazil)	x-vnd.Haiku-HaikuDepot	932372907
 Uninstall	PackageManager		Desinstalar
 Uninstalled	PackageListView		Não instalado
 Available packages	MainWindow		Pacotes disponíveis
@@ -52,7 +52,6 @@ Size	PackageListView		Tamanho
 All categories	FilterView		Todas as categorias
 n/a	PackageInfoView		n/a
 Cancel	MainWindow		Cancelar
-Tools	MainWindow		Ferramentas
 Language	RatePackageWindow		Idioma
 Log out	MainWindow		Sair
 Comment language:	RatePackageWindow		Idioma do comentário:

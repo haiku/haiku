@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-HaikuDepot	783803348
+1	thai	x-vnd.Haiku-HaikuDepot	840203303
 Repository update error	LocalRepositoryUpdateProcess		ข้อผิดพลาดการอัพเดตที่เก็บ
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		เกิดข้อผิดพลาดขณะรีเฟรชที่เก็บ: %error%
 User Created	UserLoginWindow		ผู้ใช้ถูกสร้างแล้ว
@@ -107,7 +107,6 @@ View agreed usage conditions…	MainWindow		ดูเงื่อนไขกา
 Cancel	MainWindow		ยกเลิก
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 more to download)}อื่นๆ{(# more to download)}}
 Refresh repositories	MainWindow		รีเฟรชการจัดเก็บ
-Tools	MainWindow		เครื่องมือ
 Continue	App		ต่อไป
 A password is required.	UserLoginWindow		ต้องการรหัสผ่าน
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		แพ็คเกจนี้ดูเหมือนจะไม่ได้อยู่ในเซิร์ฟเวอร์ HaikuDepot ดังนั้นจึงไม่สามารถสร้างการจัดอันดับใหม่หรือแก้ไขการจัดอันดับที่มีอยู่

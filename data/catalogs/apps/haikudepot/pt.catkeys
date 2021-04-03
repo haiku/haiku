@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-HaikuDepot	2792101273
+1	portuguese	x-vnd.Haiku-HaikuDepot	2848501228
 Repository update error	LocalRepositoryUpdateProcess		Erro na atualização de repositório
 Network error	ServerHelper		Erro de rede
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Ocorreu um erro ao atualizar o repositório: %error%
@@ -111,7 +111,6 @@ View agreed usage conditions…	MainWindow		Ver condições de utilização acor
 Cancel	MainWindow		Cancelar
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 mais para descarregar)}other{(# mais para descarregar)}}
 Refresh repositories	MainWindow		Atualizar repositórios
-Tools	MainWindow		Ferramentas
 Continue	App		Continuar
 A password is required.	UserLoginWindow		É necessária uma palavra-passe.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Este pacote parece não estar localizado no servidor HaikuDepot, pelo que não é possível criar uma nova avaliação ou editar uma já existente.

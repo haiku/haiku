@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-HaikuDepot	1476139633
+1	belarusian	x-vnd.Haiku-HaikuDepot	1532539588
 Uninstall	PackageManager		Выдаліць
 Uninstalled	PackageListView		Выдаленныя
 Rate package…	PackageInfoView		Ацаніць пакунак…
@@ -22,7 +22,6 @@ Downloading:	PackageInfoView		Спампоўваецца:
 Close	UserLoginWindow		Закрыць
 Close	RatePackageWindow		Закрыць
 n/a	PackageInfoView		н/н
-Tools	MainWindow		Прылады
 Status	PackageListView		Стан
 Unknown	PackageListView		Невядомы
 HaikuDepot	System name		HaikuDepot

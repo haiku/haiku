@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-HaikuDepot	2792101273
+1	dutch; flemish	x-vnd.Haiku-HaikuDepot	2848501228
 Repository update error	LocalRepositoryUpdateProcess		Fout bij updaten softwarebronnen
 Network error	ServerHelper		Netwerk fout
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Er is een fout opgetreden bij het verversen van de softwarebronnen: %error%
@@ -111,7 +111,6 @@ View agreed usage conditions…	MainWindow		Afgesproken gebruiksvoorwaarden beki
 Cancel	MainWindow		Annuleren
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(nog 1 om te downloaden)}other{(# meer om te downloaden)}}
 Refresh repositories	MainWindow		Pakketbronnen verversen
-Tools	MainWindow		Gereedschap
 Continue	App		Doorgaan
 A password is required.	UserLoginWindow		Een wachtwoord is vereist.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Dit pakket lijkt niet op de HaikuDepot-server aanwezig te zijn, waardoor het niet mogelijk is om een nieuwe beoordeling te maken of een bestaande beoordeling te bewerken.

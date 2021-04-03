@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-GLInfo	2211760527
+1	esperanto	x-vnd.Haiku-GLInfo	1282327690
 Maximum clipping planes	Capabilities		Maksimuma nombro da tondaj ebenoj
 Maximum evaluators equation order	Capabilities		Maksimuma ordo de ekvacia taksilo
 Texture stack size	Capabilities		Grandeco de tekstura stako
@@ -7,18 +7,21 @@ Information	InfoView		Informo
 Attributes stack size	Capabilities		Grandeco de atribua stako
 Maximum lights	Capabilities		Maksimuma nombro da lumiloj
 Extensions	Extensions		Kromaĵoj
-Available extensions	Extensions		Disponeblaj rromaĵoj
+Available extensions	Extensions		Disponeblaj kromaĵoj
 Maximum recommended vertex elements	Capabilities		Maksimuma nombro da rekomenditaj verticaj eroj
 Value	Capabilities		Valoro
 Name stack size	Capabilities		Grandeco de noma stako
 Capabilities	Capabilities		Kapabloj
 Maximum texture units	Capabilities		Maksimumo de teksturaj blokoj
+Unknown or missing OpenGL renderer.	InfoView		Forestanta aŭ nekonata bildigilo de OpenGL.
 Capability	Capabilities		Kapableco
 Maximum 2D texture size	Capabilities		Maksimuma grandeco da dudimensia teksturo
 Auxiliary buffer(s)	Capabilities		Neĉefa(j) bufro(j)
+Unknown vendor	InfoView		Nekonata produktanto
 Maximum convolution	Capabilities		Maksimuma konvolvadoaĵo
 Maximum 3D texture size	Capabilities		Maksimuma grandeco de tridimensia teksturo
 Maximum recommended index elements	Capabilities		Maksimuma nombro da rekomenditaj indeksaj eroj
+Unknown version	InfoView		Nekonata versio
 List stack size	Capabilities		Grandeco de lista stako
 Model stack size	Capabilities		Grandeco de modela stako
 Projection stack size	Capabilities		Grandeco de projekcia stako

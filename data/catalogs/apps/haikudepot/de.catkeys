@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-HaikuDepot	412302812
+1	german	x-vnd.Haiku-HaikuDepot	908828196
 Repository update error	LocalRepositoryUpdateProcess		Fehler bei Paketquellenaktualisierung
 Network error	ServerHelper		Netzwerk Fehler
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Fehler bei der Aktualisierung der Paketquelle: %error%
@@ -24,6 +24,7 @@ Rating	PackageListView		Bewertung
 Synchronizing icons	ServerIconExportUpdateProcess		Synchronisierungs-Icons
 Show	MainWindow		Anzeigen
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Fehler beim Beschaffen der Paketliste: %message%
+Settings…	MainWindow		Einstellungen…
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Um richtig zu funktionieren, muss diese Anwendung Arbeitsdateien schreiben bzw. lesen können. Eine Testdatei konnte jedoch nicht nach [%TestFilePath%] geschrieben werden. Bitte prüfen, ob es Probleme mit der lokalen Festplatte gibt oder ob für diesen Ordner nötige Schreibrechte fehlen. Dieses Problem kann zwar ignoriert werden, allerdings wird die Anwendung dann nur eingeschränkt funktionieren.
 Active	PackageListView		Aktiviert
 Login or Create account	MainWindow		Anmelden oder Benutzerkonto anlegen
@@ -77,6 +78,7 @@ Send	RatePackageWindow		Senden
 Start package daemon	App		Paket-Daemon starten
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Das Kennwort muss wiederholt werden, um die Wahrscheinlichket einer Falscheingabe zu verringern.
 The package action could not be scheduled: %Error%	PackageInfoView		Die Aktion konnte nicht auf das Paket angewandt werden: %Error%
+Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer?  You can change your preference in the \"Settings\" window later.	MainWindow		Dürfen anonyme Nutzuungsdaten von diesem Computer an den HaikuDepotServer geschickt werden? Die Option kann jederzeit im \"Einstellungen\" Fenster geändert werden.
 Cancel	RatePackageWindow		Abbrechen
 Inactive	PackageListView		Deaktiviert
 Nickname:	UserLoginWindow		Benutzername:
@@ -88,6 +90,7 @@ Usage conditions download problem	UserLoginWindow		Problem beim Herunterladen de
 OK	PackageInfoView		OK
 Downloading:	PackageInfoView		Aktueller Download:
 Success	UserLoginWindow		Erfolg
+No	MainWindow		Nein
 Package daemon problem	App		Paket Daemon Problem
 (%Votes%)	PackageInfoView		(%Votes%)
 Repository	PackageListView		Paketquelle
@@ -113,7 +116,6 @@ View agreed usage conditions…	MainWindow		Zugestimmte Nutzungsbedingungen lese
 Cancel	MainWindow		Abbrechen
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 weiterer Download)}other{(# weitere Downloads)}}
 Refresh repositories	MainWindow		Paketquellen aktualisieren
-Tools	MainWindow		Werkzeuge
 Continue	App		Weiter
 A password is required.	UserLoginWindow		Es wird ein Kennwort benötigt.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Dieses Paket scheint nicht auf dem HaikuDepot Server zu sein. Es ist daher nicht möglich eine neue Bewertung abzugeben, bzw. eine bestehende zu ändern.
@@ -143,11 +145,13 @@ Try again	App		Nochmal versuchen
 Unknown	PackageListView		Unbekannt
 I agree to the usage conditions	UserLoginWindow		I stimme den Nutzungsbedingungen zu
 Log in	UserLoginWindow		Anmelden
+Sending anonymous usage data	MainWindow		Sende anonyme Nutzungsdaten
 Logged in as %User%	MainWindow		Angemeldet als %User%
 Email address:	UserLoginWindow		E-Mail-Adresse:
 Screenshot	ScreenshotWindow		Bildschirmfoto
 A reboot is necessary to complete the installation process.	PackageManager		Um die Installation abzuschließen, muss Haiku neu gestartet werden.
 HaikuDepot	System name		HaikuDepot
+Yes	MainWindow		Ja
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{Ich bin mindestens 1 Jahr alt}other{Ich bin # Jahre oder älter}}
 View latest usage conditions…	MainWindow		Aktuelle Nutzungsbedingungen lesen…
 Quit	App		Beenden

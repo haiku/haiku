@@ -1,12 +1,14 @@
-1	hungarian	x-vnd.Haiku-Mandelbrot	3875916167
+1	hungarian	x-vnd.Haiku-Mandelbrot	2302392624
 Grassland	MandelbrotWindow		Legelő
 Tricorn	MandelbrotWindow		Tricorn
 Orbit Trap	MandelbrotWindow		Körkörös csapda
 Deepfrost	MandelbrotWindow		Mély fagy
 1 (none)	MandelbrotWindow		1 (nincs)
 Quit	MandelbrotWindow		Kilépés
+Save as image…	MandelbrotWindow		Mentés képként…
 Fire	MandelbrotWindow		Tűz
 High contrast	MandelbrotWindow		Magas kontraszt
+Full screen	MandelbrotWindow		Teljesképernyő
 Midnight	MandelbrotWindow		Éjfél
 Burning Ship	MandelbrotWindow		Égő hajó
 Lightning	MandelbrotWindow		Villám
@@ -18,6 +20,7 @@ Subsampling	MandelbrotWindow		Színfelbontás
 File	MandelbrotWindow		Fájl
 Julia	MandelbrotWindow		Júlia
 Frost	MandelbrotWindow		Zúzmara
+View	MandelbrotWindow		Nézet
 Mandelbrot	System name		Mandelbrot
 Multibrot	MandelbrotWindow		Multibrot
 Iterations	MandelbrotWindow		Iterációk

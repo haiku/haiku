@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-HaikuDepot	783803348
+1	indonesian	x-vnd.Haiku-HaikuDepot	840203303
 Repository update error	LocalRepositoryUpdateProcess		Kesalahan pembaruan repositori
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Terjadi kesalahan saat menyegarkan repositori: %error%
 User Created	UserLoginWindow		Pengguna Dibuat
@@ -107,7 +107,6 @@ View agreed usage conditions…	MainWindow		Lihat ketentuan penggunaan yang dise
 Cancel	MainWindow		Batal
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 more to download)}other{(# more to download)}}
 Refresh repositories	MainWindow		Muat-ulang repositori
-Tools	MainWindow		Perkakas
 Continue	App		Terus
 A password is required.	UserLoginWindow		Diperlukan kata sandi.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Paket ini sepertinya tidak ada di Server HaikuDepot, jadi tidak mungkin membuat peringkat baru atau mengedit peringkat yang sudah ada.

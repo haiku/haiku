@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-libtracker	2498612740
+1	esperanto	x-vnd.Haiku-libtracker	3380227078
 Created	ContainerWindow		Kreita
 Icon	AttributesView		Piktogramo
 Open and make preferred	OpenWithWindow		Uzi kaj igi preferata
@@ -6,6 +6,7 @@ Kind	ContainerWindow		Speco
 Open with…	ContainerWindow		Uzi per…
 Error moving \"%name\" to Trash. (%error)	FSUtils		Eraro de movo de \"%name\" al Rubujo. (%error)
 Or	FindPanel		Aŭ
+MIME Description	AttributesView		Priskribo per MIME
 before	FindPanel		antaŭ
 Volume icons	TrackerSettingsWindow		Piktogramoj de volumoj
 Ignore case	SelectionWindow		Malatenti usklecon
@@ -329,6 +330,7 @@ Recent folders	FavoritesMenu		Ĵusaj dosierujoj
 Signed memory size	AttributesView		Signuma memorogrando
 The specified name is illegal. Please choose another name.	FilePanelPriv		La specifita nomo kontraŭleĝas. Bonvolu elekti alian nomon.
 of %items	StatusWindow		de %items
+MIME Path	AttributesView		Itinero de MIME
 less than	FindPanel		malpli ol
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Eraris kopiante dosieron de \"%name\":\n\t%error\n\nĈu vi volas daŭrigi?
 Creating links: 	StatusWindow		Kreante ligilojn: 
@@ -443,6 +445,7 @@ Sorry, saving more than one item is not allowed.	FilePanelPriv		Bedaŭron, konse
 Move here	ContainerWindow		Movi ĉi tien
 the config folder	FSUtils		la config dosierujo
 Sorry, could not create a new folder.	FSUtils		Bedaŭron, neeblis krei novan dosierujon.
+MIME Signature	AttributesView		Subskribo de MIME
 Select all	VirtualDirectoryWindow		Elekti ĉion
 Rename	FSUtils	button label	Renomi
 Clean up all	ContainerWindow		Alkradigi ĉion

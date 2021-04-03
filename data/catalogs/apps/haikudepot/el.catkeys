@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-HaikuDepot	783803348
+1	greek, modern (1453-)	x-vnd.Haiku-HaikuDepot	840203303
 Repository update error	LocalRepositoryUpdateProcess		Σφάλμα ενημέρωσης αποθετηρίων
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Προέκυψε ένα σφάλμα κατά την ανανέωση του αποθετηρίου: %error%
 User Created	UserLoginWindow		Χρήστης Δημιουργήθηκε
@@ -107,7 +107,6 @@ View agreed usage conditions…	MainWindow		Προβολή συμφωνημέν�
 Cancel	MainWindow		Ακύρωση
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(Παραμένει 1 ακόμα)}other{(Παραμένουν # ακόμα)}}
 Refresh repositories	MainWindow		Ανανέωση αποθετηρίων
-Tools	MainWindow		Εργαλεία
 Continue	App		Συνέχεια
 A password is required.	UserLoginWindow		Απαιτείται κωδικός πρόσβασης.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Αυτό το πακέτο δεν φαίνεται να υπάρχει στον διακομιστή του HaikuDepot, άρα δεν μπορείτε να δημιουργήσετε μία νέα ή να επεξεργαστείτε μία προϋπάρχουσα αξιολόγηση.

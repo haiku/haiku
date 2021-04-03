@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-HaikuDepot	783803348
+1	russian	x-vnd.Haiku-HaikuDepot	840203303
 Repository update error	LocalRepositoryUpdateProcess		Ошибка обновления репозитория
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Произошла ошибка при обновлении репозитория: %error%
 User Created	UserLoginWindow		Пользователь создан
@@ -107,7 +107,6 @@ View agreed usage conditions…	MainWindow		Показать согласова�
 Cancel	MainWindow		Отмена
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{( осталось скачать # пакет)}few{( осталось скачать # пакета)}other{( осталось скачать # пакетов)}}
 Refresh repositories	MainWindow		Обновить репозитории
-Tools	MainWindow		Инструменты
 Continue	App		Продолжить
 A password is required.	UserLoginWindow		Требуется пароль.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Похоже, что этого пакета нет на сервере HaikuDepot из-за чего создать новый рейтинг или изменить существующий невозможно.

@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-HaikuDepot	412302812
+1	friulian	x-vnd.Haiku-HaikuDepot	468702767
 Repository update error	LocalRepositoryUpdateProcess		Erôr di inzornament dal dipuesit
 Network error	ServerHelper		Erôr di rêt
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Si è verificât un erôr intal inzornâ il dipuesit: %error%
@@ -113,7 +113,6 @@ View agreed usage conditions…	MainWindow		Viôt lis cundizions di ûs acetadis
 Cancel	MainWindow		Anule
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(ancjemò 1 discjariament)}other{(ancjemò # discjariaments)}}
 Refresh repositories	MainWindow		Inzorne dipuesits
-Tools	MainWindow		Struments
 Continue	App		Continue
 A password is required.	UserLoginWindow		E je necessarie une peraule d'ordin.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Chest pachet nol semee esisti sul servidôr HaikuDepot, duncje nol è pussibil creâ une gnove valutazion o modificâ une esistente.

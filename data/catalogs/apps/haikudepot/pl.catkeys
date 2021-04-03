@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-HaikuDepot	783803348
+1	polish	x-vnd.Haiku-HaikuDepot	840203303
 Repository update error	LocalRepositoryUpdateProcess		Błąd podczas odświeżania repozytorium
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Wystąpił błąd podczas odświeżania repozytorium: %error%
 User Created	UserLoginWindow		Użytkownik utworzony
@@ -107,7 +107,6 @@ View agreed usage conditions…	MainWindow		Zobacz zaakceptowane warunki korzyst
 Cancel	MainWindow		Anuluj
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural, one{(1 więcej do pobrania)} other{(# więcej do pobrania)}}
 Refresh repositories	MainWindow		Odśwież repozytoria
-Tools	MainWindow		Narzędzia
 Continue	App		Kontynuuj
 A password is required.	UserLoginWindow		Hasło jest wymagane.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Tego pakietu nie znaleziono na HaikuDepot Server, więc dodanie oceny lub edytowanie istniejącej nie jest możliwe.

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-HaikuDepot	412302812
+1	ukrainian	x-vnd.Haiku-HaikuDepot	468702767
 Repository update error	LocalRepositoryUpdateProcess		Помилка оновлення репозитарія 
 Network error	ServerHelper		Помилка мережі
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Під час оновлення репозитарія сталася помилка: %error%
@@ -113,7 +113,6 @@ View agreed usage conditions…	MainWindow		Погоджені Умови кор
 Cancel	MainWindow		Скасувати
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 більше для завантаження)}other{(# більше для завантаження)}}
 Refresh repositories	MainWindow		Оновити репозитарії
-Tools	MainWindow		Інструменти
 Continue	App		Продовжити
 A password is required.	UserLoginWindow		Потрібен пароль.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Цей пакет, здається, не знаходиться на HaikuDepot Server, тому неможливо створити нову оцінку або відредагувати існуючу.

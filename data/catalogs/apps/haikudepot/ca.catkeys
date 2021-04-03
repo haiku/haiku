@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-HaikuDepot	412302812
+1	catalan; valencian	x-vnd.Haiku-HaikuDepot	908828196
 Repository update error	LocalRepositoryUpdateProcess		Error d'actualització del repositori
 Network error	ServerHelper		Error de xarxa
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Hi ha hagut un error en actualitzar el repositori: %error%
@@ -24,6 +24,7 @@ Rating	PackageListView		Puntuació
 Synchronizing icons	ServerIconExportUpdateProcess		Sincronització de les icones
 Show	MainWindow		Mostra...
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Hi ha hagut un error en obtenir la llista de paquets: %message%
+Settings…	MainWindow		Paràmetres...
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Aquesta aplicació escriu i llegeix alguns fitxers de treball de l'ordinador per tal de funcionar. Sembla que hi ha problemes per escriure un fitxer de prova a [%TestFilePath%]. Comproveu que no hi ha cap problema amb el disc local o els permisos que pugui evitar que aquesta aplicació escrigui fitxers a la ubicació del directori. Podeu optar per reconèixer aquest problema i continuar, però és possible que alguna funcionalitat estigui inhabilitada.
 Active	PackageListView		Actiu
 Login or Create account	MainWindow		Entreu o creeu-ne un compte
@@ -77,6 +78,7 @@ Send	RatePackageWindow		Envia
 Start package daemon	App		Inicia el dimoni de paquets
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Cal repetir la contrasenya per reduir la possibilitat d’introduir-la incorrectament.
 The package action could not be scheduled: %Error%	PackageInfoView		L'acció del paquet no s'ha pogut programar: %Error%
+Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer?  You can change your preference in the \"Settings\" window later.	MainWindow		Seria acceptable enviar dades d’ús anònimes al sistema HaikuDepotServer d’aquest ordinador? En podeu canviar les preferències a la finestra de Paràmetres més endavant.
 Cancel	RatePackageWindow		Cancel·la
 Inactive	PackageListView		Inactiu
 Nickname:	UserLoginWindow		Sobrenom:
@@ -88,6 +90,7 @@ Usage conditions download problem	UserLoginWindow		Problema de descàrrega de le
 OK	PackageInfoView		D'acord
 Downloading:	PackageInfoView		Es baixa:
 Success	UserLoginWindow		Correcte
+No	MainWindow		No
 Package daemon problem	App		Problema amb el dimoni de paquets
 (%Votes%)	PackageInfoView		(%Votes%)
 Repository	PackageListView		Repositori
@@ -113,7 +116,6 @@ View agreed usage conditions…	MainWindow		Consulteu les condicions d’ús aco
 Cancel	MainWindow		Cancel·la
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 més per baixar)}other{(# més per baixar)}}
 Refresh repositories	MainWindow		Actualitza els repositoris
-Tools	MainWindow		Eines
 Continue	App		Continua
 A password is required.	UserLoginWindow		Cal una contrasenya.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Sembla que aquest paquet no és al servidor del Dipòsit del Haiku, per la qual cosa no és possible crear una puntuació nova ni editar-ne una d'existent.
@@ -143,11 +145,13 @@ Try again	App		Torneu-ho a provar
 Unknown	PackageListView		Desconegut
 I agree to the usage conditions	UserLoginWindow		Estic d’acord en les condicions d’ús.
 Log in	UserLoginWindow		Entreu
+Sending anonymous usage data	MainWindow		S'envien dades d'ús anònimes
 Logged in as %User%	MainWindow		Heu entrat com a %User%.
 Email address:	UserLoginWindow		Adreça electrònica:
 Screenshot	ScreenshotWindow		Captura de pantalla
 A reboot is necessary to complete the installation process.	PackageManager		Cal reiniciar per completar el procés d’instal·lació.
 HaikuDepot	System name		Dipòsit del Haiku
+Yes	MainWindow		Sí
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{Tinc com a mínim un any.}other{Tinc # anys o més.}}
 View latest usage conditions…	MainWindow		Consulteu les darreres condicions d'ús...
 Quit	App		Surt

@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-DriveSetup	4058081081
+1	romanian	x-vnd.Haiku-DriveSetup	4048496535
 Could not unmount partition %s.	MainWindow		Nu se poate demonta partiția %s.
 Mount all	MainWindow		Montează tot
 Disk	MainWindow		Disc
@@ -51,6 +51,7 @@ Wipe (not implemented)	MainWindow		Ștergere (nu este implementat)
 The currently selected partition does not have a parent partition.	MainWindow		Partiția selectată curent nu are o partiție superioară.
 Validation of the given initialization parameters failed.	MainWindow		Validarea parametrilor de inițializare furnizați a eșuat.
 Not formatted (%s)	PartitionList		Nu este formatat (%s)
+Failed to create the partition. No changes have been written to disk.	MainWindow		Nu s-a putut crea partiția. Nu au fost scrise modificări pe disc.
 Shared	PartitionList		Partajat
 MIMEs	PartitionList		MIME-uri
 BitLocker encrypted	Encryption utils		Criptat BitLocker

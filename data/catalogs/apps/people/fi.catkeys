@@ -1,5 +1,6 @@
-1	finnish	x-vnd.Be-PEPL	2332202134
+1	finnish	x-vnd.Be-PEPL	2634915100
 Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Tiedostotyypit-asetusohjelman käynnistäminen Henkilö-attribuuttien asettamiseksi epäonnistui.\n\nVirhe: 
+Mobile phone	People		Kännykkä
 Unnamed person	People		Nimetön henkilö
 New person…	People		Uusi henkilö...
 Address	People		Osoite

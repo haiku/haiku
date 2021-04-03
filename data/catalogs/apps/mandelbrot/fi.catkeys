@@ -1,12 +1,14 @@
-1	finnish	x-vnd.Haiku-Mandelbrot	3875916167
+1	finnish	x-vnd.Haiku-Mandelbrot	2302392624
 Grassland	MandelbrotWindow		Grassland
 Tricorn	MandelbrotWindow		Kolmijyväinen
 Orbit Trap	MandelbrotWindow		Kehäansa
 Deepfrost	MandelbrotWindow		Syväjäätynyt
 1 (none)	MandelbrotWindow		1 (ei mitään)
 Quit	MandelbrotWindow		Poistu
+Save as image…	MandelbrotWindow		Tallenna kuvana…
 Fire	MandelbrotWindow		Tuli
 High contrast	MandelbrotWindow		Korkea kontrasti
+Full screen	MandelbrotWindow		Kokoruutunäyttö
 Midnight	MandelbrotWindow		Keskiyö
 Burning Ship	MandelbrotWindow		Palava laiva
 Lightning	MandelbrotWindow		Salamointi
@@ -18,6 +20,7 @@ Subsampling	MandelbrotWindow		Alinäyte
 File	MandelbrotWindow		Tiedosto
 Julia	MandelbrotWindow		Julia
 Frost	MandelbrotWindow		Pakkanen
+View	MandelbrotWindow		Näkymä
 Mandelbrot	System name		Mandelbrot
 Multibrot	MandelbrotWindow		Multibrot
 Iterations	MandelbrotWindow		Kertaukset

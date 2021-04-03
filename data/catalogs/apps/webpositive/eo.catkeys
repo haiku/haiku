@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-WebPositive	1976607515
+1	esperanto	x-vnd.Haiku-WebPositive	250728390
 Authentication required	Authentication Panel		Aŭtentigo nepra
 Previous	WebPositive Window		Antaŭa
 (Finish: %date)	Download Window		(Fino: %date)
@@ -101,6 +101,7 @@ There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPosi
 Revert	Settings Window		Malfari
 Copy	WebPositive Window		Kopii
 Default standard font size:	Settings Window		Defaŭlta grado de implica tiparo:
+Custom	Settings Window		Adaptita
 Bookmark this page	WebPositive Window		Konservi ligilon de ĉi paĝo
 Show tabs if only one page is open	Settings Window		Montri panelon de langetoj eĉ se nur unu paĝo estas uzata
 Close tab	WebPositive Window		Fermi langeton

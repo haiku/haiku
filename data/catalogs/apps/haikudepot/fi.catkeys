@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-HaikuDepot	412302812
+1	finnish	x-vnd.Haiku-HaikuDepot	908828196
 Repository update error	LocalRepositoryUpdateProcess		Tietovaraston päivitysvirhe
 Network error	ServerHelper		Verkkovirhe
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Tietovaraston päivityksen yhteydessä tapahtui virhe: %error%
@@ -24,6 +24,7 @@ Rating	PackageListView		Arvosana
 Synchronizing icons	ServerIconExportUpdateProcess		Synkronoidaan kuvakkeet
 Show	MainWindow		Näytä
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Pakkausluettelon hankkimisessa tapahtui virhe: %message%
+Settings…	MainWindow		Asetukset…
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Tämä sovellus kirjoittaa ja lukee joitakin työtiedostoja tietokoneellasi toiminnan tarkistamiseksi. Näyttää, että testaustiedoston kirjoittamisessa  osoitteeseen [%TestFilePath%] on pulmia. Tarkista, että paikallisella levyasemallasi ei ole pulmia tai että käyttöoikeudet eivät estä tätä sovellusta kirjoittamasta tuohon hakemistosijaintiin. Voit kuitata tämän pulman ja jatkaa, mutta joku toiminnallisuus on poissa käytöstä.
 Active	PackageListView		Käytössä
 Login or Create account	MainWindow		Kirjaudu tai luo tili
@@ -77,6 +78,7 @@ Send	RatePackageWindow		Lähetä
 Start package daemon	App		Käynnistä pakkaustaustaprosessi
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Salasana on toistettava sen mahdollisuuden pienentämiseksi, että se on kirjoitettu väärin.
 The package action could not be scheduled: %Error%	PackageInfoView		Pakkaustoiminnon aikatauluttaminen epäonnistui: %Error%
+Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer?  You can change your preference in the \"Settings\" window later.	MainWindow		Hyväksytkö nimettömien tietojen lähettämisen HaikuDepotServer-järjestelmään tältä tietokoneelta?  Voit muuttaa asetuksiasi \"Asetukset\"-ikkunassa myöhemmin.
 Cancel	RatePackageWindow		Peru
 Inactive	PackageListView		Ei käytössä
 Nickname:	UserLoginWindow		Käyttäjätunnus:
@@ -88,6 +90,7 @@ Usage conditions download problem	UserLoginWindow		Käyttöehtojen latauspulma
 OK	PackageInfoView		Valmis
 Downloading:	PackageInfoView		Ladataan:
 Success	UserLoginWindow		Valmis
+No	MainWindow		Ei
 Package daemon problem	App		Pakkaustaustaprosessipulma
 (%Votes%)	PackageInfoView		(%Votes%)
 Repository	PackageListView		Tietovarasto
@@ -113,7 +116,6 @@ View agreed usage conditions…	MainWindow		Katso hyväksyttyjä käyttöehtoja�
 Cancel	MainWindow		Peru
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 lisää ladattavaksi)}other{(# lisää ladattavaksi)}}
 Refresh repositories	MainWindow		Virkistä tietovarastoja
-Tools	MainWindow		Työkalut
 Continue	App		Jatka
 A password is required.	UserLoginWindow		Vaaditaan salasana.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Tämä pakkaus ei näytä olevan HaikuDepot-palvelimella, joten ei ole mahdollista luoda sille uutta arvosanaa tai muokata olemassaolevaa arvosanaa.
@@ -143,11 +145,13 @@ Try again	App		Yritä uudelleen
 Unknown	PackageListView		Tuntematon
 I agree to the usage conditions	UserLoginWindow		Hyväksyn käyttöehdot
 Log in	UserLoginWindow		Kirjaudu
+Sending anonymous usage data	MainWindow		Nimettömien käyttötietojen lähettäminen
 Logged in as %User%	MainWindow		Kirjautuneena tunnuksella %User%
 Email address:	UserLoginWindow		Sähköpostiosoite:
 Screenshot	ScreenshotWindow		Kuvakaappaus
 A reboot is necessary to complete the installation process.	PackageManager		Asennusprosessin päättäminen vaatii uudelleenkäynnistämisen.
 HaikuDepot	System name		HaikuVarasto
+Yes	MainWindow		Kyllä
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{Olen vähintään vuoden ikäinen}other{Olen # vuotias tai vanhempi}}
 View latest usage conditions…	MainWindow		Katso viimeisimmät käyttöehdot…
 Quit	App		Poistu

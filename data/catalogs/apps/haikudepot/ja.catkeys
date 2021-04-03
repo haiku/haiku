@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	412302812
+1	japanese	x-vnd.Haiku-HaikuDepot	908828196
 Repository update error	LocalRepositoryUpdateProcess		リポジトリアップデートエラー
 Network error	ServerHelper		ネットワークエラー
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		リポジトリの更新中に次のエラーが発生しました: %error%
@@ -24,6 +24,7 @@ Rating	PackageListView		評価
 Synchronizing icons	ServerIconExportUpdateProcess		アイコンを同期しています。
 Show	MainWindow		表示
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		パッケージリストの取得中にエラーが発生しました: %message%
+Settings…	MainWindow		設定…
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		このアプリケーションは動作するためにあなたのコンピューター上のいくつかの作業ファイルを読み書きします。テストファイルの [%TestFilePath%] への書込みに問題があるようです。ローカルディスクに問題がないことや、そのディレクトリにアプリケーションが書込みできない権限になっているかをチェックしてください。この問題を認識して続行することもできますが、いくつかの機能が無効となるかもしれません。
 Active	PackageListView		有効
 Login or Create account	MainWindow		ログインまたはアカウントの作成
@@ -77,6 +78,7 @@ Send	RatePackageWindow		送信する
 Start package daemon	App		パッケージデーモンを起動
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		間違って入力する可能性を減らすため、パスワードを繰り返す必要があります。
 The package action could not be scheduled: %Error%	PackageInfoView		パッケージアクションを予約できませんでした: %Error%
+Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer?  You can change your preference in the \"Settings\" window later.	MainWindow		このコンピューターから匿名の使用状況データーをHaikuDepotServerシステムに送信することを受け入れますか? \"設定\" ウインドウであとから設定を変更できます。
 Cancel	RatePackageWindow		中止
 Inactive	PackageListView		無効
 Nickname:	UserLoginWindow		ニックネーム:
@@ -88,6 +90,7 @@ Usage conditions download problem	UserLoginWindow		使用条件のダウンロ�
 OK	PackageInfoView		OK
 Downloading:	PackageInfoView		ダウンロード中:
 Success	UserLoginWindow		成功
+No	MainWindow		いいえ
 Package daemon problem	App		パッケージデーモンの問題
 (%Votes%)	PackageInfoView		(%Votes%)
 Repository	PackageListView		リポジトリ
@@ -113,7 +116,6 @@ View agreed usage conditions…	MainWindow		同意した使用条件を見る…
 Cancel	MainWindow		中止
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 個以上のダウンロード)}other{(# 個以上のダウンロード)}}
 Refresh repositories	MainWindow		リポジトリの更新
-Tools	MainWindow		ツール
 Continue	App		続行
 A password is required.	UserLoginWindow		パスワードが必要です。
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		このパッケージは HaikuDepot Server 上には無いようです。従って新規の評価の作成や既存の評価の更新はできません。
@@ -143,11 +145,13 @@ Try again	App		再試行
 Unknown	PackageListView		不明
 I agree to the usage conditions	UserLoginWindow		使用条件に同意します
 Log in	UserLoginWindow		ログイン
+Sending anonymous usage data	MainWindow		匿名の使用状況データーを送信する
 Logged in as %User%	MainWindow		%User% としてログイン
 Email address:	UserLoginWindow		メールアドレス:
 Screenshot	ScreenshotWindow		スクリーンショット
 A reboot is necessary to complete the installation process.	PackageManager		インストールプロセスを完了するには再起動が必要です。
 HaikuDepot	System name		HaikuDepot
+Yes	MainWindow		はい
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{私は少なくとも 1 歳です}other{私は # 歳以上です}}
 View latest usage conditions…	MainWindow		最新の使用条件を見る…
 Quit	App		終了

@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-HaikuDepot	2792101273
+1	danish	x-vnd.Haiku-HaikuDepot	2848501228
 Repository update error	LocalRepositoryUpdateProcess		Fejl ved opdatering af softwarekilde
 Network error	ServerHelper		Fejl ved netværk
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Der opstod en fejl under opdatering af softwarekilden: %error%
@@ -111,7 +111,6 @@ View agreed usage conditions…	MainWindow		Vis aftalte anvendelsesbetingelser�
 Cancel	MainWindow		Annuller
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 mere at downloade)}other{(# mere at downloade)}}
 Refresh repositories	MainWindow		Genopfrisk softwarekilder
-Tools	MainWindow		Værktøjer
 Continue	App		Fortsæt
 A password is required.	UserLoginWindow		Der kræves en adgangskode.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Pakken ser ikke ud til at være på Haikudepot-serveren, så det er ikke muligt at oprette en ny bedømmelse eller redigere end eksisterende bedømmelse.

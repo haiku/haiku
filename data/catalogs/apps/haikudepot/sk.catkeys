@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-HaikuDepot	1218052217
+1	slovak	x-vnd.Haiku-HaikuDepot	1274452172
 Uninstall	PackageManager		Odinštalovať
 Uninstalled	PackageListView		Odinštalované
 Available packages	MainWindow		Dostupné balíky
@@ -54,7 +54,6 @@ All categories	FilterView		Všetky kategórie
 n/a	PackageInfoView		n/a
 Cancel	MainWindow		Zrušiť
 Refresh repositories	MainWindow		Obnoviť zdroje softvéru
-Tools	MainWindow		Nástroje
 Language	RatePackageWindow		Jazyk
 Log out	MainWindow		Odhlásiť sa
 Comment language:	RatePackageWindow		Jazyk komentára:

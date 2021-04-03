@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	364897767
+1	hungarian	x-vnd.Haiku-HaikuDepot	421297722
 Repository update error	LocalRepositoryUpdateProcess		Tároló frissítési hiba
 Network error	ServerHelper		Hálózati hiba
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Hiba történt a tároló frissítésekor: %error%
@@ -100,7 +100,6 @@ View agreed usage conditions…	MainWindow		Jóváhagyott felhasználási felté
 Cancel	MainWindow		Mégse
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(még 1 letöltés)}other{(még # letöltés)}}
 Refresh repositories	MainWindow		Tárolók frissítése
-Tools	MainWindow		Eszközök
 Continue	App		Folytatás
 A password is required.	UserLoginWindow		Jelszó szükséges.
 Language	RatePackageWindow		Nyelv

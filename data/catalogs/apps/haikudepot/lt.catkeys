@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-HaikuDepot	1476139633
+1	lithuanian	x-vnd.Haiku-HaikuDepot	1532539588
 Uninstall	PackageManager		Išdiegti
 Uninstalled	PackageListView		Išdiegti
 Rate package…	PackageInfoView		Įvertinti paketą…
@@ -22,7 +22,6 @@ Downloading:	PackageInfoView		Parsiunčiamas:
 Close	UserLoginWindow		Užverti
 Close	RatePackageWindow		Užverti
 n/a	PackageInfoView		n/d
-Tools	MainWindow		Priemonės
 Status	PackageListView		Būsena
 Unknown	PackageListView		Nežinoma
 HaikuDepot	System name		Paketų tvarkytuvė

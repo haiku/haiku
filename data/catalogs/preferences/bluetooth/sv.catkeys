@@ -34,13 +34,13 @@ Pick device…	Settings view		Välj enhet…
 Always ask	Settings view		Fråga alltid
 With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped…\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		Med stöd av:\n- Mika Lindqvist\n- Adrien Destugues\n- Maksym Yevmenkin\n\nTack till alla som hjälpte till…\n\nAtt donera hårdvara:\n- Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n- Edwin Erik Amsler\n- Dennis d'Entremont\n- Luroh\n- Pieter Panman\n\nEkonomiskt:\n- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n- Matt M, Doug F, Hubert H,\n- Sebastian B, Andrew M, Jared E,\n- Frederik H, Tom S, Ferry B,\n- Greg G, David F, Richard S, Martin W:\n\nMed patchar:\n- Michael Weirauch\n- Fredrik Ekdahl\n- Raynald Lesieur\n- Andreas Färber\n- Joerg Meyer\nTesting:\n- Petter H. Juliussen\nSom gav mig all deras kunskap:\n- the yellowTAB team
 Help	Window		Hjälp
-Pair…	Remote devices		Par…
+Pair…	Remote devices		Para…
 Retrieving name of %1	Inquiry panel		Hämtar namn från %1
-Inquiry	Inquiry panel		Förfrågan
+Inquiry	Inquiry panel		Sök
 Incoming connections policy:	Settings view		Policy för inkommande förbindelser:
 Retrieving names…	Inquiry panel		Hämtar namn…
 Show name	Extended local device view		Visa namn
-Add device to list	Inquiry panel		Lägg till enhet till istan
+Add device to list	Inquiry panel		Lägg till enhet i listan
 Remaining %1 seconds	Inquiry panel		Återstår %1 sekunder
 The Bluetooth services are not currently running on this system.	main		Bluetoothtjänsten körs för närvarande inte på detta system.
 Discoverable	Extended local device view		Synlig

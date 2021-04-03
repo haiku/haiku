@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-HaikuDepot	412302812
+1	romanian	x-vnd.Haiku-HaikuDepot	908828196
 Repository update error	LocalRepositoryUpdateProcess		Eroare la actualizarea depozitului
 Network error	ServerHelper		Eroare de rețea
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		A apărut o eroare în timpul reîmprospătării depozitului: %error%
@@ -24,6 +24,7 @@ Rating	PackageListView		Evaluare
 Synchronizing icons	ServerIconExportUpdateProcess		Se sincronizează iconițele
 Show	MainWindow		Arată
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		A apărut o eroare în timpul obținerii listei de pachete: %message%
+Settings…	MainWindow		Configurări…
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Această aplicație scrie și citește unele fișiere care lucrează pe calculator pentru a funcționa. Se pare că există probleme la scrierea unui fișier test la [%TestFilePath%]. Verificați dacă nu sunt probleme cu discul local sau cu permisiunile care ar putea preveni acestei aplicații să scrie fișiere în locația aceea de director. Puteți alege să admiteți această problemă și să continuați, dar unele funcționalități pot fi dezactivate.
 Active	PackageListView		Activ
 Login or Create account	MainWindow		Autentificare sau Creare cont
@@ -77,6 +78,7 @@ Send	RatePackageWindow		Trimitere
 Start package daemon	App		Pornire demon de pachet
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Parola trebuie să fie repetată pentru a reduce șansa de a introduce parola incorect.
 The package action could not be scheduled: %Error%	PackageInfoView		Actiunea pachetului n-a putut fi programată: %Error%
+Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer?  You can change your preference in the \"Settings\" window later.	MainWindow		Ar fi acceptabil să se trimită date de utilizare anonime către sistemul HaikuDepotServer de la acest calculator?  Puteți modifica preferința în fereastra \„Configurări\” mai târziu.
 Cancel	RatePackageWindow		Anulează
 Inactive	PackageListView		Inactiv
 Nickname:	UserLoginWindow		Pseudonim:
@@ -88,6 +90,7 @@ Usage conditions download problem	UserLoginWindow		Problemă de descărcare a co
 OK	PackageInfoView		OK
 Downloading:	PackageInfoView		Se descarcă:
 Success	UserLoginWindow		Succes
+No	MainWindow		Nu
 Package daemon problem	App		Problemă la serviciul pachetului
 (%Votes%)	PackageInfoView		(%Votes%)
 Repository	PackageListView		Depozit
@@ -113,7 +116,6 @@ View agreed usage conditions…	MainWindow		Vizualizați condițiile de utilizar
 Cancel	MainWindow		Anulează
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 more to download)}other{(# more to download)}}
 Refresh repositories	MainWindow		Actualizare depozite
-Tools	MainWindow		Unelte
 Continue	App		Continuare
 A password is required.	UserLoginWindow		O parolă este necesară.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Acest pachet nu pare a fi pe Server HaikuDepot, prin urmare nu este posibil să creați o evaluare nouă sau să editați o evaluare existentă.
@@ -143,11 +145,13 @@ Try again	App		Încearcă din nou
 Unknown	PackageListView		Necunoscut
 I agree to the usage conditions	UserLoginWindow		Sunt de acord cu condițiile de utilizare
 Log in	UserLoginWindow		Autentificare
+Sending anonymous usage data	MainWindow		Se trimit datele de utilizare anonime
 Logged in as %User%	MainWindow		Autentificat ca %User%
 Email address:	UserLoginWindow		Adresă email:
 Screenshot	ScreenshotWindow		Captură ecran
 A reboot is necessary to complete the installation process.	PackageManager		O repornire este necesară pentru a completa procesul de instalare.
 HaikuDepot	System name		HaikuDepot
+Yes	MainWindow		Da
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{I am at least one year old}other{I am # years of age or older}}
 View latest usage conditions…	MainWindow		Vizualizați ultimele condiții de utilizare…
 Quit	App		Ieșire

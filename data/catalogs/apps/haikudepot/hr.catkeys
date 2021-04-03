@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-HaikuDepot	3553523059
+1	croatian	x-vnd.Haiku-HaikuDepot	3609923014
 Repository update error	LocalRepositoryUpdateProcess		Greška pri ažuriranju repozitorija
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Došlo je do greške prilikom osvježavanja repozitorija: %error%
 User Created	UserLoginWindow		Korisnik je napravljen
@@ -59,7 +59,6 @@ All categories	FilterView		Sve kategorije
 Repositories	MainWindow		Repozitoriji
 Cancel	MainWindow		Otkaži
 Refresh repositories	MainWindow		Osvježi repozitorije
-Tools	MainWindow		Alati
 Continue	App		Nastavi
 A password is required.	UserLoginWindow		Potrebna je lozinka.
 Language	RatePackageWindow		Jezik

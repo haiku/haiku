@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-HaikuDepot	2077021770
+1	english	x-vnd.Haiku-HaikuDepot	2133421725
 Check for updates…	MainWindow		检查更新…
 Uninstall	PackageManager		卸载
 Uninstalled	PackageListView		已卸载
@@ -63,7 +63,6 @@ Repositories	MainWindow		仓库
 n/a	PackageInfoView		n/a
 Cancel	MainWindow		取消
 Refresh repositories	MainWindow		刷新仓库
-Tools	MainWindow		工具
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		该软件包似乎并不在 HaikuDepot Server 中，所以无法创建一个新的评分或者编辑已有的评分。
 Language	RatePackageWindow		语言
 Log out	MainWindow		注销
