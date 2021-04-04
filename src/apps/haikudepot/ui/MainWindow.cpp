@@ -649,7 +649,7 @@ MainWindow::_BuildMenu(BMenuBar* menuBar)
 		B_UTF8_ELLIPSIS), new BMessage(MSG_SOFTWARE_UPDATER)));
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Settings" B_UTF8_ELLIPSIS),
-		new BMessage(MSG_SETTINGS)));
+		new BMessage(MSG_SETTINGS), ','));
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Quit"),
 		new BMessage(B_QUIT_REQUESTED), 'Q'));
 	menuBar->AddItem(menu);
