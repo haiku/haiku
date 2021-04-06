@@ -724,7 +724,7 @@ protected:
 
 
 const char* const BlocklistMenu::kDefaultMenuTitle
-	= "Mark the entries to blocklist";
+	= "Mark the components to disable";
 
 
 class BlocklistRootMenu : public BlocklistMenu {
@@ -746,7 +746,8 @@ public:
 		} else {
 			SetDirectory(NULL);
 			SetTitle(sBootVolume != NULL && sBootVolume->IsValid()
-				? "The selected boot volume doesn't support blocklisting!"
+				? "The selected boot volume doesn't support disabling "
+				  "components!"
 				: "No boot volume selected!");
 		}
 
@@ -1337,8 +1338,8 @@ add_safe_mode_menu()
 
 	safeMenu->AddSeparatorItem();
 	sBlocklistRootMenu = new(std::nothrow) BlocklistRootMenu;
-	safeMenu->AddItem(item = new(std::nothrow) MenuItem("Blocklist entries",
-		sBlocklistRootMenu));
+	safeMenu->AddItem(item = new(std::nothrow) MenuItem(
+		"Disable system components", sBlocklistRootMenu));
 	item->SetHelpText("Allows to select system files that shall be ignored. "
 		"Useful e.g. to disable drivers temporarily.");
 
