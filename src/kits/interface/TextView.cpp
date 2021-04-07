@@ -979,17 +979,17 @@ BTextView::MessageReceived(BMessage* message)
 			bool handled = false;
 			switch(message->what) {
 				case B_GET_PROPERTY:
-					handled = _GetProperty(&specifier, specifier.what, property,
+					handled = _GetProperty(message, &specifier, property,
 						&reply);
 					break;
 
 				case B_SET_PROPERTY:
-					handled = _SetProperty(&specifier, specifier.what, property,
+					handled = _SetProperty(message, &specifier, property,
 						&reply);
 					break;
 
 				case B_COUNT_PROPERTIES:
-					handled = _CountProperties(&specifier, specifier.what,
+					handled = _CountProperties(message, &specifier,
 						property, &reply);
 					break;
 
@@ -5525,8 +5525,8 @@ BTextView::_PreviousInitialByte(int32 offset) const
 
 
 bool
-BTextView::_GetProperty(BMessage* specifier, int32 form, const char* property,
-	BMessage* reply)
+BTextView::_GetProperty(BMessage* message, BMessage* specifier,
+	const char* property, BMessage* reply)
 {
 	CALLED();
 	if (strcmp(property, "selection") == 0) {
@@ -5565,8 +5565,8 @@ BTextView::_GetProperty(BMessage* specifier, int32 form, const char* property,
 
 
 bool
-BTextView::_SetProperty(BMessage* specifier, int32 form, const char* property,
-	BMessage* reply)
+BTextView::_SetProperty(BMessage* message, BMessage* specifier,
+	const char* property, BMessage* reply)
 {
 	CALLED();
 	if (strcmp(property, "selection") == 0) {
@@ -5587,10 +5587,13 @@ BTextView::_SetProperty(BMessage* specifier, int32 form, const char* property,
 		specifier->FindInt32("range", &range);
 
 		const char* buffer = NULL;
-		if (specifier->FindString("data", &buffer) == B_OK)
+		if (message->FindString("data", &buffer) == B_OK) {
 			InsertText(buffer, range, index, NULL);
-		else
-			DeleteText(index, range);
+			_Refresh(index, index + range);
+		} else {
+			DeleteText(index, index + range);
+			_Refresh(index, index);
+		}
 
 		reply->what = B_REPLY;
 		reply->AddInt32("error", B_OK);
@@ -5604,7 +5607,7 @@ BTextView::_SetProperty(BMessage* specifier, int32 form, const char* property,
 
 
 bool
-BTextView::_CountProperties(BMessage* specifier, int32 form,
+BTextView::_CountProperties(BMessage* message, BMessage* specifier,
 	const char* property, BMessage* reply)
 {
 	CALLED();
