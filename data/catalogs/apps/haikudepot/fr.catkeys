@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-HaikuDepot	468702767
+1	french	x-vnd.Haiku-HaikuDepot	1480846026
 Repository update error	LocalRepositoryUpdateProcess		Erreur à l’actualisation du dépôt
 Network error	ServerHelper		Erreur réseau
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Une erreur est survenue lors du rafraîchissement : %error%
@@ -24,6 +24,7 @@ Rating	PackageListView		Évaluation
 Synchronizing icons	ServerIconExportUpdateProcess		Synchronisation des icônes
 Show	MainWindow		Afficher
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Erreur lors de l’obtention de la liste des paquets : %message%
+Settings…	MainWindow		Réglages…
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Cette application lit et écrit certains fichiers de travail sur votre ordinateur afin de fonctionner. Il semble qu’il y ait des problèmes pour écrire un fichier test dans [%TestFilePath%]. Vérifiez qu’il n’y a pas de problèmes avec votre disque local ou avec les autorisations qui pourraient empêcher cette application d’écrire des fichiers dans ce répertoire. Vous pouvez choisir d’assumer ce problème et de continuer, mais certaines fonctionnalités peuvent être désactivées.
 Active	PackageListView		Actif
 Login or Create account	MainWindow		Se connecter ou créer un compte
@@ -88,6 +89,7 @@ Usage conditions download problem	UserLoginWindow		Problème de téléchargement
 OK	PackageInfoView		OK
 Downloading:	PackageInfoView		Téléchargement en cours :
 Success	UserLoginWindow		Opération réussie
+No	MainWindow		Non
 Package daemon problem	App		Problème du serveur de paquets
 (%Votes%)	PackageInfoView		(%Votes%)
 Repository	PackageListView		Dépôt
@@ -147,6 +149,7 @@ Email address:	UserLoginWindow		Adresse e-mail :
 Screenshot	ScreenshotWindow		Capture d’écran
 A reboot is necessary to complete the installation process.	PackageManager		Un redémarrage est nécessaire pour terminer le processus d’installation.
 HaikuDepot	System name		DépôtHaiku
+Yes	MainWindow		Oui
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{Je suis âgé d’au moins un an}other{j’ai plus de # ans}}
 View latest usage conditions…	MainWindow		Voir les dernières conditions d’utilisation…
 Quit	App		Quitter

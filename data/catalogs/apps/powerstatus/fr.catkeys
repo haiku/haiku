@@ -23,7 +23,7 @@ Design voltage: 	PowerStatus		Voltage nominal :
 discharging	PowerStatus		sur batteries
 rechargeable	PowerStatus		rechargeable
 Battery info…	PowerStatus		Informations batteries…
-Show time	PowerStatus		Monter le temps
+Show time	PowerStatus		Afficher l’autonomie
  mA	PowerStatus		 mA
 About…	PowerStatus		À propos…
 Serial number: 	PowerStatus		Numéro de série : 
@@ -31,7 +31,7 @@ Battery critical	PowerStatus		Batterie épuisée
 Capacity: 	PowerStatus		Capacité : 
  mW	PowerStatus		 mW
 No supported battery detected. PowerStatus cannot be used on your system.	PowerStatus		Aucune batterie supportée détectée. « État d’énergie » ne peut pas être utilisé sur votre système.
-Show percent	PowerStatus		Afficher les pourcentages
+Show percent	PowerStatus		Afficher le pourcentage
 Capacity granularity 1: 	PowerStatus		Granularité de charge 1 : 
 The battery level is getting low, please plug in the device.	PowerStatus		La charge de la batterie devient faible. Veuillez brancher l’alimentation.
 Design capacity warning: 	PowerStatus		Avertissement de capacité nominale : 

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-HaikuDepot	908828196
+1	german	x-vnd.Haiku-HaikuDepot	1395664368
 Repository update error	LocalRepositoryUpdateProcess		Fehler bei Paketquellenaktualisierung
 Network error	ServerHelper		Netzwerk Fehler
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Fehler bei der Aktualisierung der Paketquelle: %error%
@@ -62,6 +62,7 @@ Cancel	UserLoginWindow		Abbrechen
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		Um richtig zu funktionieren, benötigt HaikuDepot den Paket-Daemon, der aber anscheinend gerade nicht läuft.\nSoll er gestartet werden?
 Click a package to view information	PackageInfoView		Paket anklicken, um Infos anzuzeigen
 The password must be at least eight characters long, consist of at least two digits and one upper case character.	UserLoginWindow		Das Kennwort muss mindestens acht Zeichen lang sein und wenigstens zwei Zahlen und einen Großbuchstaben enthalten.
+Share anonymous usage data with HaikuDepotServer	SettingsWindow		Anonymisierte Nutzungsdaten an den HaikuDepotServer senden
 Contents	PackageInfoView		Inhalt
 Close	PackageManager		Schließen
 Changelog	PackageInfoView		Änderungsprotokoll
@@ -78,6 +79,7 @@ Send	RatePackageWindow		Senden
 Start package daemon	App		Paket-Daemon starten
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Das Kennwort muss wiederholt werden, um die Wahrscheinlichket einer Falscheingabe zu verringern.
 The package action could not be scheduled: %Error%	PackageInfoView		Die Aktion konnte nicht auf das Paket angewandt werden: %Error%
+Cancel	SettingsWindow		Abbrechen
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer?  You can change your preference in the \"Settings\" window later.	MainWindow		Dürfen anonyme Nutzuungsdaten von diesem Computer an den HaikuDepotServer geschickt werden? Die Option kann jederzeit im \"Einstellungen\" Fenster geändert werden.
 Cancel	RatePackageWindow		Abbrechen
 Inactive	PackageListView		Deaktiviert
@@ -89,6 +91,7 @@ OK	MainWindow		OK
 Usage conditions download problem	UserLoginWindow		Problem beim Herunterladen der Nutzungsbedingungen
 OK	PackageInfoView		OK
 Downloading:	PackageInfoView		Aktueller Download:
+Quit	MainWindow		Beenden
 Success	UserLoginWindow		Erfolg
 No	MainWindow		Nein
 Package daemon problem	App		Paket Daemon Problem
@@ -100,6 +103,7 @@ Close	UserLoginWindow		Schließen
 Close	RatePackageWindow		Schließen
 An unexpected error has been sent from the server [%i]	ServerHelper		Vom Server wurde ein unerwarteter Fehler geschickt [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synchronisieren von Paketdaten für Paketquelle '%REPO_NAME%'
+Settings	SettingsWindow		Einstellungen
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Beim Herunterladen der Nutzungsbedingungen für die Erstellung eines neuen Benutzerkontos ist ein Fehler aufgetreten. Bitte Log prüfen und nochmal probieren.\nWie diese Logs angezeigt werden können, steht im Kapitel 'HaikuDepot ' des Haiku User Guide.
 View the usage conditions	UserLoginWindow		Nutzungsbedingungen lesen
 Login issue	MainWindow		Anmeldungsproblem
@@ -119,6 +123,7 @@ Refresh repositories	MainWindow		Paketquellen aktualisieren
 Continue	App		Weiter
 A password is required.	UserLoginWindow		Es wird ein Kennwort benötigt.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Dieses Paket scheint nicht auf dem HaikuDepot Server zu sein. Es ist daher nicht möglich eine neue Bewertung abzugeben, bzw. eine bestehende zu ändern.
+Apply	SettingsWindow		Anwenden
 Language	RatePackageWindow		Sprache
 Log out	MainWindow		Abmelden
 Comment language:	RatePackageWindow		Kommentar-Sprache:

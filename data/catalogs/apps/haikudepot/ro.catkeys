@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-HaikuDepot	908828196
+1	romanian	x-vnd.Haiku-HaikuDepot	1395664368
 Repository update error	LocalRepositoryUpdateProcess		Eroare la actualizarea depozitului
 Network error	ServerHelper		Eroare de rețea
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		A apărut o eroare în timpul reîmprospătării depozitului: %error%
@@ -62,6 +62,7 @@ Cancel	UserLoginWindow		Anulează
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot are nevoie de serviciul de pachete pentru a functiona și se pare că nu rulează.\nDoriți să-l porniți acum?
 Click a package to view information	PackageInfoView		Clic pe un pachet pentru a vizualiza informații
 The password must be at least eight characters long, consist of at least two digits and one upper case character.	UserLoginWindow		Parola trebuie să aibă lungimea de cel puțin opt caractere, să consiste din cel puțin două cifre și un caracter cu majusculă.
+Share anonymous usage data with HaikuDepotServer	SettingsWindow		Partajați date de utilizare anonime cu HaikuDepotServer
 Contents	PackageInfoView		Conținut
 Close	PackageManager		Închidere
 Changelog	PackageInfoView		Jurnal de modificări
@@ -78,6 +79,7 @@ Send	RatePackageWindow		Trimitere
 Start package daemon	App		Pornire demon de pachet
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Parola trebuie să fie repetată pentru a reduce șansa de a introduce parola incorect.
 The package action could not be scheduled: %Error%	PackageInfoView		Actiunea pachetului n-a putut fi programată: %Error%
+Cancel	SettingsWindow		Anulează
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer?  You can change your preference in the \"Settings\" window later.	MainWindow		Ar fi acceptabil să se trimită date de utilizare anonime către sistemul HaikuDepotServer de la acest calculator?  Puteți modifica preferința în fereastra \„Configurări\” mai târziu.
 Cancel	RatePackageWindow		Anulează
 Inactive	PackageListView		Inactiv
@@ -89,6 +91,7 @@ OK	MainWindow		OK
 Usage conditions download problem	UserLoginWindow		Problemă de descărcare a condițiilor de utilizare
 OK	PackageInfoView		OK
 Downloading:	PackageInfoView		Se descarcă:
+Quit	MainWindow		Ieșire
 Success	UserLoginWindow		Succes
 No	MainWindow		Nu
 Package daemon problem	App		Problemă la serviciul pachetului
@@ -100,6 +103,7 @@ Close	UserLoginWindow		Închidere
 Close	RatePackageWindow		Închidere
 An unexpected error has been sent from the server [%i]	ServerHelper		O eroare neașteptată a fost trimisă de la serverul [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Se sincronizează datele pachetelor pentru depozitul „%REPO_NAME%”
+Settings	SettingsWindow		Configurări
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		A apărut o eroare în timpul descărcării condițiilor de utilizare necesare pentru a crea un utilizator nou. Verificați istoricul pentru detalii și încercați din nou. \nInformații despre cum se vizualizează înregistrările sunt disponibile în secțiunea HaikuDepot a Ghidului Utilizatorului Haiku.
 View the usage conditions	UserLoginWindow		Vizualizați condițiile de utilizare
 Login issue	MainWindow		Problemă de autentificare
@@ -119,6 +123,7 @@ Refresh repositories	MainWindow		Actualizare depozite
 Continue	App		Continuare
 A password is required.	UserLoginWindow		O parolă este necesară.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Acest pachet nu pare a fi pe Server HaikuDepot, prin urmare nu este posibil să creați o evaluare nouă sau să editați o evaluare existentă.
+Apply	SettingsWindow		Aplică
 Language	RatePackageWindow		Limbă
 Log out	MainWindow		Ieșire
 Comment language:	RatePackageWindow		Limbă comentariu:

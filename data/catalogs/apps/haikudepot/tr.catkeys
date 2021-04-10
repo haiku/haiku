@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-HaikuDepot	908828196
+1	turkish	x-vnd.Haiku-HaikuDepot	1395664368
 Repository update error	LocalRepositoryUpdateProcess		Depo güncelleme hatası
 Network error	ServerHelper		Ağ hatası
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Depo güncellenirken bir hata oluştu: %error%
@@ -62,6 +62,7 @@ Cancel	UserLoginWindow		İptal
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		Haiku Depo, paket hizmetine gereksinim duyuyor ancak şu anda çalışmıyor görünüyor.\nŞimdi başlatılsın mı?
 Click a package to view information	PackageInfoView		Paket bilgisini görmek için üzerine tıklayın
 The password must be at least eight characters long, consist of at least two digits and one upper case character.	UserLoginWindow		Parola en azından sekiz karakter uzunluğunda olmalı, iki adet rakam ve bir büyük harf içermelidir.
+Share anonymous usage data with HaikuDepotServer	SettingsWindow		Anonim veri kullanımını Haiku Depo sunucusu ile paylaş
 Contents	PackageInfoView		İçerik
 Close	PackageManager		Kapat
 Changelog	PackageInfoView		Değişiklik günlüğü
@@ -78,6 +79,7 @@ Send	RatePackageWindow		Gönder
 Start package daemon	App		Paket hizmetini başlat
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Yanlış girme olasılığını ortadan kaldırmak için parolanız bir kez daha girilmelidir.
 The package action could not be scheduled: %Error%	PackageInfoView		Paket eylemi zamanlanamadı: %Error%
+Cancel	SettingsWindow		İptal
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer?  You can change your preference in the \"Settings\" window later.	MainWindow		Anonim kullanım verilerini Haiku Depo sunucusu ile paylaşmak ister misiniz? Tercihlerinizi daha sonra \"Ayarlar\" penceresinden değiştirebilirsiniz.
 Cancel	RatePackageWindow		İptal
 Inactive	PackageListView		Etkin değil
@@ -89,6 +91,7 @@ OK	MainWindow		Tamam
 Usage conditions download problem	UserLoginWindow		Kullanım koşulları indirilirken hata
 OK	PackageInfoView		Tamam
 Downloading:	PackageInfoView		İndiriliyor:
+Quit	MainWindow		Çık
 Success	UserLoginWindow		Başarılı
 No	MainWindow		Hayır
 Package daemon problem	App		Paket hizmeti sorunu
@@ -100,6 +103,7 @@ Close	UserLoginWindow		Kapat
 Close	RatePackageWindow		Kapat
 An unexpected error has been sent from the server [%i]	ServerHelper		Sunucudan beklenmedik bir hata gönderildi [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		'%REPO_NAME%' depo paket bilgisi eşitleniyor
+Settings	SettingsWindow		Ayarlar
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Yeni bir kullanıcı oluşturmak için gerekli kullanım koşulları indirilirken bir hata oluştu. Ayrıntılar için günlüğü denetleyin ve yeniden deneyin.\nGünlük görüntüleme üzerine bilgiyi Haiku Kullanıcı Kılavuzu'nun Haiku Depo bölümünde bulabilirsiniz.
 View the usage conditions	UserLoginWindow		Kullanım koşullarını görüntüle
 Login issue	MainWindow		Giriş sorunu
@@ -119,6 +123,7 @@ Refresh repositories	MainWindow		Depoları yenile
 Continue	App		Sürdür
 A password is required.	UserLoginWindow		Bir parola gerekli.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Bu paket Haiku Depo sunucusunda değil gibi görünüyor, bu yüzden bir derecelendirme yapmak veya mevcut derecelendirmeyi değiştirmek olanaklı değil.
+Apply	SettingsWindow		Uygula
 Language	RatePackageWindow		Dil
 Log out	MainWindow		Çıkış yap
 Comment language:	RatePackageWindow		Yorum dili:

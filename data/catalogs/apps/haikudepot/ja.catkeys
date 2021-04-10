@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	908828196
+1	japanese	x-vnd.Haiku-HaikuDepot	1395664368
 Repository update error	LocalRepositoryUpdateProcess		リポジトリアップデートエラー
 Network error	ServerHelper		ネットワークエラー
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		リポジトリの更新中に次のエラーが発生しました: %error%
@@ -62,6 +62,7 @@ Cancel	UserLoginWindow		中止
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot はパッケージデーモンが動作することを必要とします。 そしてそれは動作していないようです。\n今起動しますか?
 Click a package to view information	PackageInfoView		パッケージをクリックして情報を見る
 The password must be at least eight characters long, consist of at least two digits and one upper case character.	UserLoginWindow		パスワードは、最小8文字以上の長さで、少なくとも2つの数字と1つの英大文字を含む必要があります。
+Share anonymous usage data with HaikuDepotServer	SettingsWindow		匿名の使用データーを HaikuDepotServer とシェアする
 Contents	PackageInfoView		内容
 Close	PackageManager		閉じる
 Changelog	PackageInfoView		変更履歴
@@ -78,6 +79,7 @@ Send	RatePackageWindow		送信する
 Start package daemon	App		パッケージデーモンを起動
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		間違って入力する可能性を減らすため、パスワードを繰り返す必要があります。
 The package action could not be scheduled: %Error%	PackageInfoView		パッケージアクションを予約できませんでした: %Error%
+Cancel	SettingsWindow		キャンセル
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer?  You can change your preference in the \"Settings\" window later.	MainWindow		このコンピューターから匿名の使用状況データーをHaikuDepotServerシステムに送信することを受け入れますか? \"設定\" ウインドウであとから設定を変更できます。
 Cancel	RatePackageWindow		中止
 Inactive	PackageListView		無効
@@ -89,6 +91,7 @@ OK	MainWindow		OK
 Usage conditions download problem	UserLoginWindow		使用条件のダウンロードで問題
 OK	PackageInfoView		OK
 Downloading:	PackageInfoView		ダウンロード中:
+Quit	MainWindow		終了
 Success	UserLoginWindow		成功
 No	MainWindow		いいえ
 Package daemon problem	App		パッケージデーモンの問題
@@ -100,6 +103,7 @@ Close	UserLoginWindow		閉じる
 Close	RatePackageWindow		閉じる
 An unexpected error has been sent from the server [%i]	ServerHelper		サーバーから予期しないエラーが送信されました [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		リポジトリ '%REPO_NAME%' のパッケージデータを同期中
+Settings	SettingsWindow		設定
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		新規ユーザー作成に必要な使用条件のダウンロード中にエラーが発生しました。詳細はログをチェックして、再度試してみてください。\nログの見方は、HaikuユーザーガイドのHaikuDepotの章で得られます。
 View the usage conditions	UserLoginWindow		使用条件を見る
 Login issue	MainWindow		ログインに問題
@@ -119,6 +123,7 @@ Refresh repositories	MainWindow		リポジトリの更新
 Continue	App		続行
 A password is required.	UserLoginWindow		パスワードが必要です。
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		このパッケージは HaikuDepot Server 上には無いようです。従って新規の評価の作成や既存の評価の更新はできません。
+Apply	SettingsWindow		適用
 Language	RatePackageWindow		言語
 Log out	MainWindow		ログアウト
 Comment language:	RatePackageWindow		コメント言語:
