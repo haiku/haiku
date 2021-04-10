@@ -198,7 +198,7 @@ vesa_set_display_mode(display_mode* _mode)
 
 	vesa_mode* modes = gInfo->vesa_modes;
 	if (modes == NULL)
-		return B_BAD_VALUE;
+		return B_UNSUPPORTED;
 			// UEFI has no VESA modes
 
 	for (uint32 i = gInfo->shared_info->vesa_mode_count; i-- > 0;) {
