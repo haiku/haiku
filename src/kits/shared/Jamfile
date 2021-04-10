@@ -54,6 +54,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			RWLocker.cpp
 			RWLockManager.cpp
 			SettingsHandler.cpp
+			SettingsMessage.cpp
 			ShakeTrackingFilter.cpp
 			StringForRate.cpp
 			StringForSize.cpp

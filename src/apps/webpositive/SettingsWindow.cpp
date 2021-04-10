@@ -25,6 +25,7 @@
 #include <TabView.h>
 #include <TextControl.h>
 #include <debugger.h>
+#include <SettingsMessage.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -34,7 +35,6 @@
 #include "BrowserWindow.h"
 #include "FontSelectionView.h"
 #include "SettingsKeys.h"
-#include "SettingsMessage.h"
 #include "WebSettings.h"
 
 

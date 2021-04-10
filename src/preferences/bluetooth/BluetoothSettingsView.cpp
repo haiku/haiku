@@ -161,7 +161,6 @@ BluetoothSettingsView::MessageReceived(BMessage* message)
 			int32 policy;
 			if (message->FindInt32("be:value", (int32*)&policy) == B_OK) {
 				fSettings.Data.Policy = policy;
-				printf("Policy = %d\n", fSettings.Data.Policy);
 			}
 			break;
 		}
@@ -180,8 +179,6 @@ BluetoothSettingsView::MessageReceived(BMessage* message)
 			int32 deviceClass;
 			if (message->FindInt32("be:value",
 				(int32*)&deviceClass) == B_OK) {
-
-				printf("deviceClass = %d\n", deviceClass);
 
 				if (deviceClass == 5)
 					_SetDeviceClass(2, 3, 0x72);

@@ -22,7 +22,7 @@ SettingsMessage::SettingsMessage(directory_which directory,
 		const char* filename)
 	:
 	BMessage('pref'),
-	fListeners(4)
+	fListeners(0)
 {
 	fStatus = find_directory(directory, &fPath);
 

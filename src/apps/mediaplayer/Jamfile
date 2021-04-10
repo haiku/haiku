@@ -105,7 +105,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			ListenerAdapter.cpp
 			MessageEvent.cpp
 			Notifier.cpp
-			SettingsMessage.cpp
 			StackBlurFilter.cpp
 
 			# .
