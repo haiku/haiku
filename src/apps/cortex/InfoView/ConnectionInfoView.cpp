@@ -48,7 +48,7 @@
 #include <MediaDefs.h>
 
 #undef B_TRANSLATION_CONTEXT
-#define B_TRANSLATION_CONTEXT "ConnectionInfoView"
+#define B_TRANSLATION_CONTEXT "InfoView"
 
 __USE_CORTEX_NAMESPACE
 

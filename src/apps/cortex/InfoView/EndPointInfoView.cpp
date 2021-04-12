@@ -44,7 +44,7 @@
 #include <Catalog.h>
 
 #undef B_TRANSLATION_CONTEXT
-#define B_TRANSLATION_CONTEXT "EndpointInfoView"
+#define B_TRANSLATION_CONTEXT "InfoView"
 
 __USE_CORTEX_NAMESPACE
 
