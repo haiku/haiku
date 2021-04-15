@@ -787,9 +787,9 @@ TextMessageFilter::Filter(BMessage *message, BHandler **target)
 	// update parameter value
 
 	if (BTextControl *textControl = dynamic_cast<BTextControl *>(control)) {
-		TRACE("TextMessageFilter::Filter: update view %s, value = %"
-			B_PRId32 "\n", control->Name(), value);
 		BString value = textControl->Text();
+		TRACE("TextMessageFilter::Filter: update view %s, value = %s\n",
+			control->Name(), value.String());
 		if (fParameter.SetValue((void *)value.String(), value.Length() + 1, -1) < B_OK) {
 			ERROR("TextMessageFilter::Filter: Could not set parameter value for %p\n", &fParameter);
 			return B_DISPATCH_MESSAGE;
