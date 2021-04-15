@@ -26,6 +26,21 @@ public:
 	}
 };
 
+// AutoLockerHandlerLocking
+template<typename Lockable>
+class AutoLockerHandlerLocking {
+public:
+	inline bool Lock(Lockable* lockable)
+	{
+		return lockable->LockLooper();
+	}
+
+	inline void Unlock(Lockable* lockable)
+	{
+		lockable->UnlockLooper();
+	}
+};
+
 // AutoLockerReadLocking
 template<typename Lockable>
 class AutoLockerReadLocking {
@@ -172,6 +187,7 @@ protected:
 }	// namespace BPrivate
 
 using ::BPrivate::AutoLocker;
+using ::BPrivate::AutoLockerHandlerLocking;
 using ::BPrivate::AutoLockerReadLocking;
 using ::BPrivate::AutoLockerWriteLocking;
 
