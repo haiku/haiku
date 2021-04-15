@@ -33,7 +33,7 @@ as root on limerick.ams3.haiku-os.org...
 1) wget https://git.haiku-os.org/haiku/plain/build/jam/repositories/HaikuPorts/(ARCH) -O /var/lib/docker/volumes/ci_data_master_(ARCH)/_data/(ARCH)
 2) Enter the buildmaster container:
    docker exec -it $(docker ps | grep ci_buildmaster_master_(ARCH) | awk '{ print $1 }') /bin/bash -l
-3) apt update; apt install -y vim python3
+3) apt update; apt install -y vim python3 python3-pkg-resources
 4) edit the repository define, add the needed packages, _devel packages, and add base package to source section.
 5) ln -s /var/buildmaster/package_tools/package_repo /usr/bin/package_repo
 6) export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/var/buildmaster/package_tools
