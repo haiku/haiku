@@ -481,7 +481,7 @@ refclk_activate_ilk(bool hasPanel)
 	bool hasCK505;
 	if (gInfo->shared_info->pch_info == INTEL_PCH_IBX) {
 		//XXX: This should be == vbt display_clock_mode
-		hasCK505 = true;
+		hasCK505 = false;
 		wantsSSC = hasCK505;
 	} else {
 		hasCK505 = false;
