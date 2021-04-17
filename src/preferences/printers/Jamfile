@@ -8,6 +8,7 @@ Preference Printers :
 	PrintersWindow.cpp
 	PrinterListView.cpp
 	JobListView.cpp
+	ScreenSettings.cpp
 	SpoolFolder.cpp
 	TestPageView.cpp
 	TransportMenu.cpp

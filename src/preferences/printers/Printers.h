@@ -12,6 +12,8 @@
 #include <Application.h>
 #include <Catalog.h>
 
+#include "ScreenSettings.h"
+
 
 #define PRINTERS_SIGNATURE	"application/x-vnd.Be-PRNT"
 

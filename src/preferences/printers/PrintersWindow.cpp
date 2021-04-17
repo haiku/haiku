@@ -32,6 +32,7 @@
 #include "Messages.h"
 #include "PrinterListView.h"
 #include "TestPageView.h"
+#include "ScreenSettings.h"
 #include "SpoolFolder.h"
 
 
@@ -44,15 +45,16 @@ public:
 						TestPageWindow(BPrintJob* job, PrinterItem* printer);
 	virtual				~TestPageWindow();
 
-			void 		MessageReceived(BMessage* message);
+			void		MessageReceived(BMessage* message);
 private:
-		BPrintJob*		fJob;
-		TestPageView*	fTestPage;
+			BPrintJob*	fJob;
+			TestPageView*	fTestPage;
 };
 
 
 TestPageWindow::TestPageWindow(BPrintJob* job, PrinterItem* printer)
-	: BWindow(job->PaperRect().OffsetByCopy(-20000, -20000), B_TRANSLATE("Test page"),
+	: BWindow(job->PaperRect().OffsetByCopy(-20000, -20000),
+		B_TRANSLATE("Test page"),
 		B_TITLED_WINDOW, 0), fJob(job)
 {
 	fTestPage = new TestPageView(job->PrintableRect(), printer);
@@ -93,10 +95,11 @@ TestPageWindow::MessageReceived(BMessage* message)
 // #pragma mark PrintersWindow main class
 
 
-PrintersWindow::PrintersWindow(BRect frame)
+PrintersWindow::PrintersWindow(ScreenSettings* settings)
 	:
-	BWindow(BRect(78, 71, 761, 509), B_TRANSLATE_SYSTEM_NAME("Printers"),
+	BWindow(settings->WindowFrame(), B_TRANSLATE_SYSTEM_NAME("Printers"),
 		B_TITLED_WINDOW, B_AUTO_UPDATE_SIZE_LIMITS),
+	fSettings(settings),
 	fSelectedPrinter(NULL),
 	fAddingPrinter(false)
 {
@@ -104,9 +107,17 @@ PrintersWindow::PrintersWindow(BRect frame)
 }
 
 
+PrintersWindow::~PrintersWindow()
+{
+	delete fSettings;
+}
+
+
 bool
 PrintersWindow::QuitRequested()
 {
+	fSettings->SetWindowFrame(Frame());
+
 	bool result = Inherited::QuitRequested();
 	if (result)
 		be_app->PostMessage(B_QUIT_REQUESTED);
@@ -118,7 +129,7 @@ PrintersWindow::QuitRequested()
 void
 PrintersWindow::MessageReceived(BMessage* msg)
 {
-	switch(msg->what) {
+	switch (msg->what) {
 		case kMsgPrinterSelected:
 		{
 			fSelectedPrinter = fPrinterListView->SelectedItem();
