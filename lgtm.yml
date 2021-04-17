@@ -31,5 +31,5 @@ extraction:
         - ./configure --cross-tools-source $LGTM_WORKSPACE/buildtools/buildtools-master --build-cross-tools x86_64 --use-gcc-pipe -j2
     index:
       build_command:
-        - $LGTM_WORKSPACE/bin/jam -j2 @nightly-raw
+        - HAIKU_REVISION=hrev90000 $LGTM_WORKSPACE/bin/jam -j2 @nightly-raw
 
