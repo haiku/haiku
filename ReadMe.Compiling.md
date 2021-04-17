@@ -31,7 +31,7 @@ nightly builds.
  * `makeinfo` (part of `texinfo`, only needed for building GCC 4)
  * `autoheader` (part of `autoconf`, needed for building GCC)
  * `automake` (needed for building GCC)
- * `gawk`
+ * `awk` (GNU awk is most tested, but other implementations should work)
  * `nasm`
  * `wget`
  * `[un]zip`

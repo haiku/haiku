@@ -65,17 +65,17 @@ rule MIIHeaderGen
 
 actions MIIHeaderGen1
 {
-	gawk -v HEADERFILE=$(1) -f $(2[2]) $(2[1])
+	awk -v HEADERFILE=$(1) -f $(2[2]) $(2[1])
 }
 
 MIIHeaderGen [ FGristFiles miidevs.h ] : miidevs : miidevs2h.awk ;
 
 rule USBDevsHeaderGen
 {
-    SEARCH on $(2) = [ FDirName $(SUBDIR) compat dev usb ] ;
+	SEARCH on $(2) = [ FDirName $(SUBDIR) compat dev usb ] ;
 	SEARCH on $(3) = [ FDirName $(SUBDIR) tools ] ;
 
-    Depends $(1) : $(2) $(3) ;
+	Depends $(1) : $(2) $(3) ;
 	MakeLocateArch $(<) ;
 	USBDevsHeaderGen1 $(1) : $(2) $(3) ;
 	LocalClean clean : $(<) ;
@@ -83,7 +83,7 @@ rule USBDevsHeaderGen
 
 actions USBDevsHeaderGen1
 {
-    gawk -v HEADERFILE=$(1[1]) -v DATAFILE=$(1[2]) -f $(2[2]) $(2[1])
+	awk -v HEADERFILE=$(1[1]) -v DATAFILE=$(1[2]) -f $(2[2]) $(2[1])
 }
 
 USBDevsHeaderGen [ FGristFiles usbdevs.h usbdevs_data.h ] : usbdevs

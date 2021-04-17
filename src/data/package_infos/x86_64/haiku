@@ -9,7 +9,7 @@ boot loader, kernel, the system libraries, servers, and applications."
 packager		"The Haiku build system"
 vendor			"Haiku Project"
 
-copyrights		"2001-2020 Haiku, Inc. et al"
+copyrights		"2001-2021 Haiku, Inc. et al"
 licenses {
 	MIT
 	"GNU LGPL v2.1"
@@ -55,7 +55,6 @@ requires {
 	cmd:tar
 	cmd:unzip
 #endif
-	lib:libcurl
 #ifdef HAIKU_BUILD_FEATURE_X86_64_LIBEDIT_ENABLED
 	lib:libedit
 #endif
@@ -64,12 +63,12 @@ requires {
 #endif
 	lib:libfreetype
 	lib:libgcc_s
-	lib:libicudata >= 57
-	lib:libicui18n >= 57
-	lib:libicuio >= 57
-	lib:libicutest >= 57
-	lib:libicutu >= 57
-	lib:libicuuc >= 57
+	lib:libicudata >= 66
+	lib:libicui18n >= 66
+	lib:libicuio >= 66
+	lib:libicutest >= 66
+	lib:libicutu >= 66
+	lib:libicuuc >= 66
 	lib:libncurses >= 6.0
 #ifdef HAIKU_REGULAR_BUILD
 #ifdef HAIKU_BUILD_FEATURE_X86_64_EXPAT_ENABLED
@@ -91,7 +90,7 @@ requires {
 	lib:libpng16
 #endif
 #ifdef HAIKU_BUILD_FEATURE_X86_64_TIFF_ENABLED
-	lib:libtiff >= 5.2
+	lib:libtiff >= 5.6
 #endif
 #ifdef HAIKU_BUILD_FEATURE_X86_64_LIBWEBP_ENABLED
 	lib:libwebp
