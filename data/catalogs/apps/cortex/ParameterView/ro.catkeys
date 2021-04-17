@@ -1,0 +1,8 @@
+1	romanian	application/x-vnd.Cortex.ParameterView	1295152157
+Themes	ParameterWindow		Teme
+Start control panel	ParameterWindow		Pornește panoul de control
+%nodeinfo% parameters	ParameterWindow		parametri %nodeinfo%
+OK	ParameterWindow		OK
+Window	ParameterWindow		Fereastră
+Could not start control panel (%error%)	ParameterWindow		Nu s-a putut porni panoul de control (%error%)
+Close	ParameterWindow		Închide

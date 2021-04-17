@@ -1,0 +1,5 @@
+1	catalan; valencian	application/x-vnd.Cortex.AddOnHost	1256552338
+Continue	CortexAddOnHost		Continua
+Cortex AddOnHost	CortexAddOnHost		Amfitrió complementari Cortex
+Quit	CortexAddOnHost		Surt
+This program runs in the background, and is started automatically by Cortex when necessary. You probably don't want to start it manually.	CortexAddOnHost		Aquest programa s’executa en segon pla i el Cortex l’inicia automàticament quan cal. Probablement no vulgueu iniciar-lo manualment.

@@ -1,0 +1,16 @@
+1	turkish	application/x-vnd.moon-Flanger.media_addon	2732361347
+An add-on version of FlangerNode.\nby Eric Moon (16 June, 1999)	CortexAddOnsFlanger		FlangerNode'un bir eklenti biçimindeki sürümü.\nYazan: Eric Moon (16 Haziran 1999)
+Delay	CortexAddOnsFlanger		Gecikme
+Depth	CortexAddOnsFlanger		Derinlik
+Feedback	CortexAddOnsFlanger		Ötme
+Sweep rate	CortexAddOnsFlanger		Tarama hızı
+Mix ratio	CortexAddOnsFlanger		Karıştırma oranı
+MediaNodeControlApp: couldn't get node info (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: Düğüm bilgisi alınamadı (%d):\n%s\n
+MediaNodeControlApp: couldn't find node (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: Düğüm bulunamadı (%d):\n%s\n
+FlangerNode parameters	CortexAddOnsFlanger		FlangerNode parametreleri
+OK	CortexAddOnsCommonMediaNodeControlApp		Tamam
+controls	CortexAddOnsCommonMediaNodeControlApp		denetimler
+Mix output	CortexAddOnsFlanger		Karışım çıkışı
+Flanger	CortexAddOnsFlanger		Flanger
+MediaNodeControlApp: no parameters for node (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: Düğüm için parametre yok (%d):\n%s\n
+Audio input	CortexAddOnsFlanger		Ses çıkışı

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	2821577863
+1	french	x-vnd.Haiku-libtracker	1000143519
 Created	ContainerWindow		Créé
 Icon	AttributesView		Icône
 Open and make preferred	OpenWithWindow		Ouvrir et en faire la préférence
@@ -269,6 +269,7 @@ home	B_USER_DIRECTORY		personnel
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Nouveaux modèles
 Disk mounting during boot	AutoMounterSettings		Montage des disques au démarrage
 Don't automount	AutoMounterSettings		Ne pas monter automatiquement
+Node ref	AttributesView		Référence de nœud
 Could not find application \"%appname\"	OpenWithWindow		Impossible de trouver l’application « %appname »
 Unmatched parenthesis.	libtracker		Parenthèses non appariées.
 Extended attribute	AttributesView		Attribut étendu

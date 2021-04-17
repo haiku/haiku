@@ -1,0 +1,11 @@
+1	romanian	application/x-vnd.moon-Flanger.media_addon	1375877860
+Delay	CortexAddOnsFlanger		Amânare
+Depth	CortexAddOnsFlanger		Adâncime
+Feedback	CortexAddOnsFlanger		Feedback
+Sweep rate	CortexAddOnsFlanger		Rata de creștere/descreștere a frecvenței
+Mix ratio	CortexAddOnsFlanger		Raport de mix
+OK	CortexAddOnsCommonMediaNodeControlApp		OK
+controls	CortexAddOnsCommonMediaNodeControlApp		controale
+Mix output	CortexAddOnsFlanger		Ieșire mix
+Flanger	CortexAddOnsFlanger		Flanger
+Audio input	CortexAddOnsFlanger		Intrare audio

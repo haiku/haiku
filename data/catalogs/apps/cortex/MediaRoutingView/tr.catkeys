@@ -1,0 +1,34 @@
+1	turkish	application/x-vnd.Cortex.MediaRoutingView	3442339205
+Lock group	MediaNodePanel		Grubu kilitle
+%refname% (no file)	MediaNodePanel		%refname% (dosya yok)
+Video output	MediaRoutingView		Video çıkışı
+Icon view	MediaRoutingView		Simge görünümü
+OK	MediaRoutingView		Tamam
+Cycle	MediaNodePanel		Çevrim
+Advanced	MediaNodePanel		Gelişmiş
+Audio input	MediaRoutingView		Ses girişi
+Run mode	MediaNodePanel		Çalışma kipi
+Could not load '%filename%'	MediaRoutingView		'%filename%' yüklenemedi
+Stop time source	MediaNodePanel		Zaman kaynağını durdur
+Be Audio Mixer	MediaRoutingView		Be ses karıştırıcısı
+Video input	MediaRoutingView		Video girişi
+Release	MediaNodePanel		Sal
+Disconnect	MediaRoutingView		Bağlantıyı kes
+Could not disconnect	MediaRoutingView		Bağlantı kesilemedi
+Could not instantiate '%infoname%'	MediaRoutingView		'%infoname%' somutlaştırılamadı
+Mini icon view	MediaRoutingView		Ufak simge görünümü
+Select all	MediaRoutingView		Tümünü seç
+(same as group)	MediaNodePanel		(grupla aynı)
+Input	MediaJack		Giriş
+Get info	MediaJack		Bilgi al
+Start time source	MediaNodePanel		Zaman kaynağını başlat
+Error	MediaRoutingView		Hata
+Could not release '%refname%'	MediaRoutingView		'%refname%' salınamadı
+Output	MediaJack		Çıkış
+Get info	MediaNodePanel		Bilgi al
+Get info	MediaRoutingView		Bilgi al
+Clean up	MediaRoutingView		Temizle
+Start control panel	MediaNodePanel		Denetim panelini başlat
+Tweak parameters	MediaNodePanel		Parametrelere ince ayar yap
+Could not connect	MediaRoutingView		Bağlanılamadı
+Unlock group	MediaNodePanel		Grubun kilidini aç

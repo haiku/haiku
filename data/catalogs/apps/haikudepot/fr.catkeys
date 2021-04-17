@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-HaikuDepot	1480846026
+1	french	x-vnd.Haiku-HaikuDepot	2197264646
 Repository update error	LocalRepositoryUpdateProcess		Erreur à l’actualisation du dépôt
 Network error	ServerHelper		Erreur réseau
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Une erreur est survenue lors du rafraîchissement : %error%
@@ -78,6 +78,7 @@ Send	RatePackageWindow		Envoyer
 Start package daemon	App		Démarrer le serveur de paquets
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Le mot de passe doit être répété afin de réduire le risque d’une saisie erronée.
 The package action could not be scheduled: %Error%	PackageInfoView		L’action du paquet n’a pas eu lieu : %Error%
+Cancel	SettingsWindow		Annuler
 Cancel	RatePackageWindow		Annuler
 Inactive	PackageListView		Inactif
 Nickname:	UserLoginWindow		Surnom :
@@ -88,6 +89,7 @@ OK	MainWindow		Valider
 Usage conditions download problem	UserLoginWindow		Problème de téléchargement des conditions d’utilisation
 OK	PackageInfoView		OK
 Downloading:	PackageInfoView		Téléchargement en cours :
+Quit	MainWindow		Quitter
 Success	UserLoginWindow		Opération réussie
 No	MainWindow		Non
 Package daemon problem	App		Problème du serveur de paquets
@@ -98,7 +100,8 @@ The email is malformed.	UserLoginWindow		L’adresse mail est malformée.
 Close	UserLoginWindow		Fermer
 Close	RatePackageWindow		Fermer
 An unexpected error has been sent from the server [%i]	ServerHelper		Le serveur a retourné une erreur inattendue [%i]
-Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synchronisation des données de paquets depuis le dépôt "%REPO_NAME%".
+Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synchronisation des données de paquets depuis le dépôt « %REPO_NAME% ».
+Settings	SettingsWindow		Réglages
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Une erreur s’est produite lors du téléchargement des conditions d’utilisation requises pour créer un nouvel utilisateur. Vérifiez les détails dans le journal et réessayez.\nDes informations sur la manière de consulter les journaux sont disponibles dans la section DépôtHaiku du guide de l’utilisateur Haiku.
 View the usage conditions	UserLoginWindow		Voir les conditions d’utilisation
 Login issue	MainWindow		Problème d’authentification
@@ -116,8 +119,9 @@ Cancel	MainWindow		Annuler
 {0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 de plus à télécharger)}other{(# de plus à télécharger)}}
 Refresh repositories	MainWindow		Rafraîchir les dépôts
 Continue	App		Continuer
-A password is required.	UserLoginWindow		Un mot de passe est requis
+A password is required.	UserLoginWindow		Un mot de passe est requis.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Ce paquet ne semble pas se trouver sur le serveur de dépôt Haiku, il n’est donc pas possible de créer une nouvelle évaluation ou de modifier une évaluation existante.
+Apply	SettingsWindow		Appliquer
 Language	RatePackageWindow		Langue
 Log out	MainWindow		Déconnexion
 Comment language:	RatePackageWindow		Langue du commentaire :
@@ -144,6 +148,7 @@ Try again	App		Essayer à nouveau
 Unknown	PackageListView		Inconnu
 I agree to the usage conditions	UserLoginWindow		J’accepte les conditions d’utilisation
 Log in	UserLoginWindow		Connexion
+Sending anonymous usage data	MainWindow		Envoi de données d'utilisation anonymes
 Logged in as %User%	MainWindow		Connecté en tant que %User%
 Email address:	UserLoginWindow		Adresse e-mail :
 Screenshot	ScreenshotWindow		Capture d’écran

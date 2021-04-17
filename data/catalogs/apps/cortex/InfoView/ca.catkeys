@@ -1,0 +1,34 @@
+1	catalan; valencian	application/x-vnd.Cortex.InfoView	1146959223
+Description	DormantNodeInfoView		Descripció
+Output formats	DormantNodeInfoView		Formats de sortida
+Input formats	DormantNodeInfoView		Formats d'entrada
+Signature	AppNodeInfoView		Signatura
+Any number	DormantNodeInfoView	For 'Max. instances' field	Qualsevol número
+\n- Quality:	FileNodeInfoView		\n- Qualitat:
+Kinds	LiveNodeInfoView		Tipus
+Application	AppNodeInfoView		Aplicació
+Flavor flags	DormantNodeInfoView		Banderes de gust
+Max. instances	DormantNodeInfoView		Màx. d'instàncies
+\n- Duration:	FileNodeInfoView		\n- Durada:
+Dormant media node	DormantNodeInfoView		Node de mitjans inactius
+Latency	LiveNodeInfoView		Latència
+Live media node	LiveNodeInfoView		Node de mitjans actius
+Kinds	DormantNodeInfoView		Tipus
+%title% info	InfoView		Informació sobre %title%
+Node ID	LiveNodeInfoView		ID de node
+File format	AppNodeInfoView		Format del fitxer
+Live file-interface node	FileNodeInfoView		Node d'interfície de fitxer actiu
+File format	FileNodeInfoView		Format del fitxer
+(no file)	FileNodeInfoView		(cap fitxer)
+Input format	DormantNodeInfoView		Format d'entrada
+Version	AppNodeInfoView		Versió
+AddOn ID	DormantNodeInfoView		ID del complement
+Flavor ID	DormantNodeInfoView		ID del gust
+Run mode	LiveNodeInfoView		Mode d'execució
+\n- Codec:	FileNodeInfoView		\n- Còdec:
+Port	LiveNodeInfoView		Port
+Output format	DormantNodeInfoView		Format de sortida
+Application-owned node	AppNodeInfoView		Node propietat de l'aplicació
+Tracks	FileNodeInfoView		Pistes
+Copyright	FileNodeInfoView		Drets de còpia
+ID:	FileNodeInfoView		ID:

@@ -1,0 +1,30 @@
+1	romanian	application/x-vnd.Cortex.InfoView	3327010676
+Description	DormantNodeInfoView		Descriere
+Output formats	DormantNodeInfoView		Formate de ieșire
+Input formats	DormantNodeInfoView		Formate de intrare
+Signature	AppNodeInfoView		Semnătură
+Any number	DormantNodeInfoView	For 'Max. instances' field	Orice număr
+\n- Quality:	FileNodeInfoView		\n- Calitate:
+Kinds	LiveNodeInfoView		Feluri
+Application	AppNodeInfoView		Aplicație
+Flavor flags	DormantNodeInfoView		Fanioane de aromă
+Max. instances	DormantNodeInfoView		Instanțe maxime
+\n- Duration:	FileNodeInfoView		\n- Durată:
+Latency	LiveNodeInfoView		Latență
+Kinds	DormantNodeInfoView		Feluri
+%title% info	InfoView		informații %title%
+Node ID	LiveNodeInfoView		ID nod
+File format	AppNodeInfoView		Format de fișier
+File format	FileNodeInfoView		Format de fișier
+(no file)	FileNodeInfoView		(niciun fișier)
+Input format	DormantNodeInfoView		Format de intrare
+Version	AppNodeInfoView		Versiune
+AddOn ID	DormantNodeInfoView		ID supliment
+Flavor ID	DormantNodeInfoView		ID aromă
+Run mode	LiveNodeInfoView		Mod de rulare
+\n- Codec:	FileNodeInfoView		\n- Codec:
+Port	LiveNodeInfoView		Port
+Output format	DormantNodeInfoView		Format de ieșire
+Tracks	FileNodeInfoView		Piste
+Copyright	FileNodeInfoView		Drepturi de autor
+ID:	FileNodeInfoView		ID:

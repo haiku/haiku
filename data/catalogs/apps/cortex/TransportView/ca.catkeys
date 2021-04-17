@@ -1,0 +1,23 @@
+1	catalan; valencian	application/x-vnd.Cortex.TransportView	1534931965
+Roll	TransportView		Rotlle
+(none)	TransportView		(cap)
+{0, plural, one{# node} other{# nodes}}	TransportView		{0, plural, one{# node} other{# nodes}}
+Start	TransportView		Inicia
+No errors.	TransportView		Sense errors.
+to	TransportView		a
+Offline	TransportView		Desplaçament
+(???)	TransportView		(???)
+Stop	TransportView		Atura
+(no group)	TransportView		(sense grup)
+Drop data	TransportView		Eliminació de dades
+To:	TransportView		A:
+Recording	TransportView		Gravació
+Increase latency	TransportView		Augmenta la latència
+Time source:	TransportView		Font del temps:
+DAC time source	TransportView		Font de temps DAC
+Decrease precision	TransportView		Disminueix la precisió
+System clock	TransportView		Rellotge del sistema
+From:	TransportView		De:
+Roll from	TransportView		Rotlle des de
+Preroll	TransportView		Prerotlle
+Run mode:	TransportView		Mode d'execució:

@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-HaikuDepot	1395664368
+1	romanian	x-vnd.Haiku-HaikuDepot	2940546158
 Repository update error	LocalRepositoryUpdateProcess		Eroare la actualizarea depozitului
 Network error	ServerHelper		Eroare de rețea
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		A apărut o eroare în timpul reîmprospătării depozitului: %error%
@@ -80,7 +80,6 @@ Start package daemon	App		Pornire demon de pachet
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Parola trebuie să fie repetată pentru a reduce șansa de a introduce parola incorect.
 The package action could not be scheduled: %Error%	PackageInfoView		Actiunea pachetului n-a putut fi programată: %Error%
 Cancel	SettingsWindow		Anulează
-Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer?  You can change your preference in the \"Settings\" window later.	MainWindow		Ar fi acceptabil să se trimită date de utilizare anonime către sistemul HaikuDepotServer de la acest calculator?  Puteți modifica preferința în fereastra \„Configurări\” mai târziu.
 Cancel	RatePackageWindow		Anulează
 Inactive	PackageListView		Inactiv
 Nickname:	UserLoginWindow		Pseudonim:

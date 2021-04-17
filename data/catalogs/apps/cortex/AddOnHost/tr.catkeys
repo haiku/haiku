@@ -1,0 +1,5 @@
+1	turkish	application/x-vnd.Cortex.AddOnHost	1256552338
+Continue	CortexAddOnHost		Sürdür
+Cortex AddOnHost	CortexAddOnHost		Cortex AddOnHost
+Quit	CortexAddOnHost		Çık
+This program runs in the background, and is started automatically by Cortex when necessary. You probably don't want to start it manually.	CortexAddOnHost		Bu program arka planda çalışır ve Cortex tarafından gerektiğinde kendiliğinden başlatılır. Bunu kendinizin çalıştırmasına gerek olmayabilir.

@@ -1,0 +1,7 @@
+1	catalan; valencian	application/x-vnd.Cortex.NodeManager	1301322433
+System audio mixer	NodeManager		Mesclador d'àudio del sistema
+System video output	NodeManager		Sortida de vídeo del sistema
+System video input	NodeManager		Entrada de vídeo del sistema
+No name	NodeManager		Sense nom
+System audio input	NodeManager		Entrada d'àudio del sistema
+Time sources	NodeManager		Fonts de temps

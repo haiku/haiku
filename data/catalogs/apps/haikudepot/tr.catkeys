@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-HaikuDepot	1395664368
+1	turkish	x-vnd.Haiku-HaikuDepot	2940546158
 Repository update error	LocalRepositoryUpdateProcess		Depo güncelleme hatası
 Network error	ServerHelper		Ağ hatası
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Depo güncellenirken bir hata oluştu: %error%
@@ -80,7 +80,6 @@ Start package daemon	App		Paket hizmetini başlat
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Yanlış girme olasılığını ortadan kaldırmak için parolanız bir kez daha girilmelidir.
 The package action could not be scheduled: %Error%	PackageInfoView		Paket eylemi zamanlanamadı: %Error%
 Cancel	SettingsWindow		İptal
-Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer?  You can change your preference in the \"Settings\" window later.	MainWindow		Anonim kullanım verilerini Haiku Depo sunucusu ile paylaşmak ister misiniz? Tercihlerinizi daha sonra \"Ayarlar\" penceresinden değiştirebilirsiniz.
 Cancel	RatePackageWindow		İptal
 Inactive	PackageListView		Etkin değil
 Nickname:	UserLoginWindow		Takma ad:

@@ -1,0 +1,10 @@
+1	catalan; valencian	application/x-vnd.moon-AudioAdapter.media_addon	2282220510
+Input format	CortexAudioAdapter		Format d'entrada
+Channels:	CortexAudioAdapter		Canals:
+stereo	CortexAudioAdapter		estèreo
+mono	CortexAudioAdapter		mono
+Output format	CortexAudioAdapter		Format de sortida
+Audio input	CortexAddOnsCommon		Entrada d'àudio
+Sample format:	CortexAudioAdapter		Exemple de format:
+Audio output	CortexAddOnsCommon		Sortida d'àudio
+%groupname% parameters	CortexAddOnsCommon		Paràmetres de %groupname%

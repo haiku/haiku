@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-HaikuDepot	1395664368
+1	catalan; valencian	x-vnd.Haiku-HaikuDepot	2940546158
 Repository update error	LocalRepositoryUpdateProcess		Error d'actualització del repositori
 Network error	ServerHelper		Error de xarxa
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Hi ha hagut un error en actualitzar el repositori: %error%
@@ -80,7 +80,6 @@ Start package daemon	App		Inicia el dimoni de paquets
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Cal repetir la contrasenya per reduir la possibilitat d’introduir-la incorrectament.
 The package action could not be scheduled: %Error%	PackageInfoView		L'acció del paquet no s'ha pogut programar: %Error%
 Cancel	SettingsWindow		Cancel·la
-Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer?  You can change your preference in the \"Settings\" window later.	MainWindow		Seria acceptable enviar dades d’ús anònimes al sistema HaikuDepotServer d’aquest ordinador? En podeu canviar les preferències a la finestra de Paràmetres més endavant.
 Cancel	RatePackageWindow		Cancel·la
 Inactive	PackageListView		Inactiu
 Nickname:	UserLoginWindow		Sobrenom:

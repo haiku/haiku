@@ -1,0 +1,34 @@
+1	turkish	application/x-vnd.Cortex.InfoView	1146959223
+Description	DormantNodeInfoView		Açıklama
+Output formats	DormantNodeInfoView		Çıkış biçimleri
+Input formats	DormantNodeInfoView		Giriş biçimleri
+Signature	AppNodeInfoView		İmza
+Any number	DormantNodeInfoView	For 'Max. instances' field	Herhangi bir sayı
+\n- Quality:	FileNodeInfoView		\n- Kalite:
+Kinds	LiveNodeInfoView		Türler
+Application	AppNodeInfoView		Uygulama
+Flavor flags	DormantNodeInfoView		Çeşit bayrakları
+Max. instances	DormantNodeInfoView		En çok oluşum
+\n- Duration:	FileNodeInfoView		\n- Süre:
+Dormant media node	DormantNodeInfoView		Etkin olmayan ortam düğümü
+Latency	LiveNodeInfoView		Gecikme
+Live media node	LiveNodeInfoView		Canlı ortam düğümü
+Kinds	DormantNodeInfoView		Türler
+%title% info	InfoView		%title% bilgisi
+Node ID	LiveNodeInfoView		Düğüm kimliği
+File format	AppNodeInfoView		Dosya biçimi
+Live file-interface node	FileNodeInfoView		Canlı dosya arayüzü düğümü
+File format	FileNodeInfoView		Dosya biçimi
+(no file)	FileNodeInfoView		(dosya yok)
+Input format	DormantNodeInfoView		Giriş biçimi
+Version	AppNodeInfoView		Sürüm
+AddOn ID	DormantNodeInfoView		Eklenti kimliği
+Flavor ID	DormantNodeInfoView		Çeşit kimliği
+Run mode	LiveNodeInfoView		Çalışma kipi
+\n- Codec:	FileNodeInfoView		\n- Kod çözücü
+Port	LiveNodeInfoView		Kapı
+Output format	DormantNodeInfoView		Çıkış biçimi
+Application-owned node	AppNodeInfoView		Uygulamanın iyesi olduğu düğüm
+Tracks	FileNodeInfoView		Parçalar
+Copyright	FileNodeInfoView		Telif hakkı
+ID:	FileNodeInfoView		Kimlik:

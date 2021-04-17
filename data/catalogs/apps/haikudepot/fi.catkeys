@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-HaikuDepot	908828196
+1	finnish	x-vnd.Haiku-HaikuDepot	2453709986
 Repository update error	LocalRepositoryUpdateProcess		Tietovaraston päivitysvirhe
 Network error	ServerHelper		Verkkovirhe
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Tietovaraston päivityksen yhteydessä tapahtui virhe: %error%
@@ -78,7 +78,6 @@ Send	RatePackageWindow		Lähetä
 Start package daemon	App		Käynnistä pakkaustaustaprosessi
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Salasana on toistettava sen mahdollisuuden pienentämiseksi, että se on kirjoitettu väärin.
 The package action could not be scheduled: %Error%	PackageInfoView		Pakkaustoiminnon aikatauluttaminen epäonnistui: %Error%
-Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer?  You can change your preference in the \"Settings\" window later.	MainWindow		Hyväksytkö nimettömien tietojen lähettämisen HaikuDepotServer-järjestelmään tältä tietokoneelta?  Voit muuttaa asetuksiasi \"Asetukset\"-ikkunassa myöhemmin.
 Cancel	RatePackageWindow		Peru
 Inactive	PackageListView		Ei käytössä
 Nickname:	UserLoginWindow		Käyttäjätunnus:

@@ -1,0 +1,32 @@
+1	german	application/x-vnd.Cortex.InfoView	3761768827
+Description	DormantNodeInfoView		Beschreibung
+Output formats	DormantNodeInfoView		Ausgangeformate
+Input formats	DormantNodeInfoView		Eingangsformate
+Signature	AppNodeInfoView		Signatur
+Any number	DormantNodeInfoView	For 'Max. instances' field	beliebig viele
+\n- Quality:	FileNodeInfoView		\n- Qualität:
+Kinds	LiveNodeInfoView		Arten
+Application	AppNodeInfoView		Anwendung
+Flavor flags	DormantNodeInfoView		Variante
+Max. instances	DormantNodeInfoView		Max. Instanzen
+\n- Duration:	FileNodeInfoView		\n- Dauer:
+Dormant media node	DormantNodeInfoView		Schlafende Media Node
+Latency	LiveNodeInfoView		Latenz
+Live media node	LiveNodeInfoView		Live Media Node
+Kinds	DormantNodeInfoView		Arten
+%title% info	InfoView		%title% Info
+Node ID	LiveNodeInfoView		Node ID
+File format	AppNodeInfoView		Dateiformat
+Live file-interface node	FileNodeInfoView		Live Datei-Interface Node
+File format	FileNodeInfoView		Dateiformat
+(no file)	FileNodeInfoView		(keine Datei)
+Input format	DormantNodeInfoView		Eingangsformat
+Version	AppNodeInfoView		Version
+AddOn ID	DormantNodeInfoView		Add-on ID
+Flavor ID	DormantNodeInfoView		Variaten ID
+Run mode	LiveNodeInfoView		Laufmodus
+\n- Codec:	FileNodeInfoView		\n- Codec:
+Port	LiveNodeInfoView		Port
+Output format	DormantNodeInfoView		Ausgangsformat
+Application-owned node	AppNodeInfoView		Anwendungs-Node
+Tracks	FileNodeInfoView		Spuren

@@ -16,7 +16,7 @@ No updates available	UpdateAction		Aucune mise à jour disponible
 New packages to be installed	SoftwareUpdaterWindow	List super item label	Nouveaux paquets à installer
 Packages to be updated	SoftwareUpdaterWindow	List super item label	Paquets à mettre à jour
 to	SoftwareUpdaterWindow	List item text	vers
-Attempting to cancel the updates…	SoftwareUpdaterWindow		Tentative d’annulation des mises à jour
+Attempting to cancel the updates…	SoftwareUpdaterWindow		Tentative d’annulation des mises à jour…
 Contacting software repositories to check for package updates.	CheckManager		Contact des dépôts de logiciels à la recherche des mises à jour disponibles pour les paquets.
 Available updates found	CheckManager		Mises à jour disponibles
 from repository	SoftwareUpdaterWindow	List item text	depuis le dépôt

@@ -1,0 +1,33 @@
+1	french	x-vnd.haiku.SerialConnect	1797120775
+Hardware	SerialWindow	Flowcontrol	Matériel
+Connection	SerialWindow		Connexion
+Raw send…	SerialWindow		Envoi brut…
+Baud rate	SerialWindow		Vitesse de transmission
+Stop bits	SerialWindow		Bits d’arrêts
+None	SerialWindow	Flowcontrol	Aucun
+Cancel	Custom baudrate window		Annuler
+Sending…	XModemStatus		Envoi…
+<no serial port available>	SerialWindow		<aucun port série disponible>
+Log to file…	SerialWindow		Journaliser dans le fichier…
+Custom baudrate	Custom baudrate window		Vitesse de transmission personnalisée
+File	SerialWindow		Fichier
+SerialConnect	System name		ConnexionSérie
+custom…	SerialWindow	Baudrate	personnalisée…
+Parity	SerialWindow		Parité
+None	SerialWindow	Parity	Aucune
+Disconnect	SerialWindow		Déconnexion
+Everything sent, waiting for acknowledge	XModemStatus		Envoi complet, attente de l’accusé de réception
+Odd	SerialWindow	Parity	Impair
+Flow control	SerialWindow		Contrôle du flux
+file transfer progress	SerialWindow		progression du transfert de fichiers
+Data bits	SerialWindow		Bits de données
+Both	SerialWindow	Flowcontrol	Les deux
+XModem send…	SerialWindow		Envoi XModem…
+Baudrate:	Custom baudrate window		Bauds :
+OK	Custom baudrate window		OK
+Waiting for receiver…	XModemStatus		En attente d’un receveur…
+Clear history	SerialWindow		Effacer l’historique
+Settings	SerialWindow		Réglages
+Even	SerialWindow	Parity	Pair
+Software	SerialWindow	Flowcontrol	Logiciel
+Line terminator	SerialWindow		Terminateur de ligne

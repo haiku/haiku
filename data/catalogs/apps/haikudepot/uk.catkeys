@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-HaikuDepot	468702767
+1	ukrainian	x-vnd.Haiku-HaikuDepot	3041521443
 Repository update error	LocalRepositoryUpdateProcess		Помилка оновлення репозитарія 
 Network error	ServerHelper		Помилка мережі
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Під час оновлення репозитарія сталася помилка: %error%
@@ -77,6 +77,7 @@ Send	RatePackageWindow		Надіслати
 Start package daemon	App		Запустити демон пакетів
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Пароль потрібно повторити, щоб зменшити ймовірність неправильного введення пароля.
 The package action could not be scheduled: %Error%	PackageInfoView		Дію пакета неможливо спрогнозувати: %Error%
+Cancel	SettingsWindow		Скасувати
 Cancel	RatePackageWindow		Скасувати
 Inactive	PackageListView		Неактивний
 Nickname:	UserLoginWindow		Користувач:
@@ -88,6 +89,7 @@ Usage conditions download problem	UserLoginWindow		Помилка при зав�
 OK	PackageInfoView		ОК
 Downloading:	PackageInfoView		Завантаження:
 Success	UserLoginWindow		Успішно
+No	MainWindow		Ні
 Package daemon problem	App		Проблема демона пакета
 (%Votes%)	PackageInfoView		(%Votes%)
 Repository	PackageListView		Репозитарій
@@ -147,6 +149,7 @@ Email address:	UserLoginWindow		Адреса Email:
 Screenshot	ScreenshotWindow		Знімок екрана
 A reboot is necessary to complete the installation process.	PackageManager		Для завершення інсталяції потрібне перезавантаження.
 HaikuDepot	System name		HaikuDepot
+Yes	MainWindow		Так
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural, one{Мені # рік або більше} few{Мені # роки або більше} other{Мені # років або більше}}
 View latest usage conditions…	MainWindow		Перегляд останніх Умов користування…
 Quit	App		Вийти

@@ -1,0 +1,18 @@
+1	romanian	application/x-vnd.Be.LoggingConsumerApp	2235602373
+Priority	CortexAddOnsLoggingConsumer		Prioritate
+Latency	CortexAddOnsLoggingConsumer		Latență
+Logged input	CortexAddOnsLoggingConsumer		Intrare înregistrată
+CPU spin percentage	CortexAddOnsLoggingConsumer		Procentaj de rotire CPU
+NodeLogger	CortexAddOnsLoggingConsumers		NodeLogger
+Start	CortexAddOnsLoggingConsumerNodeHarnessWin		Începe
+Thread priority	CortexAddOnsLoggingConsumer		Prioritate de thread
+LoggingConsumer parameters	CortexAddOnsLoggingConsumer		Parametri LoggingConsumer
+Latency control	CortexAddOnsLoggingConsumer		Control de latență
+CPU percentage	CortexAddOnsLoggingConsumer		Procentaj CPU
+LoggingConsumer	CortexAddOnsLoggingConsumer		LoggingConsumer
+Stop	CortexAddOnsLoggingConsumerNodeHarnessWin		Oprește
+OK	CortexAddOnsCommonMediaNodeControlApp		OK
+Controls	CortexAddOnsLoggingConsumerNodeHarnessWin		Controale
+controls	CortexAddOnsCommonMediaNodeControlApp		controale
+Connect	CortexAddOnsLoggingConsumerNodeHarnessWin		Conectează
+percent	CortexAddOnsLoggingConsumer		procent

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	1395664368
+1	japanese	x-vnd.Haiku-HaikuDepot	2940546158
 Repository update error	LocalRepositoryUpdateProcess		リポジトリアップデートエラー
 Network error	ServerHelper		ネットワークエラー
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		リポジトリの更新中に次のエラーが発生しました: %error%
@@ -80,7 +80,6 @@ Start package daemon	App		パッケージデーモンを起動
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		間違って入力する可能性を減らすため、パスワードを繰り返す必要があります。
 The package action could not be scheduled: %Error%	PackageInfoView		パッケージアクションを予約できませんでした: %Error%
 Cancel	SettingsWindow		キャンセル
-Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer?  You can change your preference in the \"Settings\" window later.	MainWindow		このコンピューターから匿名の使用状況データーをHaikuDepotServerシステムに送信することを受け入れますか? \"設定\" ウインドウであとから設定を変更できます。
 Cancel	RatePackageWindow		中止
 Inactive	PackageListView		無効
 Nickname:	UserLoginWindow		ニックネーム:

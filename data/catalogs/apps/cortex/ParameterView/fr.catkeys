@@ -1,0 +1,8 @@
+1	french	application/x-vnd.Cortex.ParameterView	1295152157
+Themes	ParameterWindow		Thèmes
+Start control panel	ParameterWindow		Démarrer le panneau de contrôle
+%nodeinfo% parameters	ParameterWindow		Paramètres de %nodeinfo%
+OK	ParameterWindow		OK
+Window	ParameterWindow		Fenêtre
+Could not start control panel (%error%)	ParameterWindow		Impossible de démarrer le panneau de contrôle (%error%)
+Close	ParameterWindow		Fermer

@@ -1,0 +1,13 @@
+1	french	application/x-vnd.Cortex.InfoView	1657177474
+Description	DormantNodeInfoView		Description
+Output formats	DormantNodeInfoView		Formats de sorties
+Input formats	DormantNodeInfoView		Formats d’entrées
+Latency	LiveNodeInfoView		Latence
+Node ID	LiveNodeInfoView		ID de nœud
+File format	AppNodeInfoView		Format de fichier
+File format	FileNodeInfoView		Format de fichier
+Version	AppNodeInfoView		Version
+Run mode	LiveNodeInfoView		Mode d’exécution
+Port	LiveNodeInfoView		Port
+Output format	DormantNodeInfoView		Format
+ID:	FileNodeInfoView		ID :

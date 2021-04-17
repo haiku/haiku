@@ -115,7 +115,7 @@ Find again	ProbeView		Weitersuchen
 View	ProbeView	This is the last menubar item 'File Edit Block View'	Ansicht
 Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Bild konnte nicht eingelesen werden
 DiskProbe request	ProbeView		DiskProbe-Anfrage
-Double precision floating-point value:	TypeEditors		Doppelt-präziser Gleitkomma-Wert:
+Double precision floating-point value:	TypeEditors		Gleitkomma-Wert doppelter Genauigkeit:
 Image	TypeEditors	This is the type of view	Bild
 Save changes before closing?	ProbeView		Änderungen vor dem Beenden speichern?
 PNG format	TypeEditors		PNG-Format

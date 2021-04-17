@@ -1,0 +1,26 @@
+1	french	application/x-vnd.Cortex.support	1670052995
+(unknown format)	MediaString		(format inconnu)
+Rear-right	MediaString		Arrière-droit
+{0, plural, one{# pixel} other{# pixels}}	MediaString		{0, plural, one{# pixel} other{# pixels}}
+Mono	MediaString		Mono
+Top-Front-left	MediaString		Avant-gauche-haut
+Top-Front-center	MediaString		Avant-centre-haut
+Back-center	MediaString		Arrière-centre
+Interlaced 	MediaString		Entrelacé 
+Right	MediaString		Droite
+System mixer	MediaString		Mixeur système
+Physical output	MediaString		Sortie physique
+Top-Back-center	MediaString		Arrière-centre-haut
+Top to bottom, left to right	MediaString		De haut en bas, et de gauche à droite
+Rear-left	MediaString		Arrière-gauche
+Top-Front-right	MediaString		Avant-droit-haut
+Side-right	MediaString		Côté-droit
+Side-left	MediaString		Côté-gauche
+Front-left-center	MediaString		Avant-gauche-milieu
+Center	MediaString		Centre
+Top-Back-left	MediaString		Arrière-gauche-haut
+{0, plural,one{# byte (max)}other{# bytes (max)}}	MediaString		{0, plural,one{# octet (max)}other{# octets (max)}}
+Top-Back-right	MediaString		Arrière-droit-haut
+Left	MediaString		Gauche
+Top-center	MediaString		Centre-haut
+Bottom to top, left to right	MediaString		De bas en haut, et de gauche à droite

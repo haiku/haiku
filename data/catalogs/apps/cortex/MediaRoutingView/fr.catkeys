@@ -1,0 +1,9 @@
+1	french	application/x-vnd.Cortex.MediaRoutingView	717483812
+Video output	MediaRoutingView		Sortie vidéo
+OK	MediaRoutingView		OK
+Audio input	MediaRoutingView		Entrée audio
+Video input	MediaRoutingView		Entrée vidéo
+Disconnect	MediaRoutingView		Déconnecter
+Input	MediaJack		Entrée
+Error	MediaRoutingView		Erreur
+Output	MediaJack		Sortie

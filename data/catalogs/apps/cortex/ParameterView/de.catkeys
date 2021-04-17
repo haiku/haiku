@@ -1,0 +1,8 @@
+1	german	application/x-vnd.Cortex.ParameterView	1295152157
+Themes	ParameterWindow		Themes
+Start control panel	ParameterWindow		Steuerpanel starten
+%nodeinfo% parameters	ParameterWindow		%nodeinfo% Parameter
+OK	ParameterWindow		OK
+Window	ParameterWindow		Fenster
+Could not start control panel (%error%)	ParameterWindow		Steuerpanel konnte nicht gestartet werden (%error%)
+Close	ParameterWindow		Schließen

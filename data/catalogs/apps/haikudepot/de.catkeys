@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-HaikuDepot	1395664368
+1	german	x-vnd.Haiku-HaikuDepot	2940546158
 Repository update error	LocalRepositoryUpdateProcess		Fehler bei Paketquellenaktualisierung
 Network error	ServerHelper		Netzwerk Fehler
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Fehler bei der Aktualisierung der Paketquelle: %error%
@@ -80,7 +80,6 @@ Start package daemon	App		Paket-Daemon starten
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Das Kennwort muss wiederholt werden, um die Wahrscheinlichket einer Falscheingabe zu verringern.
 The package action could not be scheduled: %Error%	PackageInfoView		Die Aktion konnte nicht auf das Paket angewandt werden: %Error%
 Cancel	SettingsWindow		Abbrechen
-Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer?  You can change your preference in the \"Settings\" window later.	MainWindow		Dürfen anonyme Nutzuungsdaten von diesem Computer an den HaikuDepotServer geschickt werden? Die Option kann jederzeit im \"Einstellungen\" Fenster geändert werden.
 Cancel	RatePackageWindow		Abbrechen
 Inactive	PackageListView		Deaktiviert
 Nickname:	UserLoginWindow		Benutzername:

@@ -1,0 +1,5 @@
+1	german	application/x-vnd.Cortex.AddOnHost	1256552338
+Continue	CortexAddOnHost		Weiter
+Cortex AddOnHost	CortexAddOnHost		Cortex AddOnHost
+Quit	CortexAddOnHost		Beenden
+This program runs in the background, and is started automatically by Cortex when necessary. You probably don't want to start it manually.	CortexAddOnHost		Dieses Programm läuft im Hintergrund und wird wenn nötig automatisch von Cortex gestartet. Trotzdem manuell starten?

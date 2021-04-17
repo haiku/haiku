@@ -1,0 +1,7 @@
+1	romanian	application/x-vnd.Cortex.NodeManager	1301322433
+System audio mixer	NodeManager		Mixer audio de sistem
+System video output	NodeManager		Ieșire video de sistem
+System video input	NodeManager		Intrare video de sistem
+No name	NodeManager		Fără nume
+System audio input	NodeManager		Intrare audio de sistem
+Time sources	NodeManager		Surse de timp

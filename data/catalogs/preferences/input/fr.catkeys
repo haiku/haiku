@@ -29,7 +29,7 @@ Keyboard Lock Delay	TouchpadPrefView		Délai de verrouillage du clavier
 Two finger scrolling	TouchpadPrefView		Défilement à deux doigts
 Input	System name		Entrées
 Mouse acceleration	SettingsView		Accélération de la souris
-The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Une zone de défilement aussi large pourrait empêcher le fonctionnement normal du pointeur de souris. Est-ce vraiment ce que vous voulez?
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Une zone de défilement aussi large pourrait empêcher le fonctionnement normal du pointeur de souris. Est-ce vraiment ce que vous voulez ?
 High	TouchpadPrefView		Haut
 Defaults	TouchpadPrefView		Par défaut
 1-Button	SettingsView		1-Bouton

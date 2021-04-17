@@ -1,0 +1,7 @@
+1	turkish	application/x-vnd.Cortex.NodeManager	1301322433
+System audio mixer	NodeManager		Sistem ses karıştırıcısı
+System video output	NodeManager		Sistem video çıkışı
+System video input	NodeManager		Sistem video girişi
+No name	NodeManager		Adsız
+System audio input	NodeManager		Sistem ses girişi
+Time sources	NodeManager		Zaman kaynakları

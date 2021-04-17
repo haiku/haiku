@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	908828196
+1	swedish	x-vnd.Haiku-HaikuDepot	2453709986
 Repository update error	LocalRepositoryUpdateProcess		Fel vid uppdatering av repositorie
 Network error	ServerHelper		Nätverksfel
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Ett fel inträffade vid uppdatering av repositoriet: %error%
@@ -78,7 +78,6 @@ Send	RatePackageWindow		Skicka
 Start package daemon	App		Starta paket-servicen
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Lösenordet måste upprepas för att minska risken att det anges felaktigt.
 The package action could not be scheduled: %Error%	PackageInfoView		Paket körningen kunde inte planeras: %Error%
-Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer?  You can change your preference in the \"Settings\" window later.	MainWindow		Skulle det vara acceptabelt att skicka anonyma användningsdata till HaikuDepotServer-systemet från den här datorn?  Du kan ändra dina preferenser i fönstret \"Inställningar\" senare.
 Cancel	RatePackageWindow		Avbryt
 Inactive	PackageListView		Inaktiv
 Nickname:	UserLoginWindow		Användarnamn:
