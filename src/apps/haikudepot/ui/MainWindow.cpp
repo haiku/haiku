@@ -811,7 +811,7 @@ MainWindow::_PromptCanShareAnonymousUserData()
 	BAlert* alert = new(std::nothrow) BAlert(
 		B_TRANSLATE("Sending anonymous usage data"),
 		B_TRANSLATE("Would it be acceptable to send anonymous usage data to the"
-			" HaikuDepotServer system from this computer?  You can change your"
+			" HaikuDepotServer system from this computer? You can change your"
 			" preference in the \"Settings\" window later."),
 		B_TRANSLATE("No"),
 		B_TRANSLATE("Yes"));
