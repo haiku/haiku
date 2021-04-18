@@ -276,7 +276,7 @@ rule KernelArchitectureSetup architecture
 
 		case riscv64 :
 			HAIKU_KERNEL_PLATFORM ?= efi ;
-			HAIKU_BOOT_TARGETS += efi ;
+			HAIKU_BOOT_TARGETS += efi riscv ;
 
 			HAIKU_BOOT_SDIMAGE_BEGIN = 2 ; # KiB
 
@@ -526,6 +526,9 @@ rule KernelArchitectureSetup architecture
 						HAIKU_BOOT_$(bootTarget:U)_C++FLAGS += -m68020-60 ;
 					# TODO: coldfire (FireBee)
 				}
+			case riscv :
+				HAIKU_BOOT_$(bootTarget:U)_CCFLAGS += -mcmodel=medany -fno-omit-frame-pointer -fno-plt -fno-pic -fno-semantic-interposition ;
+				HAIKU_BOOT_$(bootTarget:U)_C++FLAGS += -mcmodel=medany -fno-omit-frame-pointer -fno-plt -fno-pic -fno-semantic-interposition ;
 			case * :
 				# all other bootloaders are non-PIC
 				HAIKU_BOOT_$(bootTarget:U)_CCFLAGS += -fno-pic -Wno-error=main ;

@@ -310,6 +310,10 @@ for platform in [ MultiBootSubDirSetup ] {
 			ldflags += -Map=efi.map ;
 		}
 
+		if $(TARGET_BOOT_PLATFORM) = riscv {
+			ldflags += -z,notext ;
+		}
+
 		BootLd boot_loader_$(platform:G=) :
 			boot_platform_$(platform:G=).o
 			$(archObject:G=$(archGrist))
@@ -383,6 +387,9 @@ for platform in [ MultiBootSubDirSetup ] {
 					: $(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/boot_prg_$(TARGET_BOOT_PLATFORM).ld
 					: -Bstatic
 				;
+
+			case riscv :
+				BuildBiosLoader haiku_loader.$(TARGET_BOOT_PLATFORM) : boot_loader_$(TARGET_BOOT_PLATFORM) ;
 
 			case next_m68k :
 				BuildAoutLoader haiku_loader.$(TARGET_BOOT_PLATFORM) : boot_loader_$(TARGET_BOOT_PLATFORM) ;

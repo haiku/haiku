@@ -1,0 +1,58 @@
+SubDir HAIKU_TOP src system boot platform riscv ;
+
+SubDirHdrs $(HAIKU_TOP) headers private kernel boot platform riscv ;
+
+UsePrivateHeaders [ FDirName kernel boot platform riscv ] ;
+UsePrivateHeaders [ FDirName kernel platform $(TARGET_BOOT_PLATFORM) ] ;
+UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
+UsePrivateHeaders [ FDirName graphics common ] ;
+UsePrivateHeaders [ FDirName storage ] ;
+UsePrivateHeaders [ FDirName virtio ] ;
+UseLibraryHeaders [ FDirName libfdt ] ;
+
+{
+	local defines = _BOOT_MODE ;
+
+	defines = [ FDefines $(defines) ] ;
+	SubDirCcFlags $(defines) ;
+	SubDirC++Flags $(defines) -fno-rtti ;
+	SubDirAsFlags -I $(SUBDIR) ;
+}
+
+local platform ;
+for platform in [ MultiBootSubDirSetup riscv ] {
+	on $(platform) {
+
+		BootMergeObject boot_platform_riscv_other.o :
+			crt0.S
+			start.cpp
+			debug.cpp
+			console.cpp
+			devices.cpp
+			menu.cpp
+			mmu.cpp
+			cpu.cpp
+			video.cpp
+
+			fdt.cpp
+			graphics.cpp
+			fixed_font.S
+			htif.cpp
+			virtio.cpp
+			entry.S
+
+			: :
+			boot_platform_generic_riscv.a
+			boot_fdt.a
+		;
+
+
+		BootMergeObject boot_platform_riscv.o :
+			: :
+			boot_platform_riscv_other.o
+		;
+	}
+}
+
+SEARCH on [ FGristFiles $(genericPlatformSources) ]
+	= [ FDirName $(HAIKU_TOP) src system boot platform generic ] ;

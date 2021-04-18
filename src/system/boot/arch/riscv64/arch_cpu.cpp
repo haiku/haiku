@@ -58,16 +58,15 @@ arch_ucode_load(BootVolume& volume)
 extern "C" bigtime_t
 system_time()
 {
-	#warning Implement system_time in RISCV bootloader!
-	return 0;
+	// TODO: units conversion
+	return CpuTime();
 }
 
 
 extern "C" void
 spin(bigtime_t microseconds)
 {
-	#warning Implment spin in RISCV bootloader!
-	//bigtime_t time = system_time();
-	//while ((system_time() - time) < microseconds)
-	//	asm volatile ("nop;");
+	bigtime_t time = system_time();
+	while ((system_time() - time) < microseconds)
+		asm volatile ("nop;");
 }
