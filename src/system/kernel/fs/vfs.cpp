@@ -1754,8 +1754,6 @@ acquire_advisory_lock(struct vnode* vnode, io_context* context,
 {
 	FUNCTION(("acquire_advisory_lock(vnode = %p, flock = %p, wait = %s)\n",
 		vnode, flock, wait ? "yes" : "no"));
-	dprintf("acquire_advisory_lock(vnode = %p, flock = %p, wait = %s)\n",
-		vnode, flock, wait ? "yes" : "no");
 
 	bool shared = flock->l_type == F_RDLCK;
 	void* boundTo = descriptor != NULL ? (void*)descriptor : (void*)context;
