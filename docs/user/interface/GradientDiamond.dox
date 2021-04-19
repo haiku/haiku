@@ -1,0 +1,105 @@
+/*
+ * Copyright 2020 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Name, email@email.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/GradientDiamond.h	hrev32745
+ *		src/kits/interface/GradientDiamond.cpp	hrev28564
+ */
+
+
+//! \cond INTERNAL
+
+
+/*!
+	\file GradientDiamond.h
+	\ingroup interface
+	\brief Undocumented file.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\class BGradientDiamond
+	\ingroup interface
+	\ingroup libbe
+	\brief Undocumented class.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BGradientDiamond::BGradientDiamond()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BGradientDiamond::BGradientDiamond(const BPoint &center)
+	\brief Undocumented public method
+
+	\param center Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BGradientDiamond::BGradientDiamond(float cx, float cy)
+	\brief Undocumented public method
+
+	\param cx Undocumented
+	\param cy Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BPoint BGradientDiamond::Center() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BGradientDiamond::SetCenter(const BPoint &center)
+	\brief Undocumented public method
+
+	\param center Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BGradientDiamond::SetCenter(float cx, float cy)
+	\brief Undocumented public method
+
+	\param cx Undocumented
+	\param cy Undocumented
+
+	\since Haiku R1
+*/
+
+//! \endcond INTERNAL

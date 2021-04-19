@@ -1,0 +1,128 @@
+/*
+ * Copyright 2020 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Name, email@email.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/GradientLinear.h	hrev32745
+ *		src/kits/interface/GradientLinear.cpp	hrev28564
+ */
+
+
+//! \cond INTERNAL
+
+
+/*!
+	\file GradientRadial.h
+	\ingroup interface
+	\brief Undocumented file.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\class BGradientRadial
+	\ingroup interface
+	\ingroup libbe
+	\brief Undocumented class.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BGradientRadial::BGradientRadial()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BGradientRadial::BGradientRadial(const BPoint &center, float radius)
+	\brief Undocumented public method
+
+	\param center Undocumented
+	\param radius Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BGradientRadial::BGradientRadial(float cx, float cy, float radius)
+	\brief Undocumented public method
+
+	\param cx Undocumented
+	\param cy Undocumented
+	\param radius Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BPoint BGradientRadial::Center() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn float BGradientRadial::Radius() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BGradientRadial::SetCenter(const BPoint &center)
+	\brief Undocumented public method
+
+	\param center Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BGradientRadial::SetCenter(float cx, float cy)
+	\brief Undocumented public method
+
+	\param cx Undocumented
+	\param cy Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BGradientRadial::SetRadius(float radius)
+	\brief Undocumented public method
+
+	\param radius Undocumented
+
+	\since Haiku R1
+*/
+
+//! \endcond INTERNAL

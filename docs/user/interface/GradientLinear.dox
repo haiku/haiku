@@ -1,0 +1,140 @@
+/*
+ * Copyright 2020 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Name, email@email.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/GradientLinear.h	hrev32745
+ *		src/kits/interface/GradientLinear.cpp	hrev28564
+ */
+
+
+//! \cond INTERNAL
+
+
+/*!
+	\file GradientLinear.h
+	\ingroup interface
+	\brief Undocumented file.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\class BGradientLinear
+	\ingroup interface
+	\ingroup libbe
+	\brief Undocumented class.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BGradientLinear::BGradientLinear()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BGradientLinear::BGradientLinear(const BPoint &start, const BPoint &end)
+	\brief Undocumented public method
+
+	\param start Undocumented
+	\param end Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BGradientLinear::BGradientLinear(float x1, float y1, float x2, float y2)
+	\brief Undocumented public method
+
+	\param x1 Undocumented
+	\param y1 Undocumented
+	\param x2 Undocumented
+	\param y2 Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BPoint BGradientLinear::End() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BGradientLinear::SetEnd(const BPoint &end)
+	\brief Undocumented public method
+
+	\param end Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BGradientLinear::SetEnd(float x2, float y2)
+	\brief Undocumented public method
+
+	\param x2 Undocumented
+	\param y2 Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BGradientLinear::SetStart(const BPoint &start)
+	\brief Undocumented public method
+
+	\param start Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BGradientLinear::SetStart(float x1, float y1)
+	\brief Undocumented public method
+
+	\param x1 Undocumented
+	\param y1 Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BPoint BGradientLinear::Start() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+//! \endcond INTERNAL

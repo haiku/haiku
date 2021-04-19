@@ -1,0 +1,129 @@
+/*
+ * Copyright 2020 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Name, email@email.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/GradientConic.h	hrev32745
+ *		src/kits/interface/GradientConic.cpp	hrev28560
+ */
+
+
+//! \cond INTERNAL
+
+
+/*!
+	\file GradientConic.h
+	\ingroup interface
+	\brief Undocumented file.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\class BGradientConic
+	\ingroup interface
+	\ingroup libbe
+	\brief Undocumented class.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BGradientConic::BGradientConic()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BGradientConic::BGradientConic(const BPoint &center, float angle)
+	\brief Undocumented public method
+
+	\param center Undocumented
+	\param angle Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BGradientConic::BGradientConic(float cx, float cy, float angle)
+	\brief Undocumented public method
+
+	\param cx Undocumented
+	\param cy Undocumented
+	\param angle Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn float BGradientConic::Angle() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BPoint BGradientConic::Center() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BGradientConic::SetAngle(float angle)
+	\brief Undocumented public method
+
+	\param angle Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BGradientConic::SetCenter(const BPoint &center)
+	\brief Undocumented public method
+
+	\param center Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BGradientConic::SetCenter(float cx, float cy)
+	\brief Undocumented public method
+
+	\param cx Undocumented
+	\param cy Undocumented
+
+	\since Haiku R1
+*/
+
+
+//! \endcond INTERNAL

@@ -1,0 +1,591 @@
+/*
+ * Copyright 2020 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Name, email@email.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/Gradient.h	hrev54502
+ *		src/kits/interface/Gradient.cpp	hrev54502
+ */
+
+
+//! \cond INTERNAL
+
+
+/*!
+	\file Gradient.h
+	\ingroup interface
+	\brief Undocumented file.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\class BGradient
+	\ingroup interface
+	\ingroup libbe
+	\brief Undocumented class.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\struct BGradient::ColorStop
+	\brief Undocumented class.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var rgb_color BGradient::ColorStop::color
+	\brief Undocumented public variable
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var float BGradient::ColorStop::offset
+	\brief Undocumented public variable
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BGradient::ColorStop::ColorStop()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BGradient::ColorStop::ColorStop(const ColorStop &other)
+	\brief Undocumented public method
+
+	\param other Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BGradient::ColorStop::ColorStop(const rgb_color c, float o)
+	\brief Undocumented public method
+
+	\param c Undocumented
+	\param o Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BGradient::ColorStop::ColorStop(uint8 r, uint8 g, uint8 b, uint8 a,
+		float o)
+	\brief Undocumented public method
+
+	\param r Undocumented
+	\param g Undocumented
+	\param b Undocumented
+	\param a Undocumented
+	\param o Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BGradient::ColorStop::operator!=(const ColorStop &other) const
+	\brief Undocumented public method
+
+	\param other Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\enum BGradient::Type
+	\brief Undocumented enum.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var Type BGradient::TYPE_LINEAR
+	\brief Undocumented enum value.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var Type BGradient::TYPE_RADIAL
+	\brief Undocumented enum value.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var Type BGradient::TYPE_RADIAL_FOCUS
+	\brief Undocumented enum value.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var Type BGradient::TYPE_DIAMOND
+	\brief Undocumented enum value.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var Type BGradient::TYPE_CONIC
+	\brief Undocumented enum value.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var Type BGradient::TYPE_NONE
+	\brief Undocumented enum value.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BGradient::BGradient()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BGradient::BGradient(BMessage *archive)
+	\brief Undocumented public method
+
+	\param archive Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BGradient::BGradient(const BGradient &other)
+	\brief Undocumented public method
+
+	\param other Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual BGradient::~BGradient()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn int32 BGradient::AddColor(const rgb_color &color, float offset)
+	\brief Undocumented public method
+
+	\param color Undocumented
+	\param offset Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BGradient::AddColorStop(const ColorStop &colorStop, int32 index)
+	\brief Undocumented public method
+
+	\param colorStop Undocumented
+	\param index Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual status_t BGradient::Archive(BMessage *into,
+		bool deep=true) const
+	\brief Undocumented public method
+
+	\param into Undocumented
+	\param deep Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn ColorStop* BGradient::ColorStopAt(int32 index) const
+	\brief Undocumented public method
+
+	\param index Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn ColorStop* BGradient::ColorStopAtFast(int32 index) const
+	\brief Undocumented public method
+
+	\param index Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn ColorStop* BGradient::ColorStops() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BGradient::ColorStopsAreEqual(const BGradient &other) const
+	\brief Undocumented public method
+
+	\param other Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn int32 BGradient::CountColorStops() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BGradient::Flatten(BDataIO *stream) const
+	\brief Undocumented public method
+
+	\param stream Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn Type BGradient::GetType() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BGradient::MakeEmpty()
+	\brief Undocumented public method
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BGradient::operator!=(const BGradient &other) const
+	\brief Undocumented public method
+
+	\param other Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BGradient& BGradient::operator=(const BGradient &other)
+	\brief Undocumented public method
+
+	\param other Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BGradient::operator==(const BGradient &other) const
+	\brief Undocumented public method
+
+	\param other Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BGradient::RemoveColor(int32 index)
+	\brief Undocumented public method
+
+	\param index Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BGradient::SetColor(int32 index, const rgb_color &color)
+	\brief Undocumented public method
+
+	\param index Undocumented
+	\param color Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BGradient::SetColorStop(int32 index, const ColorStop &colorStop)
+	\brief Undocumented public method
+
+	\param index Undocumented
+	\param colorStop Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BGradient::SetColorStops(const BGradient &other)
+	\brief Undocumented public method
+
+	\param other Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BGradient::SetOffset(int32 index, float offset)
+	\brief Undocumented public method
+
+	\param index Undocumented
+	\param offset Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BGradient::SortColorStopsByOffset()
+	\brief Undocumented public method
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn static status_t BGradient::Unflatten(BGradient *&output,
+		BDataIO *stream)
+	\brief Undocumented public method
+
+	\param output Undocumented
+	\param stream Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\struct BGradient::ColorStop
+	\ingroup <group name>
+	\ingroup libbe
+	\brief Undocumented class.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var rgb_color BGradient::ColorStop::color
+	\brief Undocumented public variable
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var float BGradient::ColorStop::offset
+	\brief Undocumented public variable
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BGradient::ColorStop::ColorStop()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BGradient::ColorStop::ColorStop(const ColorStop &other)
+	\brief Undocumented public method
+
+	\param other Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BGradient::ColorStop::ColorStop(const rgb_color c, float o)
+	\brief Undocumented public method
+
+	\param c Undocumented
+	\param o Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BGradient::ColorStop::ColorStop(uint8 r, uint8 g, uint8 b, uint8 a,
+		float o)
+	\brief Undocumented public method
+
+	\param r Undocumented
+	\param g Undocumented
+	\param b Undocumented
+	\param a Undocumented
+	\param o Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BGradient::ColorStop::operator!=(const ColorStop &other) const
+	\brief Undocumented public method
+
+	\param other Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+//! \endcond INTERNAL
