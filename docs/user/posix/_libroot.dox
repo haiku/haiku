@@ -22,7 +22,7 @@ POSIX standards. The BSD extensions are enabled by default unless a specific
 version of the C standard is requested from the compiler command line (for
 example by using the --std=c99 switch). In case you want to set the compiler
 to strict C99 but still use these extensions, you need to define _DEFAULT_SOURCE
-(with a #define preprocessor directive, or from the command line).
+(with a \#define preprocessor directive, or from the command line).
 
 The GNU extensions are not enabled by default, but can be enabled by defining
 _GNU_SOURCE.
