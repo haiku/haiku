@@ -1158,3 +1158,9 @@
 
 	\since Haiku R1
 */
+
+
+/*!
+	\var BAffineTransform B_AFFINE_IDENTITY_TRANSFORM
+	\brief Undocumented global variable
+*/
