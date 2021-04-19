@@ -7,7 +7,7 @@
  *		John Scipione, jscipione@gmail.com
  *
  * Corresponds to:
- *		headers/os/support/SupportDefs.h	hrev51198
+ *		headers/os/support/SupportDefs.h	hrev54953
  */
 
 
@@ -207,12 +207,6 @@
 /*!
 	\typedef typedef unsigned char uchar
 	\brief Unsigned 1-byte wide character.
-*/
-
-
-/*!
-	\typedef typedef unsigned short unichar
-	\brief Unsigned 2-byte wide character.
 */
 
 
