@@ -13,7 +13,27 @@
 
 extern efi_guid SerialIoProtocol;
 
+#define EFI_SERIAL_TERMINAL_DEVICE_TYPE_GUID \
+    {0x6ad9a60f, 0x5815, 0x4c7c, {0x8A, 0x10, 0x50, 0x53, 0xD2, 0xBF, 0x7A, 0x1B}}
+
+
 #define EFI_SERIAL_IO_PROTOCOL_REVISION 0x00010000
+#define EFI_SERIAL_IO_PROTOCOL_REVISION1p1 0x00010001
+
+//
+// Control bits.
+//
+#define EFI_SERIAL_CLEAR_TO_SEND 0x0010
+#define EFI_SERIAL_DATA_SET_READY 0x0020
+#define EFI_SERIAL_RING_INDICATE 0x0040
+#define EFI_SERIAL_CARRIER_DETECT 0x0080
+#define EFI_SERIAL_REQUEST_TO_SEND 0x0002
+#define EFI_SERIAL_DATA_TERMINAL_READY 0x0001
+#define EFI_SERIAL_INPUT_BUFFER_EMPTY 0x0100
+#define EFI_SERIAL_OUTPUT_BUFFER_EMPTY 0x0200
+#define EFI_SERIAL_HARDWARE_LOOPBACK_ENABLE 0x1000
+#define EFI_SERIAL_SOFTWARE_LOOPBACK_ENABLE 0x2000
+#define EFI_SERIAL_HARDWARE_FLOW_CONTROL_ENABLE 0x4000
 
 typedef struct efi_serial_io_protocol efi_serial_io_protocol;
 
@@ -64,4 +84,5 @@ typedef struct efi_serial_io_protocol {
                        size_t* BufferSize, void* Buffer) EFIAPI;
 
     efi_serial_io_mode* Mode;
+    const struct elf_guid* DeviceTypeGuid;  // Revision 1.1
 } efi_serial_io_protocol;
