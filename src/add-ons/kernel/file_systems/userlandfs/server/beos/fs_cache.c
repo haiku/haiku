@@ -471,7 +471,7 @@ get_iovec_array(void)
     }
 
     if (i >= MAX_IOVECS)       /* uh-oh */
-        beos_panic("cache: ran out of iovecs (pool 0x%x, used 0x%x)!\n",
+        beos_panic("cache: ran out of iovecs (pool %p, used %p)!\n",
               &iovec_pool[0], &iovec_used[0]);
 
     if (iovec_pool[i] == NULL) {
@@ -742,7 +742,7 @@ static void
 add_to_head(cache_ent_list *cel, cache_ent *ce)
 {
 if (ce->next != NULL || ce->prev != NULL) {
-    beos_panic("*** ath: ce has non-null next/prev ptr (ce 0x%x nxt 0x%x, prv 0x%x)\n",
+    beos_panic("*** ath: ce has non-null next/prev ptr (ce %p nxt %p, prv %p)\n",
            ce, ce->next, ce->prev);
 }
 
@@ -767,7 +767,7 @@ static void
 add_to_tail(cache_ent_list *cel, cache_ent *ce)
 {
 if (ce->next != NULL || ce->prev != NULL) {
-    beos_panic("*** att: ce has non-null next/prev ptr (ce 0x%x nxt 0x%x, prv 0x%x)\n",
+    beos_panic("*** att: ce has non-null next/prev ptr (ce %p nxt %p, prv %p)\n",
            ce, ce->next, ce->prev);
 }
 
@@ -790,7 +790,7 @@ cache_ent_cmp(const void *a, const void *b)
     cache_ent *p1 = *(cache_ent **)a, *p2 = *(cache_ent **)b;
 
     if (p1 == NULL || p2 == NULL)
-        beos_panic("cache_ent pointers are null?!? (a 0x%lx, b 0x%lx\n)\n", a, b);
+        beos_panic("cache_ent pointers are null?!? (a %p, b %p\n)\n", a, b);
 
     if (p1->dev == p2->dev) {
         diff = p1->block_num - p2->block_num;
@@ -1173,7 +1173,7 @@ block_lookup(int dev, fs_off_t bnum)
     }
 
     if (ce->flags & CE_BUSY)
-        beos_panic("block lookup: returning a busy block @ 0x%lx?!?\n",(ulong)ce);
+        beos_panic("block lookup: returning a busy block @ %p?!?\n", ce);
 
     return ce;
 }
@@ -1411,8 +1411,8 @@ real_remove_cached_blocks(int dev, int allow_writes, cache_ent_list *cel)
 
         if (ce->lock != 0 || (ce->flags & CE_BUSY)) {
             printf("*** remove_cached_dev: "
-                "block %" B_PRIdOFF " has lock = %d, flags 0x%x! ce @ 0x%lx\n",
-                ce->block_num, ce->lock, ce->flags, (ulong)ce);
+                "block %" B_PRIdOFF " has lock = %d, flags 0x%x! ce @ %p\n",
+                ce->block_num, ce->lock, ce->flags, ce);
         }
 
         if (allow_writes == ALLOW_WRITES &&
@@ -1444,7 +1444,7 @@ real_remove_cached_blocks(int dev, int allow_writes, cache_ent_list *cel)
 
         if ((junk = hash_delete(&bc.ht, ce->dev, ce->block_num)) != ce) {
             beos_panic("*** remove_cached_device: bad hash table entry %ld "
-                   "0x%lx != 0x%lx\n", ce->block_num, (ulong)junk, (ulong)ce);
+                   "%p != %p\n", ce->block_num, junk, ce);
         }
 
         free(ce);
@@ -1649,7 +1649,7 @@ get_ents(cache_ent **ents, int num_needed, int max, int *num_gotten, int bsize)
     while(cur < num_needed && retry_counter < max_retry) {
         for(ce=bc.normal.lru; ce && cur < num_needed; ce=ce->next) {
             if (ce->lock)
-                beos_panic("get_ents: normal list has locked blocks (ce 0x%x)\n",ce);
+                beos_panic("get_ents: normal list has locked blocks (ce %p)\n",ce);
 
             if (ce->flags & CE_BUSY)   /* don't touch busy blocks */
                 continue;
@@ -1685,7 +1685,7 @@ get_ents(cache_ent **ents, int num_needed, int max, int *num_gotten, int bsize)
                 continue;
 
             if (ce->lock)
-                beos_panic("get_ents:2 dirty list has locked blocks (ce 0x%x)\n",ce);
+                beos_panic("get_ents:2 dirty list has locked blocks (ce %p)\n",ce);
 
             ce->flags   |= CE_BUSY;
             ents[cur++]  = ce;
@@ -1908,7 +1908,7 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
             }
 
             if (bsize != ce->bsize) {
-                beos_panic("*** requested bsize %d but ce->bsize %d ce @ 0x%x\n",
+                beos_panic("*** requested bsize %d but ce->bsize %d ce @ %p\n",
                         bsize, ce->bsize, ce);
             }
 
@@ -2013,7 +2013,8 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
             get_ents(ents, num_needed, NUM_FLUSH_BLOCKS, &real_nblocks, bsize);
 
             if (real_nblocks < num_needed) {
-                beos_panic("don't have enough cache ents (need %d got %d %ld::%d)\n",
+                beos_panic("don't have enough cache ents "
+                     "(need %d got %d %ld::%" B_PRIdOFF ")\n",
                       num_needed, real_nblocks, bnum, num_blocks);
             }
 
@@ -2055,8 +2056,8 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
                 */
                 if (cur < num_needed) {
                     if (hash_insert(&bc.ht, dev, bnum + cur, ce) != 0)
-                        beos_panic("could not insert cache ent for %d %ld (0x%lx)\n",
-                              dev, bnum + cur, (ulong)ents[cur]);
+                        beos_panic("could not insert cache ent for %d %ld (%p)\n",
+                              dev, bnum + cur, ents[cur]);
                 }
 
                 if (ce->dev == -1)
@@ -2066,7 +2067,7 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
                     num_dirty++;
 
                 if (ce->lock) {
-                    beos_panic("cbio: can't use locked blocks here ce @ 0x%x\n",ce);
+                    beos_panic("cbio: can't use locked blocks here ce @ %p\n",ce);
                 } else {
                     cel = &bc.normal;
 	                delete_from_list(cel, ce);
@@ -2088,8 +2089,8 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
 
                 /* this flushes any blocks we're kicking out that are dirty */
                 if (num_dirty && (err = flush_ents(ents, real_nblocks)) != 0) {
-                    printf("flush ents failed (ents @ 0x%lx, nblocks %d!\n",
-                           (ulong)ents, cur_nblocks);
+                    printf("flush ents failed (ents @ %p, nblocks %d!\n",
+                           ents, cur_nblocks);
                     goto handle_err;
                 }
 
@@ -2144,17 +2145,17 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
 
                     tmp_ce = (cache_ent *)hash_delete(&bc.ht,dev,bnum+cur);
                     if (tmp_ce != ents[cur]) {
-                        beos_panic("hash_del0: %d %ld got 0x%lx, not 0x%lx\n",
-                                dev, bnum+cur, (ulong)tmp_ce,
-                                (ulong)ents[cur]);
+                        beos_panic("hash_del0: %d %ld got %p, not %p\n",
+                                dev, bnum+cur, tmp_ce,
+                                ents[cur]);
                     }
 
                     tmp_ce = (cache_ent *)hash_delete(&bc.ht,ents[cur]->dev,
                                                         ents[cur]->block_num);
                     if (tmp_ce != ents[cur]) {
-                        beos_panic("hash_del1: %d %ld got 0x%lx, not 0x%lx\n",
-                                ents[cur]->dev, ents[cur]->block_num, (ulong)tmp_ce,
-                                (ulong)ents[cur]);
+                        beos_panic("hash_del1: %d %ld got %p, not %p\n",
+                                ents[cur]->dev, ents[cur]->block_num, tmp_ce,
+                                ents[cur]);
                     }
 
                     ents[cur]->flags &= ~CE_BUSY;
@@ -2221,7 +2222,7 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
                 if (ce->dev != -1) {
                     tmp_ce = hash_delete(&bc.ht, ce->dev, ce->block_num);
                     if (tmp_ce == NULL || tmp_ce != ce) {
-                        beos_panic("*** hash_delete failure (ce 0x%x tce 0x%x)\n",
+                        beos_panic("*** hash_delete failure (ce %p tce %p)\n",
                               ce, tmp_ce);
                     }
                 }
@@ -2243,7 +2244,7 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
                 ents[cur]->flags &= ~CE_BUSY;
 
                 if (ents[cur]->lock)
-                    beos_panic("should not have locked blocks here (ce 0x%x)\n",
+                    beos_panic("should not have locked blocks here (ce %p)\n",
                           ents[cur]);
 
                 add_to_tail(&bc.normal, ents[cur]);
@@ -2258,9 +2259,9 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
 
                     tmp_ce = (cache_ent *)hash_delete(&bc.ht,dev,bnum+cur);
                     if (tmp_ce != ents[cur]) {
-                        beos_panic("hash_del: %d %ld got 0x%lx, not 0x%lx\n",
-                                dev, bnum+cur, (ulong)tmp_ce,
-                                (ulong)ents[cur]);
+                        beos_panic("hash_del: %d %ld got %p, not %p\n",
+                                dev, bnum+cur, tmp_ce,
+                                ents[cur]);
                     }
 
                     ce = ents[cur];
@@ -2290,13 +2291,13 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
 
                 if (ce->dev != -1) {   /* then clean this guy up */
                     if (ce->next || ce->prev)
-                        beos_panic("ce @ 0x%x should not be in a list yet!\n", ce);
+                        beos_panic("ce @ %p should not be in a list yet!\n", ce);
 
                     if (ce->clone)
                         free(ce->clone);
 
                     if (ce->data == NULL)
-                        beos_panic("ce @ 0x%lx has a null data ptr\n", (ulong)ce);
+                        beos_panic("ce @ %p has a null data ptr\n", ce);
                 }
 
                 ce->dev        = dev;
