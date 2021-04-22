@@ -422,8 +422,9 @@ rule KernelArchitectureSetup architecture
 		case riscv64 :
 			# Kernel lives within any single 2 GiB address space.
 			# Default is medlow (-2GiB / +2GiB)
-			HAIKU_KERNEL_CCFLAGS += -mcmodel=medany ;
-			HAIKU_KERNEL_C++FLAGS += -mcmodel=medany ;
+			HAIKU_KERNEL_CCFLAGS += -mcmodel=medany -fpic ;
+			HAIKU_KERNEL_C++FLAGS += -mcmodel=medany -fpic ;
+			HAIKU_KERNEL_PIC_LINKFLAGS = -shared ;
 
 		case sparc :
 			# The medlow code model is enough (64-bit addresses, programs must

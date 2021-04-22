@@ -20,19 +20,13 @@
 
 // kernel args
 typedef struct {
-	// architecture specific
-	uint64		phys_pgdir;
-	uint64  	vir_pgdir;
-	uint64		next_pagetable;
-
-	uint64		virtual_end;
-
 	// The virtual ranges we want to keep in the kernel.
 	uint32		num_virtual_ranges_to_keep;
 	addr_range	virtual_ranges_to_keep[MAX_VIRTUAL_RANGES_TO_KEEP];
 
 	// needed for UEFI, otherwise kernel acpi support can't find ACPI root
 	FixedWidthPointer<void> acpi_root;
+	FixedWidthPointer<void> fdt;
 } _PACKED arch_kernel_args;
 
 #endif	/* KERNEL_ARCH_RISCV64_KERNEL_ARGS_H */
