@@ -364,9 +364,12 @@ uint32
 SettingsMessage::GetValue(const char* name, uint32 defaultValue) const
 {
 	uint32 value;
-	if (FindUInt32(name, &value) != B_OK)
-		return defaultValue;
-	return value;
+	if (FindUInt32(name, &value) == B_OK)
+		return value;
+	// For compatibility with older versions of this class, also accept an int32
+	if (FindInt32(name, &value) == B_OK)
+		return value;
+	return defaultValue;
 }
 
 
