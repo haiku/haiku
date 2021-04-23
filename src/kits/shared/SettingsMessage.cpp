@@ -367,9 +367,9 @@ SettingsMessage::GetValue(const char* name, uint32 defaultValue) const
 	if (FindUInt32(name, &value) == B_OK)
 		return value;
 	// For compatibility with older versions of this class, also accept an int32
-	int32 signed_value;
-	if (FindInt32(name, &signed_value) == B_OK && signed_value >= 0)
-		return signed_value;
+	int32 signedValue;
+	if (FindInt32(name, &signedValue) == B_OK && signedValue >= 0)
+		return signedValue;
 	return defaultValue;
 }
 
