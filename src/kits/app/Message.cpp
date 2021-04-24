@@ -672,7 +672,7 @@ BMessage::_PrintToStream(const char* indent) const
 					break;
 
 				case B_UINT16_TYPE:
-					print_type<uint16>("uint16(0x%x or %u\n", pointer);
+					print_type<uint16>("uint16(0x%x or %u)\n", pointer);
 					break;
 
 				case B_INT32_TYPE:
@@ -680,7 +680,7 @@ BMessage::_PrintToStream(const char* indent) const
 					break;
 
 				case B_UINT32_TYPE:
-					print_type<uint32>("uint32(0x%lx or %lu\n", pointer);
+					print_type<uint32>("uint32(0x%lx or %lu)\n", pointer);
 					break;
 
 				case B_INT64_TYPE:
@@ -688,7 +688,7 @@ BMessage::_PrintToStream(const char* indent) const
 					break;
 
 				case B_UINT64_TYPE:
-					print_type<uint64>("uint64(0x%Lx or %Ld\n", pointer);
+					print_type<uint64>("uint64(0x%Lx or %Ld)\n", pointer);
 					break;
 
 				case B_BOOL_TYPE:
