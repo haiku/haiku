@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-HaikuDepot	2940546158
+1	turkish	x-vnd.Haiku-HaikuDepot	3544756144
 Repository update error	LocalRepositoryUpdateProcess		Depo güncelleme hatası
 Network error	ServerHelper		Ağ hatası
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Depo güncellenirken bir hata oluştu: %error%
@@ -39,6 +39,7 @@ Local	LocalPkgDataLoadProcess		Yerel
 Rate %Package%	RatePackageWindow		%Package% paketini derecelendir
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Paket yöneticisi başlatılırken bir hata oluştu: %message%
 Quit HaikuDepot	App		Haiku Depo'dan çık
+Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Anonim kullanım istatistiklerini Haiku Depo sunucusu ile paylaşmak ister misiniz? Tercihinizi daha sonra \"Ayarlar\" penceresinden değiştirebilirsiniz.
 An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		'%Property%' ile beklenmeyen bir '%Message%' hatası alındı
 A response to the captcha question must be provided.	UserLoginWindow		CAPTCHA sorusuna bir yanıt sağlanmalıdır.
 Category	FilterView		Kategori

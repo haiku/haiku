@@ -1,0 +1,2 @@
+1	swedish	application/x-vnd.Cortex.AddOnHost	1187369093
+This program runs in the background, and is started automatically by Cortex when necessary. You probably don't want to start it manually.	CortexAddOnHost		Detta program körs i bakgrunden och startas automatiskt av Cortex vid behov. Du vill antagligen inte starta det manuellt.

@@ -1,4 +1,4 @@
-1	turkish	application/x-vnd.Cortex.support	253230062
+1	turkish	application/x-vnd.Cortex.support	2630173556
 Header has flags	MediaString		Üstbilginin bayrakları var
 32 bit HLS	MediaString		32 bit HLS
 Recording	MediaString		Kayıt yapılıyor
@@ -9,7 +9,7 @@ Rear-right	MediaString		Sağ arka
 {0, plural, one{# pixel} other{# pixels}}	MediaString		{0, plural, one{# piksel} other{# piksel}}
 Mono	MediaString		Tek kanallı
 MPEG1	MediaString		MPEG1
-ASF format family	MediaString		ASF biçim ailesi
+ASF format family	MediaString		ASF biçimleri ailesi
 Encoded video	MediaString		Kodlanmış video
 YUV444	MediaString		YUV444
 Port	MediaString		Kapı
@@ -58,11 +58,89 @@ QuickTime format family	MediaString		QuickTime biçimleri ailesi
 Any format family	MediaString		Herhangi bir biçim ailesi
 Timecode	MediaString		Zaman kodu
 Top-Front-right	MediaString		Üst sağ ön
+32 bit float	MediaString		32 bit kayan noktalı değer
+Controllable	MediaString		Denetlenebilir
+32 bit integer	MediaString		32 bit tamsayı
 Front-right-center	MediaString		Ön merkez sağ
 Side-right	MediaString		Sağ kenar
+ kHz	MediaString		 kHz
+Little endian	MediaString		Küçük son haneli
+(unknown matrix mask)	MediaString		(bilinmeyen dizey maskesi)
+32 bit LAB	MediaString		32 bit LAB
 Side-left	MediaString		Sol kenar
+{0, plural, one{# byte per buffer} other{# bytes per buffer}}	MediaString		{0, plural, one{arabellek başına # bayt} other{arabellek başına # bayt}}
+32 bit CMYK	MediaString		32 bit CMYK
+(unknown multistream format)	MediaString		(bilinmeyen çoklu akış biçimi)
+8 bit integer	MediaString		8 bit tamsayı
+8 bit grayscale-index	MediaString		8 bit gri tonlu indeks
+YCbCr444	MediaString		YCbCr444
+Buffer producer	MediaString		Arabellek üreticisi
+Buffer consumer	MediaString		Arabellek tüketicisi
+Increase latency	MediaString		Gecikmeyi artır
 Front-left-center	MediaString		Ön merkez sol
+MPEG format family	MediaString		MPEG biçimleri ailesi
+(none)	MediaString		(yok)
+Center	MediaString		Merkez
+ kb/s (max)	MediaString		 kb/sn (en çok)
+Monochrome	MediaString		Siyah beyaz
+Private Be media type	MediaString		Özel Be ortam türü
+24 bit UVL	MediaString		24 bit UVL
+32 bit HSV	MediaString		32 bit HSV
+ID	MediaString		Kimlik
+AIFF format family	MediaString		AIFF biçimleri ailesi
 Top-Back-left	MediaString		Üst sol arka
+16 bit RGB	MediaString		16 bit RGB
+YCbCr422	MediaString		YCbCr422
+Raw audio	MediaString		Ham ses
+32 bit LABA	MediaString		32 bit LABA
+24 bit HLS	MediaString		24 bit HLS
+Non-interlaced 	MediaString		Üst üste bindirilmemiş 
+{0, plural,one{# byte (avg)}other{# bytes (avg)}}	MediaString		{0, plural,one{# bayt (ort.)}other{# bayt (ort.)}}
+MIDI	MediaString		MIDI
+YUV12	MediaString		YUV12
+WAV format family	MediaString		WAV biçimleri ailesi
+ (NTSC)	MediaString		 (NTSC)
+Physical input	MediaString		Fiziksel giriş
+Big endian	MediaString		Büyük son haneli
+Sub	MediaString		Alt
+{0, plural,one{# byte (max)}other{# bytes (max)}}	MediaString		{0, plural,one{# bayt (en çok)}other{# bayt (en çok)}}
+YUV411	MediaString		YUV411
+Multistream media	MediaString		Çoklu akış ortam
+Encoded audio	MediaString		Kodlanmış ses
+Decrease precision	MediaString		Kesinliği azalt
+File interface	MediaString		Dosya arabirimi
+(unknown byte order)	MediaString		(bilinmeyen bayt sırası)
+32 bit HSI	MediaString		32 bit HSI
+Typeless media	MediaString		Türsüz ortam
+ (PAL)	MediaString		 (PAL)
+32 bit RGBA	MediaString		32 bit RGBA
+YCbCr420	MediaString		YCbCr420
+ kb/s (avg)	MediaString		 kb/s (ort.)
+HTML	MediaString		HTML
+Time source	MediaString		Zaman kaynağı
+15 bit RGB	MediaString		15 bit RGB
+ProLogic LR	MediaString		ProLogic LR
+{0, plural,one{# byte per frame}other{# bytes per frame}}	MediaString		{0, plural,one{çerçeve başına # bayt}other{çerçeve başına # bayt}}
+Parameters	MediaString		Parametreler
+Raw data from VBL area	MediaString		VBL alanından ham veri
 Top-Back-right	MediaString		Üst sağ arka
+{0, plural, one{# byte per row}other{# bytes per row}}	MediaString		{0, plural, one{satır başına # bayt}other{satır başına # bayt}}
 Left	MediaString		Sol
+BeOS video	MediaString		BeOS video
+24 bit CMY	MediaString		24 bit CMY
+32 bit UVLA	MediaString		32 bit UVLA
+Top-center	MediaString		Üst merkez
+Entity interface	MediaString		Varlık arabirimi
+Stereo	MediaString		Çift kanallı
+8 bit color-index	MediaString		8 bit renk indeksi
 Bottom to top, left to right	MediaString		Alttan üste, soldan sağa
+32 bit UVL	MediaString		32 bit UVL
+{0, plural, one{# line} other{# lines}}	MediaString		{0, plural, one{# hat} other{# hat}}
+Text	MediaString		Metin
+Unknown media type	MediaString		Bilinmeyen ortam türü
+MPEG2	MediaString		MPEG2
+Miscellaneous format family	MediaString		Diğer biçim aileleri
+24 bit RGB	MediaString		24 bit RGB
+{0, plural,one{# frame backward}other{# frames backward}}	MediaString		{0, plural,one{# çerçeve geriye}other{# çerçeve geriye}}
+32 bit HSIA	MediaString		32 bit HSIA
+Raw video	MediaString		Ham video

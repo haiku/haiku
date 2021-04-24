@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-HaikuDepot	2940546158
+1	catalan; valencian	x-vnd.Haiku-HaikuDepot	3544756144
 Repository update error	LocalRepositoryUpdateProcess		Error d'actualització del repositori
 Network error	ServerHelper		Error de xarxa
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Hi ha hagut un error en actualitzar el repositori: %error%
@@ -39,6 +39,7 @@ Local	LocalPkgDataLoadProcess		Local
 Rate %Package%	RatePackageWindow		Puntueu %Package%
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Hi ha hagut un error en iniciar el gestor de paquets: %message%
 Quit HaikuDepot	App		Surt del Dipòsit del Haiku
+Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Seria acceptable enviar dades d’ús anònimes al sistema del servidor del Dipòsit del Haiku des d’aquest ordinador? En podeu canviar les preferències a la finestra de \Paràmetres\ més endavant.
 An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		L'error inesperat "%Message%" ha sorgit amb la propietat "%Property%".
 A response to the captcha question must be provided.	UserLoginWindow		Cal proporcionar una resposta a la pregunta de CAPTCHA.
 Category	FilterView		Categoria

@@ -1,0 +1,19 @@
+1	swedish	x-vnd.haiku.SerialConnect	562718401
+Hardware	SerialWindow	Flowcontrol	Hårdvara
+Connection	SerialWindow		Förbindelse
+Raw send…	SerialWindow		Skicka rådata...
+Baud rate	SerialWindow		Överföringshastighet
+Stop bits	SerialWindow		Stoppa bitar
+None	SerialWindow	Flowcontrol	Ingen
+Cancel	Custom baudrate window		Avbryt
+Sending…	XModemStatus		Skickar...
+<no serial port available>	SerialWindow		<ingen seriell port tillgänglig>
+Log to file…	SerialWindow		Logga till fil...
+Custom baudrate	Custom baudrate window		Anpassad baudrate
+File	SerialWindow		Fil
+SerialConnect	System name		SerialConnect
+custom…	SerialWindow	Baudrate	inställning...
+Parity	SerialWindow		Paritet
+None	SerialWindow	Parity	Ingen
+Everything sent, waiting for acknowledge	XModemStatus		Allt skickat och väntar på bekräftelse
+Checksum error, re-send block	XModemStatus		Fel i kontrollsumman, skicka blocket igen

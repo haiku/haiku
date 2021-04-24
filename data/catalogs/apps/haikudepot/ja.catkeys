@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	2940546158
+1	japanese	x-vnd.Haiku-HaikuDepot	3544756144
 Repository update error	LocalRepositoryUpdateProcess		リポジトリアップデートエラー
 Network error	ServerHelper		ネットワークエラー
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		リポジトリの更新中に次のエラーが発生しました: %error%
@@ -39,6 +39,7 @@ Local	LocalPkgDataLoadProcess		ローカル
 Rate %Package%	RatePackageWindow		%Package% を評価
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		パッケージマネージャーの初期化中にエラーが発生しました: %message%
 Quit HaikuDepot	App		HaikuDepot を終了
+Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		このコンピューターから匿名の使用情報をHaikuDepotServerシステムに送信することに問題はありますか? あとで、\"設定\"ウインドウで選択を変えられます。
 An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		予期しないエラー '%Message%' が、プロパティ '%Property%' で発生しました。
 A response to the captcha question must be provided.	UserLoginWindow		キャプチャへの回答は提供される必要がある。
 Category	FilterView		分類

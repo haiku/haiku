@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-HaikuDepot	2940546158
+1	german	x-vnd.Haiku-HaikuDepot	3544756144
 Repository update error	LocalRepositoryUpdateProcess		Fehler bei Paketquellenaktualisierung
 Network error	ServerHelper		Netzwerk Fehler
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Fehler bei der Aktualisierung der Paketquelle: %error%
@@ -39,6 +39,7 @@ Local	LocalPkgDataLoadProcess		Lokal
 Rate %Package%	RatePackageWindow		%Package% bewerten
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Fehler beim Initialisieren des Paketmanagers: %message%
 Quit HaikuDepot	App		HaikuDepot beenden
+Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Dürfen anonyme Nutzungsdaten von diesem Computer an den HaikuDepotServer geschickt werden? Die Option kann jederzeit im \"Einstellungen\" Fenster geändert werden.
 An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		Es trat ein unerwarteter Fehler '%Message%'  mit der Eigenschaft '%Property%' auf.
 A response to the captcha question must be provided.	UserLoginWindow		Das Captcha muss beantwortet werden.
 Category	FilterView		Kategorie

@@ -50,7 +50,7 @@ Default	Menus		Standard
 OK	SaveAlert		OK
 Color	Menus		Färg
 Save changes to the document \"%s\"? 	QuitAlert		Spara ändringar till dokumentet \"%s\"? 
-StyledEdit	System name		SkrivStiligt
+StyledEdit	System name		StyledEdit
 Find:	FindandReplaceWindow		Sök:
 Undo typing	QuitAlert		Ångra inmatning
 Error loading \"%s\":\n\t%s	LoadAlert		Fel vid inläsning \"%s\":\n\t%s

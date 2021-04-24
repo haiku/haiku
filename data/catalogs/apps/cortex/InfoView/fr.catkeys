@@ -1,13 +1,29 @@
-1	french	application/x-vnd.Cortex.InfoView	1657177474
+1	french	application/x-vnd.Cortex.InfoView	2085848286
 Description	DormantNodeInfoView		Description
+Connection	InfoView		Connexion
 Output formats	DormantNodeInfoView		Formats de sorties
+History	InfoView		Historique
 Input formats	DormantNodeInfoView		Formats d’entrées
+Signature	AppNodeInfoView		Signature
+Flags	InfoView		Drapeaux
+Buffer size	InfoView		Taille du tampon
+\n- Quality:	FileNodeInfoView		\n- Qualité :
 Latency	LiveNodeInfoView		Latence
 Node ID	LiveNodeInfoView		ID de nœud
+Resolution	InfoView		Résolution
 File format	AppNodeInfoView		Format de fichier
+Orientation	InfoView		Orientation
+Channels	InfoView		Canaux
 File format	FileNodeInfoView		Format de fichier
+(no file)	FileNodeInfoView		(Aucun fichier)
+Input format	DormantNodeInfoView		Format d’entrée
+Format	InfoView		Format
 Version	AppNodeInfoView		Version
 Run mode	LiveNodeInfoView		Mode d’exécution
+\n- Codec:	FileNodeInfoView		\n- Codec :
 Port	LiveNodeInfoView		Port
 Output format	DormantNodeInfoView		Format
+Tracks	FileNodeInfoView		Piste
+Source	InfoView		Source
+Destination	InfoView		Destination
 ID:	FileNodeInfoView		ID :

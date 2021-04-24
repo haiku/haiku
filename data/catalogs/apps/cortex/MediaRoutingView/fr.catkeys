@@ -1,9 +1,13 @@
-1	french	application/x-vnd.Cortex.MediaRoutingView	717483812
+1	french	application/x-vnd.Cortex.MediaRoutingView	2534343060
 Video output	MediaRoutingView		Sortie vidéo
 OK	MediaRoutingView		OK
 Audio input	MediaRoutingView		Entrée audio
 Video input	MediaRoutingView		Entrée vidéo
 Disconnect	MediaRoutingView		Déconnecter
+Could not disconnect	MediaRoutingView		Déconnexion impossible
+Could not instantiate '%infoname%'	MediaRoutingView		Impossible d’instancier « %infoname% »
 Input	MediaJack		Entrée
 Error	MediaRoutingView		Erreur
+Could not release '%refname%'	MediaRoutingView		Impossible de libérer « %refname% »
 Output	MediaJack		Sortie
+Could not connect	MediaRoutingView		Connexion impossible

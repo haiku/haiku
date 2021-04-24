@@ -8,7 +8,7 @@ Reply	Mail		Antworten
 Next message	Mail		Nächste Nachricht
 Mailing	Mail		Nachrichten
 Unread	Mail		Ungelesen
-Same sender	Mail		Selber Absender
+Same sender	Mail		Gleiche Absender
 Copy to new	Mail		In neue Nachricht kopieren
 Save as draft	Mail		Als Entwurf speichern
 Encoding:	Mail		Zeichenkodierung:
@@ -33,7 +33,7 @@ Only files can be added as attachments.	Mail		Nur Dateien können als Anhang hin
 Close	Mail		Schließen
 Untitled	Mail		Unbenannt
 Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Anhänge von weitergeleiteten Nachrichten zu entfernen wird noch nicht unterstützt.\nEs wird nicht richtig funktionieren.
-Same recipient	Mail		Selber Empfänger
+Same recipient	Mail		Gleiche Empfänger
 Previous message	Mail		Vorherige Nachricht
 (Address unavailable)	Mail		(Adresse nicht verfügbar)
 Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Anhang: %name% (Typ: %type%)
@@ -84,7 +84,7 @@ Colored quotes:	Mail		Farbige Zitate:
 Automatic	Mail		Automatisch
 Open this link	Mail		Link öffnen
 Auto signature:	Mail		Automatische Signatur:
-Same subject	Mail		Selbes Betreff
+Same subject	Mail		Gleicher Betreff
 Send	Mail		Senden
 Open draft	Mail		Entwurf öffnen
 Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Status 'New' belassen
