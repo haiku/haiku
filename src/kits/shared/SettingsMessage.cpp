@@ -167,6 +167,11 @@ SettingsMessage::SetValue(const char* name, uint32 value)
 	status_t ret = ReplaceUInt32(name, value);
 	if (ret != B_OK)
 		ret = AddUInt32(name, value);
+	if (ret == B_BAD_TYPE && HasData(name, B_INT32_TYPE)) {
+		// For compatibility with older versions of this class, replace an int32
+		RemoveData(name);
+		ret = AddUInt32(name, value);
+	}
 	if (ret == B_OK)
 		_NotifyValueChanged(name);
 	return ret;
