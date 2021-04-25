@@ -41,9 +41,11 @@ public:
 			status_t			SetValue(const char* name, bool value);
 			status_t			SetValue(const char* name, int8 value);
 			status_t			SetValue(const char* name, int16 value);
+			status_t			SetValue(const char* name, uint16 value);
 			status_t			SetValue(const char* name, int32 value);
 			status_t			SetValue(const char* name, uint32 value);
 			status_t			SetValue(const char* name, int64 value);
+			status_t			SetValue(const char* name, uint64 value);
 			status_t			SetValue(const char* name, float value);
 			status_t			SetValue(const char* name, double value);
 			status_t			SetValue(const char* name,
@@ -68,12 +70,16 @@ public:
 									int8 defaultValue) const;
 			int16				GetValue(const char* name,
 									int16 defaultValue) const;
+			uint16				GetValue(const char* name,
+									uint16 defaultValue) const;
 			int32				GetValue(const char* name,
 									int32 defaultValue) const;
 			uint32				GetValue(const char* name,
 									uint32 defaultValue) const;
 			int64				GetValue(const char* name,
 									int64 defaultValue) const;
+			uint64				GetValue(const char* name,
+									uint64 defaultValue) const;
 			float				GetValue(const char* name,
 									float defaultValue) const;
 			double				GetValue(const char* name,

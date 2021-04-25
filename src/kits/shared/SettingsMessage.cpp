@@ -150,6 +150,18 @@ SettingsMessage::SetValue(const char* name, int16 value)
 
 
 status_t
+SettingsMessage::SetValue(const char* name, uint16 value)
+{
+	status_t ret = ReplaceUInt16(name, value);
+	if (ret != B_OK)
+		ret = AddUInt16(name, value);
+	if (ret == B_OK)
+		_NotifyValueChanged(name);
+	return ret;
+}
+
+
+status_t
 SettingsMessage::SetValue(const char* name, int32 value)
 {
 	status_t ret = ReplaceInt32(name, value);
@@ -184,6 +196,18 @@ SettingsMessage::SetValue(const char* name, int64 value)
 	status_t ret = ReplaceInt64(name, value);
 	if (ret != B_OK)
 		ret = AddInt64(name, value);
+	if (ret == B_OK)
+		_NotifyValueChanged(name);
+	return ret;
+}
+
+
+status_t
+SettingsMessage::SetValue(const char* name, uint64 value)
+{
+	status_t ret = ReplaceUInt64(name, value);
+	if (ret != B_OK)
+		ret = AddUInt64(name, value);
 	if (ret == B_OK)
 		_NotifyValueChanged(name);
 	return ret;
@@ -355,6 +379,16 @@ SettingsMessage::GetValue(const char* name, int16 defaultValue) const
 }
 
 
+uint16
+SettingsMessage::GetValue(const char* name, uint16 defaultValue) const
+{
+	uint16 value;
+	if (FindUInt16(name, &value) != B_OK)
+		return defaultValue;
+	return value;
+}
+
+
 int32
 SettingsMessage::GetValue(const char* name, int32 defaultValue) const
 {
@@ -384,6 +418,16 @@ SettingsMessage::GetValue(const char* name, int64 defaultValue) const
 {
 	int64 value;
 	if (FindInt64(name, &value) != B_OK)
+		return defaultValue;
+	return value;
+}
+
+
+uint64
+SettingsMessage::GetValue(const char* name, uint64 defaultValue) const
+{
+	uint64 value;
+	if (FindUInt64(name, &value) != B_OK)
 		return defaultValue;
 	return value;
 }
