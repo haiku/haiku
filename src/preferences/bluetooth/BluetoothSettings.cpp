@@ -7,52 +7,86 @@
  * Authors:
  * 		Fredrik Modéen <fredrik_at_modeen.se>
  */
+
+
 #include "BluetoothSettings.h"
 
+#include <SettingsMessage.h>
+
+
 BluetoothSettings::BluetoothSettings()
+	:
+	fSettingsMessage(B_USER_SETTINGS_DIRECTORY, "Bluetooth_settings")
 {
-	find_directory(B_USER_SETTINGS_DIRECTORY, &fPath);
-	fPath.Append("Bluetooth_settings", true);
-}
-
-
-BluetoothSettings::~BluetoothSettings()
-{
-}
-
-
-void
-BluetoothSettings::Defaults()
-{
-	Data.PickedDevice = bdaddrUtils::NullAddress();
-	Data.LocalDeviceClass = DeviceClass();
-	Data.Policy = 0;
-	Data.InquiryTime = 15;
+	fCurrentSettings.pickeddevice = bdaddrUtils::NullAddress();
+	fCurrentSettings.localdeviceclass = DeviceClass();
+	fCurrentSettings.policy = 0;
+	fCurrentSettings.inquirytime = 15;
 }
 
 
 void
-BluetoothSettings::Load()
+BluetoothSettings::SetPickedDevice(bdaddr_t pickeddevice)
 {
-	fFile = new BFile(fPath.Path(), B_READ_ONLY);
-
-	if (fFile->InitCheck() == B_OK) {
-		fFile->Read(&Data, sizeof(Data));
-	} else
-		Defaults();
-
-	delete fFile;
+	fCurrentSettings.pickeddevice = pickeddevice;
 }
 
 
 void
-BluetoothSettings::Save()
+BluetoothSettings::SetLocalDeviceClass(DeviceClass localdeviceclass)
 {
-	fFile = new BFile(fPath.Path(), B_WRITE_ONLY | B_CREATE_FILE);
+	fCurrentSettings.localdeviceclass = localdeviceclass;
+}
 
-	if (fFile->InitCheck() == B_OK) {
-		fFile->Write(&Data, sizeof(Data));
-	}
 
-	delete fFile;
+void
+BluetoothSettings::SetPolicy(int32 policy)
+{
+	fCurrentSettings.policy = policy;
+}
+
+
+void
+BluetoothSettings::SetInquiryTime(int32 inquirytime)
+{
+	fCurrentSettings.inquirytime = inquirytime;
+}
+
+
+void
+BluetoothSettings::LoadSettings()
+{
+	bdaddr_t* addr;
+	ssize_t size;
+	status_t status = fSettingsMessage.FindData("BDAddress", B_RAW_TYPE,
+		(const void**)&addr, &size);
+	if (status == B_OK)
+		SetPickedDevice(*addr);
+	else
+		SetPickedDevice(bdaddrUtils::NullAddress());
+
+	DeviceClass* devclass;
+	status = fSettingsMessage.FindData("DeviceClass", B_RAW_TYPE,
+		(const void**)&devclass, &size);
+	if (status == B_OK)
+		SetLocalDeviceClass(*devclass);
+	else
+		SetLocalDeviceClass(DeviceClass());
+
+	SetPolicy(fSettingsMessage.GetValue("Policy", (int32)0));
+	SetInquiryTime(fSettingsMessage.GetValue("InquiryTime", (int32)15));
+}
+
+
+void
+BluetoothSettings::SaveSettings()
+{
+	fSettingsMessage.SetValue("DeviceClass", B_RAW_TYPE,
+		&fCurrentSettings.localdeviceclass, sizeof(DeviceClass));
+	fSettingsMessage.SetValue("BDAddress", B_RAW_TYPE, &fCurrentSettings.pickeddevice,
+		sizeof(bdaddr_t));
+	fSettingsMessage.SetValue("Policy", fCurrentSettings.policy);
+	fSettingsMessage.SetValue("InquiryTime", fCurrentSettings.inquirytime);
+
+	fSettingsMessage.Save();
 }

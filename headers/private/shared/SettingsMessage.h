@@ -63,6 +63,8 @@ public:
 									const BFlattenable* value);
 			status_t			SetValue(const char* name,
 									const BFont& value);
+			status_t			SetValue(const char* name, type_code type,
+									const void* data, ssize_t numBytes);
 
 			bool				GetValue(const char* name,
 									bool defaultValue) const;
@@ -98,6 +100,9 @@ public:
 									const BMessage& defaultValue) const;
 			BFont				GetValue(const char* name,
 									const BFont& defaultValue) const;
+			void*				GetValue(const char* name, type_code type,
+									ssize_t numBytes,
+									const void** defaultValue)const;
 
 private:
 			void				_NotifyValueChanged(const char* name) const;

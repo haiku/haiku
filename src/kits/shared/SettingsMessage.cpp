@@ -323,6 +323,19 @@ SettingsMessage::SetValue(const char* name, const BFlattenable* value)
 
 
 status_t
+SettingsMessage::SetValue(const char* name, type_code type, const void* data,
+	ssize_t numBytes)
+{
+	status_t ret = ReplaceData(name, type, data, numBytes);
+	if (ret != B_OK)
+		ret = AddData(name, type, data, numBytes);
+	if (ret == B_OK)
+		_NotifyValueChanged(name);
+	return ret;
+}
+
+
+status_t
 SettingsMessage::SetValue(const char* name, const BFont& value)
 {
 	font_family family;
@@ -539,8 +552,18 @@ SettingsMessage::GetValue(const char* name, const BFont& defaultValue) const
 }
 
 
-// #pragma mark - private
+void*
+SettingsMessage::GetValue(const char* name, type_code type, ssize_t numBytes,
+		const void** defaultValue) const
+{
+	void* value;
+	if (FindData(name, type, (const void**)&value, &numBytes) != B_OK)
+		return defaultValue;
+	return value;
+}
 
+
+// #pragma mark - private
 
 void
 SettingsMessage::_NotifyValueChanged(const char* name) const
@@ -564,4 +587,3 @@ SettingsMessage::_NotifyValueChanged(const char* name) const
 		listener->SendMessage(&message);
 	}
 }
-

@@ -43,7 +43,7 @@ protected:
 			float				fDivider;
 
 			BOptionPopUp*		fPolicyMenu;
-			BOptionPopUp*			fClassMenu;
+			BOptionPopUp*		fClassMenu;
 			BMenuField*			fLocalDevicesMenuField;
 			BPopUpMenu*			fLocalDevicesMenu;
 
