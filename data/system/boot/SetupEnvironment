@@ -27,7 +27,7 @@ export BEINCLUDES
 export BE_HOST_CPU
 
 if [ "$SAFEMODE" != "yes" ]; then
-	export PATH=.:$HOME/config/non-packaged/bin:$HOME/config/bin:/boot/system/non-packaged/bin:/bin:/boot/system/apps:/boot/system/preferences
+	export PATH=.:$HOME/config/non-packaged/bin:$HOME/config/bin:$HOME/config/apps:/boot/system/non-packaged/bin:/bin:/boot/system/apps:/boot/system/preferences
 	export LIBRARY_PATH="%A/lib:$HOME/config/non-packaged/lib:$HOME/config/lib:/boot/system/non-packaged/lib:/boot/system/lib"
 	export ADDON_PATH="%A/add-ons:$HOME/config/non-packaged/add-ons:$HOME/config/add-ons:/boot/system/non-packaged/add-ons:/boot/system/add-ons"
 else
