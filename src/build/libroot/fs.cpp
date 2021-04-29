@@ -1155,6 +1155,7 @@ _kern_unlock_node(int fd)
 
 // #pragma mark -
 
+#if !defined(HAIKU_HOST_PLATFORM_HAIKU)
 // read_pos
 ssize_t
 read_pos(int fd, off_t pos, void *buffer, size_t bufferSize)
@@ -1243,6 +1244,7 @@ writev_pos(int fd, off_t pos, const struct iovec *vec, int count)
 
 	return bytesWritten;
 }
+#endif
 
 
 // #pragma mark -

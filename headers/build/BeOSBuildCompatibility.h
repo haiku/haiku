@@ -49,12 +49,14 @@ extern size_t	strnlen(const char* string, size_t length);
 #endif
 
 // BeOS only
+#if !defined(HAIKU_HOST_PLATFORM_HAIKU)
 extern ssize_t  read_pos(int fd, off_t pos, void* buffer, size_t count);
 extern ssize_t  write_pos(int fd, off_t pos, const void* buffer, size_t count);
 extern ssize_t	readv_pos(int fd, off_t pos, const struct iovec* vec,
 					int count);
 extern ssize_t	writev_pos(int fd, off_t pos, const struct iovec* vec,
 					int count);
+#endif
 
 
 // There's no O_NOTRAVERSE under Linux and FreeBSD -- we replace it with a flag
