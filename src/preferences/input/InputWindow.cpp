@@ -104,16 +104,16 @@ InputWindow::MessageReceived(BMessage* message)
 			break;
 		}
 
-		case IS_NOTIFY_DEVICE:
+		case B_INPUT_DEVICES_CHANGED:
 		{
-			bool added = message->FindBool("added");
-			BString name = message->FindString("name");
+			int32 operation = message->FindInt32("be:opcode");
+			BString name = message->FindString("be:device_name");
 
-			if (added) {
+			if (operation == B_INPUT_DEVICE_ADDED) {
 				BInputDevice* device = find_input_device(name);
 				if (device)
 					AddDevice(device);
-			} else {
+			} else if (operation == B_INPUT_DEVICE_REMOVED) {
 				for (int i = 0; i < fDeviceListView->CountItems(); i++) {
 					DeviceListItemView* item
 						= dynamic_cast<DeviceListItemView*>(
