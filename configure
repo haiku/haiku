@@ -92,6 +92,7 @@ options:
   --with-gdb <gdb sources dir>
                               specify the path to a GDB source dir, to build
                               GDB for each arch we build the cross-tools for.
+  --use-stack-protector       Build with stack protection enabled
 
 environment variables:
   CC                          The host compiler. Defaults to "gcc".
@@ -803,6 +804,7 @@ while [ $# -gt 0 ] ; do
 		--no-full-xattr)HAIKU_HOST_USE_XATTR=0; shift 1;;
 		--no-xattr)		HAIKU_HOST_USE_XATTR_REF=0; shift 1;;
 		--with-gdb)	gdbSources=$2; shift 2;;
+		--use-stack-protector)	HAIKU_USE_STACK_PROTECTOR=1; shift 1;;
 		*)				echo Invalid argument: \`$1\'; exit 1;;
 	esac
 done

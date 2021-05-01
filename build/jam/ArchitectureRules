@@ -600,6 +600,16 @@ rule ArchitectureSetupWarnings architecture
 		}
 	}
 
+	rule EnableStackProtector dirTokens : scope {
+		# enable stack protector, if requested
+		if $(HAIKU_USE_STACK_PROTECTOR) = 1 {
+			AppendToConfigVar CCFLAGS : HAIKU_TOP $(dirTokens) :
+				-fstack-protector : $(scope) ;
+			AppendToConfigVar C++FLAGS : HAIKU_TOP $(dirTokens) :
+				-fstack-protector : $(scope) ;
+		}
+	}
+
 	# Work-around for GCC 2 problem -- despite -Wno-multichar it reports
 	# multichar warnings in headers/private/kernel/debugger_keymaps.h included
 	# by src/system/kernel/arch/x86/arch_debug_console.cpp.
@@ -746,6 +756,12 @@ rule ArchitectureSetupWarnings architecture
 	EnableWerror src system libroot posix locale ;
 	EnableWerror src system libroot posix wchar ;
 	EnableWerror src system runtime_loader ;
+
+	EnableStackProtector src apps ;
+	EnableStackProtector src kits ;
+	EnableStackProtector src preferences ;
+	EnableStackProtector src servers ;
+	EnableStackProtector src system kernel ;
 }
 
 
