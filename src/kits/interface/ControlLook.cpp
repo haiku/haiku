@@ -71,6 +71,15 @@ BControlLook::GetInsets(frame_type frameType, background_type backgroundType,
 }
 
 
+float
+BControlLook::GetScrollBarWidth(orientation orientation)
+{
+	// this matches HaikuControlLook.cpp currently
+	if (be_plain_font->Size() <= 12.0f) { return 14.0f; }
+	return be_plain_font->Size() / 12.0f * 14.0f;
+}
+
+
 void
 BControlLook::SetBackgroundInfo(const BMessage& backgroundInfo)
 {
@@ -127,7 +136,15 @@ B_IF_GCC_2(_ReservedControlLook4__Q28BPrivate12BControlLook,
 }
 
 
-void BControlLook::_ReservedControlLook5() {}
+extern "C" float
+B_IF_GCC_2(_ReservedControlLook5__Q28BPrivate12BControlLook,
+		_ZN8BPrivate12BControlLook21_ReservedControlLook5Ev)(
+	BControlLook* controlLook, orientation orientation)
+{
+	return controlLook->GetScrollBarWidth(orientation);
+}
+
+
 void BControlLook::_ReservedControlLook6() {}
 void BControlLook::_ReservedControlLook7() {}
 void BControlLook::_ReservedControlLook8() {}

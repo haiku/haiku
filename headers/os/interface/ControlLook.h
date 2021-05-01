@@ -426,10 +426,11 @@ public:
 									BRect rect, const BRect& updateRect,
 									const rgb_color& base, uint32 flags,
 									orientation orientation) = 0;
+	virtual float				GetScrollBarWidth(
+									orientation orientation = B_VERTICAL);
 
 private:
 	// FBC padding
-	virtual	void				_ReservedControlLook5();
 	virtual	void				_ReservedControlLook6();
 	virtual	void				_ReservedControlLook7();
 	virtual	void				_ReservedControlLook8();
