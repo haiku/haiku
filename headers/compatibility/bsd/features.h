@@ -12,11 +12,21 @@
 	#define _DEFAULT_SOURCE
 #endif
 
+#if defined(_GNU_SOURCE)
+       #undef _ISOC11_SOURCE
+       #define _ISOC11_SOURCE
+       #undef _DEFAULT_SOURCE
+       #define _DEFAULT_SOURCE
+#endif
 
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
 	#undef _ISOC11_SOURCE
 	#define _ISOC11_SOURCE
 #endif
 
+#if defined(__cplusplus) && __cplusplus >= 201703L
+       #undef _ISOC11_SOURCE
+       #define _ISOC11_SOURCE
+#endif
 
 #endif // _FEATURES_H
