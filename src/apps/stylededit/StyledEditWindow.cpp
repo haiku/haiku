@@ -1134,9 +1134,9 @@ StyledEditWindow::_InitWindow(uint32 encoding)
 	BRect viewFrame = Bounds();
 	BRect textBounds = viewFrame;
 	textBounds.OffsetTo(B_ORIGIN);
-	textBounds.InsetBy(TEXT_INSET, TEXT_INSET);
 
 	fTextView = new StyledEditView(viewFrame, textBounds, this);
+	fTextView->SetInsets(TEXT_INSET, TEXT_INSET, TEXT_INSET, TEXT_INSET);
 	fTextView->SetDoesUndo(true);
 	fTextView->SetStylable(true);
 	fTextView->SetEncoding(encoding);
