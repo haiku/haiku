@@ -3217,6 +3217,16 @@ static void pinsnv30_arch_fake(void)
 	/* not used (yet) because no coldstart will be attempted (yet) */
 	si->ps.std_engine_clock = 190;
 	si->ps.std_memory_clock = 190;
+
+	if ((CFGR(DEVID) & 0xfff0ffff) == 0x024010de) {
+		/* C51 chipset */
+		si->ps.max_system_vco = 1000;
+		si->ps.min_system_vco = 500;
+		si->ps.max_pixel_vco = 1000;
+		si->ps.min_pixel_vco = 500;
+		si->ps.max_video_vco = 1000;
+		si->ps.min_video_vco = 500;
+	}
 }
 
 static void getRAMsize_arch_nv4(void)
