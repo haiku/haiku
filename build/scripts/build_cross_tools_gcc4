@@ -240,6 +240,8 @@ CFLAGS="$ccFlags" CXXFLAGS="$cxxFlags" "$gccSourceDir/configure" \
 	--with-default-libstdcxx-abi=gcc4-compatible \
 	--with-sysroot="$sysrootDir" \
 	--disable-maintainer-mode \
+	--disable-libgomp \
+	--disable-libatomic \
 	$gccConfigureArgs \
 	|| exit 1
 
