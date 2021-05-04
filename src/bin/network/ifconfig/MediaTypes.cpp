@@ -23,7 +23,7 @@ struct media_type {
 		int subtype;
 		const char* name;
 		const char* pretty;
-	} subtypes [6];
+	} subtypes [10];
 	struct {
 		int option;
 		bool read_only;
@@ -63,6 +63,10 @@ const media_type kMediaTypes[] = {
 			{ IFM_1000_T, "1000baseT", "1 GBit, 1000BASE-T" },
 			{ IFM_1000_SX, "1000baseSX", "1 GBit, 1000BASE-SX" },
 			{ IFM_10G_T, "10GbaseT", "10 GBit, 10GBASE-T" },
+			{ IFM_10G_SR, "10GbaseSR", "10 Gbit, 850 nm Fibre"},
+			{ IFM_10G_LR, "10GbaseLR", "10 Gbit, 1310 nm Fibre"},
+			{ IFM_10G_LRM, "10GbaseLRM", "10 Gbit, 1300 nm Fibre"},
+			{ IFM_10G_TWINAX, "10GbaseCR", "10 Gbit, Direct Attach"},
 			{ -1, NULL, NULL }
 		},
 		{

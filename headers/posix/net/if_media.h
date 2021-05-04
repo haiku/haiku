@@ -29,10 +29,14 @@
 #define IFM_AUTO		0
 #define	IFM_10_T		3			/* 10Base-T - RJ45 */
 #define	IFM_100_TX		6			/* 100Base-TX - RJ45 */
+#define IFM_1000_SX		11			/* 1000Base-SX - Fiber Optic */
 #define IFM_1000_T		16			/* 1000Base-T - RJ45 */
-#define IFM_1000_SX		18			/* 1000Base-SX - Fiber Optic */
-#define IFM_10G_T		22			/* 10GBase-T - RJ45 */
+#define IFM_10G_LR		18			/* 10GBase-LR - Fiber 1310nm */
+#define IFM_10G_SR		19			/* 10GBase-SR - Fiber 850nm */
+#define IFM_10G_TWINAX		22			/* 10GBase-CR (DAC) */
+#define IFM_10G_LRM		24			/* 10GBase-LRM Fiber Optic */
 #define IFM_UNKNOWN		25			/* media types not defined yet */
+#define IFM_10G_T		26			/* 10GBase-T - RJ45 */
 
 /* General options */
 
