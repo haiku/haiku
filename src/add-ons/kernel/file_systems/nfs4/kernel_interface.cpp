@@ -28,11 +28,11 @@
 
 
 #define ERROR(format, args...) \
-	dprintf("nfs4: %s()" format "\n", __func__, ##args)
+	dprintf("nfs4: %s()" format "\n", __func__ , ##args)
 
 #ifdef DEBUG
 #define TRACE(format, args...) \
-	dprintf("nfs4: %s()" format "\n", __func__, ##args)
+	dprintf("nfs4: %s()" format "\n", __func__ , ##args)
 #else
 #define TRACE(x...)	(void)0
 #endif
