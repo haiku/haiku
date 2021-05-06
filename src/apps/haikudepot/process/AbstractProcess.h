@@ -1,9 +1,7 @@
 /*
- * Copyright 2018, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
-
-
 #ifndef ABSTRACT_PROCESS_H
 #define ABSTRACT_PROCESS_H
 
@@ -29,7 +27,7 @@ typedef enum process_state {
 
 class AbstractProcessListener : public BReferenceable {
 public:
-	virtual	void				ProcessExited() = 0;
+	virtual	void				ProcessChanged() = 0;
 };
 
 
@@ -42,6 +40,7 @@ public:
 
 	virtual	const char*			Name() const = 0;
 	virtual	const char*			Description() const = 0;
+	virtual float				Progress();
 			status_t			Run();
 			status_t			Stop();
 			status_t			ErrorStatus();
@@ -53,9 +52,12 @@ public:
 protected:
 	virtual	status_t			RunInternal() = 0;
 	virtual	status_t			StopInternal();
+			void				_NotifyChanged();
+
+protected:
+			BLocker				fLock;
 
 private:
-			BLocker				fLock;
 			BReference<AbstractProcessListener>
 								fListener;
 			bool				fWasStopped;

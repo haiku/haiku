@@ -2,8 +2,6 @@
  * Copyright 2018-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
-
-
 #ifndef PROCESS_COORDINATOR_H
 #define PROCESS_COORDINATOR_H
 
@@ -12,7 +10,7 @@
 #include <ObjectList.h>
 
 #include "AbstractProcess.h"
-#include "ProcessNode.h"
+#include "AbstractProcessNode.h"
 
 
 class ProcessCoordinator;
@@ -66,6 +64,16 @@ public:
 };
 
 
+/*!	Classes implementing this 'interface' are able to consume process
+	coordinators.  This may be in order to run them.
+*/
+
+class ProcessCoordinatorConsumer {
+public:
+	virtual	void				Consume(ProcessCoordinator *item) = 0;
+};
+
+
 /*! It is possible to create a number of ProcessNodes (themselves associated
     with AbstractProcess-s) that may have dependencies (predecessors and
     successors) and then an instance of this class is able to coordinate the
@@ -76,13 +84,15 @@ class ProcessCoordinator : public AbstractProcessListener {
 public:
 								ProcessCoordinator(
 									const char* name,
-									ProcessCoordinatorListener* listener,
 									BMessage* message = NULL);
 	virtual						~ProcessCoordinator();
 
-			void				AddNode(ProcessNode* nodes);
+			void				SetListener(
+									ProcessCoordinatorListener *listener);
 
-			void				ProcessExited();
+			void				AddNode(AbstractProcessNode* nodes);
+
+			void				ProcessChanged();
 				// AbstractProcessListener
 
 			bool				IsRunning();
@@ -98,7 +108,7 @@ public:
 			BMessage*			Message() const;
 
 private:
-			bool				_IsRunning(ProcessNode* node);
+			bool				_IsRunning(AbstractProcessNode* node);
 			void				_CoordinateAndCallListener();
 			ProcessCoordinatorState
 								_Coordinate();
@@ -107,12 +117,12 @@ private:
 			BString				_CreateStatusMessage();
 			int32				_CountNodesCompleted();
 			void				_StopSuccessorNodesToErroredOrStoppedNodes();
-			void				_StopSuccessorNodes(ProcessNode* node);
+			void				_StopSuccessorNodes(AbstractProcessNode* node);
 
 private:
 			BString				fName;
 			BLocker				fLock;
-			BObjectList<ProcessNode>
+			BObjectList<AbstractProcessNode>
 								fNodes;
 			ProcessCoordinatorListener*
 								fListener;

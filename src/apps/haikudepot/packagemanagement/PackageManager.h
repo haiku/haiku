@@ -3,6 +3,7 @@
  * Copyright 2011, Ingo Weinhold, <ingo_weinhold@gmx.de>
  * Copyright 2013, Rene Gollent, <rene@gollent.com>
  * Copyright 2017, Julian Harnath <julian.harnath@rwth-aachen.de>.
+ * Copyright 2021, Andrew Lindesay <apl@lindesay.co.nz>.
  *
  * All rights reserved. Distributed under the terms of the MIT License.
  */
@@ -16,16 +17,17 @@
 
 #include "Collector.h"
 #include "DecisionProvider.h"
+#include "DeskbarLink.h"
 #include "JobStateListener.h"
 #include "PackageAction.h"
 #include "PackageInfo.h"
+#include "PackageProgressListener.h"
 
 
 namespace BPackageKit {
 	class BSolverPackage;
 }
 
-class Model;
 class PackageManager;
 class ProblemWindow;
 class ResultWindow;
@@ -39,32 +41,6 @@ using BPackageKit::BPrivate::BDaemonClient;
 using BPackageKit::BManager::BPrivate::BPackageManager;
 
 
-class PackageProgressListener {
-	public:
-	virtual	~PackageProgressListener();
-
-	virtual	void				DownloadProgressChanged(
-									const char* packageName,
-									float progress);
-	virtual	void				DownloadProgressComplete(
-									const char* packageName);
-
-	virtual	void				ConfirmedChanges(
-									BPackageManager::InstalledRepository&
-										repository);
-
-	virtual	void				StartApplyingChanges(
-									BPackageManager::InstalledRepository&
-										repository);
-	virtual	void				ApplyingChangesDone(
-									BPackageManager::InstalledRepository&
-										repository);
-};
-
-
-typedef BObjectList<PackageProgressListener> PackageProgressListenerList;
-
-
 class PackageManager : public BPackageManager,
 	private BPackageManager::UserInteractionHandler {
 public:
@@ -73,8 +49,7 @@ public:
 	virtual						~PackageManager();
 
 	virtual	PackageState		GetPackageState(const PackageInfo& package);
-	virtual	void				GetPackageActions(PackageInfoRef package,
-									Model* model,
+	virtual	void				CollectPackageActions(PackageInfoRef package,
 									Collector<PackageActionRef>& actionList);
 
 			void				SetCurrentActionPackage(
@@ -122,8 +97,16 @@ private:
 									InstalledRepository& repository);
 
 private:
-			void				_GatherPackageActionsForActivatedOrInstalled(
-									PackageInfoRef package, Model* model,
+			PackageActionRef	_CreateUninstallPackageAction(
+									const PackageInfoRef& package);
+			PackageActionRef	_CreateInstallPackageAction(
+									const PackageInfoRef& package);
+			PackageActionRef	_CreateOpenPackageAction(
+									const PackageInfoRef& package,
+									const DeskbarLink& link);
+
+			void				_CollectPackageActionsForActivatedOrInstalled(
+									PackageInfoRef package,
 									Collector<PackageActionRef>& actionList);
 			bool				_AddResults(
 									BPackageManager::InstalledRepository&

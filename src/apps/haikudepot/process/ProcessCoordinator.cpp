@@ -76,12 +76,10 @@ ProcessCoordinatorState::ErrorStatus() const
 // #pragma mark - ProcessCoordinator implementation
 
 
-ProcessCoordinator::ProcessCoordinator(const char* name,
-	ProcessCoordinatorListener* listener,
-	BMessage* message)
+ProcessCoordinator::ProcessCoordinator(const char* name, BMessage* message)
 	:
 	fName(name),
-	fListener(listener),
+	fListener(NULL),
 	fMessage(message),
 	fWasStopped(false)
 {
@@ -92,7 +90,7 @@ ProcessCoordinator::~ProcessCoordinator()
 {
 	AutoLocker<BLocker> locker(&fLock);
 	for (int32 i = 0; i < fNodes.CountItems(); i++) {
-		ProcessNode* node = fNodes.ItemAt(i);
+		AbstractProcessNode* node = fNodes.ItemAt(i);
 		node->Process()->SetListener(NULL);
 		delete node;
 	}
@@ -101,7 +99,14 @@ ProcessCoordinator::~ProcessCoordinator()
 
 
 void
-ProcessCoordinator::AddNode(ProcessNode* node)
+ProcessCoordinator::SetListener(ProcessCoordinatorListener *listener)
+{
+	fListener = listener;
+}
+
+
+void
+ProcessCoordinator::AddNode(AbstractProcessNode* node)
 {
 	AutoLocker<BLocker> locker(&fLock);
 	fNodes.AddItem(node);
@@ -110,7 +115,7 @@ ProcessCoordinator::AddNode(ProcessNode* node)
 
 
 void
-ProcessCoordinator::ProcessExited()
+ProcessCoordinator::ProcessChanged()
 {
 	_CoordinateAndCallListener();
 }
@@ -144,7 +149,7 @@ ProcessCoordinator::Stop()
 		fWasStopped = true;
 		HDINFO("[Coordinator] will stop process coordinator");
 		for (int32 i = 0; i < fNodes.CountItems(); i++) {
-			ProcessNode* node = fNodes.ItemAt(i);
+			AbstractProcessNode* node = fNodes.ItemAt(i);
 			if (node->Process()->ErrorStatus() != B_OK) {
 				HDINFO("[Coordinator] stopping process [%s] (owing to error)",
 					node->Process()->Name());
@@ -181,9 +186,37 @@ float
 ProcessCoordinator::Progress()
 {
 	AutoLocker<BLocker> locker(&fLock);
-	if (!fWasStopped)
-		return ((float) _CountNodesCompleted()) / ((float) fNodes.CountItems());
-	return 0.0f;
+	float result = 0.0f;
+
+	if (!fWasStopped) {
+		int32 count = fNodes.CountItems();
+
+		// if there is only one then return it's value directly because this
+		// allows for the indeterminate state of -1.
+
+		if (count == 1)
+			result = fNodes.ItemAt(0)->Process()->Progress();
+		else {
+			float progressPerNode = 1.0f / ((float) count);
+
+			for (int32 i = count - 1; i >= 0; i--) {
+				AbstractProcess* process = fNodes.ItemAt(i)->Process();
+
+				switch(process->ProcessState()) {
+					case PROCESS_INITIAL:
+						break;
+					case PROCESS_RUNNING:
+						result += (progressPerNode * fmaxf(
+							0.0f, fminf(1.0, process->Progress())));
+						break;
+					case PROCESS_COMPLETE:
+						result += progressPerNode;
+						break;
+				}
+			}
+		}
+	}
+	return result;
 }
 
 
@@ -270,7 +303,7 @@ ProcessCoordinator::_Coordinate()
 	// go through the nodes and find those that are still to be run and
 	// for which the preconditions are met to start.
 	for (int32 i = 0; i < fNodes.CountItems(); i++) {
-		ProcessNode* node = fNodes.ItemAt(i);
+		AbstractProcessNode* node = fNodes.ItemAt(i);
 
 		if (node->Process()->ProcessState() == PROCESS_INITIAL) {
 			if (node->AllPredecessorsComplete())
@@ -295,7 +328,7 @@ void
 ProcessCoordinator::_StopSuccessorNodesToErroredOrStoppedNodes()
 {
 	for (int32 i = 0; i < fNodes.CountItems(); i++) {
-		ProcessNode* node = fNodes.ItemAt(i);
+		AbstractProcessNode* node = fNodes.ItemAt(i);
 		AbstractProcess* process = node->Process();
 
 		if (process->WasStopped() || process->ErrorStatus() != B_OK)
@@ -307,10 +340,10 @@ ProcessCoordinator::_StopSuccessorNodesToErroredOrStoppedNodes()
 /*! This method assumes that a lock is held on the coordinator. */
 
 void
-ProcessCoordinator::_StopSuccessorNodes(ProcessNode* predecessorNode)
+ProcessCoordinator::_StopSuccessorNodes(AbstractProcessNode* predecessorNode)
 {
 	for (int32 i = 0; i < predecessorNode->CountSuccessors(); i++) {
-		ProcessNode* node = predecessorNode->SuccessorAt(i);
+		AbstractProcessNode* node = predecessorNode->SuccessorAt(i);
 		AbstractProcess* process = node->Process();
 
 		if (process->ProcessState() == PROCESS_INITIAL) {
@@ -324,7 +357,7 @@ ProcessCoordinator::_StopSuccessorNodes(ProcessNode* predecessorNode)
 
 
 bool
-ProcessCoordinator::_IsRunning(ProcessNode* node)
+ProcessCoordinator::_IsRunning(AbstractProcessNode* node)
 {
 	return node->Process()->ProcessState() != PROCESS_COMPLETE;
 }

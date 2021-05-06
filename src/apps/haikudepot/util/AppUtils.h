@@ -6,6 +6,7 @@
 #define APP_UTILS_H
 
 
+#include "Alert.h"
 #include "Menu.h"
 
 
@@ -13,7 +14,8 @@ class AppUtils {
 
 public:
 	static	void			NotifySimpleError(const char* title,
-								const char* text);
+								const char* text,
+								alert_type type = B_INFO_ALERT);
 
 	static	status_t		MarkItemWithCodeInMenuOrFirst(const BString& code,
 								BMenu* menu);

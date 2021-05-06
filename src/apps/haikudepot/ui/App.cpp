@@ -342,6 +342,7 @@ App::_AlertSimpleError(BMessage* message)
 {
 	BString alertTitle;
 	BString alertText;
+	int32 typeInt;
 
 	if (message->FindString(KEY_ALERT_TEXT, &alertText) != B_OK)
 		alertText = "?";
@@ -349,7 +350,11 @@ App::_AlertSimpleError(BMessage* message)
 	if (message->FindString(KEY_ALERT_TITLE, &alertTitle) != B_OK)
 		alertTitle = B_TRANSLATE("Error");
 
-	BAlert* alert = new BAlert(alertTitle, alertText, B_TRANSLATE("OK"));
+	if (message->FindInt32(KEY_ALERT_TYPE, &typeInt) != B_OK)
+		typeInt = B_INFO_ALERT;
+
+	BAlert* alert = new BAlert(alertTitle, alertText, B_TRANSLATE("OK"),
+		NULL, NULL, B_WIDTH_AS_USUAL, static_cast<alert_type>(typeInt));
 
 	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go();

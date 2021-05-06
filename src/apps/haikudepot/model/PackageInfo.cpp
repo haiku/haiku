@@ -772,6 +772,13 @@ PackageInfo::AddInstallationLocation(int32 location)
 
 
 void
+PackageInfo::ClearInstallationLocations()
+{
+	fInstallationLocations.clear();
+}
+
+
+void
 PackageInfo::SetDownloadProgress(float progress)
 {
 	fState = DOWNLOADING;

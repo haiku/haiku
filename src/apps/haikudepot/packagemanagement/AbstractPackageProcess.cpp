@@ -1,13 +1,13 @@
 /*
  * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2013, Rene Gollent, <rene@gollent.com>
- * Copyright 2020, Andrew Lindesay <apl@lindesay.co.nz>
+ * Copyright 2020-2021, Andrew Lindesay <apl@lindesay.co.nz>
  *
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 
-#include "PackageAction.h"
+#include "AbstractPackageProcess.h"
 
 #include "Model.h"
 #include "PackageManager.h"
@@ -18,12 +18,12 @@ using namespace BPackageKit;
 // #pragma mark - PackageAction
 
 
-PackageAction::PackageAction(int32 type, PackageInfoRef package, Model* model)
+AbstractPackageProcess::AbstractPackageProcess(
+		PackageInfoRef package, Model* model)
 	:
 	fPackage(package),
-	fType(type),
 	fModel(model),
-	fInstallLocation(InstallLocation(package))
+	fInstallLocation(AbstractPackageProcess::InstallLocation(package))
 {
 	// TODO: ideally if the package is installed at multiple locations,
 	// the user should be able to pick which one to remove.
@@ -33,21 +33,21 @@ PackageAction::PackageAction(int32 type, PackageInfoRef package, Model* model)
 }
 
 
-PackageAction::~PackageAction()
+AbstractPackageProcess::~AbstractPackageProcess()
 {
 	delete fPackageManager;
 }
 
 
 PackageInfoRef
-PackageAction::FindPackageByName(const BString& name)
+AbstractPackageProcess::FindPackageByName(const BString& name)
 {
-	return GetModel()->PackageForName(name);
+	return fModel->PackageForName(name);
 }
 
 
-int32
-PackageAction::InstallLocation(const PackageInfoRef& package)
+/*static*/ int32
+AbstractPackageProcess::InstallLocation(const PackageInfoRef& package)
 {
 	const PackageInstallationLocationSet& locations
 		= package->InstallationLocations();

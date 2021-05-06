@@ -59,6 +59,8 @@ local dumpExportReferenceModelTargetFile =
 local sourceDirs =
 	edits_generic
 	model
+	packagemanagement
+	process
 	textview
 	ui
 	ui_generic
@@ -117,6 +119,7 @@ local applicationSources =
 	Captcha.cpp
 	CreateUserDetail.cpp
 	DecisionProvider.cpp
+	DeskbarLink.cpp
 	FeaturedPackagesView.cpp
 	FilterView.cpp
 	IconTarPtr.cpp
@@ -131,15 +134,12 @@ local applicationSources =
 	MarkupTextView.cpp
 	MessagePackageListener.cpp
 	Model.cpp
-	PackageAction.cpp
-	PackageActionHandler.cpp
 	PackageContentsView.cpp
 	PackageIconTarRepository.cpp
 	PackageInfo.cpp
 	PackageInfoListener.cpp
 	PackageInfoView.cpp
 	PackageListView.cpp
-	PackageManager.cpp
 	RatePackageWindow.cpp
 	RatingView.cpp
 	RatingStability.cpp
@@ -159,15 +159,24 @@ local applicationSources =
 	ValidationUtils.cpp
 	WorkStatusView.cpp
 
+	# packagemanagement
+	AbstractPackageProcess.cpp
+	InstallPackageProcess.cpp
+	OpenPackageProcess.cpp
+	PackageAction.cpp
+	PackageManager.cpp
+	UninstallPackageProcess.cpp
+
 	# network + server / local processes
 	AbstractProcess.cpp
+	AbstractProcessNode.cpp
 	AbstractServerProcess.cpp
 	AbstractSingleFileServerProcess.cpp
 	LocalPkgDataLoadProcess.cpp
 	LocalRepositoryUpdateProcess.cpp
+	NonBlockingProcessNode.cpp
 	ProcessCoordinator.cpp
 	ProcessCoordinatorFactory.cpp
-	ProcessNode.cpp
 	ServerHelper.cpp
 	ServerSettings.cpp
 	ServerPkgDataUpdateProcess.cpp
@@ -176,6 +185,7 @@ local applicationSources =
 	ServerIconExportUpdateProcess.cpp
 	StandardMetaDataJsonEventListener.cpp
 	StandardMetaData.cpp
+	ThreadedProcessNode.cpp
 	UserDetailVerifierProcess.cpp
 	WebAppInterface.cpp
 

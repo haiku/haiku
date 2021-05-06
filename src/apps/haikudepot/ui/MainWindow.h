@@ -14,8 +14,6 @@
 
 #include "HaikuDepotConstants.h"
 #include "Model.h"
-#include "PackageAction.h"
-#include "PackageActionHandler.h"
 #include "ProcessCoordinator.h"
 #include "PackageInfoListener.h"
 #include "TabView.h"
@@ -37,7 +35,7 @@ class WorkStatusView;
 
 
 class MainWindow : public BWindow, private PackageInfoListener,
-	private PackageActionHandler, public ProcessCoordinatorListener,
+	private ProcessCoordinatorConsumer, public ProcessCoordinatorListener,
 	public UserDetailVerifierListener {
 public:
 								MainWindow(const BMessage& settings);
@@ -51,6 +49,9 @@ public:
 
 			void				StoreSettings(BMessage& message) const;
 
+	// ProcessCoordinatorConsumer
+	virtual	void				Consume(ProcessCoordinator *item);
+
 	// ProcessCoordinatorListener
 	virtual void				CoordinatorChanged(
 									ProcessCoordinatorState& coordinatorState);
@@ -63,11 +64,6 @@ private:
 	// PackageInfoListener
 	virtual	void				PackageChanged(
 									const PackageInfoEvent& event);
-
-private:
-	// PackageActionHandler
-	virtual	status_t			SchedulePackageAction(PackageActionRef action);
-	virtual	Model*				GetModel();
 
 private:
 			std::vector<DepotInfoRef>
@@ -119,7 +115,6 @@ private:
 			void				_HandleChangePackageListViewMode();
 
 	static	status_t			_RefreshModelThreadWorker(void* arg);
-	static	status_t			_PackageActionWorker(void* arg);
 	static	status_t			_PopulatePackageWorker(void* arg);
 	static	status_t			_PackagesToShowWorker(void* arg);
 
@@ -173,12 +168,6 @@ private:
 			sem_id				fCoordinatorRunningSem;
 
 			bool				fSinglePackageMode;
-
-			thread_id			fPendingActionsWorker;
-			std::queue<PackageActionRef>
-								fPendingActions;
-			BLocker				fPendingActionsLock;
-			sem_id				fPendingActionsSem;
 
 			thread_id			fPopulatePackageWorker;
 			PackageInfoRef		fPackageToPopulate;

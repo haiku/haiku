@@ -268,10 +268,6 @@ MainWindow::~MainWindow()
 
 	BPackageRoster().StopWatching(this);
 
-	delete_sem(fPendingActionsSem);
-	if (fPendingActionsWorker >= 0)
-		wait_for_thread(fPendingActionsWorker, NULL);
-
 	if (fScreenshotWindow != NULL && fScreenshotWindow->Lock())
 		fScreenshotWindow->Quit();
 }
@@ -313,6 +309,7 @@ MainWindow::MessageReceived(BMessage* message)
 			break;
 
 		case B_PACKAGE_UPDATE:
+			HDINFO("package update received");
 			// TODO: see ticket #15879
 			// work needs to be done here to selectively update package data in
 			// the running HaikuDepot application when there are changes on the
@@ -605,6 +602,13 @@ MainWindow::StoreSettings(BMessage& settings) const
 
 
 void
+MainWindow::Consume(ProcessCoordinator *item)
+{
+	_AddProcessCoordinator(item);
+}
+
+
+void
 MainWindow::PackageChanged(const PackageInfoEvent& event)
 {
 	uint32 watchedChanges = PKG_CHANGED_STATE | PKG_CHANGED_PROMINENCE;
@@ -617,22 +621,6 @@ MainWindow::PackageChanged(const PackageInfoEvent& event)
 			// reference needs to be released by MessageReceived();
 		PostMessage(&message);
 	}
-}
-
-
-status_t
-MainWindow::SchedulePackageAction(PackageActionRef action)
-{
-	AutoLocker<BLocker> lock(&fPendingActionsLock);
-	fPendingActions.push(action);
-	return release_sem_etc(fPendingActionsSem, 1, 0);
-}
-
-
-Model*
-MainWindow::GetModel()
-{
-	return &fModel;
 }
 
 
@@ -824,15 +812,6 @@ MainWindow::_PromptCanShareAnonymousUserData()
 void
 MainWindow::_InitWorkerThreads()
 {
-	fPendingActionsSem = create_sem(0, "PendingPackageActions");
-	if (fPendingActionsSem >= 0) {
-		fPendingActionsWorker = spawn_thread(&_PackageActionWorker,
-			"Planet Express", B_NORMAL_PRIORITY, this);
-		if (fPendingActionsWorker >= 0)
-			resume_thread(fPendingActionsWorker);
-	} else
-		fPendingActionsWorker = -1;
-
 	fPackageToPopulateSem = create_sem(0, "PopulatePackage");
 	if (fPackageToPopulateSem >= 0) {
 		fPopulatePackageWorker = spawn_thread(&_PopulatePackageWorker,
@@ -930,8 +909,6 @@ MainWindow::_IncrementViewCounter(const PackageInfoRef& package)
 	if (shouldIncrementViewCounter) {
 		ProcessCoordinator* bulkLoadCoordinator =
 			ProcessCoordinatorFactory::CreateIncrementViewCounter(
-				this,
-					// ProcessCoordinatorListener
 				&fModel, package);
 		_AddProcessCoordinator(bulkLoadCoordinator);
 	}
@@ -976,8 +953,6 @@ MainWindow::_StartBulkLoad(bool force)
 		ProcessCoordinatorFactory::CreateBulkLoadCoordinator(
 			this,
 				// PackageInfoListener
-			this,
-				// ProcessCoordinatorListener
 			&fModel, force);
 	_AddProcessCoordinator(bulkLoadCoordinator);
 }
@@ -1061,38 +1036,15 @@ MainWindow::_HandleWorkStatusChangeMessageReceived(const BMessage* message)
 	if (message->FindString(KEY_WORK_STATUS_TEXT, &text) == B_OK)
 		fWorkStatusView->SetText(text);
 
-	if (message->FindFloat(KEY_WORK_STATUS_PROGRESS, &progress) == B_OK)
-		fWorkStatusView->SetProgress(progress);
-}
-
-
-/*static*/ status_t
-MainWindow::_PackageActionWorker(void* arg)
-{
-	MainWindow* window = reinterpret_cast<MainWindow*>(arg);
-
-	while (acquire_sem(window->fPendingActionsSem) == B_OK) {
-		PackageActionRef ref;
-		{
-			AutoLocker<BLocker> lock(&window->fPendingActionsLock);
-			ref = window->fPendingActions.front();
-			window->fPendingActions.pop();
-			if (!ref.IsSet())
-				break;
-		}
-
-		BMessenger messenger(window);
-		BMessage busyMessage(MSG_PACKAGE_WORKER_BUSY);
-		BString text(ref->Label());
-		text << B_UTF8_ELLIPSIS;
-		busyMessage.AddString("reason", text);
-
-		messenger.SendMessage(&busyMessage);
-		ref->Perform();
-		messenger.SendMessage(MSG_PACKAGE_WORKER_IDLE);
+	if (message->FindFloat(KEY_WORK_STATUS_PROGRESS, &progress) == B_OK) {
+		if (progress < 0.0f)
+			fWorkStatusView->SetBusy();
+		else
+			fWorkStatusView->SetProgress(progress);
+	} else {
+		HDERROR("work status change missing progress on update message");
+		fWorkStatusView->SetProgress(0.0f);
 	}
-
-	return 0;
 }
 
 
@@ -1183,8 +1135,6 @@ MainWindow::_StartUserVerify()
 			ProcessCoordinatorFactory::CreateUserDetailVerifierCoordinator(
 				this,
 					// UserDetailVerifierListener
-				this,
-					// ProcessCoordinatorListener
 				&fModel) );
 	}
 }
@@ -1411,6 +1361,8 @@ void
 MainWindow::_AddProcessCoordinator(ProcessCoordinator* item)
 {
 	AutoLocker<BLocker> lock(&fCoordinatorLock);
+
+	item->SetListener(this);
 
 	if (!fCoordinator.IsSet()) {
 		if (acquire_sem(fCoordinatorRunningSem) != B_OK)

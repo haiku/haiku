@@ -23,7 +23,8 @@
  */
 
 /*static*/ void
-AppUtils::NotifySimpleError(const char* title, const char* text)
+AppUtils::NotifySimpleError(const char* title, const char* text,
+	alert_type type)
 {
 	BMessage message(MSG_ALERT_SIMPLE_ERROR);
 
@@ -32,6 +33,8 @@ AppUtils::NotifySimpleError(const char* title, const char* text)
 
 	if (text != NULL && strlen(text) != 0)
 		message.AddString(KEY_ALERT_TEXT, text);
+
+	message.AddInt32(KEY_ALERT_TYPE, static_cast<int>(type));
 
 	be_app->PostMessage(&message);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #include "AbstractProcess.h"
@@ -77,7 +77,7 @@ AbstractProcess::Run()
 	// if so, the process orchestration needs to know when this
 	// process has completed.
 	if (listener.IsSet())
-		listener->ProcessExited();
+		listener->ProcessChanged();
 
 	return runResult;
 }
@@ -127,7 +127,7 @@ AbstractProcess::Stop()
 	}
 
 	if (listener.IsSet())
-		listener->ProcessExited();
+		listener->ProcessChanged();
 
 	return result;
 }
@@ -152,4 +152,24 @@ AbstractProcess::ProcessState()
 {
 	AutoLocker<BLocker> locker(&fLock);
 	return fProcessState;
+}
+
+
+float
+AbstractProcess::Progress()
+{
+	return kProgressIndeterminate;
+}
+
+
+void
+AbstractProcess::_NotifyChanged()
+{
+    BReference<AbstractProcessListener> listener = NULL;
+	{
+		AutoLocker<BLocker> locker(&fLock);
+		listener = fListener;
+	}
+	if (listener.IsSet())
+		listener->ProcessChanged();
 }

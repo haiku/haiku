@@ -41,8 +41,8 @@
 #include "Logger.h"
 #include "MarkupTextView.h"
 #include "MessagePackageListener.h"
-#include "PackageActionHandler.h"
 #include "PackageContentsView.h"
+#include "ProcessCoordinatorFactory.h"
 #include "PackageInfo.h"
 #include "PackageManager.h"
 #include "RatingView.h"
@@ -193,7 +193,6 @@ private:
 
 
 enum {
-	MSG_PACKAGE_ACTION			= 'pkga',
 	MSG_MOUSE_ENTERED_RATING	= 'menr',
 	MSG_MOUSE_EXITED_RATING		= 'mexr',
 };
@@ -392,20 +391,20 @@ public:
 		}
 	}
 
-	void SetPackage(const PackageInfo& package)
+	void SetPackage(const PackageInfoRef package)
 	{
 		BitmapRef bitmap;
 		status_t iconResult = fPackageIconRepository.GetIcon(
-			package.Name(), BITMAP_SIZE_64, bitmap);
+			package->Name(), BITMAP_SIZE_64, bitmap);
 
 		if (iconResult == B_OK)
 			fIconView->SetBitmap(bitmap, BITMAP_SIZE_32);
 		else
 			fIconView->UnsetBitmap();
 
-		fTitleView->SetText(package.Title());
+		fTitleView->SetText(package->Title());
 
-		BString publisher = package.Publisher().Name();
+		BString publisher = package->Publisher().Name();
 		if (publisher.CountChars() > 45) {
 			fPublisherView->SetToolTip(publisher);
 			fPublisherView->SetText(publisher.TruncateChars(45)
@@ -413,9 +412,9 @@ public:
 		} else
 			fPublisherView->SetText(publisher);
 
-		fVersionInfo->SetText(package.Version().ToString());
+		fVersionInfo->SetText(package->Version().ToString());
 
-		RatingSummary ratingSummary = package.CalculateRatingSummary();
+		RatingSummary ratingSummary = package->CalculateRatingSummary();
 
 		fRatingView->SetRating(ratingSummary.averageRating);
 
@@ -476,16 +475,17 @@ private:
 
 class PackageActionView : public BView {
 public:
-	PackageActionView(PackageActionHandler* handler)
+	PackageActionView(ProcessCoordinatorConsumer* processCoordinatorConsumer,
+			Model* model)
 		:
 		BView("about view", B_WILL_DRAW),
+		fModel(model),
 		fLayout(new BGroupLayout(B_HORIZONTAL)),
-		fPackageActionHandler(handler),
+		fProcessCoordinatorConsumer(processCoordinatorConsumer),
 		fStatusLabel(NULL),
 		fStatusBar(NULL)
 	{
 		SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
-
 		SetLayout(fLayout);
 		fLayout->AddItem(BSpaceLayoutItem::CreateGlue());
 	}
@@ -498,26 +498,27 @@ public:
 	virtual void MessageReceived(BMessage* message)
 	{
 		switch (message->what) {
-			case MSG_PACKAGE_ACTION:
+			case MSG_PKG_INSTALL:
+			case MSG_PKG_UNINSTALL:
+			case MSG_PKG_OPEN:
 				_RunPackageAction(message);
 				break;
-
 			default:
 				BView::MessageReceived(message);
 				break;
 		}
 	}
 
-	void SetPackage(const PackageInfo& package)
+	void SetPackage(const PackageInfoRef package)
 	{
-		if (package.State() == DOWNLOADING) {
+		if (package->State() == DOWNLOADING) {
 			AdoptDownloadProgress(package);
 		} else {
 			AdoptActions(package);
 		}
 	}
 
-	void AdoptActions(const PackageInfo& package)
+	void AdoptActions(const PackageInfoRef package)
 	{
 		PackageManager manager(
 			BPackageKit::B_PACKAGE_INSTALLATION_LOCATION_HOME);
@@ -527,22 +528,17 @@ public:
 		// so the user knows why no actions are presented
 		std::vector<PackageActionRef> actions;
 		VectorCollector<PackageActionRef> actionsCollector(actions);
-		manager.GetPackageActions(
-			const_cast<PackageInfo*>(&package),
-			fPackageActionHandler->GetModel(), actionsCollector);
+		manager.CollectPackageActions(package, actionsCollector);
 
-		bool clearNeeded = _IsClearNeededToAdoptActions(actions);
-		fPackageActions = actions;
-
-		if (clearNeeded) {
+		if (_IsClearNeededToAdoptActions(actions)) {
 			Clear();
-			_CreateAllNewButtonsForAdoptActions();
+			_CreateAllNewButtonsForAdoptActions(actions);
 		} else {
-			_UpdateExistingButtonsForAdoptActions();
+			_UpdateExistingButtonsForAdoptActions(actions);
 		}
 	}
 
-	void AdoptDownloadProgress(const PackageInfo& package)
+	void AdoptDownloadProgress(const PackageInfoRef package)
 	{
 		if (fButtons.CountItems() > 0)
 			Clear();
@@ -560,7 +556,7 @@ public:
 			fLayout->AddView(fStatusBar);
 		}
 
-		fStatusBar->SetTo(package.DownloadProgress() * 100.0);
+		fStatusBar->SetTo(package->DownloadProgress() * 100.0);
 	}
 
 	void Clear()
@@ -589,38 +585,31 @@ private:
 	{
 		if (fStatusBar != NULL)
 			return true;
-		if (actions.size() != fPackageActions.size())
-			return true;
 		if (fButtons.CountItems() != static_cast<int32>(actions.size()))
 			return true;
-		for (int i = 0; i < static_cast<int32>(actions.size()); i++) {
-			if (actions[i]->Type() != fPackageActions[i]->Type())
-				return true;
-		}
 		return false;
 	}
 
-	void _UpdateExistingButtonsForAdoptActions()
+	void _UpdateExistingButtonsForAdoptActions(
+		std::vector<PackageActionRef> actions)
 	{
-		// note that by this point, the actions will have been set to the
-		// member variable.
 		int32 index = 0;
-		for (int32 i = fPackageActions.size() - 1; i >= 0; i--) {
-			const PackageActionRef& action = fPackageActions[i];
+		for (int32 i = actions.size() - 1; i >= 0; i--) {
+			const PackageActionRef& action = actions[i];
+			BMessage* message = new BMessage(action->Message());
 			BButton* button = (BButton*)fButtons.ItemAtFast(index++);
-			button->SetLabel(action->Label());
+			button->SetLabel(action->Title());
+			button->SetMessage(message);
 		}
 	}
 
-	void _CreateAllNewButtonsForAdoptActions()
+	void _CreateAllNewButtonsForAdoptActions(
+		std::vector<PackageActionRef> actions)
 	{
-		for (int32 i = fPackageActions.size() - 1; i >= 0; i--) {
-			const PackageActionRef& action = fPackageActions[i];
-
-			BMessage* message = new BMessage(MSG_PACKAGE_ACTION);
-			message->AddInt32("index", i);
-
-			BButton* button = new BButton(action->Label(), message);
+		for (int32 i = actions.size() - 1; i >= 0; i--) {
+			const PackageActionRef& action = actions[i];
+			BMessage* message = new BMessage(action->Message());
+			BButton* button = new BButton(action->Title(), message);
 			fLayout->AddView(button);
 			button->SetTarget(this);
 
@@ -628,62 +617,44 @@ private:
 		}
 	}
 
-	void _RunPackageAction(BMessage* message)
+	bool _MatchesPackageActionMessage(BButton *button, BMessage* message)
 	{
-		int32 index;
-		if (message->FindInt32("index", &index) != B_OK)
-			return;
+		if (button == NULL)
+			return false;
+		BMessage* buttonMessage = button->Message();
+		if (buttonMessage == NULL)
+			return false;
+		return buttonMessage == message;
+	}
 
-		const PackageActionRef& action = fPackageActions[index];
-		if (!action.IsSet())
-			return;
+	/*!	Since the action has been fired; it should not be possible
+		to run it again because this may make no sense.  For this
+		reason, disable the corresponding button.
+	*/
 
-		status_t result = fPackageActionHandler->SchedulePackageAction(action);
-
-		if (result != B_OK) {
-			HDERROR("Failed to schedule action: %s '%s': %s",
-				action->Label(),
-				action->Package()->Name().String(),
-				strerror(result));
-			BString message(B_TRANSLATE("The package action "
-				"could not be scheduled: %Error%"));
-			message.ReplaceAll("%Error%", strerror(result));
-			BAlert* alert = new(std::nothrow) BAlert(
-				B_TRANSLATE("Package action failed"),
-				message, B_TRANSLATE("OK"), NULL, NULL,
-				B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-			if (alert != NULL)
-				alert->Go();
-		} else {
-			// Find the button for this action and disable it.
-			// Actually search the matching button instead of just using
-			// fButtons.ItemAt((fButtons.CountItems() - 1) - index) to
-			// make this robust against for example changing the order of
-			// buttons from right -> left to left -> right...
-			for (int32 i = 0; i < fButtons.CountItems(); i++) {
-				BButton* button = (BButton*)fButtons.ItemAt(index);
-				if (button == NULL)
-					continue;
-				BMessage* buttonMessage = button->Message();
-				if (buttonMessage == NULL)
-					continue;
-				int32 buttonIndex;
-				if (buttonMessage->FindInt32("index", &buttonIndex) != B_OK)
-					continue;
-				if (buttonIndex == index) {
-					button->SetEnabled(false);
-					break;
-				}
-			}
+	void _DisableButtonForPackageActionMessage(BMessage* message)
+	{
+		for (int32 i = 0; i < fButtons.CountItems(); i++) {
+			BButton* button = static_cast<BButton*>(fButtons.ItemAt(i));
+			if (_MatchesPackageActionMessage(button, message))
+				button->SetEnabled(false);
 		}
 	}
 
+	void _RunPackageAction(BMessage* message)
+	{
+		ProcessCoordinator *processCoordinator =
+			ProcessCoordinatorFactory::CreatePackageActionCoordinator(
+				fModel, message);
+		fProcessCoordinatorConsumer->Consume(processCoordinator);
+		_DisableButtonForPackageActionMessage(message);
+	}
+
 private:
+	Model*				fModel;
 	BGroupLayout*		fLayout;
-	std::vector<PackageActionRef>
-						fPackageActions;
-	PackageActionHandler*
-						fPackageActionHandler;
+	ProcessCoordinatorConsumer*
+						fProcessCoordinatorConsumer;
 	BList				fButtons;
 
 	BStringView*		fStatusLabel;
@@ -825,30 +796,30 @@ public:
 		}
 	}
 
-	void SetPackage(const PackageInfo& package)
+	void SetPackage(const PackageInfoRef package)
 	{
-		fDescriptionView->SetText(package.ShortDescription(),
-			package.FullDescription());
+		fDescriptionView->SetText(package->ShortDescription(),
+			package->FullDescription());
 
 		fEmailIconView->SetBitmap(&fEmailIcon, BITMAP_SIZE_16);
-		_SetContactInfo(fEmailLinkView, package.Publisher().Email());
+		_SetContactInfo(fEmailLinkView, package->Publisher().Email());
 		fWebsiteIconView->SetBitmap(&fWebsiteIcon, BITMAP_SIZE_16);
-		_SetContactInfo(fWebsiteLinkView, package.Publisher().Website());
+		_SetContactInfo(fWebsiteLinkView, package->Publisher().Website());
 
-		int32 countScreenshots = package.CountScreenshots();
+		int32 countScreenshots = package->CountScreenshots();
 		bool hasScreenshot = false;
 		if (countScreenshots > 0) {
-			const BitmapRef& bitmapRef = package.ScreenshotAtIndex(0);
+			const BitmapRef& bitmapRef = package->ScreenshotAtIndex(0);
 			if (bitmapRef.IsSet()) {
 				HDDEBUG("did find screenshot for package [%s]",
-					package.Name().String());
+					package->Name().String());
 				hasScreenshot = true;
 				fScreenshotView->SetBitmap(bitmapRef);
 			}
 		}
 		else {
 			HDTRACE("did not find screenshots for package [%s]",
-				package.Name().String());
+				package->Name().String());
 		}
 
 		if (!hasScreenshot)
@@ -1083,14 +1054,14 @@ public:
 		Clear();
 	}
 
-	void SetPackage(const PackageInfo& package)
+	void SetPackage(const PackageInfoRef package)
 	{
 		ClearRatings();
 
 		// TODO: Re-use rating summary already used for TitleView...
-		fRatingSummaryView->SetToSummary(package.CalculateRatingSummary());
+		fRatingSummaryView->SetToSummary(package->CalculateRatingSummary());
 
-		int count = package.CountUserRatings();
+		int count = package->CountUserRatings();
 		if (count == 0) {
 			BStringView* noRatingsView = new BStringView("no ratings",
 				B_TRANSLATE("No user ratings available."));
@@ -1105,7 +1076,7 @@ public:
 		}
 
 		for (int i = count - 1; i >= 0; i--) {
-			UserRatingRef rating = package.UserRatingAtIndex(i);
+			UserRatingRef rating = package->UserRatingAtIndex(i);
 				// was previously filtering comments just for the current
 				// user's language, but as there are not so many comments at
 				// the moment, just show all of them for now.
@@ -1164,7 +1135,7 @@ public:
 	{
 	}
 
-	void SetPackage(const PackageInfoRef& package)
+	void SetPackage(const PackageInfoRef package)
 	{
 		fPackageContents->SetPackage(package);
 	}
@@ -1212,9 +1183,9 @@ public:
 	{
 	}
 
-	void SetPackage(const PackageInfo& package)
+	void SetPackage(const PackageInfoRef package)
 	{
-		const BString& changelog = package.Changelog();
+		const BString& changelog = package->Changelog();
 		if (changelog.Length() > 0)
 			fTextView->SetText(changelog);
 		else
@@ -1265,7 +1236,7 @@ public:
 		Clear();
 	}
 
-	void SetPackage(const PackageInfoRef& package, bool switchToDefaultTab)
+	void SetPackage(const PackageInfoRef package, bool switchToDefaultTab)
 	{
 		if (switchToDefaultTab)
 			Select(TAB_ABOUT);
@@ -1278,9 +1249,9 @@ public:
 		Invalidate(TabFrame(TAB_CHANGELOG));
 		Invalidate(TabFrame(TAB_CONTENTS));
 
-		fAboutView->SetPackage(*package.Get());
-		fUserRatingsView->SetPackage(*package.Get());
-		fChangelogView->SetPackage(*package.Get());
+		fAboutView->SetPackage(package);
+		fUserRatingsView->SetPackage(package);
+		fChangelogView->SetPackage(package);
 		fContentsView->SetPackage(package);
 	}
 
@@ -1304,7 +1275,7 @@ private:
 
 
 PackageInfoView::PackageInfoView(Model* model,
-		PackageActionHandler* handler)
+		ProcessCoordinatorConsumer* processCoordinatorConsumer)
 	:
 	BView("package info view", 0),
 	fModel(model),
@@ -1333,7 +1304,8 @@ PackageInfoView::PackageInfoView(Model* model,
 	fCardLayout->SetVisibleItem((int32)0);
 
 	fTitleView = new TitleView(fModel->GetPackageIconRepository());
-	fPackageActionView = new PackageActionView(handler);
+	fPackageActionView = new PackageActionView(processCoordinatorConsumer,
+		model);
 	fPackageActionView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED,
 		B_SIZE_UNSET));
 	fPagesView = new PagesView();
@@ -1400,11 +1372,11 @@ PackageInfoView::MessageReceived(BMessage* message)
 
 			if ((changes & PKG_CHANGED_TITLE) != 0
 				|| (changes & PKG_CHANGED_RATINGS) != 0) {
-				fTitleView->SetPackage(*package.Get());
+				fTitleView->SetPackage(package);
 			}
 
 			if ((changes & PKG_CHANGED_STATE) != 0)
-				fPackageActionView->SetPackage(*package.Get());
+				fPackageActionView->SetPackage(package);
 
 			break;
 		}
@@ -1440,10 +1412,8 @@ PackageInfoView::SetPackage(const PackageInfoRef& packageRef)
 		switchToDefaultTab = false;
 	}
 
-	const PackageInfo& package = *packageRef.Get();
-
-	fTitleView->SetPackage(package);
-	fPackageActionView->SetPackage(package);
+	fTitleView->SetPackage(packageRef);
+	fPackageActionView->SetPackage(packageRef);
 	fPagesView->SetPackage(packageRef, switchToDefaultTab);
 
 	fCardLayout->SetVisibleItem(1);

@@ -13,15 +13,17 @@
 #include <package/PackageRoster.h>
 
 #include "AbstractServerProcess.h"
+#include "DeskbarLink.h"
 #include "HaikuDepotConstants.h"
 #include "IncrementViewCounterProcess.h"
+#include "InstallPackageProcess.h"
 #include "LocalPkgDataLoadProcess.h"
 #include "LocalRepositoryUpdateProcess.h"
 #include "Logger.h"
 #include "Model.h"
+#include "OpenPackageProcess.h"
 #include "PackageInfoListener.h"
 #include "ProcessCoordinator.h"
-#include "ProcessNode.h"
 #include "ServerHelper.h"
 #include "ServerIconExportUpdateProcess.h"
 #include "ServerPkgDataUpdateProcess.h"
@@ -29,6 +31,8 @@
 #include "ServerRepositoryDataUpdateProcess.h"
 #include "ServerSettings.h"
 #include "StorageUtils.h"
+#include "ThreadedProcessNode.h"
+#include "UninstallPackageProcess.h"
 #include "UserDetailVerifierProcess.h"
 
 
@@ -37,13 +41,11 @@ using namespace BPackageKit;
 
 /*static*/ ProcessCoordinator*
 ProcessCoordinatorFactory::CreateIncrementViewCounter(
-	ProcessCoordinatorListener* processCoordinatorListener,
 	Model* model, const PackageInfoRef package)
 {
 	ProcessCoordinator* processCoordinator = new ProcessCoordinator(
-		"IncrementViewCounter",
-		processCoordinatorListener);
-	ProcessNode* node = new ProcessNode(
+		"IncrementViewCounter");
+	AbstractProcessNode* node = new ThreadedProcessNode(
 		new IncrementViewCounterProcess(model, package));
 	processCoordinator->AddNode(node);
 	return processCoordinator;
@@ -53,13 +55,11 @@ ProcessCoordinatorFactory::CreateIncrementViewCounter(
 /*static*/ ProcessCoordinator*
 ProcessCoordinatorFactory::CreateUserDetailVerifierCoordinator(
 	UserDetailVerifierListener* userDetailVerifierListener,
-	ProcessCoordinatorListener* processCoordinatorListener,
 	Model* model)
 {
 	ProcessCoordinator* processCoordinator = new ProcessCoordinator(
-		"UserDetailVerifier",
-		processCoordinatorListener);
-	ProcessNode* userDetailVerifier = new ProcessNode(
+		"UserDetailVerifier");
+	AbstractProcessNode* userDetailVerifier = new ThreadedProcessNode(
 		new UserDetailVerifierProcess(model, userDetailVerifierListener));
 	processCoordinator->AddNode(userDetailVerifier);
 	return processCoordinator;
@@ -69,42 +69,40 @@ ProcessCoordinatorFactory::CreateUserDetailVerifierCoordinator(
 /* static */ ProcessCoordinator*
 ProcessCoordinatorFactory::CreateBulkLoadCoordinator(
 	PackageInfoListener *packageInfoListener,
-	ProcessCoordinatorListener* processCoordinatorListener,
 	Model* model, bool forceLocalUpdate)
 {
 	bool areWorkingFilesAvailable = StorageUtils::AreWorkingFilesAvailable();
 	uint32 serverProcessOptions = _CalculateServerProcessOptions();
 	BAutolock locker(model->Lock());
 	ProcessCoordinator* processCoordinator = new ProcessCoordinator(
-		"BulkLoad",
-		processCoordinatorListener, new BMessage(MSG_BULK_LOAD_DONE));
+		"BulkLoad", new BMessage(MSG_BULK_LOAD_DONE));
 
-	ProcessNode *localRepositoryUpdate =
-		new ProcessNode(new LocalRepositoryUpdateProcess(model,
+	AbstractProcessNode *localRepositoryUpdate =
+		new ThreadedProcessNode(new LocalRepositoryUpdateProcess(model,
 			forceLocalUpdate));
 	processCoordinator->AddNode(localRepositoryUpdate);
 
-	ProcessNode *localPkgDataLoad =
-		new ProcessNode(new LocalPkgDataLoadProcess(
+	AbstractProcessNode *localPkgDataLoad =
+		new ThreadedProcessNode(new LocalPkgDataLoadProcess(
 			packageInfoListener, model, forceLocalUpdate));
 	localPkgDataLoad->AddPredecessor(localRepositoryUpdate);
 	processCoordinator->AddNode(localPkgDataLoad);
 
 	if (areWorkingFilesAvailable) {
-		ProcessNode *serverIconExportUpdate =
-			new ProcessNode(new ServerIconExportUpdateProcess(model,
+		AbstractProcessNode *serverIconExportUpdate =
+			new ThreadedProcessNode(new ServerIconExportUpdateProcess(model,
 				serverProcessOptions));
 		serverIconExportUpdate->AddPredecessor(localPkgDataLoad);
 		processCoordinator->AddNode(serverIconExportUpdate);
 
-		ProcessNode *serverRepositoryDataUpdate =
-			new ProcessNode(new ServerRepositoryDataUpdateProcess(model,
+		AbstractProcessNode *serverRepositoryDataUpdate =
+			new ThreadedProcessNode(new ServerRepositoryDataUpdateProcess(model,
 				serverProcessOptions));
 		serverRepositoryDataUpdate->AddPredecessor(localPkgDataLoad);
 		processCoordinator->AddNode(serverRepositoryDataUpdate);
 
-		ProcessNode *serverReferenceDataUpdate =
-			new ProcessNode(new ServerReferenceDataUpdateProcess(model,
+		AbstractProcessNode *serverReferenceDataUpdate =
+			new ThreadedProcessNode(new ServerReferenceDataUpdateProcess(model,
 				serverProcessOptions));
 		processCoordinator->AddNode(serverReferenceDataUpdate);
 
@@ -122,7 +120,7 @@ ProcessCoordinatorFactory::CreateBulkLoadCoordinator(
 			AutoLocker<BLocker> locker(model->Lock());
 
 			for (int32 i = 0; i < repoNames.CountStrings(); i++) {
-				ProcessNode* processNode = new ProcessNode(
+				AbstractProcessNode* processNode = new ThreadedProcessNode(
 					new ServerPkgDataUpdateProcess(
 						model->Language()->PreferredLanguage()->Code(),
 						repoNames.StringAt(i), model, serverProcessOptions));
@@ -134,6 +132,94 @@ ProcessCoordinatorFactory::CreateBulkLoadCoordinator(
 			HDERROR("a problem has arisen getting the repository names.");
 	}
 
+	return processCoordinator;
+}
+
+
+/*static*/ ProcessCoordinator*
+ProcessCoordinatorFactory::CreatePackageActionCoordinator(
+	Model* model, BMessage* message)
+{
+	switch (message->what) {
+		case MSG_PKG_INSTALL:
+			return _CreateInstallPackageActionCoordinator(model, message);
+		case MSG_PKG_UNINSTALL:
+			return _CreateUninstallPackageActionCoordinator(model, message);
+		case MSG_PKG_OPEN:
+			return _CreateOpenPackageActionCoordinator(model, message);
+		default:
+			HDFATAL("unexpected package action message what");
+	}
+}
+
+
+/*static*/ PackageInfoRef
+ProcessCoordinatorFactory::_ExtractPackageFromMessage(
+	Model* model, BMessage* message)
+{
+	BString pkgName;
+	if (message->FindString(KEY_PACKAGE_NAME, &pkgName) != B_OK)
+		HDFATAL("malformed message missing key [%s]", KEY_PACKAGE_NAME);
+	return model->PackageForName(pkgName);
+}
+
+
+/*static*/ ProcessCoordinator*
+ProcessCoordinatorFactory::_CreateInstallPackageActionCoordinator(
+	Model* model, BMessage* message)
+{
+	ProcessCoordinator* processCoordinator = new ProcessCoordinator(
+		"InstallPackage", new BMessage(MSG_PACKAGE_ACTION_DONE));
+	PackageInfoRef package = _ExtractPackageFromMessage(model, message);
+	if (package.IsSet()) {
+		AbstractProcessNode *processNode =
+			new ThreadedProcessNode(new InstallPackageProcess(package, model));
+		processCoordinator->AddNode(processNode);
+	} else {
+		HDERROR("unable to find the package");
+	}
+	return processCoordinator;
+}
+
+
+/*static*/ ProcessCoordinator*
+ProcessCoordinatorFactory::_CreateUninstallPackageActionCoordinator(
+	Model* model, BMessage* message)
+{
+	ProcessCoordinator* processCoordinator = new ProcessCoordinator(
+		"UninstallPackage", new BMessage(MSG_PACKAGE_ACTION_DONE));
+	PackageInfoRef package = _ExtractPackageFromMessage(model, message);
+	if (package.IsSet()) {
+		AbstractProcessNode *processNode =
+			new ThreadedProcessNode(new UninstallPackageProcess(
+				package, model));
+		processCoordinator->AddNode(processNode);
+	} else {
+		HDERROR("unable to find the package");
+	}
+	return processCoordinator;
+}
+
+
+/*static*/ ProcessCoordinator*
+ProcessCoordinatorFactory::_CreateOpenPackageActionCoordinator(
+	Model* model, BMessage* message)
+{
+	ProcessCoordinator* processCoordinator = new ProcessCoordinator(
+		"OpenPackage", new BMessage(MSG_PACKAGE_ACTION_DONE));
+	PackageInfoRef package = _ExtractPackageFromMessage(model, message);
+	if (package.IsSet()) {
+		BMessage deskbarLinkMessage;
+		if (message->FindMessage(KEY_DESKBAR_LINK, &deskbarLinkMessage) != B_OK)
+			HDFATAL("malformed message missing key [%s]", KEY_DESKBAR_LINK);
+		DeskbarLink deskbarLink(&deskbarLinkMessage);
+		AbstractProcessNode *processNode =
+			new ThreadedProcessNode(new OpenPackageProcess(
+				package, model, deskbarLink));
+		processCoordinator->AddNode(processNode);
+	} else {
+		HDERROR("unable to find the package");
+	}
 	return processCoordinator;
 }
 

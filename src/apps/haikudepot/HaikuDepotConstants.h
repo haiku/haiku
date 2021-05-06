@@ -6,6 +6,7 @@
 #define HAIKU_DEPOT_CONSTANTS_H
 
 enum {
+	MSG_PACKAGE_ACTION_DONE					= 'mpad',
 	MSG_BULK_LOAD_DONE						= 'mmwd',
 	MSG_MAIN_WINDOW_CLOSED					= 'mwcl',
 	MSG_PACKAGE_SELECTED					= 'pkgs',
@@ -25,6 +26,9 @@ enum {
 	MSG_USER_USAGE_CONDITIONS_ERROR			= 'uuce',
 	MSG_USER_USAGE_CONDITIONS_NOT_LATEST	= 'uucl',
 	MSG_LOG_OUT								= 'lgot',
+	MSG_PKG_INSTALL							= 'pkgi',
+	MSG_PKG_UNINSTALL						= 'pkgu',
+	MSG_PKG_OPEN							= 'pkgo'
 };
 
 enum BitmapSize {
@@ -41,14 +45,17 @@ enum BitmapSize {
 // constants are related to the geometry of the layout
 // of the stars.
 
-#define SIZE_RATING_STAR				16.0
-#define WIDTH_RATING_STAR_SPACING		2.0
-#define BOUNDS_RATING					BRect(0, 0, \
+#define SIZE_RATING_STAR					16.0
+#define WIDTH_RATING_STAR_SPACING			2.0
+#define BOUNDS_RATING						BRect(0, 0, \
 	5 * SIZE_RATING_STAR + 4 * WIDTH_RATING_STAR_SPACING, \
 	SIZE_RATING_STAR)
 
-#define RATING_MISSING					-1.0f
-#define RATING_MIN						0.0f
+#define RATING_MISSING						-1.0f
+#define RATING_MIN							0.0f
+
+
+#define kProgressIndeterminate				-1.0f
 
 
 #define RGB_COLOR_WHITE						(rgb_color) { 255, 255, 255, 255 }
@@ -61,16 +68,20 @@ enum BitmapSize {
 #define HD_ERR_NO_DATA						(HD_ERROR_BASE + 4)
 
 
-#define REPOSITORY_NAME_SYSTEM			"system"
-#define REPOSITORY_NAME_INSTALLED		"installed"
+#define REPOSITORY_NAME_SYSTEM				"system"
+#define REPOSITORY_NAME_INSTALLED			"installed"
 
 
-#define KEY_ALERT_TEXT					"alert_text"
-#define KEY_ALERT_TITLE					"alert_title"
-#define KEY_WORK_STATUS_TEXT			"work_status_text"
-#define KEY_WORK_STATUS_PROGRESS		"work_status_progress"
-#define KEY_WINDOW_SETTINGS				"window_settings"
-#define KEY_MAIN_SETTINGS				"main_settings"
+#define KEY_ALERT_TEXT						"alert_text"
+#define KEY_ALERT_TITLE						"alert_title"
+#define KEY_ALERT_TYPE						"alert_type"
+#define KEY_WORK_STATUS_TEXT				"work_status_text"
+#define KEY_WORK_STATUS_PROGRESS			"work_status_progress"
+#define KEY_WINDOW_SETTINGS					"window_settings"
+#define KEY_MAIN_SETTINGS					"main_settings"
+#define KEY_PACKAGE_NAME					"package_name"
+#define KEY_TITLE							"title"
+#define KEY_DESKBAR_LINK					"deskbar_link"
 
 
 #define SETTING_SHOW_AVAILABLE_PACKAGES			"show available packages"
@@ -84,20 +95,21 @@ enum BitmapSize {
 
 // These constants reference resources in 'HaikuDepot.ref'
 enum {
-	RSRC_STAR_BLUE		= 510,
-	RSRC_STAR_GREY		= 520,
-	RSRC_INSTALLED		= 530,
-	RSRC_ARROW_LEFT		= 540,
-	RSRC_ARROW_RIGHT	= 550,
+	RSRC_STAR_BLUE							= 510,
+	RSRC_STAR_GREY							= 520,
+	RSRC_INSTALLED							= 530,
+	RSRC_ARROW_LEFT							= 540,
+	RSRC_ARROW_RIGHT						= 550,
 };
 
 
 enum UserUsageConditionsSelectionMode {
-	LATEST		= 1,
-	USER		= 2,
-	FIXED		= 3
+	LATEST									= 1,
+	USER									= 2,
+	FIXED									= 3
 		// means that the user usage conditions are supplied to the window.
 };
+
 
 #define LANGUAGE_DEFAULT_CODE "en"
 #define LANGUAGE_DEFAULT Language(LANGUAGE_DEFAULT_CODE, "English", true)

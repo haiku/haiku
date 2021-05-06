@@ -291,6 +291,7 @@ public:
 								InstallationLocations() const
 									{ return fInstallationLocations; }
 			void				AddInstallationLocation(int32 location);
+			void				ClearInstallationLocations();
 
 			float				DownloadProgress() const
 									{ return fDownloadProgress; }
