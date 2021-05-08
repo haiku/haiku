@@ -1,5 +1,27 @@
-1	ukrainian	x-vnd.haiku.SerialConnect	3808099678
+1	ukrainian	x-vnd.haiku.SerialConnect	2873184091
+Hardware	SerialWindow	Flowcontrol	Апаратно
+Connection	SerialWindow		З'єднання
+Baud rate	SerialWindow		Швидкість передачі
+Stop bits	SerialWindow		Стопові біти
+None	SerialWindow	Flowcontrol	Без управління
 Cancel	Custom baudrate window		Скасувати
+Sending…	XModemStatus		Відправка…
+<no serial port available>	SerialWindow		<послідовний порт недоступний>
+Log to file…	SerialWindow		Лог у файл…
 File	SerialWindow		Файл
 SerialConnect	System name		SerialConnect
+custom…	SerialWindow	Baudrate	довільно…
+Parity	SerialWindow		Парність
+None	SerialWindow	Parity	Без перевірки
+Everything sent, waiting for acknowledge	XModemStatus		Все відправлено, чекає підтвердження
+Odd	SerialWindow	Parity	Непарне
+Flow control	SerialWindow		Управління потоком
+Data bits	SerialWindow		Бітів даних
+Both	SerialWindow	Flowcontrol	Обидва
+Edit	SerialWindow		Редагувати
 OK	Custom baudrate window		ОК
+Clear history	SerialWindow		Очистити історію
+Settings	SerialWindow		Налаштування
+Even	SerialWindow	Parity	Парне
+Software	SerialWindow	Flowcontrol	Програмно
+Line terminator	SerialWindow		Символ нового рядка

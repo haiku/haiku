@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libtracker	256413178
+1	ukrainian	x-vnd.Haiku-libtracker	3380227078
 Created	ContainerWindow		Cтворений
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Відкрити і зробити пріоритетним
@@ -271,6 +271,7 @@ home	B_USER_DIRECTORY		Home
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Нові шаблони Tracker
 Disk mounting during boot	AutoMounterSettings		Підключення дисків при завантаженні
 Don't automount	AutoMounterSettings		Не підключати автоматично
+Node ref	AttributesView		Node ref
 Could not find application \"%appname\"	OpenWithWindow		Програма \"%appname\" не знайдена
 Unmatched parenthesis.	libtracker		Невизначені фігурні дужки
 Extended attribute	AttributesView		Розширені атрибути
@@ -523,6 +524,7 @@ Create a Query	FindPanel		Створити запит
 Close	QueryContainerWindow		Закрити
 I know what I'm doing	FSUtils	button label	Я знаю що роблю
 Preparing to copy items…	StatusWindow		Підготовка до копіювання елементів…
+Entry ref	AttributesView		Entry ref
 Icon view	ContainerWindow		У вигляді значків
 Name	ContainerWindow		Ім'я
 Preferred for %type	OpenWithWindow		Насамперед для %type

@@ -1,3 +1,7 @@
-1	ukrainian	application/x-vnd.Cortex.Route	3193627974
+1	ukrainian	application/x-vnd.Cortex.Route	2425116207
 OK	CortexRouteApp		ОК
 File	CortexRouteApp		Файл
+Window	CortexRouteApp		Вікно
+Transport	CortexRouteApp		Транспорт
+Cortex	CortexRouteApp		Cortex
+Quit	CortexRouteApp		Вийти

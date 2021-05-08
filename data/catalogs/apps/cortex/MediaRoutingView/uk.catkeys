@@ -1,2 +1,6 @@
-1	ukrainian	application/x-vnd.Cortex.MediaRoutingView	1000002824
+1	ukrainian	application/x-vnd.Cortex.MediaRoutingView	592532116
 OK	MediaRoutingView		ОК
+Get info	MediaJack		Дивитись Інфо
+Get info	MediaNodePanel		Дивитись Інфо
+Get info	MediaRoutingView		Дивитись Інфо
+Tweak parameters	MediaNodePanel		Параметри налаштування

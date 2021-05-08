@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-HaikuDepot	3041521443
+1	ukrainian	x-vnd.Haiku-HaikuDepot	3544756144
 Repository update error	LocalRepositoryUpdateProcess		Помилка оновлення репозитарія 
 Network error	ServerHelper		Помилка мережі
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Під час оновлення репозитарія сталася помилка: %error%
@@ -24,6 +24,7 @@ Rating	PackageListView		Оцінка
 Synchronizing icons	ServerIconExportUpdateProcess		Синхронізація піктограм
 Show	MainWindow		Показати
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Під час отримання списку пакетів сталася помилка: %message%
+Settings…	MainWindow		Налаштування…
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Ця програма записує та зчитує деякі робочі файли на Вашому комп’ютері, щоб функціонувати. Здається, що запис тестового файлу до [%TestFilePath%] викликає проблеми. Переконайтеся, що все гаразд з Вашим локальним диском або дозволами, які могли б перешкодити цій програмі записувати файли в згадану папку. Ви можете визнати цю проблему і продовжити, але деякі функції можуть бути відключені.
 Active	PackageListView		Активний
 Login or Create account	MainWindow		Авторизуватись або зареєструватись
@@ -38,6 +39,7 @@ Local	LocalPkgDataLoadProcess		Локальний
 Rate %Package%	RatePackageWindow		Оцінити %Package%
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Під час запуску диспетчера пакетів сталася помилка: %message%
 Quit HaikuDepot	App		Вийти з HaikuDepot
+Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Вам прийнятна відправка анонімних даних про використання в систему HaikuDepotServer з цього комп'ютера? Пізніше, Ви можете змінити свої уподобання у вікні \"Налаштування\".
 An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		Несподівана помилка '%Message%' виникла з право власності '%Property%'
 A response to the captcha question must be provided.	UserLoginWindow		Необхідно надати відповідь на питання капчі.
 Category	FilterView		Категорія
@@ -61,6 +63,7 @@ Cancel	UserLoginWindow		Скасувати
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot потребує запуску демона пакетів, який напевно не працює.\nЗапустити його зараз?
 Click a package to view information	PackageInfoView		Клікніть по пакету, для відображення інформації про нього
 The password must be at least eight characters long, consist of at least two digits and one upper case character.	UserLoginWindow		Пароль повинен бути не менше восьми символів, включаючи принаймні дві цифри та один символ у верхньому регістрі.
+Share anonymous usage data with HaikuDepotServer	SettingsWindow		Надавати анонімні дані про використання до HaikuDepotServer
 Contents	PackageInfoView		Вміст
 Close	PackageManager		Закрити
 Changelog	PackageInfoView		Журнал змін
@@ -88,6 +91,7 @@ OK	MainWindow		ОК
 Usage conditions download problem	UserLoginWindow		Помилка при завантаженні Умов користування
 OK	PackageInfoView		ОК
 Downloading:	PackageInfoView		Завантаження:
+Quit	MainWindow		Вийти
 Success	UserLoginWindow		Успішно
 No	MainWindow		Ні
 Package daemon problem	App		Проблема демона пакета
@@ -99,6 +103,7 @@ Close	UserLoginWindow		Закрити
 Close	RatePackageWindow		Закрити
 An unexpected error has been sent from the server [%i]	ServerHelper		Сервер надіслав у відповідь непередбачену помилку [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Синхронізую дані пакета з репозитарієм '%REPO_NAME%'
+Settings	SettingsWindow		Налаштування
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		При завантаженні Умов використання, необхідних для створення нового користувача, виникла помилка. Ознайомтеся з даними журналу та повторіть спробу. \nІнформація про те, як переглядати журнали, доступна в розділі програми HaikuDepot посібника користувача Haiku.
 View the usage conditions	UserLoginWindow		Переглянути Умови користування
 Login issue	MainWindow		Проблема входу в систему
@@ -118,6 +123,7 @@ Refresh repositories	MainWindow		Оновити репозитарії
 Continue	App		Продовжити
 A password is required.	UserLoginWindow		Потрібен пароль.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Цей пакет, здається, не знаходиться на HaikuDepot Server, тому неможливо створити нову оцінку або відредагувати існуючу.
+Apply	SettingsWindow		Застосувати
 Language	RatePackageWindow		Мова
 Log out	MainWindow		Вийти з системи
 Comment language:	RatePackageWindow		Мова коментарів:
@@ -144,6 +150,7 @@ Try again	App		Спробувати знову
 Unknown	PackageListView		Невідомо
 I agree to the usage conditions	UserLoginWindow		З Умовами користування погоджуюсь
 Log in	UserLoginWindow		Авторизуватись
+Sending anonymous usage data	MainWindow		Відправка анонімних даних про використання
 Logged in as %User%	MainWindow		Авторизований як %User%
 Email address:	UserLoginWindow		Адреса Email:
 Screenshot	ScreenshotWindow		Знімок екрана
