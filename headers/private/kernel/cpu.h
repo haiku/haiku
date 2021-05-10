@@ -48,7 +48,7 @@ typedef struct cpu_topology_node {
 
 /* CPU local data structure */
 
-typedef struct cpu_ent {
+typedef struct CACHE_LINE_ALIGN cpu_ent {
 	int				cpu_num;
 
 	// thread.c: used to force a reschedule at quantum expiration time
@@ -85,7 +85,7 @@ typedef struct cpu_ent {
 
 	// arch-specific stuff
 	arch_cpu_info 	arch;
-} cpu_ent CACHE_LINE_ALIGN;
+} cpu_ent;
 
 
 extern cpu_ent gCPU[];
