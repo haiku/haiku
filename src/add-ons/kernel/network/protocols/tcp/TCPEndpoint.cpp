@@ -1773,8 +1773,13 @@ TCPEndpoint::_Receive(tcp_segment_header& segment, net_buffer* buffer)
 				}
 			}
 
-			if (fState != CLOSED)
+			if (fState != CLOSED) {
+				tcp_sequence last = fLastAcknowledgeSent;
 				_Acknowledged(segment);
+				// we just sent an acknowledge, remove from action
+				if (last < fLastAcknowledgeSent)
+					action &= ~IMMEDIATE_ACKNOWLEDGE;
+			}
 		}
 	}
 
@@ -2024,15 +2029,15 @@ TCPEndpoint::_SendQueued(bool force, uint32 sendWindow)
 		}
 
 		// SACK information is embedded with duplicate acknowledgements
-		if (!fReceiveQueue.IsContiguous() && fLastAcknowledgeSent == fReceiveNext
+		if (!fReceiveQueue.IsContiguous()
+			&& fLastAcknowledgeSent <= fReceiveNext
 			&& (fFlags & FLAG_OPTION_SACK_PERMITTED) != 0) {
 			segment.options |= TCP_HAS_SACK;
-			int maxSackCount = 4 - ((fFlags & FLAG_OPTION_TIMESTAMP) != 0);
-			segment.sacks = (tcp_sack*)calloc(maxSackCount, sizeof(tcp_sack));
-			if (segment.sacks != NULL)
-				segment.sackCount = fReceiveQueue.PopulateSackInfo(fReceiveNext, maxSackCount, segment.sacks);
-			else
-				segment.sackCount = 0;
+			int maxSackCount = MAX_SACK_BLKS
+				- ((fFlags & FLAG_OPTION_TIMESTAMP) != 0);
+			memset(segment.sacks, 0, sizeof(segment.sacks));
+			segment.sackCount = fReceiveQueue.PopulateSackInfo(fReceiveNext,
+				maxSackCount, segment.sacks);
 		}
 
 		if ((segment.flags & TCP_FLAG_SYNCHRONIZE) != 0
@@ -2215,8 +2220,10 @@ TCPEndpoint::_SendQueued(bool force, uint32 sendWindow)
 			shouldStartRetransmitTimer = false;
 		}
 
-		if (segment.flags & TCP_FLAG_ACKNOWLEDGE)
+		if (segment.flags & TCP_FLAG_ACKNOWLEDGE) {
 			fLastAcknowledgeSent = segment.acknowledge;
+			gStackModule->cancel_timer(&fDelayedAcknowledgeTimer);
+		}
 
 		length -= segmentLength;
 		segment.flags &= ~(TCP_FLAG_SYNCHRONIZE | TCP_FLAG_RESET

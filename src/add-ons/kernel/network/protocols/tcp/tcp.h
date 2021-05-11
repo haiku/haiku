@@ -255,7 +255,8 @@ struct tcp_segment_header {
 	uint32	timestamp_value;
 	uint32	timestamp_reply;
 
-	tcp_sack	*sacks;
+#define MAX_SACK_BLKS 4
+	tcp_sack	sacks[MAX_SACK_BLKS];
 	int			sackCount;
 
 	uint32	options;
