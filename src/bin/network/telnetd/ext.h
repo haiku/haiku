@@ -62,7 +62,7 @@ extern int	auth_level;
 
 extern slcfun	slctab[NSLC + 1];	/* slc mapping table */
 
-char	*terminaltype;
+extern char	*terminaltype;
 
 /*
  * I/O data buffers, pointers, and counters.
