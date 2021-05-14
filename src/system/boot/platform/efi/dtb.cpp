@@ -21,6 +21,10 @@
 #define ERROR(x...) dprintf("efi/fdt: " x)
 
 
+static void* sDtbTable = NULL;
+static uint32 sDtbSize = 0;
+
+
 static bool
 fdt_valid(void* fdt, uint32* size)
 {
@@ -56,16 +60,27 @@ dtb_init()
 		if (!fdt_valid(dtbPtr, &fdtSize)) {
 			ERROR("Invalid FDT from UEFI table %d\n", i);
 			break;
+		} else {
+			INFO("Valid FDT from UEFI table %d (%d)\n", i, fdtSize);
+
+			sDtbTable = dtbPtr;
+			sDtbSize = fdtSize;
+			break;
 		}
+	}
+}
 
-		INFO("Valid FDT from UEFI table %d (%d)\n", i, fdtSize);
 
-		// pack into proper location if the architecture cares
+void
+dtb_set_kernel_args()
+{
+	// pack into proper location if the architecture cares
+	if (sDtbTable != NULL) {
 		#ifdef __ARM__
-		gKernelArgs.arch_args.fdt = kernel_args_malloc(fdtSize);
-		if (gKernelArgs.arch_args.fdt != NULL) {
-			memcpy(gKernelArgs.arch_args.fdt, dtbPtr, fdtSize);
-		} else
+		gKernelArgs.arch_args.fdt = kernel_args_malloc(sDtbSize);
+		if (gKernelArgs.arch_args.fdt != NULL)
+			memcpy(gKernelArgs.arch_args.fdt, sDtbTable, sDtbSize);
+		else
 			ERROR("unable to malloc for fdt!\n");
 		#endif
 	}

@@ -13,6 +13,7 @@
 
 
 extern void dtb_init();
+extern void dtb_set_kernel_args();
 
 
 #endif /* !_ASSEMBLER */
