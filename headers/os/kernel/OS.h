@@ -486,7 +486,9 @@ enum cpu_platform {
 	B_CPU_ARM_64,
 	B_CPU_ALPHA,
 	B_CPU_MIPS,
-	B_CPU_SH
+	B_CPU_SH,
+	B_CPU_SPARC,
+	B_CPU_RISC_V
 };
 
 enum cpu_vendor {
@@ -502,7 +504,9 @@ enum cpu_vendor {
 	B_CPU_VENDOR_IBM,
 	B_CPU_VENDOR_MOTOROLA,
 	B_CPU_VENDOR_NEC,
-	B_CPU_VENDOR_HYGON
+	B_CPU_VENDOR_HYGON,
+	B_CPU_VENDOR_SUN,
+	B_CPU_VENDOR_FUJITSU
 };
 
 typedef struct {

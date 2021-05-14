@@ -115,6 +115,19 @@ NormalPulseView::DetermineVendorAndProcessor()
 	get_cpu_topology_info(topology, &topologyNodeCount);
 
 	for (uint32 i = 0; i < topologyNodeCount; i++) {
+		// Use less specific platform logo only if no vendor specific one is
+		// available
+		if (logo == NULL && topology[i].type == B_TOPOLOGY_ROOT) {
+			switch (topology[i].data.root.platform) {
+				case B_CPU_RISC_V:
+					logo = kRiscVLogo;
+					logoSize = sizeof(kRiscVLogo);
+					break;
+				default:
+					break;
+			}
+		}
+
 		if (topology[i].type == B_TOPOLOGY_PACKAGE) {
 			switch (topology[i].data.package.vendor) {
 				case B_CPU_VENDOR_AMD:
@@ -246,7 +259,7 @@ NormalPulseView::Draw(BRect rect)
 	if (fBrandLogo != NULL) {
 		DrawBitmap(fBrandLogo, BPoint(
 			9 + (fChipRect.Width() - fBrandLogo->Bounds().Width()) / 2,
-			fChipRect.top + 8));
+			fChipRect.top + 6));
 	} else {
 		SetHighColor(240, 240, 240);
 		float width = StringWidth(fVendor);
@@ -258,7 +271,7 @@ NormalPulseView::Draw(BRect rect)
 	SetHighColor(240, 240, 240);
 
 	float width = StringWidth(fProcessor);
-	MovePenTo(10 + (fChipRect.Width() - width) / 2, fChipRect.top + 48);
+	MovePenTo(10 + (fChipRect.Width() - width) / 2, fChipRect.top + 53);
 	DrawString(fProcessor);
 
 	char buffer[64];
@@ -271,7 +284,7 @@ NormalPulseView::Draw(BRect rect)
 	// We can't assume anymore that a CPU clock speed is always static.
 	// Let's compute the best font size for the CPU speed string each time...
 	width = StringWidth(buffer);
-	MovePenTo(10 + (fChipRect.Width() - width) / 2, fChipRect.top + 58);
+	MovePenTo(10 + (fChipRect.Width() - width) / 2, fChipRect.top + 62);
 	DrawString(buffer);
 
 	PopState();
