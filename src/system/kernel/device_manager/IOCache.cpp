@@ -325,11 +325,11 @@ IOCache::_TransferRequestLine(IORequest* request, off_t lineOffset,
 		// If this is a read request and the missing page range does not
 		// intersect with the request, then we can skip allocating pages.
 		page_num_t requestPageOffset = requestOffset / B_PAGE_SIZE;
-		page_num_t requestPageCount =
-			(requestLength + B_PAGE_SIZE - 1) / B_PAGE_SIZE;
+		page_num_t requestPageCount
+			= (requestLength + B_PAGE_SIZE - 1) / B_PAGE_SIZE;
 
-		skipPageAllocation =
-			(firstMissing >= (requestPageOffset + requestPageCount))
+		skipPageAllocation
+			= (firstMissing >= (requestPageOffset + requestPageCount))
 			|| (lastMissing < requestPageOffset);
 	} else
 		skipPageAllocation = false;
