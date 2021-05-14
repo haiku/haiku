@@ -3,6 +3,7 @@
  * Copyright 2006-2009, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2006-2008, Stephan Aßmus.
  * Copyright 2006, Ryan Leavengood.
+ * Copyright 2021, Jacob Secunda.
  *
  * Distributed under the terms of the MIT License.
  */
@@ -75,6 +76,10 @@ static const bigtime_t kDisplayAbortingAppTimeout = 3000000; // 3 s
 static const int kStripeWidth = 30;
 static const int kIconVSpacing = 6;
 static const int kIconSize = 32;
+
+// The speed of the animation played when an application is blocked on a modal
+// panel.
+static const bigtime_t kIconAnimateInterval = 50000; // 0.05 s
 
 // message what fields (must not clobber the registrar's message namespace)
 enum {
@@ -414,18 +419,16 @@ public:
 		return B_OK;
 	}
 
-	status_t AddApp(team_id team, BBitmap* miniIcon, BBitmap* largeIcon)
+	status_t AddApp(team_id team, BBitmap* appIcon)
 	{
 		AppInfo* info = new(nothrow) AppInfo;
 		if (!info) {
-			delete miniIcon;
-			delete largeIcon;
+			delete appIcon;
 			return B_NO_MEMORY;
 		}
 
 		info->team = team;
-		info->miniIcon = miniIcon;
-		info->largeIcon = largeIcon;
+		info->appIcon = appIcon;
 
 		if (!fAppInfos.AddItem(info)) {
 			delete info;
@@ -480,6 +483,11 @@ public:
 		}
 	}
 
+	void SetWaitAnimationEnabled(bool enable)
+	{
+		fRootView->IconWaitAnimationEnabled(enable);
+	}
+
 	void SetWaitForShutdown()
 	{
 		fKillAppButton->Hide();
@@ -507,13 +515,11 @@ public:
 private:
 	struct AppInfo {
 		team_id		team;
-		BBitmap		*miniIcon;
-		BBitmap		*largeIcon;
+		BBitmap*	appIcon;
 
 		~AppInfo()
 		{
-			delete miniIcon;
-			delete largeIcon;
+			delete appIcon;
 		}
 	};
 
@@ -539,10 +545,27 @@ private:
 	class TAlertView : public BView {
 	  public:
 		TAlertView(BRect frame, const char* name, uint32 resizeMask,
-				uint32 flags)
-			: BView(frame, name, resizeMask, flags | B_WILL_DRAW),
-			fAppInfo(NULL)
+			uint32 flags)
+			:
+			BView(frame, name, resizeMask, flags | B_WILL_DRAW),
+			fCurrentIconBitmap(NULL),
+			fNormalIconBitmap(NULL),
+			fTintedIconBitmap(NULL),
+			fAnimationActive(false),
+			fAnimationWorker(-1),
+			fCurrentAnimationRow(-1),
+			fAnimationLightenPhase(true)
 		{
+		}
+
+		~TAlertView()
+		{
+			atomic_set(&fAnimationActive, false);
+			wait_for_thread(fAnimationWorker, NULL);
+
+			delete fCurrentIconBitmap;
+			delete fNormalIconBitmap;
+			delete fTintedIconBitmap;
 		}
 
 		virtual void Draw(BRect updateRect)
@@ -552,26 +575,193 @@ private:
 			SetHighColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
 			FillRect(stripeRect);
 
-			if (fAppInfo && fAppInfo->largeIcon) {
-				if (fAppInfo->largeIcon->ColorSpace() == B_RGBA32) {
+			if (fCurrentIconBitmap != NULL && fCurrentIconBitmap->IsValid()) {
+				if (fCurrentIconBitmap->ColorSpace() == B_RGBA32) {
 					SetDrawingMode(B_OP_ALPHA);
 					SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
 				} else
 					SetDrawingMode(B_OP_OVER);
 
-				DrawBitmapAsync(fAppInfo->largeIcon,
+				DrawBitmap(fCurrentIconBitmap,
 					BPoint(kStripeWidth - kIconSize / 2, kIconVSpacing));
 			}
 		}
 
 		void SetAppInfo(AppInfo* info)
 		{
-			fAppInfo = info;
+			IconWaitAnimationEnabled(false);
+
+			BAutolock lock(Window());
+			if (!lock.IsLocked())
+				return;
+
+			delete fCurrentIconBitmap;
+			fCurrentIconBitmap = NULL;
+
+			delete fNormalIconBitmap;
+			fNormalIconBitmap = NULL;
+
+			delete fTintedIconBitmap;
+			fTintedIconBitmap = NULL;
+
+			if (info != NULL && info->appIcon != NULL
+				&& info->appIcon->IsValid()) {
+				fCurrentIconBitmap = new BBitmap(BRect(0, 0, 31, 31), B_RGBA32);
+
+				if (fCurrentIconBitmap == NULL
+					|| fCurrentIconBitmap->ImportBits(info->appIcon) != B_OK) {
+					delete fCurrentIconBitmap;
+					fCurrentIconBitmap = NULL;
+				}
+			}
+
 			Invalidate();
 		}
 
+		void IconWaitAnimationEnabled(bool enable)
+		{
+			if (atomic_get(&fAnimationActive) == enable)
+				return;
+
+			BAutolock lock(Window());
+			if (!lock.IsLocked())
+				return;
+			
+			if (enable) {
+				if (fCurrentIconBitmap == NULL
+					|| !fCurrentIconBitmap->IsValid())
+					return;
+
+				if (fNormalIconBitmap == NULL
+					|| !fNormalIconBitmap->IsValid()) {
+					delete fNormalIconBitmap;
+					fNormalIconBitmap = NULL;
+
+					fNormalIconBitmap = new BBitmap(BRect(0, 0, 31, 31),
+						B_BITMAP_NO_SERVER_LINK, B_RGBA32);
+
+					if (fNormalIconBitmap == NULL
+						|| fNormalIconBitmap->ImportBits(fCurrentIconBitmap)
+							!= B_OK) {
+						delete fNormalIconBitmap;
+						fNormalIconBitmap = NULL;
+
+						return;
+					}
+				}
+
+				if (fTintedIconBitmap == NULL
+					|| !fTintedIconBitmap->IsValid()) {
+					delete fTintedIconBitmap;
+					fTintedIconBitmap = NULL;
+
+					fTintedIconBitmap = new BBitmap(BRect(0, 0, 31, 31),
+						B_BITMAP_NO_SERVER_LINK, B_RGBA32);
+
+					if (fTintedIconBitmap == NULL
+						|| fTintedIconBitmap->ImportBits(fNormalIconBitmap)
+							!= B_OK) {
+						delete fTintedIconBitmap;
+						fTintedIconBitmap = NULL;
+
+						return;
+					}
+
+					int32 width =
+						fTintedIconBitmap->Bounds().IntegerWidth() + 1;
+					int32 height =
+						fTintedIconBitmap->Bounds().IntegerHeight() + 1;
+					int32 rowLength = fTintedIconBitmap->BytesPerRow();
+
+					uint8* iconBits = (uint8*)fTintedIconBitmap->Bits();
+
+					for (int32 y = 0; y < height; y++) {
+						for (int32 x = 0; x < width; x++) {
+							int32 offset = (y * rowLength) + (x * 4);
+
+							rgb_color pixelColor = make_color(iconBits[offset],
+								iconBits[offset + 1], iconBits[offset + 2],
+								iconBits[offset + 3]);
+
+							pixelColor = tint_color(pixelColor,
+								B_DARKEN_2_TINT);
+
+							iconBits[offset] = pixelColor.red;
+							iconBits[offset + 1] = pixelColor.green;
+							iconBits[offset + 2] = pixelColor.blue;
+							iconBits[offset + 3] = pixelColor.alpha;
+						}
+					}
+				}
+				
+				fAnimationWorker = spawn_thread(&_AnimateWaitIconWorker,
+					"thumb twiddling", B_DISPLAY_PRIORITY, this);
+
+				if (fAnimationWorker < B_NO_ERROR)
+					return;
+
+				atomic_set(&fAnimationActive, true);
+				if (resume_thread(fAnimationWorker) != B_OK)
+					atomic_set(&fAnimationActive, false);
+			} else {
+				atomic_set(&fAnimationActive, false);
+				wait_for_thread(fAnimationWorker, NULL);
+
+				fCurrentAnimationRow = -1;
+				fAnimationLightenPhase = true;
+
+				if (fCurrentIconBitmap != NULL && fNormalIconBitmap != NULL)
+					fCurrentIconBitmap->ImportBits(fNormalIconBitmap);
+			}
+		}
+
 	  private:
-		const AppInfo	*fAppInfo;
+		status_t _AnimateWaitIcon()
+		{
+			while (atomic_get(&fAnimationActive)) {
+				if (LockLooperWithTimeout(kIconAnimateInterval) != B_OK)
+					continue;
+
+				if (fCurrentAnimationRow < 0) {
+					fCurrentAnimationRow =
+						fCurrentIconBitmap->Bounds().IntegerHeight();
+					fAnimationLightenPhase = !fAnimationLightenPhase;
+				}
+
+				BBitmap* sourceBitmap = fAnimationLightenPhase ?
+					fNormalIconBitmap : fTintedIconBitmap;
+
+				fCurrentIconBitmap->ImportBits(sourceBitmap,
+					BPoint(0, fCurrentAnimationRow),
+					BPoint(0, fCurrentAnimationRow),
+					sourceBitmap->Bounds().IntegerWidth(), 1);
+
+				fCurrentAnimationRow--;
+
+				Invalidate();
+
+				UnlockLooper();
+
+				snooze(kIconAnimateInterval);
+			}
+
+			return B_OK;
+		}
+
+		static status_t _AnimateWaitIconWorker(void* cookie)
+		{
+			TAlertView* ourView = (TAlertView*)cookie;
+			return ourView->_AnimateWaitIcon();
+		}
+
+	  private:
+		BBitmap*		fCurrentIconBitmap;
+		BBitmap*		fNormalIconBitmap;
+		BBitmap*		fTintedIconBitmap;
+		int32			fAnimationActive;
+		thread_id		fAnimationWorker;
+		int32			fCurrentAnimationRow;
+		bool			fAnimationLightenPhase;
 	};
 
 private:
@@ -1006,35 +1196,21 @@ ShutdownProcess::_AddShutdownWindowApps(AppInfoList& infos)
 				strerror(error));
 		}
 
-		// get the application icons
-		color_space format = B_RGBA32;
-
-		// mini icon
-		BBitmap* miniIcon = new(nothrow) BBitmap(BRect(0, 0, 15, 15), format);
-		if (miniIcon != NULL) {
-			error = miniIcon->InitCheck();
+		// get the application icon
+		BBitmap* appIcon = new(nothrow) BBitmap(BRect(0, 0, 31, 31),
+			B_BITMAP_NO_SERVER_LINK, B_RGBA32);
+		if (appIcon != NULL) {
+			error = appIcon->InitCheck();
 			if (error == B_OK)
-				error = appFileInfo.GetTrackerIcon(miniIcon, B_MINI_ICON);
+				error = appFileInfo.GetTrackerIcon(appIcon, B_LARGE_ICON);
 			if (error != B_OK) {
-				delete miniIcon;
-				miniIcon = NULL;
-			}
-		}
-
-		// mini icon
-		BBitmap* largeIcon = new(nothrow) BBitmap(BRect(0, 0, 31, 31), format);
-		if (largeIcon != NULL) {
-			error = largeIcon->InitCheck();
-			if (error == B_OK)
-				error = appFileInfo.GetTrackerIcon(largeIcon, B_LARGE_ICON);
-			if (error != B_OK) {
-				delete largeIcon;
-				largeIcon = NULL;
+				delete appIcon;
+				appIcon = NULL;
 			}
 		}
 
 		// add the app
-		error = fWindow->AddApp(info->team, miniIcon, largeIcon);
+		error = fWindow->AddApp(info->team, appIcon);
 		if (error != B_OK) {
 			WARNING("ShutdownProcess::_AddShutdownWindowApps(): Failed to "
 				"add app to the shutdown window: %s\n", strerror(error));
@@ -1094,6 +1270,17 @@ ShutdownProcess::_SetShutdownWindowKillButtonEnabled(bool enabled)
 		BAutolock _(fWindow);
 
 		fWindow->SetKillAppButtonEnabled(enabled);
+	}
+}
+
+
+void
+ShutdownProcess::_SetShutdownWindowWaitAnimationEnabled(bool enabled)
+{
+	if (fHasGUI) {
+		BAutolock _(fWindow);
+
+		fWindow->SetWaitAnimationEnabled(enabled);
 	}
 }
 
@@ -1719,6 +1906,7 @@ ShutdownProcess::_QuitBlockingApp(AppInfoList& list, team_id team,
 		_SetShutdownWindowText(buffer.String());
 		_SetShutdownWindowCurrentApp(team);
 		_SetShutdownWindowKillButtonEnabled(true);
+		_SetShutdownWindowWaitAnimationEnabled(true);
 	}
 
 	if (modal || debugged) {
@@ -1760,6 +1948,7 @@ ShutdownProcess::_QuitBlockingApp(AppInfoList& list, team_id team,
 		}
 
 		_SetShutdownWindowKillButtonEnabled(false);
+		_SetShutdownWindowWaitAnimationEnabled(false);
 
 		if (appGone)
 			return;
@@ -1816,6 +2005,7 @@ ShutdownProcess::_DisplayAbortingApp(team_id team)
 	buffer.ReplaceFirst("%appName%", appName);
 
 	// set up the window
+	_SetShutdownWindowWaitAnimationEnabled(false);
 	_SetShutdownWindowCurrentApp(team);
 	_SetShutdownWindowText(buffer.String());
 	_SetShutdownWindowWaitForAbortedOK();
