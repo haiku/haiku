@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2021, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -18,6 +18,7 @@
 #include <util/DoublyLinkedList.h>
 #include <util/OpenHashTable.h>
 
+#include <AutoDeleter.h>
 #include <KernelExport.h>
 
 #include <NetBufferUtilities.h>
@@ -699,6 +700,24 @@ UdpEndpointManager::DumpEndpoints(int argc, char *argv[])
 // #pragma mark - inbound
 
 
+struct DomainSupportDelete
+{
+	inline void operator()(UdpDomainSupport* object)
+	{
+		sUdpEndpointManager->FreeEndpoint(object);
+	}
+};
+
+
+struct DomainSupportDeleter
+	: BPrivate::AutoDeleter<UdpDomainSupport, DomainSupportDelete>
+{
+	DomainSupportDeleter(UdpDomainSupport* object)
+		: BPrivate::AutoDeleter<UdpDomainSupport, DomainSupportDelete>(object)
+	{}
+};
+
+
 status_t
 UdpEndpointManager::ReceiveData(net_buffer *buffer)
 {
@@ -710,10 +729,10 @@ UdpEndpointManager::ReceiveData(net_buffer *buffer)
 		// we are only interested in delivering data to existing sockets.
 		return B_ERROR;
 	}
+	DomainSupportDeleter deleter(domainSupport);
 
 	status_t status = Deframe(buffer);
 	if (status != B_OK) {
-		sUdpEndpointManager->FreeEndpoint(domainSupport);
 		return status;
 	}
 
@@ -723,12 +742,10 @@ UdpEndpointManager::ReceiveData(net_buffer *buffer)
 		// Send port unreachable error
 		domainSupport->Domain()->module->error_reply(NULL, buffer,
 			B_NET_ERROR_UNREACH_PORT, NULL);
-		sUdpEndpointManager->FreeEndpoint(domainSupport);
 		return B_ERROR;
 	}
 
 	gBufferModule->free(buffer);
-	sUdpEndpointManager->FreeEndpoint(domainSupport);
 	return B_OK;
 }
 
@@ -749,13 +766,13 @@ UdpEndpointManager::ReceiveError(status_t error, net_buffer* buffer)
 		// we are only interested in delivering data to existing sockets.
 		return B_ERROR;
 	}
+	DomainSupportDeleter deleter(domainSupport);
 
 	// Deframe the buffer manually, as we usually only get 8 bytes from the
 	// original packet
 	udp_header header;
 	if (gBufferModule->read(buffer, 0, &header,
 			std::min((size_t)buffer->size, sizeof(udp_header))) != B_OK) {
-		sUdpEndpointManager->FreeEndpoint(domainSupport);
 		return B_BAD_VALUE;
 	}
 
@@ -769,7 +786,6 @@ UdpEndpointManager::ReceiveError(status_t error, net_buffer* buffer)
 	destination.SetPort(header.destination_port);
 
 	error = domainSupport->DeliverError(error, buffer);
-	sUdpEndpointManager->FreeEndpoint(domainSupport);
 	return error;
 }
 
@@ -835,8 +851,6 @@ UdpEndpointManager::OpenEndpoint(UdpEndpoint *endpoint)
 	MutexLocker _(fLock);
 
 	UdpDomainSupport* domain = _GetDomainSupport(endpoint->Domain(), true);
-	if (domain)
-		domain->Ref();
 	return domain;
 }
 
@@ -884,8 +898,10 @@ UdpEndpointManager::_GetDomainSupport(net_domain* domain, bool create)
 	//      family.
 	UdpDomainList::Iterator iterator = fDomains.GetIterator();
 	while (UdpDomainSupport* domainSupport = iterator.Next()) {
-		if (domainSupport->Domain() == domain)
+		if (domainSupport->Domain() == domain) {
+			domainSupport->Ref();
 			return domainSupport;
+		}
 	}
 
 	if (!create)
@@ -899,6 +915,7 @@ UdpEndpointManager::_GetDomainSupport(net_domain* domain, bool create)
 	}
 
 	fDomains.Add(domainSupport);
+	domainSupport->Ref();
 	return domainSupport;
 }
 
@@ -913,7 +930,7 @@ UdpEndpointManager::_GetDomainSupport(net_buffer* buffer)
 	MutexLocker _(fLock);
 
 	UdpDomainSupport* support = _GetDomainSupport(_GetDomain(buffer), false);
-	if (support)
+	if (support != NULL)
 		support->Ref();
 	return support;
 }
