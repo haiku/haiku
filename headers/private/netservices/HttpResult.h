@@ -6,8 +6,6 @@
 #define _B_HTTP_RESULT_H_
 
 
-#include <iostream>
-
 #include <HttpHeaders.h>
 #include <String.h>
 #include <Url.h>

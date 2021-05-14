@@ -7,7 +7,6 @@
  *		Adrien Destugues, pulkomandy@pulkomandy.tk
  */
 
-#include <iostream>
 #include <cstdio>
 
 #include <UrlRequest.h>

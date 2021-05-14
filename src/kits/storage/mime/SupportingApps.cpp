@@ -14,7 +14,6 @@
 #include <stdio.h>
 
 #include <new>
-#include <iostream>
 
 #include <Directory.h>
 #include <Message.h>

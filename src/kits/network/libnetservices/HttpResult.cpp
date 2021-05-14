@@ -13,8 +13,6 @@
 #include <Debug.h>
 
 
-using std::ostream;
-
 #ifndef LIBNETAPI_DEPRECATED
 using namespace BPrivate::Network;
 #endif
