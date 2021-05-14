@@ -456,8 +456,10 @@ static const Translation kTranslations[] = {
 #define kCurrentMaintainers \
 	"Kyle Ambroff-Kao\n" \
 	"Stephan Aßmus\n" \
+	"Máximo Castañeda\n" \
 	"Augustin Cavalier\n" \
 	"Stefano Ceccherini\n" \
+	"Rudolf Cornelissen\n" \
 	"Adrien Destugues\n" \
 	"Axel Dörfler\n" \
 	"Jérôme Duval\n" \
@@ -491,7 +493,6 @@ static const Translation kTranslations[] = {
 	"Andrew Bachmann\n" \
 	"Salvatore Benedetto\n" \
 	"Dario Casalinuovo\n" \
-	"Rudolf Cornelissen\n" \
 	"Tyler Dauwalder\n" \
 	"Alexandre Deckner\n" \
 	"Oliver Ruiz Dorantes\n" \
@@ -532,6 +533,7 @@ static const Translation kTranslations[] = {
 	"Jonathan Yoder\n" \
 	"Clemens Zeidler\n" \
 	"Siarzhuk Zharski\n" \
+	"Janus\n" \
 	"\n"
 
 #define kTestingTeam \
@@ -545,6 +547,7 @@ static const Translation kTranslations[] = {
 	"Andrea Anzani\n" \
 	"Sean Bartell\n" \
 	"Sambuddha Basu\n" \
+	"Shubham Bhagat\n" \
 	"Hannah Boneß\n" \
 	"Andre Braga\n" \
 	"Michael Bulash\n" \
@@ -607,6 +610,7 @@ static const Translation kTranslations[] = {
 	"Brian Matzon\n" \
 	"Christopher ML Zumwalt May\n" \
 	"Andrew McCall\n" \
+	"Suhel Mehta\n" \
 	"Nathan Mentley\n" \
 	"Marius Middelthon\n" \
 	"Marco Minutoli\n" \
