@@ -112,7 +112,6 @@ __FBSDID("$FreeBSD: releng/12.0/sys/dev/ath/if_ath_led.c 326255 2017-11-27 14:52
  * XXX TODO: move the LED sysctls here.
  */
 
-
 /*
  * Configure the hardware for software and LED blinking.
  * The user may choose to configure part of each, depending upon the

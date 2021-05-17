@@ -54,7 +54,7 @@ __FBSDID("$FreeBSD: releng/12.0/sys/dev/ath/if_ath_spectral.c 327500 2018-01-02 
 #include <sys/bus.h>
 
 #include <sys/socket.h>
- 
+
 #include <net/if.h>
 #include <net/if_var.h>
 #include <net/if_media.h>
@@ -299,4 +299,3 @@ bad:
 
 	return (error);
 }
-

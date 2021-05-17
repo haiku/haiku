@@ -55,7 +55,7 @@ __FBSDID("$FreeBSD: releng/12.0/sys/dev/ath/if_ath_btcoex.c 327499 2018-01-02 19
 #include <sys/bus.h>
 
 #include <sys/socket.h>
- 
+
 #include <net/if.h>
 #include <net/if_var.h>
 #include <net/if_media.h>
@@ -485,4 +485,3 @@ bad:
 		free(outdata, M_TEMP);
 	return (error);
 }
-

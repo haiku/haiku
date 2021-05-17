@@ -1222,7 +1222,6 @@ ath_attach(u_int16_t devid, struct ath_softc *sc)
 					 IEEE80211_HTC_TXLDPC;
 		}
 
-
 		device_printf(sc->sc_dev,
 		    "[HT] %d RX streams; %d TX streams\n", rxs, txs);
 	}
@@ -1802,6 +1801,7 @@ ath_vap_delete(struct ieee80211vap *vap)
 		ath_hal_intrset(ah, 0);		/* disable interrupts */
 		/* XXX Do all frames from all vaps/nodes need draining here? */
 		ath_stoprecv(sc, 1);		/* stop recv side */
+		ath_rx_flush(sc);
 		ath_draintxq(sc, ATH_RESET_DEFAULT);		/* stop hw xmit side */
 	}
 
@@ -2386,7 +2386,7 @@ ath_fatal_proc(void *arg, int pending)
 		    "0x%08x 0x%08x 0x%08x, 0x%08x 0x%08x 0x%08x\n", state[0],
 		    state[1] , state[2], state[3], state[4], state[5]);
 	}
-	ath_reset(sc, ATH_RESET_NOLOSS);
+	ath_reset(sc, ATH_RESET_NOLOSS, HAL_RESET_FORCE_COLD);
 }
 
 static void
@@ -2497,11 +2497,11 @@ ath_bmiss_proc(void *arg, int pending)
 	 * to clear.
 	 */
 	if (ath_hal_gethangstate(sc->sc_ah, 0xff, &hangs) && hangs != 0) {
-		ath_reset(sc, ATH_RESET_NOLOSS);
+		ath_reset(sc, ATH_RESET_NOLOSS, HAL_RESET_BBPANIC);
 		device_printf(sc->sc_dev,
 		    "bb hang detected (0x%x), resetting\n", hangs);
 	} else {
-		ath_reset(sc, ATH_RESET_NOLOSS);
+		ath_reset(sc, ATH_RESET_NOLOSS, HAL_RESET_FORCE_COLD);
 		ieee80211_beacon_miss(&sc->sc_ic);
 	}
 
@@ -2900,7 +2900,8 @@ ath_reset_grablock(struct ath_softc *sc, int dowait)
  * to reset or reload hardware state.
  */
 int
-ath_reset(struct ath_softc *sc, ATH_RESET_TYPE reset_type)
+ath_reset(struct ath_softc *sc, ATH_RESET_TYPE reset_type,
+    HAL_RESET_TYPE ah_reset_type)
 {
 	struct ieee80211com *ic = &sc->sc_ic;
 	struct ath_hal *ah = sc->sc_ah;
@@ -2968,7 +2969,7 @@ ath_reset(struct ath_softc *sc, ATH_RESET_TYPE reset_type)
 	ath_hal_setchainmasks(sc->sc_ah, sc->sc_cur_txchainmask,
 	    sc->sc_cur_rxchainmask);
 	if (!ath_hal_reset(ah, sc->sc_opmode, ic->ic_curchan, AH_TRUE,
-	    HAL_RESET_NORMAL, &status))
+	    ah_reset_type, &status))
 		device_printf(sc->sc_dev,
 		    "%s: unable to reset hardware; hal status %u\n",
 		    __func__, status);
@@ -3104,7 +3105,7 @@ ath_reset_vap(struct ieee80211vap *vap, u_long cmd)
 		return 0;
 	}
 	/* XXX? Full or NOLOSS? */
-	return ath_reset(sc, ATH_RESET_FULL);
+	return ath_reset(sc, ATH_RESET_FULL, HAL_RESET_NORMAL);
 }
 
 struct ath_buf *
@@ -3779,7 +3780,7 @@ ath_reset_proc(void *arg, int pending)
 #if 0
 	device_printf(sc->sc_dev, "%s: resetting\n", __func__);
 #endif
-	ath_reset(sc, ATH_RESET_NOLOSS);
+	ath_reset(sc, ATH_RESET_NOLOSS, HAL_RESET_FORCE_COLD);
 }
 
 /*
@@ -3806,7 +3807,7 @@ ath_bstuck_proc(void *arg, int pending)
 	 * This assumes that there's no simultaneous channel mode change
 	 * occurring.
 	 */
-	ath_reset(sc, ATH_RESET_NOLOSS);
+	ath_reset(sc, ATH_RESET_NOLOSS, HAL_RESET_FORCE_COLD);
 }
 
 static int
@@ -3880,6 +3881,10 @@ ath_node_alloc(struct ieee80211vap *vap, const uint8_t mac[IEEE80211_ADDR_LEN])
 
 	/* XXX setup ath_tid */
 	ath_tx_tid_init(sc, an);
+
+	an->an_node_stats.ns_avgbrssi = ATH_RSSI_DUMMY_MARKER;
+	an->an_node_stats.ns_avgrssi = ATH_RSSI_DUMMY_MARKER;
+	an->an_node_stats.ns_avgtxrssi = ATH_RSSI_DUMMY_MARKER;
 
 	DPRINTF(sc, ATH_DEBUG_NODE, "%s: %6D: an %p\n", __func__, mac, ":", an);
 	return &an->an_node;
@@ -4299,7 +4304,7 @@ ath_tx_default_comp(struct ath_softc *sc, struct ath_buf *bf, int fail)
 void
 ath_tx_update_ratectrl(struct ath_softc *sc, struct ieee80211_node *ni,
     struct ath_rc_series *rc, struct ath_tx_status *ts, int frmlen,
-    int nframes, int nbad)
+    int rc_framelen, int nframes, int nbad)
 {
 	struct ath_node *an;
 
@@ -4310,9 +4315,16 @@ ath_tx_update_ratectrl(struct ath_softc *sc, struct ieee80211_node *ni,
 	an = ATH_NODE(ni);
 	ATH_NODE_UNLOCK_ASSERT(an);
 
+	/*
+	 * XXX TODO: teach the rate control about TXERR_FILT and
+	 * see about handling it (eg see how many attempts were
+	 * made before it got filtered and account for that.)
+	 */
+
 	if ((ts->ts_status & HAL_TXERR_FILT) == 0) {
 		ATH_NODE_LOCK(an);
-		ath_rate_tx_complete(sc, an, rc, ts, frmlen, nframes, nbad);
+		ath_rate_tx_complete(sc, an, rc, ts, frmlen, rc_framelen,
+		    nframes, nbad);
 		ATH_NODE_UNLOCK(an);
 	}
 }
@@ -4353,18 +4365,21 @@ ath_tx_process_buf_completion(struct ath_softc *sc, struct ath_txq *txq,
 			/*
 			 * XXX assume this isn't an aggregate
 			 * frame.
+			 *
+			 * XXX TODO: also do this for filtered frames?
+			 * Once rate control knows about them?
 			 */
 			ath_tx_update_ratectrl(sc, ni,
 			     bf->bf_state.bfs_rc, ts,
-			    bf->bf_state.bfs_pktlen, 1,
+			    bf->bf_state.bfs_pktlen,
+			    bf->bf_state.bfs_pktlen,
+			    1,
 			    (ts->ts_status == 0 ? 0 : 1));
 		}
 		ath_tx_default_comp(sc, bf, 0);
 	} else
 		bf->bf_comp(sc, bf, 0);
 }
-
-
 
 /*
  * Process completed xmit descriptors from the specified queue.
@@ -4491,6 +4506,8 @@ ath_tx_processq(struct ath_softc *sc, struct ath_txq *txq, int dosched)
 			nacked++;
 			sc->sc_stats.ast_tx_rssi = ts->ts_rssi;
 			ATH_RSSI_LPF(sc->sc_halstats.ns_avgtxrssi,
+				ts->ts_rssi);
+			ATH_RSSI_LPF(ATH_NODE(ni)->an_node_stats.ns_avgtxrssi,
 				ts->ts_rssi);
 		}
 		ATH_TXQ_UNLOCK(txq);
@@ -5434,6 +5451,20 @@ ath_calibrate(void *arg)
 				__func__, sc->sc_curchan->ic_freq);
 			sc->sc_stats.ast_per_calfail++;
 		}
+		/*
+		 * XXX TODO: get the NF calibration results from the HAL.
+		 * If we failed NF cal then schedule a hard reset to potentially
+		 * un-freeze the PHY.
+		 *
+		 * Note we have to be careful here to not get stuck in an
+		 * infinite NIC restart.  Ideally we'd not restart if we
+		 * failed the first NF cal - that /can/ fail sometimes in
+		 * a noisy environment.
+		 *
+		 * Instead, we should likely temporarily shorten the longCal
+		 * period to happen pretty quickly and if a subsequent one
+		 * fails, do a full reset.
+		 */
 		if (shortCal)
 			sc->sc_lastshortcal = ticks;
 	}
@@ -6071,7 +6102,6 @@ ath_newstate(struct ieee80211vap *vap, enum ieee80211_state nstate, int arg)
 
 		taskqueue_unblock(sc->sc_tq);
 	} else if (nstate == IEEE80211_S_INIT) {
-
 		/* Quiet time handling - ensure we resync */
 		memset(&avp->quiet_ie, 0, sizeof(avp->quiet_ie));
 
@@ -6089,6 +6119,17 @@ ath_newstate(struct ieee80211vap *vap, enum ieee80211_state nstate, int arg)
 			taskqueue_block(sc->sc_tq);
 			sc->sc_beacons = 0;
 		}
+
+		/*
+		 * For at least STA mode we likely should clear the ANI
+		 * and NF calibration state and allow the NIC/HAL to figure
+		 * out optimal parameters at runtime.  Otherwise if we
+		 * disassociate due to interference / deafness it may persist
+		 * when we reconnect.
+		 *
+		 * Note: may need to do this for other states too, not just
+		 * _S_INIT.
+		 */
 #ifdef IEEE80211_SUPPORT_TDMA
 		ath_hal_setcca(ah, AH_TRUE);
 #endif
@@ -6118,9 +6159,39 @@ ath_newstate(struct ieee80211vap *vap, enum ieee80211_state nstate, int arg)
 			}
 			ATH_UNLOCK(sc);
 		}
+
+		/*
+		 * Note - the ANI/calibration timer isn't re-enabled during
+		 * network sleep for now.  One unfortunate side-effect is that
+		 * the PHY/airtime statistics aren't gathered on the channel
+		 * but I haven't yet tested to see if reading those registers
+		 * CAN occur during network sleep.
+		 *
+		 * This should be revisited in a future commit, even if it's
+		 * just to split out the airtime polling from ANI/calibration.
+		 */
 	} else if (nstate == IEEE80211_S_SCAN) {
 		/* Quiet time handling - ensure we resync */
 		memset(&avp->quiet_ie, 0, sizeof(avp->quiet_ie));
+
+		/*
+		 * If we're in scan mode then startpcureceive() is
+		 * hopefully being called with "reset ANI" for this channel;
+		 * but once we attempt to reassociate we program in the previous
+		 * ANI values and.. not do any calibration until we're running.
+		 * This may mean we stay deaf unless we can associate successfully.
+		 *
+		 * So do kick off the cal timer to get NF/ANI going.
+		 */
+		ATH_LOCK(sc);
+		if (ath_longcalinterval != 0) {
+			/* start periodic recalibration timer */
+			callout_reset(&sc->sc_cal_ch, 1, ath_calibrate, sc);
+		} else {
+			DPRINTF(sc, ATH_DEBUG_CALIBRATE,
+			    "%s: calibration disabled\n", __func__);
+		}
+		ATH_UNLOCK(sc);
 	}
 bad:
 	ieee80211_free_node(ni);

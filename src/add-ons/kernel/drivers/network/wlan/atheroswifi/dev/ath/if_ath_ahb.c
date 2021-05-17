@@ -54,7 +54,7 @@ __FBSDID("$FreeBSD: releng/12.0/sys/dev/ath/if_ath_ahb.c 326255 2017-11-27 14:52
 #include <sys/rman.h>
 
 #include <sys/socket.h>
- 
+
 #include <net/if.h>
 #include <net/if_media.h>
 #include <net/if_arp.h>
@@ -336,7 +336,6 @@ static device_method_t ath_ahb_methods[] = {
 	DEVMETHOD(device_shutdown,	ath_ahb_shutdown),
 	DEVMETHOD(device_suspend,	ath_ahb_suspend),
 	DEVMETHOD(device_resume,	ath_ahb_resume),
-
 	{ 0,0 }
 };
 static driver_t ath_ahb_driver = {
