@@ -15,12 +15,12 @@ for architectureObject in [ MultiArchSubDirSetup riscv64 ] {
 		MergeObject <$(architecture)>os_arch_$(TARGET_ARCH).o :
 			byteorder.S
 
-			stack_frame.c
-			system_time.c
+			stack_frame.S
+			system_time.cpp
 
-			tls.c
-			time.c
-			thread.c
+			tls.cpp
+			time.cpp
+			thread.cpp
 
 			generic_atomic.cpp
 			generic_stack_trace.cpp

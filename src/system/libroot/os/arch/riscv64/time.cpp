@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2006, Ingo Weinhold <bonefish@cs.tu-berlin.de>.
  * Distributed under the terms of the MIT License.
  */
@@ -17,11 +17,10 @@ __arch_init_time(struct real_time_data *data, bool setDefaults)
 {
 	sRealTimeData = &data->arch_data;
 
-	if (setDefaults) {
+	if (setDefaults)
 		sRealTimeData->system_time_conversion_factor = 1000000000LL;
-	}
 
-	// __riscv64_setup_system_time(&sRealTimeData->system_time_conversion_factor);
+	__riscv64_setup_system_time(sRealTimeData->system_time_conversion_factor);
 }
 
 
