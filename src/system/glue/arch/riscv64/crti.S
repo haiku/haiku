@@ -21,8 +21,12 @@
 
 .section .init
 FUNCTION(_init):
+	addi sp, sp, -16
+	sd   ra, 8(sp)
 	// crtbegin.o stuff comes here
 
 .section .fini
 FUNCTION(_fini):
-	// crtbegin.o stuff comes here
+	addi sp, sp, -16
+	sd   ra, 8(sp)
+	// crtend.o stuff comes here
