@@ -7,7 +7,7 @@ SYSTEM_BIN += [ FFilterByBuildFeatures
 	cddb_lookup
 	clipboard CortexAddOnHost
 	dpms
-	FirstBootPrompt	fwcontrol@x86
+	FirstBootPrompt
 	<bin>i2c@x86,x86_64 installsound
 	mail mail2mbox mbox2mail media_client mkdos mount_nfs
 	play recover screenshot setcontrollook setdecor spamdbm
@@ -141,7 +141,6 @@ SYSTEM_ADD_ONS_MEDIA += [ FFilterByBuildFeatures
 	cortex_logging_consumer.media_addon
 	dvb.media_addon@x86
 	equalizer.media_addon
-	firewire_dv.media_addon@x86
 	hmulti_audio.media_addon
 	#legacy.media_addon
 	mixer.media_addon

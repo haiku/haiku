@@ -68,7 +68,7 @@ AddDriversToPackage					: console dprintf null random <driver>tty
 AddDriversToPackage audio hmulti	: $(SYSTEM_ADD_ONS_DRIVERS_AUDIO) ;
 AddDriversToPackage audio old		: $(SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD) ;
 AddDriversToPackage midi			: $(SYSTEM_ADD_ONS_DRIVERS_MIDI) ;
-AddDriversToPackage bus				: usb_raw fw_raw@x86 ;
+AddDriversToPackage bus				: usb_raw ;
 AddDriversToPackage disk floppy		: pc_floppy@x86 ;
 AddDriversToPackage disk usb		: usb_disk ;
 AddDriversToPackage disk virtual	: nbd ;
