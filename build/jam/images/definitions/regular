@@ -234,7 +234,6 @@ SYSTEM_ADD_ONS_DRIVERS_NET += [ FFilterByBuildFeatures
 		idualwifi7260
 		marvell88w8363 marvell88w8335
 		ralinkwifi realtekwifi
-		wavelanwifi
 	}@ # x86,x86_64
 ] ;
 
