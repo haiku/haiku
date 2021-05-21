@@ -385,8 +385,8 @@ struct xhci_endpoint_ctx {
 };
 
 
-#define ENDPOINT_0_STATE(x)				((x) & 0x3)
-#define ENDPOINT_0_STATE_GET(x)			((x) & 0x3)
+#define ENDPOINT_0_STATE(x)				((x) & 0x7)
+#define ENDPOINT_0_STATE_GET(x)			((x) & 0x7)
 #define ENDPOINT_0_MULT(x)				(((x) & 0x3) << 8)
 #define ENDPOINT_0_MULT_GET(x)			(((x) >> 8) & 0x3)
 #define ENDPOINT_0_MAXPSTREAMS(x)		(((x) & 0x1F) << 10)
@@ -412,6 +412,14 @@ struct xhci_endpoint_ctx {
 #define ENDPOINT_4_MAXESITPAYLOAD(x)	(((x) & 0xFFFF) << 16)
 #define ENDPOINT_4_MAXESITPAYLOAD_GET(x) (((x) >> 16) & 0xFFFF)
 
+#define ENDPOINT_STATE_DISABLED		0
+#define ENDPOINT_STATE_RUNNING		1
+#define ENDPOINT_STATE_HALTED		2
+#define ENDPOINT_STATE_STOPPED		3
+#define ENDPOINT_STATE_ERROR		4
+#define ENDPOINT_STATE_RESERVED_5	5
+#define ENDPOINT_STATE_RESERVED_6	6
+#define ENDPOINT_STATE_RESERVED_7	7
 
 struct xhci_stream_ctx {
 	uint64	qwstream0;

@@ -185,10 +185,8 @@ private:
 									bool deconfigure, uint8 slot);
 			status_t			EvaluateContext(uint64 inputContext,
 									uint8 slot);
-			status_t			ResetEndpoint(bool preserve, uint8 endpoint,
-									uint8 slot);
-			status_t			StopEndpoint(bool suspend, uint8 endpoint,
-									uint8 slot);
+			status_t			ResetEndpoint(bool preserve, xhci_endpoint* endpoint);
+			status_t			StopEndpoint(bool suspend, xhci_endpoint* endpoint);
 			status_t			SetTRDequeue(uint64 dequeue, uint16 stream,
 									uint8 endpoint, uint8 slot);
 			status_t			ResetDevice(uint8 slot);

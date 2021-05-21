@@ -968,8 +968,7 @@ XHCI::CancelQueuedTransfers(Pipe *pipe, bool force)
 	// complete, one of the queued transfers posts a completion event, so in
 	// order to avoid a deadlock, we must unlock the endpoint.
 	endpointLocker.Unlock();
-	status_t status = StopEndpoint(false, endpoint->id + 1,
-		endpoint->device->slot);
+	status_t status = StopEndpoint(false, endpoint);
 	endpointLocker.Lock();
 
 	// Detach the head TD from the endpoint.
@@ -1776,7 +1775,7 @@ XHCI::_RemoveEndpointForPipe(Pipe *pipe)
 	if (endpoint->id > 0) {
 		xhci_device *device = endpoint->device;
 		uint8 epNumber = endpoint->id + 1;
-		StopEndpoint(true, epNumber, device->slot);
+		StopEndpoint(true, endpoint);
 
 		mutex_lock(&endpoint->lock);
 
@@ -2686,14 +2685,15 @@ XHCI::EvaluateContext(uint64 inputContext, uint8 slot)
 
 
 status_t
-XHCI::ResetEndpoint(bool preserve, uint8 endpoint, uint8 slot)
+XHCI::ResetEndpoint(bool preserve, xhci_endpoint* endpoint)
 {
 	TRACE("Reset Endpoint\n");
+
 	xhci_trb trb;
 	trb.address = 0;
 	trb.status = 0;
 	trb.flags = TRB_3_TYPE(TRB_TYPE_RESET_ENDPOINT)
-		| TRB_3_SLOT(slot) | TRB_3_ENDPOINT(endpoint);
+		| TRB_3_SLOT(endpoint->device->slot) | TRB_3_ENDPOINT(endpoint->id + 1);
 	if (preserve)
 		trb.flags |= TRB_3_PRSV_BIT;
 
@@ -2702,14 +2702,29 @@ XHCI::ResetEndpoint(bool preserve, uint8 endpoint, uint8 slot)
 
 
 status_t
-XHCI::StopEndpoint(bool suspend, uint8 endpoint, uint8 slot)
+XHCI::StopEndpoint(bool suspend, xhci_endpoint* endpoint)
 {
 	TRACE("Stop Endpoint\n");
+	struct xhci_device_ctx* device_ctx = endpoint->device->device_ctx;
+
+	// XHCI 1.2, 4.8.3 Endpoint State Diagram
+	// Only exit from a HALTED state is a reset which will also stop the ep
+	switch (ENDPOINT_0_STATE_GET(_ReadContext(
+			&device_ctx->endpoints[endpoint->id].dwendpoint0))) {
+		case ENDPOINT_STATE_HALTED:
+			TRACE("Detected XHCI endpoint in halted state. Calling reset.");
+			return ResetEndpoint(false, endpoint);
+		case ENDPOINT_STATE_STOPPED:
+			return B_OK;
+		default:
+			break;
+	}
+
 	xhci_trb trb;
 	trb.address = 0;
 	trb.status = 0;
 	trb.flags = TRB_3_TYPE(TRB_TYPE_STOP_ENDPOINT)
-		| TRB_3_SLOT(slot) | TRB_3_ENDPOINT(endpoint);
+		| TRB_3_SLOT(endpoint->device->slot) | TRB_3_ENDPOINT(endpoint->id + 1);
 	if (suspend)
 		trb.flags |= TRB_3_SUSPEND_ENDPOINT_BIT;
 
