@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-DriveSetup	4058081081
+1	spanish; castilian	x-vnd.Haiku-DriveSetup	4048496535
 Could not unmount partition %s.	MainWindow		No se pudo desmontar la partición %s.
 Mount all	MainWindow		Montar todo
 Disk	MainWindow		Disco
@@ -51,6 +51,7 @@ Wipe (not implemented)	MainWindow		Limpiar (no implementado)
 The currently selected partition does not have a parent partition.	MainWindow		La partición seleccionada no tiene una partición padre.
 Validation of the given initialization parameters failed.	MainWindow		La validación de los parámetros de inicialización proporcionados falló.
 Not formatted (%s)	PartitionList		Sin formato (%s)
+Failed to create the partition. No changes have been written to disk.	MainWindow		Hubo un error al crear la partición. No se han realizado cambios en el disco.
 Shared	PartitionList		Compartida
 MIMEs	PartitionList		MIMEs
 BitLocker encrypted	Encryption utils		Cifrado BitLocker

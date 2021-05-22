@@ -1,4 +1,4 @@
-1	japanese	application/x-vnd.Cortex.Route	2905481185
+1	japanese	application/x-vnd.Cortex.Route	2011521004
 Node '%name%' released	CortexRouteApp		ノード '%name%' がリリースされました
 OK	CortexRouteApp		OK
 About Cortex/Route…	CortexRouteApp		Cortex/Routeについて…
@@ -7,7 +7,8 @@ Connection '%name%' made	CortexRouteApp		接続 '%name%' が作成されまし�
 Save nodes…	CortexRouteApp		ノードを保存…
 %producer% and %consumer%	CortexRouteApp		%producer% および %consumer%
 Node '%name%' created	CortexRouteApp		ノード '%name%' が生成されました
-Window	CortexRouteApp		ウィンドう
+Negotiated format:	CortexRouteApp		ネゴシエートされたフォーマット:
+Window	CortexRouteApp		ウィンドウ
 Transport	CortexRouteApp		トランスポート
 Connection broken	CortexRouteApp		接続が壊れています
 Untitled group	CortexRouteApp		名称未設定グループ

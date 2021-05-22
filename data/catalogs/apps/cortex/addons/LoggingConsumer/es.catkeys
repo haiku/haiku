@@ -1,0 +1,11 @@
+1	spanish; castilian	application/x-vnd.Be.LoggingConsumerApp	881315968
+Priority	CortexAddOnsLoggingConsumer		Prioridad
+Latency	CortexAddOnsLoggingConsumer		Latencia
+Start	CortexAddOnsLoggingConsumerNodeHarnessWin		Inicio
+Latency control	CortexAddOnsLoggingConsumer		Control de latencia
+Stop	CortexAddOnsLoggingConsumerNodeHarnessWin		Detener
+OK	CortexAddOnsCommonMediaNodeControlApp		Aceptar
+Controls	CortexAddOnsLoggingConsumerNodeHarnessWin		Controles
+controls	CortexAddOnsCommonMediaNodeControlApp		controles
+Connect	CortexAddOnsLoggingConsumerNodeHarnessWin		Conectar
+percent	CortexAddOnsLoggingConsumer		porcentaje

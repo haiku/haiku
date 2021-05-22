@@ -1,0 +1,8 @@
+1	spanish; castilian	application/x-vnd.Cortex.ParameterView	1295152157
+Themes	ParameterWindow		Temas
+Start control panel	ParameterWindow		Iniciar panel de control
+%nodeinfo% parameters	ParameterWindow		parámetros de %nodeinfo%
+OK	ParameterWindow		Aceptar
+Window	ParameterWindow		Ventana
+Could not start control panel (%error%)	ParameterWindow		No se pudo iniciar el panel de control (%error%)
+Close	ParameterWindow		Cerrar

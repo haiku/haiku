@@ -1,4 +1,4 @@
-1	ukrainian	application/x-vnd.Cortex.support	517817189
+1	ukrainian	application/x-vnd.Cortex.support	3456067167
 Mono	MediaString		Моно
 MPEG1	MediaString		MPEG1
 YUV444	MediaString		YUV444
@@ -6,6 +6,7 @@ Port	MediaString		Порт
 YCbCr411	MediaString		YCbCr411
 Offline	MediaString		Офлайн
 YUV422	MediaString		YUV422
+QuickTime	MediaString		QuickTime
 YUV9	MediaString		YUV9
 YUV420	MediaString		YUV420
 YCbCr444	MediaString		YCbCr444
@@ -15,6 +16,7 @@ MIDI	MediaString		MIDI
 YUV12	MediaString		YUV12
  (NTSC)	MediaString		 (NTSC)
 YUV411	MediaString		YUV411
+ (PAL)	MediaString		 (PAL)
 YCbCr420	MediaString		YCbCr420
 HTML	MediaString		HTML
 Stereo	MediaString		Стерео

@@ -1,0 +1,37 @@
+1	japanese	x-vnd.haiku.SerialConnect	354154115
+Hardware	SerialWindow	Flowcontrol	ハードウェア
+Connection	SerialWindow		接続
+Raw send…	SerialWindow		Raw 送信…
+Baud rate	SerialWindow		ボーレート
+Stop bits	SerialWindow		ストップビット
+None	SerialWindow	Flowcontrol	無し
+Cancel	Custom baudrate window		キャンセル
+Sending…	XModemStatus		送信中…
+<no serial port available>	SerialWindow		<使用できるシリアルポートがありません>
+Log to file…	SerialWindow		ログをファイルに出力…
+Custom baudrate	Custom baudrate window		カスタムボーレート
+File	SerialWindow		ファイル
+SerialConnect	System name		シリアル接続
+custom…	SerialWindow	Baudrate	カスタム…
+Parity	SerialWindow		パリティ
+None	SerialWindow	Parity	無し
+Disconnect	SerialWindow		切断
+Everything sent, waiting for acknowledge	XModemStatus		すべて送信されました、確認を待っています。
+Odd	SerialWindow	Parity	奇数
+Flow control	SerialWindow		フロー制御
+file transfer progress	SerialWindow		ファイル転送進捗
+CRC requested	XModemStatus		CRC が要求されました
+Data bits	SerialWindow		データビット
+Both	SerialWindow	Flowcontrol	両方
+Edit	SerialWindow		編集
+XModem send…	SerialWindow		XModem 送信…
+Baudrate:	Custom baudrate window		ボーレート:
+OK	Custom baudrate window		OK
+Waiting for receiver…	XModemStatus		受信先を待っています…
+Clear history	SerialWindow		履歴を消去
+Checksum error, re-send block	XModemStatus		チェックサムエラー、ブロックを再送信します
+Settings	SerialWindow		設定
+Even	SerialWindow	Parity	偶数
+Software	SerialWindow	Flowcontrol	ソフトウェア
+Line terminator	SerialWindow		行末
+Remote cancelled transfer	XModemStatus		リモート送信がキャンセルされました

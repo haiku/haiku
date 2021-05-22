@@ -1,4 +1,5 @@
-1	japanese	application/x-vnd.Cortex.AddOnHost	69183245
+1	japanese	application/x-vnd.Cortex.AddOnHost	1256552338
 Continue	CortexAddOnHost		続ける
 Cortex AddOnHost	CortexAddOnHost		Cortex AddOnHost
 Quit	CortexAddOnHost		終了
+This program runs in the background, and is started automatically by Cortex when necessary. You probably don't want to start it manually.	CortexAddOnHost		このプログラムはバックグラウンドで動作しており、必要な場合にCortexにより起動されます。 マニュアルで起動する必要はおそらくありません。

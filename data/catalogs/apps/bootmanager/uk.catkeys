@@ -23,7 +23,7 @@ Uninstall boot manager	BootManagerController	Title	Деінсталяція Boot
 About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Все готово для запису меню до загрузочного диску (%s). Перевірте інформацію перед тим як  продовжити.
 The first partition on the disk starts too early and does not leave enough space free for a boot menu.\nBoot Manager needs 2 KiB available space before the first partition.	BootManagerController		Перший розділ починається зарано і на ньому немає місця для встановлення меню загрузки.\nBoot Manager потребує принаймні 2 KБ перед першим розділом.
 Uninstall	DrivesPage	Button	Деінсталяція
-Update	DrivesPage	Button	Обновити
+Update	DrivesPage	Button	Оновити
 The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		Основний загрузочний запис (MBR) завантажувального пристрою:\n\t%s\nзараз буде записано на диск. Виберіть файл для збереження поточного MBR.\n\nКоли під час інсталяції щось піде не так або Ви захочете вилучити меню загрузки просто запустіть Boot Manager і виберіть опцію 'Деінсталювати'.
 Default Partition	DefaultPartitionPage	Title	Розділ за замовчуванням
 Installation of boot menu completed	BootManagerController	Title	Інсталяція меню загрузки завершена

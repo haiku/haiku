@@ -1,0 +1,22 @@
+1	japanese	application/x-vnd.Be.LoggingConsumerApp	1634779870
+Priority	CortexAddOnsLoggingConsumer		優先度
+Latency	CortexAddOnsLoggingConsumer		レイテンシ
+Logged input	CortexAddOnsLoggingConsumer		ロク入力
+CPU spin percentage	CortexAddOnsLoggingConsumer		CPU スピン率
+NodeLogger	CortexAddOnsLoggingConsumers		NodeLogger
+Start	CortexAddOnsLoggingConsumerNodeHarnessWin		開始
+Thread priority	CortexAddOnsLoggingConsumer		スレッド優先度
+LoggingConsumer parameters	CortexAddOnsLoggingConsumer		LoggingConsumer パラメーター
+Latency control	CortexAddOnsLoggingConsumer		レイテンシコントロール
+MediaNodeControlApp: couldn't get node info (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: ノード(%d)情報が得られませんでした:\n%s\n
+CPU percentage	CortexAddOnsLoggingConsumer		CPU 使用率
+MediaNodeControlApp: couldn't find node (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: ノード(%d)が見つかりませんでした:\n%s\n
+LoggingConsumer	CortexAddOnsLoggingConsumer		LoggingConsumer
+Stop	CortexAddOnsLoggingConsumerNodeHarnessWin		停止
+An add-on version of the LoggingConsumer node.\nSee the Be Developer Newsletter III.18: 5 May, 1999\nadapted by Eric Moon (4 June, 1999)	CortexAddOnsLoggingConsumer		An add-on version of the LoggingConsumer node.\nSee the Be Developer Newsletter III.18: 5 May, 1999\nadapted by Eric Moon (4 June, 1999)
+OK	CortexAddOnsCommonMediaNodeControlApp		OK
+Controls	CortexAddOnsLoggingConsumerNodeHarnessWin		コントロール
+controls	CortexAddOnsCommonMediaNodeControlApp		コントロール
+Connect	CortexAddOnsLoggingConsumerNodeHarnessWin		接続
+percent	CortexAddOnsLoggingConsumer		%
+MediaNodeControlApp: no parameters for node (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: ノード(%d)のパラメーターがありません:\n%s\n

@@ -1,0 +1,20 @@
+1	spanish; castilian	application/x-vnd.Cortex.support	13456559
+32 bit HLS	MediaString		HLS de 32 bit
+(unknown format)	MediaString		(formato desconocido)
+MPEG1	MediaString		MPEG1
+ASF format family	MediaString		Familia de formatos ASF
+Encoded video	MediaString		Video codificado
+YUV444	MediaString		YUV444
+Port	MediaString		Puerto
+(unkown video orientation)	MediaString		(orientación de video desconocida)
+QuickTime	MediaString		QuickTime
+32 bit HLSA	MediaString		HLSA de 32 bit
+BeOS format family	MediaString		familia de formatos BeOS
+24 bit HSV	MediaString		HSV de 24 bit
+32 bit CMY	MediaString		CMY de 32 bit
+(unknown video format)	MediaString		(formato de video desconocido)
+Interlaced 	MediaString		Entrelazado 
+32 bit RGB	MediaString		RGB de 32 bit
+System mixer	MediaString		Mezclador del sistema
+Physical output	MediaString		Salida fisica
+ kb/s	MediaString		 kb/s

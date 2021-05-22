@@ -1,0 +1,59 @@
+1	japanese	application/x-vnd.Cortex.InfoView	2382053937
+Offset	InfoView		オフセット
+Description	DormantNodeInfoView		説明
+Byte order	InfoView		バイトオーダー
+Connection	InfoView		接続
+Output formats	DormantNodeInfoView		出力フォーマット
+History	InfoView		履歴
+Input formats	DormantNodeInfoView		入力フォーマット
+Signature	AppNodeInfoView		シグネチャ
+Video data between	InfoView		ビデオデータ
+Any number	DormantNodeInfoView	For 'Max. instances' field	すべての値
+Flags	InfoView		フラグ
+Media output	InfoView		出力メディア
+Active lines	InfoView		アクティブライン
+Buffer size	InfoView		バッファーサイズ
+\n- Quality:	FileNodeInfoView		\n- 品質:
+Kinds	LiveNodeInfoView		種類
+Application	AppNodeInfoView		アプリケーション
+Flavor flags	DormantNodeInfoView		フレーバーフラグ
+Max. instances	DormantNodeInfoView		最大インスタンス
+\n- Duration:	FileNodeInfoView		\n- 再生時間:
+Dormant media node	DormantNodeInfoView		休止メディアノード
+Latency	LiveNodeInfoView		レイテンシ
+Media type	InfoView		メディアタイプ
+Live media node	LiveNodeInfoView		有効メディアノード
+Field rate	InfoView		フィールドレート
+Kinds	DormantNodeInfoView		種類
+%title% info	InfoView		%title% 情報
+Node ID	LiveNodeInfoView		ノード ID
+Resolution	InfoView		分解能
+Chunk size	InfoView		チャンクサイズ
+File format	AppNodeInfoView		ファイルフォーマット
+Matrix mask	InfoView		マトリックスマスク
+Channel mask	InfoView		チャンネルマスク
+Orientation	InfoView		向き
+Live file-interface node	FileNodeInfoView		有効’ファイルインターフェースノード
+Channels	InfoView		チャンネル
+Sample rate	InfoView		サンプルレート
+File format	FileNodeInfoView		ファイルフォーマット
+(no file)	FileNodeInfoView		(ファイルがありません)
+Media input	InfoView		入力メディア
+Bit rate	InfoView		ビットレート
+Input format	DormantNodeInfoView		入力フォーマット
+Format	InfoView		フォーマット
+Version	AppNodeInfoView		バージョン
+AddOn ID	DormantNodeInfoView		アドオン ID
+Frame size	InfoView		フレームサイズ
+Flavor ID	DormantNodeInfoView		フレーバー ID
+Run mode	LiveNodeInfoView		Run mode
+\n- Codec:	FileNodeInfoView		\n- コーデック:
+Port	LiveNodeInfoView		ポート
+Output format	DormantNodeInfoView		出力フォーマット
+Aspect ratio	InfoView		アスペクト比
+Application-owned node	AppNodeInfoView		アプリケーション所有ノード
+Tracks	FileNodeInfoView		トラック
+Source	InfoView		ソース
+Destination	InfoView		説明
+Copyright	FileNodeInfoView		Copyright
+ID:	FileNodeInfoView		ID:

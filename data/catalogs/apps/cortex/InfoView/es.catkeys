@@ -1,0 +1,5 @@
+1	spanish; castilian	application/x-vnd.Cortex.InfoView	3006970506
+Description	DormantNodeInfoView		Descripción
+Connection	InfoView		Conexión
+Output formats	DormantNodeInfoView		Formatos de salida
+Input formats	DormantNodeInfoView		Formatos de entrada

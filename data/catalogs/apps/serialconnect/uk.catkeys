@@ -1,6 +1,7 @@
-1	ukrainian	x-vnd.haiku.SerialConnect	2873184091
+1	ukrainian	x-vnd.haiku.SerialConnect	354154115
 Hardware	SerialWindow	Flowcontrol	Апаратно
 Connection	SerialWindow		З'єднання
+Raw send…	SerialWindow		Передати як RAW…
 Baud rate	SerialWindow		Швидкість передачі
 Stop bits	SerialWindow		Стопові біти
 None	SerialWindow	Flowcontrol	Без управління
@@ -8,20 +9,29 @@ Cancel	Custom baudrate window		Скасувати
 Sending…	XModemStatus		Відправка…
 <no serial port available>	SerialWindow		<послідовний порт недоступний>
 Log to file…	SerialWindow		Лог у файл…
+Custom baudrate	Custom baudrate window		Довільна швидкість
 File	SerialWindow		Файл
 SerialConnect	System name		SerialConnect
 custom…	SerialWindow	Baudrate	довільно…
 Parity	SerialWindow		Парність
 None	SerialWindow	Parity	Без перевірки
+Disconnect	SerialWindow		Роз’єднано
 Everything sent, waiting for acknowledge	XModemStatus		Все відправлено, чекає підтвердження
 Odd	SerialWindow	Parity	Непарне
 Flow control	SerialWindow		Управління потоком
+file transfer progress	SerialWindow		прогрес передачі файла
+CRC requested	XModemStatus		Запит на CRC
 Data bits	SerialWindow		Бітів даних
 Both	SerialWindow	Flowcontrol	Обидва
 Edit	SerialWindow		Редагувати
+XModem send…	SerialWindow		Передати через XModem…
+Baudrate:	Custom baudrate window		Швидкість:
 OK	Custom baudrate window		ОК
+Waiting for receiver…	XModemStatus		Очікування одержувача…
 Clear history	SerialWindow		Очистити історію
+Checksum error, re-send block	XModemStatus		Помилка контрольної суми, блок передається повторно
 Settings	SerialWindow		Налаштування
 Even	SerialWindow	Parity	Парне
 Software	SerialWindow	Flowcontrol	Програмно
 Line terminator	SerialWindow		Символ нового рядка
+Remote cancelled transfer	XModemStatus		Отримувач скасував передачу

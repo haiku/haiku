@@ -1,0 +1,8 @@
+1	japanese	application/x-vnd.Cortex.ParameterView	1295152157
+Themes	ParameterWindow		テーマ
+Start control panel	ParameterWindow		コントロールパネルを開始
+%nodeinfo% parameters	ParameterWindow		%nodeinfo% パラメーター
+OK	ParameterWindow		OK
+Window	ParameterWindow		ウィンドウ
+Could not start control panel (%error%)	ParameterWindow		コントロールパネルを開始できませんでした (%error%)
+Close	ParameterWindow		閉じる

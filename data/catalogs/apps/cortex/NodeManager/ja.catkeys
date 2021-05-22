@@ -1,0 +1,7 @@
+1	japanese	application/x-vnd.Cortex.NodeManager	1301322433
+System audio mixer	NodeManager		システムオーディオミキサー
+System video output	NodeManager		システムビデオ出力
+System video input	NodeManager		システムビデオ入力
+No name	NodeManager		名称無し
+System audio input	NodeManager		システムオーディオ入力
+Time sources	NodeManager		タイムソース

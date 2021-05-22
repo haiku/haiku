@@ -415,7 +415,7 @@ Name	OpenWithWindow		Ім'я
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Виникла проблема при спробі перемістити \"%name\". Елемент може бути відкритим або зайнятим.
 Windows	TrackerSettingsWindow		Вікна
 Show space bars on volumes	SettingsView		Показувати індикатори місця на томах
-Could not update permissions of file \"%name\". %error	FSUtils		Не вдалося обновити дозволи файлу \"%name\". %error
+Could not update permissions of file \"%name\". %error	FSUtils		Не вдалося оновити дозволи файлу \"%name\". %error
 Decrease size	DeskWindow		Зменшити розмір
 Emptying Trash… 	StatusWindow		Спорожнення смітника… 
 {0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{for # файл} few{# файли} other{for # файлів}}

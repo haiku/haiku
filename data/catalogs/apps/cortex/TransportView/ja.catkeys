@@ -1,0 +1,23 @@
+1	japanese	application/x-vnd.Cortex.TransportView	1534931965
+Roll	TransportView		ロール
+(none)	TransportView		(無し)
+{0, plural, one{# node} other{# nodes}}	TransportView		{0, plural, one{# ノード} other{# ノード}}
+Start	TransportView		開始
+No errors.	TransportView		エラー無し。
+to	TransportView		to
+Offline	TransportView		オフライン
+(???)	TransportView		(???)
+Stop	TransportView		停止
+(no group)	TransportView		(グループ無し)
+Drop data	TransportView		Drop data
+To:	TransportView		To:
+Recording	TransportView		レコーディング
+Increase latency	TransportView		レイテンシを上げる
+Time source:	TransportView		タイムソース:
+DAC time source	TransportView		DAC タイムソース
+Decrease precision	TransportView		精度を下げる
+System clock	TransportView		システムクロック
+From:	TransportView		From:
+Roll from	TransportView		次からのロール
+Preroll	TransportView		プリロール
+Run mode:	TransportView		Run mode:

@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-HaikuDepot	468702767
+1	spanish; castilian	x-vnd.Haiku-HaikuDepot	3544756144
 Repository update error	LocalRepositoryUpdateProcess		Error de actualización de repositorio
 Network error	ServerHelper		Error de red
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Ocurrió un error al actualizar el repositorio: %error%
@@ -24,6 +24,7 @@ Rating	PackageListView		Valoraciones
 Synchronizing icons	ServerIconExportUpdateProcess		Sincronizando iconos
 Show	MainWindow		Mostrar
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Ocurrió un error al obtener el listado de paquetes: %message%
+Settings…	MainWindow		Configuración…
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Para poder funcionar, esta aplicación escribe y lee algunos archivos de trabajo en su ordenador. Parece que hay problemas al escribir un archivo de prueba en [%TestFilePath%]. Compruebe que no hayan problemas en su disco duro o con los permisos que impidan a esta aplicación escribir archivos en esa ubicación de carpeta. Usted puede informarse de este problema y continuar, pero algunas funciones podrían quedar deshabilitadas.
 Active	PackageListView		Activo
 Login or Create account	MainWindow		Ingresar o crear una cuenta
@@ -38,6 +39,7 @@ Local	LocalPkgDataLoadProcess		Local
 Rate %Package%	RatePackageWindow		Puntuar %Package%
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Ocurrió un error al iniciar el administrador de paquetes: %message%
 Quit HaikuDepot	App		Salir de HaikuDepot
+Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		¿Acepta enviar datos anónimos de uso de este equipo al sistema de HaikuDepotServer? Puede cambiar este ajuste más tarde en la ventana \"Configuración\".
 An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		Se ha generado un error inesperado '%Message%' con la propiedad '%Property%'
 A response to the captcha question must be provided.	UserLoginWindow		El captcha debe ser respondido.
 Category	FilterView		Categoría
@@ -61,6 +63,7 @@ Cancel	UserLoginWindow		Cancelar
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot necesita que el demonio de paquete funcione, y parece no estar corriendo.\n¿Le gustaría iniciarlo ahora?
 Click a package to view information	PackageInfoView		Haga clic en un paquete para ver su información
 The password must be at least eight characters long, consist of at least two digits and one upper case character.	UserLoginWindow		La contraseña debe ser de al menos ocho caracteres de longitud, consistir de al menos dos números y una letra en mayúsculas.
+Share anonymous usage data with HaikuDepotServer	SettingsWindow		Compartir datos anónimos de uso con HaikuDepotServer
 Contents	PackageInfoView		Contenidos
 Close	PackageManager		Cerrar
 Changelog	PackageInfoView		Registro de cambios
@@ -77,6 +80,7 @@ Send	RatePackageWindow		Enviar
 Start package daemon	App		Arrancar demonio de paquetes
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		La contraseña debe ser repetida para evitar la posibilidad de un error en el ingreso de la misma.
 The package action could not be scheduled: %Error%	PackageInfoView		La acción de paquete no se pudo programar: %Error%
+Cancel	SettingsWindow		Cancelar
 Cancel	RatePackageWindow		Cancelar
 Inactive	PackageListView		Inactivo
 Nickname:	UserLoginWindow		Usuario:
@@ -87,7 +91,9 @@ OK	MainWindow		Aceptar
 Usage conditions download problem	UserLoginWindow		Hubo un problema al descargar las condiciones de uso
 OK	PackageInfoView		Aceptar
 Downloading:	PackageInfoView		Descargando:
+Quit	MainWindow		Salir
 Success	UserLoginWindow		Éxito
+No	MainWindow		No
 Package daemon problem	App		Problema con el proceso en segundo plano de paquetes
 (%Votes%)	PackageInfoView		(%Votes%)
 Repository	PackageListView		Repositorio
@@ -97,6 +103,7 @@ Close	UserLoginWindow		Cerrar
 Close	RatePackageWindow		Cerrar
 An unexpected error has been sent from the server [%i]	ServerHelper		El servidor ha enviado un error inesperado [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Sincronizando datos de paquetes para el repositorio '%REPO_NAME%'
+Settings	SettingsWindow		Configuración
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Ha ocurrido un error al descargar las condiciones de uso requeridas para crear un nuevo usuario. Revise los archivos de registro para obtener el detalle del error e intente de nuevo. \nLa información sobre como acceder a los archivos de registro está disponible en la sección HaikuDepot de la Guía de Usuario de Haiku.
 View the usage conditions	UserLoginWindow		Ver las condiciones de uso
 Login issue	MainWindow		Problema de inicio de sesión
@@ -116,6 +123,7 @@ Refresh repositories	MainWindow		Actualizar repositorios
 Continue	App		Continuar
 A password is required.	UserLoginWindow		Se requiere una contraseña.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		No parece que este paquete esté en el servidor de HaikuDepot, por lo que no es posible crear una nueva valoración o modificar una ya existente.
+Apply	SettingsWindow		Aplicar
 Language	RatePackageWindow		Idioma
 Log out	MainWindow		Cerrar sesión
 Comment language:	RatePackageWindow		Comentar idioma:
@@ -142,11 +150,13 @@ Try again	App		Volver a intentar
 Unknown	PackageListView		Desconocido
 I agree to the usage conditions	UserLoginWindow		Acepto las condiciones de uso
 Log in	UserLoginWindow		Iniciar sesión
+Sending anonymous usage data	MainWindow		Enviando datos anónimos de uso
 Logged in as %User%	MainWindow		Sesión iniciada como %User%
 Email address:	UserLoginWindow		Dirección de correo electrónico:
 Screenshot	ScreenshotWindow		Captura de pantalla
 A reboot is necessary to complete the installation process.	PackageManager		Es necesario un reinicio para completar el proceso de instalación.
 HaikuDepot	System name		HaikuDepot
+Yes	MainWindow		Sí
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{I am at least one year old}other{I am # years of age or older}}
 View latest usage conditions…	MainWindow		Ver las últimas condiciones de uso…
 Quit	App		Salir

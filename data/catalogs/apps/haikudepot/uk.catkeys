@@ -29,7 +29,7 @@ This application writes and reads some working files on your computer in order t
 Active	PackageListView		Активний
 Login or Create account	MainWindow		Авторизуватись або зареєструватись
 <Package contents not available for remote packages>	PackageContentsView		<Вміст пакету недоступний для відддалених пакетів>
-{0, plural,one{1 package to download}other{# packages to download}}	WorkStatusView		{0, plural,one{1 пакет для скачування} few{# пакети для скачування} other{# пакетів для скачування}}
+{0, plural,one{1 package to download}other{# packages to download}}	WorkStatusView		{0, plural,one{1 пакет для завантаження} few{# пакети для завантаження} other{# пакетів для завантаження}}
 Ratings	PackageInfoView		Оцінки
 Switch account…	MainWindow		Змінити обліковий запис…
 Preferred language:	UserLoginWindow		Мова за вподобанням:
@@ -118,7 +118,7 @@ This rating is visible to other users	RatePackageWindow		Цей рейтинг �
 While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		Під час оновлення даних пакета виникла проблема, яка може призвести до відображення програмою недостовірних даних. Додаткові відомості про цю проблему можна отримати в журналах програми.\nІнформація про те, як переглядати журнали, доступна в розділі програми HaikuDepot посібника користувача Haiku.
 View agreed usage conditions…	MainWindow		Погоджені Умови користування…
 Cancel	MainWindow		Скасувати
-{0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 більше для завантаження)}other{(# більше для завантаження)}}
+{0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(залишилось завантажити 1)}other{(залишилось завантажити #)}}
 Refresh repositories	MainWindow		Оновити репозитарії
 Continue	App		Продовжити
 A password is required.	UserLoginWindow		Потрібен пароль.
@@ -131,7 +131,7 @@ Status	PackageListView		Стан
 The password has been incorrectly repeated.	UserLoginWindow		Пароль був повторений неправильно.
 Network transport error	ServerHelper		Помилка мережевого транспорту
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		Пароль, раніше наданий для користувача [%Nickname%], наразі не дійсний. Користувачеві треба завершити сеанс з цією програмою та знову увійти в систему з оновленим паролем.
-Update	RatePackageWindow		Обновити
+Update	RatePackageWindow		Оновити
 OK	ServerHelper		ОК
 Language	UserLoginWindow		Мова
 OK	UserLoginWindow		ОК
