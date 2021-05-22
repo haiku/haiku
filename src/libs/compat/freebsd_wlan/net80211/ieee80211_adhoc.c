@@ -522,9 +522,11 @@ adhoc_input(struct ieee80211_node *ni, struct mbuf *m,
 		/*
 		 * Save QoS bits for use below--before we strip the header.
 		 */
-		if (subtype == IEEE80211_FC0_SUBTYPE_QOS)
-			qos = ieee80211_getqos(wh)[0];
-		else
+		if (subtype == IEEE80211_FC0_SUBTYPE_QOS) {
+			qos = (dir == IEEE80211_FC1_DIR_DSTODS) ?
+			    ((struct ieee80211_qosframe_addr4 *)wh)->i_qos[0] :
+			    ((struct ieee80211_qosframe *)wh)->i_qos[0];
+		} else
 			qos = 0;
 
 		/*
@@ -715,15 +717,6 @@ adhoc_recv_mgmt(struct ieee80211_node *ni, struct mbuf *m0,
 	wh = mtod(m0, struct ieee80211_frame *);
 	frm = (uint8_t *)&wh[1];
 	efrm = mtod(m0, uint8_t *) + m0->m_len;
-
-	IEEE80211_DPRINTF(vap, IEEE80211_MSG_INPUT | IEEE80211_MSG_DEBUG,
-	    "%s: recv mgmt frame, addr2=%6D, ni=%p (%6D) fc=%.02x %.02x\n",
-	    __func__,
-	    wh->i_addr2, ":",
-	    ni,
-	    ni->ni_macaddr, ":",
-	    wh->i_fc[0],
-	    wh->i_fc[1]);
 	switch (subtype) {
 	case IEEE80211_FC0_SUBTYPE_PROBE_RESP:
 	case IEEE80211_FC0_SUBTYPE_BEACON: {
@@ -796,20 +789,6 @@ adhoc_recv_mgmt(struct ieee80211_node *ni, struct mbuf *m0,
 					    vap->iv_bss->ni_esslen); /* SSID */
 				} else
 					ni = NULL;
-
-				/*
-				 * Send a probe request so we announce 11n
-				 * capabilities.
-				 *
-				 * Don't do this if we're scanning.
-				 */
-				if (! (ic->ic_flags & IEEE80211_F_SCAN))
-					ieee80211_send_probereq(ni, /* node */
-						vap->iv_myaddr, /* SA */
-						ni->ni_macaddr, /* DA */
-						vap->iv_bss->ni_bssid, /* BSSID */
-						vap->iv_bss->ni_essid,
-						vap->iv_bss->ni_esslen); /* SSID */
 
 			} else if (ni->ni_capinfo == 0) {
 				/*
@@ -959,11 +938,11 @@ adhoc_recv_mgmt(struct ieee80211_node *ni, struct mbuf *m0,
 			vap->iv_stats.is_rx_mgtdiscard++;
 		} else if (!IEEE80211_ADDR_EQ(vap->iv_myaddr, wh->i_addr1) &&
 		    !IEEE80211_IS_MULTICAST(wh->i_addr1)) {
-			IEEE80211_DISCARD(vap, IEEE80211_MSG_INPUT | IEEE80211_MSG_DEBUG,
+			IEEE80211_DISCARD(vap, IEEE80211_MSG_INPUT,
 			    wh, NULL, "%s", "not for us");
 			vap->iv_stats.is_rx_mgtdiscard++;
 		} else if (vap->iv_state != IEEE80211_S_RUN) {
-			IEEE80211_DISCARD(vap, IEEE80211_MSG_INPUT | IEEE80211_MSG_DEBUG,
+			IEEE80211_DISCARD(vap, IEEE80211_MSG_INPUT,
 			    wh, NULL, "wrong state %s",
 			    ieee80211_state_name[vap->iv_state]);
 			vap->iv_stats.is_rx_mgtdiscard++;

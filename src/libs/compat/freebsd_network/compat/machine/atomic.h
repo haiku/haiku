@@ -36,9 +36,6 @@
 #define atomic_store_rel_int	atomic_set_acq_32
 #define atomic_cmpset_acq_int	atomic_cmpset_int
 
-#define	atomic_load_32(ptr)		(*(volatile uint32 *)(ptr))
-#define atomic_set_32(ptr, val)	atomic_set((int32 *)ptr, val)
-#define atomic_fetchadd_32(ptr, val)	atomic_add((int32 *)ptr, val)
 
 #define mb()    memory_full_barrier()
 #define wmb()   memory_write_barrier_inline()

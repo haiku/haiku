@@ -918,6 +918,10 @@ malo_fix2rate(int fix_rate)
 	return (fix_rate < nitems(rates) ? rates[fix_rate] : 0);
 }
 
+/* idiomatic shorthands: MS = mask+shift, SM = shift+mask */
+#define	MS(v,x)			(((v) & x) >> x##_S)
+#define	SM(v,x)			(((v) << x##_S) & x)
+
 /*
  * Process completed xmit descriptors from the specified queue.
  */
@@ -958,8 +962,7 @@ malo_tx_processq(struct malo_softc *sc, struct malo_txq *txq)
 			status = le32toh(ds->status);
 			if (status & MALO_TXD_STATUS_OK) {
 				uint16_t format = le16toh(ds->format);
-				uint8_t txant =_IEEE80211_MASKSHIFT(
-				    format, MALO_TXD_ANTENNA);
+				uint8_t txant = MS(format, MALO_TXD_ANTENNA);
 
 				sc->malo_stats.mst_ant_tx[txant]++;
 				if (status & MALO_TXD_STATUS_OK_RETRY)
@@ -1048,9 +1051,13 @@ malo_tx_start(struct malo_softc *sc, struct ieee80211_node *ni,
 	copyhdrlen = hdrlen = ieee80211_anyhdrsize(wh);
 	pktlen = m0->m_pkthdr.len;
 	if (IEEE80211_QOS_HAS_SEQ(wh)) {
-		qos = *(uint16_t *)ieee80211_getqos(wh);
-		if (IEEE80211_IS_DSTODS(wh))
+		if (IEEE80211_IS_DSTODS(wh)) {
+			qos = *(uint16_t *)
+			    (((struct ieee80211_qosframe_addr4 *) wh)->i_qos);
 			copyhdrlen -= sizeof(qos);
+		} else
+			qos = *(uint16_t *)
+			    (((struct ieee80211_qosframe *) wh)->i_qos);
 	} else
 		qos = 0;
 
@@ -1945,6 +1952,7 @@ malo_rx_proc(void *arg, int npending)
 	struct malo_rxdesc *ds;
 	struct mbuf *m, *mnew;
 	struct ieee80211_qosframe *wh;
+	struct ieee80211_qosframe_addr4 *wh4;
 	struct ieee80211_node *ni;
 	int off, len, hdrlen, pktlen, rssi, ntodo;
 	uint8_t *data, status;
@@ -2054,8 +2062,15 @@ malo_rx_proc(void *arg, int npending)
 		/* NB: don't need to do this sometimes but ... */
 		/* XXX special case so we can memcpy after m_devget? */
 		ovbcopy(data + sizeof(uint16_t), wh, hdrlen);
-		if (IEEE80211_QOS_HAS_SEQ(wh))
-			*(uint16_t *)ieee80211_getqos(wh) = ds->qosctrl;
+		if (IEEE80211_QOS_HAS_SEQ(wh)) {
+			if (IEEE80211_IS_DSTODS(wh)) {
+				wh4 = mtod(m,
+				    struct ieee80211_qosframe_addr4*);
+				*(uint16_t *)wh4->i_qos = ds->qosctrl;
+			} else {
+				*(uint16_t *)wh->i_qos = ds->qosctrl;
+			}
+		}
 		if (ieee80211_radiotap_active(ic)) {
 			sc->malo_rx_th.wr_flags = 0;
 			sc->malo_rx_th.wr_rate = ds->rate;

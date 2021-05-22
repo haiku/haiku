@@ -472,8 +472,6 @@ static const u_int chanflags[IEEE80211_MODE_MAX] = {
 	/* check legacy */
 	[IEEE80211_MODE_11NA]	  = IEEE80211_CHAN_A,
 	[IEEE80211_MODE_11NG]	  = IEEE80211_CHAN_G,
-	[IEEE80211_MODE_VHT_5GHZ] = IEEE80211_CHAN_A,
-	[IEEE80211_MODE_VHT_2GHZ] = IEEE80211_CHAN_G,
 };
 
 static void
@@ -496,15 +494,12 @@ add_channels(struct ieee80211vap *vap,
 		if (c == NULL || isexcluded(vap, c))
 			continue;
 		if (mode == IEEE80211_MODE_AUTO) {
-			KASSERT(IEEE80211_IS_CHAN_B(c),
-			    ("%s: wrong channel for 'auto' mode %u / %u\n",
-			    __func__, c->ic_freq, c->ic_flags));
-
 			/*
 			 * XXX special-case 11b/g channels so we select
 			 *     the g channel if both are present.
 			 */
-			if ((cg = find11gchannel(ic, i, c->ic_freq)) != NULL)
+			if (IEEE80211_IS_CHAN_B(c) &&
+			    (cg = find11gchannel(ic, i, c->ic_freq)) != NULL)
 				c = cg;
 		}
 		ss->ss_chans[ss->ss_last++] = c;
@@ -623,48 +618,32 @@ makescanlist(struct ieee80211_scan_state *ss, struct ieee80211vap *vap,
 	 */
 	for (scan = table; scan->list != NULL; scan++) {
 		mode = scan->mode;
-
-		switch (mode) {
-		case IEEE80211_MODE_11B:
-			if (vap->iv_des_mode == IEEE80211_MODE_11B)
-				break;
-
+		if (vap->iv_des_mode != IEEE80211_MODE_AUTO) {
 			/*
-			 * The scan table marks 2.4Ghz channels as b
-			 * so if the desired mode is 11g / 11ng / 11acg,
-			 * then use the 11b channel list but upgrade the mode.
-			 *
-			 * NB: 11b -> AUTO lets add_channels upgrade an
-			 * 11b channel to 11g if available.
-			 */
-			if (vap->iv_des_mode == IEEE80211_MODE_AUTO ||
-			    vap->iv_des_mode == IEEE80211_MODE_11G ||
-			    vap->iv_des_mode == IEEE80211_MODE_11NG ||
-			    vap->iv_des_mode == IEEE80211_MODE_VHT_2GHZ) {
-				mode = vap->iv_des_mode;
-				break;
-			}
-
-			continue;
-		case IEEE80211_MODE_11A:
-			/* Use 11a channel list for 11na / 11ac modes */
-			if (vap->iv_des_mode == IEEE80211_MODE_11NA ||
-			    vap->iv_des_mode == IEEE80211_MODE_VHT_5GHZ) {
-				mode = vap->iv_des_mode;
-				break;
-			}
-
-			/* FALLTHROUGH */
-		default:
-			/*
-			 * If a desired mode was specified, scan only
+			 * If a desired mode was specified, scan only 
 			 * channels that satisfy that constraint.
 			 */
-			if (vap->iv_des_mode != IEEE80211_MODE_AUTO &&
-			    vap->iv_des_mode != mode)
-				continue;
+			if (vap->iv_des_mode != mode) {
+				/*
+				 * The scan table marks 2.4Ghz channels as b
+				 * so if the desired mode is 11g, then use
+				 * the 11b channel list but upgrade the mode.
+				 */
+				if (vap->iv_des_mode == IEEE80211_MODE_11G) {
+					if (mode == IEEE80211_MODE_11G) /* Skip the G check */
+						continue;
+					else if (mode == IEEE80211_MODE_11B)
+						mode = IEEE80211_MODE_11G;	/* upgrade */
+				}
+			}
+		} else {
+			/*
+			 * This lets add_channels upgrade an 11b channel
+			 * to 11g if available.
+			 */
+			if (mode == IEEE80211_MODE_11B)
+				mode = IEEE80211_MODE_AUTO;
 		}
-
 #ifdef IEEE80211_F_XR
 		/* XR does not operate on turbo channels */
 		if ((vap->iv_flags & IEEE80211_F_XR) &&
@@ -1276,8 +1255,6 @@ sta_pick_bss(struct ieee80211_scan_state *ss, struct ieee80211vap *vap)
 		 * handle notification that this has completed.
 		 */
 		ss->ss_flags &= ~IEEE80211_SCAN_NOPICK;
-		IEEE80211_DPRINTF(vap, IEEE80211_MSG_SCAN,
-		    "%s: nopick; return 1\n", __func__);
 		return 1;
 	}
 	/*
@@ -1287,9 +1264,7 @@ sta_pick_bss(struct ieee80211_scan_state *ss, struct ieee80211vap *vap)
 	/* NB: unlocked read should be ok */
 	if (TAILQ_FIRST(&st->st_entry) == NULL) {
 		IEEE80211_DPRINTF(vap, IEEE80211_MSG_SCAN,
-			"%s: no scan candidate, join=%d, return 0\n",
-			__func__,
-			!! (ss->ss_flags & IEEE80211_SCAN_NOJOIN));
+			"%s: no scan candidate\n", __func__);
 		if (ss->ss_flags & IEEE80211_SCAN_NOJOIN)
 			return 0;
 notfound:
@@ -1314,8 +1289,6 @@ notfound:
 		chan = demote11b(vap, chan);
 	if (!ieee80211_sta_join(vap, chan, &selbs->base))
 		goto notfound;
-	IEEE80211_DPRINTF(vap, IEEE80211_MSG_SCAN,
-	    "%s: terminate scan; return 1\n", __func__);
 	return 1;				/* terminate scan */
 }
 
@@ -1360,14 +1333,12 @@ sta_roam_check(struct ieee80211_scan_state *ss, struct ieee80211vap *vap)
 	mode = ieee80211_chan2mode(ic->ic_bsschan);
 	roamRate = vap->iv_roamparms[mode].rate;
 	roamRssi = vap->iv_roamparms[mode].rssi;
-	KASSERT(roamRate != 0 && roamRssi != 0, ("iv_roamparms are not"
-	    "initialized for %s mode!", ieee80211_phymode_name[mode]));
-
 	ucastRate = vap->iv_txparms[mode].ucastrate;
 	/* NB: the most up to date rssi is in the node, not the scan cache */
 	curRssi = ic->ic_node_getrssi(ni);
 	if (ucastRate == IEEE80211_FIXED_RATE_NONE) {
 		curRate = ni->ni_txrate;
+		roamRate &= IEEE80211_RATE_VAL;
 		IEEE80211_DPRINTF(vap, IEEE80211_MSG_ROAM,
 		    "%s: currssi %d currate %u roamrssi %d roamrate %u\n",
 		    __func__, curRssi, curRate, roamRssi, roamRate);
@@ -1556,7 +1527,7 @@ static int
 adhoc_start(struct ieee80211_scan_state *ss, struct ieee80211vap *vap)
 {
 	struct sta_table *st = ss->ss_priv;
-
+	
 	makescanlist(ss, vap, adhocScanTable);
 
 	if (ss->ss_mindwell == 0)

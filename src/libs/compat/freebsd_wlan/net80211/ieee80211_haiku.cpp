@@ -79,39 +79,6 @@ do {														\
 static net_notifications_module_info* sNotificationModule;
 
 
-/*
- * priv(9) NET80211 checks.
- * Return 0 if operation is allowed, E* (usually EPERM) otherwise.
- */
-int
-ieee80211_priv_check_vap_getkey(u_long cmd __unused,
-     struct ieee80211vap *vap __unused, struct ifnet *ifp __unused)
-{
-	return 0;
-}
-
-int
-ieee80211_priv_check_vap_manage(u_long cmd __unused,
-     struct ieee80211vap *vap __unused, struct ifnet *ifp __unused)
-{
-	return 0;
-}
-
-int
-ieee80211_priv_check_vap_setmac(u_long cmd __unused,
-     struct ieee80211vap *vap __unused, struct ifnet *ifp __unused)
-{
-	return 0;
-}
-
-int
-ieee80211_priv_check_create_vap(u_long cmd __unused,
-    struct ieee80211vap *vap __unused, struct ifnet *ifp __unused)
-{
-	return 0;
-}
-
-
 static struct ifnet*
 get_ifnet(device_t device, int& i)
 {
@@ -315,55 +282,6 @@ ieee80211_getmgtframe(uint8_t **frm, int headroom, int pktlen)
 		*frm = (uint8_t*)m->m_data;
 	}
 	return m;
-}
-
-
-int
-ieee80211_com_vincref(struct ieee80211vap *vap)
-{
-	uint32_t ostate;
-
-	ostate = atomic_fetchadd_32(&vap->iv_com_state, IEEE80211_COM_REF_ADD);
-
-	if (ostate & IEEE80211_COM_DETACHED) {
-		atomic_subtract_32(&vap->iv_com_state, IEEE80211_COM_REF_ADD);
-		return (ENETDOWN);
-	}
-
-	if (_IEEE80211_MASKSHIFT(ostate, IEEE80211_COM_REF) ==
-	    IEEE80211_COM_REF_MAX) {
-		atomic_subtract_32(&vap->iv_com_state, IEEE80211_COM_REF_ADD);
-		return (EOVERFLOW);
-	}
-
-	return (0);
-}
-
-
-void
-ieee80211_com_vdecref(struct ieee80211vap *vap)
-{
-	uint32_t ostate;
-
-	ostate = atomic_fetchadd_32(&vap->iv_com_state, -IEEE80211_COM_REF_ADD);
-
-	KASSERT(_IEEE80211_MASKSHIFT(ostate, IEEE80211_COM_REF) != 0,
-	    ("com reference counter underflow"));
-
-	(void) ostate;
-}
-
-
-void
-ieee80211_com_vdetach(struct ieee80211vap *vap)
-{
-	int sleep_time;
-
-	sleep_time = msecs_to_ticks(250);
-	atomic_set_32(&vap->iv_com_state, IEEE80211_COM_DETACHED);
-	while (_IEEE80211_MASKSHIFT(atomic_load_32(&vap->iv_com_state),
-	    IEEE80211_COM_REF) != 0)
-		pause("comref", sleep_time);
 }
 
 
@@ -665,68 +583,6 @@ ieee80211_parent_xmitpkt(struct ieee80211com *ic, struct mbuf *m)
 
 
 /*
- * Fetch the VAP name.
- *
- * This returns a const char pointer suitable for debugging,
- * but don't expect it to stick around for much longer.
- */
-const char *
-ieee80211_get_vap_ifname(struct ieee80211vap *vap)
-{
-	if (vap->iv_ifp == NULL)
-		return "(none)";
-	return vap->iv_ifp->if_xname;
-}
-
-#ifdef DEBUGNET
-static void
-ieee80211_debugnet_init(struct ifnet *ifp, int *nrxr, int *ncl, int *clsize)
-{
-	struct ieee80211vap *vap;
-	struct ieee80211com *ic;
-
-	vap = if_getsoftc(ifp);
-	ic = vap->iv_ic;
-
-	IEEE80211_LOCK(ic);
-	ic->ic_debugnet_meth->dn8_init(ic, nrxr, ncl, clsize);
-	IEEE80211_UNLOCK(ic);
-}
-
-static void
-ieee80211_debugnet_event(struct ifnet *ifp, enum debugnet_ev ev)
-{
-	struct ieee80211vap *vap;
-	struct ieee80211com *ic;
-
-	vap = if_getsoftc(ifp);
-	ic = vap->iv_ic;
-
-	IEEE80211_LOCK(ic);
-	ic->ic_debugnet_meth->dn8_event(ic, ev);
-	IEEE80211_UNLOCK(ic);
-}
-
-static int
-ieee80211_debugnet_transmit(struct ifnet *ifp, struct mbuf *m)
-{
-	return (ieee80211_vap_transmit(ifp, m));
-}
-
-static int
-ieee80211_debugnet_poll(struct ifnet *ifp, int count)
-{
-	struct ieee80211vap *vap;
-	struct ieee80211com *ic;
-
-	vap = if_getsoftc(ifp);
-	ic = vap->iv_ic;
-
-	return (ic->ic_debugnet_meth->dn8_poll(ic, count));
-}
-#endif
-
-/*
  * Transmit a frame to the VAP interface.
  */
 int
@@ -926,13 +782,6 @@ ieee80211_notify_country(struct ieee80211vap* vap,
 
 void
 ieee80211_notify_radio(struct ieee80211com* ic, int state)
-{
-	dprintf("%s not implemented, yet.\n", __func__);
-}
-
-
-void
-ieee80211_notify_ifnet_change(struct ieee80211vap *vap)
 {
 	dprintf("%s not implemented, yet.\n", __func__);
 }

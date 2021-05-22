@@ -65,7 +65,6 @@ __FBSDID("$FreeBSD: releng/12.0/sys/net80211/ieee80211_hostap.c 326272 2017-11-2
 #endif
 #include <net80211/ieee80211_wds.h>
 #include <net80211/ieee80211_vht.h>
-#include <net80211/ieee80211_sta.h> /* for parse_wmeie */
 
 #define	IEEE80211_RATE2MBS(r)	(((r) & IEEE80211_RATE_VAL) / 2)
 
@@ -206,9 +205,8 @@ hostap_newstate(struct ieee80211vap *vap, enum ieee80211_state nstate, int arg)
 			 * state and the timeout routines check if the flag
 			 * is set before doing anything so this is sufficient.
 			 */
-			vap->iv_flags_ext &= ~IEEE80211_FEXT_NONERP_PR;
-			vap->iv_flags_ht &= ~IEEE80211_FHT_NONHT_PR;
-			/* XXX TODO: schedule deferred update? */
+			ic->ic_flags_ext &= ~IEEE80211_FEXT_NONERP_PR;
+			ic->ic_flags_ht &= ~IEEE80211_FHT_NONHT_PR;
 			/* fall thru... */
 		case IEEE80211_S_CAC:
 			/*
@@ -710,9 +708,11 @@ hostap_input(struct ieee80211_node *ni, struct mbuf *m,
 		/*
 		 * Save QoS bits for use below--before we strip the header.
 		 */
-		if (subtype == IEEE80211_FC0_SUBTYPE_QOS)
-			qos = ieee80211_getqos(wh)[0];
-		else
+		if (subtype == IEEE80211_FC0_SUBTYPE_QOS) {
+			qos = (dir == IEEE80211_FC1_DIR_DSTODS) ?
+			    ((struct ieee80211_qosframe_addr4 *)wh)->i_qos[0] :
+			    ((struct ieee80211_qosframe *)wh)->i_qos[0];
+		} else
 			qos = 0;
 
 		/*
@@ -1637,7 +1637,7 @@ ieee80211_deliver_l2uf(struct ieee80211_node *ni)
 	struct mbuf *m;
 	struct l2_update_frame *l2uf;
 	struct ether_header *eh;
-
+	
 	m = m_gethdr(M_NOWAIT, MT_DATA);
 	if (m == NULL) {
 		IEEE80211_NOTE(vap, IEEE80211_MSG_ASSOC, ni,
@@ -1652,14 +1652,14 @@ ieee80211_deliver_l2uf(struct ieee80211_node *ni)
 	/* src: associated STA */
 	IEEE80211_ADDR_COPY(eh->ether_shost, ni->ni_macaddr);
 	eh->ether_type = htons(sizeof(*l2uf) - sizeof(*eh));
-
+	
 	l2uf->dsap = 0;
 	l2uf->ssap = 0;
 	l2uf->control = 0xf5;
 	l2uf->xid[0] = 0x81;
 	l2uf->xid[1] = 0x80;
 	l2uf->xid[2] = 0x00;
-
+	
 	m->m_pkthdr.len = m->m_len = sizeof(*l2uf);
 	hostap_deliver_data(vap, ni, m);
 }
@@ -1813,13 +1813,10 @@ hostap_recv_mgmt(struct ieee80211_node *ni, struct mbuf *m0,
 		    scan.status == 0 &&			/* NB: on-channel */
 		    ((scan.erp & 0x100) == 0 ||		/* NB: no ERP, 11b sta*/
 		     (scan.erp & IEEE80211_ERP_NON_ERP_PRESENT))) {
-			vap->iv_lastnonerp = ticks;
-			vap->iv_flags_ext |= IEEE80211_FEXT_NONERP_PR;
-			/*
-			 * XXX TODO: this may need to check all VAPs?
-			 */
-			if (vap->iv_protmode != IEEE80211_PROT_NONE &&
-			    (vap->iv_flags & IEEE80211_F_USEPROT) == 0) {
+			ic->ic_lastnonerp = ticks;
+			ic->ic_flags_ext |= IEEE80211_FEXT_NONERP_PR;
+			if (ic->ic_protmode != IEEE80211_PROT_NONE &&
+			    (ic->ic_flags & IEEE80211_F_USEPROT) == 0) {
 				IEEE80211_NOTE_FRAME(vap,
 				    IEEE80211_MSG_ASSOC, wh,
 				    "non-ERP present on channel %d "
@@ -1827,8 +1824,8 @@ hostap_recv_mgmt(struct ieee80211_node *ni, struct mbuf *m0,
 				    "enable use of protection",
 				    ic->ic_curchan->ic_ieee,
 				    scan.erp, scan.chan);
-				vap->iv_flags |= IEEE80211_F_USEPROT;
-				ieee80211_vap_update_erp_protmode(vap);
+				ic->ic_flags |= IEEE80211_F_USEPROT;
+				ieee80211_notify_erp(ic);
 			}
 		}
 		/* 
@@ -1848,12 +1845,12 @@ hostap_recv_mgmt(struct ieee80211_node *ni, struct mbuf *m0,
 					break;
 			}
 			if (scan.htinfo == NULL) {
-				ieee80211_htprot_update(vap,
+				ieee80211_htprot_update(ic,
 				    IEEE80211_HTINFO_OPMODE_PROTOPT |
 				    IEEE80211_HTINFO_NONHT_PRESENT);
 			} else if (ishtmixed(scan.htinfo)) {
 				/* XXX? take NONHT_PRESENT from beacon? */
-				ieee80211_htprot_update(vap,
+				ieee80211_htprot_update(ic,
 				    IEEE80211_HTINFO_OPMODE_MIXED |
 				    IEEE80211_HTINFO_NONHT_PRESENT);
 			}
@@ -2258,18 +2255,8 @@ hostap_recv_mgmt(struct ieee80211_node *ni, struct mbuf *m0,
 				 * Mark node as capable of QoS.
 				 */
 				ni->ni_flags |= IEEE80211_NODE_QOS;
-				if (ieee80211_parse_wmeie(wme, wh, ni) > 0) {
-					if (ni->ni_uapsd != 0)
-						ni->ni_flags |=
-						    IEEE80211_NODE_UAPSD;
-					else
-						ni->ni_flags &=
-						    ~IEEE80211_NODE_UAPSD;
-				}
 			} else
-				ni->ni_flags &=
-				    ~(IEEE80211_NODE_QOS |
-				      IEEE80211_NODE_UAPSD);
+				ni->ni_flags &= ~IEEE80211_NODE_QOS;
 #ifdef IEEE80211_SUPPORT_SUPERG
 			if (ath != NULL) {
 				setie(ath_ie, ath - sfrm);
@@ -2283,7 +2270,6 @@ hostap_recv_mgmt(struct ieee80211_node *ni, struct mbuf *m0,
 #undef setie
 		} else {
 			ni->ni_flags &= ~IEEE80211_NODE_QOS;
-			ni->ni_flags &= ~IEEE80211_NODE_UAPSD;
 			ni->ni_ath_flags = 0;
 		}
 		ieee80211_node_join(ni, resp);

@@ -47,25 +47,7 @@ extern "C" {
 #include <sys/mutex.h>
 #include <sys/sysctl.h>
 #include <sys/taskqueue.h>
-#include <sys/time.h>
 
-
-#ifdef DEBUGNET
-#include <net/debugnet.h>
-#endif
-
-/*
- * priv(9) NET80211 checks.
- */
-struct ieee80211vap;
-int ieee80211_priv_check_vap_getkey(u_long, struct ieee80211vap *,
-    struct ifnet *);
-int ieee80211_priv_check_vap_manage(u_long, struct ieee80211vap *,
-    struct ifnet *);
-int ieee80211_priv_check_vap_setmac(u_long, struct ieee80211vap *,
-    struct ifnet *);
-int ieee80211_priv_check_create_vap(u_long, struct ieee80211vap *,
-    struct ifnet *);
 
 /*
  * Common state locking definitions.
@@ -262,11 +244,6 @@ typedef struct mtx ieee80211_rt_lock_t;
  */
 #include <machine/atomic.h>
 
-struct ieee80211vap;
-int	ieee80211_com_vincref(struct ieee80211vap *);
-void	ieee80211_com_vdecref(struct ieee80211vap *);
-void	ieee80211_com_vdetach(struct ieee80211vap *);
-
 #define ieee80211_node_initref(_ni) \
 	do { ((_ni)->ni_refcnt = 1); } while (0)
 #define ieee80211_node_incref(_ni) \
@@ -278,11 +255,11 @@ int	ieee80211_node_dectestref(struct ieee80211_node *ni);
 #define	ieee80211_node_refcnt(_ni)	(_ni)->ni_refcnt
 
 struct ifqueue;
+struct ieee80211vap;
 void	ieee80211_drain_ifq(struct ifqueue *);
 void	ieee80211_flush_ifq(struct ifqueue *, struct ieee80211vap *);
 
 void	ieee80211_vap_destroy(struct ieee80211vap *);
-const char *	ieee80211_get_vap_ifname(struct ieee80211vap *);
 
 #define	IFNET_IS_UP_RUNNING(_ifp) \
 	(((_ifp)->if_flags & IFF_UP) && \
@@ -292,9 +269,9 @@ const char *	ieee80211_get_vap_ifname(struct ieee80211vap *);
 #define	ticks_to_msecs(t)	TICKS_2_MSEC(t)
 #define	ticks_to_secs(t)	((t) / hz)
 
-#define ieee80211_time_after(a,b) 	((int)(b) - (int)(a) < 0)
+#define ieee80211_time_after(a,b) 	((long)(b) - (long)(a) < 0)
 #define ieee80211_time_before(a,b)	ieee80211_time_after(b,a)
-#define ieee80211_time_after_eq(a,b)	((int)(a) - (int)(b) >= 0)
+#define ieee80211_time_after_eq(a,b)	((long)(a) - (long)(b) >= 0)
 #define ieee80211_time_before_eq(a,b)	ieee80211_time_after_eq(b,a)
 
 struct mbuf *ieee80211_getmgtframe(uint8_t **frm, int headroom, int pktlen);
@@ -448,35 +425,6 @@ typedef int ieee80211_ioctl_setfunc(struct ieee80211vap *,
     struct ieee80211req *);
 SET_DECLARE(ieee80211_ioctl_setset, ieee80211_ioctl_setfunc);
 #define	IEEE80211_IOCTL_SET(_name, _set) TEXT_SET(ieee80211_ioctl_setset, _set)
-
-#ifdef DEBUGNET
-typedef void debugnet80211_init_t(struct ieee80211com *, int *nrxr, int *ncl,
-    int *clsize);
-typedef void debugnet80211_event_t(struct ieee80211com *, enum debugnet_ev);
-typedef int debugnet80211_poll_t(struct ieee80211com *, int);
-
-struct debugnet80211_methods {
-	debugnet80211_init_t		*dn8_init;
-	debugnet80211_event_t		*dn8_event;
-	debugnet80211_poll_t		*dn8_poll;
-};
-
-#define	DEBUGNET80211_DEFINE(driver)					\
-	static debugnet80211_init_t driver##_debugnet80211_init;		\
-	static debugnet80211_event_t driver##_debugnet80211_event;	\
-	static debugnet80211_poll_t driver##_debugnet80211_poll;		\
-									\
-	static struct debugnet80211_methods driver##_debugnet80211_methods = { \
-		.dn8_init = driver##_debugnet80211_init,			\
-		.dn8_event = driver##_debugnet80211_event,		\
-		.dn8_poll = driver##_debugnet80211_poll,			\
-	}
-#define DEBUGNET80211_SET(ic, driver)					\
-	(ic)->ic_debugnet_meth = &driver##_debugnet80211_methods
-#else
-#define DEBUGNET80211_DEFINE(driver)
-#define DEBUGNET80211_SET(ic, driver)
-#endif /* DEBUGNET */
 
 /*
  * Structure prepended to raw packets sent through the bpf

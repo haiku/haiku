@@ -82,6 +82,10 @@ __FBSDID("$FreeBSD: releng/12.0/sys/dev/mwl/if_mwl.c 331797 2018-03-30 18:50:13Z
 #include <dev/mwl/if_mwlvar.h>
 #include <dev/mwl/mwldiag.h>
 
+/* idiomatic shorthands: MS = mask+shift, SM = shift+mask */
+#define	MS(v,x)	(((v) & x) >> x##_S)
+#define	SM(v,x)	(((v) << x##_S) & x)
+
 static struct ieee80211vap *mwl_vap_create(struct ieee80211com *,
 		    const char [IFNAMSIZ], int, enum ieee80211_opmode, int,
 		    const uint8_t [IEEE80211_ADDR_LEN],
@@ -1229,8 +1233,8 @@ mwl_reset_vap(struct ieee80211vap *vap, int state)
 	     vap->iv_opmode == IEEE80211_M_MBSS ||
 	     vap->iv_opmode == IEEE80211_M_IBSS)) {
 		mwl_setapmode(vap, vap->iv_bss->ni_chan);
-		mwl_hal_setnprotmode(hvap, _IEEE80211_MASKSHIFT(
-		    ic->ic_curhtprotmode, IEEE80211_HTINFO_OPMODE));
+		mwl_hal_setnprotmode(hvap,
+		    MS(ic->ic_curhtprotmode, IEEE80211_HTINFO_OPMODE));
 		return mwl_beacon_setup(vap);
 	}
 	return 0;
@@ -1861,8 +1865,8 @@ mwl_beacon_update(struct ieee80211vap *vap, int item)
 		mwl_updateslot(ic);
 		break;
 	case IEEE80211_BEACON_HTINFO:
-		mwl_hal_setnprotmode(hvap, _IEEE80211_MASKSHIFT(
-		    ic->ic_curhtprotmode, IEEE80211_HTINFO_OPMODE));
+		mwl_hal_setnprotmode(hvap,
+		    MS(ic->ic_curhtprotmode, IEEE80211_HTINFO_OPMODE));
 		break;
 	case IEEE80211_BEACON_CAPS:
 	case IEEE80211_BEACON_WME:
@@ -2614,6 +2618,7 @@ mwl_rx_proc(void *arg, int npending)
 	struct mwl_rxdesc *ds;
 	struct mbuf *m;
 	struct ieee80211_qosframe *wh;
+	struct ieee80211_qosframe_addr4 *wh4;
 	struct ieee80211_node *ni;
 	struct mwl_node *mn;
 	int off, len, hdrlen, pktlen, rssi, ntodo;
@@ -2760,8 +2765,15 @@ mwl_rx_proc(void *arg, int npending)
 		/* NB: don't need to do this sometimes but ... */
 		/* XXX special case so we can memcpy after m_devget? */
 		ovbcopy(data + sizeof(uint16_t), wh, hdrlen);
-		if (IEEE80211_QOS_HAS_SEQ(wh))
-			*(uint16_t *)ieee80211_getqos(wh) = ds->QosCtrl;
+		if (IEEE80211_QOS_HAS_SEQ(wh)) {
+			if (IEEE80211_IS_DSTODS(wh)) {
+				wh4 = mtod(m,
+				    struct ieee80211_qosframe_addr4*);
+				*(uint16_t *)wh4->i_qos = ds->QosCtrl;
+			} else {
+				*(uint16_t *)wh->i_qos = ds->QosCtrl;
+			}
+		}
 		/*
 		 * The f/w strips WEP header but doesn't clear
 		 * the WEP bit; mark the packet with M_WEP so
@@ -3039,13 +3051,13 @@ mwl_calcformat(uint8_t rate, const struct ieee80211_node *ni)
 {
 	uint16_t fmt;
 
-	fmt = _IEEE80211_SHIFTMASK(3, EAGLE_TXD_ANTENNA)
+	fmt = SM(3, EAGLE_TXD_ANTENNA)
 	    | (IEEE80211_IS_CHAN_HT40D(ni->ni_chan) ?
 		EAGLE_TXD_EXTCHAN_LO : EAGLE_TXD_EXTCHAN_HI);
 	if (rate & IEEE80211_RATE_MCS) {	/* HT MCS */
 		fmt |= EAGLE_TXD_FORMAT_HT
 		    /* NB: 0x80 implicitly stripped from ucastrate */
-		    | _IEEE80211_SHIFTMASK(rate, EAGLE_TXD_RATE);
+		    | SM(rate, EAGLE_TXD_RATE);
 		/* XXX short/long GI may be wrong; re-check */
 		if (IEEE80211_IS_CHAN_HT40(ni->ni_chan)) {
 			fmt |= EAGLE_TXD_CHW_40
@@ -3058,8 +3070,7 @@ mwl_calcformat(uint8_t rate, const struct ieee80211_node *ni)
 		}
 	} else {			/* legacy rate */
 		fmt |= EAGLE_TXD_FORMAT_LEGACY
-		    | _IEEE80211_SHIFTMASK(mwl_cvtlegacyrate(rate),
-			EAGLE_TXD_RATE)
+		    | SM(mwl_cvtlegacyrate(rate), EAGLE_TXD_RATE)
 		    | EAGLE_TXD_CHW_20
 		    /* XXX iv_flags & IEEE80211_F_SHPREAMBLE? */
 		    | (ni->ni_capinfo & IEEE80211_CAPINFO_SHORT_PREAMBLE ?
@@ -3093,9 +3104,13 @@ mwl_tx_start(struct mwl_softc *sc, struct ieee80211_node *ni, struct mwl_txbuf *
 	copyhdrlen = hdrlen;
 	pktlen = m0->m_pkthdr.len;
 	if (IEEE80211_QOS_HAS_SEQ(wh)) {
-		qos = *(uint16_t *)ieee80211_getqos(wh);
-		if (IEEE80211_IS_DSTODS(wh))
+		if (IEEE80211_IS_DSTODS(wh)) {
+			qos = *(uint16_t *)
+			    (((struct ieee80211_qosframe_addr4 *) wh)->i_qos);
 			copyhdrlen -= sizeof(qos);
+		} else
+			qos = *(uint16_t *)
+			    (((struct ieee80211_qosframe *) wh)->i_qos);
 	} else
 		qos = 0;
 
@@ -3360,8 +3375,7 @@ mwl_tx_processq(struct mwl_softc *sc, struct mwl_txq *txq)
 			status = le32toh(ds->Status);
 			if (status & EAGLE_TXD_STATUS_OK) {
 				uint16_t Format = le16toh(ds->Format);
-				uint8_t txant = _IEEE80211_MASKSHIFT(Format,
-				    EAGLE_TXD_ANTENNA);
+				uint8_t txant = MS(Format, EAGLE_TXD_ANTENNA);
 
 				sc->sc_stats.mst_ant_tx[txant]++;
 				if (status & EAGLE_TXD_STATUS_OK_RETRY)
@@ -3370,8 +3384,7 @@ mwl_tx_processq(struct mwl_softc *sc, struct mwl_txq *txq)
 					sc->sc_stats.mst_tx_mretries++;
 				if (txq->qnum >= MWL_WME_AC_VO)
 					ic->ic_wme.wme_hipri_traffic++;
-				ni->ni_txrate = _IEEE80211_MASKSHIFT(Format,
-				    EAGLE_TXD_RATE);
+				ni->ni_txrate = MS(Format, EAGLE_TXD_RATE);
 				if ((Format & EAGLE_TXD_FORMAT_HT) == 0) {
 					ni->ni_txrate = mwl_cvtlegacyrix(
 					    ni->ni_txrate);
@@ -3554,8 +3567,7 @@ mwl_recv_action(struct ieee80211_node *ni, const struct ieee80211_frame *wh,
 
 		mwl_hal_setmimops(sc->sc_mh, ni->ni_macaddr,
 		    mps->am_control & IEEE80211_A_HT_MIMOPWRSAVE_ENA,
-		    _IEEE80211_MASKSHIFT(mps->am_control,
-			IEEE80211_A_HT_MIMOPWRSAVE_MODE));
+		    MS(mps->am_control, IEEE80211_A_HT_MIMOPWRSAVE_MODE));
 		return 0;
 	} else
 		return sc->sc_recv_action(ni, wh, frm, efrm);
@@ -3658,7 +3670,7 @@ mwl_addba_response(struct ieee80211_node *ni, struct ieee80211_tx_ampdu *tap,
 		 * we know resources are available because we
 		 * pre-allocated one before forming the request.
 		 */
-		bufsiz = _IEEE80211_MASKSHIFT(baparamset, IEEE80211_BAPS_BUFSIZ);
+		bufsiz = MS(baparamset, IEEE80211_BAPS_BUFSIZ);
 		if (bufsiz == 0)
 			bufsiz = IEEE80211_AGGR_BAWMAX;
 		error = mwl_hal_bastream_create(MWL_VAP(vap)->mv_hvap,

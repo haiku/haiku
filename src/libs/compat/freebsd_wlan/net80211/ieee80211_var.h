@@ -134,8 +134,6 @@ struct ieee80211_rx_ampdu;
 struct ieee80211_superg;
 struct ieee80211_frame;
 
-struct net80211dump_methods;
-
 struct ieee80211com {
 	void			*ic_softc;	/* driver softc */
 	const char		*ic_name;	/* usually device name */
@@ -235,11 +233,17 @@ struct ieee80211com {
 	/* XXX multi-bss: split out common/vap parts */
 	struct ieee80211_wme_state ic_wme;	/* WME/WMM state */
 
-	/* Protection mode for net80211 driven channel NICs */
+	/* XXX multi-bss: can per-vap be done/make sense? */
 	enum ieee80211_protmode	ic_protmode;	/* 802.11g protection mode */
-	enum ieee80211_protmode	ic_htprotmode;	/* HT protection mode */
+	uint16_t		ic_nonerpsta;	/* # non-ERP stations */
+	uint16_t		ic_longslotsta;	/* # long slot time stations */
+	uint16_t		ic_sta_assoc;	/* stations associated */
+	uint16_t		ic_ht_sta_assoc;/* HT stations associated */
+	uint16_t		ic_ht40_sta_assoc;/* HT40 stations associated */
 	uint8_t			ic_curhtprotmode;/* HTINFO bss state */
-
+	enum ieee80211_protmode	ic_htprotmode;	/* HT protection mode */
+	int			ic_lastnonerp;	/* last time non-ERP sta noted*/
+	int			ic_lastnonht;	/* last time non-HT sta noted */
 	uint8_t			ic_rxstream;    /* # RX streams */
 	uint8_t			ic_txstream;    /* # TX streams */
 
@@ -306,22 +310,11 @@ struct ieee80211com {
 	/* TDMA update notification */
 	void			(*ic_tdma_update)(struct ieee80211_node *,
 				    const struct ieee80211_tdma_param *, int);
-
-	/* Node state management */
-
-	/* Allocate a new node */
+	/* node state management */
 	struct ieee80211_node*	(*ic_node_alloc)(struct ieee80211vap *,
 				    const uint8_t [IEEE80211_ADDR_LEN]);
-
-	/* Driver node initialisation after net80211 setup */
-	int			(*ic_node_init)(struct ieee80211_node *);
-
-	/* Driver node deallocation */
 	void			(*ic_node_free)(struct ieee80211_node *);
-
-	/* Driver node state cleanup before deallocation */
 	void			(*ic_node_cleanup)(struct ieee80211_node *);
-
 	void			(*ic_node_age)(struct ieee80211_node *);
 	void			(*ic_node_drain)(struct ieee80211_node *);
 	int8_t			(*ic_node_getrssi)(const struct ieee80211_node*);
@@ -379,7 +372,6 @@ struct ieee80211com {
 	/* The channel width has changed (20<->2040) */
 	void			(*ic_update_chw)(struct ieee80211com *);
 
-	const struct debugnet80211_methods	*ic_debugnet_meth;
 	uint64_t		ic_spare[7];
 };
 
@@ -387,8 +379,6 @@ struct ieee80211_aclator;
 struct ieee80211_tdma_state;
 struct ieee80211_mesh_state;
 struct ieee80211_hwmp_state;
-struct ieee80211_rx_histogram;
-struct ieee80211_tx_histogram;
 
 struct ieee80211vap {
 	struct ifmedia		iv_media;	/* interface media config */
@@ -412,7 +402,6 @@ struct ieee80211vap {
 	uint32_t		iv_caps;	/* capabilities */
 	uint32_t		iv_htcaps;	/* HT capabilities */
 	uint32_t		iv_htextcaps;	/* HT extended capabilities */
-	uint32_t		iv_com_state;	/* com usage / detached flag */
 	enum ieee80211_opmode	iv_opmode;	/* operation mode */
 	enum ieee80211_state	iv_state;	/* state machine state */
 	enum ieee80211_state	iv_nstate;	/* pending state */
@@ -575,38 +564,6 @@ struct ieee80211vap {
 				    const struct wmeParams *wme_params);
 	struct task		iv_wme_task;	/* deferred VAP WME update */
 
-	/* associated state; protection mode */
-	enum ieee80211_protmode	iv_protmode;	/* 802.11g protection mode */
-	enum ieee80211_protmode	iv_htprotmode;	/* HT protection mode */
-	uint8_t			iv_curhtprotmode;/* HTINFO bss state */
-
-	uint16_t		iv_nonerpsta;	/* # non-ERP stations */
-	uint16_t		iv_longslotsta;	/* # long slot time stations */
-	uint16_t		iv_ht_sta_assoc;/* HT stations associated */
-	uint16_t		iv_ht40_sta_assoc;/* HT40 stations associated */
-	int			iv_lastnonerp;	/* last time non-ERP sta noted*/
-	int			iv_lastnonht;	/* last time non-HT sta noted */
-
-	/* update device state for 802.11 slot time change */
-	void			(*iv_updateslot)(struct ieee80211vap *);
-	struct task		iv_slot_task;	/* deferred slot time update */
-
-	struct task		iv_erp_protmode_task;	/* deferred ERP protmode update */
-	void			(*iv_erp_protmode_update)(struct ieee80211vap *);
-
-	struct task		iv_preamble_task;	/* deferred short/barker preamble update */
-	void			(*iv_preamble_update)(struct ieee80211vap *);
-
-	struct task		iv_ht_protmode_task;	/* deferred HT protmode update */
-	void			(*iv_ht_protmode_update)(struct ieee80211vap *);
-
-	/* per-vap U-APSD state */
-	uint8_t			iv_uapsdinfo;	/* sta mode QoS Info flags */
-
-	/* Optional transmit/receive histogram statistics */
-	struct ieee80211_rx_histogram	*rx_histogram;
-	struct ieee80211_tx_histogram	*tx_histogram;
-
 	uint64_t		iv_spare[6];
 };
 MALLOC_DECLARE(M_80211_VAP);
@@ -688,7 +645,6 @@ MALLOC_DECLARE(M_80211_VAP);
 #define	IEEE80211_FEXT_FRAG_OFFLOAD	0x00200000	/* CONF: hardware does 802.11 fragmentation + assignment */
 #define	IEEE80211_FEXT_VHT	0x00400000	/* CONF: VHT support */
 #define	IEEE80211_FEXT_QUIET_IE	0x00800000	/* STATUS: quiet IE in a beacon has been added */
-#define	IEEE80211_FEXT_UAPSD	0x01000000	/* CONF: enable U-APSD */
 
 #define	IEEE80211_FEXT_BITS \
 	"\20\2INACT\3SCANWAIT\4BGSCAN\5WPS\6TSN\7SCANREQ\10RESUME" \
@@ -726,20 +682,10 @@ MALLOC_DECLARE(M_80211_VAP);
 #define	IEEE80211_FVHT_VHT	0x000000001	/* CONF: VHT supported */
 #define	IEEE80211_FVHT_USEVHT40	0x000000002	/* CONF: Use VHT40 */
 #define	IEEE80211_FVHT_USEVHT80	0x000000004	/* CONF: Use VHT80 */
-#define	IEEE80211_FVHT_USEVHT160	0x000000008	/* CONF: Use VHT160 */
-#define	IEEE80211_FVHT_USEVHT80P80	0x000000010	/* CONF: Use VHT 80+80 */
-#define	IEEE80211_FVHT_MASK						\
-	(IEEE80211_FVHT_VHT | IEEE80211_FVHT_USEVHT40 |			\
-	IEEE80211_FVHT_USEVHT80 | IEEE80211_FVHT_USEVHT160 |		\
-	IEEE80211_FVHT_USEVHT80P80)
+#define	IEEE80211_FVHT_USEVHT80P80	0x000000008	/* CONF: Use VHT 80+80 */
+#define	IEEE80211_FVHT_USEVHT160	0x000000010	/* CONF: Use VHT160 */
 #define	IEEE80211_VFHT_BITS \
-	"\20\1VHT\2VHT40\3VHT80\4VHT160\5VHT80P80"
-
-#define	IEEE80211_COM_DETACHED	0x00000001	/* ieee80211_ifdetach called */
-#define	IEEE80211_COM_REF_ADD	0x00000002	/* add / remove reference */
-#define	IEEE80211_COM_REF	0xfffffffe	/* reference counter bits */
-#define	IEEE80211_COM_REF_S	1
-#define	IEEE80211_COM_REF_MAX	(IEEE80211_COM_REF >> IEEE80211_COM_REF_S)
+	"\20\1VHT\2VHT40\3VHT80\4VHT80P80\5VHT160"
 
 int	ic_printf(struct ieee80211com *, const char *, ...) __printflike(2, 3);
 void	ieee80211_ifattach(struct ieee80211com *);
@@ -774,8 +720,6 @@ int	ieee80211_mhz2ieee(u_int, u_int);
 int	ieee80211_chan2ieee(struct ieee80211com *,
 		const struct ieee80211_channel *);
 u_int	ieee80211_ieee2mhz(u_int, u_int);
-int	ieee80211_add_channel_cbw(struct ieee80211_channel[], int, int *,
-	    uint8_t, uint16_t, int8_t, uint32_t, const uint8_t[], int);
 int	ieee80211_add_channel(struct ieee80211_channel[], int, int *,
 	    uint8_t, uint16_t, int8_t, uint32_t, const uint8_t[]);
 int	ieee80211_add_channel_ht40(struct ieee80211_channel[], int, int *,
@@ -783,14 +727,8 @@ int	ieee80211_add_channel_ht40(struct ieee80211_channel[], int, int *,
 uint32_t ieee80211_get_channel_center_freq(const struct ieee80211_channel *);
 uint32_t ieee80211_get_channel_center_freq1(const struct ieee80211_channel *);
 uint32_t ieee80211_get_channel_center_freq2(const struct ieee80211_channel *);
-#define	NET80211_CBW_FLAG_HT40		0x01
-#define	NET80211_CBW_FLAG_VHT80		0x02
-#define	NET80211_CBW_FLAG_VHT160	0x04
-#define	NET80211_CBW_FLAG_VHT80P80	0x08
 int	ieee80211_add_channel_list_2ghz(struct ieee80211_channel[], int, int *,
 	    const uint8_t[], int, const uint8_t[], int);
-int	ieee80211_add_channels_default_2ghz(struct ieee80211_channel[], int,
-	    int *, const uint8_t[], int);
 int	ieee80211_add_channel_list_5ghz(struct ieee80211_channel[], int, int *,
 	    const uint8_t[], int, const uint8_t[], int);
 struct ieee80211_channel *ieee80211_find_channel(struct ieee80211com *,
@@ -932,10 +870,10 @@ static __inline int
 ieee80211_vhtchanflags(const struct ieee80211_channel *c)
 {
 
-	if (IEEE80211_IS_CHAN_VHT80P80(c))
-		return IEEE80211_FVHT_USEVHT80P80;
 	if (IEEE80211_IS_CHAN_VHT160(c))
 		return IEEE80211_FVHT_USEVHT160;
+	if (IEEE80211_IS_CHAN_VHT80_80(c))
+		return IEEE80211_FVHT_USEVHT80P80;
 	if (IEEE80211_IS_CHAN_VHT80(c))
 		return IEEE80211_FVHT_USEVHT80;
 	if (IEEE80211_IS_CHAN_VHT40(c))
@@ -1016,10 +954,6 @@ ieee80211_get_node_txpower(struct ieee80211_node *ni)
 	"\13WME\14ACL\15WPA\16RADKEYS\17RADDUMP\20RADIUS\21DOT1XSM\22HWMP" \
 	"\23POWER\24STATE\25OUTPUT\26SCAN\27AUTH\30ASSOC\31NODE\32ELEMID" \
 	"\33XRATE\34INPUT\35CRYPTO\36DUPMPKTS\37DEBUG\04011N"
-
-/* Helper macros unified. */
-#define	_IEEE80211_MASKSHIFT(_v, _f)	(((_v) & _f) >> _f##_S)
-#define	_IEEE80211_SHIFTMASK(_v, _f)	(((_v) << _f##_S) & _f)
 
 #ifdef IEEE80211_DEBUG
 #define	ieee80211_msg(_vap, _m)	((_vap)->iv_debug & (_m))

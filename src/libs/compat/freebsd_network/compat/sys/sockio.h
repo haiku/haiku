@@ -13,6 +13,4 @@
 
 #define SIOCSIFCAP	SIOCSPACKETCAP
 
-#define SIOCSIFLLADDR			8950	/* set linklevel addr */
-
 #endif
