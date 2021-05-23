@@ -214,21 +214,12 @@ CachedDataReader::_ReadCacheLine(off_t lineOffset, size_t lineSize,
 
 	cacheLocker.Unlock();
 
-	// Determine whether or not we need to allocate (and read in) pages.
-	bool skipPageAllocation = true;
 	if (missingPages > 0) {
-		// If the missing page range does not intersect with the request,
-		// then we can skip allocating pages.
-		page_num_t requestPageOffset = requestOffset / B_PAGE_SIZE;
-		page_num_t requestPageCount =
-			(requestLength + B_PAGE_SIZE - 1) / B_PAGE_SIZE;
+// TODO: If the missing pages range doesn't intersect with the request, just
+// satisfy the request and don't read anything at all.
+		// There are pages of the cache line missing. We have to allocate fresh
+		// ones.
 
-		skipPageAllocation =
-			(firstMissing >= (requestPageOffset + requestPageCount))
-			|| (lastMissing < requestPageOffset);
-	}
-
-	if (!skipPageAllocation) {
 		// reserve
 		vm_page_reservation reservation;
 		if (!vm_page_try_reserve_pages(&reservation, missingPages,

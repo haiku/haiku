@@ -316,25 +316,12 @@ IOCache::_TransferRequestLine(IORequest* request, off_t lineOffset,
 
 	bool isVIP = (request->Flags() & B_VIP_IO_REQUEST) != 0;
 
-	// Determine whether or not we need to allocate (and read in) pages.
-	bool skipPageAllocation;
-	if (missingPages == 0) {
-		// Well, obviously we don't in this case!
-		skipPageAllocation = true;
-	} else if (missingPages > 0 && request->IsRead()) {
-		// If this is a read request and the missing page range does not
-		// intersect with the request, then we can skip allocating pages.
-		page_num_t requestPageOffset = requestOffset / B_PAGE_SIZE;
-		page_num_t requestPageCount
-			= (requestLength + B_PAGE_SIZE - 1) / B_PAGE_SIZE;
+	if (missingPages > 0) {
+// TODO: If this is a read request and the missing pages range doesn't intersect
+// with the request, just satisfy the request and don't read anything at all.
+		// There are pages of the cache line missing. We have to allocate fresh
+		// ones.
 
-		skipPageAllocation
-			= (firstMissing >= (requestPageOffset + requestPageCount))
-			|| (lastMissing < requestPageOffset);
-	} else
-		skipPageAllocation = false;
-
-	if (!skipPageAllocation) {
 		// reserve
 		vm_page_reservation reservation;
 		if (!vm_page_try_reserve_pages(&reservation, missingPages,
