@@ -289,7 +289,13 @@ remap_frame_buffer(vesa_info& info, addr_t physicalBase, uint32 width,
 	if (!info.complete_frame_buffer_mapped) {
 		addr_t base = physicalBase;
 		size_t size = bytesPerRow * height;
+
+#ifdef __riscv
+		// HACK: Prevent NULL framebuffer pointers from getting to userland
+		bool remap = true;
+#else
 		bool remap = !initializing;
+#endif
 
 		if (info.physical_frame_buffer_size != 0) {
 			// we can map the complete frame buffer
@@ -459,6 +465,7 @@ vesa_set_display_mode(vesa_info& info, uint32 mode)
 	status = remap_frame_buffer(info, modeInfo.physical_base, modeInfo.width,
 		modeInfo.height, modeInfo.bits_per_pixel, modeInfo.bytes_per_row,
 		false);
+
 	if (status == B_OK) {
 		// Update shared frame buffer information
 		info.shared_info->current_mode.virtual_width = modeInfo.width;

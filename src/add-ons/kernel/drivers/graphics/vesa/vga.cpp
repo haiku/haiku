@@ -15,6 +15,10 @@
 status_t
 vga_set_indexed_colors(uint8 first, uint8 *colors, uint16 count)
 {
+	// If we don't actually have an ISA bus, bail.
+	if (gISA == NULL)
+		return B_BAD_ADDRESS;
+
 	if (first + count > 256)
 		count = 256 - first;
 
@@ -39,6 +43,10 @@ status_t
 vga_planar_blit(vesa_shared_info *info, uint8 *src, int32 srcBPR,
 	int32 left, int32 top, int32 right, int32 bottom)
 {
+	// If we don't actually have an ISA bus, bail.
+	if (gISA == NULL)
+		return B_BAD_ADDRESS;
+
 	// If we don't actually have a frame_buffer, bail.
 	if (info->frame_buffer == NULL)
 		return B_BAD_ADDRESS;

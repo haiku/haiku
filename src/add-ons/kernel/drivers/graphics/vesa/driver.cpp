@@ -68,14 +68,19 @@ init_driver(void)
 
 	memset(gDeviceInfo[0], 0, sizeof(vesa_info));
 
-	status_t status = get_module(B_ISA_MODULE_NAME, (module_info**)&gISA);
-	if (status != B_OK)
-		goto err1;
+	status_t status;
+
+	// ISA may not be available on all architectures
+	status = get_module(B_ISA_MODULE_NAME, (module_info**)&gISA);
+	if (status != B_OK) {
+		TRACE((DEVICE_NAME ": ISA bus unavailable\n"));
+		gISA = NULL;
+	}
 
 	gDeviceNames[0] = strdup("graphics/vesa");
 	if (gDeviceNames[0] == NULL) {
 		status = B_NO_MEMORY;
-		goto err2;
+		goto err;
 	}
 
 	gDeviceNames[1] = NULL;
@@ -83,9 +88,8 @@ init_driver(void)
 	mutex_init(&gLock, "vesa lock");
 	return B_OK;
 
-err2:
+err:
 	put_module(B_ISA_MODULE_NAME);
-err1:
 	free(gDeviceInfo[0]);
 	return status;
 }
