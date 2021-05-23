@@ -3,4 +3,5 @@ SubDir HAIKU_TOP src add-ons kernel drivers input ;
 SubInclude HAIKU_TOP src add-ons kernel drivers input i2c_hid ;
 SubInclude HAIKU_TOP src add-ons kernel drivers input ps2_hid ;
 SubInclude HAIKU_TOP src add-ons kernel drivers input usb_hid ;
+SubInclude HAIKU_TOP src add-ons kernel drivers input virtio_input ;
 SubInclude HAIKU_TOP src add-ons kernel drivers input wacom ;
