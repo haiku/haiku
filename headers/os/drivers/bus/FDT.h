@@ -1,45 +1,31 @@
 /*
- * Copyright 2014, Ithamar R. Adema <ithamar@upgrade-android.com>
- * All rights reserved. Distributed under the terms of the MIT License.
+ * Copyright 2020-2021, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
  */
-
 #ifndef _DRIVERS_BUS_FDT_H
 #define _DRIVERS_BUS_FDT_H
 
-#include <bus_manager.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <device_manager.h>
 
-typedef int fdt_device_node;
 
-struct fdt_device_info {
-	const char *compatible;
-	status_t (*init)(struct fdt_module_info *fdt, fdt_device_node node, void *cookie);
+struct fdt_bus;
+struct fdt_device;
+
+struct fdt_bus_module_info {
+	driver_module_info info;
+	device_node* (*node_by_phandle)(fdt_bus* bus, int phandle);
 };
 
-struct fdt_module_info {
-	bus_manager_info binfo;
-
-	// basic call for triggering callbacks for supported devices
-	// scans the whole FDT tree once and calls the info.init function
-	// when a matching device is found.
-	status_t (*setup_devices)(struct fdt_device_info *info, int count, void *cookie);
-
-	// map physical "reg" range "index" of node "node", and return the virtual address in '*_address'
-	// and return the area ID or error if not able to.
-	area_id (*map_reg_range)(fdt_device_node node, int index, void **_address);
-
-	// return entry "index" out of "interrupts" property for node "node", or a negative error code on failure.
-	int (*get_interrupt)(fdt_device_node node, int index);
+struct fdt_device_module_info{
+	driver_module_info info;
+	device_node* (*get_bus)(fdt_device* dev);
+	const char* (*get_name)(fdt_device* dev);
+	const void* (*get_prop)(fdt_device* dev, const char* name, int* len);
+	bool (*get_reg)(fdt_device* dev, uint32 ord, uint64* regs, uint64* len);
+	bool (*get_interrupt)(fdt_device* dev, uint32 ord,
+		device_node** interruptController, uint64* interrupt);
 };
 
-#define B_FDT_MODULE_NAME	"bus_managers/fdt/v1"
-
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif // _DRIVERS_BUS_FDT_H
