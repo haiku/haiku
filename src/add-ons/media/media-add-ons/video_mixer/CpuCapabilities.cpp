@@ -26,6 +26,8 @@ CPUCapabilities::CPUCapabilities()
 	PrintCapabilities();
 }
 
+#ifdef __i386__
+
 void
 CPUCapabilities::setIntelCapabilities()
 {
@@ -84,6 +86,8 @@ CPUCapabilities::setIntelCapabilities()
 		}
 	}
 }
+
+#endif
 
 bool
 CPUCapabilities::HasMMX()
