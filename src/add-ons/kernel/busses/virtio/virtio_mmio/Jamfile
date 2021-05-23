@@ -1,0 +1,11 @@
+SubDir HAIKU_TOP src add-ons kernel busses virtio virtio_mmio ;
+
+SubDirC++Flags -fno-rtti ;
+
+UsePrivateKernelHeaders ;
+UsePrivateHeaders kernel virtio ;
+
+KernelAddon virtio_mmio :
+	virtio_mmio.cpp
+	VirtioDevice.cpp
+;
