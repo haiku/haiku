@@ -138,6 +138,8 @@ private:
 									uint16 interval, uint16 maxPacketSize,
 									usb_speed speed, uint8 maxBurst,
 									uint16 bytesPerInterval);
+			uint8				_GetEndpointState(xhci_endpoint* ep);
+
 			status_t			_InsertEndpointForPipe(Pipe *pipe);
 			status_t			_RemoveEndpointForPipe(Pipe *pipe);
 

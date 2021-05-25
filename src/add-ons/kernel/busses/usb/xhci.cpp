@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2019, Haiku, Inc. All rights reserved.
+ * Copyright 2011-2021, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,6 +8,7 @@
  *		Jérôme Duval <jerome.duval@gmail.com>
  *		Akshay Jaggi <akshay1994.leo@gmail.com>
  *		Michael Lotz <mmlr@mlotz.ch>
+ *		Alexander von Gluck <kallisti5@unixzen.com>
  */
 
 
@@ -969,6 +970,12 @@ XHCI::CancelQueuedTransfers(Pipe *pipe, bool force)
 	// order to avoid a deadlock, we must unlock the endpoint.
 	endpointLocker.Unlock();
 	status_t status = StopEndpoint(false, endpoint);
+	if (status == B_NOT_ALLOWED) {
+		// XHCI 1.2, 4.8.3 Endpoint State Diagram
+		// Only exit from a HALTED state is a reset
+		TRACE_ERROR("cancel queued transfers: halted endpoint. reset!");
+		status = ResetEndpoint(false, endpoint);
+	}
 	endpointLocker.Lock();
 
 	// Detach the head TD from the endpoint.
@@ -1662,6 +1669,16 @@ XHCI::FreeDevice(Device *device)
 	delete_area(fDevices[slot].device_ctx_area);
 
 	memset(&fDevices[slot], 0, sizeof(xhci_device));
+}
+
+
+uint8
+XHCI::_GetEndpointState(xhci_endpoint* endpoint)
+{
+	struct xhci_device_ctx* device_ctx = endpoint->device->device_ctx;
+	return ENDPOINT_0_STATE_GET(
+		_ReadContext(&device_ctx->endpoints[endpoint->id].dwendpoint0));
+
 }
 
 
@@ -2689,6 +2706,16 @@ XHCI::ResetEndpoint(bool preserve, xhci_endpoint* endpoint)
 {
 	TRACE("Reset Endpoint\n");
 
+	switch (_GetEndpointState(endpoint)) {
+		case ENDPOINT_STATE_STOPPED:
+			TRACE("Reset Endpoint: already stopped");
+			return B_OK;
+		case ENDPOINT_STATE_HALTED:
+			TRACE("Reset Endpoint: warning, weird state!");
+		default:
+			break;
+	}
+
 	xhci_trb trb;
 	trb.address = 0;
 	trb.status = 0;
@@ -2705,16 +2732,13 @@ status_t
 XHCI::StopEndpoint(bool suspend, xhci_endpoint* endpoint)
 {
 	TRACE("Stop Endpoint\n");
-	struct xhci_device_ctx* device_ctx = endpoint->device->device_ctx;
 
-	// XHCI 1.2, 4.8.3 Endpoint State Diagram
-	// Only exit from a HALTED state is a reset which will also stop the ep
-	switch (ENDPOINT_0_STATE_GET(_ReadContext(
-			&device_ctx->endpoints[endpoint->id].dwendpoint0))) {
+	switch (_GetEndpointState(endpoint)) {
 		case ENDPOINT_STATE_HALTED:
-			TRACE("Detected XHCI endpoint in halted state. Calling reset.");
-			return ResetEndpoint(false, endpoint);
+			TRACE("Stop Endpoint: error, halted");
+			return B_NOT_ALLOWED;
 		case ENDPOINT_STATE_STOPPED:
+			TRACE("Stop Endpoint: already stopped");
 			return B_OK;
 		default:
 			break;
