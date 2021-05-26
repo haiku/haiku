@@ -489,8 +489,11 @@ FontEngine::PrepareGlyph(uint32 glyphIndex)
 	fLastError = FT_Load_Glyph(fFace, glyphIndex, loadFlags
 		| FT_LOAD_NO_HINTING | FT_LOAD_NO_SCALE);
 
-	fPreciseAdvanceX = (double)fFace->glyph->advance.x / fFace->units_per_EM;
-	fPreciseAdvanceY = (double)fFace->glyph->advance.y / fFace->units_per_EM;
+	FT_UShort units_per_EM = fFace->units_per_EM;
+	if (!FT_IS_SCALABLE(fFace))
+		units_per_EM = 1;
+	fPreciseAdvanceX = (double)fFace->glyph->advance.x / units_per_EM;
+	fPreciseAdvanceY = (double)fFace->glyph->advance.y / units_per_EM;
 
 	// Need to load again with hinting.
 	fLastError = FT_Load_Glyph(fFace, glyphIndex, loadFlags);
