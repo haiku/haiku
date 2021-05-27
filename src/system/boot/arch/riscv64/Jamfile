@@ -15,11 +15,6 @@ local kernelLibArchObjects =
 	<src!system!kernel!lib!arch!$(TARGET_ARCH)>memset.o
 ;
 
-local kernelDebugSources =
-	blue_screen.cpp
-	frame_buffer_console.cpp
-;
-
 local kernelArchDriverSources =
 	arch_elf.cpp
 ;
@@ -33,7 +28,6 @@ for platform in [ MultiBootSubDirSetup u-boot efi riscv ] {
 	on $(platform) {
 		DEFINES += _BOOT_MODE ;
 		BootMergeObject [ FGristFiles boot_arch_$(TARGET_KERNEL_ARCH).o ] :
-			$(kernelDebugSources)
 			$(kernelArchDriverSources)
 			$(kernelGenericDriverSources)
 			arch_cpu.cpp
