@@ -480,6 +480,7 @@ intel_set_display_mode(display_mode* mode)
 
 	set_frame_buffer_base();
 		// triggers writing back double-buffered registers
+		// which is INTEL_DISPLAY_X_BYTES_PER_ROW only apparantly
 
 	// Second register dump
 	//dump_registers();

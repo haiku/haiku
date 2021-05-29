@@ -101,43 +101,21 @@ Pipe::IsEnabled()
 void
 Pipe::Configure(display_mode* mode)
 {
-#if 0
-	// FIXME the previous values are never masked out from the
-	// register, so we just OR things together and hope to fall on a working
-	// mode. Better do nothing at all for now.
 	uint32 pipeControl = read32(INTEL_DISPLAY_A_PIPE_CONTROL + fPipeOffset);
 
 	// TODO: Haswell+ dithering changes.
-	if (gInfo->shared_info->device_type.Generation() >= 4) {
-		pipeControl |= (INTEL_PIPE_DITHER_EN | INTEL_PIPE_DITHER_TYPE_SP);
-		// FIXME this makes no sense, if only because B_CMAP8, B_RGB24 and
-		// B_RGB32 have the same color precision (8bit per component).
-		// Also because the color mode is a property of the hardware
-		// (depends on which LVDS panel is used, typically), not the video mode.
-		switch (mode->space) {
-			case B_CMAP8:
-			case B_RGB15_LITTLE:
-			case B_RGB16_LITTLE:
-				pipeControl |= INTEL_PIPE_6BPC;
-				break;
-			case B_RGB24_LITTLE:
-				pipeControl |= INTEL_PIPE_8BPC;
-				break;
-			case B_RGB32_LITTLE:
-			default:
-				pipeControl |= INTEL_PIPE_10BPC;
-				break;
-		}
-	}
+	//if (gInfo->shared_info->device_type.Generation() >= 4) {
+	//	pipeControl |= (INTEL_PIPE_DITHER_EN | INTEL_PIPE_DITHER_TYPE_SP);
 
+	//Link bit depth, which is currently hardcoded to 8-bits per color
+	pipeControl = (pipeControl & ~(0x7 << 5)) | INTEL_PIPE_8BPC;
 	// TODO: CxSR downclocking?
 
 	// TODO: Interlaced modes
-	pipeControl |= INTEL_PIPE_PROGRESSIVE;
+	pipeControl = (pipeControl & ~(0x7 << 21)) | INTEL_PIPE_PROGRESSIVE;
 
 	write32(INTEL_DISPLAY_A_PIPE_CONTROL + fPipeOffset, pipeControl);
 	read32(INTEL_DISPLAY_A_PIPE_CONTROL + fPipeOffset);
-#endif
 
 	if (gInfo->shared_info->device_type.Generation() >= 6) {
 		// According to SandyBridge modesetting sequence, pipe must be enabled
@@ -277,6 +255,10 @@ Pipe::ConfigureClocks(const pll_divisors& divisors, uint32 pixelClock,
 		pllMD = INTEL_DISPLAY_B_PLL_MD;
 	}
 
+	// Disable DPLL first
+	write32(pllControl, read32(pllControl) & ~DISPLAY_PLL_ENABLED);
+	spin(150);
+
 	float refFreq = gInfo->shared_info->pll_info.reference_frequency / 1000.0f;
 
 	if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_96x)) {
@@ -311,6 +293,8 @@ Pipe::ConfigureClocks(const pll_divisors& divisors, uint32 pixelClock,
 				& DISPLAY_PLL_M2_DIVISOR_MASK));
 	}
 
+	//note: bit DISPLAY_PLL_NO_VGA_CONTROL does not exist on IvyBridge and should be left
+	//      zero there. It does not influence it though.
 	uint32 pll = DISPLAY_PLL_ENABLED | DISPLAY_PLL_NO_VGA_CONTROL | extraFlags;
 
 	if (gInfo->shared_info->device_type.Generation() >= 3) {
@@ -353,13 +337,14 @@ Pipe::ConfigureClocks(const pll_divisors& divisors, uint32 pixelClock,
 			pll |= DISPLAY_PLL_POST1_DIVIDE_2;
 	}
 
-	write32(pllControl, pll & ~DISPLAY_PLL_NO_VGA_CONTROL);
-		// FIXME what is this doing? Why put the PLL back under VGA_CONTROL
-		// here?
+	// Configure PLL while -keeping- it disabled
+	//note: on older chipsets DISPLAY_PLL_NO_VGA_CONTROL probably enables the PLL and locks regs;
+	//      on newer chipsets DISPLAY_PLL_ENABLED does this.
+	write32(pllControl, pll & ~DISPLAY_PLL_ENABLED & ~DISPLAY_PLL_NO_VGA_CONTROL);
 	read32(pllControl);
 	spin(150);
 
-	// Configure and enable the PLL
+	// enable pre-configured PLL (locks PLL settings directly blocking changes in this write even)
 	write32(pllControl, pll);
 	read32(pllControl);
 
@@ -401,7 +386,6 @@ Pipe::ConfigureClocks(const pll_divisors& divisors, uint32 pixelClock,
 	}
 }
 
-
 void
 Pipe::Enable(bool enable)
 {
@@ -416,12 +400,19 @@ Pipe::Enable(bool enable)
 		write32(pipeReg, read32(pipeReg) | INTEL_PIPE_ENABLED);
 		wait_for_vblank();
 		write32(planeReg, read32(planeReg) | DISPLAY_CONTROL_ENABLED);
+
+		//Enable default display main watermarks
+		write32(INTEL_DISPLAY_A_PIPE_WATERMARK, 0x0783818);
 	} else {
 		write32(planeReg, read32(planeReg) & ~DISPLAY_CONTROL_ENABLED);
 		wait_for_vblank();
-		write32(pipeReg, read32(pipeReg) & ~INTEL_PIPE_ENABLED);
+		//Sandy+: when link training is to be done re-enable this line but otherwise don't touch!
+		//GMA(Q45): must disable PIPE or DPLL programming fails.
+		if (gInfo->shared_info->device_type.Generation() <= 5) {
+			write32(pipeReg, read32(pipeReg) & ~INTEL_PIPE_ENABLED);
+		}
 	}
 
+	// flush the eventually cached PCI bus writes
 	read32(INTEL_DISPLAY_A_BASE);
-		// flush the eventually cached PCI bus writes
 }
