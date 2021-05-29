@@ -7,12 +7,12 @@ OK	MediaRoutingView		OK
 Cycle	MediaNodePanel		サイクル
 Advanced	MediaNodePanel		高度な設定
 Audio input	MediaRoutingView		オーディオ入力
-Run mode	MediaNodePanel		Run mode
+Run mode	MediaNodePanel		実行モード
 Could not load '%filename%'	MediaRoutingView		'%filename%'をロードできませんでした
 Stop time source	MediaNodePanel		タイムソースを停止
 Be Audio Mixer	MediaRoutingView		Beオーディオミキサー
 Video input	MediaRoutingView		ビデオ入力
-Release	MediaNodePanel		リリース
+Release	MediaNodePanel		解放
 Disconnect	MediaRoutingView		切断
 Could not disconnect	MediaRoutingView		切断できませんでした
 Could not instantiate '%infoname%'	MediaRoutingView		'%infoname%'をインスタンス化できませんでした
@@ -23,12 +23,12 @@ Input	MediaJack		入力
 Get info	MediaJack		情報を見る
 Start time source	MediaNodePanel		タイムソースを開始
 Error	MediaRoutingView		エラー
-Could not release '%refname%'	MediaRoutingView		'%refname%'をリリースできませんでした
+Could not release '%refname%'	MediaRoutingView		'%refname%'を解放できませんでした
 Output	MediaJack		出力
 Get info	MediaNodePanel		情報を見る
 Get info	MediaRoutingView		情報を見る
 Clean up	MediaRoutingView		クリーンアップ
-Start control panel	MediaNodePanel		コントロールパネルを起動
+Start control panel	MediaNodePanel		コントロールパネルを開く
 Tweak parameters	MediaNodePanel		調整パラメーター
 Could not connect	MediaRoutingView		接続できませんでした
 Unlock group	MediaNodePanel		グループをアンロック

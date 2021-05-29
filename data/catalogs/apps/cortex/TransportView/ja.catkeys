@@ -4,12 +4,12 @@ Roll	TransportView		ロール
 {0, plural, one{# node} other{# nodes}}	TransportView		{0, plural, one{# ノード} other{# ノード}}
 Start	TransportView		開始
 No errors.	TransportView		エラー無し。
-to	TransportView		to
+to	TransportView		〜
 Offline	TransportView		オフライン
 (???)	TransportView		(???)
 Stop	TransportView		停止
 (no group)	TransportView		(グループ無し)
-Drop data	TransportView		Drop data
+Drop data	TransportView		データを間引く
 To:	TransportView		To:
 Recording	TransportView		レコーディング
 Increase latency	TransportView		レイテンシを上げる
@@ -18,6 +18,6 @@ DAC time source	TransportView		DAC タイムソース
 Decrease precision	TransportView		精度を下げる
 System clock	TransportView		システムクロック
 From:	TransportView		From:
-Roll from	TransportView		次からのロール
+Roll from	TransportView		ロール
 Preroll	TransportView		プリロール
-Run mode:	TransportView		Run mode:
+Run mode:	TransportView		実行モード:

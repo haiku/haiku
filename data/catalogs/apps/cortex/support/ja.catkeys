@@ -1,10 +1,10 @@
-1	japanese	application/x-vnd.Cortex.support	782409574
+1	japanese	application/x-vnd.Cortex.support	2630173556
 Header has flags	MediaString		ヘッダーにフラグ有り
 32 bit HLS	MediaString		32 bit HLS
 Recording	MediaString		レコーディング
 (unknown format)	MediaString		(不明なフォーマット)
 Clean buffers	MediaString		バッファーを削除
-{0, plural,one{# frame forward}other{# frames forward}}	MediaString		{0, plural,one{# フレームを転送}other{# フレームを転送}}
+{0, plural,one{# frame forward}other{# frames forward}}	MediaString		{0, plural,one{# フレーム進む}other{# フレーム進む}}
 Rear-right	MediaString		Rear-right
 {0, plural, one{# pixel} other{# pixels}}	MediaString		{0, plural, one{# ピクセル} other{# ピクセル}}
 Mono	MediaString		モノラル
@@ -32,19 +32,23 @@ Back-center	MediaString		Back-center
 Ambisonic WXYZ	MediaString		Ambisonic WXYZ
 (unknown video format)	MediaString		(不明なビデオフォーマット)
 AVI format family	MediaString		AVI フォーマットファミリー
+Homogenous buffers	MediaString		Homogenous buffers
 Interlaced 	MediaString		インターレース 
 {0, plural, one{# channel}other{# channels}}	MediaString		{0, plural, one{# チャンネル}other{# チャンネル}}
 15 bit RGBA	MediaString		15 bit RGBA
+Drop data	MediaString		データを間引く
 AVI	MediaString		AVI
 YUV9	MediaString		YUV9
  Hz	MediaString		 Hz
 Right	MediaString		右
 32 bit RGB	MediaString		32 bit RGB
-System mixer	MediaString		システムミキサー
+Video data between line u and u	MediaString		Video data between line u and u
+System mixer	MediaString		System mixer
 Physical output	MediaString		物理出力
 Top-Back-center	MediaString		Top-Back-center
 YUV420	MediaString		YUV420
-(unknown run mode)	MediaString		(不明な run mode)
+Top to bottom, left to right	MediaString		Top to bottom, left to right
+(unknown run mode)	MediaString		(不明な実行モード)
  kb/s	MediaString		 kb/s
 24 bit HSI	MediaString		24 bit HSI
 User-defined media type	MediaString		ユーザー定義メディアタイプ
@@ -55,7 +59,7 @@ Any format family	MediaString		任意のフォーマットファミリー
 Timecode	MediaString		タイムコード
 Top-Front-right	MediaString		Top-Front-right
 32 bit float	MediaString		32 bit 浮動小数点数
-Controllable	MediaString		制御可能
+Controllable	MediaString		Controllable
 32 bit integer	MediaString		32 bit 整数
 Front-right-center	MediaString		Front-right-center
 Side-right	MediaString		Side-right
@@ -70,8 +74,8 @@ Side-left	MediaString		Side-left
 8 bit integer	MediaString		8 bit 整数
 8 bit grayscale-index	MediaString		8 bit グレイスケースインデックス
 YCbCr444	MediaString		YCbCr444
-Buffer producer	MediaString		バッファープロデューサー
-Buffer consumer	MediaString		バッファーコンシューマー
+Buffer producer	MediaString		Buffer producer
+Buffer consumer	MediaString		Buffer consumer
 Increase latency	MediaString		レイテンシを増加
 Front-left-center	MediaString		Front-left-center
 MPEG format family	MediaString		MPEG フォーマットファミリー
@@ -118,6 +122,7 @@ Time source	MediaString		タイムソース
 ProLogic LR	MediaString		プロロジック LR
 {0, plural,one{# byte per frame}other{# bytes per frame}}	MediaString		{0, plural,one{# バイト/フレーム}other{# バイト/フレーム}}
 Parameters	MediaString		パラメーター
+Raw data from VBL area	MediaString		Raw data from VBL area
 Top-Back-right	MediaString		Top-Back-right
 {0, plural, one{# byte per row}other{# bytes per row}}	MediaString		{0, plural, one{# バイト/列}other{# バイト/列}}
 Left	MediaString		左
@@ -128,6 +133,7 @@ Top-center	MediaString		Top-center
 Entity interface	MediaString		エンティティーインターフェース
 Stereo	MediaString		ステレオ
 8 bit color-index	MediaString		8 bit カラーインデックス
+Bottom to top, left to right	MediaString		Bottom to top, left to right
 32 bit UVL	MediaString		32 bit UVL
 {0, plural, one{# line} other{# lines}}	MediaString		{0, plural, one{# ライン} other{# ライン}}
 Text	MediaString		テキスト
@@ -135,5 +141,6 @@ Unknown media type	MediaString		不明なメディアタイプ
 MPEG2	MediaString		MPEG2
 Miscellaneous format family	MediaString		その他のフォーマットファミリー
 24 bit RGB	MediaString		24 bit RGB
+{0, plural,one{# frame backward}other{# frames backward}}	MediaString		{0, plural,one{# fフレーム戻る}other{# フレーム戻る}}
 32 bit HSIA	MediaString		32 bit HSIA
 Raw video	MediaString		Raw ビデオ
