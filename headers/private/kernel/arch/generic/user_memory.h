@@ -70,6 +70,7 @@ bool user_access(Function function)
 		clear_ac();
 		return true;
 	}
+	clear_ac();
 	return false;
 }
 
