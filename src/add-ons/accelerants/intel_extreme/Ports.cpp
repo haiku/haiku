@@ -133,7 +133,7 @@ Port::SetPipe(Pipe* pipe)
 	// FIXME is the use of PORT_TRANS_* constants correct for Sandy Bridge /
 	// Cougar Point? Or is it only for Ivy Bridge / Panther point onwards?
 	if (gInfo->shared_info->pch_info == INTEL_PCH_CPT) {
-		portState &= PORT_TRANS_SEL_MASK;
+		portState &= ~PORT_TRANS_SEL_MASK;
 		if (pipe->Index() == INTEL_PIPE_A)
 			write32(portRegister, portState | PORT_TRANS_A_SEL_CPT);
 		else
@@ -562,7 +562,7 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 
 	// LVDS on PCH needs set before display enable
 	if (gInfo->shared_info->pch_info == INTEL_PCH_CPT) {
-		lvds &= PORT_TRANS_SEL_MASK;
+		lvds &= ~PORT_TRANS_SEL_MASK;
 		if (fPipe->Index() == INTEL_PIPE_A)
 			lvds |= PORT_TRANS_A_SEL_CPT;
 		else
@@ -597,7 +597,7 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 
 	// DPLL mode LVDS for i915+
 	if (gInfo->shared_info->device_type.Generation() >= 3)
-		extraPLLFlags |= DISPLAY_PLL_MODE_LVDS;
+		extraPLLFlags |= DISPLAY_PLL_MODE_LVDS | DISPLAY_PLL_2X_CLOCK;
 
 	// Program general pipe config
 	fPipe->Configure(target);
@@ -749,7 +749,7 @@ DigitalPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 
 	uint32 extraPLLFlags = 0;
 	if (gInfo->shared_info->device_type.Generation() >= 3)
-		extraPLLFlags |= DISPLAY_PLL_MODE_NORMAL;
+		extraPLLFlags |= DISPLAY_PLL_MODE_NORMAL | DISPLAY_PLL_2X_CLOCK;
 
 	// Program general pipe config
 	fPipe->Configure(target);
@@ -1117,7 +1117,7 @@ DigitalDisplayInterface::SetDisplayMode(display_mode* target, uint32 colorMode)
 
 	uint32 extraPLLFlags = 0;
 	if (gInfo->shared_info->device_type.Generation() >= 3)
-		extraPLLFlags |= DISPLAY_PLL_MODE_NORMAL;
+		extraPLLFlags |= DISPLAY_PLL_MODE_NORMAL | DISPLAY_PLL_2X_CLOCK;
 
 	// Program general pipe config
 	fPipe->Configure(target);
