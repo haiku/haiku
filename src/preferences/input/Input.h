@@ -15,10 +15,9 @@
 #include <Catalog.h>
 #include <Locale.h>
 
-
-#include "MouseSettings.h"
 #include "InputMouse.h"
 #include "InputWindow.h"
+#include "MouseSettings.h"
 
 
 class SettingsView;

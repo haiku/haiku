@@ -4,7 +4,7 @@
  *
  * Author:
  *		Preetpal Kaur <preetpalok123@gmail.com>
-*/
+ */
 
 
 #ifndef TOUCHPAD_PREF_H
@@ -12,10 +12,10 @@
 
 
 #include <Debug.h>
-
-#include "touchpad_settings.h"
 #include <Input.h>
 #include <Path.h>
+
+#include "touchpad_settings.h"
 
 
 #if DEBUG

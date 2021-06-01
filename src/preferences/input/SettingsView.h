@@ -4,15 +4,15 @@
  *
  * Author:
  *		Preetpal Kaur <preetpalok123@gmail.com>
-*/
+ */
 
 
 #ifndef SETTINGS_VIEW_H
 #define SETTINGS_VIEW_H
 
 
-#include <Box.h>
 #include <Bitmap.h>
+#include <Box.h>
 #include <Button.h>
 #include <CheckBox.h>
 #include <OptionPopUp.h>
