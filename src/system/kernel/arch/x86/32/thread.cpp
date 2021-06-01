@@ -360,6 +360,7 @@ arch_setup_signal_frame(Thread* thread, struct sigaction* action,
 	frame->ip = x86_get_user_signal_handler_wrapper(
 		(action->sa_flags & SA_BEOS_COMPATIBLE_HANDLER) != 0,
 		thread->team->commpage_address);
+	frame->flags &= ~(X86_EFLAGS_TRAP | X86_EFLAGS_DIRECTION);
 
 	return B_OK;
 }

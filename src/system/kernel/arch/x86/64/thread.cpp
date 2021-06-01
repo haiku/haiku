@@ -376,6 +376,7 @@ arch_setup_signal_frame(Thread* thread, struct sigaction* action,
 		+ (addr_t)commPageAddress;
 	clear_ac();
 	frame->di = (addr_t)userSignalFrameData;
+	frame->flags &= ~(uint64)(X86_EFLAGS_TRAP | X86_EFLAGS_DIRECTION);
 
 	return B_OK;
 }
