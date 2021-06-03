@@ -106,6 +106,10 @@ if $(HAIKU_CC_IS_LEGACY_GCC_$(architecture)) = 1 {
 }
 
 
+# trusted keys
+SEARCH on haiku-2019.pub = [ FDirName $(HAIKU_TOP) data trust_db ] ;
+AddFilesToPackage data trust_db : haiku-2019.pub ;
+
 # servers
 AddFilesToPackage servers : $(SYSTEM_SERVERS) ;
 
