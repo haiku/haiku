@@ -251,8 +251,7 @@ arch_thread_enter_userspace(Thread* thread, addr_t entry, void* args1,
 	frame.ds = USER_DATA_SELECTOR;
 	frame.ip = entry;
 	frame.cs = USER_CODE_SELECTOR;
-	frame.flags = X86_EFLAGS_RESERVED1 | X86_EFLAGS_INTERRUPT
-		| (3 << X86_EFLAGS_IO_PRIVILEG_LEVEL_SHIFT);
+	frame.flags = X86_EFLAGS_RESERVED1 | X86_EFLAGS_INTERRUPT;
 	frame.user_sp = stackTop;
 	frame.user_ss = USER_DATA_SELECTOR;
 
