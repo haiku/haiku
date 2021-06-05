@@ -90,7 +90,7 @@ Name	Person Query Columns		名前
 Skip all	FSUtils		すべてスキップ
 Corrupted opcode.	libtracker		オペコードが壊れています。
 Atom	AttributesView		Atom
-%SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%TotalSize中%SizeProcessed処理済, %BytesPerSecond/秒
+%SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%SizeProcessed/%TotalSize処理済, %BytesPerSecond/秒
 Preparing to restore items…	StatusWindow		元に戻す準備をしています…
 Mount	ContainerWindow		マウント
 {0, plural, other{<# rectangles>}}	AttributesView		{0, plural, other{<# 個の四角形>}}

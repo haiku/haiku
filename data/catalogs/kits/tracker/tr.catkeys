@@ -80,7 +80,7 @@ Moving: 	StatusWindow		Taşınıyor:
 Select	SelectionWindow		Seç
 Select	InfoWindow		Seç
 OK	OpenWithWindow		Tamam
-Include trash	FindPanel		Çöp'ü içer
+Include trash	FindPanel		Çöp'e de bak
 GiB	WidgetAttributeText		GiB
 Clean up	ContainerWindow		Toparla
 Modified	FindPanel		Değiştirilme
@@ -356,7 +356,7 @@ after	FindPanel		sonra
 Version	OpenWithWindow		Sürüm
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Seçili ögelerden bazıları Çöp'e taşınamaz. Bunun yerine doğrudan silmek ister misiniz? (Bu işlem geri alınamaz.)
 Add printer…	ContainerWindow		Yazıcı ekle…
-On	FindPanel		Açık
+On	FindPanel		Nerede
 Permissions	ContainerWindow		İzinler
 Size:	InfoWindow		Boyut:
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Seçili öge Çöp'e taşınamaz. Bunun yerine doğrudan silmek ister misiniz? (Bu işlem geri alınamaz.)

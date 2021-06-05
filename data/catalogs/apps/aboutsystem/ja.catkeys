@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-About	511528774
+1	japanese	x-vnd.Haiku-About	493223784
 Revision	AboutView		リビジョン
 The Haikuware team and their bounty program\n	AboutView		Haikuware チーム＆報奨金プログラム\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. All rights reserved.
@@ -28,6 +28,7 @@ Unknown	AboutView		不明
 Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc.およびその開発チーム: 彼らはBeOSを創造してくれました!\n\n
 Copyright © 2002-2014 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.	AboutView		Copyright © 2002-2014 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.
 Licenses: 	AboutView		ライセンス:
+Copyright © Copyright (c) 2018-2021, Frederic Cambus	AboutView		Copyright © Copyright (c) 2018-2021, Frederic Cambus
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Haikuのコードの著作権はHaiku, Inc.または各ソースコードに明示された個々の著者に帰属します。Haiku®およびHAIKUロゴ・マーク®はHaiku, Inc.の(登録)商標です。\n\n
 Copyright © 2009 Colin Percival	AboutView		Copyright © 2009 Colin Percival
 Time running:	AboutView		稼動時間:

@@ -1,5 +1,6 @@
-1	french	application/x-vnd.Cortex.support	1670052995
+1	french	application/x-vnd.Cortex.support	2750878869
 (unknown format)	MediaString		(format inconnu)
+{0, plural,one{# frame forward}other{# frames forward}}	MediaString		{0, plural,one{# trame en avant}other{# trames en avant}}
 Rear-right	MediaString		Arrière-droit
 {0, plural, one{# pixel} other{# pixels}}	MediaString		{0, plural, one{# pixel} other{# pixels}}
 Mono	MediaString		Mono
@@ -7,20 +8,42 @@ Top-Front-left	MediaString		Avant-gauche-haut
 Top-Front-center	MediaString		Avant-centre-haut
 Back-center	MediaString		Arrière-centre
 Interlaced 	MediaString		Entrelacé 
+15 bit RGBA	MediaString		15 bits RVBA
 Right	MediaString		Droite
+32 bit RGB	MediaString		32 bits RVB
 System mixer	MediaString		Mixeur système
 Physical output	MediaString		Sortie physique
 Top-Back-center	MediaString		Arrière-centre-haut
 Top to bottom, left to right	MediaString		De haut en bas, et de gauche à droite
+32 bit CMYA	MediaString		32 bits CMJA
 Rear-left	MediaString		Arrière-gauche
+QuickTime format family	MediaString		Famille de format QuickTime
 Top-Front-right	MediaString		Avant-droit-haut
+32 bit float	MediaString		Flottant 32 bits
+Controllable	MediaString		Contrôlable
+32 bit integer	MediaString		Entier 32 bits
 Side-right	MediaString		Côté-droit
 Side-left	MediaString		Côté-gauche
+{0, plural, one{# byte per buffer} other{# bytes per buffer}}	MediaString		{0, plural, one{# octet par tampon} other{# octets par tampon}}
+8 bit integer	MediaString		Entier 8 bits
 Front-left-center	MediaString		Avant-gauche-milieu
 Center	MediaString		Centre
 Top-Back-left	MediaString		Arrière-gauche-haut
+16 bit RGB	MediaString		16 bits RVB
+Raw audio	MediaString		Audio brut
 {0, plural,one{# byte (max)}other{# bytes (max)}}	MediaString		{0, plural,one{# octet (max)}other{# octets (max)}}
+32 bit RGBA	MediaString		32 bits RVBA
+15 bit RGB	MediaString		15 bits RVB
+{0, plural,one{# byte per frame}other{# bytes per frame}}	MediaString		{0, plural,one{# octet par trame}other{# octets par trame}}
 Top-Back-right	MediaString		Arrière-droit-haut
+{0, plural, one{# byte per row}other{# bytes per row}}	MediaString		{0, plural, one{# octet par ligne}other{# octets par ligne}}
 Left	MediaString		Gauche
+24 bit CMY	MediaString		24 bits CMJ
 Top-center	MediaString		Centre-haut
+Stereo	MediaString		Stéréo
 Bottom to top, left to right	MediaString		De bas en haut, et de gauche à droite
+{0, plural, one{# line} other{# lines}}	MediaString		{0, plural, one{# ligne} other{# lignes}}
+Text	MediaString		Texte
+24 bit RGB	MediaString		24 bits RVB
+{0, plural,one{# frame backward}other{# frames backward}}	MediaString		{0, plural,one{# trame en arrière}other{# trames en arrière}}
+Raw video	MediaString		Vidéo brute

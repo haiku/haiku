@@ -1,4 +1,4 @@
-1	swedish	x-vnd.haiku.SerialConnect	562718401
+1	swedish	x-vnd.haiku.SerialConnect	354154115
 Hardware	SerialWindow	Flowcontrol	Hårdvara
 Connection	SerialWindow		Förbindelse
 Raw send…	SerialWindow		Skicka rådata...
@@ -15,5 +15,23 @@ SerialConnect	System name		SerialConnect
 custom…	SerialWindow	Baudrate	inställning...
 Parity	SerialWindow		Paritet
 None	SerialWindow	Parity	Ingen
+Disconnect	SerialWindow		Koppla ifrån
 Everything sent, waiting for acknowledge	XModemStatus		Allt skickat och väntar på bekräftelse
+Odd	SerialWindow	Parity	Udda
+Flow control	SerialWindow		Flödeskontroll
+file transfer progress	SerialWindow		Filöverföringsstatus
+CRC requested	XModemStatus		CRC begärd
+Data bits	SerialWindow		Databitar
+Both	SerialWindow	Flowcontrol	Båda
+Edit	SerialWindow		Editera
+XModem send…	SerialWindow		XModem skicka…
+Baudrate:	Custom baudrate window		Överföringshastighet:
+OK	Custom baudrate window		OK
+Waiting for receiver…	XModemStatus		Väntar på mottagare…
+Clear history	SerialWindow		Rensa historik
 Checksum error, re-send block	XModemStatus		Fel i kontrollsumman, skicka blocket igen
+Settings	SerialWindow		Inställningar
+Even	SerialWindow	Parity	Jämn
+Software	SerialWindow	Flowcontrol	Mjukvara
+Line terminator	SerialWindow		Radbrytare
+Remote cancelled transfer	XModemStatus		Fjärrdator avbröt överföringen

@@ -22,10 +22,10 @@ Revert	NetworkWindow		戻す
 off	ServiceListItem		オフ
 WEP	WEP protected network		WEP
 <no wireless networks found>	IntefaceView		<無線ネットワークが見つかりません>
-Enable	IntefaceView		有効
+Enable	IntefaceView		有効にする
 connected	IntefaceView		接続済
 Apply	IntefaceAddressView		適用
-Disable	ServiceView		無効
+Disable	ServiceView		無効にする
 WPA2	WPA2 protected network		ネットマスクはローカルネットワークを定義します
 Show network status in Deskbar	NetworkWindow		Deskbar にネットワークの状態を表示
 Mode:	IntefaceAddressView		モード:
@@ -44,12 +44,12 @@ disconnected	InterfaceListItem		切断
 Automatic	IntefaceAddressView		自動
 Choose automatically	IntefaceView		自動選択
 Status:	IntefaceView		状態:
-Disable	IntefaceView		無効
+Disable	IntefaceView		無効にする
 Manage…	NetworkWindow		管理…
 open	Open network		開く
 Network	System name		ネットワーク
 Your gateway to the internet	IntefaceAddressView		インターネットへのゲートウェイ
-Enable	ServiceView		有効
+Enable	ServiceView		有効にする
 Wireless device	InterfaceListItem		無線デバイス
 Disabled	IntefaceAddressView		無効
 VPN connection	InterfaceListItem		VPN 接続

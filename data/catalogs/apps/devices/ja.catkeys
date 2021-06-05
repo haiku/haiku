@@ -12,7 +12,7 @@ Detailed	DevicesView		詳細
 Computer	DevicesView		コンピューター
 Communications	DeviceSCSI		通信
 Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		クラス情報:\t\t\t\t: %classInfo%
-Mass storage controller	Device		大容量記憶コントローラー
+Mass storage controller	Device		大容量記憶域コントローラー
 Connection	DevicesView		接続順
 Printer	DeviceSCSI		プリンター
 ACPI Processor Namespace '%2'	DeviceACPI		ACPI プロセッサネームスペース '%2'
@@ -47,7 +47,7 @@ None	Device		無し
 Device paths	Device		デバイスパス
 Unknown device	Device		不明なデバイス
 Wireless controller	Device		ワイヤレスコントローラー
-Generic system peripheral	Device		システム周辺機器
+Generic system peripheral	Device		汎用システム周辺機器
 Value	PropertyList		値
 Devices	DevicesView		デバイス
 Device name	DeviceACPI		デバイス名
@@ -63,27 +63,27 @@ Other	DeviceSCSI		その他
 Report compatibility	DevicesView		互換性レポート
 Computer	Device		コンピューター
 PCI bus	Device		PCI バス
-Enclosure	DeviceSCSI		エンクロージャー
+Enclosure	DeviceSCSI		格納装置
 Order by:	DevicesView		並び順:
-ACPI Thermal Zone	DeviceACPI		ACPI サーマルゾーン
+ACPI Thermal Zone	DeviceACPI		ACPI 温度管理ゾーン
 Intelligent controller	Device		インテリジェントコントローラー
 Multimedia controller	Device		マルチメディアコントローラー
 Quit	DevicesView		終了
 ISA bus	Device		ISA バス
 ISA bus	DevicesView		ISA バス
 Processor	DeviceSCSI		プロセッサ
-Manufacturer:	Device		メーカー:
+Manufacturer:	Device		製造元:
 Class Info:\t\t\t\t: %classInfo%	DeviceACPI		クラス情報:\t\t\t\t: %classInfo%
 Bridge	Device		ブリッジ
 Worm	DeviceSCSI		Worm
 CD-ROM	DeviceSCSI		CD-ROM
 Manufacturer	DevicePCI		製造元
 Bridge	DeviceSCSI		ブリッジ
-Signal processing controller	Device		信号処理コントローラー
+Signal processing controller	Device		シグナル処理コントローラー
 Device name	DeviceSCSI		デバイス名
 Docking station	Device		ドッキングステーション
 Array	DeviceSCSI		アレイ
-Unclassified device	Device		未登録のデバイス
+Unclassified device	Device		未分類のデバイス
 ACPI controller	Device		ACPI コントローラー
 Network controller	Device		ネットワークコントローラー
 Driver used	Device		使用ドライバー
