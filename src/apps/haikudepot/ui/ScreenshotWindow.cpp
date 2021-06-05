@@ -262,6 +262,7 @@ ScreenshotWindow::_DownloadThread()
 	}
 
 	fScreenshotView->UnsetBitmap();
+	_ResizeToFitAndCenter();
 
 	if (!fPackage.IsSet())
 		HDINFO("package not set");
