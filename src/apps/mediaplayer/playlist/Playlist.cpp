@@ -596,7 +596,15 @@ Playlist::AppendM3uToPlaylist(const entry_ref& ref, Playlist* playlist)
 				if (item == NULL || !playlist->AddItem(item))
 					delete item;
 			} else {
-				printf("Error - %s: [%" B_PRIx32 "]\n", strerror(err), err);
+				BUrl url(line.String());
+				if (url.IsValid()) {
+					PlaylistItem* item
+						= new (std::nothrow) UrlPlaylistItem(url);
+					if (item == NULL || !playlist->AddItem(item))
+						delete item;
+				} else {
+					printf("Error - %s: [%" B_PRIx32 "]\n", strerror(err), err);
+				}
 			}
 		}
 
