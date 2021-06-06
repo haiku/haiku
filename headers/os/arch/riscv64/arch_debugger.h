@@ -6,9 +6,11 @@
 #define _ARCH_RISCV64_DEBUGGER_H
 
 
-//#warning RISCV64: fixme
 struct riscv64_debug_cpu_state {
-	uint32	dummy;
+	uint64 x[31];
+	uint64 pc;
+	double f[32];
+	uint64 fcsr;
 } __attribute__((aligned(8)));
 
 
