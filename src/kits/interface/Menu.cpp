@@ -2754,8 +2754,13 @@ BMenu::_CalcFrame(BPoint where, bool* scrollOn)
 			frame.OffsetBy(0, screenFrame.bottom - frame.bottom);
 	} else {
 		if (frame.bottom > screenFrame.bottom) {
-			frame.OffsetBy(0, -superItem->Frame().Height()
-				- frame.Height() - 3);
+			float spaceBelow = screenFrame.bottom - frame.top;
+			float spaceOver = frame.top - screenFrame.top
+				- superItem->Frame().Height();
+			if (spaceOver > spaceBelow) {
+				frame.OffsetBy(0, -superItem->Frame().Height()
+					- frame.Height() - 3);
+			}
 		}
 
 		if (frame.right > screenFrame.right)
