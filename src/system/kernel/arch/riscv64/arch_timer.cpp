@@ -18,20 +18,19 @@
 #include <Clint.h>
 
 
-extern uint32 gPlatform1;
-extern uint32 gPlatform2;
+extern uint32 gPlatform;
 
 
 void
 arch_timer_set_hardware_timer(bigtime_t timeout)
 {
 	// TODO: Read timer frequency from FDT
-	switch (gPlatform1) {
-		case kPlatform1Riscv:
+	switch (gPlatform) {
+		case kPlatformMNative:
 			MSyscall(kMSyscallSetTimer, true,
 				gClintRegs->mtime + timeout * 10);
 			break;
-		case kPlatform1Sbi: {
+		case kPlatformSbi: {
 			sbi_set_timer(CpuTime() + timeout);
 			break;
 		}
@@ -44,11 +43,11 @@ arch_timer_set_hardware_timer(bigtime_t timeout)
 void
 arch_timer_clear_hardware_timer()
 {
-	switch (gPlatform1) {
-		case kPlatform1Riscv:
+	switch (gPlatform) {
+		case kPlatformMNative:
 			MSyscall(kMSyscallSetTimer, false);
 			break;
-		case kPlatform1Sbi: {
+		case kPlatformSbi: {
 			sbi_set_timer(CpuTime() + (uint64)10000000 * 3600);
 			break;
 		}

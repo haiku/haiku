@@ -37,9 +37,8 @@ extern uint64_t arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
 void
 arch_start_kernel(addr_t kernelEntry)
 {
-	// Set RV64 platform information
-	gKernelArgs.arch_args.platform1 = kPlatform1Sbi;
-	gKernelArgs.arch_args.platform2 = kPlatform2Efi;
+	// EFI assumed to be SBI booted
+	gKernelArgs.arch_args.machine_platform = kPlatformSbi;
 
 	// Prepare to exit EFI boot services.
 	// Read the memory map.

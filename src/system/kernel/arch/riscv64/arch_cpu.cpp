@@ -15,8 +15,7 @@
 #include <platform/sbi/sbi_syscalls.h>
 
 
-extern uint32 gPlatform1;
-extern uint32 gPlatform2;
+extern uint32 gPlatform;
 
 
 status_t
@@ -113,7 +112,7 @@ arch_cpu_user_TLB_invalidate(void)
 status_t
 arch_cpu_shutdown(bool reboot)
 {
-	if (gPlatform1 == kPlatform1Sbi) {
+	if (gPlatform == kPlatformSbi) {
 		sbi_system_reset(
 			reboot ? SBI_RESET_TYPE_COLD_REBOOT : SBI_RESET_TYPE_SHUTDOWN,
 			SBI_RESET_REASON_NONE);

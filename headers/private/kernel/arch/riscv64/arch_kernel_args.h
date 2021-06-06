@@ -19,18 +19,10 @@
 
 
 enum {
-	kPlatform1None,
-	kPlatform1Riscv,
-	kPlatform1Sbi,
+	kPlatformNone,
+	kPlatformMNative,
+	kPlatformSbi,
 };
-
-enum {
-	kPlatform2None,
-	kPlatform2Riscv,
-	kPlatform2Efi,
-	kPlatform2UBoot,
-};
-
 
 enum {
 	kUartKindNone,
@@ -57,8 +49,8 @@ typedef struct {
 	uint32		num_virtual_ranges_to_keep;
 	addr_range	virtual_ranges_to_keep[MAX_VIRTUAL_RANGES_TO_KEEP];
 
-	uint32 platform1;
-	uint32 platform2;
+	// MNative hooks, or SBI
+	uint32 machine_platform;
 
 	uint bootHart;
 	uint64 timerFrequrency; // in Hz
