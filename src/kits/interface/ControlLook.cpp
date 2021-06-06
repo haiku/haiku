@@ -75,7 +75,8 @@ float
 BControlLook::GetScrollBarWidth(orientation orientation)
 {
 	// this matches HaikuControlLook.cpp currently
-	if (be_plain_font->Size() <= 12.0f) { return 14.0f; }
+	if (be_plain_font->Size() <= 12.0f)
+		return 14.0f;
 	return be_plain_font->Size() / 12.0f * 14.0f;
 }
 
