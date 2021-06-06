@@ -7,6 +7,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
 
 KernelMergeObject kernel_arch_riscv64.o :
         arch_asm.S
+        arch_traps.S
         arch_commpage.cpp
         arch_cpu.cpp
         arch_debug.cpp
