@@ -94,6 +94,7 @@ arch_elf_relocate_rela(struct elf_image_info *image,
 			case R_RISCV_NONE:
 				continue;
 			case R_RISCV_64:
+			case R_RISCV_JUMP_SLOT:
 				relocValue = symAddr + rel[i].r_addend;
 				break;
 			case R_RISCV_RELATIVE:
@@ -113,6 +114,7 @@ arch_elf_relocate_rela(struct elf_image_info *image,
 				rel[i].r_offset);
 			return B_BAD_ADDRESS;
 		}
+		*(Elf64_Addr *)relocAddr = relocValue;
 #endif
 	}
 
