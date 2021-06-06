@@ -16,7 +16,7 @@ struct vregs {
 	ulong x[31];
 	ulong pc;
 	double f[32];
-	char fcsr;
+	ulong fcsr;
 };
 #endif /* defined(__RISCV64__) */
 
