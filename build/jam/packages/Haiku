@@ -44,7 +44,8 @@ AddFilesToPackage add-ons kernel busses random : virtio_rng ;
 AddFilesToPackage add-ons kernel busses scsi : ahci virtio_scsi ;
 AddFilesToPackage add-ons kernel busses usb : <usb>uhci <usb>ohci <usb>ehci
 	<usb>xhci ;
-AddFilesToPackage add-ons kernel busses virtio : virtio_pci ;
+AddFilesToPackage add-ons kernel busses virtio : virtio_mmio@riscv64,arm,arm64
+	virtio_pci ;
 AddFilesToPackage add-ons kernel console : vga_text ;
 AddFilesToPackage add-ons kernel debugger
 	: <kdebug>demangle <kdebug>disasm@x86,x86_64 <kdebug>hangman
@@ -73,6 +74,7 @@ AddNewDriversToPackage disk virtual : virtio_block ram_disk ;
 AddNewDriversToPackage power		: $(SYSTEM_ADD_ONS_DRIVERS_POWER) ;
 AddNewDriversToPackage sensor		: $(SYSTEM_ADD_ONS_DRIVERS_SENSOR) ;
 AddNewDriversToPackage network		: virtio_net ;
+AddNewDriversToPackage input		: virtio_input ;
 #AddNewDriversToPackage display		: display_adapter@x86 ;
 
 # legacy drivers
@@ -203,10 +205,11 @@ AddBootModuleSymlinksToPackage
 	nvme_disk@x86,x86_64
 	openpic@ppc
 	packagefs pci
+	fdt@riscv64,arm,arm64
 	scsi scsi_cd scsi_disk scsi_periph silicon_image_3112 highpoint_ide_pci
 	sdhci_pci
 	usb usb_disk <usb>ehci <usb>ohci <usb>uhci <usb>xhci
-	virtio virtio_block virtio_pci virtio_scsi
+	virtio virtio_block virtio_mmio@riscv64,arm,arm64 virtio_pci virtio_scsi
 ;
 
 # add-ons
@@ -239,7 +242,7 @@ AddSymlinkToPackage add-ons Tracker
 	: /boot/system/apps/DiskUsage : DiskUsage ;
 
 AddFilesToPackage add-ons input_server devices
-	: <input>keyboard <input>mouse <input>tablet <input>wacom ;
+	: <input>keyboard <input>mouse <input>tablet <input>virtio <input>wacom ;
 AddFilesToPackage add-ons input_server filters
 	: padblocker screen_saver shortcut_catcher switch_workspace ;
 AddDirectoryToPackage add-ons input_server methods ;

@@ -143,9 +143,9 @@ SYSTEM_NETWORK_PROTOCOLS =
 ;
 
 SYSTEM_ADD_ONS_ACCELERANTS = [ FFilterByBuildFeatures
-	x86,x86_64 @{
+	x86,x86_64,riscv64 @{
 		vesa.accelerant
-	}@ # x86,x86_64
+	}@ # x86,x86_64,riscv64
 ] ;
 
 SYSTEM_ADD_ONS_TRANSLATORS =
@@ -171,9 +171,9 @@ SYSTEM_ADD_ONS_DRIVERS_AUDIO = ;
 SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD = ;
 
 SYSTEM_ADD_ONS_DRIVERS_GRAPHICS = [ FFilterByBuildFeatures
-	x86,x86_64 @{
+	x86,x86_64,riscv64 @{
 		vesa
-	}@ # x86,x86_64
+	}@ # x86,x86_64,riscv64
 ] ;
 
 SYSTEM_ADD_ONS_DRIVERS_MIDI = ;
@@ -217,6 +217,7 @@ SYSTEM_ADD_ONS_BUS_MANAGERS = [ FFilterByBuildFeatures
 	mmc
 	scsi
 	pci ps2@x86,x86_64
+	fdt@riscv64
 	random
 	usb
 	virtio
