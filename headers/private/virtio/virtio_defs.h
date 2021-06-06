@@ -31,6 +31,12 @@ enum {
 	kVirtioConfigSFeaturesOk  = 1 << 3,
 };
 
+// VirtioRegs.interruptStatus, interruptAck
+enum {
+	kVirtioIntQueue  = 1 << 0,
+	kVirtioIntConfig = 1 << 1,
+};
+
 enum {
 	kVringDescFlagsNext     = 1 << 0,
 	kVringDescFlagsWrite    = 1 << 1,
