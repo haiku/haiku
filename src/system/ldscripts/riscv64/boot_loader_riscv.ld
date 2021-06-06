@@ -16,8 +16,11 @@ SECTIONS
 
 	. = ALIGN(0x8);
 	__ctor_list = .;
-	.ctors : { *(.ctors) }
+	.init_array : { *(.init_array) }
 	__ctor_end = .;
+	__dtor_list = .;
+	.fini_array : { *(.fini_array) }
+	__dtor_end = .;
 
 	.rodata : { *(.rodata .rodata.*) }
 
