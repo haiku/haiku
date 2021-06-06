@@ -1,10 +1,11 @@
 /*
- * Copyright 2019, Haiku, Inc. All Rights Reserved
+ * Copyright 2019-2021, Haiku, Inc. All Rights Reserved
  * Distributed under the terms of the MIT License.
  */
 
 
 #include <asm_defs.h>
+#include "syscall_numbers.h"
 
 
 .text
@@ -160,3 +161,10 @@ FUNCTION(arch_longjmp_iframe):
 	mv sp, a0
 	call SVecURet
 FUNCTION_END(arch_longjmp_iframe)
+
+
+FUNCTION(arch_user_thread_exit):
+	li t0, SYSCALL_EXIT_THREAD
+	ecall
+	ret
+FUNCTION_END(arch_user_thread_exit)
