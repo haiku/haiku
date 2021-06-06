@@ -10,7 +10,8 @@
 name: \
 	li t0, n; \
 	ecall; \
-	ret
+	ret; \
+.size	name, .-name
 
 #define SYSCALL0(name, n) _SYSCALL(name, n)
 #define SYSCALL1(name, n) _SYSCALL(name, n)

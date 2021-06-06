@@ -12,6 +12,7 @@
 
 static struct arch_real_time_data *sRealTimeData;
 
+
 void
 __arch_init_time(struct real_time_data *data, bool setDefaults)
 {
@@ -27,5 +28,7 @@ __arch_init_time(struct real_time_data *data, bool setDefaults)
 bigtime_t
 __arch_get_system_time_offset(struct real_time_data *data)
 {
-	return 0;
+	// we don't use atomic_get64 because memory is read-only, maybe
+	// find another way to lock
+	return data->arch_data.system_time_offset;
 }
