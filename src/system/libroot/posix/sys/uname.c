@@ -93,6 +93,9 @@ uname(struct utsname *info)
 			case B_CPU_SH:
 				platform = "sh4";
 				break;
+			case B_CPU_RISC_V:
+				platform = "riscv64";
+				break;
 			case B_CPU_UNKNOWN:
 			default:
 				platform = "unknown";
