@@ -12,24 +12,23 @@
 static inline void
 memory_read_barrier_inline(void)
 {
-	asm volatile ("nop;" : : : "memory");
-#warning RISCV64: check memory_read_barrier_inline (FNOP ?)
+	// TODO: investigate reparate read/write barriers
+	__sync_synchronize();
 }
 
 
 static inline void
 memory_write_barrier_inline(void)
 {
-	asm volatile ("nop;" : : : "memory");
-#warning RISCV64: check memory_write_barrier_inline (FNOP ?)
+	// TODO: investigate reparate read/write barriers
+	__sync_synchronize();
 }
 
 
 static inline void
 memory_full_barrier_inline(void)
 {
-	asm volatile ("nop;" : : : "memory");
-#warning RISCV64: check memory_full_barrier_inline (FNOP ?)
+	__sync_synchronize();
 }
 
 

@@ -8,9 +8,24 @@
 #include <boot/menu.h>
 
 
+#ifdef __riscv
+
+struct CpuInfo {
+	uint32 id;
+};
+
+void arch_smp_register_cpu(CpuInfo** cpu);
+
+#endif
+
+
 int arch_smp_get_current_cpu(void);
 void arch_smp_init_other_cpus(void);
+#ifdef __riscv
+void arch_smp_boot_other_cpus(uint64 satp, uint64 kernel_entry);
+#else
 void arch_smp_boot_other_cpus(uint32 pml4, uint64 kernel_entry);
+#endif
 void arch_smp_add_safemode_menus(Menu *menu);
 void arch_smp_init(void);
 
