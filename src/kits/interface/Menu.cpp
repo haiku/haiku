@@ -2726,7 +2726,6 @@ BMenu::_CalcFrame(BPoint where, bool* scrollOn)
 	if (inMenuField)
 		frame.OffsetBy(-8.0f, 0.0f);
 
-	bool scroll = false;
 	if (superMenu == NULL || superItem == NULL || inMenuField) {
 		// just move the window on screen
 		if (frame.bottom > screenFrame.bottom)
@@ -2767,16 +2766,14 @@ BMenu::_CalcFrame(BPoint where, bool* scrollOn)
 			frame.OffsetBy(screenFrame.right - frame.right, 0);
 	}
 
-	if (!scroll) {
+	if (scrollOn != NULL) {
 		// basically, if this returns false, it means
 		// that the menu frame won't fit completely inside the screen
 		// TODO: Scrolling will currently only work up/down,
 		// not left/right
-		scroll = screenFrame.Height() < frame.Height();
+		*scrollOn = screenFrame.top > frame.top
+			|| screenFrame.bottom < frame.bottom;
 	}
-
-	if (scrollOn != NULL)
-		*scrollOn = scroll;
 
 	return frame;
 }
@@ -3252,33 +3249,28 @@ BMenu::_UpdateWindowViewSize(const bool &move)
 
 			window->ResizeTo(Bounds().Width(), Bounds().Height());
 		} else {
+
+			// Resize the window to fit the screen without overflowing the
+			// frame, and attach scrollers to our cached BMenuWindow.
 			BScreen screen(window);
+			frame = frame & screen.Frame();
+			window->ResizeTo(Bounds().Width(), frame.Height());
 
-			// Only scroll on menus not attached to a menubar, or when the
-			// menu frame is above the visible screen
-			if (dynamic_cast<BMenuBar*>(Supermenu()) == NULL || frame.top < 0) {
+			// we currently only support scrolling for B_ITEMS_IN_COLUMN
+			if (fLayout == B_ITEMS_IN_COLUMN) {
+				window->AttachScrollers();
 
-				// If we need scrolling, resize the window to fit the screen and
-				// attach scrollers to our cached BMenuWindow.
-				window->ResizeTo(Bounds().Width(), screen.Frame().Height());
-				frame.top = 0;
-
-				// we currently only support scrolling for B_ITEMS_IN_COLUMN
-				if (fLayout == B_ITEMS_IN_COLUMN) {
-					window->AttachScrollers();
-
-					BMenuItem* selectedItem = FindMarked();
-					if (selectedItem != NULL) {
-						// scroll to the selected item
-						if (Supermenu() == NULL) {
-							window->TryScrollTo(selectedItem->Frame().top);
-						} else {
-							BPoint point = selectedItem->Frame().LeftTop();
-							BPoint superPoint = Superitem()->Frame().LeftTop();
-							Supermenu()->ConvertToScreen(&superPoint);
-							ConvertToScreen(&point);
-							window->TryScrollTo(point.y - superPoint.y);
-						}
+				BMenuItem* selectedItem = FindMarked();
+				if (selectedItem != NULL) {
+					// scroll to the selected item
+					if (Supermenu() == NULL) {
+						window->TryScrollTo(selectedItem->Frame().top);
+					} else {
+						BPoint point = selectedItem->Frame().LeftTop();
+						BPoint superPoint = Superitem()->Frame().LeftTop();
+						Supermenu()->ConvertToScreen(&superPoint);
+						ConvertToScreen(&point);
+						window->TryScrollTo(point.y - superPoint.y);
 					}
 				}
 			}
