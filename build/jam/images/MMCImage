@@ -36,8 +36,13 @@ rule BuildSDImage image : files
 				Exit "Error: Unknown EFI architecture!" ;
 		}
 		BuildEfiSDImage1 $(image) : $(mbrtool) $(fatshell) $(files) ;
-	} else {
+	} else if $(TARGET_BOOT_PLATFORM) = u-boot {
 		BuildUBootSDImage1 $(image) : $(mbrtool) $(fatshell) $(files) ;
+	} else {
+		# TODO: For now we do nothing. Maybe we want a "AddSDImage" to
+		# append additional loaders like the raw riscv one?
+		echo "Asked for $(TARGET_BOOT_PLATFORM) target boot platform" ;
+		echo "Unknown path to handle adding to image" ;
 	}
 }
 
@@ -176,9 +181,12 @@ for platform in [ MultiBootSubDirSetup ] {
 				BuildSDImage $(HAIKU_MMC_NAME) : $(HAIKU_IMAGE)
 					haiku_loader.$(TARGET_BOOT_PLATFORM) ;
 			}
-		} else {
+		} else if $(TARGET_BOOT_PLATFORM) = u-boot {
 			BuildSDImage $(HAIKU_MMC_NAME) :
 				$(HAIKU_IMAGE) haiku_loader.$(TARGET_BOOT_PLATFORM) haiku-floppyboot.tgz.$(TARGET_BOOT_PLATFORM) boot.scr ;
+		} else {
+			BuildSDImage $(HAIKU_MMC_NAME) :
+				$(HAIKU_IMAGE) haiku_loader.$(TARGET_BOOT_PLATFORM) boot.scr ;
 		}
 	}
 }
