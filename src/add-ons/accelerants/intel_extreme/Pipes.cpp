@@ -107,8 +107,10 @@ Pipe::Configure(display_mode* mode)
 	//if (gInfo->shared_info->device_type.Generation() >= 4) {
 	//	pipeControl |= (INTEL_PIPE_DITHER_EN | INTEL_PIPE_DITHER_TYPE_SP);
 
-	//Link bit depth, which is currently hardcoded to 8-bits per color
-	pipeControl = (pipeControl & ~(0x7 << 5)) | INTEL_PIPE_8BPC;
+	//Link bit depth: this should be globally known per FDI link (i.e. laptop panel 3x6, rest 3x8)
+	//currently using BIOS preconfigured setup
+	//pipeControl = (pipeControl & ~INTEL_PIPE_BPC_MASK) | INTEL_PIPE_BPC(INTEL_PIPE_8BPC);
+
 	// TODO: CxSR downclocking?
 
 	// TODO: Interlaced modes
@@ -356,7 +358,7 @@ Pipe::ConfigureClocks(const pll_divisors& divisors, uint32 pixelClock,
 		// register which routes the PLL output to the transcoder that we need
 		// to configure
 		uint32 pllSel = read32(SNB_DPLL_SEL);
-		TRACE("Old PLL selection: %x\n", pllSel);
+		TRACE("Old PLL selection: 0x%" B_PRIx32 "\n", pllSel);
 		uint32 shift = 0;
 		uint32 pllIndex = 0;
 
@@ -381,7 +383,7 @@ Pipe::ConfigureClocks(const pll_divisors& divisors, uint32 pixelClock,
 		// Set up the new configuration for this transcoder and enable it
 		pllSel |= (8 | pllIndex) << shift;
 
-		TRACE("New PLL selection: %x\n", pllSel);
+		TRACE("New PLL selection: 0x%" B_PRIx32 "\n", pllSel);
 		write32(SNB_DPLL_SEL, pllSel);
 	}
 }

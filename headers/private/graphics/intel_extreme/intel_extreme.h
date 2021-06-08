@@ -727,10 +727,13 @@ struct intel_free_graphics_memory {
 #define INTEL_PIPE_DITHER_TYPE_ST2		(2 << 2)
 #define INTEL_PIPE_DITHER_TYPE_TEMP		(3 << 2)
 #define INTEL_PIPE_DITHER_EN			(1 << 4)
-#define INTEL_PIPE_8BPC					(0 << 5)
-#define INTEL_PIPE_10BPC				(1 << 5)
-#define INTEL_PIPE_6BPC					(2 << 5)
-#define INTEL_PIPE_12BPC				(3 << 5)
+#define INTEL_PIPE_COLOR_SHIFT			5
+#define INTEL_PIPE_BPC(x)				((x) << INTEL_PIPE_COLOR_SHIFT)
+#define INTEL_PIPE_BPC_MASK				(7 << INTEL_PIPE_COLOR_SHIFT)
+#define INTEL_PIPE_8BPC					0
+#define INTEL_PIPE_10BPC				1
+#define INTEL_PIPE_6BPC					2
+#define INTEL_PIPE_12BPC				3
 #define INTEL_PIPE_PROGRESSIVE			(0 << 21)
 
 // cursors
@@ -916,6 +919,10 @@ struct intel_free_graphics_memory {
 
 #define FDI_RX_ENABLE					(1 << 31)
 #define FDI_RX_PLL_ENABLED				(1 << 13)
+
+#define FDI_RX_LINK_COLOR_SHIFT			16
+#define FDI_RX_LINK_BPC(x)				((x) << FDI_RX_LINK_COLOR_SHIFT)
+#define FDI_RX_LINK_BPC_MASK			(7 << FDI_RX_LINK_COLOR_SHIFT)
 
 // Transcoder - same base as FDI_RX
 #define PCH_TRANS_CONF_A				0x0008

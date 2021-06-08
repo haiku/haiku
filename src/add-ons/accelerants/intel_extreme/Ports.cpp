@@ -21,6 +21,7 @@
 #include "accelerant_protos.h"
 #include "FlexibleDisplayInterface.h"
 #include "intel_extreme.h"
+#include "PanelFitter.h"
 
 #include <new>
 
@@ -133,7 +134,7 @@ Port::SetPipe(Pipe* pipe)
 	// FIXME is the use of PORT_TRANS_* constants correct for Sandy Bridge /
 	// Cougar Point? Or is it only for Ivy Bridge / Panther point onwards?
 	if (gInfo->shared_info->pch_info == INTEL_PCH_CPT) {
-		portState &= ~PORT_TRANS_SEL_MASK;
+		portState &= ~PORT_TRANS_SEL_MASK; //fixme should be done sooner, not here!
 		if (pipe->Index() == INTEL_PIPE_A)
 			write32(portRegister, portState | PORT_TRANS_A_SEL_CPT);
 		else
@@ -144,7 +145,6 @@ Port::SetPipe(Pipe* pipe)
 		else
 			write32(portRegister, portState | DISPLAY_MONITOR_PIPE_B);
 	}
-
 	fPipe = pipe;
 
 	if (fPipe == NULL)
@@ -306,6 +306,7 @@ AnalogPort::_PortRegister()
 status_t
 AnalogPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 {
+	CALLED();
 	TRACE("%s: %s %dx%d\n", __func__, PortName(), target->virtual_width,
 		target->virtual_height);
 
@@ -314,14 +315,13 @@ AnalogPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 		return B_ERROR;
 	}
 
-#if 0
-	// Disabled for now as our code doesn't work. Let's hope VESA/EFI has
-	// already set things up for us during boot.
-	// Train FDI if it exists
+	// Setup PanelFitter and Train FDI if it exists
 	FDILink* link = fPipe->FDI();
-	if (link != NULL)
+	if (link != NULL) {
+		// fixme insert fitter setup here
+
 		link->Train(target);
-#endif
+	}
 
 	pll_divisors divisors;
 	compute_pll_divisors(target, &divisors, false);
@@ -500,14 +500,13 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 		}
 	}
 
-#if 0
-	// Disabled for now as our code doesn't work. Let's hope VESA/EFI has
-	// already set things up for us during boot.
-	// Train FDI if it exists
+	// Setup PanelFitter and Train FDI if it exists
 	FDILink* link = fPipe->FDI();
-	if (link != NULL)
+	if (link != NULL) {
+		// fixme insert fitter setup here
+
 		link->Train(target);
-#endif
+	}
 
 	// For LVDS panels, we may need to set the timings according to the panel
 	// native video mode, and let the panel fitter do the scaling. But the
@@ -727,6 +726,7 @@ DigitalPort::_PortRegister()
 status_t
 DigitalPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 {
+	CALLED();
 	TRACE("%s: %s %dx%d\n", __func__, PortName(), target->virtual_width,
 		target->virtual_height);
 
@@ -735,14 +735,13 @@ DigitalPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 		return B_ERROR;
 	}
 
-#if 0
-	// Disabled for now as our code doesn't work. Let's hope VESA/EFI has
-	// already set things up for us during boot.
-	// Train FDI if it exists
+	// Setup PanelFitter and Train FDI if it exists
 	FDILink* link = fPipe->FDI();
-	if (link != NULL)
+	if (link != NULL) {
+		// fixme insert fitter setup here
+
 		link->Train(target);
-#endif
+	}
 
 	pll_divisors divisors;
 	compute_pll_divisors(target, &divisors, false);
@@ -934,6 +933,7 @@ DisplayPort::_PortRegister()
 status_t
 DisplayPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 {
+	CALLED();
 	TRACE("%s: %s %dx%d\n", __func__, PortName(), target->virtual_width,
 		target->virtual_height);
 
@@ -1095,6 +1095,7 @@ DigitalDisplayInterface::IsConnected()
 status_t
 DigitalDisplayInterface::SetDisplayMode(display_mode* target, uint32 colorMode)
 {
+	CALLED();
 	TRACE("%s: %s %dx%d\n", __func__, PortName(), target->virtual_width,
 		target->virtual_height);
 
