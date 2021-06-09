@@ -9,10 +9,16 @@
 #include <errno.h>
 
 #include <errno_private.h>
+#include <symbol_versioning.h>
+
+
+// prototypes for the compiler
+int _getrusage_base(int who, struct rusage *rusage);
+int _getrusage_current(int who, struct rusage *rusage);
 
 
 int
-getrusage(int who, struct rusage *rusage)
+_getrusage_base(int who, struct rusage *rusage)
 {
 	team_usage_info info;
 
@@ -30,3 +36,19 @@ getrusage(int who, struct rusage *rusage)
 	return 0;
 }
 
+
+int
+_getrusage_current(int who, struct rusage *rusage)
+{
+	int err = _getrusage_base(who, rusage);
+	if (err != -1) {
+		memset(&rusage->ru_maxrss, 0, sizeof(struct rusage) -
+			offsetof(struct rusage, ru_maxrss));
+	}
+	return err;
+}
+
+
+DEFINE_LIBROOT_KERNEL_SYMBOL_VERSION("_getrusage_base", "getrusage@", "BASE");
+DEFINE_LIBROOT_KERNEL_SYMBOL_VERSION("_getrusage_current", "getrusage@@",
+	"1_BETA3");
