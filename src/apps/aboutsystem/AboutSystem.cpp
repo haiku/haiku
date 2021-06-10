@@ -1222,7 +1222,7 @@ AboutView::_CreateCreditsView()
 
 	_AddPackageCredit(PackageCredit("Spleen font")
 		.SetCopyrights(B_TRANSLATE(COPYRIGHT_STRING
-			"Copyright (c) 2018-2021, Frederic Cambus"),
+			"2018-2021, Frederic Cambus"),
 			NULL)
 		.SetLicense(kBSDTwoClause)
 		.SetURL("https://www.cambus.net/spleen-monospaced-bitmap-fonts/"));
