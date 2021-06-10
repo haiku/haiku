@@ -51,6 +51,9 @@ DemangleTest::RunGCC3PTests()
 		"_ZN8BPrivate16BContainerWindow10UpdateMenuEP5BMenuNS0_17UpdateMenuContextE");
 	TEST("icu_57::BreakIterator::registerInstance(icu_57::BreakIterator*, icu_57::Locale const&, UBreakIteratorType, UErrorCode&)",
 		"_ZN6icu_5713BreakIterator16registerInstanceEPS0_RKNS_6LocaleE18UBreakIteratorTypeR10UErrorCode");
+	TEST("void std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_construct<char*>(char*, char*, std::forward_iterator_tag) [clone .isra.25]",
+		"_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE12_M_constructIPcEEvT_S7_St20forward_iterator_tag.isra.25");
+	TEST("foo(int) [clone .part.1.123456] [clone .constprop.777.54321]", "_Z3fooi.part.1.123456.constprop.777.54321");
 }
 #undef TEST
 
