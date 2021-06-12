@@ -30,6 +30,13 @@ for platform in [ MultiBootSubDirSetup ] {
 				BOOT_SUPPORT_FILE_SYSTEM_FAT
 			;
 
+			if $(TARGET_BOOT_PLATFORM) = efi {
+				DEFINES +=
+					_BOOT_PLATFORM_EFI
+					BOOT_SUPPORT_PARTITION_EFI
+				;
+			}
+
 			# Add architecture specific partition/file system modules
 
 			switch $(TARGET_KERNEL_ARCH) {
@@ -53,11 +60,7 @@ for platform in [ MultiBootSubDirSetup ] {
 
 						#BOOT_SUPPORT_FILE_SYSTEM_FAT
 					;
-					if $(TARGET_BOOT_PLATFORM) = efi {
-						DEFINES +=
-							_BOOT_PLATFORM_EFI
-						;
-					} else {
+					if $(TARGET_BOOT_PLATFORM) != efi {
 						DEFINES +=
 							_BOOT_PLATFORM_BIOS
 							BOOT_SUPPORT_ELF32
@@ -66,20 +69,11 @@ for platform in [ MultiBootSubDirSetup ] {
 				}
 				case "sparc" :
 				{
-					DEFINES +=
-						BOOT_SUPPORT_ELF64
-					;
+					DEFINES += BOOT_SUPPORT_ELF64 ;
 				}
 				case "riscv64" :
 				{
-					DEFINES +=
-						BOOT_SUPPORT_ELF64
-					;
-					if $(TARGET_BOOT_PLATFORM) = efi {
-						DEFINES +=
-							_BOOT_PLATFORM_EFI
-						;
-					}
+					DEFINES += BOOT_SUPPORT_ELF64 ;
 				}
 				case "m68k" :
 				{
@@ -88,11 +82,6 @@ for platform in [ MultiBootSubDirSetup ] {
 				case "arm" :
 				{
 					DEFINES += BOOT_SUPPORT_ELF32 ;
-					if $(TARGET_BOOT_PLATFORM) = efi {
-						DEFINES +=
-							_BOOT_PLATFORM_EFI
-						;
-					}
 				}
 			}
 
