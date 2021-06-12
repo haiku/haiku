@@ -22,6 +22,8 @@ local kernelArchSources =
 
 local kernelDebugSources =
 	blue_screen.cpp
+	font.cpp
+	font_spleen.cpp
 	frame_buffer_console.cpp
 ;
 
