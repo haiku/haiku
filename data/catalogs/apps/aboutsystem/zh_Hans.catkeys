@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-About	500705977
+1	english	x-vnd.Haiku-About	511528774
 Revision	AboutView		发行版本
 The Haikuware team and their bounty program\n	AboutView		Haikuware 组织及其捐赠程序\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		版权所有 © 1999-2007 Michael C. Ring，保留所有权利。
@@ -15,6 +15,7 @@ Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		�
 Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		版权素有 © 1990-2002 Info-ZIP，保留所有权利。
 Past website & marketing:\n	AboutView		早先网站及市场：\n
 Copyright © 2003 Peter Hanappe and others.	AboutView		版权所有 © 2003 Peter Hanappe 及其他人员。
+Testing and bug triaging:\n	AboutView		测试与错误分析：\n
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{处理器 单核:} other{处理器 # 核:}}
 %d MiB total	AboutView		总计 %d MiB
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Haiku所独有的代码，尤其是内核及与之紧密关联的所有应用程序的代码，它们都在 <MIT 协议> 条款下发布。那些包含第三方代码的系统库则在 <LGPL 协议> 下发布。您可以在下述信息中找到第三方部分代码的版权信息。\n\n

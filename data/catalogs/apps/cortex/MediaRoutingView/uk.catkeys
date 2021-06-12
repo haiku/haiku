@@ -1,6 +1,24 @@
-1	ukrainian	application/x-vnd.Cortex.MediaRoutingView	592532116
+1	ukrainian	application/x-vnd.Cortex.MediaRoutingView	2426283233
+Lock group	MediaNodePanel		Заблокувати групу
+%refname% (no file)	MediaNodePanel		%refname% (немає файлу)
+Video output	MediaRoutingView		Відеовихід
 OK	MediaRoutingView		ОК
+Cycle	MediaNodePanel		Цикл
+Advanced	MediaNodePanel		Додатково…
+Audio input	MediaRoutingView		Аудіовхід
+Run mode	MediaNodePanel		Режим роботи
+Could not load '%filename%'	MediaRoutingView		Не вдалося завантажити '%filename%'
+Video input	MediaRoutingView		Відеовхід
+Release	MediaNodePanel		Відключити
+Could not instantiate '%infoname%'	MediaRoutingView		Не вдалося створити екземпляр '%infoname%'
+Select all	MediaRoutingView		Вибрати все
+Input	MediaJack		Вхід
 Get info	MediaJack		Дивитись Інфо
+Error	MediaRoutingView		Помилка
+Could not release '%refname%'	MediaRoutingView		Не вдалося відключити '%refname%'
+Output	MediaJack		Вихід
 Get info	MediaNodePanel		Дивитись Інфо
 Get info	MediaRoutingView		Дивитись Інфо
+Clean up	MediaRoutingView		Упорядкувати
 Tweak parameters	MediaNodePanel		Параметри налаштування
+Unlock group	MediaNodePanel		Розблокувати групу

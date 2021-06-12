@@ -16,7 +16,7 @@ Mro	UnicodeBlocks		ムロ文字
 Mongolian	UnicodeBlocks		モンゴル文字
 Pau Cin Hau	UnicodeBlocks		パウ・チン・ハウ文字
 Yezidi	UnicodeBlocks		イェジディ文字
-Linear B ideograms	UnicodeBlocks		線文字 B 音節
+Linear B ideograms	UnicodeBlocks		線文字 B 表意文字
 Caucasian Albanian	UnicodeBlocks		カフカース・アルバニア文字
 CJK unified ideographs extension D	UnicodeBlocks		CJK 統合漢字拡張 D
 Sharada	UnicodeBlocks		シャーラダー文字
@@ -166,7 +166,7 @@ Box drawing	UnicodeBlocks		罫線素辺
 Egyptian hieroglyphs	UnicodeBlocks		ヒエログリフ文字
 Vai	UnicodeBlocks		ヴァイ文字
 Meetei Mayek extensions	UnicodeBlocks		マニプリ文字拡張
-Ethiopic extended	UnicodeBlocks		エチオピア文字
+Ethiopic extended	UnicodeBlocks		エチオピア文字拡張
 CJK compatibility	UnicodeBlocks		CJK 互換用文字
 Tai Le	UnicodeBlocks		タイ・レ文字
 Old Sogdian	UnicodeBlocks		古ソグド文字
@@ -181,7 +181,7 @@ Optical character recognition	UnicodeBlocks		光学的文字認識
 Tamil	UnicodeBlocks		タミル文字
 Lisu	UnicodeBlocks		リス文字
 Nandingari	UnicodeBlocks		ナンディナーガリー文字
-Greek extended	UnicodeBlocks		ギリシャ拡張文字
+Greek extended	UnicodeBlocks		ギリシャ文字拡張
 Myanmar extended B	UnicodeBlocks		ミャンマー文字拡張 B
 Mahajani	UnicodeBlocks		マハジャニ文字
 Lepcha	UnicodeBlocks		レプチャ文字
@@ -243,7 +243,7 @@ Meetei Mayek	UnicodeBlocks		メイテイ・マイェック文字
 CJK compatibility ideographs	UnicodeBlocks		CJK 互換漢字
 Show private blocks	CharacterWindow		プライベートブロックを表示
 Samaritan	UnicodeBlocks		サマリア文字
-Latin extended additional	UnicodeBlocks		ラテン拡張追加
+Latin extended additional	UnicodeBlocks		ラテン文字拡張追加
 Tibetan	UnicodeBlocks		チベット文字
 Combining diacritical marks	UnicodeBlocks		ダイアクリティカルマーク (合成可能)
 Tags	UnicodeBlocks		言語タグ

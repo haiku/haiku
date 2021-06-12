@@ -1,12 +1,12 @@
-1	belarusian	x-vnd.Haiku-NewMailNotification	583443025
-Keyboard LEDs	ConfigView		Клавіятурныя LED
-Log window	ConfigView		Вакно пратаколу
-Central beep	ConfigView		Цэнтральны гук
-Beep	ConfigView		Біп
-Method:	ConfigView		Метад:
-Central alert	ConfigView		Цэнтральная папярэджанне
-Alert	ConfigView		Папярэджанне
-none	ConfigView		няма
-New messages	filter		Новыя паведамленні
-New mails notification	ConfigView		Інфа пра новыя паведамленні
-OK	filter		ОК
+1	belarusian	x-vnd.Haiku-NewMailNotification	2338542986
+Log window	NotifierConfigView		Акно гісторыі
+none	NotifierConfigView		не
+New mails notification	NotifierFilter		Паведамленне пра новую пошту
+Alert	NotifierConfigView		Паведамленне
+OK	NotifierFilter		Добра
+Central alert	NotifierConfigView		Цэнтральнае паведамленне
+Beep	NotifierConfigView		Гукавы сігнал
+Central beep	NotifierConfigView		Цэнтральны гукавы сігнал
+New messages	NotifierFilter		Новыя паведамленні
+Method:	NotifierConfigView		Метад:
+Keyboard LEDs	NotifierConfigView		Клавіатурныя светадыёды

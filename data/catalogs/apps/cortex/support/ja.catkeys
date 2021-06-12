@@ -72,7 +72,7 @@ Side-left	MediaString		Side-left
 32 bit CMYK	MediaString		32 bit CMYK
 (unknown multistream format)	MediaString		(不明なマルチストリームフォーマット)
 8 bit integer	MediaString		8 bit 整数
-8 bit grayscale-index	MediaString		8 bit グレイスケースインデックス
+8 bit grayscale-index	MediaString		8 bit グレイスケールインデックス
 YCbCr444	MediaString		YCbCr444
 Buffer producer	MediaString		Buffer producer
 Buffer consumer	MediaString		Buffer consumer

@@ -1,0 +1,10 @@
+1	belarusian	x-vnd.Haiku-DNSClientService	2825577357
+DNS settings	DNSClientServiceAddOn		Наладкі DNS
+Move down	DNSSettingsView		Перасунуць уніз
+DNS settings	DNSSettingsView		Наладкі DNS
+Remove	DNSSettingsView		Выдаліць
+Domain:	DNSSettingsView		Дамен:
+Add	DNSSettingsView		Дадаць
+Server:	DNSSettingsView		Сервер:
+Move up	DNSSettingsView		Перасунуць уверх
+Apply	DNSSettingsView		Прымяніць

@@ -1,0 +1,7 @@
+1	swedish	application/x-vnd.Cortex.NodeManager	1301322433
+System audio mixer	NodeManager		System ljud mixer
+System video output	NodeManager		Systemvideoutgång
+System video input	NodeManager		Systemvideoingång
+No name	NodeManager		Inget namn
+System audio input	NodeManager		Systemljudingång
+Time sources	NodeManager		Tidskällor

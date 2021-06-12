@@ -94,7 +94,7 @@ Add Style	Icon-O-Matic-AddStylesCmd		スタイルを追加
 Nudge Control Points	Icon-O-Matic-NudgePointsCommand		コントロールポイントを動かす
 Move Styles	Icon-O-Matic-MoveStylesCmd		スタイルを移動
 Don't save	Icon-O-Matic-Menu-Settings		保存しない
-Add shape with path	Icon-O-Matic-Menu-Shape		パスつきシェイプを追加
+Add shape with path	Icon-O-Matic-Menu-Shape		パス付きシェイプを追加
 Translation X	Icon-O-Matic-PropertyNames		X軸移動
 Flip Control Points	Icon-O-Matic-FlipPointsCmd		コントロールポイントを反転
 Add Transformers	Icon-O-Matic-AddTransformersCmd		Transformerを追加

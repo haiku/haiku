@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-BluetoothPrefs	1664504189
+1	english	x-vnd.Haiku-BluetoothPrefs	3945807779
 Start bluetooth services…	Window		启动蓝牙服务...
 From all devices	Settings view		从所有设备
 Defaults	Window		默认
@@ -9,10 +9,12 @@ Only from trusted devices	Settings view		仅从信任设备
 Launch now	main		立即打开
 Bluetooth	System name		蓝牙
 Remove	Remote devices		删除
+Pick device…	Settings view		选择设备…
 Always ask	Settings view		总是询问
 Quit	main		退出
 15 secs	Settings view		15秒
 Help	Window		帮助
+With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped…\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		支持人员:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\n感谢所有帮助过我们的朋友…\n\n硬件捐赠:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\n资金支持:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\n补丁贡献:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\n测试:\n - Petter H. Juliussen\n给予我知识和经验的:\n - yellowTAB 团队
 Manufacturer: 	Device View		制造商：
 Pair…	Remote devices		校核...
 Desktop	Settings view		桌面电脑

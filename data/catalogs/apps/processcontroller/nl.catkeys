@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-ProcessController	3123774187
+1	dutch; flemish	x-vnd.Haiku-ProcessController	415082887
 Error saving file	ProcessController		Fout bij bestandsopslag
 Display priority	ProcessController		Weergave prioriteit
 That's no Fun!	ProcessController		Da's niet Leuk!
@@ -21,6 +21,7 @@ Restart Deskbar	ProcessController		Deskbar herstarten
 About ProcessController…	ProcessController		Over ProcessController...
 Usage: %s [-deskbar]\n	ProcessController		Gebruik: %s [-deskbar]\n
 Please confirm	ProcessController		Gelieve te bevestigen
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr
 Urgent priority	ProcessController		Dringende prioriteit
 What do you want to do with the thread \"%s\"?	ProcessController		Wat wilt u met de thread \"%s\" doen?
 Idle priority	ProcessController		Inactieve prioriteit

@@ -1,5 +1,6 @@
-1	english	x-vnd.Haiku-FileTypes	734679611
+1	english	x-vnd.Haiku-FileTypes	586766331
 Left	Attribute Window	Attribute column alignment in Tracker	左对齐
+Float	Attribute ListView		浮动
 Final	Application Types Window		最终版
 FileTypes request	FileTypes Window		文件类型要求
 This file type already exists	New File Type Window		该文件类型已存在
@@ -31,6 +32,7 @@ Signature:	Application Types Window		署名：
 None	FileTypes Window		无
 Exclusive launch	Application Type Window		单独启动
 Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		文件类型的删除无法进行恢复。\n您确定要删除它么？
+Integer 64 bit	Attribute ListView		整型 64 位
 Cancel	New File Type Window		取消
 Select same preferred application as	FileType Window		首选程序相同于
 Cancel	Type List Window		取消
@@ -46,7 +48,9 @@ Icon	Application Type Window		图标
 Version:	Application Type Window		版本:
 Default application	FileType Window		默认程序
 Internal name:	New File Type Window		内部名称:
+Integer 8 bit	Attribute ListView		整型 8 位
 Extension:	Extension Window		扩展:
+Time	Attribute ListView		时间
 Extensions:	FileTypes Window		扩展名：
 Select preferred application	FileType Window		设置首选程序
 Description:	FileTypes Window		描述：
@@ -66,6 +70,7 @@ Version:	Application Types Window		版本：
 Application types	Application Types Window		应用类型
 Description:	Application Types Window		描述：
 Name:	Application Types Window		名称：
+Rating	Attribute ListView		排序
 File could not be opened	Preferred App Menu		文件无法打开
 Args only	Application Type Window		仅含参数
 Could not open \"%s\":\n%s	FileTypes		无法打开 \"%s\":\n%s
@@ -86,11 +91,14 @@ Path:	Application Types Window		路径：
 Could not install file type	New File Type Window		无法安装文件类型
 Same as…	FileTypes Window		相同于...
 Golden master	Application Type Window		发运版
+Checkbox	Attribute ListView		选框
 FileTypes request	Preferred App Menu		文件类型要求
 no icon	FileTypes Window		无图标
 Single launch	Application Type Window		单个启动
 %s file type	FileType Window		%s 文件类型
+Default	Attribute ListView		默认
 Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		超级类型的删除无法恢复。\n所有处于该超级类型的文件类型将会丢失！\n\n您确定要执行此操作吗？按下Shift键，同时点击\"删除\"，将会删除整个类型组。
+String	Attribute ListView		字符串
 Add type	New File Type Window		增加类型
 Remove icon	Icon View		删除图标
 Cancel	Extension Window		取消
@@ -118,6 +126,7 @@ Add group	New File Type Window		增加用户组
 Cancel	Attribute Window		取消
 Gamma	Application Types Window		候选版
 Supported types	Application Type Window		支持文件类型
+Integer 32 bit	Attribute ListView		整型 32 位
 Beta	Application Type Window		公测版
 Could not retrieve preferred application of this file	Preferred App Menu		未检索到该文件的首选程序
 Application flags	Application Type Window		程序标识
@@ -142,6 +151,7 @@ Extra attributes	FileTypes Window		扩展属性
 Group:	New File Type Window		用户组:
 Alpha	Application Types Window		内测版
 Close	Application Type Window		关闭
+Integer 16 bit	Attribute ListView		整型 16 位
 Extension	Extension Window		扩展
 Rule:	FileTypes Window		规则：
 FileTypes	System name		文件类型
@@ -153,5 +163,6 @@ Add…	FileTypes Window		添加...
 Edit icon…	Icon View		编辑图标…
 Internal name:	Attribute Window		内部名称:
 Show recognition rule	FileTypes Window		显示识别规则
+Double	Attribute ListView		浮点数
 Move down	FileTypes Window		下移
 Alpha	Application Type Window		内测版

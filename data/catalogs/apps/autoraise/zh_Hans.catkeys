@@ -1,9 +1,10 @@
-1	english	x-vnd.mmu.AutoRaise	3791453400
+1	english	x-vnd.mmu.AutoRaise	1785543909
 AutoRaise, (c) 2002, mmu_man\nEnjoy :-)	AutoRaiseIcon		AutoRaise, (c) 2002, mmu_man\n尽情享受 :-)
 2 s	AutoRaiseIcon		2 秒
 OK	AutoRaiseIcon		确认
 AutoRaise	System name		AutoRaise
 0.2 s	AutoRaiseIcon		0.2 秒
+1 s	AutoRaiseIcon		1 秒
 Delay	AutoRaiseIcon		延迟
 5 s	AutoRaiseIcon		5 秒
 Active	AutoRaiseIcon		激活

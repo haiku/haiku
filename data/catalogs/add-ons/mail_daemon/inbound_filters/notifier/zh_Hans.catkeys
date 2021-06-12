@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-NewMailNotification	2111731137
+1	english	x-vnd.Haiku-NewMailNotification	1375000288
 Log window	NotifierConfigView		日志窗口
 none	NotifierConfigView		无
 New mails notification	NotifierFilter		新邮件通知
@@ -11,3 +11,4 @@ Central beep	NotifierConfigView		中部蜂鸣
 New messages	NotifierFilter		新消息
 Method:	NotifierConfigView		方法：
 Keyboard LEDs	NotifierConfigView		键盘LED
+You have {0, plural, one{one new message} other{# new messages}} for %account.	NotifierFilter		您的账户 %account 有 {0, plural, one{one new message} other{# new messages}}  

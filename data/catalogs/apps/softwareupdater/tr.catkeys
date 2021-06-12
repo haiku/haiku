@@ -8,7 +8,7 @@ There were no updates found.	CheckManager		Güncelleme bulunamadı.
 Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		Güncellemeler tamamlanmadı, çıkmak istediğinizden emin misiniz?
 Updates found	SoftwareUpdaterWindow		Güncellemeler bulundu
 Update now	SoftwareUpdaterWindow		Şimdi güncelle
-For some reason, we could not reboot your computer.	SoftwareUpdaterWindow		Hiçbir şey olmasa bile bir şeyler oldu ve biz bilgisayarınızı yeniden başlatamadık.
+For some reason, we could not reboot your computer.	SoftwareUpdaterWindow		Hiçbir şey olmasa bile bir şeyler oldu ve bilgisayarınızı yeniden başlatamadık.
 OK	UpdateManager		Tamam
 Unrecognized argument	SoftwareUpdaterApp	Error message	Tanımlanamayan değişken
 There were no updates found.	CheckAction		Güncelleme bulunamadı.

@@ -1,6 +1,7 @@
-1	belarusian	x-vnd.Haiku-SpamFilter	160316705
+1	belarusian	x-vnd.Haiku-SpamFilter	468104950
 or empty e-mail	SpamFilterConfig		ці пустыя паведамленні
 Genuine below and uncertain above:	SpamFilterConfig		Сапраўдныя ніжэй і нявызначаныя вышэй:
 Spam above:	SpamFilterConfig		Спам вышэй:
 Add spam rating to start of subject	SpamFilterConfig		Дадаць спам-рэйтынг ў пачатак тэмы
+Bayesian Spam Filter	SpamFilter		Спам-фільтр Баеса
 Learn from all incoming e-mail	SpamFilterConfig		Навучаць з ўсіх уваходных паведамленняў

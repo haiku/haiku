@@ -45,7 +45,7 @@ A response to the captcha question must be provided.	UserLoginWindow		キャプ�
 Category	FilterView		分類
 User rating	RatePackageWindow		ユーザーによる評価
 Installed packages	MainWindow		インストール済パッケージ
-A requested object or an object involved in the request was not found on the server.	ServerHelper		要求されたオブジェクトまたはリクエストに関連するオブジェクトがサーバー上に見つかりませんでした。　　
+A requested object or an object involved in the request was not found on the server.	ServerHelper		要求されたオブジェクトまたはリクエストに関連するオブジェクトがサーバー上に見つからなかった。
 Fatal error	PackageManager		致命的なエラー
 Package action failed	PackageInfoView		パッケージアクションに失敗しました
 No changelog available.	PackageInfoView		変更記録はありません。

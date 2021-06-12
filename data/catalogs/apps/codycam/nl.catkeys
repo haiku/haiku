@@ -1,6 +1,7 @@
-1	dutch; flemish	x-vnd.Haiku-CodyCam	40716723
+1	dutch; flemish	x-vnd.Haiku-CodyCam	12021044
 destination directory expected	CodyCam		doelmap verwacht
 reply: '%s'\n	SftpClient		antwoord: '%s'\n
+PASS <suppressed>  (real password sent)	FtpClient		PASS <verborgen>  (echt wachtwoord is verzonden)
 JPEG image	CodyCam		JPEG-afbeelding
 Remote host has closed the connection.\n	FtpClient		Host-op-afstand heeft de verbinding verbroken.\n
 image file format expected	CodyCam		bestandsformaat van afbeelding verwacht

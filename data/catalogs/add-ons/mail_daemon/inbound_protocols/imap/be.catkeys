@@ -1,5 +1,14 @@
-1	belarusian	x-vnd.Haiku-IMAP	3213145085
+1	belarusian	x-vnd.Haiku-IMAP	1343128980
+Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Немагчыма далучыцца да  \"%server%\":\n%error%
+Updating subscriptions to IMAP folders, please be patient…	IMAPFolderConfig		Абнаўленне падпісак IMAP, калі ласка пачкайце…
 Failed to fetch available storage.	IMAPFolderConfig		Памылка падчас атрымання дадзеных.
+Cancel	IMAPFolderConfig		Адмяніць
+OK	IMAPFolderConfig		Так
+Server storage: %s / %s used.	IMAPFolderConfig		Сервернае сховішча: %s / %s занята.
+No encryption	imap_config		Без кадавання
+Fetching IMAP folders, please be patient…	IMAPFolderConfig		Атрыманне папак IMAP, пачакайце калі ласка…
+Configure IMAP Folders	imap_config		Наладзіць папкі IMAP
+SSL	imap_config		SSL
 Apply	IMAPFolderConfig		Прымяніць
 status	IMAPFolderConfig		статус
 IMAP Folders	IMAPFolderConfig		IMAP папкі

@@ -2,7 +2,7 @@
 Positioning	DeviceClass		位置
 Controller	DeviceClass		コントローラー
 Common ISDN access	DeviceClass		一般的な ISDN 接続
-Unknown (reserved) minor device class	DeviceClass		不明 (予約済) の副デバイスクラス
+Unknown (reserved) minor device class	DeviceClass		不明 (予約済) なマイナーデバイスクラス
 Uncategorized	DeviceClass		未分類
 Keyboard	DeviceClass		キーボード
 Smart phone	DeviceClass		スマートフォン

@@ -21,7 +21,7 @@ Print…	ProbeView		Imprimir...
 New…	FileWindow		Nuevo...
 what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	que: '%.4s\n\n
 OK	DiskProbe		Aceptar
-DiskProbe	System name		Prueba de Disco
+DiskProbe	System name		Examinador de disco
 Back	ProbeView		Volver
 Device: 	ProbeView		Dispositivo:
 Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Base
@@ -30,7 +30,7 @@ Open file…	FileWindow		Abrir archivo...
 DiskProbe request	DiskProbe		Solicitud de examinar disco
 Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hex
 Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Falló la escritura al Archivo:\n%s\n\nSe perderán todos los cambios cuando se salga.
-Examine device:	OpenWindow		Examinar dispositivo
+Examine device:	OpenWindow		Examinar dispositivo:
 Number editor	TypeEditors		Editor de número
 Icon	TypeEditors		Icono
 Attribute	ProbeView		Atributo

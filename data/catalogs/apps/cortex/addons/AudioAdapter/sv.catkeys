@@ -1,0 +1,10 @@
+1	swedish	application/x-vnd.moon-AudioAdapter.media_addon	2282220510
+Input format	CortexAudioAdapter		Inmatningsformat
+Channels:	CortexAudioAdapter		Kanaler:
+stereo	CortexAudioAdapter		stereo
+mono	CortexAudioAdapter		mono
+Output format	CortexAudioAdapter		Utmatningsformat
+Audio input	CortexAddOnsCommon		Ljudingång
+Sample format:	CortexAudioAdapter		Exempelformat:
+Audio output	CortexAddOnsCommon		Ljudutgång
+%groupname% parameters	CortexAddOnsCommon		%groupname% parametrar

@@ -110,7 +110,7 @@ Save as Query template:	FindPanel		クエリ雛型として保存:
 Edit templates…	TemplatesMenu		テンプレートを編集…
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# バイト} other{# バイト}}
 8-bit integer	AttributesView		8 ビット整数
-8-bit unsigned integer	AttributesView		8 ビット符号なし整数
+8-bit unsigned integer	AttributesView		8 ビット符号無し整数
 %s info	InfoWindow	window title	%s の情報
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used 使用中 -- %free 使用可能)
 Hide dotfiles	SettingsView		ドットファイルを隠す
@@ -189,7 +189,7 @@ Nested *?+.	libtracker		*?+ が入れ子になっています。
 Move	FSUtils	button label	移動
 Clean up	DeskWindow		アイコンの整列
 Group	FilePermissionsView		グループ
-Could not find an application to open \"%name\" (%error). 	FSUtils		%errorエラーが発生したため、\"%name\" を開くアプリケーションが見つかりませんでした。
+Could not find an application to open \"%name\" (%error). 	FSUtils		\"%name\" を開くアプリケーションは見つからなかった (%error)。
 Internal error.	libtracker		内部エラーが発生しました。
 Mini icon view	DeskWindow		ミニアイコン表示
 Geometric size	AttributesView		幾何学的サイズ
@@ -279,7 +279,7 @@ Error %error loading Add-On %name.	ContainerWindow		アドオン%nameの読み�
 You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		下記の項目:\n\t%name%dest\nを\n\t%name%src\nで置き換えようとしています。\n\n%movemodeの項目と置き換えますか?
 Empty Trash	ContainerWindow		ごみ箱を空にする
 no supporting apps	OpenWithWindow		対応するアプリケーションはありません
-32-bit unsigned integer	AttributesView		32 ビット符号なし整数
+32-bit unsigned integer	AttributesView		32 ビット符号無し整数
 Preparing to empty Trash…	StatusWindow		ごみ箱を空にする準備をしています…
 Deleting: 	StatusWindow		削除中:
 the MIME settings	FSUtils		MIME 設定
@@ -352,12 +352,12 @@ Messenger	AttributesView		Messenger
 after	FindPanel		以降
 {0, plural, one{<# data byte>} other{<# bytes of data>}}	AttributesView		{0, plural, one{<# バイト>} other{<# バイト>}}
 Version	OpenWithWindow		バージョン
-Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		いくつかの選択項目はごみ箱に捨てられません。完全に削除してもよろしいですか?元に戻せませんので、ご注意ください。
+Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		いくつかの選択項目はごみ箱に捨てられません。完全に削除してもよろしいですか?元に戻せないので、ご注意ください。
 Add printer…	ContainerWindow		プリンターの追加…
 On	FindPanel		有効
 Permissions	ContainerWindow		アクセス権
 Size:	InfoWindow		サイズ:
-The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		選択した項目をごみ箱に捨てられません。完全に削除しても良いでしょうか? 元には戻せませんので、ご注意ください。
+The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		選択した項目をごみ箱に捨てられません。完全に削除しても良いでしょうか? 元には戻せないので、ご注意ください。
 Copy	ContainerWindow		コピー
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		「Character」属性にはマルチバイト文字を保存できません。
 Open parent	VirtualDirectoryWindow		親フォルダーを開く
@@ -392,7 +392,7 @@ Edit Query template	FindPanel		クエリテンプレートを編集
 Save query as template…	FindPanel		クエリテンプレートとして保存…
 All disks	AutoMounterSettings		全パーティション
 link	FSUtils	filename link	リンク
-16-bit unsigned integer	AttributesView		16 ビット符号なし整数
+16-bit unsigned integer	AttributesView		16 ビット符号無し整数
 Proceed	FSUtils		続行
 Edit favorites…	FilePanelPriv		お気に入りの編集…
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		フォルダーを同じフォルダーやサブフォルダーに移動できません。
@@ -439,7 +439,7 @@ E-mail	Person Query Columns		電子メール
 Arrange by	ContainerWindow		並べ換え
 Attributes	AttributesView		属性
 Sorry, saving more than one item is not allowed.	FilePanelPriv		2 項目以上は保存できません。
-64-bit unsigned integer	AttributesView		64 ビット符号なし整数
+64-bit unsigned integer	AttributesView		64 ビット符号無し整数
 Move here	ContainerWindow		ここに移動
 the config folder	FSUtils		config フォルダー
 Sorry, could not create a new folder.	FSUtils		新規フォルダーを作成できませんでした。
@@ -448,7 +448,7 @@ Rename	FSUtils	button label	名前の変更
 Clean up all	ContainerWindow		すべてを整列
 Add current folder	FilePanelPriv		このフォルダーを追加
 Description:	InfoWindow		説明:
-Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		選択した項目を削除しますか? 削除した項目は元に戻せませんので、ご注意ください。
+Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		選択した項目を削除しますか? 削除した項目は元に戻せないので、ご注意ください。
 Grayscale picture	AttributesView		グレースケール画像
 Mount	DeskWindow		マウント
 ends with	FindPanel		指定文字列で終わる

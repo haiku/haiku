@@ -1,4 +1,4 @@
-1	spanish; castilian	application/x-vnd.moon-AudioAdapter.media_addon	3501204640
+1	spanish; castilian	application/x-vnd.moon-AudioAdapter.media_addon	2282220510
 Input format	CortexAudioAdapter		Formato de entrada
 Channels:	CortexAudioAdapter		Canales:
 stereo	CortexAudioAdapter		estéreo
@@ -7,3 +7,4 @@ Output format	CortexAudioAdapter		Formato de salida
 Audio input	CortexAddOnsCommon		Entrada de audio
 Sample format:	CortexAudioAdapter		Formato de muestreo:
 Audio output	CortexAddOnsCommon		Salida de audio
+%groupname% parameters	CortexAddOnsCommon		parámetros de %groupname%

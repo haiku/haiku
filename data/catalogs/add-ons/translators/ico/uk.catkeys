@@ -8,7 +8,7 @@ Enforce valid icon sizes	ConfigView		Застосовуйте дійсні ро�
 ICO Settings	main		Налаштування ICO
 Windows icon translator	ICOTranslator		Транслятор значків Windows
 pixels in either direction.	ConfigView		пікселів в кожному напрямку.
-Write 32 bit images on true color input	ConfigView		Записати зображення 32 bit як true color
+Write 32 bit images on true color input	ConfigView		Записати 32-бітове зображення як true color
 Icon	ICOTranslator		Значок
 ICOTranslator Settings	ConfigView		Налаштування транслятора ICO
 Windows icon translator	ConfigView		Транслятор значків Windows

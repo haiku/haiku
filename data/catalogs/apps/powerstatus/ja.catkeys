@@ -30,7 +30,7 @@ Serial number: 	PowerStatus		シリアルナンバー:
 Battery critical	PowerStatus		バッテリー残量が空に近い
 Capacity: 	PowerStatus		容量:
  mW	PowerStatus		 mW
-No supported battery detected. PowerStatus cannot be used on your system.	PowerStatus		サポートされたバッテリーが見つかりませんでした。"バッテリーの状態"はこのシステムでは使用できません。
+No supported battery detected. PowerStatus cannot be used on your system.	PowerStatus		サポートされたバッテリーが見つからなかったので、"バッテリーの状態"はこのシステムでは使用できません。
 Show percent	PowerStatus		パーセントを表示
 Capacity granularity 1: 	PowerStatus		容量精度 1: 
 The battery level is getting low, please plug in the device.	PowerStatus		バッテリー 残量が低下してきたので、デバイスを電源につないでください。

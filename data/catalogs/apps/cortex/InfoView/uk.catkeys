@@ -1,4 +1,32 @@
-1	ukrainian	application/x-vnd.Cortex.InfoView	1376470321
+1	ukrainian	application/x-vnd.Cortex.InfoView	3124984981
+Description	DormantNodeInfoView		Опис
+Output formats	DormantNodeInfoView		Вихідні формати
 History	InfoView		Історія
+Input formats	DormantNodeInfoView		Вхідні формати
+Signature	AppNodeInfoView		Сигнатура
+Any number	DormantNodeInfoView	For 'Max. instances' field	Будь-яке число
+Active lines	InfoView		Активні лінії
+Buffer size	InfoView		Розмір буфера
+\n- Quality:	FileNodeInfoView		\n- Якість:
+Application	AppNodeInfoView		Програма
+\n- Duration:	FileNodeInfoView		\n- Тривалість:
+Dormant media node	DormantNodeInfoView		Латентна медіа-нода
+Latency	LiveNodeInfoView		Латентність
 %title% info	InfoView		%title% інфо
+Node ID	LiveNodeInfoView		ID ноди
+File format	AppNodeInfoView		Формат файлу
+Channel mask	InfoView		Маска каналу
+Channels	InfoView		Канали
+File format	FileNodeInfoView		Формат файлу
+(no file)	FileNodeInfoView		(немає файлу)
+Bit rate	InfoView		Бітрейт
+Input format	DormantNodeInfoView		Вхідний формат
+Format	InfoView		Формат
+Version	AppNodeInfoView		Версія
+Frame size	InfoView		Розмір кадру
+Run mode	LiveNodeInfoView		Режим роботи
+\n- Codec:	FileNodeInfoView		\n- Кодек:
+Port	LiveNodeInfoView		Порт
+Output format	DormantNodeInfoView		Вихідний формат
+Application-owned node	AppNodeInfoView		Нода програми
 ID:	FileNodeInfoView		ID:

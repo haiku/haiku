@@ -1,0 +1,33 @@
+1	friulian	application/x-vnd.Cortex.MediaRoutingView	2377053421
+Lock group	MediaNodePanel		Bloche il grup
+%refname% (no file)	MediaNodePanel		%refname% (nissun file)
+Video output	MediaRoutingView		Jessude video
+Icon view	MediaRoutingView		Viodude a iconis
+OK	MediaRoutingView		Va ben
+Cycle	MediaNodePanel		Rotazion
+Advanced	MediaNodePanel		Avanzade
+Audio input	MediaRoutingView		Jentrade audio
+Run mode	MediaNodePanel		Modalitât di esecuzion
+Could not load '%filename%'	MediaRoutingView		Impussibil cjariâ '%filename%'
+Stop time source	MediaNodePanel		Ferme la sorzint temporâl
+Video input	MediaRoutingView		Jentrade video
+Release	MediaNodePanel		Mole
+Disconnect	MediaRoutingView		Disconet
+Could not disconnect	MediaRoutingView		Impussibil disconeti
+Could not instantiate '%infoname%'	MediaRoutingView		Impussibil creâ une istance di '%infoname%'
+Mini icon view	MediaRoutingView		Viodude a iconis piçulis
+Select all	MediaRoutingView		Selezione dut
+(same as group)	MediaNodePanel		(compagn dal grup)
+Input	MediaJack		Jentrade
+Get info	MediaJack		Oten informazions
+Start time source	MediaNodePanel		Invie sorzint temporâl
+Error	MediaRoutingView		Erôr
+Could not release '%refname%'	MediaRoutingView		Impussibil molâ '%refname%'
+Output	MediaJack		Jessude
+Get info	MediaNodePanel		Oten informazions
+Get info	MediaRoutingView		Oten informazions
+Clean up	MediaRoutingView		Nete
+Start control panel	MediaNodePanel		Invie il panel di control
+Tweak parameters	MediaNodePanel		Modifiche i parametris
+Could not connect	MediaRoutingView		Impussibil coneti
+Unlock group	MediaNodePanel		Sbloche il grup

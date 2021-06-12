@@ -1,20 +1,40 @@
-1	spanish; castilian	application/x-vnd.Cortex.support	13456559
+1	spanish; castilian	application/x-vnd.Cortex.support	2921428766
+Header has flags	MediaString		El encabezado tiene marcas (banderas)
 32 bit HLS	MediaString		HLS de 32 bit
+Recording	MediaString		Registrando
 (unknown format)	MediaString		(formato desconocido)
+Clean buffers	MediaString		Limpiar búferes
+{0, plural,one{# frame forward}other{# frames forward}}	MediaString		{0, plural,one{# frame forward}other{# frames forward}}
+Rear-right	MediaString		Trasero derecho
+{0, plural, one{# pixel} other{# pixels}}	MediaString		{0, plural, one{# píxel} other{# píxeles}}
+Mono	MediaString		mono
 MPEG1	MediaString		MPEG1
 ASF format family	MediaString		Familia de formatos ASF
 Encoded video	MediaString		Video codificado
 YUV444	MediaString		YUV444
 Port	MediaString		Puerto
+Top-Front-left	MediaString		parte superior delantera izquierda
 (unkown video orientation)	MediaString		(orientación de video desconocida)
 QuickTime	MediaString		QuickTime
 32 bit HLSA	MediaString		HLSA de 32 bit
+Top-Front-center	MediaString		centro delantero superior
 BeOS format family	MediaString		familia de formatos BeOS
 24 bit HSV	MediaString		HSV de 24 bit
+Back-center	MediaString		Centro trasero
 32 bit CMY	MediaString		CMY de 32 bit
 (unknown video format)	MediaString		(formato de video desconocido)
+AVI format family	MediaString		familia de formatos AVI
+Homogenous buffers	MediaString		Búferes homogeneos
 Interlaced 	MediaString		Entrelazado 
+Right	MediaString		Derecha
 32 bit RGB	MediaString		RGB de 32 bit
+Video data between line u and u	MediaString		datos de video entre linea u y u
 System mixer	MediaString		Mezclador del sistema
 Physical output	MediaString		Salida fisica
+Top-Back-center	MediaString		Parte superior trasera central
+YUV420	MediaString		YUV420
+Top to bottom, left to right	MediaString		Arriba a abajo, derecha a izquierda
  kb/s	MediaString		 kb/s
+QuickTime format family	MediaString		Familia de formatos de QuickTime
+Any format family	MediaString		Cualquier familia de formatos
+Top-Back-left	MediaString		Arriba-atrás-izquierda

@@ -1,12 +1,14 @@
-1	dutch; flemish	x-vnd.Haiku-Mandelbrot	3875916167
+1	dutch; flemish	x-vnd.Haiku-Mandelbrot	2302392624
 Grassland	MandelbrotWindow		Grasland
 Tricorn	MandelbrotWindow		Driekantige Steek
 Orbit Trap	MandelbrotWindow		Baanval
 Deepfrost	MandelbrotWindow		Diepe Vorst
 1 (none)	MandelbrotWindow		1 (geen)
 Quit	MandelbrotWindow		Afsluiten
+Save as image…	MandelbrotWindow		Als afbeelding opslaan…
 Fire	MandelbrotWindow		Vuur
 High contrast	MandelbrotWindow		Hoog contrast
+Full screen	MandelbrotWindow		Volledig scherm
 Midnight	MandelbrotWindow		Middernacht
 Burning Ship	MandelbrotWindow		Brandend Schip
 Lightning	MandelbrotWindow		Onweer
@@ -18,6 +20,7 @@ Subsampling	MandelbrotWindow		Subsampling
 File	MandelbrotWindow		Bestand
 Julia	MandelbrotWindow		Julia
 Frost	MandelbrotWindow		Vorst
+View	MandelbrotWindow		Weergave
 Mandelbrot	System name		Mandelbrot
 Multibrot	MandelbrotWindow		Multibrot
 Iterations	MandelbrotWindow		Iteraties

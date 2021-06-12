@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Appearance	3808038515
+1	english	x-vnd.Haiku-Appearance	663472720
 Control border	Colors tab		控件边界
 Control mark	Colors tab		控件标记
 Off	AntialiasingSettingsView		关闭
@@ -8,6 +8,7 @@ Defaults	APRWindow		默认
 Shadow	Colors tab		阴影效果
 Document background	Colors tab		文档背景
 List background	Colors tab		列表背景
+No effect on running applications	DecorSettingsView		对运行中程序无效果
 Fixed font:	Font view		等宽字体：
 Appearance	System name		外观
 Reduce colored edges filter strength:	AntialiasingSettingsView		减小彩色边缘滤色强度:
@@ -50,6 +51,7 @@ Link text	Colors tab		链接文本
 Tooltip background	Colors tab		工具提示背景
 ControlLook:	DecorSettingsView		控件外观：
 Scroll bar thumb	Colors tab		滚动条缩略图
+Default	DecorSettingsView		默认
 Link visited	Colors tab		链接已访问
 Selected menu item border	Colors tab		选择菜单项边界
 Tooltip text	Colors tab		提示文本
@@ -70,6 +72,7 @@ Monospaced fonts only	AntialiasingSettingsView		仅等宽字体
 Document text	Colors tab		文件文本
 Inactive window border	Colors tab		禁用窗口边框
 Colors	APRWindow		颜色
+About control look	DecorSettingsView		关于控件外观
 Control highlight	Colors tab		控件亮度
 Status bar	Colors tab		状态栏
 Link hover	Colors tab		链接未知

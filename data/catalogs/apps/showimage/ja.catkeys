@@ -15,7 +15,7 @@ Full screen	Menus		全画面表示
 Go to page	Menus		指定ページへ
 Zoom out	Menus		縮小
 Quit	Menus		終了
-Rotate counterclockwise	Menus		左 90° 回転
+Rotate counterclockwise	Menus		左 90度回転
 High-quality zooming	Menus		高画質拡大縮小
 Browse	Menus		閲覧
 Edit	Menus		編集
@@ -55,7 +55,7 @@ Width:	PrintOptionsWindow		幅:
 Image	Menus		画像
 Move to Trash	Menus		ごみ箱に捨てる
 OK	Alerts		OK
-Rotate clockwise	Menus		右 90° 回転
+Rotate clockwise	Menus		右 90度回転
 Job setup	PrintOptionsWindow		ジョブ設定
 Original size	Menus		元のサイズ
 Next page	Menus		次のページ

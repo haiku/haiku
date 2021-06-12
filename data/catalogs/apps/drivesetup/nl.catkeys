@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-DriveSetup	2942313478
+1	dutch; flemish	x-vnd.Haiku-DriveSetup	4048496535
 Could not unmount partition %s.	MainWindow		Kon partitie %s niet onttrekken.
 Mount all	MainWindow		Alles betrekken
 Disk	MainWindow		Schijf
@@ -50,6 +50,8 @@ Are you sure you want to format a raw disk? (Most people initialize the disk wit
 Wipe (not implemented)	MainWindow		Wissen (niet geïmplementeerd)
 The currently selected partition does not have a parent partition.	MainWindow		De nu geselecteerde partitie heeft geen bovenliggende partitie.
 Validation of the given initialization parameters failed.	MainWindow		Natrekken van de opgegeven initialisatieparameters is mislukt.
+Not formatted (%s)	PartitionList		Niet geformatteerd (%s)
+Failed to create the partition. No changes have been written to disk.	MainWindow		Het maken van de partitie is mislukt. Er zijn geen wijzigingen naar de schijf geschreven.
 Shared	PartitionList		Gedeeld
 MIMEs	PartitionList		MIMEs
 BitLocker encrypted	Encryption utils		BitLocker versleuteld
@@ -62,9 +64,11 @@ Change	ChangeParametersPanel		Wijzigen
 Partition name:	ChangeParametersPanel		Naam partitie:
 LUKS encrypted	Encryption utils		LUKS versleuteld
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Bent u zeker dat u de veranderingen nu wilt terugschrijven naar de schijf?\n\nU zult alle gegevens op de %s partitie onherroepelijk kwijt zijn als u dit doet!
+Empty space	PartitionList		Lege ruimte
 Cancel	AbstractParametersPanel		Annuleren
 Format	MainWindow		Formatteren
 OK	MainWindow		Oké
+Empty space	DiskView		Lege ruimte
 Open with DiskProbe	MainWindow		Open met DiskProbe
 Could not delete the selected partition.	MainWindow		Kon de geselecteerde partitie niet verwijderen.
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Weet u zeker at u de geselecteerde schijf wilt initialiseren? Alle gegevens zullen verloren gaan. Het zal u nogmaals gevraagd worden voordat de gegevens naar de schrijf geschreven zullen worden.\n
@@ -81,6 +85,7 @@ Rescan	MainWindow		Opnieuw afzoeken
 There was an error acquiring the partition row.	MainWindow		Er is een fout ontstaan bij het verkrijgen van de partitieregel.
 Failed to initialize the disk %s!\n	MainWindow		Initialisatie van de schijf %s is mislukt!\n
 Disk system \"%s\" not found!	MainWindow		Mediaschema \"%s\" niet gevonden!
+The partition cannot be unmounted.	MainWindow		De partitie kan niet onttrokken worden.
 Delete	MainWindow		Verwijderen
 Partition type:	ChangeParametersPanel		Type partitie:
 Parameters	PartitionList		Parameters

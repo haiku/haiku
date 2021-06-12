@@ -1,0 +1,8 @@
+1	swedish	application/x-vnd.Cortex.ParameterView	1295152157
+Themes	ParameterWindow		Teman
+Start control panel	ParameterWindow		Starta kontrollpanelen
+%nodeinfo% parameters	ParameterWindow		%nodeinfo% parametrar
+OK	ParameterWindow		OK
+Window	ParameterWindow		Fönster
+Could not start control panel (%error%)	ParameterWindow		Det gick inte att starta kontrollpanelen (%error%)
+Close	ParameterWindow		Stäng

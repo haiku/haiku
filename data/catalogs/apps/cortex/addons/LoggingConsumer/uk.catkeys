@@ -1,7 +1,14 @@
-1	ukrainian	application/x-vnd.Be.LoggingConsumerApp	3691075051
+1	ukrainian	application/x-vnd.Be.LoggingConsumerApp	5678947
+Priority	CortexAddOnsLoggingConsumer		Пріоритет
+Latency	CortexAddOnsLoggingConsumer		Латентність
 NodeLogger	CortexAddOnsLoggingConsumers		NodeLogger
 Start	CortexAddOnsLoggingConsumerNodeHarnessWin		Старт
+Thread priority	CortexAddOnsLoggingConsumer		Пріоритет потоку
 LoggingConsumer parameters	CortexAddOnsLoggingConsumer		Параметри LoggingConsumer
+MediaNodeControlApp: couldn't get node info (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: не вдалося отримати інфо про ноду (%d):\n%s\n
+MediaNodeControlApp: couldn't find node (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: не вдалося знайти ноду (%d):\n%s\n
 LoggingConsumer	CortexAddOnsLoggingConsumer		LoggingConsumer
 Stop	CortexAddOnsLoggingConsumerNodeHarnessWin		Стоп
 OK	CortexAddOnsCommonMediaNodeControlApp		ОК
+percent	CortexAddOnsLoggingConsumer		відсотків
+MediaNodeControlApp: no parameters for node (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: відсутні параметри для ноди (%d):\n%s\n

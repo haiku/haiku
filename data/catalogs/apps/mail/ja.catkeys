@@ -63,7 +63,7 @@ Add signature	Mail		署名を追加
 Signature	Mail		署名
 Use default account	Mail		標準アカウントを使う
 draft	B_USER_DIRECTORY/mail/draft		下書き
-Really delete this signature? This cannot be undone.	Mail		署名を削除しますか?削除した書名は復元できませんので、ご注意ください。
+Really delete this signature? This cannot be undone.	Mail		署名を削除しますか?削除した書名は復元できないので、ご注意ください。
 spam	B_USER_DIRECTORY/mail/spam		スパム
 Reply to all	Mail		全員に返信
 Cancel	Mail		中止
@@ -76,7 +76,7 @@ View	Mail		表示
 Signatures	Mail		署名
 On	Mail		オン
 Find	Mail		検索
-Sorry, could not find an application that supports the 'Person' data type.	Mail		People データ形式をサポートするアプリケーションが見つかりませんでした。
+Sorry, could not find an application that supports the 'Person' data type.	Mail		People データ形式をサポートするアプリケーションが見つからなかった。
 Date:	Mail		日付:
 Expert	Mail		上級者
 Automatically mark mail as read:	Mail		メールを自動的に既読に設定:

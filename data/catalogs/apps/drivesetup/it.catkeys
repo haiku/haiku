@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-DriveSetup	2942313478
+1	italian	x-vnd.Haiku-DriveSetup	4058081081
 Could not unmount partition %s.	MainWindow		Impossibile smontare la partizione %s.
 Mount all	MainWindow		Monta tutto
 Disk	MainWindow		Disco
@@ -50,6 +50,7 @@ Are you sure you want to format a raw disk? (Most people initialize the disk wit
 Wipe (not implemented)	MainWindow		Pulisci (non implementato)
 The currently selected partition does not have a parent partition.	MainWindow		La partizione attualmente selezionata non ha una sopra-partizione.
 Validation of the given initialization parameters failed.	MainWindow		La validazione dei parametri di inizializzazione forniti è fallita.
+Not formatted (%s)	PartitionList		Non formattato (%s)
 Shared	PartitionList		Condiviso
 MIMEs	PartitionList		MIME
 BitLocker encrypted	Encryption utils		Crittografia BitLocker
@@ -62,9 +63,11 @@ Change	ChangeParametersPanel		Modifica
 Partition name:	ChangeParametersPanel		Nome della partizione:
 LUKS encrypted	Encryption utils		Crittogradia LUKS
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Sei sicuro di voler salvare le modifiche sul disco?\n\nProcedendo con l'operazione, tutti i dati sulla partizione %s saranno irrimediabilmente perduti!
+Empty space	PartitionList		Spazio libero
 Cancel	AbstractParametersPanel		Annulla
 Format	MainWindow		Formatta
 OK	MainWindow		OK
+Empty space	DiskView		Spazio libero
 Open with DiskProbe	MainWindow		Apri con Analizza Disco
 Could not delete the selected partition.	MainWindow		Impossibile rimuovere la partizione selezionata.
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Sei sicuro di voler inizializzare il disco selezionato? Tutti i dati saranno perduti. Ti sarà nuovamente chiesta conferma prima della scrittura delle modifiche sul disco.\n
@@ -81,6 +84,7 @@ Rescan	MainWindow		Riscansiona
 There was an error acquiring the partition row.	MainWindow		Errore durante l'acquisizione dei dati sulla partizione.
 Failed to initialize the disk %s!\n	MainWindow		Inizializzazione del disco %s fallita!\n
 Disk system \"%s\" not found!	MainWindow		Disco di sistema \"%s\" non trovato!
+The partition cannot be unmounted.	MainWindow		La partizione non può essere smontata.
 Delete	MainWindow		Rimuovi
 Partition type:	ChangeParametersPanel		Tipo di partizione:
 Parameters	PartitionList		Parametri

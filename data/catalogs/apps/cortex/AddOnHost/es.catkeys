@@ -1,4 +1,5 @@
-1	spanish; castilian	application/x-vnd.Cortex.AddOnHost	826663209
+1	spanish; castilian	application/x-vnd.Cortex.AddOnHost	1256552338
 Continue	CortexAddOnHost		Continuar
+Cortex AddOnHost	CortexAddOnHost		Anfitrión de complementos de Cortex
 Quit	CortexAddOnHost		Salir
 This program runs in the background, and is started automatically by Cortex when necessary. You probably don't want to start it manually.	CortexAddOnHost		Este programa se ejecuta en segundo plano y es iniciado automáticamente por Cortex cuando es necesario. Usted probablemente no desea iniciarlo manualmente. 

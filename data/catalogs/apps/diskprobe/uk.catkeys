@@ -26,7 +26,7 @@ Back	ProbeView		Назад
 Device: 	ProbeView		Пристрій: 
 Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Система счислення
 Open file…	FileWindow		Відкрити файл…
-32 bit unsigned pointer:	TypeEditors		32 бітовий беззнаковий вказівник:
+32 bit unsigned pointer:	TypeEditors		32-бітовий беззнаковий вказівник:
 DiskProbe request	DiskProbe		Запит DiskProbe
 Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Шістнадцятковий
 Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Збій запису до файлу:\n%s\n\nВсі зміни будуть втрачені при виході.
@@ -56,7 +56,7 @@ Cancel	AttributeWindow		Скасувати
 DiskProbe request	AttributeWindow		Запит DiskProbe
 Next	ProbeView		Наступне
 64 bit signed offset:	TypeEditors		64 бітове знакове зміщення
-32 bit signed value:	TypeEditors		32 бітове знакове значення:
+32 bit signed value:	TypeEditors		32-бітове знакове значення:
 Could not find search string.	ProbeView		Не вдалося знайти рядок.
 Close	FileWindow		Закрити
 Unknown type	TypeEditors		Невідомий тип
@@ -68,7 +68,7 @@ Block 0x%Lx	ProbeView		Блок 0x%Lx
 Attribute	AttributeWindow		Атрибут
 Mode:	FindWindow		Режим:
 16 bit	TypeEditors		16 біт
-32 bit size or status:	TypeEditors		32 бітовий розмір або стан:
+32 bit size or status:	TypeEditors		32-бітовий розмір або стан:
 of 	ProbeView		з 
 Contents:	TypeEditors		Вміст:
 Could not open file \"%s\": %s\n	DiskProbe		Не вдалося відкрити файл \"%s\": %s\n
@@ -78,7 +78,7 @@ Bookmarks	ProbeView		Закладки
 Probe device	OpenWindow		Дослідити пристрій
 none	ProbeView	No attributes	пусто
 Case sensitive	FindWindow		Враховувати регістр
-32 bit unsigned value:	TypeEditors		32 бітове беззнакове значення:
+32 bit unsigned value:	TypeEditors		32-бітове беззнакове значення:
 Remove from file	AttributeWindow		Вилучити з файла
 Attributes	ProbeView		Атрибути
 Message	TypeEditors	This is the type of view	Повідомлення
@@ -130,4 +130,4 @@ Find…	ProbeView		Знайти…
 Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Десятковий
 Image view	TypeEditors	Image means here a picture file, not a disk image.	Зображення
 Paste	ProbeView		Вставити
-32 bit unsigned size:	TypeEditors		32 бітовий беззнаковий розмір:
+32 bit unsigned size:	TypeEditors		32-бітовий беззнаковий розмір:

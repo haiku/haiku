@@ -8,13 +8,13 @@ Block size	ProbeView	Menu item. This is in the same menu window than 'Base' and 
 MIME type editor	TypeEditors		MIME タイプエディター
 Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	16 進
 16 bit unsigned value:	TypeEditors		符号無し 16 ビット値:
-8 bit signed value:	TypeEditors		符号つき 8 ビット値:
+8 bit signed value:	TypeEditors		符号付き 8 ビット値:
  (native)	ProbeView		(ネイティブ)
 Attribute offset: 	ProbeView		属性のオフセット:
 Text	TypeEditors	This is the type of editor	テキスト
 File offset: 	ProbeView		ファイルオフセット:
 Add	ProbeView		追加
-64 bit signed value:	TypeEditors		符号無し 64 ビット値:
+64 bit signed value:	TypeEditors		符号付き 64 ビット値:
 Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		本当に属性 \"%s\" をファイル \"%s\"から削除しますか?\n\nこの動作は元に戻せません。
 No type editor available	AttributeWindow		タイプエディターはありません
 Print…	ProbeView		印刷…
@@ -52,12 +52,12 @@ Copy	ProbeView		コピー
 Redo	ProbeView		やり直し
 Floating-point value:	TypeEditors		浮動小数点値:
 Cancel	AttributeWindow		中止
-16 bit signed value:	TypeEditors		符号つき 16 ビット値:
+16 bit signed value:	TypeEditors		符号付き 16 ビット値:
 DiskProbe request	AttributeWindow		DiskProbe リクエスト
 Next	ProbeView		次へ
-64 bit signed offset:	TypeEditors		符号つき 64 ビットオフセット値:
-32 bit signed value:	TypeEditors		符号つき 32 ビット値:
-Could not find search string.	ProbeView		検索文字列が見つかりませんでした。
+64 bit signed offset:	TypeEditors		符号付き 64 ビットオフセット値:
+32 bit signed value:	TypeEditors		符号付き 32 ビット値:
+Could not find search string.	ProbeView		検索文字列が見つからなかった。
 Close	FileWindow		閉じる
 Unknown type	TypeEditors		不明なタイプ
 Open device	FileWindow		デバイスを開く

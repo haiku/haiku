@@ -10,7 +10,7 @@ Script console	WebPositive Window		スクリプトコンソール
 Fonts	Settings Window		フォント
 Path	Cookie Manager		パス
 Bookmarks	WebPositive Window		ブックマーク
-Use proxy server to connect to the internet	Settings Window		インターネット接続に、プロキシサーバーを使用する
+Use proxy server to connect to the internet	Settings Window		インターネット接続にプロキシサーバーを使用する
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url の読み込み完了
 Auto-hide interface in full screen mode	Settings Window		全画面表示で自動的にインターフェースを隠す
 There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	ブックマークフォルダーの取得時にエラーが発生しました。\n\nエラー: %error

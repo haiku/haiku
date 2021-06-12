@@ -1,7 +1,8 @@
-1	dutch; flemish	x-vnd.Haiku-KeyboardInputServerDevice	1085266673
+1	dutch; flemish	x-vnd.Haiku-KeyboardInputServerDevice	131044710
 If the application will not quit you may have to kill it.	Team monitor		Als de toepassing niet afsluit moet je het misschien afbreken.
 Quit application	Team monitor		Toepassing afsluiten
 Open Terminal	Team monitor		Open Terminal
+{0, plural,one{Hold CONTROL+ALT+DELETE for # second to reboot.}other{Hold CONTROL+ALT+DELETE for # seconds to reboot.}}	Team monitor		{0, plural,one{Houd CONTROL+ALT+DELETE # seconde ingedrukt om te herstarten.}other{Houd CONTROL+ALT+DELETE ingedrukt voor # seconden om te herstarten.}}
 Restart the desktop	Team monitor		Start het bureaublad opnieuw
 Force reboot	Team monitor		Forceer herstart
 Team monitor	Team monitor		Teammonitor

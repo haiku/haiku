@@ -1,0 +1,11 @@
+1	spanish; castilian	application/x-vnd.Cortex.MediaRoutingView	2009386958
+Video output	MediaRoutingView		Salida de video
+Icon view	MediaRoutingView		Vista de ícono
+OK	MediaRoutingView		Aceptar
+Audio input	MediaRoutingView		Entrada de audio
+Run mode	MediaNodePanel		Modo de ejecución
+Could not load '%filename%'	MediaRoutingView		No se pudo cargar '%filename%'
+Video input	MediaRoutingView		Entrada de video
+Disconnect	MediaRoutingView		Desconectar
+Could not disconnect	MediaRoutingView		No se pudo desconectar
+Select all	MediaRoutingView		Seleccionar todo

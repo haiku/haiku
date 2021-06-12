@@ -1,11 +1,25 @@
-1	english	x-vnd.Haiku-libsolvsolver	3757623432
+1	english	x-vnd.Haiku-libsolvsolver	2428947941
+allow architecture change of %source% to %target%	SolverProblemSolution		允许 %source% 架构变更到 %target%
+install %source% from excluded repository	SolverProblemSolution		从外部仓库安装 %source% 
 unspecified problem	SolverProblem		未知问题
+package %source% requires %dependency%, but none of the providers can be installed	SolverProblem		软件包 %source% 依赖 %dependency%, 但无可供安装的提供包。
+package %source% implicitly obsoletes %dependency% provided by %target%	SolverProblem		软件包 %source% 隐含过期依赖 %dependency% ，由  %target% 提供。
+nothing provides requested %dependency%	SolverProblem		没有任何包提供所需依赖 %dependency%
+do not keep %source% installed	SolverProblemSolution		不保留 %source% 安装
 do not deinstall \"%selection%\"	SolverProblemSolution		不要卸载 \"%selection%\"
+install %source% despite its inferior architecture	SolverProblemSolution		安装 %source%，忽略它的下层架构
 conflicting requests	SolverProblem		请求冲突
 do not install the most recent version of \"%selection%\"	SolverProblemSolution		不要安装 \"%selection%\" 的最新版本
+allow replacement of %source% with %target%	SolverProblemSolution		允许  %source% 替换为 %target%
+package %source% obsoletes %dependency% provided by %target%	SolverProblem		软件包 %source% 不再依赖 %dependency% ，由 %target% 提供
 do not forbid installation of %source%	SolverProblemSolution		请不要禁止 %source% 的安装
 allow downgrade of %source% to %target%	SolverProblemSolution		允许降级 %source% 至 %target%
 dependency problem	SolverProblem		依赖问题
 %dependency% is provided by the system	SolverProblem		%dependency% 由系统提供
+keep %source% despite its inferior architecture	SolverProblemSolution		保留 %source%，忽略下层架构
+%source% does not belong to a distupgrade repository	SolverProblem		%source% 不属于版本升级仓库
+installed package %source% obsoletes %dependency% provided by %target%	SolverProblem		已安装软件包 %source% 不再依赖 %dependency% ，由 %target% 提供
+allow name change of %source% to %target%	SolverProblemSolution		允许 %source%  名称变更为 %target%
 package %source% conflicts with %dependency% provided by %target%	SolverProblem		软件包 %source% 与由 %target% 提供的 %dependency% 冲突
+keep %source% from excluded repository	SolverProblemSolution		保留外部仓库的 %source%
 %source% has inferior architecture	SolverProblem		%source% 有下级结构

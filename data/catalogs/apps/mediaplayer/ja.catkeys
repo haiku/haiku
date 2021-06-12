@@ -23,7 +23,7 @@ Remove	MediaPlayer-PlaylistWindow		削除
 <unknown>	MediaPlayer-InfoWin		<不明>
 Resume:	MediaPlayer-SettingsWindow		続き再生:
 Duration	MediaPlayer-InfoWin		再生時間
-Import Entries	MediaPlayer-ImportPLItemsCmd		項目のインポート
+Import Entries	MediaPlayer-ImportPLItemsCmd		項目をインポート
 Open network stream	MediaPlayer-Main		ネットワークストリームを開く 
 Move file to Trash	MediaPlayer-PlaylistWindow		ファイルをごみ箱に捨てる
 Open file…	MediaPlayer-Main		ファイルを開く…

@@ -1,0 +1,14 @@
+1	friulian	application/x-vnd.moon-Flanger.media_addon	2452237239
+An add-on version of FlangerNode.\nby Eric Moon (16 June, 1999)	CortexAddOnsFlanger		Une version zonte di FlangerNode.\ndi Eric Moon (16 di jugn dal 1999)
+Delay	CortexAddOnsFlanger		Ritart
+Depth	CortexAddOnsFlanger		Profonditât
+Feedback	CortexAddOnsFlanger		Retroazion
+Sweep rate	CortexAddOnsFlanger		Velocitât di scansion
+MediaNodeControlApp: couldn't get node info (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: impussibil otignî lis informazions dal grop (%d):\n%s\n
+MediaNodeControlApp: couldn't find node (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: impussibil cjatâ il grop (%d):\n%s\n
+FlangerNode parameters	CortexAddOnsFlanger		Parametris di FlangerNode
+OK	CortexAddOnsCommonMediaNodeControlApp		Va ben
+controls	CortexAddOnsCommonMediaNodeControlApp		controi
+Flanger	CortexAddOnsFlanger		Zontâ a anel
+MediaNodeControlApp: no parameters for node (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: nissun parametri pal grop (%d):\n%s\n
+Audio input	CortexAddOnsFlanger		Jentrade audio

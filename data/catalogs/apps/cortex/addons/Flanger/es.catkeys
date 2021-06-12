@@ -1,4 +1,8 @@
-1	spanish; castilian	application/x-vnd.moon-Flanger.media_addon	2653912368
+1	spanish; castilian	application/x-vnd.moon-Flanger.media_addon	702925204
+An add-on version of FlangerNode.\nby Eric Moon (16 June, 1999)	CortexAddOnsFlanger		Un complemento basado en FlangerNode.\nde Eric Moon (16 de junio de 1999)
+Delay	CortexAddOnsFlanger		Retraso
+Depth	CortexAddOnsFlanger		Profundidad
+Feedback	CortexAddOnsFlanger		Retroalimentación
 OK	CortexAddOnsCommonMediaNodeControlApp		Aceptar
 controls	CortexAddOnsCommonMediaNodeControlApp		controles
 Audio input	CortexAddOnsFlanger		Entrada de audio

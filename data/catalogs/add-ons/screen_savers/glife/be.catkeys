@@ -1,5 +1,14 @@
-1	belarusian	x-vnd.Haiku-GLifeScreensaver	3635568819
+1	belarusian	x-vnd.Haiku-GLifeScreensaver	2955223231
 by Aaron Hill	GLife ScreenSaver		распрацавана Aaron Hill
+Grid life delay: none	GLife ScreenSaver		Затрымка сетки: няма
 None	GLife ScreenSaver		Няма
+Grid height: %li	GLife ScreenSaver		Вышыня сеткі: %li
+Grid width: 	GLife ScreenSaver		Шырыня сетки: 
+Grid life delay: %dx	This is a factor: the x represents 'times', don't translate '%d'		Затрымка сетки: %dx
+Grid border: %li	GLife ScreenSaver		Мяжа сетки: %li
+Grid border: 	GLife ScreenSaver		Мяжа сетки:  
 OpenGL \"Game of Life\"	GLife ScreenSaver		OpenGL \"Гульня Life\"
+Grid height: 	GLife ScreenSaver		Вышыня сетки: 
 4x	GLife ScreenSaver	This is a factor: the x represents 'times'	4x
+Grid width: %li	GLife ScreenSaver		Шырыня сетки: %li
+Grid life delay: 	GLife ScreenSaver		Затрымка сетки: 

@@ -7,7 +7,7 @@ package %source% implicitly obsoletes %dependency% provided by %target%	SolverPr
 nothing provides requested %dependency%	SolverProblem		要求された %dependency% を提供するものがない
 do not keep %source% installed	SolverProblemSolution		%source% をインストールしたままにしない
 do not deinstall \"%selection%\"	SolverProblemSolution		\"%selection%\" のアンインストール不可
-install %source% despite its inferior architecture	SolverProblemSolution		下位のアーキテクチャですが、%source% をインストールする
+install %source% despite its inferior architecture	SolverProblemSolution		下位アーキテクチャですが、%source% をインストールする
 conflicting requests	SolverProblem		矛盾する要求
 do not install the most recent version of \"%selection%\"	SolverProblemSolution		\"%selection%\" の最新バージョンをインストールしない
 allow replacement of %source% with %target%	SolverProblemSolution		%source% から %target%への置換えを許可する
@@ -16,7 +16,7 @@ do not forbid installation of %source%	SolverProblemSolution		%source%のイン�
 allow downgrade of %source% to %target%	SolverProblemSolution		%source% から %target% へのダウングレードを許可する
 dependency problem	SolverProblem		依存関係の問題
 %dependency% is provided by the system	SolverProblem		%dependency% はシステムが提供する
-keep %source% despite its inferior architecture	SolverProblemSolution		下位のアーキテクチャですが、%source% を保持する
+keep %source% despite its inferior architecture	SolverProblemSolution		下位アーキテクチャですが、%source% を保持する
 %source% does not belong to a distupgrade repository	SolverProblem		%source% は、distupgrade リポジトリの一部ではありません
 installed package %source% obsoletes %dependency% provided by %target%	SolverProblem		インストール済パッケージ %source% は、%target% が提供する %dependency% を廃止する
 allow name change of %source% to %target%	SolverProblemSolution		%source% から %target%への名称の変更を許可する
@@ -34,5 +34,5 @@ allow vendor change from \"%sourceVendor%\" (%source%) to \"%targetVendor%\" (%t
 do not lock \"%selection%\"	SolverProblemSolution		\"%selection%\" をロックしない
 do not install \"%selection%\"	SolverProblemSolution		\"%selection%\" をインストールしない
 nothing provides %dependency% needed by %source%	SolverProblem		%source% が必要とする%dependency% を提供するものがありません
-%source% has inferior architecture	SolverProblem		%source% は下位のアーキテクチャーです
+%source% has inferior architecture	SolverProblem		%source% は下位アーキテクチャーです
 do not deinstall all resolvables \"%selection%\"	SolverProblemSolution		すべての解決方法 \"%selection%\"  をアンインストールしない

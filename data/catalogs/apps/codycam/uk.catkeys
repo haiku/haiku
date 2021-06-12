@@ -60,7 +60,7 @@ Start video	CodyCam		Запустити відео
 Connected…	VideoConsumer.cpp		Підключення…
 upload client name expected	CodyCam		вкажіть ім’я клієнта вивантаження
 Every 15 seconds	CodyCam		Кожні 15 секунд
-Error getting initial latency for the capture node	CodyCam		Помилка при отриманні затримки для вузла захоплення
+Error getting initial latency for the capture node	CodyCam		Помилка при отриманні затримки для ноди захоплення
 password	CodyCam		пароль
 Local	CodyCam		Локальний
 Stop video	CodyCam		Зупинити відео

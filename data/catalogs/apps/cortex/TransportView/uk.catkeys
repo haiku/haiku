@@ -1,4 +1,11 @@
-1	ukrainian	application/x-vnd.Cortex.TransportView	4245969817
+1	ukrainian	application/x-vnd.Cortex.TransportView	2066232143
+{0, plural, one{# node} other{# nodes}}	TransportView		{0, plural, one{# нода} few{# ноди} other{# нод}}
 Start	TransportView		Старт
 No errors.	TransportView		Без помилок.
+Offline	TransportView		Офлайн
+(???)	TransportView		(???)
 Stop	TransportView		Стоп
+Recording	TransportView		Запис
+Increase latency	TransportView		Збільшення затримки
+Decrease precision	TransportView		Зниження точності
+Run mode:	TransportView		Режим роботи:

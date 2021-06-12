@@ -1,7 +1,15 @@
-1	ukrainian	application/x-vnd.Cortex.Route	2425116207
+1	ukrainian	application/x-vnd.Cortex.Route	654911661
+Node '%name%' released	CortexRouteApp		Нода '%name%' відключена
 OK	CortexRouteApp		ОК
+About Cortex/Route…	CortexRouteApp		Про Cortex/Route…
 File	CortexRouteApp		Файл
+Save nodes…	CortexRouteApp		Зберегти ноди…
+%producer% and %consumer%	CortexRouteApp		%producer% та %consumer%
+Node '%name%' created	CortexRouteApp		Нода '%name%' створена
 Window	CortexRouteApp		Вікно
 Transport	CortexRouteApp		Транспорт
+Untitled group	CortexRouteApp		Група без назви
 Cortex	CortexRouteApp		Cortex
+Open…	CortexRouteApp		Відкрити…
+Show transport	CortexRouteApp		Показати транспорт
 Quit	CortexRouteApp		Вийти

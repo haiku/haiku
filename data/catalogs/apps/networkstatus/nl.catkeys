@@ -1,4 +1,5 @@
-1	dutch; flemish	x-vnd.Haiku-NetworkStatus	1162000463
+1	dutch; flemish	x-vnd.Haiku-NetworkStatus	2828540217
+IPv6 address:	NetworkStatusView		IPv6-adres:
 Quit	NetworkStatusView		Afsluiten
 Unknown	NetworkStatusView		Onbekend
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Opstarten van het netwerk is mislukt.\n\nFoutmelding:
@@ -6,14 +7,17 @@ Install in Deskbar	NetworkStatus		Installeren in Deskbar
 NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		NetworkStatus opties:\n\t--deskbar\treplicant automatisch toevoegen in Deskbar\n\t--help\t\tprint deze informatie en sluit
 Open network preferences…	NetworkStatusView		Open netwerkvoorkeuren...
 NetworkStatus	System name		Netwerkstatus
+Broadcast:	NetworkStatusView		Broadcast:
 OK	NetworkStatusView		Oké
 No link	NetworkStatusView		Er is geen link
 Could not join wireless network:\n	NetworkStatusView		Kon niet aansluiten bij draadloos netwerk:\n
 Ready	NetworkStatusView		Gereed
 Network Status	NetworkStatusView		Netwerkstatus
 Deskbar is not running, giving up.	NetworkStatus		Deskbar draait niet, geef op.
+Netmask:	NetworkStatusView		 Netwerkmasker:
 No stateful configuration	NetworkStatusView		Geen stateful-configuratie
 You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		U kunt NetwerkStatus in een venster uitvoeren, of in Deskbar installeren
+IPv4 address:	NetworkStatusView		IPv4-adres:
 %ifaceName information:\n	NetworkStatusView		%ifaceName informatie:\n
 Run in window	NetworkStatus		Actief in een venster
 <no wireless networks found>	NetworkStatusView		<geen draadloze netwerken gevonden>
