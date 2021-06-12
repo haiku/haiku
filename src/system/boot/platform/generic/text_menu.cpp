@@ -412,7 +412,8 @@ run_menu(Menu* menu)
 
 		item = menu->ItemAt(selected);
 
-		if (TEXT_CONSOLE_IS_CURSOR_KEY(key)) {
+		if (TEXT_CONSOLE_IS_CURSOR_KEY(key) || key == 'j' || key == 'J'
+			|| key == 'k' || key == 'K') {
 			if (item == NULL)
 				continue;
 
@@ -420,9 +421,13 @@ run_menu(Menu* menu)
 
 			switch (key) {
 				case TEXT_CONSOLE_KEY_UP:
+				case 'k':
+				case 'K':
 					selected = select_previous_valid_item(menu, selected - 1);
 					break;
 				case TEXT_CONSOLE_KEY_DOWN:
+				case 'j':
+				case 'J':
 					selected = select_next_valid_item(menu, selected + 1);
 					break;
 				case TEXT_CONSOLE_KEY_PAGE_UP:
