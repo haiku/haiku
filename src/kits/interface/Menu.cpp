@@ -2604,14 +2604,14 @@ BMenu::_ComputeColumnLayout(int32 index, bool bestFit, bool moveItems,
 	if (fMaxContentWidth > 0)
 		frame.right = std::min(frame.right, fMaxContentWidth);
 
+	frame.top = 0;
+	frame.right = ceilf(frame.right);
+
 	// Finally update the "right" coordinate of all items
 	if (moveItems) {
 		for (int32 i = 0; i < fItems.CountItems(); i++)
 			ItemAt(i)->fBounds.right = frame.right;
 	}
-
-	frame.top = 0;
-	frame.right = ceilf(frame.right);
 }
 
 
