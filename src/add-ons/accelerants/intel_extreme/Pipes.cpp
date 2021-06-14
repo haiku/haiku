@@ -54,7 +54,7 @@ Pipe::Pipe(pipe_index pipeIndex)
 	:
 	fHasTranscoder(false),
 	fFDILink(NULL),
-//	fPanelFitter(NULL),
+	fPanelFitter(NULL),
 	fPipeIndex(pipeIndex),
 	fPipeOffset(0),
 	fPlaneOffset(0)
@@ -75,6 +75,8 @@ Pipe::Pipe(pipe_index pipeIndex)
 
 		// Program FDILink if PCH
 		fFDILink = new(std::nothrow) FDILink(pipeIndex);
+		// Program gen5(+) style panelfitter as well
+		fPanelFitter = new(std::nothrow) PanelFitter(pipeIndex);
 	}
 
 	TRACE("Pipe %s. Pipe Base: 0x%" B_PRIxADDR

@@ -305,7 +305,8 @@ struct intel_shared_info {
 enum pipe_index {
     INTEL_PIPE_ANY,
     INTEL_PIPE_A,
-    INTEL_PIPE_B
+    INTEL_PIPE_B,
+    INTEL_PIPE_C
 };
 
 //----------------- ioctl() interface ----------------
@@ -1064,6 +1065,7 @@ struct intel_free_graphics_memory {
 #define PCH_PANEL_FITTER_WINDOW_POS		0x70
 #define PCH_PANEL_FITTER_WINDOW_SIZE	0x74
 #define PCH_PANEL_FITTER_CONTROL		0x80
+//not on IvyBridge:
 #define PCH_PANEL_FITTER_V_SCALE		0x84
 #define PCH_PANEL_FITTER_H_SCALE		0x90
 
@@ -1071,16 +1073,9 @@ struct intel_free_graphics_memory {
 #define PANEL_FITTER_PIPE_MASK			(3 << 29)
 #define PANEL_FITTER_PIPE_A				(0 << 29)
 #define PANEL_FITTER_PIPE_B				(1 << 29)
+#define PANEL_FITTER_PIPE_C				(2 << 29)
 #define PANEL_FITTER_SCALING_MODE_MASK	(7 << 26)
 #define PANEL_FITTER_FILTER_MASK		(3 << 24)
-
-// panel fitters again, more directly
-#define INTEL_PANELFITTER_0_CTRL		(0x8080 | REGS_NORTH_PIPE_AND_PORT)
-#define INTEL_PANELFITTER_1_CTRL		(0x8880 | REGS_NORTH_PIPE_AND_PORT)
-#define INTEL_PANELFITTER_2_CTRL		(0x9080 | REGS_NORTH_PIPE_AND_PORT)
-#define INTEL_PANELFITTER_0_WINDOW_SIZE	(0x8074 | REGS_NORTH_PIPE_AND_PORT)
-#define INTEL_PANELFITTER_1_WINDOW_SIZE	(0x8874 | REGS_NORTH_PIPE_AND_PORT)
-#define INTEL_PANELFITTER_2_WINDOW_SIZE	(0x9074 | REGS_NORTH_PIPE_AND_PORT)
 
 struct overlay_scale {
 	uint32 _reserved0 : 3;

@@ -9,9 +9,11 @@
 #define INTEL_FITTER_H
 
 
+#include "intel_extreme.h"
+
 class PanelFitter {
 public:
-									PanelFitter(int32 pipeIndex);
+									PanelFitter(pipe_index pipeIndex);
 virtual								~PanelFitter();
 
 		bool						IsEnabled();
