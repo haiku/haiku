@@ -500,14 +500,6 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 		}
 	}
 
-	// Setup PanelFitter and Train FDI if it exists
-	PanelFitter* fitter = fPipe->PFT();
-	if (fitter != NULL)
-		fitter->Enable(*target);
-	FDILink* link = fPipe->FDI();
-	if (link != NULL)
-		link->Train(target);
-
 	// For LVDS panels, we may need to set the timings according to the panel
 	// native video mode, and let the panel fitter do the scaling. But the
 	// place where the scaling happens varies accross generations of devices.
@@ -545,6 +537,14 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 		// and hope for the best
 		hardwareTarget = *target;
 	}
+
+	// Setup PanelFitter and Train FDI if it exists
+	PanelFitter* fitter = fPipe->PFT();
+	if (fitter != NULL)
+		fitter->Enable(hardwareTarget);
+	FDILink* link = fPipe->FDI();
+	if (link != NULL)
+		link->Train(&hardwareTarget);
 
 	pll_divisors divisors;
 	compute_pll_divisors(&hardwareTarget, &divisors, true);
