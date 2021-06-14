@@ -17,7 +17,7 @@ StaticLibrary cortex_support.a :
 ;
 
 DoCatalogs cortex_support.a :
-	application/x-vnd.Cortex.support
+	x-vnd.Cortex.support
 	:
 	MediaString.cpp
 ;

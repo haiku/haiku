@@ -63,7 +63,7 @@ __USE_CORTEX_NAMESPACE
 #define D_OPERATION(x) //PRINT (x)	// operations
 #define D_COMPARE(x) //PRINT (x)	// compare functions
 
-static BCatalog sCatalog("application/x-vnd.Cortex.DormantNodeView");
+static BCatalog sCatalog("x-vnd.Cortex.DormantNodeView");
 
 // -------------------------------------------------------- //
 // constants

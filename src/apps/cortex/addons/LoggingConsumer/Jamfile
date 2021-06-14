@@ -18,7 +18,7 @@ Addon cortex_logging_consumer.media_addon :
 ;
 
 DoCatalogs cortex_logging_consumer.media_addon
-	: application/x-vnd.Be.LoggingConsumerApp
+	: x-vnd.Be.LoggingConsumerApp
 	:
 	LoggingConsumer.cpp
 	LoggingConsumerAddOn.cpp

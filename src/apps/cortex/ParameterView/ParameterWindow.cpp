@@ -70,7 +70,7 @@ __USE_CORTEX_NAMESPACE
 #define D_INTERNAL(x) //PRINT (x)
 #define D_MESSAGE(x) //PRINT (x)
 
-static BCatalog sCatalog("application/x-vnd.Cortex.ParameterView");
+static BCatalog sCatalog("x-vnd.Cortex.ParameterView");
 
 // -------------------------------------------------------- //
 // ctor/dtor

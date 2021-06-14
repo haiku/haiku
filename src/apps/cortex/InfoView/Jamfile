@@ -19,7 +19,7 @@ StaticLibrary cortex_info_view.a :
 ;
 
 DoCatalogs cortex_info_view.a :
-	application/x-vnd.Cortex.InfoView
+	x-vnd.Cortex.InfoView
 	:
 	AppNodeInfoView.cpp
 	ConnectionInfoView.cpp

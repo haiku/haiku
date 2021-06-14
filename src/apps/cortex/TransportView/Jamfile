@@ -15,7 +15,7 @@ StaticLibrary cortex_transport_view.a :
 ;
 
 DoCatalogs cortex_transport_view.a :
-	application/x-vnd.Cortex.TransportView
+	x-vnd.Cortex.TransportView
 	:
 	TransportView.cpp
 ;

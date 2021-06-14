@@ -68,7 +68,7 @@ __USE_CORTEX_NAMESPACE
 #define D_ROSTER(x) //PRINT (x)
 #define D_LOCK(x) //PRINT (x)
 
-static BCatalog sCatalog("application/x-vnd.Cortex.NodeManager");
+static BCatalog sCatalog("x-vnd.Cortex.NodeManager");
 
 // -------------------------------------------------------- //
 // messaging constants

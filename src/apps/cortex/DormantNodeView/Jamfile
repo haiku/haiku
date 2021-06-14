@@ -16,7 +16,7 @@ StaticLibrary cortex_dormant_node_view.a :
 ;
 
 DoCatalogs cortex_dormant_node_view.a :
-	application/x-vnd.Cortex.DormantNodeView
+	x-vnd.Cortex.DormantNodeView
 	:
 	DormantNodeListItem.cpp
 	DormantNodeWindow.cpp

@@ -46,7 +46,7 @@ Application Cortex :
 ;
 
 DoCatalogs Cortex :
-	application/x-vnd.Cortex.Route
+	x-vnd.Cortex.Route
 	:
 	RouteAppNodeManager.cpp
 	RouteWindow.cpp

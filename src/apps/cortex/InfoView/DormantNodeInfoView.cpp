@@ -54,7 +54,7 @@ __USE_CORTEX_NAMESPACE
 #include <Debug.h>
 #define D_METHOD(x) //PRINT (x)
 
-static BCatalog sCatalog("application/x-vnd.Cortex.InfoView");
+static BCatalog sCatalog("x-vnd.Cortex.InfoView");
 
 // -------------------------------------------------------- //
 // *** ctor/dtor (public)

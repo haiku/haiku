@@ -16,7 +16,7 @@ StaticLibrary cortex_node_manager.a :
 ;
 
 DoCatalogs cortex_node_manager.a :
-	application/x-vnd.Cortex.NodeManager
+	x-vnd.Cortex.NodeManager
 	:
 	NodeManager.cpp
 ;

@@ -70,7 +70,7 @@ using namespace std;
 
 __USE_CORTEX_NAMESPACE
 
-static BCatalog sCatalog("application/x-vnd.Cortex.TransportView");
+static BCatalog sCatalog("x-vnd.Cortex.TransportView");
 
 // -------------------------------------------------------- //
 // _GroupInfoView

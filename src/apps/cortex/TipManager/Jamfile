@@ -13,7 +13,7 @@ StaticLibrary cortex_tip_manager.a :
 ;
 
 DoCatalogs cortex_tip_manager.a :
-	application/x-vnd.Cortex.TipManager
+	x-vnd.Cortex.TipManager
 	:
 	TipWindow.cpp
 ;

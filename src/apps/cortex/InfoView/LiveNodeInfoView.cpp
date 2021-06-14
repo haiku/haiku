@@ -61,7 +61,7 @@ __USE_CORTEX_NAMESPACE
 #define D_METHOD(x) //PRINT (x)
 #define D_MESSAGE(x) //PRINT (x)
 
-static BCatalog sCatalog("application/x-vnd.Cortex.InfoView");
+static BCatalog sCatalog("x-vnd.Cortex.InfoView");
 
 // -------------------------------------------------------- //
 // *** ctor/dtor (public)

@@ -45,7 +45,7 @@
 
 __USE_CORTEX_NAMESPACE
 
-static BCatalog sCatalog("application/x-vnd.Cortex.TipManager");
+static BCatalog sCatalog("x-vnd.Cortex.TipManager");
 
 // -------------------------------------------------------- //
 // *** dtor/ctors

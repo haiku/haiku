@@ -25,7 +25,7 @@ Addon cortex_audioadapter.media_addon :
 ;
 
 DoCatalogs cortex_audioadapter.media_addon
-	: application/x-vnd.moon-AudioAdapter.media_addon
+	: x-vnd.moon-AudioAdapter.media_addon
 	:
 	AudioAdapterParams.cpp
 

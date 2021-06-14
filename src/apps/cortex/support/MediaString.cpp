@@ -51,7 +51,7 @@ __USE_CORTEX_NAMESPACE
 #include <Debug.h>
 #define D_METHOD(x) //PRINT (x)
 
-static BCatalog sCatalog("application/x-vnd.Cortex.support");
+static BCatalog sCatalog("x-vnd.Cortex.support");
 
 // -------------------------------------------------------- //
 // *** media_node strings (public)

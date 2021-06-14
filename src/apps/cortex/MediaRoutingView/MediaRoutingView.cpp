@@ -87,7 +87,7 @@ __USE_CORTEX_NAMESPACE
 #define D_MOUSE(x) //PRINT (x)
 #define D_KEY(x) //PRINT (x)
 
-static BCatalog sCatalog("application/x-vnd.Cortex.MediaRoutingView");
+static BCatalog sCatalog("x-vnd.Cortex.MediaRoutingView");
 
 // ---------------------------------------------------------------- //
 // constants

@@ -59,7 +59,7 @@ __USE_CORTEX_NAMESPACE
 #define D_MESSAGE(x) //PRINT (x)	// MessageReceived()
 #define D_INTERNAL(x) //PRINT (x)	// internal operations
 
-static BCatalog sCatalog("application/x-vnd.Cortex.DormantNodeView");
+static BCatalog sCatalog("x-vnd.Cortex.DormantNodeView");
 
 // -------------------------------------------------------- //
 // constants

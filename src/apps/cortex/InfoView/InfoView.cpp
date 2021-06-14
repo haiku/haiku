@@ -63,7 +63,7 @@ __USE_CORTEX_NAMESPACE
 #define D_ACCESS(X) //PRINT (x)			// Accessors
 #define D_METHOD(x) //PRINT (x)
 
-static BCatalog sCatalog("application/x-vnd.Cortex.InfoView");
+static BCatalog sCatalog("x-vnd.Cortex.InfoView");
 
 // -------------------------------------------------------- //
 // *** internal class: _InfoTextField

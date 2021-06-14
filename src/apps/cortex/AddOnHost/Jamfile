@@ -12,7 +12,7 @@ Application CortexAddOnHost :
 ;
 
 DoCatalogs CortexAddOnHost :
-	application/x-vnd.Cortex.AddOnHost
+	x-vnd.Cortex.AddOnHost
 	:
 	AddOnHostApp.cpp
 ;

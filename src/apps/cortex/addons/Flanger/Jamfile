@@ -17,7 +17,7 @@ Addon cortex_flanger.media_addon :
 ;
 
 DoCatalogs cortex_flanger.media_addon
-	: application/x-vnd.moon-Flanger.media_addon
+	: x-vnd.moon-Flanger.media_addon
 	:
 	FlangerAddOn.cpp
 	FlangerNode.cpp

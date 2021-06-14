@@ -23,7 +23,7 @@ StaticLibrary cortex_media_routing_view.a :
 ;
 
 DoCatalogs cortex_media_routing_view.a :
-	application/x-vnd.Cortex.MediaRoutingView
+	x-vnd.Cortex.MediaRoutingView
 	:
 	MediaJack.cpp
 	MediaNodePanel.cpp
