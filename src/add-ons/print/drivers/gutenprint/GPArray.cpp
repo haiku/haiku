@@ -32,7 +32,7 @@ template<typename TYPE>
 void
 GPArray<TYPE>::SetSize(int size)
 {
-	ASSERT(fSize == NULL);
+	ASSERT(fSize == 0);
 	fArray = new PointerType[size];
 	if (fArray == NULL)
 		return;
