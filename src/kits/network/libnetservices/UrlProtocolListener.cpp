@@ -8,6 +8,9 @@
  */
 
 #include <cstdio>
+#ifdef DEBUG
+#include <iostream>
+#endif
 
 #include <UrlRequest.h>
 #include <UrlProtocolListener.h>
