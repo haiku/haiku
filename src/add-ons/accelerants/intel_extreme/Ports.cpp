@@ -790,10 +790,18 @@ HDMIPort::IsConnected()
 	if (portRegister == 0)
 		return false;
 
-	bool hasPCH = (gInfo->shared_info->pch_info != INTEL_PCH_NONE);
-	if (!hasPCH && PortIndex() == INTEL_PORT_C) {
-		// there's no detection bit on this port
-	} else if ((read32(portRegister) & DISPLAY_MONITOR_PORT_DETECTED) == 0)
+	//Notes:
+	//- DISPLAY_MONITOR_PORT_DETECTED does only tell you *some* sort of digital display is
+	//  connected to the port *if* you have the AUX channel stuff under power. It does not
+	//  tell you which -type- of digital display is connected.
+	//- Since we rely on the BIOS anyway, let's just use the conclusions it made for us :)
+	//  Beware though: set_display_power_mode() uses this DISPLAY_MONITOR_PORT_ENABLED bit
+	//  for DPMS as well. So we should better buffer our findings here for i.e. possible
+	//  accelerant clones starting up. For DPMS there's currently no problem as this bit
+	//  is only programmed for LVDS, DVI and VGA while we detect presence only for DP and HDMI.
+	//
+	//if ((read32(portRegister) & DISPLAY_MONITOR_PORT_DETECTED) == 0)
+	if ((read32(portRegister) & DISPLAY_MONITOR_PORT_ENABLED) == 0)
 		return false;
 
 	return HasEDID();
@@ -849,12 +857,26 @@ DisplayPort::IsConnected()
 	if (portRegister == 0)
 		return false;
 
-	if ((read32(portRegister) & DISPLAY_MONITOR_PORT_DETECTED) == 0) {
+	//Notes:
+	//- DISPLAY_MONITOR_PORT_DETECTED does only tell you *some* sort of digital display is
+	//  connected to the port *if* you have the AUX channel stuff under power. It does not
+	//  tell you which -type- of digital display is connected.
+	//- Since we rely on the BIOS anyway, let's just use the conclusions it made for us :)
+	//  Beware though: set_display_power_mode() uses this DISPLAY_MONITOR_PORT_ENABLED bit
+	//  for DPMS as well. So we should better buffer our findings here for i.e. possible
+	//  accelerant clones starting up. For DPMS there's currently no problem as this bit
+	//  is only programmed for LVDS, DVI and VGA while we detect presence only for DP and HDMI.
+	//
+	//if ((read32(portRegister) & DISPLAY_MONITOR_PORT_DETECTED) == 0) {
+	if ((read32(portRegister) & DISPLAY_MONITOR_PORT_ENABLED) == 0) {
 		TRACE("%s: %s link not detected\n", __func__, PortName());
 		return false;
 	}
 
-	return HasEDID();
+	//since EDID is not correctly implemented yet for this connection type we'll do without it for now
+	//return HasEDID();
+	TRACE("%s: %s link detected\n", __func__, PortName());
+	return true;
 }
 
 
@@ -1086,8 +1108,9 @@ DigitalDisplayInterface::IsConnected()
 	TRACE("%s: %s Maximum Lanes: %" B_PRId8 "\n", __func__,
 		PortName(), fMaxLanes);
 
-	HasEDID();
-
+	//since EDID is not correctly implemented yet for this connection type we'll do without it for now
+	//return HasEDID();
+	TRACE("%s: %s link detected\n", __func__, PortName());
 	return true;
 }
 
@@ -1104,14 +1127,13 @@ DigitalDisplayInterface::SetDisplayMode(display_mode* target, uint32 colorMode)
 		return B_ERROR;
 	}
 
-#if 0
-	// Disabled for now as our code doesn't work. Let's hope VESA/EFI has
-	// already set things up for us during boot.
-	// Train FDI if it exists
+	// Setup PanelFitter and Train FDI if it exists
+	PanelFitter* fitter = fPipe->PFT();
+	if (fitter != NULL)
+		fitter->Enable(*target);
 	FDILink* link = fPipe->FDI();
 	if (link != NULL)
 		link->Train(target);
-#endif
 
 	pll_divisors divisors;
 	compute_pll_divisors(target, &divisors, false);

@@ -243,6 +243,8 @@ probe_ports()
 	TRACE("lvds: %08" B_PRIx32 "\n", read32(INTEL_DIGITAL_LVDS_PORT));
 
 	bool foundLVDS = false;
+	bool foundDP = false;
+	bool foundDDI = false;
 
 	gInfo->port_count = 0;
 	for (int i = INTEL_PORT_A; i <= INTEL_PORT_D; i++) {
@@ -251,9 +253,10 @@ probe_ports()
 		if (displayPort == NULL)
 			return B_NO_MEMORY;
 
-		if (displayPort->IsConnected())
+		if (displayPort->IsConnected()) {
+			foundDP = true;
 			gInfo->ports[gInfo->port_count++] = displayPort;
-		else
+		} else
 			delete displayPort;
 	}
 
@@ -268,9 +271,10 @@ probe_ports()
 			if (ddiPort == NULL)
 				return B_NO_MEMORY;
 
-			if (ddiPort->IsConnected())
+			if (ddiPort->IsConnected()) {
+				foundDDI = true;
 				gInfo->ports[gInfo->port_count++] = ddiPort;
-			else
+			} else
 				delete ddiPort;
 		}
 	}
@@ -292,6 +296,7 @@ probe_ports()
 		TRACE("Probing HDMI %d\n", i);
 		if (has_connected_port((port_index)i, INTEL_PORT_TYPE_ANY)) {
 			// Ensure port not already claimed by something like DDI
+			TRACE("Port already claimed\n");
 			continue;
 		}
 
@@ -318,8 +323,8 @@ probe_ports()
 	} else
 		delete lvdsPort;
 
-	TRACE("Probing DVI\n");
 	if (!has_connected_port(INTEL_PORT_ANY, INTEL_PORT_TYPE_ANY)) {
+		TRACE("Probing DVI\n");
 		// there's neither DisplayPort nor HDMI so far, assume DVI B
 		for (port_index index = INTEL_PORT_B; index <= INTEL_PORT_C;
 				index = (port_index)(index + 1)) {
@@ -353,8 +358,7 @@ probe_ports()
 	if (gInfo->shared_info->pch_info == INTEL_PCH_IBX
 		|| gInfo->shared_info->pch_info == INTEL_PCH_CPT) {
 		TRACE("Activating clocks\n");
-		// XXX: Is LVDS the same as Panel?
-		refclk_activate_ilk(foundLVDS);
+		refclk_activate_ilk(foundLVDS || foundDP || foundDDI);
 	}
 	/*
 	} else if (gInfo->shared_info->pch_info == INTEL_PCH_LPT) {
