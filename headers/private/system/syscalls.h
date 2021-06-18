@@ -286,7 +286,7 @@ extern ssize_t		_kern_select(int numfds, struct fd_set *readSet,
 						struct fd_set *writeSet, struct fd_set *errorSet,
 						bigtime_t timeout, const sigset_t *sigMask);
 extern ssize_t		_kern_poll(struct pollfd *fds, int numFDs,
-						bigtime_t timeout);
+						bigtime_t timeout, const sigset_t *sigMask);
 
 extern int			_kern_open_attr_dir(int fd, const char *path,
 						bool traverseLeafLink);

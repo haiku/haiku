@@ -550,7 +550,8 @@ common_select(int numFDs, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
 
 
 static int
-common_poll(struct pollfd *fds, nfds_t numFDs, bigtime_t timeout, bool kernel)
+common_poll(struct pollfd *fds, nfds_t numFDs, bigtime_t timeout,
+	const sigset_t *sigMask, bool kernel)
 {
 	// allocate sync object
 	select_sync* sync;
@@ -580,10 +581,25 @@ common_poll(struct pollfd *fds, nfds_t numFDs, bigtime_t timeout, bool kernel)
 		}
 	}
 
+	// set new signal mask
+	sigset_t oldSigMask;
+	if (sigMask != NULL) {
+		sigprocmask(SIG_SETMASK, sigMask, &oldSigMask);
+		if (!kernel) {
+			Thread *thread = thread_get_current_thread();
+			thread->old_sig_block_mask = oldSigMask;
+			thread->flags |= THREAD_FLAGS_OLD_SIGMASK;
+		}
+	}
+
 	if (!invalid) {
 		status = acquire_sem_etc(sync->sem, 1,
 			B_CAN_INTERRUPT | (timeout >= 0 ? B_ABSOLUTE_TIMEOUT : 0), timeout);
 	}
+
+	// restore the old signal mask
+	if (sigMask != NULL && kernel)
+		sigprocmask(SIG_SETMASK, &oldSigMask, NULL);
 
 	// deselect file descriptors
 
@@ -892,12 +908,13 @@ _kern_select(int numFDs, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
 
 
 ssize_t
-_kern_poll(struct pollfd *fds, int numFDs, bigtime_t timeout)
+_kern_poll(struct pollfd *fds, int numFDs, bigtime_t timeout,
+	const sigset_t *sigMask)
 {
 	if (timeout >= 0)
 		timeout += system_time();
 
-	return common_poll(fds, numFDs, timeout, true);
+	return common_poll(fds, numFDs, timeout, sigMask, true);
 }
 
 
@@ -1017,10 +1034,12 @@ err:
 
 
 ssize_t
-_user_poll(struct pollfd *userfds, int numFDs, bigtime_t timeout)
+_user_poll(struct pollfd *userfds, int numFDs, bigtime_t timeout,
+	const sigset_t *userSigMask)
 {
-	struct pollfd *fds;
-	size_t bytes;
+	struct pollfd *fds = NULL;
+	size_t bytes = 0;
+	sigset_t sigMask;
 	int result;
 
 	if (timeout >= 0) {
@@ -1033,28 +1052,33 @@ _user_poll(struct pollfd *userfds, int numFDs, bigtime_t timeout)
 	if (numFDs < 0)
 		return B_BAD_VALUE;
 
-	if (numFDs == 0) {
-		// special case: no FDs
-		return common_poll(NULL, 0, timeout, false);
+	if (numFDs != 0) {
+
+		if (!check_max_fds(numFDs))
+			return B_BAD_VALUE;
+
+		if (userfds == NULL || !IS_USER_ADDRESS(userfds))
+			return B_BAD_ADDRESS;
+
+		fds = (struct pollfd *)malloc(bytes = numFDs * sizeof(struct pollfd));
+		if (fds == NULL)
+			return B_NO_MEMORY;
+
+		if (user_memcpy(fds, userfds, bytes) < B_OK) {
+			result = B_BAD_ADDRESS;
+			goto err;
+		}
 	}
 
-	if (!check_max_fds(numFDs))
-		return B_BAD_VALUE;
-
-	// copy parameters
-	if (userfds == NULL || !IS_USER_ADDRESS(userfds))
-		return B_BAD_ADDRESS;
-
-	fds = (struct pollfd *)malloc(bytes = numFDs * sizeof(struct pollfd));
-	if (fds == NULL)
-		return B_NO_MEMORY;
-
-	if (user_memcpy(fds, userfds, bytes) < B_OK) {
+	if (userSigMask != NULL
+		&& (!IS_USER_ADDRESS(userSigMask)
+			|| user_memcpy(&sigMask, userSigMask, sizeof(sigMask)) < B_OK)) {
 		result = B_BAD_ADDRESS;
 		goto err;
 	}
 
-	result = common_poll(fds, numFDs, timeout, false);
+	result = common_poll(fds, numFDs, timeout,
+		userSigMask != NULL ? &sigMask : NULL, false);
 
 	// copy back results
 	if (numFDs > 0 && user_memcpy(userfds, fds, bytes) != 0) {
