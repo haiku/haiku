@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-HaikuDepot	2848501228
+1	dutch; flemish	x-vnd.Haiku-HaikuDepot	776396196
 Repository update error	LocalRepositoryUpdateProcess		Fout bij updaten softwarebronnen
 Network error	ServerHelper		Netwerk fout
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Er is een fout opgetreden bij het verversen van de softwarebronnen: %error%
@@ -24,6 +24,7 @@ Rating	PackageListView		Beoordeling
 Synchronizing icons	ServerIconExportUpdateProcess		Iconen synchroniseren
 Show	MainWindow		Toon
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Een fout is opgetreden bij het ophalen van de pakket lijst: %message%
+Settings…	MainWindow		Instellingen…
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Deze applicatie leest en schrijft wat werkbestanden op uw computer om te functioneren. Het lijkt erop dat er problemen zijn met het schrijven van een testbestand op [%TestFilePath%]. Controleer dat er geen problemen zijn met uw lokale schijf of met de rechten van mappen en bestanden, die er voor zouden kunnen zorgen dat deze toepassing geen bestanden in die map kan schrijven. U kan ervoor kiezen om het probleem te erkennen en door te gaan, maar dan wordt sommige functionaliteit uitgeschakeld.
 Active	PackageListView		Actief
 Login or Create account	MainWindow		Inloggen of registreren
@@ -38,6 +39,7 @@ Local	LocalPkgDataLoadProcess		Lokaal
 Rate %Package%	RatePackageWindow		Beoordeel %Package%
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Een fout is opgetreden bij het initialiseren van de pakketbeheerder: %message%
 Quit HaikuDepot	App		HaikuDepot afsluiten
+Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Gaat u akkoord met het versturen van anonieme gebruiksgegegevens aan de HaikuDepotServer van deze computer? U kan uw voorkeuren altijd wijzingen in het \"Instellingen\"-venster.
 An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		Een onverwachte fout '%Message%' met eigenschap %Property%' heeft zich voorgedaan
 A response to the captcha question must be provided.	UserLoginWindow		Een antwoord op de captcha-vraag moet gegeven worden.
 Category	FilterView		Categorie
@@ -61,6 +63,7 @@ Cancel	UserLoginWindow		Annuleren
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot vereist dat de pakket-daemon functioneert, welke niet actief lijkt.\nWilt u de pakket-daemon nu starten?
 Click a package to view information	PackageInfoView		Klik op een pakket om informatie te bekijken
 The password must be at least eight characters long, consist of at least two digits and one upper case character.	UserLoginWindow		Het wachtwoord moet tenminste acht karakters lang zijn, en moet uit tenminste twee cijfers en één hoofdletter bestaan.
+Share anonymous usage data with HaikuDepotServer	SettingsWindow		Anonieme gebruiksgegevens met de HaikuDepotServer delen
 Contents	PackageInfoView		Pakketinhoud
 Close	PackageManager		Sluiten
 Changelog	PackageInfoView		Changelog
@@ -77,6 +80,7 @@ Send	RatePackageWindow		Versturen
 Start package daemon	App		Start pakket-daemon
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Het wachtwoord moet tweemaal ingevuld worden om te kans op een verkeerde invoer te verkleinen.
 The package action could not be scheduled: %Error%	PackageInfoView		De pakketactie kon niet ingepland worden: %Error%
+Cancel	SettingsWindow		Annuleren
 Cancel	RatePackageWindow		Annuleren
 Inactive	PackageListView		Inactief
 Nickname:	UserLoginWindow		Gebruikersnaam:
@@ -87,7 +91,9 @@ OK	MainWindow		OK
 Usage conditions download problem	UserLoginWindow		Gebruiksvoorwaarden downloadprobleem
 OK	PackageInfoView		OK
 Downloading:	PackageInfoView		Downloaden:
+Quit	MainWindow		Afsluiten
 Success	UserLoginWindow		Succes
+No	MainWindow		Nee
 Package daemon problem	App		Pakket-daemonprobleem
 (%Votes%)	PackageInfoView		(%Votes%)
 Repository	PackageListView		Pakketbron
@@ -97,6 +103,8 @@ Close	UserLoginWindow		Sluiten
 Close	RatePackageWindow		Sluiten
 An unexpected error has been sent from the server [%i]	ServerHelper		Een onverwachte fout is ontvangen van de server [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synchroniseer pakketdata voor pakketbron '%REPO_NAME%'
+Settings	SettingsWindow		Instellingen
+An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Er is een fout opgetreden bij het ophalen van de gebruiksvoorwaarden voor het maken van een nieuwe gebruikersaccount. Controleer de log voor details en probeer het later nog eens. \nInformatie over hoe u de logs kunt bekijken is te vinden in het HaikuDepot-onderdeel van de Haiku User Guide.
 View the usage conditions	UserLoginWindow		Bekijk de gebruiksvoorwaarden
 Login issue	MainWindow		Inlogprobleem
 Your rating:	RatePackageWindow		Uw beoordeling:

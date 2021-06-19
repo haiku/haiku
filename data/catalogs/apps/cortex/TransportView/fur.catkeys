@@ -1,0 +1,16 @@
+1	friulian	application/x-vnd.Cortex.TransportView	2709303214
+(none)	TransportView		(nissun)
+{0, plural, one{# node} other{# nodes}}	TransportView		{0, plural, one{# grop} other{# grops}}
+No errors.	TransportView		Nissun erôr.
+to	TransportView		a
+Offline	TransportView		Fûr rêt
+(???)	TransportView		(???)
+(no group)	TransportView		(nissun grup)
+To:	TransportView		A:
+Increase latency	TransportView		Aumente la latence
+Time source:	TransportView		Sorzint temporâl:
+DAC time source	TransportView		Sorzint temporâl DAC
+Decrease precision	TransportView		Diminuìs la precision
+System clock	TransportView		Orloi di sisteme
+From:	TransportView		Di:
+Run mode:	TransportView		Modalitât esecuzion:

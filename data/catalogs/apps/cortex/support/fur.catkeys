@@ -1,3 +1,138 @@
-1	friulian	application/x-vnd.Cortex.support	448331777
+1	friulian	application/x-vnd.Cortex.support	1960494264
 Header has flags	MediaString		La intestazion e à opzions
 32 bit HLS	MediaString		HLS a 32 bit
+(unknown format)	MediaString		(formât no cognossût)
+Clean buffers	MediaString		Nete lis memoriis tampon
+Rear-right	MediaString		Daûr a diestre
+{0, plural, one{# pixel} other{# pixels}}	MediaString		{0, plural, one{# pixel} other{# pixels}}
+Mono	MediaString		Mono
+MPEG1	MediaString		MPEG1
+ASF format family	MediaString		Famee di formâts ASF
+Encoded video	MediaString		Video codificât
+YUV444	MediaString		YUV444
+Port	MediaString		Puarte
+Top-Front-left	MediaString		In alt denant a çampe
+24 bit LAB	MediaString		LAB a 24 bit
+16 bit integer	MediaString		Intîr a 16 bit
+32 bit HSVA	MediaString		HSVA a 32 bit
+YCbCr411	MediaString		YCbCr411
+Offline	MediaString		Fûr rêt
+YUV422	MediaString		YUV422
+(unkown video orientation)	MediaString		(orientament dal video no cognossût)
+QuickTime	MediaString		QuickTime
+32 bit HLSA	MediaString		HLSA a 32 bit
+Top-Front-center	MediaString		In alt denant tal mieç
+BeOS format family	MediaString		Famee di formâts BeOS
+24 bit HSV	MediaString		HSV a 24 bit
+Back-center	MediaString		Daûr tal mieç
+32 bit CMY	MediaString		CMY a 32 bit
+{0, plural, other{# bit integer}}	MediaString		{0, plural, other{intîr a # bit}}
+Ambisonic WXYZ	MediaString		Ambisonic WXYZ
+(unknown video format)	MediaString		(formât video no cognossût)
+AVI format family	MediaString		Famee di formâts AVI
+Homogenous buffers	MediaString		Memoriis tampon omogjeniis
+Interlaced 	MediaString		Interlaçât 
+{0, plural, one{# channel}other{# channels}}	MediaString		{0, plural, one{# canâl}other{# canâi}}
+15 bit RGBA	MediaString		RGBA a 15 bit
+AVI	MediaString		AVI
+YUV9	MediaString		YUV9
+ Hz	MediaString		 Hz
+Right	MediaString		Diestre
+32 bit RGB	MediaString		RGB a 32 bit
+Video data between line u and u	MediaString		Dâts video tra la linie u e u
+Physical output	MediaString		Jessude fisiche
+Top-Back-center	MediaString		In alt daûr tal mieç
+YUV420	MediaString		YUV420
+Top to bottom, left to right	MediaString		Dal alt in bas, di çampe a drete
+(unknown run mode)	MediaString		(modalitât di esecuzion no cognossude)
+ kb/s	MediaString		 kb/s
+24 bit HSI	MediaString		HSI a 24 bit
+User-defined media type	MediaString		Gjenar multimediâl definît dal utent
+32 bit CMYA	MediaString		CMYA a 32 bit
+Rear-left	MediaString		Daûr a çampe
+QuickTime format family	MediaString		Famee di formâts QuickTime
+Any format family	MediaString		Cualsisei famee di formâts
+Timecode	MediaString		Codiç temporâl
+Top-Front-right	MediaString		In alt denant a diestre
+32 bit float	MediaString		Virgule mobil a 32 bit
+Controllable	MediaString		Controlabil
+32 bit integer	MediaString		Intîr a 32 bit
+Front-right-center	MediaString		Denant a diestre tal mieç
+Side-right	MediaString		In bande a diestre
+ kHz	MediaString		 kHz
+Little endian	MediaString		Little endian
+(unknown matrix mask)	MediaString		(mascare matriç no cognossude)
+32 bit LAB	MediaString		LAB a 32 bit
+Side-left	MediaString		In bande a çampe
+{0, plural, one{# byte per buffer} other{# bytes per buffer}}	MediaString		{0, plural, one{# byte par buffer} other{# bytes par buffer}}
+32 bit CMYK	MediaString		CMYK a 32 bit
+(unknown multistream format)	MediaString		(formât a flus multiplis no cognossût)
+8 bit integer	MediaString		Intîr a 8 bit
+8 bit grayscale-index	MediaString		Indiç di scjale di grîs a 8 bit
+YCbCr444	MediaString		YCbCr444
+Buffer producer	MediaString		Produtôr di memorie tampon
+Buffer consumer	MediaString		Consumadôr di memorie tampon
+Increase latency	MediaString		Aumente latence
+Front-left-center	MediaString		Denant a çampe tal mieç
+MPEG format family	MediaString		Famee di formâts MPEG
+Center	MediaString		Tal mieç
+ kb/s (max)	MediaString		 kb/s (max)
+Monochrome	MediaString		Monocromatic
+Private Be media type	MediaString		Gjenar multimediâl Be privât
+24 bit UVL	MediaString		UVL a 24 bit
+32 bit HSV	MediaString		HSV a 32 bit
+ID	MediaString		ID
+AIFF format family	MediaString		Famee di formâts AIFF
+Top-Back-left	MediaString		In alt daûr a çampe
+16 bit RGB	MediaString		RGB a 16 bit
+YCbCr422	MediaString		YCbCr422
+Raw audio	MediaString		Audio grês
+32 bit LABA	MediaString		LABA a 32 bit
+24 bit HLS	MediaString		HLS a 24 bit
+Non-interlaced 	MediaString		No interlaçât 
+{0, plural,one{# byte (avg)}other{# bytes (avg)}}	MediaString		{0, plural,one{# byte (medie)}other{# bytes (medie)}}
+MIDI	MediaString		MIDI
+YUV12	MediaString		YUV12
+WAV format family	MediaString		Famee di formâts WAV
+ (NTSC)	MediaString		 (NTSC)
+Physical input	MediaString		Jentrade fisiche
+Big endian	MediaString		Big endian
+{0, plural,one{# byte (max)}other{# bytes (max)}}	MediaString		{0, plural,one{# byte (massim)}other{# bytes (massim)}}
+YUV411	MediaString		YUV411
+Multistream media	MediaString		Multimedia a flus multiplis
+Encoded audio	MediaString		Audio codificât
+Decrease precision	MediaString		Diminuìs la precision
+File interface	MediaString		Interface file
+(unknown byte order)	MediaString		(ordin dai bytes no cognossût)
+32 bit HSI	MediaString		HSI a 32 bit
+Typeless media	MediaString		Multimedia cence gjenar
+ (PAL)	MediaString		 (PAL)
+32 bit RGBA	MediaString		RGBA a 32 bit
+YCbCr420	MediaString		YCbCr420
+ kb/s (avg)	MediaString		 kb/s (medie)
+HTML	MediaString		HTML
+Time source	MediaString		Sorzint temporâl
+15 bit RGB	MediaString		RGB a 15 bit
+ProLogic LR	MediaString		ProLogic LR
+Parameters	MediaString		Parametris
+Raw data from VBL area	MediaString		Dâts grês de aree VBL
+Top-Back-right	MediaString		In alt daûr a diestre
+{0, plural, one{# byte per row}other{# bytes per row}}	MediaString		{0, plural, one{# byte par rie}other{# bytes par rie}}
+Left	MediaString		Çampe
+BeOS video	MediaString		Video BeOS
+24 bit CMY	MediaString		CMY a 24 bit
+32 bit UVLA	MediaString		UVLA a 32 bit
+Top-center	MediaString		In alt tal mieç
+Entity interface	MediaString		Interface di entitât
+Stereo	MediaString		Stereo
+8 bit color-index	MediaString		Indiç di colôrs a 8 bit
+Bottom to top, left to right	MediaString		Dal bas in alt, di çampe a diestre
+32 bit UVL	MediaString		UVL a 32 bit
+{0, plural, one{# line} other{# lines}}	MediaString		{0, plural, one{# linie} other{# liniis}}
+Text	MediaString		Test
+Unknown media type	MediaString		Gjenar multimediâl no cognossût
+MPEG2	MediaString		MPEG2
+Miscellaneous format family	MediaString		Famee di formâts varis
+24 bit RGB	MediaString		RGB a 24 bit
+32 bit HSIA	MediaString		HSIA a 32 bit
+Raw video	MediaString		Video grês

@@ -1,40 +1,146 @@
-1	spanish; castilian	application/x-vnd.Cortex.support	2921428766
-Header has flags	MediaString		El encabezado tiene marcas (banderas)
-32 bit HLS	MediaString		HLS de 32 bit
-Recording	MediaString		Registrando
+1	spanish; castilian	application/x-vnd.Cortex.support	2630173556
+Header has flags	MediaString		El encabezado tiene marcas
+32 bit HLS	MediaString		HLS de 32 bits
+Recording	MediaString		Grabación
 (unknown format)	MediaString		(formato desconocido)
 Clean buffers	MediaString		Limpiar búferes
-{0, plural,one{# frame forward}other{# frames forward}}	MediaString		{0, plural,one{# frame forward}other{# frames forward}}
+{0, plural,one{# frame forward}other{# frames forward}}	MediaString		{0, plural,one{# cuadro adelante}other{# cuadros adelante}}
 Rear-right	MediaString		Trasero derecho
 {0, plural, one{# pixel} other{# pixels}}	MediaString		{0, plural, one{# píxel} other{# píxeles}}
-Mono	MediaString		mono
+Mono	MediaString		Mono
 MPEG1	MediaString		MPEG1
 ASF format family	MediaString		Familia de formatos ASF
 Encoded video	MediaString		Video codificado
 YUV444	MediaString		YUV444
 Port	MediaString		Puerto
-Top-Front-left	MediaString		parte superior delantera izquierda
+Top-Front-left	MediaString		Superior delantero izquierdo
+24 bit LAB	MediaString		LAB de 24 bits
+16 bit integer	MediaString		entero de 16 bits
+32 bit HSVA	MediaString		HSVA de 32 bits
+YCbCr411	MediaString		YCbCr411
+Offline	MediaString		Sin conexión
+YUV422	MediaString		YUV422
 (unkown video orientation)	MediaString		(orientación de video desconocida)
 QuickTime	MediaString		QuickTime
-32 bit HLSA	MediaString		HLSA de 32 bit
-Top-Front-center	MediaString		centro delantero superior
-BeOS format family	MediaString		familia de formatos BeOS
-24 bit HSV	MediaString		HSV de 24 bit
-Back-center	MediaString		Centro trasero
-32 bit CMY	MediaString		CMY de 32 bit
+32 bit HLSA	MediaString		HLSA de 32 bits
+Top-Front-center	MediaString		Central delantero superior
+BeOS format family	MediaString		Familia de formatos BeOS
+24 bit HSV	MediaString		HSV de 24 bits
+Back-center	MediaString		Central trasero
+32 bit CMY	MediaString		CMY de 32 bits
+{0, plural, other{# bit integer}}	MediaString		{0, plural, other{entero de # bits}}
+Ambisonic WXYZ	MediaString		WXYZ ambisónico
 (unknown video format)	MediaString		(formato de video desconocido)
-AVI format family	MediaString		familia de formatos AVI
-Homogenous buffers	MediaString		Búferes homogeneos
+AVI format family	MediaString		Familia de formatos AVI
+Homogenous buffers	MediaString		Búferes homogéneos
 Interlaced 	MediaString		Entrelazado 
+{0, plural, one{# channel}other{# channels}}	MediaString		{0, plural, one{# canal}other{# canales}}
+15 bit RGBA	MediaString		RGBA de 15 bits
+Drop data	MediaString		Descartar datos
+AVI	MediaString		AVI
+YUV9	MediaString		YUV9
+ Hz	MediaString		 Hz
 Right	MediaString		Derecha
-32 bit RGB	MediaString		RGB de 32 bit
-Video data between line u and u	MediaString		datos de video entre linea u y u
+32 bit RGB	MediaString		RGB de 32 bits
+Video data between line u and u	MediaString		Datos de video entre línea u y u
 System mixer	MediaString		Mezclador del sistema
-Physical output	MediaString		Salida fisica
-Top-Back-center	MediaString		Parte superior trasera central
+Physical output	MediaString		Salida física
+Top-Back-center	MediaString		Superior trasera central
 YUV420	MediaString		YUV420
-Top to bottom, left to right	MediaString		Arriba a abajo, derecha a izquierda
+Top to bottom, left to right	MediaString		Arriba hacia abajo, derecha a izquierda
+(unknown run mode)	MediaString		(modo de ejecución desconocido)
  kb/s	MediaString		 kb/s
-QuickTime format family	MediaString		Familia de formatos de QuickTime
+24 bit HSI	MediaString		HSI de 24 bits
+User-defined media type	MediaString		Tipo de medio definido por el usuario
+32 bit CMYA	MediaString		CMYA de 32 bits
+Rear-left	MediaString		Trasero izquierdo
+QuickTime format family	MediaString		Familia de formatos QuickTime
 Any format family	MediaString		Cualquier familia de formatos
-Top-Back-left	MediaString		Arriba-atrás-izquierda
+Timecode	MediaString		Marca de tiempo
+Top-Front-right	MediaString		Superior frontal derecho
+32 bit float	MediaString		coma flotante de 32 bits
+Controllable	MediaString		Controlable
+32 bit integer	MediaString		entero de 32 bits
+Front-right-center	MediaString		Central frontal derecho
+Side-right	MediaString		Lateral derecho
+ kHz	MediaString		 kHz
+Little endian	MediaString		Little endian
+(unknown matrix mask)	MediaString		(máscara de la matriz desconocida)
+32 bit LAB	MediaString		LAB de 32 bits
+Side-left	MediaString		Lateral izquierdo
+{0, plural, one{# byte per buffer} other{# bytes per buffer}}	MediaString		{0, plural, one{# byte por búfer} other{# bytes por búfer}}
+32 bit CMYK	MediaString		CMYK de 32 bits
+(unknown multistream format)	MediaString		(formato de flujos múltiples desconocido)
+8 bit integer	MediaString		entero de 8 bits
+8 bit grayscale-index	MediaString		índice de escala de grises de 8 bits
+YCbCr444	MediaString		YCbCr444
+Buffer producer	MediaString		Productor de búfer
+Buffer consumer	MediaString		Consumidor de búfer
+Increase latency	MediaString		Aumento de latencia
+Front-left-center	MediaString		Central frontal izquierdo
+MPEG format family	MediaString		Familia de formatos MPEG
+(none)	MediaString		(ninguno)
+Center	MediaString		Centro
+ kb/s (max)	MediaString		 kb/s (máximo)
+Monochrome	MediaString		Monocromo
+Private Be media type	MediaString		Tipo de medio Be privado
+24 bit UVL	MediaString		UVL de 24 bits
+32 bit HSV	MediaString		HSV de 32 bits
+ID	MediaString		Identificador
+AIFF format family	MediaString		Familia de formatos AIFF
+Top-Back-left	MediaString		Superior trasero izquierdo
+16 bit RGB	MediaString		RGB de 16 bits
+YCbCr422	MediaString		YCbCr422
+Raw audio	MediaString		Audio sin procesar
+32 bit LABA	MediaString		LABA de 32 bits
+24 bit HLS	MediaString		HLS de 24 bits
+Non-interlaced 	MediaString		Sin entrelazar 
+{0, plural,one{# byte (avg)}other{# bytes (avg)}}	MediaString		{0, plural,one{# byte (promedio)}other{# bytes (promedio)}}
+MIDI	MediaString		MIDI
+YUV12	MediaString		YUV12
+WAV format family	MediaString		Familia de formatos WAV
+ (NTSC)	MediaString		 (NTSC)
+Physical input	MediaString		Entrada física
+Big endian	MediaString		Big endian
+Sub	MediaString		Sub
+{0, plural,one{# byte (max)}other{# bytes (max)}}	MediaString		{0, plural,one{# byte (máximo)}other{# bytes (máximo)}}
+YUV411	MediaString		YUV411
+Multistream media	MediaString		Medio multiflujo
+Encoded audio	MediaString		Audio codificado
+Decrease precision	MediaString		Disminuir precisión
+File interface	MediaString		Interfaz de archivo
+(unknown byte order)	MediaString		(orden de bytes desconocido)
+32 bit HSI	MediaString		HSI de 32 bits
+Typeless media	MediaString		Medio sin tipo
+ (PAL)	MediaString		 (PAL)
+32 bit RGBA	MediaString		RGBA de 32 bits
+YCbCr420	MediaString		YCbCr420
+ kb/s (avg)	MediaString		 kb/s (promedio)
+HTML	MediaString		HTML
+Time source	MediaString		Fuente de tiempo
+15 bit RGB	MediaString		RGB de 15 bits
+ProLogic LR	MediaString		ProLogic LR
+{0, plural,one{# byte per frame}other{# bytes per frame}}	MediaString		{0, plural,one{# byte por cuadro}other{# bytes por cuadro}}
+Parameters	MediaString		Parámetros
+Raw data from VBL area	MediaString		Datos sin procesar del área VBL
+Top-Back-right	MediaString		Superior trasero derecho
+{0, plural, one{# byte per row}other{# bytes per row}}	MediaString		{0, plural, one{# byte por fila}other{# bytes por fila}}
+Left	MediaString		Izquierdo
+BeOS video	MediaString		Video de BeOS
+24 bit CMY	MediaString		CMY de 24 bits
+32 bit UVLA	MediaString		UVLA de 32 bits
+Top-center	MediaString		Central superior
+Entity interface	MediaString		Interfaz de entidad
+Stereo	MediaString		Estereo
+8 bit color-index	MediaString		índice de color de 8 bits
+Bottom to top, left to right	MediaString		Abajo hacia arriba, izquierda a derecha
+32 bit UVL	MediaString		UVL de 32 bits
+{0, plural, one{# line} other{# lines}}	MediaString		{0, plural, one{# línea} other{# líneas}}
+Text	MediaString		Texto
+Unknown media type	MediaString		Tipo de medio desconocido
+MPEG2	MediaString		MPEG2
+Miscellaneous format family	MediaString		Familia de formatos variados
+24 bit RGB	MediaString		RGB de 24 bits
+{0, plural,one{# frame backward}other{# frames backward}}	MediaString		{0, plural,one{# cuadro atrás}other{# cuadros atrás}}
+32 bit HSIA	MediaString		HSIA de 32 bits
+Raw video	MediaString		Video sin procesar

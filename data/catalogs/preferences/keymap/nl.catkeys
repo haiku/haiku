@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Keymap	1075970008
+1	dutch; flemish	x-vnd.Haiku-Keymap	2850776429
 Key	Modifier keys window	As in a computer keyboard key	Toets
 Japanese	KeymapNames		Japans
 US	KeymapNames		VS
@@ -6,6 +6,7 @@ PG ↑	Keyboard Layout View	Very short for 'page up'	PG ↑
 Brazilian	KeymapNames		Braziliaans
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (VS)
 Right control	Keyboard Layout View		Rechter control
+X-Bows Nature	KeyboardLayoutNames		X-Bows Nature
 Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Optie:
 Cancel	Modifier keys window		Annuleren
@@ -89,6 +90,7 @@ Esperanto	KeymapNames		Esperanto
 Belarusian	KeymapNames		Wit-Russisch
 Warning: left and right key roles do not match	Modifier keys window		Waarschuwing: rol van de linker- en rechtertoetsen komen niet overeen
 Circumflex trigger	Keymap window		Circumflex-activeerder
+Fizzbook NL2	KeyboardLayoutNames		Fizzbook NL2
 Caps lock	Keyboard Layout View		Caps lock
 Left shift	Keyboard Layout View		Linker shift
 Russian (Yawert)	KeymapNames		Russisch (Yawert)

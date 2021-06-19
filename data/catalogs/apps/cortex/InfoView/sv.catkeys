@@ -1,0 +1,59 @@
+1	swedish	application/x-vnd.Cortex.InfoView	2382053937
+Offset	InfoView		Offset
+Description	DormantNodeInfoView		Beskrivning
+Byte order	InfoView		Byte ordning
+Connection	InfoView		Förbindelse
+Output formats	DormantNodeInfoView		Utdataformat
+History	InfoView		Historia
+Input formats	DormantNodeInfoView		Ingångsformat
+Signature	AppNodeInfoView		Signatur
+Video data between	InfoView		Videodata mellan
+Any number	DormantNodeInfoView	For 'Max. instances' field	Vilket nummer som helst
+Flags	InfoView		Flaggor
+Media output	InfoView		Medieutmatning
+Active lines	InfoView		Aktiva linjer
+Buffer size	InfoView		Buffertstorlek
+\n- Quality:	FileNodeInfoView		\n- Kvalitet:
+Kinds	LiveNodeInfoView		Typer
+Application	AppNodeInfoView		Ansökan
+Flavor flags	DormantNodeInfoView		Smaksätt flaggor
+Max. instances	DormantNodeInfoView		Max instanser
+\n- Duration:	FileNodeInfoView		\n- Längd:
+Dormant media node	DormantNodeInfoView		Vilande medienod
+Latency	LiveNodeInfoView		Latens
+Media type	InfoView		Mediatyp
+Live media node	LiveNodeInfoView		Live media nod
+Field rate	InfoView		Fälthastighet
+Kinds	DormantNodeInfoView		Typer
+%title% info	InfoView		%title% info
+Node ID	LiveNodeInfoView		Nod-ID
+Resolution	InfoView		Upplösning
+Chunk size	InfoView		Storlek
+File format	AppNodeInfoView		Filformat
+Matrix mask	InfoView		Matrismask
+Channel mask	InfoView		Kanalmask
+Orientation	InfoView		Orientering
+Live file-interface node	FileNodeInfoView		Live filgränssnittsnod
+Channels	InfoView		Kanaler
+Sample rate	InfoView		Samplingshastighet
+File format	FileNodeInfoView		Filformat
+(no file)	FileNodeInfoView		(ingen fil)
+Media input	InfoView		Mediainmatning
+Bit rate	InfoView		Bithastighet
+Input format	DormantNodeInfoView		Inmatningsformat
+Format	InfoView		Formatera
+Version	AppNodeInfoView		Version
+AddOn ID	DormantNodeInfoView		Tilläggs Id
+Frame size	InfoView		Ram storlek
+Flavor ID	DormantNodeInfoView		Smaks-ID
+Run mode	LiveNodeInfoView		Körläge
+\n- Codec:	FileNodeInfoView		\n- Codec:
+Port	LiveNodeInfoView		Port
+Output format	DormantNodeInfoView		Utmatningsformat
+Aspect ratio	InfoView		Bildförhållande
+Application-owned node	AppNodeInfoView		Programägd nod
+Tracks	FileNodeInfoView		Spår
+Source	InfoView		Källa
+Destination	InfoView		Destination
+Copyright	FileNodeInfoView		Upphovsrätt
+ID:	FileNodeInfoView		ID:

@@ -1,0 +1,47 @@
+1	swedish	application/x-vnd.Cortex.support	3220757490
+Header has flags	MediaString		Rubrik har flaggor
+32 bit HLS	MediaString		32-bitars HLS
+Recording	MediaString		Inspelning
+(unknown format)	MediaString		(okänt format)
+Clean buffers	MediaString		Rensa buffrar
+{0, plural,one{# frame forward}other{# frames forward}}	MediaString		{0, plural,one{# bildruta framåt}other{# bildrutor framåt}}
+Rear-right	MediaString		Bak till höger
+{0, plural, one{# pixel} other{# pixels}}	MediaString		{0, plural, one{# pixel} other{# pixlar}}
+Mono	MediaString		Mono
+MPEG1	MediaString		MPEG1
+ASF format family	MediaString		ASF-formatfamilj
+Encoded video	MediaString		Kodad video
+YUV444	MediaString		YUV444
+Port	MediaString		Port
+Top-Front-left	MediaString		Upp-Fram-vänster
+24 bit LAB	MediaString		24-bitars LAB
+16 bit integer	MediaString		16 bitars heltal
+32 bit HSVA	MediaString		32-bitars HSVA
+YCbCr411	MediaString		YCbCr411
+Offline	MediaString		Off-line
+YUV422	MediaString		YUV422
+(unkown video orientation)	MediaString		(okänd videorientering)
+QuickTime	MediaString		QuickTime
+32 bit HLSA	MediaString		32-bitars HLSA
+Top-Front-center	MediaString		Upp-Fram-mitt
+BeOS format family	MediaString		BeOS-formatfamilj
+24 bit HSV	MediaString		24 bitars HSV
+Back-center	MediaString		Baksida mitten
+32 bit CMY	MediaString		32 bitars CMY
+{0, plural, other{# bit integer}}	MediaString		{0, plural, other{# bit heltal}}
+Ambisonic WXYZ	MediaString		Ambisonic WXYZ
+(unknown video format)	MediaString		(okänt videoformat)
+YUV9	MediaString		YUV9
+YUV420	MediaString		YUV420
+YCbCr444	MediaString		YCbCr444
+ID	MediaString		ID
+YCbCr422	MediaString		YCbCr422
+YUV12	MediaString		YUV12
+ (NTSC)	MediaString		 (NTSC)
+YUV411	MediaString		YUV411
+ (PAL)	MediaString		 (PAL)
+YCbCr420	MediaString		YCbCr420
+BeOS video	MediaString		BeOS video
+Stereo	MediaString		Stereo
+Text	MediaString		Text
+MPEG2	MediaString		MPEG2

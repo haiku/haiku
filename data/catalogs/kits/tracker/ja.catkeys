@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	2498612740
+1	japanese	x-vnd.Haiku-libtracker	3380227078
 Created	ContainerWindow		作成日時
 Icon	AttributesView		アイコン
 Open and make preferred	OpenWithWindow		関連付けて開く
@@ -6,6 +6,7 @@ Kind	ContainerWindow		種類
 Open with…	ContainerWindow		指定アプリケーションで開く…
 Error moving \"%name\" to Trash. (%error)	FSUtils		\"%name\" をごみ箱に捨てようとしたら、エラーが発生しました。(%error)
 Or	FindPanel		または
+MIME Description	AttributesView		MIME 説明
 before	FindPanel		以前
 Volume icons	TrackerSettingsWindow		ディスクアイコン
 Ignore case	SelectionWindow		大文字小文字を区別しない
@@ -329,6 +330,7 @@ Recent folders	FavoritesMenu		最近使ったフォルダー
 Signed memory size	AttributesView		符号付きメモリサイズ
 The specified name is illegal. Please choose another name.	FilePanelPriv		指定された名前は利用できない文字を含んでいます。他の名前を指定してください。
 of %items	StatusWindow		/ %items
+MIME Path	AttributesView		MIME パス
 less than	FindPanel		より小さい
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		\"%name\" をコピー中にエラーが発生しました:\n\t%error\n\nそれでも続けますか?
 Creating links: 	StatusWindow		作成中リンク:
@@ -443,6 +445,7 @@ Sorry, saving more than one item is not allowed.	FilePanelPriv		2 項目以上�
 Move here	ContainerWindow		ここに移動
 the config folder	FSUtils		config フォルダー
 Sorry, could not create a new folder.	FSUtils		新規フォルダーを作成できませんでした。
+MIME Signature	AttributesView		MIME 署名
 Select all	VirtualDirectoryWindow		すべて選択
 Rename	FSUtils	button label	名前の変更
 Clean up all	ContainerWindow		すべてを整列

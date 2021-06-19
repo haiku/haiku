@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-HaikuDepot	2848501228
+1	esperanto	x-vnd.Haiku-HaikuDepot	1629587309
 Repository update error	LocalRepositoryUpdateProcess		Eraro dum ĝisdatigo de deponejo
 Network error	ServerHelper		Eraro de reto
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Eraro okazis dum aktualigo de la deponejo: %error%
@@ -24,6 +24,7 @@ Rating	PackageListView		Takso
 Synchronizing icons	ServerIconExportUpdateProcess		Sinkronigas piktogramojn
 Show	MainWindow		Montri
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Eraro okazis dum akirado de la listo de pakaĵoj: %message%
+Settings…	MainWindow		Agordo…
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Ĉi tiu programo konservas kaj prenas laborajn dosierojn je via komputilo por funkcii. Ŝajnas, ke okazis problemoj skribante provizoran dosieron en [%TestFilePath%]-on. Kontrolu, ke forestas problemoj de via disko aŭ permesoj, kiuj povus malhelpi al ĉi programo skribi en tiu loko. Vi rajtas malatenti ĉi problemon kaj malgraŭe daŭri, sed iuj kapabloj povas malŝaltiĝi.
 Active	PackageListView		Aktiva
 Login or Create account	MainWindow		Ensaluti aŭ Krei konton
@@ -38,6 +39,7 @@ Local	LocalPkgDataLoadProcess		Loka
 Rate %Package%	RatePackageWindow		Taksi %Package%
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Eraro okazis dum pravalorizado de la pakaĵa administrilo: %message%
 Quit HaikuDepot	App		Forlasi HaikuTenejon
+Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Ĉu vi permesas sendi anoniman informon pri uzado al la servilo de HaikuTenejo de ĉi tiu komputilo? Vi povas ŝanĝi vian agordon per la fenestro \"Agordo\" poste.
 An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		Neatendita eraro '%Message%' okazis kun atributo '%Property%'
 A response to the captcha question must be provided.	UserLoginWindow		Respondo al la kapĉa demando estas bezonata.
 Category	FilterView		Kategorio
@@ -61,6 +63,7 @@ Cancel	UserLoginWindow		Nuligi
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuTenejo bezonas la pakaĵan demonon por funkcii, kaj ĝi ne ŝajnas aktive.\nĈu vi volas ŝalti ĝin nun?
 Click a package to view information	PackageInfoView		Alklaku pakaĵon por vidi informon
 The password must be at least eight characters long, consist of at least two digits and one upper case character.	UserLoginWindow		La pasvorto bezonas almenaŭ ok signojn, inkluzivi almenaŭ du ciferojn kaj unu majusklon.
+Share anonymous usage data with HaikuDepotServer	SettingsWindow		Konigi anoniman informon pri uzado kun servilo de HaikuTenejo
 Contents	PackageInfoView		Enhavo
 Close	PackageManager		Fermi
 Changelog	PackageInfoView		Ŝanĝoprotokolo
@@ -77,6 +80,7 @@ Send	RatePackageWindow		Sendi
 Start package daemon	App		Ekruli pakaĵan demonon
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		La pasvorto devas esti ripetiĝita pro averti pasvortajn mistajpojn.
 The package action could not be scheduled: %Error%	PackageInfoView		La pakaĵa ago ne povis esti planita: %Error%
+Cancel	SettingsWindow		Nuligi
 Cancel	RatePackageWindow		Nuligi
 Inactive	PackageListView		Neaktiva
 Nickname:	UserLoginWindow		Kromnomo:
@@ -87,7 +91,9 @@ OK	MainWindow		Bone
 Usage conditions download problem	UserLoginWindow		Problemo pri elŝuti uzkondiĉojn
 OK	PackageInfoView		Bone
 Downloading:	PackageInfoView		Elŝutas:
+Quit	MainWindow		Ĉesi
 Success	UserLoginWindow		Sukceso
+No	MainWindow		Ne
 Package daemon problem	App		Pakaĵa demona problemo
 (%Votes%)	PackageInfoView		(%Votes%)
 Repository	PackageListView		Deponejo
@@ -97,6 +103,7 @@ Close	UserLoginWindow		Forlasi
 Close	RatePackageWindow		Forlasi
 An unexpected error has been sent from the server [%i]	ServerHelper		La servilo sendis neatenditan eraron [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Sinkronigado de pakaĵa datumo por la deponejo '%REPO_NAME%'
+Settings	SettingsWindow		Agordo
 View the usage conditions	UserLoginWindow		Vidi la kondiĉojn de uzado
 Login issue	MainWindow		Ensaluta eraro
 Your rating:	RatePackageWindow		Via takso:
@@ -114,6 +121,7 @@ Refresh repositories	MainWindow		Aktualigi deponejojn
 Continue	App		Daŭrigi
 A password is required.	UserLoginWindow		Pasvorto estas deviga.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Ĉi tiu pakaĵo ne ŝajnas esti en la HaikuTeneja Servilo, do krei novan takson aŭ redakti ekzistantan tenejon ne estas ebla.
+Apply	SettingsWindow		Apliki
 Language	RatePackageWindow		Lingvo
 Log out	MainWindow		Elsaluti
 Comment language:	RatePackageWindow		Komenta lingvo:
@@ -140,11 +148,13 @@ Try again	App		Provi denove
 Unknown	PackageListView		Nekonata
 I agree to the usage conditions	UserLoginWindow		Mi konsentas la kondiĉojn de uzado
 Log in	UserLoginWindow		Ensaluti
+Sending anonymous usage data	MainWindow		Sendi anoniman informon pri uzado
 Logged in as %User%	MainWindow		Ensalutis kiel %User%
 Email address:	UserLoginWindow		Retpoŝtadreso:
 Screenshot	ScreenshotWindow		Ekrankopio
 A reboot is necessary to complete the installation process.	PackageManager		Restartigo estas necesa por kompletigi la instalon.
 HaikuDepot	System name		HaikuTenejo
+Yes	MainWindow		Jes
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{Mi havas malpleje unu jaron}other{Mi havas # jarojn aŭ pli}}
 View latest usage conditions…	MainWindow		Vidi plej novan kondiĉojn de uzado…
 Quit	App		Forlasi

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.haiku-softwareupdater	1642797078
+1	hungarian	x-vnd.haiku-softwareupdater	1502093331
 Updating version	SoftwareUpdaterWindow	List item text	Jelenlegi:
 Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Kattints ide {0, plural, one{# friss csomag} other{# friss csomag}} telepítéséhez.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Eltávolítandó csomagok
@@ -58,4 +58,5 @@ Uninstalling version	SoftwareUpdaterWindow	List item text	Eltávolítandó verzi
 %i of %i	UpdateManager	Do not translate %i	%i / %i
 Quit	SoftwareUpdaterWindow		Kilépés
 No updates available	CheckManager		Nincs elérhető frissítés
+No remote repositories are available. Please verify that some repositories are enabled using the Repositories preflet or the 'pkgman' command.	SoftwareUpdaterWindow	Error message	Nincsenek elérhető tárolók. Kérlek ellenőrizd a Tárolók beállításoknál vagy pedig a 'pkgman' parancsal, hogy van-e engedélyezett tároló.
 Downloading packages	UpdateManager		Csomagok letöltése

@@ -1,0 +1,34 @@
+1	swedish	application/x-vnd.Cortex.MediaRoutingView	3442339205
+Lock group	MediaNodePanel		Lås grupp
+%refname% (no file)	MediaNodePanel		%refname% (ingen fil)
+Video output	MediaRoutingView		Videoutgång
+Icon view	MediaRoutingView		Ikonvy
+OK	MediaRoutingView		OK
+Cycle	MediaNodePanel		Omloppstid
+Advanced	MediaNodePanel		Avancerad
+Audio input	MediaRoutingView		Ljudingång
+Run mode	MediaNodePanel		Körläge
+Could not load '%filename%'	MediaRoutingView		Det gick inte att ladda '%filename%'
+Stop time source	MediaNodePanel		Stopptidskälla
+Be Audio Mixer	MediaRoutingView		Be ljudmixer
+Video input	MediaRoutingView		Videoingång
+Release	MediaNodePanel		Släpp
+Disconnect	MediaRoutingView		Koppla ifrån
+Could not disconnect	MediaRoutingView		Det gick inte att koppla bort
+Could not instantiate '%infoname%'	MediaRoutingView		Kunde inte starta '%infoname%'
+Mini icon view	MediaRoutingView		Mini-ikonvy
+Select all	MediaRoutingView		Välj alla
+(same as group)	MediaNodePanel		(samma som grupp)
+Input	MediaJack		Inmatning
+Get info	MediaJack		Få information
+Start time source	MediaNodePanel		Starttidskälla
+Error	MediaRoutingView		Fel
+Could not release '%refname%'	MediaRoutingView		Kunde inte släppa '%refname%'
+Output	MediaJack		Produktion
+Get info	MediaNodePanel		Få information
+Get info	MediaRoutingView		Få information
+Clean up	MediaRoutingView		Städa
+Start control panel	MediaNodePanel		Starta kontrollpanelen
+Tweak parameters	MediaNodePanel		Justera parametrar
+Could not connect	MediaRoutingView		Kunde inte ansluta
+Unlock group	MediaNodePanel		Lås upp grupp

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-About	511528774
+1	hungarian	x-vnd.Haiku-About	2374494647
 Revision	AboutView		Kiadás
 The Haikuware team and their bounty program\n	AboutView		A Haikuware csapatának és az adományprogramjuknak\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. Minden jog fenntartva.
@@ -16,7 +16,7 @@ Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Copyright © 19
 Past website & marketing:\n	AboutView		Előző weboldal illetve marketing:\n
 Copyright © 2003 Peter Hanappe and others.	AboutView		Copyright © 2003 Peter Hanappe és mások.
 Testing and bug triaging:\n	AboutView		Tesztelés és hibakeresés:\n
-{0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{Processzor:} other{#Processzor:}}
+{0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{Processzor:} other{# processzor:}}
 %d MiB total	AboutView		%d MiB összesen
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Minden egyedi kód a Haikuban, különösen a kernel és azon kódrészletek, amelyek csatolva vannak programokhoz, az <MIT licenc> alatt érhetőek el. Néhány funkciótár tartalmaz harmadik féltől származó kódot, ezek az <LGPL licenc> alatt érhetőek el. A harmadik felekre vonatkozó szerzői jogok alább találhatóak.\n\n
 Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Copyright © 1996-1997 Jeff Prosise. Minden jog fenntartva.
@@ -72,6 +72,7 @@ Memory:	AboutView		Memória:
 \n…and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… és a többi ember, akiket lehet elfelejtettünk megemlíteni (elnézést!)\n\n
 BSD (2-clause)	AboutWindow		BSD (2-clause)
 Website & marketing:\n	AboutView		Weboldal és marketing:\n
+Copyright © 2018-2021, Frederic Cambus	AboutView		Copyright © 2018-2021, Frederic Cambus
 2001 by Andy Ritger based on the Generalized Timing Formula	AboutView		2001 Andy Ritger által, az Általános Időzítéses Formula (Generalized Timing Formula) alapján
 …and the many people making donations!\n\n	AboutView		… a rengeteg adományokkal segítő embernek!\n\n
 BSD (4-clause)	AboutWindow		BSD (4-clause)

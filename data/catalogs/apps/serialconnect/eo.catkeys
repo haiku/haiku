@@ -1,0 +1,4 @@
+1	esperanto	x-vnd.haiku.SerialConnect	442102857
+None	SerialWindow	Flowcontrol	Nenio
+None	SerialWindow	Parity	Nenio
+Both	SerialWindow	Flowcontrol	Ambaŭ

@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.haiku-screenshot-cli	1618937837
+1	dutch; flemish	x-vnd.haiku-screenshot-cli	3958461128
 Include window border	ScreenshotWindow		Vensterrand insluiten
 Overwrite	ScreenshotWindow		Overschrijven
 Save in:	ScreenshotWindow		Opslaan in:
@@ -12,6 +12,7 @@ seconds	ScreenshotWindow		seconden
 New screenshot	ScreenshotWindow		Nieuwe schermafdruk
 Screenshot	System name		Schermafdruk
 Desktop	ScreenshotWindow		Bureaublad
+Artwork folder	ScreenshotWindow		Afbeeldingenmap
 Translator Settings	ScreenshotWindow		Instellingen vertaler
 Include mouse pointer	ScreenshotWindow		Muis aanwijzer insluiten
 overwrite	ScreenshotWindow		overschrijven

@@ -1,6 +1,7 @@
-1	swedish	application/x-vnd.Cortex.TransportView	2441025405
+1	swedish	application/x-vnd.Cortex.TransportView	1534931965
 Roll	TransportView		Roll
 (none)	TransportView		(ingen)
+{0, plural, one{# node} other{# nodes}}	TransportView		{0, plural, one{# nod} other{# noder}}
 Start	TransportView		Start
 No errors.	TransportView		Inga fel.
 to	TransportView		till

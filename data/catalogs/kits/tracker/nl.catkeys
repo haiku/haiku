@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-libtracker	2730310071
+1	dutch; flemish	x-vnd.Haiku-libtracker	3380227078
 Created	ContainerWindow		Gemaakt
 Icon	AttributesView		Icoon
 Open and make preferred	OpenWithWindow		Openen en bevoorkeuren
@@ -6,6 +6,7 @@ Kind	ContainerWindow		Soort
 Open with…	ContainerWindow		Openen met...
 Error moving \"%name\" to Trash. (%error)	FSUtils		Fout bij het verplaatsen van \"%name\" naar de prullenbak. (%error)
 Or	FindPanel		Of
+MIME Description	AttributesView		MIME-omschrijving
 before	FindPanel		voor
 Volume icons	TrackerSettingsWindow		Gegevensdrager-iconen
 Ignore case	SelectionWindow		Niet hoofd-/kleine lettergevoelig
@@ -40,6 +41,7 @@ Small bitmap icon	AttributesView		Klein afbeeldingsicoon
 Would you like to find a suitable application to open the file?	FSUtils		Wilt u een geschikte toepassing zoeken om het bestand mee te openen?
 64 x 64	ContainerWindow		64 x64
 You cannot replace a folder or a symbolic link with a file.	FSUtils		U kunt geen map of gelinkt bestand vervangen door een bestand.
+{0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# datums>}}
 Trailing \\.	libtracker		\\ aan het einde.
 At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		find_directory() in \n%func is mislukt. \nReden: %error
 Handles any file	OpenWithWindow		Behandelt elk bestand
@@ -92,6 +94,7 @@ Atom	AttributesView		Atoom
 %SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%SizeProcessed van %TotalSize, %BytesPerSecond/s
 Preparing to restore items…	StatusWindow		Herstel van items wordt voorbereid...
 Mount	ContainerWindow		Betrekken
+{0, plural, other{<# rectangles>}}	AttributesView		{0, plural, other{<# rechthoeken>}}
 Desktop	B_DESKTOP_DIRECTORY		Bureaublad
 Corrupted pointers.	libtracker		Corrupte pointers.
 Link to:	InfoWindow		Link naar:
@@ -109,6 +112,7 @@ Edit templates…	TemplatesMenu		Wijzig sjablonen...
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# byte} other{# bytes}}
 8-bit integer	AttributesView		8-bit integer
 8-bit unsigned integer	AttributesView		8-bit unsigned integer
+%s info	InfoWindow	window title	%s info
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used gebruikt -- %free vrij)
 Hide dotfiles	SettingsView		Verberg dot-bestanden
 Trash	Model		Prullenbak
@@ -180,6 +184,7 @@ MIME Type	AttributesView		MIME-type
 Show folder location in title tab	SettingsView		Toon de maplocatie in de titel-tab
 There was an error resolving the link.	Tracker		Er is een fout opgetreden bij het toekennen van de link.
 There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Er was een probleem bij het opslaan naar de gespecifieerde map. Kies alstublieft een andere.
+{0, plural, other{<# values>}}	AttributesView		{0, plural, other{<# waarden>}}
 Desktop	TrackerSettingsWindow		Bureaublad
 Nested *?+.	libtracker		Geneste *?+.
 Move	FSUtils	button label	Verplaatsen
@@ -266,6 +271,7 @@ home	B_USER_DIRECTORY		home
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Tracker Nieuwe Sjablonen
 Disk mounting during boot	AutoMounterSettings		Schijf wordt betrokken tijdens opstarten
 Don't automount	AutoMounterSettings		Niet automatisch betrekken
+Node ref	AttributesView		Node-referentie
 Could not find application \"%appname\"	OpenWithWindow		Kon de toepassing \"%appname\" niet vinden
 Unmatched parenthesis.	libtracker		Openingshaken zonder sluithaken.
 Extended attribute	AttributesView		Extra eigenschap
@@ -324,6 +330,7 @@ Recent folders	FavoritesMenu		Recente mappen
 Signed memory size	AttributesView		Geheugengrootte
 The specified name is illegal. Please choose another name.	FilePanelPriv		De opgegeven naam is ongeldig. Kies alstublieft een andere naam.
 of %items	StatusWindow		van %items
+MIME Path	AttributesView		MIME-pad
 less than	FindPanel		minder dan
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Fout bij het kopiëren van het bestand \"%name\":\n\t%error\n\nWilt u doorgaan?
 Creating links: 	StatusWindow		Bezig met maken van koppelingen:
@@ -345,6 +352,7 @@ Could not open \"%document\" with application \"%app\" (Missing libraries: %libr
 Finish: %time	StatusWindow		Voltooid: %time
 Messenger	AttributesView		Messenger
 after	FindPanel		na
+{0, plural, one{<# data byte>} other{<# bytes of data>}}	AttributesView		{0, plural, one{<# gegevensbyte>} other{<# gegevensbytes>}}
 Version	OpenWithWindow		Versie
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Sommige van de geselecteerde items kunnen niet naar de prullenbak verplaatst worden. Wilt u ze in plaats daarvan verwijderen? (Deze actie kan niet ongedaan gemaakt worden.)
 Add printer…	ContainerWindow		Printer toevoegen...
@@ -437,6 +445,7 @@ Sorry, saving more than one item is not allowed.	FilePanelPriv		Sorry, meer dan 
 Move here	ContainerWindow		Hierheen verplaatsen
 the config folder	FSUtils		de configuratiemap
 Sorry, could not create a new folder.	FSUtils		Sorry, kon geen nieuwe map aanmaken.
+MIME Signature	AttributesView		MIME-handtekening
 Select all	VirtualDirectoryWindow		Alles selecteren
 Rename	FSUtils	button label	Naam wijzigen
 Clean up all	ContainerWindow		Alles opruimen
@@ -515,6 +524,7 @@ Create a Query	FindPanel		Maak een Zoekopdracht
 Close	QueryContainerWindow		Sluiten
 I know what I'm doing	FSUtils	button label	Ik weet zeker wat ik doe
 Preparing to copy items…	StatusWindow		Kopiëren van items wordt voorbereid...
+Entry ref	AttributesView		Entry-referentie
 Icon view	ContainerWindow		Icoonweergave
 Name	ContainerWindow		Naam
 Preferred for %type	OpenWithWindow		Geschikt voor %type

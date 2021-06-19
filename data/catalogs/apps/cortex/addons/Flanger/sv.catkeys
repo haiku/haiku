@@ -1,4 +1,16 @@
-1	swedish	application/x-vnd.moon-Flanger.media_addon	933031127
+1	swedish	application/x-vnd.moon-Flanger.media_addon	2732361347
 An add-on version of FlangerNode.\nby Eric Moon (16 June, 1999)	CortexAddOnsFlanger		En tilläggsversion av FlangerNode.\nav Eric Moon (16 Juni, 1999)
 Delay	CortexAddOnsFlanger		Dröjsmål
 Depth	CortexAddOnsFlanger		Djup
+Feedback	CortexAddOnsFlanger		Respons
+Sweep rate	CortexAddOnsFlanger		Svepande betyg
+Mix ratio	CortexAddOnsFlanger		Blandningsförhållande
+MediaNodeControlApp: couldn't get node info (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: kunde inte få nodinformation (%d):\n%s\n
+MediaNodeControlApp: couldn't find node (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: kunde inte hitta nod (%d):\n%s\n
+FlangerNode parameters	CortexAddOnsFlanger		FlangerNode-parametrar
+OK	CortexAddOnsCommonMediaNodeControlApp		OK
+controls	CortexAddOnsCommonMediaNodeControlApp		kontroller
+Mix output	CortexAddOnsFlanger		Blanda utdata
+Flanger	CortexAddOnsFlanger		Flanger
+MediaNodeControlApp: no parameters for node (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: inga parametrar för nod (%d):\n%s\n
+Audio input	CortexAddOnsFlanger		Ljudingång

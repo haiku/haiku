@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-About	511528774
+1	japanese	x-vnd.Haiku-About	2374494647
 Revision	AboutView		リビジョン
 The Haikuware team and their bounty program\n	AboutView		Haikuware チーム＆報奨金プログラム\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. All rights reserved.
@@ -72,6 +72,7 @@ Memory:	AboutView		メモリ:
 \n…and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n…おそらく、ここに記載し忘れた方々もいることでしょう (すみません!)\n\n
 BSD (2-clause)	AboutWindow		BSD (二条項)
 Website & marketing:\n	AboutView		ウェブサイトおよびマーケティング:\n
+Copyright © 2018-2021, Frederic Cambus	AboutView		Copyright © 2018-2021, Frederic Cambus
 2001 by Andy Ritger based on the Generalized Timing Formula	AboutView		2001 by Andy Ritger based on the Generalized Timing Formula
 …and the many people making donations!\n\n	AboutView		…寄付をしていただいた大勢の方々!\n\n
 BSD (4-clause)	AboutWindow		BSD (四条項)

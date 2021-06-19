@@ -1,0 +1,37 @@
+1	friulian	x-vnd.haiku.SerialConnect	354154115
+Hardware	SerialWindow	Flowcontrol	Hardware
+Connection	SerialWindow		Conession
+Raw send…	SerialWindow		Inviament grês…
+Baud rate	SerialWindow		Frecuence di simbul
+Stop bits	SerialWindow		Bits di stop
+None	SerialWindow	Flowcontrol	Nissun
+Cancel	Custom baudrate window		Anule
+Sending…	XModemStatus		Daûr a inviâ…
+<no serial port available>	SerialWindow		<nissune puarte seriâl disponibile>
+Log to file…	SerialWindow		Regjistre su file…
+Custom baudrate	Custom baudrate window		Frecuence di simbul personalizade
+File	SerialWindow		File
+SerialConnect	System name		Conession seriâl
+custom…	SerialWindow	Baudrate	personalizade…
+Parity	SerialWindow		Paritât
+None	SerialWindow	Parity	Nissune
+Disconnect	SerialWindow		Disconet
+Everything sent, waiting for acknowledge	XModemStatus		Dut inviât, in spiete pal ricognossiment
+Odd	SerialWindow	Parity	Dispar
+Flow control	SerialWindow		Control dal flus
+file transfer progress	SerialWindow		avanzament dal trasferiment dal file
+CRC requested	XModemStatus		CRC domandât
+Data bits	SerialWindow		Bits dai dâts
+Both	SerialWindow	Flowcontrol	Ducj i doi
+Edit	SerialWindow		Modifiche
+XModem send…	SerialWindow		Inviament XModem…
+Baudrate:	Custom baudrate window		Frecuence di simbul:
+OK	Custom baudrate window		Va ben
+Waiting for receiver…	XModemStatus		In spiete pal destinatari…
+Clear history	SerialWindow		Nete la cronologjie
+Checksum error, re-send block	XModemStatus		Erôr de sume di control, torne invie il bloc
+Settings	SerialWindow		Impostazions
+Even	SerialWindow	Parity	Pâr
+Software	SerialWindow	Flowcontrol	Software
+Line terminator	SerialWindow		Terminadôr di linie
+Remote cancelled transfer	XModemStatus		Il lontan al à cancelât il trasferiment

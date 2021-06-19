@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-Installer	1288089140
+1	esperanto	x-vnd.Haiku-Installer	1810485715
 Performing installation.	InstallProgress		Instalante.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Elektu la elan diskon el la ŝpruca menuo. Poste alklaku \"Ek\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Bonvolu fermi la fenestron de la Diskagordilo antaŭ fermi la fenestron de al Instalilo.
@@ -23,6 +23,7 @@ Welcome to the Haiku Installer!\n\n	InstallerApp		Bonvenon ĉe la Haiku Instalil
 ?? of ??	InstallerWindow	Unknown progress	?? de ??
 Quit Boot Manager	InstallerWindow		Forlasi Praŝargan Administrilon
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Diskagordilo, la programo por agordi subdiskojn, ne povas esti rulita.
+The target volume is not empty. If it already contains a Haiku installation, it will be overwritten. This will remove all installed software.\n\nIf you want to upgrade your system without removing installed software, see the Haiku User Guide's topic on the application \"SoftwareUpdater\" for update instructions.\n\nAre you sure you want to continue the installation?	InstallProgress		La cela portilo ne estas malplena. Se ĝi jam enhavas instalaĵon de Haiku, ĝi estos anstataŭigota. Ĉiu instalita programaro estos forigita.\nSe vi volas ĝisdatigi vian sistemon sen forigi instalitajn programojn, legu manlibron de Haiku, la temo pri la programo \"Ĝisdatigilo\" por instrukcioj pri ĝisdatigo.\nĈu vi certas ke vi volas daŭri la instaladon?
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Lanĉas Praŝargan Administrilon…\n\nFermu Praŝargan Administrilon por daŭrigi la instaladon.
 Quit DriveSetup	InstallerWindow		Ĉesi la Diskagordilon
 Write boot sector	InstallerWindow		Skribi praŝargan sektoron

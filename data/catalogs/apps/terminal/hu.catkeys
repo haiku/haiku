@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Terminal	3268822313
+1	hungarian	x-vnd.Haiku-Terminal	3117643489
 Close other tabs	Terminal TermWindow		Többi lap bezárása
 Insert path	Terminal TermView		Útvonal beszúrása
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Sajnos, a terminálnak nem sikerült elindítani a shellt.
@@ -82,11 +82,12 @@ Decrease	Terminal TermWindow		Csökkentés
 Settings…	Terminal TermWindow		Beállítások…
 Cancel	Terminal SetTitleWindow		Mégse
 Blinking cursor	Terminal AppearancePrefView		Villogó kurzor
-The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Az ablak címét meghatározó minta. A következő kódok használhatóak:
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Az ablak címét meghatározó minta. A következő kódok\nhasználhatóak:\n
 Use text:	Terminal FindWindow		Szöveg használata:
 Close active tab	Terminal TermWindow		Aktív lap bezárása
 Save as default	Terminal TermWindow		Beállítás alapértelmezettként
 Nothing is selected.	Terminal TermWindow		Nincs semmi kijelölve.
+Use left Option as Meta key	Terminal AppearancePrefView		Bal Opció használata Meta-billentyűnek
 Find	Terminal FindWindow		Keresés
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		A jelenlegi lap címét meghatározó minta. A következő kódok \nhasználhatóak:\n
 Professional	Terminal colors scheme		Professzionális

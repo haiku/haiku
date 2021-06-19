@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-CharacterMap	120394814
+1	dutch; flemish	x-vnd.Haiku-CharacterMap	3662124912
 Tirhuta	UnicodeBlocks		Tirhuta
 Miscellaneous mathematical symbols B	UnicodeBlocks		Gevarieerde wiskundige symbolen B
 Latin extended E	UnicodeBlocks		Latijns uitgebreid E
@@ -161,6 +161,7 @@ Arabic	UnicodeBlocks		Arabisch
 Khmer symbols	UnicodeBlocks		Khmersymbolen
 Ol Chiki	UnicodeBlocks		Ol Chiki
 Box drawing	UnicodeBlocks		Kadertekens
+Egyptian hieroglyphs	UnicodeBlocks		Egyptische hiërogliefen
 Vai	UnicodeBlocks		Vai
 Ethiopic extended	UnicodeBlocks		Ethiopisch (uitgebreid)
 CJK compatibility	UnicodeBlocks		CJK-uitwisselbaarheid
@@ -172,6 +173,7 @@ Greek extended	UnicodeBlocks		Grieks (uitgebreid)
 Lepcha	UnicodeBlocks		Lepcha
 Old italic	UnicodeBlocks		Oud-Italisch
 Quit	CharacterWindow		Afsluiten
+Playing cards	UnicodeBlocks		Speelkaarten
 Buhid	UnicodeBlocks		Buhid
 Supplementary private use area B	UnicodeBlocks		Toegevoegde ruimte voor persoonlijk gebruik B
 Cuneiform	UnicodeBlocks		Spijkerschrift
@@ -189,12 +191,14 @@ Supplemental mathematical operators	UnicodeBlocks		Toegevoegde wiskundige operat
 Sinhala	UnicodeBlocks		Singalees
 Bhaiksuki	UnicodeBlocks		Bhaiksuki
 Ugaritic	UnicodeBlocks		Ugaritisch
+Geometric shapes extended	UnicodeBlocks		Geometrische figuren uitbreiding
 Cyrillic extended C	UnicodeBlocks		Cyrillisch (uitgebreid) C
 Syriac	UnicodeBlocks		Syrisch
 Private use area	UnicodeBlocks		Ruimte voor persoonlijk gebruik
 Supplement punctuation	UnicodeBlocks		Toegevoegde interpunctie
 Lycian	UnicodeBlocks		Lycisch
 Ancient symbols	UnicodeBlocks		Antieke symbolen
+Arabic mathematical alphabetic symbols	UnicodeBlocks		Arabische wiskundige alfabetische symbolen
 Miscellaneous symbols and arrows	UnicodeBlocks		gevarieerde symbolen en pijlen
 Kharoshthi	UnicodeBlocks		Kharoshthi
 Buginese	UnicodeBlocks		Buginees

@@ -1,32 +1,46 @@
-1	ukrainian	application/x-vnd.Cortex.InfoView	3124984981
+1	ukrainian	application/x-vnd.Cortex.InfoView	2688600647
 Description	DormantNodeInfoView		Опис
+Byte order	InfoView		Порядок байтів
 Output formats	DormantNodeInfoView		Вихідні формати
 History	InfoView		Історія
 Input formats	DormantNodeInfoView		Вхідні формати
 Signature	AppNodeInfoView		Сигнатура
 Any number	DormantNodeInfoView	For 'Max. instances' field	Будь-яке число
+Media output	InfoView		Медіавихід
 Active lines	InfoView		Активні лінії
 Buffer size	InfoView		Розмір буфера
 \n- Quality:	FileNodeInfoView		\n- Якість:
+Kinds	LiveNodeInfoView		Категорії
 Application	AppNodeInfoView		Програма
 \n- Duration:	FileNodeInfoView		\n- Тривалість:
 Dormant media node	DormantNodeInfoView		Латентна медіа-нода
 Latency	LiveNodeInfoView		Латентність
+Media type	InfoView		Тип медіа
+Live media node	LiveNodeInfoView		Активна медіанода
+Kinds	DormantNodeInfoView		Категорії
 %title% info	InfoView		%title% інфо
 Node ID	LiveNodeInfoView		ID ноди
+Resolution	InfoView		Роздільна здатність
 File format	AppNodeInfoView		Формат файлу
 Channel mask	InfoView		Маска каналу
 Channels	InfoView		Канали
+Sample rate	InfoView		Частота дискретизації
 File format	FileNodeInfoView		Формат файлу
 (no file)	FileNodeInfoView		(немає файлу)
+Media input	InfoView		Медіавхід
 Bit rate	InfoView		Бітрейт
 Input format	DormantNodeInfoView		Вхідний формат
 Format	InfoView		Формат
 Version	AppNodeInfoView		Версія
+AddOn ID	DormantNodeInfoView		ID Доповнення
 Frame size	InfoView		Розмір кадру
 Run mode	LiveNodeInfoView		Режим роботи
 \n- Codec:	FileNodeInfoView		\n- Кодек:
 Port	LiveNodeInfoView		Порт
 Output format	DormantNodeInfoView		Вихідний формат
+Aspect ratio	InfoView		Співвідношення сторін
 Application-owned node	AppNodeInfoView		Нода програми
+Tracks	FileNodeInfoView		Треки
+Source	InfoView		Походження
+Destination	InfoView		Призначення
 ID:	FileNodeInfoView		ID:

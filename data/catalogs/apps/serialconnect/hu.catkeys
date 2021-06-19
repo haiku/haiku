@@ -1,0 +1,37 @@
+1	hungarian	x-vnd.haiku.SerialConnect	354154115
+Hardware	SerialWindow	Flowcontrol	Eszköz
+Connection	SerialWindow		Kapcsolat
+Raw send…	SerialWindow		Nyers küldés…
+Baud rate	SerialWindow		Jelarány mértéke
+Stop bits	SerialWindow		Stop bit
+None	SerialWindow	Flowcontrol	Nincs
+Cancel	Custom baudrate window		Mégse
+Sending…	XModemStatus		Küldés…
+<no serial port available>	SerialWindow		<nincs elérhető soros port>
+Log to file…	SerialWindow		Naplózás fájlba…
+Custom baudrate	Custom baudrate window		Egyéni jelarány
+File	SerialWindow		Fájl
+SerialConnect	System name		SorosKapcsolat
+custom…	SerialWindow	Baudrate	egyéni…
+Parity	SerialWindow		Paritás
+None	SerialWindow	Parity	Nincs
+Disconnect	SerialWindow		Kapcsolat bontása
+Everything sent, waiting for acknowledge	XModemStatus		Minden elküldve, várakozás a megerősítésre
+Odd	SerialWindow	Parity	Páratlan
+Flow control	SerialWindow		Áramlásszabályozás
+file transfer progress	SerialWindow		fájl átvitel folyamata
+CRC requested	XModemStatus		CRC megkérve
+Data bits	SerialWindow		Adat bit
+Both	SerialWindow	Flowcontrol	Mindkettő
+Edit	SerialWindow		Szerkesztés
+XModem send…	SerialWindow		XModem küldés…
+Baudrate:	Custom baudrate window		Jelarány:
+OK	Custom baudrate window		Rendben
+Waiting for receiver…	XModemStatus		Várakozás a fogadóra…
+Clear history	SerialWindow		Előzmények törlése
+Checksum error, re-send block	XModemStatus		Ellenőrzőkód hiba, újraküldés
+Settings	SerialWindow		Beállítások
+Even	SerialWindow	Parity	Páros
+Software	SerialWindow	Flowcontrol	Szoftver
+Line terminator	SerialWindow		Sorvég
+Remote cancelled transfer	XModemStatus		Távolról megszakított átvitel
