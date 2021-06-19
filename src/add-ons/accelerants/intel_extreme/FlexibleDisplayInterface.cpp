@@ -278,6 +278,7 @@ FDILink::Train(display_mode* target)
 			ERROR("%s: FDI illegal link colordepth set.\n", __func__);
 			return B_ERROR;
 	}
+	TRACE("%s: FDI Link %s:\n", __func__, (fPipeIndex == INTEL_PIPE_A) ? "A" : "B");
 	TRACE("%s: FDI Link Colordepth: %" B_PRIu32 "\n", __func__, bitsPerPixel);
 
 	// Khz / 10. ( each output octet encoded as 10 bits.

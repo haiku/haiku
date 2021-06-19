@@ -419,6 +419,7 @@ assign_pipes()
 			}
 
 			gInfo->ports[i]->SetPipe(gInfo->pipes[current]);
+			assigned[current] = true;
 		}
 	}
 
