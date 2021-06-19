@@ -390,7 +390,7 @@ assign_pipes()
 	// to limitations in the current driver on current hardware). Assign those
 	// first
 	for (uint32 i = 0; i < gInfo->port_count; i++) {
-		if (gInfo->ports[i] == NULL)
+		if (!gInfo->ports[i]->IsConnected())
 			continue;
 
 		pipe_index preference = gInfo->ports[i]->PipePreference();
@@ -408,7 +408,7 @@ assign_pipes()
 
 	// In a second pass, assign the remaining ports to the remaining pipes
 	for (uint32 i = 0; i < gInfo->port_count; i++) {
-		if (gInfo->ports[i]->IsConnected()) {
+		if (gInfo->ports[i]->IsConnected() && gInfo->ports[i]->GetPipe() == NULL) {
 			while (current < gInfo->pipe_count && assigned[current])
 				current++;
 
