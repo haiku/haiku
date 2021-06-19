@@ -163,6 +163,11 @@ Port::SetPipe(Pipe* pipe)
 status_t
 Port::Power(bool enabled)
 {
+	if (fPipe == NULL) {
+		ERROR("%s: Setting power mode without assigned pipe!\n", __func__);
+		return B_ERROR;
+	}
+
 	fPipe->Enable(enabled);
 
 	return B_OK;

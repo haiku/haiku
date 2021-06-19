@@ -32,6 +32,8 @@ enable_all_pipes(bool enable)
 			continue;
 		if (!gInfo->ports[i]->IsConnected())
 			continue;
+		if (gInfo->ports[i]->GetPipe() == NULL)
+			continue;
 
 		gInfo->ports[i]->Power(enable);
 	}
