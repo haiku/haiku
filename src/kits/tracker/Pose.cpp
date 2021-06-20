@@ -969,9 +969,12 @@ BPose::CalcRect(const BPoseView* poseView) const
 	} else {
 		// MINI_ICON_MODE rect calc
 		rect.left = location.x;
-		rect.top = location.y;
 		rect.right = rect.left + B_MINI_ICON + kMiniIconSeparator;
-		rect.bottom = rect.top + poseView->IconPoseHeight();
+
+		// big font sizes can push top above icon location top
+		rect.bottom = location.y
+			+ roundf((B_MINI_ICON + poseView->FontHeight()) / 2);
+		rect.top = rect.bottom - floorf(poseView->FontHeight());
 		BTextWidget* widget = WidgetFor(poseView->FirstColumn()->AttrHash());
 		if (widget != NULL)
 			rect.right += ceil(widget->TextWidth(poseView) + 1);
