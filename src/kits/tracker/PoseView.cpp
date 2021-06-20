@@ -1020,8 +1020,7 @@ BPoseView::SetIconPoseHeight()
 
 		case kMiniIconMode:
 			fViewState->SetIconSize(B_MINI_ICON);
-			fIconPoseHeight = ceilf(sFontHeight <
-				IconSizeInt() ? IconSizeInt() : sFontHeight + 1);
+			fIconPoseHeight = std::max((float)IconSizeInt(), sFontHeight + 1);
 			break;
 
 		case kListMode:

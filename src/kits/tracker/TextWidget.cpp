@@ -138,7 +138,7 @@ BTextWidget::ColumnRect(BPoint poseLoc, const BColumn* column,
 	result.right = result.left + column->Width();
 	result.bottom = poseLoc.y
 		+ roundf((view->ListElemHeight() + view->FontHeight()) / 2);
-	result.top = result.bottom - view->FontHeight();
+	result.top = result.bottom - floorf(view->FontHeight());
 	return result;
 }
 
@@ -158,7 +158,7 @@ BTextWidget::CalcRectCommon(BPoint poseLoc, const BColumn* column,
 		switch (fAlignment) {
 			case B_ALIGN_LEFT:
 				result.left = poseLoc.x;
-				result.right = result.left + 1 + viewWidth;
+				result.right = result.left + viewWidth;
 				break;
 
 			case B_ALIGN_CENTER:
@@ -167,12 +167,12 @@ BTextWidget::CalcRectCommon(BPoint poseLoc, const BColumn* column,
 				if (result.left < 0)
 					result.left = 0;
 
-				result.right = result.left + 1 + viewWidth;
+				result.right = result.left + viewWidth;
 				break;
 
 			case B_ALIGN_RIGHT:
 				result.right = poseLoc.x + column->Width();
-				result.left = result.right - 1 - viewWidth;
+				result.left = result.right - viewWidth;
 				if (result.left < 0)
 					result.left = 0;
 				break;
@@ -201,7 +201,7 @@ BTextWidget::CalcRectCommon(BPoint poseLoc, const BColumn* column,
 		result.right = result.left + viewWidth;
 	}
 
-	result.top = result.bottom - view->FontHeight();
+	result.top = result.bottom - floorf(view->FontHeight());
 
 	return result;
 }
@@ -478,7 +478,8 @@ BTextWidget::StartEdit(BRect bounds, BPoseView* view, BPose* pose)
 		// limit max width to 30em in icon and mini icon mode
 		fMaxWidth = textView->StringWidth("M") * 30;
 
-		if (textView->LineWidth() > fMaxWidth) {
+		if (textView->LineWidth() > fMaxWidth
+			|| view->ViewMode() == kMiniIconMode) {
 			// compensate for text going over right inset
 			rect.OffsetBy(-2, 0);
 		}
