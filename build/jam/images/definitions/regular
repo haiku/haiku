@@ -205,6 +205,7 @@ SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD +=
 ;
 
 SYSTEM_ADD_ONS_DRIVERS_GRAPHICS += [ FFilterByBuildFeatures
+	ati
 	x86,x86_64 @{
 		intel_810 intel_extreme
 		matrox
@@ -214,7 +215,6 @@ SYSTEM_ADD_ONS_DRIVERS_GRAPHICS += [ FFilterByBuildFeatures
 	}@ # x86,x86_64
 	x86 @{
 		3dfx
-		ati
 		neomagic
 		s3
 	}@ # x86
