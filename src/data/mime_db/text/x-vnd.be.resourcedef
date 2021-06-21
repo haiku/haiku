@@ -3,21 +3,18 @@ resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
 
 resource(1, "META:TYPE") "x-vnd.be.resourcedef";
 
-//resource(2, "META:SNIFF_RULE") #'CSTR' array {
-//	"0.20          ([0]\"//\" | [0]\"/*\" | [0:32]\"#include\" | [0:3"
-//	"2]\"#ifndef\" | [0:32]\"#ifdef\")"
-//};
+resource(2, "META:PREF_APP") #'MSIG' "application/x-vnd.beunited.pe";
 
-resource(2, "META:S:DESC") #'MSDC' "Source for generating a resource file.";
+resource(3, "META:S:DESC") #'MSDC' "Resource definition file";
 
-resource(3, "META:EXTENS") message(234) {
+resource(4, "META:L:DESC") #'MLDC' "Source for generating a resource file";
+
+resource(5, "META:EXTENS") message(234) {
 	"extensions" = "rdef",
 	"type" = "text/x-vnd.be.resourcedef"
 };
 
-//resource(5, "META:PREF_APP") #'MSIG' "application/x-vnd.beunited.pe";
-
-resource(4, "META:ICON") #'VICN' array {
+resource(6, "META:ICON") #'VICN' array {
 	$"6E63696607050102000603399E0F3D9C0ABF82B23B84A94B88504870C900A5B1"
 	$"FFBCEAF1FFFFB3B8FF020106023E49240000000000003CAAAA4940004A3000FF"
 	$"C0D5FF7C896EFF040192020006023A4BAE3411A9B629883C6629495368484715"

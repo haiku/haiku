@@ -5,11 +5,13 @@ resource(1, "META:TYPE") "text/calendar";
 
 resource(2, "META:S:DESC") #'MSDC' "iCalendar";
 
-resource(2, "META:SNIFF_RULE") #'CSTR' array {
+resource(3, "META:SNIFF_RULE") #'CSTR' array {
 	"0.50          ([0]\"BEGIN:VCALENDAR\")"
 };
 
-resource(3, "META:EXTENS") message(234) {
+resource(4, "META:EXTENS") message(234) {
+	"extensions" = "ical",
+	"extensions" = "icalendar",
 	"extensions" = "ics",
 	"extensions" = "ifb",
 	"type" = "text/calendar"

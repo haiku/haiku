@@ -1,0 +1,12 @@
+
+resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
+
+resource(1, "META:TYPE") "text/markdown";
+
+resource(2, "META:S:DESC") #'MSDC' "Markdown file";
+
+resource(3, "META:EXTENS") message(234) {
+	"extensions" = "md",
+	"extensions" = "markdown",
+	"type" = "text/markdown"
+};
