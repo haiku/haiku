@@ -110,6 +110,7 @@ SYSTEM_ADD_ONS_DRIVERS_BT_H2 +=
 ;
 
 SYSTEM_ADD_ONS_ACCELERANTS += [ FFilterByBuildFeatures
+	ati.accelerant
 	x86,x86_64 @{
 		intel_810.accelerant intel_extreme.accelerant
 		matrox.accelerant
@@ -118,7 +119,7 @@ SYSTEM_ADD_ONS_ACCELERANTS += [ FFilterByBuildFeatures
 		via.accelerant
 	}@ # x86,x86_64
 	x86 @{
-		3dfx.accelerant ati.accelerant neomagic.accelerant s3.accelerant
+		3dfx.accelerant neomagic.accelerant s3.accelerant
 	}@ # x86
 ] ;
 

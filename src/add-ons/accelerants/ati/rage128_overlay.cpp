@@ -131,7 +131,7 @@ Rage128_DisplayOverlay(const overlay_window* window,
 	int32 p1_v_accum_init = ((tmp << 4) & 0x03ff8000) | 0x00000001;
 
 	// Compute offset of overlay buffer in the video memory.
-	uint32 offset = uint32(buffer->buffer) - si.videoMemAddr;
+	uint32 offset = (uint32)((addr_t)buffer->buffer - si.videoMemAddr);
 
 	OUTREG(R128_OV0_REG_LOAD_CNTL, 1);
 	while (!(INREG(R128_OV0_REG_LOAD_CNTL) & (1 << 3)))
