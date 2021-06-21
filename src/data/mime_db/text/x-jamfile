@@ -9,6 +9,11 @@ resource(2, "META:SNIFF_RULE") #'CSTR' array {
 
 resource(3, "META:S:DESC") #'MSDC' "Jamfile";
 
+resource(4, "META:EXTENS") message(234) {
+	"extensions" = "jam",
+	"type" = "text/x-jamfile"
+};
+
 resource(5, "META:PREF_APP") #'MSIG' "application/x-vnd.beunited.pe";
 
 resource(6, "META:ICON") #'VICN' array {

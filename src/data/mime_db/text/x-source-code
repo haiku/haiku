@@ -4,7 +4,7 @@ resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
 resource(1, "META:TYPE") "text/x-source-code";
 
 resource(2, "META:SNIFF_RULE") #'CSTR' array {
-	"0.20          ([0]\"//\" | [0]\"/*\" | [0:32]\"#include\" | [0:3"
+	"0.30          ([0]\"//\" | [0]\"/*\" | [0:32]\"#include\" | [0:3"
 	"2]\"#ifndef\" | [0:32]\"#ifdef\" | [0]\"SUMMARY=\")"
 };
 

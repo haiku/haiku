@@ -1,7 +1,7 @@
 
 resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
 
-resource(1, "META:TYPE") "text/x-vcard";
+resource(1, "META:TYPE") "text/vcard";
 
 resource(2, "META:S:DESC") #'MSDC' "vCard";
 
@@ -12,5 +12,5 @@ resource(2, "META:SNIFF_RULE") #'CSTR' array {
 resource(3, "META:EXTENS") message(234) {
 	"extensions" = "vcf",
 	"extensions" = "vcard",
-	"type" = "text/x-vcard"
+	"type" = "text/vcard"
 };
