@@ -129,7 +129,7 @@ typedef struct {
 	uint32		devslp;			// Device Sleep
 	uint32		res[10];		// Reserved
 	uint32		vendor[4];		// Vendor Specific
-} _PACKED ahci_port;
+} ahci_port;
 
 
 enum {
