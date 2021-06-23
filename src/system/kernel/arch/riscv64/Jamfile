@@ -22,6 +22,7 @@ KernelMergeObject kernel_arch_riscv64.o :
         arch_vm_translation_map.cpp
         RISCV64VMTranslationMap.cpp
         Htif.cpp
+        sbi_syscalls.S
         :
         $(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused
         :
