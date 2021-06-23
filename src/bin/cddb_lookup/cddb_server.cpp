@@ -375,7 +375,7 @@ CDDBServer::_SendCommand(const BString& command, BString& output)
 
 	// And now add command header and footer.
 	fullCommand.Prepend("GET /~cddb/cddb.cgi?cmd=");
-	fullCommand << " HTTP 1.0\n\n";
+	fullCommand << " HTTP/1.0\n\n";
 
 	int32 result = fConnection.Send((void*)fullCommand.String(),
 		fullCommand.Length());
