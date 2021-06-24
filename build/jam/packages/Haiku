@@ -25,6 +25,11 @@ for driver in $(SYSTEM_ADD_ONS_DRIVERS_NET) {
 	}
 }
 
+# bootloaders
+local bootTarget ;
+for bootTarget in $(HAIKU_BOOT_TARGETS) {
+	AddFilesToPackage data platform_loaders : haiku_loader.$(bootTarget) ;
+}
 
 # modules
 AddFilesToPackage add-ons kernel bus_managers : $(SYSTEM_ADD_ONS_BUS_MANAGERS) ;
