@@ -134,7 +134,7 @@ Port::SetPipe(Pipe* pipe)
 	// FIXME is the use of PORT_TRANS_* constants correct for Sandy Bridge /
 	// Cougar Point? Or is it only for Ivy Bridge / Panther point onwards?
 	if (gInfo->shared_info->pch_info == INTEL_PCH_CPT) {
-		portState &= ~PORT_TRANS_SEL_MASK; //fixme should be done sooner, not here!
+		portState &= ~PORT_TRANS_SEL_MASK;
 		if (pipe->Index() == INTEL_PIPE_A)
 			write32(portRegister, portState | PORT_TRANS_A_SEL_CPT);
 		else
@@ -221,6 +221,40 @@ status_t
 Port::GetPLLLimits(pll_limits& limits)
 {
 	return B_ERROR;
+}
+
+
+pipe_index
+Port::PipePreference()
+{
+	// Ideally we could just return INTEL_PIPE_ANY for all devices by default, but
+	// this doesn't quite work yet. We need to use the BIOS presetup pipes for now.
+	if (gInfo->shared_info->device_type.Generation() < 4)
+		return INTEL_PIPE_ANY;
+
+	// Notes:
+	// - The BIOSes seen sofar do not use PIPE C by default.
+	// - The BIOSes seen sofar program transcoder A to PIPE A, etc.
+	// - Later devices add a pipe C alongside the added transcoder C.
+
+	// FIXME How's this setup in newer gens? Currently return INTEL_PIPE_ANY there..
+	if (gInfo->shared_info->device_type.Generation() <= 7) {
+		uint32 portState = read32(_PortRegister());
+		if (gInfo->shared_info->pch_info == INTEL_PCH_CPT) {
+			portState &= PORT_TRANS_SEL_MASK;
+			if (portState == PORT_TRANS_B_SEL_CPT)
+				return INTEL_PIPE_B;
+			else
+				return INTEL_PIPE_A;
+		} else {
+			if (portState & DISPLAY_MONITOR_PIPE_B)
+				return INTEL_PIPE_B;
+			else
+				return INTEL_PIPE_A;
+		}
+	}
+
+	return INTEL_PIPE_ANY;
 }
 
 
@@ -386,22 +420,34 @@ LVDSPort::PipePreference()
 	// Ideally we could just return INTEL_PIPE_ANY for the newer devices, but
 	// this doesn't quite work yet.
 
-	// For Ibex Point and SandyBridge, read the existing LVDS configuration and
-	// just reuse that (it seems our attempt to change it doesn't work, anyway)
-	// On SandyBridge, there is a transcoder C that can't be used by the LVDS
-	// port (but A and B would be fine).
-	if (gInfo->shared_info->device_type.Generation() <= 6) {
+	// On SandyBridge and later, there is a transcoder C. On SandyBridge at least
+	// that can't be used by the LVDS port (but A and B would be fine).
+	// On Ibex Point, SandyBridge and IvyBridge (tested) changing pipes does not
+	// work yet.
+	// Notes:
+	// - Switching Pipes only works reliably when a 'full modeswitch' is executed
+	//   (FDI training) so we have to reuse the BIOS preset setup always for now.
+	// - The BIOSes seen sofar do not use PIPE C by default.
+	// - The BIOSes seen sofar program transcoder A to PIPE A, etc.
+	// - Later devices add a pipe C alongside the added transcoder C.
+
+	// FIXME How's this setup in newer gens? Currently return Pipe B fixed there..
+	if (gInfo->shared_info->device_type.Generation() <= 7) {
 		uint32 portState = read32(_PortRegister());
-		if (portState & DISPLAY_MONITOR_PIPE_B)
-			return INTEL_PIPE_B;
-		else
-			return INTEL_PIPE_A;
+		if (gInfo->shared_info->pch_info == INTEL_PCH_CPT) {
+			portState &= PORT_TRANS_SEL_MASK;
+			if (portState == PORT_TRANS_B_SEL_CPT)
+				return INTEL_PIPE_B;
+			else
+				return INTEL_PIPE_A;
+		} else {
+			if (portState & DISPLAY_MONITOR_PIPE_B)
+				return INTEL_PIPE_B;
+			else
+				return INTEL_PIPE_A;
+		}
 	}
 
-	// For later generations, assume pipe B for now. Note that later devices
-	// add a pipe C (and a transcoder C), so we'd need to handle that and the
-	// port register has a different format because of it.
-	// (using PORT_TRANS_*_SEL_CPT to select which transcoder to use)
 	return INTEL_PIPE_B;
 }
 
