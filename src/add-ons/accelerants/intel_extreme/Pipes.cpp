@@ -406,7 +406,12 @@ Pipe::Enable(bool enable)
 		write32(planeReg, read32(planeReg) | DISPLAY_CONTROL_ENABLED);
 
 		//Enable default display main watermarks
-		write32(INTEL_DISPLAY_A_PIPE_WATERMARK, 0x0783818);
+		if (gInfo->shared_info->pch_info == INTEL_PCH_CPT) {
+			if (fPipeOffset == 0)
+				write32(INTEL_DISPLAY_A_PIPE_WATERMARK, 0x0783818);
+			else
+				write32(INTEL_DISPLAY_B_PIPE_WATERMARK, 0x0783818);
+		}
 	} else {
 		write32(planeReg, read32(planeReg) & ~DISPLAY_CONTROL_ENABLED);
 		wait_for_vblank();
