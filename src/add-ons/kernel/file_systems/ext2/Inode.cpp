@@ -32,6 +32,10 @@
 #define ERROR(x...) dprintf("\33[34mext2:\33[0m " x)
 
 
+#define EXT2_EA_CHECKSUM_SIZE (offsetof(ext2_inode, checksum_high) \
+	+ sizeof(uint16) - EXT2_INODE_NORMAL_SIZE)
+
+
 Inode::Inode(Volume* volume, ino_t id)
 	:
 	fVolume(volume),
@@ -135,23 +139,23 @@ Inode::WriteBack(Transaction& transaction)
 	if (inodeBlockData == NULL)
 		return B_IO_ERROR;
 
-	if (fVolume->HasMetaGroupChecksumFeature()) {
-		uint32 checksum = _InodeChecksum();
-		fNode.checksum = checksum & 0xffff;
-		if (fNodeSize > EXT2_INODE_NORMAL_SIZE
-			&& fNodeSize >= offsetof(ext2_inode, change_time_extra)) {
-			fNode.checksum_high = checksum >> 16;
-		}
-	}
 	TRACE("Inode::WriteBack(): Inode ID: %" B_PRIdINO ", inode block: %"
 		B_PRIdOFF ", data: %p, index: %" B_PRIu32 ", inode size: %" B_PRIu32
 		", node size: %" B_PRIu32 ", this: %p, node: %p\n",
 		fID, blockNum, inodeBlockData, fVolume->InodeBlockIndex(fID),
 		fVolume->InodeSize(), fNodeSize, this, &fNode);
-	memcpy(inodeBlockData +
-			fVolume->InodeBlockIndex(fID) * fVolume->InodeSize(),
-		(uint8*)&fNode, fNodeSize);
+	ext2_inode* inode = (ext2_inode*)(inodeBlockData +
+			fVolume->InodeBlockIndex(fID) * fVolume->InodeSize());
+	memcpy(inode, (uint8*)&fNode, fNodeSize);
 
+	if (fVolume->HasMetaGroupChecksumFeature()) {
+		uint32 checksum = _InodeChecksum(inode);
+		inode->checksum = checksum & 0xffff;
+		if (fNodeSize > EXT2_INODE_NORMAL_SIZE
+			&& fNode.ExtraInodeSize() >= EXT2_EA_CHECKSUM_SIZE) {
+			inode->checksum_high = checksum >> 16;
+		}
+	}
 	TRACE("Inode::WriteBack() finished %" B_PRId32 "\n", Node().stream.direct[0]);
 
 	return B_OK;
@@ -186,11 +190,11 @@ Inode::UpdateNodeFromDisk()
 	memcpy(&fNode, inode, fNodeSize);
 
 	if (fVolume->HasMetaGroupChecksumFeature()) {
-		uint32 checksum = _InodeChecksum();
+		uint32 checksum = _InodeChecksum(inode);
 		uint32 provided = fNode.checksum;
 		if (fNodeSize > EXT2_INODE_NORMAL_SIZE
-			&& fNodeSize >= offsetof(ext2_inode, change_time_extra)) {
-			provided |= (fNode.checksum_high << 16);
+			&& fNode.ExtraInodeSize() >= EXT2_EA_CHECKSUM_SIZE) {
+			provided |= ((uint32)fNode.checksum_high << 16);
 		} else
 			checksum &= 0xffff;
 		if (provided != checksum) {
@@ -943,28 +947,31 @@ Inode::IncrementNumLinks(Transaction& transaction)
 
 
 uint32
-Inode::_InodeChecksum()
+Inode::_InodeChecksum(ext2_inode* inode)
 {
 	size_t offset = offsetof(ext2_inode, checksum);
-	size_t offset2 = offsetof(ext2_inode, reserved);
 	uint32 number = fID;
-	uint32 checksum = calculate_crc32c(fVolume->ChecksumSeed(), (uint8*)&number,
-		sizeof(number));
+	uint32 checksum = calculate_crc32c(fVolume->ChecksumSeed(),
+		(uint8*)&number, sizeof(number));
 	uint32 gen = fNode.generation;
 	checksum = calculate_crc32c(checksum, (uint8*)&gen, sizeof(gen));
-	checksum = calculate_crc32c(checksum, (uint8*)&fNode, offset);
+	checksum = calculate_crc32c(checksum, (uint8*)inode, offset);
 	uint16 dummy = 0;
 	checksum = calculate_crc32c(checksum, (uint8*)&dummy, sizeof(dummy));
-	checksum = calculate_crc32c(checksum, (uint8*)&fNode + offset2,
-		EXT2_INODE_NORMAL_SIZE - offset2);
+	offset += sizeof(dummy);
+	checksum = calculate_crc32c(checksum, (uint8*)inode + offset,
+		EXT2_INODE_NORMAL_SIZE - offset);
 	if (fNodeSize > EXT2_INODE_NORMAL_SIZE) {
 		offset = offsetof(ext2_inode, checksum_high);
-		offset2 = offsetof(ext2_inode, change_time_extra);
-		checksum = calculate_crc32c(checksum, (uint8*)&fNode + EXT2_INODE_NORMAL_SIZE,
-			offset - EXT2_INODE_NORMAL_SIZE);
-		checksum = calculate_crc32c(checksum, (uint8*)&dummy, sizeof(dummy));
-		checksum = calculate_crc32c(checksum, (uint8*)&fNode + offset2,
-			fNodeSize - offset2);
+		checksum = calculate_crc32c(checksum, (uint8*)inode
+			+ EXT2_INODE_NORMAL_SIZE, offset - EXT2_INODE_NORMAL_SIZE);
+		if (fNode.ExtraInodeSize() >= EXT2_EA_CHECKSUM_SIZE) {
+			checksum = calculate_crc32c(checksum, (uint8*)&dummy,
+				sizeof(dummy));
+			offset += sizeof(dummy);
+		}
+		checksum = calculate_crc32c(checksum, (uint8*)inode + offset,
+			fVolume->InodeSize() - offset);
 	}
 	return checksum;
 }

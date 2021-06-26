@@ -483,6 +483,7 @@ struct ext2_inode {
 	uint32	creation_time;
 	uint32	creation_time_extra;
 	uint32	version_high;
+	uint32	project_id;
 
 	uint16 Mode() const { return B_LENDIAN_TO_HOST_INT16(mode); }
 	uint32 Flags() const { return B_LENDIAN_TO_HOST_INT32(flags); }
