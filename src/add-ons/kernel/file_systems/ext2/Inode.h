@@ -145,7 +145,7 @@ private:
 			uint64		_NumBlocks();
 			status_t	_SetNumBlocks(uint64 numBlocks);
 
-			uint32		_InodeChecksum();
+			uint32		_InodeChecksum(ext2_inode* inode);
 
 			ext2_dir_entry_tail*	_DirEntryTail(uint8* block) const;
 			uint32		_DirEntryChecksum(uint8* block, uint32 id,
