@@ -1,0 +1,38 @@
+1	portuguese	application/x-vnd.Cortex.support	3422467827
+Mono	MediaString		Mono
+MPEG1	MediaString		MPEG1
+YUV444	MediaString		YUV444
+YCbCr411	MediaString		YCbCr411
+YUV422	MediaString		YUV422
+(unkown video orientation)	MediaString		(orientação de vídeo desconhecida)
+QuickTime	MediaString		QuickTime
+Ambisonic WXYZ	MediaString		Ambisonic WXYZ
+(unknown video format)	MediaString		(formato de vídeo desconhecido)
+AVI	MediaString		AVI
+YUV9	MediaString		YUV9
+ Hz	MediaString		 Hz
+System mixer	MediaString		Misturador do sistema
+Physical output	MediaString		Saída física
+YUV420	MediaString		YUV420
+ kb/s	MediaString		 kb/s
+ kHz	MediaString		 kHz
+YCbCr444	MediaString		YCbCr444
+(none)	MediaString		(nenhum)
+ kb/s (max)	MediaString		 kb/s (máx.)
+ID	MediaString		ID
+YCbCr422	MediaString		YCbCr422
+MIDI	MediaString		MIDI
+YUV12	MediaString		YUV12
+ (NTSC)	MediaString		 (NTSC)
+Physical input	MediaString		Entrada física
+Big endian	MediaString		Big endian
+YUV411	MediaString		YUV411
+ (PAL)	MediaString		 (PAL)
+YCbCr420	MediaString		YCbCr420
+ kb/s (avg)	MediaString		 kb/s (média)
+HTML	MediaString		HTML
+ProLogic LR	MediaString		ProLogic LR
+Parameters	MediaString		Parâmetros
+Stereo	MediaString		Estéreo
+Text	MediaString		Texto
+MPEG2	MediaString		MPEG2

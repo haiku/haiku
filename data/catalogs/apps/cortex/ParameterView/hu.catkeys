@@ -1,0 +1,8 @@
+1	hungarian	application/x-vnd.Cortex.ParameterView	1295152157
+Themes	ParameterWindow		Témák
+Start control panel	ParameterWindow		Vezérlő panel megnyitása
+%nodeinfo% parameters	ParameterWindow		%nodeinfo% paraméterek
+OK	ParameterWindow		Rendben
+Window	ParameterWindow		Ablak
+Could not start control panel (%error%)	ParameterWindow		Nem tudtam elindítani a vezérlő panelt (%error%)
+Close	ParameterWindow		Bezárás

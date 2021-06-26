@@ -1,5 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-HaikuDepot	932372907
-Uninstall	PackageManager		Desinstalar
+1	portuguese (brazil)	x-vnd.Haiku-HaikuDepot	493990906
 Uninstalled	PackageListView		Não instalado
 Available packages	MainWindow		Pacotes disponíveis
 Create account	UserLoginWindow		Criar conta
@@ -21,8 +20,6 @@ Rate %Package%	RatePackageWindow		Avaliar %Package%
 Quit HaikuDepot	App		Fechar o Depósito Haiku
 Category	FilterView		Categoria
 Installed packages	MainWindow		Pacotes instalados
-Fatal error	PackageManager		Erro fatal
-Package action failed	PackageInfoView		Ação do pacote falhou
 No changelog available.	PackageInfoView		Nenhum relatório de mudanças disponível.
 There was a puzzling response from the web service.	UserLoginWindow		Houve uma resposta enigmática do serviço web.
 Not logged in	MainWindow		Não autenticado
@@ -38,10 +35,8 @@ About	PackageInfoView		Sobre
 Stability	RatePackageWindow		Estabilidade
 Send	RatePackageWindow		Enviar
 Start package daemon	App		Iniciar daemon de pacote
-The package action could not be scheduled: %Error%	PackageInfoView		A ação do pacote não pode ser agendada: %Error%
 Cancel	RatePackageWindow		Cancelar
 Inactive	PackageListView		Inativo
-OK	PackageInfoView		OK
 Downloading:	PackageInfoView		Baixando:
 Success	UserLoginWindow		Sucesso
 (%Votes%)	PackageInfoView		(%Votes%)
@@ -62,8 +57,8 @@ OK	UserLoginWindow		OK
 Stability:	RatePackageWindow		Estabilidade:
 Source packages	MainWindow		Pacotes fonte
 -	no package size		-
-Rate package	RatePackageWindow		Avaliar pacote…
 Try again	App		Tente novamente
+Rate package	RatePackageWindow		Avaliar pacote…
 Unknown	PackageListView		Desconhecido
 Log in	UserLoginWindow		Entrar
 Logged in as %User%	MainWindow		Autenticado como %User%
@@ -76,7 +71,6 @@ Category:	FilterView		Categoria:
 Authentication failed	UserLoginWindow		A autenticação falhou
 Description	PackageListView		Descrição
 Open %DeskbarLink%	PackageManager		Abrir %DeskbarLink%
-Install	PackageManager		Instalar
 Input validation	UserLoginWindow		Validação de entrada
 Log in…	MainWindow		Entrar…
 You need to be logged into an account before you can rate packages.	MainWindow		Você precisa estar autenticado em uma conta antes de poder classificar pacotes.

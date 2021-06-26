@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-Network	3062143965
+1	portuguese	x-vnd.Haiku-Network	543099905
 Ethernet device	InterfaceListItem		Dispositivo Ethernet
 Link speed:	IntefaceView		Velocidade de ligação:
 disconnected	IntefaceView		desligado
@@ -13,6 +13,7 @@ Gateway:	IntefaceAddressView		Gateway:
 The netmask defines your local network	IntefaceAddressView		A máscara de sub-rede define a sua rede local
 Your IP address	IntefaceAddressView		O seu endereço de IP
 DHCP	IntefaceAddressView		DHCP
+IP address:	IntefaceAddressView		Endereço IP:
 Netmask:	IntefaceAddressView		Máscara de sub-rede:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Serviços

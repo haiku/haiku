@@ -1,9 +1,10 @@
-1	ukrainian	application/x-vnd.Cortex.support	2545924357
+1	ukrainian	application/x-vnd.Cortex.support	406316131
 32 bit HLS	MediaString		32-бітовий HLS
 Recording	MediaString		Запис
 (unknown format)	MediaString		(невідомий формат)
 Clean buffers	MediaString		Очистити буфери
-{0, plural, one{# pixel} other{# pixels}}	MediaString		{0, plural, one{# піксель} few{# пікселя} other{# пікселі}}
+{0, plural,one{# frame forward}other{# frames forward}}	MediaString		{0, plural, one{# кадр вперед} few{# кадри вперед} other{# кадрів вперед}}
+{0, plural, one{# pixel} other{# pixels}}	MediaString		{0, plural, one{# піксель} few{# пікселя} other{# пікселів}}
 Mono	MediaString		Моно
 MPEG1	MediaString		MPEG1
 ASF format family	MediaString		Сімейство форматів ASF
@@ -90,6 +91,7 @@ WAV format family	MediaString		Сімейство форматів WAV
  (NTSC)	MediaString		 (NTSC)
 Physical input	MediaString		Фізичний вхід
 Big endian	MediaString		від старшого до молодшого
+{0, plural,one{# byte (max)}other{# bytes (max)}}	MediaString		{0, plural, one{# байт (макс.)} few{# байти (макс.)} other{# байтів (макс.)}}
 YUV411	MediaString		YUV411
 Multistream media	MediaString		Мультипотокове медіа
 Encoded audio	MediaString		Кодоване аудіо
@@ -104,8 +106,10 @@ YCbCr420	MediaString		YCbCr420
 HTML	MediaString		HTML
 15 bit RGB	MediaString		15-бітовий RGB
 ProLogic LR	MediaString		ProLogic LR
+{0, plural,one{# byte per frame}other{# bytes per frame}}	MediaString		{0, plural, one{# байт на кадр} few{# байти на кадр} other{# байтів на кадр}}
 Parameters	MediaString		Параметри
 Top-Back-right	MediaString		Зверху-Тил-справа
+{0, plural, one{# byte per row}other{# bytes per row}}	MediaString		{0, plural, one{# байт на рядок} few{# байти на рядок} other{# байтів на рядок}}
 Left	MediaString		Лівий
 BeOS video	MediaString		BeOS відео
 24 bit CMY	MediaString		24-бітовий CMY
@@ -115,10 +119,12 @@ Entity interface	MediaString		Інтерфейс об'єкта
 Stereo	MediaString		Стерео
 Bottom to top, left to right	MediaString		Знизу вгору, зліва направо
 32 bit UVL	MediaString		32-бітовий UVL
+{0, plural, one{# line} other{# lines}}	MediaString		{0, plural, one{# рядок} few{# рядка} other{# рядків}}
 Text	MediaString		Текст
 Unknown media type	MediaString		Невідомий тип медіа
 MPEG2	MediaString		MPEG2
 Miscellaneous format family	MediaString		Змішане сімейство форматів
 24 bit RGB	MediaString		24-бітовий RGB
+{0, plural,one{# frame backward}other{# frames backward}}	MediaString		{0, plural, one{# кадр назад} few{# кадри назад} other{# кадрів назад}}
 32 bit HSIA	MediaString		32-бітовий HSIA
 Raw video	MediaString		Необроблене відео

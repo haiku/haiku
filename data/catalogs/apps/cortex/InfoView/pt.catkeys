@@ -1,0 +1,30 @@
+1	portuguese	application/x-vnd.Cortex.InfoView	980116304
+Description	DormantNodeInfoView		Descrição
+Output formats	DormantNodeInfoView		Formatos de saída
+Input formats	DormantNodeInfoView		Formatos de entrada
+Signature	AppNodeInfoView		Assinatura
+Video data between	InfoView		Dados de vídeo entre
+Any number	DormantNodeInfoView	For 'Max. instances' field	Qualquer número
+Active lines	InfoView		Linhas ativas
+\n- Quality:	FileNodeInfoView		\n- Qualidade:
+Application	AppNodeInfoView		Aplicação
+\n- Duration:	FileNodeInfoView		\n- Duração:
+Latency	LiveNodeInfoView		Latência
+Resolution	InfoView		Resolução
+File format	AppNodeInfoView		Formato de ficheiro
+Orientation	InfoView		Orientação
+Channels	InfoView		Canais
+Sample rate	InfoView		Taxa de amostragem
+File format	FileNodeInfoView		Formato de ficheiro
+(no file)	FileNodeInfoView		(nenhum ficheiro)
+Input format	DormantNodeInfoView		Formato de entrada
+Format	InfoView		Formato
+Version	AppNodeInfoView		Versão
+Frame size	InfoView		Tamanho de quadro
+Output format	DormantNodeInfoView		Formato de saída
+Aspect ratio	InfoView		Proporção
+Tracks	FileNodeInfoView		Faixas
+Source	InfoView		Origem
+Destination	InfoView		Destino
+Copyright	FileNodeInfoView		Copyright
+ID:	FileNodeInfoView		ID:

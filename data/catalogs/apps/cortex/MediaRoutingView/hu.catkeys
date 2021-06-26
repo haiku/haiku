@@ -1,0 +1,34 @@
+1	hungarian	application/x-vnd.Cortex.MediaRoutingView	3442339205
+Lock group	MediaNodePanel		Csoport zárolása
+%refname% (no file)	MediaNodePanel		%refname% (nincs fájl)
+Video output	MediaRoutingView		Videó kimenet
+Icon view	MediaRoutingView		Ikon nézet
+OK	MediaRoutingView		Rendben
+Cycle	MediaNodePanel		Ciklus
+Advanced	MediaNodePanel		Bővebb
+Audio input	MediaRoutingView		Audió bemenet
+Run mode	MediaNodePanel		Futás módja
+Could not load '%filename%'	MediaRoutingView		'%filename%' nem tölthető be
+Stop time source	MediaNodePanel		Időforrás leállítása
+Be Audio Mixer	MediaRoutingView		Be Audio Mixer
+Video input	MediaRoutingView		Videó bemenet
+Release	MediaNodePanel		Kioldás
+Disconnect	MediaRoutingView		Leválasztás
+Could not disconnect	MediaRoutingView		Nem lehet leválasztani
+Could not instantiate '%infoname%'	MediaRoutingView		'%infoname%' nem példányosítható
+Mini icon view	MediaRoutingView		Mini ikon nézet
+Select all	MediaRoutingView		Összes kijelölése
+(same as group)	MediaNodePanel		(csoportal egyező)
+Input	MediaJack		Bemenet
+Get info	MediaJack		Információk
+Start time source	MediaNodePanel		Idő forrás indítása
+Error	MediaRoutingView		Hiba
+Could not release '%refname%'	MediaRoutingView		'%refname%' nem oldható ki
+Output	MediaJack		Kimenet
+Get info	MediaNodePanel		Információk
+Get info	MediaRoutingView		Információk
+Clean up	MediaRoutingView		Rendrakás
+Start control panel	MediaNodePanel		Vezérlő panel indítása
+Tweak parameters	MediaNodePanel		Finomhangoló paraméterek
+Could not connect	MediaRoutingView		Nem lehet csatlakoztatni
+Unlock group	MediaNodePanel		Csoport feloldása

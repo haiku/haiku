@@ -1,9 +1,8 @@
-1	thai	x-vnd.Haiku-HaikuDepot	840203303
+1	thai	x-vnd.Haiku-HaikuDepot	401821302
 Repository update error	LocalRepositoryUpdateProcess		ข้อผิดพลาดการอัพเดตที่เก็บ
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		เกิดข้อผิดพลาดขณะรีเฟรชที่เก็บ: %error%
 User Created	UserLoginWindow		ผู้ใช้ถูกสร้างแล้ว
 Check for updates…	MainWindow		ตรวจสอบสำหรับการอัพเดท
-Uninstall	PackageManager		ยกเลิกการติดตั้ง
 Uninstalled	PackageListView		ยกเลิกการติดตั้งแล้ว
 It was not possible to create the new user.	UserLoginWindow		ไม่สามารถสร้างผู้ใช้ใหม่ได้
 Available packages	MainWindow		แพ็คเกจที่มี
@@ -42,8 +41,6 @@ Category	FilterView		หมวดหมู่
 User rating	RatePackageWindow		คะแนนจากผู้ใช้
 Installed packages	MainWindow		แพคเกจที่ติดตั้ง
 A requested object or an object involved in the request was not found on the server.	ServerHelper		ไม่พบวัตถุที่ร้องขอหรือวัตถุที่เกี่ยวข้องในคำขอบนเซิร์ฟเวอร์
-Fatal error	PackageManager		ข้อผิดพลาดร้ายแรง
-Package action failed	PackageInfoView		การกระทำของแพคเกจล้มเหลว
 No changelog available.	PackageInfoView		ไม่มีการเปลี่ยนแปลง
 Error	App		ผิดพลาด
 There was a puzzling response from the web service.	UserLoginWindow		มีการตอบสนองที่น่าสงสัยจากบริการบนเว็บ
@@ -73,7 +70,6 @@ Stability	RatePackageWindow		ความเสถียร
 Send	RatePackageWindow		ส่ง
 Start package daemon	App		เริ่มแพคเกจ daemon
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		ต้องทำซ้ำรหัสผ่านเพื่อลดโอกาสในการป้อนรหัสผ่านไม่ถูกต้อง
-The package action could not be scheduled: %Error%	PackageInfoView		ไม่สามารถกำหนดเวลาการทำงานของแพ็คเกจได้: %Error%
 Cancel	RatePackageWindow		ยกเลิก
 Inactive	PackageListView		ไม่ใช้งาน
 Nickname:	UserLoginWindow		ชื่อเล่น:
@@ -82,7 +78,6 @@ There are problems in the supplied data:	UserLoginWindow		มีปัญหา�
 OK	MainWindow		ตกลง
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# item} อื่นๆ{# items}}
 Usage conditions download problem	UserLoginWindow		ปัญหาการดาวน์โหลดเงื่อนไขการใช้งาน
-OK	PackageInfoView		ตกลง
 Downloading:	PackageInfoView		กำลังดาวน์โหลด:
 Success	UserLoginWindow		สำเร็จ
 Package daemon problem	App		ปัญหาแพคเกจ daemon
@@ -129,16 +124,16 @@ The nickname is required.	UserLoginWindow		ต้องระบุชื่อ�
 Source packages	MainWindow		แพ็คเกจต้นทาง
 -	no package size		-
 Problem with working files	App		ปัญหาเกี่ยวกับไฟล์ทำงาน
-Rate package	RatePackageWindow		Rate package
 Try again	App		ลองใหม่อีกครั้ง
+Rate package	RatePackageWindow		Rate package
 Unknown	PackageListView		ไม่ทราบ
 I agree to the usage conditions	UserLoginWindow		ฉันเห็นด้วยกับเงื่อนไขการใช้งาน
 Log in	UserLoginWindow		เข้าสู่ระบบ
 Logged in as %User%	MainWindow		เข้าสู่ระบบในฐานะ %User%
 Email address:	UserLoginWindow		ที่อยู่อีเมล:
 Screenshot	ScreenshotWindow		ภาพหน้าจอ
-A reboot is necessary to complete the installation process.	PackageManager		จำเป็นต้องรีบูตเครื่องเพื่อให้กระบวนการติดตั้งเสร็จสมบูรณ์
 HaikuDepot	System name		HaikuDepot
+A reboot is necessary to complete the installation process.	PackageManager		จำเป็นต้องรีบูตเครื่องเพื่อให้กระบวนการติดตั้งเสร็จสมบูรณ์
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{I am at least one year old}อื่นๆ{I am # years of age or older}}
 View latest usage conditions…	MainWindow		ดูเงื่อนไขการใช้งานล่าสุด
 Quit	App		ปิด
@@ -154,7 +149,6 @@ Fetching remote repository data	LocalRepositoryUpdateProcess		กำลังด
 Description	PackageListView		ลักษณะ
 Open %DeskbarLink%	PackageManager		เปิด %DeskbarLink%
 User creation error	UserLoginWindow		ข้อผิดพลาดในการสร้างผู้ใช้
-Install	PackageManager		ติดตั้ง
 Input validation	UserLoginWindow		การตรวจสอบอินพุต
 Log in…	MainWindow		เข้าใช้งาน
 You need to be logged into an account before you can rate packages.	MainWindow		คุณต้องเข้าสู่ระบบบัญชีก่อนจึงจะสามารถให้คะแนนแพ็คเกจได้

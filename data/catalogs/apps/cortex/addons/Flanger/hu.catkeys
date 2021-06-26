@@ -1,0 +1,16 @@
+1	hungarian	application/x-vnd.moon-Flanger.media_addon	2732361347
+An add-on version of FlangerNode.\nby Eric Moon (16 June, 1999)	CortexAddOnsFlanger		FlangerNode egy kiegészítő verziója.\nkészítette: Eric Moon (16 June, 1999)
+Delay	CortexAddOnsFlanger		Késleltetés
+Depth	CortexAddOnsFlanger		Mélység
+Feedback	CortexAddOnsFlanger		Visszajelzés
+Sweep rate	CortexAddOnsFlanger		Hajlás mértéke
+Mix ratio	CortexAddOnsFlanger		Keverési arány
+MediaNodeControlApp: couldn't get node info (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: nem sikerült csomópont (%d) információt szerezni:\n%s\n
+MediaNodeControlApp: couldn't find node (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: a csomópont (%d) nem található:\n%s\n
+FlangerNode parameters	CortexAddOnsFlanger		FlangerNode paraméterek
+OK	CortexAddOnsCommonMediaNodeControlApp		Rendben
+controls	CortexAddOnsCommonMediaNodeControlApp		vezérlők
+Mix output	CortexAddOnsFlanger		Keverő kimenet
+Flanger	CortexAddOnsFlanger		Flanger
+MediaNodeControlApp: no parameters for node (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: nincsenek paraméterek a csomóponthoz (%d):\n%s\n
+Audio input	CortexAddOnsFlanger		Audió bemenet

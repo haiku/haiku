@@ -1,10 +1,9 @@
-1	danish	x-vnd.Haiku-HaikuDepot	2848501228
+1	danish	x-vnd.Haiku-HaikuDepot	2410119227
 Repository update error	LocalRepositoryUpdateProcess		Fejl ved opdatering af softwarekilde
 Network error	ServerHelper		Fejl ved netværk
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Der opstod en fejl under opdatering af softwarekilden: %error%
 User Created	UserLoginWindow		Bruger oprettet
 Check for updates…	MainWindow		Søg efter opdateringer…
-Uninstall	PackageManager		Afinstaller
 Uninstalled	PackageListView		Afinstalleret
 It was not possible to create the new user.	UserLoginWindow		Det var ikke muligt at oprette den nye bruger.
 Available packages	MainWindow		Tilgængelige pakker
@@ -44,8 +43,6 @@ Category	FilterView		Kategori
 User rating	RatePackageWindow		Brugerbedømmelse
 Installed packages	MainWindow		Installerede pakker
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Et anmodet objekt eller et objekt som er involveret i anmodningen blev ikke fundet på serveren.
-Fatal error	PackageManager		Fatal fejl
-Package action failed	PackageInfoView		Pakkehandling mislykkedes
 No changelog available.	PackageInfoView		Ingen ændringslog tilgængelig.
 Error	App		Fejl
 There was a puzzling response from the web service.	UserLoginWindow		Der var et gådesvar fra webtjenesten.
@@ -76,7 +73,6 @@ Stability	RatePackageWindow		Stabilitet
 Send	RatePackageWindow		Send
 Start package daemon	App		Start pakkedæmon
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Adgangskoden skal gentages for at reducere sandsynligheden for at indtaste adgangskoden forkert.
-The package action could not be scheduled: %Error%	PackageInfoView		Pakkehandlingen kunne ikke planlægges: %Error%
 Cancel	RatePackageWindow		Annuller
 Inactive	PackageListView		Inaktiv
 Nickname:	UserLoginWindow		Kaldenavn:
@@ -85,7 +81,6 @@ There are problems in the supplied data:	UserLoginWindow		Er der problemer med d
 OK	MainWindow		OK
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# element} other{# elementer}}
 Usage conditions download problem	UserLoginWindow		Problem ved download af anvendelsesbetingelser
-OK	PackageInfoView		OK
 Downloading:	PackageInfoView		Downloader:
 Success	UserLoginWindow		Lykkedes
 Package daemon problem	App		Problem med pakkedæmon
@@ -135,16 +130,16 @@ Source packages	MainWindow		Kildepakker
 -	no package size		-
 Problem with working files	App		Problem med arbejdsfiler
 Server error	ServerHelper		Fejl ved server
-Rate package	RatePackageWindow		Bedøm pakke
 Try again	App		Prøv igen
+Rate package	RatePackageWindow		Bedøm pakke
 Unknown	PackageListView		Ukendt
 I agree to the usage conditions	UserLoginWindow		Jeg accepterer anvendelsesbetingelserne
 Log in	UserLoginWindow		Log ind
 Logged in as %User%	MainWindow		Logger ind som %User%
 Email address:	UserLoginWindow		E-mailadresse:
 Screenshot	ScreenshotWindow		Skærmbillede
-A reboot is necessary to complete the installation process.	PackageManager		Der kræves en genstart for at fuldføre installationsprocessen.
 HaikuDepot	System name		Haikudepot
+A reboot is necessary to complete the installation process.	PackageManager		Der kræves en genstart for at fuldføre installationsprocessen.
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{Jeg er mindst et år gammel}other{Jeg er # år eller ældre}}
 View latest usage conditions…	MainWindow		Vis seneste anvendelsesbetingelser…
 Quit	App		Afslut
@@ -160,7 +155,6 @@ Fetching remote repository data	LocalRepositoryUpdateProcess		Henter data for fj
 Description	PackageListView		Beskrivelse
 Open %DeskbarLink%	PackageManager		Åbn %DeskbarLink%
 User creation error	UserLoginWindow		Fejl i oprettelse af bruger
-Install	PackageManager		Installer
 Input validation	UserLoginWindow		Inputvalidering
 Log in…	MainWindow		Log ind…
 You need to be logged into an account before you can rate packages.	MainWindow		Du skal logge ind på en konto inden du kan bedømme pakker.

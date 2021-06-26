@@ -1,9 +1,8 @@
-1	greek, modern (1453-)	x-vnd.Haiku-HaikuDepot	840203303
+1	greek, modern (1453-)	x-vnd.Haiku-HaikuDepot	401821302
 Repository update error	LocalRepositoryUpdateProcess		Σφάλμα ενημέρωσης αποθετηρίων
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Προέκυψε ένα σφάλμα κατά την ανανέωση του αποθετηρίου: %error%
 User Created	UserLoginWindow		Χρήστης Δημιουργήθηκε
 Check for updates…	MainWindow		Έλεγχος για ενημερώσεις…
-Uninstall	PackageManager		Απεγκατάσταση
 Uninstalled	PackageListView		Έγινε απεγκατάσταση
 It was not possible to create the new user.	UserLoginWindow		Δεν ήταν δυνατή η δημιουργία του νέου χρήστη.
 Available packages	MainWindow		Διαθέσιμα πακέτα
@@ -42,8 +41,6 @@ Category	FilterView		Κατηγορία
 User rating	RatePackageWindow		Αξιολόγηση χρήστη
 Installed packages	MainWindow		Εγκατεστημένα πακέτα
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Το ζητούμενο αντικείμενο ή ένα αντικείμενο που έχει σχέσει με το αίτημά σας δεν βρέθηκε στον διακομιστή.
-Fatal error	PackageManager		Σφάλμα κατάρρευσης
-Package action failed	PackageInfoView		Η ενέργεια πακέτου απέτυχε
 No changelog available.	PackageInfoView		Δεν υπάρχει διαθέσιμη καταγραφή αλλαγών.
 Error	App		Σφάλμα
 There was a puzzling response from the web service.	UserLoginWindow		Ο εξυπηρετητής έστειλε μία ακατανόητη απάντηση.
@@ -73,7 +70,6 @@ Stability	RatePackageWindow		Σταθερότητα
 Send	RatePackageWindow		Αποστολή
 Start package daemon	App		Έναρξη προγράμματος παρασκηνίου πακέτων
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Ο κωδικός πρέπει να επαναληφθεί, έτσι ώστε να είμαστε βέβαιοι ότι ο κωδικός δεν έχει εισαχθεί λανθασμένα.
-The package action could not be scheduled: %Error%	PackageInfoView		Η ενέργεια πακέτου δεν μπόρεσε να προγραμματιστεί: %Error%
 Cancel	RatePackageWindow		Ακύρωση
 Inactive	PackageListView		Ανενεργό
 Nickname:	UserLoginWindow		Ψευδώνυμο:
@@ -82,7 +78,6 @@ There are problems in the supplied data:	UserLoginWindow		Υπάρχουν πρ�
 OK	MainWindow		Εντάξει
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# αντικείμενο} other{# αντικείμενα}}
 Usage conditions download problem	UserLoginWindow		Σφάλμα λήψης όρων χρήσης
-OK	PackageInfoView		Εντάξει
 Downloading:	PackageInfoView		Γίνεται λήψη:
 Success	UserLoginWindow		Επιτυχία
 Package daemon problem	App		Πρόβλημα προγράμματος παρασκηνίου πακέτων
@@ -129,16 +124,16 @@ The nickname is required.	UserLoginWindow		Απαιτείται ψευδώνυμ
 Source packages	MainWindow		Πηγαία πακέτα
 -	no package size		-
 Problem with working files	App		Πρόβλημα με τα επεξεργαζόμενα αρχεία
-Rate package	RatePackageWindow		Αξιολόγηση πακέτου
 Try again	App		Προσπάθεια ξανά
+Rate package	RatePackageWindow		Αξιολόγηση πακέτου
 Unknown	PackageListView		Άγνωστο
 I agree to the usage conditions	UserLoginWindow		Συμφωνώ στους όρους χρήσης
 Log in	UserLoginWindow		Είσοδος
 Logged in as %User%	MainWindow		Έχετε συνδεθεί ως %User%
 Email address:	UserLoginWindow		Διεύθυνση ηλεκτρονικού ταχυδρομείου:
 Screenshot	ScreenshotWindow		Στιγμιότυπο οθόνης
-A reboot is necessary to complete the installation process.	PackageManager		Είναι απαραίτητη μία επανεκκίνηση για την ολοκλήρωση της εγκατάστασης.
 HaikuDepot	System name		HaikuDepot
+A reboot is necessary to complete the installation process.	PackageManager		Είναι απαραίτητη μία επανεκκίνηση για την ολοκλήρωση της εγκατάστασης.
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{Είμαι τουλάχιστον ενός έτους}other{Είμαι # ετών ή μεγαλύτερος}}
 View latest usage conditions…	MainWindow		Προβολή των πιο πρόσφατων όρων χρήσεις…
 Quit	App		Έξοδος
@@ -154,7 +149,6 @@ Fetching remote repository data	LocalRepositoryUpdateProcess		Γίνεται λ�
 Description	PackageListView		Περιγραφή
 Open %DeskbarLink%	PackageManager		Άνοιγμα %DeskbarLink%
 User creation error	UserLoginWindow		Σφάλμα δημιουργίας χρήστη
-Install	PackageManager		Εγκατάσταση
 Input validation	UserLoginWindow		Επικύρωση στοχεύων εισαγωγής
 Log in…	MainWindow		Είσοδος…
 You need to be logged into an account before you can rate packages.	MainWindow		Πρέπει να εισέλθετε σε έναν λογαριασμό για να μπορέσετε να αξιολογήσετε πακέτα.

@@ -1,10 +1,9 @@
-1	german	x-vnd.Haiku-HaikuDepot	3544756144
+1	german	x-vnd.Haiku-HaikuDepot	3106374143
 Repository update error	LocalRepositoryUpdateProcess		Fehler bei Paketquellenaktualisierung
 Network error	ServerHelper		Netzwerk Fehler
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Fehler bei der Aktualisierung der Paketquelle: %error%
 User Created	UserLoginWindow		Benutzerkonto erstellt
 Check for updates…	MainWindow		Aktualisierungen suchen…
-Uninstall	PackageManager		Deinstallieren
 Uninstalled	PackageListView		Deinstalliert
 It was not possible to create the new user.	UserLoginWindow		Das neue Benutzerkonto konntenicht angelegt werden.
 Available packages	MainWindow		Verfügbare Pakete
@@ -46,8 +45,6 @@ Category	FilterView		Kategorie
 User rating	RatePackageWindow		Bewertung
 Installed packages	MainWindow		Installierte Pakete
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Ein angefordertes Objekt bzw. ein bei der Anfrage beteiligtes Objekt, wurde auf dem Server  nicht gefunden.
-Fatal error	PackageManager		Schwerwiegender Fehler
-Package action failed	PackageInfoView		Paket-Aktion fehlgeschlagen
 No changelog available.	PackageInfoView		Änderungsprotokoll nicht vorhanden.
 Error	App		Fehler
 There was a puzzling response from the web service.	UserLoginWindow		Der Web-Dienst hat mit einer wirren Meldung geantwortet.
@@ -79,7 +76,6 @@ Stability	RatePackageWindow		Stabilität
 Send	RatePackageWindow		Senden
 Start package daemon	App		Paket-Daemon starten
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Das Kennwort muss wiederholt werden, um die Wahrscheinlichket einer Falscheingabe zu verringern.
-The package action could not be scheduled: %Error%	PackageInfoView		Die Aktion konnte nicht auf das Paket angewandt werden: %Error%
 Cancel	SettingsWindow		Abbrechen
 Cancel	RatePackageWindow		Abbrechen
 Inactive	PackageListView		Deaktiviert
@@ -89,7 +85,6 @@ There are problems in the supplied data:	UserLoginWindow		Es gibt Probleme mit d
 OK	MainWindow		OK
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# Objekt} other{# Objekte}}
 Usage conditions download problem	UserLoginWindow		Problem beim Herunterladen der Nutzungsbedingungen
-OK	PackageInfoView		OK
 Downloading:	PackageInfoView		Aktueller Download:
 Quit	MainWindow		Beenden
 Success	UserLoginWindow		Erfolg
@@ -145,8 +140,8 @@ Source packages	MainWindow		Quellcode-Pakete
 -	no package size		-
 Problem with working files	App		Problem mit Arbeitsdateien
 Server error	ServerHelper		Server Fehler
-Rate package	RatePackageWindow		Paket bewerten
 Try again	App		Nochmal versuchen
+Rate package	RatePackageWindow		Paket bewerten
 Unknown	PackageListView		Unbekannt
 I agree to the usage conditions	UserLoginWindow		I stimme den Nutzungsbedingungen zu
 Log in	UserLoginWindow		Anmelden
@@ -154,8 +149,8 @@ Sending anonymous usage data	MainWindow		Sende anonyme Nutzungsdaten
 Logged in as %User%	MainWindow		Angemeldet als %User%
 Email address:	UserLoginWindow		E-Mail-Adresse:
 Screenshot	ScreenshotWindow		Bildschirmfoto
-A reboot is necessary to complete the installation process.	PackageManager		Um die Installation abzuschließen, muss Haiku neu gestartet werden.
 HaikuDepot	System name		HaikuDepot
+A reboot is necessary to complete the installation process.	PackageManager		Um die Installation abzuschließen, muss Haiku neu gestartet werden.
 Yes	MainWindow		Ja
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{Ich bin mindestens 1 Jahr alt}other{Ich bin # Jahre oder älter}}
 View latest usage conditions…	MainWindow		Aktuelle Nutzungsbedingungen lesen…
@@ -172,7 +167,6 @@ Fetching remote repository data	LocalRepositoryUpdateProcess		Abrufen von Paketq
 Description	PackageListView		Beschreibung
 Open %DeskbarLink%	PackageManager		%DeskbarLink% öffnen
 User creation error	UserLoginWindow		Fehler beim Erstellen des Benutzerkontos
-Install	PackageManager		Installieren
 Input validation	UserLoginWindow		Eingabeprüfung
 Log in…	MainWindow		Anmelden…
 You need to be logged into an account before you can rate packages.	MainWindow		Nur angemeldete Benutzer können Pakete bewerten.

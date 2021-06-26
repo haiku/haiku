@@ -1,0 +1,20 @@
+1	dutch; flemish	x-vnd.haiku.SerialConnect	1764922950
+Hardware	SerialWindow	Flowcontrol	Hardware
+Connection	SerialWindow		Verbinding
+Raw send…	SerialWindow		Onbewerkt verzenden…
+Baud rate	SerialWindow		Baudsnelheid
+Stop bits	SerialWindow		Stopbits
+None	SerialWindow	Flowcontrol	Geen
+Cancel	Custom baudrate window		Annuleren
+Sending…	XModemStatus		Versturen…
+<no serial port available>	SerialWindow		<geen seriële poort beschikbaar>
+Log to file…	SerialWindow		In bestand loggen…
+Custom baudrate	Custom baudrate window		Aangepaste baudsnelheid
+File	SerialWindow		Bestand
+SerialConnect	System name		SerialConnect
+custom…	SerialWindow	Baudrate	aangepast…
+Parity	SerialWindow		Pariteit
+None	SerialWindow	Parity	Geen
+Disconnect	SerialWindow		Verbinding sluiten
+Everything sent, waiting for acknowledge	XModemStatus		Alles is verzonden, bezig met wachten op bevestiging
+Odd	SerialWindow	Parity	Oneven

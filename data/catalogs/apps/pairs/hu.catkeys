@@ -10,7 +10,7 @@ Pairs did not find enough vector icons to start; it needs at least %zu, found %z
 You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWindow		A játékot {0, plural, one{# kattintással} other{# kattintással}} fejezte be.\n
 Small	PairsWindow		Kicsi
 Size	PairsWindow		Méret
-%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n	PairsWindow		%app%\n\tkészítette: Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n
+%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n	PairsWindow		%app%\n\tkészítette: Ralf Schülke\n\t© 2008-2010, Haiku Inc.\n\n
 Quit game	PairsWindow		Kilépés a játékból
 Large	PairsWindow		Nagy
 Beginner (4x4)	PairsWindow		Kezdő (4x4)

@@ -29,7 +29,7 @@ OK	AboutWindow		Aceptar
 Special Thanks:	AboutWindow		Agradecimientos especiales:
 Default Haiku window decorator.	Default decorator about box		Decorador de ventana predeterminado de Haiku
 %.2f TiB	StringForSize		%.2f TiB
-Remove replicant	Dragger		Remover replicante
+Remove replicant	Dragger		Quitar replicante
 Version	AboutWindow		Versión
 Red:	ColorControl		Rojo:
 <empty>	Menu		<vacío>

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-PackageInstaller	4116690169
+1	hungarian	x-vnd.Haiku-PackageInstaller	2472572058
 Package description	UninstallView		Leírás
 none	PackageView		nincs
 Continue	PackageInstall		Folytatás
@@ -18,6 +18,7 @@ No installation type selected	PackageView		Nincs másféle telepítéstípus kiv
 Do you want to remember this decision for the rest of this installation?\n	PackageView		Megjegyezzük ezt a választást ennek a telepítésnek az idejére?\n
 The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		A kijelölt csomagot nem sikerült eltávolítani. A megadott csomag információs fájlja sérült lehet.
 Install…	UninstallView		Telepítés…
+The item named '%s' already exists in the given path.\nReplace the item with the one from this package or skip it?	PackageView		'%s' már létezik a megadott útvonalon.\nLecseréljem a meglévőt, vagy kihagyjam?
 Installing files and folders	PackageInstall		Fájlok és mappák telepítése
 Installed packages	UninstallWindow		Telepített csomagok
 Remove	UninstallView		Eltávolítás
@@ -39,16 +40,20 @@ No package selected.	UninstallView		Nincs csomag kiválasztva.
 Error while installing the package\n	PackageView		Hiba történt a csomag telepítése közben\n
 Finishing installation	PackageInstall		Telepítés befejezése
 No package available.	PackageInfo		Nincs elérhető csomag.
+The script named '%s' already exists in the given path.\nReplace the script with the one from this package or skip it?	PackageView		'%s' már létezik a megadott útvonalon.\nLecseréljem a meglévőt, vagy kihagyjam?
 Installation type:	PackageView		Telepítés típusa:
 The package you selected has been successfully removed from your system.	UninstallView		A kijelölt csomagot sikeresen eltávolítottam.
 There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		A fájlméretek a csomagfájlban nem egyeznek. A csomag korrupt lehet, vagy lehet, hogy az elkészítése után módosították. Biztos folytatni kívánod?
 %name% (%size%)	PackageView		%name% (%size%)
 Abort	PackageInstall		Megszakítás
+The file named '%s' already exists in the given path.\nReplace the file with the one from this package or skip it?	PackageView		'%s' már létezik a megadott útvonalon.\nLecseréljem a meglévőt, vagy kihagyjam?
 Replace all	PackageView		Összes cseréje
 The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		A csomagfájl nem olvasható.\nLehet, hogy nem érvényes BeOS .pkg csomagformátumban van.
 Continue	PackageInfo		Folytatás
 No package selected.	PackageInfo		Nincs csomag kiválasztva.
 Error! \"%s\" is not a valid path.\n	Packageinstaller main		Hiba! Érvénytelen útvonal: \"%s\".\n
+The directory named '%s' already exists in the given path.\nReplace the directory with one from this package or skip it?	PackageView		'%s' már létezik a megadott útvonalon.\nLecseréljem a meglévőt, vagy kihagyjam?
+LegacyPackageInstaller	System name		Csomagtelepítő
 Ask again	PackageView		Kérdezze újból
 Begin	PackageView		Kezdés
 OK	PackageView		Rendben

@@ -1,10 +1,9 @@
-1	romanian	x-vnd.Haiku-HaikuDepot	2940546158
+1	romanian	x-vnd.Haiku-HaikuDepot	2502164157
 Repository update error	LocalRepositoryUpdateProcess		Eroare la actualizarea depozitului
 Network error	ServerHelper		Eroare de rețea
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		A apărut o eroare în timpul reîmprospătării depozitului: %error%
 User Created	UserLoginWindow		Utilizator creat
 Check for updates…	MainWindow		Verifică pentru actualizări…
-Uninstall	PackageManager		Dezinstalare
 Uninstalled	PackageListView		Dezinstalat
 It was not possible to create the new user.	UserLoginWindow		Nu a fost posibil să se creeze utilizatorul nou.
 Available packages	MainWindow		Pachete disponibile
@@ -45,8 +44,6 @@ Category	FilterView		Categorie
 User rating	RatePackageWindow		Evaluarea utilizatorului
 Installed packages	MainWindow		Pachete instalate
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Un obiect cerut sau un obiect implicat în cerere nu a fost găsit pe server.
-Fatal error	PackageManager		Eroare fatală
-Package action failed	PackageInfoView		Acțiune pachet eșuată
 No changelog available.	PackageInfoView		Nu există jurnal de modificări disponibil.
 Error	App		Eroare
 There was a puzzling response from the web service.	UserLoginWindow		A apărut un răspuns neobișnuit de la serviciul web.
@@ -78,7 +75,6 @@ Stability	RatePackageWindow		Stabilitate
 Send	RatePackageWindow		Trimitere
 Start package daemon	App		Pornire demon de pachet
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Parola trebuie să fie repetată pentru a reduce șansa de a introduce parola incorect.
-The package action could not be scheduled: %Error%	PackageInfoView		Actiunea pachetului n-a putut fi programată: %Error%
 Cancel	SettingsWindow		Anulează
 Cancel	RatePackageWindow		Anulează
 Inactive	PackageListView		Inactiv
@@ -88,7 +84,6 @@ There are problems in the supplied data:	UserLoginWindow		Sunt probleme cu datel
 OK	MainWindow		OK
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# element} other{# elemente}}
 Usage conditions download problem	UserLoginWindow		Problemă de descărcare a condițiilor de utilizare
-OK	PackageInfoView		OK
 Downloading:	PackageInfoView		Se descarcă:
 Quit	MainWindow		Ieșire
 Success	UserLoginWindow		Succes
@@ -144,8 +139,8 @@ Source packages	MainWindow		Pachete sursă
 -	no package size		-
 Problem with working files	App		Problemă cu fișierele de lucru
 Server error	ServerHelper		Eroare de server
-Rate package	RatePackageWindow		Evaluați pachet
 Try again	App		Încearcă din nou
+Rate package	RatePackageWindow		Evaluați pachet
 Unknown	PackageListView		Necunoscut
 I agree to the usage conditions	UserLoginWindow		Sunt de acord cu condițiile de utilizare
 Log in	UserLoginWindow		Autentificare
@@ -153,8 +148,8 @@ Sending anonymous usage data	MainWindow		Se trimit datele de utilizare anonime
 Logged in as %User%	MainWindow		Autentificat ca %User%
 Email address:	UserLoginWindow		Adresă email:
 Screenshot	ScreenshotWindow		Captură ecran
-A reboot is necessary to complete the installation process.	PackageManager		O repornire este necesară pentru a completa procesul de instalare.
 HaikuDepot	System name		HaikuDepot
+A reboot is necessary to complete the installation process.	PackageManager		O repornire este necesară pentru a completa procesul de instalare.
 Yes	MainWindow		Da
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{I am at least one year old}other{I am # years of age or older}}
 View latest usage conditions…	MainWindow		Vizualizați ultimele condiții de utilizare…
@@ -171,7 +166,6 @@ Fetching remote repository data	LocalRepositoryUpdateProcess		Se aduc datele dep
 Description	PackageListView		Descriere
 Open %DeskbarLink%	PackageManager		Deschide %DeskbarLink%
 User creation error	UserLoginWindow		Eroare la crearea utilizatorului
-Install	PackageManager		Instalare
 Input validation	UserLoginWindow		Validare intrare
 Log in…	MainWindow		Autentificare…
 You need to be logged into an account before you can rate packages.	MainWindow		Trebuie să fiți autentificat într-un cont înainte de a evalua pachete.

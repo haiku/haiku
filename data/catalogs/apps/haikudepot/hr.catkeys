@@ -1,9 +1,8 @@
-1	croatian	x-vnd.Haiku-HaikuDepot	3609923014
+1	croatian	x-vnd.Haiku-HaikuDepot	849501161
 Repository update error	LocalRepositoryUpdateProcess		Greška pri ažuriranju repozitorija
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Došlo je do greške prilikom osvježavanja repozitorija: %error%
 User Created	UserLoginWindow		Korisnik je napravljen
 Check for updates…	MainWindow		Provjeri za ažuriranja...
-Uninstall	PackageManager		Deinstaliraj
 Uninstalled	PackageListView		Deinstalirani
 It was not possible to create the new user.	UserLoginWindow		Nije bilo moguće stvoriti novog korisnika.
 Available packages	MainWindow		Dostupni paketi
@@ -26,7 +25,6 @@ Name	PackageListView		Ime
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Došlo je d ogreške prilikom iniciranja upravitelja paketima: %message%
 Category	FilterView		Kategorija
 Installed packages	MainWindow		Instalirani paketi
-Fatal error	PackageManager		Ozbiljna greška
 Error	App		Greška
 Version	PackageListView		Inačica
 Not logged in	MainWindow		Niste prijavljeni
@@ -45,7 +43,6 @@ Cancel	RatePackageWindow		Otkaži
 Inactive	PackageListView		Neaktivan
 Nickname:	UserLoginWindow		Nadimak:
 OK	MainWindow		U redu
-OK	PackageInfoView		U redu
 Downloading:	PackageInfoView		Preuzimam:
 Success	UserLoginWindow		Uspjeh
 (%Votes%)	PackageInfoView		(%Glasovi%)
@@ -72,8 +69,8 @@ Stability:	RatePackageWindow		Stabilnost:
 The nickname is required.	UserLoginWindow		Potreban je nadimak.
 Source packages	MainWindow		Izvorni paketi
 -	no package size		-
-Rate package	RatePackageWindow		Ocijeni paket
 Try again	App		Pokušaj ponovno
+Rate package	RatePackageWindow		Ocijeni paket
 Unknown	PackageListView		Nepoznato
 I agree to the usage conditions	UserLoginWindow		Slažem se sa uvjetima korištenja
 Log in	UserLoginWindow		Prijava
@@ -86,7 +83,6 @@ Authentication failed	UserLoginWindow		Neuspjela ovjera
 Manage repositories…	MainWindow		Upravljaj repozitorijima…
 Description	PackageListView		Opis
 Open %DeskbarLink%	PackageManager		Otvori %DeskbarLink%
-Install	PackageManager		Instaliraj
 Log in…	MainWindow		Prijava...
 9999.99 KiB	PackageListView		9999.99 KiB
 Repeat password:	UserLoginWindow		Ponovi lozinku:

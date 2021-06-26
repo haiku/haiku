@@ -18,7 +18,7 @@ Attribute name:	Attribute Window		Jellemző neve:
 Long description:	Application Type Window		Hosszú leírás:
 Cancel	Preferred App Menu		Mégse
 Remove	FileTypes Window		Eltávolítás
-The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		„%s” program nem támogatja ezt a fájltípust.\nBiztosan ehhez rendeled hozzá?
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		\"%s\" program nem támogatja ezt a fájltípust.\nBiztosan ehhez rendeled hozzá?
 Remove	Application Type Window		Eltávolítás
 Gamma	Application Type Window		Gamma
 Cancel	Application Type Window		Mégse
@@ -75,7 +75,7 @@ Rating	Attribute ListView		Értékelés
 duration	Attribute ListView		időtartam
 File could not be opened	Preferred App Menu		A fájl nem nyitható meg
 Args only	Application Type Window		Csak paraméterek
-Could not open \"%s\":\n%s	FileTypes		„%s” nem megnyitható:\n%s
+Could not open \"%s\":\n%s	FileTypes		\"%s\" nem megnyitható:\n%s
 Right	Attribute Window	Attribute column alignment in Tracker	Jobbra
 Save changes before closing?	Application Type Window		Menti a változtatásokat kilépés előtt?
 Background app	Application Type Window		Futtatás a háttérben
@@ -100,7 +100,7 @@ no icon	FileTypes Window		nincs ikon
 Single launch	Application Type Window		Egyszer indítható
 %s file type	FileType Window		%s fájltípusok
 Default	Attribute ListView		Alapérték
-Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Egy szupertípus eltávolítását nem lehet visszavonni.\nMinden fájltípus ami ehhez a szupertípushoz tartozik el fog vészni!\n\nBiztos ezt akarod tenni? A teljes csoport eltávolításához tartsd lenyomva a „Shift” billentyűt és nyomj az „Eltávolítás” gombra.
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Egy szupertípus eltávolítását nem lehet visszavonni.\nMinden fájltípus ami ehhez a szupertípushoz tartozik el fog vészni!\n\nBiztos ezt akarod tenni? A teljes csoport eltávolításához tartsd lenyomva a Shift billentyűt és nyomj az \"Eltávolítás\" gombra.
 String	Attribute ListView		Szöveg
 Add type	New File Type Window		Típus hozzáadása
 Remove icon	Icon View		Ikon eltávolítása

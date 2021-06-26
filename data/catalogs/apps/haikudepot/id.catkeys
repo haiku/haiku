@@ -1,9 +1,8 @@
-1	indonesian	x-vnd.Haiku-HaikuDepot	840203303
+1	indonesian	x-vnd.Haiku-HaikuDepot	401821302
 Repository update error	LocalRepositoryUpdateProcess		Kesalahan pembaruan repositori
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Terjadi kesalahan saat menyegarkan repositori: %error%
 User Created	UserLoginWindow		Pengguna Dibuat
 Check for updates…	MainWindow		Memeriksa pembaruan…
-Uninstall	PackageManager		Hapus
 Uninstalled	PackageListView		Telah dilepas
 It was not possible to create the new user.	UserLoginWindow		Tadi tidak mungkin untuk membuat pengguna baru.
 Available packages	MainWindow		Paket yang tersedia
@@ -42,8 +41,6 @@ Category	FilterView		Kategori
 User rating	RatePackageWindow		Peringkat pengguna
 Installed packages	MainWindow		Paket-paket yang terpasang
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Objek yang diminta atau objek yang terlibat dalam permintaan tidak ditemukan di server.
-Fatal error	PackageManager		Kesalahan fatal
-Package action failed	PackageInfoView		Tindakan paket gagal
 No changelog available.	PackageInfoView		Tak ada log perubahan tersedia.
 Error	App		Kesalahan
 There was a puzzling response from the web service.	UserLoginWindow		Ada respon membingungkan dari layanan web.
@@ -73,7 +70,6 @@ Stability	RatePackageWindow		Kestabilan
 Send	RatePackageWindow		Kirim
 Start package daemon	App		Mulai daemon paket
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Kata sandi harus diulang untuk mengurangi kemungkinan memasukkan kata sandi yang salah.
-The package action could not be scheduled: %Error%	PackageInfoView		Tindakan paket tidak dapat dijadwalkan: %Error%
 Cancel	RatePackageWindow		Batal
 Inactive	PackageListView		Tak aktif
 Nickname:	UserLoginWindow		Nama panggilan:
@@ -82,7 +78,6 @@ There are problems in the supplied data:	UserLoginWindow		Ada masalah dalam data
 OK	MainWindow		OKE
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# item} other{# items}}
 Usage conditions download problem	UserLoginWindow		Masalah pengunduhan kondisi penggunaan
-OK	PackageInfoView		OKE
 Downloading:	PackageInfoView		Mengunduh:
 Success	UserLoginWindow		Berhasil
 Package daemon problem	App		Masalah daemon paket
@@ -129,16 +124,16 @@ The nickname is required.	UserLoginWindow		Nama panggilan diperlukan.
 Source packages	MainWindow		Paket sumber
 -	no package size		-
 Problem with working files	App		Masalah dengan file yang berkaitan
-Rate package	RatePackageWindow		Nilai paket
 Try again	App		Coba lagi
+Rate package	RatePackageWindow		Nilai paket
 Unknown	PackageListView		Tidak dikenal
 I agree to the usage conditions	UserLoginWindow		Saya menyetujui ketentuan penggunaan
 Log in	UserLoginWindow		Masuk
 Logged in as %User%	MainWindow		Masuk sebagai %User%
 Email address:	UserLoginWindow		Alamat email:
 Screenshot	ScreenshotWindow		Screenshot
-A reboot is necessary to complete the installation process.	PackageManager		Boot ulang diperlukan untuk menyelesaikan proses pemasangan.
 HaikuDepot	System name		HaikuDepot
+A reboot is necessary to complete the installation process.	PackageManager		Boot ulang diperlukan untuk menyelesaikan proses pemasangan.
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{I am at least one year old}other{I am # tahun lebih tua}}
 View latest usage conditions…	MainWindow		Lihat ketentuan penggunaan terbaru…
 Quit	App		Berhenti
@@ -154,7 +149,6 @@ Fetching remote repository data	LocalRepositoryUpdateProcess		Mengambil data rep
 Description	PackageListView		Deskripsi
 Open %DeskbarLink%	PackageManager		Buka %DeskbarLink%
 User creation error	UserLoginWindow		Kesalahan pembuatan pengguna
-Install	PackageManager		Instalasi
 Input validation	UserLoginWindow		Validasi masukan
 Log in…	MainWindow		Log masuk…
 You need to be logged into an account before you can rate packages.	MainWindow		Anda harus masuk ke akun sebelum dapat memberi nilai paket.

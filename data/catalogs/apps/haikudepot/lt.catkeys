@@ -1,5 +1,4 @@
-1	lithuanian	x-vnd.Haiku-HaikuDepot	1532539588
-Uninstall	PackageManager		Išdiegti
+1	lithuanian	x-vnd.Haiku-HaikuDepot	2848065911
 Uninstalled	PackageListView		Išdiegti
 Rate package…	PackageInfoView		Įvertinti paketą…
 <no info>	PackageInfoView		<informacijos nėra>
@@ -8,7 +7,6 @@ Rating	PackageListView		Įvertinimas
 Active	PackageListView		Aktyvus
 Ratings	PackageInfoView		Įvertinimai
 Name	PackageListView		Pavadinimas
-Fatal error	PackageManager		Kritinė klaida
 No changelog available.	PackageInfoView		Pakeitimų žurnalas neprieinamas.
 Available	PackageListView		Prieinamas
 Click a package to view information	PackageInfoView		Spustelėkite paketą jo informacijai pamatyti
@@ -28,4 +26,3 @@ HaikuDepot	System name		Paketų tvarkytuvė
 Search terms:	FilterView		Ieškomi žodžiai:
 Pending…	PackageListView		Laukiama…
 Description	PackageListView		Aprašas
-Install	PackageManager		Įdiegti

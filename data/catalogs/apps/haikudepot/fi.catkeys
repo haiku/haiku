@@ -1,10 +1,9 @@
-1	finnish	x-vnd.Haiku-HaikuDepot	2453709986
+1	finnish	x-vnd.Haiku-HaikuDepot	2015327985
 Repository update error	LocalRepositoryUpdateProcess		Tietovaraston päivitysvirhe
 Network error	ServerHelper		Verkkovirhe
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Tietovaraston päivityksen yhteydessä tapahtui virhe: %error%
 User Created	UserLoginWindow		Käyttäjän luoma
 Check for updates…	MainWindow		Tarkista päivitykset…
-Uninstall	PackageManager		Poista asennus
 Uninstalled	PackageListView		Poistetut asennukset
 It was not possible to create the new user.	UserLoginWindow		Uuden käyttäjän luominen epäonnistui.
 Available packages	MainWindow		Saatavilla olevat pakkaukset
@@ -45,8 +44,6 @@ Category	FilterView		Luokka
 User rating	RatePackageWindow		Käyttäjäarvosanat
 Installed packages	MainWindow		Asennetut paketit
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Pyydettyä objektia tai pyyntöön liittyvää objektia ei löytynyt palvelimelta.
-Fatal error	PackageManager		Kriittinen virhe
-Package action failed	PackageInfoView		Pakettitoiminta epäonnistui
 No changelog available.	PackageInfoView		Mitään muutoslokia ei ole saatavilla.
 Error	App		Virhe
 There was a puzzling response from the web service.	UserLoginWindow		Webbipalvelun vastaus oli pulmallinen.
@@ -77,7 +74,6 @@ Stability	RatePackageWindow		Stabiilisuus
 Send	RatePackageWindow		Lähetä
 Start package daemon	App		Käynnistä pakkaustaustaprosessi
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Salasana on toistettava sen mahdollisuuden pienentämiseksi, että se on kirjoitettu väärin.
-The package action could not be scheduled: %Error%	PackageInfoView		Pakkaustoiminnon aikatauluttaminen epäonnistui: %Error%
 Cancel	RatePackageWindow		Peru
 Inactive	PackageListView		Ei käytössä
 Nickname:	UserLoginWindow		Käyttäjätunnus:
@@ -86,7 +82,6 @@ There are problems in the supplied data:	UserLoginWindow		Toimitetuissa tiedoiss
 OK	MainWindow		Valmis
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# kohde} other{# kohdetta}}
 Usage conditions download problem	UserLoginWindow		Käyttöehtojen latauspulma
-OK	PackageInfoView		Valmis
 Downloading:	PackageInfoView		Ladataan:
 Success	UserLoginWindow		Valmis
 No	MainWindow		Ei
@@ -139,8 +134,8 @@ Source packages	MainWindow		Lähdekoodipakkaukset
 -	no package size		-
 Problem with working files	App		Pulma työtiedostoissa
 Server error	ServerHelper		Palvelinvirhe
-Rate package	RatePackageWindow		Anna pakkaukselle arvosana
 Try again	App		Yritä uudelleen
+Rate package	RatePackageWindow		Anna pakkaukselle arvosana
 Unknown	PackageListView		Tuntematon
 I agree to the usage conditions	UserLoginWindow		Hyväksyn käyttöehdot
 Log in	UserLoginWindow		Kirjaudu
@@ -148,8 +143,8 @@ Sending anonymous usage data	MainWindow		Nimettömien käyttötietojen lähettä
 Logged in as %User%	MainWindow		Kirjautuneena tunnuksella %User%
 Email address:	UserLoginWindow		Sähköpostiosoite:
 Screenshot	ScreenshotWindow		Kuvakaappaus
-A reboot is necessary to complete the installation process.	PackageManager		Asennusprosessin päättäminen vaatii uudelleenkäynnistämisen.
 HaikuDepot	System name		HaikuVarasto
+A reboot is necessary to complete the installation process.	PackageManager		Asennusprosessin päättäminen vaatii uudelleenkäynnistämisen.
 Yes	MainWindow		Kyllä
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{Olen vähintään vuoden ikäinen}other{Olen # vuotias tai vanhempi}}
 View latest usage conditions…	MainWindow		Katso viimeisimmät käyttöehdot…
@@ -166,7 +161,6 @@ Fetching remote repository data	LocalRepositoryUpdateProcess		Noudetaan etätiet
 Description	PackageListView		Kuvaus
 Open %DeskbarLink%	PackageManager		Avaa %DeskbarLink%
 User creation error	UserLoginWindow		Käyttäjän luomisen virhe
-Install	PackageManager		Asenna
 Input validation	UserLoginWindow		Syötevalidointi
 Log in…	MainWindow		Kirjaudu...
 You need to be logged into an account before you can rate packages.	MainWindow		Sinun on kirjauduttava tilille ennen kuin voit antaa arvosanoja pakkauksille.

@@ -1,4 +1,4 @@
-1	swedish	application/x-vnd.Cortex.support	3220757490
+1	swedish	application/x-vnd.Cortex.support	3071292607
 Header has flags	MediaString		Rubrik har flaggor
 32 bit HLS	MediaString		32-bitars HLS
 Recording	MediaString		Inspelning
@@ -31,8 +31,33 @@ Back-center	MediaString		Baksida mitten
 {0, plural, other{# bit integer}}	MediaString		{0, plural, other{# bit heltal}}
 Ambisonic WXYZ	MediaString		Ambisonic WXYZ
 (unknown video format)	MediaString		(okänt videoformat)
+AVI format family	MediaString		AVI-formatfamilj
+Homogenous buffers	MediaString		Homogena buffertar
+Interlaced 	MediaString		Interlaced 
+{0, plural, one{# channel}other{# channels}}	MediaString		{0, plural, one{# kanal}other{# kanaler}}
+15 bit RGBA	MediaString		15 bitars RGBA
+Drop data	MediaString		Släpp data
+AVI	MediaString		AVI
 YUV9	MediaString		YUV9
+ Hz	MediaString		 Hz
+Right	MediaString		Höger
+32 bit RGB	MediaString		32-bitars RGB
+Video data between line u and u	MediaString		Videodata mellan rad u och u
+System mixer	MediaString		Systemblandare
+Physical output	MediaString		Fysisk produktion
+Top-Back-center	MediaString		Topp-Baksida-mitt
 YUV420	MediaString		YUV420
+Top to bottom, left to right	MediaString		Uppifrån och ned, vänster till höger
+(unknown run mode)	MediaString		(okänt körläge)
+ kb/s	MediaString		 kb/s
+24 bit HSI	MediaString		24-bitars HSI
+User-defined media type	MediaString		Användardefinierad medietyp
+32 bit CMYA	MediaString		32-bitars CMYA
+Rear-left	MediaString		Bak vänster
+QuickTime format family	MediaString		QuickTime-formatfamilj
+Any format family	MediaString		Vilken som helst formatfamilj
+Timecode	MediaString		Tidskod
+Top-Front-right	MediaString		Upp-Fram-höger
 YCbCr444	MediaString		YCbCr444
 ID	MediaString		ID
 YCbCr422	MediaString		YCbCr422

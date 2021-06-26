@@ -1,0 +1,5 @@
+1	hungarian	application/x-vnd.Cortex.AddOnHost	1256552338
+Continue	CortexAddOnHost		Folytatás
+Cortex AddOnHost	CortexAddOnHost		Cortex AddOnHost
+Quit	CortexAddOnHost		Kilépés
+This program runs in the background, and is started automatically by Cortex when necessary. You probably don't want to start it manually.	CortexAddOnHost		A program a háttérben fut, és szükség esetén a Cortex automatikusan indítja. Nem szükséges kézzel indítanod.

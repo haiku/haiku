@@ -8,7 +8,7 @@ Keyboard	DeviceClass		Billentyűzet
 Smart phone	DeviceClass		Okostelefon
 VCR	DeviceClass		VCR
 Cellular	DeviceClass		Mobil
-Audio	DeviceClass		Audio
+Audio	DeviceClass		Audió
 Audio/Video	DeviceClass		Audio/Videó
 Car audio	DeviceClass		Autós audiószett
 Major class: 	DeviceClass		Főcsoport:
@@ -62,7 +62,7 @@ Wearable	DeviceClass	A wearable computer	Hordozható
 Display	DeviceClass		Kijelző
 Gamepad	DeviceClass		Konzol
 Video monitor	DeviceClass		Videómonitor
-Palm	DeviceClass	A palm-held device	Palm
+Palm	DeviceClass	A palm-held device	Palmtop
 Joystick	DeviceClass		Botkormány
 Networking	DeviceClass		Hálózat
 Telephony	DeviceClass		Telefónia
@@ -75,7 +75,7 @@ Pointing device	DeviceClass		Mutatóeszköz
 Rendering	DeviceClass		Renderelés
 Information	DeviceClass		Információ
 Helmet	DeviceClass		Sisak
-Pager	DeviceClass	A small radio device to receive short text messages	Személyhívó 
+Pager	DeviceClass	A small radio device to receive short text messages	Személyhívó
 Hands-free	DeviceClass		Szabadkézi
 Digitizer tablet	DeviceClass		Digitalizáló tábla
 Portable audio	DeviceClass		Hordozható audio
