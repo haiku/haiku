@@ -238,7 +238,8 @@ Port::PipePreference()
 	// - Later devices add a pipe C alongside the added transcoder C.
 
 	// FIXME How's this setup in newer gens? Currently return INTEL_PIPE_ANY there..
-	if (gInfo->shared_info->device_type.Generation() <= 7) {
+	if ((gInfo->shared_info->device_type.Generation() <= 7) &&
+		(!gInfo->shared_info->device_type.HasDDI())) {
 		uint32 portState = read32(_PortRegister());
 		if (gInfo->shared_info->pch_info == INTEL_PCH_CPT) {
 			portState &= PORT_TRANS_SEL_MASK;
@@ -252,6 +253,10 @@ Port::PipePreference()
 			else
 				return INTEL_PIPE_A;
 		}
+	}
+
+	if (gInfo->shared_info->device_type.HasDDI()) {
+		//fixme implement detection via PIPE_DDI_FUNC_CTL_x scan..
 	}
 
 	return INTEL_PIPE_ANY;
@@ -1182,9 +1187,12 @@ DigitalDisplayInterface::SetDisplayMode(display_mode* target, uint32 colorMode)
 	PanelFitter* fitter = fPipe->PFT();
 	if (fitter != NULL)
 		fitter->Enable(*target);
-	FDILink* link = fPipe->FDI();
-	if (link != NULL)
-		link->Train(target);
+	// Skip FDI if we have a CPU connected display
+	if (PortIndex() != INTEL_PORT_A) {
+		FDILink* link = fPipe->FDI();
+		if (link != NULL)
+			link->Train(target);
+	}
 
 	pll_divisors divisors;
 	compute_pll_divisors(target, &divisors, false);

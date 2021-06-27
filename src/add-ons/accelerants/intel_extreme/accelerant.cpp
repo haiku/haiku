@@ -246,18 +246,21 @@ probe_ports()
 	bool foundDP = false;
 	bool foundDDI = false;
 
-	gInfo->port_count = 0;
-	for (int i = INTEL_PORT_A; i <= INTEL_PORT_D; i++) {
-		TRACE("Probing DisplayPort %d\n", i);
-		Port* displayPort = new(std::nothrow) DisplayPort((port_index)i);
-		if (displayPort == NULL)
-			return B_NO_MEMORY;
+	// Display Port
+	if (!gInfo->shared_info->device_type.HasDDI()) {
+		gInfo->port_count = 0;
+		for (int i = INTEL_PORT_A; i <= INTEL_PORT_D; i++) {
+			TRACE("Probing DisplayPort %d\n", i);
+			Port* displayPort = new(std::nothrow) DisplayPort((port_index)i);
+			if (displayPort == NULL)
+				return B_NO_MEMORY;
 
-		if (displayPort->IsConnected()) {
-			foundDP = true;
-			gInfo->ports[gInfo->port_count++] = displayPort;
-		} else
-			delete displayPort;
+			if (displayPort->IsConnected()) {
+				foundDP = true;
+				gInfo->ports[gInfo->port_count++] = displayPort;
+			} else
+				delete displayPort;
+		}
 	}
 
 	// Digital Display Interface
