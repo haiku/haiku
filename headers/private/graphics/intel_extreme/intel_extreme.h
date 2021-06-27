@@ -637,6 +637,20 @@ struct intel_free_graphics_memory {
 #define 	DDI_PORT_WIDTH(width)		(((width) - 1) << 1)
 #define 	DDI_INIT_DISPLAY_DETECTED	(1 << 0)
 
+#define PIPE_DDI_FUNC_CTL_A				(0x0400 | REGS_NORTH_PIPE_AND_PORT)
+#define PIPE_DDI_FUNC_CTL_B				(0x1400 | REGS_NORTH_PIPE_AND_PORT)
+#define PIPE_DDI_FUNC_CTL_C				(0x2400 | REGS_NORTH_PIPE_AND_PORT)
+#define PIPE_DDI_FUNC_CTL_EDP			(0xF400 | REGS_NORTH_PIPE_AND_PORT)
+#define PIPE_DDI_FUNC_CTL_ENABLE		(1 << 31)
+#define PIPE_DDI_SELECT_SHIFT			28
+#define PIPE_DDI_SELECT_PORT(x)			((x) << PIPE_DDI_SELECT_SHIFT)
+#define PIPE_DDI_SELECT_MASK			(7 << PIPE_DDI_SELECT_SHIFT)
+#define PIPE_DDI_PORT_NONE				0
+#define PIPE_DDI_PORT_B					1
+#define PIPE_DDI_PORT_C					2
+#define PIPE_DDI_PORT_D					3
+#define PIPE_DDI_PORT_E					4
+
 // DP_A always @ 6xxxx, DP_B-DP_D move with PCH
 #define INTEL_DISPLAY_PORT_A			(0x4000 | REGS_NORTH_PIPE_AND_PORT)
 #define INTEL_DISPLAY_PORT_B			(0x4100 | REGS_SOUTH_TRANSCODER_PORT)
