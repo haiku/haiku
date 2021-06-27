@@ -137,6 +137,7 @@ set_display_power_mode(uint32 mode)
 			break;
 	}
 
+	//fixme: port DPMS programming should better be in Ports.cpp. Resetup..
 	if (gInfo->head_mode & HEAD_MODE_A_ANALOG) {
 		write32(INTEL_ANALOG_PORT, (read32(INTEL_ANALOG_PORT)
 				& ~(DISPLAY_MONITOR_MODE_MASK | DISPLAY_MONITOR_PORT_ENABLED))
@@ -144,7 +145,8 @@ set_display_power_mode(uint32 mode)
 			| (mode != B_DPMS_OFF ? DISPLAY_MONITOR_PORT_ENABLED : 0));
 	}
 
-	if (gInfo->head_mode & HEAD_MODE_B_DIGITAL) {
+	//fixme: port DPMS programming should better be in Ports.cpp and is faulty. Resetup..
+	if (false) {//gInfo->head_mode & HEAD_MODE_B_DIGITAL) {
 		write32(INTEL_DIGITAL_PORT_B, (read32(INTEL_DIGITAL_PORT_B)
 				& ~(/*DISPLAY_MONITOR_MODE_MASK |*/ DISPLAY_MONITOR_PORT_ENABLED))
 			| (mode != B_DPMS_OFF ? DISPLAY_MONITOR_PORT_ENABLED : 0));
