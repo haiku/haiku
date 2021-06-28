@@ -399,7 +399,8 @@ rule KernelArchitectureSetup architecture
 		case arm :
 			HAIKU_KERNEL_PIC_LINKFLAGS += -z max-page-size=0x1000 ;
 			HAIKU_KERNEL_ADDON_LINKFLAGS += -z max-page-size=0x1000 ;
-			HAIKU_KERNEL_PIC_CCFLAGS = -fno-pic ;
+			HAIKU_KERNEL_PIC_CCFLAGS = -fpic ;
+			HAIKU_KERNEL_PIC_LINKFLAGS = -shared ;
 
 		case arm64 :
 			HAIKU_KERNEL_PIC_LINKFLAGS += -z max-page-size=0x1000 ;
