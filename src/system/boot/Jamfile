@@ -307,7 +307,7 @@ for platform in [ MultiBootSubDirSetup ] {
 		# efi loader needs to be shared.
 		if $(TARGET_BOOT_PLATFORM) = efi {
 			ldflags += -shared ;
-			ldflags += -Map=efi.map ;
+			ldflags += -Map=$(HAIKU_OUTPUT_DIR)/efi.map ;
 		}
 
 		if $(TARGET_BOOT_PLATFORM) = riscv {
