@@ -1158,9 +1158,18 @@ BlockAllocator::_CheckGroup(int32 groupIndex) const
 status_t
 BlockAllocator::Trim(uint64 offset, uint64 size, uint64& trimmedSize)
 {
+	// TODO: Remove this check when offset and size handling is implemented
+	if (offset != 0
+		|| fVolume->NumBlocks() < 0
+		|| size < (uint64)fVolume->NumBlocks() * fVolume->BlockSize()) {
+		INFORM(("BFS Trim: Ranges smaller than the file system size"
+			" are not supported yet.\n"));
+		return B_UNSUPPORTED;
+	}
+
 	const uint32 kTrimRanges = 128;
 	fs_trim_data* trimData = (fs_trim_data*)malloc(sizeof(fs_trim_data)
-		+ sizeof(uint64) * kTrimRanges);
+		+ 2 * sizeof(uint64) * (kTrimRanges - 1));
 	if (trimData == NULL)
 		return B_NO_MEMORY;
 
@@ -1175,7 +1184,7 @@ BlockAllocator::Trim(uint64 offset, uint64 size, uint64& trimmedSize)
 	uint32 blockShift = fVolume->BlockShift();
 
 	uint64 firstFree = 0;
-	size_t freeLength = 0;
+	uint64 freeLength = 0;
 
 	trimData->range_count = 0;
 	trimmedSize = 0;
@@ -1191,6 +1200,15 @@ BlockAllocator::Trim(uint64 offset, uint64 size, uint64& trimmedSize)
 				if (cached.IsUsed(i)) {
 					// Block is in use
 					if (freeLength > 0) {
+						// Overflow is unlikely to happen, but check it anyway
+						if ((firstFree << blockShift) >> blockShift
+								!= firstFree
+							|| (freeLength << blockShift) >> blockShift
+								!= freeLength) {
+							FATAL(("BlockAllocator::Trim:"
+								" Overflow detected!\n"));
+							return B_ERROR;
+						}
 						status_t status = _TrimNext(*trimData, kTrimRanges,
 							firstFree << blockShift, freeLength << blockShift,
 							false, trimmedSize);
@@ -1306,7 +1324,7 @@ BlockAllocator::CheckBlockRun(block_run run, const char* type, bool allocated)
 }
 
 
-status_t
+bool
 BlockAllocator::_AddTrim(fs_trim_data& trimData, uint32 maxRanges,
 	uint64 offset, uint64 size)
 {
@@ -1333,13 +1351,16 @@ BlockAllocator::_TrimNext(fs_trim_data& trimData, uint32 maxRanges,
 	if (!pushed || force) {
 		// Trim now
 		trimData.trimmed_size = 0;
-dprintf("TRIM FS:\n");
-for (uint32 i = 0; i < trimData.range_count; i++) {
-	dprintf("[%3" B_PRIu32 "] %" B_PRIu64 " : %" B_PRIu64 "\n", i,
-		trimData.ranges[i].offset, trimData.ranges[i].size);
-}
+#ifdef DEBUG_TRIM
+		dprintf("TRIM: BFS: free ranges (bytes):\n");
+		for (uint32 i = 0; i < trimData.range_count; i++) {
+			dprintf("[%3" B_PRIu32 "] %" B_PRIu64 " : %" B_PRIu64 "\n", i,
+				trimData.ranges[i].offset, trimData.ranges[i].size);
+		}
+#endif
 		if (ioctl(fVolume->Device(), B_TRIM_DEVICE, &trimData,
-				sizeof(fs_trim_data)) != 0) {
+				sizeof(fs_trim_data)
+					+ 2 * sizeof(uint64) * (trimData.range_count - 1)) != 0) {
 			return errno;
 		}
 

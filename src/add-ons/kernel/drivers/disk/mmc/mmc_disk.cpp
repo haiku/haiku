@@ -491,36 +491,60 @@ mmc_block_trim(mmc_disk_driver_info* info, fs_trim_data* trimData)
 	};
 	TRACE("trim_device()\n");
 
+	trimData->trimmed_size = 0;
+
+	const off_t deviceSize = info->DeviceSize(); // in bytes
+	if (deviceSize < 0)
+		return B_BAD_VALUE;
+
+	STATIC_ASSERT(sizeof(deviceSize) <= sizeof(uint64));
+	ASSERT(deviceSize >= 0);
+
+	// Do not trim past device end
+	for (uint32 i = 0; i < trimData->range_count; i++) {
+		uint64 offset = trimData->ranges[i].offset;
+		uint64& size = trimData->ranges[i].size;
+
+		if (offset >= (uint64)deviceSize)
+			return B_BAD_VALUE;
+		size = min_c(size, (uint64)deviceSize - offset);
+	}
+
 	uint64 trimmedSize = 0;
 	status_t result = B_OK;
 	for (uint32 i = 0; i < trimData->range_count; i++) {
-		off_t offset = trimData->ranges[i].offset;
-		off_t length = trimData->ranges[i].size;
+		uint64 offset = trimData->ranges[i].offset;
+		uint64 length = trimData->ranges[i].size;
 
 		// Round up offset and length to multiple of the sector size
 		// The offset is rounded up, so some space may be left
 		// (not trimmed) at the start of the range.
 		offset = ROUNDUP(offset, kBlockSize);
 		// Adjust the length for the possibly skipped range
-		length -= trimData->ranges[i].offset - offset;
+		length -= offset - trimData->ranges[i].offset;
 		// The length is rounded down, so some space at the end may also
 		// be left (not trimmed).
 		length &= ~(kBlockSize - 1);
 
-		if (length == 0) {
-			trimmedSize += trimData->ranges[i].size;
+		if (length == 0)
 			continue;
-		}
 
-		TRACE("trim %" B_PRIdOFF " bytes from %" B_PRIdOFF "\n",
+		TRACE("trim %" B_PRIu64 " bytes from %" B_PRIu64 "\n",
 			length, offset);
 
 		ASSERT(offset % kBlockSize == 0);
 		ASSERT(length % kBlockSize == 0);
 
-		if (info->flags & kIoCommandOffsetAsSectors) {
+		if ((info->flags & kIoCommandOffsetAsSectors) != 0) {
 			offset /= kBlockSize;
 			length /= kBlockSize;
+		}
+
+		// Parameter of execute_command is uint32_t
+		if (offset > UINT32_MAX
+			|| length > UINT32_MAX - offset) {
+			result = B_BAD_VALUE;
+			break;
 		}
 
 		uint32_t response;
@@ -537,7 +561,8 @@ mmc_block_trim(mmc_disk_driver_info* info, fs_trim_data* trimData)
 		if (result != B_OK)
 			break;
 
-		trimmedSize += trimData->ranges[i].size;
+		trimmedSize += (info->flags & kIoCommandOffsetAsSectors) != 0
+			? length * kBlockSize : length;
 	}
 
 	trimData->trimmed_size = trimmedSize;

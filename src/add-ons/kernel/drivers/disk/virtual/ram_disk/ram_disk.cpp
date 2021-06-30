@@ -531,54 +531,78 @@ struct RawDevice : Device, DoublyLinkedListLinkImpl<RawDevice> {
 	{
 		TRACE("trim_device()\n");
 
+		trimData->trimmed_size = 0;
+
+		const off_t deviceSize = fDeviceSize; // in bytes
+		if (deviceSize < 0)
+			return B_BAD_VALUE;
+
+		STATIC_ASSERT(sizeof(deviceSize) <= sizeof(uint64));
+		ASSERT(deviceSize >= 0);
+
+		// Do not trim past device end
+		for (uint32 i = 0; i < trimData->range_count; i++) {
+			uint64 offset = trimData->ranges[i].offset;
+			uint64& size = trimData->ranges[i].size;
+
+			if (offset >= (uint64)deviceSize)
+				return B_BAD_VALUE;
+			size = min_c(size, (uint64)deviceSize - offset);
+		}
+
+		status_t result = B_OK;
 		uint64 trimmedSize = 0;
 		for (uint32 i = 0; i < trimData->range_count; i++) {
-			trimmedSize += trimData->ranges[i].size;
-
-			off_t offset = trimData->ranges[i].offset;
-			off_t length = trimData->ranges[i].size;
+			uint64 offset = trimData->ranges[i].offset;
+			uint64 length = trimData->ranges[i].size;
 
 			// Round up offset and length to multiple of the page size
 			// The offset is rounded up, so some space may be left
 			// (not trimmed) at the start of the range.
 			offset = (offset + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
 			// Adjust the length for the possibly skipped range
-			length -= trimData->ranges[i].offset - offset;
+			length -= offset - trimData->ranges[i].offset;
 			// The length is rounded down, so some space at the end may also
 			// be left (not trimmed).
 			length &= ~(B_PAGE_SIZE - 1);
 
-			TRACE("ramdisk: trim %" B_PRIdOFF " bytes from %" B_PRIdOFF "\n",
+			if (length == 0)
+				continue;
+
+			TRACE("ramdisk: trim %" B_PRIu64 " bytes from %" B_PRIu64 "\n",
 				length, offset);
 
 			ASSERT(offset % B_PAGE_SIZE == 0);
 			ASSERT(length % B_PAGE_SIZE == 0);
 
 			vm_page** pages = new(std::nothrow) vm_page*[length / B_PAGE_SIZE];
-			if (pages == NULL)
-				return B_NO_MEMORY;
+			if (pages == NULL) {
+				result = B_NO_MEMORY;
+				break;
+			}
 			ArrayDeleter<vm_page*> pagesDeleter(pages);
 
-			_GetPages(offset, length, false, pages);
+			_GetPages((off_t)offset, (off_t)length, false, pages);
 
 			AutoLocker<VMCache> locker(fCache);
-			uint32 j;
+			uint64 j;
 			for (j = 0; j < length / B_PAGE_SIZE; j++) {
 				// If we run out of pages (some may already be trimmed), stop.
 				if (pages[j] == NULL)
 					break;
 
-				TRACE("free range %" B_PRIu32 ", page %" B_PRIu32 ", offset %"
-					B_PRIdOFF "\n", i, j, offset);
+				TRACE("free range %" B_PRIu32 ", page %" B_PRIu64 ", offset %"
+					B_PRIu64 "\n", i, j, offset);
 				if (pages[j]->Cache())
 					fCache->RemovePage(pages[j]);
 				vm_page_free(NULL, pages[j]);
+				trimmedSize += B_PAGE_SIZE;
 			}
 		}
 
 		trimData->trimmed_size = trimmedSize;
 
-		return B_OK;
+		return result;
 	}
 
 

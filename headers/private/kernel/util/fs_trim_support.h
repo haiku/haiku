@@ -64,7 +64,7 @@ copy_trim_data_to_user(void* buffer, fs_trim_data* trimData)
 		return B_BAD_ADDRESS;
 
 	// Do not copy any ranges
-	return user_memcpy(buffer, trimData, sizeof(uint64) * 2);
+	return user_memcpy(buffer, trimData, offsetof(fs_trim_data, ranges));
 }
 
 

@@ -495,15 +495,46 @@ err1:
 }
 
 
-template<typename size_type> static inline void
+static inline void
 translate_partition_access(devfs_partition* partition, off_t& offset,
-	size_type& size)
+	size_t& size)
 {
 	ASSERT(offset >= 0);
 	ASSERT(offset < partition->info.size);
 
-	size = (size_type)min_c((off_t)size, partition->info.size - offset);
+	size = (size_t)min_c((off_t)size, partition->info.size - offset);
 	offset += partition->info.offset;
+}
+
+
+static bool
+translate_partition_access(devfs_partition* partition, uint64& offset,
+	uint64& size)
+{
+	const off_t partitionSize = partition->info.size;
+	const off_t partitionOffset = partition->info.offset;
+
+	// Check that off_t values can be cast to uint64,
+	// partition offset can theoretically be negative
+	ASSERT(partitionSize >= 0);
+	STATIC_ASSERT(sizeof(partitionSize) <= sizeof(uint64));
+	STATIC_ASSERT(sizeof(partitionOffset) <= sizeof(uint64));
+
+	// Check that calculations give expected results
+	if (offset >= (uint64)partitionSize)
+		return false;
+	if (partitionOffset >= 0 && offset > UINT64_MAX - (uint64)partitionOffset)
+		return false;
+	if (partitionOffset < 0 && offset < (uint64)-partitionOffset)
+		return false;
+
+	size = min_c(size, (uint64)partitionSize - offset);
+	if (partitionOffset >= 0)
+		offset += (uint64)partitionOffset;
+	else
+		offset -= (uint64)-partitionOffset;
+
+	return true;
 }
 
 
@@ -1479,14 +1510,38 @@ devfs_ioctl(fs_volume* _volume, fs_vnode* _vnode, void* _cookie, uint32 op,
 				if (status != B_OK)
 					return status;
 
+#ifdef DEBUG_TRIM
+				dprintf("TRIM: devfs: received TRIM ranges (bytes):\n");
+				for (uint32 i = 0; i < trimData->range_count; i++) {
+					dprintf("[%3" B_PRIu32 "] %" B_PRIu64 " : %"
+						B_PRIu64 "\n", i,
+						trimData->ranges[i].offset,
+						trimData->ranges[i].size);
+				}
+#endif
+
 				if (partition != NULL) {
 					// If there is a partition, offset all ranges according
 					// to the partition start.
+					// Range size may be reduced to fit the partition size.
 					for (uint32 i = 0; i < trimData->range_count; i++) {
-						translate_partition_access(partition,
+						if (!translate_partition_access(partition,
+							trimData->ranges[i].offset,
+							trimData->ranges[i].size)) {
+							return B_BAD_VALUE;
+						}
+					}
+
+#ifdef DEBUG_TRIM
+					dprintf("TRIM: devfs: TRIM ranges after partition"
+						" translation (bytes):\n");
+					for (uint32 i = 0; i < trimData->range_count; i++) {
+						dprintf("[%3" B_PRIu32 "] %" B_PRIu64 " : %"
+							B_PRIu64 "\n", i,
 							trimData->ranges[i].offset,
 							trimData->ranges[i].size);
 					}
+#endif
 				}
 
 				status = vnode->stream.u.dev.device->Control(
