@@ -9,7 +9,6 @@ SubInclude HAIKU_TOP src libs gnu ;
 SubInclude HAIKU_TOP src libs icon ;
 SubInclude HAIKU_TOP src libs iconv ;
 SubInclude HAIKU_TOP src libs libtelnet ;
-SubInclude HAIKU_TOP src libs libunwind ;
 SubInclude HAIKU_TOP src libs linprog ;
 SubInclude HAIKU_TOP src libs mapm ;
 SubInclude HAIKU_TOP src libs posix_error_mapper ;
