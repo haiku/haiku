@@ -1015,8 +1015,45 @@ DisplayPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	TRACE("%s: %s %dx%d\n", __func__, PortName(), target->virtual_width,
 		target->virtual_height);
 
-	ERROR("TODO: DisplayPort\n");
-	return B_ERROR;
+	if (fPipe == NULL) {
+		ERROR("%s: Setting display mode without assigned pipe!\n", __func__);
+		return B_ERROR;
+	}
+
+	//fixme: doesn't work yet. For now just scale to native mode.
+#if 0
+	// Setup PanelFitter and Train FDI if it exists
+	PanelFitter* fitter = fPipe->PFT();
+	if (fitter != NULL)
+		fitter->Enable(*target);
+	FDILink* link = fPipe->FDI();
+	if (link != NULL)
+		link->Train(target);
+
+	pll_divisors divisors;
+	compute_pll_divisors(target, &divisors, false);
+
+	uint32 extraPLLFlags = 0;
+	if (gInfo->shared_info->device_type.Generation() >= 3)
+		extraPLLFlags |= DISPLAY_PLL_MODE_NORMAL | DISPLAY_PLL_2X_CLOCK;
+
+	// Program general pipe config
+	fPipe->Configure(target);
+
+	// Program pipe PLL's
+	fPipe->ConfigureClocks(divisors, target->timing.pixel_clock, extraPLLFlags);
+
+	// Program target display mode
+	fPipe->ConfigureTimings(target);
+#endif
+
+	// Keep monitor at native mode and scale image to that
+	fPipe->ConfigureScalePos(target);
+
+	// Set fCurrentMode to our set display mode
+	memcpy(&fCurrentMode, target, sizeof(display_mode));
+
+	return B_OK;
 }
 
 

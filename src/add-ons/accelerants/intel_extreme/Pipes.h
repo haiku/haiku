@@ -40,6 +40,7 @@ public:
 		void						Disable();
 
 		void						Configure(display_mode* mode);
+		void						ConfigureScalePos(display_mode* mode);
 		void						ConfigureTimings(display_mode* mode,
 										bool hardware = true);
 		void						ConfigureClocks(

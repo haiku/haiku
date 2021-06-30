@@ -242,6 +242,14 @@ probe_ports()
 		read32(INTEL_DIGITAL_PORT_B), read32(INTEL_DIGITAL_PORT_C));
 	TRACE("lvds: %08" B_PRIx32 "\n", read32(INTEL_DIGITAL_LVDS_PORT));
 
+	TRACE("dp_a: %08" B_PRIx32 "\n", read32(INTEL_DISPLAY_PORT_A));
+	TRACE("dp_b: %08" B_PRIx32 "\n", read32(INTEL_DISPLAY_PORT_B));
+	TRACE("dp_c: %08" B_PRIx32 "\n", read32(INTEL_DISPLAY_PORT_C));
+	TRACE("dp_d: %08" B_PRIx32 "\n", read32(INTEL_DISPLAY_PORT_D));
+	TRACE("tra_dp: %08" B_PRIx32 "\n", read32(INTEL_TRANSCODER_A_DP_CTL));
+	TRACE("trb_dp: %08" B_PRIx32 "\n", read32(INTEL_TRANSCODER_B_DP_CTL));
+	TRACE("trc_dp: %08" B_PRIx32 "\n", read32(INTEL_TRANSCODER_C_DP_CTL));
+
 	bool foundLVDS = false;
 	bool foundDP = false;
 	bool foundDDI = false;

@@ -169,6 +169,47 @@ Pipe::_ConfigureTranscoder(display_mode* target)
 
 
 void
+Pipe::ConfigureScalePos(display_mode* target)
+{
+	CALLED();
+
+	TRACE("%s: fPipeOffset: 0x%" B_PRIx32"\n", __func__, fPipeOffset);
+
+	if (target == NULL) {
+		ERROR("%s: Invalid display mode!\n", __func__);
+		return;
+	}
+
+	if (gInfo->shared_info->device_type.Generation() < 6) {
+		// FIXME check on which generations this register exists
+		// (it appears it would be available only for cursor planes, not
+		// display planes)
+		// Since we set the plane to be the same size as the display, we can
+		// just show it starting at top-left.
+		write32(INTEL_DISPLAY_A_POS + fPipeOffset, 0);
+	}
+
+	// The only thing that really matters: set the image size and let the
+	// panel fitter or the transcoder worry about the rest
+	write32(INTEL_DISPLAY_A_PIPE_SIZE + fPipeOffset,
+		((uint32)(target->virtual_width - 1) << 16)
+			| ((uint32)target->virtual_height - 1));
+
+	// Set the plane size as well while we're at it (this is independant, we
+	// could have a larger plane and scroll through it).
+	if (gInfo->shared_info->device_type.Generation() <= 4) {
+		// This is "reserved" on G35 and GMA965, but needed on 945 (for which
+		// there is no public documentation), and I assume earlier devices as
+		// well. Note that the height and width are swapped when compared to
+		// the other registers.
+		write32(INTEL_DISPLAY_A_IMAGE_SIZE + fPipeOffset,
+			((uint32)(target->virtual_height - 1) << 16)
+			| ((uint32)target->virtual_width - 1));
+	}
+}
+
+
+void
 Pipe::ConfigureTimings(display_mode* target, bool hardware)
 {
 	CALLED();
@@ -208,32 +249,7 @@ Pipe::ConfigureTimings(display_mode* target, bool hardware)
 			| ((uint32)target->timing.v_sync_start - 1));
 	}
 
-	if (gInfo->shared_info->device_type.Generation() < 6) {
-		// FIXME check on which generations this register exists
-		// (it appears it would be available only for cursor planes, not
-		// display planes)
-		// Since we set the plane to be the same size as the display, we can
-		// just show it starting at top-left.
-		write32(INTEL_DISPLAY_A_POS + fPipeOffset, 0);
-	}
-
-	// The only thing that really matters: set the image size and let the
-	// panel fitter or the transcoder worry about the rest
-	write32(INTEL_DISPLAY_A_PIPE_SIZE + fPipeOffset,
-		((uint32)(target->virtual_width - 1) << 16)
-			| ((uint32)target->virtual_height - 1));
-
-	// Set the plane size as well while we're at it (this is independant, we
-	// could have a larger plane and scroll through it).
-	if (gInfo->shared_info->device_type.Generation() <= 4) {
-		// This is "reserved" on G35 and GMA965, but needed on 945 (for which
-		// there is no public documentation), and I assume earlier devices as
-		// well. Note that the height and width are swapped when compared to
-		// the other registers.
-		write32(INTEL_DISPLAY_A_IMAGE_SIZE + fPipeOffset,
-			((uint32)(target->virtual_height - 1) << 16)
-			| ((uint32)target->virtual_width - 1));
-	}
+	ConfigureScalePos(target);
 
 	if (fHasTranscoder && hardware) {
 		_ConfigureTranscoder(target);
