@@ -183,6 +183,8 @@ virtual	bool						IsConnected();
 virtual status_t					SetDisplayMode(display_mode* mode,
 										uint32 colorMode);
 
+virtual pipe_index					PipePreference();
+
 protected:
 virtual	addr_t						_DDCRegister();
 virtual	addr_t						_PortRegister();

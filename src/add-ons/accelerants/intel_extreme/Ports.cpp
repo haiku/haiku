@@ -227,6 +227,7 @@ Port::GetPLLLimits(pll_limits& limits)
 pipe_index
 Port::PipePreference()
 {
+	CALLED();
 	// Ideally we could just return INTEL_PIPE_ANY for all devices by default, but
 	// this doesn't quite work yet. We need to use the BIOS presetup pipes for now.
 	if (gInfo->shared_info->device_type.Generation() < 4)
@@ -418,6 +419,7 @@ LVDSPort::LVDSPort()
 pipe_index
 LVDSPort::PipePreference()
 {
+	CALLED();
 	// Older devices have hardcoded pipe/port mappings, so just use that
 	if (gInfo->shared_info->device_type.Generation() < 4)
 		return INTEL_PIPE_B;
@@ -899,6 +901,53 @@ DisplayPort::DisplayPort(port_index index, const char* baseName)
 	:
 	Port(index, baseName)
 {
+}
+
+
+pipe_index
+DisplayPort::PipePreference()
+{
+	CALLED();
+	if (gInfo->shared_info->device_type.Generation() <= 4)
+		return INTEL_PIPE_ANY;
+
+	// Notes:
+	// - The BIOSes seen sofar do not use PIPE C by default.
+	// - Looks like BIOS selected Transcoder (A,B,C) is not always same as selected Pipe (A,B,C)
+	//   so these should probably be handled seperately. For now this is OK as we don't touch
+	//   the pipe for DisplayPort, only the transcoder..
+	uint32 TranscoderPort = INTEL_TRANS_DP_PORT_NONE;
+	switch (PortIndex()) {
+		case INTEL_PORT_A:
+			return INTEL_PIPE_ANY;
+		case INTEL_PORT_B:
+			TranscoderPort = INTEL_TRANS_DP_PORT_B;
+			break;
+		case INTEL_PORT_C:
+			TranscoderPort = INTEL_TRANS_DP_PORT_C;
+			break;
+		case INTEL_PORT_D:
+			TranscoderPort = INTEL_TRANS_DP_PORT_D;
+			break;
+		default:
+			return INTEL_PIPE_ANY;
+	}
+
+	for (uint32 Transcoder = 0; Transcoder < 3; Transcoder++) {
+		if ((read32(INTEL_TRANSCODER_A_DP_CTL + (Transcoder << 12)) & INTEL_TRANS_DP_PORT_MASK) ==
+			INTEL_TRANS_DP_PORT(TranscoderPort)) {
+			switch (Transcoder) {
+				case 0:
+					return INTEL_PIPE_A;
+				case 1:
+					return INTEL_PIPE_B;
+				case 2:
+					return INTEL_PIPE_C;
+			}
+		}
+	}
+
+	return INTEL_PIPE_ANY;
 }
 
 
