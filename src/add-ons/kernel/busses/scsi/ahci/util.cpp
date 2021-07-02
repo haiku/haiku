@@ -93,6 +93,11 @@ status_t
 sg_memcpy(const physical_entry *sgTable, int sgCount, const void *data,
 	size_t dataSize)
 {
+	if (sgTable == NULL || data == NULL) {
+		if (dataSize == 0)
+			return B_OK;
+		return B_ERROR;
+	}
 	int i;
 	for (i = 0; i < sgCount && dataSize > 0; i++) {
 		size_t size = min_c(dataSize, sgTable[i].size);
