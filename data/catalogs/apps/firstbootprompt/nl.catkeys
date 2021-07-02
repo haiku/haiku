@@ -67,7 +67,7 @@ Custom	BootPromptWindow		Aangepast
 Norwegian	KeymapNames		Noors
 Danish	KeymapNames		Deens
 Bulgarian (Phonetic)	KeymapNames		Bulgaars (Fonetisch)
-Try out %distroname%	BootPromptWindow		%distroname proberen
+Try out %distroname%	BootPromptWindow		%distroname% proberen
 Canadian-French	KeymapNames		Canadees-Frans
 Russian	KeymapNames		Russisch
 Hungarian	KeymapNames		Hongaars

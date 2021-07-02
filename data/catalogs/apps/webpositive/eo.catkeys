@@ -52,7 +52,7 @@ Clear	WebPositive Window		Viŝi
 Cookies for %s	Cookie Manager		Retkuketo por %s
 The download could not be opened.	Download Window		La elŝutito ne povas esti uzata.
 Close	Download Window		Fermi
-WebPositive	System name		La Retprospero (WebPositive)
+WebPositive	System name		Retprospero
 %s - Search term	Settings Window		%s - Serĉvorto
 Reload	WebPositive Window		Reŝargi
 Expiration	Cookie Manager		Eksvalidiĝo
@@ -107,7 +107,7 @@ Show tabs if only one page is open	Settings Window		Montri panelon de langetoj e
 Close tab	WebPositive Window		Fermi langeton
 Remove	Download Window		Forigi
 About	WebPositive Window		Pri
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		La elŝutado daŭras, ĉu vi certas ke vi volas ĉesigi la Retprosperon nun?
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		La elŝutado daŭras, ĉu vi certas ke vi volas ĉesigi Retprosperon nun?
 Continue downloads	WebPositive		Daŭrigi elŝutadon
 Proxy server requires authentication	Settings Window		La prokurilo postulas aŭtentigon
 Cancel	Settings Window		Nuligi
@@ -132,7 +132,7 @@ Next	WebPositive Window		Sekva
 Bookmark error	WebPositive Window		Eraro de legosignoj
 OK	WebPositive Window		Bone
 (%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% el %expectedSize%, %rate%/s)
-WebPositive	Download Window		La Retprospero (WebPositive)
+WebPositive	Download Window		Retprospero
 Zoom text only	WebPositive Window		Zomi nur tekston
 Save page as…	WebPositive Window		Konservi paĝon kiel...
 Page source error	WebPositive Window		Eraro de paĝa fonto

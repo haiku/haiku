@@ -15,7 +15,7 @@ The panel experienced a problem!	MainWindow		A panel hibát okozott!
 Device	DiskView		Eszköz
 Are you sure you want to format the Intel Extended Partition? Any subpartitions it contains will be overwritten if you continue. You will be asked again before changes are written to the disk.	MainWindow		Biztosan megformázod az Intel kiterjesztett partíciót? Az abban szereplő partíciók is törlődnek. A változtatások véglegesítése előtt újra meg kell erősíteni a műveletet.
 Unmount	MainWindow		Leválasztás
-Failed to format the partition %s!\n	MainWindow		Nem sikerült előkészíteni a partíciót: „%s”.\n
+Failed to format the partition %s!\n	MainWindow		Nem sikerült előkészíteni a partíciót: %s.\n
 Partition size	CreateParametersPanel		A partíció mérete
 Validation of the given parameters failed.	MainWindow		A megadott paramétereket nem sikerült érvényesíteni.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Biztosan meg akarod formázni a partíciót \"%s\"? A végleges művelet előtt még egyszer meg kell ezt erősítened.
@@ -23,10 +23,10 @@ DriveSetup	System name		Lemezkezelő
 Mounted at	PartitionList		Csatolási pont
 Create…	MainWindow		Létrehozás…
 Write changes	MainWindow		Írás a lemezre
-Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Nem sikerült előkészíteni a(z) „%s” partíciót. A lemez tartalma érintetlen maradt.
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Nem sikerült előkészíteni a(z) %s partíciót. A lemez tartalma érintetlen maradt.
 Validation of the given creation parameters failed.	MainWindow		A létrehozáshoz megadott paramétereket nem sikerült érvényesíteni.
 Eject	MainWindow		Kiadás
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Biztosan lemezre szeretnéd írni a kijelölt változtatásokat?\n\nEz esetben a „%s” lemez teljes tartalma visszavonhatatlanul meg fog semmisülni.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Biztosan lemezre szeretnéd írni a kijelölt változtatásokat?\n\nEz esetben a %s lemez teljes tartalma visszavonhatatlanul meg fog semmisülni.
 Surface test (not implemented)	MainWindow		Felületellenőrzés (még nem működik)
 Read only	PartitionList		Csak olvasható
 The panel could not return successfully.	MainWindow		A panel sikertelenül tért vissza.
@@ -63,7 +63,7 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Change	ChangeParametersPanel		Módosítás
 Partition name:	ChangeParametersPanel		Partíció neve:
 LUKS encrypted	Encryption utils		LUKS-al kódolt
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Biztosan a lemezre szeretnéd írni a kijelölt változtatásokat?\n\nEz esetben a(z) „%s” partíció teljes tartalma visszavonhatatlanul meg fog semmisülni.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Biztosan a lemezre szeretnéd írni a kijelölt változtatásokat?\n\nEz esetben a(z) %s partíció teljes tartalma visszavonhatatlanul meg fog semmisülni.
 Empty space	PartitionList		Üres terület
 Cancel	AbstractParametersPanel		Mégse
 Format	MainWindow		Formázás
@@ -83,7 +83,7 @@ Partition	MainWindow		Partíció
 Change parameters	MainWindow		Paraméterek módosítása
 Rescan	MainWindow		Frissítés
 There was an error acquiring the partition row.	MainWindow		Hiba történt a partíció adatainak lekérdezésénél.
-Failed to initialize the disk %s!\n	MainWindow		Nem sikerült előkészíteni a partíciót: „%s”.\n
+Failed to initialize the disk %s!\n	MainWindow		Nem sikerült előkészíteni a partíciót: %s.\n
 Disk system \"%s\" not found!	MainWindow		\"%s\" lemez típus nem található!
 The partition cannot be unmounted.	MainWindow		A partíció nem választható le.
 Delete	MainWindow		Törlés

@@ -1,5 +1,4 @@
-1	slovak	x-vnd.Haiku-HaikuDepot	1274452172
-Uninstall	PackageManager		Odinštalovať
+1	slovak	x-vnd.Haiku-HaikuDepot	836070171
 Uninstalled	PackageListView		Odinštalované
 Available packages	MainWindow		Dostupné balíky
 Create account	UserLoginWindow		Vytvoriť účet
@@ -21,8 +20,6 @@ Rate %Package%	RatePackageWindow		Ohodnotiť %Package%
 Quit HaikuDepot	App		Ukončiť HaikuDepot
 Category	FilterView		Kategória
 Installed packages	MainWindow		Nainštalované balíky
-Fatal error	PackageManager		Kritická chyba
-Package action failed	PackageInfoView		Operácia s balíkom zlyhala
 No changelog available.	PackageInfoView		Záznam zmien nie je dostupný.
 There was a puzzling response from the web service.	UserLoginWindow		Od webovej služby prišla neočakávaná odpoveď.
 Not logged in	MainWindow		Neprihlásený
@@ -38,11 +35,9 @@ About	PackageInfoView		O aplikácii
 Stability	RatePackageWindow		Stabilita
 Send	RatePackageWindow		Poslať
 Start package daemon	App		Spustiť démona balíkov
-The package action could not be scheduled: %Error%	PackageInfoView		Operáciu s balíkom nebolo možné naplánovať: %Error%
 Cancel	RatePackageWindow		Zrušiť
 Inactive	PackageListView		Neaktívne
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# položka} few{# položky} other{# položiek}}
-OK	PackageInfoView		OK
 Downloading:	PackageInfoView		Sťahuje sa:
 Success	UserLoginWindow		Úspech
 (%Votes%)	PackageInfoView		(%Votes%)
@@ -79,7 +74,6 @@ Authentication failed	UserLoginWindow		Overenie totožnosti zlyhalo
 Manage repositories…	MainWindow		Spravovať zdroje softvéru…
 Description	PackageListView		Popis
 Open %DeskbarLink%	PackageManager		Otvoriť %DeskbarLink%
-Install	PackageManager		Nainštalovať
 Input validation	UserLoginWindow		Overenie platnosti vstupu
 Log in…	MainWindow		Prihlásiť sa…
 You need to be logged into an account before you can rate packages.	MainWindow		Musíte byť prihlásení do účtu predtým, než budete môcť hodnotiť balíky.

@@ -1,2 +1,6 @@
-1	russian	x-vnd.haiku-screenshot-cli	721864121
+1	russian	x-vnd.haiku-screenshot-cli	3988100505
+Include window border	ScreenshotWindow		Включая заголовок окна
+Overwrite	ScreenshotWindow		Перезаписать
+Save in:	ScreenshotWindow		Сохранить в:
+Error saving \"%s\":\n\t%s	ScreenshotWindow		Ошибка при сохранении \"%s\":\n\t%s
 screenshot	Screenshot	Base filename of screenshot files	снимок

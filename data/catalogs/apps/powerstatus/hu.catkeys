@@ -1,6 +1,6 @@
 1	hungarian	x-vnd.Haiku-PowerStatus	1085070685
 Run in window	PowerStatus		Futtatás ablakban
-Extended battery info	PowerStatus		Bővebb akku információ
+Extended battery info	PowerStatus		Akkumulátor információ
 Show status icon	PowerStatus		Állapotikon megjelenítése
 Battery charging	PowerStatus		Akku töltődik
 Design capacity low warning: 	PowerStatus		Figyelmeztetés alacsony tervezett kapacitásnál: 
@@ -26,7 +26,7 @@ Battery info…	PowerStatus		Akku infó…
 Show time	PowerStatus		Idő kijelzése
  mA	PowerStatus		 mA
 About…	PowerStatus		Névjegy…
-Serial number: 	PowerStatus		Szériaszám: 
+Serial number: 	PowerStatus		Sorozatszám: 
 Battery critical	PowerStatus		Veszélyesen alacsony töltés
 Capacity: 	PowerStatus		Kapacitás: 
  mW	PowerStatus		 mW
@@ -37,7 +37,7 @@ The battery level is getting low, please plug in the device.	PowerStatus		Az akk
 Design capacity warning: 	PowerStatus		Tervezett kapacitás figyelmeztetés: 
 Capacity granularity 2: 	PowerStatus		Kapacitás granularitás 2: 
 Too bad!	PowerStatus		Kár...
-Technology: 	PowerStatus		Technológia:
+Technology: 	PowerStatus		Technológia: 
  mWh	PowerStatus		 mWh
 PowerStatus	System name		Energiaállapot
 Design capacity: 	PowerStatus		Tervezett kapacitás: 

@@ -1,0 +1,6 @@
+1	portuguese (brazil)	x-vnd.Haiku-bluetooth_server	3947256172
+Stopping the Bluetooth server failed.	BluetoothReplicant		Falha ao interromper o servidor Bluetooth.
+Settings…	BluetoothReplicant		Definições…
+OK	BluetoothReplicant		OK
+Error: %status%	BluetoothReplicant		Erro: %status%
+Quit	BluetoothReplicant		Sair

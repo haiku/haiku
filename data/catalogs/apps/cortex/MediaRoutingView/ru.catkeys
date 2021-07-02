@@ -1,0 +1,30 @@
+1	russian	application/x-vnd.Cortex.MediaRoutingView	810580958
+Lock group	MediaNodePanel		Заблокировать группу
+%refname% (no file)	MediaNodePanel		%refname% (нет файла)
+Video output	MediaRoutingView		Видеовыход
+Icon view	MediaRoutingView		Большие значки
+OK	MediaRoutingView		ОК
+Cycle	MediaNodePanel		Цикл
+Advanced	MediaNodePanel		Дополнительно
+Audio input	MediaRoutingView		Аудиовход
+Run mode	MediaNodePanel		Режим работы
+Could not load '%filename%'	MediaRoutingView		Не удалось загрузить '%filename%'
+Stop time source	MediaNodePanel		Остановить источник времени
+Be Audio Mixer	MediaRoutingView		Ве аудиомикшер
+Video input	MediaRoutingView		Видеовход
+Disconnect	MediaRoutingView		Разъединить
+Could not disconnect	MediaRoutingView		Не удалось разъединить
+Could not instantiate '%infoname%'	MediaRoutingView		Не удалось создать '%infoname%'
+Mini icon view	MediaRoutingView		Маленькие значки
+Select all	MediaRoutingView		Выбрать все
+Input	MediaJack		Вход
+Get info	MediaJack		Информация
+Error	MediaRoutingView		Ошибка
+Output	MediaJack		Вывод
+Get info	MediaNodePanel		Информация
+Get info	MediaRoutingView		Информация
+Clean up	MediaRoutingView		Очистить
+Start control panel	MediaNodePanel		Запустить панель управления
+Tweak parameters	MediaNodePanel		Настройка параметров
+Could not connect	MediaRoutingView		Не удалось подключиться
+Unlock group	MediaNodePanel		Разблокировать группу

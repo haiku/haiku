@@ -47,7 +47,7 @@ Attributes	MediaPlayer-Main		Jellemzők
 Bottom of screen	MediaPlayer-SettingsWindow		A képernyő alján
 MediaPlayer settings	MediaPlayer-SettingsWindow		Médialejátszó beállításai
 Copyright	MediaPlayer-InfoWin		Másolásvédett
-Invalid URL inserted!	MediaPlayer-NetworkStream		A megadott cím érvénytelen.
+Invalid URL inserted!	MediaPlayer-NetworkStream		A megadott cím érvénytelen!
 Aspect ratio	MediaPlayer-Main		Képarány
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Lejátszási lista mentése sikertelen.\n\nHiba:
 <no media>	MediaPlayer-InfoWin		<nincs fájl>

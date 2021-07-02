@@ -1,9 +1,17 @@
-1	portuguese (brazil)	x-vnd.Haiku-keystore_server	1147091869
+1	portuguese (brazil)	x-vnd.Haiku-keystore_server	2429996361
+to perform the following action:\n%accessString%\n\n	AppAccessRequestWindow		para realizar a seguinte ação:\n%accessString%\n\n
+This application doesn't yet have the required privileges.	AppAccessRequestWindow		Este aplicativo ainda não tem os privilégios necessários.
+Keyring:	KeyRequestWindow		Chaveiro:
 requests access to keyring:\n%keyringName%\n\n	AppAccessRequestWindow		solicita acesso ao chaveiro:\n%keyringName%\n\n
 Application keyring access	AppAccessRequestWindow		Acesso ao chaveiro do aplicativo
 Disallow	AppAccessRequestWindow		Proibir
 Allow once	AppAccessRequestWindow		Permitir uma vez
+Unlock keyring	KeyRequestWindow		Desbloquear chaveiro
+An application wants to access the keyring below, but it is locked with a passphrase. Please enter the passphrase to unlock the keyring.\nIf you unlock the keyring, it stays unlocked until the system is shut down or the keyring is manually locked again.\nIf you cancel this dialog the keyring will remain locked.	KeyRequestWindow		Um aplicativo quer acessar o chaveiro abaixo, mas ele está bloqueado com uma senha. Por favor insira a senha para desbloquear o chaveiro.\nSe você desbloquear o chaveiro, ele continuará desbloqueado até o sistema ser desligado ou o chaveiro for bloqueado manualmente de novo.\nSe você cancelar este diálogo o chaveiro vai continuar bloqueado.
+Password:	KeyRequestWindow		Senha:
+Cancel	KeyRequestWindow		Cancelar
 This application has been updated since it was last granted access.	AppAccessRequestWindow		Este aplicativo foi atualizado desde que perdeu o acesso concedido.
 Allow always	AppAccessRequestWindow		Permitir sempre
 Unlock	KeyRequestWindow		Desbloquear
+The application:\n%signature% (%path%)\n\n	AppAccessRequestWindow		O aplicativo:\n%signature% (%path%)\n\n
 This application hasn't been granted access before.	AppAccessRequestWindow		A este aplicativo não foi concedido acesso previamente.

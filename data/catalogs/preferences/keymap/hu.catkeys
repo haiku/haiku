@@ -111,7 +111,7 @@ Thai (TIS-820.2538)	KeymapNames		Thai (TIS-820.2538)
 Control:	Modifier keys window	Control key role name	Vezérlőbillentyű
 Generic 105-key International	KeyboardLayoutNames		Hagyományos 105 billentyűs (nemzetközi)
 Disabled	Modifier keys window	Do nothing	Letiltva
-Select dead keys	Keymap window		„Beragadó” gombok kiválasztása
+Select dead keys	Keymap window		Beragadó gombok kiválasztása
 Russian (Mac)	KeymapNames		Orosz (Mac)
 Right shift	Keyboard Layout View		Jobb Shift
 ESC	Keyboard Layout View		ESC

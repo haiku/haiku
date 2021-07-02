@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Notifications	2334112933
+1	russian	x-vnd.Haiku-Notifications	4196496676
 Lower left	GeneralView		Внизу слева
 Application does not have a valid signature	NotificationView	Alert message	Приложение не имеет действительной подписи
 Status	NotificationView		Статус
@@ -10,8 +10,11 @@ OK	PrefletWin		ОК
 Notifications	PrefletWin		Уведомления
 Notifications preflet sample	PrefletWin		Пример панели уведомления
 Mute notifications from this application	NotificationView		Приглушить уведомления от этого приложения
+wide	GeneralView	Window width: Slider high text	широкая
+narrow	GeneralView	Window width: Slider low text	узкая
 Revert	PrefletWin		Вернуть
 Applications	PrefletView		Приложения
+{0, plural, =1{Timeout: # second}other{Timeout: # seconds}}	GeneralView		{0, plural, =1{Время ожидания: # секунда} few{Время ожидания: # секунды} other{Время ожидания: # секунд}}
 Upper right	GeneralView		Вверху справа
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Произошла ошибка при сохранении настроек.\nВозможно кончилось место на диске.
 Defaults	PrefletWin		По умолчанию

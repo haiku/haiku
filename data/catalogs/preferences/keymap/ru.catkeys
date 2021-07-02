@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Keymap	1075970008
+1	russian	x-vnd.Haiku-Keymap	2850776429
 Key	Modifier keys window	As in a computer keyboard key	Клавиша
 Japanese	KeymapNames		Японская
 US	KeymapNames		США
@@ -6,6 +6,7 @@ PG ↑	Keyboard Layout View	Very short for 'page up'	PgUp
 Brazilian	KeymapNames		Бразильская
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (US)
 Right control	Keyboard Layout View		Правый control
+X-Bows Nature	KeyboardLayoutNames		X-Bows Nature
 Dvorak	KeymapNames		Дворак
 Option:	Modifier keys window	Option key role name	Option:
 Cancel	Modifier keys window		Отмена
@@ -89,6 +90,7 @@ Esperanto	KeymapNames		Эсперанто
 Belarusian	KeymapNames		Беларуская
 Warning: left and right key roles do not match	Modifier keys window		Внимание: роль левой и правой клавиши не совпадают
 Circumflex trigger	Keymap window		Циркумфлекс
+Fizzbook NL2	KeyboardLayoutNames		Fizzbook NL2
 Caps lock	Keyboard Layout View		Caps lock
 Left shift	Keyboard Layout View		Левый shift
 Russian (Yawert)	KeymapNames		Русская (фонетическая)

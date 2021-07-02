@@ -1,0 +1,15 @@
+1	russian	application/x-vnd.Cortex.support	3767779850
+Header has flags	MediaString		Заголовок имеет флаги
+Recording	MediaString		Запись
+(unknown format)	MediaString		(неизвестный формат)
+Mono	MediaString		Моно
+Encoded video	MediaString		Кодированное видео
+Port	MediaString		Порт
+(unkown video orientation)	MediaString		неизвестная ориентация видео
+(unknown video format)	MediaString		(неизвестный формат видео)
+Right	MediaString		Правый
+Physical output	MediaString		Физический выход
+Top to bottom, left to right	MediaString		Сверху вниз, слева направо
+QuickTime format family	MediaString		Семейство формата QuickTime
+Any format family	MediaString		Семейство любого формата
+Timecode	MediaString		Временной код

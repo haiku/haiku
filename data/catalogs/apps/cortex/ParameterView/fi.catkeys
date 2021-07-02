@@ -1,0 +1,8 @@
+1	finnish	application/x-vnd.Cortex.ParameterView	1295152157
+Themes	ParameterWindow		Teemat
+Start control panel	ParameterWindow		Käynnistä ohjauspaneeli
+%nodeinfo% parameters	ParameterWindow		%nodeinfo% -parametrit
+OK	ParameterWindow		Valmis
+Window	ParameterWindow		Ikkuna
+Could not start control panel (%error%)	ParameterWindow		Ohjauspaneelin (%error%) käynnistäminen epäonnistui
+Close	ParameterWindow		Sulje

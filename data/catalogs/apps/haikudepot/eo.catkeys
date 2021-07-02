@@ -1,10 +1,9 @@
-1	esperanto	x-vnd.Haiku-HaikuDepot	1629587309
+1	esperanto	x-vnd.Haiku-HaikuDepot	1191205308
 Repository update error	LocalRepositoryUpdateProcess		Eraro dum ĝisdatigo de deponejo
 Network error	ServerHelper		Eraro de reto
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Eraro okazis dum aktualigo de la deponejo: %error%
 User Created	UserLoginWindow		Kreis Uzanton
 Check for updates…	MainWindow		Kontroli ĝisdatigojn…
-Uninstall	PackageManager		Malinstali
 Uninstalled	PackageListView		Malinstalita
 It was not possible to create the new user.	UserLoginWindow		Krei la novan uzanton ne estis ebla.
 Available packages	MainWindow		Disponeblaj pakaĵoj
@@ -46,8 +45,6 @@ Category	FilterView		Kategorio
 User rating	RatePackageWindow		Uzanta takso
 Installed packages	MainWindow		Instalitaj pakaĵoj
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Petita objekto aŭ objekto de la peto ne troviĝis en la servilo.
-Fatal error	PackageManager		Neriparebla eraro
-Package action failed	PackageInfoView		Pakaĵa ago malsukcesis
 No changelog available.	PackageInfoView		Ŝanĝoprotokolo ne estas disponebla.
 Error	App		Eraro
 There was a puzzling response from the web service.	UserLoginWindow		Estis stranga respondo el la reta servo.
@@ -79,7 +76,6 @@ Stability	RatePackageWindow		Stabileco
 Send	RatePackageWindow		Sendi
 Start package daemon	App		Ekruli pakaĵan demonon
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		La pasvorto devas esti ripetiĝita pro averti pasvortajn mistajpojn.
-The package action could not be scheduled: %Error%	PackageInfoView		La pakaĵa ago ne povis esti planita: %Error%
 Cancel	SettingsWindow		Nuligi
 Cancel	RatePackageWindow		Nuligi
 Inactive	PackageListView		Neaktiva
@@ -89,7 +85,6 @@ There are problems in the supplied data:	UserLoginWindow		Estas problemoj en la 
 OK	MainWindow		Bone
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# ero} other{# eroj}}
 Usage conditions download problem	UserLoginWindow		Problemo pri elŝuti uzkondiĉojn
-OK	PackageInfoView		Bone
 Downloading:	PackageInfoView		Elŝutas:
 Quit	MainWindow		Ĉesi
 Success	UserLoginWindow		Sukceso
@@ -170,7 +165,6 @@ Fetching remote repository data	LocalRepositoryUpdateProcess		Elŝutado de fora 
 Description	PackageListView		Priskribo
 Open %DeskbarLink%	PackageManager		Uzi %DeskbarLink%-on
 User creation error	UserLoginWindow		Uzanta kreada eraro
-Install	PackageManager		Instali
 Input validation	UserLoginWindow		Validigo de enigo
 Log in…	MainWindow		Ensaluti…
 You need to be logged into an account before you can rate packages.	MainWindow		Vi devas esti ensalutita per konto antaŭ vi povas taksi pakaĵojn.

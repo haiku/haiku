@@ -1,0 +1,11 @@
+1	russian	application/x-vnd.Cortex.TransportView	3262162925
+Start	TransportView		Старт
+No errors.	TransportView		Нет ошибок.
+Stop	TransportView		Стоп
+(no group)	TransportView		(нет группы)
+Recording	TransportView		Запись
+Increase latency	TransportView		Увеличить задержку
+Time source:	TransportView		Источник времени:
+DAC time source	TransportView		Источник времени ЦАП
+System clock	TransportView		Системное время
+From:	TransportView		От:

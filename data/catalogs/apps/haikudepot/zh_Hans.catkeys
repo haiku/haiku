@@ -1,6 +1,5 @@
-1	english	x-vnd.Haiku-HaikuDepot	2133421725
+1	english	x-vnd.Haiku-HaikuDepot	1695039724
 Check for updates…	MainWindow		检查更新…
-Uninstall	PackageManager		卸载
 Uninstalled	PackageListView		已卸载
 Available packages	MainWindow		可用软件包
 Create account	UserLoginWindow		创建账号
@@ -23,8 +22,6 @@ Quit HaikuDepot	App		退出 HaikuDepot
 Category	FilterView		分类
 User rating	RatePackageWindow		用户评分
 Installed packages	MainWindow		已安装软件包
-Fatal error	PackageManager		严重错误
-Package action failed	PackageInfoView		软件包操作失败
 No changelog available.	PackageInfoView		未发现更新记录。
 There was a puzzling response from the web service.	UserLoginWindow		网络服务响应异常。
 Not logged in	MainWindow		未登陆
@@ -42,11 +39,9 @@ About	PackageInfoView		关于
 Stability	RatePackageWindow		稳定性
 Send	RatePackageWindow		发送
 Start package daemon	App		启动软件包管理后台
-The package action could not be scheduled: %Error%	PackageInfoView		软件包操作无法预订执行：%Error%
 Cancel	RatePackageWindow		取消
 Inactive	PackageListView		未激活
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# item} other{# items}}
-OK	PackageInfoView		确定
 Downloading:	PackageInfoView		下载中：
 Success	UserLoginWindow		成功
 Package daemon problem	App		软件包守护进程问题
@@ -89,7 +84,6 @@ Authentication failed	UserLoginWindow		认证失败
 Manage repositories…	MainWindow		管理仓库…
 Description	PackageListView		描述
 Open %DeskbarLink%	PackageManager		打开 %DeskbarLink%
-Install	PackageManager		安装
 Input validation	UserLoginWindow		输入无效
 Log in…	MainWindow		登录…
 You need to be logged into an account before you can rate packages.	MainWindow		在对软件包进行评级之前，您需要进行账户登录。

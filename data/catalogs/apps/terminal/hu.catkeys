@@ -11,7 +11,7 @@ Confirm exit if active programs exist	Terminal AppearancePrefView		Kilépés meg
 Solarized Dark	Terminal colors scheme		Erős sötét színek
 Copy	Terminal TermWindow		Másolás
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory	Terminal TermApp		-h, --help a súgó kiírása\n-t, --title ablak címének megadása\n-f, --fullscreen indítás teljesképernyős módban\n-w, --working-directory kezdő mappa megadása
-Retro	Terminal colors scheme		Retro
+Retro	Terminal colors scheme		Retró
 Edit tab title…	Terminal TermWindow		Lap címének szerkesztése…
 Print	Terminal TermWindow		Nyomtatás
 Settings	Terminal TermWindow		Beállítások
@@ -111,7 +111,7 @@ Set window title	Terminal TermWindow		Ablak címének beállítása
 Increase	Terminal TermWindow		Növelés
 OK	Terminal TermWindow		Rendben
 Close window	Terminal TermWindow		Ablak bezárása
-Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminál\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui és Takashi Murai.\n\nHasználat: %s [OPCIÓ] [RENDSZERHÉJ]\n
+Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminál\n© 2001-2019 Haiku, Inc.\n© 1999 Kazuho Okui és Takashi Murai.\n\nHasználat: %s [OPCIÓ] [RENDSZERHÉJ]\n
 Solarized Light	Terminal colors scheme		Égetett fény
 Clear all	Terminal TermWindow		Összes törlése
 Search forward	Terminal FindWindow		Keresés előre

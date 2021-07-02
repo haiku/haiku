@@ -1,0 +1,146 @@
+1	finnish	application/x-vnd.Cortex.support	2630173556
+Header has flags	MediaString		Otsakkeella on lippuja
+32 bit HLS	MediaString		32-bittinen HLS
+Recording	MediaString		Tallennetaan
+(unknown format)	MediaString		(tuntematon muoto)
+Clean buffers	MediaString		Tyhjennä puskurit
+{0, plural,one{# frame forward}other{# frames forward}}	MediaString		{0, plural,one{# kehys eteenpäin}other{# kehystä eteenpäin}}
+Rear-right	MediaString		Takaoikea
+{0, plural, one{# pixel} other{# pixels}}	MediaString		{0, plural, one{# pikseli} other{# pikseliä}}
+Mono	MediaString		Mono
+MPEG1	MediaString		MPEG1
+ASF format family	MediaString		ASF-muotoperhe
+Encoded video	MediaString		Koodattu video
+YUV444	MediaString		YUV444
+Port	MediaString		Portti
+Top-Front-left	MediaString		Yläetuvasen
+24 bit LAB	MediaString		24-bittinen LAB
+16 bit integer	MediaString		16-bittinen kokonaisluku
+32 bit HSVA	MediaString		32-bittinen HSVA
+YCbCr411	MediaString		YCbCr411
+Offline	MediaString		Erillisverkko
+YUV422	MediaString		YUV422
+(unkown video orientation)	MediaString		(tuntematon videosuunta)
+QuickTime	MediaString		QuickTime
+32 bit HLSA	MediaString		32-bittinen HLSA
+Top-Front-center	MediaString		Yläedustakeskusta
+BeOS format family	MediaString		BeOS-muotoperhe
+24 bit HSV	MediaString		24-bittinen HSV
+Back-center	MediaString		Takakeskusta
+32 bit CMY	MediaString		32-bittinen CMY
+{0, plural, other{# bit integer}}	MediaString		{0, plural, other{# bittinen kokonaisluku}}
+Ambisonic WXYZ	MediaString		Ambisoninen WXYZ
+(unknown video format)	MediaString		(tuntematon videomuoto)
+AVI format family	MediaString		AVI-muotoperhe
+Homogenous buffers	MediaString		Homogeeniset puskurit
+Interlaced 	MediaString		Lomitettuja 
+{0, plural, one{# channel}other{# channels}}	MediaString		{0, plural, one{# kanava}other{# kanavaa}}
+15 bit RGBA	MediaString		15-bittinen RGBA
+Drop data	MediaString		Pudota dataa
+AVI	MediaString		AVI
+YUV9	MediaString		YUV9
+ Hz	MediaString		 Hz
+Right	MediaString		Oikea
+32 bit RGB	MediaString		32-bittinen RGB
+Video data between line u and u	MediaString		Videodata rivien u ja u välillä
+System mixer	MediaString		Järjestelmäsekoitin
+Physical output	MediaString		Fyysinen lähtö
+Top-Back-center	MediaString		Ylätaustakeskusta
+YUV420	MediaString		YUV420
+Top to bottom, left to right	MediaString		Ylhäältä alas, vasemmalta oikealle
+(unknown run mode)	MediaString		(tuntematon suoritustila)
+ kb/s	MediaString		 kb/s
+24 bit HSI	MediaString		24-bittinen HSI
+User-defined media type	MediaString		Käyttäjämääritelty mediatyyppi
+32 bit CMYA	MediaString		32-bittinen CMYA
+Rear-left	MediaString		Taustavasen
+QuickTime format family	MediaString		QuickTime-muotoperhe
+Any format family	MediaString		Mikä tahansa muotoperhe
+Timecode	MediaString		Timecode
+Top-Front-right	MediaString		Yläetuoikea
+32 bit float	MediaString		32-bittinen liukuluku
+Controllable	MediaString		Ohjattava
+32 bit integer	MediaString		32-bittinen kokonaisluku
+Front-right-center	MediaString		Edustaoikeakeskusta
+Side-right	MediaString		Sivuoikea
+ kHz	MediaString		 kHz
+Little endian	MediaString		Little endian
+(unknown matrix mask)	MediaString		(tuntematon matriisimaski)
+32 bit LAB	MediaString		32-bittinen LAB
+Side-left	MediaString		Sivuvasen
+{0, plural, one{# byte per buffer} other{# bytes per buffer}}	MediaString		{0, plural, one{# tavu per puskuri} other{# tavua per puskuri}}
+32 bit CMYK	MediaString		32-bittinen CMYK
+(unknown multistream format)	MediaString		(tuntematon monistriimimuoto)
+8 bit integer	MediaString		8-bittinen kokonaisluku
+8 bit grayscale-index	MediaString		8-bittinen harmaaskaalaindeksi
+YCbCr444	MediaString		YCbCr444
+Buffer producer	MediaString		Puskurituottaja
+Buffer consumer	MediaString		Puskurikuluttaja
+Increase latency	MediaString		Kasvata viivettä
+Front-left-center	MediaString		Edustavasenkeskusta
+MPEG format family	MediaString		MPEG-muotoperhe
+(none)	MediaString		(ei mitään)
+Center	MediaString		Keskusta
+ kb/s (max)	MediaString		 kb/s (maksimi)
+Monochrome	MediaString		Mustavalkoinen
+Private Be media type	MediaString		Yksityinen Be-mediatyyppi
+24 bit UVL	MediaString		24-bittinen UVL
+32 bit HSV	MediaString		32-bittinen HSV
+ID	MediaString		Tunniste
+AIFF format family	MediaString		AIFF-muotoperhe
+Top-Back-left	MediaString		Ylätakavasen
+16 bit RGB	MediaString		16-bittinen RGB
+YCbCr422	MediaString		YCbCr422
+Raw audio	MediaString		Raaka-audio
+32 bit LABA	MediaString		32-bittinen LABA
+24 bit HLS	MediaString		24-bittinen HLS
+Non-interlaced 	MediaString		Ei-lomitettu 
+{0, plural,one{# byte (avg)}other{# bytes (avg)}}	MediaString		{0, plural,one{# tavu (keskimäärin)}other{# tavua (keskimäärin)}}
+MIDI	MediaString		MIDI
+YUV12	MediaString		YUV12
+WAV format family	MediaString		WAV-muotoperhe
+ (NTSC)	MediaString		 (NTSC)
+Physical input	MediaString		Fyysinen syöte
+Big endian	MediaString		Big endian
+Sub	MediaString		Ala
+{0, plural,one{# byte (max)}other{# bytes (max)}}	MediaString		{0, plural,one{# tavu (enintään)}other{# tavua (enintään)}}
+YUV411	MediaString		YUV411
+Multistream media	MediaString		Monistriimimedia
+Encoded audio	MediaString		Koodattu audio
+Decrease precision	MediaString		Pienennä tarkkuutta
+File interface	MediaString		Tiedostorajapinta
+(unknown byte order)	MediaString		(tuntematon tavujärjestys)
+32 bit HSI	MediaString		32-bittinen HSI
+Typeless media	MediaString		Tyypitön media
+ (PAL)	MediaString		 (PAL)
+32 bit RGBA	MediaString		32-bittinen RGBA
+YCbCr420	MediaString		YCbCr420
+ kb/s (avg)	MediaString		 kb/s (keskimäärin)
+HTML	MediaString		HTML
+Time source	MediaString		Aikalähde
+15 bit RGB	MediaString		15-bittinen RGB
+ProLogic LR	MediaString		ProLogic LR
+{0, plural,one{# byte per frame}other{# bytes per frame}}	MediaString		{0, plural,one{# tavu per kehys}other{# tavua per kehys}}
+Parameters	MediaString		Parametrit
+Raw data from VBL area	MediaString		Raaka-dataa VBL-alueelta
+Top-Back-right	MediaString		Ylätakaoikea
+{0, plural, one{# byte per row}other{# bytes per row}}	MediaString		{0, plural, one{# tavu per rivi}other{# tavua per rivi}}
+Left	MediaString		Vasen
+BeOS video	MediaString		BeOS-video
+24 bit CMY	MediaString		24-bittinen CMY
+32 bit UVLA	MediaString		32-bittinen UVLA
+Top-center	MediaString		Yläkeskusta
+Entity interface	MediaString		Entiteettirajapinta
+Stereo	MediaString		Stereo
+8 bit color-index	MediaString		8-bittinen väri-indeksi
+Bottom to top, left to right	MediaString		Alhaalta ylös, vasemmalta oikealle
+32 bit UVL	MediaString		32-bittinen UVL
+{0, plural, one{# line} other{# lines}}	MediaString		{0, plural, one{# rivi} other{# riviä}}
+Text	MediaString		Teksti
+Unknown media type	MediaString		Tuntematon mediatyyppi
+MPEG2	MediaString		MPEG2
+Miscellaneous format family	MediaString		Sekalainen muotoperhe
+24 bit RGB	MediaString		24-bittinen RGB
+{0, plural,one{# frame backward}other{# frames backward}}	MediaString		{0, plural,one{# kehys taaksepäin}other{# kehystä taaksepäin}}
+32 bit HSIA	MediaString		32-bittinen HSIA
+Raw video	MediaString		Raakavideo

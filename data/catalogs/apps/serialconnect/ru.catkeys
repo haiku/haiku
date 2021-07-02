@@ -1,0 +1,23 @@
+1	russian	x-vnd.haiku.SerialConnect	1460410278
+Hardware	SerialWindow	Flowcontrol	Аппаратное
+Connection	SerialWindow		Соединение
+Baud rate	SerialWindow		Скорость передачи
+Stop bits	SerialWindow		Стоповые биты
+None	SerialWindow	Flowcontrol	Без управления
+Cancel	Custom baudrate window		Отмена
+Sending…	XModemStatus		Отправка…
+<no serial port available>	SerialWindow		<последовательный порт не найден>
+Log to file…	SerialWindow		Сохранить журнал в файл…
+Custom baudrate	Custom baudrate window		Настроить скорость передачи
+File	SerialWindow		Файл
+custom…	SerialWindow	Baudrate	в ручную…
+Parity	SerialWindow		Четность
+None	SerialWindow	Parity	Без проверки
+Disconnect	SerialWindow		Отключить
+Edit	SerialWindow		Изменить
+XModem send…	SerialWindow		Передать через XModem…
+Baudrate:	Custom baudrate window		Скорость:
+OK	Custom baudrate window		ОК
+Clear history	SerialWindow		Очистить историю
+Checksum error, re-send block	XModemStatus		Ошибка контрольной суммы, повторная отправка
+Settings	SerialWindow		Настройки

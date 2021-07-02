@@ -1,0 +1,8 @@
+1	russian	application/x-vnd.Cortex.ParameterView	1295152157
+Themes	ParameterWindow		Тема
+Start control panel	ParameterWindow		Запустить панель управления
+%nodeinfo% parameters	ParameterWindow		Параметры %nodeinfo%
+OK	ParameterWindow		ОК
+Window	ParameterWindow		Окно
+Could not start control panel (%error%)	ParameterWindow		Не удалось запустить панель управления (%error%)
+Close	ParameterWindow		Закрыть

@@ -1,10 +1,11 @@
-1	russian	x-vnd.Haiku-Input	3272444562
+1	russian	x-vnd.Haiku-Input	3312605348
 Scrolling	TouchpadPrefView		Прокрутка
 Defaults	InputMouse		По умолчанию
 Long	KeyboardView		Длинная
 Cancel	TouchpadPrefView		Отмена
 4-Button	SettingsView		Четырехкнопочная
 Slow	TouchpadPrefView		Медленно
+Tapping sensitivity	TouchpadPrefView		Чувствительность нажатия
 Device List	InputWindow		Список устройств
 Double-click speed	SettingsView		Скорость двойного клика
 5-Button	SettingsView		Пятикнопочная
@@ -13,7 +14,9 @@ Mouse type:	SettingsView		Тип мыши:
 Revert	InputKeyboard		Вернуть
 Fast	KeyboardView		Быстро
 Off	TouchpadPrefView		Выключить
+Never	TouchpadPrefView		Никогда
 Fast	TouchpadPrefView		Быстро
+6-Button	SettingsView		6-кнопочная
 Please confirm	TouchpadPrefView		Пожалуйста, подтвердите
 Click to focus	SettingsView		Кликнуть для фокусировки окна
 Acceleration	TouchpadPrefView		Ускорение
@@ -22,6 +25,7 @@ Accept first click	SettingsView		Принимать первый клик
 OK	TouchpadPrefView		ОК
 Horizontal scrolling	TouchpadPrefView		Горизонтальная прокрутка
 Delay until key repeat	KeyboardView		Задержка перед повтором клавиши
+Keyboard Lock Delay	TouchpadPrefView		Задержка блокировки клавиатуры
 Two finger scrolling	TouchpadPrefView		Прокрутка двумя пальцами
 Input	System name		Ввод
 Mouse acceleration	SettingsView		Ускорение мыши
@@ -30,6 +34,7 @@ High	TouchpadPrefView		Высокая
 Defaults	TouchpadPrefView		По умолчанию
 1-Button	SettingsView		Однокнопочная
 Defaults	InputKeyboard		По умолчанию
+Quick	TouchpadPrefView		Быстро
 Short	KeyboardView		Короткая
 Slow	KeyboardView		Медленно
 Revert	InputMouse		Вернуть

@@ -1,9 +1,8 @@
-1	polish	x-vnd.Haiku-HaikuDepot	840203303
+1	polish	x-vnd.Haiku-HaikuDepot	401821302
 Repository update error	LocalRepositoryUpdateProcess		Błąd podczas odświeżania repozytorium
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Wystąpił błąd podczas odświeżania repozytorium: %error%
 User Created	UserLoginWindow		Użytkownik utworzony
 Check for updates…	MainWindow		Sprawdź dostępność aktualizacji…
-Uninstall	PackageManager		Usuń
 Uninstalled	PackageListView		Niezainstalowany
 It was not possible to create the new user.	UserLoginWindow		Nie udało się utworzyć nowego użytkownika.
 Available packages	MainWindow		Dostępne pakiety
@@ -42,8 +41,6 @@ Category	FilterView		Kategoria
 User rating	RatePackageWindow		Ocena użytkowników
 Installed packages	MainWindow		Zainstalowane pakiety
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Żądany obiekt lub obiekt zależny nie został znaleziony na serwerze.
-Fatal error	PackageManager		Błąd krytyczny
-Package action failed	PackageInfoView		Akcja dla pakietu nie powiodła się
 No changelog available.	PackageInfoView		Dziennik zmian nie jest dostępny.
 Error	App		Błąd
 There was a puzzling response from the web service.	UserLoginWindow		Odebrano dziwną odpowiedź od usługi sieciowej.
@@ -73,7 +70,6 @@ Stability	RatePackageWindow		Stabilność
 Send	RatePackageWindow		Wyślij
 Start package daemon	App		Uruchom demona pakietów
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Hasło musi zostać wprowadzone dwa razy w celu zredukowania szansy na ustawienie błędnego hasła.
-The package action could not be scheduled: %Error%	PackageInfoView		Akcja dla pakietu nie mogła zostać dodana do kolejki: %Error%
 Cancel	RatePackageWindow		Anuluj
 Inactive	PackageListView		Nieaktywny
 Nickname:	UserLoginWindow		Pseudonim:
@@ -82,7 +78,6 @@ There are problems in the supplied data:	UserLoginWindow		Istnieją problemy w d
 OK	MainWindow		OK
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# element} few{# elementy} many{# elementów} other{# elementu}}
 Usage conditions download problem	UserLoginWindow		Problem z pobieraniem warunków korzystania
-OK	PackageInfoView		OK
 Downloading:	PackageInfoView		Pobieranie:
 Success	UserLoginWindow		Powodzenie
 Package daemon problem	App		Problem z demonem pakietów
@@ -154,7 +149,6 @@ Fetching remote repository data	LocalRepositoryUpdateProcess		Pobieranie danych 
 Description	PackageListView		Opis
 Open %DeskbarLink%	PackageManager		Otwórz %DeskbarLink%
 User creation error	UserLoginWindow		Błąd tworzenia użytkownika
-Install	PackageManager		Zainstaluj
 Input validation	UserLoginWindow		Walidacja wejścia
 Log in…	MainWindow		Zaloguj się…
 You need to be logged into an account before you can rate packages.	MainWindow		Musisz być zalogowany, aby móc oceniać pakiety.

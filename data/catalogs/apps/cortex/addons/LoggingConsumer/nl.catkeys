@@ -1,0 +1,15 @@
+1	dutch; flemish	application/x-vnd.Be.LoggingConsumerApp	2694185769
+Priority	CortexAddOnsLoggingConsumer		Prioriteit
+Latency	CortexAddOnsLoggingConsumer		Vertraging
+Logged input	CortexAddOnsLoggingConsumer		Gelogde invoer
+CPU spin percentage	CortexAddOnsLoggingConsumer		Percentage CPU-gebruik
+NodeLogger	CortexAddOnsLoggingConsumers		NodeLogger
+Start	CortexAddOnsLoggingConsumerNodeHarnessWin		Start
+Thread priority	CortexAddOnsLoggingConsumer		Thread-prioriteit
+LoggingConsumer parameters	CortexAddOnsLoggingConsumer		Parameters LoggingConsumer
+Latency control	CortexAddOnsLoggingConsumer		Vertragingsbeheersing
+MediaNodeControlApp: couldn't get node info (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: kan geen node info (%d) vinden:\n%s\n
+CPU percentage	CortexAddOnsLoggingConsumer		CPU-percentage
+MediaNodeControlApp: couldn't find node (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: kan node (%d) niet vinden:\n%s\n
+LoggingConsumer	CortexAddOnsLoggingConsumer		LoggingConsumer
+Stop	CortexAddOnsLoggingConsumerNodeHarnessWin		Stoppen

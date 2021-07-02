@@ -1,0 +1,10 @@
+1	russian	application/x-vnd.moon-AudioAdapter.media_addon	2282220510
+Input format	CortexAudioAdapter		Входной формат
+Channels:	CortexAudioAdapter		Каналы:
+stereo	CortexAudioAdapter		стерео
+mono	CortexAudioAdapter		моно
+Output format	CortexAudioAdapter		Выходной формат
+Audio input	CortexAddOnsCommon		Аудиовход
+Sample format:	CortexAudioAdapter		Разрядность:
+Audio output	CortexAddOnsCommon		Аудиовыход
+%groupname% parameters	CortexAddOnsCommon		Параметры %groupname%

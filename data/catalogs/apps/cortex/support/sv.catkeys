@@ -1,4 +1,4 @@
-1	swedish	application/x-vnd.Cortex.support	3220757490
+1	swedish	application/x-vnd.Cortex.support	2717502130
 Header has flags	MediaString		Rubrik har flaggor
 32 bit HLS	MediaString		32-bitars HLS
 Recording	MediaString		Inspelning
@@ -31,10 +31,65 @@ Back-center	MediaString		Baksida mitten
 {0, plural, other{# bit integer}}	MediaString		{0, plural, other{# bit heltal}}
 Ambisonic WXYZ	MediaString		Ambisonic WXYZ
 (unknown video format)	MediaString		(okänt videoformat)
+AVI format family	MediaString		AVI-formatfamilj
+Homogenous buffers	MediaString		Homogena buffertar
+Interlaced 	MediaString		Interlaced 
+{0, plural, one{# channel}other{# channels}}	MediaString		{0, plural, one{# kanal}other{# kanaler}}
+15 bit RGBA	MediaString		15 bitars RGBA
+Drop data	MediaString		Släpp data
+AVI	MediaString		AVI
 YUV9	MediaString		YUV9
+ Hz	MediaString		 Hz
+Right	MediaString		Höger
+32 bit RGB	MediaString		32-bitars RGB
+Video data between line u and u	MediaString		Videodata mellan rad u och u
+System mixer	MediaString		Systemblandare
+Physical output	MediaString		Fysisk produktion
+Top-Back-center	MediaString		Topp-Baksida-mitt
 YUV420	MediaString		YUV420
+Top to bottom, left to right	MediaString		Uppifrån och ned, vänster till höger
+(unknown run mode)	MediaString		(okänt körläge)
+ kb/s	MediaString		 kb/s
+24 bit HSI	MediaString		24-bitars HSI
+User-defined media type	MediaString		Användardefinierad medietyp
+32 bit CMYA	MediaString		32-bitars CMYA
+Rear-left	MediaString		Bak vänster
+QuickTime format family	MediaString		QuickTime-formatfamilj
+Any format family	MediaString		Vilken som helst formatfamilj
+Timecode	MediaString		Tidskod
+Top-Front-right	MediaString		Upp-Fram-höger
+32 bit float	MediaString		32-bitars float
+Controllable	MediaString		Kontrollerbar
+32 bit integer	MediaString		32-bitars heltal
+Front-right-center	MediaString		Fram-höger-mitt
+Side-right	MediaString		Sido-höger
+ kHz	MediaString		 kHz
+Little endian	MediaString		Liten endian
+(unknown matrix mask)	MediaString		(okänd matrismask)
+32 bit LAB	MediaString		32-bitars LAB
+Side-left	MediaString		Sidovänster
+{0, plural, one{# byte per buffer} other{# bytes per buffer}}	MediaString		{0, plural, one{# byte per buffert} other{# bytes per buffertar}}
+32 bit CMYK	MediaString		32 bitars CMYK
+(unknown multistream format)	MediaString		(okänt multistream-format)
+8 bit integer	MediaString		8-bitars heltal
+8 bit grayscale-index	MediaString		8-bitars gråskala-index
 YCbCr444	MediaString		YCbCr444
+Buffer producer	MediaString		Buffertproducent
+Buffer consumer	MediaString		Buffertkonsument
+Increase latency	MediaString		Öka latensen
+Front-left-center	MediaString		Fram-vänster-mitt
+MPEG format family	MediaString		MPEG-formatfamilj
+(none)	MediaString		(ingen)
+Center	MediaString		Centrum
+ kb/s (max)	MediaString		 kb/s (max)
+Monochrome	MediaString		Svartvit
+Private Be media type	MediaString		Privat Be mediatyp
+24 bit UVL	MediaString		24 bitars UVL
+32 bit HSV	MediaString		32 bitars HSV
 ID	MediaString		ID
+AIFF format family	MediaString		AIFF-formatfamilj
+Top-Back-left	MediaString		Upp-Bak-Vänster
+16 bit RGB	MediaString		16 bitars RGB
 YCbCr422	MediaString		YCbCr422
 YUV12	MediaString		YUV12
  (NTSC)	MediaString		 (NTSC)

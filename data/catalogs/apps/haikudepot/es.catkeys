@@ -1,10 +1,9 @@
-1	spanish; castilian	x-vnd.Haiku-HaikuDepot	3544756144
+1	spanish; castilian	x-vnd.Haiku-HaikuDepot	3106374143
 Repository update error	LocalRepositoryUpdateProcess		Error de actualización de repositorio
 Network error	ServerHelper		Error de red
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Ocurrió un error al actualizar el repositorio: %error%
 User Created	UserLoginWindow		Usuario creado
 Check for updates…	MainWindow		Buscar actualizaciones…
-Uninstall	PackageManager		Desinstalar
 Uninstalled	PackageListView		Desinstalado
 It was not possible to create the new user.	UserLoginWindow		No fue posible crear el nuevo usuario.
 Available packages	MainWindow		Paquetes disponibles
@@ -46,8 +45,6 @@ Category	FilterView		Categoría
 User rating	RatePackageWindow		Puntuación del usuario
 Installed packages	MainWindow		Paquetes instalados
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Un objeto requerido o un objeto implicado en el requerimiento no se ha encontrado en el servidor.
-Fatal error	PackageManager		Error fatal
-Package action failed	PackageInfoView		La acción del paquete falló
 No changelog available.	PackageInfoView		No hay registro de cambios disponible.
 Error	App		Error
 There was a puzzling response from the web service.	UserLoginWindow		Hubo una respuesta misteriosa desde el servicio Web.
@@ -79,7 +76,6 @@ Stability	RatePackageWindow		Estabilidad
 Send	RatePackageWindow		Enviar
 Start package daemon	App		Arrancar demonio de paquetes
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		La contraseña debe ser repetida para evitar la posibilidad de un error en el ingreso de la misma.
-The package action could not be scheduled: %Error%	PackageInfoView		La acción de paquete no se pudo programar: %Error%
 Cancel	SettingsWindow		Cancelar
 Cancel	RatePackageWindow		Cancelar
 Inactive	PackageListView		Inactivo
@@ -89,7 +85,6 @@ There are problems in the supplied data:	UserLoginWindow		Hay problemas en la in
 OK	MainWindow		Aceptar
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# item} other{# items}}
 Usage conditions download problem	UserLoginWindow		Hubo un problema al descargar las condiciones de uso
-OK	PackageInfoView		Aceptar
 Downloading:	PackageInfoView		Descargando:
 Quit	MainWindow		Salir
 Success	UserLoginWindow		Éxito
@@ -172,7 +167,6 @@ Fetching remote repository data	LocalRepositoryUpdateProcess		Obteniendo datos d
 Description	PackageListView		Descripción
 Open %DeskbarLink%	PackageManager		Abrir %DeskbarLink%
 User creation error	UserLoginWindow		Se produjo un error al crear el usuario
-Install	PackageManager		Instalar
 Input validation	UserLoginWindow		Validación de entrada
 Log in…	MainWindow		Iniciar sesión…
 You need to be logged into an account before you can rate packages.	MainWindow		Necesita haber ingresado con una cuenta antes de poder valorar paquetes.

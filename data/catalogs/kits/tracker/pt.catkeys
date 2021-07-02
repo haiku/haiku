@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-libtracker	936620033
+1	portuguese	x-vnd.Haiku-libtracker	256413178
 Created	ContainerWindow		Criado
 Icon	AttributesView		Ícone
 Open and make preferred	OpenWithWindow		Abrir e tornar preferida
@@ -329,6 +329,7 @@ Recent folders	FavoritesMenu		Pastas recentes
 Signed memory size	AttributesView		Tamanho de memória com sinal
 The specified name is illegal. Please choose another name.	FilePanelPriv		O nome especificado é ilegal. Por favor escolha outro nome.
 of %items	StatusWindow		de %items
+MIME Path	AttributesView		Caminho MIME
 less than	FindPanel		menor que
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Ocorreu um erro ao copiar o ficheiro \"%name\":\n\t%error\n\nPretende continuar?
 Creating links: 	StatusWindow		A criar atalhos: 
@@ -443,6 +444,7 @@ Sorry, saving more than one item is not allowed.	FilePanelPriv		Desculpe, não �
 Move here	ContainerWindow		Mover para aqui
 the config folder	FSUtils		a pasta de configuração
 Sorry, could not create a new folder.	FSUtils		Desculpe, não foi possível criar uma nova pasta.
+MIME Signature	AttributesView		Assinatura MIME
 Select all	VirtualDirectoryWindow		Selecionar tudo
 Rename	FSUtils	button label	Alterar nome
 Clean up all	ContainerWindow		Arrumar tudo

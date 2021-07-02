@@ -160,7 +160,7 @@ The target disk does not support creating links.	FSUtils		La cela disko ne subte
 develop	B_SYSTEM_DEVELOP_DIRECTORY		disvolvo
 64-bit integer	AttributesView		64-bita entjero
 Cut more	ContainerWindow		Tondi pli
-The Tracker must be running to see Info windows.	PoseView		Spurilo devas esti rulata por vidi Informajn fenestrojn.
+The Tracker must be running to see Info windows.	PoseView		La Spurilo devas esti rulata por vidi Informajn fenestrojn.
 Tracker preferences	TrackerSettingsWindow		Agordoj de Spurilo
 Read	FilePermissionsView		Legi
 There was an error writing the attribute.	WidgetAttributeText		Eraris skribante la atributon.
@@ -290,7 +290,7 @@ Error creating link to \"%name\".	FSUtils		Eraris kreante ligilon al \"%name\".
 Unknown	FilePermissionsView		Nekonata
 Paste links	ContainerWindow		Alglui ligilojn
 Restoring: 	StatusWindow		Restaŭrante: 
-The Tracker must be running to set the default printer.	PoseView		Spurilo devas esti rulata por agordi la defaŭltan presilon.
+The Tracker must be running to set the default printer.	PoseView		Tracker devas esti rulata por agordi la implicitan presilon.
 calculating…	InfoWindow		kalkulante…
 Preferred for file	OpenWithWindow		Preferata por dosiero
 OK	AutoMounterSettings		Bone

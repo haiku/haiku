@@ -8,7 +8,7 @@ Changes will take effect upon reboot.	SettingsWindow		A változtatások csak új
 Revert	SettingsWindow		Visszaállít
 Keep enabled	SettingsWindow		Tartsd bekapcsolva
 The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		A beállítások fájlban lévő adatok érvénytelenek. Betöltheti az eredeti beállításokat, vagy kiléphet.
-VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		Virtuális memória\n\tÍrta Axel Dörfler\n\tCopyright 2005, Haiku.\n
+VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		Virtuális memória\n\tÍrta Axel Dörfler\n\t© 2005, Haiku.\n
 The volume specified in the settings file could not be found. You can use the boot volume or quit.	SettingsWindow		A beállítások fájlban megadott lemez nem található. Használhatod a rendszer lemezt, vagy kiléphetsz.
 Current Swap:	SettingsWindow		Jelenlegi fájl:
 Load defaults	SettingsWindow		Eredeti beállítások betöltése

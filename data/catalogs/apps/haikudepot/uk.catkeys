@@ -1,10 +1,9 @@
-1	ukrainian	x-vnd.Haiku-HaikuDepot	3544756144
+1	ukrainian	x-vnd.Haiku-HaikuDepot	3106374143
 Repository update error	LocalRepositoryUpdateProcess		Помилка оновлення репозитарія 
 Network error	ServerHelper		Помилка мережі
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Під час оновлення репозитарія сталася помилка: %error%
 User Created	UserLoginWindow		Користувача створено
 Check for updates…	MainWindow		Перевірити на обнови…
-Uninstall	PackageManager		Деінсталяція
 Uninstalled	PackageListView		Деінстальовані
 It was not possible to create the new user.	UserLoginWindow		Не вдалося створити нового користувача.
 Available packages	MainWindow		Доступні пакети
@@ -46,8 +45,6 @@ Category	FilterView		Категорія
 User rating	RatePackageWindow		Рейтинг користувача
 Installed packages	MainWindow		Встановлені пакети
 A requested object or an object involved in the request was not found on the server.	ServerHelper		На сервері не знайдено потрібний об'єкт або об'єкт, що міститься у запиті.
-Fatal error	PackageManager		Критична помилка
-Package action failed	PackageInfoView		Роботу пакету призупинено
 No changelog available.	PackageInfoView		Історія змін недоступна
 Error	App		Помилка
 There was a puzzling response from the web service.	UserLoginWindow		Отримано загадкову відповідь від мережевого сервісу.
@@ -79,7 +76,6 @@ Stability	RatePackageWindow		Стабільність
 Send	RatePackageWindow		Надіслати
 Start package daemon	App		Запустити демон пакетів
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Пароль потрібно повторити, щоб зменшити ймовірність неправильного введення пароля.
-The package action could not be scheduled: %Error%	PackageInfoView		Дію пакета неможливо спрогнозувати: %Error%
 Cancel	SettingsWindow		Скасувати
 Cancel	RatePackageWindow		Скасувати
 Inactive	PackageListView		Неактивний
@@ -89,7 +85,6 @@ There are problems in the supplied data:	UserLoginWindow		У наданих да
 OK	MainWindow		ОК
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# об'єкт} few{# об'єкти} other{# об'єктів}}
 Usage conditions download problem	UserLoginWindow		Помилка при завантаженні Умов користування
-OK	PackageInfoView		ОК
 Downloading:	PackageInfoView		Завантаження:
 Quit	MainWindow		Вийти
 Success	UserLoginWindow		Успішно
@@ -172,7 +167,6 @@ Fetching remote repository data	LocalRepositoryUpdateProcess		Отримання
 Description	PackageListView		Опис
 Open %DeskbarLink%	PackageManager		Відкрити %DeskbarLink%
 User creation error	UserLoginWindow		Помилка створення користувача
-Install	PackageManager		Інсталяція
 Input validation	UserLoginWindow		Перевірка вхідних даних
 Log in…	MainWindow		Авторизація…
 You need to be logged into an account before you can rate packages.	MainWindow		Для оцінки пакетів спочатку необхідно авторизуватись.

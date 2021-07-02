@@ -1,0 +1,4 @@
+1	russian	application/x-vnd.Cortex.AddOnHost	826663209
+Continue	CortexAddOnHost		Продолжить
+Quit	CortexAddOnHost		Выход
+This program runs in the background, and is started automatically by Cortex when necessary. You probably don't want to start it manually.	CortexAddOnHost		Эта программа выполняется в фоновом режиме и при необходимости Cortex запустит ее автоматически. Возможно, вам не нужно запускать ее вручную.

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-StyledEdit	325970205
+1	hungarian	x-vnd.Haiku-StyledEdit	2796309255
 Document statistics	Statistics		Statisztika
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nem vonható vissza, a fájl \"%s\" nem található.
 Cut	Menus		Kivágás
@@ -31,7 +31,7 @@ Replace…	Menus		Csere…
 File	Menus		Fájl
 Paste	Menus		Beillesztés
 Bold	Menus		Félkövér
-File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		A fájlt \"%file"\" egy másik program módosította. Újratöltsem?
+File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		A fájlt \"%file%\" egy másik program módosította. Újratöltsem?
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		A fájlt \"%file%\" egy másik program törölte. Helyre szeretnéd állítani?
 Lines:	Statistics		Sor:
 Replace in all windows	FindandReplaceWindow		Cserélje minden ablakban
@@ -49,12 +49,12 @@ Left	Menus		Balra
 Default	Menus		Alapérték
 OK	SaveAlert		Rendben
 Color	Menus		Szín
-Save changes to the document \"%s\"? 	QuitAlert		Menti a dokumentum \"%s\" változtatásait?
+Save changes to the document \"%s\"? 	QuitAlert		Mented a dokumentum \"%s\" változtatásait?
 StyledEdit	System name		StyledEdit
 Find:	FindandReplaceWindow		Keresés:
 Undo typing	QuitAlert		Gépelés visszavonása
-Error loading \"%s\":\n\t%s	LoadAlert		Hiba történt \"%s\" betöltésekor:\n\t%s
-Don't save	SaveAlert		Ne mentsen
+Error loading \"%s\":\n\t%s	LoadAlert		\"%s\" betöltése sikertelen:\n\t%s
+Don't save	SaveAlert		Ne mentse
 Reload…	Menus		Újratöltés…
 Print…	Menus		Nyomtatás…
 Quit	Menus		Kilépés
@@ -62,7 +62,7 @@ Redo typing	QuitAlert		Újragépelés
 Ignore	NodeMonitorAlerts		Mellőzés
 Wrap lines	Menus		Sortörés
 Text encoding	Menus		Szöveg kódolása
-Unable to unlock file\n\t%s	QuitAlert		Nem tudom feloldani a fájlt:\n\t %s
+Unable to unlock file\n\t%s	QuitAlert		Nem tudom feloldani a fájlt:\n\t%s
 Modified	StatusView		Módosítva
 OK	LoadAlert		Rendben
 Save	QuitAlert		Mentés
@@ -72,6 +72,7 @@ Find…	Menus		Keresés…
 Cancel	SaveAlert		Mégse
 Revert	RevertToSavedAlert		Visszaállítás
 Size	Menus		Méret
+Decrease size	Menus		Méret csökkentése
 Autodetect	Menus		Automatikus felismerés
 Replace next	Menus		Következő cseréje
 OK	QuitAlert		Rendben
@@ -82,7 +83,7 @@ Save as…	Menus		Mentés másként…
 Replace	FindandReplaceWindow		Cserél
 Characters:	Statistics		Karakter:
 Don't save	QuitAlert		Ne mentse
-This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Ez a fájl írásvédett. Menti a \"%s\" dokumentum változtatásait?
+This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Ez a fájl írásvédett. Mented a \"%s\" dokumentum változtatásait?
 Font	Menus		Betűtípus
 Align	Menus		Igazítás
 Select all	Menus		Összes kijelölése
