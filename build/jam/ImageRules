@@ -1671,9 +1671,11 @@ rule BuildEfiSystemPartition image : efiLoader
 {
 	local macVolumeIcon = [ FDirName
 		$(HAIKU_TOP) data artwork VolumeIcon.icns ] ;
+	local fatshell = <build>fat_shell ;
 
 	Depends $(image) : $(efiLoader) ;
 	Depends $(image) : $(macVolumeIcon) ;
+	Depends $(image) : $(fatshell) ;
 
 	switch $(TARGET_ARCH) {
 		case x86_64 :
@@ -1690,18 +1692,26 @@ rule BuildEfiSystemPartition image : efiLoader
 			Exit "Error: Unknown EFI architecture!" ;
 	}
 
-	EFIICON on $(image) = $(macVolumeIcon) ;
-
-	BuildEfiSystemPartition1 $(image) : $(efiLoader) ;
+	BuildEfiSystemPartition1 $(image) : $(fatshell) $(macVolumeIcon) $(efiLoader) ;
 }
 
+# Usage:
+#  out : fatshell volumeIcon loader
 actions BuildEfiSystemPartition1
 {
 	$(RM) $(<)
+
+	export $(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+
 	dd if=/dev/zero of=$(<) bs=1024 count=2880
-	mformat -i $(<) -f 2880
-	mmd -D s -i $(<) ::/EFI
-	mmd -D s -i $(<) ::/EFI/BOOT
-	mcopy -D o -i $(<) $(EFIICON) ::/.VolumeIcon.icns
-	mcopy -D o -i $(<) $(>) ::/EFI/BOOT/$(EFINAME)
+
+	FATFS="$(2[1])"
+	EFIICON="$(2[2])"
+	LOADER="$(2[3])"
+
+	${FATFS} --initialize "$(<)" 'Haiku ESP'
+	echo "mkdir myfs/EFI" | ${FATFS} $(<)
+	echo "mkdir myfs/EFI/BOOT" | ${FATFS} $(<)
+	echo "cp :${LOADER} myfs/EFI/BOOT/$(EFINAME)" | ${FATFS} $(<)
+	echo "cp :${EFIICON} myfs/.VolumeIcon.icns" | ${FATFS} $(<)
 }
