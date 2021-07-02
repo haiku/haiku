@@ -1058,6 +1058,70 @@ DisplayPort::_PortRegister()
 
 
 status_t
+DisplayPort::_SetPortLinkGen4(display_mode* target)
+{
+	// Khz / 10. ( each output octet encoded as 10 bits. 
+	//uint32 linkBandwidth = gInfo->shared_info->fdi_link_frequency * 1000 / 10; //=270000 khz
+	//fixme: always so?
+	uint32 linkBandwidth = 270000; //khz
+	uint32 fPipeOffset = 0;
+	if (fPipe->Index() == INTEL_PIPE_B)
+		fPipeOffset = 0x1000;
+
+	TRACE("%s: DP M1 data before: 0x%" B_PRIx32 "\n", __func__, read32(INTEL_PIPE_A_DATA_M + fPipeOffset));
+	TRACE("%s: DP N1 data before: 0x%" B_PRIx32 "\n", __func__, read32(INTEL_PIPE_A_DATA_N + fPipeOffset));
+	TRACE("%s: DP M1 link before: 0x%" B_PRIx32 "\n", __func__, read32(INTEL_PIPE_A_LINK_M + fPipeOffset));
+	TRACE("%s: DP N1 link before: 0x%" B_PRIx32 "\n", __func__, read32(INTEL_PIPE_A_LINK_N + fPipeOffset));
+
+	uint32 bitsPerPixel = 24;	//fixme: always so?
+	uint32 lanes = 4;			//fixme: always so?
+
+	//Setup Data M/N
+	uint64 linkspeed = lanes * linkBandwidth * 8;
+	uint64 ret_n = 1;
+	while(ret_n < linkspeed) {
+		ret_n *= 2;
+	}
+	if (ret_n > 0x800000) {
+		ret_n = 0x800000;
+	}
+	uint64 ret_m = target->timing.pixel_clock * ret_n * bitsPerPixel / linkspeed;
+	while ((ret_n > 0xffffff) || (ret_m > 0xffffff)) {
+		ret_m >>= 1;
+		ret_n >>= 1;
+	}
+	//Set TU size bits (to default, max) before link training so that error detection works
+	write32(INTEL_PIPE_A_DATA_M + fPipeOffset, ret_m | FDI_PIPE_MN_TU_SIZE_MASK);
+	write32(INTEL_PIPE_A_DATA_N + fPipeOffset, ret_n);
+
+	//Setup Link M/N
+	linkspeed = linkBandwidth;
+	ret_n = 1;
+	while(ret_n < linkspeed) {
+		ret_n *= 2;
+	}
+	if (ret_n > 0x800000) {
+		ret_n = 0x800000;
+	}
+	ret_m = target->timing.pixel_clock * ret_n / linkspeed;
+	while ((ret_n > 0xffffff) || (ret_m > 0xffffff)) {
+		ret_m >>= 1;
+		ret_n >>= 1;
+	}
+	write32(INTEL_PIPE_A_LINK_M + fPipeOffset, ret_m);
+	//Writing Link N triggers all four registers to be activated also (on next VBlank)
+	write32(INTEL_PIPE_A_LINK_N + fPipeOffset, ret_n);
+
+	TRACE("%s: DP M1 data after: 0x%" B_PRIx32 "\n", __func__, read32(INTEL_PIPE_A_DATA_M + fPipeOffset));
+	TRACE("%s: DP N1 data after: 0x%" B_PRIx32 "\n", __func__, read32(INTEL_PIPE_A_DATA_N + fPipeOffset));
+	TRACE("%s: DP M1 link after: 0x%" B_PRIx32 "\n", __func__, read32(INTEL_PIPE_A_LINK_M + fPipeOffset));
+	TRACE("%s: DP N1 link after: 0x%" B_PRIx32 "\n", __func__, read32(INTEL_PIPE_A_LINK_N + fPipeOffset));
+
+	return B_OK;
+}
+
+
+status_t
 DisplayPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 {
 	CALLED();
@@ -1069,40 +1133,46 @@ DisplayPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 		return B_ERROR;
 	}
 
-	//fixme: doesn't work yet. For now just scale to native mode.
+	status_t result = B_OK;
+	if (gInfo->shared_info->device_type.Generation() <= 4) {
+		fPipe->ConfigureTimings(target);
+		result = _SetPortLinkGen4(target);
+	} else {
+		//fixme: doesn't work yet. For now just scale to native mode.
 #if 0
-	// Setup PanelFitter and Train FDI if it exists
-	PanelFitter* fitter = fPipe->PFT();
-	if (fitter != NULL)
-		fitter->Enable(*target);
-	FDILink* link = fPipe->FDI();
-	if (link != NULL)
-		link->Train(target);
+		// Setup PanelFitter and Train FDI if it exists
+		PanelFitter* fitter = fPipe->PFT();
+		if (fitter != NULL)
+			fitter->Enable(*target);
+		FDILink* link = fPipe->FDI();
+		if (link != NULL)
+			link->Train(target);
 
-	pll_divisors divisors;
-	compute_pll_divisors(target, &divisors, false);
+		pll_divisors divisors;
+		compute_pll_divisors(target, &divisors, false);
 
-	uint32 extraPLLFlags = 0;
-	if (gInfo->shared_info->device_type.Generation() >= 3)
-		extraPLLFlags |= DISPLAY_PLL_MODE_NORMAL | DISPLAY_PLL_2X_CLOCK;
+		uint32 extraPLLFlags = 0;
+		if (gInfo->shared_info->device_type.Generation() >= 3)
+			extraPLLFlags |= DISPLAY_PLL_MODE_NORMAL | DISPLAY_PLL_2X_CLOCK;
 
-	// Program general pipe config
-	fPipe->Configure(target);
+		// Program general pipe config
+		fPipe->Configure(target);
 
-	// Program pipe PLL's
-	fPipe->ConfigureClocks(divisors, target->timing.pixel_clock, extraPLLFlags);
+		// Program pipe PLL's
+		fPipe->ConfigureClocks(divisors, target->timing.pixel_clock, extraPLLFlags);
 
-	// Program target display mode
-	fPipe->ConfigureTimings(target);
+		// Program target display mode
+		fPipe->ConfigureTimings(target);
 #endif
 
-	// Keep monitor at native mode and scale image to that
-	fPipe->ConfigureScalePos(target);
+		// Keep monitor at native mode and scale image to that
+		fPipe->ConfigureScalePos(target);
+	}
 
 	// Set fCurrentMode to our set display mode
 	memcpy(&fCurrentMode, target, sizeof(display_mode));
 
-	return B_OK;
+	return result;
 }
 
 

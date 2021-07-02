@@ -188,6 +188,9 @@ virtual pipe_index					PipePreference();
 protected:
 virtual	addr_t						_DDCRegister();
 virtual	addr_t						_PortRegister();
+
+private:
+		status_t					_SetPortLinkGen4(display_mode* target);
 };
 
 
