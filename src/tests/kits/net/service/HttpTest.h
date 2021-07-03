@@ -25,6 +25,8 @@ public:
 	virtual	void		setUp();
 
 			void		GetTest();
+			void		HeadTest();
+			void		NoContentTest();
 			void		UploadTest();
 			void		AuthBasicTest();
 			void		AuthDigestTest();

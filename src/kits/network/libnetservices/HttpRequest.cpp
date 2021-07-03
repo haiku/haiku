@@ -684,8 +684,7 @@ BHttpRequest::_MakeRequest()
 				//   example in the case of a chunked transfer, we can't know
 				// - If the request method is "HEAD" which explicitly asks the
 				//   server to not send any data (only the headers)
-				if (bytesTotal > 0 && bytesReceived != bytesTotal
-					&& fRequestMethod != B_HTTP_HEAD) {
+				if (bytesTotal > 0 && bytesReceived != bytesTotal) {
 					readError = B_IO_ERROR;
 					break;
 				}
@@ -752,6 +751,14 @@ BHttpRequest::_MakeRequest()
 					bytesTotal = atoll(fHeaders.HeaderAt(index).Value());
 				else
 					bytesTotal = -1;
+
+				if (fRequestMethod == B_HTTP_HEAD
+					|| fResult.StatusCode() == 204) {
+					// In the case of a HEAD request or if the server replies
+					// 204 ("no content"), we don't expect to receive anything
+					// more, and the socket will be closed.
+					receiveEnd = true;
+				}
 			}
 		}
 
@@ -968,8 +975,7 @@ BHttpRequest::_MakeRequest()
 				//   example in the case of a chunked transfer, we can't know
 				// - If the request method is "HEAD" which explicitly asks the
 				//   server to not send any data (only the headers)
-				if (bytesTotal > 0 && bytesReceived != bytesTotal
-					&& fRequestMethod != B_HTTP_HEAD) {
+				if (bytesTotal > 0 && bytesReceived != bytesTotal) {
 					readError = B_IO_ERROR;
 					break;
 				}
@@ -1047,6 +1053,14 @@ BHttpRequest::_MakeRequest()
 					bytesTotal = atoll(fHeaders.HeaderAt(index).Value());
 				else
 					bytesTotal = -1;
+
+				if (fRequestMethod == B_HTTP_HEAD
+					|| fResult.StatusCode() == 204) {
+					// In the case of a HEAD request or if the server replies
+					// 204 ("no content"), we don't expect to receive anything
+					// more, and the socket will be closed.
+					receiveEnd = true;
+				}
 			}
 		}
 
