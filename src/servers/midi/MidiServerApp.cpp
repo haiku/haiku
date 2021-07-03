@@ -8,6 +8,7 @@
 
 /*
  * Copyright (c) 2002-2004 Matthijs Hollemans
+ * Copyright (c) 2021 Panagiotis Vasilopoulos
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -33,7 +34,10 @@
 
 #include <new>
 
-#include <Alert.h>
+#include <AboutWindow.h>
+#include <Catalog.h>
+#include <Locale.h>
+#include <LocaleRoster.h>
 
 #include "debug.h"
 #include "protocol.h"
@@ -42,6 +46,10 @@
 
 
 using std::nothrow;
+
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "midi_server"
 
 
 MidiServerApp::MidiServerApp(status_t& error)
@@ -75,15 +83,32 @@ MidiServerApp::~MidiServerApp()
 void
 MidiServerApp::AboutRequested()
 {
-	BAlert* alert = new BAlert(0,
-		"Haiku midi_server 1.0.0 alpha\n\n"
-		"notes disguised as bytes\n"
-		"propagating to endpoints,\n"
-		"an aural delight",
-		"OK", 0, 0, B_WIDTH_AS_USUAL,
-		B_INFO_ALERT);
-	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-	alert->Go();
+	BAboutWindow* window = new BAboutWindow(B_TRANSLATE_SYSTEM_NAME(
+		"Haiku MIDI Server"), MIDI_SERVER_SIGNATURE);
+	window->AddDescription(B_TRANSLATE(
+		"Notes disguised as bytes\n"
+		"propagating to endpoints-\n"
+		"An aural delight."));
+
+	const char* extraCopyrights[] = {
+		"2002-2004 Matthijs Hollemans",
+		"2021 Panagiotis Vasilopoulos",
+		NULL
+	};
+
+	const char* authors[] = {
+		"Humdinger",
+		"Matthijs Hollemans",
+		"Oliver Tappe",
+		"Panagiotis Vasilopoulos",
+		"Philippe Houdoin",
+		NULL
+	};
+
+	window->AddCopyright(2021, "Haiku, Inc.", extraCopyrights);
+	window->AddAuthors(authors);
+
+	window->Show();
 }
 
 
