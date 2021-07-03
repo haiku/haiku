@@ -1,4 +1,4 @@
-1	japanese	application/x-vnd.Cortex.Route	2011521004
+1	japanese	application/x-vnd.Cortex.Route	25925955
 Node '%name%' released	CortexRouteApp		ノード '%name%' が解放された
 OK	CortexRouteApp		OK
 About Cortex/Route…	CortexRouteApp		Cortex/Routeについて…
@@ -17,6 +17,7 @@ Connection '%name%' broken	CortexRouteApp		接続 '%name%' は壊れています
 Between:	CortexRouteApp		以下の間
 Cortex	CortexRouteApp		Cortex
 Open…	CortexRouteApp		開く…
+Pull palettes	CortexRouteApp		パレットを抽出する
 Connection made	CortexRouteApp		接続が生成された
 Show transport	CortexRouteApp		トランスポートを表示
 Show add-ons	CortexRouteApp		Add-onを表示

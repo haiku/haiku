@@ -1,4 +1,4 @@
-1	romanian	application/x-vnd.Cortex.Route	770263528
+1	romanian	application/x-vnd.Cortex.Route	25925955
 Node '%name%' released	CortexRouteApp		Nodul „%name%” a fost eliberat
 OK	CortexRouteApp		OK
 About Cortex/Route…	CortexRouteApp		Despre Cortex/Route…
@@ -22,4 +22,5 @@ Connection made	CortexRouteApp		Conexiunea a fost creată
 Show transport	CortexRouteApp		Arată transportul
 Show add-ons	CortexRouteApp		Arată suplimentele
 Quit	CortexRouteApp		Ieșire
+Cortex/Route 2.1.2\n\nCopyright 1999-2000 Eric Moon\nAll rights reserved.\n\nThe Cortex Team:\n\nChristopher Lenz: UI\nEric Moon: UI, back-end\n\nThanks to:\nJohn Ashmun\nJon Watte\nDoug Wright\n<your name here>\n\nCertain icons used herein are the property of\nBe, Inc. and are used by permission.	CortexRouteApp		Cortex/Route 2.1.2\n\nDrepturi de autor 1999-2000 Eric Moon\nToate drepturile rezervate.\n\nEchipa Cortex:\n\nChristopher Lenz: UI\nEric Moon: UI, backend\n\nMulțumiri:\nJohn Ashmun\nJon Watte\nDoug Wright\n<your name here>\n\nAnumite iconițe utilizate aici sunt proprietatea\nBe, Inc. și sunt utilizate cu permisiune.
 Tried format:	CortexRouteApp		Format încercat:

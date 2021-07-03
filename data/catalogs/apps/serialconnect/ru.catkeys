@@ -1,4 +1,4 @@
-1	russian	x-vnd.haiku.SerialConnect	1460410278
+1	russian	x-vnd.haiku.SerialConnect	758466423
 Hardware	SerialWindow	Flowcontrol	Аппаратное
 Connection	SerialWindow		Соединение
 Baud rate	SerialWindow		Скорость передачи
@@ -10,10 +10,13 @@ Sending…	XModemStatus		Отправка…
 Log to file…	SerialWindow		Сохранить журнал в файл…
 Custom baudrate	Custom baudrate window		Настроить скорость передачи
 File	SerialWindow		Файл
+SerialConnect	System name		Последовательное Подключение
 custom…	SerialWindow	Baudrate	в ручную…
 Parity	SerialWindow		Четность
 None	SerialWindow	Parity	Без проверки
 Disconnect	SerialWindow		Отключить
+Everything sent, waiting for acknowledge	XModemStatus		Все отправлено, ждем подтверждения
+file transfer progress	SerialWindow		прогресс передачи файлов
 Edit	SerialWindow		Изменить
 XModem send…	SerialWindow		Передать через XModem…
 Baudrate:	Custom baudrate window		Скорость:
@@ -21,3 +24,4 @@ OK	Custom baudrate window		ОК
 Clear history	SerialWindow		Очистить историю
 Checksum error, re-send block	XModemStatus		Ошибка контрольной суммы, повторная отправка
 Settings	SerialWindow		Настройки
+Software	SerialWindow	Flowcontrol	Программное обеспечение

@@ -1,0 +1,25 @@
+1	dutch; flemish	application/x-vnd.Cortex.InfoView	2406840540
+Offset	InfoView		Startpunt
+Description	DormantNodeInfoView		Omschrijving
+Byte order	InfoView		Byte-volgorde
+Connection	InfoView		Verbinding
+Output formats	DormantNodeInfoView		Uitvoerformaten
+History	InfoView		Geschiedenis
+Input formats	DormantNodeInfoView		Invoerformaten
+Signature	AppNodeInfoView		Handtekening
+Video data between	InfoView		Videogegevens tussen
+Any number	DormantNodeInfoView	For 'Max. instances' field	Elk mogelijk getal
+Flags	InfoView		Opties
+Media output	InfoView		Mediauitvoer
+Active lines	InfoView		Actieve lijnen
+Buffer size	InfoView		Buffergrootte
+\n- Quality:	FileNodeInfoView		\n- Kwaliteit:
+Kinds	LiveNodeInfoView		Soorten
+Application	AppNodeInfoView		Toepassing
+Flavor flags	DormantNodeInfoView		Smaakopties
+Max. instances	DormantNodeInfoView		Max. instanties
+\n- Duration:	FileNodeInfoView		\n- Duur:
+Dormant media node	DormantNodeInfoView		Inactieve medianode
+Latency	LiveNodeInfoView		Vertraging
+Media type	InfoView		Mediatype
+Live media node	LiveNodeInfoView		Actieve medianode

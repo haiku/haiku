@@ -1,9 +1,10 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	3106374143
+1	japanese	x-vnd.Haiku-HaikuDepot	3544756144
 Repository update error	LocalRepositoryUpdateProcess		リポジトリアップデートエラー
 Network error	ServerHelper		ネットワークエラー
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		リポジトリの更新中に次のエラーが発生しました: %error%
 User Created	UserLoginWindow		作成されたユーザー
 Check for updates…	MainWindow		更新をチェック…
+Uninstall	PackageManager		アンインストール
 Uninstalled	PackageListView		アンインストール済
 It was not possible to create the new user.	UserLoginWindow		新規ユーザーを作成できませんでした。
 Available packages	MainWindow		使用可能なパッケージ
@@ -45,6 +46,8 @@ Category	FilterView		分類
 User rating	RatePackageWindow		ユーザーによる評価
 Installed packages	MainWindow		インストール済パッケージ
 A requested object or an object involved in the request was not found on the server.	ServerHelper		要求されたオブジェクトまたはリクエストに関連するオブジェクトがサーバー上に見つからなかった。
+Fatal error	PackageManager		致命的なエラー
+Package action failed	PackageInfoView		パッケージアクションが失敗しました
 No changelog available.	PackageInfoView		変更記録はありません。
 Error	App		エラー
 There was a puzzling response from the web service.	UserLoginWindow		ウェブサービスから不可解なレスポンスがあった。
@@ -76,6 +79,7 @@ Stability	RatePackageWindow		安定度
 Send	RatePackageWindow		送信する
 Start package daemon	App		パッケージデーモンを起動
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		間違って入力する可能性を減らすため、パスワードを繰り返す必要があります。
+The package action could not be scheduled: %Error%	PackageInfoView		パッケージアクションはスケジュールできませんでした: %Error%
 Cancel	SettingsWindow		キャンセル
 Cancel	RatePackageWindow		中止
 Inactive	PackageListView		無効
@@ -85,6 +89,7 @@ There are problems in the supplied data:	UserLoginWindow		入力されたデー�
 OK	MainWindow		OK
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# アイテム} other{# アイテム}}
 Usage conditions download problem	UserLoginWindow		使用条件のダウンロードで問題
+OK	PackageInfoView		OK
 Downloading:	PackageInfoView		ダウンロード中:
 Quit	MainWindow		終了
 Success	UserLoginWindow		成功
@@ -167,6 +172,7 @@ Fetching remote repository data	LocalRepositoryUpdateProcess		リモートリポ
 Description	PackageListView		説明
 Open %DeskbarLink%	PackageManager		%DeskbarLink% を開く
 User creation error	UserLoginWindow		ユーザー作成エラー
+Install	PackageManager		インストール
 Input validation	UserLoginWindow		入力検証
 Log in…	MainWindow		ログイン…
 You need to be logged into an account before you can rate packages.	MainWindow		パッケージを評価する前にアカウントにログインする必要があります。
