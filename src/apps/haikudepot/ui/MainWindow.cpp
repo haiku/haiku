@@ -309,13 +309,7 @@ MainWindow::MessageReceived(BMessage* message)
 			break;
 
 		case B_PACKAGE_UPDATE:
-			HDINFO("package update received");
-			// TODO: see ticket #15879
-			// work needs to be done here to selectively update package data in
-			// the running HaikuDepot application when there are changes on the
-			// system.  There is now too much data to just load everything when
-			// there is a change.
-			//_StartBulkLoad(false);
+			_HandleExternalPackageUpdateMessageReceived(message);
 			break;
 
 		case MSG_REFRESH_REPOS:
@@ -1021,6 +1015,38 @@ MainWindow::_NotifyWorkStatusChange(const BString& text, float progress)
 	message.AddFloat(KEY_WORK_STATUS_PROGRESS, progress);
 
 	this->PostMessage(&message, this);
+}
+
+
+// needs to be implemented to update details for added / removed packages.
+// TODO: see ticket #15879
+
+void
+MainWindow::_HandleExternalPackageUpdateMessageReceived(const BMessage* message)
+{
+	BStringList addedPackageNames;
+	BStringList removedPackageNames;
+
+	if (message->FindStrings("added package names",
+			&addedPackageNames) == B_OK) {
+		addedPackageNames.Sort();
+		for (int32 i = 0; i < addedPackageNames.CountStrings(); i++) {
+			HDINFO("added package name; %s",
+				addedPackageNames.StringAt(i).String());
+		}
+	}
+	else
+		HDINFO("no [added package names] key in inbound message");
+
+	if (message->FindStrings("removed package names",
+			&removedPackageNames) == B_OK) {
+		removedPackageNames.Sort();
+		for (int32 i = 0; i < removedPackageNames.CountStrings(); i++) {
+			HDINFO("removed package name; %s",
+				removedPackageNames.StringAt(i).String());
+		}
+	} else
+		HDINFO("no [removed package names] key in inbound message");
 }
 
 

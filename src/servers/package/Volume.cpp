@@ -1,9 +1,10 @@
 /*
- * Copyright 2013-2014, Haiku, Inc. All Rights Reserved.
+ * Copyright 2013-2021, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Ingo Weinhold <ingo_weinhold@gmx.de>
+ *		Andrew Lindesay <apl@lindesay.co.nz>
  */
 
 
@@ -1322,6 +1323,21 @@ void
 Volume::_SetLatestState(VolumeState* state, bool isActive)
 {
 	AutoLocker<BLocker> locker(fLock);
+
+	bool sendNotification = fRoot->IsSystemRoot();
+		// Send a notification, if this is a system root volume.
+	BStringList addedPackageNames;
+	BStringList removedPackageNames;
+
+	// If a notification should be sent then assemble the latest and incoming
+	// set of the packages' names.  This can be used to figure out which
+	// packages are added and which are removed.
+
+	if (sendNotification) {
+		_CollectPackageNamesAdded(fLatestState, state, addedPackageNames);
+		_CollectPackageNamesAdded(state, fLatestState, removedPackageNames);
+	}
+
 	if (isActive) {
 		if (fLatestState != fActiveState)
 			delete fActiveState;
@@ -1336,13 +1352,40 @@ Volume::_SetLatestState(VolumeState* state, bool isActive)
 	locker.Unlock();
 
 	// Send a notification, if this is a system root volume.
-	if (fRoot->IsSystemRoot()) {
+	if (sendNotification) {
 		BMessage message(B_PACKAGE_UPDATE);
 		if (message.AddInt32("event",
 				(int32)B_INSTALLATION_LOCATION_PACKAGES_CHANGED) == B_OK
+			&& message.AddStrings("added package names",
+				addedPackageNames) == B_OK
+			&& message.AddStrings("removed package names",
+				removedPackageNames) == B_OK
 			&& message.AddInt32("location", (int32)Location()) == B_OK
 			&& message.AddInt64("change count", fChangeCount) == B_OK) {
 			BRoster::Private().SendTo(&message, NULL, false);
+		}
+	}
+}
+
+
+/*static*/ void
+Volume::_CollectPackageNamesAdded(const VolumeState* oldState,
+	const VolumeState* newState, BStringList& addedPackageNames)
+{
+	if (newState == NULL)
+		return;
+
+	for (PackageFileNameHashTable::Iterator it
+			= newState->ByFileNameIterator(); it.HasNext();) {
+		Package* package = it.Next();
+		BString packageName = package->Info().Name();
+		if (oldState == NULL)
+			addedPackageNames.Add(packageName);
+		else {
+			Package* oldStatePackage = oldState->FindPackage(
+				package->FileName());
+			if (oldStatePackage == NULL)
+				addedPackageNames.Add(packageName);
 		}
 	}
 }

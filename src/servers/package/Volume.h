@@ -1,9 +1,10 @@
 /*
- * Copyright 2013-2014, Haiku, Inc. All Rights Reserved.
+ * Copyright 2013-2021, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Ingo Weinhold <ingo_weinhold@gmx.de>
+ *		Andrew Lindesay <apl@lindesay.co.nz>
  */
 #ifndef VOLUME_H
 #define VOLUME_H
@@ -180,6 +181,11 @@ private:
 									const PackageSet& packagesAlreadyAdded,
 									const PackageSet& packagesAlreadyRemoved,
 									BCommitTransactionResult& _result);
+
+	static	void				_CollectPackageNamesAdded(
+									const VolumeState* oldState,
+									const VolumeState* newState,
+									BStringList& addedPackageNames);
 
 private:
 			BString				fPath;

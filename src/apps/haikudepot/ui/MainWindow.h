@@ -112,6 +112,9 @@ private:
 			void				_HandleWorkStatusChangeMessageReceived(
 									const BMessage* message);
 
+			void				_HandleExternalPackageUpdateMessageReceived(
+									const BMessage* message);
+
 			void				_HandleChangePackageListViewMode();
 
 	static	status_t			_RefreshModelThreadWorker(void* arg);
