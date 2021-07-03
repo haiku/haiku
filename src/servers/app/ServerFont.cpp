@@ -652,35 +652,6 @@ ServerFont::IncludesUnicodeBlock(uint32 start, uint32 end, bool& hasBlock)
 }
 
 
-class HasGlyphsConsumer {
- public:
-	HasGlyphsConsumer(bool* hasArray)
-		:
-		fHasArray(hasArray)
-	{
-	}
-
-	bool NeedsVector() { return false; }
-	void Start() {}
-	void Finish(double x, double y) {}
-	void ConsumeEmptyGlyph(int32 index, uint32 charCode, double x, double y)
-	{
-		fHasArray[index] = false;
-	}
-
-	bool ConsumeGlyph(int32 index, uint32 charCode, const GlyphCache* glyph,
-		FontCacheEntry* entry, double x, double y, double advanceX,
-			double advanceY)
-	{
-		fHasArray[index] = glyph->glyph_index != 0;
-		return true;
-	}
-
- private:
-	bool* fHasArray;
-};
-
-
 status_t
 ServerFont::GetHasGlyphs(const char* string, int32 numBytes, int32 numChars,
 	bool* hasArray) const
@@ -688,13 +659,44 @@ ServerFont::GetHasGlyphs(const char* string, int32 numBytes, int32 numChars,
 	if (string == NULL || numBytes <= 0 || numChars <= 0 || hasArray == NULL)
 		return B_BAD_DATA;
 
-	HasGlyphsConsumer consumer(hasArray);
-	if (GlyphLayoutEngine::LayoutGlyphs(consumer, *this, string, numBytes,
-			numChars, NULL, fSpacing)) {
-		return B_OK;
+	FontCacheEntry* entry = NULL;
+	FontCacheReference cacheReference;
+	BObjectList<FontCacheReference> fallbacks(21, true);
+	int32 fallbacksCount = -1;
+
+	entry = GlyphLayoutEngine::FontCacheEntryFor(*this, false);
+	if (entry == NULL || !cacheReference.SetTo(entry, false))
+		return B_ERROR;
+
+	uint32 charCode;
+	int32 charIndex = 0;
+	const char* start = string;
+	while (charIndex < numChars && (charCode = UTF8ToCharCode(&string)) != 0) {
+		hasArray[charIndex] = entry->CanCreateGlyph(charCode);
+
+		if (hasArray[charIndex] == false) {
+			if (fallbacksCount < 0) {
+				GlyphLayoutEngine::PopulateAndLockFallbacks(
+					fallbacks, *this, false, false);
+				fallbacksCount = fallbacks.CountItems();
+			}
+
+			for (int32 index = 0; index < fallbacksCount; index++) {
+				FontCacheEntry* fallbackEntry
+					= fallbacks.ItemAt(index)->Entry();
+				if (fallbackEntry->CanCreateGlyph(charCode)) {
+					hasArray[charIndex] = true;
+					break;
+				}
+			}
+		}
+
+		charIndex++;
+		if (string - start + 1 > numBytes)
+			break;
 	}
 
-	return B_ERROR;
+	return B_OK;
 }
 
 

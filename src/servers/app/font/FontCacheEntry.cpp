@@ -312,9 +312,6 @@ FontCacheEntry::CreateGlyph(uint32 glyphCode, FontCacheEntry* fallbackEntry)
 		if (render_as_space(glyphCode)) {
 			// get the normal space glyph
 			glyphIndex = engine->GlyphIndexForGlyphCode(0x20 /* space */);
-		} else {
-			// The glyph was not found anywhere.
-			return NULL;
 		}
 	}
 

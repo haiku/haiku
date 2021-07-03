@@ -120,16 +120,17 @@ public:
 									const BPoint* offsets = NULL,
 									FontCacheReference* cacheReference = NULL);
 
+	static	void				PopulateAndLockFallbacks(
+									BObjectList<FontCacheReference>& fallbacks,
+									const ServerFont& font, bool forceVector,
+									bool writeLock);
+
 private:
 	static	const GlyphCache*	_CreateGlyph(
 									FontCacheReference& cacheReference,
 									BObjectList<FontCacheReference>& fallbacks,
 									const ServerFont& font, bool needsVector,
 									uint32 glyphCode);
-
-	static	void				_PopulateAndLockFallbacks(
-									BObjectList<FontCacheReference>& fallbacks,
-									const ServerFont& font, bool forceVector);
 
 								GlyphLayoutEngine();
 	virtual						~GlyphLayoutEngine();
@@ -305,7 +306,7 @@ GlyphLayoutEngine::_CreateGlyph(FontCacheReference& cacheReference,
 		// The main font is unlocked first, in case it is also in the fallback
 		// list, so that we always keep the same order to avoid deadlocks.
 		cacheReference.UnlockAndDisown();
-		_PopulateAndLockFallbacks(fallbacks, font, forceVector);
+		PopulateAndLockFallbacks(fallbacks, font, forceVector, true);
 		if (!cacheReference.SetTo(entry, true)) {
 			return NULL;
 		}
@@ -318,14 +319,15 @@ GlyphLayoutEngine::_CreateGlyph(FontCacheReference& cacheReference,
 			return entry->CreateGlyph(charCode, fallbackEntry);
 	}
 
-	return NULL;
+	return entry->CreateGlyph(charCode);
+		// No one knows how to draw this, so use the missing glyph symbol.
 }
 
 
 inline void
-GlyphLayoutEngine::_PopulateAndLockFallbacks(
+GlyphLayoutEngine::PopulateAndLockFallbacks(
 	BObjectList<FontCacheReference>& fallbacksList,
-	const ServerFont& font, bool forceVector)
+	const ServerFont& font, bool forceVector, bool writeLock)
 {
 	ASSERT(fallbacksList.IsEmpty());
 
@@ -388,7 +390,7 @@ GlyphLayoutEngine::_PopulateAndLockFallbacks(
 		FontCacheReference* cacheReference =
 			new(std::nothrow) FontCacheReference();
 		if (cacheReference != NULL) {
-			if (cacheReference->SetTo(fallbackCacheEntries[i], true))
+			if (cacheReference->SetTo(fallbackCacheEntries[i], writeLock))
 				fallbacksList.AddItem(cacheReference);
 			else
 				delete cacheReference;
