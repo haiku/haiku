@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2015 Haiku, Inc. All rights reserved.
+ * Copyright 2008-2021 Haiku, Inc. All rights reserved.
  * Copyright 2007-2009, Marcus Overhagen. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
@@ -7,6 +7,7 @@
  *		Axel Dörfler, axeld@pinc-software.de
  *		Michael Lotz, mmlr@mlotz.ch
  *		Alexander von Gluck IV, kallisti5@unixzen.com
+ *		David Sebek, dasebek@gmail.com
  */
 
 
@@ -47,6 +48,18 @@
 #define INQUIRY_BASE_LENGTH 36
 
 
+// DATA SET MANAGEMENT command limits
+
+#define DSM_MAX_COUNT_48			UINT16_MAX
+	// max number of 512-byte blocks (48-bit command)
+#define DSM_MAX_COUNT_28			UINT8_MAX
+	// max number of 512-byte blocks (28-bit command)
+#define DSM_RANGE_BLOCK_ENTRIES		64
+	// max entries in a 512-byte block (512 / 8)
+#define DSM_MAX_RANGE_VALUE			UINT16_C(0xffff)
+#define DSM_MAX_LBA_VALUE			UINT64_C(0xffffffffffff)
+
+
 AHCIPort::AHCIPort(AHCIController* controller, int index)
 	:
 	fController(controller),
@@ -64,7 +77,9 @@ AHCIPort::AHCIPort(AHCIController* controller, int index)
 	fTestUnitReadyActive(false),
 	fPortReset(false),
 	fError(false),
-	fTrimSupported(false)
+	fTrimSupported(false),
+	fTrimReturnsZeros(false),
+	fMaxTrimRangeBlocks(0)
 {
 	B_INITIALIZE_SPINLOCK(&fSpinlock);
 	fRequestSem = create_sem(1, "ahci request");
@@ -585,26 +600,69 @@ AHCIPort::ScsiVPDInquiry(scsi_ccb* request, ata_device_infoblock* ataData)
 	switch (cmd->page_code) {
 		case SCSI_PAGE_SUPPORTED_VPD:
 		{
-			scsi_page_list vpdPageData;
-			vpdDataLength = sizeof(vpdPageData);
+			// supported pages should be in ascending numerical order
+			const uint8 supportedPages[] = {
+				SCSI_PAGE_SUPPORTED_VPD,
+				SCSI_PAGE_BLOCK_LIMITS,
+				SCSI_PAGE_LB_PROVISIONING
+			};
 
-			vpdPageData.page_code = cmd->page_code;
+			const size_t bufferLength = sizeof(scsi_page_list)
+				+ sizeof(supportedPages) - 1;
+			uint8 buffer[bufferLength];
+
+			scsi_page_list* vpdPageData = (scsi_page_list*)buffer;
+			memset(vpdPageData, 0, bufferLength);
+
+			vpdPageData->page_code = cmd->page_code;
 			// Our supported pages
-			vpdPageData.page_length = 1;
-			vpdPageData.pages[0] = SCSI_PAGE_BLOCK_LIMITS;
+			vpdPageData->page_length = sizeof(supportedPages);
+			memcpy(vpdPageData->pages, supportedPages, sizeof(supportedPages));
+
+			uint8 allocationLength = cmd->allocation_length;
+			vpdDataLength = min_c(allocationLength, bufferLength);
 
 			transactionResult = sg_memcpy(request->sg_list, request->sg_count,
-				&vpdPageData, vpdDataLength);
+				vpdPageData, vpdDataLength);
 			break;
 		}
 		case SCSI_PAGE_BLOCK_LIMITS:
 		{
 			scsi_page_block_limits vpdPageData;
-			vpdDataLength = sizeof(vpdPageData);
+			memset(&vpdPageData, 0, sizeof(vpdPageData));
 
 			vpdPageData.page_code = cmd->page_code;
-			vpdPageData.max_unmap_lba_count
-				= ataData->max_data_set_management_lba_range_blocks;
+			vpdPageData.page_length
+				= B_HOST_TO_BENDIAN_INT16(sizeof(vpdPageData) - 4);
+			if (fTrimSupported) {
+				// We can handle anything as long as we have enough memory
+				// (UNMAP structure can realistically be max. 65528 bytes)
+				vpdPageData.max_unmap_lba_count
+					= B_HOST_TO_BENDIAN_INT32(UINT32_MAX);
+				vpdPageData.max_unmap_blk_count
+					= B_HOST_TO_BENDIAN_INT32(UINT32_MAX);
+			}
+
+			uint8 allocationLength = cmd->allocation_length;
+			vpdDataLength = min_c(allocationLength, sizeof(vpdPageData));
+
+			transactionResult = sg_memcpy(request->sg_list, request->sg_count,
+				&vpdPageData, vpdDataLength);
+			break;
+		}
+		case SCSI_PAGE_LB_PROVISIONING:
+		{
+			scsi_page_lb_provisioning vpdPageData;
+			memset(&vpdPageData, 0, sizeof(vpdPageData));
+
+			vpdPageData.page_code = cmd->page_code;
+			vpdPageData.page_length
+				= B_HOST_TO_BENDIAN_INT16(sizeof(vpdPageData) - 4);
+			vpdPageData.lbpu = fTrimSupported;
+			vpdPageData.lbprz = fTrimReturnsZeros;
+
+			uint8 allocationLength = cmd->allocation_length;
+			vpdDataLength = min_c(allocationLength, sizeof(vpdPageData));
 
 			transactionResult = sg_memcpy(request->sg_list, request->sg_count,
 				&vpdPageData, vpdDataLength);
@@ -612,7 +670,6 @@ AHCIPort::ScsiVPDInquiry(scsi_ccb* request, ata_device_infoblock* ataData)
 		}
 		case SCSI_PAGE_USN:
 		case SCSI_PAGE_BLOCK_DEVICE_CHARS:
-		case SCSI_PAGE_LB_PROVISIONING:
 		case SCSI_PAGE_REFERRALS:
 			ERROR("VPD AHCI page %d not yet implemented!\n",
 				cmd->page_code);
@@ -669,6 +726,8 @@ AHCIPort::ScsiInquiry(scsi_ccb* request)
 		return;
 	}
 
+	memset(&ataData, 0, sizeof(ataData));
+
 	sata_request sreq;
 	sreq.SetData(&ataData, sizeof(ataData));
 	sreq.SetATACommand(fIsATAPI
@@ -698,12 +757,16 @@ AHCIPort::ScsiInquiry(scsi_ccb* request)
 	}
 */
 
+	memset(&scsiData, 0, sizeof(scsiData));
+
 	scsiData.device_type = fIsATAPI
 		? ataData.word_0.atapi.command_packet_set : scsi_dev_direct_access;
 	scsiData.device_qualifier = scsi_periph_qual_connected;
 	scsiData.device_type_modifier = 0;
 	scsiData.removable_medium = ataData.word_0.ata.removable_media_device;
-	scsiData.ansi_version = 2;
+	scsiData.ansi_version = 5;
+		// Set the version to SPC-3 so that scsi_periph
+		// uses READ CAPACITY (16) and attempts to read VPD pages
 	scsiData.ecma_version = 0;
 	scsiData.iso_version = 0;
 	scsiData.response_data_format = 2;
@@ -721,6 +784,7 @@ AHCIPort::ScsiInquiry(scsi_ccb* request)
 		fSectorCount = ataData.SectorCount(fUse48BitCommands, true);
 		fSectorSize = ataData.SectorSize();
 		fTrimSupported = ataData.data_set_management_support;
+		fTrimReturnsZeros = ataData.supports_read_zero_after_trim;
 		fMaxTrimRangeBlocks = B_LENDIAN_TO_HOST_INT16(
 			ataData.max_data_set_management_lba_range_blocks);
 		TRACE("lba %d, lba48 %d, fUse48BitCommands %d, sectors %" B_PRIu32
@@ -738,7 +802,7 @@ AHCIPort::ScsiInquiry(scsi_ccb* request)
 				"%sdeterministic%s.\n", fMaxTrimRangeBlocks,
 				deterministic ? "" : "non-", deterministic
 					? (ataData.supports_read_zero_after_trim
-						? ", zero" : ", random") : "");
+						? ", zero" : ", undefined") : "");
 			#endif
 		}
 	}
@@ -842,6 +906,8 @@ AHCIPort::ScsiReadCapacity(scsi_ccb* request)
 	TRACE("SectorSize %" B_PRIu32 ", SectorCount 0x%" B_PRIx64 "\n",
 		fSectorSize, fSectorCount);
 
+	memset(&scsiData, 0, sizeof(scsiData));
+
 	scsiData.block_size = B_HOST_TO_BENDIAN_INT32(fSectorSize);
 
 	if (fSectorCount <= 0xffffffff)
@@ -865,20 +931,37 @@ AHCIPort::ScsiReadCapacity16(scsi_ccb* request)
 {
 	TRACE("AHCIPort::ScsiReadCapacity16 port %d\n", fIndex);
 
+	const scsi_cmd_read_capacity_long* cmd
+		= (const scsi_cmd_read_capacity_long*)request->cdb;
 	scsi_res_read_capacity_long scsiData;
+
+	uint32 allocationLength = B_BENDIAN_TO_HOST_INT32(cmd->alloc_length);
+	size_t copySize = min_c(allocationLength, sizeof(scsiData));
+
+	if (cmd->pmi || cmd->lba || request->data_length < copySize) {
+		TRACE("invalid request\n");
+		request->subsys_status = SCSI_REQ_ABORTED;
+		gSCSI->finished(request, 1);
+		return;
+	}
 
 	TRACE("SectorSize %" B_PRIu32 ", SectorCount 0x%" B_PRIx64 "\n",
 		fSectorSize, fSectorCount);
 
+	memset(&scsiData, 0, sizeof(scsiData));
+
 	scsiData.block_size = B_HOST_TO_BENDIAN_INT32(fSectorSize);
 	scsiData.lba = B_HOST_TO_BENDIAN_INT64(fSectorCount - 1);
+	scsiData.rc_basis = 0x01;
+	scsiData.lbpme = fTrimSupported;
+	scsiData.lbprz = fTrimReturnsZeros;
 
 	if (sg_memcpy(request->sg_list, request->sg_count, &scsiData,
-			sizeof(scsiData)) < B_OK) {
+			copySize) < B_OK) {
 		request->subsys_status = SCSI_DATA_RUN_ERR;
 	} else {
 		request->subsys_status = SCSI_REQ_CMP;
-		request->data_resid = request->data_length - sizeof(scsiData);
+		request->data_resid = request->data_length - copySize;
 	}
 	gSCSI->finished(request, 1);
 }
@@ -939,108 +1022,147 @@ AHCIPort::ScsiReadWrite(scsi_ccb* request, uint64 lba, size_t sectorCount,
 void
 AHCIPort::ScsiUnmap(scsi_ccb* request, scsi_unmap_parameter_list* unmapBlocks)
 {
+	if (!fTrimSupported || fMaxTrimRangeBlocks == 0) {
+		ERROR("TRIM error: Invalid TRIM support values detected\n");
+		return;
+	}
+
 	// Determine how many blocks are supposed to be trimmed in total
-	uint32 scsiRangeCount = B_BENDIAN_TO_HOST_INT16(
+	uint32 scsiRangeCount = (uint16)B_BENDIAN_TO_HOST_INT16(
 		unmapBlocks->block_data_length) / sizeof(scsi_unmap_block_descriptor);
 
-dprintf("TRIM SCSI:\n");
-for (uint32 i = 0; i < scsiRangeCount; i++) {
-	dprintf("[%3" B_PRIu32 "] %" B_PRIu64 " : %" B_PRIu32 "\n", i,
-		(uint64)B_BENDIAN_TO_HOST_INT64(unmapBlocks->blocks[i].lba),
-		(uint32)B_BENDIAN_TO_HOST_INT32(unmapBlocks->blocks[i].block_count));
-}
+#ifdef DEBUG_TRIM
+	dprintf("TRIM: AHCI: received a SCSI UNMAP command (blocks):\n");
+	for (uint32 i = 0; i < scsiRangeCount; i++) {
+		dprintf("[%3" B_PRIu32 "] %" B_PRIu64 " : %" B_PRIu32 "\n", i,
+			(uint64)B_BENDIAN_TO_HOST_INT64(unmapBlocks->blocks[i].lba),
+			(uint32)B_BENDIAN_TO_HOST_INT32(
+				unmapBlocks->blocks[i].block_count));
+	}
+#endif
 
-	uint32 scsiIndex = 0;
-	uint32 scsiLastBlocks = 0;
-	uint32 maxLBARangeCount = fMaxTrimRangeBlocks * 512 / 8;
-		// 512 bytes per range block, 8 bytes per range
+	if (scsiRangeCount == 0) {
+		request->subsys_status = SCSI_REQ_CMP;
+		request->data_resid = 0;
+		request->device_status = SCSI_STATUS_GOOD;
+		gSCSI->finished(request, 1);
+		return;
+	}
 
-	// Split the SCSI ranges into ATA ranges as large as allowed.
-	// We assume that the SCSI unmap ranges cannot be merged together
+	size_t lbaRangeCount = 0;
+	for (uint32 i = 0; i < scsiRangeCount; i++) {
+		uint32 range
+			= B_BENDIAN_TO_HOST_INT32(unmapBlocks->blocks[i].block_count);
+		lbaRangeCount += range / DSM_MAX_RANGE_VALUE;
+		if (range % DSM_MAX_RANGE_VALUE != 0)
+			lbaRangeCount++;
+	}
+	TRACE("Total number of ATA ranges: %" B_PRIuSIZE "\n", lbaRangeCount);
 
-	while (scsiIndex < scsiRangeCount) {
-		// Determine how many LBA ranges we need for the next chunk
-		uint32 lbaRangeCount = 0;
-		for (uint32 i = scsiIndex; i < scsiRangeCount; i++) {
-			uint32 scsiBlocks = B_BENDIAN_TO_HOST_INT32(
-				unmapBlocks->blocks[i].block_count);
-			if (scsiBlocks == 0)
-				break;
-			if (i == scsiIndex)
-				scsiBlocks -= scsiLastBlocks;
+	size_t lbaRangesAllocatedSize = lbaRangeCount * sizeof(uint64);
+	// Request data is transferred in 512-byte blocks
+	if (lbaRangesAllocatedSize % 512 != 0) {
+		lbaRangesAllocatedSize += 512 - (lbaRangesAllocatedSize % 512);
+	}
+	// Apply reported device limits
+	if (lbaRangesAllocatedSize > (size_t)fMaxTrimRangeBlocks * 512) {
+		lbaRangesAllocatedSize = (size_t)fMaxTrimRangeBlocks * 512;
+	}
+	// Allocate a single buffer and re-use it between requests
+	TRACE("Allocating a %" B_PRIuSIZE "-byte buffer for ATA request ranges\n",
+		lbaRangesAllocatedSize);
+	uint64* lbaRanges = (uint64*)malloc(lbaRangesAllocatedSize);
+	if (lbaRanges == NULL) {
+		ERROR("out of memory when allocating space for %" B_PRIuSIZE
+			" unmap ranges\n", lbaRangesAllocatedSize / sizeof(uint64));
+		request->subsys_status = SCSI_REQ_ABORTED;
+		gSCSI->finished(request, 1);
+		return;
+	}
 
-			lbaRangeCount += (scsiBlocks + 65534) / 65535;
-			if (lbaRangeCount >= maxLBARangeCount) {
-				lbaRangeCount = maxLBARangeCount;
-				break;
-			}
-		}
-		if (lbaRangeCount == 0)
-			break;
+	MemoryDeleter deleter(lbaRanges);
 
-		uint32 lbaRangesSize = lbaRangeCount * sizeof(uint64);
-		uint64* lbaRanges = (uint64*)malloc(lbaRangesSize);
-		if (lbaRanges == NULL) {
-			ERROR("out of memory when allocating %" B_PRIu32 " unmap ranges\n",
-				lbaRangeCount);
-			request->subsys_status = SCSI_REQ_ABORTED;
-			gSCSI->finished(request, 1);
-			return;
-		}
+	memset(lbaRanges, 0, lbaRangesAllocatedSize);
+		// Entries with range length of 0 will be ignored
+	uint32 lbaIndex = 0;
+	for (uint32 i = 0; i < scsiRangeCount; i++) {
+		uint64 lba = B_BENDIAN_TO_HOST_INT64(unmapBlocks->blocks[i].lba);
+		uint64 length = (uint32)B_BENDIAN_TO_HOST_INT32(
+			unmapBlocks->blocks[i].block_count);
 
-		MemoryDeleter deleter(lbaRanges);
+		if (length == 0)
+			continue; // Length of 0 would be ignored by the device anyway
 
-		for (uint32 lbaIndex = 0;
-				scsiIndex < scsiRangeCount && lbaIndex < lbaRangeCount;) {
-			uint64 scsiOffset = B_BENDIAN_TO_HOST_INT64(
-				unmapBlocks->blocks[scsiIndex].lba) + scsiLastBlocks;
-			uint32 scsiBlocksLeft = B_BENDIAN_TO_HOST_INT32(
-				unmapBlocks->blocks[scsiIndex].block_count) - scsiLastBlocks;
-
-			if (scsiBlocksLeft == 0) {
-				// Ignore the rest of the ranges (they are empty)
-				scsiIndex = scsiRangeCount;
-				break;
-			}
-
-			while (scsiBlocksLeft > 0 && lbaIndex < lbaRangeCount) {
-				uint16 blocks = scsiBlocksLeft > 65535
-					? 65535 : (uint16)scsiBlocksLeft;
-				lbaRanges[lbaIndex++] = B_HOST_TO_LENDIAN_INT64(
-					((uint64)blocks << 48) | scsiOffset);
-
-				scsiOffset += blocks;
-				scsiLastBlocks += blocks;
-				scsiBlocksLeft -= blocks;
-			}
-
-			if (scsiBlocksLeft == 0) {
-				scsiLastBlocks = 0;
-				scsiIndex++;
-			}
+		if (lba > DSM_MAX_LBA_VALUE) {
+			ERROR("LBA value is too large!"
+				" This unmap range will be skipped.\n");
+			continue;
 		}
 
-dprintf("TRIM AHCI:\n");
-for (uint32 i = 0; i < lbaRangeCount; i++) {
-	uint64 value = B_HOST_TO_LENDIAN_INT64(lbaRanges[i]);
-	dprintf("[%3" B_PRIu32 "] %" B_PRIu64 " : %" B_PRIu64 "\n", i,
-		value & (((uint64)1 << 48) - 1), value >> 48);
-}
+		// Split large ranges if needed.
+		// Range length is limited by:
+		//   - max value of the range field (DSM_MAX_RANGE_VALUE)
+		while (length > 0) {
+			uint64 ataRange = min_c(length, DSM_MAX_RANGE_VALUE);
+			lbaRanges[lbaIndex++]
+				= B_HOST_TO_LENDIAN_INT64((ataRange << 48) | lba);
 
-		sata_request sreq;
-		sreq.SetATA48Command(ATA_COMMAND_DATA_SET_MANAGEMENT, 0,
-			(lbaRangesSize + 511) / 512);
-		sreq.SetFeature(1);
-		sreq.SetData(lbaRanges, lbaRangesSize);
+			// Split into multiple requests if needed.
+			// The number of entries in a request is limited by:
+			//   - the maximum number of 512-byte blocks reported by the device
+			//   - maximum possible value of the COUNT field
+			//   - the size of our buffer
+			if (lbaIndex >= fMaxTrimRangeBlocks * DSM_RANGE_BLOCK_ENTRIES
+				|| (((lbaIndex + 1) * sizeof(uint64) + 511) / 512)
+					> DSM_MAX_COUNT_48
+				|| lbaIndex >= lbaRangesAllocatedSize / sizeof(uint64)
+				|| (i == scsiRangeCount - 1 && length <= DSM_MAX_RANGE_VALUE))
+			{
+				uint32 lbaRangeCount = lbaIndex;
+				if (lbaRangeCount % DSM_RANGE_BLOCK_ENTRIES != 0)
+					lbaRangeCount += DSM_RANGE_BLOCK_ENTRIES
+						- (lbaRangeCount % DSM_RANGE_BLOCK_ENTRIES);
+				uint32 lbaRangesSize = lbaRangeCount * sizeof(uint64);
 
-		ExecuteSataRequest(&sreq);
-		sreq.WaitForCompletion();
+#ifdef DEBUG_TRIM
+				dprintf("TRIM: AHCI: sending a DATA SET MANAGEMENT command"
+					" to the device (blocks):\n");
+				for (uint32 i = 0; i < lbaRangeCount; i++) {
+					uint64 value = B_LENDIAN_TO_HOST_INT64(lbaRanges[i]);
+					dprintf("[%3" B_PRIu32 "] %" B_PRIu64 " : %" B_PRIu64 "\n", i,
+						value & (((uint64)1 << 48) - 1), value >> 48);
+				}
+#endif
 
-		if ((sreq.CompletionStatus() & ATA_STATUS_ERROR) != 0) {
-			ERROR("trim failed (%" B_PRIu32 " ranges)!\n", lbaRangeCount);
-			request->subsys_status = SCSI_REQ_CMP_ERR;
-		} else
-			request->subsys_status = SCSI_REQ_CMP;
+				ASSERT(lbaRangesSize % 512 == 0);
+				ASSERT(lbaRangesSize <= lbaRangesAllocatedSize);
+
+				sata_request sreq;
+				sreq.SetATA48Command(ATA_COMMAND_DATA_SET_MANAGEMENT, 0,
+					lbaRangesSize / 512);
+				sreq.SetFeature(1);
+				sreq.SetData(lbaRanges, lbaRangesSize);
+
+				ExecuteSataRequest(&sreq, true);
+				sreq.WaitForCompletion();
+
+				if ((sreq.CompletionStatus() & ATA_STATUS_ERROR) != 0) {
+					ERROR("trim failed (%" B_PRIu32
+						" ATA ranges)!\n", lbaRangeCount);
+					request->subsys_status = SCSI_REQ_CMP_ERR;
+					request->device_status = SCSI_STATUS_CHECK_CONDITION;
+					gSCSI->finished(request, 1);
+					return;
+				} else
+					request->subsys_status = SCSI_REQ_CMP;
+
+				lbaIndex = 0;
+				memset(lbaRanges, 0, lbaRangesSize);
+			}
+
+			length -= ataRange;
+			lba += ataRange;
+		}
 	}
 
 	request->data_resid = 0;
@@ -1301,9 +1423,15 @@ AHCIPort::ScsiExecuteRequest(scsi_ccb* request)
 			scsi_unmap_parameter_list* unmapBlocks
 				= (scsi_unmap_parameter_list*)request->data;
 			if (unmapBlocks == NULL
-				|| B_BENDIAN_TO_HOST_INT16(cmd->length) != request->data_length
-				|| B_BENDIAN_TO_HOST_INT16(unmapBlocks->data_length)
-					!= request->data_length - 1) {
+				|| (uint16)B_BENDIAN_TO_HOST_INT16(cmd->length)
+					!= request->data_length
+				|| (uint16)B_BENDIAN_TO_HOST_INT16(unmapBlocks->data_length)
+					!= request->data_length
+						- offsetof(scsi_unmap_parameter_list, block_data_length)
+				|| (uint16)B_BENDIAN_TO_HOST_INT16(
+						unmapBlocks->block_data_length)
+					!= request->data_length
+						- offsetof(scsi_unmap_parameter_list, blocks)) {
 				ERROR("%s port %d: invalid unmap parameter data length\n",
 					__func__, fIndex);
 				request->subsys_status = SCSI_REQ_ABORTED;

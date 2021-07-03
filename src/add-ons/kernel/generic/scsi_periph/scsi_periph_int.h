@@ -16,6 +16,14 @@
 #include "wrapper.h"
 
 
+enum trim_command {
+	TRIM_NONE,			// TRIM operation is disabled for this device
+	TRIM_UNMAP,			// UNMAP command wil be used
+	TRIM_WRITESAME10,	// WRITE SAME (10) with UNMAP bit enabled will be used
+	TRIM_WRITESAME16	// WRITE SAME (16) with UNMAP bit enabled will be used
+};
+
+
 typedef struct scsi_periph_device_info {
 	struct scsi_periph_handle_info *handles;
 
@@ -27,6 +35,10 @@ typedef struct scsi_periph_device_info {
 	bool removal_requested;
 
 	bool removable;			// true, if device is removable
+
+	enum trim_command unmap_command;	// command to be used to discard free blocks
+	uint32 max_unmap_lba_count;			// max. number of LBAs in one command
+	uint32 max_unmap_descriptor_count;	// max. number of ranges in one command
 
 	uint32 block_size;
 	int32 preferred_ccb_size;
@@ -78,7 +90,7 @@ status_t periph_handle_free(scsi_periph_handle_info *handle);
 
 status_t periph_check_capacity(scsi_periph_device_info *device, scsi_ccb *ccb);
 status_t periph_trim_device(scsi_periph_device_info *device, scsi_ccb *request,
-	scsi_block_range* ranges, uint32 rangeCount);
+	scsi_block_range* ranges, uint32 rangeCount, uint64* trimmedBlocks);
 
 
 // device.c
@@ -101,8 +113,8 @@ status_t periph_io(scsi_periph_device_info* device, io_operation* operation,
 status_t periph_ioctl(scsi_periph_handle_info *handle, int op,
 	void *buf, size_t len);
 void periph_sync_queue_daemon(void *arg, int iteration);
-status_t vpd_page_get(scsi_periph_device_info *device, uint8 page, void* data,
-	uint16 length);
+status_t vpd_page_get(scsi_periph_device_info *device, scsi_ccb* request,
+	uint8 page, void* data, uint16 length);
 
 
 // scsi_periph.c

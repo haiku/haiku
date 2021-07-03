@@ -177,6 +177,8 @@ ATADevice::ReadCapacity(ATARequest *request)
 	}
 
 	scsi_res_read_capacity data;
+	memset(&data, 0, sizeof(data));
+
 	data.block_size = B_HOST_TO_BENDIAN_INT32(fBlockSize);
 
 	if (fTotalSectors <= UINT_MAX) {
@@ -184,7 +186,8 @@ ATADevice::ReadCapacity(ATARequest *request)
 		data.lba = B_HOST_TO_BENDIAN_INT32(lastBlock);
 	} else
 		data.lba = UINT_MAX;
-	TRACE("returning last block: %lu\n", B_BENDIAN_TO_HOST_INT32(data.lba));
+	TRACE("returning last block: %" B_PRIu32 "\n",
+		B_BENDIAN_TO_HOST_INT32(data.lba));
 
 	copy_sg_data(ccb, 0, ccb->data_length, &data, sizeof(data), false);
 	ccb->data_resid = MAX(ccb->data_length - sizeof(data), 0);
@@ -198,15 +201,29 @@ ATADevice::ReadCapacity16(ATARequest *request)
 	TRACE_FUNCTION("%p\n", request);
 
 	scsi_ccb *ccb = request->CCB();
+	scsi_cmd_read_capacity_long *command
+		= (scsi_cmd_read_capacity_long *)ccb->cdb;
+	if (command->pmi || command->lba) {
+		request->SetSense(SCSIS_KEY_ILLEGAL_REQUEST, SCSIS_ASC_INV_CDB_FIELD);
+		return B_ERROR;
+	}
+
+	uint32 allocationLength = B_BENDIAN_TO_HOST_INT32(command->alloc_length);
+
 	scsi_res_read_capacity_long data;
+	memset(&data, 0, sizeof(data));
+
 	data.block_size = B_HOST_TO_BENDIAN_INT32(fBlockSize);
 
 	uint64 lastBlock = fTotalSectors - 1;
 	data.lba = B_HOST_TO_BENDIAN_INT64(lastBlock);
-	TRACE("returning last block: %llu\n", data.lba);
+	TRACE("returning last block: %" B_PRIu64 "\n",
+		B_BENDIAN_TO_HOST_INT64(data.lba));
 
-	copy_sg_data(ccb, 0, ccb->data_length, &data, sizeof(data), false);
-	ccb->data_resid = MAX(ccb->data_length - sizeof(data), 0);
+	size_t copySize = min_c(allocationLength, sizeof(data));
+
+	copy_sg_data(ccb, 0, ccb->data_length, &data, copySize, false);
+	ccb->data_resid = MAX(ccb->data_length - copySize, 0);
 	return B_OK;
 }
 

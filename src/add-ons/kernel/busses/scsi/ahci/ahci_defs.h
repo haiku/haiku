@@ -334,7 +334,7 @@ extern pci_x86_module_info* gPCIx86Module;
 
 #define LO32(val) ((uint32)(addr_t)(val))
 #define HI32(val) ((uint32)(((uint64)(addr_t)(val)) >> 32))
-#define ASSERT(expr) if (expr) {} else panic(#expr)
+#define ASSERT(expr) if (expr) {} else panic("%s", #expr)
 
 #define PCI_VENDOR_INTEL	0x8086
 #define PCI_VENDOR_JMICRON	0x197b

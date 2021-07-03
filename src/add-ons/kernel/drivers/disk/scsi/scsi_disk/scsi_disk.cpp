@@ -1,7 +1,8 @@
 /*
- * Copyright 2008-2013, Axel Dörfler, axeld@pinc-software.de.
- * Copyright 2002/03, Thomas Kurschel. All rights reserved.
- * Distributed under the terms of the MIT License.
+ * Copyright 2021 David Sebek, dasebek@gmail.com
+ * Copyright 2008-2013 Axel Dörfler, axeld@pinc-software.de
+ * Copyright 2002/03 Thomas Kurschel
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 
@@ -156,31 +157,64 @@ synchronize_cache(das_driver_info *device)
 }
 
 
-#if 0
 static status_t
 trim_device(das_driver_info* device, fs_trim_data* trimData)
 {
 	TRACE("trim_device()\n");
 
+	trimData->trimmed_size = 0;
+
 	scsi_ccb* request = device->scsi->alloc_ccb(device->scsi_device);
 	if (request == NULL)
 		return B_NO_MEMORY;
 
-	uint64 trimmedSize = 0;
+	scsi_block_range* blockRanges = (scsi_block_range*)
+		malloc(trimData->range_count * sizeof(*blockRanges));
+	if (blockRanges == NULL)
+		return B_NO_MEMORY;
+
+	MemoryDeleter deleter(blockRanges);
+
 	for (uint32 i = 0; i < trimData->range_count; i++) {
-		trimmedSize += trimData->ranges[i].size;
+		uint64 startBytes = trimData->ranges[i].offset;
+		uint64 sizeBytes = trimData->ranges[i].size;
+		uint32 blockSize = device->block_size;
+
+		// Align to a block boundary so we don't discard blocks
+		// that could also contain some other data
+		uint64 blockOffset = startBytes % blockSize;
+		if (blockOffset == 0) {
+			blockRanges[i].lba = startBytes / blockSize;
+			blockRanges[i].size = sizeBytes / blockSize;
+		} else {
+			blockRanges[i].lba = startBytes / blockSize + 1;
+			blockRanges[i].size = (sizeBytes - (blockSize - blockOffset))
+				/ blockSize;
+		}
 	}
+
+	// Check ranges against device capacity and make them fit
+	for (uint32 i = 0; i < trimData->range_count; i++) {
+		if (blockRanges[i].lba >= device->capacity) {
+			dprintf("trim_device(): range offset (LBA) %" B_PRIu64
+				" exceeds device capacity %" B_PRIu64 "\n",
+				blockRanges[i].lba, device->capacity);
+			return B_BAD_VALUE;
+		}
+		uint64 maxSize = device->capacity - blockRanges[i].lba;
+		blockRanges[i].size = min_c(blockRanges[i].size, maxSize);
+	}
+
+	uint64 trimmedBlocks;
 	status_t status = sSCSIPeripheral->trim_device(device->scsi_periph_device,
-		request, (scsi_block_range*)&trimData->ranges[0],
-		trimData->range_count);
+		request, blockRanges, trimData->range_count, &trimmedBlocks);
 
 	device->scsi->free_ccb(request);
-	if (status == B_OK)
-		trimData->trimmed_size = trimmedSize;
+	// Some blocks may have been trimmed even if trim_device returns a failure
+	trimData->trimmed_size = trimmedBlocks * device->block_size;
 
 	return status;
 }
-#endif
 
 
 static int
@@ -415,7 +449,6 @@ das_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 		case B_FLUSH_DRIVE_CACHE:
 			return synchronize_cache(info);
 
-#if 0
 		case B_TRIM_DEVICE:
 		{
 			// We know the buffer is kernel-side because it has been
@@ -423,7 +456,6 @@ das_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 			ASSERT(IS_KERNEL_ADDRESS(buffer));
 			return trim_device(info, (fs_trim_data*)buffer);
 		}
-#endif
 
 		default:
 			return sSCSIPeripheral->ioctl(handle->scsi_periph_handle, op,

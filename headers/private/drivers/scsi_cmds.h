@@ -255,7 +255,10 @@ typedef struct scsi_res_inquiry {
 										// Asynchronous Event Notification Capable
 	);
 	uint8	additional_length;			// total (whished) length = this + 4
-	uint8	_res5;
+	B_LBITFIELD8_2(
+		protect : 1,
+		_res5_1 : 7
+	);
 	uint8	_res6;
 	B_LBITFIELD8_8(
 		soft_reset : 1,					// 0 = soft reset leads to hard reset
@@ -350,7 +353,7 @@ typedef struct scsi_page_block_limits {
 	);
 	uint8	page_code;
 
-	uint16	_page_length;
+	uint16	page_length;
 	B_LBITFIELD8_2(
 		wsnz : 1,
 		_res4_1 : 7
@@ -424,13 +427,36 @@ typedef struct scsi_cmd_read_capacity_long {
 	uint8	service_action;
 	uint64	lba;
 	uint32	alloc_length;
-	uint8	relative_address;
+	B_LBITFIELD8_2(
+		pmi : 1,
+		_res14_1 : 7
+	);
 	uint8	control;
 } _PACKED scsi_cmd_read_capacity_long;
 
 typedef struct scsi_res_read_capacity_long {
 	uint64	lba;					// big endian
 	uint32	block_size;				// in bytes
+	B_LBITFIELD8_4(
+		prot_en : 1,
+		p_type : 3,
+		rc_basis : 2,
+		_res12_6 : 2
+	);
+	B_LBITFIELD8_2(
+		logical_blocks_per_physical_block_exponent : 4,
+		p_i_exponent : 4
+	);
+	B_LBITFIELD8_3(
+		lowest_aligned_lba_p1 : 6,
+			// first part of the Lowest Aligned LBA field
+		lbprz : 1,
+		lbpme : 1
+	);
+	uint8	lowest_aligned_lba_p2;
+		// second part of the Lowest Aligned LBA field
+		// (B_LBITFIELD16_3 would not help here because of its alignment)
+	uint8	_res16[16];
 } _PACKED scsi_res_read_capacity_long;
 
 
@@ -508,16 +534,38 @@ typedef struct scsi_cmd_rw_16 {
 } _PACKED scsi_cmd_rw_16;
 
 
+// WRITE SAME (10)
+
+typedef struct scsi_cmd_wsame_10 {
+	uint8	opcode;
+	B_LBITFIELD8_6(
+		_obsolete1_0 : 1,
+		_obsolete1_1 : 1,
+		_obsolete1_2 : 1,
+		unmap : 1,
+		anchor : 1,
+		write_protect : 3
+	);
+	uint32	lba;
+	B_LBITFIELD8_2(
+		group_number : 5,
+		_res6_5 : 3
+	);
+	uint16	length;
+	uint8	control;
+} _PACKED scsi_cmd_wsame_10;
+
+
 // WRITE SAME (16)
 
 typedef struct scsi_cmd_wsame_16 {
 	uint8	opcode;
 	B_LBITFIELD8_6(
-		_res1_0 : 1,
+		ndob : 1,
 		lb_data : 1,
 		pb_data : 1,
 		unmap : 1,
-		_res1_4 : 1,
+		anchor : 1,
 		write_protect : 3
 	);
 	uint64	lba;
