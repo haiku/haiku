@@ -8,9 +8,6 @@
  */
 
 #include <cstdio>
-#ifdef DEBUG
-#include <iostream>
-#endif
 
 #include <UrlRequest.h>
 #include <UrlProtocolListener.h>
@@ -111,24 +108,24 @@ BUrlProtocolListener::DebugMessage(BUrlRequest* caller,
 #ifdef DEBUG
 	switch (type) {
 		case B_URL_PROTOCOL_DEBUG_TEXT:
-			cout << "   ";
+			fprintf(stderr, "   ");
 			break;
 
 		case B_URL_PROTOCOL_DEBUG_ERROR:
-			cout << "!!!";
+			fprintf(stderr, "!!!");
 			break;
 
 		case B_URL_PROTOCOL_DEBUG_TRANSFER_IN:
 		case B_URL_PROTOCOL_DEBUG_HEADER_IN:
-			cout << "<--";
+			fprintf(stderr, "<--");
 			break;
 
 		case B_URL_PROTOCOL_DEBUG_TRANSFER_OUT:
 		case B_URL_PROTOCOL_DEBUG_HEADER_OUT:
-			cout << "-->";
+			fprintf(stderr, "-->");
 			break;
 	}
 
-	cout << " " << caller->Protocol() << ": " << text << endl;
+	fprintf(stderr, " %s: %s\n", caller->Protocol().String(), text);
 #endif
 }

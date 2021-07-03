@@ -68,10 +68,15 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
         self.send_response(status_code)
         if status_code >= 300 and status_code < 400:
             self.send_header('Location', '/')
-        self.send_header('Content-Type', 'text/plain')
-        self.send_header('Content-Length', str(len(response_body)))
-        if encoding:
-            self.send_header('Content-Encoding', encoding)
+
+        if status_code == 204:
+            write_response = False
+        else:
+            self.send_header('Content-Type', 'text/plain')
+            self.send_header('Content-Length', str(len(response_body)))
+            if encoding:
+                self.send_header('Content-Encoding', encoding)
+
         for header_name, header_value in extra_headers:
             self.send_header(header_name, header_value)
         self.end_headers()
