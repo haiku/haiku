@@ -659,28 +659,33 @@ get_boot_file_system(stage2_args* args, BootVolume& _bootVolume)
 		if (error != B_OK)
 			continue;
 
-		Partition *partition;
-		error = platform_get_boot_partition(args, device, &gPartitions, &partition);
+		NodeList bootPartitions;
+		error = platform_get_boot_partitions(args, device, &gPartitions, &bootPartitions);
 		if (error != B_OK)
 			continue;
 
-		Directory *fileSystem;
-		error = partition->Mount(&fileSystem, true);
-		if (error != B_OK) {
-			// this partition doesn't contain any known file system; we
-			// don't need it anymore
-			gPartitions.Remove(partition);
-			delete partition;
-			continue;
+		NodeIterator partitionIterator = bootPartitions.GetIterator();
+		while (partitionIterator.HasNext()) {
+			Partition *partition = (Partition*)partitionIterator.Next();
+
+			Directory *fileSystem;
+			error = partition->Mount(&fileSystem, true);
+			if (error != B_OK) {
+				// this partition doesn't contain any known file system; we
+				// don't need it anymore
+				gPartitions.Remove(partition);
+				delete partition;
+				continue;
+			}
+
+			// init the BootVolume
+			error = _bootVolume.SetTo(fileSystem);
+			if (error != B_OK)
+				continue;
+
+			sBootDevice = device;
+			return B_OK;
 		}
-
-		// init the BootVolume
-		error = _bootVolume.SetTo(fileSystem);
-		if (error != B_OK)
-			continue;
-
-		sBootDevice = device;
-		return B_OK;
 	}
 
 	return B_ERROR;
