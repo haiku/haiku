@@ -227,6 +227,9 @@ enum PackageState {
 };
 
 
+const char* package_state_to_string(PackageState state);
+
+
 using BPackageKit::BPackageInfo;
 using BPackageKit::BPackageVersion;
 

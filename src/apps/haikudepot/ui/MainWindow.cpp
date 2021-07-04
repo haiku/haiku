@@ -484,22 +484,9 @@ MainWindow::MessageReceived(BMessage* message)
 			PackageInfo* info;
 			if (message->FindPointer("package", (void**)&info) == B_OK) {
 				PackageInfoRef ref(info, true);
-				uint32 changes;
-				if (message->FindUInt32("changes", &changes) != B_OK)
-					changes = 0;
-				if ((changes & PKG_CHANGED_STATE) != 0) {
-					BAutolock locker(fModel.Lock());
-					fModel.SetPackageState(ref, ref->State());
-				}
-
 				fFeaturedPackagesView->BeginAddRemove();
 				_AddRemovePackageFromLists(ref);
 				fFeaturedPackagesView->EndAddRemove();
-
-				if ((changes & PKG_CHANGED_STATE) != 0
-						&& !fCoordinator.IsSet()) {
-					fWorkStatusView->PackageStatusChanged(ref);
-				}
 			}
 			break;
 		}
@@ -610,7 +597,6 @@ MainWindow::PackageChanged(const PackageInfoEvent& event)
 		PackageInfoRef ref(event.Package());
 		BMessage message(MSG_PACKAGE_CHANGED);
 		message.AddPointer("package", ref.Get());
-		message.AddUInt32("changes", event.Changes());
 		ref.Detach();
 			// reference needs to be released by MessageReceived();
 		PostMessage(&message);
@@ -1018,9 +1004,6 @@ MainWindow::_NotifyWorkStatusChange(const BString& text, float progress)
 }
 
 
-// needs to be implemented to update details for added / removed packages.
-// TODO: see ticket #15879
-
 void
 MainWindow::_HandleExternalPackageUpdateMessageReceived(const BMessage* message)
 {
@@ -1030,10 +1013,8 @@ MainWindow::_HandleExternalPackageUpdateMessageReceived(const BMessage* message)
 	if (message->FindStrings("added package names",
 			&addedPackageNames) == B_OK) {
 		addedPackageNames.Sort();
-		for (int32 i = 0; i < addedPackageNames.CountStrings(); i++) {
-			HDINFO("added package name; %s",
-				addedPackageNames.StringAt(i).String());
-		}
+		AutoLocker<BLocker> locker(fModel.Lock());
+		fModel.SetStateForPackagesByName(addedPackageNames, ACTIVATED);
 	}
 	else
 		HDINFO("no [added package names] key in inbound message");
@@ -1041,10 +1022,8 @@ MainWindow::_HandleExternalPackageUpdateMessageReceived(const BMessage* message)
 	if (message->FindStrings("removed package names",
 			&removedPackageNames) == B_OK) {
 		removedPackageNames.Sort();
-		for (int32 i = 0; i < removedPackageNames.CountStrings(); i++) {
-			HDINFO("removed package name; %s",
-				removedPackageNames.StringAt(i).String());
-		}
+		AutoLocker<BLocker> locker(fModel.Lock());
+		fModel.SetStateForPackagesByName(addedPackageNames, UNINSTALLED);
 	} else
 		HDINFO("no [removed package names] key in inbound message");
 }

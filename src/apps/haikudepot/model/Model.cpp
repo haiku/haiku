@@ -357,9 +357,23 @@ Model::Clear()
 
 
 void
-Model::SetPackageState(const PackageInfoRef& package, PackageState state)
+Model::SetStateForPackagesByName(BStringList& packageNames, PackageState state)
 {
-	package->SetState(state);
+	for (int32 i = 0; i < packageNames.CountStrings(); i++) {
+		BString packageName = packageNames.StringAt(i);
+		PackageInfoRef packageInfo = PackageForName(packageName);
+
+		if (packageInfo.IsSet()) {
+			packageInfo->SetState(state);
+			HDINFO("did update package [%s] with state [%s]",
+				packageName.String(), package_state_to_string(state));
+		}
+		else {
+			HDINFO("was unable to find package [%s] so was not possible to set"
+				" the state to [%s]", packageName.String(),
+				package_state_to_string(state));
+		}
+	}
 }
 
 

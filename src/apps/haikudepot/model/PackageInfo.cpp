@@ -1296,3 +1296,24 @@ DepotInfo::SetWebAppRepositorySourceCode(const BString& code)
 {
 	fWebAppRepositorySourceCode = code;
 }
+
+
+const char* package_state_to_string(PackageState state)
+{
+	switch (state) {
+		case NONE:
+			return "NONE";
+		case INSTALLED:
+			return "INSTALLED";
+		case DOWNLOADING:
+			return "DOWNLOADING";
+		case ACTIVATED:
+			return "ACTIVATED";
+		case UNINSTALLED:
+			return "UNINSTALLED";
+		case PENDING:
+			return "PENDING";
+		default:
+			debugger("unknown package state");
+	}
+}

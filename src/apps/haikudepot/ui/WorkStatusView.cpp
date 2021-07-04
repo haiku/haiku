@@ -1,6 +1,6 @@
 /*
  * Copyright 2017 Julian Harnath <julian.harnath@rwth-aachen.de>
- * Copyright 2020 Andrew Lindesay <apl@lindesay.co.nz>
+ * Copyright 2020-2021 Andrew Lindesay <apl@lindesay.co.nz>
  * All rights reserved. Distributed under the terms of the MIT license.
  */
 
@@ -106,77 +106,4 @@ void
 WorkStatusView::SetText(const BString& text)
 {
 	fStatusText->SetText(text);
-}
-
-
-void
-WorkStatusView::PackageStatusChanged(const PackageInfoRef& package)
-{
-	switch (package->State()) {
-		case DOWNLOADING:
-			fPendingPackages.erase(package->Name());
-			if (package->Name() != fDownloadingPackage) {
-				fDownloadingPackage = package->Name();
-				_SetTextDownloading(package->Title());
-			}
-			SetProgress(package->DownloadProgress());
-			break;
-
-		case PENDING:
-			fPendingPackages.insert(package->Name());
-			if (package->Name() == fDownloadingPackage)
-				fDownloadingPackage = "";
-			if (fDownloadingPackage.IsEmpty()) {
-				_SetTextPendingDownloads();
-				SetBusy();
-			}
-			break;
-
-		case NONE:
-		case ACTIVATED:
-		case INSTALLED:
-		case UNINSTALLED:
-			if (package->Name() == fDownloadingPackage)
-				fDownloadingPackage = "";
-			fPendingPackages.erase(package->Name());
-			if (fPendingPackages.empty())
-				SetIdle();
-			else {
-				_SetTextPendingDownloads();
-				SetBusy();
-			}
-			break;
-	}
-}
-
-
-void
-WorkStatusView::_SetTextPendingDownloads()
-{
-	BString text;
-	static BStringFormat format(B_TRANSLATE("{0, plural,"
- 		"one{1 package to download}"
-		"other{# packages to download}}"));
-		format.Format(text, fPendingPackages.size());
-
-	SetText(text);
-}
-
-
-void
-WorkStatusView::_SetTextDownloading(const BString& title)
-{
-	BString text(B_TRANSLATE("Downloading package '%name%'"));
-	text.ReplaceFirst("%name%", title);
-
-	if (!fPendingPackages.empty()) {
-		BString more;
-		static BStringFormat format(B_TRANSLATE("{0, plural,"
-			"one{(1 more to download)}"
-			"other{(# more to download)}}"));
-		format.Format(more, fPendingPackages.size());
-		text += " ";
-		text += more;
-	}
-	SetText(text);
 }

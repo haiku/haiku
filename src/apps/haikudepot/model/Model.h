@@ -100,8 +100,8 @@ public:
 			void				AddRatingStabilities(
 									std::vector<RatingStabilityRef>& values);
 
-			void				SetPackageState(
-									const PackageInfoRef& package,
+			void				SetStateForPackagesByName(
+									BStringList& packageNames,
 									PackageState state);
 
 			// Configure PackageFilters
