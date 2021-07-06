@@ -377,6 +377,12 @@ HOST_LIBROOT = libroot_build_function_remapper.a libroot_build.so ;
 HOST_STATIC_LIBROOT = libroot_build_function_remapper.a libroot_build.a ;
 HOST_LIBBE = libbe_build.so ;
 
+# adding rpath allows directly invoking host tools without specifying
+# a library search path
+if $(HOST_PLATFORM) != darwin {
+	HOST_LINKFLAGS += -Wl,-rpath,$(HOST_BUILD_COMPATIBILITY_LIB_DIR) ;
+}
+
 if $(HOST_PLATFORM_HAIKU_COMPATIBLE) {
 	# the C++ standard and support libraries
 	if $(HOST_CC_IS_LEGACY_GCC) = 1 {
