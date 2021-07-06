@@ -76,7 +76,7 @@ rule DefineDefaultBuildProfiles
 			if $(HAIKU_INCLUDE_SOURCES) = 1 {
 				HAIKU_IMAGE_SIZE ?= 1100 ;
 			} else {
-				HAIKU_IMAGE_SIZE ?= 700 ;
+				HAIKU_IMAGE_SIZE ?= 710 ;
 			}
 
 			AddHaikuImageSystemPackages
