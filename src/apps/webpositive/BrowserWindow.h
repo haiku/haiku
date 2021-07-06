@@ -30,8 +30,10 @@
 
 
 #include "WebWindow.h"
+
 #include <Messenger.h>
 #include <String.h>
+#include <UrlContext.h>
 
 class BButton;
 class BCheckBox;
@@ -46,7 +48,6 @@ class BPath;
 class BStatusBar;
 class BStringView;
 class BTextControl;
-class BUrlContext;
 class BWebView;
 
 class BookmarkBar;
@@ -100,7 +101,7 @@ public:
 								BrowserWindow(BRect frame,
 									SettingsMessage* appSettings,
 									const BString& url,
-									BUrlContext* context,
+									BPrivate::Network::BUrlContext* context,
 									uint32 interfaceElements
 										= INTERFACE_ELEMENT_ALL,
 									BWebView* webView = NULL);
@@ -265,7 +266,7 @@ private:
 			bigtime_t			fLastMouseMovedTime;
 			BPoint				fLastMousePos;
 
-			BUrlContext*		fContext;
+			BPrivate::Network::BUrlContext*	fContext;
 
 			// cached settings
 			SettingsMessage*	fAppSettings;

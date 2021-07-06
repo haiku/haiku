@@ -25,6 +25,7 @@
 #include <ScrollView.h>
 #include <SeparatorView.h>
 #include <SpaceLayoutItem.h>
+#include <UrlContext.h>
 
 #include "BrowserApp.h"
 #include "BrowserWindow.h"

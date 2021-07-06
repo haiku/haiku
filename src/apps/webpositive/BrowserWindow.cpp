@@ -344,8 +344,8 @@ private:
 
 
 BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
-		const BString& url, BUrlContext* context, uint32 interfaceElements,
-		BWebView* webView)
+		const BString& url, BPrivate::Network::BUrlContext* context,
+		uint32 interfaceElements, BWebView* webView)
 	:
 	BWebWindow(frame, kApplicationName,
 		B_DOCUMENT_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,

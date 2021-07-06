@@ -31,11 +31,11 @@
 
 #include <Application.h>
 #include <Catalog.h>
+#include <NetworkCookieJar.h>
 #include <Rect.h>
+#include <UrlContext.h>
 
 
-class BNetworkCookieJar;
-class BUrlContext;
 class ConsoleWindow;
 class CookieWindow;
 class DownloadWindow;
@@ -80,7 +80,7 @@ private:
 			SettingsMessage*	fSettings;
 			SettingsMessage*	fCookies;
 			SettingsMessage*	fSession;
-			BUrlContext*		fContext;
+			BPrivate::Network::BUrlContext*	fContext;
 
 			DownloadWindow*		fDownloadWindow;
 			SettingsWindow*		fSettingsWindow;
