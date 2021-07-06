@@ -3,9 +3,6 @@ SubDir HAIKU_TOP src apps webpositive ;
 SubDirC++Flags $(defines) -Wno-error=sequence-point -Wno-error=format-truncation ;
 SubDirCcFlags $(defines) -Wno-error=sequence-point -Wno-error=format-truncation ;
 
-# Use the deprecated libnetapi.so classes
-SubDirC++Flags [ FDefines LIBNETAPI_DEPRECATED ] ;
-
 # source directories
 local sourceDirs =
 	autocompletion
@@ -76,7 +73,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			[ BuildFeatureAttribute webkit : libraries ]
 			[ TargetLibstdc++ ] localestub shared
 			[ MultiArchDefaultGristFiles libcolumnlistview.a ]
-			be network bnetapi tracker translation
+			be network libnetservices.a tracker translation
 			:
 			WebPositive.rdef
 			;

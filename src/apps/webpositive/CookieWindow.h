@@ -11,9 +11,10 @@
 
 #include <Window.h>
 
+#include <NetworkCookieJar.h>
+
 
 class BColumnListView;
-class BNetworkCookieJar;
 class BOutlineListView;
 class BStringItem;
 class BStringView;
@@ -23,7 +24,7 @@ class BString;
 class CookieWindow : public BWindow {
 public:
 								CookieWindow(BRect frame,
-									BNetworkCookieJar& jar);
+									BPrivate::Network::BNetworkCookieJar& jar);
 	virtual	void				MessageReceived(BMessage* message);
 	virtual void				Show();
 	virtual	bool				QuitRequested();
@@ -39,7 +40,7 @@ private:
 	BColumnListView*			fCookies;
 	BStringView*				fHeaderView;
 
-	BNetworkCookieJar&			fCookieJar;
+	BPrivate::Network::BNetworkCookieJar&	fCookieJar;
 };
 
 
