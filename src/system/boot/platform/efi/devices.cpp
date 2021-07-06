@@ -235,7 +235,7 @@ platform_add_block_devices(struct stage2_args *args, NodeList *devicesList)
 	TRACE("%s: called\n", __func__);
 
 	//TODO: Currently we add all in platform_add_boot_device
-	return B_ENTRY_NOT_FOUND;
+	return devicesList->Count() > 0 ? B_OK : B_ENTRY_NOT_FOUND;
 }
 
 
@@ -247,7 +247,6 @@ platform_get_boot_partitions(struct stage2_args *args, Node *bootDevice,
 	boot::Partition *partition = NULL;
 	while ((partition = (boot::Partition*)iterator.Next()) != NULL) {
 		if (device_contains_partition((EfiDevice*)bootDevice, partition)) {
-			iterator.Remove();
 			bootPartitions->Insert(partition);
 		}
 	}
