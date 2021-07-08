@@ -54,6 +54,24 @@ AppearancePrefView::AppearancePrefView(const char* name,
 		B_TRANSLATE_MARK("Text under cursor"),
 		B_TRANSLATE_MARK("Selected text"),
 		B_TRANSLATE_MARK("Selected background"),
+		"",
+		B_TRANSLATE_MARK("ANSI black color"),
+		B_TRANSLATE_MARK("ANSI red color"),
+		B_TRANSLATE_MARK("ANSI green color"),
+		B_TRANSLATE_MARK("ANSI yellow color"),
+		B_TRANSLATE_MARK("ANSI blue color"),
+		B_TRANSLATE_MARK("ANSI magenta color"),
+		B_TRANSLATE_MARK("ANSI cyan color"),
+		B_TRANSLATE_MARK("ANSI white color"),
+		"",
+		B_TRANSLATE_MARK("ANSI bright black color"),
+		B_TRANSLATE_MARK("ANSI bright red color"),
+		B_TRANSLATE_MARK("ANSI bright green color"),
+		B_TRANSLATE_MARK("ANSI bright yellow color"),
+		B_TRANSLATE_MARK("ANSI bright blue color"),
+		B_TRANSLATE_MARK("ANSI bright magenta color"),
+		B_TRANSLATE_MARK("ANSI bright cyan color"),
+		B_TRANSLATE_MARK("ANSI bright white color"),
 		NULL
 	};
 
@@ -411,6 +429,22 @@ AppearancePrefView::_ChangeColorScheme(color_scheme* scheme)
 	pref->setRGB(PREF_SELECT_BACK_COLOR, scheme->select_back_color);
 	pref->setRGB(PREF_CURSOR_FORE_COLOR, scheme->cursor_fore_color);
 	pref->setRGB(PREF_CURSOR_BACK_COLOR, scheme->cursor_back_color);
+	pref->setRGB(PREF_ANSI_BLACK_COLOR, scheme->ansi_colors.black);
+	pref->setRGB(PREF_ANSI_RED_COLOR, scheme->ansi_colors.red);
+	pref->setRGB(PREF_ANSI_GREEN_COLOR, scheme->ansi_colors.green);
+	pref->setRGB(PREF_ANSI_YELLOW_COLOR, scheme->ansi_colors.yellow);
+	pref->setRGB(PREF_ANSI_BLUE_COLOR, scheme->ansi_colors.blue);
+	pref->setRGB(PREF_ANSI_MAGENTA_COLOR, scheme->ansi_colors.magenta);
+	pref->setRGB(PREF_ANSI_CYAN_COLOR, scheme->ansi_colors.cyan);
+	pref->setRGB(PREF_ANSI_WHITE_COLOR, scheme->ansi_colors.white);
+	pref->setRGB(PREF_ANSI_BLACK_HCOLOR, scheme->ansi_colors_h.black);
+	pref->setRGB(PREF_ANSI_RED_HCOLOR, scheme->ansi_colors_h.red);
+	pref->setRGB(PREF_ANSI_GREEN_HCOLOR, scheme->ansi_colors_h.green);
+	pref->setRGB(PREF_ANSI_YELLOW_HCOLOR, scheme->ansi_colors_h.yellow);
+	pref->setRGB(PREF_ANSI_BLUE_HCOLOR, scheme->ansi_colors_h.blue);
+	pref->setRGB(PREF_ANSI_MAGENTA_HCOLOR, scheme->ansi_colors_h.magenta);
+	pref->setRGB(PREF_ANSI_CYAN_HCOLOR, scheme->ansi_colors_h.cyan);
+	pref->setRGB(PREF_ANSI_WHITE_HCOLOR, scheme->ansi_colors_h.white);
 }
 
 
@@ -425,6 +459,25 @@ AppearancePrefView::_SetCurrentColorScheme()
 	gCustomColorScheme.select_back_color = pref->getRGB(PREF_SELECT_BACK_COLOR);
 	gCustomColorScheme.cursor_fore_color = pref->getRGB(PREF_CURSOR_FORE_COLOR);
 	gCustomColorScheme.cursor_back_color = pref->getRGB(PREF_CURSOR_BACK_COLOR);
+	gCustomColorScheme.ansi_colors.black = pref->getRGB(PREF_ANSI_BLACK_COLOR);
+	gCustomColorScheme.ansi_colors.red = pref->getRGB(PREF_ANSI_RED_COLOR);
+	gCustomColorScheme.ansi_colors.green = pref->getRGB(PREF_ANSI_GREEN_COLOR);
+	gCustomColorScheme.ansi_colors.yellow = pref->getRGB(PREF_ANSI_YELLOW_COLOR);
+	gCustomColorScheme.ansi_colors.blue = pref->getRGB(PREF_ANSI_BLUE_COLOR);
+	gCustomColorScheme.ansi_colors.magenta =
+		pref->getRGB(PREF_ANSI_MAGENTA_COLOR);
+	gCustomColorScheme.ansi_colors.cyan = pref->getRGB(PREF_ANSI_CYAN_COLOR);
+	gCustomColorScheme.ansi_colors.white = pref->getRGB(PREF_ANSI_WHITE_COLOR);
+	gCustomColorScheme.ansi_colors_h.black = pref->getRGB(PREF_ANSI_BLACK_HCOLOR);
+	gCustomColorScheme.ansi_colors_h.red = pref->getRGB(PREF_ANSI_RED_HCOLOR);
+	gCustomColorScheme.ansi_colors_h.green = pref->getRGB(PREF_ANSI_GREEN_HCOLOR);
+	gCustomColorScheme.ansi_colors_h.yellow =
+		pref->getRGB(PREF_ANSI_YELLOW_HCOLOR);
+	gCustomColorScheme.ansi_colors_h.blue = pref->getRGB(PREF_ANSI_BLUE_HCOLOR);
+	gCustomColorScheme.ansi_colors_h.magenta =
+		pref->getRGB(PREF_ANSI_MAGENTA_HCOLOR);
+	gCustomColorScheme.ansi_colors_h.cyan = pref->getRGB(PREF_ANSI_CYAN_HCOLOR);
+	gCustomColorScheme.ansi_colors_h.white = pref->getRGB(PREF_ANSI_WHITE_HCOLOR);
 
 	const char* currentSchemeName = NULL;
 
