@@ -1,0 +1,14 @@
+
+resource app_signature "application/x-vnd.Haiku-ShelfScreensaver";
+
+resource app_name_catalog_entry "x-vnd.Haiku-ShelfScreensaver:System name:Shelf";
+
+resource app_version {
+	major  = 1,
+	middle = 0,
+	minor  = 0,
+	variety = 0,
+	internal = 0,
+	short_info = "Shelf",
+	long_info = "Screensaver Shelf"
+};
