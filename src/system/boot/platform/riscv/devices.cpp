@@ -182,16 +182,17 @@ platform_add_block_devices(struct stage2_args* args, NodeList* devicesList)
 
 
 status_t
-platform_get_boot_partition(
-	struct stage2_args* args, Node* bootDevice,
-	NodeList* partitions, boot::Partition** _partition
-)
+platform_get_boot_partitions(struct stage2_args* args, Node* bootDevice,
+	NodeList *list, NodeList *partitionList)
 {
-	// return B_ENTRY_NOT_FOUND;
-
-	*_partition = (boot::Partition*)partitions->GetIterator().Next();
-	dprintf("*_partition: %p\n", *_partition);
-	return *_partition != NULL ? B_OK : B_ENTRY_NOT_FOUND;
+	NodeIterator iterator = list->GetIterator();
+	boot::Partition *partition = NULL;
+	while ((partition = (boot::Partition *)iterator.Next()) != NULL) {
+		// ToDo: just take the first partition for now
+		partitionList->Insert(partition);
+		return B_OK;
+	}
+	return B_ENTRY_NOT_FOUND;
 }
 
 
