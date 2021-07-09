@@ -1211,7 +1211,9 @@ add_boot_volume_item(Menu* menu, Directory* volume, const char* name)
 			if (state == selectedState) {
 				stateItem->SetMarked(true);
 				stateItem->Select(true);
-				item->UpdateStateName(stateItem->VolumeState());
+				if (volume == sBootVolume->RootDirectory()) {
+					item->UpdateStateName(stateItem->VolumeState());
+				}
 			}
 		}
 	}
