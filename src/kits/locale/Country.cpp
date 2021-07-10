@@ -98,7 +98,7 @@ BCountry::GetNativeName(BString& name) const
 		return valid;
 
 	UnicodeString string;
-	fICULocale->getDisplayName(*fICULocale, string);
+	fICULocale->getDisplayCountry(*fICULocale, string);
 	string.toTitle(NULL, *fICULocale);
 
 	name.Truncate(0);
@@ -129,7 +129,7 @@ BCountry::GetName(BString& name, const BLanguage* displayLanguage) const
 
 	if (status == B_OK) {
 		UnicodeString uString;
-		fICULocale->getDisplayName(Locale(appLanguage), uString);
+		fICULocale->getDisplayCountry(Locale(appLanguage), uString);
 		name.Truncate(0);
 		BStringByteSink stringConverter(&name);
 		uString.toUTF8(stringConverter);
