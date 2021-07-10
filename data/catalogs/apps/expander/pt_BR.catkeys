@@ -1,13 +1,14 @@
-1	portuguese (brazil)	x-vnd.Haiku-Expander	3824492603
+1	portuguese (brazil)	x-vnd.Haiku-Expander	3300517306
 Expand	ExpanderMenu		Expandir
+Expanding '%s'…	ExpanderWindow		Expandindo '%s'…
 Close window when done expanding	ExpanderPreferences		Fechar a janela quando concluída a expansão
 Set destination…	ExpanderMenu		Selecionar destino…
 Use:	ExpanderPreferences		Uso:
 File expanded	ExpanderWindow		Arquivo expandido
 The destination is read only.	ExpanderWindow		O destino é somente para leitura.
 Expander: Open	ExpanderWindow		Expansor: Abrir
- is not supported	ExpanderWindow		não é suportado
-Expander settings	ExpanderPreferences		Definições do expansor
+ is not supported	ExpanderWindow		 não é suportado
+Expander settings	ExpanderPreferences		Configurações do Expansor
 Select current	DirectoryFilePanel		Selecione o atual
 Source	ExpanderWindow		Fonte
 Error when expanding archive	ExpanderWindow		Erro ao expandir conjunto de arquivos
@@ -20,6 +21,7 @@ Other	ExpanderPreferences		Outro
 Cancel	ExpanderPreferences		Cancelar
 Expansion	ExpanderPreferences		Expansão
 Select	DirectoryFilePanel		Selecionar
+The folder was either moved, renamed or not supported.	ExpanderWindow		A pasta foi movida, renomeada ou não é suportada.
 Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		A pasta de destino não existe. Deseja criá-la?
 Same directory as source (archive) file	ExpanderPreferences		Mesmo diretório como arquivo fonte (conjunto de arquivos)
 Settings	ExpanderMenu		Configurações
@@ -29,6 +31,7 @@ Select	ExpanderPreferences		Selecionar
 Show contents	ExpanderWindow		Mostrar o conteúdo
 Automatically show contents listing	ExpanderPreferences		Exibir automaticamente lista do conteúdo
 OK	ExpanderPreferences		OK
+Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Tem certeza que deseja parar de expandir este conjunto de arquivos? Os itens expandidos podem não estar completos.
 Leave destination folder path empty	ExpanderPreferences		Deixar caminho da pasta de destino vazio
 Failed to create the destination folder.	ExpanderWindow		Falha ao criar a pasta de destino.
 Select '%s'…	DirectoryFilePanel		Selecionar '%s'…
@@ -41,6 +44,7 @@ Expand	ExpanderWindow		Expandir
 Close	ExpanderMenu		Fechar
 The destination is not a folder.	ExpanderWindow		O destino não é uma pasta.
 Open destination folder after extraction	ExpanderPreferences		Abrir a pasta de destino após a extração
+Creating listing for '%s'…	ExpanderWindow		Criando listas para '%s'…
 Set source…	ExpanderMenu		Definir fonte…
 Show contents	ExpanderMenu		Mostrar o conteúdo
 Stop	ExpanderWindow		Parar

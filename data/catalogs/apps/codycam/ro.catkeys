@@ -21,7 +21,7 @@ Every 30 seconds	CodyCam		La fiecare 30 de secunde
 Cannot create a video window	CodyCam		Nu se poate crea o fereastră video
 Cannot register the video window	CodyCam		Nu se poate înregistra fereastra video
 capture rate expected	CodyCam		cota de captură așteptată
-Quit	CodyCam		Închidere
+Quit	CodyCam		Ieșire
 Cannot connect the video source to the video window	CodyCam		Nu se poate conecta sursa video la fereastra video
 read: %d\n	SftpClient		citește: %d\n
 Every 2 hours	CodyCam		La fiecare 2 ore

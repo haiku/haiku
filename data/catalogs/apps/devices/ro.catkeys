@@ -68,7 +68,7 @@ Order by:	DevicesView		Ordonează după:
 ACPI Thermal Zone	DeviceACPI		Zonă termală ACPI
 Intelligent controller	Device		Controler inteligent
 Multimedia controller	Device		Controler multimedia
-Quit	DevicesView		Închidere
+Quit	DevicesView		Ieșire
 ISA bus	Device		Magistrală ISA
 ISA bus	DevicesView		Magistrală ISA
 Processor	DeviceSCSI		Procesor

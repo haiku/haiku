@@ -1,11 +1,11 @@
 1	romanian	x-vnd.Haiku-libmail	3450478295
 Partially download messages larger than	ProtocolConfigView		Descarcă parțial mesajele mai mari decât
 Password:	ProtocolConfigView		Parolă:
-Remove mail from server when deleted	ProtocolConfigView		Elimină mailul de pe server când este șters
-Mail server:	ProtocolConfigView		Server mail:
-Select…	MailKit		Selectează…
+Remove mail from server when deleted	ProtocolConfigView		Elimină emailul de pe server când este șters
+Mail server:	ProtocolConfigView		Server de email:
+Select…	MailKit		Selectare…
 Connection type:	ProtocolConfigView		Tip de conexiune:
 KB	ProtocolConfigView	kilo byte	KB
-Leave mail on server	ProtocolConfigView		Lasă mailul pe server
+Leave mail on server	ProtocolConfigView		Lasă emailul pe server
 Username:	ProtocolConfigView		Nume de utilizator:
 Login type:	ProtocolConfigView		Tip de autentificare:

@@ -56,7 +56,7 @@ Find failed	Terminal TermWindow		Găsește eșuat
 Match word	Terminal FindWindow		Potrivire cuvânt
 Color scheme:	Terminal AppearancePrefView		Schemă de culori:
 New Terminal	Terminal TermWindow		Terminal nou
-Quit	Terminal TermWindow		Închidere
+Quit	Terminal TermWindow		Ieșire
 Match case	Terminal FindWindow		Potrivire caz
 Find previous	Terminal TermWindow		Găsește precedent
 The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Modelul care specifică titlurile taburilor. Următorii înlocuitori\npot fi utilizați:

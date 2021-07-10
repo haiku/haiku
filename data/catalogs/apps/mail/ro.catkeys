@@ -47,7 +47,7 @@ Show icons only	Mail		Afișează doar pictogramele
 Subject:	Mail		Subiect:
 OK	Mail		OK
 UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
-Quit	Mail		Închidere
+Quit	Mail		Ieșire
 Title:	Mail		Titlu:
 Account from mail	Mail		Cont de la mail
 %e - E-mail address	Mail		%e - Adresă email

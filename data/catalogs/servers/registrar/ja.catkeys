@@ -6,18 +6,18 @@ Shutdown status	ShutdownProcess		シャットダウンの状態
 Shut down	ShutdownProcess		シャットダウン
 The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		\"%appName%\"がモーダルパネルでブロックしているかもしれません。
 System is shut down	ShutdownProcess		システムがシャットダウンされました
-Restart system	ShutdownProcess		システムを再起動
+Restart system	ShutdownProcess		システムの再起動
 Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		\"%appName%\" がシャットダウンプロセスを中断しました。
 Asking background applications to quit.	ShutdownProcess		バックグランドアプリケーションに終了を要求しています。
 Do you really want to restart the system?	ShutdownProcess		本当にシステムを再起動しますか?
 Restart	ShutdownProcess		再起動
 It's now safe to turn off the computer.	ShutdownProcess		コンピューターの電源を切断しても安全です。 
 Asking other processes to quit.	ShutdownProcess		ほかのプロセスに終了を要求しています。
-Cancel shutdown	ShutdownProcess		シャットダウンを中止
-Restarting…	ShutdownProcess		再起動中…
+Cancel shutdown	ShutdownProcess		シャットダウンの中止
+Restarting…	ShutdownProcess		再起動中...
 %action%?	ShutdownProcess		%action%?
 Tidying things up a bit.	ShutdownProcess		少し片付け中です。
 Kill application	ShutdownProcess		強制終了
 Shutdown aborted	ShutdownProcess		シャットダウンが中断されました。
-Shutting down…	ShutdownProcess		シャットダウン中…
+Shutting down…	ShutdownProcess		シャットダウン中...
 Asking \"%appName%\" to quit.	ShutdownProcess		\"%appName%\"に終了を要求しています。

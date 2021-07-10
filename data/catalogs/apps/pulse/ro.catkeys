@@ -1,7 +1,7 @@
 1	romanian	x-vnd.Haiku-Pulse	559379362
 Normal mode	DeskbarPulseView		Mod normal
 Info	CPUButton		Info
-Quit	DeskbarPulseView		Închidere
+Quit	DeskbarPulseView		Ieșire
 Info	DeskbarPulseView		Info
 Normal mode	MiniPulseView		Mod normal
 Frame color	ConfigView		Culoare cadru
@@ -36,7 +36,7 @@ Deskbar	CPUButton		Bară de desktop
 Settings…	PulseView		Configurări…
 Deskbar menu	CPUButton		Meniul barei de desktop
 Mini mode	NormalPulseView		Mod mini
-Quit	MiniPulseView		Închidere
+Quit	MiniPulseView		Ieșire
 Info	PulseView		Detalii
 Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]	PulseApp		Utilizare: Pulse [--mini] [-w lățime] [--width=lățime]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]
 OK	DeskbarPulseView		OK

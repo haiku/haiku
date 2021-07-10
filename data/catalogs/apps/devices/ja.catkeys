@@ -5,7 +5,7 @@ Bus Information	Device		バス情報
 Devices	System name		デバイス
 Graphics Peripheral	DeviceSCSI		グラフィック装置
 Processor	Device		プロセッサ
-Generate system information	DevicesView		システム情報を作成
+Generate system information	DevicesView		システム情報の作成
 Class info	DevicePCI		クラス情報
 ACPI Information	DeviceACPI		ACPI 情報
 Detailed	DevicesView		詳細
@@ -40,7 +40,7 @@ PCI Information	DevicePCI		PCI 情報
 Tape Drive	DeviceSCSI		テープドライブ
 Changer	DeviceSCSI		チェンジャー
 Serial bus controller	Device		シリアルバスコントローラー
-Refresh devices	DevicesView		デバイスを更新
+Refresh devices	DevicesView		デバイスの更新
 Category	DevicesView		カテゴリー順
 RBC	DeviceSCSI		RBC
 None	Device		無し

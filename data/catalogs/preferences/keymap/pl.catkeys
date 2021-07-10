@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Keymap	1075970008
+1	polish	x-vnd.Haiku-Keymap	2850776429
 Key	Modifier keys window	As in a computer keyboard key	Klawisz
 Japanese	KeymapNames		Japoński
 US	KeymapNames		Amerykański
@@ -6,6 +6,7 @@ PG ↑	Keyboard Layout View	Very short for 'page up'	PG ↑
 Brazilian	KeymapNames		Brazylijski
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (amerykański)
 Right control	Keyboard Layout View		Prawy Ctrl
+X-Bows Nature	KeyboardLayoutNames		X-Bows Nature
 Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Opcja:
 Cancel	Modifier keys window		Anuluj
@@ -89,6 +90,7 @@ Esperanto	KeymapNames		Esperanto
 Belarusian	KeymapNames		Białoruski
 Warning: left and right key roles do not match	Modifier keys window		Uwaga: przeznaczenie klawiszy lewego i prawego się nie zgadzają
 Circumflex trigger	Keymap window		Wywołanie akcentu
+Fizzbook NL2	KeyboardLayoutNames		Fizzbook NL2
 Caps lock	Keyboard Layout View		Caps Lock
 Left shift	Keyboard Layout View		Lewy Shift
 Russian (Yawert)	KeymapNames		Rosyjski (Yawert)

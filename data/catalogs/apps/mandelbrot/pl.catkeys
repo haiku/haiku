@@ -1,12 +1,14 @@
-1	polish	x-vnd.Haiku-Mandelbrot	3875916167
+1	polish	x-vnd.Haiku-Mandelbrot	2302392624
 Grassland	MandelbrotWindow		Łąka
 Tricorn	MandelbrotWindow		Tricorn
 Orbit Trap	MandelbrotWindow		Orbit Trap
 Deepfrost	MandelbrotWindow		Mróz
 1 (none)	MandelbrotWindow		1 (wyłączony)
 Quit	MandelbrotWindow		Zakończ
+Save as image…	MandelbrotWindow		Zapisz jako obraz…
 Fire	MandelbrotWindow		Ogień
 High contrast	MandelbrotWindow		Wysoki kontrast
+Full screen	MandelbrotWindow		Pełny ekran
 Midnight	MandelbrotWindow		Północ
 Burning Ship	MandelbrotWindow		Płonący statek
 Lightning	MandelbrotWindow		Piorun
@@ -18,6 +20,7 @@ Subsampling	MandelbrotWindow		Subsampling
 File	MandelbrotWindow		Plik
 Julia	MandelbrotWindow		Julia
 Frost	MandelbrotWindow		Szron
+View	MandelbrotWindow		Widok
 Mandelbrot	System name		Mandelbrot
 Multibrot	MandelbrotWindow		Multibrot
 Iterations	MandelbrotWindow		Liczba iteracji

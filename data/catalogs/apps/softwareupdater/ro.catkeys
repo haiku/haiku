@@ -5,7 +5,7 @@ Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Pachetele
 No active network connection was found	UpdateManager	Error message	Nu s-a găsit o conexiune la rețea activă
 Quit	SoftwareUpdaterWindow	Alert button label	Ieșire
 There were no updates found.	CheckManager		Nu au fost găsite actualizări.
-Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		Actualizările nu au fost completate, sigur doriți să ieșiți?
+Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		Actualizările nu au fost finalizate, sigur doriți să ieșiți?
 Updates found	SoftwareUpdaterWindow		Actualizări găsite
 Update now	SoftwareUpdaterWindow		Actualizează acum
 For some reason, we could not reboot your computer.	SoftwareUpdaterWindow		Dintr-un anumit motiv, nu s-a putut reporni calculatorul.

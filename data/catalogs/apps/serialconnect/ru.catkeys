@@ -24,4 +24,4 @@ OK	Custom baudrate window		ОК
 Clear history	SerialWindow		Очистить историю
 Checksum error, re-send block	XModemStatus		Ошибка контрольной суммы, повторная отправка
 Settings	SerialWindow		Настройки
-Software	SerialWindow	Flowcontrol	Программное обеспечение
+Software	SerialWindow	Flowcontrol	Программно

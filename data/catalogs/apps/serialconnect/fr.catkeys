@@ -1,4 +1,4 @@
-1	french	x-vnd.haiku.SerialConnect	1797120775
+1	french	x-vnd.haiku.SerialConnect	3572614496
 Hardware	SerialWindow	Flowcontrol	Matériel
 Connection	SerialWindow		Connexion
 Raw send…	SerialWindow		Envoi brut…
@@ -22,12 +22,15 @@ Flow control	SerialWindow		Contrôle du flux
 file transfer progress	SerialWindow		progression du transfert de fichiers
 Data bits	SerialWindow		Bits de données
 Both	SerialWindow	Flowcontrol	Les deux
+Edit	SerialWindow		Éditer
 XModem send…	SerialWindow		Envoi XModem…
 Baudrate:	Custom baudrate window		Bauds :
 OK	Custom baudrate window		OK
 Waiting for receiver…	XModemStatus		En attente d’un receveur…
 Clear history	SerialWindow		Effacer l’historique
+Checksum error, re-send block	XModemStatus		Erreur de somme de contrôle, renvoi du bloc
 Settings	SerialWindow		Réglages
 Even	SerialWindow	Parity	Pair
 Software	SerialWindow	Flowcontrol	Logiciel
 Line terminator	SerialWindow		Terminateur de ligne
+Remote cancelled transfer	XModemStatus		Transfert annulé par la machine distante

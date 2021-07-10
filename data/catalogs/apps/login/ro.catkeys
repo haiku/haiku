@@ -9,7 +9,7 @@ Login application for Haiku\nUsage:\n	Login App		Aplicație de login pentru Haik
 Desktop	Desktop Window		Desktop
 Hide password	Login View		Ascunde parola
 Reboot	Login View		Restartează
-You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Puteți personaliza desktop-ul afișat în spatele aplicației de Autentificare prin plasarea replicanților pe acesta.\n\nCând ați terminat, închideți doar aplicația (Cmd-Q).
+You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Puteți personaliza desktop-ul afișat în spatele aplicației de autentificare prin plasarea replicanților peste acesta.\n\nCând ați terminat, ieșiți din aplicație (Cmd-Q).
 OK	Login View		OK
 Info	Login App		Info
 Login:	Login View		Login:

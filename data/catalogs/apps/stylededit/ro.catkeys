@@ -57,7 +57,7 @@ Error loading \"%s\":\n\t%s	LoadAlert		Eroare la încărcarea lui \"%s\":\n\t%s
 Don't save	SaveAlert		Nu salva
 Reload…	Menus		Reîncărcare…
 Print…	Menus		Tipărește…
-Quit	Menus		Închidere
+Quit	Menus		Ieșire
 Redo typing	QuitAlert		Repetă tastarea
 Ignore	NodeMonitorAlerts		Ignoră
 Wrap lines	Menus		Încadrează linii

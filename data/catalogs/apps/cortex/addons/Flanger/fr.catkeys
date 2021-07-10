@@ -1,7 +1,9 @@
-1	french	application/x-vnd.moon-Flanger.media_addon	2928223885
+1	french	application/x-vnd.moon-Flanger.media_addon	560803438
 Delay	CortexAddOnsFlanger		Retard
 Depth	CortexAddOnsFlanger		Profondeur
 Feedback	CortexAddOnsFlanger		Rétroaction
+Sweep rate	CortexAddOnsFlanger		Vitesse de balayage
+Mix ratio	CortexAddOnsFlanger		Ratio de mixage
 OK	CortexAddOnsCommonMediaNodeControlApp		OK
 controls	CortexAddOnsCommonMediaNodeControlApp		contrôles
 Audio input	CortexAddOnsFlanger		Entrée audio

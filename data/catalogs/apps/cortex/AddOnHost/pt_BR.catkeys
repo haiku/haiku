@@ -1,0 +1,5 @@
+1	portuguese (brazil)	application/x-vnd.Cortex.AddOnHost	1256552338
+Continue	CortexAddOnHost		Continuar
+Cortex AddOnHost	CortexAddOnHost		Cortex AddOnHost
+Quit	CortexAddOnHost		Sair
+This program runs in the background, and is started automatically by Cortex when necessary. You probably don't want to start it manually.	CortexAddOnHost		Este programa é executado em segundo plano, e é iniciado automaticamente pelo Cortex quando necessário. Você provavelmente não deseja iniciá-lo manualmente.

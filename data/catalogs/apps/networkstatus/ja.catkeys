@@ -10,7 +10,7 @@ NetworkStatus	System name		ネットワークの状態
 Broadcast:	NetworkStatusView		ブロードキャスト:
 OK	NetworkStatusView		OK
 No link	NetworkStatusView		リンク無し
-Could not join wireless network:\n	NetworkStatusView		無線ネットワークに参加できませんでした:\n
+Could not join wireless network:\n	NetworkStatusView		無線ネットワークに参加できません:\n
 Ready	NetworkStatusView		完了
 Network Status	NetworkStatusView		ネットワークの状態
 Deskbar is not running, giving up.	NetworkStatus		Deskbar が動作していないので、断念します。

@@ -14,7 +14,7 @@ Always on top	MainWin		Întotdeauna deasupra
 Debug	MainWin		Depanare
 Interface	MainWin		Interfață
 force 720 x 576, display aspect 4:3	MainWin		forțează 720 x 576, aspect afișare 4:3
-Quit	MainWin		Închidere
+Quit	MainWin		Ieșire
 Channel	MainWin		Canal
 Previous channel	MainWin		Canalul precedent
 OK	MainWin		OK

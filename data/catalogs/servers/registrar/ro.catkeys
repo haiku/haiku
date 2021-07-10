@@ -2,22 +2,22 @@
 Cancel	ShutdownProcess		Anulează
 OK	ShutdownProcess		OK
 Do you really want to shut down the system?	ShutdownProcess		Sigur doriți să opriți sistemul?
-Shutdown status	ShutdownProcess		Stare oprire
+Shutdown status	ShutdownProcess		Starea opririi
 Shut down	ShutdownProcess		Oprire
-The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Aplicația \"%appName%\" pare a fi blocată pe un panou modal.
+The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Aplicația \„%appName%\” poate fi blocată pe un panou modal.
 System is shut down	ShutdownProcess		Sistemul este oprit
 Restart system	ShutdownProcess		Repornire sistem
-Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Applicația \"%appName%\" a eșuat procesul de oprire.
-Asking background applications to quit.	ShutdownProcess		Cerere aplicațiilor de fond să termine.
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Aplicația \„%appName%\” a întrerupt procesul de oprire.
+Asking background applications to quit.	ShutdownProcess		Se solicită aplicațiilor de plan secund să termine.
 Do you really want to restart the system?	ShutdownProcess		Sigur doriți să reporniți sistemul?
 Restart	ShutdownProcess		Repornire
 It's now safe to turn off the computer.	ShutdownProcess		Acum este sigur să închideți calculatorul.
-Asking other processes to quit.	ShutdownProcess		Cerere altor procese să termine.
+Asking other processes to quit.	ShutdownProcess		Se solicită celorlaltor procese să termine.
 Cancel shutdown	ShutdownProcess		Anulează oprirea
-Restarting…	ShutdownProcess		Repornire…
+Restarting…	ShutdownProcess		Se repornește…
 %action%?	ShutdownProcess		%action%?
-Tidying things up a bit.	ShutdownProcess		Aranjez lucrurile un pic.
-Kill application	ShutdownProcess		Omoară aplicația
-Shutdown aborted	ShutdownProcess		Oprire anulată
+Tidying things up a bit.	ShutdownProcess		Se aranjează lucrurile puțin.
+Kill application	ShutdownProcess		Termină aplicația
+Shutdown aborted	ShutdownProcess		Oprire întreruptă
 Shutting down…	ShutdownProcess		Se oprește…
-Asking \"%appName%\" to quit.	ShutdownProcess		Cerere \"%appName%\" să termine.
+Asking \"%appName%\" to quit.	ShutdownProcess		Se solicită \„%appName%\” să termine.

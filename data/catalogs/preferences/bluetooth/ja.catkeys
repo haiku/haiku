@@ -1,5 +1,5 @@
 1	japanese	x-vnd.Haiku-BluetoothPrefs	3945807779
-Start bluetooth services…	Window		Bluetooth サービスを開始…
+Start bluetooth services…	Window		Bluetooth サービスの開始...
 From all devices	Settings view		すべてのデバイスから
 Defaults	Window		デフォルト
 Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		リモートデバイスの Bluetooth 機能がアクティブになっていることを確認してください。スキャンを開始するには「問い合わせ」ボタンを押してください。デバイスの名前を取得するに必要な時間は不明ですが、デバイス毎に 3 秒以内に完了すると思われます。その後一覧に追加ができて、ペアリングが可能になります。
@@ -9,14 +9,14 @@ Only from trusted devices	Settings view		信用されているデバイスのみ
 Launch now	main		ただちに起動
 Bluetooth	System name		Bluetooth
 Remove	Remote devices		削除
-Pick device…	Settings view		デバイスを選択…
+Pick device…	Settings view		デバイスの選択...
 Always ask	Settings view		常に確認する
 Quit	main		終了
 15 secs	Settings view		15 秒
 Help	Window		ヘルプ
-With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped…\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		支援を受けた方々:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\n協力してくれた方々に感謝…\n\nハードウェアの送付/寄付:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\n経済的な協力:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nパッチ:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nテスト:\n - Petter H. Juliussen\nすべての知識を与えてくれた:\n - the yellowTAB team
+With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped…\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		支援を受けた方々:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\n協力してくれた方々に感謝...\n\nハードウェアの送付/寄付:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\n経済的な協力:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nパッチ:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nテスト:\n - Petter H. Juliussen\nすべての知識を与えてくれた:\n - the yellowTAB team
 Manufacturer: 	Device View		製造元:
-Pair…	Remote devices		ペアリング…
+Pair…	Remote devices		ペアリング...
 Desktop	Settings view		デスクトップ
 Server	Window		サーバー
 Retrieving name of %1	Inquiry panel		%1の名前を取得しています
@@ -26,26 +26,26 @@ Local devices found on system:	Settings view		認識されたローカルデバ�
 Service classes: 	Device View		サービスクラス:
 Incoming connections policy:	Settings view		着信接続ポリシー:
 Remote devices	Window		リモートデバイス
-Retrieving names…	Inquiry panel		名前を取得中…
+Retrieving names…	Inquiry panel		名前の取得中...
 Add device to list	Inquiry panel		デバイスを一覧に追加
-Show name	Extended local device view		名前を表示
+Show name	Extended local device view		名前の表示
 Settings	Window		設定
 Remaining %1 seconds	Inquiry panel		残り %1 秒
-Stop bluetooth services…	Window		Bluetooth サービスを停止…
+Stop bluetooth services…	Window		Bluetooth サービスの停止...
 61 secs	Settings view		61 秒
 Authenticate	Extended local device view		認証
 Discoverable	Extended local device view		検出可能
 The Bluetooth services are not currently running on this system.	main		Bluetooth サービスは現在システム上で動作していません。
-Add…	Remote devices		追加…
+Add…	Remote devices		追加...
 Scanning completed.	Inquiry panel		スキャンが完了しました。
 Smart phone	Settings view		スマートフォン
 There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		このシステムには Bluetooth ローカルデバイスが登録されていません。
 Default inquiry time:	Settings view		デフォルトの問い合わせ時間:
 Revert	Window		戻す
-Refresh local devices…	Window		ローカルデバイスを更新…
+Refresh local devices…	Window		ローカルデバイスの更新...
 Server	Settings view		サーバー
  packets: 	Device View		 パケット: 
 Handheld	Settings view		ハンドヘルド機器
 Disconnect	Remote devices		切断
-About Bluetooth…	Window		Bluetooth について…
-Starting scan…	Inquiry panel		スキャンを開始中…
+About Bluetooth…	Window		Bluetooth について...
+Starting scan…	Inquiry panel		スキャンの開始中...

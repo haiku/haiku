@@ -2,7 +2,7 @@
 ©2010-2017 Haiku Inc.	ConfigView		©2010-2017 Haiku Inc.
 Compression method:	ConfigView		圧縮方式:
 WebP image translator	ConfigView		WebP イメージトランスレーター
-Preset	ConfigView		プリセット:
+Preset	ConfigView		プリセット
 WebP images	WebPTranslator		WebP イメージ
 WebPTranslator Settings	ConfigView		WebP トランスレーター設定
 Output quality:	ConfigView		出力品質:

@@ -1,28 +1,28 @@
 1	romanian	x-vnd.Haiku-Media	582516163
-Couldn't add volume control in Deskbar: %s\n	Media views		Nu s-a putut adăuga controlul de volum pe bara de desktop: %s\n
-Restart media services	Media views		Restartează servicii media
-Quit	Media Window		Închidere
+Couldn't add volume control in Deskbar: %s\n	Media views		Nu s-a putut adăuga controlul de volum pe Deskbar: %s\n
+Restart media services	Media views		Repornește serviciile media
+Quit	Media Window		Ieșire
 <none>	VideoInputMenu	Used when no video input is available	<none>
-Couldn't remove volume control in Deskbar: %s\n	Media views		Nu s-a putut elimina controlul de volum de pe bara de desktop: %s\n
+Couldn't remove volume control in Deskbar: %s\n	Media views		Nu s-a putut elimina controlul de volum de pe Deskbar: %s\n
 Video output:	Media views		Ieșire video:
 Video input:	Media views		Intrare video:
 Audio output:	Media views		Ieșire audio:
 Please select a SoundFont.	Midi View		Selectați un SoundFont.
-There are no SoundFonts installed.	Midi View		Nu există SoundFonturi instalate.
-Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Dacă închideți Media acum se va opri repornirea serviciilor media. Drept rezultat veți avea o functionalitate media șubredă sau nedisponibilă.
-Could not connect to the media server.\nWould you like to start it ?	Media Window		Nu s-a putut conecta la serverul media.\nDoriți să îl porniți ?
+There are no SoundFonts installed.	Midi View		Nu sunt SoundFonts instalate.
+Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Ieșirea din Media va opri repornirea serviciilor media. Rezultatul probabil este o functionalitate media fulgurantă sau indisponibilă.
+Could not connect to the media server.\nWould you like to start it ?	Media Window		Nu s-a putut conecta la serverul media.\nDoriți să îl porniți?
 Video settings	Media Window		Configurări video
 Audio mixer	Media Window		Mixaj audio
-Show volume control on Deskbar	Media views		Afișează controlul volumului în Deskbar
-Start media server	Media Window		Pornește server media
+Show volume control on Deskbar	Media views		Arată controlul de volum pe Deskbar
+Start media server	Media Window		Pornește serverul media
 Audio settings	Media Window		Configurări audio
-Quit anyway	Media Window		Închide oricum
+Quit anyway	Media Window		Ieși oricum
 Media	System name		Media
 Warning!	Media Window		Avertisment!
 MIDI Settings	Media Window		Configurări MIDI
 SoundFonts	Midi View		SoundFonts
 Audio input:	Media views		Intrare audio:
-<none>	Media views		<nimic>
+<none>	Media views		<none>
 Channel:	Media views		Canal:
 This hardware has no controls.	Media Window		Acest hardware nu are controale.
 Defaults	Media views		Implicite

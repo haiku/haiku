@@ -11,7 +11,7 @@ Latin-American	KeymapNames		ラテンアメリカ言語
 Ukrainian	KeymapNames		ウクライナ語
 Russian (Yawert)	KeymapNames		ロシア語 (Yawert)
 United-Kingdom	KeymapNames		英語 (United-Kingdom)
-Quit Haiku	System name		Haiku を終了
+Quit Haiku	System name		Haiku の終了
 Serbian (Cyrillic)	KeymapNames		セルビア語 (Cyrillic)
 Turkish (Type-F)	KeymapNames		トルコ語 (Type-F)
 Bulgarian (Cyrillic)	KeymapNames		ブルガリア語 (Cyrillic)
@@ -46,7 +46,7 @@ Spanish	KeymapNames		スペイン語
 Ukrainian (Mac)	KeymapNames		ウクライナ語 (Mac)
 Estonian	KeymapNames		エストニア語
 French (Bépo)	KeymapNames		フランス語 (Bépo)
-Restart system	BootPromptWindow		システムを再起動
+Restart system	BootPromptWindow		システムの再起動
 Serbian (Latin)	KeymapNames		セルビア語 (Latin)
 Russian (Typewriter)	KeymapNames		ロシア語 (Typewriter)
 French	KeymapNames		フランス語
@@ -67,7 +67,7 @@ Custom	BootPromptWindow		カスタム
 Norwegian	KeymapNames		ノルウェー語
 Danish	KeymapNames		デンマーク語
 Bulgarian (Phonetic)	KeymapNames		ブルガリア語 (Phonetic)
-Try out %distroname%	BootPromptWindow		%distroname%を試用する
+Try out %distroname%	BootPromptWindow		%distroname%を試用
 Canadian-French	KeymapNames		フランス語 (カナダ)
 Russian	KeymapNames		ロシア語
 Hungarian	KeymapNames		ハンガリー語
@@ -79,6 +79,6 @@ Czech (Mac)	KeymapNames		チェコ語 (Mac)
 Brazilian (ABNT2)	KeymapNames		ブラジル語 (ABNT2)
 Albanian	KeymapNames		アルバニア語
 Dutch	KeymapNames		オランダ語
-Install %distroname%	BootPromptWindow		%distroname%をインストール
+Install %distroname%	BootPromptWindow		%distroname%のインストール
 Friulian	KeymapNames		フリウリ語
 Icelandic	KeymapNames		アイスランド語

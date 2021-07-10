@@ -70,7 +70,7 @@ Revert	MediaPlayer-SettingsWindow		Revenire
 Low volume	MediaPlayer-SettingsWindow		Volum redus
 Audio	MediaPlayer-Main		Audio
 {0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Stereo} other{# Canale}}
-Quit	MediaPlayer-Main		Închidere
+Quit	MediaPlayer-Main		Ieșire
 Redo	MediaPlayer-PlaylistWindow		Repetă
 Move Entry	MediaPlayer-MovePLItemsCmd		Mută intrare
 <unknown>	PlaylistItem-author		<necunoscut>

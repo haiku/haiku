@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-libtracker	2730310071
+1	polish	x-vnd.Haiku-libtracker	384019165
 Created	ContainerWindow		Utworzono
 Icon	AttributesView		Ikona
 Open and make preferred	OpenWithWindow		Otwórz i zaznacz jako preferowane
@@ -6,6 +6,7 @@ Kind	ContainerWindow		Rodzaj
 Open with…	ContainerWindow		Otwórz za pomocą…
 Error moving \"%name\" to Trash. (%error)	FSUtils		Błąd przy przenoszeniu „%name” do Kosza. (%error)
 Or	FindPanel		Lub
+MIME Description	AttributesView		Opis MIME
 before	FindPanel		przed
 Volume icons	TrackerSettingsWindow		Ikony dysków
 Ignore case	SelectionWindow		Ignoruj wielkość liter
@@ -40,6 +41,7 @@ Small bitmap icon	AttributesView		Mała ikona bitmapowa
 Would you like to find a suitable application to open the file?	FSUtils		Czy chcesz poszukać odpowiedniej aplikacji do otwarcia tego pliku?
 64 x 64	ContainerWindow		64 x 64
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Nie możesz podmienić plikiem katalogu ani dowiązania.
+{0, plural, other{<# dates>}}	AttributesView		{0, plural, few{<# daty>} many{<# dat>} other{<# daty>}}
 Trailing \\.	libtracker		Końcowe \\.
 At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		W %func \nfind_directory() nie powiódł się. \nPowód: %error
 Handles any file	OpenWithWindow		Obsługuje każdy plik
@@ -92,6 +94,7 @@ Atom	AttributesView		Atom
 %SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%SizeProcessed z %TotalSize, %BytesPerSecond/s
 Preparing to restore items…	StatusWindow		Przygotowanie do przywrócenia elementów…
 Mount	ContainerWindow		Zamontuj
+{0, plural, other{<# rectangles>}}	AttributesView		{0, plural, few{<# prostokąty>} many{<# prostokątów>} other{<# prostokąta>}}
 Desktop	B_DESKTOP_DIRECTORY		Desktop
 Corrupted pointers.	libtracker		Niepoprawne wskaźniki.
 Link to:	InfoWindow		Dowiązanie do:

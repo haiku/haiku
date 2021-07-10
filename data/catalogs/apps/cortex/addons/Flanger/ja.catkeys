@@ -5,8 +5,8 @@ Depth	CortexAddOnsFlanger		Depth
 Feedback	CortexAddOnsFlanger		フィードバック
 Sweep rate	CortexAddOnsFlanger		Sweep rate
 Mix ratio	CortexAddOnsFlanger		Mix ratio
-MediaNodeControlApp: couldn't get node info (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: ノード(%d)情報を得られませんでした:\n%s\n
-MediaNodeControlApp: couldn't find node (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: ノード(%d)を見つけられませんでした:\n%s\n
+MediaNodeControlApp: couldn't get node info (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: ノード(%d)情報を得られません:\n%s\n
+MediaNodeControlApp: couldn't find node (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: ノード(%d)を見つけられません:\n%s\n
 FlangerNode parameters	CortexAddOnsFlanger		FlangerNode パラメーター
 OK	CortexAddOnsCommonMediaNodeControlApp		OK
 controls	CortexAddOnsCommonMediaNodeControlApp		コントロール

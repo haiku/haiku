@@ -15,7 +15,7 @@ Cancelling	MediaConverter		中止中
 None available	Audio codecs		利用できません
 No file selected	MediaConverter-FileInfo		ファイルが選択されていません
 High	MediaConverter		高い
-{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{ファイルはサポートされたメディアファイルとして認識されませんでした:} other{#個のファイルがサポートされたメディアファイルとして認識されませんでした:}}
+{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{ファイルはサポートされたメディアファイルとして認識されません:} other{#個のファイルがサポートされたメディアファイルとして認識されません:}}
 File Error	MediaConverter-FileInfo		ファイルエラー
 None available	Video codecs		利用できません
 Output format	MediaConverter		出力フォーマット
@@ -25,10 +25,10 @@ OK	MediaConverter		OK
 Error creating '%filename'	MediaConverter		'%filename' の作成中にエラーが発生しました
 Error loading a file	MediaConverter		ファイルのロード中にエラーが発生しました
 Encoder parameters	MediaConverter-EncoderWindow		エンコーターパラメーター
-Open…	Menu		開く…
+Open…	Menu		開く...
 Audio encoding:	MediaConverter		オーディオエンコーディング
 Audio quality: %3d%%	MediaConverter		オーディオ品質: %3d%%
-Cancelling…	MediaConverter		中止中…
+Cancelling…	MediaConverter		中止しています...
 Output file '%filename' created	MediaConverter		出力ファイル '%filename' が作成されました
 Output folder	MediaConverter		出力先フォルダー
 Error creating track.	MediaConverter		トラックの作成に失敗しました。

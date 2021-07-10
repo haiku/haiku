@@ -1,9 +1,9 @@
 1	romanian	x-vnd.Haiku-BMPTranslator	2497639570
 BMP images	BMPTranslator		Imagini BMP
-BMPTranslator Settings	BMPTranslator		Configurări TraducătorBMP
+BMPTranslator Settings	BMPTranslator		Configurări BMPTranslator
 BMP image (OS/2 format, %d bits)	BMPTranslator		Imagine BMP (format OS/2, %d biți)
-BMP image translator	BMPView		Traducător imagine BMP
-BMP image (MS format, %d bits	BMPTranslator	Ignore missing closing round bracket	Imagine BMP (format MS, %d biți
+BMP image translator	BMPView		Traducător de imagine BMP
+BMP image (MS format, %d bits	BMPTranslator	Ignore missing closing round bracket	Imagine BMP (format MS, %d biți)
 BMP Settings	BMPMain		Configurări BMP
-Version %d.%d.%d, %s	BMPView		Versiune %d.%d.%d, %s
-BMP image translator	BMPTranslator		Traducător imagine BMP
+Version %d.%d.%d, %s	BMPView		Versiunea %d.%d.%d, %s
+BMP image translator	BMPTranslator		Traducător de imagine BMP

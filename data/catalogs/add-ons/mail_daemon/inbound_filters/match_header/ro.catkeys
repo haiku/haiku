@@ -1,16 +1,16 @@
 1	romanian	x-vnd.Haiku-MatchHeader	1946584206
 Delete message	ConfigView		Șterge mesajul
 Match \"%attribute\" against \"%regex\"	RuleFilter		Potrivește \„%attribute\” peste \„%regex\”
-Match header	RuleFilter		Potrivește antet
-Set flags to	ConfigView		Stabilește indicatorii la
+Match header	RuleFilter		Potrivește antetul
+Set flags to	ConfigView		Stabilește fanioanele la
 Header field (e.g. Subject, From, …)	ConfigView		Fișier antet (de ex. Subiect, De la, …)
-<Choose account>	ConfigView		<Selectează contul>
+<Choose account>	ConfigView		<Choose account>
 Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		O valoare de metacaracter precum \„*spam*\”.\nPrefixați cu \„REGEX:\” pentru a utiliza expresii regulate.
 Then	ConfigView		Atunci
 If	ConfigView		Dacă
-Set as read	ConfigView		Marchează ca citit
+Set as read	ConfigView		Stabilește la citit
 Reply with	ConfigView		Răspunde cu
-<Choose action>	ConfigView		<Selectează acțiunea>
+<Choose action>	ConfigView		<Choose action>
 Move to	ConfigView		Mută la
 this field is based on the action	ConfigView		acest câmp este bazat pe acțiunea
 Account	ConfigView		Cont

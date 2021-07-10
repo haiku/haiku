@@ -1,6 +1,6 @@
 1	romanian	x-vnd.Haiku-Pairs	818003250
 Pairs	System name		Perechi
-Quit	PairsWindow		Închidere
+Quit	PairsWindow		Ieșire
 Medium	PairsWindow		Mediu
 Game	PairsWindow		Joc
 Expert (8x8)	PairsWindow		Avansat (8x8)
@@ -11,7 +11,7 @@ You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWind
 Small	PairsWindow		Mic
 Size	PairsWindow		Dimensiune
 %app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n	PairsWindow		%app%\n\tscris de Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n
-Quit game	PairsWindow		Închide jocul
+Quit game	PairsWindow		Ieși din joc
 Large	PairsWindow		Mare
 Beginner (4x4)	PairsWindow		Începător (4x4)
 Intermediate (6x6)	PairsWindow		Mediu (6x6)

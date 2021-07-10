@@ -1,9 +1,10 @@
-1	turkish	x-vnd.Haiku-HaikuDepot	3106374143
+1	turkish	x-vnd.Haiku-HaikuDepot	3544756144
 Repository update error	LocalRepositoryUpdateProcess		Depo güncelleme hatası
 Network error	ServerHelper		Ağ hatası
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Depo güncellenirken bir hata oluştu: %error%
 User Created	UserLoginWindow		Kullanıcı Oluşturuldu
 Check for updates…	MainWindow		Güncellemeleri denetle…
+Uninstall	PackageManager		Kaldır
 Uninstalled	PackageListView		Kaldırıldı
 It was not possible to create the new user.	UserLoginWindow		Yeni kullanıcı oluşturulamadı.
 Available packages	MainWindow		Kullanılabilir paketler
@@ -45,6 +46,8 @@ Category	FilterView		Kategori
 User rating	RatePackageWindow		Kullanıcı oyları
 Installed packages	MainWindow		Yüklü paketler
 A requested object or an object involved in the request was not found on the server.	ServerHelper		İstenen nesne veya istekle ilgili bir nesne sunucuda bulunamadı.
+Fatal error	PackageManager		Onulmaz hata
+Package action failed	PackageInfoView		Paket eylemi başarısız
 No changelog available.	PackageInfoView		Değişiklik günlüğü mevcut değil
 Error	App		Hata
 There was a puzzling response from the web service.	UserLoginWindow		Web servisinden kafa karıştıran bir yanıt alındı.
@@ -76,6 +79,7 @@ Stability	RatePackageWindow		Kararlılık
 Send	RatePackageWindow		Gönder
 Start package daemon	App		Paket hizmetini başlat
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Yanlış girme olasılığını ortadan kaldırmak için parolanız bir kez daha girilmelidir.
+The package action could not be scheduled: %Error%	PackageInfoView		Paket eylemi zamanlanamadı: %Error%
 Cancel	SettingsWindow		İptal
 Cancel	RatePackageWindow		İptal
 Inactive	PackageListView		Etkin değil
@@ -85,6 +89,7 @@ There are problems in the supplied data:	UserLoginWindow		Girilen veride sorunla
 OK	MainWindow		Tamam
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, other{# öge}}
 Usage conditions download problem	UserLoginWindow		Kullanım koşulları indirilirken hata
+OK	PackageInfoView		Tamam
 Downloading:	PackageInfoView		İndiriliyor:
 Quit	MainWindow		Çık
 Success	UserLoginWindow		Başarılı
@@ -167,6 +172,7 @@ Fetching remote repository data	LocalRepositoryUpdateProcess		Uzak depo bilgisi 
 Description	PackageListView		Tanım
 Open %DeskbarLink%	PackageManager		Aç: %DeskbarLink%
 User creation error	UserLoginWindow		Kullanıcı oluşturma hatası
+Install	PackageManager		Yükle
 Input validation	UserLoginWindow		Girdi doğrulaması
 Log in…	MainWindow		Giriş yap…
 You need to be logged into an account before you can rate packages.	MainWindow		Paketleri derecelendirmek için giriş yapmalısınız.

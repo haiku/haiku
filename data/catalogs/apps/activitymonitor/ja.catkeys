@@ -13,14 +13,14 @@ Cache	DataSource		キャッシュ
 CPU usage (combined)	DataSource		CPU 使用率 (合計)
 Threads	DataSource		スレッド数
 Receiving	DataSource		受信量
-Remove graph	ActivityView		グラフを削除
+Remove graph	ActivityView		グラフの削除
 Swap space	DataSource		スワップサイズ
 CPU	DataSource		CPU
 ActivityMonitor	System name		アクティビティモニター
 CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		更新間隔:
 RX	DataSource	Shorter version for Receiving.	受信
-Settings…	ActivityWindow		設定…
+Settings…	ActivityWindow		設定...
 Block cache	DataSource		ブロックキャッシュ
 Memory	DataSource		メモリ
 CPU usage	DataSource		CPU 使用率
@@ -29,7 +29,7 @@ Raw clipboard	DataSource		バイナリクリップボード
 Settings	ActivityWindow		設定
 Used memory	DataSource		使用メモリ
 %.1f faults/s	DataSource		%.1f フォールト/s
-Show legend	ActivityView		説明を表示
+Show legend	ActivityView		説明の表示
 Cached memory	DataSource		キャッシュメモリ
 CPU %d usage	DataSource		CPU %d 使用率
 File	ActivityWindow		ファイル
@@ -37,7 +37,7 @@ Ports	DataSource		ポート数
 Page faults	DataSource		ページフォールト数
 Apps	DataSource		アプリ
 Additional items	ActivityView		追加項目
-Add graph	ActivityWindow		グラフを追加
+Add graph	ActivityWindow		グラフの追加
 Sending	DataSource		送信量
 %.1f MiB	DataSource		%.1f MiB
 Always on top	ActivityWindow		常に最前面

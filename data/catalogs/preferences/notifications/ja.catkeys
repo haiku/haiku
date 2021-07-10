@@ -2,7 +2,7 @@
 Lower left	GeneralView		左下
 Application does not have a valid signature	NotificationView	Alert message	アプリケーションは有効なシグネチャーがありません
 Status	NotificationView		ステータス
-Add…	NotificationView		追加…
+Add…	NotificationView		追加...
 Lower right	GeneralView		右下
 Muted	NotificationView		ミュート
  is already listed	NotificationView	Alert message	 はすでにリストにあリます

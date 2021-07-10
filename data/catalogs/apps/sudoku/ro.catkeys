@@ -9,7 +9,7 @@ New	SudokuWindow		Nou
 Easy	SudokuWindow		Simplu
 Undo	SudokuWindow		Anulează
 Export as…	SudokuWindow		Exportă ca…
-Quit	SudokuWindow		Închidere
+Quit	SudokuWindow		Ieșire
 Redo	SudokuWindow		Repetă
 Could not open \"%s\":\n%s\n	SudokuWindow		Nu s-a putut deschide \"%s\":\n%s\n
 Blank	SudokuWindow		Spațiu

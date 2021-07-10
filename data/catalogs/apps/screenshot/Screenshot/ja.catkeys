@@ -16,10 +16,10 @@ Artwork folder	ScreenshotWindow		アートワークフォルダー
 Translator Settings	ScreenshotWindow		Translator 設定
 Include mouse pointer	ScreenshotWindow		マウスポインターも取り込む
 overwrite	ScreenshotWindow		上書き
-Settings…	ScreenshotWindow		設定…
-Choose folder	ScreenshotWindow		フォルダーを選択
+Settings…	ScreenshotWindow		設定...
+Choose folder	ScreenshotWindow		フォルダーの選択
 Name:	ScreenshotWindow		ファイル名:
-Choose folder…	ScreenshotWindow		フォルダーを選択…
+Choose folder…	ScreenshotWindow		フォルダーの選択...
 Please select	ScreenshotWindow		選択してください
 Failed to save screenshot	ScreenshotWindow		スクリーンショットの保存に失敗しました
 Cancel	ScreenshotWindow		中止

@@ -1,8 +1,8 @@
 1	portuguese (brazil)	x.vnd.OBOS-Inspector	577867100
 \nInput Formats:	ImageView		\nFormatos de Entrada:
-Next Page	ImageWindow		Próxima página
+Next Page	ImageWindow		Próxima Página
 Previous Page	ImageWindow		Página Anterior
-Active Translators	InspectorApp		Tradutores ativos
+Active Translators	InspectorApp		Tradutores Ativos
 System Translators	ActiveTranslatorsWindow		Tradutores do Sistema
 \nType: '%1' (%2)\nGroup: '%3' (%4)\nQuality: %5\nCapability: %6\nMIME Type: %7\nName: %8\n	ImageView		\nTipo: '%1' (%2)\nGrupo: '%3' (%4)\nQualidade: %5\nRecursos: %6\nTipo MIME: %7\nNome: %8\n
 OK	ImageWindow		OK
@@ -16,15 +16,15 @@ No image available to save.	ImageWindow		Nenhuma imagem disponível para salvar.
 OK	ImageView		OK
 Bummer	ImageWindow		Que chatice
 \nOutput Formats:	ImageView		\nFormatos de Saída:
-Number of Documents: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Número de documentos: %1\n\nTradutor usado:\nNome: %2\nInformações: %3\nVersão: %4\n
+Number of Documents: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Número de Documentos: %1\n\nTradutor Usado:\nNome: %2\nInformações: %3\nVersão: %4\n
 User Translators	ActiveTranslatorsWindow		Tradutores do Usuário
 Last Page	ImageWindow		Última Página
-\nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\nTradutor usado:\nNome: %1\nInformações: %2\nVersão: %3\n
+\nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\nTradutor Usado:\nNome: %1\nInformações: %2\nVersão: %3\n
 Unknown	ImageView		Desconhecido
 Info Win	InspectorApp	This is a quite narrow info window and title 'Info Win' is therefore shortened.	Janela de Informação
 Sorry, unable to load the image.	ImageView		Desculpe, não foi possível carregar a imagem.
 File	ImageWindow		Arquivo
-Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Documento selecionado: %1\n\nTradutor usado:\nNome: %2\nInformações: %3\nVersão: %4\n
+Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Documento Selecionado: %1\n\nTradutor Usado:\nNome: %2\nInformações: %3\nVersão: %4\n
 Quit	ImageWindow		Sair
 Sorry, unable to write the image file.	ImageView		Desculpe, não foi possível gravar o arquivo de imagem.
 Save…	ImageWindow		Salvar…

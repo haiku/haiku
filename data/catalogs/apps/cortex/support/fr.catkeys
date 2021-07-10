@@ -1,12 +1,17 @@
-1	french	application/x-vnd.Cortex.support	2750878869
+1	french	application/x-vnd.Cortex.support	2845758808
 (unknown format)	MediaString		(format inconnu)
 {0, plural,one{# frame forward}other{# frames forward}}	MediaString		{0, plural,one{# trame en avant}other{# trames en avant}}
 Rear-right	MediaString		Arrière-droit
 {0, plural, one{# pixel} other{# pixels}}	MediaString		{0, plural, one{# pixel} other{# pixels}}
 Mono	MediaString		Mono
+Encoded video	MediaString		Vidéo compressée
 Top-Front-left	MediaString		Avant-gauche-haut
+Offline	MediaString		Hors ligne
 Top-Front-center	MediaString		Avant-centre-haut
+BeOS format family	MediaString		Famille de format BeOS
 Back-center	MediaString		Arrière-centre
+(unknown video format)	MediaString		(format vidéo inconnu)
+AVI format family	MediaString		Famille de format AVI
 Interlaced 	MediaString		Entrelacé 
 15 bit RGBA	MediaString		15 bits RVBA
 Right	MediaString		Droite
@@ -23,27 +28,38 @@ Top-Front-right	MediaString		Avant-droit-haut
 Controllable	MediaString		Contrôlable
 32 bit integer	MediaString		Entier 32 bits
 Side-right	MediaString		Côté-droit
+Little endian	MediaString		Petit-boutien
 Side-left	MediaString		Côté-gauche
 {0, plural, one{# byte per buffer} other{# bytes per buffer}}	MediaString		{0, plural, one{# octet par tampon} other{# octets par tampon}}
 8 bit integer	MediaString		Entier 8 bits
+8 bit grayscale-index	MediaString		Niveaux de gris indexé 8 bits
+Increase latency	MediaString		Augmenter le temps de latence
 Front-left-center	MediaString		Avant-gauche-milieu
 Center	MediaString		Centre
+AIFF format family	MediaString		Famille de format AIFF
 Top-Back-left	MediaString		Arrière-gauche-haut
 16 bit RGB	MediaString		16 bits RVB
 Raw audio	MediaString		Audio brut
+WAV format family	MediaString		Famille de format WAV
+Big endian	MediaString		Gros-boutiste
 {0, plural,one{# byte (max)}other{# bytes (max)}}	MediaString		{0, plural,one{# octet (max)}other{# octets (max)}}
+Encoded audio	MediaString		Audio compressé
 32 bit RGBA	MediaString		32 bits RVBA
+Time source	MediaString		Référence de temps
 15 bit RGB	MediaString		15 bits RVB
 {0, plural,one{# byte per frame}other{# bytes per frame}}	MediaString		{0, plural,one{# octet par trame}other{# octets par trame}}
+Parameters	MediaString		Paramètres
 Top-Back-right	MediaString		Arrière-droit-haut
 {0, plural, one{# byte per row}other{# bytes per row}}	MediaString		{0, plural, one{# octet par ligne}other{# octets par ligne}}
 Left	MediaString		Gauche
+BeOS video	MediaString		Vidéo BeOS
 24 bit CMY	MediaString		24 bits CMJ
 Top-center	MediaString		Centre-haut
 Stereo	MediaString		Stéréo
 Bottom to top, left to right	MediaString		De bas en haut, et de gauche à droite
 {0, plural, one{# line} other{# lines}}	MediaString		{0, plural, one{# ligne} other{# lignes}}
 Text	MediaString		Texte
+Unknown media type	MediaString		Type de média inconnu
 24 bit RGB	MediaString		24 bits RVB
 {0, plural,one{# frame backward}other{# frames backward}}	MediaString		{0, plural,one{# trame en arrière}other{# trames en arrière}}
 Raw video	MediaString		Vidéo brute

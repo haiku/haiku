@@ -29,7 +29,7 @@ Vertical layout	LaunchBox		Aranjament vertical
 Pad	LaunchBox		Suport
 Close	LaunchBox		Închide
 Remove button	LaunchBox		Elimină buton
-Quit	LaunchBox		Închidere
+Quit	LaunchBox		Ieșire
 Horizontal layout	LaunchBox		Aranjament orizontal
 New	LaunchBox		Nou
 Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Trimiterea comenzii 'deschide dosar' la Tracker a eșuat.\n\nEroare: 

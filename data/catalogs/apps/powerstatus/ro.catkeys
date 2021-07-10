@@ -10,7 +10,7 @@ Last full charge: 	PowerStatus		Ultima încărcate completă:
  mV	PowerStatus		 mV
 Current rate: 	PowerStatus		Cotă curentă: 
 Show text label	PowerStatus		Afișează etichetă text
-Quit	PowerStatus		Închidere
+Quit	PowerStatus		Ieșire
 Battery low	PowerStatus		Baterie scăzută
 Model number: 	PowerStatus		Număr model: 
 Battery unused	PowerStatus		Baterie neutilizată

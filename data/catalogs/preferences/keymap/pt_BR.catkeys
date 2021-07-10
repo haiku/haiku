@@ -1,58 +1,175 @@
-1	portuguese (brazil)	x-vnd.Haiku-Keymap	1385051534
+1	portuguese (brazil)	x-vnd.Haiku-Keymap	2850776429
 Key	Modifier keys window	As in a computer keyboard key	Tecla
+Japanese	KeymapNames		Japonês
+US	KeymapNames		US
+PG ↑	Keyboard Layout View	Very short for 'page up'	PG ↑
+Brazilian	KeymapNames		Brasileiro
+ThinkPad (US)	KeyboardLayoutNames		ThinkPad (US)
 Right control	Keyboard Layout View		Control direito
-Option:	Modifier keys window	Option key role name	Opção:
+X-Bows Nature	KeyboardLayoutNames		X-Bows Nature
+Dvorak	KeymapNames		Dvorak
+Option:	Modifier keys window	Option key role name	Option:
 Cancel	Modifier keys window		Cancelar
 Sample and clipboard:	Keymap window		Amostra e área de transferência:
+Polish	KeymapNames		Polonês
+Latin-American	KeymapNames		Latino-Americano
+Ukrainian	KeymapNames		Ucraniano
+PAGE ↓	Keyboard Layout View		PÁGINA ↓
+DEL	Keyboard Layout View		DEL
+United-Kingdom	KeymapNames		Reino Unido
+Turkish (Type-F)	KeymapNames		Turco (Tipo F)
+Serbian (Cyrillic)	KeymapNames		Sérvio (Cirílico)
+Belgian (point)	KeymapNames		Belga (ponto)
+Finnish	KeymapNames		Finlandês
 Num lock	Keyboard Layout View		Num lock
 Switch shortcut keys to Windows/Linux mode	Keymap window		Alternar teclas de atalho para modo Windows/Linux
-Option	Keyboard Layout View	Option key	Opção
+Option	Keyboard Layout View	Option key	Option
+Spanish (Dvorak)	KeymapNames		Espanhol (Dvorak)
 Scroll lock	Keyboard Layout View		Scroll lock
-Right option	Keyboard Layout View		Opção da direita
+US-International	KeymapNames		US-International
+Right option	Keyboard Layout View		Option da direita
+Turkish (Type-Q)	KeymapNames		Turco (Tipo Q)
 Revert	Modifier keys window		Reverter
+Slovak	KeymapNames		Eslovaco
+CAPS LOCK	Keyboard Layout View		CAPS LOCK
+Colemak	KeymapNames		Colemak
+Dvorak (programmer's)	KeymapNames		Dvorak (programador)
+PRINT	Keyboard Layout View		PRINT
+German (Mac)	KeymapNames		Alemão (Mac)
+Arabic (102)	KeymapNames		Árabe (102)
+ThinkPad	KeyboardLayoutNames		ThinkPad
+Belarusian (Mac)	KeymapNames		Bielorruso (Mac)
+Croatian	KeymapNames		Croata
+PAGE ↑	Keyboard Layout View		PÁGINA ↑
 Set modifier keys	Modifier keys window		Definir teclas modificadoras
+Apple Aluminium International	KeyboardLayoutNames		Apple Aluminium Internacional
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Tecla Win/Cmd
+PG ↓	Keyboard Layout View	Very short for 'page down'	PG ↓
+ThinkPad X1 (US)	KeyboardLayoutNames		ThinkPad X1 (US)
+Apple Aluminum	KeyboardLayoutNames		Apple Aluminum
+Spanish	KeymapNames		Espanhol
+HOME	Keyboard Layout View		HOME
+COMMAND	Keyboard Layout View		COMMAND
+Ukrainian (Mac)	KeymapNames		Ucraniano (Mac)
 Command:	Modifier keys window	Command key role name	Command:
+French (Bépo)	KeymapNames		Francês (Bépo)
+Russian (Typewriter)	KeymapNames		Russo (máquina de escrever)
 Acute trigger	Keymap window		Tecla de acento agudo
+Italian	KeymapNames		Italiano
+ThinkPad T400s International	KeyboardLayoutNames		ThinkPad T400s International
+Kinesis Ergo Elan International	KeyboardLayoutNames		Kinesis Ergo Elan Internacional
+Apple Aluminum (US)	KeyboardLayoutNames		Apple Aluminum (US)
+French (NF Z71-300)	KeymapNames		Francês (NF Z71-300)
 Modifier keys	Modifier keys window		Teclas modificadoras
+ThinkPad X1 International	KeyboardLayoutNames		ThinkPad X1 Internacional
+Kazakh	KeymapNames		Cazaque
 Save as…	Keymap window		Salvar como...
-Error: duplicate keys	Modifier keys window		Erro: chaves duplicadas
+Lithuanian (Standard)	KeymapNames		Lituano (padrão)
+Error: duplicate keys	Modifier keys window		Erro: teclas duplicadas
+NUM	Keyboard Layout View	Very short for 'num lock'	NUM
+Bulgarian (Phonetic)	KeymapNames		Búlgaro (fonético)
+Kinesis Advantage	KeyboardLayoutNames		Kinesis Advantage
+Canadian-French	KeymapNames		Francês do Canadá
+Hungarian	KeymapNames		Húngaro
 Control	Keyboard Layout View	Control key	Control
+Irish	KeymapNames		Irlandês
 Remove	Keyboard Layout View		Remover
 Tilde trigger	Keymap window		Acento til
 Shift	Keyboard Layout View	Shift key	Shift
+CONTROL	Keyboard Layout View		CONTROLE
+Macedonian	KeymapNames		Macedónio
+Czech (Mac)	KeymapNames		Checo (Mac)
 Left command	Keyboard Layout View		Comando esquerdo
+Albanian	KeymapNames		Albanês
 (Current)	Keymap window		(Atual)
-Left option	Keyboard Layout View		Opção esquerda
+OPT	Keyboard Layout View	Very short for 'option'	OPT
+Friulian	KeymapNames		Friulano
+Left option	Keyboard Layout View		Option da esquerda
+END	Keyboard Layout View		END
+Esperanto	KeymapNames		Esperanto
+Belarusian	KeymapNames		Bielorrusso
 Warning: left and right key roles do not match	Modifier keys window		Aviso: regras das teclas direita e esquerda não são iguais
 Circumflex trigger	Keymap window		Tecla de circunflexo
+Fizzbook NL2	KeyboardLayoutNames		Fizzbook NL2
 Caps lock	Keyboard Layout View		Caps lock
 Left shift	Keyboard Layout View		Shift esquerdo
+Russian (Yawert)	KeymapNames		Russo (Yawert)
+ThinkPad X100e International	KeyboardLayoutNames		ThinkPad X100e Internacional
+Bulgarian (Cyrillic)	KeymapNames		Búlgaro (Cirílico)
+Swedish	KeymapNames		Sueco
 Left control	Keyboard Layout View		Control esquerdo
+CAPS	Keyboard Layout View	Very short for 'caps lock'	CAPS
 Role	Modifier keys window	As in the role of a modifier key	Função
+Svorak	KeymapNames		Svorak
+German	KeymapNames		Alemão
+ThinkPad X100e (US)	KeyboardLayoutNames		ThinkPad X100e (US)
+Swiss-German	KeymapNames		Suíço-Alemão
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Tecla control
+Czech	KeymapNames		Checo
+Russian (Udmurt, Komi, Mari)	KeymapNames		Russo (Udmurt, Komi, Mari)
+Thai (TIS-820.2538)	KeymapNames		Tailandês (TIS-820.2538)
 Control:	Modifier keys window	Control key role name	Controle:
+Generic 105-key International	KeyboardLayoutNames		Genérico Internacional de 105 teclas
 Disabled	Modifier keys window	Do nothing	Desabilitado
 Select dead keys	Keymap window		Selecionar teclas de acento
+Russian (Mac)	KeymapNames		Russo (Mac)
 Right shift	Keyboard Layout View		Shift direito
+ESC	Keyboard Layout View		ESC
+Belarusian (Latin)	KeymapNames		Bielorruso (Latino)
+Hebrew	KeymapNames		Hebraico
 Layout	Keymap window		Disposição
+Greek	KeymapNames		Grego
 Revert	Keymap window		Reverter
+CTRL	Keyboard Layout View	Very short for 'control'	CTRL
 Grave trigger	Keymap window		Tecla morta
 Menu	Keyboard Layout View	Menu key	Menu
+Faeroese	KeymapNames		Feroês
 Quit	Keymap window		Sair
+Polish (Typewriter)	KeymapNames		Polonês (máquina de escrever)
+French (Mac)	KeymapNames		Francês (Mac)
 User:	Keymap window		Usuário:
+Apple Aluminium Extended International	KeyboardLayoutNames		Apple Aluminium Extended International
 Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Tecla Alt/Opt
+SHIFT	Keyboard Layout View		SHIFT
+Estonian	KeymapNames		Estoniano
+Serbian (Latin)	KeymapNames		Sérvio (Latino)
+French	KeymapNames		Francês
+Portuguese	KeymapNames		Português
+Swiss-French	KeymapNames		Francês da Suíça
 Shift:	Modifier keys window	Shift key role name	Deslocar:
-Keymap	System name		Mapa do teclado
+Keymap	System name		Disposição de teclado
+Slovene	KeymapNames		Esloveno
+Lithuanian	KeymapNames		Lituano
 Set modifier keys…	Keymap window		Definir modificador de teclas…
 Switch shortcut keys to Haiku mode	Keymap window		Alternar teclas de atalho para o modo Haiku
 Defaults	Keymap window		Configurações padrão
+ISO-9995	KeymapNames		ISO-9995
 System:	Keymap window		Sistema:
+ThinkPad International	KeyboardLayoutNames		ThinkPad Internacional
+Apple Aluminum Extended (US)	KeyboardLayoutNames		Apple Aluminum Extended (US)
 Switch shortcut keys	Keymap window		Mudas as teclas de atalho
 Right command	Keyboard Layout View		Comando direito
+NUM LOCK	Keyboard Layout View		NUM LOCK
+MENU	Keyboard Layout View		MENU
+Belgian (comma)	KeymapNames		Belga (vírgula)
+Norwegian	KeymapNames		Norueguês
 Font	Keymap window		Fonte
+Danish	KeymapNames		Dinamarquês
+Generic 104-key	KeyboardLayoutNames		Genérico de 104 teclas
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Tecla shift
+PAUSE	Keyboard Layout View		PAUSE
+Russian	KeymapNames		Russo
+TypeMatrix 2030	KeyboardLayoutNames		TypeMatrix 2030
+Romanian	KeymapNames		Romeno
+CMD	Keyboard Layout View	Very short for 'command'	CMD
 Command	Keyboard Layout View	Command key	Comando
+SCROLL	Keyboard Layout View		SCROLL
 File	Keymap window		Arquivo
+Brazilian (ABNT2)	KeymapNames		Brasileiro (ABNT2)
+INS	Keyboard Layout View		INS
+OPTION	Keyboard Layout View		OPTION
+Dutch	KeymapNames		Holandês
 Diaeresis trigger	Keymap window		Tecla de trema
+Icelandic	KeymapNames		Islandês
 Open…	Keymap window		Abrir...
+ThinkPad T400s (US)	KeyboardLayoutNames		ThinkPad T400s (US)

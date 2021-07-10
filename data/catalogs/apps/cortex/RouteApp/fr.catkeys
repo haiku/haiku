@@ -1,12 +1,14 @@
-1	french	application/x-vnd.Cortex.Route	2895281500
+1	french	application/x-vnd.Cortex.Route	2746881077
 Node '%name%' released	CortexRouteApp		Nœud « %name% » libéré
 OK	CortexRouteApp		OK
 About Cortex/Route…	CortexRouteApp		À propos de Cortex/Route…
 File	CortexRouteApp		Fichier
 Connection '%name%' made	CortexRouteApp		Connexion « %name% » effectuée
 Save nodes…	CortexRouteApp		Enregistrer les nœuds…
+%producer% and %consumer%	CortexRouteApp		%producer% et %consumer%
 Node '%name%' created	CortexRouteApp		Nœud « %name% » créé
 Window	CortexRouteApp		Fenêtre
+Untitled group	CortexRouteApp		Groupe sans titre
 Between:	CortexRouteApp		Entre :
 Cortex	CortexRouteApp		Cortex
 Open…	CortexRouteApp		Ouvrir…

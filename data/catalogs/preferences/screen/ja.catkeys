@@ -4,9 +4,9 @@ bits/pixel	Screen		ビット/ピクセル
 15 bits/pixel, 32768 colors	Screen		15 ビット/ピクセル, 32768 色
 Rows:	Screen		行:
 %.1f Hz	Screen		%.1f Hz
-The screen mode could not be set:\n\t%s\n	Screen		スクリーンモードは設定できませんでした:\n\t%s\n
+The screen mode could not be set:\n\t%s\n	Screen		スクリーンモードは設定できません:\n\t%s\n
 Keep	Screen		保持
-/other…	Screen		/その他…
+/other…	Screen		/その他...
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		水平周波数: \t%lu - %lu kHz\n垂直周波数: \t%lu - %lu Hz\n\n最大ピクセルクロック: \t%g MHz
 Refresh rate:	Screen		リフレッシュレート:
 Video format:	Screen		ビデオフォーマット:
@@ -16,11 +16,11 @@ Current workspace	Screen		現在のワークスペース
 vertically	Screen		垂直に
 All workspaces	Screen		すべてのワークスペース
 Use laptop panel:	Screen		ラップトップパネルを使用:
-Could not write VESA mode settings file:\n\t	Screen		VESA モード設定ファイルを書き込めませんでした:\n\t
+Could not write VESA mode settings file:\n\t	Screen		VESA モード設定ファイルを書き込めません:\n\t
 Display info	Screen		ディスプレイ情報
 Settings will revert in %seconds.	Screen		設定は %seconds 秒以内に元に戻ります。
 Cancel	Screen		中止
-Other…	Screen		その他…
+Other…	Screen		その他...
 Screen	Screen		画面
 Colors:	Screen		色:
 yes	Screen		はい
@@ -49,7 +49,7 @@ Resolution:	Screen		解像度:
 Apply	Screen		適用
 horizontally	Screen		水平に
 disable	Screen		無効
-Set background…	Screen		背景を設定…
+Set background…	Screen		背景の設定...
 Type or use the left and right arrow keys.	Screen		入力するか、左右矢印キーを使用してください。
 Screen	System name		画面
 Do you wish to keep these settings?	Screen		これらの設定を保存しますか?

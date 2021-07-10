@@ -1,0 +1,59 @@
+1	portuguese (brazil)	application/x-vnd.Cortex.InfoView	2382053937
+Offset	InfoView		Desvio
+Description	DormantNodeInfoView		Descrição
+Byte order	InfoView		Ordem de bytes
+Connection	InfoView		Conexão
+Output formats	DormantNodeInfoView		Formatos de saída
+History	InfoView		História
+Input formats	DormantNodeInfoView		Formatos de entrada
+Signature	AppNodeInfoView		Assinatura
+Video data between	InfoView		Dados de vídeo entre
+Any number	DormantNodeInfoView	For 'Max. instances' field	Qualquer número
+Flags	InfoView		Sinalizadores
+Media output	InfoView		Saída de mídia
+Active lines	InfoView		Linhas ativas
+Buffer size	InfoView		Tamanho do buffer
+\n- Quality:	FileNodeInfoView		\n- Qualidade:
+Kinds	LiveNodeInfoView		Tipos
+Application	AppNodeInfoView		Aplicação
+Flavor flags	DormantNodeInfoView		Estilo de sinalizadores
+Max. instances	DormantNodeInfoView		Instâncias máx.
+\n- Duration:	FileNodeInfoView		\n- Duração:
+Dormant media node	DormantNodeInfoView		Nó de mídia dormente
+Latency	LiveNodeInfoView		Latência
+Media type	InfoView		Tipo de mídia
+Live media node	LiveNodeInfoView		Nó de mídia ao vivo
+Field rate	InfoView		Taxa de campo
+Kinds	DormantNodeInfoView		Tipos
+%title% info	InfoView		informação %title%
+Node ID	LiveNodeInfoView		Nó de ID
+Resolution	InfoView		Resolução
+Chunk size	InfoView		Tamanho do pedaço
+File format	AppNodeInfoView		Formato de arquivo
+Matrix mask	InfoView		Máscara de matriz
+Channel mask	InfoView		Máscara de canal
+Orientation	InfoView		Orientação
+Live file-interface node	FileNodeInfoView		Nó de interface de arquivo ao vivo
+Channels	InfoView		Canais
+Sample rate	InfoView		Taxa de amostragem
+File format	FileNodeInfoView		Formato de arquivo
+(no file)	FileNodeInfoView		(nenhum arquivo)
+Media input	InfoView		Entrada de mídia
+Bit rate	InfoView		Taxa de bits
+Input format	DormantNodeInfoView		Formato de entrada
+Format	InfoView		Formato
+Version	AppNodeInfoView		Versão
+AddOn ID	DormantNodeInfoView		AddOn ID
+Frame size	InfoView		Tamanho do quadro
+Flavor ID	DormantNodeInfoView		ID de sabor
+Run mode	LiveNodeInfoView		Modo corrida
+\n- Codec:	FileNodeInfoView		\n- Codec:
+Port	LiveNodeInfoView		Porta
+Output format	DormantNodeInfoView		Formato de saída
+Aspect ratio	InfoView		Proporção da tela
+Application-owned node	AppNodeInfoView		Nó de propriedade do aplicativo
+Tracks	FileNodeInfoView		Trilhas
+Source	InfoView		Origem
+Destination	InfoView		Destino
+Copyright	FileNodeInfoView		Direitos autorais
+ID:	FileNodeInfoView		ID:

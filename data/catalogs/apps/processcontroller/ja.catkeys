@@ -2,11 +2,11 @@
 Error saving file	ProcessController		ファイル保存中にエラーが発生しました
 Display priority	ProcessController		表示優先度
 That's no Fun!	ProcessController		そんなのおもしろくない!
-What do you want to do with the team \"%s\"?	ProcessController		スレッド \"%s\" に対してなにをしますか?
-Your setting file could not be saved!\n(%s)	ProcessController		設定ファイルは保存できませんでした。\n(%s)
+What do you want to do with the team \"%s\"?	ProcessController		スレッド \"%s\" にどうしますか?
+Your setting file could not be saved!\n(%s)	ProcessController		設定ファイルは保存できません。\n(%s)
 Processor %d	ProcessController		プロセッサ %d
 Live in the Deskbar	ProcessController		Deskbar 中で実行
-Kill this team!	ProcessController		スレッドを強制終了
+Kill this team!	ProcessController		スレッドの強制終了
 OK	ProcessController		OK
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		プロセスコントローラーをウィンドウモードで起動するか、または Deskbar にインストールできます。
 Real-time priority	ProcessController		リアルタイム優先度
@@ -17,33 +17,33 @@ Urgent display priority	ProcessController		緊急表示優先度
 Memory usage	ProcessController		メモリ使用量
 Ok!	ProcessController		Ok!
 Normal priority	ProcessController		通常優先度
-Restart Deskbar	ProcessController		Deskbar を再起動
-About ProcessController…	ProcessController		プロセスコントローラーについて…
+Restart Deskbar	ProcessController		Deskbar の再起動
+About ProcessController…	ProcessController		プロセスコントローラーについて...
 Usage: %s [-deskbar]\n	ProcessController		Usage: %s [-deskbar]\n
 Please confirm	ProcessController		確認してください。
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr
 Urgent priority	ProcessController		緊急優先度
-What do you want to do with the thread \"%s\"?	ProcessController		スレッド \"%s\" に対してなにをしますか?
+What do you want to do with the thread \"%s\"?	ProcessController		スレッド \"%s\" にどうしますか?
 Idle priority	ProcessController		アイドル優先度
 Real-time display priority	ProcessController		リアルタイム表示優先度
 Threads and CPU usage	ProcessController		スレッドと CPU の使用率
-Quit application	ProcessController		アプリケーションを終了
+Quit application	ProcessController		アプリケーションの終了
 Info	ProcessController		情報
-Kill this thread!	ProcessController		スレッドを強制終了
-This team is already gone…	ProcessController		Team はすでに終了しています…
-Gone teams…	ProcessController		終了した team…
-Quit an application	ProcessController		アプリケーションを終了
+Kill this thread!	ProcessController		スレッドの強制終了
+This team is already gone…	ProcessController		Team はすでに終了しています...
+Gone teams…	ProcessController		終了した Team...
+Quit an application	ProcessController		アプリケーションの終了
 Cancel	ProcessController		中止
 Install in Deskbar	ProcessController		Deskbar にインストール
-Debug this team!	ProcessController		スレッドをデバッグ
+Debug this team!	ProcessController		スレッドのデバッグ
 ProcessController	System name		プロセスコントローラー
 Lowest active priority	ProcessController		最低アクティブ優先度
-Restart Tracker	ProcessController		Tracker を再起動
-System resources & caches…	ProcessController		システムリソースとキャッシュ…
+Restart Tracker	ProcessController		Tracker の再起動
+System resources & caches…	ProcessController		システムリソースとキャッシュ...
 Damned!	ProcessController		とんでもない!
-New Terminal	ProcessController		ターミナルを起動
+New Terminal	ProcessController		新しいターミナル
 Power saving	ProcessController		省電力モード
 ProcessController is already installed in Deskbar.	ProcessController		プロセスコントローラーは、すでに Deskbar にインストールされています
-This is the last active processor…\nYou can't turn it off!	ProcessController		これは最後のアクティブなプロセッサです…\n止められません!
-This thread is already gone…	ProcessController		スレッドはすでに終了しています…
+This is the last active processor…\nYou can't turn it off!	ProcessController		これは最後のアクティブなプロセッサです...\n止められません!
+This thread is already gone…	ProcessController		スレッドはすでに終了しています...
 Run in window	ProcessController		ウィンドウモードで起動

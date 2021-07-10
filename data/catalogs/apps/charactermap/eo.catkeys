@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-CharacterMap	1685391092
+1	esperanto	x-vnd.Haiku-CharacterMap	4261926097
 Tirhuta	UnicodeBlocks		Tirhuta, la tradicia maitila abugida skribsistemo (normo ISO15924)
 Miscellaneous mathematical symbols B	UnicodeBlocks		Diversaj matematikaj simboloj-B
 Latin extended E	UnicodeBlocks		Latina etendaĵo E
@@ -11,9 +11,10 @@ Ogham	UnicodeBlocks		Ogama
 Inscriptional Pahlavi	UnicodeBlocks		Prapahlava skribsistemo
 Hebrew	UnicodeBlocks		Hebrea
 Katakana	UnicodeBlocks		Katakana
-Miao	UnicodeBlocks		La miaa lingvo
+Miao	UnicodeBlocks		Miaa lingvo
 Mro	UnicodeBlocks		Mroa lingvo
 Mongolian	UnicodeBlocks		Mongola lingvo
+Pau Cin Hau	UnicodeBlocks		Pau Cin Hau
 Yezidi	UnicodeBlocks		Kurmanĝia (norda kurda) lingvo
 Linear B ideograms	UnicodeBlocks		Ideogramoj de linia skribo B
 Caucasian Albanian	UnicodeBlocks		Praudia lingvo (aghbania aŭ de Kaŭkaza Albanio)
@@ -42,6 +43,7 @@ Latin extended D	UnicodeBlocks		Latina etendaĵo D
 Aegean numbers	UnicodeBlocks		Egeaj numeroj
 Hangul syllables	UnicodeBlocks		Hangulaj silaboj
 Modifier tone letters	UnicodeBlocks		Literoj kiuj modifas tonon
+Kaithi	UnicodeBlocks		Kaithi
 Newa	UnicodeBlocks		Nevara
 View	CharacterWindow		Vidi
 Enclosed CJK letters and months	UnicodeBlocks		Ĉirkaŭigitaj Ĉin-japan-koreaj literoj kaj monatsignoj
@@ -198,6 +200,7 @@ Cyrillic supplement	UnicodeBlocks		Suplemento al cirila skribsistemo
 Yi Radicals	UnicodeBlocks		Jiaj Radikoj
 Supplementary private use area A	UnicodeBlocks		Suplemento al aro por privata uzo A
 Armenian	UnicodeBlocks		Armena
+Miscellaneous symbols and pictographs	UnicodeBlocks		Diversaj simboloj kaj bildoj
 Phags-pa	UnicodeBlocks		Mongola kvadrata skribsistemo de lamao Pĥagva (normo ISO15924)
 Meetei Mayek	UnicodeBlocks		Manipura lingvo
 CJK compatibility ideographs	UnicodeBlocks		Ĉin-japan-korea kongrua ideogramaro
@@ -253,6 +256,7 @@ New Tai Lue	UnicodeBlocks		Nova skribsistemo por la taja de popolo ljuo (normo I
 Sutton SignWriting	UnicodeBlocks		Signo-Skribado de Sutono
 Limbu	UnicodeBlocks		Limbua
 Kanbun	UnicodeBlocks		Kanbuna
+Emoticons	UnicodeBlocks		Miensimboloj
 CJK symbols and punctuation	UnicodeBlocks		Ĉin-japan-koreaj simboloj kaj interpunkcioj
 CJK strokes	UnicodeBlocks		Ĉin-japan-koreaj strekoj
 Combining half marks	UnicodeBlocks		Kunligaj duonsignoj

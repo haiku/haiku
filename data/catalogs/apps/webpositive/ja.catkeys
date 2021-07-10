@@ -10,7 +10,7 @@ Script console	WebPositive Window		スクリプトコンソール
 Fonts	Settings Window		フォント
 Path	Cookie Manager		パス
 Bookmarks	WebPositive Window		ブックマーク
-Use proxy server to connect to the internet	Settings Window		インターネット接続にプロキシサーバーを使用する
+Use proxy server to connect to the internet	Settings Window		インターネット接続にプロキシサーバーを使用
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url の読み込み完了
 Auto-hide interface in full screen mode	Settings Window		全画面表示で自動的にインターフェースを隠す
 There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	ブックマークフォルダーの取得時にエラーが発生しました。\n\nエラー: %error
@@ -27,21 +27,21 @@ Start page:	Settings Window		スタートページ:
 Cancel	Download Window		中止
 Settings	Settings Window		設定
 Downloads	WebPositive Window		ダウンロード
-Browse…	Settings Window		ブラウズ…
+Browse…	Settings Window		ブラウズ...
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	このページ (%bookmarkName) のブックマークはすでに存在します。
-Resume prior session	Settings Window		以前のセッションを再開する
+Resume prior session	Settings Window		以前のセッションを再開
 Match case	WebPositive Window		大文字小文字を区別
-Proxy password:	Settings Window		パスワード:
+Proxy password:	Settings Window		プロキシのパスワード:
 Size:	Font Selection view		サイズ:
 Page source	WebPositive Window		ページのソース
 Proxy server port:	Settings Window		ポート:
 Error opening downloads folder	Download Window		ダウンロードフォルダーを開けません
-Show bookmark bar	WebPositive Window		ブックマークバーを表示
+Show bookmark bar	WebPositive Window		ブックマークバーの表示
 Find	WebPositive Window		検索
 Standard font:	Settings Window		標準フォント:
 Open download error	Download Window		ダウンロードエラーを開く
 General	Settings Window		一般
-New tabs:	Settings Window		新規タブ:
+New tabs:	Settings Window		新しいタブ:
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url の読み込みに失敗しました
 Open downloads folder	Download Window		ダウンロードフォルダーを表示
 Proxy server	Settings Window		プロキシサーバー
@@ -50,7 +50,7 @@ Default fixed font size:	Settings Window		等幅フォントサイズ:
 Sans serif font:	Settings Window		サンセリフフォント:
 Clear	WebPositive Window		クリア
 Cookies for %s	Cookie Manager		%s 用の Cookie
-The download could not be opened.	Download Window		ダウンロードファイルを開けませんでした。
+The download could not be opened.	Download Window		ダウンロードファイルを開けません。
 Close	Download Window		閉じる
 WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - 検索語
@@ -62,7 +62,7 @@ OK	Authentication Panel		OK
 Hide password text	Authentication Panel		パスワードを隠す
 Username:	Authentication Panel		ユーザー名:
 Name	Cookie Manager		名前
-Remove finished	Download Window		ダウンロード済を削除
+Remove finished	Download Window		ダウンロード済の削除
 Earlier	WebPositive Window		前
 Edit	WebPositive Window		編集
 Back	WebPositive Window		戻る
@@ -79,14 +79,14 @@ Paste	URL Bar		貼り付け
 Find next	WebPositive Window		次を検索
 Open search page	Settings Window		検索ページを開く
 Increase size	WebPositive Window		拡大
-New tab	WebPositive Window		新規タブ
+New tab	WebPositive Window		新しいタブ
 Today	WebPositive Window		今日
 Open location	WebPositive Window		場所を開く
-New browser window	Download Window		新規ブラウザウィンドウ
+New browser window	Download Window		新しいブラウザーウィンドウ
 Open	Download Window		開く
-New window	WebPositive Window		新規ウィンドウ
-New windows:	Settings Window		新規ウィンドウ:
-The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	ダウンフォードフォルダーを開けませんでした。\n\nエラー: %error
+New window	WebPositive Window		新しいウィンドウ
+New windows:	Settings Window		新しいウィンドウ:
+The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	ダウンフォードフォルダーを開けません。\n\nエラー: %error
 Cancel	Authentication Panel		中止
 Style:	Font Selection view		スタイル:
 There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	ブックマークファイルの作成時にエラーが発生しました。\n\nエラー: %error
@@ -121,30 +121,30 @@ Find previous occurrence of search terms	WebPositive Window	find bar previous bu
 Remember username and password for this site	Authentication Panel		このサイトのユーザー名とパスワードを保存する
 (Finish: %date - %duration left)	Download Window		(完了: %date - 残り %duration)
 Cookie manager	Cookie Manager		Cookie マネージャー
-Show home button	Settings Window		ホームボタンを表示
+Show home button	Settings Window		ホームボタンの表示
 Start new session	Settings Window		新しいセッションの開始
 The cookie jar is empty!	Cookie Manager		cookie ジャーは空です!
 Value	Cookie Manager		値
 Remove missing	Download Window		行方不明のものを削除
 Paste	WebPositive Window		貼り付け
-Double-click or middle-click to open new tab.	Tab Manager		ダブルクリックかミドルクリックで新規タブを開く。
+Double-click or middle-click to open new tab.	Tab Manager		ダブルクリックかミドルクリックで新しいタブを開く。
 Next	WebPositive Window		次へ
 Bookmark error	WebPositive Window		ブックマークエラー
 OK	WebPositive Window		OK
 (%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% / %expectedSize%, %rate%/s)
 WebPositive	Download Window		WebPositive
 Zoom text only	WebPositive Window		文字サイズのみ変更
-Save page as…	WebPositive Window		名前を付けてページを保存…
+Save page as…	WebPositive Window		名前を付けてページを保存...
 Page source error	WebPositive Window		ページソースエラー
 Auto-hide mouse pointer	Settings Window		マウスポインターを自動的に隠す
-Requesting %url	WebPositive Window		%url を要求中
+Requesting %url	WebPositive Window		%url の要求中
 Flags	Cookie Manager		フラグ
 Window	WebPositive Window		ウィンドウ
 Proxy server address:	Settings Window		アドレス:
 Search page:	Settings Window		検索ページ:
 Settings	WebPositive Window		設定
 Clear	URL Bar		クリア
-Loading %url	WebPositive Window		%url を読み込み中
+Loading %url	WebPositive Window		%url の読み込み中
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	The quick brown fox jumps over the lazy dog.
 Start up:	Settings Window		スタートアップ:
 Confirmation	WebPositive Window		確認
@@ -153,7 +153,7 @@ Open all	WebPositive Window		すべてを開く
 Cut	WebPositive Window		切り取り
 Downloads	Download Window		ダウンロード
 Open blank page	Settings Window		空白のページを表示
-Clear history	WebPositive Window		履歴を消去
+Clear history	WebPositive Window		履歴の消去
 Cancel	WebPositive Window		中止
 Bookmark info	WebPositive Window		ブックマーク情報
 Script console	Console Window		スクリプトコンソール

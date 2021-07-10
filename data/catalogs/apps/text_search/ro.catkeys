@@ -15,7 +15,7 @@ Look in sub-folders	GrepWindow		Caută în subdosare
 Follow symbolic links	GrepWindow		Urmărește legăturile simbolice
 Regular expression	GrepWindow		Expresie regulată
 Text files only	GrepWindow		Numai fișiere text
-Quit	GrepWindow		Închidere
+Quit	GrepWindow		Ieșire
 Show files in Tracker	GrepWindow		Afișează fișiere în Agentul de urmărire
 Please select the files you wish to keep searching.	GrepWindow		Selectați fișierele pe care doriți să le căutați în continuare.
 Trim to selection	GrepWindow		Potrivește la selecție

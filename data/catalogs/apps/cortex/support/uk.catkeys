@@ -1,4 +1,4 @@
-1	ukrainian	application/x-vnd.Cortex.support	406316131
+1	ukrainian	application/x-vnd.Cortex.support	1797066429
 32 bit HLS	MediaString		32-бітовий HLS
 Recording	MediaString		Запис
 (unknown format)	MediaString		(невідомий формат)
@@ -59,10 +59,12 @@ Controllable	MediaString		Керований
 Front-right-center	MediaString		Фронт-правий-центр
  kHz	MediaString		 кГц
 Little endian	MediaString		від молодшого до старшого
+(unknown matrix mask)	MediaString		(невідома матрична маска)
 32 bit LAB	MediaString		32-бітовий LAB
 32 bit CMYK	MediaString		32-бітовий CMYK
 (unknown multistream format)	MediaString		(невідомий мультипотоковий формат)
 8 bit integer	MediaString		8-бітове ціле
+8 bit grayscale-index	MediaString		8 бітовий індексний сірий
 YCbCr444	MediaString		YCbCr444
 Buffer producer	MediaString		Буфер паредавача
 Buffer consumer	MediaString		Буфер отримувача
@@ -73,6 +75,7 @@ MPEG format family	MediaString		Сімейство форматів MPEG
 Center	MediaString		Центр
  kb/s (max)	MediaString		 кбіт/c (макс)
 Monochrome	MediaString		Монохромний
+Private Be media type	MediaString		Приватний Be медіа тип
 24 bit UVL	MediaString		24-бітовий UVL
 32 bit HSV	MediaString		32-бітовий HSV
 ID	MediaString		ID
@@ -104,6 +107,7 @@ Typeless media	MediaString		Медіа без типу
 YCbCr420	MediaString		YCbCr420
  kb/s (avg)	MediaString		 кбіт/c (середнє)
 HTML	MediaString		HTML
+Time source	MediaString		Лічильник часу
 15 bit RGB	MediaString		15-бітовий RGB
 ProLogic LR	MediaString		ProLogic LR
 {0, plural,one{# byte per frame}other{# bytes per frame}}	MediaString		{0, plural, one{# байт на кадр} few{# байти на кадр} other{# байтів на кадр}}
@@ -117,6 +121,7 @@ BeOS video	MediaString		BeOS відео
 Top-center	MediaString		Зверху-центр
 Entity interface	MediaString		Інтерфейс об'єкта
 Stereo	MediaString		Стерео
+8 bit color-index	MediaString		8 бітовий індексний колір
 Bottom to top, left to right	MediaString		Знизу вгору, зліва направо
 32 bit UVL	MediaString		32-бітовий UVL
 {0, plural, one{# line} other{# lines}}	MediaString		{0, plural, one{# рядок} few{# рядка} other{# рядків}}

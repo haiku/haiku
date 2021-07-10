@@ -29,7 +29,7 @@ Open file…	FileWindow		Deschide fișier…
 32 bit unsigned pointer:	TypeEditors		indicator pozitiv 32 biți:
 DiskProbe request	DiskProbe		Cerere TestareDisc
 Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hex
-Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Scrierea în fișier a eșuat.\n%s\n\nToate modificările vor fi pierdute atunci când închideți.
+Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Scrierea în fișier a eșuat.\n%s\n\nToate modificările vor fi pierdute atunci când ieșiți.
 Examine device:	OpenWindow		Examinează dispozitiv:
 Number editor	TypeEditors		Editor de număr
 Icon	TypeEditors		Pictogramă
@@ -62,7 +62,7 @@ Close	FileWindow		Închide
 Unknown type	TypeEditors		Tip necunoscut
 Open device	FileWindow		Deschide dispozitiv
 Number:	TypeEditors		Număr:
-Quit	FileWindow		Închidere
+Quit	FileWindow		Ieșire
 Text	FindWindow		Text
 Block 0x%Lx	ProbeView		Bloc 0x%Lx
 Attribute	AttributeWindow		Atribut

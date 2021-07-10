@@ -7,7 +7,7 @@ White	TeapotWindow		Alb
 Yellow	TeapotWindow		Galben
 Blue	TeapotWindow		Albastru
 Gouraud shading	TeapotWindow		Umbrire Gouraud
-Quit	TeapotWindow		Închidere
+Quit	TeapotWindow		Ieșire
 Filled polygons	TeapotWindow		Poligoane completate
 Settings	TeapotWindow		Configurări
 Fog	TeapotWindow		Ceață

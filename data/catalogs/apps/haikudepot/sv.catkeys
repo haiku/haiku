@@ -1,9 +1,10 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	3106374143
+1	swedish	x-vnd.Haiku-HaikuDepot	3544756144
 Repository update error	LocalRepositoryUpdateProcess		Fel vid uppdatering av repositorie
 Network error	ServerHelper		Nätverksfel
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Ett fel inträffade vid uppdatering av repositoriet: %error%
 User Created	UserLoginWindow		Användare skapad
 Check for updates…	MainWindow		Leta efter uppdateringar…
+Uninstall	PackageManager		Avinstallera
 Uninstalled	PackageListView		Avinstallera
 It was not possible to create the new user.	UserLoginWindow		Det gick inte att skapa den nya användaren.
 Available packages	MainWindow		Tillgängliga paket
@@ -45,6 +46,8 @@ Category	FilterView		Kategori
 User rating	RatePackageWindow		Användarbetyg
 Installed packages	MainWindow		Installerade paket
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Ett begärt objekt eller ett objekt involverat i begäran hittades inte på servern.
+Fatal error	PackageManager		Allvarligt fel
+Package action failed	PackageInfoView		Paketåtgärden misslyckades
 No changelog available.	PackageInfoView		Ingen ändringslogg finns.
 Error	App		Fel
 There was a puzzling response from the web service.	UserLoginWindow		Det komm ett konstigt meddelande från webb servicen.
@@ -76,6 +79,7 @@ Stability	RatePackageWindow		Stabilitet
 Send	RatePackageWindow		Skicka
 Start package daemon	App		Starta paket-servicen
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Lösenordet måste upprepas för att minska risken att det anges felaktigt.
+The package action could not be scheduled: %Error%	PackageInfoView		Paketåtgärden kunde inte schemaläggas: %Error%
 Cancel	SettingsWindow		Avbryt
 Cancel	RatePackageWindow		Avbryt
 Inactive	PackageListView		Inaktiv
@@ -85,6 +89,7 @@ There are problems in the supplied data:	UserLoginWindow		Det finns problem med 
 OK	MainWindow		OK
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# enhet} other{# enheter}}
 Usage conditions download problem	UserLoginWindow		Fel vid hämtning av användarvillkor
+OK	PackageInfoView		OK
 Downloading:	PackageInfoView		Mestadels stabil
 Quit	MainWindow		Avsluta
 Success	UserLoginWindow		Klar
@@ -167,6 +172,7 @@ Fetching remote repository data	LocalRepositoryUpdateProcess		Hämtar fjärrdata
 Description	PackageListView		Beskrivning
 Open %DeskbarLink%	PackageManager		Öppna %DeskbarLink%
 User creation error	UserLoginWindow		Användarskapande-fel
+Install	PackageManager		Installera
 Input validation	UserLoginWindow		Ogiltigt indata
 Log in…	MainWindow		Logga in...
 You need to be logged into an account before you can rate packages.	MainWindow		Du måste logga in för att kunna betygsätta paket.

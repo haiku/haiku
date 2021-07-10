@@ -1,6 +1,8 @@
-1	ukrainian	application/x-vnd.Cortex.InfoView	2688600647
+1	ukrainian	application/x-vnd.Cortex.InfoView	2507047210
+Offset	InfoView		Зміщення
 Description	DormantNodeInfoView		Опис
 Byte order	InfoView		Порядок байтів
+Connection	InfoView		З'єднання
 Output formats	DormantNodeInfoView		Вихідні формати
 History	InfoView		Історія
 Input formats	DormantNodeInfoView		Вхідні формати
@@ -12,6 +14,7 @@ Buffer size	InfoView		Розмір буфера
 \n- Quality:	FileNodeInfoView		\n- Якість:
 Kinds	LiveNodeInfoView		Категорії
 Application	AppNodeInfoView		Програма
+Max. instances	DormantNodeInfoView		Макс. екземплярів
 \n- Duration:	FileNodeInfoView		\n- Тривалість:
 Dormant media node	DormantNodeInfoView		Латентна медіа-нода
 Latency	LiveNodeInfoView		Латентність
@@ -22,6 +25,7 @@ Kinds	DormantNodeInfoView		Категорії
 Node ID	LiveNodeInfoView		ID ноди
 Resolution	InfoView		Роздільна здатність
 File format	AppNodeInfoView		Формат файлу
+Matrix mask	InfoView		Матрична маска
 Channel mask	InfoView		Маска каналу
 Channels	InfoView		Канали
 Sample rate	InfoView		Частота дискретизації

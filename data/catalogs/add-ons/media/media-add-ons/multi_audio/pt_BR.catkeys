@@ -11,22 +11,22 @@ Aux	MultiAudio		Aux
 Output bass	MultiAudio		Saída do baixo
 Headphones	MultiAudio		Fones de ouvido
 Beep	MultiAudio		Bip
-Output mono mix	MultiAudio		Misturador da saída mono
-Output stereo mix	MultiAudio		Misturador da saída estéreo
+Output mono mix	MultiAudio		Mix da saída mono
+Output stereo mix	MultiAudio		Mix da saída estéreo
 Input	MultiAudio		Entrada
 Output treble	MultiAudio		Saída de agudos
-Mono mix	MultiAudio		Misturador mono
+Mono mix	MultiAudio		Mix mono
 General	MultiAudio		Geral
 Input & Output	MultiAudio		Entrada e Saída
 Enhanced Setup	MultiAudio		Configuração Avançada
-Stereo mix	MultiAudio		Misturador estéreo
+Stereo mix	MultiAudio		Mix estéreo
 Output 3D depth	MultiAudio		Profundidade de saída 3D
 Volume	MultiAudio		Volume
 Output	MultiAudio		Saída
 Video	MultiAudio		Vídeo
 Line	MultiAudio		Linha
 Mic	MultiAudio		Microfone
- frequency:	MultiAudio		frequência:
+ frequency:	MultiAudio		 frequência:
 Enable	MultiAudio		Habilitar
 Mute	MultiAudio		Mudo
 Wave	MultiAudio		Onda

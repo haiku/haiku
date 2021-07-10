@@ -38,7 +38,7 @@ Authorization or security issue. Logout and log back in again to check that your
 Local	LocalPkgDataLoadProcess		Local
 Rate %Package%	RatePackageWindow		Evaluează %Package%
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		A apărut o eroare în timpul inițializării administratorului de pachete: %message%
-Quit HaikuDepot	App		Închide HaikuDepot
+Quit HaikuDepot	App		Ieșire din HaikuDepot
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Ar fi acceptabil să se trimită date de utilizare anonime la sistemul HaikuDepotServer de la acest calculator? Puteți să modificați preferințele în fereastra \„Configurări\” mai târziu.
 An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		A apărut o eroare neașteptată '%Message%' cu proprietatea '%Property%'
 A response to the captcha question must be provided.	UserLoginWindow		Trebuie să dați un răspuns la întrebarea captcha.
@@ -53,7 +53,7 @@ Error	App		Eroare
 There was a puzzling response from the web service.	UserLoginWindow		A apărut un răspuns neobișnuit de la serviciul web.
 Version	PackageListView		Versiune
 Not logged in	MainWindow		Nu sunteți autentificat
-No, quit HaikuDepot	App		Nu, închideți HaikuDepot
+No, quit HaikuDepot	App		Nu, ieși din HaikuDepot
 Featured packages	FeaturedPackagesView		Pachete recomandate
 The supplied response to the captcha is incorrect. A new captcha will be generated; try again.	UserLoginWindow		Răspunsul furnizat pentru captcha nu este corect. O captcha nouă va fi generată, încercați din nou.
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Nu a fost posibil să comunicați cu serverul pentru a obține imaginea captcha necesară pentru a crea un utilizator nou.

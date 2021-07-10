@@ -27,12 +27,12 @@ What do you want to do with the thread \"%s\"?	ProcessController		Ce doriți să
 Idle priority	ProcessController		Prioritate în așteptare
 Real-time display priority	ProcessController		Prioritate afișaj în timp real
 Threads and CPU usage	ProcessController		Utilizare fire de execuție și CPU
-Quit application	ProcessController		Închide aplicația
+Quit application	ProcessController		Ieși din aplicație
 Info	ProcessController		Detalii
 Kill this thread!	ProcessController		Termină forțat acest fir de execuție!
 This team is already gone…	ProcessController		Această echipă este plecată deja…
 Gone teams…	ProcessController		Echipe plecate…
-Quit an application	ProcessController		Închide o aplicație
+Quit an application	ProcessController		Ieși dintr-o aplicație
 Cancel	ProcessController		Anulează
 Install in Deskbar	ProcessController		Instalează pe bara de desktop
 Debug this team!	ProcessController		Depanează această echipă!

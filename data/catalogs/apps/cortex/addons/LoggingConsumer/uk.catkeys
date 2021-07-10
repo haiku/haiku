@@ -1,4 +1,4 @@
-1	ukrainian	application/x-vnd.Be.LoggingConsumerApp	3597860682
+1	ukrainian	application/x-vnd.Be.LoggingConsumerApp	1256766262
 Priority	CortexAddOnsLoggingConsumer		Пріоритет
 Latency	CortexAddOnsLoggingConsumer		Латентність
 NodeLogger	CortexAddOnsLoggingConsumers		NodeLogger
@@ -7,10 +7,12 @@ Thread priority	CortexAddOnsLoggingConsumer		Пріоритет потоку
 LoggingConsumer parameters	CortexAddOnsLoggingConsumer		Параметри LoggingConsumer
 Latency control	CortexAddOnsLoggingConsumer		Контроль латентності
 MediaNodeControlApp: couldn't get node info (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: не вдалося отримати інфо про ноду (%d):\n%s\n
+CPU percentage	CortexAddOnsLoggingConsumer		Загрузка CPU
 MediaNodeControlApp: couldn't find node (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: не вдалося знайти ноду (%d):\n%s\n
 LoggingConsumer	CortexAddOnsLoggingConsumer		LoggingConsumer
 Stop	CortexAddOnsLoggingConsumerNodeHarnessWin		Стоп
 An add-on version of the LoggingConsumer node.\nSee the Be Developer Newsletter III.18: 5 May, 1999\nadapted by Eric Moon (4 June, 1999)	CortexAddOnsLoggingConsumer		Нода LoggingConsumer в версії доповнення.\nДивіться Інформаційний бюлетень Be Developer III.18: 5 травня 1999\nадаптував Eric Moon (4 червня 1999)
 OK	CortexAddOnsCommonMediaNodeControlApp		ОК
+Connect	CortexAddOnsLoggingConsumerNodeHarnessWin		З'єднати
 percent	CortexAddOnsLoggingConsumer		відсотків
 MediaNodeControlApp: no parameters for node (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: відсутні параметри для ноди (%d):\n%s\n

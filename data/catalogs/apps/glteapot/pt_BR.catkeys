@@ -11,7 +11,7 @@ Quit	TeapotWindow		Sair
 Filled polygons	TeapotWindow		Polígonos preenchidos
 Settings	TeapotWindow		Configurações
 Fog	TeapotWindow		Neblina
-Backface culling	TeapotWindow		Backface culling
+Backface culling	TeapotWindow		Remoção de faces posteriores
 Z-buffered	TeapotWindow		Z-buffered
 File	TeapotWindow		Arquivo
 Perspective	TeapotWindow		Perspectiva

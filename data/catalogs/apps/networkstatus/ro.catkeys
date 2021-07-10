@@ -1,6 +1,6 @@
 1	romanian	x-vnd.Haiku-NetworkStatus	2828540217
 IPv6 address:	NetworkStatusView		Adresă IPv6:
-Quit	NetworkStatusView		Închidere
+Quit	NetworkStatusView		Ieșire
 Unknown	NetworkStatusView		Necunoscut
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Lansarea prefletului de rețea a eșuat.\n\nEroare: 
 Install in Deskbar	NetworkStatus		Instalează în bara de desktop

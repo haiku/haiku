@@ -16,7 +16,7 @@ Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Copyright © 19
 Past website & marketing:\n	AboutView		過去のウェブサイトおよびマーケティング:\n
 Copyright © 2003 Peter Hanappe and others.	AboutView		Copyright © 2003 Peter Hanappe他
 Testing and bug triaging:\n	AboutView		テストとバグの分別:\n
-{0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{プロセッサ:} other{# プロセッサ:}}
+{0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{プロセッサ:} other{#プロセッサ:}}
 %d MiB total	AboutView		合計 %d MiB
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Haiku独自のコード、特にカーネルと、アプリケーションがリンクするすべてのコードは <MITライセンス>で配布されています。いくつかのシステムライブラリは、<LGPLライセンス> で配布されているサードパーティのコードも含まれています。サードパーティのライセンスは以下で見つけられます。\n\n
 Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Copyright © 1996-1997 Jeff Prosise. All rights reserved.
@@ -69,11 +69,11 @@ Copyright © 2001-2003 Expat maintainers.	AboutView		Copyright © 2001-2003 Expa
 Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Copyright © 2002-2006 Maxim Shemanarev (McSeem).
 Translations:\n	AboutView		各国語翻訳:\n
 Memory:	AboutView		メモリ:
-\n…and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n…おそらく、ここに記載し忘れた方々もいることでしょう (すみません!)\n\n
+\n…and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n...おそらく、ここに記載し忘れた方々もいることでしょう (すみません!)\n\n
 BSD (2-clause)	AboutWindow		BSD (二条項)
 Website & marketing:\n	AboutView		ウェブサイトおよびマーケティング:\n
 Copyright © 2018-2021, Frederic Cambus	AboutView		Copyright © 2018-2021, Frederic Cambus
 2001 by Andy Ritger based on the Generalized Timing Formula	AboutView		2001 by Andy Ritger based on the Generalized Timing Formula
-…and the many people making donations!\n\n	AboutView		…寄付をしていただいた大勢の方々!\n\n
+…and the many people making donations!\n\n	AboutView		...寄付をしていただいた大勢の方々!\n\n
 BSD (4-clause)	AboutWindow		BSD (四条項)
 BITSTREAM CHARTER is a registered trademark of Bitstream Inc.	AboutView		BITSTREAM CHARTER is a registered trademark of Bitstream Inc.

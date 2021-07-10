@@ -16,7 +16,7 @@ Rotate	Icon-O-Matic-TransformationBoxStates		Rotește
 Remove Control Points	Icon-O-Matic-RemovePointsCmd		Elimină puncte de control
 Shorten	Icon-O-Matic-PropertyNames		Scurtează
 Unassign Path	Icon-O-Matic-UnassignPathCmd		Înlătură atribuire cale
-The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		Textul pe care încercați să-l importați este destul de lung, sunteți sigur?
+The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		Textul pe care încercați să îl importați este destul de lung, sunteți sigur?
 Paste	Icon-O-Matic-Properties		Lipește
 Detect Orient.	Icon-O-Matic-PropertyNames		Detectare orient.
 Click on a shape above	Empty transformers list - 1st line		Dați clic pe o formă de mai sus
@@ -135,7 +135,7 @@ Move Pivot	Icon-O-Matic-TransformationBoxStates		Mută pivot
 Remove	Icon-O-Matic-PathsList		Elimină
 Remove Transformers	Icon-O-Matic-RemoveTransformersCmd		Elimină transformatori
 Style type	Icon-O-Matic-StyleTypes		Tip de stil
-Quit	Icon-O-Matic-Menu-File		Închidere
+Quit	Icon-O-Matic-Menu-File		Ieșire
 Remove Styles	Icon-O-Matic-RemoveStylesCmd		Elimină stiluri
 Gradient	Icon-O-Matic-StyleTypes		Degrade
 bad news	Title of error alert		vești rele

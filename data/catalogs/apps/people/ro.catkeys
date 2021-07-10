@@ -7,7 +7,7 @@ Address	People		Adresă
 Zip	People		Cod poștal
 Select all	People		Selectează tot
 Could not create %s.	People		Nu s-a putut crea %s.
-Quit	People		Închidere
+Quit	People		Ieșire
 Company	People		Companie
 Name	People		Nume
 The file '%name%' could not be written.	People		Nu a putut fi scris fișierul '%name%'.

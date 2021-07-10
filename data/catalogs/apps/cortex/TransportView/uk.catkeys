@@ -1,4 +1,4 @@
-1	ukrainian	application/x-vnd.Cortex.TransportView	1179563377
+1	ukrainian	application/x-vnd.Cortex.TransportView	1402918430
 Roll	TransportView		Прокрутити
 (none)	TransportView		(пусто)
 {0, plural, one{# node} other{# nodes}}	TransportView		{0, plural, one{# нода} few{# ноди} other{# нод}}
@@ -10,8 +10,13 @@ Offline	TransportView		Офлайн
 Stop	TransportView		Стоп
 (no group)	TransportView		(не в групі)
 Drop data	TransportView		Скидання даних
+To:	TransportView		До:
 Recording	TransportView		Запис
 Increase latency	TransportView		Збільшення затримки
+Time source:	TransportView		Лічильник часу:
+DAC time source	TransportView		ЦАП лічильник часу
 Decrease precision	TransportView		Зниження точності
+System clock	TransportView		Системний годинник
+From:	TransportView		Від:
 Roll from	TransportView		Прокрутити з
 Run mode:	TransportView		Режим роботи:

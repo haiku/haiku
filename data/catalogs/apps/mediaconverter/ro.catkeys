@@ -51,7 +51,7 @@ File details	MediaConverter		Detalii fișier
 No audio	Audio codecs list		Fără audio
 Drop media files onto this window	MediaConverter		Plasează fișiere media în această fereastră
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# cadru} other{# cadre}}
-Quit	Menu		Închidere
+Quit	Menu		Ieșire
 {0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# octet} other{# octeți}}
 Duration:	MediaConverter-FileInfo		Durată:
 MediaConverter	System name		ConvertorMedia

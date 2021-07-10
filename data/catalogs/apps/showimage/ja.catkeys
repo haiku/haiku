@@ -1,13 +1,13 @@
 1	japanese	x-vnd.Haiku-ShowImage	3998703664
-Use as background…	Menus		デスクトップの背景にする…
+Use as background…	Menus		デスクトップの背景にする...
 File	Menus		ファイル
 Slide delay	Menus		表示間隔
 Selection mode	Menus		選択モード
 Zoom in	Menus		拡大
 The document '%s' has been changed. Do you want to close the document?	ClosePrompt		ファイル '%s' が変更されています。保存せずに閉じますか?
-Page setup…	Menus		ページ設定…
-Print…	Menus		印刷…
-Get info…	Menus		詳細情報…
+Page setup…	Menus		ページ設定...
+Print…	Menus		印刷...
+Get info…	Menus		詳細情報...
 OK	SaveToFile		OK
 Previous page	Menus		前のページ
 View	Menus		表示
@@ -30,14 +30,14 @@ Rating	Menus		評価
 Flip left to right	Menus		左右反転
 Show caption in full screen mode	Menus		全画面表示モードでキャプションを表示
 DPI:	PrintOptionsWindow		解像度 (DPI):
-Open…	Menus		開く…
+Open…	Menus		開く...
 Next file	Menus		次のファイル
 Clear selection	Menus		選択解除
 Close document	ClosePrompt		ファイルを閉じる
 Height: 	PrintOptionsWindow		高さ:
-The file '%s' could not be written.	SaveToFile		画像ファイル '%s' を保存できませんでした。
+The file '%s' could not be written.	SaveToFile		画像ファイル '%s' を保存できません。
 Cancel	ClosePrompt		中止
-Show tool bar	Menus		ツールバーを表示
+Show tool bar	Menus		ツールバーの表示
 Fit to window	Menus		ウィンドウに合わせる
 Print options	PrintOptionsWindow		印刷オプション
 Copy	Menus		コピー
@@ -59,4 +59,4 @@ Rotate clockwise	Menus		右 90度回転
 Job setup	PrintOptionsWindow		ジョブ設定
 Original size	Menus		元のサイズ
 Next page	Menus		次のページ
-Save as…	Menus		ファイル形式を選んで保存…
+Save as…	Menus		ファイル形式を選んで保存...
