@@ -21,18 +21,20 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <AutoDeleter.h>
 #include <Catalog.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
-#include <FindDirectory.h>
 #include <Font.h>
 #include <GraphicsDefs.h>
 #include <Locale.h>
 #include <Message.h>
 #include <NodeInfo.h>
 #include <Path.h>
+#include <PathFinder.h>
 
+#include "Colors.h"
 #include "Globals.h"
 #include "TermConst.h"
 
@@ -110,6 +112,11 @@ PrefHandler::PrefHandler(bool loadSettings)
 		BPath path;
 		GetDefaultPath(path);
 		OpenText(path.Path());
+
+		// Add the builtin schemes
+		if (gColorSchemes == NULL) {
+			LoadThemes();
+		}
 	}
 
 	// TODO: If no fixed font is available, be_fixed_font
@@ -250,6 +257,60 @@ PrefHandler::SaveAsText(const char *path, const char *mimetype,
 		info.SetType(mimetype);
 		info.SetPreferredApp(signature);
 	}
+}
+
+
+static int
+SortByName(const color_scheme *lhs, const color_scheme *rhs)
+{
+	return strcmp(lhs->name, rhs->name);
+}
+
+
+void
+PrefHandler::LoadThemes()
+{
+	gColorSchemes = new BObjectList<const color_scheme>(10, true);
+
+	BStringList paths;
+
+	if (BPathFinder::FindPaths(B_FIND_PATH_DATA_DIRECTORY,
+			"Terminal/Themes/", B_FIND_PATH_EXISTING_ONLY, paths) == B_OK)
+		paths.DoForEach(PrefHandler::_LoadThemesFromDirectory);
+
+	if (BPathFinder::FindPaths(B_FIND_PATH_SETTINGS_DIRECTORY,
+			"Terminal/Themes/", B_FIND_PATH_EXISTING_ONLY, paths) == B_OK)
+		paths.DoForEach(PrefHandler::_LoadThemesFromDirectory);
+
+	gColorSchemes->SortItems(SortByName);
+}
+
+
+void
+PrefHandler::LoadColorScheme(color_scheme* scheme)
+{
+	scheme->text_fore_color = getRGB(PREF_TEXT_FORE_COLOR);
+	scheme->text_back_color = getRGB(PREF_TEXT_BACK_COLOR);
+	scheme->select_fore_color = getRGB(PREF_SELECT_FORE_COLOR);
+	scheme->select_back_color = getRGB(PREF_SELECT_BACK_COLOR);
+	scheme->cursor_fore_color = getRGB(PREF_CURSOR_FORE_COLOR);
+	scheme->cursor_back_color = getRGB(PREF_CURSOR_BACK_COLOR);
+	scheme->ansi_colors.black = getRGB(PREF_ANSI_BLACK_COLOR);
+	scheme->ansi_colors.red = getRGB(PREF_ANSI_RED_COLOR);
+	scheme->ansi_colors.green = getRGB(PREF_ANSI_GREEN_COLOR);
+	scheme->ansi_colors.yellow = getRGB(PREF_ANSI_YELLOW_COLOR);
+	scheme->ansi_colors.blue = getRGB(PREF_ANSI_BLUE_COLOR);
+	scheme->ansi_colors.magenta = getRGB(PREF_ANSI_MAGENTA_COLOR);
+	scheme->ansi_colors.cyan = getRGB(PREF_ANSI_CYAN_COLOR);
+	scheme->ansi_colors.white = getRGB(PREF_ANSI_WHITE_COLOR);
+	scheme->ansi_colors_h.black = getRGB(PREF_ANSI_BLACK_HCOLOR);
+	scheme->ansi_colors_h.red = getRGB(PREF_ANSI_RED_HCOLOR);
+	scheme->ansi_colors_h.green = getRGB(PREF_ANSI_GREEN_HCOLOR);
+	scheme->ansi_colors_h.yellow = getRGB(PREF_ANSI_YELLOW_HCOLOR);
+	scheme->ansi_colors_h.blue = getRGB(PREF_ANSI_BLUE_HCOLOR);
+	scheme->ansi_colors_h.magenta = getRGB(PREF_ANSI_MAGENTA_HCOLOR);
+	scheme->ansi_colors_h.cyan = getRGB(PREF_ANSI_CYAN_HCOLOR);
+	scheme->ansi_colors_h.white = getRGB(PREF_ANSI_WHITE_HCOLOR);
 }
 
 
@@ -482,4 +543,47 @@ PrefHandler::_LoadFromTextFile(const char * path)
 
 	fclose(file);
 	return B_OK;
+}
+
+
+bool
+PrefHandler::_LoadThemesFromDirectory(const BString &directory)
+{
+	BDirectory *themes = new BDirectory(directory.String());
+	if (themes == NULL)
+		return false;
+
+	BEntry entry;
+	BPath path;
+	FindColorSchemeByName comparator;
+	while (themes->GetNextEntry(&entry) == B_OK)
+	{
+		if (entry.GetPath(&path) != B_OK)
+			continue;
+
+		PrefHandler *themeHandler = new PrefHandler(false);
+		ObjectDeleter<PrefHandler> themeHandlerDeleter(themeHandler);
+		themeHandler->_LoadFromTextFile(path.Path());
+
+		const char *name = themeHandler->fContainer.GetString(PREF_THEME_NAME, NULL);
+
+		if (name == NULL || strlen(name) == 0)
+			continue;
+
+		comparator.scheme_name = name;
+
+		const color_scheme *scheme = gColorSchemes->FindIf(comparator);
+
+		if (scheme != NULL) {
+			// Scheme with this name exists, replace with this version instead
+			gColorSchemes->RemoveItem(scheme);
+		}
+
+		color_scheme *newScheme = new color_scheme();
+		newScheme->name = strdup(name);
+		themeHandler->LoadColorScheme(newScheme);
+		gColorSchemes->AddItem(newScheme);
+	}
+
+	return false;
 }

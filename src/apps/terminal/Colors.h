@@ -11,6 +11,7 @@
 
 
 #include <InterfaceDefs.h>
+#include <ObjectList.h>
 
 
 struct ansi_color_scheme {
@@ -38,8 +39,24 @@ struct color_scheme {
 	bool operator==(const color_scheme& color);
 };
 
+struct FindColorSchemeByName : public UnaryPredicate<const color_scheme> {
+	FindColorSchemeByName() : scheme_name("") {}
+
+	FindColorSchemeByName(const char* name)
+		: scheme_name(name)
+	{
+	}
+
+	int operator()(const color_scheme* item) const
+	{
+		return strcmp(item->name, scheme_name);
+	}
+
+	const char*	scheme_name;
+};
+
 extern color_scheme gCustomColorScheme;
-extern const color_scheme* gPredefinedColorSchemes[];
+extern BObjectList<const color_scheme> *gColorSchemes;
 
 const uint kANSIColorCount = 16;
 const uint kTermColorCount = 256;

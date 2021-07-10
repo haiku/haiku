@@ -18,10 +18,13 @@
 #include <SupportDefs.h>
 #include <GraphicsDefs.h>
 #include <Message.h>
+#include <String.h>
 
 class BFont;
 class BPath;
 
+
+struct color_scheme;
 
 struct pref_defaults {
 	const char *key;
@@ -71,10 +74,14 @@ class PrefHandler {
 
 		static status_t GetDefaultPath(BPath& path);
 
+		void LoadThemes();
+		void LoadColorScheme(color_scheme* scheme);
+
 	private:
 		void		_ConfirmFont(const BFont *fallbackFont);
 		status_t    _LoadFromDefault(const pref_defaults* defaults = NULL);
 		status_t    _LoadFromTextFile(const char * path);
+	static bool _LoadThemesFromDirectory(const BString &directory);
 
 		BMessage    fContainer;
 
