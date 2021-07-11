@@ -254,7 +254,7 @@ SettingsWindow::QuitRequested()
 void
 SettingsWindow::Show()
 {
-	// When showing the window, the this is always the
+	// When showing the window, this is always the
 	// point to which we can revert the settings.
 	_RevertSettings();
 	BWindow::Show();
