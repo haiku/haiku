@@ -1503,7 +1503,7 @@ BrowserWindow::LoadCommitted(const BString& url, BWebView* view)
 	if (view != CurrentWebView())
 		return;
 
-	// This hook is invoked when the load is commited.
+	// This hook is invoked when the load is committed.
 	fURLInputGroup->SetText(url.String());
 
 	BString status(B_TRANSLATE("Loading %url"));

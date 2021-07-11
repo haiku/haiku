@@ -689,7 +689,7 @@ SettingsWindow::_ApplySettings()
 	fSettings->SetValue(kSettingsKeyNewWindowPolicy, _NewWindowPolicy());
 	fSettings->SetValue(kSettingsKeyNewTabPolicy, _NewTabPolicy());
 
-	// Store fond settings
+	// Store font settings
 	fSettings->SetValue("standard font", fStandardFontView->Font());
 	fSettings->SetValue("serif font", fSerifFontView->Font());
 	fSettings->SetValue("sans serif font", fSansSerifFontView->Font());
