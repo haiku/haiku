@@ -67,12 +67,19 @@ Screen::~Screen()
 status_t
 Screen::Initialize()
 {
+	status_t status = B_NO_INIT;
+
 	if (fHWInterface.IsSet()) {
 		// init the graphics hardware
-		return fHWInterface->Initialize();
+		status = fHWInterface->Initialize();
 	}
 
-	return B_NO_INIT;
+	// Turn on screen if this is not yet done by BIOS
+	if (status == B_OK)
+		fHWInterface->SetDPMSMode(B_DPMS_ON);
+
+
+	return status;
 }
 
 
