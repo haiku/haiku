@@ -118,6 +118,13 @@ FetchFileJob::Execute()
 
 		thread_id thread = request->Run();
 		wait_for_thread(thread, NULL);
+
+		if (fError != B_IO_ERROR && fError != B_DEV_TIMEOUT && fError != B_OK) {
+			// Something went wrong with the download and it's not just a
+			// timeout. Remove whatever we wrote to the file, since the content
+			// returned by the server was probably not part of the file.
+			fTargetFile.SetSize(currentPosition);
+		}
 	} while (fError == B_IO_ERROR || fError == B_DEV_TIMEOUT);
 
 	if (fError == B_OK) {
@@ -176,8 +183,13 @@ FetchFileJob::RequestCompleted(BUrlRequest* request, bool success)
 					fError = B_DEV_TIMEOUT;
 					break;
 				case B_HTTP_STATUS_NOT_IMPLEMENTED:
-				case B_HTTP_STATUS_UNSUPPORTED_MEDIA_TYPE:
 					fError = B_NOT_SUPPORTED;
+					break;
+				case B_HTTP_STATUS_UNSUPPORTED_MEDIA_TYPE:
+					fError = B_UNKNOWN_MIME_TYPE;
+					break;
+				case B_HTTP_STATUS_REQUESTED_RANGE_NOT_SATISFIABLE:
+					fError = B_RESULT_NOT_REPRESENTABLE; // alias for ERANGE
 					break;
 				case B_HTTP_STATUS_UNAUTHORIZED:
 					fError = B_PERMISSION_DENIED;
