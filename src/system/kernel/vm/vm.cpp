@@ -5420,8 +5420,10 @@ vm_debug_copy_page_memory(team_id teamID, void* unsafeMemory, void* buffer,
 }
 
 
+/** Validate that a memory range is either fully in kernel space, or fully in
+ *  userspace */
 static inline bool
-validate_user_range(const void* addr, size_t size)
+validate_memory_range(const void* addr, size_t size)
 {
 	addr_t address = (addr_t)addr;
 
@@ -5429,11 +5431,23 @@ validate_user_range(const void* addr, size_t size)
 	if ((address + size) < address)
 		return false;
 
-	// Validate that the address does not cross the kernel/user boundary.
-	if (IS_USER_ADDRESS(address))
-		return IS_USER_ADDRESS(address + size);
-	else
-		return !IS_USER_ADDRESS(address + size);
+	// Validate that the address range does not cross the kernel/user boundary.
+	return IS_USER_ADDRESS(address) == IS_USER_ADDRESS(address + size - 1);
+}
+
+
+/** Validate that a memory range is fully in userspace. */
+static inline bool
+validate_user_memory_range(const void* addr, size_t size)
+{
+	addr_t address = (addr_t)addr;
+
+	// Check for overflows on all addresses.
+	if ((address + size) < address)
+		return false;
+
+	// Validate that both the start and end address are in userspace
+	return IS_USER_ADDRESS(address) && IS_USER_ADDRESS(address + size - 1);
 }
 
 
@@ -5443,7 +5457,7 @@ validate_user_range(const void* addr, size_t size)
 status_t
 user_memcpy(void* to, const void* from, size_t size)
 {
-	if (!validate_user_range(to, size) || !validate_user_range(from, size))
+	if (!validate_memory_range(to, size) || !validate_memory_range(from, size))
 		return B_BAD_ADDRESS;
 
 	if (arch_cpu_user_memcpy(to, from, size) < B_OK)
@@ -5477,7 +5491,7 @@ user_strlcpy(char* to, const char* from, size_t size)
 	if (IS_USER_ADDRESS(from) && !IS_USER_ADDRESS((addr_t)from + maxSize))
 		maxSize = USER_TOP - (addr_t)from;
 
-	if (!validate_user_range(to, maxSize))
+	if (!validate_memory_range(to, maxSize))
 		return B_BAD_ADDRESS;
 
 	ssize_t result = arch_cpu_user_strlcpy(to, from, maxSize);
@@ -5495,7 +5509,7 @@ user_strlcpy(char* to, const char* from, size_t size)
 status_t
 user_memset(void* s, char c, size_t count)
 {
-	if (!validate_user_range(s, count))
+	if (!validate_memory_range(s, count))
 		return B_BAD_ADDRESS;
 
 	if (arch_cpu_user_memset(s, c, count) < B_OK)
@@ -6587,8 +6601,10 @@ _user_unmap_memory(void* _address, size_t size)
 		return B_BAD_VALUE;
 	}
 
-	if (!IS_USER_ADDRESS(address) || !IS_USER_ADDRESS((addr_t)address + size))
+	if (!IS_USER_ADDRESS(address)
+		|| !IS_USER_ADDRESS((addr_t)address + size - 1)) {
 		return B_BAD_ADDRESS;
+	}
 
 	// Write lock the address space and ensure the address range is not wired.
 	AddressSpaceWriteLocker locker;
@@ -6613,8 +6629,7 @@ _user_set_memory_protection(void* _address, size_t size, uint32 protection)
 
 	if ((address % B_PAGE_SIZE) != 0)
 		return B_BAD_VALUE;
-	if ((addr_t)address + size < (addr_t)address || !IS_USER_ADDRESS(address)
-		|| !IS_USER_ADDRESS((addr_t)address + size)) {
+	if (!validate_user_memory_range(_address, size)) {
 		// weird error code required by POSIX
 		return ENOMEM;
 	}
@@ -6758,8 +6773,7 @@ _user_sync_memory(void* _address, size_t size, uint32 flags)
 	// check params
 	if ((address % B_PAGE_SIZE) != 0)
 		return B_BAD_VALUE;
-	if ((addr_t)address + size < (addr_t)address || !IS_USER_ADDRESS(address)
-		|| !IS_USER_ADDRESS((addr_t)address + size)) {
+	if (!validate_user_memory_range(_address, size)) {
 		// weird error code required by POSIX
 		return ENOMEM;
 	}
@@ -6837,8 +6851,7 @@ _user_memory_advice(void* _address, size_t size, uint32 advice)
 		return B_BAD_VALUE;
 
 	size = PAGE_ALIGN(size);
-	if (address + size < address || !IS_USER_ADDRESS(address)
-		|| !IS_USER_ADDRESS(address + size)) {
+	if (!validate_user_memory_range(_address, size)) {
 		// weird error code required by POSIX
 		return B_NO_MEMORY;
 	}
