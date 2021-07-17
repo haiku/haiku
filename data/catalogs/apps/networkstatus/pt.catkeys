@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-NetworkStatus	2206718696
+1	portuguese	x-vnd.Haiku-NetworkStatus	2828540217
 IPv6 address:	NetworkStatusView		Endereço IPv6:
 Quit	NetworkStatusView		Sair
 Unknown	NetworkStatusView		Desconhecido
@@ -7,6 +7,7 @@ Install in Deskbar	NetworkStatus		Instalar na Deskbar
 NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		Opções do NetworkStatus:\n\t--deskbar\tadicionar automaticamente replicante à Deskbar\n\t--help\t\tmostrar esta informação e sair
 Open network preferences…	NetworkStatusView		Abrir preferências de rede…
 NetworkStatus	System name		Estado da Rede
+Broadcast:	NetworkStatusView		Broadcast:
 OK	NetworkStatusView		OK
 No link	NetworkStatusView		Sem ligação
 Could not join wireless network:\n	NetworkStatusView		Não foi possível aceder à rede sem fios:\n

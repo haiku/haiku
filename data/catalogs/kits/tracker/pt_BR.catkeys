@@ -16,7 +16,7 @@ Mount all disks now	AutoMounterSettings		Montar todos os discos agora
 Location:	InfoWindow		Local:
 Name	PoseView		Nome
 Kind:	InfoWindow		Tipo:
-{0, plural, one{# byte} other{# bytes}}	WidgetAttributeText		{0, plural, um{# byte} outros{# bytes}}
+{0, plural, one{# byte} other{# bytes}}	WidgetAttributeText		{0, plural, one{# byte} other{# bytes}}
 contains	FindPanel		contém
 32 x 32	ContainerWindow		32 x 32
 Open	FilePanelPriv		Abrir
@@ -41,7 +41,7 @@ Small bitmap icon	AttributesView		Ícone de bitmap pequeno
 Would you like to find a suitable application to open the file?	FSUtils		Gostaria de localizar um aplicativo adequado para abrir o arquivo?
 64 x 64	ContainerWindow		64 x 64
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Você não pode substituir uma pasta ou um atalho por um arquivo.
-{0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# dates>}}
+{0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# datas>}}
 Trailing \\.	libtracker		Seguindo \\.
 At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Em %func \nfind_directory() falhou. \nRazão: %error
 Handles any file	OpenWithWindow		Lida com qualquer arquivo
@@ -352,7 +352,7 @@ Could not open \"%document\" with application \"%app\" (Missing libraries: %libr
 Finish: %time	StatusWindow		Término: %time
 Messenger	AttributesView		Messenger
 after	FindPanel		após
-{0, plural, one{<# data byte>} other{<# bytes of data>}}	AttributesView		{0, plural, one{<# data byte>} other{<# bytes of data>}}
+{0, plural, one{<# data byte>} other{<# bytes of data>}}	AttributesView		{0, plural, one{<# byte de dados>} other{<# bytes de dados>}}
 Version	OpenWithWindow		Versão
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Alguns dos itens selecionados não podem ser movidos para a Lixeira. Você gostaria de deletá-los então? (Esta operação não pode ser desfeita).
 Add printer…	ContainerWindow		Adicionar impressora...
@@ -408,7 +408,7 @@ Object	AttributesView		Objeto
 Paste	FilePanelPriv		Colar
 Paste	ContainerWindow		Colar
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Um item chamado \"%name\" já existe nesta pasta, e pode conter\nitens com os mesmos nomes. Gostaria de substituí-los com aqueles na pasta que está %verb?
-Cannot unmount the boot volume \"%name\".	FSUtils		Não foi possível desmontar volume de boot \"%name\".
+Cannot unmount the boot volume \"%name\".	FSUtils		Não foi possível desmontar volume de inicialização \"%name\".
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Não foi possível abrir \"%document\" com o aplicativo \"%app\" (Símbolo faltando: %symbol). \n
 New folder	ContainerWindow		Nova pasta
 Name	OpenWithWindow		Nome

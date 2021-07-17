@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-Network	3062143965
+1	danish	x-vnd.Haiku-Network	543099905
 Ethernet device	InterfaceListItem		Ethernet-enhed
 Link speed:	IntefaceView		Linkhastighed:
 disconnected	IntefaceView		ikke forbundet
@@ -13,6 +13,7 @@ Gateway:	IntefaceAddressView		Gateway:
 The netmask defines your local network	IntefaceAddressView		Netmasken angiver dit lokale netværk
 Your IP address	IntefaceAddressView		Din IP-adresse
 DHCP	IntefaceAddressView		DHCP
+IP address:	IntefaceAddressView		IP-adresse:
 Netmask:	IntefaceAddressView		Netmaske:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Tjenester

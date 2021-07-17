@@ -38,5 +38,5 @@ Remove these repositories?	RepositoriesView	Removal alert confirmation message	E
 Keep trying	TaskTimer	Button label	Continuă să încerci
 Cancel	Constants	Button label	Anulează
 Only one URL for each repository can be enabled. Please change your selections.	RepositoriesView	Error message	Doar un URL pentru fiecare depozit poate fi activat. Modificați selectările.
-Stop and quit	RepositoriesWindow	Button label	Oprire și ieșire
+Stop and quit	RepositoriesWindow	Button label	Oprește și ieși
 Disable all	RepositoriesView	Button label	Dezactivare toate

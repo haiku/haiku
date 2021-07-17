@@ -2,26 +2,26 @@
 Teams	DataSource		Echipe
 Semaphores	DataSource		Semafoare
 TX	DataSource	Shorter version for Sending	TX
-Block cache memory	DataSource		Blochează memoria tampon
+Block cache memory	DataSource		Memorie cache de bloc
 %lld ms	SettingsWindow		%lld ms
 MiB	DataSource		MiO
 Media nodes	DataSource		Noduri media
-Text clipboard	DataSource		Clipboard text
+Text clipboard	DataSource		Clipboard de text
 Network send	DataSource		Trimite în rețea
 Running applications	DataSource		Aplicații care rulează
 Cache	DataSource		Cache
 CPU usage (combined)	DataSource		Utilizare CPU (combinat)
-Threads	DataSource		Fire de execuție
+Threads	DataSource		Thread-uri
 Receiving	DataSource		Primire
-Remove graph	ActivityView		Elimină grafic
-Swap space	DataSource		Spaţiu swap
+Remove graph	ActivityView		Elimină graficul
+Swap space	DataSource		Spaţiu de swap
 CPU	DataSource		CPU
 ActivityMonitor	System name		ActivityMonitor
 CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		Actualizează intervalul de timp:
 RX	DataSource	Shorter version for Receiving.	RX
 Settings…	ActivityWindow		Configurări…
-Block cache	DataSource		Blochează cache
+Block cache	DataSource		Cache de bloc
 Memory	DataSource		Memorie
 CPU usage	DataSource		Utilizare CPU
 Quit	ActivityWindow		Ieșire
@@ -36,10 +36,10 @@ File	ActivityWindow		Fișier
 Ports	DataSource		Porturi
 Page faults	DataSource		Defecțiuni de pagină
 Apps	DataSource		Aplicații
-Additional items	ActivityView		Elemente adiționale
-Add graph	ActivityWindow		Adaugă grafic
+Additional items	ActivityView		Elemente suplimentare
+Add graph	ActivityWindow		Adaugă un grafic
 Sending	DataSource		Trimitere
-%.1f MiB	DataSource		%.1f MO
+%.1f MiB	DataSource		%.1f MiO
 Always on top	ActivityWindow		Mereu deasupra
 Swap	DataSource		Swap
 %lld sec.	SettingsWindow		%lld sec.

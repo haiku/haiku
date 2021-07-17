@@ -1,9 +1,9 @@
 1	romanian	application/x-vnd.Cortex.support	2630173556
 Header has flags	MediaString		Antetul are fanioane
-32 bit HLS	MediaString		HLS 32 biți
+32 bit HLS	MediaString		HLS pe 32 biți
 Recording	MediaString		Înregistare
 (unknown format)	MediaString		(format necunoscut)
-Clean buffers	MediaString		Curăță memoria intermediară
+Clean buffers	MediaString		Curăță preîncărcările
 {0, plural,one{# frame forward}other{# frames forward}}	MediaString		{0, plural,one{# frame forward}other{# frames forward}}
 Rear-right	MediaString		Spate-dreapta
 {0, plural, one{# pixel} other{# pixels}}	MediaString		{0, plural, one{# pixel} other{# pixels}}
@@ -13,70 +13,70 @@ ASF format family	MediaString		Familie de format ASF
 Encoded video	MediaString		Video codat
 YUV444	MediaString		YUV444
 Port	MediaString		Port
-Top-Front-left	MediaString		Sus-Față-stânga
-24 bit LAB	MediaString		LAB 24 biți
-16 bit integer	MediaString		Întreg 16 biți
-32 bit HSVA	MediaString		HSVA 32 biți
+Top-Front-left	MediaString		Sus-față-stânga
+24 bit LAB	MediaString		LAB pe 24 biți
+16 bit integer	MediaString		Întreg pe 16 biți
+32 bit HSVA	MediaString		HSVA pe 32 biți
 YCbCr411	MediaString		YCbCr411
 Offline	MediaString		Deconectat
 YUV422	MediaString		YUV422
 (unkown video orientation)	MediaString		(orientare video necunoscută)
 QuickTime	MediaString		QuickTime
-32 bit HLSA	MediaString		HLSA 32 biți
-Top-Front-center	MediaString		Sus-Față-centru
+32 bit HLSA	MediaString		HLSA pe 32 biți
+Top-Front-center	MediaString		Sus-față-centru
 BeOS format family	MediaString		Familie de format BeOS
-24 bit HSV	MediaString		HSV 24 biți
+24 bit HSV	MediaString		HSV pe 24 biți
 Back-center	MediaString		Spate-centru
-32 bit CMY	MediaString		CMY 32 biți
+32 bit CMY	MediaString		CMY pe 32 biți
 {0, plural, other{# bit integer}}	MediaString		{0, plural, other{# bit integer}}
 Ambisonic WXYZ	MediaString		WXYZ ambisonic
 (unknown video format)	MediaString		(format video necunoscut)
 AVI format family	MediaString		Familie de format AVI
-Homogenous buffers	MediaString		Memorie temporară omogenă
+Homogenous buffers	MediaString		Preîncărcări omogene
 Interlaced 	MediaString		Întrețesut 
 {0, plural, one{# channel}other{# channels}}	MediaString		{0, plural, one{# channel}other{# channels}}
-15 bit RGBA	MediaString		RGBA 15 biți
+15 bit RGBA	MediaString		RGBA pe 15 biți
 Drop data	MediaString		Renunță la date
 AVI	MediaString		AVI
 YUV9	MediaString		YUV9
  Hz	MediaString		 Hz
 Right	MediaString		Dreapta
-32 bit RGB	MediaString		RGB 32 biți
+32 bit RGB	MediaString		RGB pe 32 biți
 Video data between line u and u	MediaString		Date video între liniile u și u
 System mixer	MediaString		Mixer de sistem
 Physical output	MediaString		Ieșire fizică
-Top-Back-center	MediaString		Sus-Spate-centru
+Top-Back-center	MediaString		Sus-spate-centru
 YUV420	MediaString		YUV420
-Top to bottom, left to right	MediaString		Sus în jos, stânga la dreapta
+Top to bottom, left to right	MediaString		De sus în jos, de la stânga la dreapta
 (unknown run mode)	MediaString		(mod de rulare necunoscut)
  kb/s	MediaString		 kb/s
-24 bit HSI	MediaString		HSI 24 biți
-User-defined media type	MediaString		Tip media definit de utilizator
-32 bit CMYA	MediaString		CMYA 32 biți
+24 bit HSI	MediaString		HSI pe 24 biți
+User-defined media type	MediaString		Tip de media definit de utilizator
+32 bit CMYA	MediaString		CMYA pe 32 biți
 Rear-left	MediaString		Spate-stânga
 QuickTime format family	MediaString		Familie de format QuickTime
 Any format family	MediaString		Orice familie de format
-Timecode	MediaString		Cod de timp
-Top-Front-right	MediaString		Sus-Față-dreapta
-32 bit float	MediaString		float 32 biți
+Timecode	MediaString		Timecode
+Top-Front-right	MediaString		Sus-față-dreapta
+32 bit float	MediaString		Float pe 32 biți
 Controllable	MediaString		Controlabil
-32 bit integer	MediaString		Întreg 32 biți
+32 bit integer	MediaString		Întreg pe 32 biți
 Front-right-center	MediaString		Față-dreapta-centru
 Side-right	MediaString		Lateral-dreapta
  kHz	MediaString		 kHz
 Little endian	MediaString		Endian mic
 (unknown matrix mask)	MediaString		(mască de matrice necunoscută)
-32 bit LAB	MediaString		LAB 32 biți
+32 bit LAB	MediaString		LAB pe 32 biți
 Side-left	MediaString		Lateral-stânga
 {0, plural, one{# byte per buffer} other{# bytes per buffer}}	MediaString		{0, plural, one{# byte per buffer} other{# bytes per buffer}}
-32 bit CMYK	MediaString		CMYK 32 biți
-(unknown multistream format)	MediaString		(format fluxuri multiple necunoscut)
-8 bit integer	MediaString		întreg 8 biți
-8 bit grayscale-index	MediaString		index scală de gri 8 biți
+32 bit CMYK	MediaString		CMYK pe 32 biți
+(unknown multistream format)	MediaString		(format de fluxuri multiple necunoscut)
+8 bit integer	MediaString		Întreg pe 8 biți
+8 bit grayscale-index	MediaString		Index scală de gri pe 8 biți
 YCbCr444	MediaString		YCbCr444
-Buffer producer	MediaString		Producător memorie intermediară
-Buffer consumer	MediaString		Consumator memorie intermediară
-Increase latency	MediaString		Mărește latența
+Buffer producer	MediaString		Producător preîncărcare
+Buffer consumer	MediaString		Consumator preîncărcare
+Increase latency	MediaString		Crește latența
 Front-left-center	MediaString		Față-stânga-centru
 MPEG format family	MediaString		Familie de format MPEG
 (none)	MediaString		(nespecificat)
@@ -84,16 +84,16 @@ Center	MediaString		Centru
  kb/s (max)	MediaString		 kb/s (max)
 Monochrome	MediaString		Monocrom
 Private Be media type	MediaString		Tip privat de media Be
-24 bit UVL	MediaString		UVL 24 biți
-32 bit HSV	MediaString		HSV 32 biți
+24 bit UVL	MediaString		UVL pe 24 biți
+32 bit HSV	MediaString		HSV pe 32 biți
 ID	MediaString		ID
 AIFF format family	MediaString		Familie de format AIFF
-Top-Back-left	MediaString		Sus-Spate-stânga
-16 bit RGB	MediaString		RGB 16 biți
+Top-Back-left	MediaString		Sus-spate-stânga
+16 bit RGB	MediaString		RGB pe 16 biți
 YCbCr422	MediaString		YCbCr422
 Raw audio	MediaString		Audio brut
-32 bit LABA	MediaString		LABA 32 biți
-24 bit HLS	MediaString		HLS 32 biți
+32 bit LABA	MediaString		LABA pe 32 biți
+24 bit HLS	MediaString		HLS pe 32 biți
 Non-interlaced 	MediaString		Nu este întrețesut 
 {0, plural,one{# byte (avg)}other{# bytes (avg)}}	MediaString		{0, plural,one{# byte (avg)}other{# bytes (avg)}}
 MIDI	MediaString		MIDI
@@ -107,40 +107,40 @@ Sub	MediaString		Sub
 YUV411	MediaString		YUV411
 Multistream media	MediaString		Media de fluxuri multiple
 Encoded audio	MediaString		Audio codat
-Decrease precision	MediaString		Micșorează precizia
-File interface	MediaString		Interfață fișier
+Decrease precision	MediaString		Scade precizia
+File interface	MediaString		Interfață de fișier
 (unknown byte order)	MediaString		(ordine de octeți necunoscută)
-32 bit HSI	MediaString		HSI 32 biți
+32 bit HSI	MediaString		HSI pe 32 biți
 Typeless media	MediaString		Media fără tip
  (PAL)	MediaString		 (PAL)
-32 bit RGBA	MediaString		RGBA 32 biți
+32 bit RGBA	MediaString		RGBA pe 32 biți
 YCbCr420	MediaString		YCbCr420
  kb/s (avg)	MediaString		 kb/s (medie)
 HTML	MediaString		HTML
 Time source	MediaString		Sursă de timp
-15 bit RGB	MediaString		RGB 15 biți
+15 bit RGB	MediaString		RGB pe 15 biți
 ProLogic LR	MediaString		ProLogic LR
 {0, plural,one{# byte per frame}other{# bytes per frame}}	MediaString		{0, plural,one{# byte per frame}other{# bytes per frame}}
 Parameters	MediaString		Parametri
 Raw data from VBL area	MediaString		Date brute de la zona VBL
-Top-Back-right	MediaString		Sus-Spate-dreapta
+Top-Back-right	MediaString		Sus-spate-dreapta
 {0, plural, one{# byte per row}other{# bytes per row}}	MediaString		{0, plural, one{# byte per row}other{# bytes per row}}
 Left	MediaString		Stânga
 BeOS video	MediaString		Video BeOS
-24 bit CMY	MediaString		CMY 24 biți
-32 bit UVLA	MediaString		UVLA 32 biți
+24 bit CMY	MediaString		CMY pe 24 biți
+32 bit UVLA	MediaString		UVLA pe 32 biți
 Top-center	MediaString		Sus-centru
-Entity interface	MediaString		Interfață entitate
+Entity interface	MediaString		Interfață de entitate
 Stereo	MediaString		Stereo
-8 bit color-index	MediaString		Indice de culoare 8 biți
-Bottom to top, left to right	MediaString		Jos în sus, stânga la dreapta
-32 bit UVL	MediaString		UVL 32 biți
+8 bit color-index	MediaString		Indice de culoare pe 8 biți
+Bottom to top, left to right	MediaString		De jos în sus, de la stânga la dreapta
+32 bit UVL	MediaString		UVL pe 32 biți
 {0, plural, one{# line} other{# lines}}	MediaString		{0, plural, one{# line} other{# lines}}
 Text	MediaString		Text
 Unknown media type	MediaString		Tip de media necunoscut
 MPEG2	MediaString		MPEG2
-Miscellaneous format family	MediaString		Familie de format variat
-24 bit RGB	MediaString		RGB 24 biți
+Miscellaneous format family	MediaString		Familie de format diverse
+24 bit RGB	MediaString		RGB pe 24 biți
 {0, plural,one{# frame backward}other{# frames backward}}	MediaString		{0, plural,one{# frame backward}other{# frames backward}}
-32 bit HSIA	MediaString		HSIA 32 biți
+32 bit HSIA	MediaString		HSIA pe 32 biți
 Raw video	MediaString		Video brut

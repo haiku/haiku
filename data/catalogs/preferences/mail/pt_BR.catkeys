@@ -2,7 +2,7 @@
 Account settings	AutoConfigWindow		Configurações da conta
 \t\t· Outgoing	Config Window		\t\t· Saída
 An error occurred while creating the config view: %error.	Config Views		Ocorreu um erro durante a criação de visão de configuração: %erro.
-E-mail address:	E-Mail		Endereço de correio eletrônico:
+E-mail address:	E-Mail		Endereço de e-mail:
 Create new account	AutoConfigWindow		Criar nova conta
 While sending and receiving	Config Window		Enquanto envia e recebe
 Error!	Config Views		Erro!
@@ -43,7 +43,7 @@ E-mail	System name		E-mail
 Check every	Config Window		Checar a cada
 Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Crie uma nova conta com o botão Adicionar.\n\nRemova uma conta com o botão Remover no item selecionado.\n\nSelecione um item na lista para alterar suas configurações.
 Account name:	E-Mail		Nome da conta:
-Edit mailbox menu…	Config Window		Editar menu da caixa de e-mail...
+Edit mailbox menu…	Config Window		Editar menu da caixa de correio...
 Server Name:	E-Mail		Nome do Servidor:
 Remove	Config Window		Remover
 Login name:	E-Mail		Nome de login:

@@ -1,64 +1,64 @@
 1	romanian	x-vnd.Haiku-PackageInstaller	2472572058
-Package description	UninstallView		Descriere pachet
-none	PackageView		nimic
-Continue	PackageInstall		Continuare
-Running post-installation scripts	PackageInstall		Se rulează scripturi post-instalare
-Package installer	PackageView		Program de instalare pachete
-All existing files will be skipped?	PackageView		Toate fișierele existente vor fi sărite?
+Package description	UninstallView		Descrierea pachetului
+none	PackageView		nespecificat
+Continue	PackageInstall		Continuă
+Running post-installation scripts	PackageInstall		Se rulează scripturile de post-instalare
+Package installer	PackageView		Instalator de pachete
+All existing files will be skipped?	PackageView		Toate fișierele existente vor fi omise?
 Replace	PackageView		Înlocuire
 All existing files will be replaced?	PackageView		Toate fișierele existente vor fi înlocuite?
 Other…	PackageView		Altele…
-The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		Legătura simbolică '%s' există deja pe calea dată.\nÎnlocuiți legătura cu aceea din acest pachet sau omiteți?
-Stop	PackageStatus		Oprire
+The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		Legătura simbolică cu numele „%s” există deja în calea dată.\nÎnlocuiți legătura cu cea din acest pachet sau o omiteți?
+Stop	PackageStatus		Oprește
 Install to:	PackageView		Instalează la:
-The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Se pare că pachetul dat este deja instalat în sistem. Doriți să-l dezinstalați pe cel existent și să continuați cu instalarea?
-Skip all	PackageView		Omite tot
-The installation of the package has been aborted.	PackageView		Instalarea pachetului a fost anulată.
-No installation type selected	PackageView		Niciun tip de instalare selectat
-Do you want to remember this decision for the rest of this installation?\n	PackageView		Doriți să țineți minte această decizie pentru restul acestei instalări?\n
-The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Pachetul selectat nu a fost eliminat din sistem. E posibil ca fișierul primit cu informații despre pachetul instalat să fie corupt.
+The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Pachetul dat pare să fie deja instalat pe sistem. Doriți să îl dezinstalați pe cel existent și să continuați instalarea?
+Skip all	PackageView		Omite toate
+The installation of the package has been aborted.	PackageView		Instalarea pachetului a fost întreruptă.
+No installation type selected	PackageView		Nu a fost selectat niciun tip de instalare
+Do you want to remember this decision for the rest of this installation?\n	PackageView		Doriți să rețineți această decizie pentru restul acestei instalări?\n
+The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Pachetul selectat nu a fost eliminat din sistem. Este posibil ca fișierul cu informații despre pachetul instalat să fi fost corupt.
 Install…	UninstallView		Instalare…
-The item named '%s' already exists in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Elementul cu numele „%s” există deja la calea dată.\nSe înlocuiește elementul cu acela din acest pachet sau se sare?
-Installing files and folders	PackageInstall		Se instalează fișiere și dosare
+The item named '%s' already exists in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Elementul cu numele „%s” există deja în calea dată.\nÎnlocuiți elementul cu cel din acest pachet sau îl omiteți?
+Installing files and folders	PackageInstall		Instalarea fișierelor și dosarelor
 Installed packages	UninstallWindow		Pachete instalate
 Remove	UninstallView		Elimină
-The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Instalarea pachetului cerut a eșuat pe acest sistem. S-ar putea să fie o problemă cu fișierul pachet țintă. Consultați această problemă cu distribuitorul de pachete.
+The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Pachetul cerut nu a putut fi instalat pe sistem. Aceasta ar putea fi o problemă cu fișierul de pachet țintă. Consultați această problemă cu distribuitorul pachetului.
 OK	UninstallView		OK
-Accept	PackageTextViewer		Acceptare
-Abort	PackageView		Anulează
-Disclaimer	PackageTextViewer		Declarație de neasumare a responsabiltății
+Accept	PackageTextViewer		Acceptă
+Abort	PackageView		Întrerupe
+Disclaimer	PackageTextViewer		Declinare de responsabilitate
 Preparing package	PackageInstall		Se pregătește pachetul
-The package you requested has been successfully installed on your system.	PackageView		Pachetul pe care l-ați solicitat a fost instalat cu succes în sistem.
-Installation progress	PackageView		Progres instalare
-Decline	PackageTextViewer		Refuzare
-Continue	PackageTextViewer		Continuare
+The package you requested has been successfully installed on your system.	PackageView		Pachetul pe care l-ați cerut a fost instalat cu succes pe sistem.
+Installation progress	PackageView		Progresul instalării
+Decline	PackageTextViewer		Refuză
+Continue	PackageTextViewer		Continuă
 Installing package	PackageStatus		Se instalează pachetul
 Install %name%	PackageView		Instalează %name%
 %index% of %total%	PackageInstall		%index% din %total%
 No package selected.	UninstallView		Niciun pachet selectat.
-%name% (%size% free)	PackageView		%name% (%size% liber)
-Error while installing the package\n	PackageView		Eroare în timpul instalării pachetului\n
-Finishing installation	PackageInstall		Se termină instalarea
+%name% (%size% free)	PackageView		%name% (%size% gol)
+Error while installing the package\n	PackageView		Eroare la instalarea pachetului\n
+Finishing installation	PackageInstall		Se finalizează instalarea
 No package available.	PackageInfo		Niciun pachet disponibil.
-The script named '%s' already exists in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Scriptul cu numele „%s” există deja la calea dată.\nSe înlocuiește scriptul cu acela din acest pachet sau se sare?
-Installation type:	PackageView		Tip instalare:
+The script named '%s' already exists in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Scriptul cu numele „%s” există deja în calea dată.\nÎnlocuiți scriptul cu cel din acest pachet sau îl omiteți?
+Installation type:	PackageView		Tip de instalare:
 The package you selected has been successfully removed from your system.	UninstallView		Pachetul selectat a fost eliminat cu succes din sistem.
-There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Se pare că există o nepotrivire de dimensiune de fișier în fișierul pachetului. Pachetul ar putea să fie corupt sau să fi fost modificat după crearea lui. Doriți să mai continuați?
+There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Se pare că există o nepotrivire a dimensiunii fișierului în fișierul pachetului. Pachetul poate fi corupt sau poate fi modificat după crearea sa. Mai doriți să continuați?
 %name% (%size%)	PackageView		%name% (%size%)
-Abort	PackageInstall		Anulează
-The file named '%s' already exists in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Fișierul cu numele „%s” există deja la calea dată.\nSe înlocuiește fișierul cu acela din acest pachet sau se sare?
-Replace all	PackageView		Înlocuiește tot
-The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Fișierul de pachet nu se poate citi.\nUnul din motivele posibile ar putea fi că fișierul solicitat nu este un pachet .pkg BeOS valid.
-Continue	PackageInfo		Continuare
+Abort	PackageInstall		Întrerupe
+The file named '%s' already exists in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Fișierul cu numele „%s” există deja în calea dată.\nÎnlocuiți fișierul cu cel din acest pachet sau îl omiteți?
+Replace all	PackageView		Înlocuiește toate
+The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Fișierul pachetului nu poate fi citit.\nUnul dintre posibilele motive pentru acest lucru ar putea fi faptul că fișierul cerut nu este un pachet BeOS .pkg valid.
+Continue	PackageInfo		Continuă
 No package selected.	PackageInfo		Niciun pachet selectat.
-Error! \"%s\" is not a valid path.\n	Packageinstaller main		Eroare! \"%s\" nu este o cale validă.\n
-The directory named '%s' already exists in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Directorul cu numele „%s” există deja la calea dată.\nSe înlocuiește directorul cu unul din acest pachet sau se sare?
+Error! \"%s\" is not a valid path.\n	Packageinstaller main		Eroare! \„%s\” nu este o cale validă.\n
+The directory named '%s' already exists in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Directorul cu numele „%s” există deja în calea dată.\nÎnlocuiți directorul cu unul din acest pachet sau îl omiteți?
 LegacyPackageInstaller	System name		LegacyPackageInstaller
 Ask again	PackageView		Întreabă din nou
-Begin	PackageView		Început
+Begin	PackageView		Începe
 OK	PackageView		OK
-Abort	PackageInfo		Anulează
-Done	PackageInstall		Terminat
-Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Eroare (%s)! Nu s-a putut deschide \"%s\".\n
+Abort	PackageInfo		Întrerupe
+Done	PackageInstall		Gata
+Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Eroare (%s)! Nu s-a putut deschide \„%s\”.\n
 Skip	PackageView		Omite
-Image not loaded correctly	PackageImageViewer		Imaginea nu s-a încărcat corect
+Image not loaded correctly	PackageImageViewer		Imaginea nu a fost încărcată corect

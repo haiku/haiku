@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-libtracker	2498612740
+1	danish	x-vnd.Haiku-libtracker	3380227078
 Created	ContainerWindow		Oprettet
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Åbn og lav foretrukket
@@ -6,6 +6,7 @@ Kind	ContainerWindow		Slags
 Open with…	ContainerWindow		Åbn med…
 Error moving \"%name\" to Trash. (%error)	FSUtils		Fejl ved flytning af \"%name\" til papirkurven. (%error)
 Or	FindPanel		Eller
+MIME Description	AttributesView		MIME-beskrivelse
 before	FindPanel		før
 Volume icons	TrackerSettingsWindow		Ikoner for diskområder
 Ignore case	SelectionWindow		Skel ikke mellem store og små bogstaver
@@ -329,6 +330,7 @@ Recent folders	FavoritesMenu		Nylige mapper
 Signed memory size	AttributesView		Hukommelsesstørrelse med fortegn
 The specified name is illegal. Please choose another name.	FilePanelPriv		Det specificerede navn er ulovligt. Vælg venligst en andet navn.
 of %items	StatusWindow		af %items
+MIME Path	AttributesView		MIME-sti
 less than	FindPanel		mindre end
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Fejl ved kopiering af filen \"%name\":\n\t%error\n\nVil du fortsætte?
 Creating links: 	StatusWindow		Opretning af links: 
@@ -443,6 +445,7 @@ Sorry, saving more than one item is not allowed.	FilePanelPriv		Beklager, det er
 Move here	ContainerWindow		Flyt her
 the config folder	FSUtils		konfigurationsmappen
 Sorry, could not create a new folder.	FSUtils		Beklager, kunne ikke lave en ny mappe.
+MIME Signature	AttributesView		MIME-underskrift
 Select all	VirtualDirectoryWindow		Vælg alle
 Rename	FSUtils	button label	Omdøb
 Clean up all	ContainerWindow		Opryd alle

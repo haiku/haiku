@@ -1,4 +1,4 @@
-1	ukrainian	application/x-vnd.Cortex.InfoView	2507047210
+1	ukrainian	application/x-vnd.Cortex.InfoView	2382053937
 Offset	InfoView		Зміщення
 Description	DormantNodeInfoView		Опис
 Byte order	InfoView		Порядок байтів
@@ -7,26 +7,33 @@ Output formats	DormantNodeInfoView		Вихідні формати
 History	InfoView		Історія
 Input formats	DormantNodeInfoView		Вхідні формати
 Signature	AppNodeInfoView		Сигнатура
+Video data between	InfoView		Відеодані поміж
 Any number	DormantNodeInfoView	For 'Max. instances' field	Будь-яке число
+Flags	InfoView		Позначки
 Media output	InfoView		Медіавихід
 Active lines	InfoView		Активні лінії
 Buffer size	InfoView		Розмір буфера
 \n- Quality:	FileNodeInfoView		\n- Якість:
 Kinds	LiveNodeInfoView		Категорії
 Application	AppNodeInfoView		Програма
+Flavor flags	DormantNodeInfoView		Позначки сімейства
 Max. instances	DormantNodeInfoView		Макс. екземплярів
 \n- Duration:	FileNodeInfoView		\n- Тривалість:
-Dormant media node	DormantNodeInfoView		Латентна медіа-нода
+Dormant media node	DormantNodeInfoView		Пасивна медіанода
 Latency	LiveNodeInfoView		Латентність
 Media type	InfoView		Тип медіа
 Live media node	LiveNodeInfoView		Активна медіанода
+Field rate	InfoView		Частота напівкадрів
 Kinds	DormantNodeInfoView		Категорії
 %title% info	InfoView		%title% інфо
 Node ID	LiveNodeInfoView		ID ноди
 Resolution	InfoView		Роздільна здатність
+Chunk size	InfoView		Розмір частки
 File format	AppNodeInfoView		Формат файлу
 Matrix mask	InfoView		Матрична маска
 Channel mask	InfoView		Маска каналу
+Orientation	InfoView		Орієнтація
+Live file-interface node	FileNodeInfoView		Активна нода файлового інтерфейсу
 Channels	InfoView		Канали
 Sample rate	InfoView		Частота дискретизації
 File format	FileNodeInfoView		Формат файлу
@@ -38,6 +45,7 @@ Format	InfoView		Формат
 Version	AppNodeInfoView		Версія
 AddOn ID	DormantNodeInfoView		ID Доповнення
 Frame size	InfoView		Розмір кадру
+Flavor ID	DormantNodeInfoView		ID у сімействі
 Run mode	LiveNodeInfoView		Режим роботи
 \n- Codec:	FileNodeInfoView		\n- Кодек:
 Port	LiveNodeInfoView		Порт
@@ -47,4 +55,5 @@ Application-owned node	AppNodeInfoView		Нода програми
 Tracks	FileNodeInfoView		Треки
 Source	InfoView		Походження
 Destination	InfoView		Призначення
+Copyright	FileNodeInfoView		Авторське право
 ID:	FileNodeInfoView		ID:

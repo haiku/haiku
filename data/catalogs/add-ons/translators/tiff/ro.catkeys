@@ -3,7 +3,7 @@ TIFF Library:	TIFFView		Bibliotecă TIFF:
 RLE (Packbits)	TIFFView		RLE (Packbits)
 ZIP (Deflate)	TIFFView		ZIP (dezumflare)
 identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: index de document nevalid\n
-Use compression:	TIFFView		Utilizează compresie:
+Use compression:	TIFFView		Utilizează compresia:
 TIFF image translator	TIFFView		Traducător de imagine TIFF
 TIFF image	TIFFTranslator		Imagine TIFF
 TIFF Settings	TIFFMain		Configurări TIFF

@@ -12,10 +12,10 @@ Stop	TransportView		Oprește
 Drop data	TransportView		Renunță la date
 To:	TransportView		Către:
 Recording	TransportView		Înregistrare
-Increase latency	TransportView		Mărește latența
+Increase latency	TransportView		Crește latența
 Time source:	TransportView		Sursă de timp:
 DAC time source	TransportView		Sursă de timp DAC
-Decrease precision	TransportView		Micșorează precizia
+Decrease precision	TransportView		Scade precizia
 System clock	TransportView		Ceas de sistem
 From:	TransportView		De la:
 Roll from	TransportView		Rulează de la

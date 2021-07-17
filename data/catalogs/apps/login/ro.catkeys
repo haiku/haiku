@@ -1,18 +1,18 @@
 1	romanian	x-vnd.Haiku-Login	336867745
-Invalid login!	Login View		Login invalid!
+Invalid login!	Login View		Autentificare nevalidă!
 Error	Login App		Eroare
---edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tLansați în modul de editare raft pentru a permite personalizarea dektopului.\n
+--edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tLansați în modul de editare raft pentru a permite personalizarea desktopului.\n
 Welcome to Haiku	Login Window		Bine ați venit la Haiku
-Halt	Login View		Oprește
-Login application for Haiku\nUsage:\n	Login App		Aplicație de login pentru Haiku\nUtilizare:\n
+Halt	Login View		Oprire
+Login application for Haiku\nUsage:\n	Login App		Aplicație de autentificare pentru Haiku\nUtilizare:\n
 --nonmodal\tDo not make the window modal\n	Login App		--nonmodal\tNu face fereastra modală\n
 Desktop	Desktop Window		Desktop
 Hide password	Login View		Ascunde parola
-Reboot	Login View		Restartează
-You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Puteți personaliza desktop-ul afișat în spatele aplicației de autentificare prin plasarea replicanților peste acesta.\n\nCând ați terminat, ieșiți din aplicație (Cmd-Q).
+Reboot	Login View		Repornire
+You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Puteți personaliza desktopul afișat în spatele aplicației de autentificare plasând replicanți pe aceasta.\n\nCând ați terminat, ieșiți din aplicație (Cmd-Q).
 OK	Login View		OK
-Info	Login App		Info
-Login:	Login View		Login:
+Info	Login App		Informații
+Login:	Login View		Autentificare:
 Password:	Login View		Parolă:
 Unimplemented	Login App		Neimplementat
 OK	Login App		OK

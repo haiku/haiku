@@ -104,7 +104,7 @@ Close	RatePackageWindow		Fechar
 An unexpected error has been sent from the server [%i]	ServerHelper		Um erro inesperado foi enviado do servidor [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Sincronizando dados do pacote para o repositório '%REPO_NAME%'
 Settings	SettingsWindow		Configurações
-An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Ocorreu um erro ao baixar as condições de uso necessárias para criar um novo usuário. Verifique o log para obter detalhes e tente novamente.\nAs informações sobre como visualizar os logs estão disponíveis na seção HaikuDepot do Guia do usuário do Haiku.
+An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Ocorreu um erro ao baixar as condições de uso necessárias para criar um novo usuário. Verifique o log para obter detalhes e tente novamente. \nAs informações sobre como visualizar os logs estão disponíveis na seção HaikuDepot do Guia do usuário do Haiku.
 View the usage conditions	UserLoginWindow		Veja as condições de uso
 Login issue	MainWindow		Problema de login
 Your rating:	RatePackageWindow		Sua avaliação:

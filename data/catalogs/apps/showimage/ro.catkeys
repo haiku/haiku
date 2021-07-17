@@ -1,56 +1,56 @@
 1	romanian	x-vnd.Haiku-ShowImage	3998703664
-Use as background…	Menus		Utilizează ca fundal…
+Use as background…	Menus		Utilizare ca fundal…
 File	Menus		Fișier
-Slide delay	Menus		Întârziere imagine
-Selection mode	Menus		Mod de selectare
+Slide delay	Menus		Întârziere de diapozitiv
+Selection mode	Menus		Modul de selecție
 Zoom in	Menus		Mărește
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Documentul '%s' a fost modificat. Doriți să închideți documentul?
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Documentul „%s” a fost modificat. Doriți să închideți documentul?
 Page setup…	Menus		Configurare pagină…
-Print…	Menus		Tipărește…
-Get info…	Menus		Obține detalii…
+Print…	Menus		Tipărire…
+Get info…	Menus		Obține informații…
 OK	SaveToFile		OK
 Previous page	Menus		Pagina anterioară
-View	Menus		Vizualizează
+View	Menus		Vizualizare
 Full screen	Menus		Ecran complet
 Go to page	Menus		Mergi la pagina
 Zoom out	Menus		Micșorează
 Quit	Menus		Ieșire
 Rotate counterclockwise	Menus		Rotește în sens anti-orar
 High-quality zooming	Menus		Focalizare de înaltă calitate
-Browse	Menus		Navighează
-Edit	Menus		Editează
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Nu s-a putut încărca imaginea! Fișierul sau un traducător de imagine nu există pentru aceasta.
+Browse	Menus		Navigare
+Edit	Menus		Editare
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Nu s-a putut încărca imaginea! Fie fișierul, fie un traducător de imagine pentru acesta nu există.
 First page	Menus		Prima pagină
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Documentul '%s' (pagina %d) a fost modificat. Doriți să închideți documentul?
-Leave full screen	Menus		Părăsește pe tot ecranul
+The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Documentul „%s” (pagina %d) a fost modificat. Doriți să închideți documentul?
+Leave full screen	Menus		Părăsește ecranul complet
 Close	Menus		Închide
 Close	ClosePrompt		Închide
-Resize to (in 1/72 inches):	PrintOptionsWindow		Redimensionează la (în 1/72 țoli):
+Resize to (in 1/72 inches):	PrintOptionsWindow		Redimensionare la (în 1/72 țoli):
 Rating	Menus		Evaluare
-Flip left to right	Menus		Inversează stânga cu dreapta
-Show caption in full screen mode	Menus		Afișează legendă în modul ecran complet
+Flip left to right	Menus		Inversează de la stânga la dreapta
+Show caption in full screen mode	Menus		Arată legenda în modul ecran complet
 DPI:	PrintOptionsWindow		DPI:
 Open…	Menus		Deschide…
 Next file	Menus		Fișierul următor
-Clear selection	Menus		Eliberează selecție
-Close document	ClosePrompt		Închide document
+Clear selection	Menus		Eliberează selecția
+Close document	ClosePrompt		Închide documentul
 Height: 	PrintOptionsWindow		Înălțime: 
-The file '%s' could not be written.	SaveToFile		Fișierul '%s' nu a putut fi scris.
+The file '%s' could not be written.	SaveToFile		Fișierul „%s” nu a putut fi scris.
 Cancel	ClosePrompt		Anulează
-Show tool bar	Menus		Afișează bara de unelte
+Show tool bar	Menus		Arată bara de unelte
 Fit to window	Menus		Potrivește la fereastră
-Print options	PrintOptionsWindow		Opțiuni imprimare
+Print options	PrintOptionsWindow		Opțiuni de tipărire
 Copy	Menus		Copiază
 Progress monitor	ProgressWindow		Monitor de progres
 Last page	Menus		Ultima pagină
 Stretch to window	Menus		Întinde la fereastră
 Previous file	Menus		Fișier anterior
 ShowImage	System name		ShowImage
-Slide show	Menus		Succesiune imagini
-Fit image to page	PrintOptionsWindow		Potrivește imagine la pagină
-Flip top to bottom	Menus		Inversează sus cu jos
-Select all	Menus		Selectează tot
-Zoom factor in %:	PrintOptionsWindow		Factor de mărire %:
+Slide show	Menus		Prezentare de diapozitive
+Fit image to page	PrintOptionsWindow		Potrivește imaginea la pagină
+Flip top to bottom	Menus		Inversează de sus în jos
+Select all	Menus		Selectează toate
+Zoom factor in %:	PrintOptionsWindow		Factor de focalizare în %:
 Width:	PrintOptionsWindow		Lățime:
 Image	Menus		Imagine
 Move to Trash	Menus		Mută la gunoi

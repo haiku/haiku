@@ -1,0 +1,26 @@
+1	dutch; flemish	application/x-vnd.Cortex.Route	25925955
+Node '%name%' released	CortexRouteApp		Node '%name' vrijgegeven
+OK	CortexRouteApp		Okee
+About Cortex/Route…	CortexRouteApp		Over Cortex/Route…
+File	CortexRouteApp		Bestand
+Connection '%name%' made	CortexRouteApp		Verbinding '%name%' totstand gekomen
+Save nodes…	CortexRouteApp		Nodes opslaan…
+%producer% and %consumer%	CortexRouteApp		%producer% en %consumer%
+Node '%name%' created	CortexRouteApp		Node '%name' aangemaakt
+Negotiated format:	CortexRouteApp		Onderhandeld formaat:
+Window	CortexRouteApp		Venster
+Transport	CortexRouteApp		Transport
+Connection broken	CortexRouteApp		Verbinding verbroken
+Untitled group	CortexRouteApp		Groep zonder titel
+Connection failed	CortexRouteApp		Verbinding mislukt
+Connection '%name%' broken	CortexRouteApp		Verbinding '%name' verbroken
+Between:	CortexRouteApp		Tussen:
+Cortex	CortexRouteApp		Cortex
+Open…	CortexRouteApp		Openen…
+Pull palettes	CortexRouteApp		Palletten trekken
+Connection made	CortexRouteApp		Verbinding gemaakt
+Show transport	CortexRouteApp		Transport tonen
+Show add-ons	CortexRouteApp		Add-ons tonen
+Quit	CortexRouteApp		Afsluiten
+Cortex/Route 2.1.2\n\nCopyright 1999-2000 Eric Moon\nAll rights reserved.\n\nThe Cortex Team:\n\nChristopher Lenz: UI\nEric Moon: UI, back-end\n\nThanks to:\nJohn Ashmun\nJon Watte\nDoug Wright\n<your name here>\n\nCertain icons used herein are the property of\nBe, Inc. and are used by permission.	CortexRouteApp		Cortex/Route 2.1.2\n\nCopyright 1999-2000 Eric Moon\nAlle rechten voorbehouden.\n\nHet Cortex Team:\n\nChristopher Lenz: UI\nEric Moon: UI, back-end\n\nMet dank aan:\nJohn Ashmun\nJon Watte\nDoug Wright\n<your name here>\n\nBepaalde pictogrammen zijn eigendom van\nBe, Inc. en zijn met toestemming gebruikt.
+Tried format:	CortexRouteApp		Geprobeerd formaat:

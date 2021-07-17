@@ -1,17 +1,17 @@
 1	romanian	x-vnd.Be-TSKB	2656653225
 Power off	DeskbarMenu		Oprire
-Sort applications by name	PreferencesWindow		Sortează aplicații după nume
+Sort applications by name	PreferencesWindow		Sortează aplicațiile după nume
 Suspend	DeskbarMenu		Suspendare
 Hide clock	TimeView		Ascunde ceasul
 Applications	PreferencesWindow		Aplicații
 Time preferences…	TimeView		Preferințe ceas…
 About Haiku	DeskbarMenu		Despre Haiku
-Edit in Tracker…	PreferencesWindow		Editează în Tracker…
+Edit in Tracker…	PreferencesWindow		Editare în Tracker…
 Recent documents:	PreferencesWindow		Documente recente:
 Recent applications	DeskbarMenu		Aplicații recente
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Aplicații
 Find…	DeskbarMenu		Căutare…
-Show clock	Tray		Afișează ceasul
+Show clock	Tray		Arată ceasul
 Window	PreferencesWindow		Fereastră
 Defaults	PreferencesWindow		Implicite
 Menu	PreferencesWindow		Meniu
@@ -19,32 +19,32 @@ Recent documents	DeskbarMenu		Documente recente
 Auto-hide	PreferencesWindow		Ascundere automată
 Always on top	PreferencesWindow		Întotdeauna deasupra
 <Deskbar folder is empty>	DeskbarMenu		<Deskbar folder is empty>
-Show all	WindowMenu		Afișează tot
+Show all	WindowMenu		Afișează toate
 No windows	WindowMenu		Fără ferestre
 Deskbar	System name		Deskbar
 Restart system	DeskbarMenu		Repornire sistem
 Large	PreferencesWindow		Mare
-Auto-raise	PreferencesWindow		Auto-montează
+Auto-raise	PreferencesWindow		Ridicare automată
 Recent folders:	PreferencesWindow		Dosare recente:
-Show application expander	PreferencesWindow		Afișează extensorul de aplicație
-Close all	WindowMenu		Închide tot
-Deskbar preferences	PreferencesWindow		Preferințe Deskbar
+Show application expander	PreferencesWindow		Arată extensorul de aplicație
+Close all	WindowMenu		Închide toate
+Deskbar preferences	PreferencesWindow		Preferințe deskbar
 Mount	DeskbarMenu		Montare
 Revert	PreferencesWindow		Revenire
 Small	PreferencesWindow		Mic
 Recent applications:	PreferencesWindow		Aplicații recente:
 Shutdown…	DeskbarMenu		Oprire…
-Tracker always first	PreferencesWindow		Trackerul întotdeauna primul
+Tracker always first	PreferencesWindow		Tracker întotdeauna primul
 Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Preferințe
 Recent folders	DeskbarMenu		Dosare recente
 About this system	DeskbarMenu		Despre acest sistem
-Show calendar…	TimeView		Afișează calendar…
-Deskbar preferences…	DeskbarMenu		Preferințe Deskbar…
-Expand new applications	PreferencesWindow		Extinde aplicații noi
+Show calendar…	TimeView		Arată calendarul…
+Deskbar preferences…	DeskbarMenu		Preferințe deskbar…
+Expand new applications	PreferencesWindow		Extinde aplicațiile noi
 Show replicants	DeskbarMenu		Arată replicanții
 Hide application names	PreferencesWindow		Ascunde numele aplicațiilor
-Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demo-uri
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demos
 Icon size	PreferencesWindow		Dimensiune pictogramă
-Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Miniaplicații desktop
-Hide all	WindowMenu		Ascunde tot
-Quit application	WindowMenu		Ieși din aplicație
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Mini-aplicații desktop
+Hide all	WindowMenu		Ascunde toate
+Quit application	WindowMenu		Ieșire din aplicație

@@ -10,7 +10,7 @@ About	JPEGTranslator		Despre
 Version %d.%d.%d	JPEGTranslator		Versiunea %d.%d.%d
 Write black-and-white images as RGB24	JPEGTranslator		Scrie imaginile alb-negru ca RGB24
 Output smoothing strength	JPEGTranslator		Rezistența de netezire a ieșirii
-Use progressive compression	JPEGTranslator		Utilizează compresie progresivă
+Use progressive compression	JPEGTranslator		Utilizează compresia progresivă
 Make file smaller (sligthtly worse quality)	JPEGTranslator		Micșorează fișierul (calitate mai scăzută)
 High	JPEGTranslator		Ridicată
 Read greyscale images as RGB32	JPEGTranslator		Citește imaginile în scală de gri ca RGB32

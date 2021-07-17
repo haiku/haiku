@@ -1,5 +1,5 @@
 1	romanian	x-vnd.Haiku-TGATranslator	3075011211
-Save with RLE compression	TGAView		Salvează cu compresie RLE
+Save with RLE compression	TGAView		Salvează cu compresia RLE
 Targa image (%d bits truecolor)	TGATranslator		Imagine Targa (culori reale %d biți)
 Ignore TGA alpha channel	TGAView		Ignoră canalul alfa TGA
 Targa image (%d bits colormap)	TGATranslator		Imagine Targa (hartă de culori %d biți)

@@ -34,7 +34,7 @@ OK	ExpanderPreferences		OK
 Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		本当にこのアーカイブの解凍を中止しますか? 解凍されたアイテムは完全ではないかもしれません。
 Leave destination folder path empty	ExpanderPreferences		解凍時に指定
 Failed to create the destination folder.	ExpanderWindow		展開先のフォルダーを作成できません。
-Select '%s'…	DirectoryFilePanel		'%s' の選択...
+Select '%s'…	DirectoryFilePanel		'%s' を選択...
 Create	ExpanderWindow		作成
 The file doesn't exist	ExpanderWindow		ファイルがありません
 Stop	ExpanderMenu		中止

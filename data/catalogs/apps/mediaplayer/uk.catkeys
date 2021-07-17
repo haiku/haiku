@@ -14,7 +14,7 @@ Subtitles	MediaPlayer-Main		Субтитри
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% викликав внутрішню помилку. Файл неможливо відкрити.
 DrawBitmap	MediaPlayer-InfoWin		DrawBitmap
 File info	MediaPlayer-InfoWin		Інформація про файл
-raw audio	MediaPlayer-InfoWin		raw аудіо
+raw audio	MediaPlayer-InfoWin		необроблене аудіо
 Select all	MediaPlayer-PlaylistWindow		Вибрати все
 New player…	MediaPlayer-Main		Новий програвач…
 Move Entries	MediaPlayer-MovePLItemsCmd		Перемістити записи
@@ -27,7 +27,7 @@ Import Entries	MediaPlayer-ImportPLItemsCmd		Імпортувати записи
 Open network stream	MediaPlayer-Main		Відкрити мережевий потік
 Move file to Trash	MediaPlayer-PlaylistWindow		Перемістити до смітника
 Open file…	MediaPlayer-Main		Відкрити файл…
-Scale controls in full screen mode	MediaPlayer-SettingsWindow		Масштабувати кнопки керування в повноекранному режимі
+Scale controls in full screen mode	MediaPlayer-SettingsWindow		Масштабувати кнопки управління в повноекранному режимі
 View options	MediaPlayer-SettingsWindow		Опції перегляду
 %d kHz	MediaPlayer-InfoWin		%d кГц
 Full volume	MediaPlayer-SettingsWindow		Повна гучність

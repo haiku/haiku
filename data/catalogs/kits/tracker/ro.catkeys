@@ -433,7 +433,7 @@ Create relative link here	ContainerWindow		Creează o legătură relativă aici
 Copy	FilePanelPriv		Copiază
 All Haiku disks	AutoMounterSettings		Toate discurile Haiku
 Close all	ContainerWindow		Închide toate
-Paused: click to resume or stop	StatusWindow		Pauzat: dați clic pentru a relua sau a opri
+Paused: click to resume or stop	StatusWindow		Pauzat: clic pentru a relua sau a opri
 Name	QueryPoseView		Nume
 Error %error loading add-On %name.	ContainerWindow		Eroare %error la încărcarea suplimentului %name.
 Does not handle file	OpenWithWindow		Nu gestionează fișierul

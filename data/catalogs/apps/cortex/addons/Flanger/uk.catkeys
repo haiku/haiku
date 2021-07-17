@@ -9,7 +9,7 @@ MediaNodeControlApp: couldn't get node info (%d):\n%s\n	CortexAddOnsCommonMediaN
 MediaNodeControlApp: couldn't find node (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: не вдалося знайти ноду (%d):\n%s\n
 FlangerNode parameters	CortexAddOnsFlanger		Параметри FlangerNode
 OK	CortexAddOnsCommonMediaNodeControlApp		ОК
-controls	CortexAddOnsCommonMediaNodeControlApp		елементи керування
+controls	CortexAddOnsCommonMediaNodeControlApp		управління
 Mix output	CortexAddOnsFlanger		Змішаний вихід
 Flanger	CortexAddOnsFlanger		Flanger
 MediaNodeControlApp: no parameters for node (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: відсутні параметри для ноди (%d):\n%s\n

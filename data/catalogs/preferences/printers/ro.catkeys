@@ -35,7 +35,7 @@ Printers	System name		Imprimante
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Imprimantă: %printer_name%\nDriver:  %driver%\n
 Green	TestPageView		Verde
 Print test page	PrintersWindow		Tipărește o pagină de test
-Restart job	PrintersWindow		Repornește sarcina
+Restart job	PrintersWindow		Reîncepe sarcina
 Driver: %driver%	PrinterListView		Driver: %driver%
 Cancel job	PrintersWindow		Anulează sarcina
 %.2f KB	JobListView		%.2f KO

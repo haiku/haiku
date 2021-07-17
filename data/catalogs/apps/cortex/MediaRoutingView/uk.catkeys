@@ -1,4 +1,4 @@
-1	ukrainian	application/x-vnd.Cortex.MediaRoutingView	2771497372
+1	ukrainian	application/x-vnd.Cortex.MediaRoutingView	3442339205
 Lock group	MediaNodePanel		Заблокувати групу
 %refname% (no file)	MediaNodePanel		%refname% (немає файлу)
 Video output	MediaRoutingView		Відеовихід
@@ -18,6 +18,7 @@ Could not disconnect	MediaRoutingView		Не вдалося роз’єднати
 Could not instantiate '%infoname%'	MediaRoutingView		Не вдалося створити екземпляр '%infoname%'
 Mini icon view	MediaRoutingView		Вид "Міні-значки"
 Select all	MediaRoutingView		Вибрати все
+(same as group)	MediaNodePanel		(як для групи)
 Input	MediaJack		Вхід
 Get info	MediaJack		Дивитись Інфо
 Start time source	MediaNodePanel		Запустити відлік часу

@@ -1,9 +1,11 @@
-1	ukrainian	application/x-vnd.Cortex.support	1797066429
+1	ukrainian	application/x-vnd.Cortex.support	2630173556
+Header has flags	MediaString		Заголовок з позначками
 32 bit HLS	MediaString		32-бітовий HLS
 Recording	MediaString		Запис
 (unknown format)	MediaString		(невідомий формат)
 Clean buffers	MediaString		Очистити буфери
 {0, plural,one{# frame forward}other{# frames forward}}	MediaString		{0, plural, one{# кадр вперед} few{# кадри вперед} other{# кадрів вперед}}
+Rear-right	MediaString		Задній правий
 {0, plural, one{# pixel} other{# pixels}}	MediaString		{0, plural, one{# піксель} few{# пікселя} other{# пікселів}}
 Mono	MediaString		Моно
 MPEG1	MediaString		MPEG1
@@ -18,6 +20,7 @@ Top-Front-left	MediaString		Зверху-Фронт-зліва
 YCbCr411	MediaString		YCbCr411
 Offline	MediaString		Офлайн
 YUV422	MediaString		YUV422
+(unkown video orientation)	MediaString		(невідома орієнтація відео)
 QuickTime	MediaString		QuickTime
 32 bit HLSA	MediaString		32-бітовий HLSA
 Top-Front-center	MediaString		Зверху-Фронт-центр
@@ -25,6 +28,7 @@ BeOS format family	MediaString		Сімейство форматів BeOS
 24 bit HSV	MediaString		24-бітовий HSV
 Back-center	MediaString		Тил-центр
 32 bit CMY	MediaString		32-бітовий CMY
+{0, plural, other{# bit integer}}	MediaString		{0, plural, other{# бітове ціле}}
 Ambisonic WXYZ	MediaString		Ambisonic WXYZ
 (unknown video format)	MediaString		(невідомий формат відео)
 AVI format family	MediaString		Сімейство форматів AVI
@@ -49,6 +53,7 @@ Top to bottom, left to right	MediaString		Зверху вниз, зліва на
 24 bit HSI	MediaString		24-бітовий HSI
 User-defined media type	MediaString		Тип медіа визначений користувачем
 32 bit CMYA	MediaString		32-бітовий CMYA
+Rear-left	MediaString		Задній лівий
 QuickTime format family	MediaString		Сімейство форматів QuickTime
 Any format family	MediaString		Будь-яке сімейство формату
 Timecode	MediaString		Timecode
@@ -57,10 +62,13 @@ Top-Front-right	MediaString		Зверху-Фронт-справа
 Controllable	MediaString		Керований
 32 bit integer	MediaString		32-бітове ціле
 Front-right-center	MediaString		Фронт-правий-центр
+Side-right	MediaString		Боковий правий
  kHz	MediaString		 кГц
 Little endian	MediaString		від молодшого до старшого
 (unknown matrix mask)	MediaString		(невідома матрична маска)
 32 bit LAB	MediaString		32-бітовий LAB
+Side-left	MediaString		Боковий лівий
+{0, plural, one{# byte per buffer} other{# bytes per buffer}}	MediaString		{0, plural, one{# байт на буфер} few{# байти на буфер} other{# байтів на буфер}}
 32 bit CMYK	MediaString		32-бітовий CMYK
 (unknown multistream format)	MediaString		(невідомий мультипотоковий формат)
 8 bit integer	MediaString		8-бітове ціле
@@ -94,11 +102,13 @@ WAV format family	MediaString		Сімейство форматів WAV
  (NTSC)	MediaString		 (NTSC)
 Physical input	MediaString		Фізичний вхід
 Big endian	MediaString		від старшого до молодшого
+Sub	MediaString		Сабвуфер
 {0, plural,one{# byte (max)}other{# bytes (max)}}	MediaString		{0, plural, one{# байт (макс.)} few{# байти (макс.)} other{# байтів (макс.)}}
 YUV411	MediaString		YUV411
 Multistream media	MediaString		Мультипотокове медіа
 Encoded audio	MediaString		Кодоване аудіо
 Decrease precision	MediaString		Зниження точності
+File interface	MediaString		Файловий інтерфейс
 (unknown byte order)	MediaString		(невідомий порядок байтів)
 32 bit HSI	MediaString		32-бітовий HSI
 Typeless media	MediaString		Медіа без типу
@@ -112,6 +122,7 @@ Time source	MediaString		Лічильник часу
 ProLogic LR	MediaString		ProLogic LR
 {0, plural,one{# byte per frame}other{# bytes per frame}}	MediaString		{0, plural, one{# байт на кадр} few{# байти на кадр} other{# байтів на кадр}}
 Parameters	MediaString		Параметри
+Raw data from VBL area	MediaString		Необроблені дані простору VBL
 Top-Back-right	MediaString		Зверху-Тил-справа
 {0, plural, one{# byte per row}other{# bytes per row}}	MediaString		{0, plural, one{# байт на рядок} few{# байти на рядок} other{# байтів на рядок}}
 Left	MediaString		Лівий

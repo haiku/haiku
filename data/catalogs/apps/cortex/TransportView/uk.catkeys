@@ -1,4 +1,4 @@
-1	ukrainian	application/x-vnd.Cortex.TransportView	1402918430
+1	ukrainian	application/x-vnd.Cortex.TransportView	1534931965
 Roll	TransportView		Прокрутити
 (none)	TransportView		(пусто)
 {0, plural, one{# node} other{# nodes}}	TransportView		{0, plural, one{# нода} few{# ноди} other{# нод}}
@@ -19,4 +19,5 @@ Decrease precision	TransportView		Зниження точності
 System clock	TransportView		Системний годинник
 From:	TransportView		Від:
 Roll from	TransportView		Прокрутити з
+Preroll	TransportView		Спроба
 Run mode:	TransportView		Режим роботи:

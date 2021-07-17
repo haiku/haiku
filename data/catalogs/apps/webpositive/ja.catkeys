@@ -43,7 +43,7 @@ Open download error	Download Window		ダウンロードエラーを開く
 General	Settings Window		一般
 New tabs:	Settings Window		新しいタブ:
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url の読み込みに失敗しました
-Open downloads folder	Download Window		ダウンロードフォルダーを表示
+Open downloads folder	Download Window		ダウンロードフォルダーの表示
 Proxy server	Settings Window		プロキシサーバー
 Decrease size	WebPositive Window		縮小
 Default fixed font size:	Settings Window		等幅フォントサイズ:
@@ -109,7 +109,7 @@ Remove	Download Window		除去
 About	WebPositive Window		このソフトウェアについて
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		まだダウンロードが進行中です。本当に WebPositive をすぐに終了しますか?
 Continue downloads	WebPositive		ダウンロードを続ける
-Proxy server requires authentication	Settings Window		プロキシサーバーは認証を必要とする
+Proxy server requires authentication	Settings Window		プロキシサーバーが認証を要求する
 Cancel	Settings Window		中止
 History	WebPositive Window		履歴
 Reset size	WebPositive Window		リセット

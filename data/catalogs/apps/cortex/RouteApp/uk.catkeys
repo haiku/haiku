@@ -1,4 +1,4 @@
-1	ukrainian	application/x-vnd.Cortex.Route	1130016953
+1	ukrainian	application/x-vnd.Cortex.Route	25925955
 Node '%name%' released	CortexRouteApp		Нода '%name%' відключена
 OK	CortexRouteApp		ОК
 About Cortex/Route…	CortexRouteApp		Про Cortex/Route…
@@ -14,10 +14,13 @@ Connection broken	CortexRouteApp		З’єднання розірвано
 Untitled group	CortexRouteApp		Група без назви
 Connection failed	CortexRouteApp		З’єднатися не вдалося
 Connection '%name%' broken	CortexRouteApp		З’єднання '%name%' розірвано
+Between:	CortexRouteApp		Поміж:
 Cortex	CortexRouteApp		Cortex
 Open…	CortexRouteApp		Відкрити…
+Pull palettes	CortexRouteApp		Скріпити вікна
 Connection made	CortexRouteApp		З’єднання здійснено
 Show transport	CortexRouteApp		Показати Транспорт
 Show add-ons	CortexRouteApp		Показати Доповнення
 Quit	CortexRouteApp		Вийти
 Cortex/Route 2.1.2\n\nCopyright 1999-2000 Eric Moon\nAll rights reserved.\n\nThe Cortex Team:\n\nChristopher Lenz: UI\nEric Moon: UI, back-end\n\nThanks to:\nJohn Ashmun\nJon Watte\nDoug Wright\n<your name here>\n\nCertain icons used herein are the property of\nBe, Inc. and are used by permission.	CortexRouteApp		Cortex/Route 2.1.2\n\nCopyright 1999-2000 Eric Moon\nВсі права захищені.\n\nКоманда Cortex:\n\nChristopher Lenz: UI\nEric Moon: UI, back-end\n\nПодяка:\nJohn Ashmun\nJon Watte\nDoug Wright\n<тут може бути Ваше ім'я>\n\nДеякі значки, застосовані в програмі, є власністю\nBe, Inc. і використовуються маючи дозвіл.
+Tried format:	CortexRouteApp		Перевірений формат:

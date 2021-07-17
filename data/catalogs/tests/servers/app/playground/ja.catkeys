@@ -20,7 +20,7 @@ Invert	Playground		ネガの作成
 Clear all drawing objects?	Playground		オブジェクトをすべて削除しても良いですか?
 Width:	Playground		幅:
 Alpha	Playground		アルファ合成
-New object	Playground		新しいオブジェクト
+New object	Playground		新規オブジェクト
 Test	Playground		テスト
 Max	Playground		RGB最大値
 Add	Playground		RGB加算

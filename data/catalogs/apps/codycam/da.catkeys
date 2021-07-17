@@ -1,6 +1,7 @@
-1	danish	x-vnd.Haiku-CodyCam	40716723
+1	danish	x-vnd.Haiku-CodyCam	12021044
 destination directory expected	CodyCam		destination folder forventet
 reply: '%s'\n	SftpClient		svar: '%s'\n
+PASS <suppressed>  (real password sent)	FtpClient		PASS <udeladt>  (rigtige adgangskode sendt)
 JPEG image	CodyCam		JPEG billede
 Remote host has closed the connection.\n	FtpClient		Modpart har lukket forbindelsen.\n
 image file format expected	CodyCam		billedfilformat forventet
