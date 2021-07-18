@@ -1,0 +1,38 @@
+1	czech	x-vnd.Haiku-libsolvsolver	3404387783
+allow architecture change of %source% to %target%	SolverProblemSolution		umožnit změnu architektury %source% na %target%
+install %source% from excluded repository	SolverProblemSolution		nainstalovat %source% z vynechaného zdroje softwaru
+unspecified problem	SolverProblem		neurčený problém
+package %source% requires %dependency%, but none of the providers can be installed	SolverProblem		balíček %source% požaduje %dependency%, to ale od žádného z poskytovatelů není možné nainstalovat
+package %source% implicitly obsoletes %dependency% provided by %target%	SolverProblem		balíkček %source% implicitně činí zastaralým %dependency%, který poskytuje %target%
+nothing provides requested %dependency%	SolverProblem		nic neposkytuje požadovaný %dependency%
+do not keep %source% installed	SolverProblemSolution		nezanechávat %source% nainstalován
+do not deinstall \"%selection%\"	SolverProblemSolution		neodinstalovat \"%selection%\"
+install %source% despite its inferior architecture	SolverProblemSolution		nainstalovat %source% přes jeho podřadnou architekturu
+conflicting requests	SolverProblem		konfliktní požadavky
+do not install the most recent version of \"%selection%\"	SolverProblemSolution		neinstalovat nejnovější verzi \"%selection%\"
+allow replacement of %source% with %target%	SolverProblemSolution		umožnit náhradu %source% za %target%
+package %source% obsoletes %dependency% provided by %target%	SolverProblem		balíček %source% činí zastaralým %dependency%, který poskytuje %target%
+do not forbid installation of %source%	SolverProblemSolution		nezakazovat instalaci %source%
+allow downgrade of %source% to %target%	SolverProblemSolution		umožnit snížení verze %source% na %target%
+dependency problem	SolverProblem		problém se závislostí
+%dependency% is provided by the system	SolverProblem		%dependency% poskytuje systém
+keep %source% despite its inferior architecture	SolverProblemSolution		ponechat %source% přes jeho podřadnou architekturu
+%source% does not belong to a distupgrade repository	SolverProblem		%source% nepatří do zdroje softwaru distupgrade
+installed package %source% obsoletes %dependency% provided by %target%	SolverProblem		nainstalovaný balíček %source% činí zastaralým %dependency%, který poskytuje %target%
+allow name change of %source% to %target%	SolverProblemSolution		umožnit změnu názvu %source% na %target%
+package %source% conflicts with %dependency% provided by %target%	SolverProblem		balíček %source% je v konfliktu s %dependency%, který poskytuje %target%
+do something	SolverProblemSolution		něco udělat
+install %selection% despite its old version	SolverProblemSolution		nainstalovat %selection% přes jeho starou verzi
+cannot install both %source% and %target%	SolverProblem		není možné nainstalovat %source% a %target% zároveň
+package %source% is not installable	SolverProblem		balíček %source% není možné nainstalovat
+problem with installed package %source%	SolverProblem		problém s nainstalovaným balíčkem %source%
+allow deinstallation of %source%	SolverProblemSolution		umožnit odinstalování %source%
+keep %source% from excluded repository	SolverProblemSolution		ponechat %source% mimo vynechaného zdroje softwaru
+keep old %source%	SolverProblemSolution		ponechat starý %source%
+package %source% conflicts with %dependency% provided by itself	SolverProblem		balíček %source% je v konfliktu s %dependency%, kterou sám poskytuje
+allow vendor change from \"%sourceVendor%\" (%source%) to \"%targetVendor%\" (%target%)	SolverProblemSolution		umožnit změnu dodavatele z \"%sourceVendor%\" (%source%) na \"%targetVendor%\" (%target%)
+do not lock \"%selection%\"	SolverProblemSolution		nezamykat \"%selection%\"
+do not install \"%selection%\"	SolverProblemSolution		neinstalovat \"%selection%\"
+nothing provides %dependency% needed by %source%	SolverProblem		nic neposkytuje %dependency%, který potřebuje %source%
+%source% has inferior architecture	SolverProblem		%source% má podřadnou architekturu
+do not deinstall all resolvables \"%selection%\"	SolverProblemSolution		neodinstalovat všechny řešitelné \"%selection%\"

@@ -1,0 +1,8 @@
+1	czech	application/x-vnd.Cortex.ParameterView	1295152157
+Themes	ParameterWindow		Motivy
+Start control panel	ParameterWindow		Spustit ovládací panel
+%nodeinfo% parameters	ParameterWindow		%nodeinfo% parametry
+OK	ParameterWindow		OK
+Window	ParameterWindow		Okno
+Could not start control panel (%error%)	ParameterWindow		Nepodařilo se otevřít ovládací panel (%error%)
+Close	ParameterWindow		Zavřít

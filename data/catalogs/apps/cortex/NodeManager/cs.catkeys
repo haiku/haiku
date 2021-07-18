@@ -1,0 +1,7 @@
+1	czech	application/x-vnd.Cortex.NodeManager	1301322433
+System audio mixer	NodeManager		Systémový směšovač zvuků
+System video output	NodeManager		Systémový video výstup
+System video input	NodeManager		Systémový video vstup
+No name	NodeManager		Bez názvu
+System audio input	NodeManager		Systémový zvukový vstup
+Time sources	NodeManager		Zdroje času

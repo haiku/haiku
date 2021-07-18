@@ -1,4 +1,4 @@
-1	russian	application/x-vnd.Cortex.MediaRoutingView	810580958
+1	russian	application/x-vnd.Cortex.MediaRoutingView	1481422791
 Lock group	MediaNodePanel		Заблокировать группу
 %refname% (no file)	MediaNodePanel		%refname% (нет файла)
 Video output	MediaRoutingView		Видеовыход
@@ -17,6 +17,7 @@ Could not disconnect	MediaRoutingView		Не удалось разъединит�
 Could not instantiate '%infoname%'	MediaRoutingView		Не удалось создать '%infoname%'
 Mini icon view	MediaRoutingView		Маленькие значки
 Select all	MediaRoutingView		Выбрать все
+(same as group)	MediaNodePanel		(такое же, как у группы)
 Input	MediaJack		Вход
 Get info	MediaJack		Информация
 Error	MediaRoutingView		Ошибка

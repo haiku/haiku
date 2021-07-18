@@ -1,0 +1,16 @@
+1	czech	x-vnd.haiku-package_daemon	1440586681
+Package changes	PackageResult	Window title	Změny balíčků
+uninstall package %s\n	PackageResult	Don't change '%s' variable	odinstalovat balíček %s\n
+ignore problem for now	PackageProblem		prozatím problém ignorovat
+solution %d:	PackageProblem	Don't change the %d variable	řešení %d:
+The following problems have been encountered. Please select a solution for each:	PackageProblem		Došlo k následujícím problémům. Pro každý, prosím, vyberte řešení:
+Apply changes	PackageResult		Použít změny
+Package daemon	PackageManager		Služba balíčků
+install package %s from repository %s\n	PackageResult	Don't change '%s' variables	instalovat balíček %s z repozitáře %s\n
+The following additional package changes have to be made:	PackageResult		Navíc je třeba udělat změny následujících balíčků:
+Warning	PackageManager		Varování
+Cancel	PackageProblem		Zrušit
+don't activate package %source%	PackageProblem	don't change '%source%	neaktivovat balíček %source%
+Cancel	PackageResult		Zrušit
+Retry	PackageProblem		Znovu
+Package problems	PackageProblem	Window title	Problémy balíčku

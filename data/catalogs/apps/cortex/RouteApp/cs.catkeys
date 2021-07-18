@@ -1,0 +1,26 @@
+1	czech	application/x-vnd.Cortex.Route	25925955
+Node '%name%' released	CortexRouteApp		Uzel '%name%' uvolněn
+OK	CortexRouteApp		OK
+About Cortex/Route…	CortexRouteApp		O Cortex/Route…
+File	CortexRouteApp		Soubor
+Connection '%name%' made	CortexRouteApp		Vytrořeno připojení '%name%'
+Save nodes…	CortexRouteApp		Uložit uzly…
+%producer% and %consumer%	CortexRouteApp		%producer% a %consumer%
+Node '%name%' created	CortexRouteApp		Uzel '%name%' vytvořen
+Negotiated format:	CortexRouteApp		Vyjednaný formát:
+Window	CortexRouteApp		Okno
+Transport	CortexRouteApp		Přenos
+Connection broken	CortexRouteApp		Přerušeno spojení
+Untitled group	CortexRouteApp		Nepojmenovaná skupina
+Connection failed	CortexRouteApp		Selhalo spojení
+Connection '%name%' broken	CortexRouteApp		Spojení '%name%' je rozbité
+Between:	CortexRouteApp		Mezi:
+Cortex	CortexRouteApp		Kortex
+Open…	CortexRouteApp		Otevřít…
+Pull palettes	CortexRouteApp		Tahací palety
+Connection made	CortexRouteApp		Spojení vytvořeno
+Show transport	CortexRouteApp		Zobrazit přenos
+Show add-ons	CortexRouteApp		Zobrazit doplňky
+Quit	CortexRouteApp		Ukončit
+Cortex/Route 2.1.2\n\nCopyright 1999-2000 Eric Moon\nAll rights reserved.\n\nThe Cortex Team:\n\nChristopher Lenz: UI\nEric Moon: UI, back-end\n\nThanks to:\nJohn Ashmun\nJon Watte\nDoug Wright\n<your name here>\n\nCertain icons used herein are the property of\nBe, Inc. and are used by permission.	CortexRouteApp		Cortex/Route 2.1.2\n\nCopyright 1999-2000 Eric Moon\nVšechna práva vyhrazena.\n\nTým Cortex:\n\nChristopher Lenz: UI\nEric Moon: UI, back-end\n\nPoděkování:\nJohn Ashmun\nJon Watte\nDoug Wright\n<your name here>\n\nNěkteré zde použité ikony jsou vlastnictvím\nBe, Inc. a jsou použity se svolením.
+Tried format:	CortexRouteApp		Zkoušený formát:

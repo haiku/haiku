@@ -1,4 +1,4 @@
-1	russian	application/x-vnd.Cortex.Route	1282662787
+1	russian	application/x-vnd.Cortex.Route	3665151149
 Node '%name%' released	CortexRouteApp		Узел "%name%" свободен
 OK	CortexRouteApp		ОК
 About Cortex/Route…	CortexRouteApp		О программе Cortex/Route…
@@ -13,7 +13,10 @@ Connection broken	CortexRouteApp		Соединение разорвано
 Untitled group	CortexRouteApp		Группа без названия
 Connection failed	CortexRouteApp		Не удалось установить соединение
 Connection '%name%' broken	CortexRouteApp		Соединение '%name%' разорвано
+Between:	CortexRouteApp		Между:
 Open…	CortexRouteApp		Открыть…
 Connection made	CortexRouteApp		Соединение выполнено
 Show transport	CortexRouteApp		Показать транспорт
+Show add-ons	CortexRouteApp		Показать аддоны
 Quit	CortexRouteApp		Выход
+Cortex/Route 2.1.2\n\nCopyright 1999-2000 Eric Moon\nAll rights reserved.\n\nThe Cortex Team:\n\nChristopher Lenz: UI\nEric Moon: UI, back-end\n\nThanks to:\nJohn Ashmun\nJon Watte\nDoug Wright\n<your name here>\n\nCertain icons used herein are the property of\nBe, Inc. and are used by permission.	CortexRouteApp		Cortex/Route 2.1.2\n\nАвторское право 1999-2000 Eric Moon\nВсе права защищены.\n\nThe Cortex Team:\n\nChristopher Lenz: UI\nEric Moon: UI, back-end\n\nОтдельное спасибо:\nJohn Ashmun\nJon Watte\nDoug Wright\n<ваше имя здесь>\n\nНекоторые иконки здесь принадлежат\nBe, Inc. и использованы по разрешению.

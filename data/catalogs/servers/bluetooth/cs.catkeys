@@ -1,0 +1,7 @@
+1	czech	x-vnd.Haiku-bluetooth_server	3418434903
+Stopping the Bluetooth server failed.	BluetoothReplicant		Selhalo zastavení Bluetooth serveru.
+Bluetooth error	BluetoothReplicant		Chyba bluetooth
+Settings…	BluetoothReplicant		Nastavení…
+OK	BluetoothReplicant		OK
+Error: %status%	BluetoothReplicant		Chyba: %status%
+Quit	BluetoothReplicant		Ukončit

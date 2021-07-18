@@ -1,0 +1,17 @@
+1	czech	x-vnd.Haiku-MatchHeader	1946584206
+Delete message	ConfigView		Smazat zprávu
+Match \"%attribute\" against \"%regex\"	RuleFilter		Shoda \"%attribute\" vůči \"%regex\"
+Match header	RuleFilter		Shoda hlavičky
+Set flags to	ConfigView		Nastavit příznaky na
+Header field (e.g. Subject, From, …)	ConfigView		Hlavička (např. Předmět, Od, ...)
+<Choose account>	ConfigView		<Zvolte účet>
+Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Hodnota se zástupnými znaky jako například \"*spam*\".\nPoužijte předponu \"REGEX:\" pokud chcete použít regulární výraz.
+Then	ConfigView		Pak
+If	ConfigView		Jestliže
+Set as read	ConfigView		Nastavit jako přečtené
+Reply with	ConfigView		Odpovědět pomocí
+<Choose action>	ConfigView		<Zvolte akci>
+Move to	ConfigView		Přesunout do
+this field is based on the action	ConfigView		toto pole je založeno na operaci
+Account	ConfigView		Účet
+has	ConfigView		má

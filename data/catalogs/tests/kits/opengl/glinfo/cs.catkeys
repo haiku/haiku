@@ -1,0 +1,27 @@
+1	czech	x-vnd.Haiku-GLInfo	1282327690
+Maximum clipping planes	Capabilities		Maximální oříznutí roviny
+Maximum evaluators equation order	Capabilities		Maximální řád počítaných rovnic
+Texture stack size	Capabilities		Velikost zásobníku textur
+GL Info	System name		Info GL
+Information	InfoView		Informace
+Attributes stack size	Capabilities		Velikost zásobníku atributů
+Maximum lights	Capabilities		Maximum světel
+Extensions	Extensions		Rozšíření
+Available extensions	Extensions		Dostupná rozšíření
+Maximum recommended vertex elements	Capabilities		Doporučené maximum vrcholů
+Value	Capabilities		Hodnota
+Name stack size	Capabilities		Velikost zásobníku názvů
+Capabilities	Capabilities		Schopnosti
+Maximum texture units	Capabilities		Maximum texturovacích jednotek
+Unknown or missing OpenGL renderer.	InfoView		Neznámý nebo chybějící vykreslovač OpenGL.
+Capability	Capabilities		Schopnost
+Maximum 2D texture size	Capabilities		Maximální rozměr 2D textury
+Auxiliary buffer(s)	Capabilities		Pomocná vyrovnávací paměť
+Unknown vendor	InfoView		Neznámý dodavatel
+Maximum convolution	Capabilities		Maximální konvoluce
+Maximum 3D texture size	Capabilities		Maximální rozměr 3D textur
+Maximum recommended index elements	Capabilities		Doporučené maximum indexů
+Unknown version	InfoView		Neznámá verze
+List stack size	Capabilities		Velikost zásobníku seznamu
+Model stack size	Capabilities		Velikost zásobníku modelu
+Projection stack size	Capabilities		Velikost zásobníku projekce

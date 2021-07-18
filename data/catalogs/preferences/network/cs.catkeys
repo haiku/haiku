@@ -1,0 +1,55 @@
+1	czech	x-vnd.Haiku-Network	543099905
+Ethernet device	InterfaceListItem		Ethernetové zařízení
+Link speed:	IntefaceView		Rychlost spojení:
+disconnected	IntefaceView		odpojeno
+WPA	WPA protected network		WPA
+Network:	IntefaceView		Síť:
+Received:	IntefaceView		Přijato:
+New…	NetworkWindow		Nová…
+no link	InterfaceListItem		žádné spojení
+Other	NetworkWindow		Ostatní
+Sent:	IntefaceView		Odesláno:
+Gateway:	IntefaceAddressView		Brána:
+The netmask defines your local network	IntefaceAddressView		Síťová maska definuje vaši místní síť
+Your IP address	IntefaceAddressView		Vaše adresa IP
+DHCP	IntefaceAddressView		DHCP
+IP address:	IntefaceAddressView		Adresa IP:
+Netmask:	IntefaceAddressView		Síťová maska:
+EAP	EAP protected network		EAP
+Services	NetworkWindow		Služby
+Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Instalace stavu sítě do panelu selhala: %s
+Revert	NetworkWindow		Vrátit
+off	ServiceListItem		vypnuto
+WEP	WEP protected network		WEP
+<no wireless networks found>	IntefaceView		<nenalezena žádná bezdrátová síť>
+Enable	IntefaceView		Povolit
+connected	IntefaceView		připojeno
+Apply	IntefaceAddressView		Použít
+Disable	ServiceView		Zakázat
+WPA2	WPA2 protected network		WPA2
+Show network status in Deskbar	NetworkWindow		Zobrazit stav sítě na panelu
+Mode:	IntefaceAddressView		Režim:
+connected	InterfaceListItem		připojeno
+OK	NetworkWindow		OK
+Static	IntefaceAddressView		Statická
+launch error	NetworkWindow		chyba spuštění
+Renegotiate	IntefaceView		Znovu vyjednat
+MAC address:	IntefaceView		Adresa MAC:
+%name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
+disabled	InterfaceListItem		zakázané
+Dial-up connection	InterfaceListItem		Vytáčené připojení
+on	ServiceListItem		zapnuto
+The method for obtaining an IP address	IntefaceAddressView		Způsob získávání IP adresy
+disconnected	InterfaceListItem		odpojeno
+Automatic	IntefaceAddressView		Automaticky
+Choose automatically	IntefaceView		Vybrat automaticky
+Status:	IntefaceView		Stav:
+Disable	IntefaceView		Zakázat
+Manage…	NetworkWindow		Spravovat…
+open	Open network		otevřená
+Network	System name		Síť
+Your gateway to the internet	IntefaceAddressView		Vaše brána do internetu
+Enable	ServiceView		Povolit
+Wireless device	InterfaceListItem		Bezdrátové zařízení
+Disabled	IntefaceAddressView		Zakázáno
+VPN connection	InterfaceListItem		Připojení VPN

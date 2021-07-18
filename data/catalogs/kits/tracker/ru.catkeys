@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	2033262428
+1	russian	x-vnd.Haiku-libtracker	256413178
 Created	ContainerWindow		Создан
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Открыть и сделать предпочтительным
@@ -329,6 +329,7 @@ Recent folders	FavoritesMenu		Недавние папки
 Signed memory size	AttributesView		Установленный размер памяти
 The specified name is illegal. Please choose another name.	FilePanelPriv		Введённое имя недопустимо. Введите какое-нибудь другое.
 of %items	StatusWindow		из %items
+MIME Path	AttributesView		MIME Путь
 less than	FindPanel		меньше чем
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Ошибка при копировании файла \"%name\":\n\t%error\n\nВы хотите продолжить?
 Creating links: 	StatusWindow		Создание ссылок: 

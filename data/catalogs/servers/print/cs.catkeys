@@ -1,0 +1,55 @@
+1	czech	x-vnd.Be-PSRV	1222926379
+Undefined	ConfigWindow		Nedefinováno
+Return the number of available transports	PrintServerApp Scripting		Zobrazit počet dostupných přenosů
+Return the number of available printers	PrintServerApp Scripting		Zobrazit počet dostupných tiskáren
+Get currently available ports/devices	Transport Scripting		Získat aktuálně dostupné porty/zařízení
+Retrieve or select the active printer	PrintServerApp Scripting		Načíst nebo zvolit aktivní tiskárnu
+Cancel	PrintServerApp		Zrušit
+Retrieve a specific printer	PrintServerApp Scripting		Načíst určitou tiskárnu
+Page %1 to %2	ConfigWindow		Stránky %1 až %2
+Get name of the printer add-on used for this printer	Printer Scripting		Získat jméno doplňku pro tuto tiskárnu
+B5 (JIS)	ConfigWindow	JIS P0138 B5, a Japanese paper size	B5 (JIS)
+OK	ConfigWindow		OK
+Cancel	ConfigWindow		Zrušit
+Printer server	ConfigWindow		Tiskový server
+Page %1 to %2, %3 copies	ConfigWindow		Stránky %1 až %2, %3 kopie
+A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Tiskárna s tímto názvem již existuje, ale její ovladač nebyl nalezen! Nahradit?
+Yes	PrintServerApp		Ano
+Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	ANSI B (ledger)
+Would you like to set one up now?	PrintServerApp		Chcete nastavit nyní?
+Print job setup:	ConfigWindow		Nastavení tiskové úlohy:
+A6	ConfigWindow	ISO 216 paper size	A6
+Portrait	ConfigWindow		Portrét
+All pages	ConfigWindow		Všechny stránky
+There is no default printer set up.	PrintServerApp		Není nastavena výchozí tiskárna.
+B5	ConfigWindow	ISO 216 paper size	B5
+A0	ConfigWindow	ISO 216 paper size	A0
+Letter	ConfigWindow	ANSI A (letter), a North American paper size	ANSI A (dopis)
+Printer:	ConfigWindow		Tiskárna:
+A2	ConfigWindow	ISO 216 paper size	A2
+Select a printer	ConfigWindow		Vybrat tiskárnu
+Show configuration window	PrintServerApp Scripting		Zobrazit okno nastavení
+A4	ConfigWindow	ISO 216 paper size	A4
+Get comments about this printer	Printer Scripting		Získat komentáře k této tiskárně
+A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		Tiskárna s tímto názvem již existuje, ale není vůbec použitelná! Nahradit?
+No	PrintServerApp		Ne
+Get the transport configuration for this printer	Printer Scripting		Získat nastavení přenosu pro tuto tiskárnu
+Landscape	ConfigWindow		Krajina
+Legal	ConfigWindow	A North American paper size (216 x 356 mm, or 8.5 x 14 in)	Legal
+There are no printers set up.	PrintServerApp		Nejsou nastaveny žádné tiskárny.
+Get name of the transport add-on used for this printer	Printer Scripting		Získat jméno doplňku přenosu pro tuto tiskárnu
+All pages, %1 copies	ConfigWindow		Všechny stránky, %1 kopie
+Delete a specific printer	PrintServerApp Scripting		Odstranit určitou tiskárnu
+Create a new printer	PrintServerApp Scripting		Vytvořit novou tiskárnu
+OK	PrintServerApp		OK
+Print setup	ConfigWindow		Nastavení tisku
+A1	ConfigWindow	ISO 216 paper size	A1
+Retrieve a specific transport	PrintServerApp Scripting		Získat určitý přenos
+Get name of printer	Printer Scripting		Získat jméno tiskárny
+A3	ConfigWindow	ISO 216 paper size	A3
+Get name of transport	Transport Scripting		Získat jméno přenosu
+A5	ConfigWindow	ISO 216 paper size	A5
+Would you like to make @ the default printer?	PrintServerApp		Chcete nastavit @ jako výchozí tiskárnu?
+Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	ANSI B (tabloid)
+Page setup	ConfigWindow		Nastavení stránky
+Paper setup:	ConfigWindow		Nastavení papíru:

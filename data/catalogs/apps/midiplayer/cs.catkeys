@@ -1,0 +1,20 @@
+1	czech	x-vnd.Haiku-MidiPlayer	1046133011
+This tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Tento malý program\ndokáže zahrát tisíce\nkýčovitě znějících písní
+Dungeon	Main Window		Hrobka
+Could not load song	Main Window		Skladbu nelze načíst
+Igor's lab	Main Window		Igorova laboratoř
+Off	Main Window		Vypnuto
+Loading instruments…	Scope View		Načítání nástrojů…
+Volume:	Main Window		Hlasitost:
+Closet	Main Window		Komora
+Scope	Main Window		Dráha
+Drop MIDI file here	Scope View		Upusťte MIDI soubor zde
+None	Main Window		Žádný
+Reverb:	Main Window		Ozvěna:
+MidiPlayer	System name		Přehrávač MIDI
+OK	Main Window		OK
+Stop	Main Window		Stop
+Live input:	Main Window		Živý vstup:
+Garage	Main Window		Garáž
+Play	Main Window		Přehrát
+Cavern	Main Window		Jeskyně

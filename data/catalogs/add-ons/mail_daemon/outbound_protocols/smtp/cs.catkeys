@@ -1,0 +1,14 @@
+1	czech	x-vnd.Haiku-SMTP	815985329
+POP3 authentication failed. The server said:\n	smtp		Autentifikace POP3 selhala. Server odpověděl:\n
+Destination:	ConfigView		Cíl:
+Error while logging in to %serv	smtp		Chyba při přihlašovaní k %serv
+Connecting to server…	smtp		Připojování k serveru…
+Unencrypted	ConfigView		Nešifrované
+. The server says:\n	smtp		. Server říká:\n
+Error while opening connection to %serv	smtp		Chyba při otevírání spojení s %serv
+. The server said:\n	smtp		. Server odpověděl:\n
+None	ConfigView		Žádné
+SMTP server:	ConfigView		Server SMTP:
+ESMTP	ConfigView		ESMTP
+POP3 before SMTP	ConfigView		POP3, potom SMTP
+SSL	ConfigView		SSL

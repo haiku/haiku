@@ -1,0 +1,146 @@
+1	czech	application/x-vnd.Cortex.support	2630173556
+Header has flags	MediaString		Hlavička má příznaky
+32 bit HLS	MediaString		32 bitů HLS
+Recording	MediaString		Nahrávám
+(unknown format)	MediaString		(neznámý formát)
+Clean buffers	MediaString		Vyčistit zásobníky
+{0, plural,one{# frame forward}other{# frames forward}}	MediaString		{0, plural,one{# snímek dopředu}few{# snímky dopředu}other{# snímků dopředu}}
+Rear-right	MediaString		Pravý zadní
+{0, plural, one{# pixel} other{# pixels}}	MediaString		{0, plural, one{# pixel} few{# pixely} other{# pixelů}}
+Mono	MediaString		Mono
+MPEG1	MediaString		MPEG1
+ASF format family	MediaString		Skupina formátů ASF
+Encoded video	MediaString		Převedené video
+YUV444	MediaString		YUV444
+Port	MediaString		Port
+Top-Front-left	MediaString		Horní-přední-levý
+24 bit LAB	MediaString		24 bitů LAB
+16 bit integer	MediaString		16 bitové celé číslo
+32 bit HSVA	MediaString		32 bitů HSVA
+YCbCr411	MediaString		YCbCr411
+Offline	MediaString		Odpojené
+YUV422	MediaString		YUV422
+(unkown video orientation)	MediaString		(neznámá orientace videa)
+QuickTime	MediaString		QuickTime
+32 bit HLSA	MediaString		32 bitů HLSA
+Top-Front-center	MediaString		Horní-přední-prostřední
+BeOS format family	MediaString		Skupina formátů BeOS
+24 bit HSV	MediaString		24 bitů HSV
+Back-center	MediaString		Zadní-prostřední
+32 bit CMY	MediaString		32 bitů CMY
+{0, plural, other{# bit integer}}	MediaString		{0, plural, other{# bitové celé číslo}}
+Ambisonic WXYZ	MediaString		Ambisonické WXYZ
+(unknown video format)	MediaString		(neznámý video formát)
+AVI format family	MediaString		Skupina formátů AVI
+Homogenous buffers	MediaString		Homogenní zásobník
+Interlaced 	MediaString		Prokládaný 
+{0, plural, one{# channel}other{# channels}}	MediaString		{0, plural, one{# kanál}few{# kanály}other{# kanálů}}
+15 bit RGBA	MediaString		15 bit RGBA
+Drop data	MediaString		Zahodit data
+AVI	MediaString		AVI
+YUV9	MediaString		YUV9
+ Hz	MediaString		 Hz
+Right	MediaString		Pravý
+32 bit RGB	MediaString		32 bitů RGB
+Video data between line u and u	MediaString		Video data mezi řádky u a u
+System mixer	MediaString		Systémový směšovač
+Physical output	MediaString		Fyzický výstup
+Top-Back-center	MediaString		Horní-zadní-prostřední
+YUV420	MediaString		YUV420
+Top to bottom, left to right	MediaString		Shora dolů. zleva doprava
+(unknown run mode)	MediaString		(neznámý mód běhu)
+ kb/s	MediaString		 kb/s
+24 bit HSI	MediaString		24 bitů HSI
+User-defined media type	MediaString		Uživatelsky definovaný typ média
+32 bit CMYA	MediaString		32 bitů CMYA
+Rear-left	MediaString		Zadní levý
+QuickTime format family	MediaString		Skupina formátů QuickTime
+Any format family	MediaString		Jakákoli skupina formátů
+Timecode	MediaString		Časový kód
+Top-Front-right	MediaString		Horní-přední-pravý
+32 bit float	MediaString		32 bitové reálné číslo
+Controllable	MediaString		Ovladatelné
+32 bit integer	MediaString		32 bitové celé číslo
+Front-right-center	MediaString		Přední-pravý-střední
+Side-right	MediaString		Boční-pravý
+ kHz	MediaString		 kHz
+Little endian	MediaString		Malý endian
+(unknown matrix mask)	MediaString		(nezámá maticová maska)
+32 bit LAB	MediaString		32 bitů LAB
+Side-left	MediaString		Boční-levý
+{0, plural, one{# byte per buffer} other{# bytes per buffer}}	MediaString		{0, plural, one{# bajt na vyrovnávací paměť} few{# bajty na vyrovnávací paměť} other{# bajtů na vyrovnávací paměť}}
+32 bit CMYK	MediaString		32 bitů CMYK
+(unknown multistream format)	MediaString		(neznámý víceproudový formát)
+8 bit integer	MediaString		8 bitové celé číslo
+8 bit grayscale-index	MediaString		8 bitový černobílý indexovaný
+YCbCr444	MediaString		YCbCr444
+Buffer producer	MediaString		Tvůrce vyrovnávací paměti
+Buffer consumer	MediaString		Požírač vyrovnávací paměti
+Increase latency	MediaString		Zvýšit prodlení
+Front-left-center	MediaString		Přední-levý-prostřední
+MPEG format family	MediaString		Skupina formátů MPEG
+(none)	MediaString		(nic)
+Center	MediaString		Střední
+ kb/s (max)	MediaString		 kb/s (max)
+Monochrome	MediaString		Černobílý
+Private Be media type	MediaString		Soukromý typ médií Be
+24 bit UVL	MediaString		24 bitů UVL
+32 bit HSV	MediaString		32 bitů HSV
+ID	MediaString		ID
+AIFF format family	MediaString		Skupina formátů AIFF
+Top-Back-left	MediaString		Horní-zadní-levý
+16 bit RGB	MediaString		16 bitů RGB
+YCbCr422	MediaString		YCbCr422
+Raw audio	MediaString		Surový zvuk
+32 bit LABA	MediaString		32 bitů LABA
+24 bit HLS	MediaString		24 bitů HLS
+Non-interlaced 	MediaString		Neprokládaný 
+{0, plural,one{# byte (avg)}other{# bytes (avg)}}	MediaString		{0, plural,one{# bajt (průměrně)},few{# bajty (průměrně)},other{# bajtů (průměrně)}}
+MIDI	MediaString		MIDI
+YUV12	MediaString		YUV12
+WAV format family	MediaString		Skupina formátů WAV
+ (NTSC)	MediaString		 (NTSC)
+Physical input	MediaString		Fyzický vstup
+Big endian	MediaString		Velký endian
+Sub	MediaString		Sub
+{0, plural,one{# byte (max)}other{# bytes (max)}}	MediaString		{0, plural,one{# bajt (max)}few{# bajty (max)}other{# bajtů (max)}}
+YUV411	MediaString		YUV411
+Multistream media	MediaString		Víceprodová média
+Encoded audio	MediaString		Převedený zvuk
+Decrease precision	MediaString		Snížit přesnost
+File interface	MediaString		Souborové rozhraní
+(unknown byte order)	MediaString		(neznámé pořadí bajtů)
+32 bit HSI	MediaString		32 bitů HSI
+Typeless media	MediaString		Média bez typu
+ (PAL)	MediaString		 (PAL)
+32 bit RGBA	MediaString		32 bitů RGBA
+YCbCr420	MediaString		YCbCr420
+ kb/s (avg)	MediaString		 kb/s (průměrně)
+HTML	MediaString		HTML
+Time source	MediaString		Zdroj času
+15 bit RGB	MediaString		15 bitů RGB
+ProLogic LR	MediaString		ProLogic LR
+{0, plural,one{# byte per frame}other{# bytes per frame}}	MediaString		{0, plural,one{# bajt na snímek}few{# bajty na snímek}other{# bajtů na snímek}}
+Parameters	MediaString		Parametry
+Raw data from VBL area	MediaString		Surová data z oblasti VBL
+Top-Back-right	MediaString		Horní-zadní-pravý
+{0, plural, one{# byte per row}other{# bytes per row}}	MediaString		{0, plural, one{# bajt na řádek}few{# bajty na řádek}other{# bajtů na řádek}}
+Left	MediaString		Levý
+BeOS video	MediaString		BeOS video
+24 bit CMY	MediaString		24 bitů CMY
+32 bit UVLA	MediaString		32 bitů UVLA
+Top-center	MediaString		Horní-prostřední
+Entity interface	MediaString		Rozhraní jednotky
+Stereo	MediaString		Stereo
+8 bit color-index	MediaString		8 bitový barevný indexovaný
+Bottom to top, left to right	MediaString		Zespoda nahoru, zleva doprava
+32 bit UVL	MediaString		32 bitů UVL
+{0, plural, one{# line} other{# lines}}	MediaString		{0, plural, one{# řádek}few{# řádky} other{# řádků}}
+Text	MediaString		Text
+Unknown media type	MediaString		Neznámý typ médií
+MPEG2	MediaString		MPEG2
+Miscellaneous format family	MediaString		Rodina různých formátů
+24 bit RGB	MediaString		24 bitů RGB
+{0, plural,one{# frame backward}other{# frames backward}}	MediaString		{0, plural,one{# snímek zpět}few{# snímky zpět}other{# snímků zpět}}
+32 bit HSIA	MediaString		32 bitů HSIA
+Raw video	MediaString		Surové video

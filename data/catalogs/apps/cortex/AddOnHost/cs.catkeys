@@ -1,0 +1,5 @@
+1	czech	application/x-vnd.Cortex.AddOnHost	1256552338
+Continue	CortexAddOnHost		Pokračovat
+Cortex AddOnHost	CortexAddOnHost		Cortex doplněk hostitel
+Quit	CortexAddOnHost		Ukončit
+This program runs in the background, and is started automatically by Cortex when necessary. You probably don't want to start it manually.	CortexAddOnHost		Tato aplikace běží na pozadí a spouští se automaticky Cortexem když je třeba. Nejspíš ji nechcete spustit ručně.

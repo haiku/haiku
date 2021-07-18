@@ -1,0 +1,90 @@
+1	czech	x-vnd.Haiku-StyledEdit	2796309255
+Document statistics	Statistics		Statistika dokumentu
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nemohu se vrátit, soubor nenalezen: \"%s\".
+Cut	Menus		Vystřihnout
+Center	Menus		Na střed
+Increase size	Menus		Zvětšit velikost
+Page setup…	Menus		Nastavení stránky...
+Wrap-around search	FindandReplaceWindow		Vyhledávání zalomení
+Untitled 	StyledEditWindow		Neoznačeno
+OK	Statistics		OK
+Find	FindandReplaceWindow		Najít
+New	Menus		Nový
+Document	Menus		Dokument
+Search backwards	FindandReplaceWindow		Hledat zpětně
+Find again	Menus		Najít další
+Read-only	StatusView		Pouze pro čtení
+Save	Menus		Uložit
+Cancel	QuitAlert		Zrušit
+Copy	Menus		Kopírovat
+Reload	NodeMonitorAlerts		Obnovit
+line %d, column %d	StatusView		řádek %d, sloupec %d
+Words:	Statistics		Slova:
+???	LoadAlert		???
+Recover	NodeMonitorAlerts		Obnovit
+Error saving \"%s\":\n%s	SaveAlert		Chyba při ukládání \"%s\":\n%s
+OK	RevertToSavedAlert		OK
+Unlock file	StatusView		Odemknout soubor
+Italic	Menus		Kurzíva
+Can't undo	Menus		Nelze vrátit zpět
+Replace…	Menus		Nahradit...
+File	Menus		Soubor
+Paste	Menus		Vložit
+Bold	Menus		Tučně
+File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Soubor \"%file%\" změnila jiná aplikace. Chcete ho znovu načíst?
+File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Soubor \"%file%\" odstranila jiná aplikace. Chcete ho obnovit?
+Lines:	Statistics		Řádky:
+Replace in all windows	FindandReplaceWindow		Nahradit ve všech oknech
+\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" má neuložené změny.\nChcete vrátit zpět jeho poslední uloženou verzi? 
+Save	SaveAlert		Uložit
+Default	Open_and_SaveAsPanel		Původní
+Cancel	RevertToSavedAlert		Zrušit
+Cancel	FindandReplaceWindow		Zrušit
+Statistics…	Menus		Statistika...
+Encoding	Open_and_SaveAsPanel		Kódování
+Replace all	FindandReplaceWindow		Nahradit vše
+Close	Menus		Zavřít
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Chyba při načítání \"%s\":\n\tNepodporovaný formát
+Left	Menus		Vlevo
+Default	Menus		Původní
+OK	SaveAlert		OK
+Color	Menus		Barva
+Save changes to the document \"%s\"? 	QuitAlert		Uložit změny do dokumentu \"%s\"?
+StyledEdit	System name		Stylizovaný editor
+Find:	FindandReplaceWindow		Najít:
+Undo typing	QuitAlert		Zpět psaní
+Error loading \"%s\":\n\t%s	LoadAlert		Chyba při nahrávání \"%s\":\n\t%s
+Don't save	SaveAlert		Neukládat
+Reload…	Menus		Znovu načíst...
+Print…	Menus		Tisk...
+Quit	Menus		Ukončit
+Redo typing	QuitAlert		Znovu psaní
+Ignore	NodeMonitorAlerts		Ignorovat
+Wrap lines	Menus		Zlom řádků
+Text encoding	Menus		Kódování textu
+Unable to unlock file\n\t%s	QuitAlert		Nebylo možné odemknout soubor\n\t%s
+Modified	StatusView		Změněný
+OK	LoadAlert		OK
+Save	QuitAlert		Uložit
+Case-sensitive	FindandReplaceWindow		Citlivé na velikost písmen
+Find selection	Menus		Najdi výběr
+Find…	Menus		Najít...
+Cancel	SaveAlert		Zrušit
+Revert	RevertToSavedAlert		Vrátit zpět
+Size	Menus		Velikost
+Decrease size	Menus		Zmenšit velikost
+Autodetect	Menus		Zjistit automaticky
+Replace next	Menus		Nahradit další
+OK	QuitAlert		OK
+Edit	Menus		Editovat
+Replace with:	FindandReplaceWindow		Nahradit:
+Open…	Menus		Otevřít...
+Save as…	Menus		Uložit jako...
+Replace	FindandReplaceWindow		Nahradit
+Characters:	Statistics		Znaky:
+Don't save	QuitAlert		Neukládat
+This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Tento soubor je označený jen pro čtení. Uložit změny v dokumentu \"%s\"? 
+Font	Menus		Písmo
+Align	Menus		Zarovnání
+Select all	Menus		Vybrat vše
+Right	Menus		Vpravo

@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-Terminal	2277843400
+1	danish	x-vnd.Haiku-Terminal	3117643489
 Close other tabs	Terminal TermWindow		Luk andre faneblade
 Insert path	Terminal TermView		Indsæt sti
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal kunne ikke køre skallen. Beklager.
@@ -10,6 +10,7 @@ Confirm exit if active programs exist	Terminal AppearancePrefView		Bekræft lukn
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tDen nuværende arbejdsmappe for den aktive proces i det\n\t\t\tnuværende faneblad. Det maksimale antal stikomponenter kan\n\t\t\tvalgfrit angives. F.eks. '%2d' for højst to komponenter.\n\t%T\t-\tTerminal-programnavnet for den nuværende lokalitet.\n\t%e\t-\tKodningen på det nuværende faneblad. Vises ikke ved UTF-8.\n\t%i\t-\tIndekset på vinduet.\n\t%p\t-\tNavnet på den aktive proces i det nuværende faneblad.\n\t%t\t-\tTitlen på det nuværende faneblad.
 Solarized Dark	Terminal colors scheme		Solariseret mørkt
 Copy	Terminal TermWindow		Kopiér
+  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory	Terminal TermApp		  -h,     --help               vis denne hjælp\n  -t,     --title              indstil vinduets titel\n  -f,     --fullscreen         start fuldskærm\n  -w,     --working-directory  indstil indledende arbejdsmappe
 Retro	Terminal colors scheme		Retro
 Edit tab title…	Terminal TermWindow		Rediger fanebladstitel…
 Print	Terminal TermWindow		Udskriv

@@ -1,0 +1,34 @@
+1	czech	application/x-vnd.Cortex.MediaRoutingView	3442339205
+Lock group	MediaNodePanel		Zamknout skupinu
+%refname% (no file)	MediaNodePanel		%refname% (žádný soubor)
+Video output	MediaRoutingView		Video výstup
+Icon view	MediaRoutingView		Zobrazení ikon
+OK	MediaRoutingView		OK
+Cycle	MediaNodePanel		Cyklus
+Advanced	MediaNodePanel		Pokročilé
+Audio input	MediaRoutingView		Zvukový vstup
+Run mode	MediaNodePanel		Mód běhu
+Could not load '%filename%'	MediaRoutingView		Nepodařilo se načíst '%filename%'
+Stop time source	MediaNodePanel		Zastavit zdroj hodin
+Be Audio Mixer	MediaRoutingView		Směšovač zvuku Be
+Video input	MediaRoutingView		Video vstup
+Release	MediaNodePanel		Uvolnit
+Disconnect	MediaRoutingView		Odpojit
+Could not disconnect	MediaRoutingView		Nepodařilo se odpojit
+Could not instantiate '%infoname%'	MediaRoutingView		Nepodařilo se vytvořit instanci '%infoname%'
+Mini icon view	MediaRoutingView		Zobrazení malých ikon
+Select all	MediaRoutingView		Označit vše
+(same as group)	MediaNodePanel		(stejně jako skupina)
+Input	MediaJack		Vstup
+Get info	MediaJack		Získat informace
+Start time source	MediaNodePanel		Spustit zdroj hodin
+Error	MediaRoutingView		Chyba
+Could not release '%refname%'	MediaRoutingView		Nepodařilo se uvolnit '%refname%'
+Output	MediaJack		Výstup
+Get info	MediaNodePanel		Získat informace
+Get info	MediaRoutingView		Získat informace
+Clean up	MediaRoutingView		Vyčistit
+Start control panel	MediaNodePanel		Spustit ovládací panel
+Tweak parameters	MediaNodePanel		Ladit parametry
+Could not connect	MediaRoutingView		Nepodařilo se připojit
+Unlock group	MediaNodePanel		Odemknout skupinu

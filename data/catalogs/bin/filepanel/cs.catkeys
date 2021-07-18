@@ -1,0 +1,17 @@
+1	czech	x-vnd.mmu_man.filepanel	1996091223
+display a load/save file panel\n	FilePanelApp		zobrazit panel načíst/uložit soubor\n
+short\tlong\tdescription\n	FilePanelApp		krátký\tdlouhý\tpopis\n
+%s not a valid option\n	FilePanelApp		%s není platná volba\n
+-s\t--save\tuse a save FilePanel\n	FilePanelApp		-s\t--save\totevřít dialog pro uložení\n
+%s: this option requires a parameter\n	FilePanelApp		%s: tato volba vyžaduje parametr\n
+-h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\tzobrazit použití\n
+-l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\totevřít dialog pro otevření\n
+-n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tnastavit implicitní jméno pro uložení\n
+-k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\tdruh vstupů, které lze otevřít, lze kombinovat (f = soubor (výchozí), d = adresář, s = odkaz)\n
+usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]	FilePanelApp		použití: %s [-h]     [-d adresář]              [-l|-s]     [-t titulek]      [-1]       [-m]
+usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal]\n	FilePanelApp		použití: %s [--help] [--directory adresář] [--load|--save] [--title titulek] [--single] [--modal]\n
+-t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\ttitulek okna\n
+-1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\tpovolit pouze jeden soubor\n
+-m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\tmodální okno (zablokuje rodiče)\n
+options:\n	FilePanelApp		možnosti:\n
+-d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\totevřít v umístění <adresář>\n

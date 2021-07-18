@@ -1,0 +1,31 @@
+1	czech	x-vnd.haiku-screenshot-cli	3958461128
+Include window border	ScreenshotWindow		Zahrnout okraj okna
+Overwrite	ScreenshotWindow		Přepsat
+Save in:	ScreenshotWindow		Uložit do:
+Error saving \"%s\":\n\t%s	ScreenshotWindow		Chyba při ukládání \"%s\":\n\t%s
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Tento soubor již existuje.\n Opravdu ho chcete přepsat?
+OK	ScreenshotWindow		OK
+The destination path exists but is not a folder.	ScreenshotWindow		Cílová cesta existuje, ale nejde o adresář.
+Select	ScreenshotWindow		Vybrat
+Save as:	ScreenshotWindow		Uložit jako:
+seconds	ScreenshotWindow		sekund/y
+New screenshot	ScreenshotWindow		Nový snímek obrazovky
+Screenshot	System name		Snímek obrazovky
+Desktop	ScreenshotWindow		Ploše
+Artwork folder	ScreenshotWindow		Adresář kreseb
+Translator Settings	ScreenshotWindow		Nastavení překladače
+Include mouse pointer	ScreenshotWindow		Zahrnout kurzor myši
+overwrite	ScreenshotWindow		přepsat
+Settings…	ScreenshotWindow		Nastavení…
+Choose folder	ScreenshotWindow		Vybrat adresář
+Name:	ScreenshotWindow		Název:
+Choose folder…	ScreenshotWindow		Vybrat adresář…
+Please select	ScreenshotWindow		Zvolte prosím
+Failed to save screenshot	ScreenshotWindow		Selhalo uložení snímku obrazovky
+Cancel	ScreenshotWindow		Zrušit
+Delay:	ScreenshotWindow		Zpoždění:
+Copy to clipboard	ScreenshotWindow		Zkopírovat do schránky
+screenshot	Screenshot	Base filename of screenshot files	snímek obrazovky
+Home folder	ScreenshotWindow		Domovské složce
+Save	ScreenshotWindow		Uložit
+Capture active window	ScreenshotWindow		Zachytit aktivní okno

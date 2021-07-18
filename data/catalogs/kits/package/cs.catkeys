@@ -1,0 +1,10 @@
+1	czech	x-vnd.Haiku-libpackage	134767648
+Fetching repository-cache from %url	RefreshRepositoryRequest		Načítání mezipaměti repozitáře z %url
+Validating checksum for %repositoryName	RefreshRepositoryRequest		Ověřuji kontrolní součet pro %repositoryName
+Failed to remove transaction directory	PackageManagerKit		Chyba při odstraňování transakčního adresáře
+Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		Získání konfigurace repozitáře \"%s\" se nezdařilo. Přeskakuji.
+Refreshing repository \"%s\" failed	PackageManagerKit		Obnova repozitáře \"%s\" selhala
+Fetching repository checksum from %url	RefreshRepositoryRequest		Stahuji kontrolní součet repozitáře z %url
+Failed to get repository names	PackageManagerKit		Nepodařilo se získat názvy repozitářů
+Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		Nepodařilo se načíst mezipaměť repozitáře \"%s\". Přeskakuji.
+Package %s-%s doesn't have a matching requires for its base package \"%s\"	PackageManagerKit		Balíček %s-%s nemá odpovídající požadavky pro základní balíček \"%s\"

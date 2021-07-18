@@ -1,0 +1,39 @@
+1	czech	x-vnd.Haiku.TextSearch	1757850908
+Please select the files you wish to have selected for you in Tracker.	GrepWindow		Prosím vyberte soubory, které si přejete mít vybrány v Trackeru.
+%appname% : %path%	GrepWindow		%appname% : %path%
+Failed to start xargs program!	Grepper		Selhalo spuštění aplikace xargs!
+Open selection	GrepWindow		Otevřít výběr
+Actions	GrepWindow		Akce
+New window	GrepWindow		Nové okno
+Encoding	GrepWindow		Kódování
+Set target to parent folder	GrepWindow		Nastavit cíl na nadřazený adresář
+OK	GrepWindow		OK
+%appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
+Close	GrepWindow		Zavřít
+Look in sub-folders	GrepWindow		Dívat se do podsložek
+%s: Not enough room to escape the filename.	Grepper		%s: Málo prostoru pro GREP vypíchnutí jména souboru.
+Follow symbolic links	GrepWindow		Následovat symbolické linky
+Regular expression	GrepWindow		Regulární výraz
+Text files only	GrepWindow		Pouze textové soubory
+Quit	GrepWindow		Ukončit
+Show files in Tracker	GrepWindow		Zobrazit soubory v Trackeru
+Please select the files you wish to keep searching.	GrepWindow		Prosím vyberte soubory, které si přejete dále prohledávat.
+Trim to selection	GrepWindow		Upravit do výběru
+Set target…	GrepWindow		Nastavit cíl...
+Failed to open input pipe!	Grepper		Chyba otevření vstupní roury!
+Search	GrepWindow		Hledat
+Copy text to clipboard	GrepWindow		Kopírovat text do schránky
+Show lines	GrepWindow		Zobrazit řádky
+Failed to open errors pipe!	Grepper		Chyba otevření chybové roury!
+The unselected files will be removed from the list.	GrepWindow		Nevybrané soubory budou ze seznamu odstraněny.
+Open files in code editor	GrepWindow		Otevřít soubory v editoru kódu
+Skip folders starting with a dot	GrepWindow		Přeskočit složky začínající tečkou
+Failed to open output pipe!	Grepper		Chyba otevření výstupní roury!
+Cancel	GrepWindow		Zrušit
+History	GrepWindow		Historie
+TextSearch	System name		Vyhledávání textu
+File	GrepWindow		Soubor
+Case-sensitive	GrepWindow		Rozlišovat velikost písmen
+Select all	GrepWindow		Vybrat vše
+%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME nemohl otevřít jednu nebo více složek.
+Settings	GrepWindow		Nastavení
