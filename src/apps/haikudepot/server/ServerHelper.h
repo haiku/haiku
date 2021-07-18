@@ -35,11 +35,6 @@ public:
 	static	void						GetFailuresFromJsonRpcError(
 											ValidationFailures& failures,
 											BMessage& responseEnvelopeMessage);
-
-private:
-	static	void						_GetFailuresFromJsonRpcFailures(
-											ValidationFailures& failures,
-											BMessage& jsonRpcFailures);
 };
 
 #endif // SERVER_HELPER_H

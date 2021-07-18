@@ -15,6 +15,7 @@
 #include <NetworkInterface.h>
 #include <NetworkRoster.h>
 
+#include "Logger.h"
 #include "HaikuDepotConstants.h"
 #include "ServerSettings.h"
 #include "WebAppInterface.h"
@@ -224,11 +225,7 @@ ServerHelper::IsPlatformNetworkAvailable()
  *   ...
  *   "error": {
  *     "code": -32800,
- *     "data": {
-         "validationfailures": [
-           { "property": "nickname", "message": "required" },
-           ...
-         ]
+ *     "data": { "nickname": "required" }
        },
        ...
  *   }
@@ -237,7 +234,7 @@ ServerHelper::IsPlatformNetworkAvailable()
  *
  * \param failures is the object into which the validation failures are to be
  *   written.
- * \param responseEnvelopeMessage is a representation of the entire JSON-RPC
+ * \param responseEnvelopeMessage is a representation of the entire
  *   response sent back from the server when the error occurred.
  *
  */
@@ -252,35 +249,26 @@ ServerHelper::GetFailuresFromJsonRpcError(
 		BMessage dataMessage;
 
 		if (errorMessage.FindMessage("data", &dataMessage) == B_OK) {
-			BMessage validationFailuresMessage;
 
-			if (dataMessage.FindMessage("validationfailures",
-					&validationFailuresMessage) == B_OK) {
-				_GetFailuresFromJsonRpcFailures(failures,
-					validationFailuresMessage);
+			// the names and values (strings) are key-value pairs indicating
+			// the error.
+
+			int32 i = 0;
+			BMessage dataItemMessage;
+
+			while (dataMessage.FindMessage(BString() << i, &dataItemMessage)
+					== B_OK) {
+				BString key;
+				BString value;
+				if (dataItemMessage.FindString("key", &key) == B_OK
+					&& dataItemMessage.FindString("value", &value) == B_OK) {
+					failures.AddFailure(key, value);
+				} else {
+					HDERROR("possibly corrupt validation message missing key "
+						"or value");
+				}
+				i++;
 			}
-		}
-	}
-}
-
-
-/*static*/ void
-ServerHelper::_GetFailuresFromJsonRpcFailures(
-	ValidationFailures& failures, BMessage& jsonRpcFailures)
-{
-	int32 index = 0;
-	while (true) {
-		BString name;
-		name << index++;
-		BMessage failure;
-		if (jsonRpcFailures.FindMessage(name, &failure) != B_OK)
-			break;
-
-		BString property;
-		BString message;
-		if (failure.FindString("property", &property) == B_OK
-				&& failure.FindString("message", &message) == B_OK) {
-			failures.AddFailure(property, message);
 		}
 	}
 }

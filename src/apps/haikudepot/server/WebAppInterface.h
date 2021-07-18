@@ -140,18 +140,15 @@ private:
 			status_t			_RetrieveUserUsageConditionsCopy(
 									const BString& code, BDataIO* stream);
 
-			void				_WriteStandardJsonRpcEnvelopeValues(
-									BJsonWriter& writer,
-									const char* methodName);
-			status_t			_SendJsonRequest(const char* domain,
+			status_t			_SendJsonRequest(const char* urlPathComponents,
 									const BString& jsonString, uint32 flags,
 									BMessage& reply) const;
-			status_t			_SendJsonRequest(const char* domain,
+			status_t			_SendJsonRequest(const char* urlPathComponents,
 									UserCredentials credentials,
 									BPositionIO* requestData,
 									size_t requestDataSize, uint32 flags,
 									BMessage& reply) const;
-			status_t			_SendJsonRequest(const char* domain,
+			status_t			_SendJsonRequest(const char* urlPathComponents,
 									BPositionIO* requestData,
 									size_t requestDataSize, uint32 flags,
 									BMessage& reply) const;

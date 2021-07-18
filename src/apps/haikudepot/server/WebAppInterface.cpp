@@ -31,6 +31,7 @@ using namespace BPrivate::Network;
 
 #define BASEURL_DEFAULT "https://depot.haiku-os.org"
 #define USERAGENT_FALLBACK_VERSION "0.0.0"
+#define PROTOCOL_NAME "post-json"
 #define LOG_PAYLOAD_LIMIT 8192
 
 
@@ -81,7 +82,7 @@ public:
 	virtual void DebugMessage(BUrlRequest* caller,
 		BUrlProtocolDebugMessage type, const char* text)
 	{
-		HDTRACE("jrpc: %s", text);
+		HDTRACE("post-json: %s", text);
 	}
 };
 
@@ -160,22 +161,13 @@ WebAppInterface::GetChangelog(const BString& packageName, BMessage& message)
 	BJsonTextWriter requestEnvelopeWriter(requestEnvelopeData);
 
 	requestEnvelopeWriter.WriteObjectStart();
-	_WriteStandardJsonRpcEnvelopeValues(requestEnvelopeWriter,
-		"getPkgChangelog");
-	requestEnvelopeWriter.WriteObjectName("params");
-	requestEnvelopeWriter.WriteArrayStart();
-	requestEnvelopeWriter.WriteObjectStart();
-
 	requestEnvelopeWriter.WriteObjectName("pkgName");
 	requestEnvelopeWriter.WriteString(packageName.String());
-
-	requestEnvelopeWriter.WriteObjectEnd();
-	requestEnvelopeWriter.WriteArrayEnd();
 	requestEnvelopeWriter.WriteObjectEnd();
 
-	return _SendJsonRequest("pkg", requestEnvelopeData,
-		_LengthAndSeekToZero(requestEnvelopeData), 0,
-		message);
+	return _SendJsonRequest("pkg/get-pkg-change-log",
+		requestEnvelopeData, _LengthAndSeekToZero(requestEnvelopeData),
+		0, message);
 }
 
 
@@ -189,12 +181,6 @@ WebAppInterface::RetreiveUserRatingsForPackageForDisplay(
 	BJsonTextWriter requestEnvelopeWriter(requestEnvelopeData);
 
 	requestEnvelopeWriter.WriteObjectStart();
-	_WriteStandardJsonRpcEnvelopeValues(requestEnvelopeWriter,
-		"searchUserRatings");
-	requestEnvelopeWriter.WriteObjectName("params");
-	requestEnvelopeWriter.WriteArrayStart();
-	requestEnvelopeWriter.WriteObjectStart();
-
 	requestEnvelopeWriter.WriteObjectName("pkgName");
 	requestEnvelopeWriter.WriteString(packageName.String());
 	requestEnvelopeWriter.WriteObjectName("offset");
@@ -208,12 +194,10 @@ WebAppInterface::RetreiveUserRatingsForPackageForDisplay(
 	}
 
 	requestEnvelopeWriter.WriteObjectEnd();
-	requestEnvelopeWriter.WriteArrayEnd();
-	requestEnvelopeWriter.WriteObjectEnd();
 
-	return _SendJsonRequest("userrating", requestEnvelopeData,
-		_LengthAndSeekToZero(requestEnvelopeData), 0,
-		message);
+	return _SendJsonRequest("user-rating/search-user-ratings",
+		requestEnvelopeData, _LengthAndSeekToZero(requestEnvelopeData),
+		0, message);
 }
 
 
@@ -226,12 +210,6 @@ WebAppInterface::RetreiveUserRatingForPackageAndVersionByUser(
 		// BHttpRequest later takes ownership of this.
 	BMallocIO* requestEnvelopeData = new BMallocIO();
 	BJsonTextWriter requestEnvelopeWriter(requestEnvelopeData);
-
-	requestEnvelopeWriter.WriteObjectStart();
-	_WriteStandardJsonRpcEnvelopeValues(requestEnvelopeWriter,
-		"getUserRatingByUserAndPkgVersion");
-	requestEnvelopeWriter.WriteObjectName("params");
-	requestEnvelopeWriter.WriteArrayStart();
 
 	requestEnvelopeWriter.WriteObjectStart();
 
@@ -270,10 +248,10 @@ WebAppInterface::RetreiveUserRatingForPackageAndVersionByUser(
 	}
 
 	requestEnvelopeWriter.WriteObjectEnd();
-	requestEnvelopeWriter.WriteArrayEnd();
-	requestEnvelopeWriter.WriteObjectEnd();
 
-	return _SendJsonRequest("userrating", requestEnvelopeData,
+	return _SendJsonRequest(
+		"user-rating/get-user-rating-by-user-and-pkg-version",
+		requestEnvelopeData,
 		_LengthAndSeekToZero(requestEnvelopeData), NEEDS_AUTHORIZATION,
 		message);
 }
@@ -299,19 +277,13 @@ WebAppInterface::RetrieveUserDetailForCredentials(
 	BJsonTextWriter requestEnvelopeWriter(requestEnvelopeData);
 
 	requestEnvelopeWriter.WriteObjectStart();
-	_WriteStandardJsonRpcEnvelopeValues(requestEnvelopeWriter, "getUser");
-	requestEnvelopeWriter.WriteObjectName("params");
-	requestEnvelopeWriter.WriteArrayStart();
-	requestEnvelopeWriter.WriteObjectStart();
 	requestEnvelopeWriter.WriteObjectName("nickname");
 	requestEnvelopeWriter.WriteString(credentials.Nickname().String());
 	requestEnvelopeWriter.WriteObjectEnd();
-	requestEnvelopeWriter.WriteArrayEnd();
-	requestEnvelopeWriter.WriteObjectEnd();
 
-	status_t result = _SendJsonRequest("user", credentials, requestEnvelopeData,
-		_LengthAndSeekToZero(requestEnvelopeData), NEEDS_AUTHORIZATION,
-		message);
+	status_t result = _SendJsonRequest("user/get-user", credentials,
+		requestEnvelopeData, _LengthAndSeekToZero(requestEnvelopeData),
+		NEEDS_AUTHORIZATION, message);
 		// note that the credentials used here are passed in as args.
 
 	return result;
@@ -446,26 +418,17 @@ WebAppInterface::AgreeUserUsageConditions(const BString& code,
 	BJsonTextWriter requestEnvelopeWriter(requestEnvelopeData);
 
 	requestEnvelopeWriter.WriteObjectStart();
-	_WriteStandardJsonRpcEnvelopeValues(requestEnvelopeWriter,
-		"agreeUserUsageConditions");
-
-	requestEnvelopeWriter.WriteObjectName("params");
-	requestEnvelopeWriter.WriteArrayStart();
-	requestEnvelopeWriter.WriteObjectStart();
 	requestEnvelopeWriter.WriteObjectName("userUsageConditionsCode");
 	requestEnvelopeWriter.WriteString(code.String());
 	requestEnvelopeWriter.WriteObjectName("nickname");
 	requestEnvelopeWriter.WriteString(fCredentials.Nickname());
 	requestEnvelopeWriter.WriteObjectEnd();
-	requestEnvelopeWriter.WriteArrayEnd();
-
-	requestEnvelopeWriter.WriteObjectEnd();
 
 	// now fetch this information into an object.
 
-	return _SendJsonRequest("user", requestEnvelopeData,
-		_LengthAndSeekToZero(requestEnvelopeData), NEEDS_AUTHORIZATION,
-		responsePayload);
+	return _SendJsonRequest("user/agree-user-usage-conditions",
+		requestEnvelopeData, _LengthAndSeekToZero(requestEnvelopeData),
+		NEEDS_AUTHORIZATION, responsePayload);
 }
 
 
@@ -477,12 +440,6 @@ WebAppInterface::_RetrieveUserUsageConditionsMeta(const BString& code,
 	BJsonTextWriter requestEnvelopeWriter(requestEnvelopeData);
 
 	requestEnvelopeWriter.WriteObjectStart();
-	_WriteStandardJsonRpcEnvelopeValues(requestEnvelopeWriter,
-		"getUserUsageConditions");
-	requestEnvelopeWriter.WriteObjectName("params");
-	requestEnvelopeWriter.WriteArrayStart();
-
-	requestEnvelopeWriter.WriteObjectStart();
 
 	if (!code.IsEmpty()) {
 		requestEnvelopeWriter.WriteObjectName("code");
@@ -490,13 +447,12 @@ WebAppInterface::_RetrieveUserUsageConditionsMeta(const BString& code,
 	}
 
 	requestEnvelopeWriter.WriteObjectEnd();
-	requestEnvelopeWriter.WriteArrayEnd();
-	requestEnvelopeWriter.WriteObjectEnd();
 
 	// now fetch this information into an object.
 
-	return _SendJsonRequest("user", requestEnvelopeData,
-		_LengthAndSeekToZero(requestEnvelopeData), 0, message);
+	return _SendJsonRequest("user/get-user-usage-conditions",
+		requestEnvelopeData, _LengthAndSeekToZero(requestEnvelopeData),
+		0, message);
 }
 
 
@@ -517,15 +473,9 @@ WebAppInterface::CreateUserRating(const BString& packageName,
 	const BString& languageCode, const BString& comment,
 	const BString& stability, int rating, BMessage& message)
 {
-		// BHttpRequest later takes ownership of this.
 	BMallocIO* requestEnvelopeData = new BMallocIO();
+		// BHttpRequest later takes ownership of this.
 	BJsonTextWriter requestEnvelopeWriter(requestEnvelopeData);
-
-	requestEnvelopeWriter.WriteObjectStart();
-	_WriteStandardJsonRpcEnvelopeValues(requestEnvelopeWriter,
-		"createUserRating");
-	requestEnvelopeWriter.WriteObjectName("params");
-	requestEnvelopeWriter.WriteArrayStart();
 
 	requestEnvelopeWriter.WriteObjectStart();
 	requestEnvelopeWriter.WriteObjectName("pkgName");
@@ -582,12 +532,10 @@ WebAppInterface::CreateUserRating(const BString& packageName,
 	}
 
 	requestEnvelopeWriter.WriteObjectEnd();
-	requestEnvelopeWriter.WriteArrayEnd();
-	requestEnvelopeWriter.WriteObjectEnd();
 
-	return _SendJsonRequest("userrating", requestEnvelopeData,
-		_LengthAndSeekToZero(requestEnvelopeData), NEEDS_AUTHORIZATION,
-		message);
+	return _SendJsonRequest("user-rating/create-user-rating",
+		requestEnvelopeData, _LengthAndSeekToZero(requestEnvelopeData),
+		NEEDS_AUTHORIZATION, message);
 }
 
 
@@ -596,16 +544,9 @@ WebAppInterface::UpdateUserRating(const BString& ratingID,
 	const BString& languageCode, const BString& comment,
 	const BString& stability, int rating, bool active, BMessage& message)
 {
-		// BHttpRequest later takes ownership of this.
 	BMallocIO* requestEnvelopeData = new BMallocIO();
+		// BHttpRequest later takes ownership of this.
 	BJsonTextWriter requestEnvelopeWriter(requestEnvelopeData);
-
-	requestEnvelopeWriter.WriteObjectStart();
-	_WriteStandardJsonRpcEnvelopeValues(requestEnvelopeWriter,
-		"updateUserRating");
-
-	requestEnvelopeWriter.WriteObjectName("params");
-	requestEnvelopeWriter.WriteArrayStart();
 
 	requestEnvelopeWriter.WriteObjectStart();
 
@@ -641,12 +582,10 @@ WebAppInterface::UpdateUserRating(const BString& ratingID,
 	}
 
 	requestEnvelopeWriter.WriteObjectEnd();
-	requestEnvelopeWriter.WriteArrayEnd();
-	requestEnvelopeWriter.WriteObjectEnd();
 
-	return _SendJsonRequest("userrating", requestEnvelopeData,
-		_LengthAndSeekToZero(requestEnvelopeData), NEEDS_AUTHORIZATION,
-		message);
+	return _SendJsonRequest("user-rating/update-user-rating",
+		requestEnvelopeData, _LengthAndSeekToZero(requestEnvelopeData),
+		NEEDS_AUTHORIZATION, message);
 }
 
 
@@ -668,18 +607,11 @@ WebAppInterface::RequestCaptcha(BMessage& message)
 	BJsonTextWriter requestEnvelopeWriter(requestEnvelopeData);
 
 	requestEnvelopeWriter.WriteObjectStart();
-	_WriteStandardJsonRpcEnvelopeValues(requestEnvelopeWriter,
-		"generateCaptcha");
-	requestEnvelopeWriter.WriteObjectName("params");
-	requestEnvelopeWriter.WriteArrayStart();
-	requestEnvelopeWriter.WriteObjectStart();
-	requestEnvelopeWriter.WriteObjectEnd();
-	requestEnvelopeWriter.WriteArrayEnd();
 	requestEnvelopeWriter.WriteObjectEnd();
 
-	return _SendJsonRequest("captcha", requestEnvelopeData,
-		_LengthAndSeekToZero(requestEnvelopeData), 0,
-		message);
+	return _SendJsonRequest("captcha/generate-captcha",
+		requestEnvelopeData, _LengthAndSeekToZero(requestEnvelopeData),
+		0, message);
 }
 
 
@@ -693,11 +625,6 @@ WebAppInterface::CreateUser(const BString& nickName,
 		// BHttpRequest later takes ownership of this.
 	BMallocIO* requestEnvelopeData = new BMallocIO();
 	BJsonTextWriter requestEnvelopeWriter(requestEnvelopeData);
-
-	requestEnvelopeWriter.WriteObjectStart();
-	_WriteStandardJsonRpcEnvelopeValues(requestEnvelopeWriter, "createUser");
-	requestEnvelopeWriter.WriteObjectName("params");
-	requestEnvelopeWriter.WriteArrayStart();
 
 	requestEnvelopeWriter.WriteObjectStart();
 
@@ -720,10 +647,8 @@ WebAppInterface::CreateUser(const BString& nickName,
 	}
 
 	requestEnvelopeWriter.WriteObjectEnd();
-	requestEnvelopeWriter.WriteArrayEnd();
-	requestEnvelopeWriter.WriteObjectEnd();
 
-	return _SendJsonRequest("user", requestEnvelopeData,
+	return _SendJsonRequest("user/create-user", requestEnvelopeData,
 		_LengthAndSeekToZero(requestEnvelopeData), 0, message);
 }
 
@@ -737,11 +662,6 @@ WebAppInterface::AuthenticateUser(const BString& nickName,
 	BJsonTextWriter requestEnvelopeWriter(requestEnvelopeData);
 
 	requestEnvelopeWriter.WriteObjectStart();
-	_WriteStandardJsonRpcEnvelopeValues(requestEnvelopeWriter,
-		"authenticateUser");
-	requestEnvelopeWriter.WriteObjectName("params");
-	requestEnvelopeWriter.WriteArrayStart();
-	requestEnvelopeWriter.WriteObjectStart();
 
 	requestEnvelopeWriter.WriteObjectName("nickname");
 	requestEnvelopeWriter.WriteString(nickName.String());
@@ -749,12 +669,10 @@ WebAppInterface::AuthenticateUser(const BString& nickName,
 	requestEnvelopeWriter.WriteString(passwordClear.String());
 
 	requestEnvelopeWriter.WriteObjectEnd();
-	requestEnvelopeWriter.WriteArrayEnd();
-	requestEnvelopeWriter.WriteObjectEnd();
 
-	return _SendJsonRequest("user", requestEnvelopeData,
-		_LengthAndSeekToZero(requestEnvelopeData), 0,
-		message);
+	return _SendJsonRequest("user/authenticate-user",
+		requestEnvelopeData, _LengthAndSeekToZero(requestEnvelopeData),
+		0, message);
 }
 
 
@@ -766,11 +684,6 @@ WebAppInterface::IncrementViewCounter(const PackageInfoRef package,
 		// BHttpRequest later takes ownership of this.
 	BJsonTextWriter requestEnvelopeWriter(requestEnvelopeData);
 
-	requestEnvelopeWriter.WriteObjectStart();
-	_WriteStandardJsonRpcEnvelopeValues(requestEnvelopeWriter,
-		"incrementViewCounter");
-	requestEnvelopeWriter.WriteObjectName("params");
-	requestEnvelopeWriter.WriteArrayStart();
 	requestEnvelopeWriter.WriteObjectStart();
 
 	requestEnvelopeWriter.WriteObjectName("architectureCode");
@@ -804,12 +717,10 @@ WebAppInterface::IncrementViewCounter(const PackageInfoRef package,
 	}
 
 	requestEnvelopeWriter.WriteObjectEnd();
-	requestEnvelopeWriter.WriteArrayEnd();
-	requestEnvelopeWriter.WriteObjectEnd();
 
-	return _SendJsonRequest("pkg", requestEnvelopeData,
-		_LengthAndSeekToZero(requestEnvelopeData), 0,
-		message);
+	return _SendJsonRequest("pkg/increment-view-counter",
+		requestEnvelopeData, _LengthAndSeekToZero(requestEnvelopeData),
+		0, message);
 }
 
 
@@ -839,54 +750,44 @@ WebAppInterface::ErrorCodeFromResponse(BMessage& responseEnvelopeMessage)
 // #pragma mark - private
 
 
-void
-WebAppInterface::_WriteStandardJsonRpcEnvelopeValues(BJsonWriter& writer,
-	const char* methodName)
+status_t
+WebAppInterface::_SendJsonRequest(const char* urlPathComponents,
+	BPositionIO* requestData, size_t requestDataSize, uint32 flags,
+	BMessage& reply) const
 {
-	writer.WriteObjectName("jsonrpc");
-	writer.WriteString("2.0");
-	writer.WriteObjectName("id");
-	writer.WriteInteger(++fRequestIndex);
-	writer.WriteObjectName("method");
-	writer.WriteString(methodName);
+	return _SendJsonRequest(urlPathComponents, fCredentials, requestData,
+		requestDataSize, flags, reply);
 }
 
 
 status_t
-WebAppInterface::_SendJsonRequest(const char* domain, BPositionIO* requestData,
-	size_t requestDataSize, uint32 flags, BMessage& reply) const
-{
-	return _SendJsonRequest(domain, fCredentials, requestData, requestDataSize,
-		flags, reply);
-}
-
-
-status_t
-WebAppInterface::_SendJsonRequest(const char* domain,
+WebAppInterface::_SendJsonRequest(const char* urlPathComponents,
 	UserCredentials credentials, BPositionIO* requestData,
 	size_t requestDataSize, uint32 flags, BMessage& reply) const
 {
 	if (requestDataSize == 0) {
-		HDINFO("jrpc; empty request payload");
+		HDINFO("%s; empty request payload", PROTOCOL_NAME);
 		return B_ERROR;
 	}
 
 	if (!ServerHelper::IsNetworkAvailable()) {
-		HDDEBUG("jrpc; dropping request to ...[%s] as network is not"
-		 	" available", domain);
+		HDDEBUG("%s; dropping request to ...[%s] as network is not"
+			" available", PROTOCOL_NAME, urlPathComponents);
 		delete requestData;
 		return HD_NETWORK_INACCESSIBLE;
 	}
 
 	if (ServerSettings::IsClientTooOld()) {
-		HDDEBUG("jrpc; dropping request to ...[%s] as client is too old",
-			domain);
+		HDDEBUG("%s; dropping request to ...[%s] as client is too old",
+			PROTOCOL_NAME, urlPathComponents);
 		delete requestData;
 		return HD_CLIENT_TOO_OLD;
 	}
 
-	BUrl url = ServerSettings::CreateFullUrl(BString("/__api/v1/") << domain);
-	HDDEBUG("jrpc; will make request to [%s]", url.UrlString().String());
+	BUrl url = ServerSettings::CreateFullUrl(BString("/__api/v2/")
+		<< urlPathComponents);
+	HDDEBUG("%s; will make request to [%s]", PROTOCOL_NAME,
+		url.UrlString().String());
 
 	// If the request payload is logged then it must be copied to local memory
 	// from the stream.  This then requires that the request data is then
@@ -894,7 +795,7 @@ WebAppInterface::_SendJsonRequest(const char* domain,
 
 	if (Logger::IsTraceEnabled()) {
 		HDLOGPREFIX(LOG_LEVEL_TRACE)
-		printf("jrpc request; ");
+		printf("%s request; ", PROTOCOL_NAME);
 		_LogPayload(requestData, requestDataSize);
 		printf("\n");
 	}
@@ -937,8 +838,8 @@ WebAppInterface::_SendJsonRequest(const char* domain,
 
 	int32 statusCode = result.StatusCode();
 
-	HDDEBUG("jrpc; did receive http-status [%" B_PRId32 "] from [%s]",
-		statusCode, url.UrlString().String());
+	HDDEBUG("%s; did receive http-status [%" B_PRId32 "] from [%s]",
+		PROTOCOL_NAME, statusCode, url.UrlString().String());
 
 	switch (statusCode) {
 		case B_HTTP_STATUS_OK:
@@ -949,8 +850,9 @@ WebAppInterface::_SendJsonRequest(const char* domain,
 			return HD_CLIENT_TOO_OLD;
 
 		default:
-			HDERROR("jrpc request to endpoint [.../%s] failed with http "
-				"status [%" B_PRId32 "]\n", domain, statusCode);
+			HDERROR("%s; request to endpoint [.../%s] failed with http "
+				"status [%" B_PRId32 "]\n", PROTOCOL_NAME, urlPathComponents,
+				statusCode);
 			return B_ERROR;
 	}
 
@@ -958,7 +860,7 @@ WebAppInterface::_SendJsonRequest(const char* domain,
 
 	if (Logger::IsTraceEnabled()) {
 		HDLOGPREFIX(LOG_LEVEL_TRACE)
-		printf("jrpc response; ");
+		printf("%s; response; ", PROTOCOL_NAME);
 		_LogPayload(&replyData, replyData.BufferLength());
 		printf("\n");
 	}
@@ -977,15 +879,15 @@ WebAppInterface::_SendJsonRequest(const char* domain,
 
 
 status_t
-WebAppInterface::_SendJsonRequest(const char* domain, const BString& jsonString,
-	uint32 flags, BMessage& reply) const
+WebAppInterface::_SendJsonRequest(const char* urlPathComponents,
+	const BString& jsonString, uint32 flags, BMessage& reply) const
 {
 	// gets 'adopted' by the subsequent http request.
 	BMemoryIO* data = new BMemoryIO(jsonString.String(),
 		jsonString.Length() - 1);
 
-	return _SendJsonRequest(domain, data, jsonString.Length() - 1, flags,
-		reply);
+	return _SendJsonRequest(urlPathComponents, data, jsonString.Length() - 1,
+		flags, reply);
 }
 
 
@@ -1034,7 +936,7 @@ WebAppInterface::_LogPayload(BPositionIO* requestData, size_t size)
 		size = LOG_PAYLOAD_LIMIT;
 
 	if (B_OK != requestData->ReadExactly(buffer, size)) {
-		printf("jrpc; error logging payload");
+		printf("%s; error logging payload", PROTOCOL_NAME);
 	} else {
 		for (uint32 i = 0; i < size; i++) {
     		bool esc = buffer[i] > 126 ||
