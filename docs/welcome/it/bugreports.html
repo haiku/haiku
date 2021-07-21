@@ -11,11 +11,13 @@
  * 		Niels Reedijk, Matt Madia and Ingo Weinhold who wrote
  *		http://dev.haiku-os.org/wiki/ and http://dev.haiku-os.org/wiki/ReportingBugs
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Gabriele
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta name="robots" content="all" />
-	<title>Reporting bugs</title>
+	<title>Aprire una segnalazione di bug</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
@@ -34,6 +36,7 @@
 <li><a href="../de/bugreports.html">Deutsch</a></li>
 <li><a href="../en/bugreports.html">English</a></li>
 <li><a href="../es/bugreports.html">Español</a></li>
+<li><a href="../eo/bugreports.html">Esperanto</a></li>
 <li><a href="../fr/bugreports.html">Français</a></li>
 <li><a href="../fur/bugreports.html">Furlan</a></li>
 <li><a href="../hu/bugreports.html">Magyar</a></li>
@@ -73,42 +76,42 @@
                   <a href="#next">What's next?</a></td></tr>
 </table>
 
-<h1>Reporting bugs</h1>
+<h1>Aprire una segnalazione di bug</h1>
 
-<p>Since our developers are unable to test every hardware combination, nor every different way of interacting with the operating system, we are relying on users to give us some input on how things work at their end. Since Haiku is still quite young, it's very likely that you will encounter bugs. We thank you for taking the time to report these. Together we can improve Haiku, bit by bit.</p>
-<p>To keep our bugtracker effective, it's essential to abide by the <a href="http://dev.haiku-os.org/wiki/BugTrackerEtiquette">Bug Tracker Etiquette</a>.</p>
-
-<h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="account" name="accout">Getting a Trac account</a></h2>
-<p>To file a ticket, you need to have an account at <a href="http://dev.haiku-os.org/register" title="Register at Haiku's Bugtracker">Haiku's Bugtracker</a>.<br />
-When creating a new account, be certain to <b>provide your email address</b> as it is necessary to obtain basic ticket modification privileges. Be sure to <b>check your spam folder</b> shortly afterwards, as the all important verification mail often ends up there.</p>
+<p>Poiché i nostri sviluppatori non sono in grado di testare tutte le possibili combinazioni di hardware, o tutte le modalità con cui è possibile interagire col sistema operativo, ci affidiamo agli utenti per darci più informazioni su come le cose funzionano dal loro punto di vista. Poiché Haiku è un progetto ancora molto giovane, è molto probabile che sia possibile incorrere in alcuni malfunzionamenti. Vi ringraziamo per il tempo che dedicherete a segnalarci questi bug. Insieme, miglioreremo Haiku, un passo alla volta.</p>
+<p>Affinché il tracciamento dei bug sia efficiente, è essenziale rispettare la <a href="http://dev.haiku-os.org/wiki/BugTrackerEtiquette">Bug Tracker Etiquette</a> (pagina in inglese).</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="report" name="report">Creating a bug report</a></h2>
-<p>Before reporting a bug, please <a href="http://dev.haiku-os.org/query?status=new&amp;status=assigned&amp;status=reopened&amp;status=closed&amp;summary=%7Etext+you+want+to+search+for&amp;order=priority">make sure</a> that it does not yet exist. You can also use the <a href="http://dev.haiku-os.org/search?q=&amp;noquickjump=1&amp;ticket=on">search</a> function for this.<br />
-After you have established that it's a unique bug, make your information as accurate as possible:</p>
+<a id="account" name="accout">Iscrizione a Trac</a></h2>
+<p>Per aprire un ticket, è necessario un account sulla <a href="http://dev.haiku-os.org/register" title="Register at Haiku's Bugtracker">piattaforma di segnalazione di Haiku</a>.<br />
+Nel momento in cui crei un nuovo account, assicurati di <b>fornire un indirizzo mail valido</b>, in quanto esso è necessario per ottenere alcuni privilegi base per modificare il ticket. Assicurati di <b>controllare la cartella della posta indsiderata</b>, perché talvolta la mail di verifica è erroneamente marcata come tale.</p>
+
+<h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="report" name="report">Creazione di un bug report</a></h2>
+<p>Prima di effettuare una segnalazione di bug, per favore <a href="http://dev.haiku-os.org/query?status=new&amp;status=assigned&amp;status=reopened&amp;status=closed&amp;summary=%7Etext+you+want+to+search+for&amp;order=priority">verifica</a> che non sia già stato riportato. A tale scopo, puoi anche utilizzare la funzione di <a href="http://dev.haiku-os.org/search?q=&amp;noquickjump=1&amp;ticket=on">ricerca</a>.<br />
+Una volta stabilito che il bug non sia già stato segnalato, assicurati di fornire quante più informazioni possibili:</p>
 <ul>
-	<li><p>Attempt to reproduce your issue on the current revision of Haiku. Pre-built images for testing purposes are  <a href="http://download.haiku-os.org">available</a> online.</p></li>
-	<li><p>Include basic information such as how you are testing Haiku (on real hardware, on VMWare, on QEMU, etc.).</p></li>
-	<li><p>Mention which revision you are running. You can find this information in <span class="menu">About Haiku...</span> from the Deskbar menu. Also mention what kind of Haiku build you are testing (x86_gcc2, x86_64). The downloadable images are named accordingly, for a self-built image you should know how you built it.</p></li>
-	<li><p>Describe the problem you are experiencing. Try to be as accurate as you can: describe the actual behavior, and the behavior you expected.</p></li>
-	<li><p>Describe what steps you need to perform in order to expose the bug. This will help developers reproduce the bug.</p></li>
-	<li><p>Attach as much information as you have. If it is a GUI bug, or a bug in one of the applications, try to take a screenshot by pressing the <span class="key">PRINT</span> key.</p></li>
+	<li><p>I tentativi di riprodurre il bug che hai condotto nella versione più recente di Haiku. Le immagini per i test sono <a href="http://download.haiku-os.org">disponibili per il download</a>.</p></li>
+	<li><p>Includi alcune informazioni di base dell'ambiente in cui stai testando Haiku (su una macchina reale, su VMWare, su QEMU, ecc.).</p></li>
+	<li><p>Riporta che revisione del sistema stai utilizzando. Puoi recuperare questa informazione alla voce <span class="menu">Informazioni su Haiku</span> dal menu della Deskbar. Riporta anche che tipo di architettura (x86_gcc2, x86_64) stai testando. Le immagini che è possibile scaricare hanno ben evidente questa informazione nel nome del file, per le immagini compilate da te si suppone che tu sappia come le hai costruite.</p></li>
+	<li><p>Descrivi il problema che hai riscontrato. Cerca di essere il più accurato possibile: descrivi il comportamento riscontrato e quello atteso.</p></li>
+	<li><p>Riporta tutti i passaggi che è necessario compiere per esporre il bug. Questo aiuterà gli sviluppatori a riprodurlo.</p></li>
+	<li><p>Allega quante più informazioni possibilli. Se il problema riguarda l'interfaccia grafica, o un'applicazione particolare, allega alla segnalazione un'istantanea dello schermo, se possibile, premendo il tasto <span class="key">STAMPA</span>.</p></li>
 </ul>
 	
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="app" name="app">Application bugs</a></h2>
-<p>When an application crashed, you can either save a report or write a core file (both saved to the Desktop) that you can attach to a bugreport, or you can evoke the <a href="../../userguide/it/applications/debugger.html">Debugger</a>.</p>
-<p>If it's not a crashing bug, you may get useful information when starting the application from Terminal. Some applications provide logging and other options when started with certain parameters; try <tt>-h</tt> or <tt>--help</tt> to see if that is the case. As example, see the different logging levels of <a href="../../userguide/it/applications/haikudepot.html#logs">HaikuDepot</a>.</p>
+<a id="app" name="app">Bug delle applicazioni</a></h2>
+<p>Quando ad andare in errore è un'applicazione, puoi sia salvare un file di registro oppure un dump della memoria (in entrambi i casi il file sarà salvato sulla Scrivania) che puoi poi, eventualmente, allegare al ticket. Puoi anche decidere di avviare il <a href="../../userguide/it/applications/debugger.html">Debugger</a>.</p>
+<p>Se il bug non provoca il crash dell'applicazione, è possibili che maggiori informazioni siano disponibili a schermo quando l'applicazione è lanciata tramite Terminale. Alcune applicazioni dispongono di opzioni di logging particolari quando lanciate in questo modo con degli opportuni parametri; prova <tt>-h</tt> oppure <tt>--help</tt> per vedere se è questo il caso. A titolo d'esempio, osserva i diversi livelli di log di <a href="../../userguide/it/applications/haikudepot.html#logs">HaikuDepot</a>.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="server" name="server">Server bugs</a></h2>
+<a id="server" name="server">Bug dei server</a></h2>
 <p>When vital servers like the app server, the registrar or the input server crash, you won't see the usual crash alert. Instead the whole screen will be cleared white and the Debugger will be started in text-mode, its output appearing directly on screen. Likely you will still be able to move the mouse, which will overwrite the white and Debugger output on screen. Applications still running (like ProcessController or the clock in the Deskbar) might also draw over the debugger output on screen.<br />
 Besides everything being more ugly and inconvenient, basically the same applies as for application bugs. Most importantly procure a back trace (<span class="cli">bt</span> command). You may need to take a picture of the screen with a digital camera, since you won't be able to copy the text anywhere.<br />
 Depending on what exactly crashed, you can try to save a crash report on the Desktop with <span class="cli">save-report</span> or <span class="cli">write-core</span> for a core file, and then press the power button once to try shutting cleanly down. If the power button doesn't work, there are also the commands <span class="cli">shutdown</span> and <span class="cli">reboot</span>.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="kernel" name="kernel">Kernel bugs</a></h2>
+<a id="kernel" name="kernel">Bug del kernel</a></h2>
 <p>Kernel bugs are usually the ones with the most severe effects while at the same time being the hardest to debug. There are different kinds of symptoms, which most likely point to a kernel or driver issue:</p>
 <ul>
 <li><p>The system enters kernel debugging land (KDL) on its own volition. The upper part of the screen is cleared white and several lines of text are printed on it. The second line says "<i>Welcome to Kernel Debugging Land...</i>", the one above it states the immediate reason for entering KDL.</p></li>

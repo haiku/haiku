@@ -14,6 +14,7 @@
  * Translators:
  *		Humdinger
  *		Loïc
+ *		Máximo Castañeda
  *		roptat
  *		Vincent Duvert
  *
@@ -39,6 +40,7 @@
 <li><a href="../de/bugreports.html">Deutsch</a></li>
 <li><a href="../en/bugreports.html">English</a></li>
 <li><a href="../es/bugreports.html">Español</a></li>
+<li><a href="../eo/bugreports.html">Esperanto</a></li>
 <li><a href="../fur/bugreports.html">Furlan</a></li>
 <li><a href="../it/bugreports.html">Italiano</a></li>
 <li><a href="../hu/bugreports.html">Magyar</a></li>
@@ -62,7 +64,7 @@
 
 <div id="content">
 <div>
-<div class="box-info">Cette page n'est pas encore entièrement traduite. Les parties non encore traduites seront en anglais.</div>
+<div class="box-info">La traduction de cette page n'est pas achevée. Les parties non encore traduites apparaîtrons en anglais.</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Index</td></tr>
@@ -93,7 +95,7 @@ Lors de la création d’un nouveau compte, pensez à <b>indiquer votre adresse 
 <p>Avant de rapporter un bogue, veuillez <a href="http://dev.haiku-os.org/query?status=new&amp;status=assigned&amp;status=reopened&amp;status=closed&amp;summary=%7Etext+you+want+to+search+for&amp;order=priority">vérifier</a> qu’il n’est pas déjà répertorié. Vous pouvez aussi utiliser la <a href="http://dev.haiku-os.org/search?q=&amp;noquickjump=1&amp;ticket=on">fonction de recherche</a> pour cela.<br />
 Après vous être assuré que votre bogue est unique, obtenez des informations précises sur votre environnement :</p>
 <ul>
-	<li><p>Essayez de reproduire votre problème avec la version actuelle d'Haiku. Des <a href="http://haiku-files.org/">images préfabriqués</a> sont disponible à cet usage.</p></li>
+	<li><p>Essayez de reproduire votre problème avec la version actuelle d'Haiku. Des <a href="http://download.haiku-os.org">images préfabriqués</a> sont disponible à cet usage.</p></li>
 	<li><p>Indiquez comment vous testez Haiku (sur machine réelle, dans VMware, dans Qemu…)</p></li>
 	<li><p>Indiquez quelle révision vous utilisez. Vous pouvez trouver cette information dans le menu <span class="menu">À propos de Haiku...</span> de la Deskbar.
 N'oubliez pas de mentionner le type de construction dont est issu le système que vous testez (x86_gcc2, x86_64). 
@@ -136,7 +138,7 @@ Notez bien que votre clavier pourrait ne pas fonctionner en mode débogage du no
 En règle générale, le clavier doit être branché directement sur le port, et non par l'intermédiaire d'un concentrateur. Dans certains cas, le clavier ne fonctionne que si l'on a invoqué le mode débogage du noyau une première fois via le raccourci clavier. Pour le moment l'USB OHCI n'est pas supporté.</p>
 <p>KDL est, par lui-même, une sorte d'interpréteur de commande. On peut exécuter des instructions pour afficher des informations sur le système. Les commandes suivantes pourraient vous intéresser :</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="cli">bt</span> (alias <span class="cli">sc</span>)</td><td> </td><td>Prints a back trace (aka stack crawl). If the system entered KDL on its on volition, a back trace is normally printed automatically. Enter the command if that didn't happen or part of it is obscured (e.g. when the stack trace is so long that it wrapped around) and your only way of providing the information to developers is by taking a picture of the screen.</td></tr>
+<tr><td><span class="cli">bt</span> (alias <span class="cli">sc</span>)</td><td> </td><td>Imprime une trace de débogage (aka back trace) ou pile d'appel (aka stack crawl). Si le système est entré en KDL de son plein gré, la pile d'appel sera normalement imprimée automatiquement. Saisissez la commande si cela ne s'est pas produit ou si une partie de celle-ci est masquée (par exemple, lorsque la trace de la pile est si longue qu'elle a bouclé sur elle même). Votre seul moyen de fournir les informations aux développeurs, est alors de prendre une photo de l'écran.</td></tr>
 <tr><td><span class="cli">ints</span></td><td> </td><td>Affichera les interruptions matérielles qui sont gérées, ainsi que celles qui sont ignorées.</td></tr>
 <tr><td class="onelinetop"><span class="cli">co</span> (alias continue)</td><td> </td><td>Quitte le débogueur pour reprendre, si possible, les opérations normales du système.</td></tr>
 <tr><td><span class="cli">reboot</span></td><td> </td><td>Redémarre le système immédiatement. Vous perdrez toutes les données non enregistrées, ainsi que celles qui ont été enregistrés, mais qui n'ont pas encore été écrites sur le disque.</td></tr>
@@ -170,7 +172,7 @@ Une ou plusieurs pages de texte seront affiché à l'écran, Seules les quelques
 <tr><td>- <span class="cli">open /var/log/syslog</span></td><td> </td><td>Le journal système principal utilisé par Haiku (voir <a href="#syslog">Le journal système</a> ci-dessus)
 est similaire à l'écran de débogage pendant le démarrage. Avec la commande <span class="cli">open</span>, vous pouvez modifier ce journal dans un éditeur de texte pour n'en conserver que la partie la plus pertinente.</td></tr>
 <tr><td class="onelinetop">- <span class="cli">listimage | grep drivers/</span></td><td> </td><td>Liste tous les drivers utilisés.</td></tr>
-<tr><td>- <span class="cli">usb_hid_report</span></td><td> </td><td>In case of USB input devices, add the <span class="cli">/tmp/usb_hid_report_descriptor_*.bin</span> file.</td></tr>
+<tr><td>- <span class="cli">usb_hid_report</span></td><td> </td><td>Dans le cas de périphériques d'entrée USB, ajoutez le fichier <span class="cli">/tmp/usb_hid_report_descriptor_*.bin</span>.</td></tr>
 <tr><td>- <span class="cli">ints</span></td><td> </td><td>Seulement disponible dans le <i>mode débogage du noyau</i> (voir ci-dessous). Montre l'utilisation des interruptions. 
 Il ne devrait pas y avoir trop d'interruptions partagées par plusieurs périphériques.</td></tr>
 <tr><td colspan="3">- Les sorties écran du débogueur (une option de démarrage en mode sans échec, voir <a href="#onscreen">ci-dessus</a>).</td></tr>

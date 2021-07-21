@@ -14,6 +14,7 @@
  * Translators:
  *		dgy18787
  *		Pengphei Han
+ *		Máximo Castañeda
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -37,6 +38,7 @@
 <li><a href="../de/bugreports.html">Deutsch</a></li>
 <li><a href="../en/bugreports.html">English</a></li>
 <li><a href="../es/bugreports.html">Español</a></li>
+<li><a href="../eo/bugreports.html">Esperanto</a></li>
 <li><a href="../fr/bugreports.html">Français</a></li>
 <li><a href="../fur/bugreports.html">Furlan</a></li>
 <li><a href="../it/bugreports.html">Italiano</a></li>
@@ -93,7 +95,7 @@
 <br />
 在确定它是一个独特的错误之后，您需要尽可能的找出有关的详细信息：</p>
 <ul>
-	<li><p>尝试在当前版本的Haiku系统中重现您的问题。  有许多用于测试的预编译镜像都是<a href="http://haiku-files.org/">可用的</a>。</p></li>
+	<li><p>尝试在当前版本的Haiku系统中重现您的问题。  有许多用于测试的预编译镜像都是<a href="http://download.haiku-os.org">可用的</a>。</p></li>
 	<li><p>包括基本的信息，例如以何种方式测试 Haiku（利用真实的硬件，VMware，还是 QEMU）。</p></li>
 	<li><p>Mention which revision you are running. You can find this information in <span class="menu">About Haiku...</span> from the Deskbar menu. Also mention what kind of Haiku build you are testing (x86_gcc2, x86_64). The downloadable images are named accordingly, for a self-built image you should know how you built it.</p></li>
 	<li><p>描述您所遇到的问题。尽量把问题讲得精确和明白：详细的描述系统的行为反馈，和您期望的反馈。</p></li>
@@ -122,7 +124,7 @@ Depending on what exactly crashed, you can try to save a crash report on the Des
 <li><p>系统无法实现正确引导。它可能自动重启，或停止在某个步骤（例如，某个启动图标）。对于后一种情况，可以尝试使用快捷键 <span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span>。</p></li>
 <li><p>整个系统或者部分硬件无法正确运行。例如，系统运行缓慢，出现错误，或者完全无法运行。如果某个硬件完全无法工作，首要的是检查Haiku目前是否支持该硬件（例如，在邮件列表或论坛中进行询问）。</p></li>
 </ul>
-<p>需要注意的是，只有最后这种情况与硬件相关，而所有其他的问题也可能由硬件驱动中的错误引起。如果您对引起该问题的硬件或相关的驱动有所疑问，您可以检查删除/禁用该硬件或驱动是否会产生影响。例如，如果您怀疑无线网络有问题，您会发现 BIOS 中有可禁用它的选项。如果其中没有该选项，您可以从安装的 Haiku 中删除相关的无线网络驱动（参见 <a href="../../../userguide/en/bootloader.html">引导程序</a>）。</p>
+<p>需要注意的是，只有最后这种情况与硬件相关，而所有其他的问题也可能由硬件驱动中的错误引起。如果您对引起该问题的硬件或相关的驱动有所疑问，您可以检查删除/禁用该硬件或驱动是否会产生影响。例如，如果您怀疑无线网络有问题，您会发现 BIOS 中有可禁用它的选项。如果其中没有该选项，您可以从安装的 Haiku 中删除相关的无线网络驱动（参见 <a href="../../../userguide/zh_CN/bootloader.html">引导程序</a>）。</p>
 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="kdl" name="kdl">内核调试 - KDL</a></h3>

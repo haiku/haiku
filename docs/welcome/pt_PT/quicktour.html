@@ -11,6 +11,7 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		Humdinger
+ *		Máximo Castañeda
  *		'
  *
 -->
@@ -38,6 +39,7 @@
 <li><a href="../de/quicktour.html">Deutsch</a></li>
 <li><a href="../en/quicktour.html">English</a></li>
 <li><a href="../es/quicktour.html">Español</a></li>
+<li><a href="../eo/quicktour.html">Esperanto</a></li>
 <li><a href="../fr/quicktour.html">Français</a></li>
 <li><a href="../fur/quicktour.html">Furlan</a></li>
 <li><a href="../it/quicktour.html">Italiano</a></li>
@@ -57,7 +59,8 @@
 
 
 <span class="navdots">
-<a href="#start"><acronym title="Start" class="current-page">◉</acronym></a> 
+<a class="hide-no-js" id="prevtopic" title="Previous topic">◀</a>
+<a href="#start"><acronym title="Start">◉</acronym></a> 
 <a href="#deskbar"><acronym title="The Deskbar">◉</acronym></a> 
 <a href="#window"><acronym title="The window widgets">◉</acronym></a> 
 <a href="#shortcutkey"><acronym title="The shortcut key">◉</acronym></a> 
@@ -76,16 +79,23 @@
 <a href="#wireless"><acronym title="Wireless connection">◉</acronym></a> 
 <a href="#moresoftware"><acronym title="Getting more and updating software">◉</acronym></a> 
 <a href="#end"><acronym title="End">◉</acronym></a> 
+<a class="hide-no-js" id="nexttopic" title="Next topic">▶</a>
 </span>
 
+<span class="hide-no-js"><a id="toggle" title="Toggle slides view">▤</a></span>
+
 <span>
-<a href="#topics" class="uplink">Topics</a> 
+<a href="#index" class="uplink">Topics</a> 
 </span>
 </div>
 </div>
 
 <div id="content">
 <div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div></div>
+<!-- Please keep the previous empty div there so that the tool can add the "not fully translated" notice on export -->
+
+<div class="topic">
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Índice</td></tr>
@@ -115,12 +125,17 @@
 <h1><a id="start" name="start">Bem-vindo(a) à Visita Guiada ao Haiku</a></h1>
 
 <p>Ainda que partilhe muitas ideias com outros sistemas operativos, o Haiku tem uma abordagem singular em algumas áreas que vale a pena destacar. Em apenas alguns dispositivos, ficará a conhecer as principais funcionalidades e peculiaridades, o que o(a) ajudará a começar rapidamente.</p>
-<p>No fundo de cada página , encontrará ligações para “leitura adicional“ que direcionam para recursos adicionais, como tópicos relacionados no  <a href="https://www.haiku-os.org/docs/userguide/en/contents.html" target="_blank">Manual do Utilizador</a>.</p>
+<p>For each topic you can find a box with links for "further reading" that point to additional resources, like related topics in the <a href="https://www.haiku-os.org/docs/userguide/pt_PT/contents.html" target="_blank">Userguide</a>.</p>
 
 </div>
 
 <div class="topic">
 <h1><a id="deskbar" name="deskbar">A Deskbar</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Leitura adicional</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/pt_PT/deskbar.html" target="_blank">Deskbar</a></td></tr>
+</table>
 
 <p>Posicionada por predefinição no canto superior direito do ecrã, a Deskbar é o centro da interação com o Haiku. Com ela pode, por exemplo, iniciar aplicações, applets e preferências, bem como alternar entre as aplicações em execução.</p>
 
@@ -128,14 +143,16 @@
 <div class="shot">
 <img src="./images/quicktour/deskbar.png" alt="The Deskbar" />
 </div>
-
-<div class="further">Leitura adicional:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/deskbar.html" target="_blank">Deskbar</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="window" name="window">Os controlos de janela</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Leitura adicional</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/pt_PT/gui.html" target="_blank">Haiku's GUI</a></td></tr>
+</table>
 
 <p>Esta é uma janela típica do Haiku com os seus controlos habituais:</p>
 
@@ -143,14 +160,16 @@
 <div class="shot">
 <img src="./images/quicktour/window.png" alt="A window and its widgets" />
 </div>
-
-<div class="further">Leitura adicional:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/gui.html" target="_blank">Haiku's GUI</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="shortcutkey" name="shortcutkey">A tecla de atalho</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Leitura adicional</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/pt_PT/keyboard-shortcuts.html" target="_blank">Shortcuts and key combinations</a></td></tr>
+</table>
 
 <p>As preferências da <span class="app">Disposição de Teclado</span> permitem trocar a tecla <span class="key">ALT</span> padrão do Haiku pela tecla <span class="key">CTRL</span> (modo Windows/Linux). Trata-se de uma definição global, por isso, por exemplo, ao terminar um programa na linha de comandos isso passará a ser feito com <span class="key">ALT</span> <span class="key">C</span> em vez do habitual <span class="key">CTRL</span> <span class="key">C</span>.<br />
 Esta inconsistência é uma razão para o atalho de teclado vir predefinido como <span class="key">ALT</span> no Haiku.</p>
@@ -159,14 +178,16 @@ Esta inconsistência é uma razão para o atalho de teclado vir predefinido como
 <div class="shot">
 <img src="./images/quicktour/alt-ctrl.png" alt="Shortcut key: ALT vs. CTRL" />
 </div>
-
-<div class="further">Leitura adicional:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/keyboard-shortcuts.html" target="_blank">Shortcuts and key combinations</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="twitcher" name="twitcher">O Twitcher</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Leitura adicional</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/pt_PT/twitcher.html" target="_blank">Twitcher</a></td></tr>
+</table>
 
 <p>Pressionando <span class="key">CTRL</span> <span class="key">TAB</span> invocará o <span class="app">Twitcher</span> onde pode alternar entre as aplicações que se encontram em execução.<br />
 Ao tocar na tecla <span class="key">TAB</span> de forma rápida enquanto pressiona <span class="key">CTRL</span>, trocamos para a última aplicação utilizada.</p>
@@ -174,14 +195,16 @@ Ao tocar na tecla <span class="key">TAB</span> de forma rápida enquanto pressio
 <div class="shot">
 <img src="../images/quicktour/twitcher.png" alt="The Twitcher switching between apps" />
 </div>
-
-<div class="further">Leitura adicional:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/twitcher.html" target="_blank">Twitcher</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="teammonitor" name="teammonitor">O Monitor de Equipas</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Leitura adicional</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/pt_PT/teammonitor.html" target="_blank">Team monitor</a></td></tr>
+</table>
 
 <p>Caso alguma aplicação tenha bloqueado gravemente e talvez nem desapareça da list de aplicações em execução na Deskbar, pressione <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">DEL</span> para invocar o <span class="app">Monitor de Equipas</span>. Aqui poderá selecionar uma entrada da lista e matar a aplicação que não se esteja a portar corretamente.</p>
 
@@ -191,13 +214,16 @@ Ao tocar na tecla <span class="key">TAB</span> de forma rápida enquanto pressio
 
 <p>Uma boa forma de se livrar de uma aplicação que esteja bloqueada na Deskbar é a <i>Vulcan Death Grip</i>.<br />
 Pressione <span class="key">SHIFT</span> <span class="key">CTRL</span> <span class="key">ALT</span> e clique na entrada correspondente à aplicação problemática na Deskbar. Puf!</p>
-<div class="further">Leitura adicional:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/teammonitor.html" target="_blank">Team monitor</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="move-resize" name="move-resize">Gestão de janelas: Mover &amp; Redimensionar</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Leitura adicional</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/pt_PT/gui.html#move-resize" target="_blank">A quick way to move or resize windows</a></td></tr>
+</table>
 
 <p>O Haiku disponibiliza uma forma prática de mover ou redimensionar janelas rapidamente:<br />
 Pressionando <span class="key">CTRL</span> <span class="key">ALT</span> os limites de janela mais próximos do ponteiro do rato serão realçados.<br />
@@ -207,14 +233,16 @@ Clicar e arrastar com o botão <i>esquerdo</i> do rato permite mover a janela de
 <div class="shot">
 <img src="./images/quicktour/move-resize.png" alt="Move with CTRL+ALT+left mouse button" />
 </div>
-
-<div class="further">Leitura adicional:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/gui.html#move-resize" target="_blank">A quick way to move or resize windows</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="stack" name="stack">Gestão de janelas: Empilhar</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Leitura adicional</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/pt_PT/gui.html#stack-tile" target="_blank">Stack &amp; Tile</a></td></tr>
+</table>
 
 <p>"Empilhar" ("Stacking") significa posicionar as janelas umas por cima das outras, deslocando automaticamente as abas amarelas para posições adequadas.<br />
 Ao pressionar a tecla <span class="key">OPT</span> (normalmente aparece como <span class="key">WIN</span> no teclado), as abas mudam de cor quando se sobrepõem. Largue a janela para aplicar o empilhamento.<br />
@@ -225,14 +253,16 @@ Delay time 200 (= 2 secs), option "Don't stack frames" -->
 <div class="shot">
 <img src="./images/quicktour/stack.gif" alt="Stacking windows" />
 </div>
-
-<div class="further">Leitura adicional:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/gui.html#stack-tile" target="_blank">Stack &amp; Tile</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="tile" name="tile">Gestão de janelas: Encaixar</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Leitura adicional</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/pt_PT/gui.html#stack-tile" target="_blank">Stack &amp; Tile</a></td></tr>
+</table>
 
 <p>Encaixar ("Tiling") significa colar janelas horizontal ou verticalmente pelos seus limites.<br />
 pressionando <span class="key">OPT</span>, os limites que ficarão juntos quando largar a janela mudam de cor sempre que se aproximam um perto do outro.<br />
@@ -243,14 +273,17 @@ Delay time 200 (= 2 secs), option "Don't stack frames" -->
 <div class="shot">
 <img src="./images/quicktour/tile.gif" alt="Tiling windows" />
 </div>
-
-<div class="further">Leitura adicional:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/gui.html#stack-tile" target="_blank">Stack &amp; Tile</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="workspaces" name="workspaces">Áreas de Trabalho</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Leitura adicional</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/pt_PT/workspaces.html" target="_blank">Workspaces</a><br />
+<a href="https://www.haiku-os.org/docs/userguide/pt_PT/preferences/screen.html" target="_blank">Screen</a></td></tr>
+</table>
 
 <p>As Áreas de Trabalho são secretárias virtuais, cada uma completa com a sua própria resolução de ecrã, profundidade de cor e imagem ou cor de fundo.<br />
 Podem ser definidos até 32 destas áreas de trabalho a partir das preferências de <span class="app">Ecrã</span>.</p>
@@ -261,15 +294,16 @@ Se a estes adicionar a tecla <span class="key">SHIFT</span>, a janela ativa ser�
 <div class="shot">
 <img src="./images/quicktour/workspaces.png" alt="The Workspaces applet" />
 </div>
-
-<div class="further">Leitura adicional:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/workspaces.html" target="_blank">Workspaces</a><br />
-<a href="https://www.haiku-os.org/docs/userguide/en/preferences/screen.html" target="_blank">Screen</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="replicants" name="replicants">Replicantes</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Leitura adicional</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/pt_PT/gui.html#replicants" target="_blank">Replicants</a></td></tr>
+</table>
 
 <p>Os Replicantes são pequenas partes auto-suficientes de aplicações que podem ser integradas na Área de Trabalho (e noutros programas).<br />
 Desde que a opção da Deskbar para <span class="menu">Mostrar replicantes</span> esteja ativa, os replicantes são indicados por uma pequena pega.<br />
@@ -281,14 +315,16 @@ Pode arrastá-las por essa pega e largá-las na Área de Trabalho, onde elas sã
 </div>
 
 <p>Pode mover um replicante pela sua pega e removê-la com um clique direito nela e selecionando <span class="menu">Remover replicante</span>.</p>
-
-<div class="further">Leitura adicional:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/gui.html#replicants" target="_blank">Replicants</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="singlewindow" name="singlewindow">Navegação em janela única</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Leitura adicional</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/pt_PT/tracker.html" target="_blank">Tracker</a></td></tr>
+</table>
 
 <p>Se utilizar várias vezes o duplo-clique para abrir caminho, pasta após pasta, rapidamente acabará com muitas janelas do  Tracker abertas.<br />
 Pressionando a tecla <span class="key">OPT</span> (que normalmente aparece como <span class="key">WIN</span> no teclado) evita isto, fechando automaticamente a pasta superior.<br />
@@ -299,14 +335,16 @@ Em alternativa, poderá ativar a <span class="menu">Navegação em janela única
 <div class="shot">
 <img src="./images/quicktour/singlewindow.png" alt="Using Single window navigation" />
 </div>
-
-<div class="further">Leitura adicional:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/tracker.html" target="_blank">Tracker</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="drilldown" name="drilldown">Navegação "drill-down"</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Leitura adicional</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/pt_PT/tracker.html#navigating" target="_blank">Tracker navigation</a></td></tr>
+</table>
 
 <p>Uma boa alternativa à abertura de uma hierarquia profunda de pastas é chamada "navegação <I>drill-down</I>". Clicando com o botão direito numa pasta ou em qualquer lugar na Área de Trabalho ou numa janela do Tracker,  fará abrir um menu contextual. Para além dos comandos habituais, encontrará no topo um menu da pasta atual contendo todas as suas sub-pastas.<br />
 Percorra o seu caminho até encontrar a pasta ou ficheiro que pretende abrir.</p>
@@ -314,14 +352,16 @@ Percorra o seu caminho até encontrar a pasta ou ficheiro que pretende abrir.</p
 <div class="shot">
 <img src="./images/quicktour/drilldown.png" alt="Drilling down folder hierarchies" />
 </div>
-
-<div class="further">Leitura adicional:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/tracker.html#navigating" target="_blank">Tracker navigation</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="mounting" name="mounting">Montar volumes</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Leitura adicional</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/pt_PT/tracker.html#mounting-volumes" target="_blank">Mounting volumes</a></td></tr>
+</table>
 
 <p>Para acender a um disco rígido, CD, unidade USB, etc., deverá primeiro montar o volume. Uma vez montado, o seu ícone aparece na Área de Trabalho.<br />
 Para tal, clique com o botão direito na Área de Trabalho ou num volume que já esteja montado (como o disco de arranque) e escolha o volume a partir do submenu <span class="menu">Montar</span>. Encontrará o mesmo menu <span class="menu">Montar</span> na Deskbar. As imagens ISO podem ser montadas com duplo-clique.</p>
@@ -331,14 +371,18 @@ Para tal, clique com o botão direito na Área de Trabalho ou num volume que já
 <div class="shot">
 <img src="./images/quicktour/mount.png" alt="Mounting a volume" />
 </div>
-
-<div class="further">Leitura adicional:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/tracker.html#mounting-volumes" target="_blank">Mounting volumes</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="filesystem" name="filesystem">Estrutura do sistema de ficheiros</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Leitura adicional</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/pt_PT/filesystem-layout.html" target="_blank">Filesystem layout</a><br />
+<a href="https://www.haiku-os.org/docs/userguide/pt_PT/applications.html" target="_blank">Applications</a><br />
+<a href="https://git.haiku-os.org/haiku/tree/docs/develop/packages/DirectoryStructure.rst" target="_blank">Directory structure</a></td></tr>
+</table>
 
 <p>Apesar de o Haiku atualmente não ser multi-utilizador, já há dois ramos na árvore do sistema de ficheiros:</p>
 
@@ -362,16 +406,17 @@ As pastas que aí se encontram (como <i>add-ons</i>, <i>apps</i>, <i>bin</i> etc
 
 <p>As pastas <i>non-packaged</i> (de leitura e escrita) espelham a hierarquia das pastas /system ou ~/config/ (<i>add-ons</i>, <i>apps</i>, <i>bin</i>…).<br />
 O software que não vem sob a forma de um pacote HPKG pode ser instalado aí.</p>
-
-<div class="further">Leitura adicional:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/filesystem-layout.html" target="_blank">Filesystem layout</a><br />
-<a href="https://www.haiku-os.org/docs/userguide/en/applications.html" target="_blank">Applications</a><br />
-<a href="https://git.haiku-os.org/haiku/tree/docs/develop/packages/DirectoryStructure.rst" target="_blank">Directory structure</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="queries" name="queries">Encontrar ficheiros com consultas</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Leitura adicional</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/pt_PT/queries.html" target="_blank">Queries</a><br />
+<a href="https://www.haiku-os.org/docs/userguide/pt_PT/workshop-filetypes attributes.html" target="_blank">Filetypes, Attributes, Index and Queries</a></td></tr>
+</table>
 
 <p>É possível pesquisar rapidamente ficheiros em volumes formatados pelo Haiku (BFS) com <span class="menu">Procurar…</span> a partir da Deskbar. Em vez de nomes de ficheiros e pastas, pode também pesquisar por atributos específicos do tipo de ficheiro, por exemplo o nome de um artista na sua coleção de MP3.</p>
 
@@ -379,15 +424,18 @@ O software que não vem sob a forma de um pacote HPKG pode ser instalado aí.</p
 <div class="shot">
 <img src="./images/quicktour/query.png" alt="Finding all MP3s of an artist" />
 </div>
-
-<div class="further">Leitura adicional:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/queries.html" target="_blank">Queries</a><br />
-<a href="https://www.haiku-os.org/docs/userguide/en/workshop-filetypes attributes.html" target="_blank">Filetypes, Attributes, Index and Queries</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="wireless" name="wireless">Ligação sem fios</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Leitura adicional</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/pt_PT/workshop-wlan.html" target="_blank">Wireless networking</a><br />
+<a href="https://www.haiku-os.org/docs/userguide/pt_PT/desktop-applets/networkstatus.html" target="_blank">NetworkStatus</a><br />
+<a href="https://www.haiku-os.org/docs/userguide/pt_PT/preferences/network.html" target="_blank">Network preferences</a></td></tr>
+</table>
 
 <p>Pode ligar ao seu <I>router</I> WLAN clicando com botão direito no ícone <span class="app">Estado da Rede</span> no tabuleiro da Deskbar,<br />
 ou selecionando a sua rede a partir das preferências de <span class="app">Rede</span> (<I>Network</I>).<br />
@@ -397,16 +445,18 @@ Quando a ligação for estabelecida, ser-lhe-á solicitado o tipo de encriptaç�
 <div class="shot">
 <img src="./images/quicktour/wireless.png" alt="Connecting with a wireless network" />
 </div>
-
-<div class="further">Leitura adicional:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/workshop-wlan.html" target="_blank">Wireless networking</a><br />
-<a href="https://www.haiku-os.org/docs/userguide/en/desktop-applets/networkstatus.html" target="_blank">NetworkStatus</a><br />
-<a href="https://www.haiku-os.org/docs/userguide/en/preferences/network.html" target="_blank">Network preferences</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="moresoftware" name="moresoftware">Atualizar e obter mais software</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Leitura adicional</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/pt_PT/applications/haikudepot.html" target="_blank">HaikuDepot</a><br />
+<a href="https://www.haiku-os.org/docs/userguide/pt_PT/applications/softwareupdater.html" target="_blank">SoftwareUpdater</a><br />
+<a href="https://www.haiku-os.org/docs/userguide/pt_PT/preferences/repositories.html" target="_blank">Repositories</a></td></tr>
+</table>
 
 <p>O <span class="app">HaikuDepot</span>, que se encontra no menu de aplicações da Deskbar, é onde podemos procurar, instalar e desinstalar pacotes de software.<br />
 A <span class="app">Atualização de Software</span> deve ser iniciada de vez em quando para atualizar o software instalado, bem como o próprio Haiku.</p>
@@ -415,18 +465,14 @@ A <span class="app">Atualização de Software</span> deve ser iniciada de vez em
 <div class="shot">
 <img src="./images/quicktour/moresoftware.png" alt="Installing and updating apps" />
 </div>
-
-<div class="further">Leitura adicional:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/applications/haikudepot.html" target="_blank">HaikuDepot</a><br />
-<a href="https://www.haiku-os.org/docs/userguide/en/applications/softwareupdater.html" target="_blank">SoftwareUpdater</a><br />
-<a href="https://www.haiku-os.org/docs/userguide/en/preferences/repositories.html" target="_blank">Repositories</a></div>
 </div>
 
-<div>
+
+<div class="topic">
 <h1><a id="end" name="end">Fim</a></h1>
 
 <p>Chegámos ao fim desta breve visita guiada. Esperamos que tenha ajudado a sentir-se em casa no seu novo sistema operativo!</p>
-<p>Para informação mais detalhada, consulte a página <a href="https://www.haiku-os.org/docs/welcome/welcome_en.html" target="_blank">Bem-vindo ao Haiku!</a> e o <a href="https://www.haiku-os.org/docs/userguide/en/contents.html" target="_blank">Guia do Utilizador</a>.<br />
+<p>Para informação mais detalhada, consulte a página <a href="https://www.haiku-os.org/docs/welcome/welcome_pt_PT.html" target="_blank">Bem-vindo ao Haiku!</a> e o <a href="https://www.haiku-os.org/docs/userguide/pt_PT/contents.html" target="_blank">Guia do Utilizador</a>.<br />
 Também pode participar no nosso  <a href="https://discuss.haiku-os.org/" target="_blank">fórum <I>web</I></a> e no nosso <a href="https://www.haiku-os.org/community/irc/" target="_blank">canal principal de IRC #haiku</a> para obter ajuda ou para partilhar e discutir as suas ideias.</p>
 <p>O <I>website</I> do Haiku contém informação sobre como <a href="https://www.haiku-os.org/community/getting-involved/" target="_blank">participar ativamente</a> em fazer avançar o Haiku. Pode também efetuar <a href="https://www.haiku-os.org/community/donating_to_haiku" target="_blank">donativos financeiros</a>.</p>
 
@@ -438,5 +484,10 @@ Também pode participar no nosso  <a href="https://discuss.haiku-os.org/" target
 </div>
 </div>
 
+<div id="bottom-nav" class="slide-only">
+<a id="prevtopic-bottom" class="navbutton" title="Previous">◀</a>
+<a id="nexttopic-bottom" class="navbutton" title="Next">▶</a>
+</div>
+<script type="text/javascript" src="../Haiku-tour.js"></script>
 </body>
 </html>
