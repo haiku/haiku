@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-Installer	1364063076
+1	danish	x-vnd.Haiku-Installer	1520271509
 Performing installation.	InstallProgress		Udfører installation.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Vælg en oprindelsesdisk fra popup-menuen. Tryk dernæst på \"Begynd\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Luk venligst vinduet for drevopsætning, før du lukker installationsvinduet.
@@ -23,6 +23,7 @@ Welcome to the Haiku Installer!\n\n	InstallerApp		Velkommen til Haiku-installati
 ?? of ??	InstallerWindow	Unknown progress	?? af ??
 Quit Boot Manager	InstallerWindow		Afslut opstartsmanager
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Drevopsætning, programmet til at konfigurere diskpartitioner, kunne ikke begynde.
+The target volume is not empty. If it already contains a Haiku installation, it will be overwritten. This will remove all installed software.\n\nIf you want to upgrade your system without removing installed software, see the Haiku User Guide's topic on the application \"SoftwareUpdater\" for update instructions.\n\nAre you sure you want to continue the installation?	InstallProgress		Måldiskområdet er ikke tomt. Hvis det allerede indeholder en Haiku-installation, så vil den blive overskrevet. Det vil fjerne al installerede software.\n\nHvis du vil opgradere dit system uden at fjerne installerede software, så se emnerne om programmet \"Softwareopdatering\" i Haikus brugervejledning for instruktioner om opdatering.\n\nEr du sikker på, at du vil fortsætte installationen?
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Kører opstartsmanager…\n\nLuk opstartsmanager for at fortsætte med installationen.
 Quit DriveSetup	InstallerWindow		Afslut drevopsætning
 Write boot sector	InstallerWindow		Skriv opstartssektoren
@@ -43,6 +44,7 @@ Error writing boot sector.	InstallProgress		Fejl ved skrivning af opstartssektor
 OK	InstallerWindow		OK
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Luk venligst vinduerne for opstartsmanager og drevopsætning, før du lukker vinduet for installationen.
 Failed to launch Boot Manager	InstallerWindow		Kunne ikke start opstartshåndteringen
+3)   When you successfully boot into Haiku for the first time, make sure to read our \"User Guide\" and take the \"Quick Tour\". There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Når du starter Heiku for første gang, så sørg for at læse vores \"Brugervejledning\" og tag \"Quick Tour\". Der er links på skrivebordet og i WebPositive's bogmærker.\n\n
 Try installing anyway	InstallProgress		Prøv at installer alligevel
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		VIGTIG INFORMATION INDEN INSTALLATION AF HAIKU\n\n
 Additional disk space required: %s	InstallerWindow		Yderligere påkrævet diskplads: %s
@@ -55,6 +57,7 @@ The disk can't be mounted. Please choose a different disk.	InstallProgress		Disk
 Begin	InstallerWindow		Begynd
 Collecting copy information.	InstallProgress		Samler information om ophavsret.
 Show optional packages	InstallerWindow		Vis valgfri pakker
+No partitions have been found that are suitable for installation. Please set up partitions and format at least one partition with the Be File System.	InstallerWindow		Der blev ikke fundet nogle partitioner som er egnet til installation. Opsæt venligst partitioner og formatér mindst én partition med Be-filsystemet.
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Destinationsdisken har måske ikke nok plads. Prøv at vælge en anden disk, eller prøv ikke at installere valgfrie elementer.
 Installation canceled.	InstallProgress		Installation afbrudt.
 Stop	InstallerWindow		Stop

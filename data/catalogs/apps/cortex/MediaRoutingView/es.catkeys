@@ -12,7 +12,7 @@ Could not load '%filename%'	MediaRoutingView		No se pudo cargar '%filename%'
 Stop time source	MediaNodePanel		Parar fuente de tiempo
 Be Audio Mixer	MediaRoutingView		Mezclador de Audio Be
 Video input	MediaRoutingView		Entrada de video
-Release	MediaNodePanel		Soltar
+Release	MediaNodePanel		Liberar
 Disconnect	MediaRoutingView		Desconectar
 Could not disconnect	MediaRoutingView		No se pudo desconectar
 Could not instantiate '%infoname%'	MediaRoutingView		No se pudo concretar '%infoname%'
@@ -23,7 +23,7 @@ Input	MediaJack		Entrada
 Get info	MediaJack		Obtener información
 Start time source	MediaNodePanel		Iniciar fuente de tiempo
 Error	MediaRoutingView		Error
-Could not release '%refname%'	MediaRoutingView		No se pudo soltar '%refname%'
+Could not release '%refname%'	MediaRoutingView		No se pudo liberar '%refname%'
 Output	MediaJack		Salida
 Get info	MediaNodePanel		Obtener información
 Get info	MediaRoutingView		Obtener información

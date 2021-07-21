@@ -130,16 +130,16 @@ Source packages	MainWindow		Pacchetti sorgente
 -	no package size		-
 Problem with working files	App		Problema con i file di supporto dell'applicazione
 Server error	ServerHelper		Errore del server
-Try again	App		Riprova
 Rate package	RatePackageWindow		Valuta pacchetto
+Try again	App		Riprova
 Unknown	PackageListView		Sconosciuto
 I agree to the usage conditions	UserLoginWindow		Acconsento alle condizioni d'uso
 Log in	UserLoginWindow		Accesso
 Logged in as %User%	MainWindow		Sessione avviata come %User%
 Email address:	UserLoginWindow		Indirizzo e-mail:
 Screenshot	ScreenshotWindow		Istantanea
-HaikuDepot	System name		HaikuDepot
 A reboot is necessary to complete the installation process.	PackageManager		Per completare l'installazione è necessario riavviare.
+HaikuDepot	System name		HaikuDepot
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{Ho almeno un anno}other{Ho # anni o oltre}}
 View latest usage conditions…	MainWindow		Vedi l'ultima revisione delle condizioni d'uso…
 Quit	App		Chiudi

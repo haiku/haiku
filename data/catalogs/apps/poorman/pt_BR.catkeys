@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-PoorMan	3777995057
+1	portuguese (brazil)	x-vnd.Haiku-PoorMan	1829050509
 Select web folder	PoorMan		Selecionar pasta web
 Console logging	PoorMan		Registro do console
 Create Log File	PoorMan		Criar Arquivo de Registro
@@ -17,7 +17,7 @@ Logging view	PoorMan		Visão do registro
 Save console as…	PoorMan		Salvar console como…
 Edit	PoorMan		Editar
 Cancel	PoorMan		Cancelar
-Directory: 	PoorMan		Diretório:  
+Directory: 	PoorMan		Diretório: 
 Hits: %lu	PoorMan		Visitas: %lu
 Hits: 0	PoorMan		Visitas: 0
 Shutting down.\n	PoorMan		Desligando.\n
@@ -34,7 +34,7 @@ Create public_html	PoorMan		Criar public_html
 Clear hit counter	PoorMan		Limpar contador de visitas
 Status: Stopped	PoorMan		Status: Parado
 File	PoorMan		Arquivo
-Settings…	PoorMan		Definições…
+Settings…	PoorMan		Configurações…
 Log To File	PoorMan		Registrar no Arquivo
 Connections	PoorMan		Conexões
 Controls	PoorMan		Controles
@@ -46,8 +46,9 @@ PoorMan	System name		Pobre Homem
 Clear console log	PoorMan		Limpar registro do console
 Run server	PoorMan		Executar servidor
 Create	PoorMan		Criar
+{0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# conexão} other{# conexões}}
 done.\n	PoorMan		concluído.\n
-PoorMan settings	PoorMan		Definições do Pobre Homem
+PoorMan settings	PoorMan		Configurações do Pobre Homem
 Console Logging	PoorMan		Registrando Console
 Clear log file	PoorMan		Limpar arquivo de registro
 Save log console selection	PoorMan		Salvar seleção do console de registro

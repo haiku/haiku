@@ -1,26 +1,26 @@
 1	romanian	x-vnd.Haiku-hmulti_audio.media_addon	451057402
-Master	MultiAudio		Stăpân
+Master	MultiAudio		Principal
 SPDIF	MultiAudio		SPDIF
-Gain	MultiAudio		Câștig
-Output 3D center	MultiAudio		Ieșire 3D centru
-Extended Setup	MultiAudio		Configurare Extinsă
+Gain	MultiAudio		Amplificare
+Output 3D center	MultiAudio		Ieșire centru 3D
+Extended Setup	MultiAudio		Configurare extinsă
 CD	MultiAudio		CD
-Tone control	MultiAudio		Control ton
+Tone control	MultiAudio		Control de ton
 Phone	MultiAudio		Telefon
 Aux	MultiAudio		Aux
-Output bass	MultiAudio		Ieșire bas
+Output bass	MultiAudio		Bas de ieșire
 Headphones	MultiAudio		Căști
 Beep	MultiAudio		Bip
-Output mono mix	MultiAudio		Ieșire mix mono
-Output stereo mix	MultiAudio		Ieșire mix stereo
+Output mono mix	MultiAudio		Mix mono de ieșire
+Output stereo mix	MultiAudio		Mix stereo de ieșire
 Input	MultiAudio		Intrare
-Output treble	MultiAudio		Ieșire sopran
+Output treble	MultiAudio		Sopran de ieșire
 Mono mix	MultiAudio		Mix mono
-General	MultiAudio		General
-Input & Output	MultiAudio		Intrare & Ieșire
+General	MultiAudio		Generale
+Input & Output	MultiAudio		Intrare și ieșire
 Enhanced Setup	MultiAudio		Configurare îmbunătățită
 Stereo mix	MultiAudio		Mix stereo
-Output 3D depth	MultiAudio		Ieșire 3D adâncime
+Output 3D depth	MultiAudio		Adâncime 3D de ieșire
 Volume	MultiAudio		Volum
 Output	MultiAudio		Ieșire
 Video	MultiAudio		Video

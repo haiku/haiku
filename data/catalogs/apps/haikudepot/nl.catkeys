@@ -1,9 +1,10 @@
-1	dutch; flemish	x-vnd.Haiku-HaikuDepot	3106374143
+1	dutch; flemish	x-vnd.Haiku-HaikuDepot	3544756144
 Repository update error	LocalRepositoryUpdateProcess		Fout bij updaten softwarebronnen
 Network error	ServerHelper		Netwerk fout
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Er is een fout opgetreden bij het verversen van de softwarebronnen: %error%
 User Created	UserLoginWindow		Gebruiker Aangemaakt
 Check for updates…	MainWindow		Controleer op updates…
+Uninstall	PackageManager		Verwijderen
 Uninstalled	PackageListView		Verwijderd
 It was not possible to create the new user.	UserLoginWindow		Het was niet mogelijk om een nieuwe gebruiker aan te maken.
 Available packages	MainWindow		Beschikbare pakketten
@@ -45,6 +46,8 @@ Category	FilterView		Categorie
 User rating	RatePackageWindow		Beoordeling
 Installed packages	MainWindow		Geïnstalleerde pakketten
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Een gevraagd object of een object verbonden in het verzoek werd niet gevonden op de server.
+Fatal error	PackageManager		Fatale fout
+Package action failed	PackageInfoView		Pakketactie mislukt
 No changelog available.	PackageInfoView		Geen changelog beschikbaar.
 Error	App		Fout
 There was a puzzling response from the web service.	UserLoginWindow		De webservice gaf een raadselachtig antwoord.
@@ -76,6 +79,7 @@ Stability	RatePackageWindow		Stabiliteit
 Send	RatePackageWindow		Versturen
 Start package daemon	App		Start pakket-daemon
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Het wachtwoord moet tweemaal ingevuld worden om te kans op een verkeerde invoer te verkleinen.
+The package action could not be scheduled: %Error%	PackageInfoView		De pakketactie kon niet gepland worden: %Error%
 Cancel	SettingsWindow		Annuleren
 Cancel	RatePackageWindow		Annuleren
 Inactive	PackageListView		Inactief
@@ -85,6 +89,7 @@ There are problems in the supplied data:	UserLoginWindow		Er zijn problemen met 
 OK	MainWindow		OK
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# item} other{# items}}
 Usage conditions download problem	UserLoginWindow		Gebruiksvoorwaarden downloadprobleem
+OK	PackageInfoView		Okee
 Downloading:	PackageInfoView		Downloaden:
 Quit	MainWindow		Afsluiten
 Success	UserLoginWindow		Succes
@@ -140,8 +145,8 @@ Source packages	MainWindow		Broncodepakketten
 -	no package size		-
 Problem with working files	App		Probleem met de werkbestanden
 Server error	ServerHelper		Server fout
-Try again	App		Opnieuw proberen
 Rate package	RatePackageWindow		Beoordeel pakket
+Try again	App		Opnieuw proberen
 Unknown	PackageListView		Onbekend
 I agree to the usage conditions	UserLoginWindow		Ik aanvaard de gebruiksvoorwaarden
 Log in	UserLoginWindow		Inloggen
@@ -149,8 +154,8 @@ Sending anonymous usage data	MainWindow		Bezig met het verzenden van anonieme ge
 Logged in as %User%	MainWindow		Ingelogd als %User%
 Email address:	UserLoginWindow		E-mailadres:
 Screenshot	ScreenshotWindow		Schermafbeelding
-HaikuDepot	System name		HaikuDepot
 A reboot is necessary to complete the installation process.	PackageManager		Een herstart is vereist om het installatie proces te voltooien.
+HaikuDepot	System name		HaikuDepot
 Yes	MainWindow		Ja
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{Ik ben tenminste één jaar oud}other{Ik ben # jaar of ouder}}
 View latest usage conditions…	MainWindow		Bekijk laatste gebruiksvoorwaarden...
@@ -167,6 +172,7 @@ Fetching remote repository data	LocalRepositoryUpdateProcess		Ophalen pakketbron
 Description	PackageListView		Beschrijving
 Open %DeskbarLink%	PackageManager		Open %DeskbarLink%
 User creation error	UserLoginWindow		Fout bij het aanmaken van de gebruiker
+Install	PackageManager		Installeren
 Input validation	UserLoginWindow		Invoervalidatie
 Log in…	MainWindow		Inloggen…
 You need to be logged into an account before you can rate packages.	MainWindow		U moet ingelogd zijn om pakketten te kunnen beoordelen.

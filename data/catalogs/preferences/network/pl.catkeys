@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Network	3062143965
+1	polish	x-vnd.Haiku-Network	543099905
 Ethernet device	InterfaceListItem		Urządzenie ethernetowe
 Link speed:	IntefaceView		Prędkość połączenia:
 disconnected	IntefaceView		rozłączone
@@ -13,6 +13,7 @@ Gateway:	IntefaceAddressView		Brama:
 The netmask defines your local network	IntefaceAddressView		Maska sieci definiuje twoją sieć lokalną
 Your IP address	IntefaceAddressView		Twój adres IP
 DHCP	IntefaceAddressView		DHCP
+IP address:	IntefaceAddressView		Adres IP:
 Netmask:	IntefaceAddressView		Maska sieci:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Usługi

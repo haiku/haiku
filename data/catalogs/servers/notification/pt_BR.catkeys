@@ -2,4 +2,4 @@
 Warning	NotificationWindow		Aviso
 Notification	NotificationWindow		Notificação
 OK	NotificationWindow		OK
-Couldn't start general settings monitor.\nLive filter changes disabled.	NotificationWindow		Não foi possível iniciar o monitor de configurações gerais.\nAlterações de filtro "ao vivo" desabilitadas.
+Couldn't start general settings monitor.\nLive filter changes disabled.	NotificationWindow		Não foi possível iniciar o monitor de configurações gerais.\nAlterações de filtro ao vivo desativadas.

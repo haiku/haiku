@@ -7,7 +7,7 @@ Default Printer	PrinterListView		Imprimantă implicită
 Connected to:	AddPrinterDialog		Conectat la:
 Make default	PrintersWindow		Stabilește ca implicit
 Cyan	TestPageView		Cyan
-Completed	JobListView		Completat
+Completed	JobListView		Finalizat
 Test page	PrintersWindow		Pagină de test
 Transport: %transport% %transport_address%	PrinterListView		Transport: %transport% %transport_address%
 Failed	JobListView		Eșuat
@@ -18,15 +18,15 @@ Cancel	AddPrinterDialog		Anulează
 Unknown status	JobListView		Stare necunoscută
 Print jobs for %printer_name%	PrintersWindow		Sarcini de tipărire pentru %printer_name%
 {0, plural, =-1{??? pages}=1{# page}other{# pages}}	JobListView		{0, plural, =-1{??? pages}=1{# page}other{# pages}}
-Add printer	AddPrinterDialog		Adaugă imprimantă
+Add printer	AddPrinterDialog		Adaugă o imprimantă
 Printers	PrintersWindow		Imprimante
-No printer found!	TransportMenu		Nicio imprimantă găsită!
-Add…	PrintersWindow		Adaugă…
-Magenta	TestPageView		Purpuriu
+No printer found!	TransportMenu		Nu s-a găsit nicio imprimantă!
+Add…	PrintersWindow		Adăugare…
+Magenta	TestPageView		Magenta
 Transport: %transport% %transport_address%	TestPageView		Transport: %transport% %transport_address%
 Add	AddPrinterDialog		Adaugă
-Print jobs: No printer selected	PrintersWindow		Sarcini de tipărire: Nicio imprimantă selectată
-Printer name:	AddPrinterDialog		Nume imprimantă:
+Print jobs: No printer selected	PrintersWindow		Sarcini de tipărire: nu a fost selectată nicio imprimantă
+Printer name:	AddPrinterDialog		Nume de imprimantă:
 Yellow	TestPageView		Galben
 Black	TestPageView		Negru
 Printer type:	AddPrinterDialog		Tip de imprimantă:
@@ -35,7 +35,7 @@ Printers	System name		Imprimante
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Imprimantă: %printer_name%\nDriver:  %driver%\n
 Green	TestPageView		Verde
 Print test page	PrintersWindow		Tipărește o pagină de test
-Restart job	PrintersWindow		Repornește sarcină
+Restart job	PrintersWindow		Reîncepe sarcina
 Driver: %driver%	PrinterListView		Driver: %driver%
-Cancel job	PrintersWindow		Anulează sarcină
-%.2f KB	JobListView		%.2f KB
+Cancel job	PrintersWindow		Anulează sarcina
+%.2f KB	JobListView		%.2f KO

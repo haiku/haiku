@@ -1,0 +1,43 @@
+1	russian	application/x-vnd.Cortex.InfoView	3415143429
+Offset	InfoView		Смещение
+Description	DormantNodeInfoView		Описание
+Byte order	InfoView		Порядок байтов
+Connection	InfoView		Соединение
+Output formats	DormantNodeInfoView		Формат выхода
+History	InfoView		История
+Input formats	DormantNodeInfoView		Форматы входа
+Signature	AppNodeInfoView		Сигнатура
+Any number	DormantNodeInfoView	For 'Max. instances' field	Любое число
+Buffer size	InfoView		Размер буфера
+\n- Quality:	FileNodeInfoView		\n- Качество:
+Application	AppNodeInfoView		Приложение
+Max. instances	DormantNodeInfoView		Макс. инстансов
+\n- Duration:	FileNodeInfoView		\n- Длительность:
+Latency	LiveNodeInfoView		Задержка
+Media type	InfoView		Медиаформат
+%title% info	InfoView		Информация о %title%
+Node ID	LiveNodeInfoView		ID узла
+Resolution	InfoView		Разрешение
+Chunk size	InfoView		Размер куска
+File format	AppNodeInfoView		Формат файла
+Orientation	InfoView		Ориентация
+Channels	InfoView		Каналы
+Sample rate	InfoView		Частота дискретизации
+File format	FileNodeInfoView		Формат файла
+(no file)	FileNodeInfoView		(нет файла)
+Media input	InfoView		Медиа вход
+Bit rate	InfoView		Битрейт
+Input format	DormantNodeInfoView		Формат ввода
+Format	InfoView		Формат
+Version	AppNodeInfoView		Версия
+AddOn ID	DormantNodeInfoView		ID аддона
+Frame size	InfoView		Размер кадра
+\n- Codec:	FileNodeInfoView		\n- Кодек:
+Port	LiveNodeInfoView		Порт
+Output format	DormantNodeInfoView		Выходной формат
+Aspect ratio	InfoView		Соотношение сторон
+Tracks	FileNodeInfoView		Дорожки
+Source	InfoView		Источник
+Destination	InfoView		Назначение
+Copyright	FileNodeInfoView		Авторское право
+ID:	FileNodeInfoView		ID:

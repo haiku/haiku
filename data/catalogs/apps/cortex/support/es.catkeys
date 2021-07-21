@@ -76,7 +76,7 @@ Side-left	MediaString		Lateral izquierdo
 YCbCr444	MediaString		YCbCr444
 Buffer producer	MediaString		Productor de búfer
 Buffer consumer	MediaString		Consumidor de búfer
-Increase latency	MediaString		Aumento de latencia
+Increase latency	MediaString		Aumentar la latencia
 Front-left-center	MediaString		Central frontal izquierdo
 MPEG format family	MediaString		Familia de formatos MPEG
 (none)	MediaString		(ninguno)

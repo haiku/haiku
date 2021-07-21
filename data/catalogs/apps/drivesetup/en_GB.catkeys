@@ -1,4 +1,4 @@
-1	english (united kingdom)	x-vnd.Haiku-DriveSetup	1882543531
+1	english (united kingdom)	x-vnd.Haiku-DriveSetup	2753519366
 Initialize	MainWindow		Initialise
 Could not change the parameters of the selected partition.	MainWindow		Could not change the parametres of the selected partition.
 Validation of the given parameters failed.	MainWindow		Validation of the given parametres failed.
@@ -7,6 +7,7 @@ Validation of the given creation parameters failed.	MainWindow		Validation of th
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Failed to change the parametres of the partition. No changes have been written to disk.
 No disk devices have been recognized.	DiskView		No disc devices have been recognised.
 Change parameters…	MainWindow		Change parametres…
+Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Are you sure you want to format a raw disk? (Most people initialise the disk with a partitioning system first) You will be asked again before changes are written to the disk.
 Validation of the given initialization parameters failed.	MainWindow		Validation of the given initialisation parametres failed.
 OK	MainWindow		Alright
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Are you sure you want to initialise the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n

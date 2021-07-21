@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-DriveSetup	2942313478
+1	russian	x-vnd.Haiku-DriveSetup	4048496535
 Could not unmount partition %s.	MainWindow		Невозможно отключить раздел %s.
 Mount all	MainWindow		Подключить все
 Disk	MainWindow		Диск
@@ -50,6 +50,8 @@ Are you sure you want to format a raw disk? (Most people initialize the disk wit
 Wipe (not implemented)	MainWindow		Форматировать (еще не реализовано)
 The currently selected partition does not have a parent partition.	MainWindow		Выбранный раздел не имеет родительского раздела.
 Validation of the given initialization parameters failed.	MainWindow		Не удалось применить параметры, введенные при инициализации.
+Not formatted (%s)	PartitionList		Не инициализирован (%s)
+Failed to create the partition. No changes have been written to disk.	MainWindow		Не удалось создать раздел. Изменения не были записаны на диск.
 Shared	PartitionList		Разделяемый
 MIMEs	PartitionList		MIME типы
 BitLocker encrypted	Encryption utils		Зашифрован с BitLocker
@@ -62,9 +64,11 @@ Change	ChangeParametersPanel		Изменить
 Partition name:	ChangeParametersPanel		Название раздела:
 LUKS encrypted	Encryption utils		Зашифрован с LUKS
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Вы уверены, что хотите записать изменения на диск прямо сейчас?\n\nЕсли вы продолжите, то все данные на разделе %s будут безвозвратно потеряны!
+Empty space	PartitionList		Без разметки
 Cancel	AbstractParametersPanel		Отмена
 Format	MainWindow		Инициализировать
 OK	MainWindow		ОК
+Empty space	DiskView		Без разметки
 Open with DiskProbe	MainWindow		Открыть в Редакторе диска
 Could not delete the selected partition.	MainWindow		Невозможно удалить выбранный раздел.
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Вы уверены, что хотите инициализировать выбранный диск? Все данные на этом диске будут потеряны.\nПовторный запрос будет выдан непосредственно перед записью изменений на диск.\n
@@ -81,6 +85,7 @@ Rescan	MainWindow		Пересканировать
 There was an error acquiring the partition row.	MainWindow		Произошла ошибка при получении списка разделов.
 Failed to initialize the disk %s!\n	MainWindow		Не удалось инициализировать раздел %s!\n
 Disk system \"%s\" not found!	MainWindow		Дисковая система \"%s\" не обнаружена!
+The partition cannot be unmounted.	MainWindow		Раздел не удается отмонтировать.
 Delete	MainWindow		Удалить
 Partition type:	ChangeParametersPanel		Тип раздела:
 Parameters	PartitionList		Параметры

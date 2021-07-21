@@ -1,0 +1,5 @@
+1	finnish	application/x-vnd.Cortex.AddOnHost	1256552338
+Continue	CortexAddOnHost		Jatka
+Cortex AddOnHost	CortexAddOnHost		Cortex AddOnHost
+Quit	CortexAddOnHost		Poistu
+This program runs in the background, and is started automatically by Cortex when necessary. You probably don't want to start it manually.	CortexAddOnHost		Tämä ohjelma suoritetaan taustalla ja Cortex käynnistää sen tarvittaessa automaattisesti. Et luultavasti halua käynnistää sitä manuaalisesti.

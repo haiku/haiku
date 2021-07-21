@@ -1,13 +1,18 @@
-1	french	application/x-vnd.Cortex.MediaRoutingView	2534343060
+1	french	application/x-vnd.Cortex.MediaRoutingView	4052235998
 Video output	MediaRoutingView		Sortie vidéo
 OK	MediaRoutingView		OK
+Advanced	MediaNodePanel		Avancé
 Audio input	MediaRoutingView		Entrée audio
 Video input	MediaRoutingView		Entrée vidéo
 Disconnect	MediaRoutingView		Déconnecter
 Could not disconnect	MediaRoutingView		Déconnexion impossible
 Could not instantiate '%infoname%'	MediaRoutingView		Impossible d’instancier « %infoname% »
+Select all	MediaRoutingView		Sélectionner tout
+(same as group)	MediaNodePanel		(identique au groupe)
 Input	MediaJack		Entrée
 Error	MediaRoutingView		Erreur
 Could not release '%refname%'	MediaRoutingView		Impossible de libérer « %refname% »
 Output	MediaJack		Sortie
+Clean up	MediaRoutingView		Nettoyer
+Tweak parameters	MediaNodePanel		Affiner les paramètres
 Could not connect	MediaRoutingView		Connexion impossible

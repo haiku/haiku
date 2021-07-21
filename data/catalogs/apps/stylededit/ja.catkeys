@@ -4,7 +4,7 @@ Cannot revert, file not found: \"%s\".	RevertToSavedAlert		ファイル \"%s\" �
 Cut	Menus		切り取り
 Center	Menus		中央揃え
 Increase size	Menus		拡大
-Page setup…	Menus		ページ設定…
+Page setup…	Menus		ページ設定...
 Wrap-around search	FindandReplaceWindow		折り返し検索
 Untitled 	StyledEditWindow		無題
 OK	Statistics		OK
@@ -27,7 +27,7 @@ OK	RevertToSavedAlert		OK
 Unlock file	StatusView		ロック解除
 Italic	Menus		イタリック
 Can't undo	Menus		元に戻せません
-Replace…	Menus		置換…
+Replace…	Menus		置換...
 File	Menus		ファイル
 Paste	Menus		貼り付け
 Bold	Menus		太字
@@ -40,7 +40,7 @@ Save	SaveAlert		保存
 Default	Open_and_SaveAsPanel		デフォルト
 Cancel	RevertToSavedAlert		中止
 Cancel	FindandReplaceWindow		中止
-Statistics…	Menus		統計…
+Statistics…	Menus		統計...
 Encoding	Open_and_SaveAsPanel		文字コード
 Replace all	FindandReplaceWindow		すべて置換
 Close	Menus		閉じる
@@ -55,8 +55,8 @@ Find:	FindandReplaceWindow		検索:
 Undo typing	QuitAlert		元に戻す
 Error loading \"%s\":\n\t%s	LoadAlert		\"%s\" を読み込み中にエラーが発生しました:\n\t %s
 Don't save	SaveAlert		保存しない
-Reload…	Menus		再読み込み…
-Print…	Menus		印刷…
+Reload…	Menus		再読み込み...
+Print…	Menus		印刷...
 Quit	Menus		終了
 Redo typing	QuitAlert		やり直し
 Ignore	NodeMonitorAlerts		無視
@@ -68,7 +68,7 @@ OK	LoadAlert		OK
 Save	QuitAlert		保存
 Case-sensitive	FindandReplaceWindow		大文字小文字を区別
 Find selection	Menus		選択範囲を検索
-Find…	Menus		検索…
+Find…	Menus		検索...
 Cancel	SaveAlert		中止
 Revert	RevertToSavedAlert		戻す
 Size	Menus		サイズ
@@ -78,8 +78,8 @@ Replace next	Menus		次を置換
 OK	QuitAlert		OK
 Edit	Menus		編集
 Replace with:	FindandReplaceWindow		置換:
-Open…	Menus		開く…
-Save as…	Menus		名前を付けて保存…
+Open…	Menus		開く...
+Save as…	Menus		名前を付けて保存...
 Replace	FindandReplaceWindow		置換
 Characters:	Statistics		文字数:
 Don't save	QuitAlert		保存しない

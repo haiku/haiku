@@ -124,16 +124,16 @@ The nickname is required.	UserLoginWindow		Απαιτείται ψευδώνυμ
 Source packages	MainWindow		Πηγαία πακέτα
 -	no package size		-
 Problem with working files	App		Πρόβλημα με τα επεξεργαζόμενα αρχεία
-Try again	App		Προσπάθεια ξανά
 Rate package	RatePackageWindow		Αξιολόγηση πακέτου
+Try again	App		Προσπάθεια ξανά
 Unknown	PackageListView		Άγνωστο
 I agree to the usage conditions	UserLoginWindow		Συμφωνώ στους όρους χρήσης
 Log in	UserLoginWindow		Είσοδος
 Logged in as %User%	MainWindow		Έχετε συνδεθεί ως %User%
 Email address:	UserLoginWindow		Διεύθυνση ηλεκτρονικού ταχυδρομείου:
 Screenshot	ScreenshotWindow		Στιγμιότυπο οθόνης
-HaikuDepot	System name		HaikuDepot
 A reboot is necessary to complete the installation process.	PackageManager		Είναι απαραίτητη μία επανεκκίνηση για την ολοκλήρωση της εγκατάστασης.
+HaikuDepot	System name		HaikuDepot
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{Είμαι τουλάχιστον ενός έτους}other{Είμαι # ετών ή μεγαλύτερος}}
 View latest usage conditions…	MainWindow		Προβολή των πιο πρόσφατων όρων χρήσεις…
 Quit	App		Έξοδος

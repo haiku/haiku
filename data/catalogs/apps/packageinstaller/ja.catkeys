@@ -7,18 +7,18 @@ Package installer	PackageView		パッケージインストーラー
 All existing files will be skipped?	PackageView		既存のファイルをすべてスキップしますか?
 Replace	PackageView		置き換える
 All existing files will be replaced?	PackageView		既存のファイルをすべて置き換えますか?
-Other…	PackageView		他の場所…
-The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		'%s' で指定されたシンボリックリンクはすでに与えられたパスに存在します。\nリンクをパッケージからのものに置き換えますか、またはスキップしますか?
+Other…	PackageView		他の場所...
+The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		シンボリックリンク'%s'はすでに指定されたパスに存在します。\nリンクをパッケージからのものに置き換えますか、またはスキップしますか?
 Stop	PackageStatus		中止
 Install to:	PackageView		インストール先:
-The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		与えられたパッケージはすでにインストールされているようです。既存のものをアンインストールしてインストールを続けますか?
+The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		指定されたパッケージはすでにインストールされているようです。既存のものをアンインストールしてインストールを続けますか?
 Skip all	PackageView		すべてスキップ
 The installation of the package has been aborted.	PackageView		パッケージのインストールは中止されました。
 No installation type selected	PackageView		インストールタイプが選択されていません
 Do you want to remember this decision for the rest of this installation?\n	PackageView		この決定を残りのインストール作業のために記憶しますか?\n
-The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		選択されたパッケージはシステムから削除されていません。あるインストール済パッケージの情報ファイルが壊れているかもしれません。
-Install…	UninstallView		インストール…
-The item named '%s' already exists in the given path.\nReplace the item with the one from this package or skip it?	PackageView		項目 '%s' がすでにパスに存在します。\n項目をパッケージの物と置換えますか、またはスキップしますか?
+The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		選択されたパッケージはシステムから削除されていません。与えられたインストール済パッケージの情報ファイルが壊れているかもしれません。
+Install…	UninstallView		インストール...
+The item named '%s' already exists in the given path.\nReplace the item with the one from this package or skip it?	PackageView		項目 '%s' がすでに指定されたパスに存在します。\n項目をパッケージの物と置換えますか、またはスキップしますか?
 Installing files and folders	PackageInstall		ファイルとフォルダーをインストールしています
 Installed packages	UninstallWindow		インストール済パッケージ
 Remove	UninstallView		削除
@@ -32,33 +32,33 @@ The package you requested has been successfully installed on your system.	Packag
 Installation progress	PackageView		インストール状況
 Decline	PackageTextViewer		断る
 Continue	PackageTextViewer		続ける
-Installing package	PackageStatus		パッケージをインストール中
-Install %name%	PackageView		%name% をインストール
+Installing package	PackageStatus		パッケージのインストール中
+Install %name%	PackageView		%name% のインストール
 %index% of %total%	PackageInstall		%index% / %total%
 No package selected.	UninstallView		パッケージが選択されていません。
 %name% (%size% free)	PackageView		%name% (%size% 空き)
 Error while installing the package\n	PackageView		パッケージをインストール中にエラーが発生しました\n
-Finishing installation	PackageInstall		インストールを終了中
+Finishing installation	PackageInstall		インストールの終了中
 No package available.	PackageInfo		利用できるパッケージがありません。
-The script named '%s' already exists in the given path.\nReplace the script with the one from this package or skip it?	PackageView		スクリプト '%s' がすでにパスに存在します。\nスクリプトをパッケージの物と置換えますか、またはスキップしますか?
+The script named '%s' already exists in the given path.\nReplace the script with the one from this package or skip it?	PackageView		スクリプト '%s' がすでに指定されたパスに存在します。\nスクリプトをパッケージの物と置換えますか、またはスキップしますか?
 Installation type:	PackageView		インストールタイプ:
 The package you selected has been successfully removed from your system.	UninstallView		選択されたパッケージはシステムから正常に削除されました。
 There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		パッケージファイルにファイルサイズの不一致があるようです。パッケージが壊れているか、作成後変更されたおそれがあります。インストールを本当に続けますか?
 %name% (%size%)	PackageView		%name% (%size%)
 Abort	PackageInstall		中断
-The file named '%s' already exists in the given path.\nReplace the file with the one from this package or skip it?	PackageView		ファイル '%s' がすでにパスに存在します。\nファイルをパッケージの物と置換えますか、またはスキップしますか?
+The file named '%s' already exists in the given path.\nReplace the file with the one from this package or skip it?	PackageView		ファイル '%s' がすでに指定されたパスに存在します。\nファイルをパッケージの物と置換えますか、またはスキップしますか?
 Replace all	PackageView		すべて置換
 The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		パッケージファイルを読めません。\n考えられる原因のひとつとして、要求されたファイルが正しい BeOS .pkg パッケージで無いことが考えられます。
 Continue	PackageInfo		続ける
 No package selected.	PackageInfo		パッケージが選択されていません。
 Error! \"%s\" is not a valid path.\n	Packageinstaller main		エラー! \"%s\" は正しいパスではありません。\n
-The directory named '%s' already exists in the given path.\nReplace the directory with one from this package or skip it?	PackageView		ディレクトリ '%s' がすでにパスに存在します。\nディレクトリをパッケージの物と置換えますか、またはスキップしますか?
+The directory named '%s' already exists in the given path.\nReplace the directory with one from this package or skip it?	PackageView		ディレクトリ '%s' がすでに指定されたパスに存在します。\nディレクトリをパッケージの物と置換えますか、またはスキップしますか?
 LegacyPackageInstaller	System name		パッケージインストーラー
 Ask again	PackageView		次回確認する
 Begin	PackageView		開始
 OK	PackageView		OK
 Abort	PackageInfo		中断
 Done	PackageInstall		完了
-Error (%s)! Could not open \"%s\".\n	Packageinstaller main		エラー (%s)! \"%s\" を開けませんでした。\n
+Error (%s)! Could not open \"%s\".\n	Packageinstaller main		エラー (%s)! \"%s\" を開けません。\n
 Skip	PackageView		スキップ
 Image not loaded correctly	PackageImageViewer		イメージが正しくロードされていません

@@ -1,9 +1,10 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	3648285625
+1	hungarian	x-vnd.Haiku-HaikuDepot	3544756144
 Repository update error	LocalRepositoryUpdateProcess		Tároló frissítési hiba
 Network error	ServerHelper		Hálózati hiba
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Hiba történt a tároló frissítésekor: %error%
 User Created	UserLoginWindow		Felhasználó létrehozva
 Check for updates…	MainWindow		Frissítések keresése…
+Uninstall	PackageManager		Eltávolítás
 Uninstalled	PackageListView		Eltávolítva
 It was not possible to create the new user.	UserLoginWindow		Nem sikerült létrehozni a felhasználót.
 Available packages	MainWindow		Elérhető csomagok
@@ -39,11 +40,14 @@ Rate %Package%	RatePackageWindow		%Package% értékelése
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Nem sikerült elindítani a csomagkezelőt: %message%.
 Quit HaikuDepot	App		Raktár bezárása
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Hozzájárulsz ahhoz, hogy névtelen felhasználási adatokat küldjünk a HaikuDepot kiszolgálóra? Bármikor módosítható ez a \"Beállítások\" panelen.
+An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		Váratlan hiba '%Message%' lépett fel '%Property%' jellemzőnél
 A response to the captcha question must be provided.	UserLoginWindow		Szükséges a captcha kérdésre válaszolni.
 Category	FilterView		Kategória
 User rating	RatePackageWindow		Felhasználói értékelés
 Installed packages	MainWindow		Telepített csomagok
 A requested object or an object involved in the request was not found on the server.	ServerHelper		A kért objektum vagy a kérésben szereplő objektum nem található a kiszolgálón.
+Fatal error	PackageManager		Súlyos hiba
+Package action failed	PackageInfoView		Sikertelen csomag-művelet
 No changelog available.	PackageInfoView		Nincs módosítás-előzmény
 Error	App		Hiba
 There was a puzzling response from the web service.	UserLoginWindow		A webes szolgáltatás rejtélyes választ adott.
@@ -75,6 +79,7 @@ Stability	RatePackageWindow		Stabilitás
 Send	RatePackageWindow		Küldés
 Start package daemon	App		Csomag démon indítása
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Ismételd meg a jelszót annak érdekében hogy csökkenjen a rossz jelszó megadásának esélye.
+The package action could not be scheduled: %Error%	PackageInfoView		A csomag-művelet nem ütemezhető: %Error%
 Cancel	SettingsWindow		Mégse
 Cancel	RatePackageWindow		Mégse
 Inactive	PackageListView		Inaktív
@@ -84,6 +89,7 @@ There are problems in the supplied data:	UserLoginWindow		Hibás adatok lettek m
 OK	MainWindow		Rendben
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# elem} other{# elem}}
 Usage conditions download problem	UserLoginWindow		Hiba történt a felhasználási feltételek letöltésekor
+OK	PackageInfoView		Rendben
 Downloading:	PackageInfoView		Letöltés:
 Quit	MainWindow		Kilépés
 Success	UserLoginWindow		Sikeres
@@ -139,8 +145,8 @@ Source packages	MainWindow		Forráskód csomagok
 -	no package size		-
 Problem with working files	App		Nem tudok a fájlokkal dolgozni
 Server error	ServerHelper		Mentési hiba
-Try again	App		Próbáld újra
 Rate package	RatePackageWindow		Csomag értékelése
+Try again	App		Próbáld újra
 Unknown	PackageListView		Ismeretlen
 I agree to the usage conditions	UserLoginWindow		Elfogadom a felhasználási feltételeket
 Log in	UserLoginWindow		Bejelentkezés
@@ -148,8 +154,8 @@ Sending anonymous usage data	MainWindow		Névtelen felhasználási adatok küld�
 Logged in as %User%	MainWindow		Bejelentkezett mint %User%
 Email address:	UserLoginWindow		E-mail cím:
 Screenshot	ScreenshotWindow		Képernyőkép
-HaikuDepot	System name		Raktár
 A reboot is necessary to complete the installation process.	PackageManager		Újraindítás szükséges a telepítés befejezéséhez.
+HaikuDepot	System name		Raktár
 Yes	MainWindow		Igen
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{Legalább egy éves vagyok}other{# éves vagy idősebb vagyok}}
 View latest usage conditions…	MainWindow		Felhasználási feltételek…
@@ -166,6 +172,7 @@ Fetching remote repository data	LocalRepositoryUpdateProcess		Tároló adatainak
 Description	PackageListView		Leírás
 Open %DeskbarLink%	PackageManager		%DeskbarLink% megnyitása
 User creation error	UserLoginWindow		Felhasználó létrehozási hiba
+Install	PackageManager		Telepítés
 Input validation	UserLoginWindow		Bevitel érvényesítése
 Log in…	MainWindow		Bejelentkezés…
 You need to be logged into an account before you can rate packages.	MainWindow		Csomag értékelése előtt be kell jelentkezni egy felhasználói fiókba.

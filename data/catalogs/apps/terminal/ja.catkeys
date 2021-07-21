@@ -1,7 +1,7 @@
 1	japanese	x-vnd.Haiku-Terminal	3117643489
 Close other tabs	Terminal TermWindow		他のタブを閉じる
-Insert path	Terminal TermView		パスを挿入
-Terminal couldn't start the shell. Sorry.	Terminal TermApp		すみません、シェルを起動できませんでした。
+Insert path	Terminal TermView		パスの挿入
+Terminal couldn't start the shell. Sorry.	Terminal TermApp		すみません、シェルを起動できません。
 Text encoding	Terminal TermWindow		文字コード
 OK	Terminal SetTitleWindow		OK
 Edit	Terminal TermWindow		編集
@@ -12,7 +12,7 @@ Solarized Dark	Terminal colors scheme		Solarized Dark
 Copy	Terminal TermWindow		コピー
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory	Terminal TermApp		  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory
 Retro	Terminal colors scheme		レトロ
-Edit tab title…	Terminal TermWindow		タブタイトルの編集…
+Edit tab title…	Terminal TermWindow		タブタイトルの編集...
 Print	Terminal TermWindow		印刷
 Settings	Terminal TermWindow		設定
 %app% settings	Terminal PrefWindow	window title	%app% 設定
@@ -26,8 +26,8 @@ Encoding:	Terminal AppearancePrefView		文字コード:
 Create link here	Terminal TermView		カレントディレクトリにリンク作成
 Custom	Terminal AppearancePrefView	Window size	カスタム
 Selected text	Terminal AppearancePrefView		選択されたテキスト
-Change directory	Terminal TermView		ディレクトリを変更
-Page setup…	Terminal TermWindow		ページ設定…
+Change directory	Terminal TermView		ディレクトリの変更
+Page setup…	Terminal TermWindow		ページ設定...
 Slate	Terminal colors scheme		スレート
 Defaults	Terminal PrefWindow		デフォルト
 Cancel	Terminal TermView		中止
@@ -39,7 +39,7 @@ Copy link location	Terminal TermView		リンクの場所をコピー
 Window title:	Terminal AppearancePrefView		ウィンドウタイトル:
 New tab	Terminal TermWindow		新しいタブ
 Allow bold text	Terminal AppearancePrefView		太字を有効にする
-Window title…	Terminal TermWindow		ウィンドウタイトル…
+Window title…	Terminal TermWindow		ウィンドウタイトル...
 Blue	Terminal colors scheme		ブルー
 Cannot execute \"%command\":\n\t%error	Terminal Shell		\"%command\" を実行できません:\n\t%error
 Open path	Terminal TermView		パスを開く
@@ -48,7 +48,7 @@ Font size	Terminal TermWindow		フォントサイズ
 Custom	Terminal colors scheme		カスタム
 Really close?	Terminal TermWindow		本当に閉じますか?
 OK	Terminal TermApp		OK
-The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		プロセス \"%1\" がまだ実行中です。\nTerminalを閉じると強制終了されます。
+The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		プロセス \"%1\" がまだ実行中です。\nターミナルを閉じると強制終了されます。
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Unrecognized option \"%s\"\n
 Tab title:	Terminal AppearancePrefView		タブタイトル:
 Text not found.	Terminal TermWindow		検索テキストが見つかりません。
@@ -61,11 +61,11 @@ Match case	Terminal FindWindow		大文字小文字を区別
 Find previous	Terminal TermWindow		前を検索
 The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		パターンはタブタイトルを定めます。以下のプレースホルダーが\n使えます:
 Close	Terminal TermWindow		閉じる
-Save to file…	Terminal PrefWindow		ファイルに保存…
+Save to file…	Terminal PrefWindow		ファイルに保存...
 Background	Terminal AppearancePrefView		背景
-Copy path	Terminal TermView		パスをコピー
+Copy path	Terminal TermView		パスのコピー
 Window size	Terminal TermWindow		ウィンドウサイズ
-Copy absolute path	Terminal TermView		絶対パスをコピー
+Copy absolute path	Terminal TermView		絶対パスのコピー
 Cancel	Terminal TermWindow		中止
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		プロセス \"%1\" がまだ実行中です。\nタブを閉じると強制終了されます。
 Cursor	Terminal AppearancePrefView		カーソル
@@ -79,7 +79,7 @@ Default	Terminal colors scheme		デフォルト
 Window size:	Terminal AppearancePrefView		ウィンドウサイズ:
 Switch Terminals	Terminal TermWindow		ターミナルを切替える
 Decrease	Terminal TermWindow		縮小
-Settings…	Terminal TermWindow		設定…
+Settings…	Terminal TermWindow		設定...
 Cancel	Terminal SetTitleWindow		中止
 Blinking cursor	Terminal AppearancePrefView		カーソルを点滅させる
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		パターンはウィンドウタイトルを指定します。次のプレースホルダーが\n使用できます:\n
@@ -95,19 +95,19 @@ Font:	Terminal AppearancePrefView		フォント:
 Paste	Terminal TermWindow		貼り付け
 The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		パターンはウィンドウタイトルを定めます。以下のプレースホルダーが\n使えます:
 Copy here	Terminal TermView		カレントディレクトリへコピー
-Use default shell	Terminal Shell		デフォルトシェルを使用
+Use default shell	Terminal Shell		デフォルトシェルの使用
 Color:	Terminal AppearancePrefView		色:
 Open link	Terminal TermView		リンクを開く
 Text	Terminal AppearancePrefView		テキスト
 Not found.	Terminal TermWindow		これ以上見つかりません。
-Find…	Terminal TermWindow		検索…
+Find…	Terminal TermWindow		検索...
 No search string was entered.	Terminal TermWindow		検索テキストが入力されていません。
 Text under cursor	Terminal AppearancePrefView		カーソル位置の文字
 Move here	Terminal TermView		カレントディレクトリへ移動
 Abort	Terminal Shell		中断
 \t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tThe アクティブなプロセスのカレントワーキングディレクトリ。\n\t\t\tオプションとして、パス要素の最大数を指定できます。\n\t\t\t例 '%2d' は最大 2 つの要素を示します。\n\t%i\t-\tタブのインデックス。\n\t%e\t-\t現在のタブの文字コード。UTF-8 の場合は表示されません。\n\t%p\t-\tアクティブなプロセス名。\n\t%%\t-\t文字 '%'.
-The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		次のプロセスがまだ実行中です:\n\n\t%1\n\nTerminalを閉じると強制終了されます。
-Set window title	Terminal TermWindow		ウィンドウタイトルを設定
+The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		次のプロセスがまだ実行中です:\n\n\t%1\n\nターミナルを閉じると強制終了されます。
+Set window title	Terminal TermWindow		ウィンドウタイトルの設定
 Increase	Terminal TermWindow		拡大
 OK	Terminal TermWindow		OK
 Close window	Terminal TermWindow		ウィンドウを閉じる

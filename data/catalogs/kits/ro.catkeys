@@ -15,35 +15,35 @@ Warning	Dragger		Avertisment
 Green:	ColorControl		Verde:
 %3.2f KiB/s	StringForRate		%3.2f KiO/s
 Redo	TextView		Repetă
-No pages to print!	PrintJob		Fără pagini de imprimat!
+No pages to print!	PrintJob		Fără pagini de tipărit!
 beta	AboutWindow		beta
 OK	ZombieReplicantView		OK
 Cut	TextView		Taie
-%3.2f GiB	StringForSize		%3.2f GiB
+%3.2f GiB	StringForSize		%3.2f GiO
 Default	Default decorator about box		Implicit
-Can't delete this replicant from its original application. Life goes on.	Dragger		Nu se poate șterge această copie din locația originală. Viața merge mai departe.
+Can't delete this replicant from its original application. Life goes on.	Dragger		Nu se poate șterge acest replicant din locația originală. Viața merge mai departe.
 Error	ZombieReplicantView		Eroare
 Paste	TextView		Lipește
 OK	AboutWindow		OK
 {0, plural, one{# byte/s} other{# bytes/s}}	StringForRate		{0, plural, one{# byte/s} other{# bytes/s}}
 Special Thanks:	AboutWindow		Mulţumiri speciale:
-Default Haiku window decorator.	Default decorator about box		Decorator de fereastră implicit Haiku.
-%.2f TiB	StringForSize		%.2f TiB
-Remove replicant	Dragger		Elimină copie
+Default Haiku window decorator.	Default decorator about box		Decorator de fereastră Haiku implicit.
+%.2f TiB	StringForSize		%.2f TiO
+Remove replicant	Dragger		Elimină replicantul
 Version	AboutWindow		Versiune
 Red:	ColorControl		Roșu:
-<empty>	Menu		<liber>
+<empty>	Menu		<empty>
 Copy	TextView		Copiază
 Select all	TextView		Selectează toate
 alpha	AboutWindow		alfa
-%3.2f MiB	StringForSize		%3.2f MiB
+%3.2f MiB	StringForSize		%3.2f MiO
 %3.2f MiB/s	StringForRate		%3.2f MiO/s
 Error	PrintJob		Eroare
 About %app%	AboutWindow		Despre %app%
 About %app…	Dragger		Despre %app…
 Version history:	AboutWindow		Istoricul versiunii:
-Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Nu se poate găsi aplicația pentru copie. Nu a fost furnizată nicio semnătură de aplicație.\n%error
-%3.2f KiB	StringForSize		%3.2f KiB
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Nu se poate localiza aplicația pentru replicant. Nu a fost furnizată nicio semnătură de aplicație.\n%error
+%3.2f KiB	StringForSize		%3.2f KiO
 Blue:	ColorControl		Albastru:
-Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Nu se poate crea copie pentru \"%description\".\n%error
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Nu se poate crea replicantul pentru \„%description\”.\n%error
 Written by:	AboutWindow		Scris de:

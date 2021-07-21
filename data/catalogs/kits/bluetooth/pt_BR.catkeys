@@ -10,9 +10,9 @@ VCR	DeviceClass		VCR
 Cellular	DeviceClass		Celular
 Audio	DeviceClass		Áudio
 Audio/Video	DeviceClass		Áudio/Vídeo
-Car audio	DeviceClass		áudio veicular
-Major class: 	DeviceClass		Classe maior:
-HiFi audio device	DeviceClass		dispositivo de áudio de alta fidelidade
+Car audio	DeviceClass		Áudio veicular
+Major class: 	DeviceClass		Classe principal: 
+HiFi audio device	DeviceClass		Dispositivo de áudio de HiFi
 Microphone	DeviceClass		Microfone
 Capturing	DeviceClass		Capturar
 Jacket	DeviceClass		Jaqueta
@@ -38,24 +38,24 @@ Unspecified	DeviceClass		Não especificado
 Miscellaneous	DeviceClass		Diversos
 Robot	DeviceClass		Robô
 Vehicle	DeviceClass		Veículo
-LAN access	DeviceClass		Acesso local
+LAN access	DeviceClass		Acesso LAN
 Glasses	DeviceClass		Óculos
 Phone	DeviceClass		Fone
 Laptop	DeviceClass		Laptop
 67-83% utilized	DeviceClass		utilizados 67-83%
 Cordless	DeviceClass		Sem fio
 Invalid device class!\n	DeviceClass		Classe de dispositivo inválida!\n
-Minor class: 	DeviceClass		Classe menor:
+Minor class: 	DeviceClass		Classe menor: 
 Doll/Action figure	DeviceClass		Boneca/Boneco
 Not implemented	RemoteDevice		Não implementado
 33-50% utilized	DeviceClass		utilizados 33-50%
 Gaming/Toy	DeviceClass		Jogos/Brinquedo
 Video camera	DeviceClass		Câmera de vídeo
 Handheld	DeviceClass		Handheld
-Service classes: 	DeviceClass		Classes de serviço:
+Service classes: 	DeviceClass		Classes de serviço: 
 Loudspeaker	DeviceClass		Autofalante
 83-99% utilized	DeviceClass		83-99% utilizados
-SIM card reader	DeviceClass		leitor de cartão SIM
+SIM card reader	DeviceClass		Leitor de cartão SIM
 Computer	DeviceClass		Computador
 Scanner	DeviceClass		Digitalizador
 Wearable	DeviceClass	A wearable computer	Usável
@@ -85,4 +85,4 @@ Combo keyboard/pointing device	DeviceClass		Combinação teclado/dispositivo apo
 Video conferencing	DeviceClass		Videoconferência
 Peripheral	DeviceClass		Periférico
 Object transfer	DeviceClass		Transferência de objeto
-Set-top box	DeviceClass		Set-top box
+Set-top box	DeviceClass		Decodificador de TV

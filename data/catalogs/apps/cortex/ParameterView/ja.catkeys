@@ -4,5 +4,5 @@ Start control panel	ParameterWindow		コントロールパネルを開く
 %nodeinfo% parameters	ParameterWindow		%nodeinfo% パラメーター
 OK	ParameterWindow		OK
 Window	ParameterWindow		ウィンドウ
-Could not start control panel (%error%)	ParameterWindow		コントロールパネルを開けませんでした (%error%)
+Could not start control panel (%error%)	ParameterWindow		コントロールパネルを開けません (%error%)
 Close	ParameterWindow		閉じる

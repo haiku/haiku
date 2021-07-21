@@ -241,7 +241,7 @@ Phags-pa	UnicodeBlocks		パスパ文字
 Nabataean	UnicodeBlocks		ナバテア文字
 Meetei Mayek	UnicodeBlocks		メイテイ・マイェック文字
 CJK compatibility ideographs	UnicodeBlocks		CJK 互換漢字
-Show private blocks	CharacterWindow		プライベートブロックを表示
+Show private blocks	CharacterWindow		プライベートブロックの表示
 Samaritan	UnicodeBlocks		サマリア文字
 Latin extended additional	UnicodeBlocks		ラテン文字拡張追加
 Tibetan	UnicodeBlocks		チベット文字
@@ -269,7 +269,7 @@ Tagbanwa	UnicodeBlocks		タグバンワ文字
 Basic Latin	UnicodeBlocks		基本ラテン文字
 Greek and Coptic	UnicodeBlocks		ギリシャ文字およびコプト文字
 Kangxi radicals	UnicodeBlocks		康煕部首
-Copy character	CharacterView		文字をコピー
+Copy character	CharacterView		文字のコピー
 Hangul Jamo	UnicodeBlocks		ハングル字母
 Font	CharacterWindow		フォント
 Ornamental dingbats	UnicodeBlocks		装飾用絵記号

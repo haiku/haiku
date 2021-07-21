@@ -1,9 +1,9 @@
 1	romanian	x-vnd.Haiku-CodyCam	12021044
 destination directory expected	CodyCam		dosar de destinație așteptat
-reply: '%s'\n	SftpClient		răspuns: '%s'\n
-PASS <suppressed>  (real password sent)	FtpClient		PAROLĂ <suppressed>  (parolă reală trimisă)
+reply: '%s'\n	SftpClient		răspuns: „%s”\n
+PASS <suppressed>  (real password sent)	FtpClient		PASS <suppressed>  (parolă reală trimisă)
 JPEG image	CodyCam		Imagine JPEG
-Remote host has closed the connection.\n	FtpClient		Gazda la distanță a închis conexiunea.\n
+Remote host has closed the connection.\n	FtpClient		Gazda de la distanță a închis conexiunea.\n
 image file format expected	CodyCam		format de fișier imagine așteptat
 Every 30 minutes	CodyCam		La fiecare 30 de minute
 Capturing Image…	VideoConsumer.cpp		Se capturează imaginea…
@@ -12,7 +12,7 @@ Waiting…	CodyCam		Se așteaptă…
 Passive FTP	CodyCam		FTP pasiv
 Every 10 minutes	CodyCam		La fiecare 10 minute
 Every minute	CodyCam		La fiecare minut
-Capture Rate Menu	CodyCam		Meniul cotei de capturare
+Capture Rate Menu	CodyCam		Meniul ratei de captură
 Cannot seek time source!	CodyCam		Nu se poate derula sursa de timp!
 Server login failed	VideoConsumer.cpp		Autentificarea la server a eșuat
 on or off expected	Settings	Do not translate 'on' and 'off'	on sau off așteptat
@@ -20,10 +20,10 @@ invalid upload client %ld\n	VideoConsumer.cpp		client de încărcare nevalid %ld
 Every 30 seconds	CodyCam		La fiecare 30 de secunde
 Cannot create a video window	CodyCam		Nu se poate crea o fereastră video
 Cannot register the video window	CodyCam		Nu se poate înregistra fereastra video
-capture rate expected	CodyCam		cota de captură așteptată
-Quit	CodyCam		Închidere
+capture rate expected	CodyCam		rată de captură așteptată
+Quit	CodyCam		Ieșire
 Cannot connect the video source to the video window	CodyCam		Nu se poate conecta sursa video la fereastra video
-read: %d\n	SftpClient		citește: %d\n
+read: %d\n	SftpClient		citit: %d\n
 Every 2 hours	CodyCam		La fiecare 2 ore
 Cannot get a time source	CodyCam		Nu se poate obține o sursă de timp
 Every 4 hours	CodyCam		La fiecare 4 ore
@@ -32,14 +32,14 @@ Closing the window	VideoConsumer.cpp		Se închide fereastra
 Never	CodyCam		Niciodată
 Every 8 hours	CodyCam		La fiecare 8 ore
 Cannot start the video source	CodyCam		Nu se poate porni sursa video
-Cannot set the time source for the video source	CodyCam		Nu se poate configura sursa de timp pentru sursa video
+Cannot set the time source for the video source	CodyCam		Nu se poate stabili sursa de timp pentru sursa video
 Renaming…	VideoConsumer.cpp		Se redenumește…
 Send to…	CodyCam		Trimite la…
 Password:	CodyCam		Parolă:
-still image filename expected	CodyCam		nume de fișier imagine fixă așteptat
-File name:	CodyCam		Nume fișier:
-Directory:	CodyCam		Dosar:
-Error setting type of output file	VideoConsumer.cpp		Eroare la setarea tipului pentru fișierul de ieșire
+still image filename expected	CodyCam		nume de fișier de imagine statică așteptat
+File name:	CodyCam		Nume de fișier:
+Directory:	CodyCam		Director:
+Error setting type of output file	VideoConsumer.cpp		Eroare la stabilirea tipului de fișier de ieșire
 Locking the window	VideoConsumer.cpp		Se blochează fereastra
 Cannot find an available video stream	CodyCam		Nu se poate găsi un flux video disponibil
 Upload…	VideoConsumer.cpp		Încărcare…
@@ -49,40 +49,40 @@ Output	CodyCam		Ieșire
 server address expected	CodyCam		adresă de server așteptată
 Cannot start the video window	CodyCam		Nu se poate porni fereastra video
 reply: %d, %d\n	FtpClient		răspuns: %d, %d\n
-Cannot set the time source for the video window	CodyCam		Nu se poate configura sursa de timp pentru fereastra video
+Cannot set the time source for the video window	CodyCam		Nu se poate stabili sursa de timp pentru fereastra video
 Every 15 minutes	CodyCam		La fiecare 15 minute
 Every 24 hours	CodyCam		La fiecare 24 de ore
-Image Format Menu	CodyCam		Meniu format imagine
+Image Format Menu	CodyCam		Meniu format de imagine
 Every 5 minutes	CodyCam		La fiecare 5 minute
-File upload failed	VideoConsumer.cpp		Încărcarea fisierului a eşuat
+File upload failed	VideoConsumer.cpp		Încărcarea fișierului a eșuat
 Format:	CodyCam		Format:
-Start video	CodyCam		Pornește video
+Start video	CodyCam		Începe video
 Connected…	VideoConsumer.cpp		Conectat…
-upload client name expected	CodyCam		nume de client pentru încărcare așteptat
+upload client name expected	CodyCam		încărcare de nume de client așteptată
 Every 15 seconds	CodyCam		La fiecare 15 secunde
 Error getting initial latency for the capture node	CodyCam		Eroare la obținerea latenței inițiale pentru modul captură
 password	CodyCam		parolă
 Local	CodyCam		Local
 Stop video	CodyCam		Oprește video
 Last Capture: 	VideoConsumer.cpp		Ultima captură: 
-Rate:	CodyCam		Cotă:
-Couldn't find requested directory on server	VideoConsumer.cpp		Nu s-a putut găsi dosarul cerut pe server
-Cannot find the media roster	CodyCam		Nu se poate găsi lista media
+Rate:	CodyCam		Rată:
+Couldn't find requested directory on server	VideoConsumer.cpp		Nu s-a putut găsi directorul cerut pe server
+Cannot find the media roster	CodyCam		Nu se poate găsi lista de media
 Type:	CodyCam		Tip:
-Rename failed	VideoConsumer.cpp		Redenumire eșuată
+Rename failed	VideoConsumer.cpp		Redenumirea a eșuat
 unrecognized upload client specified	CodyCam		client de încărcare nerecunoscut specificat
 Server:	CodyCam		Server:
 Login:	CodyCam		Autentificare:
 File	CodyCam		Fișier
-read: %ld\n	SftpClient		citește: %ld\n
+read: %ld\n	SftpClient		citit: %ld\n
 Every hour	CodyCam		La fiecare oră
-login ID expected	CodyCam		așteptat ID de autentificare
+login ID expected	CodyCam		ID de autentificare așteptat
 Video settings	CodyCam		Configurări video
 Can't find an available connection to the video window	CodyCam		Nu se poate găsi o conexiune disponibilă la fereastra video
 FTP	CodyCam		FTP
 Error creating output file	VideoConsumer.cpp		Eroare la crearea fișierului de ieșire
 Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Nu s-a putut găsi sursa video.\nAveți nevoie de o cameră web pentru a utiliza CodyCam.
-Logging in…	VideoConsumer.cpp		Se deschide sesiunea…
+Logging in…	VideoConsumer.cpp		Se loghează…
 CodyCam	System name		CodyCam
 Error writing output file	VideoConsumer.cpp		Eroare la scrierea fișierului de ieșire
 Capture controls	CodyCam		Controale de captură

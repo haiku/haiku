@@ -1,58 +1,58 @@
 1	romanian	x-vnd.Haiku-Devices	3345509916
 ACPI bus	DevicesView		Magistrală ACPI
-Encryption controller	Device		Controler de criptare
+Encryption controller	Device		Controlor de criptare
 Bus Information	Device		Infomații magistrală
 Devices	System name		Dispozitive
-Graphics Peripheral	DeviceSCSI		Periferic grafică
+Graphics Peripheral	DeviceSCSI		Periferice grafice
 Processor	Device		Procesor
-Generate system information	DevicesView		Generează informații de sistem
-Class info	DevicePCI		Detalii clasă
+Generate system information	DevicesView		Generează informațiile de sistem
+Class info	DevicePCI		Informații clasă
 ACPI Information	DeviceACPI		Informații ACPI
 Detailed	DevicesView		Detaliat
 Computer	DevicesView		Calculator
 Communications	DeviceSCSI		Comunicații
-Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Detalii clasă:\t\t\t\t: %classInfo%
-Mass storage controller	Device		Controler de stocare
+Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Informații clasă:\t\t\t\t: %classInfo%
+Mass storage controller	Device		Controlor de stocare în masă
 Connection	DevicesView		Conexiune
 Printer	DeviceSCSI		Imprimantă
-ACPI Processor Namespace '%2'	DeviceACPI		Spațiu de nume procesor ACPI '%2'
+ACPI Processor Namespace '%2'	DeviceACPI		Spațiu de nume de procesor ACPI „%2”
 SCSI Information	DeviceSCSI		Informații SCSI
 Manufacturer	Device		Producător
-Device name:	Device		Nume dispozitiv:
+Device name:	Device		Nume de dispozitiv:
 Scanner	DeviceSCSI		Scanner
-Memory controller	Device		Controler de memorie
+Memory controller	Device		Controlor de memorie
 Unknown device	DevicesView		Dispozitiv necunoscut
 Unknown	DevicePCI		Necunoscut
-ACPI node '%1'	DeviceACPI		Nod ACPI '%1'
+ACPI node '%1'	DeviceACPI		Nod ACPI „%1”
 Optical Drive	DeviceSCSI		Unitate optică
 Name	PropertyList		Nume
 Manufacturer	DeviceSCSI		Producător
-Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Nume dispozitiv\t\t\t\t: %Name%\nProducător\t\t\t: %Manufacturer%\nDriver utilizat\t\t\t\t: %DriverUsed%\nCăi dispozitiv\t: %DevicePaths%
+Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Nume dispozitiv\t\t\t\t: %Name%\nProducător\t\t\t: %Manufacturer%\nDriver utilizat\t\t\t\t: %DriverUsed%\nCăi de dispozitiv\t: %DevicePaths%
 Device name	Device		Nume dispozitiv
-Satellite communications controller	Device		Controler de comunicații prin satelit
+Satellite communications controller	Device		Controlor de comunicații prin satelit
 Device class	DeviceSCSI		Clasă de dispozitive
 Device	Device		Dispozitiv
-Input device controller	Device		Controler dispozitiv de intrare
+Input device controller	Device		Controlor de dispozitiv de intrare
 PCI bus	DevicesView		Magistrală PCI
 ACPI System Indicator	DeviceACPI		Indicator de sistem ACPI
 ACPI System Bus	DeviceACPI		Magistrală de sistem ACPI
 PCI Information	DevicePCI		Informații PCI
-Tape Drive	DeviceSCSI		Unitate bandă magnetică
+Tape Drive	DeviceSCSI		Unitate de bandă magnetică
 Changer	DeviceSCSI		Schimbător
-Serial bus controller	Device		Controler de magistrală serială
-Refresh devices	DevicesView		Reîmprospătează dispozitive
+Serial bus controller	Device		Controlor de magistrală serială
+Refresh devices	DevicesView		Reîmprospătează dispozitivele
 Category	DevicesView		Categorie
 RBC	DeviceSCSI		RBC
-None	Device		Nimic
-Device paths	Device		Căi dispozitiv
+None	Device		Nespecificat
+Device paths	Device		Căi de dispozitiv
 Unknown device	Device		Dispozitiv necunoscut
-Wireless controller	Device		Controler fără fir
-Generic system peripheral	Device		Periferic generic de sistem
+Wireless controller	Device		Controlor fără fir
+Generic system peripheral	Device		Periferice generice de sistem
 Value	PropertyList		Valoare
 Devices	DevicesView		Dispozitive
 Device name	DeviceACPI		Nume dispozitiv
 Card Reader	DeviceSCSI		Cititor de carduri
-Display controller	Device		Controler de afișare
+Display controller	Device		Controlor de afișaj
 Basic information	DevicesView		Informații de bază
 ACPI Button '%1'	DeviceACPI		Buton ACPI „%1”
 Bus	DevicesView		Magistrală
@@ -60,33 +60,33 @@ ACPI <unknown>	DeviceACPI		ACPI <unknown>
 Device name	DevicePCI		Nume dispozitiv
 Disk Drive	DeviceSCSI		Unitate disc
 Other	DeviceSCSI		Altele
-Report compatibility	DevicesView		Raportează compatibilitate
+Report compatibility	DevicesView		Raportează compatibilitatea
 Computer	Device		Calculator
 PCI bus	Device		Magistrală PCI
-Enclosure	DeviceSCSI		Încadrare
-Order by:	DevicesView		Ordonează după:
+Enclosure	DeviceSCSI		Incintă
+Order by:	DevicesView		Ordonare după:
 ACPI Thermal Zone	DeviceACPI		Zonă termală ACPI
-Intelligent controller	Device		Controler inteligent
-Multimedia controller	Device		Controler multimedia
-Quit	DevicesView		Închidere
+Intelligent controller	Device		Controlor inteligent
+Multimedia controller	Device		Controlor multimedia
+Quit	DevicesView		Ieșire
 ISA bus	Device		Magistrală ISA
 ISA bus	DevicesView		Magistrală ISA
 Processor	DeviceSCSI		Procesor
 Manufacturer:	Device		Producător:
-Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Detalii clasă:\t\t\t\t: %classInfo%
+Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Informații clasă:\t\t\t\t: %classInfo%
 Bridge	Device		Punte
 Worm	DeviceSCSI		Vierme
 CD-ROM	DeviceSCSI		CD-ROM
 Manufacturer	DevicePCI		Producător
 Bridge	DeviceSCSI		Punte
-Signal processing controller	Device		Controler de procesare a semnalului
+Signal processing controller	Device		Controlor de procesare a semnalului
 Device name	DeviceSCSI		Nume dispozitiv
 Docking station	Device		Stație de andocare
 Array	DeviceSCSI		Vector
 Unclassified device	Device		Dispozitiv neclasificat
-ACPI controller	Device		Controler ACPI
-Network controller	Device		Controler de rețea
+ACPI controller	Device		Controlor ACPI
+Network controller	Device		Controlor de rețea
 Driver used	Device		Driver utilizat
-Communication controller	Device		Controler de comunicație
+Communication controller	Device		Controlor de comunicație
 ACPI bus	Device		Magistrală ACPI
 unknown	Device		necunoscut

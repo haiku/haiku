@@ -1,5 +1,6 @@
-1	danish	x-vnd.Haiku-CharacterMap	124574598
+1	danish	x-vnd.Haiku-CharacterMap	3425050642
 Miscellaneous mathematical symbols B	UnicodeBlocks		Forskellige matematiske symboler, B
+Latin extended E	UnicodeBlocks		Latin, udvidet E
 Saurashtra	UnicodeBlocks		Saurashtra
 Arabic supplement	UnicodeBlocks		Arabisk supplement
 Hanunoo	UnicodeBlocks		Hanuoo
@@ -100,6 +101,7 @@ Latin extended A	UnicodeBlocks		Latin, udvidet A
 Sundanese	UnicodeBlocks		Sundanesisk
 Geometric shapes	UnicodeBlocks		Geometriske former
 Clear	CharacterWindow		Klar
+Symbols and pictographs extended A	UnicodeBlocks		Symboler og piktogrammer, udvidet A
 Adlam	UnicodeBlocks		Adlam
 Arabic	UnicodeBlocks		Arabisk
 Khmer symbols	UnicodeBlocks		Khmer-symboler
@@ -147,10 +149,11 @@ Cyrillic supplement	UnicodeBlocks		Kyrillisk supplement
 Yi Radicals	UnicodeBlocks		Yi-radikaler
 Supplementary private use area A	UnicodeBlocks		Supplementært privatområde A
 Armenian	UnicodeBlocks		Armensk
+Miscellaneous symbols and pictographs	UnicodeBlocks		Diverse symboler og piktogrammer
 Phags-pa	UnicodeBlocks		Phags-pa
 CJK compatibility ideographs	UnicodeBlocks		CJK, kompatibilitets-ideografer
 Show private blocks	CharacterWindow		Vis private blokke
-Latin extended additional	UnicodeBlocks		Latin, udvidet
+Latin extended additional	UnicodeBlocks		Latin, udvidet yderligere
 Tibetan	UnicodeBlocks		Tibetansk
 Combining diacritical marks	UnicodeBlocks		Kombinerende diakritiske tegn
 Tags	UnicodeBlocks		Mærkater

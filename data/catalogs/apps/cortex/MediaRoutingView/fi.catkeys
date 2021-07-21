@@ -1,0 +1,34 @@
+1	finnish	application/x-vnd.Cortex.MediaRoutingView	3442339205
+Lock group	MediaNodePanel		Lukitusryhmä
+%refname% (no file)	MediaNodePanel		%refname% (ei tiedostoa)
+Video output	MediaRoutingView		Videolähtö
+Icon view	MediaRoutingView		Kuvakenäkymä
+OK	MediaRoutingView		Valmis
+Cycle	MediaNodePanel		Tahti
+Advanced	MediaNodePanel		Kehittynyt
+Audio input	MediaRoutingView		Audiosyöte
+Run mode	MediaNodePanel		Suoritustila
+Could not load '%filename%'	MediaRoutingView		Tiedoston ’%filename%’ lataaminen epäonnistui
+Stop time source	MediaNodePanel		Pysäytysaikalähde
+Be Audio Mixer	MediaRoutingView		Be-audiosekoitin
+Video input	MediaRoutingView		Videosyöte
+Release	MediaNodePanel		Julkaisu
+Disconnect	MediaRoutingView		Irrota
+Could not disconnect	MediaRoutingView		Irrottaminen epäonnistui
+Could not instantiate '%infoname%'	MediaRoutingView		Alustus ’%infoname%’ epäonnistui
+Mini icon view	MediaRoutingView		Minikuvakenäkymä
+Select all	MediaRoutingView		Valitse kaikki
+(same as group)	MediaNodePanel		(sama kuin ryhmä)
+Input	MediaJack		Syöte
+Get info	MediaJack		Hae tiedot
+Start time source	MediaNodePanel		Käynnistysaikalähde
+Error	MediaRoutingView		Virhe
+Could not release '%refname%'	MediaRoutingView		Julkaisu ’%refname%’ epäonnistui
+Output	MediaJack		Lähtö
+Get info	MediaNodePanel		Hae tiedot
+Get info	MediaRoutingView		Hae tiedot
+Clean up	MediaRoutingView		Siisti
+Start control panel	MediaNodePanel		Käynnistä ohjauspaneeli
+Tweak parameters	MediaNodePanel		Nykäisyparametrit
+Could not connect	MediaRoutingView		Yhdistäminen epäonnistui
+Unlock group	MediaNodePanel		Lukituksen avausryhmä

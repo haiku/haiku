@@ -1,0 +1,23 @@
+1	czech	application/x-vnd.Cortex.TransportView	1534931965
+Roll	TransportView		Rolování
+(none)	TransportView		(žádný)
+{0, plural, one{# node} other{# nodes}}	TransportView		{0, plural, one{# uzel} few{# uzly} other{# uzlů}}
+Start	TransportView		Spustit
+No errors.	TransportView		Bez chyb.
+to	TransportView		do
+Offline	TransportView		Odpojené
+(???)	TransportView		(???)
+Stop	TransportView		Zastavit
+(no group)	TransportView		(žádná skupina)
+Drop data	TransportView		Zahodit data
+To:	TransportView		Do:
+Recording	TransportView		Nahrávání
+Increase latency	TransportView		Zvýšit prodlevu
+Time source:	TransportView		Zdroj času:
+DAC time source	TransportView		Zdroj času DAC
+Decrease precision	TransportView		Snížit přesnost
+System clock	TransportView		Systémové hodiny
+From:	TransportView		Od:
+Roll from	TransportView		Rolovat z
+Preroll	TransportView		Předrolování
+Run mode:	TransportView		Mód běhu:

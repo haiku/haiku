@@ -1,48 +1,48 @@
 1	romanian	x-vnd.Haiku-Pulse	559379362
-Normal mode	DeskbarPulseView		Mod normal
-Info	CPUButton		Info
-Quit	DeskbarPulseView		Închidere
-Info	DeskbarPulseView		Info
-Normal mode	MiniPulseView		Mod normal
-Frame color	ConfigView		Culoare cadru
+Normal mode	DeskbarPulseView		Modul normal
+Info	CPUButton		Informații
+Quit	DeskbarPulseView		Ieșire
+Info	DeskbarPulseView		Informații
+Normal mode	MiniPulseView		Modul normal
+Frame color	ConfigView		Culoare de cadru
 Error	PulseApp		Eroare
-Bar colors	ConfigView		Culori bară
+Bar colors	ConfigView		Culori de bară
 %.2f GHz	NormalPulseView		%.2f GHz
 Defaults	PrefsWindow		Implicite
 %ld MHz	NormalPulseView		%ld MHz
-Mini mode	PrefsWindow		Mod mini
+Mini mode	PrefsWindow		Modul mini
 CPU progress bar	NormalPulseView		Bara de progres a CPU
 Fade colors	ConfigView		Culori translucide
 About Pulse…	PulseView		Despre Pulse…
-Pulse	NormalPulseView		Puls
-Deskbar mode	NormalPulseView		Mod bară de desktop
+Pulse	NormalPulseView		Pulse
+Deskbar mode	NormalPulseView		Modul deskbar
 Pulse settings	PulseApp		Configurări Pulse
-Remove replicant	CPUButton		Elimină replicant
+Remove replicant	CPUButton		Elimină replicantul
 You can't disable the last active CPU.	PulseView		Nu puteți dezactiva ultimul CPU activ.
 Width of icon:	ConfigView		Lățimea pictogramei:
-Deskbar mode	MiniPulseView		Mod bară de desktop
+Deskbar mode	MiniPulseView		Modul deskbar
 OK	PulseView		OK
 %s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nDe David Ramsey și Arve Hjønnevåg\nRevizuit de Daniel Switkin\n
 OK	PrefsWindow		OK
-Pulse	PulseApp		Puls
-Removing from Deskbar failed.\n%s	DeskbarPulseView		Eliminarea de pe Deskbar a eșuat.\n%s
+Pulse	PulseApp		Pulse
+Removing from Deskbar failed.\n%s	DeskbarPulseView		Eliminarea de pe deskbar a eșuat.\n%s
 OK	PulseApp		OK
 About Pulse…	CPUButton		Despre Pulse…
-Deskbar mode	PrefsWindow		Mod bară de desktop
-Mini mode	DeskbarPulseView		Mod mini
+Deskbar mode	PrefsWindow		Modul deskbar
+Mini mode	DeskbarPulseView		Modul mini
 You can't disable the last active CPU.	CPUButton		Nu puteți dezactiva ultimul CPU activ.
 OK	CPUButton		OK
-Deskbar	CPUButton		Bară de desktop
+Deskbar	CPUButton		Deskbar
 Settings…	PulseView		Configurări…
-Deskbar menu	CPUButton		Meniul barei de desktop
-Mini mode	NormalPulseView		Mod mini
-Quit	MiniPulseView		Închidere
-Info	PulseView		Detalii
+Deskbar menu	CPUButton		Meniu deskbar
+Mini mode	NormalPulseView		Modul mini
+Quit	MiniPulseView		Ieșire
+Info	PulseView		Informații
 Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]	PulseApp		Utilizare: Pulse [--mini] [-w lățime] [--width=lățime]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]
 OK	DeskbarPulseView		OK
-Info	PulseApp		Detalii
-Pulse	System name		Puls
+Info	PulseApp		Informații
+Pulse	System name		Pulse
 Active color	ConfigView		Culoare activă
-Installing in Deskbar failed\n%s	PulseApp		Instalarea pe Deskbar a eșuat\n%s
+Installing in Deskbar failed\n%s	PulseApp		Instalarea în deskbar a eșuat\n%s
 Idle color	ConfigView		Culoare în așteptare
-Normal mode	PrefsWindow		Mod normal
+Normal mode	PrefsWindow		Modul normal

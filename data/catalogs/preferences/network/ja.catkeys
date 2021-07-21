@@ -5,7 +5,7 @@ disconnected	IntefaceView		切断済
 WPA	WPA protected network		WPA
 Network:	IntefaceView		ネットワーク:
 Received:	IntefaceView		受信:
-New…	NetworkWindow		新規…
+New…	NetworkWindow		新規...
 no link	InterfaceListItem		リンク切れ
 Other	NetworkWindow		その他
 Sent:	IntefaceView		送信:
@@ -26,7 +26,7 @@ Enable	IntefaceView		有効にする
 connected	IntefaceView		接続済
 Apply	IntefaceAddressView		適用
 Disable	ServiceView		無効にする
-WPA2	WPA2 protected network		ネットマスクはローカルネットワークを定義します
+WPA2	WPA2 protected network		WPA2
 Show network status in Deskbar	NetworkWindow		Deskbar にネットワークの状態を表示
 Mode:	IntefaceAddressView		モード:
 connected	InterfaceListItem		接続済
@@ -45,7 +45,7 @@ Automatic	IntefaceAddressView		自動
 Choose automatically	IntefaceView		自動選択
 Status:	IntefaceView		状態:
 Disable	IntefaceView		無効にする
-Manage…	NetworkWindow		管理…
+Manage…	NetworkWindow		管理...
 open	Open network		開く
 Network	System name		ネットワーク
 Your gateway to the internet	IntefaceAddressView		インターネットへのゲートウェイ

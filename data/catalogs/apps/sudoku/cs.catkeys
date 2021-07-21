@@ -1,0 +1,35 @@
+1	czech	x-vnd.Haiku-Sudoku	3382377306
+Restore snapshot	SudokuWindow		Obnovit snímek
+File	SudokuWindow		Soubor
+Mark invalid values	SudokuWindow		Označ neplatné položky
+Solve single field	SudokuWindow		Vyřešit jediné políčko
+Hard	SudokuWindow		Těžké
+Start again	SudokuWindow		Spustit znova
+New	SudokuWindow		Nový
+Easy	SudokuWindow		Snadné
+Undo	SudokuWindow		Zpět
+Export as…	SudokuWindow		Exportovat jako...
+Quit	SudokuWindow		Konec
+Redo	SudokuWindow		Znovu
+Could not open \"%s\":\n%s\n	SudokuWindow		Nebylo možno otevřít \"%s\":\n%s\n
+Blank	SudokuWindow		Prázdné
+Sudoku solved - congratulations!\n	SudokuWindow		Sudoku je vyřešeno - gratuluijeme!\n
+Text	SudokuWindow		Text
+Copy	SudokuWindow		Kopírovat
+Solve	SudokuWindow		Vyřešit
+HTML	SudokuWindow		HTML
+Advanced	SudokuWindow		Rozšířené
+Set all hints	SudokuWindow		Nastavit všechny rady
+Searching for removable values	SudokuGenerator		Vyhledávání odstranitelných položek
+Abort	ProgressWindow		Zrušit
+Could not set Sudoku:\n%s\n	SudokuWindow		Sudoku nebylo možno nastavit:\n%s\n
+Help	SudokuWindow		Pomoc
+OK	SudokuWindow		OK
+Sudoku	System name		Sudoku
+Progress monitor	ProgressWindow		Monitor vývoje
+Creating solvable field	SudokuGenerator		Vytváření řešitelného pole
+View	SudokuWindow		Pohled
+Snapshot current	SudokuWindow		Aktuální snímek
+Mark valid hints	SudokuWindow		Označit platné úseky
+Sudoku request	SudokuWindow		Sudoku dotaz
+Open file…	SudokuWindow		Otevřít soubor...

@@ -23,7 +23,7 @@ Belgian (point)	KeymapNames		ベルギー語 (point)
 Finnish	KeymapNames		フィンランド語
 Num lock	Keyboard Layout View		Num lock
 Switch shortcut keys to Windows/Linux mode	Keymap window		ショートカットキーを Windows/Linux モードに切り替え
-Option	Keyboard Layout View	Option key	オプションキー:
+Option	Keyboard Layout View	Option key	Option
 Spanish (Dvorak)	KeymapNames		スペイン語 (Dvorak)
 Scroll lock	Keyboard Layout View		Scroll lock
 US-International	KeymapNames		英語 (US-International)
@@ -41,7 +41,7 @@ ThinkPad	KeyboardLayoutNames		ThinkPad
 Belarusian (Mac)	KeymapNames		ベラルーシ語 (Mac)
 Croatian	KeymapNames		クロアチア語
 PAGE ↑	Keyboard Layout View		PAGE ↑
-Set modifier keys	Modifier keys window		修飾キーを設定
+Set modifier keys	Modifier keys window		修飾キーの設定
 Apple Aluminium International	KeyboardLayoutNames		Apple Aluminium International
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd キー
 PG ↓	Keyboard Layout View	Very short for 'page down'	PG ↓
@@ -63,7 +63,7 @@ French (NF Z71-300)	KeymapNames		フランス語 (NF Z71-300)
 Modifier keys	Modifier keys window		修飾キー
 ThinkPad X1 International	KeyboardLayoutNames		ThinkPad X1 International
 Kazakh	KeymapNames		カザフ語
-Save as…	Keymap window		名前を付けて保存…
+Save as…	Keymap window		名前を付けて保存...
 Lithuanian (Standard)	KeymapNames		リトアニア語 (標準)
 Error: duplicate keys	Modifier keys window		エラー: 重複したキー
 NUM	Keyboard Layout View	Very short for 'num lock'	NUM
@@ -71,7 +71,7 @@ Bulgarian (Phonetic)	KeymapNames		ブルガリア語 (Phonetic)
 Kinesis Advantage	KeyboardLayoutNames		Kinesis Advantage
 Canadian-French	KeymapNames		フランス語 (カナダ)
 Hungarian	KeymapNames		ハンガリー語
-Control	Keyboard Layout View	Control key	Control:
+Control	Keyboard Layout View	Control key	Control
 Irish	KeymapNames		アイルランド語
 Remove	Keyboard Layout View		削除
 Tilde trigger	Keymap window		チルダのトリガー
@@ -122,7 +122,7 @@ Greek	KeymapNames		ギリシア語
 Revert	Keymap window		戻す
 CTRL	Keyboard Layout View	Very short for 'control'	CTRL
 Grave trigger	Keymap window		グレイヴアクセントのトリガー
-Menu	Keyboard Layout View	Menu key	メニューキー
+Menu	Keyboard Layout View	Menu key	Menu
 Faeroese	KeymapNames		フェロー語
 Quit	Keymap window		終了
 Polish (Typewriter)	KeymapNames		ポーランド語 (Typewriter)
@@ -140,7 +140,7 @@ Shift:	Modifier keys window	Shift key role name	Shift:
 Keymap	System name		キーマップ
 Slovene	KeymapNames		スロベニア語
 Lithuanian	KeymapNames		リトアニア語
-Set modifier keys…	Keymap window		修飾キーを設定…
+Set modifier keys…	Keymap window		修飾キーの設定...
 Switch shortcut keys to Haiku mode	Keymap window		ショートカットキーを Haiku モードに切り替え
 Defaults	Keymap window		デフォルト
 ISO-9995	KeymapNames		ISO-9995
@@ -171,5 +171,5 @@ OPTION	Keyboard Layout View		OPTION
 Dutch	KeymapNames		オランダ語
 Diaeresis trigger	Keymap window		ウムラウトのトリガー
 Icelandic	KeymapNames		アイスランド語
-Open…	Keymap window		開く…
+Open…	Keymap window		開く...
 ThinkPad T400s (US)	KeyboardLayoutNames		ThinkPad T400s (US)

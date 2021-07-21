@@ -1,0 +1,19 @@
+1	czech	x-vnd.Be-POST	2949558073
+No new messages	MailDaemon		Žádné nové zprávy
+No new messages	DeskbarView		Žádné nové zprávy
+Shutdown mail services	DeskbarView		Ukončit poštovní služby
+Mail status	MailDaemon		Stav pošty
+Fetching mail for %name	Notifier		Stahuji poštu pro %name
+{0, plural, one{# new message} other{# new messages}}	DeskbarView		{0, plural, one{# nová zpráva} few{# nové zprávy} other{# nových zpráv}}
+{0, plural, one{# new message} other{# new messages}} for %name\n	MailDaemon		{0, plural, one{# nová zpráva} few{# nové zprávy} other{# nových zpráv}} pro %name\n
+Create new message…	DeskbarView		Vytvořit novou zprávu…
+Send pending mails	DeskbarView		Odeslat neodeslanou poštu
+Settings…	DeskbarView		Nastavení…
+{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{Jedna nová zpráva} few{# nové zprávy} other{# nových zpráv}}
+New Messages	MailDaemon		Nové zprávy
+<no accounts>	DeskbarView		<žádné účty>
+Mail status	Notifier		Stav pošty
+Check for mails only	DeskbarView		Jen zkontrolovat poštu
+Check for mail now	DeskbarView		Zkontrolovat poštu hned
+Sending mail for %name	Notifier		Odesílání pošty pro %name
+Mail daemon status log	MailDaemon		Stavový záznam poštovní služby

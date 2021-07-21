@@ -1,0 +1,5 @@
+1	polish	application/x-vnd.Cortex.AddOnHost	1256552338
+Continue	CortexAddOnHost		Kontynuuj
+Cortex AddOnHost	CortexAddOnHost		Cortex AddOnHost
+Quit	CortexAddOnHost		Zakończ
+This program runs in the background, and is started automatically by Cortex when necessary. You probably don't want to start it manually.	CortexAddOnHost		Ten program działa w tle i jest uruchamiany automatycznie przez Cortex w razie potrzeby. Prawdopodobnie nie ma potrzeby uruchamiać go ręcznie.

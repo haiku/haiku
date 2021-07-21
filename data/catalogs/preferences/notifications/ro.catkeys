@@ -2,33 +2,33 @@
 Lower left	GeneralView		Stânga jos
 Application does not have a valid signature	NotificationView	Alert message	Aplicația nu are o semnătură validă
 Status	NotificationView		Stare
-Add…	NotificationView		Adaugă…
+Add…	NotificationView		Adăugare…
 Lower right	GeneralView		Dreapta jos
-Muted	NotificationView		Mutat
+Muted	NotificationView		Dezactivat
  is already listed	NotificationView	Alert message	 este deja listat
 OK	PrefletWin		OK
-Notifications	PrefletWin		Înștiințări
-Notifications preflet sample	PrefletWin		Mostră de aplicație de preferințe ale notificărilor
-Mute notifications from this application	NotificationView		Mută notificări de la această aplicație
-wide	GeneralView	Window width: Slider high text	larg
-narrow	GeneralView	Window width: Slider low text	îngust
+Notifications	PrefletWin		Notificări
+Notifications preflet sample	PrefletWin		Eșantion preflet de notificări
+Mute notifications from this application	NotificationView		Dezactivează notificările din această aplicație
+wide	GeneralView	Window width: Slider high text	lată
+narrow	GeneralView	Window width: Slider low text	îngustă
 Revert	PrefletWin		Revenire
 Applications	PrefletView		Aplicații
 {0, plural, =1{Timeout: # second}other{Timeout: # seconds}}	GeneralView		{0, plural, =1{Timeout: # second}other{Timeout: # seconds}}
 Upper right	GeneralView		Dreapta sus
-An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		A apărut o eroare la salvarea preferințelor.\nEste posibil că rămâneți fără spațiu pe hard disc.
+An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		A apărut o eroare la salvarea preferințelor.\nEste posibil să rămâneți fără spațiu pe hard disc.
 Defaults	PrefletWin		Implicite
 Upper left	GeneralView		Stânga sus
 Window width	GeneralView		Lățime fereastră
 Applications	NotificationView		Aplicații
-General	PrefletView		General
+General	PrefletView		Generale
 OK	NotificationView		OK
 Follow Deskbar	GeneralView		Urmărește Deskbar
-Notifications	System name		Înștiințări
-Allowed	NotificationView		Permis
+Notifications	System name		Notificări
+Allowed	NotificationView		Permise
 Duration:	GeneralView		Durată:
 Application	NotificationView		Aplicație
-Enable notifications	GeneralView		Activează înștiințări
-This is a test notification message	PrefletWin		Acesta este un mesaj de notificare test
+Enable notifications	GeneralView		Activează notificările
+This is a test notification message	PrefletWin		Acesta este un test de mesaj de notificare
 Remove	NotificationView		Elimină
 Position:	GeneralView		Poziție:

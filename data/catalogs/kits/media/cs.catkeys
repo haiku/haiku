@@ -1,0 +1,12 @@
+1	czech	x-vnd.Haiku-libmedia	1819860668
+Cleaning up.	MediaDefs		Uklízím.
+Starting media_services.	MediaDefs		Spouštím media_services.
+Stopping media_addon_server.	MediaDefs		Zastavuji media_addon_server.
+Waiting for media_addon_server to quit.	MediaDefs		Čeká se na ukončení media_addon_server.
+Telling media_addon_server to quit.	MediaDefs		Nařizuji ukončení media_addon_server.
+Ready for use.	MediaDefs		Připraveno k použití.
+Stopping media server…	MediaDefs		Zastavuji mediální server…
+Waiting for media_server to quit.	MediaDefs		Čekám na ukončení media_server.
+Done shutting down.	MediaDefs		Dokončen proces vypínání.
+Error occurred starting media services.	MediaDefs		Nastala chyba při spouštění služeb médií.
+Media Service	MediaDefs		Služby médií

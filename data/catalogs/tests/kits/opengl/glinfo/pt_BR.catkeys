@@ -1,9 +1,27 @@
-1	portuguese (brazil)	x-vnd.Haiku-GLInfo	3678488342
+1	portuguese (brazil)	x-vnd.Haiku-GLInfo	1282327690
+Maximum clipping planes	Capabilities		Planos de corte máximos
+Maximum evaluators equation order	Capabilities		Ordem máxima da equação dos avaliadores
+Texture stack size	Capabilities		Tamanho da pilha de textura
 GL Info	System name		Informações GL
 Information	InfoView		Informação
+Attributes stack size	Capabilities		Tamanho da pilha de atributos
+Maximum lights	Capabilities		Luzes máximas
 Extensions	Extensions		Extensões
 Available extensions	Extensions		Extensões disponíveis
+Maximum recommended vertex elements	Capabilities		Máximo de elementos de vértice recomendados
 Value	Capabilities		Valor
+Name stack size	Capabilities		Nome do tamanho da pilha
 Capabilities	Capabilities		Recursos
+Maximum texture units	Capabilities		Unidades máximas de textura
+Unknown or missing OpenGL renderer.	InfoView		Renderizador OpenGL desconhecido ou ausente.
 Capability	Capabilities		Recurso
+Maximum 2D texture size	Capabilities		Tamanho máximo da textura 2D
+Auxiliary buffer(s)	Capabilities		Buffer(s) auxiliar(es)
+Unknown vendor	InfoView		Fabricante desconhecido
 Maximum convolution	Capabilities		Convolução máxima
+Maximum 3D texture size	Capabilities		Tamanho máximo da textura 3D
+Maximum recommended index elements	Capabilities		Máximo de elementos de índice recomendados
+Unknown version	InfoView		Versão desconhecida
+List stack size	Capabilities		Tamanho da pilha de lista
+Model stack size	Capabilities		Tamanho da pilha do modelo
+Projection stack size	Capabilities		Tamanho da pilha de projeção

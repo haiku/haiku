@@ -1,0 +1,41 @@
+1	czech	x-vnd.Be-PRNT	1465107170
+Test page	TestPageView		Testovací stránka
+Remove	PrintersWindow		Odstranit
+Red	TestPageView		Červená
+Default Printer	PrinterListView		Výchozí tiskárna
+<pick one>	AddPrinterDialog		<vyberte jeden>
+Connected to:	AddPrinterDialog		Připojeno k:
+Make default	PrintersWindow		Nastavit jako výchozí
+Cyan	TestPageView		Azurová
+Completed	JobListView		Hotovo
+Test page	PrintersWindow		Testovací stránka
+Transport: %transport% %transport_address%	PrinterListView		Přenos: %transport% %transport_address%
+Failed	JobListView		Selhalo
+Blue	TestPageView		Modrá
+Waiting	JobListView		Čekám
+Processing	JobListView		Zpracování
+Cancel	AddPrinterDialog		Zrušit
+Unknown status	JobListView		Neznámý stav
+Print jobs for %printer_name%	PrintersWindow		Vytisknout úlohy pro %printer_name%
+{0, plural, =-1{??? pages}=1{# page}other{# pages}}	JobListView		{0, plural, =-1{??? stran}=1{# strana}few{# strany}other{# stran}}
+Add printer	AddPrinterDialog		Přidat tiskárnu
+Printers	PrintersWindow		Tiskárny
+No printer found!	TransportMenu		Nebyla nalezena žádná tiskárna!
+Add…	PrintersWindow		Přidat…
+Magenta	TestPageView		Purpurová
+Transport: %transport% %transport_address%	TestPageView		Přenos: %transport% %transport_address%
+Add	AddPrinterDialog		Přidat
+Print jobs: No printer selected	PrintersWindow		Úlohy tisku: nevybrána žádná tiskárna
+Printer name:	AddPrinterDialog		Jméno tiskárny:
+Yellow	TestPageView		Žlutá
+Black	TestPageView		Černá
+Printer type:	AddPrinterDialog		Typ tiskárny:
+Printers	System name		Tiskárny
+{0, plural,=0{No pending jobs}=1{1 pending job}other{# pending jobs}}	PrinterListView		{0, plural,=0{Žádné čekající úlohy}=1{1 čekající úloha}few{# čekající úlohy}other{# čekajících úloh}}
+Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Tiskárna: %printer_name%\nDriver:  %driver%\n
+Green	TestPageView		Zelená
+Print test page	PrintersWindow		Vytisknout zkušební stránku
+Restart job	PrintersWindow		Restartovat úlohu
+Driver: %driver%	PrinterListView		Ovladač: %driver%
+Cancel job	PrintersWindow		Zrušit úlohu
+%.2f KB	JobListView		%.2f KB

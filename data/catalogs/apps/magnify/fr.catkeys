@@ -1,6 +1,7 @@
-1	french	x-vnd.Haiku-Magnify	3228180819
+1	french	x-vnd.Haiku-Magnify	1248284405
   size must be > 4 and a multiple of 4	Console		  la taille doit être > 4 et un multiple de 4
 Decrease pixel size	Magnify-Main		Réduire le grossissement
+no clip msg	In console, when clipboard is empty after clicking Copy image		pas de message du presse-papier
 Increase pixel size	Magnify-Main		Augmenter le grossissement
 magnify: size must be a multiple of 4	Console		Agrandissement : la taille doit être un multiple de 4
 Stick coordinates	Magnify-Main		Mémoriser les coordonnées

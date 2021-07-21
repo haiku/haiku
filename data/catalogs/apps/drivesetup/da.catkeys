@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-DriveSetup	2942313478
+1	danish	x-vnd.Haiku-DriveSetup	4048496535
 Could not unmount partition %s.	MainWindow		Kunne ikke afmontere partition %s.
 Mount all	MainWindow		Monter alle
 Disk	MainWindow		Disk
@@ -30,12 +30,12 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Surface test (not implemented)	MainWindow		Overflade test (ikke implementeret)
 Read only	PartitionList		Skrivebeskyttet
 The panel could not return successfully.	MainWindow		Panelet kunne ikke returnere.
-Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Kunne ikke ændre parameterne for partitionen. Der blev ikke skrevet nogen ændringer til disken.
+Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Kunne ikke ændre parameterne for partitionen. Der blev ikke skrevet nogle ændringer til disken.
 Partition %ld	DiskView		Partition %ld
 There's no space on the partition where a child partition could be created.	MainWindow		Der er ikke plads på partitionen til at der kan oprettes under partitioner.
 No disk devices have been recognized.	DiskView		Kunne ikke genkende nogle disk enheder.
 Attributes	PartitionList		Attributter
-Failed to delete the partition. No changes have been written to disk.	MainWindow		Fejl ved sletning af partitionen. Der er ikke blevet skrevet nogle ændringer til disken.
+Failed to delete the partition. No changes have been written to disk.	MainWindow		Kunne ikke slette partitionen. Der er ikke blevet skrevet nogle ændringer til disken.
 Change parameters…	MainWindow		Skift parametre…
 Format	InitializeParametersPanel		Format
 Could not unmount partition	MainWindow		Kunne ikke afmontere partition
@@ -50,6 +50,8 @@ Are you sure you want to format a raw disk? (Most people initialize the disk wit
 Wipe (not implemented)	MainWindow		Stryg (ikke implementeret)
 The currently selected partition does not have a parent partition.	MainWindow		Den valgte partition har ikke nogen over-partition.
 Validation of the given initialization parameters failed.	MainWindow		Validering af de angivne initialiseringsparametre mislykkedes.
+Not formatted (%s)	PartitionList		Ikke formateret (%s)
+Failed to create the partition. No changes have been written to disk.	MainWindow		Kunne ikke oprette partitionen. Der er ikke blevet skrevet nogle ændringer til disken.
 Shared	PartitionList		Delt
 MIMEs	PartitionList		MIME'er
 BitLocker encrypted	Encryption utils		BitLocker-krypteret
@@ -62,9 +64,11 @@ Change	ChangeParametersPanel		Skift
 Partition name:	ChangeParametersPanel		Partitionsnavn:
 LUKS encrypted	Encryption utils		LUKS-krypteret
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Er du sikker på, at du vil skrive ændringerne tilbage til disken nu?\n\nAl data på den valgte partition %s vil blive permanent slettet!
+Empty space	PartitionList		Tomrum
 Cancel	AbstractParametersPanel		Annuller
 Format	MainWindow		Format
 OK	MainWindow		OK
+Empty space	DiskView		Tomrum
 Open with DiskProbe	MainWindow		Åbn med Disksondering
 Could not delete the selected partition.	MainWindow		Kunne ikke slette den valgte partition.
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Er du sikker på, at du vil initialisere den valgte disk? Al data vil gå tabt. Du vil blive spurgt igen inden ændringerne skrives til disken.\n
@@ -81,6 +85,7 @@ Rescan	MainWindow		Søg igen
 There was an error acquiring the partition row.	MainWindow		Der opstod en fejl ved indhentning af partitionsrækken.
 Failed to initialize the disk %s!\n	MainWindow		Kunne ikke initialisere disken %s!\n
 Disk system \"%s\" not found!	MainWindow		Disksystemet \"%s\" blev ikke fundet!
+The partition cannot be unmounted.	MainWindow		Partitionen kan ikke afmonteres.
 Delete	MainWindow		Slet
 Partition type:	ChangeParametersPanel		Partitionstype:
 Parameters	PartitionList		Parametre

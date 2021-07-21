@@ -3,7 +3,7 @@ Partially download messages larger than	ProtocolConfigView		次より大きい�
 Password:	ProtocolConfigView		パスワード:
 Remove mail from server when deleted	ProtocolConfigView		ローカルからメールが削除されたらサーバーからも削除
 Mail server:	ProtocolConfigView		サーバー名:
-Select…	MailKit		選択…
+Select…	MailKit		選択...
 Connection type:	ProtocolConfigView		接続タイプ:
 KB	ProtocolConfigView	kilo byte	KB
 Leave mail on server	ProtocolConfigView		受信後もサーバーにメールを保存する

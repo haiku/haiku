@@ -1,17 +1,17 @@
 1	romanian	x-vnd.Haiku-FontDemo	3449067186
-Stop cycling	ControlView		Opreşte ciclare
+Stop cycling	ControlView		Opreşte ciclarea
 Haiku, Inc.	FontDemoView		Haiku, Inc.
 Rotation: %d	ControlView		Rotaţie: %d
-Shear: %d	ControlView		Forfecare: %d
+Shear: %d	ControlView		Tăiere: %d
 Spacing: %d	ControlView		Spaţiere: %d
-Cycle fonts	ControlView		Ciclează fonturi
+Cycle fonts	ControlView		Fonturi de ciclare
 Font:	ControlView		Font:
-Drawing mode:	ControlView		Mod desenare:
+Drawing mode:	ControlView		Mod desen:
 Haiku, Inc.	ControlView		Haiku, Inc.
 Controls	FontDemo		Controale
-FontDemo	System name		DemoFont
+FontDemo	System name		FontDemo
 Outline: %d	ControlView		Contur: %d
 Text:	ControlView		Text:
-Antialiased text	ControlView		Text cu anti-alias
-Bounding boxes	ControlView		Casete incadrare
-Size: %d	ControlView		Mărime: %d
+Antialiased text	ControlView		Text cu antialias
+Bounding boxes	ControlView		Casete de delimitare
+Size: %d	ControlView		Dimensiune: %d

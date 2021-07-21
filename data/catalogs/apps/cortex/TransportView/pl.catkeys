@@ -1,0 +1,23 @@
+1	polish	application/x-vnd.Cortex.TransportView	1534931965
+Roll	TransportView		Puść
+(none)	TransportView		(brak)
+{0, plural, one{# node} other{# nodes}}	TransportView		{0, plural, one{# węzeł} few{# węzły} many{# węzłów} other{# węzła}}
+Start	TransportView		Uruchom
+No errors.	TransportView		Brak błędów.
+to	TransportView		do
+Offline	TransportView		Wyłączony
+(???)	TransportView		(???)
+Stop	TransportView		Zatrzymaj
+(no group)	TransportView		(brak grupy)
+Drop data	TransportView		Gubienie danych
+To:	TransportView		Do:
+Recording	TransportView		Nagrywanie
+Increase latency	TransportView		Zwiększanie opóźnienia
+Time source:	TransportView		Źródło czasu:
+DAC time source	TransportView		Źródło czasu DAC
+Decrease precision	TransportView		Zmniejszanie precyzji
+System clock	TransportView		Zegar systemowy
+From:	TransportView		Z:
+Roll from	TransportView		Puść od
+Preroll	TransportView		Preroll
+Run mode:	TransportView		Tryb działania:

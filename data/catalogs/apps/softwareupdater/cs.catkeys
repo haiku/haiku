@@ -1,0 +1,64 @@
+1	czech	x-vnd.haiku-softwareupdater	369324613
+Updating version	SoftwareUpdaterWindow	List item text	Aktualizuji verzi
+Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Klikněte zde pro instalaci {0, plural, one{# aktualizovaného balíčku} other{# aktualizovaných balíčků}}.
+Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Balíčky k odinstalování
+No active network connection was found	UpdateManager	Error message	Nebylo nalezeno aktivní síťové připojení
+Quit	SoftwareUpdaterWindow	Alert button label	Ukončit
+There were no updates found.	CheckManager		Žádné aktualizace nebyly nalezeny.
+Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		Instalace aktualizací nebyla dokončena, opravdu ji chcete ukončit?
+Updates found	SoftwareUpdaterWindow		Nalezeny aktualizace
+Update now	SoftwareUpdaterWindow		Aktualizovat nyní
+For some reason, we could not reboot your computer.	SoftwareUpdaterWindow		Z nějakého důvodu se nepodařilo restartovat váš počítač.
+OK	UpdateManager		OK
+Unrecognized argument	SoftwareUpdaterApp	Error message	Nerozpoznaný argument
+There were no updates found.	CheckAction		Nebyly nalezeny žádné aktualizace.
+No updates available	UpdateAction		Nejsou dostupné žádné aktualizace
+New packages to be installed	SoftwareUpdaterWindow	List super item label	Nové balíčky k instalaci
+Packages to be updated	SoftwareUpdaterWindow	List super item label	Balíčky k aktualizaci
+to	SoftwareUpdaterWindow	List item text	do
+Attempting to cancel the updates…	SoftwareUpdaterWindow		Pokouším se o zrušení aktualizací…
+Contacting software repositories to check for package updates.	CheckManager		Připojování k softwarovým repozitářum na kontrolu aktualizací balíčku.
+Available updates found	CheckManager		Nalezeny dostupné aktualizace
+from repository	SoftwareUpdaterWindow	List item text	z repozitáře
+Contacting software repositories to check for package updates.	SoftwareUpdaterWindow		Připojování k softwarovým repozitářům na kontrolu aktualizací balíčků.
+Cancelling updates	SoftwareUpdaterWindow		Ruším aktualizace
+Cancel	SoftwareUpdaterWindow	Alert button label	Zrušit
+There were no updates found.	UpdateAction		Nenalezeny žádné aktualizace.
+OK	SoftwareUpdaterWindow		OK
+Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Zvolte z těchto možností:\n\nAktualizace:\n\tAktualizovat všechny instalované balíčky.\nPlná synchronizace:\n\tSynchronizovat instalované balíčky s repozitáři.
+The following changes will be made:	SoftwareUpdaterWindow		Následující změny budou uplatněny:
+Argument variables are no longer accepted\n	SoftwareUpdaterApp		Argumenty již nejsou akceptovány\n
+Fatal error while checking for updates: %s\n	CheckAction		Kritická chyba při kontrole aktualizací: %s\n
+SoftwareUpdater	System name		Aktualizovač
+No active network connection was found.\n	CheckManager		Nebylo nalezeno aktivní připojení k síti.\n
+Applying changes	UpdateManager		Uplatňuji změny
+Full sync	SoftwareUpdaterWindow	Alert button label	Plná synchronizace
+Quit	SoftwareUpdaterWindow	Button label	Ukončit
+Updates have been successfully installed.	UpdateManager		Aktualizace byly úspěšně instalovány.
+Exception occurred while updating packages : %s\n	UpdateAction		Nastala chyba při aktualizaci balíčků: %s\n
+A reboot is necessary to complete the update process.	UpdateManager		K dokončení aktualizace je potřeba restart.
+Exception occurred while checking for updates: %s\n	CheckAction		Došlo k výjimce při kontrole aktualizací: %s\n
+Packages are being updated	UpdateManager		Balíčky se aktualizují
+Cancel	SoftwareUpdaterWindow		Zrušit
+Don't quit	SoftwareUpdaterWindow		Neukončovat
+Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Klikněte zde pro aktualizování. Některé aktualizace potřebují poštelovat.
+Checking for updates	SoftwareUpdaterWindow		Kontroluji aktualizace
+Updates completed	UpdateManager		Aktualizace hotova
+Reboot	SoftwareUpdaterWindow		Restartovat
+Show more details	SoftwareUpdaterWindow		Zobrazit podrobnosti
+Installing version	SoftwareUpdaterWindow	List item text	Instaluji verzi
+Checking for updates	CheckManager		Kontroluji aktualizace
+No remote repositories are available	UpdateManager	Error message	Žádné vzdálené repozitáře nejsou dostupné
+Software {0, plural, one{update} other{updates}} available	CheckManager		Aktualizace {0, plural, one{programu} other{programů}} je dostupná
+Reboot	SoftwareUpdaterWindow	Button label	Restart
+Update	SoftwareUpdaterWindow	Alert button label	Aktualizace
+Open Repositories	SoftwareUpdaterWindow	Alert button label	Otevřít repozitáře
+Updates did not complete	UpdateAction		Instalace aktualizací nebyla dokončena
+Invalid update type, cannot continue with updates	UpdateAction		Chybný typ aktualizace, nelze pokračovat
+Uninstalling version	SoftwareUpdaterWindow	List item text	Odinstalace verze
+%i of %i	UpdateManager	Do not translate %i	%i z %i
+Quit	SoftwareUpdaterWindow		Ukončit
+No updates available	CheckManager		Žádné dostupné aktualizace
+Usage:  SoftwareUpdater <command> [ <option> ]\nUpdates installed packages.\n\nCommands:\n  update     - Search repositories for updates on all packages.\n  check      - Check for available updates but only display a notification with results.\n  full-sync  - Synchronize the installed packages with the repositories.\n\nOptions:\n  -h or --help       Print this usage help\n  -v or --verbose    Output verbose information\n	SoftwareUpdaterApp	Command line usage help	Použití:  SoftwareUpdater <command> [ <option> ]\nAktualizace instalovaných balíčků.\n\nCommands:\n  update     - Prohledává repozitáře na aktualizace ve všech balíčcích.\n  check      - Zkontroluje, zda jsou dostupné aktualizace, ale zobrazí pouze oznámení s výsledky.\n  full-sync  - Synchronizuje nainstalované balíčky s repozitáři.\n\nOptions:\n  -h or --help       Zobrazí návod k použití\n  -v or --verbose    Zobrazí podrobné informace\n
+No remote repositories are available. Please verify that some repositories are enabled using the Repositories preflet or the 'pkgman' command.	SoftwareUpdaterWindow	Error message	Vzdálené repozitáře nejsou dostupné. Zkontrolujte prosím, zda jsou povolené pomocí přednastavení repozitářů nebo příkazem 'pkgman'.
+Downloading packages	UpdateManager		Stahuji balíčky

@@ -1,6 +1,6 @@
 1	romanian	x-vnd.Haiku-MidiPlayer	1046133011
-This tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Acest program infim\nȘtie să redea mii de\nMelodii siropoase
-Dungeon	Main Window		Donjon
+This tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Acest program mic\nȘtie să redea mii de\nCântece faine
+Dungeon	Main Window		Temniță
 Could not load song	Main Window		Nu s-a putut încărca melodia
 Igor's lab	Main Window		Laboratorul lui Igor
 Off	Main Window		Oprit
@@ -8,13 +8,13 @@ Loading instruments…	Scope View		Se încarcă instrumentele…
 Volume:	Main Window		Volum:
 Closet	Main Window		Dulap
 Scope	Main Window		Gamă
-Drop MIDI file here	Scope View		Plasați fișier MIDI aici
-None	Main Window		Nimic
-Reverb:	Main Window		Reflectă:
-MidiPlayer	System name		PlayerMidi
+Drop MIDI file here	Scope View		Plasați un fișier MIDI aici
+None	Main Window		Nespecificat
+Reverb:	Main Window		Reverb:
+MidiPlayer	System name		MidiPlayer
 OK	Main Window		OK
 Stop	Main Window		Oprește
-Live input:	Main Window		Intrare directă:
+Live input:	Main Window		Intrare live:
 Garage	Main Window		Garaj
 Play	Main Window		Redă
-Cavern	Main Window		Cavernă
+Cavern	Main Window		Peșteră

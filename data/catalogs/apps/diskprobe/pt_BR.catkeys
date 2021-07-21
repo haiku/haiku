@@ -1,5 +1,5 @@
 1	portuguese (brazil)	x-vnd.Haiku-DiskProbe	2944605311
-Raw editor	AttributeWindow		Editor em bruto
+Raw editor	AttributeWindow		Editor de formato Raw
 Remove	AttributeWindow		Remover
 Close	ProbeView		Fechar
 Boolean value:	TypeEditors		Valor booleano:
@@ -12,18 +12,18 @@ Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if
  (native)	ProbeView		 (nativo)
 Attribute offset: 	ProbeView		Compensação de atributo: 
 Text	TypeEditors	This is the type of editor	Texto
-File offset: 	ProbeView		Offset do arquivo:
+File offset: 	ProbeView		Offset do arquivo: 
 Add	ProbeView		Adicionar
 64 bit signed value:	TypeEditors		valor assinado de 64 bit:
 Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Você realmente quer remover o atributo \"%s\" do arquivo \"%s\"?\n\nVocê não pode desfazer essa ação.
 No type editor available	AttributeWindow		Nenhum editor de tipo disponível
 Print…	ProbeView		Imprimir…
 New…	FileWindow		Novo...
-what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	O que é: '%.4s'\n\n
+what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	o que é: '%.4s'\n\n
 OK	DiskProbe		OK
 DiskProbe	System name		Analisador de Disco
 Back	ProbeView		Voltar
-Device: 	ProbeView		Dispositivo:
+Device: 	ProbeView		Dispositivo: 
 Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Base
 Open file…	FileWindow		Abrir arquivo…
 32 bit unsigned pointer:	TypeEditors		ponteiro não assinado de 32 bits:
@@ -82,7 +82,7 @@ Case sensitive	FindWindow		Diferenciar maiúsculas e minúsculas
 Remove from file	AttributeWindow		Remover do arquivo
 Attributes	ProbeView		Atributos
 Message	TypeEditors	This is the type of view	Mensagem
-Message View	TypeEditors		Visualização de Mensagem
+Message View	TypeEditors		Visualizar Mensagem
 Offset: 	ProbeView		Deslocamento: 
 Swapped: 0x%0*Lx	ProbeView		Trocado: 0x%0*Lx
 MIME type:	TypeEditors		Tipo MIME:
@@ -97,7 +97,7 @@ Close	AttributeWindow		Fechar
 Type editor	AttributeWindow		Editor de tipo
 Save	ProbeView		Salvar
 of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	de 0x0
-Attribute type: 	ProbeView		Tipo de atributo:
+Attribute type: 	ProbeView		Tipo de atributo: 
 15 bit	TypeEditors		15 bits
 Page setup…	ProbeView		Configurar página...
 Boolean	TypeEditors	This is the type of editor	Booleano
@@ -124,10 +124,10 @@ Number	TypeEditors	This is the type of editor	Número
 Edit	ProbeView		Editar
 String editor	TypeEditors		Editor de expressões
 Boolean editor	TypeEditors		Editor booleano
-Device offset: 	ProbeView		Offset do dispositivo:
+Device offset: 	ProbeView		Offset do dispositivo: 
 Find…	ProbeView		Localizar...
 8 bit palette	TypeEditors		Paleta de 8 bit
 Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Decimal
-Image view	TypeEditors	Image means here a picture file, not a disk image.	Visualização de imagem
+Image view	TypeEditors	Image means here a picture file, not a disk image.	Visualização imagem
 Paste	ProbeView		Colar
 32 bit unsigned size:	TypeEditors		tamanho não assinado de 32 bits:

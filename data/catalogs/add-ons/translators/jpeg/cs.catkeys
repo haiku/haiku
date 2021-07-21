@@ -1,0 +1,22 @@
+1	czech	x-vnd.Haiku-JPEGTranslator	3788699631
+Read	JPEGTranslator		Načíst
+Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Formát Be Bitmap (JPEGPřekladač)
+Show warning messages	JPEGTranslator		Zobrazit varování
+Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Použij CMYK kódování s 0 pro 100% barevné krytí
+JPEG Library Error: %s\n	be_jerror		Chyba knihovny JPEG: %s\n
+©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nZaloženo na knihovně IJG ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\npodporu \"bezstratové\" komprese napsal Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nNěkteré funkce na konverzi mezi barevnými prostory napsal Magnus Hellman\n\thttp://www.bebits.com/app/802\n
+None	JPEGTranslator		Žádný
+About	JPEGTranslator		O programu
+Version %d.%d.%d	JPEGTranslator		Verze %d.%d.%d
+Write black-and-white images as RGB24	JPEGTranslator		Zapsat černobílé obrázky jako RGB24
+Output smoothing strength	JPEGTranslator		Síla výstupního vyhlazení
+Use progressive compression	JPEGTranslator		Použít progresívní kompresi
+Make file smaller (sligthtly worse quality)	JPEGTranslator		Menší soubor (v trošičku horší kvalitě)
+High	JPEGTranslator		Vysoká
+Read greyscale images as RGB32	JPEGTranslator		Načíst obrázky ve stupních šedi jako RGB32
+Output quality	JPEGTranslator		Výstupní kvalita
+Low	JPEGTranslator		Nízká
+Write	JPEGTranslator		Zapsat
+Prevent colors 'washing out'	JPEGTranslator		Předejít "vymytí" barev
+JPEG Library Warning: %s\n	be_jerror		Varování knihovny JPEG: %s\n
+JPEG images	JPEGTranslator		obrázky JPEG

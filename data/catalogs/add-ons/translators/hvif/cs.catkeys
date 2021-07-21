@@ -1,0 +1,8 @@
+1	czech	x-vnd.Haiku-HVIFTranslator	249304797
+Haiku vector icon translator	HVIFTranslator		Překladač vektorového formátu ikon Haiku
+HVIF icons	HVIFTranslator		HVIF ikony
+Render size:	HVIFView		Renderovaná velikost
+HVIFTranslator Settings	HVIFTranslator		Nastavení Překladače HVIF
+Haiku vector icon translator	HVIFView		Překladač vektorového formátu ikon Haiku
+HVIF Settings	HVIFMain		Nastavení HVIF
+Version %d.%d.%d, %s	HVIFView		Verze %d.%d.%d, %s

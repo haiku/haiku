@@ -1,49 +1,49 @@
 1	romanian	x-vnd.Haiku-ProcessController	415082887
 Error saving file	ProcessController		Eroare la salvarea fișierului
-Display priority	ProcessController		Prioritate afișaj
-That's no Fun!	ProcessController		Nu e amuzant!
-What do you want to do with the team \"%s\"?	ProcessController		Ce doriți să faceți cu echipa \"%s\"?
+Display priority	ProcessController		Prioritate de afișaj
+That's no Fun!	ProcessController		Nu este distractiv!
+What do you want to do with the team \"%s\"?	ProcessController		Ce doriți să faceți cu echipa \„%s\”?
 Your setting file could not be saved!\n(%s)	ProcessController		Fișierul de configurare nu a putut fi salvat!\n(%s)
-Processor %d	ProcessController		Procesor %d
-Live in the Deskbar	ProcessController		Activ pe bara de desktop
-Kill this team!	ProcessController		Omoară această echipă!
+Processor %d	ProcessController		Procesorul %d
+Live in the Deskbar	ProcessController		Live în deskbar
+Kill this team!	ProcessController		Termină această echipă!
 OK	ProcessController		OK
-You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Puteți să rulați ControlerProces într-o fereastră sau să îl instalați pe bara de desktop.
+You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Puteți rula ProcessController într-o fereastră sau să îl instalați în deskbar.
 Real-time priority	ProcessController		Prioritate în timp real
 Custom priority	ProcessController		Prioritate personalizată
-Debug this thread!	ProcessController		Depanează acest fir de execuție!
+Debug this thread!	ProcessController		Depanează acest thread!
 Low priority	ProcessController		Prioritate scăzută
-Urgent display priority	ProcessController		Prioritate afișaj urgent
+Urgent display priority	ProcessController		Prioritate de afișaj urgentă
 Memory usage	ProcessController		Utilizarea memoriei
 Ok!	ProcessController		Ok!
 Normal priority	ProcessController		Prioritate normală
-Restart Deskbar	ProcessController		Repornește bara de desktop
+Restart Deskbar	ProcessController		Repornire deskbar
 About ProcessController…	ProcessController		Despre ProcessController…
 Usage: %s [-deskbar]\n	ProcessController		Utilizare: %s [-deskbar]\n
 Please confirm	ProcessController		Confirmați
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr
 Urgent priority	ProcessController		Prioritate urgentă
-What do you want to do with the thread \"%s\"?	ProcessController		Ce doriți să faceți cu firul de execuție \"%s\"?
+What do you want to do with the thread \"%s\"?	ProcessController		Ce doriți să faceți cu threadul \„%s\”?
 Idle priority	ProcessController		Prioritate în așteptare
-Real-time display priority	ProcessController		Prioritate afișaj în timp real
-Threads and CPU usage	ProcessController		Utilizare fire de execuție și CPU
-Quit application	ProcessController		Închide aplicația
-Info	ProcessController		Detalii
-Kill this thread!	ProcessController		Termină forțat acest fir de execuție!
-This team is already gone…	ProcessController		Această echipă este plecată deja…
-Gone teams…	ProcessController		Echipe plecate…
-Quit an application	ProcessController		Închide o aplicație
+Real-time display priority	ProcessController		Prioritate de afișaj în timp real
+Threads and CPU usage	ProcessController		Utilizare threaduri și CPU
+Quit application	ProcessController		Ieșire din aplicație
+Info	ProcessController		Informații
+Kill this thread!	ProcessController		Termină acest thread!
+This team is already gone…	ProcessController		Această echipă a dispărut deja…
+Gone teams…	ProcessController		Echipe dispărute…
+Quit an application	ProcessController		Ieșire dintr-o aplicație
 Cancel	ProcessController		Anulează
-Install in Deskbar	ProcessController		Instalează pe bara de desktop
+Install in Deskbar	ProcessController		Instalează în deskbar
 Debug this team!	ProcessController		Depanează această echipă!
-ProcessController	System name		ControlProcese
-Lowest active priority	ProcessController		Cea mai scăzută prioritate activă
-Restart Tracker	ProcessController		Repornește Tracker
-System resources & caches…	ProcessController		Resurse de sistem & cache-uri…
+ProcessController	System name		ProcessController
+Lowest active priority	ProcessController		Prioritatea activă cea mai scăzută
+Restart Tracker	ProcessController		Repornire Tracker
+System resources & caches…	ProcessController		Resurse de sistem și cache-uri…
 Damned!	ProcessController		Aiurea!
 New Terminal	ProcessController		Terminal nou
 Power saving	ProcessController		Economisire de energie
-ProcessController is already installed in Deskbar.	ProcessController		ControlerProces este instalat deja pe bara de desktop.
-This is the last active processor…\nYou can't turn it off!	ProcessController		Acesta este ultimul procesor activ…\nNu puteți să îl opriți!
-This thread is already gone…	ProcessController		Acest fir de execuție este plecat deja…
-Run in window	ProcessController		Pornește în fereastră
+ProcessController is already installed in Deskbar.	ProcessController		ProcessController este instalat deja în deskbar.
+This is the last active processor…\nYou can't turn it off!	ProcessController		Acesta este ultimul procesor activ…\nNu îl puteți opri!
+This thread is already gone…	ProcessController		Acest thread a dispărut deja…
+Run in window	ProcessController		Rulează în fereastră

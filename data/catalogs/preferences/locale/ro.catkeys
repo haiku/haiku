@@ -4,27 +4,27 @@ Negative:	TimeFormatSettings		Negativ:
 Language	Locale Preflet Window		Limbă
 Short format:	TimeFormatSettings		Format scurt:
 24 hour	TimeFormatSettings		24 de ore
-Locale	Locale Preflet Window		Local
+Locale	Locale Preflet Window		Localizare
 Time	TimeFormatSettings		Oră
 Defaults	Locale Preflet Window		Implicite
-Locale	System name		Localizare
+Locale	System name		Locale
 Date	TimeFormatSettings		Dată
 OK	Locale Preflet Window		OK
 Long format:	TimeFormatSettings		Format lung:
 Numbers	TimeFormatSettings		Numere
 Available languages	Locale Preflet Window		Limbi disponibile
-Locale	Locale Preflet		Local
+Locale	Locale Preflet		Localizare
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Nu s-au putut găsi limbile disponibile! Nu puteți utiliza acest preflet!
 Formatting	Locale Preflet Window		Formatare
-Use month/day-names from preferred language	TimeFormatSettings		Utilizează nume-lună/zi pentru limba preferată
+Use month/day-names from preferred language	TimeFormatSettings		Utilizează numele de lună/zi din limba preferată
 already chosen	LanguageListView		deja ales
-Preferred languages	Locale Preflet Window		Limbă preferată
+Preferred languages	Locale Preflet Window		Limbi preferate
 Full format:	TimeFormatSettings		Format complet:
 Cancel	Locale Preflet Window		Anulează
 Revert	Locale Preflet Window		Revenire
 Translate application and folder names	TimeFormatSettings		Traduce numele aplicațiilor și dosarelor
 12 hour	TimeFormatSettings		12 ore
 Positive:	TimeFormatSettings		Pozitiv:
-Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Deskbar și Tracker trebuie repornite pentru ca această modificare să aibă efect. Dorești să le repornești acum?
-Restart	Locale Preflet Window		Repornește
+Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Deskbar și Tracker trebuie repornite pentru ca această modificare să aibă efect. Doriți să le reporniți acum?
+Restart	Locale Preflet Window		Repornire
 Currency	TimeFormatSettings		Valută

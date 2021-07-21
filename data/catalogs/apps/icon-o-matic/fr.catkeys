@@ -164,7 +164,7 @@ Untitled	Icon-O-Matic-Main		Sans nom
 Max LOD	Icon-O-Matic-PropertyNames		Seuil max.
 Add Path	Icon-O-Matic-AddPathsCmd		Ajouter un chemin
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Sauvegarder les changements de l’icône actuelle avant de fermer ?
-Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		Impossible d'ouvrir le fichier « %s » comme un document SVG.\n\n
+Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		Impossible d’ouvrir le fichier « %s » comme un document SVG.\n\n
 load error	Icon-O-Matic-SVGImport		erreur de chargement
 Transformation	Icon-O-Matic-TransformersList		Transformation
 Save as…	Icon-O-Matic-Menu-File		Enregistrer sous…

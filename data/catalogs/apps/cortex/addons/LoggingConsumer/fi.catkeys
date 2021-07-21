@@ -1,0 +1,21 @@
+1	finnish	application/x-vnd.Be.LoggingConsumerApp	2792125938
+Priority	CortexAddOnsLoggingConsumer		Prioriteetti
+Latency	CortexAddOnsLoggingConsumer		Viive
+Logged input	CortexAddOnsLoggingConsumer		Kirjautumissyöte
+NodeLogger	CortexAddOnsLoggingConsumers		NodeLogger
+Start	CortexAddOnsLoggingConsumerNodeHarnessWin		Käynnistä
+Thread priority	CortexAddOnsLoggingConsumer		Säieprioriteetti
+LoggingConsumer parameters	CortexAddOnsLoggingConsumer		LoggingConsumer-parametrit
+Latency control	CortexAddOnsLoggingConsumer		Viiveohjaus
+MediaNodeControlApp: couldn't get node info (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: solmutietojen (%d) haku epäonnistui:\n%s\n
+CPU percentage	CortexAddOnsLoggingConsumer		Prosessoriprosentti
+MediaNodeControlApp: couldn't find node (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: solmun (%d) etsintä epäonnistui:\n%s\n
+LoggingConsumer	CortexAddOnsLoggingConsumer		LoggingConsumer
+Stop	CortexAddOnsLoggingConsumerNodeHarnessWin		Pysäytä
+An add-on version of the LoggingConsumer node.\nSee the Be Developer Newsletter III.18: 5 May, 1999\nadapted by Eric Moon (4 June, 1999)	CortexAddOnsLoggingConsumer		LoggingConsumer-solmun lisäosaversio.\nKatso Be-kehittäjäuutiskirjettä III.18: 5 toukokuuta, 1999\nmuokkaaja: Eric Moon (4 kesäkuuta, 1999)
+OK	CortexAddOnsCommonMediaNodeControlApp		Valmis
+Controls	CortexAddOnsLoggingConsumerNodeHarnessWin		Ohjaimet
+controls	CortexAddOnsCommonMediaNodeControlApp		ohjaimet
+Connect	CortexAddOnsLoggingConsumerNodeHarnessWin		Yhdistä
+percent	CortexAddOnsLoggingConsumer		prosentti
+MediaNodeControlApp: no parameters for node (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: solmulla (%d) ei ole parametreja:\n%s\n

@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-WebPositive	55235296
+1	polish	x-vnd.Haiku-WebPositive	250728390
 Authentication required	Authentication Panel		Wymagane uwierzytelnienie
 Previous	WebPositive Window		Poprzedni
 (Finish: %date)	Download Window		(Koniec: %date)
@@ -53,6 +53,7 @@ Cookies for %s	Cookie Manager		Ciasteczka dla %s
 The download could not be opened.	Download Window		Pobrania nie można otworzyć.
 Close	Download Window		Zamknij
 WebPositive	System name		WebPositive
+%s - Search term	Settings Window		%s – Wyszukiwane hasło
 Reload	WebPositive Window		Odśwież
 Expiration	Cookie Manager		Data ważności
 Download finished	Download Window		Pobieranie zakończone
@@ -100,6 +101,7 @@ There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPosi
 Revert	Settings Window		Cofnij
 Copy	WebPositive Window		Kopiuj
 Default standard font size:	Settings Window		Domyślny rozmiar fontu standardowego:
+Custom	Settings Window		Własne
 Bookmark this page	WebPositive Window		Dodaj zakładkę
 Show tabs if only one page is open	Settings Window		Pokaż karty, nawet jeśli tylko jedna strona jest otwarta
 Close tab	WebPositive Window		Zamknij kartę
@@ -129,6 +131,7 @@ Double-click or middle-click to open new tab.	Tab Manager		Dwuklik lub wciśnię
 Next	WebPositive Window		Następna
 Bookmark error	WebPositive Window		Błąd zakładki
 OK	WebPositive Window		OK
+(%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% z %expectedSize%, %rate%/s)
 WebPositive	Download Window		WebPositive
 Zoom text only	WebPositive Window		Powiększaj tylko tekst
 Save page as…	WebPositive Window		Zapisz stronę jako…

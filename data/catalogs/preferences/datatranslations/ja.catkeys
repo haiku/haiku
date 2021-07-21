@@ -3,7 +3,7 @@ Path:	DataTranslations		パス:
 Name:	DataTranslations		名前:
 DataTranslations - Note	DataTranslations		データ変換 - 注意
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		'%name' はトランスレーターではないようなのでインストールされません。
-Could not install %s:\n%s	DataTranslations		インストールできませんでした %s:\n%s
+Could not install %s:\n%s	DataTranslations		インストールできません %s:\n%s
 OK	DataTranslations		OK
 Cancel	DataTranslations		中止
 Info:	DataTranslations		情報:

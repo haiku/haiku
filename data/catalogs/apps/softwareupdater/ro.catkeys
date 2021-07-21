@@ -1,64 +1,64 @@
 1	romanian	x-vnd.haiku-softwareupdater	369324613
 Updating version	SoftwareUpdaterWindow	List item text	Se actualizează versiunea
-Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Apăsați clic aici pentru a instala {0, plural, one{# updated package} other{# updated packages}}.
+Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Clic aici pentru a instala {0, plural, one{# updated package} other{# updated packages}}.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Pachetele de dezinstalat
-No active network connection was found	UpdateManager	Error message	Nu s-a găsit o conexiune la rețea activă
+No active network connection was found	UpdateManager	Error message	Nu a fost găsită nicio conexiune de rețea activă
 Quit	SoftwareUpdaterWindow	Alert button label	Ieșire
 There were no updates found.	CheckManager		Nu au fost găsite actualizări.
-Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		Actualizările nu au fost completate, sigur doriți să ieșiți?
+Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		Actualizările nu au fost finalizate, sigur doriți să ieșiți?
 Updates found	SoftwareUpdaterWindow		Actualizări găsite
 Update now	SoftwareUpdaterWindow		Actualizează acum
-For some reason, we could not reboot your computer.	SoftwareUpdaterWindow		Dintr-un anumit motiv, nu s-a putut reporni calculatorul.
+For some reason, we could not reboot your computer.	SoftwareUpdaterWindow		Din anumite motive, nu s-a putut reporni calculatorul.
 OK	UpdateManager		OK
 Unrecognized argument	SoftwareUpdaterApp	Error message	Argument nerecunoscut
-There were no updates found.	CheckAction		Nu s-au găsit actualizări.
+There were no updates found.	CheckAction		Nu au fost găsite actualizări.
 No updates available	UpdateAction		Nu există actualizări disponibile
 New packages to be installed	SoftwareUpdaterWindow	List super item label	Pachete noi de instalat
 Packages to be updated	SoftwareUpdaterWindow	List super item label	Pachete de actualizat
 to	SoftwareUpdaterWindow	List item text	la
 Attempting to cancel the updates…	SoftwareUpdaterWindow		Se încearcă anularea actualizărilor…
-Contacting software repositories to check for package updates.	CheckManager		Se contactează depozitele de programe pentru a verifica dacă sunt actualizări de pachete.
+Contacting software repositories to check for package updates.	CheckManager		Se contactează depozitele software pentru a verifica actualizările de pachete.
 Available updates found	CheckManager		S-au găsit actualizări disponibile
 from repository	SoftwareUpdaterWindow	List item text	din depozitul
-Contacting software repositories to check for package updates.	SoftwareUpdaterWindow		Se contactează depozitele de programe pentru a verifica dacă sunt actualizări de pachete.
+Contacting software repositories to check for package updates.	SoftwareUpdaterWindow		Se contactează depozitele software pentru a verifica actualizările de pachete.
 Cancelling updates	SoftwareUpdaterWindow		Se anulează actualizările
 Cancel	SoftwareUpdaterWindow	Alert button label	Anulează
-There were no updates found.	UpdateAction		Nu s-au găsit actualizări
+There were no updates found.	UpdateAction		Nu au fost găsite actualizări.
 OK	SoftwareUpdaterWindow		OK
 Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Alegeți din aceste opțiuni de actualizare:\n\nActualizare:\n\tActualizează toate pachetele instalate.\nSincronizare completă:\n\tSincronizează pachetele instalate cu depozitele.
 The following changes will be made:	SoftwareUpdaterWindow		Următoarele modificări vor fi efectuate:
-Argument variables are no longer accepted\n	SoftwareUpdaterApp		Variabilele de argumente nu mai sunt acceptate\n
-Fatal error while checking for updates: %s\n	CheckAction		Eroare fatală la verificarea pentru actualizări: %s\n
+Argument variables are no longer accepted\n	SoftwareUpdaterApp		Variabilele argument nu mai sunt acceptate\n
+Fatal error while checking for updates: %s\n	CheckAction		Eroare fatală la verificarea actualizărilor: %s\n
 SoftwareUpdater	System name		SoftwareUpdater
-No active network connection was found.\n	CheckManager		Nu s-a găsit o conexiune de rețea activă.\n
+No active network connection was found.\n	CheckManager		Nu a fost găsită nicio conexiune de rețea activă.\n
 Applying changes	UpdateManager		Se aplică modificările
 Full sync	SoftwareUpdaterWindow	Alert button label	Sincronizare completă
 Quit	SoftwareUpdaterWindow	Button label	Ieșire
 Updates have been successfully installed.	UpdateManager		Actualizările au fost instalate cu succes.
-Exception occurred while updating packages : %s\n	UpdateAction		A apărut o excepție în timpul încărcării pachetelor: %s\n
-A reboot is necessary to complete the update process.	UpdateManager		O repornire este necesară pentru a completa procesul de actualizare.
-Exception occurred while checking for updates: %s\n	CheckAction		A apărut o excepție în timpul verificării pentru actualizări: %s\n
-Packages are being updated	UpdateManager		Se actualizează pachetele
+Exception occurred while updating packages : %s\n	UpdateAction		A apărut o excepție la actualizarea pachetelor: %s\n
+A reboot is necessary to complete the update process.	UpdateManager		Este necesară o repornire pentru a finaliza procesul de actualizare.
+Exception occurred while checking for updates: %s\n	CheckAction		A apărut o excepție la verificarea actualizărilor: %s\n
+Packages are being updated	UpdateManager		Pachetele sunt în curs de actualizare
 Cancel	SoftwareUpdaterWindow		Anulează
 Don't quit	SoftwareUpdaterWindow		Nu ieși
-Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Apăsați clic aici pentru a rula SoftwareUpdater. Unele actualizări vor necesita selectarea unei soluții pentru problemă.
-Checking for updates	SoftwareUpdaterWindow		Se verifică pentru actualizări
-Updates completed	UpdateManager		Actualizări completate
+Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Clic aici pentru a rula SoftwareUpdater. Unele actualizări vor necesita selectarea unei soluții la problemă.
+Checking for updates	SoftwareUpdaterWindow		Se verifică actualizările
+Updates completed	UpdateManager		Actualizări finalizate
 Reboot	SoftwareUpdaterWindow		Repornire
-Show more details	SoftwareUpdaterWindow		Afișează mai multe detalii
+Show more details	SoftwareUpdaterWindow		Arată mai multe detalii
 Installing version	SoftwareUpdaterWindow	List item text	Se instalează versiunea
-Checking for updates	CheckManager		Se verifică pentru actualizări
-No remote repositories are available	UpdateManager	Error message	Nu există depozite disponibile la distanță
-Software {0, plural, one{update} other{updates}} available	CheckManager		{0, plural, one{update} other{updates}} software disponibile
+Checking for updates	CheckManager		Se verifică actualizările
+No remote repositories are available	UpdateManager	Error message	Nu sunt disponibile depozite de la distanță
+Software {0, plural, one{update} other{updates}} available	CheckManager		{0, plural, one{update} other{updates}} de software disponibil(e)
 Reboot	SoftwareUpdaterWindow	Button label	Repornire
 Update	SoftwareUpdaterWindow	Alert button label	Actualizează
 Open Repositories	SoftwareUpdaterWindow	Alert button label	Deschide depozitele
-Updates did not complete	UpdateAction		Actualizările nu au fost completate
-Invalid update type, cannot continue with updates	UpdateAction		Tip de actualizare nevalid, nu se poate continua cu actualizările
+Updates did not complete	UpdateAction		Actualizările nu s-au finalizat
+Invalid update type, cannot continue with updates	UpdateAction		Tipul de actualizare nu este valid, nu se poate continua cu actualizările
 Uninstalling version	SoftwareUpdaterWindow	List item text	Se dezinstalează versiunea
 %i of %i	UpdateManager	Do not translate %i	%i din %i
 Quit	SoftwareUpdaterWindow		Ieșire
 No updates available	CheckManager		Nu există actualizări disponibile
-Usage:  SoftwareUpdater <command> [ <option> ]\nUpdates installed packages.\n\nCommands:\n  update     - Search repositories for updates on all packages.\n  check      - Check for available updates but only display a notification with results.\n  full-sync  - Synchronize the installed packages with the repositories.\n\nOptions:\n  -h or --help       Print this usage help\n  -v or --verbose    Output verbose information\n	SoftwareUpdaterApp	Command line usage help	Utilizare:  SoftwareUpdater <command> [ <option> ]\nActualizează pachetele instalate.\n\nComenzi:\n  update     - Caută în depozite actualizări pentru toate pachetele.\n  check      - Verifică dacă există actualizări disponibile dar afișează doar o notificare cu rezultatele.\n  full-sync  - Sincronizează pachetele instalate cu depozitele.\n\nOpțiuni:\n  -h or --help       Tipărește acest ajutor de utilizare\n  -v or --verbose    Produce informații detaliate\n
-No remote repositories are available. Please verify that some repositories are enabled using the Repositories preflet or the 'pkgman' command.	SoftwareUpdaterWindow	Error message	Nu sunt disponibile depozite la distanță. Verificați dacă unele depozite sunt activate utilizând preferințele Depozite sau comanda „pkgman”.
+Usage:  SoftwareUpdater <command> [ <option> ]\nUpdates installed packages.\n\nCommands:\n  update     - Search repositories for updates on all packages.\n  check      - Check for available updates but only display a notification with results.\n  full-sync  - Synchronize the installed packages with the repositories.\n\nOptions:\n  -h or --help       Print this usage help\n  -v or --verbose    Output verbose information\n	SoftwareUpdaterApp	Command line usage help	Utilizare:  SoftwareUpdater <command> [ <option> ]\nActualizează pachetele instalate.\n\nComenzi:\n  update     - Caută în depozite actualizări pentru toate pachetele.\n  check      - Verifică actualizările disponibile, dar afișează doar o notificare cu rezultatele.\n  full-sync  - Sincronizează pachetele instalate cu depozitele.\n\nOpțiuni:\n  -h or --help       Tipărește acest ajutor de utilizare\n  -v or --verbose    Produce informații detaliate\n
+No remote repositories are available. Please verify that some repositories are enabled using the Repositories preflet or the 'pkgman' command.	SoftwareUpdaterWindow	Error message	Nu sunt disponibile depozite de la distanță. Verificați dacă unele depozite sunt activate utilizând mini-aplicația preferințe Repositories sau comanda „pkgman”.
 Downloading packages	UpdateManager		Se descarcă pachete

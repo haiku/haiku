@@ -3,7 +3,7 @@ Account settings	AutoConfigWindow		アカウント設定
 \t\t· Outgoing	Config Window		\t\t· 送信
 An error occurred while creating the config view: %error.	Config Views		config view 作成時にエラーが発生しました: %error.
 E-mail address:	E-Mail		E-mail アドレス:
-Create new account	AutoConfigWindow		新規アカウント作成
+Create new account	AutoConfigWindow		新しいアカウント作成
 While sending and receiving	Config Window		送受信中に
 Error!	Config Views		エラー
 Apply	Config Window		適用
@@ -19,31 +19,31 @@ Outgoing	E-Mail		送信
 Accounts	Config Window		アカウント
 Outgoing	Config Window		送信
 Remove	Config Views		削除
-Show notifications:	Config Window		通知を表示:
+Show notifications:	Config Window		通知の表示:
 Settings	Config Window		設定
 Never	Config Window	show status window	表示しない
 Account name:	Config Views		アカウント名:
 \t\t· Incoming	Config Window		\t\t· 受信
 Enter a valid e-mail address.	AutoConfigWindow		有効な E-mail アドレスを入力してください。
-\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\n一般設定を戻せませんでした。\n\n読み取り時に次のエラーが発生しました:\n%s\n
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\n一般設定を戻せません。\n\n読み取り時に次のエラーが発生しました:\n%s\n
 Incoming	E-Mail		受信
 Choose Protocol	E-Mail		プロトコルを選択してください
 Return address:	Config Views		返信先アドレス:
 Password:	E-Mail		パスワード:
 Error retrieving general settings: %s\n	Config Window		一般設定の読み取り時に次のエラーが発生しました: %s\n
-The filter could not be moved. Deleting filter.	Config Views		フィルターを移動できませんでした。削除します。
+The filter could not be moved. Deleting filter.	Config Views		フィルターを移動できません、削除します。
 OK	Config Views		OK
 Revert	Config Window		戻す
 Incoming	Config Window		受信
 Finish	AutoConfigWindow		完了
-Add filter	Config Views		フィルターを追加
+Add filter	Config Views		フィルターの追加
 Account settings	Config Views		アカウント設定
 minutes	Config Window		分ごとにチェック
 E-mail	System name		メール
 Check every	Config Window		メールを
-Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		追加ボタンで新規アカウントを作成します。\n\nアカウントを選択して削除ボタンを押すと、アカウントが削除されます。\n\nアカウントの設定を変更するには、リスト内のアカウントを選択します。
+Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		追加ボタンで新しいアカウントを作成します。\n\nアカウントを選択して削除ボタンを押すと、アカウントが削除されます。\n\nアカウントの設定を変更するには、リスト内のアカウントを選択します。
 Account name:	E-Mail		アカウント名:
-Edit mailbox menu…	Config Window		メールボックスメニューの編集…
+Edit mailbox menu…	Config Window		メールボックスメニューの編集...
 Server Name:	E-Mail		サーバー名:
 Remove	Config Window		削除
 Login name:	E-Mail		ログイン名:

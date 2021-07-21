@@ -1,4 +1,4 @@
-1	hungarian	application/x-vnd.Cortex.support	2966828614
+1	hungarian	application/x-vnd.Cortex.support	2630173556
 Header has flags	MediaString		A fejlécnek vannak zászlói
 32 bit HLS	MediaString		32 bites HLS
 Recording	MediaString		Felvétel
@@ -64,6 +64,7 @@ Controllable	MediaString		Vezérelhető
 Front-right-center	MediaString		Jobb középső-elülső
 Side-right	MediaString		Jobb oldalsó
  kHz	MediaString		 kHz
+Little endian	MediaString		Kicsi elől
 (unknown matrix mask)	MediaString		(ismeretlen mátrix maszk)
 32 bit LAB	MediaString		32 bites LAB
 Side-left	MediaString		Bal oldalsó
@@ -73,6 +74,8 @@ Side-left	MediaString		Bal oldalsó
 8 bit integer	MediaString		8 bites integer
 8 bit grayscale-index	MediaString		8 bites szürkeárnyalat-index
 YCbCr444	MediaString		YCbCr444
+Buffer producer	MediaString		Buffer létrehozó
+Buffer consumer	MediaString		Buffer fogyasztó
 Increase latency	MediaString		Késleltetés növelése
 Front-left-center	MediaString		Bal középső-elülső
 MPEG format family	MediaString		MPEG formátum-család
@@ -98,6 +101,7 @@ YUV12	MediaString		YUV12
 WAV format family	MediaString		WAV formátum-család
  (NTSC)	MediaString		 (NTSC)
 Physical input	MediaString		Fizikai bemenet
+Big endian	MediaString		Nagy elől
 Sub	MediaString		Mély
 {0, plural,one{# byte (max)}other{# bytes (max)}}	MediaString		{0, plural,one{# bájt (max)}other{# bájt (max)}}
 YUV411	MediaString		YUV411
@@ -126,6 +130,7 @@ BeOS video	MediaString		BeOS videó
 24 bit CMY	MediaString		24 bites CMY
 32 bit UVLA	MediaString		32 bites UVLA
 Top-center	MediaString		Középső felső
+Entity interface	MediaString		Entitás interfész
 Stereo	MediaString		Sztereó
 8 bit color-index	MediaString		8 bites szín-index
 Bottom to top, left to right	MediaString		Lentről felfelé, balról jobbra

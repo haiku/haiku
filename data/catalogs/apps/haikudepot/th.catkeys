@@ -124,16 +124,16 @@ The nickname is required.	UserLoginWindow		ต้องระบุชื่อ�
 Source packages	MainWindow		แพ็คเกจต้นทาง
 -	no package size		-
 Problem with working files	App		ปัญหาเกี่ยวกับไฟล์ทำงาน
-Try again	App		ลองใหม่อีกครั้ง
 Rate package	RatePackageWindow		Rate package
+Try again	App		ลองใหม่อีกครั้ง
 Unknown	PackageListView		ไม่ทราบ
 I agree to the usage conditions	UserLoginWindow		ฉันเห็นด้วยกับเงื่อนไขการใช้งาน
 Log in	UserLoginWindow		เข้าสู่ระบบ
 Logged in as %User%	MainWindow		เข้าสู่ระบบในฐานะ %User%
 Email address:	UserLoginWindow		ที่อยู่อีเมล:
 Screenshot	ScreenshotWindow		ภาพหน้าจอ
-HaikuDepot	System name		HaikuDepot
 A reboot is necessary to complete the installation process.	PackageManager		จำเป็นต้องรีบูตเครื่องเพื่อให้กระบวนการติดตั้งเสร็จสมบูรณ์
+HaikuDepot	System name		HaikuDepot
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{I am at least one year old}อื่นๆ{I am # years of age or older}}
 View latest usage conditions…	MainWindow		ดูเงื่อนไขการใช้งานล่าสุด
 Quit	App		ปิด

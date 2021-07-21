@@ -124,16 +124,16 @@ The nickname is required.	UserLoginWindow		Nama panggilan diperlukan.
 Source packages	MainWindow		Paket sumber
 -	no package size		-
 Problem with working files	App		Masalah dengan file yang berkaitan
-Try again	App		Coba lagi
 Rate package	RatePackageWindow		Nilai paket
+Try again	App		Coba lagi
 Unknown	PackageListView		Tidak dikenal
 I agree to the usage conditions	UserLoginWindow		Saya menyetujui ketentuan penggunaan
 Log in	UserLoginWindow		Masuk
 Logged in as %User%	MainWindow		Masuk sebagai %User%
 Email address:	UserLoginWindow		Alamat email:
 Screenshot	ScreenshotWindow		Screenshot
-HaikuDepot	System name		HaikuDepot
 A reboot is necessary to complete the installation process.	PackageManager		Boot ulang diperlukan untuk menyelesaikan proses pemasangan.
+HaikuDepot	System name		HaikuDepot
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{I am at least one year old}other{I am # tahun lebih tua}}
 View latest usage conditions…	MainWindow		Lihat ketentuan penggunaan terbaru…
 Quit	App		Berhenti

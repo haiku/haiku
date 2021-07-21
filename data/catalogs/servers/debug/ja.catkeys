@@ -3,6 +3,6 @@ The application:\n\n      %app\n\nhas encountered an error which prevents it fro
 Oh yeah!	DebugServer		Oh yeah!
 Debug	DebugServer		デバッグ
 Terminate	DebugServer		終了
-Save report	DebugServer		レポートを保存
+Save report	DebugServer		レポートの保存
 Write core file	DebugServer		コアファイルを書き込む
 Oh no!	DebugServer		Oh no!

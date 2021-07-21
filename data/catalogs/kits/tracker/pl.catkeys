@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-libtracker	2730310071
+1	polish	x-vnd.Haiku-libtracker	3380227078
 Created	ContainerWindow		Utworzono
 Icon	AttributesView		Ikona
 Open and make preferred	OpenWithWindow		Otwórz i zaznacz jako preferowane
@@ -6,6 +6,7 @@ Kind	ContainerWindow		Rodzaj
 Open with…	ContainerWindow		Otwórz za pomocą…
 Error moving \"%name\" to Trash. (%error)	FSUtils		Błąd przy przenoszeniu „%name” do Kosza. (%error)
 Or	FindPanel		Lub
+MIME Description	AttributesView		Opis MIME
 before	FindPanel		przed
 Volume icons	TrackerSettingsWindow		Ikony dysków
 Ignore case	SelectionWindow		Ignoruj wielkość liter
@@ -40,6 +41,7 @@ Small bitmap icon	AttributesView		Mała ikona bitmapowa
 Would you like to find a suitable application to open the file?	FSUtils		Czy chcesz poszukać odpowiedniej aplikacji do otwarcia tego pliku?
 64 x 64	ContainerWindow		64 x 64
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Nie możesz podmienić plikiem katalogu ani dowiązania.
+{0, plural, other{<# dates>}}	AttributesView		{0, plural, few{<# daty>} many{<# dat>} other{<# daty>}}
 Trailing \\.	libtracker		Końcowe \\.
 At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		W %func \nfind_directory() nie powiódł się. \nPowód: %error
 Handles any file	OpenWithWindow		Obsługuje każdy plik
@@ -92,6 +94,7 @@ Atom	AttributesView		Atom
 %SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%SizeProcessed z %TotalSize, %BytesPerSecond/s
 Preparing to restore items…	StatusWindow		Przygotowanie do przywrócenia elementów…
 Mount	ContainerWindow		Zamontuj
+{0, plural, other{<# rectangles>}}	AttributesView		{0, plural, few{<# prostokąty>} many{<# prostokątów>} other{<# prostokąta>}}
 Desktop	B_DESKTOP_DIRECTORY		Desktop
 Corrupted pointers.	libtracker		Niepoprawne wskaźniki.
 Link to:	InfoWindow		Dowiązanie do:
@@ -109,6 +112,7 @@ Edit templates…	TemplatesMenu		Modyfikuj szablony…
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# bajt} few{# bajty} many{# bajtów} other{# bajta}}
 8-bit integer	AttributesView		8-bitowa liczba całkowita
 8-bit unsigned integer	AttributesView		8-bitowa liczba całkowita bez znaku
+%s info	InfoWindow	window title	Informacje o %s
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used zajęte -- %free wolne)
 Hide dotfiles	SettingsView		Ukryj pliki zaczynające się od kropki
 Trash	Model		Kosz
@@ -180,6 +184,7 @@ MIME Type	AttributesView		Typ MIME
 Show folder location in title tab	SettingsView		Pokaż ścieżkę katalogu na zakładce
 There was an error resolving the link.	Tracker		Pojawił się problem przy przetwarzaniu skrótu.
 There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Pojawił się problem przy zapisywaniu we wskazanej lokalizacji. Proszę podać inną lokalizację.
+{0, plural, other{<# values>}}	AttributesView		{0, plural, other{<# wartości>}}
 Desktop	TrackerSettingsWindow		Pulpit
 Nested *?+.	libtracker		Zagnieżdzone *?+.
 Move	FSUtils	button label	Przenieś
@@ -266,6 +271,7 @@ home	B_USER_DIRECTORY		home
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Tracker New Templates
 Disk mounting during boot	AutoMounterSettings		Montowanie dysku przy uruchamianiu
 Don't automount	AutoMounterSettings		Nie montuj automatycznie
+Node ref	AttributesView		Node ref
 Could not find application \"%appname\"	OpenWithWindow		Nie można odnaleźć aplikacji „%appname”
 Unmatched parenthesis.	libtracker		Nawias bez pary.
 Extended attribute	AttributesView		Atrybut rozszerzony
@@ -324,6 +330,7 @@ Recent folders	FavoritesMenu		Ostatnio odwiedzane foldery
 Signed memory size	AttributesView		Rozmiar pamięci ze znakiem
 The specified name is illegal. Please choose another name.	FilePanelPriv		Podana nazwa jest niedozwolona. Proszę wybrać inną nazwę.
 of %items	StatusWindow		z %items
+MIME Path	AttributesView		Ścieżka MIME
 less than	FindPanel		mniej niż
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Błąd przy kopiowaniu pliku „%name”:\n\t%error\n\nCzy chcesz kontynuować?
 Creating links: 	StatusWindow		Tworzenie dowiązań: 
@@ -345,6 +352,7 @@ Could not open \"%document\" with application \"%app\" (Missing libraries: %libr
 Finish: %time	StatusWindow		Koniec o: %time
 Messenger	AttributesView		Posłaniec (messenger)
 after	FindPanel		po
+{0, plural, one{<# data byte>} other{<# bytes of data>}}	AttributesView		{0, plural, one{<# bajt danych>} few{<# bajty danych>} many{<# bajtów danych>} other{<# bajta danych>}}
 Version	OpenWithWindow		Wersja
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Część zaznaczonych plików nie może zostać przeniesiona do kosza. Czy chcesz je usunąć zamiast tego? (Ta operacja nie może zostać cofnięta)
 Add printer…	ContainerWindow		Dodaj drukarkę…
@@ -437,6 +445,7 @@ Sorry, saving more than one item is not allowed.	FilePanelPriv		Można zapisać 
 Move here	ContainerWindow		Przenieś tutaj
 the config folder	FSUtils		katalog konfiguracji
 Sorry, could not create a new folder.	FSUtils		Nie można utworzyć nowego katalogu.
+MIME Signature	AttributesView		Sygnatura MIME
 Select all	VirtualDirectoryWindow		Zaznacz wszystkie
 Rename	FSUtils	button label	Zmień nazwę
 Clean up all	ContainerWindow		Wyczyść wszystko
@@ -515,6 +524,7 @@ Create a Query	FindPanel		Stwórz zapytanie
 Close	QueryContainerWindow		Zamknij
 I know what I'm doing	FSUtils	button label	Wiem co robię
 Preparing to copy items…	StatusWindow		Przygotowanie do kopiowania elementów…
+Entry ref	AttributesView		Entry ref
 Icon view	ContainerWindow		Widok ikon
 Name	ContainerWindow		Nazwa
 Preferred for %type	OpenWithWindow		Preferowane dla %type

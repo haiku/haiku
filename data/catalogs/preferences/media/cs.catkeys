@@ -1,0 +1,29 @@
+1	czech	x-vnd.Haiku-Media	582516163
+Couldn't add volume control in Deskbar: %s\n	Media views		Nelze přidat ovladač hlasitosti na Panel: %s\n
+Restart media services	Media views		Restartovat služby médií
+Quit	Media Window		Konec
+<none>	VideoInputMenu	Used when no video input is available	<žádné>
+Couldn't remove volume control in Deskbar: %s\n	Media views		Nelze odstranit ovladač hlasitosti z Panelu: %s\n
+Video output:	Media views		Video výstup:
+Video input:	Media views		Video vstup:
+Audio output:	Media views		Audio výstup:
+Please select a SoundFont.	Midi View		Prosím vyberte SoundFont.
+There are no SoundFonts installed.	Midi View		Žádné SoundFonty nejsou nainstalovány.
+Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Pokud nyní ukončíte Média, dojde k restartování multimediálních služeb. Výsledkem bude s velkou pravděpodobností jejich zadrhnutí nebo nedostupnost.
+Could not connect to the media server.\nWould you like to start it ?	Media Window		Nelze se spojit s media serverem.\nPřejete si ho spustit ?
+Video settings	Media Window		Nastavení videa
+Audio mixer	Media Window		Audio směšovač
+Show volume control on Deskbar	Media views		Zobrazit ovládání hlasitosti na Panelu
+Start media server	Media Window		Spustit multimediální server
+Audio settings	Media Window		Nastavení zvuku
+Quit anyway	Media Window		Přesto ukončit
+Media	System name		Multimédia
+Warning!	Media Window		Varování!
+MIDI Settings	Media Window		Nastavení MIDI
+SoundFonts	Midi View		SoundFonty
+Audio input:	Media views		Audio vstup:
+<none>	Media views		<žádné>
+Channel:	Media views		Kanál:
+This hardware has no controls.	Media Window		Tento hardware nemá žádné ovládání.
+Defaults	Media views		Výchozí
+<none>	VideoOutputMenu	Used when no video output is available	<žádný>

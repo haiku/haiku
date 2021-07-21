@@ -49,7 +49,7 @@ Output	CodyCam		Вивід
 server address expected	CodyCam		вкажіть адресу сервера
 Cannot start the video window	CodyCam		Неможливо запустити вікно відео
 reply: %d, %d\n	FtpClient		відповідь: %d, %d\n
-Cannot set the time source for the video window	CodyCam		Неможливо встановити лічильник для відео вікна
+Cannot set the time source for the video window	CodyCam		Неможливо встановити лічильник для вікна відео
 Every 15 minutes	CodyCam		Кожні 15 хвилин
 Every 24 hours	CodyCam		Кожні 24 години
 Image Format Menu	CodyCam		Меню формата зображення

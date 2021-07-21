@@ -1,0 +1,13 @@
+1	danish	application/x-vnd.Cortex.MediaRoutingView	1615780678
+Lock group	MediaNodePanel		Lås gruppe
+Video output	MediaRoutingView		Videooutput
+Icon view	MediaRoutingView		Ikonvisning
+OK	MediaRoutingView		OK
+Advanced	MediaNodePanel		Avanceret
+Audio input	MediaRoutingView		Lydinput
+Video input	MediaRoutingView		Videoinput
+Input	MediaJack		Input
+Error	MediaRoutingView		Fejl
+Output	MediaJack		Output
+Clean up	MediaRoutingView		Ryd op
+Start control panel	MediaNodePanel		Start kontrolpanel

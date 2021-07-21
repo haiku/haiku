@@ -5,7 +5,7 @@ Bus Information	Device		バス情報
 Devices	System name		デバイス
 Graphics Peripheral	DeviceSCSI		グラフィック装置
 Processor	Device		プロセッサ
-Generate system information	DevicesView		システム情報を作成
+Generate system information	DevicesView		システム情報の作成
 Class info	DevicePCI		クラス情報
 ACPI Information	DeviceACPI		ACPI 情報
 Detailed	DevicesView		詳細
@@ -27,7 +27,7 @@ ACPI node '%1'	DeviceACPI		ACPI ノード '%1'
 Optical Drive	DeviceSCSI		光学ドライブ
 Name	PropertyList		名前
 Manufacturer	DeviceSCSI		製造元
-Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		デバイス名\t\t\t\t: %Name%\n製造元\t\t\t: %Manufacturer%\n使用されているドライバー\t\t\t\t: %DriverUsed%\nデバイスパス\t: %DevicePaths%
+Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		デバイス名\t\t\t\t: %Name%\n製造元\t\t\t: %Manufacturer%\n使用中のドライバー\t\t\t\t: %DriverUsed%\nデバイスパス\t: %DevicePaths%
 Device name	Device		デバイス名
 Satellite communications controller	Device		衛星通信コントローラー
 Device class	DeviceSCSI		デバイスクラス
@@ -40,7 +40,7 @@ PCI Information	DevicePCI		PCI 情報
 Tape Drive	DeviceSCSI		テープドライブ
 Changer	DeviceSCSI		チェンジャー
 Serial bus controller	Device		シリアルバスコントローラー
-Refresh devices	DevicesView		デバイスを更新
+Refresh devices	DevicesView		デバイスの更新
 Category	DevicesView		カテゴリー順
 RBC	DeviceSCSI		RBC
 None	Device		無し

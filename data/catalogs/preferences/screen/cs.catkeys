@@ -1,0 +1,55 @@
+1	czech	x-vnd.Haiku-Screen	133788249
+no	Screen		ne
+bits/pixel	Screen		bitů/pixel
+15 bits/pixel, 32768 colors	Screen		15 bitů/pixel, 32768 barev
+Rows:	Screen		Řádky:
+%.1f Hz	Screen		%.1f Hz
+The screen mode could not be set:\n\t%s\n	Screen		Režim obrazovky nemohl být nastaven:\n\t%s\n
+Keep	Screen		Zachovat
+/other…	Screen		/jiné...
+Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Horizontální frekvence:\t%lu - %lu kHz\nVertikální frekvence:\t%lu - %lu Hz\n\nMaximální takt pixelů:\t%g MHz
+Refresh rate:	Screen		Obnovovací frekvence:
+Video format:	Screen		Formát videa:
+Undo	Screen		Zpět
+OK	Screen		OK
+Current workspace	Screen		Aktuální pracovní plocha
+vertically	Screen		svisle
+All workspaces	Screen		Všechny pracovní plochy
+Use laptop panel:	Screen		Použít panel notebooku:
+Could not write VESA mode settings file:\n\t	Screen		Nemohu zapsat soubor nastavení VESA režimu:\n\t
+Display info	Screen		Informace o displeji
+Settings will revert in %seconds.	Screen		Nastavení bude vráceno za %seconds.
+Cancel	Screen		Zrušit
+Other…	Screen		Jiné...
+Screen	Screen		Obrazovka
+Colors:	Screen		Barvy:
+yes	Screen		ano
+Swap displays:	Screen		Prohodit displeje:
+%sSerial no.: %s	Screen		%sSériové č.: %s
+8 bits/pixel, 256 colors	Screen		8 bitů/pixel, 256 barev
+Revert	Screen		Vrátit
+always	Screen		vždy
+Confirm changes	Screen		Potvrdit změny
+Warning	Screen		Varování
+24 bits/pixel, 16 Million colors	Screen		24 bitů/pixel, 16 Milionů barev
+Hz	Screen		Hz
+Workspaces	Screen		Pracovní plochy
+Brightness:	Screen		Jas:
+32 bits/pixel, 16 Million colors	Screen		32 bitů/pixel, 16 Milionů barev
+Done	Screen		Hotovo
+16 bits/pixel, 65536 colors	Screen		16 bitů/pixel, 65536 barev
+Screen preferences by the Haiku team	Screen		Nastavení obrazovky od týmu Haiku
+Refresh rate	Screen		Obnovovací frekvence
+if needed	Screen		je-li potřeba
+Combine displays:	Screen		Kombinovat displeje:
+Unknown mode	Screen		Neznámý režim
+About	Screen		O aplikaci
+Columns:	Screen		Sloupce:
+Resolution:	Screen		Rozlišení:
+Apply	Screen		Použít
+horizontally	Screen		vodorovně
+disable	Screen		zakázat
+Set background…	Screen		Nastavit pozadí...
+Type or use the left and right arrow keys.	Screen		Pište nebo použijte šipky doleva a doprava.
+Screen	System name		Obrazovka
+Do you wish to keep these settings?	Screen		Přejete si zachovat toto nastavení?

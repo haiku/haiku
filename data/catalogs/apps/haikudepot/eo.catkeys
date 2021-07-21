@@ -138,8 +138,8 @@ Source packages	MainWindow		Fontaj pakaĵoj
 -	no package size		-
 Problem with working files	App		Problemo kun kurantaj dosieroj
 Server error	ServerHelper		Eraro de servilo
-Try again	App		Provi denove
 Rate package	RatePackageWindow		Taksi pakaĵon
+Try again	App		Provi denove
 Unknown	PackageListView		Nekonata
 I agree to the usage conditions	UserLoginWindow		Mi konsentas la kondiĉojn de uzado
 Log in	UserLoginWindow		Ensaluti
@@ -147,8 +147,8 @@ Sending anonymous usage data	MainWindow		Sendi anoniman informon pri uzado
 Logged in as %User%	MainWindow		Ensalutis kiel %User%
 Email address:	UserLoginWindow		Retpoŝtadreso:
 Screenshot	ScreenshotWindow		Ekrankopio
-HaikuDepot	System name		HaikuTenejo
 A reboot is necessary to complete the installation process.	PackageManager		Restartigo estas necesa por kompletigi la instalon.
+HaikuDepot	System name		HaikuTenejo
 Yes	MainWindow		Jes
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{Mi havas malpleje unu jaron}other{Mi havas # jarojn aŭ pli}}
 View latest usage conditions…	MainWindow		Vidi plej novan kondiĉojn de uzado…

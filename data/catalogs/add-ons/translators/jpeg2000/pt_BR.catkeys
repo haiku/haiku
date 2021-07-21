@@ -2,7 +2,7 @@
 High	JPEG2000Translator		Alto
 Low	JPEG2000Translator		Baixo
 Output quality	JPEG2000Translator		Qualidade da saída
-JPEG2000 images	JPEG2000Translator		Imagens JPEG 2000
+JPEG2000 images	JPEG2000Translator		Imagens JPEG2000
 About	JPEG2000Translator		Sobre
 Write black-and-white images as RGB24	JPEG2000Translator		Gravar imagens preto e brancas como RGB24
 Version %d.%d.%d	JPEG2000Translator		Versão %d.%d.%d

@@ -1,2 +1,31 @@
-1	polish	x-vnd.haiku-screenshot-cli	721864121
+1	polish	x-vnd.haiku-screenshot-cli	3958461128
+Include window border	ScreenshotWindow		Dołącz obramowanie okna
+Overwrite	ScreenshotWindow		Nadpisz
+Save in:	ScreenshotWindow		Zapisz w:
+Error saving \"%s\":\n\t%s	ScreenshotWindow		Błąd zapisu „%s”:\n\t%s
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Ten plik już istnieje.\n Na pewno chcesz go nadpisać?
+OK	ScreenshotWindow		OK
+The destination path exists but is not a folder.	ScreenshotWindow		Ścieżka docelowa istnieje, ale nie jest katalogiem.
+Select	ScreenshotWindow		Wybierz
+Save as:	ScreenshotWindow		Zapisz jako:
+seconds	ScreenshotWindow		sekund
+New screenshot	ScreenshotWindow		Nowy zrzut ekranu
+Screenshot	System name		Zrzut ekranu
+Desktop	ScreenshotWindow		Pulpit
+Artwork folder	ScreenshotWindow		Katalog na obrazki
+Translator Settings	ScreenshotWindow		Ustawienia translatora
+Include mouse pointer	ScreenshotWindow		Dołącz wskaźnik myszy
+overwrite	ScreenshotWindow		nadpisz
+Settings…	ScreenshotWindow		Ustawienia…
+Choose folder	ScreenshotWindow		Wybierz katalog
+Name:	ScreenshotWindow		Nazwa:
+Choose folder…	ScreenshotWindow		Wybierz katalog…
+Please select	ScreenshotWindow		Proszę wybrać
+Failed to save screenshot	ScreenshotWindow		Nie można zapisać zrzutu ekranu
+Cancel	ScreenshotWindow		Anuluj
+Delay:	ScreenshotWindow		Opóźnienie:
+Copy to clipboard	ScreenshotWindow		Kopiuj do schowka
 screenshot	Screenshot	Base filename of screenshot files	zrzut_ekranu
+Home folder	ScreenshotWindow		Katalog domowy
+Save	ScreenshotWindow		Zapisz
+Capture active window	ScreenshotWindow		Przechwyć aktywne okno

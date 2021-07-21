@@ -1,5 +1,5 @@
 1	japanese	x-vnd.haiku-softwareupdater	369324613
-Updating version	SoftwareUpdaterWindow	List item text	バージョンを更新中:
+Updating version	SoftwareUpdaterWindow	List item text	バージョンの更新中
 Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		ここをクリックして、{0, plural, one{# 個の更新されたパッケージ} other{# 個の更新されたパッケージ}}をインストールします。
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	アンインストールされるパッケージ
 No active network connection was found	UpdateManager	Error message	有効なネットワーク接続が見つからなかった。
@@ -8,18 +8,18 @@ There were no updates found.	CheckManager		更新が見つからなかった。
 Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		更新は完了していません。本当に終了してよいですか?
 Updates found	SoftwareUpdaterWindow		更新が見つかりました
 Update now	SoftwareUpdaterWindow		いますぐ更新
-For some reason, we could not reboot your computer.	SoftwareUpdaterWindow		何らかの理由で、コンピューターを再起動できませんでした。
+For some reason, we could not reboot your computer.	SoftwareUpdaterWindow		コンピューターを再起動できません。
 OK	UpdateManager		OK
 Unrecognized argument	SoftwareUpdaterApp	Error message	認識されない引数
 There were no updates found.	CheckAction		更新が見つからなかった。
 No updates available	UpdateAction		更新はありません
-New packages to be installed	SoftwareUpdaterWindow	List super item label	インストールされる新規パッケージ
+New packages to be installed	SoftwareUpdaterWindow	List super item label	インストールされる新しいパッケージ
 Packages to be updated	SoftwareUpdaterWindow	List super item label	更新されるパッケージ
 to	SoftwareUpdaterWindow	List item text	から
-Attempting to cancel the updates…	SoftwareUpdaterWindow		更新を中止しようとしています…
+Attempting to cancel the updates…	SoftwareUpdaterWindow		更新を中止しようとしています...
 Contacting software repositories to check for package updates.	CheckManager		パッケージの更新確認のため、ソフトウェアリポジトリに接続しています。
 Available updates found	CheckManager		利用可能な更新が見つかりました
-from repository	SoftwareUpdaterWindow	List item text	入手先リポジトリ:
+from repository	SoftwareUpdaterWindow	List item text	入手先リポジトリ
 Contacting software repositories to check for package updates.	SoftwareUpdaterWindow		パッケージの更新確認のため、ソフトウェアリポジトリに接続しています。
 Cancelling updates	SoftwareUpdaterWindow		更新を中止しています
 Cancel	SoftwareUpdaterWindow	Alert button label	中止
@@ -38,27 +38,27 @@ Updates have been successfully installed.	UpdateManager		更新が正常にイ�
 Exception occurred while updating packages : %s\n	UpdateAction		パッケージの更新中に例外が発生しました : %s\n
 A reboot is necessary to complete the update process.	UpdateManager		更新プロセスを完了するには再起動が必要です。
 Exception occurred while checking for updates: %s\n	CheckAction		更新の確認中に例外が発生しました: %s\n
-Packages are being updated	UpdateManager		パッケージを更新中
+Packages are being updated	UpdateManager		パッケージの更新中
 Cancel	SoftwareUpdaterWindow		中止
 Don't quit	SoftwareUpdaterWindow		終了しない
 Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		クリックしてソフトウェアの更新を起動してください。いくつかの更新は選択すべき問題の解決策を必要とするでしょう。
 Checking for updates	SoftwareUpdaterWindow		更新を確認しています
 Updates completed	UpdateManager		更新が完了しました
 Reboot	SoftwareUpdaterWindow		再起動
-Show more details	SoftwareUpdaterWindow		詳細を表示
-Installing version	SoftwareUpdaterWindow	List item text	インストール中のバージョン:
-Checking for updates	CheckManager		更新を確認中
+Show more details	SoftwareUpdaterWindow		詳細の表示
+Installing version	SoftwareUpdaterWindow	List item text	インストール中のバージョン
+Checking for updates	CheckManager		更新の確認中
 No remote repositories are available	UpdateManager	Error message	リモートのリポジトリは利用できません。
 Software {0, plural, one{update} other{updates}} available	CheckManager		{0, plural, one{個の} other{個の}}ソフトウェアアップデートが利用できます
 Reboot	SoftwareUpdaterWindow	Button label	再起動
 Update	SoftwareUpdaterWindow	Alert button label	更新
 Open Repositories	SoftwareUpdaterWindow	Alert button label	リポジトリを開く
-Updates did not complete	UpdateAction		更新は完了しませんでした
+Updates did not complete	UpdateAction		更新は完了しなかった
 Invalid update type, cannot continue with updates	UpdateAction		無効な更新タイプです、更新を継続できません
-Uninstalling version	SoftwareUpdaterWindow	List item text	アンインストール中のバージョン:
+Uninstalling version	SoftwareUpdaterWindow	List item text	アンインストール中のバージョン
 %i of %i	UpdateManager	Do not translate %i	%i / %i
 Quit	SoftwareUpdaterWindow		終了
 No updates available	CheckManager		更新はありません
 Usage:  SoftwareUpdater <command> [ <option> ]\nUpdates installed packages.\n\nCommands:\n  update     - Search repositories for updates on all packages.\n  check      - Check for available updates but only display a notification with results.\n  full-sync  - Synchronize the installed packages with the repositories.\n\nOptions:\n  -h or --help       Print this usage help\n  -v or --verbose    Output verbose information\n	SoftwareUpdaterApp	Command line usage help	Usage:  SoftwareUpdater <command> [ <option> ]\nUpdates installed packages.\n\nCommands:\n  update     - Search repositories for updates on all packages.\n  check      - Check for available updates but only display a notification with results.\n  full-sync  - Synchronize the installed packages with the repositories.\n\nOptions:\n  -h or --help       Print this usage help\n  -v or --verbose    Output verbose information\n
 No remote repositories are available. Please verify that some repositories are enabled using the Repositories preflet or the 'pkgman' command.	SoftwareUpdaterWindow	Error message	リモートのリボジトリは利用できません。リポジトリ プレファレンスか 'pkgman' コマンドを使って、リポジトリが有効になっているかか確認してください。
-Downloading packages	UpdateManager		パッケージをダウンロード中
+Downloading packages	UpdateManager		パッケージのダウンロード中

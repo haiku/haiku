@@ -1,0 +1,8 @@
+1	danish	application/x-vnd.Be.LoggingConsumerApp	1627625629
+Start	CortexAddOnsLoggingConsumerNodeHarnessWin		Start
+CPU percentage	CortexAddOnsLoggingConsumer		CPU-procent
+Stop	CortexAddOnsLoggingConsumerNodeHarnessWin		Stop
+OK	CortexAddOnsCommonMediaNodeControlApp		OK
+Controls	CortexAddOnsLoggingConsumerNodeHarnessWin		Styringer
+controls	CortexAddOnsCommonMediaNodeControlApp		styringer
+percent	CortexAddOnsLoggingConsumer		procent

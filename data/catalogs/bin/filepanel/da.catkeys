@@ -1,4 +1,4 @@
-1	danish	x-vnd.mmu_man.filepanel	3326046391
+1	danish	x-vnd.mmu_man.filepanel	1996091223
 display a load/save file panel\n	FilePanelApp		vis et åbn-/gem-filpanel\n
 short\tlong\tdescription\n	FilePanelApp		kort\tlang\tbeskrivelse\n
 %s not a valid option\n	FilePanelApp		%s er ikke et gyldigt tilvalg\n
@@ -8,6 +8,8 @@ short\tlong\tdescription\n	FilePanelApp		kort\tlang\tbeskrivelse\n
 -l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tbrug et indlæs-filpanel (standard)\n
 -n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tsæt standardnavnet til når der gemmes\n
 -k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\tslags punkter der kan åbnes (variant): enhver kombination af f, d, s (fil (standard), mappe, symlink)\n
+usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]	FilePanelApp		anvendelse: %s [-h]     [-d mappe]              [-l|-s]     [-t ttl]      [-1]       [-m]
+usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal]\n	FilePanelApp		anvendelse: %s [--help] [--directory mappe] [--load|--save] [--title ttl] [--single] [--modal]\n
 -t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\tsæt filpanelets vinduestitel\n
 -1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\ttillad kun valg af én fil\n
 -m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\tgør filpanelet modalt\n

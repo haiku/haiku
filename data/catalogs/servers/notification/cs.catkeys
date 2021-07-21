@@ -1,0 +1,5 @@
+1	czech	x-vnd.Haiku-notification_server	2022780929
+Warning	NotificationWindow		Varování
+Notification	NotificationWindow		Vyrozumění
+OK	NotificationWindow		OK
+Couldn't start general settings monitor.\nLive filter changes disabled.	NotificationWindow		Nelze spustit monitor hlavních nastavení.\nZměny filtrů za běhu jsou vypnuty.

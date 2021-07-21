@@ -1,0 +1,7 @@
+1	finnish	application/x-vnd.Cortex.NodeManager	1301322433
+System audio mixer	NodeManager		Järjestelmän audiosekoitin
+System video output	NodeManager		Järjestelmän videolähtö
+System video input	NodeManager		Järjestelmän videosyöte
+No name	NodeManager		Ei nimeä
+System audio input	NodeManager		Järjestelmän audiosyöte
+Time sources	NodeManager		Aikalähteet

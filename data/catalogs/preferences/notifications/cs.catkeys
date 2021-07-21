@@ -1,0 +1,34 @@
+1	czech	x-vnd.Haiku-Notifications	4196496676
+Lower left	GeneralView		Vlevo dole
+Application does not have a valid signature	NotificationView	Alert message	Aplikace nemá platný podpis
+Status	NotificationView		Stav
+Add…	NotificationView		Přidat…
+Lower right	GeneralView		Vpravo dole
+Muted	NotificationView		Zakázáno
+ is already listed	NotificationView	Alert message	 už je v seznamu
+OK	PrefletWin		OK
+Notifications	PrefletWin		Upozornění
+Notifications preflet sample	PrefletWin		Vzor nastavení upozornění
+Mute notifications from this application	NotificationView		Zakázat upozornění z této aplikace
+wide	GeneralView	Window width: Slider high text	široký
+narrow	GeneralView	Window width: Slider low text	úzký
+Revert	PrefletWin		Vrátit
+Applications	PrefletView		Aplikace
+{0, plural, =1{Timeout: # second}other{Timeout: # seconds}}	GeneralView		{0, plural, =1{Doba: # sekunda} few{Doba: # sekundy} other{Doba: # sekund}}
+Upper right	GeneralView		Vpravo nahoře
+An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Při ukládání nastavení došlo k chybě.\nJe možné, že dochází místo na disku.
+Defaults	PrefletWin		Výchozí nastavení
+Upper left	GeneralView		Vlevo nahoře
+Window width	GeneralView		Šířka okna
+Applications	NotificationView		Aplikace
+General	PrefletView		Obecné
+OK	NotificationView		OK
+Follow Deskbar	GeneralView		Stejně jako Panel
+Notifications	System name		Upozornění
+Allowed	NotificationView		Dovoleno
+Duration:	GeneralView		Doba:
+Application	NotificationView		Aplikace
+Enable notifications	GeneralView		Povolit upozornění
+This is a test notification message	PrefletWin		Toto je zkušební upozornění
+Remove	NotificationView		Odstranit
+Position:	GeneralView		Poloha:

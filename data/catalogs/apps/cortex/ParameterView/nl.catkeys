@@ -1,0 +1,8 @@
+1	dutch; flemish	application/x-vnd.Cortex.ParameterView	1295152157
+Themes	ParameterWindow		Thema's
+Start control panel	ParameterWindow		Start controle paneel
+%nodeinfo% parameters	ParameterWindow		%nodeinfo% parameters
+OK	ParameterWindow		Ok
+Window	ParameterWindow		Venster
+Could not start control panel (%error%)	ParameterWindow		Kan het controle paneel niet starten (%error%)
+Close	ParameterWindow		Sluiten

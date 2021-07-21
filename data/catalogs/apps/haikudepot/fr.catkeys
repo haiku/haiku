@@ -1,9 +1,10 @@
-1	french	x-vnd.Haiku-HaikuDepot	3106374143
+1	french	x-vnd.Haiku-HaikuDepot	3763775264
 Repository update error	LocalRepositoryUpdateProcess		Erreur à l’actualisation du dépôt
 Network error	ServerHelper		Erreur réseau
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Une erreur est survenue lors du rafraîchissement : %error%
 User Created	UserLoginWindow		Utilisateur créé
 Check for updates…	MainWindow		Vérifier les mises à jour…
+Uninstall	PackageManager		Désinstaller
 Uninstalled	PackageListView		Désinstallé
 It was not possible to create the new user.	UserLoginWindow		Impossible de créer le nouvel utilisateur.
 Available packages	MainWindow		Paquets disponibles
@@ -38,13 +39,15 @@ Local	LocalPkgDataLoadProcess		Local
 Rate %Package%	RatePackageWindow		Évaluer %Package%
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Une erreur est survenue lors de l’initialisation du gestionnaire de paquets : %message%
 Quit HaikuDepot	App		Quitter DépôtHaiku
-Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Considéreriez-vous comme acceptable d'envoyer des données d'utilisation anonymes au système du Serveur de dépôt Haiku depuis cet ordinateur ? Vous pouvez changer votre préférence dans la fenêtre des « Réglages » ultérieurement.
+Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Considéreriez-vous comme acceptable d’envoyer des données d’utilisation anonymes au système du Serveur de dépôt Haiku depuis cet ordinateur ? Vous pouvez changer votre préférence dans la fenêtre des « Réglages » ultérieurement.
 An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		Une erreur inattendue « %Message% » est survenue avec la propriété « %Property% ».
 A response to the captcha question must be provided.	UserLoginWindow		Vous devez fournir une réponse à la question Captcha.
 Category	FilterView		Catégorie
 User rating	RatePackageWindow		Avis de l’utilisateur
 Installed packages	MainWindow		Paquets installés
 A requested object or an object involved in the request was not found on the server.	ServerHelper		L’objet demandé ou l’objet associé à la requête n’a pas été trouvé sur le serveur.
+Fatal error	PackageManager		Erreur fatale
+Package action failed	PackageInfoView		L’action du paquet a échouée
 No changelog available.	PackageInfoView		La liste des modifications n’est pas disponible.
 Error	App		Erreur
 There was a puzzling response from the web service.	UserLoginWindow		La réponse du service web est incompréhensible.
@@ -60,7 +63,7 @@ Cancel	UserLoginWindow		Annuler
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		Le DépôtHaiku a besoin du serveur de paquets pour fonctionner, et il ne semble pas être démarré.\nVoulez-vous le démarrer maintenant ?
 Click a package to view information	PackageInfoView		Cliquez sur un paquet pour afficher ses informations
 The password must be at least eight characters long, consist of at least two digits and one upper case character.	UserLoginWindow		Le mot de passe doit être composé d’au moins huit caractères, composé d’au moins deux chiffres et d’un caractère majuscule.
-Share anonymous usage data with HaikuDepotServer	SettingsWindow		Partager des données d'utilisation anonymes avec le système du Serveur de dépôt Haiku
+Share anonymous usage data with HaikuDepotServer	SettingsWindow		Partager des données d’utilisation anonymes avec le système du Serveur de dépôt Haiku
 Contents	PackageInfoView		Contenu
 Close	PackageManager		Fermer
 Changelog	PackageInfoView		Journal des modifications
@@ -76,6 +79,7 @@ Stability	RatePackageWindow		Stabilité
 Send	RatePackageWindow		Envoyer
 Start package daemon	App		Démarrer le serveur de paquets
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Le mot de passe doit être répété afin de réduire le risque d’une saisie erronée.
+The package action could not be scheduled: %Error%	PackageInfoView		L’action du paquet n’a pas pu être planifiée : %Error%
 Cancel	SettingsWindow		Annuler
 Cancel	RatePackageWindow		Annuler
 Inactive	PackageListView		Inactif
@@ -140,17 +144,17 @@ Source packages	MainWindow		Paquets sources
 -	no package size		-
 Problem with working files	App		Problème avec les fichiers de travail
 Server error	ServerHelper		Erreur du serveur
-Try again	App		Essayer à nouveau
 Rate package	RatePackageWindow		Évaluer le paquet
+Try again	App		Essayer à nouveau
 Unknown	PackageListView		Inconnu
 I agree to the usage conditions	UserLoginWindow		J’accepte les conditions d’utilisation
 Log in	UserLoginWindow		Connexion
-Sending anonymous usage data	MainWindow		Envoi de données d'utilisation anonymes
+Sending anonymous usage data	MainWindow		Envoi de données d’utilisation anonymes
 Logged in as %User%	MainWindow		Connecté en tant que %User%
 Email address:	UserLoginWindow		Adresse e-mail :
 Screenshot	ScreenshotWindow		Capture d’écran
-HaikuDepot	System name		DépôtHaiku
 A reboot is necessary to complete the installation process.	PackageManager		Un redémarrage est nécessaire pour terminer le processus d’installation.
+HaikuDepot	System name		DépôtHaiku
 Yes	MainWindow		Oui
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{Je suis âgé d’au moins un an}other{j’ai plus de # ans}}
 View latest usage conditions…	MainWindow		Voir les dernières conditions d’utilisation…
@@ -167,6 +171,7 @@ Fetching remote repository data	LocalRepositoryUpdateProcess		Récupération des
 Description	PackageListView		Description
 Open %DeskbarLink%	PackageManager		Ouvrir %DeskbarLink%
 User creation error	UserLoginWindow		Erreur à la création de l’utilisateur
+Install	PackageManager		Installer
 Input validation	UserLoginWindow		Validation des entrées
 Log in…	MainWindow		Connexion…
 You need to be logged into an account before you can rate packages.	MainWindow		Vous devez vous authentifier pour évaluer les paquets.

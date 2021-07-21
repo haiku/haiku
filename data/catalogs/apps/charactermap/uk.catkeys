@@ -175,7 +175,7 @@ Lao	UnicodeBlocks		Лаоська
 Chorasmian	UnicodeBlocks		Хорезмійська
 Lisu supplement	UnicodeBlocks		Додаток Лісу
 Takri	UnicodeBlocks		Такрі
-Shorthand format controls	UnicodeBlocks		Елементи керування форматом скорочень
+Shorthand format controls	UnicodeBlocks		Управління форматом скорочень
 Inscriptional Parthian	UnicodeBlocks		Парфянська
 Optical character recognition	UnicodeBlocks		Оптичне розпізнавання символів
 Tamil	UnicodeBlocks		Тамільська
@@ -273,7 +273,7 @@ Copy character	CharacterView		Зкопіювати символ
 Hangul Jamo	UnicodeBlocks		Хангуль Джамо
 Font	CharacterWindow		Шрифт
 Ornamental dingbats	UnicodeBlocks		Декоративні позначки (дінгбати)
-Egyptian hieroglyph format controls	UnicodeBlocks		Елементи керування форматом єгипетських ієрогліфів
+Egyptian hieroglyph format controls	UnicodeBlocks		Управління форматом єгипетських ієрогліфів
 Manichaean	UnicodeBlocks		Маніхейське письмо
 Phaistos disc	UnicodeBlocks		Фестська
 Miscellaneous technical	UnicodeBlocks		Інші технічні

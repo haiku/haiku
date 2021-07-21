@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-Appearance	3106786237
+1	portuguese (brazil)	x-vnd.Haiku-Appearance	663472720
 Control border	Colors tab		Borda do controle
 Control mark	Colors tab		Marca de controle
 Off	AntialiasingSettingsView		Desligado
@@ -8,10 +8,12 @@ Defaults	APRWindow		Padrões
 Shadow	Colors tab		Sombra
 Document background	Colors tab		Plano de fundo do documento
 List background	Colors tab		Plano de fundo da lista
+No effect on running applications	DecorSettingsView		Sem efeito na execução de aplicativos
 Fixed font:	Font view		Fonte de largura fixa:
 Appearance	System name		Aparência
 Reduce colored edges filter strength:	AntialiasingSettingsView		Reduzir a força do filtro de bordas coloridas:
 Glyph hinting:	AntialiasingSettingsView		Sugestão de glifo:
+Default Haiku ControlLook	DecorSettingsView		Controlador de aparência padrão do Haiku
 Menu item text	Colors tab		Texto de item de menu
 About decorator	DecorSettingsView		Sobre o decorador
 Antialiasing menu	AntialiasingSettingsView		Menu de suavização de serrilhado
@@ -28,6 +30,7 @@ OK	DecorSettingsView		OK
 Control text	Colors tab		Texto do controle
 Look and feel	APRWindow		Olhar e sentir
 Selected menu item background	Colors tab		Plano de fundo do item de menu selecionado
+Link active	Colors tab		Link ativo
 Antialiasing	APRWindow		Suavização de serrilhado
 Menu font:	Font view		Fonte de menu:
 Bold font:	Font view		Negrito:
@@ -40,12 +43,16 @@ Selected menu item text	Colors tab		Texto do item do menu selecionado
 Size:	Font Selection view		Tamanho:
 Panel background	Colors tab		Plano de fundo do painel
 Plain font:	Font view		Fonte plana:
-Window tab text	Colors tab		Texto da aba da Janela
+Window tab text	Colors tab		Aba de texto da janela
 Navigation pulse	Colors tab		Navegação de pulso
 LCD subpixel	AntialiasingSettingsView		Subpixel LCD
 Window tab	Colors tab		Aba da janela
+Link text	Colors tab		Texto do link
 Tooltip background	Colors tab		Plano de fundo das dicas
+ControlLook:	DecorSettingsView		Controle de Aparência:
 Scroll bar thumb	Colors tab		Botão da barra de rolagem
+Default	DecorSettingsView		Padrão
+Link visited	Colors tab		Link visitado
 Selected menu item border	Colors tab		Borda do item de menu selecionado
 Tooltip text	Colors tab		Texto da dica
 Control background	Colors tab		Plano de fundo do controle
@@ -60,9 +67,13 @@ Antialiasing type:	AntialiasingSettingsView		Tipo de suavização de serrilhado:
 Panel text	Colors tab		Texto de janela de diálogo
 Hinting menu	AntialiasingSettingsView		Menu de sugestão
 Scroll bar:	DecorSettingsView		Barra de rolagem:
+Choose ControlLook	DecorSettingsView		Escolher controle de aparência
 Monospaced fonts only	AntialiasingSettingsView		Apenas fontes monoespaçadas
 Document text	Colors tab		Texto do documento
 Inactive window border	Colors tab		Margem inativa de janela
 Colors	APRWindow		Cores
+About control look	DecorSettingsView		Sobre controle de aparência
 Control highlight	Colors tab		Realce do controle
+Status bar	Colors tab		Barra de status
+Link hover	Colors tab		Realce de link ao passar por cima
 Single:	DecorSettingsView		Único:

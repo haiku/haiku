@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Be-MAIL	1559146339
+1	portuguese (brazil)	x-vnd.Be-MAIL	1477453861
 Set to Saved	Mail		Definir como Salvo
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		O texto principal contém %ld caracteres não codificáveis. Quem sabe um conjunto de caracteres diferente trabalhe melhor? Clique em Enviar para enviar a mensagem como está (um caractere substituto será usado no lugar dos não codificáveis) ou escolha Cancelar para voltar e tentar consertar isso.
 Text wrapping:	Mail		Quebra de texto:
@@ -8,10 +8,12 @@ Reply	Mail		Resposta
 Next message	Mail		Próxima mensagem
 Mailing	Mail		Correspondência
 Unread	Mail		Não lido
+Same sender	Mail		Mesmo remetente
 Copy to new	Mail		Copiar para novo
 Save as draft	Mail		Salvar como rascunho
 Encoding:	Mail		Codificação:
 Print	Mail		Imprimir
+Decrease quote level	Mail		Diminuir o nível de cotação
 Encoding	Mail		Codificação
 Default account:	Mail		Conta padrão:
 Message	Mail		Mensagem
@@ -24,19 +26,20 @@ Button bar:	Mail		Barra de botões:
 Save changes to this signature?	Mail		Salvar alterações para esta assinatura?
 Save attachment…	Mail		Salvar anexo…
 Paste	Mail		Colar
-E-mail draft could not be saved!	Mail		Rascunho do correio não pôde ser salvo!
+E-mail draft could not be saved!	Mail		Não foi possível salvar o rascunho do e-mail!
 Don't send	Mail		Não enviar
 sent	B_USER_DIRECTORY/mail/sent		enviado
 Only files can be added as attachments.	Mail		Apenas arquivos podem ser adicionados como anexos.
 Close	Mail		Fechar
 Untitled	Mail		Sem título
-Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Remover anexos de um correio encaminhado não foi ainda implementado!\nAinda não irá funcionar corretamente.
+Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		A remoção de anexos de um e-mail encaminhado ainda não foi implementada!\nAinda não funcionará corretamente.
+Same recipient	Mail		Mesmo destinatário
 Previous message	Mail		Mensagem anterior
 (Address unavailable)	Mail		(Endereço indisponível)
 Mail	System name		Correio
 Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Compartimento: %name% (Tipo: %type%)
 Copy link location	Mail		Copiar endereço do vínculo
-Attachments: 	Mail		Anexos:  
+Attachments: 	Mail		Anexos: 
 Remove enclosure	Mail		Remover compartimento
 Next	Mail		Próximo
 Attachments:	Mail		Anexos:
@@ -46,14 +49,14 @@ OK	Mail		OK
 UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
 Quit	Mail		Sair
 Title:	Mail		Título:
-Account from mail	Mail		Conta de correio
-%e - E-mail address	Mail		%e - Endereço de correio eletrônico
+Account from mail	Mail		Conta do correio
+%e - E-mail address	Mail		%e - Endereço de e-mail
 Cc:	Mail		Cc:
 No matches	Mail		Nenhuma correspondência
 Queries	Mail		Consultas
 Cut	Mail		Recortar
 Reply to sender	Mail		Responder ao remetente
-\\n - Newline	Mail		\\n  - Nova linha
+\\n - Newline	Mail		\\n - Nova linha
 Copy	Mail		Copiar
 Add signature	Mail		Adicionar assinatura
 %n - Full name	Mail		%n - Nome completo
@@ -76,12 +79,13 @@ Find	Mail		Localizar
 Sorry, could not find an application that supports the 'Person' data type.	Mail		Desculpe, não foi possível encontrar um aplicativo que suporte o tipo de dados 'Pessoa'.
 Date:	Mail		Data:
 Expert	Mail		Especialista
-Automatically mark mail as read:	Mail		Marcar automaticamente correio como lido:
-Close and 	Mail		Fechar e  
+Automatically mark mail as read:	Mail		Marcar automaticamente e-mails como lidos:
+Close and 	Mail		Fechar e 
 Colored quotes:	Mail		Citações coloridas:
 Automatic	Mail		Automático
 Open this link	Mail		Abrir este vínculo
 Auto signature:	Mail		Auto assinatura:
+Same subject	Mail		Mesmo assunto
 Send	Mail		Enviar
 Open draft	Mail		Abrir rascunho
 Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Deixar como 'Novo'
@@ -96,7 +100,7 @@ The mail_daemon could not be started:\n\t	Mail		O mail_daemon não pôde ser ini
 Mail couldn't find its dictionary.	Mail		O correio não pôde encontrar seu dicionário.
 Mail preferences	Mail		Preferências de correio
 helpful message	Mail		mensagem útil
- Read 	Mail		  Ler  
+ Read 	Mail		 Ler 
 Font:	Mail		Fonte:
 Accounts…	Mail		Contas…
 Previous	Mail		Anterior
@@ -110,7 +114,7 @@ Check spelling	Mail		Verificar ortografia
 Redo	Mail		Refazer
 Leave as '%s'	Mail		Deixar como '%s'
 Print…	Mail		Imprimir…
-Settings…	Mail		Definições…
+Settings…	Mail		Configurações…
 Warn unencodable:	Mail		Avisar não codificável:
 Trash	Mail		Lixeira
 Show raw message	Mail		Exibir a mensagem bruta
@@ -156,9 +160,10 @@ An error occurred trying to save this signature.	Mail		Ocorreu um erro ao tentar
 Beginner	Mail		Iniciante
 Send message	Mail		Enviar mensagem
 Delete	Mail		Excluir
-Put your favorite e-mail queries and query templates in this folder.	Mail		Ponha suas consultas de correio e de modelos preferidas nesta pasta.
+Put your favorite e-mail queries and query templates in this folder.	Mail		Ponha suas consultas de e-mail e de modelos preferidas nesta pasta.
 Spam	Mail		Mensagens não solicitadas
 Couldn't open this signature. Sorry.	Mail		Não foi possível abrir esta assinatura. Desculpe.
 Revert	Mail		Reverter
 Unknown	Mail		Desconhecido
+Increase quote level	Mail		Aumentar o nível de citação
 Add enclosure…	Mail		Adicionar compartimento…

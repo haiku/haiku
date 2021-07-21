@@ -1,0 +1,59 @@
+1	finnish	application/x-vnd.Cortex.InfoView	2382053937
+Offset	InfoView		Vaihesiirto
+Description	DormantNodeInfoView		Kuvaus
+Byte order	InfoView		Tavujärjestys
+Connection	InfoView		Yhteys
+Output formats	DormantNodeInfoView		Lähtömuodot
+History	InfoView		Historia
+Input formats	DormantNodeInfoView		Syötemuodot
+Signature	AppNodeInfoView		Allekirjoitus
+Video data between	InfoView		Videodata välillä
+Any number	DormantNodeInfoView	For 'Max. instances' field	Mikä tahansa numero
+Flags	InfoView		Liput
+Media output	InfoView		Medialähtö
+Active lines	InfoView		Aktiivirivit
+Buffer size	InfoView		Puskurikoko
+\n- Quality:	FileNodeInfoView		\n- Laatu:
+Kinds	LiveNodeInfoView		Tyylit
+Application	AppNodeInfoView		Sovellus
+Flavor flags	DormantNodeInfoView		Flavor-liput
+Max. instances	DormantNodeInfoView		Enimmäisilmentymät
+\n- Duration:	FileNodeInfoView		\n- Kesto:
+Dormant media node	DormantNodeInfoView		Horrostava mediasolmu
+Latency	LiveNodeInfoView		Viive
+Media type	InfoView		Mediatyyppi
+Live media node	LiveNodeInfoView		Live-mediasolmu
+Field rate	InfoView		Kenttänopeus
+Kinds	DormantNodeInfoView		Tyypit
+%title% info	InfoView		%title% -tiedot
+Node ID	LiveNodeInfoView		Solmutunniste
+Resolution	InfoView		Resoluutio
+Chunk size	InfoView		Näytekoko
+File format	AppNodeInfoView		Tiedostomuoto
+Matrix mask	InfoView		Matriisimaski
+Channel mask	InfoView		Kanavamaski
+Orientation	InfoView		Suunta
+Live file-interface node	FileNodeInfoView		Live-tiedostorajapintasolmu
+Channels	InfoView		Kanavat
+Sample rate	InfoView		Näytetaajuus
+File format	FileNodeInfoView		Tiedostomuoto
+(no file)	FileNodeInfoView		(ei tiedostoa)
+Media input	InfoView		Mediasyöte
+Bit rate	InfoView		Bittitaajuus
+Input format	DormantNodeInfoView		Syötemuoto
+Format	InfoView		Muoto
+Version	AppNodeInfoView		Versio
+AddOn ID	DormantNodeInfoView		AddOn-tunniste
+Frame size	InfoView		Kehyskoko
+Flavor ID	DormantNodeInfoView		Flavor-tunniste
+Run mode	LiveNodeInfoView		Suoritustila
+\n- Codec:	FileNodeInfoView		\n- Koodekki:
+Port	LiveNodeInfoView		Portti
+Output format	DormantNodeInfoView		Lähtömuoto
+Aspect ratio	InfoView		Kuvasuhde
+Application-owned node	AppNodeInfoView		Sovellusomistettu solmu
+Tracks	FileNodeInfoView		Raidat
+Source	InfoView		Lähde
+Destination	InfoView		Kohde
+Copyright	FileNodeInfoView		Copyright
+ID:	FileNodeInfoView		Tunniste:

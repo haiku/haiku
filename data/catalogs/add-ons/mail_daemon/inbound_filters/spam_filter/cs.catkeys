@@ -1,0 +1,7 @@
+1	czech	x-vnd.Haiku-SpamFilter	468104950
+or empty e-mail	SpamFilterConfig		nebo prázdný e-mail
+Genuine below and uncertain above:	SpamFilterConfig		Originální níže a nejistý výše:
+Spam above:	SpamFilterConfig		Spam výše:
+Add spam rating to start of subject	SpamFilterConfig		Přidat hodnocení jako spam na začátek předmětu
+Bayesian Spam Filter	SpamFilter		Bayesovo filtrování spamu
+Learn from all incoming e-mail	SpamFilterConfig		Učit se ze všech příchozích e-mailů

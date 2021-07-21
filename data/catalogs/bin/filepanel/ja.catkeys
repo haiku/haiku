@@ -1,5 +1,5 @@
 1	japanese	x-vnd.mmu_man.filepanel	1996091223
-display a load/save file panel\n	FilePanelApp		読込 / 保存パネルを表示\n
+display a load/save file panel\n	FilePanelApp		読込 / 保存パネルの表示\n
 short\tlong\tdescription\n	FilePanelApp		短い\t長い\t概要\n
 %s not a valid option\n	FilePanelApp		%s は正しいオプションではありません\n
 -s\t--save\tuse a save FilePanel\n	FilePanelApp		-s\t--save\tuse a save FilePanel\n

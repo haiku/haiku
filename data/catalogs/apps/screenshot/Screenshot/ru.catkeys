@@ -15,7 +15,7 @@ Desktop	ScreenshotWindow		Рабочий стол
 Artwork folder	ScreenshotWindow		Папку artwork
 Translator Settings	ScreenshotWindow		Настройки транслятора
 Include mouse pointer	ScreenshotWindow		Включая курсор
-overwrite	ScreenshotWindow		Перезаписать
+overwrite	ScreenshotWindow		перезаписать
 Settings…	ScreenshotWindow		Настройки…
 Choose folder	ScreenshotWindow		Выбрать папку
 Name:	ScreenshotWindow		Имя:

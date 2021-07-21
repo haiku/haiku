@@ -17,7 +17,7 @@ IP address:	IntefaceAddressView		IP adreso:
 Netmask:	IntefaceAddressView		Retmasko:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Servoj
-Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Instaligo de la Retstato en Laborstrion malsukcesis: %s
+Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Instaligo de Retstato al Laborstrio malsukcesis: %s
 Revert	NetworkWindow		Malfari
 off	ServiceListItem		malŝaltita
 WEP	WEP protected network		WEP

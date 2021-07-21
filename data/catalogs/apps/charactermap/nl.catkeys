@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-CharacterMap	402082923
+1	dutch; flemish	x-vnd.Haiku-CharacterMap	2410613018
 Tirhuta	UnicodeBlocks		Tirhuta
 Miscellaneous mathematical symbols B	UnicodeBlocks		Gevarieerde wiskundige symbolen B
 Latin extended E	UnicodeBlocks		Latijns uitgebreid E
@@ -216,37 +216,49 @@ Mende Kikakui	UnicodeBlocks		Mende Kikakui
 Geometric shapes extended	UnicodeBlocks		Geometrische figuren uitbreiding
 Transport and map symbols	UnicodeBlocks		Transport- en kaartsymbolen
 Tamil supplement	UnicodeBlocks		Tamil-supplement
+Combining diacritical marks extended	UnicodeBlocks		Uitgebreide combinatie van diakritische tekens
 Cyrillic extended C	UnicodeBlocks		Cyrillisch (uitgebreid) C
 Syriac	UnicodeBlocks		Syrisch
 Private use area	UnicodeBlocks		Ruimte voor persoonlijk gebruik
+Vedic extensions	UnicodeBlocks		Vedische extensies
 Supplement punctuation	UnicodeBlocks		Toegevoegde interpunctie
 Lycian	UnicodeBlocks		Lycisch
 Myanmar extended A	UnicodeBlocks		Myanmar uitgebreid A
 Ancient symbols	UnicodeBlocks		Antieke symbolen
 Arabic mathematical alphabetic symbols	UnicodeBlocks		Arabische wiskundige alfabetische symbolen
 Miscellaneous symbols and arrows	UnicodeBlocks		gevarieerde symbolen en pijlen
+Common Indic number forms	UnicodeBlocks		Gemeenschappelijke Indische nummervormen
 Kharoshthi	UnicodeBlocks		Kharoshthi
 Buginese	UnicodeBlocks		Buginees
 Telugu	UnicodeBlocks		Telugu
 Cyrillic supplement	UnicodeBlocks		Cyrillisch (toevoegsel)
+Grantha	UnicodeBlocks		Grantha
 Yi Radicals	UnicodeBlocks		Yi-basiskarakters
 Supplementary private use area A	UnicodeBlocks		Toegevoegde ruimte A voor persoonlijk gebruik
 Armenian	UnicodeBlocks		Armeens
+Miscellaneous symbols and pictographs	UnicodeBlocks		Diverse symbolen en pictogrammen
 Phags-pa	UnicodeBlocks		Phagspa
+Nabataean	UnicodeBlocks		Nabateeërs
+Meetei Mayek	UnicodeBlocks		Meetei Mayek
 CJK compatibility ideographs	UnicodeBlocks		Uitwisselbare CJK-ideogrammen
 Show private blocks	CharacterWindow		Toon persoonlijke gedeeltes
+Samaritan	UnicodeBlocks		Samaritaan
 Latin extended additional	UnicodeBlocks		Latijns (uitgebreid additioneel)
 Tibetan	UnicodeBlocks		Tibetaans
 Combining diacritical marks	UnicodeBlocks		Combinerende diakretische tekens
 Tags	UnicodeBlocks		Tags
 Khmer	UnicodeBlocks		Khmer
+Hangul Jamo extended B	UnicodeBlocks		Hangul Jamo verlengd B
+Tai Viet	UnicodeBlocks		Tai Viet
 Georgian supplement	UnicodeBlocks		Georgisch (toevoeging)
 Tagalog	UnicodeBlocks		Tagalog
+CJK unified ideographs extension F	UnicodeBlocks		CJK verenigde ideografen extensie F
 Supplemental Symbols and Pictographs	UnicodeBlocks		Aanvullende symbolen en pictografisch schrift
 Devanagari	UnicodeBlocks		Devanagari
 Runic	UnicodeBlocks		Runen
 General punctuation	UnicodeBlocks		Algemene leestekens
 Mongolian supplement	UnicodeBlocks		Mongools supplement
+Khudawadi	UnicodeBlocks		Khudawadi
 Glagotic	UnicodeBlocks		Glagotisch
 Cyrillic extended B	UnicodeBlocks		Cyrillisch (uitgebreid) B
 Anatolian hieroglyphs	UnicodeBlocks		Anatolische hiërogliefen
@@ -260,6 +272,9 @@ Kangxi radicals	UnicodeBlocks		Kangxi-basiskarakters
 Copy character	CharacterView		Karakter kopiëren
 Hangul Jamo	UnicodeBlocks		Hangul Jamo
 Font	CharacterWindow		Lettertype
+Ornamental dingbats	UnicodeBlocks		Sier dingbats
+Egyptian hieroglyph format controls	UnicodeBlocks		Besturingselementen in Egyptische hiërogliefindeling
+Manichaean	UnicodeBlocks		Manichaean
 Phaistos disc	UnicodeBlocks		Schijf van Phaistos
 Miscellaneous technical	UnicodeBlocks		Technisch (gevarieerd)
 Braille patterns	UnicodeBlocks		Braille-patronen
@@ -268,19 +283,29 @@ Thaana	UnicodeBlocks		Thaana
 Ethiopic	UnicodeBlocks		Ethiopisch
 Byzantine musical symbols	UnicodeBlocks		Byzantijnse muzieksymbolen
 Gujarati	UnicodeBlocks		Gujarati
+Symbols for legacy computing	UnicodeBlocks		Symbolen voor legacy computing
+Gunjala Gondi	UnicodeBlocks		Gunjala Gondi
+Hangul Jamo extended A	UnicodeBlocks		Hangul Jamo verlengd A
+Elbasan	UnicodeBlocks		Elbasan
 Hangul compatibility Jamo	UnicodeBlocks		Uitwisselbare Hangul Jamo
 Phonetic extensions supplement	UnicodeBlocks		Fonetische uitbreidingen (toevoegsel)
 CJK unified ideographs extension E	UnicodeBlocks		CJK-uitbreiding voor verenigde ideogrammen E
+Nüshu	UnicodeBlocks		Nüshu
 Old Persian	UnicodeBlocks		Oud-Persisch
 Malayalam	UnicodeBlocks		Malayalam
 CJK radicals supplement	UnicodeBlocks		CJK radicalen (toevoegsel)
+Old South Arabian	UnicodeBlocks		Oud Zuid-Arabisch
 Marchen	UnicodeBlocks		Marchen
+Sogdian	UnicodeBlocks		Sogdian
 Control pictures	UnicodeBlocks		Controle-afbeeldingen
+Tai Tham	UnicodeBlocks		Tai Tham
 Cyrillic extended A	UnicodeBlocks		Cyrillisch (uitgebreid) A
 New Tai Lue	UnicodeBlocks		Nieuw Tai Lue
 Sutton SignWriting	UnicodeBlocks		Sutton SignWriting
 Limbu	UnicodeBlocks		Limbu
 Kanbun	UnicodeBlocks		Kanbun
+Emoticons	UnicodeBlocks		Emoticons
+Siddham	UnicodeBlocks		Siddham
 CJK symbols and punctuation	UnicodeBlocks		Symbolen en interpunctie in CJK
 CJK strokes	UnicodeBlocks		CJK-karakterlijnen
 Combining half marks	UnicodeBlocks		Combinerende halve tekens

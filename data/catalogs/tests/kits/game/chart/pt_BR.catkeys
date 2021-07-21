@@ -9,9 +9,9 @@ Blue	ChartWindow		Azul
 Colors	ChartWindow		Cores
 Novas	ChartWindow		Novas
 LineArray	ChartWindow		LineArray
- 0.6 f/s  (logarythmic scale)	ChartWindow		0.6 f/s (escala logarítmica)
+ 0.6 f/s  (logarythmic scale)	ChartWindow		 0.6 f/s  (escala logarítmica)
 Free motion	ChartWindow		Movimento livre
-(high) 100% 	ChartWindow		(alto) 100%
+(high) 100% 	ChartWindow		(alto) 100% 
 Green	ChartWindow		Verde
 Amas	ChartWindow		Amas
 2 threads	ChartWindow		2 tópicos
@@ -21,7 +21,7 @@ Chaos	ChartWindow		Caos
 Full screen	ChartWindow		Tela Cheia
 Spiral	ChartWindow		Espiral
 Slow motion	ChartWindow		Câmera lenta
- 5% (low)	ChartWindow		5% (baixo)
+ 5% (low)	ChartWindow		 5% (baixo)
 Fast motion	ChartWindow		Câmera rápida
 Special	ChartWindow		Especial
 Status	ChartWindow		Status

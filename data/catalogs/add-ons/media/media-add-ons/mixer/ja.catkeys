@@ -7,7 +7,7 @@ Output mapping	AudioMixer		出力マッピング
 Allow input channel remapping	AudioMixer		入力チャンネルの再マッピングを許可する
 Resampling algorithm	AudioMixer		リサンプリングアルゴリズム
 Attenuate mixer output by 3dB (like BeOS R5)	AudioMixer		ミキサー出力を 3dB 下げる ( BeOS R5 と同様)
-Display balance control for stereo connections	AudioMixer		ステレオ接続に対してバランスコントロールを表示
+Display balance control for stereo connections	AudioMixer		ステレオ接続にバランスコントロールを表示
 To output	AudioMixer		出力へ
 not connected	AudioMixer		接続されていません
 Refuse input format changes	AudioMixer		入力フォーマットの変更を許可しない

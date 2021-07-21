@@ -1,14 +1,55 @@
-1	portuguese (brazil)	x-vnd.Haiku-Network	4026755568
+1	portuguese (brazil)	x-vnd.Haiku-Network	543099905
+Ethernet device	InterfaceListItem		Dispositivo Ethernet
+Link speed:	IntefaceView		Velocidade de conexão:
+disconnected	IntefaceView		disconectado
+WPA	WPA protected network		WPA
+Network:	IntefaceView		Rede:
+Received:	IntefaceView		Recebido:
 New…	NetworkWindow		Novo…
+no link	InterfaceListItem		sem link
 Other	NetworkWindow		Outro
+Sent:	IntefaceView		Enviar:
 Gateway:	IntefaceAddressView		Rota padrão:
+The netmask defines your local network	IntefaceAddressView		A máscara de rede define sua rede local
+Your IP address	IntefaceAddressView		Seu endereço de IP
+DHCP	IntefaceAddressView		DHCP
+IP address:	IntefaceAddressView		Endereço de IP:
+Netmask:	IntefaceAddressView		Máscara de sub-rede:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Serviços
+Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Falha ao instalar o status de rede na Deskbar: %s
 Revert	NetworkWindow		Reverter
+off	ServiceListItem		desligado
+WEP	WEP protected network		WEP
+<no wireless networks found>	IntefaceView		<não foram detetadas redes sem fios>
+Enable	IntefaceView		Habilitar
+connected	IntefaceView		conectado
 Apply	IntefaceAddressView		Aplicar
+Disable	ServiceView		Desabilitar
+WPA2	WPA2 protected network		WPA2
+Show network status in Deskbar	NetworkWindow		Mostrar status de rede na Deskbar
+Mode:	IntefaceAddressView		Modo:
+connected	InterfaceListItem		conectado
+OK	NetworkWindow		OK
 Static	IntefaceAddressView		Estático
-launch error	NetworkWindow		Erro de carregamento
+launch error	NetworkWindow		erro de inicialização
+Renegotiate	IntefaceView		Renegociar
+MAC address:	IntefaceView		Endereço MAC:
+%name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
+disabled	InterfaceListItem		desabilitado
+Dial-up connection	InterfaceListItem		Conexão Dial-up
+on	ServiceListItem		conectado
+The method for obtaining an IP address	IntefaceAddressView		O método para se obter um endereço IP
+disconnected	InterfaceListItem		desconectado
 Automatic	IntefaceAddressView		Automático
+Choose automatically	IntefaceView		Escolher automaticamente
+Status:	IntefaceView		Estado:
+Disable	IntefaceView		Desativar
+Manage…	NetworkWindow		Gerir…
+open	Open network		abrir
+Network	System name		Rede
 Your gateway to the internet	IntefaceAddressView		Sua rota padrão para a internet
 Enable	ServiceView		Habilitar
+Wireless device	InterfaceListItem		Dispositivo wireless
 Disabled	IntefaceAddressView		Desabilitado
+VPN connection	InterfaceListItem		Conexão VPN

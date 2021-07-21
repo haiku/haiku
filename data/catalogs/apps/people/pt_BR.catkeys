@@ -1,6 +1,7 @@
-1	portuguese (brazil)	x-vnd.Be-PEPL	2332202134
+1	portuguese (brazil)	x-vnd.Be-PEPL	2634915100
 Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Lançamento do preflet FileTypes para configurar atributos de Pessoa falhou.\n\nErro: 
-Unnamed person	People		pessoa não nomeada
+Mobile phone	People		Telefone móvel
+Unnamed person	People		Pessoa não nomeada
 New person…	People		Nova pessoa...
 Address	People		Endereço
 Zip	People		CEP
@@ -23,7 +24,7 @@ New person	People		Nova pessoa
 Save	People		Salvar
 Fax	People		Fax
 URL	People		URL
-%name% picture	People		%name% picture
+%name% picture	People		Foto de %name%
 Home phone	People		Fone residencial
 none	Groups list		nenhum
 Save as…	People		Salvar como...

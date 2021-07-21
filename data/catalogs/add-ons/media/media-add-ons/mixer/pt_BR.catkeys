@@ -6,7 +6,7 @@ Refuse output format changes	AudioMixer		Recusar mudanças de formato de saída
 Output mapping	AudioMixer		Mapeamento de saída
 Allow input channel remapping	AudioMixer		Permitir remapeamento do canal de entrada
 Resampling algorithm	AudioMixer		Algoritmo de reamostragem
-Attenuate mixer output by 3dB (like BeOS R5)	AudioMixer		Atenuar saída do mixer em 3dB (como BeOS R5)
+Attenuate mixer output by 3dB (like BeOS R5)	AudioMixer		Atenuar saída do mixador em 3dB (como BeOS R5)
 Display balance control for stereo connections	AudioMixer		Mostrar controle de balanço para conexões estéreo
 To output	AudioMixer		Para saída
 not connected	AudioMixer		desconectado

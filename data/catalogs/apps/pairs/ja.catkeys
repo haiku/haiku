@@ -11,8 +11,8 @@ You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWind
 Small	PairsWindow		小
 Size	PairsWindow		サイズ
 %app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n	PairsWindow		%app%\n\tRalf Schülke 作\n\tCopyright 2008-2010, Haiku Inc.\n\n
-Quit game	PairsWindow		ゲームを終了
+Quit game	PairsWindow		ゲームの終了
 Large	PairsWindow		大
 Beginner (4x4)	PairsWindow		初級 (4x4)
 Intermediate (6x6)	PairsWindow		中級 (6x6)
-New game	PairsWindow		新規ゲーム
+New game	PairsWindow		新しいゲーム
