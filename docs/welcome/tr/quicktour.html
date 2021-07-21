@@ -11,6 +11,7 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		Emir SARI
+ *		Máximo Castañeda
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -37,6 +38,7 @@
 <li><a href="../de/quicktour.html">Deutsch</a></li>
 <li><a href="../en/quicktour.html">English</a></li>
 <li><a href="../es/quicktour.html">Español</a></li>
+<li><a href="../eo/quicktour.html">Esperanto</a></li>
 <li><a href="../fr/quicktour.html">Français</a></li>
 <li><a href="../fur/quicktour.html">Furlan</a></li>
 <li><a href="../it/quicktour.html">Italiano</a></li>
@@ -56,7 +58,8 @@
 
 
 <span class="navdots">
-<a href="#start"><acronym title="Start" class="current-page">◉</acronym></a> 
+<a class="hide-no-js" id="prevtopic" title="Previous topic">◀</a>
+<a href="#start"><acronym title="Start">◉</acronym></a> 
 <a href="#deskbar"><acronym title="The Deskbar">◉</acronym></a> 
 <a href="#window"><acronym title="The window widgets">◉</acronym></a> 
 <a href="#shortcutkey"><acronym title="The shortcut key">◉</acronym></a> 
@@ -75,16 +78,22 @@
 <a href="#wireless"><acronym title="Wireless connection">◉</acronym></a> 
 <a href="#moresoftware"><acronym title="Getting more and updating software">◉</acronym></a> 
 <a href="#end"><acronym title="End">◉</acronym></a> 
+<a class="hide-no-js" id="nexttopic" title="Next topic">▶</a>
 </span>
 
+<span class="hide-no-js"><a id="toggle" title="Toggle slides view">▤</a></span>
+
 <span>
-<a href="#topics" class="uplink">Topics</a> 
+<a href="#index" class="uplink">Topics</a> 
 </span>
 </div>
 </div>
 
 <div id="content">
-<div>
+<div></div>
+<!-- Please keep the previous empty div there so that the tool can add the "not fully translated" notice on export -->
+
+<div class="topic">
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>İçindekiler</td></tr>
@@ -114,12 +123,17 @@
 <h1><a id="start" name="start">Haiku Hızlı Tur'a hoş geldiniz!</a></h1>
 
 <p>Haiku'nun diğer işletim sistemleri ile birçok ortak noktası olmasına rağmen, kendine özel yaklaşımının olduğu bazı alanlar bulunmaktadır. Birkaç slayt ile Haiku ile çalışmaya başlama ve daha üretken olma için bilmeniz gereken önemli özelliklerini öğreneceksiniz.</p>
-<p>Her sayfanın alt kısmında, yararlı olabilecek kaynaklara işaret eden "Ek okuma" bölümleri bulunmaktadır; örneğin <a href="https://www.haiku-os.org/docs/userguide/en/contents.html" target="_blank">Kullanıcı Kılavuzu</a> gibi.</p>
+<p>Her konunun altında "ek okuma" için bağlantılar bulunmaktadır. Bu bağlantılardan <a href="https://www.haiku-os.org/docs/userguide/tr/contents.html" target="_blank">Kullanıcı Kılavuzu</a>'ndaki ek kaynaklara erişebilirsiniz.</p>
 
 </div>
 
 <div class="topic">
 <h1><a id="deskbar" name="deskbar">Masaüstü Çubuğu</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Ek okuma</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/tr/deskbar.html" target="_blank">Masaüstü Çubuğu</a></td></tr>
+</table>
 
 <p>Öntanımlı olarak masaüstünün sağ üst köşesinde bulunan Masaüstü Çubuğu, Haiku ile olan etkileşiminizin temel noktasıdır. Buradan uygulamaları başlatabilir veya çalışmakta olan uygulamalar arasında geçiş yapabilirsiniz.</p>
 
@@ -127,14 +141,16 @@
 <div class="shot">
 <img src="./images/quicktour/deskbar.png" alt="The Deskbar" />
 </div>
-
-<div class="further">Ek okuma:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/deskbar.html" target="_blank">Masaüstü Çubuğu</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="window" name="window">Pencere ögeleri</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Ek okuma</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/tr/gui.html" target="_blank">Haiku Grafik Kullanıcı Arabirimi</a></td></tr>
+</table>
 
 <p>Aşağıda sıradan bir Haiku penceresini kendine özgü ögeleri ile birlikte görebilirsiniz.</p>
 
@@ -142,14 +158,16 @@
 <div class="shot">
 <img src="./images/quicktour/window.png" alt="A window and its widgets" />
 </div>
-
-<div class="further">Ek okuma:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/gui.html" target="_blank">Haiku Grafik Kullanıcı Arabirimi</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="shortcutkey" name="shortcutkey">Kısayol düğmesi</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Ek okuma</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/tr/keyboard-shortcuts.html" target="_blank">Kısayollar ve düğme kombinasyonları</a></td></tr>
+</table>
 
 <p><span class="app">Klavye Dizilimi</span> tercihleri Haiku standardı olan <span class="key">ALT</span> kısayol düğmesinden <span class="key">CTRL</span> (Windows/Linux kipi) düğmesine geçmenize izin verir. Bu global bir anahtardır, örneğin kabukta programlardan çıkış alışılagelen <span class="key">CTRL</span> <span class="key">C</span> kısayolu yerine <span class="key">ALT</span> <span class="key">C</span> kısayolu ile yapılır.<br />
 Bu uyumsuzluk nedeniyle Haiku'daki öntanımlı kısayol düğmesi <span class="key">ALT</span> olarak belirlenmiştir.</p>
@@ -158,14 +176,16 @@ Bu uyumsuzluk nedeniyle Haiku'daki öntanımlı kısayol düğmesi <span class="
 <div class="shot">
 <img src="./images/quicktour/alt-ctrl.png" alt="Shortcut key: ALT vs. CTRL" />
 </div>
-
-<div class="further">Ek okuma:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/keyboard-shortcuts.html" target="_blank">Kısayollar ve düğme kombinasyonları</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="twitcher" name="twitcher">Seğirtici</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Ek okuma</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/tr/twitcher.html" target="_blank">Seğirtici</a></td></tr>
+</table>
 
 <p><span class="key">CTRL</span> <span class="key">TAB</span> düğmelerini basılı tutmak uygulamalar arasında geçiş yapmak için kullanabileceğiniz <span class="app">Seğirtici</span>'yi çağırır.<br />
 <span class="key">CTRL</span> düğmesini basılı tutarken <span class="key">TAB</span> düğmesine bir kez basmak en son kullanılan uygulamaya geçer.</p>
@@ -173,14 +193,16 @@ Bu uyumsuzluk nedeniyle Haiku'daki öntanımlı kısayol düğmesi <span class="
 <div class="shot">
 <img src="../images/quicktour/twitcher.png" alt="The Twitcher switching between apps" />
 </div>
-
-<div class="further">Ek okuma:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/twitcher.html" target="_blank">Seğirtici</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="teammonitor" name="teammonitor">Takım Monitörü</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Ek okuma</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/tr/teammonitor.html" target="_blank">Takım monitörü</a></td></tr>
+</table>
 
 <p>Eğer bazı uygulamalar düzgün davranmıyor ve Masaüstü Çubuğu'nun çalışan uygulamalar listesinden çıkmamakta direniyorsa <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">DEL</span> düğmelerine basarak <span class="app">Takım Monitörü</span>'nü çağırın. Buradaki listeden bir uygulama seçebilir ve düzgün davranmayan uygulamayı sonlandırabilirsiniz.</p>
 
@@ -190,13 +212,16 @@ Bu uyumsuzluk nedeniyle Haiku'daki öntanımlı kısayol düğmesi <span class="
 
 <p>Takılan bir uygulamadan çıkmanın şekilli bir yolu olarak Vulkan Ölüm Kavrayışı'nı deneyebilirsiniz.<br />
 <span class="key">SHIFT</span> <span class="key">CTRL</span> <span class="key">ALT</span> düğmelerini basılı tutun ve takılan uygulamanın Masaüstü Çubuğu'ndaki simgesine tıklayın. İşte bu kadar!</p>
-<div class="further">Ek okuma:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/teammonitor.html" target="_blank">Takım monitörü</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="move-resize" name="move-resize">Pencere yönetimi: Taşıma ve boyutlandırma</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Ek okuma</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/tr/gui.html#move-resize" target="_blank">Pencereleri hızlıca taşıma ve boyutlandırma</a></td></tr>
+</table>
 
 <p>Haiku ile pencerelerinizi hızlıca taşıyabilir veya yeniden boyutlandırabilirsiniz:<br />
 <span class="key">CTRL</span> <span class="key">ALT</span> düğmelerini basılı tutmak fare imlecine en yakın olan pencere kenarlarını vurgular.<br />
@@ -206,14 +231,16 @@ Aynı işlemi <i>sol</i> fare düğmesi ile yaparak pencereyi taşıyabilirsiniz
 <div class="shot">
 <img src="./images/quicktour/move-resize.png" alt="Move with CTRL+ALT+left mouse button" />
 </div>
-
-<div class="further">Ek okuma:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/gui.html#move-resize" target="_blank">Pencereleri hızlıca taşıma ve boyutlandırma</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="stack" name="stack">Pencere yönetimi: Yığma</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Ek okuma</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/tr/gui.html#stack-tile" target="_blank">Yığma ve Döşeme</a></td></tr>
+</table>
 
 <p>"Yığma" yaparak pencereleri birbirlerine tutturabilir ve aralarında kolayca geçiş yapabilirsiniz.<br />
 <span class="key">OPT</span> düğmesini basılı tutup (bazı klavyelerde <span class="key">WIN</span> düğmesi olabilir) pencereleri başlıklarından tutup diğer pencerenin başlığının üzerine getirin (rengi hafiften değişecektir) ve bırakın.<br />
@@ -224,14 +251,16 @@ Delay time 200 (= 2 secs), option "Don't stack frames" -->
 <div class="shot">
 <img src="./images/quicktour/stack.gif" alt="Stacking windows" />
 </div>
-
-<div class="further">Ek okuma:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/gui.html#stack-tile" target="_blank">Yığma ve Döşeme</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="tile" name="tile">Pencere yönetimi: Döşeme</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Ek okuma</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/tr/gui.html#stack-tile" target="_blank">Yığma ve Döşeme</a></td></tr>
+</table>
 
 <p>"Döşeme" yaparak pencereleri yatay veya dikey olarak birbirine yapıştırabilirsiniz.<br />
 <span class="key">OPT</span> düğmesini basılı tutarken bir pencereyi başka bir pencerenin dibine getirdiğinizde pencere kenarlarının rengi değişecek ve bıraktığınızda da pencereler birbirine yapışacaktır.<br />
@@ -242,14 +271,17 @@ Delay time 200 (= 2 secs), option "Don't stack frames" -->
 <div class="shot">
 <img src="./images/quicktour/tile.gif" alt="Tiling windows" />
 </div>
-
-<div class="further">Ek okuma:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/gui.html#stack-tile" target="_blank">Yığma ve Döşeme</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="workspaces" name="workspaces">Çalışma Alanları</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Ek okuma</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/tr/workspaces.html" target="_blank">Çalışma Alanları</a><br />
+<a href="https://www.haiku-os.org/docs/userguide/tr/preferences/screen.html" target="_blank">Ekran</a></td></tr>
+</table>
 
 <p>Çalışma Alanları sanal masaüstlerinden oluşuyor olup her birinin kendi çözünürlüğü, renk derinliği ve arkaplanı olabilmektedir.<br />
 <span class="app">Ekran</span> tercihlerinden 32 adete kadar çalışma alanı ayarlanabilmektedir.</p>
@@ -260,15 +292,16 @@ Bu kısayollara <span class="key">SHIFT</span> düğmesini eklerseniz, etkin ola
 <div class="shot">
 <img src="./images/quicktour/workspaces.png" alt="The Workspaces applet" />
 </div>
-
-<div class="further">Ek okuma:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/workspaces.html" target="_blank">Çalışma Alanları</a><br />
-<a href="https://www.haiku-os.org/docs/userguide/en/preferences/screen.html" target="_blank">Ekran</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="replicants" name="replicants">Yinelenenler</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Ek okuma</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/tr/gui.html#replicants" target="_blank">Yinelenenler</a></td></tr>
+</table>
 
 <p>Yinelenenler, uygulamaların Masaüstü'ne veya başka uygulamalara entegre edilebilecek ufak çaplı öz kısımlarıdır.<br />
 Masaüstü'nde <span class="menu">Yinelenenleri göster</span> seçeneğini etkin duruma getirdikten sonra yinelenenler uygulamanın köşesinde ufak bir tutacak ile gösterilirler.<br />
@@ -280,46 +313,52 @@ Bu tutacaklardan tutup çekerek yinelenenleri örneğin Masaüstü'ne bırakabil
 </div>
 
 <p>Yinelenenleri kaldırmak için tutacakta sağ tıklayın ve <span class="menu">Yineleneni kaldır</span>'ı seçin.</p>
-
-<div class="further">Ek okuma:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/gui.html#replicants" target="_blank">Yinelenenler</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="singlewindow" name="singlewindow">Tek pencereli dolaşım</a></h1>
 
-<p>Pencerelerde çift tıklaya tıklaya bir sure İzleyici penceresi içinde yitip gitmeniz olasıdır.<br />
-Holding the <span class="key">OPT</span> düğmesini (klavyeye göre <span class="key">WIN</span> düğmesi) çift tıklarken basılı tutmanız yeni bir klasör açarken bir öncekini kapatacaktır.<br />
-Veya <span class="app">İzleyici</span> tercihlerinden <span class="menu">Tek pencereli dolaşım</span>'ı seçebilirsiniz.<br />
+<table class="index further">
+<tr class="heading"><td>Ek okuma</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/tr/tracker.html" target="_blank">İzleyici</a></td></tr>
+</table>
+
+<p>Pencerelerde çift tıklarken bir sürü İzleyici penceresi içinde yitip gitmeniz olasıdır.<br />
+<span class="key">OPT</span> düğmesini (çoğu klavyede göre <span class="key">WIN</span> düğmesi olarak geçer) çift tıklarken basılı tutmanız yeni bir klasör açarken bir önceki pencereyi kapatacaktır.<br />
+Çoklu pencereler yerine tek bir pencerede işlerinizi halletmeyi seviyorsanız <span class="app">İzleyici</span> tercihlerinden <span class="menu">Tek pencereli dolaşım</span>'ı seçebilirsiniz.<br />
 <span class="menu">Adres çubuğunu göster</span> seçeneği adres çubuğuna ek olarak ileri/geri/yukarı düğmelerini ekleyecektir.</p>
 
 <!-- [screenshot: Tracker preferences and Tracker window with navigator] -->
 <div class="shot">
 <img src="./images/quicktour/singlewindow.png" alt="Using Single window navigation" />
 </div>
-
-<div class="further">Ek okuma:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/tracker.html" target="_blank">İzleyici</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="drilldown" name="drilldown">Açılır menülerle dolaşım</a></h1>
 
+<table class="index further">
+<tr class="heading"><td>Ek okuma</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/tr/tracker.html#navigating" target="_blank">İzleyici'de dolaşım</a></td></tr>
+</table>
+
 <p>Derin bir ağaç yapısına sahip klasörleri teker teker açmanın başka bir alternatifi olarak "açılır menülerle dolaşım" kullanılabilir. Bir İzleyeci penceresinde veya herhangi başka bir yerde sağ tıklamak bir bağlam menüsü açacaktır. Alışılagelen komutların yanında menünün en tepesinde içinde bulunulan klasörün adını taşıyan menüyü izleyerek alt klasörlerde bulunan tüm dosya ve klasörlere kolaylıkla erişebilirsiniz. Açmak istediğiniz dosyayı bulana kadar sürdürün. Aynı dolaşımı Kes/Kopyala/Yapıştır işlemleri için de kullanabilirsiniz.</p>
 
 <div class="shot">
 <img src="./images/quicktour/drilldown.png" alt="Drilling down folder hierarchies" />
 </div>
-
-<div class="further">Ek okuma:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/tracker.html#navigating" target="_blank">İzleyici'de dolaşım</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="mounting" name="mounting">Disk bağlama</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Ek okuma</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/tr/tracker.html#mounting-volumes" target="_blank">Diskleri Bağlama</a></td></tr>
+</table>
 
 <p>Bir sabit disk, CD, USB belleğe erişmek için öncelikle o diski bağlamalısınız. Bağlandıktan sonra simgesi Masaüstü'nde görünecektir.<br />
 Bağlamak için Masaüstü'nde veya önceden bağlanmış bir diskin simgesi üzerinde sağ tıklayın ve <span class="menu">Bağla</span> alt menüsünden bağlamak istediğiniz diski seçin. Aynı <span class="menu">Bağla</span> menüsünü Masaüstü Çubuğu'nda da bulabilirsiniz. ISO yansıları çift tıklama ile bağlanabilir.</p>
@@ -329,14 +368,18 @@ Bağlamak için Masaüstü'nde veya önceden bağlanmış bir diskin simgesi üz
 <div class="shot">
 <img src="./images/quicktour/mount.png" alt="Mounting a volume" />
 </div>
-
-<div class="further">Ek okuma:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/tracker.html#mounting-volumes" target="_blank">Diskleri Bağlama</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="filesystem" name="filesystem">Dosya sistemi yerleşimi</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Ek okuma</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/tr/filesystem-layout.html" target="_blank">Dosya sistemi yerleşimi</a><br />
+<a href="https://www.haiku-os.org/docs/userguide/tr/applications.html" target="_blank">Uygulamalar</a><br />
+<a href="https://git.haiku-os.org/haiku/tree/docs/develop/packages/DirectoryStructure.rst" target="_blank">Dizin yapısı</a></td></tr>
+</table>
 
 <p>Haiku şu anda çok kullanıcılı bir işletim sistemi olmasa da dosya sistemi ağacında iki adet ana dal vardır.</p>
 
@@ -358,16 +401,17 @@ Burada bulunan klasörler (örn. <i>add-ons</i>, <i>apps</i>, <i>bin</i> ve diğ
 
 <p>Yazılabilir <i>non-packaged</i> klasörü /system veya ~/config/ klasörlerinin hiyerarşisinin bir yansısını içerir (<i>add-ons</i>, <i>apps</i>, <i>bin</i>…).<br />
 HPKG biçiminde gelmeyen yazılımlar bu konuma yüklenebilir.</p>
-
-<div class="further">Ek okuma:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/filesystem-layout.html" target="_blank">Dosya sistemi yerleşimi</a><br />
-<a href="https://www.haiku-os.org/docs/userguide/en/applications.html" target="_blank">Uygulamalar</a><br />
-<a href="https://git.haiku-os.org/haiku/tree/docs/develop/packages/DirectoryStructure.rst" target="_blank">Dizin yapısı</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="queries" name="queries">Dosya bulmak için sorguları kullanma</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Ek okuma</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/tr/queries.html" target="_blank">Sorgular</a><br />
+<a href="https://www.haiku-os.org/docs/userguide/tr/workshop-filetypes+attributes.html" target="_blank">Dosya Türleri, Öznitelikler, İndeks ve Sorgular</a></td></tr>
+</table>
 
 <p>Haiku biçimli (BFS) disklerdeki dosyalar hızlı bir biçimde Masaüstü Çubuğu'ndaki <span class="menu">Bul…</span> seçeneğini kullanarak aranabilir. Dosya ve/veya klasör adını kullanmak yerine özel dosya özniteliklerini kullanarak da arama yapabilirsiniz (örneğin müzik kitaplığınızdaki bir sanatçı adını kullanarak).</p>
 
@@ -375,15 +419,18 @@ HPKG biçiminde gelmeyen yazılımlar bu konuma yüklenebilir.</p>
 <div class="shot">
 <img src="./images/quicktour/query.png" alt="Finding all MP3s of an artist" />
 </div>
-
-<div class="further">Ek okuma:<br />
-<a href="https://www.haiku-os.org/docs/userguide/{LANG}/queries.html" target="_blank">Sorgular</a><br />
-<a href="https://www.haiku-os.org/docs/userguide/{LANG}/workshop-filetypes+attributes.html" target="_blank">Dosya Türleri, Öznitelikler, İndeks ve Sorgular</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="wireless" name="wireless">Kablosuz bağlantı</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Ek okuma</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/tr/workshop-wlan.html" target="_blank">Kablosuz ağlar</a><br />
+<a href="https://www.haiku-os.org/docs/userguide/tr/desktop-applets/networkstatus.html" target="_blank">Ağ Durumu</a><br />
+<a href="https://www.haiku-os.org/docs/userguide/tr/preferences/network.html" target="_blank">Ağ tercihleri</a></td></tr>
+</table>
 
 <p>Kablosuz ağ (WLAN) bağdaştırıcınıza Masaüstü Çubuğu tepsisindeki <span class="app">Ağ Durumu</span> simgesine tıklayarak,<br />
 veya <span class="app">Ağ</span> tercihlerinden ulaşabilirsiniz.<br />
@@ -393,16 +440,18 @@ Bağlantı kurulduktan sonra eğer gerekliyse ağda kimlik doğrulama bilgilerin
 <div class="shot">
 <img src="./images/quicktour/wireless.png" alt="Connecting with a wireless network" />
 </div>
-
-<div class="further">Ek okuma:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/workshop-wlan.html" target="_blank">Kablosuz ağlar</a><br />
-<a href="https://www.haiku-os.org/docs/userguide/en/desktop-applets/networkstatus.html" target="_blank">Ağ Durumu</a><br />
-<a href="https://www.haiku-os.org/docs/userguide/en/preferences/network.html" target="_blank">Ağ tercihleri</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="moresoftware" name="moresoftware">Yeni ve güncel yazılımlara ulaşma</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Ek okuma</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/tr/applications/haikudepot.html" target="_blank">Haiku Depo</a><br />
+<a href="https://www.haiku-os.org/docs/userguide/tr/applications/softwareupdater.html" target="_blank">Yazılım Güncelleyici</a><br />
+<a href="https://www.haiku-os.org/docs/userguide/tr/preferences/repositories.html" target="_blank">Depolar</a></td></tr>
+</table>
 
 <p>Masaüstü Çubuğu'ndaki uygulamalar menüsünde bulabileceğini <span class="app">Haiku Depo</span> uygulamasını kullanarak yeni uygulamalar bulabilir, yükleyebilir, veya yüklü olan uygulama paketlerini kaldırabilirsiniz.<br />
 <span class="app">Yazılım Güncelleyici</span>'yi ara sıra çalıştırarak yüklü yazılımlarınızı ve/veya Haiku'nun kendisini güncellemeniz önerilir.</p>
@@ -411,18 +460,14 @@ Bağlantı kurulduktan sonra eğer gerekliyse ağda kimlik doğrulama bilgilerin
 <div class="shot">
 <img src="./images/quicktour/moresoftware.png" alt="Installing and updating apps" />
 </div>
-
-<div class="further">Ek okuma:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/applications/haikudepot.html" target="_blank">Haiku Depo</a><br />
-<a href="https://www.haiku-os.org/docs/userguide/en/applications/softwareupdater.html" target="_blank">Yazılım Güncelleyici</a><br />
-<a href="https://www.haiku-os.org/docs/userguide/en/preferences/repositories.html" target="_blank">Depolar</a></div>
 </div>
 
-<div>
+
+<div class="topic">
 <h1><a id="end" name="end">Son</a></h1>
 
 <p>Turumuzun sonuna geldik. Bu turun yeni işletim sisteminize alışmanızda yardımcı olduğunu umuyoruz!</p>
-<p>Daha fazla bilgi için lütfen <a href="https://www.haiku-os.org/docs/welcome/welcome_en.html" target="_blank">Hoş geldiniz</a> ve <a href="https://www.haiku-os.org/docs/userguide/en/contents.html" target="_blank">Kullanıcı Kılavuzu</a> sayfalarına bir göz atın.<br />
+<p>Daha fazla bilgi için lütfen <a href="https://www.haiku-os.org/docs/welcome/welcome_tr.html" target="_blank">Hoş geldiniz</a> ve <a href="https://www.haiku-os.org/docs/userguide/tr/contents.html" target="_blank">Kullanıcı Kılavuzu</a> sayfalarına bir göz atın.<br />
 Aynı zamanda <a href="https://discuss.haiku-os.org/" target="_blank">yazışmalığımıza</a> ve <a href="https://www.haiku-os.org/community/irc/" target="_blank">ana IRC kanalımız #haiku</a>'ya gelip yardım alabilir ve düşüncelerinizi paylaşabilirsiniz.</p>
 <p>Haiku web sayfasında Haiku'ya nasıl <a href="https://www.haiku-os.org/community/getting-involved/" target="_blank">katkıda bulunabileceğiniz</a> konusunda bilgi bulunmaktadır. Aynı zamanda <a href="https://www.haiku-os.org/community/donating_to_haiku" target="_blank">bağış</a> da yapabilirsiniz.</p>
 
@@ -434,5 +479,10 @@ Aynı zamanda <a href="https://discuss.haiku-os.org/" target="_blank">yazışmal
 </div>
 </div>
 
+<div id="bottom-nav" class="slide-only">
+<a id="prevtopic-bottom" class="navbutton" title="Previous">◀</a>
+<a id="nexttopic-bottom" class="navbutton" title="Next">▶</a>
+</div>
+<script type="text/javascript" src="../Haiku-tour.js"></script>
 </body>
 </html>

@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="jp" xml:lang="jp"> 
+<html xmlns="http://www.w3.org/1999/xhtml" lang="jp" xml:lang="jp">
 <head>
-<!-- 
+<!--
  *
- * Copyright 2008-2019, Haiku. All rights reserved.
+ * Copyright 2008-2021, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
- *		Stephan Aßmus <superstippi@gmx.de> 
+ *		Stephan Aßmus <superstippi@gmx.de>
  * Translators:
  *		Humdinger
  *		iwaim
@@ -26,7 +26,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>ユーザーガイド</span></div>
 </div>
 
 <div class="nav">
@@ -38,6 +38,7 @@
 <li><a href="welcome_de.html">Deutsch</a></li>
 <li><a href="welcome_en.html">English</a></li>
 <li><a href="welcome_es.html">Español</a></li>
+<li><a href="welcome_eo.html">Esperanto</a></li>
 <li><a href="welcome_fr.html">Français</a></li>
 <li><a href="welcome_fur.html">Furlan</a></li>
 <li><a href="welcome_it.html">Italiano</a></li>
@@ -61,13 +62,13 @@
 
 <div id="content">
 <div>
+<div class="box-info">このページの翻訳はまだ完全ではありません。完成するまでは、未完成の部分はオリジナルの英文を使用します。</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>インデックス</td></tr>
-<tr class="index"><td>
-	<a href="#welcome">Haiku へようこそ!</a><br />
-	<a href="#bugreport">バグに注意</a><br />
+<tr class="index"><td>	<a href="#welcome">Haiku へようこそ!</a><br />
 	<a href="#system">システムを把握する</a><br />
+	<a href="#bugreport">バグに注意</a><br />
 	<a href="#software">ソフトウェアをインストールする</a><br />
 	<a href="#update">Haiku を更新する</a><br />
 	<a href="#wifi">Haiku で Wifi を使用する</a><br />
@@ -78,8 +79,19 @@
 
 <h1>
 <a id="welcome" name="welcome">Haiku へようこそ！</a></h1>
-<p>Haiku を選んでくれてとてもうれしいよ! これは私たちの 6 番目の公式リリースです。私たちは新しい開発者をプロジェクトに迎え入れて、ユーザーに Haiku を選択してもらう機会を与えたいと考えています。この 2 番めの<i>ベータリリース</i>は、Haiku の最終リリースに計画された重要な機能をすべて含んでいますが、まだ多くのバグがあり、さらに洗練する必要のある荒削りな部分があります。しかし、私たちはこのリリースがかなり使い物になると考えており、あなたがこのリリースで Haiku の素晴らしいポテンシャルに気づき、私たちの興奮を共有してくれることを願っています。</p>
+<p>Haiku を選んでくれてとてもうれしいよ! これは私たちの 7 番目の公式リリースです。私たちは新しい開発者をプロジェクトに迎え入れて、ユーザーに Haiku を選択してもらう機会を与えたいと考えています。この 3 番めの<i>ベータリリース</i>は、Haiku の最終リリースに計画された重要な機能をすべて含んでいますが、まだ多くのバグがあり、さらに洗練する必要のある荒削りな部分があります。しかし、私たちはこのリリースがかなり使い物になると考えており、あなたがこのリリースで Haiku の素晴らしいポテンシャルに気づき、私たちの興奮を共有してくれることを願っています。</p>
 <p>プロジェクトのウェブサイト、<a hrf="https://www.haiku-os.org">Haiku-os.org</a> にアクセスして、最新のニュースとお知らせを入手してください。</p>
+
+<h2>
+<a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="system" name="system">システムを把握する</a></h2>
+<p>最初の Haiku のリリースは BeOS R5 によく似た、それを再実装するオペレーティングシステムになる予定ですが、長年 Haiku チームによって開発された多くの追加項目や改良があります。そのため、読者が戻ってきた BeOS ユーザーか新規ユーザーならこれらのリンクを見てください:</p>
+<table cellspacing="16" border="0">
+<tr><td align="center"><a href="jp/quicktour.html"><img src="images/quicktour_icon_96.png" /></a><p><a href="jp/quicktour.html">Haiku Quick Tour</a></p></td>
+<td width="24"></td>
+<td align="center"><a href="../userguide/jp/contents.html"><img src="images/userguide_icon_96.png" /></a><p><a href="../userguide/jp/contents.html">Haiku User Guide</a></p></td></tr>
+</table>
+<p>For more interactive help and support, become part of the <a href="https://www.haiku-os.org/community/" class="printurl">Haiku community</a> and join our forums and chat channel.</p>
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -91,16 +103,6 @@
 <ul>
 	<li><a href="https://dev.haiku-os.org/wiki" class="printurl">Haiku バグトラッカー</a></li>
 	<li><a href="jp/bugreports.html">役立つバグレポートのためのヒント</a></li>
-</ul>
-
-<h2>
-<a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="system" name="system">システムを把握する</a></h2>
-<p>最初の Haiku のリリースは BeOS R5 によく似た、それを再実装するオペレーティングシステムになる予定ですが、長年 Haiku チームによって開発された多くの追加項目や改良があります。そのため、読者が戻ってきた BeOS ユーザーか新規ユーザーならこれらのリンクを見てください:</p>
-<ul>
-	<li><a href="jp/quicktour.html">Haiku クイックツアー</a></li>
-	<li><a href="../userguide/jp/contents.html">Haiku ユーザーガイド</a></li>
-	<li><a href="https://www.haiku-os.org/community/" class="printurl">ヘルプとサポート、そしてコミュニティーの一員になるには</a></li>
 </ul>
 
 <h2>
@@ -137,7 +139,7 @@
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="contact" name="contact">連絡を取る</a></h2>
-<p>IRC  (webchat 上の <a href="http://webchat.freenode.net/?channels=haiku">#haiku</a>) や私たちのフォーラムまたはメーリングリストでほかの開発者やユーザーと連絡を取り、議論に参加できます。たくさんの人々が一緒に活動を場合、ルールにしっかりと準拠して行動をする必要があります。<a href="https://www.haiku-os.org/community/ml/etiquette">メーリングリストでのエチケット</a>に準拠して行動するようにお願いします。</p>
+<p>IRC  (webchat 上の <a href="https://webchat.oftc.net/?channels=haiku">#haiku</a>) や私たちのフォーラムまたはメーリングリストでほかの開発者やユーザーと連絡を取り、議論に参加できます。たくさんの人々が一緒に活動を場合、ルールにしっかりと準拠して行動をする必要があります。<a href="https://www.haiku-os.org/community/ml/etiquette">メーリングリストでのエチケット</a>に準拠して行動するようにお願いします。</p>
 <ul>
 	<li><a href="https://www.haiku-os.org/community/irc" class="printurl">IRC チャンネル</a></li>
 	<li><a href="https://www.haiku-os.org/forum" class="printurl">フォーラム</a></li>

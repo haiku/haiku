@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="pt-PT" xml:lang="pt-PT"> 
+<html xmlns="http://www.w3.org/1999/xhtml" lang="pt-PT" xml:lang="pt-PT">
 <head>
-<!-- 
+<!--
  *
- * Copyright 2008-2019, Haiku. All rights reserved.
+ * Copyright 2008-2021, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
- *		Stephan Aßmus <superstippi@gmx.de> 
+ *		Stephan Aßmus <superstippi@gmx.de>
  * Translators:
+ *		Humdinger
  *		'
  *
 -->
@@ -35,6 +36,7 @@
 <li><a href="welcome_de.html">Deutsch</a></li>
 <li><a href="welcome_en.html">English</a></li>
 <li><a href="welcome_es.html">Español</a></li>
+<li><a href="welcome_eo.html">Esperanto</a></li>
 <li><a href="welcome_fr.html">Français</a></li>
 <li><a href="welcome_fur.html">Furlan</a></li>
 <li><a href="welcome_it.html">Italiano</a></li>
@@ -63,42 +65,43 @@
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Índice</td></tr>
 <tr class="index"><td>
-	<a href="#welcome">Bem-vindo ao Haiku!</a><br />
-	<a href="#bugreport">Cuidado com os <i>Bugs</i></a><br />
-	<a href="#system">Conhecer o sistema</a><br />
-	<a href="#software">Instalar mais software</a><br />
-	<a href="#update">Atualizar o Haiku</a><br />
-	<a href="#wifi">Wifi no Haiku</a><br />
-	<a href="#api">Conhecer a API</a><br />
-	<a href="#contact">Entrar em contacto</a>
+	<a href="#welcome">Welcome to Haiku!</a><br />
+	<a href="#system">Getting to know the system</a><br />
+	<a href="#bugreport">Beware of Bugs</a><br />
+	<a href="#software">Installing new software</a><br />
+	<a href="#update">Updating Haiku</a><br />
+	<a href="#wifi">Wifi in Haiku</a><br />
+	<a href="#api">Getting to know the API</a><br />
+	<a href="#contact">Getting in contact</a>
 </td></tr>
 </table>
 
 <h1>
 <a id="welcome" name="welcome">Bem-vindo ao Haiku!</a></h1>
-<p>Thanks for checking out Haiku! This is our sixth public release. We hope to attract new developers to our project and give users a chance to check out Haiku. While this second <i>beta release</i> includes all major features planned for the final Haiku release, it still has many bugs and a few rough edges that need further polishing. However, we think that this release is quite usable and hope it lets you discover Haiku's great potential and that you share our excitement.</p>
+<p>Thanks for checking out Haiku! This is our seventh public release. We hope to attract new developers to our project and give users a chance to check out Haiku. While this third <i>beta release</i> includes all major features planned for the final Haiku release, it still has bugs and a few rough edges that need further polishing. However, we think that this release is quite usable and hope it lets you discover Haiku's great potential and that you share our excitement.</p>
 <p>Visite o <i>site</i> do nosso projeto em  <a href="https://www.haiku-os.org">Haiku-os.org</a> para saber das últimas notícias e comunicados.</p>
+
+<h2>
+<a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="system" name="system">Conhecer o sistema</a></h2>
+<p>Ainda que as primeiras versões do Haiku sejam muito semelhantes ao BeOS R5, o sistema operativo que está a reimplementar, há muitas novidades e melhoramentos que foram desenvolvidos pela equipa do Haiku ao longo dos anos. Portanto, quer tenha sido utilizador do BeOS, quer seja um novo utilizador, dê uma olhada nestas ligações:</p>
+<table cellspacing="16" border="0">
+<tr><td align="center"><a href="pt_PT/quicktour.html"><img src="images/quicktour_icon_96.png" /></a><p><a href="pt_PT/quicktour.html">Haiku Quick Tour</a></p></td>
+<td width="24"></td>
+<td align="center"><a href="../userguide/pt_PT/contents.html"><img src="images/userguide_icon_96.png" /></a><p><a href="../userguide/pt_PT/contents.html">Haiku User Guide</a></p></td></tr>
+</table>
+<p>For more interactive help and support, become part of the <a href="https://www.haiku-os.org/community/" class="printurl">Haiku community</a> and join our forums and chat channel.</p>
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="bugreport" name="bugreport">Cuidado com os <i>Bugs</i></a></h2>
 <p>Estivemos a trabalhar arduamente para corrigir <i>bugs</i> potencialmente críticos, entretanto, por ser uma versão beta, é natural que ainda existam alguns à espera de serem descobertos.</p>
-<div class="box-warning">Desencorajamos o uso de versões beta como sistemas de produção. Os seus dados poderão ser seriamente alterados, corrompidos ou completamente destruídos. Mantenha as cópias de segurança atualizadas!</div>
+<div class="box-warning">Desencorajamos o uso de versões beta como sistemas de produção. Os seus dados poderiam ser seriamente alterados, corrompidos ou completamente destruídos. Mantenha as suas cópias de segurança atualizadas!</div>
 
 <p>Uma das principais razões para lançar uma versão beta é para cativar mais pessoas para testar o sistema e descobrir falhas ou oferecer sugestões para futuros melhoramentos. Por favor relate erros e sugestões de melhoramentos no nosso sistema de acompanhamento de <i>bugs</i>, depois de usar a nossa ferramenta de pesquisa, para evitar duplicados.</p>
 <ul>
 	<li><a href="https://dev.haiku-os.org/wiki" class="printurl">Sistema de Acompanhamento de Problemas do Haiku</a></li>
 	<li><a href="pt_PT/bugreports.html">Dicas para um relatório de erros útil</a></li>
-</ul>
-
-<h2>
-<a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="system" name="system">Conhecer o sistema</a></h2>
-<p>While the first release(s) of Haiku will be very much like the BeOS R5, the operating system it is reimplementing, there are many additions and improvements that were developed by the Haiku team over the years. So, if you're a returning BeOS user or are new user, have a look at these links:</p>
-<ul>
-	<li><a href="pt_PT/quicktour.html">Visita Guiada ao Haiku</a></li>
-	<li><a href="../userguide/pt_PT/contents.html">Guia do Utilizador do Haiku</a></li>
-	<li><a href="https://www.haiku-os.org/community/" class="printurl">Obter ajuda e suporte, e tornar-se parte da comunidade</a></li>
 </ul>
 
 <h2>
@@ -138,11 +141,11 @@ As divergências a partir da BeOS API e os acréscimos específicos do Haiku sã
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="contact" name="contact">Entrar em contacto</a></h2>
-<p>Entre em contacto com outros desenvolvedores e utilizadores, e junte-se às discussões no IRC (<a href="http://webchat.freenode.net/?channels=haiku">#haiku</a> no <i>web chat</i>), nos nossos fóruns ou nas listas de discussão (<i>mailing lists</i>). Quando se juntam muitas pessoas diferentes, devem ser estabelecidas regras para manter efetiva a comunicação. Por favor, respeite a nossa <a href="https://www.haiku-os.org/community/ml/etiquette">Etiqueta nas Listas de Discussão</a>.</p>
+<p>Entre em contacto com outros desenvolvedores e utilizadores, e junte-se às discussões no IRC (<a href="https://webchat.oftc.net/?channels=haiku">#haiku</a> no <i>web chat</i>), nos nossos fóruns ou nas listas de discussão (<i>mailing lists</i>). Quando se juntam muitas pessoas diferentes, devem ser estabelecidas regras para manter efetiva a comunicação. Por favor, respeite a nossa <a href="https://www.haiku-os.org/community/ml/etiquette">Etiqueta nas Listas de Discussão</a>.</p>
 <ul>
-	<li><a href="https://www.haiku-os.org/community/irc" class="printurl">IRC channels</a></li>
-	<li><a href="https://www.haiku-os.org/forum" class="printurl">Forums</a></li>
-	<li><a href="https://www.freelists.org/list/haiku" class="printurl">General mailing list</a></li>
+	<li><a href="https://www.haiku-os.org/community/irc" class="printurl">Canais de IRC</a></li>
+	<li><a href="https://www.haiku-os.org/forum" class="printurl">Fóruns</a></li>
+	<li><a href="https://www.freelists.org/list/haiku" class="printurl">Mailing List Geral</a></li>
 	<li><a href="https://www.freelists.org/list/haiku-development" class="printurl">Development mailing list concerning Haiku itself</a></li>
 	<li><a href="https://www.freelists.org/list/haiku-3rdparty-dev" class="printurl">Mailing list for 3rd party application programmers</a></li>
 	<li><a href="https://www.haiku-os.org/community/ml" class="printurl">Overview of all mailing lists</a></li>

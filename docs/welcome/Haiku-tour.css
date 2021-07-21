@@ -7,6 +7,23 @@
  *		Augustin Cavalier <waddlesplash>
  */
 
+body {
+	position: fixed;
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+}
+
+body > div {
+	flex: 0 0 auto;
+}
+
+body #content {
+	flex: 1 1 auto;
+	overflow: auto;
+}
+
 /* Some headers act as anchors, don't give them a hover effect */
 h1 a:hover, a:active {
 	text-decoration: none;
@@ -40,18 +57,70 @@ div.nav {
 
 div.topic {
 	position: relative;
-	min-height: calc(100vh - 100px);
 	margin-bottom: 5vh;
-	padding-bottom: 100px;
+	clear: both;
 }
 
-div.further {
-	position: absolute;
-	bottom: 0;
-	width: 100%;
-	color: silver;
-	background: #f8f8f8;
-	border-top: dotted thin #a0a0a0;
-	padding: 5px;
+table.index.further {
+	width: 25%;
+	font-size: 90%;
+}
+
+table.index.further tr.index td {
+	text-align: center;
+}
+
+#index {
+	position: relative;
+	z-index: 10;
+}
+
+ul.lang-menu {
+	overflow-x: hidden;
+	overflow-y: auto;
+	max-height: calc(100vh - 84px);
+	padding-bottom: 2px;
+}
+
+.hide-no-js {
+	display: none;
+}
+
+#bottom-nav {
+	text-align: center;
+	font-size: 150%;
+	background: #e0e0e0;
+	color: white;
+}
+
+.navbutton {
+	display: inline-block;
+	padding: 5px 1em;
+	background: silver;
+}
+
+.navbutton:hover {
+	text-decoration: none;
+}
+
+
+/* Slides */
+
+body.slides #content div.topic {
+	display: none;
+}
+
+body.slides #content div.topic.current-page {
+	display: block;
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
+.slide-only {
+	display: none;
+}
+
+body.slides .slide-only {
+	display: initial;
 }
 
