@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2013-2020 Haiku. All rights reserved.
+ * Copyright 2013-2021 Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -24,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>ユーザーガイド</span></div>
 </div>
 
 <div class="nav">
@@ -36,6 +36,7 @@
 <li><a href="../../de/applications/haikudepot.html">Deutsch</a></li>
 <li><a href="../../en/applications/haikudepot.html">English</a></li>
 <li><a href="../../es/applications/haikudepot.html">Español</a></li>
+<li><a href="../../eo/applications/haikudepot.html">Esperanto</a></li>
 <li><a href="../../fr/applications/haikudepot.html">Français</a></li>
 <li><a href="../../fur/applications/haikudepot.html">Furlan</a></li>
 <li><a href="../../it/applications/haikudepot.html">Italiano</a></li>
@@ -70,7 +71,8 @@
                 <a href="#menu">ツールと表示メニュー</a><br />
                 <a href="#account">ユーザーアカウントの作成</a><br />
                 <a href="#rating">評価とコメント</a><br />
-                <a href="#logs">診断ログ</a><br /></td></tr>
+                <a href="#logs">診断ログ Logs</a><br />
+                <a href="#tips">ヒント</a><br /></td></tr>
 </table>
 
 <h2><img src="../../images/apps-images/haikudepot-icon_64.png" alt="haikudepot-icon_64.png" width="64" height="64" />HaikuDepot</h2>
@@ -127,10 +129,11 @@
 </ul>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="menu" name="menu">ツールと表示メニュー</a></h2>
-<p>ウィンドウの一番上にある<span class="menu">ツール (Tools)</span> メニュー内に、<span class="menu">リポジトリを更新 (Refresh repositories)</span> する項目があります。これは、リポジトリから利用可能なすべてのパッケージの最新リストを要求します。<br />
+<a id="menu" name="menu">HaikuDepot と表示メニュー</a></h2>
+<p>ウィンドウの一番上にある<span class="menu">HaikuDepot</span> メニュー内に、<span class="menu">リポジトリを更新 (Refresh repositories)</span> する項目があります。これは、リポジトリから利用可能なすべてのパッケージの最新リストを要求します。<br />
 もうひとつの項目は、<span class="menu">リポジトリの管理... (Manage repositories...)</span> です。それは、<a href="../preferences/repositories.html">リポジトリ</a>プレファレンスを開き、リポジトリの追加 / 削除、または有効化 / 無効化を行います。<br />
-<span class="menu">更新のチェック... (Check for updates...)</span> は、<a href="../apps/softwareupdater.html">ソフトウェアの更新 (SoftwareUpdater)</a> を開き、更新されたパッケージの検索とインストールを行います。</p>
+<span class="menu">更新のチェック... (Check for updates...)</span> は、<a href="../apps/softwareupdater.html">ソフトウェアの更新 (SoftwareUpdater)</a> を開き、更新されたパッケージの検索とインストールを行います。<br />
+<span class="menu">設定... (Settings...)</span> は、現在のところ 1 つのオプション、<span class="menu">匿名使用データーをHaikuDepotServerとシェアする (Share anonymous data with HaikuDepotServer)</span> を持つウィンドウを開きます。データーは例えば、パッケージの閲覧およびインストールされた回数に関するカウンターを増やすのに使われます。これにより、パッケージを　”推奨パッケージ (Featured packages)" リストに載るように決定することができます。</p>
 <p><span class="menu">表示 (Show)</span> の下では、<span class="menu">開発用パッケージ (Develop packages)</span> および、<span class="menu">ソースパッケージ (Source packages)</span> をパッケージリスト内に表示することも選択できます。これらは通常のユーザーには興味のあるものではなく、リストをごちゃごちゃさせるだけです。しかし、パッケージのライブラリやヘッダーなどを必要とする人たちにとっては、それらに依存するプログラムの開発やコンパイルのために重要となります。</p>
 <p>さらに興味深いものは、<span class="menu">使用可能なパッケージ (Available packages)</span> と、<span class="menu">インストール済みパッケージ (Installed packages)</span> だけを表示するオプションです。</p>
 
@@ -143,8 +146,9 @@
 <li>8 文字以上の長さで、2 文字以上の大文字と、2 文字以上の数字を含むパスワードを使用してください。</li>
 <li>有効な email アドレスを入力してください (パスワードを忘れた場合、新しいパスワードが必要なら送信されます)。</li>
 <li>キャプチャを解いてください。</li>
-<li>ユーザーが16歳以上で、下にリンクされた使用条件を読んだことを確認したら、チェックマークを付けます。</li></ul>
+<li>ユーザーが17歳以上で、下にリンクされた使用条件を読んだことを確認したら、チェックマークを付けます。</li></ul>
 <p>ログイン後、HaikuDepot の上右端のメニューは、<span class="menu">(...) としてログイン (Logged in as (...))</span> となるでしょう。ここで、() 内はユーザー名を表示しています。メニューは直ちに、<span class="menu">アカウントの変更… (Switch account...)</span> または <span class="menu">ログアウト (Log out)</span> を提供します。</p>
+<p>上記のチェックボックスをクリックしたときに、本当に同意したかのリマインダーとして、there are menu items to <span class="menu">最新 / 同意済 使用条件... を表示 (View latest/agreed usage conditions...) </span>メニュー項目があります。</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="rating" name="rating">評価とコメント</a></h2>
@@ -155,7 +159,7 @@
 </p>
 <p>いつでも評価ウィンドウに戻ってコメントの編集とパッケージの再評価ができます。また、<span class="menu">ほかのユーザーがこの評価を見ることができます (This rating is visible to other users)</span> チェックボックスを無効にすれば、ほかのユーザーにコメントを見せないようにできます。</p>
 
- <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="logs" name="logs">診断ログ</a></h2>
 <p>HaikuDepot が使用されるとき、ネットワークおよびローカルサービスと対話します。時々アプリケーションが作成されたときには予想されていなかった方法で、物事は悪くなることがあるかもしれません。そのような場合、エラーメッセージは非常に曖昧なものになるかもしれません。与えられた問題を診断するために、HaikuDepot はアプリケーションの動作のログを提供できます。</p>
 <p>ログを見てより掘り下げた情報を得るようにエラーメッセージが提案するかもしれません。または、問題をHaiku <a href="https://dev.haiku-os.org/">bug tracking system</a> に提出するときに、ログを提供するように要求されるかもしれません。</p>
@@ -163,6 +167,11 @@
 <pre>HaikuDepot -v debug</pre>
 <p>コマンドは、<span class="cli">-v</span> フラグを使って、診断ログの冗長性を制御します。使用できる値は、<span class="cli">off</span>, <span class="cli">info</span>, <span class="cli">debug</span> および <span class="cli">trace</span> です。<span class="cli">off</span> を使用すると、ほんの少しの量のログを出力します。一方、<span class="cli">trace</span> は、最大の詳細なログを出力します。</p>
 <p>HaikuDepot が起動して、アプリケーションと対話するとき、ターミナルウィンドウ内にテキストがスクロールするのを見るでしょう。これが診断ログです。</p>
+
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="tips" name="tips">ヒント</a></h2>
+<p>HaikuDepot アプリケーション内から直接でなく、新規および更新されたアプリケーションを把握する方法があります。そのためには、<a href="https://depot.haiku-os.org">Haiku Depot Server</a> ウェブサイトで RSS ATOM フィードを作成する必要があります。右上の "ハンバーガー" メニューをクリックして、データーの下の<span class="menu">フィードURL作成 (Build Feed URL)</span> を選んでください。<br />
+そのページには、もっとも興味を引く数個の設定があります。すべての新規 / 更新されたパッケージに関するフィードの受け取りに加えて、興味のあるパッケージ名を追加することもできます。<span class="button">フィードURL作成</span> ボタンをクリックすると RSS URL を得ます。それは、BePodder, QuiteRSS, fRiSS などのような RSS フィードリーダーに貼り付けられます。</p>
 </div>
 </div>
 

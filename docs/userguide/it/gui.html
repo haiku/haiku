@@ -13,6 +13,7 @@
  *		Barrett
  *		fyskij
  *		MichaelPeppers
+ *		Gabriele
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -37,6 +38,7 @@
 <li><a href="../de/gui.html">Deutsch</a></li>
 <li><a href="../en/gui.html">English</a></li>
 <li><a href="../es/gui.html">Español</a></li>
+<li><a href="../eo/gui.html">Esperanto</a></li>
 <li><a href="../fr/gui.html">Français</a></li>
 <li><a href="../fur/gui.html">Furlan</a></li>
 <li><a href="../hu/gui.html">Magyar</a></li>
@@ -56,7 +58,7 @@
 <span>
  «  <a href="filesystem-layout.html">La struttura del FileSystem di Haiku</a> 
 ::  <a href="contents.html" class="uplink">Contenuti</a> 
-::  <a href="workspaces.html">Workspaces</a>  »
+::  <a href="workspaces.html">Spazi di lavoro</a>  »
 </span></div>
 </div>
 
@@ -67,33 +69,33 @@
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Indice</td></tr>
 <tr class="index"><td>
-		<a href="#move-resize">Easy moving and resizing</a><br />
+		<a href="#move-resize">Muovere e ridimensionare le finestre</a><br />
                 <a href="#stack-tile">Stack &amp; Tile</a><br />
-                <a href="#open-save-panel">Open and save panels</a><br />
-                <a href="#replicants">Replicants</a></td></tr>
+                <a href="#open-save-panel">I pannelli apri e salva</a><br />
+                <a href="#replicants">Replicanti</a></td></tr>
 </table>
 
 <h1>Interfaccia grafica di Haiku</h1>
 
-<p>Haiku's graphical user interface is an integral part of the system. Unlike other Unix-like operating systems, there is no separate window manager and booting just into a command-line shell is not possible. Haiku's focus being on the desktop user, this is just not considered necessary.</p>
+<p>L'interfaccia grafica (GUI) di Haiku è parte integrante del sistema. Al contrario dei sistemi operativi Unix, non c'è un gestore delle finestre (window manager) separato e l'avvio a riga di comando non è possibile; ciò è semplicemente non ritenuto necessario, il focus di Haiku è l'utente desktop.</p>
 <p>Probabilente l'utente avrà già esperienza con altri ambienti grafici, quindi salteremo i classici menu da tasto destro, drag &amp; drop, ecc...e cercheremo invece di focalizzarci sui pochi aspetti unici della GUI di Haiku.</p>
 <img src="images/gui-images/gui.png" alt="gui.png" />
-<p>Alcuni aspetti nella GUI di Haiku non sono evidenti e quindi devono essere approfonditi.</p>
+<p>Alcuni aspetti della GUI di Haiku non sono evidenti e quindi devono essere approfonditi.</p>
 <ol>
-<li><p>La Deskbar è il menu "Start" di Haiku e la barra applicazioni. Si consiglia di leggere il capitolo <a href="deskbar.html">Deskbar</a>.</p></li>
+<li><p>La Deskbar è il menu "Avvio" di Haiku e la barra applicazioni. Si consiglia di leggere il capitolo <a href="deskbar.html">Deskbar</a>.</p></li>
 <li>Il tab giallo offre molto di più che il nome del programma o il nome del file aperto:
-<ul><li>E' possibile spostarlo tenendo premuto il tasto<span class="key">SHIFT</span> mentre viene trascinato in un'altra posizione, consentendo di impilare un certo numero di finestre ed accedere ad esse comodamente dal nome del loro tab.</li>
+<ul><li>È possibile spostarlo tenendo premuto il tasto<span class="key">SHIFT</span> mentre viene trascinato in un'altra posizione, consentendo di impilare un certo numero di finestre ed accedere ad esse comodamente dal nome del loro tab.</li>
 <li>Si può minimizzare una finestra con un doppio click sul suo tab, (o con <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">M</span>), è possibile anche avere accesso alle finestre nascoste dalla loro voce nella <a href="deskbar.html">Deskbar</a> o nel <a href="twitcher.html">Twitcher</a>.</li>
 <li>Si può mandare una finestra in background con un click destro sul suo tab (o sul suo bordo).</li></ul></li>
 <li><p>Il pulsante di chiusura.</p></li>
-<li><p>The "zoom" button (or <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span>). In most applications, this will expand a window to maximum size without obscuring the Deskbar (hold <span class="key">SHIFT</span> to cover the Deskbar as well). It doesn't have to, however. Tracker windows, for example, will resize to best fit the contents.</p></li>
-<li><p>The window border. Left-dragging moves the window, right-dragging resizes.</p></li>
-<li><p>The resize corner.</p></li>
+<li><p>Il bottone "zoom" (o <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span>). Nella maggior parte delle applicazioni, espanderà la finestra alla dimensione massima senza coprire la Deskbar (tieni premuto <span class="key">SHIFT</span> per coprire anche la Deskbar). Ma questo, tuttavia, non è obbligatorio. Le finestre del Tracker, per esempio, verranno ridimensionate per adattarsi nel miglior modo possibile al contenuto.</p></li>
+<li><p>Il bordo della finestra. Trascinando con il tasto sinistro, la finestra si sposterà. Con il tasto destro, invece, si ridimensionerà.</p></li>
+<li><p>L'angolo di ridimensionamento.</p></li>
 </ol>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="move-resize" name="move-resize">A quick way to move or resize windows</a></h2>
+<a id="move-resize" name="move-resize">Muovere e ridimensionare le finestre</a></h2>
 <p>Moving and resizing windows is a large part of interacting with several concurrently running applications. Instead of aiming at the small yellow title tab or the even tinier window border, there's a more convenient way to move a window. Also, additionally to its small size, the resize corner has another limitation: It only allows resizing at and in the direction of the lower right corner. <br />Right-dragging a border for resizing works, but again you'll have to aim carefully.</p>
 <p>To address these issues, Haiku provides a neat solution using the window management key combo <span class="key">CTRL</span> <span class="key">ALT</span> and the mouse. See also chapter <a href="keyboard-shortcuts.html#general">Shortcuts and key combinations</a> for more shortcuts concerning window management.</p>
 <img src="images/gui-images/resizing.png" alt="resizing.png" />
@@ -108,7 +110,7 @@ In the example below, a Tracker window with bookmarks is tiled to the left of a 
 <img src="images/gui-images/gui-s+t.gif" alt="gui-s+t.gif" />
 <p>Connected like this, the group of windows can be moved and resized together - a nice arrangement to work in a more project centric environment. Instead of looking for the right browser window with documentation, editor and Tracker windows and maybe a related email concerning one project you are currently working on, just stack&amp;tile them together.</p>
 <p>Doing the actual arranging of windows is easy: Hold down <span class="key">OPT</span> while dragging a window by its tab close to another window's tab or border until it's highlighted and release the mouse button.</p>
-<p>Stack &amp; Tile consists of two related parts.</p>
+<p>Lo "Stack &amp; Tile" consiste in due parti.</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td><img src="images/gui-images/gui-stacking.png" alt="gui-stacking.png" /></td><td width="10"></td>
 <td><p>"<i>Stacking</i>" is putting windows on top of each other, automatically moving the yellow tabs into position.<br />
@@ -160,9 +162,9 @@ Tutti i favoriti sono conservati nella cartella <span class="path">/boot/home/co
 <p>I replicanti sono piccole parti di applicazioni che possono essere integrate in altri programmi.
 A patto che l'opzione della Deskbar <span class="menu">Visualizza i Replicanti</span> sia stata attivata, si potrà riconoscere una parte "replicabile" di un'applicazione dalla sua piccola maniglia, normalmente nell'angolo in basso a destra:</p>
 <img src="../images/gui-images/replicant.png" alt="replicant.png" />
-<p>Il luogo più significante che accetta i replicanti è il Desktop: basta semplicemente trascinare la piccola maniglia su di esso.
-Da ora in poi è parte del Desktop e l'applicazione principale del replicante non deve essere avviata per farlo funzionare.<br />
-Un tasto destro sull'uncino del replicante permette di visualizzare la finestra <span class="menu">About</span> dell'applicazione principale e rimuovere il replicante.</p>
+<p>Il luogo più significante che accetta i replicanti è la Scrivani: basta semplicemente trascinare la piccola maniglia su di esso.
+Da quel momento in poi sarà parte della Scrivania e l'applicazione principale del replicante non deve essere avviata per farlo funzionare.<br />
+Un tasto destro sull'uncino del replicante permette di visualizzare la finestra <span class="menu">Informazioni</span> dell'applicazione principale e rimuovere il replicante.</p>
 <div class="box-info">In caso di difficoltà con un replicante sul Desktop e se non si riesce a rimuoverlo, basta cancellare <span class="path">~/config/settings/Tracker/tracker_shelf</span>. Sfortunatamente questo rimuoverà 
 <i>tutti </i> i replicanti dal Desktop.</div>
 <p>Esempi di applicazioni replicabili sono i grafici dell'<a href="applications/activitymonitor.html">ActivityMonitor</a>, l'<a href="workspaces.html">applet Workspace</a> o <a href="applications/deskcalc.html">DeskCalc</a>.</p>
@@ -173,7 +175,7 @@ Un tasto destro sull'uncino del replicante permette di visualizzare la finestra 
 <div class="inner"><span>
  «  <a href="filesystem-layout.html">La struttura del FileSystem di Haiku</a> 
 ::  <a href="contents.html" class="uplink">Contenuti</a> 
-::  <a href="workspaces.html">Workspaces</a>  »
+::  <a href="workspaces.html">Spazi di lavoro</a>  »
 </span></div>
 </div>
 

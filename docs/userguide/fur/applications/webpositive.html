@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2013, Haiku. All rights reserved.
+ * Copyright 2010-2021, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -35,6 +35,7 @@
 <li><a href="../../de/applications/webpositive.html">Deutsch</a></li>
 <li><a href="../../en/applications/webpositive.html">English</a></li>
 <li><a href="../../es/applications/webpositive.html">Español</a></li>
+<li><a href="../../eo/applications/webpositive.html">Esperanto</a></li>
 <li><a href="../../fr/applications/webpositive.html">Français</a></li>
 <li><a href="../../it/applications/webpositive.html">Italiano</a></li>
 <li><a href="../../hu/applications/webpositive.html">Magyar</a></li>
@@ -76,10 +77,10 @@ In bas tal barcon si à une sbare di stât, che e mostre il URL dal sît cjariâ
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Impostazions</h2>
 <p>Dal menù <span class="menu">Barcon</span> tu puedis vierzi un panel <span class="menu">Impostazions</span> par configurâ cualchi element essenziâl di WebPositive.</p>
 <img src="../images/apps-images/webpositive-settings.png" alt="webpositive-settings.png" />
-<p>La prime schede e à a ce fâ cu lis impostazions gjenerâls: Cuâl file o URL al servìs tant che <span class="menu">Pagjine iniziâl</span>, Ce che si à di doprâ come <span class="menu">Pagjine di ricercje</span>, cuale <span class="menu">Cartele dai file discjariâts</span> doprâ pe robe che tu otegnis de rêt.<br />
+<p>La prime schede e à a ce fâ cu lis impostazions gjenerâls: cuâl file o URL al servìs tant che <span class="menu">Pagjine iniziâl</span>, ce che si à di doprâ come <span class="menu">Pagjine di ricercje</span> (se tu stabilissis un motôr di ricercje<span class="menu">Personalizât</span>, "<i>%s</i>" al ven doprât pe variabile dal tiermin di cirî), cuale <span class="menu">Cartele dai file discjariâts</span> doprâ pe robe che tu otegnis de rêt.<br />
 Doi menù a tende ti permetin di decidi cuale pagjine cjariâ - se si 'nd à cualchidune - cuant che si vierç un gnûf barcon o schede.<br />
 Gracie aes caselis di selezion lì sot tu puedis evitâ di mostrâ la sbare des schedis cuant che e je vierte dome une pagjine. Si pues dî ae interface di WebPositive di platâsi in automatic cuant che si è in modalitât plen visôr, e si pues platâ in automatic il pontadôr dal mouse ogni volte che nol ven mot par un pôc.<br />
-Ae fin, tu puedis decidi se includi il boton "Inizi" (chel de cjasute) inte sbare di navigazion e stabilî par trops dîs che il navigadôr al à di visâsi i sîts che tu âs visitât, lassantju inte sô cronologjie.</p>
+Infin, tu puedis decidi se includi il boton "Inizi" (chel de cjasute) inte sbare di navigazion e stabilî par trops dîs che il navigadôr al à di visâsi i sîts che tu âs visitât, lassantju inte sô cronologjie.</p>
 <p>Inte seconde schede tu puedis sielzi i caratars doprâts in maniere predefinide, i caratars serif, no-serif e a spaziadure fisse e stabilî lis lôr dimensions predefinidis.</p>
 <p>La ultime schede e ven doprade par configurâ li servidôr proxy.</p>
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Sgarfâ</h2>
@@ -91,8 +92,19 @@ Ae fin, tu puedis decidi se includi il boton "Inizi" (chel de cjasute) inte sbar
 <li><p>Dal menù <span class="menu">Viodude</span> tu puedis fâ <span class="menu">Aumente dimension</span> e <span class="menu">Diminuìs dimension</span> di une pagjine. Si à ancje la opzion par dî <span class="menu">Ingrandìs dome il test</span>, lassant dutis lis imagjins aes lôr dimensions origjinâls.</p></li>
 <li><p>Se tu passis ae modalitât plen visôr e tu âs ativât la impostazion par platâ la interface, chê e sparirà dopo un secont. Par fâle vignî fûr un moment, al baste spostâ il pontadôr te te part superiôr dal schermi.</p></li>
 <li><img src="../images/apps-images/webpositive-locator.png" alt="webpositive-locator.png" />
-<p>Intant che tu scrivis intal cjamp di test pes direzions web, il navigadôr al cumbine la stringhe cui sîts che tu âs za visitât e ju liste lì sot. Tu puedis continuâ a zontâ letaris, cussì di scurtâ la liste opûr sielzi une vôs cun <span class="key">↑</span> o <span class="key">↓</span>. <span class="key">INVIE</span> al cjariarà la pagjine. Tu puedis ancje doprâ il boton lontan a diestre che al servìs par tornâ a cjariâ la pagjine.<br />
-Lis stringhis che no vegnin ricognossudis tant che URL a vignaran cirudis in Google, cussì il cjamp pe direzion al doplee la sô funzion tant che rapide scurte pes ricercjis sul web.</p></li>
+<p>Intant che tu scrivis intal cjamp di test pes direzions web, il navigadôr al cumbine la stringhe cui sîts che tu âs za visitât e ju liste lì sot. Tu puedis continuâ a zontâ letaris, cussì di scurtâ la liste opûr sielzi une vôs cun <span class="key">↑</span> o <span class="key">↓</span>. <span class="key">INVIE</span> al cjariarà la pagjine. Tu puedis ancje doprâ il boton lontan a diestre, che al servìs ancje par tornâ a cjariâ la pagjine.<br />
+Lis stringhis che no vegnin ricognossudis tant che URLs a vignaran cirudis cul motôr di ricercje stabilît intes impostazions di WebPositive, cussì il cjamp pe direzion al doplee la sô funzion tant che rapide scurte pes ricercjis sul web.</p>
+<div class="box-info"><p>WebPositive al supuarte lis scurtis rapidis a diviers motôrs di ricercje par cirî daurman i tiermins. Al baste inserî la scurte di une letare sole  cun daûr il tiermin di cirî.</p>
+<ul>
+<li>"g” par Google</li>
+<li>“b” par Bing</li>
+<li>“w” par Wikipedia</li>
+<li>“d” par DuckDuckGo</li>
+<li>“a” par Baiku</li>
+<li>“y” par Yandex</li>
+<li>“e” par Ecosia</li>
+<li>“q” par Qwant</li>
+</ul></div></li>
 <li><p>Fasint clic diestri si vierç un menù contestuâl che, in base al ogjet che si à fat clic, al ufrìs la pussibilitât di vierzi il colegament intung gnûf barcon o intune gnove schede, discjariâ l'ogjet e vie indenant.</p></li>
 <li><p><span class="menu">Modifiche | Cjate</span> al mostre une sbare di ricercje in bas par scomençâ une ricercje inte pagjine. I risultâts inte pagjine che a corispuindin a vegnin evidenziâts.</p></li>
 </ul>

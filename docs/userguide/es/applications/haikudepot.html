@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2013-2020 Haiku. All rights reserved.
+ * Copyright 2013-2021 Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -24,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Guía del usuario</span></div>
 </div>
 
 <div class="nav">
@@ -35,6 +35,7 @@
 <li><a href="../../ca/applications/haikudepot.html">Català</a></li>
 <li><a href="../../de/applications/haikudepot.html">Deutsch</a></li>
 <li><a href="../../en/applications/haikudepot.html">English</a></li>
+<li><a href="../../eo/applications/haikudepot.html">Esperanto</a></li>
 <li><a href="../../fr/applications/haikudepot.html">Français</a></li>
 <li><a href="../../fur/applications/haikudepot.html">Furlan</a></li>
 <li><a href="../../it/applications/haikudepot.html">Italiano</a></li>
@@ -61,25 +62,26 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
+<div class="box-info">La traducción de esta página aún no está completa. Hasta que lo esté, las partes sin traducir se muestran en el original en inglés.</div>
 
 <table class="index" id="index" summary="index">
-<tr class="heading"><td>Contenido</td></tr>
+<tr class="heading"><td>Índice</td></tr>
 <tr class="index"><td><a href="#filter">The Filter</a><br />
                 <a href="#list">The List</a><br />
                 <a href="#info">The Info Area</a><br />
-                <a href="#menu">Tools and Show menus</a><br />
+                <a href="#menu">HaikuDepot and Show menu</a><br />
                 <a href="#account">Creating a User Account</a><br />
                 <a href="#rating">Rating and Commenting</a><br />
                 <a href="#logs">Diagnostic Logs</a><br />
+                <a href="#tips">Tips</a><br />
 </td></tr>
 </table>
 
 <h2><img src="../../images/apps-images/haikudepot-icon_64.png" alt="haikudepot-icon_64.png" width="64" height="64" />HaikuDepot</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
+<tr><td>Barra de escritorio:</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
 <tr><td>Ubicación:</td><td></td><td><span class="path">/boot/system/apps/HaikuDepot</span></td></tr>
-<tr><td>Configuración:</td><td></td><td><span class="path">~/config/settings/HaikuDepot/main_settings</span><br />
+<tr><td>Configuraciones:</td><td></td><td><span class="path">~/config/settings/HaikuDepot/main_settings</span><br />
 <span class="path">~/config/cache/HaikuDepot/</span> - descripciones, capturas de pantallas, íconos y demás, almacenados en memoria caché</td></tr>
 </table>
 <p><br /></p>
@@ -131,10 +133,11 @@ En el medio hay comentarios de usuarios con su seudónimo, cuantas estrellas le 
 </ul>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="menu" name="menu">Menú de Herramientas y Mostrar</a></h2>
-<p>En el menú de <span class="menu">Herramientas</span> en la parte superior de la ventana, encontrará un elemento para <span class="menu">Refrescar repositorios</span>. Esto requerirá una lista actualizada de todos los paquetes disponibles de los repositorios.<br />
-El segundo elemento es <span class="menu">Administrar repositorios...</span>. Abre las preferencias de <a href="../preferences/repositories.html">Repositorios</a>, para añadir/quitar y activar repositorios.<br />
-<span class="menu">Revisa por actualizaciones...</span> abre <a href="../apps/softwareupdater.html">SoftwareUpdater</a> para buscar e instalar los paquetes actualizados.</p>
+<a id="menu" name="menu">HaikuDepot and Show menu</a></h2>
+<p>In the <span class="menu">HaikuDepot</span> menu at the top of the window, you'll find an item to <span class="menu">Refresh repositories</span>. This will request an up-to-date list of all available packages from the repositories.<br />
+The second item is to <span class="menu">Manage repositories...</span>. It opens the <a href="../preferences/repositories.html">Repositories</a> preferences, to add/remove or disable and enable repositories.<br />
+<span class="menu">Check for updates...</span> opens the <a href="../apps/softwareupdater.html">SoftwareUpdater</a> to search and install updated packages.<br />
+<span class="menu">Settings...</span> opens a window with the currently only option: <span class="menu">Share anonymous usage data with HaikuDepotServer</span>. The data is used to, for example, increase a counter on how often a package is viewed and installed, which then can determine if a package is promoted to the "Featured packages" list.</p>
 <p>Bajo <span class="menu">Mostrar</span> puede escoger ver los display <span class="menu">Paquetes de desarrollo</span> y <span class="menu">Paquetes fuente</span> en la lista de paquetes. Para el usuario normal estos no son de ningún interés y solamente sobrecargaría la lista. No obstante, son importantes para quienes necesitan las bibliotecas, encabezados, etc. de un paquete para desarrollar y compilar programas que dependan de ellos.</p>
 <p>De mayor interés son las opciones para sólo mostrar <span class="menu">Paquetes disponibles</span> y <span class="menu">Paquetes instalados</span>.</p>
 
@@ -147,8 +150,9 @@ El segundo elemento es <span class="menu">Administrar repositorios...</span>. Ab
 <li>usar una contraseña de al menos 8 caracteres con al menos 2 mayúsculas y 2 números</li>
 <li>proveer una dirección de correo electrónico válida (si quiere una nueva contraseña enviada en caso que la olvide)</li>
 <li>resolver el captcha</li>
-<li>tick the checkmarks to confirm you're over 16 and have read the usage conditions linked below them.</li></ul>
+<li>tick the checkboxes to confirm you're over 16 and have read the usage conditions linked below them.</li></ul>
 <p>Luego de ingresar, el menú de la parte derecha superior de la ventana de HaikuDepot ahora mostrará <span class="menu">Conectado como (...)</span>, mostrando su nombre. El menú ahora le ofrece <span class="menu">Cambiar de cuenta...</span> o <span class="menu">Salir</span>.</p>
+<p>As a reminder of what you actually agreed to when you ticked the above mentioned checkbox, there are menu items to <span class="menu">View latest/agreed usage conditions...</span></p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="rating" name="rating">Valoración y Comentarios</a></h2>
@@ -160,7 +164,7 @@ Sólo coloque el ratón sobre las estrellas de calificación en el área de info
 Luego de hacer clic en <span class="button">Enviar</span> los datos son transmitidos al servidor. Puede que tenga que ir al menú <span class="menu">Herramientas</span> para <span class="menu">Refrescar repositorios</span> antes que pueda ver sus cambios.</p>
 <p>At any time, you can come back and edit your comment and re-rate it. You can also hide your rating from other users by deactivating a checkbox <span class="menu">This rating is visible to other users</span>, that appears in this window once you've rated a package.</p>
 
- <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="logs" name="logs">Diagnostic Logs</a></h2>
 <p>As HaikuDepot is used, it interacts with network as well as local services. Things can go wrong, sometimes in ways that were not anticipated when the application was written. In those cases the error message may be quite unspecific. To help diagnosing a given problem, HaikuDepot can provide a log of what the application does.</p>
 <p>An error message may suggest to view the logs to get further in-depth information or you may be asked to provide the log when you file an issue at the Haiku <a href="https://dev.haiku-os.org/">bug tracking system</a>.</p>
@@ -168,6 +172,11 @@ Luego de hacer clic en <span class="button">Enviar</span> los datos son transmit
 <pre>HaikuDepot -v debug</pre>
 <p>The command uses the <span class="cli">-v</span> flag to control the verbosity of the diagnostic logs. Possible values are: <span class="cli">off</span>, <span class="cli">info</span>, <span class="cli">debug</span> and <span class="cli">trace</span>. Using <span class="cli">off</span> will do only a small amount of logging, while <span class="cli">trace</span> does it in the highest detail.</p>
 <p>As HaikuDepot starts up and when interacting with the application, you will see text scroll by in the Terminal window; this is the diagnostic log.</p>
+
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="tips" name="tips">Tips</a></h2>
+<p>Not directly from within the HaikuDepot application, but there is a way to keep track of new and updated packages. For that, you need to create an RSS ATOM feed at the <a href="https://depot.haiku-os.org">Haiku Depot Server</a> website. Click the "hamburger" widget at the top right, and choose <span class="menu">Build Feed URL</span> under Data.<br />
+Most interesting of the few settings on that page: Besides getting a feed for all new/updated packages, you are also able to add just the names of the packages you're interested in. Click the <span class="button">Build Feed URL</span> button and you get an RSS URL that you can paste into an RSS feed reader like BePodder, QuiteRSS, fRiSS etc.</p>
 </div>
 </div>
 

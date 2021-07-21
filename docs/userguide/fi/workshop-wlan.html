@@ -24,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Käyttäjäopas</span></div>
 </div>
 
 <div class="nav">
@@ -36,6 +36,7 @@
 <li><a href="../de/workshop-wlan.html">Deutsch</a></li>
 <li><a href="../en/workshop-wlan.html">English</a></li>
 <li><a href="../es/workshop-wlan.html">Español</a></li>
+<li><a href="../eo/workshop-wlan.html">Esperanto</a></li>
 <li><a href="../fr/workshop-wlan.html">Français</a></li>
 <li><a href="../fur/workshop-wlan.html">Furlan</a></li>
 <li><a href="../it/workshop-wlan.html">Italiano</a></li>
@@ -62,6 +63,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
 
 <table class="index" id="index" summary="index">
@@ -74,8 +76,8 @@
 
 <h1>Työpaja: Langaton verkko</h1>
 
-<p>Verkkoyhteyksien saaminen toimimaan on olennasta nykypäivän tarpeessa pysyvään internet-yhteyteen. Koska erilaisten ja jatkuvasti muuttuvien laitteistojen ja ajurien pitäminen ajan tasalla on aika mahdotonta pienelle projektille, Haiku käyttää <a href="http://www.freebsd.org">FreeBSD</a>-yhteensopivuuskerrosta verkkoajureissaan.<br />
-Tämä takaa valtavan joukon tuettuja laitteita, vaikka se ei luultavasti kata 100 prosenttia markkinoilla olevista. Katso tuettujen mallien luettelo <a href="http://www.freebsd.org/releases/12.0R/hardware.html#wlan">FreeBSD 12.0:n julkistuksen laitteiden tiedot</a>.</p>
+<p>Getting the networking to run is essential in today's need for permanent internet connection. As keeping up to date with all the different and ever changing hardware and drivers is quite impossible for a small project, Haiku relies on a <a href="http://www.freebsd.org">FreeBSD</a> compatibility layer for its networking drivers.<br />
+This ensures a massive amount of supported hardware, though probably not 100% of what's out there. See <a href="https://www.freebsd.org/releases/13.0R/hardware#wlan">FreeBSD 13.0's release hardware notes</a> for a list of supported models.</p>
 <div class="box-info">Nykyisin vain PCI-, PCI-X-, PCI-Express-, Mini PCI-, ja Mini PCI-Express-laitteiden otaksutaan toimivan.<br />
 PCMCIA-, CardBus-, ExpressCard-, USB- ja ISA-laitteet tarvitsevat vielä työtä tullakseen toimiviksi.</div>
 
@@ -107,9 +109,9 @@ Tulostus näyttää julkisen nimen (SSID), MAC-osoitteen, signaalivoimakkuuden j
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="firmware" name="firmware">Kuinka tuettu laitteisto saadaan toimimaan</a></h2>
-<p>Kaikki tuetut nykyaikaiset langattomat laitteet toimivat suoraan pakkauslaatikosta otettuna.</p>
+<p>All supported modern wireless hardware works out of the box and you don't have to download/install any additional firmware.</p>
 
-<p>Muutamat vanhat piirisarjat (Intel 2100/2200/2225/2915, Broadcom 43xx, Marvell 88w8335) vaativat binaarisia laitteisto-ohjelmistomoduuleja, joita Haiku ei kuitenkaan voi jakaa lisensointisyistä. Jotta nämä langattomat kortit saataisiin toimimaan, mukaan on lisätty yksinkertainen skripti, joka noutaa ja asentaa tarvittavat yksityisomistukselliset palaset sinulle.</p>
+<p>Only a few quite old chipsets (Intel 2100/2200/2225/2915, Broadcom 43xx, Marvell 88w8335) require binary firmware modules that Haiku cannot include due to licensing issues, though. To get these wireless cards to work, a simple script is included which will retrieve and install all of the needed proprietary bits for you.</p>
 <p>Avaa Pääteikkuna ja kirjoita:</p>
 <pre class="terminal">install-wifi-firmwares.sh</pre>
 <p>Katselmoi nyt lisenssit ja hyväksy ne, jotta voit asentaa kaikki tarvittavat mikro-ohjelmistotiedostot.</p>
@@ -126,7 +128,7 @@ Skripti lataa tarvittavat tiedostot ja luo zip-tiedoston, joka puretaan Haikun <
 <div class="nav">
 <div class="inner"><span>
  «  <a href="workshop-email.html">Työpaja: Sähköpostin hallinta</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">Sisältö</a> 
 ::  <a href="applications.html">Sovellukset</a>  »
 </span></div>
 </div>

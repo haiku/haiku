@@ -12,6 +12,7 @@
  * Translators:
  *		helix84
  *		Humdinger
+ *		Máximo Castañeda
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -24,7 +25,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Používateľská príručka</span></div>
 </div>
 
 <div class="nav">
@@ -36,6 +37,7 @@
 <li><a href="../de/contents.html">Deutsch</a></li>
 <li><a href="../en/contents.html">English</a></li>
 <li><a href="../es/contents.html">Español</a></li>
+<li><a href="../eo/contents.html">Esperanto</a></li>
 <li><a href="../fr/contents.html">Français</a></li>
 <li><a href="../fur/contents.html">Furlan</a></li>
 <li><a href="../it/contents.html">Italiano</a></li>
@@ -59,11 +61,11 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
+<div class="box-info">Preklad tejto stránky zatiaľ nie je dokončený. Dovtedy sa nedokončené časti zobrazia v anglickom origináli.</div>
 
 <h1>Víta vás Používateľská príručka Haiku</h1>
 
-<p>Dolu nájdete dokumentáciu najdôležitejších aspektov Haiku. Prirodzene, dokončenie a rozširovanie dokumentácie je prebiehajúci proces (aktuálnu verziu príručky a jej prekladov nájdete <a href="http://www.haiku-os.org/docs/userguide/en/contents.html">online</a>. Ak nájdete chyby, chcete navrhnúť novú tému alebo možno sami niečo napísať, prosím, kontaktujte nás v <a href="http://www.freelists.org/list/haiku-doc">poštovej konferencii dokumentácie</a>. Ak máte záujem pomôcť s prekladmi, informácie o tom nájdete na wiki v téme <a href="http://dev.haiku-os.org/wiki/i18n/UserGuide">Internacionalizácia Používateľskej príručky</a>.</p>
+<p>Dolu nájdete dokumentáciu najdôležitejších aspektov Haiku. Prirodzene, dokončenie a rozširovanie dokumentácie je prebiehajúci proces (aktuálnu verziu príručky a jej prekladov nájdete <a href="http://www.haiku-os.org/docs/userguide/sk/contents.html">online</a>. Ak nájdete chyby, chcete navrhnúť novú tému alebo možno sami niečo napísať, prosím, kontaktujte nás v <a href="http://www.freelists.org/list/haiku-doc">poštovej konferencii dokumentácie</a>. Ak máte záujem pomôcť s prekladmi, informácie o tom nájdete na wiki v téme <a href="http://dev.haiku-os.org/wiki/i18n/UserGuide">Internacionalizácia Používateľskej príručky</a>.</p>
 <p><br /></p>
 <table summary="contents" border="1" rules="rows" frame="void" cellpadding="10" cellspacing="0" style="border: dotted thin #e0e0e0">
 <!-- Excluded until it's further fleshed out
@@ -76,12 +78,7 @@
 		<li><a href="installation.html#transfer-data">Transfering data to/from a Haiku installation</a></li></ul></td>
 		<td valign="top">Step by step guides covering Haiku installation during the (pre-) alpha release phase.</td></tr>
 -->
-	<tr><td valign="top">﻿<a href="bootloader.html">Zavádzač systému</a></td>
-		<td valign="top">Riešenie problémov s konfiguráciou nastavením bezpečných volieb zavádzača systému.</td></tr>
-	<tr><td valign="top"><a href="filesystem-layout.html">Rozloženie súborového systému</a><ul>
-		<li><a href="filesystem-layout.html#system">Priečinok „Systém“</a></li>
-		<li><a href="filesystem-layout.html#home">Domovský priečinok</a></li></ul></td>
-		<td valign="top">Vysvetlenie hierarchie súborového systému a oboznámenie sa s dôležitými miestami, kde nájdete súbory a priečinky.</td></tr>
+
 	<tr><td valign="top"><a href="gui.html">Používateľské rozhranie Haiku</a><ul>
 		<li><a href="gui.html#move-resize">Jednoduché presúvanie a zmena veľkosti</a></li>
 		<li><a href="gui.html#stack-tile">Skladanie a dlaždice</a></li>
@@ -90,13 +87,79 @@
 		<a href="gui.html#favorites-recent">- Priečinky Obľubené a Nedávno použité</a></li>
 		<li><a href="gui.html#replicants">Replikanti</a></li></ul></td>
 		<td valign="top">Vysvetlenie základných prvkov grafického používateľského rozhrania.</td></tr>
-	<tr><td valign="top"><a href="keyboard-shortcuts.html">Shortcuts and key combinations</a><ul>
-		<li><a href="keyboard-shortcuts.html#general">General shortcuts</a></li>
-		<li><a href="keyboard-shortcuts.html#textediting">Textediting shortcuts</a></li>
-		<li><a href="keyboard-shortcuts.html#tracker-navigation">Shortcuts for Tracker navigation</a></li>
-		<li><a href="keyboard-shortcuts.html#terminal">Shortcuts in Terminal</a></li>
-		<li><a href="keyboard-shortcuts.html#other-combos">Other key combinations</a></li></ul></td>
-		<td valign="top">Najpoužívanejšie klávesové skratky na urýchlenie vašich pracovných postupov.</td></tr>
+
+	<tr><td valign="top"><a href="deskbar.html">Panel</a><ul>
+		<li><a href="deskbar.html#deskbar-menu">Menu Panel</a></li>
+		<li><a href="deskbar.html#tray">Oznamovacia oblasť</a></li>
+		<li><a href="deskbar.html#list-of-apps">Zoznam bežiacich programov</a></li></ul></td>
+		<td valign="top">Používanie obdoby menu „Štart“ a panela úloh v Haiku.</td></tr>
+
+	<tr><td valign="top"><a href="tracker.html">Tracker</a><ul>
+		<li><a href="tracker.html#mounting-volumes">Pripájanie zväzkov</a></li>
+		<li><a href="tracker.html#navigating">Navigácia</a></li>
+		<li><a href="tracker.html#appearance">Vzhľad</a></li>
+		<li><a href="tracker.html#tracker-preferences">Nastavenia Trackera</a></li>
+		<li><a href="tracker.html#working-with-files">Práca so súbormi</a></li>
+		<li><a href="tracker.html#transaction-status">Stav transakcie</a></li>
+		<li><a href="tracker-add-ons.html">Doplnky Trackera</a></li></ul></td>
+		<td valign="top">Všetko o navigácii, práci so súbormi a priečinkami a konfigurácii správcu súborov Haiku.</td></tr>
+
+	<tr><td valign="top"><a href="applications.html">Applications</a><ul>
+		<li><a href="applications.html#hpkg">Haiku packages (.hpkg)</a></li>
+		<li><a href="applications.html#beos_apps">Old BeOS archives (.zip and .pkg)</a></li>
+		<li><a href="applications.html#list-of-apps">Haiku's applications</a></li></ul></td>
+		<td>Naučte sa inštalovať a odinštalovať aplikácie vo všeobecnosti a pracovať s aplikáciami, ktoré sa dodávajú s Haiku.</td></tr>
+
+	<tr><td colspan="2"><table align="center"><tr><td>
+			<a href="applications/activitymonitor.html">ActivityMonitor</a><br />
+			<a href="applications/bootmanager.html">BootManager</a><br />
+			<a href="applications/charactermap.html">CharacterMap</a><br />
+			<a href="applications/codycam.html">CodyCam</a><br />
+			<a href="applications/debugger.html">Debugger</a><br />
+			<a href="applications/deskcalc.html">DeskCalc</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="applications/diskprobe.html">DiskProbe</a><br />
+			<a href="applications/diskusage.html">DiskUsage</a><br />
+			<a href="applications/drivesetup.html">DriveSetup</a><br />
+			<a href="applications/expander.html">Expander</a><br />
+			<a href="applications/haikudepot.html">HaikuDepot</a><br />
+			<a href="applications/icon-o-matic.html">Icon-O-Matic</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="applications/installer.html">Installer</a><br />
+			<a href="applications/magnify.html">Magnify</a><br />
+			<a href="applications/mail.html">Mail</a><br />
+			<a href="applications/mediaplayer.html">MediaPlayer</a><br />
+			<a href="applications/midiplayer.html">MidiPlayer</a><br />
+			<a href="applications/packageinstaller.html">LegacyPackageInstaller</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="applications/people.html">People</a><br />
+			<a href="applications/poorman.html">PoorMan</a><br />
+			<a href="applications/screenshot.html">Screenshot</a><br />
+			<a href="applications/showimage.html">ShowImage</a><br />
+			<a href="applications/softwareupdater.html">SoftwareUpdater</a><br />
+			<a href="applications/soundrecorder.html">SoundRecorder</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="applications/stylededit.html">StyledEdit</a><br />
+			<a href="applications/terminal.html">Terminal</a><br />
+			<a href="applications/textsearch.html">TextSearch</a><br />
+			<a href="applications/tv.html">TV</a><br />
+			<a href="applications/webpositive.html">WebPositive</a></td></tr>
+		</table>
+	</td></tr>
+
+	<tr><td valign="top"><ul>
+		<li><a href="applications.html#cli-apps">Haiku's commandline applications</a></li>
+		<li><a href="applications.html#list-of-bundled-apps">Bundled applications</a></li>
+		<ul><li><a href="applications/bepdf.html">- BePDF</a></li>
+			<li><a href="applications/pe.html">- Pe</a></li>
+			<li><a href="applications/vision.html">- Vision</a></li>
+			<li><a href="applications/wonderbrush.html">- WonderBrush</a></li></ul>
+	</ul></td><td></td></tr>
+
 	<tr><td valign="top"><a href="workspaces.html">Pracovné plochy</a><ul>
 		<li><a href="workspaces.html#switching">Prepínanie medzi plochami</a></li>
 		<li><a href="desktop-applets/workspaces.html#applet">Aplet Pracovné plochy</a></li>
@@ -107,20 +170,69 @@
 		<td valign="top">Prepínanie medzi bežiacimi aplikáciami.</td></tr>
 	<tr><td valign="top"><a href="teammonitor.html">Monitor tímov</a></td>
 		<td valign="top">Ukončenie aplikácií alebo komponentov systému, ktoré prestali odpovedať.</td></tr>
-	<tr><td valign="top"><a href="tracker.html">Tracker</a><ul>
-		<li><a href="tracker.html#mounting-volumes">Pripájanie zväzkov</a></li>
-		<li><a href="tracker.html#navigating">Navigácia</a></li>
-		<li><a href="tracker.html#appearance">Vzhľad</a></li>
-		<li><a href="tracker.html#tracker-preferences">Nastavenia Trackera</a></li>
-		<li><a href="tracker.html#working-with-files">Práca so súbormi</a></li>
-		<li><a href="tracker.html#transaction-status">Stav transakcie</a></li>
-		<li><a href="tracker-add-ons.html">Doplnky Trackera</a></li></ul></td>
-		<td valign="top">Všetko o navigácii, práci so súbormi a priečinkami a konfigurácii správcu súborov Haiku.</td></tr>
-	<tr><td valign="top"><a href="deskbar.html">Panel</a><ul>
-		<li><a href="deskbar.html#deskbar-menu">Menu Panel</a></li>
-		<li><a href="deskbar.html#tray">Oznamovacia oblasť</a></li>
-		<li><a href="deskbar.html#list-of-apps">Zoznam bežiacich programov</a></li></ul></td>
-		<td valign="top">Používanie obdoby menu „Štart“ a panela úloh v Haiku.</td></tr>
+
+	<tr><td valign="top"><a href="keyboard-shortcuts.html">Shortcuts and key combinations</a><ul>
+		<li><a href="keyboard-shortcuts.html#general">General shortcuts</a></li>
+		<li><a href="keyboard-shortcuts.html#textediting">Textediting shortcuts</a></li>
+		<li><a href="keyboard-shortcuts.html#tracker-navigation">Shortcuts for Tracker navigation</a></li>
+		<li><a href="keyboard-shortcuts.html#terminal">Shortcuts in Terminal</a></li>
+		<li><a href="keyboard-shortcuts.html#other-combos">Other key combinations</a></li></ul></td>
+		<td valign="top">Najpoužívanejšie klávesové skratky na urýchlenie vašich pracovných postupov.</td></tr>
+
+	<tr><td valign="top"><a href="desktop-applets.html">Desktop Applets</a><ul>
+			<li><a href="desktop-applets/launchbox.html">LaunchBox</a></li>
+			<li><a href="desktop-applets/networkstatus.html">NetworkStatus</a></li>
+			<li><a href="desktop-applets/powerstatus.html">PowerStatus</a></li>
+			<li><a href="desktop-applets/processcontroller.html">ProcessController</a></li>
+			<li><a href="desktop-applets/workspaces.html">Workspaces</a></li></ul></td>
+		<td>Jednoduché nástroje, ktoré sa inštalujú na vašu Plochu a Panel.</td></tr>
+
+	<tr><td valign="top"><a href="preferences.html">Preferences</a></td>
+		<td>Konfigurácia a nastavenie vášho systému.</td></tr>
+	<tr><td colspan="2"><table align="center"><tr><td>
+			<a href="preferences/appearance.html">Appearance</a><br />
+			<a href="preferences/backgrounds.html">Backgrounds</a><br />
+			<a href="preferences/datatranslations.html">DataTranslations</a><br />
+			<a href="preferences/deskbar.html">Deskbar</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="preferences/e-mail.html">E-mail</a><br />
+			<a href="preferences/filetypes.html">FileTypes</a><br />
+			<a href="preferences/input.html">Input</a><br />
+			<a href="preferences/keymap.html">Keymap</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="preferences/locale.html">Locale</a><br />
+			<a href="preferences/media.html">Media</a><br />
+			<a href="preferences/network.html">Network</a><br />
+			<a href="preferences/printers.html">Printers</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="preferences/repositories.html">Repositories</a><br />
+			<a href="preferences/screen.html">Screen</a><br />
+			<a href="preferences/screensaver.html">ScreenSaver</a><br />
+			<a href="preferences/shortcuts.html">Shortcuts</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="preferences/sounds.html">Sounds</a><br />
+			<a href="preferences/time.html">Time</a><br />
+			<a href="preferences/tracker.html">Tracker</a><br />
+			<a href="preferences/virtualmemory.html">VirtualMemory</a></td></tr>
+		</table>
+		</td></tr>
+<!--
+	<tr><td valign="top"><a href="demos.html">Demos</a></td>
+		<td>Games and demo applications.</td></tr>
+-->
+	<tr><td valign="top"><a href="queries.html">Queries</a><ul>
+		<li><a href="queries.html#find-window">The Find window</a></li>
+		<li><a href="queries.html#basic-query">Basic queries - "by Name"</a></li>
+		<li><a href="queries.html#adv-query">Advanced queries - "by Attribute"</a></li>
+		<li><a href="queries.html#more-adv-query">Even more advanced queries - "by Formula"</a></li>
+		<li><a href="queries.html#result-window">The result window</a></li>
+		<li><a href="queries.html#query-template">Query Templates</a></li></ul></td>
+		<td valign="top">Používanie bleskurýchlych požiadaviek Haiku na rýchle nájdenie toho, čo hľadáte.</td></tr>
+
 	<tr><td valign="top"><a href="filetypes.html">Typy súborov</a><ul>
 		<li><a href="filetypes.html#filetype">Typ súboru</a></li>
 		<li><a href="filetypes.html#preferred-app">Preferovaná aplikácia</a></li>
@@ -128,106 +240,34 @@
 		<li><a href="filetypes.html#settings-apps">Špeciálne nastavenia aplikácií</a></li>
 		<li><a href="filetypes.html#filetypes-preferences">Globálne nastavenia pomocou Nastavenia typov súborov</a></li></ul></td>
 		<td valign="top">Nastavovanie predvolených aplikácií, zmena a tvorba vlastných typov súborov.</td></tr>
+
 	<tr><td valign="top"><a href="attributes.html">Atribúty</a><ul>
 		<li><a href="attributes.html#attributes-tracker">Atribúty v Trackeri</a></li>
 		<li><a href="attributes.html#attributes-terminal">Atribúty v Termináli</a></li></ul></td>
-		<td valign="top">Jedna z hlavných vlastností Haiku vám umožňuje spravovať a pridávať ľubovoľný typ údajov ku každému súboru.</td></tr>		
+		<td valign="top">Jedna z hlavných vlastností Haiku vám umožňuje spravovať a pridávať ľubovoľný typ údajov ku každému súboru.</td></tr>
+
 	<tr><td valign="top"><a href="index.html">Indexovanie</a></td>
 		<td>Používanie indexovania na hľadanie atribútov.</td></tr>
-	<tr><td valign="top"><a href="queries.html">Požiadavky</a><ul>
-		<li><a href="queries.html#find-window">Okno Hľadať</a></li>
-		<li><a href="queries.html#basic-query">Základné požiadavky - „podľa názvu“</a></li>
-		<li><a href="queries.html#adv-query">Pokročilé požiadavky - „podľa atribútu“</a></li>
-		<li><a href="queries.html#more-adv-query">Ešte pokročilejšie požiadavky - „podľa vzorca“</a></li>
-		<li><a href="queries.html#result-window">Okno výsledkov</a></li>
-		<li><a href="queries.html#query-template">Šablóny požiadaviek</a></li>
-</ul></td>
-		<td valign="top">Používanie bleskurýchlych požiadaviek Haiku na rýchle nájdenie toho, čo hľadáte.</td></tr>
+
+	<tr><td valign="top"><a href="filesystem-layout.html">Rozloženie súborového systému</a><ul>
+		<li><a href="filesystem-layout.html#system">Priečinok „Systém“</a></li>
+		<li><a href="filesystem-layout.html#home">Domovský priečinok</a></li></ul></td>
+		<td valign="top">Vysvetlenie hierarchie súborového systému a oboznámenie sa s dôležitými miestami, kde nájdete súbory a priečinky.</td></tr>
+
 	<tr><td valign="top"><a href="workshop-filetypes+attributes.html">Workshop: typy súborov, atribúty, indexovanie a požiadavky</a></td>
 		<td valign="top">Naučte sa používať niektoré z kľúčových vlastností Haiku na organizáciu vašej zbierky DVD.</td></tr>
+
 	<tr><td valign="top"><a href="workshop-email.html">Workshop: správa emailu</a></td>
 		<td valign="top">Naučte sa používať systém pošty v Haiku s vlastnými stavmi a požiadavkami.</td></tr>
+
 	<tr><td valign="top"><a href="workshop-wlan.html">Workshop: Bezdrôtová sieť</a></td>
 		<td valign="top">Nastavenie otvorenej alebo šifrovanej bezdrôtovej siete.</td></tr>
-	<tr><td valign="top"><a href="applications.html">Aplikácie</a><ul>
-		<li><a href="applications.html#hpkg">balíky Haiku (.hpkg)</a></li>
-		<li><a href="applications.html#beos_apps">Staré archívy BeOS (.zip a .pkg)</a></li>
-		<li><a href="applications.html#list-of-apps">Aplikácie Haiku</a></li>
-		<ul>
-			<li><a href="applications/activitymonitor.html">Monitor aktivity</a></li>
-			<li><a href="applications/bootmanager.html">Správca zavádzania</a></li>
-			<li><a href="applications/charactermap.html">Mapa znakov</a></li>
-			<li><a href="applications/codycam.html">CodyCam</a></li>
-			<li><a href="applications/debugger.html">Debugger</a></li>
-			<li><a href="applications/deskcalc.html">Kalkulačka</a></li>
-			<li><a href="applications/diskprobe.html">Disková sonda</a></li>
-			<li><a href="applications/diskusage.html">Využitie disku</a></li>
-			<li><a href="applications/drivesetup.html">Nastavenie diskových oblastí</a></li>
-			<li><a href="applications/expander.html">Rozbaľovač</a></li>
-			<li><a href="applications/haikudepot.html">HaikuDepot</a></li>
-			<li><a href="applications/icon-o-matic.html">Icon-O-Matic</a></li>
-			<li><a href="applications/installer.html">Inštalátor</a></li>
-			<li><a href="applications/magnify.html">Lupa</a></li>
-			<li><a href="applications/mail.html">Pošta</a></li>
-			<li><a href="applications/mediaplayer.html">Prehrávač multimédií</a></li>
-			<li><a href="applications/midiplayer.html">Prehrávač MIDI</a></li>
-			<li><a href="applications/packageinstaller.html">Inštalátor starších aplikácií</a></li>
-			<li><a href="applications/people.html">Ľudia</a></li>
-			<li><a href="applications/poorman.html">PoorMan</a></li>
-			<li><a href="applications/screenshot.html">Snímka obrazovky</a></li>
-			<li><a href="applications/showimage.html">Prehliadač obrázkov</a></li>
-			<li><a href="applications/softwareupdater.html">SoftwareUpdater</a></li>
-			<li><a href="applications/soundrecorder.html">SoundRecorder</a></li>
-			<li><a href="applications/stylededit.html">StyledEdit</a></li>
-			<li><a href="applications/terminal.html">Terminál</a></li>
-			<li><a href="applications/textsearch.html">Hľadanie textu</a></li>
-			<li><a href="applications/tv.html">TV</a></li>
-			<li><a href="applications/webpositive.html">WebPositive</a></li>
-		</ul>
-		<li><a href="applications.html#cli-apps">Aplikácie príkazového riadka Haiku</a></li>
-		<li><a href="applications.html#list-of-bundled-apps">Balíky aplikácií</a></li></ul></td>
-		<td>Naučte sa inštalovať a odinštalovať aplikácie vo všeobecnosti a pracovať s aplikáciami, ktoré sa dodávajú s Haiku.</td></tr>
-	<tr><td valign="top"><a href="desktop-applets.html">Aplety plochy</a>
-		<ul>
-			<li><a href="desktop-applets/launchbox.html">Spúšťač</a></li>
-			<li><a href="desktop-applets/networkstatus.html">Stav siete</a></li>
-			<li><a href="desktop-applets/powerstatus.html">Stav napájania</a></li>
-			<li><a href="desktop-applets/processcontroller.html">Správca procesov</a></li>
-			<li><a href="desktop-applets/workspaces.html">Pracovné plochy</a></li>
-		</ul></td>
-		<td>Jednoduché nástroje, ktoré sa inštalujú na vašu Plochu a Panel.</td></tr>
-	<tr><td valign="top"><a href="preferences.html">Nastavenia</a>
-		<ul>
-			<li><a href="preferences/appearance.html">Vzhľad</a></li>
-			<li><a href="preferences/backgrounds.html">Pozadia</a></li>
-			<li><a href="preferences/datatranslations.html">Preklad dát</a></li>
-			<li><a href="preferences/deskbar.html">Panel</a></li>
-			<li><a href="preferences/e-mail.html">E-mail</a></li>
-			<li><a href="preferences/filetypes.html">Typy súborov</a></li>
-			<li><a href="preferences/keyboard.html">Klávesnica</a></li>
-			<li><a href="preferences/keymap.html">Mapa klávesov</a></li>
-			<li><a href="preferences/locale.html">Locale</a></li>
-			<li><a href="preferences/media.html">Multimédiá</a></li>
-			<li><a href="preferences/mouse.html">Myš</a></li>
-			<li><a href="preferences/network.html">Sieť</a></li>
-			<li><a href="preferences/printers.html">Tlačiarne</a></li>
-			<li><a href="preferences/repositories.html">Repozitáre</a></li>
-			<li><a href="preferences/screen.html">Obrazovka</a></li>
-			<li><a href="preferences/screensaver.html">Šetrič obrazovky</a></li>
-			<li><a href="preferences/shortcuts.html">Skratky</a></li>
-			<li><a href="preferences/sounds.html">Zvuky</a></li>
-			<li><a href="preferences/time.html">Čas</a></li>
-			<li><a href="preferences/tracker.html">Tracker</a></li>
-			<li><a href="preferences/touchpad.html">Touchpad</a></li>
-			<li><a href="preferences/virtualmemory.html">Virtuálna pamäť</a></li>
-		</ul></td>
-		<td>Konfigurácia a nastavenie vášho systému.</td></tr>
-<!--
-	<tr><td valign="top"><a href="demos.html">Demos</a></td>
-		<td>Games and demo applications.</td></tr>
--->
+
 	<tr><td valign="top"><a href="bash-scripting.html">Bash a písanie skriptov</a></td>
 		<td>Vysvetlenie niektorých zaujímavých skriptov, ktoré systém používa a zoznam online zdrojov o práci v shelli a skriptovaní.</td></tr>
+
+	<tr><td valign="top">﻿<a href="bootloader.html">Zavádzač systému</a></td>
+		<td valign="top">Riešenie problémov s konfiguráciou nastavením bezpečných volieb zavádzača systému.</td></tr>
 </table>
 
 </div>

@@ -24,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Používateľská príručka</span></div>
 </div>
 
 <div class="nav">
@@ -36,6 +36,7 @@
 <li><a href="../de/workshop-wlan.html">Deutsch</a></li>
 <li><a href="../en/workshop-wlan.html">English</a></li>
 <li><a href="../es/workshop-wlan.html">Español</a></li>
+<li><a href="../eo/workshop-wlan.html">Esperanto</a></li>
 <li><a href="../fr/workshop-wlan.html">Français</a></li>
 <li><a href="../fur/workshop-wlan.html">Furlan</a></li>
 <li><a href="../it/workshop-wlan.html">Italiano</a></li>
@@ -62,7 +63,7 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
+<div class="box-info">Preklad tejto stránky zatiaľ nie je dokončený. Dovtedy sa nedokončené časti zobrazia v anglickom origináli.</div>
 
 
 <table class="index" id="index" summary="index">
@@ -77,7 +78,7 @@
 <h1>Workshop: Bezdrôtová sieť</h1>
 
 <p>Getting the networking to run is essential in today's need for permanent internet connection. As keeping up to date with all the different and ever changing hardware and drivers is quite impossible for a small project, Haiku relies on a <a href="http://www.freebsd.org">FreeBSD</a> compatibility layer for its networking drivers.<br />
-This ensures a massive amount of supported hardware, though probably not 100% of what's out there. See <a href="http://www.freebsd.org/releases/12.0R/hardware.html#wlan">FreeBSD 12.0's release hardware notes</a> for a list of supported models.</p>
+This ensures a massive amount of supported hardware, though probably not 100% of what's out there. See <a href="https://www.freebsd.org/releases/13.0R/hardware#wlan">FreeBSD 13.0's release hardware notes</a> for a list of supported models.</p>
 <div class="box-info">Momentálne sa očakáva, že budú fungovať iba zariadenia PCI, PCI-X, PCI-Express, Mini PCI a Mini PCI-Express.<br />
 Zariadenia PCMCIA, CardBus, ExpressCard, USB a ISA ešte vyžadujú ďalšiu prácu, než budú funkčné.</div>
 
@@ -109,9 +110,9 @@ Výstup zobrazuje verejné meno (SSID), MAC adresu, silu signálu a spôsob over
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="firmware" name="firmware">Ako rozchodiť podporovaný hardvér</a></h2>
-<p>All supported modern wireless hardware works out of the box.</p>
+<p>All supported modern wireless hardware works out of the box and you don't have to download/install any additional firmware.</p>
 
-<p>A few quite old chipsets (Intel 2100/2200/2225/2915, Broadcom 43xx, Marvell 88w8335) require binary firmware modules that Haiku cannot include due to licensing issues, though. To get these wireless cards to work, a simple script is included which will retrieve and install all of the needed proprietary bits for you.</p>
+<p>Only a few quite old chipsets (Intel 2100/2200/2225/2915, Broadcom 43xx, Marvell 88w8335) require binary firmware modules that Haiku cannot include due to licensing issues, though. To get these wireless cards to work, a simple script is included which will retrieve and install all of the needed proprietary bits for you.</p>
 <p>Otvorte Terminál a napíšte:</p>
 <pre class="terminal">install-wifi-firmwares.sh</pre>
 <p>Teraz si prečítajte licencie a prijmite ich, aby sa nainštalovali všetky dostupné súbory firmvéru.</p>
@@ -127,8 +128,8 @@ The script will download the needed files and create a zip file that is to be ex
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="workshop-email.html">Workshop: Managing Email</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+ «  <a href="workshop-email.html">Workshop: Spravovanie emailov</a> 
+::  <a href="contents.html" class="uplink">Obsah</a> 
 ::  <a href="applications.html">Aplikácie</a>  »
 </span></div>
 </div>

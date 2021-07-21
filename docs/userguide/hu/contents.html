@@ -24,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Használati útmutató</span></div>
 </div>
 
 <div class="nav">
@@ -36,6 +36,7 @@
 <li><a href="../de/contents.html">Deutsch</a></li>
 <li><a href="../en/contents.html">English</a></li>
 <li><a href="../es/contents.html">Español</a></li>
+<li><a href="../eo/contents.html">Esperanto</a></li>
 <li><a href="../fr/contents.html">Français</a></li>
 <li><a href="../fur/contents.html">Furlan</a></li>
 <li><a href="../it/contents.html">Italiano</a></li>
@@ -59,7 +60,7 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
+<div class="box-info">Az oldal fordítása még folyamatban van. Amíg tart a fordítás, addig a lefordítatlan részek angolul jelennek meg.</div>
 
 <h1>Üdvözöllek a Haiku felhasználói útmutatóban</h1>
 
@@ -76,12 +77,7 @@
 		<li><a href="installation.html#transfer-data">Transfering data to/from a Haiku installation</a></li></ul></td>
 		<td valign="top">Step by step guides covering Haiku installation during the (pre-) alpha release phase.</td></tr>
 -->
-	<tr><td valign="top"><a href="bootloader.html">Rendszertöltő</a></td>
-		<td valign="top">Biztonsági indítási opciók a problémák megoldása érdekében.</td></tr>
-	<tr><td valign="top"><a href="filesystem-layout.html">Fájlrendszer felépítése</a><ul>
-		<li><a href="filesystem-layout.html#system">A rendszer mappa</a></li>
-		<li><a href="filesystem-layout.html#home">A saját mappa</a></li></ul></td>
-		<td valign="top">A fájlrendszer hierarchiájának megértése és a fontos mappák összegyűjtése.</td></tr>
+
 	<tr><td valign="top"><a href="gui.html">A Haiku felhasználói felülete</a><ul>
 		<li><a href="gui.html#move-resize">Könnyű mozgatás és méretezés</a></li>
 		<li><a href="gui.html#stack-tile">Halmozás és csempézés</a></li>
@@ -90,13 +86,78 @@
 		<a href="gui.html#favorites-recent">- Kedvencek és legutóbbi mappák</a></li>
 		<li><a href="gui.html#replicants">Replikánsok</a></li></ul></td>
 		<td valign="top">A grafikus felület egyszerűbb elemeinek bemutatása.</td></tr>
-	<tr><td valign="top"><a href="keyboard-shortcuts.html">Shortcuts and key combinations</a><ul>
-		<li><a href="keyboard-shortcuts.html#general">General shortcuts</a></li>
-		<li><a href="keyboard-shortcuts.html#textediting">Textediting shortcuts</a></li>
-		<li><a href="keyboard-shortcuts.html#tracker-navigation">Shortcuts for Tracker navigation</a></li>
-		<li><a href="keyboard-shortcuts.html#terminal">Shortcuts in Terminal</a></li>
-		<li><a href="keyboard-shortcuts.html#other-combos">Other key combinations</a></li></ul></td>
-		<td valign="top">A legáltalánosabb billentyű-parancsok, melyek meggyorsítják a munkánkat.</td></tr>
+
+	<tr><td valign="top"><a href="deskbar.html">Asztalsáv</a><ul>
+		<li><a href="deskbar.html#deskbar-menu">Asztalsáv menü</a></li>
+		<li><a href="deskbar.html#tray">A Polc</a></li>
+		<li><a href="deskbar.html#list-of-apps">Futó programok listája</a></li></ul></td>
+		<td valign="top">A "Start menü" Haiku változatának a használata.</td></tr>
+
+	<tr><td valign="top"><a href="tracker.html">Nyomkövető</a><ul>
+		<li><a href="tracker.html#mounting-volumes">Lemezek csatolása</a></li>
+		<li><a href="tracker.html#navigating">Navigálás</a></li>
+		<li><a href="tracker.html#appearance">Megjelenés</a></li>
+		<li><a href="tracker.html#tracker-preferences">Beállítások</a></li>
+		<li><a href="tracker.html#working-with-files">Munka a fájlokkal</a></li>
+		<li><a href="tracker.html#transaction-status">Folyamatjelző</a></li>
+		<li><a href="tracker-add-ons.html">Nyomkövető kiegészítők</a></li></ul></td>
+		<td valign="top">Navigálás, fájlokkal és mappákkal való munka és a Haiku fájlkezelőjének beállítása.</td></tr>
+
+	<tr><td valign="top"><a href="applications.html">Programok</a><ul>
+		<li><a href="applications.html#hpkg">Haiku csomagok (.hpkg)</a></li>
+		<li><a href="applications.html#beos_apps">Régi BeOS archívumok (.zip és .pkg)</a></li>		<li><a href="applications.html#list-of-apps">Haiku programok</a></li></ul></td>
+		<td>A Haiku programjainak működése és újak telepítése, meglévők eltávolítása.</td></tr>
+
+	<tr><td colspan="2"><table align="center"><tr><td>
+			<a href="applications/activitymonitor.html">ActivityMonitor</a><br />
+			<a href="applications/bootmanager.html">BootManager</a><br />
+			<a href="applications/charactermap.html">CharacterMap</a><br />
+			<a href="applications/codycam.html">CodyCam</a><br />
+			<a href="applications/debugger.html">Debugger</a><br />
+			<a href="applications/deskcalc.html">DeskCalc</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="applications/diskprobe.html">DiskProbe</a><br />
+			<a href="applications/diskusage.html">DiskUsage</a><br />
+			<a href="applications/drivesetup.html">DriveSetup</a><br />
+			<a href="applications/expander.html">Expander</a><br />
+			<a href="applications/haikudepot.html">HaikuDepot</a><br />
+			<a href="applications/icon-o-matic.html">Icon-O-Matic</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="applications/installer.html">Installer</a><br />
+			<a href="applications/magnify.html">Magnify</a><br />
+			<a href="applications/mail.html">Mail</a><br />
+			<a href="applications/mediaplayer.html">MediaPlayer</a><br />
+			<a href="applications/midiplayer.html">MidiPlayer</a><br />
+			<a href="applications/packageinstaller.html">LegacyPackageInstaller</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="applications/people.html">People</a><br />
+			<a href="applications/poorman.html">PoorMan</a><br />
+			<a href="applications/screenshot.html">Screenshot</a><br />
+			<a href="applications/showimage.html">ShowImage</a><br />
+			<a href="applications/softwareupdater.html">SoftwareUpdater</a><br />
+			<a href="applications/soundrecorder.html">SoundRecorder</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="applications/stylededit.html">StyledEdit</a><br />
+			<a href="applications/terminal.html">Terminal</a><br />
+			<a href="applications/textsearch.html">TextSearch</a><br />
+			<a href="applications/tv.html">TV</a><br />
+			<a href="applications/webpositive.html">WebPositive</a></td></tr>
+		</table>
+	</td></tr>
+
+	<tr><td valign="top"><ul>
+		<li><a href="applications.html#cli-apps">Haiku's commandline applications</a></li>
+		<li><a href="applications.html#list-of-bundled-apps">Bundled applications</a></li>
+		<ul><li><a href="applications/bepdf.html">- BePDF</a></li>
+			<li><a href="applications/pe.html">- Pe</a></li>
+			<li><a href="applications/vision.html">- Vision</a></li>
+			<li><a href="applications/wonderbrush.html">- WonderBrush</a></li></ul>
+	</ul></td><td></td></tr>
+
 	<tr><td valign="top"><a href="workspaces.html">Munkaasztalok</a><ul>
 		<li><a href="workspaces.html#switching">Munkaasztalok közötti váltás</a></li>
 		<li><a href="desktop-applets/workspaces.html#applet">Munkaasztalok kisalkalmazás</a></li>
@@ -107,20 +168,69 @@
 		<td valign="top">Váltás a futó programok között.</td></tr>
 	<tr><td valign="top"><a href="teammonitor.html">Folyamatfigyelő</a></td>
 		<td valign="top">A nem válaszoló programok és rendszerösszetevők bezárása.</td></tr>
-	<tr><td valign="top"><a href="tracker.html">Nyomkövető</a><ul>
-		<li><a href="tracker.html#mounting-volumes">Lemezek csatolása</a></li>
-		<li><a href="tracker.html#navigating">Navigálás</a></li>
-		<li><a href="tracker.html#appearance">Megjelenés</a></li>
-		<li><a href="tracker.html#tracker-preferences">Beállítások</a></li>
-		<li><a href="tracker.html#working-with-files">Munka a fájlokkal</a></li>
-		<li><a href="tracker.html#transaction-status">Folyamatjelző</a></li>
-		<li><a href="tracker-add-ons.html">Nyomkövető kiegészítők</a></li></ul></td>
-		<td valign="top">Navigálás, fájlokkal és mappákkal való munka és a Haiku fájlkezelőjének beállítása.</td></tr>
-	<tr><td valign="top"><a href="deskbar.html">Asztalsáv</a><ul>
-		<li><a href="deskbar.html#deskbar-menu">Asztalsáv menü</a></li>
-		<li><a href="deskbar.html#tray">A Polc</a></li>
-		<li><a href="deskbar.html#list-of-apps">Futó programok listája</a></li></ul></td>
-		<td valign="top">A "Start menü" Haiku változatának a használata.</td></tr>
+
+	<tr><td valign="top"><a href="keyboard-shortcuts.html">Shortcuts and key combinations</a><ul>
+		<li><a href="keyboard-shortcuts.html#general">General shortcuts</a></li>
+		<li><a href="keyboard-shortcuts.html#textediting">Textediting shortcuts</a></li>
+		<li><a href="keyboard-shortcuts.html#tracker-navigation">Shortcuts for Tracker navigation</a></li>
+		<li><a href="keyboard-shortcuts.html#terminal">Shortcuts in Terminal</a></li>
+		<li><a href="keyboard-shortcuts.html#other-combos">Other key combinations</a></li></ul></td>
+		<td valign="top">A legáltalánosabb billentyű-parancsok, melyek meggyorsítják a munkánkat.</td></tr>
+
+	<tr><td valign="top"><a href="desktop-applets.html">Desktop Applets</a><ul>
+			<li><a href="desktop-applets/launchbox.html">LaunchBox</a></li>
+			<li><a href="desktop-applets/networkstatus.html">NetworkStatus</a></li>
+			<li><a href="desktop-applets/powerstatus.html">PowerStatus</a></li>
+			<li><a href="desktop-applets/processcontroller.html">ProcessController</a></li>
+			<li><a href="desktop-applets/workspaces.html">Workspaces</a></li></ul></td>
+		<td>Egyszerű kis programok, melyeket az Asztalra illetve az Asztalsávra helyezhetünk.</td></tr>
+
+	<tr><td valign="top"><a href="preferences.html">Beállítások</a></td>
+		<td>A rendszer személyre szabása, beállítása.</td></tr>
+	<tr><td colspan="2"><table align="center"><tr><td>
+			<a href="preferences/appearance.html">Appearance</a><br />
+			<a href="preferences/backgrounds.html">Backgrounds</a><br />
+			<a href="preferences/datatranslations.html">DataTranslations</a><br />
+			<a href="preferences/deskbar.html">Deskbar</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="preferences/e-mail.html">E-mail</a><br />
+			<a href="preferences/filetypes.html">FileTypes</a><br />
+			<a href="preferences/input.html">Input</a><br />
+			<a href="preferences/keymap.html">Keymap</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="preferences/locale.html">Locale</a><br />
+			<a href="preferences/media.html">Media</a><br />
+			<a href="preferences/network.html">Network</a><br />
+			<a href="preferences/printers.html">Printers</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="preferences/repositories.html">Repositories</a><br />
+			<a href="preferences/screen.html">Screen</a><br />
+			<a href="preferences/screensaver.html">ScreenSaver</a><br />
+			<a href="preferences/shortcuts.html">Shortcuts</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="preferences/sounds.html">Sounds</a><br />
+			<a href="preferences/time.html">Time</a><br />
+			<a href="preferences/tracker.html">Tracker</a><br />
+			<a href="preferences/virtualmemory.html">VirtualMemory</a></td></tr>
+		</table>
+		</td></tr>
+<!--
+	<tr><td valign="top"><a href="demos.html">Demos</a></td>
+		<td>Games and demo applications.</td></tr>
+-->
+	<tr><td valign="top"><a href="queries.html">Queries</a><ul>
+		<li><a href="queries.html#find-window">The Find window</a></li>
+		<li><a href="queries.html#basic-query">Basic queries - "by Name"</a></li>
+		<li><a href="queries.html#adv-query">Advanced queries - "by Attribute"</a></li>
+		<li><a href="queries.html#more-adv-query">Even more advanced queries - "by Formula"</a></li>
+		<li><a href="queries.html#result-window">The result window</a></li>
+		<li><a href="queries.html#query-template">Query Templates</a></li></ul></td>
+		<td valign="top">A Haiku villámgyors keresőjével gyorsan megtaláljuk, amik keresünk.</td></tr>
+
 	<tr><td valign="top"><a href="filetypes.html">Fájltípusok</a><ul>
 		<li><a href="filetypes.html#filetype">A fájl típusa</a></li>
 		<li><a href="filetypes.html#preferred-app">Előnyben részesített program</a></li>
@@ -128,107 +238,34 @@
 		<li><a href="filetypes.html#settings-apps">Programok speciális beállításai</a></li>
 		<li><a href="filetypes.html#filetypes-preferences">Általános beállítások a Fájltípusok beállítások panelen</a></li></ul></td>
 		<td valign="top">Alapértelmezett programok megadása, fájltípusok módosítása, létrehozása.</td></tr>
+
 	<tr><td valign="top"><a href="attributes.html">Jellemzők</a><ul>
 		<li><a href="attributes.html#attributes-tracker">Jellemzők a Nyomkövetőben</a></li>
 		<li><a href="attributes.html#attributes-terminal">Jellemzők a Terminálban</a></li></ul></td>
-		<td valign="top">A Haiku egyik legfőbb előnye, mellyel bármelyik fájlhoz adhatunk különféle adatokat.</td></tr>		
+		<td valign="top">A Haiku egyik legfőbb előnye, mellyel bármelyik fájlhoz adhatunk különféle adatokat.</td></tr>
+
 	<tr><td valign="top"><a href="index.html">Index</a></td>
 		<td>Az indexelés lehetővé teszi a jellemzők keresését.</td></tr>
-	<tr><td valign="top"><a href="queries.html">Lekérdezések</a><ul>
-		<li><a href="queries.html#find-window">A kereső ablak</a></li>
-		<li><a href="queries.html#basic-query">Egyszerű lekérdezések - "Név alapján"</a></li>
-		<li><a href="queries.html#adv-query">Összetett lekérdezések - "Jellemzők alapján"</a></li>
-		<li><a href="queries.html#more-adv-query">Még összetettebb lekérdezések - "Képlet alapján"</a></li>
-		<li><a href="queries.html#result-window">Az eredmény ablak</a></li>
-		<li><a href="queries.html#query-template">Keresési sablonok</a></li>
-</ul></td>
-		<td valign="top">A Haiku villámgyors keresőjével gyorsan megtaláljuk, amik keresünk.</td></tr>
+
+	<tr><td valign="top"><a href="filesystem-layout.html">Fájlrendszer felépítése</a><ul>
+		<li><a href="filesystem-layout.html#system">A rendszer mappa</a></li>
+		<li><a href="filesystem-layout.html#home">A saját mappa</a></li></ul></td>
+		<td valign="top">A fájlrendszer hierarchiájának megértése és a fontos mappák összegyűjtése.</td></tr>
+
 	<tr><td valign="top"><a href="workshop-filetypes+attributes.html">Műhely: fájltípusok, jellemzők, indexek és lekérdezések</a></td>
 		<td valign="top">A Haiku legfontosabb tulajdonságainak bemutatása.</td></tr>
+
 	<tr><td valign="top"><a href="workshop-email.html">Műhely: levelek kezelése</a></td>
 		<td valign="top">A Haiku levelező rendszerének használata egyéni lekérdezésekkel.</td></tr>
+
 	<tr><td valign="top"><a href="workshop-wlan.html">Műhely: vezeték nélküli hálózat</a></td>
 		<td valign="top">Titkosított vagy titkosítatlan vezeték nélküli hálózat beállítása.</td></tr>
-	<tr><td valign="top"><a href="applications.html">Applications</a><ul>
-		<li><a href="applications.html#hpkg">Haiku packages (.hpkg)</a></li>
-		<li><a href="applications.html#beos_apps">Old BeOS archives (.zip and .pkg)</a></li>
-		<li><a href="applications.html#list-of-apps">Haiku's applications</a></li>
-		<ul>
-			<li><a href="applications/activitymonitor.html">ActivityMonitor</a></li>
-			<li><a href="applications/bootmanager.html">BootManager</a></li>
-			<li><a href="applications/charactermap.html">CharacterMap</a></li>
-			<li><a href="applications/codycam.html">CodyCam</a></li>
-			<li><a href="applications/debugger.html">Debugger</a></li>
-			<li><a href="applications/deskcalc.html">DeskCalc</a></li>
-			<li><a href="applications/diskprobe.html">DiskProbe</a></li>
-			<li><a href="applications/diskusage.html">DiskUsage</a></li>
-			<li><a href="applications/drivesetup.html">DriveSetup</a></li>
-			<li><a href="applications/expander.html">Expander</a></li>
-			<li><a href="applications/haikudepot.html">HaikuDepot</a></li>
-			<li><a href="applications/icon-o-matic.html">Icon-O-Matic</a></li>
-			<li><a href="applications/installer.html">Installer</a></li>
-			<li><a href="applications/magnify.html">Magnify</a></li>
-			<li><a href="applications/mail.html">Mail</a></li>
-			<li><a href="applications/mediaplayer.html">MediaPlayer</a></li>
-			<li><a href="applications/midiplayer.html">MidiPlayer</a></li>
-			<li><a href="applications/packageinstaller.html">LegacyPackageInstaller</a></li>
-			<li><a href="applications/people.html">People</a></li>
-			<li><a href="applications/poorman.html">PoorMan</a></li>
-			<li><a href="applications/screenshot.html">Screenshot</a></li>
-			<li><a href="applications/showimage.html">ShowImage</a></li>
-			<li><a href="applications/softwareupdater.html">SoftwareUpdater</a></li>
-			<li><a href="applications/soundrecorder.html">SoundRecorder</a></li>
-			<li><a href="applications/stylededit.html">StyledEdit</a></li>
-			<li><a href="applications/terminal.html">Terminal</a></li>
-			<li><a href="applications/textsearch.html">TextSearch</a></li>
-			<li><a href="applications/tv.html">TV</a></li>
-			<li><a href="applications/webpositive.html">WebPositive</a></li>
-		</ul>
-		<li><a href="applications.html#cli-apps">Haiku's commandline applications</a></li>
-		<li><a href="applications.html#list-of-bundled-apps">Bundled applications</a></li>
-		</ul></td>
-		<td>A Haiku programjainak működése és újak telepítése, meglévők eltávolítása.</td></tr>
-	<tr><td valign="top"><a href="desktop-applets.html">Desktop Applets</a>
-		<ul>
-			<li><a href="desktop-applets/launchbox.html">LaunchBox</a></li>
-			<li><a href="desktop-applets/networkstatus.html">NetworkStatus</a></li>
-			<li><a href="desktop-applets/powerstatus.html">PowerStatus</a></li>
-			<li><a href="desktop-applets/processcontroller.html">ProcessController</a></li>
-			<li><a href="desktop-applets/workspaces.html">Workspaces</a></li>
-		</ul></td>
-		<td>Egyszerű kis programok, melyeket az Asztalra illetve az Asztalsávra helyezhetünk.</td></tr>
-	<tr><td valign="top"><a href="preferences.html">Preferences</a>
-		<ul>
-			<li><a href="preferences/appearance.html">Appearance</a></li>
-			<li><a href="preferences/backgrounds.html">Backgrounds</a></li>
-			<li><a href="preferences/datatranslations.html">DataTranslations</a></li>
-			<li><a href="preferences/deskbar.html">Deskbar</a></li>
-			<li><a href="preferences/e-mail.html">E-mail</a></li>
-			<li><a href="preferences/filetypes.html">FileTypes</a></li>
-			<li><a href="preferences/keyboard.html">Keyboard</a></li>
-			<li><a href="preferences/keymap.html">Keymap</a></li>
-			<li><a href="preferences/locale.html">Locale</a></li>
-			<li><a href="preferences/media.html">Media</a></li>
-			<li><a href="preferences/mouse.html">Mouse</a></li>
-			<li><a href="preferences/network.html">Network</a></li>
-			<li><a href="preferences/printers.html">Printers</a></li>
-			<li><a href="preferences/repositories.html">Repositories</a></li>
-			<li><a href="preferences/screen.html">Screen</a></li>
-			<li><a href="preferences/screensaver.html">ScreenSaver</a></li>
-			<li><a href="preferences/shortcuts.html">Shortcuts</a></li>
-			<li><a href="preferences/sounds.html">Sounds</a></li>
-			<li><a href="preferences/time.html">Time</a></li>
-			<li><a href="preferences/tracker.html">Tracker</a></li>
-			<li><a href="preferences/touchpad.html">Touchpad</a></li>
-			<li><a href="preferences/virtualmemory.html">VirtualMemory</a></li>
-		</ul></td>
-		<td>A rendszer személyre szabása, beállítása.</td></tr>
-<!--
-	<tr><td valign="top"><a href="demos.html">Demos</a></td>
-		<td>Games and demo applications.</td></tr>
--->
+
 	<tr><td valign="top"><a href="bash-scripting.html">Bash és szkriptek</a></td>
 		<td>Néhány érdekes szkript és interneten elérhető segédlet a szkriptek használatához.</td></tr>
+
+	<tr><td valign="top"><a href="bootloader.html">Rendszertöltő</a></td>
+		<td valign="top">Biztonsági indítási opciók a problémák megoldása érdekében.</td></tr>
 </table>
 
 </div>

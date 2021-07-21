@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2013, Haiku. All rights reserved.
+ * Copyright 2010-2021, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -25,7 +25,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>User Guide</span></div>
 </div>
 
 <div class="nav">
@@ -36,6 +36,7 @@
 <li><a href="../../ca/applications/webpositive.html">Català</a></li>
 <li><a href="../../en/applications/webpositive.html">English</a></li>
 <li><a href="../../es/applications/webpositive.html">Español</a></li>
+<li><a href="../../eo/applications/webpositive.html">Esperanto</a></li>
 <li><a href="../../fr/applications/webpositive.html">Français</a></li>
 <li><a href="../../fur/applications/webpositive.html">Furlan</a></li>
 <li><a href="../../it/applications/webpositive.html">Italiano</a></li>
@@ -76,14 +77,14 @@ Daneben folgt ein Textfeld zur Eingabe einer Zieladresse (URL).<br />
 Unter dieser Navigationsleiste werden die Webseiten angezeigt. Es lassen sich mehrere Seiten parallel öffnen, indem man sie in eigene Reiter lädt.<br />
 Ganz unten im Fenster befindet sie eine Statusleiste, in der die URL der gerade ladenden Seite angezeigt wird, oder auch die Zieladresse eines Links, über dem sich der Mauszeiger gerade befindet. Während eine Seite geladen wird, erscheint rechts ein Fortschrittsbalken.</p>
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Einstellungen</h2>
-<p>Aus dem <span class="menu">Window</span> Menü lässt sich ein Panel <span class="menu">Settings</span> öffnen, um einige Konfigurationen für WebPositive vorzunehmen.</p>
+<p>Aus dem <span class="menu">Fenster</span> Menü lässt sich ein Panel <span class="menu">Einstellungen</span> öffnen, um einige Konfigurationen für WebPositive vorzunehmen.</p>
 <img src="../images/apps-images/webpositive-settings.png" alt="webpositive-settings.png" />
-<p>Der erste Reiter, <span class="menu">General</span>, betrifft allgemeine Einstellungen: Welche Datei oder URL dient als Startseite (<span class="menu">Start page</span>), welche als Suchseite (<span class="menu">Search page</span>), in welchem Ordner (<span class="menu">Downloads folder</span>) sollen Downloads aus dem Netz gespeichert werden.<br />
+<p>Der erste Reiter, <span class="menu">Allgemein</span>, betrifft allgemeine Einstellungen: Welche Datei oder URL dient als <span class="menu">Startseite</span>, welche als <span class="menu">Suchmaschine</span> (konfiguriert man hier eine <span class="menu">benutzerdefinierte</span>, ist "<i>%s</i>" hier die Variable für den Suchbegriff), in welchem <span class="menu">Download-Ordner</span>) sollen herunter geladene Dateien gespeichert werden.<br />
 Mittels zweier Menüs lässt sich entscheiden, welche Seite mit neuen Fenstern oder Reitern geladen oder ob eine leere Seite angezeigt werden soll.<br />
 Die Reiterleiste lässt sich ausblenden, wenn sowieso nur eine einzelne Seite geöffnet ist. Die gesamte Oberfläche kann im Vollbildmodus automatisch ausgeblendet werden, und der Mauszeiger kann automatisch verschwinden, nachdem die Maus für kurze Zeit nicht bewegt wird.<br />
 Schließlich lässt sich das Symbol für die Startseite in der Navigationsleiste ein- und ausblenden und die Anzahl der Tage einstellen, die sich der Browser die angesurften Orte in der Historie merkt.</p>
 <p>Im zweiten Reiter können Schriftarten für Standard, Serifen, Non-Serifen und Schriften mit fester Breite und deren Größen ausgewählt werden.</p>
-<p>Der letzte Reiter zur Konfiguration eines Proxyservers.</p>
+<p>Der letzte Reiter zur Konfiguration eines Proxy-Servers.</p>
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Bilder durchsehen</h2>
 <p>Wer schon mal einen Browser benutzt hat, dürfte mit WebPositive keine großen Überraschungen erleben. Anstatt jedes Menü und Feature durchzugehen, hier nur einige der interessanteren Punkte.</p>
 <ul>
@@ -94,22 +95,34 @@ Schließlich lässt sich das Symbol für die Startseite in der Navigationsleiste
 <li><p>Ist die Einstellung zum Ausblenden der Oberfläche aktiviert, verschwindet beim Wechsel in den Vollbildmodus nach kurzer Zeit. Um sie kurzzeitig wieder einzublenden, muss man nur mit der Maus zum oberen Bildschirmrand fahren.</p></li>
 <li><img src="../images/apps-images/webpositive-locator.png" alt="webpositive-locator.png" />
 <p>Während man eine Adresse in das Textfeld eingibt, sucht der Browser dazu passende URLs von Webseiten, die früher schon mal besucht wurden und listet sie unter dem Textfeld auf. Entweder man fügt weitere Buchstaben hinzu, um die Liste zu verkürzen oder wählt einen Eintrag mit <span class="key">↑</span> oder <span class="key">↓</span> aus. <span class="key">RETURN</span> lädt die Seite. Oder man klickt das Symbol ganz rechts in der Leiste, das auch zum Aktualisieren der Seite dient.<br />
-Eingaben, die nicht als URL erkannt werden, dienen als Suchbegriff für eine Google-Suche. Das Textfeld kann also auch für eine schnelle Websuche genutzt werden.</p></li>
+Eingaben, die nicht als URL erkannt werden, dienen als Suchbegriff für die in den Einstellungen gesetzte Suchmaschine. Das Textfeld kann also auch für eine schnelle Websuche genutzt werden.</p>
+<div class="box-info"><p>WebPositive bietet die Möglichkeit mit einem vor den Suchbegriff gesetzten Buchstaben eine spezielle Suchmaschine auszuwählen:</p>
+<ul>
+<li>"g” für Google</li>
+<li>“b” für Bing</li>
+<li>“w” für Wikipedia</li>
+<li>“d” für DuckDuckGo</li>
+<li>“a” für Baiku</li>
+<li>“y” für Yandex</li>
+<li>“e” für Ecosia</li>
+<li>“q” für Qwant</li>
+</ul></div></li>
 <li><p>Ein Rechtsklick öffnet ein Kontextmenü, mit dem, abhängig vom angeklickten Objekt, beispielsweise ein Link in einem neuen Fenster oder Reiter geöffnet, oder das Objekt runtergeladen werden kann etc.</p></li>
-<li><p><span class="menu">Edit | Find</span> öffnet eine Suchleiste unten im Fenster, um Begriffe auf der aktuellen Seite zu suchen. Die Fundstellen werden farbig hinterlegt.</p></li>
+<li><p><span class="menu">Bearbeiten | Suchen</span> öffnet eine Suchleiste unten im Fenster, um Begriffe auf der aktuellen Seite zu suchen. Die Fundstellen werden farbig hinterlegt.</p></li>
 </ul>
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Lesezeichen</h2>
-<p>WebPositives Lesezeichen werden als einzelne Dateien und Ordner in <span class="path">~/config/settings/WebPositive/Bookmarks/</span> verwaltet. Fügt man ein neues Lesezeichen hinzu, wird dort eine neue Datei erstellt. Dieser Ordner lässt sich bequem mit <span class="menu">Manage Bookmarks...</span> öffnen.</p>
+<p>WebPositives Lesezeichen werden als einzelne Dateien und Ordner in <span class="path">~/config/settings/WebPositive/Bookmarks/</span> verwaltet. Fügt man ein neues Lesezeichen hinzu, wird dort eine neue Datei erstellt. Dieser Ordner lässt sich bequem mit <span class="menu">Lesezeichen verwalten...</span> öffnen.</p>
 <img src="../images/apps-images/webpositive-bookmarks.png" alt="webpositive-bookmarks" />
-<p>Man kann URL, Name und Titel eines Lesezeichens ändern und Begriffe als "Keywords" eingeben, wie bei jeder Datei mit Attributen. Dazu müssen in Trackers <span class="menu">Attribute</span> Menü nur all diese Spalten angezeigt werden. Dann markiert man eine Datei, drückt ALT E und editiert das Attribut. Spalten werden mittels TAB gewechselt. Lesezeichen lassen sich in selbst angelegte Ordner einsortieren.</p>
+<p>Man kann URL, Name und Titel eines Lesezeichens ändern und Begriffe als "Keywords" eingeben, wie bei jeder Datei mit Attributen. Dazu müssen in Trackers <span class="menu">Attribute</span> Menü nur all diese Spalten angezeigt werden. Dann markiert man eine Datei, drückt <span class="key">ALT</span> <span class="key">E</span> und editiert das Attribut. Spalten werden mittels <span class="key">TAB</span> gewechselt.<br />
+Lesezeichen lassen sich in selbst angelegte Ordner einsortieren.</p>
 <p>Weil der Tracker zur Verwaltung von Lesezeichen verwendet wird, lassen sich seine einzigartigen Features nutzen, um schnell zu finden was man sucht.<br />
 Ist das <span class="menu">Filtern während der Eingabe</span> in den <a href="../tracker.html#tracker-preferences">Trackereinstellungen</a> aktiviert, lässt sich die Liste der Lesezeichen im Handumdrehen so verkürzen, dass nur noch die gezeigt werden, die die eingegebene Zeichenkette enthalten. Noch ein paarmal <span class="key">↑</span> oder <span class="key">↓</span> drücken, um das entsprechende Lesezeichen zu markieren und ein <span class="key">RETURN</span> öffnet die Seite. Dabei sollte man alle Attributspalten eingeblendet haben, damit der Filter auch auf Name, Titel, URL und Keywords angewendet wird.</p>
-<p>Damit das gut funktioniert, sollten alle Lesezeichen direkt in <span class="path">~/config/settings/WebPositive/Bookmarks/</span> abgelegt und nur Kopien in Unterordner einsortiert werden, um sie in WebPositives <span class="menu">Bookmarks</span> Menü zu nutzen (wenn überhaupt). Befüllte "Keywords" Attribute helfen übrigens auch...</p>
+<p>Damit das gut funktioniert, sollten alle Lesezeichen direkt in <span class="path">~/config/settings/WebPositive/Bookmarks/</span> abgelegt und nur Kopien in Unterordner einsortiert werden, um sie in WebPositives <span class="menu">Lesezeichen</span> Menü zu nutzen (wenn überhaupt). Befüllte "Keywords" Attribute helfen übrigens auch...</p>
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Downloads</h2>
-<p><span class="menu">Window | Downloads</span> öffnet ein Fenster mit allen vergangenen und laufenden Downloads:
+<p><span class="menu">Fenster | Downloads</span> öffnet ein Fenster mit allen vergangenen und laufenden Downloads:
 </p>
 <img src="../images/apps-images/webpositive-downloads.png" alt="webpositive-downloads.png" />
-<p>Gerade laufende Downloads werden mit einem Fortschrittsbalken dargestellt und zeigen, wie bei Kopieraktionen in Tracker, Informationen zu Downloadgeschwindigkeit, Dateigröße und voraussichtliche Endzeit. Rechts davon sind Buttons, um den Download abzubrechen (<span class="button">Cancel</span>) oder neu zu starten (<span class="button">Restart</span>) oder die Datei zu öffnen (<span class="button">Open</span>) und ihren Eintrag von der Liste zu entfernen (<span class="button">Remove</span>). <span class="button">Remove missing</span> und <span class="button">Remove finished</span> unter der Liste tun dies für alle Einträge. "Missing" sind Dateien, die in der Zwischenzeit gelöscht wurden.</p>
+<p>Gerade laufende Downloads werden mit einem Fortschrittsbalken dargestellt und zeigen, wie bei Kopieraktionen in Tracker, Informationen zu Downloadgeschwindigkeit, Dateigröße und voraussichtliche Endzeit. Rechts davon sind Buttons; mit ihnen lässt sich ein Download <span class="button">Abbrechen</span>) oder ein (<span class="button">Neustart</span>) einleiten. Die fertig heruntergeladene Datei lässt sich <span class="button">Öffnen</span>) und ihr Eintrag von der Liste <span class="button">Entfernen</span>). <span class="button">Fehlende entfernen</span> und <span class="button">Fertige entfernen</span> unter der Liste tun dies für alle Einträge. "Fehlende" sind Dateien, die in der Zwischenzeit gelöscht oder verschoben wurden.</p>
 <p>Wird eine Datei in den Papierkorb verschoben noch während sie heruntergeladen wird, wird der Download abgebrochen. Außerdem erscheint ihr Icon halb-transparent.<br />
 Sowieso ist WebPositive sehr tolerant, wenn es um Dateioperationen in Tracker geht. Dateien können umbenannt und verschoben werden, noch während sie heruntergeladen werden, und auch nachdem der Download abgeschlossen ist, werden solche Änderungen in den Einträgen im Downloads-Fenster weiter berücksichtigt.</p>
 <div class="box-info"><p>Wer wollte nicht schon mal wissen, von welcher Webseite ein bestimmtes Paket, Bild oder sonst eine Datei heruntergeladen wurde? Das lässt sich herausfinden, indem man die Datei in <a href="diskprobe.html">DiskProbe</a> öffnet und einen Blick in ihr META:url Attribute wirft.</p></div>

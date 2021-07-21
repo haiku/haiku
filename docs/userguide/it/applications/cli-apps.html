@@ -39,6 +39,7 @@
 <li><a href="../../de/applications/cli-apps.html">Deutsch</a></li>
 <li><a href="../../en/applications/cli-apps.html">English</a></li>
 <li><a href="../../es/applications/cli-apps.html">Español</a></li>
+<li><a href="../../eo/applications/cli-apps.html">Esperanto</a></li>
 <li><a href="../../fr/applications/cli-apps.html">Français</a></li>
 <li><a href="../../fur/applications/cli-apps.html">Furlan</a></li>
 <li><a href="../../hu/applications/cli-apps.html">Magyar</a></li>
@@ -64,7 +65,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">La traduzione di questa pagina non è stata ancora completata. Finché non lo sarà, le parti non tradotte saranno visualizzate in inglese.</div>
 
 <h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Applicazioni su riga di comando specifiche per Haiku</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -139,32 +139,31 @@ Un esempio:</p>
 		<td valign="top"><p>Tramite <span class="cli">diskimage</span> puoi registrare un file come un dispositivo disco. Per esempiom puoi registrare un file immagine di Haiku, montarla tramite il Tracker e copiare, modificare o cancellare file prima di utilizzarla come immagine di partenza per una installazione attraverso il Programma di Installazione.</p>
 </td></tr>
 <tr><td><p><span class="cli">launch_roster</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p>The launch_daemon starts all sorts of services and applications at boot-up. For some it was instructed to re-start them if they were quit. If you don't want that – maybe you'd like to test a modified Tracker, for example – you use <span class="cli">launch_roster</span> to <tt>stop</tt> the re-starting of the application before quitting it. Similarly, you can <tt>start</tt> it again or get <tt>info</tt> about it.c  The parameter <tt>log</tt> prints out a log of all launch_daemon related events.<br />
-Without parameter, <span class="cli">launch_roster</span> lists all apps/services that are under its control.<br />
-For example, this will stop the re-launching of the Deskbar:</p>
+		<td valign="top"><p>Il launch_daemon si occupa di avviare tutti i servizi e le applicazioni all'avvio. Per alcuni di questi servizi, si occupa di riavviarli nel caso venissero chiuse. Se non è ciò che desideri – magari perché vuoi provare una versione modificata del Tracker, ad esempio – puoi utilizzare <span class="cli">launch_roster</span> per <tt>fermare</tt> il riavvio di un'applicazione, prima di chiuderla. Allo stesso modo puoi <tt>avviarla</tt> nuovamente o recuperare alcune <tt>informazioni</tt> su di essa. Il parametro <tt>log</tt> stampa un riepilogo di registro di tutti gli eventi relativi a launch_daemon related.<br />
+Senza alcun parametro, <span class="cli">launch_roster</span> mostra una lista di tutte le applicazioni e i servizi sotto il suo controllo.<br />
+L'esempio qui sotto impedisce il riavvio automatico della Deskbar:</p>
 <pre class="terminal">launch_roster stop x-vnd.be-tskb</pre></td></tr>
 <tr><td><p><span class="cli">mountvolume</span><br /><span class="cli">mount</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">mountvolume</span> is preferred by many to mount local partitions and disks, because its usage is so easy: just call it with the name of the partition and you're done. Try <tt>--help</tt> for more options.</p>
-<p><span class="cli">mount</span> can additionally mount remote disks by using a network filesystem, like NFS4. You specify the used filesystem with the <tt>-t</tt> parameter and the remote location with the <tt>-p</tt> parameter. As filesystem parameter you can use anything you find in <span class="path">/system/add-ons/kernel/file_system</span> (and corresponding file hierarchies under <span class="path">~/config</span> or "<span class="path">non-packaged</span>", of course). You also have to create a folder as mountpoint. Here's an example:</p>
+		<td valign="top"><p><span class="cli">mountvolume</span> è spesso preferito per montare partizioni e dischi, in quanto estremamente semplice da usare: invocalo specificando semplicemente il nome della partizione da montare e il gioco è fatto. Prova il parametro <tt>--help</tt> per una lista delle altre opzioni.</p>
+<p><span class="cli">mount</span> può anche montare dischi remoti utilizzando un file system di rete, come NFS4. Specifica il tipo di file system mediante il parametro <tt>-t</tt> e la posizione remota mediante il parametro <tt>-p</tt>. Come file system puoi scegliere tra tutti quelli che trovo al percorso <span class="path">/system/add-ons/kernel/file_system</span> (come anche il percorso speculare sotto <span class="path">~/config</span> oppure, naturalmente, "<span class="path">non-packaged</span>"). Ricordati di creare una directory da usare come mountpoint. Qui di seguito un esempio:</p>
 <pre class="terminal">mkdir -p /DiskStation
 mount -t nfs4 -p "192.168.178.3:volume1" /DiskStation</pre></td></tr>
 <tr><td><p><span class="cli">open</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">open</span> è un'applicazione semplice ma anche molto pratica. Permette di aprire qualsiasi file con la sua applicazione preferita o avviare uno specifico programma a partire dalla sua firma senza la necessità di conoscerne l'esatto percorso. Il comando funziona anche con gli URL e con le cartelle "virtuali" (<tt>.</tt> indica la cartella corrente e <tt>..</tt> indica la cartella superiore) aprendo la cartella direttamente nel Tracker.</p></td></tr>
 <tr><td><p><span class="cli">ramdisk</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p>A ramdisk is like a harddisk running only in the computer's memory. That makes it very fast but also volatile, because its contents vanishes when you shut down the computer, or it crashes or you experience a blackout.<br />
-To create a ramdisk of 1 GiB, format to the name "RAMses" and mount it, you enter this in Terminal or create a script of it:</p>
+		<td valign="top"><p>Un disco RAM (ramdisk) è come un disco rigido, solo che risiede nella memoria del computer. Questo lo rende estremamente veloce, ma anche volatile, in quanto il suo contenuto viene perduto quando spegni il computer, quando va in crash o quando si verifica un blackout.<br />
+Per creare un disco RAM da 1 GiB, formattarlo con il nome "RAMses" e montarlo, immetti questi comandi da Terminale, oppure crea uno script che li contiene:</p>
 <pre class="terminal">ramdisk create -s 1gb
 mkfs -q -t bfs /dev/disk/virtual/ram/0/raw RAMses
 mountvolume RAMses</pre>
-<p>Note: When creating a ramdisk, the <span class="cli">ramdisk</span> command prints out the path to it. If you create several disks, that path <span class="path">/dev/disk/virtual/ram/0/raw</span> will change!</p>
-<p>To preserve the contents, at least if no calamity like a blackout etc. strikes, a ramdisk can be set up to read/write an image on the harddisk. For that, you need to supply a file of the desired size that will be read from every time you start your ramdisk, and written to when you unmount it. To create an image file "RAMimage" of 500MiB and format it, do this:</p>
+<p>Nota: quando crei un disco RAM, il comando<span class="cli">ramdisk</span> restituisce il suo percorso. Se crei più dischi, il percorso<span class="path">/dev/disk/virtual/ram/0/raw</span> cambierà!</p>
+<p>Per preservarne il contenuto, almeno nel caso non vi sia una calamità imprevista come, appunto, un blackout, un disco RAM può essere configurato per leggere/scrivere da un'immagine su disco rigido. A tale scopo, devi fornire un file delle dimensioni desiderate e take file verrà letto all'avvio del disco RAM e scritto quando lo smonti.  Per creare un'immagine "RAMimage" di 500MiB e per formattarla, immetti questi comandi:</p>
 <pre class="terminal">dd if=/dev/zero of=RAMimage bs=500M count=1
 mkfs -q -t bfs /dev/disk/virtual/ram/0/raw RAMimage</pre>
-<p>From now on, you start the ramdisk like this:</p>
+<p>Da questo momento in poi, il comando di avvio del disco RAM sarà il seguente:</p>
 <pre class="terminal">ramdisk create RAMimage
 mountvolume RAMimage</pre>
-<p>It's very important to always cleanly unmount you ramdisk, either from Tracker or with <span class="cli">unmount /RAMimage</span>, or the changes won't be written back to the image file!</p>
-</td></tr>
+<p>È estremamente importante smontare correttamente il disco RAM, tramite il Tracker oppure il comando<span class="cli">unmount /RAMimage</span>. Se non lo fai, le modifiche apportate non verranno trascritte nel file immagine!</p></td></tr>
 </table>
 </div>
 </div>

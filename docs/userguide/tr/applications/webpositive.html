@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2013, Haiku. All rights reserved.
+ * Copyright 2010-2021, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -23,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Kullanıcı kılavuzu</span></div>
 </div>
 
 <div class="nav">
@@ -35,6 +35,7 @@
 <li><a href="../../de/applications/webpositive.html">Deutsch</a></li>
 <li><a href="../../en/applications/webpositive.html">English</a></li>
 <li><a href="../../es/applications/webpositive.html">Español</a></li>
+<li><a href="../../eo/applications/webpositive.html">Esperanto</a></li>
 <li><a href="../../fr/applications/webpositive.html">Français</a></li>
 <li><a href="../../fur/applications/webpositive.html">Furlan</a></li>
 <li><a href="../../it/applications/webpositive.html">Italiano</a></li>
@@ -76,10 +77,10 @@ Pencerenin alt kısmında yüklenen URL'yi veya üzerine getirilen linkin ayrın
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Ayarlar</h2>
 <p><span class="menu">Pencere</span> menüsünden WebPositive'in mevcut ayarlarını düzenlemek için <span class="menu">Ayarlar</span> panelini açabilirsiniz.</p>
 <img src="../images/apps-images/webpositive-settings.png" alt="webpositive-settings.png" />
-<p>İlk sekme genel ayarları içerir: <span class="menu">Başlangıç sayfası</span>'nın ne olacağı, <span class="menu">Arama sayfası</span> olarak ne kullanılacağı, <span class="menu">İndirmeler klasörü</span>'nün nerede olacağı gibi.<br />
-İki açılır menü yeni bir pencere veya sekme açtığınızda neyi görmek istediğinizi ayarlamanıza olanak verir.<br />
-Aşağısında bulunan onay kutuları ile tek bir sayfa açıkken sekme çubuğunun görünmemesini veya uzunca bir süre hareket etmediyse fare imlecinin kendiliğinden gizlenmesini sağlayabilirsiniz.<br />
-Son olarak "Anasayfa" düğmesinin dolaşım çubuğunda görünüp görünmeyeceğine veya ziyaret ettiğiniz sayfaların kaç gün geçmişinizde kalacağını geriye kalan seçeneklerden ayarlamanız mümkündür.</p>
+<p>İlk sekmede genel ayarlar bulunur: Hangi dosya veya URL'nin <span class="menu">Başlangıç sayfası</span>olarak kullanılacağı, <span class="menu">Arama sayfası</span>'nın ne olacağı (eğer <span class="menu">Özel</span> bir arama motoru koyarsanız "<i>%s</i>" arama terimi değişkeni olarak kullanılır), internetten indirdiğiniz ıvır zıvır için hangi <span class="menu">İndirmeler klasörü</span>'nün kullanılacağı gibi.<br />
+İki açılır menüden bir sekme veya pencere açtığınızda neyin yükleneceğini seçebilirsiniz.<br />
+İzleyen onay kutularıyla yalnızca bir sayfa açıkken sekme çubuğunu gizleyebilirsiniz. WebPositive'in arayüzü tam ekran kipindeyken tümüyle gizlenebilir ve fare imleci belirli bir süre etkinlik olmazsa kendiliğinden gizlenebilir.<br />
+Son olarak, "Anasayfa" düğmesini dolaşım çubuğunda gizleyebilir ve tarayıcının göz atma geçmişini kaç gün belleğinde tutacağını belirleyebilirsiniz.</p>
 <p>İkinci sekmede ise hangi standart, serif, serif olmayan ve sabit genişliklikli yazıtiplerinin kullanılacağını ve öntanımlı boyutlarını ayarlayabilirsiniz.</p>
 <p>Son sekmede vekil sunucu ayarları bulunur.</p>
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Tarama</h2>
@@ -92,7 +93,18 @@ Son olarak "Anasayfa" düğmesinin dolaşım çubuğunda görünüp görünmeyec
 <li><p>Tam ekran kipine geçip arabirimi saklayan özelliği açtıysanız bir saniye sonra devreye girecektir. Arabirimi yeniden görmek için fare imlecini ekranın üst kısmına getirin.</p></li>
 <li><img src="../images/apps-images/webpositive-locator.png" alt="webpositive-locator.png" />
 <p>Adres çubuğuna metin girdiğinizde, tarayıcı girdiğiniz metinle daha önce ziyaret ettiğiniz sayfalar arasından eşleşenleri size gösterir. Bundan sonra metin girmeyi sürdürebilir veya <span class="key">↑</span> veya <span class="key">↓</span> düğmeleri ile listelenenlerden birini seçebilirsiniz. <span class="key">ENTER</span> düğmesine basmak seçtiğiniz girdiyi yükler. Aynı zamanda sağ uzak yandaki düğmeyi de kullanabilirsiniz, bu düğme sayfayı da yenilemek için kullanılabilir.<br />
-URL olarak tanımlanamayan girdiler Google kullanılarak aranacaktır. Adres çubuğu böylece arama kutusu işlevi de görür.</p></li>
+URL olarak tanımlanamayan girdiler Google kullanılarak aranacaktır. Adres çubuğu böylece arama kutusu işlevi de görür.</p>
+<div class="box-info"><p>WebPositive çeşitli arama motorlarını hızlıca kullanabilmeniz için kısayolları destekler. Arama terimi öncesinde yalnızca kullanmak istediğiniz arama motorunun tek harfli kısayolunu girin.</p>
+<ul>
+<li>"g” - Google</li>
+<li>“b” - Bing</li>
+<li>“w” - Wikipedia</li>
+<li>“d” - DuckDuckGo</li>
+<li>“a” - Baiku</li>
+<li>“y” - Yandex</li>
+<li>“e” - Ecosia</li>
+<li>“q” - Qwant</li>
+</ul></div></li>
 <li><p>Sağ tıklama, tıkladığınız nesnenin türüne göre değişiklik gösterecek bir bağlam menüsü açar; örneğin bir bağlantıya tıklarsanız yeni bir pencerede veya sekmede açmak için seçenekler görebilirsiniz.</p></li>
 <li><p><span class="menu">Düzen | Bul</span> sayfa içinde arama yapabileceğiniz bir çubuk gösterir. Eşleşmeler kolayca öne çıkmaları için vurgulanır.</p></li>
 </ul>

@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="eo" xml:lang="eo">
+<head>
+<!-- 
+ *
+ * Copyright 2008-2019, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Va Miluŝnikov
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>La Spurilo (Tracker)</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>User guide</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now">Esperanto&nbsp;<span class="dropdown-caret">&#9660;</span></li>
+<li><a href="../id/tracker.html">Bahasa Indonesia</a></li>
+<li><a href="../ca/tracker.html">Català</a></li>
+<li><a href="../de/tracker.html">Deutsch</a></li>
+<li><a href="../en/tracker.html">English</a></li>
+<li><a href="../es/tracker.html">Español</a></li>
+<li><a href="../fr/tracker.html">Français</a></li>
+<li><a href="../fur/tracker.html">Furlan</a></li>
+<li><a href="../it/tracker.html">Italiano</a></li>
+<li><a href="../hu/tracker.html">Magyar</a></li>
+<li><a href="../pl/tracker.html">Polski</a></li>
+<li><a href="../pt_PT/tracker.html">Português</a></li>
+<li><a href="../pt_BR/tracker.html">Português (Brazil)</a></li>
+<li><a href="../ro/tracker.html">Română</a></li>
+<li><a href="../sk/tracker.html">Slovenčina</a></li>
+<li><a href="../fi/tracker.html">Suomi</a></li>
+<li><a href="../sv_SE/tracker.html">Svenska</a></li>
+<li><a href="../tr/tracker.html">Türkçe</a></li>
+<li><a href="../zh_CN/tracker.html"> 中文 ［中文］</a></li>
+<li><a href="../ru/tracker.html">Русский</a></li>
+<li><a href="../uk/tracker.html">Українська</a></li>
+<li><a href="../jp/tracker.html">日本語</a></li>
+</ul>
+<span>
+ «  <a href="teammonitor.html">Team Monitor</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="tracker-add-ons.html">Tracker Add-Ons</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+
+<table class="index" id="index" summary="index">
+<tr class="heading"><td>Enhavtabelo</td></tr>
+<tr class="index"><td>
+	<a href="#mounting-volumes">Surmetado de volumoj</a><br />
+	<a href="#navigating">Navigado</a><br />
+	<a href="#appearance">Aspekto</a><br />
+	<a href="#tracker-preferences">Agordo de la Spurilo</a><br />
+	<a href="#working-with-files">Prilaboro de dosieroj</a><br />
+	<a href="#transaction-status">Stato de agoj</a>
+</td></tr>
+</table>
+
+<h1>La Spurilo (Tracker)</h1>
+
+<p>La Spurilo estas grafika interfaco al ĉiuj viaj dosieroj. Ĝi permesas al vi krei novajn dosierojn kaj dosierujojn aŭ serĉi, lanĉi, nomŝamĝi, forigi kaj kopii ekzistantajn.</p>
+<p>La Spurilo estas programo tute simila al ĉiuj aliaj (la labortablo kun ĝiaj piktogramoj fakte estas nur plenekrana fenestro de la Spurilo konstante montranta la specialan dosierujon), La Spurilo aperas kun ĉiuj ĝiaj fenestroj en listo de la Laborstrio, povas esti ĉesigita kaj restartigita. La plej simpla vojo ĉesigi kaj restartigi paneintan aŭ paraliziĝintan la Spurilon (aŭ eĉ la Labortstrion) estas uzi <a href="teammonitor.html">La Procezarobservilon</a>.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="mounting-volumes" name="mounting-volumes">Surmetado de volumoj</a></h2>
+<p>Por atingi entenon de fiksitaj diskoj, lumdiskoj, poŝmemoriloj k.t.p., vi devas komence surmeti volumojn por la sistemo ekuzis ilin. Vi povas fari tion per submenuo <span class="menu">Surmeti</span>, kiun vi povas trovi en menuo de la Laborstrio aŭ de la Spurilo, per dekstra alklako sur ajna loko de la labortablo aŭ per dekstra alklako sur piktogramo de disko sur la labortablo.</p>
+<img src="images/tracker-images/mount-settings.png" alt="drill-down.png" />
+<p>Por eviti permanan surmetadon por ĉio necesa dum ĉiu praŝargo ekzistas speciala 
+<span class="menu">Agordo</span>.<br />
+La ekzempla agordo supre aŭtomate surmetos  iun ajn konektitan/enmetitan memorilon kaj ankaŭ resurmetos  ĉiuj antaŭe surmetitajn diskojn dum praŝargo.</p>
+<div class="box-warning">Antaŭ ol diskonekti fiksitan diskon aŭ poŝmemorilon certiĝu ke vi sukcese demetis la volumojn kaj ĝiaj piktogramoj malaperis. Tio garantios ke transdono de ĉiu via datumo estas finita. Aliokaze vi povas perdi vian datumon aŭ eĉ rompi diskon!</div>
+<div class="box-warning">La Hajko kapablas surmeti volumojn formatigitajn ne per la sistemo BFS. Tamen aliaj dosieraj sistemoj ne estis testitaj rigore. Konservado de informo en tiujn volumojn povas iam kaŭzi perdon de informo. Se vi atentas sekurecon ĉiam preferu <span class="button">Surmeti nurlege</span>.</div>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="navigating" name="navigating">Navigado</a></h2>
+<p>Duobla alklako al dosierujo dekomence implicas ke la Spurilo malfermos novan fenestron lasante malfermita la patran. Tio povas rapide superplenigi ekranon per la fenestroj.<br />
+Vi povas preventi tion premtenante <span class="key">OPCIKLAVON</span>, kio aŭtomate fermos patran fenestron.<br />
+Tio funkcias ankaŭ dum klavara navigado. Pli detale legu en la ĉapitro <a href="keyboard-shortcuts.html">Ŝparklavoj kaj klavkombinaĵoj</a>.</p>
+<p>Movado tra dosierujoj estas unu el ĉefaj celoj de la Spurilo, simile al dosieraj administriloj en aliaj sistemoj. La Spurilo de la Hajko havas kelkajn unikajn eblecojn helpantajn fari tion pli komforte.</p>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a><a id="drill-down" name="drill-down">Hierarkiaj falmenuoj</a></h3>
+<p>Anstataŭ duoble alklaki dosierujon por eniri suben ekzistas pli komforta rimedo - la hierarkia falmenuo:</p>
+<img src="images/tracker-images/drill-down.png" alt="drill-down.png" />
+<!-- screenshot needs updating to show /boot/system/documentation -->
+<p>Dekstra alklako sur dosierujo aperigas menuon kie la unua elemento estas falmenuo, kiu permesas navigi al subaj niveloj. Simple iru laŭ hierarkio ĝis necesa dosiero aŭ dosierujo kaj alklaku ĝin por uzi. Supra ekzemplo montras entenon de la dosierujo<span class="path">/boot/home/config/</span>.<br />
+Se vi faros tion trenante dosieron, la dosiero estos movita en elektiton.</p>
+<p>Vi povas uzi similan metodon en ajna fenestro de la Spurilo:</p>
+<img src="images/tracker-images/window-drill-down.png" alt="window-drill-down.png" />
+<p>Alklaku suban maldekstran areon kun informo pri nombro de elementoj kaj aperos submenuo por ĉiuj niveloj ekde nuna loko. Tie vi povas kutime navigi.</p>
+<p>Atentu, ke la labortablo ĉiam estas la plej supra nivelo kie la Spurilo montras surmetitajn volumojn. Do, se vi volas navigi en alian diskon komence navigu supron (labortablon).</p><br />
+<p>Vi povas uzi saman submenuon trenante dosieron sur dosierujo. Se vi iom da tempon tenos trenatan dosieron sur dosierujo aperos submenuo per kiu vi povos elekti celon. Se treni dosieron per dekstra musbutono vi povos elekti agon inter kopii, movi aŭ ligiligi tuj kiam vi lasos la butonon.</p>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="type-ahead" name="type-ahead">Saltado al dosieroj per antaŭtajpado</a></h3>
+<p>Ŝajne vi konas eblecon de aliaj dosieradministriloj: tajpante komencajn literojn de la nomo vi tuj saltos al unua dosiero kiu komenciĝas per tiuj literoj. La Hajko disvolvis la ideon. Se forestas dosiero kun nomo komencanta per tiuj literoj vi saltos al unua dosiero kies nomo entenas la literojn ie ajn en la nomo. Aŭ eĉ se nomo ne entenas literojn la serĉado daŭros tra atributoj de doiseroj.</p>
+<img src="images/tracker-images/window-type-ahead.png" alt="window-type-ahead.png" />
+<p>En supra ekzemplo multaj dosieroj komenciĝas per "Haiku logo", do tajpado de komencaj literoj estos senutila. Tamen en la Hajko vi povas tajpi "web" por salti al la dosiero "Haiku logo - website". Enigataj signoj aperas en suba maldekstra angulo, kie vi kutime vidas nombron de dosieroj en dosierujo. Kaj post sekundo la la informo en la kampo restaŭriĝos kaj vi povos ekserĉi denove.</p>
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="type-ahead-filter" name="type-ahead-filter">Filtrado per antaŭtajpado</a></h3>
+<p>Anstataŭ salti dum tajpado vi ankaŭ povas filtri taŭgajn dosierojn - ĉiuj netaŭgaŭ dosieroj fariĝos nevideblaj. Tio povas efektivigi serĉadon precipe se  dosieroj estas tre multnombraj. Por komenci filtradon aŭ dividi serĉajn ŝablonojn premu <span class="key">MAJUSKLIGKLAVON</span> <span class="key">SPACON</span>.<br />
+Diference de antaŭtajpa saltado la filtrado daŭros ĝis kiam vi ne presos <span class="key">ESKAPKLAVO</span> aŭ ne fermos ĉi fenestron (aŭ ne ŝanĝos dosierujon, se vi uzas solfenestran navigadon).<br />
+Ŝalti antaŭtajpan filtradon vi povas en <a href="#tracker-preferences.html">Agordo de la Spurilo</a>.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="appearance" name="appearance">Aspekto</a></h2>
+<img src="images/tracker-images/window-menu.png" alt="window-menu.png" />
+<p>Fenestroj de la Spurilo proponas tri reĝimojn de montrado per la menuo <span class="menu">Fenestro</span>:</p>
+<ul>
+<li><p><span class="menu">Piktograma vido</span> (<span class="key">ALTERNATIVKLAVO</span> <span class="key">1</span>) - grandaj piktogramoj, kies gradon vi povas ŝanĝi per submenuo aŭ pliigi/malpliigi per <span class="key">ALTTERNATIVKLAVO</span> <span class="key">+</span>/<span class="key">-</span>.</p></li>
+<li><p><span class="menu">Eta piktograma vido</span> (<span class="key">ALTERNATIVKLAVO</span> <span class="key">2</span>) - malgrandaj piktogramoj.</p></li>
+<li><p><span class="menu">Lista vido</span> (<span class="key">ALTERNATIVKLAVO</span> <span class="key">3</span>) - detala listo de dosieroj kaj ebleco montri/kaŝi aldonajn dosierajn indikojn (rigardu ĉapitron <a href="attributes.html">Atributoj</a>).</p></li>
+</ul>
+<p>La menuo <span class="menu">Fenestro</span> proponas kelkajn aliajn funkciojn:</p>
+<ul>
+<li><p><span class="menu">Adapti laŭ grando</span> (<span class="key">ALTERNATIVKLAVO</span> <span class="key">Y</span>) - Adapti la fenestron al la plej taŭga grando.</p></li>
+<li><p><span class="menu">Ordigi laŭ...</span> - Submebuo, havebla nur en la vido kiel grandaj aŭ malgrandaj piktogramoj, kiu permesas ordigi sosieroj laŭ divesaj indikoj:</p>
+	<ul>
+	<li><p><span class="menu">Nomo</span>, <span class="menu">Reala nomo</span>, <span class="menu">Grando</span>, <span class="menu">Dato de lasta ŝanĝo</span>, <span class="menu">Dato de kreado</span>, <span class="menu">Speco</span>, <span class="menu">Loko</span>, <span class="menu">Permesoj</span></p></li>
+	<li><p><span class="menu">Renversa ordo</span> - Rinversas direkton de ordigo</p></li>
+	<li _translation_id="4339"><p><span class="menu">Alkradigi</span> (<span class="key">ALTERNATIVKLAVO</span> <span class="key">K</span>) - Alkradigas ĉiujn piktogramojn al nevidebla krado. Kun premita <span class="key">MAJUSKLIGKLAVO</span> en la submenuo aperas <span class="menu">Alkradigi ĉion</span> kiu aldone ordigos ĉiujn piktogramojn konkorde al antaŭ elektita regulo.</p></li>
+	</ul></li>
+<li><p><span class="menu">Elekti...</span> (<span class="key">MAJUSKLIGKLAVO</span> <span class="key">ALTERNATIVKLAVO</span> <span class="key">A</span>) - Elektas dosierojn konkorde al <a href="https://eo.wikipedia.org/wiki/Regula_esprimo" class="external free" title="Wikipedia: Regular expression">regula esprimo</a>.</p></li>
+<li><p><span class="menu">Fermi</span> (<span class="key">ALTERNATIVKLAVO</span> <span class="key">W</span>) - Fermas la fenestron. Kun premita <span class="key">MAJUSKLIGKLAVO</span> en la menuo aperas <span class="menu">Fermi ĉiujn</span> kiu fermos ĉiujn fenestrojn de la Spurilo.</p></li>
+<li><p><span class="menu">Fermi ĉion en la laborspaco</span> (<span class="key">ALTERNATIVKLAVO</span> <span class="key">Q</span>) - Fermas ĉiujn fenestrojn de la Spurilo ĉe aktuala laborspaco. Tio estas utila ŝparklavo se vi forgesis uzi <span class="key">OPCIKLAVON</span> alklakante dosierujojn kaj ĉiuj fenestroj kun antaŭaj dosierujoj restas malfermitaj ĉe via flua laborspaco.</p></li>
+</ul>
+<p>Iam vi volus reordigi nur kelkajn dosierojn sen plenumo de tuteca <span class="menu">Alkradigi ĉion</span> (per <span class="key">ALTERNATIVKLAVO</span> <span class="key">K</span>). Tiuokaze vi elektu deziratajn piktogramojn kaj trenu ilin al nova loko. Antaŭ ĵeti ilin tie premtenu <span class="key">ALTERNATIVKLAVON</span>. Tio alkradigos la piktogramojn.</p>
+<p>Aliaj funkcioj estas evidentaj.</p>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="tracker-preferences" name="tracker-preferences">Agordo de la Spurilo</a></h3>
+<p><span class="menu">Fenestro | Agordo...</span> malfermas panelon kun iom da opciojn kiuj estas aplikataj realtempe, do vi vidos ŝanĝojn tuj.
+<br />Tio estas:</p>
+<ul>
+<li><p><span class="menu">Labortablo</span> - Decidu, ĉu ĉiuj surmetitaj volumoj aperu rekte sur labortablo aŭ ĉu estu sola piktogramo malfermanta la fenestron kun volumoj.</p></li>
+<li><p><span class="menu">Fenestroj</span> - Vi povas atribui <span class="menu">Navigadon per sola fenestro</span> kiam doubla alklako sur dosierujo ne malfermos ĝian apartan fenestron, sed montros ĝin en jama fenestro. Tio diferencas de malfermo kun premtenata <span class="key">OPCIKLAVO</span> kiel estas priskribite antaŭe, ĉar tiel vi perdos konservitajn ekranlokiĝo kaj grando de koncerna dosierujon fenestro.
+</p>
+<img src="images/tracker-images/tracker-preferences-navigator.png" alt="tracker-preferences-navigator.png" />
+<p>Antaŭ vi ŝanĝos reĝimon de la Spurilo al <span class="menu">Navigado per sola fenestro</span>, ĉar ĝi estas pli kutima por vi, ni rekomendas komence provi navigadon per falmenuoj, ĉar ĝi estas pli rapida se vi alkutiniĝos. Tamen, navigado per sola fenestro proponas la <i>Navigilon</i> kie vi povas entajpi aŭ  kopii &amp; alglui itileron kaj uzi butonojn reen, antaŭen kaj supren.</p> 
+<p>Ŝaltinte <span class="menu">antaŭtajpan filtradon</span> vi povos filtri entenon de fenestroj de la Spurilo por vidi nur dosierojn kies nomoj aŭ indikoj taŭgas vian ĉenon. Rigardu <a href="#type-ahead-filter">supre</a>.</p></li>
+<li><p><span class="menu">Piktogramoj de volumoj</span> - Atribuu koloron por nedeviga indikilo  de liberspaco montrebla flanke de voluma piktogramo.</p></li>
+<li><p><span class="menu">Surmeti diskon</span> - Difinas kiam aŭtomate surmeti volumojn, kiel estas priskribite supre, en <a href="#mounting-volumes">Surmetado de volumoj</a>.</p></li>
+</ul>
+<p>La agorda panelo estas alireble ankaŭ per <span class="app">La Spurilo (Tracker)</span> el menuo <span class="menu">Preferences</span> de la Laborstrio.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="working-with-files" name="working-with-files">Prilaboro de dosieroj</a></h2>
+<p>Preskaŭ ĉiuj agoj proponataj per la menuo <span class="menu">Dosiero</span> por elektita dosiero estas ankaŭ proponataj per la kunteksta menuo, kiu aperas per dekstra alklako sur dosiero.</p>
+<p>La komandoj estas evidentaj.</p>
+<ul>
+<li><p><span class="menu">Serĉi...</span> - por serĉi dosierojn aŭ dosierujojn.. Rigardu la ĉapitron <a href="queries.html">Serĉmendoj</a> por aldona informo.</p></li>
+<li><p><span class="menu">Nova</span> - Kreas novan dosierujon aŭ iu ajn dosieron per <i>ŝablono</i>.
+</p>
+<img src="images/tracker-images/new-menu.png" alt="new-menu.png" />
+<p>Elektinte <span class="menu">Redakti ŝablonojn...</span> vi trafos la dosierujon <span class="path">/boot/home/config/settings/Tracker/Tracker New Templates</span>. Kreado de dosiero en ĉi dosierujo donos ŝablonon kun nomo, speco kaj aliaj indikoj por la menuo <span class="menu">Nova</span>. La supra bildo montras ekzemplon: la dosiero kun nomo "text file" kaj la speco <tt>text/plain</tt>. Rigardu la ĉapitron <a href="filetypes.html">Dosierspecoj</a> por aldona informo.</p></li>
+<li><p><span class="menu">Uzi per...</span> - submenuo kun ĉiuj programoj kapablaj prilabori ĉi dosierspecon.
+</p>
+<img src="images/tracker-images/open-with.png" alt="open-with.png" />
+
+<p>La preferata programo, kiu estos lanĉita per duobla alklako sur dosiero estas markita per bonmarko. Komence de submenuo lokiĝas programoj kiuj ĝuste kapablas prilabori la dosierspecon, la ekzemplo montras tekstan dosieron kun la speco <tt>text/plain</tt>. Poste lokiĝas programoj kapablaj prilabori superan specon, ĉi tie <tt>text/*</tt>. Lastaj programoj en la listo kapablas prilabori iun ajn dosieron. Se vi nenion elektos sed alklakos la menuon <span class="menu">Uzi per...</span> mem, do aperos la dialogo:</p>
+
+<img src="images/tracker-images/open-with-preferred.png" alt="open-with-preferred" />
+<p>Ĉi tie vi ankaŭ povas trovi programojn menciitajn en la menuo. Vi povas elekti kaj presi la butonon <span class="button">Uzi kaj igi preferata</span> por ŝanĝi preferatan programon por ĉiuj dosieroj kun la speco , en la ekzemplo kun <tt>text/plain</tt>.</p></li>
+<li><span class="menu">Akiri informon</span>
+<p>Ĉi tio malfermas la panelon kiu montras metan datumon de dosiero kaj permesas redakti permesojn por ĝi. Ankaŭ vi povas ŝanĝi nomon per alklako al noma kampo supre.</p>
+<img src="images/tracker-images/get-info.png" alt="get-info" />
+<p>La panelo havas tri langetojn:</p>
+<ul>
+<li><span class="menu">Informo</span>: Montras kutiman informon - grandon, daton de kreado/ŝanĝo, specon kaj lokiĝon. Alklako sur intinero mafermos doserujon entenantan la dosieron. Menuero <span class="menu">Uzebla per</span> atribuas preferatan programon por uzi same ĉi tiun dosieron.</li>
+<li><span class="menu">Permesoj</span>: Por ŝanĝi posedanton, grupon kaj uzpermesojn de la dosiero.</li>
+<li><span class="menu">Atributoj</span>: Listigas ĉiujn aldonajn atributojn de dosiero kaj ĝiajn valorojn kaj specojn.</li>
+</ul>
+</li>
+<li><p><span class="menu">Redakti nomon</span>, <span class="menu">Duobligi</span> kaj <span class="menu">Movi al Rubujo</span> - evidente.</p></li>
+<li><p><span class="menu">Movi al</span>, <span class="menu">Kopii al</span> kaj <span class="menu">Krei ligilon</span> - permesas por vi movi, kopii kaj ligigi elektita(j)n dosiero(j)n uzante falmenuan manieron navigi. Kun kunpremita <span class="key">MAJUSKLIGKLAVO</span> la menuo <span class="menu">Krei ligilon</span> permesas krei relativan ligilon.</p></li>
+<li><p><span class="menu">Tondi</span>, <span class="menu">Kopii</span> kaj <span class="menu">Alglui</span> - permesas por vi manipuli dosierojn uzante la tondujon. Se premteni <span class="key">MAJUSKLIGKLAVON</span> dum ekuzo de la menuo vi povos <span class="menu">Tondi/Kopii pli</span> da dosieroj, eventuale eĉ el aliaj dosierujoj, por poste alglui ilin ĉiujn kune. Ankaŭ kun premtenata <span class="key">MAJUSKLIGKLAVO</span> vi povas alglui dosierojn el la tondujo kiel ligiloj.</p></li>
+<li><p><span class="menu">Identigi</span> - permesas rekoni specon de doseiro kaj atribui ĝin, sed ĝi ne estis atribuita antaŭe, ekzemple se vi ŝargis dosieron per la programo <span class="cli">wget</span> kiu ne atribuias dosierspecon. Kun <span class="key">MAJUSKLIGKLAVO</span> dum ekuzo de la menuo vi havos <span class="menu">Devige identigi</span> por ripari misan specon.</p></li>
+<li><p><span class="menu">Aldonaĵoj</span> - proponas apliki aldonaĵojn de la Spurilo, kiuj kapablas prilabori elektita(j)n dosiero(j)n. Rigardu la ĉapitron <a href="tracker-add-ons.html">Aldonaĵoj de la Spurilo</a> por aldona informo.</p></li>
+</ul>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="transaction-status" name="transaction-status">Stato de agoj</a></h2>
+<p>Kiam vi kopias, movas aŭ forigas dosierojn la Spurolo montras staton de la agoj per speciala fenestro. Se okazas pli ol unu ago, por ĉiu tasko estas propra stato.</p>
+<img src="images/tracker-images/transaction-status.png" alt="transaction-status.png" />
+<p>Du dekstraj butonoj permesas paŭzi aŭ tute ĉesi la agojn. Tio povas utili dum amasaj agadoj. Por ekzemplo, vi bezonas urĝe lanĉi grandan programon. Tamen jam okazas kopiado de granda amplekso da datumo per kiu estas forte okupitaj viaj diskoj kaj tio prokrastos la lanĉadon - vi povas tempe paŭzi kopiadon.</p>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="teammonitor.html">Team Monitor</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="tracker-add-ons.html">Tracker Add-Ons</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

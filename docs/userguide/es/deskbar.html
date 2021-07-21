@@ -10,6 +10,7 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
+ *		'
  *		CapitanPico
  *		Humdinger
  *		kervas
@@ -27,7 +28,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Guía del usuario</span></div>
 </div>
 
 <div class="nav">
@@ -38,6 +39,7 @@
 <li><a href="../ca/deskbar.html">Català</a></li>
 <li><a href="../de/deskbar.html">Deutsch</a></li>
 <li><a href="../en/deskbar.html">English</a></li>
+<li><a href="../eo/deskbar.html">Esperanto</a></li>
 <li><a href="../fr/deskbar.html">Français</a></li>
 <li><a href="../fur/deskbar.html">Furlan</a></li>
 <li><a href="../it/deskbar.html">Italiano</a></li>
@@ -56,18 +58,17 @@
 <li><a href="../jp/deskbar.html">日本語</a></li>
 </ul>
 <span>
- «  <a href="tracker-add-ons.html">Tracker Add-Ons</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+ «  <a href="tracker-add-ons.html">Agregados de Tracker</a> 
+::  <a href="contents.html" class="uplink">Contenido</a> 
 ::  <a href="filetypes.html">Tipos de archivo</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <table class="index" id="index" summary="index">
-<tr class="heading"><td>Contenido</td></tr>
+<tr class="heading"><td>Índice</td></tr>
 <tr class="index"><td>
 	<a href="#deskbar-menu">El menú Deskbar</a><br />
 	<a href="#tray">La bandeja de sistema</a><br />
@@ -79,8 +80,8 @@
 
 <p>La Barra de Escritorio es el pequeño panel situado por defecto en la esquina superior derecha de la pantalla. Es la versión de Haiku de la Barra de Tareas de Windows con su botón "Inicio". Contiene el menú "Deskbar" , desde el que se pueden iniciar aplicaciones y acceder a las preferencias, una bandeja del sistema con un reloj y otras herramientas debajo de este, y debajo una lista de las programas actualmente en ejecución.</p>
 <img src="images/deskbar-images/positions.png" alt="positions" />
-<p>You can move the Deskbar to any corner or as a bar along the upper or lower border of the screen by gripping the knobbly area on one side of the tray (see arrows above) and drag &amp; drop it into the new position.<br />
-You can also fold it into a more compact layout by drag &amp; dropping the knobbly area onto Deskbar's Leaf menu. Being only the height of a regular window tab, even windows that take up the whole screen won't obscure the Deskbar tray with its clock and icons.</p>
+<p>Se puede mover la barra de escritorio a cualquier esquina o a lo largo del borde superior o inferior de la pantalla tomando la zona resaltada a una lado de la bandeja del sistema y arrastándola a la nueva posición.<br />
+También se la puede plegar en una disposición más compacta arrastrándo y soltando la zona resaltada en el botón de hoja de la barra de escritorio. Como es del mismo tamaño de una pestaña normal de ventana, incluso las ventanas que cubran toda la pantalla no se interpodrán a la bandeja de la barra de escritorio con su reloj e íconos.</p>
 <p>Puede cambiar el ancho de la Barra de Escritorio, agarrando el widget de puntitos que está a la derecha de la bandeja, y luego arrastrándola a la izquierda o la derecha:</p>
 <img src="images/deskbar-images/width.png" alt="width" />
 <p>Con una Barra de Escritorio más ancha, puede acomodar una mayor cantidad de íconos en la bandeja en una sola fila. También reducirá la ocurrencia que los nombres largos en la lista de aplicaciones salgan recortados, especialmente si tiene activada la opción de usar íconos grandes.</p>
@@ -104,7 +105,7 @@ You can also fold it into a more compact layout by drag &amp; dropping the knobb
 </ul>
 
 <h3>
-<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>Preferencias del Deskbar</h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>Preferencias de la barra de escritorio</h3>
 <img src="images/deskbar-images/prefs-deskbar.png" alt="prefs-deskbar.png" />
 <p>El panel de preferencias del Deskbar se divide en tres secciones.</p>
 
@@ -133,7 +134,7 @@ Debe crear un enlace de la carpeta <span class="path">menu</span> en <span class
 <p>Finalmente, la ventana de preferencias del Deskbar.</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td class="onelinetop"><span class="menu">Siempre encima</span></td><td> </td><td>El Deskbar siempre permanece encima de las demás ventanas.</td></tr>
-<tr><td><span class="menu">Auto-elevar</span></td><td> </td><td>The Deskbar pops to the front when the mouse pointer touches where the Deskbar meets the screen edge, and is lowered when it leaves the Deskbar area.</td></tr>
+<tr><td><span class="menu">Auto-elevar</span></td><td> </td><td>La barra de escritorio salta al frente cuando el puntero del ratón toca el área en donde la barra de escritorio se encuentra con el borde de pantalla y retrocede cuando el puntero deja el área de la barra de escritorio.</td></tr>
 <tr><td><span class="menu">Auto-esconder</span></td><td> </td><td>El Deskbar se reduce a unos pocos pixeles y solamente se muestra si el puntero del mouse le toca.</td></tr>
 </table>
 
@@ -150,8 +151,8 @@ Debe crear un enlace de la carpeta <span class="path">menu</span> en <span class
 <img src="images/deskbar-images/list-of-apps.png" alt="list-of-apps.png" />
 <p>Se puede cambiar a una aplicación concreta en ejecución haciendo clic en su entrada en el Deskbar y seleccionando una de sus ventanas desde el submenú. Dando clic con el botón derecho puede <span class="menu">Esconder/Mostrar todas</span> las ventanas o <span class="menu">Cerrar</span> todas.</p>
 <p>Un clic junto a <span class="key">SHIFT</span> <span class="key">CTRL</span> sobre cualquier aplicación esconde todas sus ventanas, un clic y <span class="key">CTRL</span> las muestra de nuevo.</p>
-<p>When using the "expander" setting to show all windows of an application, you can middle-click on a window or app to start a new instance. For example, middle-clicking a running StyledEdit will open a new document window.<br />
-Maybe more useful: while holding <span class="key">SHIFT</span>, a middle-click on a window closes it. Handy when you'd like to close some of many open Tracker windows, for example.</p>
+<p>Al usar la opción de configuración del «extensor» para mostrar en la lista todas las ventanas de una aplicación, puede hacer clic central sobre la entrada de ventana o de la aplicación para abrir una instancia nueva. Por ejemplo, al hacer clic central sobre una instancia en ejecución de Edición con estilo creará una ventana de documento nuevo.<br />
+Algo probablemente más útil es hacer clic central mientras mantiene presionada la tecla <span class="key">MAYÚS</span> sobre una ventana, lo que hará que esta se cierre. Es práctico, por ejemplo, para cerrar varias ventanas de Tracker cuando hay muchas ventanas de Tracker abiertas.</p>
 <div class="box-info">A veces una aplicación se podría colgar y aunque ya no tenga ventanas abiertas, la entrada en el listado de aplicaciones en ejecución del Deskbar no desaparece. En una situación así, utilice la Llave Mortal Vulcana para eliminarla: mantenga presionadas <span class="key">SHIFT</span> <span class="key">CTRL</span> <span class="key">ALT</span> y haga clic en la entrada infractora en el Deskbar. Fascinante!</div>
 <p>Si se activaron los Expanders en las selecciones del Deskbar, se puede expandir/colapsar la lista de ventanas directamente bajo una entrada de aplicación.</p>
 <p>Enfrente de cada ventana de aplicación hay un símbolo que proporciona información sobre su estado. Un símbolo brillante significa que una ventana está visible, uno oscuro, que está minimizado. Tres líneas enfrente a un símbolo muestra que no está en el espacio de trabajo actual.</p>
@@ -161,8 +162,8 @@ Maybe more useful: while holding <span class="key">SHIFT</span>, a middle-click 
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="tracker-add-ons.html">Tracker Add-Ons</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+ «  <a href="tracker-add-ons.html">Agregados de Tracker</a> 
+::  <a href="contents.html" class="uplink">Contenido</a> 
 ::  <a href="filetypes.html">Tipos de archivo</a>  »
 </span></div>
 </div>

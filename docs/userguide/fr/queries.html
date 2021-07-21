@@ -36,6 +36,7 @@
 <li><a href="../de/queries.html">Deutsch</a></li>
 <li><a href="../en/queries.html">English</a></li>
 <li><a href="../es/queries.html">Español</a></li>
+<li><a href="../eo/queries.html">Esperanto</a></li>
 <li><a href="../fur/queries.html">Furlan</a></li>
 <li><a href="../it/queries.html">Italiano</a></li>
 <li><a href="../hu/queries.html">Magyar</a></li>
@@ -61,7 +62,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">Cette page n'est pas encore entièrement traduite. Les parties non encore traduites seront en anglais.</div>
 
 
 <table class="index" id="index" summary="index">
@@ -116,9 +116,9 @@ Mieux encore, vous n'avez pas à double-cliquer à nouveau pour rafraichir une r
 <p>Cela ajoute une liste déroulante à gauche de la zone de texte ainsi que les boutons <span class="button">Add</span> et <span class="button">Remove</span> juste dessous. Dans la liste déroulante vous choisissez quel attribut rechercher. Avec<span class="button">Add</span> et <span class="button">Remove</span> vous pouvez interroger des attributs supplémentaires ou les retirer. Ces attributs peuvent être combinés logiquement avec ET/OU.</p>
 <p>Faisons par exemple une requête sur un e-mail :</p>
 <img src="images/queries-images/query-window-filled.png" alt="query-window-filled.png" />
-<p>This is your Find window when you're looking for all emails Clara Oswald has sent to you in the last two months that had in the subject "sufflé" or "impossible".<br />
-As you see, searching through time-based attributes supports some useful phrases: besides for the "last 2 months", you could also use "today", "yesterday", "Monday" or "last Monday" (which would be the Monday last week), or "last 2 minutes/hours/days/weeks".<br />
-A good way to cut down the number of search results.</p>
+<p>Voici votre fenêtre de recherche lorsque vous recherchez tous les courriels que Clara Oswald vous a envoyés au cours des deux derniers mois et qui avaient pour objet "vibraphone" ou "skepticality".<br />
+Comme vous le voyez, la recherche par les attributs temporels permet de trouver des expressions utiles : outre les "last 2 months" (2 derniers mois), vous pouvez également utiliser "today" (aujourd'hui), "yesterday" (hier), "Monday" (lundi) ou "last Monday" (qui serait le lundi de la semaine dernière), ou "last 2 minutes/hours/days/weeks" (2 dernières minutes/heures/jours/semaines).<br />
+Un bon moyen de réduire le nombre de résultats de recherche.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -129,13 +129,14 @@ A good way to cut down the number of search results.</p>
 <p>la même chose, sous forme de texte, édité pour plus de lisibilité :</p>
 <pre>(((((MAIL:from=="*[cC][lL][aA][rR][aA] [oO][sS][wW][aA][lL][dD]*")
        &amp;&amp;(MAIL:when&gt;=%2 months%))
-       &amp;&amp;(MAIL:subject=="*[sS][uU][fF][fF][lL][éÉ]*"))
-       ||(MAIL:subject=="*[iI][mM][pP][oO][sS][sS][iI][bB][lL][eE]*"))
+       &amp;&amp;(MAIL:subject=="*[Vv][Ii][Bb][Rr][Aa][Pp][Hh][Oo][Nn][Ee]*"))
+       ||(MAIL:subject=="*[Ss][Kk][Ee][Pp][Tt][Ii][Cc][Aa][Ll][Ii][Tt][Yy]*"))
        &amp;&amp;(BEOS:TYPE=="text/x-email"))</pre>
 <p>A quoi ça sert ?</p>
 <ul>
 <li><p>Vous pouvez copier et coller la chaîne dans un e-mail, un forum ou sur IRC pour que d'autres puissent l'utiliser ou la déboguer.</p></li>
-<li><p>You can use this method to construct a query in <span class="menu">Attribute</span> mode and then switch to <span class="menu">Formula</span> mode, to comfortably generate a search string. Enclosed in single quotes, that string can then be used with the <span class="cli">query</span> command in the Terminal.</p></li>
+<li><p>En construisant une requête en mode <span class="menu">Attribute</span>, puis en passant en mode <span class="menu">Formula</span>, Vous pouvez générer facilement une chaîne de recherche.
+Placée entre guillemets simples, cette chaîne peut ensuite être utilisée avec la commande <span class="cli">query</span> dans le Terminal.</p></li>
 <li><p>Vous pouvez affiner votre recherche en ajoutant des parenthèses si nécessaire, rendre une partie sensible à la casse ou modifier leur combinaison logique en changeant par exemple "<tt>==</tt>" en "<tt>!=</tt>" pour un NON ET. Il suffit d'avoir une compréhension de base des <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="http://en.wikipedia.org/wiki/Regular expression">expressions régulières</a>, et peut-être quelques notions de base de scripts.</p></li>
 </ul>
 

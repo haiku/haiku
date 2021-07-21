@@ -25,7 +25,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>ユーザーガイド</span></div>
 </div>
 
 <div class="nav">
@@ -37,6 +37,7 @@
 <li><a href="../de/bash-scripting.html">Deutsch</a></li>
 <li><a href="../en/bash-scripting.html">English</a></li>
 <li><a href="../es/bash-scripting.html">Español</a></li>
+<li><a href="../eo/bash-scripting.html">Esperanto</a></li>
 <li><a href="../fr/bash-scripting.html">Français</a></li>
 <li><a href="../fur/bash-scripting.html">Furlan</a></li>
 <li><a href="../it/bash-scripting.html">Italiano</a></li>
@@ -55,7 +56,7 @@
 </ul>
 <span>
  «  <a href="preferences.html">Preferences (プレファレンス)</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">目次</a> 
 <!-- ::  <a href="filesystem-layout.html">ファイルシステムレイアウト</a>  » -->
 </span></div>
 </div>
@@ -92,17 +93,17 @@
 
 # ワークスペースアプレットを起動する
 /boot/system/apps/Workspaces &amp;</pre>
-<p>コマンドをバックグラウンドプロセスとして実行するために、コマンドの末尾を "<tt>&amp;</tt>" で忘れずに終わらせてください。そうしなければ、そのコマンドが完了するまで (この例では、起動したアプリケーションが再度閉じられるまで) スクリプトが停止してしまいます。</p>
+<p>コマンドをバックグラウンドプロセスとして実行するために、コマンドの末尾を "<tt>&amp;</tt>" で終わらせることを忘れないでください。そうしなければ、そのコマンドが完了するまで (この例では、起動したアプリケーションが再度閉じられるまで) スクリプトが停止してしまいます。</p>
 
-<p>システム起動時にアプリケーションを起動させるための、上記とは別のシンプルな方法の 1 つは、それらアプリケーションへのリンクを <span class="path">/boot/home/config/settings/boot/launch</span> ディレクトリに置くことです。これは、自動起動させたいアプリケーションを右クリックして、<span class="menu">指定先にリンクを作成 (Create Link)</span> にマウスカーソルを合わせたあと、前述のディレクトリへ<a href="tracker.html#navigating">ナビゲート</a>すれば簡単に実現できます。</p>
+<p>システム起動時にアプリケーションを起動させるための、上記とは別のシンプルな方法の 1 つは、それらへのリンクを <span class="path">/boot/home/config/settings/boot/launch</span> ディレクトリに置くことです。これは、自動起動させたいアプリケーションを右クリックして、<span class="menu">指定先にリンクを作成 (Create Link)</span> にマウスカーソルを合わせたあと、前述のディレクトリへ<a href="tracker.html#navigating">ナビゲート</a>すれば簡単に実現できます。</p>
 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="usershutdownscript" name="usershutdownscript">The UserShutdownScript - <i>まだ動作しません</i></a></h3>
+<a id="usershutdownscript" name="usershutdownscript">UserShutdownScript - <i>まだ動作しません</i></a></h3>
 <p><span class="path">/boot/home/config/settings/boot/UserShutdownScript</span> はシャットダウンプロセスの最初のステップで実行されます。このスクリプトが 0 以外の終了ステータスを返すと、シャットダウンは中断されます。</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="usershutdownfinishscript" name="usershutdownfinishscript">The UserShutdownFinishScript - <i>まだ動作しません</i></a></h3>
+<a id="usershutdownfinishscript" name="usershutdownfinishscript">UserShutdownFinishScript - <i>まだ動作しません</i></a></h3>
 <p><span class="path">/boot/home/config/settings/boot/UserShutdownFinishScript</span> はシャットダウンの最終ステップで実行されます。このスクリプトが実行されるときには、システムの大部分が終了していることに注意してください。</p>
 
 </div>
@@ -111,7 +112,7 @@
 <div class="nav">
 <div class="inner"><span>
  «  <a href="preferences.html">Preferences (プレファレンス)</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">目次</a> 
 <!-- ::  <a href="filesystem-layout.html">ファイルシステムレイアウト</a>  » -->
 </span></div>
 </div>

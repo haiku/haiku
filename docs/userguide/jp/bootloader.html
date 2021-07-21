@@ -11,6 +11,7 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		log-1
+ *		Máximo Castañeda
  *		mt
  *
 -->
@@ -24,7 +25,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>ユーザーガイド</span></div>
 </div>
 
 <div class="nav">
@@ -36,6 +37,7 @@
 <li><a href="../de/bootloader.html">Deutsch</a></li>
 <li><a href="../en/bootloader.html">English</a></li>
 <li><a href="../es/bootloader.html">Español</a></li>
+<li><a href="../eo/bootloader.html">Esperanto</a></li>
 <li><a href="../fr/bootloader.html">Français</a></li>
 <li><a href="../fur/bootloader.html">Furlan</a></li>
 <li><a href="../it/bootloader.html">Italiano</a></li>
@@ -55,7 +57,7 @@
 <span>
     <!-- «  <a href="installation.html">Installing Haiku</a> 
 ::  -->
-    <a href="contents.html" class="uplink">Contents</a> 
+    <a href="contents.html" class="uplink">目次</a> 
 ::  <a href="filesystem-layout.html">ファイルシステムレイアウト</a>  »
 </span></div>
 </div>
@@ -67,7 +69,8 @@
 
 <p>Haiku のブートローダーオプションは、ハードウェア周りの問題で悩んだ場合や、Haiku を複数インストールしていて (おそらくインストール CD 上あるいは USB メモリ上の Haiku)、そのいずれかを選択する場合に役立ちます。また、あるソフトウェアコンポーネントをインストールしたもののそれが正しく動作せず、システムの起動を妨げてしまう場合にもそれは役立ちます。以下の<a href="#troubleshooting">トラブルシューティング</a>を見てください。</p>
 <p>ブートローダーオプションに入るには、Haiku の起動プロセスが始まる前に <span class="key">SHIFT</span> キーを押し続ける必要があります。ブートマネージャーがインストールされているなら、Haiku のブートエントリーの実行前に <span class="key">SHIFT</span> を押し続ける動作を始めても構いません。Haiku がそのマシンの唯一のオペレーティングシステムであれば、BIOS からのブートメッセージがまだ表示されている状態から SHIFT キーを押し続ける動作を始められます。</p>
-<div class="box-info">昔からの BIOS でなく UEFI をブートに使用しているコンピューター上では、代わりに <span class="key">SPACEBAR</span> を押してください。</div>
+<div class="box-info">いくつかのハードウェアでは、BIOS で USB キーボードを有効にしておく必要があります。<br />
+昔からの BIOS でなく UEFI をブートに使用しているコンピューター上では、代わりに <span class="key">SPACEBAR</span> を押してください。</div>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="options" name="options">ブートローダーオプション</a></h2>
@@ -79,7 +82,7 @@
 <tr><td></td><td></td><td>	<p><span class="menu">Safe mode</span><br />
 		システムをセーフモードにします。このオプションは、ほかのオプションと無関係に有効にできます。</p>
 	<p><span class="menu">Disable user add-ons</span><br />
-		ユーザーがインストールしたすべてのアドオンを読み込まれないようにします。システムディレクトリにあるアドオンだけが読み込まれます。以下の<a href="#troubleshooting">トラブルシューティング</a>を見てください。</p>
+		ユーザーがインストールしたすべてのアドオンを読み込まないようにします。システムディレクトリにあるアドオンだけが読み込まれます。以下の<a href="#troubleshooting">トラブルシューティング</a>を見てください。</p>
 	<p><span class="menu">Disable IDE DMA</span><br />
 		IDE DMA を無効にします。IDE の互換性は向上しますが、速度が犠牲になります。</p>
 	<p><span class="menu">Ignore memory beyond 4 GiB</span><br />
@@ -92,18 +95,20 @@
 		ローカル APIC の使用を無効にします。また、SMP も無効にします。</p>
 	<p><span class="menu">Disable X2APIC</span><br />
 		第二世代 APIC を無効にします。</p>
+	<p><span class="menu">Disable SMEP and SMAP</span><br />
+		CPU の SMEP/SMAP セキュリティ機能を無効にします。</p>
 	<p><span class="menu">Disable SMP</span><br />
-		CPU コアをひとつを除いて無効にします。</p>
+		CPU コアをひとつを除いてすべて無効にします。</p>
 	<p><span class="menu">Don't call the BIOS</span><br />
 		システムが BIOS 機能を呼び出すことを止めます。</p>
 	<p><span class="menu">Disable APM</span><br />
 		アドバンストパワーマネージメント (APM) のハードウェアサポートを無効にします。カーネル設定ファイル内の APM 設定を上書きします。</p>
 	<p><span class="menu">Disable ACPI</span><br />
 		アドバンスドコンフィグレーションアンドパワーインターフェイス (ACPI) のハードウェアサポートを無効にします。カーネル設定ファイル内の ACPI 設定を上書きします。</p>
-	<p><span class="menu">Blacklist entries</span><br />
+	<p><span class="menu">Disable system components</span><br />
 		無視しなければならないシステムファイルを選択できるようにします。たとえば、ドライバーを一時的に無効にする場合に役立ちます。以下の<a href="#troubleshooting">トラブルシューティング</a>を見てください。</p></td></tr>
 <tr><td><b>Select debug options</b>
-</td><td> </td><td>これを選択すると、デバッグに役立ついくつかのオプションや、<a href="../../welcome/en/bugreports.html">バグ報告</a>用に詳細な情報を取得するのに役立つオプションが現れます。ここでも、各オプションに関する短い説明が画面の下部に表示されます。</td></tr>
+</td><td> </td><td>これを選択すると、デバッグに役立ついくつかのオプションや、<a href="../../welcome/jp/bugreports.html">バグ報告</a>用に詳細な情報を取得するのに役立つオプションが現れます。ここでも、各オプションに関する短い説明が画面の下部に表示されます。</td></tr>
 <tr><td></td><td></td><td>	<p><span class="menu">Enable serial debug output</span><br />
 		syslog 出力のシリアルインターフェースへの転送をオンにします (デフォルト値: 115200, 8N1)。</p>
 	<p><span class="menu">Enable on screen debug output</span><br />
@@ -128,14 +133,14 @@
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="troubleshooting" name="troubleshooting">トラブルシューティング</a></h2>
-<p>Haiku が最初からユーザーのハードウェアで起動しない場合、<span class="menu">Select safe mode options</span> のさまざまなオプションを設定してみてください。とにかく、<a href="../../welcome/en/bugreports.html">バグレポート</a>の提出を検討してください。</p>
+<p>Haiku が最初から起動しない場合、<span class="menu">Select safe mode options</span> のさまざまなオプションを設定してみてください。とにかく、<a href="../../welcome/jp/bugreports.html">バグレポート</a>の提出を検討してください。</p>
 <p>一方、Haiku がいくつかのソフトウェア、特にハードウェアドライバーをインストールした後に突然調子が悪くなった場合、Haiku を再び起動可能にするオプションがいくつかあるので、障害を起こすパッケージをアンインストールできます。</p>
 <ul>
 <li><p><span class="menu">Safe mode</span> を有効にすると、ほとんどのサーバー、デーモン、そして UserBootScript の起動を禁止します。</p></li>
 <li><p><span class="menu">Disable user add-ons</span> を有効にすると、ユーザーがホームフォルダー以下の階層にインストールしたすべてのアドオン (ドライバー、トランスレーターなど) の使用を禁止します。</p></li>
 <li><p><span class="menu">Use fail-safe graphics driver</span> の有効化で、VESA グラフィックへの代替によりトラブルが解決するなら、テキストファイル <span class="path">/boot/home/config/settings/kernel/drivers/kernel</span> 内の<i>#fail_safe_video_mode true</i> 行の<tt>#</tt> を削除すると設定を永続的にできます。</p></li>
-<li><p>問題のあるドライバー、アドオンなどが、システム階層にインストールされている場合は、少しばかり複雑になります。なぜなら、そこは読み取り専用だからです。ここで、<span class="menu">Blacklist entries</span> オプションが出てきます。それにより、システム階層全体を検索して、それから <span class="key">SPACE</span> または <span class="key">RETURN</span> キーでチェックすれば、システムを混乱させるコンポーネントを無効にします。<span class="key">ESC</span> は親ディレクトリへ一段戻ります。</p>
-<p>オンラインで、<a href="http://www.haiku-os.org/blog/barrett/2013-12-15_how_permanently_blacklist_package_file">How to Permanently Blacklist a Package File</a> という記事があります。これには、コンポーネントの無効化を固定化する方法が説明されています。</p></li>
+<li><p>問題のあるドライバー、アドオンなどが、システム階層にインストールされている場合は、もう少し複雑になります。なぜなら、そこは読み取り専用だからです。ここで、<span class="menu">Disable system components</span> オプションが出てきます。それにより、システム階層全体を検索して、それから <span class="key">SPACE</span> または <span class="key">RETURN</span> キーでチェックすれば、状況を混乱させるコンポーネントを無効にします。<span class="key">ESC</span> はひとつ上の親ディレクトリーへ戻ります。</p>
+<p>オンラインで、<a href="http://www.haiku-os.org/blog/barrett/2013-12-15_how_permanently_blacklist_package_file">Disabling components of packages</a> という記事があります。これには、コンポーネントの無効化設定を固定する方法が説明されています。</p></li>
 <li><p><span class="menu">Select boot volume</span> の下では、Haiku の以前の "バージョン" を指定して起動できます。パッケージをアンインストール / インストールするたびに、以前の状態は保存されます。ブートローダーオプション内のリストから選択すれば、それを起動できます。<br />
 つまり、あるパッケージをインストールした後に起動時の問題が発生したら、問題が起きる前の Haiku のバージョンを起動して、問題となるパッケージをアンインストールしてください。</p></li>
 </ul>
@@ -164,7 +169,7 @@
 <div class="inner"><span>
     <!-- «  <a href="installation.html">Installing Haiku</a> 
 ::  -->
-    <a href="contents.html" class="uplink">Contents</a> 
+    <a href="contents.html" class="uplink">目次</a> 
 ::  <a href="filesystem-layout.html">ファイルシステムレイアウト</a>  »
 </span></div>
 </div>

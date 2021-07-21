@@ -12,6 +12,7 @@
  * Translators:
  *		dill
  *		Pengphei Han
+ *		Máximo Castañeda
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -36,6 +37,7 @@
 <li><a href="../de/bootloader.html">Deutsch</a></li>
 <li><a href="../en/bootloader.html">English</a></li>
 <li><a href="../es/bootloader.html">Español</a></li>
+<li><a href="../eo/bootloader.html">Esperanto</a></li>
 <li><a href="../fr/bootloader.html">Français</a></li>
 <li><a href="../fur/bootloader.html">Furlan</a></li>
 <li><a href="../it/bootloader.html">Italiano</a></li>
@@ -68,7 +70,8 @@
 
 <p>Haiku 的系统引导选项可以帮助您解决遇到的硬件相关问题，或者用于选择通过 Haiku 的哪种安装方式来启动，如果您有多个引导介质（可以是 CD 光驱或 USB 盘安装）。此外，如果安装了某个软件组件导致系统无法启动，请查看下述的 <a href="#troubleshooting">故障诊断</a> 。</p>
 <p>为了进入引导程序选项，您需要在 Haiku 的启动进程开始前，持续按住 <span class="key">SHIFT</span> 键。如果已经安装了启动管理软件，您可以在进入 Haiku 启动调用之前开始按下 <span class="key">SHIFT</span> 键。如果Haiku是唯一的操作系统，您可以在 BIOS 中显示启动消息时就开始按下该按键。</p>
-<div class="box-info">On computers that use UEFI for booting instead of the classic BIOS, you need to use the <span class="key">SPACEBAR</span> instead.</div>
+<div class="box-info">With some hardware, you'll have to make sure USB keyboards are enabled in the BIOS.<br />
+On computers that use UEFI for booting instead of the classic BIOS, you need to use the <span class="key">SPACEBAR</span> instead of <span class="key">SHIFT</span>.</div>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="options" name="options">引导管理器选项</a></h2>
@@ -105,10 +108,10 @@
 		Disables Advanced Power Management hardware support, overriding the APM setting in the kernel settings file.</p>
 	<p><span class="menu">Disable ACPI</span><br />
 		Disables Advanced Configuration and Power Interface hardware support, overriding the ACPI setting in the kernel settings file.</p>
-	<p><span class="menu">Blacklist entries</span><br />
+	<p><span class="menu">Disable system components</span><br />
 		Allows to select system files that shall be ignored. Useful e.g. to disable drivers temporarily. See <a href="#troubleshooting">Troubleshooting</a> below.</p></td></tr>
 <tr><td><b>Select debug options</b><br />
-</td><td> </td><td>在这里，你会发现几个选项，它们用于调试或者获取<a href="../../welcome/en/bugreports.html">错误报告</a>的详细情况。同时，对于每个选项，在屏幕底部也都会出现相关的说明。</td></tr>
+</td><td> </td><td>在这里，你会发现几个选项，它们用于调试或者获取<a href="../../welcome/zh_CN/bugreports.html">错误报告</a>的详细情况。同时，对于每个选项，在屏幕底部也都会出现相关的说明。</td></tr>
 <tr><td></td><td></td><td>
 	<p><span class="menu">Enable serial debug output</span><br />
 		打开并输出 syslog 信息到串口（默认：115200, 8N1）。</p>
@@ -134,14 +137,14 @@
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="troubleshooting" name="troubleshooting">故障诊断</a></h2>
-<p>如果 Haiku 从一开始就无法从您的硬件上进行启动，那么您需要尝试以下 <span class="menu">选择安全模式选项</span> 中的不同设置项。或者考虑提交一个 <a href="../welcome/en/bugreports.html">问题报告</a> 。</p>
+<p>如果 Haiku 从一开始就无法从您的硬件上进行启动，那么您需要尝试以下 <span class="menu">选择安全模式选项</span> 中的不同设置项。或者考虑提交一个 <a href="../welcome/zh_CN/bugreports.html">问题报告</a> 。</p>
 <p>换句话说，如果在您安装完某些软件之后，Haiku 突然无法启动，特别是一些硬件驱动，您可以通过一些设置让 Haiku 能够重新启动，然后通过卸载这些软件包来进行修复： </p>
 <ul>
 <li><p>激活 <span class="menu">Safe mode</span> 将会阻止多数的服务，后台以及 UserBootScript 启动。 </p></li>
 <li><p>激活 <span class="menu">Disable user add-ons</span> 将会阻止所有在 Home 目录下用户目录中安装的附加组件（驱动，转换器，等）的使用。</p></li>
 <li><p>如果激活 <span class="menu">Use fail-safe graphics driver</span> 通过回退到 VESA 显卡模式解决了您的问题，您可以通过在 <span class="path">/boot/home/config/settings/kernel/drivers/kernel</span> 文本文件中移除 <i>#fail_safe_video_mode true</i> 之前的 <tt>#</tt> 注释符永久的解决该问题。 </p></li>
-<li><p>如果一些恶意的驱动，附件组件等安装到了系统路径中，问题可能会有些复杂，因为这些位置都是只读的。下面的 <span class="menu">Blacklist entries</span> 将会起到作用。通过该菜单，您将能够导航并进入到任意的系统目录，然后通过 <span class="key">SPACE</span> 或者 <span class="key">RETURN</span> 选中并禁用那些造成问题的组件。<span class="key">ESC</span> 键用于返回到上级目录。</p>
-<p>如何进行更多的设置，可以参考在线文档 <a href="http://www.haiku-os.org/blog/barrett/2013-12-15_how_permanently_blacklist_package_file">如何将包文件永久列入黑名单</a>。</p></li>
+<li><p>If the offending driver, add-on etc. is installed in the system hierarchy, things get a bit more complicated, because that area is read-only. Here, the <span class="menu">Disable system components</span> comes into play. With it, you can navigate through the whole system hierarchy and disable the component that's messing things up for you by checking an entry with the <span class="key">SPACE</span> or <span class="key">RETURN</span> key. <span class="key">ESC</span> returns you up one level to the parent directory.</p>
+<p>Online, there's the guide <a href="https://www.haiku-os.org/guides/daily-tasks/blacklist-packages">Disabling components of packages</a> showing how to make that setting stick.</p></li>
 <li><p> 在 <span class="menu">Select boot volume</span> 菜单中，您可以指定希望启动的 Haiku 版本。每次在安装或者卸载系统组件时，原有状态都将保存。您可以在引导管理器选项列表中选择对应的启动状态。<br />
 因此，如果在安装完某些包之后，出现了启动引导问题，您可以选择引导在问题出现以前的 Haiku 状态，并且卸载该软件包。</p></li>
 </ul>

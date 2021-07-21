@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2013-2020 Haiku. All rights reserved.
+ * Copyright 2013-2021 Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -24,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Käyttäjäopas</span></div>
 </div>
 
 <div class="nav">
@@ -36,6 +36,7 @@
 <li><a href="../../de/applications/haikudepot.html">Deutsch</a></li>
 <li><a href="../../en/applications/haikudepot.html">English</a></li>
 <li><a href="../../es/applications/haikudepot.html">Español</a></li>
+<li><a href="../../eo/applications/haikudepot.html">Esperanto</a></li>
 <li><a href="../../fr/applications/haikudepot.html">Français</a></li>
 <li><a href="../../fur/applications/haikudepot.html">Furlan</a></li>
 <li><a href="../../it/applications/haikudepot.html">Italiano</a></li>
@@ -61,7 +62,7 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
+<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Hakemisto</td></tr>
@@ -71,7 +72,8 @@
                 <a href="#menu">Työkalut ja Näytä-valikot</a><br />
                 <a href="#account">Käyttäjätilin luominen</a><br />
                 <a href="#rating">Arvosanat ja kommentointi</a><br />
-                <a href="#logs">Diagnostiikkalokitiedostot</a><br /></td></tr>
+                <a href="#logs">Diagnostiikkalokitiedostot</a><br />
+<a href="#tips">Vihjeet</a><br /></td></tr>
 </table>
 
 <h2><img src="../../images/apps-images/haikudepot-icon_64.png" alt="haikudepot-icon_64.png" width="64" height="64" />HaikuVarasto</h2>
@@ -82,7 +84,7 @@
 <span class="path">~/config/cache/HaikuDepot/</span> - Välimuistissa olevat kuvakkeet, kuvakaappaukset, kuvaukset jne.</td></tr>
 </table>
 <p><br /></p>
-<p>HaikuDepot is the central application when it comes to managing your software packages. With it you can browse and search through package repositories and install and uninstall packages. By default, HaikuDepot starts up with a list of "<i>Featured packages</i>", software that's deemed interesting to many users.</p>
+<p>HaikuVarasto on keskeinen sovellus ohjelmistopakkaustesi hallintaan. Sovelluksella voit selata ja etsiä tietovarastoja sekä asentaa ja poistaa pakkauksia. HaikuVarasto alkaa ”<i>Jakeluversiopakkaukset</i>”-luettelolla, jossa on ohjelmistoja, jotka tuntuvat kiinnostavan monia käyttäjiä.</p>
 <img src="../images/apps-images/haikudepot.png" alt="haikudepot.png" />
 <p>Toinen välilehti näyttää <span class="menu">Kaikki pakkaukset</span>, näyttöön vaihtuu pienempi kuvake ja lisätiedot järjestetään sarakkeisiin:</p>
 <img src="../images/apps-images/haikudepot_all.png" alt="haikudepot.png" />
@@ -109,8 +111,8 @@
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="info" name="info">Tietoalue</a></h2>
-<p>At the bottom is an area that displays information on the package that is currently selected in the list above it.<br />
-To the right of package name, author, rating and version is a button, that – depending on the current state of the package – lets you <span class="button">Install</span> or <span class="button">Uninstall</span> it. If a package is already installed, you'll find an additional button there to <span class="button">Open</span> the application.</p>
+<p>Alimmaisena on alue, joka näyttää tietoja pakkauksesta, joka on parhaillaan valittuna luettelossa.<br />
+Pakkausnimen, tekijän, arvosanan ja version oikealla puolella on painike, joka – riippuen pakkauksen nykyisestä tilasta – sallii sinun <span class="button">Asentaa</span> tai <span class="button">Poistaa</span> pakkauksen. Jos pakkaus on jo asennettu, löydät täältä lisäpainikkeen, joka <span class="button">Avaa</span> sovelluksen.</p>
 <p>Alla on neljä välilehteä: Ohjelmasta, Arvosanat, Muutosloki ja Sisällöt.</p>
 <ul>
 <li><p _translation_id="5252"><span class="menu">Ohjelmasta</span></p>
@@ -130,9 +132,11 @@ Keskellä on käyttäjäkommentteja käyttäjätunnuksilla, heidän antamiensa t
 </ul>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="menu" name="menu">Työkalut- ja Näytä-valikko</a></h2>
-<p><span class="menu">Työkalut</span>-valikosta ikkunan yläosassa löydät rivin <span class="menu">Päivitä tietovarastot</span>. Tämä pyytää tietovarastoista ajantasaisen luettelon kaikista saatavilla olevista pakkauksista. Toinen rivi on <span class="menu">Hallinnoi tietovarastoja...</span>. Se avaa <a href="../preferences/repositories.html">Tietovarastot</a>-asetusohjelman tietovarastojen lisäämiseksi/poistamiseksi tai tietovarastojen ottamiseksi käyttöön tai niiden poistamiseksi käytöstä.<br />
-<span class="menu">Tarkista päivitykset</span> avaa <a href="../apps/softwareupdater.html">Ohjelmistopäivittäjän</a> päivitettyjen pakkausten etsimiseksi ja asentamiseksi.</p>
+<a id="menu" name="menu">HaikuDepot and Show menu</a></h2>
+<p>In the <span class="menu">HaikuDepot</span> menu at the top of the window, you'll find an item to <span class="menu">Refresh repositories</span>. This will request an up-to-date list of all available packages from the repositories.<br />
+The second item is to <span class="menu">Manage repositories...</span>. It opens the <a href="../preferences/repositories.html">Repositories</a> preferences, to add/remove or disable and enable repositories.<br />
+<span class="menu">Check for updates...</span> opens the <a href="../apps/softwareupdater.html">SoftwareUpdater</a> to search and install updated packages.<br />
+<span class="menu">Settings...</span> opens a window with the currently only option: <span class="menu">Share anonymous usage data with HaikuDepotServer</span>. The data is used to, for example, increase a counter on how often a package is viewed and installed, which then can determine if a package is promoted to the "Featured packages" list.</p>
 <p>Valikosta <span class="menu">Näytä</span> voit valita pakkausten luettelosta <span class="menu">Kehityspakkaukset</span> ja <span class="menu">Lähdekoodipakkaukset</span>. Normaalikäyttäjille ne eivät ole kiinnostavia ja vain sekoittaisivat luetteloa. Ne ovat kuitenkin tärkeitä ihmisille, jotka tarvitsevat pakkausten kirjastoja, otsaketiedostoja jne. niistä riippuvien ohjelmien kehittämiseksi ja kääntämiseksi ohjelmakielistä toimivaksi ohjelmiksi.</p>
 <p>Kiinnostavampia ovat valitsimet, jotka näyttävät vain <span class="menu">Saatavilla olevat pakkaukset</span> ja <span class="menu">Asennetut pakkaukset</span>.</p>
 
@@ -145,8 +149,9 @@ Keskellä on käyttäjäkommentteja käyttäjätunnuksilla, heidän antamiensa t
 <li>käytettävä salasanaa, jossa on vähintään 8 merkkiä, joista vähintään 2 on suuria kirjaimia ja 2 numeroita</li>
 <li>tarjottava sähköpostiosoite (jos haluat uuden salasana lähetettäväksi siinä tapauksessa että unohdat sen)</li>
 <li>ratkaistava captcha-kuva-arvoitus</li>
-<li>napsauta valintoja vahvistaaksesi, että olet yli 16-vuotias ja olet lukenut alapuolella linkitetyt käyttöehdot.</li></ul>
+<li>tick the checkboxes to confirm you're over 16 and have read the usage conditions linked below them.</li></ul>
 <p>Kirjautumisen jälkeen HaikuVaraston valikon yläoikealla lukee <span class="menu">Kirjautuneena tunnuksella (...)</span>, mikä näyttää käyttäjätunnuksesi. Valikko tarjoaa nyt sinulle <span class="menu">Vaihda tiliä...</span> tai <span class="menu">Kirjaudu ulos</span>.</p>
+<p>As a reminder of what you actually agreed to when you ticked the above mentioned checkbox, there are menu items to <span class="menu">View latest/agreed usage conditions...</span></p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="rating" name="rating">Arvosanat ja kommentointi</a></h2>
@@ -154,9 +159,9 @@ Keskellä on käyttäjäkommentteja käyttäjätunnuksilla, heidän antamiensa t
 <img src="../images/apps-images/haiku-depot-ratingpanel.png" alt="haiku-depot-ratingpanel.png" />
 <p>Tässä liikutat hiiren kohdistinta tähtien yläpuolella niiden sytyttämiseksi ja arvosanasi valitsemiseksi, voit myös valita tasonumeron sovelluksen stabilisuusarvioksi ja poimia valinnaisen kommentin kielen. Jotta kommentti olisi merkityksellinen, sinun pitäisi työskennellä arvioitavalla sovelluksella tutustuaksesi sen ominaisuuksiin, ohjelmointivirheisiin ja oikkuihin. Ja älä kirjoita seuraavaa suomalaista suurromaania... pidä kommenttisi lyhyenä, lempeänä ja kohteliaana. :)<br />
 <span class="button">Lähetä</span>-painikkeen napsauttamisen jälkeen tiedot lähetetään palvelimelle. Sinun on ehkä siirryttävä <span class="menu">Työkalut</span>-valikkoon valitsemaan <span class="menu">Päivitä tietovarastot</span> ennen kuin voit nähdä muutoksesi.</p>
-<p>At any time, you can come back and edit your comment and re-rate it. You can also hide your rating from other users by deactivating a checkbox <span class="menu">This rating is visible to other users</span>, that appears in this window once you've rated a package.</p>
+<p>Voit milloin tahansa palata ja muokata kommenttiasi tai antaa arvosanan uudelleen. Voit myös piilottaa arvioinnin muilta käyttäjältä poistamalla valinnan valintaruudusta <span class="menu">Muut käyttäjät voivat nähdä tämän arvosanan</span>, joka näkyy ikkunassa heti kun olet esimmäisen kerran antanut pakkaukselle arvosanan.</p>
 
- <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="logs" name="logs">Diagnostiikkalokitiedostot</a></h2>
 <p>Kun HaikuVarastoa käytetään, se keskustelee niin verkon kuin paikallisten palvelujen kanssa. Asiat voivat mennä pieleen, joskus tavoilla, joita ei odoteta, kun sovellusta kirjoitetaan. Niissä tapauksissa virheilmoitus on aivan määrittelemätön. Tietyn pulman diagnostoimisen helpottamiseksi HaikuVarasto voi tarjota lokitiedoston siitä, mitä sovellus tekee.</p>
 <p>Virheilmoitus saattaa suositella katsomaan lokitiedostosta lisätietoja tai sinua saatetaan pyytää tarjoamaan lokitiedosto, kun teet vikailmoituksen Haikun <a href="https://dev.haiku-os.org/">vianjäljitysjärjestelmässä</a>.</p>
@@ -164,6 +169,11 @@ Keskellä on käyttäjäkommentteja käyttäjätunnuksilla, heidän antamiensa t
 <pre>HaikuDepot -v debug</pre>
 <p>Komento käyttää <span class="cli">-v</span>-lippua ohjaamaan diagnostiikkalokien perusteellisuutta. Mahdolliset arvot ovat: <span class="cli">off</span>, <span class="cli">info</span>, <span class="cli">debug</span> ja <span class="cli">trace</span>. Asetuksen <span class="cli">off</span>-käyttäminen näyttää vain pienen määrän tietoja lokitiedostossa kun taas <span class="cli">trace</span> näyttää suurimman määrän yksityiskohtia.</p>
 <p>Kun HaikuVarasto käynnistyy ja kun käytät sovellusta, näet tekstin vierivän Pääteikkunassa; se on diagnostiikkalokitiedosto.</p>
+
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="tips" name="tips">Vihjeet</a></h2>
+<p>Tämä ei onnistu suoraan HaikuVarasto-sovelluksesta, mutta on yksi tapa seurata uusia ja päivittyjä pakkauksia. Sitä varten sinun on luotava RSS ATOM-syöte <a href="https://depot.haiku-os.org">Haiku Depot Server</a>-webbisivulla. Napsauta ”hamburger”-pienoisohjelmaa oikeassa yläkulmassa ja valitse syöteverkko-osoite <span class="menu">Build Feed URL</span> kohdan Data alta.<br />
+Sivulla muutamat mielenkiintoisimmat asetukset: sen lisäksi, että saat uusia/päivitettyjä pakkauksia, voit myös lisätä sinua kiinnostavien pakkausten nimiä. Napsauta painiketta <span class="button">Build Feed URL</span> ja saat RSS-verkko-osoitteen, jonka voit liittää RSS-syötteen lukijaan kuten BePodder, QuiteRSS, fRiSS jne.</p>
 </div>
 </div>
 

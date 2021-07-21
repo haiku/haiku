@@ -23,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Kullanıcı kılavuzu</span></div>
 </div>
 
 <div class="nav">
@@ -35,6 +35,7 @@
 <li><a href="../../de/preferences/backgrounds.html">Deutsch</a></li>
 <li><a href="../../en/preferences/backgrounds.html">English</a></li>
 <li><a href="../../es/preferences/backgrounds.html">Español</a></li>
+<li><a href="../../eo/preferences/backgrounds.html">Esperanto</a></li>
 <li><a href="../../fr/preferences/backgrounds.html">Français</a></li>
 <li><a href="../../fur/preferences/backgrounds.html">Furlan</a></li>
 <li><a href="../../it/preferences/backgrounds.html">Italiano</a></li>
@@ -60,33 +61,32 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h2><img src="../../images/prefs-images/backgrounds-icon_64.png" alt="backgrounds-icon_64.png" width="64" height="64" />Arka Planlar</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Masaüstü Çubuğu:</td><td style="width:15px;"></td><td><span class="menu">Tercihler</span>      </td></tr>
 <tr><td>Konum:</td><td></td><td><span class="path">/boot/system/preferences/Backgrounds</span></td></tr>
 <tr><td>Ayarlar:</td><td></td><td><span class="path">~/config/settings/system/app_server/workspaces</span><br />
-<span class="path">~/config/settings/Backgrounds settings</span> - stores the panel's window position</td></tr>
+<span class="path">~/config/settings/Backgrounds settings</span> - panelin pencere konumunu depolar</td></tr>
 </table>
 <p><br /></p>
-<p>You can set a color or an image as background for every folder and the Desktop for every workspace.</p>
+<p>Herhangi bir klasör veya çalışma alanlarındaki her bir masaüstü için bir rengi veya görseli arka plan olarak ayarlayabilirsiniz.</p>
 <img src="../images/prefs-images/backgrounds.png" alt="backgrounds.png" />
-<p>The top menu specifies if your changes are applied to the current workspace only, all workspaces, a specific folder or as default for every new folder.</p>
-<p>Below that you can assign an image or select <span class="menu">None</span> if you want simply a colored background. Images can also be drag &amp; dropped onto the preview to the left.</p>
-<p>If you are using an image, you have to decide on the placement:</p>
+<p>Üst menü, değişikliklerinizin yalnızca geçerli çalışma alanına mı yoksa tüm çalışma alanlarına mı veya özel bir klasöre mi veya her bir yeni klasöre mi uygulanacağını belirtir.</p>
+<p>Bunun altında bir görseli veya <span class="menu">Hiçbiri</span> seçeneğini kullanarak arka planı belirleyebilirsiniz. Görseller sol taraftaki ekran görünümüne sürükle ve bırak da yapılabilir.</p>
+<p>Eğer bir görsel kullanacaksanız görselin yerleşimini belirlemelisiniz:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="menu">Manual</span></td><td> </td><td>lets you specify the coordinates. You can drag the picture around in the preview to the left or enter <i>X</i> and <i>Y</i> manually.</td></tr>
-<tr><td><span class="menu">Center</span></td><td> </td><td>centers the picture in the middle of the screen.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Scale to fit</span></td><td> </td><td>enlarges the picture with no regard to its aspect ratio until it fills the screen.</td></tr>
-<tr><td><span class="menu">Tile</span></td><td> </td><td>fills the screen by repeating the picture.</td></tr>
+<tr><td><span class="menu">El ile</span></td><td> </td><td>koordinatları kendinizin belirlemenize izin verir. Önizlemede görseli fare imleci ile konumlandırabilir veya <i>X</i> ve <i>Y</i> değerlerini el ile girebilirsiniz.</td></tr>
+<tr><td><span class="menu">Merkez</span></td><td> </td><td>görseli ekranda ortalar.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Sığacak biçimde ölçeklendir</span></td><td> </td><td>görseli en-boy oranına sadık kalmayacak biçimde ekrana sığana değin genişletir.</td></tr>
+<tr><td><span class="menu">Döşe</span></td><td> </td><td>görseli yineleyerek ekranı doldurur.</td></tr>
 </table>
-<p>Activating <span class="menu">Icon label outline</span> puts a thin contour around icon labels.</p>
-<p>Whether an icon label's actual text is black or white depends on the setting of the color picker. A dark color sets the text to white, a light color to black. So, if you assign a very bright image to the background, you should also set the color picker to a bright color in order to have icon labels readable in black. (Or use the outline option above.)<br />
-The selected color is also reflected in the <a href="../desktop-applets/workspaces.html">Workspaces applet</a>, which ignores images as backgrounds.</p>
+<p><span class="menu">Simge etiketi dış hatları</span>, simge etiketlerinin dışına ince bir kenarlık ekler.</p>
+<p>Bir simge etiketi metninin siyah veya beyaz olması renk seçicisinin ayarına bağlıdır. Koyu bir renk metin rengini beyaz, açık bir renk siyah yapar. Arka plana görece aydınlık bir görsel koyarsınız renk seçicisini de açık bir renge ayarlamalısınız (veya yukarıdaki dış hatları kullanabilirsiniz).<br />
+Seçili renk aynı zamanda <a href="../desktop-applets/workspaces.html">Çalışma Alanları</a> gerecine de yansıtılır. Ancak görseller belirtilmez.</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="button">Eski haline döndür</span></td><td> </td><td>brings back the settings that were active when you started the Backgrounds preferences.</td></tr>
-<tr><td><span class="button">Apply</span></td><td> </td><td>sets your changes.</td></tr>
+<tr><td><span class="button">Eski haline döndür</span></td><td> </td><td>Arka Planlar tercihlerini açtığınızdaki ayarlara geri döndürür.</td></tr>
+<tr><td><span class="button">Uygula</span></td><td> </td><td>değişikliklerinizi ayarlar.</td></tr>
 </table>
 
 </div>

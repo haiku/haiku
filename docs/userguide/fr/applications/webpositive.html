@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2013, Haiku. All rights reserved.
+ * Copyright 2010-2021, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -36,6 +36,7 @@
 <li><a href="../../de/applications/webpositive.html">Deutsch</a></li>
 <li><a href="../../en/applications/webpositive.html">English</a></li>
 <li><a href="../../es/applications/webpositive.html">Español</a></li>
+<li><a href="../../eo/applications/webpositive.html">Esperanto</a></li>
 <li><a href="../../fur/applications/webpositive.html">Furlan</a></li>
 <li><a href="../../it/applications/webpositive.html">Italiano</a></li>
 <li><a href="../../hu/applications/webpositive.html">Magyar</a></li>
@@ -60,6 +61,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">La traduction de cette page n'est pas achevée. Les parties non encore traduites apparaîtrons en anglais.</div>
 <h2><img src="../../images/apps-images/webpositive-icon_64.png" alt="webpositive-icon_64.png" width="64" height="64" />WebPositive</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar :</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
@@ -77,10 +79,10 @@ Au bas de la fenêtre une barre d'état vous indique l'URL du site en cours de c
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Réglages</h2>
 <p>À partir du menu "Fenêtre" (<span class="menu">Window</span>), vous pouvez ouvrir le panneau de "réglage" (<span class="menu">Settings</span>) pour configurer les paramètres élémentaires de WebPositive.</p>
 <img src="../images/apps-images/webpositive-settings.png" alt="webpositive-settings.png" />
-<p>Le premier onglet concerne les réglages généraux : Quel fichier ou URL sert de page d'accueil (<span class="menu">Start page</span>), quelle est la page du moteur de recherche (<span class="menu">Search page</span>), dans quel dossier placer les fichiers que vous téléchargez (<span class="menu">Download folder</span>).<br />
-Deux listes déroulantes vous permettent de choisir la page à charger lors de l'ouverture d'une nouvelle fenêtre ou d'un nouvel onglet.<br />
-Avec les boîtes à cocher qui suivent, vous pouvez éviter l'affichage de la barre d'onglets quand il n'y a qu'une seule page ouverte. L'interface de WebPositive peut être réglée de manière à se masquer automatiquement en mode plein écran, ainsi que le pointeur de la souris après un certain temps d'inactivité.<br />
-Enfin, vous pouvez décider d'inclure le bouton « Home » dans la barre de navigation et régler le nombre de jours pendant lesquels le navigateur conserve l'historique des sites que vous avez visités.</p>
+<p>The first tab deals with general settings: What file or URL serves as a <span class="menu">Start page</span>, what's used as a <span class="menu">Search page</span> (if you set a <span class="menu">Custom</span> search engine, "<i>%s</i>" is used for the search term variable), what <span class="menu">Download folder</span> is used for stuff you get from the net.<br />
+Two pop-up menus let you decide what page to load - if any - when opening a new window or tab.<br />
+Via the following checkboxes you can avoid showing the tab bar when there's only one page open anyway. WebPositive's interface can be told to automatically hide in full screen mode, and the mouse pointer can be automatically hidden whenever it's not moved for a while.<br />
+Finally, you can decide to include the "Home" button in the navigation bar and set the number of days the browser remembers the sites you have visited in its history.</p>
 <p>Dans le deuxième onglet, vous pouvez choisir 
 les polices à utiliser en standard, avec empattements, sans empattements ou à espacement fixe et définir leurs tailles par défaut.</p>
 <p>Le dernier onglet permet de configurer un serveur proxy.</p>
@@ -93,8 +95,19 @@ les polices à utiliser en standard, avec empattements, sans empattements ou à 
 <li><p>Dans le menu <span class="menu">View</span> (Affichage), vous pouvez agrandir (<span class="menu">Zoom in</span>) ou réduire (<span class="menu">Zoom out</span>) une page. Il existe aussi une option pour grossir uniquement le texte <span class="menu">Zoom text only</span>, conservant ainsi la taille d'origine de toutes les images.</p></li>
 <li><p>Si vous passez en mode plein écran et que vous avez réglé l'interface pour qu'elle se masque automatiquement, elle disparaîtra après une seconde. Pour la faire réapparaitre temporairement, déplacez simplement le pointeur de la souris vers le haut de l'écran.</p></li>
 <li><img src="../images/apps-images/webpositive-locator.png" alt="webpositive-locator.png" />
-<p>Si vous saisissez une adresse dans la zone de texte, le navigateur recherche si un site que vous avez visité dans le passé lui correspond. Vous pouvez continuer à saisir d'autres lettres pour raccourcir la liste des sites possibles, ou bien  sélectionner une entrée avec <span class="key">↑</span> ou <span class="key">↓</span> avant de presser <span class="key">Entrée</span> pour charger la page. Vous pouvez aussi utiliser le bouton tout à droite pour recharger la page en cours.<br />
-Les chaînes non reconnues comme URL seront exploitées à l'aide du moteur de recherche de Google, de sorte que la zone d'adresse sert aussi de raccourci rapide pour effectuer vos recherches sur le Web.</p></li>
+<p>While you type in the locator text field, the browser matches the string to sites you have visited in the past and lists them below the text field. You either keep adding more letters to shorten the  list of possible sites, or choose an entry with <span class="key">↑</span> or <span class="key">↓</span>. <span class="key">ENTER</span> will load the page. You can also use the button to the far right which also serves to reload a page.<br />
+Strings not recognized as URLs will get looked up with the search engine set in WebPositive's settings, so the locator field doubles as quick shortcut to web searches.</p>
+<div class="box-info"><p>WebPositive supports quick shortcuts to direct search terms to different search engines. Just enter the one-letter-shortcut followed by your search term.</p>
+<ul>
+<li>"g” for Google</li>
+<li>“b” for Bing</li>
+<li>“w” for Wikipedia</li>
+<li>“d” for DuckDuckGo</li>
+<li>“a” for Baiku</li>
+<li>“y” for Yandex</li>
+<li>“e” for Ecosia</li>
+<li>“q” for Qwant</li>
+</ul></div></li>
 <li><p>Un clic droit ouvre un menu contextuel qui vous propose, selon l'objet sur lequel vous avez cliqué, de télécharger l'objet, ou d'ouvrir le lien dans une nouvelle fenêtre ou un nouvel onglet.</p></li>
 <li><p><span class="menu">Edit | Find</span> (Éditer | Rechercher) affiche une barre de recherche en bas de la fenêtre pour examiner le contenu de la page. Les correspondances trouvées dans la page apparaitront en surbrillance.</p></li>
 </ul>

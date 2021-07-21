@@ -35,6 +35,7 @@
 <li><a href="../de/workshop-email.html">Deutsch</a></li>
 <li><a href="../en/workshop-email.html">English</a></li>
 <li><a href="../es/workshop-email.html">Español</a></li>
+<li><a href="../eo/workshop-email.html">Esperanto</a></li>
 <li><a href="../fr/workshop-email.html">Français</a></li>
 <li><a href="../it/workshop-email.html">Italiano</a></li>
 <li><a href="../hu/workshop-email.html">Magyar</a></li>
@@ -67,10 +68,10 @@
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Tabele</td></tr>
 <tr class="index"><td>
-	<a href="#mailsystem">Haiku's mail system</a><br />
-	<a href="#statuses">Using custom statuses</a><br />
-	<a href="#queries">Using queries</a><br />
-	<a href="#tips">More tips</a>
+	<a href="#mailsystem">Sisteme de pueste in Haiku</a><br />
+	<a href="#statuses">Doprâ i stâts personalizâts</a><br />
+	<a href="#queries">Doprâ lis interogazions</a><br />
+	<a href="#tips">Altris sugjeriments</a>
 </td></tr>
 </table>
 
@@ -80,7 +81,7 @@
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="mailsystem" name="mailsystem">Haiku's mail system</a></h2>
+<a id="mailsystem" name="mailsystem">Sisteme de pueste in Haiku</a></h2>
 <p>If you come to Haiku from other operating systems, you're probably used to big applications like MS Outlook or Mozilla's Thunderbird. You have to configure them by entering all the info on mail server addresses etc. and they use their own contacts database. They take care of sending and fetching email and store them in some big special file.<br />
 Changing you email client can be a hassle with quite some ex/importing and converting going on. Using more than one client in parallel to check out what else is available is also not without the occasional kerfuffle.</p>
 <p>Haiku's mail system is different. It breaks down into smaller separate modules.</p>
@@ -101,7 +102,7 @@ Also, improvements in any of these system areas benefit not just emailing, but a
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="status" name="status">Using custom statuses</a></h2>
+<a id="status" name="status">Doprâ i stâts personalizâts</a></h2>
 <p>When you browse through your newly arrived email, you may want to come back to some of them later to think about it in more depth. While you could use Mail's menu <span class="menu">Close and | Leave as New</span> to keep them in your "<i>New messages</i>" query, things tend to pile up that way...</p>
 <p>One solution is of course to just start a reply and save it as draft. But if you don't expect to write a reply and just want to re-read the mail later, that isn't ideal.</p>
 <img src="images/workshop-email-images/status.png" alt="status.png" /> 
@@ -112,7 +113,7 @@ In any case, try to keep the status name short. That way it always fits in a nor
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="queries" name="queries">Using queries</a></h2>
+<a id="queries" name="queries">Doprâ lis interogazions</a></h2>
 <p>Sure, you specify a folder to store all your email, you can open it et voilà,  there's all you mail. But over time the folder becomes crowded and showing all will take longer and longer as thousands of files and their attributes have to be parsed and sorted. Also, most of the time you don't really care about two year old emails of Nigerian princes and their inheritory trouble ...</p>
 <div class="box-info">A lot of time when populating a folder is spent on putting files read from disk into the correct sorting order and displaying that in the window. If you do have to open a folder with a huge number of files, you can shorten the wait by making the Tracker window "invisible", i.e. either minimize it or change to another workspace. Watch <a href="desktop-applets/processcontroller.html">ProcessController</a> to see how it affects CPU usage.</div>
 <p><a href="queries.html">Queries</a>, to the rescue!</p>
@@ -127,7 +128,7 @@ In any case, try to keep the status name short. That way it always fits in a nor
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="query-examples" name="query-examples">Query examples</a></h3>
+<a id="query-examples" name="query-examples">Esemplis di interogazions</a></h3>
 <p>Here are a few examples of useful queries:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="10">
 <tr align="center"><td><img src="images/workshop-email-images/query-1.png" alt="query-1.png" /><br />
@@ -143,7 +144,7 @@ This finds all posts from the Haiku commit list of the past 12 hours.</td></tr>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="tips" name="tips">More tips</a></h2>
+<a id="tips" name="tips">Altris sugjeriments</a></h2>
 <ul>
 <li><p>If you don't save a query as "<i>Query</i>" but as "<i>Query template</i>", invoking it won't show the result window, but the Find... window instead. That way you can easily exchange the search string for the subject or sender, for example, or change a "<i>2 days</i>" time limit to "<i>3 days</i>".</p></li>
 <li><p>Activating "type-ahead filtering" in <a href="tracker.html#tracker-preferences">Tracker's preferences</a> allows you to very quickly filter a query result even further. Often it's enough to query for all mails of the last 3 days and go with type-ahead filtering from there. The big advantage is, that you don't have to exactly specify which attribute to search for, as all displayed are considered when filtering.</p></li>

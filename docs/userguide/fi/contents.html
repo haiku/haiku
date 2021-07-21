@@ -24,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Käyttäjäopas</span></div>
 </div>
 
 <div class="nav">
@@ -36,6 +36,7 @@
 <li><a href="../de/contents.html">Deutsch</a></li>
 <li><a href="../en/contents.html">English</a></li>
 <li><a href="../es/contents.html">Español</a></li>
+<li><a href="../eo/contents.html">Esperanto</a></li>
 <li><a href="../fr/contents.html">Français</a></li>
 <li><a href="../fur/contents.html">Furlan</a></li>
 <li><a href="../it/contents.html">Italiano</a></li>
@@ -59,7 +60,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h1>Tervetuloa Haiku-käyttäjäoppaaseen</h1>
 
@@ -76,12 +76,7 @@
 		<li><a href="installation.html#transfer-data">Transfering data to/from a Haiku installation</a></li></ul></td>
 		<td valign="top">Step by step guides covering Haiku installation during the (pre-) alpha release phase.</td></tr>
 -->
-	<tr><td valign="top"><a href="bootloader.html">Käynnistyslataaja</a></td>
-		<td valign="top">Aseta turvalliset käynnistysasetukset asetuspulmien ratkaisemiseksi.</td></tr>
-	<tr><td valign="top"><a href="filesystem-layout.html">Tiedostojärjestelmäsijoittelu</a><ul>
-		<li><a href="filesystem-layout.html#system">Järjestelmäkansio</a></li>
-		<li><a href="filesystem-layout.html#home">Kotikansio</a></li></ul></td>
-		<td valign="top">Ymmärrä tiedostojärjestelmän hierarkia ja tutustu tärkeisiin tiedostosijainteihin ja kansioihin.</td></tr>
+
 	<tr><td valign="top"><a href="gui.html">Haikun graafinen käyttöliittymä</a><ul>
 		<li><a href="gui.html#move-resize">Helppo siirtäminen ja koon muuttaminen</a></li>
 		<li><a href="gui.html#stack-tile">Pino &amp; laatoitus</a></li>
@@ -90,13 +85,80 @@
 		<a href="gui.html#favorites-recent">- Suosikit ja äskettäiset kansiot</a></li>
 		<li><a href="gui.html#replicants">Kopiot</a></li></ul></td>
 		<td valign="top">Opi graafisen käyttöliittymän peruselementeistä.</td></tr>
-	<tr><td valign="top"><a href="keyboard-shortcuts.html">Shortcuts and key combinations</a><ul>
-		<li><a href="keyboard-shortcuts.html#general">General shortcuts</a></li>
-		<li><a href="keyboard-shortcuts.html#textediting">Textediting shortcuts</a></li>
-		<li><a href="keyboard-shortcuts.html#tracker-navigation">Shortcuts for Tracker navigation</a></li>
-		<li><a href="keyboard-shortcuts.html#terminal">Shortcuts in Terminal</a></li>
-		<li><a href="keyboard-shortcuts.html#other-combos">Other key combinations</a></li></ul></td>
-		<td valign="top">Yleisimmät oikotiet työkulkusi nopeuttamiseksi.</td></tr>
+
+	<tr><td valign="top"><a href="deskbar.html">Työpöytäpalkki</a><ul>
+		<li><a href="deskbar.html#deskbar-menu">Työpöytäpalkkivalikko</a></li>
+		<li><a href="deskbar.html#tray">Tarjotin</a></li>
+		<li><a href="deskbar.html#list-of-apps">Suoritettavien ohjelmien luettelo</a></li></ul></td>
+		<td valign="top">Käytä ja aseta Haikun versio "Käynnistä"-valikosta ja tehtäväpalkista.</td></tr>
+
+	<tr><td valign="top"><a href="tracker.html">Seuraaja</a><ul>
+		<li><a href="tracker.html#mounting-volumes">Taltioiden liittäminen</a></li>
+		<li><a href="tracker.html#navigating">Navigointi</a></li>
+		<li><a href="tracker.html#appearance">Ulkoasu</a></li>
+		<li><a href="tracker.html#tracker-preferences">Seuraaja-asetukset</a></li>
+		<li><a href="tracker.html#working-with-files">Tiedostojen kanssa työskenteleminen</a></li>
+		<li><a href="tracker.html#transaction-status">Tapahtumatila</a></li>
+		<li><a href="tracker-add-ons.html">Seuraajalisäosat</a></li></ul></td>
+		<td valign="top">Opi kaikki navigoinnista, tiedostojen ja kansioiden kanssa työskentelemisestä ja kuinka asetetaan Haikun tiedostohallinta.</td></tr>
+
+	<tr><td valign="top"><a href="applications.html">Sovellukset</a><ul>
+		<li><a href="applications.html#hpkg">Haiku-pakkaukset (.hpkg)</a></li>
+		<li><a href="applications.html#beos_apps">Vanhat BeOS-arkistot (.zip ja .pkg)</a></li>
+		<li><a href="applications.html#list-of-apps">Haikun sovellukset</a></li>
+		</ul></td>
+		<td>Opi kuinka poistetaan ja asennetaan sovelluksia yleensä ja kuin työskennellään Haikun mukana tulevien sovellusten kanssa.</td></tr>
+
+	<tr><td colspan="2"><table align="center"><tr><td>
+<a href="applications/activitymonitor.html">Aktiviteettivalvonta</a><br />
+		<a href="applications/bootmanager.html">Käynnistyshallinta</a><br />
+		<a href="applications/charactermap.html">Merkkikuvaus</a><br />
+		<a href="applications/codycam.html">Cody-kamera</a><br />
+		<a href="applications/debugger.html">Vianjäljitin</a><br />
+		<a href="applications/deskcalc.html">Työpöytälaskin</a></td>
+<td width="32px"></td>
+<td valign="top">
+		<a href="applications/diskprobe.html">Levykoestin</a><br />
+		<a href="applications/diskusage.html">Levykäyttö</a><br />
+		<a href="applications/drivesetup.html">Levyasema-asetukset</a><br />
+		<a href="applications/expander.html">Laajentaja</a><br />
+		<a href="applications/haikudepot.html">HaikuVarasto</a><br />
+		<a href="applications/icon-o-matic.html">Kuvakemaatti</a></td>
+<td width="32px"></td>
+<td valign="top">
+		<a href="applications/installer.html">Asennusohjelma</a><br />
+		<a href="applications/magnify.html">Suurennuslasi</a><br />
+		<a href="applications/mail.html">Sähköposti</a><br />
+		<a href="applications/mediaplayer.html">Mediasoitin</a><br />
+		<a href="applications/midiplayer.html">Midi-soitin</a><br />
+		<a href="applications/packageinstaller.html">Perinnepakkausasennin</a></td>
+<td width="32px"></td>
+<td valign="top">
+		<a href="applications/people.html">Ihmiset</a><br />
+		<a href="applications/poorman.html">Köyhis</a><br />
+		<a href="applications/screenshot.html">Näytönkaappaus</a><br />
+		<a href="applications/showimage.html">Kuvakatselin</a><br />
+		<a href="applications/softwareupdater.html">Ohjelmistopäivittäjä</a><br />
+		<a href="applications/soundrecorder.html">Ääninauhuri</a></td>
+<td width="32px"></td>
+<td valign="top">
+		<a href="applications/stylededit.html">Tyylitetty editori</a><br />
+		<a href="applications/terminal.html">Pääteikkuna</a><br />
+		<a href="applications/textsearch.html">Tekstihaku</a><br />
+		<a href="applications/tv.html">TV</a><br />
+		<a href="applications/webpositive.html">WebPositive</a></td></tr>
+		</table>
+	</td></tr>
+
+	<tr><td valign="top"><ul>
+		<li><a href="applications.html#cli-apps">Haikun komentorivisovellukset</a></li>
+		<li><a href="applications.html#list-of-bundled-apps">Sovelluspakkaukset</a></li>
+		<ul><li><a href="applications/bepdf.html">- BePDF</a></li>
+			<li><a href="applications/pe.html">- Pe</a></li>
+			<li><a href="applications/vision.html">- Vision</a></li>
+			<li><a href="applications/wonderbrush.html">- WonderBrush</a></li></ul>
+	</ul></td><td></td></tr>
+
 	<tr><td valign="top"><a href="workspaces.html">Työtilat</a><ul>
 		<li><a href="workspaces.html#switching">Työtilojen vaihtaminen</a></li>
 		<li><a href="desktop-applets/workspaces.html#applet">Työtilasovelmat</a></li>
@@ -107,87 +169,15 @@
 		<td valign="top">Vaihda suoritettavien sovellusten välillä.</td></tr>
 	<tr><td valign="top"><a href="teammonitor.html">Ryhmävalvonta</a></td>
 		<td valign="top">Tapa ne sovellukset ja järjestelmäkomponentit, jotka eivät vastaa.</td></tr>
-	<tr><td valign="top"><a href="tracker.html">Seuraaja</a><ul>
-		<li><a href="tracker.html#mounting-volumes">Taltioiden liittäminen</a></li>
-		<li><a href="tracker.html#navigating">Navigointi</a></li>
-		<li><a href="tracker.html#appearance">Ulkoasu</a></li>
-		<li><a href="tracker.html#tracker-preferences">Seuraaja-asetukset</a></li>
-		<li><a href="tracker.html#working-with-files">Tiedostojen kanssa työskenteleminen</a></li>
-		<li><a href="tracker.html#transaction-status">Tapahtumatila</a></li>
-		<li><a href="tracker-add-ons.html">Seuraajalisäosat</a></li></ul></td>
-		<td valign="top">Opi kaikki navigoinnista, tiedostojen ja kansioiden kanssa työskentelemisestä ja kuinka asetetaan Haikun tiedostohallinta.</td></tr>
-	<tr><td valign="top"><a href="deskbar.html">Työpöytäpalkki</a><ul>
-		<li><a href="deskbar.html#deskbar-menu">Työpöytäpalkkivalikko</a></li>
-		<li><a href="deskbar.html#tray">Tarjotin</a></li>
-		<li><a href="deskbar.html#list-of-apps">Suoritettavien ohjelmien luettelo</a></li></ul></td>
-		<td valign="top">Käytä ja aseta Haikun versio "Käynnistä"-valikosta ja tehtäväpalkista.</td></tr>
-	<tr><td valign="top"><a href="filetypes.html">Tiedostotyypit</a><ul>
-		<li><a href="filetypes.html#filetype">Tiedostotyyppi</a></li>
-		<li><a href="filetypes.html#preferred-app">Ensisijainen sovellu</a></li>
-		<li><a href="filetypes.html#icon">Kuvake</a></li>
-		<li><a href="filetypes.html#settings-apps">Sovellusten erityisasetukset</a></li>
-		<li><a href="filetypes.html#filetypes-preferences">Tiedostotyyppiasetusten yleiset asetukset</a></li></ul></td>
-		<td valign="top">Aseta  oletussovellukset, vaihda tiedostotyypit ja luo omia tiedostotyyppejäsi.</td></tr>
-	<tr><td valign="top"><a href="attributes.html">Attribuutit</a><ul>
-		<li><a href="attributes.html#attributes-tracker">Attribuutit Seuraajassa</a></li>
-		<li><a href="attributes.html#attributes-terminal">Attribuutit Pääteikkunassa</a></li></ul></td>
-		<td valign="top">Yksi Haikun pääpiirteistä on antaa sinun hallita ja lisätä mitä tahansa tietoja mihin tahansa tiedostoon.</td></tr>		
-	<tr><td valign="top"><a href="index.html">Indeksi</a></td>
-		<td>Käytä indeksointia kyetäksesi etsimään attribuutteja.</td></tr>
-	<tr><td valign="top"><a href="queries.html">Kyselyt</a><ul>
-		<li><a href="queries.html#find-window">Etsintäikkuna</a></li>
-		<li><a href="queries.html#basic-query">Peruskyselyt - "nimellä"</a></li>
-		<li><a href="queries.html#adv-query">Edistyneet kyselyt - "attribuutilla"</a></li>
-		<li><a href="queries.html#more-adv-query">Vielä edistyneemmät kyselyt - "kaavalla"</a></li>
-		<li><a href="queries.html#result-window">Tulosikkuna</a></li>
-		<li><a href="queries.html#query-template">Kyselymallinteet</a></li>
-</ul></td>
-		<td valign="top">Käytä Haikun salamannopeita kyselyjä löytääksesi nopeasti sen mitä olet etsimässä.</td></tr>
-	<tr><td valign="top"><a href="workshop-filetypes+attributes.html">Työpaja: Tiedostotyypit, attribuutit, indeksi ja kyselyt</a></td>
-		<td valign="top">Opi käyttämään joitakin Haikun avainominaisuuksia järjestelemällä DVD-levyjäsi.</td></tr>
-	<tr><td valign="top"><a href="workshop-email.html">Työpaja: Sähköpostin hallinta</a></td>
-		<td valign="top">Opi käyttämään Haikun sähköpostijärjestelmää omilla tilatiedoilla ja kyselyillä.</td></tr>
-	<tr><td valign="top"><a href="workshop-wlan.html">Työpaja: Langaton verkko</a></td>
-		<td valign="top">Aseta avoin tai salattu langaton verkko.</td></tr>
-	<tr><td valign="top"><a href="applications.html">Sovellukset</a><ul>
-		<li><a href="applications.html#hpkg">Haiku-pakkaukset (.hpkg)</a></li>
-		<li><a href="applications.html#beos_apps">Vanhat BeOS-arkistot (.zip ja .pkg)</a></li>
-		<li><a href="applications.html#list-of-apps">Haikun sovellukset</a></li>
-		<ul>
-			<li><a href="applications/activitymonitor.html">Aktiviteettivalvonta</a></li>
-			<li><a href="applications/bootmanager.html">Käynnistyshallinta</a></li>
-			<li><a href="applications/charactermap.html">Merkkikuvaus</a></li>
-			<li><a href="applications/codycam.html">Cody-kamera</a></li>
-			<li><a href="applications/debugger.html">Vianjäljitin</a></li>
-			<li><a href="applications/deskcalc.html">Työpöytälaskin</a></li>
-			<li><a href="applications/diskprobe.html">Levykoestin</a></li>
-			<li><a href="applications/diskusage.html">Levykäyttö</a></li>
-			<li><a href="applications/drivesetup.html">Levyasema-asetukset</a></li>
-			<li><a href="applications/expander.html">Laajentaja</a></li>
-			<li><a href="applications/haikudepot.html">HaikuVarasto</a></li>
-			<li><a href="applications/icon-o-matic.html">Kuvakemaatti</a></li>
-			<li><a href="applications/installer.html">Asennusohjelma</a></li>
-			<li><a href="applications/magnify.html">Suurennuslasi</a></li>
-			<li><a href="applications/mail.html">Sähköposti</a></li>
-			<li><a href="applications/mediaplayer.html">Mediasoitin</a></li>
-			<li><a href="applications/midiplayer.html">Midi-soitin</a></li>
-			<li><a href="applications/packageinstaller.html">Perinnepakkausasennin</a></li>
-			<li><a href="applications/people.html">Ihmiset</a></li>
-			<li><a href="applications/poorman.html">Köyhis</a></li>
-			<li><a href="applications/screenshot.html">Näytönkaappaus</a></li>
-			<li><a href="applications/showimage.html">Kuvakatselin</a></li>
-			<li><a href="applications/softwareupdater.html">Ohjelmistopäivittäjä</a></li>
-			<li><a href="applications/soundrecorder.html">Ääninauhuri</a></li>
-			<li><a href="applications/stylededit.html">Tyylitetty editori</a></li>
-			<li><a href="applications/terminal.html">Pääteikkuna</a></li>
-			<li><a href="applications/textsearch.html">Tekstihaku</a></li>
-			<li><a href="applications/tv.html">TV</a></li>
-			<li><a href="applications/webpositive.html">WebPositive</a></li>
-		</ul>
-		<li><a href="applications.html#cli-apps">Haikun komentorivisovellukset</a></li>
-		<li><a href="applications.html#list-of-bundled-apps">Sovelluspakkaukset</a></li>
-		</ul></td>
-		<td>Opi kuinka poistetaan ja asennetaan sovelluksia yleensä ja kuin työskennellään Haikun mukana tulevien sovellusten kanssa.</td></tr>
+
+	<tr><td valign="top"><a href="keyboard-shortcuts.html">Pikanäppäimet ja näppäinyhdistelmät</a><ul>
+		<li><a href="keyboard-shortcuts.html#general">Yleiset pikanäppäimet</a></li>
+<li><a href="keyboard-shortcuts.html#textediting">Tekstinmuokkauspikanäppäimet</a></li>
+		<li><a href="keyboard-shortcuts.html#tracker-navigation">Pikanäppäimet Seuraaja-navigointiin</a></li>
+		<li><a href="keyboard-shortcuts.html#terminal">Pikanäppäimet Pääteikkunassa</a></li>
+		<li><a href="keyboard-shortcuts.html#other-combos">Muut näppäinyhdistelmät</a></li></ul></td>
+		<td valign="top">Yleisimmät oikotiet työkulkusi nopeuttamiseksi.</td></tr>
+
 	<tr><td valign="top"><a href="desktop-applets.html">Työpöytäsovelmat</a>
 		<ul>
 			<li><a href="desktop-applets/launchbox.html">Käynnistyslaatikko</a></li>
@@ -197,38 +187,88 @@
 			<li><a href="desktop-applets/workspaces.html">Työtilat</a></li>
 		</ul></td>
 		<td>Yksinkertaiset työkalut asennettavaksi työpöydällesi ja työpöytäpalkkiisi.</td></tr>
-	<tr><td valign="top"><a href="preferences.html">Asetukset</a>
-		<ul>
-			<li><a href="preferences/appearance.html">Ulkoasu</a></li>
-			<li><a href="preferences/backgrounds.html">Tausta-asetukset</a></li>
-			<li><a href="preferences/datatranslations.html">Tietomuuntimet</a></li>
-			<li><a href="preferences/deskbar.html">Työpöytäpalkki</a></li>
-			<li><a href="preferences/e-mail.html">Sähköposti</a></li>
-			<li><a href="preferences/filetypes.html">Tiedostotyypit</a></li>
-			<li><a href="preferences/keyboard.html">Näppäimistö</a></li>
-			<li><a href="preferences/keymap.html">Näppäimistökuvaus</a></li>
-			<li><a href="preferences/locale.html">Paikallisasetukset</a></li>
-			<li><a href="preferences/media.html">Media</a></li>
-			<li><a href="preferences/mouse.html">Hiiri</a></li>
-			<li><a href="preferences/network.html">Verkko</a></li>
-			<li><a href="preferences/printers.html">Tulostimet</a></li>
-			<li><a href="preferences/repositories.html">Tietovarastot</a></li>
-			<li><a href="preferences/screen.html">Näytöt</a></li>
-			<li><a href="preferences/screensaver.html">Näytönsäästäjät</a></li>
-			<li><a href="preferences/shortcuts.html">Pikakuvakkeet</a></li>
-			<li><a href="preferences/sounds.html">Äänet</a></li>
-			<li><a href="preferences/time.html">Aika</a></li>
-			<li><a href="preferences/tracker.html">Seuraaja</a></li>
-			<li><a href="preferences/touchpad.html">Levyhiiri</a></li>
-			<li><a href="preferences/virtualmemory.html">Virtuaalimuisti</a></li>
-		</ul></td>
+
+	<tr><td valign="top"><a href="preferences.html">Asetukset</a></td>
 		<td>Järjestelmäsi asettamisesta.</td></tr>
+	<tr><td colspan="2"><table align="center"><tr><td>
+			<a href="preferences/appearance.html">Ulkoasu</a><br />
+			<a href="preferences/backgrounds.html">Tausta-asetukset</a><br />
+			<a href="preferences/datatranslations.html">Tietomuuntimet</a><br />
+			<a href="preferences/deskbar.html">Työpöytäpalkki</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="preferences/e-mail.html">Sähköposti</a><br />
+			<a href="preferences/filetypes.html">Tiedostotyypit</a><br />
+			<a href="preferences/input.html">Syöte</a><br />
+			<a href="preferences/keymap.html">Näppäimistökuvaus</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="preferences/locale.html">Paikallisasetukset</a><br />
+			<a href="preferences/media.html">Media</a><br />
+			<a href="preferences/network.html">Verkko</a><br />
+			<a href="preferences/printers.html">Tulostimet</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="preferences/repositories.html">Tietovarastot</a><br />
+			<a href="preferences/screen.html">Näytöt</a><br />
+			<a href="preferences/screensaver.html">Näytönsäästäjät</a><br />
+			<a href="preferences/shortcuts.html">Pikakuvakkeet</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="preferences/sounds.html">Äänet</a><br />
+			<a href="preferences/time.html">Aika</a><br />
+			<a href="preferences/tracker.html">Seuraaja</a><br />
+			<a href="preferences/virtualmemory.html">Virtuaalimuisti</a></td></tr>
+		</table></td></tr>
 <!--
 	<tr><td valign="top"><a href="demos.html">Demos</a></td>
 		<td>Games and demo applications.</td></tr>
 -->
+	<tr><td valign="top"><a href="queries.html">Kyselyt</a><ul>
+		<li><a href="queries.html#find-window">Etsintäikkuna</a></li>
+		<li><a href="queries.html#basic-query">Peruskyselyt - "nimellä"</a></li>
+		<li><a href="queries.html#adv-query">Edistyneet kyselyt - "attribuutilla"</a></li>
+		<li><a href="queries.html#more-adv-query">Vielä edistyneemmät kyselyt - "kaavalla"</a></li>
+		<li><a href="queries.html#result-window">Tulosikkuna</a></li>
+		<li><a href="queries.html#query-template">Kyselymallinteet</a></li>
+</ul></td>
+		<td valign="top">Käytä Haikun salamannopeita kyselyjä löytääksesi nopeasti sen mitä olet etsimässä.</td></tr>
+
+	<tr><td valign="top"><a href="filetypes.html">Tiedostotyypit</a><ul>
+		<li><a href="filetypes.html#filetype">Tiedostotyyppi</a></li>
+		<li><a href="filetypes.html#preferred-app">Ensisijainen sovellu</a></li>
+		<li><a href="filetypes.html#icon">Kuvake</a></li>
+		<li><a href="filetypes.html#settings-apps">Sovellusten erityisasetukset</a></li>
+		<li><a href="filetypes.html#filetypes-preferences">Tiedostotyyppiasetusten yleiset asetukset</a></li></ul></td>
+		<td valign="top">Aseta  oletussovellukset, vaihda tiedostotyypit ja luo omia tiedostotyyppejäsi.</td></tr>
+
+	<tr><td valign="top"><a href="attributes.html">Attribuutit</a><ul>
+		<li><a href="attributes.html#attributes-tracker">Attribuutit Seuraajassa</a></li>
+		<li><a href="attributes.html#attributes-terminal">Attribuutit Pääteikkunassa</a></li></ul></td>
+		<td valign="top">Yksi Haikun pääpiirteistä on antaa sinun hallita ja lisätä mitä tahansa tietoja mihin tahansa tiedostoon.</td></tr>
+
+	<tr><td valign="top"><a href="index.html">Indeksi</a></td>
+		<td>Käytä indeksointia kyetäksesi etsimään attribuutteja.</td></tr>
+
+	<tr><td valign="top"><a href="filesystem-layout.html">Tiedostojärjestelmäsijoittelu</a><ul>
+		<li><a href="filesystem-layout.html#system">Järjestelmäkansio</a></li>
+		<li><a href="filesystem-layout.html#home">Kotikansio</a></li></ul></td>
+		<td valign="top">Ymmärrä tiedostojärjestelmän hierarkia ja tutustu tärkeisiin tiedostosijainteihin ja kansioihin.</td></tr>
+
+	<tr><td valign="top"><a href="workshop-filetypes+attributes.html">Työpaja: Tiedostotyypit, attribuutit, indeksi ja kyselyt</a></td>
+		<td valign="top">Opi käyttämään joitakin Haikun avainominaisuuksia järjestelemällä DVD-levyjäsi.</td></tr>
+
+	<tr><td valign="top"><a href="workshop-email.html">Työpaja: Sähköpostin hallinta</a></td>
+		<td valign="top">Opi käyttämään Haikun sähköpostijärjestelmää omilla tilatiedoilla ja kyselyillä.</td></tr>
+
+	<tr><td valign="top"><a href="workshop-wlan.html">Työpaja: Langaton verkko</a></td>
+		<td valign="top">Aseta avoin tai salattu langaton verkko.</td></tr>
+
 	<tr><td valign="top"><a href="bash-scripting.html">Bash ja skriptaus</a></td>
 		<td>Opi joitakin järjestelmän käyttämiä mielenkiintoisia skriptejä ja verkkoresursseja, joita voi käyttää komentotulkissa ja skriptejä käytettäessä.</td></tr>
+
+	<tr><td valign="top"><a href="bootloader.html">Käynnistyslataaja</a></td>
+		<td valign="top">Aseta turvalliset käynnistysasetukset asetuspulmien ratkaisemiseksi.</td></tr>
 </table>
 
 </div>

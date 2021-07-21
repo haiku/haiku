@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2013-2020 Haiku. All rights reserved.
+ * Copyright 2013-2021 Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -36,6 +36,7 @@
 <li><a href="../../de/applications/haikudepot.html">Deutsch</a></li>
 <li><a href="../../en/applications/haikudepot.html">English</a></li>
 <li><a href="../../es/applications/haikudepot.html">Español</a></li>
+<li><a href="../../eo/applications/haikudepot.html">Esperanto</a></li>
 <li><a href="../../fr/applications/haikudepot.html">Français</a></li>
 <li><a href="../../it/applications/haikudepot.html">Italiano</a></li>
 <li><a href="../../hu/applications/haikudepot.html">Magyar</a></li>
@@ -61,17 +62,18 @@
 
 <div id="content">
 <div>
+<div class="box-info">La traduzion di cheste pagjine no je ancjemò finide. Spietant che lu sedi, pes parts che no son finidis, dopre la version origjinâl par Inglês.</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Tabele</td></tr>
-<tr class="index"><td><a href="#filter">Il filtri</a><br />
-                <a href="#list">La liste</a><br />
-                <a href="#info">La aree des informazions</a><br />
-                <a href="#menu">I menù Struments e Mostre</a><br />
-                <a href="#account">Creâ un account utent</a><br />
-                <a href="#rating">Valutâ e comentâ</a><br />
-                <a href="#logs">Regjistris di diagnostiche</a><br />
-
+<tr class="index"><td><a href="#filter">The Filter</a><br />
+                <a href="#list">The List</a><br />
+                <a href="#info">The Info Area</a><br />
+                <a href="#menu">HaikuDepot and Show menu</a><br />
+                <a href="#account">Creating a User Account</a><br />
+                <a href="#rating">Rating and Commenting</a><br />
+                <a href="#logs">Diagnostic Logs</a><br />
+                <a href="#tips">Tips</a><br />
 </td></tr>
 </table>
 
@@ -131,10 +133,11 @@ Intal mieç a stan i coments dai utents cul lôr sorenon, il numar di stelis che
 </ul>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="menu" name="menu">I menù Struments e Mostre</a></h2>
-<p>Intal menù <span class="menu">Struments</span> in alt tal barcon, tu cjatis l'element <span class="menu">Inzorne dipuesits</span>. Chest al domandarà dai dipuesits une liste inzornade dai pachets disponibii.<br />
+<a id="menu" name="menu">I menù Mostre e HaikuDepot</a></h2>
+<p>Intal menù <span class="menu">HaikuDepot</span> in alt tal barcon, tu cjatarâs l'element <span class="menu">Inzorne dipuesits</span>. Chest al domandarà ai dipuesits une liste inzornade dai pachets disponibii.<br />
 Cul secont element, <span class="menu">Gjestìs dipuesits...</span>, tu gjestissis i dipuesits. Al vierç lis preferencis dai <a href="../preferences/repositories.html">Dipuesits</a>, par zontâ/gjavâ o disabilitâ e abilitât i dipuesits.<br />
-<span class="menu">Controle inzornaments...</span> al vierç <a href="../apps/softwareupdater.html">SoftwareUpdater</a> par cirî e instalâ i pachets inzornâts.</p>
+<span class="menu">Controle inzornaments...</span> al vierç <a href="../apps/softwareupdater.html">SoftwareUpdater</a> par cirî e instalâ i pachets inzornâts.<br />
+<span class="menu">Impostazions...</span> al vierç un barcon che pal moment al à la uniche opzion: <span class="menu">Condivît dâts anonims sul ûs cun HaikuDepotServerShare</span>. I dâts a vegnin doprâts par, par esempli, incrementâ un contadôr su trop che un pachet al ven viodût e instalât. Chest al pues determinâ se un pachet al à di vignî mostrât te liste "Pachets in risalt".</p>
 <p>Sot di <span class="menu">Mostre</span> tu puedis sielzi di mostrâ ancje i <span class="menu">Pachets di svilup</span> e i <span class="menu">Pachets sorzint</span> te liste dai pachets. Pal utent normâl chei no son di nissune utilitât e dome a confusionaran la liste. Dut câs a son impuartants pes personis che a àn dibisugne des librariis e dai header (...) di un pachet par disvilupâ e compilâ programs che a dipendin di chescj.</p>
 <p>Plui interessantis a son lis opzions par mostrâ dome i <span class="menu">Pachets disponibii</span> e i <span class="menu">Pachets instalâts</span>.</p>
 
@@ -149,6 +152,7 @@ Cul secont element, <span class="menu">Gjestìs dipuesits...</span>, tu gjestiss
 <li>risolvi il captcha</li>
 <li>striche lis caselis di selezion par confermâ che tu âs plui di 16 agns e che tu âs let lis condizions di ûs tal colegament lì sot.</li></ul>
 <p>Daspò sei jentrâts, il menù in alt a drete tal barcon di HaikuDepot al mostrarà <span class="menu">Jentrât come (...)</span>, mostrant il to non utent. Cumò cul menù ti puedis sielzi tra <span class="menu">Cambie account...</span> o <span class="menu">Termine session</span>.</p>
+<p>Tant che pro memoria di ce che tu âs acetât strincant su la casele di selezion chi parsore menzonade, si àn lis vôs dal menù <span class="menu">Viôt lis ultimis condizions di ûs</span> e <span class="menu">Viôt lis cundizions di ûs acetadis...</span></p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="rating" name="rating">Valutâ e comentâ</a></h2>
@@ -158,7 +162,7 @@ Cul secont element, <span class="menu">Gjestìs dipuesits...</span>, tu gjestiss
 Dopo vê clicât su <span class="button">Invie</span>, i dâts a vegnin trasmetûts al servidôr. Tu podaressis vê di lâ sul menù <span class="menu">Struments</span> e fâ <span class="menu">Inzorne dipuesits</span> prime di podê viodi lis tôs modifichis.</p>
 <p>In ogni moment, tu puedis tornâ indaûr e modificâ il to coment e tornâ a dâ une valutazion. Tu puedis ancje platâ il to vôt dai altris utents disativant la casele <span class="menu">Altris utents a puedin viodi cheste valutazion</span>, che e ven fûr une volte che si à valutât un pachet.</p>
 
- <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="logs" name="logs">Regjistris di diagnostiche</a></h2>
 <p>Cuant che si dopre HaikuDepot, chest al interagjìs tant cu la rêt che cui servizis locâi. Lis robis a puedin lâ strucjis, cualchi volte in manieris che no si veve pensât cuant che e je stade scrite la aplicazion. In chei câs il messaç di erôr al podarès jessi no specific. Par judâti te diagnosi di un probleme indicât, HaikuDepot al pues furnî un regjistri cun ce che la aplicazion e à fat.</p>
 <p>Un messaç di erôr al podarès sugjerî di viodi i regjistris par vê infomazions plui detaiadis opûr ti si podarès domandâ di indicâ il regjistri cuant che tu segnalis un probleme sul <a href="https://dev.haiku-os.org/">sisteme di bug tracking</a> di Haiku.</p>
@@ -166,6 +170,11 @@ Dopo vê clicât su <span class="button">Invie</span>, i dâts a vegnin trasmet�
 <pre>HaikuDepot -v debug</pre>
 <p>Il comant al dopre la opzion <span class="cli">-v</span> pal control de prolissitât dai regjistris di diagnostiche. I valôrs pussibii a son: <span class="cli">off</span>, <span class="cli">info</span>, <span class="cli">debug</span> e <span class="cli">trace</span>. Doprant <span class="cli">off</span> al regjistrarà dome une piçule part des informazions, al contrari <span class="cli">trace</span> al fasarà il lavôr cu la plui grande cuantitât di detais.</p>
 <p>Cuant che HaikuDepot al partirà e cuant che al interagjirà cu la aplicazion, tu viodarâs scori il test tal barcon dal terminâl; chest al è il regjistri di diagnostiche.</p>
+
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="tips" name="tips">Sugjeriments</a></h2>
+<p>No di dentri de aplicazion HaikuDepot, ma e je une maniere par tignî sot voli i pachets gnûfs e inzornâts. Par fâlu, tu scugnis creâ un feed RSS ATOM al sît web dal <a href="https://depot.haiku-os.org">Servidôr di Haiku Depot</a>. Fâ clic sul widget "hamburger" in alt a diestre e sielzi <span class="menu">Build Feed URL</span> sot de sezion Data.<br />
+La plui interessante des pocjis impostazions su chê pagjine e je cheste: sore a otignî un feed par ducj i pachets gnûfs/inzornâts, al è pussibil ancje zontâ dome i nons dai pachets che ti interessin. Fâs clic sul boton <span class="button">Build Feed URL</span> e tu otegnis un URL di RSS che tu puedis tacâ intun letôr di feed RSS come BePodder, QuiteRSS, fRiSS e v.i.</p>
 </div>
 </div>
 

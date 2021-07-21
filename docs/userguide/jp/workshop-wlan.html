@@ -24,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>ユーザーガイド</span></div>
 </div>
 
 <div class="nav">
@@ -36,6 +36,7 @@
 <li><a href="../de/workshop-wlan.html">Deutsch</a></li>
 <li><a href="../en/workshop-wlan.html">English</a></li>
 <li><a href="../es/workshop-wlan.html">Español</a></li>
+<li><a href="../eo/workshop-wlan.html">Esperanto</a></li>
 <li><a href="../fr/workshop-wlan.html">Français</a></li>
 <li><a href="../fur/workshop-wlan.html">Furlan</a></li>
 <li><a href="../it/workshop-wlan.html">Italiano</a></li>
@@ -73,8 +74,8 @@
 
 <h1>ワークショップ: ワイヤレスネットワーク</h1>
 
-<p>ネットワークを動作させることは、今日のインターネット常時接続に対する要求において必要不可欠なことです。小規模のプロジェクトにとって、さまざまな、絶え間なく変化するハードウェアとドライバーについていくことはとても困難なことです。Haiku は<a href="http://www.freebsd.org">FreeBSD</a> ネットワークドライバー用の互換レイヤーに頼っています。<br />
-これは、大量のハードウェアのサポートを確保します。しかし、それらの 100% がサポートされるわけではありません。サポートされているモデルを <a href="http://www.freebsd.org/releases/12.0R/hardware.html#wlan">FreeBSD 12.0's release hardware notes</a>でオンラインで参照ください。</p>
+<p>ネットワークを開始することは、今日のインターネット常時接続の要求上必要不可欠なことです。小規模のプロジェクトにとって、さまざまな絶え間なく変化するハードウェアとドライバーについていくことはとても困難なことです。Haiku は<a href="http://www.freebsd.org">FreeBSD</a> ネットワークドライバー用の互換レイヤーに頼っています。<br />
+これは、大量のハードウェアのサポートを確保します。しかし、それらの 100% がサポートされるわけではありません。サポートされているモデルのリストは <a href="https://www.freebsd.org/releases/13.0R/hardware#wlan">FreeBSD 13.0's release hardware notes</a>で参照ください。</p>
 <div class="box-info">現在のところ、PCI、PCI-X、PCI-Express、Mini PCI、および Mini PCI-Express デバイスのみサポートされているはずです。<br />PCMCIA、CardBus、ExpressCard、USB、および ISA デバイスは動作するようになるのにまだ作業が必要です。</div>
 
 <h2>
@@ -101,12 +102,12 @@ ArcorInternet123                 00:20:12:a4:29:e1        15  WPA</pre>
 <p>もちろん、ワイヤレスネットワークアダプタへのパスは修正する必要があります。<br />出力は、見つかったすべてのネットワークの公開名 (SSID)、MAC アドレス、信号強度および認証方式です。</p>
 <p>ネットワークに参加するには、次の行を使い、各自の公開名 (SSID) とパスワードを挿入します。</p>
 <pre class="terminal">ifconfig /dev/net/iprowifi3945/0 join {SSID} {password}</pre>
-<p>システム起動後、ワイヤレスネットワークアダプタの初期設定が完了していることを、<tt>ifconfig</tt> コマンドの実行前に確認してください。さもなければ、コマンドは無視されます。ハードウェアとネットワークの構成により、それはしばらくかかります。通知を見てください。</p>
+<p>システム起動後、ワイヤレスネットワークアダプタの初期設定が完了していることを、<tt>ifconfig</tt> コマンドの実行前に確認してください。さもなければ、コマンドは無視されます。ハードウェアとネットワークの構成により、それはしばらくかかるかもしれません。通知を見てください...</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="firmware" name="firmware">サポートされているハードウェアを動くようにする</a></h2>
-<p>サポートされた最新のワイヤレスハードウェアはそのままで動作します。</p>
+<p>サポートされた最新のワイヤレスハードウェアはそのままで動作するので、追加のファームウェアをダウンロード/インストールする必要はありません。</p>
 
 <p>少数のかなり古いチップセット (Intel 2100/2200/2225/2915, Broadcom 43xx, Marvell 88w8335) は、バイナリハードウェアモジュールを必要とします。しかし、ライセンス上の理由から Haiku はそれらを含められません。これらのワイヤレスカードを動作させるために、必要なすべてのプロエタリなバイナリを取得してインストールする小さなスクリプトが含まれています。</p>
 <p>ターミナルを立ち上げて、次のように入力します。</p>
@@ -114,7 +115,7 @@ ArcorInternet123                 00:20:12:a4:29:e1        15  WPA</pre>
 <p>ライセンスを見なおして承認後、利用できるファームウェアファイルをすべてインストールします。</p>
 
 <p>バイナリファームウェアファイルを <tt>install-wifi-firmwares.sh</tt> スクリプトで入手できない場合 (たとえば、Haiku でインターネット接続ができないため)、同様に<a href="http://www.haiku-os.org/files/download-data-for-wlan-firmwares.txt">このシェルスクリプト</a>をダウンロードし、<tt>wget</tt> と <tt>zip</tt> がインストールされたほかの OS から実行できます。<br />
-Windows ユーザーは、Windows 用の <a href="http://gnuwin32.sourceforge.net/packages/wget.htm">wget</a> と <a href="http://gnuwin32.sourceforge.net/packages/zip.htm">zip</a> を規定の位置にインストールしている必要があります。それから、<a href="https://www.haiku-os.org/files/download-data-for-wlan-firmwares.bat">このバッチファイルスクリプト</a>を使用してください。<br />
+Windows ユーザーは、Windows 用の <a href="http://gnuwin32.sourceforge.net/packages/wget.htm">wget</a> と <a href="http://gnuwin32.sourceforge.net/packages/zip.htm">zip</a> を規定の位置にインストールする必要があります。それから、<a href="https://www.haiku-os.org/files/download-data-for-wlan-firmwares.bat">このバッチファイルスクリプト</a>を使用してください。<br />
 このスクリプトは必要なファイルをダウンロードし、Haiku の <tt>/boot</tt> で解凍するための zip ファイルを作成するでしょう。解凍後、ターミナルを開いて以下を入力します。</p>
 <pre class="terminal">install-wifi-firmwares.sh</pre>
 <p>ライセンスを見なおして承認後、利用できるファームウェアファイルをすべてインストールします。</p>
@@ -125,7 +126,7 @@ Windows ユーザーは、Windows 用の <a href="http://gnuwin32.sourceforge.ne
 <div class="nav">
 <div class="inner"><span>
  «  <a href="workshop-email.html">ワークショップ: メールの管理</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">目次</a> 
 ::  <a href="applications.html">アプリケーション</a>  »
 </span></div>
 </div>
