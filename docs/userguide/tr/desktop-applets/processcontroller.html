@@ -24,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Kullanıcı kılavuzu</span></div>
 </div>
 
 <div class="nav">
@@ -36,6 +36,7 @@
 <li><a href="../../de/desktop-applets/processcontroller.html">Deutsch</a></li>
 <li><a href="../../en/desktop-applets/processcontroller.html">English</a></li>
 <li><a href="../../es/desktop-applets/processcontroller.html">Español</a></li>
+<li><a href="../../eo/desktop-applets/processcontroller.html">Esperanto</a></li>
 <li><a href="../../fr/desktop-applets/processcontroller.html">Français</a></li>
 <li><a href="../../fur/desktop-applets/processcontroller.html">Furlan</a></li>
 <li><a href="../../it/desktop-applets/processcontroller.html">Italiano</a></li>
@@ -55,13 +56,12 @@
 <span>
  «  <a href="powerstatus.html">Güç Durumu</a> 
 ::  <a href="../desktop-applets.html" class="uplink">Masaüstü Gereçleri</a> 
-::  <a href="workspaces.html">Workspaces</a>  »
+::  <a href="workspaces.html">Çalışma Alanları</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h2><img src="../../images/desktop-applets-images/processcontroller-icon_64.png" alt="processcontroller-icon_64.png" width="64" height="64" />İşlem Denetimcisi</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -70,37 +70,36 @@
 <tr><td>Ayarlar:</td><td></td><td><i>yok</i></td></tr>
 </table>
 
-<p><img src="../images/processcontroller-images/applet.png" alt="ProcessController applet" style="float:left;margin: 0 1em 0 0" />The primary task of the ProcessController applet is to show the activity of your CPU(s) and the amount of used memory. It allows monitoring of individual teams, change their priority, and kill them if the program freezes. In multiprocessor environments it allows you to disable individual processors/cores. When Tracker or Deskbar crash you can restart them from ProcessController's menu.</p>
-<p>Indicators on the left show each CPU's usage, while the bar on the right shows the memory consumption. Remember that the number of indicators depend on the number of processors/cores in the computer.</p>
-<p>If not yet running, launching ProcessController asks if it should open in window mode or live in the Deskbar. In window mode you can resize the bar-display by resizing the window and then use the <a href="../gui.html#replicants">Replicant</a> handle to drag it to the Desktop.<br />
-Wherever it's installed, it's operated via a right-click context menu.<br />
-To remove the applet again from the Deskbar, uncheck <span class="menu">Live in the Deskbar</span> in its context menu.</p>
-<h2>Quit an application</h2>
+<p><img src="../images/processcontroller-images/applet.png" alt="ProcessController applet" style="float:left;margin: 0 1em 0 0" />İşlem Denetimcisi uygulamasının öncelikli görevi CPU'larınızın etkinliklerini ve kullanılan bellek tutarını göstermektir. Bireysel takımların izlenmesine, önceliklerinin değiştirilmesine ve program donarsa sonlandırılabilmelerine izin verir. Çoklu işlemcili ortamlarda bireysel çekirdekler ve işlemciler isteğe bağlı olarak devre dışı bırakılabilir. İzleyici veya Masaüstü Çubuğu çakıldığında onları İşlem Denetimcisi'nin menüsünden yeniden başlatabilirsiniz.</p>
+<p>Soldaki göstergeler her bir CPU'nun kullanımını gösterirken, sağdaki gösterge ise bellek kullanımını gösterir. Gösterge sayısı bilgisayarınızdaki işlemci/çekirdek sayısına bağlı olarak değişiklik gösterir.</p>
+<p>Eğer henüz çalışmıyorsa İşlem Denetimcisi pencere kipinde veya Masaüstü Çubuğu'nda canlı çalışıp çalışmak istemediğini sorar. Pencere kipinde pencereyi yeniden boyutlandırarak istediğiniz gibi ayarlayabilir veya <a href="../gui.html#replicants">Yinelenen</a> tutacını kullanarak Masaüstü'ne taşıyabilirsiniz.<br />
+Yüklendikten sonra sağ-tık menüsü kullanılarak ayarlanabilir.<br />
+Uygulamayı Masaüstü Çubuğu'ndan kaldırmak için <span class="menu">Canlı yenileme</span> seçeneğini menüden kaldırın.</p>
+<h2>Bir uygulamadan çıkın</h2>
 <img src="../images/processcontroller-images/quit.png" alt="ProcessController - Quit an application" />
-<p>To quit an application just choose its name from the <span class="menu">Quit an application</span> menu. This is a clean way to close app, just like  clicking its close button. Be careful not to quit system processes like servers or daemons, however. Your system may stop working reliably. </p>
-<h2>Memory usage</h2>
+<p>Bir uygulamadan çıkmak için yalnızca adını seçin ve <span class="menu">Uygulamadan çık</span> seçeneğini tıklayın. Bu, bir uygulamadan çıkmanın temiz bir yoludur; aynı kapat düğmesine tıklamak gibi. Bunu yaparken sistem işlemlerinden; örneğin sunucular veya arka plan servislerinden çıkmamaya dikkat edin. Sisteminiz düzgün çalışmayı durdurabilir.</p>
+<h2>Bellek kullanımı</h2>
 <img src="../images/processcontroller-images/memory.png" alt="ProcessController - Memory usage" />
-<p>Monitoring memory usage can be rather inaccurate.</p>
-<p>This menu allows you to monitor memory usage of different teams in your system. Next to the team's name there are two columns: first with the amount reserved for writable memory, while the second shows all memory including read-only space (shared libraries for example).</p>
-<p>The first row <i>System resources &amp; caches...</i> shows the total amount of memory used by the system and all applications. The length of the blue bar is based on the total physical memory in your computer. The next rows show memory used by each process. Note that the length of the bar is based only on the actually used part of the memory.</p>
+<p>Bellek kullanımını izleme biraz hatalı olabilir.</p>
+<p>Bu menü, sisteminizdeki farklı takımların bellek kullanımlarını izlemenize olanak verir. Takımın adının yanında iki adet sütun bulunur: İlki yazılabilir bellek dahil olarak, ikincisi de saltokunur bellek dahil tüm belleği belirtir (örn. paylaşılan kitaplıklar da dahil).</p>
+<p>İlk satır <i>Sistem kaynakları ve önbellekler...</i> sistem ve tüm uygulamalar tarafından kullanılan toplam bellek tutarını gösterir. Mavi çubuğun uzunluğu sisteminizdeki toplam fiziksel belleğe göredir. Sonraki satırlar ise her bir işlem tarafından kullanılan belleği gösterir. Buradaki çubuk uzunluğu kullanılan belleğe göredir.</p>
 <table>
-		<tr><td style="width:20px;height:20px;background:#1414E7"></td><td style="width:10px"></td><td>Memory used only by given application (with write access)</td></tr>
-		<tr><td style="height:20px;background:#A4A4F5"></td><td></td><td>Memory including read-only space (can be shared with other applications)</td></tr>
+		<tr><td style="width:20px;height:20px;background:#1414E7"></td><td style="width:10px"></td><td>Uygulama tarafından kullanılan bellek (yazma erişimi ile)</td></tr>
+		<tr><td style="height:20px;background:#A4A4F5"></td><td></td><td>Saltokunur alanı içeren bellek (diğer uygulamalarla paylaşılabilir)</td></tr>
 </table>
 
-<h2>Threads and CPU usage</h2>
-<p>This menu allows you to change thread priorities, kill teams or debug them.</p>
-<div class="box-stop">Changes via the commands in this menu reach deep into the system and can cause data loss and system instability. Keep that mouse hand steady!</div>
+<h2>İş parçacıkları ve CPU kullanımı</h2>
+<p>Bu menü iş parçacığı önceliklerini değiştirmenize, takımları sonlandırmanıza veya hata ayıklamanıza izin verir.</p>
+<div class="box-stop">Bu menüden değiştireceğiniz öncelikler ve komutlar sistemin işleyişini derinden etkiler ve veri kaybına veya sistem kararsızlığına neden olabilir. Fareyi tutan o elinize hakim olun!</div>
 <img src="../images/processcontroller-images/priority.png" alt="ProcessController - Priority" />
 <table>
-	<tr><td style="width:20px;height:20px;background:#1414E7"></td><td style="width:10px"></td><td>Kernel code</td></tr>
-	<tr><td style="height:20px;background:#A4A4F5"></td><td></td><td>User code</td></tr>
-	<tr><td style="height:20px;background:#6EBE6E"></td><td></td><td>Idle thread</td></tr>
+	<tr><td style="width:20px;height:20px;background:#1414E7"></td><td style="width:10px"></td><td>Çekirdek kodu</td></tr>
+	<tr><td style="height:20px;background:#A4A4F5"></td><td></td><td>Kullanıcı kodu</td></tr>
+	<tr><td style="height:20px;background:#6EBE6E"></td><td></td><td>Boştaki iş parçacığı</td></tr>
 </table>
-<p>At the first level you see team names. By clicking on one, you can kill the whole team. The dark-blue part of the bar is time spent in kernel code, the light-blue part in user code, the green part in the idle thread(s). A bar completely filled with blue means that the team is using all processoring power.</p>
-<p>The second level shows particular threads of a team. By clicking on one, you can debug or kill it. A bar completely filled with blue means that the thread is pegging one processor/core.</p>
-<p>The last level of the menu allows you to change a thread's priority. Be careful with that! As a rule of thumb the priority of a thread should be inverse its CPU usage. That is, the more it tries to claim CPU time, the lower should be its priority. In general, don't mess with an app's priorities; contact its author, that's his business.
-</p>
+<p>İlk düzeyde takım adlarını görürsünüz. Birinin üzerine tıklayarak tüm takımı sonlandırabilirsiniz. Çubuğun koyu mavi kısmı çekirdek alanında, açık mavi kısmı ise kullanıcı alanında, yeşil alan ise boş iş parçacıklarında geçen zamanı gösterir. Tümü mavi olan bir çubuk, takımın mevcut tüm işlemci gücünü kullandığını belirtir.</p>
+<p>İkinci düzey ise bir takımın ilgili iş parçacıklarını gösterir. Birinin üzerine tıklayarak hata ayıklayabilir veya sonlandırabilirsiniz. Tümü mavi olan bir çubuk, iş parçacığının bir işlemci/çekirdeği tümüyle sömürdüğünü belirtir.</p>
+<p>Menünün son düzeyi bir iş parçacığının önceliğini değiştirmenize izin verir. Bunu yaparken dikkatli olun. Genel bir kural olarak, bir iş parçacığının önceliği kullandığı CPU gücünün tersi olmalıdır. Demeli, ne kadar çok CPU zamanı istiyorsa o kadar düşük öncelikte olmalıdır. Siz yine de bir uygulamanın öncelikleriyle uğraşmayın, bir sıkıntınız varsa uygulamanın yazarına iletin, o uğraşsın.</p>
 
 </div>
 </div>
@@ -109,7 +108,7 @@ To remove the applet again from the Deskbar, uncheck <span class="menu">Live in 
 <div class="inner"><span>
 «  <a href="powerstatus.html">Güç Durumu</a> 
 ::  <a href="../desktop-applets.html" class="uplink">Masaüstü Gereçleri</a> 
-::  <a href="workspaces.html">Workspaces</a>  »
+::  <a href="workspaces.html">Çalışma Alanları</a>  »
 </span></div>
 </div>
 

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2013, Haiku. All rights reserved.
+ * Copyright 2010-2021, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -36,6 +36,7 @@
 <li><a href="../../de/applications/webpositive.html">Deutsch</a></li>
 <li><a href="../../en/applications/webpositive.html">English</a></li>
 <li><a href="../../es/applications/webpositive.html">Español</a></li>
+<li><a href="../../eo/applications/webpositive.html">Esperanto</a></li>
 <li><a href="../../fr/applications/webpositive.html">Français</a></li>
 <li><a href="../../fur/applications/webpositive.html">Furlan</a></li>
 <li><a href="../../it/applications/webpositive.html">Italiano</a></li>
@@ -61,6 +62,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">A tradução desta página ainda não está completa. Até lá, partes incompletas mostrarão o original em inglês.</div>
 <h2><img src="../../images/apps-images/webpositive-icon_64.png" alt="webpositive-icon_64.png" width="64" height="64" />WebPositive</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Aplicativos</span></td></tr>
@@ -78,10 +80,10 @@ Na base da janela está a barra de status, mostrando o endereço do sítio que e
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Configurações</h2>
 <p>Do menu <span class="menu">Janela</span> podemos abrir uma caixa de diálogo <span class="menu">Configurações</span> para configurar alguns itens básicos do WebPositive.</p>
 <img src="../images/apps-images/webpositive-settings.png" alt="webpositive-settings.png" />
-<p>A primeira aba trata das configurações gerais: Que arquivo ou endereço é utilizado como <span class="menu">Página inicial</span>, qual é usado como <span class="menu">Página de pesquisa</span>, qual <span class="menu">Pasta de download</span> é usada para as coisas que baixar da rede.<br />
-Dois menus pop-up permitem decidir que página carregar - se for o caso - quando abrir uma nova janela ou guia.<br />
-Através das caixas de verificação seguintes podemos ocultar a barra da guia quando existe apenas uma página aberta. A interface do WebPositive pode ser configurada para ocultar-se automaticamente em mode de tela cheia e o cursor do mouse pode ser oculto automaticamente sempre que não mover-se no momento.<br />
-Finalmente, pode-se decidir incluir um botão "Página inicial" na barra de navegação e definir o número de dias a serem gravados pelo navegador no histórico.</p>
+<p>The first tab deals with general settings: What file or URL serves as a <span class="menu">Start page</span>, what's used as a <span class="menu">Search page</span> (if you set a <span class="menu">Custom</span> search engine, "<i>%s</i>" is used for the search term variable), what <span class="menu">Download folder</span> is used for stuff you get from the net.<br />
+Two pop-up menus let you decide what page to load - if any - when opening a new window or tab.<br />
+Via the following checkboxes you can avoid showing the tab bar when there's only one page open anyway. WebPositive's interface can be told to automatically hide in full screen mode, and the mouse pointer can be automatically hidden whenever it's not moved for a while.<br />
+Finally, you can decide to include the "Home" button in the navigation bar and set the number of days the browser remembers the sites you have visited in its history.</p>
 <p>Na segunda aba pode-se escolher as fontes usadas por padrão, serifada, não-serifada ou monoespaçada, e definir seus tamanhos.</p>
 <p>A última aba é usada para configurar um servidor proxy.</p>
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Navegando</h2>
@@ -93,8 +95,19 @@ Finalmente, pode-se decidir incluir um botão "Página inicial" na barra de nave
 <li><p>A partir do menu <span class="menu">Visualizar</span> pode-se <span class="menu">Aumentar o zoom</span> and <span class="menu">Diminuir o Zoom</span> de uma página. Existe também a opção de <span class="menu">Zoom apenas no texto</span>, deixando todas as imagens em seu tamanho original.</p></li>
 <li><p>Se mudar para modo de tela cheia e houver ativado a definição de ocultar a interface, ela irá desaparecer após um segundo. Para trazê-la temporariamente de volta, simplesmente mova o cursor do mouse para o topo da tela.</p></li>
 <li><img src="../images/apps-images/webpositive-locator.png" alt="webpositive-locator.png" />
-<p>Enquanto digita no campo de texto do localizador, o navegador compara a sequência digitada aos sítios já visitados e lista-os abaixo do campo de texto. Também pode continuar digitando para reduzir a lista de sítios possíveis ou escolher uma entrada com as setas <span class="key">↑</span> ou <span class="key">↓</span>. <span class="key">ENTER</span> irá carregar a página. Pode também usar o botão na extrimidade direita que também serve para recarregar a página.<br />
-Sequências não reconhecidas como endereços válidos serão pesquisados pelo Google, então o campo do localizador funciona como um atalho rápido para pesquisas na web.</p></li>
+<p>While you type in the locator text field, the browser matches the string to sites you have visited in the past and lists them below the text field. You either keep adding more letters to shorten the  list of possible sites, or choose an entry with <span class="key">↑</span> or <span class="key">↓</span>. <span class="key">ENTER</span> will load the page. You can also use the button to the far right which also serves to reload a page.<br />
+Strings not recognized as URLs will get looked up with the search engine set in WebPositive's settings, so the locator field doubles as quick shortcut to web searches.</p>
+<div class="box-info"><p>WebPositive supports quick shortcuts to direct search terms to different search engines. Just enter the one-letter-shortcut followed by your search term.</p>
+<ul>
+<li>"g” for Google</li>
+<li>“b” for Bing</li>
+<li>“w” for Wikipedia</li>
+<li>“d” for DuckDuckGo</li>
+<li>“a” for Baiku</li>
+<li>“y” for Yandex</li>
+<li>“e” for Ecosia</li>
+<li>“q” for Qwant</li>
+</ul></div></li>
 <li><p>Clicar com o botão direito do mouse abre um menu de contexto o qual, dependendo do objeto clicado, permite abrir o link em uma nova janela ou nova guia, baixar o objetco, etc.</p></li>
 <li><p><span class="menu">Editar | Procurar</span> mostra uma barra de localização na base do navegador para iniciar uma pesquisa na própria página.</p></li>
 </ul>

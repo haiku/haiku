@@ -12,12 +12,13 @@
  * Translators:
  *		Barrett
  *		Francesco Franchina
+ *		Gabriele
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>L'Installer</title>
+	<title>Il programma di installazione</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
@@ -36,6 +37,7 @@
 <li><a href="../../de/applications/installer.html">Deutsch</a></li>
 <li><a href="../../en/applications/installer.html">English</a></li>
 <li><a href="../../es/applications/installer.html">Español</a></li>
+<li><a href="../../eo/applications/installer.html">Esperanto</a></li>
 <li><a href="../../fr/applications/installer.html">Français</a></li>
 <li><a href="../../fur/applications/installer.html">Furlan</a></li>
 <li><a href="../../hu/applications/installer.html">Magyar</a></li>
@@ -55,15 +57,14 @@
 <span>
  «  <a href="icon-o-matic.html">Icon-O-Matic</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Applicazioni</a> 
-::  <a href="magnify.html">Magnify</a>  »
+::  <a href="magnify.html">Ingrandimento</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">La traduzione di questa pagina non è stata ancora completata. Finché non lo sarà, le parti non tradotte saranno visualizzate in inglese.</div>
 
-<h2><img src="../../images/apps-images/installer-icon_64.png" alt="installer-icon_64.png" width="64" height="64" />L'Installer</h2>
+<h2><img src="../../images/apps-images/installer-icon_64.png" alt="installer-icon_64.png" width="64" height="64" />Il programma di installazione</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Applicazioni</span></td></tr>
 <tr><td>Percorso:</td><td></td><td><span class="path">/boot/system/apps/Installer</span></td></tr>
@@ -73,23 +74,23 @@
 <p>L'installer è utile per copiare Haiku all'interno di un altro volume.<br />
 Appena avviato, mostra in una finestra iniziale con importanti informazioni; questa non è la solita EULA da saltare in un batter d'occhio, essa afferma che:</p>
 <ul>
-<li><p>This is beta-quality software. Make backups or suffer the consequences!</p></li>
-<li><p>The Installer needs a prepared partition. You can use <a href="drivesetup.html">DriveSetup</a> to create and format a partition, but cannot yet resize existing partitions. For that you'll have to use a <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> or a similar tool for now.</p></li>
-<li>Haiku can be added manually to the bootmanager <a href="http://www.gnu.org/software/grub/manual/grub.html">GRUB</a>. How that is done exactly is available as an <a href="http://www.haiku-os.org/get-haiku/installation-guide">online guide</a>.</li>
+<li><p>Questo è un software in fase beta. Si raccomanda di effettuare un backup prima che sia troppo tardi.</p></li>
+<li><p>L'installazione necessita di una partizione già pronta. Per questo compito puoi usare <a href="drivesetup.html">DriveSetup</a> per creare e formattare una partizione, ma non puoi alterare le dimensioni delle partizioni già esistenti. Per far ciò, per il momento devi usare <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> o un'applicazione simile </p></li>
+<li>Haiku può essere aggiunto manualmente al gestore di avvio <a href="http://www.gnu.org/software/grub/manual/grub.html">GRUB</a>. La procedura dettagliata è disponibile sulla <a href="http://www.haiku-os.org/get-haiku/installation-guide">guida in linea</a>.</li>
 </ul>
 <p><br /><br /></p>
-<p>Una volta che si è accettato con <span class="button">Continue</span>, viene aperta la finestra principale:</p>
+<p>Una volta che si è accettato con <span class="button">Continua</span>, viene aperta la finestra principale:</p>
 <img src="../images/apps-images/installer.png" alt="installer.png" />
 <p>Nel primo menù a cascata è possibile selezionare la sorgente d'installazione. Questa può essere una versione di Haiku già installata, un CD d'installazione o una pennetta USB, ecc.<br />
 Nel secondo menù a cascata è specificata la destinazione dell'installazione. Questa verrà completamente sovrascritta dopo essere stata preparata in un primo momento grazie a un'applicazione come GParted.</p>
 <p>Cliccando sul widget <i>Mostra pacchetti opzionali</i> verranno mostrati, se presenti, i pacchetti addizionali tra i quali è possibile selezionare quelli da installare in aggiunta a quelli base di Haiku.</p>
-<p>Prima di cominciare il processo d'installazione, è consigliabile controllare per l'ultima volta se si è scelta una destinazione corretta. Cliccare su <span class="button">Imposta partizioni...</span> per aprire <a href="drivesetup.html">DriveSetup</a> e dare un'occhiata ai nomi e alla configurazione dei volumi e delle partizioni disponibili.</p>
-<p><span class="button">Begin</span> starts the installation procedure, which basically copies the <span class="path">/home/</span> and <span class="path">/system/</span> folder onto the target volume and makes it bootable.</p>
+<p>Prima di cominciare il processo d'installazione, è consigliabile controllare per l'ultima volta se si è scelta una destinazione corretta. Cliccare su <span class="button">Imposta partizioni...</span> per aprire <a href="drivesetup.html">Utility Disco</a> e dare un'occhiata ai nomi e alla configurazione dei volumi e delle partizioni disponibili.</p>
+<p><span class="button">Inizia</span> darà inizio alla procedura d'installazione, che fondamentalmente si occupa di copiare all'interno del volume di destinazione le cartelle <span class="path">/home/</span> e <span class="path">/system/</span>, fatto questo lo rende avviabile.</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="tools" name="tools">Strumenti</a></h2>
 <p>Dopo la procedura d'installazione, la partizione viene automaticamente resa avviabile. Tuttavia, può capitare che qualche altro sistema operativo o qualche applicazione di partizionamento sovrascriva (accidentalmente) il boot sector del volume di Haiku. In questo caso, avviare il CD di installazione e far partire l'Installer. Selezionare la propria partizione di boot di Haiku dal menù <span class="menu">Su: Scegli destinazione</span> e selezionare <span class="menu">Scrivi settore d'avvio</span> dal menù <span class="menu">Strumenti</span> per renderla nuovamente avviabile.</p>
-<p>L'altro elemento che si trova nel menù <span class="menu">Strumenti</span> è <span class="menu">Boot Manager</span> che crea un menù nel boot sector dal quale scegliere quale sistema operativo avviare.<br />
+<p>L'altro elemento che si trova nel menù <span class="menu">Strumenti</span> è <span class="menu">Boot Manager</span> che crea un menù nel settore di avvio dal quale scegliere quale sistema operativo avviare. Consulta la guida al capitolo <a href="bootmanager.html">BootManager</a> per ulteriori informazioni.<br />
 Non c'è bisogno di eseguire <span class="app">Boot Manager</span> se Haiku è l'unico sistema installato sulla macchina oppure si sta già utilizzando un bootmanager come Grub, in questo caso bisognerebbe aggiungere manualmente Haiku (si veda sopra).</p>
 
 
@@ -100,7 +101,7 @@ Non c'è bisogno di eseguire <span class="app">Boot Manager</span> se Haiku è l
 <div class="inner"><span>
  «  <a href="icon-o-matic.html">Icon-O-Matic</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Applicazioni</a> 
-::  <a href="magnify.html">Magnify</a>  »
+::  <a href="magnify.html">Ingrandimento</a>  »
 </span></div>
 </div>
 

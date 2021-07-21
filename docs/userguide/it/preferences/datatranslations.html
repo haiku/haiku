@@ -35,6 +35,7 @@
 <li><a href="../../de/preferences/datatranslations.html">Deutsch</a></li>
 <li><a href="../../en/preferences/datatranslations.html">English</a></li>
 <li><a href="../../es/preferences/datatranslations.html">Español</a></li>
+<li><a href="../../eo/preferences/datatranslations.html">Esperanto</a></li>
 <li><a href="../../fr/preferences/datatranslations.html">Français</a></li>
 <li><a href="../../fur/preferences/datatranslations.html">Furlan</a></li>
 <li><a href="../../hu/preferences/datatranslations.html">Magyar</a></li>
@@ -60,7 +61,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">La traduzione di questa pagina non è stata ancora completata. Finché non lo sarà, le parti non tradotte saranno visualizzate in inglese.</div>
 
 <h2><img src="../../images/prefs-images/datatranslations-icon_64.png" alt="datatranslations-icon_64.png" width="64" height="64" />Traduzione Dati</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
@@ -72,7 +72,7 @@
 <p>Ogni applicazione può aprire e salvare ogni file il cui corrispettivo traduttore sia stato installato. Le impostazioni di questi traduttori sono modificabili nel pannello Traduzione Dati.</p>
 <p><br /></p>
 <img src="../images/prefs-images/datatranslations.png" alt="datatranslations.png" />
-<p>In base alle sue caratteristiche, ogni traduttore ha il suo insieme di impostazioni. Il pulsante <span class="button">Informazioni</span> è certamente disponibile ed apre una finestra con i curatori del traduttore e il percorso di installazione.<br />
+<p>In base alle sue caratteristiche, ogni traduttore ha il suo insieme di impostazioni. Il pulsante <span class="button">Informazioni</span> apre una finestra con i curatori del traduttore e il percorso di installazione.<br />
 La tabella seguente fornisce una panoramica dei traduttori predefiniti e le loro opzioni di funzionamento più utili.</p>
 <table summary="translators" border="0" cellpadding="2" cellspacing="0">
 <tr><td><span class="menu">Icone Apple</span></td><td>Le dimensioni accettate sono 16, 32, 48, 128, 256, 512 o 1024 pixel (RGB32 e RGBA32)</td></tr>
@@ -84,25 +84,25 @@ Puoi salvare immagini con trasparenza, sia automatica utilizzando un canale alfa
 <tr><td><span class="menu">Icone HVIF</span></td><td>Traduttore per il formato di icone vettoriali native di Haiku</td></tr>
 <tr><td><span class="menu">Immagini JPEG2000</span></td><td>24bit, compresse, prive di trasparenza<br />
 In questo caso, probabilmente vorrai modificare solo la qualità dei file al salvataggio.</td></tr>
-<tr><td><span class="menu">Immagini JPEG</span></td><td>24bit, compressed, no transparency<br />
-Besides the output quality you can also set a smoothing that will lessen compression artefacts but can blur the picture a little.</td></tr>
-<tr><td><span class="menu">Immagini PCX</span></td><td>24bit, uncompressed, no transparency, PC Paintbrush Exchange format</td></tr>
-<tr><td><span class="menu">Immagini Photoshop</span></td><td>32bit, lossless compression, transparency<br />
-The translator reduces all layers to one bitmap layer.</td></tr>
-<tr><td><span class="menu">Immagini PNG</span></td><td>32bit, lossless compression, transparency</td></tr>
-<tr><td><span class="menu">Immagini PPM</span></td><td>24bit, uncompressed, no transparency, Portable PixMap format</td></tr>
-<tr><td><span class="menu">Immagini RAW</span></td><td>up to 48bit, uncompressed, no transparency</td></tr>
+<tr><td><span class="menu">Immagini JPEG</span></td><td>24bit, compresse, con trasparenza<br />
+Oltre alla qualità desiderata, puoi anche impostare un livello di sfumatura utile per mascherare gli artefatti di compressione, ma che può introdurre un piccolo effetto di sfocatura all'immagine.</td></tr>
+<tr><td><span class="menu">Immagini PCX</span></td><td>24bit, non compresse, prive di trasparenza, formato PC Paintbrush Exchange</td></tr>
+<tr><td><span class="menu">Immagini Photoshop</span></td><td>32bit, con compressione priva di perdita (losslee), con trasparenza<br />
+Questo traduttore riduce tutti i livelli dell'immagine ad un unico livello di tipo bitmap.</td></tr>
+<tr><td><span class="menu">Immagini PNG</span></td><td>32bit, con compressione priva di perdita (lossless), con trasparenza</td></tr>
+<tr><td><span class="menu">Immagini PPM</span></td><td>24bit, non compresse, prive di trasparenza, formato portabile PixMap</td></tr>
+<tr><td><span class="menu">Immagini RAW</span></td><td>Fino a 48bit, non compresse, prive di trasparenza</td></tr>
 <tr><td><span class="menu">File di testo RTF</span></td><td>Testo con formattazione</td></tr>
-<tr><td><span class="menu">Immagini SGI</span></td><td>24bit, optional lossless compression, transparency</td></tr>
+<tr><td><span class="menu">Immagini SGI</span></td><td>24bit,con compressione priva di perdita (lossless) opzionale, con trasparenza</td></tr>
 <tr><td><span class="menu">File di testo StyledEdit</span></td><td>Testo semplice con elementi di formattazione salvati tramite attributi</td></tr>
-<tr><td><span class="menu">Immagini TGA</span></td><td>32bit, optional lossless compression, transparency</td></tr>
-<tr><td><span class="menu">Immagini TIFF</span></td><td>24bit, optional lossless compression, layers, transparency</td></tr>
-<tr><td><span class="menu">Immagini WebP</span></td><td>8-bit YUV 4:2:0 image format, compressed, no transparency</td></tr>
+<tr><td><span class="menu">Immagini TGA</span></td><td>32bit, con compressione priva di perdita (lossless) opzionale, con trasparenza</td></tr>
+<tr><td><span class="menu">Immagini TIFF</span></td><td>24bit, con compressione priva di perdita (lossless) opzionale, con livelli, con trasparenza</td></tr>
+<tr><td><span class="menu">Immagini WebP</span></td><td>8-bit YUV 4:2:0, compresse, prive di trasparenza</td></tr>
 <tr><td><span class="menu">Icone Windows</span></td><td>Le dimensioni accettate sono 16, 32 o 48 pixel </td></tr>
 <tr><td class="onelinetop"><span class="menu">Immagini WonderBrush</span></td><td>32bit, livelli, trasprenza, dati vettoriali/pixel</td></tr>
 </table>
 <p><br /></p>
-<div class="box-info">Screenshots, charts, black&amp;white drawings and other images with few used colors, as well as small pictures are best saved as GIF (up to 256 colors) or PNG (millions of colors). JPEG, for example, introduces compression artefacts without gain in smaller filesize.</div>
+<div class="box-info">Istantanee dello schemo, grafici, disegni in bianco e nero e altre immagini con pochi colori dovrebbero essere salvati in GIF (fino a 256 colori) o PNG (milioni di colori). Il formato JPEG, infatti, introduce i suoi tipici artefatti di compressione, ma non apporta alcun beneficio in termini di dimensioni in file così piccoli.</div>
 
 </div>
 </div>

@@ -23,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Kullanıcı kılavuzu</span></div>
 </div>
 
 <div class="nav">
@@ -35,6 +35,7 @@
 <li><a href="../de/bootloader.html">Deutsch</a></li>
 <li><a href="../en/bootloader.html">English</a></li>
 <li><a href="../es/bootloader.html">Español</a></li>
+<li><a href="../eo/bootloader.html">Esperanto</a></li>
 <li><a href="../fr/bootloader.html">Français</a></li>
 <li><a href="../fur/bootloader.html">Furlan</a></li>
 <li><a href="../it/bootloader.html">Italiano</a></li>
@@ -54,110 +55,110 @@
 <span>
     <!-- «  <a href="installation.html">Installing Haiku</a> 
 ::  -->
-    <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="filesystem-layout.html">Filesystem layout</a>  »
+    <a href="contents.html" class="uplink">İçerik</a> 
+::  <a href="filesystem-layout.html">Dosya sistemi yerleşimi</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h1>Açılış Yöneticisi</h1>
 
-<p>Haiku's Boot Loader Options can help when you experience hardware related problems or want to choose which Haiku installation to start, if you have more than one (maybe on an installation CD or USB stick). It's also handy if you have installed a software component that acts up and prevents you from booting Haiku, see <a href="#troubleshooting">Troubleshooting</a> below.</p>
-<p>To enter the Boot Loader Options, you have to press and keep holding the <span class="key">SHIFT</span> key before the beginning of Haiku's boot process. If there's a boot manager installed, you can start holding <span class="key">SHIFT</span> before invoking the boot entry for Haiku. If Haiku is the only operating system on the machine, you can begin holding the key while still seeing boot messages from the BIOS.</p>
-<div class="box-info">On computers that use UEFI for booting instead of the classic BIOS, you need to use the <span class="key">SPACEBAR</span> instead.</div>
+<p>Haiku'nun Açılış Yöneticisi Seçenekleri, donanım kaynaklı sorunlar yaşadığınızda veya birden fazla Haiku yüklemeniz varsa (örn. CD veya USB bellek) hangisini başlatmak istediğinizi seçmede yardımcı olur. Aynı zamanda yüklediğiniz bir yazılım bileşeninin ötesi berisi ayrı oynayıp sistemi başlatmanızı engelliyorsa da işe yarar; bkz. <a href="#troubleshooting">Sorun tespiti</a>.</p>
+<p>Önyükleyici seçeneklerine girmek için Haiku önyükleme süreci başlamadan önce <span class="key">SHIFT</span> düğmesini basılı tutun. Eğer bir önyükleme yöbeticisi yüklüyse  <span class="key">SHIFT</span> düğmesini Haiku girdisini seçmeden önce basılı tutmaya başlayabilirsiniz. Haiku, makinedeki tek yüklü işletim sistemiyse BIOS iletilerini görmeye başladığınız anda basılı tutmanız yine aynı etkiyi gösterecektir.</p>
+<div class="box-info">Bazı donanımlarda, USB klavyelerin BIOS'ta etkinleştirildiğinden emin olmanız gerekebilir.<br />
+Önyükleme için BIOS yerine UEFI kullanan bilgisayarlarda <span class="key">BOŞLUK</span> düğmesinin kullanmanız gerekir.</div>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="options" name="options">Boot Loader Options</a></h2>
-<p>Once it's there, you're offered four menus:</p>
+<a id="options" name="options">Açılış Yöneticisi Seçenekleri</a></h2>
+<p>Başlangıçta dört seçenek sunulur:</p>
 <table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
-<tr><td><b>Select boot volume</b></td><td> </td><td>Choose which Haiku installation/state to start (see <a href="#troubleshooting">Troubleshooting</a> below).</td></tr>
-<tr><td><b>Select safe mode options</b></td><td> </td><td>There are several options to try in case of hardware related trouble or if the system becomes unstable or unbootable because of a misbehaving add-on. When moving the selection bar to an option, a short explanation appears at the bottom of the screen.</td></tr>
+<tr><td><b>Select boot volume</b></td><td> </td><td>Hangi Haiku yüklemesinin veya durumunun başlatılacağını seçin (aşağıda <a href="#troubleshooting">Sorun tespiti</a> bölümüne bakın).</td></tr>
+<tr><td><b>Select safe mode options</b></td><td> </td><td>Donanım kaynaklı sorunlarda veya sistem hatalı davranan bir eklenti yüzünden kararsız veya önyüklenemez duruma gelirse deneyebileceğiniz birkaç seçenek barındırır. Seçenekler üzerinde hareket ettiğinizde kısa bir açıklama ekranın altında belirir.</td></tr>
 <tr><td></td><td></td><td>
 	<p><span class="menu">Safe mode</span><br />
-		Puts the system into safe mode. This can be enabled independently from the other options.</p>
+		Sistemi güvenli kipe sokar. Bu seçenek diğer seçeneklerden bağımsız olarak etkinleştirilebilir.</p>
 	<p><span class="menu">Disable user add-ons</span><br />
-		Prevents all user installed add-ons from being loaded. Only the add-ons in the system directory will be used. See <a href="#troubleshooting">Troubleshooting</a> below.</p>
+		Kullanıcı tarafından kurulan tüm eklentilerin yüklenmesini engeller. Yalnızca sistem dizinindeki eklentiler kullanılacaktır. Aşağıda <a href="#troubleshooting">Sorun tespiti</a> bölümüne bakın.</p>
 	<p><span class="menu">Disable IDE DMA</span><br />
-		Disables IDE DMA, increasing IDE compatibility at the expense of performance.</p>
+		IDE DMA devre dışı bırakır, başarımın azalması karşılığında IDE uyumluluğunu artırır.</p>
 	<p><span class="menu">Ignore memory beyond 4 GiB</span><br />
-		Ignores all memory beyond the 4 GiB address limit, overriding the setting in the kernel settings file.
+		Çekirdek ayarları dosyasındaki ayarı yok sayarak 4 GiB adres limiti ötesindeki tüm belleği yok sayar.
 </p>
 	<p><span class="menu">Use fail-safe graphics driver</span><br />
-		The system will use VESA mode and won't try to use any video graphics drivers.</p>
+		Sistem VESA grafik kipini kullanır ve herhangi bir video grafik sürücüsü yüklemez.</p>
 	<p><span class="menu">Disable IO-APIC</span><br />
-		Disables using the IO APIC for interrupt routing, forcing the use of the legacy PIC instead.</p>
+		Yarıda kesme yönlendirmesi için IO APIC kullanımını devre dışı bırakır, bunun yerine eski PIC kullanılır.</p>
 	<p><span class="menu">Disable local APIC</span><br />
-		Disables using the local APIC, also disables SMP.</p>
+		Yerel APIC ve SMP'yi devre dışı bırakır.</p>
 	<p><span class="menu">Disable X2APIC</span><br />
-		Disables second generation APIC.</p>
+		İkinci kuşak APIC'i devre dışı bırakır.</p>
 	<p><span class="menu">Disable SMEP and SMAP</span><br />
-		Disables SMEP/SMAP security features of the CPU.</p>
+		İşlemcinin SMEP/SMAP güvenlik özelliklerini devre dışı bırakır.</p>
 	<p><span class="menu">Disable SMP</span><br />
-		Disables all but one CPU core.</p>
+		Tek bir işlemci çekirdeği dışındaki tüm işlemci çekirdeklerini devre dışı bırakır.</p>
 	<p><span class="menu">Don't call the BIOS</span><br />
-		Stops the system from calling BIOS functions.</p>
+		Sistemin BIOS işlevlerini çağırmasını engeller.</p>
 	<p><span class="menu">Disable APM</span><br />
-		Disables Advanced Power Management hardware support, overriding the APM setting in the kernel settings file.</p>
+		Çekirdek ayarları dosyasındaki ayarı yok sayarak Gelişmiş Güç Yönetimi donanım desteğini devre dışı bırakır.</p>
 	<p><span class="menu">Disable ACPI</span><br />
-		Disables Advanced Configuration and Power Interface hardware support, overriding the ACPI setting in the kernel settings file.</p>
-	<p><span class="menu">Blacklist entries</span><br />
-		Allows to select system files that shall be ignored. Useful e.g. to disable drivers temporarily. See <a href="#troubleshooting">Troubleshooting</a> below.</p></td></tr>
-<tr><td><b>Select debug options</b></td><td> </td><td>Here you'll find several options that help with debugging or getting details for a <a href="../../welcome/en/bugreports.html">bug report</a>. Again, a short explanation for each option is displayed at the bottom.</td></tr>
+		Çekirdek ayarları dosyasındaki ayarı yok sayarak Gelişmiş Yapılandırma ve Güç Arayüzü donanım desteğini devre dışı bırakır.</p>
+	<p><span class="menu">Disable system components</span><br />
+		Yok sayılacak sistem dosyalarının seçilmesine izin verir. Devre dışı bırakmak istediğiniz bir sürücü olması durumunda yararlıdır. Aşağıda <a href="#troubleshooting">Sorun tespiti</a> bölümüne bakın.</p></td></tr>
+<tr><td><b>Select debug options</b></td><td> </td><td>Burada hata ayıklama veya bir <a href="../../welcome/tr/bugreports.html">hata raporu</a> için ayrıntı toplamanıza yardımcı olacak birkaç seçenek bulacaksınız. Her seçenek için kısa bir açıklama aşağıda belirtilir.</td></tr>
 <tr><td></td><td></td><td>
 	<p><span class="menu">Enable serial debug output</span><br />
-		Turns on forwarding the syslog output to the serial interface (default: 115200, 8N1).</p>
+		Sistem günlük çıktısını seri arayüze yönlendirir (öntanımlı: 115200, 8N1).</p>
 	<p><span class="menu">Enable on screen debug output</span><br />
-		Display debug output on screen while the system is booting, instead of the normal boot logo.</p>
+		Normal önyükleme logosu yerine sistem önyükleme hata ayıklama çıktısını ekranda görüntüler.</p>
 	<p><span class="menu">Disable on screen paging</span><br />
-		Disables paging when on screen debug output is enabled.</p>
+		Ekran hata ayıklama çıktısı etkinken sayfalandırmayı devre dışı bırakır.</p>
 	<p><span class="menu">Enable debug syslog</span><br />
-		Enables a special in-memory syslog buffer for this session that the boot loader will be able to access after rebooting.</p>
+		Yeniden başlatma sonrası önyükleyicinin erişebileceği özel bir bellek içi sistem günlük arabelleğini etkinleştirir.</p>
 	<p><span class="menu">Display current boot loader log</span><br />
-		Displays the debug info the boot loader has logged (press <span class="key">Q</span> to exit the log)</p>
+		Önyükleyicinin günlüklediği hata ayıklama verisini görüntüler (günlükten çıkmak için <span class="key">Q</span>'ye basın).</p>
 	<p><span class="menu">Add advanced debug option</span><br />
-		Allows advanced debugging options to be entered directly.</p></td></tr>
-<tr><td></td><td></td><td>If <span class="menu">Enable debug syslog</span> is activated, a warm reboot after a crash shows these additional options:</td></tr>
+		Gelişmiş hata ayıklama seçeneklerinin doğrudan girilmesine izin verir.</p></td></tr>
+<tr><td></td><td></td><td>Eğer <span class="menu">Enable debug syslog</span> etkinleştirilmişse bir çakılma sonrası sıcak yeniden başlatma sırasında aşağıdaki ek seçenekleri görüntüler:</td></tr>
 <tr><td></td><td></td><td>	<p><span class="menu">Save syslog from previous session during boot</span><br />
-		Saves the syslog from the previous Haiku session to <span class="path">/var/log/previous_syslog</span> when booting.</p>
+		Bir önceki Haiku oturumundan olan sistem günlüğünü <span class="path">/var/log/previous_syslog</span> konumuna önyükleme sırasında kaydeder.</p>
 	<p><span class="menu">Display syslog from previous session</span><br />
-		Displays the syslog from the previous Haiku session.</p>
+		Bir önceki Haiku oturumundan olan sistem günlüğünü görüntüler.</p>
 	<p><span class="menu">Save syslog from previous session</span><br />
-		Saves the syslog from the previous Haiku session to disk. Currently only FAT32 volumes are supported.</p></td></tr>
-<tr><td class="onelinetop"><b>Select screen resolution</b></td><td> </td><td>Lets you force a certain screen resolution and color depth.</td></tr>
+		Bir önceki Haiku oturumundan olan sistem günlüğünü diske kaydeder. Şimdilik yalnızca FAT32 birimleri desteklenir.</p></td></tr>
+<tr><td class="onelinetop"><b>Select screen resolution</b></td><td> </td><td>Belirli bir ekran çözünürlüğü ve renk derinliği zorlamanıza izin verir.</td></tr>
 </table>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="troubleshooting" name="troubleshooting">Troubleshooting</a></h2>
-<p>If Haiku refuses to boot on your hardware from the get-go, try out setting different options under <span class="menu">Select safe mode options</span>. Consider filing a <a href="../../welcome/en/bugreports.html">bug report</a> in any case.</p>
-<p>On the other hand, if Haiku only suddenly acts up after you have installed some software, especially hardware drivers, you have several options to get Haiku bootable again so you can uninstall the offending package:</p>
+<a id="troubleshooting" name="troubleshooting">Sorun tespiti</a></h2>
+<p>Eğer Haiku donanımınızda doğrudan başlamıyorsa <span class="menu">Select safe mode options</span> altından değişik seçenekleri deneyin. Her halükarda bir <a href="../../welcome/tr/bugreports.html">hata raporu</a> oluşturmanız yararlı olacaktır.</p>
+<p>Bunun yanında, Haiku birden garip davranmaya başlamışsa; örneğin yeni bir yazılım yüklemişseniz (özellikle donanım sürücüsü) Haiku'yu yeniden önyüklenebilir duruma getirebileceğiniz birkaç seçenek bulunmaktadır. Böylece soruna neden olan paketi kaldırabilirsiniz:</p>
 <ul>
-<li><p>Activating <span class="menu">Safe mode</span> will prevent most servers, daemons and the UserBootscript from being started.</p></li>
-<li><p>Activating <span class="menu">Disable user add-ons</span> will prevent using any add-ons (drivers, translators, etc.) you have installed in the user hierarchy under your Home folder.</p></li>
-<li><p>If activating <span class="menu">Use fail-safe graphics driver</span> solves your troubles by falling back to VESA graphics, you can make the setting permanent by removing the <tt>#</tt> of the line <i>#fail_safe_video_mode true</i> in the text file <span class="path">/boot/home/config/settings/kernel/drivers/kernel</span>.</p></li>
-<li><p>If the offending driver, add-on etc. is installed in the system hierarchy, things get a bit more complicated, because that area is read-only. Here, the <span class="menu">Blacklist entries</span> comes into play. With it, you can navigate through the whole system hierarchy and disable the component that's messing things up for you by checking an entry with the <span class="key">SPACE</span> or <span class="key">RETURN</span> key. <span class="key">ESC</span> returns you up one level to the parent directory.</p>
-<p>Online, there's the article <a href="http://www.haiku-os.org/blog/barrett/2013-12-15_how_permanently_blacklist_package_file">How to Permanently Blacklist a Package File</a> showing how to make that setting stick.</p></li>
-<li><p>Under <span class="menu">Select boot volume</span> you can specify what former "version" of Haiku to boot. Every time you un/install a package, the old state is saved and you can boot into it by choosing it from the list presented in the boot loader options.<br />
-So, if you encounter boot problems after installing some package, boot a Haiku state from before that time and uninstall the offending package.</p></li>
+<li><p><span class="menu">Safe mode</span> 'u etkinleştirmek çoğu sunucuyu, yöneticiyi ve UserBootscript'i engeller.</p></li>
+<li><p><span class="menu">Disable user add-ons</span> Ev dizini altına kurduğunuz herhangi bir eklentiyi (sürücüler, çeviriciler) devre dışı bırakır.</p></li>
+<li><p><span class="menu">Use fail-safe graphics driver</span> seçeneği sorununuzu VESA grafik kipine dönerek çözdüyse bu seçeneği <span class="path">/boot/home/config/settings/kernel/drivers/kernel</span> dosyasında <i>#fail_safe_video_mode true</i> satırının başında bulunan <tt>#</tt> karakterini kaldırarak sürekli duruma getirebilirsiniz.</p></li>
+<li><p>Soruna neden olan sürücü, eklenti vb. sistem hiyerarşisi içindeyse durum biraz daha çetrefilli olabilir; çünkü bu bölüm salt okunur olarak işlem görür. Bu noktada <span class="menu">Disable system components</span> seçeneği işe yarar. Bu seçenekle birlikte tüm sistem hiyerarşisi içinde dolanabilir ve soruna neden olan bileşeni <span class="key">SPACE</span> veya <span class="key">RETURN</span> düğmesine basarak devre dışı bırakabilirsiniz. <span class="key">ESC</span> düğmesi sizi bir düzey yukarıya götürür.</p>
+<p>Yaptığınız ayarı sürekli kılmak için <a href="http://www.haiku-os.org/blog/barrett/2013-12-15_how_permanently_blacklist_package_file">How to Permanently Blacklist a Package File</a> makalesi size ayrıntılı bilgi verecektir.</p></li>
+<li><p><span class="menu">Select boot volume</span> seçeneği altında hangi önceki Haiku "sürümünü" önyükleyeceğinizi seçebilirsiniz. Bir paketi her yüklediğinizde veya kaldırdığınızda eski durum kaydedilir ve önyükleyici içinde seçebileceğiniz girdilerden başlatacağınız durumu seçebilirsiniz.<br />
+Yüklediğiniz bir paket Haiku'yu başlatmanıza engel oluyorsa yalnızca eski durumu başlatın ve sorun çıkaran paketi kaldırın.</p></li>
 </ul>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="booting" name="booting">Booting Haiku</a></h2>
-<p>After activating one or more options, you return to the main menu and continue booting, which presents you with this boot screen:</p>
+<a id="booting" name="booting">Haiku'yu önyükleme</a></h2>
+<p>Bir veya birden fazla seçeneği etkinleştirdiğinizde ana menüye dönersiniz ve önyükleme sürdürülür. Aşağıdaki önyükleme ekranı görünür.</p>
 <img src="../images/bootloader-images/boot-screen.png" alt="boot-screen.png" />
 
-<p>If everything works OK, one symbol after another quickly lights up.<br />
-The different symbols roughly correspond to these boot stages:</p>
+<p>Her şey yolunda giderse simgelerin her biri birbiri ardına yanmaya başlar.<br />
+Simgelerin her biri kabaca aşağıdaki önyükleme durumlarına denk gelirler:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
-	<tr><td><b>Atom</b></td><td style="width:10px;"> </td><td>Initializing modules.</td></tr>
-	<tr><td><b>Disk + magnifier</b></td><td> </td><td>Creating rootfs (<span class="path">/</span>) and mounting devfs (<span class="path">/dev</span>).</td></tr>
-	<tr><td><b>Plug-in card</b></td><td> </td><td>Initializing device manager.</td></tr>
-	<tr><td><b>Boot disk</b></td><td> </td><td>Mounting boot disk.</td></tr>
-	<tr><td><b>Chip</b></td><td> </td><td>Loading CPU specific modules.</td></tr>
-	<tr><td><b>Folder</b></td><td> </td><td>Final initialization of subsystems.</td></tr>
-	<tr><td><b>Rocket</b></td><td> </td><td>Launch_daemon has started the system.</td></tr>
+	<tr><td><b>Atom</b></td><td style="width:10px;"> </td><td>Modüller başlatılır.</td></tr>
+	<tr><td><b>Disk + büyüteç</b></td><td> </td><td>rootfs (<span class="path">/</span>) oluşturulur ve devfs (<span class="path">/dev</span>) bağlanır.</td></tr>
+	<tr><td><b>Genişletme kartı</b></td><td> </td><td>Aygıt yöneticisi başlatılır.</td></tr>
+	<tr><td><b>Önyükleme diski</b></td><td> </td><td>Önyükleme diski bağlanır.</td></tr>
+	<tr><td><b>Yonga</b></td><td> </td><td>CPU'ya özel modüller yüklenir.</td></tr>
+	<tr><td><b>Klasör</b></td><td> </td><td>Altsistemlerin son ilklendirmeleri tamamlanır.</td></tr>
+	<tr><td><b>Roket</b></td><td> </td><td>launch_daemon, sistemi başlatır.</td></tr>
 </table>
 
 </div>
@@ -167,8 +168,8 @@ The different symbols roughly correspond to these boot stages:</p>
 <div class="inner"><span>
     <!-- «  <a href="installation.html">Installing Haiku</a> 
 ::  -->
-    <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="filesystem-layout.html">Filesystem layout</a>  »
+    <a href="contents.html" class="uplink">İçerik</a> 
+::  <a href="filesystem-layout.html">Dosya sistemi yerleşimi</a>  »
 </span></div>
 </div>
 

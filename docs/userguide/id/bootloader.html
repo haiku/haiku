@@ -10,6 +10,7 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
+ *		Máximo Castañeda
  *		mazbrili abu ibrahim
  *
 -->
@@ -23,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Panduan pengguna</span></div>
 </div>
 
 <div class="nav">
@@ -34,6 +35,7 @@
 <li><a href="../de/bootloader.html">Deutsch</a></li>
 <li><a href="../en/bootloader.html">English</a></li>
 <li><a href="../es/bootloader.html">Español</a></li>
+<li><a href="../eo/bootloader.html">Esperanto</a></li>
 <li><a href="../fr/bootloader.html">Français</a></li>
 <li><a href="../fur/bootloader.html">Furlan</a></li>
 <li><a href="../it/bootloader.html">Italiano</a></li>
@@ -54,19 +56,21 @@
 <span>
     <!-- «  <a href="installation.html">Installing Haiku</a> 
 ::  -->
-    <a href="contents.html" class="uplink">Contents</a> 
+    <a href="contents.html" class="uplink">Daftar Isi</a> 
 ::  <a href="filesystem-layout.html">Layout Filesystem</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
+<div class="box-info">Terjemahan halaman ini belum lengkap. Sampai saat itu, bagian yang belum selesai menggunakan aslinya bahasa Inggris.</div>
 
 <h1>Boot Loader</h1>
 
 <p>Opsi Boot Loader Haiku dapat membantu ketika Anda mengalami masalah terkait perangkat keras atau ingin memilih instalasi Haiku mana yang akan dimulai, jika Anda memiliki lebih dari satu (mungkin pada CD instalasi atau stik USB). Ini juga berguna jika Anda telah menginstal komponen perangkat lunak yang bertindak dan mencegah Anda mem-boot Haiku, lihat <a href="#troubleshooting">Pemecahan Masalah</a> di bawah ini.</p>
 <p>Untuk masuk ke Opsi Boot Loader, Anda harus menekan dan terus menahan tombol <span class="key">SHIFT</span> sebelum awal proses boot Haiku. Jika ada boot manager diinstal, Anda dapat mulai memegang <span class="key">SHIFT</span> sebelum memanggil entri boot untuk Haiku. Jika Haiku adalah satu-satunya sistem operasi pada mesin, Anda dapat mulai memegang kunci sambil masih melihat pesan boot dari BIOS.</p>
-<div class="box-info">Pada komputer yang menggunakan UEFI untuk melakukan booting alih-alih BIOS klasik, Anda harus menggunakan <span class="key">SPACEBAR</span> sebagai gantinya.</div>
+<div class="box-info">With some hardware, you'll have to make sure USB keyboards are enabled in the BIOS.<br />
+On computers that use UEFI for booting instead of the classic BIOS, you need to use the <span class="key">SPACEBAR</span> instead of <span class="key">SHIFT</span>.</div>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="options" name="options">Opsi Boot Loader </a></h2>
@@ -76,35 +80,35 @@
 <tr><td><b>Select safe mode options</b></td><td> </td><td>Ada beberapa opsi untuk dicoba jika terjadi masalah terkait perangkat keras atau jika sistem menjadi tidak stabil atau tidak bisa di-boot karena add-on yang salah tingkah. Saat memindahkan bilah pilihan ke suatu opsi, penjelasan singkat muncul di bagian bawah layar.</td></tr>
 <tr><td></td><td></td><td>
 	<p><span class="menu">Safe mode</span><br />
-		Menempatkan sistem ke mode aman.Ini dapat diaktifkan secara independen dari opsi lain.</p>
+		Puts the system into safe mode. This can be enabled independently from the other options.</p>
 	<p><span class="menu">Disable user add-ons</span><br />
-		Mencegah semua add-on yang diinstal pengguna dari dimuat. Hanya add-on di direktori sistem yang akan digunakan. Lihat<a href="#troubleshooting"> Troubleshooting</a> di bawah ini.</p>
+		Prevents all user installed add-ons from being loaded. Only the add-ons in the system directory will be used. See <a href="#troubleshooting">Troubleshooting</a> below.</p>
 	<p><span class="menu">Disable IDE DMA</span><br />
-		Menonaktifkan IDE DMA, meningkatkan kompatibilitas IDE dengan mengorbankan kinerja.</p>
+		Disables IDE DMA, increasing IDE compatibility at the expense of performance.</p>
 	<p><span class="menu">Ignore memory beyond 4 GiB</span><br />
-		Abaikan semua memori di luar batas alamat 4 GiB, yang mengabaikan pengaturan dalam file pengaturan kernel.
+		Ignores all memory beyond the 4 GiB address limit, overriding the setting in the kernel settings file.
 </p>
 	<p><span class="menu">Use fail-safe graphics driver</span><br />
-		Sistem akan menggunakan mode VESA dan tidak akan mencoba menggunakan driver grafis video apa pun.</p>
+		The system will use VESA mode and won't try to use any video graphics drivers.</p>
 	<p><span class="menu">Disable IO-APIC</span><br />
-		Menonaktifkan menggunakan IO APIC untuk mengganggu routing, memaksa penggunaan PIC lawas sebagai gantinya.</p>
+		Disables using the IO APIC for interrupt routing, forcing the use of the legacy PIC instead.</p>
 	<p><span class="menu">Disable local APIC</span><br />
-		Menonaktifkan menggunakan APIC lokal, juga menonaktifkan SMP.</p>
+		Disables using the local APIC, also disables SMP.</p>
 	<p><span class="menu">Disable X2APIC</span><br />
-		Menonaktifkan APIC generasi kedua.</p>
+		Disables second generation APIC.</p>
 	<p><span class="menu">Disable SMEP and SMAP</span><br />
-		Menonaktifkan fitur keamanan SMEP / SMAP dari CPU.</p>
+		Disables SMEP/SMAP security features of the CPU.</p>
 	<p><span class="menu">Disable SMP</span><br />
-		Menonaktifkan semua kecuali satu inti CPU.</p>
+		Disables all but one CPU core.</p>
 	<p><span class="menu">Don't call the BIOS</span><br />
-		Menghentikan sistem dari memanggil fungsi BIOS.</p>
+		Stops the system from calling BIOS functions.</p>
 	<p><span class="menu">Disable APM</span><br />
-		Menonaktifkan dukungan perangkat keras Manajemen Daya Lanjutan, mengabaikan pengaturan APM dalam file pengaturan kernel.</p>
+		Disables Advanced Power Management hardware support, overriding the APM setting in the kernel settings file.</p>
 	<p><span class="menu">Disable ACPI</span><br />
-		Menonaktifkan dukungan Konfigurasi Lanjut dan antarmuka perangkat keras Power, mengesampingkan pengaturan ACPI di file pengaturan kernel.</p>
-	<p><span class="menu">Blacklist entries</span><br />
-		Memungkinkan untuk memilih file sistem yang harus diabaikan. Berguna misalnya untuk menonaktifkan driver sementara. lihat <a href="#troubleshooting"> Troubleshooting</a> di bawah ini.</p></td></tr>
-<tr><td><b>Select debug options</b></td><td> </td><td>Di sini Anda akan menemukan beberapa opsi yang membantu dengan debugging atau mendapatkan detail untuk <a href="../../welcome/en/bugreports.html">Laporan bug</a>. Sekali lagi, penjelasan singkat untuk setiap opsi ditampilkan di bagian bawah.</td></tr>
+		Disables Advanced Configuration and Power Interface hardware support, overriding the ACPI setting in the kernel settings file.</p>
+	<p><span class="menu">Disable system components</span><br />
+		Allows to select system files that shall be ignored. Useful e.g. to disable drivers temporarily. See <a href="#troubleshooting">Troubleshooting</a> below.</p></td></tr>
+<tr><td><b>Select debug options</b></td><td> </td><td>Di sini Anda akan menemukan beberapa opsi yang membantu dengan debugging atau mendapatkan detail untuk <a href="../../welcome/id/bugreports.html">Laporan bug</a>. Sekali lagi, penjelasan singkat untuk setiap opsi ditampilkan di bagian bawah.</td></tr>
 <tr><td></td><td></td><td>
 	<p><span class="menu">Enable serial debug output</span><br />
 		Menyalakan penerusan output syslog ke antarmuka serial (default: 115200, 8N1).</p>
@@ -134,7 +138,7 @@ Menyimpan syslog dari sesi Haiku sebelumnya ke disk. Saat ini hanya volume FAT32
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="troubleshooting" name="troubleshooting">Pemecahan masalah</a></h2>
-<p>Jika Haiku menolak untuk mem-boot perangkat keras Anda sejak awal, cobalah mengatur berbagai opsi di bawah <span class="menu"> Pilih opsi mode aman. </span>. Pertimbangkan mengajukan   <a href="../../welcome/en/bugreports.html">laporan bug</a> dalam hal apa pun.
+<p>Jika Haiku menolak untuk mem-boot perangkat keras Anda sejak awal, cobalah mengatur berbagai opsi di bawah <span class="menu"> Pilih opsi mode aman. </span>. Pertimbangkan mengajukan   <a href="../../welcome/id/bugreports.html">laporan bug</a> dalam hal apa pun.
  </p>
 <p>Di sisi lain, jika Haiku hanya tiba-tiba bertindak setelah Anda menginstal beberapa perangkat lunak, terutama driver perangkat keras, Anda memiliki beberapa opsi untuk membuat Haiku dapat di-boot kembali sehingga Anda dapat menghapus paket yang menyinggung:</p>
 <ul>
@@ -142,7 +146,7 @@ Menyimpan syslog dari sesi Haiku sebelumnya ke disk. Saat ini hanya volume FAT32
 <li><p>Mengaktifkan <span class="menu">Disable user add-ons</span> akan mencegah penggunaan add-on apa pun (driver, penerjemah, dll.) Yang telah Anda instal dalam hierarki pengguna di bawah folder Beranda Anda.</p></li>
 <li><p>Jika mengaktifkan <span class="menu">Use fail-safe graphics driver</span> menyelesaikan masalah Anda dengan kembali ke grafik VESA, Anda dapat menjadikan pengaturan ini permanen dengan menghapus <tt>#</tt> dari baris  <i>#fail_safe_video_mode true</i> dalam text file <span class="path">/boot/home/config/settings/kernel/drivers/kernel</span>.</p></li>
 <li><p>Jika driver yang menyinggung, add-on dll diinstal dalam hierarki sistem, hal-hal menjadi sedikit lebih rumit, karena area itu hanya baca. Di sini, <span class="menu">Blacklist entries</span> ikut bermain. Dengan itu, Anda dapat menavigasi keseluruhan hierarki sistem dan nonaktifkan komponen yang mengacaukan Anda dengan memeriksa entri dengan kunci <span class="key">SPACE</span> or <span class="key">RETURN</span> key. <span class="key">ESC</span> mengembalikan Anda satu tingkat ke direktori induk.</p>
-<p>Online, ada artikel <a href="http://www.haiku-os.org/blog/barrett/2013-12-15_how_permanently_blacklist_package_file">How to Permanently Blacklist a Package File</a> yang menunjukkan cara membuat pengaturan tetap Secara Permanen.</p></li>
+<p>Online, ada artikel <a href="http://www.haiku-os.org/blog/barrett/2013-12-15_how_permanently_blacklist_package_file">Bagaimana secara permanen mem-dafarhitamkan berkas paket</a> yang menunjukkan cara membuat pengaturan tetap Secara Permanen.</p></li>
 <li><p>Di bawah <span class="menu">Select boot volume</span> Anda dapat menentukan "versi" Haiku mana yang akan di-boot. Setiap kali Anda menghapus paket, kondisi lama disimpan dan Anda dapat mem-boot-nya dengan memilihnya dari daftar yang disajikan dalam opsi boot loader.<br />
 Jadi, jika Anda mengalami masalah boot setelah menginstal beberapa paket, boot kondisi Haiku dari sebelum waktu itu dan hapus instalan paket yang menyinggung.</p>
 </li>
@@ -172,7 +176,7 @@ Simbol yang berbeda kira-kira sesuai dengan tahapan boot ini:</p>
 <div class="inner"><span>
     <!-- «  <a href="installation.html">Installing Haiku</a> 
 ::  -->
-    <a href="contents.html" class="uplink">Contents</a> 
+    <a href="contents.html" class="uplink">Daftar Isi</a> 
 ::  <a href="filesystem-layout.html">Layout Filesystem</a>  »
 </span></div>
 </div>

@@ -36,6 +36,7 @@
 <li><a href="../ca/bootloader.html">Català</a></li>
 <li><a href="../en/bootloader.html">English</a></li>
 <li><a href="../es/bootloader.html">Español</a></li>
+<li><a href="../eo/bootloader.html">Esperanto</a></li>
 <li><a href="../fr/bootloader.html">Français</a></li>
 <li><a href="../fur/bootloader.html">Furlan</a></li>
 <li><a href="../it/bootloader.html">Italiano</a></li>
@@ -68,7 +69,8 @@
 
 <p>Mit den "Haiku Boot Loader Optionen" kann man zum einen unterschiedliche Haiku-Installationen starten, zum anderen hardware-spezifische Probleme umgehen. Er is auch nützlich wenn man etwas installiert hat, das das Booten von Haiku verhindert, siehe <a href="#troubleshooting">Fehlersuche</a> weiter unten.</p>
 <p>Um zum Bildschirm der Boot Loader Optionen zu gelangen, muss man noch vor Beginn des Boot-Prozesses <span class="key">SHIFT</span> gedrückt halten. Ist ein Bootmanager installiert, kann man das bereits tun, bevor man dort den Haiku-Eintrag auswählt. Ist Haiku das einzige Betriebssystem auf dem Rechner, kann die Taste schon gehalten werden, während noch die BIOS Meldungen zu sehen sind.</p>
-<div class="box-info">Wird per UEFI anstatt dem klassischen BIOS gebootet, muss die <span class="key">Leertaste</span> benutzt werden.</div>
+<div class="box-info">Bei mancher Hardware müssen im BIOS erst USB Tastaturen aktiviert werden, um diese beim Hochfahren benutzen zu können. <br />
+Wird per UEFI anstatt dem klassischen BIOS gebootet, muss anstatt <span class="key">SHIFT</span> die <span class="key">LEERTASTE</span> benutzt werden.</div>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="options" name="options">Boot Loader Optionen</a></h2>
@@ -104,7 +106,7 @@
 		Deaktiviert Advanced Power Management Hardware-Unterstützung, setzt APM-Einstellungen in der 'kernel' Datei außer Kraft.</p>
 	<p><span class="menu">Disable ACPI</span><br />
 		Deaktiviert Advanced Configuration and Power Interface Hardware-Unterstützung, setzt ACPI-Einstellungen in der 'kernel' Datei außer Kraft.</p>
-	<p><span class="menu">Blacklist entries</span><br />
+	<p><span class="menu">Disable system components</span><br />
 		Ermöglicht die Auswahl von Systemdateien, die ignoriert werden sollen. Nützlich, um beispielsweise Treiber vorübergehend zu deaktivieren. Siehe <a href="#troubleshooting">Fehlersuche</a> weiter unten.</p></td></tr>
 <tr><td><b>Select debug options</b>
 </td><td> </td><td>Hier befinden sich einige hilfreiche Optionen zum Debuggen bzw. um Details für einen <a href="../../welcome/de/bugreports.html">Bugreport</a> zu erhalten. Auch hier wird bei jeder Option unten erklärender Text eingeblendet.</td></tr>
@@ -140,7 +142,7 @@
 <li><p>Aktiviert man <span class="menu">Disable user add-ons</span>, verhindert das die Nutzung jeglicher Add-Ons (Treiber, Translatoren etc.), die in der Benutzer-Hierarchie unter Home installiert wurden.</p></li>
 <li><p>Falls das Zurückfallen in den VESA Modus durch Aktivieren von <span class="menu">Use fail-safe graphics driver</span> die Bootprobleme löst, kann diese Einstellung "fest verdrahtet" werden. Dazu muss man einfach nur in der Textdatei <span class="path">/boot/home/config/settings/kernel/drivers/kernel</span> das <tt>#</tt> der Zeile <i>#fail_safe_video_mode true</i> entfernen.</p></li>
 <li><p>Befindet sich der problematische Treiber oder Add-On etc. allerdings in der System Hierarchie, wird die Sache etwas komplizierter, da dieser Teil des Dateisystems nicht beschreibbar ist. Hier kommt die Option <span class="menu">Blacklist entries</span> zum Einsatz. Mit ihr lässt sich durch die System-Verzeichnisse navigieren, um die entsprechende Komponente mittels <span class="key">LEERTASTE</span> oder <span class="key">RETURN</span> zu deaktivieren. <span class="key">ESC</span> führt wieder eine Verzeichnisebene zurück nach oben.</p>
-<p>Online zeigt der Artikel "<a href="http://www.haiku-os.org/blog/barrett/2013-12-15_how_permanently_blacklist_package_file">How to Permanently Blacklist a Package File</a>" wie man diese Einstellung festlegt, damit sie bei jedem Hochfahren erhalten bleibt.</p></li>
+<p>Online zeigt der Artikel "<a href="https://www.haiku-os.org/guides/daily-tasks/blacklist-packages">Disabling components of packages</a>" wie man diese Einstellung festlegt, damit sie bei jedem Hochfahren erhalten bleibt.</p></li>
 <li><p>Unter <span class="menu">Select boot volume</span> kann man angeben welcher frühere Zustand von Haiku gebootet werden soll. Jedesmal wenn ein Paket installiert oder deinstalliert wird, wird der alte Zustand gespeichert und er kann in den Boot Loader Optionen aus einer Liste ausgewählt werden, um Haiku in diesen alten Zustand zu booten.<br />
 Wenn Haiku also nach der Installation eines Pakets nicht mehr hochfahren kann, einfach eine Haiku Version vor diesem Zeitpunkt booten und dann das betreffende Paket wieder deinstallieren.</p></li>
 </ul>

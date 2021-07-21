@@ -23,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Panduan pengguna</span></div>
 </div>
 
 <div class="nav">
@@ -34,6 +34,7 @@
 <li><a href="../../de/applications/vision.html">Deutsch</a></li>
 <li><a href="../../en/applications/vision.html">English</a></li>
 <li><a href="../../es/applications/vision.html">Español</a></li>
+<li><a href="../../eo/applications/vision.html">Esperanto</a></li>
 <li><a href="../../fr/applications/vision.html">Français</a></li>
 <li><a href="../../fur/applications/vision.html">Furlan</a></li>
 <li><a href="../../it/applications/vision.html">Italiano</a></li>
@@ -60,7 +61,7 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
+<div class="box-info">Terjemahan halaman ini belum lengkap. Sampai saat itu, bagian yang belum selesai menggunakan aslinya bahasa Inggris.</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Indeks</td></tr>
@@ -77,16 +78,14 @@
 </table>
 <p><br /></p>
 <p>Vision adalah klien IRC yang awalnya dikembangkan untuk BeOS. Lebih banyak dokumentasi dan pelacak bug tersedia di beranda Vision. <a href="https://github.com/HaikuArchives/Vision/">Vision homepage</a>.</p>
-<div class="box-info">Anda dapat menemukan bantuan dari pengguna dan pengembang Haiku lainnya di  <a href="https://www.haiku-os.org/community/irc">Haiku channels</a>alam berbagai bahasa.<br />
-Saluran yang paling sering dikunjungi adalah #haiku berbahasa Inggris di irc.freenode.net.
-</div>
+<div class="box-info">You can find help from other Haiku users and developers on <a href="https://www.haiku-os.org/community/irc">Haiku channels</a> in various languages.<br />
+The most frequented channel is the English speaking #haiku at irc.oftc.net.</div>
 <p>Beberapa saran, terutama jika Anda baru mengenal IRC:</p>
 <ul>
 <li><p>Cari di web untuk "etiket IRC" untuk mengetahui apa yang harus dan tidak boleh dilakukan dalam obrolan. Tanpa banyak pencarian, saya menemukan <a href="https://workaround.org/getting-help-on-irc/">Mendapatkan bantuan di IRC</a> oleh Christoph Haas sangat membantu.</p>
 
   </li>
-<li><p>Dengan mendaftarkan nama panggilan Anda, Anda memastikan tidak ada yang bisa menarik perhatian dan Anda mendapatkan kepercayaan dari penduduk. Lihat <a href="http://freenode.net/kb/answer/registration">Freenode's FAQ</a> tentang hal itu.</p>
-</li>
+<li><p>By registering your nickname you make sure nobody can pull any shenanigans and you gain the trust of the residents. See <a href="https://www.oftc.net/FAQ/Services/">OFTC's FAQ</a> on that matter.</p></li>
 <li><p>Siapkan suara di preferensi Suara Haiku untuk diberitahukan jika seseorang menyebutkan nama panggilan Anda. Orang tidak selalu menonton layar klien IRC mereka. Menempatkan nama panggilan orang yang Anda ajak bicara di awal apa yang akan Anda posting meningkatkan peluang Anda untuk diperhatikan. Mirip dengan Terminal, Vision mendukung penyelesaian tab untuk nama panggilan, yaitu jika Anda memasukkan huruf awal nama panggilan dan menekan tombol tab, Vision melengkapinya dengan nama depan yang cocok.</p></li>
 </ul>
 
@@ -271,34 +270,38 @@ Menampilkan topik saluran saat ini atau, jika disediakan, dari &lt;channel&gt;.<
 </li>
 
 <li><p><span class="menu">/TOPIC &lt;channel&gt; &lt;new-channel-topic&gt;</span><br />
-Sets the topic of &lt;channel&gt; to &lt;new-channel-topic&gt;.</p></li>
+Atur topik &lt;channel&gt; ke &lt;new-channel-topic&gt;.</p></li>
 
 <li><p><span class="menu">/TOPIC &lt;new-channel-topic&gt;</span><br />
-Same as <span class="menu">/TOPIC &lt;channel&gt; &lt;new-channel-topic&gt;</span>, but on current channel.</p></li>
+Sama serperti <span class="menu">/TOPIC &lt;channel&gt; &lt;new-channel-topic&gt;</span>, tapi pada kanal ini.</p></li>
 
 <li><p><span class="menu">/UNNOTIFY &lt;nick1&gt; [nick2] ...</span><br />
-Removes &lt;nick(s)&gt; from your notify list.</p></li>
+Menghapus &lt;nick(s)&gt; dari daftar notif.</p></li>
 
 <li><p><span class="menu">/UPTIME [-l]</span><br />
-Displays the systems uptime. If [-l] is specified, the uptime will be echoed locally, and not sent to the network.</p></li>
+Menampilkan uptime sistem. Jika [-l] ditentukan, uptime akan digaungkan secara lokal, dan tidak dikirim ke jaringan..</p></li>
 
 <li><p><span class="menu">/VERSION &lt;nick&gt;</span><br />
-Returns the client-version of &lt;nicks&gt; IRC-client. Equivalent to <span class="menu">/CTCP &lt;nick&gt; VERSION</span>.</p></li>
+Menberitahukan versi klien dari &lt;nicks&gt; IRC-client. Setara dengan <span class="menu">/CTCP &lt;nick&gt; VERSION</span>.</p>
+</li>
 
 <li><p><span class="menu">/VISIT &lt;url&gt;</span><br />
-Opens &lt;url&gt; with your current html handler. (Note: If the handler is not a browser, it opens the application specified in FileTypes.)</p></li>
+Buka &lt;url&gt; dengan penangan html Anda saat ini. (Catatan: Jika handler bukan browser, akan membuka aplikasi yang ditentukan dalam FileTypes.)</p></li>
 
 <li><p><span class="menu">/WEBSTER /DICTIONARY [word]</span><br />
-Opens www.m-w.com (Merriam Webster) with your current html handler. (Note: If the handler is not a browser, it opens the application specified in FileTypes.)</p></li>
+Buka www.m-w.com (Merriam Webster) dengan penangan html Anda saat ini. (Catatan: Jika handler bukan browser, itu membuka aplikasi yang ditentukan dalam FileTypes.)</p>
+
+</li>
 
 <li><p><span class="menu">/VUPTIME [-l]</span><br />
-Displays the Vision uptime. If [-l] is specified, the uptime will be echoed locally, and not sent to the network.</p></li>
+Menampilkan waktu aktif Vision. Jika [-l] ditentukan, uptime akan digaungkan secara lokal, dan tidak dikirim ke jaringan.</p>
+</li>
 
 <li><p><span class="menu">/WALLOPS</span><br />
-IRC operator command that sends a wallops message (visible to those with umode  w active).</p></li>
+Perintah operator IRC yang mengirim pesan wallops (terlihat oleh orang-orang dengan umode w active).</p></li>
 
 <li><p><span class="menu">/WHOIS /W &lt;nick&gt;</span><br />
-Returns whois information of &lt;nick&gt;.</p></li>
+Memberitahukan informasi whois dari &lt;nick&gt;.</p></li>
 </ul>
 
 </div>

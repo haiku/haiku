@@ -25,7 +25,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>ユーザーガイド</span></div>
 </div>
 
 <div class="nav">
@@ -37,6 +37,7 @@
 <li><a href="../de/applications.html">Deutsch</a></li>
 <li><a href="../en/applications.html">English</a></li>
 <li><a href="../es/applications.html">Español</a></li>
+<li><a href="../eo/applications.html">Esperanto</a></li>
 <li><a href="../fr/applications.html">Français</a></li>
 <li><a href="../fur/applications.html">Furlan</a></li>
 <li><a href="../it/applications.html">Italiano</a></li>
@@ -54,8 +55,8 @@
 <li><a href="../uk/applications.html">Українська</a></li>
 </ul>
 <span>
- «  <a href="workshop-filetypes+attributes.html">Workshop</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+ «  <a href="workshop-filetypes+attributes.html">ワークショップ</a> 
+::  <a href="contents.html" class="uplink">目次</a> 
 ::  <a href="desktop-applets.html">デスクトップアプレット</a>  »
 </span></div>
 </div>
@@ -83,13 +84,13 @@
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="beos_apps" name="beos_apps">以前の BeOS アーカイブ (.zip および .pkg)</a></h2>
-<p>BeOS アーカイブで、フォルダー内にアプリケーションに必要なものをすべて含んでいるものは、単に <tt>/boot/home/</tt> 内のどこかに解凍して (ダブルクリックで<span class="app">ファイル解凍</span>または以前の <span class="app">PackageInstaller</span> が開きます)、そこから実行できます。そのようなアプリケーションのアンインストールは簡単です。つまり、フォルダーを削除するだけです。</p>
-<p>これは、ほとんどの古い BeOS アプリケーションについて当てはまります。解凍しただけではアプリケーションが動かない場合、それはアーカイブがファイルを存在しないハードコートされた場所にまき散らすためですが、手動で修正する必要があります。<tt>/system/non-packaged/</tt> フォルダーに必要なフォルダー階層を作成できます。本物の.hpkg ファイルがより多く利用できるようになり、古い BeOS アプリケーションが再パッケージされるようになれば、手動で行う必要は減るでしょう。<tt>non-packaged</tt> フォルダー階層の使い方は、この<a href="http://www.haiku-os.org/guides/daily-tasks/install-applications">オンライン記事</a>を参照ください。</p>
+<p>BeOS アーカイブで、フォルダー内にアプリケーションに必要なものをすべて含んでいるものは、単に <tt>/boot/home/</tt> 内のどこかに解凍して (ダブルクリックで<span class="app">ファイル解凍</span>または以前の<span class="app">パッケージインストーラー</span>が開きます)、そこから実行できます。そのようなアプリケーションのアンインストールは簡単です。つまり、フォルダーを削除するだけです。</p>
+<p>これは、ほとんどの古い BeOS アプリケーションについて当てはまります。解凍しただけではアプリケーションが動かない場合、それはアーカイブが存在しないハードコートされた場所へファイルをまき散らすためなので、手動で修正する必要があります。<tt>/system/non-packaged/</tt> フォルダーに必要なフォルダー階層を作成できます。本物の.hpkg ファイルがより多く利用できるようになり、古い BeOS アプリケーションが再パッケージされるようになれば、手動で行う必要は減るでしょう。<tt>non-packaged</tt> フォルダー階層の使い方は、この<a href="http://www.haiku-os.org/guides/daily-tasks/install-applications">オンライン記事</a>を参照ください。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="list-of-apps" name="list-of-apps">Haiku に付属するアプリケーション</a></h2>
-<p>Haiku には、大部分は小さいが必要不可欠な一連のアプリケーションが付属しています。これらすべてのアプリケーションは、<span class="path">/boot/system/apps/</span> にあります。データファイルのダブルクリックで通常起動 (たとえば、画像ファイルをダブルクリックすると、画像ビューワ (ShowImage) が起動します) しないアプリケーションは Deskbar の <span class="menu">Applications</span> メニュー中にあります。</p>
+<p>Haiku には、ほとんどは小さいけれど必要不可欠な一連のアプリケーションが付属しています。これらすべてのアプリケーションは、<span class="path">/boot/system/apps/</span> にあります。データファイルのダブルクリックで通常起動 (たとえば、画像ファイルをダブルクリックすると、画像ビューワ (ShowImage) が起動します) しないアプリケーションは Deskbar の <span class="menu">Applications</span> メニュー中にあります。</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td style="width:24px;"><img src="../images/apps-images/activitymonitor-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/activitymonitor.html">アクティビティモニター</a></td><td style="width:10px;"> </td>
 		<td valign="top">CPU やメモリーの使用量のようなシステムリソースを追跡するツール</td></tr>
@@ -154,7 +155,7 @@
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="cli-apps" name="cli-apps">Haiku に付属するコマンドラインアプリケーション</a></h2>
-<p>Bash シェルに付属するコマンドラインツールおよび POSIX 準拠に必要な標準的なコマンドラインツールに加えて、言及する価値のある Haiku 特有のコマンドラインツールが存在します。これらコマンドは多くの場合、スクリプト化する上で役立ちます。<a href="bash-scripting.html">Bash とスクリプト処理</a>のトピックも参照ください。</p>
+<p>Bash シェルに付属するコマンドラインツールおよび POSIX 準拠に必要な標準的なコマンドラインツールに加えて、言及する価値のある Haiku 特有のコマンドラインツールが存在します。これらコマンドは多くの場合、スクリプト化のために役立ちます。<a href="bash-scripting.html">Bash とスクリプト処理</a>のトピックも参照ください。</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 		<tr><td style="width:24px;"><img src="../images/apps-images/cli-app-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/list-cli-apps.html">すべてのコマンドラインアプリケーション</a></td><td> </td></tr>
 		<tr><td style="width:24px;"><img src="../images/apps-images/cli-app-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/cli-apps.html">Haiku 特有のコマンドラインアプリケーション</a></td><td> </td></tr>
@@ -184,8 +185,8 @@
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="workshop-filetypes+attributes.html">Workshop</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+ «  <a href="workshop-filetypes+attributes.html">ワークショップ</a> 
+::  <a href="contents.html" class="uplink">目次</a> 
 ::  <a href="desktop-applets.html">デスクトップアプレット</a>  »
 </span></div>
 </div>

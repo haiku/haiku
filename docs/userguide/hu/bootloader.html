@@ -36,6 +36,7 @@
 <li><a href="../de/bootloader.html">Deutsch</a></li>
 <li><a href="../en/bootloader.html">English</a></li>
 <li><a href="../es/bootloader.html">Español</a></li>
+<li><a href="../eo/bootloader.html">Esperanto</a></li>
 <li><a href="../fr/bootloader.html">Français</a></li>
 <li><a href="../fur/bootloader.html">Furlan</a></li>
 <li><a href="../it/bootloader.html">Italiano</a></li>
@@ -68,7 +69,8 @@
 
 <p>Haiku's Boot Loader Options can help when you experience hardware related problems or want to choose which Haiku installation to start, if you have more than one (maybe on an installation CD or USB stick). It's also handy if you have installed a software component that acts up and prevents you from booting Haiku, see <a href="#troubleshooting">Troubleshooting</a> below.</p>
 <p>A rendszertöltőbe való belépéshez tartsuk lenyomva a <span class="key">SHIFT</span> billentyűt, mielőtt a Haiku betöltési folyamat elindul (mielőtt megjelenik a Haiku logó). Ha rendszerválasztó menü is van telepítve, akkor tartsuk lenyomva a <span class="key">SHIFT</span>-et mielőtt kiválasztjuk az indítandó rendszert. Ha csak Haiku van a gépünkön, akkor ajánlott már akkor lenyomva tartani a billentyűt, amikor még a BIOS üzenetei vannak a képernyőn.</p>
-<div class="box-info">On computers that use UEFI for booting instead of the classic BIOS, you need to use the <span class="key">SPACEBAR</span> instead.</div>
+<div class="box-info">With some hardware, you'll have to make sure USB keyboards are enabled in the BIOS.<br />
+On computers that use UEFI for booting instead of the classic BIOS, you need to use the <span class="key">SPACEBAR</span> instead of <span class="key">SHIFT</span>.</div>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="options" name="options">A rendszer betöltésekor elérhető opciók</a></h2>
@@ -105,7 +107,7 @@
 		Disables Advanced Power Management hardware support, overriding the APM setting in the kernel settings file.</p>
 	<p><span class="menu">Disable ACPI</span><br />
 		Disables Advanced Configuration and Power Interface hardware support, overriding the ACPI setting in the kernel settings file.</p>
-	<p><span class="menu">Blacklist entries</span><br />
+	<p><span class="menu">Disable system components</span><br />
 		Allows to select system files that shall be ignored. Useful e.g. to disable drivers temporarily. See <a href="#troubleshooting">Troubleshooting</a> below.</p></td></tr>
 <tr><td><b>Debug menu</b><br />Hibakereső menü
 </td><td> </td><td>Az alábbi opciók segítséghetnek a hiba keresésben illetve a hiba <a href="../../welcome/hu/bugreports.html">jelentésében</a>. Szintén kapunk egy kis leírást a képernyő alján ha kiválasztunk egy opciót.</td></tr>
@@ -129,7 +131,7 @@
 		A legutóbbi munkamenetben összegyűjtött hibakeresési információk megjelenítse.</p>
 	<p><span class="menu">Save syslog from previous session</span> (Előző munkamenet naplójának elmentése)<br />
 		A legutóbbi munkamenetben összegyűjtött hibakeresési információk elmentése lemezre. Jelenleg csak FAT32 fájlrendszerű lemezek használhatóak.</p></td></tr>
-<tr><td class="onelinetop"><b>Select screen resolution</b></td><td> </td><td>Lets you force a certain screen resolution and color depth.</td></tr>
+<tr><td class="onelinetop"><b>Select screen resolution</b><br />Képernyőfelbontás</td><td> </td><td>Lets you force a certain screen resolution and color depth.</td></tr>
 </table>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -140,8 +142,8 @@
 <li><p>A <span class="menu">Safe mode</span> engedélyezésével megakadályozhatjuk a legtöbb szerver, démon elindítását illetve a UserBootScript végrehajtását.</p></li>
 <li><p>A <span class="menu">Disable user add-ons</span> aktiválásával elkerülhetjük az általunk feltelepített kiegészítők (vezérlők, értelmezők, stb.) betöltését, használatát.</p></li>
 <li><p>If activating <span class="menu">Use fail-safe graphics driver</span> solves your troubles by falling back to VESA graphics, you can make the setting permanent by removing the <tt>#</tt> of the line <i>#fail_safe_video_mode true</i> in the text file <span class="path">/boot/home/config/settings/kernel/drivers/kernel</span>.</p></li>
-<li><p>Ha az érintett vezérlő, kiegészítő, stb rendszer szinten van telepítve, akkor a helyzet kicsit nehezebb. Itt kap szerepet a <span class="menu">Blacklist entries</span>. Használatakor az egész fájlrendszeren végig mehetünk és letilthatjuk a szükséges összetevőket. A kiválasztás a <span class="key">SPACE</span> vagy <span class="key">RETURN</span> billentyűvel történik. Az <span class="key">ESC</span> lenyomásával egy szintel feljebb mehetünk.</p>
-<p>Az interneten olvasható egy cikk (<a href="http://www.haiku-os.org/blog/barrett/2013-12-15_how_permanently_blacklist_package_file">How to Permanently Blacklist a Package File</a>) arról, hogy hogyan tudjuk véglegesíteni ezeknek az összetevőknek a letiltását.</p></li>
+<li><p>If the offending driver, add-on etc. is installed in the system hierarchy, things get a bit more complicated, because that area is read-only. Here, the <span class="menu">Disable system components</span> comes into play. With it, you can navigate through the whole system hierarchy and disable the component that's messing things up for you by checking an entry with the <span class="key">SPACE</span> or <span class="key">RETURN</span> key. <span class="key">ESC</span> returns you up one level to the parent directory.</p>
+<p>Online, there's the guide <a href="https://www.haiku-os.org/guides/daily-tasks/blacklist-packages">Disabling components of packages</a> showing how to make that setting stick.</p></li>
 <li><p>Under <span class="menu">Select boot volume</span> you can specify what former "version" of Haiku to boot. Every time you un/install a package, the old state is saved and you can boot into it by choosing it from the list presented in the boot loader options.<br />
 So, if you encounter boot problems after installing some package, boot a Haiku state from before that time and uninstall the offending package.</p></li>
 </ul>

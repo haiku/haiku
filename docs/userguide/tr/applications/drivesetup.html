@@ -24,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Kullanıcı kılavuzu</span></div>
 </div>
 
 <div class="nav">
@@ -36,6 +36,7 @@
 <li><a href="../../de/applications/drivesetup.html">Deutsch</a></li>
 <li><a href="../../en/applications/drivesetup.html">English</a></li>
 <li><a href="../../es/applications/drivesetup.html">Español</a></li>
+<li><a href="../../eo/applications/drivesetup.html">Esperanto</a></li>
 <li><a href="../../fr/applications/drivesetup.html">Français</a></li>
 <li><a href="../../fur/applications/drivesetup.html">Furlan</a></li>
 <li><a href="../../it/applications/drivesetup.html">Italiano</a></li>
@@ -61,7 +62,7 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
+<div class="box-info">Bu sayfanın çevrilmesi henüz tamamlanmamıştır. Tamamlanana kadar henüz bitirilmeyen kısımlar İngilizce metni kullanır.</div>
 
 <h2><img src="../../images/apps-images/drivesetup-icon_64.png" alt="drivesetup-icon_64.png" width="64" height="64" />Disk İzlencesi</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -70,7 +71,7 @@
 <tr><td>Ayarlar:</td><td></td><td><span class="path">~/config/settings/DriveSetup</span></td></tr>
 </table>
 <p><br /></p>
-<p>DriveSetup is a tool to create, delete and format partitions. At this time it can't resize or move existing partitions, so that you'll either need an unpartitioned volume (perhaps an external USB drive or another harddisk) or do the initial setup with a tool like the <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> to provide the space for another partition.</p>
+<p>Disk İzlencesi ile disk bölümleri oluşturabilir, silebilir ve biçimlendirebilirsiniz. Şu anda mevcut bölümleri yeniden boyutlandıramaz veya silemez; bu nedenle bölümlendirilmemiş bir diske (belki bir harici USB bellek veya başka bir sabit disk) veya ilk bölümlendirme işlemini <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> gibi başka bir araçla tamamlamanız gerekebilir.</p>
 <img src="../images/apps-images/drivesetup.png" alt="drivesetup.png" />
 <p>At the top is a graphical representation of all partitions inside the device chosen in the list below it. Each device, by default, can hold a maximum of 4 <i>primary</i> partitions. This limit can be removed by making one of those an <i>extended</i> partition, which in turn can hold theoretically an unlimited number of <i>logical</i> partitions (practical limitations depend on, for example, other OSes installed).<br />
 You may have to expand such a list with the +/- widget that appears in that case in front of that device to see the details of every logical partition.</p>
@@ -78,35 +79,35 @@ You may have to expand such a list with the +/- widget that appears in that case
 Besides the familiar icons for harddisks, CD drives and USB sticks etc., there are a few that indicate a their mount mode:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="4">
 <tr><td><img src="../../images/apps-images/drivesetup-icon_boot.png" alt="drivesetup-icon_boot.png" width="16" height="16" /></td><td style="width:10px;"> </td>
-<td>The /boot partition</td></tr>
+<td>/boot bölümü</td></tr>
 <tr><td><img src="../../images/apps-images/drivesetup-icon_encrypted.png" alt="drivesetup-icon_encrypted.png" width="16" height="16" /></td><td> </td>
-<td>An encrypted partition</td></tr>
+<td>Şifrelenmiş bir bölüm</td></tr>
 <tr><td><img src="../../images/apps-images/drivesetup-icon_shared.png" alt="drivesetup-icon_shared.png" width="16" height="16" /></td><td> </td>
-<td>A partition shared through SMB/NFS etc.</td></tr>
+<td>SMB/NFS üzerinden paylaşılan bir bölüm.</td></tr>
 <tr><td><img src="../../images/apps-images/drivesetup-icon_read-only.png" alt="drivesetup-icon_read-only.png" width="16" height="16" /></td><td> </td>
-<td>A partition that was mounted read-only</td></tr>
+<td>Saltokunur bağlanmış bir bölüm</td></tr>
 <tr><td><img src="../../images/apps-images/drivesetup-icon_virtual.png" alt="drivesetup-icon_virtual.png" width="16" height="16" /></td><td> </td>
-<td>A mounted image file (see also the <a href="./cli-apps.html">diskimage command</a>)</td></tr>
+<td>Bağlanmış bir yansı dosyası (ayrıca bkz. <a href="./cli-apps.html">diskimage komutu</a>)</td></tr>
 </table>
-<p>When mounted, a colored bar shows the used space of a partition. The color depends on the kind of partition:</p>
+<p>Bağlandığında, renkli bir çubuk bölümün kullanılan alanını belirtir. Renk, bölüm türüne göre değişiklik gösterir:</p>
 <table summary="layout" border="0" cellspacing="2" cellpadding="4">
-<tr><td style="background-color:#BEFFBE" width="20"></td><td width="3"></td><td>A BFS formatted partition</td></tr>
-<tr><td style="background-color:#ACACFF"></td><td></td><td>A non-BFS formatted partition</td></tr>
-<tr><td style="background-color:#FFACAC"></td><td></td><td>A read-only partition</td></tr>
-<tr><td style="background-image: repeating-linear-gradient(135deg, #E0E000 1%, #C0C0C0 15%)"></td><td></td><td>An encrypted partition</td></tr>
+<tr><td style="background-color:#BEFFBE" width="20"></td><td width="3"></td><td>BFS ile biçimlendirilmiş bir bölüm</td></tr>
+<tr><td style="background-color:#ACACFF"></td><td></td><td>BFS dışı bir dosya sistemi ile biçimlendirilmiş bir bölüm</td></tr>
+<tr><td style="background-color:#FFACAC"></td><td></td><td>Saltokunur bir bölüm</td></tr>
+<tr><td style="background-image: repeating-linear-gradient(135deg, #E0E000 1%, #C0C0C0 15%)"></td><td></td><td>Şifrelenmiş bir bölüm</td></tr>
 </table>
-<p>You can select a partition and choose various commands from the context or <span class="menu">Partition</span> menu, like <span class="menu">Mount</span>/<span class="menu">Unmount</span>, or to <span class="menu">Open in DiskProbe</span>.</p>
-<p>You can also <span class="menu">Format</span> or completely <span class="menu">Delete</span> a partition.</p>
-<div class="box-stop">Dealing with creating/deleting/formatting partitions is very dangerous business. Always check twice to be sure you're working with the right one and always keep an up-to-date backup of your data in case something goes wrong!</div>
+<p>Sağ tık menüsünden veya <span class="menu">Bölüm</span> menüsünden bir bölümü seçebilir ve çeşitli komutları uygulayabilirsiniz; örneğin <span class="menu">Bağla</span>/<span class="menu">Bağlantıyı kes</span> veya <span class="menu">DiskProbe ile aç</span>.</p>
+<p>Aynı zamanda bir bölümü <span class="menu">Biçimlendir</span> veya toptan <span class="menu">Sil</span> işlemlerini yapmanız da olanaklıdır.</p>
+<div class="box-stop">Bölüm oluşturma/silme/biçimlendirme özünde dikkatli yapılması gereken tehlikeli işlemlerdir. Her zaman doğru komutu çalıştırdığınızdan ve bir şeylerin ters gitme olasılığına karşın verinizi başka bir konumda yedeklediğinizden emin olun.</div>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="initializing" name="initializing">Initializing a disk</a></h2>
-<p>If you don't plan to use just one of the partitions of a larger disk, but the entire drive as one partition, e.g. a USB stick or a Compact Flash card, you'll have to initialize the disk first.</p>
+<a id="initializing" name="initializing">Disk ilklendirme</a></h2>
+<p>Eğer daha büyük bir diskin yalnızca bir bölümünü değil de diskin tümünü tek bir bölüm olarak kullanacaksanız öncelikle diski ilklendirmeniz gerekmektedir.</p>
 <p>You do this by selecting the raw disk from list of devices and choose a partition map from the <span class="menu">Disk | Initialize</span> menu. The <span class="menu">Intel Partition Map</span> is the right choice for classical booting via a BIOS.</p>
-<div class="box-stop">Initializing will destroy all data on the drive!</div>
+<div class="box-stop">Diski ilklendirmek disk üzerindeki tüm veriyi yok eder!</div>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="creating" name="creating">Creating a new partition</a></h2>
+<a id="creating" name="creating">Yeni bir bölüm oluşturma</a></h2>
 <p>When you found unformatted space on a drive, like the above <tt>&lt;empty&gt;</tt>, you can create a new partition in this space with <span class="menu">Partition | Create...</span>(<span class="key">ALT</span> <span class="key">C</span>).</p>
 <img src="../images/apps-images/drivesetup-create.png" alt="drivesetup-create.png" />
 <p>You're prompted with this dialog that lets you adjust the partition size and type. Choose <span class="menu">Be File System</span> if you want to use the partition for an Haiku installation or if you want to use all the interesting Haiku features with it, like attributes and queries. Note, that other operating systems might not be able to access such a partition.</p>
@@ -114,12 +115,12 @@ Besides the familiar icons for harddisks, CD drives and USB sticks etc., there a
 <p>Before you can use, or even mount the newly created partition, it has to be formatted with a filesystem.</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="initializing" name="formatting">Formatting a partition</a></h2>
+<a id="initializing" name="formatting">Bir bölümü biçimlendirme</a></h2>
 <p>Only unmounted partitions can be formatted by choosing a filesystem from the sub-menu of <span class="menu">Partition | Format</span>. The <span class="menu">Be File System</span> (BFS) is mandatory for a Haiku boot partition and recommended for data partitions to be used with Haiku. Only BFS formatted partitions can be queried and fully support Haiku's file attributes.</p>
 <img src="../images/apps-images/drivesetup-initialize.png" alt="drivesetup-initialize.png" />
 <p>Here you set the name for the partition and its blocksize. The blocksize is the space in bytes that a file will allocate at minimum. 2048 bytes per block are recommended, but you can choose larger or smaller sizes if you have these very specific needs.<br />
 If the future data on your partition won't need any querying, you can uncheck <span class="menu">Enable query support</span>  to save a bit of overhead for managing the index. </p>
-<div class="box-stop">Formatting will destroy all data on the partition!</div>
+<div class="box-stop">Diski biçimlendirmek disk üzerindeki tüm veriyi yok eder!</div>
 </div>
 </div>
 

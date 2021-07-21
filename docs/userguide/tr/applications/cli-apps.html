@@ -23,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Kullanıcı kılavuzu</span></div>
 </div>
 
 <div class="nav">
@@ -35,6 +35,7 @@
 <li><a href="../../de/applications/cli-apps.html">Deutsch</a></li>
 <li><a href="../../en/applications/cli-apps.html">English</a></li>
 <li><a href="../../es/applications/cli-apps.html">Español</a></li>
+<li><a href="../../eo/applications/cli-apps.html">Esperanto</a></li>
 <li><a href="../../fr/applications/cli-apps.html">Français</a></li>
 <li><a href="../../fur/applications/cli-apps.html">Furlan</a></li>
 <li><a href="../../it/applications/cli-apps.html">Italiano</a></li>
@@ -60,7 +61,7 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
+<div class="box-info">Bu sayfanın çevrilmesi henüz tamamlanmamıştır. Tamamlanana kadar henüz bitirilmeyen kısımlar İngilizce metni kullanır.</div>
 
 <h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Haiku komut satırı uygulamaları</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -92,18 +93,18 @@ Bir parametre hakkında daha fazla bilgi için "--help" bayrağını ekleyin, ö
 <p>Aşağıda özellikle betik yazımında çok kullanılan komutların bir listesini bulabilirsiniz (ayrıca bkz: <a href="../bash-scripting.html">Bash ve betik yazımı</a>).</p>
 <table summary="scripting cli tools" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><p><span class="cli">alert</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">alert</span> conjures up the typical alert window with a pre-defined icon, explanatory text and up to three buttons. It will return the title of the pressed button and an exit status (starting with 0). For example, this is made of the line:</p>
-<pre class="terminal">alert --idea "FantasticApp(tm) installed successfully! \
-Would you like a link to it?" "On Desktop" "In Deskbar" "No thanks"</pre>
+		<td valign="top"><p><span class="cli">alert</span> komutu bildiğimiz uyarı penceresini gösterir; pencerede öntanımlı bir simge, açıklama metni ve üç taneye kadar düğme bulunur. Basılan düğmenin başlığını ve bir çıkış kodu döndürür (0 ile başlar). Örneğin:</p>
+<pre class="terminal">alert --idea "FantasticApp(tm) başarıyla yüklendi! \
+Bir bağlantı yapılmasını ister misiniz?" "Masaüstü'nde" "Masaüstü Çubuğu'nda" "Kalsın, almayayım"</pre>
 <p><img src="../images/apps-images/cli-alert.png" alt="cli-alert.png" /></p>
 </td></tr>
 <tr><td><p><span class="cli">filepanel</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">filepanel</span> displays a load or save file panel and lets the user choose a file or location. As a return value you'll get the chosen file or folder's path. There are several parameters available, for example to set a starting directory, a window title, a default name when saving or restrictions to the allowed types of files. This is an example of</p>
+		<td valign="top"><p><span class="cli">filepanel</span> bir yükle veya kaydet paneli görüntüler ve kullanıcının bir dosya veya konum seçmesine olanak verir. Dönüş değeri olarak seçili dosyayı veya konumu döndürür. Parametre olarak bir başlangıç dizini, pencere başlığı veya bir dosyayı kaydederken veya sınırlandırırken öntanımlı bir ad verebilirsiniz. Aşağıdaki görsele ulaşmak için örnek olarak bu komutu kullanabilirsiniz:</p>
 <pre class="terminal">filepanel -s -t "Save your logfile" -d ~/config/settings -n Fantastic.log</pre>
 <p><img src="../images/apps-images/cli-filepanel.png" alt="cli-filepanel.png" /></p>
 </td></tr>
 <tr><td><p><span class="cli">hey</span></p></td><td style="width:10px;"> </td>
-<td valign="top"><p><span class="cli">hey</span> is a littler helper tool that sends BMessages to applications and prints out their answer. It can be used for application scripting, i.e. "remote controlling" a program from a script or the command line. Its usage is a bit complex... <a href="https://www.haiku-os.org/blog/humdinger/2017-11-05_scripting_the_gui_with_hey/">Humdinger's blog post</a> serves as a good introduction, and thanks to Scot Hacker's BeOS Bible, there is a much more comprehensive <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting6.html">hey tutorial</a> by Chris Herborth.</p>
+<td valign="top"><p><span class="cli">hey</span>, uygulamalara BMessage gönderen ve yanıtlarını yazdıran ufak bir yardımcı izlencedir. Bir uygulamayı betik yardımıyla veya komut satırından kullanılmasına (diğer bir tanımla uzaktan denetimine) izin verir. Kullanımı biraz karmaşık gelebilir; ancak <a href="https://www.haiku-os.org/blog/humdinger/2017-11-05_scripting_the_gui_with_hey/">Humdinger'in günlük yazısı</a> iyi bir başlangıç materyali olabilir. Chris Herborth tarafından yazılan çok daha ayrıntılı bir <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting6.html">hey öğreticisi</a> de BeBook içinde bulunmaktadır.</p>
 </td></tr>
 <tr><td><p><span class="cli">notify</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">notify</span> shows a notification panel with a message. There are various parameters that are described when you call <span class="cli">notify --help</span>. A notification can also be used to show the progress of some action. When doing that, it's important to set a <i>messageID</i> and always use it when you update the progress (a float between 0.0 and 1.0 that's printed as percent). Otherwise you'll see several notification panels if you update quicker then the set timeout.<br />
@@ -120,7 +121,7 @@ An example:</p>
 </td></tr></table>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="cli-other" name="cli-other">Other commands</a></h3>
+<a id="cli-other" name="cli-other">Diğer komutlar</a></h3>
 
 <table summary="scripting cli tools" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><p><span class="cli">checkfs</span></p></td><td style="width:10px;"> </td>

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2013, Haiku. All rights reserved.
+ * Copyright 2010-2021, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -23,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Käyttäjäopas</span></div>
 </div>
 
 <div class="nav">
@@ -35,6 +35,7 @@
 <li><a href="../../de/applications/webpositive.html">Deutsch</a></li>
 <li><a href="../../en/applications/webpositive.html">English</a></li>
 <li><a href="../../es/applications/webpositive.html">Español</a></li>
+<li><a href="../../eo/applications/webpositive.html">Esperanto</a></li>
 <li><a href="../../fr/applications/webpositive.html">Français</a></li>
 <li><a href="../../fur/applications/webpositive.html">Furlan</a></li>
 <li><a href="../../it/applications/webpositive.html">Italiano</a></li>
@@ -76,10 +77,10 @@ Ikkunan pohjalla on tilapalkki, joka näyttää ladattavana olevan sivun verkko-
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Asetukset</h2>
 <p><span class="menu">Ikkuna</span>-valikosta voit avata <span class="menu">Asetukset</span>-paneelin muutamia WebPositiven tärkeitä asetuksia varten.</p>
 <img src="../images/apps-images/webpositive-settings.png" alt="webpositive-settings.png" />
-<p>Ensimmäisessä välilehdessä käsitellään yleisasetuksia: Mitä tiedosto tai verkko-osoite palvelee <span class="menu">Aloitussivu</span>na, mitä käytetään <span class="menu">Etsintäsivu</span>na, mitä <span class="menu">Latauskansio</span>na netistä saatavaa materiaalia varten.<br />
-Kaksi ponnahdusvalikko sallii sinun päättää, että mitä sivua ladata - jos mitään - kun avataan uusi ikkuna tai välilehti.<br />
+<p>Ensimmäisessä välilehdessä käsitellään yleisasetuksia: Mikä tiedosto tai verkko-osoite palvelee <span class="menu">Aloitussivu</span>na, mitä käytetään <span class="menu">Etsintäsivu</span>na, mitä <span class="menu">Latauskansio</span>na netistä saatavaa materiaalia varten.<br />
+Kaksi ponnahdusvalikkoa sallii sinun päättää, että mitä sivua ladata - jos mitään - kun avataan uusi ikkuna tai välilehti.<br />
 Seuraavien valintaruutujen kautta vältät näyttämästä välilehtipalkkia, jos avoinna on vain yksi sivu. WebPositiven käyttöliittymä voidaan ohjata piiloutumaan automaattisesti kokonäyttötilassa, ja hiiren osoitin piilotetaan automaattisesti, jos hiirtä ei vähään aikaan siirretä.<br />
-Lopuksi voit päättää sisällyttää "Koti"-painikkeen navigointipalkkiin ja asettaa niiden päivien lukumäärän, joina selaina muistaa historiassaan vieraillut sivut.</p>
+Lopuksi voit päättää sisällyttää "Koti"-painikkeen navigointipalkkiin ja asettaa niiden päivien lukumäärän, joina selain muistaa historiassaan vieraillut sivut.</p>
 <p>Toisessa välilehdessä voit valita vakio-, serif-, ei-serif- ja tasaväliset kirjasimet ja asettaa niiden oletuskoon.</p>
 <p>Viimeistä välilehteä käytetään välityspalvelimen asettamiseen.</p>
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Selataan</h2>
@@ -91,8 +92,19 @@ Lopuksi voit päättää sisällyttää "Koti"-painikkeen navigointipalkkiin ja 
 <li><p>Valikosta <span class="menu">Näkymä</span> voit <span class="menu">Lähentää</span> ja <span class="menu">Loitontaa</span> sivua. Valittavana on myös <span class="menu">Laajenna vain tekstiä</span>, mikä jättää kuvat alkuperäisen kokoisiksi.</p></li>
 <li><p>Jos vaihdat kokonäyttötilaan ja käyttöliittymän piilotusasetus on aktivoitu, käyttöliittymä katoaa sekunnin kuluttua. Se liukuu takaisin näkyviin yksinkertaisesti liikuttamalla hiiren osoitinta näytön yllä.</p></li>
 <li><img src="../images/apps-images/webpositive-locator.png" alt="webpositive-locator.png" />
-<p>Kun kirjoitat sijaintitekstikenttään, selain täsmää merkkijonon webbisivuosoitteisiin, joilla olet vieraillut aiemmin ja luettelee ne tekstikentän alapuolella. Voit joka jatkaa kirjainten lisäämistä lyhentääksesi mahdollisten sivujen luettelon, tai valita rivi näppäimellä <span class="key">↑</span> tai näppäimellä <span class="key">↓</span>. <span class="key">ENTER</span>-näppäin lataa valitun sivun. Voit myös käyttää oikeanpuoleisinta painiketta sivun uudelleenlataamiseen.<br />
-Google etsii ne merkkijonot, joita ei tunnisteta verkko-osoitteiksi, joten sijaintikenttä nopeuttaa pikaisen webbihaun.</p></li>
+<p>Kun kirjoitat sijaintitekstikenttään, selain täsmää merkkijonon webbisivuosoitteisiin, joilla olet vieraillut aiemmin ja luettelee ne tekstikentän alapuolella. Voit joko jatkaa kirjainten lisäämistä lyhentääksesi mahdollisten sivujen luettelon tai valita rivi näppäimellä <span class="key">↑</span> tai näppäimellä <span class="key">↓</span>. <span class="key">ENTER</span>-näppäin lataa valitun sivun. Voit myös käyttää oikeanpuoleisinta painiketta sivun uudelleenlataamiseen.<br />
+Merkkijonoja, joita ei tunnisteta webbiosoitteiksi, etsitään hakukoneella, joka on asetettu WebPositiven asetuksissa, joten sijaintitekstikenttä kaksinkertaistaa webbihakujen nopeat haut.</p>
+<div class="box-info"><p>WebPositive tukee pikakoodeja, jotka ohjaavat termit eri hakukoneisiin. Kirjoita vain yksimerkkinen koodi, jota seuraa hakutermisi.</p>
+<ul>
+<li>"g” Google-haku</li>
+<li>“b” Bing-haku</li>
+<li>“w” Wikipedia-haku</li>
+<li>“d” DuckDuckGo-haku</li>
+<li>“a” Baiku-haku</li>
+<li>“y” Yandex-haku</li>
+<li>“e” Ecosia-haku</li>
+<li>“q” Qwant-haku</li>
+</ul></div></li>
 <li><p>Napsautettavasta kohteesta riippuen hiiren kakkospainike avaa asiayhteysvalikon, jossa on linkki uuteen ikkunaan tai välilehteen, kohteen lataukseen jne.</p></li>
 <li><p><span class="menu">Muokkaa | Etsi</span> näyttää etsintäpalkin sivun alalaidassa sivun sisäisen etsinnän käynnistämiseksi. Hakuosumat korostetaan sivulla.</p></li>
 </ul>

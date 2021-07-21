@@ -12,6 +12,7 @@
  * Translators:
  *		Humdinger
  *		Pengphei Han
+ *		Máximo Castañeda
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -24,7 +25,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>用户指南</span></div>
 </div>
 
 <div class="nav">
@@ -36,6 +37,7 @@
 <li><a href="../de/contents.html">Deutsch</a></li>
 <li><a href="../en/contents.html">English</a></li>
 <li><a href="../es/contents.html">Español</a></li>
+<li><a href="../eo/contents.html">Esperanto</a></li>
 <li><a href="../fr/contents.html">Français</a></li>
 <li><a href="../fur/contents.html">Furlan</a></li>
 <li><a href="../it/contents.html">Italiano</a></li>
@@ -59,11 +61,11 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
+<div class="box-info">本节的翻译还未完成。在未完成之前，所有的未完成部分都将使用英语原文。</div>
 
 <h1>欢迎使用Haiku用户指南</h1>
 
-<p>接下来，您将看到的是有关Haiku最重要方面的文档 。当然，该文档的完善和扩充是一个渐进的过程（您可以查阅<a href="http://www.haiku-os.org/docs/userguide/en/contents.html">在线版本</a>来获取更新的页面和翻译）。如果您发现了其中的错误，希望给出建议，甚至愿意提供贡献，您可以发送邮件到<a href="http://www.freelists.org/list/haiku-doc">文档邮件列表</a>。如果您对文档的翻译感兴趣，您可以在 <a href="http://dev.haiku-os.org/wiki/i18n/UserGuide">i18n用户指南维基</a> 中找到相关的信息。</p>
+<p>接下来，您将看到的是有关Haiku最重要方面的文档 。当然，该文档的完善和扩充是一个渐进的过程（您可以查阅<a href="http://www.haiku-os.org/docs/userguide/zh_CN/contents.html">在线版本</a>来获取更新的页面和翻译）。如果您发现了其中的错误，希望给出建议，甚至愿意提供贡献，您可以发送邮件到<a href="http://www.freelists.org/list/haiku-doc">文档邮件列表</a>。如果您对文档的翻译感兴趣，您可以在 <a href="http://dev.haiku-os.org/wiki/i18n/UserGuide">i18n用户指南维基</a> 中找到相关的信息。</p>
 <p><br /></p>
 <table summary="contents" border="1" rules="rows" frame="void" cellpadding="10" cellspacing="0" style="border: dotted thin #e0e0e0">
 <!-- Excluded until it's further fleshed out
@@ -76,13 +78,7 @@
 		<li><a href="installation.html#transfer-data">Transfering data to/from a Haiku installation</a></li></ul></td>
 		<td valign="top">Step by step guides covering Haiku installation during the (pre-) alpha release phase.</td></tr>
 -->
-	<tr><td valign="top"><a href="bootloader.html">引导程序</a></td>
-		<td valign="top">设置安全的启动选项，解决系统配置问题。</td></tr>
-	<tr><td valign="top"><a href="filesystem-layout.html">文件系统布局</a><ul>
-		<li><a href="filesystem-layout.html#system">system 文件夹</a>
-</li>
-		<li><a href="filesystem-layout.html#home"> home 文件夹</a></li></ul></td>
-		<td valign="top">理解文件系统层次，熟悉重要的文件位置和文件夹。</td></tr>
+
 	<tr><td valign="top"><a href="gui.html">Haiku 图形用户界面</a><ul>
     <li><a href="gui.html#move-resize">移动和自定义窗口大小</a></li>
     <li><a href="gui.html#stack-tile">窗口堆叠</a></li>
@@ -91,13 +87,79 @@
 		<a href="gui.html#favorites-recent">- 收藏和最近文件</a></li>
 		<li><a href="gui.html#replicants">程序副本</a></li></ul></td>
 		<td valign="top">了解Haiku图形用户界面的基本元素。</td></tr>
-	<tr><td valign="top"><a href="keyboard-shortcuts.html">Shortcuts and key combinations</a><ul>
-		<li><a href="keyboard-shortcuts.html#general">General shortcuts</a></li>
-		<li><a href="keyboard-shortcuts.html#textediting">Textediting shortcuts</a></li>
-		<li><a href="keyboard-shortcuts.html#tracker-navigation">Shortcuts for Tracker navigation</a></li>
-		<li><a href="keyboard-shortcuts.html#terminal">Shortcuts in Terminal</a></li>
-		<li><a href="keyboard-shortcuts.html#other-combos">Other key combinations</a></li></ul></td>
-		<td valign="top">介绍了通用的快捷键，利用它们可以加快您的工作进程。</td></tr>
+
+	<tr><td valign="top"><a href="deskbar.html">桌面栏</a><ul>
+		<li><a href="deskbar.html#deskbar-menu">桌面栏菜单</a></li>
+		<li><a href="deskbar.html#tray">系统托盘</a></li>
+		<li><a href="deskbar.html#list-of-apps">运行程序列表</a></li></ul></td>
+		<td valign="top">介绍了如何使用和配置Haiku上的“开始”菜单和任务栏。</td></tr>
+
+	<tr><td valign="top"><a href="tracker.html">文件浏览器</a><ul>
+		<li><a href="tracker.html#mounting-volumes">挂载磁卷</a></li>
+		<li><a href="tracker.html#navigating">浏览导航</a></li>
+		<li><a href="tracker.html#appearance">显示设置</a></li>
+		<li><a href="tracker.html#tracker-preferences">偏好设置</a></li>
+		<li><a href="tracker.html#working-with-files">处理文件</a></li>
+		<li><a href="tracker.html#transaction-status">状态信息</a></li>
+		<li><a href="tracker-add-ons.html">附加组件</a></li></ul></td>
+		<td valign="top">了解文件导航，文件和文件夹的处理，以及如何配置Haiku的文件管理器。</td></tr>
+
+	<tr><td valign="top"><a href="applications.html">Applications</a><ul>
+		<li><a href="applications.html#hpkg">Haiku packages (.hpkg)</a></li>
+		<li><a href="applications.html#beos_apps">Old BeOS archives (.zip and .pkg)</a></li>
+		<li><a href="applications.html#list-of-apps">Haiku's applications</a></li></ul></td>
+		<td>学习如何安装和卸载程序和如何使用 Haiku 自带的程序。</td></tr>
+
+	<tr><td colspan="2"><table align="center"><tr><td>
+			<a href="applications/activitymonitor.html">ActivityMonitor</a><br />
+			<a href="applications/bootmanager.html">BootManager</a><br />
+			<a href="applications/charactermap.html">CharacterMap</a><br />
+			<a href="applications/codycam.html">CodyCam</a><br />
+			<a href="applications/debugger.html">Debugger</a><br />
+			<a href="applications/deskcalc.html">DeskCalc</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="applications/diskprobe.html">DiskProbe</a><br />
+			<a href="applications/diskusage.html">DiskUsage</a><br />
+			<a href="applications/drivesetup.html">DriveSetup</a><br />
+			<a href="applications/expander.html">Expander</a><br />
+			<a href="applications/haikudepot.html">HaikuDepot</a><br />
+			<a href="applications/icon-o-matic.html">Icon-O-Matic</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="applications/installer.html">Installer</a><br />
+			<a href="applications/magnify.html">Magnify</a><br />
+			<a href="applications/mail.html">Mail</a><br />
+			<a href="applications/mediaplayer.html">MediaPlayer</a><br />
+			<a href="applications/midiplayer.html">MidiPlayer</a><br />
+			<a href="applications/packageinstaller.html">LegacyPackageInstaller</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="applications/people.html">People</a><br />
+			<a href="applications/poorman.html">PoorMan</a><br />
+			<a href="applications/screenshot.html">Screenshot</a><br />
+			<a href="applications/showimage.html">ShowImage</a><br />
+			<a href="applications/softwareupdater.html">SoftwareUpdater</a><br />
+			<a href="applications/soundrecorder.html">SoundRecorder</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="applications/stylededit.html">StyledEdit</a><br />
+			<a href="applications/terminal.html">Terminal</a><br />
+			<a href="applications/textsearch.html">TextSearch</a><br />
+			<a href="applications/tv.html">TV</a><br />
+			<a href="applications/webpositive.html">WebPositive</a></td></tr>
+		</table>
+	</td></tr>
+
+	<tr><td valign="top"><ul>
+		<li><a href="applications.html#cli-apps">Haiku's commandline applications</a></li>
+		<li><a href="applications.html#list-of-bundled-apps">Bundled applications</a></li>
+		<ul><li><a href="applications/bepdf.html">- BePDF</a></li>
+			<li><a href="applications/pe.html">- Pe</a></li>
+			<li><a href="applications/vision.html">- Vision</a></li>
+			<li><a href="applications/wonderbrush.html">- WonderBrush</a></li></ul>
+	</ul></td><td></td></tr>
+
 	<tr><td valign="top"><a href="workspaces.html">工作区</a><ul>
 		<li><a href="workspaces.html#switching">工作区的切换</a></li>
 		<li><a href="desktop-applets/workspaces.html#applet">工作区小程序</a></li>
@@ -108,20 +170,69 @@
 		<td valign="top">在运行中的程序之间进行切换。</td></tr>
 	<tr><td valign="top"><a href="teammonitor.html">程序监控器</a></td>
 		<td valign="top">关闭未响应的程序或者系统组件。</td></tr>
-	<tr><td valign="top"><a href="tracker.html">文件浏览器</a><ul>
-		<li><a href="tracker.html#mounting-volumes">挂载磁卷</a></li>
-		<li><a href="tracker.html#navigating">浏览导航</a></li>
-		<li><a href="tracker.html#appearance">显示设置</a></li>
-		<li><a href="tracker.html#tracker-preferences">偏好设置</a></li>
-		<li><a href="tracker.html#working-with-files">处理文件</a></li>
-		<li><a href="tracker.html#transaction-status">状态信息</a></li>
-		<li><a href="tracker-add-ons.html">附加组件</a></li></ul></td>
-		<td valign="top">了解文件导航，文件和文件夹的处理，以及如何配置Haiku的文件管理器。</td></tr>
-	<tr><td valign="top"><a href="deskbar.html">桌面栏</a><ul>
-		<li><a href="deskbar.html#deskbar-menu">桌面栏菜单</a></li>
-		<li><a href="deskbar.html#tray">系统托盘</a></li>
-		<li><a href="deskbar.html#list-of-apps">运行程序列表</a></li></ul></td>
-		<td valign="top">介绍了如何使用和配置Haiku上的“开始”菜单和任务栏。</td></tr>
+
+	<tr><td valign="top"><a href="keyboard-shortcuts.html">Shortcuts and key combinations</a><ul>
+		<li><a href="keyboard-shortcuts.html#general">General shortcuts</a></li>
+		<li><a href="keyboard-shortcuts.html#textediting">Textediting shortcuts</a></li>
+		<li><a href="keyboard-shortcuts.html#tracker-navigation">Shortcuts for Tracker navigation</a></li>
+		<li><a href="keyboard-shortcuts.html#terminal">Shortcuts in Terminal</a></li>
+		<li><a href="keyboard-shortcuts.html#other-combos">Other key combinations</a></li></ul></td>
+		<td valign="top">介绍了通用的快捷键，利用它们可以加快您的工作进程。</td></tr>
+
+	<tr><td valign="top"><a href="desktop-applets.html">Desktop Applets</a><ul>
+			<li><a href="desktop-applets/launchbox.html">LaunchBox</a></li>
+			<li><a href="desktop-applets/networkstatus.html">NetworkStatus</a></li>
+			<li><a href="desktop-applets/powerstatus.html">PowerStatus</a></li>
+			<li><a href="desktop-applets/processcontroller.html">ProcessController</a></li>
+			<li><a href="desktop-applets/workspaces.html">Workspaces</a></li></ul></td>
+		<td>用于安装到桌面和桌面栏中的小工具。</td></tr>
+
+	<tr><td valign="top"><a href="preferences.html">Preferences</a></td>
+		<td>系统配置和相关设置程序</td></tr>
+	<tr><td colspan="2"><table align="center"><tr><td>
+			<a href="preferences/appearance.html">Appearance</a><br />
+			<a href="preferences/backgrounds.html">Backgrounds</a><br />
+			<a href="preferences/datatranslations.html">DataTranslations</a><br />
+			<a href="preferences/deskbar.html">Deskbar</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="preferences/e-mail.html">E-mail</a><br />
+			<a href="preferences/filetypes.html">FileTypes</a><br />
+			<a href="preferences/input.html">Input</a><br />
+			<a href="preferences/keymap.html">Keymap</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="preferences/locale.html">Locale</a><br />
+			<a href="preferences/media.html">Media</a><br />
+			<a href="preferences/network.html">Network</a><br />
+			<a href="preferences/printers.html">Printers</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="preferences/repositories.html">Repositories</a><br />
+			<a href="preferences/screen.html">Screen</a><br />
+			<a href="preferences/screensaver.html">ScreenSaver</a><br />
+			<a href="preferences/shortcuts.html">Shortcuts</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="preferences/sounds.html">Sounds</a><br />
+			<a href="preferences/time.html">Time</a><br />
+			<a href="preferences/tracker.html">Tracker</a><br />
+			<a href="preferences/virtualmemory.html">VirtualMemory</a></td></tr>
+		</table>
+		</td></tr>
+<!--
+	<tr><td valign="top"><a href="demos.html">Demos</a></td>
+		<td>Games and demo applications.</td></tr>
+-->
+	<tr><td valign="top"><a href="queries.html">Queries</a><ul>
+		<li><a href="queries.html#find-window">The Find window</a></li>
+		<li><a href="queries.html#basic-query">Basic queries - "by Name"</a></li>
+		<li><a href="queries.html#adv-query">Advanced queries - "by Attribute"</a></li>
+		<li><a href="queries.html#more-adv-query">Even more advanced queries - "by Formula"</a></li>
+		<li><a href="queries.html#result-window">The result window</a></li>
+		<li><a href="queries.html#query-template">Query Templates</a></li></ul></td>
+		<td valign="top">使用 Haiku 轻量级的快速查询，快速找出所需内容。</td></tr>
+
 	<tr><td valign="top"><a href="filetypes.html">文件类型</a><ul>
 		<li><a href="filetypes.html#filetype">文件类型</a></li>
 		<li><a href="filetypes.html#preferred-app">首选程序</a></li>
@@ -129,106 +240,35 @@
 		<li><a href="filetypes.html#settings-apps">程序的特殊设置</a></li>
 		<li><a href="filetypes.html#filetypes-preferences">文件类型首选项的全局设置</a></li></ul></td>
 		<td valign="top">设置默认关联程序，修改文件类型，创建自己的文件类型。</td></tr>
+
 	<tr><td valign="top"><a href="attributes.html">属性</a><ul>
 		<li><a href="attributes.html#attributes-tracker">文件浏览器中的属性</a></li>
 		<li><a href="attributes.html#attributes-terminal">终端中的属性</a></li></ul></td>
-		<td valign="top">Haiku的主要特性之一，可以让您添加和管理文件相关的任何类型数据。</td></tr>		
+		<td valign="top">Haiku的主要特性之一，可以让您添加和管理文件相关的任何类型数据。</td></tr>
+
 	<tr><td valign="top"><a href="index.html">索引</a></td>
 		<td>利用索引来实现属性的查找。</td></tr>
-	<tr><td valign="top"><a href="queries.html">查询</a><ul>
-		<li><a href="queries.html#find-window">查找窗口</a></li>
-		<li><a href="queries.html#basic-query">基本查询 - "使用文件名"</a></li>
-		<li><a href="queries.html#adv-query">标准查询 - "使用属性"</a></li>
-		<li><a href="queries.html#more-adv-query">高级查询 - "使用表达式</a></li>
-		<li><a href="queries.html#result-window">结果窗口</a></li>
-		<li><a href="queries.html#query-template">查询模板</a></li>
-</ul></td>
-		<td valign="top">使用 Haiku 轻量级的快速查询，快速找出所需内容。</td></tr>
+
+	<tr><td valign="top"><a href="filesystem-layout.html">文件系统布局</a><ul>
+		<li><a href="filesystem-layout.html#system">system 文件夹</a>
+</li>
+		<li><a href="filesystem-layout.html#home"> home 文件夹</a></li></ul></td>
+		<td valign="top">理解文件系统层次，熟悉重要的文件位置和文件夹。</td></tr>
+
 	<tr><td valign="top"><a href="workshop-filetypes+attributes.html">操作练习：文件类型，属性，索引，和查询</a></td>
 		<td valign="top">通过组织您的 DVD，学习使用 Haiku 的一些重要特性。</td></tr>
+
 	<tr><td valign="top"><a href="workshop-email.html">操作练习：邮箱管理</a></td>
 		<td valign="top">学习使用 Haiku 邮件系统自定义状态和查询。</td></tr>
+
 	<tr><td valign="top"><a href="workshop-wlan.html">操作练习： 无线网络</a></td>
 		<td valign="top">设置您的开放或者加密无限网络。</td></tr>
-	<tr><td valign="top"><a href="applications.html">应用程序</a><ul>
-		<li><a href="applications.html#hpkg">Haiku 软件包（.hpkg）</a></li>
-		<li><a href="applications.html#beos_apps">BeOS 遗留安装包（.zip and .pkg）</a></li>
-		<li><a href="applications.html#list-of-apps">Haiku 应用程序</a></li>
-<ul>
-			<li><a href="applications/activitymonitor.html">系统监视器</a></li>
-			<li><a href="applications/bootmanager.html">引导管理器</a></li>
-			<li><a href="applications/charactermap.html">字符映射表</a></li>
-			<li><a href="applications/codycam.html">摄像头</a></li>
-			<li><a href="applications/debugger.html">调试器</a></li>
-			<li><a href="applications/deskcalc.html">计算器</a></li>
-			<li><a href="applications/diskprobe.html">磁盘扫描器</a></li>
-			<li><a href="applications/diskusage.html">磁盘查看器</a></li>
-			<li><a href="applications/drivesetup.html">磁盘管理器</a></li>
-			<li><a href="applications/expander.html">归档管理器</a></li>
-			<li><a href="applications/haikudepot.html">HaikuDepot</a></li>
-			<li><a href="applications/icon-o-matic.html">图标套件</a></li>
-			<li><a href="applications/installer.html">系统安装器</a></li>
-			<li><a href="applications/magnify.html">放大镜</a></li>
-			<li><a href="applications/mail.html">电子邮件</a></li>
-			<li><a href="applications/mediaplayer.html">媒体播放器</a></li>
-			<li><a href="applications/midiplayer.html">Midi播放器</a></li>
-			<li><a href="applications/packageinstaller.html">LegacyPackageInstaller</a></li>
-			<li><a href="applications/people.html">联系人</a></li>
-			<li><a href="applications/poorman.html">PoorMan</a></li>
-			<li><a href="applications/screenshot.html">Screenshot</a></li>
-			<li><a href="applications/showimage.html">ShowImage</a></li>
-			<li><a href="applications/softwareupdater.html">SoftwareUpdater</a></li>
-			<li><a href="applications/soundrecorder.html">SoundRecorder</a></li>
-			<li><a href="applications/stylededit.html">StyledEdit</a></li>
-			<li><a href="applications/terminal.html">终端</a></li>
-			<li><a href="applications/textsearch.html">TextSearch</a></li>
-			<li><a href="applications/tv.html">电视</a></li>
-			<li><a href="applications/webpositive.html">WebPositive</a></li>
-		</ul>
-		<li><a href="applications.html#cli-apps">Haiku 命令行程序</a></li>
-		<li><a href="applications.html#list-of-bundled-apps">绑定程序</a></li></ul></td>
-		<td>学习如何安装和卸载程序和如何使用 Haiku 自带的程序。</td></tr>
-	<tr><td valign="top"><a href="desktop-applets.html">桌面小程序</a>
-           <ul>
-			<li><a href="desktop-applets/launchbox.html">启动栏</a></li>
-			<li><a href="desktop-applets/networkstatus.html">网络状态</a></li>
-			<li><a href="desktop-applets/powerstatus.html">电源状态</a></li>
-			<li><a href="desktop-applets/processcontroller.html">进程控制器</a></li>
-			<li><a href="desktop-applets/workspaces.html">工作区</a></li>
-		</ul></td>
-		<td>用于安装到桌面和桌面栏中的小工具。</td></tr>
-	<tr><td valign="top"><a href="preferences.html">首选项</a>
-		<ul>
-			<li><a href="preferences/appearance.html">外观</a></li>
-			<li><a href="preferences/backgrounds.html">背景</a></li>
-			<li><a href="preferences/datatranslations.html">数据转换</a></li>
-			<li><a href="preferences/deskbar.html">桌面栏</a></li>
-			<li><a href="preferences/e-mail.html">电子邮件</a></li>
-			<li><a href="preferences/filetypes.html">文件类型</a></li>
-			<li><a href="preferences/keyboard.html">键盘</a></li>
-			<li><a href="preferences/keymap.html">按键映射</a></li>
-			<li><a href="preferences/locale.html">本地化</a></li>
-			<li><a href="preferences/media.html">多媒体</a></li>
-			<li><a href="preferences/mouse.html">鼠标</a></li>
-			<li><a href="preferences/network.html">网络</a></li>
-			<li><a href="preferences/printers.html">打印机</a></li>
-			<li><a href="preferences/repositories.html">软件仓库</a></li>
-			<li><a href="preferences/screen.html">屏幕</a></li>
-			<li><a href="preferences/screensaver.html">屏幕保护</a></li>
-			<li><a href="preferences/shortcuts.html">快捷键</a></li>
-			<li><a href="preferences/sounds.html">声音</a></li>
-			<li><a href="preferences/time.html">时间</a></li>
-			<li><a href="preferences/tracker.html">文件浏览器</a></li>
-			<li><a href="preferences/touchpad.html">触摸板</a></li>
-			<li><a href="preferences/virtualmemory.html">虚拟内存</a></li>
-		</ul></td>
-		<td>系统配置和相关设置程序</td></tr>
-<!--
-	<tr><td valign="top"><a href="demos.html">Demos</a></td>
-		<td>Games and demo applications.</td></tr>
--->
+
 	<tr><td valign="top"><a href="bash-scripting.html">Bash和脚本</a></td>
 		<td>了解系统中所使用的一些有趣脚本以及有关Shell和脚本使用的网络资源。</td></tr>
+
+	<tr><td valign="top"><a href="bootloader.html">引导程序</a></td>
+		<td valign="top">设置安全的启动选项，解决系统配置问题。</td></tr>
 </table>
 
 </div>

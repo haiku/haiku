@@ -18,7 +18,7 @@
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Workshop: filetype, attributi, indici e query</title>
+	<title>Workshop: tipi di file, attributi, indici e interrogazioni</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
@@ -37,6 +37,7 @@
 <li><a href="../de/workshop-filetypes+attributes.html">Deutsch</a></li>
 <li><a href="../en/workshop-filetypes+attributes.html">English</a></li>
 <li><a href="../es/workshop-filetypes+attributes.html">Español</a></li>
+<li><a href="../eo/workshop-filetypes+attributes.html">Esperanto</a></li>
 <li><a href="../fr/workshop-filetypes+attributes.html">Français</a></li>
 <li><a href="../fur/workshop-filetypes+attributes.html">Furlan</a></li>
 <li><a href="../hu/workshop-filetypes+attributes.html">Magyar</a></li>
@@ -54,7 +55,7 @@
 <li><a href="../jp/workshop-filetypes+attributes.html">日本語</a></li>
 </ul>
 <span>
- «  <a href="queries.html">Le query</a> 
+ «  <a href="queries.html">Le interrogazioni</a> 
 ::  <a href="contents.html" class="uplink">Contenuti</a> 
 ::  <a href="applications.html">Applicazioni</a>  »
 </span></div>
@@ -81,14 +82,14 @@
 </td></tr>
 </table>
 
-<h1>Workshop: filetype, attributi, indici e query</h1>
+<h1>Workshop: tipi di file, attributi, indici e interrogazioni</h1>
 
-<p>Questo è un workshop, una sezione in cui verrà mostrato l'uso degli <a href="attributes.html">Attributi</a>, delle <a href="queries.html">Query</a>, dell'<a href="index.html">Indice del filesystem</a> e dei <a href="filetypes.html">Filetype</a>. Si costruirà a titolo di esempio un database per tenere traccia di una collezione di DVD.</p>
+<p>Questo è un workshop, una sezione in cui verrà mostrato l'uso degli <a href="attributes.html">Attributi</a>, delle <a href="queries.html">Interrogazioni</a>, dell'<a href="index.html">Indice del filesystem</a> e dei <a href="filetypes.html">Tipi di File</a>. Si costruirà a titolo di esempio un database per tenere traccia di una collezione di DVD.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="preparations" name="preparations">Preparativi</a></h2>
-<p>Innanzi tutto, devi decidere di che attributi e tipo di file hai necessità. All'inizio, l'idea era di usare un file di segnalibri con i collegamenti al sito IMdB, ma all'epoca il browser di Haiku non aveva il supporto per i bookmark a differenza di <span class="app">NetPositive</span>, il browser del BeOS. La soluzione (più ragionevole) che è stata scelta è allora la seguente: il file sarà un'immagine JPEG che rappresenta la copertina del film.<br />
+<p>Innanzi tutto, devi decidere di che attributi e tipo di file hai necessità. All'inizio, l'idea era di usare un file di segnalibri con i collegamenti al sito IMdB, ma all'epoca il browser di Haiku non aveva il supporto per i segnalibri a differenza di <span class="app">NetPositive</span>, il browser del BeOS. La soluzione (più ragionevole) che è stata scelta è allora la seguente: il file sarà un'immagine JPEG che rappresenta la copertina del film.<br />
 <span class="app">WebPositive</span> adesso supporta i file di segnalibri, così l'idea iniziale può ora, se preferisci, essere realizzata.<br />
 In ogni caso, andremo ad aggiungere al file un paio di attributi. È in questa fase in cui dovremo decidere se vogliamo riservarci la possibilità di interrogare il file successivamente (e in questo caso dovremo aggiungerlo all'indice) e, in caso affermativo, stabilire di che tipo saranno i nuovi attributi. Ricorda che i numeri (int, float) possono essere valutati differentemente dal testo (&lt;/=/&gt; oppure is/contains/starts with).</p>
 <p>Ecco alcuni attributi utili per classificare i DVD:</p>
@@ -148,7 +149,7 @@ In ogni caso, andremo ad aggiungere al file un paio di attributi. È in questa f
 <ul>
 <li><p><i>Nome Attributo</i> - Appare, ad esempio, come colonna in alto nella finestra di Tracker.</p></li>
 <li><p><i>Nome Interno</i> - È utilizzato per indicizzare l'attributo.</p></li>
-<li><i>Type</i> - Definisce che tipo di valore può essere conservato dall'attributo e come può essere richiesto attraverso un'interrogazione.
+<li><i>Tipo</i> - Definisce che tipo di valore può essere conservato dall'attributo e come può essere richiesto attraverso un'interrogazione.
     <ul>
     <li><span class="menu">Stringa</span> per il semplice testo</li>
     <li><span class="menu">Booleano</span> per dati binari: 0 oppure 1</li>
@@ -195,7 +196,7 @@ In ogni caso, andremo ad aggiungere al file un paio di attributi. È in questa f
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="indexing" name="indexing">Indicizzazione</a></h2>
-<p>Prima di iniziare con l'immissione dei dati nel piccolo database dei DVD, è necessario aggiungere gli attributi all'<a href="index.html">Indice</a>, solo gli attributi indicizzati potranno essere raggiunti da Haiku tramite una <a href="queries.html">Query</a>.<br />
+<p>Prima di iniziare con l'immissione dei dati nel piccolo database dei DVD, è necessario aggiungere gli attributi all'<a href="index.html">Indice</a>, solo gli attributi indicizzati potranno essere raggiunti da Haiku tramite una <a href="queries.html">Interrogazione</a>.<br />
 Allora, cosa si dovrà cercare in futuro? Probabilmente non ci si chiederà "Cosa c'è nella coordinata B4 dello scaffale?" o "In quale film la parola 'pope-shenooda' è contenuta nell'url di IMdB o nella trama?".</p>
 <p>Questa scelta porta a usare solo questi attributi:</p>
 <table summary="Attribute Type" cellpadding="10" border="1">
@@ -222,7 +223,7 @@ Dal momento che il file di base è l'immagine della copertina, ci si collegherà
 Maggiori informazioni sull'argomento sono reperibili nel capitolo sui <a href="filetypes.html">Tipi di File</a>.</p>
 <p>A questo punto è necessario attivare tutti gli attributi di DVDdb dal menù <span class="menu">Attributes</span> della finestra di Tracker e risistemare a piacere le colonne:</p>
 <img src="images/workshop-filetypes+attributes-images/filetypes-dvddb-empty.png" alt="filetypes-dvddb-empty.png" />
-<p>Cliccando su un attributo ancora vuoto (o premendo <span class="key">ALT</span> <span class="key">E</span>) si passa alla modalità per la modifica nella quale è possibile inserire ciascun attributo. E' possibile spostarsi tra gli attributi con la scorciatoia <span class="key">TAB</span> e <span class="key">SHIFT</span> <span class="key">TAB</span>.</p>
+<p>Cliccando su un attributo ancora vuoto (o premendo <span class="key">ALT</span> <span class="key">E</span>) si passa alla modalità per la modifica nella quale è possibile inserire ciascun attributo. È possibile spostarsi tra gli attributi con la scorciatoia <span class="key">TAB</span> e <span class="key">SHIFT</span> <span class="key">TAB</span>.</p>
 <p>Nell'esempio visto, solitamente si cominciava scaricando un file JPG e cambiando il suo filetype in applications/DVDdb. Esiste un altro metodo elegante per produrre analoghi risultati. Basta copiare un file vuoto che abbia il filetype desiderato in <span class="path">/boot/home/config/settings/Tracker/Tracker New Templates</span> e rinominarlo come DVDdb.</p>
 <p>Cliccando col tasto destro all'interno della finestra di Tracker ci sarà una nuova voce sotto <span class="menu">New...</span> accanto alla voce predefinita "New folder".</p>
 
@@ -230,9 +231,9 @@ Maggiori informazioni sull'argomento sono reperibili nel capitolo sui <a href="f
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="query-db" name="query-db">Effettuare interrogazioni al database</a></h2>
 <p>Dopo un paio d'ore di duro lavoro, si avrà un piccolo database nel quale è possibile ricercare tutti i film di Christina Ricci che hanno un bel 7+...</p>
-<p>È possibile determinare il layout dei risultati di uno specifico filetype.<br />
-Per fare questo aprire la cartella contenente i file DVDdb e sistemare a piacere i risultati come dovrebbero essere presentati. In fine copiare questo layout con <span class="menu">Attributi | Copia Layout</span>.</p>
-<p>Continuando, aprire la cartella <span class="path">/boot/home/config/settings/Tracker/DefaultQueryTemplates</span>, creandone una nuova e rinominandola <i>group/filetype</i>, rimpiazzando il carattere slash con degli underscore; nel nostro caso sarà "applications_DVDdb".</p>
+<p>È possibile determinare il layout dei risultati di uno specifico tip di file.<br />
+Per fare questo aprire la cartella contenente i file DVDdb e sistemare a piacere i risultati come dovrebbero essere presentati. Infine copiare questo layout con <span class="menu">Attributi | Copia Layout</span>.</p>
+<p>Open <span class="path">/boot/home/config/settings/Tracker/DefaultQueryTemplates</span>, create a new folder and rename it to <i>group/filetype</i>, replacing slashes with underscores; in our case "application_DVDdb".</p>
 <p>Per finire si apra una nuova cartella e ci si incolli il layout con <span class="menu">Attributi | Incolla Layout</span>. Ed ecco il risultato:</p>
 <img src="images/workshop-filetypes+attributes-images/query-dvddb.png" alt="query-dvddb.png" />
 
@@ -241,7 +242,7 @@ Per fare questo aprire la cartella contenente i file DVDdb e sistemare a piacere
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="queries.html">Le query</a> 
+ «  <a href="queries.html">Le interrogazioni</a> 
 ::  <a href="contents.html" class="uplink">Contenuti</a> 
 ::  <a href="applications.html">Applicazioni</a>  »
 </span></div>

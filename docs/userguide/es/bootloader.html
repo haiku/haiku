@@ -10,8 +10,10 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
+ *		'
  *		Humdinger
  *		kervas
+ *		Máximo Castañeda
  *		miguel~1.mx
  *		Oscar Carballal
  *
@@ -37,6 +39,7 @@
 <li><a href="../ca/bootloader.html">Català</a></li>
 <li><a href="../de/bootloader.html">Deutsch</a></li>
 <li><a href="../en/bootloader.html">English</a></li>
+<li><a href="../eo/bootloader.html">Esperanto</a></li>
 <li><a href="../fr/bootloader.html">Français</a></li>
 <li><a href="../fur/bootloader.html">Furlan</a></li>
 <li><a href="../it/bootloader.html">Italiano</a></li>
@@ -64,14 +67,14 @@
 
 <div id="content">
 <div>
-<div class="box-info">La traducción de esta página aún no está completa. Hasta que lo esté, las partes sin traducir se muestran en el inglés original.</div>
 
 <h1>Cargador de arranque</h1>
 
 <p>Las opciones del cargador de arranque de Haiku pueden ayudarle cuando experimente problemas de hardware o quiera elegir cual instalación de Haiku quiere iniciar, en caso que disponga de más de una (seguramente en un CD de instalación o unidad USB).<br />
 También viene muy bien para cuando ha instalado algún componente de software que muestra problemas, previniendo el arranque del sistema, vea <a href="#troubleshooting">Resolución de problemas</a> abajo.</p>
 <p>Para visualizar las opciones del cargador de arranque, hay que mantener presionada la techa <span class="key">Mayús</span> (SHIFT) antes del comienzo del proceso de arranque de Haiku. En de haber un administrador de arranque instalado, empiece a presionar la tecla antes de seleccionar Haiku desde el mismo. Si Haiku es el único sistema operativo instalado, empiece a presionar la tecla mientras se viualizan los mensajes de arranque del BIOS.</p>
-<div class="box-info">On computers that use UEFI for booting instead of the classic BIOS, you need to use the <span class="key">SPACEBAR</span> instead.</div>
+<div class="box-info">En algunos dispositivos deberá asegurarse que los teclados USB estén habilitados en el BIOS.<br />
+En computadoras que para arrancar usan UEFI en vez del antiguo BIOS, tendrá que usar la <span class="key">BARRA ESPACIADORA</span> en vez de la tecla <span class="key">MAYÚSCULAS</span>.</div>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="options" name="options">Opciones del Cargador de Arranque</a></h2>
@@ -82,37 +85,37 @@ También viene muy bien para cuando ha instalado algún componente de software q
 </td><td> </td><td>Existen muchas opciones para probarse en caso de que tenga un problema de hardware o si el sistema se vuelve inestable o no arranca debido a una extensión (add-on) con mal comportamiento. Al mover la barra de selección a una opción, una pequeña explicación aparecerá en la parte inferior de la pantalla.
 </td></tr>
 <tr><td></td><td></td><td>
-	<p><span class="menu">Safe mode</span><br />
-		Puts the system into safe mode. This can be enabled independently from the other options.</p>
-	<p><span class="menu">Disable user add-ons</span><br />
-		Prevents all user installed add-ons from being loaded. Only the add-ons in the system directory will be used. See <a href="#troubleshooting">Troubleshooting</a> below.</p>
-	<p><span class="menu">Disable IDE DMA</span><br />
-		Disables IDE DMA, increasing IDE compatibility at the expense of performance.</p>
-	<p><span class="menu">Ignore memory beyond 4 GiB</span><br />
-		Ignores all memory beyond the 4 GiB address limit, overriding the setting in the kernel settings file.
+	<p><span class="menu">Safe mode (Modo a prueba de fallas)</span><br />
+		Pone el sistema en modo a prueba de fallas. Esto puede habilitarse independiente de otras opciones.</p>
+	<p><span class="menu">Disable user add-ons (Desactivar extensiones de usuario)</span><br />
+		Evita que se carguen todas las extensiones (add-ons) de usuario. Sólo se utilizarán las extensiones de la carpeta de sistema. Véase abajo <a href="#troubleshooting">Resolución de problemas</a>.</p>
+	<p><span class="menu">Disable IDE DMA (Desactivar DMA IDE)</span><br />
+		Desactiva DMA IDE, mejorando la compatibilidad IDE a costa de rendimiento.</p>
+	<p><span class="menu">Ignore memory beyond 4 GiB (Ignorar memoria más allá de 4GiB)</span><br />
+		Ignora toda la memoría más allá del límite de 4 GiB, invalidando el ajuste en el archivo de configuración del núcleo (kernel).
 </p>
-	<p><span class="menu">Use fail-safe graphics driver</span><br />
-		The system will use VESA mode and won't try to use any video graphics drivers.</p>
-	<p><span class="menu">Disable IO-APIC</span><br />
-		Disables using the IO APIC for interrupt routing, forcing the use of the legacy PIC instead.</p>
-	<p><span class="menu">Disable local APIC</span><br />
-		Disables using the local APIC, also disables SMP.</p>
-	<p><span class="menu">Disable X2APIC</span><br />
-		Disables second generation APIC.</p>
-	<p><span class="menu">Disable SMEP and SMAP</span><br />
-		Disables SMEP/SMAP security features of the CPU.</p>
-	<p><span class="menu">Disable SMP</span><br />
-		Disables all but one CPU core.</p>
-	<p><span class="menu">Don't call the BIOS</span><br />
-		Stops the system from calling BIOS functions.</p>
-	<p><span class="menu">Disable APM</span><br />
-		Disables Advanced Power Management hardware support, overriding the APM setting in the kernel settings file.</p>
-	<p><span class="menu">Disable ACPI</span><br />
-		Disables Advanced Configuration and Power Interface hardware support, overriding the ACPI setting in the kernel settings file.</p>
-	<p><span class="menu">Blacklist entries</span><br />
-		Allows to select system files that shall be ignored. Useful e.g. to disable drivers temporarily. See <a href="#troubleshooting">Troubleshooting</a> below.</p></td></tr>
+	<p><span class="menu">Use fail-safe video mode (Utilizar modo de vídeo a prueba de fallas)</span><br />
+		El sistema usará el modo VESA y no intentará usar ningún controlador de vídeo.</p>
+	<p><span class="menu">Disable IO-APIC (Desactivar IO-APIC)</span><br />
+		Desactiva el uso de IO APIC para enrutamiento de interruptores, haciendo obligatorio el uso del antiguo PIC.</p>
+	<p><span class="menu">Disable local APIC (Desactivar APIC local)</span><br />
+		Desactiva el APIC local y también desactiva SMP.</p>
+	<p><span class="menu">Disable X2APIC (Desactivar X2APIC)</span><br />
+		Desactiva el APIC de segunda generación.</p>
+	<p><span class="menu">Disable SMEP and SMAP (Desactivar SMEP y SMAP)</span><br />
+		Desactiva las características de seguridad SMEP y SMAP de la CPU.</p>
+	<p><span class="menu">Disable SMP (Desactivar SMP)</span><br />
+		Desactiva todos los núcleos del CPU excepto uno.</p>
+	<p><span class="menu">Don't call the BIOS (No llamar al BIOS)</span><br />
+		Evita que el sistema realice llamadas al BIOS.</p>
+	<p><span class="menu">Disable APM (Desactivar APM)</span><br />
+		Desactiva el soporte de hardware para el Administrador Avanzado de Energía, anulando el ajuste de APM del archivo de configuración del núcleo (kernel).</p>
+	<p><span class="menu">Disable ACPI (Desactivar ACPI)</span><br />
+		Desactiva soporte de hardware para la Interface de Energía y Configuración Avanzada, anulando el ajuste de ACPI del archivo de configuración del núcleo (kernel).</p>
+	<p><span class="menu">Disable system components (Desactivar componentes del sistema)</span><br />
+		Permite elegir archivos del sistema para ser ignorados. Esto es útil para, por ejemplo, desactivar controladores temporalmente. Véase <a href="#troubleshooting">Resolución de problemas</a> abajo.</p></td></tr>
 <tr><td><b>Selección de opciones de depuración</b>
-</td><td> </td><td>Aquí encontrará bastantes opciones que le ayudarán con la depuración o en obtener detalles para un <a href="../../welcome/en/bugreports.html">reporte de fallo</a>. De nuevo, una explicación corta de cada opción se muestra abajo.</td></tr>
+</td><td> </td><td>Aquí encontrará bastantes opciones que le ayudarán con la depuración o en obtener detalles para un <a href="../../welcome/es/bugreports.html">reporte de fallo</a>. De nuevo, una explicación corta de cada opción se muestra abajo.</td></tr>
 <tr><td></td><td></td><td>
 	<p><span class="menu">Enable serial debug output (Habilitar la salida de depuración serial)</span><br />
 		Enciende el re-envío de la salida del registro de sistema a la interfaz serial (predeterminado: 115200, 8N1).</p>
@@ -138,15 +141,14 @@ También viene muy bien para cuando ha instalado algún componente de software q
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="troubleshooting" name="troubleshooting">Resolución de problemas</a></h2>
-<p>Si Haiku se rehusa a arrancar en su equipo desde el principio, intente configurar diferentes opciones bajo <span class="menu">Seleccione opciones de modo seguro</span>. Considere registrar un <a href="../../welcome/en/bugreports.html">informe de fallos</a> de cualquier forma.</p>
+<p>Si Haiku se rehusa a arrancar en su equipo desde el principio, intente configurar diferentes opciones bajo <span class="menu">Seleccione opciones de modo seguro</span>. Considere registrar un <a href="../../welcome/es/bugreports.html">informe de fallos</a> de cualquier forma.</p>
 <p>Por el otro lado, si Haiku sólo empieza a dar problemas hasta después que ha instalado algún software, particularmente controladores de dispositivos, tiene varias opciones para lograr que Haiku pueda arrancar otra vez para poder desinstalar el paquete infractor:</p>
 <ul>
 <li><p>Activar el <span class="menu">modo seguro</span> prevendrá que inicien la mayoría de los servidores, servicios de fondo (daemons) y el UserBootScript.</p></li>
 <li><p>Activar la opción <span class="menu">Deshabilitar extensiones (add-ons) de usuario</span> prevendrá el uso de cualquier extensión (controladores, traductores, etc.) que tenga instalados en su jerarquía bajo su carpeta personal Home.</p></li>
 <li><p>Si logra resolver sus problemas al activar la opción de <span class="menu">Utilizar controlador de gráficos a prueba de fallas</span> recurriendo a gráficos VESA, puede hacer que el ajuste sea permanente, quitando el <tt>#</tt> de la línea que dice <i>#fail_safe_video_mode true</i> en el archivo de texto <span class="path">/boot/home/config/settings/kernel/drivers/kernel</span>.</p></li>
-<li><p>
-Si un controlador, extensión, etc. infractor está instalado bajo la jerarquía del sistema, las cosas se vuelven un poco más complicadas, porque esa área es de sólo léctura. Aquí, las <span class="menu">Entradas de lista negra</span> hacen su parte. Con ellas, puede navegar a través de toda la jerarquía del sistema y deshabilitar el componente que está causando problemas, al activar una de las entradas con la tecla<span class="key">ESPACIADORA</span> o <span class="key">RETORNO</span>. <span class="key">ESC</span> lo regresa un nivel arriba al directorio padre.</p>
-<p>Existe un artículo en línea, <a href="http://www.haiku-os.org/blog/barrett/2013-12-15_how_permanently_blacklist_package_file">Cómo incluir un paquete en la lista negra permanentemente (en inglés)</a>, que muestra cómo lograr que se mantengan los cambios.</p></li>
+<li><p>Si un controlador, extensión, etc. problemático está instalado bajo la jerarquía del sistema, las cosas se vuelven un poco más complicadas, porque esa área es de sólo léctura. En estos casos es que la opción <span class="menu">Disable system components (Desactivar componentes del sistema)</span> resulta útil. Con ella, puede navegar a través de todo el árbol del sistema y deshabilitar el componente que está causando problemas, al activar una de las entradas con la <span class="key">BARRA ESPACIADORA</span> o con <span class="key">RETORNO</span>. <span class="key">ESC</span> lo regresa un nivel arriba al directorio padre.</p>
+<p>Existe un artículo en línea, <a href="http://www.haiku-os.org/blog/barrett/2013-12-15_how_permanently_blacklist_package_file">Cómo deshabilitar componentes de paquetes (en inglés)</a>, que muestra cómo lograr que se mantengan los cambios.</p></li>
 <li><p>Bajo <span class="menu">Select boot volume (Elija el volumen de arranque)</span> puede especificar cuál versión anterior de Haiku a arrancar. Cada vez que instale/desinstale un paquete, el estado anterior se guarda y puede iniciar en él seleccionandolo de la lista presentada en las opciones del cargador de arranque.<br />
 Por tanto, si encuentra problemas de arranque después de instalar algún paquete, inicie una versión de Haiku previa a ese momento, y desinstale el paquete infractor.</p></li>
 </ul>

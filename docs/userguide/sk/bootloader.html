@@ -36,6 +36,7 @@
 <li><a href="../de/bootloader.html">Deutsch</a></li>
 <li><a href="../en/bootloader.html">English</a></li>
 <li><a href="../es/bootloader.html">Español</a></li>
+<li><a href="../eo/bootloader.html">Esperanto</a></li>
 <li><a href="../fr/bootloader.html">Français</a></li>
 <li><a href="../fur/bootloader.html">Furlan</a></li>
 <li><a href="../it/bootloader.html">Italiano</a></li>
@@ -68,7 +69,8 @@
 
 <p>Haiku's Boot Loader Options can help when you experience hardware related problems or want to choose which Haiku installation to start, if you have more than one (maybe on an installation CD or USB stick). It's also handy if you have installed a software component that acts up and prevents you from booting Haiku, see <a href="#troubleshooting">Troubleshooting</a> below.</p>
 <p>Voľby Zavádzača systému môžete zadať po stlačení a podržaní klávesu <span class="key">SHIFT</span> pred začiatkom zavádzania systému Haiku. Ak je nainštalovaný správca zavádzania, môžete kláves <span class="key">SHIFT</span> začať držať už predtým, než vyvoláte položku Haiku. Ak je Haiku na počítači jediný operačný systém, môžete začať držať kláves ešte vtedy, keď vidíte štartovacie správy od BIOSu.</p>
-<div class="box-info">On computers that use UEFI for booting instead of the classic BIOS, you need to use the <span class="key">SPACEBAR</span> instead.</div>
+<div class="box-info">With some hardware, you'll have to make sure USB keyboards are enabled in the BIOS.<br />
+On computers that use UEFI for booting instead of the classic BIOS, you need to use the <span class="key">SPACEBAR</span> instead of <span class="key">SHIFT</span>.</div>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="options" name="options">Voľby zavádzača</a></h2>
@@ -104,7 +106,7 @@
 		Disables Advanced Power Management hardware support, overriding the APM setting in the kernel settings file.</p>
 	<p><span class="menu">Disable ACPI</span><br />
 		Disables Advanced Configuration and Power Interface hardware support, overriding the ACPI setting in the kernel settings file.</p>
-	<p><span class="menu">Blacklist entries</span><br />
+	<p><span class="menu">Disable system components</span><br />
 		Allows to select system files that shall be ignored. Useful e.g. to disable drivers temporarily. See <a href="#troubleshooting">Troubleshooting</a> below.</p></td></tr>
 <tr><td><b>Vyberte voľby ladenia</b>
 </td><td> </td><td>Tu nájdete niekoľko volieb, ktoré pomáhajú pri ladení alebo získavaní podrobností do <a href="../../welcome/sk/bugreports.html">hlásenia chyby</a>. Dolu má opäť každá voľba krátke vysvetlenie.</td></tr>
@@ -140,8 +142,8 @@
 <li><p>Aktivácia <span class="menu">Bezpečného režimu</span> zabráni spusteniu väčšiny serverov, démonov a používateľských skriptov pri štarte (UserBootScript).</p></li>
 <li><p><span class="menu">Vypnutie používateľských doplnkov</span> zabráni použitiu akýchkoľvek doplnkov (ovládače, prekladače atď.), ktoré ste si nainštalovali do používateľskej hierarchie vo vašom domovskom priečinku.</p></li>
 <li><p>If activating <span class="menu">Use fail-safe graphics driver</span> solves your troubles by falling back to VESA graphics, you can make the setting permanent by removing the <tt>#</tt> of the line <i>#fail_safe_video_mode true</i> in the text file <span class="path">/boot/home/config/settings/kernel/drivers/kernel</span>.</p></li>
-<li><p>V prípade, že je problematický ovládač, doplnok atď. nainštalovaný v hierarchii systému, bude to trochu zložitejšie, pretože táto oblasť je len na čítanie. To sa dajú použiť položky na <span class="menu">Černej listine</span>. Pomocou nich môžete prechádzať celou hierarchiou systému a zakázať komponenty, ktoré vám spôsobujú problémy, zaškrtnutím položky pomocou klávesu <span class="key">medzerník</span> alebo <span class="key">Enter</span>. <span class="key">ESC</span> vás vráti o úroveň vyššie do nadradeného adresára.</p>
-<p>Online nájdete článok <a href="http://www.haiku-os.org/blog/barrett/2013-12-15_how_permanently_blacklist_package_file">Ako trvale umiestniť na čiernu listinu súbor balíka</a>, ktorý vám ukáže ako toto nastavenie zachovať natrvalo.</p></li>
+<li><p>If the offending driver, add-on etc. is installed in the system hierarchy, things get a bit more complicated, because that area is read-only. Here, the <span class="menu">Disable system components</span> comes into play. With it, you can navigate through the whole system hierarchy and disable the component that's messing things up for you by checking an entry with the <span class="key">SPACE</span> or <span class="key">RETURN</span> key. <span class="key">ESC</span> returns you up one level to the parent directory.</p>
+<p>Online, there's the guide <a href="https://www.haiku-os.org/guides/daily-tasks/blacklist-packages">Disabling components of packages</a> showing how to make that setting stick.</p></li>
 <li><p>Under <span class="menu">Select boot volume</span> you can specify what former "version" of Haiku to boot. Every time you un/install a package, the old state is saved and you can boot into it by choosing it from the list presented in the boot loader options.<br />
 So, if you encounter boot problems after installing some package, boot a Haiku state from before that time and uninstall the offending package.</p></li>
 </ul>

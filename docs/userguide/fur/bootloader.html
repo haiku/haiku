@@ -10,6 +10,7 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
+ *		Máximo Castañeda
  *		Fabio Tomat
  *
 -->
@@ -35,6 +36,7 @@
 <li><a href="../de/bootloader.html">Deutsch</a></li>
 <li><a href="../en/bootloader.html">English</a></li>
 <li><a href="../es/bootloader.html">Español</a></li>
+<li><a href="../eo/bootloader.html">Esperanto</a></li>
 <li><a href="../fr/bootloader.html">Français</a></li>
 <li><a href="../it/bootloader.html">Italiano</a></li>
 <li><a href="../hu/bootloader.html">Magyar</a></li>
@@ -66,7 +68,8 @@
 
 <p>Lis opzions dal Boot Loader di Haiku a puedin judâ cuant che si à a ce fâ cun problemis di hardware opûr cuant che si à plui instalazions di Haiku e si desidere sielzi cuale instalazion di Haiku fâ partî (par esempli un CD di instalazion o une clavute USB). Al è ancje util se si à instalât un component software che al impedìs di inviâ Haiku e duncje di gjavâlu, viôt la <a href="#troubleshooting">Risoluzion dai problemis</a> chi sot.</p>
 <p>Par jentrâ tes Opzions dal Boot Loader, tu âs di tignî fracât il tast <span class="key">MAIUSC</span> prime che al tachi il procès di inviament di Haiku. Se al è instalât un gjestôr di inviament, tu puedis tacâ a tignî fracât <span class="key">MAIUSC</span> prime di invocâ la vôs dal menù par Haiku. Se Haiku al è l'unic sisteme operatîf inte machine, tu puedis tacâ a fracâ il tast bielzà cuant che tu viodis i messaçs di inviament dal BIOS.</p>
-<div class="box-info">Sui computer che a doprin UEFI pal inviament al puest dal classic BIOS, tu scugnis doprâ invezit la <span class="key">SBARE DI SPAZI</span>.</div>
+<div class="box-info">Su cualchi machine tu varâs di controlâ che lis tastieris USB a sedin abilitadis tal BIOS.<br />
+Sui computers che, al puest dal classic BIOS, a doprin UEFI pal inviament, tu scugnis doprâ la <span class="key">SBARE DI SPAZI</span> invezit di <span class="key">MAIUSC</span>.</div>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="options" name="options">Opzions dal Boot Loader</a></h2>
@@ -76,9 +79,9 @@
 <tr><td><b>Select safe mode options</b></td><td> </td><td>A son diviersis opzions di provâ tal câs di un probleme hardware o se il sisteme al devente instabil o no si pues inviâ par vie di un compuartament sbaliât di un component zontât. Cuant che si sposte la sbare di selezion suntune opzion, e ven fûr une curte spiegazion in bas tal schermi.</td></tr>
 <tr><td></td><td></td><td>
 	<p><span class="menu">Safe mode</span><br />
-		Al met il sisteme in modalitât sigure. Chest al pues jessi abilitât in maniere indipendente des altris opzions.</p>
+		Al met il sisteme in modalitât sigure. Al è pussibil abilitâ cheste modalitât in maniere indipendente di chês altris opzions.</p>
 	<p><span class="menu">Disable user add-ons</span><br />
-		Al impedìs il cjariament di dutis lis zontis (add-on) instaladis dal utent. Dome lis zontis inte cartele di sisteme a vignaran dopradis. Viôt la <a href="#troubleshooting">Risoluzion dai problemis</a> chi sot.</p>
+		Al impedìs il cjariament di dutis lis zontis (add-on) instaladis dal utent. A vignaran dopradis dome lis zontis te cartele di sisteme. Viôt la <a href="#troubleshooting">Risoluzion dai problemis</a> chi sot.</p>
 	<p><span class="menu">Disable IDE DMA</span><br />
 		Al disabilite il DMA dal IDE, aumentant la compatibilitât IDE al cost des prestazions.</p>
 	<p><span class="menu">Ignore memory beyond 4 GiB</span><br />
@@ -87,7 +90,7 @@
 	<p><span class="menu">Use fail-safe graphics driver</span><br />
 		Il sisteme al doprarà la modalitât VESA e no cirarà di doprâ nissun driver grafic di schede video.</p>
 	<p><span class="menu">Disable IO-APIC</span><br />
-		Al disabilite l'ûs dal IO APIC pal indreçament dai interrupt, sfuarçant invezit l'ûs dal PIC vecje maniere.</p>
+		Al disabilite l'ûs dal IO APIC pal indreçament dai interrupt, sfuarçant invezit l'ûs dal PIC te vecje maniere.</p>
 	<p><span class="menu">Disable local APIC</span><br />
 		Al disabilite l'ûs dal APIC locâl, al disabilite ancje il SMP.</p>
 	<p><span class="menu">Disable X2APIC</span><br />
@@ -102,9 +105,9 @@
 		Al disabilite il supuart hardware dal Advanced Power Management (gjestion alimentazion avanzade), passant parsore de impostazion APM tal file des impostazions dal kernel.</p>
 	<p><span class="menu">Disable ACPI</span><br />
 		Al disabilite il supuart hardware dal Advanced Configuration and Power Interface (configurazion avanzade e interface di alimentazion), passant parsore de configurazion ACPI intal file des impostazions dal kernel.</p>
-	<p><span class="menu">Blacklist entries</span><br />
-		Al permet di selezionâ i file di sisteme che si à di ignorâ. Util p.e. par disabilitâ i driver in mût temponi. Viôt la <a href="#troubleshooting">Risoluzion dai problemis</a> chi sot.</p></td></tr>
-<tr><td><b>Select debug options</b></td><td> </td><td>Chi tu cjatarâs diviersis opzions che a judin cul debug o a vê detais par fâ une <a href="../../welcome/en/bugreports.html">segnalazion di erôr</a>. Di gnûf, une curte spiegazion par ogni opzion e ven mostrade in bas.</td></tr>
+	<p><span class="menu">Disable system components</span><br />
+		Al permet di selezionâ i files di sisteme che si àn di ignorâ. Util p.e. par disabilitâ i driver in mût temporani. Viôt la <a href="#troubleshooting">Risoluzion dai problemis</a> chi sot.</p></td></tr>
+<tr><td><b>Select debug options</b></td><td> </td><td>Chi tu cjatarâs diviersis opzions che a judin cul debug o a vê detais par fâ une <a href="../../welcome/fur/bugreports.html">segnalazion di erôr</a>. Di gnûf, une curte spiegazion par ogni opzion e ven mostrade in bas.</td></tr>
 <tr><td></td><td></td><td>
 	<p><span class="menu">Enable serial debug output</span><br />
 		Al ative il mandâ fûr l'output dal syslog te interface seriâl (predefinît: 115200, 8N1).</p>
@@ -130,13 +133,13 @@
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="troubleshooting" name="troubleshooting">Risoluzion dai problemis</a></h2>
-<p>Se Haiku al refude di inviâsi sul vuestri hardware dal inizi, prove a stabilî opzions diferentissot di <span class="menu">Select safe mode options</span>. Considere la idee di inviâ une <a href="../../welcome/en/bugreports.html">segnalazion di erôr</a> in ogni câs.</p>
+<p>Se Haiku al refude di inviâsi sul vuestri hardware dal inizi, prove a stabilî opzions diferentissot di <span class="menu">Select safe mode options</span>. Considere la idee di inviâ une <a href="../../welcome/fur/bugreports.html">segnalazion di erôr</a> in ogni câs.</p>
 <p>Di chê altre bande, se Haiku al tache a dâ problemis dome dopo vê instalât cualchi software, specialmentri driver hardware, tu âs diviersis opzions par vê di gnûf Haiku funzionant cussì di podê disinstalâ il pachet incriminât:</p>
 <ul>
 <li><p>Ativant <span class="menu">Safe mode</span> si impedirà ae plui part dai servidôrs, demonis e il UserBootscript di jessi inviâts.</p></li>
 <li><p>Ativant <span class="menu">Disable user add-ons</span> si impedirà l'ûs di cualsisei zonte (add-on) (driver, tradutôrs, e vie indenant) che tu âs instalât inte gjerarchie utent sot de tô cartele Home.</p></li>
 <li><p>Se ativant <span class="menu">Use fail-safe graphics driver</span> al risolf i tiei problemis cessant ae grafiche VESA, tu puedis rindi permanente la impostazion lant a gjavâ il <tt>#</tt> de rie <i>#fail_safe_video_mode true</i> intal file di test <span class="path">/boot/home/config/settings/kernel/drivers/kernel</span>.</p></li>
-<li><p>Se il driver incriminât, o la zonte e vie indenant, al è instalât te gjerarchie dal sisteme, lis robis a diventin un tic plui complicadis, parcè che chê aree e je in dome-leture. Chi, il <span class="menu">Blacklist entries</span> al jentre in zûc. Cun chel, tu puedis navigâ su dute la gjerarchie dal sisteme e disabilitâ il component che fâs damps segnant une vôs cul tast <span class="key">SPAZI</span> o <span class="key">INVIE</span>. <span class="key">ESC</span> ti fâs tornâ insù di un nivel ae cartele superiôr.</p>
+<li><p>Se il driver incriminât, o la zonte e v.i., al è instalât te jerarchie dal sisteme, lis robis a diventin un tic plui complicadis, parcè che chê aree e je in dome-leture. Chi, il <span class="menu">Disable system components</span> al jentre in zûc. Cun chel, tu puedis navigâ su dute la jerarchie dal sisteme e disabilitâ il component che al fâs dams segnant une vôs cul tast <span class="key">SPAZI</span> o <span class="key">INVIE</span>. <span class="key">ESC</span> ti fâs tornâ insù di un nivel ae cartele superiôr.</p>
 <p>In rêt, al è l'articul <a href="http://www.haiku-os.org/blog/barrett/2013-12-15_how_permanently_blacklist_package_file">How to Permanently Blacklist a Package File</a> che al mostre ce mût fâ in mût di mantignî lis modifichis.</p></li>
 <li><p>Sot di <span class="menu">Select boot volume</span> tu puedis specificâ cuale "version" precedente di Haiku inviâ. Ogni volte che tu dis/instalis un pachet, il stât vecjo al ven salvât etu puedis inviâlu sielzintlu de liste presentade intes opzions dal boot loader.<br />
 Cussì, se ti si presentin problemis di inviament dopo vê instalât cualchi pachet, invie un stât di Haiku precedent a chê volte e disinstale il pachet incriminât.</p></li>

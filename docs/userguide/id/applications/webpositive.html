@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2013, Haiku. All rights reserved.
+ * Copyright 2010-2021, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -23,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Panduan pengguna</span></div>
 </div>
 
 <div class="nav">
@@ -34,6 +34,7 @@
 <li><a href="../../de/applications/webpositive.html">Deutsch</a></li>
 <li><a href="../../en/applications/webpositive.html">English</a></li>
 <li><a href="../../es/applications/webpositive.html">Español</a></li>
+<li><a href="../../eo/applications/webpositive.html">Esperanto</a></li>
 <li><a href="../../fr/applications/webpositive.html">Français</a></li>
 <li><a href="../../fur/applications/webpositive.html">Furlan</a></li>
 <li><a href="../../it/applications/webpositive.html">Italiano</a></li>
@@ -59,6 +60,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Terjemahan halaman ini belum lengkap. Sampai saat itu, bagian yang belum selesai menggunakan aslinya bahasa Inggris.</div>
 <h2><img src="../../images/apps-images/webpositive-icon_64.png" alt="webpositive-icon_64.png" width="64" height="64" />WebPositive</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Aplikasi</span></td></tr>
@@ -76,10 +78,10 @@ Di bagian bawah jendela adalah bilah status, yang menunjukkan URL situs yang sed
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Pengaturan</h2>
 <p>Dari menu <span class="menu">Jendela</span> Anda dapat membuka panel Pengaturan untuk mengkonfigurasi beberapa hal penting dari WebPositive.</p>
 <img src="../images/apps-images/webpositive-settings.png" alt="webpositive-settings.png" />
-<p>Tab pertama berkaitan dengan pengaturan umum: File atau URL apa yang berfungsi sebagai <span class="menu">Start page</span>, apa yang digunakan sebagai <span class="menu">Halaman pencarian </span>, <span class="menu">Folder unduhan</span> apa yang digunakan untuk barang yang Anda dapatkan dari internet.<br />
-Dua menu pop-up memungkinkan Anda memutuskan halaman mana yang akan dimuat - jika ada - saat membuka jendela atau tab baru.<br />
-Melalui kotak centang berikut, Anda dapat menghindari menampilkan bilah tab saat hanya ada satu halaman yang terbuka. Antarmuka WebPositive dapat diperintahkan untuk secara otomatis bersembunyi dalam mode layar penuh, dan penunjuk tetikus dapat secara otomatis disembunyikan kapan pun tidak dipindahkan untuk sementara waktu.<br />
-Terakhir, Anda dapat memutuskan untuk memasukkan tombol "Beranda" di bilah navigasi dan mengatur berapa hari browser mengingat situs yang telah Anda kunjungi dalam riwayatnya.</p>
+<p>The first tab deals with general settings: What file or URL serves as a <span class="menu">Start page</span>, what's used as a <span class="menu">Search page</span> (if you set a <span class="menu">Custom</span> search engine, "<i>%s</i>" is used for the search term variable), what <span class="menu">Download folder</span> is used for stuff you get from the net.<br />
+Two pop-up menus let you decide what page to load - if any - when opening a new window or tab.<br />
+Via the following checkboxes you can avoid showing the tab bar when there's only one page open anyway. WebPositive's interface can be told to automatically hide in full screen mode, and the mouse pointer can be automatically hidden whenever it's not moved for a while.<br />
+Finally, you can decide to include the "Home" button in the navigation bar and set the number of days the browser remembers the sites you have visited in its history.</p>
 <p>Pada tab kedua Anda dapat memilih font yang digunakan untuk font standar, serif, non-serif dan monospace dan mengatur ukuran bawaan-nya.</p>
 <p>Tab terakhir digunakan untuk mengonfigurasi server proxy.</p>
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Menjelajah</h2>
@@ -91,8 +93,19 @@ Terakhir, Anda dapat memutuskan untuk memasukkan tombol "Beranda" di bilah navig
 <li><p>Dari menu <span class="menu">Lihat</span>, Anda dapat <span class="menu">Memperbesar</span> dan <span class="menu">Memperkecil</span> halaman. Ada juga pilihan untuk <span class="menu">Perbesar Text saja</span>, meninggalkan semua gambar dengan ukuran aslinya.</p></li>
 <li><p>Jika Anda beralih ke mode layar penuh dan telah mengaktifkan pengaturan untuk menyembunyikan antarmuka, itu akan menghilang setelah satu detik. Untuk menggesernya kembali sementara, cukup gerakkan penunjuk mouse ke bagian atas layar.</p></li>
 <li><img src="../images/apps-images/webpositive-locator.png" alt="webpositive-locator.png" />
-<p>Saat Anda mengetik di bidang teks locator, browser mencocokkan string ke situs yang telah Anda kunjungi di masa lalu dan mencantumkannya di bawah bidang teks. Anda tetap menambahkan lebih banyak surat untuk mempersingkat daftar situs yang mungkin, atau memilih entri dengan <span class="key">↑</span> atau <span class="key">↓</span>. <span class="key">ENTER</span> akan memuat halaman. Anda juga dapat menggunakan tombol di ujung kanan yang juga berfungsi untuk memuat ulang halaman.
-Text yang tidak dikenali sebagai URL akan terlihat oleh Google, sehingga bidang locator berfungsi ganda sebagai pintasan cepat untuk pencarian web.</p></li>
+<p>While you type in the locator text field, the browser matches the string to sites you have visited in the past and lists them below the text field. You either keep adding more letters to shorten the  list of possible sites, or choose an entry with <span class="key">↑</span> or <span class="key">↓</span>. <span class="key">ENTER</span> will load the page. You can also use the button to the far right which also serves to reload a page.<br />
+Strings not recognized as URLs will get looked up with the search engine set in WebPositive's settings, so the locator field doubles as quick shortcut to web searches.</p>
+<div class="box-info"><p>WebPositive supports quick shortcuts to direct search terms to different search engines. Just enter the one-letter-shortcut followed by your search term.</p>
+<ul>
+<li>"g” for Google</li>
+<li>“b” for Bing</li>
+<li>“w” for Wikipedia</li>
+<li>“d” for DuckDuckGo</li>
+<li>“a” for Baiku</li>
+<li>“y” for Yandex</li>
+<li>“e” for Ecosia</li>
+<li>“q” for Qwant</li>
+</ul></div></li>
 <li><p>Mengklik kanan membuka menu konteks yang, tergantung pada objek yang Anda klik, menawarkan untuk membuka tautan di jendela baru atau tab baru, mengunduh objek dll.</p></li>
 <li><p><span class="menu">Sunting | cari </span> menunjukkan bilah cari di bagian bawah untuk memulai pencarian dalam halaman. Kecocokan disorot dalam halaman.</p></li>
 </ul>
