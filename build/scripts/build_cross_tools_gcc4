@@ -161,7 +161,7 @@ binutilsObjDir="$objDir/binutils"
 gccObjDir="$objDir/gcc"
 gdbObjDir="$objDir/gdb"
 stdcxxObjDir="$objDir/stdcxx"
-sysrootDir="$installDir/sysroot"
+sysrootDir=${HAIKU_USE_SYSROOT:-"$installDir/sysroot"}
 tmpIncludeDir="$sysrootDir/boot/system/develop/headers"
 tmpLibDir="$sysrootDir/boot/system/develop/lib"
 
@@ -279,7 +279,11 @@ mv "$installDir/$haikuMachine/lib/libstdc++.a" \
 	"$installDir/$haikuMachine/lib/libstdc++-static.a"
 
 # remove the sysroot dir
-rm -rf "$sysrootDir"
+if [ -n "$HAIKU_USE_SYSROOT" ]; then
+	rm -rf "$sysrootDir"/boot/system/*
+else
+	rm -rf "$sysrootDir"
+fi
 
 # remove the objects dir
 rm -rf "$objDir"
