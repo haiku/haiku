@@ -4,7 +4,7 @@ Delay	CortexAddOnsFlanger		Retraso
 Depth	CortexAddOnsFlanger		Profundidad
 Feedback	CortexAddOnsFlanger		Retroalimentación
 Sweep rate	CortexAddOnsFlanger		Ritmo de barrido
-Mix ratio	CortexAddOnsFlanger		Proporción de mezcla
+Mix ratio	CortexAddOnsFlanger		Proporción de la mezcla
 MediaNodeControlApp: couldn't get node info (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: No se pudo obtener la información del nodo (%d):\n%s\n
 MediaNodeControlApp: couldn't find node (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: No se pudo encontrar el nodo (%d):\n%s\n
 FlangerNode parameters	CortexAddOnsFlanger		Parámetros de FlangerNode

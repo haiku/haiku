@@ -27,7 +27,7 @@ ACPI node '%1'	DeviceACPI		ACPI ノード '%1'
 Optical Drive	DeviceSCSI		光学ドライブ
 Name	PropertyList		名前
 Manufacturer	DeviceSCSI		製造元
-Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		デバイス名\t\t\t\t: %Name%\n製造元\t\t\t: %Manufacturer%\n使用されているドライバー\t\t\t\t: %DriverUsed%\nデバイスパス\t: %DevicePaths%
+Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		デバイス名\t\t\t\t: %Name%\n製造元\t\t\t: %Manufacturer%\n使用中のドライバー\t\t\t\t: %DriverUsed%\nデバイスパス\t: %DevicePaths%
 Device name	Device		デバイス名
 Satellite communications controller	Device		衛星通信コントローラー
 Device class	DeviceSCSI		デバイスクラス

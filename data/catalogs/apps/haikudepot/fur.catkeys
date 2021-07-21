@@ -1,9 +1,10 @@
-1	friulian	x-vnd.Haiku-HaikuDepot	3106374143
+1	friulian	x-vnd.Haiku-HaikuDepot	3544756144
 Repository update error	LocalRepositoryUpdateProcess		Erôr di inzornament dal dipuesit
 Network error	ServerHelper		Erôr di rêt
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Si è verificât un erôr intal inzornâ il dipuesit: %error%
 User Created	UserLoginWindow		Utent creât
 Check for updates…	MainWindow		Controle inzornaments…
+Uninstall	PackageManager		Disinstale
 Uninstalled	PackageListView		Disinstalât
 It was not possible to create the new user.	UserLoginWindow		Nol è stât pussibil creâ il gnûf utent.
 Available packages	MainWindow		Pachets disponibii
@@ -45,6 +46,8 @@ Category	FilterView		Categorie
 User rating	RatePackageWindow		Valutazion utents
 Installed packages	MainWindow		Pachets instalâts
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Un ogjet domandât o un ogjet che al centrave cu la richieste nol è stât cjatât sul servidôr.
+Fatal error	PackageManager		Erôr fatâl
+Package action failed	PackageInfoView		Azion dal pachet falide
 No changelog available.	PackageInfoView		Nissun regjistri des modifichis disponibil.
 Error	App		Erôr
 There was a puzzling response from the web service.	UserLoginWindow		La rispueste dal servizi web e jere ambigue.
@@ -76,6 +79,7 @@ Stability	RatePackageWindow		Stabilitât
 Send	RatePackageWindow		Invie
 Start package daemon	App		Invie demoni dai pachets
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Si scugne ripeti la peraule d'ordin par podê diminuî lis pussibilitâts di inserîle sbaliade.
+The package action could not be scheduled: %Error%	PackageInfoView		Impussibil programâ la azion dal pachet: %Error%
 Cancel	SettingsWindow		Anule
 Cancel	RatePackageWindow		Anule
 Inactive	PackageListView		Inatîf
@@ -85,6 +89,7 @@ There are problems in the supplied data:	UserLoginWindow		Si à problemis tai d�
 OK	MainWindow		Va ben
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# item} other{# items}}
 Usage conditions download problem	UserLoginWindow		Probleme tal discjariament des condizions di ûs
+OK	PackageInfoView		Va ben
 Downloading:	PackageInfoView		Ricezion:
 Quit	MainWindow		Jes
 Success	UserLoginWindow		Lât a bon fin
@@ -167,6 +172,7 @@ Fetching remote repository data	LocalRepositoryUpdateProcess		Daûr a recuperâ 
 Description	PackageListView		Descrizion
 Open %DeskbarLink%	PackageManager		Vierç %DeskbarLink%
 User creation error	UserLoginWindow		Erôr di creazion dal utent
+Install	PackageManager		Instale
 Input validation	UserLoginWindow		Convalide input
 Log in…	MainWindow		Acès…
 You need to be logged into an account before you can rate packages.	MainWindow		Si scugne jessi jentrâts intun account prime di podê valutâ i pachets.

@@ -1,0 +1,59 @@
+1	polish	application/x-vnd.Cortex.InfoView	2382053937
+Offset	InfoView		Przesunięcie
+Description	DormantNodeInfoView		Opis
+Byte order	InfoView		Kolejność bajtów
+Connection	InfoView		Połączenie
+Output formats	DormantNodeInfoView		Formaty wyjściowe
+History	InfoView		Historia
+Input formats	DormantNodeInfoView		Formaty wejściowe
+Signature	AppNodeInfoView		Sygnatura
+Video data between	InfoView		Dane wideo pomiędzy
+Any number	DormantNodeInfoView	For 'Max. instances' field	Dowolna liczba
+Flags	InfoView		Flagi
+Media output	InfoView		Wyjście mediów
+Active lines	InfoView		Aktywne linie
+Buffer size	InfoView		Rozmiar bufora
+\n- Quality:	FileNodeInfoView		\n- Jakość:
+Kinds	LiveNodeInfoView		Rodzaje
+Application	AppNodeInfoView		Aplikacja
+Flavor flags	DormantNodeInfoView		Flagi odmian
+Max. instances	DormantNodeInfoView		Maks. instancji
+\n- Duration:	FileNodeInfoView		\n- Czas trwania:
+Dormant media node	DormantNodeInfoView		Uśpiony węzeł mediów
+Latency	LiveNodeInfoView		Opóźnienie
+Media type	InfoView		Typ mediów
+Live media node	LiveNodeInfoView		Aktywny węzeł mediów
+Field rate	InfoView		Częstotliwość przeplatania
+Kinds	DormantNodeInfoView		Rodzaje
+%title% info	InfoView		Informacje o %title%
+Node ID	LiveNodeInfoView		ID węzła
+Resolution	InfoView		Rozdzielczość
+Chunk size	InfoView		Rozmiar fragmentu
+File format	AppNodeInfoView		Format pliku
+Matrix mask	InfoView		Maska matrycy
+Channel mask	InfoView		Maska kanałów
+Orientation	InfoView		Orientacja
+Live file-interface node	FileNodeInfoView		Aktywny węzeł plik-interfejs
+Channels	InfoView		Kanały
+Sample rate	InfoView		Częstotliwość próbkowania
+File format	FileNodeInfoView		Format pliku
+(no file)	FileNodeInfoView		(brak pliku)
+Media input	InfoView		Wejście mediów
+Bit rate	InfoView		Przepływność
+Input format	DormantNodeInfoView		Format wejścia
+Format	InfoView		Format
+Version	AppNodeInfoView		Wersja
+AddOn ID	DormantNodeInfoView		ID dodatku
+Frame size	InfoView		Rozmiar ramki
+Flavor ID	DormantNodeInfoView		ID odmiany
+Run mode	LiveNodeInfoView		Tryb działania
+\n- Codec:	FileNodeInfoView		\n- Kodek:
+Port	LiveNodeInfoView		Port
+Output format	DormantNodeInfoView		Format wyjściowy
+Aspect ratio	InfoView		Format obrazu
+Application-owned node	AppNodeInfoView		Węzeł należący do aplikacji
+Tracks	FileNodeInfoView		Ścieżki
+Source	InfoView		Źródło
+Destination	InfoView		Cel
+Copyright	FileNodeInfoView		Copyright
+ID:	FileNodeInfoView		ID:

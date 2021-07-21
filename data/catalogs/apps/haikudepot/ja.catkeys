@@ -39,7 +39,7 @@ Local	LocalPkgDataLoadProcess		ローカル
 Rate %Package%	RatePackageWindow		%Package% の評価
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		パッケージマネージャーの初期化中にエラーが発生しました: %message%
 Quit HaikuDepot	App		HaikuDepot の終了
-Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		このコンピューターから匿名の使用情報をHaikuDepotServerシステムに送信することに問題はありますか? あとで、\"設定\"ウィンドウで選択を変えられます。
+Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		このコンピューターから匿名の使用情報を HaikuDepotServer システムに送信することを受け入れますか?あとから、\"設定\" ウィンドウで選択を変えられます。
 An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		予期しないエラー '%Message%' が、プロパティ '%Property%' で発生しました。
 A response to the captcha question must be provided.	UserLoginWindow		キャプチャへの回答は提供される必要がある。
 Category	FilterView		分類

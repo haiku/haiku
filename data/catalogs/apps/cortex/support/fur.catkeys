@@ -1,8 +1,10 @@
-1	friulian	application/x-vnd.Cortex.support	1960494264
+1	friulian	application/x-vnd.Cortex.support	3808791440
 Header has flags	MediaString		La intestazion e à opzions
 32 bit HLS	MediaString		HLS a 32 bit
+Recording	MediaString		Regjistrazion
 (unknown format)	MediaString		(formât no cognossût)
 Clean buffers	MediaString		Nete lis memoriis tampon
+{0, plural,one{# frame forward}other{# frames forward}}	MediaString		{0, plural,one{# fotogram indenant}other{# fotograms indenant}}
 Rear-right	MediaString		Daûr a diestre
 {0, plural, one{# pixel} other{# pixels}}	MediaString		{0, plural, one{# pixel} other{# pixels}}
 Mono	MediaString		Mono
@@ -114,6 +116,7 @@ HTML	MediaString		HTML
 Time source	MediaString		Sorzint temporâl
 15 bit RGB	MediaString		RGB a 15 bit
 ProLogic LR	MediaString		ProLogic LR
+{0, plural,one{# byte per frame}other{# bytes per frame}}	MediaString		{0, plural,one{# byte par fotogram}other{# bytes par fotogram}}
 Parameters	MediaString		Parametris
 Raw data from VBL area	MediaString		Dâts grês de aree VBL
 Top-Back-right	MediaString		In alt daûr a diestre
@@ -134,5 +137,6 @@ Unknown media type	MediaString		Gjenar multimediâl no cognossût
 MPEG2	MediaString		MPEG2
 Miscellaneous format family	MediaString		Famee di formâts varis
 24 bit RGB	MediaString		RGB a 24 bit
+{0, plural,one{# frame backward}other{# frames backward}}	MediaString		{0, plural,one{# fotogram indaûr}other{# fotograms indaûr}}
 32 bit HSIA	MediaString		HSIA a 32 bit
 Raw video	MediaString		Video grês
