@@ -191,8 +191,8 @@ RemotePackageRepository HaikuPorts
 	graphite2_x86-1.3.14-1
 	graphite2_x86_devel-1.3.14-1
 	grep_x86-3.6-2
-	haikuwebkit_x86-1.8.2-1
-	haikuwebkit_x86_devel-1.8.2-1
+	haikuwebkit_x86-1.8.2-2
+	haikuwebkit_x86_devel-1.8.2-2
 	harfbuzz_x86-2.8.1-1
 	harfbuzz_x86_devel-2.8.1-1
 	icu66_x86-66.1-2
