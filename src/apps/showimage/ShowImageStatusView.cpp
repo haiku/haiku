@@ -220,8 +220,9 @@ ShowImageStatusView::_ValidatePreferredSize()
 	fPreferredSize.height = ceilf(fontHeight.ascent + fontHeight.descent
 		+ fontHeight.leading);
 
-	if (fPreferredSize.height < B_H_SCROLL_BAR_HEIGHT)
-		fPreferredSize.height = B_H_SCROLL_BAR_HEIGHT;
+	float scrollBarSize = be_control_look->GetScrollBarWidth(B_HORIZONTAL);
+	if (fPreferredSize.height < scrollBarSize)
+		fPreferredSize.height = scrollBarSize;
 
 	float delta = fPreferredSize.width - orgWidth;
 	ResizeBy(delta, 0);
