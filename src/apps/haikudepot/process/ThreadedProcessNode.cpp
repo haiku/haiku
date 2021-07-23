@@ -12,15 +12,25 @@
 #include "Logger.h"
 
 
-#define TIMEOUT_UNTIL_STARTED_SECS 10
-#define TIMEOUT_UNTIL_STOPPED_SECS 10
+#define TIMEOUT_UNTIL_STARTED_SECS_DEFAULT 10
+#define TIMEOUT_UNTIL_STOPPED_SECS_DEFAULT 10
+
+
+ThreadedProcessNode::ThreadedProcessNode(AbstractProcess* process,
+		int32 startTimeoutSeconds)
+	:
+	AbstractProcessNode(process),
+	fWorker(B_BAD_THREAD_ID),
+	fStartTimeoutSeconds(startTimeoutSeconds)
+{
+}
 
 
 ThreadedProcessNode::ThreadedProcessNode(AbstractProcess* process)
 	:
 	AbstractProcessNode(process),
-	fWorker(B_BAD_THREAD_ID)
-
+	fWorker(B_BAD_THREAD_ID),
+	fStartTimeoutSeconds(TIMEOUT_UNTIL_STARTED_SECS_DEFAULT)
 {
 }
 
@@ -34,7 +44,7 @@ ThreadedProcessNode::~ThreadedProcessNode()
 */
 
 status_t
-ThreadedProcessNode::StartProcess()
+ThreadedProcessNode::Start()
 {
 	if (fWorker != B_BAD_THREAD_ID)
 		return B_BUSY;
@@ -47,40 +57,17 @@ ThreadedProcessNode::StartProcess()
 	if (fWorker >= 0) {
 		resume_thread(fWorker);
 		return _SpinUntilProcessState(PROCESS_RUNNING | PROCESS_COMPLETE,
-			TIMEOUT_UNTIL_STARTED_SECS);
+			fStartTimeoutSeconds);
 	}
 
 	return B_ERROR;
 }
 
 
-/*! Considered to be protected from concurrent access by the ProcessCoordinator
-*/
-
 status_t
-ThreadedProcessNode::StopProcess()
+ThreadedProcessNode::RequestStop()
 {
-	Process()->SetListener(NULL);
-	status_t stopResult = Process()->Stop();
-	status_t waitResult = _SpinUntilProcessState(PROCESS_COMPLETE,
-		TIMEOUT_UNTIL_STOPPED_SECS);
-
-	// if the thread is still running then it will be necessary to tear it
-	// down.
-
-	if (waitResult != B_OK) {
-		HDINFO("[%s] process did not stop within timeout - will be stopped "
-			"uncleanly", Process()->Name());
-		kill_thread(fWorker);
-	}
-
-	if (stopResult != B_OK)
-		return stopResult;
-
-	if (waitResult != B_OK)
-		return waitResult;
-
-	return B_OK;
+	return Process()->Stop();
 }
 
 

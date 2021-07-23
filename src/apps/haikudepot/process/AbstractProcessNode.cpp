@@ -12,8 +12,8 @@
 #include "Logger.h"
 
 
-#define SPIN_UNTIL_STARTED_DELAY_MI 250 * 1000
-	// quarter of a second
+#define SPIN_DELAY_MI 500 * 1000
+	// half of a second
 
 #define TIMEOUT_UNTIL_STARTED_SECS 10
 #define TIMEOUT_UNTIL_STOPPED_SECS 10
@@ -45,20 +45,21 @@ AbstractProcessNode::Process() const
 
 status_t
 AbstractProcessNode::_SpinUntilProcessState(
-	uint32 desiredStatesMask, uint32 timeoutSeconds)
+	uint32 desiredStatesMask, int32 timeoutSeconds)
 {
 	bigtime_t start = system_time();
-	bigtime_t timeoutMicroSeconds = timeoutSeconds * 1000 * 1000;
-
 	while (true) {
 		if ((Process()->ProcessState() & desiredStatesMask) != 0)
 			return B_OK;
 
-		usleep(SPIN_UNTIL_STARTED_DELAY_MI);
+		usleep(SPIN_DELAY_MI);
 
-		if (system_time() - start > timeoutMicroSeconds) {
-			HDERROR("[Node<%s>] timeout waiting for process state",
-				Process()->Name());
+		int32 secondElapsed = static_cast<int32>(
+			(system_time() - start) / (1000 * 1000));
+
+		if (timeoutSeconds > 0 && secondElapsed > timeoutSeconds) {
+			HDERROR("[Node<%s>] timeout waiting for process state after %"
+				B_PRIi32 " seconds", Process()->Name(), secondElapsed);
 			return B_ERROR;
 		}
 	}

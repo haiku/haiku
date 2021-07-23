@@ -48,6 +48,7 @@
 #include "support.h"
 #include "ScreenshotWindow.h"
 #include "SettingsWindow.h"
+#include "ShuttingDownWindow.h"
 #include "ToLatestUserUsageConditionsWindow.h"
 #include "UserLoginWindow.h"
 #include "UserUsageConditionsWindow.h"
@@ -133,12 +134,14 @@ MainWindow::MainWindow(const BMessage& settings)
 		B_DOCUMENT_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
 	fScreenshotWindow(NULL),
+	fShuttingDownWindow(NULL),
 	fUserMenu(NULL),
 	fLogInItem(NULL),
 	fLogOutItem(NULL),
 	fUsersUserUsageConditionsMenuItem(NULL),
 	fModelListener(new MainWindowModelListener(BMessenger(this)), true),
 	fCoordinator(NULL),
+	fShouldCloseWhenNoProcessesToCoordinate(false),
 	fSinglePackageMode(false)
 {
 	if ((fCoordinatorRunningSem = create_sem(1, "ProcessCoordinatorSem")) < B_OK)
@@ -226,12 +229,14 @@ MainWindow::MainWindow(const BMessage& settings, const PackageInfoRef& package)
 	fPackageListView(NULL),
 	fWorkStatusView(NULL),
 	fScreenshotWindow(NULL),
+	fShuttingDownWindow(NULL),
 	fUserMenu(NULL),
 	fLogInItem(NULL),
 	fLogOutItem(NULL),
 	fUsersUserUsageConditionsMenuItem(NULL),
 	fModelListener(new MainWindowModelListener(BMessenger(this)), true),
 	fCoordinator(NULL),
+	fShouldCloseWhenNoProcessesToCoordinate(false),
 	fSinglePackageMode(true)
 {
 	if ((fCoordinatorRunningSem = create_sem(1, "ProcessCoordinatorSem")) < B_OK)
@@ -268,23 +273,56 @@ MainWindow::~MainWindow()
 
 	BPackageRoster().StopWatching(this);
 
-	if (fScreenshotWindow != NULL && fScreenshotWindow->Lock())
-		fScreenshotWindow->Quit();
+	if (fScreenshotWindow != NULL) {
+		if (fScreenshotWindow->Lock())
+			fScreenshotWindow->Quit();
+	}
+
+	if (fShuttingDownWindow != NULL) {
+		if (fShuttingDownWindow->Lock())
+			fShuttingDownWindow->Quit();
+	}
 }
 
 
 bool
 MainWindow::QuitRequested()
 {
-	BMessage settings;
-	StoreSettings(settings);
-
-	BMessage message(MSG_MAIN_WINDOW_CLOSED);
-	message.AddMessage(KEY_WINDOW_SETTINGS, &settings);
-
-	be_app->PostMessage(&message);
 
 	_StopProcessCoordinators();
+
+	// If there are any processes in flight we need to be careful to make
+	// sure that they are cleanly completed before actually quitting.  By
+	// turning on the `fShouldCloseWhenNoProcessesToCoordinate` flag, when
+	// the process coordination has completed then it will detect this and
+	// quit again.
+
+	{
+		AutoLocker<BLocker> lock(&fCoordinatorLock);
+		fShouldCloseWhenNoProcessesToCoordinate = true;
+
+		if (fCoordinator.IsSet()) {
+			HDINFO("a coordinator is running --> will wait before quitting...");
+
+			if (fShuttingDownWindow == NULL)
+				fShuttingDownWindow = new ShuttingDownWindow(this);
+			fShuttingDownWindow->Show();
+
+			return false;
+		}
+	}
+
+	BMessage settings;
+	StoreSettings(settings);
+	BMessage message(MSG_MAIN_WINDOW_CLOSED);
+	message.AddMessage(KEY_WINDOW_SETTINGS, &settings);
+	be_app->PostMessage(&message);
+
+	if (fShuttingDownWindow != NULL) {
+		if (fShuttingDownWindow->Lock())
+			fShuttingDownWindow->Quit();
+		fShuttingDownWindow = NULL;
+	}
 
 	return true;
 }
@@ -1367,6 +1405,13 @@ MainWindow::_AddProcessCoordinator(ProcessCoordinator* item)
 {
 	AutoLocker<BLocker> lock(&fCoordinatorLock);
 
+	if (fShouldCloseWhenNoProcessesToCoordinate) {
+		HDINFO("system shutting down --> new process coordinator [%s] rejected",
+			item->Name().String());
+		delete item;
+		return;
+	}
+
 	item->SetListener(this);
 
 	if (!fCoordinator.IsSet()) {
@@ -1405,29 +1450,19 @@ MainWindow::_SpinUntilProcessCoordinatorComplete()
 void
 MainWindow::_StopProcessCoordinators()
 {
-	HDINFO("will stop all process coordinators");
+	HDINFO("will stop all queued process coordinators");
+	AutoLocker<BLocker> lock(&fCoordinatorLock);
 
-	{
-		AutoLocker<BLocker> lock(&fCoordinatorLock);
-
-		while (!fCoordinatorQueue.empty()) {
-			BReference<ProcessCoordinator> processCoordinator
-				= fCoordinatorQueue.front();
-			HDINFO("will drop queued process coordinator [%s]",
-				processCoordinator->Name().String());
-			fCoordinatorQueue.pop();
-		}
-
-		if (fCoordinator.IsSet()) {
-			fCoordinator->Stop();
-		}
+	while (!fCoordinatorQueue.empty()) {
+		BReference<ProcessCoordinator> processCoordinator
+			= fCoordinatorQueue.front();
+		HDINFO("will drop queued process coordinator [%s]",
+			processCoordinator->Name().String());
+		fCoordinatorQueue.pop();
 	}
 
-	HDINFO("will wait until the process coordinator has stopped");
-
-	_SpinUntilProcessCoordinatorComplete();
-
-	HDINFO("did stop all process coordinators");
+	if (fCoordinator.IsSet())
+		fCoordinator->RequestStop();
 }
 
 
@@ -1474,6 +1509,11 @@ MainWindow::CoordinatorChanged(ProcessCoordinatorState& coordinatorState)
 			}
 			else {
 				_NotifyWorkStatusClear();
+				if (fShouldCloseWhenNoProcessesToCoordinate) {
+					HDINFO("no more processes to coord --> will quit");
+					BMessage message(B_QUIT_REQUESTED);
+					PostMessage(&message);
+				}
 			}
 		}
 		else {
@@ -1481,8 +1521,10 @@ MainWindow::CoordinatorChanged(ProcessCoordinatorState& coordinatorState)
 				coordinatorState.Progress());
 				// show the progress to the user.
 		}
-	} else
+	} else {
+		_NotifyWorkStatusClear();
 		HDINFO("! unknown process coordinator changed");
+	}
 }
 
 

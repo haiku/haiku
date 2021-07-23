@@ -142,7 +142,7 @@ ProcessCoordinator::Start()
 
 
 void
-ProcessCoordinator::Stop()
+ProcessCoordinator::RequestStop()
 {
 	AutoLocker<BLocker> locker(&fLock);
 	if (!fWasStopped) {
@@ -150,19 +150,10 @@ ProcessCoordinator::Stop()
 		HDINFO("[Coordinator] will stop process coordinator");
 		for (int32 i = 0; i < fNodes.CountItems(); i++) {
 			AbstractProcessNode* node = fNodes.ItemAt(i);
-			if (node->Process()->ErrorStatus() != B_OK) {
-				HDINFO("[Coordinator] stopping process [%s] (owing to error)",
-					node->Process()->Name());
-			} else {
-				HDINFO("[Coordinator] stopping process [%s]",
-					node->Process()->Name());
-			}
-			node->StopProcess();
+			HDINFO("[Coordinator] stopping process [%s]",
+				node->Process()->Name());
+			node->RequestStop();
 		}
-	}
-	if (fListener != NULL) {
-		ProcessCoordinatorState state = _CreateStatus();
-		fListener->CoordinatorChanged(state);
 	}
 }
 
@@ -307,7 +298,7 @@ ProcessCoordinator::_Coordinate()
 
 		if (node->Process()->ProcessState() == PROCESS_INITIAL) {
 			if (node->AllPredecessorsComplete())
-				node->StartProcess();
+				node->Start();
 			else {
 				HDTRACE("[Coordinator] all predecessors not complete -> "
 					"[%s] not started", node->Process()->Name());
@@ -349,7 +340,7 @@ ProcessCoordinator::_StopSuccessorNodes(AbstractProcessNode* predecessorNode)
 		if (process->ProcessState() == PROCESS_INITIAL) {
 			HDDEBUG("[Coordinator] [%s] (failed) --> [%s] (stopping)",
 				predecessorNode->Process()->Name(), process->Name());
-			node->StopProcess();
+			node->RequestStop();
 			_StopSuccessorNodes(node);
 		}
 	}

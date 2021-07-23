@@ -173,7 +173,8 @@ ProcessCoordinatorFactory::_CreateInstallPackageActionCoordinator(
 	PackageInfoRef package = _ExtractPackageFromMessage(model, message);
 	if (package.IsSet()) {
 		AbstractProcessNode *processNode =
-			new ThreadedProcessNode(new InstallPackageProcess(package, model));
+			new ThreadedProcessNode(
+				new InstallPackageProcess(package, model), 10);
 		processCoordinator->AddNode(processNode);
 	} else {
 		HDERROR("unable to find the package");
@@ -191,8 +192,8 @@ ProcessCoordinatorFactory::_CreateUninstallPackageActionCoordinator(
 	PackageInfoRef package = _ExtractPackageFromMessage(model, message);
 	if (package.IsSet()) {
 		AbstractProcessNode *processNode =
-			new ThreadedProcessNode(new UninstallPackageProcess(
-				package, model));
+			new ThreadedProcessNode(
+				new UninstallPackageProcess(package, model), 10);
 		processCoordinator->AddNode(processNode);
 	} else {
 		HDERROR("unable to find the package");

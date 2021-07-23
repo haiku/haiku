@@ -24,8 +24,8 @@ public:
 	virtual						~AbstractProcessNode();
 
 			AbstractProcess*	Process() const;
-	virtual	status_t			StartProcess() = 0;
-	virtual	status_t			StopProcess() = 0;
+	virtual	status_t			Start() = 0;
+	virtual	status_t			RequestStop() = 0;
 
 			void				AddPredecessor(AbstractProcessNode* node);
 			int32				CountPredecessors() const;
@@ -40,7 +40,7 @@ public:
 protected:
 			status_t			_SpinUntilProcessState(
 									uint32 desiredStatesMask,
-									uint32 timeoutSeconds);
+									int32 timeoutSeconds);
 
 private:
 			void				_AddSuccessor(AbstractProcessNode* node);

@@ -14,16 +14,19 @@ class AbstractProcess;
 
 class ThreadedProcessNode : public AbstractProcessNode {
 public:
+								ThreadedProcessNode(AbstractProcess* process,
+									int32 startTimeoutSeconds);
 								ThreadedProcessNode(AbstractProcess* process);
 	virtual						~ThreadedProcessNode();
 
-	virtual	status_t			StartProcess();
-	virtual	status_t			StopProcess();
+	virtual	status_t			Start();
+	virtual	status_t			RequestStop();
 
 private:
 	static	status_t			_StartProcess(void* cookie);
 
 			thread_id			fWorker;
+			int32				fStartTimeoutSeconds;
 };
 
 

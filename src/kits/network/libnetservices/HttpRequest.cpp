@@ -417,6 +417,7 @@ BHttpRequest::Result() const
 status_t
 BHttpRequest::Stop()
 {
+
 	if (fSocket != NULL) {
 		fSocket->Disconnect();
 			// Unlock any pending connect, read or write operation.

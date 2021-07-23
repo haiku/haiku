@@ -15,6 +15,8 @@
 #include <pthread.h>
 #include <stdio.h>
 
+#include "Logger.h"
+
 
 // #pragma mark - MachineRoom
 
@@ -78,6 +80,7 @@ private:
 
 		BMessenger* messenger = new BMessenger(pole);
 		fMessengers.AddItem(messenger);
+		HDTRACE("did add barber-pole to machine room");
 
 		if (wasEmpty)
 			release_sem(fSpinLoopLock);
@@ -91,6 +94,7 @@ private:
 			BMessenger* messenger = fMessengers.ItemAt(i);
 			if (messenger->Target(NULL) == pole) {
 				fMessengers.RemoveItem(messenger, true);
+				HDTRACE("did remove barber-pole from machine room");
 				break;
 			}
 		}

@@ -149,6 +149,7 @@ local applicationSources =
 	ScrollableGroupView.cpp
 	SettingsWindow.cpp
 	SharedBitmap.cpp
+	ShuttingDownWindow.cpp
 	ToLatestUserUsageConditionsWindow.cpp
 	UserCredentials.cpp
 	UserDetail.cpp
@@ -174,7 +175,6 @@ local applicationSources =
 	AbstractSingleFileServerProcess.cpp
 	LocalPkgDataLoadProcess.cpp
 	LocalRepositoryUpdateProcess.cpp
-	NonBlockingProcessNode.cpp
 	ProcessCoordinator.cpp
 	ProcessCoordinatorFactory.cpp
 	ServerHelper.cpp

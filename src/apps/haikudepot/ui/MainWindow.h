@@ -31,6 +31,7 @@ class PackageActionsView;
 class PackageInfoView;
 class PackageListView;
 class ScreenshotWindow;
+class ShuttingDownWindow;
 class WorkStatusView;
 
 
@@ -146,6 +147,7 @@ private:
 			WorkStatusView*		fWorkStatusView;
 
 			ScreenshotWindow*	fScreenshotWindow;
+			ShuttingDownWindow*	fShuttingDownWindow;
 
 			BMenu*				fUserMenu;
 			BMenu*				fRepositoryMenu;
@@ -169,6 +171,7 @@ private:
 								fCoordinator;
 			BLocker				fCoordinatorLock;
 			sem_id				fCoordinatorRunningSem;
+			bool				fShouldCloseWhenNoProcessesToCoordinate;
 
 			bool				fSinglePackageMode;
 

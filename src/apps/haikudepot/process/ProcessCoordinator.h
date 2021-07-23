@@ -98,7 +98,7 @@ public:
 			bool				IsRunning();
 
 			void				Start();
-			void				Stop();
+			void				RequestStop();
 
 			status_t			ErrorStatus();
 
