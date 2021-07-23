@@ -737,11 +737,11 @@ _user_xsi_semget(key_t key, int numberOfSemaphores, int flags)
 		(int)key, numberOfSemaphores, flags));
 	XsiSemaphoreSet *semaphoreSet = NULL;
 	Ipc *ipcKey = NULL;
-	// Default assumptions
-	bool isPrivate = true;
-	bool create = true;
 
-	MutexLocker _(sIpcLock);
+	// Default assumption
+	bool isPrivate = true;
+
+	MutexLocker ipcLocker(sIpcLock);
 	if (key != IPC_PRIVATE) {
 		isPrivate = false;
 		// Check if key already exist, if it does it already has a semaphore
@@ -760,7 +760,6 @@ _user_xsi_semget(key_t key, int numberOfSemaphores, int flags)
 					"for key %d\n",	(int)key));
 				return ENOMEM;
 			}
-			sIpcHashTable.Insert(ipcKey);
 		} else {
 			// The IPC key exist and it already has a semaphore
 			if ((flags & IPC_CREAT) && (flags & IPC_EXCL)) {
@@ -769,7 +768,7 @@ _user_xsi_semget(key_t key, int numberOfSemaphores, int flags)
 			}
 			int semaphoreSetID = ipcKey->SemaphoreSetID();
 
-			MutexLocker _(sXsiSemaphoreSetLock);
+			MutexLocker semaphoreSetLocker(sXsiSemaphoreSetLock);
 			semaphoreSet = sSemaphoreHashTable.Lookup(semaphoreSetID);
 			if (semaphoreSet == NULL) {
 				TRACE_ERROR(("xsi_semget: calling process has no semaphore, "
@@ -789,47 +788,51 @@ _user_xsi_semget(key_t key, int numberOfSemaphores, int flags)
 					semaphoreSet->ID(), (int)key));
 				return EINVAL;
 			}
-			create = false;
+
+			return semaphoreSet->ID();
 		}
 	}
 
-	if (create) {
-		// Create a new sempahore set for this key
-		if (numberOfSemaphores <= 0
-			|| numberOfSemaphores >= MAX_XSI_SEMS_PER_TEAM) {
-			TRACE_ERROR(("xsi_semget: numberOfSemaphores out of range\n"));
-			return EINVAL;
-		}
-		if (sXsiSemaphoreCount >= MAX_XSI_SEMAPHORE
-			|| sXsiSemaphoreSetCount >= MAX_XSI_SEMAPHORE_SET) {
-			TRACE_ERROR(("xsi_semget: reached limit of maximum number of "
-				"semaphores allowed\n"));
-			return ENOSPC;
-		}
-
-		semaphoreSet = new(std::nothrow) XsiSemaphoreSet(numberOfSemaphores,
-			flags);
-		if (semaphoreSet == NULL || !semaphoreSet->InitOK()) {
-			TRACE_ERROR(("xsi_semget: failed to allocate a new xsi "
-				"semaphore set\n"));
-			delete semaphoreSet;
-			return ENOMEM;
-		}
-		atomic_add(&sXsiSemaphoreCount, numberOfSemaphores);
-		atomic_add(&sXsiSemaphoreSetCount, 1);
-
-		MutexLocker _(sXsiSemaphoreSetLock);
-		semaphoreSet->SetID();
-		if (isPrivate) {
-			semaphoreSet->SetIpcKey((key_t)-1);
-		} else {
-			semaphoreSet->SetIpcKey(key);
-			ipcKey->SetSemaphoreSetID(semaphoreSet);
-		}
-		sSemaphoreHashTable.Insert(semaphoreSet);
-		TRACE(("semget: new set = %d created, sequence = %ld\n",
-			semaphoreSet->ID(), semaphoreSet->SequenceNumber()));
+	// Create a new sempahore set for this key
+	if (numberOfSemaphores <= 0
+		|| numberOfSemaphores >= MAX_XSI_SEMS_PER_TEAM) {
+		TRACE_ERROR(("xsi_semget: numberOfSemaphores out of range\n"));
+		delete ipcKey;
+		return EINVAL;
 	}
+	if (sXsiSemaphoreCount >= MAX_XSI_SEMAPHORE
+		|| sXsiSemaphoreSetCount >= MAX_XSI_SEMAPHORE_SET) {
+		TRACE_ERROR(("xsi_semget: reached limit of maximum number of "
+			"semaphores allowed\n"));
+		delete ipcKey;
+		return ENOSPC;
+	}
+
+	semaphoreSet = new(std::nothrow) XsiSemaphoreSet(numberOfSemaphores,
+		flags);
+	if (semaphoreSet == NULL || !semaphoreSet->InitOK()) {
+		TRACE_ERROR(("xsi_semget: failed to allocate a new xsi "
+			"semaphore set\n"));
+		delete semaphoreSet;
+		delete ipcKey;
+		return ENOMEM;
+	}
+
+	atomic_add(&sXsiSemaphoreCount, numberOfSemaphores);
+	atomic_add(&sXsiSemaphoreSetCount, 1);
+
+	MutexLocker semaphoreSetLocker(sXsiSemaphoreSetLock);
+	semaphoreSet->SetID();
+	if (isPrivate) {
+		semaphoreSet->SetIpcKey((key_t)-1);
+	} else {
+		sIpcHashTable.Insert(ipcKey);
+		semaphoreSet->SetIpcKey(key);
+		ipcKey->SetSemaphoreSetID(semaphoreSet);
+	}
+	sSemaphoreHashTable.Insert(semaphoreSet);
+	TRACE(("semget: new set = %d created, sequence = %ld\n",
+		semaphoreSet->ID(), semaphoreSet->SequenceNumber()));
 
 	return semaphoreSet->ID();
 }
