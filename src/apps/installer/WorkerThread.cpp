@@ -311,6 +311,10 @@ WorkerThread::_LaunchFinishScript(BPath &path)
 	command.SetToFormat("mkdir -p \"%s/system/cache/tmp\"", path.Path());
 	if (system(command.String()) != 0)
 		return B_ERROR;
+	command.SetToFormat("mkdir -p \"%s/system/packages/administrative\"",
+		path.Path());
+	if (system(command.String()) != 0)
+		return B_ERROR;
 
 	// Ask for first boot processing of all the packages copied into the new
 	// installation, since by just copying them the normal package processing
