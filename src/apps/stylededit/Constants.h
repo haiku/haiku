@@ -54,7 +54,8 @@ const uint32 FONT_STYLE					= 'FSch';
 const uint32 FONT_COLOR					= 'Fcol';
 const uint32 kMsgSetItalic				= 'Fita';
 const uint32 kMsgSetBold				= 'Fbld';
-const uint32 kMsgSetFontDown				= 'Fsdw';
+const uint32 kMsgSetUnderline			= 'Fuln';
+const uint32 kMsgSetFontDown			= 'Fsdw';
 const uint32 kMsgSetFontUp				= 'Fsup';
 
 const rgb_color palette[] = {

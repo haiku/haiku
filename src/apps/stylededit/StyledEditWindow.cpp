@@ -376,6 +376,7 @@ StyledEditWindow::MessageReceived(BMessage* message)
 			font.SetFamilyAndStyle(fontFamily, fontStyle);
 			fItalicItem->SetMarked((font.Face() & B_ITALIC_FACE) != 0);
 			fBoldItem->SetMarked((font.Face() & B_BOLD_FACE) != 0);
+			fUnderlineItem->SetMarked((font.Face() & B_UNDERSCORE_FACE) != 0);
 
 			_SetFontStyle(fontFamily, fontStyle);
 			break;
@@ -400,6 +401,7 @@ StyledEditWindow::MessageReceived(BMessage* message)
 			font.SetFamilyAndStyle(fontFamily, fontStyle);
 			fItalicItem->SetMarked((font.Face() & B_ITALIC_FACE) != 0);
 			fBoldItem->SetMarked((font.Face() & B_BOLD_FACE) != 0);
+			fUnderlineItem->SetMarked((font.Face() & B_UNDERSCORE_FACE) != 0);
 
 			_SetFontStyle(fontFamily, fontStyle);
 			break;
@@ -466,6 +468,23 @@ StyledEditWindow::MessageReceived(BMessage* message)
 			if (fBoldItem->IsMarked())
 				font.SetFace(B_REGULAR_FACE);
 			fBoldItem->SetMarked(!fBoldItem->IsMarked());
+
+			font_family family;
+			font_style style;
+			font.GetFamilyAndStyle(&family, &style);
+
+			_SetFontStyle(family, style);
+			break;
+		}
+		case kMsgSetUnderline:
+		{
+			uint32 sameProperties;
+			BFont font;
+			fTextView->GetFontAndColor(&font, &sameProperties);
+
+			if (fUnderlineItem->IsMarked())
+				font.SetFace(B_REGULAR_FACE);
+			fUnderlineItem->SetMarked(!fUnderlineItem->IsMarked());
 
 			font_family family;
 			font_style style;
@@ -742,6 +761,7 @@ StyledEditWindow::MenusBeginning()
 
 	fBoldItem->SetMarked((font.Face() & B_BOLD_FACE) != 0);
 	fItalicItem->SetMarked((font.Face() & B_ITALIC_FACE) != 0);
+	fUnderlineItem->SetMarked((font.Face() & B_UNDERSCORE_FACE) != 0);
 
 	switch (fTextView->Alignment()) {
 		case B_ALIGN_LEFT:
@@ -1213,6 +1233,10 @@ StyledEditWindow::_InitWindow(uint32 encoding)
 		new BMessage(kMsgSetItalic));
 	fItalicItem->SetShortcut('I', 0);
 
+	fUnderlineItem = new BMenuItem(B_TRANSLATE("Underline"),
+		new BMessage(kMsgSetUnderline));
+	fUnderlineItem->SetShortcut('U', 0);
+
 	fFontMenu = new BMenu(B_TRANSLATE("Font"));
 	fCurrentFontItem = 0;
 	fCurrentStyleItem = 0;
@@ -1226,6 +1250,7 @@ StyledEditWindow::_InitWindow(uint32 encoding)
 		.AddItem(B_TRANSLATE("Decrease size"), kMsgSetFontDown, '-')
 		.AddItem(fBoldItem)
 		.AddItem(fItalicItem)
+		.AddItem(fUnderlineItem)
 		.AddSeparator()
 	.End();
 
@@ -1879,9 +1904,12 @@ StyledEditWindow::_SetFontStyle(const char* fontFamily, const char* fontStyle)
 	if (fItalicItem->IsMarked())
 		face |= B_ITALIC_FACE;
 
+	if (fUnderlineItem->IsMarked())
+		face |= B_UNDERSCORE_FACE;
+
 	font.SetFace(face);
 
-	fTextView->SetFontAndColor(&font, B_FONT_FAMILY_AND_STYLE);
+	fTextView->SetFontAndColor(&font, B_FONT_FAMILY_AND_STYLE | B_FONT_FACE);
 
 	BMenuItem* superItem;
 	superItem = fFontMenu->FindItem(fontFamily);
