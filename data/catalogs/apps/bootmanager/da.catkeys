@@ -2,9 +2,9 @@
 Old Master Boot Record backup failure	BootManagerController	Title	Sikkerhedskopiering af gammel Master Boot Record mislykkedes
 At least one partition must be selected!	BootManagerController		Mindst en af partitionerne skal være valgt!
 No space available!	DrivesPage	Cannot install	Ingen plads tilgængelig!
-Boot Manager is unable to read the partition table!	BootManagerController		Opstartsmanageren er ude af stand til at læse partitionstabellen!
+Boot Manager is unable to read the partition table!	BootManagerController		Opstartshåndteringen er ude af stand til at læse partitionstabellen!
 Immediately	DefaultPartitionPage		Omgående
-Uninstall Boot Manager	UninstallPage	Title	Afinstaller opstartsmanageren
+Uninstall Boot Manager	UninstallPage	Title	Afinstaller Opstartshåndteringen
 Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Ukendt
 Installation of boot menu failed	BootManagerController	Title	Installationen af opstartsmenuen mislykkedes
 Backup Master Boot Record	BootManagerController	Title	Sikkerhedskopiér Master Boot Record
@@ -19,12 +19,12 @@ After three seconds	DefaultPartitionPage		Efter tre sekunder
 Read only!	DrivesPage	Cannot install	Skrivebeskyttet!
 Write boot menu	BootManagerController	Button	Skriv opstartsmenu
 OK	BootManagerController	Button	OK
-Uninstall boot manager	BootManagerController	Title	Afinstaller opstartsmanager
+Uninstall boot manager	BootManagerController	Title	Afinstaller Opstartshåndtering
 About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		I gang med at skrive følgende opstartsmenu til opstartsdisken (%s). Verificer venligst informationen nedenfor før du fortsætter.
 The first partition on the disk starts too early and does not leave enough space free for a boot menu.\nBoot Manager needs 2 KiB available space before the first partition.	BootManagerController		Den første partition på disken starter for tidligt og efterlader ikke nok ledig plads til en opstartsmenu.\nOpstartshåndteringen behøver 2 KiB tilgængelige plads før den første partition.
 Uninstall	DrivesPage	Button	Afinstaller
 Update	DrivesPage	Button	Opdater
-The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		Master Boot Record (MBR) af start-enheden:\n\t%s\nvil nu blive gemt til disken. Vælg venligst en fil til at gemme MBR i.\n\nHvis noget går galt ved installationen, eller hvis du senere vil fjerne start-menuen, skal du blot køre opstartsmanageren og vælge 'Afinstaller'.
+The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		Master Boot Record (MBR) af start-enheden:\n\t%s\nvil nu blive gemt til disken. Vælg venligst en fil til at gemme MBR i.\n\nHvis noget går galt ved installationen, eller hvis du senere vil fjerne start-menuen, skal du blot køre opstartshåndteringensprogrammet og vælge 'Afinstaller'.
 Default Partition	DefaultPartitionPage	Title	Standardpartition
 Installation of boot menu completed	BootManagerController	Title	Installationen af opstartsmenuen fuldført
 After one minute	DefaultPartitionPage		Efter et minut
@@ -37,8 +37,8 @@ The following partitions were detected. Please check the box next to the partiti
 After five seconds	DefaultPartitionPage		Efter fem sekunder
 Timeout: %s	DefaultPartitionPage		Timeout: %s
 The Master Boot Record could not be restored!	BootManagerController		Master Boot Record kunne ikke gendannes!
-The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager only works with IBM PC MBR partitions.	BootManagerController		Partitionstabellen på den første harddisk er ikke kompatibel med opstartshåndteringen.\nOpstartshåndtering virker kun med IBM PC MBR-partitioner.
-Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		Vælg venligst det drev opstartsmanageren skal installeres på eller afinstalleres fra.
+The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager only works with IBM PC MBR partitions.	BootManagerController		Partitionstabellen på den første harddisk er ikke kompatibel med Opstartshåndtering.\nOpstartshåndtering virker kun med IBM PC MBR-partitioner.
+Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		Vælg venligst det drev opstartshåndteringen skal installeres på eller afinstalleres fra.
 After four seconds	DefaultPartitionPage		Efter fire sekunder
 Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Unavngivet %d
 First partition starts too early	BootManagerController	Title	Første partition starter for tidligt
@@ -57,13 +57,13 @@ After two seconds	DefaultPartitionPage		Efter to sekunder
 Partition table not compatible	BootManagerController	Title	Partitionstabellen er ikke kompatibel
 The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		Master Boot Record fra opstartsenheden (%DISK) er blevet gendannet fra %FILE.
 Done	BootManagerController	Button	Færdig
-BootManager	System name		Opstartsmanager
-Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Find venligst Master Boot Record (MBR) filen til at gendanne fra. Dette er filen der blev lavet da opstartsmanageren blev installeret første gang.
-Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		Find venligst Master Boot Record (MBR) filen til at gendanne fra. Dette er filen der blev lavet da opstartsmanageren blev installeret første gang.
+BootManager	System name		Opstartshåndtering
+Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Find venligst Master Boot Record (MBR) filen til at gendanne fra. Dette er filen der blev lavet da opstartshåndteringen blev installeret første gang.
+Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		Find venligst Master Boot Record (MBR) filen til at gendanne fra. Dette er filen der blev lavet da opstartshåndteringen blev installeret første gang.
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	I gang med at gendanne Master Boot Record (MBR) af %disk fra %file. Vil du fortsætte?
 Install	DrivesPage	Button	Installer
 File:	FileSelectionPage	Text control label	Fil:
 Error reading partition table	BootManagerController	Title	Fejl ved læsninger af partitionstabellen
 Back	BootManagerController	Button	Tilbage
-The boot manager has been successfully installed on your system.	BootManagerController		Opstartsmanageren er blevet installeret på dit system.
+The boot manager has been successfully installed on your system.	BootManagerController		Opstartshåndteringen er blevet installeret på dit system.
 The old Master Boot Record could not be saved to %s. You can continue the installation but there will be no way to uninstall the boot menu.	BootManagerController		Den gamle Master Boot Record kunne ikke gemmes til %s. Du kan fortsætte installationen, men det vil ikke være muligt at afinstallere opstartsmenuen.

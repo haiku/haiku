@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-DriveSetup	2942313478
+1	greek, modern (1453-)	x-vnd.Haiku-DriveSetup	4048496535
 Could not unmount partition %s.	MainWindow		Δεν ήταν δυνατή η αποπροσάρτηση της κατάτμησης %s.
 Mount all	MainWindow		Προσάρτηση όλων
 Disk	MainWindow		Δίσκος
@@ -50,6 +50,8 @@ Are you sure you want to format a raw disk? (Most people initialize the disk wit
 Wipe (not implemented)	MainWindow		Εκκαθάριση (δεν έχει ενσωματωθεί ακόμα)
 The currently selected partition does not have a parent partition.	MainWindow		Η τρέχουσα επιλεγμένη κατάτμηση δεν έχει κατάτμηση γονέα.
 Validation of the given initialization parameters failed.	MainWindow		Η επικύρωση των δοθέντων παραμέτρων αρχικοποίησης απέτυχε.
+Not formatted (%s)	PartitionList		Αμορφοποίητο (%s)
+Failed to create the partition. No changes have been written to disk.	MainWindow		Η δημιουργία τομής απέτυχε. Καμιά αλλαγή δεν πραγματοποιήθηκε στο δίσκο.
 Shared	PartitionList		Κοινόχρηστη
 MIMEs	PartitionList		ΜΙΜΕ
 BitLocker encrypted	Encryption utils		Κρυπτογραφημένη με BitLocker
@@ -62,9 +64,11 @@ Change	ChangeParametersPanel		Αλλαγή
 Partition name:	ChangeParametersPanel		Όνομα κατάτμησης:
 LUKS encrypted	Encryption utils		Κρυπτογραφημένη με LUKS
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Είστε σίγουρος πως θέλετε να εγγράψετε τις αλλαγές στον δίσκο τώρα;\n\nΌλα τα δεδομένα στην κατάτμηση %s θα διαγραφούν οριστικά!
+Empty space	PartitionList		Κενός χώρος
 Cancel	AbstractParametersPanel		Άκυρο
 Format	MainWindow		Διαμόρφωση
 OK	MainWindow		Εντάξει
+Empty space	DiskView		Κενός χώρος
 Open with DiskProbe	MainWindow		Άνοιγμα με Ελεγχτή Δίσκου
 Could not delete the selected partition.	MainWindow		Αδυναμία διαγραφής της επιλεγμένης κατάτμησης.
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Είστε σίγουρος ότι θέλετε να αρχικοποιήσετε τον επιλεγμένο δίσκο; Όλα τα δεδομένα θα διαγραφούν. Θα ρωτηθείτε ξανά πριν εγγραφούν οι αλλαγές στον δίσκο.\n
@@ -81,6 +85,7 @@ Rescan	MainWindow		Επανάληψη σάρωσης
 There was an error acquiring the partition row.	MainWindow		Υπήρξε ένα σφάλμα κατά την απόκτηση της σειράς κατάτμησης.
 Failed to initialize the disk %s!\n	MainWindow		Η αρχικοποίηση του δίσκου %s απέτυχε!\n
 Disk system \"%s\" not found!	MainWindow		Το σύστημα δίσκου \"%s\" δεν βρέθηκε!
+The partition cannot be unmounted.	MainWindow		Η τομή δεν μπορεί να αποπροσαρτηστεί.
 Delete	MainWindow		Διαγραφή
 Partition type:	ChangeParametersPanel		Είδος κατάτμησης:
 Parameters	PartitionList		Παράμετροι

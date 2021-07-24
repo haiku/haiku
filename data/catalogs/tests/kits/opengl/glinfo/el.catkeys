@@ -1,10 +1,10 @@
 1	greek, modern (1453-)	x-vnd.Haiku-GLInfo	2318446144
-Maximum clipping planes	Capabilities		Μέγιστος αριθμός επιπέδων αποκοπής
+Maximum clipping planes	Capabilities		Μέγιστος αριθμός επιπέδων αποκοπής 
 Maximum evaluators equation order	Capabilities		Μέγιστη σειρά εξίσωσης αξιολογητών
-Texture stack size	Capabilities		Μέγεθος υφής στην μνήμη σωρού
+Texture stack size	Capabilities		Μέγεθος στοίβας υφής
 GL Info	System name		Πληροφορίες GL
 Information	InfoView		Πληροφορίες
-Attributes stack size	Capabilities		Μέγεθος ιδιοτήτων στην μνήμη σωρού
+Attributes stack size	Capabilities		Μέγεθος στοίβας ιδιοτήτων
 Maximum lights	Capabilities		Μέγιστος αριθμός φώτων
 Extensions	Extensions		Επεκτάσεις
 Available extensions	Extensions		Διαθέσιμες προεκτάσεις

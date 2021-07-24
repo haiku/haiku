@@ -1,4 +1,4 @@
-1	french	x-vnd.haiku.SerialConnect	3572614496
+1	french	x-vnd.haiku.SerialConnect	354154115
 Hardware	SerialWindow	Flowcontrol	Matériel
 Connection	SerialWindow		Connexion
 Raw send…	SerialWindow		Envoi brut…
@@ -20,6 +20,7 @@ Everything sent, waiting for acknowledge	XModemStatus		Envoi complet, attente de
 Odd	SerialWindow	Parity	Impair
 Flow control	SerialWindow		Contrôle du flux
 file transfer progress	SerialWindow		progression du transfert de fichiers
+CRC requested	XModemStatus		CRC demandé
 Data bits	SerialWindow		Bits de données
 Both	SerialWindow	Flowcontrol	Les deux
 Edit	SerialWindow		Éditer

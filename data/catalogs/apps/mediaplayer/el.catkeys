@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-MediaPlayer	3495947958
+1	greek, modern (1453-)	x-vnd.Haiku-MediaPlayer	1961774506
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Μετακίνηση Αρχείου στον Κάδο Απορριμάτων
 Close	MediaPlayer-PlaylistWindow		Κλείσιμο
 Volume of background clips	MediaPlayer-SettingsWindow		Ένταση κλιπ παρασκηνίου
@@ -35,6 +35,7 @@ Full volume	MediaPlayer-SettingsWindow		Μέγιστη ένταση
 Start media server	MediaPlayer-Main		Εκκίνηση διακομιστή πολυμέσων
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Φαίνεται ότι ο διακομιστής πολυμέσων δεν εκτελείται.\nΘέλετε να τον ξεκινήσετε;
 Location	MediaPlayer-InfoWin		Τοποθεσία
+Opening '%s'.	MediaPlayer-Main		Άνοιγμα του '%s'.
 Medium	MediaPlayer-SettingsWindow		Μέτριο
 Play mode	MediaPlayer-SettingsWindow		Λειτουργία αναπαραγωγής
 Playlist	MediaPlayer-PlaylistWindow		Λίστα Αναπαραγωγής
@@ -103,6 +104,7 @@ Rating	MediaPlayer-Main		Βαθμολογία
 Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Εσωτερικό σφάλμα (δεν υπάρχει διαθέσιμη μνήμη). Η αποθήκευση της λίστας αναπαραγωγής απέτυχε.
 Video	MediaPlayer-Main		Βίντεο
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Δεν υπάρχει εγκατεστημένος αποκωδικοποιητής που μπορεί να επεξεργαστεί το μορφότυπο του αρχείου ή ο αποκωδικοποιητής αντιμετωπίζει προβλήματα με την συγκεκριμένη έκδοση του μορφότυπου.
+Lock Peaks	MediaPlayer-PeakView		Κλείδωμα κορυφών
 none	Audio track menu		κανένα
 Open network stream	MediaPlayer-NetworkStream		Άνοιγμα ροής δικτύου
 Automatically start playing	MediaPlayer-SettingsWindow		Αυτόματη αναπαραγωγή

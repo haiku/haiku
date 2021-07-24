@@ -28,7 +28,7 @@ Revert	APRWindow		Reverter
 List item text	Colors tab		Texto do item da lista
 OK	DecorSettingsView		OK
 Control text	Colors tab		Texto do controle
-Look and feel	APRWindow		Olhar e sentir
+Look and feel	APRWindow		Estilo visual
 Selected menu item background	Colors tab		Plano de fundo do item de menu selecionado
 Link active	Colors tab		Link ativo
 Antialiasing	APRWindow		Suavização de serrilhado
@@ -42,7 +42,7 @@ Double:	DecorSettingsView		Duplo:
 Selected menu item text	Colors tab		Texto do item do menu selecionado
 Size:	Font Selection view		Tamanho:
 Panel background	Colors tab		Plano de fundo do painel
-Plain font:	Font view		Fonte plana:
+Plain font:	Font view		Fonte normal:
 Window tab text	Colors tab		Aba de texto da janela
 Navigation pulse	Colors tab		Navegação de pulso
 LCD subpixel	AntialiasingSettingsView		Subpixel LCD

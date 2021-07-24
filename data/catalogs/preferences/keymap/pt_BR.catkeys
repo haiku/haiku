@@ -117,7 +117,7 @@ Right shift	Keyboard Layout View		Shift direito
 ESC	Keyboard Layout View		ESC
 Belarusian (Latin)	KeymapNames		Bielorruso (Latino)
 Hebrew	KeymapNames		Hebraico
-Layout	Keymap window		Disposição
+Layout	Keymap window		Layout
 Greek	KeymapNames		Grego
 Revert	Keymap window		Reverter
 CTRL	Keyboard Layout View	Very short for 'control'	CTRL
@@ -137,7 +137,7 @@ French	KeymapNames		Francês
 Portuguese	KeymapNames		Português
 Swiss-French	KeymapNames		Francês da Suíça
 Shift:	Modifier keys window	Shift key role name	Deslocar:
-Keymap	System name		Disposição de teclado
+Keymap	System name		Mapa de teclado
 Slovene	KeymapNames		Esloveno
 Lithuanian	KeymapNames		Lituano
 Set modifier keys…	Keymap window		Definir modificador de teclas…

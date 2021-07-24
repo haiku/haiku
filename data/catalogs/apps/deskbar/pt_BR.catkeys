@@ -6,7 +6,7 @@ Hide clock	TimeView		Ocultar relógio
 Applications	PreferencesWindow		Aplicativos
 Time preferences…	TimeView		Preferências de hora…
 About Haiku	DeskbarMenu		Sobre o Haiku
-Edit in Tracker…	PreferencesWindow		Editar no Rastreador…
+Edit in Tracker…	PreferencesWindow		Editar no Tracker…
 Recent documents:	PreferencesWindow		Documentos recentes:
 Recent applications	DeskbarMenu		Aplicativos recentes
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Aplicativos
@@ -34,7 +34,7 @@ Revert	PreferencesWindow		Reverter
 Small	PreferencesWindow		Pequeno
 Recent applications:	PreferencesWindow		Aplicativos recentes:
 Shutdown…	DeskbarMenu		Desligar…
-Tracker always first	PreferencesWindow		Tracker sempre em primeiro
+Tracker always first	PreferencesWindow		Tracker sempre primeiro
 Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Preferências
 Recent folders	DeskbarMenu		Pastas recentes
 About this system	DeskbarMenu		Sobre este sistema

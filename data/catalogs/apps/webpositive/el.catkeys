@@ -1,7 +1,8 @@
-1	greek, modern (1453-)	x-vnd.Haiku-WebPositive	2389041372
+1	greek, modern (1453-)	x-vnd.Haiku-WebPositive	250728390
 Authentication required	Authentication Panel		Απαιτείται ταυτοποίηση
 Previous	WebPositive Window		Προηγούμενο
 (Finish: %date)	Download Window		(Ολοκλήρωση: %date)
+Open bookmarks confirmation	WebPositive Window		Άνοιγμα επιβεβαίωσης σελιδοδεικτών
 Download folder:	Settings Window		Φάκελος λήψεων:
 Close window	WebPositive Window		Κλείσιμο παραθύρου
 Find:	WebPositive Window		Εύρεση:
@@ -52,6 +53,7 @@ Cookies for %s	Cookie Manager		Cookies για %s
 The download could not be opened.	Download Window		Δεν ήταν δυνατό το άνοιγμα της λήψης.
 Close	Download Window		Κλείσιμο
 WebPositive	System name		Περιηγητής Ιστού
+%s - Search term	Settings Window		%s – όρος αναζήτησης
 Reload	WebPositive Window		Ανανέωση
 Expiration	Cookie Manager		Λήξη
 Download finished	Download Window		Η λήψη ολοκληρώθηκε
@@ -99,6 +101,7 @@ There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPosi
 Revert	Settings Window		Επαναφορά
 Copy	WebPositive Window		Αντιγραφή
 Default standard font size:	Settings Window		Προεπιλεγμένο μέγεθος γραμματοσειράς:
+Custom	Settings Window		Προσαρμογή
 Bookmark this page	WebPositive Window		Προσθήκη στους σελιδοδείκτες
 Show tabs if only one page is open	Settings Window		Να εμφανίζονται οι καρτέλες όταν μόνο μία σελίδα είναι ανοιχτή
 Close tab	WebPositive Window		Κλείσιμο καρτέλας
@@ -128,6 +131,7 @@ Double-click or middle-click to open new tab.	Tab Manager		Κάντε διπλό
 Next	WebPositive Window		Επόμενο
 Bookmark error	WebPositive Window		Σφάλμα σελιδοδείκτη
 OK	WebPositive Window		Εντάξει
+(%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% από %expectedSize%, %rate%/δευτ.)
 WebPositive	Download Window		Περιηγητής Ιστού
 Zoom text only	WebPositive Window		Να μεγενθυθεί το κείμενο μόνο
 Save page as…	WebPositive Window		Αποθήκευση σελίδας ως…

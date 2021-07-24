@@ -5,7 +5,7 @@ There was an error refreshing the repository cache for %name%	TaskLooper	Error m
 There was an error disabling the repository %name%	TaskLooper	Error message, do not translate %name%	Houve um erro ao desabilitar o repositório %name%
 Unknown	Constants	Unknown repository name	Desconhecido
 Remove all	RepositoriesView	Button label	Remover tudo
-Enable repositories to use with package management:	RepositoriesView	Label text	Habilitar os repositórios para usarem o gerenciador de pacotes:
+Enable repositories to use with package management:	RepositoriesView	Label text	Habilitar repositórios a serem usados pelo gerenciador de pacotes:
 Disable	RepositoriesView	Button label	Desabilitar
 Cancel task	TaskTimer	Button label	Cancelar tarefa
 Changes completed	RepositoriesView	Status view text	Alterações concluídas

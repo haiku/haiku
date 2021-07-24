@@ -6,7 +6,7 @@ Open bookmarks confirmation	WebPositive Window		Abrir confirmação de marcadore
 Download folder:	Settings Window		Pasta de arquivos baixados:
 Close window	WebPositive Window		Fechar janela
 Find:	WebPositive Window		Localizar:
-Script console	WebPositive Window		Console do script
+Script console	WebPositive Window		Console de script
 Fonts	Settings Window		Fontes
 Path	Cookie Manager		Caminho
 Bookmarks	WebPositive Window		Marcadores
@@ -33,7 +33,7 @@ Resume prior session	Settings Window		Continuar sessão anterior
 Match case	WebPositive Window		Caso de compatibilidade
 Proxy password:	Settings Window		Senha do proxy:
 Size:	Font Selection view		Tamanho:
-Page source	WebPositive Window		Origem da página
+Page source	WebPositive Window		Código-fonte da página
 Proxy server port:	Settings Window		Porta do servidor proxy:
 Error opening downloads folder	Download Window		Erro ao abrir pasta de itens baixados
 Show bookmark bar	WebPositive Window		Mostrar barra de marcadores
@@ -49,7 +49,7 @@ Decrease size	WebPositive Window		Diminuir tamanho
 Default fixed font size:	Settings Window		Tamanho padrão da fonte fixa:
 Sans serif font:	Settings Window		Fonte sem serifa:
 Clear	WebPositive Window		Limpar
-Cookies for %s	Cookie Manager		Biscoitos para %s
+Cookies for %s	Cookie Manager		Cookies para %s
 The download could not be opened.	Download Window		O item baixado não pôde ser aberto.
 Close	Download Window		Fechar
 WebPositive	System name		WebPositive
@@ -57,7 +57,7 @@ WebPositive	System name		WebPositive
 Reload	WebPositive Window		Recarregar
 Expiration	Cookie Manager		Expiração
 Download finished	Download Window		Download concluído
-Cookie manager	WebPositive Window		Gerenciador de biscoito
+Cookie manager	WebPositive Window		Gerenciador de cookies
 OK	Authentication Panel		OK
 Hide password text	Authentication Panel		Ocultar texto da senha
 Username:	Authentication Panel		Usuário:
@@ -112,7 +112,7 @@ Continue downloads	WebPositive		Continuar baixando arquivos
 Proxy server requires authentication	Settings Window		O servidor proxy requer autenticação
 Cancel	Settings Window		Cancelar
 History	WebPositive Window		Histórico
-Reset size	WebPositive Window		Desfazer o tamanho
+Reset size	WebPositive Window		Redefinir tamanho
 Do you really want to clear the browsing history?	WebPositive Window		Você quer realmente limpar o histórico de navegação?
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Encontrar a próxima ocorrência nos termos da busca
 Fixed font:	Settings Window		Fonte fixa:
@@ -120,10 +120,10 @@ Quit	WebPositive Window		Sair
 Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Encontrar as ocorrências anteriores nos termos da pesquisa
 Remember username and password for this site	Authentication Panel		Lembrar dados de usuário e senha deste site
 (Finish: %date - %duration left)	Download Window		(Término: %date - %duration restante)
-Cookie manager	Cookie Manager		Gerenciador de biscoito
+Cookie manager	Cookie Manager		Gerenciador de cookie
 Show home button	Settings Window		Mostrar botão inicial
 Start new session	Settings Window		Iniciar nova sessão
-The cookie jar is empty!	Cookie Manager		O pote de biscoito está vazio!
+The cookie jar is empty!	Cookie Manager		O pote de biscoito (cookie) está vazio!
 Value	Cookie Manager		Valor
 Remove missing	Download Window		Remover perdidos
 Paste	WebPositive Window		Colar
@@ -133,9 +133,9 @@ Bookmark error	WebPositive Window		Erro no marcador
 OK	WebPositive Window		OK
 (%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% de %expectedSize%, %rate%/s)
 WebPositive	Download Window		WebPositive
-Zoom text only	WebPositive Window		Aproximar o texto somente
+Zoom text only	WebPositive Window		Aumentar somente o texto
 Save page as…	WebPositive Window		Salvar página como…
-Page source error	WebPositive Window		Erro de origem da página
+Page source error	WebPositive Window		Erro no código-fonte da página
 Auto-hide mouse pointer	Settings Window		Auto-ocultar ponteiro do mouse
 Requesting %url	WebPositive Window		Solicitando %url
 Flags	Cookie Manager		Sinalizadores
@@ -148,7 +148,7 @@ Loading %url	WebPositive Window		Carregando %url
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Ser ou não ser, eis a questão!
 Start up:	Settings Window		Inicialização:
 Confirmation	WebPositive Window		Confirmação
-Session cookie	Cookie Manager		Sessão de biscoitos
+Session cookie	Cookie Manager		Cookie da sessão
 Open all	WebPositive Window		Abrir tudo
 Cut	WebPositive Window		Recortar
 Downloads	Download Window		Itens baixados
@@ -156,6 +156,6 @@ Open blank page	Settings Window		Abrir página em branco
 Clear history	WebPositive Window		Limpar histórico
 Cancel	WebPositive Window		Cancelar
 Bookmark info	WebPositive Window		Informação do marcador
-Script console	Console Window		Console do script
+Script console	Console Window		Console de script
 Copy	URL Bar		Copiar
 Open start page	Settings Window		Abrir página inicial

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-HaikuDepot	3763775264
+1	french	x-vnd.Haiku-HaikuDepot	3544756144
 Repository update error	LocalRepositoryUpdateProcess		Erreur à l’actualisation du dépôt
 Network error	ServerHelper		Erreur réseau
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Une erreur est survenue lors du rafraîchissement : %error%
@@ -89,6 +89,7 @@ There are problems in the supplied data:	UserLoginWindow		Il y a des problèmes 
 OK	MainWindow		Valider
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# objet} other{# objets}}
 Usage conditions download problem	UserLoginWindow		Problème de téléchargement des conditions d’utilisation
+OK	PackageInfoView		OK
 Downloading:	PackageInfoView		Téléchargement en cours :
 Quit	MainWindow		Quitter
 Success	UserLoginWindow		Opération réussie

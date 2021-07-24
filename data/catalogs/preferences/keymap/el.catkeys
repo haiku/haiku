@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Keymap	1075970008
+1	greek, modern (1453-)	x-vnd.Haiku-Keymap	2850776429
 Key	Modifier keys window	As in a computer keyboard key	Πλήκτρο
 Japanese	KeymapNames		Ιαπωνέζικο
 US	KeymapNames		ΗΠΑ
@@ -6,6 +6,7 @@ PG ↑	Keyboard Layout View	Very short for 'page up'	PG ↑
 Brazilian	KeymapNames		Βραζιλιάνικο
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (ΗΠΑ)
 Right control	Keyboard Layout View		Δεξιό control
+X-Bows Nature	KeyboardLayoutNames		X-Bows Nature
 Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Option:
 Cancel	Modifier keys window		Άκυρο
@@ -89,6 +90,7 @@ Esperanto	KeymapNames		Εσπεράντο
 Belarusian	KeymapNames		Λευκορώσικο
 Warning: left and right key roles do not match	Modifier keys window		Προσοχή: Οι ρόλοι του αριστερού και του δεξιού πλήκτρου δεν αντιστοιχούν
 Circumflex trigger	Keymap window		Περισπωμένη
+Fizzbook NL2	KeyboardLayoutNames		Fizzbook NL2
 Caps lock	Keyboard Layout View		Caps lock
 Left shift	Keyboard Layout View		Αριστερό shift
 Russian (Yawert)	KeymapNames		Ρώσικο (Yawert)

@@ -1,4 +1,4 @@
-1	french	application/x-vnd.Cortex.support	2845758808
+1	french	application/x-vnd.Cortex.support	1760547772
 (unknown format)	MediaString		(format inconnu)
 {0, plural,one{# frame forward}other{# frames forward}}	MediaString		{0, plural,one{# trame en avant}other{# trames en avant}}
 Rear-right	MediaString		Arrière-droit
@@ -7,6 +7,7 @@ Mono	MediaString		Mono
 Encoded video	MediaString		Vidéo compressée
 Top-Front-left	MediaString		Avant-gauche-haut
 Offline	MediaString		Hors ligne
+(unkown video orientation)	MediaString		(orientation vidéo inconnue)
 Top-Front-center	MediaString		Avant-centre-haut
 BeOS format family	MediaString		Famille de format BeOS
 Back-center	MediaString		Arrière-centre
@@ -20,6 +21,8 @@ System mixer	MediaString		Mixeur système
 Physical output	MediaString		Sortie physique
 Top-Back-center	MediaString		Arrière-centre-haut
 Top to bottom, left to right	MediaString		De haut en bas, et de gauche à droite
+(unknown run mode)	MediaString		(mode d’exécution inconnu)
+User-defined media type	MediaString		Type de média défini par l’utilisateur
 32 bit CMYA	MediaString		32 bits CMJA
 Rear-left	MediaString		Arrière-gauche
 QuickTime format family	MediaString		Famille de format QuickTime
@@ -40,10 +43,12 @@ AIFF format family	MediaString		Famille de format AIFF
 Top-Back-left	MediaString		Arrière-gauche-haut
 16 bit RGB	MediaString		16 bits RVB
 Raw audio	MediaString		Audio brut
+Non-interlaced 	MediaString		Non entrelacé 
 WAV format family	MediaString		Famille de format WAV
 Big endian	MediaString		Gros-boutiste
 {0, plural,one{# byte (max)}other{# bytes (max)}}	MediaString		{0, plural,one{# octet (max)}other{# octets (max)}}
 Encoded audio	MediaString		Audio compressé
+(unknown byte order)	MediaString		(boutisme inconnu)
 32 bit RGBA	MediaString		32 bits RVBA
 Time source	MediaString		Référence de temps
 15 bit RGB	MediaString		15 bits RVB

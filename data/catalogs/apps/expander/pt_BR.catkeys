@@ -1,9 +1,9 @@
 1	portuguese (brazil)	x-vnd.Haiku-Expander	3300517306
 Expand	ExpanderMenu		Expandir
 Expanding '%s'…	ExpanderWindow		Expandindo '%s'…
-Close window when done expanding	ExpanderPreferences		Fechar a janela quando concluída a expansão
+Close window when done expanding	ExpanderPreferences		Fechar a janela quando concluir a expansão
 Set destination…	ExpanderMenu		Selecionar destino…
-Use:	ExpanderPreferences		Uso:
+Use:	ExpanderPreferences		Usar:
 File expanded	ExpanderWindow		Arquivo expandido
 The destination is read only.	ExpanderWindow		O destino é somente para leitura.
 Expander: Open	ExpanderWindow		Expansor: Abrir
@@ -23,7 +23,7 @@ Expansion	ExpanderPreferences		Expansão
 Select	DirectoryFilePanel		Selecionar
 The folder was either moved, renamed or not supported.	ExpanderWindow		A pasta foi movida, renomeada ou não é suportada.
 Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		A pasta de destino não existe. Deseja criá-la?
-Same directory as source (archive) file	ExpanderPreferences		Mesmo diretório como arquivo fonte (conjunto de arquivos)
+Same directory as source (archive) file	ExpanderPreferences		Mesmo diretório que o arquivo fonte (conjunto de arquivos)
 Settings	ExpanderMenu		Configurações
 Settings…	ExpanderMenu		Configurações…
 Expander: Choose destination	DirectoryFilePanel		Expansor: Escolher destino

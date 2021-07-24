@@ -1,3 +1,4 @@
-1	danish	application/x-vnd.Cortex.AddOnHost	3934261412
+1	danish	application/x-vnd.Cortex.AddOnHost	826663209
 Continue	CortexAddOnHost		Fortsæt
 Quit	CortexAddOnHost		Afslut
+This program runs in the background, and is started automatically by Cortex when necessary. You probably don't want to start it manually.	CortexAddOnHost		Programmet kører i baggrunden og startes automatisk af Cortex når det er nødvendigt. Du ønsker formodentligt ikke at starte den manuelt.

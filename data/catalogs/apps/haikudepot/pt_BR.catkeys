@@ -39,7 +39,7 @@ Local	LocalPkgDataLoadProcess		Local
 Rate %Package%	RatePackageWindow		Avaliar %Package%
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Ocorreu um erro ao inicializar o gerenciador de pacotes: %message%
 Quit HaikuDepot	App		Fechar o Depósito Haiku
-Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Seria aceitável enviar dados de uso anônimos para o sistema HaikuDepotServer deste computador? Você pode alterar suas preferências na janela \"Settings\" posteriormente.
+Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Seria aceitável enviar dados anônimos de uso deste computador para o sistema HaikuDepotServer? Você pode alterar suas preferências posteriormente na janela \"Configurações\".
 An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		Um erro inesperado '%Message%' surgiu com a propriedade '%Property%'
 A response to the captcha question must be provided.	UserLoginWindow		Uma resposta à pergunta do captcha deve ser fornecida.
 Category	FilterView		Categoria
@@ -63,7 +63,7 @@ Cancel	UserLoginWindow		Cancelar
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		O Depósito Haiku precisa do daemon de pacote para funcionar e ele parece não estar em execução.\nGostaria de iniciá-lo agora?
 Click a package to view information	PackageInfoView		Clique em um pacote para visualizar a informação
 The password must be at least eight characters long, consist of at least two digits and one upper case character.	UserLoginWindow		A senha deve ter pelo menos oito caracteres, pelo menos dois dígitos e um caractere maiúsculo.
-Share anonymous usage data with HaikuDepotServer	SettingsWindow		Compartilhe dados de uso anônimos com HaikuDepotServer
+Share anonymous usage data with HaikuDepotServer	SettingsWindow		Compartilhar dados anônimos de uso com HaikuDepotServer
 Contents	PackageInfoView		Conteúdo
 Close	PackageManager		Fechar
 Changelog	PackageInfoView		Registro de alterações
@@ -150,7 +150,7 @@ Try again	App		Tente novamente
 Unknown	PackageListView		Desconhecido
 I agree to the usage conditions	UserLoginWindow		Eu concordo com as condições de uso
 Log in	UserLoginWindow		Entrar
-Sending anonymous usage data	MainWindow		Envio de dados anônimos de uso
+Sending anonymous usage data	MainWindow		Enviando de dados anônimos de uso
 Logged in as %User%	MainWindow		Autenticado como %User%
 Email address:	UserLoginWindow		Endereço de e-mail:
 Screenshot	ScreenshotWindow		Captura de tela

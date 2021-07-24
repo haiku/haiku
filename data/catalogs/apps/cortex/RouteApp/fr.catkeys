@@ -1,4 +1,4 @@
-1	french	application/x-vnd.Cortex.Route	2746881077
+1	french	application/x-vnd.Cortex.Route	35209296
 Node '%name%' released	CortexRouteApp		Nœud « %name% » libéré
 OK	CortexRouteApp		OK
 About Cortex/Route…	CortexRouteApp		À propos de Cortex/Route…
@@ -13,4 +13,5 @@ Between:	CortexRouteApp		Entre :
 Cortex	CortexRouteApp		Cortex
 Open…	CortexRouteApp		Ouvrir…
 Connection made	CortexRouteApp		Connexion effectuée
+Show add-ons	CortexRouteApp		Montrer les extensions
 Quit	CortexRouteApp		Quitter

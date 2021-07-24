@@ -1,0 +1,37 @@
+1	greek, modern (1453-)	x-vnd.haiku.SerialConnect	354154115
+Hardware	SerialWindow	Flowcontrol	Υλικό
+Connection	SerialWindow		Σύνδεση
+Raw send…	SerialWindow		Αποστολή ακατέργαστων πακέτων...
+Baud rate	SerialWindow		Ρυθμός Baud
+Stop bits	SerialWindow		Bits σταματήματος
+None	SerialWindow	Flowcontrol	Κανένα
+Cancel	Custom baudrate window		Άκυρο
+Sending…	XModemStatus		Αποστολή...
+<no serial port available>	SerialWindow		<καμία σειριακή θύρα διαθέσιμη>
+Log to file…	SerialWindow		Καταγραφή σε αρχείο...
+Custom baudrate	Custom baudrate window		Προσαρμοσμένος ρυμός Baud
+File	SerialWindow		Αρχείο
+SerialConnect	System name		SerialConnect
+custom…	SerialWindow	Baudrate	προσαρμογή...
+Parity	SerialWindow		Ισοτιμία
+None	SerialWindow	Parity	Καμία
+Disconnect	SerialWindow		Αποσύνδεση
+Everything sent, waiting for acknowledge	XModemStatus		Τα δεδομένα απεστάλησαν, αναμονή για επιβεβαίωση
+Odd	SerialWindow	Parity	Περιττή
+Flow control	SerialWindow		Διαχείρηση ροής
+file transfer progress	SerialWindow		εξέλιξη μεταφοράς αρχείου
+CRC requested	XModemStatus		Ζητήθηκε CRC
+Data bits	SerialWindow		Bits δεδομένων
+Both	SerialWindow	Flowcontrol	Και τα δυο
+Edit	SerialWindow		Επεξεργασία
+XModem send…	SerialWindow		Αποστολή μέσω XModem...
+Baudrate:	Custom baudrate window		Ρυθμός Baud:
+OK	Custom baudrate window		Εντάξει
+Waiting for receiver…	XModemStatus		Αναμονή για αποδέκτη...
+Clear history	SerialWindow		Άδειασμα ιστορικού
+Checksum error, re-send block	XModemStatus		Σφάλμα ταυτοποίησης checksum, επαναποστολή μπλοκ
+Settings	SerialWindow		Ρυθμίσεις
+Even	SerialWindow	Parity	Ζυγή
+Software	SerialWindow	Flowcontrol	Λογισμικό
+Line terminator	SerialWindow		Τέλος γραμμής
+Remote cancelled transfer	XModemStatus		Ο απομακρυσμένος υπολογιστής ακύρωσε τη μεταφορά

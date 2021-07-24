@@ -1,4 +1,4 @@
-1	danish	application/x-vnd.Cortex.InfoView	3525744887
+1	danish	application/x-vnd.Cortex.InfoView	2537861329
 Offset	InfoView		Forskydning
 Description	DormantNodeInfoView		Beskrivelse
 Connection	InfoView		Forbindelse
@@ -7,6 +7,9 @@ History	InfoView		Historik
 Input formats	DormantNodeInfoView		Inputformater
 Signature	AppNodeInfoView		Underskrift
 Media output	InfoView		Medieoutput
+\n- Quality:	FileNodeInfoView		\n- Kvalitet:
+Application	AppNodeInfoView		Program
+\n- Duration:	FileNodeInfoView		\n- Varighed:
 Media type	InfoView		Medietype
 Resolution	InfoView		Opløsning
 File format	AppNodeInfoView		Filformat

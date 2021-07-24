@@ -24,7 +24,7 @@ Mouse speed	SettingsView		Velocidade do mouse
 Accept first click	SettingsView		Aceitar o primeiro clique
 OK	TouchpadPrefView		OK
 Horizontal scrolling	TouchpadPrefView		Rolagem horizontal
-Delay until key repeat	KeyboardView		Atrase até a repetição da tecla
+Delay until key repeat	KeyboardView		Atraso até a repetição da tecla
 Keyboard Lock Delay	TouchpadPrefView		Atraso de bloqueio do teclado
 Two finger scrolling	TouchpadPrefView		Rolagem com dois dedos
 Input	System name		Entrada
@@ -38,7 +38,7 @@ Quick	TouchpadPrefView		Rápido
 Short	KeyboardView		Curto
 Slow	KeyboardView		Lento
 Revert	InputMouse		Reverter
-Key repeat rate	KeyboardView		Taxa de repetição tecla
+Key repeat rate	KeyboardView		Taxa de repetição de teclas
 2-Button	SettingsView		2 Botões
 Click to focus and raise	SettingsView		Clique para focar e aumentar
 Vertical	TouchpadPrefView		Vertical

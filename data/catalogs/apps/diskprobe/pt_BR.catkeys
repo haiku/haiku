@@ -72,7 +72,7 @@ Mode:	FindWindow		Modo:
 of 	ProbeView		de 
 Contents:	TypeEditors		Conteúdo:
 Could not open file \"%s\": %s\n	DiskProbe		Não foi possível abrir o arquivo \"%s\": %s\n
-Probe file…	OpenWindow		Analisando arquivo…
+Probe file…	OpenWindow		Analisar arquivo…
 Block: 	ProbeView		Bloco: 
 Bookmarks	ProbeView		Marcadores
 Probe device	OpenWindow		Analisar dispositivo

@@ -16,7 +16,7 @@ Model number: 	PowerStatus		Número do modelo:
 Battery unused	PowerStatus		Bateria sem uso
 Type: 	PowerStatus		Tipo: 
 Damaged battery	PowerStatus		Bateria danificada
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Você pode rodar o Estado de Força numa janela ou instalá-lo na Deskbar
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Você pode rodar o Status de Energia numa janela ou instalá-lo na Deskbar
  mAh	PowerStatus		 mAh
 Battery discharging	PowerStatus		Descarregando bateria
 Design voltage: 	PowerStatus		Design de voltagem: 
@@ -39,7 +39,7 @@ Capacity granularity 2: 	PowerStatus		Granularidade de capacidade 2:
 Too bad!	PowerStatus		Muito ruim!
 Technology: 	PowerStatus		Tecnologia: 
  mWh	PowerStatus		 mWh
-PowerStatus	System name		Estado de Força
+PowerStatus	System name		Status de Energia
 Design capacity: 	PowerStatus		Capacidade de design: 
 OEM info: 	PowerStatus		Informação do fabricante: 
 no battery	PowerStatus		sem bateria

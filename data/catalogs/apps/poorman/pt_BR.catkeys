@@ -8,7 +8,7 @@ Log to file	PoorMan		Registrar no arquivo
 Shutting down.	PoorMan		Desligando.
 Error Dir	PoorMan		Erro de Diretório
 Web folder:	PoorMan		Pasta da Web:
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Por favor escolha a pasta a ser publicada na web.\n\nÉ possível que o Pobre Homem crie um arquivo padrão \"public_html\" na sua pasta home.\nOu selecione um de suas próprias pastas.
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Por favor escolha a pasta a ser publicada na web.\n\nVocê pode fazer o PoorMan criar um \"public_html\" padrão na sua pasta home.\nOu pode selecionar uma de suas próprias pastas.
 Log To Console	PoorMan		Registrar no Console
 File Name	PoorMan		Nome do Arquivo
 Starting up... 	PoorMan		Iniciando…
@@ -24,7 +24,7 @@ Shutting down.\n	PoorMan		Desligando.\n
 Select all	PoorMan		Selecionar tudo
 Error Server	PoorMan		Erro do Servidor
 Send file listing if there's no start page	PoorMan		Enviar listagem de arquivo se não existir página inicial
-Create PoorMan log	PoorMan		Criar registro do Pobre Homem
+Create PoorMan log	PoorMan		Criar registro do PoorMan
 Max. simultaneous connections:	PoorMan		Conexões simultâneas máximas:
 Done	PoorMan		Concluído
 Site	PoorMan		Sítio
@@ -42,13 +42,13 @@ Log to console	PoorMan		Registrar no console
 Advanced	PoorMan		Avançado
 Copy	PoorMan		Copiar
 Logging	PoorMan		Registrando
-PoorMan	System name		Pobre Homem
+PoorMan	System name		PoorMan
 Clear console log	PoorMan		Limpar registro do console
 Run server	PoorMan		Executar servidor
 Create	PoorMan		Criar
 {0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# conexão} other{# conexões}}
 done.\n	PoorMan		concluído.\n
-PoorMan settings	PoorMan		Configurações do Pobre Homem
+PoorMan settings	PoorMan		Configurações do PoorMan
 Console Logging	PoorMan		Registrando Console
 Clear log file	PoorMan		Limpar arquivo de registro
 Save log console selection	PoorMan		Salvar seleção do console de registro
