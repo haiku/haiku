@@ -40,8 +40,6 @@ public:
 
 	// URL protocol thread management
 	virtual	thread_id				Run();
-	virtual status_t				Pause();
-	virtual status_t				Resume();
 	virtual	status_t				Stop();
 	virtual void					SetTimeout(bigtime_t timeout) {}
 

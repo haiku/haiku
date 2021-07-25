@@ -99,22 +99,6 @@ BUrlRequest::Run()
 
 
 status_t
-BUrlRequest::Pause()
-{
-	// TODO
-	return B_ERROR;
-}
-
-
-status_t
-BUrlRequest::Resume()
-{
-	// TODO
-	return B_ERROR;
-}
-
-
-status_t
 BUrlRequest::Stop()
 {
 	if (!fRunning)
@@ -146,7 +130,11 @@ BUrlRequest::SetContext(BUrlContext* context)
 	if (IsRunning())
 		return B_ERROR;
 
-	fContext = context;
+	if (context == NULL)
+		fContext = gDefaultContext;
+	else
+		fContext = context;
+
 	return B_OK;
 }
 
