@@ -2455,8 +2455,8 @@ BWindow::ResizeToPreferred()
 	width = std::max(width, fTopView->MinSize().width);
 
 	float height = fTopView->PreferredSize().height;
-	height = std::min(width, fTopView->MaxSize().height);
-	height = std::max(width, fTopView->MinSize().height);
+	height = std::min(height, fTopView->MaxSize().height);
+	height = std::max(height, fTopView->MinSize().height);
 
 	if (GetLayout()->HasHeightForWidth())
 		GetLayout()->GetHeightForWidth(width, NULL, NULL, &height);
