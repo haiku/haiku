@@ -18,15 +18,59 @@
 #define MAX_VIRTUAL_RANGES_TO_KEEP      32
 
 
+enum {
+	kPlatform1None,
+	kPlatform1Riscv,
+	kPlatform1Sbi,
+};
+
+enum {
+	kPlatform2None,
+	kPlatform2Riscv,
+	kPlatform2Efi,
+	kPlatform2UBoot,
+};
+
+
+enum {
+	kUartKindNone,
+	kUartKind8250,
+	kUartKindSifive,
+	kUartKindPl011,
+};
+
+
+typedef struct {
+	uint32 kind;
+	addr_range regs;
+	uint32 irq;
+	int64 clock;
+} _PACKED ArchUart;
+
+
 // kernel args
 typedef struct {
+	// Virtual address range of RAM physical memory mapping region
+	addr_range physMap;
+
 	// The virtual ranges we want to keep in the kernel.
 	uint32		num_virtual_ranges_to_keep;
 	addr_range	virtual_ranges_to_keep[MAX_VIRTUAL_RANGES_TO_KEEP];
 
-	// needed for UEFI, otherwise kernel acpi support can't find ACPI root
+	uint32 platform1;
+	uint32 platform2;
+
+	uint bootHart;
+	uint64 timerFrequrency; // in Hz
+
+	// All following address are virtual
 	FixedWidthPointer<void> acpi_root;
 	FixedWidthPointer<void> fdt;
+
+	addr_range	htif;
+	addr_range	plic;
+	addr_range	clint;
+	ArchUart    uart;
 } _PACKED arch_kernel_args;
 
 #endif	/* KERNEL_ARCH_RISCV64_KERNEL_ARGS_H */
