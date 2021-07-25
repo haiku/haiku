@@ -3,6 +3,8 @@ SubDir HAIKU_TOP src system kernel arch riscv64 ;
 SubDirHdrs $(SUBDIR) $(DOTDOT) generic ;
 UsePrivateKernelHeaders ;
 
+SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
+
 KernelMergeObject kernel_arch_riscv64.o :
         arch_asm.S
         arch_commpage.cpp
@@ -23,6 +25,9 @@ KernelMergeObject kernel_arch_riscv64.o :
         RISCV64VMTranslationMap.cpp
         Htif.cpp
         sbi_syscalls.S
+
+        debug_uart_8250.cpp
+        arch_uart_sifive.cpp
         :
         $(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused
         :
