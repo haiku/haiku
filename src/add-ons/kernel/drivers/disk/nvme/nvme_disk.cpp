@@ -198,6 +198,11 @@ nvme_disk_init_device(void* _info, void** _cookie)
 
 	device->pci_info = &info->info;
 
+	// enable busmaster and memory mapped access
+	uint16 command = pci->read_pci_config(pcidev, PCI_command, 2);
+	command |= PCI_command_master | PCI_command_memory;
+	pci->write_pci_config(pcidev, PCI_command, 2, command);
+
 	// open the controller
 	info->ctrlr = nvme_ctrlr_open(device, NULL);
 	if (info->ctrlr == NULL) {
@@ -290,10 +295,6 @@ nvme_disk_init_device(void* _info, void** _cookie)
 		sPCIx86Module = NULL;
 	}
 
-	uint16 command = pci->read_pci_config(pcidev, PCI_command, 2);
-	command &= ~(PCI_command_int_disable);
-	pci->write_pci_config(pcidev, PCI_command, 2, command);
-
 	uint8 irq = info->info.u.h0.interrupt_line;
 	if (sPCIx86Module != NULL) {
 		if (sPCIx86Module->get_msix_count(info->info.bus, info->info.device,
@@ -317,6 +318,10 @@ nvme_disk_init_device(void* _info, void** _cookie)
 				irq = msiVector;
 			}
 		}
+	} else {
+		uint16 command = pci->read_pci_config(pcidev, PCI_command, 2);
+		command &= ~(PCI_command_int_disable);
+		pci->write_pci_config(pcidev, PCI_command, 2, command);
 	}
 
 	if (irq == 0 || irq == 0xFF) {
@@ -946,6 +951,7 @@ nvme_disk_register_device(device_node* parent)
 	CALLED();
 
 	device_attr attrs[] = {
+		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { string: "NVMe Disk" } },
 		{ NULL }
 	};
 
@@ -1016,8 +1022,8 @@ nvme_disk_register_child_devices(void* _cookie)
 
 
 module_dependency module_dependencies[] = {
-	{B_DEVICE_MANAGER_MODULE_NAME, (module_info**)&sDeviceManager},
-	{}
+	{ B_DEVICE_MANAGER_MODULE_NAME, (module_info**)&sDeviceManager },
+	{ NULL }
 };
 
 struct device_module_info sNvmeDiskDevice = {

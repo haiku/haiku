@@ -129,9 +129,13 @@ nvme_pcicfg_map_bar(void* devhandle, unsigned int bar, bool read_only,
 	struct pci_device* dev = (struct pci_device*)devhandle;
 	pci_info* info = (pci_info*)dev->pci_info;
 
-	uint32 addr = info->u.h0.base_registers[bar];
-	uint32 size = info->u.h0.base_register_sizes[bar];
+	uint64 addr = info->u.h0.base_registers[bar];
+	if ((info->u.h0.base_register_flags[0] & PCI_address_type)
+			== PCI_address_type_64) {
+		addr |= (uint64)info->u.h0.base_registers[1] << 32;
+	}
 
+	uint32 size = info->u.h0.base_register_sizes[bar];
 	area_id area = map_physical_memory("nvme mapped bar", (phys_addr_t)addr,
 		size, B_ANY_KERNEL_ADDRESS,
 		B_KERNEL_READ_AREA | (read_only ? 0 : B_KERNEL_WRITE_AREA),
