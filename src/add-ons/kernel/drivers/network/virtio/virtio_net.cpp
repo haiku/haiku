@@ -895,8 +895,8 @@ virtio_net_register_device(device_node* node)
 {
 	CALLED();
 
-	// ready to register
 	device_attr attrs[] = {
+		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {string: "Virtio Network"} },
 		{ NULL }
 	};
 
