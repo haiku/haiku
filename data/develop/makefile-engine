@@ -144,30 +144,21 @@ VPATH :=
 VPATH += $(addprefix :, $(subst  ,:, $(filter-out $($(subst, :, ,$(VPATH))), $(SRC_PATHS))))
 
 # Set up the local & system include paths and C++ stdlibs.
-ifneq (,$(filter $(CPU),x86 x86_64))
-	LOC_INCLUDES = $(foreach path, $(SRC_PATHS) $(LOCAL_INCLUDE_PATHS), $(addprefix -I, $(path)))
- ifeq ($(CC_VER), 2)
+LOC_INCLUDES = $(foreach path, $(SRC_PATHS) $(LOCAL_INCLUDE_PATHS), $(addprefix -I, $(path)))
+ifeq ($(CC_VER), 2)
 	INCLUDES = $(LOC_INCLUDES)
 	INCLUDES += -I-
 	INCLUDES += $(foreach path, $(SYSTEM_INCLUDE_PATHS), $(addprefix -I, $(path)))
 
 	STDCPPLIBS = stdc++.r4
- else
+else
 	INCLUDES = -iquote./
 	INCLUDES += $(foreach path, $(SRC_PATHS) $(LOCAL_INCLUDE_PATHS), $(addprefix -iquote, $(path)))
 	INCLUDES += $(foreach path, $(SYSTEM_INCLUDE_PATHS), $(addprefix -isystem, $(path)))
 
 	STDCPPLIBS = stdc++ supc++
- endif
-else
-ifeq ($(CPU), ppc)
-	LOC_INCLUDES = $(foreach path, $(SRC_PATHS) $(LOCAL_INCLUDE_PATHS), $(addprefix -I, $(path)))
-	SYS_INCLUDES += -i-
-	SYS_INCLUDES += $(foreach path, $(SYSTEM_INCLUDE_PATHS), $(addprefix -i , $(path)))
+endif
 
-	INCLUDES = $(LOC_INCLUDES) $(SYS_INCLUDES)
-endif
-endif
 
 # Add the -L prefix to all of the library paths.
 LINK_PATHS = $(foreach path, $(SRC_PATHS) $(LIBPATHS), \
