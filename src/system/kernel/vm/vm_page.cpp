@@ -760,6 +760,63 @@ private:
 #endif	// VM_PAGE_ALLOCATION_TRACKING_AVAILABLE
 
 
+static void
+list_page(vm_page* page)
+{
+	kprintf("0x%08" B_PRIxADDR " ",
+		(addr_t)(page->physical_page_number * B_PAGE_SIZE));
+	switch (page->State()) {
+		case PAGE_STATE_ACTIVE:   kprintf("A"); break;
+		case PAGE_STATE_INACTIVE: kprintf("I"); break;
+		case PAGE_STATE_MODIFIED: kprintf("M"); break;
+		case PAGE_STATE_CACHED:   kprintf("C"); break;
+		case PAGE_STATE_FREE:     kprintf("F"); break;
+		case PAGE_STATE_CLEAR:    kprintf("L"); break;
+		case PAGE_STATE_WIRED:    kprintf("W"); break;
+		case PAGE_STATE_UNUSED:   kprintf("-"); break;
+	}
+	kprintf(" ");
+	if (page->busy)         kprintf("B"); else kprintf("-");
+	if (page->busy_writing) kprintf("W"); else kprintf("-");
+	if (page->accessed)     kprintf("A"); else kprintf("-");
+	if (page->modified)     kprintf("M"); else kprintf("-");
+	if (page->unused)       kprintf("U"); else kprintf("-");
+
+	kprintf(" usage:%3u", page->usage_count);
+	kprintf(" wired:%5u", page->WiredCount());
+
+	bool first = true;
+	vm_page_mappings::Iterator iterator = page->mappings.GetIterator();
+	vm_page_mapping* mapping;
+	while ((mapping = iterator.Next()) != NULL) {
+		if (first) {
+			kprintf(": ");
+			first = false;
+		} else
+			kprintf(", ");
+
+		kprintf("%" B_PRId32 " (%s)", mapping->area->id, mapping->area->name);
+		mapping = mapping->page_link.next;
+	}
+}
+
+
+static int
+dump_page_list(int argc, char **argv)
+{
+	kprintf("page table:\n");
+	for (page_num_t i = 0; i < sNumPages; i++) {
+		if (sPages[i].State() != PAGE_STATE_UNUSED) {
+			list_page(&sPages[i]);
+			kprintf("\n");
+		}
+	}
+	kprintf("end of page table\n");
+
+	return 0;
+}
+
+
 static int
 find_page(int argc, char **argv)
 {
@@ -836,7 +893,7 @@ page_state_to_string(int state)
 
 
 static int
-dump_page(int argc, char **argv)
+dump_page_long(int argc, char **argv)
 {
 	bool addressIsPointer = true;
 	bool physical = false;
@@ -3347,9 +3404,11 @@ vm_page_init_post_area(kernel_args *args)
 		PAGE_ALIGN(sNumPages * sizeof(vm_page)), B_ALREADY_WIRED,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
+	add_debugger_command("list_pages", &dump_page_list,
+		"List physical pages");
 	add_debugger_command("page_stats", &dump_page_stats,
 		"Dump statistics about page usage");
-	add_debugger_command_etc("page", &dump_page,
+	add_debugger_command_etc("page", &dump_page_long,
 		"Dump page info",
 		"[ \"-p\" | \"-v\" ] [ \"-m\" ] <address>\n"
 		"Prints information for the physical page. If neither \"-p\" nor\n"
