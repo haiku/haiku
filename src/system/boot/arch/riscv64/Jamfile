@@ -17,6 +17,8 @@ local kernelLibArchObjects =
 
 local kernelArchDriverSources =
 	arch_elf.cpp
+	arch_uart_sifive.cpp
+	sbi_syscalls.S
 ;
 
 local kernelGenericDriverSources =

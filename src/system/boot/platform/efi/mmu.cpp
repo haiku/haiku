@@ -133,7 +133,10 @@ platform_allocate_region(void **_address, size_t size, uint8 /* protection */,
 		kBootServices->FreePages(addr, pages);
 		return B_NO_MEMORY;
 	}
+
+#ifdef TRACE_MMU
 	//region->dprint("Allocated");
+#endif
 	allocated_regions = region;
 	*_address = (void *)region->paddr;
 	return B_OK;
@@ -261,11 +264,35 @@ platform_free_region(void *address, size_t size)
 			memory_region* old = *ref;
 			//pointer to current allocated_memory_region* now points to next
 			*ref = (*ref)->next;
+#ifdef TRACE_MMU
 			old->dprint("Freeing");
+#endif
 			delete old;
 			return B_OK;
 		}
 	}
 	panic("platform_free_region: Unknown region to free??");
 	return B_ERROR; // NOT Reached
+}
+
+
+bool
+mmu_next_region(void** cookie, addr_t* vaddr, phys_addr_t* paddr, size_t* size)
+{
+	if (*cookie == NULL)
+		*cookie = &allocated_regions;
+	else
+		*cookie = ((memory_region*)*cookie)->next;
+
+	memory_region* region = (memory_region*)*cookie;
+	if (region == NULL)
+		return false;
+
+	if (region->vaddr == 0)
+		region->vaddr = get_next_virtual_address(region->size);
+
+	*vaddr = region->vaddr;
+	*paddr = region->paddr;
+	*size = region->size;
+	return true;
 }

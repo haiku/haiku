@@ -299,7 +299,8 @@ ELFLoader<Class>::Load(int fd, preloaded_image* _image)
 	{
 		AddrType address = firstRegion->start;
 		if (Class::AllocateRegion(&address, totalSize,
-				B_READ_AREA | B_WRITE_AREA, &mappedRegion) != B_OK) {
+				B_READ_AREA | B_WRITE_AREA | B_EXECUTE_AREA, &mappedRegion)
+				!= B_OK) {
 			status = B_NO_MEMORY;
 			goto error1;
 		}
@@ -727,13 +728,12 @@ elf_relocate_image(preloaded_image* image)
 #ifdef BOOT_SUPPORT_ELF64
 	if (image->elf_class == ELFCLASS64)
 		return ELF64Loader::Relocate(image);
-	else
 #endif
 #ifdef BOOT_SUPPORT_ELF32
+	if (image->elf_class == ELFCLASS32)
 		return ELF32Loader::Relocate(image);
-#else
-		return B_ERROR;
 #endif
+	return B_ERROR;
 }
 
 

@@ -12,6 +12,7 @@
 #include <KernelExport.h>
 
 #include <arch/cpu.h>
+#include <arch_cpu_defs.h>
 #include <kernel.h>
 
 #include <boot/kernel_args.h>
@@ -24,7 +25,9 @@
 #include "acpi.h"
 #include "console.h"
 #include "cpu.h"
+#ifdef _BOOT_FDT_SUPPORT
 #include "dtb.h"
+#endif
 #include "efi_platform.h"
 #include "mmu.h"
 #include "quirks.h"
@@ -142,19 +145,49 @@ get_kernel_entry(void)
 }
 
 
+static void
+get_kernel_regions(addr_range& text, addr_range& data)
+{
+	if (gKernelArgs.kernel_image->elf_class == ELFCLASS64) {
+		preloaded_elf64_image *image = static_cast<preloaded_elf64_image *>(
+			gKernelArgs.kernel_image.Pointer());
+		text.start = image->text_region.start;
+		text.size = image->text_region.size;
+		data.start = image->data_region.start;
+		data.size = image->data_region.size;
+		return;
+	} else if (gKernelArgs.kernel_image->elf_class == ELFCLASS32) {
+		preloaded_elf32_image *image = static_cast<preloaded_elf32_image *>(
+			gKernelArgs.kernel_image.Pointer());
+		text.start = image->text_region.start;
+		text.size = image->text_region.size;
+		data.start = image->data_region.start;
+		data.size = image->data_region.size;
+		return;
+	}
+	panic("Unknown kernel format! Not 32-bit or 64-bit!");
+}
+
+
 extern "C" void
 platform_start_kernel(void)
 {
 	smp_init_other_cpus();
+#ifdef _BOOT_FDT_SUPPORT
 	dtb_set_kernel_args();
+#endif
 
 	addr_t kernelEntry = get_kernel_entry();
 
+	addr_range textRegion = {.start = 0, .size = 0}, dataRegion = {.start = 0, .size = 0};
+	get_kernel_regions(textRegion, dataRegion);
+	dprintf("kernel:\n");
+	dprintf("  text: %#" B_PRIx64 ", %#" B_PRIx64 "\n", textRegion.start, textRegion.size);
+	dprintf("  data: %#" B_PRIx64 ", %#" B_PRIx64 "\n", dataRegion.start, dataRegion.size);
+	dprintf("  entry: %#lx\n", kernelEntry);
+
 	arch_mmu_init();
 	convert_kernel_args();
-
-	// Save the kernel entry point address.
-	dprintf("kernel entry at %#lx\n", kernelEntry);
 
 	// map in a kernel stack
 	void *stack_address = NULL;
@@ -166,7 +199,7 @@ platform_start_kernel(void)
 	gKernelArgs.cpu_kstack[0].start = fix_address((addr_t)stack_address);
 	gKernelArgs.cpu_kstack[0].size = KERNEL_STACK_SIZE
 		+ KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE;
-	dprintf("Kernel stack at %#lx\n", gKernelArgs.cpu_kstack[0].start);
+	dprintf("Kernel stack at %#" B_PRIx64 "\n", gKernelArgs.cpu_kstack[0].start);
 
 	// Apply any weird EFI quirks
 	quirks_init();
@@ -216,7 +249,9 @@ efi_main(efi_handle image, efi_system_table *systemTable)
 
 	cpu_init();
 	acpi_init();
+#ifdef _BOOT_FDT_SUPPORT
 	dtb_init();
+#endif
 	timer_init();
 	smp_init();
 

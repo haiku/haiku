@@ -167,7 +167,7 @@ status_t
 Node::Acquire()
 {
 	fRefCount++;
-	TRACE(("%p::Acquire(), fRefCount = %ld\n", this, fRefCount));
+	TRACE(("%p::Acquire(), fRefCount = %" B_PRId32 "\n", this, fRefCount));
 	return B_OK;
 }
 
@@ -175,7 +175,7 @@ Node::Acquire()
 status_t
 Node::Release()
 {
-	TRACE(("%p::Release(), fRefCount = %ld\n", this, fRefCount));
+	TRACE(("%p::Release(), fRefCount = %" B_PRId32 "\n", this, fRefCount));
 	if (--fRefCount == 0) {
 		TRACE(("delete node: %p\n", this));
 		delete this;

@@ -161,6 +161,7 @@ platform_init_video(void)
 	efi_status status = kBootServices->LocateProtocol(&sGraphicsOutputGuid,
 		NULL, (void **)&sGraphicsOutput);
 	if (sGraphicsOutput == NULL || status != EFI_SUCCESS) {
+		dprintf("GOP protocol not found\n");
 		gKernelArgs.frame_buffer.enabled = false;
 		sGraphicsOutput = NULL;
 		return B_ERROR;

@@ -87,8 +87,11 @@ main(stage2_args *args)
 
 	if (bootVolume.IsValid()) {
 		// we got a volume to boot from!
-		load_driver_settings(args, bootVolume.RootDirectory());
 
+		// TODO: fix for riscv64
+#ifndef __riscv
+		load_driver_settings(args, bootVolume.RootDirectory());
+#endif
 		status_t status;
 		while ((status = load_kernel(args, bootVolume)) < B_OK) {
 			// loading the kernel failed, so let the user choose another
@@ -130,8 +133,11 @@ main(stage2_args *args)
 			gKernelArgs.ucode_data_size = 0;
 			platform_load_ucode(bootVolume);
 
+			// TODO: fix for riscv64
+#ifndef __riscv
 			// apply boot settings
 			apply_boot_settings();
+#endif
 
 			// set up kernel args version info
 			gKernelArgs.kernel_args_size = sizeof(kernel_args);

@@ -17,6 +17,8 @@ for platform in [ MultiBootSubDirSetup efi ] {
 		arch_smp.cpp
 		arch_mmu.cpp
 		arch_timer.cpp
+		arch_traps.cpp
+		arch_traps_asm.S
 		;
 
 	BootMergeObject boot_platform_efi_riscv64.o :

@@ -5,10 +5,19 @@ UsePrivateHeaders [ FDirName kernel platform ] ;
 UsePrivateHeaders [ FDirName kernel boot platform efi ] ;
 UsePrivateHeaders [ FDirName kernel boot arch $(TARGET_KERNEL_ARCH) ] ;
 
+if $(TARGET_ARCH) != x86_64 && $(TARGET_ARCH) != x86 {
+	UseLibraryHeaders [ FDirName libfdt ] ;
+}
+
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems gpt ;
 
 {
 	local defines = _BOOT_MODE _BOOT_PLATFORM_EFI ;
+
+	if $(TARGET_ARCH) != x86_64 && $(TARGET_ARCH) != x86 {
+		defines += _BOOT_FDT_SUPPORT ;
+	}
+
 	defines = [ FDefines $(defines) ] ;
 	SubDirCcFlags $(defines) ;
 	SubDirC++Flags $(defines) -fno-rtti ;
@@ -23,7 +32,6 @@ local platform_src =
 	mmu.cpp
 	heap.cpp
 	acpi.cpp
-	dtb.cpp
 	timer.cpp
 	menu.cpp
 	devices.cpp
@@ -33,6 +41,11 @@ local platform_src =
 	;
 
 local support_libs ;
+
+if $(TARGET_ARCH) != x86_64 && $(TARGET_ARCH) != x86 {
+	support_libs += boot_fdt.a ;
+	platform_src += dtb.cpp ;
+}
 
 local platform ;
 for platform in [ MultiBootSubDirSetup efi ] {

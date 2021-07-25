@@ -831,3 +831,21 @@ platform_init_heap(struct stage2_args *args, void **_base, void **_top)
 }
 
 
+extern "C" status_t
+platform_bootloader_address_to_kernel_address(void *address, addr_t *_result)
+{
+	TRACE("%s: called\n", __func__);
+	// bios_ia32 really doesn't need an address converstion
+	*_result = (addr_t)address;
+	return B_OK;
+}
+
+
+extern "C" status_t
+platform_kernel_address_to_bootloader_address(addr_t address, void **_result)
+{
+	TRACE("%s: called\n", __func__);
+	// bios_ia32 really doesn't need an address converstion
+	*_result = (void*)address;
+	return B_OK;
+}

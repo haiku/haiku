@@ -36,6 +36,8 @@ extern void mmu_init();
 
 extern phys_addr_t mmu_allocate_page();
 
+bool mmu_next_region(void** cookie, addr_t* vaddr, phys_addr_t* paddr, size_t* size);
+
 extern addr_t mmu_map_physical_memory(addr_t physicalAddress, size_t size,
 	uint32 flags);
 
