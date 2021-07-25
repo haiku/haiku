@@ -538,6 +538,11 @@ radeon_hd_init(radeon_info &info)
 		"Radeon %s 1002:%" B_PRIX32 "\n", __func__, info.id,
 		radeon_chip_name[info.chipsetID], info.pciID);
 
+	// Enable response in I/O, memory space. Enable bus mastering
+	uint32 pciConfig = get_pci_config(info.pci, PCI_command, 2);
+	pciConfig |= PCI_command_io | PCI_command_memory | PCI_command_master;
+	set_pci_config(info.pci, PCI_command, 2, pciConfig);
+
 	// *** Map shared info
 	AreaKeeper sharedCreator;
 	info.shared_area = sharedCreator.Create("radeon hd shared info",
@@ -629,27 +634,37 @@ radeon_hd_init(radeon_info &info)
 		info.shared_info->graphics_memory_size / 1024);
 
 	// *** Framebuffer mapping
+	phys_addr_t physicalAddress = info.pci->u.h0.base_registers[PCI_BAR_FB];
+	if ((info.pci->u.h0.base_register_flags[PCI_BAR_FB] & PCI_address_type)
+			== PCI_address_type_64) {
+		physicalAddress
+			|= (uint64)info.pci->u.h0.base_registers[PCI_BAR_FB + 1] << 32;
+	}
+
+	TRACE("framebuffer paddr: %#" B_PRIxADDR "\n", physicalAddress);
 	AreaKeeper frambufferMapper;
 	info.framebuffer_area = frambufferMapper.Map("radeon hd frame buffer",
-		info.pci->u.h0.base_registers[PCI_BAR_FB],
-		info.shared_info->frame_buffer_size * 1024,
+		physicalAddress, info.shared_info->frame_buffer_size * 1024,
 		B_ANY_KERNEL_ADDRESS, B_READ_AREA | B_WRITE_AREA,
 		(void**)&info.shared_info->frame_buffer);
+
 	if (frambufferMapper.InitCheck() < B_OK) {
 		ERROR("%s: card(%" B_PRId32 "): couldn't map frame buffer!\n",
 			__func__, info.id);
 		return info.framebuffer_area;
 	}
+	TRACE("frambuffer vaddr: %#" B_PRIxADDR "\n",
+		(addr_t)info.shared_info->frame_buffer);
+	TRACE("frambuffer size: %#" B_PRIxSIZE "\n",
+		(size_t)info.shared_info->frame_buffer_size * 1024);
 
 	// Turn on write combining for the frame buffer area
-	vm_set_area_memory_type(info.framebuffer_area,
-		info.pci->u.h0.base_registers[PCI_BAR_FB], B_MTR_WC);
+	vm_set_area_memory_type(info.framebuffer_area, physicalAddress, B_MTR_WC);
 
 	frambufferMapper.Detach();
 
 	info.shared_info->frame_buffer_area = info.framebuffer_area;
-	info.shared_info->frame_buffer_phys
-		= info.pci->u.h0.base_registers[PCI_BAR_FB];
+	info.shared_info->frame_buffer_phys = physicalAddress;
 
 	// Pass common information to accelerant
 	info.shared_info->deviceIndex = info.id;

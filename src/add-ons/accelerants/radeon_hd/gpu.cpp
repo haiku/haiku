@@ -570,7 +570,7 @@ radeon_gpu_mc_init()
 	}
 
 	gInfo->fb.vramStart = vramBase;
-	gInfo->fb.vramSize = gInfo->shared_info->frame_buffer_size * 1024;
+	gInfo->fb.vramSize = (uint64)gInfo->shared_info->frame_buffer_size * 1024;
 	gInfo->fb.vramEnd = (vramBase + gInfo->fb.vramSize) - 1;
 }
 

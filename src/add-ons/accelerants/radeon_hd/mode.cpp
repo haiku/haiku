@@ -179,6 +179,14 @@ radeon_set_display_mode(display_mode* mode)
 	// TODO: multi-monitor? For now we set the mode on
 	// the first display found.
 
+	TRACE("%s\n", __func__);
+	TRACE("  mode->space: %#" B_PRIx32 "\n", mode->space);
+	TRACE("  mode->virtual_width: %" B_PRIu16 "\n", mode->virtual_width);
+	TRACE("  mode->virtual_height: %" B_PRIu16 "\n", mode->virtual_height);
+	TRACE("  mode->h_display_start: %" B_PRIu16 "\n", mode->h_display_start);
+	TRACE("  mode->v_display_start: %" B_PRIu16 "\n", mode->v_display_start);
+	TRACE("  mode->flags: %#" B_PRIx32 "\n", mode->flags);
+
 	uint8 crtcID = 0;
 
 	if (gDisplay[crtcID]->attached == false)
@@ -276,6 +284,12 @@ radeon_get_frame_buffer_config(frame_buffer_config* config)
 	config->frame_buffer_dma = (uint8*)gInfo->shared_info->frame_buffer_phys;
 
 	config->bytes_per_row = gInfo->shared_info->bytes_per_row;
+
+	TRACE("  config->frame_buffer: %#" B_PRIxADDR "\n",
+		(phys_addr_t)config->frame_buffer);
+	TRACE("  config->frame_buffer_dma: %#" B_PRIxADDR "\n",
+		(phys_addr_t)config->frame_buffer_dma);
+	TRACE("  config->bytes_per_row: %" B_PRIu32 "\n", config->bytes_per_row);
 
 	return B_OK;
 }
