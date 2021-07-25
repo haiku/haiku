@@ -17,6 +17,7 @@
 #include <Path.h>
 #include <PopUpMenu.h>
 #include <ScrollView.h>
+#include <StatusView.h>
 
 #include <tracker_private.h>
 #include "DirMenu.h"
@@ -41,7 +42,7 @@ void
 ShowImageStatusView::AttachedToWindow()
 {
 	SetFont(be_plain_font);
-	SetFontSize(ceilf(be_plain_font->Size() * 0.83f));
+	BPrivate::AdoptScrollBarFontSize(this);
 
 	BScrollBar* scrollBar = fScrollView->ScrollBar(B_HORIZONTAL);
 	MoveTo(0.0, scrollBar->Frame().top);
