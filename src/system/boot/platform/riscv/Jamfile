@@ -38,7 +38,10 @@ for platform in [ MultiBootSubDirSetup riscv ] {
 			graphics.cpp
 			fixed_font.S
 			htif.cpp
+			FwCfg.cpp
 			virtio.cpp
+			traps.cpp
+			traps_asm.S
 			entry.S
 
 			: :

@@ -22,7 +22,6 @@ int32_t gVirtioDevListLen = 0;
 
 DoublyLinkedList<VirtioDevice> gVirtioDevices;
 VirtioDevice* gKeyboardDev = NULL;
-VirtioDevice* gDiskDev = NULL;
 
 
 void*
@@ -251,9 +250,12 @@ virtio_init()
 			gKeyboardDev = new(std::nothrow) VirtioDevice(*devRes);
 	}
 	dprintf("virtio_input count: %d\n", i);
-	for (int i = 0; i < 4; i++)
-		gKeyboardDev->ScheduleIO(new(std::nothrow) IORequest(ioOpWrite,
-			malloc(sizeof(VirtioInputPacket)), sizeof(VirtioInputPacket)));
+	if (gKeyboardDev != NULL) {
+		for (int i = 0; i < 4; i++) {
+			gKeyboardDev->ScheduleIO(new(std::nothrow) IORequest(ioOpWrite,
+				malloc(sizeof(VirtioInputPacket)), sizeof(VirtioInputPacket)));
+		}
+	}
 }
 
 
@@ -270,6 +272,9 @@ virtio_fini()
 int
 virtio_input_get_key()
 {
+	if (gKeyboardDev == NULL)
+		return 0;
+
 	IORequest* req = gKeyboardDev->ConsumeIO();
 	if (req == NULL)
 		return 0;

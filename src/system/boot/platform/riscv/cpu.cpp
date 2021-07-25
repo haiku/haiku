@@ -35,10 +35,10 @@ cpu_init()
 {
 	gKernelArgs.num_cpus = 1;
 
-	// enable FPU
-	MstatusReg status(Mstatus());
-	status.fs = extStatusInitial;
-	SetMstatus(status.val);
+	SstatusReg status(Sstatus());
+	status.fs = extStatusInitial; // enable FPU
+	status.xs = extStatusOff;
+	SetSstatus(status.val);
 }
 
 
