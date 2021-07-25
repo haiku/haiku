@@ -112,6 +112,18 @@ enum {
 	causeStorePageFault   = 15,
 };
 
+// physical memory protection
+enum {
+	pmpR = 0,
+	pmpW = 1,
+	pmpX = 2,
+};
+
+enum {
+	// naturally aligned power of two
+	pmpMatchNapot = 3 << 3,
+};
+
 enum {
 	pageSize = 4096,
 	pageBits = 12,
@@ -167,12 +179,12 @@ struct SatpReg {
 	SatpReg(uint64 val): val(val) {}
 };
 
-static B_ALWAYS_INLINE uint64 PhysAdrPte(uint64 physAdr, uint32 level)
+static B_ALWAYS_INLINE uint64 VirtAdrPte(uint64 physAdr, uint32 level)
 {
 	return (physAdr >> (pageBits + pteIdxBits*level)) % (1 << pteIdxBits);
 }
 
-static B_ALWAYS_INLINE uint64 PhysAdrOfs(uint64 physAdr)
+static B_ALWAYS_INLINE uint64 VirtAdrOfs(uint64 physAdr)
 {
 	return physAdr % pageSize;
 }
@@ -246,7 +258,7 @@ static B_ALWAYS_INLINE void SetStvec(uint64 x) {
 static B_ALWAYS_INLINE uint64 Satp() {
 	uint64 x; asm volatile("csrr %0, satp" : "=r" (x)); return x;}
 static B_ALWAYS_INLINE void SetSatp(uint64 x) {
-	asm volatile("csrw satp, %0" : : "r" (x));}
+	asm volatile("csrw satp, %0" : : "r" (x) : "memory");}
 
 // scratch register
 static B_ALWAYS_INLINE uint64 Mscratch() {
@@ -284,18 +296,34 @@ static B_ALWAYS_INLINE uint64 Mcounteren() {
 static B_ALWAYS_INLINE void SetMcounteren(uint64 x) {
 	asm volatile("csrw mcounteren, %0" : : "r" (x));}
 
-// machine-mode cycle counter
-static B_ALWAYS_INLINE uint64 Mcycle() {
+// cycle counter
+static B_ALWAYS_INLINE uint64 CpuMcycle() {
 	uint64 x; asm volatile("csrr %0, mcycle" : "=r" (x)); return x;}
+static B_ALWAYS_INLINE uint64 CpuCycle() {
+	uint64 x; asm volatile("csrr %0, cycle" : "=r" (x)); return x;}
 // monotonic timer
 static B_ALWAYS_INLINE uint64 CpuTime() {
 	uint64 x; asm volatile("csrr %0, time" : "=r" (x)); return x;}
+
+// physical memory protection
+static B_ALWAYS_INLINE uint64 Pmpaddr0() {
+	uint64 x; asm volatile("csrr %0, pmpaddr0" : "=r" (x)); return x;}
+static B_ALWAYS_INLINE uint64 Pmpcfg0() {
+	uint64 x; asm volatile("csrr %0, pmpcfg0" : "=r" (x)); return x;}
+static B_ALWAYS_INLINE void SetPmpaddr0(uint64 x) {
+	asm volatile("csrw pmpaddr0, %0" : : "r" (x));}
+static B_ALWAYS_INLINE void SetPmpcfg0(uint64 x) {
+	asm volatile("csrw pmpcfg0, %0" : : "r" (x));}
 
 // flush the TLB
 static B_ALWAYS_INLINE void FlushTlbAll() {
 	asm volatile("sfence.vma" : : : "memory");}
 static B_ALWAYS_INLINE void FlushTlbPage(uint64 x) {
 	asm volatile("sfence.vma %0" : : "r" (x) : "memory");}
+static B_ALWAYS_INLINE void FlushTlbAllAsid(uint64 asid) {
+	asm volatile("sfence.vma x0, %0" : : "r" (asid) : "memory");}
+static B_ALWAYS_INLINE void FlushTlbPageAsid(uint64 page, uint64 asid) {
+	asm volatile("sfence.vma %0, %0" : : "r" (page), "r" (asid) : "memory");}
 
 static B_ALWAYS_INLINE uint64 Sp() {
 	uint64 x; asm volatile("mv %0, sp" : "=r" (x)); return x;}

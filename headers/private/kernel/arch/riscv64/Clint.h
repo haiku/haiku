@@ -12,9 +12,9 @@
 // core local interruptor
 struct ClintRegs
 {
-	uint8  unknown1[0x4000];
-	uint64 mTimeCmp[4095]; // per CPU core, but not implemented in temu
-	uint64 mTime;          // @0xBFF8
+	uint32 msip    [4096]; // machine software interrupt pending, per CPU core
+	uint64 mtimecmp[4095]; // per CPU core
+	uint64 mtime;          // @0xBFF8
 };
 
 extern ClintRegs* volatile gClintRegs;
