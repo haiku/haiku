@@ -164,6 +164,7 @@
 #       define R128_VERT_STRETCH_RESERVED    0xf8e00000
 
 #define R128_GEN_INT_CNTL				  0x0040
+#define R128_GEN_INT_STATUS				  0x0044
 #define R128_GEN_RESET_CNTL 			  0x00f0
 #		define R128_SOFT_RESET_GUI		  (1 <<  0)
 #define R128_GPIO_MONID 				  0x0068
