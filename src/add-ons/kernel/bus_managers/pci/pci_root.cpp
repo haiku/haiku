@@ -8,6 +8,7 @@
 
 #include <device_manager.h>
 #include <PCI.h>
+#include <drivers/bus/FDT.h>
 
 #include <string.h>
 
@@ -19,16 +20,33 @@
 #define PCI_ROOT_MODULE_NAME "bus_managers/pci/root/driver_v1"
 
 
+device_node* gPCIRootNode = NULL;
+
+
 static float
 pci_root_supports_device(device_node* parent)
 {
-	// make sure parent is really device root
 	const char* bus;
-	if (gDeviceManager->get_attr_string(parent, B_DEVICE_BUS, &bus, false))
-		return B_ERROR;
+	if (gDeviceManager->get_attr_string(parent, B_DEVICE_BUS, &bus, false) < B_OK)
+		return -1.0f;
 
-	if (strcmp(bus, "root"))
-		return 0.0;
+#ifdef __riscv
+	const char* compatible;
+	if (gDeviceManager->get_attr_string(parent, "fdt/compatible", &compatible,
+		false) < B_OK)
+		return -1.0f;
+
+	if (strcmp(bus, "fdt") != 0)
+		return 0.0f;
+
+	if (strcmp(compatible, "pci-host-ecam-generic") != 0
+		&& strcmp(compatible, "sifive,fu740-pcie") != 0) {
+		return 0.0f;
+	}
+#else
+	if (strcmp(bus, "root") != 0)
+		return 0.0f;
+#endif
 
 	return 1.0;
 }
@@ -37,6 +55,7 @@ pci_root_supports_device(device_node* parent)
 static status_t
 pci_root_register_device(device_node* parent)
 {
+	dprintf("pci_root_register_device()\n");
 // XXX how do we handle this for PPC?
 // I/O port for PCI config space address
 #define PCI_CONFIG_ADDRESS 0xcf8
@@ -59,6 +78,7 @@ pci_root_register_device(device_node* parent)
 static status_t
 pci_root_register_child_devices(void* cookie)
 {
+	dprintf("pci_root_register_child_devices()\n");
 	device_node* node = (device_node*)cookie;
 
 	pci_info info;
@@ -66,7 +86,7 @@ pci_root_register_child_devices(void* cookie)
 		uint8 domain;
 		uint8 bus;
 		if (gPCI->ResolveVirtualBus(info.bus, &domain, &bus) != B_OK) {
-dprintf("FAILED!!!!\n");
+			dprintf("ResolveVirtualBus(%u) failed\n", info.bus);
 			continue;
 		}
 
@@ -103,7 +123,16 @@ dprintf("FAILED!!!!\n");
 static status_t
 pci_root_init(device_node* node, void** _cookie)
 {
+	dprintf("pci_root_init()\n");
 	*_cookie = node;
+
+	gPCIRootNode = node;
+
+	module_info *module;
+	status_t res = get_module(B_PCI_MODULE_NAME, &module);
+	if (res < B_OK)
+		return res;
+
 	return B_OK;
 }
 
@@ -114,13 +143,19 @@ pci_root_std_ops(int32 op, ...)
 	switch (op) {
 		case B_MODULE_INIT:
 		{
+			dprintf("+pci_root\n");
+/*
 			module_info *module;
 			return get_module(B_PCI_MODULE_NAME, &module);
 				// this serializes our module initialization
+*/
+			return B_OK;
 		}
 
 		case B_MODULE_UNINIT:
-			return put_module(B_PCI_MODULE_NAME);
+			dprintf("-pci_root\n");
+			// return put_module(B_PCI_MODULE_NAME);
+			return B_OK;
 	}
 
 	return B_BAD_VALUE;

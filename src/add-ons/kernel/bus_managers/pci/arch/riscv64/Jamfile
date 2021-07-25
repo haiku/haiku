@@ -1,10 +1,20 @@
 SubDir HAIKU_TOP src add-ons kernel bus_managers pci arch $(TARGET_ARCH) ;
 
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) ] ;
-UsePrivateHeaders kernel [ FDirName kernel arch $(TARGET_ARCH) ]
-	[ FDirName kernel boot platform $(HAIKU_BOOT_PLATFORM) ] ;
+UsePrivateKernelHeaders ;
+UsePrivateHeaders shared ;
+UsePrivateHeaders [ FDirName kernel util ] ;
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) fu740 ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) ecam ] ;
 
 KernelStaticLibrary pci_arch_bus_manager :
-	pci_controller.cpp
-	pci_io.c
+	arch_pci_controller.cpp
+	pci_io.cpp
+
+	# SiFive fu740
+	pci_fu740.cpp
+
+	# ECAM
+	pci_ecam.cpp
 ;

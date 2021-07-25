@@ -39,6 +39,8 @@ typedef struct pci_root_module_info {
 extern pci_root_module_info gPCIRootModule;
 extern pci_device_module_info gPCIDeviceModule;
 
+extern device_node* gPCIRootNode;
+
 
 #ifdef __cplusplus
 extern "C" {
