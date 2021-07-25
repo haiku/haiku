@@ -289,7 +289,7 @@ BLayoutUtils::_GetLayoutTreeDump(BView* view, int level, BString& _output)
 
 	BRect frame = view->Frame();
 	BSize min = view->MinSize();
-	BSize max = view->MinSize();
+	BSize max = view->MaxSize();
 	BSize preferred = view->PreferredSize();
 	_output << BString().SetToFormat(
 		"%sview %p (%s):\n"
@@ -336,7 +336,7 @@ BLayoutUtils::_GetLayoutTreeDump(BLayoutItem* item, int level,
 	BLayout* layout = dynamic_cast<BLayout*>(item);
 	BRect frame = item->Frame();
 	BSize min = item->MinSize();
-	BSize max = item->MinSize();
+	BSize max = item->MaxSize();
 	BSize preferred = item->PreferredSize();
 	if (isViewLayout) {
 		_output << indent << BString().SetToFormat("  [layout %p (%s)]\n",
