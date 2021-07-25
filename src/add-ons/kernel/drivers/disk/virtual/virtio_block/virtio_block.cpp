@@ -576,8 +576,8 @@ virtio_block_register_device(device_node *node)
 {
 	CALLED();
 
-	// ready to register
 	device_attr attrs[] = {
+		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {string: "Virtio Block"} },
 		{ NULL }
 	};
 
@@ -655,8 +655,8 @@ virtio_block_register_child_devices(void* _cookie)
 
 
 module_dependency module_dependencies[] = {
-	{B_DEVICE_MANAGER_MODULE_NAME, (module_info**)&sDeviceManager},
-	{}
+	{ B_DEVICE_MANAGER_MODULE_NAME, (module_info**)&sDeviceManager },
+	{ NULL }
 };
 
 struct device_module_info sVirtioBlockDevice = {
