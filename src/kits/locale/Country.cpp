@@ -142,7 +142,7 @@ BCountry::GetName(BString& name, const BLanguage* displayLanguage) const
 status_t
 BCountry::GetPreferredLanguage(BLanguage& language) const
 {
-#if __GNUC__ == 2
+#if U_ICU_VERSION_MAJOR_NUM < 63
 	return ENOSYS;
 #else
 	status_t status = InitCheck();
