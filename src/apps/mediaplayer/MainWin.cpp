@@ -1254,14 +1254,15 @@ MainWin::Eject()
 {
 	status_t mediaStatus = B_DEV_NO_MEDIA;
 	// find the cd player device
-	fDevice = FindCdPlayerDevice("/dev/disk");
+	int cdPlayerFd = FindCdPlayerDevice("/dev/disk");
 	// get the status first
-	ioctl(fDevice, B_GET_MEDIA_STATUS, &mediaStatus, sizeof(mediaStatus));
+	ioctl(cdPlayerFd, B_GET_MEDIA_STATUS, &mediaStatus, sizeof(mediaStatus));
 	// if door open, load the media, else eject the cd
-	status_t result = ioctl(fDevice,
+	status_t result = ioctl(cdPlayerFd,
 		mediaStatus == B_DEV_DOOR_OPEN ? B_LOAD_MEDIA : B_EJECT_DEVICE);
 	if (result != B_NO_ERROR)
 		printf("Error ejecting device");
+	close(cdPlayerFd);
 }
 
 
