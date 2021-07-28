@@ -494,15 +494,14 @@ SettingsView::SettingsView(BRect frame)
 	for (size_t i = 0; i < widthsLength; i++) {
 		BString label;
 		if (widths[i] == 0)
-			label.SetTo("screen resolution");
+			label.SetTo(B_TRANSLATE("screen resolution"));
 		else
-			label.SetToFormat("%" B_PRId32 " pixels", widths[i]);
+			label.SetToFormat(B_TRANSLATE("%" B_PRId32 " pixels"), widths[i]);
 
 		BMessage* message = new BMessage(kMsgWidth);
 		message->AddInt32("width", widths[i]);
 
-		const char* l = label.String();
-		BMenuItem* item = new BMenuItem(B_TRANSLATE(l), message);
+		BMenuItem* item = new BMenuItem(label.String(), message);
 		popUpMenu->AddItem(item);
 		item->SetMarked(gSettingsWidth == widths[i]);
 	}
