@@ -43,7 +43,6 @@ extern void platform_switch_to_logo(void);
 extern void platform_switch_to_text_mode(void);
 extern void platform_start_kernel(void);
 extern void platform_exit(void);
-extern void platform_load_ucode(BootVolume& volume);
 
 #ifdef __cplusplus
 }
@@ -63,6 +62,7 @@ extern status_t platform_get_boot_partitions(struct stage2_args *args, Node *boo
 					NodeList *partitions, NodeList *bootPartitions);
 extern status_t platform_register_boot_device(Node *device);
 extern void platform_cleanup_devices();
+extern void platform_load_ucode(BootVolume& volume);
 
 /* menu functions */
 

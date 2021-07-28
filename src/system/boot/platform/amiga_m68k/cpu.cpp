@@ -106,7 +106,7 @@ cpu_init()
 }
 
 
-extern "C" void
+void
 platform_load_ucode(BootVolume& volume)
 {
 }

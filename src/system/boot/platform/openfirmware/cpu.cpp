@@ -7,7 +7,7 @@
 #include <boot/platform.h>
 
 
-extern "C" void
+void
 platform_load_ucode(BootVolume& volume)
 {
 }
