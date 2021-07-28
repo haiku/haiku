@@ -263,7 +263,8 @@ CharacterWindow::CharacterWindow()
 		new BMessage(kMsgPrivateBlocks)));
 	item->SetMarked(fCharacterView->IsShowingPrivateBlocks());
 
-	menu->AddItem(item = new BMenuItem("Only show blocks contained in font",
+	menu->AddItem(item = new BMenuItem(
+		B_TRANSLATE("Only show blocks contained in font"),
 		new BMessage(kMsgContainedBlocks)));
 	item->SetMarked(fCharacterView->IsShowingContainedBlocksOnly());
 	menuBar->AddItem(menu);
