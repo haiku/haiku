@@ -24,6 +24,7 @@ ata_sim_init_bus(device_node *node, void **cookie)
 	status_t result = channel->InitCheck();
 	if (result != B_OK) {
 		TRACE_ERROR("failed to set up ata channel object\n");
+		delete channel;
 		return result;
 	}
 
