@@ -41,7 +41,7 @@ Lowest active priority	ProcessController		Priorita nejnižší aktivity
 Restart Tracker	ProcessController		Restartovat Tracker
 System resources & caches…	ProcessController		Systémové zdroje & cache…
 Damned!	ProcessController		Dokoprdele!
-New Terminal	ProcessController		Nový Terminál
+New Terminal	ProcessController		Nový terminál
 Power saving	ProcessController		Úspora napájení
 ProcessController is already installed in Deskbar.	ProcessController		Správce Procesů je již v Deskbaru nainstalován.
 This is the last active processor…\nYou can't turn it off!	ProcessController		Toto je poslední aktivní processor…\nNemůžete ho vypnout!

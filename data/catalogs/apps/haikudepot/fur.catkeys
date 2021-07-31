@@ -39,7 +39,7 @@ Local	LocalPkgDataLoadProcess		Locâl
 Rate %Package%	RatePackageWindow		Vote %Package%
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Si è verificât un erôr intal inizializâ il gjestôr dal pachet: %message%
 Quit HaikuDepot	App		Siere HaikuDepot
-Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Podaressial jessi acetabil inviâ dâts anonims sul ûs di chest computer al sisteme HaikuDepotServer? Plui indenant tu puedis modificâ lis tôs preferencis tal barcon \"Impostazions\".
+Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Acetaressistu di inviâ dâts anonims sul ûs di chest computer al sisteme HaikuDepotServer? Plui indenant tu podarâs modificâ lis tôs preferencis tal barcon \"Impostazions\".
 An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		Al è vignût fûr un erôr '%Message%' inspietât cun proprietât '%Property%'
 A response to the captcha question must be provided.	UserLoginWindow		Si scugne dâ une rispueste ae domande captcha.
 Category	FilterView		Categorie
@@ -102,7 +102,7 @@ The email is malformed.	UserLoginWindow		La direzion e-mail e je malformade.
 Close	UserLoginWindow		Siere
 Close	RatePackageWindow		Siere
 An unexpected error has been sent from the server [%i]	ServerHelper		Al è stât inviât dal servidôr [%i] un erôr inspietât
-Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Sincronizazion dâts pachet pal dipuesit '%REPO_NAME%'
+Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Sincronizazion dâts dai pachets pal dipuesit '%REPO_NAME%'
 Settings	SettingsWindow		Impostazions
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Al è vignût fûr un erôr discjariant lis condizions di ûs necessaris par creâ un gnûf utent. Controle il regjistri pai detais e torne prove. \nLis informazions su ce mût viodi i regjistris a son disponibilis inte sezion di HaikuDepot  de Vuide utent di Haiku.
 View the usage conditions	UserLoginWindow		Viôt lis condizions di ûs

@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-libtracker	1713978454
+1	greek, modern (1453-)	x-vnd.Haiku-libtracker	572235135
 Created	ContainerWindow		Δημιουργήθηκε
 Icon	AttributesView		Εικονίδιο
 Open and make preferred	OpenWithWindow		'Ανοιγμα και ορισμός προεπιλεγμένου
@@ -6,6 +6,7 @@ Kind	ContainerWindow		Είδος
 Open with…	ContainerWindow		Άνοιγμα με…
 Error moving \"%name\" to Trash. (%error)	FSUtils		Σφάλμα κατά τη μετακίνηση του \"%name\" στον Κάδο Απορριμμάτων. (%error)
 Or	FindPanel		Ή
+MIME Description	AttributesView		Περιγραφή MIME
 before	FindPanel		πριν
 Volume icons	TrackerSettingsWindow		Εικονίδια τόμου
 Ignore case	SelectionWindow		Αγνόηση
@@ -40,6 +41,7 @@ Small bitmap icon	AttributesView		Μικρό εικονίδιο bitmap
 Would you like to find a suitable application to open the file?	FSUtils		Θα θέλατε να πραγματοποιηθεί η έυρεση μιας κατάλληλης εφαρμογής για το άνοιγμα του αρχείου;
 64 x 64	ContainerWindow		64 x 64
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Δεν μπορείται να αντικαταστήσετε έναν φάκελο ή έναν συμβολικό δεσμό με ένα αρχείο.
+{0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# ημερομηνίες>}}
 Trailing \\.	libtracker		Περισσευούμενο \\.
 At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Στην %func \nαπέτυχε η find_directory(). \nΑιτία: %error
 Handles any file	OpenWithWindow		Χειρίζεται κάθε αρχείο
@@ -91,6 +93,7 @@ Corrupted opcode.	libtracker		Μη έγκυρος κώδικας χειρισμ�
 %SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%SizeProcessed από %TotalSize, %BytesPerSecond/δ
 Preparing to restore items…	StatusWindow		Γίνεται προετοιμασία για την επαναφορά αντικειμένων…
 Mount	ContainerWindow		Προσάρτηση
+{0, plural, other{<# rectangles>}}	AttributesView		{0, plural, other{<# τετράγωνα>}}
 Desktop	B_DESKTOP_DIRECTORY		Επιφάνεια Εργασίας
 Corrupted pointers.	libtracker		Κατεστραμμένοι δείκτες.
 Link to:	InfoWindow		Σύνδεση με:
@@ -107,6 +110,7 @@ Edit templates…	TemplatesMenu		Επεξεργασία προτύπων…
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# byte} other{# bytes}}
 8-bit integer	AttributesView		Ακέραιος αριθμός 8-bit
 8-bit unsigned integer	AttributesView		Ακέραιος αριθμός χωρίς πρόσημο 8-bit
+%s info	InfoWindow	window title	Πληροφορίες για %s
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used σε χρήση -- %free ελεύθερα)
 Hide dotfiles	SettingsView		Απόκρυψη αρχείων με τελεία στην αρχή
 Trash	Model		Κάδος
@@ -118,6 +122,7 @@ Resize to fit	QueryContainerWindow		Προσαρμογή μεγέθους
 List folders first	SettingsView		Λίστα φακέλων πρώτα
 Find	FSUtils		Εύρεση
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Ένα στοιχείο που ονομάζεται \"%name\" υπάρχει ήδη σε αυτό το φάκελο. Θα θέλατε να τον αντικαταστήσετε με τον συμβολικό δεσμό που δημιουργείτε;
+List view	ContainerWindow		Προβολή λίστας
 Temporary	FindPanel		Προσωρινό
 Modified	QueryPoseView		Τροποποιήθηκε
 Create relative link	ContainerWindow		Δημιουργία συγγενικού συνδέσμου
@@ -316,6 +321,7 @@ Recent folders	FavoritesMenu		Πρόσφατοι φάκελοι
 Signed memory size	AttributesView		Μέγεθος μνήμης με πρόσημο
 The specified name is illegal. Please choose another name.	FilePanelPriv		Το προσδιορισμένο όνομα είναι μη αποδεκτό. Παρακαλώ διαλέξτε άλλο όνομα.
 of %items	StatusWindow		από %items
+MIME Path	AttributesView		Διαδρομή MIME
 less than	FindPanel		λιγότερο από
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Σφάλμα αντιγραφής του αρχείου \"%name\":\n\t%error\n\nΘα θέλατε να συνεχίσετε;
 Creating links: 	StatusWindow		Γίνεται δημιουργία συνδέσμων: 
@@ -427,6 +433,7 @@ Sorry, saving more than one item is not allowed.	FilePanelPriv		Δεν επιτ�
 Move here	ContainerWindow		Μετακίνηση εδώ
 the config folder	FSUtils		ο φάκελος παραμέτρων
 Sorry, could not create a new folder.	FSUtils		Λυπούμαστε, αδυναμία δημιουργίας ενός νέου φακέλου.
+MIME Signature	AttributesView		Υπογραφή MIME
 Select all	VirtualDirectoryWindow		Επιλογή όλων
 Rename	FSUtils	button label	Μετονομασία
 Clean up all	ContainerWindow		Καθαρισμός όλων

@@ -1,7 +1,7 @@
 1	czech	x-vnd.Haiku-KeyboardInputServerDevice	131044710
 If the application will not quit you may have to kill it.	Team monitor		Pokud se aplikace neukončí, možná ji budete muset zabít.
 Quit application	Team monitor		Ukončit aplikaci
-Open Terminal	Team monitor		Otevřít okno Terminálu
+Open Terminal	Team monitor		Otevřít okno terminálu
 {0, plural,one{Hold CONTROL+ALT+DELETE for # second to reboot.}other{Hold CONTROL+ALT+DELETE for # seconds to reboot.}}	Team monitor		{0, plural,one{Pro restart podržte klávesy CONTROL+ALT+DELETE po dobu # sekundy.}other{Pro restart podržte klávesy CONTROL+ALT+DELETE po dobu # sekund.}}
 Restart the desktop	Team monitor		Restartovat plochu
 Force reboot	Team monitor		Vynutit restart

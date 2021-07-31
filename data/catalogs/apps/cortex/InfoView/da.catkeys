@@ -1,4 +1,4 @@
-1	danish	application/x-vnd.Cortex.InfoView	2537861329
+1	danish	application/x-vnd.Cortex.InfoView	1812482476
 Offset	InfoView		Forskydning
 Description	DormantNodeInfoView		Beskrivelse
 Connection	InfoView		Forbindelse
@@ -21,8 +21,10 @@ Media input	InfoView		Medieinput
 Input format	DormantNodeInfoView		Inputformat
 Format	InfoView		Format
 Version	AppNodeInfoView		Version
+Run mode	LiveNodeInfoView		Kørselstilstand
 Port	LiveNodeInfoView		Port
 Output format	DormantNodeInfoView		Outputformat
+Aspect ratio	InfoView		Højde-bredde-forhold
 Tracks	FileNodeInfoView		Spor
 Source	InfoView		Kilde
 Destination	InfoView		Destination

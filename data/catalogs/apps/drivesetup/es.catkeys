@@ -19,7 +19,7 @@ Failed to format the partition %s!\n	MainWindow		Error al formatear la partició
 Partition size	CreateParametersPanel		Tamaño de partición
 Validation of the given parameters failed.	MainWindow		Falló la validación de los parámetros proporcionados.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		¿Está seguro de que desea formatear la partición \"%s\"? Tendrá que confirmarlo nuevamente antes de que los cambios se apliquen al disco.
-DriveSetup	System name		Examinador de disco
+DriveSetup	System name		Configuración de discos
 Mounted at	PartitionList		Montado en
 Create…	MainWindow		Crear…
 Write changes	MainWindow		Escribir cambios

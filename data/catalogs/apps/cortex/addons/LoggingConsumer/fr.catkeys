@@ -1,8 +1,9 @@
-1	french	application/x-vnd.Be.LoggingConsumerApp	4066837535
+1	french	application/x-vnd.Be.LoggingConsumerApp	274650859
 Priority	CortexAddOnsLoggingConsumer		Priorité
 Latency	CortexAddOnsLoggingConsumer		Temps de latence
 Logged input	CortexAddOnsLoggingConsumer		Entrées journalisés
 Start	CortexAddOnsLoggingConsumerNodeHarnessWin		Démarrer
+LoggingConsumer parameters	CortexAddOnsLoggingConsumer		Paramètres du LoggingConsumer
 Latency control	CortexAddOnsLoggingConsumer		Contrôle du temps de latence
 CPU percentage	CortexAddOnsLoggingConsumer		Pourcentages CPU
 Stop	CortexAddOnsLoggingConsumerNodeHarnessWin		Arrêter
@@ -10,3 +11,4 @@ OK	CortexAddOnsCommonMediaNodeControlApp		OK
 Controls	CortexAddOnsLoggingConsumerNodeHarnessWin		Contrôles
 controls	CortexAddOnsCommonMediaNodeControlApp		contrôles
 Connect	CortexAddOnsLoggingConsumerNodeHarnessWin		Connecter
+percent	CortexAddOnsLoggingConsumer		pourcent

@@ -24,4 +24,4 @@ TV	System name		TV
 Settings…	MainWin		Indstillinger…
 None	MainWin		Ingen
 Error, interface is busy:\n\n	MainWin		Fejl, grænseflade er optaget:\n\n
-pixel aspect ratio	MainWin		pixel aspekt forhold
+pixel aspect ratio	MainWin		pixel højde-bredde-forhold

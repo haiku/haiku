@@ -69,7 +69,7 @@ Cancel	AbstractParametersPanel		Zrušit
 Format	MainWindow		Formátovat
 OK	MainWindow		OK
 Empty space	DiskView		Prázdné místo
-Open with DiskProbe	MainWindow		Otevřít Diskovou sondou
+Open with DiskProbe	MainWindow		Otevřít diskovou sondou
 Could not delete the selected partition.	MainWindow		Nelze odstranit vybraný oddíl.
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Opravdu chcete inicializovat vybraný disk? Všechna data budou ztracena. Budete požádáni znovu, než budou na disk zapsány změny.\n
 There was an error preparing the disk for modifications.	MainWindow		Při přípravě disku na úpravy došlo k chybě.

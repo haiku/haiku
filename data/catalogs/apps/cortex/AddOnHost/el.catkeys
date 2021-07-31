@@ -1,0 +1,4 @@
+1	greek, modern (1453-)	application/x-vnd.Cortex.AddOnHost	826663209
+Continue	CortexAddOnHost		Συνέχεια
+Quit	CortexAddOnHost		Έξοδος
+This program runs in the background, and is started automatically by Cortex when necessary. You probably don't want to start it manually.	CortexAddOnHost		Αυτό το πρόγραμμα εκτελείται στο παρασκήνιο και εκκινείται αυτόματα από το Cortex όταν είναι απαραίτητο. Πιθανόν να μη θέλετε να το ξεκινήσετε χειροκίνητα.

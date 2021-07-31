@@ -1,4 +1,4 @@
-1	danish	application/x-vnd.Cortex.MediaRoutingView	2821927531
+1	danish	application/x-vnd.Cortex.MediaRoutingView	2442001291
 Lock group	MediaNodePanel		Lås gruppe
 Video output	MediaRoutingView		Videooutput
 Icon view	MediaRoutingView		Ikonvisning
@@ -8,7 +8,10 @@ Audio input	MediaRoutingView		Lydinput
 Run mode	MediaNodePanel		Kørselstilstand
 Could not load '%filename%'	MediaRoutingView		Kunne ikke indlæse '%filename%'
 Stop time source	MediaNodePanel		Stop tidskilde
+Be Audio Mixer	MediaRoutingView		Be-lydmixer
 Video input	MediaRoutingView		Videoinput
+Mini icon view	MediaRoutingView		Miniikonvisning
+Select all	MediaRoutingView		Vælg alt
 (same as group)	MediaNodePanel		(samme som gruppe)
 Input	MediaJack		Input
 Get info	MediaJack		Hent info
@@ -20,3 +23,4 @@ Get info	MediaRoutingView		Hent info
 Clean up	MediaRoutingView		Ryd op
 Start control panel	MediaNodePanel		Start kontrolpanel
 Tweak parameters	MediaNodePanel		Finjuster parametre
+Unlock group	MediaNodePanel		Lås op for gruppe

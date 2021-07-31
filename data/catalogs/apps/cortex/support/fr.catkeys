@@ -1,4 +1,4 @@
-1	french	application/x-vnd.Cortex.support	1760547772
+1	french	application/x-vnd.Cortex.support	2589023184
 (unknown format)	MediaString		(format inconnu)
 {0, plural,one{# frame forward}other{# frames forward}}	MediaString		{0, plural,one{# trame en avant}other{# trames en avant}}
 Rear-right	MediaString		Arrière-droit
@@ -6,11 +6,14 @@ Rear-right	MediaString		Arrière-droit
 Mono	MediaString		Mono
 Encoded video	MediaString		Vidéo compressée
 Top-Front-left	MediaString		Avant-gauche-haut
+16 bit integer	MediaString		Entier 16 bits
 Offline	MediaString		Hors ligne
 (unkown video orientation)	MediaString		(orientation vidéo inconnue)
 Top-Front-center	MediaString		Avant-centre-haut
 BeOS format family	MediaString		Famille de format BeOS
 Back-center	MediaString		Arrière-centre
+32 bit CMY	MediaString		32 bits CMJ
+{0, plural, other{# bit integer}}	MediaString		{0, plural, other{Entier # bits}}
 (unknown video format)	MediaString		(format vidéo inconnu)
 AVI format family	MediaString		Famille de format AVI
 Interlaced 	MediaString		Entrelacé 
@@ -34,8 +37,9 @@ Side-right	MediaString		Côté-droit
 Little endian	MediaString		Petit-boutien
 Side-left	MediaString		Côté-gauche
 {0, plural, one{# byte per buffer} other{# bytes per buffer}}	MediaString		{0, plural, one{# octet par tampon} other{# octets par tampon}}
+32 bit CMYK	MediaString		32 bits CMJN
 8 bit integer	MediaString		Entier 8 bits
-8 bit grayscale-index	MediaString		Niveaux de gris indexé 8 bits
+8 bit grayscale-index	MediaString		Palette de gris 8 bits
 Increase latency	MediaString		Augmenter le temps de latence
 Front-left-center	MediaString		Avant-gauche-milieu
 Center	MediaString		Centre
@@ -61,6 +65,7 @@ BeOS video	MediaString		Vidéo BeOS
 24 bit CMY	MediaString		24 bits CMJ
 Top-center	MediaString		Centre-haut
 Stereo	MediaString		Stéréo
+8 bit color-index	MediaString		Palette de couleurs 8 bits
 Bottom to top, left to right	MediaString		De bas en haut, et de gauche à droite
 {0, plural, one{# line} other{# lines}}	MediaString		{0, plural, one{# ligne} other{# lignes}}
 Text	MediaString		Texte

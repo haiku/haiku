@@ -1,8 +1,10 @@
-1	danish	application/x-vnd.Cortex.Route	3866265772
+1	danish	application/x-vnd.Cortex.Route	3241560755
 OK	CortexRouteApp		OK
 File	CortexRouteApp		Fil
 Window	CortexRouteApp		Vindue
+Transport	CortexRouteApp		Transport
 Untitled group	CortexRouteApp		Unavngivet gruppe
 Open…	CortexRouteApp		Åbn…
+Show transport	CortexRouteApp		Vis transport
 Show add-ons	CortexRouteApp		Vis tilføjelser
 Quit	CortexRouteApp		Afslut

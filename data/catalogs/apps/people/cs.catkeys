@@ -1,5 +1,5 @@
 1	czech	x-vnd.Be-PEPL	2634915100
-Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Spouštění FileTypes prefletu pro konfiguraci Osobních atributů selhalo.\n\nChyba:
+Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Spouštění nastavení typů souborů pro konfiguraci osobních atributů selhalo.\n\nChyba: 
 Mobile phone	People		Mobilní telefon
 Unnamed person	People		Nepojmenovaná osoba
 New person…	People		Nová osoba...

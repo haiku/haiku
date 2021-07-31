@@ -1,9 +1,10 @@
-1	russian	x-vnd.Haiku-HaikuDepot	3106374143
+1	russian	x-vnd.Haiku-HaikuDepot	1280097287
 Repository update error	LocalRepositoryUpdateProcess		Ошибка обновления репозитория
 Network error	ServerHelper		Ошибка сети
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Произошла ошибка при обновлении репозитория: %error%
 User Created	UserLoginWindow		Пользователь создан
 Check for updates…	MainWindow		Проверить обновления…
+Uninstall	PackageManager		Удалить
 Uninstalled	PackageListView		Удаленные
 It was not possible to create the new user.	UserLoginWindow		Не удалось создать нового пользователя.
 Available packages	MainWindow		Доступные пакеты
