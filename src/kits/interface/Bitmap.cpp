@@ -637,11 +637,7 @@ BBitmap::SetBits(const void* data, int32 length, int32 offset,
 	int32 inBPR = -1;
 	// tweaks to mimic R5 behavior
 	if (error == B_OK) {
-		if (colorSpace == B_RGB32) {
-			// B_RGB32 means actually unpadded B_RGB24_BIG
-			colorSpace = B_RGB24_BIG;
-			inBPR = width * 3;
-		} else if (colorSpace == B_CMAP8 && fColorSpace != B_CMAP8) {
+		if (colorSpace == B_CMAP8 && fColorSpace != B_CMAP8) {
 			// If in color space is B_CMAP8, but the bitmap's is another one,
 			// ignore source data row padding.
 			inBPR = width;
