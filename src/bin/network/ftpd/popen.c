@@ -85,9 +85,8 @@ ftpd_popen(char *program, char *type)
 	if (!pids) {
 		if ((fds = getdtablesize()) <= 0)
 			return (NULL);
-		if ((pids = malloc(fds * sizeof(int))) == NULL)
+		if ((pids = calloc(fds, sizeof(int))) == NULL)
 			return (NULL);
-		memset(pids, 0, fds * sizeof(int));
 	}
 	if (pipe(pdes) < 0)
 		return (NULL);
@@ -110,10 +109,11 @@ ftpd_popen(char *program, char *type)
 		flags |= GLOB_LIMIT;
 		if (glob(argv[argc], flags, NULL, &gl))
 			gargv[gargc++] = strdup(argv[argc]);
-		else
+		else if (gl.gl_pathc > 0) {
 			for (pop = gl.gl_pathv; *pop && gargc < (MAXGLOBARGS-1);
 			     pop++)
 				gargv[gargc++] = strdup(*pop);
+		}
 		globfree(&gl);
 	}
 	gargv[gargc] = NULL;
@@ -191,7 +191,7 @@ ftpd_pclose(FILE *iop)
 	 * pclose returns -1 if stream is not associated with a
 	 * `popened' command, or, if already `pclosed'.
 	 */
-	if (pids == 0 || pids[fdes = fileno(iop)] == 0)
+	if (pids == NULL || pids[fdes = fileno(iop)] == 0)
 		return (-1);
 	(void)fclose(iop);
 	omask = sigblock(sigmask(SIGINT)|sigmask(SIGQUIT)|sigmask(SIGHUP));

@@ -1069,7 +1069,7 @@ user(char *name)
 		}
 	}
 	if (logging)
-		strncpy(curname, name, sizeof(curname)-1);
+		strlcpy(curname, name, sizeof(curname));
 
 	pwok = 0;
 #ifdef USE_PAM
@@ -1501,7 +1501,7 @@ skip:
 		    (struct sockaddr *)&his_addr);
 	logged_in = 1;
 
-	if (guest && stats && statfd < 0)
+	if (guest && stats && statfd < 0) {
 #ifdef VIRTUAL_HOSTING
 		statfd = open(thishost->statfile, O_WRONLY|O_APPEND);
 #else
@@ -1509,6 +1509,7 @@ skip:
 #endif
 		if (statfd < 0)
 			stats = 0;
+	}
 
 	dochroot =
 		checkuser(_PATH_FTPCHROOT, pw->pw_name, 1, &residue)
@@ -2159,7 +2160,7 @@ send_data(FILE *instr, FILE *outstr, size_t blksize, off_t filesize, int isreg)
 				}
 			}
 			ENDXFER;
-			reply(226, msg);
+			reply(226, "%s", msg);
 			return (0);
 		}
 
@@ -2357,6 +2358,10 @@ statfilecmd(char *filename)
 	code = lstat(filename, &st) == 0 && S_ISDIR(st.st_mode) ? 212 : 213;
 	(void)snprintf(line, sizeof(line), _PATH_LS " -lgA %s", filename);
 	fin = ftpd_popen(line, "r");
+	if (fin == NULL) {
+			perror_reply(551, filename);
+			return;
+	}
 	lreply(code, "Status of %s:", filename);
 	atstart = 1;
 	while ((c = getc(fin)) != EOF) {
@@ -2818,15 +2823,20 @@ static int
 myoob(void)
 {
 	char *cp;
+	int ret;
 
 	if (!transflag) {
 		syslog(LOG_ERR, "Internal: myoob() while no transfer");
 		return (0);
 	}
 	cp = tmpline;
-	if (ftpd_getline(cp, 7, stdin) == NULL) {
+	ret = getline(cp, 7, stdin);
+	if (ret == -1) {
 		reply(221, "You could at least say goodbye.");
 		dologout(0);
+	} else if (ret == -2) {
+			/* Ignore truncated command. */
+			return (0);
 	}
 	upper(cp);
 	if (strcmp(cp, "ABOR\r\n") == 0) {
