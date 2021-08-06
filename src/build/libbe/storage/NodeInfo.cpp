@@ -766,19 +766,3 @@ BNodeInfo::operator=(const BNodeInfo &nodeInfo)
 BNodeInfo::BNodeInfo(const BNodeInfo &)
 {
 }
-
-
-//	#pragma mark -
-
-namespace BPrivate {
-
-extern bool
-CheckNodeIconHintPrivate(const BNode *node, bool whatever)
-{
-	// I've no idea what this is supposed to do exactly, but
-	// it seems to tell Tracker if there is an icon for the
-	// node. See kits/tracker/Model.cpp for details
-	return true;
-}
-
-}	// namespace BPrivate

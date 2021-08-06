@@ -420,6 +420,7 @@ WindowsSettingsView::WindowsSettingsView()
 	fSortFolderNamesFirstCheckBox(NULL),
 	fHideDotFilesCheckBox(NULL),
 	fTypeAheadFilteringCheckBox(NULL),
+	fGenerateImageThumbnailsCheckBox(NULL),
 	fShowFullPathInTitleBar(false),
 	fSingleWindowBrowse(false),
 	fShowNavigator(false),
@@ -456,6 +457,10 @@ WindowsSettingsView::WindowsSettingsView()
 		B_TRANSLATE("Enable type-ahead filtering"),
 		new BMessage(kTypeAheadFilteringChanged));
 
+	fGenerateImageThumbnailsCheckBox = new BCheckBox("",
+		B_TRANSLATE("Generate image thumbnails"),
+		new BMessage(kGenerateImageThumbnailsChanged));
+
 	const float spacing = be_control_look->DefaultItemSpacing();
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
@@ -472,6 +477,7 @@ WindowsSettingsView::WindowsSettingsView()
 			.Add(fSortFolderNamesFirstCheckBox)
 			.Add(fHideDotFilesCheckBox)
 			.Add(fTypeAheadFilteringCheckBox)
+			.Add(fGenerateImageThumbnailsCheckBox)
 			.End()
 		.AddGlue()
 		.SetInsets(spacing);
@@ -488,6 +494,7 @@ WindowsSettingsView::AttachedToWindow()
 	fSortFolderNamesFirstCheckBox->SetTarget(this);
 	fHideDotFilesCheckBox->SetTarget(this);
 	fTypeAheadFilteringCheckBox->SetTarget(this);
+	fGenerateImageThumbnailsCheckBox->SetTarget(this);
 }
 
 
@@ -582,6 +589,17 @@ WindowsSettingsView::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case kGenerateImageThumbnailsChanged:
+		{
+			settings.SetGenerateImageThumbnails(
+				fGenerateImageThumbnailsCheckBox->Value() == 1);
+			send_bool_notices(kGenerateImageThumbnailsChanged,
+				"GenerateImageThumbnails",
+				fGenerateImageThumbnailsCheckBox->Value() == 1);
+			Window()->PostMessage(kSettingsContentsModified);
+			break;
+		}
+
 		default:
 			_inherited::MessageReceived(message);
 			break;
@@ -637,6 +655,12 @@ WindowsSettingsView::SetDefaults()
 			"TypeAheadFiltering", true);
 	}
 
+	if (settings.GenerateImageThumbnails()) {
+		settings.SetGenerateImageThumbnails(false);
+		send_bool_notices(kGenerateImageThumbnailsChanged,
+			"GenerateImageThumbnails", true);
+	}
+
 	ShowCurrentSettings();
 }
 
@@ -651,7 +675,8 @@ WindowsSettingsView::IsDefaultable() const
 		|| settings.ShowNavigator() != false
 		|| settings.TransparentSelection() != true
 		|| settings.SortFolderNamesFirst() != true
-		|| settings.TypeAheadFiltering() != false;
+		|| settings.TypeAheadFiltering() != false
+		|| settings.GenerateImageThumbnails() != false;
 }
 
 
@@ -703,6 +728,12 @@ WindowsSettingsView::Revert()
 			"TypeAheadFiltering", fTypeAheadFiltering);
 	}
 
+	if (settings.GenerateImageThumbnails() != fGenerateImageThumbnails) {
+		settings.SetGenerateImageThumbnails(fGenerateImageThumbnails);
+		send_bool_notices(kGenerateImageThumbnailsChanged,
+			"GenerateImageThumbnails", fGenerateImageThumbnails);
+	}
+
 	ShowCurrentSettings();
 }
 
@@ -722,6 +753,8 @@ WindowsSettingsView::ShowCurrentSettings()
 	fSortFolderNamesFirstCheckBox->SetValue(settings.SortFolderNamesFirst());
 	fHideDotFilesCheckBox->SetValue(settings.HideDotFiles());
 	fTypeAheadFilteringCheckBox->SetValue(settings.TypeAheadFiltering());
+	fGenerateImageThumbnailsCheckBox->SetValue(
+		settings.GenerateImageThumbnails());
 }
 
 
@@ -737,6 +770,7 @@ WindowsSettingsView::RecordRevertSettings()
 	fSortFolderNamesFirst = settings.SortFolderNamesFirst();
 	fHideDotFiles = settings.HideDotFiles();
 	fTypeAheadFiltering = settings.TypeAheadFiltering();
+	fGenerateImageThumbnails = settings.GenerateImageThumbnails();
 }
 
 
@@ -751,7 +785,8 @@ WindowsSettingsView::IsRevertable() const
 		|| fTransparentSelection != settings.TransparentSelection()
 		|| fSortFolderNamesFirst != settings.SortFolderNamesFirst()
 		|| fHideDotFiles != settings.HideDotFiles()
-		|| fTypeAheadFiltering != settings.TypeAheadFiltering();
+		|| fTypeAheadFiltering != settings.TypeAheadFiltering()
+		|| fGenerateImageThumbnails != settings.GenerateImageThumbnails();
 }
 
 

@@ -72,6 +72,7 @@ private:
 	BooleanValueSetting* fSortFolderNamesFirst;
 	BooleanValueSetting* fHideDotFiles;
 	BooleanValueSetting* fTypeAheadFiltering;
+	BooleanValueSetting* fGenerateImageThumbnails;
 
 	ScalarValueSetting* fRecentApplicationsCount;
 	ScalarValueSetting* fRecentDocumentsCount;
@@ -136,6 +137,7 @@ TTrackerState::TTrackerState()
 	fSortFolderNamesFirst(NULL),
 	fHideDotFiles(NULL),
 	fTypeAheadFiltering(NULL),
+	fGenerateImageThumbnails(NULL),
 	fRecentApplicationsCount(NULL),
 	fRecentDocumentsCount(NULL),
 	fRecentFoldersCount(NULL),
@@ -167,6 +169,7 @@ TTrackerState::TTrackerState(const TTrackerState&)
 	fSortFolderNamesFirst(NULL),
 	fHideDotFiles(NULL),
 	fTypeAheadFiltering(NULL),
+	fGenerateImageThumbnails(NULL),
 	fRecentApplicationsCount(NULL),
 	fRecentDocumentsCount(NULL),
 	fRecentFoldersCount(NULL),
@@ -228,6 +231,8 @@ TTrackerState::LoadSettingsIfNeeded()
 	Add(fHideDotFiles = new BooleanValueSetting("HideDotFiles", false));
 	Add(fTypeAheadFiltering
 		= new BooleanValueSetting("TypeAheadFiltering", false));
+	Add(fGenerateImageThumbnails
+		= new BooleanValueSetting("GenerateImageThumbnails", false));
 	Add(fSingleWindowBrowse
 		= new BooleanValueSetting("SingleWindowBrowse", false));
 	Add(fShowNavigator = new BooleanValueSetting("ShowNavigator", false));
@@ -462,6 +467,20 @@ void
 TrackerSettings::SetTypeAheadFiltering(bool enabled)
 {
 	gTrackerState.fTypeAheadFiltering->SetValue(enabled);
+}
+
+
+bool
+TrackerSettings::GenerateImageThumbnails()
+{
+	return gTrackerState.fGenerateImageThumbnails->Value();
+}
+
+
+void
+TrackerSettings::SetGenerateImageThumbnails(bool enabled)
+{
+	gTrackerState.fGenerateImageThumbnails->SetValue(enabled);
 }
 
 

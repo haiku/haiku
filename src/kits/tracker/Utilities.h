@@ -67,6 +67,7 @@ namespace BPrivate {
 class Benaphore;
 class BPose;
 class BPoseView;
+class Model;
 
 // global variables
 static const rgb_color kBlack = {0, 0, 0, 255};
@@ -481,7 +482,8 @@ void _ThrowOnAssert(bool, const char*, int32);
 // stub calls that work around BAppFile info inefficiency
 status_t GetAppSignatureFromAttr(BFile*, char*);
 status_t GetAppIconFromAttr(BFile* file, BBitmap* icon, icon_size which);
-status_t GetFileIconFromAttr(BNode* node, BBitmap* icon, icon_size which);
+status_t GetFileIconFromAttr(Model* model, BBitmap* icon, icon_size which);
+status_t GetThumbnailIcon(Model* model, BBitmap* icon, icon_size which);
 
 // debugging
 void HexDump(const void* buffer, int32 length);

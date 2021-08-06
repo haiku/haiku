@@ -1043,6 +1043,7 @@ BContainerWindow::Init(const BMessage* message)
 	SetFlags(Flags() & ~B_NO_WORKSPACE_ACTIVATION);
 }
 
+
 void
 BContainerWindow::InitLayout()
 {
@@ -1080,6 +1081,7 @@ BContainerWindow::InitLayout()
 		fPoseView->CountView()->SetExplicitMinSize(size);
 	}
 }
+
 
 void
 BContainerWindow::RestoreState()
