@@ -80,7 +80,7 @@ ArchUARTSifive::GetChar(bool wait)
 {
 	UARTSifiveRegs::Rxdata data;
 	do {
-		data = { .val = Regs()->rxdata.val };
+		data.val = Regs()->rxdata.val;
 	} while (!wait || data.isEmpty);
 
 	return data.isEmpty ? -1 : data.data;
