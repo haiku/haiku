@@ -11,7 +11,7 @@ Scope	Main Window		Espectro
 Drop MIDI file here	Scope View		Solte aqui um arquivo MIDI
 None	Main Window		Nenhum
 Reverb:	Main Window		Reverberação:
-MidiPlayer	System name		MidiPlayer
+MidiPlayer	System name		Tocador de MIDI
 OK	Main Window		OK
 Stop	Main Window		Parar
 Live input:	Main Window		Entrada ao vivo:

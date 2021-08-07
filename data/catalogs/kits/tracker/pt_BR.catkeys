@@ -256,7 +256,7 @@ Delete	FilePanelPriv		Deletar
 <No recent items>	FavoritesMenu		<Nenhum item recente>
 Formula %formula	FindPanel	FindResultTitle	Fórmula %formula
 Preparing to create links…	StatusWindow		Preparando para criar vínculos...
-Tracker status	StatusWindow		Status do Tracker
+Tracker status	StatusWindow		Estado do Tracker
 Handles any %type	OpenWithWindow		Lidar com qualquer %tipo
 The mount server could not be contacted.	AutoMounterSettings		O servidor de montagem não pode ser contactado
 Query template	FindPanel		Modelo de consulta
@@ -423,7 +423,7 @@ KiB	WidgetAttributeText		KiB
 Revert	TrackerSettingsWindow		Reverter
 trash	B_TRASH_DIRECTORY		lixeira
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Se mover a pasta de sistema ou o seu conteúdo, não conseguirá iniciar o %osName!\n\nTem certeza de que quer fazer isso?\n\nPara mover de qualquer modo a pasta de sistema ou o seu conteúdo, mantenha premida a tecla Shift e clique \"Mover\".
-Close all in workspace	ContainerWindow		Fechar tudo no ambiente de trabalho
+Close all in workspace	ContainerWindow		Fechar tudo na área de trabalho
 Corrupted expression.	libtracker		Expressão corrompida.
 32 x 32	DeskWindow		32 x 32
 Network address	AttributesView		Endereço de rede

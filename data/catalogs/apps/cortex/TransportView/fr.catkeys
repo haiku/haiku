@@ -1,6 +1,8 @@
-1	french	application/x-vnd.Cortex.TransportView	1915428651
+1	french	application/x-vnd.Cortex.TransportView	3084941746
+(none)	TransportView		(aucun)
 {0, plural, one{# node} other{# nodes}}	TransportView		{0, plural, one{# nœud} other{# nœuds}}
 Start	TransportView		Démarrer
+No errors.	TransportView		Pas d’erreurs.
 Offline	TransportView		Hors ligne
 (???)	TransportView		(???)
 Stop	TransportView		Arrêter

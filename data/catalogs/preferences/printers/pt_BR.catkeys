@@ -15,7 +15,7 @@ Blue	TestPageView		Azul
 Waiting	JobListView		Aguardando
 Processing	JobListView		Processando
 Cancel	AddPrinterDialog		Cancelar
-Unknown status	JobListView		Status desconhecido
+Unknown status	JobListView		Estado desconhecido
 Print jobs for %printer_name%	PrintersWindow		Trabalhos de impressão para %printer_name%
 {0, plural, =-1{??? pages}=1{# page}other{# pages}}	JobListView		{0, plural, =-1{??? páginas}=1{# página}other{# páginas}}
 Add printer	AddPrinterDialog		Adicionar impressora

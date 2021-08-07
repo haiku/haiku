@@ -73,7 +73,7 @@ Open with DiskProbe	MainWindow		Ouvrir avec Sondeur de disque
 Could not delete the selected partition.	MainWindow		Impossible de supprimer la partition sélectionnée.
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Êtes-vous sûr de vouloir initialiser le disque sélectionné ? Toutes les données seront perdues. Une confirmation vous sera à nouveau demandée avant que les changements ne soient écrits sur le disque.\n
 There was an error preparing the disk for modifications.	MainWindow		Une erreur est survenue pendant la préparation des modifications du disque.
-The disk has been successfully initialized.\n	MainWindow		Le disque a été correctement initialisée.\n
+The disk has been successfully initialized.\n	MainWindow		Le disque a été correctement initialisé.\n
 Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Faut-il forcer le démontage ?\n\nRemarque : si une application est en train d’écrire sur le volume, le démonter maintenant peut entraîner une perte de données.\n
 Cancel	MainWindow		Annuler
 Free space	PartitionList		Espace libre

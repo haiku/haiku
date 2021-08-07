@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-HaikuDepot	1280097287
+1	russian	x-vnd.Haiku-HaikuDepot	1571828700
 Repository update error	LocalRepositoryUpdateProcess		Ошибка обновления репозитория
 Network error	ServerHelper		Ошибка сети
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Произошла ошибка при обновлении репозитория: %error%
@@ -46,6 +46,7 @@ Category	FilterView		Все категории
 User rating	RatePackageWindow		Пользовательский рейтинг
 Installed packages	MainWindow		Установленные пакеты
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Запрашиваемый объект или объект, указанный в запросе, не найден на сервере.
+Fatal error	PackageManager		Неисправимая ошибка
 No changelog available.	PackageInfoView		История изменений недоступна.
 Error	App		Ошибка
 There was a puzzling response from the web service.	UserLoginWindow		Был получен странный ответ от веб сервера.
@@ -86,6 +87,7 @@ There are problems in the supplied data:	UserLoginWindow		Есть пробле�
 OK	MainWindow		OK
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# объект} few{# объекта} other{# объектов}}
 Usage conditions download problem	UserLoginWindow		Проблема загрузки условий использования
+OK	PackageInfoView		ОК
 Downloading:	PackageInfoView		Загружается:
 Quit	MainWindow		Выйти
 Success	UserLoginWindow		Выполнено успешно
@@ -168,6 +170,7 @@ Fetching remote repository data	LocalRepositoryUpdateProcess		Получение
 Description	PackageListView		Описание
 Open %DeskbarLink%	PackageManager		Открыть %DeskbarLink%
 User creation error	UserLoginWindow		Ошибка создания пользователя
+Install	PackageManager		Установить
 Input validation	UserLoginWindow		Проверка ввода
 Log in…	MainWindow		Войти…
 You need to be logged into an account before you can rate packages.	MainWindow		Вы должны войти в свою учётную запись перед тем как оценить пакет.

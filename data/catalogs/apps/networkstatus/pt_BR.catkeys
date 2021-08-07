@@ -6,17 +6,17 @@ Launching the network preflet failed.\n\nError: 	NetworkStatusView		Falha ao ini
 Install in Deskbar	NetworkStatus		Instalar na Deskbar
 NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		Opções do NetworkStatus:\n\t--deskbar\tadicionar replicante automaticamente no Deskbar\n\t--help\t\texibir esta informação e sair
 Open network preferences…	NetworkStatusView		Abrir preferências de Rede...
-NetworkStatus	System name		Status de Rede
+NetworkStatus	System name		Estado da Rede
 Broadcast:	NetworkStatusView		Broadcast:
 OK	NetworkStatusView		OK
 No link	NetworkStatusView		Sem link
 Could not join wireless network:\n	NetworkStatusView		Não foi possível conectar à rede sem fio:\n
 Ready	NetworkStatusView		Pronto
-Network Status	NetworkStatusView		Status da rede
+Network Status	NetworkStatusView		Estado da Rede
 Deskbar is not running, giving up.	NetworkStatus		Deskbar não está excutando, desistindo.
 Netmask:	NetworkStatusView		Máscara da rede:
 No stateful configuration	NetworkStatusView		Nenhuma configuração de monitorização de estado
-You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Você pode executar Status de Rede em uma janela ou instalá-lo na Deskbar.
+You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Você pode executar o Estado de Rede em uma janela ou instalá-lo na Deskbar.
 IPv4 address:	NetworkStatusView		Endereço IPv4:
 %ifaceName information:\n	NetworkStatusView		Informação sobre %ifaceName:\n
 Run in window	NetworkStatus		Executar em janela

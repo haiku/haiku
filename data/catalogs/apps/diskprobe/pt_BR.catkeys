@@ -68,7 +68,7 @@ Block 0x%Lx	ProbeView		Bloco 0x%Lx
 Attribute	AttributeWindow		Atributo
 Mode:	FindWindow		Modo:
 16 bit	TypeEditors		16 bit
-32 bit size or status:	TypeEditors		Tamanho de 32 bit ou status:
+32 bit size or status:	TypeEditors		Tamanho ou estado de 32 bit:
 of 	ProbeView		de 
 Contents:	TypeEditors		Conteúdo:
 Could not open file \"%s\": %s\n	DiskProbe		Não foi possível abrir o arquivo \"%s\": %s\n

@@ -1,15 +1,18 @@
-1	portuguese	application/x-vnd.Cortex.MediaRoutingView	850971648
+1	portuguese	application/x-vnd.Cortex.MediaRoutingView	3146168479
 Video output	MediaRoutingView		Saída de vídeo
 Icon view	MediaRoutingView		Vista de ícones
 OK	MediaRoutingView		OK
 Advanced	MediaNodePanel		Avançado
 Audio input	MediaRoutingView		Entrada de áudio
+Be Audio Mixer	MediaRoutingView		Misturador de áudio Be
 Video input	MediaRoutingView		Entrada de vídeo
+Release	MediaNodePanel		Lançamento
 Disconnect	MediaRoutingView		Desligar
 Could not disconnect	MediaRoutingView		Não foi possível desligar
 Could not instantiate '%infoname%'	MediaRoutingView		Não foi possível instanciar '%infoname%'
 Mini icon view	MediaRoutingView		Vista de mini-ícones
 Select all	MediaRoutingView		Selecionar todos
+(same as group)	MediaNodePanel		(mesmo que o grupo)
 Input	MediaJack		Entrada
 Get info	MediaJack		Obter informações
 Error	MediaRoutingView		Erro
