@@ -66,7 +66,6 @@ public:
 								NetServer(status_t& status);
 	virtual						~NetServer();
 
-	virtual	void				AboutRequested();
 	virtual	void				ReadyToRun();
 	virtual	void				MessageReceived(BMessage* message);
 
@@ -151,26 +150,6 @@ NetServer::NetServer(status_t& error)
 NetServer::~NetServer()
 {
 	BPrivate::BPathMonitor::StopWatching("/dev/net", this);
-}
-
-
-void
-NetServer::AboutRequested()
-{
-	BAlert *alert = new BAlert("about", "Networking Server\n"
-		"\tCopyright " B_UTF8_COPYRIGHT "2006, Haiku.\n", "OK");
-	BTextView *view = alert->TextView();
-	BFont font;
-
-	view->SetStylable(true);
-
-	view->GetFont(&font);
-	font.SetSize(18);
-	font.SetFace(B_BOLD_FACE);
-	view->SetFontAndColor(0, 17, &font);
-
-	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-	alert->Go(NULL);
 }
 
 
