@@ -487,8 +487,10 @@ DraggableContainerIcon::MouseMoved(BPoint where, uint32, const BMessage*)
 
 	// See if we need to truncate the string
 	BString nameString = model->Name();
-	if (view->StringWidth(model->Name()) > rect.Width())
-		view->TruncateString(&nameString, B_TRUNCATE_END, rect.Width() - 5);
+	if (view->StringWidth(model->Name()) > rect.Width()) {
+		view->TruncateString(&nameString, B_TRUNCATE_MIDDLE,
+			rect.Width() - 5);
+	}
 
 	// Draw the label
 	float leftText = (view->StringWidth(nameString.String())
