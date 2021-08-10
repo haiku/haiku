@@ -24,9 +24,6 @@ HIDReport::HIDReport(HIDParser *parser, uint8 type, uint8 id)
 		fType(type),
 		fReportID(id),
 		fReportSize(0),
-		fItemsUsed(0),
-		fItemsAllocated(0),
-		fItems(NULL),
 		fReportStatus(B_NO_INIT),
 		fCurrentReport(NULL),
 		fBusyCount(0)
@@ -39,7 +36,7 @@ HIDReport::HIDReport(HIDParser *parser, uint8 type, uint8 id)
 
 HIDReport::~HIDReport()
 {
-	free(fItems);
+
 }
 
 
@@ -112,19 +109,6 @@ HIDReport::AddMainItem(global_item_state &globalState,
 
 	uint32 usageRangeIndex = 0;
 	for (uint32 i = 0; i < globalState.report_count; i++) {
-		if (fItemsUsed >= fItemsAllocated) {
-			fItemsAllocated += 10;
-			HIDReportItem **newItems = (HIDReportItem **)realloc(fItems,
-				sizeof(HIDReportItem *) * fItemsAllocated);
-			if (newItems == NULL) {
-				TRACE_ALWAYS("no memory when growing report item list\n");
-				fItemsAllocated -= 10;
-				return;
-			}
-
-			fItems = newItems;
-		}
-
 		if (mainData.array_variable == 1) {
 			usage_value usage;
 			if (i < localState.usage_stack_used)
@@ -139,20 +123,23 @@ HIDReport::AddMainItem(global_item_state &globalState,
 			usageMinimum = usageMaximum = usage.u.extended;
 		}
 
-		fItems[fItemsUsed] = new(std::nothrow) HIDReportItem(this,
+		HIDReportItem *item = new(std::nothrow) HIDReportItem(this,
 			fReportSize, globalState.report_size, mainData.data_constant == 0,
 			mainData.array_variable == 0, mainData.relative != 0,
 			logicalMinimum, logicalMaximum, usageMinimum, usageMaximum);
-		if (fItems[fItemsUsed] == NULL)
+		if (item == NULL)
 			TRACE_ALWAYS("no memory when creating report item\n");
 
 		if (collection != NULL)
-			collection->AddItem(fItems[fItemsUsed]);
+			collection->AddItem(item);
 		else
 			TRACE_ALWAYS("main item not part of a collection\n");
 
+		if (fItems.PushBack(item) == B_NO_MEMORY) {
+			TRACE_ALWAYS("no memory when growing report item list\n");
+		}
+
 		fReportSize += globalState.report_size;
-		fItemsUsed++;
 	}
 }
 
@@ -186,7 +173,7 @@ HIDReport::SendReport()
 	fCurrentReport = report;
 	memset(fCurrentReport, 0, reportSize);
 
-	for (uint32 i = 0; i < fItemsUsed; i++) {
+	for (int32 i = 0; i < fItems.Count(); i++) {
 		HIDReportItem *item = fItems[i];
 		if (item == NULL)
 			continue;
@@ -206,7 +193,7 @@ HIDReport::SendReport()
 HIDReportItem *
 HIDReport::ItemAt(uint32 index)
 {
-	if (index >= fItemsUsed)
+	if (index >= fItems.Count())
 		return NULL;
 	return fItems[index];
 }
@@ -215,7 +202,7 @@ HIDReport::ItemAt(uint32 index)
 HIDReportItem *
 HIDReport::FindItem(uint16 usagePage, uint16 usageID)
 {
-	for (uint32 i = 0; i < fItemsUsed; i++) {
+	for (int32 i = 0; i < fItems.Count(); i++) {
 		if (fItems[i]->UsagePage() == usagePage
 			&& fItems[i]->UsageID() == usageID)
 			return fItems[i];
@@ -285,8 +272,8 @@ HIDReport::PrintToStream()
 	TRACE_ALWAYS("\treport size: %" B_PRIu32 " bits = %" B_PRIu32 " bytes\n",
 		fReportSize, (fReportSize + 7) / 8);
 
-	TRACE_ALWAYS("\titem count: %" B_PRIu32 "\n", fItemsUsed);
-	for (uint32 i = 0; i < fItemsUsed; i++) {
+	TRACE_ALWAYS("\titem count: %" B_PRIu32 "\n", fItems.Count());
+	for (int32 i = 0; i < fItems.Count(); i++) {
 		HIDReportItem *item = fItems[i];
 		if (item != NULL)
 			item->PrintToStream(1);

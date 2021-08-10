@@ -6,6 +6,8 @@
 #define HID_PARSER_H
 
 #include "HIDDataTypes.h"
+#include "util/Vector.h"
+
 
 class HIDCollection;
 class HIDDevice;
@@ -43,8 +45,7 @@ private:
 
 		HIDDevice *				fDevice;
 		bool					fUsesReportIDs;
-		uint8					fReportCount;
-		HIDReport **			fReports;
+		Vector<HIDReport *>		fReports;
 		HIDCollection *			fRootCollection;
 };
 

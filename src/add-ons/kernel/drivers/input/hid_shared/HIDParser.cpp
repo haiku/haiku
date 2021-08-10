@@ -28,8 +28,6 @@ static int8 sUnitExponent[16] = {
 HIDParser::HIDParser(HIDDevice *device)
 	:	fDevice(device),
 		fUsesReportIDs(false),
-		fReportCount(0),
-		fReports(NULL),
 		fRootCollection(NULL)
 {
 }
@@ -53,20 +51,12 @@ HIDParser::ParseReportDescriptor(const uint8 *reportDescriptor,
 	local_item_state localState;
 	memset(&localState, 0, sizeof(local_item_state));
 
-	uint32 usageStackUsed = 0;
-	uint32 usageStackSize = 10;
-	usage_value *usageStack = (usage_value *)malloc(usageStackSize
-		* sizeof(usage_value));
-	if (usageStack == NULL) {
-		TRACE_ALWAYS("no memory to allocate usage stack\n");
-		return B_NO_MEMORY;
-	}
+	Vector<usage_value> usageStack;
 
 	fRootCollection = new(std::nothrow) HIDCollection(NULL, COLLECTION_LOGICAL,
 		localState);
 	if (fRootCollection == NULL) {
 		TRACE_ALWAYS("no memory to allocate root collection\n");
-		free(usageStack);
 		return B_NO_MEMORY;
 	}
 
@@ -115,7 +105,7 @@ HIDParser::ParseReportDescriptor(const uint8 *reportDescriptor,
 				// collections and report items)
 				if (item->tag != ITEM_TAG_MAIN_END_COLLECTION) {
 					// make all usages extended for easier later processing
-					for (uint32 i = 0; i < usageStackUsed; i++) {
+					for (int32 i = 0; i < usageStack.Count(); i++) {
 						if (usageStack[i].is_extended)
 							continue;
 						usageStack[i].u.s.usage_page = globalState.usage_page;
@@ -133,8 +123,8 @@ HIDParser::ParseReportDescriptor(const uint8 *reportDescriptor,
 							= localState.usage_maximum.is_extended = true;
 					}
 
-					localState.usage_stack = usageStack;
-					localState.usage_stack_used = usageStackUsed;
+					localState.usage_stack = &usageStack[0];
+					localState.usage_stack_used = usageStack.Count();
 				}
 
 				if (item->tag == ITEM_TAG_MAIN_COLLECTION) {
@@ -200,7 +190,7 @@ HIDParser::ParseReportDescriptor(const uint8 *reportDescriptor,
 
 				// reset the local item state
 				memset(&localState, 0, sizeof(local_item_state));
-				usageStackUsed = 0;
+				usageStack.MakeEmpty();
 				break;
 			}
 
@@ -289,24 +279,15 @@ HIDParser::ParseReportDescriptor(const uint8 *reportDescriptor,
 				switch (item->tag) {
 					case ITEM_TAG_LOCAL_USAGE:
 					{
-						if (usageStackUsed >= usageStackSize) {
-							usageStackSize += 10;
-							usage_value *newUsageStack
-								= (usage_value *)realloc(usageStack,
-									usageStackSize * sizeof(usage_value));
-							if (newUsageStack == NULL) {
-								TRACE_ALWAYS("no memory when growing usages\n");
-								usageStackSize -= 10;
-								break;
-							}
-
-							usageStack = newUsageStack;
+						usage_value value;
+						value.is_extended = itemSize == sizeof(uint32);
+						value.u.extended = data;
+						
+						if (usageStack.PushBack(value)==B_NO_MEMORY) {
+							TRACE_ALWAYS("no memory when growing usages\n");
+							break;
 						}
-
-						usage_value *value = &usageStack[usageStackUsed];
-						value->is_extended = itemSize == sizeof(uint32);
-						value->u.extended = data;
-						usageStackUsed++;
+						
 						break;
 					}
 
@@ -385,7 +366,6 @@ HIDParser::ParseReportDescriptor(const uint8 *reportDescriptor,
 		state = next;
 	}
 
-	free(usageStack);
 	return B_OK;
 }
 
@@ -393,7 +373,7 @@ HIDParser::ParseReportDescriptor(const uint8 *reportDescriptor,
 HIDReport *
 HIDParser::FindReport(uint8 type, uint8 id)
 {
-	for (uint8 i = 0; i < fReportCount; i++) {
+	for (int32 i = 0; i < fReports.Count(); i++) {
 		HIDReport *report = fReports[i];
 		if (report == NULL)
 			continue;
@@ -410,7 +390,7 @@ uint8
 HIDParser::CountReports(uint8 type)
 {
 	uint8 count = 0;
-	for (uint8 i = 0; i < fReportCount; i++) {
+	for (int32 i = 0; i < fReports.Count(); i++) {
 		HIDReport *report = fReports[i];
 		if (report == NULL)
 			continue;
@@ -426,7 +406,7 @@ HIDParser::CountReports(uint8 type)
 HIDReport *
 HIDParser::ReportAt(uint8 type, uint8 index)
 {
-	for (uint8 i = 0; i < fReportCount; i++) {
+	for (int32 i = 0; i < fReports.Count(); i++) {
 		HIDReport *report = fReports[i];
 		if (report == NULL || (report->Type() & type) == 0)
 			continue;
@@ -443,7 +423,7 @@ size_t
 HIDParser::MaxReportSize()
 {
 	size_t maxSize = 0;
-	for (uint32 i = 0; i < fReportCount; i++) {
+	for (int32 i = 0; i < fReports.Count(); i++) {
 		HIDReport *report = fReports[i];
 		if (report == NULL)
 			continue;
@@ -480,7 +460,7 @@ HIDParser::SetReport(status_t status, uint8 *report, size_t length)
 	// We need to notify all input reports, as we don't know who has waiting
 	// listeners. Anyone other than the target report also waiting for a
 	// transfer to happen needs to reschedule one now.
-	for (uint32 i = 0; i < fReportCount; i++) {
+	for (int32 i = 0; i < fReports.Count(); i++) {
 		if (fReports[i] == NULL
 			|| fReports[i]->Type() != HID_REPORT_TYPE_INPUT)
 			continue;
@@ -496,7 +476,7 @@ HIDParser::SetReport(status_t status, uint8 *report, size_t length)
 void
 HIDParser::PrintToStream()
 {
-	for (uint8 i = 0; i < fReportCount; i++) {
+	for (int32 i = 0; i < fReports.Count(); i++) {
 		HIDReport *report = fReports[i];
 		if (report == NULL)
 			continue;
@@ -521,16 +501,12 @@ HIDParser::_FindOrCreateReport(uint8 type, uint8 id)
 		return NULL;
 	}
 
-	HIDReport **newReports = (HIDReport **)realloc(fReports,
-		(fReportCount + 1) * sizeof(HIDReport *));
-	if (newReports == NULL) {
+	if (fReports.PushBack(report) == B_NO_MEMORY) {
 		TRACE_ALWAYS("no memory when growing report list\n");
 		delete report;
 		return NULL;
 	}
 
-	fReports = newReports;
-	fReports[fReportCount++] = report;
 	return report;
 }
 
@@ -567,14 +543,14 @@ HIDParser::_CalculateResolution(global_item_state *state)
 void
 HIDParser::_Reset()
 {
-	for (uint8 i = 0; i < fReportCount; i++)
+	
+	for (int32 i = 0; i < fReports.Count(); i++)
 		delete fReports[i];
+	
+	fReports.MakeEmpty();
 
 	delete fRootCollection;
-	free(fReports);
 
 	fUsesReportIDs = false;
-	fReportCount = 0;
-	fReports = NULL;
 	fRootCollection = NULL;
 }

@@ -23,12 +23,7 @@ HIDCollection::HIDCollection(HIDCollection *parent, uint8 type,
 	:	fParent(parent),
 		fType(type),
 		fStringID(localState.string_index),
-		fPhysicalID(localState.designator_index),
-		fChildCount(0),
-		fChildren(NULL),
-		fItemCount(0),
-		fItemsAllocated(0),
-		fItems(NULL)
+		fPhysicalID(localState.designator_index)
 {
 	usage_value usageValue;
 	if (localState.usage_stack != NULL && localState.usage_stack_used > 0)
@@ -51,10 +46,8 @@ HIDCollection::HIDCollection(HIDCollection *parent, uint8 type,
 
 HIDCollection::~HIDCollection()
 {
-	for (uint32 i = 0; i < fChildCount; i++)
+	for (int32 i = 0; i < fChildren.Count(); i++)
 		delete fChildren[i];
-	free(fChildren);
-	free(fItems);
 }
 
 
@@ -79,15 +72,10 @@ HIDCollection::UsageID()
 status_t
 HIDCollection::AddChild(HIDCollection *child)
 {
-	HIDCollection **newChildren = (HIDCollection **)realloc(fChildren,
-		(fChildCount + 1) * sizeof(HIDCollection *));
-	if (newChildren == NULL) {
+	if (fChildren.PushBack(child) == B_NO_MEMORY) {
 		TRACE_ALWAYS("no memory when trying to resize collection child list\n");
-		return B_NO_MEMORY;
 	}
 
-	fChildren = newChildren;
-	fChildren[fChildCount++] = child;
 	return B_OK;
 }
 
@@ -95,7 +83,7 @@ HIDCollection::AddChild(HIDCollection *child)
 HIDCollection *
 HIDCollection::ChildAt(uint32 index)
 {
-	if (index >= fChildCount)
+	if (index >= fChildren.Count())
 		return NULL;
 
 	return fChildren[index];
@@ -109,7 +97,7 @@ HIDCollection::CountChildrenFlat(uint8 type)
 	if (type == COLLECTION_ALL || fType == type)
 		count++;
 
-	for (uint32 i = 0; i < fChildCount; i++) {
+	for (int32 i = 0; i < fChildren.Count(); i++) {
 		HIDCollection *child = fChildren[i];
 		if (child == NULL)
 			continue;
@@ -131,27 +119,17 @@ HIDCollection::ChildAtFlat(uint8 type, uint32 index)
 void
 HIDCollection::AddItem(HIDReportItem *item)
 {
-	if (fItemCount >= fItemsAllocated) {
-		fItemsAllocated += 10;
-		HIDReportItem **newItems = (HIDReportItem **)realloc(fItems,
-			fItemsAllocated * sizeof(HIDReportItem *));
-		if (newItems == NULL) {
-			TRACE_ALWAYS("no memory when trying to resize collection items\n");
-			fItemsAllocated -= 10;
-			return;
-		}
-
-		fItems = newItems;
+	if (fItems.PushBack(item) == B_NO_MEMORY) {
+		TRACE_ALWAYS("no memory when trying to resize collection items\n");
 	}
 
-	fItems[fItemCount++] = item;
 }
 
 
 HIDReportItem *
 HIDCollection::ItemAt(uint32 index)
 {
-	if (index >= fItemCount)
+	if (index >= fItems.Count())
 		return NULL;
 
 	return fItems[index];
@@ -161,9 +139,9 @@ HIDCollection::ItemAt(uint32 index)
 uint32
 HIDCollection::CountItemsFlat()
 {
-	uint32 count = fItemCount;
+	uint32 count = fItems.Count();
 
-	for (uint32 i = 0; i < fChildCount; i++) {
+	for (int32 i = 0; i < fChildren.Count(); i++) {
 		HIDCollection *child = fChildren[i];
 		if (child != NULL)
 			count += child->CountItemsFlat();
@@ -218,15 +196,15 @@ HIDCollection::PrintToStream(uint32 indentLevel)
 	TRACE_ALWAYS("%s\tstring id: %u\n", indent, fStringID);
 	TRACE_ALWAYS("%s\tphysical id: %u\n", indent, fPhysicalID);
 
-	TRACE_ALWAYS("%s\titem count: %" B_PRIu32 "\n", indent, fItemCount);
-	for (uint32 i = 0; i < fItemCount; i++) {
+	TRACE_ALWAYS("%s\titem count: %" B_PRIu32 "\n", indent, fItems.Count());
+	for (int32 i = 0; i < fItems.Count(); i++) {
 		HIDReportItem *item = fItems[i];
 		if (item != NULL)
 			item->PrintToStream(indentLevel + 1);
 	}
 
-	TRACE_ALWAYS("%s\tchild count: %" B_PRIu32 "\n", indent, fChildCount);
-	for (uint32 i = 0; i < fChildCount; i++) {
+	TRACE_ALWAYS("%s\tchild count: %" B_PRIu32 "\n", indent, fChildren.Count());
+	for (int32 i = 0; i < fChildren.Count(); i++) {
 		HIDCollection *child = fChildren[i];
 		if (child != NULL)
 			child->PrintToStream(indentLevel + 1);
@@ -244,7 +222,7 @@ HIDCollection::_ChildAtFlat(uint8 type, uint32 &index)
 		index--;
 	}
 
-	for (uint32 i = 0; i < fChildCount; i++) {
+	for (int32 i = 0; i < fChildren.Count(); i++) {
 		HIDCollection *child = fChildren[i];
 		if (child == NULL)
 			continue;
@@ -261,12 +239,12 @@ HIDCollection::_ChildAtFlat(uint8 type, uint32 &index)
 HIDReportItem *
 HIDCollection::_ItemAtFlat(uint32 &index)
 {
-	if (index < fItemCount)
+	if (index < fItems.Count())
 		return fItems[index];
 
-	index -= fItemCount;
+	index -= fItems.Count();
 
-	for (uint32 i = 0; i < fChildCount; i++) {
+	for (int32 i = 0; i < fChildren.Count(); i++) {
 		HIDCollection *child = fChildren[i];
 		if (child == NULL)
 			continue;
@@ -285,7 +263,7 @@ HIDCollection::BuildReportList(uint8 reportType,
 	HIDReport **reportList, uint32 &reportCount)
 {
 
-	for (uint32 i = 0; i < fItemCount; i++) {
+	for (int32 i = 0; i < fItems.Count(); i++) {
 		HIDReportItem *item = fItems[i];
 		if (item == NULL)
 			continue;
@@ -308,7 +286,7 @@ HIDCollection::BuildReportList(uint8 reportType,
 		reportList[reportCount++] = report;
 	}
 
-	for (uint32 i = 0; i < fChildCount; i++) {
+	for (int32 i = 0; i < fChildren.Count(); i++) {
 		HIDCollection *child = fChildren[i];
 		if (child == NULL)
 			continue;
