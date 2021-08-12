@@ -424,7 +424,7 @@ STrap(iframe* frame)
 			addr_t newIP = 0;
 			enable_interrupts();
 			vm_page_fault(stval, frame->epc, cause == causeStorePageFault,
-				cause == causeExecPageFault, status.spp == modeU, status.sum != 0, &newIP);
+				cause == causeExecPageFault, status.spp == modeU, &newIP);
 			if (newIP != 0)
 				frame->epc = newIP;
 

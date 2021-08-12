@@ -726,8 +726,7 @@ RISCV64VMTranslationMap::MemcpyFromMap(char *to, addr_t from, size_t size)
 				", calling page fault handler\n", va0);
 
 			addr_t newIP;
-			vm_page_fault(va0, Ra(), true, false, true, true,
-				&newIP);
+			vm_page_fault(va0, Ra(), true, false, true, &newIP);
 
 			pa0 = LookupAddr(va0);
 			TRACE("LookupAddr(0x%" B_PRIxADDR "): 0x%"
@@ -767,8 +766,7 @@ RISCV64VMTranslationMap::MemsetToMap(addr_t to, char c, size_t count)
 			TRACE("[!] not mapped: 0x%" B_PRIxADDR
 				", calling page fault handler\n", va0);
 			addr_t newIP;
-			vm_page_fault(va0, Ra(), true, false, true, true,
-				&newIP);
+			vm_page_fault(va0, Ra(), true, false, true, &newIP);
 			pa0 = LookupAddr(va0);
 			TRACE("LookupAddr(0x%" B_PRIxADDR "): 0x%"
 				B_PRIxADDR "\n", va0, pa0);
