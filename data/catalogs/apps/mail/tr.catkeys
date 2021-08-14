@@ -94,7 +94,7 @@ Attach attributes:	Mail		Öznitelik ekle:
 Find again	Mail		Yeniden bul
 Size:	Mail		Boyut:
 To:	Mail		Kime:
-Need Tracker to move items to trash	Mail		İzleyici'nin ögeleri çöpe taşıması gerekiyor
+Need Tracker to move items to trash	Mail		Ögelerin çöpe taşınabilmesi için İzleyici'nin çalışması gerekiyor
 The mail_daemon could not be started:\n\t	Mail		mail_daemon başlatılamadı:\n\t
 <no account found>	Mail		<hesap bulunamadı>
 Mail couldn't find its dictionary.	Mail		Posta, kendi sözlüğünü bulamadı.

@@ -1,5 +1,8 @@
-1	french	application/x-vnd.Cortex.support	2889541925
+1	french	application/x-vnd.Cortex.support	787758846
+Header has flags	MediaString		L’en-tête comporte des drapeaux
+Recording	MediaString		Enregistrement
 (unknown format)	MediaString		(format inconnu)
+Clean buffers	MediaString		Nettoyer les tampons
 {0, plural,one{# frame forward}other{# frames forward}}	MediaString		{0, plural,one{# trame en avant}other{# trames en avant}}
 Rear-right	MediaString		Arrière-droit
 {0, plural, one{# pixel} other{# pixels}}	MediaString		{0, plural, one{# pixel} other{# pixels}}
@@ -8,6 +11,7 @@ MPEG1	MediaString		MPEG1
 ASF format family	MediaString		Famille de formats ASF
 Encoded video	MediaString		Vidéo compressée
 YUV444	MediaString		YUV444
+Port	MediaString		Port
 Top-Front-left	MediaString		Avant-gauche-haut
 16 bit integer	MediaString		Entier 16 bits
 YCbCr411	MediaString		YCbCr411
@@ -21,7 +25,9 @@ Back-center	MediaString		Arrière-centre
 {0, plural, other{# bit integer}}	MediaString		{0, plural, other{Entier # bits}}
 (unknown video format)	MediaString		(format vidéo inconnu)
 AVI format family	MediaString		Famille de format AVI
+Homogenous buffers	MediaString		Tampons homogènes
 Interlaced 	MediaString		Entrelacé 
+{0, plural, one{# channel}other{# channels}}	MediaString		{0, plural, one{# canal}other{# canaux}}
 15 bit RGBA	MediaString		15 bits RVBA
 YUV9	MediaString		YUV9
  Hz	MediaString		 Hz
@@ -43,6 +49,7 @@ Top-Front-right	MediaString		Avant-droit-haut
 32 bit float	MediaString		Flottant 32 bits
 Controllable	MediaString		Contrôlable
 32 bit integer	MediaString		Entier 32 bits
+Front-right-center	MediaString		Avant-droit-centre
 Side-right	MediaString		Côté-droit
  kHz	MediaString		 kHz
 Little endian	MediaString		Petit-boutien
@@ -65,6 +72,7 @@ Top-Back-left	MediaString		Arrière-gauche-haut
 YCbCr422	MediaString		YCbCr422
 Raw audio	MediaString		Audio brut
 Non-interlaced 	MediaString		Non entrelacé 
+{0, plural,one{# byte (avg)}other{# bytes (avg)}}	MediaString		{0, plural,one{# octet (moy.)}other{# octets (moy.)}}
 YUV12	MediaString		YUV12
 WAV format family	MediaString		Famille de format WAV
  (NTSC)	MediaString		 (NTSC)

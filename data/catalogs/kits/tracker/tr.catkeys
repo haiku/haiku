@@ -354,7 +354,7 @@ Messenger	AttributesView		Ulak
 after	FindPanel		sonra
 {0, plural, one{<# data byte>} other{<# bytes of data>}}	AttributesView		{0, plural, other{<# bayt veri>}}
 Version	OpenWithWindow		Sürüm
-Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Seçili ögelerden bazıları Çöp'e taşınamaz. Bunun yerine doğrudan silmek ister misiniz? (Bu işlem geri alınamaz.)
+Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Seçili ögelerden bazıları Çöp'e taşınamaz. Bunun yerine doğrudan silmek ister misiniz (bu işlem geri alınamaz)?
 Add printer…	ContainerWindow		Yazıcı ekle…
 On	FindPanel		Nerede
 Permissions	ContainerWindow		İzinler
@@ -401,7 +401,7 @@ You can't move a folder into itself or any of its own sub-folders.	FSUtils		Bir 
 New	ContainerWindow		Yeni
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Ögeleri \"Diskler\" penceresinin içindeki disk simgelerinden birinin üzerine bırakmalısınız.
 If you alter %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		%target ögesini değiştirirseniz %osName düzgün çalışmayabilir!\n\nBunu yapmak istediğinizden emin misiniz?
-Sorry, you can't copy items to the Trash.	FSClipBoard		Üzgünüm, ögeler Çöp'e kopyalanamaz.
+Sorry, you can't copy items to the Trash.	FSClipBoard		Üzgünüm, Çöp'e herhangi bir öge kopyalanamaz.
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Bu klasördeki bazı ögeler %verb bazı ögelerle aynı ada sahip.\n\nBu ögeleri %verb ögelerle değiştirmek ister misiniz veya teker teker sorulsun mu?
 When	Email Query Columns		Ne zaman
 Object	AttributesView		Nesne
@@ -511,7 +511,7 @@ Cancel	PoseView		İptal
 Delete	PoseView		Sil
 Media parameter	AttributesView		Ortam parametresi
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Ev klasörünü değiştirirseniz %osName düzgün çalışmayacaktır!\n\nBunu yapmak istediğinizden emin misiniz?\n\nYine de değiştirmek istiyorsanız, Shift düğmesini basılı tutun ve \"Ne yaptığımı biliyorum\"a tıklayın.
-Sorry, you can't copy items to the Trash.	PoseView		Üzgünüm, ögeler Çöp'e kopyalanamaz.
+Sorry, you can't copy items to the Trash.	PoseView		Üzgünüm, Çöp'e herhangi bir öge kopyalanamaz.
 Invert selection	VirtualDirectoryWindow		Seçimi tersine çevir
 New folder	FilePanelPriv		Yeni klasör
 {0, plural, one{# item} other{# items}}	CountView	Number of selected items: \"1 item\" or \"2 items\"	{0, plural, other{# öge}}

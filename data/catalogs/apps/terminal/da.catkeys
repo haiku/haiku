@@ -26,7 +26,7 @@ Encoding:	Terminal AppearancePrefView		Kodning:
 Create link here	Terminal TermView		Lav link her
 Custom	Terminal AppearancePrefView	Window size	Tilpas
 Selected text	Terminal AppearancePrefView		Valgte tekst
-Change directory	Terminal TermView		Skift folder
+Change directory	Terminal TermView		Skift mappe
 Page setup…	Terminal TermWindow		Sideopsætning…
 Slate	Terminal colors scheme		Skiffer
 Defaults	Terminal PrefWindow		Standarder

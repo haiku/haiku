@@ -18,7 +18,7 @@ Netmask:	NetworkStatusView		Netmaske:
 No stateful configuration	NetworkStatusView		Ingen tilstandsfuld konfiguration
 You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Du kan køre netværksstatus i et vindue eller installere det i skrivebordslinjen.
 IPv4 address:	NetworkStatusView		IPv4-adresse:
-%ifaceName information:\n	NetworkStatusView		%ifaceName-information:\n
+%ifaceName information:\n	NetworkStatusView		Information om %ifaceName:\n
 Run in window	NetworkStatus		Kør i vindue
 <no wireless networks found>	NetworkStatusView		<fandt ingen trådløse netværk>
 Configuring	NetworkStatusView		Konfigurering

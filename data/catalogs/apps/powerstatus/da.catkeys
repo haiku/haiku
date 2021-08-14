@@ -41,7 +41,7 @@ Technology: 	PowerStatus		Teknologi:
  mWh	PowerStatus		 mWh
 PowerStatus	System name		Strømstatus
 Design capacity: 	PowerStatus		Designkapacitet: 
-OEM info: 	PowerStatus		OEM-info: 
+OEM info: 	PowerStatus		Information om OEM: 
 no battery	PowerStatus		intet batteri
 Empty battery slot	PowerStatus		Tom batteri plads
 Install in Deskbar	PowerStatus		Installer i skrivebordslinje

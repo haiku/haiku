@@ -18,7 +18,7 @@ You have successfully authenticated as user %Nickname%.	UserLoginWindow		Det lyk
 <no info>	PackageInfoView		<ingen info>
 No user ratings available.	PackageInfoView		Ingen tilgængelige brugerbedømmelser.
 Downloading package '%name%'	WorkStatusView		Downloader pakken '%name%'
-It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Det var ikke muligt at udtrække den nødvendige captcha-information fra den data som serveren sendte tilbage.
+It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Det var ikke muligt at udtrække den nødvendige information om captcha fra den data som serveren sendte tilbage.
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Der opstod en fejl ved netværkstransport med kommunikation med serversystemet: %s
 Rating	PackageListView		Bedømmelse
 Synchronizing icons	ServerIconExportUpdateProcess		Synkroniserer ikoner

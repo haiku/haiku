@@ -14,12 +14,12 @@ Mini icon view	MediaRoutingView		Miniikonvisning
 Select all	MediaRoutingView		Vælg alt
 (same as group)	MediaNodePanel		(samme som gruppe)
 Input	MediaJack		Input
-Get info	MediaJack		Hent info
+Get info	MediaJack		Hent information
 Start time source	MediaNodePanel		Start tidskilde
 Error	MediaRoutingView		Fejl
 Output	MediaJack		Output
-Get info	MediaNodePanel		Hent info
-Get info	MediaRoutingView		Hent info
+Get info	MediaNodePanel		Hent information
+Get info	MediaRoutingView		Hent information
 Clean up	MediaRoutingView		Ryd op
 Start control panel	MediaNodePanel		Start kontrolpanel
 Tweak parameters	MediaNodePanel		Finjuster parametre

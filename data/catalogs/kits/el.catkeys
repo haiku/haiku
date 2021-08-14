@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-libbe	3038472371
+1	greek, modern (1453-)	x-vnd.Haiku-libbe	2914417806
 {0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# byte} other{# bytes}}
 %.2f TiB/s	StringForRate		%.2f TiB/δευτ.
 All Rights Reserved.	AboutWindow		Με επιφύλαξη παντός δικαιώματος.
@@ -27,6 +27,7 @@ Paste	TextView		Επικόλληση
 OK	AboutWindow		Εντάξει
 {0, plural, one{# byte/s} other{# bytes/s}}	StringForRate		{0, plural, one{# byte/δευτ.} other{# bytes/δευτ.}}
 Special Thanks:	AboutWindow		Ευχαριστούμε ιδιαίτερα τους/τις:
+Default Haiku window decorator.	Default decorator about box		Προεπιλεγμένη διακόσμηση παραθύρων Haiku.
 %.2f TiB	StringForSize		%.2f TiB
 Remove replicant	Dragger		Αφαίρεση ρέπλικας
 Version	AboutWindow		Έκδοση
