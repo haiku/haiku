@@ -124,7 +124,12 @@ platform_allocate_region(void **_address, size_t size, uint8 /* protection */,
 
 	memory_region *region = new(std::nothrow) memory_region {
 		next: allocated_regions,
+#ifdef __riscv
+		// Disables allocation at fixed virtual address
+		vaddr: 0,
+#else
 		vaddr: *_address == NULL ? 0 : (addr_t)*_address,
+#endif
 		paddr: (phys_addr_t)addr,
 		size: size
 	};
