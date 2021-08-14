@@ -17,7 +17,7 @@ uint32 gPlatform;
 
 void* gFDT = NULL;
 
-HtifRegs  *volatile gHtifRegs  = (HtifRegs *volatile)0x40008000;
+HtifRegs  *volatile gHtifRegs  = (HtifRegs *volatile)0;
 PlicRegs  *volatile gPlicRegs;
 ClintRegs *volatile gClintRegs;
 

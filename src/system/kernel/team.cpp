@@ -444,7 +444,7 @@ Team::Team(team_id id, bool kernel)
 	fArgs[0] = '\0';
 	num_threads = 0;
 	io_context = NULL;
-	address_space = NULL;
+	address_space = kernel ? VMAddressSpace::Kernel() : NULL;
 	realtime_sem_context = NULL;
 	xsi_sem_context = NULL;
 	thread_list = NULL;
