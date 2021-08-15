@@ -40,6 +40,11 @@ public:
 
 	// URL protocol thread management
 	virtual	thread_id				Run();
+#ifdef LIBNETAPI_DEPRECATED
+	virtual status_t				Pause();
+	virtual status_t				Resume();
+#endif
+
 	virtual	status_t				Stop();
 	virtual void					SetTimeout(bigtime_t timeout) {}
 

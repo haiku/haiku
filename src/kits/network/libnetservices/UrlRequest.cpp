@@ -109,6 +109,22 @@ BUrlRequest::Stop()
 }
 
 
+#ifdef LIBNETAPI_DEPRECATED
+status_t
+BUrlRequest::Pause()
+{
+	return B_ERROR;
+}
+
+
+status_t
+BUrlRequest::Resume()
+{
+	return B_ERROR;
+}
+#endif
+
+
 // #pragma mark URL protocol parameters modification
 
 
