@@ -319,7 +319,8 @@ ArchUARTPL011::FlushRx()
 }
 
 
-ArchUARTPL011 *arch_get_uart_pl011(addr_t base, int64 clock)
+ArchUARTPL011*
+arch_get_uart_pl011(addr_t base, int64 clock)
 {
 	static char buffer[sizeof(ArchUARTPL011)];
 	ArchUARTPL011 *uart = new(buffer) ArchUARTPL011(base, clock);

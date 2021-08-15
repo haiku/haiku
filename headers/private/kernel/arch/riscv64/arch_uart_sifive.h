@@ -1,8 +1,7 @@
 /*
- * Copyright 2021, Haiku, Inc.
+ * Copyright 2021, Haiku, Inc. All rights reserved
  * Distributed under the terms of the MIT License.
  */
-
 #ifndef _ARCH_UART_SIFIVE_H_
 #define _ARCH_UART_SIFIVE_H_
 
@@ -95,6 +94,9 @@ ArchUARTSifive::Regs()
 {
 	return (volatile UARTSifiveRegs*)Base();
 }
+
+
+ArchUARTSifive* arch_get_uart_sifive(addr_t base, int64 clock);
 
 
 #endif	// _ARCH_UART_SIFIVE_H_

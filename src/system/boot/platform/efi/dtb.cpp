@@ -40,24 +40,6 @@ static addr_range sClint = {0};
 static ArchUart sUart = {.kind = kUartKindNone};
 
 
-DebugUART8250*
-arch_get_uart_8250(addr_t base, int64 clock)
-{
-	static char buffer[sizeof(DebugUART8250)];
-	DebugUART8250* uart = new(buffer) DebugUART8250(base, clock);
-	return uart;
-}
-
-
-ArchUARTSifive*
-arch_get_uart_sifive(addr_t base, int64 clock)
-{
-	static char buffer[sizeof(ArchUARTSifive)];
-	ArchUARTSifive* uart = new(buffer) ArchUARTSifive(base, clock);
-	return uart;
-}
-
-
 static void WriteString(const char *str) {dprintf("%s", str);}
 static void WriteLn() {dprintf("\n");}
 static void WriteHex(uint64_t val, int n) {dprintf("%08" B_PRIx64, val);}

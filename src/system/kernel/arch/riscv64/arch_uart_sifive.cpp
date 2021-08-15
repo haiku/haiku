@@ -3,7 +3,9 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include <arch/riscv64/arch_uart_sifive.h>
+#include <new>
 
 
 ArchUARTSifive::ArchUARTSifive(addr_t base, int64 clock)
@@ -103,4 +105,13 @@ void
 ArchUARTSifive::Barrier()
 {
 	asm volatile ("" : : : "memory");
+}
+
+
+ArchUARTSifive*
+arch_get_uart_sifive(addr_t base, int64 clock)
+{
+	static char buffer[sizeof(ArchUARTSifive)];
+	ArchUARTSifive* uart = new(buffer) ArchUARTSifive(base, clock);
+	return uart;
 }

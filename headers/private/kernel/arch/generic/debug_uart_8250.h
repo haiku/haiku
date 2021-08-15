@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Haiku, Inc. All rights reserved.
+ * Copyright 2012-2021 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -33,8 +33,7 @@ public:
 };
 
 
-extern DebugUART8250 *arch_get_uart_8250(addr_t base, int64 clock);
-extern DebugUART8250 *arch_get_uart_8250_omap(addr_t base, int64 clock);
+DebugUART8250* arch_get_uart_8250(addr_t base, int64 clock);
 
 
 #endif /* _KERNEL_ARCH_DEBUG_UART_8250_H */

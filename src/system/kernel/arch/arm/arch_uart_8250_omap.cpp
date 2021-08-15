@@ -8,22 +8,10 @@
 
 
 #include <arch/arm/reg.h>
-#include <arch/generic/debug_uart_8250.h>
+#include <arch/arm/debug_uart_8250_omap.h>
 #include <debug.h>
 #include <omap3.h>
 #include <new>
-
-
-class ArchUART8250Omap : public DebugUART8250 {
-public:
-							ArchUART8250Omap(addr_t base, int64 clock);
-							~ArchUART8250Omap();
-	void					InitEarly();
-
-	// ARM MMIO: on ARM the UART regs are aligned on 32bit
-	virtual void			Out8(int reg, uint8 value);
-	virtual uint8			In8(int reg);
-};
 
 
 ArchUART8250Omap::ArchUART8250Omap(addr_t base, int64 clock)
@@ -70,9 +58,10 @@ ArchUART8250Omap::In8(int reg)
 }
 
 
-DebugUART8250 *arch_get_uart_8250_omap(addr_t base, int64 clock)
+DebugUART8250*
+arch_get_uart_8250_omap(addr_t base, int64 clock)
 {
 	static char buffer[sizeof(ArchUART8250Omap)];
-	ArchUART8250Omap *uart = new(buffer) ArchUART8250Omap(base, clock);
+	ArchUART8250Omap* uart = new(buffer) ArchUART8250Omap(base, clock);
 	return uart;
 }

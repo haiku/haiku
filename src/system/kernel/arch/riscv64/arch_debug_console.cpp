@@ -22,24 +22,6 @@
 static DebugUART* sArchDebugUART = NULL;
 
 
-DebugUART8250*
-arch_get_uart_8250(addr_t base, int64 clock)
-{
-	static char buffer[sizeof(DebugUART8250)];
-	DebugUART8250* uart = new(buffer) DebugUART8250(base, clock);
-	return uart;
-}
-
-
-ArchUARTSifive*
-arch_get_uart_sifive(addr_t base, int64 clock)
-{
-	static char buffer[sizeof(ArchUARTSifive)];
-	ArchUARTSifive* uart = new(buffer) ArchUARTSifive(base, clock);
-	return uart;
-}
-
-
 void
 arch_debug_remove_interrupt_handler(uint32 line)
 {
