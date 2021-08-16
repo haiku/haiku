@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2011, Haiku. All rights reserved.
+ * Copyright 2002-2021, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,6 +7,7 @@
  *		Mike Berg <mike@berg-net.us>
  *		Julun <host.haiku@gmx.de>
  *		Hamish Morrison <hamish@lavabit.com>
+ *		Panagiotis Vasilopoulos <hello@alwayslivid.com>
  */
 
 
@@ -16,8 +17,10 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#include <AboutWindow.h>
 #include <Alert.h>
 #include <Catalog.h>
+#include <Locale.h>
 #include <LocaleRoster.h>
 
 #include "NetworkTimeView.h"
@@ -56,13 +59,23 @@ TimeApplication::ReadyToRun()
 void
 TimeApplication::AboutRequested()
 {
-	BAlert* alert = new BAlert(B_TRANSLATE("about"),
-		B_TRANSLATE(
-		"Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\t"
-		"Julun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku."),
-		B_TRANSLATE("OK"));
-	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-	alert->Go();
+	BAboutWindow* window = new BAboutWindow(B_TRANSLATE_SYSTEM_NAME(
+		"Time & Date"), kAppSignature);
+
+	const char* authors[] = {
+		"Mike Berg",
+		"Andrew Edward McCall",
+		"Hamish Morrison",
+		"Philippe Saint-Pierre",
+		"Panagiotis Vasilopoulos",
+		"Julun",
+		NULL
+	};
+
+	window->AddCopyright(2021, "Haiku, Inc.");
+	window->AddAuthors(authors);
+
+	window->Show();
 }
 
 
