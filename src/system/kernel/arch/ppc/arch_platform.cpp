@@ -15,24 +15,22 @@
 #include <real_time_clock.h>
 #include <util/kernel_cpp.h>
 
-#include "fdt_serial.h"
 
 void *gFDT;
 static PPCPlatform *sPPCPlatform;
 
 
-// constructor
 PPCPlatform::PPCPlatform(ppc_platform_type platformType)
 	: fPlatformType(platformType)
 {
 }
 
-// destructor
+
 PPCPlatform::~PPCPlatform()
 {
 }
 
-// Default
+
 PPCPlatform *
 PPCPlatform::Default()
 {
@@ -72,12 +70,13 @@ private:
 
 }	// namespace BPrivate
 
+
 using BPrivate::PPCOpenFirmware;
 
 
 // OF debugger commands
 
-// debug_command_of_exit
+
 static int
 debug_command_of_exit(int argc, char **argv)
 {
@@ -86,7 +85,7 @@ debug_command_of_exit(int argc, char **argv)
 	return 0;
 }
 
-// debug_command_of_enter
+
 static int
 debug_command_of_enter(int argc, char **argv)
 {
@@ -95,7 +94,6 @@ debug_command_of_enter(int argc, char **argv)
 }
 
 
-// constructor
 PPCOpenFirmware::PPCOpenFirmware()
 	: PPCPlatform(PPC_PLATFORM_OPEN_FIRMWARE),
 	  fInput(-1),
@@ -104,12 +102,12 @@ PPCOpenFirmware::PPCOpenFirmware()
 {
 }
 
-// destructor
+
 PPCOpenFirmware::~PPCOpenFirmware()
 {
 }
 
-// Init
+
 status_t
 PPCOpenFirmware::Init(struct kernel_args *kernelArgs)
 {
@@ -117,7 +115,7 @@ PPCOpenFirmware::Init(struct kernel_args *kernelArgs)
 		(intptr_t(*)(void*))kernelArgs->platform_args.openfirmware_entry);
 }
 
-// InitSerialDebug
+
 status_t
 PPCOpenFirmware::InitSerialDebug(struct kernel_args *kernelArgs)
 {
@@ -131,7 +129,7 @@ PPCOpenFirmware::InitSerialDebug(struct kernel_args *kernelArgs)
 	return B_OK;
 }
 
-// InitPostVM
+
 status_t
 PPCOpenFirmware::InitPostVM(struct kernel_args *kernelArgs)
 {
@@ -143,6 +141,7 @@ PPCOpenFirmware::InitPostVM(struct kernel_args *kernelArgs)
 
 	return B_OK;
 }
+
 
 // InitRTC
 status_t
@@ -159,7 +158,7 @@ PPCOpenFirmware::InitRTC(struct kernel_args *kernelArgs,
 	return B_OK;
 }
 
-// DebugSerialGetChar
+
 char
 PPCOpenFirmware::SerialDebugGetChar()
 {
@@ -169,7 +168,7 @@ PPCOpenFirmware::SerialDebugGetChar()
 	return (char)key;
 }
 
-// DebugSerialPutChar
+
 void
 PPCOpenFirmware::SerialDebugPutChar(char c)
 {
@@ -182,7 +181,7 @@ PPCOpenFirmware::SerialDebugPutChar(char c)
 		of_write(fOutput, &c, 1);
 }
 
-// SetHardwareRTC
+
 void
 PPCOpenFirmware::SetHardwareRTC(uint32 seconds)
 {
@@ -198,7 +197,7 @@ PPCOpenFirmware::SetHardwareRTC(uint32 seconds)
 	}
 }
 
-// GetHardwareRTC
+
 uint32
 PPCOpenFirmware::GetHardwareRTC()
 {
@@ -215,7 +214,7 @@ PPCOpenFirmware::GetHardwareRTC()
 	return rtc_tm_to_secs(&t);
 }
 
-// ShutDown
+
 void
 PPCOpenFirmware::ShutDown(bool reboot)
 {
@@ -264,7 +263,6 @@ private:
 using BPrivate::PPCUBoot;
 
 
-// constructor
 PPCUBoot::PPCUBoot()
 	: PPCPlatform(PPC_PLATFORM_U_BOOT),
 	  fInput(-1),
@@ -274,12 +272,12 @@ PPCUBoot::PPCUBoot()
 {
 }
 
-// destructor
+
 PPCUBoot::~PPCUBoot()
 {
 }
 
-// Init
+
 status_t
 PPCUBoot::Init(struct kernel_args *kernelArgs)
 {
@@ -288,24 +286,25 @@ PPCUBoot::Init(struct kernel_args *kernelArgs)
 	return B_OK;
 }
 
-// InitSerialDebug
+
 status_t
 PPCUBoot::InitSerialDebug(struct kernel_args *kernelArgs)
 {
-	fDebugUART = debug_uart_from_fdt(gFDT);
+	// TODO: get relevant debug uart from fdt
+	//fDebugUART = debug_uart_from_fdt(gFDT);
 	if (fDebugUART == NULL)
 		return B_ERROR;
 	return B_OK;
 }
 
-// InitPostVM
+
 status_t
 PPCUBoot::InitPostVM(struct kernel_args *kernelArgs)
 {
 	return B_ERROR;
 }
 
-// InitRTC
+
 status_t
 PPCUBoot::InitRTC(struct kernel_args *kernelArgs,
 	struct real_time_data *data)
@@ -313,7 +312,7 @@ PPCUBoot::InitRTC(struct kernel_args *kernelArgs,
 	return B_ERROR;
 }
 
-// DebugSerialGetChar
+
 char
 PPCUBoot::SerialDebugGetChar()
 {
@@ -322,7 +321,7 @@ PPCUBoot::SerialDebugGetChar()
 	return 0;
 }
 
-// DebugSerialPutChar
+
 void
 PPCUBoot::SerialDebugPutChar(char c)
 {
@@ -330,20 +329,20 @@ PPCUBoot::SerialDebugPutChar(char c)
 		fDebugUART->PutChar(c);
 }
 
-// SetHardwareRTC
+
 void
 PPCUBoot::SetHardwareRTC(uint32 seconds)
 {
 }
 
-// GetHardwareRTC
+
 uint32
 PPCUBoot::GetHardwareRTC()
 {
 	return 0;
 }
 
-// ShutDown
+
 void
 PPCUBoot::ShutDown(bool reboot)
 {
@@ -356,6 +355,7 @@ PPCUBoot::ShutDown(bool reboot)
 #define PLATFORM_BUFFER_SIZE MAX(sizeof(PPCOpenFirmware),sizeof(PPCUBoot))
 // static buffer for constructing the actual PPCPlatform
 static char *sPPCPlatformBuffer[PLATFORM_BUFFER_SIZE];
+
 
 status_t
 arch_platform_init(struct kernel_args *kernelArgs)

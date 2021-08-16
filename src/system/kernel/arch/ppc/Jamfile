@@ -57,7 +57,6 @@ KernelMergeObject kernel_arch_ppc.o :
 
 	# serial uart
 	debug_uart_8250.cpp
-	arch_uart_8250.cpp
 
 	# paging
 	generic_vm_physical_page_mapper.cpp

@@ -4,6 +4,7 @@
  *
  * Authors:
  *		François Revol, revol@free.fr
+ *		Alexander von Gluck IV, kallisti5@unixzen.com
  */
 #ifndef _KERNEL_ARCH_DEBUG_UART_8250_H
 #define _KERNEL_ARCH_DEBUG_UART_8250_H
@@ -30,6 +31,8 @@ public:
 
 			void			FlushTx();
 			void			FlushRx();
+
+	virtual	void			Barrier();
 };
 
 
