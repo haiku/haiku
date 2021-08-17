@@ -819,9 +819,9 @@ HaikuControlLook::DrawScrollBarThumb(BView* view, BRect& rect,
 
 		if (knobStyle == B_KNOB_DOTS) {
 			// draw dots on the scroll bar thumb
-			float hcenter = rect.left + rect.Width() / 2;
-			float vmiddle = rect.top + rect.Height() / 2;
-			BRect knob(hcenter, vmiddle, hcenter, vmiddle);
+			float hcenter = rect.left + roundf(rect.Width() / 2);
+			float vmiddle = rect.top + roundf(rect.Height() / 2);
+			BRect knob(hcenter - 1, vmiddle - 1, hcenter, vmiddle);
 
 			if (orientation == B_HORIZONTAL) {
 				view->SetHighColor(knobDark);
