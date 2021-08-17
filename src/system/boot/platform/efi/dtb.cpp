@@ -33,7 +33,7 @@ static void* sDtbTable = NULL;
 static uint32 sDtbSize = 0;
 
 static uint32 sBootHart = 0;
-static uint64 sTimerFrequrency = 10000000;
+static uint64 sTimerFrequency = 10000000;
 
 static addr_range sPlic = {0};
 static addr_range sClint = {0};
@@ -320,7 +320,7 @@ HandleFdt(const void* fdt, int node, uint32 addressCells, uint32 sizeCells,
 			sBootHart = fdt32_to_cpu(*prop);
 	} else if (strcmp(name, "cpus") == 0) {
 		if (uint32* prop = (uint32*)fdt_getprop(fdt, node, "timebase-frequency", NULL))
-			sTimerFrequrency = fdt32_to_cpu(*prop);
+			sTimerFrequency = fdt32_to_cpu(*prop);
 	}
 
 	const char* deviceType = (const char*)fdt_getprop(fdt, node,
@@ -441,8 +441,8 @@ dtb_set_kernel_args()
 #ifdef __riscv
 	dprintf("bootHart: %" B_PRIu32 "\n", sBootHart);
 	gKernelArgs.arch_args.bootHart = sBootHart;
-	dprintf("timerFrequrency: %" B_PRIu64 "\n", sTimerFrequrency);
-	gKernelArgs.arch_args.timerFrequrency = sTimerFrequrency;
+	dprintf("timerFrequency: %" B_PRIu64 "\n", sTimerFrequency);
+	gKernelArgs.arch_args.timerFrequency = sTimerFrequency;
 
 //	gKernelArgs.arch_args.htif  = {.start = 0x40008000, .size = 0x10};
 	gKernelArgs.arch_args.htif  = {.start = 0, .size = 0};

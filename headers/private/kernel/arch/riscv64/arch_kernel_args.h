@@ -53,7 +53,7 @@ typedef struct {
 	uint32 machine_platform;
 
 	uint bootHart;
-	uint64 timerFrequrency; // in Hz
+	uint64 timerFrequency; // in Hz
 
 	// All following address are virtual
 	FixedWidthPointer<void> acpi_root;

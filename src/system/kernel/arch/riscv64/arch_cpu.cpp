@@ -40,7 +40,7 @@ arch_cpu_init(kernel_args *args)
 {
 /*
 	uint64 conversionFactor
-		= (1LL << 32) * 1000000LL / args->arch_args.timerFrequrency;
+		= (1LL << 32) * 1000000LL / args->arch_args.timerFrequency;
 
 	__riscv64_setup_system_time(conversionFactor);
 */

@@ -17,10 +17,10 @@ arch_rtc_init(kernel_args *args, struct real_time_data *data)
 {
 /*
 	data->arch_data.system_time_conversion_factor
-		= (1LL << 32) * 1000000LL / args->arch_args.timerFrequrency;
+		= (1LL << 32) * 1000000LL / args->arch_args.timerFrequency;
 
-	dprintf("timerFrequrency: %" B_PRIu64 "\n",
-		args->arch_args.timerFrequrency);
+	dprintf("timerFrequency: %" B_PRIu64 "\n",
+		args->arch_args.timerFrequency);
 	dprintf("system_time_conversion_factor: %" B_PRIu64 "\n",
 		data->arch_data.system_time_conversion_factor);
 */
