@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src add-ons kernel busses virio ;
+SubDir HAIKU_TOP src add-ons kernel busses virtio ;
 
 SubInclude HAIKU_TOP src add-ons kernel busses virtio virtio_mmio ;
 SubInclude HAIKU_TOP src add-ons kernel busses virtio virtio_pci ;
