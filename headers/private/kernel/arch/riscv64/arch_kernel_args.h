@@ -11,6 +11,7 @@
 
 
 #include <util/FixedWidthPointer.h>
+#include <boot/uart.h>
 
 
 #define _PACKED __attribute__((packed))
@@ -23,21 +24,6 @@ enum {
 	kPlatformMNative,
 	kPlatformSbi,
 };
-
-enum {
-	kUartKindNone,
-	kUartKind8250,
-	kUartKindSifive,
-	kUartKindPl011,
-};
-
-
-typedef struct {
-	uint32 kind;
-	addr_range regs;
-	uint32 irq;
-	int64 clock;
-} _PACKED ArchUart;
 
 
 // kernel args
@@ -62,7 +48,8 @@ typedef struct {
 	addr_range	htif;
 	addr_range	plic;
 	addr_range	clint;
-	ArchUart    uart;
+
+	uart_info	uart;
 } _PACKED arch_kernel_args;
 
 #endif	/* KERNEL_ARCH_RISCV64_KERNEL_ARGS_H */

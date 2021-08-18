@@ -10,9 +10,9 @@
 #include <arch_kernel.h>
 #include <boot/platform.h>
 #include <boot/stage2.h>
-
 #include <efi/types.h>
 #include <efi/boot-services.h>
+#include <string.h>
 
 #include "mmu.h"
 #include "efi_platform.h"
@@ -419,10 +419,12 @@ arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
 	MapAddrRange(gKernelArgs.arch_args.clint, (1 << pteRead) | (1 << pteWrite));
 	MapAddrRange(gKernelArgs.arch_args.htif, (1 << pteRead) | (1 << pteWrite));
 	MapAddrRange(gKernelArgs.arch_args.plic, (1 << pteRead) | (1 << pteWrite));
-	if (gKernelArgs.arch_args.uart.kind != kUartKindNone) {
-		// !!!
-		MapRange(gKernelArgs.arch_args.uart.regs.start, gKernelArgs.arch_args.uart.regs.start, gKernelArgs.arch_args.uart.regs.size, (1 << pteRead) | (1 << pteWrite));
 
+	if (strcmp(gKernelArgs.arch_args.uart.kind, "") != 0) {
+		MapRange(gKernelArgs.arch_args.uart.regs.start,
+			gKernelArgs.arch_args.uart.regs.start,
+			gKernelArgs.arch_args.uart.regs.size,
+			(1 << pteRead) | (1 << pteWrite));
 		MapAddrRange(gKernelArgs.arch_args.uart.regs,
 			(1 << pteRead) | (1 << pteWrite));
 	}

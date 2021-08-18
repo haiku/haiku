@@ -7,13 +7,19 @@
  */
 
 
+#include <arch_smp.h>
+#include <arch/generic/debug_uart_8250.h>
+#if defined(__riscv)
+#	include <arch/riscv64/arch_uart_sifive.h>
+#elif defined(__ARM__) || defined(__ARM64__)
+#	include <arch/arm/arch_uart_pl011.h>
+#endif
 #include <boot/addr_range.h>
 #include <boot/platform.h>
 #include <boot/stage2.h>
+#include <boot/uart.h>
+#include <string.h>
 #include <kernel/kernel.h>
-#include <arch_smp.h>
-#include <arch/generic/debug_uart_8250.h>
-#include <arch/riscv64/arch_uart_sifive.h>
 
 #include <ByteOrder.h>
 
@@ -37,13 +43,35 @@ static uint64 sTimerFrequency = 10000000;
 
 static addr_range sPlic = {0};
 static addr_range sClint = {0};
-static ArchUart sUart = {.kind = kUartKindNone};
 
 
 static void WriteString(const char *str) {dprintf("%s", str);}
 static void WriteLn() {dprintf("\n");}
 static void WriteHex(uint64_t val, int n) {dprintf("%08" B_PRIx64, val);}
 static void WriteInt(int64_t val) {dprintf("%" B_PRId64, val);}
+
+
+template <typename T> DebugUART*
+get_uart(addr_t base, int64 clock) {
+	static char buffer[sizeof(T)];
+	return new(buffer) T(base, clock);
+}
+
+
+const struct supported_uarts {
+	const char*	dtb_compat;
+	const char*	kind;
+	DebugUART*	(*uart_driver_init)(addr_t base, int64 clock);
+} kSupportedUarts[] = {
+	{ "ns16550a", UART_KIND_8250, &get_uart<DebugUART8250> },
+	{ "ns16550", UART_KIND_8250, &get_uart<DebugUART8250> },
+#if defined(__riscv)
+	{ "sifive,uart0", UART_KIND_SIFIVE, &get_uart<ArchUARTSifive> },
+#elif defined(__ARM__) || defined(__ARM64__)
+	{ "arm,pl011", UART_KIND_PL011, &get_uart<ArchUARTPL011> },
+	{ "arm,primecell", UART_KIND_PL011, &get_uart<ArchUARTPL011> },
+#endif
+};
 
 
 static void WriteStringList(const char* prop, size_t size)
@@ -341,47 +369,48 @@ HandleFdt(const void* fdt, int node, uint32 addressCells, uint32 sizeCells,
 	int compatibleLen;
 	const char* compatible = (const char*)fdt_getprop(fdt, node,
 		"compatible", &compatibleLen);
-	if (compatible == NULL) return;
+
+	if (compatible == NULL)
+		return;
+
 	if (HasFdtString(compatible, compatibleLen, "riscv,clint0")) {
 		GetReg(fdt, node, addressCells, sizeCells, 0, sClint);
-	} else if (
-		HasFdtString(compatible, compatibleLen, "riscv,plic0") ||
-		HasFdtString(compatible, compatibleLen, "sifive,plic-1.0.0")
-	) {
-		GetReg(fdt, node, addressCells, sizeCells, 0, sPlic);
-	} else if (
-		sUart.kind == kUartKindNone && (
-			HasFdtString(compatible, compatibleLen, "ns16550a") ||
-			HasFdtString(compatible, compatibleLen, "sifive,uart0") ||
-			HasFdtString(compatible, compatibleLen, "arm,pl011")
-		)
-	) {
-		if (HasFdtString(compatible, compatibleLen, "ns16550a"))
-			sUart.kind = kUartKind8250;
-		else if (HasFdtString(compatible, compatibleLen, "sifive,uart0"))
-			sUart.kind = kUartKindSifive;
-		else if (HasFdtString(compatible, compatibleLen, "arm,pl011"))
-			sUart.kind = kUartKindPl011;
-
-		GetReg(fdt, node, addressCells, sizeCells, 0, sUart.regs);
-		sUart.irq = GetInterrupt(fdt, node, interruptCells);
-		const void* prop = fdt_getprop(fdt, node, "clock-frequency", NULL);
-		sUart.clock = (prop == NULL) ? 0 : fdt32_to_cpu(*(uint32*)prop);
-
-		switch (sUart.kind) {
-			case kUartKind8250:
-				gUART = arch_get_uart_8250(sUart.regs.start, sUart.clock);
-				break;
-			case kUartKindSifive:
-				gUART = arch_get_uart_sifive(sUart.regs.start, sUart.clock);
-				break;
-			default:
-				;
-		}
-
-		if (gUART != NULL)
-			gUART->InitEarly();
+		return;
 	}
+
+	if (HasFdtString(compatible, compatibleLen, "riscv,plic0")
+		|| HasFdtString(compatible, compatibleLen, "sifive,plic-1.0.0")) {
+		GetReg(fdt, node, addressCells, sizeCells, 0, sPlic);
+		return;
+	}
+
+	// TODO: We should check for the "chosen" uart and prioritize that one
+
+	uart_info &uart = gKernelArgs.arch_args.uart;
+	if (uart.kind[0] != 0)
+		return;
+
+	// check for a uart if we don't have one
+	for (uint32 i = 0; i < B_COUNT_OF(kSupportedUarts); i++) {
+		if (HasFdtString(compatible, compatibleLen,
+				kSupportedUarts[i].dtb_compat)) {
+
+			memcpy(uart.kind, kSupportedUarts[i].kind,
+				sizeof(uart.kind));
+
+			GetReg(fdt, node, addressCells, sizeCells, 0, uart.regs);
+			uart.irq = GetInterrupt(fdt, node, interruptCells);
+			const void* prop = fdt_getprop(fdt, node, "clock-frequency", NULL);
+
+			uart.clock = (prop == NULL) ? 0 : fdt32_to_cpu(*(uint32*)prop);
+
+			gUART = kSupportedUarts[i].uart_driver_init(uart.regs.start,
+				uart.clock);
+		}
+	}
+
+	if (gUART != NULL)
+		gUART->InitEarly();
 }
 
 
@@ -390,6 +419,9 @@ dtb_init()
 {
 	efi_configuration_table *table = kSystemTable->ConfigurationTable;
 	size_t entries = kSystemTable->NumberOfTableEntries;
+
+	// Ensure uart is empty before we scan for one
+	memset(&gKernelArgs.arch_args.uart, 0, sizeof(uart_info));
 
 	INFO("Probing for device trees from UEFI...\n");
 
@@ -450,19 +482,16 @@ dtb_set_kernel_args()
 	gKernelArgs.arch_args.clint = sClint;
 #endif
 #if defined(__ARM__) || defined(__riscv)
-	gKernelArgs.arch_args.uart  = sUart;
-	dprintf("UART:\n");
-	dprintf("  kind: ");
-	switch (sUart.kind) {
-		case kUartKindNone: dprintf("none"); break;
-		case kUartKind8250: dprintf("8250"); break;
-		case kUartKindSifive: dprintf("sifive"); break;
-		case kUartKindPl011: dprintf("pl011"); break;
-		default: ;
+	uart_info &uart = gKernelArgs.arch_args.uart;
+	dprintf("Chosen UART:\n");
+	if (uart.kind[0] == 0) {
+		dprintf("kind: None!\n");
+	} else {
+		dprintf("  kind: %s", uart.kind);
+		dprintf("\n");
+		dprintf("  regs: %#" B_PRIx64 ", %#" B_PRIx64 "\n", uart.regs.start, uart.regs.size);
+		dprintf("  irq: %" B_PRIu32 "\n", uart.irq);
+		dprintf("  clock: %" B_PRIu64 "\n", uart.clock);
 	}
-	dprintf("\n");
-	dprintf("  regs: %#" B_PRIx64 ", %#" B_PRIx64 "\n", sUart.regs.start, sUart.regs.size);
-	dprintf("  irq: %" B_PRIu32 "\n", sUart.irq);
-	dprintf("  clock: %" B_PRIu64 "\n", sUart.clock);
 #endif
 }

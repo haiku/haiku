@@ -9,6 +9,9 @@
 #include <arch/generic/debug_uart.h>
 
 
+#define UART_KIND_SIFIVE "sifive"
+
+
 // UARTSifiveRegs.ie, ip
 enum {
 	kUartSifiveTxwm = 1 << 0,

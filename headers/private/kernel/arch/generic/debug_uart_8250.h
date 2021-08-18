@@ -17,6 +17,9 @@
 #include "debug_uart.h"
 
 
+#define UART_KIND_8250 "8250"
+
+
 class DebugUART8250 : public DebugUART {
 public:
 							DebugUART8250(addr_t base, int64 clock);
