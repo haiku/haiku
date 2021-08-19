@@ -78,6 +78,7 @@ fdt_register_node(fdt_bus* bus, int node, device_node* parentDev,
 	if (prop != NULL) {
 		*attr++ = (device_attr) { "fdt/device_type", B_STRING_TYPE,
 			{ string: (const char*)prop } };
+	}
 
 	prop = fdt_getprop(gFDT, node, "compatible", &propLen);
 
