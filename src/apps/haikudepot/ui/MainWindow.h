@@ -41,7 +41,7 @@ class MainWindow : public BWindow, private PackageInfoListener,
 public:
 								MainWindow(const BMessage& settings);
 								MainWindow(const BMessage& settings,
-									const PackageInfoRef& package);
+									PackageInfoRef& package);
 	virtual						~MainWindow();
 
 	// BWindow interface

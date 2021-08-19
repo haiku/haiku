@@ -220,7 +220,7 @@ MainWindow::MainWindow(const BMessage& settings)
 }
 
 
-MainWindow::MainWindow(const BMessage& settings, const PackageInfoRef& package)
+MainWindow::MainWindow(const BMessage& settings, PackageInfoRef& package)
 	:
 	BWindow(BRect(50, 50, 650, 350), B_TRANSLATE_SYSTEM_NAME("HaikuDepot"),
 		B_DOCUMENT_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
@@ -254,12 +254,22 @@ MainWindow::MainWindow(const BMessage& settings, const PackageInfoRef& package)
 
 	fModel.AddListener(fModelListener);
 
+	// add the single package into the model so that any internal
+	// business logic is able to find the package.
+	DepotInfoRef depot(new DepotInfo("single-pkg-depot"), true);
+	depot->AddPackage(package);
+	fModel.MergeOrAddDepot(depot);
+
 	// Restore settings
 	_RestoreNickname(settings);
 	_UpdateAuthorization();
 	_RestoreWindowFrame(settings);
 
 	fPackageInfoView->SetPackage(package);
+
+	// start worker threads
+	BPackageRoster().StartWatching(this,
+		B_WATCH_PACKAGE_INSTALLATION_LOCATIONS);
 
 	_InitWorkerThreads();
 }
