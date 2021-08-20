@@ -695,7 +695,7 @@ EntryTest::InitTest1()
 	InitTest1DirPaths(relVeryBadLink4, B_OK);
 // R5: returns E2BIG instead of B_NAME_TOO_LONG
 	InitTest1DirPaths(tooLongEntry1, fuzzy_error(E2BIG, B_NAME_TOO_LONG));
-// OBOS: Fails, because the implementation concatenates the dir and leaf
+// Haiku: Fails, because the implementation concatenates the dir and leaf
 // 		 name.
 #if !TEST_OBOS /* !!!POSIX ONLY!!! */
 	InitTest1DirPaths(tooLongDir16, B_OK, true);
@@ -743,7 +743,7 @@ EntryTest::InitTest1()
 	InitTest1DirPaths(relVeryBadLink4, B_ENTRY_NOT_FOUND, true);
 // R5: returns E2BIG instead of B_NAME_TOO_LONG
 	InitTest1DirPaths(tooLongEntry1, fuzzy_error(E2BIG, B_NAME_TOO_LONG), true);
-// OBOS: Fails, because the implementation concatenates the dir and leaf
+// Haiku: Fails, because the implementation concatenates the dir and leaf
 // 		 name.
 #if !TEST_OBOS /* !!!POSIX ONLY!!! */
 	InitTest1DirPaths(tooLongDir16, B_OK, true);
@@ -1167,7 +1167,7 @@ EntryTest::InitTest2()
 	InitTest2DirPaths(relVeryBadLink4, B_OK);
 // R5: returns E2BIG instead of B_NAME_TOO_LONG
 	InitTest2DirPaths(tooLongEntry1, fuzzy_error(E2BIG, B_NAME_TOO_LONG));
-// OBOS: Fails, because the implementation concatenates the dir and leaf
+// Haiku: Fails, because the implementation concatenates the dir and leaf
 // 		 name.
 #if !TEST_OBOS /* !!!POSIX ONLY!!! */
 	InitTest2DirPaths(tooLongDir16, B_OK, true);
@@ -1215,7 +1215,7 @@ EntryTest::InitTest2()
 	InitTest2DirPaths(relVeryBadLink4, B_ENTRY_NOT_FOUND, true);
 // R5: returns E2BIG instead of B_NAME_TOO_LONG
 	InitTest2DirPaths(tooLongEntry1, fuzzy_error(E2BIG, B_NAME_TOO_LONG), true);
-// OBOS: Fails, because the implementation concatenates the dir and leaf
+// Haiku: Fails, because the implementation concatenates the dir and leaf
 // 		 name.
 #if !TEST_OBOS /* !!!POSIX ONLY!!! */
 	InitTest2DirPaths(tooLongDir16, B_OK, true);
@@ -1328,7 +1328,7 @@ EntryTest::SpecialGetCasesTest()
 	CPPUNIT_ASSERT( entry.GetPath(&path) == B_NO_INIT );
 	entry.Unset();	
 	// too long pathname
-// OBOS: Fails, because the implementation concatenates the dir and leaf
+// Haiku: Fails, because the implementation concatenates the dir and leaf
 // 		 name.
 #if !TEST_OBOS /* !!!POSIX ONLY!!! */
 	NextSubTest();

@@ -1,6 +1,5 @@
 /*
- * Copyright 2001-2002 OpenBeOS
- * Copyright 2003-2016 Haiku, Inc. All rights reserved.
+ * Copyright 2001-2016 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:

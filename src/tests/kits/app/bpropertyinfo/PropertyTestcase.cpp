@@ -1,7 +1,7 @@
 /*
 	$Id: PropertyTestcase.cpp 10130 2004-11-21 21:03:29Z shatty $
 	
-	This file implements the first test for the OpenBeOS BPropertyInfo code.
+	This file implements the first test for the Haiku BPropertyInfo code.
 	It tests the Construction use cases.  It does so by doing the following:
 	
 	*/

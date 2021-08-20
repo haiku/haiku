@@ -92,13 +92,13 @@ case 3:	teamIDList is not NULL and not empty, signature is not NULL and
 void GetRecentApps(BMessage *refList, int32 maxCount)
 case A1:	refList is NULL; maxCount < 0
 			R5: crashes
-			OBOS: should quietly do nothing.
+			Haiku: should quietly do nothing.
 case A1:	refList is NULL; maxCount == 0
 			R5: crashes
-			OBOS: should quietly do nothing.
+			Haiku: should quietly do nothing.
 case A1:	refList is NULL; maxCount > 0
 			R5: crashes
-			OBOS: should quietly do nothing.
+			Haiku: should quietly do nothing.
 case B1:	refList is valid; maxCount < 0
 			Should return zero recent apps
 case B2:	refList is valid; maxCount == 0
@@ -129,10 +129,10 @@ case 1:	refList is NULL; all other params are valid.
 		Should quietly do nothing.
 case 2:	refList is non-NULL, maxCount is zero, fileType and appSig are NULL.
 		R5: Returns one recent document.
-		OBOS: Returns an empty message
+		Haiku: Returns an empty message
 case 3:	refList is non-NULL, maxCount is negative, fileType and appSig are NULL.
 		R5: Returns one recent document.
-		OBOS: Returns an empty message
+		Haiku: Returns an empty message
 case 4:	Normal function.
 case 5: Duplicate entries with different app sigs are added. When requested,
         only most recent instance among the duplicates is returned.
@@ -142,10 +142,10 @@ case 1:	refList is NULL; maxCount is valid, appSig is NULL.
 		Should quietly do nothing.
 case 2:	refList is valid, maxCount is negative, appSig is NULL.
 		R5: Returns one recent document.
-		OBOS: Returns an empty message.
+		Haiku: Returns an empty message.
 case 3:	refList is valid, maxCount is zero, appSig is NULL.
 		R5: Returns one recent document.
-		OBOS: Returns an empty message.
+		Haiku: Returns an empty message.
 case 4: Normal function
 case 5: Duplicate entries with different app sigs are added. When requested,
         only most recent instance among the duplicates is returned.
@@ -190,7 +190,7 @@ case 10:installed type mimeType, preferred app, app type installed,
 		different signature =>
 		Should return B_OK and set the ref to refer to the application's
 		executable. Should remove the incorrect app hint on the app type.
-		(OBOS: Should set the correct app hint.
+		(Haiku: Should set the correct app hint.
 		 Don't even return the wrong app?)
 case 11:installed type mimeType, preferred app, app type installed,
 		preferred app type has an app hint pointing to void,
@@ -217,7 +217,7 @@ case 16:installed type mimeType, preferred app, app type installed,
 		preferred app type has an app hint pointing to a cyclic link,
 		no app with this signature exists =>
 		R5: Should return B_OK and set the ref to refer to the link.
-		OBOS: Should return B_LAUNCH_FAILED_APP_NOT_FOUND and unset the app
+		Haiku: Should return B_LAUNCH_FAILED_APP_NOT_FOUND and unset the app
 		type's app hint.
 
 status_t FindApp(const char *mimeType, entry_ref *app) const
@@ -313,7 +313,7 @@ case 10:installed type mimeType, preferred app, app type installed,
 		Should return B_OK and set team to the ID of the team running the
 		application's executable. Should remove the incorrect app hint on
 		the app type.
-		(OBOS: Should set the correct app hint.
+		(Haiku: Should set the correct app hint.
 		 Don't even run the wrong app?)
 case 11:installed type mimeType, preferred app, app type installed,
 		preferred app type has an app hint pointing to void,
@@ -400,7 +400,7 @@ case 29:installed type mimeType, preferred app, app type installed,
 		preferred app type has an app hint pointing to a cyclic link,
 		no app with this signature exists =>
 		Should return
-		OBOS: B_LAUNCH_FAILED_APP_NOT_FOUND and unset the app type's app hint.
+		Haiku: B_LAUNCH_FAILED_APP_NOT_FOUND and unset the app type's app hint.
 		R5: B_ENTRY_NOT_FOUND or B_LAUNCH_FAILED_NO_RESOLVE_LINK.
 case 30:installed type mimeType, preferred app, app type installed,
 		preferred app type has an app hint that points to an app without a

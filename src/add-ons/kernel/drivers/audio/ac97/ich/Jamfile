@@ -12,7 +12,6 @@ KernelAddon ich_ac97 :
 	ac97.c
 ;
 
-# For OpenBeOS we should be building the driver objects this way.
 #KernelObjects
 #	ac97_multi.c
 #	config.c

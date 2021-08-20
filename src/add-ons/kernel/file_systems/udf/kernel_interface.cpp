@@ -520,7 +520,7 @@ udf_rewind_dir(fs_volume *volume, fs_vnode *vnode, void *cookie)
 	      - A way to get the proper info (best)
 	      - To ignore trying to find anchor volume descriptor pointers at
 	        locations N-256 and N. (acceptable, perhaps, but not really correct)
-	      Either way we should address this problem properly for OBOS::R1.
+	      Either way we should address this problem properly for Haiku::R1.
 	\todo Looks like B_GET_GEOMETRY doesn't work on non-device files (i.e.
 	      disk images), so I need to use stat or something else for those
 	      instances.

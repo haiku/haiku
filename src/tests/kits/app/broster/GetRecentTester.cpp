@@ -321,7 +321,7 @@ status_t get_test_ref(const char *leafname, entry_ref *ref)
 	void GetRecentApps(BMessage *refList, int32 maxCount)
 	@case A1		refList is NULL; maxCount < 0
 	@results		R5: crashes
-	                OBOS: should quietly do nothing.
+	                Haiku: should quietly do nothing.
 */
 void 
 GetRecentTester::GetRecentAppsTestA1()
@@ -336,7 +336,7 @@ GetRecentTester::GetRecentAppsTestA1()
 	void GetRecentApps(BMessage *refList, int32 maxCount)
 	@case A1		refList is NULL; maxCount == 0
 	@results		R5: crashes
-	                OBOS: should quietly do nothing.
+	                Haiku: should quietly do nothing.
 */
 void 
 GetRecentTester::GetRecentAppsTestA2()
@@ -351,7 +351,7 @@ GetRecentTester::GetRecentAppsTestA2()
 	void GetRecentApps(BMessage *refList, int32 maxCount)
 	@case A1		refList is NULL; maxCount > 0
 	@results		R5: crashes
-	                OBOS: should quietly do nothing.
+	                Haiku: should quietly do nothing.
 */
 void 
 GetRecentTester::GetRecentAppsTestA3()
@@ -556,7 +556,7 @@ GetRecentTester::GetRecentDocumentsTest1()
 	@case 2			refList is non-NULL, maxCount is zero, fileType and
 	                appSig are NULL.
 	@results		R5: Returns one recent document.
-	                OBOS: Returns an empty message
+	                Haiku: Returns an empty message
 */
 void
 GetRecentTester::GetRecentDocumentsTest2()
@@ -577,7 +577,7 @@ GetRecentTester::GetRecentDocumentsTest2()
 	@case 3			refList is non-NULL, maxCount is negative, fileType and
 	                appSig are NULL.
 	@results		R5: Returns one recent document.
-	                OBOS: Returns an empty message
+	                Haiku: Returns an empty message
 */
 void
 GetRecentTester::GetRecentDocumentsTest3()
@@ -1030,7 +1030,7 @@ GetRecentTester::GetRecentFoldersTest1()
 	void GetRecentFolders(BMessage *refList, int32 maxCount, const char *appSig)
 	@case 2		refList is valid, maxCount is negative, appSig is NULL.
 	@results		R5: Returns one recent document.
-	                OBOS: Returns an empty message
+	                Haiku: Returns an empty message
 */
 void
 GetRecentTester::GetRecentFoldersTest2()
@@ -1060,7 +1060,7 @@ GetRecentTester::GetRecentFoldersTest2()
 	void GetRecentFolders(BMessage *refList, int32 maxCount, const char *appSig)
 	@case 3			refList is valid, maxCount is zero, appSig is NULL.
 	@results		R5: Returns one recent document.
-	                OBOS: Returns an empty message
+	                Haiku: Returns an empty message
 */
 void
 GetRecentTester::GetRecentFoldersTest3()
@@ -1391,7 +1391,7 @@ GetRecentTester::setUp()
 			err = file.SetTo(filename, B_READ_WRITE);
 
 // For some reason, only the first CreateFile() call works with R5. None
-// work with OBOS...
+// work with Haiku...
 /*
 			err = tempDir.CreateFile(test_docs[i].name, &file);
 			if (!err)

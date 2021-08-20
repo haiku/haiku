@@ -1,6 +1,6 @@
 /*****************************************************************************/
 // TGAView
-// Written by Michael Wilber, OBOS Translation Kit Team
+// Written by Michael Wilber, Haiku Translation Kit Team
 // Use of Layout API added by Maxime Simon, maxime.simon@gmail.com, 2009.
 //
 // TGAView.cpp
@@ -8,7 +8,7 @@
 // This BView based object displays information about the TGATranslator.
 //
 //
-// Copyright (c) 2002 OpenBeOS Project
+// Copyright (c) 2002 Haiku Project
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),

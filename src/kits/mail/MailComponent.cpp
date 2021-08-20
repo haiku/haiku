@@ -395,7 +395,7 @@ BMailComponent::MIMEType(BMimeType* mime)
 		strcpy(typeAsLowerCaseString, "text/plain"); // Hope this is an OK default.
 	} else {
 		// Some extra processing to convert mixed or upper case MIME types into
-		// lower case, since the BeOS R5 BMimeType is case sensitive (but OpenBeOS
+		// lower case, since the BeOS R5 BMimeType is case sensitive (but Haiku
 		// isn't).  Also truncate the string if it is too long.
 		for (i = 0; i < sizeof(typeAsLowerCaseString) - 1
 			&& typeAsString[i] != 0; i++)

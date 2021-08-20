@@ -107,7 +107,7 @@ void TBMessageRunnerTester::BMessageRunnerA2()
 	@case 3			target is valid, message is valid, interval == 0, count > 0
 	@results		R5: InitCheck() should return B_ERROR.
 						GetInfo() should return B_BAD_VALUE.
-					OBOS: InitCheck() should return B_OK.
+					Haiku: InitCheck() should return B_OK.
 						  GetInfo() should return B_OK.
 						  A minimal time interval is used (50000).
  */
@@ -321,7 +321,7 @@ void TBMessageRunnerTester::BMessageRunnerB2()
 	@case 3			target is valid, message is valid, interval == 0, count > 0
 	@results		R5: InitCheck() should return B_ERROR.
 						GetInfo() should return B_BAD_VALUE.
-					OBOS: InitCheck() should return B_OK.
+					Haiku: InitCheck() should return B_OK.
 						  GetInfo() should return B_OK.
 						  A minimal time interval is used (50000).
  */

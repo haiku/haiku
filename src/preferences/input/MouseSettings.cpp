@@ -18,9 +18,9 @@
 #include <stdio.h>
 
 
-// The R5 settings file differs from that of OpenBeOS;
+// The R5 settings file differs from that of Haiku;
 // the latter maps 16 different mouse buttons
-#define R5_COMPATIBLE 1
+#define R5_COMPATIBLE 0
 
 static const bigtime_t kDefaultClickSpeed = 500000;
 static const int32 kDefaultMouseSpeed = 65536;

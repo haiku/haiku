@@ -222,7 +222,7 @@ void SetCountTester::SetCount5()
 					R5: GetInfo() should return B_OK and count 0!
 						The timer is NOT reset and a message arives after the
 						time specified by the interval!
-					OBOS: GetInfo() should return B_BAD_VALUE.
+					Haiku: GetInfo() should return B_BAD_VALUE.
  */
 void SetCountTester::SetCount6()
 {

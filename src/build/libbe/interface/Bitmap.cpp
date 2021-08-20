@@ -1737,7 +1737,7 @@ BBitmap::Bounds() const
 	The currently supported source/target color spaces are
 	\c B_RGB{32,24,16,15}[_BIG], \c B_CMAP8 and \c B_GRAY{8,1}.
 
-	\note As this methods is apparently a bit strange to use, OBOS introduces
+	\note As this methods is apparently a bit strange to use, Haiku introduces
 		  ImportBits() methods, which are recommended to be used instead.
 
 	\param data The data to be copied.

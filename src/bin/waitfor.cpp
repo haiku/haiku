@@ -1,5 +1,5 @@
 /* waitfor.c - waits for a given threadname
- * (c) 2002, François Revol (mmu_man) for OpenBeOS
+ * (c) 2002, François Revol (mmu_man) for Haiku
  * released under the MIT licence.
  *
  * ChangeLog:

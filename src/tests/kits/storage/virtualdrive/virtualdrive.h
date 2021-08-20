@@ -1,4 +1,4 @@
-/* This software is part of the OpenBeOS distribution and is covered 
+/* This software is part of the Haiku distribution and is covered
 ** by the MIT License.
 */
 #ifndef VIRTUAL_DRIVE_H

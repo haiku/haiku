@@ -1,7 +1,7 @@
 /*
 	$Id: RegionIntersect.cpp 4235 2003-08-06 06:46:06Z jackburton $
 	
-	This file implements the intersect test for the OpenBeOS BRegion
+	This file implements the intersect test for the Haiku BRegion
 	code.
 	
 	*/

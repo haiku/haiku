@@ -1,6 +1,6 @@
 /*
  * Copyright 2015, François Revol <revol@free.fr>
- * Copyright (c) 2002 Marcus Overhagen <marcus@overhagen.de>, OpenBeOS project
+ * Copyright (c) 2002 Marcus Overhagen <marcus@overhagen.de>, Haiku project
  *
  * Distributed under the terms of the MIT License.
  */

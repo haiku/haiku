@@ -8,7 +8,7 @@
  *   * Do not burn the candle at both ends as it leads to the life of a
  *     hairdresser.
  *=--------------------------------------------------------------------------=*
- * Copyright (c) 2002, The OpenBeOS project.
+ * Copyright (c) 2002, The Haiku project.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),

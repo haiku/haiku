@@ -27,7 +27,7 @@ StringInsertTest::PerformTest(void)
 	delete str1;
 	
 #ifndef TEST_R5
-	// This test crashes R5 and should drop into the debugger in OpenBeOS
+	// This test crashes R5 and should drop into the debugger in Haiku
 	// (if compiled with DEBUG):
 	NextSubTest();
 	str1 = new BString("String");
@@ -59,7 +59,7 @@ StringInsertTest::PerformTest(void)
 	delete str1;
 	
 #ifndef TEST_R5
-	// This test crashes R5 and should drop into the debugger in OpenBeOS
+	// This test crashes R5 and should drop into the debugger in Haiku
 	// (if compiled with DEBUG):
 	NextSubTest();
 	str1 = new BString("string");

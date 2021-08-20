@@ -8,7 +8,7 @@
 #include <View.h>
 
 PrintTestWindow::PrintTestWindow()
-	: Inherited(BRect(100,100,500,300), "OpenBeOS Printing", B_DOCUMENT_WINDOW, 0)
+	: Inherited(BRect(100,100,500,300), "Haiku Printing", B_DOCUMENT_WINDOW, 0)
 {
 	BuildGUI();
 }

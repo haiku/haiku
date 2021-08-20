@@ -2,7 +2,7 @@
 
 PrintTransport
 
-Copyright (c) 2004 OpenBeOS.
+Copyright (c) 2004 Haiku.
 
 Authors:
 	Philippe Houdoin

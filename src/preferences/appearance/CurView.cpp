@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2002, Haiku
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -233,9 +233,9 @@ printf("Loading cursor sets from disk\n");
 		{
 			case B_NAME_TOO_LONG:
 			{
-				BAlert *a=new BAlert("OpenBeOS","Couldn't open the folder for cursor sets. "
+				BAlert *a=new BAlert("Haiku","Couldn't open the folder for cursor sets. "
 					"You will be able to change system cursors, but be unable to save them to a cursor set. "
-					"Please contact OpenBeOS about Appearance Preferences::CurView::"
+					"Please contact Haiku about Appearance Preferences::CurView::"
 					"LoadCursorSets::B_NAME_TOO_LONG for a bugfix", "OK",
 					 NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 				a->SetFlags(a->Flags() | B_CLOSE_ON_ESCAPE);
@@ -264,7 +264,7 @@ printf("Loading cursor sets from disk\n");
 			}
 			case B_FILE_ERROR:
 			{
-				BAlert *a=new BAlert("OpenBeOS","Couldn't open the folder for cursor sets "
+				BAlert *a=new BAlert("Haiku","Couldn't open the folder for cursor sets "
 					"because of a file error. Perhaps there is a file (instead of a folder) at " COLOR_SET_DIR
 					"? You will be able to change system cursors, but be unable to save them to a cursor set. ",
 					"OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
@@ -274,7 +274,7 @@ printf("Loading cursor sets from disk\n");
 			}
 			case B_NO_MORE_FDS:
 			{
-				BAlert *a=new BAlert("OpenBeOS","Couldn't open the folder for cursor sets "
+				BAlert *a=new BAlert("Haiku","Couldn't open the folder for cursor sets "
 					"because there are too many open files. Please close some files and restart "
 					" this application.", "OK",
 					 NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);

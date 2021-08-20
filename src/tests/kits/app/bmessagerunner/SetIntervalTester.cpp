@@ -224,7 +224,7 @@ void SetIntervalTester::SetInterval5()
 					InitCheck() should return B_OK.
 					R5: GetInfo() should return B_BAD_VALUE.
 						All messages are delivered, but at weird times.
-					OBOS: GetInfo() should return B_OK and the minimal
+					Haiku: GetInfo() should return B_OK and the minimal
 						  interval. The timer is reset. The messages start to
 						  arive after the time specified by the minimal
 						  interval.
@@ -270,7 +270,7 @@ void SetIntervalTester::SetInterval6()
 					InitCheck() should return B_OK.
 					R5: GetInfo() should return B_BAD_VALUE.
 						All messages are delivered, but at weird times.
-					OBOS: GetInfo() should return B_OK and the minimal
+					Haiku: GetInfo() should return B_OK and the minimal
 						  interval. The timer is reset. The messages start to
 						  arive after the time specified by the minimal
 						  interval.

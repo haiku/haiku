@@ -126,7 +126,7 @@ struct __attribute__((packed)) bfs_inode
 	uint32		type;				// attribute type
 
 	int32		inode_size;
-	uint32		etc;				// for in-memory structures (unused in OpenBeOS' fs)
+	uint32		etc;				// for in-memory structures (unused in Haiku' fs)
 
 	union __attribute__((packed)) {
 		data_stream		data;

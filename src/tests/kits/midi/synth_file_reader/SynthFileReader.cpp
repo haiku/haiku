@@ -2,7 +2,7 @@
 
 SynthFileReader.cpp
 
-Copyright (c) 2002 OpenBeOS.
+Copyright (c) 2002 Haiku.
 
 
 Author:

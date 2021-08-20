@@ -1,7 +1,7 @@
-April 21, 2003 - MuTerminal goes from GPL to OBOS!
+April 21, 2003 - MuTerminal goes from GPL to Haiku!
 
 Thanks to the effort of BiPolar and the generosity of Kazuho Okui and
-Takashi Murai we have had donated to OBOS the sources for MuTerminal.
+Takashi Murai we have had donated to Haiku the sources for MuTerminal.
 MuTerminal was formerly under the GPL license.  The complete MuTerminal
 package as it was originally released on April 2, 2000 (version 2.3) is
 preserved in this directory in the original form that I obtained from
@@ -32,7 +32,7 @@ I really don't know if you are still developing this program, but I
 have to ask you:
 Is there any chance of that you change the license from GPL to MIT/BSD?
 
-If you do so, then the OpenBeOS Team (http://open-beos.sourceforge.net)
+If you do so, then the Haiku Team (https://www.haiku-os.org)
 could use your app as a Terminal Replacement in the future release of
 their O.S.
 
@@ -44,7 +44,7 @@ BeOS Community.
 
 About the license: I understand that part of your code depends on
 libconv, which is under GPL, but that part can be replaced with they
-counterpart from OpenBeOS, with is under a MIT/BSD like license.
+counterpart from Haiku, with is under a MIT/BSD like license.
 
 Thanks for your time, and thanks again for MuTerm!
 
@@ -64,7 +64,7 @@ Hi,
 Now, Muterm's licence is GPL, but, I'm not use other GPL code in Muterm.
 So, I can change Muterm`s licence to MIT/BSD/AS IS and other.
 
-If you (and OpenBeOS team) adopt Muterm to default terminal on OpenBeOS,
+If you (and Haiku Team) adopt Muterm to default terminal on Haiku,
 I will welcome it.
 
 I want you to leave only the credit of me and Takashi Murai in that case.

@@ -1,6 +1,6 @@
 /*
 ** Copyright 2003, Axel D�fler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the MIT License.
 */
 
 #include <asm_defs.h>

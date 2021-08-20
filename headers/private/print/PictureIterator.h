@@ -2,7 +2,7 @@
 
 PictureIterator.
 
-Copyright (c) 2001, 2002 OpenBeOS. 
+Copyright (c) 2001, 2002 Haiku.
 
 Authors: 
 	Philippe Houdoin
