@@ -25,6 +25,24 @@
 #endif
 
 
+static platform_cpu_info sCpus[SMP_MAX_CPUS];
+uint32 sCpuCount = 0;
+
+
+void
+arch_smp_register_cpu(platform_cpu_info** cpu)
+{
+	dprintf("arch_smp_register_cpu()\n");
+	uint32 newCount = sCpuCount + 1;
+	if (newCount > SMP_MAX_CPUS) {
+		*cpu = NULL;
+		return;
+	}
+	*cpu = &sCpus[sCpuCount];
+	sCpuCount = newCount;
+}
+
+
 int
 arch_smp_get_current_cpu(void)
 {

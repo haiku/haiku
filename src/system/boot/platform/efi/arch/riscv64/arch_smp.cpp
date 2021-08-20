@@ -38,7 +38,7 @@ struct CpuEntryInfo {
 };
 
 
-static CpuInfo sCpus[SMP_MAX_CPUS];
+static platform_cpu_info sCpus[SMP_MAX_CPUS];
 uint32 sCpuCount = 0;
 
 
@@ -52,7 +52,7 @@ CpuEntry(int hartId, CpuEntryInfo* info)
 
 
 void
-arch_smp_register_cpu(CpuInfo** cpu)
+arch_smp_register_cpu(platform_cpu_info** cpu)
 {
 	dprintf("arch_smp_register_cpu()\n");
 	uint32 newCount = sCpuCount + 1;

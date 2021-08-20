@@ -356,11 +356,12 @@ HandleFdt(const void* fdt, int node, uint32 addressCells, uint32 sizeCells,
 
 	if (deviceType != NULL) {
 		if (strcmp(deviceType, "cpu") == 0) {
-			CpuInfo* info;
+			platform_cpu_info* info;
 			arch_smp_register_cpu(&info);
 			if (info == NULL)
 				return;
-			info->id = fdt32_to_cpu(*(uint32*)fdt_getprop(fdt, node, "reg", NULL));
+			info->id = fdt32_to_cpu(*(uint32*)fdt_getprop(fdt, node,
+				"reg", NULL));
 			dprintf("cpu\n");
 			dprintf("  id: %" B_PRIu32 "\n", info->id);
 		}

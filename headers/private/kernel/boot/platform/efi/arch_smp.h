@@ -5,17 +5,18 @@
 #ifndef KERNEL_BOOT_PLATFORM_EFI_ARCH_SMP_H
 #define KERNEL_BOOT_PLATFORM_EFI_ARCH_SMP_H
 
+
 #include <boot/menu.h>
 
 
-#ifdef __riscv
+#if defined(__riscv) || defined(__ARM__) || defined(__ARM64__)
+// These platforms take inventory of cpu cores from fdt
 
-struct CpuInfo {
+struct platform_cpu_info {
 	uint32 id;
 };
 
-void arch_smp_register_cpu(CpuInfo** cpu);
-
+void arch_smp_register_cpu(platform_cpu_info** cpu);
 #endif
 
 
