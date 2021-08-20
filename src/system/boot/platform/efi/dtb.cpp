@@ -11,7 +11,7 @@
 #include <arch/generic/debug_uart_8250.h>
 #if defined(__riscv)
 #	include <arch/riscv64/arch_uart_sifive.h>
-#elif defined(__ARM__) || defined(__ARM64__)
+#elif defined(__ARM__) || defined(__aarch64__)
 #	include <arch/arm/arch_uart_pl011.h>
 #endif
 #include <boot/addr_range.h>
@@ -67,7 +67,7 @@ const struct supported_uarts {
 	{ "ns16550", UART_KIND_8250, &get_uart<DebugUART8250> },
 #if defined(__riscv)
 	{ "sifive,uart0", UART_KIND_SIFIVE, &get_uart<ArchUARTSifive> },
-#elif defined(__ARM__) || defined(__ARM64__)
+#elif defined(__ARM__) || defined(__aarch64__)
 	{ "arm,pl011", UART_KIND_PL011, &get_uart<ArchUARTPL011> },
 	{ "arm,primecell", UART_KIND_PL011, &get_uart<ArchUARTPL011> },
 #endif
