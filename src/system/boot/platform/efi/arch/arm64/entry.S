@@ -26,7 +26,7 @@ FUNCTION(arch_enter_kernel):
 	mov		x1,#0	// currentCPU=0
 
 	// call the kernel
-	b		x4
+	br		x4
 
 	// return
 	mov		x0,#-1	// B_ERROR
