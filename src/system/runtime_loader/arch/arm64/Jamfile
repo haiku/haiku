@@ -17,7 +17,7 @@ for architectureObject in [ MultiArchSubDirSetup arm64 ] {
 			:
 			<src!system!libroot!os!arch!$(TARGET_ARCH)!$(architecture)>thread.o
 
-			<src!system!libroot!posix!string!arch!$(TARGET_ARCH)!$(architecture)>arch_string.o
+			<src!system!libroot!posix!string!arch!$(TARGET_ARCH)!$(architecture)>memcpy.o
 			<src!system!libroot!posix!string!arch!$(TARGET_ARCH)!$(architecture)>memset.o
 			;
 	}
