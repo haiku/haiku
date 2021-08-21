@@ -1570,6 +1570,39 @@ TDragRegion::SwitchModeForRegion(BPoint where, BRegion region,
 }
 
 
+//! Deskbar regions
+//
+// ┌───────3──────────┬─────────────────────────────────┬──────────3───────┐
+// ├────────────────┬─┘                                 └─┬────────────────┤
+// │       2        │                                     │        2       │
+// ├────────────────┤                                     ├────────────────┤
+// │                │                                     │                │
+// │                │                                     │                │
+// │                │                  4                  │                │
+// │                │                                     │                │
+// │                │                                     │                │
+// │       1        │                                     │        1       │
+// │                │                                     │                │
+// │                │                                     │                │
+// │                ├─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─┤                │
+// │                │                                     │                │
+// │                │                                     │                │
+// │                │                                     │                │
+// ├────────────────┘                                     └────────────────┤
+// │                                                                       │
+// │                                   4                                   │
+// │                                                                       │
+// │                                                                       │
+// ├────────────────┐                                     ┌────────────────┤
+// │       2        │                                     │        2       │
+// ├────────────────┴─┐                                 ┌─┴────────────────┤
+// └───────3──────────┴─────────────────────────────────┴──────────3───────┘
+//
+// 1. Vertical expando-mode, right (default) or left
+// 2. Vertical mini-mode, right-top left-top left-bottom or right-bottom
+// 3. Horizontal mini-mode, right-top left-top left-bottom or right-bottom
+// 4. Horizontal expando-mode top or bottom
+
 void
 TDragRegion::CalculateRegions()
 {
