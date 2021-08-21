@@ -83,6 +83,10 @@ for platform in [ MultiBootSubDirSetup ] {
 				{
 					DEFINES += BOOT_SUPPORT_ELF32 ;
 				}
+				case "arm64" :
+				{
+					DEFINES += BOOT_SUPPORT_ELF64 ;
+				}
 			}
 
 			local kernelC++Header = [ FDirName $(HAIKU_TOP) headers private kernel util
