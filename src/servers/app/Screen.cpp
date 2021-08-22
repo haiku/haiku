@@ -74,11 +74,6 @@ Screen::Initialize()
 		status = fHWInterface->Initialize();
 	}
 
-	// Turn on screen if this is not yet done by BIOS
-	if (status == B_OK)
-		fHWInterface->SetDPMSMode(B_DPMS_ON);
-
-
 	return status;
 }
 

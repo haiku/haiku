@@ -519,6 +519,8 @@ Desktop::Init()
 		return B_ERROR;
 	}
 
+	HWInterface()->SetDPMSMode(B_DPMS_ON);
+
 	float brightness = fWorkspaces[0].StoredScreenConfiguration().Brightness(0);
 	if (brightness > 0)
 		HWInterface()->SetBrightness(brightness);
