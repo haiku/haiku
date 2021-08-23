@@ -56,6 +56,11 @@ public:
 								BBitmap(const BBitmap* source,
 									bool acceptsViews = false,
 									bool needsContiguous = false);
+								BBitmap(area_id area, ptrdiff_t areaOffset,
+									BRect bounds, uint32 flags,
+									color_space colorSpace,
+									int32 bytesPerRow = B_ANY_BYTES_PER_ROW,
+									screen_id screenID = B_MAIN_SCREEN_ID);
 	virtual						~BBitmap();
 
 	// Archiving
@@ -133,7 +138,9 @@ private:
 			int32				_ServerToken() const;
 			void				_InitObject(BRect bounds,
 									color_space colorSpace, uint32 flags,
-									int32 bytesPerRow, screen_id screenID);
+									int32 bytesPerRow, screen_id screenID,
+									area_id area = -1,
+									ptrdiff_t areaOffset = 0);
 			void				_CleanUp();
 			void				_AssertPointer();
 
