@@ -9,7 +9,7 @@
 #include <boot/menu.h>
 
 
-#if defined(__riscv) || defined(__ARM__) || defined(__ARM64__)
+#if defined(__riscv) || defined(__ARM__) || defined(__aarch64__)
 // These platforms take inventory of cpu cores from fdt
 
 struct platform_cpu_info {
