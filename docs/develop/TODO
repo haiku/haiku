@@ -1,0 +1,17 @@
+Documents that still need to be converted to restructuredtext (or thrown away):
+
+- kernel/vm*: it looks like these should be comments in the sourcecode?
+- kits/*: TODO, some interesting info in there but also a lot of probably obsolete things
+- media/*: some useful things, some sourcecode, and a PDF file about the echo audio driver
+
+Other things to do:
+
+- Organize the table of contents a bit. For now I just wanted to get all the existing files in,
+  in a mostly flat organization. But it makes things hard to follow.
+- Reorganize the directories. For example move midi to kits/midi. Should we follow the layout of
+  the source tree? Or the hierarchy of the table of contents?
+- There are doxyfiles for various components. Unlike the one used for API docs, they scan the cpp
+  source files and will extract some internals documentation from there. Decide what to do with that.
+- Migrate some things from the website. Start with documentation about configure and jam, for example.
+- There are TODO lists in various places in the docs, turn them into bugreports in the bugtracker
+  (including this one!)

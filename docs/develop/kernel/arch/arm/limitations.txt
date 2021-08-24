@@ -1,2 +1,0 @@
-* Does not support < ARMv5
-* Requires support for high vectors

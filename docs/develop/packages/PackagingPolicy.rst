@@ -135,6 +135,6 @@ alternative.  A typical use would be to create a desktop icon that the user
 can move around or delete.
 
 Pre-Uninstallation Scripts
-=========================
+==========================
 These undo the effects of a post-installation script and usually are put
 into "boot/pre-uninstall".  A typical use is to remove desktop icons.
