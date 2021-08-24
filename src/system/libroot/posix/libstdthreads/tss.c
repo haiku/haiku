@@ -29,6 +29,7 @@
  */
 
 
+#include <limits.h>
 #include <pthread.h>
 
 #include "threads.h"

@@ -10,6 +10,8 @@
 #include <stdint.h>
 #include <sys/types.h>
 
+#include <config/HaikuConfig.h>
+
 
 /* access modes */
 #define R_OK	4
@@ -29,31 +31,116 @@
 #define F_TEST		3	/* test a section for locks by other processes */
 
 /* POSIX version support */
-#define _POSIX_VERSION			(199009L)	/* TODO: Update! */
+#define _POSIX_VERSION			(200809L)
+#define	_POSIX2_VERSION			(200809L)
+#define _XOPEN_VERSION			(700)
 
-#define _POSIX_CHOWN_RESTRICTED	1
-#define _POSIX_JOB_CONTROL		1
-#define _POSIX_NO_TRUNC			0
-#define _POSIX_SAVED_IDS		1
+
 #define _POSIX_VDISABLE			((unsigned char)-2)
-	/* TODO: Check this! */
-/* TODO: Update these to the current POSIX version! Ideally after actually
-	supporting the features. */
-#define _POSIX_BARRIERS						(200112L)
-#define _POSIX_SEMAPHORES					(200112L)
-#define _POSIX_THREADS						(200112L)
+
+/*
+ * POSIX options and options groups.
+ * Please keep this list in the same order as the applicable standard.
+ * https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap02.html#tag_02_01_06
+ */
+#define _POSIX_ADVISORY_INFO				(200809L)
+#define _POSIX_ASYNCHRONOUS_IO				(-1)
+#define _POSIX_BARRIERS						(200809L)
+#define _POSIX_CHOWN_RESTRICTED				(1)
+#define _POSIX_CLOCK_SELECTION				(200809L)
+#define _POSIX_CPUTIME						(200809L)
+#define _POSIX_FSYNC						(200809L)
+#define _POSIX_IPV6							(200809L)
+#define _POSIX_JOB_CONTROL					(1)
 #define _POSIX_MAPPED_FILES					(200809L)
-#define _POSIX_THREAD_PROCESS_SHARED		(200809L)
+#define _POSIX_MEMLOCK						(-1)
+#define _POSIX_MEMLOCK_RANGE				(200809L)
+#define _POSIX_MEMORY_PROTECTION			(200809L)
+#define _POSIX_MESSAGE_PASSING				(-1)
+#define _POSIX_MONOTONIC_CLOCK				(200809L) /* aio_suspend() is missing in Haiku1 */
+#define _POSIX_NO_TRUNC						(0)
+#define _POSIX_PRIORITIZED_IO				(-1)
+#define _POSIX_PRIORITY_SCHEDULING			(-1)
+#define _POSIX_RAW_SOCKETS					(-1)
+#define _POSIX_READER_WRITER_LOCKS			(200809L)
+#define _POSIX_REALTIME_SIGNALS				(200809L)
+#define _POSIX_REGEXP						(200809L)
+#define _POSIX_SAVED_IDS					(1)
+#define _POSIX_SEMAPHORES					(200112L)
+#define _POSIX_SHARED_MEMORY_OBJECTS		(200809L)
+#define _POSIX_SHELL						(200809L)
+#define _POSIX_SPAWN						(200809L)
+#define _POSIX_SPIN_LOCKS					(-1)
+#define _POSIX_SPORADIC_SERVER				(-1)
+#define _POSIX_SYNCHRONIZED_IO				(-1) /* missing fdatasync() */
 #define _POSIX_THREAD_ATTR_STACKADDR		(200809L)
 #define _POSIX_THREAD_ATTR_STACKSIZE		(200809L)
-#define _POSIX_THREAD_PRIORITY_SCHEDULING	(-1)	/* currently unsupported */
-#define _POSIX_REALTIME_SIGNALS				(200809L)
-#define _POSIX_MEMORY_PROTECTION			(200809L)
-#define _POSIX_MONOTONIC_CLOCK				(200809L)
-#define _POSIX_TIMERS						(200809L)
-#define _POSIX_CPUTIME						(200809L)
 #define _POSIX_THREAD_CPUTIME				(200809L)
+#define _POSIX_THREAD_PRIO_INHERIT			(-1) /* not inplemented */
+#define _POSIX_THREAD_PRIO_PROTECT          (-1)
+#define _POSIX_THREAD_PRIORITY_SCHEDULING	(-1)
+#define _POSIX_THREAD_PROCESS_SHARED		(200809L)
+#define _POSIX_THREAD_ROBUST_PRIO_INHERIT	(-1)
+#define _POSIX_THREAD_ROBUST_PRIO_PROTECT	(-1)
+#define _POSIX_THREAD_SAFE_FUNCTIONS		(200809L)
+#define _POSIX_THREAD_SPORADIC_SERVER		(-1)
+#define _POSIX_THREADS						(200809L)
+#define _POSIX_TIMEOUTS						(-1)
+#define _POSIX_TIMERS						(200809L)
+#define _POSIX_TRACE						(-1)
+#define _POSIX_TRACE_EVENT_FILTER			(-1)
+#define _POSIX_TRACE_INHERIT				(-1)
+#define _POSIX_TRACE_LOG					(-1)
+#define _POSIX_TYPED_MEMORY_OBJECTS			(-1)
 
+#define	__ILP32_OFF32						(-1)
+#ifdef __HAIKU_ARCH_64_BIT
+#define	__ILP32_OFFBIG						(-1)
+#define	__LP64_OFF64						(0)
+#else /* __HAIKU_ARCH_32_BIT */
+#define	__ILP32_OFFBIG						(0)
+#define	__LP64_OFF64						(-1)
+#endif
+#define	__LPBIG_OFFBIG						(-1)
+
+
+#define	_POSIX_V6_ILP32_OFF32		__ILP32_OFF32	/* OB */
+#define	_POSIX_V6_ILP32_OFFBIG		__ILP32_OFFBIG	/* OB */
+#define	_POSIX_V6_LP64_OFF64		__LP64_OFF64	/* OB */
+#define	_POSIX_V6_LPBIG_OFFBIG		__LPBIG_OFFBIG	/* OB */
+
+#define	_POSIX_V7_ILP32_OFF32		__ILP32_OFF32
+#define	_POSIX_V7_ILP32_OFFBIG		__ILP32_OFFBIG
+#define	_POSIX_V7_LP64_OFF64		__LP64_OFF64
+#define	_POSIX_V7_LPBIG_OFFBIG		__LPBIG_OFFBIG
+
+
+/* POSIX2 */
+#define	_POSIX2_C_BIND						(200809L)
+#define	_POSIX2_C_DEV						(-1)
+#define	_POSIX2_CHAR_TERM					(1)
+#define	_POSIX2_FORT_DEV					(-1)
+#define	_POSIX2_FORT_RUN					(-1)
+#define	_POSIX2_LOCALEDEF					(-1)
+#define	_POSIX2_PBS							(-1)
+#define	_POSIX2_PBS_ACCOUNTING				(-1)
+#define	_POSIX2_PBS_CHECKPOINT				(-1)
+#define	_POSIX2_PBS_LOCATE					(-1)
+#define	_POSIX2_PBS_MESSAGE					(-1)
+#define	_POSIX2_PBS_TRACK					(-1)
+#define	_POSIX2_SW_DEV						(-1)
+#define	_POSIX2_UPE							(-1)
+
+/* XSI */
+#define _XOPEN_CRYPT						(-1)
+#define _XOPEN_ENH_I18N						(-1)
+#define	_XOPEN_LEGACY						(-1)
+#define	_XOPEN_REALTIME						(-1)
+#define	_XOPEN_REALTIME_THREADS				(-1)
+#define	_XOPEN_SHM							(-1)
+#define	_XOPEN_STREAMS						(-1)
+#define	_XOPEN_UNIX							(-1)
+#define _XOPEN_UUCP							(-1)
 
 /* pathconf() constants */
 /* BeOS supported values, do not touch */
@@ -136,6 +223,88 @@
 #define _SC_SYMLOOP_MAX					63
 #define _SC_SHELL						64
 #define _SC_TTY_NAME_MAX				65
+#define _SC_ADVISORY_INFO				66
+#define _SC_BARRIERS					67
+#define _SC_CLOCK_SELECTION				68
+#define _SC_FSYNC						69
+#define _SC_IPV6						70
+#define _SC_MEMLOCK						71
+#define _SC_MEMLOCK_RANGE				72
+#define _SC_MESSAGE_PASSING				73
+#define _SC_PRIORITIZED_IO				74
+#define _SC_PRIORITY_SCHEDULING			75
+#define _SC_READER_WRITER_LOCKS			76
+#define _SC_SHARED_MEMORY_OBJECTS		77
+#define _SC_SPAWN						78
+#define _SC_SPIN_LOCKS					79
+#define _SC_SPORADIC_SERVER				80
+#define _SC_SYNCHRONIZED_IO				81
+#define _SC_THREAD_PRIO_INHERIT			82
+#define _SC_THREAD_PRIO_PROTECT			83
+#define _SC_THREAD_ROBUST_PRIO_INHERIT	84
+#define _SC_THREAD_ROBUST_PRIO_PROTECT	85
+#define _SC_THREAD_SAFE_FUNCTIONS		86
+#define _SC_THREAD_SPORADIC_SERVER		87
+#define _SC_TIMEOUTS					88
+#define _SC_TRACE						89
+#define _SC_TRACE_EVENT_FILTER			90
+#define _SC_TRACE_INHERIT				91
+#define _SC_TRACE_LOG					92
+#define _SC_TYPED_MEMORY_OBJECTS		93
+#define _SC_V6_ILP32_OFF32				94	/* OB */
+#define _SC_V6_ILP32_OFFBIG				95	/* OB */
+#define _SC_V6_LP64_OFF64				96	/* OB */
+#define _SC_V6_LPBIG_OFFBIG				97	/* OB */
+#define _SC_V7_ILP32_OFF32				98
+#define _SC_V7_ILP32_OFFBIG				99
+#define _SC_V7_LP64_OFF64				100
+#define _SC_V7_LPBIG_OFFBIG				101
+#define _SC_2_C_BIND					102
+#define _SC_2_C_DEV						103
+#define _SC_2_CHAR_TERM					104
+#define _SC_2_FORT_DEV					105
+#define _SC_2_FORT_RUN					106
+#define _SC_2_LOCALEDEF					107
+#define _SC_2_PBS						108	/* OB BE */
+#define _SC_2_PBS_ACCOUNTING			109	/* OB BE */
+#define _SC_2_PBS_CHECKPOINT			110	/* OB BE */
+#define _SC_2_PBS_LOCATE				111 /* OB BE */
+#define _SC_2_PBS_MESSAGE				112	/* OB BE */
+#define _SC_2_PBS_TRACK					113	/* OB BE */
+#define _SC_2_SW_DEV					114
+#define _SC_2_UPE						115
+#define _SC_2_VERSION					116
+#define _SC_XOPEN_CRYPT					117
+#define _SC_XOPEN_ENH_I18N				118
+#define _SC_XOPEN_REALTIME				119
+#define _SC_XOPEN_REALTIME_THREADS		120
+#define _SC_XOPEN_SHM					121
+#define _SC_XOPEN_STREAMS				122
+#define _SC_XOPEN_UNIX					123
+#define _SC_XOPEN_UUCP					124
+#define _SC_XOPEN_VERSION				125
+
+#if _POSIX_ASYNCHRONOUS_IO >= 0
+#define _SC_AIO_LISTIO_MAX				126
+#define _SC_AIO_MAX						127
+#define _SC_AIO_PRIO_DELTA_MAX			128
+#endif
+
+#define _SC_BC_BASE_MAX					129
+#define _SC_BC_DIM_MAX					130
+#define _SC_BC_SCALE_MAX				131
+#define _SC_BC_STRING_MAX				132
+
+#define _SC_COLL_WEIGHTS_MAX			133
+#define _SC_EXPR_NEST_MAX				134
+#define _SC_LINE_MAX					135
+#define _SC_LOGIN_NAME_MAX				136
+#define _SC_MQ_OPEN_MAX					137
+#define _SC_MQ_PRIO_MAX					138
+#define _SC_THREAD_DESTRUCTOR_ITERATIONS	139
+#define _SC_THREAD_KEYS_MAX				140
+#define _SC_THREAD_THREADS_MAX			141
+#define _SC_RE_DUP_MAX					142
 
 
 /* confstr() constants */
