@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020, Haiku, Inc. All rights reserved.
+ * Copyright 2021, Haiku, Inc. All rights reserved.
  * Released under the terms of the MIT License.
 */
 
@@ -23,6 +23,13 @@
 #else
 #	define TRACE(x) ;
 #endif
+
+
+void
+arch_smp_register_cpu(platform_cpu_info** cpu)
+{
+        dprintf("TODO: arch_smp_register_cpu()\n");
+}
 
 
 int
