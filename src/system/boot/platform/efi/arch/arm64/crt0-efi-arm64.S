@@ -36,7 +36,7 @@ coff_header:
 	.long	0				// PointerToSymbolTable
 	.long	1				// NumberOfSymbols
 	.short	section_table - optional_header	// SizeOfOptionalHeader
-	.short	0x206				// Characteristics.
+	.short	0x20e				// Characteristics.
 						// IMAGE_FILE_DEBUG_STRIPPED |
 						// IMAGE_FILE_EXECUTABLE_IMAGE |
 						// IMAGE_FILE_LINE_NUMS_STRIPPED
@@ -44,16 +44,16 @@ optional_header:
 	.short	0x20b				// PE32+ format
 	.byte	0x02				// MajorLinkerVersion
 	.byte	0x14				// MinorLinkerVersion
-	.long	_data - _start			// SizeOfCode
-	.long	_data_size			// SizeOfInitializedData
+	.long	_edata - _start			// SizeOfCode
+	.long	0			// SizeOfInitializedData
 	.long	0				// SizeOfUninitializedData
 	.long	_start - ImageBase		// AddressOfEntryPoint
 	.long	_start - ImageBase		// BaseOfCode
 
 extra_header_fields:
 	.quad	0				// ImageBase
-	.long	0x1000				// SectionAlignment
-	.long	0x200				// FileAlignment
+	.long	32				// SectionAlignment
+	.long	8				// FileAlignment
 	.short	0				// MajorOperatingSystemVersion
 	.short	0				// MinorOperatingSystemVersion
 	.short	0				// MajorImageVersion
@@ -74,7 +74,7 @@ extra_header_fields:
 	.quad	0				// SizeOfHeapReserve
 	.quad	0				// SizeOfHeapCommit
 	.long	0				// LoaderFlags
-	.long	0x6				// NumberOfRvaAndSizes
+	.long	16				// NumberOfRvaAndSizes
 
 	.quad	0				// ExportTable
 	.quad	0				// ImportTable
@@ -82,32 +82,51 @@ extra_header_fields:
 	.quad	0				// ExceptionTable
 	.quad	0				// CertificationTable
 	.quad	0				// BaseRelocationTable
-
+	.quad	0				// Debug
+	.quad	0				// Architecture
+	.quad	0				// Global Ptr
+	.quad	0				// TLS Table
+	.quad	0				// Load Config Table
+	.quad	0				// Bound Import
+	.quad	0				// IAT
+	.quad	0				// Delay Import Descriptor
+	.quad	0				// CLR Runtime Header
+	.quad	0				// Reserved
 	// Section table
 section_table:
-	.ascii	".text\0\0\0"
-	.long	_data - _start		// VirtualSize
+
+	/*
+	 * The EFI application loader requires a relocation section
+	 * because EFI applications must be relocatable.  This is a
+	 * dummy section as far as we are concerned.
+	 */
+	.ascii	".reloc"
+	.byte	0
+	.byte	0			// end of 0 padding of section name
+	.long	0
+	.long	0
+	.long	0			// SizeOfRawData
+	.long	0			// PointerToRawData
+	.long	0			// PointerToRelocations
+	.long	0			// PointerToLineNumbers
+	.short	0			// NumberOfRelocations
+	.short	0			// NumberOfLineNumbers
+	.long	0x42100040		// Characteristics (section flags)
+
+	.ascii	".text"
+	.byte	0
+	.byte	0
+	.byte	0
+	.long	_edata - _start		// VirtualSize
 	.long	_start - ImageBase	// VirtualAddress
-	.long	_data - _start		// SizeOfRawData
+	.long	_edata - _start		// SizeOfRawData
 	.long	_start - ImageBase	// PointerToRawData
 
 	.long	0		// PointerToRelocations (0 for executables)
 	.long	0		// PointerToLineNumbers (0 for executables)
 	.short	0		// NumberOfRelocations  (0 for executables)
 	.short	0		// NumberOfLineNumbers  (0 for executables)
-	.long	0x60000020	// Characteristics (section flags)
-
-	.ascii	".data\0\0\0"
-	.long	_data_size		// VirtualSize
-	.long	_data - ImageBase	// VirtualAddress
-	.long	_data_size		// SizeOfRawData
-	.long	_data - ImageBase	// PointerToRawData
-
-	.long	0		// PointerToRelocations (0 for executables)
-	.long	0		// PointerToLineNumbers (0 for executables)
-	.short	0		// NumberOfRelocations  (0 for executables)
-	.short	0		// NumberOfLineNumbers  (0 for executables)
-	.long	0xc0000040	// Characteristics (section flags)
+	.long	0xe0500020	// Characteristics (section flags)
 
 	.align		12
 
