@@ -96,6 +96,9 @@ requires {
 #ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_zlib_ENABLED
 	lib:libz
 #endif
+#ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_zstd_ENABLED
+	lib:libzstd >= 1
+#endif
 
 #ifdef HAIKU_REGULAR_BUILD
 #ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_ffmpeg_ENABLED
@@ -136,9 +139,6 @@ requires {
 #endif
 #ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_libwebp_ENABLED
 	lib:libwebp
-#endif
-#ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_zstd_ENABLED
-	lib:libzstd >= 1
 #endif
 #endif
 }
