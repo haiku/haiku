@@ -444,7 +444,7 @@ Team::Team(team_id id, bool kernel)
 	fArgs[0] = '\0';
 	num_threads = 0;
 	io_context = NULL;
-	address_space = kernel ? VMAddressSpace::Kernel() : NULL;
+	address_space = NULL;
 	realtime_sem_context = NULL;
 	xsi_sem_context = NULL;
 	thread_list = NULL;
@@ -2859,6 +2859,8 @@ team_init(kernel_args* args)
 	sKernelTeam = Team::Create(1, "kernel_team", true);
 	if (sKernelTeam == NULL)
 		panic("could not create kernel team!\n");
+
+	sKernelTeam->address_space = VMAddressSpace::Kernel();
 	sKernelTeam->SetArgs(sKernelTeam->Name());
 	sKernelTeam->state = TEAM_STATE_NORMAL;
 
