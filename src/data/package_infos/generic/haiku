@@ -1,6 +1,6 @@
 name 			haiku
 version			%HAIKU_VERSION%
-architecture	x86_gcc2
+architecture	%HAIKU_PACKAGING_ARCH%
 summary			"The Haiku base system"
 
 description		"The Haiku base system includes all system core software, like
@@ -17,7 +17,11 @@ licenses {
 flags			system_package
 
 provides {
-	haiku=%HAIKU_VERSION% compat>=R1~alpha1
+#ifdef HAIKU_BUILD_FEATURE_x86_64_x86_64_ENABLED
+	haiku=%HAIKU_VERSION% compat>=R1~alpha4_pm_hrev51198
+#else
+	haiku=%HAIKU_VERSION% compat>=R1~beta1
+#endif
 	cmd:arp
 	cmd:chop
 	cmd:clear
@@ -44,7 +48,6 @@ provides {
 	cmd:useradd
 	cmd:watch
 	cmd:xres
-	lib:libstdc++
 }
 
 requires {
@@ -62,6 +65,10 @@ requires {
 	cmd:unzip
 #endif
 
+	lib:libgcc_s
+	lib:libstdc++
+	lib:libsupc++
+
 #ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_libedit_ENABLED
 	lib:libedit
 #endif
@@ -72,12 +79,12 @@ requires {
 	lib:libfreetype
 #endif
 #ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_icu_ENABLED
-	lib:libicudata >= 57
-	lib:libicui18n >= 57
-	lib:libicuio >= 57
-	lib:libicutest >= 57
-	lib:libicutu >= 57
-	lib:libicuuc >= 57
+	lib:libicudata >= 66
+	lib:libicui18n >= 66
+	lib:libicuio >= 66
+	lib:libicutest >= 66
+	lib:libicutu >= 66
+	lib:libicuuc >= 66
 #endif
 #ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_ncurses_ENABLED
 	lib:libncurses >= 6.0
@@ -108,8 +115,8 @@ requires {
 	lib:libicns
 #endif
 #ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_openexr_ENABLED
-	lib:libilmimf
-	lib:libilmimfutil
+	lib:libilmimf_2_4
+	lib:libilmimfutil_2_4
 #endif
 #ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_jasper_ENABLED
 	lib:libjasper

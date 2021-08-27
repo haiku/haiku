@@ -114,7 +114,7 @@ rule PreprocessPackageOrRepositoryInfo target : source : architecture
 	}
 	for feature in $(HAIKU_BUILD_FEATURES) {
 		local featureSplit = [ FSplitString $(feature) : ":" ] ;
-		defines += HAIKU_BUILD_FEATURE_$(featureSplit:UJ=_)_ENABLED ;
+		defines += HAIKU_BUILD_FEATURE_$(featureSplit:J=_)_ENABLED ;
 	}
 
 	local revisionFile = [ DetermineHaikuRevision ] ;
