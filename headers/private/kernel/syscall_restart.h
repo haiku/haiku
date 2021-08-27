@@ -50,8 +50,8 @@ syscall_restart_handle_timeout_pre(uint32& flags, bigtime_t& timeout)
 		timeout = *(bigtime_t*)thread->syscall_restart.parameters;
 		if (timeout > 0 && (flags & B_RELATIVE_TIMEOUT) != 0)
 			flags = (flags & ~B_RELATIVE_TIMEOUT) | B_ABSOLUTE_TIMEOUT;
-	} else if ((flags & B_RELATIVE_TIMEOUT) != 0) {
-		if (timeout > 0) {
+	} else if ((flags & B_RELATIVE_TIMEOUT)) {
+		if (timeout > 0 && timeout < B_INFINITE_TIMEOUT) {
 			timeout += system_time();
 			// deal with overflow
 			if (timeout < 0)
