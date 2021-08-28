@@ -18,7 +18,7 @@
 #define KERNEL_LOAD_BASE_64_BIT 0xffffffc000000000
 
 
-#if defined(__riscv64__)
+#if (defined(__riscv) && __riscv_xlen == 64)
 
 // Base of the kernel address space.
 #define KERNEL_BASE               0xffffffc000000000
@@ -35,7 +35,7 @@
 #define USER_STACK_REGION       (USER_BASE + 0x3000000000)
 #define USER_STACK_REGION_SIZE  ((USER_TOP - USER_STACK_REGION) + 1)
 
-#else /* ! __riscv64__ */
+#else /* ! riscv64 */
 	#warning Unknown RISC-V Architecture!
 #endif
 

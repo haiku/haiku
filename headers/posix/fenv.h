@@ -11,7 +11,7 @@
 #  include <arch/arm64/fenv.h>
 #elif defined(__POWERPC__)
 #  include <arch/ppc/fenv.h>
-#elif defined(__riscv64__)
+#elif (defined(__riscv) && __riscv_xlen == 64)
 #  include <arch/riscv64/fenv.h>
 #elif defined(__sparc__)
 #  include <arch/sparc64/fenv.h>
