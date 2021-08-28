@@ -205,7 +205,7 @@ AddBootModuleSymlinksToPackage
 	nvme_disk@x86,x86_64
 	openpic@ppc
 	packagefs pci
-	fdt@riscv64,arm,arm64
+	fdt@riscv64,arm
 	scsi scsi_cd scsi_disk scsi_periph silicon_image_3112 highpoint_ide_pci
 	sdhci_pci
 	usb usb_disk <usb>ehci <usb>ohci <usb>uhci <usb>xhci
