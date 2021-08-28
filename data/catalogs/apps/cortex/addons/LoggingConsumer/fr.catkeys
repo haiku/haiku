@@ -1,7 +1,8 @@
-1	french	application/x-vnd.Be.LoggingConsumerApp	274650859
+1	french	application/x-vnd.Be.LoggingConsumerApp	3412272087
 Priority	CortexAddOnsLoggingConsumer		Priorité
 Latency	CortexAddOnsLoggingConsumer		Temps de latence
 Logged input	CortexAddOnsLoggingConsumer		Entrées journalisés
+CPU spin percentage	CortexAddOnsLoggingConsumer		Taux de charge du CPU
 Start	CortexAddOnsLoggingConsumerNodeHarnessWin		Démarrer
 LoggingConsumer parameters	CortexAddOnsLoggingConsumer		Paramètres du LoggingConsumer
 Latency control	CortexAddOnsLoggingConsumer		Contrôle du temps de latence

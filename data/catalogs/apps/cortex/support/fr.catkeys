@@ -1,4 +1,4 @@
-1	french	application/x-vnd.Cortex.support	787758846
+1	french	application/x-vnd.Cortex.support	1390555974
 Header has flags	MediaString		L’en-tête comporte des drapeaux
 Recording	MediaString		Enregistrement
 (unknown format)	MediaString		(format inconnu)
@@ -59,6 +59,8 @@ Side-left	MediaString		Côté-gauche
 8 bit integer	MediaString		Entier 8 bits
 8 bit grayscale-index	MediaString		Palette de gris 8 bits
 YCbCr444	MediaString		YCbCr444
+Buffer producer	MediaString		Tampon producteur
+Buffer consumer	MediaString		Tampon consommateur
 Increase latency	MediaString		Augmenter le temps de latence
 Front-left-center	MediaString		Avant-gauche-milieu
 MPEG format family	MediaString		Famille de formats MPEG
@@ -73,6 +75,7 @@ YCbCr422	MediaString		YCbCr422
 Raw audio	MediaString		Audio brut
 Non-interlaced 	MediaString		Non entrelacé 
 {0, plural,one{# byte (avg)}other{# bytes (avg)}}	MediaString		{0, plural,one{# octet (moy.)}other{# octets (moy.)}}
+MIDI	MediaString		MIDI
 YUV12	MediaString		YUV12
 WAV format family	MediaString		Famille de format WAV
  (NTSC)	MediaString		 (NTSC)
@@ -81,11 +84,13 @@ Big endian	MediaString		Gros-boutiste
 {0, plural,one{# byte (max)}other{# bytes (max)}}	MediaString		{0, plural,one{# octet (max)}other{# octets (max)}}
 YUV411	MediaString		YUV411
 Encoded audio	MediaString		Audio compressé
+File interface	MediaString		Interface fichier
 (unknown byte order)	MediaString		(boutisme inconnu)
  (PAL)	MediaString		 (PAL)
 32 bit RGBA	MediaString		32 bits RVBA
 YCbCr420	MediaString		YCbCr420
  kb/s (avg)	MediaString		 kb/s (moy.)
+HTML	MediaString		HTML
 Time source	MediaString		Référence de temps
 15 bit RGB	MediaString		15 bits RVB
 {0, plural,one{# byte per frame}other{# bytes per frame}}	MediaString		{0, plural,one{# octet par trame}other{# octets par trame}}
@@ -103,6 +108,7 @@ Bottom to top, left to right	MediaString		De bas en haut, et de gauche à droite
 Text	MediaString		Texte
 Unknown media type	MediaString		Type de média inconnu
 MPEG2	MediaString		MPEG2
+Miscellaneous format family	MediaString		Famille de formats divers
 24 bit RGB	MediaString		24 bits RVB
 {0, plural,one{# frame backward}other{# frames backward}}	MediaString		{0, plural,one{# trame en arrière}other{# trames en arrière}}
 Raw video	MediaString		Vidéo brute
