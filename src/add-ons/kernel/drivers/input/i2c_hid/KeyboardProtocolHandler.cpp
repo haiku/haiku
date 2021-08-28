@@ -704,7 +704,7 @@ KeyboardProtocolHandler::_ReadReport(bigtime_t timeout, uint32 *cookie)
 
 			if (key == 0) {
 				// unmapped normal key or consumer/button key
-				key = fKeys[i]->UsageMinimum() + current[i];
+				key = fInputReport.Usages()[0] + current[i];
 			}
 
 			_WriteKey(key, keyDown);

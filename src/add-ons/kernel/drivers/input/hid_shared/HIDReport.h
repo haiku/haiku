@@ -51,6 +51,9 @@ public:
 		HIDReportItem *			ItemAt(uint32 index);
 		HIDReportItem *			FindItem(uint16 usagePage, uint16 usageID);
 
+		uint32 *				Usages();
+		uint32					CountUsages() { return fUsages.Count(); };
+		
 #ifndef USERLAND_HID
 		status_t				WaitForReport(bigtime_t timeout);
 		void					DoneProcessing();
@@ -72,6 +75,9 @@ private:
 		status_t				fReportStatus;
 		uint8 *					fCurrentReport;
 		int32					fBusyCount;
+
+		Vector<uint32>			fUsages;
+		
 
 #ifndef USERLAND_HID
 		ConditionVariable		fConditionVariable;

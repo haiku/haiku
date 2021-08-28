@@ -15,7 +15,7 @@ public:
 									uint32 bitOffset, uint8 bitLength,
 									bool hasData, bool isArray, bool isRelative,
 									uint32 minimum, uint32 maximum,
-									uint32 usageMinimum, uint32 usageMaximum);
+									uint32 usage);
 
 		HIDReport *				Report() { return fReport; };
 
@@ -27,8 +27,7 @@ public:
 		uint16					UsagePage();
 		uint16					UsageID();
 
-		uint32					UsageMinimum() { return fUsageMinimum; };
-		uint32					UsageMaximum() { return fUsageMaximum; };
+		uint32					Usage() { return fUsage; };
 
 		status_t				Extract();
 		status_t				Insert();
@@ -55,8 +54,7 @@ private:
 		bool					fRelative;
 		uint32					fMinimum;
 		uint32					fMaximum;
-		uint32					fUsageMinimum;
-		uint32					fUsageMaximum;
+		uint32					fUsage;
 
 		uint32					fData;
 		bool					fValid;

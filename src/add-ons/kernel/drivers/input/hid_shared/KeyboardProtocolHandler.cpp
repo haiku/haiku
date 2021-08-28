@@ -76,6 +76,7 @@ KeyboardProtocolHandler::KeyboardProtocolHandler(HIDReport &inputReport,
 
 	// find modifiers and keys
 	bool debugUsable = false;
+
 	for (uint32 i = 0; i < inputReport.CountItems(); i++) {
 		HIDReportItem *item = inputReport.ItemAt(i);
 		if (!item->HasData())
@@ -85,26 +86,16 @@ KeyboardProtocolHandler::KeyboardProtocolHandler(HIDReport &inputReport,
 			|| item->UsagePage() == B_HID_USAGE_PAGE_CONSUMER
 			|| item->UsagePage() == B_HID_USAGE_PAGE_BUTTON) {
 			TRACE("keyboard item with usage %" B_PRIx32 "\n",
-				item->UsageMinimum());
+				item->Usage());
 
-			if (item->Array()) {
-				// normal or "consumer"/button keys handled as array items
-				if (fKeyCount < MAX_KEYS)
-					fKeys[fKeyCount++] = item;
+			debugUsable = true;
 
-				if (item->UsagePage() == B_HID_USAGE_PAGE_KEYBOARD)
-					debugUsable = true;
-			} else {
-				if (item->UsagePage() == B_HID_USAGE_PAGE_KEYBOARD
-					&& item->UsageID() >= B_HID_UID_KB_LEFT_CONTROL
-					&& item->UsageID() <= B_HID_UID_KB_RIGHT_GUI) {
-					// modifiers are generally implemented as bitmaps
-					if (fModifierCount < MAX_MODIFIERS)
-						fModifiers[fModifierCount++] = item;
-
-					debugUsable = true;
-				}
-			}
+			if (item->UsageID() >= B_HID_UID_KB_LEFT_CONTROL
+				&& item->UsageID() <= B_HID_UID_KB_RIGHT_GUI) {
+				if (fModifierCount < MAX_MODIFIERS)
+					fModifiers[fModifierCount++] = item;
+			} else if (fKeyCount < MAX_KEYS)
+						fKeys[fKeyCount++] = item;
 		}
 	}
 
@@ -132,6 +123,8 @@ KeyboardProtocolHandler::KeyboardProtocolHandler(HIDReport &inputReport,
 		fStatus = B_NO_MEMORY;
 		return;
 	}
+
+	memset(fLastKeys, 0, fKeyCount * 2 * sizeof(uint16));
 
 	// find leds if we have an output report
 	for (uint32 i = 0; i < MAX_LEDS; i++)
@@ -538,8 +531,17 @@ KeyboardProtocolHandler::_ReadReport(bigtime_t timeout, uint32 *cookie)
 		if (key == NULL)
 			break;
 
-		if (key->Extract() == B_OK && key->Valid())
-			fCurrentKeys[i] = key->Data();
+		if (key->Extract() == B_OK && key->Valid()) {
+			// handle both array and bitmap based keyboard reports
+			if (key->Array()) {
+				fCurrentKeys[i] = key->Data();
+			} else {
+				if (key->Data() == 1) 
+					fCurrentKeys[i] = key->UsageID();
+				else 
+					fCurrentKeys[i] = 0;
+			}
+		}
 		else
 			fCurrentKeys[i] = 0;
 	}
@@ -792,7 +794,7 @@ KeyboardProtocolHandler::_ReadReport(bigtime_t timeout, uint32 *cookie)
 
 			if (key == 0) {
 				// unmapped normal key or consumer/button key
-				key = fKeys[i]->UsageMinimum() + current[i];
+				key = fInputReport.Usages()[0] + current[i];
 			}
 
 			_WriteKey(key, keyDown);

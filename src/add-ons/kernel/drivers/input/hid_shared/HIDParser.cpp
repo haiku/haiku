@@ -112,17 +112,6 @@ HIDParser::ParseReportDescriptor(const uint8 *reportDescriptor,
 						usageStack[i].is_extended = true;
 					}
 
-					if (!localState.usage_minimum.is_extended) {
-						// the specs say if one of them is extended they must
-						// both be extended, so if the minimum isn't, the
-						// maximum mustn't either.
-						localState.usage_minimum.u.s.usage_page
-							= localState.usage_maximum.u.s.usage_page
-								= globalState.usage_page;
-						localState.usage_minimum.is_extended
-							= localState.usage_maximum.is_extended = true;
-					}
-
 					localState.usage_stack = &usageStack[0];
 					localState.usage_stack_used = usageStack.Count();
 				}
@@ -283,7 +272,7 @@ HIDParser::ParseReportDescriptor(const uint8 *reportDescriptor,
 						value.is_extended = itemSize == sizeof(uint32);
 						value.u.extended = data;
 						
-						if (usageStack.PushBack(value)==B_NO_MEMORY) {
+						if (usageStack.PushBack(value) == B_NO_MEMORY) {
 							TRACE_ALWAYS("no memory when growing usages\n");
 							break;
 						}
@@ -303,6 +292,26 @@ HIDParser::ParseReportDescriptor(const uint8 *reportDescriptor,
 						localState.usage_maximum.is_extended
 							= itemSize == sizeof(uint32);
 						localState.usage_maximum_set = true;
+
+						if (localState.usage_minimum.u.extended
+							<= localState.usage_maximum.u.extended) {
+
+							uint32 count = localState.usage_maximum.u.extended
+								- localState.usage_minimum.u.extended + 1;
+							usage_value value = localState.usage_minimum;
+
+							for (uint32 n = 0; n < count ; n++) {
+								if (usageStack.PushBack(value) == B_NO_MEMORY) {
+									TRACE_ALWAYS(
+										"no memory when growing usages\n");
+									break;
+								}
+								value.u.extended++;
+							}
+						}
+
+						localState.usage_minimum_set
+							= localState.usage_maximum_set = false;
 						break;
 
 					case ITEM_TAG_LOCAL_DESIGNATOR_INDEX:
