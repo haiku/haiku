@@ -202,44 +202,6 @@ VideoNode::AcceptFormat(const media_destination &dst, media_format *format)
 	if (format->type != B_MEDIA_RAW_VIDEO)
 		return B_MEDIA_BAD_FORMAT;
 
-	// In order to display video we need to create a buffer that is either
-	// in the overlay colorspace B_YCbCr422
-	// or the requested colorspace if not B_YCbCr422
-	// and we need to tell the node upstream of our choice
-
-	BRect frame(0, 0, format->u.raw_video.display.line_width,
-		format->u.raw_video.display.line_count);
-
-	DeleteBuffers();
-	status_t err;
-
-	if (format->u.raw_video.display.format == B_NO_COLOR_SPACE) {
-		// upstream node is leaving it up to us so we try overlay then B_RGBA32 (We probably should try what format the screen is)
-		err = CreateBuffers(frame, B_YCbCr422, true);
-		SetOverlayEnabled(err == B_OK);
-		if (!fOverlayEnabled) {
-			// no overlay available so fall back to RGBA32
-			err = CreateBuffers(frame, B_RGBA32, false);
-		}
-	} else if (format->u.raw_video.display.format == B_YCbCr422) {
-		// upstream node is likely requesting overlay
-		err = CreateBuffers(frame, B_YCbCr422, true);
-		SetOverlayEnabled(err == B_OK);
-		// if we cannot give them what they want then return error
-	} else {
-		// upstream node is requesting some other format
-		SetOverlayEnabled(false);
-		err = CreateBuffers(frame, format->u.raw_video.display.format, fOverlayEnabled);
-	}
-
-	if (err) {
-		fprintf(stderr, "VideoNode::Connected failed, fOverlayEnabled = %d\n",
-			fOverlayEnabled);
-		return err;
-	} else {
-		format->u.raw_video.display.format = fBitmap->ColorSpace();
-	}
-
 	return B_OK;
 }
 
@@ -264,6 +226,46 @@ VideoNode::Connected(const media_source &src, const media_destination &dst,
 
 	if (fInput.format.u.raw_video.field_rate < 1.0)
 		fInput.format.u.raw_video.field_rate = 25.0;
+
+	// In order to display video we need to create a buffer that is either
+	// in the overlay colorspace B_YCbCr422
+	// or the requested colorspace if not B_YCbCr422
+	// and we need to tell the node upstream of our choice
+
+	BRect frame(0, 0, format.u.raw_video.display.line_width - 1,
+		format.u.raw_video.display.line_count - 1);
+
+	DeleteBuffers();
+	status_t err;
+
+	if (format.u.raw_video.display.format == B_NO_COLOR_SPACE) {
+		// upstream node is leaving it up to us so we try overlay then
+		// B_RGBA32 (We probably should try what format the screen is)
+		err = CreateBuffers(frame, B_YCbCr422, true);
+		SetOverlayEnabled(err == B_OK);
+		if (!fOverlayEnabled) {
+			// no overlay available so fall back to RGBA32
+			err = CreateBuffers(frame, B_RGBA32, false);
+		}
+	} else if (format.u.raw_video.display.format == B_YCbCr422) {
+		// upstream node is likely requesting overlay
+		err = CreateBuffers(frame, B_YCbCr422, true);
+		SetOverlayEnabled(err == B_OK);
+		// if we cannot give them what they want then return error
+	} else {
+		// upstream node is requesting some other format
+		SetOverlayEnabled(false);
+		err = CreateBuffers(frame, format.u.raw_video.display.format,
+			fOverlayEnabled);
+	}
+
+	if (err) {
+		fprintf(stderr, "VideoNode::Connected failed, fOverlayEnabled = %d\n",
+			fOverlayEnabled);
+		return err;
+	} else {
+		fInput.format.u.raw_video.display.format = fBitmap->ColorSpace();
+	}
 
 	*out_input = fInput;
 
