@@ -409,7 +409,7 @@ void MediaJack::_updateBitmap()
 	{
 		delete m_bitmap;
 	}
-	BBitmap *tempBitmap = new BBitmap(Frame().OffsetToCopy(0.0, 0.0), B_CMAP8, true);
+	BBitmap *tempBitmap = new BBitmap(Frame().OffsetToCopy(0.0, 0.0), B_RGBA32, true);
 	tempBitmap->Lock();
 	{
 		BView *tempView = new BView(tempBitmap->Bounds(), "", B_FOLLOW_NONE, 0);

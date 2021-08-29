@@ -108,21 +108,8 @@ void DormantNodeListItem::DrawItem(
 		r.top += (frame.Height() / 2.0) - (B_MINI_ICON / 2.0);
 		r.right = r.left + B_MINI_ICON - 1.0;
 		r.bottom = r.top + B_MINI_ICON - 1.0;
-		if (IsSelected()) {
-			owner->SetHighColor(255, 255, 255, 255);
-			owner->FillRect(r);
-			owner->SetDrawingMode(B_OP_INVERT);
-			owner->DrawBitmap(m_icon, r.LeftTop());
-			owner->SetDrawingMode(B_OP_ALPHA);
-			owner->SetHighColor(0, 0, 0, 180);
-			owner->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_COMPOSITE);
-			owner->DrawBitmap(m_icon, r.LeftTop());
-			owner->SetDrawingMode(B_OP_OVER);
-		}
-		else {
-			owner->SetDrawingMode(B_OP_OVER);
-			owner->DrawBitmap(m_icon, r.LeftTop());
-		}
+		owner->SetDrawingMode(B_OP_OVER);
+		owner->DrawBitmap(m_icon, r.LeftTop());
 	}
 
 	// Draw label

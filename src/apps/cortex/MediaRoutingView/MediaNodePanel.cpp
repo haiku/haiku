@@ -891,7 +891,8 @@ void MediaNodePanel::_updateBitmap()
 	{
 		delete m_bitmap;
 	}
-	BBitmap *tempBitmap = new BBitmap(Frame().OffsetToCopy(0.0, 0.0), B_CMAP8, true);
+	BBitmap *tempBitmap = new BBitmap(Frame().OffsetToCopy(0.0, 0.0),
+		B_RGBA32, true);
 	tempBitmap->Lock();
 	{
 		BView *tempView = new BView(tempBitmap->Bounds(), "", B_FOLLOW_NONE, 0);
@@ -946,21 +947,8 @@ void MediaNodePanel::_drawInto(
 			{
 				p.x = m_bodyRect.left + m_bodyRect.Width() / 2.0 - B_LARGE_ICON / 2.0;
 				p.y = m_labelRect.bottom + m_bodyRect.Height() / 2.0 - B_LARGE_ICON / 2.0;
-				if (isSelected())
-				{
-					target->SetDrawingMode(B_OP_INVERT);
-					target->DrawBitmapAsync(m_icon, p);
-					target->SetDrawingMode(B_OP_ALPHA); 
-					target->SetHighColor(0, 0, 0, 180);       
-					target->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_COMPOSITE);
-					target->DrawBitmapAsync(m_icon, p);
-					target->SetDrawingMode(B_OP_OVER);
-				}
-				else
-				{
-					target->SetDrawingMode(B_OP_OVER);
-					target->DrawBitmapAsync(m_icon, p);
-				}
+				target->SetDrawingMode(B_OP_OVER);
+				target->DrawBitmapAsync(m_icon, p);
 			}
 		
 			// Draw label
@@ -1012,21 +1000,8 @@ void MediaNodePanel::_drawInto(
 			{
 				p.x = m_bodyRect.left + M_BODY_H_MARGIN;
 				p.y = m_bodyRect.top + (m_bodyRect.Height() / 2.0) - (B_MINI_ICON / 2.0);
-				if (isSelected())
-				{
-					target->SetDrawingMode(B_OP_INVERT);
-					target->DrawBitmapAsync(m_icon, p);
-					target->SetDrawingMode(B_OP_ALPHA); 
-					target->SetHighColor(0, 0, 0, 180);       
-					target->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_COMPOSITE);
-					target->DrawBitmapAsync(m_icon, p);
-					target->SetDrawingMode(B_OP_OVER);
-				}
-				else
-				{
-					target->SetDrawingMode(B_OP_OVER);
-					target->DrawBitmapAsync(m_icon, p);
-				}
+				target->SetDrawingMode(B_OP_OVER);
+				target->DrawBitmapAsync(m_icon, p);
 			}
 		
 			// Draw label
