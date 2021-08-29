@@ -54,6 +54,9 @@
 #define NEW(t,n) ((t*) malloc( sizeof(t) * (n) ))
 #define RENEW(o,t,n) ((t*) realloc( (void*) o, sizeof(t) * (n) ))
 
+/* Do overlapping strcpy safely, by using memmove. */
+#define ol_strcpy(dst,src) memmove(dst,src,strlen(src)+1)
+
 
 /* The httpd structs. */
 
@@ -86,7 +89,7 @@ typedef struct {
     int global_passwd;
     char* url_pattern;
     char* local_pattern;
-    int no_empty_referers;
+    int no_empty_referrers;
     //added for poorman
     int do_list_dir;
     char* index_name;
@@ -112,7 +115,7 @@ typedef struct {
     char* encodings;
     char* pathinfo;
     char* query;
-    char* referer;
+    char* referrer;
     char* useragent;
     char* accept;
     char* accepte;
@@ -146,7 +149,8 @@ typedef struct {
     int should_linger;
     struct stat sb;
     int conn_fd;
-    int processed_directory_index;
+	int processed_directory_index;
+    char* file_address;
     } httpd_conn;
 
 /* Methods. */
@@ -154,6 +158,9 @@ typedef struct {
 #define METHOD_GET 1
 #define METHOD_HEAD 2
 #define METHOD_POST 3
+#define METHOD_PUT 4
+#define METHOD_DELETE 5
+#define METHOD_TRACE 6
 
 /* States for checked_state. */
 #define CHST_FIRSTWORD 0
@@ -182,7 +189,7 @@ extern httpd_server* httpd_initialize(
     unsigned short port, char* cgi_pattern, int cgi_limit, char* charset,
     char* p3p, int max_age, char* cwd, int no_log, FILE* logfp,
     int no_symlink_check, int vhost, int global_passwd, char* url_pattern,
-    char* local_pattern, int no_empty_referers );
+    char* local_pattern, int no_empty_referrers );
 
 /* PoorMan: Initialize_listen_socket() is changed from static to extern.
 ** httpd_unlisten() needs an opposite operation that can be accessed from
@@ -261,7 +268,8 @@ extern void httpd_destroy_conn( httpd_conn* hc );
 
 /* Send an error message back to the client. */
 extern void httpd_send_err(
-    httpd_conn* hc, int status, char* title, char* extraheads, char* form, char* arg );
+    httpd_conn* hc, int status, char* title, char* extraheads, char* form,
+    char* arg );
 
 /* Some error messages. */
 extern char* httpd_err400title;
@@ -290,7 +298,7 @@ extern void httpd_clear_ndelay( int fd );
 extern int httpd_read_fully( int fd, void* buf, size_t nbytes );
 
 /* Write the requested buffer completely, accounting for interruptions. */
-extern int httpd_write_fully( int fd, const void* buf, size_t nbytes );
+extern int httpd_write_fully( int fd, const char* buf, size_t nbytes );
 
 /* Generate debugging statistics syslog message. */
 extern void httpd_logstats( long secs );
