@@ -45,6 +45,12 @@
 #define R_X86_64_TLSDESC_CALL		35	/* Marker for call through TLS descriptor. */
 #define R_X86_64_TLSDESC			36	/* TLS descriptor. */
 #define R_X86_64_IRELATIVE			37	/* Adjust indirectly by program base. */
+#define R_X86_64_RELATIVE64			38	/* 64-bit adjust by program base */
+/* 39 and 40 were BND-related, already decomissioned */
+#define R_X86_64_GOTPCRELX			40	/* Load from 32 bit signed pc relative offset to GOT entry
+										without REX prefix, relaxable. */
+#define R_X86_64_REX_GOTPCRELX		41	/* Load from 32 bit signed pc relative offset to GOT entry
+										with REX prefix, relaxable. */
 
 
 #if defined(_BOOT_MODE) || defined(ELF32_COMPAT)

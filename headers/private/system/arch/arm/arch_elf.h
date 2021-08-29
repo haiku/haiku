@@ -25,6 +25,9 @@
 #define R_ARM_THM_SWI8          14
 #define R_ARM_XPC25             15
 #define R_ARM_THM_XPC22         16
+#define	R_ARM_TLS_DTPMOD32		17		/* ID of module containing symbol */
+#define	R_ARM_TLS_DTPOFF32		18		/* Offset in TLS block */
+#define	R_ARM_TLS_TPOFF32		19		/* Offset in static TLS block */
 #define R_ARM_COPY              20      /* Copy symbol at runtime */
 #define R_ARM_GLOB_DAT          21      /* Create GOT entry */
 #define R_ARM_JMP_SLOT          22      /* Create PLT entry */
