@@ -1,8 +1,6 @@
 SubDir HAIKU_TOP src libs uuid ;
 
-SubDirCcFlags [ FDefines _KERNEL_MODE ] ;
-
-StaticLibrary libuuid_kernel.a :
+KernelStaticLibrary libuuid_kernel.a :
 	clear.c
 	compare.c
 	copy.c
