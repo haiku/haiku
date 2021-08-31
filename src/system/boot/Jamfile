@@ -346,7 +346,7 @@ for platform in [ MultiBootSubDirSetup ] {
 		switch $(TARGET_BOOT_PLATFORM) {
 			case efi :
 				BuildEFILoader haiku_loader.$(TARGET_BOOT_PLATFORM) : boot_loader_$(TARGET_BOOT_PLATFORM) ;
-				if $(TARGET_ARCH) = arm || $(TARGET_ARCH) = arm64 || $(TARGET_ARCH) = riscv64 {
+				if $(TARGET_ARCH) = arm || $(TARGET_ARCH) = riscv64 {
 					# These EFI platforms need u-boot to get them going
 					BuildUImageScript boot.scr
 						: [ FDirName $(HAIKU_TOP) data boot u-boot boot-$(TARGET_ARCH).scr.txt ] ;
