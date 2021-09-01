@@ -254,7 +254,7 @@ Device::Device(Object* parent, int8 hubAddress, uint8 hubPort,
 					break;
 				}
 
-				case USB_DESCRIPTOR_ENDPOINT_COMPANION: {
+				case USB_DESCRIPTOR_ENDPOINT_SS_COMPANION: {
 					if (currentInterface != NULL) {
 						usb_endpoint_descriptor* desc
 							= currentInterface->endpoint[
@@ -496,7 +496,7 @@ Device::InitEndpoints(int32 interfaceIndex)
 			usb_endpoint_info* endpoint = &interfaceInfo->endpoint[i];
 			Pipe* pipe = NULL;
 
-			usb_endpoint_companion_descriptor* comp_descr = NULL;
+			usb_endpoint_ss_companion_descriptor* comp_descr = NULL;
 			if (fSpeed == USB_SPEED_SUPERSPEED) {
 				// We should have a companion descriptor for this device.
 				// Let's find it: it'll be the "i"th one.
@@ -504,11 +504,12 @@ Device::InitEndpoints(int32 interfaceIndex)
 				for (size_t j = 0; j < interfaceInfo->generic_count; j++) {
 					usb_descriptor* desc = interfaceInfo->generic[j];
 					if (desc->endpoint.descriptor_type
-							!= USB_DESCRIPTOR_ENDPOINT_COMPANION) {
+							!= USB_DESCRIPTOR_ENDPOINT_SS_COMPANION) {
 						continue;
 					}
 					if (k == i) {
-						comp_descr = (usb_endpoint_companion_descriptor*)desc;
+						comp_descr =
+							(usb_endpoint_ss_companion_descriptor*)desc;
 						break;
 					}
 					k++;
