@@ -13,6 +13,7 @@
 #include <iovec.h>
 
 #include <USB_spec.h>
+#include <USB_isochronous.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -72,12 +73,6 @@ struct usb_configuration_info {
 	size_t						interface_count;/* interfaces in this config */
 	usb_interface_list			*interface;
 };
-
-typedef struct {
-	int16						request_length;
-	int16						actual_length;
-	status_t					status;
-} usb_iso_packet_descriptor;
 
 // Flags for queue_isochronous
 #define	USB_ISO_ASAP	0x01
