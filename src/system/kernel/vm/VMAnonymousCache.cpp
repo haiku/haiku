@@ -44,6 +44,7 @@
 #include <slab/Slab.h>
 #include <syscalls.h>
 #include <system_info.h>
+#include <thread.h>
 #include <tracing.h>
 #include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>

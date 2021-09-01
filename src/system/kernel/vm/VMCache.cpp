@@ -22,6 +22,7 @@
 #include <kernel.h>
 #include <slab/Slab.h>
 #include <smp.h>
+#include <thread.h>
 #include <tracing.h>
 #include <util/AutoLock.h>
 #include <vfs.h>
