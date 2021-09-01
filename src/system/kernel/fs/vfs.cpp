@@ -52,6 +52,7 @@
 #include <tracing.h>
 #include <util/atomic.h>
 #include <util/AutoLock.h>
+#include <util/ThreadAutoLock.h>
 #include <util/DoublyLinkedList.h>
 #include <vfs.h>
 #include <vm/vm.h>

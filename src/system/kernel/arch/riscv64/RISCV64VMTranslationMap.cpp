@@ -17,6 +17,7 @@
 #include <slab/Slab.h>
 
 #include <util/AutoLock.h>
+#include <util/ThreadAutoLock.h>
 
 
 //#define DISABLE_MODIFIED_FLAGS 1

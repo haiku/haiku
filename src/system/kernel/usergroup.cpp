@@ -19,6 +19,7 @@
 #include <thread.h>
 #include <thread_types.h>
 #include <util/AutoLock.h>
+#include <util/ThreadAutoLock.h>
 #include <vfs.h>
 
 #include <AutoDeleter.h>

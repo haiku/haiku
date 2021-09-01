@@ -47,6 +47,7 @@
 #include <team.h>
 #include <tracing.h>
 #include <util/AutoLock.h>
+#include <util/ThreadAutoLock.h>
 #include <vm/vm_page.h>
 #include <vm/vm_priv.h>
 #include <vm/VMAddressSpace.h>

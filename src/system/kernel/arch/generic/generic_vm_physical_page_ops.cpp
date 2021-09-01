@@ -8,6 +8,7 @@
 
 #include <vm/vm.h>
 #include <util/AutoLock.h>
+#include <util/ThreadAutoLock.h>
 
 
 status_t

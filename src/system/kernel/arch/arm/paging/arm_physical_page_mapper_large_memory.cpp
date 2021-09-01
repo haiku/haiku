@@ -34,6 +34,7 @@
 #include <lock.h>
 #include <smp.h>
 #include <util/AutoLock.h>
+#include <util/ThreadAutoLock.h>
 #include <vm/vm.h>
 #include <vm/vm_types.h>
 #include <vm/VMAddressSpace.h>

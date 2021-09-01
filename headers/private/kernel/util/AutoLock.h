@@ -14,7 +14,6 @@
 
 #include <int.h>
 #include <lock.h>
-#include <thread.h>
 
 
 namespace BPrivate {
@@ -298,27 +297,6 @@ typedef AutoLocker<seqlock, InterruptsWriteSequentialLocking>
 	InterruptsWriteSequentialLocker;
 
 
-class ThreadCPUPinLocking {
-public:
-	inline bool Lock(Thread* thread)
-	{
-		thread_pin_to_current_cpu(thread);
-		return true;
-	}
-
-	inline void Unlock(Thread* thread)
-	{
-		thread_unpin_from_current_cpu(thread);
-	}
-};
-
-typedef AutoLocker<Thread, ThreadCPUPinLocking> ThreadCPUPinner;
-
-
-typedef AutoLocker<Team> TeamLocker;
-typedef AutoLocker<Thread> ThreadLocker;
-
-
 }	// namespace BPrivate
 
 using BPrivate::AutoLocker;
@@ -335,9 +313,6 @@ using BPrivate::WriteSpinLocker;
 using BPrivate::InterruptsWriteSpinLocker;
 using BPrivate::WriteSequentialLocker;
 using BPrivate::InterruptsWriteSequentialLocker;
-using BPrivate::ThreadCPUPinner;
-using BPrivate::TeamLocker;
-using BPrivate::ThreadLocker;
 
 
 #endif	// KERNEL_UTIL_AUTO_LOCKER_H

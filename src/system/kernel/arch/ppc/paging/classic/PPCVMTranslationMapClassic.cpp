@@ -84,6 +84,7 @@
 #include <slab/Slab.h>
 #include <smp.h>
 #include <util/AutoLock.h>
+#include <util/ThreadAutoLock.h>
 #include <util/queue.h>
 #include <vm/vm_page.h>
 #include <vm/vm_priv.h>

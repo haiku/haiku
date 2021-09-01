@@ -18,6 +18,7 @@
 #include <thread_types.h>
 #include <user_debugger.h>
 #include <util/AutoLock.h>
+#include <util/ThreadAutoLock.h>
 
 #include <stdlib.h>
 #include <string.h>

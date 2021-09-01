@@ -26,6 +26,7 @@
 #include <OS.h>
 
 #include <util/AutoLock.h>
+#include <util/ThreadAutoLock.h>
 
 #include <arch/debug.h>
 #include <boot/kernel_args.h>

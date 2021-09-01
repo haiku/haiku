@@ -35,6 +35,7 @@
 #include <user_debugger.h>
 #include <user_thread.h>
 #include <util/AutoLock.h>
+#include <util/ThreadAutoLock.h>
 
 
 //#define TRACE_SIGNAL

@@ -34,6 +34,7 @@
 
 #include <AutoDeleter.h>
 #include <util/AutoLock.h>
+#include <util/ThreadAutoLock.h>
 
 #include "BreakpointManager.h"
 

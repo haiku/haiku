@@ -58,6 +58,7 @@
 #include <vm/vm.h>
 #include <vm/VMAddressSpace.h>
 #include <util/AutoLock.h>
+#include <util/ThreadAutoLock.h>
 
 #include "TeamThreadTables.h"
 
