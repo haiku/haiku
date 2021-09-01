@@ -12,6 +12,7 @@
 #include <util/AutoLock.h>
 
 #include <debug.h>
+#include <kernel.h>
 
 #include "Driver.h"
 #include "KeyboardProtocolHandler.h"

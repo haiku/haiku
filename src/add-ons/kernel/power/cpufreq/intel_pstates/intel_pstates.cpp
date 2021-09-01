@@ -10,6 +10,7 @@
 
 #include <cpufreq.h>
 #include <KernelExport.h>
+#include <new>
 
 #include <arch_cpu.h>
 #include <cpu.h>

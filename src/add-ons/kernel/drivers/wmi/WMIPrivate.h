@@ -14,6 +14,7 @@
 #include <lock.h>
 #include <smbios.h>
 #include <util/AutoLock.h>
+#include <util/DoublyLinkedList.h>
 #include <wmi.h>
 
 

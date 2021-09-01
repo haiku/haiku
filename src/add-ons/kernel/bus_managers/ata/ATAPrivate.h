@@ -13,6 +13,7 @@
 #include <ata_types.h>
 #include <bus/ATA.h>
 #include <bus/SCSI.h>
+#include <condition_variable.h>
 #include <device_manager.h>
 #include <lock.h>
 #include <new>

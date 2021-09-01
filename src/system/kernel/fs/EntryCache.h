@@ -9,6 +9,7 @@
 #include <stdlib.h>
 
 #include <util/AutoLock.h>
+#include <util/DoublyLinkedList.h>
 #include <util/OpenHashTable.h>
 #include <util/StringHash.h>
 

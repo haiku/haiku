@@ -6,6 +6,7 @@
 
 #include "I2CPrivate.h"
 
+#include <kernel.h>
 #include <StackOrHeapArray.h>
 
 

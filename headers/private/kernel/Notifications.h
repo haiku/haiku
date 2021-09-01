@@ -22,6 +22,7 @@
 #include <Referenceable.h>
 
 #include <util/AutoLock.h>
+#include <util/DoublyLinkedList.h>
 #include <util/KMessage.h>
 #include <util/OpenHashTable.h>
 

@@ -9,6 +9,7 @@
 #define RPCCALLBACKSERVER_H
 
 
+#include <string.h>
 #include <util/AutoLock.h>
 
 #include "Connection.h"

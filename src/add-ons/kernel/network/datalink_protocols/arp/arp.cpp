@@ -22,6 +22,7 @@
 #include <util/atomic.h>
 #include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
+#include <util/OpenHashTable.h>
 
 #include <ByteOrder.h>
 #include <KernelExport.h>

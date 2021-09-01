@@ -18,6 +18,7 @@
 #include <USB3.h>
 #include <KernelExport.h>
 
+#include <ByteOrder.h>
 #include <util/AutoLock.h>
 
 #include "xhci.h"
