@@ -10,6 +10,7 @@
 
 #include <string.h>
 
+#include <smp.h>
 #include <util/AutoLock.h>
 #include <vm/vm.h>
 #include <vm/VMAddressSpace.h>
