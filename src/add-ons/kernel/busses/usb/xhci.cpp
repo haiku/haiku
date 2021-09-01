@@ -1808,12 +1808,12 @@ XHCI::_RemoveEndpointForPipe(Pipe *pipe)
 		memset(endpoint, 0, sizeof(xhci_endpoint));
 
 		_WriteContext(&device->input_ctx->input.dropFlags, (1 << epNumber));
-		_WriteContext(&device->input_ctx->input.addFlags, 0);
+		_WriteContext(&device->input_ctx->input.addFlags, (1 << 0));
 
-		if (epNumber > 1)
-			ConfigureEndpoint(device->input_ctx_addr, true, device->slot);
-		else
-			EvaluateContext(device->input_ctx_addr, device->slot);
+		// The Deconfigure bit in the Configure Endpoint command indicates
+		// that *all* endpoints are to be deconfigured, and not just the ones
+		// specified in the context flags. (XHCI 1.2 § 4.6.6 p115.)
+		ConfigureEndpoint(device->input_ctx_addr, false, device->slot);
 	}
 
 	return B_OK;
