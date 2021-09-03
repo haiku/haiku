@@ -31,7 +31,6 @@ Stream::Stream(Device* device, size_t interface, usb_interface_list* List)
 	fCurrentBuffer(0),
 	fSamplesCount(0),
 	fStartingFrame(0),
-	fPacketSize(0),
 	fProcessedBuffers(0),
 	fInsideNotify(0)
 {
@@ -164,11 +163,11 @@ Stream::_SetupBuffers()
 	uint32 sampleSize = format->fNumChannels * format->fSubframeSize;
 
 	// data size pro 1 ms USB 1 frame or 1/8 ms USB 2 microframe
-	fPacketSize = samplingRate * sampleSize
+	size_t packetSize = samplingRate * sampleSize
 		/ (fDevice->fUSBVersion < 0x0200 ? 1000 : 8000);
-	TRACE(INF, "packetSize:%ld\n", fPacketSize);
+	TRACE(INF, "packetSize:%ld\n", packetSize);
 
-	if (fPacketSize == 0) {
+	if (packetSize == 0) {
 		TRACE(ERR, "computed packet size is 0!");
 		return B_BAD_VALUE;
 	}
@@ -180,7 +179,7 @@ Stream::_SetupBuffers()
 		delete fDescriptors;
 	}
 
-	fAreaSize = sampleSize * kSamplesBufferSize;
+	fAreaSize = sampleSize * kSamplesBufferSize * kSamplesBufferCount;
 	TRACE(INF, "estimate fAreaSize:%d\n", fAreaSize);
 
 	// round up to B_PAGE_SIZE and create area
@@ -210,19 +209,19 @@ Stream::_SetupBuffers()
 	TRACE(INF, "Created area id:%d at addr:%#010x size:%#010lx\n",
 		fArea, fDescriptors, fAreaSize);
 
-	fDescriptorsCount = fAreaSize / fPacketSize;
+	fDescriptorsCount = fAreaSize / packetSize;
 	// we need same size sub-buffers. round it
 	fDescriptorsCount = ROUNDDOWN(fDescriptorsCount, kSamplesBufferCount);
 	fDescriptors = new usb_iso_packet_descriptor[fDescriptorsCount];
 	TRACE(INF, "descriptorsCount:%d\n", fDescriptorsCount);
 
 	// samples count
-	fSamplesCount = fDescriptorsCount * fPacketSize / sampleSize;
+	fSamplesCount = fDescriptorsCount * packetSize / sampleSize;
 	TRACE(INF, "samplesCount:%d\n", fSamplesCount);
 
 	// initialize descriptors array
 	for (size_t i = 0; i < fDescriptorsCount; i++) {
-		fDescriptors[i].request_length = fPacketSize;
+		fDescriptors[i].request_length = packetSize;
 		fDescriptors[i].actual_length = 0;
 		fDescriptors[i].status = B_OK;
 	}
@@ -317,7 +316,7 @@ Stream::_QueueNextTransfer(size_t queuedBuffer, bool start)
 		Stream::_TransferCallback, this);
 
 	TRACE(DTA, "frame:%#010x\n", fStartingFrame);
-	return status; // B_OK;
+	return status;
 }
 
 
@@ -325,6 +324,8 @@ void
 Stream::_TransferCallback(void* cookie, status_t status, void* data,
 	size_t actualLength)
 {
+	TRACE(DTA, "st:%#010x, data:%#010x, len:%d\n", status, data, actualLength);
+
 	Stream* stream = (Stream*)cookie;
 	atomic_add(&stream->fInsideNotify, 1);
 	if (status == B_CANCELED || stream->fDevice->fRemoved || !stream->fIsRunning) {
@@ -334,18 +335,15 @@ Stream::_TransferCallback(void* cookie, status_t status, void* data,
 		return;
 	}
 
-	stream->fCurrentBuffer = (stream->fCurrentBuffer + 1) % kSamplesBufferCount;
-
 	stream->_DumpDescriptors();
-
-	/*status_t result =*/ stream->_QueueNextTransfer(stream->fCurrentBuffer, false);
 
 	if (atomic_add(&stream->fProcessedBuffers, 1) > (int32)kSamplesBufferCount)
 		TRACE(ERR, "Processed buffers overflow:%d\n", stream->fProcessedBuffers);
 
 	release_sem_etc(stream->fDevice->fBuffersReadySem, 1, B_DO_NOT_RESCHEDULE);
 
-	TRACE(DTA, "st:%#010x, data:%#010x, len:%d\n", status, data, actualLength);
+	stream->fCurrentBuffer = (stream->fCurrentBuffer + 1) % kSamplesBufferCount;
+	status = stream->_QueueNextTransfer(stream->fCurrentBuffer, false);
 
 	atomic_add(&stream->fInsideNotify, -1);
 }
@@ -498,13 +496,9 @@ Stream::GetBuffers(multi_buffer_list* List)
 			uint32 stride = format->fSubframeSize * format->fNumChannels;
 			descs[channel].stride = stride;
 
-			// init to buffers area begin
+			size_t bufferSize = (fSamplesCount / kSamplesBufferCount) * stride;
 			descs[channel].base = (char*)fBuffers;
-			// shift for whole buffer if required
-			size_t bufferSize = fPacketSize
-				* (fDescriptorsCount / kSamplesBufferCount);
 			descs[channel].base += buffer * bufferSize;
-			// shift for channel if required
 			descs[channel].base += channel * format->fSubframeSize;
 
 			TRACE(DTA, "%d:%d: base:%#010x; stride:%#010x\n", buffer, channel,

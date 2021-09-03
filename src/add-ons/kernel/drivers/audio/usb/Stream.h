@@ -58,7 +58,6 @@ protected:
 			size_t			fCurrentBuffer;
 			size_t			fSamplesCount;
 
-			size_t			fPacketSize;
 			uint32			fStartingFrame;
 			int32			fProcessedBuffers;
 			int32			fInsideNotify;
