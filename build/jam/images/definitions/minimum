@@ -217,7 +217,7 @@ SYSTEM_ADD_ONS_BUS_MANAGERS = [ FFilterByBuildFeatures
 	mmc
 	scsi
 	pci ps2@x86,x86_64
-	fdt@riscv64
+	fdt@riscv64,arm
 	random
 	usb
 	virtio
