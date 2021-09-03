@@ -29,8 +29,8 @@ Stream::Stream(Device* device, size_t interface, usb_interface_list* List)
 	fDescriptors(NULL),
 	fDescriptorsCount(0),
 	fCurrentBuffer(0),
-	fStartingFrame(0),
 	fSamplesCount(0),
+	fStartingFrame(0),
 	fPacketSize(0),
 	fProcessedBuffers(0),
 	fInsideNotify(0)
@@ -146,7 +146,7 @@ Stream::OnRemove()
 	// not inside the callback anymore before returning, as we would otherwise
 	// violate the promise not to use any of the pipes after returning from the
 	// removed callback
-	while (atomic_add(&fInsideNotify, 0) != 0)
+	while (atomic_get(&fInsideNotify) != 0)
 		snooze(100);
 
 	gUSBModule->cancel_queued_transfers(fStreamEndpoint);
@@ -285,7 +285,7 @@ Stream::Stop()
 {
 	if (fIsRunning) {
 		// wait until possible notification handling finished...
-		while (atomic_add(&fInsideNotify, 0) != 0)
+		while (atomic_get(&fInsideNotify) != 0)
 			snooze(100);
 		fIsRunning = false;
 	}
@@ -328,9 +328,9 @@ Stream::_TransferCallback(void* cookie, status_t status, void* data,
 	Stream* stream = (Stream*)cookie;
 	atomic_add(&stream->fInsideNotify, 1);
 	if (status == B_CANCELED || stream->fDevice->fRemoved || !stream->fIsRunning) {
-		atomic_add(&stream->fInsideNotify, -1);
 		TRACE(ERR, "Cancelled: c:%p st:%#010x, data:%#010x, len:%d\n",
 			cookie, status, data, actualLength);
+		atomic_add(&stream->fInsideNotify, -1);
 		return;
 	}
 
@@ -354,10 +354,7 @@ Stream::_TransferCallback(void* cookie, status_t status, void* data,
 void
 Stream::_DumpDescriptors()
 {
-	//size_t packetsCount = fDescriptorsCount / kSamplesBufferCount;
-	size_t from = /*fCurrentBuffer > 0 ? packetsCount :*/ 0 ;
-	size_t to   = /*fCurrentBuffer > 0 ?*/ fDescriptorsCount /*: packetsCount*/ ;
-	for (size_t i = from; i < to; i++)
+	for (size_t i = 0; i < fDescriptorsCount; i++)
 		TRACE(ISO, "%d:req_len:%d; act_len:%d; stat:%#010x\n", i,
 			fDescriptors[i].request_length,	fDescriptors[i].actual_length,
 			fDescriptors[i].status);
@@ -489,8 +486,6 @@ Stream::GetBuffers(multi_buffer_list* List)
 
 	TypeIFormatDescriptor* format = static_cast<TypeIFormatDescriptor*>(
 		fAlternates[fActiveAlternate]->Format());
-//	const ASEndpointDescriptor* endpoint
-//					= fAlternates[fActiveAlternate]->Endpoint();
 
 	// [buffer][channel] init buffers
 	for (size_t buffer = 0; buffer < kSamplesBufferCount; buffer++) {
@@ -538,7 +533,7 @@ Stream::GetBuffers(multi_buffer_list* List)
 bool
 Stream::ExchangeBuffer(multi_buffer_info* Info)
 {
-	if (fProcessedBuffers <= 0)
+	if (atomic_get(&fProcessedBuffers) <= 0)
 		return false;
 
 	if (fIsInput) {

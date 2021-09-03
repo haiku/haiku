@@ -694,9 +694,10 @@ Device::_MultiBufferExchange(multi_buffer_info* multiInfo)
 		return B_BAD_ADDRESS;
 	}
 
-	for (int i = 0; i < fStreams.Count(); i++)
+	for (int i = 0; i < fStreams.Count(); i++) {
 		if (!fStreams[i]->IsRunning())
 			fStreams[i]->Start();
+	}
 
 	status_t status = acquire_sem_etc(fBuffersReadySem, 1,
 		B_RELATIVE_TIMEOUT | B_CAN_INTERRUPT, 50000);
@@ -706,11 +707,12 @@ Device::_MultiBufferExchange(multi_buffer_info* multiInfo)
 	}
 
 	status = B_ERROR;
-	for (int i = 0; i < fStreams.Count(); i++)
+	for (int i = 0; i < fStreams.Count(); i++) {
 		if (fStreams[i]->ExchangeBuffer(&Info)) {
 			status = B_OK;
 			break;
 		}
+	}
 
 	if (status != B_OK) {
 		TRACE(ERR, "Error processing buffers:%08x.\n", status);
