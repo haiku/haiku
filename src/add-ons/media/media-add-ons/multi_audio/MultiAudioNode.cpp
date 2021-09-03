@@ -193,59 +193,58 @@ MultiAudioNode::MultiAudioNode(BMediaAddOn* addon, const char* name,
 	fAddOn = addon;
 	fId = internalID;
 
-	AddNodeKind(B_PHYSICAL_OUTPUT);
-	AddNodeKind(B_PHYSICAL_INPUT);
+	if (fDevice->Description().output_channel_count > 0) {
+		// initialize our preferred format objects
+		fOutputPreferredFormat.type = B_MEDIA_RAW_AUDIO;
+		fOutputPreferredFormat.u.raw_audio.format
+			= MultiAudio::convert_to_media_format(
+				fDevice->FormatInfo().output.format);
+		fOutputPreferredFormat.u.raw_audio.valid_bits
+			= MultiAudio::convert_to_valid_bits(
+				fDevice->FormatInfo().output.format);
+		fOutputPreferredFormat.u.raw_audio.channel_count = 2;
+		fOutputPreferredFormat.u.raw_audio.frame_rate
+			= MultiAudio::convert_to_sample_rate(fDevice->FormatInfo().output.rate);
+			// measured in Hertz
+		fOutputPreferredFormat.u.raw_audio.byte_order = B_MEDIA_HOST_ENDIAN;
 
-	// initialize our preferred format objects
-	fOutputPreferredFormat.type = B_MEDIA_RAW_AUDIO;
-	fOutputPreferredFormat.u.raw_audio.format
-		= MultiAudio::convert_to_media_format(
-			fDevice->FormatInfo().output.format);
-	fOutputPreferredFormat.u.raw_audio.valid_bits
-		= MultiAudio::convert_to_valid_bits(
-			fDevice->FormatInfo().output.format);
-	fOutputPreferredFormat.u.raw_audio.channel_count = 2;
-	fOutputPreferredFormat.u.raw_audio.frame_rate
-		= MultiAudio::convert_to_sample_rate(fDevice->FormatInfo().output.rate);
-		// measured in Hertz
-	fOutputPreferredFormat.u.raw_audio.byte_order = B_MEDIA_HOST_ENDIAN;
+		if (fOutputPreferredFormat.u.raw_audio.format != 0) {
+			AddNodeKind(B_PHYSICAL_OUTPUT);
 
-	if (fOutputPreferredFormat.u.raw_audio.format == 0) {
-		fInitStatus = B_BAD_VALUE;
-		return;
+			// we'll use the consumer's preferred buffer size, if any
+			fOutputPreferredFormat.u.raw_audio.buffer_size
+				= fDevice->BufferList().return_playback_buffer_size
+					* (fOutputPreferredFormat.u.raw_audio.format
+							& media_raw_audio_format::B_AUDIO_SIZE_MASK)
+					* fOutputPreferredFormat.u.raw_audio.channel_count;
+		}
 	}
 
-	// we'll use the consumer's preferred buffer size, if any
-	fOutputPreferredFormat.u.raw_audio.buffer_size
-		= fDevice->BufferList().return_playback_buffer_size
-			* (fOutputPreferredFormat.u.raw_audio.format
-					& media_raw_audio_format::B_AUDIO_SIZE_MASK)
-			* fOutputPreferredFormat.u.raw_audio.channel_count;
+	if (fDevice->Description().input_channel_count > 0) {
+		// initialize our preferred format objects
+		fInputPreferredFormat.type = B_MEDIA_RAW_AUDIO;
+		fInputPreferredFormat.u.raw_audio.format
+			= MultiAudio::convert_to_media_format(
+				fDevice->FormatInfo().input.format);
+		fInputPreferredFormat.u.raw_audio.valid_bits
+			= MultiAudio::convert_to_valid_bits(fDevice->FormatInfo().input.format);
+		fInputPreferredFormat.u.raw_audio.channel_count = 2;
+		fInputPreferredFormat.u.raw_audio.frame_rate
+			= MultiAudio::convert_to_sample_rate(fDevice->FormatInfo().input.rate);
+			// measured in Hertz
+		fInputPreferredFormat.u.raw_audio.byte_order = B_MEDIA_HOST_ENDIAN;
 
-	// initialize our preferred format objects
-	fInputPreferredFormat.type = B_MEDIA_RAW_AUDIO;
-	fInputPreferredFormat.u.raw_audio.format
-		= MultiAudio::convert_to_media_format(
-			fDevice->FormatInfo().input.format);
-	fInputPreferredFormat.u.raw_audio.valid_bits
-		= MultiAudio::convert_to_valid_bits(fDevice->FormatInfo().input.format);
-	fInputPreferredFormat.u.raw_audio.channel_count = 2;
-	fInputPreferredFormat.u.raw_audio.frame_rate
-		= MultiAudio::convert_to_sample_rate(fDevice->FormatInfo().input.rate);
-		// measured in Hertz
-	fInputPreferredFormat.u.raw_audio.byte_order = B_MEDIA_HOST_ENDIAN;
+		if (fInputPreferredFormat.u.raw_audio.format != 0) {
+			AddNodeKind(B_PHYSICAL_INPUT);
 
-	if (fInputPreferredFormat.u.raw_audio.format == 0) {
-		fInitStatus = B_BAD_VALUE;
-		return;
+			// we'll use the consumer's preferred buffer size, if any
+			fInputPreferredFormat.u.raw_audio.buffer_size
+				= fDevice->BufferList().return_record_buffer_size
+					* (fInputPreferredFormat.u.raw_audio.format
+							& media_raw_audio_format::B_AUDIO_SIZE_MASK)
+					* fInputPreferredFormat.u.raw_audio.channel_count;
+		}
 	}
-
-	// we'll use the consumer's preferred buffer size, if any
-	fInputPreferredFormat.u.raw_audio.buffer_size
-		= fDevice->BufferList().return_record_buffer_size
-			* (fInputPreferredFormat.u.raw_audio.format
-					& media_raw_audio_format::B_AUDIO_SIZE_MASK)
-			* fInputPreferredFormat.u.raw_audio.channel_count;
 
 	if (config != NULL) {
 		fConfig = *config;
