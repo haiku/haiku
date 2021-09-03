@@ -719,8 +719,14 @@ UHCI::SubmitTransfer(Transfer *transfer)
 		return SubmitRequest(transfer);
 
 	// Process isochronous transfers
+#if 0
 	if (pipe->Type() & USB_OBJECT_ISO_PIPE)
 		return SubmitIsochronous(transfer);
+#else
+	// At present, isochronous transfers cause busylooping, and do not seem to work.
+	if (pipe->Type() & USB_OBJECT_ISO_PIPE)
+		return B_NOT_SUPPORTED;
+#endif
 
 	uhci_td *firstDescriptor = NULL;
 	uhci_qh *transferQueue = NULL;
