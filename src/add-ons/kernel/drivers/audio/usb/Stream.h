@@ -49,10 +49,12 @@ protected:
 			uint8			fTerminalID;
 			usb_pipe		fStreamEndpoint;
 			bool			fIsRunning;
-			area_id			fArea;
+			area_id			fArea, fKernelArea;
 			size_t			fAreaSize;
-			usb_iso_packet_descriptor*	fDescriptors;
+			usb_iso_packet_descriptor* fDescriptors;
 			size_t			fDescriptorsCount;
+			uint8*			fBuffers;
+			uint8*			fKernelBuffers;
 			size_t			fCurrentBuffer;
 			uint32			fStartingFrame;
 			size_t			fSamplesCount;

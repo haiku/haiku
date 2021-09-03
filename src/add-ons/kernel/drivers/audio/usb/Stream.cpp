@@ -24,6 +24,7 @@ Stream::Stream(Device* device, size_t interface, usb_interface_list* List)
 	fStreamEndpoint(0),
 	fIsRunning(false),
 	fArea(-1),
+	fKernelArea(-1),
 	fAreaSize(0),
 	fDescriptors(NULL),
 	fDescriptorsCount(0),
@@ -40,6 +41,8 @@ Stream::Stream(Device* device, size_t interface, usb_interface_list* List)
 Stream::~Stream()
 {
 	delete_area(fArea);
+	delete_area(fKernelArea);
+	delete fDescriptors;
 }
 
 
@@ -173,21 +176,21 @@ Stream::_SetupBuffers()
 	if (fArea != -1) {
 		Stop();
 		delete_area(fArea);
+		delete_area(fKernelArea);
+		delete fDescriptors;
 	}
 
-	fAreaSize = (sizeof(usb_iso_packet_descriptor) + fPacketSize)
-		* sampleSize * 1024 / fPacketSize;
+	fAreaSize = sampleSize * kSamplesBufferSize;
 	TRACE(INF, "estimate fAreaSize:%d\n", fAreaSize);
 
 	// round up to B_PAGE_SIZE and create area
 	fAreaSize = (fAreaSize + (B_PAGE_SIZE - 1)) &~ (B_PAGE_SIZE - 1);
 	TRACE(INF, "rounded up fAreaSize:%d\n", fAreaSize);
 
-	fArea = create_area( (fIsInput) ? DRIVER_NAME "_record_area"
-		: DRIVER_NAME "_playback_area", (void**)&fDescriptors,
-		B_ANY_KERNEL_ADDRESS, fAreaSize, B_CONTIGUOUS,
+	fArea = create_area(fIsInput ? DRIVER_NAME "_record_area"
+		: DRIVER_NAME "_playback_area", (void**)&fBuffers,
+		B_ANY_ADDRESS, fAreaSize, B_NO_LOCK,
 		B_READ_AREA | B_WRITE_AREA);
-
 	if (fArea < 0) {
 		TRACE(ERR, "Error of creating %#x - "
 			"bytes size buffer area:%#010x\n", fAreaSize, fArea);
@@ -195,16 +198,22 @@ Stream::_SetupBuffers()
 		return fStatus;
 	}
 
+	// The kernel is not allowed to touch userspace areas, so we clone our
+	// area into kernel space.
+	fKernelArea = clone_area("usb_audio cloned area", (void**)&fKernelBuffers,
+		B_ANY_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, fArea);
+	if (fKernelArea < 0) {
+		fStatus = fKernelArea;
+		return fStatus;
+	}
+
 	TRACE(INF, "Created area id:%d at addr:%#010x size:%#010lx\n",
 		fArea, fDescriptors, fAreaSize);
 
-	// descriptors count
-	fDescriptorsCount = fAreaSize
-		/ (sizeof(usb_iso_packet_descriptor) + fPacketSize);
-
+	fDescriptorsCount = fAreaSize / fPacketSize;
 	// we need same size sub-buffers. round it
-	fDescriptorsCount /= kSamplesBufferCount;
-	fDescriptorsCount *= kSamplesBufferCount;
+	fDescriptorsCount = ROUNDDOWN(fDescriptorsCount, kSamplesBufferCount);
+	fDescriptors = new usb_iso_packet_descriptor[fDescriptorsCount];
 	TRACE(INF, "descriptorsCount:%d\n", fDescriptorsCount);
 
 	// samples count
@@ -295,16 +304,14 @@ Stream::_QueueNextTransfer(size_t queuedBuffer, bool start)
 	size_t bufferSize = format->fNumChannels * format->fSubframeSize;
 	bufferSize *= fSamplesCount / kSamplesBufferCount;
 
-	uint8* buffers = (uint8*)(fDescriptors + fDescriptorsCount);
-
 	size_t packetsCount = fDescriptorsCount / kSamplesBufferCount;
 
 	TRACE(DTA, "buffers:%#010x[%#x]\ndescrs:%#010x[%#x]\n",
-		buffers + bufferSize * queuedBuffer, bufferSize,
+		fKernelBuffers + bufferSize * queuedBuffer, bufferSize,
 		fDescriptors + queuedBuffer * packetsCount, packetsCount);
 
 	status_t status = gUSBModule->queue_isochronous(fStreamEndpoint,
-		buffers + bufferSize * queuedBuffer, bufferSize,
+		fKernelBuffers + bufferSize * queuedBuffer, bufferSize,
 		fDescriptors + queuedBuffer * packetsCount, packetsCount,
 		&fStartingFrame, start ? USB_ISO_ASAP : 0,
 		Stream::_TransferCallback, this);
@@ -497,10 +504,9 @@ Stream::GetBuffers(multi_buffer_list* List)
 			descs[channel].stride = stride;
 
 			// init to buffers area begin
-			descs[channel].base
-				= (char*)(fDescriptors + fDescriptorsCount);
+			descs[channel].base = (char*)fBuffers;
 			// shift for whole buffer if required
-			size_t bufferSize = fPacketSize/*endpoint->fMaxPacketSize*/
+			size_t bufferSize = fPacketSize
 				* (fDescriptorsCount / kSamplesBufferCount);
 			descs[channel].base += buffer * bufferSize;
 			// shift for channel if required
@@ -510,7 +516,7 @@ Stream::GetBuffers(multi_buffer_list* List)
 				descs[channel].base, descs[channel].stride);
 		}
 		if (!IS_USER_ADDRESS(Buffers[buffer])
-			|| user_memcpy(Buffers[buffer], descs, sizeof(descs)) < B_OK) {
+				|| user_memcpy(Buffers[buffer], descs, sizeof(descs)) < B_OK) {
 			return B_BAD_ADDRESS;
 		}
 	}
@@ -549,4 +555,3 @@ Stream::ExchangeBuffer(multi_buffer_info* Info)
 
 	return true;
 }
-
