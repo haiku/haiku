@@ -1076,7 +1076,7 @@ AudioControlInterface::GetChannelsDescription(
 			= Terminals[i]->SubType() == USB_AUDIO_AC_INPUT_TERMINAL;
 
 		AudioChannelCluster* cluster = Terminals[i]->OutCluster();
-		if (cluster == 0 || cluster->ChannelsCount() <= 0) {
+		if (cluster == NULL || cluster->ChannelsCount() <= 0) {
 			TRACE(ERR, "Terminal #%d ignored due null "
 				"channels cluster (%08x)\n", Terminals[i]->ID(), cluster);
 			continue;
@@ -1167,7 +1167,7 @@ AudioControlInterface::GetBusChannelsDescription(
 			continue;
 
 		AudioChannelCluster* cluster = control->OutCluster();
-		if (cluster == 0 || cluster->ChannelsCount() <= 0) {
+		if (cluster == NULL || cluster->ChannelsCount() <= 0) {
 			TRACE(ERR, "Terminal #%d ignored due null "
 				"channels cluster (%08x)\n", control->ID(), cluster);
 			continue;

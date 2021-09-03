@@ -493,27 +493,18 @@ Device::_MultiGetDescription(multi_description* multiDescription)
 
 	Description.control_panel[0] = '\0';
 
-	Vector<_AudioControl*>	USBTerminals;
+	Vector<_AudioControl*> USBTerminals;
 
-	// channels (USB I/O  terminals) are already in fStreams
+	// channels (USB I/O terminals) are already in fStreams
 	// in outputs->inputs order, use them.
 	for (int i = 0; i < fStreams.Count(); i++) {
-		uint8 id = fStreams[i]->TerminalLink();
-		_AudioControl* control = fAudioControl.Find(id);
-		// if (control->SubType() == USB_AUDIO_AC_OUTPUT_TERMINAL) {
-		// if (control->SubType() == USB_AUDIO_AC_INPUT_TERMINAL) {
-		//	USBTerminals.PushFront(control);
-		//	fStreams[i]->GetFormatsAndRates(Description);
-		// } else
-		// if (control->SubType() == IDSInputTerminal) {
-			USBTerminals.PushBack(control);
-			fStreams[i]->GetFormatsAndRates(&Description);
-		// }
+		USBTerminals.PushBack(fAudioControl.Find(fStreams[i]->TerminalLink()));
+		fStreams[i]->GetFormatsAndRates(&Description);
 	}
 
 	Vector<multi_channel_info> Channels;
 	fAudioControl.GetChannelsDescription(Channels, &Description, USBTerminals);
-	fAudioControl.GetBusChannelsDescription(Channels, &Description );
+	fAudioControl.GetBusChannelsDescription(Channels, &Description);
 
 	// Description.request_channel_count = channels + bus_channels;
 
@@ -812,7 +803,7 @@ Device::_SetupEndpoints()
 				{
 					Stream* stream = new(std::nothrow) Stream(this, i,
 						&config->interface[i]);
-					if (B_OK == stream->Init()) {
+					if (stream->Init() == B_OK) {
 						// put the stream in the correct order:
 						// first output that input ones.
 						if (stream->IsInput())
