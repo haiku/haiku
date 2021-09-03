@@ -58,6 +58,7 @@ protected:
 			size_t			fCurrentBuffer;
 			size_t			fSamplesCount;
 
+			bigtime_t		fRealTime;
 			uint32			fStartingFrame;
 			int32			fProcessedBuffers;
 			int32			fInsideNotify;

@@ -30,6 +30,7 @@ Stream::Stream(Device* device, size_t interface, usb_interface_list* List)
 	fDescriptorsCount(0),
 	fCurrentBuffer(0),
 	fSamplesCount(0),
+	fRealTime(0),
 	fStartingFrame(0),
 	fProcessedBuffers(0),
 	fInsideNotify(0)
@@ -339,6 +340,7 @@ Stream::_TransferCallback(void* cookie, status_t status, void* data,
 
 	if (atomic_add(&stream->fProcessedBuffers, 1) > (int32)kSamplesBufferCount)
 		TRACE(ERR, "Processed buffers overflow:%d\n", stream->fProcessedBuffers);
+	stream->fRealTime = system_time();
 
 	release_sem_etc(stream->fDevice->fBuffersReadySem, 1, B_DO_NOT_RESCHEDULE);
 
@@ -531,11 +533,11 @@ Stream::ExchangeBuffer(multi_buffer_info* Info)
 		return false;
 
 	if (fIsInput) {
-		Info->recorded_real_time = system_time();// TODO fRealTime;
+		Info->recorded_real_time = fRealTime;
 		Info->recorded_frames_count += fSamplesCount / kSamplesBufferCount;
 		Info->record_buffer_cycle = fCurrentBuffer;
 	} else {
-		Info->played_real_time = system_time();// TODO fRealTime;
+		Info->played_real_time = fRealTime;
 		Info->played_frames_count += fSamplesCount / kSamplesBufferCount;
 		Info->playback_buffer_cycle = fCurrentBuffer;
 	}
