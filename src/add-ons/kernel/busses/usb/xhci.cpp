@@ -971,10 +971,9 @@ XHCI::CancelQueuedTransfers(Pipe *pipe, bool force)
 	// order to avoid a deadlock, we must unlock the endpoint.
 	endpointLocker.Unlock();
 	status_t status = StopEndpoint(false, endpoint);
-	if (status == B_NOT_ALLOWED) {
-		// XHCI 1.2, 4.8.3 Endpoint State Diagram
-		// Only exit from a HALTED state is a reset
-		TRACE_ERROR("cancel queued transfers: halted endpoint. reset!");
+	if (status == B_DEV_STALLED) {
+		// Only exit from a Halted state is a reset. (XHCI 1.2 § 4.8.3 p163.)
+		TRACE_ERROR("cancel queued transfers: halted endpoint, reset!\n");
 		status = ResetEndpoint(false, endpoint);
 	}
 	endpointLocker.Lock();
@@ -1679,7 +1678,6 @@ XHCI::_GetEndpointState(xhci_endpoint* endpoint)
 	struct xhci_device_ctx* device_ctx = endpoint->device->device_ctx;
 	return ENDPOINT_0_STATE_GET(
 		_ReadContext(&device_ctx->endpoints[endpoint->id].dwendpoint0));
-
 }
 
 
@@ -2737,7 +2735,7 @@ XHCI::StopEndpoint(bool suspend, xhci_endpoint* endpoint)
 	switch (_GetEndpointState(endpoint)) {
 		case ENDPOINT_STATE_HALTED:
 			TRACE("Stop Endpoint: error, halted");
-			return B_NOT_ALLOWED;
+			return B_DEV_STALLED;
 		case ENDPOINT_STATE_STOPPED:
 			TRACE("Stop Endpoint: already stopped");
 			return B_OK;
