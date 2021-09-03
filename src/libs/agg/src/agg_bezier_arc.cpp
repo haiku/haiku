@@ -144,7 +144,7 @@ namespace agg
         m_radii_ok = true;
 
         if(rx < 0.0) rx = -rx;
-        if(ry < 0.0) ry = -rx;
+        if(ry < 0.0) ry = -ry;
 
         // Calculate the middle point between 
         // the current and the final points
