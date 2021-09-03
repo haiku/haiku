@@ -1066,15 +1066,12 @@ AudioControlInterface::InitACHeader(size_t interface,
 
 uint32
 AudioControlInterface::GetChannelsDescription(
-		Vector<multi_channel_info>& Channels, multi_description* Description,
-		Vector<_AudioControl*>&Terminals)
+	Vector<multi_channel_info>& Channels, multi_description* Description,
+	Vector<_AudioControl*>& Terminals, bool isForInput)
 {
 	uint32 addedChannels = 0;
 
 	for (int32 i = 0; i < Terminals.Count(); i++) {
-		bool bIsInputTerminal
-			= Terminals[i]->SubType() == USB_AUDIO_AC_INPUT_TERMINAL;
-
 		AudioChannelCluster* cluster = Terminals[i]->OutCluster();
 		if (cluster == NULL || cluster->ChannelsCount() <= 0) {
 			TRACE(ERR, "Terminal #%d ignored due null "
@@ -1083,9 +1080,9 @@ AudioControlInterface::GetChannelsDescription(
 		}
 
 		uint32 channels = GetTerminalChannels(Channels, cluster,
-			bIsInputTerminal ? B_MULTI_INPUT_CHANNEL : B_MULTI_OUTPUT_CHANNEL);
+			isForInput ? B_MULTI_INPUT_CHANNEL : B_MULTI_OUTPUT_CHANNEL);
 
-		if (bIsInputTerminal)
+		if (isForInput)
 			Description->input_channel_count += channels;
 		else
 			Description->output_channel_count += channels;
@@ -1134,7 +1131,7 @@ AudioControlInterface::GetTerminalChannels(Vector<multi_channel_info>& Channels,
 
 uint32
 AudioControlInterface::GetBusChannelsDescription(
-		Vector<multi_channel_info>& Channels, multi_description* Description)
+	Vector<multi_channel_info>& Channels, multi_description* Description)
 {
 	uint32 addedChannels = 0;
 

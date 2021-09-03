@@ -493,17 +493,18 @@ Device::_MultiGetDescription(multi_description* multiDescription)
 
 	Description.control_panel[0] = '\0';
 
-	Vector<_AudioControl*> USBTerminals;
+	Vector<multi_channel_info> Channels;
 
-	// channels (USB I/O terminals) are already in fStreams
-	// in outputs->inputs order, use them.
+	// channels (USB I/O terminals) are already in fStreams in outputs->inputs order.
 	for (int i = 0; i < fStreams.Count(); i++) {
-		USBTerminals.PushBack(fAudioControl.Find(fStreams[i]->TerminalLink()));
+		Vector<_AudioControl*> USBTerminal;
+		USBTerminal.PushBack(fAudioControl.Find(fStreams[i]->TerminalLink()));
+
+		fAudioControl.GetChannelsDescription(Channels, &Description, USBTerminal,
+			fStreams[i]->IsInput());
 		fStreams[i]->GetFormatsAndRates(&Description);
 	}
 
-	Vector<multi_channel_info> Channels;
-	fAudioControl.GetChannelsDescription(Channels, &Description, USBTerminals);
 	fAudioControl.GetBusChannelsDescription(Channels, &Description);
 
 	// Description.request_channel_count = channels + bus_channels;
