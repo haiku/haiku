@@ -872,8 +872,9 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 		uint32 frame;
 		if ((isochronousData->flags & USB_ISO_ASAP) != 0
 				|| isochronousData->starting_frame_number == NULL) {
+			// All reads from the microframe index register must be
+			// incremented by 1. (XHCI 1.2 § 4.14.2.1.4 p265.)
 			frame = ReadRunReg32(XHCI_MFINDEX) + 1;
-				// TODO: The +1 comes from the XHCI spec; document that.
 			td->trbs[0].flags |= TRB_3_ISO_SIA_BIT;
 		} else {
 			frame = *isochronousData->starting_frame_number;
