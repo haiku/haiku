@@ -50,18 +50,21 @@ Stack::Stack()
 		return;
 	}
 
-	// Check for host controller modules
-	// While using a fixed list of names is inflexible it allows us to control
+	// Check for host controller modules.
+	//
+	// While using a fixed list of names is inflexible, it allows us to control
 	// the order in which we try modules. There are controllers/BIOSes that
 	// require UHCI/OHCI to be initialized before EHCI or otherwise they
 	// refuse to publish any high-speed devices.
-	// On other systems the ordering is probably ensured because the EHCI
+	//
+	// On other systems, the ordering is probably ensured because the EHCI
 	// controller is required to have a higher PCI function number than the
 	// companion host controllers (per the EHCI specs) and it would therefore
-	// be enumerated as the last item. As this does not apply to us we have to
+	// be enumerated as the last item. As this does not apply to us, we have to
 	// ensure ordering using another method.
-	// Intel Lynx Point and Panther Point chipsets have ports shared between
-	// EHCI and XHCI, defaulting to EHCI. The XHCI module will switch USB 2.0
+	//
+	// Furthermore, on some systems, there can be ports shared between
+	// EHCI and XHCI, defaulting to EHCI. The XHCI module will switch these
 	// ports before the EHCI module discovers them.
 	const char *moduleNames[] = {
 		"busses/usb/xhci",
