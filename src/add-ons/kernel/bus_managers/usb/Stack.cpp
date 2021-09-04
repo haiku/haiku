@@ -223,6 +223,7 @@ Stack::GetObject(usb_id id)
 Object *
 Stack::GetObjectNoLock(usb_id id) const
 {
+	ASSERT(debug_debugger_running());
 	if (id >= fObjectMaxCount)
 		return NULL;
 	return fObjectArray[id];
