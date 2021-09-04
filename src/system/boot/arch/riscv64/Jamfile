@@ -22,6 +22,7 @@ local kernelArchDriverSources =
 ;
 
 local kernelGenericDriverSources =
+	debug_uart.cpp
 	debug_uart_8250.cpp
 ;
 

@@ -17,7 +17,7 @@ local kernelLibArchObjects =
 
 local kernelArchSources =
 	arch_elf.cpp
-	arch_uart_8250.cpp
+	arch_uart_pl011.cpp
 ;
 
 local kernelDebugSources =
@@ -28,6 +28,7 @@ local kernelDebugSources =
 ;
 
 local kernelGenericDriverSources =
+	debug_uart.cpp
 	debug_uart_8250.cpp
 ;
 

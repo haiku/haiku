@@ -177,18 +177,6 @@ DebugUART8250::FlushRx()
 }
 
 
-void
-DebugUART8250::Barrier()
-{
-	// Simple memory barriers
-#if defined(__POWERPC__)
-	asm volatile("eieio; sync");
-#elif defined(__ARM__)
-	asm volatile ("" : : : "memory");
-#endif
-}
-
-
 DebugUART8250*
 arch_get_uart_8250(addr_t base, int64 clock)
 {

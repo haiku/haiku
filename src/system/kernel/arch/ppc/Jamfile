@@ -56,6 +56,7 @@ KernelMergeObject kernel_arch_ppc.o :
 	arch_asm.S
 
 	# serial uart
+	debug_uart.cpp
 	debug_uart_8250.cpp
 
 	# paging

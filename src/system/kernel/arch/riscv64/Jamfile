@@ -6,30 +6,32 @@ UsePrivateKernelHeaders ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
 
 KernelMergeObject kernel_arch_riscv64.o :
-        arch_asm.S
-        arch_traps.S
-        arch_commpage.cpp
-        arch_cpu.cpp
-        arch_debug.cpp
-        arch_debug_console.cpp
-        arch_elf.cpp
-        arch_int.cpp
-        arch_platform.cpp
-        arch_real_time_clock.cpp
-        arch_smp.cpp
-        arch_system_info.cpp
-        arch_timer.cpp
-        arch_thread.cpp
-        arch_user_debugger.cpp
-        arch_vm.cpp
-        arch_vm_translation_map.cpp
-        RISCV64VMTranslationMap.cpp
-        Htif.cpp
-        sbi_syscalls.S
+	arch_asm.S
+	arch_traps.S
+	arch_commpage.cpp
+	arch_cpu.cpp
+	arch_debug.cpp
+	arch_debug_console.cpp
+	arch_elf.cpp
+	arch_int.cpp
+	arch_platform.cpp
+	arch_real_time_clock.cpp
+	arch_smp.cpp
+	arch_system_info.cpp
+	arch_timer.cpp
+	arch_thread.cpp
+	arch_user_debugger.cpp
+	arch_vm.cpp
+	arch_vm_translation_map.cpp
+	RISCV64VMTranslationMap.cpp
+	Htif.cpp
+	sbi_syscalls.S
 
-        debug_uart_8250.cpp
-        arch_uart_sifive.cpp
-        :
-        $(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused
-        :
+	# Serial UART drivers
+	debug_uart.cpp
+	debug_uart_8250.cpp
+	arch_uart_sifive.cpp
+	:
+	$(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused
+	:
 ;

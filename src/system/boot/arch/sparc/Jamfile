@@ -5,14 +5,18 @@ local kernelLibArchObjects =
 	<src!system!kernel!lib!arch!$(TARGET_ARCH)>memset.o
 ;
 
+local kernelGenericDriverSources =
+	debug_uart.cpp
+	debug_uart_8250.cpp
+;
+
 local platform ;
 for platform in [ MultiBootSubDirSetup openfirmware ] {
     on $(platform) {
 		DEFINES += _BOOT_MODE ;
 
 		BootMergeObject [ FGristFiles boot_arch_$(TARGET_KERNEL_ARCH).o ] :
-			debug_uart_8250.cpp
-			#arch_uart_8250.cpp
+			$(kernelGenericDriverSources)
 			arch_elf.cpp
 			: # additional flags
 			:
@@ -23,7 +27,7 @@ for platform in [ MultiBootSubDirSetup openfirmware ] {
 		SEARCH on [ FGristFiles arch_elf.cpp arch_uart_8250.cpp ]
 		    = [ FDirName $(HAIKU_TOP) src system kernel arch $(TARGET_KERNEL_ARCH) ] ;
 
-		SEARCH on [ FGristFiles debug_uart_8250.cpp ]
+		SEARCH on [ FGristFiles $(kernelGenericDriverSources) ]
 			= [ FDirName $(HAIKU_TOP) src system kernel arch generic ] ;
 	}
 }

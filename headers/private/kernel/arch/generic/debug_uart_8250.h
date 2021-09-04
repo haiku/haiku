@@ -34,8 +34,6 @@ public:
 
 			void			FlushTx();
 			void			FlushRx();
-
-	virtual	void			Barrier();
 };
 
 
