@@ -612,9 +612,9 @@ synaptics_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 
 	switch (op) {
 		case MS_READ:
-			TRACE("SYNAPTICS: MS_READ get event\n");
 			if ((status = get_synaptics_movment(cookie, &movement)) != B_OK)
 				return status;
+			TRACE("SYNAPTICS: MS_READ get event\n");
 			return user_memcpy(buffer, &movement, sizeof(movement));
 
 		case MS_IS_TOUCHPAD:

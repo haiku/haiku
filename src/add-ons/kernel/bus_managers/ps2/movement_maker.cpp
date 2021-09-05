@@ -375,7 +375,8 @@ TouchpadMovement::EventToMovement(touch_event *event, mouse_movement *movement)
 	movement->timestamp = system_time();
 
 	if ((movement->timestamp - fTapTime) > fTapTimeOUT) {
-		TRACE("TouchpadMovement: tap gesture timed out\n");
+		if (fTapStarted)
+			TRACE("TouchpadMovement: tap gesture timed out\n");
 		fTapStarted = false;
 		if (!fDoubleClick
 			|| (movement->timestamp - fTapTime) > 2 * fTapTimeOUT) {
@@ -495,7 +496,8 @@ TouchpadMovement::_NoTouchToMovement(touch_event *event,
 {
 	uint32 buttons = event->buttons;
 
-	TRACE("TouchpadMovement: no touch event\n");
+	if (fMovementStarted)
+		TRACE("TouchpadMovement: no touch event\n");
 
 	fScrollingStarted = false;
 	fMovementStarted = false;
@@ -508,9 +510,10 @@ TouchpadMovement::_NoTouchToMovement(touch_event *event,
 
 	// if the movement stopped switch off the tap drag when timeout is expired
 	if ((movement->timestamp - fTapTime) > fTapTimeOUT) {
+		if (fTapdragStarted)
+			TRACE("TouchpadMovement: tap drag gesture timed out\n");
 		fTapdragStarted = false;
 		fValidEdgeMotion = false;
-		TRACE("TouchpadMovement: tap drag gesture timed out\n");
 	}
 
 	if (abs(fTapDeltaX) > 15 || abs(fTapDeltaY) > 15) {
