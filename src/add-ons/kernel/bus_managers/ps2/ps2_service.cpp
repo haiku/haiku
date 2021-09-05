@@ -21,6 +21,14 @@
 #endif
 
 
+//#define TRACE_PS2_SERVICE
+#ifdef TRACE_PS2_SERVICE
+#	define TRACE(x...) dprintf(x)
+#else
+#	define TRACE(x...)
+#endif
+
+
 typedef struct {
 	uint32		id;
 	ps2_dev *	dev;

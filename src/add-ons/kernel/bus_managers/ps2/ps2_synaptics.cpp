@@ -21,6 +21,13 @@
 #include "ps2_service.h"
 
 
+//#define TRACE_PS2_SYNAPTICS
+#ifdef TRACE_PS2_SYNAPTICS
+#	define TRACE(x...) dprintf(x)
+#else
+#	define TRACE(x...)
+#endif
+
 // synaptics touchpad proportions
 #define SYN_EDGE_MOTION_WIDTH	50
 #define SYN_AREA_OFFSET			40

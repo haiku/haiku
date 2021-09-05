@@ -15,6 +15,14 @@
 #include "ps2_trackpoint.h"
 
 
+//#define TRACE_PS2_TRACKPOINT
+#ifdef TRACE_PS2_TRACKPOINT
+#	define TRACE(x...) dprintf(x)
+#else
+#	define TRACE(x...)
+#endif
+
+
 const char* kTrackpointPath[4] = {
 	"input/mouse/ps2/ibm_trackpoint_0",
 	"input/mouse/ps2/ibm_trackpoint_1",

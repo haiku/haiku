@@ -18,6 +18,14 @@
 #include "ps2_service.h"
 
 
+//#define TRACE_PS2_ELANTECH
+#ifdef TRACE_PS2_ELANTECH
+#	define TRACE(x...) dprintf(x)
+#else
+#	define TRACE(x...)
+#endif
+
+
 static int32 generate_event(timer* timer);
 
 

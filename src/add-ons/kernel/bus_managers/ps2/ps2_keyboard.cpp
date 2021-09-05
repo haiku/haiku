@@ -30,6 +30,13 @@
 #define KEY_BUFFER_SIZE 100
 	// we will buffer 100 key strokes before we start dropping them
 
+//#define TRACE_PS2_KEYBOARD
+#ifdef TRACE_PS2_KEYBOARD
+#	define TRACE(x...) dprintf(x)
+#else
+#	define TRACE(x...)
+#endif
+
 enum {
 	LED_SCROLL 	= 1,
 	LED_NUM 	= 2,
