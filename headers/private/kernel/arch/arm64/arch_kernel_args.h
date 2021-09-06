@@ -21,7 +21,7 @@ typedef struct {
 	// needed for UEFI, otherwise kernel acpi support can't find ACPI root
 	FixedWidthPointer<void> acpi_root;
 //	TODO:  Deal with this later in the port
-//	FixedWidthPointer<void> fdt;
+	FixedWidthPointer<void> fdt;
 //	uart_info		uart;
 } _PACKED arch_kernel_args;
 
