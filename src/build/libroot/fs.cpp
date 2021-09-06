@@ -235,6 +235,7 @@ find_dir_entry(DIR *dir, const char *path, NodeRef ref, string &name,
 	return B_OK;
 }
 
+
 // find_dir_entry
 static status_t
 find_dir_entry(const char *path, NodeRef ref, string &name, bool skipDot)
@@ -253,96 +254,50 @@ find_dir_entry(const char *path, NodeRef ref, string &name, bool skipDot)
 }
 
 
-static bool
-guess_normalized_dir_path(string path, NodeRef ref, string& _normalizedPath)
-{
-	// We assume the CWD is normalized and hope that the directory is an
-	// ancestor of it. We just chop off path components until we find a match or
-	// hit root.
-	char cwd[B_PATH_NAME_LENGTH];
-	if (getcwd(cwd, sizeof(cwd)) == NULL)
-		return false;
-
-	while (cwd[0] == '/') {
-		struct stat st;
-		if (stat(cwd, &st) == 0) {
-			if (st.st_dev == ref.device && st.st_ino == ref.node) {
-				_normalizedPath = cwd;
-				return true;
-			}
-		}
-
-		*strrchr(cwd, '/') = '\0';
-	}
-
-	// TODO: If path is absolute, we could also try to work with that, though
-	// the other way around -- trying prefixes until we hit a "." or ".."
-	// component.
-
-	return false;
-}
-
-
-// normalize_dir_path
-static status_t
-normalize_dir_path(string path, NodeRef ref, string &normalizedPath)
-{
-	// get parent path
-	path += "/..";
-
-	// stat the parent dir
-	struct stat st;
-	if (lstat(path.c_str(), &st) < 0)
-		return errno;
-
-	// root dir?
-	NodeRef parentRef(st);
-	if (parentRef == ref) {
-		normalizedPath = "/";
-		return 0;
-	}
-
-	// find the entry
-	string name;
-	status_t error = find_dir_entry(path.c_str(), ref, name, true)				;
-	if (error != B_OK) {
-		if (error != B_ENTRY_NOT_FOUND) {
-			// We couldn't open the directory. This might be because we don't
-			// have read permission. We're OK with not fully normalizing the
-			// path and try to guess the path in this case. Note: We don't check
-			// error for B_PERMISSION_DENIED, since opendir() may clobber the
-			// actual kernel error code with something not helpful.
-			if (guess_normalized_dir_path(path, ref, normalizedPath))
-				return B_OK;
-		}
-
-		return error;
-	}
-
-	// recurse to get the parent dir path, if found
-	error = normalize_dir_path(path, parentRef, normalizedPath);
-	if (error != 0)
-		return error;
-
-	// construct the normalizedPath
-	if (normalizedPath.length() > 1) // don't append "/", if parent is root
-		normalizedPath += '/';
-	normalizedPath += name;
-
-	return 0;
-}
-
-// normalize_dir_path
+// normalize_dir_path: Make path absolute and remove redundant entries.
 static status_t
 normalize_dir_path(const char *path, string &normalizedPath)
 {
-	// stat() the dir
-	struct stat st;
-	if (stat(path, &st) < 0)
-		return errno;
+	const size_t pathLen = strlen(path);
 
-	return normalize_dir_path(path, NodeRef(st), normalizedPath);
+	// Add CWD to relative paths.
+	if (pathLen == 0 || path[0] != '/') {
+		char pwd[PATH_MAX];
+		if (getcwd(pwd, sizeof(pwd)) == NULL)
+			return B_ERROR;
+
+		normalizedPath += pwd;
+	}
+
+	const char *end = &path[pathLen];
+	const char *next;
+	for (const char *ptr = path; ptr < end; ptr = next + 1) {
+		next = (char *)memchr(ptr, '/', end - ptr);
+		if (next == NULL)
+			next = end;
+
+		size_t len = next - ptr;
+		if (len == 2 && ptr[0] == '.' && ptr[1] == '.') {
+			string::size_type pos = normalizedPath.rfind('/');
+			if (pos != string::npos)
+				normalizedPath.resize(pos);
+			continue;
+		} else if (len == 0 || (len == 1 && ptr[0] == '.')) {
+			continue;
+		}
+
+		if (normalizedPath.length() != 1)
+			normalizedPath += '/';
+
+		normalizedPath.append(ptr, len);
+	}
+
+	if (normalizedPath.length() == 0)
+		normalizedPath += '/';
+
+	return B_OK;
 }
+
 
 // normalize_entry_path
 static status_t
@@ -362,7 +317,6 @@ normalize_entry_path(const char *path, string &normalizedPath)
 			dirPathString = string(path, leafName - path);
 			dirPath = dirPathString.c_str();
 		}
-
 	} else {
 		// path contains no slash, so it is a path relative to the current dir
 		dirPath = ".";
