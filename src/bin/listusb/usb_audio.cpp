@@ -429,7 +429,7 @@ DumpASFormatTypeI(const usb_audio_format_descriptor* descriptor)
 		descriptor->typeI.nr_channels);
 	printf("                    Subframe size ..... %u\n",
 		descriptor->typeI.subframe_size);
-	printf("                    Bit resoultion .... %u\n",
+	printf("                    Bit resolution .... %u\n",
 		descriptor->typeI.bit_resolution);
 
 	DumpSamplingFrequencies(descriptor->typeI.sam_freq_type,
@@ -448,7 +448,7 @@ DumpASFormatTypeIII(const usb_audio_format_descriptor* descriptor)
 		descriptor->typeIII.nr_channels);
 	printf("                    Subframe size ..... %u\n",
 		descriptor->typeIII.subframe_size);
-	printf("                    Bit resoultion .... %u\n",
+	printf("                    Bit resolution .... %u\n",
 		descriptor->typeIII.bit_resolution);
 
 	DumpSamplingFrequencies(descriptor->typeIII.sam_freq_type,
