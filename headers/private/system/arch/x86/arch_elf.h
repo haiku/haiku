@@ -50,6 +50,8 @@
 #define	R_386_IRELATIVE		42	/* PLT entry resolved indirectly at runtime */
 #define	R_386_GOT32X		43
 
+#define TLS_DTV_OFFSET 0
+
 #ifdef _BOOT_MODE
 # include "../x86_64/arch_elf.h"
 #endif
