@@ -266,7 +266,7 @@ normalize_dir_path(const char *path, string &normalizedPath)
 		if (getcwd(pwd, sizeof(pwd)) == NULL)
 			return B_ERROR;
 
-		normalizedPath += pwd;
+		normalizedPath = pwd;
 	}
 
 	const char *end = &path[pathLen];
