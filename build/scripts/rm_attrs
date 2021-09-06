@@ -1,8 +1,10 @@
 #!/bin/sh
 
+set -e
+
 if [ $# -lt 2 ]; then
 	echo "$0: Usage:..."
-	exit 1;
+	exit 1
 fi
 
 rmAttrs=$1
