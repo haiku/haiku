@@ -32,6 +32,17 @@ StringAssignTest::PerformTest(void)
 	CPPUNIT_ASSERT(strcmp(str->String(), "Something Else") == 0);
 	delete str;
 
+	// =(BString&&)
+#if __cplusplus >= 201103L
+	NextSubTest();
+	BString movableString("Something movable");
+	str = new BString();
+	*str = std::move(movableString);
+	CPPUNIT_ASSERT(strcmp(str->String(), "Something movable") == 0);
+	CPPUNIT_ASSERT(strcmp(movableString.String(), "") == 0);
+	delete str;
+#endif
+
 	// char ptr is NULL
 	NextSubTest();
 	char *s = NULL;

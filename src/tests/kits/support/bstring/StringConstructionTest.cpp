@@ -56,7 +56,19 @@ StringConstructionTest::PerformTest(void)
 	CPPUNIT_ASSERT(strncmp(string->String(), str, 5) == 0);
 	CPPUNIT_ASSERT(string->Length() == 5);
 	delete string;
-	
+
+	// BString(BString&&)
+#if __cplusplus >= 201103L
+	NextSubTest();
+	BString movableString(str);
+	string = new BString(std::move(movableString));
+	CPPUNIT_ASSERT(strcmp(string->String(), str) == 0);
+	CPPUNIT_ASSERT(string->Length() == strlen(str));
+	CPPUNIT_ASSERT(strcmp(movableString.String(), "") == 0);
+	CPPUNIT_ASSERT(movableString.Length() == 0);
+	delete string;
+#endif
+
 	NextSubTest();
 	string = new BString(str, 255);
 	CPPUNIT_ASSERT(strcmp(string->String(), str) == 0);

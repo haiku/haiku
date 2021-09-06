@@ -22,6 +22,9 @@ public:
 							BString(const char* string);
 							BString(const BString& string);
 							BString(const char* string, int32 maxLength);
+#if __cplusplus >= 201103L
+							BString(BString&& string);
+#endif
 							~BString();
 
 			// Access
@@ -39,6 +42,9 @@ public:
 			BString&		operator=(const BString& string);
 			BString&		operator=(const char* string);
 			BString&		operator=(char c);
+#if __cplusplus >= 201103L
+			BString&		operator=(BString&& string);
+#endif
 
 			BString&		SetTo(const char* string);
 			BString&		SetTo(const char* string, int32 maxLength);

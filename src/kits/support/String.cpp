@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2014 Haiku, Inc. All rights reserved.
+ * Copyright 2001-2021 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -193,6 +193,15 @@ BString::BString(const char* string, int32 maxLength)
 }
 
 
+#if __cplusplus >= 201103L
+BString::BString(BString&& string)
+{
+	fPrivateData = string.fPrivateData;
+	string.fPrivateData = NULL;
+}
+#endif
+
+
 BString::~BString()
 {
 	if (!_IsShareable() || atomic_add(&_ReferenceCount(), -1) == 1)
@@ -261,6 +270,21 @@ BString::operator=(char c)
 {
 	return SetTo(c, 1);
 }
+
+
+#if __cplusplus >= 201103L
+BString&
+BString::operator=(BString&& string)
+{
+	if (this != &string) {
+		this->~BString();
+			// free up any resources allocated by the current contents
+		fPrivateData = string.fPrivateData;
+		string.fPrivateData = NULL;
+	}
+	return *this;
+}
+#endif
 
 
 BString&
