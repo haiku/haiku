@@ -37,7 +37,7 @@ rule BuildAoutLoader {
 }
 
 actions BuildAoutLoader bind ELF2AOUT {
-	rm -f $(1)
+	$(RM) -f $(1)
 	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR) \
 	$(ELF2AOUT) -o $(1) $(2)
 }
@@ -61,11 +61,11 @@ rule BuildCoffLoader {
 }
 
 actions BuildCoffLoader bind HACK_COFF {
-	rm -f $(1)
+	$(RM) -f $(1)
 	# get the address of the COFF entry
 	$(TARGET_OBJCOPY_$(TARGET_PACKAGING_ARCH)) -O symbolsrec $(2) $(2).syms
 	EP=`grep _coff_start $(2).syms | tr -d '\r' | cut -d'$' -f2`
-	rm -f $(2).syms
+	$(RM) -f $(2).syms
 	# copy to XCOFF format and patch the entry point
 	$(TARGET_OBJCOPY_$(TARGET_PACKAGING_ARCH)) -O $(COFF_FORMAT) --set-start="0x${EP}" $(2) $(1)
 	#$(CP) $(2) $(1)
@@ -92,7 +92,7 @@ rule BuildBiosLoader {
 }
 
 actions BuildBiosLoader {
-	rm -f $(1)
+	$(RM) -f $(1)
 	$(TARGET_OBJCOPY_$(TARGET_PACKAGING_ARCH)) -O binary $(2) $(1)
 }
 
@@ -124,7 +124,7 @@ rule BuildEFILoader {
 
 actions BuildEFILoader
 {
-	rm -f $(1)
+	$(RM) -f $(1)
 	if [ "$(OUTPUT_TARGET)" = "binary" ]; then
 		# no bfd support, fake efi Pe header
 		$(TARGET_OBJCOPY_$(TARGET_PACKAGING_ARCH)) -j .text -j .sdata -j .data \
@@ -178,7 +178,7 @@ rule BuildUImageScript script : source
 
 actions BuildUImageScript1
 {
-	rm -f $(1)
+	$(RM) -f $(1)
 	mkimage -A $(ARCH) -O $(FAKEOS) -T script -C none -n $(SCRIPTNAME) \
 		-d $(2) $(1)
 }

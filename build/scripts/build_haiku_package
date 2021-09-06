@@ -115,7 +115,7 @@ $mimeset --mimedb "$mimeDB" "$contentsDir"
 # create the package
 if [ ! $updateOnly ]; then
 	echo "$packageName: Creating the package ..."
-	rm -f "$packagePath"
+	$rmAttrs -f "$packagePath"
 	$package create -q "-$compressionLevel" -i "$packageInfoPath" \
 		-C "$contentsDir" "$packagePath"
 else
