@@ -35,4 +35,20 @@ struct Mutex
 };
 
 
+struct CpuInfo
+{
+	uint32 phandle;
+	uint32 hartId;
+	uint32 plicContext;
+};
+
+
+CpuInfo* smp_find_cpu(uint32 phandle);
+
+void smp_init_other_cpus(void);
+void smp_boot_other_cpus(uint64 pageTable, uint64 kernel_entry);
+
+void smp_init();
+
+
 #endif	// _SMP_H_

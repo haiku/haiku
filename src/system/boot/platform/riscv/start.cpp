@@ -159,10 +159,8 @@ platform_start_kernel(void)
 	preloaded_elf64_image* image = static_cast<preloaded_elf64_image*>(
 		gKernelArgs.kernel_image.Pointer());
 
-	//smp_init_other_cpus();
+	smp_init_other_cpus();
 	//serial_cleanup();
-	//mmu_init_for_kernel();
-	//smp_boot_other_cpus();
 
 	// Avoid interrupts from virtio devices before kernel driver takes control.
 	virtio_fini();
@@ -175,6 +173,8 @@ platform_start_kernel(void)
 	convert_kernel_args();
 	uint64 satp;
 	mmu_init_for_kernel(satp);
+
+	smp_boot_other_cpus(satp, image->elf_header.e_entry);
 
 	dprintf("kernel entry: %lx\n", image->elf_header.e_entry);
 	dprintf("args: %lx\n", (addr_t)args);
@@ -214,7 +214,7 @@ _start(int hartId, void* fdt)
 	cpu_init();
 	mmu_init();
 	//apm_init();
-	//smp_init();
+	smp_init();
 
 	main(&args);
 }

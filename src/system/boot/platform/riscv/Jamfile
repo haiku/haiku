@@ -32,6 +32,7 @@ for platform in [ MultiBootSubDirSetup riscv ] {
 			menu.cpp
 			mmu.cpp
 			cpu.cpp
+			smp.cpp
 			video.cpp
 
 			fdt.cpp

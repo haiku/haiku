@@ -11,12 +11,14 @@
 #include <boot/stage2.h>
 #include <arch/generic/debug_uart_8250.h>
 #include <arch/riscv64/arch_uart_sifive.h>
+#include <arch_cpu_defs.h>
 
 extern "C" {
 #include <libfdt.h>
 }
 
 #include "mmu.h"
+#include "smp.h"
 #include "graphics.h"
 #include "virtio.h"
 #include "Htif.h"
@@ -46,6 +48,35 @@ HasFdtString(const char* prop, int size, const char* pattern)
 		prop += curLen + 1;
 	}
 	return false;
+}
+
+
+static bool
+GetReg(const void* fdt, int node, uint32 addressCells, uint32 sizeCells, size_t idx,
+	addr_range& range)
+{
+	int propSize;
+	const uint8* prop = (const uint8*)fdt_getprop(fdt, node, "reg", &propSize);
+	if (prop == NULL)
+		return false;
+
+	size_t entrySize = 4*(addressCells + sizeCells);
+	if ((idx + 1)*entrySize > (size_t)propSize)
+		return false;
+
+	prop += idx*entrySize;
+
+	switch (addressCells) {
+		case 1: range.start = fdt32_to_cpu(*(uint32*)prop); prop += 4; break;
+		case 2: range.start = fdt64_to_cpu(*(uint64*)prop); prop += 8; break;
+		default: panic("unsupported addressCells");
+	}
+	switch (sizeCells) {
+		case 1: range.size = fdt32_to_cpu(*(uint32*)prop); prop += 4; break;
+		case 2: range.size = fdt64_to_cpu(*(uint64*)prop); prop += 8; break;
+		default: panic("unsupported sizeCells");
+	}
+	return true;
 }
 
 
@@ -94,9 +125,25 @@ HandleFdt(const void* fdt, int node, uint32 addressCells, uint32 sizeCells,
 		sClint.size  = fdt64_to_cpu(*(reg + 1));
 		gClintRegs = (ClintRegs*)sClint.start;
 	} else if (HasFdtString(compatible, compatibleLen, "riscv,plic0")) {
-		uint64* reg = (uint64*)fdt_getprop(fdt, node, "reg", NULL);
-		sPlic.start = fdt64_to_cpu(*(reg + 0));
-		sPlic.size  = fdt64_to_cpu(*(reg + 1));
+		GetReg(fdt, node, addressCells, sizeCells, 0, sPlic);
+		int propSize;
+		if (uint32* prop = (uint32*)fdt_getprop(fdt, node, "interrupts-extended", &propSize)) {
+			dprintf("PLIC contexts\n");
+			uint32 contextId = 0;
+			for (uint32 *it = prop; (uint8_t*)it - (uint8_t*)prop < propSize; it += 2) {
+				uint32 phandle = fdt32_to_cpu(*it);
+				uint32 interrupt = fdt32_to_cpu(*(it + 1));
+				if (interrupt == sExternInt) {
+					CpuInfo* cpuInfo = smp_find_cpu(phandle);
+					dprintf("  context %" B_PRIu32 ": %" B_PRIu32 "\n", contextId, phandle);
+					if (cpuInfo != NULL) {
+						cpuInfo->plicContext = contextId;
+						dprintf("    hartId: %" B_PRIu32 "\n", cpuInfo->hartId);
+					}
+				}
+				contextId++;
+			}
+		}
 	} else if (HasFdtString(compatible, compatibleLen, "virtio,mmio")) {
 		uint64* reg = (uint64*)fdt_getprop(fdt, node, "reg", NULL);
 		virtio_register(
