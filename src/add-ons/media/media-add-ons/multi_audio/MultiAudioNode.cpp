@@ -35,16 +35,17 @@
 #define PARAMETER_ID_OUTPUT_FREQUENCY	2
 
 
-//This represent an hardware output
+// This represents a hardware output.
 class node_input {
 public:
-	node_input(media_input& input, media_format format);
+	node_input(media_input& input, media_format preferredFormat);
 	~node_input();
 
 	int32				fChannelId;
 	media_input			fInput;
 	media_format 		fPreferredFormat;
 	media_format		fFormat;
+
 	volatile uint32		fBufferCycle;
 	int32				fOldBufferCycle;
 	BBuffer*			fBuffer;
@@ -52,10 +53,10 @@ public:
 };
 
 
-//This represent an hardware input
+// This represents a hardware input.
 class node_output {
 public:
-	node_output(media_output& output, media_format format);
+	node_output(media_output& output, media_format preferredFormat);
 	~node_output();
 
 	int32				fChannelId;
@@ -125,11 +126,11 @@ const char* kMultiControlString[] = {
 //	#pragma mark -
 
 
-node_input::node_input(media_input& input, media_format format)
+node_input::node_input(media_input& input, media_format preferredFormat)
 {
 	CALLED();
 	fInput = input;
-	fPreferredFormat = format;
+	fPreferredFormat = preferredFormat;
 	fBufferCycle = 1;
 	fOldBufferCycle = -1;
 	fBuffer = NULL;
@@ -146,14 +147,14 @@ node_input::~node_input()
 //	#pragma mark -
 
 
-node_output::node_output(media_output& output, media_format format)
+node_output::node_output(media_output& output, media_format preferredFormat)
 	:
 	fBufferGroup(NULL),
 	fOutputEnabled(true)
 {
 	CALLED();
 	fOutput = output;
-	fPreferredFormat = format;
+	fPreferredFormat = preferredFormat;
 	fBufferCycle = 1;
 	fOldBufferCycle = -1;
 	fResampler = NULL;
@@ -404,6 +405,7 @@ MultiAudioNode::NodeRegistered()
 			currentInput = new node_input(*input, fOutputPreferredFormat);
 			currentInput->fPreferredFormat.u.raw_audio.channel_count = 1;
 			currentInput->fInput.format = currentInput->fPreferredFormat;
+
 			delete currentInput->fResampler;
 			currentInput->fResampler = new
 				Resampler(currentInput->fPreferredFormat.AudioFormat(),
@@ -464,6 +466,7 @@ MultiAudioNode::NodeRegistered()
 			currentOutput = new node_output(*output, fInputPreferredFormat);
 			currentOutput->fPreferredFormat.u.raw_audio.channel_count = 1;
 			currentOutput->fOutput.format = currentOutput->fPreferredFormat;
+
 			delete currentOutput->fResampler;
 			currentOutput->fResampler = new
 				Resampler(fInputPreferredFormat.AudioFormat(),
@@ -556,10 +559,10 @@ status_t
 MultiAudioNode::AcceptFormat(const media_destination& dest,
 	media_format* format)
 {
-	// Check to make sure the format is okay, then remove
-	// any wildcards corresponding to our requirements.
 	CALLED();
 
+	// Check to make sure the format is okay, then remove
+	// any wildcards corresponding to our requirements.
 	if (format == NULL)
 		return B_BAD_VALUE;
 	if (format->type != B_MEDIA_RAW_AUDIO)
@@ -1950,16 +1953,6 @@ void
 MultiAudioNode::_WriteZeros(node_input& input, uint32 bufferCycle)
 {
 	//CALLED();
-	/*int32 samples = input.fInput.format.u.raw_audio.buffer_size;
-	if(input.fInput.format.u.raw_audio.format == media_raw_audio_format::B_AUDIO_UCHAR) {
-		uint8 *sample = (uint8*)fDevice->BufferList().playback_buffers[input.fBufferCycle][input.fChannelId].base;
-		for(int32 i = samples-1; i>=0; i--)
-			*sample++ = 128;
-	} else {
-		int32 *sample = (int32*)fDevice->BufferList().playback_buffers[input.fBufferCycle][input.fChannelId].base;
-		for(int32 i = (samples / 4)-1; i>=0; i--)
-			*sample++ = 0;
-	}*/
 
 	uint32 channelCount = input.fFormat.u.raw_audio.channel_count;
 	uint32 bufferSize = fDevice->BufferList().return_playback_buffer_size;
