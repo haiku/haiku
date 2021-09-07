@@ -41,8 +41,6 @@
 #define DB_EXPONENT_POSITIVE 1.4	// for dB values > 0
 #define DB_EXPONENT_NEGATIVE 1.8	// for dB values < 0
 
-#define USE_MEDIA_FORMAT_WORKAROUND 1
-
 #define DB_TO_GAIN(db)			dB_to_Gain((db))
 #define GAIN_TO_DB(gain)		Gain_to_dB((gain))
 #define PERCENT_TO_GAIN(pct)	((pct) / 100.0)
@@ -81,12 +79,6 @@
 #define PARAM_IS_MUTE(id)					(((id) & 0xf) == 0x7)
 #define PARAM_IS_GAIN(id)					(((id) & 0xf) == 0x8)
 #define PARAM_IS_BALANCE(id)				(((id) & 0xf) == 0x9)
-
-#if USE_MEDIA_FORMAT_WORKAROUND
-static void
-multi_audio_format_specialize(media_multi_audio_format *format,
-	const media_multi_audio_format *other);
-#endif
 
 #define FORMAT_USER_DATA_TYPE 		0x7294a8f3
 #define FORMAT_USER_DATA_MAGIC_1	0xc84173bd
@@ -617,12 +609,7 @@ AudioMixer::FormatChangeRequested(const media_source &source,
 	}
 
 	/* remove wildcards */
-#if USE_MEDIA_FORMAT_WORKAROUND
-	multi_audio_format_specialize(&io_format->u.raw_audio,
-		&fDefaultFormat.u.raw_audio);
-#else
 	io_format->SpecializeTo(&fDefaultFormat);
-#endif
 
 	media_node_id id;
 	FindLatencyFor(destination, &fDownstreamLatency, &id);
@@ -873,12 +860,7 @@ AudioMixer::PrepareToConnect(const media_source &what,
 	strcpy(out_name, "Mixer Output");
 
 	/* remove wildcards */
-#if USE_MEDIA_FORMAT_WORKAROUND
-	multi_audio_format_specialize(&format->u.raw_audio,
-		&fDefaultFormat.u.raw_audio);
-#else
 	format->SpecializeTo(&fDefaultFormat);
-#endif
 
 	PRINT_FORMAT("AudioMixer::PrepareToConnect: final format", *format);
 
@@ -1933,46 +1915,3 @@ AudioMixer::UpdateParameterWeb()
 	fCore->Unlock();
 	SetParameterWeb(web);
 }
-
-
-#if USE_MEDIA_FORMAT_WORKAROUND
-static void
-raw_audio_format_specialize(media_raw_audio_format *format,
-	const media_raw_audio_format *other)
-{
-	if (format->frame_rate == 0)
-		format->frame_rate = other->frame_rate;
-	if (format->channel_count == 0)
-		format->channel_count = other->channel_count;
-	if (format->format == 0)
-		format->format = other->format;
-	if (format->byte_order == 0)
-		format->byte_order = other->byte_order;
-	if (format->buffer_size == 0)
-		format->buffer_size = other->buffer_size;
-	if (format->frame_rate == 0)
-		format->frame_rate = other->frame_rate;
-}
-
-
-static void
-multi_audio_info_specialize(media_multi_audio_info *format,
-	const media_multi_audio_info *other)
-{
-	if (format->channel_mask == 0)
-		format->channel_mask = other->channel_mask;
-	if (format->valid_bits == 0)
-		format->valid_bits = other->valid_bits;
-	if (format->matrix_mask == 0)
-		format->matrix_mask = other->matrix_mask;
-}
-
-
-static void
-multi_audio_format_specialize(media_multi_audio_format *format,
-	const media_multi_audio_format *other)
-{
-	raw_audio_format_specialize(format, other);
-	multi_audio_info_specialize(format, other);
-}
-#endif
