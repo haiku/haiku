@@ -424,7 +424,19 @@ status_t AudioFilterNode::AcceptFormat(
 		return err;
 		
 	// if an output connection has been made, try to create an operation
-	if(m_output.destination != media_destination::null) {
+	if (m_output.destination != media_destination::null) {
+		// Further specialize the format, in case of any remaining wildcards.
+		// Special case for buffer size: make sure we use the same frame count.
+		const bool setFrameSize = ioFormat->u.raw_audio.buffer_size
+			== media_raw_audio_format::wildcard.buffer_size;
+		ioFormat->SpecializeTo(&m_output.format);
+		if (setFrameSize) {
+			ioFormat->u.raw_audio.buffer_size =
+				bytes_per_frame(ioFormat->u.raw_audio)
+				* (m_output.format.u.raw_audio.buffer_size
+					/ bytes_per_frame(m_output.format.u.raw_audio));
+		}
+
 		ASSERT(m_opFactory);
 		IAudioOp* op = m_opFactory->createOp(
 			this,
