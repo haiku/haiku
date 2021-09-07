@@ -201,19 +201,27 @@ operator<(const media_node& a, const media_node& b)
 // #pragma mark -
 
 
-media_multi_audio_format media_raw_audio_format::wildcard;
+#if __GNUC__ == 2
+const media_multi_audio_format media_raw_audio_format::wildcard
+	= media_multi_audio_format();
 
-media_multi_audio_format media_multi_audio_format::wildcard;
+const media_multi_audio_format media_multi_audio_format::wildcard
+	= media_multi_audio_format();
+#else
+const media_multi_audio_format media_raw_audio_format::wildcard = {};
 
-media_encoded_audio_format media_encoded_audio_format::wildcard = {{0}};
+const media_multi_audio_format media_multi_audio_format::wildcard = {};
+#endif
 
-media_video_display_info media_video_display_info::wildcard = {(color_space)0};
+const media_encoded_audio_format media_encoded_audio_format::wildcard = {};
 
-media_raw_video_format media_raw_video_format::wildcard = {0};
+const media_video_display_info media_video_display_info::wildcard = {};
 
-media_encoded_video_format media_encoded_video_format::wildcard = {{0}};
+const media_raw_video_format media_raw_video_format::wildcard = {};
 
-media_multistream_format media_multistream_format::wildcard = {0};
+const media_encoded_video_format media_encoded_video_format::wildcard = {};
+
+const media_multistream_format media_multistream_format::wildcard = {};
 
 
 // #pragma mark - media_format::Matches() support

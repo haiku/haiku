@@ -65,7 +65,7 @@ int32 BMediaNode::_m_changeTag = 0;
 
 // media_node
 
-media_node media_node::null;
+const media_node media_node::null;
 
 media_node::media_node()
 	:
