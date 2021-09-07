@@ -54,6 +54,13 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 				: <$(architecture)>libshared.a
 				;
 		} else {
+			if $(HAIKU_CC_IS_LEGACY_GCC_$(architecture)) = 0 {
+				# In order to not have conflicts between libraries built against
+				# different versions of libnetservices.a, prevent symbols from
+				# being re-exported from the static library.
+				SubDirC++Flags -fvisibility=hidden ;
+			}
+
 			StaticLibrary [ MultiArchDefaultGristFiles libnetservices.a ] :
 				$(sources)
 				Geolocation.cpp
