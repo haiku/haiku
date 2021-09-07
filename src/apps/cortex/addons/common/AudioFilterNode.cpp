@@ -1498,6 +1498,9 @@ void AudioFilterNode::processBuffer(
 
 		ASSERT(toProcess > 0);
 
+		if (toProcess > framesRemaining)
+			toProcess = framesRemaining;
+
 		uint32 processed = m_op->process(
 			input, output, sourceOffset, destinationOffset, (uint32)toProcess, targetTime);
 		if(processed < toProcess) {
@@ -1506,10 +1509,7 @@ void AudioFilterNode::processBuffer(
 				"*** AudioFilterNode::processBuffer(): insufficient frames filled\n"));
 		}
 			
-		if(toProcess > framesRemaining)
-			framesRemaining = 0;
-		else
-			framesRemaining -= toProcess;
+		framesRemaining -= toProcess;
 			
 		// advance target time
 		targetTime = nextEventTime; // +++++ might this drift from the real frame offset?
