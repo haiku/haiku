@@ -131,72 +131,25 @@ status_t AudioFilterNode::_validate_raw_audio_format(
 	string_for_format(ioProposedFormat, formatStr, 255);
 	PRINT(("\tincoming proposed format: %s\n", formatStr));
 	
-	status_t err = B_OK;
-	
-	if(ioProposedFormat.type != B_MEDIA_RAW_AUDIO) {
+	if (ioProposedFormat.type != B_MEDIA_RAW_AUDIO) {
 		// out of the ballpark
 		ioProposedFormat = preferredFormat;
 		return B_MEDIA_BAD_FORMAT;
 	}
 
-	// wildcard format
-	media_raw_audio_format& wild = media_raw_audio_format::wildcard;
-	// proposed format
-	media_raw_audio_format& f = ioProposedFormat.u.raw_audio;
-	// template format
-	const media_raw_audio_format& pref = preferredFormat.u.raw_audio;
-		
-	if(pref.frame_rate != wild.frame_rate) {
-		if(f.frame_rate != pref.frame_rate) {
-			if(f.frame_rate != wild.frame_rate)
-				err = B_MEDIA_BAD_FORMAT;
-			f.frame_rate = pref.frame_rate;
-		}
-	}
-
-	if(pref.channel_count != wild.channel_count) {
-		if(f.channel_count != pref.channel_count) {
-			if(f.channel_count != wild.channel_count)
-				err = B_MEDIA_BAD_FORMAT;
-			f.channel_count = pref.channel_count;
-		}
-	}
-		
-	if(pref.format != wild.format) {
-		if(f.format != pref.format) {
-			if(f.format != wild.format)
-				err = B_MEDIA_BAD_FORMAT;
-			f.format = pref.format;
-		}
-	}
-		
-	if(pref.byte_order != wild.byte_order) {
-		if(f.byte_order != pref.byte_order) {
-			if(f.byte_order != wild.byte_order)
-				err = B_MEDIA_BAD_FORMAT;
-			f.byte_order = pref.byte_order;
-		}
-	}
-		
-	if(pref.buffer_size != wild.buffer_size) {
-		if(f.buffer_size != pref.buffer_size) {
-			if(f.buffer_size != wild.buffer_size)
-				err = B_MEDIA_BAD_FORMAT;
-			f.buffer_size = pref.buffer_size;
-		}
-	}
-	
-	if(err != B_OK) {
+	if (!format_is_compatible(preferredFormat, ioProposedFormat)) {
 		string_for_format(ioProposedFormat, formatStr, 255);
 		PRINT((
 			"\tformat conflict; suggesting:\n\tformat %s\n", formatStr));
+		return B_MEDIA_BAD_FORMAT;
 	}
-	else {
-		string_for_format(ioProposedFormat, formatStr, 255);
-		PRINT(("\toutbound proposed format: %s\n", formatStr));
-	}
+
+	ioProposedFormat.SpecializeTo(&preferredFormat);
+
+	string_for_format(ioProposedFormat, formatStr, 255);
+	PRINT(("\toutbound proposed format: %s\n", formatStr));
 	
-	return err;	
+	return B_OK;
 }
 
 status_t AudioFilterNode::validateProposedInputFormat(
