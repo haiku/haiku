@@ -6,7 +6,11 @@
 
 #include "RAWTranslator.h"
 #include "ConfigView.h"
+#ifdef USES_LIBRAW
+#include "LibRAW.h"
+#else
 #include "RAW.h"
+#endif
 
 #include <Catalog.h>
 #include <BufferIO.h>
@@ -127,7 +131,11 @@ RAWTranslator::DerivedIdentify(BPositionIO *stream,
 		return B_NO_TRANSLATOR;
 
 	BBufferIO io(stream, 128 * 1024, false);
+#ifdef USES_LIBRAW
+	LibRAW raw(io);
+#else
 	DCRaw raw(io);
+#endif
 	status_t status;
 
 	try {
@@ -199,7 +207,11 @@ RAWTranslator::DerivedTranslate(BPositionIO* stream,
 		return B_NO_TRANSLATOR;
 
 	BBufferIO io(stream, 1024 * 1024, false);
+#ifdef USES_LIBRAW
+	LibRAW raw(io);
+#else
 	DCRaw raw(io);
+#endif
 
 	bool headerOnly = false;
 
@@ -300,13 +312,23 @@ RAWTranslator::DerivedTranslate(BPositionIO* stream,
 			free(exifBuffer);
 		}
 	}
+
+#ifdef USES_LIBRAW
+	uint32 dataSize = data.output_width * 3 * data.output_height;
+#else
 	uint32 dataSize = data.output_width * 4 * data.output_height;
+#endif
 
 	TranslatorBitmap header;
 	header.magic = B_TRANSLATOR_BITMAP;
 	header.bounds.Set(0, 0, data.output_width - 1, data.output_height - 1);
+#ifdef USES_LIBRAW
+	header.rowBytes = data.output_width * 3;
+	header.colors = B_RGB24_BIG;
+#else
 	header.rowBytes = data.output_width * 4;
 	header.colors = B_RGB32;
+#endif
 	header.dataSize = dataSize;
 
 	// write out Be's Bitmap header

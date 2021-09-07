@@ -7,16 +7,32 @@ AddResources RAWTranslator : RAWTranslator.rdef ;
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
+
+		local backend = RAW.cpp ;
+		local libs = ;
+		local defines = ;
+
+		if [ FIsBuildFeatureEnabled libraw ] {
+			UseBuildFeatureHeaders libraw ;
+			backend = LibRAW.cpp ;
+			libs = [ BuildFeatureAttribute libraw : libraries ] ;
+			defines = [ FDefines USES_LIBRAW ]  ;
+			Includes [ FGristFiles ConfigView.cpp LibRAW.cpp
+				RAWTranslator.cpp ]
+				: [ BuildFeatureAttribute libraw : headers ] ;
+		}
+		SubDirC++Flags $(defines) ;
+
 		Translator [ MultiArchDefaultGristFiles RAWTranslator ] :
 			# RawTranslator classes
 			main.cpp
 			RAWTranslator.cpp
 			ConfigView.cpp
-			RAW.cpp
+			$(backend)
 			: 
 			be translation 
 			[ MultiArchDefaultGristFiles libtranslatorsutils.a ]
-			[ TargetLibsupc++ ] localestub
+			[ TargetLibsupc++ ] $(libs) localestub
 			: 
 			true
 		;

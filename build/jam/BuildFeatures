@@ -622,6 +622,23 @@ if [ IsPackageAvailable libdvdnav_devel ] {
 }
 
 
+# libraw
+if [ IsPackageAvailable libraw_devel ] {
+	ExtractBuildFeatureArchives libraw :
+		file: base libraw
+			runtime: lib
+		file: devel libraw_devel
+			depends: base
+			libraries: $(developLibDir)/libraw.so.19
+			headers: $(developHeadersDir)
+		;
+
+	EnableBuildFeatures libraw ;
+} else {
+	unavailableBuildFeatures += libraw ;
+}
+
+
 # libwebp
 if [ IsPackageAvailable libwebp_devel ] {
 	if $(HAIKU_PACKAGING_ARCH) = x86 && $(TARGET_PACKAGING_ARCH) = x86_gcc2 {
