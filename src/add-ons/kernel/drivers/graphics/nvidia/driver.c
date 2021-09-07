@@ -519,6 +519,7 @@ map_device(device_info *di)
 	shared_info *si = di->si;
 	uint32	tmpUlong, tmpROMshadow;
 	pci_info *pcii = &(di->pcii);
+	phys_addr_t physicalAddress;
 	system_info sysinfo;
 
 	/* variables for making copy of ROM */
@@ -654,7 +655,7 @@ map_device(device_info *di)
 		di->pcii.vendor_id, di->pcii.device_id,
 		di->pcii.bus, di->pcii.device, di->pcii.function);
 
-	phys_addr_t physicalAddress = di->pcii.u.h0.base_registers_pci[frame_buffer];
+	physicalAddress = di->pcii.u.h0.base_registers_pci[frame_buffer];
 	if ((di->pcii.u.h0.base_register_flags[frame_buffer] & PCI_address_type)
 			== PCI_address_type_64) {
 		physicalAddress
