@@ -62,7 +62,6 @@ public:
 	int32				fChannelId;
 	media_output		fOutput;
 	media_format 		fPreferredFormat;
-	media_format		fFormat;
 
 	BBufferGroup*		fBufferGroup;
 	bool 				fOutputEnabled;
@@ -404,6 +403,7 @@ MultiAudioNode::NodeRegistered()
 
 			currentInput = new node_input(*input, fOutputPreferredFormat);
 			currentInput->fPreferredFormat.u.raw_audio.channel_count = 1;
+			currentInput->fFormat = currentInput->fPreferredFormat;
 			currentInput->fInput.format = currentInput->fPreferredFormat;
 
 			delete currentInput->fResampler;
@@ -419,6 +419,7 @@ MultiAudioNode::NodeRegistered()
 		} else {
 			PRINT(("NodeRegistered(): adding a channel\n"));
 			currentInput->fPreferredFormat.u.raw_audio.channel_count++;
+			currentInput->fFormat = currentInput->fPreferredFormat;
 			currentInput->fInput.format = currentInput->fPreferredFormat;
 		}
 		currentInput->fInput.format.u.raw_audio.format
@@ -565,51 +566,15 @@ MultiAudioNode::AcceptFormat(const media_destination& dest,
 	// any wildcards corresponding to our requirements.
 	if (format == NULL)
 		return B_BAD_VALUE;
-	if (format->type != B_MEDIA_RAW_AUDIO)
-		return B_MEDIA_BAD_FORMAT;
 
 	node_input *channel = _FindInput(dest);
 	if (channel == NULL)
 		return B_MEDIA_BAD_DESTINATION;
 
-/*	media_format * myFormat = GetFormat();
-	fprintf(stderr,"proposed format: ");
-	print_media_format(format);
-	fprintf(stderr,"\n");
-	fprintf(stderr,"my format: ");
-	print_media_format(myFormat);
-	fprintf(stderr,"\n");*/
-	// Be's format_is_compatible doesn't work.
-//	if (!format_is_compatible(*format,*myFormat)) {
-
-	channel->fFormat = channel->fPreferredFormat;
-
-	/*if(format->u.raw_audio.format == media_raw_audio_format::B_AUDIO_FLOAT
-		&& channel->fPreferredFormat.u.raw_audio.format == media_raw_audio_format::B_AUDIO_SHORT)
-		format->u.raw_audio.format = media_raw_audio_format::B_AUDIO_FLOAT;
-	else*/
-	format->u.raw_audio.format = channel->fPreferredFormat.u.raw_audio.format;
-	format->u.raw_audio.valid_bits
-		= channel->fPreferredFormat.u.raw_audio.valid_bits;
-
-	format->u.raw_audio.frame_rate
-		= channel->fPreferredFormat.u.raw_audio.frame_rate;
-	format->u.raw_audio.channel_count
-		= channel->fPreferredFormat.u.raw_audio.channel_count;
-	format->u.raw_audio.byte_order = B_MEDIA_HOST_ENDIAN;
-	format->u.raw_audio.buffer_size
-		= fDevice->BufferList().return_playback_buffer_size
-			* (format->u.raw_audio.format
-				& media_raw_audio_format::B_AUDIO_SIZE_MASK)
-			* format->u.raw_audio.channel_count;
-
-	/*media_format myFormat;
-	GetFormat(&myFormat);
-	if (!format_is_acceptible(*format,myFormat)) {
-		fprintf(stderr,"<- B_MEDIA_BAD_FORMAT\n");
+	if (!format_is_compatible(*format, channel->fPreferredFormat))
 		return B_MEDIA_BAD_FORMAT;
-	}*/
-	//AddRequirements(format);
+
+	format->SpecializeTo(&channel->fPreferredFormat);
 	return B_OK;
 }
 
@@ -971,28 +936,15 @@ MultiAudioNode::PrepareToConnect(const media_source& what,
 	if (channel->fOutput.destination != media_destination::null)
 		return B_MEDIA_ALREADY_CONNECTED;
 
-	// the format may not yet be fully specialized (the consumer might have
-	// passed back some wildcards).  Finish specializing it now, and return an
-	// error if we don't support the requested format.
-	if (format->type != B_MEDIA_RAW_AUDIO) {
-		fprintf(stderr, "\tnon-raw-audio format?!\n");
+	// Allow buffer sizes other than our preferred one.
+	media_format compatible = channel->fPreferredFormat;
+	compatible.u.raw_audio.buffer_size
+		= media_raw_audio_format::wildcard.buffer_size;
+
+	if (!format_is_compatible(*format, compatible))
 		return B_MEDIA_BAD_FORMAT;
-	}
 
-	// !!! validate all other fields except for buffer_size here, because the
-	// consumer might have supplied different values from AcceptFormat()?
-
-	// check the buffer size, which may still be wildcarded
-	if (format->u.raw_audio.buffer_size
-			== media_raw_audio_format::wildcard.buffer_size) {
-		format->u.raw_audio.buffer_size = 2048;
-			// pick something comfortable to suggest
-		fprintf(stderr, "\tno buffer size provided, suggesting %lu\n",
-			format->u.raw_audio.buffer_size);
-	} else {
-		fprintf(stderr, "\tconsumer suggested buffer_size %lu\n",
-			format->u.raw_audio.buffer_size);
-	}
+	format->SpecializeTo(&channel->fPreferredFormat);
 
 	// Now reserve the connection, and return information about it
 	channel->fOutput.destination = where;
@@ -2403,10 +2355,6 @@ MultiAudioNode::_SetNodeOutputFrameRate(float frameRate)
 			i++) {
 		channel->fPreferredFormat.u.raw_audio.frame_rate = frameRate;
 		channel->fPreferredFormat.u.raw_audio.buffer_size
-			= fInputPreferredFormat.u.raw_audio.buffer_size;
-
-		channel->fFormat.u.raw_audio.frame_rate = frameRate;
-		channel->fFormat.u.raw_audio.buffer_size
 			= fInputPreferredFormat.u.raw_audio.buffer_size;
 
 		channel->fOutput.format.u.raw_audio.frame_rate = frameRate;
