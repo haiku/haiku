@@ -37,6 +37,7 @@
 #include <Debug.h>
 #include <RealtimeAlloc.h>
 #include "AudioBuffer.h"
+#include "SoundUtils.h"
 
 #include <cmath>
 #include <cstring>
@@ -104,14 +105,13 @@ AudioBuffer::AudioBuffer(
 	RawBuffer(),
 	m_format(format)
 	
-	{
-
+{
 	if(pBuffer->Header()->type != B_MEDIA_RAW_AUDIO)
 		return;
 	
 	// reference it:
 	m_pData = pBuffer->Data();
-	m_frameSize = (m_format.format & 0x0f) * m_format.channel_count;
+	m_frameSize = bytes_per_frame(m_format);
 	m_frames = pBuffer->Header()->size_used / m_frameSize;
 	m_allocatedSize = 0;
 	m_bOwnData = false;
