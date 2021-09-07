@@ -1143,7 +1143,7 @@ status_t FlangerNode::validateProposedFormat(
 	}
 
 	// wildcard format
-	media_raw_audio_format& wild = media_raw_audio_format::wildcard;
+	const media_raw_audio_format& wild = media_raw_audio_format::wildcard;
 	// proposed format
 	media_raw_audio_format& f = ioProposedFormat.u.raw_audio;
 	// template format
@@ -1212,7 +1212,7 @@ void FlangerNode::specializeOutputFormat(
 
 	// carpal_tunnel_paranoia
 	media_raw_audio_format& f = ioFormat.u.raw_audio;
-	media_raw_audio_format& w = media_raw_audio_format::wildcard;
+	const media_raw_audio_format& w = media_raw_audio_format::wildcard;
 
 	if (f.frame_rate == w.frame_rate)
 		f.frame_rate = 44100.0;

@@ -109,7 +109,7 @@ status_t _AudioAdapterNode::getPreferredInputFormat(
 	ASSERT(p);
 	
 	media_raw_audio_format& f = ioFormat.u.raw_audio;
-	media_raw_audio_format& w = media_raw_audio_format::wildcard;
+	const media_raw_audio_format& w = media_raw_audio_format::wildcard;
 	
 	// copy user preferences
 	if(p->inputFormat.format != w.format)
@@ -182,7 +182,7 @@ status_t _AudioAdapterNode::getPreferredOutputFormat(
 	_AudioAdapterParams* p = dynamic_cast<_AudioAdapterParams*>(parameterSet());
 	ASSERT(p);
 	
-	media_raw_audio_format& w = media_raw_audio_format::wildcard;
+	const media_raw_audio_format& w = media_raw_audio_format::wildcard;
 	
 	// copy user preferences
 	if(p->outputFormat.format != w.format)
@@ -223,7 +223,7 @@ status_t _AudioAdapterNode::validateProposedInputFormat(
 	status_t err = _inherited::validateProposedInputFormat(
 		preferredFormat, ioProposedFormat);
 		
-	media_raw_audio_format& w = media_raw_audio_format::wildcard;
+	const media_raw_audio_format& w = media_raw_audio_format::wildcard;
 		
 	if(output().destination != media_destination::null) {
 
@@ -270,7 +270,7 @@ status_t _AudioAdapterNode::validateProposedOutputFormat(
 	status_t err = _inherited::validateProposedOutputFormat(
 		preferredFormat, ioProposedFormat);
 		
-	media_raw_audio_format& w = media_raw_audio_format::wildcard;
+	const media_raw_audio_format& w = media_raw_audio_format::wildcard;
 		
 	if(input().source != media_source::null) {
 
