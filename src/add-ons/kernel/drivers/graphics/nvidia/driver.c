@@ -654,10 +654,17 @@ map_device(device_info *di)
 		di->pcii.vendor_id, di->pcii.device_id,
 		di->pcii.bus, di->pcii.device, di->pcii.function);
 
+	phys_addr_t physicalAddress = di->pcii.u.h0.base_registers_pci[frame_buffer];
+	if ((di->pcii.u.h0.base_register_flags[frame_buffer] & PCI_address_type)
+			== PCI_address_type_64) {
+		physicalAddress
+			|= (uint64)di->pcii.u.h0.base_registers_pci[frame_buffer + 1] << 32;
+	}
+
 	/* map the framebuffer into vmem, using Write Combining*/
 	si->fb_area = map_physical_memory(buffer,
 		/* WARNING: Nvidia needs to map framebuffer as viewed from PCI space! */
-		di->pcii.u.h0.base_registers_pci[frame_buffer],
+		physicalAddress,
 		di->pcii.u.h0.base_register_sizes[frame_buffer],
 		B_ANY_KERNEL_BLOCK_ADDRESS | B_MTR_WC,
 		B_READ_AREA | B_WRITE_AREA | B_CLONEABLE_AREA,
@@ -667,7 +674,7 @@ map_device(device_info *di)
 	if (si->fb_area < 0) {
 		si->fb_area = map_physical_memory(buffer,
 			/* WARNING: Nvidia needs to map framebuffer as viewed from PCI space! */
-			di->pcii.u.h0.base_registers_pci[frame_buffer],
+			physicalAddress,
 			di->pcii.u.h0.base_register_sizes[frame_buffer],
 			B_ANY_KERNEL_BLOCK_ADDRESS,
 			B_READ_AREA | B_WRITE_AREA | B_CLONEABLE_AREA,
@@ -683,7 +690,7 @@ map_device(device_info *di)
 
 	//fixme: retest for card coldstart and PCI/virt_mem mapping!!
 	/* remember the DMA address of the frame buffer for BDirectWindow?? purposes */
-	si->framebuffer_pci = (void *) di->pcii.u.h0.base_registers_pci[frame_buffer];
+	si->framebuffer_pci = (void *) physicalAddress;
 
 	/* note the amount of memory mapped by the kerneldriver so we can make sure we
 	 * don't attempt to adress more later on */
