@@ -23,6 +23,8 @@ local sources =
 Includes [ FGristFiles $(sources) ]
 	: [ BuildFeatureAttribute freetype : headers ] ;
 
+NO_HIDDEN_VISIBILITY on libstackandtile.a = 1 ;
+
 StaticLibrary libstackandtile.a :
 	$(sources)
 ;

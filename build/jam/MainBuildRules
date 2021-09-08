@@ -154,6 +154,12 @@ rule StaticLibrary
 
 	InheritPlatform $(objects) : $(lib) ;
 
+	if $(TARGET_CC_IS_LEGACY_GCC_$(TARGET_PACKAGING_ARCH)) = 0
+			&& [ on $(lib) return $(NO_HIDDEN_VISIBILITY) ] != 1 {
+		CCFLAGS on $(objects) += -fvisibility=hidden ;
+		C++FLAGS on $(objects) += -fvisibility=hidden ;
+	}
+
 	StaticLibraryFromObjects $(lib) : $(objects) $(otherObjects) ;
 	Objects $(2) ;
 }
