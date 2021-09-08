@@ -22,7 +22,7 @@ Application LegacyPackageInstaller :
 	InstalledPackageInfo.cpp
 	UninstallWindow.cpp
 	UninstallView.cpp
-	: be localestub tracker translation
+	: be localestub tracker translation shared
 		[ BuildFeatureAttribute zlib : library ]
 		[ TargetLibsupc++ ]
 	: PackageInstaller.rdef
