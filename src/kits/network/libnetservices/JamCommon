@@ -66,6 +66,8 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 				Geolocation.cpp
 				UrlResult.cpp
 				;
+			LinkAgainst [ MultiArchDefaultGristFiles libnetservices.a ] :
+				<$(architecture)>libshared.a ;
 		}
 
 		SEARCH on [ FGristFiles $(sources) ]

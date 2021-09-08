@@ -508,6 +508,9 @@ rule LinkAgainst
 	local libs = $(2) ;
 	local mapLibs = $(3:E=true) ;
 
+	local linkLibs ;
+	local needLibs ;
+
 	on $(target) {
 		local i ;
 
@@ -525,11 +528,7 @@ rule LinkAgainst
 			libs = $(mappedLibs) ;
 		}
 
-		local linkLibs ;
-		local needLibs ;
-
-		for i in $(libs)
-		{
+		for i in $(libs) {
 			local isfile = ;
 			if $(i:D) || $(i:G) {
 				isfile = true ;
@@ -556,7 +555,18 @@ rule LinkAgainst
 				linkLibs += $(i) ;
 			}
 		}
+	}
 
+	# Copy in the library dependencies from any static libraries first.
+	# (We have to do the [ on ... ] outside the on { } block. )
+	for i in $(needLibs) {
+		if $(i:S) = .a  {
+			needLibs += [ on $(i) return $(NEEDLIBS) ] ;
+			linkLibs += [ on $(i) return $(LINKLIBS) ] ;
+		}
+	}
+
+	on $(target) {
 		NEEDLIBS on $(1) = $(NEEDLIBS) $(needLibs) ;
 		LINKLIBS on $(1) = $(LINKLIBS) -l$(linkLibs) ;
 
