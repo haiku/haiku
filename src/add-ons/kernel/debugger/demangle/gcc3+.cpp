@@ -1300,7 +1300,7 @@ private:
 
 class ClonedNode : public ObjectNode {
 public:
-	ClonedNode(Node* clone, Node* node)
+	ClonedNode(Node* clone, ObjectNode* node)
 		:
 		ObjectNode(NULL),
 		fNode(node),
@@ -1314,12 +1314,22 @@ public:
 	{
 		if (!fNode->GetName(buffer))
 			return false;
+		buffer.Append(" ", 1);
+		return _AppendCloneName(buffer);
+	}
 
-		buffer.Append(" [clone ");
-		if (!fCloneNode->GetName(buffer))
-			return false;
-		buffer.Append("]");
-		return true;
+	virtual bool GetObjectName(NameBuffer& buffer,
+		const DemanglingParameters& parameters)
+	{
+		if (parameters.objectNameOnly) {
+			if (!fNode->GetObjectName(buffer, parameters))
+				return false;
+			if (!_AppendCloneName(buffer))
+				return false;
+			return buffer.Append(" ", 1);
+		}
+
+		return ObjectNode::GetObjectName(buffer, parameters);
 	}
 
 	virtual Node* GetUnqualifiedNode(Node* beforeNode)
@@ -1344,9 +1354,24 @@ public:
 		return PREFIX_UNKNOWN;
 	}
 
+	virtual Node* ParameterAt(uint32 index) const
+	{
+		return fNode->ParameterAt(index);
+	}
+
 private:
-	Node*	fNode;
-	Node*	fCloneNode;
+	bool _AppendCloneName(NameBuffer& buffer) const
+	{
+		buffer.Append("[clone ");
+		if (!fCloneNode->GetName(buffer))
+			return false;
+		buffer.Append("]");
+		return true;
+	}
+
+private:
+	ObjectNode*	fNode;
+	Node*		fCloneNode;
 };
 
 
@@ -3969,7 +3994,6 @@ get_next_argument_gcc3(uint32* _cookie, const char* mangledName, char* name,
 const char*
 demangle_name_gcc3(const char* mangledName, char* buffer, size_t bufferSize)
 {
-
 	Demangler demangler;
 	DemanglingInfo info(false);
 	if (demangler.Demangle(mangledName, buffer, bufferSize, info) != ERROR_OK)
