@@ -2003,12 +2003,13 @@ MultiAudioNode::_FillNextBuffer(node_input& input, BBuffer* buffer)
 	uint32 bufferSize = fDevice->BufferList().return_playback_buffer_size;
 
 	if (buffer->SizeUsed() / inputSampleSize / channelCount != bufferSize) {
+		fprintf(stderr, "MultiAudioNode: Rejecting buffer: size is different\n");
 		_WriteZeros(input, input.fBufferCycle);
 		return;
 	}
 
 	if (channelCount != input.fFormat.u.raw_audio.channel_count) {
-		PRINT(("Channel count is different"));
+		fprintf(stderr, "MultiAudioNode: Rejecting buffer: channel count is different\n");
 		return;
 	}
 
