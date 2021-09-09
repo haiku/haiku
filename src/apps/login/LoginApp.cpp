@@ -129,11 +129,11 @@ LoginApp::ArgvReceived(int32 argc, char **argv)
 		else if (arg == "--nonmodal")
 			fModalMode = false;
 		else /*if (arg == "--help")*/ {
-			printf(B_TRANSLATE("Login application for Haiku\nUsage:\n"));
+			puts(B_TRANSLATE("Login application for Haiku\nUsage:"));
 			printf("%s [--nonmodal] [--edit]\n", argv[0]);
-			printf(B_TRANSLATE("--nonmodal	Do not make the window modal\n"));
-			printf(B_TRANSLATE("--edit	Launch in shelf editting mode to "
-				"allow customizing the desktop.\n"));
+			puts(B_TRANSLATE("--nonmodal	Do not make the window modal"));
+			puts(B_TRANSLATE("--edit	Launch in shelf editting mode to "
+				"allow customizing the desktop."));
 			// just return to the shell
 			exit((arg == "--help") ? 0 : 1);
 			return;
