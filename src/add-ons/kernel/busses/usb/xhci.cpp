@@ -715,9 +715,14 @@ XHCI::SubmitControlRequest(Transfer *transfer)
 
 	xhci_endpoint *endpoint = (xhci_endpoint *)pipe->ControllerCookie();
 	if (endpoint == NULL) {
-		TRACE_ERROR("invalid endpoint!\n");
+		TRACE_ERROR("control pipe has no endpoint!\n");
 		return B_BAD_VALUE;
 	}
+	if (endpoint->device == NULL) {
+		panic("endpoint is not initialized!");
+		return B_NO_INIT;
+	}
+
 	status_t status = transfer->InitKernelAccess();
 	if (status != B_OK)
 		return status;
@@ -793,8 +798,14 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 	bool directionIn = (pipe->Direction() == Pipe::In);
 
 	xhci_endpoint *endpoint = (xhci_endpoint *)pipe->ControllerCookie();
-	if (endpoint == NULL)
+	if (endpoint == NULL) {
+		TRACE_ERROR("pipe has no endpoint!\n");
 		return B_BAD_VALUE;
+	}
+	if (endpoint->device == NULL) {
+		panic("endpoint is not initialized!");
+		return B_NO_INIT;
+	}
 
 	status_t status = transfer->InitKernelAccess();
 	if (status != B_OK)
@@ -1823,13 +1834,6 @@ status_t
 XHCI::_LinkDescriptorForPipe(xhci_td *descriptor, xhci_endpoint *endpoint)
 {
 	TRACE("link descriptor for pipe\n");
-
-	// We must check this before we lock the endpoint, because if it is
-	// NULL, the mutex is probably uninitialized, too.
-	if (endpoint->device == NULL) {
-		TRACE_ERROR("trying to submit a transfer to a non-existent endpoint!\n");
-		return B_NO_INIT;
-	}
 
 	// Use mutex_trylock first, in case we are in KDL.
 	if (mutex_trylock(&endpoint->lock) != B_OK)
