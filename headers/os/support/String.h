@@ -423,6 +423,7 @@ private:
 			const int32& 	_ReferenceCount() const;
 			bool			_IsShareable() const;
 			void			_FreePrivateData();
+			void			_ReleasePrivateData();
 
 			char*			fPrivateData;
 };

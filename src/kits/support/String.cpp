@@ -204,8 +204,7 @@ BString::BString(BString&& string)
 
 BString::~BString()
 {
-	if (!_IsShareable() || atomic_add(&_ReferenceCount(), -1) == 1)
-		_FreePrivateData();
+	_ReleasePrivateData();
 }
 
 
@@ -277,8 +276,7 @@ BString&
 BString::operator=(BString&& string)
 {
 	if (this != &string) {
-		this->~BString();
-			// free up any resources allocated by the current contents
+		_ReleasePrivateData();
 		fPrivateData = string.fPrivateData;
 		string.fPrivateData = NULL;
 	}
@@ -309,15 +307,7 @@ BString::SetTo(const BString& string)
 	if (fPrivateData == string.fPrivateData)
 		return *this;
 
-	bool freeData = true;
-
-	if (_IsShareable() && atomic_add(&_ReferenceCount(), -1) > 1) {
-		// there is still someone who shares our data
-		freeData = false;
-	}
-
-	if (freeData)
-		_FreePrivateData();
+	_ReleasePrivateData();
 
 	// if source is sharable share, otherwise clone
 	if (string._IsShareable()) {
@@ -2293,10 +2283,7 @@ BString::_MakeWritable()
 	if (atomic_get(&_ReferenceCount()) > 1) {
 		// It might be shared, and this requires special treatment
 		char* newData = _Clone(fPrivateData, Length());
-		if (atomic_add(&_ReferenceCount(), -1) == 1) {
-			// someone else left, we were the last owner
-			_FreePrivateData();
-		}
+		_ReleasePrivateData();
 		if (newData == NULL)
 			return B_NO_MEMORY;
 
@@ -2328,10 +2315,7 @@ BString::_MakeWritable(int32 length, bool copy)
 		if (newData == NULL)
 			return B_NO_MEMORY;
 
-		if (atomic_add(&_ReferenceCount(), -1) == 1) {
-			// someone else left, we were the last owner
-			_FreePrivateData();
-		}
+		_ReleasePrivateData();
 	} else {
 		// we don't share our data with someone else
 		newData = _Resize(length);
@@ -2466,6 +2450,15 @@ BString::_FreePrivateData()
 		free(fPrivateData - kPrivateDataOffset);
 		fPrivateData = NULL;
 	}
+}
+
+
+void
+BString::_ReleasePrivateData()
+{
+	if (!_IsShareable() || atomic_add(&_ReferenceCount(), -1) == 1)
+		_FreePrivateData();
+	fPrivateData = NULL;
 }
 
 
