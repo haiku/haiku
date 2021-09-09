@@ -98,7 +98,7 @@ usb_serial_trace(bool force, const char *format, ...)
 		close(fd);
 		release_sem(sLogLock);
 	} else
-		dprintf(buffer);
+		dprintf("%s", buffer);
 }
 
 
