@@ -48,11 +48,8 @@ VMArea::VMArea(VMAddressSpace* addressSpace, uint32 wiring, uint32 protection)
 
 VMArea::~VMArea()
 {
-	const uint32 flags = HEAP_DONT_WAIT_FOR_MEMORY
-		| HEAP_DONT_LOCK_KERNEL_SPACE;
-		// TODO: This might be stricter than necessary.
-
-	free_etc(page_protections, flags);
+	free_etc(page_protections, address_space == VMAddressSpace::Kernel()
+		? HEAP_DONT_WAIT_FOR_MEMORY | HEAP_DONT_LOCK_KERNEL_SPACE : 0);
 }
 
 

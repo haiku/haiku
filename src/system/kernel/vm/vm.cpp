@@ -465,7 +465,8 @@ allocate_area_page_protections(VMArea* area)
 	// so we use 4 bits per page.
 	size_t bytes = (area->Size() / B_PAGE_SIZE + 1) / 2;
 	area->page_protections = (uint8*)malloc_etc(bytes,
-		HEAP_DONT_LOCK_KERNEL_SPACE);
+		area->address_space == VMAddressSpace::Kernel()
+			? HEAP_DONT_LOCK_KERNEL_SPACE : 0);
 	if (area->page_protections == NULL)
 		return B_NO_MEMORY;
 
@@ -2634,7 +2635,9 @@ vm_copy_area(team_id team, const char* name, void** _address,
 	if (source->page_protections != NULL) {
 		size_t bytes = (source->Size() / B_PAGE_SIZE + 1) / 2;
 		targetPageProtections = (uint8*)malloc_etc(bytes,
-			HEAP_DONT_LOCK_KERNEL_SPACE);
+			(source->address_space == VMAddressSpace::Kernel()
+					|| targetAddressSpace == VMAddressSpace::Kernel())
+				? HEAP_DONT_LOCK_KERNEL_SPACE : 0);
 		if (targetPageProtections == NULL)
 			return B_NO_MEMORY;
 
