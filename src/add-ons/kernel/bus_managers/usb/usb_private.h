@@ -124,6 +124,8 @@ public:
 
 		usb_id							GetUSBID(Object *object);
 		void							PutUSBID(Object *object);
+
+		// This sets the object as busy; the caller must set it un-busy.
 		Object *						GetObject(usb_id id);
 
 		// only for the kernel debugger
@@ -264,6 +266,9 @@ virtual									~Object();
 		Stack *							GetStack() const { return fStack; }
 
 		usb_id							USBID() const { return fUSBID; }
+		void							SetBusy(bool busy)
+											{ atomic_add(&fBusy, busy ? 1 : -1); }
+
 virtual	uint32							Type() const { return USB_OBJECT_NONE; }
 virtual	const char *					TypeName() const { return "object"; }
 
@@ -280,6 +285,7 @@ private:
 		BusManager *					fBusManager;
 		Stack *							fStack;
 		usb_id							fUSBID;
+		int32							fBusy;
 };
 
 

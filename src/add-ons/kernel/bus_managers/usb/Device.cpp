@@ -326,9 +326,6 @@ Device::Device(Object* parent, int8 hubAddress, uint8 hubPort,
 
 Device::~Device()
 {
-	// Unset fInitOK to indicate we are tearing down.
-	fInitOK = false;
-
 	// Destroy open endpoints. Do not send a device request to unconfigure
 	// though, since we may be deleted because the device was unplugged already.
 	Unconfigure(false);
@@ -347,7 +344,11 @@ Device::~Device()
 
 			for (size_t k = 0; k < interfaceList->alt_count; k++) {
 				usb_interface_info* interface = &interfaceList->alt[k];
-				delete (Interface*)GetStack()->GetObject(interface->handle);
+				Interface* interfaceObject =
+					(Interface*)GetStack()->GetObject(interface->handle);
+				if (interfaceObject != NULL)
+					interfaceObject->SetBusy(false);
+				delete interfaceObject;
 				interface->handle = 0;
 			}
 		}
@@ -629,7 +630,10 @@ Device::ClearEndpoints(int32 interfaceIndex)
 
 		for (size_t i = 0; i < interfaceInfo->endpoint_count; i++) {
 			usb_endpoint_info* endpoint = &interfaceInfo->endpoint[i];
-			delete (Pipe*)GetStack()->GetObject(endpoint->handle);
+			Pipe* pipe = (Pipe*)GetStack()->GetObject(endpoint->handle);
+			if (pipe != NULL)
+				pipe->SetBusy(false);
+			delete pipe;
 			endpoint->handle = 0;
 		}
 	}
