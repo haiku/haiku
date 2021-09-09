@@ -705,7 +705,14 @@ MemoryManager::FreeRawOrReturnCache(void* pages, uint32 flags)
 	readLocker.Unlock();
 
 	if (area == NULL) {
-		// Probably a large allocation. Look up the VM area.
+		// Probably a large allocation.
+		if ((flags & CACHE_DONT_LOCK_KERNEL_SPACE) != 0) {
+			// We cannot delete areas without locking the kernel address space,
+			// so defer the free until we can do that.
+			deferred_free(pages);
+			return NULL;
+		}
+
 		VMAddressSpace* addressSpace = VMAddressSpace::Kernel();
 		addressSpace->ReadLock();
 		VMArea* area = addressSpace->LookupArea((addr_t)pages);
@@ -738,6 +745,12 @@ MemoryManager::FreeRawOrReturnCache(void* pages, uint32 flags)
 	ASSERT(reference <= areaBase + SLAB_AREA_SIZE - 1);
 	size_t size = reference - (addr_t)pages + 1;
 	ASSERT((size % SLAB_CHUNK_SIZE_SMALL) == 0);
+
+	// Verify we can actually lock the kernel space before going further.
+	if ((flags & CACHE_DONT_LOCK_KERNEL_SPACE) != 0) {
+		deferred_free(pages);
+		return NULL;
+	}
 
 	// unmap the chunks
 	_UnmapChunk(area->vmArea, (addr_t)pages, size, flags);
