@@ -178,10 +178,10 @@ void BNetDebug::Dump(const char* data, size_t size, const char* title)
 
 			ptr[0] = '\n';
 			ptr[1] = '\0';
-			fprintf(stderr, text);
+			fputs(text, stderr);
 		};
 	};
-    fprintf( stderr, "----------\n" );
+    fputs("----------\n", stderr);
     fflush( stderr );
 }
 
