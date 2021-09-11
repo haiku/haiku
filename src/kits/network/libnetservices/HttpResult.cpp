@@ -12,10 +12,7 @@
 #include <errno.h>
 #include <Debug.h>
 
-
-#ifndef LIBNETAPI_DEPRECATED
 using namespace BPrivate::Network;
-#endif
 
 
 BHttpResult::BHttpResult(const BUrl& url)
@@ -25,23 +22,6 @@ BHttpResult::BHttpResult(const BUrl& url)
 	fStatusCode(0)
 {
 }
-
-
-#ifdef LIBNETAPI_DEPRECATED
-BHttpResult::BHttpResult(BMessage* archive)
-	:
-	BUrlResult(archive),
-	fUrl(archive->FindString("http:url")),
-	fHeaders(),
-	fStatusCode(archive->FindInt32("http:statusCode"))
-{
-	fStatusString = archive->FindString("http:statusString");
-
-	BMessage headers;
-	archive->FindMessage("http:headers", &headers);
-	fHeaders.PopulateFromArchive(&headers);
-}
-#endif
 
 
 BHttpResult::BHttpResult(const BHttpResult& other)
@@ -86,38 +66,6 @@ BHttpResult::ContentType() const
 }
 
 
-#ifdef LIBNETAPI_DEPRECATED
-size_t
-BHttpResult::Length() const
-{
-	const char* length = Headers()["Content-Length"];
-	if (length == NULL)
-		return 0;
-
-	/* NOTE: Not RFC7230 compliant:
-	 * - If Content-Length is a list, all values must be checked and verified
-	 *   to be duplicates of each other, but this is currently not supported.
-	 */
-	size_t result = 0;
-	/* strtoul() will ignore a prefixed sign, so we verify that there aren't
-	 * any before continuing (RFC7230 only permits digits).
-	 *
-	 * We can check length[0] directly because header values are trimmed by
-	 * HttpHeader beforehand. */
-	if (length[0] != '-' && length[0] != '+') {
-		errno = 0;
-		char *endptr = NULL;
-		result = strtoul(length, &endptr, 10);
-		/* ERANGE will be signalled if the result is too large (which can
-		 * happen), in that case, return 0. */
-		if (errno != 0 || *endptr != '\0')
-			result = 0;
-	}
-	return result;
-}
-
-#else
-
 off_t
 BHttpResult::Length() const
 {
@@ -146,7 +94,6 @@ BHttpResult::Length() const
 	}
 	return result;
 }
-#endif // BNETAPI_DEPRECATED
 
 
 const BHttpHeaders&
@@ -196,34 +143,3 @@ BHttpResult::operator=(const BHttpResult& other)
 
 	return *this;
 }
-
-
-#ifdef LIBNETAPI_DEPRECATED
-status_t
-BHttpResult::Archive(BMessage* target, bool deep) const
-{
-	status_t result = BUrlResult::Archive(target, deep);
-	if (result != B_OK)
-		return result;
-
-	target->AddString("http:url", fUrl);
-	target->AddInt32("http:statusCode", fStatusCode);
-	target->AddString("http:statusString", fStatusString);
-
-	BMessage headers;
-	fHeaders.Archive(&headers);
-	target->AddMessage("http:headers", &headers);
-
-	return B_OK;
-}
-
-
-/*static*/ BArchivable*
-BHttpResult::Instantiate(BMessage* archive)
-{
-	if (!validate_instantiation(archive, "BHttpResult"))
-		return NULL;
-
-	return new BHttpResult(archive);
-}
-#endif

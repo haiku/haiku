@@ -30,13 +30,10 @@
 #include <StackOrHeapArray.h>
 #include <ZlibCompressionAlgorithm.h>
 
+using namespace BPrivate::Network;
+
 
 static const int32 kHttpBufferSize = 4096;
-
-
-#ifndef LIBNETAPI_DEPRECATED
-using namespace BPrivate::Network;
-#endif
 
 
 namespace BPrivate {
@@ -101,53 +98,6 @@ namespace BPrivate {
 };
 
 
-#ifdef LIBNETAPI_DEPRECATED
-BHttpRequest::BHttpRequest(const BUrl& url, bool ssl, const char* protocolName,
-	BUrlProtocolListener* listener, BUrlContext* context)
-	:
-	BNetworkRequest(url, listener, context, "BUrlProtocol.HTTP", protocolName),
-	fSSL(ssl),
-	fRequestMethod(B_HTTP_GET),
-	fHttpVersion(B_HTTP_11),
-	fResult(url),
-	fRequestStatus(kRequestInitialState),
-	fOptHeaders(NULL),
-	fOptPostFields(NULL),
-	fOptInputData(NULL),
-	fOptInputDataSize(-1),
-	fOptRangeStart(-1),
-	fOptRangeEnd(-1),
-	fOptFollowLocation(true)
-{
-	_ResetOptions();
-	fSocket = NULL;
-}
-
-
-BHttpRequest::BHttpRequest(const BHttpRequest& other)
-	:
-	BNetworkRequest(other.Url(), other.fListener, other.fContext,
-		"BUrlProtocol.HTTP", other.fSSL ? "HTTPS" : "HTTP"),
-	fSSL(other.fSSL),
-	fRequestMethod(other.fRequestMethod),
-	fHttpVersion(other.fHttpVersion),
-	fResult(other.fUrl),
-	fRequestStatus(kRequestInitialState),
-	fOptHeaders(NULL),
-	fOptPostFields(NULL),
-	fOptInputData(NULL),
-	fOptInputDataSize(-1),
-	fOptRangeStart(other.fOptRangeStart),
-	fOptRangeEnd(other.fOptRangeEnd),
-	fOptFollowLocation(other.fOptFollowLocation)
-{
-	_ResetOptions();
-		// FIXME some options may be copied from other instead.
-	fSocket = NULL;
-}
-
-#else
-
 BHttpRequest::BHttpRequest(const BUrl& url, BDataIO* output, bool ssl,
 	const char* protocolName, BUrlProtocolListener* listener,
 	BUrlContext* context)
@@ -193,7 +143,6 @@ BHttpRequest::BHttpRequest(const BHttpRequest& other)
 		// FIXME some options may be copied from other instead.
 	fSocket = NULL;
 }
-#endif // LIBNETAPI_DEPRECATED
 
 
 BHttpRequest::~BHttpRequest()
@@ -264,13 +213,11 @@ BHttpRequest::SetAutoReferrer(bool enable)
 }
 
 
-#ifndef LIBNETAPI_DEPRECATED
 void
 BHttpRequest::SetStopOnError(bool stop)
 {
 	fOptStopOnError = stop;
 }
-#endif
 
 
 void
@@ -603,298 +550,6 @@ BHttpRequest::_ProtocolLoop()
 }
 
 
-#ifdef LIBNETAPI_DEPRECATED
-status_t
-BHttpRequest::_MakeRequest()
-{
-	delete fSocket;
-
-	if (fSSL) {
-		if (fContext->UseProxy()) {
-			BNetworkAddress proxy(fContext->GetProxyHost(), fContext->GetProxyPort());
-			fSocket = new(std::nothrow) BPrivate::CheckedProxySecureSocket(proxy, this);
-		} else
-			fSocket = new(std::nothrow) BPrivate::CheckedSecureSocket(this);
-	} else
-		fSocket = new(std::nothrow) BSocket();
-
-	if (fSocket == NULL)
-		return B_NO_MEMORY;
-
-	_EmitDebug(B_URL_PROTOCOL_DEBUG_TEXT, "Connection to %s on port %d.",
-		fUrl.Authority().String(), fRemoteAddr.Port());
-	status_t connectError = fSocket->Connect(fRemoteAddr);
-
-	if (connectError != B_OK) {
-		_EmitDebug(B_URL_PROTOCOL_DEBUG_ERROR, "Socket connection error %s",
-			strerror(connectError));
-		return connectError;
-	}
-
-	//! ProtocolHook:ConnectionOpened
-	if (fListener != NULL)
-		fListener->ConnectionOpened(this);
-
-	_EmitDebug(B_URL_PROTOCOL_DEBUG_TEXT,
-		"Connection opened, sending request.");
-
-	BString requestHeaders;
-	requestHeaders.Append(_SerializeRequest());
-	requestHeaders.Append(_SerializeHeaders());
-	requestHeaders.Append("\r\n");
-	fSocket->Write(requestHeaders.String(), requestHeaders.Length());
-	_EmitDebug(B_URL_PROTOCOL_DEBUG_TEXT, "Request sent.");
-
-	_SendPostData();
-	fRequestStatus = kRequestInitialState;
-
-
-
-	// Receive loop
-	bool disableListener = false;
-	bool receiveEnd = false;
-	bool parseEnd = false;
-	bool readByChunks = false;
-	bool decompress = false;
-	status_t readError = B_OK;
-	ssize_t bytesRead = 0;
-	off_t bytesReceived = 0;
-	off_t bytesTotal = 0;
-	size_t previousBufferSize = 0;
-	off_t bytesUnpacked = 0;
-	char* inputTempBuffer = new(std::nothrow) char[kHttpBufferSize];
-	ArrayDeleter<char> inputTempBufferDeleter(inputTempBuffer);
-	ssize_t inputTempSize = kHttpBufferSize;
-	ssize_t chunkSize = -1;
-	DynamicBuffer decompressorStorage;
-	BDataIO* decompressingStream;
-	ObjectDeleter<BDataIO> decompressingStreamDeleter;
-
-	while (!fQuit && !(receiveEnd && parseEnd)) {
-		if ((!receiveEnd) && (fInputBuffer.Size() == previousBufferSize)) {
-			BStackOrHeapArray<char, 4096> chunk(kHttpBufferSize);
-			bytesRead = fSocket->Read(chunk, kHttpBufferSize);
-
-			if (bytesRead < 0) {
-				readError = bytesRead;
-				break;
-			} else if (bytesRead == 0) {
-				// Check if we got the expected number of bytes.
-				// Exceptions:
-				// - If the content-length is not known (bytesTotal is 0), for
-				//   example in the case of a chunked transfer, we can't know
-				// - If the request method is "HEAD" which explicitly asks the
-				//   server to not send any data (only the headers)
-				if (bytesTotal > 0 && bytesReceived != bytesTotal) {
-					readError = B_IO_ERROR;
-					break;
-				}
-				receiveEnd = true;
-			}
-
-			fInputBuffer.AppendData(chunk, bytesRead);
-		} else
-			bytesRead = 0;
-
-		previousBufferSize = fInputBuffer.Size();
-
-		if (fRequestStatus < kRequestStatusReceived) {
-			_ParseStatus();
-
-			//! ProtocolHook:ResponseStarted
-			if (fRequestStatus >= kRequestStatusReceived && fListener != NULL
-					&& !disableListener)
-				fListener->ResponseStarted(this);
-		}
-
-		if (fRequestStatus < kRequestHeadersReceived) {
-			_ParseHeaders();
-
-			if (fRequestStatus >= kRequestHeadersReceived) {
-				_ResultHeaders() = fHeaders;
-
-				// Parse received cookies
-				if (fContext != NULL) {
-					for (int32 i = 0;  i < fHeaders.CountHeaders(); i++) {
-						if (fHeaders.HeaderAt(i).NameIs("Set-Cookie")) {
-							fContext->GetCookieJar().AddCookie(
-								fHeaders.HeaderAt(i).Value(), fUrl);
-						}
-					}
-				}
-
-				//! ProtocolHook:HeadersReceived
-				if (fListener != NULL && !disableListener)
-					fListener->HeadersReceived(this, fResult);
-
-
-				if (BString(fHeaders["Transfer-Encoding"]) == "chunked")
-					readByChunks = true;
-
-				BString contentEncoding(fHeaders["Content-Encoding"]);
-				// We don't advertise "deflate" support (see above), but we
-				// still try to decompress it, if a server ever sends a deflate
-				// stream despite it not being in our Accept-Encoding list.
-				if (contentEncoding == "gzip"
-						|| contentEncoding == "deflate") {
-					decompress = true;
-					readError = BZlibCompressionAlgorithm()
-						.CreateDecompressingOutputStream(&decompressorStorage,
-							NULL, decompressingStream);
-					if (readError != B_OK)
-						break;
-
-					decompressingStreamDeleter.SetTo(decompressingStream);
-				}
-
-				int32 index = fHeaders.HasHeader("Content-Length");
-				if (index != B_ERROR)
-					bytesTotal = atoll(fHeaders.HeaderAt(index).Value());
-				else
-					bytesTotal = -1;
-
-				if (fRequestMethod == B_HTTP_HEAD
-					|| fResult.StatusCode() == 204) {
-					// In the case of a HEAD request or if the server replies
-					// 204 ("no content"), we don't expect to receive anything
-					// more, and the socket will be closed.
-					receiveEnd = true;
-				}
-			}
-		}
-
-		if (fRequestStatus >= kRequestHeadersReceived) {
-			// If Transfer-Encoding is chunked, we should read a complete
-			// chunk in buffer before handling it
-			if (readByChunks) {
-				if (chunkSize >= 0) {
-					if ((ssize_t)fInputBuffer.Size() >= chunkSize + 2) {
-							// 2 more bytes to handle the closing CR+LF
-						bytesRead = chunkSize;
-						if (inputTempSize < chunkSize + 2) {
-							inputTempSize = chunkSize + 2;
-							inputTempBuffer
-								= new(std::nothrow) char[inputTempSize];
-							inputTempBufferDeleter.SetTo(inputTempBuffer);
-						}
-
-						if (inputTempBuffer == NULL) {
-							readError = B_NO_MEMORY;
-							break;
-						}
-
-						fInputBuffer.RemoveData(inputTempBuffer,
-							chunkSize + 2);
-						chunkSize = -1;
-					} else {
-						// Not enough data, try again later
-						bytesRead = -1;
-					}
-				} else {
-					BString chunkHeader;
-					if (_GetLine(chunkHeader) == B_ERROR) {
-						chunkSize = -1;
-						bytesRead = -1;
-					} else {
-						// Format of a chunk header:
-						// <chunk size in hex>[; optional data]
-						int32 semiColonIndex = chunkHeader.FindFirst(';', 0);
-
-						// Cut-off optional data if present
-						if (semiColonIndex != -1) {
-							chunkHeader.Remove(semiColonIndex,
-								chunkHeader.Length() - semiColonIndex);
-						}
-
-						chunkSize = strtol(chunkHeader.String(), NULL, 16);
-						if (chunkSize == 0)
-							fRequestStatus = kRequestContentReceived;
-
-						bytesRead = -1;
-					}
-				}
-
-				// A chunk of 0 bytes indicates the end of the chunked transfer
-				if (bytesRead == 0)
-					receiveEnd = true;
-			} else {
-				bytesRead = fInputBuffer.Size();
-
-				if (bytesRead > 0) {
-					if (inputTempSize < bytesRead) {
-						inputTempSize = bytesRead;
-						inputTempBuffer = new(std::nothrow) char[bytesRead];
-						inputTempBufferDeleter.SetTo(inputTempBuffer);
-					}
-
-					if (inputTempBuffer == NULL) {
-						readError = B_NO_MEMORY;
-						break;
-					}
-					fInputBuffer.RemoveData(inputTempBuffer, bytesRead);
-				}
-			}
-
-			if (bytesRead >= 0) {
-				bytesReceived += bytesRead;
-
-				if (fListener != NULL && !disableListener) {
-					if (decompress) {
-						readError = decompressingStream->WriteExactly(
-							inputTempBuffer, bytesRead);
-						if (readError != B_OK)
-							break;
-
-						ssize_t size = decompressorStorage.Size();
-						BStackOrHeapArray<char, 4096> buffer(size);
-						size = decompressorStorage.Read(buffer, size);
-						_NotifyDataReceived(buffer, bytesUnpacked, size,
-							bytesReceived, bytesTotal);
-						bytesUnpacked += size;
-					} else if (bytesRead > 0) {
-						_NotifyDataReceived(inputTempBuffer,
-							bytesReceived - bytesRead, bytesRead,
-							bytesReceived, bytesTotal);
-					}
-				}
-
-				if (bytesTotal >= 0 && bytesReceived >= bytesTotal)
-					receiveEnd = true;
-
-				if (decompress && receiveEnd && !disableListener) {
-					readError = decompressingStream->Flush();
-
-					if (readError == B_BUFFER_OVERFLOW)
-						readError = B_OK;
-
-					if (readError != B_OK)
-						break;
-
-					ssize_t size = decompressorStorage.Size();
-					BStackOrHeapArray<char, 4096> buffer(size);
-					size = decompressorStorage.Read(buffer, size);
-					if (fListener != NULL) {
-						_NotifyDataReceived(buffer, bytesUnpacked, size,
-							bytesReceived, bytesTotal);
-						bytesUnpacked += size;
-					}
-				}
-			}
-		}
-
-		parseEnd = (fInputBuffer.Size() == 0);
-	}
-
-	fSocket->Disconnect();
-
-	if (readError != B_OK)
-		return readError;
-
-	return fQuit ? B_INTERRUPTED : B_OK;
-}
-
-#else
-
 status_t
 BHttpRequest::_MakeRequest()
 {
@@ -1214,7 +869,6 @@ BHttpRequest::_MakeRequest()
 
 	return fQuit ? B_INTERRUPTED : B_OK;
 }
-#endif // LIBNETAPI_DEPRECATED
 
 
 void
@@ -1598,33 +1252,3 @@ BHttpRequest::_IsDefaultPort()
 		return true;
 	return false;
 }
-
-
-#ifdef LIBNETAPI_DEPRECATED
-void
-BHttpRequest::_NotifyDataReceived(const char* data, off_t pos, ssize_t size,
-	off_t bytesReceived, ssize_t bytesTotal)
-{
-	if (fListener == NULL || size <= 0)
-		return;
-	if (fOptRangeStart > 0) {
-		pos += fOptRangeStart;
-		// bytesReceived and bytesTotal refer to the requested range,
-		// so that should technically not be adjusted for the range start.
-		// For displaying progress to the user, this is not ideal, though.
-		// But only for the case where we request the remainder of a file.
-		// Range requests can also be used to request any portion of a
-		// resource, so not modifying them is technically more correct.
-		// We can use a little trick, though: We know when the remainder
-		// is requested, because then fOptRangeEnd is -1.
-		if (fOptRangeEnd == -1) {
-			bytesReceived += fOptRangeStart;
-			if (bytesTotal > 0)
-				bytesTotal += fOptRangeStart;
-		}
-	}
-	fListener->DataReceived(this, data, pos, size);
-	fListener->DownloadProgress(this, bytesReceived,
-		std::max((ssize_t)0, bytesTotal));
-}
-#endif

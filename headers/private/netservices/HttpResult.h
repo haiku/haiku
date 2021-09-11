@@ -12,11 +12,10 @@
 #include <UrlResult.h>
 
 
-#ifndef LIBNETAPI_DEPRECATED
 namespace BPrivate {
 
 namespace Network {
-#endif
+
 
 class BUrlRequest;
 
@@ -26,9 +25,6 @@ class BHttpResult: public BUrlResult {
 
 public:
 										BHttpResult(const BUrl& url);
-#ifdef LIBNETAPI_DEPRECATED
-										BHttpResult(BMessage*);
-#endif
 										BHttpResult(const BHttpResult& other);
 										~BHttpResult();
 
@@ -38,11 +34,7 @@ public:
 	// Result parameters access
 			const BUrl&					Url() const;
 			BString						ContentType() const;
-#ifdef LIBNETAPI_DEPRECATED
-			size_t						Length() const;
-#else
 			off_t						Length() const;
-#endif
 
 	// HTTP-Specific stuff
 			const BHttpHeaders&			Headers() const;
@@ -55,10 +47,6 @@ public:
 	// Overloaded members
 			BHttpResult&				operator=(const BHttpResult& other);
 
-#ifdef LIBNETAPI_DEPRECATED
-	virtual	status_t					Archive(BMessage*, bool) const;
-	static	BArchivable*				Instantiate(BMessage*);
-#endif
 private:
 			BUrl						fUrl;
 
@@ -67,10 +55,9 @@ private:
 			BString						fStatusString;
 };
 
-#ifndef LIBNETAPI_DEPRECATED
+
 } // namespace Network
 
 } // namespace BPrivate
-#endif
 
 #endif // _B_URL_RESULT_H_

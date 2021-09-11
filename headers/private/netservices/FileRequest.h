@@ -13,11 +13,10 @@
 #include <UrlProtocolRoster.h>
 
 
-#ifndef LIBNETAPI_DEPRECATED
 namespace BPrivate {
 
 namespace Network {
-#endif
+
 
 class BFileRequest : public BUrlRequest {
 public:
@@ -29,26 +28,19 @@ public:
 private:
 			friend class BUrlProtocolRoster;
 
-#ifdef LIBNETAPI_DEPRECATED
-								BFileRequest(const BUrl& url,
-									BUrlProtocolListener* listener = NULL,
-									BUrlContext* context = NULL);
-#else
 								BFileRequest(const BUrl& url,
 									BDataIO* output,
 									BUrlProtocolListener* listener = NULL,
 									BUrlContext* context = NULL);
-#endif
 
 			status_t			_ProtocolLoop();
 private:
 			BUrlResult			fResult;
 };
 
-#ifndef LIBNETAPI_DEPRECATED
+
 } // namespace Network
 
 } // namespace BPrivate
-#endif
 
 #endif // _B_FILE_REQUEST_H_

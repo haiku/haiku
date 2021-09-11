@@ -12,11 +12,10 @@
 #include <UrlProtocolRoster.h>
 
 
-#ifndef LIBNETAPI_DEPRECATED
 namespace BPrivate {
 
 namespace Network {
-#endif
+
 
 class BGopherRequest : public BNetworkRequest {
 public:
@@ -29,27 +28,18 @@ public:
 private:
 			friend class BUrlProtocolRoster;
 
-#ifdef LIBNETAPI_DEPRECATED
-								BGopherRequest(const BUrl& url,
-									BUrlProtocolListener* listener = NULL,
-									BUrlContext* context = NULL);
-#else
 								BGopherRequest(const BUrl& url,
 									BDataIO* output,
 									BUrlProtocolListener* listener = NULL,
 									BUrlContext* context = NULL);
-#endif
 
 			status_t			_ProtocolLoop();
 			void				_SendRequest();
 
 			bool				_NeedsParsing();
 			bool				_NeedsLastDotStrip();
-#ifdef LIBNETAPI_DEPRECATED
-			void				_ParseInput(bool last);
-#else
+
 			status_t			_ParseInput(bool last);
-#endif
 
 			BString&			_HTMLEscapeString(BString &str);
 
@@ -62,10 +52,9 @@ private:
 			BUrlResult			fResult;
 };
 
-#ifndef LIBNETAPI_DEPRECATED
+
 } // namespace Network
 
 } // namespace BPrivate
-#endif
 
 #endif // _B_GOPHER_REQUEST_H_

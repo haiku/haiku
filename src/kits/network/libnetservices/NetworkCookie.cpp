@@ -20,12 +20,8 @@
 #include <HttpTime.h>
 #include <NetworkCookie.h>
 
-#ifdef LIBNETAPI_DEPRECATED
-using BPrivate::BHttpTime;
-using BPrivate::B_HTTP_TIME_FORMAT_COOKIE;
-#else
 using namespace BPrivate::Network;
-#endif
+
 
 static const char* kArchivedCookieName = "be:cookie.name";
 static const char* kArchivedCookieValue = "be:cookie.value";

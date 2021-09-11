@@ -13,6 +13,8 @@
 
 #include <cstdio>
 
+using namespace BPrivate::Network;
+
 
 // The formats used should be, in order of preference (according to RFC2616,
 // section 3.3):
@@ -47,12 +49,6 @@ static const char* kDateFormats[] = {
 	"%a %d %b %H:%M:%S %Y"
 };
 
-#ifdef LIBNETAPI_DEPRECATED
-using namespace BPrivate;
-#else
-using namespace BPrivate::Network;
-#endif
-
 
 BHttpTime::BHttpTime()
 	:
@@ -78,7 +74,7 @@ BHttpTime::BHttpTime(const BString& dateString)
 {
 }
 
-	
+
 // #pragma mark Date modification
 
 
@@ -95,7 +91,7 @@ BHttpTime::SetDate(BDateTime date)
 	fDate = date;
 }
 
-	
+
 // #pragma mark Date conversion
 
 
@@ -103,7 +99,7 @@ BDateTime
 BHttpTime::Parse()
 {
 	struct tm expireTime;
-	
+
 	if (fDateString.Length() < 4)
 		return 0;
 
@@ -162,10 +158,10 @@ BHttpTime::ToString(int8 format)
 		static const uint16 kTimetToStringMaxLength = 128;
 		char expirationString[kTimetToStringMaxLength + 1];
 		size_t strLength;
-	
+
 		strLength = strftime(expirationString, kTimetToStringMaxLength,
 			kDateFormats[format], &expirationTm);
-	
+
 		expirationFinal.SetTo(expirationString, strLength);
 	}
 	return expirationFinal;

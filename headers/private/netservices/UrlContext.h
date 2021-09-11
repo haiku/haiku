@@ -14,11 +14,10 @@
 #include <Referenceable.h>
 
 
-#ifndef LIBNETAPI_DEPRECATED
 namespace BPrivate {
 
 namespace Network {
-#endif
+
 
 class BUrlContext: public BReferenceable {
 public:
@@ -55,11 +54,8 @@ private:
 };
 
 
-#ifndef LIBNETAPI_DEPRECATED
 } // namespace Network
 
 } // namespace BPrivate
-#endif
-
 
 #endif // _B_URL_CONTEXT_H_
