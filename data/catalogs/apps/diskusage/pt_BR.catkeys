@@ -3,13 +3,13 @@
 Scanning %refName%	Scanner		Analisando %refName%
 %d files	Status View	For UI layouting only, use the longest plural form for your language	%d arquivos
 Size	Info Window		Tamanho
-Rescan	Pie View		ReAnalisar
+Rescan	Pie View		Re-analisar
 Kind	Info Window		Tipo
 file unavailable	Pie View		arquivo não disponível
 no supporting apps	Pie View		sem suporte a apps
 Path	Info Window		Caminho
 Scan	Status View		Analisar
-Rescan	Status View		ReAnalisar
+Rescan	Status View		Re-analisar
 file unavailable	Status View		arquivo não disponível
 Get info	Pie View		Obter informação
 DiskUsage	System name		Uso de Disco

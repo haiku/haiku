@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-CharacterMap	3632238193
+1	thai	x-vnd.Haiku-CharacterMap	638822715
 Tirhuta	UnicodeBlocks		Tirhuta
 Miscellaneous mathematical symbols B	UnicodeBlocks		สัญลักษณ์ทางคณิตศาสตร์เบ็ดเตล็ด B
 Latin extended E	UnicodeBlocks		Latin ขยาย E
@@ -211,6 +211,8 @@ Sinhala	UnicodeBlocks		สิงหล
 Bhaiksuki	UnicodeBlocks		Bhaiksuki
 Dives Akuru	UnicodeBlocks		ดิเวส อกุรุ
 Ugaritic	UnicodeBlocks		Ugaritic
+Old North Arabian	UnicodeBlocks		อาระเบียนเหนือโบราญ
+Mende Kikakui	UnicodeBlocks		เมนเด คิคากุย
 Cyrillic extended C	UnicodeBlocks		Cyrillic extended C
 Syriac	UnicodeBlocks		Syriac
 Private use area	UnicodeBlocks		พื้นที่ใช้งานส่วนตัว

@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku.TextSearch	3859480651
+1	greek, modern (1453-)	x-vnd.Haiku.TextSearch	1757850908
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Παρακαλώ επιλέξτε τα αρχεία που επιθυμείτε, τα οποία έχουν επιλέγει στον Ιχνηλάτη για σας.
 %appname% : %path%	GrepWindow		%appname% : %path%
 Failed to start xargs program!	Grepper		Το ξεκίνημα του προγράμματος xargs απέτυχε!
@@ -6,6 +6,7 @@ Open selection	GrepWindow		Άνοιγμα επιλεγμένου
 Actions	GrepWindow		Ενέργειες
 New window	GrepWindow		Νέο παράθυρο
 Encoding	GrepWindow		Κωδικοποίηση
+Set target to parent folder	GrepWindow		Ορισμός τονικού καταλόγου ως προορισμό
 OK	GrepWindow		Εντάξει
 %appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
 Close	GrepWindow		Κλείσιμο

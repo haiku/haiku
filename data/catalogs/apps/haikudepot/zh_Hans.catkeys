@@ -69,8 +69,8 @@ OK	UserLoginWindow		确定
 Stability:	RatePackageWindow		稳定性:
 Source packages	MainWindow		源代码包
 -	no package size		-
-Rate package	RatePackageWindow		软件包评分
 Try again	App		请重试
+Rate package	RatePackageWindow		软件包评分
 Unknown	PackageListView		未知
 Log in	UserLoginWindow		登陆
 Logged in as %User%	MainWindow		登录 as %User%

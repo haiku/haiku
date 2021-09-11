@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Network	3062143965
+1	greek, modern (1453-)	x-vnd.Haiku-Network	543099905
 Ethernet device	InterfaceListItem		Συσκευή Ethernet
 Link speed:	IntefaceView		Ταχύτητα σύνδεσης:
 disconnected	IntefaceView		έγινε αποσύνδεση
@@ -13,6 +13,7 @@ Gateway:	IntefaceAddressView		Πύλη δικτύου:
 The netmask defines your local network	IntefaceAddressView		Η μάσκα δικτύου καθορίζει το τοπικό σας δίκτυο
 Your IP address	IntefaceAddressView		Η διεύθυνση IP σας
 DHCP	IntefaceAddressView		DHCP
+IP address:	IntefaceAddressView		Διεύθυνση IP:
 Netmask:	IntefaceAddressView		Μάσκα δικτύου:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Υπηρεσίες

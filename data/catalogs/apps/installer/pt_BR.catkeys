@@ -1,11 +1,11 @@
 1	portuguese (brazil)	x-vnd.Haiku-Installer	2017577026
-Performing installation.	InstallProgress		Fazendo a instalação.
+Performing installation.	InstallProgress		Executando a instalação.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Escolha o disco de origem no menu pop-up. Então clique em \"Iniciar\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Por favor feche o Gerenciador de Disco antes de fechar o Instalador.
 No optional packages available.	PackagesView		Nenhum pacote opcional disponível.
 The mount point could not be retrieved.	InstallProgress		O ponto de montagem não pôde ser recuperado.
 <none>	InstallerWindow	No partition available	<nenhum>
-Please choose target	InstallerWindow		Por favor, escolha um alvo
+Please choose target	InstallerWindow		Favor escolher um destino
 Cancel	InstallProgress		Cancelar
 Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Instalação concluída. O setor de inicialização foi gravado em '%s'. Pressione Reiniciar para reiniciar o computador ou escolha um novo volume para realizar outra instalação.
 Are you sure you want to to stop the installation?	InstallerWindow		Tem certeza de que deseja parar a instalação?
@@ -55,7 +55,7 @@ Writing bootsector.	InstallProgress		Escrevendo setor de inicialização.
 An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Um erro foi encontrado e a instalação não foi concluída:\n\nErro:  %s
 Restart	InstallerWindow		Reiniciar
 The disk can't be mounted. Please choose a different disk.	InstallProgress		O disco não pode ser montado. Por favor escolha um disco diferente.
-Begin	InstallerWindow		Início
+Begin	InstallerWindow		Iniciar
 Collecting copy information.	InstallProgress		Coletando informações para cópia.
 Show optional packages	InstallerWindow		Mostrar items opcionais
 No partitions have been found that are suitable for installation. Please set up partitions and format at least one partition with the Be File System.	InstallerWindow		Não foram encontradas partições adequadas para instalação. Configure as partições e formate pelo menos uma partição com o Be File System.
@@ -68,7 +68,7 @@ Scanning for disks…	InstallerWindow		Analisando os discos…
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Executando o Gerenciador de Disco…\n\nFechar o Gerenciador de Disco para continuar com a instalação.
 The installation is not complete yet!\nAre you sure you want to stop it?	InstallerWindow		A instalação ainda não está concluída!\nTem certeza que deseja parar?
 The partition can't be mounted. Please choose a different partition.	InstallProgress		A partição não pode ser montada. Por favor escolha uma partição diferente.
-Set up partitions…	InstallerWindow		Configurar as partições...
+Set up partitions…	InstallerWindow		Configurar partições…
 Install progress:  	InstallerWindow		Progresso na instalação:  
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Você não pode instalar o conteúdo de um disco dentro dele mesmo. Por favor escolha um disco diferente.
 Boot Manager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Gerenciador de Inicialização, o aplicativo para configurar o menu de inicialização do Haiku não pôde ser iniciado.

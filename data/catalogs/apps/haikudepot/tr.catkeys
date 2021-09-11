@@ -1,10 +1,9 @@
-1	turkish	x-vnd.Haiku-HaikuDepot	3544756144
+1	turkish	x-vnd.Haiku-HaikuDepot	3437352458
 Repository update error	LocalRepositoryUpdateProcess		Depo güncelleme hatası
 Network error	ServerHelper		Ağ hatası
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Depo güncellenirken bir hata oluştu: %error%
 User Created	UserLoginWindow		Kullanıcı Oluşturuldu
 Check for updates…	MainWindow		Güncellemeleri denetle…
-Uninstall	PackageManager		Kaldır
 Uninstalled	PackageListView		Kaldırıldı
 It was not possible to create the new user.	UserLoginWindow		Yeni kullanıcı oluşturulamadı.
 Available packages	MainWindow		Kullanılabilir paketler
@@ -17,7 +16,6 @@ Starting the package daemon failed:\n\n%Error%	App		Paket hizmeti başlatılamad
 You have successfully authenticated as user %Nickname%.	UserLoginWindow		Kimlik %Nickname% olarak başarıyla doğrulandı.
 <no info>	PackageInfoView		<bilgi yok>
 No user ratings available.	PackageInfoView		Kullanıcı oyu yok.
-Downloading package '%name%'	WorkStatusView		'%name%' paketi indiriliyor
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Sunucudan geri gönderilen veriyle gerekli CAPTCHA bilgisi alınamadı.
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Sunucu sistemi ile iletişim kurarken bir ağ ulaşım hatası oluştu: %s
 Rating	PackageListView		Derecelendirme
@@ -29,7 +27,6 @@ This application writes and reads some working files on your computer in order t
 Active	PackageListView		Etkin
 Login or Create account	MainWindow		Giriş yap veya hesap oluştur
 <Package contents not available for remote packages>	PackageContentsView		<Uzak konum paketleri için paket içeriği kullanılamıyor>
-{0, plural,one{1 package to download}other{# packages to download}}	WorkStatusView		{0, plural, other{# paket indirilecek}}
 Ratings	PackageInfoView		Derecelendirmeler
 Switch account…	MainWindow		Hesap değiştir…
 Preferred language:	UserLoginWindow		Tercih edilen dil:
@@ -46,8 +43,6 @@ Category	FilterView		Kategori
 User rating	RatePackageWindow		Kullanıcı oyları
 Installed packages	MainWindow		Yüklü paketler
 A requested object or an object involved in the request was not found on the server.	ServerHelper		İstenen nesne veya istekle ilgili bir nesne sunucuda bulunamadı.
-Fatal error	PackageManager		Onulmaz hata
-Package action failed	PackageInfoView		Paket eylemi başarısız
 No changelog available.	PackageInfoView		Değişiklik günlüğü mevcut değil
 Error	App		Hata
 There was a puzzling response from the web service.	UserLoginWindow		Web servisinden kafa karıştıran bir yanıt alındı.
@@ -79,7 +74,6 @@ Stability	RatePackageWindow		Kararlılık
 Send	RatePackageWindow		Gönder
 Start package daemon	App		Paket hizmetini başlat
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Yanlış girme olasılığını ortadan kaldırmak için parolanız bir kez daha girilmelidir.
-The package action could not be scheduled: %Error%	PackageInfoView		Paket eylemi zamanlanamadı: %Error%
 Cancel	SettingsWindow		İptal
 Cancel	RatePackageWindow		İptal
 Inactive	PackageListView		Etkin değil
@@ -89,7 +83,6 @@ There are problems in the supplied data:	UserLoginWindow		Girilen veride sorunla
 OK	MainWindow		Tamam
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, other{# öge}}
 Usage conditions download problem	UserLoginWindow		Kullanım koşulları indirilirken hata
-OK	PackageInfoView		Tamam
 Downloading:	PackageInfoView		İndiriliyor:
 Quit	MainWindow		Çık
 Success	UserLoginWindow		Başarılı
@@ -118,7 +111,6 @@ This rating is visible to other users	RatePackageWindow		Bu derecelendirme diğe
 While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		Paket verisi güncellenirken verinin uygulamaya yansıtılamamasına neden olan bir sorun oluştu. Bu sorun hakkında ayrıntılı bilgiye uygulama günlüklerinden erişilebilir.\nGünlük görüntüleme üzerine bilgiyi Haiku Kullanıcı Kılavuzu'nun Haiku Depo bölümünde bulabilirsiniz.
 View agreed usage conditions…	MainWindow		Kabul edilen kullanım koşullarını görüntüle…
 Cancel	MainWindow		İptal
-{0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 tane daha indirilecek)}other{(# tane daha indirilecek)}}
 Refresh repositories	MainWindow		Depoları yenile
 Continue	App		Sürdür
 A password is required.	UserLoginWindow		Bir parola gerekli.
@@ -145,8 +137,8 @@ Source packages	MainWindow		Kaynak paketleri
 -	no package size		-
 Problem with working files	App		Çalışma dosyalarında sorun
 Server error	ServerHelper		Sunucu hatası
-Rate package	RatePackageWindow		Paketi derecelendir
 Try again	App		Yeniden dene
+Rate package	RatePackageWindow		Paketi derecelendir
 Unknown	PackageListView		Bilinmeyen
 I agree to the usage conditions	UserLoginWindow		Kullanım koşullarını kabul ediyorum
 Log in	UserLoginWindow		Giriş yap
@@ -154,8 +146,8 @@ Sending anonymous usage data	MainWindow		Anonim kullanım verisi gönder
 Logged in as %User%	MainWindow		%User% olarak giriş yapıldı
 Email address:	UserLoginWindow		E-posta adresi:
 Screenshot	ScreenshotWindow		Ekran görüntüsü
-A reboot is necessary to complete the installation process.	PackageManager		Yükleme işlemini tamamlamak için bilgisayarı yeniden başlatmalısınız.
 HaikuDepot	System name		Haiku Depo
+A reboot is necessary to complete the installation process.	PackageManager		Yükleme işlemini tamamlamak için bilgisayarı yeniden başlatmalısınız.
 Yes	MainWindow		Evet
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{Bir yaşından büyüğüm}other{# yaşından büyüğüm}}
 View latest usage conditions…	MainWindow		Güncel kullanım koşullarını görüntüle…
@@ -172,7 +164,6 @@ Fetching remote repository data	LocalRepositoryUpdateProcess		Uzak depo bilgisi 
 Description	PackageListView		Tanım
 Open %DeskbarLink%	PackageManager		Aç: %DeskbarLink%
 User creation error	UserLoginWindow		Kullanıcı oluşturma hatası
-Install	PackageManager		Yükle
 Input validation	UserLoginWindow		Girdi doğrulaması
 Log in…	MainWindow		Giriş yap…
 You need to be logged into an account before you can rate packages.	MainWindow		Paketleri derecelendirmek için giriş yapmalısınız.

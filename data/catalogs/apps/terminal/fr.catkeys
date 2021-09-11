@@ -13,8 +13,8 @@ Copy	Terminal TermWindow		Copier
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory	Terminal TermApp		  -h,     --help               affiche cette aide\n  -t,     --title              défini le titre de la fenêtre\n  -f,     --fullscreen         démarre en plein écran\n  -w,     --working-directory  défini le répertoire de travail initial
 Retro	Terminal colors scheme		Rétro
 Edit tab title…	Terminal TermWindow		Éditer le titre de l’onglet…
-Print	Terminal TermWindow		Imprimer
 Settings	Terminal TermWindow		Réglages
+Print	Terminal TermWindow		Imprimer
 %app% settings	Terminal PrefWindow	window title	Réglages du %app%
 Use default	Terminal SetTitleWindow		Par défaut
 Close tab	Terminal TermWindow		Fermer l’onglet
@@ -33,8 +33,8 @@ Defaults	Terminal PrefWindow		Paramètres par défaut
 Cancel	Terminal TermView		Annuler
 Revert	Terminal PrefWindow		Rétablir
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
-Use selection	Terminal FindWindow		Utiliser la sélection
 Find next	Terminal TermWindow		Rechercher le suivant
+Use selection	Terminal FindWindow		Utiliser la sélection
 Copy link location	Terminal TermView		Copier l’emplacement du lien
 Window title:	Terminal AppearancePrefView		Titre de la fenêtre :
 New tab	Terminal TermWindow		Nouvel onglet
@@ -53,12 +53,12 @@ Unrecognized option \"%s\"\n	Terminal arguments parsing		Option « %s » non r
 Tab title:	Terminal AppearancePrefView		Titre de l’onglet :
 Text not found.	Terminal TermWindow		Texte non trouvé.
 Find failed	Terminal TermWindow		Échec de la recherche
-Match word	Terminal FindWindow		Rechercher le mot
 Color scheme:	Terminal AppearancePrefView		Profil de couleurs :
+Match word	Terminal FindWindow		Rechercher le mot
 New Terminal	Terminal TermWindow		Nouveau Terminal
 Quit	Terminal TermWindow		Quitter
-Match case	Terminal FindWindow		Sensible à la casse
 Find previous	Terminal TermWindow		Rechercher le précédent
+Match case	Terminal FindWindow		Sensible à la casse
 The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Le motif servant à composer le titre des onglets. Vous\npouvez utiliser les variables suivantes :
 Close	Terminal TermWindow		Fermer
 Save to file…	Terminal PrefWindow		Enregistrer sous…
@@ -80,11 +80,11 @@ Window size:	Terminal AppearancePrefView		Taille de la fenêtre :
 Switch Terminals	Terminal TermWindow		Inverser les Terminaux
 Decrease	Terminal TermWindow		Réduire
 Settings…	Terminal TermWindow		Réglages…
-Cancel	Terminal SetTitleWindow		Annuler
 Blinking cursor	Terminal AppearancePrefView		Curseur clignotant
+Cancel	Terminal SetTitleWindow		Annuler
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Le modèle utilisé pour composer le titre des fenêtres peut\ncontenir les éléments suivants :\n
-Use text:	Terminal FindWindow		Utiliser le texte :
 Close active tab	Terminal TermWindow		Fermer l’onglet actif
+Use text:	Terminal FindWindow		Utiliser le texte :
 Save as default	Terminal TermWindow		Enregistrer comme valeur par défaut
 Nothing is selected.	Terminal TermWindow		Rien n’est sélectionné.
 Use left Option as Meta key	Terminal AppearancePrefView		Utiliser la touche Option gauche comme touche Meta
@@ -112,6 +112,6 @@ Increase	Terminal TermWindow		Augmenter
 OK	Terminal TermWindow		OK
 Close window	Terminal TermWindow		Fermer la fenêtre
 Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright ©1999 Kazuho Okui et Takashi Murai.\n\nUtilisation : %s [OPTION] [SHELL]\n
-Solarized Light	Terminal colors scheme		Ensoleillé
 Clear all	Terminal TermWindow		Effacer tout
+Solarized Light	Terminal colors scheme		Ensoleillé
 Search forward	Terminal FindWindow		Rechercher en avant

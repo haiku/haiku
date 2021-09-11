@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-FirstBootPrompt	3595268803
+1	portuguese	x-vnd.Haiku-FirstBootPrompt	2131367349
 Japanese	KeymapNames		Japonês
 US	KeymapNames		EUA
 Cancel	BootPromptWindow		Cancelar
@@ -56,18 +56,15 @@ Swiss-French	KeymapNames		Francês da Suíça
 Slovene	KeymapNames		Esloveno
 Lithuanian	KeymapNames		Lituano
 French (NF Z71-300)	KeymapNames		Francês (NF Z71-300)
-Thank you for trying out %distroname%! We hope you'll like it!\n\nPlease select your preferred language and keymap. Both settings can also be changed later when running %distroname%.\n\nDo you wish to install %distroname% now, or try it out first?	BootPromptWindow	For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	Obrigado por experimentar o %distroname%! Esperamos que seja do seu agrado!\n\nPor favor, selecione a língua e a disposição de teclado que prefere. Ambas as configurações podem ser alteradas mais tarde ao usar o %distroname%.\n\nPretende instalar agora o %distroname%, ou experimentar primeiro?
 ISO-9995	KeymapNames		ISO-9995
 Kazakh	KeymapNames		Cazaque
 Language	BootPromptWindow		Idioma
-Welcome to %distroname%!	BootPromptWindow		Bem-vindo(a) ao %distroname%!
 Lithuanian (Standard)	KeymapNames		Lituano (padrão)
 Belgian (comma)	KeymapNames		Belga (vírgula)
 Custom	BootPromptWindow		Personalizado
 Norwegian	KeymapNames		Norueguês
 Danish	KeymapNames		Dinamarquês
 Bulgarian (Phonetic)	KeymapNames		Búlgaro (fonético)
-Try out %distroname%	BootPromptWindow		Experimentar %distroname%
 Canadian-French	KeymapNames		Francês do Canadá
 Russian	KeymapNames		Russo
 Hungarian	KeymapNames		Húngaro
@@ -79,6 +76,5 @@ Czech (Mac)	KeymapNames		Checo (Mac)
 Brazilian (ABNT2)	KeymapNames		Brasileiro (ABNT2)
 Albanian	KeymapNames		Albanês
 Dutch	KeymapNames		Holandês
-Install %distroname%	BootPromptWindow		Instalar %distroname%
 Friulian	KeymapNames		Friulano
 Icelandic	KeymapNames		Islandês

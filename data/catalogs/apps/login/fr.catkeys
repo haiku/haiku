@@ -1,11 +1,8 @@
-1	french	x-vnd.Haiku-Login	336867745
+1	french	x-vnd.Haiku-Login	3033693897
 Invalid login!	Login View		Échec de l’identification !
 Error	Login App		Erreur
---edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tLancer en mode édition de présentoire pour permettre la personnalisation du bureau.\n
 Welcome to Haiku	Login Window		Bienvenue dans Haiku
 Halt	Login View		Arrêter
-Login application for Haiku\nUsage:\n	Login App		Application d’authentification pour Haiku\nUtilisation :\n
---nonmodal\tDo not make the window modal\n	Login App		--nonmodal\tLa fenêtre n’est pas rendue modale\n
 Desktop	Desktop Window		Bureau
 Hide password	Login View		Camoufler le mot de passe
 Reboot	Login View		Redémarrer

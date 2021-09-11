@@ -1,7 +1,6 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Time	834234238
+1	greek, modern (1453-)	x-vnd.Haiku-Time	2069485065
 OK	Time		Εντάξει
 Message receiving failed	Time		Η λήψη μηνυμάτων απέτυχε
-Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Ώρα & Ημέρα, αναπτύχθηκε από τους:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nΠνευματική ιδιοκτησία 2004-2012, Haiku.
 Australia	Time		Αυστραλία
 America	Time		Αμερική
 Reset to default server list	Time		Επαναφορά στην προεπιλεγμένη λίστα διακομιστών
@@ -38,7 +37,6 @@ Atlantic	Time		Αντλαντικός
 Show clock in Deskbar	Time		Εμφάνιση ρολογιού στην Γραμμή Εργασιών
 Display time with seconds	Time		Εμφάνιση ώρας με δευτερόλεπτα
 Time	System name		Ημερομηνία και ώρα
-about	Time		περίπου
 Show time zone	Time		Εμφάνιση ζώνης ώρας
 Synchronize at boot	Time		Συγχρονισμός κατά την εκκίνηση
 Indian	Time		Ινδικός

@@ -1,5 +1,6 @@
-1	greek, modern (1453-)	x-vnd.Haiku-HaikuDepot	401821302
+1	greek, modern (1453-)	x-vnd.Haiku-HaikuDepot	3437352458
 Repository update error	LocalRepositoryUpdateProcess		Σφάλμα ενημέρωσης αποθετηρίων
+Network error	ServerHelper		Σφάλμα δικτύου
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Προέκυψε ένα σφάλμα κατά την ανανέωση του αποθετηρίου: %error%
 User Created	UserLoginWindow		Χρήστης Δημιουργήθηκε
 Check for updates…	MainWindow		Έλεγχος για ενημερώσεις…
@@ -15,17 +16,17 @@ Starting the package daemon failed:\n\n%Error%	App		Η έναρξη του πρ�
 You have successfully authenticated as user %Nickname%.	UserLoginWindow		Έχετε ταυτοποιηθεί επιτυχώς ως ο χρήστης %Nickname%.
 <no info>	PackageInfoView		<καμία πληροφορία>
 No user ratings available.	PackageInfoView		Δεν υπάρχουν διαθέσιμες αξιολογήσεις χρήστη.
-Downloading package '%name%'	WorkStatusView		Γίνεται λήψη του πακέτου '%name%'
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Δεν ήταν δυνατή η εξαγωγή απαραίτητων δεδομένων captcha από τα δεδομένα που λήφθηκαν από τον διακομιστή.
+A network transport error has arisen communicating with the server system: %s	ServerHelper		Ένα δικτυακό σφάλμα μεταφοράς προέκυψε κατά την επικοινωνία με τον εξυπηρετητή: %s
 Rating	PackageListView		Αξιολόγηση
 Synchronizing icons	ServerIconExportUpdateProcess		Γίνεται συγχρονισμός εικονιδίων
 Show	MainWindow		Εμφάνιση
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Προέκυψε σφάλμα κατά την λήψη λίστας πακέτων: %message%
+Settings…	MainWindow		Ρυθμίσεις...
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Η εφαρμογή θα αναγνώσει και θα δημιουργήσει κάποια αρχεία στον υπολογιστή σας, έτσι ώστε να λειτουργήσει σωστά. Φαίνεται πως προέκυψαν προβλήματα κατά την εγγραφή ενός δοκιμαστικού αρχείου στην διαδρομή [%TestFilePath%]. Ελέγξτε ότι δεν υπάρχουν προβλήματα με τον δίσκο σας ή με τις άδειες, τα οποία θα μπορούσαν να αποτρέψουν την εφαρμογή από το να εγγράψει αρχεία σε αυτήν την τοποθεσία. Μπορείτε να συνεχίσετε, εφόσον έχετε ενημερωθεί για το πρόβλημα αυτό, αλλά ορισμένες λειτουργίες ενδεχομένως να είναι απενεργοποιημένες.
 Active	PackageListView		Ενεργό
 Login or Create account	MainWindow		Είσοδος ή Δημιουργία λογαριασμού
 <Package contents not available for remote packages>	PackageContentsView		<Τα περιεχόμενα ενός πακέτου δεν είναι διαθέσιμα για μη-εγκατεστημένα πακέτα>
-{0, plural,one{1 package to download}other{# packages to download}}	WorkStatusView		{0, plural,one{1 πακέτο προς λήψη}other{# πακέτα προς λήψη}}
 Ratings	PackageInfoView		Αξιολογήσεις
 Switch account…	MainWindow		Αλλαγή λογαριασμού…
 Preferred language:	UserLoginWindow		Προτιμώμενη γλώσσα:
@@ -35,6 +36,7 @@ Local	LocalPkgDataLoadProcess		Τοπικό
 Rate %Package%	RatePackageWindow		Αξιολόγηση %Package%
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Προέκυψε σφάλμα κατά την αρχικοποίηση του διαχειριστή πακέτων: %message%
 Quit HaikuDepot	App		Έξοδος από HaikuDepot
+Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Θα ήταν αποδεκτή η αποστολή ανώνυμων στοιχείων χρήσης από τη συσκευή αυτή στον εξυπηρετητή του HaikuDepot; Μπορείτε να τροποποιήσετε την επιλογή αυτή αργότερα, μέσα από το παράθυρο \"Ρυθμίσεις\".
 An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		Προέκυψε ένα απρόσμενο σφάλμα '%Message%' με την ιδιότητα '%Property%'
 A response to the captcha question must be provided.	UserLoginWindow		Πρέπει να γράψετε τον κωδικό captcha.
 Category	FilterView		Κατηγορία
@@ -56,6 +58,7 @@ Cancel	UserLoginWindow		Ακύρωση
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		Το HaikuDepot χρειάζεται το πρόγραμμα παρασκηνίου διαχείρισης πακέτων για να λειτουργήσει, το οποίο δεν εκτελείται.\nΘα θέλατε να το ξεκινήσετε;
 Click a package to view information	PackageInfoView		Κάντε κλικ σε ένα πακέτο για προβολή πληροφοριών
 The password must be at least eight characters long, consist of at least two digits and one upper case character.	UserLoginWindow		Ο κωδικός πρόσβασης πρέπει να έχει τουλάχιστον 8 χαρακτήρες, οι οποίοι θα αποτελούνται από τουλάχιστον δύο ψηφία και έναν κεφαλαίο χαρακτήρα.
+Share anonymous usage data with HaikuDepotServer	SettingsWindow		Διαμοιρασμός ανώνυμων στατιστικών χρήσης με το HaikuDepotServer
 Contents	PackageInfoView		Περιεχόμενο
 Close	PackageManager		Κλείσιμο
 Changelog	PackageInfoView		Καταγραφή αλλαγών
@@ -66,10 +69,12 @@ About	PackageInfoView		Σχετικά
 Reboot required	PackageManager		Απαιτείται επανεκκίνηση
 Password:	UserLoginWindow		Κωδικός πρόσβασης:
 All packages	PackageListView		Όλα τα πακέτα
+This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Αυτή η εφαρμογή είναι πολύ απαρχαιωμένη για να επικοινωνήσει με το σύστημα του εξυπηρετητή. Παρακαλώ προμηθευτείτε μια πιο σύγχρονη έκδοση αναβαθμίζοντας το σύστημά σας. Η ελάχιστη απαιτούμενη έκδοση της εφαρμογής είναι \"%s\". 
 Stability	RatePackageWindow		Σταθερότητα
 Send	RatePackageWindow		Αποστολή
 Start package daemon	App		Έναρξη προγράμματος παρασκηνίου πακέτων
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Ο κωδικός πρέπει να επαναληφθεί, έτσι ώστε να είμαστε βέβαιοι ότι ο κωδικός δεν έχει εισαχθεί λανθασμένα.
+Cancel	SettingsWindow		Άκυρο
 Cancel	RatePackageWindow		Ακύρωση
 Inactive	PackageListView		Ανενεργό
 Nickname:	UserLoginWindow		Ψευδώνυμο:
@@ -79,7 +84,9 @@ OK	MainWindow		Εντάξει
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# αντικείμενο} other{# αντικείμενα}}
 Usage conditions download problem	UserLoginWindow		Σφάλμα λήψης όρων χρήσης
 Downloading:	PackageInfoView		Γίνεται λήψη:
+Quit	MainWindow		Έξοδος
 Success	UserLoginWindow		Επιτυχία
+No	MainWindow		Όχι
 Package daemon problem	App		Πρόβλημα προγράμματος παρασκηνίου πακέτων
 (%Votes%)	PackageInfoView		(%Votes%)
 Repository	PackageListView		Αποθετήριο
@@ -87,7 +94,10 @@ Repository	PackageListView		Αποθετήριο
 The email is malformed.	UserLoginWindow		Η διεύθυνση ηλεκτρονικού ταχυδρομείου δεν είναι έγκυρη.
 Close	UserLoginWindow		Κλείσιμο
 Close	RatePackageWindow		Κλείσιμο
+An unexpected error has been sent from the server [%i]	ServerHelper		Ένα απρόσμενο σφάλμα προέκυψε από τη μεριά του εξυπηρετητή [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Γίνεται συγχρονισμός πληροφοριών πακέτων για το αποθετήριο '%REPO_NAME%'
+Settings	SettingsWindow		Ρυθμίσεις
+An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Σφάλμα κατά τη λήψη των όρων χρήσης για την εγγραφή νέου χρήστη. Παρακαλώ ελέγξτε το αρχείο καταγραφών και ξαναδοκιμάστε.\nΠληροφορίες για το αρχείο καταγραφών υπάρχουν στο λήμμα του Οδηγού Χρήστη του Haiku για την εφαρμογή HaikuDepot.
 View the usage conditions	UserLoginWindow		Προβολή όρων χρήσης
 Login issue	MainWindow		Σφάλμα εισόδου
 Your rating:	RatePackageWindow		Η αξιολόγησή σας:
@@ -98,18 +108,20 @@ All categories	FilterView		Όλες οι κατηγορίες
 Repositories	MainWindow		Αποθετήρια
 n/a	PackageInfoView		δ/υ
 This rating is visible to other users	RatePackageWindow		Η αξιολόγηση είναι ορατή και σε άλλους χρήστες
+While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		Κατά την ενημέρωση των στοιχείων πακέτων προέκυψε ένα πρόβλημα που μπορεί να προκαλέσει την εμφάνιση απαρχαιωμένων πακέτων και την απόκρυψη άλλων. Περισσότερες πληροφορίες σχετικά με το πρόβλημα αυτό μπορούν να αντληθούν από τα αρχεία καταγραφής της εφαρμογής.\nΠληροφορίες για το αρχείο καταγραφών υπάρχει στο λήμμα του Οδηγού Χρήστη του Haiku για την εφαρμογή HaikuDepot.
 View agreed usage conditions…	MainWindow		Προβολή συμφωνημένων όρων χρήσης…
 Cancel	MainWindow		Ακύρωση
-{0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(Παραμένει 1 ακόμα)}other{(Παραμένουν # ακόμα)}}
 Refresh repositories	MainWindow		Ανανέωση αποθετηρίων
 Continue	App		Συνέχεια
 A password is required.	UserLoginWindow		Απαιτείται κωδικός πρόσβασης.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Αυτό το πακέτο δεν φαίνεται να υπάρχει στον διακομιστή του HaikuDepot, άρα δεν μπορείτε να δημιουργήσετε μία νέα ή να επεξεργαστείτε μία προϋπάρχουσα αξιολόγηση.
+Apply	SettingsWindow		Εφαρμογή
 Language	RatePackageWindow		Γλώσσα
 Log out	MainWindow		Έξοδος
 Comment language:	RatePackageWindow		Γλώσσα σχολίου:
 Status	PackageListView		Κατάσταση
 The password has been incorrectly repeated.	UserLoginWindow		Ο κωδικός πρόσβασης έχει επαναληφθεί λανθασμένα.
+Network transport error	ServerHelper		Δικτυακό σφάλμα μεταφοράς
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		Ο κωδικός που είχε δοθεί για τον χρήστη [%Nickname%] δεν είναι πια έγκυρος. Θα γίνει έξοδος του χρήστη από την εφαρμογή αυτή, έπειτα θα μπορέσετε να κάνετε είσοδο ξανά με τον ενημερωμένο κωδικό σας.
 Update	RatePackageWindow		Ενημέρωση
 OK	ServerHelper		Εντάξει
@@ -124,16 +136,19 @@ The nickname is required.	UserLoginWindow		Απαιτείται ψευδώνυμ
 Source packages	MainWindow		Πηγαία πακέτα
 -	no package size		-
 Problem with working files	App		Πρόβλημα με τα επεξεργαζόμενα αρχεία
-Rate package	RatePackageWindow		Αξιολόγηση πακέτου
+Server error	ServerHelper		Σφάλμα εξυπηρετητή
 Try again	App		Προσπάθεια ξανά
+Rate package	RatePackageWindow		Αξιολόγηση πακέτου
 Unknown	PackageListView		Άγνωστο
 I agree to the usage conditions	UserLoginWindow		Συμφωνώ στους όρους χρήσης
 Log in	UserLoginWindow		Είσοδος
+Sending anonymous usage data	MainWindow		Αποστολή ανώνυμων στατιστικών χρήσης
 Logged in as %User%	MainWindow		Έχετε συνδεθεί ως %User%
 Email address:	UserLoginWindow		Διεύθυνση ηλεκτρονικού ταχυδρομείου:
 Screenshot	ScreenshotWindow		Στιγμιότυπο οθόνης
-A reboot is necessary to complete the installation process.	PackageManager		Είναι απαραίτητη μία επανεκκίνηση για την ολοκλήρωση της εγκατάστασης.
 HaikuDepot	System name		HaikuDepot
+A reboot is necessary to complete the installation process.	PackageManager		Είναι απαραίτητη μία επανεκκίνηση για την ολοκλήρωση της εγκατάστασης.
+Yes	MainWindow		Ναι
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{Είμαι τουλάχιστον ενός έτους}other{Είμαι # ετών ή μεγαλύτερος}}
 View latest usage conditions…	MainWindow		Προβολή των πιο πρόσφατων όρων χρήσεις…
 Quit	App		Έξοδος

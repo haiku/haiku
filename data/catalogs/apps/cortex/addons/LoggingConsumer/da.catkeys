@@ -1,4 +1,5 @@
-1	danish	application/x-vnd.Be.LoggingConsumerApp	1627625629
+1	danish	application/x-vnd.Be.LoggingConsumerApp	3259009599
+Priority	CortexAddOnsLoggingConsumer		Prioritet
 Start	CortexAddOnsLoggingConsumerNodeHarnessWin		Start
 CPU percentage	CortexAddOnsLoggingConsumer		CPU-procent
 Stop	CortexAddOnsLoggingConsumerNodeHarnessWin		Stop

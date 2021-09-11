@@ -31,7 +31,7 @@ Description	FileTypes Window		Descrição
 Signature:	Application Types Window		Assinatura:
 None	FileTypes Window		Nenhum
 Exclusive launch	Application Type Window		Instância exclusiva
-Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		Removendo um tipo de arquivo não pode ser revertido.\nVocê tem certeza que deseja remover mesmo assim?
+Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		Remover um tipo de arquivo não pode ser revertido.\nTem certeza de que deseja remover mesmo assim?
 Integer 64 bit	Attribute ListView		Inteiro de 64 bits
 Cancel	New File Type Window		Cancelar
 Select same preferred application as	FileType Window		Selecionar como o mesmo aplicativo preferido de
@@ -85,7 +85,7 @@ Editable	Attribute Window	If Tracker allows to edit this attribute.	Editável
 New resource file…	FileTypes Window		Novo arquivo de recursos...
 [Multiple files] file types	FileType Window		[Múltiplos arquivos] tipos de arquivo
 Application type	Application Type Window		Tipo de aplicativo
-Show in Tracker…	Application Types Window		Mostrar no Rastreador (Tracker)…
+Show in Tracker…	Application Types Window		Mostrar no Tracker…
 Type name:	FileTypes Window		Nome do tipo:
 Visible	Attribute Window		Visível
 Select preferred application	FileTypes Window		Selecionar aplicativo preferido

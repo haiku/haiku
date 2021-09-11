@@ -17,7 +17,7 @@ Defaults	PreferencesWindow		Standarder
 Menu	PreferencesWindow		Menu
 Recent documents	DeskbarMenu		Seneste dokumenter
 Auto-hide	PreferencesWindow		Skjul automatisk
-Always on top	PreferencesWindow		Altid oven på
+Always on top	PreferencesWindow		Altid øverst
 <Deskbar folder is empty>	DeskbarMenu		<Skrivebordslinje-mappe er tom>
 Show all	WindowMenu		Vis alle
 No windows	WindowMenu		Ingen vinduer
@@ -25,11 +25,11 @@ Deskbar	System name		Skrivebordslinje
 Restart system	DeskbarMenu		Genstart systemet
 Large	PreferencesWindow		Stor
 Auto-raise	PreferencesWindow		Auto hæv
-Recent folders:	PreferencesWindow		Seneste foldere:
+Recent folders:	PreferencesWindow		Seneste mapper:
 Show application expander	PreferencesWindow		Vis programudvider
 Close all	WindowMenu		Luk alle
-Deskbar preferences	PreferencesWindow		Skrivebordslinje-præferencer
-Mount	DeskbarMenu		Monter
+Deskbar preferences	PreferencesWindow		Præferencer for skrivebordslinje
+Mount	DeskbarMenu		Montér
 Revert	PreferencesWindow		Tilbagefør
 Small	PreferencesWindow		Lille
 Recent applications:	PreferencesWindow		Seneste programmer:
@@ -39,7 +39,7 @@ Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Præferencer
 Recent folders	DeskbarMenu		Seneste mapper
 About this system	DeskbarMenu		Om systemet
 Show calendar…	TimeView		Vis kalender…
-Deskbar preferences…	DeskbarMenu		Skrivebordslinje-præferencer…
+Deskbar preferences…	DeskbarMenu		Præferencer for skrivebordslinje…
 Expand new applications	PreferencesWindow		Udvid nye programmer
 Show replicants	DeskbarMenu		Vis replikanter
 Hide application names	PreferencesWindow		Skjul programnavne

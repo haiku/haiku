@@ -9,8 +9,8 @@ Select all	Terminal TermWindow		Odaberi sve
 Confirm exit if active programs exist	Terminal AppearancePrefView		Potvrdi izlaz ako postoji aktivni program
 Copy	Terminal TermWindow		kopiraj
 Edit tab title…	Terminal TermWindow		Uredi naslov kartice...
-Print	Terminal TermWindow		Ispis
 Settings	Terminal TermWindow		Postavke
+Print	Terminal TermWindow		Ispis
 %app% settings	Terminal PrefWindow	window title	%app% postavke
 Use default	Terminal SetTitleWindow		Koristi zadano
 Close tab	Terminal TermWindow		Zatvori karticu
@@ -27,8 +27,8 @@ Defaults	Terminal PrefWindow		Zadano
 Cancel	Terminal TermView		Odustani
 Revert	Terminal PrefWindow		Obrnuto
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
-Use selection	Terminal FindWindow		koristi izbor
 Find next	Terminal TermWindow		Nađi tekst
+Use selection	Terminal FindWindow		koristi izbor
 Copy link location	Terminal TermView		Kopiraj lokaciju poveznice
 Window title:	Terminal AppearancePrefView		Naslov prozora:
 New tab	Terminal TermWindow		Nova kartica
@@ -69,11 +69,11 @@ Window size:	Terminal AppearancePrefView		Veličina prozora
 Switch Terminals	Terminal TermWindow		Zamjeni terminale
 Decrease	Terminal TermWindow		Smanji
 Settings…	Terminal TermWindow		Postavke...
-Cancel	Terminal SetTitleWindow		Odustani
 Blinking cursor	Terminal AppearancePrefView		Trepćući pokazivač
+Cancel	Terminal SetTitleWindow		Odustani
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Uzorak koji specificira naslov prozora. Sljedeće rezarvirano mjesto\n se može koristiti:\n
-Use text:	Terminal FindWindow		Koristi tekst:
 Close active tab	Terminal TermWindow		Zatvori aktivnu karticu
+Use text:	Terminal FindWindow		Koristi tekst:
 Save as default	Terminal TermWindow		Spremi kao zadano
 Nothing is selected.	Terminal TermWindow		Ništa nije izabrano
 Find	Terminal FindWindow		Nađi

@@ -31,7 +31,7 @@ Select	ExpanderPreferences		Vælg
 Show contents	ExpanderWindow		Vis indhold
 Automatically show contents listing	ExpanderPreferences		Automatisk visning af indholdets oplistning
 OK	ExpanderPreferences		OK
-Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Er du sikker på, at du vil stoppe udvidelsen af arkivet? De udvidede punkter er måske ikke fuldførte.
+Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Er du sikker på, at du vil stoppe udvidelsen af arkivet? De udvidede elementer er måske ikke fuldførte.
 Leave destination folder path empty	ExpanderPreferences		Lad stien til destinationsmappen være tom
 Failed to create the destination folder.	ExpanderWindow		Kunne ikke oprette destinationsmappen.
 Select '%s'…	DirectoryFilePanel		Vælg '%s'…
@@ -42,7 +42,7 @@ File	ExpanderMenu		Fil
 Expander	System name		Udvider
 Expand	ExpanderWindow		Pak ud
 Close	ExpanderMenu		Luk
-The destination is not a folder.	ExpanderWindow		Destinationen er ikke en folder.
+The destination is not a folder.	ExpanderWindow		Destinationen er ikke en mappe.
 Open destination folder after extraction	ExpanderPreferences		Åbn destinationsmappe efter udpakning
 Creating listing for '%s'…	ExpanderWindow		Opretter oplistning til '%s'…
 Set source…	ExpanderMenu		Vælg kilde…

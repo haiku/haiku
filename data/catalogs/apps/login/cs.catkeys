@@ -1,11 +1,8 @@
-1	czech	x-vnd.Haiku-Login	336867745
+1	czech	x-vnd.Haiku-Login	3033693897
 Invalid login!	Login View		Neplatné přihlášení!
 Error	Login App		Chyba
---edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tSpustit v režimu editace, umožňuje přizpůsobit si plochu.\n
 Welcome to Haiku	Login Window		Vítejte v Haiku
 Halt	Login View		Zastavit
-Login application for Haiku\nUsage:\n	Login App		Aplikace pro přihlášení do Haiku\nPoužití:\n
---nonmodal\tDo not make the window modal\n	Login App		--nonmodal\tNespouštět v modálním okně\n
 Desktop	Desktop Window		Plocha
 Hide password	Login View		Skrýt heslo
 Reboot	Login View		Restartovat

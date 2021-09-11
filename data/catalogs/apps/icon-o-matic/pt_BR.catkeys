@@ -38,7 +38,7 @@ Assign Style	Icon-O-Matic-AssignStyleCmd		Atribuir Estilo
 Transformation	Icon-O-Matic-TransformationBoxStates		Transformação
 Closed	Icon-O-Matic-PropertyNames		Fechado
 Split Control Point	Icon-O-Matic-SplitPointsCmd		Dividir Ponto de Controle
-<nothing to redo>	Icon-O-Matic-Menu-Edit		<nada para refazer>
+<nothing to redo>	Icon-O-Matic-Menu-Edit		<nada a refazer>
 Height	Icon-O-Matic-PropertyNames		Altura
 Add Shape	Icon-O-Matic-AddShapesCmd		Adicionar Forma
 warning	Icon-O-Matic-SVGExport		aviso
@@ -196,6 +196,6 @@ Export	Icon-O-Matic-Menu-File		Exportar
 Width	Icon-O-Matic-PropertyNames		Largura
 Bummer	Cancel button - error alert		Vagabundo
 Style	Icon-O-Matic-Menus		Estilo
-edit it's properties here.	Empty property list - 3rd line		edite suas propriedades aqui.
+edit it's properties here.	Empty property list - 3rd line		editar suas propriedades aqui.
 Off	Icon-O-Matic-Menu-Settings		Desligar
 Edit	Icon-O-Matic-Menus		Editar

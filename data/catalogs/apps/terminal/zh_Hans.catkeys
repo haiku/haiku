@@ -12,8 +12,8 @@ Solarized Dark	Terminal colors scheme		深色的 Solarized
 Copy	Terminal TermWindow		复制
 Retro	Terminal colors scheme		复古主题
 Edit tab title…	Terminal TermWindow		编辑标签标题...
-Print	Terminal TermWindow		打印
 Settings	Terminal TermWindow		设置
+Print	Terminal TermWindow		打印
 %app% settings	Terminal PrefWindow	window title	%app% 设置
 Use default	Terminal SetTitleWindow		使用默认
 Close tab	Terminal TermWindow		关闭标签
@@ -32,8 +32,8 @@ Defaults	Terminal PrefWindow		默认主题
 Cancel	Terminal TermView		取消
 Revert	Terminal PrefWindow		恢复
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	终端
-Use selection	Terminal FindWindow		使用选择
 Find next	Terminal TermWindow		查找下一个
+Use selection	Terminal FindWindow		使用选择
 Copy link location	Terminal TermView		复制链接位置
 Window title:	Terminal AppearancePrefView		窗口标题：
 New tab	Terminal TermWindow		新建标签
@@ -51,12 +51,12 @@ Unrecognized option \"%s\"\n	Terminal arguments parsing		无法识别的选项\"
 Tab title:	Terminal AppearancePrefView		标签标题：
 Text not found.	Terminal TermWindow		文本未搜索到。
 Find failed	Terminal TermWindow		查找失败
-Match word	Terminal FindWindow		匹配单词
 Color scheme:	Terminal AppearancePrefView		色彩模式：
+Match word	Terminal FindWindow		匹配单词
 New Terminal	Terminal TermWindow		新建窗口
 Quit	Terminal TermWindow		退出
-Match case	Terminal FindWindow		匹配大小写
 Find previous	Terminal TermWindow		查找上一个
+Match case	Terminal FindWindow		匹配大小写
 The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		该模式用于指定标签标题。可以使用下述\n占位符：
 Close	Terminal TermWindow		关闭
 Save to file…	Terminal PrefWindow		保存为…
@@ -78,11 +78,11 @@ Window size:	Terminal AppearancePrefView		窗口大小:
 Switch Terminals	Terminal TermWindow		切换终端
 Decrease	Terminal TermWindow		缩小
 Settings…	Terminal TermWindow		设置…
-Cancel	Terminal SetTitleWindow		取消
 Blinking cursor	Terminal AppearancePrefView		闪烁游标
+Cancel	Terminal SetTitleWindow		取消
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		该图案指定了窗口标题。可以使用下述的\n占位符：\n
-Use text:	Terminal FindWindow		使用文本：
 Close active tab	Terminal TermWindow		关闭活动标签
+Use text:	Terminal FindWindow		使用文本：
 Save as default	Terminal TermWindow		默认保存
 Nothing is selected.	Terminal TermWindow		未选中任何文件。
 Find	Terminal FindWindow		查找
@@ -108,6 +108,6 @@ Set window title	Terminal TermWindow		设置窗口标题
 Increase	Terminal TermWindow		增大
 OK	Terminal TermWindow		确定
 Close window	Terminal TermWindow		关闭窗口
-Solarized Light	Terminal colors scheme		浅色的 Solarized
 Clear all	Terminal TermWindow		清空
+Solarized Light	Terminal colors scheme		浅色的 Solarized
 Search forward	Terminal FindWindow		搜索前一个

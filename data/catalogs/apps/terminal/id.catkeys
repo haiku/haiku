@@ -12,8 +12,8 @@ Solarized Dark	Terminal colors scheme		Gelap terpartisi
 Copy	Terminal TermWindow		Salin
 Retro	Terminal colors scheme		Retro
 Edit tab title…	Terminal TermWindow		Edit judul tab ...
-Print	Terminal TermWindow		Cetak
 Settings	Terminal TermWindow		Pengaturan
+Print	Terminal TermWindow		Cetak
 %app% settings	Terminal PrefWindow	window title	%app% pengaturan
 Use default	Terminal SetTitleWindow		Gunakan standar
 Close tab	Terminal TermWindow		Tutup tab
@@ -32,8 +32,8 @@ Defaults	Terminal PrefWindow		Bawaan
 Cancel	Terminal TermView		Batalkan
 Revert	Terminal PrefWindow		Pulih
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
-Use selection	Terminal FindWindow		Gunakan seleksi
 Find next	Terminal TermWindow		Cari selanjutnya
+Use selection	Terminal FindWindow		Gunakan seleksi
 Copy link location	Terminal TermView		Salin lokasi tautan
 Window title:	Terminal AppearancePrefView		Judul jendela:
 New tab	Terminal TermWindow		Tab baru
@@ -52,12 +52,12 @@ Unrecognized option \"%s\"\n	Terminal arguments parsing		Opsi tak-dikenal \"%s\"
 Tab title:	Terminal AppearancePrefView		Judul tab:
 Text not found.	Terminal TermWindow		Teks tak ditemukan
 Find failed	Terminal TermWindow		Pencarian gagal
-Match word	Terminal FindWindow		Kata cocok
 Color scheme:	Terminal AppearancePrefView		Skema warna:
+Match word	Terminal FindWindow		Kata cocok
 New Terminal	Terminal TermWindow		Terminal Baru
 Quit	Terminal TermWindow		Keluar
-Match case	Terminal FindWindow		Sesuaikan besar kecil huruf
 Find previous	Terminal TermWindow		Cari sebelumnya
+Match case	Terminal FindWindow		Sesuaikan besar kecil huruf
 The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Pola menentukan judul tab. Tempat penampung berikut\ndapat digunakan:
 Close	Terminal TermWindow		Tutup
 Save to file…	Terminal PrefWindow		Simpan ke file...
@@ -79,11 +79,11 @@ Window size:	Terminal AppearancePrefView		Ukuran jendela:
 Switch Terminals	Terminal TermWindow		Beralih Terminal
 Decrease	Terminal TermWindow		Menurunkan
 Settings…	Terminal TermWindow		Pengaturan...
-Cancel	Terminal SetTitleWindow		Batalkan
 Blinking cursor	Terminal AppearancePrefView		Kursor berkedip
+Cancel	Terminal SetTitleWindow		Batalkan
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Pola menentukan judul jendela. Penampung berikut\ndapat digunakan:\n
-Use text:	Terminal FindWindow		Gunakan teks:
 Close active tab	Terminal TermWindow		Tutup tab aktif
+Use text:	Terminal FindWindow		Gunakan teks:
 Save as default	Terminal TermWindow		Simpan sebagai bawaan
 Nothing is selected.	Terminal TermWindow		Tidak ada yang dipilih
 Use left Option as Meta key	Terminal AppearancePrefView		Gunakan Opsi kiri sebagai kunci Meta
@@ -111,6 +111,6 @@ Increase	Terminal TermWindow		Meningkat
 OK	Terminal TermWindow		OKE
 Close window	Terminal TermWindow		Tutup jendela
 Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Terminal Haiku\nHak Cipta 2001-2019 Haiku, Inc.\nHak Cipta(C) 1999 Kazuho Okui and Takashi Murai.\n\npenggunaan: %s [OPTION] [SHELL]\n
-Solarized Light	Terminal colors scheme		Cahaya tersolarisasi
 Clear all	Terminal TermWindow		Bersihkan semua
+Solarized Light	Terminal colors scheme		Cahaya tersolarisasi
 Search forward	Terminal FindWindow		Pencarian selanjutnya

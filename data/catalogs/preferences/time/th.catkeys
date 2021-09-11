@@ -1,7 +1,6 @@
-1	thai	x-vnd.Haiku-Time	834234238
+1	thai	x-vnd.Haiku-Time	2069485065
 OK	Time		ตกลง
 Message receiving failed	Time		การรับข้อความล้มเหลว
-Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		เวลาและวันที่เขียนโดย:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nลิขสิทธิ์ 2004-2012, Haiku
 Australia	Time		ออสเตรเลีย
 America	Time		อเมริกา
 Reset to default server list	Time		รีเซ็ตเป็นรายการเซิร์ฟเวอร์เริ่มต้น
@@ -38,7 +37,6 @@ Atlantic	Time		แอตแลนติก
 Show clock in Deskbar	Time		แสดงนาฬิกาในเดสก์บาร์
 Display time with seconds	Time		แสดงเวลาแบบมีวินาที
 Time	System name		เวลา
-about	Time		เกี่ยวกับ
 Show time zone	Time		แสดงเขตเวลา
 Synchronize at boot	Time		ซิงโครไนซ์ตอนบูต
 Indian	Time		อินเดีย

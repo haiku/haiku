@@ -1,6 +1,7 @@
-1	greek, modern (1453-)	x-vnd.Haiku-FirstBootPrompt	585808223
+1	greek, modern (1453-)	x-vnd.Haiku-FirstBootPrompt	2131367349
 Japanese	KeymapNames		Ιαπωνικό
 US	KeymapNames		ΗΠΑ
+Cancel	BootPromptWindow		Άκυρο
 Esperanto	KeymapNames		Εσπεράντο
 Belarusian	KeymapNames		Λευκορώσικο
 Brazilian	KeymapNames		Βραζιλιάνικο
@@ -10,6 +11,7 @@ Latin-American	KeymapNames		Λατινοαμερικάνικο
 Ukrainian	KeymapNames		Ουκρανικό
 Russian (Yawert)	KeymapNames		Ρώσικο (Yawert)
 United-Kingdom	KeymapNames		Ηνωμένου Βασιλείου
+Quit Haiku	System name		Έξοδος από το Haiku
 Serbian (Cyrillic)	KeymapNames		Σέρβικο (Κυριλλικό)
 Turkish (Type-F)	KeymapNames		Τούρκικο (Τύπου-F)
 Bulgarian (Cyrillic)	KeymapNames		Βουλγαρικό (Κυριλλικό)
@@ -44,6 +46,7 @@ Spanish	KeymapNames		Ισπανικό
 Ukrainian (Mac)	KeymapNames		Ουκρανικό (Mac)
 Estonian	KeymapNames		Εσθονικό
 French (Bépo)	KeymapNames		Γαλλικό (Bépo)
+Restart system	BootPromptWindow		Επανεκκίνηση
 Serbian (Latin)	KeymapNames		Σέρβικο (Λατινικό)
 Russian (Typewriter)	KeymapNames		Ρώσικο (Γραφομηχανής)
 French	KeymapNames		Γαλλικό
@@ -67,6 +70,7 @@ Russian	KeymapNames		Ρώσικο
 Hungarian	KeymapNames		Ουγγρικό
 Irish	KeymapNames		Ιρλανδικό
 Romanian	KeymapNames		Ρουμανικό
+Are you sure you want to close this window? This will restart your system!	BootPromptWindow		Είστε σίγουρος/η ότι θέλετε να κλείσετε αυτό το παράθυρο; Αυτό θα προκαλέσει επανεκκίνηση.
 Macedonian	KeymapNames		Βόρειο Μακεδονικό
 Czech (Mac)	KeymapNames		Τσέχικο (Mac)
 Brazilian (ABNT2)	KeymapNames		Βραζιλιάνικο (ABNT2)

@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-HaikuDepot	401821302
+1	indonesian	x-vnd.Haiku-HaikuDepot	732799617
 Repository update error	LocalRepositoryUpdateProcess		Kesalahan pembaruan repositori
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Terjadi kesalahan saat menyegarkan repositori: %error%
 User Created	UserLoginWindow		Pengguna Dibuat
@@ -15,7 +15,6 @@ Starting the package daemon failed:\n\n%Error%	App		Mulai layanan paket gagal :\
 You have successfully authenticated as user %Nickname%.	UserLoginWindow		Anda telah berhasil diautentikasi sebagai pengguna %Nickname%.
 <no info>	PackageInfoView		<no info>
 No user ratings available.	PackageInfoView		Tak tersedia penilaian pengguna.
-Downloading package '%name%'	WorkStatusView		Paket pengunduhan '%name%'
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Tadi tidak mungkin mengekstraksi informasi captcha yang diperlukan dari data yang dikirim kembali dari server.
 Rating	PackageListView		Penilaian
 Synchronizing icons	ServerIconExportUpdateProcess		Ikon sinkronisasi
@@ -25,7 +24,6 @@ This application writes and reads some working files on your computer in order t
 Active	PackageListView		Aktif
 Login or Create account	MainWindow		Masuk atau Buat akun
 <Package contents not available for remote packages>	PackageContentsView		<Package contents not available for remote packages>
-{0, plural,one{1 package to download}other{# packages to download}}	WorkStatusView		{0, plural,one{1 package to download}other{# paket diunduh}}
 Ratings	PackageInfoView		Peringkat
 Switch account…	MainWindow		Beralih akun...
 Preferred language:	UserLoginWindow		Bahasa pilihan:
@@ -100,7 +98,6 @@ n/a	PackageInfoView		n/a
 This rating is visible to other users	RatePackageWindow		Peringkat ini terlihat oleh pengguna lain
 View agreed usage conditions…	MainWindow		Lihat ketentuan penggunaan yang disepakati…
 Cancel	MainWindow		Batal
-{0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 more to download)}other{(# more to download)}}
 Refresh repositories	MainWindow		Muat-ulang repositori
 Continue	App		Terus
 A password is required.	UserLoginWindow		Diperlukan kata sandi.
@@ -124,16 +121,16 @@ The nickname is required.	UserLoginWindow		Nama panggilan diperlukan.
 Source packages	MainWindow		Paket sumber
 -	no package size		-
 Problem with working files	App		Masalah dengan file yang berkaitan
-Rate package	RatePackageWindow		Nilai paket
 Try again	App		Coba lagi
+Rate package	RatePackageWindow		Nilai paket
 Unknown	PackageListView		Tidak dikenal
 I agree to the usage conditions	UserLoginWindow		Saya menyetujui ketentuan penggunaan
 Log in	UserLoginWindow		Masuk
 Logged in as %User%	MainWindow		Masuk sebagai %User%
 Email address:	UserLoginWindow		Alamat email:
 Screenshot	ScreenshotWindow		Screenshot
-A reboot is necessary to complete the installation process.	PackageManager		Boot ulang diperlukan untuk menyelesaikan proses pemasangan.
 HaikuDepot	System name		HaikuDepot
+A reboot is necessary to complete the installation process.	PackageManager		Boot ulang diperlukan untuk menyelesaikan proses pemasangan.
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{I am at least one year old}other{I am # tahun lebih tua}}
 View latest usage conditions…	MainWindow		Lihat ketentuan penggunaan terbaru…
 Quit	App		Berhenti

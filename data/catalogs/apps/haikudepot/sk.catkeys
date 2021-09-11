@@ -59,8 +59,8 @@ OK	UserLoginWindow		OK
 Stability:	RatePackageWindow		Stabilita:
 Source packages	MainWindow		Zdrojové balíky
 -	no package size		-
-Rate package	RatePackageWindow		Ohodnotiť balík
 Try again	App		Skúsiť znova
+Rate package	RatePackageWindow		Ohodnotiť balík
 Unknown	PackageListView		Neznámy
 Log in	UserLoginWindow		Prihlásiť sa
 Logged in as %User%	MainWindow		Prihlásený ako %User%

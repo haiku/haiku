@@ -1,7 +1,6 @@
-1	ukrainian	x-vnd.Haiku-Time	834234238
+1	ukrainian	x-vnd.Haiku-Time	2069485065
 OK	Time		ОК
 Message receiving failed	Time		Не вдалось отримати повідомлення
-Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Дата & Час, автори:\n\n\t Andrew Edward McCall\n\t Mike Berg\n\t Julun\n\t Philippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
 Australia	Time		Австралія
 America	Time		Америка
 Reset to default server list	Time		Скинути список серверів за замовчуванням
@@ -38,7 +37,6 @@ Atlantic	Time		Атлантичний океан
 Show clock in Deskbar	Time		Показувати час в Deskbar
 Display time with seconds	Time		Показувати секунди
 Time	System name		Time
-about	Time		про
 Show time zone	Time		Встановити часову зону
 Synchronize at boot	Time		Синхронізувати при завантаженні
 Indian	Time		Індійський

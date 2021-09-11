@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-HaikuDepot	2410119227
+1	italian	x-vnd.Haiku-HaikuDepot	2741097542
 Repository update error	LocalRepositoryUpdateProcess		Errore nell'aggiornamento del Repository
 Network error	ServerHelper		Errore di rete
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Si è verificato un errore nell'aggiornamento del repository: %error%
@@ -16,7 +16,6 @@ Starting the package daemon failed:\n\n%Error%	App		Avvio del demone dei pacchet
 You have successfully authenticated as user %Nickname%.	UserLoginWindow		Ti sei autenticato con successo come utente %Nickname%.
 <no info>	PackageInfoView		<nessuna informazione>
 No user ratings available.	PackageInfoView		Nessuna valutazione utente è disponibile.
-Downloading package '%name%'	WorkStatusView		Download del pacchetto '%name%' in corso
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Non è stato possibile estrarre le informazioni captcha necessarie dai dati restituiti dal server.
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Si è verificato un errore di rete nel tentativo di connettersi al server: %s
 Rating	PackageListView		Valutazione
@@ -27,7 +26,6 @@ This application writes and reads some working files on your computer in order t
 Active	PackageListView		Attivo
 Login or Create account	MainWindow		Accedi o Registrati
 <Package contents not available for remote packages>	PackageContentsView		<Contenuto del pacchetto non disponibile per pacchetti remoti>
-{0, plural,one{1 package to download}other{# packages to download}}	WorkStatusView		{0, plural,one{1 pacchetto da scaricare}other{# pacchetti da scaricare}}
 Ratings	PackageInfoView		Valutazioni
 Switch account…	MainWindow		Cambia account…
 Preferred language:	UserLoginWindow		Lingua preferita:
@@ -104,7 +102,6 @@ n/a	PackageInfoView		nd
 This rating is visible to other users	RatePackageWindow		Questa valutazione è visibile dagli altri utenti.
 View agreed usage conditions…	MainWindow		Vedi le condizioni d'uso accettate…
 Cancel	MainWindow		Annulla
-{0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 ancora da scaricare)}other{(# ancora da scaricare)}}
 Refresh repositories	MainWindow		Aggiorna repository
 Continue	App		Continua
 A password is required.	UserLoginWindow		Una password è necessaria.
@@ -130,16 +127,16 @@ Source packages	MainWindow		Pacchetti sorgente
 -	no package size		-
 Problem with working files	App		Problema con i file di supporto dell'applicazione
 Server error	ServerHelper		Errore del server
-Rate package	RatePackageWindow		Valuta pacchetto
 Try again	App		Riprova
+Rate package	RatePackageWindow		Valuta pacchetto
 Unknown	PackageListView		Sconosciuto
 I agree to the usage conditions	UserLoginWindow		Acconsento alle condizioni d'uso
 Log in	UserLoginWindow		Accesso
 Logged in as %User%	MainWindow		Sessione avviata come %User%
 Email address:	UserLoginWindow		Indirizzo e-mail:
 Screenshot	ScreenshotWindow		Istantanea
-A reboot is necessary to complete the installation process.	PackageManager		Per completare l'installazione è necessario riavviare.
 HaikuDepot	System name		HaikuDepot
+A reboot is necessary to complete the installation process.	PackageManager		Per completare l'installazione è necessario riavviare.
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{Ho almeno un anno}other{Ho # anni o oltre}}
 View latest usage conditions…	MainWindow		Vedi l'ultima revisione delle condizioni d'uso…
 Quit	App		Chiudi

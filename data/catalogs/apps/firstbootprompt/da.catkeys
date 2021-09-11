@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-FirstBootPrompt	3595268803
+1	danish	x-vnd.Haiku-FirstBootPrompt	2131367349
 Japanese	KeymapNames		Japansk
 US	KeymapNames		USA
 Cancel	BootPromptWindow		Annuller
@@ -56,18 +56,15 @@ Swiss-French	KeymapNames		Fransk (schweiz)
 Slovene	KeymapNames		Slovensk
 Lithuanian	KeymapNames		Litauisk
 French (NF Z71-300)	KeymapNames		Fransk (NF Z71-300)
-Thank you for trying out %distroname%! We hope you'll like it!\n\nPlease select your preferred language and keymap. Both settings can also be changed later when running %distroname%.\n\nDo you wish to install %distroname% now, or try it out first?	BootPromptWindow	For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	Tak fordi du prøver %distroname%! Vi håber at du kan lide det!\n\nVælg venglist dit foretrukne sprog og tastaturlayout. Begge indstillinger kan også ændres senere ved at køre %distroname%.\n\nØnsker du at installere %distroname% nu eller afprøve det først?
 ISO-9995	KeymapNames		ISO-9995
 Kazakh	KeymapNames		Kasakhisk
 Language	BootPromptWindow		Sprog
-Welcome to %distroname%!	BootPromptWindow		Velkommen til %distroname%!
 Lithuanian (Standard)	KeymapNames		Litauisk (standard)
 Belgian (comma)	KeymapNames		Belgisk (komma)
 Custom	BootPromptWindow		Tilpasset
 Norwegian	KeymapNames		Norsk
 Danish	KeymapNames		Dansk
 Bulgarian (Phonetic)	KeymapNames		Bulgarsk (fonetisk)
-Try out %distroname%	BootPromptWindow		Prøv %distroname%
 Canadian-French	KeymapNames		Fransk (canadisk)
 Russian	KeymapNames		Russisk
 Hungarian	KeymapNames		Ungarsk
@@ -79,6 +76,5 @@ Czech (Mac)	KeymapNames		Tjekkisk (Mac)
 Brazilian (ABNT2)	KeymapNames		Brasiliansk (ABNT2)
 Albanian	KeymapNames		Albansk
 Dutch	KeymapNames		Nederlandsk
-Install %distroname%	BootPromptWindow		Installer %distroname%
 Friulian	KeymapNames		Friulisk
 Icelandic	KeymapNames		Islandsk

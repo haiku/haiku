@@ -13,8 +13,8 @@ Copy	Terminal TermWindow		Kopieren
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory	Terminal TermApp		  -h,     --help               Diese Hilfe ausgeben\n  -t,     --title              Fenstertitel setzen\n  -f,     --fullscreen         Im Vollbild-Modus starten\n  -w,     --working-directory  Setzt das anfängliche Arbeitsverzeichnis
 Retro	Terminal colors scheme		Retro
 Edit tab title…	Terminal TermWindow		Reiter umbenennen...
-Print	Terminal TermWindow		Drucken
 Settings	Terminal TermWindow		Einstellungen
+Print	Terminal TermWindow		Drucken
 %app% settings	Terminal PrefWindow	window title	%app%-Einstellungen
 Use default	Terminal SetTitleWindow		Standardwerte
 Close tab	Terminal TermWindow		Reiter schließen
@@ -33,8 +33,8 @@ Defaults	Terminal PrefWindow		Standardwerte
 Cancel	Terminal TermView		Abbrechen
 Revert	Terminal PrefWindow		Anfangswerte
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
-Use selection	Terminal FindWindow		Verwende Auswahl
 Find next	Terminal TermWindow		Weitersuchen
+Use selection	Terminal FindWindow		Verwende Auswahl
 Copy link location	Terminal TermView		Link-Adresse kopieren
 Window title:	Terminal AppearancePrefView		Fenstertitel:
 New tab	Terminal TermWindow		Neuer Reiter
@@ -53,12 +53,12 @@ Unrecognized option \"%s\"\n	Terminal arguments parsing		Unbekannte Option \"%s\
 Tab title:	Terminal AppearancePrefView		Reitertitel:
 Text not found.	Terminal TermWindow		Der Suchbegriff wurde nicht gefunden.
 Find failed	Terminal TermWindow		Suche fehlgeschlagen
-Match word	Terminal FindWindow		Ganze Wörter suchen
 Color scheme:	Terminal AppearancePrefView		Farbschema:
+Match word	Terminal FindWindow		Ganze Wörter suchen
 New Terminal	Terminal TermWindow		Neues Terminal
 Quit	Terminal TermWindow		Beenden
-Match case	Terminal FindWindow		Groß-/Kleinschreibung beachten
 Find previous	Terminal TermWindow		Rückwärts suchen
+Match case	Terminal FindWindow		Groß-/Kleinschreibung beachten
 The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Die Formel für Reitertitel. Folgende Variablen\nstehen zur Verfügung:
 Close	Terminal TermWindow		Schließen
 Save to file…	Terminal PrefWindow		In Datei speichern…
@@ -80,11 +80,11 @@ Window size:	Terminal AppearancePrefView		Fenstergröße
 Switch Terminals	Terminal TermWindow		Terminals wechseln
 Decrease	Terminal TermWindow		Verkleinern
 Settings…	Terminal TermWindow		Einstellungen...
-Cancel	Terminal SetTitleWindow		Abbrechen
 Blinking cursor	Terminal AppearancePrefView		Blinkender Cursor
+Cancel	Terminal SetTitleWindow		Abbrechen
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Die Formel für den Fenstertitel. Folgende Variablen\nstehen zur Verfügung:\n
-Use text:	Terminal FindWindow		Suchbegriff:
 Close active tab	Terminal TermWindow		Aktiven Reiter schließen
+Use text:	Terminal FindWindow		Suchbegriff:
 Save as default	Terminal TermWindow		Als Standardwerte speichern
 Nothing is selected.	Terminal TermWindow		Es wurde nichts ausgewählt.
 Use left Option as Meta key	Terminal AppearancePrefView		Linke Option-Taste als Meta-Taste verwenden
@@ -112,6 +112,6 @@ Increase	Terminal TermWindow		Vergrößern
 OK	Terminal TermWindow		OK
 Close window	Terminal TermWindow		Fenster schließen
 Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui und Takashi Murai.\n\nGebrauch: %s [OPTION] [SHELL]\n
-Solarized Light	Terminal colors scheme		Solarized hell
 Clear all	Terminal TermWindow		Bildschirm leeren
+Solarized Light	Terminal colors scheme		Solarized hell
 Search forward	Terminal FindWindow		Vorwärts suchen

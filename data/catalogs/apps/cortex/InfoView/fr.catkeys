@@ -1,4 +1,4 @@
-1	french	application/x-vnd.Cortex.InfoView	3622294481
+1	french	application/x-vnd.Cortex.InfoView	3854052292
 Description	DormantNodeInfoView		Description
 Byte order	InfoView		Boutisme
 Connection	InfoView		Connexion
@@ -10,10 +10,13 @@ Flags	InfoView		Drapeaux
 Active lines	InfoView		Lignes actives
 Buffer size	InfoView		Taille du tampon
 \n- Quality:	FileNodeInfoView		\n- Qualité :
+Max. instances	DormantNodeInfoView		Instances max.
+\n- Duration:	FileNodeInfoView		\n- Durée :
 Latency	LiveNodeInfoView		Temps de latence
 Media type	InfoView		Type de média
 Node ID	LiveNodeInfoView		ID de nœud
 Resolution	InfoView		Résolution
+Chunk size	InfoView		Taille des fragments
 File format	AppNodeInfoView		Format de fichier
 Orientation	InfoView		Orientation
 Channels	InfoView		Canaux
@@ -31,4 +34,5 @@ Output format	DormantNodeInfoView		Format
 Tracks	FileNodeInfoView		Piste
 Source	InfoView		Source
 Destination	InfoView		Destination
+Copyright	FileNodeInfoView		Copyright
 ID:	FileNodeInfoView		ID :

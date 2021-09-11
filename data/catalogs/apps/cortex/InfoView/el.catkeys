@@ -1,0 +1,27 @@
+1	greek, modern (1453-)	application/x-vnd.Cortex.InfoView	4191502754
+Offset	InfoView		Μετατόπιση
+Description	DormantNodeInfoView		Περιγραφή
+Byte order	InfoView		Σειρά bytes
+Connection	InfoView		Σύνδεση
+Output formats	DormantNodeInfoView		Μορφότυπα εξόδου
+History	InfoView		Ιστορικό
+Input formats	DormantNodeInfoView		Μορφότυπα εισόδου
+Signature	AppNodeInfoView		Υπογραφή
+Video data between	InfoView		Ενδιάμεσα δεδομένα βίντεο
+Any number	DormantNodeInfoView	For 'Max. instances' field	Οποιοσδήποτε αριθμός
+Media output	InfoView		Έξοδος πολυμέσων
+Active lines	InfoView		Ενεργές γραμμές
+Buffer size	InfoView		Μέγεθος buffer
+\n- Quality:	FileNodeInfoView		\n- Ποιότητα
+Kinds	LiveNodeInfoView		Είδη
+Application	AppNodeInfoView		Εφσρμογή
+\n- Duration:	FileNodeInfoView		\n- Διάρκεια:
+Media type	InfoView		Είδος πολυμέσων
+%title% info	InfoView		Πληροφορίες για %title%
+Node ID	LiveNodeInfoView		Αναγνωριστικό κόμβου
+File format	AppNodeInfoView		Μορφότυπο
+Orientation	InfoView		Προσανατολισμός
+Channels	InfoView		Κανάλια
+File format	FileNodeInfoView		Μορφότυπο
+(no file)	FileNodeInfoView		(κανένα αρχείο)
+Media input	InfoView		Είσοδος πολυμέσων

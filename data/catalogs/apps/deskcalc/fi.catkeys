@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-DeskCalc	3178768763
+1	finnish	x-vnd.Haiku-DeskCalc	2154833291
 cos	CalcView		cos
 3	CalcView		3
 (	CalcView		(
@@ -8,12 +8,10 @@ acos	CalcView		acos
 E	CalcView		E
 /	CalcView		/
 C	CalcView		C
-C	CalcView	Key label, 'C' means clear	C
 8	CalcView		8
 ceil	CalcView		ceil
 -	CalcView		-
 cbrt	CalcView		cbrt
-BS	CalcView	Key label, 'BS' means backspace	BS
 floor	CalcView		floor
 sinh	CalcView		sinh
 6	CalcView		6

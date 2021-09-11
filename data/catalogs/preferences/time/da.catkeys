@@ -1,7 +1,6 @@
-1	danish	x-vnd.Haiku-Time	834234238
+1	danish	x-vnd.Haiku-Time	2069485065
 OK	Time		OK
 Message receiving failed	Time		Modtagning af meddelelse mislykkedes
-Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Klokkeslæt og dato, skrevet af:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nOphavsret 2004-2012, Haiku.
 Australia	Time		Australien
 America	Time		Amerika
 Reset to default server list	Time		Nulstil til standard serverliste
@@ -38,7 +37,6 @@ Atlantic	Time		Atlantisk
 Show clock in Deskbar	Time		Vis ur i skrivebordslinje
 Display time with seconds	Time		Vis klokkeslæt med sekunder
 Time	System name		Tid
-about	Time		om
 Show time zone	Time		Vis tidszone
 Synchronize at boot	Time		Synkronisér ved opstart
 Indian	Time		Indien

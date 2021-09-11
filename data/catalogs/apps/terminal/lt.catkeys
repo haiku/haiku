@@ -10,8 +10,8 @@ Confirm exit if active programs exist	Terminal AppearancePrefView		Prašyti darb
 Copy	Terminal TermWindow		Kopijuoti
 Retro	Terminal colors scheme		Retro
 Edit tab title…	Terminal TermWindow		Keisti kortelės antraštę…
-Print	Terminal TermWindow		Spausdinti
 Settings	Terminal TermWindow		Nuostatos
+Print	Terminal TermWindow		Spausdinti
 %app% settings	Terminal PrefWindow	window title	Terminalo nuostatos
 Use default	Terminal SetTitleWindow		Grąžinti numatytąją
 Close tab	Terminal TermWindow		Užverti kortelę
@@ -27,8 +27,8 @@ Page setup…	Terminal TermWindow		Puslapio nuostatos…
 Slate	Terminal colors scheme		Skalūnas
 Cancel	Terminal TermView		Atsisakyti
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminalas
-Use selection	Terminal FindWindow		Ieškoti pažymėto teksto
 Find next	Terminal TermWindow		Ieškoti kito
+Use selection	Terminal FindWindow		Ieškoti pažymėto teksto
 Copy link location	Terminal TermView		Kopijuoti saito adresą
 Window title:	Terminal AppearancePrefView		Lango antraštė:
 New tab	Terminal TermWindow		Nauja kortelė
@@ -46,12 +46,12 @@ Unrecognized option \"%s\"\n	Terminal arguments parsing		Nežinomas argumentas: 
 Tab title:	Terminal AppearancePrefView		Kortelės antraštė:
 Text not found.	Terminal TermWindow		Ieškotas tekstas nerastas.
 Find failed	Terminal TermWindow		Paieška nepavyko
-Match word	Terminal FindWindow		Atitikti visą žodį
 Color scheme:	Terminal AppearancePrefView		Spalvų schema:
+Match word	Terminal FindWindow		Atitikti visą žodį
 New Terminal	Terminal TermWindow		Naujas langas
 Quit	Terminal TermWindow		Baigti darbą
-Match case	Terminal FindWindow		Paisyti raidžių registro
 Find previous	Terminal TermWindow		Ieškoti ankstesnio
+Match case	Terminal FindWindow		Paisyti raidžių registro
 Close	Terminal TermWindow		Užverti
 Save to file…	Terminal PrefWindow		Įrašyti į failą…
 Background	Terminal AppearancePrefView		Fono
@@ -69,11 +69,11 @@ Default	Terminal colors scheme		Numatytoji
 Switch Terminals	Terminal TermWindow		Pereiti į kitą terminalą
 Decrease	Terminal TermWindow		Pamažinti
 Settings…	Terminal TermWindow		Nuostatos…
-Cancel	Terminal SetTitleWindow		Atsisakyti
 Blinking cursor	Terminal AppearancePrefView		Mirksintis žymeklis
+Cancel	Terminal SetTitleWindow		Atsisakyti
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Lango antraštės šablonas. Galite naudoti šiuos vietaženklius:\n
-Use text:	Terminal FindWindow		Ieškoti teksto:
 Close active tab	Terminal TermWindow		Užverti aktyvią kortelę
+Use text:	Terminal FindWindow		Ieškoti teksto:
 Nothing is selected.	Terminal TermWindow		Nėra pažymėto teksto.
 Find	Terminal FindWindow		Ieškoti
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Aktyvios kortelės antraštės šablonas. Galite naudoti šiuos vietaženklius:\n

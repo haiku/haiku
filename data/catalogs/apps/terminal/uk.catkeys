@@ -13,8 +13,8 @@ Copy	Terminal TermWindow		Копіювати
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory	Terminal TermApp		  -h,     --help               показати довідку\n  -t,     --title              установити заголовок вікна\n  -f,     --fullscreen         повноекранний режим\n  -w,     --working-directory  установити робочий каталог
 Retro	Terminal colors scheme		Ретро
 Edit tab title…	Terminal TermWindow		Редагувати заголовок вкладки…
-Print	Terminal TermWindow		Друк
 Settings	Terminal TermWindow		Налаштування
+Print	Terminal TermWindow		Друк
 %app% settings	Terminal PrefWindow	window title	%app% налаштування
 Use default	Terminal SetTitleWindow		За замовчуванням
 Close tab	Terminal TermWindow		Закрити вкладку
@@ -33,8 +33,8 @@ Defaults	Terminal PrefWindow		За замовчуванням
 Cancel	Terminal TermView		Скасувати
 Revert	Terminal PrefWindow		Без змін
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Термінал
-Use selection	Terminal FindWindow		Використати вибране
 Find next	Terminal TermWindow		Знайти наступне
+Use selection	Terminal FindWindow		Використати вибране
 Copy link location	Terminal TermView		Копіювати адресу посилання
 Window title:	Terminal AppearancePrefView		Заголовок вікна:
 New tab	Terminal TermWindow		Нова вкладка
@@ -53,12 +53,12 @@ Unrecognized option \"%s\"\n	Terminal arguments parsing		Нероспізнан�
 Tab title:	Terminal AppearancePrefView		Заголовок вкладки:
 Text not found.	Terminal TermWindow		Текст не знайдено.
 Find failed	Terminal TermWindow		Збій пошуку
-Match word	Terminal FindWindow		Слово повністю
 Color scheme:	Terminal AppearancePrefView		Схема кольорів:
+Match word	Terminal FindWindow		Слово повністю
 New Terminal	Terminal TermWindow		Новий Термінал
 Quit	Terminal TermWindow		Вийти
-Match case	Terminal FindWindow		Враховувати регістр
 Find previous	Terminal TermWindow		Знайти попереднє
+Match case	Terminal FindWindow		Враховувати регістр
 The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Шаблон визначає заголовки вкладок.\nМожна використовувати наступні заповнювачі:\n\n
 Close	Terminal TermWindow		Закрити
 Save to file…	Terminal PrefWindow		Зберегти у файл…
@@ -80,11 +80,11 @@ Window size:	Terminal AppearancePrefView		Розмір вікна:
 Switch Terminals	Terminal TermWindow		Переключити термінали
 Decrease	Terminal TermWindow		Зменшити
 Settings…	Terminal TermWindow		Налаштування…
-Cancel	Terminal SetTitleWindow		Скасувати
 Blinking cursor	Terminal AppearancePrefView		Мигання курсору
+Cancel	Terminal SetTitleWindow		Скасувати
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Шаблон визначає заголовок вікна.\nМожна використовувати наступні заповнювачі:\n\n
-Use text:	Terminal FindWindow		Використати текст:
 Close active tab	Terminal TermWindow		Закрити активну вкладку
+Use text:	Terminal FindWindow		Використати текст:
 Save as default	Terminal TermWindow		Зберегти за замовчуванням
 Nothing is selected.	Terminal TermWindow		Нічого не вибрано.
 Use left Option as Meta key	Terminal AppearancePrefView		Використовувати лівий Option як клавішу Meta 
@@ -112,6 +112,6 @@ Increase	Terminal TermWindow		Збільшити
 OK	Terminal TermWindow		ОК
 Close window	Terminal TermWindow		Закрити вікно
 Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nВикористання: %s [OPTION] [SHELL]\n
-Solarized Light	Terminal colors scheme		Сяюче світло
 Clear all	Terminal TermWindow		Очистити все
+Solarized Light	Terminal colors scheme		Сяюче світло
 Search forward	Terminal FindWindow		Шукати далі

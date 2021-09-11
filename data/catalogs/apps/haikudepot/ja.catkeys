@@ -1,10 +1,9 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	3544756144
+1	japanese	x-vnd.Haiku-HaikuDepot	3437352458
 Repository update error	LocalRepositoryUpdateProcess		リポジトリアップデートエラー
 Network error	ServerHelper		ネットワークエラー
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		リポジトリの更新中に次のエラーが発生しました: %error%
 User Created	UserLoginWindow		作成されたユーザー
 Check for updates…	MainWindow		更新のチェック...
-Uninstall	PackageManager		アンインストール
 Uninstalled	PackageListView		アンインストール済
 It was not possible to create the new user.	UserLoginWindow		新しいユーザーを作成できません。
 Available packages	MainWindow		使用可能なパッケージ
@@ -17,7 +16,6 @@ Starting the package daemon failed:\n\n%Error%	App		パッケージデーモン�
 You have successfully authenticated as user %Nickname%.	UserLoginWindow		ユーザー %Nickname% として無事に認証されました。
 <no info>	PackageInfoView		<情報無し>
 No user ratings available.	PackageInfoView		ユーザー評価はありません。
-Downloading package '%name%'	WorkStatusView		パッケージ '%name%' のダウンロード中
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		サーバーの返信から、必要なキャプチャ情報を抽出できませんでした。
 A network transport error has arisen communicating with the server system: %s	ServerHelper		サーバーシステムと通信中にネットワーク転送エラーが発生しました: %s
 Rating	PackageListView		評価
@@ -29,7 +27,6 @@ This application writes and reads some working files on your computer in order t
 Active	PackageListView		有効
 Login or Create account	MainWindow		ログインまたはアカウントの作成
 <Package contents not available for remote packages>	PackageContentsView		<リモートパッケージには利用できません>
-{0, plural,one{1 package to download}other{# packages to download}}	WorkStatusView		{0, plural,one{1個のダウンロードパッケージ}other{#個のダウンロードパッケージ}}
 Ratings	PackageInfoView		評価
 Switch account…	MainWindow		アカウントの切り替え...
 Preferred language:	UserLoginWindow		優先言語:
@@ -46,8 +43,6 @@ Category	FilterView		分類
 User rating	RatePackageWindow		ユーザーによる評価
 Installed packages	MainWindow		インストール済パッケージ
 A requested object or an object involved in the request was not found on the server.	ServerHelper		要求されたオブジェクトまたはリクエストに関連するオブジェクトがサーバー上に見つからなかった。
-Fatal error	PackageManager		致命的なエラー
-Package action failed	PackageInfoView		パッケージアクションが失敗しました
 No changelog available.	PackageInfoView		変更記録はありません。
 Error	App		エラー
 There was a puzzling response from the web service.	UserLoginWindow		ウェブサービスから不可解なレスポンスがあった。
@@ -79,7 +74,6 @@ Stability	RatePackageWindow		安定度
 Send	RatePackageWindow		送信する
 Start package daemon	App		パッケージデーモンの起動
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		間違って入力する可能性を減らすため、パスワードを繰り返す必要があります。
-The package action could not be scheduled: %Error%	PackageInfoView		パッケージアクションはスケジュールできません: %Error%
 Cancel	SettingsWindow		キャンセル
 Cancel	RatePackageWindow		中止
 Inactive	PackageListView		無効
@@ -89,7 +83,6 @@ There are problems in the supplied data:	UserLoginWindow		入力されたデー�
 OK	MainWindow		OK
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# アイテム} other{# アイテム}}
 Usage conditions download problem	UserLoginWindow		使用条件のダウンロードで問題
-OK	PackageInfoView		OK
 Downloading:	PackageInfoView		ダウンロード中:
 Quit	MainWindow		終了
 Success	UserLoginWindow		成功
@@ -118,7 +111,6 @@ This rating is visible to other users	RatePackageWindow		この評価はほか�
 While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		パッケージデータの更新中に問題が発生しました。そのためデータが期限切れに、つまりアプリケーションの表示から消えてしまいます。この問題の詳細は、アプリケーションのログから得られるでしょう。\nログの見方についての情報は、HaikuユーザーガイドのHaikuDepotの章で得られます。
 View agreed usage conditions…	MainWindow		同意した使用条件を見る...
 Cancel	MainWindow		中止
-{0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 個以上のダウンロード)}other{(# 個以上のダウンロード)}}
 Refresh repositories	MainWindow		リポジトリの更新
 Continue	App		続行
 A password is required.	UserLoginWindow		パスワードが必要です。
@@ -145,8 +137,8 @@ Source packages	MainWindow		ソースパッケージ
 -	no package size		-
 Problem with working files	App		作業用ファイルに問題があります
 Server error	ServerHelper		サーバーエラー
-Rate package	RatePackageWindow		パッケージを評価
 Try again	App		再試行
+Rate package	RatePackageWindow		パッケージを評価
 Unknown	PackageListView		不明
 I agree to the usage conditions	UserLoginWindow		使用条件に同意します
 Log in	UserLoginWindow		ログイン
@@ -154,8 +146,8 @@ Sending anonymous usage data	MainWindow		匿名の使用状況データーを送
 Logged in as %User%	MainWindow		%User% としてログイン
 Email address:	UserLoginWindow		メールアドレス:
 Screenshot	ScreenshotWindow		スクリーンショット
-A reboot is necessary to complete the installation process.	PackageManager		インストールプロセスを完了するには再起動が必要です。
 HaikuDepot	System name		HaikuDepot
+A reboot is necessary to complete the installation process.	PackageManager		インストールプロセスを完了するには再起動が必要です。
 Yes	MainWindow		はい
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{私は少なくとも 1 歳です}other{私は # 歳以上です}}
 View latest usage conditions…	MainWindow		最新の使用条件を見る...
@@ -172,7 +164,6 @@ Fetching remote repository data	LocalRepositoryUpdateProcess		リモートリポ
 Description	PackageListView		説明
 Open %DeskbarLink%	PackageManager		%DeskbarLink% を開く
 User creation error	UserLoginWindow		ユーザー作成エラー
-Install	PackageManager		インストール
 Input validation	UserLoginWindow		入力検証
 Log in…	MainWindow		ログイン...
 You need to be logged into an account before you can rate packages.	MainWindow		パッケージの評価前にアカウントにログインする必要があります。

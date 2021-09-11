@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-HaikuDepot	1191205308
+1	esperanto	x-vnd.Haiku-HaikuDepot	1522183623
 Repository update error	LocalRepositoryUpdateProcess		Eraro dum ĝisdatigo de deponejo
 Network error	ServerHelper		Eraro de reto
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Eraro okazis dum aktualigo de la deponejo: %error%
@@ -16,7 +16,6 @@ Starting the package daemon failed:\n\n%Error%	App		Ekrulado de la pakaĵa demon
 You have successfully authenticated as user %Nickname%.	UserLoginWindow		Vi sukcese aŭtentigis kiel uzanto %Nickname%.
 <no info>	PackageInfoView		<ne estas informo>
 No user ratings available.	PackageInfoView		Uzantaj taksoj ne estas disponeblaj
-Downloading package '%name%'	WorkStatusView		Elŝutas pakaĵon '%name%'
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Ne povis eltiri necesan kapĉan informon el la datuma bloko kiu estis sendita el la servilo.
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Eraro de reta transporto dum konversacio kun servilo: %s
 Rating	PackageListView		Takso
@@ -28,7 +27,6 @@ This application writes and reads some working files on your computer in order t
 Active	PackageListView		Aktiva
 Login or Create account	MainWindow		Ensaluti aŭ Krei konton
 <Package contents not available for remote packages>	PackageContentsView		<Pakaĵa enhavo ne estas disponebla por foraj pakaĵoj>
-{0, plural,one{1 package to download}other{# packages to download}}	WorkStatusView		{0, plural,one{1 pakaĵon por elŝuti}other{# pakaĵojn por elŝuti}}
 Ratings	PackageInfoView		Taksoj
 Switch account…	MainWindow		Ŝanĝi konton…
 Preferred language:	UserLoginWindow		Preferata lingvo:
@@ -111,7 +109,6 @@ n/a	PackageInfoView		Neaplikebla
 This rating is visible to other users	RatePackageWindow		Ĉi tiu takso estas videbla al aliaj uzantoj
 View agreed usage conditions…	MainWindow		Vidi konsentitajn uzkondiĉojn…
 Cancel	MainWindow		Nuligi
-{0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 plu por elŝuti)}other{(# plu por elŝuti)}}
 Refresh repositories	MainWindow		Aktualigi deponejojn
 Continue	App		Daŭrigi
 A password is required.	UserLoginWindow		Pasvorto estas deviga.
@@ -138,8 +135,8 @@ Source packages	MainWindow		Fontaj pakaĵoj
 -	no package size		-
 Problem with working files	App		Problemo kun kurantaj dosieroj
 Server error	ServerHelper		Eraro de servilo
-Rate package	RatePackageWindow		Taksi pakaĵon
 Try again	App		Provi denove
+Rate package	RatePackageWindow		Taksi pakaĵon
 Unknown	PackageListView		Nekonata
 I agree to the usage conditions	UserLoginWindow		Mi konsentas la kondiĉojn de uzado
 Log in	UserLoginWindow		Ensaluti
@@ -147,8 +144,8 @@ Sending anonymous usage data	MainWindow		Sendi anoniman informon pri uzado
 Logged in as %User%	MainWindow		Ensalutis kiel %User%
 Email address:	UserLoginWindow		Retpoŝtadreso:
 Screenshot	ScreenshotWindow		Ekrankopio
-A reboot is necessary to complete the installation process.	PackageManager		Restartigo estas necesa por kompletigi la instalon.
 HaikuDepot	System name		HaikuTenejo
+A reboot is necessary to complete the installation process.	PackageManager		Restartigo estas necesa por kompletigi la instalon.
 Yes	MainWindow		Jes
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{Mi havas malpleje unu jaron}other{Mi havas # jarojn aŭ pli}}
 View latest usage conditions…	MainWindow		Vidi plej novan kondiĉojn de uzado…

@@ -50,7 +50,7 @@ Default	Menus		Padrões
 OK	SaveAlert		OK
 Color	Menus		Cor
 Save changes to the document \"%s\"? 	QuitAlert		Salvar as alterações ao documento \"%s\"? 
-StyledEdit	System name		Estilo de Edição
+StyledEdit	System name		StyledEdit
 Find:	FindandReplaceWindow		Localizar:
 Undo typing	QuitAlert		Desfazer digitação
 Error loading \"%s\":\n\t%s	LoadAlert		Erro ao salvar \"%s\":\n%s

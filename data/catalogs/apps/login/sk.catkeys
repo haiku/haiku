@@ -1,11 +1,8 @@
-1	slovak	x-vnd.Haiku-Login	336867745
+1	slovak	x-vnd.Haiku-Login	3033693897
 Invalid login!	Login View		Neplatné prihlasovacie meno!
 Error	Login App		Chyba
---edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\t Spustiť v režime úpravy políc umožňujúcom prispôsobiť plochu.\n
 Welcome to Haiku	Login Window		Vitajte v Haiku
 Halt	Login View		Vypnúť
-Login application for Haiku\nUsage:\n	Login App		Prihlasovacia aplikácia Haiku\n Použitie:\n
---nonmodal\tDo not make the window modal\n	Login App		--nonmodal\t Nevytvárať okno ako modálne\n
 Desktop	Desktop Window		Plocha
 Hide password	Login View		Skryť heslo
 Reboot	Login View		Reštartovať

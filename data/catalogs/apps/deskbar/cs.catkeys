@@ -28,7 +28,7 @@ Auto-raise	PreferencesWindow		Automatické zvětšení
 Recent folders:	PreferencesWindow		Nedávné adresáře:
 Show application expander	PreferencesWindow		Zobrazit aplikační rozšíření
 Close all	WindowMenu		Zavřít vše
-Deskbar preferences	PreferencesWindow		Nastavení Panelu
+Deskbar preferences	PreferencesWindow		Nastavení panelu
 Mount	DeskbarMenu		Připojit
 Revert	PreferencesWindow		Vrátit zpět
 Small	PreferencesWindow		Malé
@@ -39,7 +39,7 @@ Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Nastavení
 Recent folders	DeskbarMenu		Nedávné adresáře
 About this system	DeskbarMenu		O tomto systému
 Show calendar…	TimeView		Zobrazit kalendář...
-Deskbar preferences…	DeskbarMenu		Nastavení Panelu…
+Deskbar preferences…	DeskbarMenu		Nastavení panelu…
 Expand new applications	PreferencesWindow		Rozbalit nové aplikace
 Show replicants	DeskbarMenu		Zobrazit replikanty
 Hide application names	PreferencesWindow		Skrýt názvy aplikací

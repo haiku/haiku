@@ -2,7 +2,7 @@
 Left	Attribute Window	Attribute column alignment in Tracker	Vlevo
 Float	Attribute ListView		Číslo s plovoucí desetinnou čárkou
 Final	Application Types Window		Finální
-FileTypes request	FileTypes Window		Požadavek Typy souborů
+FileTypes request	FileTypes Window		Požadavek typů souborů
 This file type already exists	New File Type Window		Tento typ již existuje
 Preferred application	FileTypes Window		Preferovaná aplikace
 Launch	Application Types Window		Spustit
@@ -95,7 +95,7 @@ Could not install file type	New File Type Window		Nemohu nainstalovat typ soubor
 Same as…	FileTypes Window		Jako...
 Golden master	Application Type Window		Hlavní originál
 Checkbox	Attribute ListView		Zaškrtávací pole
-FileTypes request	Preferred App Menu		Požadavek Typy souborů
+FileTypes request	Preferred App Menu		Požadavek typů souborů
 no icon	FileTypes Window		žádná ikona
 Single launch	Application Type Window		Jediné spuštění
 %s file type	FileType Window		%s typ souboru

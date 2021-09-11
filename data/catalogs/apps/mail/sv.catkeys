@@ -136,7 +136,7 @@ No file attributes, just plain data	Mail		Inga fil attribut, bara vanlig data
 Add	Mail		Lägg till
 out	B_USER_DIRECTORY/mail/out		ut
 Send this message before closing?	Mail		Skicka meddelandet innan programmet stängs?
-in	B_USER_DIRECTORY/mail/in		i
+in	B_USER_DIRECTORY/mail/in		in
 Open	Mail		Öppna
 Don't save	Mail		Spara ej
 Leave same	Mail		Lämna samma

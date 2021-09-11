@@ -1,13 +1,13 @@
 1	danish	x-vnd.Haiku-Devices	3345509916
 ACPI bus	DevicesView		ACPI-bus
 Encryption controller	Device		Krypterings-kontroller
-Bus Information	Device		Bus-information
+Bus Information	Device		Information om bus
 Devices	System name		Enheder
 Graphics Peripheral	DeviceSCSI		Grafisk perifer
 Processor	Device		Processor
 Generate system information	DevicesView		Generer systeminformation
 Class info	DevicePCI		Klasseinfo
-ACPI Information	DeviceACPI		ACPI-information
+ACPI Information	DeviceACPI		Information om ACPI
 Detailed	DevicesView		Detaljer
 Computer	DevicesView		Computer
 Communications	DeviceSCSI		Kommunikation
@@ -16,7 +16,7 @@ Mass storage controller	Device		Masselagerings-kontroller
 Connection	DevicesView		Forbindelse
 Printer	DeviceSCSI		Printer
 ACPI Processor Namespace '%2'	DeviceACPI		ACPI-processor-navnerum '%2'
-SCSI Information	DeviceSCSI		SCSI-information
+SCSI Information	DeviceSCSI		Information om SCSI
 Manufacturer	Device		Producent
 Device name:	Device		Enhedsnavn:
 Scanner	DeviceSCSI		Skanner
@@ -36,7 +36,7 @@ Input device controller	Device		Inputenheds-kontroller
 PCI bus	DevicesView		PCI-bus
 ACPI System Indicator	DeviceACPI		ACPI systemindikator
 ACPI System Bus	DeviceACPI		ACPI systembus
-PCI Information	DevicePCI		PCI-information
+PCI Information	DevicePCI		Information om PCI
 Tape Drive	DeviceSCSI		Bånddrev
 Changer	DeviceSCSI		Skifter
 Serial bus controller	Device		Seriel bus-kontroller

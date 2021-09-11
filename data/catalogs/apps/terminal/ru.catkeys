@@ -12,8 +12,8 @@ Solarized Dark	Terminal colors scheme		Соляризированная тьма
 Copy	Terminal TermWindow		Копировать
 Retro	Terminal colors scheme		Ретро
 Edit tab title…	Terminal TermWindow		Переименовать вкладку…
-Print	Terminal TermWindow		Печать
 Settings	Terminal TermWindow		Настройки
+Print	Terminal TermWindow		Печать
 %app% settings	Terminal PrefWindow	window title	Настройки терминала
 Use default	Terminal SetTitleWindow		По умолчанию
 Close tab	Terminal TermWindow		Закрыть вкладку
@@ -32,8 +32,8 @@ Defaults	Terminal PrefWindow		По умолчанию
 Cancel	Terminal TermView		Отмена
 Revert	Terminal PrefWindow		Вернуть
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Терминал
-Use selection	Terminal FindWindow		Использовать выделенный текст
 Find next	Terminal TermWindow		Найти далее
+Use selection	Terminal FindWindow		Использовать выделенный текст
 Copy link location	Terminal TermView		Скопировать ссылку
 Window title:	Terminal AppearancePrefView		Заголовок окна:
 New tab	Terminal TermWindow		Новая вкладка
@@ -52,12 +52,12 @@ Unrecognized option \"%s\"\n	Terminal arguments parsing		Нераспознан�
 Tab title:	Terminal AppearancePrefView		Заголовок вкладки:
 Text not found.	Terminal TermWindow		Текст не найден
 Find failed	Terminal TermWindow		Строка не найдена
-Match word	Terminal FindWindow		Только слово целиком
 Color scheme:	Terminal AppearancePrefView		Цветовая схема:
+Match word	Terminal FindWindow		Только слово целиком
 New Terminal	Terminal TermWindow		Новый терминал
 Quit	Terminal TermWindow		Выход
-Match case	Terminal FindWindow		Учитывать регистр
 Find previous	Terminal TermWindow		Найти ранее
+Match case	Terminal FindWindow		Учитывать регистр
 The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Этот шаблон описывает заголовки вкладок.\nВозможно использовать следующие переменные:
 Close	Terminal TermWindow		Закрыть
 Save to file…	Terminal PrefWindow		Сохранить в файл…
@@ -79,11 +79,11 @@ Window size:	Terminal AppearancePrefView		Размер окна:
 Switch Terminals	Terminal TermWindow		Переключить терминалы
 Decrease	Terminal TermWindow		Уменьшить
 Settings…	Terminal TermWindow		Настройки…
-Cancel	Terminal SetTitleWindow		Отмена
 Blinking cursor	Terminal AppearancePrefView		Мигающий курсор
+Cancel	Terminal SetTitleWindow		Отмена
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Этот шаблон описывает заголовок окна.\nВозможно использовать следующие переменные:\n
-Use text:	Terminal FindWindow		Использовать текст:
 Close active tab	Terminal TermWindow		Закрыть текущую вкладку
+Use text:	Terminal FindWindow		Использовать текст:
 Save as default	Terminal TermWindow		Сохранить по умолчанию
 Nothing is selected.	Terminal TermWindow		Ничего не выделено
 Use left Option as Meta key	Terminal AppearancePrefView		Использовать левый Option как клавишу Meta
@@ -111,6 +111,6 @@ Increase	Terminal TermWindow		Увеличить
 OK	Terminal TermWindow		ОК
 Close window	Terminal TermWindow		Закрыть окно
 Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nВсе права защищены © 2001-2019 Haiku, Inc.\nВсе права защищены © 1999 Kazuho Okui и Takashi Murai.\n\nИспользование: %s [OPTION] [SHELL]\n
-Solarized Light	Terminal colors scheme		Солнечный свет
 Clear all	Terminal TermWindow		Очистить всё
+Solarized Light	Terminal colors scheme		Солнечный свет
 Search forward	Terminal FindWindow		Искать сверху вниз

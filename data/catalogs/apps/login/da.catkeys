@@ -1,11 +1,8 @@
-1	danish	x-vnd.Haiku-Login	336867745
+1	danish	x-vnd.Haiku-Login	3033693897
 Invalid login!	Login View		Ugyldigt login!
 Error	Login App		Fejl
---edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tStart i hylderedigeringstilstand for tilpasning af skrivebordet.\n
 Welcome to Haiku	Login Window		Velkommen til Haiku
 Halt	Login View		Stop
-Login application for Haiku\nUsage:\n	Login App		Login-program til Haiku\nAnvendelse:\n
---nonmodal\tDo not make the window modal\n	Login App		--nonmodal\tGør ikke vinduet modalt\n
 Desktop	Desktop Window		Skrivebord
 Hide password	Login View		Skjul adgangskode
 Reboot	Login View		Genstart

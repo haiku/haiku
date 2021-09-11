@@ -104,7 +104,7 @@ Rating	MediaPlayer-Main		Classificação
 Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Erro interno (sem memória). Falha ao salvar a lista de reprodução.
 Video	MediaPlayer-Main		Vídeo
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Não existe decodificador instalado para manipular o formato de arquivo, ou o decodificador tem problema com a versão específica do formato.
-Lock Peaks	MediaPlayer-PeakView		Bloquear Picos
+Lock Peaks	MediaPlayer-PeakView		Travar Picos
 none	Audio track menu		nenhum
 Open network stream	MediaPlayer-NetworkStream		Abrir stream de rede
 Automatically start playing	MediaPlayer-SettingsWindow		Iniciar a reprodução automaticamente
@@ -124,7 +124,7 @@ Full screen	MediaPlayer-Main		Tela Cheia
 OK	MediaPlayer-NetworkStream		OK
 Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Erro interno (falha ao bloquear). Falha ao salvar a lista de reprodução.
 100% scale	MediaPlayer-Main		escala de 100%
-<nothing to redo>	MediaPlayer-PlaylistWindow		<nada para refazer>
+<nothing to redo>	MediaPlayer-PlaylistWindow		<nada a refazer>
 Bad URL	MediaPlayer-NetworkStream		URL ruim
 Save	MediaPlayer-Main		Salvar
 Close window after playing video	MediaPlayer-SettingsWindow		Fechar a janela após reproduzir vídeo
