@@ -1,3 +1,46 @@
 SubDir HAIKU_TOP src kits network libnetservices ;
 
-include [ FDirName $(HAIKU_TOP) src kits network libnetservices JamCommon ] ;
+UsePrivateHeaders net netservices shared support ;
+
+if [ Glob $(SUBDIR) : DefaultGeolocationServiceKey.h ] {
+	SubDirC++Flags [ FDefines HAVE_DEFAULT_GEOLOCATION_SERVICE_KEY ] ;
+}
+
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
+
+		StaticLibrary [ MultiArchDefaultGristFiles libnetservices.a ] :
+			DataRequest.cpp
+			HttpAuthentication.cpp
+			HttpHeaders.cpp
+			HttpForm.cpp
+			HttpRequest.cpp
+			HttpResult.cpp
+
+			FileRequest.cpp
+
+			GopherRequest.cpp
+
+			Geolocation.cpp
+
+			HttpTime.cpp
+			NetworkCookie.cpp
+			NetworkCookieJar.cpp
+
+			NetworkRequest.cpp
+			UrlContext.cpp
+			UrlProtocolAsynchronousListener.cpp
+			UrlProtocolDispatchingListener.cpp
+			UrlProtocolListener.cpp
+			UrlProtocolRoster.cpp
+			UrlRequest.cpp
+			UrlResult.cpp
+			UrlSynchronousRequest.cpp
+			;
+
+		LinkAgainst [ MultiArchDefaultGristFiles libnetservices.a ] :
+			<$(architecture)>libshared.a ;
+	}
+}

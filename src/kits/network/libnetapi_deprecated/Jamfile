@@ -1,3 +1,0 @@
-SubDir HAIKU_TOP src kits network libnetapi_deprecated ;
-
-include [ FDirName $(HAIKU_TOP) src kits network libnetservices JamCommon ] ;

@@ -58,7 +58,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			notifications.cpp
 
 			:
-			<libnetapi!$(architecture)>netservices.o
 			be shared $(TARGET_NETWORK_LIBS) [ TargetLibstdc++ ]
 			[ TargetLibsupc++ ] [ BuildFeatureAttribute openssl : libraries ]
 			[ BuildFeatureAttribute icu : libraries ]
