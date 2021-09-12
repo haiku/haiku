@@ -47,12 +47,22 @@ public:
 
 			size_t				BitmapSize() const;
 
+			bool				IsInverted() const
+								{ return fInverse; }
+
+			bool				IsClipped() const
+								{ return fClippedToCanvas; }
+
+			uint8				OutsideOpacity() const
+								{ return fOutsideOpacity; }
+
 protected:
 			ServerBitmap*		_CreateTemporaryBitmap(BRect bounds) const;
 			void				_Generate();
 			void				_SetNoClipping();
 			const IntRect&		_PreviousMaskBounds() const;
 	virtual	void				_AddToCache() = 0;
+			void				_SetOutsideOpacity();
 
 private:
 	virtual	ServerBitmap*		_RenderSource(const IntRect& canvasBounds) = 0;
@@ -73,6 +83,7 @@ private:
 			IntRect				fCanvasBounds;
 			const bool			fInverse;
 			uint8				fBackgroundOpacity;
+			uint8				fOutsideOpacity;
 
 			int32				fNextMaskCount;
 			bool				fInCache;
