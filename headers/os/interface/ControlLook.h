@@ -430,6 +430,9 @@ public:
 	virtual float				GetScrollBarWidth(
 									orientation orientation = B_VERTICAL);
 
+	static	bool				ShouldDraw(BView* view, const BRect& rect,
+									const BRect& updateRect);
+
 private:
 	// FBC padding
 	virtual	void				_ReservedControlLook6();
