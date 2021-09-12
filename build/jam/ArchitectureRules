@@ -675,7 +675,7 @@ rule ArchitectureSetupWarnings architecture
 	EnableWerror src add-ons kernel drivers video ;
 	EnableWerror src add-ons kernel file_systems bfs ;
 	EnableWerror src add-ons kernel file_systems cdda ;
-#	EnableWerror src add-ons kernel file_systems ext2 ;
+	EnableWerror src add-ons kernel file_systems ext2 ;
 #	EnableWerror src add-ons kernel file_systems fat ;
 #	EnableWerror src add-ons kernel file_systems googlefs ;
 	EnableWerror src add-ons kernel file_systems iso9660 ;

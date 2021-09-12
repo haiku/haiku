@@ -17,6 +17,8 @@
 #include "Inode.h"
 
 
+#undef ASSERT
+
 //#define TRACE_EXT2
 #ifdef TRACE_EXT2
 #	define TRACE(x...) dprintf("\33[34mext2:\33[0m " x)
@@ -840,8 +842,10 @@ DirectoryIterator::_CheckDirEntry(const ext2_dir_entry* dirEntry, const uint8* b
 		errmsg = "Length is not a multiple of 4";
 	else if (dirEntry->Length() < EXT2_DIR_REC_LEN(dirEntry->NameLength()))
 		errmsg = "Length is too short for the name";
-	else if (((uint8*)dirEntry - buffer) + dirEntry->Length() > fBlockSize)
+	else if (((uint8*)dirEntry - buffer) + dirEntry->Length()
+	         > (ptrdiff_t)fBlockSize) {
 		errmsg = "Length is too big for the blocksize";
+	}
 
 	TRACE("DirectoryIterator::_CheckDirEntry() %s\n", errmsg);
 	return errmsg == NULL;

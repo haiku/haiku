@@ -45,29 +45,6 @@ struct identify_cookie {
 };
 
 
-//!	ext2_io() callback hook
-static status_t
-iterative_io_get_vecs_hook(void* cookie, io_request* request, off_t offset,
-	size_t size, struct file_io_vec* vecs, size_t* _count)
-{
-	Inode* inode = (Inode*)cookie;
-
-	return file_map_translate(inode->Map(), offset, size, vecs, _count,
-		inode->GetVolume()->BlockSize());
-}
-
-
-//!	ext2_io() callback hook
-static status_t
-iterative_io_finished_hook(void* cookie, io_request* request, status_t status,
-	bool partialTransfer, size_t bytesTransferred)
-{
-	Inode* inode = (Inode*)cookie;
-	rw_lock_read_unlock(inode->Lock());
-	return B_OK;
-}
-
-
 //	#pragma mark - Scanning
 
 
@@ -398,34 +375,6 @@ ext2_write_pages(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 	rw_lock_read_unlock(inode->Lock());
 
 	return status;
-}
-
-
-static status_t
-ext2_io(fs_volume* _volume, fs_vnode* _node, void* _cookie, io_request* request)
-{
-	Volume* volume = (Volume*)_volume->private_volume;
-	Inode* inode = (Inode*)_node->private_node;
-
-#ifndef EXT2_SHELL
-	if (io_request_is_write(request) && volume->IsReadOnly()) {
-		notify_io_request(request, B_READ_ONLY_DEVICE);
-		return B_READ_ONLY_DEVICE;
-	}
-#endif
-
-	if (inode->FileCache() == NULL) {
-#ifndef EXT2_SHELL
-		notify_io_request(request, B_BAD_VALUE);
-#endif
-		return B_BAD_VALUE;
-	}
-
-	// We lock the node here and will unlock it in the "finished" hook.
-	rw_lock_read_lock(inode->Lock());
-
-	return do_iterative_fd_io(volume->Device(), request,
-		iterative_io_get_vecs_hook, iterative_io_finished_hook, inode);
 }
 
 
@@ -1635,14 +1584,6 @@ ext2_rewind_attr_dir(fs_volume* _volume, fs_vnode* _node, void* _cookie)
 
 	/* attribute operations */
 static status_t
-ext2_create_attr(fs_volume* _volume, fs_vnode* _node,
-	const char* name, uint32 type, int openMode, void** _cookie)
-{
-	return EROFS;
-}
-
-
-static status_t
 ext2_open_attr(fs_volume* _volume, fs_vnode* _node, const char* name,
 	int openMode, void** _cookie)
 {
@@ -1692,15 +1633,6 @@ ext2_read_attr(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 
 
 static status_t
-ext2_write_attr(fs_volume* _volume, fs_vnode* _node, void* cookie,
-	off_t pos, const void* buffer, size_t* length)
-{
-	return EROFS;
-}
-
-
-
-static status_t
 ext2_read_attr_stat(fs_volume* _volume, fs_vnode* _node,
 	void* _cookie, struct stat* stat)
 {
@@ -1710,30 +1642,6 @@ ext2_read_attr_stat(fs_volume* _volume, fs_vnode* _node,
 	Attribute attribute(inode, cookie);
 
 	return attribute.Stat(*stat);
-}
-
-
-static status_t
-ext2_write_attr_stat(fs_volume* _volume, fs_vnode* _node,
-	void* cookie, const struct stat* stat, int statMask)
-{
-	return EROFS;
-}
-
-
-static status_t
-ext2_rename_attr(fs_volume* _volume, fs_vnode* fromVnode,
-	const char* fromName, fs_vnode* toVnode, const char* toName)
-{
-	return ENOSYS;
-}
-
-
-static status_t
-ext2_remove_attr(fs_volume* _volume, fs_vnode* vnode,
-	const char* name)
-{
-	return ENOSYS;
 }
 
 
@@ -1806,16 +1714,16 @@ fs_vnode_ops gExt2VnodeOps = {
 	&ext2_rewind_attr_dir,
 
 	/* attribute operations */
-	NULL, //&ext2_create_attr,
+	NULL,
 	&ext2_open_attr,
 	&ext2_close_attr,
 	&ext2_free_attr_cookie,
 	&ext2_read_attr,
-	NULL, //&ext2_write_attr,
+	NULL,
 	&ext2_read_attr_stat,
-	NULL, //&ext2_write_attr_stat,
-	NULL, //&ext2_rename_attr,
-	NULL, //&ext2_remove_attr,
+	NULL,
+	NULL,
+	NULL,
 };
 
 
