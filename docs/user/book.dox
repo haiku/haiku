@@ -607,15 +607,22 @@ snooze_until(time - Latency(), B_SYSTEM_TIMEBASE);
 
 	\defgroup json Json Handling
 	\brief Provides for parsing and writing of data in Json encoding.
+*/
 
+
+#if __cplusplus >= 201703L
+/*!
 	\defgroup netservices Experimental Network Services Support
 	\brief Experimental API to do higher level network requests
 
 	This API currently is marked as experimental. It is part of the
 	<code>BPrivate::Network</code> namespace, the header files are found at
-	<code>headers\\private\\netservices</code>, and you have to link your
-	application to <code>libnetservices.a</code>.
+	<code>headers\\private\\netservices2</code>, and you have to link your
+	application to <code>libnetservices2.a</code>. The new API is only
+	available for modern platforms (x86 and x86_64), and not for the legacy
+	platform (x86_gcc2). The compiler needs to support C++17 or higher.
 */
+#endif
 
 
 ///// Namespace Documentation /////
@@ -623,6 +630,8 @@ snooze_until(time - Latency(), B_SYSTEM_TIMEBASE);
 
 //! \brief Internal or experimental API
 namespace BPrivate {
+
+#if __cplusplus >= 201703L
 	/*!
 		\brief Experimental Network Services API
 
@@ -631,4 +640,6 @@ namespace BPrivate {
 	namespace Network {
 
 	}
+#endif
+
 }
