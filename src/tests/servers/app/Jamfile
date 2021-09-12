@@ -262,6 +262,7 @@ SubInclude HAIKU_TOP src tests servers app font_spacing ;
 SubInclude HAIKU_TOP src tests servers app gradients ;
 SubInclude HAIKU_TOP src tests servers app hide_and_show ;
 SubInclude HAIKU_TOP src tests servers app idle_test ;
+SubInclude HAIKU_TOP src tests servers app inverse_clipping ;
 SubInclude HAIKU_TOP src tests servers app lagging_get_mouse ;
 SubInclude HAIKU_TOP src tests servers app lock_focus ;
 SubInclude HAIKU_TOP src tests servers app look_and_feel ;
