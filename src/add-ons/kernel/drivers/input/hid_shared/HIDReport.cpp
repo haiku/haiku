@@ -107,7 +107,14 @@ HIDReport::AddMainItem(global_item_state &globalState,
 		}
 	}
 
-	uint32 usage = 0;
+	usage_value page;
+
+	if (localState.usage_stack_used > 0) {
+		page = localState.usage_stack[0];
+		page.u.s.usage_id = 0;
+	}
+
+	uint32 usage = page.u.extended;
 
 	for (uint32 i = 0; i < globalState.report_count; i++) {
 		if (mainData.array_variable == 1) {
