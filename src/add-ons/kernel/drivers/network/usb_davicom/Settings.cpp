@@ -118,7 +118,7 @@ void usb_davicom_trace(bool force, const char* func, const char *fmt, ...)
 	va_end(arg_list);
 
 	if (gLogFilePath == NULL) {
-		dprintf(buffer);
+		dprintf("%s", buffer);
 		return;
 	}
 

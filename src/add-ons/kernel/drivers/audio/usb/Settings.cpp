@@ -103,7 +103,7 @@ void usb_audio_trace(uint32 bits, const char* func, const char* fmt, ...)
 	va_end(arg_list);
 
 	if (gLogFilePath == NULL) {
-		dprintf(buffer);
+		dprintf("%s", buffer);
 		return;
 	}
 
