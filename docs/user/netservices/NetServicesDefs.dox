@@ -1,0 +1,128 @@
+/*
+ * Copyright 2021 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Niels Sascha Reedijk, niels.reedijk@gmail.com
+ *
+ * Corresponds to:
+ *		headers/private/netservices2/NetServicesDefs.h	hrev?????
+ */
+
+
+#if __cplusplus >= 201703L
+
+namespace BPrivate {
+
+namespace Network {
+
+
+/*!
+	\class BUnsupportedProtocol
+	\ingroup netservices
+	\brief Error that indicates that the protocol is not supported.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BUnsupportedProtocol::BUnsupportedProtocol(const char* origin,
+		BUrl url, BStringList supportedProtocols)
+	\brief Create a new error unsupported protocol error.
+
+	\param origin A string representing where this error occured. It is advised
+		to initialize it to \c __PRETTY_FUNCTION__ by default.
+	\param url The URL object with the unsupported protocol.
+	\param supportedProtocols A list with the supported protocols.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BUnsupportedProtocol::BUnsupportedProtocol(BString origin, BUrl url,
+		BStringList supportedProtocols)
+	\copydoc BUnsupportedProtocol(const char*, BUrl, BStringList)
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual const char* BUnsupportedProtocol::Message() const noexcept override
+	\brief Access the string representation of the message.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BUrl& BUnsupportedProtocol::Url() const
+	\brief The URL that caused the issue.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BStringList& BUnsupportedProtocol::SupportedProtocols() const
+	\brief A list of protocols that are supported.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\class BInvalidUrl
+	\ingroup netservices
+	\brief Error that indicates that the URL is not valid.
+
+	This error is raised as an exception when the caller tries to pass a
+	\ref BUrl object that does not contain a valid URL.
+
+	\see \ref BUrl::IsValid()
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BInvalidUrl::BInvalidUrl(const char* origin, BUrl url)
+	\brief Create a new error invalid URL error.
+
+	\param origin A string representing where this error occured. It is advised
+		to initialize it to \c __PRETTY_FUNCTION__ by default.
+	\param url The URL object that did not contain a valid URL.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BInvalidUrl::BInvalidUrl(BString origin, BUrl url)
+	\copydoc BInvalidUrl::BInvalidUrl(const char* origin, BUrl url)
+*/
+
+
+/*!
+	\fn virtual const char* BInvalidUrl::Message() const noexcept override
+	\brief Access the string representation of the message.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BUrl& BInvalidUrl::Url() const
+	\brief The URL that caused the issue.
+
+	\since Haiku R1
+*/
+
+
+} // namespace Network
+
+} // namespace BPrivate
+
+#endif

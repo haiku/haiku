@@ -1,0 +1,159 @@
+/*
+ * Copyright 2021 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Niels Sascha Reedijk, niels.reedijk@gmail.com
+ *
+ * Corresponds to:
+ *		headers/private/netservices2/HttpSession.h			hrev?????
+ *		src/kits/network/libnetservices2/HttpSession.cpp	hrev?????
+ */
+
+
+#if __cplusplus >= 201703L
+
+namespace BPrivate {
+
+namespace Network {
+
+
+/*!
+	\class BHttpSession
+	\ingroup netservices
+	\brief Schedule, execute and manage HTTP requests
+
+	All requests start from a `BHttpSession`. This class has the following jobs:
+		- Store data used between various HTTP calls
+			- Proxies
+			- Cookies
+			- Additional SSL certificates
+			- Authentication Data
+		- Manage the scheduling and execution of HTTP requests.
+
+	Objects of the `BHttpSession` class can be shared between different parts
+	of the application. They should be copied, rather than shared using
+	pointers. This is because they have an inner state that is shared between
+	the various objects.
+
+	\code
+	// Creating and sharing a session
+	auto session = BHttpSession();
+
+	// A copy is passed to window1 and window2, which share the same session data
+	auto window1 = new WindowWithSession(session);
+	auto window2 = new WindowWithSession(session);
+
+	// Add a cookie to the session, this cookie will be used in window1 and window2
+	BNetworkCookie cookie("key", "value", BUrl("https://example.com/"));
+	session.AddCookie(std::move(cookie));
+
+	// The session data persists, even if the original session goes out of scope
+	\endcode
+
+	There are specific scenarios for having more than one session, most notably
+	if an application provides services over HTTP whereby a user is identified
+	by cookies, and the application wants to support more than one user
+	account. But in most cases, there will be one instance of the BHttpSession
+	that is shared between various segments of the application.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpSession::BHttpSession()
+	\brief Construct a new object.
+
+	Each newly constructed object will have their own queue for HTTP requests,
+	as well as their own cookies and certificate store.
+
+	\exception std::bad_alloc Unable to allocate resources for the object.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpSession::BHttpSession(const BHttpSession&) noexcept
+	\brief Create a new BHttpSession object that shares a state with another.
+
+	The internal HTTP queue and context can be shared among multiple objects.
+	You can use the copy constructor to create a new object.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpSession::BHttpSession(BHttpSession&&) noexcept
+	\brief Move is disabled.
+
+	BHttpSession objects cannot be moved. Because it has a shared internal
+	state, making copies is cheap and it is the only supported method of
+	creating multiple scoped objects with a shared lifetime.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpSession::~BHttpSession() noexcept
+	\brief Destructor
+
+	The destructor releases the shared internal state of the session object.
+	If there are no more sessions using the shared state, the state is
+	cleaned up.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpSession& BHttpSession::operator=(const BHttpSession&) noexcept
+	\brief Copy and use the shared state from another session.
+
+	The internal HTTP queue and context can be shared among multiple objects.
+	You can use the copy constructor to create a new copy.
+
+	This copy assignment operator should be used in very specific instances
+	only, where there is a particular reason to replace an existing session
+	internal session with another. It should not be used in the following case:
+
+	\code
+	// Bad example
+	BHttpSession session1 = BHttpSession();
+		// Creates a new session, including an entirely new (expensive) state
+	BHttpSession session2 = BHttpSession();
+		// Creates another new session, including internal state
+	session2 = session1;
+		// At this stage, the internal state of session2 would
+		// have to be cleaned up just after it was created.
+
+	// Instead do this
+	BHttpSession session1 = BHttpSession();
+	BHttpSession session2(session1);
+		// Now session2 directly shares the state with session 1
+	\endcode
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpSession& BHttpSession::operator=(BHttpSession&&) noexcept
+	\brief Move is disabled.
+
+	BHttpSession objects cannot be moved. Because it has a shared internal
+	state, making copies is cheap and it is the only supported method of
+	creating multiple scoped objects with a shared lifetime.
+
+	\since Haiku R1
+*/
+
+
+} // namespace Network
+
+} // namespace BPrivate
+
+#endif

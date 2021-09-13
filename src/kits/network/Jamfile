@@ -2,3 +2,4 @@ SubDir HAIKU_TOP src kits network ;
 
 SubInclude HAIKU_TOP src kits network libnetapi ;
 SubInclude HAIKU_TOP src kits network libnetservices ;
+SubInclude HAIKU_TOP src kits network libnetservices2 ;

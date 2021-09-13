@@ -852,6 +852,7 @@ INPUT                  = . \
                          ../../headers/os/media \
                          ../../headers/os/midi2 \
                          ../../headers/os/net \
+                         ../../headers/private/netservices2 \
                          ../../headers/os/storage \
                          ../../headers/os/support \
                          ../../headers/os/translation \
