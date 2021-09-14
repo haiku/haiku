@@ -69,6 +69,7 @@ namespace Network {
 	as well as their own cookies and certificate store.
 
 	\exception std::bad_alloc Unable to allocate resources for the object.
+	\exception BRuntimeError Unable to create semaphores or threads.
 
 	\since Haiku R1
 */

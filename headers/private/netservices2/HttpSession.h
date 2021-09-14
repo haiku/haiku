@@ -28,7 +28,8 @@ public:
 	BHttpSession&			operator=(BHttpSession&&) noexcept = delete;
 
 private:
-	struct Impl;
+	class Request;
+	class Impl;
 	std::shared_ptr<Impl>	fImpl;
 };
 
