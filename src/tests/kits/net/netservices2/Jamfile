@@ -1,0 +1,15 @@
+SubDir HAIKU_TOP src tests kits net netservices2 ;
+
+if $(TARGET_PACKAGING_ARCH) != x86_gcc2 {
+	# do not target the legacy platform
+	UsePrivateHeaders netservices2 ;
+
+	UnitTestLib netservicekit2test.so :
+		ServicesKitTestAddon.cpp
+
+		HttpTest.cpp
+
+		: be libnetservices2.a $(TARGET_NETWORK_LIBS) $(HAIKU_NETAPI_LIB)
+		[ TargetLibstdc++ ]
+		;
+}
