@@ -34,7 +34,9 @@
 #endif
 
 /* define if the compiler has stringstream */
-/* #undef CPPUNIT_HAVE_SSTREAM */
+#ifndef CPPUNIT_HAVE_SSTREAM 
+#define CPPUNIT_HAVE_SSTREAM  1 
+#endif
 
 /* Define if you have the <strstream> header file. */
 #ifndef CPPUNIT_HAVE_STRSTREAM 
