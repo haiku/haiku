@@ -352,8 +352,8 @@ status_t
 AnalogPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 {
 	CALLED();
-	TRACE("%s: %s %dx%d\n", __func__, PortName(), target->virtual_width,
-		target->virtual_height);
+	TRACE("%s: %s %dx%d\n", __func__, PortName(), target->timing.h_display,
+		target->timing.v_display);
 
 	if (fPipe == NULL) {
 		ERROR("%s: Setting display mode without assigned pipe!\n", __func__);
@@ -531,7 +531,7 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	}
 
 	TRACE("%s: %s-%d %dx%d\n", __func__, PortName(), PortIndex(),
-		target->virtual_width, target->virtual_height);
+		target->timing.h_display, target->timing.v_display);
 
 	if (fPipe == NULL) {
 		ERROR("%s: Setting display mode without assigned pipe!\n", __func__);
@@ -572,17 +572,20 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 		// Set vbios hardware panel mode as base
 		hardwareTarget = gInfo->shared_info->panel_mode;
 
-		if (hardwareTarget.virtual_width == target->virtual_width
-				&& hardwareTarget.virtual_height == target->virtual_height) {
+		if (hardwareTarget.timing.h_display == target->timing.h_display
+				&& hardwareTarget.timing.v_display == target->timing.v_display) {
 			// We are setting the native video mode, nothing special to do
 			TRACE("Setting LVDS to native mode\n");
 			hardwareTarget = *target;
 		} else {
 			// We need to enable the panel fitter
 			TRACE("%s: hardware mode will actually be %dx%d\n", __func__,
-				hardwareTarget.virtual_width, hardwareTarget.virtual_height);
+				hardwareTarget.timing.h_display, hardwareTarget.timing.v_display);
 
 			hardwareTarget.space = target->space;
+			// retain requested virtual size
+			hardwareTarget.virtual_width = target->virtual_width;
+			hardwareTarget.virtual_height = target->virtual_height;
 			// FIXME we should also get the refresh frequency from the target
 			// mode, and then "sanitize" the resulting mode we made up.
 
@@ -785,8 +788,8 @@ status_t
 DigitalPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 {
 	CALLED();
-	TRACE("%s: %s %dx%d\n", __func__, PortName(), target->virtual_width,
-		target->virtual_height);
+	TRACE("%s: %s %dx%d\n", __func__, PortName(), target->timing.h_display,
+		target->timing.v_display);
 
 	if (fPipe == NULL) {
 		ERROR("%s: Setting display mode without assigned pipe!\n", __func__);
@@ -1125,8 +1128,8 @@ status_t
 DisplayPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 {
 	CALLED();
-	TRACE("%s: %s %dx%d\n", __func__, PortName(), target->virtual_width,
-		target->virtual_height);
+	TRACE("%s: %s %dx%d\n", __func__, PortName(), target->timing.h_display,
+		target->timing.v_display);
 
 	if (fPipe == NULL) {
 		ERROR("%s: Setting display mode without assigned pipe!\n", __func__);
@@ -1331,8 +1334,8 @@ status_t
 DigitalDisplayInterface::SetDisplayMode(display_mode* target, uint32 colorMode)
 {
 	CALLED();
-	TRACE("%s: %s %dx%d\n", __func__, PortName(), target->virtual_width,
-		target->virtual_height);
+	TRACE("%s: %s %dx%d\n", __func__, PortName(), target->timing.h_display,
+		target->timing.v_display);
 
 	if (fPipe == NULL) {
 		ERROR("%s: Setting display mode without assigned pipe!\n", __func__);

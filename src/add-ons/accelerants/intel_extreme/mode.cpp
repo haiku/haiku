@@ -152,9 +152,9 @@ limit_modes_for_gen3_lvds(display_mode* mode)
 	// display.
 	// FIXME do this only for that display. The whole display mode logic
 	// needs to be adjusted to know which display we're talking about.
-	if (gInfo->shared_info->panel_mode.virtual_width < mode->virtual_width)
+	if (gInfo->shared_info->panel_mode.timing.h_display < mode->timing.h_display)
 		return false;
-	if (gInfo->shared_info->panel_mode.virtual_height < mode->virtual_height)
+	if (gInfo->shared_info->panel_mode.timing.v_display < mode->timing.v_display)
 		return false;
 
 	return true;
@@ -269,18 +269,23 @@ intel_propose_display_mode(display_mode* target, const display_mode* low,
 	// TODO: Only sanitize_display_mode should be used. However, at the moment
 	// the mode constraints are not optimal and do not work for all
 	// configurations.
+	uint32 VirtualWidth = target->virtual_width;
+	uint32 VirtualHeight = target->virtual_height;
 	for (uint32 i = 0; i < gInfo->shared_info->mode_count; i++) {
 		display_mode *mode = &gInfo->mode_list[i];
 
 		// TODO: improve this, ie. adapt pixel clock to allowed values!!!
 
-		if (target->virtual_width != mode->virtual_width
-			|| target->virtual_height != mode->virtual_height
+		if (target->timing.h_display != mode->timing.h_display
+			|| target->timing.v_display != mode->timing.v_display
 			|| target->space != mode->space) {
 			continue;
 		}
 
 		*target = *mode;
+		// retain requested virtual size
+		target->virtual_width = VirtualWidth;
+		target->virtual_height = VirtualHeight;
 		return B_OK;
 	}
 
@@ -298,7 +303,7 @@ intel_set_display_mode(display_mode* mode)
 		return B_BAD_VALUE;
 
 	TRACE("%s(%" B_PRIu16 "x%" B_PRIu16 ")\n", __func__,
-		mode->virtual_width, mode->virtual_height);
+		mode->timing.h_display, mode->timing.v_display);
 
 	display_mode target = *mode;
 

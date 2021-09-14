@@ -162,8 +162,8 @@ Pipe::_ConfigureTranscoder(display_mode* target)
 	// XXX: Is it ok to do these on non-digital?
 	write32(INTEL_TRANSCODER_A_POS + fPipeOffset, 0);
 	write32(INTEL_TRANSCODER_A_IMAGE_SIZE + fPipeOffset,
-		((uint32)(target->virtual_width - 1) << 16)
-			| ((uint32)target->virtual_height - 1));
+		((uint32)(target->timing.h_display - 1) << 16)
+			| ((uint32)target->timing.v_display - 1));
 	#endif
 }
 
@@ -192,8 +192,8 @@ Pipe::ConfigureScalePos(display_mode* target)
 	// The only thing that really matters: set the image size and let the
 	// panel fitter or the transcoder worry about the rest
 	write32(INTEL_DISPLAY_A_PIPE_SIZE + fPipeOffset,
-		((uint32)(target->virtual_width - 1) << 16)
-			| ((uint32)target->virtual_height - 1));
+		((uint32)(target->timing.h_display - 1) << 16)
+			| ((uint32)target->timing.v_display - 1));
 
 	// Set the plane size as well while we're at it (this is independant, we
 	// could have a larger plane and scroll through it).
@@ -203,8 +203,8 @@ Pipe::ConfigureScalePos(display_mode* target)
 		// well. Note that the height and width are swapped when compared to
 		// the other registers.
 		write32(INTEL_DISPLAY_A_IMAGE_SIZE + fPipeOffset,
-			((uint32)(target->virtual_height - 1) << 16)
-			| ((uint32)target->virtual_width - 1));
+			((uint32)(target->timing.h_display - 1) << 16)
+			| ((uint32)target->timing.v_display - 1));
 	}
 }
 
