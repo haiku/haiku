@@ -201,7 +201,6 @@ XHCI::XHCI(pci_info *info, Stack *stack)
 		fCmdCompSem(-1),
 		fStopThreads(false),
 		fRootHub(NULL),
-		fRootHubAddress(0),
 		fPortCount(0),
 		fSlotCount(0),
 		fScratchpadCount(0),
@@ -664,8 +663,7 @@ XHCI::Start()
 		TRACE_ERROR("HCH start up timeout\n");
 	}
 
-	fRootHubAddress = AllocateAddress();
-	fRootHub = new(std::nothrow) XHCIRootHub(RootObject(), fRootHubAddress);
+	fRootHub = new(std::nothrow) XHCIRootHub(RootObject(), 1);
 	if (!fRootHub) {
 		TRACE_ERROR("no memory to allocate root hub\n");
 		return B_NO_MEMORY;
@@ -693,7 +691,7 @@ status_t
 XHCI::SubmitTransfer(Transfer *transfer)
 {
 	// short circuit the root hub
-	if (transfer->TransferPipe()->DeviceAddress() == fRootHubAddress)
+	if (transfer->TransferPipe()->DeviceAddress() == 1)
 		return fRootHub->ProcessTransfer(this, transfer);
 
 	TRACE("SubmitTransfer(%p)\n", transfer);
@@ -1705,10 +1703,13 @@ XHCI::_InsertEndpointForPipe(Pipe *pipe)
 	}
 
 	Device* usbDevice = (Device *)pipe->Parent();
+	if (usbDevice->Parent() == RootObject()) {
+		// root hub needs no initialization
+		return B_OK;
+	}
+
 	struct xhci_device *device = (struct xhci_device *)
 		usbDevice->ControllerCookie();
-	if (usbDevice->Parent() == RootObject())
-		return B_OK;
 	if (device == NULL) {
 		panic("device is NULL\n");
 		return B_NO_INIT;

@@ -252,7 +252,6 @@ private:
 
 			// Root Hub
 			XHCIRootHub *		fRootHub;
-			uint8				fRootHubAddress;
 
 			// Port management
 			uint8				fPortCount;
