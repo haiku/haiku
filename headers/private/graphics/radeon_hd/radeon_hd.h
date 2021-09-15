@@ -122,6 +122,7 @@ enum radeon_chipset {
 	RADEON_VEGA12,		// DCE 13.0?
 	RADEON_VEGA20,		// DCE 13.0?
 	RADEON_RAVEN,		// DCE 13?
+	RADEON_NAVI,		// DCE 13.0?
 };
 
 // !! Must match chipset families above
@@ -189,6 +190,7 @@ static const char radeon_chip_name[][MAX_NAME_LENGTH] = {
 	"Vega 12",
 	"Vega 20",
 	"Raven",
+	"Navi",
 };
 
 

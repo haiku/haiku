@@ -609,6 +609,49 @@ const struct supported_device {
 	// Raven (APU)
 	{0x15dd, 13, 0, RADEON_RAVEN, CHIP_APU, "Radeon Vega Raven"},
 	{0x15d8, 13, 0, RADEON_RAVEN, CHIP_APU, "Radeon Vega Raven"},
+
+	// TODO: We might need to split NAVI into NAVI10, NAVI12, etc
+
+	// Introduced: 2019
+	// Codename: Navi
+	// Process: 7nm FinFET
+	// Navi 10
+	{0x7310, 13, 3, RADEON_NAVI, CHIP_STD, "Radeon RX Navi"},
+	{0x7312, 13, 3, RADEON_NAVI, CHIP_STD, "Radeon RX Navi"},
+	{0x7318, 13, 3, RADEON_NAVI, CHIP_STD, "Radeon RX Navi"},
+	{0x7319, 13, 3, RADEON_NAVI, CHIP_STD, "Radeon RX Navi"},
+	{0x731a, 13, 3, RADEON_NAVI, CHIP_STD, "Radeon RX Navi"},
+	{0x731b, 13, 3, RADEON_NAVI, CHIP_STD, "Radeon RX Navi"},
+	{0x731e, 13, 3, RADEON_NAVI, CHIP_STD, "Radeon RX Navi"},
+	{0x731f, 13, 3, RADEON_NAVI, CHIP_STD, "Radeon RX 5600 / 5700"},
+	// Renoir?
+	{0x1636, 13, 3, RADEON_NAVI, CHIP_APU, "Radeon Renoir"},
+	{0x1638, 13, 3, RADEON_NAVI, CHIP_APU, "Radeon Renoir"},
+	{0x164c, 13, 3, RADEON_NAVI, CHIP_APU, "Radeon Renoir"},
+	// Navi 14
+	{0x7340, 13, 3, RADEON_NAVI, CHIP_STD, "Radeon RX 5500"},
+	// Navi 21/22 aka "Sienna Cichlid"?
+	{0x73a0, 13, 4, RADEON_NAVI, CHIP_STD, "Radeon RX Navi"},
+	{0x73a1, 13, 4, RADEON_NAVI, CHIP_STD, "Radeon RX Navi"},
+	{0x73a2, 13, 4, RADEON_NAVI, CHIP_STD, "Radeon RX Navi"},
+	{0x73a3, 13, 4, RADEON_NAVI, CHIP_STD, "Radeon RX Navi"},
+	{0x73ab, 13, 4, RADEON_NAVI, CHIP_STD, "Radeon RX Navi"},
+	{0x73ae, 13, 4, RADEON_NAVI, CHIP_STD, "Radeon RX Navi"},
+	{0x73bf, 13, 4, RADEON_NAVI, CHIP_STD, "Radeon RX 6800 / 6900 XT"},
+	{0x73cf, 13, 4, RADEON_NAVI, CHIP_STD, "Radeon RX Navi"},
+	{0x73df, 13, 4, RADEON_NAVI, CHIP_STD, "Radeon RX 6700 XT"},
+	// Van Gogh?
+	{0x163f, 13, 4, RADEON_NAVI, CHIP_STD, "Radeon RX Navi (Van Gogh)"},
+	// Navy Flounder?
+	{0x73c0, 13, 5, RADEON_NAVI, CHIP_STD, "Radeon RX Navi (Navy)"},
+	{0x73c1, 13, 5, RADEON_NAVI, CHIP_STD, "Radeon RX Navi (Navy)"},
+	{0x73c3, 13, 5, RADEON_NAVI, CHIP_STD, "Radeon RX Navi (Navy)"},
+	{0x73df, 13, 5, RADEON_NAVI, CHIP_STD, "Radeon RX Navi (Navy)"},
+	// Dimgrey Cavefish?
+	{0x73e0, 13, 5, RADEON_NAVI, CHIP_STD, "Radeon RX Navi (Dimgrey)"},
+	{0x73e1, 13, 5, RADEON_NAVI, CHIP_STD, "Radeon RX Navi (Dimgrey)"},
+	{0x73e2, 13, 5, RADEON_NAVI, CHIP_STD, "Radeon RX Navi (Dimgrey)"},
+	{0x73ff, 13, 5, RADEON_NAVI, CHIP_STD, "Radeon RX Navi (Dimgrey)"},
 };
 
 
