@@ -1395,17 +1395,18 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 	_WriteContext(&device->input_ctx->input.addFlags, 3);
 
 	uint8 rhPort = hubPort;
-	uint32 route = rhPort;
+	uint32 route = 0;
 	for (Device *hubDevice = parent; hubDevice != RootObject();
 			hubDevice = (Device *)hubDevice->Parent()) {
 		if (hubDevice->Parent() == RootObject())
 			break;
 
-		rhPort = hubDevice->HubPort();
 		if (rhPort > 15)
 			rhPort = 15;
 		route = route << 4;
 		route |= rhPort;
+
+		rhPort = hubDevice->HubPort();
 	}
 
 	uint32 dwslot0 = SLOT_0_NUM_ENTRIES(1) | SLOT_0_ROUTE(route);
