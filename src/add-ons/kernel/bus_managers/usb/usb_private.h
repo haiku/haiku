@@ -226,8 +226,10 @@ virtual	status_t						NotifyPipeChange(Pipe *pipe,
 		Hub *							GetRootHub() const { return fRootHub; }
 		void							SetRootHub(Hub *hub) { fRootHub = hub; }
 
-		usb_id							USBID() const { return fUSBID; }
 virtual	const char *					TypeName() const = 0;
+
+protected:
+		usb_id							USBID() const { return fStackIndex; }
 
 protected:
 		bool							fInitOK;
@@ -245,7 +247,7 @@ private:
 		Hub *							fRootHub;
 		Object *						fRootObject;
 
-		usb_id							fUSBID;
+		usb_id							fStackIndex;
 };
 
 
