@@ -1417,11 +1417,11 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 	case USB_SPEED_LOWSPEED:
 		dwslot0 |= SLOT_0_SPEED(2);
 		break;
-	case USB_SPEED_HIGHSPEED:
-		dwslot0 |= SLOT_0_SPEED(3);
-		break;
 	case USB_SPEED_FULLSPEED:
 		dwslot0 |= SLOT_0_SPEED(1);
+		break;
+	case USB_SPEED_HIGHSPEED:
+		dwslot0 |= SLOT_0_SPEED(3);
 		break;
 	case USB_SPEED_SUPERSPEED:
 		dwslot0 |= SLOT_0_SPEED(4);
@@ -2123,14 +2123,14 @@ XHCI::GetPortSpeed(uint8 index, usb_speed* speed)
 	uint32 portStatus = ReadOpReg(XHCI_PORTSC(index));
 
 	switch (PS_SPEED_GET(portStatus)) {
-	case 3:
-		*speed = USB_SPEED_HIGHSPEED;
-		break;
 	case 2:
 		*speed = USB_SPEED_LOWSPEED;
 		break;
 	case 1:
 		*speed = USB_SPEED_FULLSPEED;
+		break;
+	case 3:
+		*speed = USB_SPEED_HIGHSPEED;
 		break;
 	case 4:
 		*speed = USB_SPEED_SUPERSPEED;
