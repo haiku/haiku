@@ -1384,6 +1384,11 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 		TRACE_ERROR("unable to create a input context area\n");
 		return NULL;
 	}
+	if (fContextSizeShift == 1) {
+		// 64-byte contexts have to be page-aligned in order for
+		// _OffsetContextAddr to function properly.
+		ASSERT((((addr_t)device->input_ctx) % B_PAGE_SIZE) == 0);
+	}
 
 	memset(device->input_ctx, 0, sizeof(*device->input_ctx) << fContextSizeShift);
 	_WriteContext(&device->input_ctx->input.dropFlags, 0);
