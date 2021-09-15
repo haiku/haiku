@@ -491,7 +491,18 @@ PaletteConverter::_InitializeDefaultNoAppServer()
 
 
 typedef uint32 (readFunc)(const uint8 **source, int32 index);
+typedef uint64 (read64Func)(const uint16 **source, int32 index);
 typedef void (writeFunc)(uint8 **dest, uint8 *data, int32 index);
+
+
+uint64
+ReadRGB48(const uint16 **source, int32 index)
+{
+	uint64 result = (*source)[0] | ((uint64)((*source)[1]) << 16)
+		| ((uint64)((*source)[2]) << 32);
+	*source += 3;
+	return result;
+}
 
 
 void
@@ -575,6 +586,145 @@ ReadCMAP8(const uint8 **source, int32 index)
 
 template<typename srcByte, typename dstByte>
 status_t
+ConvertBits64To32(const srcByte *srcBits, dstByte *dstBits, int32 srcBitsLength,
+	int32 dstBitsLength, int32 redShift, int32 greenShift, int32 blueShift,
+	int32 alphaShift, int32 alphaBits, uint32 redMask, uint32 greenMask,
+	uint32 blueMask, uint32 alphaMask, int32 srcBytesPerRow,
+	int32 dstBytesPerRow, int32 srcBitsPerPixel, int32 dstBitsPerPixel,
+	color_space srcColorSpace, color_space dstColorSpace, BPoint srcOffset,
+	BPoint dstOffset, int32 width, int32 height, bool srcSwap, bool dstSwap,
+	read64Func *srcFunc, writeFunc *dstFunc)
+{
+	uint8* srcBitsEnd = (uint8*)srcBits + srcBitsLength;
+	uint8* dstBitsEnd = (uint8*)dstBits + dstBitsLength;
+
+	int32 srcBitsPerRow = srcBytesPerRow << 3;
+	int32 dstBitsPerRow = dstBytesPerRow << 3;
+
+	// Advance the buffers to reach their offsets
+	int32 srcOffsetX = (int32)srcOffset.x;
+	int32 dstOffsetX = (int32)dstOffset.x;
+	int32 srcOffsetY = (int32)srcOffset.y;
+	int32 dstOffsetY = (int32)dstOffset.y;
+	if (srcOffsetX < 0) {
+		dstOffsetX -= srcOffsetX;
+		srcOffsetX = 0;
+	}
+	if (srcOffsetY < 0) {
+		dstOffsetY -= srcOffsetY;
+		height += srcOffsetY;
+		srcOffsetY = 0;
+	}
+	if (dstOffsetX < 0) {
+		srcOffsetX -= dstOffsetX;
+		dstOffsetX = 0;
+	}
+	if (dstOffsetY < 0) {
+		srcOffsetY -= dstOffsetY;
+		height += dstOffsetY;
+		dstOffsetY = 0;
+	}
+
+	srcBits = (srcByte*)((uint8*)srcBits + ((srcOffsetY * srcBitsPerRow
+		+ srcOffsetX * srcBitsPerPixel) >> 3));
+	dstBits = (dstByte*)((uint8*)dstBits + ((dstOffsetY * dstBitsPerRow
+		+ dstOffsetX * dstBitsPerPixel) >> 3));
+
+	// Ensure that the width fits
+	int32 srcWidth = (srcBitsPerRow - srcOffsetX * srcBitsPerPixel)
+		/ srcBitsPerPixel;
+	if (srcWidth < width)
+		width = srcWidth;
+
+	int32 dstWidth = (dstBitsPerRow - dstOffsetX * dstBitsPerPixel)
+		/ dstBitsPerPixel;
+	if (dstWidth < width)
+		width = dstWidth;
+
+	if (width < 0)
+		return B_OK;
+
+	int32 srcLinePad = (srcBitsPerRow - width * srcBitsPerPixel + 7) >> 3;
+	int32 dstLinePad = (dstBitsPerRow - width * dstBitsPerPixel + 7) >> 3;
+	uint64 result;
+	uint64 source;
+
+	// srcSwap, means the lower bits come first
+	if (srcSwap) {
+		redShift -= 8;
+		greenShift -= 8;
+		blueShift -= 8;
+		alphaShift -= 8;
+	}
+
+	for (int32 i = 0; i < height; i++) {
+		for (int32 j = 0; j < width; j++) {
+			if ((uint8 *)srcBits + sizeof(srcByte) > srcBitsEnd
+				|| (uint8 *)dstBits + sizeof(dstByte) > dstBitsEnd)
+				return B_OK;
+
+			if (srcFunc)
+				source = srcFunc((const uint16 **)&srcBits, srcOffsetX++);
+			else {
+				source = *srcBits;
+				srcBits++;
+			}
+
+			if (redShift > 0)
+				result = ((source >> redShift) & redMask);
+			else if (redShift < 0)
+				result = ((source << -redShift) & redMask);
+			else
+				result = source & redMask;
+
+			if (greenShift > 0)
+				result |= ((source >> greenShift) & greenMask);
+			else if (greenShift < 0)
+				result |= ((source << -greenShift) & greenMask);
+			else
+				result |= source & greenMask;
+
+			if (blueShift > 0)
+				result |= ((source >> blueShift) & blueMask);
+			else if (blueShift < 0)
+				result |= ((source << -blueShift) & blueMask);
+			else
+				result |= source & blueMask;
+
+			if (alphaBits > 0) {
+				if (alphaShift > 0)
+					result |= ((source >> alphaShift) & alphaMask);
+				else if (alphaShift < 0)
+					result |= ((source << -alphaShift) & alphaMask);
+				else
+					result |= source & alphaMask;
+
+				// if we only had one alpha bit we want it to be 0/255
+				if (alphaBits == 1 && result & alphaMask)
+					result |= alphaMask;
+			} else
+				result |= alphaMask;
+
+			if (dstFunc)
+				dstFunc((uint8 **)&dstBits, (uint8 *)&result, dstOffsetX++);
+			else {
+				*dstBits = result;
+				dstBits++;
+			}
+		}
+
+		srcBits = (srcByte*)((uint8*)srcBits + srcLinePad);
+		dstBits = (dstByte*)((uint8*)dstBits + dstLinePad);
+		dstOffsetX -= width;
+		srcOffsetX -= width;
+	}
+
+	return B_OK;
+}
+
+
+template<typename srcByte, typename dstByte>
+status_t
 ConvertBits(const srcByte *srcBits, dstByte *dstBits, int32 srcBitsLength,
 	int32 dstBitsLength, int32 redShift, int32 greenShift, int32 blueShift,
 	int32 alphaShift, int32 alphaBits, uint32 redMask, uint32 greenMask,
@@ -614,10 +764,10 @@ ConvertBits(const srcByte *srcBits, dstByte *dstBits, int32 srcBitsLength,
 		dstOffsetY = 0;
 	}
 
-	srcBits = (srcByte*)((uint8*)srcBits + ((srcOffsetY * srcBitsPerRow + srcOffsetX
-		* srcBitsPerPixel) >> 3));
-	dstBits = (dstByte*)((uint8*)dstBits + ((dstOffsetY * dstBitsPerRow + dstOffsetX
-		* dstBitsPerPixel) >> 3));
+	srcBits = (srcByte*)((uint8*)srcBits + ((srcOffsetY * srcBitsPerRow
+		+ srcOffsetX * srcBitsPerPixel) >> 3));
+	dstBits = (dstByte*)((uint8*)dstBits + ((dstOffsetY * dstBitsPerRow
+		+ dstOffsetX * dstBitsPerPixel) >> 3));
 
 	// Ensure that the width fits
 	int32 srcWidth = (srcBitsPerRow - srcOffsetX * srcBitsPerPixel)
@@ -732,6 +882,64 @@ ConvertBits(const srcByte *srcBits, dstByte *dstBits, int32 srcBitsLength,
 		dstBits = (dstByte*)((uint8*)dstBits + dstLinePad);
 		dstOffsetX -= width;
 		srcOffsetX -= width;
+	}
+
+	return B_OK;
+}
+
+
+template<typename srcByte>
+status_t
+ConvertBits64(const srcByte *srcBits, void *dstBits, int32 srcBitsLength,
+	int32 dstBitsLength, int32 redShift, int32 greenShift, int32 blueShift,
+	int32 alphaShift, int32 alphaBits, int32 srcBytesPerRow,
+	int32 dstBytesPerRow, int32 srcBitsPerPixel, color_space srcColorSpace,
+	color_space dstColorSpace, BPoint srcOffset, BPoint dstOffset, int32 width,
+	int32 height, bool srcSwap,	read64Func *srcFunc)
+{
+	switch (dstColorSpace) {
+		case B_RGBA32:
+			ConvertBits64To32(srcBits, (uint32 *)dstBits, srcBitsLength,
+				dstBitsLength, redShift - 24, greenShift - 16, blueShift - 8,
+				alphaShift - 32, alphaBits, 0x00ff0000, 0x0000ff00, 0x000000ff,
+				0xff000000, srcBytesPerRow, dstBytesPerRow, srcBitsPerPixel,
+				32, srcColorSpace, dstColorSpace, srcOffset, dstOffset, width,
+				height, srcSwap, false, srcFunc, NULL);
+			break;
+
+		case B_RGBA32_BIG:
+			ConvertBits64To32(srcBits, (uint32 *)dstBits, srcBitsLength,
+				dstBitsLength, redShift - 16, greenShift - 24, blueShift - 32,
+				alphaShift - 8, alphaBits, 0x0000ff00, 0x00ff0000, 0xff000000,
+				0x00000ff, srcBytesPerRow, dstBytesPerRow, srcBitsPerPixel, 32,
+				srcColorSpace, dstColorSpace, srcOffset, dstOffset, width,
+				height, srcSwap, false, srcFunc, NULL);
+			break;
+
+		/* Note:	we set the unused alpha to 255 here. This is because BeOS
+					uses the unused alpha for B_OP_ALPHA even though it should
+					not care about it. */
+		case B_RGB32:
+			ConvertBits64To32(srcBits, (uint32 *)dstBits, srcBitsLength,
+				dstBitsLength, redShift - 24, greenShift - 32, blueShift - 16,
+				0, 0, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000,
+				srcBytesPerRow, dstBytesPerRow, srcBitsPerPixel, 32,
+				srcColorSpace, dstColorSpace, srcOffset, dstOffset, width,
+				height, srcSwap, false, srcFunc, NULL);
+			break;
+
+		case B_RGB32_BIG:
+			ConvertBits64To32(srcBits, (uint32 *)dstBits, srcBitsLength,
+				dstBitsLength, redShift - 16, greenShift - 24, blueShift - 32,
+				0, 0, 0x0000ff00, 0x00ff0000, 0xff000000, 0x000000ff,
+				srcBytesPerRow, dstBytesPerRow, srcBitsPerPixel, 32,
+				srcColorSpace, dstColorSpace, srcOffset, dstOffset, width,
+				height, srcSwap, false, srcFunc, NULL);
+			break;
+
+		default:
+			return B_BAD_VALUE;
+			break;
 	}
 
 	return B_OK;
@@ -927,6 +1135,22 @@ ConvertBits(const void *srcBits, void *dstBits, int32 srcBitsLength,
 		return B_BAD_VALUE;
 
 	switch (srcColorSpace) {
+		case B_RGBA64:
+		case B_RGBA64_BIG:
+			return ConvertBits64((const uint64 *)srcBits, dstBits,
+				srcBitsLength, dstBitsLength, 16, 32, 48, 64, 16,
+				srcBytesPerRow, dstBytesPerRow, 64, srcColorSpace,
+				dstColorSpace, srcOffset, dstOffset, width, height,
+				srcColorSpace == B_RGBA64_BIG, NULL);
+
+		case B_RGB48:
+		case B_RGB48_BIG:
+			return ConvertBits64((const uint16 *)srcBits, dstBits,
+				srcBitsLength, dstBitsLength, 16, 32, 48, 0, 0, srcBytesPerRow,
+				dstBytesPerRow, 48, srcColorSpace, dstColorSpace, srcOffset,
+				dstOffset, width, height, srcColorSpace == B_RGB48_BIG,
+				ReadRGB48);
+
 		case B_RGBA32:
 			return ConvertBits((const uint32 *)srcBits, dstBits, srcBitsLength,
 				dstBitsLength, 24, 16, 8, 32, 8, srcBytesPerRow,

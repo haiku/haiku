@@ -179,6 +179,12 @@ get_raw_bytes_per_row(color_space colorSpace, int32 width)
 	int32 bpr = 0;
 	switch (colorSpace) {
 		// supported
+		case B_RGBA64: case B_RGBA64_BIG:
+			bpr = 8 * width;
+			break;
+		case B_RGB48: case B_RGB48_BIG:
+			bpr = 6 * width;
+			break;
 		case B_RGB32: case B_RGBA32:
 		case B_RGB32_BIG: case B_RGBA32_BIG:
 		case B_UVL32: case B_UVLA32:
