@@ -1389,23 +1389,21 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 	_WriteContext(&device->input_ctx->input.dropFlags, 0);
 	_WriteContext(&device->input_ctx->input.addFlags, 3);
 
-	uint32 route = 0;
-	uint8 routePort = hubPort;
 	uint8 rhPort = hubPort;
+	uint32 route = rhPort;
 	for (Device *hubDevice = parent; hubDevice != RootObject();
-		hubDevice = (Device *)hubDevice->Parent()) {
-
-		rhPort = routePort;
+			hubDevice = (Device *)hubDevice->Parent()) {
 		if (hubDevice->Parent() == RootObject())
 			break;
-		route *= 16;
-		if (hubPort > 15)
-			route += 15;
-		else
-			route += routePort;
 
-		routePort = hubDevice->HubPort();
+		rhPort = hubDevice->HubPort();
+		if (rhPort > 15)
+			rhPort = 15;
+		route = route << 4;
+		route |= rhPort;
 	}
+
+	uint32 dwslot0 = SLOT_0_NUM_ENTRIES(1) | SLOT_0_ROUTE(route);
 
 	// Get speed of port, only if device connected to root hub port
 	// else we have to rely on value reported by the Hub Explore thread
@@ -1413,8 +1411,6 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 		GetPortSpeed(hubPort - 1, &speed);
 		TRACE("speed updated %d\n", speed);
 	}
-
-	uint32 dwslot0 = SLOT_0_NUM_ENTRIES(1) | SLOT_0_ROUTE(route);
 
 	// add the speed
 	switch (speed) {
