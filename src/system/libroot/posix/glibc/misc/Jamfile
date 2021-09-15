@@ -20,11 +20,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		UsePrivateHeaders libroot ;
 
 		MergeObject <$(architecture)>posix_gnu_misc.o :
-			hsearch.c
-			hsearch_r.c
-			insremque.c
-			lsearch.c
-			tsearch.c
 			efgcvt.c
 			efgcvt_r.c
 			;
