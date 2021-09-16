@@ -347,6 +347,9 @@ virtual	status_t						SetFeature(uint16 selector);
 virtual	status_t						ClearFeature(uint16 selector);
 virtual	status_t						GetStatus(uint16 *status);
 
+protected:
+		friend class					Device;
+
 private:
 		int8							fDeviceAddress;
 		uint8							fEndpointAddress;
