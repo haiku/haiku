@@ -1215,15 +1215,19 @@ syslog_sender(void* data)
 			if (length > (int32)SYSLOG_MAX_MESSAGE_LENGTH)
 				length = SYSLOG_MAX_MESSAGE_LENGTH;
 
-			length = ring_buffer_peek(sSyslogBuffer, sSyslogBufferOffset,
-				(uint8*)sSyslogMessage->message, length);
-			sSyslogBufferOffset += length;
+			uint8* message = (uint8*)sSyslogMessage->message;
 			if (sSyslogDropped) {
-				// Add drop marker - since parts had to be dropped, it's
-				// guaranteed that we have enough space in the buffer now.
-				ring_buffer_write(sSyslogBuffer, (uint8*)"<DROP>", 6);
+				memcpy(message, "<DROP>", 6);
+				message += 6;
+				if ((length + 6) > (int32)SYSLOG_MAX_MESSAGE_LENGTH)
+					length -= 6;
 				sSyslogDropped = false;
 			}
+
+			length = ring_buffer_peek(sSyslogBuffer, sSyslogBufferOffset,
+				message, length);
+			sSyslogBufferOffset += length;
+			length += (addr_t)message - (addr_t)sSyslogMessage->message;
 
 			release_spinlock(&sSpinlock);
 			restore_interrupts(state);
