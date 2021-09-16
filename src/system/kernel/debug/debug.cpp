@@ -1367,16 +1367,21 @@ syslog_init_post_vm(struct kernel_args* args)
 			status = B_NO_MEMORY;
 			goto err2;
 		}
-	} else {
+	} else if (args->debug_output != NULL) {
 		// create an area for the debug syslog buffer
 		void* base = (void*)ROUNDDOWN((addr_t)(void *)args->debug_output, B_PAGE_SIZE);
 		size_t size = ROUNDUP(args->debug_size, B_PAGE_SIZE);
 		area_id area = create_area("syslog debug", &base, B_EXACT_ADDRESS, size,
-				B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+			B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 		if (area < 0) {
 			status = B_NO_MEMORY;
 			goto err2;
 		}
+	}
+
+	if (!args->keep_debug_output_buffer && args->debug_output != NULL) {
+		syslog_write((const char*)args->debug_output.Pointer(),
+			args->debug_size, false);
 	}
 
 	// initialize syslog message
@@ -1384,12 +1389,6 @@ syslog_init_post_vm(struct kernel_args* args)
 	sSyslogMessage->options = LOG_KERN;
 	sSyslogMessage->priority = LOG_DEBUG;
 	sSyslogMessage->ident[0] = '\0';
-	//strcpy(sSyslogMessage->ident, "KERNEL");
-
-	if (args->debug_output != NULL) {
-		syslog_write((const char*)args->debug_output.Pointer(),
-			args->debug_size, false);
-	}
 
 	// Allocate memory for the previous session's debug syslog output. In
 	// syslog_init_post_modules() we'll write it back to disk and free it.
