@@ -1269,8 +1269,10 @@ syslog_write(const char* text, int32 length, bool notify)
 		return;
 
 	if (length > sSyslogBuffer->size) {
-		text = "<DROP>";
-		length = 6;
+		syslog_write("<TRUNC>", 7, false);
+
+		text += length - (sSyslogBuffer->size - 7);
+		length = sSyslogBuffer->size - 7;
 	}
 
 	int32 writable = ring_buffer_writable(sSyslogBuffer);
