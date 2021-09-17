@@ -111,7 +111,7 @@ sanitize_display_mode(display_mode& mode)
 
 
 static void
-set_frame_buffer_registers(uint32 baseRegister, uint32 surfaceRegister)
+set_frame_buffer_registers(uint32 offset)
 {
 	intel_shared_info &sharedInfo = *gInfo->shared_info;
 	display_mode &mode = gInfo->current_mode;
@@ -121,16 +121,24 @@ set_frame_buffer_registers(uint32 baseRegister, uint32 surfaceRegister)
 		|| sharedInfo.device_type.InGroup(INTEL_GROUP_ILK)
 		|| sharedInfo.device_type.InFamily(INTEL_FAMILY_SER5)
 		|| sharedInfo.device_type.InFamily(INTEL_FAMILY_SOC0)) {
-		write32(baseRegister, mode.v_display_start * sharedInfo.bytes_per_row
-			+ mode.h_display_start * (sharedInfo.bits_per_pixel + 7) / 8);
-		read32(baseRegister);
-		write32(surfaceRegister, sharedInfo.frame_buffer_offset);
-		read32(surfaceRegister);
+		if (sharedInfo.device_type.InGroup(INTEL_GROUP_HAS)) {
+			write32(INTEL_DISPLAY_A_OFFSET_HAS + offset,
+				((uint32)mode.v_display_start << 16)
+					| (uint32)mode.h_display_start);
+			read32(INTEL_DISPLAY_A_OFFSET_HAS + offset);
+		} else {
+			write32(INTEL_DISPLAY_A_BASE + offset,
+				mode.v_display_start * sharedInfo.bytes_per_row
+				+ mode.h_display_start * (sharedInfo.bits_per_pixel + 7) / 8);
+			read32(INTEL_DISPLAY_A_BASE + offset);
+		}
+		write32(INTEL_DISPLAY_A_SURFACE + offset, sharedInfo.frame_buffer_offset);
+		read32(INTEL_DISPLAY_A_SURFACE + offset);
 	} else {
-		write32(baseRegister, sharedInfo.frame_buffer_offset
+		write32(INTEL_DISPLAY_A_BASE + offset, sharedInfo.frame_buffer_offset
 			+ mode.v_display_start * sharedInfo.bytes_per_row
 			+ mode.h_display_start * (sharedInfo.bits_per_pixel + 7) / 8);
-		read32(baseRegister);
+		read32(INTEL_DISPLAY_A_BASE + offset);
 	}
 }
 
@@ -140,8 +148,8 @@ set_frame_buffer_base()
 {
 	// TODO we always set both displays to the same address. When we support
 	// multiple framebuffers, they should get different addresses here.
-	set_frame_buffer_registers(INTEL_DISPLAY_A_BASE, INTEL_DISPLAY_A_SURFACE);
-	set_frame_buffer_registers(INTEL_DISPLAY_B_BASE, INTEL_DISPLAY_B_SURFACE);
+	set_frame_buffer_registers(0);
+	set_frame_buffer_registers(INTEL_DISPLAY_OFFSET);
 }
 
 
