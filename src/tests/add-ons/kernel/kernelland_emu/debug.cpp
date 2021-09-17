@@ -144,7 +144,7 @@ dump_block(const char *buffer, int size, const char *prefix)
 	for (i = 0; i < size;) {
 		int start = i;
 
-		dprintf(prefix);
+		dprintf("%s", prefix);
 		for (; i < start + DUMPED_BLOCK_SIZE; i++) {
 			if (!(i % 4))
 				dprintf(" ");
