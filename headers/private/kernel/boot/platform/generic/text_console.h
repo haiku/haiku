@@ -9,7 +9,7 @@
 #include <boot/vfs.h>
 #include <boot/stdio.h>
 
-// Standard 16 color palette. Common for BIOS and OpenFirmware.
+// Standard 16 color palette.
 enum console_color {
 	// foreground and background colors
 	BLACK,
@@ -20,8 +20,7 @@ enum console_color {
 	PURPLE,
 	BROWN,
 	GRAY,
-	// foreground colors only if blinking is enabled (restriction applies
-	// to BIOS only)
+	// foreground colors only, if blinking is enabled (on bios_ia32)
 	DARK_GRAY,
 	BRIGHT_BLUE,
 	BRIGHT_GREEN,
