@@ -50,7 +50,7 @@ extern void twalk(const void *root,
 	void (*action)(const void *, VISIT, int ));
 
 #ifdef _GNU_SOURCE
-extern void tdestroy(void *root, void (*free_key)(void *))
+extern void tdestroy(void *root, void (*free_key)(void *));
 #endif
 
 #ifdef __cplusplus
