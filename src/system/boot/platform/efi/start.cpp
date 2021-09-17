@@ -25,6 +25,7 @@
 #include "acpi.h"
 #include "console.h"
 #include "cpu.h"
+#include "debug.h"
 #ifdef _BOOT_FDT_SUPPORT
 #include "dtb.h"
 #endif
@@ -185,6 +186,8 @@ platform_start_kernel(void)
 	dprintf("  text: %#" B_PRIx64 ", %#" B_PRIx64 "\n", textRegion.start, textRegion.size);
 	dprintf("  data: %#" B_PRIx64 ", %#" B_PRIx64 "\n", dataRegion.start, dataRegion.size);
 	dprintf("  entry: %#lx\n", kernelEntry);
+
+	debug_cleanup();
 
 	arch_mmu_init();
 	convert_kernel_args();
