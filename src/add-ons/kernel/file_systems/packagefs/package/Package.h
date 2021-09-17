@@ -10,7 +10,7 @@
 #include <package/PackageFlags.h>
 #include <package/PackageArchitecture.h>
 
-#include <Referenceable.h>
+#include <WeakReferenceable.h>
 
 #include <util/DoublyLinkedList.h>
 #include <util/OpenHashTable.h>
@@ -35,7 +35,7 @@ class Volume;
 class Version;
 
 
-class Package : public BReferenceable,
+class Package : public BWeakReferenceable,
 	public DoublyLinkedListLinkImpl<Package> {
 public:
 								Package(::Volume* volume,
