@@ -13,6 +13,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			insque.c
 			lsearch.c
 			tdelete.c
+			tdestroy.c
 			tfind.c
 			tsearch.c
 			twalk.c

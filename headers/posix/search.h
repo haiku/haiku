@@ -49,6 +49,10 @@ extern void *tsearch(const void *key, void **_root,
 extern void twalk(const void *root,
 	void (*action)(const void *, VISIT, int ));
 
+#ifdef _GNU_SOURCE
+extern void tdestroy(void *root, void (*free_key)(void *))
+#endif
+
 #ifdef __cplusplus
 }
 #endif
