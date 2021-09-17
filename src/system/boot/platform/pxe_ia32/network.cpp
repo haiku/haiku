@@ -92,7 +92,7 @@ PXEService::Init()
 	if (res != 0 || cached_info.Status != 0) {
 		char s[100];
 		snprintf(s, sizeof(s), "Can't determine IP address! PXENV_GET_CACHED_INFO res %x, status %x\n", res, cached_info.Status);
-		panic(s);
+		panic("%s", s);
 		return B_ERROR;
 	}
 
