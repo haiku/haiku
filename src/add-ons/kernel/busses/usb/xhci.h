@@ -257,7 +257,6 @@ private:
 			uint8				fPortCount;
 			uint8				fSlotCount;
 			usb_speed			fPortSpeeds[XHCI_MAX_PORTS];
-			uint8				fPortSlots[XHCI_MAX_PORTS];
 
 			// Scratchpad
 			uint32				fScratchpadCount;

@@ -402,7 +402,6 @@ XHCI::XHCI(pci_info *info, Stack *stack)
 	install_io_interrupt_handler(fIRQ, InterruptHandler, (void *)this, 0);
 
 	memset(fPortSpeeds, 0, sizeof(fPortSpeeds));
-	memset(fPortSlots, 0, sizeof(fPortSlots));
 	memset(fDevices, 0, sizeof(fDevices));
 
 	fInitOK = true;
@@ -1656,31 +1655,28 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 	// otherwise happen when this Pipe object is destroyed.
 	pipe.SetControllerCookie(NULL);
 
-	fPortSlots[hubPort] = slot;
 	TRACE("AllocateDevice() port %d slot %d\n", hubPort, slot);
 	return deviceObject;
 }
 
 
 void
-XHCI::FreeDevice(Device *device)
+XHCI::FreeDevice(Device *usbDevice)
 {
-	uint8 hubPort = device->HubPort();
-	uint8 slot = fPortSlots[hubPort];
-	TRACE("FreeDevice() port %d slot %d\n", hubPort, slot);
+	xhci_device* device = (xhci_device*)usbDevice->ControllerCookie();
+	TRACE("FreeDevice() slot %d\n", device->slot);
 
 	// Delete the device first, so it cleans up its pipes and tells us
 	// what we need to destroy before we tear down our internal state.
-	delete device;
+	delete usbDevice;
 
-	DisableSlot(slot);
-	fDcba->baseAddress[slot] = 0;
-	fPortSlots[hubPort] = 0;
-	delete_area(fDevices[slot].trb_area);
-	delete_area(fDevices[slot].input_ctx_area);
-	delete_area(fDevices[slot].device_ctx_area);
+	DisableSlot(device->slot);
+	fDcba->baseAddress[device->slot] = 0;
+	delete_area(device->trb_area);
+	delete_area(device->input_ctx_area);
+	delete_area(device->device_ctx_area);
 
-	memset(&fDevices[slot], 0, sizeof(xhci_device));
+	memset(device, 0, sizeof(xhci_device));
 }
 
 
