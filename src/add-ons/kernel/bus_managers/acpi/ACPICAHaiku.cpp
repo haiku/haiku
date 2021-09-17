@@ -1199,7 +1199,7 @@ AcpiOsSignal(UINT32 function, void *info)
 	switch (function) {
 		case ACPI_SIGNAL_FATAL:
 #ifdef _KERNEL_MODE
-			panic(info == NULL ? "AcpiOsSignal: fatal" : (const char*)info);
+			panic("%s", info == NULL ? "AcpiOsSignal: fatal" : (const char*)info);
 			break;
 #endif
 		case ACPI_SIGNAL_BREAKPOINT:
