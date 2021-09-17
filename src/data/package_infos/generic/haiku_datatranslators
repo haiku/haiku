@@ -1,0 +1,62 @@
+name			haiku_datatranslators
+version			%HAIKU_VERSION%
+architecture	%HAIKU_PACKAGING_ARCH%
+summary			"Haiku data translators"
+description 	"Standard data translators and media format plugins"
+
+packager		"The Haiku build system"
+vendor			"Haiku Project"
+
+copyrights		"2001-2021 Haiku, Inc."
+licenses		MIT
+
+provides {
+	haiku_datatranslators=%HAIKU_VERSION%
+}
+
+requires {
+	haiku
+
+#ifdef HAIKU_REGULAR_BUILD
+#ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_ffmpeg_ENABLED
+	lib:libavcodec >= 58
+	lib:libavfilter >= 7
+	lib:libavformat >= 58
+	lib:libavutil >= 56
+	lib:libswresample >= 3
+#endif
+#ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_libicns_ENABLED
+	lib:libicns
+#endif
+#ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_openexr_ENABLED
+#ifdef HAIKU_PACKAGING_ARCH_x86_gcc2
+	lib:libilmimf
+	lib:libilmimfutil
+#else
+	lib:libilmimf_2_4
+	lib:libilmimfutil_2_4
+#endif
+#endif
+#ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_jasper_ENABLED
+	lib:libjasper
+#endif
+#ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_jpeg_ENABLED
+	lib:libjpeg
+#endif
+#ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_libpng_ENABLED
+	lib:libpng16
+#endif
+#ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_libavif_ENABLED
+	lib:libavif >= 12
+#endif
+#ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_tiff_ENABLED
+	lib:libtiff >= 5.6
+#endif
+#ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_libwebp_ENABLED
+	lib:libwebp
+#endif
+#ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_libraw_ENABLED
+	lib:libraw >= 19
+#endif
+#endif
+}

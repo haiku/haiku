@@ -48,6 +48,8 @@ provides {
 }
 
 requires {
+	haiku_datatranslators
+
 	noto >= 2.7
 #ifdef HAIKU_REGULAR_BUILD
 	noto_sans_cjk_jp
@@ -91,44 +93,15 @@ requires {
 #endif
 
 #ifdef HAIKU_REGULAR_BUILD
-#ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_ffmpeg_ENABLED
-	lib:libavcodec >= 58
-	lib:libavfilter >= 7
-	lib:libavformat >= 58
-	lib:libavutil >= 56
-	lib:libswresample >= 3
-#endif
 #ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_expat_ENABLED
 	lib:libexpat
 #endif
 #ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_gutenprint_ENABLED
 	lib:libgutenprint >= 8
 #endif
-#ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_libicns_ENABLED
-	lib:libicns
-#endif
-#ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_openexr_ENABLED
-	lib:libilmimf
-	lib:libilmimfutil
-#endif
-#ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_jasper_ENABLED
-	lib:libjasper
-#endif
-#ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_jpeg_ENABLED
-	lib:libjpeg
-#endif
-#ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_libpng_ENABLED
-	lib:libpng16
-#endif
 #ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_openssl_ENABLED
 	lib:libssl
 	lib:libcrypto
-#endif
-#ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_tiff_ENABLED
-	lib:libtiff >= 5.6
-#endif
-#ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_libwebp_ENABLED
-	lib:libwebp
 #endif
 #ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_zstd_ENABLED
 	lib:libzstd >= 1

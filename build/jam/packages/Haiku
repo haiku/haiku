@@ -214,7 +214,6 @@ AddBootModuleSymlinksToPackage
 
 # add-ons
 AddFilesToPackage add-ons accelerants	: $(SYSTEM_ADD_ONS_ACCELERANTS) ;
-AddFilesToPackage add-ons Translators	: $(SYSTEM_ADD_ONS_TRANSLATORS) ;
 AddFilesToPackage add-ons locale catalogs : $(SYSTEM_ADD_ONS_LOCALE_CATALOGS) ;
 
 AddFilesToPackage add-ons mail_daemon inbound_protocols		: POP3
@@ -225,7 +224,6 @@ AddFilesToPackage add-ons mail_daemon inbound_filters
 AddFilesToPackage add-ons mail_daemon outbound_filters		: Fortune ;
 
 AddFilesToPackage add-ons media : $(SYSTEM_ADD_ONS_MEDIA) ;
-AddFilesToPackage add-ons media plugins : $(SYSTEM_ADD_ONS_MEDIA_PLUGINS) ;
 
 AddFilesToPackage add-ons Network\ Settings
 	: IPv4Interface IPv6Interface DNSClientService Hostname FTPService SSHService

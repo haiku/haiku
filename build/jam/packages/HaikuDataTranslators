@@ -1,0 +1,9 @@
+local architecture = $(HAIKU_PACKAGING_ARCHS[1]) ;
+
+local dataTranslatorsPackage = haiku_datatranslators.hpkg ;
+HaikuPackage $(dataTranslatorsPackage) ;
+
+AddFilesToPackage add-ons Translators	: $(SYSTEM_ADD_ONS_TRANSLATORS) ;
+AddFilesToPackage add-ons media plugins : $(SYSTEM_ADD_ONS_MEDIA_PLUGINS) ;
+
+BuildHaikuPackage $(dataTranslatorsPackage) : haiku_datatranslators ;
