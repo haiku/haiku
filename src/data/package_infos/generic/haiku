@@ -93,6 +93,10 @@ requires {
 	lib:libsolv
 	lib:libsolvext
 #endif
+#ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_openssl_ENABLED
+	lib:libssl
+	lib:libcrypto
+#endif
 #ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_zlib_ENABLED
 	lib:libz
 #endif
@@ -132,10 +136,6 @@ requires {
 #endif
 #ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_libavif_ENABLED
 	lib:libavif >= 12
-#endif
-#ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_openssl_ENABLED
-	lib:libssl
-	lib:libcrypto
 #endif
 #ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_tiff_ENABLED
 	lib:libtiff >= 5.6
