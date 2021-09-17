@@ -1373,8 +1373,8 @@ syslog_init_post_vm(struct kernel_args* args)
 			status = B_NO_MEMORY;
 			goto err2;
 		}
-	} else if (args->debug_output != NULL) {
-		// create an area for the debug syslog buffer
+	} else if (args->keep_debug_output_buffer) {
+		// create an area for the already-existing debug syslog buffer
 		void* base = (void*)ROUNDDOWN((addr_t)(void *)args->debug_output, B_PAGE_SIZE);
 		size_t size = ROUNDUP(args->debug_size, B_PAGE_SIZE);
 		area_id area = create_area("syslog debug", &base, B_EXACT_ADDRESS, size,
