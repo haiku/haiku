@@ -146,6 +146,9 @@ SYSTEM_ADD_ONS_ACCELERANTS = [ FFilterByBuildFeatures
 	x86,x86_64,riscv64 @{
 		vesa.accelerant
 	}@ # x86,x86_64,riscv64
+	riscv64 @{
+		radeon_hd.accelerant
+	}@ # riscv64
 ] ;
 
 SYSTEM_ADD_ONS_TRANSLATORS =
@@ -174,6 +177,9 @@ SYSTEM_ADD_ONS_DRIVERS_GRAPHICS = [ FFilterByBuildFeatures
 	x86,x86_64,riscv64 @{
 		vesa
 	}@ # x86,x86_64,riscv64
+	riscv64 @{
+		radeon_hd
+	}@ # riscv64
 ] ;
 
 SYSTEM_ADD_ONS_DRIVERS_MIDI = ;
