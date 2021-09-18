@@ -1,8 +1,10 @@
-1	japanese	x-vnd.Haiku-Terminal	3117643489
+1	japanese	x-vnd.Haiku-Terminal	4032760800
+ANSI cyan color	Terminal AppearancePrefView		ANSI シアン
 Close other tabs	Terminal TermWindow		他のタブを閉じる
 Insert path	Terminal TermView		パスの挿入
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		すみません、シェルを起動できません。
 Text encoding	Terminal TermWindow		文字コード
+ANSI blue color	Terminal AppearancePrefView		ANSI ブルー
 OK	Terminal SetTitleWindow		OK
 Edit	Terminal TermWindow		編集
 Select all	Terminal TermWindow		すべて選択
@@ -10,39 +12,49 @@ Confirm exit if active programs exist	Terminal AppearancePrefView		実行中の�
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tタブで動作中のプロセスの作業中フォルダー\n\t\t\tオプションでパスの最大要素数を指定できます。\n\t\t\t例. '%2d' は最大 2 つの要素を示します。\n\t%T\t-\t現在のロケールでの Terminal アプリケーション名\n\t%e\t-\tタブの文字コード。UTF-8 の場合は非表示です。\n\t%i\t-\tウィンドウのインデックス\n\t%p\t-\tタブ内で実行中のプロセス名\n\t%t\t-\tタブのタイトル
 Solarized Dark	Terminal colors scheme		Solarized Dark
 Copy	Terminal TermWindow		コピー
+ANSI bright green color	Terminal AppearancePrefView		ANSI ブライトグリーン
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory	Terminal TermApp		  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory
+ANSI white color	Terminal AppearancePrefView		ANSI ホワイト
 Retro	Terminal colors scheme		レトロ
 Edit tab title…	Terminal TermWindow		タブタイトルの編集...
 Settings	Terminal TermWindow		設定
 Print	Terminal TermWindow		印刷
 %app% settings	Terminal PrefWindow	window title	%app% 設定
+ANSI black color	Terminal AppearancePrefView		ANSI ブラック
 Use default	Terminal SetTitleWindow		デフォルトを使用
 Close tab	Terminal TermWindow		タブを閉じる
 Selected background	Terminal AppearancePrefView		選択されたテキストの背景
 Error!	Terminal getString		エラー!
 Set tab title	Terminal TermWindow		タブのタイトルを設定
 Appearance	Terminal PrefWindow		外観
+ANSI bright yellow color	Terminal AppearancePrefView		ANSI ブライトイエロー
 Encoding:	Terminal AppearancePrefView		文字コード:
 Create link here	Terminal TermView		カレントディレクトリにリンク作成
 Custom	Terminal AppearancePrefView	Window size	カスタム
 Selected text	Terminal AppearancePrefView		選択されたテキスト
 Change directory	Terminal TermView		ディレクトリの変更
+ANSI magenta color	Terminal AppearancePrefView		ANSI マゼンタ
 Page setup…	Terminal TermWindow		ページ設定...
 Slate	Terminal colors scheme		スレート
 Defaults	Terminal PrefWindow		デフォルト
 Cancel	Terminal TermView		中止
 Revert	Terminal PrefWindow		戻す
+Relaxed	Terminal colors scheme		Relaxed
+ANSI bright magenta color	Terminal AppearancePrefView		ANSI ブライトマゼンタ
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	ターミナル
+ANSI bright cyan color	Terminal AppearancePrefView		ANSI ブライトシアン
 Find next	Terminal TermWindow		次を検索
 Use selection	Terminal FindWindow		選択部で検索
 Copy link location	Terminal TermView		リンクの場所をコピー
 Window title:	Terminal AppearancePrefView		ウィンドウタイトル:
 New tab	Terminal TermWindow		新しいタブ
+ANSI bright blue color	Terminal AppearancePrefView		ANSI ブライトブルー
 Allow bold text	Terminal AppearancePrefView		太字を有効にする
 Window title…	Terminal TermWindow		ウィンドウタイトル...
 Blue	Terminal colors scheme		ブルー
 Cannot execute \"%command\":\n\t%error	Terminal Shell		\"%command\" を実行できません:\n\t%error
 Open path	Terminal TermView		パスを開く
+ANSI yellow color	Terminal AppearancePrefView		ANSI イエロー
 Terminal	System name		ターミナル
 Font size	Terminal TermWindow		フォントサイズ
 Custom	Terminal colors scheme		カスタム
@@ -63,6 +75,7 @@ The pattern specifying the tab titles. The following placeholders\ncan be used:	
 Close	Terminal TermWindow		閉じる
 Save to file…	Terminal PrefWindow		ファイルに保存...
 Background	Terminal AppearancePrefView		背景
+ANSI green color	Terminal AppearancePrefView		ANSI グリーン
 Copy path	Terminal TermView		パスのコピー
 Window size	Terminal TermWindow		ウィンドウサイズ
 Copy absolute path	Terminal TermView		絶対パスのコピー
@@ -80,6 +93,7 @@ Window size:	Terminal AppearancePrefView		ウィンドウサイズ:
 Switch Terminals	Terminal TermWindow		ターミナルを切替える
 Decrease	Terminal TermWindow		縮小
 Settings…	Terminal TermWindow		設定...
+ANSI bright white color	Terminal AppearancePrefView		ANSI ブライトホワイト
 Blinking cursor	Terminal AppearancePrefView		カーソルを点滅させる
 Cancel	Terminal SetTitleWindow		中止
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		パターンはウィンドウタイトルを指定します。次のプレースホルダーが\n使用できます:\n
@@ -87,6 +101,7 @@ Close active tab	Terminal TermWindow		タブを閉じる
 Use text:	Terminal FindWindow		テキスト指定:
 Save as default	Terminal TermWindow		デフォルトとして保存
 Nothing is selected.	Terminal TermWindow		なにも選択されていません。
+ANSI red color	Terminal AppearancePrefView		ANSI レッド
 Use left Option as Meta key	Terminal AppearancePrefView		左オプションキーをメタキーとして使う
 Find	Terminal FindWindow		検索
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		パターンは現在のタブタイトルを指定します。次のプレースホルダーが\n使用できます:\n
@@ -94,7 +109,9 @@ Professional	Terminal colors scheme		プロフェッショナル
 Font:	Terminal AppearancePrefView		フォント:
 Paste	Terminal TermWindow		貼り付け
 The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		パターンはウィンドウタイトルを定めます。以下のプレースホルダーが\n使えます:
+ANSI bright black color	Terminal AppearancePrefView		ANSI ブライトブラック
 Copy here	Terminal TermView		カレントディレクトリへコピー
+ANSI bright red color	Terminal AppearancePrefView		ANSI ブライトレッド
 Use default shell	Terminal Shell		デフォルトシェルの使用
 Color:	Terminal AppearancePrefView		色:
 Open link	Terminal TermView		リンクを開く

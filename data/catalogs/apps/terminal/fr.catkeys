@@ -1,8 +1,10 @@
-1	french	x-vnd.Haiku-Terminal	3117643489
+1	french	x-vnd.Haiku-Terminal	610710493
+ANSI cyan color	Terminal AppearancePrefView		Couleur cyan ANSI
 Close other tabs	Terminal TermWindow		Fermer les autres onglets
 Insert path	Terminal TermView		Insérer un chemin de recherche
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal ne peut pas démarrer l’interpréteur de commande.
 Text encoding	Terminal TermWindow		Encodage texte
+ANSI blue color	Terminal AppearancePrefView		Couleur bleu ANSI
 OK	Terminal SetTitleWindow		OK
 Edit	Terminal TermWindow		Éditer
 Select all	Terminal TermWindow		Sélectionner tout
@@ -10,6 +12,7 @@ Confirm exit if active programs exist	Terminal AppearancePrefView		Demander une 
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tLe répertoire de travail courant du processus actif dans\n\t\t\tl’onglet courant. En option, le nombre maximum d’éléments\n\t\t\tdu chemin peut être spécifié. Par exemple « %2d » pour au plus\n\t\t\tdeux éléments.\n\t%T\t-\tLe nom de l’application Terminal pour la langue active.\n\t%e\t-\tLe codage de l’onglet courant. Non affiché pour UTF-8.\n\t%i\t-\tL’index de la fenêtre.\n\t%p\t-\tLe nom du processus actif dans l’onglet courant.\n\t%t\t-\tLe titre de l’onglet courant.
 Solarized Dark	Terminal colors scheme		Ombragé
 Copy	Terminal TermWindow		Copier
+ANSI bright green color	Terminal AppearancePrefView		Couleur vert clair ANSI
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory	Terminal TermApp		  -h,     --help               affiche cette aide\n  -t,     --title              défini le titre de la fenêtre\n  -f,     --fullscreen         démarre en plein écran\n  -w,     --working-directory  défini le répertoire de travail initial
 Retro	Terminal colors scheme		Rétro
 Edit tab title…	Terminal TermWindow		Éditer le titre de l’onglet…
@@ -22,27 +25,33 @@ Selected background	Terminal AppearancePrefView		Fond sélectionné
 Error!	Terminal getString		Erreur !
 Set tab title	Terminal TermWindow		Changer le titre de l’onglet
 Appearance	Terminal PrefWindow		Apparence
+ANSI bright yellow color	Terminal AppearancePrefView		Couleur jaune vif ANSI
 Encoding:	Terminal AppearancePrefView		Encodage :
 Create link here	Terminal TermView		Créer un raccourci ici
 Custom	Terminal AppearancePrefView	Window size	Personnalisé
 Selected text	Terminal AppearancePrefView		Texte sélectionné
 Change directory	Terminal TermView		Changer de répertoire
+ANSI magenta color	Terminal AppearancePrefView		Couleur magenta ANSI
 Page setup…	Terminal TermWindow		Mise en page…
 Slate	Terminal colors scheme		Ardoise
 Defaults	Terminal PrefWindow		Paramètres par défaut
 Cancel	Terminal TermView		Annuler
 Revert	Terminal PrefWindow		Rétablir
+ANSI bright magenta color	Terminal AppearancePrefView		Couleur magenta clair ANSI
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
+ANSI bright cyan color	Terminal AppearancePrefView		Couleur cyan clair ANSI
 Find next	Terminal TermWindow		Rechercher le suivant
 Use selection	Terminal FindWindow		Utiliser la sélection
 Copy link location	Terminal TermView		Copier l’emplacement du lien
 Window title:	Terminal AppearancePrefView		Titre de la fenêtre :
 New tab	Terminal TermWindow		Nouvel onglet
+ANSI bright blue color	Terminal AppearancePrefView		Couleur bleu clair ANSI
 Allow bold text	Terminal AppearancePrefView		Autoriser le texte en gras
 Window title…	Terminal TermWindow		Titre de la fenêtre…
 Blue	Terminal colors scheme		Bleu
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Impossible d’exécuter « %command » :\n\t%error
 Open path	Terminal TermView		Ouvrir l’emplacement
+ANSI yellow color	Terminal AppearancePrefView		Couleur jaune ANSI
 Terminal	System name		Terminal
 Font size	Terminal TermWindow		Taille de la police
 Custom	Terminal colors scheme		Personnalisé
@@ -63,6 +72,7 @@ The pattern specifying the tab titles. The following placeholders\ncan be used:	
 Close	Terminal TermWindow		Fermer
 Save to file…	Terminal PrefWindow		Enregistrer sous…
 Background	Terminal AppearancePrefView		Fond
+ANSI green color	Terminal AppearancePrefView		Couleur vert ANSI
 Copy path	Terminal TermView		Copier le chemin
 Window size	Terminal TermWindow		Taille de la fenêtre
 Copy absolute path	Terminal TermView		Copier le chemin absolu
@@ -87,6 +97,7 @@ Close active tab	Terminal TermWindow		Fermer l’onglet actif
 Use text:	Terminal FindWindow		Utiliser le texte :
 Save as default	Terminal TermWindow		Enregistrer comme valeur par défaut
 Nothing is selected.	Terminal TermWindow		Rien n’est sélectionné.
+ANSI red color	Terminal AppearancePrefView		Couleur rouge ANSI
 Use left Option as Meta key	Terminal AppearancePrefView		Utiliser la touche Option gauche comme touche Meta
 Find	Terminal FindWindow		Rechercher
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Le modèle utilisé pour composer le titre de l’onglet actif peut\ncontenir les éléments suivants :\n
@@ -95,6 +106,7 @@ Font:	Terminal AppearancePrefView		Police :
 Paste	Terminal TermWindow		Coller
 The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Le motif servant à composer le titre de la fenêtre. Vous pouvez\nutiliser les variables suivantes :
 Copy here	Terminal TermView		Copier ici
+ANSI bright red color	Terminal AppearancePrefView		Couleur rouge clair ANSI
 Use default shell	Terminal Shell		Utiliser l’interpréteur de commande par défaut
 Color:	Terminal AppearancePrefView		Couleur :
 Open link	Terminal TermView		Ouvrir le lien

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	3437352458
+1	hungarian	x-vnd.Haiku-HaikuDepot	761125591
 Repository update error	LocalRepositoryUpdateProcess		Tároló frissítési hiba
 Network error	ServerHelper		Hálózati hiba
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Hiba történt a tároló frissítésekor: %error%
@@ -8,6 +8,7 @@ Uninstalled	PackageListView		Eltávolítva
 It was not possible to create the new user.	UserLoginWindow		Nem sikerült létrehozni a felhasználót.
 Available packages	MainWindow		Elérhető csomagok
 Create account	UserLoginWindow		Felhasználói fiók létrehozása
+Install %PackageTitle%	PackageManager		%PackageTitle% telepítése
 OK	App		Rendben
 The response to the captcha was incorrect.	ServerHelper		Hibás válasz a captcha-kódra.
 Develop packages	MainWindow		Fejlesztői csomagok
@@ -123,6 +124,7 @@ Status	PackageListView		Állapot
 The password has been incorrectly repeated.	UserLoginWindow		A megismételt jelszó téves.
 Network transport error	ServerHelper		Hálózati átviteli hiba
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		A felhasználó [%Nickname%] előzőleg megadott jelszava évrénytelen. A felhasználó ki lesz léptetve az alkalmazásból majd újra be kell jelentkezni az érvényes jelszóval.
+Uninstall %PackageTitle%	PackageManager		%PackageTitle% eltávolítása
 Update	RatePackageWindow		Frissítés
 OK	ServerHelper		Rendben
 Language	UserLoginWindow		Nyelv

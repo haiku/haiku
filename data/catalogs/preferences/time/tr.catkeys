@@ -1,10 +1,11 @@
-1	turkish	x-vnd.Haiku-Time	2069485065
+1	turkish	x-vnd.Haiku-Time	3691539601
 OK	Time		Tamam
 Message receiving failed	Time		İleti alımı başarısız
 Australia	Time		Avustralya
 America	Time		Amerika
 Reset to default server list	Time		Öntanımlı sunucu listesine sıfırla
 Could not resolve server address	Time		Sunucu adı çözülemedi
+Time & Date	System name		Tarih ve Saat
 Set time zone	Time		Saat dilimini ayarla
 Waiting for answer failed	Time		Yanıt bekleme başarısız
 <Other>	Time		<Diğer>

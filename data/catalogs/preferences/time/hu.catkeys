@@ -1,10 +1,11 @@
-1	hungarian	x-vnd.Haiku-Time	2069485065
+1	hungarian	x-vnd.Haiku-Time	3691539601
 OK	Time		Rendben
 Message receiving failed	Time		Sikertelen üzenetfogadás
 Australia	Time		Ausztrália
 America	Time		Amerika
 Reset to default server list	Time		Eredeti kiszolgálólista visszaállìtása
 Could not resolve server address	Time		Nem sikerült feloldani a kiszolgáló címét
+Time & Date	System name		Dátum és idő
 Set time zone	Time		Időzóna beállítása
 Waiting for answer failed	Time		Nem érkezett válasz
 <Other>	Time		<Egyéb>

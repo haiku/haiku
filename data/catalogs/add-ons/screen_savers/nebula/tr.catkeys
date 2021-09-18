@@ -1,10 +1,11 @@
-1	turkish	x-vnd.Haiku-NebulaScreensaver	3897597581
+1	turkish	x-vnd.Haiku-NebulaScreensaver	2177689501
 cold	Nebula Screen Saver		donuk
 Internal width:	Nebula Screen Saver		İç genişlik:
 16:9, wide-screen	Nebula Screen Saver		16:9, geniş ekran
 Maximum Frames Per Second	Nebula Screen Saver		Saniyedeki en çok kare sayısı
 Format:	Nebula Screen Saver		Biçim:
 yellow	Nebula Screen Saver		sarı
+screen resolution	Nebula Screen Saver		ekran çözünürlüğü
 2:3.5, cinemascope	Nebula Screen Saver		2:35.5, sinemaskop
 Color:	Nebula Screen Saver		Renk:
 © 2001-2004 Axel Dörfler.	Nebula Screen Saver		© 2001-2004 Axel Dörfler.
@@ -15,6 +16,7 @@ fullscreen, no borders	Nebula Screen Saver		tam ekran, kenarlıklar olmadan
 orange (original)	Nebula Screen Saver		turuncu (orijinal)
 cyan	Nebula Screen Saver		camgöbeği
 Speed	Nebula Screen Saver		Hız
+%d pixels	Nebula Screen Saver		%d piksel
 Nebula	Nebula Screen Saver		Bulutsu
 red	Nebula Screen Saver		kırmızı
 grey	Nebula Screen Saver		gri

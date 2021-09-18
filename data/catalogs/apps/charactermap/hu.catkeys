@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-CharacterMap	2410613018
+1	hungarian	x-vnd.Haiku-CharacterMap	917523322
 Tirhuta	UnicodeBlocks		Tirhuta
 Miscellaneous mathematical symbols B	UnicodeBlocks		Különféle matematikai B szimbólumok
 Latin extended E	UnicodeBlocks		Latin kiterjesztett E
@@ -60,6 +60,7 @@ CJK unified ideographs extension C	UnicodeBlocks		CJK egységes ideográfiák C 
 Ancient Greek musical notation	UnicodeBlocks		Ősi görög zenei jelek
 Thai	UnicodeBlocks		Thai
 Ethiopic supplement	UnicodeBlocks		Etióp kiegészítés
+Only show blocks contained in font	CharacterWindow		Csak a betűkészletben meglévő blokkok mutatása
 Chess symbols	UnicodeBlocks		Sakk szombólumok
 Yijing hexagram symbols	UnicodeBlocks		Yijing hexagram szimbólumok
 Ottoman Siyaq numbers	UnicodeBlocks		Ottoman Siyaq számok

@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-HaikuDepot	3437352458
+1	turkish	x-vnd.Haiku-HaikuDepot	761125591
 Repository update error	LocalRepositoryUpdateProcess		Depo güncelleme hatası
 Network error	ServerHelper		Ağ hatası
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Depo güncellenirken bir hata oluştu: %error%
@@ -8,6 +8,7 @@ Uninstalled	PackageListView		Kaldırıldı
 It was not possible to create the new user.	UserLoginWindow		Yeni kullanıcı oluşturulamadı.
 Available packages	MainWindow		Kullanılabilir paketler
 Create account	UserLoginWindow		Hesap oluştur
+Install %PackageTitle%	PackageManager		%PackageTitle% yükle
 OK	App		Tamam
 The response to the captcha was incorrect.	ServerHelper		CAPTCHA yanıtı yanlış.
 Develop packages	MainWindow		Geliştirme paketleri
@@ -123,6 +124,7 @@ Status	PackageListView		Durum
 The password has been incorrectly repeated.	UserLoginWindow		İkinci parola girişinde yanlış(lar) var.
 Network transport error	ServerHelper		Ağ ulaşım hatası
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		Önceden [%Nickname%] kullanıcısına ait olan parola şu anda geçerli değil. Uygulamadan çıkış yapılacaktır; güncellenmiş parola ile yeniden giriş yapmanız gerekmektedir.
+Uninstall %PackageTitle%	PackageManager		%PackageTitle% kaldır
 Update	RatePackageWindow		Güncelle
 OK	ServerHelper		Tamam
 Language	UserLoginWindow		Dil

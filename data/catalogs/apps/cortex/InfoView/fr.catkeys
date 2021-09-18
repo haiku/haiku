@@ -1,4 +1,4 @@
-1	french	application/x-vnd.Cortex.InfoView	3854052292
+1	french	application/x-vnd.Cortex.InfoView	3513193697
 Description	DormantNodeInfoView		Description
 Byte order	InfoView		Boutisme
 Connection	InfoView		Connexion
@@ -10,6 +10,7 @@ Flags	InfoView		Drapeaux
 Active lines	InfoView		Lignes actives
 Buffer size	InfoView		Taille du tampon
 \n- Quality:	FileNodeInfoView		\n- Qualité :
+Application	AppNodeInfoView		Application
 Max. instances	DormantNodeInfoView		Instances max.
 \n- Duration:	FileNodeInfoView		\n- Durée :
 Latency	LiveNodeInfoView		Temps de latence

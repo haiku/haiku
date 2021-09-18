@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-MediaPlayer	1961774506
+1	japanese	x-vnd.Haiku-MediaPlayer	716811487
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		項目をごみ箱に捨てる
 Close	MediaPlayer-PlaylistWindow		閉じる
 Volume of background clips	MediaPlayer-SettingsWindow		バックグラウンド再生時のボリューム
@@ -30,6 +30,7 @@ Open file…	MediaPlayer-Main		ファイルを開く...
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		フルスクリーン表示時にコントロールを拡大
 View options	MediaPlayer-SettingsWindow		表示オプション
 %d kHz	MediaPlayer-InfoWin		%d kHz
+Eject Device	MediaPlayer-Main		デバイスの取り出し
 Full volume	MediaPlayer-SettingsWindow		最大音量
 <untitled>	PlaylistItem-title		<無題>
 Start media server	MediaPlayer-Main		メディアサーバーを起動

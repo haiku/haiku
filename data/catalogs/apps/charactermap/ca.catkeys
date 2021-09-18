@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-CharacterMap	2410613018
+1	catalan; valencian	x-vnd.Haiku-CharacterMap	917523322
 Tirhuta	UnicodeBlocks		Tirhuta
 Miscellaneous mathematical symbols B	UnicodeBlocks		Símbols matemàtics diversos - B
 Latin extended E	UnicodeBlocks		Llatí ampliat E
@@ -60,6 +60,7 @@ CJK unified ideographs extension C	UnicodeBlocks		Extensió d'ideògrafs unifica
 Ancient Greek musical notation	UnicodeBlocks		Notació musical grega antiga
 Thai	UnicodeBlocks		Tai
 Ethiopic supplement	UnicodeBlocks		Suplement etíop
+Only show blocks contained in font	CharacterWindow		Mostra només els blocs continguts a la lletra.
 Chess symbols	UnicodeBlocks		Símbols d’escacs
 Yijing hexagram symbols	UnicodeBlocks		Símbols d'hexagrames Yijing
 Ottoman Siyaq numbers	UnicodeBlocks		Nombres de Siyaq otomans

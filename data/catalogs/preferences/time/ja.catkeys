@@ -1,10 +1,11 @@
-1	japanese	x-vnd.Haiku-Time	2069485065
+1	japanese	x-vnd.Haiku-Time	3691539601
 OK	Time		OK
 Message receiving failed	Time		メッセージの取得に失敗しました
 Australia	Time		オーストラリア
 America	Time		アメリカ
 Reset to default server list	Time		デフォルトのサーバーリストにリセット
 Could not resolve server address	Time		サーバーアドレスを解決できません
+Time & Date	System name		日付と時刻
 Set time zone	Time		タイムゾーンを設定
 Waiting for answer failed	Time		返答待ちに失敗しました
 <Other>	Time		<その他>

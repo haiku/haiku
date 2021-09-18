@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-FirstBootPrompt	2131367349
+1	french	x-vnd.Haiku-FirstBootPrompt	2643331834
 Japanese	KeymapNames		Japonais
 US	KeymapNames		US
 Cancel	BootPromptWindow		Annuler
@@ -7,10 +7,12 @@ Belarusian	KeymapNames		Biélorusse
 Brazilian	KeymapNames		Brésilien
 Dvorak	KeymapNames		Dvorak
 Polish	KeymapNames		Polonais
+Try Haiku	BootPromptWindow		Essayer Haiku
 Latin-American	KeymapNames		Latino-Américain
 Ukrainian	KeymapNames		Ukrainien
 Russian (Yawert)	KeymapNames		Russe (Yawert)
 United-Kingdom	KeymapNames		Royaume-Uni
+Welcome!	BootPromptWindow		Bienvenue !
 Quit Haiku	System name		Quitter Haiku
 Serbian (Cyrillic)	KeymapNames		Serbe (cyrillique)
 Turkish (Type-F)	KeymapNames		Turc (Type F)
@@ -45,6 +47,7 @@ French (Mac)	KeymapNames		Français (Mac)
 Spanish	KeymapNames		Espagnol
 Ukrainian (Mac)	KeymapNames		Ukrainien (Mac)
 Estonian	KeymapNames		Estonien
+Install Haiku	BootPromptWindow		Installer Haiku
 French (Bépo)	KeymapNames		Français (Bépo)
 Restart system	BootPromptWindow		Redémarrer le système
 Serbian (Latin)	KeymapNames		Serbe (Latin)
@@ -66,8 +69,10 @@ Norwegian	KeymapNames		Norvégien
 Danish	KeymapNames		Danois
 Bulgarian (Phonetic)	KeymapNames		Bulgare (phonétique)
 Canadian-French	KeymapNames		Français Canadien
+Welcome to Haiku!	BootPromptWindow		Bienvenue dans Haiku !
 Russian	KeymapNames		Russe
 Hungarian	KeymapNames		Hongrois
+Install	BootPromptWindow		Installer
 Irish	KeymapNames		Irlandais
 Romanian	KeymapNames		Roumain
 Are you sure you want to close this window? This will restart your system!	BootPromptWindow		Voulez-vous vraiment fermer cette fenêtre ? Cela redémarrera votre système !

@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-libtracker	759131278
+1	turkish	x-vnd.Haiku-libtracker	294379846
 Created	ContainerWindow		Oluşturulma
 Icon	AttributesView		Simge
 Open and make preferred	OpenWithWindow		Aç ve tercih edilen yap
@@ -85,6 +85,7 @@ GiB	WidgetAttributeText		GiB
 Clean up	ContainerWindow		Toparla
 Modified	FindPanel		Değiştirilme
 Select all	QueryContainerWindow		Tümünü seç
+Generate image thumbnails	SettingsView		Küçük resimler oluştur
 Select…	FilePanelPriv		Seç…
 preferences	B_PREFERENCES_DIRECTORY		tercihler
 Name	Person Query Columns		Ad

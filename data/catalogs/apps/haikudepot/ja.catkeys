@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	3437352458
+1	japanese	x-vnd.Haiku-HaikuDepot	761125591
 Repository update error	LocalRepositoryUpdateProcess		リポジトリアップデートエラー
 Network error	ServerHelper		ネットワークエラー
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		リポジトリの更新中に次のエラーが発生しました: %error%
@@ -8,6 +8,7 @@ Uninstalled	PackageListView		アンインストール済
 It was not possible to create the new user.	UserLoginWindow		新しいユーザーを作成できません。
 Available packages	MainWindow		使用可能なパッケージ
 Create account	UserLoginWindow		アカウントの作成
+Install %PackageTitle%	PackageManager		%PackageTitle% をインストール
 OK	App		OK
 The response to the captcha was incorrect.	ServerHelper		キャプチャの回答が間違っていました
 Develop packages	MainWindow		開発用パッケージ
@@ -123,6 +124,7 @@ Status	PackageListView		状態
 The password has been incorrectly repeated.	UserLoginWindow		パスワードが間違って再入力されています。
 Network transport error	ServerHelper		ネットワーク転送エラー
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		以前にユーザー [%Nickname%] に提供されたパスワードは現在期限切れです。ユーザーはこのアプリケーションをログアウトして、新しいパスワードで再ログインする必要があります。
+Uninstall %PackageTitle%	PackageManager		%PackageTitle% をアンインストール
 Update	RatePackageWindow		更新
 OK	ServerHelper		OK
 Language	UserLoginWindow		言語

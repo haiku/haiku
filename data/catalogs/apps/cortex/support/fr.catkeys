@@ -1,4 +1,4 @@
-1	french	application/x-vnd.Cortex.support	1390555974
+1	french	application/x-vnd.Cortex.support	1081380755
 Header has flags	MediaString		L’en-tête comporte des drapeaux
 Recording	MediaString		Enregistrement
 (unknown format)	MediaString		(format inconnu)
@@ -29,6 +29,7 @@ Homogenous buffers	MediaString		Tampons homogènes
 Interlaced 	MediaString		Entrelacé 
 {0, plural, one{# channel}other{# channels}}	MediaString		{0, plural, one{# canal}other{# canaux}}
 15 bit RGBA	MediaString		15 bits RVBA
+Drop data	MediaString		Rejeter les données
 YUV9	MediaString		YUV9
  Hz	MediaString		 Hz
 Right	MediaString		Droite

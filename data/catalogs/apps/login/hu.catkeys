@@ -1,6 +1,8 @@
-1	hungarian	x-vnd.Haiku-Login	3033693897
+1	hungarian	x-vnd.Haiku-Login	1584886353
 Invalid login!	Login View		Érvénytelen felhasználónév!
 Error	Login App		Hiba
+Login application for Haiku\nUsage:	Login App		Bejelentkező alkalmazás Haikuhoz\nHasználat:
+--nonmodal\tDo not make the window modal	Login App		--nonmodal\tNe legyen a többi ablak előtt
 Welcome to Haiku	Login Window		Üdvözöllek a Haikuban
 Halt	Login View		Megszakítás
 Desktop	Desktop Window		Asztal

@@ -1,10 +1,11 @@
-1	catalan; valencian	x-vnd.Haiku-Time	2069485065
+1	catalan; valencian	x-vnd.Haiku-Time	3691539601
 OK	Time		D'acord
 Message receiving failed	Time		Ha fallat rebre el missatge.
 Australia	Time		Austràlia
 America	Time		Amèrica
 Reset to default server list	Time		Restableix la llista de servidors predeterminada
 Could not resolve server address	Time		No s'ha pogut resoldre l'adreça del servidor.
+Time & Date	System name		Hora i dia
 Set time zone	Time		Estableix la zona horària
 Waiting for answer failed	Time		Ha fallat esperar la resposta.
 <Other>	Time		<Altres>

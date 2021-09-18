@@ -1,8 +1,10 @@
-1	turkish	x-vnd.Haiku-Terminal	3117643489
+1	turkish	x-vnd.Haiku-Terminal	4032760800
+ANSI cyan color	Terminal AppearancePrefView		ANSI camgöbeği
 Close other tabs	Terminal TermWindow		Diğer sekmeleri kapat
 Insert path	Terminal TermView		Yolu ekle
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Uçbirim kabuğu başlatamadı. Üzgünüz.
 Text encoding	Terminal TermWindow		Metin kodlaması
+ANSI blue color	Terminal AppearancePrefView		ANSI mavi
 OK	Terminal SetTitleWindow		Tamam
 Edit	Terminal TermWindow		Düzen
 Select all	Terminal TermWindow		Tümünü seç
@@ -10,39 +12,49 @@ Confirm exit if active programs exist	Terminal AppearancePrefView		Etkin program
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tSekmede çalışan etkin işlemin içinde çalıştığı dizin\n\t\t\tİsteğe bağlı olarak olabilecek en çok yol bileşenlerinin sayısı\n\t\t\tbelirtilebilir. Örneğin en fazla iki bileşen için '%2d'.\n\t%T\t-\tMevcut yerelleştirme için Uçbirim uygulaması adı\n\t%e\t-\tSekme kodlaması. UTF-8 için gösterilmez.\n\t%i\t-\tPencere sırası\n\t%p\t-\tSekmedeki etkin işlemin adı\n\t%t\t-\tSekme başlığı
 Solarized Dark	Terminal colors scheme		Solmuş Koyu
 Copy	Terminal TermWindow		Kopyala
+ANSI bright green color	Terminal AppearancePrefView		ANSI açık yeşil
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory	Terminal TermApp		  -h     --help               yardımı göster\n  -t     --title              pencere başlığını ayarla\n  -f     --fullscreen         tam ekran yap\n  -w     --working-directory  başlangıç çalışma dizinini ayarla
+ANSI white color	Terminal AppearancePrefView		ANSI beyaz
 Retro	Terminal colors scheme		Eski Moda
 Edit tab title…	Terminal TermWindow		Sekme başlığını düzenle…
 Settings	Terminal TermWindow		Ayarlar
 Print	Terminal TermWindow		Yazdır
 %app% settings	Terminal PrefWindow	window title	%app% Ayarları
+ANSI black color	Terminal AppearancePrefView		ANSI siyah
 Use default	Terminal SetTitleWindow		Öntanımlıları kullan
 Close tab	Terminal TermWindow		Sekmeyi kapat
 Selected background	Terminal AppearancePrefView		Seçili arka plan
 Error!	Terminal getString		Hata!
 Set tab title	Terminal TermWindow		Sekme başlığını ayarla
 Appearance	Terminal PrefWindow		Görünüm
+ANSI bright yellow color	Terminal AppearancePrefView		ANSI açık sarı
 Encoding:	Terminal AppearancePrefView		Kodlama:
 Create link here	Terminal TermView		Burada bağlantı oluştur
 Custom	Terminal AppearancePrefView	Window size	Özel
 Selected text	Terminal AppearancePrefView		Seçili metin
 Change directory	Terminal TermView		Dizini değiştir
+ANSI magenta color	Terminal AppearancePrefView		ANSI mor
 Page setup…	Terminal TermWindow		Sayfa düzeni…
 Slate	Terminal colors scheme		Arduvaz
 Defaults	Terminal PrefWindow		Öntanımlılar
 Cancel	Terminal TermView		İptal
 Revert	Terminal PrefWindow		Eski haline döndür
+Relaxed	Terminal colors scheme		Sakin
+ANSI bright magenta color	Terminal AppearancePrefView		ANSI açık mor
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Uçbirim
+ANSI bright cyan color	Terminal AppearancePrefView		ANSI açık camgöbeği
 Find next	Terminal TermWindow		Sonrakini bul
 Use selection	Terminal FindWindow		Seçimi kullan
 Copy link location	Terminal TermView		Bağlantı konumunu kopyala
 Window title:	Terminal AppearancePrefView		Pencere başlığı:
 New tab	Terminal TermWindow		Yeni sekme
+ANSI bright blue color	Terminal AppearancePrefView		ANSI açık mavi
 Allow bold text	Terminal AppearancePrefView		Kalın metne izin ver
 Window title…	Terminal TermWindow		Pencere başlığı…
 Blue	Terminal colors scheme		Mavi
 Cannot execute \"%command\":\n\t%error	Terminal Shell		\"%command\" çalıştırılamadı:\n\t%error
 Open path	Terminal TermView		Yol aç
+ANSI yellow color	Terminal AppearancePrefView		ANSI sarı
 Terminal	System name		Uçbirim
 Font size	Terminal TermWindow		Yazıtipi boyutu
 Custom	Terminal colors scheme		Özel
@@ -63,6 +75,7 @@ The pattern specifying the tab titles. The following placeholders\ncan be used:	
 Close	Terminal TermWindow		Kapat
 Save to file…	Terminal PrefWindow		Dosyaya kaydet…
 Background	Terminal AppearancePrefView		Arka plan
+ANSI green color	Terminal AppearancePrefView		ANSI yeşil
 Copy path	Terminal TermView		Yolu kopyala
 Window size	Terminal TermWindow		Pencere boyutu
 Copy absolute path	Terminal TermView		Tam yolu kopyala
@@ -80,6 +93,7 @@ Window size:	Terminal AppearancePrefView		Pencere boyutu:
 Switch Terminals	Terminal TermWindow		Diğer uçbirime geç
 Decrease	Terminal TermWindow		Azalt
 Settings…	Terminal TermWindow		Ayarlar…
+ANSI bright white color	Terminal AppearancePrefView		ANSI açık beyaz
 Blinking cursor	Terminal AppearancePrefView		Yanıp sönen imleç
 Cancel	Terminal SetTitleWindow		İptal
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Pencere başlığını belirten dizgi.\nAşağıdaki yer tutucular kullanılabilir:\n
@@ -87,6 +101,7 @@ Close active tab	Terminal TermWindow		Etkin sekmeyi kapat
 Use text:	Terminal FindWindow		Şu metni kullan:
 Save as default	Terminal TermWindow		Öntanımlı olarak kaydet
 Nothing is selected.	Terminal TermWindow		Hiçbir şey seçilmedi.
+ANSI red color	Terminal AppearancePrefView		ANSI kırmızı
 Use left Option as Meta key	Terminal AppearancePrefView		Sol Alt düğmesini Meta düğmesi olarak kullan
 Find	Terminal FindWindow		Bul
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Etkin sekme başlığını belirten dizgi.\nAşağıdaki yer tutucular kullanılabilir:\n
@@ -94,7 +109,9 @@ Professional	Terminal colors scheme		Profesyonel
 Font:	Terminal AppearancePrefView		Yazıtipi:
 Paste	Terminal TermWindow		Yapıştır
 The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Pencere başlıklarını belirten dizgi. Aşağıdaki yer tutucular kullanılabilir:\n
+ANSI bright black color	Terminal AppearancePrefView		ANSI açık siyah
 Copy here	Terminal TermView		Buraya kopyala
+ANSI bright red color	Terminal AppearancePrefView		ANSI açık kırmızı
 Use default shell	Terminal Shell		Öntanımlı kabuğu kullan
 Color:	Terminal AppearancePrefView		Renk:
 Open link	Terminal TermView		Bağlantıyı aç
