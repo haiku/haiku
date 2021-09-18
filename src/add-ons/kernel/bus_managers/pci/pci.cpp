@@ -455,6 +455,12 @@ pci_init(void)
 {
 	gPCI = new PCI;
 
+	// pci_controller_init may setup things needed by pci_io_init like mmio addresses
+	if (pci_controller_init() != B_OK) {
+		TRACE(("PCI: pci_controller_init failed\n"));
+		return B_ERROR;
+	}
+
 	if (pci_io_init() != B_OK) {
 		TRACE(("PCI: pci_io_init failed\n"));
 		return B_ERROR;
@@ -473,11 +479,6 @@ pci_init(void)
 	add_debugger_command("out16", &write_io, "write io shorts (16-bit)");
 	add_debugger_command("outb", &write_io, "write io bytes (8-bit)");
 	add_debugger_command("out8", &write_io, "write io bytes (8-bit)");
-
-	if (pci_controller_init() != B_OK) {
-		TRACE(("PCI: pci_controller_init failed\n"));
-		return B_ERROR;
-	}
 
 	gPCI->InitDomainData();
 	gPCI->InitBus();
