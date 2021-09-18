@@ -194,7 +194,7 @@ DumpVideoCSInterfaceDescriptorProcessingUnit(
 	for (int i = 0; i < 19; i++)
 	{
 		if (controls & (1 << (23 - i))) {
-			printf(ProcessingControlString(i));
+			fputs(ProcessingControlString(i), stdout);
 		}
 	}
 	printf("\n");
