@@ -194,7 +194,7 @@ BString::BString(const char* string, int32 maxLength)
 
 
 #if __cplusplus >= 201103L
-BString::BString(BString&& string)
+BString::BString(BString&& string) noexcept
 {
 	fPrivateData = string.fPrivateData;
 	string.fPrivateData = NULL;
@@ -273,7 +273,7 @@ BString::operator=(char c)
 
 #if __cplusplus >= 201103L
 BString&
-BString::operator=(BString&& string)
+BString::operator=(BString&& string) noexcept
 {
 	if (this != &string) {
 		_ReleasePrivateData();
