@@ -702,12 +702,12 @@ public:
 										size_t vectorCount);
 		iovec *						Vector() { return fVector; }
 		size_t						VectorCount() const { return fVectorCount; }
-		size_t						VectorLength();
 
 		uint16						Bandwidth() const { return fBandwidth; }
 
 		bool						IsFragmented() const { return fFragmented; }
 		void						AdvanceByFragment(size_t actualLength);
+		size_t						FragmentLength() const;
 
 		status_t					InitKernelAccess();
 		status_t					PrepareKernelAccess();

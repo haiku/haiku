@@ -1164,9 +1164,9 @@ OHCI::_FinishTransfers()
 						// this transfer may still have data left
 						TRACE("advancing fragmented transfer\n");
 						transfer->transfer->AdvanceByFragment(actualLength);
-						if (transfer->transfer->VectorLength() > 0) {
+						if (transfer->transfer->FragmentLength() > 0) {
 							TRACE("still %ld bytes left on transfer\n",
-								transfer->transfer->VectorLength());
+								transfer->transfer->FragmentLength());
 							// TODO actually resubmit the transfer
 						}
 
@@ -1374,7 +1374,7 @@ OHCI::_SubmitRequest(Transfer *transfer)
 		ohci_general_td *lastDescriptor = NULL;
 		result = _CreateDescriptorChain(&dataDescriptor, &lastDescriptor,
 			directionIn ? OHCI_TD_DIRECTION_PID_IN : OHCI_TD_DIRECTION_PID_OUT,
-			transfer->VectorLength());
+			transfer->FragmentLength());
 		if (result < B_OK) {
 			_FreeGeneralDescriptor(setupDescriptor);
 			_FreeGeneralDescriptor(statusDescriptor);
@@ -1426,7 +1426,7 @@ OHCI::_SubmitTransfer(Transfer *transfer)
 	ohci_general_td *lastDescriptor = NULL;
 	status_t result = _CreateDescriptorChain(&firstDescriptor, &lastDescriptor,
 		directionIn ? OHCI_TD_DIRECTION_PID_IN : OHCI_TD_DIRECTION_PID_OUT,
-		transfer->VectorLength());
+		transfer->FragmentLength());
 
 	if (result < B_OK)
 		return result;
@@ -2022,7 +2022,7 @@ OHCI::_CreateIsochronousDescriptorChain(ohci_isochronous_td **_firstDescriptor,
 	Pipe *pipe = transfer->TransferPipe();
 	usb_isochronous_data *isochronousData = transfer->IsochronousData();
 
-	size_t dataLength = transfer->VectorLength();
+	size_t dataLength = transfer->FragmentLength();
 	size_t packet_count = isochronousData->packet_count;
 
 	if (packet_count == 0) {

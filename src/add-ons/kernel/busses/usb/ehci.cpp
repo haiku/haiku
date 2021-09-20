@@ -1889,7 +1889,7 @@ EHCI::FinishTransfers()
 					if (transfer->transfer->IsFragmented()) {
 						// this transfer may still have data left
 						transfer->transfer->AdvanceByFragment(actualLength);
-						if (transfer->transfer->VectorLength() > 0) {
+						if (transfer->transfer->FragmentLength() > 0) {
 							FreeDescriptorChain(transfer->data_descriptor);
 							status_t result = FillQueueWithData(
 								transfer->transfer,
@@ -2319,7 +2319,7 @@ EHCI::FillQueueWithRequest(Transfer *transfer, ehci_qh *queueHead,
 	if (transfer->VectorCount() > 0) {
 		ehci_qtd *lastDescriptor = NULL;
 		status_t result = CreateDescriptorChain(pipe, &dataDescriptor,
-			&lastDescriptor, statusDescriptor, transfer->VectorLength(),
+			&lastDescriptor, statusDescriptor, transfer->FragmentLength(),
 			directionIn ? EHCI_QTD_PID_IN : EHCI_QTD_PID_OUT);
 
 		if (result != B_OK) {
@@ -2363,7 +2363,7 @@ EHCI::FillQueueWithData(Transfer *transfer, ehci_qh *queueHead,
 	ehci_qtd *lastDescriptor = NULL;
 	ehci_qtd *strayDescriptor = queueHead->stray_log;
 	status_t result = CreateDescriptorChain(pipe, &firstDescriptor,
-		&lastDescriptor, strayDescriptor, transfer->VectorLength(),
+		&lastDescriptor, strayDescriptor, transfer->FragmentLength(),
 		directionIn ? EHCI_QTD_PID_IN : EHCI_QTD_PID_OUT);
 
 	if (result != B_OK)

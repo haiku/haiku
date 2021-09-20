@@ -992,7 +992,7 @@ UHCI::SubmitRequest(Transfer *transfer)
 		uhci_td *lastDescriptor = NULL;
 		status_t result = CreateDescriptorChain(pipe, &dataDescriptor,
 			&lastDescriptor, directionIn ? TD_TOKEN_IN : TD_TOKEN_OUT,
-			transfer->VectorLength());
+			transfer->FragmentLength());
 
 		if (result < B_OK) {
 			FreeDescriptor(setupDescriptor);
@@ -1504,9 +1504,9 @@ UHCI::FinishTransfers()
 						// this transfer may still have data left
 						TRACE("advancing fragmented transfer\n");
 						transfer->transfer->AdvanceByFragment(actualLength);
-						if (transfer->transfer->VectorLength() > 0) {
+						if (transfer->transfer->FragmentLength() > 0) {
 							TRACE("still %ld bytes left on transfer\n",
-								transfer->transfer->VectorLength());
+								transfer->transfer->FragmentLength());
 
 							Transfer *resubmit = transfer->transfer;
 
@@ -1962,7 +1962,7 @@ UHCI::CreateFilledTransfer(Transfer *transfer, uhci_td **_firstDescriptor,
 	uhci_td *lastDescriptor = NULL;
 	status_t result = CreateDescriptorChain(pipe, &firstDescriptor,
 		&lastDescriptor, directionIn ? TD_TOKEN_IN : TD_TOKEN_OUT,
-		transfer->VectorLength());
+		transfer->FragmentLength());
 
 	if (result < B_OK)
 		return result;
