@@ -329,8 +329,9 @@ Device::~Device()
 	// Cancel transfers on the default pipe and put its USBID to prevent
 	// further transfers from being queued.
 	if (fDefaultPipe != NULL) {
-		fDefaultPipe->PutUSBID();
+		fDefaultPipe->PutUSBID(false);
 		fDefaultPipe->CancelQueuedTransfers(true);
+		fDefaultPipe->WaitForUnbusy();
 	}
 
 	// Destroy open endpoints. Do not send a device request to unconfigure

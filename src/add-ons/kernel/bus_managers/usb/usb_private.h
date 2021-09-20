@@ -278,7 +278,8 @@ virtual	status_t						ClearFeature(uint16 selector);
 virtual	status_t						GetStatus(uint16 *status);
 
 protected:
-		void							PutUSBID();
+		void							PutUSBID(bool waitForUnbusy = true);
+		void							WaitForUnbusy();
 
 private:
 		Object *						fParent;

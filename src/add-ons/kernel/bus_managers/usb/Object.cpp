@@ -36,20 +36,26 @@ Object::~Object()
 
 
 void
-Object::PutUSBID()
+Object::PutUSBID(bool waitForUnbusy)
 {
-	if (fUSBID == UINT32_MAX)
-		return;
+	if (fUSBID != UINT32_MAX) {
+		fStack->PutUSBID(this);
+		fUSBID = UINT32_MAX;
+	}
 
-	fStack->PutUSBID(this);
+	if (waitForUnbusy)
+		WaitForUnbusy();
+}
 
+
+void
+Object::WaitForUnbusy()
+{
 	int32 retries = 20;
 	while (atomic_get(&fBusy) != 0 && retries--)
 		snooze(100);
 	if (retries <= 0)
 		panic("USB object did not become unbusy!");
-
-	fUSBID = UINT32_MAX;
 }
 
 
