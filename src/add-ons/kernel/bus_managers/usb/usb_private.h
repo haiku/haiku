@@ -341,7 +341,7 @@ virtual	void							SetDataToggle(bool toggle)
 											{ fDataToggle = toggle; }
 
 		status_t						SubmitTransfer(Transfer *transfer);
-		status_t						CancelQueuedTransfers(bool force);
+virtual	status_t						CancelQueuedTransfers(bool force);
 
 		void							SetControllerCookie(void *cookie)
 											{ fControllerCookie = cookie; }
@@ -413,6 +413,8 @@ static	void							SendRequestCallback(void *cookie,
 											void *data, size_t dataLength,
 											usb_callback_func callback,
 											void *callbackCookie);
+
+virtual	status_t						CancelQueuedTransfers(bool force);
 
 private:
 		mutex							fSendRequestLock;

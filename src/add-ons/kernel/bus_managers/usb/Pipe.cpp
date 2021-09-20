@@ -23,7 +23,7 @@ Pipe::~Pipe()
 {
 	PutUSBID();
 
-	CancelQueuedTransfers(true);
+	Pipe::CancelQueuedTransfers(true);
 	GetBusManager()->NotifyPipeChange(this, USB_CHANGE_DESTROYED);
 }
 
@@ -334,6 +334,10 @@ ControlPipe::ControlPipe(Object *parent)
 
 ControlPipe::~ControlPipe()
 {
+	// We do this here in case a submitted request is still running.
+	PutUSBID();
+	ControlPipe::CancelQueuedTransfers(true);
+
 	if (fNotifySem >= 0)
 		delete_sem(fNotifySem);
 	mutex_lock(&fSendRequestLock);
@@ -464,4 +468,19 @@ ControlPipe::QueueRequest(uint8 requestType, uint8 request, uint16 value,
 	if (result < B_OK)
 		delete transfer;
 	return result;
+}
+
+
+status_t
+ControlPipe::CancelQueuedTransfers(bool force)
+{
+	if (force && fNotifySem >= 0) {
+		// There is likely a transfer currently running; we need to cancel it
+		// manually, as callbacks are not invoked when force-cancelling.
+		fTransferStatus = B_CANCELED;
+		fActualLength = 0;
+		release_sem_etc(fNotifySem, 1, B_RELEASE_IF_WAITING_ONLY);
+	}
+
+	return Pipe::CancelQueuedTransfers(force);
 }
