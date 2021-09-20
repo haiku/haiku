@@ -70,6 +70,8 @@ Transfer::SetData(uint8 *data, size_t dataLength)
 	if (data && dataLength > 0)
 		fVectorCount = 1;
 
+	fFragmented = dataLength > USB_MAX_FRAGMENT_SIZE;
+
 	// Calculate the bandwidth (only if it is not a bulk transfer)
 	if (!(fPipe->Type() & USB_OBJECT_BULK_PIPE)) {
 		if (_CalculateBandwidth() < B_OK)
@@ -97,10 +99,7 @@ Transfer::SetVector(iovec *vector, size_t vectorCount)
 	for (size_t i = 0; i < fVectorCount && length < USB_MAX_FRAGMENT_SIZE; i++)
 		length += fVector[i].iov_len;
 
-	if (length > USB_MAX_FRAGMENT_SIZE) {
-		// the data is too large and would overflow the allocator
-		fFragmented = true;
-	}
+	fFragmented = length > USB_MAX_FRAGMENT_SIZE;
 }
 
 
