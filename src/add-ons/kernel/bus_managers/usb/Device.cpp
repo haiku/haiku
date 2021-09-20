@@ -326,6 +326,13 @@ Device::Device(Object* parent, int8 hubAddress, uint8 hubPort,
 
 Device::~Device()
 {
+	// Cancel transfers on the default pipe and put its USBID to prevent
+	// further transfers from being queued.
+	if (fDefaultPipe != NULL) {
+		fDefaultPipe->PutUSBID();
+		fDefaultPipe->CancelQueuedTransfers(true);
+	}
+
 	// Destroy open endpoints. Do not send a device request to unconfigure
 	// though, since we may be deleted because the device was unplugged already.
 	Unconfigure(false);
@@ -355,8 +362,6 @@ Device::~Device()
 	}
 
 	// Remove ourselves from the stack before deleting public structures.
-	if (fDefaultPipe != NULL)
-		fDefaultPipe->PutUSBID();
 	PutUSBID();
 	delete fDefaultPipe;
 
