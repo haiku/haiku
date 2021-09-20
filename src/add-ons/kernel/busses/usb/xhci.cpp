@@ -788,7 +788,7 @@ XHCI::SubmitControlRequest(Transfer *transfer)
 status_t
 XHCI::SubmitNormalRequest(Transfer *transfer)
 {
-	TRACE("SubmitNormalRequest() length %ld\n", transfer->DataLength());
+	TRACE("SubmitNormalRequest() length %ld\n", transfer->FragmentLength());
 
 	Pipe *pipe = transfer->TransferPipe();
 	usb_isochronous_data *isochronousData = transfer->IsochronousData();
@@ -826,7 +826,7 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 	}
 
 	// Now that we know trbSize, compute the count.
-	const int32 trbCount = (transfer->DataLength() + trbSize - 1) / trbSize;
+	const int32 trbCount = (transfer->FragmentLength() + trbSize - 1) / trbSize;
 
 	xhci_td *td = CreateDescriptor(trbCount, trbCount, trbSize);
 	if (td == NULL)
@@ -834,7 +834,7 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 
 	// Normal Stage
 	const size_t maxPacketSize = pipe->MaxPacketSize();
-	size_t remaining = transfer->DataLength();
+	size_t remaining = transfer->FragmentLength();
 	for (int32 i = 0; i < trbCount; i++) {
 		int32 trbLength = (remaining < trbSize) ? remaining : trbSize;
 		remaining -= trbLength;
@@ -2914,7 +2914,8 @@ XHCI::FinishTransfers()
 			bool directionIn = (transfer->TransferPipe()->Direction() != Pipe::Out);
 
 			status_t callbackStatus = B_OK;
-			switch (td->trb_completion_code) {
+			const uint8 completionCode = td->trb_completion_code;
+			switch (completionCode) {
 				case COMP_SHORT_PACKET:
 				case COMP_SUCCESS:
 					callbackStatus = B_OK;
@@ -2938,18 +2939,19 @@ XHCI::FinishTransfers()
 					break;
 			}
 
-			size_t actualLength = transfer->DataLength();
-			if (td->trb_completion_code != COMP_SUCCESS) {
+			size_t actualLength = transfer->FragmentLength();
+			if (completionCode != COMP_SUCCESS) {
 				actualLength = td->td_transferred;
 				if (td->td_transferred == -1)
-					actualLength = transfer->DataLength() - td->trb_left;
+					actualLength = transfer->FragmentLength() - td->trb_left;
 				TRACE("transfer not successful, actualLength=%" B_PRIuSIZE "\n",
 					actualLength);
 			}
 
 			usb_isochronous_data* isochronousData = transfer->IsochronousData();
 			if (isochronousData != NULL) {
-				size_t packetSize = transfer->DataLength() / isochronousData->packet_count,
+				size_t packetSize = transfer->DataLength()
+						/ isochronousData->packet_count,
 					left = actualLength;
 				for (uint32 i = 0; i < isochronousData->packet_count; i++) {
 					size_t size = min_c(packetSize, left);
@@ -2970,9 +2972,22 @@ XHCI::FinishTransfers()
 					callbackStatus = status;
 				}
 			}
-			transfer->Finished(callbackStatus, actualLength);
-			delete transfer;
+
 			FreeDescriptor(td);
+
+			// this transfer may still have data left
+			transfer->AdvanceByFragment(actualLength);
+			if (completionCode == COMP_SUCCESS
+					&& transfer->FragmentLength() > 0) {
+				TRACE("still %" B_PRIuSIZE " bytes left on transfer\n",
+					transfer->FragmentLength());
+				SubmitTransfer(transfer);
+			} else {
+				// The actualLength was already handled in AdvanceByFragment.
+				transfer->Finished(callbackStatus, 0);
+				delete transfer;
+			}
+
 			mutex_lock(&fFinishedLock);
 		}
 		mutex_unlock(&fFinishedLock);
