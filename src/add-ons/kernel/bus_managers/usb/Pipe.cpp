@@ -68,6 +68,9 @@ Pipe::SetHubInfo(int8 address, uint8 port)
 status_t
 Pipe::SubmitTransfer(Transfer *transfer)
 {
+	if (USBID() == UINT32_MAX)
+		return B_NO_INIT;
+
 	// ToDo: keep track of all submited transfers to be able to cancel them
 	return GetBusManager()->SubmitTransfer(transfer);
 }
@@ -443,6 +446,9 @@ ControlPipe::QueueRequest(uint8 requestType, uint8 request, uint16 value,
 {
 	if (dataLength > 0 && data == NULL)
 		return B_BAD_VALUE;
+
+	if (USBID() == UINT32_MAX)
+		return B_NO_INIT;
 
 	usb_request_data *requestData = new(std::nothrow) usb_request_data;
 	if (!requestData)
