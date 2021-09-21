@@ -444,10 +444,10 @@ frame_buffer_update(addr_t baseAddress, int32 width, int32 height, int32 depth,
 status_t
 frame_buffer_console_init(kernel_args* args)
 {
+	mutex_init(&sConsole.lock, "console_lock");
+
 	if (!args->frame_buffer.enabled)
 		return B_OK;
-
-	mutex_init(&sConsole.lock, "console_lock");
 
 	void* frameBuffer;
 	sConsole.area = map_physical_memory("vesa frame buffer",
