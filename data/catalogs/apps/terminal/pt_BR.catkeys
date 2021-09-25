@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-Terminal	3117643489
+1	portuguese (brazil)	x-vnd.Haiku-Terminal	3771520812
 Close other tabs	Terminal TermWindow		Fechar outras guias
 Insert path	Terminal TermView		Inserir caminho
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal não pôde iniciar o shell. Desculpe.
@@ -32,6 +32,7 @@ Slate	Terminal colors scheme		Ardósia
 Defaults	Terminal PrefWindow		Padrões
 Cancel	Terminal TermView		Cancelar
 Revert	Terminal PrefWindow		Reverter
+Relaxed	Terminal colors scheme		Relaxado
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
 Find next	Terminal TermWindow		Localizar próximo
 Use selection	Terminal FindWindow		Usar seleção

@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-HaikuDepot	3437352458
+1	greek, modern (1453-)	x-vnd.Haiku-HaikuDepot	761125591
 Repository update error	LocalRepositoryUpdateProcess		Σφάλμα ενημέρωσης αποθετηρίων
 Network error	ServerHelper		Σφάλμα δικτύου
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Προέκυψε ένα σφάλμα κατά την ανανέωση του αποθετηρίου: %error%
@@ -8,6 +8,7 @@ Uninstalled	PackageListView		Έγινε απεγκατάσταση
 It was not possible to create the new user.	UserLoginWindow		Δεν ήταν δυνατή η δημιουργία του νέου χρήστη.
 Available packages	MainWindow		Διαθέσιμα πακέτα
 Create account	UserLoginWindow		Δημιουργία λογαριασμού
+Install %PackageTitle%	PackageManager		Εγκατάσταση του πακέτου %PackageTitle%
 OK	App		Εντάξει
 The response to the captcha was incorrect.	ServerHelper		Η απάντηση στο captcha είναι λανθασμένη.
 Develop packages	MainWindow		Ανάπτυξη πακέτων
@@ -123,6 +124,7 @@ Status	PackageListView		Κατάσταση
 The password has been incorrectly repeated.	UserLoginWindow		Ο κωδικός πρόσβασης έχει επαναληφθεί λανθασμένα.
 Network transport error	ServerHelper		Δικτυακό σφάλμα μεταφοράς
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		Ο κωδικός που είχε δοθεί για τον χρήστη [%Nickname%] δεν είναι πια έγκυρος. Θα γίνει έξοδος του χρήστη από την εφαρμογή αυτή, έπειτα θα μπορέσετε να κάνετε είσοδο ξανά με τον ενημερωμένο κωδικό σας.
+Uninstall %PackageTitle%	PackageManager		Απεγκατάσταση του πακέτου %PackageTitle%
 Update	RatePackageWindow		Ενημέρωση
 OK	ServerHelper		Εντάξει
 Language	UserLoginWindow		Γλώσσα
