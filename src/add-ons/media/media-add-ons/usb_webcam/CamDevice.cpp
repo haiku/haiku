@@ -571,8 +571,6 @@ CamDevice::DataPumpThread()
 		for (int i = 0; i<numPacketDescriptors; i++)
 			packetDescriptors[i].request_length = 256;	
 
-		int fullPackets = 0;
-		int totalPackets = 0;
 		while (fTransferEnabled) {
 			ssize_t len = -1;
 			BAutolock lock(fLocker);

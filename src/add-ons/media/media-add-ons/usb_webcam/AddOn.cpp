@@ -175,8 +175,8 @@ WebCamMediaAddOn::CameraRemoved(CamDevice* device)
 void
 WebCamMediaAddOn::FillDefaultFlavorInfo(flavor_info* info)
 {
-	info->name = "USB Web Camera";
-	info->info = "USB Web Camera";
+	info->name = (char *)"USB Web Camera";
+	info->info = (char *)"USB Web Camera";
 	info->kinds = B_BUFFER_PRODUCER | B_CONTROLLABLE | B_PHYSICAL_INPUT;
 	info->flavor_flags = 0;//B_FLAVOR_IS_GLOBAL;
 	info->internal_id = atomic_add((int32*)&fInternalIDCounter, 1);

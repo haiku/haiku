@@ -27,7 +27,7 @@ const usb_webcam_support_descriptor kSupportedDevices[] = {
 };
 
 
-#warning TODO!
+// TODO: Complete implementation!
 
 // datasheets: (scarce)
 // http://www.digchip.com/datasheets/parts/datasheet/132/NW800.php
@@ -88,10 +88,7 @@ NW80xCamDevice::SupportsIsochronous()
 
 status_t
 NW80xCamDevice::StartTransfer()
-{
-	status_t err;
-	uint8 r;
-	
+{	
 	SetScale(1);
 	if (Sensor())
 		SetVideoFrame(BRect(0, 0, Sensor()->MaxWidth()-1, Sensor()->MaxHeight()-1));
@@ -100,6 +97,9 @@ NW80xCamDevice::StartTransfer()
 
 DumpRegs();
 #if 0
+	status_t err;
+	uint8 r;
+
 	err = ReadReg(SN9C102_CHIP_CTRL, &r, 1, true);
 	if (err < 0)
 		return err;
@@ -116,11 +116,11 @@ status_t
 NW80xCamDevice::StopTransfer()
 {
 	status_t err;
-	uint8 r;
-	
-DumpRegs();
+	DumpRegs();
 	err = CamDevice::StopTransfer();
 #if 0
+	uint8 r;
+	
 //	if (err < 0)
 //		return err;
 	err = ReadReg(SN9C102_CHIP_CTRL, &r, 1, true);
@@ -158,7 +158,7 @@ NW80xCamDevice::GetStatusIIC()
 {
 	status_t err = B_ERROR;
 	uint8 status = 0;
-#warning WRITEME
+	// TODO: WRITEME
 	//dprintf(ID "i2c_status: error 0x%08lx, status = %02x\n", err, status);
 	if (err < 0)
 		return err;
@@ -169,8 +169,7 @@ NW80xCamDevice::GetStatusIIC()
 status_t
 NW80xCamDevice::WaitReadyIIC()
 {
-	status_t err;
-#warning WRITEME
+	// TODO: WRITEME
 	return EBUSY;
 }
 
@@ -178,8 +177,7 @@ NW80xCamDevice::WaitReadyIIC()
 ssize_t
 NW80xCamDevice::WriteIIC(uint8 address, uint8 *data, size_t count)
 {
-	status_t err;
-	int i;
+	size_t i;
 	uint8 buffer[0x23];
 	if (count > 16)
 		return EINVAL;
@@ -206,7 +204,6 @@ ssize_t
 NW80xCamDevice::ReadIIC8(uint8 address, uint8 *data)
 {
 	status_t err;
-	int i;
 	uint8 buffer[0x23];
 	memset(buffer, 0, sizeof(buffer));
 	buffer[0x20] = Sensor() ? Sensor()->IICReadAddress() : 0;
@@ -234,7 +231,6 @@ ssize_t
 NW80xCamDevice::ReadIIC16(uint8 address, uint16 *data)
 {
 	status_t err;
-	int i;
 	uint8 buffer[0x23];
 	memset(buffer, 0, sizeof(buffer));
 	buffer[0x20] = Sensor() ? Sensor()->IICReadAddress() : 0;

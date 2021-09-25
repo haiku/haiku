@@ -170,10 +170,10 @@ TAS5110C1BSensor::SetVideoFrame(BRect rect)
 void
 TAS5110C1BSensor::AddParameters(BParameterGroup *group, int32 &index)
 {
-	BContinuousParameter *p;
 	CamSensor::AddParameters(group, index);
 
 #ifdef ENABLE_GAIN
+	BContinuousParameter *p;
 	// NON-FUNCTIONAL
 	BParameterGroup *g = group->MakeGroup("global gain");
 	p = g->MakeContinuousParameter(index++, 

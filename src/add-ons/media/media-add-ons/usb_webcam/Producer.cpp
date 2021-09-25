@@ -711,7 +711,7 @@ VideoProducer::GetParameterValue(
 			*((uint32 *)value) = fColor;
 			return B_OK;
 		case P_INFO:
-			if (*size < fInfoString.Length() + 1)
+			if (*size < (size_t)(fInfoString.Length() + 1))
 				return EINVAL;
 			*last_change = fLastColorChange;
 			*size = fInfoString.Length() + 1;
