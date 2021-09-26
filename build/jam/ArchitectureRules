@@ -723,7 +723,7 @@ rule ArchitectureSetupWarnings architecture
 	EnableWerror src add-ons media plugins ape_reader ;
 	EnableWerror src add-ons media plugins au_reader ;
 #	EnableWerror src add-ons media plugins ffmpeg ;
-#	EnableWerror src add-ons media plugins raw_decoder ;
+	EnableWerror src add-ons media plugins raw_decoder ;
 	EnableWerror src add-ons print ;
 	EnableWerror src add-ons screen_savers ;
 	EnableWerror src add-ons tracker ;
