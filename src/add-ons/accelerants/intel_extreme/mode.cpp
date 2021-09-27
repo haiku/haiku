@@ -115,6 +115,7 @@ set_frame_buffer_registers(uint32 offset)
 {
 	intel_shared_info &sharedInfo = *gInfo->shared_info;
 	display_mode &mode = sharedInfo.current_mode;
+	uint32 bytes_per_pixel = (sharedInfo.bits_per_pixel + 7) / 8;
 
 	if (sharedInfo.device_type.InGroup(INTEL_GROUP_96x)
 		|| sharedInfo.device_type.InGroup(INTEL_GROUP_G4x)
@@ -129,7 +130,7 @@ set_frame_buffer_registers(uint32 offset)
 		} else {
 			write32(INTEL_DISPLAY_A_BASE + offset,
 				mode.v_display_start * sharedInfo.bytes_per_row
-				+ mode.h_display_start * (sharedInfo.bits_per_pixel + 7) / 8);
+				+ mode.h_display_start * bytes_per_pixel);
 			read32(INTEL_DISPLAY_A_BASE + offset);
 		}
 		write32(INTEL_DISPLAY_A_SURFACE + offset, sharedInfo.frame_buffer_offset);
@@ -137,7 +138,7 @@ set_frame_buffer_registers(uint32 offset)
 	} else {
 		write32(INTEL_DISPLAY_A_BASE + offset, sharedInfo.frame_buffer_offset
 			+ mode.v_display_start * sharedInfo.bytes_per_row
-			+ mode.h_display_start * (sharedInfo.bits_per_pixel + 7) / 8);
+			+ mode.h_display_start * bytes_per_pixel);
 		read32(INTEL_DISPLAY_A_BASE + offset);
 	}
 }
@@ -494,8 +495,6 @@ intel_set_display_mode(display_mode* mode)
 
 	// update shared info
 	sharedInfo.current_mode = target;
-
-	// TODO: move to gInfo
 	sharedInfo.bytes_per_row = bytesPerRow;
 	sharedInfo.bits_per_pixel = bitsPerPixel;
 
@@ -638,8 +637,6 @@ intel_get_pixel_clock_limits(display_mode* mode, uint32* _low, uint32* _high)
 status_t
 intel_move_display(uint16 horizontalStart, uint16 verticalStart)
 {
-	CALLED();
-
 	intel_shared_info &sharedInfo = *gInfo->shared_info;
 	Autolock locker(sharedInfo.accelerant_lock);
 
