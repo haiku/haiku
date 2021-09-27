@@ -1,5 +1,7 @@
-#!/usr/bin/sh
-# Detects Haiku on BeFS partitions.
+#!/bin/sh
+# Detects Haiku on BeFS partitions and FUSE mounted BeFS too.
+# Discussion at https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=732696
+# From version 42 (dated 20150811) updated by Jeroen Oortwijn at https://bazaar.launchpad.net/~idefix/ubuntu/trusty/os-prober/HaikuPM/files/head:/os-probes/mounted/x86
 
 . /usr/share/os-prober/common.sh
 
@@ -9,43 +11,38 @@ type="$3"
 
 # Weed out stuff that doesn't apply to us
 case "$type" in
-	befs|befs_be) debug "$partition is a BeFS partition" ;;
+	bfs|befs) debug "$partition is a BeFS partition" ;;
+	fuse|fuseblk) debug "$partition is a FUSE partition" ; mpoint="$mpoint/myfs" ;; # might be befs-fuse
 	*) debug "$partition is not a BeFS partition: exiting"; exit 1 ;;
 esac
 
-if head -c 512 "$partition" | grep -qs 'system.*haiku_loader'; then
-	debug "Stage 1 bootloader found"
+if head -c 512 "$partition" | grep -qs "haiku_loader"; then
+	debug "Haiku stage 1 bootloader found"
 else
-	debug "Stage 1 bootloader not found: exiting"
+	debug "Haiku stage 1 bootloader not found: exiting"
 	exit 1
 fi
 
-system="$(item_in_dir "system" "$mpoint")"
-packages="$(item_in_dir "packages" "$mpoint/$system")"
-found=
-if [ "$system" != "" ] &&
+if system="$(item_in_dir "system" "$mpoint")" &&
+	packages="$(item_in_dir "packages" "$mpoint/$system")" &&
+		item_in_dir -q "haiku_loader-.*\.hpkg" "$mpoint/$system/$packages" &&
+		rev="$(item_in_dir "haiku-.*\.hpkg" "$mpoint/$system/$packages")"
+then
+	debug "Haiku PM stage 2 bootloader and kernel found"
+	label="$(count_next_label Haiku)"
+	rev="$(echo "$rev" | sed 's/haiku-//;s/^\(r[0-9]\+\)./\U\1\E /;s/ \([a-z]\+[0-9]\+\)[_-]/ \1 /;s/ [a-z]*_\?\(hrev[0-9]\+\)\+-/ (\1) /;s/[^ ]\+.hpkg//;s/ $//')"
+	long="Haiku $rev"
+	result "$partition:$long:$label:chain"
+	exit 0
+elif system="$(item_in_dir "system" "$mpoint")" &&
 	item_in_dir -q "haiku_loader" "$mpoint/$system" &&
-	(item_in_dir -q "kernel_x86" "$mpoint/$system" ||
-		item_in_dir -q "kernel_x86_64" "$mpoint/$system")
+	item_in_dir -q "kernel_.*" "$mpoint/$system"
 then
-	found=1
-fi
-
-if [ "$found" = "" ] && [ "$packages" != "" ] &&
-	item_in_dir -q "haiku_loader\-.*" "$mpoint/$system/$packages" &&
-	(item_in_dir -q "haiku_x86\-.*" "$mpoint/$system/$packages" ||
-		item_in_dir -q "haiku_x86_64\-.*" "$mpoint/$system/$packages")
-then
-	found=1
-fi
-
-if [ "$found" != "" ]
-then
-	debug "Stage 2 bootloader and kernel found"
+	debug "Haiku non-PM stage 2 bootloader and kernel found"
 	label="$(count_next_label Haiku)"
 	result "$partition:Haiku:$label:chain"
 	exit 0
 else
-	debug "Stage 2 bootloader and kernel not found: exiting"
+	debug "Haiku stage 2 bootloader and kernel not found: exiting"
 	exit 1
 fi
