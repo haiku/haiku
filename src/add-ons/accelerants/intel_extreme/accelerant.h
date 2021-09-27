@@ -40,8 +40,6 @@ struct accelerant_info {
 	intel_shared_info* shared_info;
 	area_id			shared_info_area;
 
-	display_mode	current_mode;	// pretty much a hack until per-display modes
-
 	display_mode*	mode_list;		// cloned list of standard display modes
 	area_id			mode_list_area;
 

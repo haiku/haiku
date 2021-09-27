@@ -114,7 +114,7 @@ static void
 set_frame_buffer_registers(uint32 offset)
 {
 	intel_shared_info &sharedInfo = *gInfo->shared_info;
-	display_mode &mode = gInfo->current_mode;
+	display_mode &mode = sharedInfo.current_mode;
 
 	if (sharedInfo.device_type.InGroup(INTEL_GROUP_96x)
 		|| sharedInfo.device_type.InGroup(INTEL_GROUP_G4x)
@@ -294,10 +294,16 @@ intel_propose_display_mode(display_mode* target, const display_mode* low,
 		// retain requested virtual size
 		target->virtual_width = VirtualWidth;
 		target->virtual_height = VirtualHeight;
+		// (most) modeflags are outputs from us (the driver). So we should
+		// set them depending on the mode and the current hardware config
+		target->flags |= B_SCROLL;
 		return B_OK;
 	}
 
 	sanitize_display_mode(*target);
+	// (most) modeflags are outputs from us (the driver). So we should
+	// set them depending on the mode and the current hardware config
+	target->flags |= B_SCROLL;
 
 	return is_display_mode_within_bounds(*target, *low, *high)
 		? B_OK : B_BAD_VALUE;
@@ -310,12 +316,12 @@ intel_set_display_mode(display_mode* mode)
 	if (mode == NULL)
 		return B_BAD_VALUE;
 
-	TRACE("%s(%" B_PRIu16 "x%" B_PRIu16 ")\n", __func__,
-		mode->timing.h_display, mode->timing.v_display);
+	TRACE("%s(%" B_PRIu16 "x%" B_PRIu16 ", virtual: %" B_PRIu16 "x%" B_PRIu16 ")\n", __func__,
+		mode->timing.h_display, mode->timing.v_display, mode->virtual_width, mode->virtual_height);
 
 	display_mode target = *mode;
 
-	if (sanitize_display_mode(target)) {
+	if (sanitize_display_mode(target)) {  //should be in proposemode..
 		TRACE("Video mode was adjusted by sanitize_display_mode\n");
 		TRACE("Initial mode: Hd %d Hs %d He %d Ht %d Vd %d Vs %d Ve %d Vt %d\n",
 			mode->timing.h_display, mode->timing.h_sync_start,
@@ -328,6 +334,8 @@ intel_set_display_mode(display_mode* mode)
 			target.timing.v_display, target.timing.v_sync_start,
 			target.timing.v_sync_end, target.timing.v_total);
 	}
+	if (intel_propose_display_mode(&target, &target, &target) != B_OK)
+		return B_BAD_VALUE;
 
 	uint32 colorMode, bytesPerRow, bitsPerPixel;
 	get_color_space_format(target, colorMode, bytesPerRow, bitsPerPixel);
@@ -354,7 +362,7 @@ intel_set_display_mode(display_mode* mode)
 			base) < B_OK) {
 		// oh, how did that happen? Unfortunately, there is no really good way
 		// back. Try to restore a framebuffer for the previous mode, at least.
-		if (intel_allocate_memory(gInfo->current_mode.virtual_height
+		if (intel_allocate_memory(sharedInfo.current_mode.virtual_height
 				* sharedInfo.bytes_per_row, 0, base) == B_OK) {
 			sharedInfo.frame_buffer = base;
 			sharedInfo.frame_buffer_offset = base
@@ -485,7 +493,7 @@ intel_set_display_mode(display_mode* mode)
 	write32(INTEL_DISPLAY_B_BYTES_PER_ROW, bytesPerRow);
 
 	// update shared info
-	gInfo->current_mode = target;
+	sharedInfo.current_mode = target;
 
 	// TODO: move to gInfo
 	sharedInfo.bytes_per_row = bytesPerRow;
@@ -507,7 +515,7 @@ intel_get_display_mode(display_mode* _currentMode)
 {
 	CALLED();
 
-	*_currentMode = gInfo->current_mode;
+	*_currentMode = gInfo->shared_info->current_mode;
 
 	// This seems unreliable. We should always know the current_mode
 	//retrieve_current_mode(*_currentMode, INTEL_DISPLAY_A_PLL);
@@ -635,7 +643,7 @@ intel_move_display(uint16 horizontalStart, uint16 verticalStart)
 	intel_shared_info &sharedInfo = *gInfo->shared_info;
 	Autolock locker(sharedInfo.accelerant_lock);
 
-	display_mode &mode = gInfo->current_mode;
+	display_mode &mode = sharedInfo.current_mode;
 
 	if (horizontalStart + mode.timing.h_display > mode.virtual_width
 		|| verticalStart + mode.timing.v_display > mode.virtual_height)

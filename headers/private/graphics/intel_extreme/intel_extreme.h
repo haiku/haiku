@@ -248,6 +248,7 @@ struct intel_shared_info {
 	area_id			mode_list_area;		// area containing display mode list
 	uint32			mode_count;
 
+	display_mode	current_mode;		// pretty much a hack until per-display modes
 	display_mode	panel_mode;			// VBIOS VBT panel mode
 	uint32			bytes_per_row;
 	uint32			bits_per_pixel;
