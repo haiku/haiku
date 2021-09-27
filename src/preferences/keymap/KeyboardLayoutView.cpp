@@ -18,6 +18,7 @@
 #include <Bitmap.h>
 #include <ControlLook.h>
 #include <LayoutUtils.h>
+#include <InputServerDevice.h>
 #include <MenuItem.h>
 #include <PopUpMenu.h>
 #include <Region.h>
@@ -80,17 +81,18 @@ is_mappable_to_modifier(uint32 keyCode)
 //	#pragma mark - KeyboardLayoutView
 
 
-KeyboardLayoutView::KeyboardLayoutView(const char* name)
+KeyboardLayoutView::KeyboardLayoutView(const char* name, BInputServerDevice* dev)
 	:
 	BView(name, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS),
 	fKeymap(NULL),
-	fEditable(true),
+	fEditable(dev == NULL),
 	fModifiers(0),
 	fDeadKey(0),
 	fButtons(0),
 	fDragKey(NULL),
 	fDropTarget(NULL),
-	fOldSize(0, 0)
+	fOldSize(0, 0),
+	fDevice(dev)
 {
 	fLayout = new KeyboardLayout;
 	memset(fKeyState, 0, sizeof(fKeyState));
@@ -210,7 +212,7 @@ KeyboardLayoutView::MouseDown(BPoint point)
 			|| ((buttons & B_PRIMARY_MOUSE_BUTTON) != 0
 		&& (modifiers() & B_CONTROL_KEY) != 0)) {
 		// secondary mouse button, pop up a swap context menu
-		if (!is_mappable_to_modifier(key->code)) {
+		if (fEditable && !is_mappable_to_modifier(key->code)) {
 			// ToDo: Pop up a list of alternative characters to map
 			// the key to. Currently we only add an option to remove the
 			// current key mapping.
@@ -224,7 +226,7 @@ KeyboardLayoutView::MouseDown(BPoint point)
 			alternativesPopUp->SetAsyncAutoDestruct(true);
 			if (alternativesPopUp->SetTargetForItems(Window()) == B_OK)
 				alternativesPopUp->Go(ConvertToScreen(point), true);
-		} else {
+		} else if (fEditable) {
 			// pop up the modifier keys menu
 			BPopUpMenu* modifiersPopUp = new BPopUpMenu("Modifiers pop up",
 				true, true, B_ITEMS_IN_COLUMN);
@@ -403,7 +405,7 @@ KeyboardLayoutView::MouseUp(BPoint point)
 		_InvalidateKey(key);
 
 		if (fDragKey == NULL)
-			_SendFakeKeyDown(key);
+			_SendKeyDown(key);
 	}
 
 	fDragKey = NULL;
@@ -415,6 +417,10 @@ KeyboardLayoutView::MouseMoved(BPoint point, uint32 transit,
 	const BMessage* dragMessage)
 {
 	if (fKeymap == NULL)
+		return;
+
+	// Ignore mouse-moved events if we are acting as a real input device.
+	if (fDevice != NULL)
 		return;
 
 	// prevent dragging for tertiary mouse button
@@ -607,7 +613,7 @@ KeyboardLayoutView::MessageReceived(BMessage* message)
 				}
 			} else {
 				// Send the old key to the target, so it's not lost entirely
-				_SendFakeKeyDown(fDropTarget);
+				_SendKeyDown(fDropTarget);
 
 				fKeymap->SetKey(fDropTarget->code, fModifiers, fDeadKey,
 					(const char*)data, dataSize);
@@ -1290,7 +1296,7 @@ KeyboardLayoutView::_EvaluateDropTarget(BPoint point)
 
 
 void
-KeyboardLayoutView::_SendFakeKeyDown(const Key* key)
+KeyboardLayoutView::_SendKeyDown(const Key* key)
 {
 	BMessage message(B_KEY_DOWN);
 	message.AddInt64("when", system_time());
@@ -1298,7 +1304,10 @@ KeyboardLayoutView::_SendFakeKeyDown(const Key* key)
 		sizeof(fKeyState));
 	message.AddInt32("key", key->code);
 	message.AddInt32("modifiers", fModifiers);
-	message.AddPointer("keymap", fKeymap);
+	message.AddInt32("be:key_repeat", 1);
+
+	if (fDevice == NULL)
+		message.AddPointer("keymap", fKeymap);
 
 	char* string;
 	int32 numBytes;
@@ -1316,7 +1325,15 @@ KeyboardLayoutView::_SendFakeKeyDown(const Key* key)
 		delete[] string;
 	}
 
-	fTarget.SendMessage(&message);
+	if (fDevice == NULL) {
+		fTarget.SendMessage(&message);
+	} else {
+#if defined(VIRTUAL_KEYBOARD_DEVICE)
+		BMessage* deviceMessage = new BMessage(message);
+		if (fDevice->EnqueueMessage(deviceMessage) != B_OK)
+			delete deviceMessage;
+#endif
+	}
 }
 
 
