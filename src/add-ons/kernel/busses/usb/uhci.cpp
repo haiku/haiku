@@ -1065,6 +1065,19 @@ UHCI::AddPendingTransfer(Transfer *transfer, Queue *queue,
 		return B_ERROR;
 	}
 
+	// We do not support queuing other transfers in tandem with a fragmented one.
+	transfer_data *it = fFirstTransfer;
+	while (it) {
+		if (it->transfer && it->transfer->TransferPipe() == transfer->TransferPipe()
+				&& it->transfer->IsFragmented()) {
+			TRACE_ERROR("cannot submit transfer: a fragmented transfer is queued\n");
+
+			Unlock();
+			delete data;
+			return B_DEV_RESOURCE_CONFLICT;
+		}
+	}
+
 	if (fLastTransfer)
 		fLastTransfer->link = data;
 	if (!fFirstTransfer)

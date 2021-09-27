@@ -1846,6 +1846,14 @@ XHCI::_LinkDescriptorForPipe(xhci_td *descriptor, xhci_endpoint *endpoint)
 		return B_BAD_VALUE;
 	}
 
+	// We do not support queuing other transfers in tandem with a fragmented one.
+	if (endpoint->td_head != NULL && endpoint->td_head->transfer != NULL
+			&& endpoint->td_head->transfer->IsFragmented()) {
+		TRACE_ERROR("cannot submit transfer: a fragmented transfer is queued\n");
+		mutex_unlock(&endpoint->lock);
+		return B_DEV_RESOURCE_CONFLICT;
+	}
+
 	endpoint->used++;
 	descriptor->next = endpoint->td_head;
 	endpoint->td_head = descriptor;

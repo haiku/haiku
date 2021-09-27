@@ -1451,6 +1451,17 @@ OHCI::_SubmitTransfer(Transfer *transfer)
 		= (ohci_endpoint_descriptor *)pipe->ControllerCookie();
 
 	MutexLocker endpointLocker(endpoint->lock);
+
+	// We do not support queuing other transfers in tandem with a fragmented one.
+	transfer_data *it = fFirstTransfer;
+	while (it) {
+		if (it->transfer && it->transfer->TransferPipe() == pipe && it->transfer->IsFragmented()) {
+			TRACE_ERROR("cannot submit transfer: a fragmented transfer is queued\n");
+			_FreeDescriptorChain(firstDescriptor);
+			return B_DEV_RESOURCE_CONFLICT;
+		}
+	}
+
 	result = _AddPendingTransfer(transfer, endpoint, firstDescriptor,
 		firstDescriptor, lastDescriptor, directionIn);
 	if (result < B_OK) {
