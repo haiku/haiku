@@ -13,17 +13,33 @@ case "$type" in
 	*) debug "$partition is not a BeFS partition: exiting"; exit 1 ;;
 esac
 
-if head -c 512 "$partition" | grep -aqs "system.haiku_loader"; then
+if head -c 512 "$partition" | grep -qs 'system.*haiku_loader'; then
 	debug "Stage 1 bootloader found"
 else
 	debug "Stage 1 bootloader not found: exiting"
 	exit 1
 fi
 
-if system="$(item_in_dir "system" "$mpoint")" &&
+system="$(item_in_dir "system" "$mpoint")"
+packages="$(item_in_dir "packages" "$mpoint/$system")"
+found=
+if [ "$system" != "" ] &&
 	item_in_dir -q "haiku_loader" "$mpoint/$system" &&
 	(item_in_dir -q "kernel_x86" "$mpoint/$system" ||
 		item_in_dir -q "kernel_x86_64" "$mpoint/$system")
+then
+	found=1
+fi
+
+if [ "$found" = "" ] && [ "$packages" != "" ] &&
+	item_in_dir -q "haiku_loader\-.*" "$mpoint/$system/$packages" &&
+	(item_in_dir -q "haiku_x86\-.*" "$mpoint/$system/$packages" ||
+		item_in_dir -q "haiku_x86_64\-.*" "$mpoint/$system/$packages")
+then
+	found=1
+fi
+
+if [ "$found" != "" ]
 then
 	debug "Stage 2 bootloader and kernel found"
 	label="$(count_next_label Haiku)"
