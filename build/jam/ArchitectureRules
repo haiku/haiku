@@ -716,7 +716,7 @@ rule ArchitectureSetupWarnings architecture
 	EnableWerror src add-ons media media-add-ons usb_vision ;
 #	EnableWerror src add-ons media media-add-ons usb_webcam ;
 	EnableWerror src add-ons media media-add-ons video_mixer ;
-#	EnableWerror src add-ons media media-add-ons video_producer_demo ;
+	EnableWerror src add-ons media media-add-ons video_producer_demo ;
 	EnableWerror src add-ons media media-add-ons videowindow ;
 	EnableWerror src add-ons media media-add-ons writer ;
 	EnableWerror src add-ons media plugins ape_reader ;
