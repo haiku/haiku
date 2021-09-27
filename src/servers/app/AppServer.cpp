@@ -70,12 +70,15 @@ AppServer::AppServer(status_t* status)
 	// Create the bitmap allocator. Object declared in BitmapManager.cpp
 	gBitmapManager = new BitmapManager();
 
+#if 0
+	// This is not presently needed, as app_server is launched from the login session.
 #ifndef HAIKU_TARGET_PLATFORM_LIBBE_TEST
 	// TODO: check the attached displays, and launch login session for them
 	BMessage data;
 	data.AddString("name", "app_server");
 	data.AddInt32("session", 0);
 	BLaunchRoster().Target("login", data);
+#endif
 #endif
 }
 

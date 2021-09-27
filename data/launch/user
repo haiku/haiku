@@ -1,6 +1,10 @@
-target desktop {
-	env /system/boot/SetupEnvironment
+env /system/boot/SetupEnvironment
 
+service x-vnd.Haiku-app_server {
+	launch /system/servers/app_server
+}
+
+target desktop {
 	service x-vnd.Be-TRAK {
 		launch /system/Tracker
 		legacy
