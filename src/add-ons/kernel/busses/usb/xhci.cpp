@@ -1835,14 +1835,12 @@ XHCI::_LinkDescriptorForPipe(xhci_td *descriptor, xhci_endpoint *endpoint)
 	TRACE("link descriptor for pipe\n");
 
 	// Use mutex_trylock first, in case we are in KDL.
-	if (mutex_trylock(&endpoint->lock) != B_OK)
-		mutex_lock(&endpoint->lock);
+	MutexLocker endpointLocker(&endpoint->lock, mutex_trylock(&endpoint->lock) == B_OK);
 
 	// "used" refers to the number of currently linked TDs, not the number of
 	// used TRBs on the ring (we use 2 TRBs on the ring per transfer.)
 	if (endpoint->used >= (XHCI_MAX_TRANSFERS - 1)) {
 		TRACE_ERROR("link descriptor for pipe: max transfers count exceeded\n");
-		mutex_unlock(&endpoint->lock);
 		return B_BAD_VALUE;
 	}
 
@@ -1850,7 +1848,6 @@ XHCI::_LinkDescriptorForPipe(xhci_td *descriptor, xhci_endpoint *endpoint)
 	if (endpoint->td_head != NULL && endpoint->td_head->transfer != NULL
 			&& endpoint->td_head->transfer->IsFragmented()) {
 		TRACE_ERROR("cannot submit transfer: a fragmented transfer is queued\n");
-		mutex_unlock(&endpoint->lock);
 		return B_DEV_RESOURCE_CONFLICT;
 	}
 
@@ -1945,7 +1942,7 @@ XHCI::_LinkDescriptorForPipe(xhci_td *descriptor, xhci_endpoint *endpoint)
 		B_LENDIAN_TO_HOST_INT32(endpoint->trbs[current].flags));
 
 	endpoint->current = next;
-	mutex_unlock(&endpoint->lock);
+	endpointLocker.Unlock();
 
 	TRACE("Endpoint status 0x%08" B_PRIx32 " 0x%08" B_PRIx32 " 0x%016" B_PRIx64 "\n",
 		_ReadContext(&endpoint->device->device_ctx->endpoints[endpoint->id].dwendpoint0),
@@ -2480,8 +2477,7 @@ XHCI::HandleTransferComplete(xhci_trb* trb)
 	}
 
 	// Use mutex_trylock first, in case we are in KDL.
-	MutexLocker endpointLocker(endpoint->lock,
-		mutex_trylock(&endpoint->lock) == B_OK);
+	MutexLocker endpointLocker(endpoint->lock, mutex_trylock(&endpoint->lock) == B_OK);
 	if (!endpointLocker.IsLocked()) {
 		// We failed to get the lock. Most likely it was destroyed
 		// while we were waiting for it.
