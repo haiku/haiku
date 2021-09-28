@@ -266,10 +266,6 @@ AddFilesToPackage add-ons disk_systems
 # Kernel bluetooth stack
 AddFilesToPackage add-ons kernel bluetooth : $(SYSTEM_BT_STACK) ;
 
-# decorators
-AddFilesToPackage add-ons decorators : BeDecorator ;
-	# MacDecorator WinDecorator
-
 # the MIME DB
 CopyDirectoryToPackage data : <mimedb>mime_db : : : isTarget ;
 

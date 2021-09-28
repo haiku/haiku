@@ -2,8 +2,8 @@ name			haiku_extras
 version			%HAIKU_VERSION%
 architecture	%HAIKU_PACKAGING_ARCH%
 summary			"Haiku extra files"
-description 	"Miscellaneous files and applications for Haiku, usually not
-needed on standard installations."
+description 	"A delightfully hand-curated set of oddities and tidbits to
+enhance your usage of Haiku."
 
 packager		"The Haiku build system"
 vendor			"Haiku Project"

@@ -1,0 +1,10 @@
+SubDir HAIKU_TOP src add-ons control_look FlatControlLook ;
+
+UsePrivateHeaders interface ;
+
+AddResources FlatControlLook : FlatControlLook.rdef ;
+
+Addon FlatControlLook :
+	FlatControlLook.cpp
+	: be <nogrist>app_server [ TargetLibstdc++ ] [ TargetLibsupc++ ]
+;

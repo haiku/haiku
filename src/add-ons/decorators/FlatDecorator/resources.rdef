@@ -1,0 +1,10 @@
+resource("be:decor:info") message('deco') {
+	"name"				= "FlatDecorator",
+	"authors"			= "Nhtello",
+	"short_descr"		= "FlatDecorator for Haiku v1.3",
+	"long_descr"		= "FlatDecorator: best if you use it with FlatControlLook",
+	"lic_url"			= "",
+	"lic_name"			= "MIT",
+	"support_url"		= "http://www.haiku-os.org/",
+	float "version"		= 1.3
+};
