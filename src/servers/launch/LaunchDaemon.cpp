@@ -105,16 +105,17 @@ public:
 			uint32				Flags() const
 									{ return fFlags; }
 
-			int32				CountListeners() const;
-			BaseJob*			ListenerAt(int32 index) const;
+			void				Trigger();
+			void				ResetSticky();
 
-			status_t			AddListener(BaseJob* job);
-			void				RemoveListener(BaseJob* job);
+			status_t			AddDestination(Event* event);
+			void				RemoveDestination(Event* event);
 
 private:
 			BString				fName;
 			uint32				fFlags;
-			BObjectList<BaseJob> fListeners;
+			BObjectList<Event>	fDestinations;
+			bool				fStickyTriggered;
 };
 
 
@@ -206,12 +207,11 @@ private:
 									const BMessage& message);
 
 			ExternalEventSource*
-								_FindEvent(const char* owner,
+								_FindExternalEventSource(const char* owner,
 									const char* name) const;
 			void				_ResolveExternalEvents(
 									ExternalEventSource* event,
 									const BString& name);
-			void				_ResolveExternalEvents(BaseJob* job);
 			void				_GetBaseJobInfo(BaseJob* job, BMessage& info);
 			void				_ForwardEventMessage(uid_t user,
 									BMessage* message);
@@ -274,7 +274,8 @@ ExternalEventSource::ExternalEventSource(BMessenger& source,
 	:
 	fName(name),
 	fFlags(flags),
-	fListeners(5, true)
+	fDestinations(5),
+	fStickyTriggered(false)
 {
 }
 
@@ -291,24 +292,32 @@ ExternalEventSource::Name() const
 }
 
 
-int32
-ExternalEventSource::CountListeners() const
+void
+ExternalEventSource::Trigger()
 {
-	return fListeners.CountItems();
+	for (int32 index = 0; index < fDestinations.CountItems(); index++)
+		Events::TriggerExternalEvent(fDestinations.ItemAt(index));
+
+	if ((fFlags & B_STICKY_EVENT) != 0)
+		fStickyTriggered = true;
 }
 
 
-BaseJob*
-ExternalEventSource::ListenerAt(int32 index) const
+void
+ExternalEventSource::ResetSticky()
 {
-	return fListeners.ItemAt(index);
+	if ((fFlags & B_STICKY_EVENT) != 0)
+		fStickyTriggered = false;
+
+	for (int32 index = 0; index < fDestinations.CountItems(); index++)
+		Events::ResetStickyExternalEvent(fDestinations.ItemAt(index));
 }
 
 
 status_t
-ExternalEventSource::AddListener(BaseJob* job)
+ExternalEventSource::AddDestination(Event* event)
 {
-	if (fListeners.AddItem(job))
+	if (fDestinations.AddItem(event))
 		return B_OK;
 
 	return B_NO_MEMORY;
@@ -316,9 +325,9 @@ ExternalEventSource::AddListener(BaseJob* job)
 
 
 void
-ExternalEventSource::RemoveListener(BaseJob* job)
+ExternalEventSource::RemoveDestination(Event* event)
 {
-	fListeners.RemoveItem(job);
+	fDestinations.RemoveItem(event);
 }
 
 
@@ -415,15 +424,34 @@ status_t
 LaunchDaemon::RegisterExternalEvent(Event* event, const char* name,
 	const BStringList& arguments)
 {
-	// TODO: register actual event with event source
-	return B_OK;
+	status_t status = B_NAME_NOT_FOUND;
+	for (EventMap::iterator iterator = fEvents.begin();
+			iterator != fEvents.end(); iterator++) {
+		ExternalEventSource* eventSource = iterator->second;
+		Event* externalEvent = Events::ResolveExternalEvent(event,
+			eventSource->Name(), eventSource->Flags());
+		if (externalEvent != NULL) {
+			status = eventSource->AddDestination(event);
+			break;
+		}
+	}
+	return status;
 }
 
 
 void
 LaunchDaemon::UnregisterExternalEvent(Event* event, const char* name)
 {
-	// TODO!
+	for (EventMap::iterator iterator = fEvents.begin();
+			iterator != fEvents.end(); iterator++) {
+		ExternalEventSource* eventSource = iterator->second;
+		Event* externalEvent = Events::ResolveExternalEvent(event,
+			eventSource->Name(), eventSource->Flags());
+		if (externalEvent != NULL) {
+			eventSource->RemoveDestination(event);
+			break;
+		}
+	}
 }
 
 
@@ -1059,16 +1087,10 @@ LaunchDaemon::_HandleNotifyLaunchEvent(BMessage* message)
 		const char* ownerName = message->GetString("owner");
 		// TODO: support arguments (as selectors)
 
-		ExternalEventSource* event = _FindEvent(ownerName, name);
+		ExternalEventSource* event = _FindExternalEventSource(ownerName, name);
 		if (event != NULL) {
 			fLog.ExternalEventTriggered(name);
-
-			// Evaluate all of its jobs
-			int32 count = event->CountListeners();
-			for (int32 index = 0; index < count; index++) {
-				BaseJob* listener = event->ListenerAt(index);
-				Events::TriggerExternalEvent(listener->Event(), name);
-			}
+			event->Trigger();
 		}
 	}
 
@@ -1089,15 +1111,9 @@ LaunchDaemon::_HandleResetStickyLaunchEvent(BMessage* message)
 		const char* ownerName = message->GetString("owner");
 		// TODO: support arguments (as selectors)
 
-		ExternalEventSource* event = _FindEvent(ownerName, name);
-		if (event != NULL) {
-			// Evaluate all of its jobs
-			int32 count = event->CountListeners();
-			for (int32 index = 0; index < count; index++) {
-				BaseJob* listener = event->ListenerAt(index);
-				Events::ResetStickyExternalEvent(listener->Event(), name);
-			}
-		}
+		ExternalEventSource* eventSource = _FindExternalEventSource(ownerName, name);
+		if (eventSource != NULL)
+			eventSource->ResetSticky();
 	}
 
 	_ForwardEventMessage(user, message);
@@ -1844,7 +1860,6 @@ LaunchDaemon::_SetEvent(BaseJob* job, const BMessage& message)
 	if (updated) {
 		TRACE("    event: %s\n", event->ToString().String());
 		job->SetEvent(event);
-		_ResolveExternalEvents(job);
 	}
 }
 
@@ -1859,7 +1874,7 @@ LaunchDaemon::_SetEnvironment(BaseJob* job, const BMessage& message)
 
 
 ExternalEventSource*
-LaunchDaemon::_FindEvent(const char* owner, const char* name) const
+LaunchDaemon::_FindExternalEventSource(const char* owner, const char* name) const
 {
 	if (name == NULL)
 		return NULL;
@@ -1886,30 +1901,15 @@ LaunchDaemon::_FindEvent(const char* owner, const char* name) const
 
 
 void
-LaunchDaemon::_ResolveExternalEvents(ExternalEventSource* event,
+LaunchDaemon::_ResolveExternalEvents(ExternalEventSource* eventSource,
 	const BString& name)
 {
 	for (JobMap::iterator iterator = fJobs.begin(); iterator != fJobs.end();
 			iterator++) {
-		Job* job = iterator->second;
-		if (Events::ResolveExternalEvent(job->Event(), name, event->Flags()))
-			event->AddListener(job);
-	}
-}
-
-
-void
-LaunchDaemon::_ResolveExternalEvents(BaseJob* job)
-{
-	if (job->Event() == NULL)
-		return;
-
-	for (EventMap::iterator iterator = fEvents.begin();
-			iterator != fEvents.end(); iterator++) {
-		ExternalEventSource* event = iterator->second;
-		if (Events::ResolveExternalEvent(job->Event(), event->Name(),
-				event->Flags()))
-			event->AddListener(job);
+		Event* externalEvent = Events::ResolveExternalEvent(iterator->second->Event(),
+			name, eventSource->Flags());
+		if (externalEvent != NULL)
+			eventSource->AddDestination(externalEvent);
 	}
 }
 
