@@ -55,7 +55,6 @@ pci_root_supports_device(device_node* parent)
 static status_t
 pci_root_register_device(device_node* parent)
 {
-	dprintf("pci_root_register_device()\n");
 // XXX how do we handle this for PPC?
 // I/O port for PCI config space address
 #define PCI_CONFIG_ADDRESS 0xcf8
@@ -78,7 +77,6 @@ pci_root_register_device(device_node* parent)
 static status_t
 pci_root_register_child_devices(void* cookie)
 {
-	dprintf("pci_root_register_child_devices()\n");
 	device_node* node = (device_node*)cookie;
 
 	pci_info info;
@@ -123,7 +121,6 @@ pci_root_register_child_devices(void* cookie)
 static status_t
 pci_root_init(device_node* node, void** _cookie)
 {
-	dprintf("pci_root_init()\n");
 	*_cookie = node;
 
 	gPCIRootNode = node;
@@ -142,19 +139,9 @@ pci_root_std_ops(int32 op, ...)
 {
 	switch (op) {
 		case B_MODULE_INIT:
-		{
-			dprintf("+pci_root\n");
-/*
-			module_info *module;
-			return get_module(B_PCI_MODULE_NAME, &module);
-				// this serializes our module initialization
-*/
 			return B_OK;
-		}
 
 		case B_MODULE_UNINIT:
-			dprintf("-pci_root\n");
-			// return put_module(B_PCI_MODULE_NAME);
 			return B_OK;
 	}
 
