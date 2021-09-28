@@ -1076,6 +1076,8 @@ UHCI::AddPendingTransfer(Transfer *transfer, Queue *queue,
 			delete data;
 			return B_DEV_RESOURCE_CONFLICT;
 		}
+
+		it = it->link;
 	}
 
 	if (fLastTransfer)

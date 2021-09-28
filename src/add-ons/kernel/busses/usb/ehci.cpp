@@ -1558,6 +1558,8 @@ EHCI::AddPendingTransfer(Transfer *transfer, ehci_qh *queueHead,
 			delete data;
 			return B_DEV_RESOURCE_CONFLICT;
 		}
+
+		it = it->link;
 	}
 
 	if (fLastTransfer)

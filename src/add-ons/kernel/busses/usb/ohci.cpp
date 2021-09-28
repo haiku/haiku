@@ -1460,6 +1460,8 @@ OHCI::_SubmitTransfer(Transfer *transfer)
 			_FreeDescriptorChain(firstDescriptor);
 			return B_DEV_RESOURCE_CONFLICT;
 		}
+
+		it = it->link;
 	}
 
 	result = _AddPendingTransfer(transfer, endpoint, firstDescriptor,
