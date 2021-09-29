@@ -696,7 +696,7 @@ rule ArchitectureSetupWarnings architecture
 	EnableWerror src add-ons kernel network notifications ;
 	EnableWerror src add-ons kernel network ppp ;
 	EnableWerror src add-ons kernel network protocols ;
-#	EnableWerror src add-ons kernel network stack ;
+	EnableWerror src add-ons kernel network stack ;
 	EnableWerror src add-ons kernel partitioning_systems ;
 	EnableWerror src add-ons kernel power ;
 	EnableWerror src add-ons locale ;
