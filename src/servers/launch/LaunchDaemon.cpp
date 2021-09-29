@@ -317,6 +317,9 @@ ExternalEventSource::ResetSticky()
 status_t
 ExternalEventSource::AddDestination(Event* event)
 {
+	if (fStickyTriggered)
+		Events::TriggerExternalEvent(event);
+
 	if (fDestinations.AddItem(event))
 		return B_OK;
 
