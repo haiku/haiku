@@ -96,7 +96,7 @@ Transfer::SetVector(iovec *vector, size_t vectorCount)
 	fBaseAddress = fVector[0].iov_base;
 
 	size_t length = 0;
-	for (size_t i = 0; i < fVectorCount && length < USB_MAX_FRAGMENT_SIZE; i++)
+	for (size_t i = 0; i < fVectorCount && length <= USB_MAX_FRAGMENT_SIZE; i++)
 		length += fVector[i].iov_len;
 
 	fFragmented = length > USB_MAX_FRAGMENT_SIZE;
