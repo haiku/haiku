@@ -17,8 +17,10 @@ licenses {
 flags			system_package
 
 provides {
-#ifdef HAIKU_BUILD_FEATURE_x86_64_x86_64_ENABLED
+#if defined(HAIKU_PACKAGING_ARCH_x86_64)
 	haiku=%HAIKU_VERSION% compat>=R1~alpha4_pm_hrev51198
+#elif defined(HAIKU_PACKAGING_ARCH_x86_gcc2)
+	haiku=%HAIKU_VERSION% compat>=R1~alpha1
 #else
 	haiku=%HAIKU_VERSION% compat>=R1~beta1
 #endif
@@ -48,6 +50,10 @@ provides {
 	cmd:useradd
 	cmd:watch
 	cmd:xres
+
+#if defined(HAIKU_PACKAGING_ARCH_x86_gcc2)
+	lib:libstdc++
+#endif
 }
 
 requires {
@@ -67,9 +73,11 @@ requires {
 	cmd:unzip
 #endif
 
+#if !defined(HAIKU_PACKAGING_ARCH_x86_gcc2)
 	lib:libgcc_s
 	lib:libstdc++
 	lib:libsupc++
+#endif
 
 #ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_libedit_ENABLED
 	lib:libedit
