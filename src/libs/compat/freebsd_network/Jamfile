@@ -58,7 +58,7 @@ rule MIIHeaderGen
 	SEARCH on $(3) = [ FDirName $(SUBDIR) tools ] ;
 
 	Depends $(1) : $(2) $(3) ;
-	MakeLocateArch $(<) ;
+	MakeLocateCommonPlatform $(<) ;
 	MIIHeaderGen1 $(1) : $(2) $(3) ;
 	LocalClean clean : $(<) ;
 }
@@ -76,7 +76,7 @@ rule USBDevsHeaderGen
 	SEARCH on $(3) = [ FDirName $(SUBDIR) tools ] ;
 
 	Depends $(1) : $(2) $(3) ;
-	MakeLocateArch $(<) ;
+	MakeLocateCommonPlatform $(<) ;
 	USBDevsHeaderGen1 $(1) : $(2) $(3) ;
 	LocalClean clean : $(<) ;
 }

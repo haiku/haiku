@@ -22,6 +22,5 @@ KernelAddon marvell_yukon :
 	;
 
 ObjectHdrs [ FGristFiles ukphy$(SUFOBJ) e1000phy$(SUFOBJ) ]
-	: [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR_$(TARGET_PACKAGING_ARCH)) libs
-		compat freebsd_network ] ;
+	: [ FDirName $(HAIKU_COMMON_PLATFORM_OBJECT_DIR) libs compat freebsd_network ] ;
 Includes [ FGristFiles ukphy.c e1000phy.c ] : <src!libs!compat!freebsd_network>miidevs.h ;

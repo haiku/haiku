@@ -21,6 +21,5 @@ KernelAddon rtl81xx :
 	;
 
 ObjectHdrs [ FGristFiles rgephy$(SUFOBJ) rlphy$(SUFOBJ) ]
-	: [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR_$(TARGET_PACKAGING_ARCH)) libs
-		compat freebsd_network ] ;
+	: [ FDirName $(HAIKU_COMMON_PLATFORM_OBJECT_DIR) libs compat freebsd_network ] ;
 Includes [ FGristFiles rgephy.c rlphy.c ] : <src!libs!compat!freebsd_network>miidevs.h ;

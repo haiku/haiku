@@ -30,6 +30,5 @@ KernelAddon pcnet :
 	;
 
 ObjectHdrs [ FGristFiles ukphy$(SUFOBJ) nsphy$(SUFOBJ) nsphyter$(SUFOBJ) ]
-	: [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR_$(TARGET_PACKAGING_ARCH)) libs
-		compat freebsd_network ] ;
+	: [ FDirName $(HAIKU_COMMON_PLATFORM_OBJECT_DIR) libs compat freebsd_network ] ;
 Includes [ FGristFiles ukphy.c nsphy.c nsphyter.c ] : <src!libs!compat!freebsd_network>miidevs.h ;
