@@ -438,7 +438,13 @@ LaunchDaemon::RegisterExternalEvent(Event* event, const char* name,
 			break;
 		}
 	}
-	return status;
+
+	TRACE("Register external event '%s': %" B_PRId32 "\n", name, status);
+
+	// Even if we failed to find a matching source, we do not want to return an error,
+	// as that will be propagated up the chain and prevent this job from being instantiated.
+	// Jobs will be re-scanned later for unregistered external events.
+	return B_OK;
 }
 
 
