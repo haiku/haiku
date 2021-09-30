@@ -4,13 +4,15 @@ RemotePackageRepository HaikuPorts
 	:
 	# architecture "any" packages
 	be_book-2008_10_26-3
-	ca_root_certificates-2021_01_19-1
-	gnu_efi_kernel-3.0.10-1
+	ca_root_certificates-2021_07_05-1
 	haikuporter-1.2.4-1
 	noto-20200106-1
 	noto_sans_cjk_jp-1.004-2
 	timgmsoundfont-fixed-5
 	wqy_microhei-0.2.0~beta-4
+	intel_wifi_firmwares-2019_11_02-1
+	realtek_wifi_firmwares-2019_01_02-1
+	ralink_wifi_firmwares-2015_02_11-1
 	:
 	# repository architecture packages
 	# primary architecture (x86_gcc2)
@@ -18,7 +20,7 @@ RemotePackageRepository HaikuPorts
 	automake-1.16.3-1
 	bash-5.1-1
 	bc-1.07.1-2
-	bepdf-2.1.2-1
+	bepdf-2.1.4-2
 	binutils-2.17_2016_07_24-4
 	bison-3.0.5-1
 	bzip2-1.0.8-1
@@ -27,8 +29,8 @@ RemotePackageRepository HaikuPorts
 	cdrtools_devel-3.02~a09-1
 	ctags-5.8-5
 	coreutils-8.24-2
-	curl-7.76.1-1
-	curl_devel-7.76.1-1
+	curl-7.78.0-1
+	curl_devel-7.78.0-1
 	diffutils-3.7-1
 	expat-2.4.1-1
 	expat_devel-2.4.1-1
@@ -63,7 +65,7 @@ RemotePackageRepository HaikuPorts
 	jam-2.5_2018_11_21-8
 	jasper-2.0.16-4
 	jasper_devel-2.0.16-4
-	keymapswitcher-1.2.7.15-1
+	keymapswitcher-1.2.7.16-1
 	lame-3.100-3
 	lame_devel-3.100-3
 	less-581.2-1
@@ -89,6 +91,8 @@ RemotePackageRepository HaikuPorts
 	libpsl_devel-0.21.0-1
 	libsolv-0.3.0_haiku_2014_12_22-3
 	libsolv_devel-0.3.0_haiku_2014_12_22-3
+	libssh2-1.9.0-2
+	libssh2_devel-1.9.0-2
 	libtheora-1.1.1-7
 	libtheora_devel-1.1.1-7
 	libtool-2.4.6-2
@@ -117,7 +121,7 @@ RemotePackageRepository HaikuPorts
 	openexr_devel-2.2.1-3
 	openjpeg-2.1.2-3
 	openjpeg_devel-2.1.2-3
-	openssh-8.6p1-1
+	openssh-8.6p1-2
 	openssl-1.1.1k-1
 	openssl_devel-1.1.1k-1
 	opus-1.3.1-1
@@ -138,19 +142,21 @@ RemotePackageRepository HaikuPorts
 	taglib-1.7.2-3
 	taglib_devel-1.7.2-3
 	tcpdump-4.9.2-1
-	texinfo-6.1-6
+	texinfo-6.1-7
 	tiff4-4.2.0-1
 	tiff4_devel-4.2.0-1
 	tnftp-20151004-6
 	unzip-6.10c23-4
-	vision-0.10.6-1
+	vision-0.10.6-2
 	wget-1.21.1-1
 	which-2.21-6
 	wonderbrush-2.1.2-11
-	wpa_supplicant-2.9.haiku.1-2
+	wpa_supplicant-2.9.haiku.1-3
 	zip-3.0-4
 	zlib-1.2.11-4
 	zlib_devel-1.2.11-4
+	zstd-1.5.0-2
+	zstd_devel-1.5.0-2
 	# secondary architecture (x86)
 	binutils_x86-2.26.1_2016_07_22-6
 	bison_x86-3.7.6-1
@@ -158,10 +164,10 @@ RemotePackageRepository HaikuPorts
 	bzip2_x86_devel-1.0.8-1
 	cdrtools_x86-3.02~a09-1
 	cdrtools_x86_devel-3.02~a09-1
-	curl_x86-7.76.1-1
-	curl_x86_devel-7.76.1-1
-	dav1d_x86-0.8.2-1
-	dav1d_x86_devel-0.8.2-1
+	curl_x86-7.78.0-1
+	curl_x86_devel-7.78.0-1
+	dav1d_x86-0.9.1-1
+	dav1d_x86_devel-0.9.1-1
 	enca_x86-1.19-2
 	enca_x86_devel-1.19-2
 	expat_x86-2.4.1-1
@@ -205,11 +211,13 @@ RemotePackageRepository HaikuPorts
 	lcms_x86_devel-2.12-1
 	libass_x86-0.15.1-1
 	libass_x86_devel-0.15.1-1
+	libavif_x86-0.8.4-2
+	libavif_x86_devel-0.8.4-2
 	libedit_x86-20210419_3.1-1
 	libedit_x86_devel-20210419_3.1-1
 	libexecinfo_x86-1.1-5
-	libffi_x86-3.2.1-6
-	libffi_x86_devel-3.2.1-6
+	libffi_x86-3.4.2-1
+	libffi_x86_devel-3.4.2-1
 	libgcrypt_x86-1.8.5-1
 	libgpg_error_x86-1.36-1
 	libiconv_x86-1.16-1
@@ -230,6 +238,8 @@ RemotePackageRepository HaikuPorts
 	libpng16_x86_devel-1.6.37-1
 	libsolv_x86-0.3.0_haiku_2014_12_22-3
 	libsolv_x86_devel-0.3.0_haiku_2014_12_22-3
+	libssh2_x86-1.9.0-2
+	libssh2_x86_devel-1.9.0-2
 	libtasn1_x86-4.16.0-1
 	libtheora_x86-1.1.1-7
 	libtheora_x86_devel-1.1.1-7
@@ -269,7 +279,7 @@ RemotePackageRepository HaikuPorts
 	opus_x86_devel-1.3.1-1
 	p7zip_x86-17.04-2
 	pkgconfig_x86-0.29.2-4
-	python3_x86-3.7.10-4
+	python3_x86-3.7.10-5
 	readline_x86-8.1-1
 	sharutils_x86-4.15.2-3
 	snappy_x86-1.1.8-1
@@ -290,6 +300,8 @@ RemotePackageRepository HaikuPorts
 	xz_utils_x86_devel-5.2.5-1
 	zlib_x86-1.2.11-4
 	zlib_x86_devel-1.2.11-4
+	zstd_x86-1.5.0-2
+	zstd_x86_devel-1.5.0-2
 	:
 	# source packages
 	autoconf
@@ -343,6 +355,7 @@ RemotePackageRepository HaikuPorts
 	lcms_x86
 	less
 	libass_x86
+	libavif_x86
 	libedit
 	libedit_x86
 	libexecinfo
@@ -364,6 +377,7 @@ RemotePackageRepository HaikuPorts
 	libpng16
 	libpsl
 	libsolv
+	libssh2
 	libtasn1
 	libtheora
 	libtool
@@ -427,6 +441,7 @@ RemotePackageRepository HaikuPorts
 	xz_utils_x86
 	zip
 	zlib
+	zstd
 	:
 	# debuginfo packages
 	bison
