@@ -27,19 +27,19 @@ NO_HAIKU_REENABLE_INTERRUPTS();
 HAIKU_DRIVER_REQUIREMENTS(FBSD_TASKQUEUES | FBSD_WLAN);
 HAIKU_FIRMWARE_VERSION(44417);
 HAIKU_FIRMWARE_NAME_MAP({
-	{"iwn100fw", "iwlwifi-100-5.ucode"},
-	{"iwn105fw", "iwlwifi-105-6.ucode"},
-	{"iwn135fw", "iwlwifi-135-6.ucode"},
-	{"iwn1000fw", "iwlwifi-1000-5.ucode"},
-	{"iwn2000fw", "iwlwifi-2000-6.ucode"},
-	{"iwn2030fw", "iwlwifi-2030-6.ucode"},
-	{"iwn4965fw", "iwlwifi-4965-2.ucode"},
-	{"iwn5000fw", "iwlwifi-5000-5.ucode"},
-	{"iwn5150fw", "iwlwifi-5150-2.ucode"},
-	{"iwn6000fw", "iwlwifi-6000-4.ucode"},
-	{"iwn6000g2afw", "iwlwifi-6000g2a-6.ucode"},
-	{"iwn6000g2bfw", "iwlwifi-6000g2b-6.ucode"},
-	{"iwn6050fw", "iwlwifi-6050-5.ucode"}
+	{"iwn100fw", "iwlwifi-100-39.ucode"},
+	{"iwn105fw", "iwlwifi-105-6-18.ucode"},
+	{"iwn135fw", "iwlwifi-135-6-18.ucode"},
+	{"iwn1000fw", "iwlwifi-1000-39.ucode"},
+	{"iwn2000fw", "iwlwifi-2000-18.ucode"},
+	{"iwn2030fw", "iwlwifi-2030-18.ucode"},
+	{"iwn4965fw", "iwlwifi-4965-228.ucode"},
+	{"iwn5000fw", "iwlwifi-5000-8.ucode"},
+	{"iwn5150fw", "iwlwifi-5150-8.ucode"},
+	{"iwn6000fw", "iwlwifi-6000-9.ucode"},
+	{"iwn6000g2afw", "iwlwifi-6000g2a-18.ucode"},
+	{"iwn6000g2bfw", "iwlwifi-6000g2b-18.ucode"},
+	{"iwn6050fw", "iwlwifi-6050-41.ucode"}
 });
 
 

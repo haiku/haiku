@@ -64,6 +64,12 @@ requires {
 	noto_sans_cjk_jp
 #endif
 
+#ifdef HAIKU_REGULAR_BUILD
+	intel_wifi_firmwares
+	ralink_wifi_firmwares
+	realtek_wifi_firmwares
+#endif
+
 	coreutils
 	cmd:sh
 #ifdef HAIKU_REGULAR_BUILD
