@@ -67,7 +67,7 @@ if $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 {
 
 # drivers
 AddNewDriversToPackage 				: wmi@x86,x86_64 ;
-AddNewDriversToPackage disk			: nvme_disk@x86,x86_64 ;
+AddNewDriversToPackage disk			: nvme_disk ;
 AddNewDriversToPackage disk mmc		: mmc_disk ;
 AddNewDriversToPackage disk scsi	: scsi_cd scsi_disk ;
 AddNewDriversToPackage disk virtual : virtio_block ram_disk ;
@@ -202,7 +202,7 @@ AddBootModuleSymlinksToPackage
 	ide_isa@x86 isa@x86,x86_64 intel it8211
 	legacy_sata locked_pool
 	mmc mmc_disk
-	nvme_disk@x86,x86_64
+	nvme_disk
 	openpic@ppc
 	packagefs pci
 	fdt@riscv64,arm
