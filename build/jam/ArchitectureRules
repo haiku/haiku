@@ -690,7 +690,7 @@ rule ArchitectureSetupWarnings architecture
 	EnableWerror src add-ons kernel file_systems udf ;
 	EnableWerror src add-ons kernel file_systems userlandfs ;
 	EnableWerror src add-ons kernel generic ;
-#	EnableWerror src add-ons kernel network datalink_protocols ;
+	EnableWerror src add-ons kernel network datalink_protocols ;
 	EnableWerror src add-ons kernel network devices ;
 	EnableWerror src add-ons kernel network dns_resolver ;
 	EnableWerror src add-ons kernel network notifications ;
