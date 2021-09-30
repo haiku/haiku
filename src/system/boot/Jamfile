@@ -63,11 +63,11 @@ rule BuildCoffLoader {
 actions BuildCoffLoader bind HACK_COFF {
 	$(RM) -f $(1)
 	# get the address of the COFF entry
-	$(TARGET_OBJCOPY_$(TARGET_PACKAGING_ARCH)) -O symbolsrec $(2) $(2).syms
+	$(TARGET_OBJCOPY_$(TARGET_KERNEL_ARCH)) -O symbolsrec $(2) $(2).syms
 	EP=`grep _coff_start $(2).syms | tr -d '\r' | cut -d'$' -f2`
 	$(RM) -f $(2).syms
 	# copy to XCOFF format and patch the entry point
-	$(TARGET_OBJCOPY_$(TARGET_PACKAGING_ARCH)) -O $(COFF_FORMAT) --set-start="0x${EP}" $(2) $(1)
+	$(TARGET_OBJCOPY_$(TARGET_KERNEL_ARCH)) -O $(COFF_FORMAT) --set-start="0x${EP}" $(2) $(1)
 	#$(CP) $(2) $(1)
 	# fill-in some fields objcopy missed
 	$(HACK_COFF) $(1)
@@ -93,7 +93,7 @@ rule BuildBiosLoader {
 
 actions BuildBiosLoader {
 	$(RM) -f $(1)
-	$(TARGET_OBJCOPY_$(TARGET_PACKAGING_ARCH)) -O binary $(2) $(1)
+	$(TARGET_OBJCOPY_$(TARGET_KERNEL_ARCH)) -O binary $(2) $(1)
 }
 
 
@@ -127,12 +127,12 @@ actions BuildEFILoader
 	$(RM) -f $(1)
 	if [ "$(OUTPUT_TARGET)" = "binary" ]; then
 		# no bfd support, fake efi Pe header
-		$(TARGET_OBJCOPY_$(TARGET_PACKAGING_ARCH)) -j .text -j .sdata -j .data \
+		$(TARGET_OBJCOPY_$(TARGET_KERNEL_ARCH)) -j .text -j .sdata -j .data \
 			-j .dynamic -j .dynsym -j .rel* -j .rela* -j .reloc -j .dynstr \
 			--output-target=$(OUTPUT_TARGET) $(2) $(1)
 	else
 		# bfd supports pe + efi for arch
-		$(TARGET_OBJCOPY_$(TARGET_PACKAGING_ARCH)) -j .text -j .sdata -j .data \
+		$(TARGET_OBJCOPY_$(TARGET_KERNEL_ARCH)) -j .text -j .sdata -j .data \
 			-j .dynamic -j .dynsym -j .rel* -j .rela* -j .reloc -j .dynstr \
 			--output-target=$(OUTPUT_TARGET) \
 			--subsystem=efi-app $(2) $(1)
@@ -222,7 +222,7 @@ rule AtariBootPrgLd
 {
 	# AtariBootPrgLd <name> : <objs> : <linkerscript> : <args> ;
 
-	LINK on $(1) = $(TARGET_LD_$(TARGET_PACKAGING_ARCH)) ;
+	LINK on $(1) = $(TARGET_LD_$(TARGET_KERNEL_ARCH)) ;
 
 	LINKFLAGS on $(1) = $(4) ;
 	if $(3) { LINKFLAGS on $(1) += --script=$(3) ; }
@@ -250,7 +250,7 @@ actions AtariBootPrgLd
 
 
 local extraSources = ;
-if $(TARGET_CC_IS_LEGACY_GCC_$(TARGET_PACKAGING_ARCH)) = 1 {
+if $(TARGET_CC_IS_LEGACY_GCC_$(TARGET_KERNEL_ARCH)) = 1 {
 	extraSources += atomic.S ;
 }
 

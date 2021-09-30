@@ -76,9 +76,9 @@ rule SetupBoot
 		SourceSysHdrs $(sources) : $(TARGET_PRIVATE_KERNEL_HEADERS) ;
 	}
 
-	if $(HAIKU_BOOT_C++_HEADERS_DIR_$(TARGET_PACKAGING_ARCH)) {
+	if $(HAIKU_BOOT_C++_HEADERS_DIR_$(TARGET_KERNEL_ARCH)) {
 		SourceSysHdrs $(sources) :
-			$(HAIKU_BOOT_C++_HEADERS_DIR_$(TARGET_PACKAGING_ARCH)) ;
+			$(HAIKU_BOOT_C++_HEADERS_DIR_$(TARGET_KERNEL_ARCH)) ;
 	}
 
 	# MultiBootSubDirSetup sets the target boot platform on the target object,
@@ -90,6 +90,8 @@ rule SetupBoot
 	local platform = $(TARGET_BOOT_PLATFORM:U) ;
 	local object ;
 	for object in $(objects) {
+		TARGET_PACKAGING_ARCH on $(object) = $(TARGET_KERNEL_ARCH) ;
+
 		# add boot flags for the object
 		ObjectCcFlags $(object) : $(HAIKU_BOOT_CCFLAGS) $(HAIKU_BOOT_$(platform)_CCFLAGS) $(2) ;
 		ObjectC++Flags $(object) : $(HAIKU_BOOT_C++FLAGS) $(HAIKU_BOOT_$(platform)_C++FLAGS) $(2) ;
@@ -97,13 +99,13 @@ rule SetupBoot
 		ASFLAGS on $(object) = $(HAIKU_BOOT_CCFLAGS) $(HAIKU_BOOT_$(platform)_CCFLAGS) ;
 
 		# override regular CCFLAGS/C++FLAGS, as we don't want them
-		TARGET_CCFLAGS_$(TARGET_PACKAGING_ARCH) on $(object) = ;
-		TARGET_C++FLAGS_$(TARGET_PACKAGING_ARCH) on $(object) = ;
+		TARGET_CCFLAGS_$(TARGET_KERNEL_ARCH) on $(object) = ;
+		TARGET_C++FLAGS_$(TARGET_KERNEL_ARCH) on $(object) = ;
 
 		# override warning flags
-		TARGET_WARNING_CCFLAGS_$(TARGET_PACKAGING_ARCH) on $(object)
+		TARGET_WARNING_CCFLAGS_$(TARGET_KERNEL_ARCH) on $(object)
 			= $(TARGET_KERNEL_WARNING_CCFLAGS) ;
-		TARGET_WARNING_C++FLAGS_$(TARGET_PACKAGING_ARCH) on $(object)
+		TARGET_WARNING_C++FLAGS_$(TARGET_KERNEL_ARCH) on $(object)
 			= $(TARGET_KERNEL_WARNING_C++FLAGS) ;
 	 }
 }
@@ -118,7 +120,7 @@ rule BootLd
 {
 	# BootLd <name> : <objs> : <linkerscript> : <args> ;
 
-	LINK on $(1) = $(TARGET_LD_$(TARGET_PACKAGING_ARCH)) ;
+	LINK on $(1) = $(TARGET_LD_$(TARGET_KERNEL_ARCH)) ;
 
 	LINKFLAGS on $(1) = $(HAIKU_BOOT_$(TARGET_BOOT_PLATFORM:U)_LDFLAGS) $(4) ;
 	if $(3) { LINKFLAGS on $(1) += --script=$(3) ; }
@@ -130,8 +132,8 @@ rule BootLd
 		libs += [ TargetBootLibsupc++ true ] ;
 		Depends $(1) : [ TargetBootLibsupc++ ] ;
 	}
-	LINKLIBS on $(1) = $(libs) [ TargetBootLibgcc true ] ;
-	Depends $(1) : [ TargetBootLibgcc ] ;
+	LINKLIBS on $(1) = $(libs) [ TargetBootLibgcc $(TARGET_KERNEL_ARCH) : true ] ;
+	Depends $(1) : [ TargetBootLibgcc $(TARGET_KERNEL_ARCH) ] ;
 
 	# TODO: Do we really want to invoke SetupBoot here? The objects should
 	# have been compiled with BootObjects anyway, so we're doing that twice.
@@ -205,7 +207,7 @@ actions BootStaticLibraryObjects
 	# Force recreation of the archive to avoid build errors caused by
 	# stale dependencies after renaming or deleting object files.
 	$(RM) "$(1)"
-	$(HAIKU_AR_$(TARGET_PACKAGING_ARCH)) -r "$(1)" "$(2)" ;
+	$(HAIKU_AR_$(TARGET_KERNEL_ARCH)) -r "$(1)" "$(2)" ;
 }
 
 rule BuildMBR binary : source

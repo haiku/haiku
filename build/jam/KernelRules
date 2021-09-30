@@ -16,14 +16,16 @@ rule SetupKernel
 
 	local object ;
 	for object in $(objects) {
+		TARGET_PACKAGING_ARCH on $(object) = $(TARGET_KERNEL_ARCH) ;
+
 		# add kernel flags for the object
 		ObjectCcFlags $(object) : $(TARGET_KERNEL_CCFLAGS) $(2) ;
 		ObjectC++Flags $(object) : $(TARGET_KERNEL_C++FLAGS) $(2) ;
 		ObjectDefines $(object) : $(TARGET_KERNEL_DEFINES) ;
 
 		# override regular CCFLAGS/C++FLAGS, as we don't want them
-		TARGET_CCFLAGS_$(TARGET_PACKAGING_ARCH) on $(object) = ;
-		TARGET_C++FLAGS_$(TARGET_PACKAGING_ARCH) on $(object) = ;
+		TARGET_CCFLAGS_$(TARGET_KERNEL_ARCH) on $(object) = ;
+		TARGET_C++FLAGS_$(TARGET_KERNEL_ARCH) on $(object) = ;
 
 		# override warning flags
 		TARGET_WARNING_CCFLAGS_$(TARGET_PACKAGING_ARCH) on $(object)
@@ -43,7 +45,7 @@ rule KernelLd
 {
 	# KernelLd <name> : <objs> : <linkerscript> : <args> ;
 
-	LINK on $(1) = $(TARGET_LD_$(TARGET_PACKAGING_ARCH)) ;
+	LINK on $(1) = $(TARGET_LD_$(HAIKU_KERNEL_ARCH)) ;
 
 	LINKFLAGS on $(1) = $(4) ;
 	if $(3) {
@@ -103,7 +105,7 @@ actions KernelSo1
 	export $(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
 
 	$(2[1]) --data $(2[2]) $(1) &&
-	$(HAIKU_ELFEDIT_$(TARGET_PACKAGING_ARCH)) --output-type dyn $(1)
+	$(HAIKU_ELFEDIT_$(HAIKU_KERNEL_ARCH)) --output-type dyn $(1)
 }
 
 rule KernelAddon
@@ -114,6 +116,8 @@ rule KernelAddon
 	local sources = $(2) ;
 	local libs = $(3) ;
 	AddResources $(1) : $(4) ;
+
+	TARGET_PACKAGING_ARCH on $(target) = $(TARGET_KERNEL_ARCH) ;
 
 	local kernel ;
 	local beginGlue ;
@@ -164,6 +168,8 @@ rule KernelMergeObject
 	#                  will be added.
 	#
 
+	TARGET_PACKAGING_ARCH on $(1) = $(TARGET_KERNEL_ARCH) ;
+
 	SetupKernel $(2) : $(3) ;
 	Objects $(2) ;
 	MergeObjectFromObjects $(1) : $(2:S=$(SUFOBJ)) : $(4) ;
@@ -175,6 +181,8 @@ rule KernelStaticLibrary
 	# This is designed to take a set of sources and libraries and create
 	# a static library.
 
+	TARGET_PACKAGING_ARCH on $(1) = $(TARGET_KERNEL_ARCH) ;
+
 	SetupKernel $(2) : $(3) : false ;
 	Library $(1) : $(2) ;
 }
@@ -184,6 +192,8 @@ rule KernelStaticLibraryObjects
 	# Usage KernelStaticLibrary <name> : <sources> ;
 	# This is designed to take a set of sources and libraries and create
 	# a file called <name>
+
+	TARGET_PACKAGING_ARCH on $(1) = $(TARGET_KERNEL_ARCH) ;
 
 	# Show that we depend on the libraries we need
 	SetupKernel $(2) ;
@@ -199,5 +209,5 @@ actions KernelStaticLibraryObjects
 	# Force recreation of the archive to avoid build errors caused by
 	# stale dependencies after renaming or deleting object files.
 	$(RM) "$(1)"
-	$(HAIKU_AR_$(TARGET_PACKAGING_ARCH)) -r "$(1)" "$(2)" ;
+	$(HAIKU_AR_$(HAIKU_KERNEL_ARCH)) -r "$(1)" "$(2)" ;
 }

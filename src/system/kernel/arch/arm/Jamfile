@@ -58,5 +58,5 @@ KernelMergeObject kernel_arch_arm.o :
 	kernel_fdt.a
 ;
 
-CreateAsmStructOffsetsHeader asm_offsets.h : asm_offsets.cpp ;
+CreateAsmStructOffsetsHeader asm_offsets.h : asm_offsets.cpp : $(TARGET_KERNEL_ARCH) ;
 

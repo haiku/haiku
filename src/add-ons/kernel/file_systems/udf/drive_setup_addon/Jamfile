@@ -13,7 +13,7 @@ oldOPTIM = $(OPTIM) ;
 		defines += COMPILE_FOR_R5 ;
 	}
 
-	if $(TARGET_PACKAGING_ARCH) = x86_gcc2 {
+	if $(TARGET_KERNEL_ARCH) = x86_gcc2 {
 		# the gcc on BeOS doesn't compile BFS correctly with -O2 or more
 		OPTIM = -O1 ;
 	}

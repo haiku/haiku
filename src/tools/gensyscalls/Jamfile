@@ -150,7 +150,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 				[ FDirName $(SUBDIR) arch $(TARGET_ARCH_$(architecture)) ]
 				$(TARGET_PRIVATE_SYSTEM_HEADERS_$(architecture)) ;
 		CreateAsmStructOffsetsHeader $(syscallTypesSizes)
-			: $(syscallTypesSizesSource) ;
+			: $(syscallTypesSizesSource) : $(TARGET_PACKAGING_ARCH) ;
 
 		#Includes $(syscallInfos) : $(syscallTypesSizes) ;
 			# explicitly tell jam about the inclusion of the generated header

@@ -6,12 +6,13 @@ rule Link
 {
 	# Note: RESFILES must be set before invocation.
 
+	local architecture = [ on $(1) return $(TARGET_PACKAGING_ARCH) ] ;
 	if [ on $(1) return $(PLATFORM) ] = host {
 		LINK on $(1) = $(HOST_LINK) ;
 	 	LINKFLAGS on $(1) = $(HOST_LINKFLAGS) [ on $(1) return $(LINKFLAGS) ] ;
 	} else {
-		LINK on $(1) = $(TARGET_LINK_$(TARGET_PACKAGING_ARCH)) ;
-	 	LINKFLAGS on $(1) = $(TARGET_LINKFLAGS_$(TARGET_PACKAGING_ARCH))
+		LINK on $(1) = $(TARGET_LINK_$(architecture)) ;
+		LINKFLAGS on $(1) = $(TARGET_LINKFLAGS_$(architecture))
 			[ on $(1) return $(LINKFLAGS) ] ;
 	}
 

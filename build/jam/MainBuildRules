@@ -258,14 +258,16 @@ actions Ld
 	$(LINK) $(LINKFLAGS) -o "$(1)" "$(2)" "$(NEEDLIBS)" $(LINKLIBS)
 }
 
-rule CreateAsmStructOffsetsHeader header : source
+rule CreateAsmStructOffsetsHeader header : source : architecture
 {
-	# CreateAsmStructOffsetsHeader header : source
+	# CreateAsmStructOffsetsHeader header : source : architecture
 	#
 	# Grist will be added to both header and source.
 
 	header = [ FGristFiles $(header) ] ;
 	source = [ FGristFiles $(source) ] ;
+
+	TARGET_PACKAGING_ARCH on $(header) = $(architecture) ;
 
 	# find out which headers, defines, etc. to use
 	local headers ;
@@ -367,7 +369,8 @@ rule CreateAsmStructOffsetsHeader header : source
 
 	Depends $(header) : $(source) $(PLATFORM) ;
 	SEARCH on $(source) += $(SEARCH_SOURCE) ;
-	MakeLocateArch $(header) ;
+	MakeLocate $(header) : [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR_$(architecture))
+		system kernel ] ;
 	LocalClean clean : $(header) ;
 
 	HDRRULE on $(source) = HdrRule ;

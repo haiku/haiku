@@ -78,12 +78,12 @@ KernelMergeObject kernel_core.o :
 
 # Generate the header defining macros for C++ structure sizes.
 local kernelC++StructSizesHeader = [ FGristFiles kernel_c++_struct_sizes.h ] ;
-TARGET_HDRS_$(TARGET_PACKAGING_ARCH) on $(kernelC++StructSizesHeader)
+TARGET_HDRS_$(TARGET_KERNEL_ARCH) on $(kernelC++StructSizesHeader)
 	= [ on $(kernelC++StructSizesHeader)
-			return $(TARGET_HDRS_$(TARGET_PACKAGING_ARCH)) ]
+			return $(TARGET_HDRS_$(TARGET_KERNEL_ARCH)) ]
 		$(TARGET_PRIVATE_KERNEL_HEADERS) ;
 CreateAsmStructOffsetsHeader $(kernelC++StructSizesHeader)
-	: kernel_c++_structs.cpp ;
+	: kernel_c++_structs.cpp : $(TARGET_KERNEL_ARCH) ;
 
 # We need to specify the dependency on the generated syscalls files explicitly.
 Includes [ FGristFiles syscalls.cpp ]

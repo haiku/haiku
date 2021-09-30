@@ -341,7 +341,7 @@ rule KernelArchitectureSetup architecture
 		;
 
 	# C/C++ flags
-	local ccBaseFlags = -finline -fno-builtin ;
+	local ccBaseFlags = -finline -fno-builtin -Wno-main ;
 
 	if $(HAIKU_CC_IS_LEGACY_GCC_$(architecture)) != 1 {
 		if $(HAIKU_CC_IS_CLANG_$(architecture)) != 1 {
@@ -468,6 +468,11 @@ rule KernelArchitectureSetup architecture
 	}
 
 	# bootloader-centric flags
+	HAIKU_BOOT_CCFLAGS
+		+= -DBOOT_ARCHIVE_IMAGE_OFFSET=$(HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET) ;
+	HAIKU_BOOT_C++FLAGS
+		+= -DBOOT_ARCHIVE_IMAGE_OFFSET=$(HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET) ;
+
 	local bootTarget ;
 	for bootTarget in $(HAIKU_BOOT_TARGETS) {
 		switch $(bootTarget) {
@@ -556,11 +561,6 @@ rule KernelArchitectureSetup architecture
 
 	# defines
 	HAIKU_KERNEL_DEFINES += _KERNEL_MODE ;
-
-	HAIKU_DEFINES_$(architecture)
-		+= BOOT_ARCHIVE_IMAGE_OFFSET=$(HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET) ;
-		# TODO: That doesn't need to be a general define. It's just needed for
-		# compiling (part of) the boot loader.
 
 	# kernel add-on glue code
 	HAIKU_KERNEL_ADDON_BEGIN_GLUE_CODE = <$(architecture)>crtbeginS.o

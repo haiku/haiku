@@ -114,7 +114,12 @@ for architecture in $(HAIKU_PACKAGING_ARCHS) {
 }
 
 if $(HAIKU_PACKAGING_ARCH) {
-	KernelArchitectureSetup $(HAIKU_PACKAGING_ARCH) ;
+	local kernelArch = $(HAIKU_PACKAGING_ARCH) ;
+	# Always use the non-legacy GCC for the kernel.
+	if $(kernelArch) = x86_gcc2 {
+		kernelArch = x86 ;
+	}
+	KernelArchitectureSetup $(kernelArch) ;
 }
 
 # define primary packaging architecture macro
