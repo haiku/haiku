@@ -4,13 +4,15 @@ RemotePackageRepository HaikuPorts
 	:
 	# architecture "any" packages
 	be_book-2008_10_26-3
-	ca_root_certificates-2021_01_19-1
-	gnu_efi_kernel-3.0.10-1
+	ca_root_certificates-2021_07_05-1
 	haikuporter-1.2.4-1
 	noto-20200106-1
 	noto_sans_cjk_jp-1.004-2
 	timgmsoundfont-fixed-5
 	wqy_microhei-0.2.0~beta-4
+	intel_wifi_firmwares-2019_11_02-1
+	realtek_wifi_firmwares-2019_01_02-1
+	ralink_wifi_firmwares-2015_02_11-1
 	:
 	# repository architecture packages
 	# primary architecture (x86_64)
@@ -18,7 +20,7 @@ RemotePackageRepository HaikuPorts
 	automake-1.16.3-1
 	bash-5.1-1
 	bc-1.07.1-2
-	bepdf-2.1.2-1
+	bepdf-2.1.4-2
 	binutils-2.31.1-2
 	bison-3.7.6-1
 	bzip2-1.0.8-1
@@ -27,10 +29,10 @@ RemotePackageRepository HaikuPorts
 	cdrtools_devel-3.02~a09-1
 	coreutils-8.29-2
 	ctags-5.8-5
-	curl-7.76.1-1
-	curl_devel-7.76.1-1
-	dav1d-0.8.2-1
-	dav1d_devel-0.8.2-1
+	curl-7.78.0-1
+	curl_devel-7.78.0-1
+	dav1d-0.9.1-1
+	dav1d_devel-0.9.1-1
 	diffutils-3.7-1
 	enca-1.19-2
 	enca_devel-1.19-2
@@ -85,7 +87,7 @@ RemotePackageRepository HaikuPorts
 	jam-2.5_2018_11_21-8
 	jasper-2.0.16-4
 	jasper_devel-2.0.16-4
-	keymapswitcher-1.2.7.15-1
+	keymapswitcher-1.2.7.16-1
 	lame-3.100-3
 	lame_devel-3.100-3
 	lcms-2.12-1
@@ -93,6 +95,8 @@ RemotePackageRepository HaikuPorts
 	less-581.2-1
 	libass-0.15.1-1
 	libass_devel-0.15.1-1
+	libavif-0.8.4-2
+	libavif-0.8.4-2
 	libbluray-1.3.0-1
 	libbluray_devel-1.3.0-1
 	libdvdnav-6.1.1-1
@@ -102,7 +106,7 @@ RemotePackageRepository HaikuPorts
 	libedit-20210419_3.1-1
 	libedit_devel-20210419_3.1-1
 	libexecinfo-1.1-5
-	libffi-3.2.1-6
+	libffi-3.4.2-1
 	libgcrypt-1.8.5-1
 	libgpg_error-1.36-1
 	libiconv-1.16-1
@@ -125,8 +129,12 @@ RemotePackageRepository HaikuPorts
 	libpng16_devel-1.6.37-1
 	libpsl-0.21.0-1
 	libpsl_devel-0.21.0-1
+	libraw-0.19.5-3
+	libraw_devel-0.19.5-3
 	libsolv-0.3.0_haiku_2014_12_22-3
 	libsolv_devel-0.3.0_haiku_2014_12_22-3
+	libssh2-1.9.0-2
+	libssh2_devel-1.9.0-2
 	libtasn1-4.16.0-1
 	libtheora-1.1.1-7
 	libtheora_devel-1.1.1-7
@@ -150,7 +158,7 @@ RemotePackageRepository HaikuPorts
 	make-4.1-4
 	mandoc-1.14.3-2
 	mawk-1.3.4_20171017-1
-	mercurial-4.8.1-2
+	mercurial-4.9.1-1
 	mesa-17.1.10-6
 	mesa_devel-17.1.10-6
 	mesa_swpipe-17.1.10-6
@@ -169,7 +177,7 @@ RemotePackageRepository HaikuPorts
 	openexr_devel-2.4.1-1
 	openjpeg-2.4.0-1
 	openjpeg_devel-2.4.0-1
-	openssh-8.6p1-1
+	openssh-8.6p1-2
 	openssl-1.1.1k-1
 	openssl_devel-1.1.1k-1
 	opus-1.3.1-1
@@ -181,7 +189,7 @@ RemotePackageRepository HaikuPorts
 	pe-2.4.5-8
 	perl-5.32.1-1
 	pkgconfig-0.29.2-4
-	python3-3.7.10-4
+	python3-3.7.10-5
 	qrencode_kdl_devel-3.4.4-2
 	readline-8.1-1
 	sed-4.8-1
@@ -199,25 +207,25 @@ RemotePackageRepository HaikuPorts
 	taglib_devel-1.12-1
 	tar-1.34-1
 	tcpdump-4.9.2-1
-	texinfo-6.7-2
+	texinfo-6.7-3
 	tiff4-4.2.0-1
 	tiff4_devel-4.2.0-1
 	tnftp-20151004-6
 	unzip-6.10c23-4
-	vision-0.10.6-1
+	vision-0.10.6-2
 	wavpack-5.4.0-1
 	wavpack_devel-5.4.0-1
 	wget-1.21.1-1
 	which-2.21-6
-	wpa_supplicant-2.9.haiku.1-2
+	wpa_supplicant-2.9.haiku.1-3
 	xz_utils-5.2.5-1
 	xz_utils_devel-5.2.5-1
 	zip-3.0-4
 	zlib-1.2.11-4
 	zlib_devel-1.2.11-4
-	zstd-1.4.5-1
-	zstd_bin-1.4.5-1
-	zstd_devel-1.4.5-1
+	zstd-1.5.0-2
+	zstd_bin-1.5.0-2
+	zstd_devel-1.5.0-2
 	:
 	# source packages
 	autoconf
@@ -265,6 +273,7 @@ RemotePackageRepository HaikuPorts
 	lcms
 	less
 	libass
+	libavif
 	libbluray
 	libdvdnav
 	libdvdread
@@ -284,7 +293,9 @@ RemotePackageRepository HaikuPorts
 	libpcre2
 	libpng16
 	libpsl
+	libraw
 	libsolv
+	libssh2
 	libtasn1
 	libtheora
 	libtool
