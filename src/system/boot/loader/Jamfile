@@ -19,7 +19,7 @@ for platform in [ MultiBootSubDirSetup ] {
 
 			DEFINES +=
 				_BOOT_MODE
-				BOOT_ARCH=\\\"$(TARGET_KERNEL_ARCH)\\\"
+				BOOT_ARCH=\\\"$(TARGET_KERNEL_ARCH_DIR)\\\"
 				KMESSAGE_CONTAINER_ONLY
 
 				BOOT_SUPPORT_PARTITION_INTEL
@@ -39,7 +39,7 @@ for platform in [ MultiBootSubDirSetup ] {
 
 			# Add architecture specific partition/file system modules
 
-			switch $(TARGET_KERNEL_ARCH) {
+			switch $(TARGET_KERNEL_ARCH_DIR) {
 				case "ppc" :
 				{
 					DEFINES +=
@@ -172,7 +172,7 @@ for platform in [ MultiBootSubDirSetup ] {
 			= [ FDirName $(HAIKU_TOP) src add-ons kernel partitioning_systems intel ] ;
 
 		SEARCH on [ FGristFiles stage2_crt0.S ]
-			= [ FDirName $(HAIKU_TOP) src system boot arch $(TARGET_KERNEL_ARCH) ] ;
+			= [ FDirName $(HAIKU_TOP) src system boot arch $(TARGET_KERNEL_ARCH_DIR) ] ;
 
 		SEARCH on [ FGristFiles DataIO.cpp Referenceable.cpp ]
 			= [ FDirName $(HAIKU_TOP) src kits support ] ;

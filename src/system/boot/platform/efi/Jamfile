@@ -3,7 +3,7 @@ SubDir HAIKU_TOP src system boot platform efi ;
 UsePrivateHeaders [ FDirName kernel boot ] ;
 UsePrivateHeaders [ FDirName kernel platform ] ;
 UsePrivateHeaders [ FDirName kernel boot platform efi ] ;
-UsePrivateHeaders [ FDirName kernel boot arch $(TARGET_KERNEL_ARCH) ] ;
+UsePrivateHeaders [ FDirName kernel boot arch $(TARGET_KERNEL_ARCH_DIR) ] ;
 
 if $(TARGET_ARCH) != x86_64 && $(TARGET_ARCH) != x86 && $(TARGET_ARCH) != arm64 {
 	UseLibraryHeaders [ FDirName libfdt ] ;

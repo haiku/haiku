@@ -1,14 +1,14 @@
 SubDir HAIKU_TOP src system boot platform u-boot arch arm ;
 
 SubDirHdrs $(HAIKU_TOP) src system boot platform $(TARGET_BOOT_PLATFORM) ;
-SubDirHdrs $(HAIKU_TOP) src system boot arch $(TARGET_KERNEL_ARCH) ;
+SubDirHdrs $(HAIKU_TOP) src system boot arch $(TARGET_KERNEL_ARCH_DIR) ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel bus_managers fdt ;
 
 UseLibraryHeaders [ FDirName libfdt ] ;
 
 UsePrivateSystemHeaders ;
 UsePrivateHeaders kernel [ FDirName kernel platform u-boot ] ;
-UsePrivateHeaders kernel [ FDirName kernel arch $(TARGET_KERNEL_ARCH) ] 
+UsePrivateHeaders kernel [ FDirName kernel arch $(TARGET_KERNEL_ARCH_DIR) ]
 	[ FDirName kernel boot platform $(HAIKU_BOOT_PLATFORM) ] ;
 
 SubDirC++Flags -fno-rtti ;
@@ -43,6 +43,6 @@ BootMergeObject boot_platform_u-boot_arm.o :
 ;
 
 SEARCH on [ FGristFiles $(kernelArchDriverSources) ]
-	= [ FDirName $(HAIKU_TOP) src system kernel arch $(TARGET_KERNEL_ARCH) ] ;
+	= [ FDirName $(HAIKU_TOP) src system kernel arch $(TARGET_KERNEL_ARCH_DIR) ] ;
 #SEARCH on [ FGristFiles arch_cpu_asm.S ]
-#    = [ FDirName $(HAIKU_TOP) src system kernel arch $(TARGET_KERNEL_ARCH) ] ;
+#    = [ FDirName $(HAIKU_TOP) src system kernel arch $(TARGET_KERNEL_ARCH_DIR) ] ;

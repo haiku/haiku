@@ -217,6 +217,7 @@ rule KernelArchitectureSetup architecture
 	# packaging architecture (supplied for convenience).
 
 	HAIKU_KERNEL_ARCH = $(HAIKU_ARCH) ;
+	HAIKU_KERNEL_ARCH_DIR = $(HAIKU_KERNEL_ARCH) ;
 
 	local cpu = $(HAIKU_CPU_$(architecture)) ;
 
@@ -295,7 +296,7 @@ rule KernelArchitectureSetup architecture
 			HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 320 ; # in kB
 
 			# x86_64 kernel source is under arch/x86.
-			HAIKU_KERNEL_ARCH = x86 ;
+			HAIKU_KERNEL_ARCH_DIR = x86 ;
 
 			# nasm is required for target arch x86_64
 			if ! $(HAIKU_NASM) {
@@ -333,7 +334,7 @@ rule KernelArchitectureSetup architecture
 	HAIKU_PRIVATE_KERNEL_HEADERS =
 		[ PrivateHeaders $(DOT) kernel libroot shared
 			kernel/boot/platform/$(HAIKU_KERNEL_PLATFORM) ]
-		[ ArchHeaders $(HAIKU_KERNEL_ARCH) ]
+		[ ArchHeaders $(HAIKU_KERNEL_ARCH_DIR) ]
 		[ FDirName $(HAIKU_COMMON_DEBUG_OBJECT_DIR_$(architecture)) system
 			kernel ]
 		$(HAIKU_PRIVATE_SYSTEM_HEADERS_$(architecture))

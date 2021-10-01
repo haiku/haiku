@@ -3,7 +3,7 @@ SubDir HAIKU_TOP src tests system boot loader ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName kernel util ] ;
 UsePrivateHeaders kernel shared storage system ;
-SubDirSysHdrs $(HAIKU_TOP) headers private kernel arch $(TARGET_KERNEL_ARCH) ;
+SubDirSysHdrs $(HAIKU_TOP) headers private kernel arch $(TARGET_KERNEL_ARCH_DIR) ;
 SubDirSysHdrs $(HAIKU_TOP) headers private system arch $(TARGET_ARCH) ;
 SubDirSysHdrs $(HAIKU_TOP) src tests system boot loader ;
 SubDirHdrs $(HAIKU_TOP) src system boot loader ;

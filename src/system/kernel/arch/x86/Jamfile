@@ -107,7 +107,7 @@ local archGenericSources =
 	x86_pit.cpp
 ;
 
-KernelMergeObject kernel_arch_x86.o :
+KernelMergeObject kernel_arch_$(TARGET_KERNEL_ARCH).o :
 	$(archSpecificSources)
 	$(archGenericSources)
 	:

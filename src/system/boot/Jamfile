@@ -261,7 +261,7 @@ for platform in [ MultiBootSubDirSetup ] {
 								x86_64 ] ;
 		} else {
 			SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) libroot os arch
-									$(TARGET_KERNEL_ARCH) ] ;
+									$(TARGET_KERNEL_ARCH_DIR) ] ;
 		}
 
 		SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) libroot posix string ] ;
@@ -299,7 +299,7 @@ for platform in [ MultiBootSubDirSetup ] {
 
 		AddResources haiku_loader.$(TARGET_BOOT_PLATFORM) : boot_loader.rdef ;
 
-		local archGrist = [ FGrist src system boot arch $(TARGET_KERNEL_ARCH) $(platform:G=) ] ;
+		local archGrist = [ FGrist src system boot arch $(TARGET_KERNEL_ARCH_DIR) $(platform:G=) ] ;
 		local archObject = boot_arch_$(TARGET_KERNEL_ARCH).o ;
 		local ldflags = $(HAIKU_BOOT_LDFLAGS) $(HAIKU_BOOT_$(platform:G=:U)_LDFLAGS) ;
 		ldflags ?= $(TARGET_BOOT_LDFLAGS) ;
@@ -400,6 +400,6 @@ for platform in [ MultiBootSubDirSetup ] {
 	}
 }
 
-SubInclude HAIKU_TOP src system boot arch $(TARGET_KERNEL_ARCH) ;
+SubInclude HAIKU_TOP src system boot arch $(TARGET_KERNEL_ARCH_DIR) ;
 SubInclude HAIKU_TOP src system boot loader ;
 SubInclude HAIKU_TOP src system boot platform ;

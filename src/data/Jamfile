@@ -9,5 +9,5 @@ HaikuSubInclude settings ;
 
 # Known device trees
 if $(TARGET_ARCH) = "arm" {
-	HaikuSubInclude dts arch $(TARGET_KERNEL_ARCH) ;
+	HaikuSubInclude dts arch $(TARGET_KERNEL_ARCH_DIR) ;
 }
