@@ -8,7 +8,7 @@ Uninstalled	PackageListView		Kaldırıldı
 It was not possible to create the new user.	UserLoginWindow		Yeni kullanıcı oluşturulamadı.
 Available packages	MainWindow		Kullanılabilir paketler
 Create account	UserLoginWindow		Hesap oluştur
-Install %PackageTitle%	PackageManager		%PackageTitle% yükle
+Install %PackageTitle%	PackageManager		Yükle: %PackageTitle%
 OK	App		Tamam
 The response to the captcha was incorrect.	ServerHelper		CAPTCHA yanıtı yanlış.
 Develop packages	MainWindow		Geliştirme paketleri

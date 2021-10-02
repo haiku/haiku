@@ -1,4 +1,5 @@
-1	ukrainian	x-vnd.Haiku-Terminal	3117643489
+1	ukrainian	x-vnd.Haiku-Terminal	3655788306
+ANSI cyan color	Terminal AppearancePrefView		ANSI ціан
 Close other tabs	Terminal TermWindow		Закрити інші вкладки
 Insert path	Terminal TermView		Введіть шлях
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Термінал не зміг запустити оболонку. Прикро.
@@ -11,11 +12,13 @@ Confirm exit if active programs exist	Terminal AppearancePrefView		Підтве�
 Solarized Dark	Terminal colors scheme		Сяючий морок
 Copy	Terminal TermWindow		Копіювати
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory	Terminal TermApp		  -h,     --help               показати довідку\n  -t,     --title              установити заголовок вікна\n  -f,     --fullscreen         повноекранний режим\n  -w,     --working-directory  установити робочий каталог
+ANSI white color	Terminal AppearancePrefView		ANSI білий
 Retro	Terminal colors scheme		Ретро
 Edit tab title…	Terminal TermWindow		Редагувати заголовок вкладки…
 Settings	Terminal TermWindow		Налаштування
 Print	Terminal TermWindow		Друк
 %app% settings	Terminal PrefWindow	window title	%app% налаштування
+ANSI black color	Terminal AppearancePrefView		ANSI чорний
 Use default	Terminal SetTitleWindow		За замовчуванням
 Close tab	Terminal TermWindow		Закрити вкладку
 Selected background	Terminal AppearancePrefView		Вибраний фон
@@ -27,6 +30,7 @@ Create link here	Terminal TermView		Створити посилання тут
 Custom	Terminal AppearancePrefView	Window size	Вибір користувача
 Selected text	Terminal AppearancePrefView		Вибраний текст
 Change directory	Terminal TermView		Змінити каталог
+ANSI magenta color	Terminal AppearancePrefView		ANSI пурпурний
 Page setup…	Terminal TermWindow		Налаштування друку…
 Slate	Terminal colors scheme		Сланець
 Defaults	Terminal PrefWindow		За замовчуванням
@@ -43,6 +47,7 @@ Window title…	Terminal TermWindow		Заголовок вікна…
 Blue	Terminal colors scheme		Синій
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Неможливо виконати \"%command\":\n\t%error
 Open path	Terminal TermView		Відкрити шлях
+ANSI yellow color	Terminal AppearancePrefView		ANSI жовтий
 Terminal	System name		Terminal
 Font size	Terminal TermWindow		Розмір шрифту
 Custom	Terminal colors scheme		Вибір користувача
@@ -63,6 +68,7 @@ The pattern specifying the tab titles. The following placeholders\ncan be used:	
 Close	Terminal TermWindow		Закрити
 Save to file…	Terminal PrefWindow		Зберегти у файл…
 Background	Terminal AppearancePrefView		Фон
+ANSI green color	Terminal AppearancePrefView		ANSI зелений
 Copy path	Terminal TermView		Копіювати шлях
 Window size	Terminal TermWindow		Розмір вікна
 Copy absolute path	Terminal TermView		Копіювати абсолютний шлях
@@ -87,6 +93,7 @@ Close active tab	Terminal TermWindow		Закрити активну вкладк
 Use text:	Terminal FindWindow		Використати текст:
 Save as default	Terminal TermWindow		Зберегти за замовчуванням
 Nothing is selected.	Terminal TermWindow		Нічого не вибрано.
+ANSI red color	Terminal AppearancePrefView		ANSI червоний
 Use left Option as Meta key	Terminal AppearancePrefView		Використовувати лівий Option як клавішу Meta 
 Find	Terminal FindWindow		Знайти
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Шаблон визначає заголовок поточної вкладки.\nМожна використовувати наступні заповнювачі:\n\n

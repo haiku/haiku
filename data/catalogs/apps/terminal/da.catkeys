@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-Terminal	3117643489
+1	danish	x-vnd.Haiku-Terminal	3771520812
 Close other tabs	Terminal TermWindow		Luk andre faneblade
 Insert path	Terminal TermView		Indsæt sti
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal kunne ikke køre skallen. Beklager.
@@ -32,6 +32,7 @@ Slate	Terminal colors scheme		Skiffer
 Defaults	Terminal PrefWindow		Standarder
 Cancel	Terminal TermView		Annuller
 Revert	Terminal PrefWindow		Omvendt
+Relaxed	Terminal colors scheme		Afslappet
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
 Find next	Terminal TermWindow		Find næste
 Use selection	Terminal FindWindow		Brug udvælgelse

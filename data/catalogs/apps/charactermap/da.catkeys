@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-CharacterMap	2410613018
+1	danish	x-vnd.Haiku-CharacterMap	917523322
 Tirhuta	UnicodeBlocks		Tirhuta
 Miscellaneous mathematical symbols B	UnicodeBlocks		Diverse matematiske symboler B
 Latin extended E	UnicodeBlocks		Latin, udvidet E
@@ -60,6 +60,7 @@ CJK unified ideographs extension C	UnicodeBlocks		CJK unified ideographs extensi
 Ancient Greek musical notation	UnicodeBlocks		Oldgræsk musiknotation
 Thai	UnicodeBlocks		Thailandsk
 Ethiopic supplement	UnicodeBlocks		Etiopisk, supplement
+Only show blocks contained in font	CharacterWindow		Vis kun blokke som er indeholdt i skrifttype
 Chess symbols	UnicodeBlocks		Skaksymboler
 Yijing hexagram symbols	UnicodeBlocks		Yijing, heksagram-symboler
 Ottoman Siyaq numbers	UnicodeBlocks		Ottoman Siyaq numbers

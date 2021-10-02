@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-StyledEdit	2796309255
+1	greek, modern (1453-)	x-vnd.Haiku-StyledEdit	3760185556
 Document statistics	Statistics		Στατιστικά εγγράφου
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Δεν μπορεί να γίνει επαναφορά, το αρχείο δεν βρέθηκε: \"%s\".
 Cut	Menus		Αποκοπή
@@ -51,6 +51,7 @@ OK	SaveAlert		Εντάξει
 Color	Menus		Χρώμα
 Save changes to the document \"%s\"? 	QuitAlert		Να αποθηκευτούν οι αλλαγές στο έγγραφο \"%s\"; 
 StyledEdit	System name		Επεξεργαστής Κειμένου
+Underline	Menus		Υπογράμμιση
 Find:	FindandReplaceWindow		Εύρεση:
 Undo typing	QuitAlert		Αναίρεση πληκτρολόγησης
 Error loading \"%s\":\n\t%s	LoadAlert		Σφάλμα φόρτωσης \"%s\":\n\t%s

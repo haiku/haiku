@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-HaikuDepot	3437352458
+1	czech	x-vnd.Haiku-HaikuDepot	761125591
 Repository update error	LocalRepositoryUpdateProcess		Chyba aktualizace repozitářů
 Network error	ServerHelper		Chyba sítě
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Nastala chyba při aktualizaci repozitáře: %error%
@@ -8,6 +8,7 @@ Uninstalled	PackageListView		Odinstalován
 It was not possible to create the new user.	UserLoginWindow		Nepodařilo se vytvořit nového uživatele.
 Available packages	MainWindow		Dostupné balíčky
 Create account	UserLoginWindow		Vytvořit účet
+Install %PackageTitle%	PackageManager		Nainstalovat %PackageTitle%
 OK	App		OK
 The response to the captcha was incorrect.	ServerHelper		Odpověď na captchu byla chybná.
 Develop packages	MainWindow		Vývojové balíčky
@@ -123,6 +124,7 @@ Status	PackageListView		Stav
 The password has been incorrectly repeated.	UserLoginWindow		Heslo nesouhlasí s předchozím zadaným.
 Network transport error	ServerHelper		Chyba při přenosu v síti
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		Heslo zadané pro uživatele [%Nickname%] už není platné. Uživatel bude odhlášen. Přihlašte se znova s novým heslem.
+Uninstall %PackageTitle%	PackageManager		Odinstalovat %PackageTitle%
 Update	RatePackageWindow		Aktualizovat
 OK	ServerHelper		OK
 Language	UserLoginWindow		Jazyk

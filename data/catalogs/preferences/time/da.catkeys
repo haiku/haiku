@@ -1,10 +1,11 @@
-1	danish	x-vnd.Haiku-Time	2069485065
+1	danish	x-vnd.Haiku-Time	3691539601
 OK	Time		OK
 Message receiving failed	Time		Modtagning af meddelelse mislykkedes
 Australia	Time		Australien
 America	Time		Amerika
 Reset to default server list	Time		Nulstil til standard serverliste
 Could not resolve server address	Time		Kunne ikke løse serveradresse
+Time & Date	System name		Tid og klokkeslæt
 Set time zone	Time		Sæt tidszone
 Waiting for answer failed	Time		Ventning af meddelelse mislykkedes
 <Other>	Time		<Andet>

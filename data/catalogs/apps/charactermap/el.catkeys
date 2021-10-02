@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-CharacterMap	3594532431
+1	greek, modern (1453-)	x-vnd.Haiku-CharacterMap	917523322
 Tirhuta	UnicodeBlocks		Τιρχουτά
 Miscellaneous mathematical symbols B	UnicodeBlocks		Διάφορα μαθηματικά σύμβολα Β
 Latin extended E	UnicodeBlocks		Λατινικό εκτεταμένο Ε
@@ -60,6 +60,7 @@ CJK unified ideographs extension C	UnicodeBlocks		Ηνωμένα ιδεογρα�
 Ancient Greek musical notation	UnicodeBlocks		Σημειογραφία Αρχαίας Ελληνικής μουσικής
 Thai	UnicodeBlocks		Thai
 Ethiopic supplement	UnicodeBlocks		Συπληρωματικά Αιθιοπικά
+Only show blocks contained in font	CharacterWindow		Εμφάνιση μόνο μπλοκ που περιλαμβάνονται στη γραμματοσειρά
 Chess symbols	UnicodeBlocks		Σκακιστικά σύμβολα
 Yijing hexagram symbols	UnicodeBlocks		Σύμβολα εξαγράμμου Ι Τσινγκ
 Ottoman Siyaq numbers	UnicodeBlocks		Οθωμανικοί αριθμοί Σιγιάκ
@@ -220,6 +221,7 @@ Combining diacritical marks extended	UnicodeBlocks		Συνδυαστικά δι�
 Cyrillic extended C	UnicodeBlocks		Εκτεταμένη C με κυριλλικά
 Syriac	UnicodeBlocks		Συριακά
 Private use area	UnicodeBlocks		Προσωπικός χώρος χρήσης
+Vedic extensions	UnicodeBlocks		Βεντικά προεκτάσεις
 Supplement punctuation	UnicodeBlocks		Συμπληρωματικά σημεία στίξης
 Lycian	UnicodeBlocks		Lycian
 Myanmar extended A	UnicodeBlocks		Μιανμάρ εκτεταμένη Α
@@ -237,6 +239,8 @@ Supplementary private use area A	UnicodeBlocks		Συμπληρωματική ι�
 Armenian	UnicodeBlocks		Αρμενικά
 Miscellaneous symbols and pictographs	UnicodeBlocks		Άλλα σύμβολα
 Phags-pa	UnicodeBlocks		Phags-pa
+Nabataean	UnicodeBlocks		Ναμπαταιανά
+Meetei Mayek	UnicodeBlocks		Μιτέι Μάγιεκ
 CJK compatibility ideographs	UnicodeBlocks		Ιδεογράμματα CJK
 Show private blocks	CharacterWindow		Εμβάνιση προσωπικών μπλοκ
 Samaritan	UnicodeBlocks		Σαμαριτιανά
@@ -249,6 +253,7 @@ Hangul Jamo extended B	UnicodeBlocks		Χανγκούλ Ζαμό εκτεταμέ
 Tai Viet	UnicodeBlocks		Βιετναμέζικα
 Georgian supplement	UnicodeBlocks		Γεωργιανό συμπλήρωμα
 Tagalog	UnicodeBlocks		Ταγκαλόγκ
+CJK unified ideographs extension F	UnicodeBlocks		CJK ενωμένα ιδεογράμματα προέκταση ΣΤ
 Supplemental Symbols and Pictographs	UnicodeBlocks		Συμπληρωματικά Σύμβολα και Εικονογράμματα
 Devanagari	UnicodeBlocks		Devanagari
 Runic	UnicodeBlocks		Runic
@@ -268,6 +273,9 @@ Kangxi radicals	UnicodeBlocks		Kangxi radicals
 Copy character	CharacterView		Αντιγράψετε τον χαρακτήρα
 Hangul Jamo	UnicodeBlocks		Hangul Jamo
 Font	CharacterWindow		Φόντο
+Ornamental dingbats	UnicodeBlocks		Διακοσμητικά σύμβολα
+Egyptian hieroglyph format controls	UnicodeBlocks		Αιγυπτιανά ιερογλυφικά χαρακτήρες ελέγχου μορφοποίησης
+Manichaean	UnicodeBlocks		Μανιχαιανά
 Phaistos disc	UnicodeBlocks		Δίσκος της Φαιστού
 Miscellaneous technical	UnicodeBlocks		Γενικά τεχνικά
 Braille patterns	UnicodeBlocks		Πρότυπα Braille
@@ -277,16 +285,21 @@ Ethiopic	UnicodeBlocks		Αιθιοπικά
 Byzantine musical symbols	UnicodeBlocks		Βυζαντινά σύμβολα μουσικής
 Gujarati	UnicodeBlocks		Γκουτζαρατικά
 Symbols for legacy computing	UnicodeBlocks		Σύμβολα απαρχαιωμένης πληροφορικής
+Gunjala Gondi	UnicodeBlocks		Γκουντζαλά Γκόντι
+Hangul Jamo extended A	UnicodeBlocks		Χαγκούλ Ζαμό εκτεταμένα Α
 Elbasan	UnicodeBlocks		Ελμπασάν
 Hangul compatibility Jamo	UnicodeBlocks		Συμβατικά Hangul σε Jamo
 Phonetic extensions supplement	UnicodeBlocks		Συμπλήρωμα φωνητικών επεκτάσεων
 CJK unified ideographs extension E	UnicodeBlocks		Επέκταση ενοποιημένων ιδεογραμμάτων CJK Ε
+Nüshu	UnicodeBlocks		Νουσού
 Old Persian	UnicodeBlocks		Αρχαία Περσικά
 Malayalam	UnicodeBlocks		Malayalam
 CJK radicals supplement	UnicodeBlocks		Συμπληρώματα CJK
 Old South Arabian	UnicodeBlocks		Παλαιά Νοτιοαραβικά
 Marchen	UnicodeBlocks		Μαρχέν
+Sogdian	UnicodeBlocks		Σογκντιανά
 Control pictures	UnicodeBlocks		Έλεγχος φωτογραφιών
+Tai Tham	UnicodeBlocks		Ταΐ Ταμ
 Cyrillic extended A	UnicodeBlocks		Κυριλλικά εκτεταμένα Α
 New Tai Lue	UnicodeBlocks		New Tai Lue
 Sutton SignWriting	UnicodeBlocks		Sutton SignWriting

@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-About	2374494647
+1	danish	x-vnd.Haiku-About	408681589
 Revision	AboutView		Revision
 The Haikuware team and their bounty program\n	AboutView		Haikuware-holdet og deres dusørprogram\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Ophavsret © 1999-2007 Michael C. Ring. Alle rettigheder forbeholdes.
@@ -11,7 +11,7 @@ Google and their Google Summer of Code and Google Code In programs\n	AboutView		
 Contributors:\n	AboutView		Bidragsydere:\n
 Kernel:	AboutView		Kerne:
 Copyright © 2006-2012 Kentaro Fukuchi	AboutView		Ophavsret © 2006-2012 Kentaro Fukuchi
-Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Ophavsret © 1991-2000 Silicon Graphics, Inc. All rights reserved.
+Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Ophavsret © 1991-2000 Silicon Graphics, Inc. Alle rettigheder forbeholdes.
 Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Ophavsret © 1990-2002 Info-ZIP. Alle rettigheder forbeholdes.
 Past website & marketing:\n	AboutView		Forhenværende websted og markedsføring:\n
 Copyright © 2003 Peter Hanappe and others.	AboutView		Ophavsret © 2003 Peter Hanappe og andre.
@@ -20,7 +20,7 @@ Testing and bug triaging:\n	AboutView		Testning og fejltriagering:\n
 %d MiB total	AboutView		%d MiB i alt
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Kode som er unikt til Haiku, specielt kernen og al kode som programmer kan linke mod, distribueres under vilkårene i <MIT-licensen>. Nogle systembiblioteker indeholder tredjepartskode som distribueres under <LGPL-licensen>. Du kan finde ophavsrettene til tredjepartskode nedenfor.\n\n
 Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Ophavsret © 1996-1997 Jeff Prosise. Alle rettigheder forbeholdes.
-Copyright © 1999-2006 Brian Paul. Mesa3D Project. All rights reserved.	AboutView		Ophavsret © 1999-2006 Brian Paul. Mesa3D Project. Alle rettigheder forbeholdes.
+Copyright © 1999-2006 Brian Paul. Mesa3D Project. All rights reserved.	AboutView		Ophavsret © 1999-2006 Brian Paul. Mesa3D-projektet. Alle rettigheder forbeholdes.
 Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Ophavsret © 2010-2011 Google Inc. Alle rettigheder forbeholdes.
 Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Ophavsret © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAlle rettigheder forbeholdes.
 Past maintainers:\n	AboutView		Forhenværende vedligeholdere:\n
@@ -42,6 +42,7 @@ About this system	AboutWindow		Om systemet
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Ophavsret © 1999-2010 af forfatterne af Gutenprint. Alle rettigheder forbeholdes.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Ophavsret © 1994-1997 Mark Kilgard. Alle rettigheder forbeholdes.
 AboutSystem	System name		Om systemet
+Copyright © 2019 Joe Drago. All rights reserved.	AboutView		Ophavsret © 2019 Joe Drago. Alle rettigheder forbeholdes.
 Copyright © 1995-2001 Lars Düning. All rights reserved.	AboutView		Ophavsret © 1995-2001 Lars Düning. Alle rettigheder forbeholdes.
 Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		Ophavsret © 1998-2000 Thai Open Source Software Center Ltd og Clark Cooper.
 Source Code: 	AboutView		Kildekode: 
@@ -50,7 +51,7 @@ GNU GPL v3	AboutWindow		GNU GPL v3
 The HaikuPorts team\n	AboutView		HaikuPorts-teamet\n
 Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		Indeholder software fra GNU-projektet, udgivet under GPL- og LGPL-licenserne:\nGNU C-bibliotek, GNU-kerneværktøjer, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nOphavsret © The Free Software Foundation.
 Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		Ophavsret © 1996-2002, 2006 David Turner, Robert Wilhelm og Werner Lemberg.
-Contains software from the FreeBSD Project, released under the BSD license:\nftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		Indeholder software fra FreeBSD-projektet, udgivet under BSD-licenserne:\nftpd, ping, telnet, telnetd, traceroute\nOphavsret © 1994-2008 FreeBSD-projektet. Alle rettigheder forbeholdt.
+Contains software from the FreeBSD Project, released under the BSD license:\nftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		Indeholder software fra FreeBSD-projektet, udgivet under BSD-licenserne:\nftpd, ping, telnet, telnetd, traceroute\nOphavsret © 1994-2008 FreeBSD-projektet. Alle rettigheder forbeholdes.
 Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		Ophavsret © 2002-2003 Steve Lhomme. Alle rettigheder forbeholdes.
 Copyright © 2000-2019 Fabrice Bellard, et al.	AboutView		Ophavsret © 2000-2019 Fabrice Bellard, med flere
 Current maintainers:\n	AboutView		Nuværende vedligeholdere:\n

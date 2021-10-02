@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-MediaPlayer	1961774506
+1	czech	x-vnd.Haiku-MediaPlayer	716811487
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Odstranit položky do koše
 Close	MediaPlayer-PlaylistWindow		Zavřít
 Volume of background clips	MediaPlayer-SettingsWindow		Hlasitost klipů na pozadí
@@ -30,6 +30,7 @@ Open file…	MediaPlayer-Main		Otevřít soubor...
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Přizpůsobit velikost ovládacích prvků v režimu celé obrazovky
 View options	MediaPlayer-SettingsWindow		Volby zobrazení
 %d kHz	MediaPlayer-InfoWin		%d kHz
+Eject Device	MediaPlayer-Main		Vysunout zařízení
 Full volume	MediaPlayer-SettingsWindow		Plná hlasitost
 <untitled>	PlaylistItem-title		<bez titulku>
 Start media server	MediaPlayer-Main		Spustit media server

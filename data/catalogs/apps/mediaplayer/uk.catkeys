@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-MediaPlayer	1961774506
+1	ukrainian	x-vnd.Haiku-MediaPlayer	716811487
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Видалити запис до смітника
 Close	MediaPlayer-PlaylistWindow		Закрити
 Volume of background clips	MediaPlayer-SettingsWindow		Гучність фонових кліпів
@@ -30,6 +30,7 @@ Open file…	MediaPlayer-Main		Відкрити файл…
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Масштабувати кнопки управління в повноекранному режимі
 View options	MediaPlayer-SettingsWindow		Опції перегляду
 %d kHz	MediaPlayer-InfoWin		%d кГц
+Eject Device	MediaPlayer-Main		Вийняти пристрій
 Full volume	MediaPlayer-SettingsWindow		Повна гучність
 <untitled>	PlaylistItem-title		<без імені>
 Start media server	MediaPlayer-Main		Запустити Медіа сервер

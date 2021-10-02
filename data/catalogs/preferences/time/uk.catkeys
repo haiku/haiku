@@ -1,10 +1,11 @@
-1	ukrainian	x-vnd.Haiku-Time	2069485065
+1	ukrainian	x-vnd.Haiku-Time	3691539601
 OK	Time		ОК
 Message receiving failed	Time		Не вдалось отримати повідомлення
 Australia	Time		Австралія
 America	Time		Америка
 Reset to default server list	Time		Скинути список серверів за замовчуванням
 Could not resolve server address	Time		Недозволена адреса сервера
+Time & Date	System name		Час & Дата
 Set time zone	Time		Встановити часову зону
 Waiting for answer failed	Time		Відповідь не отримана
 <Other>	Time		<Інше>

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-HaikuDepot	3437352458
+1	ukrainian	x-vnd.Haiku-HaikuDepot	761125591
 Repository update error	LocalRepositoryUpdateProcess		Помилка оновлення репозитарія 
 Network error	ServerHelper		Помилка мережі
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Під час оновлення репозитарія сталася помилка: %error%
@@ -8,6 +8,7 @@ Uninstalled	PackageListView		Деінстальовані
 It was not possible to create the new user.	UserLoginWindow		Не вдалося створити нового користувача.
 Available packages	MainWindow		Доступні пакети
 Create account	UserLoginWindow		Створити обліковий запис
+Install %PackageTitle%	PackageManager		Інсталяція %PackageTitle%
 OK	App		ОК
 The response to the captcha was incorrect.	ServerHelper		Невірна відповідь на капчу.
 Develop packages	MainWindow		Пакети розробника
@@ -123,6 +124,7 @@ Status	PackageListView		Стан
 The password has been incorrectly repeated.	UserLoginWindow		Пароль був повторений неправильно.
 Network transport error	ServerHelper		Помилка мережевого транспорту
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		Пароль, раніше наданий для користувача [%Nickname%], наразі не дійсний. Користувачеві треба завершити сеанс з цією програмою та знову увійти в систему з оновленим паролем.
+Uninstall %PackageTitle%	PackageManager		Деінсталяція %PackageTitle%
 Update	RatePackageWindow		Оновити
 OK	ServerHelper		ОК
 Language	UserLoginWindow		Мова

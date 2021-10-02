@@ -1,6 +1,8 @@
-1	danish	x-vnd.Haiku-Login	3033693897
+1	danish	x-vnd.Haiku-Login	3568987751
 Invalid login!	Login View		Ugyldigt login!
 Error	Login App		Fejl
+Login application for Haiku\nUsage:	Login App		Indlogningsprogram til Haiku\nAnvendelse:
+--nonmodal\tDo not make the window modal	Login App		--nonmodal\tGør ikke vinduet modalt
 Welcome to Haiku	Login Window		Velkommen til Haiku
 Halt	Login View		Stop
 Desktop	Desktop Window		Skrivebord
@@ -9,6 +11,7 @@ Reboot	Login View		Genstart
 You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Du kan tilpasse skrivebordet som vises bag login-programmet ved at slippe replikanter på det.\n\nNår du er færdig, så afslut blot programmet (Cmd-Q).
 OK	Login View		OK
 Info	Login App		Info
+--edit\tLaunch in shelf editting mode to allow customizing the desktop.	Login App		--edit\tStart i hylderedigeringstilstand, så det er muligt at tilpasse skrivebordet.
 Login:	Login View		Login:
 Password:	Login View		Adgangskode:
 Unimplemented	Login App		Uimplementeret
