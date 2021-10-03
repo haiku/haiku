@@ -551,13 +551,12 @@ intel_uninit_accelerant(void)
 	delete_area(gInfo->mode_list_area);
 	gInfo->mode_list = NULL;
 
-	intel_shared_info &info = *gInfo->shared_info;
-
-	uninit_lock(&info.accelerant_lock);
-	uninit_lock(&info.engine_lock);
-
-	uninit_ring_buffer(info.primary_ring_buffer);
-
+	if (!gInfo->is_clone) {
+		intel_shared_info &info = *gInfo->shared_info;
+		uninit_lock(&info.accelerant_lock);
+		uninit_lock(&info.engine_lock);
+		uninit_ring_buffer(info.primary_ring_buffer);
+	}
 	uninit_common();
 }
 
