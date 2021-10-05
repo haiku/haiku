@@ -328,7 +328,6 @@ STATIC_FUNCTION(int_bottom_user):
 
 	// Restore the previous GS base and return.
 	swapgs
-	lfence
 	iretq
 
 .Lkernel_exit_work:
@@ -362,7 +361,6 @@ STATIC_FUNCTION(int_bottom_user):
 
 	// Restore the previous GS base and return.
 	swapgs
-	lfence
 	iretq
 
 .Lkernel_exit_handle_signals:
@@ -382,7 +380,6 @@ FUNCTION(x86_64_syscall_entry):
 	// scratch space to store the user stack pointer in before we can push it
 	// to the stack.
 	swapgs
-	lfence
 	movq	%rsp, %gs:ARCH_THREAD_user_rsp
 	movq	%gs:ARCH_THREAD_syscall_rsp, %rsp
 
@@ -495,7 +492,6 @@ FUNCTION(x86_64_syscall_entry):
 
 	// Restore previous GS base and return.
 	swapgs
-	lfence
 	sysretq
 
 .Lpre_syscall_debug:
@@ -574,7 +570,6 @@ FUNCTION(x86_64_syscall_entry):
 
 	// Restore the previous GS base and return.
 	swapgs
-	lfence
 	iretq
 
 .Lpost_syscall_handle_signals:
@@ -651,7 +646,6 @@ FUNCTION(x86_return_to_userland):
 	// Restore the frame and return.
 	RESTORE_IFRAME()
 	swapgs
-	lfence
 	iretq
 .Luserland_return_work:
 	// Slow path for return to userland.
@@ -676,7 +670,6 @@ FUNCTION(x86_return_to_userland):
 
 	// Restore the previous GS base and return.
 	swapgs
-	lfence
 	iretq
 .Luserland_return_handle_signals:
 	// thread_at_kernel_exit requires interrupts to be enabled, it will disable
