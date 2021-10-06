@@ -64,6 +64,18 @@ string_for_color_space(color_space format)
 {
 	const char* name = "<unkown format>";
 	switch (format) {
+		case B_RGBA64:
+			name = "B_RGBA64";
+			break;
+		case B_RGBA64_BIG:
+			name = "B_RGBA64_BIG";
+			break;
+		case B_RGB48:
+			name = "B_RGB48";
+			break;
+		case B_RGB48_BIG:
+			name = "B_RGB48_BIG";
+			break;
 		case B_RGB32:
 			name = "B_RGB32";
 			break;
