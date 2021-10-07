@@ -127,22 +127,35 @@ status_t
 arch_thread_enter_userspace(Thread *thread, addr_t entry, void *arg1,
 	void *arg2)
 {
-	// dprintf("arch_thread_enter_uspace()\n");
+	//dprintf("arch_thread_enter_uspace(%" B_PRId32 "(%s))\n", thread->id, thread->name);
+
+	addr_t commpageAdr = (addr_t)thread->team->commpage_address;
+	addr_t threadExitAddr;
+	ASSERT(user_memcpy(&threadExitAddr,
+		&((addr_t*)commpageAdr)[COMMPAGE_ENTRY_RISCV64_THREAD_EXIT],
+		sizeof(threadExitAddr)) >= B_OK);
+	threadExitAddr += commpageAdr;
 
 	disable_interrupts();
-	if (arch_setjmp(&thread->arch_info.context) == 0) {
-		SstatusReg status(Sstatus());
-		status.pie = (1 << modeS); // enable interrupts when enter userspace
-		status.spp = modeU;
-		SetSstatus(status.val);
-		SetStvec((addr_t)SVecU);
-		SetSepc(entry);
-		RestoreUserRegs();
-		arch_enter_userspace(arg1, arg2,
-			thread->user_stack_base + thread->user_stack_size);
-	} else {
-		panic("return from userspace");
-	}
+
+	iframe frame;
+	memset(&frame, 0, sizeof(frame));
+
+	SstatusReg status(Sstatus());
+	status.pie = (1 << modeS); // enable interrupts when enter userspace
+	status.spp = modeU;
+	SetSstatus(status.val);
+
+	frame.epc = entry;
+	frame.a0 = (addr_t)arg1;
+	frame.a1 = (addr_t)arg2;
+	frame.ra = threadExitAddr;
+	frame.sp = thread->user_stack_base + thread->user_stack_size;
+	frame.tp = thread->user_local_storage;
+
+	arch_longjmp_iframe(&frame);
+
+	// never return
 	return B_ERROR;
 }
 
