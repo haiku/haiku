@@ -1,10 +1,11 @@
-1	finnish	x-vnd.Haiku-Time	2069485065
+1	finnish	x-vnd.Haiku-Time	3691539601
 OK	Time		Valmis
 Message receiving failed	Time		Viestin vastaanotto epäonnistui
 Australia	Time		Australia
 America	Time		Amerikka
 Reset to default server list	Time		Nollaa oletuspalvelinluettelo
 Could not resolve server address	Time		Palvelinosoitteen ratkaiseminen epäonnistui
+Time & Date	System name		Aika & Päivämäärä
 Set time zone	Time		Aseta aikavyöhyke
 Waiting for answer failed	Time		Vastauksen odottaminen epäonnistui
 <Other>	Time		<Muut>

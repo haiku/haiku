@@ -1,4 +1,5 @@
-1	indonesian	x-vnd.Haiku-NetworkStatus	1162000463
+1	indonesian	x-vnd.Haiku-NetworkStatus	1515316847
+IPv6 address:	NetworkStatusView		Alamat IPv6
 Quit	NetworkStatusView		Keluar
 Unknown	NetworkStatusView		Takdiketahui
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Gagal meluncurkan preflet jaringan.\n\nkesalahan: 
@@ -14,6 +15,7 @@ Network Status	NetworkStatusView		Status Jaringan
 Deskbar is not running, giving up.	NetworkStatus		Deskbar tidak berjalan, menyerah.
 No stateful configuration	NetworkStatusView		Takada konfigurasi tersimpan
 You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Anda dapat menjalankan StatusJaringan di sebuah Jendela atau memasangnya di Deksbar.
+IPv4 address:	NetworkStatusView		Alamat IPv4
 %ifaceName information:\n	NetworkStatusView		%ifaceName informasi:\n
 Run in window	NetworkStatus		Jalankan di jendela
 <no wireless networks found>	NetworkStatusView		<tidak ditemukan jaringan nirkabel>

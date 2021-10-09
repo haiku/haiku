@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-WebPositive	55235296
+1	indonesian	x-vnd.Haiku-WebPositive	440329287
 Authentication required	Authentication Panel		Otentikasi dibutuhkan
 Previous	WebPositive Window		Sebelumnya
 (Finish: %date)	Download Window		(Selesai: %date)
@@ -53,6 +53,7 @@ Cookies for %s	Cookie Manager		Kuki untuk %s
 The download could not be opened.	Download Window		Unduhan tidak bisa dibuka.
 Close	Download Window		Tutup
 WebPositive	System name		WebPositive
+%s - Search term	Settings Window		%s - Istilah pencarian
 Reload	WebPositive Window		Muat ulang
 Expiration	Cookie Manager		Kedaluwarsa
 Download finished	Download Window		Unduhan selesai

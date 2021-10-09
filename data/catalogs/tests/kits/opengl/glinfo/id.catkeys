@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-GLInfo	2211760527
+1	indonesian	x-vnd.Haiku-GLInfo	1282327690
 Maximum clipping planes	Capabilities		Clipping plana maksimum
 Maximum evaluators equation order	Capabilities		Urutan persamaan evaluator maksimum
 Texture stack size	Capabilities		Ukuran tumpukan tekstur
@@ -13,12 +13,15 @@ Value	Capabilities		Nilai
 Name stack size	Capabilities		Ukuran tumpukan nama
 Capabilities	Capabilities		Kemampuan
 Maximum texture units	Capabilities		Unit tekstur maksimum
+Unknown or missing OpenGL renderer.	InfoView		Perender OpenGL hilang atau tidak dikenali
 Capability	Capabilities		Kemampuan
 Maximum 2D texture size	Capabilities		Ukuran tekstur 2D maksimum
 Auxiliary buffer(s)	Capabilities		Tambahan buffer
+Unknown vendor	InfoView		Vendor tidak diketahui
 Maximum convolution	Capabilities		Konvolusi maksimum
 Maximum 3D texture size	Capabilities		Ukuran tekstur 3D maksimum
 Maximum recommended index elements	Capabilities		Elemen indeks maksimum yang disarankan
+Unknown version	InfoView		Versi tidak diketahui
 List stack size	Capabilities		Ukuran tumpukan daftar
 Model stack size	Capabilities		Ukuran tumpukan model
 Projection stack size	Capabilities		Ukuran tumpukan proyeksi

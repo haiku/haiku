@@ -1,0 +1,15 @@
+1	indonesian	application/x-vnd.Cortex.InfoView	514429199
+Description	DormantNodeInfoView		Deskripsi
+Byte order	InfoView		Urutan bita
+Connection	InfoView		Koneksi
+Output formats	DormantNodeInfoView		Format keluaran
+History	InfoView		Riwayat
+Input formats	DormantNodeInfoView		Format masukan
+Flags	InfoView		Tanda
+Kinds	DormantNodeInfoView		Jenis
+Resolution	InfoView		Resolusi
+Orientation	InfoView		Orientasi
+Channels	InfoView		Kanal
+(no file)	FileNodeInfoView		(tidak ada berkas)
+Format	InfoView		Format
+Version	AppNodeInfoView		Versi

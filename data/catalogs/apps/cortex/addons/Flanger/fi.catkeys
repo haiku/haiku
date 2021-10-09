@@ -1,4 +1,4 @@
-1	finnish	application/x-vnd.moon-Flanger.media_addon	3644480584
+1	finnish	application/x-vnd.moon-Flanger.media_addon	2732361347
 An add-on version of FlangerNode.\nby Eric Moon (16 June, 1999)	CortexAddOnsFlanger		FlangerNode-lisäosaversio.\ntekijä: Eric Moon (16 kesäkuuta, 1999)
 Delay	CortexAddOnsFlanger		Viive
 Depth	CortexAddOnsFlanger		Syvyys
@@ -11,5 +11,6 @@ FlangerNode parameters	CortexAddOnsFlanger		FlangerNode-parametrit
 OK	CortexAddOnsCommonMediaNodeControlApp		Valmis
 controls	CortexAddOnsCommonMediaNodeControlApp		ohjaimet
 Mix output	CortexAddOnsFlanger		Sekoituslähtö
+Flanger	CortexAddOnsFlanger		Reunustaja
 MediaNodeControlApp: no parameters for node (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: solmulle (%d) ei ole parametreja:\n%s\n
 Audio input	CortexAddOnsFlanger		Audiosyöte

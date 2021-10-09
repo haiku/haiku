@@ -1,7 +1,8 @@
-1	finnish	application/x-vnd.Be.LoggingConsumerApp	2792125938
+1	finnish	application/x-vnd.Be.LoggingConsumerApp	1634779870
 Priority	CortexAddOnsLoggingConsumer		Prioriteetti
 Latency	CortexAddOnsLoggingConsumer		Viive
 Logged input	CortexAddOnsLoggingConsumer		Kirjautumissyöte
+CPU spin percentage	CortexAddOnsLoggingConsumer		Prosessorituulettimen pyörimisprosentti
 NodeLogger	CortexAddOnsLoggingConsumers		NodeLogger
 Start	CortexAddOnsLoggingConsumerNodeHarnessWin		Käynnistä
 Thread priority	CortexAddOnsLoggingConsumer		Säieprioriteetti

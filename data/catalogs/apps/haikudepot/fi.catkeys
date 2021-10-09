@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-HaikuDepot	3437352458
+1	finnish	x-vnd.Haiku-HaikuDepot	761125591
 Repository update error	LocalRepositoryUpdateProcess		Tietovaraston päivitysvirhe
 Network error	ServerHelper		Verkkovirhe
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Tietovaraston päivityksen yhteydessä tapahtui virhe: %error%
@@ -8,6 +8,7 @@ Uninstalled	PackageListView		Poistetut asennukset
 It was not possible to create the new user.	UserLoginWindow		Uuden käyttäjän luominen epäonnistui.
 Available packages	MainWindow		Saatavilla olevat pakkaukset
 Create account	UserLoginWindow		Luo tili
+Install %PackageTitle%	PackageManager		Asenna %PackageTitle%
 OK	App		Valmis
 The response to the captcha was incorrect.	ServerHelper		Captcha-vastaus oli virheellinen.
 Develop packages	MainWindow		Kehityspaketit
@@ -123,6 +124,7 @@ Status	PackageListView		Tila
 The password has been incorrectly repeated.	UserLoginWindow		Salasanan toistaminen epäonnistui.
 Network transport error	ServerHelper		Verkkosiirtovirhe
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		Käyttäjälle [%Nickname%] aiemmin tarjottu salasana ei ole nykyään kelvollinen. Käyttäjä kirjautuu ulos tästä sovelluksesta ja sinun pitäisi kirjautua uudelleen päivitetyllä salasanallasi.
+Uninstall %PackageTitle%	PackageManager		Poista %PackageTitle% -pakkaus
 Update	RatePackageWindow		Päivitä
 OK	ServerHelper		Valmis
 Language	UserLoginWindow		Kieli

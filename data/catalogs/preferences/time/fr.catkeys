@@ -1,10 +1,11 @@
-1	french	x-vnd.Haiku-Time	2069485065
+1	french	x-vnd.Haiku-Time	3691539601
 OK	Time		OK
 Message receiving failed	Time		La réception du message a échoué
 Australia	Time		Australie
 America	Time		Amérique
 Reset to default server list	Time		Restaurer la liste de serveurs par défaut
 Could not resolve server address	Time		Impossible de résoudre l’adresse du serveur
+Time & Date	System name		Heure & Date
 Set time zone	Time		Régler le fuseau horaire
 Waiting for answer failed	Time		L’attente d’une réponse a échoué
 <Other>	Time		<Autre>

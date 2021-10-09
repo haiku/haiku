@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-CharacterMap	2410613018
+1	finnish	x-vnd.Haiku-CharacterMap	917523322
 Tirhuta	UnicodeBlocks		Tirhuta
 Miscellaneous mathematical symbols B	UnicodeBlocks		Sekalaiset matemaattiset symbolit B
 Latin extended E	UnicodeBlocks		Latinalainen laajennettu E
@@ -60,6 +60,7 @@ CJK unified ideographs extension C	UnicodeBlocks		CJK yhtenäinen ideografinen l
 Ancient Greek musical notation	UnicodeBlocks		Antiikin kreikan nuottikirjoitus
 Thai	UnicodeBlocks		Thain kieli
 Ethiopic supplement	UnicodeBlocks		Etiopian täydennys
+Only show blocks contained in font	CharacterWindow		Näytä vain kirjasinlajiin sisältyvät lohkot
 Chess symbols	UnicodeBlocks		Shakkisymbolit
 Yijing hexagram symbols	UnicodeBlocks		Yijing-heksagrammisymbolit
 Ottoman Siyaq numbers	UnicodeBlocks		Ottomaaniset Siyaq-numerot

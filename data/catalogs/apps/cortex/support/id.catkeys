@@ -1,0 +1,54 @@
+1	indonesian	application/x-vnd.Cortex.support	989862702
+24 bit HSV	MediaString		HSV 24 bit
+Back-center	MediaString		Belakang tengah
+32 bit CMY	MediaString		CMY 32 bit
+15 bit RGBA	MediaString		RGBA 15 bit
+AVI	MediaString		AVI
+YUV9	MediaString		YUV9
+ Hz	MediaString		 Hz
+Right	MediaString		Kanan
+32 bit RGB	MediaString		RGB 32 bit
+System mixer	MediaString		Mixer sistem
+Physical output	MediaString		Keluaran fisik
+Top-Back-center	MediaString		Tengah atas belakang
+YUV420	MediaString		YUV420
+Top to bottom, left to right	MediaString		Atas ke bawah, kiri ke kanan
+(unknown run mode)	MediaString		(mode jalan tidak dikenali)
+ kb/s	MediaString		 kb/s
+24 bit HSI	MediaString		HSI 24 bit
+User-defined media type	MediaString		Tipe media tetapan pengguna
+32 bit CMYA	MediaString		CMYA 32 bit
+Rear-left	MediaString		Belakang kiri
+Top-Front-right	MediaString		Kanan depan atas
+32 bit float	MediaString		float 32 bit
+32 bit integer	MediaString		integer 32 bit
+Front-right-center	MediaString		Tengah depan kanan
+Side-right	MediaString		Samping kanan
+ kHz	MediaString		 kHz
+32 bit LAB	MediaString		LAB 32 bit
+Side-left	MediaString		Samping kiri
+32 bit CMYK	MediaString		CMYK 32 bit
+YCbCr444	MediaString		YCbCr444
+Center	MediaString		Tengah
+ kb/s (max)	MediaString		 kb/s (maks)
+Monochrome	MediaString		Monokrom
+24 bit UVL	MediaString		UVL 24 bit
+32 bit HSV	MediaString		HSV 32 bit
+ID	MediaString		ID
+Top-Back-left	MediaString		Atas-Belakang-kiri
+16 bit RGB	MediaString		RGB 16 bit
+YCbCr422	MediaString		YCbCr422
+32 bit LABA	MediaString		LABA 32 bit
+24 bit HLS	MediaString		HLS 24 bit
+MIDI	MediaString		MIDI
+YUV12	MediaString		YUV12
+WAV format family	MediaString		keluarga format WAV
+ (NTSC)	MediaString		 (NTSC)
+32 bit HSI	MediaString		HSI 32 bit
+ (PAL)	MediaString		 (PAL)
+32 bit RGBA	MediaString		RGBA 32 bit
+YCbCr420	MediaString		YCbCr420
+ kb/s (avg)	MediaString		 kb/s (rerata)
+HTML	MediaString		HTML
+Time source	MediaString		Sumber waktu
+15 bit RGB	MediaString		RGB 15 bit

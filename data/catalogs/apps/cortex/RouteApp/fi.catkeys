@@ -1,4 +1,4 @@
-1	finnish	application/x-vnd.Cortex.Route	2011521004
+1	finnish	application/x-vnd.Cortex.Route	25925955
 Node '%name%' released	CortexRouteApp		Solmu ’%name%’ julkaistu
 OK	CortexRouteApp		Valmis
 About Cortex/Route…	CortexRouteApp		Ohjelmasta Cortex/Route…
@@ -17,6 +17,7 @@ Connection '%name%' broken	CortexRouteApp		Yhteys '%name%' katkennut
 Between:	CortexRouteApp		Välillä:
 Cortex	CortexRouteApp		Cortex
 Open…	CortexRouteApp		Avaa…
+Pull palettes	CortexRouteApp		Anna paletit
 Connection made	CortexRouteApp		Yhteys muodostettu
 Show transport	CortexRouteApp		Näytä siirto
 Show add-ons	CortexRouteApp		Näytä lisäosat

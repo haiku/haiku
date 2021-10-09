@@ -2,13 +2,13 @@
 Delete message	ConfigView		Hapus pesan
 Match \"%attribute\" against \"%regex\"	RuleFilter		Cocokkan \"%attribute\" terhadap \"%regex\"
 Match header	RuleFilter		Cocokan tajuk
-Set flags to	ConfigView		Setel bendera ke
+Set flags to	ConfigView		Atur bendera ke
 Header field (e.g. Subject, From, …)	ConfigView		Bidang tajuk (misal. Subyek, Dari, …)
 <Choose account>	ConfigView		<Pilih akun>
 Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Nilai wildcard seperti \"*spam*\".\nDiawali dengan \"REGEX:\" untuk menggunakan expresi-ekspresi reguler.
 Then	ConfigView		Kemudian
 If	ConfigView		Jika
-Set as read	ConfigView		Setel telah dibaca
+Set as read	ConfigView		Atur sebagai dibaca
 Reply with	ConfigView		Balas dengan
 <Choose action>	ConfigView		<Pilih tindakan>
 Move to	ConfigView		Pindahkan ke
