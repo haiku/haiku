@@ -7,16 +7,9 @@
 #include <stdarg.h>
 #include <fcntl.h>
 
+#include "symbol_visibility.h"
+
 #include "remapped_functions.h"
-
-
-#if __GNUC__ >= 4
-#	define HIDDEN_FUNCTION(function)	do {} while (0)
-#	define HIDDEN_FUNCTION_ATTRIBUTE	__attribute__((visibility("hidden")))
-#else
-#	define HIDDEN_FUNCTION(function)	asm volatile(".hidden " #function)
-#	define HIDDEN_FUNCTION_ATTRIBUTE
-#endif
 
 
 extern "C" int HIDDEN_FUNCTION_ATTRIBUTE
