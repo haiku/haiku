@@ -30,10 +30,14 @@ SimpleTest get_cpu_num_test :
 
 
 CCFLAGS += -fstack-protector ;
-SimpleTest stack_protector_test :
-	stack_protector_test.c
-;
-
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		SimpleTest [ MultiArchDefaultGristFiles stack_protector_test ] :
+			stack_protector_test.c
+		;
+	}
+}
 
 
 # Tell Jam where to find these sources

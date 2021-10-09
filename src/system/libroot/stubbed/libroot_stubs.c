@@ -2739,6 +2739,8 @@ void srand48() {}
 void srand48_r() {}
 void srandom() {}
 void srandom_r() {}
+void __stack_chk_fail() {}
+void __stack_chk_fail_local() {}
 void sscanf() {}
 void statvfs() {}
 void stime() {}
