@@ -526,7 +526,7 @@ load_image(char const* name, image_type type, const char* rpath,
 	fd = open_executable(path, type, rpath, get_program_path(),
 		requestingObjectPath, sSearchPathSubDir);
 	if (fd < 0) {
-		FATAL("Cannot open file %s: %s\n", name, strerror(fd));
+		FATAL("Cannot open file %s(needed by %s): %s\n", name, requestingObjectPath, strerror(fd));
 		KTRACE("rld: load_container(\"%s\"): failed to open file", name);
 		return fd;
 	}
