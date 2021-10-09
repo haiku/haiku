@@ -28,6 +28,7 @@
 #	undef _KERNEL_MODE
 #endif
 
+#include <BeBuild.h>
 #include <directories.h>
 #include <driver_settings.h>
 #include <FindDirectory.h>
@@ -959,7 +960,6 @@ get_driver_settings(void *handle)
 
 // Obsolete function, use unload_driver_settings instead. Introduced by
 // accident in hrev3530 (2003) and present in public headers for a long time.
-extern "C" __typeof(unload_driver_settings) delete_driver_settings
-	__attribute__((weak, alias ("unload_driver_settings")));
+B_DEFINE_WEAK_ALIAS(unload_driver_settings, delete_driver_settings);
 
 #endif
