@@ -409,20 +409,22 @@ dormant_flavor_info::Unflatten(type_code c, const void *buffer, ssize_t size)
 	// struct flavor_info
 	nameLength = *(int32*)buf; buf += sizeof(int32);
 	if (nameLength >= 0) { // if nameLength is -1, we leave name = 0
-		name = new(std::nothrow) char [nameLength + 1];
-		if (name) {
-			memcpy(name, buf, nameLength);
-			name[nameLength] = 0;
+		char* nameStorage = new(std::nothrow) char [nameLength + 1];
+		name = nameStorage;
+		if (nameStorage) {
+			memcpy(nameStorage, buf, nameLength);
+			nameStorage[nameLength] = 0;
 			buf += nameLength; // XXX not save
 		}
 	}
 
 	infoLength = *(int32*)buf; buf += sizeof(int32);
 	if (infoLength >= 0) { // if infoLength is -1, we leave info = 0
-		info = new(std::nothrow) char [infoLength + 1];
-		if (info) {
-			memcpy(info, buf, infoLength);
-			info[infoLength] = 0;
+		char* infoStorage = new(std::nothrow) char [infoLength + 1];
+		info = infoStorage;
+		if (infoStorage) {
+			memcpy(infoStorage, buf, infoLength);
+			infoStorage[infoLength] = 0;
 			buf += infoLength; // XXX not save
 		}
 	}

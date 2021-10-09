@@ -2681,9 +2681,8 @@ OpenSoundNode::GetFlavor(flavor_info* outInfo, int32 id)
 	outInfo->out_formats = 0;
 	outInfo->internal_id = id;
 
-	outInfo->name = (char *)"OpenSoundNode Node";
-	outInfo->info = (char *)"The OpenSoundNode outputs to OpenSound System v4 "
-		"drivers.";
+	outInfo->name = "OpenSoundNode Node";
+	outInfo->info = "The OpenSoundNode outputs to OpenSound System v4 drivers.";
 	outInfo->kinds = B_BUFFER_CONSUMER | B_BUFFER_PRODUCER | B_TIME_SOURCE
 		| B_PHYSICAL_OUTPUT | B_PHYSICAL_INPUT | B_CONTROLLABLE;
 	// TODO: If the OSS engine supports outputing encoded audio,

@@ -80,9 +80,8 @@ status_t FlangerAddOn::GetFlavorAt(
 	
 	flavor_info* pInfo = new flavor_info;
 	pInfo->internal_id = n;
-	pInfo->name = (char *)B_TRANSLATE("Flanger");
-	pInfo->info = (char *)
-		B_TRANSLATE("An add-on version of FlangerNode.\n"
+	pInfo->name = B_TRANSLATE("Flanger");
+	pInfo->info = B_TRANSLATE("An add-on version of FlangerNode.\n"
 		"by Eric Moon (16 June, 1999)");
 	pInfo->kinds = B_BUFFER_CONSUMER | B_BUFFER_PRODUCER | B_CONTROLLABLE;
 	pInfo->flavor_flags = 0;
