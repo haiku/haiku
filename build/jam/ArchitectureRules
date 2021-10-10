@@ -638,7 +638,7 @@ rule ArchitectureSetupWarnings architecture
 	EnableWerror src add-ons kernel bus_managers agp_gart ;
 	EnableWerror src add-ons kernel bus_managers ata ;
 	EnableWerror src add-ons kernel bus_managers config_manager ;
-#	EnableWerror src add-ons kernel bus_managers firewire ;
+	EnableWerror src add-ons kernel bus_managers firewire ;
 	EnableWerror src add-ons kernel bus_managers ide ;
 	EnableWerror src add-ons kernel bus_managers isa ;
 	EnableWerror src add-ons kernel bus_managers pci ;
