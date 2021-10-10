@@ -654,7 +654,7 @@ rule ArchitectureSetupWarnings architecture
 	EnableWerror src add-ons kernel busses usb ;
 	EnableWerror src add-ons kernel console ;
 	EnableWerror src add-ons kernel cpu ;
-#	EnableWerror src add-ons kernel debugger ; # gcc2
+	EnableWerror src add-ons kernel debugger ;
 #	EnableWerror src add-ons kernel drivers audio ;
 	EnableWerror src add-ons kernel drivers bluetooth ;
 #	EnableWerror src add-ons kernel drivers bus ;

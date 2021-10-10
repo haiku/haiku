@@ -117,8 +117,8 @@ status_t
 init_words(char *from)
 {
 	int fd;
-	size_t sz, got;
-	int current, beg, end, i;
+	size_t sz, got, beg, end, i;
+	int current;
 	struct stat st;
 
 	memset((void *)words, 0, sizeof(words));
@@ -173,8 +173,8 @@ init_words(char *from)
 status_t
 init_words_from_threadnames(void)
 {
-	size_t sz, got;
-	int current, beg, end, i;
+	size_t sz, got, beg, end, i;
+	int current;
 	thread_info ti;
 
 	memset((void *)words, 0, sizeof(words));
