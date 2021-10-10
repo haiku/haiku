@@ -669,7 +669,7 @@ rule ArchitectureSetupWarnings architecture
 	EnableWerror src add-ons kernel drivers misc ;
 #	EnableWerror src add-ons kernel drivers network ;
 	EnableWerror src add-ons kernel drivers ports ;
-#	EnableWerror src add-ons kernel drivers power ;
+	EnableWerror src add-ons kernel drivers power ;
 	EnableWerror src add-ons kernel drivers printer ;
 	EnableWerror src add-ons kernel drivers random ;
 	EnableWerror src add-ons kernel drivers tty ;
