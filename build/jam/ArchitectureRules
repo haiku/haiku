@@ -631,7 +631,7 @@ rule ArchitectureSetupWarnings architecture
 	EnableWerror src add-ons disk_systems ;
 	EnableWerror src add-ons input_server devices ;
 	EnableWerror src add-ons input_server filters ;
-#	EnableWerror src add-ons input_server methods pen ;
+	EnableWerror src add-ons input_server methods pen ;
 	EnableWerror src add-ons input_server methods t9 ;
 	EnableWerror src add-ons kernel bluetooth ;
 	EnableWerror src add-ons kernel bus_managers acpi ;
