@@ -657,7 +657,7 @@ rule ArchitectureSetupWarnings architecture
 	EnableWerror src add-ons kernel debugger ;
 #	EnableWerror src add-ons kernel drivers audio ;
 	EnableWerror src add-ons kernel drivers bluetooth ;
-#	EnableWerror src add-ons kernel drivers bus ;
+	EnableWerror src add-ons kernel drivers bus ;
 	EnableWerror src add-ons kernel drivers common ;
 #	EnableWerror src add-ons kernel drivers disk ;
 	EnableWerror src add-ons kernel drivers dvb ;
