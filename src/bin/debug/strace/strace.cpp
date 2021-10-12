@@ -350,11 +350,11 @@ print_syscall(FILE *outputFile, Syscall* syscall, debug_post_syscall &message,
 
 	// print syscall name, without the "_kern_"
 	if (colorize) {
-		print_to_string(&string, &length, "[%6ld] %s%s%s(",
+		print_to_string(&string, &length, "[%6" B_PRId32 "] %s%s%s(",
 			message.origin.thread, kTerminalTextBlue,
 			syscall->Name().c_str() + 6, kTerminalTextNormal);
 	} else {
-		print_to_string(&string, &length, "[%6ld] %s(",
+		print_to_string(&string, &length, "[%6" B_PRId32 "] %s(",
 			message.origin.thread, syscall->Name().c_str() + 6);
 	}
 
@@ -439,11 +439,11 @@ print_signal(FILE *outputFile, debug_signal_received &message,
 
 	// print signal name
 	if (colorize) {
-		print_to_string(&string, &length, "[%6ld] --- %s%s (%s) %s---\n",
+		print_to_string(&string, &length, "[%6" B_PRId32 "] --- %s%s (%s) %s---\n",
 			message.origin.thread, kTerminalTextRed, signal_name(signalNumber),
 			strsignal(signalNumber), kTerminalTextNormal);
 	} else {
-		print_to_string(&string, &length, "[%6ld] --- %s (%s) ---\n",
+		print_to_string(&string, &length, "[%6" B_PRId32 "] --- %s (%s) ---\n",
 			message.origin.thread, signal_name(signalNumber),
 			strsignal(signalNumber));
 	}
