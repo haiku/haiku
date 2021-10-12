@@ -71,7 +71,7 @@ struct VirtioInputHandle {
 
 device_manager_info* gDeviceManager;
 
-
+#ifdef TRACE_VIRTIO_INPUT
 static void
 WriteInputPacket(const VirtioInputPacket &pkt)
 {
@@ -159,7 +159,7 @@ WriteInputPacket(const VirtioInputPacket &pkt)
 			TRACE(", %" B_PRId32, pkt.value);
 	}
 }
-
+#endif
 
 static void
 InitPackets(VirtioInputDevice* dev, uint32 count)
@@ -205,26 +205,6 @@ PacketPhysEntry(VirtioInputDevice* dev, Packet* pkt)
 	pe.address = dev->physAdr + (uint8*)pkt - (uint8*)dev->packets;
 	pe.size = sizeof(VirtioInputPacket);
 	return pe;
-}
-
-
-static Packet*
-AllocPacket(VirtioInputDevice* dev)
-{
-	int32 idx = dev->freePackets;
-	if (idx < 0)
-		return NULL;
-	dev->freePackets = dev->packets[idx].next;
-
-	return &dev->packets[idx];
-}
-
-
-static void
-FreePacket(VirtioInputDevice* dev, Packet* pkt)
-{
-	pkt->next = dev->freePackets;
-	dev->freePackets = pkt - dev->packets;
 }
 
 

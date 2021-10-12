@@ -194,7 +194,8 @@ HIDReport::SendReport()
 HIDReportItem *
 HIDReport::ItemAt(uint32 index)
 {
-	if (index >= fItems.Count())
+	int32 count = fItems.Count();
+	if (count < 0 || index >= (uint32)count)
 		return NULL;
 	return fItems[index];
 }
