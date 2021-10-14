@@ -532,6 +532,10 @@ error_description(int error)
 			return "Text file busy";
 		case ENOATTR:
 			return "No such attribute";
+		case ENOTRECOVERABLE:
+			return "State not recoverable";
+		case EOWNERDEAD:
+			return "Previous owner died";
 
 		default:
 			return NULL;

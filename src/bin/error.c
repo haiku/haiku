@@ -288,6 +288,13 @@ struct error_pair {
 #ifdef ETXTBSY
 	E(ETXTBSY),
 #endif
+	E(ENOATTR),
+#ifdef ENOTRECOVERABLE
+	E(ENOTRECOVERABLE),
+#endif
+#ifdef EOWNERDEAD
+	E(EOWNERDEAD),
+#endif
 	E(EWOULDBLOCK),
 	E(EXDEV),
 	{ 0, NULL }
