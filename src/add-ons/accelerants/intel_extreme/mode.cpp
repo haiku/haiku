@@ -280,6 +280,9 @@ intel_propose_display_mode(display_mode* target, const display_mode* low,
 	// configurations.
 	uint32 VirtualWidth = target->virtual_width;
 	uint32 VirtualHeight = target->virtual_height;
+	float RefreshRate = (float)target->timing.pixel_clock /
+		(target->timing.h_total * target->timing.v_total);
+
 	for (uint32 i = 0; i < gInfo->shared_info->mode_count; i++) {
 		display_mode *mode = &gInfo->mode_list[i];
 
@@ -295,6 +298,10 @@ intel_propose_display_mode(display_mode* target, const display_mode* low,
 		// retain requested virtual size
 		target->virtual_width = VirtualWidth;
 		target->virtual_height = VirtualHeight;
+		// retain requested refreshrate
+		target->timing.pixel_clock =
+			target->timing.h_total * target->timing.v_total * RefreshRate;
+
 		// (most) modeflags are outputs from us (the driver). So we should
 		// set them depending on the mode and the current hardware config
 		target->flags |= B_SCROLL;
