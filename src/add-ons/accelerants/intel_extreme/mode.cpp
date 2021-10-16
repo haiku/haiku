@@ -273,42 +273,21 @@ intel_propose_display_mode(display_mode* target, const display_mode* low,
 {
 	CALLED();
 
-	// first search for the specified mode in the list, if no mode is found
-	// try to fix the target mode in sanitize_display_mode
-	// TODO: Only sanitize_display_mode should be used. However, at the moment
-	// the mode constraints are not optimal and do not work for all
-	// configurations.
-	uint32 VirtualWidth = target->virtual_width;
-	uint32 VirtualHeight = target->virtual_height;
-	float RefreshRate = (float)target->timing.pixel_clock /
-		(target->timing.h_total * target->timing.v_total);
+	display_mode mode = *target;
 
-	for (uint32 i = 0; i < gInfo->shared_info->mode_count; i++) {
-		display_mode *mode = &gInfo->mode_list[i];
-
-		// TODO: improve this, ie. adapt pixel clock to allowed values!!!
-
-		if (target->timing.h_display != mode->timing.h_display
-			|| target->timing.v_display != mode->timing.v_display
-			|| target->space != mode->space) {
-			continue;
-		}
-
-		*target = *mode;
-		// retain requested virtual size
-		target->virtual_width = VirtualWidth;
-		target->virtual_height = VirtualHeight;
-		// retain requested refreshrate
-		target->timing.pixel_clock =
-			target->timing.h_total * target->timing.v_total * RefreshRate;
-
-		// (most) modeflags are outputs from us (the driver). So we should
-		// set them depending on the mode and the current hardware config
-		target->flags |= B_SCROLL;
-		return B_OK;
+	if (sanitize_display_mode(*target)) {
+		TRACE("Video mode was adjusted by sanitize_display_mode\n");
+		TRACE("Initial mode: Hd %d Hs %d He %d Ht %d Vd %d Vs %d Ve %d Vt %d\n",
+			mode.timing.h_display, mode.timing.h_sync_start,
+			mode.timing.h_sync_end, mode.timing.h_total,
+			mode.timing.v_display, mode.timing.v_sync_start,
+			mode.timing.v_sync_end, mode.timing.v_total);
+		TRACE("Sanitized: Hd %d Hs %d He %d Ht %d Vd %d Vs %d Ve %d Vt %d\n",
+			target->timing.h_display, target->timing.h_sync_start,
+			target->timing.h_sync_end, target->timing.h_total,
+			target->timing.v_display, target->timing.v_sync_start,
+			target->timing.v_sync_end, target->timing.v_total);
 	}
-
-	sanitize_display_mode(*target);
 	// (most) modeflags are outputs from us (the driver). So we should
 	// set them depending on the mode and the current hardware config
 	target->flags |= B_SCROLL;
@@ -329,19 +308,6 @@ intel_set_display_mode(display_mode* mode)
 
 	display_mode target = *mode;
 
-	if (sanitize_display_mode(target)) {  //should be in proposemode..
-		TRACE("Video mode was adjusted by sanitize_display_mode\n");
-		TRACE("Initial mode: Hd %d Hs %d He %d Ht %d Vd %d Vs %d Ve %d Vt %d\n",
-			mode->timing.h_display, mode->timing.h_sync_start,
-			mode->timing.h_sync_end, mode->timing.h_total,
-			mode->timing.v_display, mode->timing.v_sync_start,
-			mode->timing.v_sync_end, mode->timing.v_total);
-		TRACE("Sanitized: Hd %d Hs %d He %d Ht %d Vd %d Vs %d Ve %d Vt %d\n",
-			target.timing.h_display, target.timing.h_sync_start,
-			target.timing.h_sync_end, target.timing.h_total,
-			target.timing.v_display, target.timing.v_sync_start,
-			target.timing.v_sync_end, target.timing.v_total);
-	}
 	if (intel_propose_display_mode(&target, &target, &target) != B_OK)
 		return B_BAD_VALUE;
 

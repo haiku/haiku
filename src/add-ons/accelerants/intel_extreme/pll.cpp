@@ -39,89 +39,86 @@
 #define CALLED(x...) TRACE("CALLED %s\n", __PRETTY_FUNCTION__)
 
 
-// PLL limits, taken from programming manual when available, and from Linux KMS
-// drivers otherwise. However, note that we use the values of N+2, M1+2 and
-// M2+2 here, the - 2 being applied when we write the values to the registers.
+// PLL limits, taken from i915 DRM driver. However, note that we use the values of
+// N+2, M1+2 and M2+2 here, the - 2 being applied when we write the values to the registers.
 
 static pll_limits kLimits85x = {
 	// p, p1, p2,  n,   m, m1, m2
-	{  4,  2,  2,  5,  96, 20,  8},
+	{  4,  2,  2,  4,  96, 20,  8},
 	{128, 33,  4, 18, 140, 28, 18},
-	165000, 930000, 1400000
+	165000, 908000, 1512000
 };
 
-// TODO according to the docs, the limits for 9xx anf G45 should be the same.
 // For Iron Lake, a new set of timings is introduced along with the FDI system,
 // and carried on to later cards with just one further change (to the P2 cutoff
 // frequency) in Sandy Bridge.
-//
-// So, it makes no sense to have separate limits and algorithm for 9xx and G45.
 
 static pll_limits kLimits9xxSdvo = {
 	// p, p1, p2,  n,   m, m1, m2
-	{  5,  1,  5,  5,  70, 12,  7},	// min
-	{ 80,  8, 10, 10, 120, 22, 11},	// max
+	{  5,  1,  5,  3,  70, 10,  5},	// min
+	{ 80,  8, 10,  8, 120, 20,  9},	// max
 	200000, 1400000, 2800000
 };
 
 static pll_limits kLimits9xxLvds = {
 	// p, p1, p2,  n,   m, m1, m2
-	{  7,  1,  7,  1,  70,  8,  3},	// min
-	{ 98,  8, 14,  6, 120, 18,  7},	// max
+	{  7,  1,  7,  3,  70, 10,  5},	// min
+	{ 98,  8, 14,  8, 120, 20,  9},	// max
 	112000, 1400000, 2800000
 };
 
-// Limits for G45 cards taken from g45_vlo3_register_0_0_0.pdf, page 46
-// Note that n here is actually n+2, but m1 and m2 are as in the datasheet.
+// Limits for G45 cards taken from i915 DRM driver, mixed with old setup
+// plus tests to accomodate lower resolutions with still correct refresh.
+// Note that n here is actually n+2, same applies to m1 and m2.
 
 static pll_limits kLimitsG4xSdvo = {
 	// p, p1, p2,  n,   m, m1, m2
-	{  5,  1,  5,  5,  70, 12,  7},	// min
-	{ 80,  8, 10, 10, 120, 22, 11},	// max
-	270000, 1400000, 2800000
+	{ 10,  1, 10,  3, 104, 19,  7},	// min
+	{ 80,  8, 10,  8, 138, 25, 13},	// max
+	270000, 1750000, 3500000
 };
 
 #if 0
 static pll_limits kLimitsG4xHdmi = {
 	// p, p1, p2,  n,   m, m1, m2
-	{  5,  1,  5,  5,  70, 12,  7},	// min
-	{ 80,  8, 10, 10, 120, 22, 11},	// max
-	165000, 1400000, 2800000
+	{  5,  1,  5,  3, 104, 18,  7},	// min
+	{ 80,  8, 10,  8, 138, 25, 13},	// max
+	165000, 1750000, 3500000
 };
 #endif
 
 static pll_limits kLimitsG4xLvdsSingle = {
 	// p, p1, p2,  n,   m, m1, m2
-	{  7,  1, 14,  5,  70, 12,  7},	// min
-	{ 98,  8, 14, 10, 120, 22, 11},	// max
-	0, 1400000, 2800000
+	{ 28,  2, 14,  3, 104, 19,  7},	// min
+	{112,  8, 14,  8, 138, 25, 13},	// max
+	0, 1750000, 3500000
 };
 
 static pll_limits kLimitsG4xLvdsDual = {
 	// p, p1, p2,  n,   m, m1, m2
-	{ 14,  2,  7,  5,  70, 12,  7},	// min
-	{ 42,  6,  7, 10, 120, 22, 11},	// max
-	0, 1400000, 2800000
+	{ 14,  2,  7,  3, 104, 19,  7},	// min
+	{ 42,  6,  7,  8, 138, 25, 13},	// max
+	0, 1750000, 3500000
 };
 
 static pll_limits kLimitsIlkDac = {
 	// p, p1, p2, n,   m, m1, m2
 	{  5,  1,  5, 3,  79, 14,  7}, // min
-	{ 80,  8, 10, 8, 118, 24, 11}, // max
+	{ 80,  8, 10, 7, 127, 24, 11}, // max
 	225000, 1760000, 3510000
 };
 
 static pll_limits kLimitsIlkLvdsSingle = {
 	// p, p1, p2, n,   m, m1, m2
 	{ 28,  2, 14, 3,  79, 14,  7}, // min
-	{112,  8, 14, 8, 118, 24, 11}, // max
+	{112,  8, 14, 5, 118, 24, 11}, // max
 	225000, 1760000, 3510000
 };
 
 static pll_limits kLimitsIlkLvdsDual = {
 	// p, p1, p2, n,   m, m1, m2
 	{ 14,  2,  7, 3,  79, 14,  7}, // min
-	{ 56,  8,  7, 8, 127, 24, 11}, // max
+	{ 56,  8,  7, 5, 127, 24, 11}, // max
 	225000, 1760000, 3510000
 };
 
@@ -129,14 +126,14 @@ static pll_limits kLimitsIlkLvdsDual = {
 static pll_limits kLimitsIlkLvdsSingle100 = {
 	// p, p1, p2, n,   m, m1, m2
 	{ 28,  2, 14, 3,  79, 14,  7}, // min
-	{112,  8, 14, 8, 126, 24, 11}, // max
+	{112,  8, 14, 4, 126, 24, 11}, // max
 	225000, 1760000, 3510000
 };
 
 static pll_limits kLimitsIlkLvdsDual100 = {
 	// p, p1, p2, n,   m, m1, m2
 	{ 14,  2,  7, 3,  79, 14,  7}, // min
-	{ 42,  6,  7, 8, 126, 24, 11}, // max
+	{ 42,  6,  7, 5, 126, 24, 11}, // max
 	225000, 1760000, 3510000
 };
 
@@ -345,8 +342,8 @@ compute_dpll_g4x(display_mode* current, pll_divisors* divisors, bool isLVDS)
 						continue;
 
 					float error = fabs(requestedPixelClock
-						- ((referenceClock * divisors->m) / divisors->n)
-						/ divisors->p);
+						- (referenceClock * divisors->m)
+						/ (divisors->n * divisors->p));
 					if (error < best) {
 						best = error;
 						bestDivisors = *divisors;
@@ -360,7 +357,7 @@ compute_dpll_g4x(display_mode* current, pll_divisors* divisors, bool isLVDS)
 	}
 	*divisors = bestDivisors;
 	TRACE("%s: best MHz: %g (error: %g)\n", __func__,
-		((referenceClock * divisors->m) / divisors->n) / divisors->p,
+		(referenceClock * divisors->m) / (divisors->n * divisors->p),
 		best);
 }
 
@@ -423,8 +420,8 @@ compute_dpll_9xx(display_mode* current, pll_divisors* divisors, bool isLVDS)
 						continue;
 
 					float error = fabs(requestedPixelClock
-						- ((referenceClock * divisors->m) / divisors->n)
-						/ divisors->p);
+						- (referenceClock * divisors->m)
+						/ (divisors->n * divisors->p));
 					if (error < best) {
 						best = error;
 						bestDivisors = *divisors;
@@ -443,7 +440,7 @@ compute_dpll_9xx(display_mode* current, pll_divisors* divisors, bool isLVDS)
 		debugger("No valid PLL configuration found");
 	else {
 		TRACE("%s: best MHz: %g (error: %g)\n", __func__,
-			((referenceClock * divisors->m) / divisors->n) / divisors->p,
+			(referenceClock * divisors->m) / (divisors->n * divisors->p),
 			best);
 	}
 }
