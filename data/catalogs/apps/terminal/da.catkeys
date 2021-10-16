@@ -1,8 +1,10 @@
-1	danish	x-vnd.Haiku-Terminal	3771520812
+1	danish	x-vnd.Haiku-Terminal	4032760800
+ANSI cyan color	Terminal AppearancePrefView		ANSI cyan farve
 Close other tabs	Terminal TermWindow		Luk andre faneblade
 Insert path	Terminal TermView		Indsæt sti
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal kunne ikke køre skallen. Beklager.
 Text encoding	Terminal TermWindow		Tekstkodning
+ANSI blue color	Terminal AppearancePrefView		ANSI blå farve
 OK	Terminal SetTitleWindow		OK
 Edit	Terminal TermWindow		Rediger
 Select all	Terminal TermWindow		Vælg alt
@@ -10,40 +12,49 @@ Confirm exit if active programs exist	Terminal AppearancePrefView		Bekræft lukn
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tDen nuværende arbejdsmappe for den aktive proces i det\n\t\t\tnuværende faneblad. Det maksimale antal stikomponenter kan\n\t\t\tvalgfrit angives. F.eks. '%2d' for højst to komponenter.\n\t%T\t-\tTerminal-programnavnet for den nuværende lokalitet.\n\t%e\t-\tKodningen på det nuværende faneblad. Vises ikke ved UTF-8.\n\t%i\t-\tIndekset på vinduet.\n\t%p\t-\tNavnet på den aktive proces i det nuværende faneblad.\n\t%t\t-\tTitlen på det nuværende faneblad.
 Solarized Dark	Terminal colors scheme		Solariseret mørkt
 Copy	Terminal TermWindow		Kopiér
+ANSI bright green color	Terminal AppearancePrefView		ANSI klar grøn farve
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory	Terminal TermApp		  -h,     --help               vis denne hjælp\n  -t,     --title              indstil vinduets titel\n  -f,     --fullscreen         start fuldskærm\n  -w,     --working-directory  indstil indledende arbejdsmappe
+ANSI white color	Terminal AppearancePrefView		ANSI hvid farve
 Retro	Terminal colors scheme		Retro
 Edit tab title…	Terminal TermWindow		Rediger fanebladstitel…
 Settings	Terminal TermWindow		Indstillinger
 Print	Terminal TermWindow		Udskriv
 %app% settings	Terminal PrefWindow	window title	%app%-indstillinger
+ANSI black color	Terminal AppearancePrefView		ANSI sort farve
 Use default	Terminal SetTitleWindow		Brug standard
 Close tab	Terminal TermWindow		Luk faneblad
 Selected background	Terminal AppearancePrefView		Valgte baggrund
 Error!	Terminal getString		Fejl!
 Set tab title	Terminal TermWindow		Sæt fanebladstitel
 Appearance	Terminal PrefWindow		Udseende
+ANSI bright yellow color	Terminal AppearancePrefView		ANSI klar gul farve
 Encoding:	Terminal AppearancePrefView		Kodning:
 Create link here	Terminal TermView		Lav link her
 Custom	Terminal AppearancePrefView	Window size	Tilpas
 Selected text	Terminal AppearancePrefView		Valgte tekst
 Change directory	Terminal TermView		Skift mappe
+ANSI magenta color	Terminal AppearancePrefView		ANSI magenta farve
 Page setup…	Terminal TermWindow		Sideopsætning…
 Slate	Terminal colors scheme		Skiffer
 Defaults	Terminal PrefWindow		Standarder
 Cancel	Terminal TermView		Annuller
 Revert	Terminal PrefWindow		Omvendt
 Relaxed	Terminal colors scheme		Afslappet
+ANSI bright magenta color	Terminal AppearancePrefView		ANSI klar magenta farve
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
+ANSI bright cyan color	Terminal AppearancePrefView		ANSI klar cyan farve
 Find next	Terminal TermWindow		Find næste
 Use selection	Terminal FindWindow		Brug udvælgelse
 Copy link location	Terminal TermView		Kopiér linkplacering
 Window title:	Terminal AppearancePrefView		Vinduestitel:
 New tab	Terminal TermWindow		Nyt faneblad
+ANSI bright blue color	Terminal AppearancePrefView		ANSI klar blå farve
 Allow bold text	Terminal AppearancePrefView		Tillad fed tekst
 Window title…	Terminal TermWindow		Vinduestitel…
 Blue	Terminal colors scheme		Blå
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Kan ikke køre \"%command\":\n\t%error
 Open path	Terminal TermView		Åbn sti
+ANSI yellow color	Terminal AppearancePrefView		ANSI gul farve
 Terminal	System name		Terminal
 Font size	Terminal TermWindow		Skriftstørrelse
 Custom	Terminal colors scheme		Tilpas
@@ -64,6 +75,7 @@ The pattern specifying the tab titles. The following placeholders\ncan be used:	
 Close	Terminal TermWindow		Luk
 Save to file…	Terminal PrefWindow		Gem i fil…
 Background	Terminal AppearancePrefView		Baggrund
+ANSI green color	Terminal AppearancePrefView		ANSI grøn farve
 Copy path	Terminal TermView		Kopiér sti
 Window size	Terminal TermWindow		Vinduesstørrelse
 Copy absolute path	Terminal TermView		Kopiér absolut sti
@@ -81,6 +93,7 @@ Window size:	Terminal AppearancePrefView		Vinduesstørrelse:
 Switch Terminals	Terminal TermWindow		Skift terminal
 Decrease	Terminal TermWindow		Mindre
 Settings…	Terminal TermWindow		Indstillinger…
+ANSI bright white color	Terminal AppearancePrefView		ANSI klar hvid farve
 Blinking cursor	Terminal AppearancePrefView		Blinkende markør
 Cancel	Terminal SetTitleWindow		Annuller
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Mønsteret angiver vinduestitlen. Følgende pladsholdere\nkan bruges:\n
@@ -88,6 +101,7 @@ Close active tab	Terminal TermWindow		Luk aktivt faneblad
 Use text:	Terminal FindWindow		Brug tekst:
 Save as default	Terminal TermWindow		Gem som standard
 Nothing is selected.	Terminal TermWindow		Intet er markeret.
+ANSI red color	Terminal AppearancePrefView		ANSI rød farve
 Use left Option as Meta key	Terminal AppearancePrefView		Brug venstre Option som Meta-tast
 Find	Terminal FindWindow		Find
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Mønsteret angiver den aktuelle fanebladstitel. Følgende pladsholdere\nkan bruges:\n
@@ -95,7 +109,9 @@ Professional	Terminal colors scheme		Professionel
 Font:	Terminal AppearancePrefView		Skrifttype:
 Paste	Terminal TermWindow		Indsæt
 The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Mønsteret som angiver vinduestitlerne. Følgende pladsholdere\nkan bruges:
+ANSI bright black color	Terminal AppearancePrefView		ANSI klar sort farve
 Copy here	Terminal TermView		Kopiér her
+ANSI bright red color	Terminal AppearancePrefView		ANSI klar rød farve
 Use default shell	Terminal Shell		Brug standardskal
 Color:	Terminal AppearancePrefView		Farve:
 Open link	Terminal TermView		Åbn link

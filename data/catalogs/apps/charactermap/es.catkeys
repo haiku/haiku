@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-CharacterMap	2410613018
+1	spanish; castilian	x-vnd.Haiku-CharacterMap	917523322
 Tirhuta	UnicodeBlocks		Tirhuta
 Miscellaneous mathematical symbols B	UnicodeBlocks		Variado de símbolos matemáticos B
 Latin extended E	UnicodeBlocks		Latín extendido E
@@ -60,6 +60,7 @@ CJK unified ideographs extension C	UnicodeBlocks		Ideogramas CJK unificados exte
 Ancient Greek musical notation	UnicodeBlocks		Notación musical griega antigua
 Thai	UnicodeBlocks		Tailandés
 Ethiopic supplement	UnicodeBlocks		Suplemento de etíope
+Only show blocks contained in font	CharacterWindow		Mostrar solamente bloques contenidos en la fuente
 Chess symbols	UnicodeBlocks		Símbolos de ajedrez
 Yijing hexagram symbols	UnicodeBlocks		Hexagramas de Yijing
 Ottoman Siyaq numbers	UnicodeBlocks		Números otomanos siyaq

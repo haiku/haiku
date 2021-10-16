@@ -124,7 +124,7 @@ Status	PackageListView		Durum
 The password has been incorrectly repeated.	UserLoginWindow		İkinci parola girişinde yanlış(lar) var.
 Network transport error	ServerHelper		Ağ ulaşım hatası
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		Önceden [%Nickname%] kullanıcısına ait olan parola şu anda geçerli değil. Uygulamadan çıkış yapılacaktır; güncellenmiş parola ile yeniden giriş yapmanız gerekmektedir.
-Uninstall %PackageTitle%	PackageManager		%PackageTitle% kaldır
+Uninstall %PackageTitle%	PackageManager		Kaldır: %PackageTitle%
 Update	RatePackageWindow		Güncelle
 OK	ServerHelper		Tamam
 Language	UserLoginWindow		Dil

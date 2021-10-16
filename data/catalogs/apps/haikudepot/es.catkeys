@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-HaikuDepot	3437352458
+1	spanish; castilian	x-vnd.Haiku-HaikuDepot	761125591
 Repository update error	LocalRepositoryUpdateProcess		Error de actualización de repositorio
 Network error	ServerHelper		Error de red
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Ocurrió un error al actualizar el repositorio: %error%
@@ -8,6 +8,7 @@ Uninstalled	PackageListView		Desinstalado
 It was not possible to create the new user.	UserLoginWindow		No fue posible crear el nuevo usuario.
 Available packages	MainWindow		Paquetes disponibles
 Create account	UserLoginWindow		Crear cuenta
+Install %PackageTitle%	PackageManager		Instalar %PackageTitle%
 OK	App		Aceptar
 The response to the captcha was incorrect.	ServerHelper		La respuesta al captcha fue incorrecta.
 Develop packages	MainWindow		Paquetes para desarrollo
@@ -123,6 +124,7 @@ Status	PackageListView		Estado
 The password has been incorrectly repeated.	UserLoginWindow		La contraseña reingresada no coincide.
 Network transport error	ServerHelper		Error de transporte de red
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		La contraseña anteriormente usada por [%Nickname%] ya no es válida. El usuario se desconectará y la aplicación le pedirá de nuevo iniciar sesión con su contraseña actualizada.
+Uninstall %PackageTitle%	PackageManager		Desinstalar %PackageTitle%
 Update	RatePackageWindow		Actualizar
 OK	ServerHelper		Aceptar
 Language	UserLoginWindow		Idioma

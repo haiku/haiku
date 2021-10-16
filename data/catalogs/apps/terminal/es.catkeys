@@ -1,8 +1,10 @@
-1	spanish; castilian	x-vnd.Haiku-Terminal	3117643489
+1	spanish; castilian	x-vnd.Haiku-Terminal	4032760800
+ANSI cyan color	Terminal AppearancePrefView		Color ANSI cian
 Close other tabs	Terminal TermWindow		Cerrar otras pestañas
 Insert path	Terminal TermView		Insertar la ruta de acceso
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Lo sentimos, pero el Terminal no pudo iniciar la shell.
 Text encoding	Terminal TermWindow		Codificación de texto
+ANSI blue color	Terminal AppearancePrefView		Color ANSI azul
 OK	Terminal SetTitleWindow		Aceptar
 Edit	Terminal TermWindow		Editar
 Select all	Terminal TermWindow		Seleccionar todo
@@ -10,39 +12,49 @@ Confirm exit if active programs exist	Terminal AppearancePrefView		Confirmar la 
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tEl directorio de trabajo del proceso activo en la pestaña actual.\n\t\t\tOpcionalmente puede especificarse el número máximo de\n\t\t\tcomponentes de ruta. P.ej. '%2d' para al menos dos componentes.\n\t%T\t-\tEl nombre en Terminal de la aplicación para el local actual.\n\t%e\t-\tLa codificación de la pestaña actual. No mostrado para UTF-8.\n\t%i\t-\tEl índice de la ventana.\n\t%p\t-\tEl nombre del proceso activo en la pestaña actual.\n\t%t\t-\tEl nombre de la pestaña actual.
 Solarized Dark	Terminal colors scheme		Oscuridad solarizada
 Copy	Terminal TermWindow		Copiar
+ANSI bright green color	Terminal AppearancePrefView		Color ANSI verde claro
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory	Terminal TermApp		  -h,     --help               muestra este mensaje de ayuda\n  -t,     --title              establece el título de la ventana\n  -f,     --fullscreen         comienza en pantalla completa\n  -w,     --working-directory  establece el directorio de trabajo inicial
+ANSI white color	Terminal AppearancePrefView		Color ANSI blanco
 Retro	Terminal colors scheme		Retro
 Edit tab title…	Terminal TermWindow		Cambiar el título de la pestaña
 Settings	Terminal TermWindow		Ajustes
 Print	Terminal TermWindow		Imprimir
 %app% settings	Terminal PrefWindow	window title	Configuración de %app%
+ANSI black color	Terminal AppearancePrefView		Color ANSI negro
 Use default	Terminal SetTitleWindow		Usar predeterminado
 Close tab	Terminal TermWindow		Cerrar pestaña
 Selected background	Terminal AppearancePrefView		Fondo seleccionado
 Error!	Terminal getString		¡Error!
 Set tab title	Terminal TermWindow		Fijar el título de la ventana
 Appearance	Terminal PrefWindow		Apariencia
+ANSI bright yellow color	Terminal AppearancePrefView		Color ANSI amarillo claro
 Encoding:	Terminal AppearancePrefView		Personalizado
 Create link here	Terminal TermView		Crear enlace aquí
 Custom	Terminal AppearancePrefView	Window size	Personalizada
 Selected text	Terminal AppearancePrefView		Seleccionar texto
 Change directory	Terminal TermView		Cambiar directorio 
+ANSI magenta color	Terminal AppearancePrefView		Color ANSI magenta
 Page setup…	Terminal TermWindow		Configuración de la página...
 Slate	Terminal colors scheme		Pizarra
 Defaults	Terminal PrefWindow		Predeterminado
 Cancel	Terminal TermView		Cancelar
 Revert	Terminal PrefWindow		Revertir
+Relaxed	Terminal colors scheme		Relajado
+ANSI bright magenta color	Terminal AppearancePrefView		Color ANSI magenta claro
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
+ANSI bright cyan color	Terminal AppearancePrefView		Color ANSI cian claro
 Find next	Terminal TermWindow		Buscar siguiente
 Use selection	Terminal FindWindow		Utilizar selección
 Copy link location	Terminal TermView		Copiar ubicación del enlace
 Window title:	Terminal AppearancePrefView		Titulo de la ventana:
 New tab	Terminal TermWindow		Nueva pestaña
+ANSI bright blue color	Terminal AppearancePrefView		Color ANSI azul claro
 Allow bold text	Terminal AppearancePrefView		Permitir texto en negrita
 Window title…	Terminal TermWindow		Título de la ventana...
 Blue	Terminal colors scheme		Azul
 Cannot execute \"%command\":\n\t%error	Terminal Shell		No se pudo ejecutar \"%command\":\n\t%error
 Open path	Terminal TermView		Abrir ruta
+ANSI yellow color	Terminal AppearancePrefView		Color ANSI amarillo
 Terminal	System name		Terminal
 Font size	Terminal TermWindow		Tamaño de tipografía
 Custom	Terminal colors scheme		Personalizada
@@ -63,6 +75,7 @@ The pattern specifying the tab titles. The following placeholders\ncan be used:	
 Close	Terminal TermWindow		Cerrar
 Save to file…	Terminal PrefWindow		Guardar a fichero...
 Background	Terminal AppearancePrefView		Fondo
+ANSI green color	Terminal AppearancePrefView		Color ANSI verde
 Copy path	Terminal TermView		Copiar ruta
 Window size	Terminal TermWindow		Tamaño de la ventana
 Copy absolute path	Terminal TermView		Copiar ruta absoluta
@@ -80,6 +93,7 @@ Window size:	Terminal AppearancePrefView		Tamaño de la ventana:
 Switch Terminals	Terminal TermWindow		Intercambiar terminales
 Decrease	Terminal TermWindow		Disminuir
 Settings…	Terminal TermWindow		Ajustes...
+ANSI bright white color	Terminal AppearancePrefView		Color ANSI blanco claro
 Blinking cursor	Terminal AppearancePrefView		Cursor parpadeante
 Cancel	Terminal SetTitleWindow		Cancelar
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		El patrón especifica el título de la ventana. Los siguientes marcadores de posición\ncpueden ser usados:\n
@@ -87,6 +101,7 @@ Close active tab	Terminal TermWindow		Cerrar la pestaña activa
 Use text:	Terminal FindWindow		Utilizar texto:
 Save as default	Terminal TermWindow		Definir como predeterminado
 Nothing is selected.	Terminal TermWindow		No se ha seleccionado nada.
+ANSI red color	Terminal AppearancePrefView		Color ANSI rojo
 Use left Option as Meta key	Terminal AppearancePrefView		Usar la Opción izquierda como tecla Meta
 Find	Terminal FindWindow		Encontrar
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		El patrón especifica el título de la pestaña actual. Los siguientes marcadores de posición\nse pueden utilizar:\n
@@ -94,7 +109,9 @@ Professional	Terminal colors scheme		Profesional
 Font:	Terminal AppearancePrefView		Tipo de letra:
 Paste	Terminal TermWindow		Pegar
 The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		El patrón especificando los títulos de las ventanas. Los siguientes marcadores de posición\nse pueden utilizar:
+ANSI bright black color	Terminal AppearancePrefView		Color ANSI negro claro
 Copy here	Terminal TermView		Copiar aquí
+ANSI bright red color	Terminal AppearancePrefView		Color ANSI rojo claro
 Use default shell	Terminal Shell		Usar intérprete predeterminado
 Color:	Terminal AppearancePrefView		Color:
 Open link	Terminal TermView		Abrir enlace

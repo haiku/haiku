@@ -44,7 +44,7 @@ File system	PartitionList		Filsystem
 The selected partition does not contain a partitioning system.	MainWindow		Den valgte partition indeholder ikke et partitions system.
 End: %s	Support		Slutning: %s
 Partition type	PartitionList		Partitionstype
-Unable to find the selected partition by ID.	MainWindow		Kunne ikke finde den valgte partition ud fra ID.
+Unable to find the selected partition by ID.	MainWindow		Kunne ikke finde den valgte partition ud fra id.
 The currently selected partition is not empty.	MainWindow		Den valgte partition er ikke tom.
 Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Er du sikker på, at du vil formatere en rå disk? (de fleste mennesker initialiserer først disken med et partitionssystem). Du vil blive spurgt igen inden ændringerne skrives til disken.
 Wipe (not implemented)	MainWindow		Stryg (ikke implementeret)

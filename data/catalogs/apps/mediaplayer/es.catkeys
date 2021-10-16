@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-MediaPlayer	1961774506
+1	spanish; castilian	x-vnd.Haiku-MediaPlayer	716811487
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Enviar entrada a la papelera
 Close	MediaPlayer-PlaylistWindow		Cerrar
 Volume of background clips	MediaPlayer-SettingsWindow		Volumen de secuencias de fondo
@@ -30,6 +30,7 @@ Open file…	MediaPlayer-Main		Abrir archivo...
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Escalar controles en modo de pantalla completa
 View options	MediaPlayer-SettingsWindow		Ver opciones
 %d kHz	MediaPlayer-InfoWin		%d kHz
+Eject Device	MediaPlayer-Main		Extraer dispositivo
 Full volume	MediaPlayer-SettingsWindow		Máximo volumen
 <untitled>	PlaylistItem-title		<sin título>
 Start media server	MediaPlayer-Main		Iniciar servidor de medios

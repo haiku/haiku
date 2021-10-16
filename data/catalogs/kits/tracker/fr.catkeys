@@ -85,7 +85,7 @@ GiB	WidgetAttributeText		Gio
 Clean up	ContainerWindow		Nettoyer
 Modified	FindPanel		Modifié
 Select all	QueryContainerWindow		Sélectionner tout
-Generate image thumbnails	SettingsView		Générer des vignettes d'images
+Generate image thumbnails	SettingsView		Générer des vignettes d’images
 Select…	FilePanelPriv		Sélectionner…
 preferences	B_PREFERENCES_DIRECTORY		préférences
 Name	Person Query Columns		Nom

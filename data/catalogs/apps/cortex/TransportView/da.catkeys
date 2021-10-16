@@ -1,6 +1,7 @@
-1	danish	application/x-vnd.Cortex.TransportView	2104607314
+1	danish	application/x-vnd.Cortex.TransportView	1198513874
 Roll	TransportView		Rul
 (none)	TransportView		(ingen)
+{0, plural, one{# node} other{# nodes}}	TransportView		{0, plural, one{# knudepunkt} other{# knudepunkter}}
 Start	TransportView		Start
 No errors.	TransportView		Ingen fejl.
 to	TransportView		til

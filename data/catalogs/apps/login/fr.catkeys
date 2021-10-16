@@ -10,7 +10,7 @@ Reboot	Login View		Redémarrer
 You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Vous pouvez personnaliser le bureau affiché derrière l’application Login en déposant des réplicants dessus.\n\nLorsque vous avez terminé, quittez l’application (Cmd-Q).
 OK	Login View		OK
 Info	Login App		Informations
---edit\tLaunch in shelf editting mode to allow customizing the desktop.	Login App		--edit\tLancement en mode plateforme d'édition pour permettre la personnalisation du bureau.
+--edit\tLaunch in shelf editting mode to allow customizing the desktop.	Login App		--edit\tLancement en mode plateforme d’édition pour permettre la personnalisation du bureau.
 Login:	Login View		Identifiant :
 Password:	Login View		Mot de passe :
 Unimplemented	Login App		Non implémenté

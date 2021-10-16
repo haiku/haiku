@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-StyledEdit	2796309255
+1	spanish; castilian	x-vnd.Haiku-StyledEdit	3760185556
 Document statistics	Statistics		Estadísticas del documento
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		No se puede revertir, archivo no encontrado: \"%s\".
 Cut	Menus		Cortar
@@ -51,6 +51,7 @@ OK	SaveAlert		Aceptar
 Color	Menus		Color
 Save changes to the document \"%s\"? 	QuitAlert		¿Desea guardar los cambios realizados sobre el documento \"%s\"?
 StyledEdit	System name		Edición con Estilo
+Underline	Menus		Subrayado
 Find:	FindandReplaceWindow		Encontrar:
 Undo typing	QuitAlert		Deshacer lo escrito
 Error loading \"%s\":\n\t%s	LoadAlert		Error cargando \"%s\":\n\t%s
