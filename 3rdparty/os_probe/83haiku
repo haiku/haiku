@@ -1,4 +1,4 @@
-#!/usr/bin/sh
+#!/bin/sh
 # Detects bootable Haiku OS on BeFS partitions and FUSE mounted BeFS too.
 # If it doesn't find anything, try mounting the BeFS volumes in Linux.
 # Discussion of improvements and development history at
