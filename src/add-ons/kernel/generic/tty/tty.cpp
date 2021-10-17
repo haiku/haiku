@@ -5,11 +5,6 @@
  */
 
 
-// This file could be moved into a generic tty module.
-// The whole hardware signaling stuff is missing, though - it's currently
-// tailored for pseudo-TTYs. Have a look at Be's TTY includes (drivers/tty/*)
-
-
 #include "tty_private.h"
 
 #include <ctype.h>
@@ -1267,59 +1262,6 @@ tty_write_to_tty_slave(tty_cookie* sourceCookie, const void* _buffer,
 }
 
 
-#if 0
-static void
-dump_tty_settings(struct tty_settings& settings)
-{
-	kprintf("  pgrp_id:      %ld\n", settings.pgrp_id);
-	kprintf("  session_id:   %ld\n", settings.session_id);
-
-	kprintf("  termios:\n");
-	kprintf("    c_iflag:    0x%08lx\n", settings.termios.c_iflag);
-	kprintf("    c_oflag:    0x%08lx\n", settings.termios.c_oflag);
-	kprintf("    c_cflag:    0x%08lx\n", settings.termios.c_cflag);
-	kprintf("    c_lflag:    0x%08lx\n", settings.termios.c_lflag);
-	kprintf("    c_line:     %d\n", settings.termios.c_line);
-	kprintf("    c_ispeed:   %u\n", settings.termios.c_ispeed);
-	kprintf("    c_ospeed:   %u\n", settings.termios.c_ospeed);
-	for (int i = 0; i < NCCS; i++)
-		kprintf("    c_cc[%02d]:   %d\n", i, settings.termios.c_cc[i]);
-
-	kprintf("  wsize:        %u x %u c, %u x %u pxl\n",
-		settings.window_size.ws_row, settings.window_size.ws_col,
-		settings.window_size.ws_xpixel, settings.window_size.ws_ypixel);
-}
-
-
-static void
-dump_tty_struct(struct tty& tty)
-{
-	kprintf("  tty @:        %p\n", &tty);
-	kprintf("  is_master:    %s\n", tty.is_master ? "true" : "false");
-	kprintf("  open_count:   %ld\n", tty.open_count);
-	kprintf("  select_pool:  %p\n", tty.select_pool);
-	kprintf("  pending_eof:  %lu\n", tty.pending_eof);
-
-	kprintf("  input_buffer:\n");
-	kprintf("    first:      %ld\n", tty.input_buffer.first);
-	kprintf("    in:         %lu\n", tty.input_buffer.in);
-	kprintf("    size:       %lu\n", tty.input_buffer.size);
-	kprintf("    buffer:     %p\n", tty.input_buffer.buffer);
-
-	kprintf("  reader queue:\n");
-	tty.reader_queue.Dump("    ");
-	kprintf("  writer queue:\n");
-	tty.writer_queue.Dump("    ");
-
-	kprintf("  cookies:     ");
-	TTYCookieList::Iterator it = tty.cookies.GetIterator();
-	while (tty_cookie* cookie = it.Next())
-		kprintf(" %p", cookie);
-	kprintf("\n");
-}
-#endif
-
-
 // #pragma mark - public API
 
 
@@ -1435,7 +1377,7 @@ tty_close_cookie(tty_cookie* cookie)
 	// critical code
 	if (unblock) {
 		TRACE(("tty_close_cookie(): cookie %p, there're still pending "
-			"operations, acquire blocking sem %ld\n", cookie,
+			"operations, acquire blocking sem %" B_PRId32 "\n", cookie,
 			cookie->blocking_semaphore));
 
 		acquire_sem(cookie->blocking_semaphore);
@@ -1530,7 +1472,8 @@ tty_read(tty_cookie* cookie, void* _buffer, size_t* _length)
 	bigtime_t interCharTimeout = 0;
 	size_t bytesNeeded = 1;
 
-	TRACE(("tty_input_read(tty = %p, length = %lu, mode = %lu)\n", tty, length, mode));
+	TRACE(("tty_input_read(tty = %p, length = %lu, mode = %" B_PRIu32 ")\n",
+		tty, length, mode));
 
 	if (length == 0)
 		return B_OK;
@@ -1549,8 +1492,8 @@ tty_read(tty_cookie* cookie, void* _buffer, size_t* _length)
 			// Non-blocking mode. Handle VMIN and VTIME.
 			bytesNeeded = tty->settings.termios.c_cc[VMIN];
 			bigtime_t vtime = tty->settings.termios.c_cc[VTIME] * 100000;
-			TRACE(("tty_input_read: icanon vmin %lu, vtime %Ldus\n", bytesNeeded,
-				vtime));
+			TRACE(("tty_input_read: icanon vmin %lu, vtime %" B_PRIdBIGTIME
+				"us\n", bytesNeeded, vtime));
 
 			if (bytesNeeded == 0) {
 				// In this case VTIME specifies a relative total timeout. We
@@ -1573,8 +1516,8 @@ tty_read(tty_cookie* cookie, void* _buffer, size_t* _length)
 	*_length = 0;
 
 	do {
-		TRACE(("tty_input_read: AcquireReader(%Ldus, %ld)\n", timeout,
-			bytesNeeded));
+		TRACE(("tty_input_read: AcquireReader(%" B_PRIdBIGTIME "us, %ld)\n",
+			timeout, bytesNeeded));
 		status = locker.AcquireReader(timeout, bytesNeeded);
 		size_t toRead = locker.AvailableBytes();
 		if (status != B_OK && toRead == 0) {
@@ -1646,7 +1589,8 @@ tty_control(tty_cookie* cookie, uint32 op, void* buffer, size_t length)
 	if (!ttyReference.IsLocked())
 		return B_FILE_ERROR;
 
-	TRACE(("tty_ioctl: tty %p, op %lu, buffer %p, length %lu\n", tty, op, buffer, length));
+	TRACE(("tty_ioctl: tty %p, op %" B_PRIu32 ", buffer %p, length %"
+		B_PRIuSIZE "\n", tty, op, buffer, length));
 	MutexLocker locker(tty->lock);
 
 	switch (op) {
@@ -1670,9 +1614,10 @@ tty_control(tty_cookie* cookie, uint32 op, void* buffer, size_t length)
 		case TCSETAW:
 		case TCSETAF:
 		{
-			TRACE(("tty: set attributes (iflag = %lx, oflag = %lx, "
-				"cflag = %lx, lflag = %lx)\n", tty->settings.termios.c_iflag,
-				tty->settings.termios.c_oflag, tty->settings.termios.c_cflag,
+			TRACE(("tty: set attributes (iflag = %" B_PRIx32 ", oflag = %"
+				B_PRIx32 ", cflag = %" B_PRIx32 ", lflag = %" B_PRIx32 ")\n",
+				tty->settings.termios.c_iflag, tty->settings.termios.c_oflag,
+				tty->settings.termios.c_cflag,
 				tty->settings.termios.c_lflag));
 
 			status_t status = user_memcpy(&tty->settings.termios, buffer,
@@ -1688,7 +1633,7 @@ tty_control(tty_cookie* cookie, uint32 op, void* buffer, size_t length)
 		// get and set window size
 
 		case TIOCGWINSZ:
-			TRACE(("tty: set window size\n"));
+			TRACE(("tty: get window size\n"));
 			return user_memcpy(buffer, &tty->settings.window_size,
 				sizeof(struct winsize));
 
@@ -1834,7 +1779,7 @@ tty_control(tty_cookie* cookie, uint32 op, void* buffer, size_t length)
 		}
 	}
 
-	TRACE(("tty: unsupported opcode %lu\n", op));
+	TRACE(("tty: unsupported opcode %" B_PRIu32 "\n", op));
 	return B_BAD_VALUE;
 }
 
@@ -1844,8 +1789,8 @@ tty_select(tty_cookie* cookie, uint8 event, uint32 ref, selectsync* sync)
 {
 	struct tty* tty = cookie->tty;
 
-	TRACE(("tty_select(cookie = %p, event = %u, ref = %lu, sync = %p)\n",
-		cookie, event, ref, sync));
+	TRACE(("tty_select(cookie = %p, event = %u, ref = %" B_PRIu32 ", sync = "
+		"%p)\n", cookie, event, ref, sync));
 
 	// we don't support all kinds of events
 	if (event < B_SELECT_READ || event > B_SELECT_ERROR)
@@ -1872,8 +1817,8 @@ tty_select(tty_cookie* cookie, uint8 event, uint32 ref, selectsync* sync)
 	// add the event to the TTY's pool
 	status_t error = add_select_sync_pool_entry(&tty->select_pool, sync, event);
 	if (error != B_OK) {
-		TRACE(("tty_select() done: add_select_sync_pool_entry() failed: %lx\n",
-			error));
+		TRACE(("tty_select() done: add_select_sync_pool_entry() failed: %"
+			B_PRIx32 "\n", error));
 
 		return error;
 	}

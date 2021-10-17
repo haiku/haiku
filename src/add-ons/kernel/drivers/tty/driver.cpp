@@ -11,6 +11,7 @@
 
 #include <lock.h>
 
+#include "tty_driver.h"
 #include "tty_private.h"
 
 
@@ -32,10 +33,103 @@ char *gDeviceNames[kNumTTYs * 2 + 3];
 	// terminating NULL
 
 static mutex sTTYLocks[kNumTTYs];
+static tty_settings sTTYSettings[kNumTTYs];
 
 struct mutex gGlobalTTYLock;
 struct mutex gTTYCookieLock;
 struct recursive_lock gTTYRequestLock;
+
+
+static void
+dump_tty_settings(struct tty_settings& settings)
+{
+	kprintf("  pgrp_id:      %" B_PRId32 "\n", settings.pgrp_id);
+	kprintf("  session_id:   %" B_PRId32 "\n", settings.session_id);
+
+	kprintf("  termios:\n");
+	kprintf("    c_iflag:    0x%08" B_PRIx32 "\n", settings.termios.c_iflag);
+	kprintf("    c_oflag:    0x%08" B_PRIx32 "\n", settings.termios.c_oflag);
+	kprintf("    c_cflag:    0x%08" B_PRIx32 "\n", settings.termios.c_cflag);
+	kprintf("    c_lflag:    0x%08" B_PRIx32 "\n", settings.termios.c_lflag);
+	kprintf("    c_line:     %d\n", settings.termios.c_line);
+	kprintf("    c_ispeed:   %u\n", settings.termios.c_ispeed);
+	kprintf("    c_ospeed:   %u\n", settings.termios.c_ospeed);
+	for (int i = 0; i < NCCS; i++)
+		kprintf("    c_cc[%02d]:   %d\n", i, settings.termios.c_cc[i]);
+
+	kprintf("  wsize:        %u x %u c, %u x %u pxl\n",
+		settings.window_size.ws_row, settings.window_size.ws_col,
+		settings.window_size.ws_xpixel, settings.window_size.ws_ypixel);
+}
+
+
+static void
+dump_tty_struct(struct tty& tty)
+{
+	kprintf("  tty @:        %p\n", &tty);
+	kprintf("  index:        %" B_PRId32 "\n", tty.index);
+	kprintf("  is_master:    %s\n", tty.is_master ? "true" : "false");
+	kprintf("  open_count:   %" B_PRId32 "\n", tty.open_count);
+	kprintf("  select_pool:  %p\n", tty.select_pool);
+	kprintf("  pending_eof:  %" B_PRIu32 "\n", tty.pending_eof);
+	kprintf("  lock:         %p\n", tty.lock);
+
+	kprintf("  input_buffer:\n");
+	kprintf("    first:      %" B_PRId32 "\n", tty.input_buffer.first);
+	kprintf("    in:         %lu\n", tty.input_buffer.in);
+	kprintf("    size:       %lu\n", tty.input_buffer.size);
+	kprintf("    buffer:     %p\n", tty.input_buffer.buffer);
+
+	kprintf("  reader queue:\n");
+	tty.reader_queue.Dump("    ");
+	kprintf("  writer queue:\n");
+	tty.writer_queue.Dump("    ");
+
+	kprintf("  cookies:     ");
+	TTYCookieList::Iterator it = tty.cookies.GetIterator();
+	while (tty_cookie* cookie = it.Next())
+		kprintf(" %p", cookie);
+	kprintf("\n");
+}
+
+
+static int
+dump_tty(int argc, char** argv)
+{
+	if (argc < 2) {
+		kprintf("Usage: %s <tty index>\n", argv[0]);
+		return 0;
+	}
+
+	int32 index = atol(argv[1]);
+	if (index < 0 || index >= (int32)kNumTTYs) {
+		kprintf("Invalid tty index.\n");
+		return 0;
+	}
+
+	kprintf("master:\n");
+	dump_tty_struct(gMasterTTYs[index]);
+	kprintf("slave:\n");
+	dump_tty_struct(gSlaveTTYs[index]);
+	kprintf("settings:\n");
+	dump_tty_settings(sTTYSettings[index]);
+
+	return 0;
+}
+
+
+void
+tty_add_debugger_commands()
+{
+	add_debugger_command("tty", &dump_tty, "Dump info on a tty");
+}
+
+
+void
+tty_remove_debugger_commands()
+{
+	remove_debugger_command("tty", &dump_tty);
+}
 
 
 status_t
@@ -89,7 +183,7 @@ init_driver(void)
 		mutex_init(&sTTYLocks[i], "tty lock");
 		reset_tty(&gMasterTTYs[i], i, &sTTYLocks[i], true);
 		reset_tty(&gSlaveTTYs[i], i, &sTTYLocks[i], false);
-		reset_tty_settings(&gTTYSettings[i], i);
+		reset_tty_settings(&sTTYSettings[i]);
 
 		if (!gDeviceNames[i] || !gDeviceNames[i + kNumTTYs]) {
 			uninit_driver();
@@ -147,3 +241,32 @@ find_device(const char *name)
 	return NULL;
 }
 
+
+int32
+get_tty_index(const char* name)
+{
+	// device names follow this form: "pt/%c%x"
+	int8 digit = name[4];
+	if (digit >= 'a') {
+		// hexadecimal digits
+		digit -= 'a' - 10;
+	} else
+		digit -= '0';
+
+	return (name[3] - 'p') * 16 + digit;
+}
+
+
+void
+reset_tty(struct tty* tty, int32 index, mutex* lock, bool isMaster)
+{
+	tty->ref_count = 0;
+	tty->open_count = 0;
+	tty->opened_count = 0;
+	tty->index = index;
+	tty->lock = lock;
+	tty->settings = &sTTYSettings[index];
+	tty->select_pool = NULL;
+	tty->is_master = isMaster;
+	tty->pending_eof = 0;
+}

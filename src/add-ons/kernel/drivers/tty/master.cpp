@@ -4,6 +4,7 @@
 */
 
 
+#include "tty_driver.h"
 #include "tty_private.h"
 
 #include <stdlib.h>
@@ -99,8 +100,6 @@ master_open(const char *name, uint32 flags, void **_cookie)
 		tty_close(&gMasterTTYs[index]);
 		return status;
 	}
-
-	add_tty_cookie(cookie);
 
 	*_cookie = cookie;
 
