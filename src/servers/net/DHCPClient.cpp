@@ -460,7 +460,7 @@ socket_timeout::Shift(int socket, bigtime_t stateMaxTime, const char* device)
 		timeout = std::max(remaining, bigtime_t(60));
 	}
 
-	syslog(LOG_DEBUG, "%s: Timeout shift: %lu msecs (try %lu)\n",
+	syslog(LOG_DEBUG, "%s: Timeout shift: %" B_PRIdTIME " msecs (try %" B_PRIu8 ")\n",
 		device, timeout / 1000, tries);
 
 	UpdateSocket(socket);
@@ -868,7 +868,7 @@ DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address,
 				break;
 
 			default:
-				syslog(LOG_DEBUG, "  UNKNOWN OPTION %lu (0x%x)\n",
+				syslog(LOG_DEBUG, "  UNKNOWN OPTION %" B_PRIu32 " (0x%" B_PRIx32 ")\n",
 					(uint32)option, (uint32)option);
 				break;
 		}
