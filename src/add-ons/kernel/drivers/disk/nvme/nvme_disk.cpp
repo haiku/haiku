@@ -713,16 +713,18 @@ nvme_disk_io(void* cookie, io_request* request)
 			bounceAll = true;
 	}
 
-	// See if we need to bounce due to the first or last vec.
+	// See if we need to bounce due to the first or last vec (which, unlike middle vecs,
+	// need only be a multiple of the block size, and must end and start on a page boundary,
+	// respectively, though the start address must always be 32-bit-aligned.)
 	if (nvme_request.iovec_count > 1) {
 		physical_entry* entry = &nvme_request.iovecs[0];
 		if (!bounceAll && (((entry->address + entry->size) % B_PAGE_SIZE) != 0
-				|| (entry->size % block_size) != 0))
+				|| (entry->address & 0x3) != 0 || (entry->size % block_size) != 0))
 			bounceAll = true;
 
 		entry = &nvme_request.iovecs[nvme_request.iovec_count - 1];
 		if (!bounceAll && ((entry->address % B_PAGE_SIZE) != 0
-				|| (entry->size % block_size) != 0))
+				|| (entry->address & 0x3) != 0 || (entry->size % block_size) != 0))
 			bounceAll = true;
 	}
 
