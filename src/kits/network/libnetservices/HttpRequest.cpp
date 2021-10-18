@@ -593,7 +593,7 @@ BHttpRequest::_ProtocolLoop()
 	} while (newRequest);
 
 	_EmitDebug(B_URL_PROTOCOL_DEBUG_TEXT,
-		"%ld headers and %ld bytes of data remaining",
+		"%" B_PRId32 " headers and %" B_PRIuSIZE " bytes of data remaining",
 		fHeaders.CountHeaders(), fInputBuffer.Size());
 
 	if (fResult.StatusCode() == 404)
