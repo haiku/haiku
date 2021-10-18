@@ -1291,11 +1291,6 @@ tty_create(tty_service_func func, bool isMaster)
 
 	tty->service_func = func;
 
-	// construct the queues
-	new(&tty->reader_queue) RequestQueue;
-	new(&tty->writer_queue) RequestQueue;
-	new(&tty->cookies) TTYCookieList;
-
 	return tty;
 }
 
@@ -1303,12 +1298,10 @@ tty_create(tty_service_func func, bool isMaster)
 void
 tty_destroy(struct tty* tty)
 {
-	// destroy the queues
-	tty->reader_queue.~RequestQueue();
-	tty->writer_queue.~RequestQueue();
-	tty->cookies.~TTYCookieList();
-
+	TRACE(("tty_destroy(%p)\n", tty));
 	uninit_line_buffer(tty->input_buffer);
+	delete_select_sync_pool(tty->select_pool);
+	mutex_destroy(&tty->lock);
 
 	delete tty;
 }
@@ -1435,13 +1428,11 @@ tty_close_cookie(tty_cookie* cookie)
 		}
 
 		requestLocker.Unlock();
+
+		// notify a select write event on the other tty, if we've closed this tty
+		if (cookie->other_tty->open_count > 0)
+			tty_notify_select_event(cookie->other_tty, B_SELECT_WRITE);
 	}
-
-	// notify pending select()s and cleanup the select sync pool
-
-	// notify a select write event on the other tty, if we've closed this tty
-	if (cookie->tty->open_count == 0 && cookie->other_tty->open_count > 0)
-		tty_notify_select_event(cookie->other_tty, B_SELECT_WRITE);
 }
 
 
