@@ -1477,13 +1477,11 @@ tty_close_cookie(struct tty_cookie* cookie)
 
 		// finally close the tty
 		tty_close(cookie->tty);
+
+		// notify a select write event on the other tty, if we've closed this tty
+		if (cookie->other_tty->open_count > 0)
+			tty_notify_select_event(cookie->other_tty, B_SELECT_WRITE);
 	}
-
-	// notify pending select()s and cleanup the select sync pool
-
-	// notify a select write event on the other tty, if we've closed this tty
-	if (cookie->tty->open_count == 0 && cookie->other_tty->open_count > 0)
-		tty_notify_select_event(cookie->other_tty, B_SELECT_WRITE);
 }
 
 

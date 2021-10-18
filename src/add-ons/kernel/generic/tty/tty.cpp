@@ -96,9 +96,9 @@ public:
 
 protected:
 	void Lock()
-		{ mutex_lock(&fCookie->tty->lock); }
+		{ recursive_lock_lock(fCookie->tty->lock); }
 	void Unlock()
-		{ mutex_unlock(&fCookie->tty->lock); }
+		{ recursive_lock_unlock(fCookie->tty->lock); }
 
 	tty_cookie*	fCookie;
 	size_t		fBytes;
@@ -834,6 +834,13 @@ tty_readable(struct tty* tty)
 }
 
 
+/** \brief Notify anyone waiting on events for this TTY.
+ *
+ * The TTY lock must be held.
+ *
+ * Otherwise, the select_pool may be modified or deleted (which happens automatically when the last
+ * item is removed from it).
+ */
 static void
 tty_notify_select_event(struct tty* tty, uint8 event)
 {
@@ -1266,25 +1273,39 @@ tty_write_to_tty_slave(tty_cookie* sourceCookie, const void* _buffer,
 
 
 struct tty*
-tty_create(tty_service_func func, bool isMaster)
+tty_create(tty_service_func func, struct tty* master)
 {
 	struct tty* tty = new(std::nothrow) (struct tty);
 	if (tty == NULL)
 		return NULL;
 
-	mutex_init(&tty->lock, "tty lock");
+	if (master == NULL) {
+		tty->is_master = true;
+		tty->lock = new(std::nothrow) recursive_lock;
+		if (tty->lock == NULL) {
+			delete tty;
+			return NULL;
+		}
+		recursive_lock_init(tty->lock, "tty lock");
+	} else {
+		tty->is_master = false;
+		tty->lock = master->lock;
+	}
 
 	tty->ref_count = 0;
 	tty->open_count = 0;
 	tty->opened_count = 0;
 	tty->select_pool = NULL;
-	tty->is_master = isMaster;
 	tty->pending_eof = 0;
 	tty->hardware_bits = 0;
 
 	reset_tty_settings(tty->settings);
 
 	if (init_line_buffer(tty->input_buffer, TTY_BUFFER_SIZE) < B_OK) {
+		if (tty->is_master) {
+			recursive_lock_destroy(tty->lock);
+			delete tty->lock;
+		}
 		delete tty;
 		return NULL;
 	}
@@ -1301,7 +1322,10 @@ tty_destroy(struct tty* tty)
 	TRACE(("tty_destroy(%p)\n", tty));
 	uninit_line_buffer(tty->input_buffer);
 	delete_select_sync_pool(tty->select_pool);
-	mutex_destroy(&tty->lock);
+	if (tty->is_master) {
+		recursive_lock_destroy(tty->lock);
+		delete tty->lock;
+	}
 
 	delete tty;
 }
@@ -1327,7 +1351,7 @@ tty_create_cookie(struct tty* tty, struct tty* otherTTY, uint32 openMode)
 	cookie->closed = false;
 
 
-	MutexLocker locker(cookie->tty->lock);
+	RecursiveLocker locker(cookie->tty->lock);
 
 	// add to the TTY's cookie list
 	tty->cookies.Add(cookie);
@@ -1379,7 +1403,7 @@ tty_close_cookie(tty_cookie* cookie)
 	// For the removal of the cookie acquire the TTY's lock. This ensures, that
 	// cookies will not be removed from a TTY (or added -- cf. add_tty_cookie())
 	// as long as the TTY's lock is being held.
-	MutexLocker ttyLocker(cookie->tty->lock);
+	RecursiveLocker ttyLocker(cookie->tty->lock);
 
 	// remove the cookie from the TTY's cookie list
 	cookie->tty->cookies.Remove(cookie);
@@ -1439,7 +1463,7 @@ tty_close_cookie(tty_cookie* cookie)
 void
 tty_destroy_cookie(tty_cookie* cookie)
 {
-	MutexLocker locker(cookie->tty->lock);
+	RecursiveLocker locker(cookie->tty->lock);
 	cookie->tty->ref_count--;
 	locker.Unlock();
 
@@ -1582,7 +1606,7 @@ tty_control(tty_cookie* cookie, uint32 op, void* buffer, size_t length)
 
 	TRACE(("tty_ioctl: tty %p, op %" B_PRIu32 ", buffer %p, length %"
 		B_PRIuSIZE "\n", tty, op, buffer, length));
-	MutexLocker locker(tty->lock);
+	RecursiveLocker locker(tty->lock);
 
 	switch (op) {
 		// blocking/non-blocking mode
@@ -1798,7 +1822,7 @@ tty_select(tty_cookie* cookie, uint8 event, uint32 ref, selectsync* sync)
 
 	// lock the TTY (allows us to freely access the cookie lists of this and
 	// the other TTY)
-	MutexLocker ttyLocker(tty->lock);
+	RecursiveLocker ttyLocker(tty->lock);
 
 	// get the other TTY -- needed for `write' events
 	struct tty* otherTTY = cookie->other_tty;
@@ -1871,7 +1895,7 @@ tty_deselect(tty_cookie* cookie, uint8 event, selectsync* sync)
 		return B_BAD_VALUE;
 
 	// lock the TTY (guards the select sync pool, among other things)
-	MutexLocker ttyLocker(tty->lock);
+	RecursiveLocker ttyLocker(tty->lock);
 
 	return remove_select_sync_pool_entry(&tty->select_pool, sync, event);
 }

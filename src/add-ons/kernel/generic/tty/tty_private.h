@@ -137,7 +137,7 @@ struct tty {
 	tty_service_func	service_func;
 	uint32				pending_eof;
 	bool				is_master;
-	struct mutex		lock;
+	recursive_lock*		lock;
 	tty_settings		settings;
 	uint8				hardware_bits;
 };
@@ -146,7 +146,7 @@ struct tty {
 extern struct mutex gTTYCookieLock;
 extern struct recursive_lock gTTYRequestLock;
 
-extern struct tty *tty_create(tty_service_func func, bool isMaster);
+extern struct tty *tty_create(tty_service_func func, struct tty* masterTTY);
 extern void tty_destroy(struct tty *tty);
 
 extern tty_cookie *tty_create_cookie(struct tty *tty, struct tty *otherTTY,
