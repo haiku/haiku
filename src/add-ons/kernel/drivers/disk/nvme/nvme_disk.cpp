@@ -295,6 +295,10 @@ nvme_disk_init_device(void* _info, void** _cookie)
 		sPCIx86Module = NULL;
 	}
 
+	command = pci->read_pci_config(pcidev, PCI_command, 2);
+	command &= ~(PCI_command_int_disable);
+	pci->write_pci_config(pcidev, PCI_command, 2, command);
+
 	uint8 irq = info->info.u.h0.interrupt_line;
 	if (sPCIx86Module != NULL) {
 		if (sPCIx86Module->get_msix_count(info->info.bus, info->info.device,
@@ -318,10 +322,6 @@ nvme_disk_init_device(void* _info, void** _cookie)
 				irq = msiVector;
 			}
 		}
-	} else {
-		uint16 command = pci->read_pci_config(pcidev, PCI_command, 2);
-		command &= ~(PCI_command_int_disable);
-		pci->write_pci_config(pcidev, PCI_command, 2, command);
 	}
 
 	if (irq == 0 || irq == 0xFF) {
