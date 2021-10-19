@@ -271,7 +271,7 @@ report_error()
 {
 	switch (rdef_err) {
 		case RDEF_COMPILE_ERR:
-			error("%s:%ld %s", rdef_err_file, rdef_err_line, rdef_err_msg);
+			error("%s:%" B_PRId32 " %s", rdef_err_file, rdef_err_line, rdef_err_msg);
 			break;
 
 		case RDEF_FILE_NOT_FOUND:
@@ -292,7 +292,7 @@ report_error()
 
 		case B_ERROR:
 		default:
-			error("unknown error: %lx (%s)", rdef_err, strerror(rdef_err));
+			error("unknown error: %" B_PRIx32 " (%s)", rdef_err, strerror(rdef_err));
 			break;
 	}
 }
