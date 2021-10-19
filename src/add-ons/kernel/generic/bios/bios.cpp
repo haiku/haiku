@@ -21,36 +21,44 @@ struct BIOSState {
 	BIOSState()
 		:
 		mapped_address(0),
-		bios_area(-1),
-		ram_area(-1),
+		area(-1),
 		allocated_size(0)
 	{
 	}
 
 	~BIOSState()
 	{
-		if (bios_area >= 0)
-			delete_area(bios_area);
-		if (ram_area >= 0)
-			delete_area(ram_area);
+		if (area >= 0)
+			delete_area(area);
 	}
 
 	addr_t		mapped_address;
-	area_id		bios_area;
-	area_id		ram_area;
+	area_id		area;
 	size_t		allocated_size;
 };
 
 
 // BIOS memory layout definitions.
+
+// Bottom of RAM contains the interrupt jump vectors
+// They need to be copied to our memory area
 static const uint32 kBDABase = 0;
 static const uint32 kBDASize = 0x1000;
-static const uint32 kEBDABase = 0x90000;
-static const uint32 kEBDASize = 0x70000;
+
+// Remaining part of RAM (left uninitialized initially)
 static const uint32 kRAMBase = 0x1000;
 static const uint32 kRAMSize = 0x8f000;
-static const uint32 kStackSize = 0x1000;
+
+// Upper part of address space: a bit of RAM, the video RAM, then the ROMs
+// Copied to the memory area as well, so the BIOS can be patched if needed.
+static const uint32 kEBDABase = 0x90000;
+static const uint32 kEBDASize = 0x70000;
+
+// Total size of the above
 static const uint32 kTotalSize = 0x100000;
+
+// The stack is dynamically allocated somewhere inside the RAM
+static const uint32 kStackSize = 0x1000;
 
 
 static sem_id sBIOSLock;
@@ -218,13 +226,13 @@ bios_prepare(bios_state** _state)
 		return status;
 
 	// Map RAM for for the BIOS.
-	state->ram_area = create_area("bios ram", (void**)&state->mapped_address,
-		B_EXACT_ADDRESS, kBDASize + kRAMSize, B_NO_LOCK, B_KERNEL_READ_AREA
+	state->area = create_area("bios", (void**)&state->mapped_address,
+		B_EXACT_ADDRESS, kTotalSize, B_NO_LOCK, B_KERNEL_READ_AREA
 			| B_KERNEL_WRITE_AREA);
-	if (state->ram_area < B_OK) {
+	if (state->area < B_OK) {
 		vm_unreserve_address_range(VMAddressSpace::KernelID(),
 			(void*)state->mapped_address, kTotalSize);
-		return state->ram_area;
+		return state->area;
 	}
 
 	// Copy the interrupt vectors and the BIOS data area.
@@ -238,12 +246,12 @@ bios_prepare(bios_state** _state)
 
 	// Map the extended BIOS data area and VGA memory.
 	void* address = (void*)(state->mapped_address + kEBDABase);
-	state->bios_area = map_physical_memory("bios", kEBDABase, kEBDASize,
-		B_EXACT_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, &address);
-	if (state->bios_area < B_OK) {
+	status = vm_memcpy_from_physical(address, kEBDABase, kEBDASize, false);
+
+	if (status != B_OK) {
 		vm_unreserve_address_range(VMAddressSpace::KernelID(),
 			(void*)state->mapped_address, kTotalSize);
-		return state->bios_area;
+		return status;
 	}
 
 	// Attempt to acquire exclusive access to the BIOS.
