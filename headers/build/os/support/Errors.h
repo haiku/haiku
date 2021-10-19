@@ -100,8 +100,7 @@
 
 /* Storage Kit/File System Errors */
 #define B_FILE_ERROR						(B_STORAGE_ERROR_BASE + 0)
-#define B_FILE_NOT_FOUND					(B_STORAGE_ERROR_BASE + 1)
-			/* deprecated: use B_ENTRY_NOT_FOUND instead */
+/* 1 was B_FILE_NOT_FOUND (deprecated) */
 #define B_FILE_EXISTS						(B_STORAGE_ERROR_BASE + 2)
 #define B_ENTRY_NOT_FOUND					(B_STORAGE_ERROR_BASE + 3)
 #define B_NAME_TOO_LONG						(B_STORAGE_ERROR_BASE + 4)

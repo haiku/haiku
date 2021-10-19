@@ -183,7 +183,7 @@ error_description(int error)
 		case B_FILE_ERROR:
 			// EBADF
 			return "Bad file descriptor";
-		case B_FILE_NOT_FOUND:
+		case (B_STORAGE_ERROR_BASE + 1): /* B_FILE_NOT_FOUND (deprecated) */
 		case B_ENTRY_NOT_FOUND:
 			// ENOENT
 			return "No such file or directory";
