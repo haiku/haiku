@@ -143,7 +143,6 @@ static const status_t kErrors[] = {
 	B_ERROR,
 	B_FILE_ERROR,
 	B_FILE_EXISTS,
-	B_FILE_NOT_FOUND,
 	B_IS_A_DIRECTORY,
 	B_LINK_LIMIT,
 	B_NAME_TOO_LONG,

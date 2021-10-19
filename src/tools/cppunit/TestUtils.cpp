@@ -35,10 +35,6 @@ status_t DecodeResult(status_t result) {
 			str = "B_FILE_ERROR";
 			break;
 
-		case B_FILE_NOT_FOUND:
-			str = "B_FILE_NOT_FOUND";
-			break;
-
 		case B_FILE_EXISTS:
 			str = "B_FILE_EXISTS";
 			break;

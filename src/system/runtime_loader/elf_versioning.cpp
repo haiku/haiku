@@ -181,7 +181,7 @@ check_needed_image_versions(image_t* image)
 			// the file should also appear in DT_NEEDED.
 			FATAL("%s: Version dependency \"%s\" not found", image->path,
 				fileName);
-			return B_FILE_NOT_FOUND;
+			return B_ENTRY_NOT_FOUND;
 		}
 
 		elf_vernaux* vernaux
