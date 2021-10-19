@@ -740,7 +740,7 @@ if [ IsPackageAvailable expat_devel ] {
 
 
 # zstd
-if [ IsPackageAvailable zstd_devel ] && $(TARGET_PACKAGING_ARCH) != x86_gcc2  {
+if [ IsPackageAvailable zstd_devel ] {
 	ExtractBuildFeatureArchives zstd :
 		file: base zstd
 			runtime: lib
