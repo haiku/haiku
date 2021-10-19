@@ -1,6 +1,5 @@
 /*
  * Copyright 2005-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
- * Copyright 2016-207, Jessica Hamilton, jessica.l.hamilton@gmail.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -67,11 +66,8 @@ init_common(int device, bool isClone)
 	if (status < B_OK)
 		return status;
 
-	if (gInfo->shared_info->vesa_mode_count == 0)
-		gInfo->vesa_modes = NULL;
-	else
-		gInfo->vesa_modes = (vesa_mode *)((uint8 *)gInfo->shared_info
-			+ gInfo->shared_info->vesa_mode_offset);
+	gInfo->vesa_modes = (vesa_mode *)((uint8 *)gInfo->shared_info
+		+ gInfo->shared_info->vesa_mode_offset);
 
 	infoDeleter.Detach();
 	sharedDeleter.Detach();
@@ -191,16 +187,9 @@ status_t
 vesa_get_accelerant_device_info(accelerant_device_info *info)
 {
 	info->version = B_ACCELERANT_VERSION;
-
-	// TODO: provide some more insight here...
-	if (gInfo->vesa_modes != NULL) {
-		strcpy(info->name, "VESA driver");
-		strcpy(info->chipset, "VESA");
-	} else {
-		strcpy(info->name, "Framebuffer");
-		strcpy(info->chipset, "");
-	}
-
+	strcpy(info->name, "VESA Driver");
+	strcpy(info->chipset, "VESA");
+		// ToDo: provide some more insight here...
 	strcpy(info->serial_no, "None");
 
 #if 0

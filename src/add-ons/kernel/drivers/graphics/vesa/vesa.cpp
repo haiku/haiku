@@ -289,13 +289,7 @@ remap_frame_buffer(vesa_info& info, addr_t physicalBase, uint32 width,
 	if (!info.complete_frame_buffer_mapped) {
 		addr_t base = physicalBase;
 		size_t size = bytesPerRow * height;
-
-#ifdef __riscv
-		// HACK: Prevent NULL framebuffer pointers from getting to userland
-		bool remap = true;
-#else
 		bool remap = !initializing;
-#endif
 
 		if (info.physical_frame_buffer_size != 0) {
 			// we can map the complete frame buffer
@@ -408,12 +402,10 @@ vesa_init(vesa_info& info)
 		memcpy(&sharedInfo.edid_info, edidInfo, sizeof(edid1_info));
 	}
 
-	if (modes != NULL) {
-		vbe_get_dpms_capabilities(info.vbe_dpms_capabilities,
-			sharedInfo.dpms_capabilities);
-		if (bufferInfo->depth <= 8)
-			vbe_set_bits_per_gun(info, 8);
-	}
+	vbe_get_dpms_capabilities(info.vbe_dpms_capabilities,
+		sharedInfo.dpms_capabilities);
+	if (bufferInfo->depth <= 8)
+		vbe_set_bits_per_gun(info, 8);
 
 	dprintf(DEVICE_NAME ": vesa_init() completed successfully!\n");
 	return B_OK;
@@ -465,7 +457,6 @@ vesa_set_display_mode(vesa_info& info, uint32 mode)
 	status = remap_frame_buffer(info, modeInfo.physical_base, modeInfo.width,
 		modeInfo.height, modeInfo.bits_per_pixel, modeInfo.bytes_per_row,
 		false);
-
 	if (status == B_OK) {
 		// Update shared frame buffer information
 		info.shared_info->current_mode.virtual_width = modeInfo.width;
@@ -485,9 +476,6 @@ vesa_get_dpms_mode(vesa_info& info, uint32& mode)
 {
 	mode = B_DPMS_ON;
 		// we always return a valid mode
-
-	if (info.modes == NULL)
-		return B_ERROR;
 
 	// Prepare BIOS environment
 	bios_state* state;
@@ -526,9 +514,6 @@ out:
 status_t
 vesa_set_dpms_mode(vesa_info& info, uint32 mode)
 {
-	if (info.modes == NULL)
-		return B_ERROR;
-
 	// Only let supported modes through
 	mode &= info.shared_info->dpms_capabilities;
 
