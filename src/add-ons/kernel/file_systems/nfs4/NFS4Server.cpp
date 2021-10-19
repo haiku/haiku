@@ -341,8 +341,8 @@ NFS4Server::CallbackRecall(RequestInterpreter* request, ReplyBuilder* reply)
 	locker.Unlock();
 
 	if (delegation == NULL) {
-		reply->Recall(B_FILE_NOT_FOUND);
-		return B_FILE_NOT_FOUND;
+		reply->Recall(B_ENTRY_NOT_FOUND);
+		return B_ENTRY_NOT_FOUND;
 	}
 
 	DelegationRecallArgs* args = new(std::nothrow) DelegationRecallArgs;
@@ -383,8 +383,8 @@ NFS4Server::CallbackGetAttr(RequestInterpreter* request, ReplyBuilder* reply)
 	locker.Unlock();
 
 	if (delegation == NULL) {
-		reply->GetAttr(B_FILE_NOT_FOUND, 0, 0, 0);
-		return B_FILE_NOT_FOUND;
+		reply->GetAttr(B_ENTRY_NOT_FOUND, 0, 0, 0);
+		return B_ENTRY_NOT_FOUND;
 	}
 
 	struct stat st;

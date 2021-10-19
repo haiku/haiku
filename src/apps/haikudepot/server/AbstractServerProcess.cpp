@@ -108,7 +108,7 @@ AbstractServerProcess::IfModifiedSinceHeaderValue(BString& headerValue,
 		if (ENOENT != errno)
 			 return B_ERROR;
 
-		return B_FILE_NOT_FOUND;
+		return B_ENTRY_NOT_FOUND;
 	}
 
 	if (s.st_size == 0)
@@ -193,7 +193,7 @@ AbstractServerProcess::ParseJsonFromFileWithListener(
 	if (file == NULL) {
 		HDERROR("[%s] unable to find the meta data file at [%s]", Name(),
 			path.Path());
-		return B_FILE_NOT_FOUND;
+		return B_ENTRY_NOT_FOUND;
 	}
 
 	BFileIO rawInput(file, true); // takes ownership

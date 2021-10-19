@@ -214,7 +214,7 @@ AutoConfigView::_GetSMTPAddOnRef(entry_ref *ref)
 			return B_OK;
 	}
 
-	return B_FILE_NOT_FOUND;
+	return B_ENTRY_NOT_FOUND;
 }
 
 

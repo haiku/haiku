@@ -594,7 +594,7 @@ Hey(BMessenger* target, char* argv[], int32* argx, int32 argc, BMessage* reply)
 			(*argx)++;
 		result = add_data(&the_message, argv, argx);
 		if (result != B_OK) {
-			if (result == B_FILE_NOT_FOUND) {
+			if (result == B_ENTRY_NOT_FOUND) {
 				if (!silent)
 					fprintf(stderr, "File not found!\n");
 			} else if (!silent)
@@ -635,7 +635,7 @@ add_with(BMessage *to_message, char *argv[], int32 *argx, int32 argc)
 			do {
 				result = add_data(to_message, argv, argx);
 				if (result != B_OK) {
-					if (result == B_FILE_NOT_FOUND) {
+					if (result == B_ENTRY_NOT_FOUND) {
 						if (!silent)
 							fprintf(stderr, "File not found!\n");
 					} else {
@@ -946,13 +946,13 @@ add_data(BMessage *to_message, char *argv[], int32 *argx)
 			valuestring[strlen(valuestring) - 1] = 0;
 
 		if (get_ref_for_path(valuestring + 5, &file_ref) != B_OK)
-			return B_FILE_NOT_FOUND;
+			return B_ENTRY_NOT_FOUND;
 
 		// check if the ref is valid
 		BEntry entry;
 		if (entry.SetTo(&file_ref) != B_OK)
-			return B_FILE_NOT_FOUND;
-		//if(!entry.Exists())  return B_FILE_NOT_FOUND;
+			return B_ENTRY_NOT_FOUND;
+		//if(!entry.Exists())  return B_ENTRY_NOT_FOUND;
 
 		// add both ways, refsreceived needs it as "refs" while scripting needs "data"
 		to_message->AddRef("refs", &file_ref);

@@ -946,7 +946,7 @@ ReplyInterpreter::_NFS4ErrorToHaiku(uint32 x)
 
 		case NFS4ERR_STALE:
 		case NFS4ERR_FHEXPIRED:
-								return B_FILE_NOT_FOUND;
+								return B_ENTRY_NOT_FOUND;
 		// ...
 		default:				return B_ERROR;
 	}
