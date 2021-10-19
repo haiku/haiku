@@ -409,17 +409,16 @@ DWindowHWInterface::_OpenGraphicsDevice(int deviceNumber)
 	if (!directory)
 		return -1;
 
-	// ToDo: the former R5 "stub" driver is called "vesa" under Haiku; however,
-	//	we do not need to avoid this driver this way when is has been ported
-	//	to the new driver architecture - the special case here can then be
-	//	removed.
+	// TODO: We do not need to avoid the "vesa" or "framebuffer" drivers this way
+	// once they been ported to the new driver architecture - the special case here
+	// can then be removed.
 	int count = 0;
 	struct dirent *entry = NULL;
 	int current_card_fd = -1;
 	char path[PATH_MAX];
 	while (count < deviceNumber && (entry = readdir(directory)) != NULL) {
-		if (!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, "..") ||
-			!strcmp(entry->d_name, "stub") || !strcmp(entry->d_name, "vesa"))
+		if (!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, "..")
+			|| !strcmp(entry->d_name, "vesa") || !strcmp(entry->d_name, "framebuffer"))
 			continue;
 
 		if (current_card_fd >= 0) {
@@ -433,11 +432,15 @@ DWindowHWInterface::_OpenGraphicsDevice(int deviceNumber)
 			count++;
 	}
 
-	// Open VESA driver if we were not able to get a better one
+	// Open VESA or Framebuffer driver if we were not able to get a better one.
 	if (count < deviceNumber) {
 		if (deviceNumber == 1) {
 			sprintf(path, "/dev/graphics/vesa");
 			current_card_fd = open(path, B_READ_WRITE);
+			if (current_card_fd < 0) {
+				sprintf(path, "/dev/graphics/framebuffer");
+				current_card_fd = open(path, B_READ_WRITE);
+			}
 		} else {
 			close(current_card_fd);
 			current_card_fd = B_ENTRY_NOT_FOUND;
