@@ -2,8 +2,9 @@ SubDir HAIKU_TOP src system boot loader file_systems packagefs ;
 
 UsePrivateHeaders kernel shared storage support ;
 UseBuildFeatureHeaders zlib ;
+UseBuildFeatureHeaders zstd ;
 
-DEFINES += _BOOT_MODE ;
+DEFINES += _BOOT_MODE ZSTD_ENABLED ;
 
 local kernelC++Header = [ FDirName $(HAIKU_TOP) headers private kernel util
 	kernel_cpp.h ] ;
@@ -44,9 +45,12 @@ for platform in [ MultiBootSubDirSetup ] {
 			# support kit
 			CompressionAlgorithm.cpp
 			ZlibCompressionAlgorithm.cpp
+			ZstdCompressionAlgorithm.cpp
 		;
 
 		Includes [ FGristFiles ZlibCompressionAlgorithm.cpp ]
 			: [ BuildFeatureAttribute zlib : headers ] ;
+		Includes [ FGristFiles ZstdCompressionAlgorithm.cpp ]
+			: [ BuildFeatureAttribute zstd : headers ] ;
 	}
 }

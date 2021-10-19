@@ -16,6 +16,19 @@ local zlibSources =
 	zutil.c
 	;
 
+local zstdSourceDirectory = [ BuildFeatureAttribute zstd : sources : path ] ;
+UseHeaders [ FDirName $(zstdSourceDirectory) lib ] ;
+UseHeaders [ FDirName $(zstdSourceDirectory) lib common ] ;
+
+local zstdCommonSources =
+	error_private.c
+	entropy_common.c fse_decompress.c zstd_common.c
+	xxhash.c
+	;
+local zstdDecSources =
+	huf_decompress.c zstd_ddict.c zstd_decompress.c zstd_decompress_block.c
+	;
+
 local platform ;
 for platform in [ MultiBootSubDirSetup ] {
 	on $(platform) {
@@ -30,5 +43,20 @@ for platform in [ MultiBootSubDirSetup ] {
 		BootStaticLibrary [ MultiBootGristFiles boot_zlib ] :
 			$(zlibSources)
 			;
+
+		# zstd
+		LOCATE on [ FGristFiles $(zstdCommonSources) ] =
+			[ FDirName $(zstdSourceDirectory) lib common ] ;
+		LOCATE on [ FGristFiles $(zstdDecSources) ] =
+			[ FDirName $(zstdSourceDirectory) lib decompress ] ;
+
+		# tune build for smaller size
+		DEFINES += HUF_FORCE_DECOMPRESS_X1 ZSTD_FORCE_DECOMPRESS_SEQUENCES_SHORT ;
+
+		BootStaticLibrary [ MultiBootGristFiles boot_zstd ] :
+			$(zstdCommonSources) $(zstdDecSources)
+			;
+		Depends [ FGristFiles $(zstdCommonSources) $(zstdDecSources) ]
+			: [ BuildFeatureAttribute zstd : sources ] ;
 	}
 }

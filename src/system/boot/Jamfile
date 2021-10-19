@@ -335,6 +335,7 @@ for platform in [ MultiBootSubDirSetup ] {
 
 				# needed by tarfs, packagefs, and video_splash.cpp
 				boot_zlib.a
+				boot_zstd.a
 			]
 			# libroot functions needed by the stage2 boot loader
 			boot_libroot_$(platform:G=).o
