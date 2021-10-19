@@ -152,8 +152,8 @@ RemotePackageRepository HaikuPorts
 	libxslt-1.1.34-3
 	live555-2016.06.22-5
 	live555_devel-2016.06.22-5
-	llvm7-7.0.1-2
-	llvm7_libs-7.0.1-2
+	llvm9-9.0.1-2
+	llvm9_libs-9.0.1-2
 	m4-1.4.18-3
 	make-4.1-4
 	mandoc-1.14.3-2
@@ -307,7 +307,7 @@ RemotePackageRepository HaikuPorts
 	libxml2
 	libxslt
 	live555
-	llvm7
+	llvm9
 	m4
 	make
 	mandoc
