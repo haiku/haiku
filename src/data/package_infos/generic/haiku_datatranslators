@@ -47,7 +47,7 @@ requires {
 	lib:libpng16
 #endif
 #ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_libavif_ENABLED
-	lib:libavif >= 12
+	lib:libavif
 #endif
 #ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_tiff_ENABLED
 	lib:libtiff >= 5.6
