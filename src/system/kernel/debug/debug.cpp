@@ -941,7 +941,7 @@ kernel_debugger_loop(const char* messagePrefix, const char* message,
 
 
 static void
-enter_kernel_debugger(int32 cpu)
+enter_kernel_debugger(int32 cpu, int32& previousCPU)
 {
 	while (atomic_add(&sInDebugger, 1) > 0) {
 		atomic_add(&sInDebugger, -1);
@@ -969,6 +969,9 @@ enter_kernel_debugger(int32 cpu)
 		smp_send_broadcast_ici_interrupts_disabled(cpu, SMP_MSG_CPU_HALT, 0, 0,
 			0, NULL, SMP_MSG_FLAG_SYNC);
 	}
+
+	previousCPU = sDebuggerOnCPU;
+	sDebuggerOnCPU = cpu;
 
 	if (sBlueScreenOutput) {
 		if (blue_screen_enter(false) == B_OK)
@@ -1021,15 +1024,17 @@ kernel_debugger_internal(const char* messagePrefix, const char* message,
 	va_list args, int32 cpu)
 {
 	while (true) {
+		// If we're called recursively sDebuggerOnCPU will be != -1.
+		int32 previousCPU = -1;
+
 		if (sHandOverKDLToCPU == cpu) {
 			sHandOverKDLToCPU = -1;
 			sHandOverKDL = false;
-		} else
-			enter_kernel_debugger(cpu);
 
-		// If we're called recursively sDebuggerOnCPU will be != -1.
-		int32 previousCPU = sDebuggerOnCPU;
-		sDebuggerOnCPU = cpu;
+			previousCPU = sDebuggerOnCPU;
+			sDebuggerOnCPU = cpu;
+		} else
+			enter_kernel_debugger(cpu, previousCPU);
 
 		kernel_debugger_loop(messagePrefix, message, args, cpu);
 
