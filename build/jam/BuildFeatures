@@ -675,7 +675,7 @@ if [ IsPackageAvailable libavif_devel ] {
 				runtime: lib
 			file: devel libavif_devel
 				depends: base
-				library: $(developLibDir)/libavif.so.12
+				library: $(developLibDir)/libavif.so.9
 				headers: $(developHeadersDir) $(developHeadersDir)/avif
 			;
 		EnableBuildFeatures libavif ;
