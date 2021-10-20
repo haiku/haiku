@@ -31,7 +31,7 @@
   POSSIBILITY OF SUCH DAMAGE.
 
 ******************************************************************************/
-/*$FreeBSD: releng/12.0/sys/dev/e1000/e1000_defines.h 326022 2017-11-20 19:36:21Z pfg $*/
+/*$FreeBSD$*/
 
 #ifndef _E1000_DEFINES_H_
 #define _E1000_DEFINES_H_
@@ -1205,10 +1205,6 @@
 #define PCIE_LINK_SPEED_2500		0x01
 #define PCIE_LINK_SPEED_5000		0x02
 #define PCIE_DEVICE_CONTROL2_16ms	0x0005
-
-#ifndef ETH_ADDR_LEN
-#define ETH_ADDR_LEN			6
-#endif
 
 #define PHY_REVISION_MASK		0xFFFFFFF0
 #define MAX_PHY_REG_ADDRESS		0x1F  /* 5 bit address bus (0-0x1F) */

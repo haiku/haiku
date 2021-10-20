@@ -31,7 +31,7 @@
   POSSIBILITY OF SUCH DAMAGE.
 
 ******************************************************************************/
-/*$FreeBSD: releng/12.0/sys/dev/e1000/e1000_82542.c 326022 2017-11-20 19:36:21Z pfg $*/
+/*$FreeBSD$*/
 
 /*
  * 82542 Gigabit Ethernet Controller
@@ -573,7 +573,7 @@ s32 e1000_read_mac_addr_82542(struct e1000_hw *hw)
 
 	DEBUGFUNC("e1000_read_mac_addr");
 
-	for (i = 0; i < ETH_ADDR_LEN; i += 2) {
+	for (i = 0; i < ETHER_ADDR_LEN; i += 2) {
 		offset = i >> 1;
 		ret_val = hw->nvm.ops.read(hw, offset, 1, &nvm_data);
 		if (ret_val) {
@@ -584,7 +584,7 @@ s32 e1000_read_mac_addr_82542(struct e1000_hw *hw)
 		hw->mac.perm_addr[i+1] = (u8)(nvm_data >> 8);
 	}
 
-	for (i = 0; i < ETH_ADDR_LEN; i++)
+	for (i = 0; i < ETHER_ADDR_LEN; i++)
 		hw->mac.addr[i] = hw->mac.perm_addr[i];
 
 out:

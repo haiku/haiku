@@ -31,7 +31,7 @@
   POSSIBILITY OF SUCH DAMAGE.
 
 ******************************************************************************/
-/*$FreeBSD: releng/12.0/sys/dev/e1000/e1000_mac.h 333345 2018-05-08 01:39:45Z mmacy $*/
+/*$FreeBSD$*/
 
 #ifndef _E1000_MAC_H_
 #define _E1000_MAC_H_

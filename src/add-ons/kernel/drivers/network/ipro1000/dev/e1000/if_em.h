@@ -66,6 +66,10 @@
 #include <net/if_dl.h>
 #include <net/if_media.h>
 #include <net/iflib.h>
+#ifdef	RSS
+#include <net/rss_config.h>
+#include <netinet/in_rss.h>
+#endif
 
 #include <net/if_types.h>
 #include <net/if_vlan_var.h>
@@ -308,7 +312,6 @@
 #define EM_BAR_MEM_TYPE_MASK	0x00000006
 #define EM_BAR_MEM_TYPE_32BIT	0x00000000
 #define EM_BAR_MEM_TYPE_64BIT	0x00000004
-#define EM_MSIX_BAR		3	/* On 82575 */
 
 /* More backward compatibility */
 #if __FreeBSD_version < 900000
@@ -337,7 +340,6 @@
 #define EM_MSIX_MASK		0x01F00000 /* For 82574 use */
 #define EM_MSIX_LINK		0x01000000 /* For 82574 use */
 #define ETH_ZLEN		60
-#define ETH_ADDR_LEN		6
 #define EM_CSUM_OFFLOAD		(CSUM_IP | CSUM_IP_UDP | CSUM_IP_TCP) /* Offload bits in mbuf flag */
 #define IGB_CSUM_OFFLOAD	(CSUM_IP | CSUM_IP_UDP | CSUM_IP_TCP | \
 				 CSUM_IP_SCTP | CSUM_IP6_UDP | CSUM_IP6_TCP | \

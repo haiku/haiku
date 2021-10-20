@@ -31,7 +31,7 @@
   POSSIBILITY OF SUCH DAMAGE.
 
 ******************************************************************************/
-/*$FreeBSD: releng/12.0/sys/dev/e1000/e1000_mbx.c 330803 2018-03-12 17:05:53Z tsoome $*/
+/*$FreeBSD$*/
 
 #include "e1000_mbx.h"
 

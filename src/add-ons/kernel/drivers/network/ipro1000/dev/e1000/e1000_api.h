@@ -31,7 +31,7 @@
   POSSIBILITY OF SUCH DAMAGE.
 
 ******************************************************************************/
-/*$FreeBSD: releng/12.0/sys/dev/e1000/e1000_api.h 326022 2017-11-20 19:36:21Z pfg $*/
+/*$FreeBSD$*/
 
 #ifndef _E1000_API_H_
 #define _E1000_API_H_
