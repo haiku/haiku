@@ -53,11 +53,8 @@ init_common(int device, bool isClone)
 	// get basic info from driver
 
 	area_id sharedArea;
-	if (ioctl(device, VESA_GET_PRIVATE_DATA, &sharedArea, sizeof(area_id))
-			!= 0) {
-		free(gInfo);
+	if (ioctl(device, VESA_GET_PRIVATE_DATA, &sharedArea, sizeof(area_id)) != 0)
 		return B_ERROR;
-	}
 
 	AreaDeleter sharedDeleter(clone_area("vesa shared info",
 		(void **)&gInfo->shared_info, B_ANY_ADDRESS,

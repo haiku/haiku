@@ -113,7 +113,6 @@ init_common(int device, bool isClone)
 
 	if (ioctl(device, RADEON_GET_PRIVATE_DATA, &data,
 			sizeof(radeon_get_private_data)) != 0) {
-		free(gInfo);
 		return B_ERROR;
 	}
 
