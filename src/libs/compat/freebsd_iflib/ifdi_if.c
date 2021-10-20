@@ -103,6 +103,11 @@
 	{
 	}
 
+	static bool
+	null_needs_restart_op(if_ctx_t _ctx __unused, enum iflib_restart_event _event __unused)
+	{
+	}
+
 	static int
 	null_q_setup(if_ctx_t _ctx __unused, uint32_t _qid __unused)
 	{
@@ -376,4 +381,8 @@ struct kobjop_desc ifdi_sysctl_int_delay_desc = {
 
 struct kobjop_desc ifdi_debug_desc = {
 	0, { NULL, ID_ifdi_debug, (kobjop_t)null_void_op }
+};
+
+struct kobjop_desc ifdi_needs_restart_desc = {
+	0, { NULL, ID_ifdi_needs_restart, (kobjop_t)null_needs_restart_op }
 };

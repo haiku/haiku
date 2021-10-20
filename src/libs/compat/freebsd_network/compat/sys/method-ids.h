@@ -78,6 +78,7 @@ enum device_method_ids {
 	ID_ifdi_vlan_unregister,
 	ID_ifdi_sysctl_int_delay,
 	ID_ifdi_debug,
+	ID_ifdi_needs_restart,
 };
 
 
