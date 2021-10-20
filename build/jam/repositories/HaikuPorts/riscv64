@@ -4,10 +4,10 @@ RemotePackageRepository HaikuPorts
 	:
 	# architecture "any" packages
 	be_book-2008_10_26-3
-	ca_root_certificates-2020_01_01-1
+	ca_root_certificates-2021_07_05-1
 	gnu_efi_kernel-3.0.10-1
-	haikuporter-1.2.3-2
-	noto-20170920-4
+	haikuporter-1.2.5-1
+	noto-20200106-1
 	timgmsoundfont-fixed-5
 	wqy_microhei-0.2.0~beta-4
 	:
@@ -41,6 +41,8 @@ RemotePackageRepository HaikuPorts
 	python-2.7.6-1
 	sed-4.2.1-1
 	texinfo-4.13a-1
+	zstd-1.5.0-2
+	zstd_devel-1.5.0-2
 	zlib-1.2.11-1
 	zlib_devel-1.2.11-1
 	:
@@ -121,6 +123,7 @@ RemotePackageRepository HaikuPorts
 	yasm
 	xz_utils
 	zlib
+	zstd
 	:
 	# debuginfo packages
 	;
