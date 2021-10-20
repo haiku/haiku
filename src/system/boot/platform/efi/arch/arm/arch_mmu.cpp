@@ -17,10 +17,82 @@
 #include "mmu.h"
 #include "efi_platform.h"
 
+#define ALIGN_PAGEDIR (1024 * 16)
+#define MAX_PAGE_TABLES 192
+#define PAGE_TABLE_AREA_SIZE (MAX_PAGE_TABLES * ARM_MMU_L2_COARSE_TABLE_SIZE)
+
+static uint32_t *sPageDirectory = NULL;
+static uint32_t *sFirstPageTable = NULL;
+static uint32_t *sNextPageTable = NULL;
+static uint32_t *sLastPageTable = NULL;
+
+
+static void
+dump_page_dir(void)
+{
+	dprintf("=== Page Directory ===\n");
+	for (uint32_t i = 0; i < ARM_MMU_L1_TABLE_ENTRY_COUNT; i++) {
+		uint32 directoryEntry = sPageDirectory[i];
+		if (directoryEntry != 0) {
+			dprintf("virt 0x%08x --> page table 0x%08x type 0x%08x\n",
+				i << 20, directoryEntry & ARM_PDE_ADDRESS_MASK,
+				directoryEntry & ARM_PDE_TYPE_MASK);
+			uint32_t *pageTable = (uint32_t *)(directoryEntry & ARM_PDE_ADDRESS_MASK);
+			for (uint32_t j = 0; j < ARM_MMU_L2_COARSE_ENTRY_COUNT; j++) {
+				uint32 tableEntry = pageTable[j];
+				if (tableEntry != 0) {
+					dprintf("virt 0x%08x     --> page 0x%08x type+flags 0x%08x\n",
+						(i << 20) | (j << 12),
+						tableEntry & ARM_PTE_ADDRESS_MASK,
+						tableEntry & (~ARM_PTE_ADDRESS_MASK));
+				}
+			}
+		}
+	}
+}
+
+static uint32 *
+get_next_page_table(void)
+{
+	uint32 *page_table = sNextPageTable;
+	sNextPageTable += ARM_MMU_L2_COARSE_ENTRY_COUNT;
+	if (sNextPageTable >= sLastPageTable)
+		panic("ran out of page tables\n");
+	return page_table;
+}
+
+
+static void
+map_page(addr_t virt_addr, phys_addr_t phys_addr, uint32_t flags)
+{
+	phys_addr &= ~(B_PAGE_SIZE - 1);
+
+	uint32 *pageTable = NULL;
+	uint32 pageDirectoryIndex = VADDR_TO_PDENT(virt_addr);
+	uint32 pageDirectoryEntry = sPageDirectory[pageDirectoryIndex];
+
+	if (pageDirectoryEntry == 0) {
+		pageTable = get_next_page_table();
+		sPageDirectory[pageDirectoryIndex] = (uint32_t)pageTable | ARM_MMU_L1_TYPE_COARSE;
+	} else {
+		pageTable = (uint32 *)(pageDirectoryEntry & ARM_PDE_ADDRESS_MASK);
+	}
+
+	uint32 pageTableIndex = VADDR_TO_PTENT(virt_addr);
+	pageTable[pageTableIndex] = phys_addr | flags | ARM_MMU_L2_TYPE_SMALLNEW;
+}
+
 
 static void
 map_range(addr_t virt_addr, phys_addr_t phys_addr, size_t size, uint32_t flags)
 {
+	//dprintf("map 0x%08x --> 0x%08x, len=0x%08x, flags=0x%08x\n",
+	//	(uint32_t)virt_addr, (uint32_t)phys_addr, (uint32_t)size, flags);
+
+	for (addr_t offset = 0; offset < size; offset += B_PAGE_SIZE) {
+		map_page(virt_addr + offset, phys_addr + offset, flags);
+	}
+
 	ASSERT_ALWAYS(insert_virtual_allocated_range(virt_addr, size) >= B_OK);
 }
 
@@ -133,8 +205,8 @@ arch_mmu_post_efi_setup(size_t memory_map_size,
 	// Switch EFI to virtual mode, using the kernel pmap.
 	// Something involving ConvertPointer might need to be done after this?
 	// http://wiki.phoenix.com/wiki/index.php/EFI_RUNTIME_SERVICES
-	//kRuntimeServices->SetVirtualAddressMap(memory_map_size, descriptor_size,
-	//	descriptor_version, memory_map);
+	kRuntimeServices->SetVirtualAddressMap(memory_map_size, descriptor_size,
+		descriptor_version, memory_map);
 
 	dprintf("phys memory ranges:\n");
 	for (uint32_t i = 0; i < gKernelArgs.num_physical_memory_ranges; i++) {
@@ -162,12 +234,34 @@ arch_mmu_post_efi_setup(size_t memory_map_size,
 }
 
 
+static void
+arch_mmu_allocate_page_tables(void)
+{
+	if (platform_allocate_region((void **)&sPageDirectory,
+		ARM_MMU_L1_TABLE_SIZE + ALIGN_PAGEDIR + PAGE_TABLE_AREA_SIZE, 0, false) != B_OK)
+		panic("Failed to allocate page directory.");
+	sPageDirectory = (uint32*)(((uint32)sPageDirectory + ALIGN_PAGEDIR - 1) & ~(ALIGN_PAGEDIR-1));
+	memset(sPageDirectory, 0, ARM_MMU_L1_TABLE_SIZE);
+
+	sFirstPageTable = (uint32*)((uint32)sPageDirectory + ARM_MMU_L1_TABLE_SIZE);
+	sNextPageTable = sFirstPageTable;
+	sLastPageTable = (uint32*)((uint32)sFirstPageTable + PAGE_TABLE_AREA_SIZE);
+
+	memset(sFirstPageTable, 0, PAGE_TABLE_AREA_SIZE);
+
+	dprintf("sPageDirectory  = 0x%08x\n", (uint32)sPageDirectory);
+	dprintf("sFirstPageTable = 0x%08x\n", (uint32)sFirstPageTable);
+	dprintf("sLastPageTable  = 0x%08x\n", (uint32)sLastPageTable);
+}
+
 uint32_t
 arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
 	efi_memory_descriptor *memory_map, size_t descriptor_size,
 	uint32_t descriptor_version)
 {
 	addr_t memory_map_addr = (addr_t)memory_map;
+
+	arch_mmu_allocate_page_tables();
 
 	build_physical_memory_list(memory_map_size, memory_map,
 		descriptor_size, descriptor_version);
@@ -179,7 +273,8 @@ arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
 		case EfiLoaderCode:
 		case EfiLoaderData:
 			map_range(entry->VirtualStart, entry->PhysicalStart,
-				entry->NumberOfPages * B_PAGE_SIZE, 0);
+				entry->NumberOfPages * B_PAGE_SIZE,
+				ARM_MMU_L2_FLAG_B | ARM_MMU_L2_FLAG_C | ARM_MMU_L2_FLAG_AP_RW);
 			break;
 		default:
 			;
@@ -191,7 +286,8 @@ arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
 			(efi_memory_descriptor *)(memory_map_addr + i * descriptor_size);
 		if ((entry->Attribute & EFI_MEMORY_RUNTIME) != 0)
 			map_range(entry->VirtualStart, entry->PhysicalStart,
-				entry->NumberOfPages * B_PAGE_SIZE, 0);
+				entry->NumberOfPages * B_PAGE_SIZE,
+				ARM_MMU_L2_FLAG_B | ARM_MMU_L2_FLAG_C | ARM_MMU_L2_FLAG_AP_RW);
 	}
 
 	void* cookie = NULL;
@@ -199,14 +295,36 @@ arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
 	phys_addr_t paddr;
 	size_t size;
 	while (mmu_next_region(&cookie, &vaddr, &paddr, &size)) {
-		map_range(vaddr, paddr, size, 0);
+		map_range(vaddr, paddr, size,
+			ARM_MMU_L2_FLAG_B | ARM_MMU_L2_FLAG_C | ARM_MMU_L2_FLAG_AP_RW);
 	}
 
 	// identity mapping for the debug uart
-	map_range(0x09000000, 0x09000000, B_PAGE_SIZE, 0);
+	map_range(0x09000000, 0x09000000, B_PAGE_SIZE, ARM_MMU_L2_FLAG_B);
+
+	// identity mapping for page table area
+	uint32_t page_table_area = (uint32_t)sFirstPageTable;
+	map_range(page_table_area, page_table_area, PAGE_TABLE_AREA_SIZE,
+		ARM_MMU_L2_FLAG_B | ARM_MMU_L2_FLAG_C | ARM_MMU_L2_FLAG_AP_RW);
 
 	sort_address_ranges(gKernelArgs.virtual_allocated_range,
 		gKernelArgs.num_virtual_allocated_ranges);
 
-	return 0;
+	addr_t vir_pgdir;
+	platform_bootloader_address_to_kernel_address((void*)sPageDirectory, &vir_pgdir);
+
+	gKernelArgs.arch_args.phys_pgdir = (uint32)sPageDirectory;
+	gKernelArgs.arch_args.vir_pgdir = (uint32)vir_pgdir;
+	gKernelArgs.arch_args.next_pagetable = (uint32)(sNextPageTable) - (uint32)sPageDirectory;
+
+	dprintf("gKernelArgs.arch_args.phys_pgdir     = 0x%08x\n",
+		(uint32_t)gKernelArgs.arch_args.phys_pgdir);
+	dprintf("gKernelArgs.arch_args.vir_pgdir      = 0x%08x\n",
+		(uint32_t)gKernelArgs.arch_args.vir_pgdir);
+	dprintf("gKernelArgs.arch_args.next_pagetable = 0x%08x\n",
+		(uint32_t)gKernelArgs.arch_args.next_pagetable);
+
+	//dump_page_dir();
+
+	return (uint32_t)sPageDirectory;
 }
