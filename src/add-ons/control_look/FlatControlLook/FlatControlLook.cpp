@@ -35,7 +35,8 @@ static const float kHoverTintFactor = 0.55;
 static const float kButtonPopUpIndicatorWidth = 11;
 
 
-FlatControlLook::FlatControlLook(): HaikuControlLook()
+FlatControlLook::FlatControlLook()
+	: HaikuControlLook()
 {
 }
 
@@ -49,7 +50,7 @@ FlatControlLook::~FlatControlLook()
 
 
 void
-HaikuControlLook::DrawButtonFrame(BView* view, BRect& rect, const BRect& updateRect,
+FlatControlLook::DrawButtonFrame(BView* view, BRect& rect, const BRect& updateRect,
 	const rgb_color& base, const rgb_color& background, uint32 flags,
 	uint32 borders)
 {
@@ -59,7 +60,7 @@ HaikuControlLook::DrawButtonFrame(BView* view, BRect& rect, const BRect& updateR
 
 
 void
-HaikuControlLook::DrawButtonFrame(BView* view, BRect& rect, const BRect& updateRect,
+FlatControlLook::DrawButtonFrame(BView* view, BRect& rect, const BRect& updateRect,
 	float radius, const rgb_color& base, const rgb_color& background, uint32 flags,
 	uint32 borders)
 {
@@ -69,7 +70,7 @@ HaikuControlLook::DrawButtonFrame(BView* view, BRect& rect, const BRect& updateR
 
 
 void
-HaikuControlLook::DrawButtonFrame(BView* view, BRect& rect,
+FlatControlLook::DrawButtonFrame(BView* view, BRect& rect,
 	const BRect& updateRect, float leftTopRadius, float rightTopRadius,
 	float leftBottomRadius, float rightBottomRadius, const rgb_color& base,
 	const rgb_color& background, uint32 flags,
@@ -239,7 +240,7 @@ FlatControlLook::DrawMenuFieldBackground(BView* view, BRect& rect,
 
 
 void
-HaikuControlLook::DrawMenuBackground(BView* view, BRect& rect,
+FlatControlLook::DrawMenuBackground(BView* view, BRect& rect,
 	const BRect& updateRect, const rgb_color& base, uint32 flags,
 	uint32 borders)
 {
@@ -311,7 +312,7 @@ FlatControlLook::DrawMenuItemBackground(BView* view, BRect& rect,
 
 
 void
-HaikuControlLook::DrawScrollBarBorder(BView* view, BRect rect,
+FlatControlLook::DrawScrollBarBorder(BView* view, BRect rect,
 	const BRect& updateRect, const rgb_color& base, uint32 flags,
 	orientation orientation)
 {
@@ -367,7 +368,7 @@ HaikuControlLook::DrawScrollBarBorder(BView* view, BRect rect,
 
 
 void
-HaikuControlLook::DrawScrollBarButton(BView* view, BRect rect,
+FlatControlLook::DrawScrollBarButton(BView* view, BRect rect,
 	const BRect& updateRect, const rgb_color& base, uint32 flags,
 	int32 direction, orientation orientation, bool down)
 {
@@ -410,7 +411,7 @@ HaikuControlLook::DrawScrollBarButton(BView* view, BRect rect,
 
 
 void
-HaikuControlLook::DrawScrollBarBackground(BView* view, BRect& rect1,
+FlatControlLook::DrawScrollBarBackground(BView* view, BRect& rect1,
 	BRect& rect2, const BRect& updateRect, const rgb_color& base, uint32 flags,
 	orientation orientation)
 {
@@ -420,7 +421,7 @@ HaikuControlLook::DrawScrollBarBackground(BView* view, BRect& rect1,
 
 
 void
-HaikuControlLook::DrawScrollBarBackground(BView* view, BRect& rect,
+FlatControlLook::DrawScrollBarBackground(BView* view, BRect& rect,
 	const BRect& updateRect, const rgb_color& base, uint32 flags,
 	orientation orientation)
 {
@@ -648,7 +649,7 @@ FlatControlLook::DrawScrollBarThumb(BView* view, BRect& rect,
 
 
 void
-HaikuControlLook::DrawScrollViewFrame(BView* view, BRect& rect,
+FlatControlLook::DrawScrollViewFrame(BView* view, BRect& rect,
 	const BRect& updateRect, BRect verticalScrollBarFrame,
 	BRect horizontalScrollBarFrame, const rgb_color& base,
 	border_style borderStyle, uint32 flags, uint32 _borders)
@@ -733,7 +734,7 @@ HaikuControlLook::DrawScrollViewFrame(BView* view, BRect& rect,
 
 
 rgb_color
-HaikuControlLook::SliderBarColor(const rgb_color& base)
+FlatControlLook::SliderBarColor(const rgb_color& base)
 {
 	rgb_color customColor = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), 1.05);
 	// if the color BACKGROUND used is too dark, then make it lighter using the
@@ -747,7 +748,7 @@ HaikuControlLook::SliderBarColor(const rgb_color& base)
 
 
 void
-HaikuControlLook::DrawSliderBar(BView* view, BRect rect, const BRect& updateRect,
+FlatControlLook::DrawSliderBar(BView* view, BRect rect, const BRect& updateRect,
 	const rgb_color& base, rgb_color leftFillColor, rgb_color rightFillColor,
 	float sliderScale, uint32 flags, orientation orientation)
 {
@@ -804,7 +805,7 @@ HaikuControlLook::DrawSliderBar(BView* view, BRect rect, const BRect& updateRect
 
 
 void
-HaikuControlLook::DrawSliderBar(BView* view, BRect rect, const BRect& updateRect,
+FlatControlLook::DrawSliderBar(BView* view, BRect rect, const BRect& updateRect,
 	const rgb_color& base, rgb_color fillColor, uint32 flags,
 	orientation orientation)
 {
@@ -955,7 +956,7 @@ HaikuControlLook::DrawSliderBar(BView* view, BRect rect, const BRect& updateRect
 
 
 void
-HaikuControlLook::DrawSliderThumb(BView* view, BRect& rect, const BRect& updateRect,
+FlatControlLook::DrawSliderThumb(BView* view, BRect& rect, const BRect& updateRect,
 	const rgb_color& base, uint32 flags, orientation orientation)
 {
 	if (!rect.IsValid() || !rect.Intersects(updateRect))
@@ -995,7 +996,6 @@ HaikuControlLook::DrawSliderThumb(BView* view, BRect& rect, const BRect& updateR
 		frameShadowColor = tint_color(base, frameShadowTint);
 	}
 
-	BRect originalRect(rect);
 	rect.right--;
 	rect.bottom--;
 
@@ -1033,7 +1033,7 @@ HaikuControlLook::DrawSliderThumb(BView* view, BRect& rect, const BRect& updateR
 
 
 void
-HaikuControlLook::DrawActiveTab(BView* view, BRect& rect,
+FlatControlLook::DrawActiveTab(BView* view, BRect& rect,
 	const BRect& updateRect, const rgb_color& base, uint32 flags,
 	uint32 borders, uint32 side, int32, int32, int32, int32)
 {
@@ -1364,7 +1364,7 @@ FlatControlLook::DrawRaisedBorder(BView* view, BRect& rect,
 
 
 void
-HaikuControlLook::DrawTextControlBorder(BView* view, BRect& rect,
+FlatControlLook::DrawTextControlBorder(BView* view, BRect& rect,
 	const BRect& updateRect, const rgb_color& base, uint32 flags,
 	uint32 borders)
 {
@@ -1447,7 +1447,7 @@ HaikuControlLook::DrawTextControlBorder(BView* view, BRect& rect,
 
 
 void
-HaikuControlLook::DrawGroupFrame(BView* view, BRect& rect, const BRect& updateRect,
+FlatControlLook::DrawGroupFrame(BView* view, BRect& rect, const BRect& updateRect,
 	const rgb_color& base, uint32 borders)
 {
 	rgb_color frameColor = tint_color(base, 1.1);
@@ -1499,7 +1499,7 @@ FlatControlLook::DrawButtonWithPopUpBackground(BView* view, BRect& rect,
 
 
 void
-HaikuControlLook::_DrawButtonFrame(BView* view, BRect& rect,
+FlatControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 	const BRect& updateRect, float leftTopRadius, float rightTopRadius,
 	float leftBottomRadius, float rightBottomRadius, const rgb_color& base,
 	const rgb_color& background, float contrast, float brightness,
@@ -1902,7 +1902,7 @@ FlatControlLook::_DrawNonFlatButtonBackground(BView* view, BRect& rect,
 
 
 void
-HaikuControlLook::_DrawPopUpMarker(BView* view, const BRect& rect,
+FlatControlLook::_DrawPopUpMarker(BView* view, const BRect& rect,
 	const rgb_color& base, uint32 flags)
 {
 	BPoint center(roundf((rect.left + rect.right) / 2.0),
@@ -2184,7 +2184,7 @@ FlatControlLook::_EdgeShadowColor(const rgb_color& base, float contrast,
 
 
 rgb_color
-HaikuControlLook::_BevelLightColor(const rgb_color& base, uint32 flags)
+FlatControlLook::_BevelLightColor(const rgb_color& base, uint32 flags)
 {
 	rgb_color bevelLightColor = tint_color(base, 1.0);
 	return bevelLightColor;
@@ -2192,7 +2192,7 @@ HaikuControlLook::_BevelLightColor(const rgb_color& base, uint32 flags)
 
 
 rgb_color
-HaikuControlLook::_BevelShadowColor(const rgb_color& base, uint32 flags)
+FlatControlLook::_BevelShadowColor(const rgb_color& base, uint32 flags)
 {
 	rgb_color bevelShadowColor = tint_color(base, 1.0);
 	return bevelShadowColor;
@@ -2200,7 +2200,7 @@ HaikuControlLook::_BevelShadowColor(const rgb_color& base, uint32 flags)
 
 
 void
-HaikuControlLook::_MakeGradient(BGradientLinear& gradient, const BRect& rect,
+FlatControlLook::_MakeGradient(BGradientLinear& gradient, const BRect& rect,
 	const rgb_color& base, float topTint, float bottomTint,
 	orientation orientation) const
 {
@@ -2215,7 +2215,7 @@ HaikuControlLook::_MakeGradient(BGradientLinear& gradient, const BRect& rect,
 
 
 void
-HaikuControlLook::_MakeGlossyGradient(BGradientLinear& gradient, const BRect& rect,
+FlatControlLook::_MakeGlossyGradient(BGradientLinear& gradient, const BRect& rect,
 	const rgb_color& base, float topTint, float middle1Tint,
 	float middle2Tint, float bottomTint,
 	orientation orientation) const
@@ -2231,7 +2231,7 @@ HaikuControlLook::_MakeGlossyGradient(BGradientLinear& gradient, const BRect& re
 
 
 void
-HaikuControlLook::_MakeButtonGradient(BGradientLinear& gradient, BRect& rect,
+FlatControlLook::_MakeButtonGradient(BGradientLinear& gradient, BRect& rect,
 	const rgb_color& base, uint32 flags, orientation orientation) const
 {
 	float topTint = 0.99;
