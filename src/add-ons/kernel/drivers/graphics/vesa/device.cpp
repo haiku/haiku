@@ -137,6 +137,18 @@ device_ioctl(void* cookie, uint32 msg, void* buffer, size_t bufferLength)
 			return vesa_set_display_mode(*info, mode);
 		}
 
+		case VESA_SET_CUSTOM_DISPLAY_MODE:
+		{
+			if (bufferLength != sizeof(display_mode))
+				return B_BAD_VALUE;
+
+			display_mode mode;
+			if (user_memcpy(&mode, buffer, sizeof(display_mode)) != B_OK)
+				return B_BAD_ADDRESS;
+
+			return vesa_set_custom_display_mode(*info, mode);
+		}
+
 		case VESA_GET_DPMS_MODE:
 		{
 			if (bufferLength != sizeof(uint32))

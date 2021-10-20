@@ -39,6 +39,7 @@ struct vesa_info {
 extern status_t vesa_init(vesa_info& info);
 extern void vesa_uninit(vesa_info& info);
 extern status_t vesa_set_display_mode(vesa_info& info, uint32 mode);
+extern status_t vesa_set_custom_display_mode(vesa_info& info, display_mode& mode);
 extern status_t vesa_get_dpms_mode(vesa_info& info, uint32& mode);
 extern status_t vesa_set_dpms_mode(vesa_info& info, uint32 mode);
 extern status_t vesa_set_indexed_colors(vesa_info& info, uint8 first,

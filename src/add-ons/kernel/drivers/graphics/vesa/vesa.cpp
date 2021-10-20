@@ -7,6 +7,7 @@
 #include "vesa_private.h"
 #include "vesa.h"
 
+#define _GNU_SOURCE
 #include <string.h>
 
 #include <drivers/bios.h>
@@ -19,6 +20,8 @@
 #include "driver.h"
 #include "utility.h"
 #include "vesa_info.h"
+
+#include "atombios.h"
 
 
 static bios_module_info* sBIOSModule;
@@ -276,6 +279,65 @@ vbe_set_bits_per_gun(vesa_info& info, uint8 bits)
 }
 
 
+/*! Identify the BIOS type if it's one of the common ones, and locate where the BIOS store its
+ * allowed video modes table. We can then patch this table to add extra video modes that the
+ * manufacturer didn't allow.
+ */
+static void
+vbe_identify_bios(vesa_shared_info* sharedInfo)
+{
+	// TODO vbe_call_prepare/vbe_call_finish is a costly operation (loading and unloading the
+	// BIOS module all the time). We should try to do it less often.
+	bios_state* state;
+	status_t status = vbe_call_prepare(&state);
+	if (status != B_OK)
+		return;
+
+	// Get a pointer to the BIOS
+	const uintptr_t kBiosBase = 0xc0000;
+	uint8_t* bios = (uint8_t*)sBIOSModule->virtual_address(state, kBiosBase);
+
+	const size_t kAtomBiosHeaderOffset = 0x48;
+	const char kAtomSignature[] = {'A', 'T', 'O', 'M'};
+
+	ATOM_ROM_HEADER* atomRomHeader = (ATOM_ROM_HEADER*)(bios + kAtomBiosHeaderOffset);
+
+	sharedInfo->bios_type = kUnknownBiosType;
+
+	if (*(uint16*)(bios + 0x44) == 0x8086) {
+		dprintf(DEVICE_NAME ": detected Intel BIOS\n");
+
+		// TODO check if we can find the mode table
+		sharedInfo->bios_type = kIntelBiosType;
+	} else if (memcmp(atomRomHeader->uaFirmWareSignature,  kAtomSignature, 4) == 0) {
+		dprintf(DEVICE_NAME ": detected ATOM BIOS\n");
+
+		ATOM_MASTER_DATA_TABLE* masterDataTable = (ATOM_MASTER_DATA_TABLE*)(bios
+			+ atomRomHeader->usMasterDataTableOffset);
+		dprintf(DEVICE_NAME ": list of data tables: %p", &masterDataTable->ListOfDataTables);
+		ATOM_ANALOG_TV_INFO* standardVesaTable = (ATOM_ANALOG_TV_INFO*)(bios
+			+ masterDataTable->ListOfDataTables.StandardVESA_Timing);
+		dprintf(DEVICE_NAME ": std_vesa: %p", standardVesaTable);
+		if (standardVesaTable->aModeTimings == NULL) {
+			dprintf(DEVICE_NAME ": unable to locate the mode table\n");
+		} else {
+			sharedInfo->bios_type = kAtomBiosType1;
+			// TODO detect kAtomBiosType2
+			// TODO set sharedInfo->mode_table_offset
+		}
+	} else if (memmem(bios, 512, "NVID", 4) != NULL) {
+		dprintf(DEVICE_NAME ": detected nVidia BIOS\n");
+
+		// TODO check if we can find the mode table
+		sharedInfo->bios_type = kNVidiaBiosType;
+	} else {
+		dprintf(DEVICE_NAME ": unknown BIOS type, custom video modes will not be available\n");
+	}
+
+	vbe_call_finish(state);
+}
+
+
 /*!	Remaps the frame buffer if necessary; if we've already mapped the complete
 	frame buffer, there is no need to map it again.
 */
@@ -402,6 +464,8 @@ vesa_init(vesa_info& info)
 		memcpy(&sharedInfo.edid_info, edidInfo, sizeof(edid1_info));
 	}
 
+	vbe_identify_bios(&sharedInfo);
+
 	vbe_get_dpms_capabilities(info.vbe_dpms_capabilities,
 		sharedInfo.dpms_capabilities);
 	if (bufferInfo->depth <= 8)
@@ -457,6 +521,171 @@ vesa_set_display_mode(vesa_info& info, uint32 mode)
 	status = remap_frame_buffer(info, modeInfo.physical_base, modeInfo.width,
 		modeInfo.height, modeInfo.bits_per_pixel, modeInfo.bytes_per_row,
 		false);
+	if (status == B_OK) {
+		// Update shared frame buffer information
+		info.shared_info->current_mode.virtual_width = modeInfo.width;
+		info.shared_info->current_mode.virtual_height = modeInfo.height;
+		info.shared_info->current_mode.space = get_color_space_for_depth(
+			modeInfo.bits_per_pixel);
+	}
+
+out:
+	vbe_call_finish(state);
+	return status;
+}
+
+
+status_t
+vbe_patch_intel_bios(bios_state* state, display_mode& mode)
+{
+	edid1_detailed_timing_raw timing;
+
+	timing.pixel_clock = mode.timing.pixel_clock / 10;
+
+	timing.h_active = mode.timing.h_display & 0xFF;
+	timing.h_active_high = (mode.timing.h_display >> 8) & 0xF;
+
+	uint16 h_blank = mode.timing.h_total - mode.timing.h_display;
+	timing.h_blank = h_blank & 0xff;
+	timing.h_blank_high = (h_blank >> 8) & 0xF;
+
+	timing.v_active = mode.timing.v_display & 0xFF;
+	timing.v_active_high = (mode.timing.v_display >> 8) & 0xF;
+
+	uint16 v_blank = mode.timing.v_total - mode.timing.v_display;
+	timing.v_blank = v_blank & 0xff;
+	timing.v_blank_high = (v_blank >> 8) & 0xF;
+
+	uint16 h_sync_off = mode.timing.h_sync_start - mode.timing.h_display;
+	timing.h_sync_off = h_sync_off & 0xFF;
+	timing.h_sync_off_high = (h_sync_off >> 8) & 0x3;
+
+	uint16 h_sync_width = mode.timing.h_sync_end - mode.timing.h_sync_start;
+	timing.h_sync_width = h_sync_width & 0xFF;
+	timing.h_sync_width_high = (h_sync_width >> 8) & 0x3;
+
+	uint16 v_sync_off = mode.timing.v_sync_start - mode.timing.v_display;
+	timing.v_sync_off = v_sync_off & 0xF;
+	timing.v_sync_off_high = (v_sync_off >> 4) & 0x3;
+
+	uint16 v_sync_width = mode.timing.v_sync_end - mode.timing.v_sync_start;
+	timing.v_sync_width = v_sync_width & 0xF;
+	timing.v_sync_width_high = (v_sync_width >> 4) & 0x3;
+
+	timing.h_size = 0;
+	timing.v_size = 0;
+	timing.h_size_high = 0;
+	timing.v_size_high = 0;
+	timing.h_border = 0;
+	timing.v_border = 0;
+	timing.interlaced = 0;
+	timing.stereo = 0;
+	timing.sync = 3;
+	timing.misc = 0;
+	timing.stereo_il = 0;
+
+	static const uint8 knownMode[] = { 0x64, 0x19, 0x00, 0x40, 0x41, 0x00, 0x26, 0x30, 0x18,
+		0x88, 0x36, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x18};
+		// This is the EDID description for a standard 1024x768 timing. We will find and replace
+		// all occurences of it in the BIOS with our custom mode.
+
+	// Get a pointer to the BIOS
+	const uintptr_t kBiosBase = 0xc0000;
+	const size_t kBiosSize = 0x10000;
+	uint8_t* bios = (uint8_t*)sBIOSModule->virtual_address(state, kBiosBase);
+	uint8_t* biosEnd = bios + kBiosSize;
+
+	int replacementCount = 0;
+	while (bios < biosEnd) {
+		bios = (uint8_t*)memmem(bios, biosEnd - bios, knownMode, sizeof(knownMode));
+		if (bios == NULL)
+			break;
+		memcpy(bios, &timing, sizeof(timing));
+		bios++; // Skip one byte so the next memmem finds another occurence
+		replacementCount++;
+	}
+
+	dprintf(DEVICE_NAME ": patched custom mode in %d locations\n", replacementCount);
+
+	// Did we manage to find a mode descriptor to replace?
+	if (replacementCount == 0)
+		return B_NOT_SUPPORTED;
+	return B_OK;
+}
+
+
+status_t
+vesa_set_custom_display_mode(vesa_info& info, display_mode& mode)
+{
+	if (info.shared_info->bios_type == kUnknownBiosType)
+		return B_NOT_SUPPORTED;
+
+	// Prepare BIOS environment
+	bios_state* state;
+	status_t status = vbe_call_prepare(&state);
+	if (status != B_OK)
+		return status;
+
+	int32 modeIndex; // Index of the mode that will be patched
+
+	// Patch bios to inject custom video mode
+	switch (info.shared_info->bios_type) {
+		case kIntelBiosType:
+			status = vbe_patch_intel_bios(state, mode);
+			// The patch replaces the 1024x768 modes with our custom resolution. We can then use
+			// mode 0x118 which is the standard VBE2 mode for 1024x768 at 32 bits per pixel, and
+			// know it will use our new timings.
+			// TODO use modes 105 (256 colors), 116 (15 bit) and 117 (16 bit) depending on the
+			// requested colorspace. They should work too.
+			// TODO ideally locate the 1024x768 modes from the mode list in info.modes[], instead
+			// of hardcoding its number, in case the BIOS does not use VBE2 standard numbering.
+			modeIndex = 0x118;
+			break;
+#if 0
+		case kNVidiaBiosType:
+			status = vbe_patch_nvidia_bios(state, mode);
+			break;
+		case kAtomBiosType1:
+			status = vbe_patch_atom1_bios(state, mode);
+			break;
+		case kAtomBiosType2:
+			status = vbe_patch_atom2_bios(state, mode);
+			break;
+#endif
+		default:
+			status = B_NOT_SUPPORTED;
+			break;
+	}
+
+	if (status != B_OK)
+		goto out;
+
+	// Get mode information
+	struct vbe_mode_info modeInfo;
+	status = vbe_get_mode_info(state, modeIndex, &modeInfo);
+	if (status != B_OK) {
+		dprintf(DEVICE_NAME ": vesa_set_custom_display_mode(): cannot get mode info\n");
+		goto out;
+	}
+
+	dprintf(DEVICE_NAME ": custom mode resolution %dx%d\n", modeInfo.width, modeInfo.height);
+
+	// Set mode
+	status = vbe_set_mode(state, modeIndex);
+	if (status != B_OK) {
+		dprintf(DEVICE_NAME ": vesa_set_custom_display_mode(): cannot set mode\n");
+		goto out;
+	}
+
+	if (info.modes[modeIndex].bits_per_pixel <= 8)
+		vbe_set_bits_per_gun(state, info, 8);
+
+	// Map new frame buffer if necessary
+
+	status = remap_frame_buffer(info, modeInfo.physical_base, modeInfo.width,
+		modeInfo.height, modeInfo.bits_per_pixel, modeInfo.bytes_per_row,
+		false);
+
 	if (status == B_OK) {
 		// Update shared frame buffer information
 		info.shared_info->current_mode.virtual_width = modeInfo.width;
