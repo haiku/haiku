@@ -33,7 +33,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/re/if_re.c 333813 2018-05-18 20:13:34Z mmacy $");
+__FBSDID("$FreeBSD$");
 
 /*
  * RealTek 8139C+/8169/8169S/8110S/8168/8111/8101E PCI NIC driver
@@ -128,6 +128,7 @@ __FBSDID("$FreeBSD: releng/12.0/sys/dev/re/if_re.c 333813 2018-05-18 20:13:34Z m
 #include <sys/sysctl.h>
 #include <sys/taskqueue.h>
 
+#include <net/debugnet.h>
 #include <net/if.h>
 #include <net/if_var.h>
 #include <net/if_arp.h>
@@ -138,8 +139,6 @@ __FBSDID("$FreeBSD: releng/12.0/sys/dev/re/if_re.c 333813 2018-05-18 20:13:34Z m
 #include <net/if_vlan_var.h>
 
 #include <net/bpf.h>
-
-#include <netinet/netdump/netdump.h>
 
 #include <machine/bus.h>
 #include <machine/resource.h>
@@ -187,6 +186,8 @@ static const struct rl_type re_devs[] = {
 	    "RealTek 810xE PCIe 10/100baseTX" },
 	{ RT_VENDORID, RT_DEVICEID_8168, 0,
 	    "RealTek 8168/8111 B/C/CP/D/DP/E/F/G PCIe Gigabit Ethernet" },
+	{ RT_VENDORID, RT_DEVICEID_8161, 0,
+	    "RealTek 8168 Gigabit Ethernet" },
 	{ NCUBE_VENDORID, RT_DEVICEID_8168, 0,
 	    "TP-Link TG-3468 v2 (RTL8168) Gigabit Ethernet" },
 	{ RT_VENDORID, RT_DEVICEID_8169, 0,
@@ -310,7 +311,7 @@ static void re_setwol		(struct rl_softc *);
 static void re_clrwol		(struct rl_softc *);
 static void re_set_linkspeed	(struct rl_softc *);
 
-NETDUMP_DEFINE(re);
+DEBUGNET_DEFINE(re);
 
 #ifdef DEV_NETMAP	/* see ixgbe.c for details */
 #include <dev/netmap/if_re_netmap.h>
@@ -650,6 +651,20 @@ re_miibus_statchg(device_t dev)
 	 */
 }
 
+static u_int
+re_hash_maddr(void *arg, struct sockaddr_dl *sdl, u_int cnt)
+{
+	uint32_t h, *hashes = arg;
+
+	h = ether_crc32_be(LLADDR(sdl), ETHER_ADDR_LEN) >> 26;
+	if (h < 32)
+		hashes[0] |= (1 << h);
+	else
+		hashes[1] |= (1 << (h - 32));
+
+	return (1);
+}
+
 /*
  * Set the RX configuration and 64-bit multicast hash filter.
  */
@@ -657,9 +672,8 @@ static void
 re_set_rxmode(struct rl_softc *sc)
 {
 	struct ifnet		*ifp;
-	struct ifmultiaddr	*ifma;
-	uint32_t		hashes[2] = { 0, 0 };
-	uint32_t		h, rxfilt;
+	uint32_t		h, hashes[2] = { 0, 0 };
+	uint32_t		rxfilt;
 
 	RL_LOCK_ASSERT(sc);
 
@@ -684,18 +698,7 @@ re_set_rxmode(struct rl_softc *sc)
 		goto done;
 	}
 
-	if_maddr_rlock(ifp);
-	TAILQ_FOREACH(ifma, &ifp->if_multiaddrs, ifma_link) {
-		if (ifma->ifma_addr->sa_family != AF_LINK)
-			continue;
-		h = ether_crc32_be(LLADDR((struct sockaddr_dl *)
-		    ifma->ifma_addr), ETHER_ADDR_LEN) >> 26;
-		if (h < 32)
-			hashes[0] |= (1 << h);
-		else
-			hashes[1] |= (1 << (h - 32));
-	}
-	if_maddr_runlock(ifp);
+	if_foreach_llmaddr(ifp, re_hash_maddr, hashes);
 
 	if (hashes[0] != 0 || hashes[1] != 0) {
 		/*
@@ -1655,7 +1658,7 @@ re_attach(device_t dev)
 	ifp->if_snd.ifq_drv_maxlen = RL_IFQ_MAXLEN;
 	IFQ_SET_READY(&ifp->if_snd);
 
-	TASK_INIT(&sc->rl_inttask, 0, re_int_task, sc);
+	NET_TASK_INIT(&sc->rl_inttask, 0, re_int_task, sc);
 
 #define	RE_PHYAD_INTERNAL	 0
 
@@ -1745,7 +1748,7 @@ re_attach(device_t dev)
 		goto fail;
 	}
 
-	NETDUMP_SET(ifp, re);
+	DEBUGNET_SET(ifp, re);
 
 fail:
 	if (error)
@@ -3357,6 +3360,10 @@ re_init_locked(struct rl_softc *sc)
 
 	sc->rl_watchdog_timer = 0;
 	callout_reset(&sc->rl_stat_callout, hz, re_tick, sc);
+
+#ifdef DEV_NETMAP
+	netmap_enable_all_rings(ifp);
+#endif /* DEV_NETMAP */
 }
 
 /*
@@ -3604,6 +3611,10 @@ re_stop(struct rl_softc *sc)
 	sc->rl_watchdog_timer = 0;
 	callout_stop(&sc->rl_stat_callout);
 	ifp->if_drv_flags &= ~(IFF_DRV_RUNNING | IFF_DRV_OACTIVE);
+
+#ifdef DEV_NETMAP
+	netmap_disable_all_rings(ifp);
+#endif /* DEV_NETMAP */
 
 	/*
 	 * Disable accepting frames to put RX MAC into idle state.
@@ -3968,14 +3979,15 @@ re_add_sysctls(struct rl_softc *sc)
 	children = SYSCTL_CHILDREN(device_get_sysctl_tree(sc->rl_dev));
 
 	SYSCTL_ADD_PROC(ctx, children, OID_AUTO, "stats",
-	    CTLTYPE_INT | CTLFLAG_RW, sc, 0, re_sysctl_stats, "I",
-	    "Statistics Information");
+	    CTLTYPE_INT | CTLFLAG_RW | CTLFLAG_NEEDGIANT, sc, 0,
+	    re_sysctl_stats, "I", "Statistics Information");
 	if ((sc->rl_flags & (RL_FLAG_MSI | RL_FLAG_MSIX)) == 0)
 		return;
 
 	SYSCTL_ADD_PROC(ctx, children, OID_AUTO, "int_rx_mod",
-	    CTLTYPE_INT | CTLFLAG_RW, &sc->rl_int_rx_mod, 0,
-	    sysctl_hw_re_int_mod, "I", "re RX interrupt moderation");
+	    CTLTYPE_INT | CTLFLAG_RW | CTLFLAG_NEEDGIANT,
+	    &sc->rl_int_rx_mod, 0, sysctl_hw_re_int_mod, "I",
+	    "re RX interrupt moderation");
 	/* Pull in device tunables. */
 	sc->rl_int_rx_mod = RL_TIMER_DEFAULT;
 	error = resource_int_value(device_get_name(sc->rl_dev),
@@ -4093,28 +4105,28 @@ sysctl_hw_re_int_mod(SYSCTL_HANDLER_ARGS)
 	    RL_TIMER_MAX));
 }
 
-#ifdef NETDUMP
+#ifdef DEBUGNET
 static void
-re_netdump_init(struct ifnet *ifp, int *nrxr, int *ncl, int *clsize)
+re_debugnet_init(struct ifnet *ifp, int *nrxr, int *ncl, int *clsize)
 {
 	struct rl_softc *sc;
 
 	sc = if_getsoftc(ifp);
 	RL_LOCK(sc);
 	*nrxr = sc->rl_ldata.rl_rx_desc_cnt;
-	*ncl = NETDUMP_MAX_IN_FLIGHT;
+	*ncl = DEBUGNET_MAX_IN_FLIGHT;
 	*clsize = (ifp->if_mtu > RL_MTU &&
 	    (sc->rl_flags & RL_FLAG_JUMBOV2) != 0) ? MJUM9BYTES : MCLBYTES;
 	RL_UNLOCK(sc);
 }
 
 static void
-re_netdump_event(struct ifnet *ifp __unused, enum netdump_ev event __unused)
+re_debugnet_event(struct ifnet *ifp __unused, enum debugnet_ev event __unused)
 {
 }
 
 static int
-re_netdump_transmit(struct ifnet *ifp, struct mbuf *m)
+re_debugnet_transmit(struct ifnet *ifp, struct mbuf *m)
 {
 	struct rl_softc *sc;
 	int error;
@@ -4131,7 +4143,7 @@ re_netdump_transmit(struct ifnet *ifp, struct mbuf *m)
 }
 
 static int
-re_netdump_poll(struct ifnet *ifp, int count)
+re_debugnet_poll(struct ifnet *ifp, int count)
 {
 	struct rl_softc *sc;
 	int error;
@@ -4147,4 +4159,4 @@ re_netdump_poll(struct ifnet *ifp, int count)
 		return (error);
 	return (0);
 }
-#endif /* NETDUMP */
+#endif /* DEBUGNET */

@@ -32,7 +32,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $FreeBSD: releng/12.0/sys/dev/bge/if_bgereg.h 325966 2017-11-18 14:26:50Z pfg $
+ * $FreeBSD$
  */
 
 /*
@@ -144,7 +144,6 @@
 #define	BGE_AVAIL_REGION2_END		0x0001FFFF
 #define	BGE_EXT_SSRAM			0x00020000
 #define	BGE_EXT_SSRAM_END		0x000FFFFF
-
 
 /*
  * BCM570x register offsets. These are memory mapped registers
@@ -461,7 +460,6 @@
 #define	BGE_PCICLOCKCTL_PCIPLL_DISABLE	0x00004000
 #define	BGE_PCICLOCKCTL_SYSPLL_DISABLE	0x00008000
 #define	BGE_PCICLOCKCTL_BIST_ENABLE	0x00010000
-
 
 #ifndef PCIM_CMD_MWIEN
 #define	PCIM_CMD_MWIEN			0x0010
@@ -902,7 +900,6 @@
 #define	BGE_SGDIGSTS_PAUSE_CAP		0x00080000
 #define	BGE_SGDIGSTS_ASYM_PAUSE		0x00100000
 
-
 /* MI communication register */
 #define	BGE_MICOMM_DATA			0x0000FFFF
 #define	BGE_MICOMM_REG			0x001F0000
@@ -926,7 +923,6 @@
 #define	BGE_MIMODE_CLKCNT		0x001F0000
 #define	BGE_MIMODE_500KHZ_CONST		0x00008000
 #define	BGE_MIMODE_BASE			0x000C0000
-
 
 /*
  * Send data initiator control registers.
@@ -1157,7 +1153,6 @@
 #define	BGE_RXLP_LOCSTAT_IFIN_ERRORS	0x2254
 #define	BGE_RXLP_LOCSTAT_RXTHRESH_HIT	0x2258
 
-
 /* Receive List Placement mode register */
 #define	BGE_RXLPMODE_RESET		0x00000001
 #define	BGE_RXLPMODE_ENABLE		0x00000002
@@ -1208,7 +1203,6 @@
 #define	BGE_RDBDI_RETURN_PROD15		0x24BC
 #define	BGE_RDBDI_HWDIAG		0x24C0
 
-
 /* Receive Data and Receive BD Initiator Mode register */
 #define	BGE_RDBDIMODE_RESET		0x00000001
 #define	BGE_RDBDIMODE_ENABLE		0x00000002
@@ -1220,7 +1214,6 @@
 #define	BGE_RDBDISTAT_JUMBO_ATTN	0x00000004
 #define	BGE_RDBDISTAT_GIANT_ATTN	0x00000008
 #define	BGE_RDBDISTAT_BADRINGSZ_ATTN	0x00000010
-
 
 /*
  * Receive Data Completion Control registers
@@ -1410,7 +1403,6 @@
 #define	BGE_HCC_TX_BD_CONS14		0x3CF8
 #define	BGE_HCC_TX_BD_CONS15		0x3CFC
 
-
 /* Host coalescing mode register */
 #define	BGE_HCCMODE_RESET		0x00000001
 #define	BGE_HCCMODE_ENABLE		0x00000002
@@ -1544,7 +1536,6 @@
 #define	BGE_BMANSTAT_ERRO		0x00000004
 #define	BGE_BMANSTAT_LOWMBUF_ERROR	0x00000010
 
-
 /*
  * Read DMA Control registers
  */
@@ -1652,7 +1643,6 @@
 #define	BGE_WDMASTAT_PCI_FIFOOREAD_ATTN	0x00000100
 #define	BGE_WDMASTAT_LOCREAD_TOOBIG	0x00000200
 
-
 /*
  * RX CPU registers
  */
@@ -1747,7 +1737,6 @@
 #define	BGE_TXCPUSTAT_MA_DATAMASK_OFLOW	0x20000000
 #define	BGE_TXCPUSTAT_MA_REQ_FIFOOFLOW	0x40000000
 #define	BGE_TXCPUSTAT_BLOCKING_READ	0x80000000
-
 
 /*
  * Low priority mailbox registers
@@ -1924,7 +1913,6 @@
 #define	BGE_MSISTAT_MSI_FIFOUFLOW_ATTN	0x00000020
 #define	BGE_MSISTAT_MSI_FIFOOFLOW_ATTN	0x00000040
 
-
 /*
  * DMA Completion registers
  */
@@ -1933,7 +1921,6 @@
 /* DMA Completion mode register */
 #define	BGE_DMACMODE_RESET		0x00000001
 #define	BGE_DMACMODE_ENABLE		0x00000002
-
 
 /*
  * General control registers.
@@ -2427,7 +2414,6 @@ struct bge_status_block {
 #define	BGE_STATFLAG_LINKSTATE_CHANGED	0x00000002
 #define	BGE_STATFLAG_ERROR		0x00000004
 
-
 /*
  * Broadcom Vendor ID
  * (Note: the BCM570x still defaults to the Alteon PCI vendor ID
@@ -2566,17 +2552,11 @@ struct bge_status_block {
 #define	APPLE_DEVICE_BCM5701		0x1645
 
 /*
- * Sun PCI vendor ID
- */
-#define	SUN_VENDORID			0x108e
-
-/*
  * Fujitsu vendor/device IDs
  */
 #define	FJTSU_VENDORID			0x10cf
 #define	FJTSU_DEVICEID_PW008GE5		0x11a1
 #define	FJTSU_DEVICEID_PW008GE4		0x11a2
-#define	FJTSU_DEVICEID_PP250450		0x11cc		/* PRIMEPOWER250/450 LAN */
 
 /*
  * Offset of MAC address inside EEPROM.
@@ -2665,7 +2645,6 @@ struct bge_rx_mac_stats {
 	bge_hostaddr		etherStatsPkts4096Octetsto8191Octets;
 	bge_hostaddr		etherStatsPkts8192Octetsto9022Octets;
 };
-
 
 /* Statistics maintained MAC Transmit block. */
 struct bge_tx_mac_stats {
@@ -2864,6 +2843,12 @@ struct bge_gib {
 #define	BGE_DMA_MAXADDR		BUS_SPACE_MAXADDR
 #else
 #define	BGE_DMA_MAXADDR		0xFFFFFFFFFF
+#endif
+
+#if (BUS_SPACE_MAXSIZE > 0xFFFFFFFF)
+#define	BGE_DMA_BNDRY		0x100000000
+#else
+#define	BGE_DMA_BNDRY		0
 #endif
 
 /*

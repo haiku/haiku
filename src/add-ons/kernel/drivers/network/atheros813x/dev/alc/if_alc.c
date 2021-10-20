@@ -30,7 +30,7 @@
 /* Driver for Atheros AR813x/AR815x PCIe Ethernet. */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/alc/if_alc.c 338948 2018-09-26 17:12:14Z imp $");
+__FBSDID("$FreeBSD$");
 
 #include <sys/param.h>
 #include <sys/systm.h>
@@ -50,6 +50,7 @@ __FBSDID("$FreeBSD: releng/12.0/sys/dev/alc/if_alc.c 338948 2018-09-26 17:12:14Z
 #include <sys/taskqueue.h>
 
 #include <net/bpf.h>
+#include <net/debugnet.h>
 #include <net/if.h>
 #include <net/if_var.h>
 #include <net/if_arp.h>
@@ -64,7 +65,6 @@ __FBSDID("$FreeBSD: releng/12.0/sys/dev/alc/if_alc.c 338948 2018-09-26 17:12:14Z
 #include <netinet/in_systm.h>
 #include <netinet/ip.h>
 #include <netinet/tcp.h>
-#include <netinet/netdump/netdump.h>
 
 #include <dev/mii/mii.h>
 #include <dev/mii/miivar.h>
@@ -215,7 +215,7 @@ static int	sysctl_int_range(SYSCTL_HANDLER_ARGS, int, int);
 static int	sysctl_hw_alc_proc_limit(SYSCTL_HANDLER_ARGS);
 static int	sysctl_hw_alc_int_mod(SYSCTL_HANDLER_ARGS);
 
-NETDUMP_DEFINE(alc);
+DEBUGNET_DEFINE(alc);
 
 static device_method_t alc_methods[] = {
 	/* Device interface. */
@@ -1387,7 +1387,7 @@ alc_attach(device_t dev)
 	mtx_init(&sc->alc_mtx, device_get_nameunit(dev), MTX_NETWORK_LOCK,
 	    MTX_DEF);
 	callout_init_mtx(&sc->alc_tick_ch, &sc->alc_mtx, 0);
-	TASK_INIT(&sc->alc_int_task, 0, alc_int_task, sc);
+	NET_TASK_INIT(&sc->alc_int_task, 0, alc_int_task, sc);
 	sc->alc_ident = alc_find_ident(dev);
 
 	/* Map the device. */
@@ -1659,8 +1659,8 @@ alc_attach(device_t dev)
 		goto fail;
 	}
 
-	/* Attach driver netdump methods. */
-	NETDUMP_SET(ifp, alc);
+	/* Attach driver debugnet methods. */
+	DEBUGNET_SET(ifp, alc);
 
 fail:
 	if (error != 0)
@@ -1749,11 +1749,11 @@ alc_sysctl_node(struct alc_softc *sc)
 	child = SYSCTL_CHILDREN(device_get_sysctl_tree(sc->alc_dev));
 
 	SYSCTL_ADD_PROC(ctx, child, OID_AUTO, "int_rx_mod",
-	    CTLTYPE_INT | CTLFLAG_RW, &sc->alc_int_rx_mod, 0,
-	    sysctl_hw_alc_int_mod, "I", "alc Rx interrupt moderation");
+	    CTLTYPE_INT | CTLFLAG_RW | CTLFLAG_NEEDGIANT, &sc->alc_int_rx_mod,
+	    0, sysctl_hw_alc_int_mod, "I", "alc Rx interrupt moderation");
 	SYSCTL_ADD_PROC(ctx, child, OID_AUTO, "int_tx_mod",
-	    CTLTYPE_INT | CTLFLAG_RW, &sc->alc_int_tx_mod, 0,
-	    sysctl_hw_alc_int_mod, "I", "alc Tx interrupt moderation");
+	    CTLTYPE_INT | CTLFLAG_RW | CTLFLAG_NEEDGIANT, &sc->alc_int_tx_mod,
+	    0, sysctl_hw_alc_int_mod, "I", "alc Tx interrupt moderation");
 	/* Pull in device tunables. */
 	sc->alc_int_rx_mod = ALC_IM_RX_TIMER_DEFAULT;
 	error = resource_int_value(device_get_name(sc->alc_dev),
@@ -1780,8 +1780,8 @@ alc_sysctl_node(struct alc_softc *sc)
 		}
 	}
 	SYSCTL_ADD_PROC(ctx, child, OID_AUTO, "process_limit",
-	    CTLTYPE_INT | CTLFLAG_RW, &sc->alc_process_limit, 0,
-	    sysctl_hw_alc_proc_limit, "I",
+	    CTLTYPE_INT | CTLFLAG_RW | CTLFLAG_NEEDGIANT,
+	    &sc->alc_process_limit, 0, sysctl_hw_alc_proc_limit, "I",
 	    "max number of Rx events to process");
 	/* Pull in device tunables. */
 	sc->alc_process_limit = ALC_PROC_DEFAULT;
@@ -1798,13 +1798,13 @@ alc_sysctl_node(struct alc_softc *sc)
 		}
 	}
 
-	tree = SYSCTL_ADD_NODE(ctx, child, OID_AUTO, "stats", CTLFLAG_RD,
-	    NULL, "ALC statistics");
+	tree = SYSCTL_ADD_NODE(ctx, child, OID_AUTO, "stats",
+	    CTLFLAG_RD | CTLFLAG_MPSAFE, NULL, "ALC statistics");
 	parent = SYSCTL_CHILDREN(tree);
 
 	/* Rx statistics. */
-	tree = SYSCTL_ADD_NODE(ctx, parent, OID_AUTO, "rx", CTLFLAG_RD,
-	    NULL, "Rx MAC statistics");
+	tree = SYSCTL_ADD_NODE(ctx, parent, OID_AUTO, "rx",
+	    CTLFLAG_RD | CTLFLAG_MPSAFE, NULL, "Rx MAC statistics");
 	child = SYSCTL_CHILDREN(tree);
 	ALC_SYSCTL_STAT_ADD32(ctx, child, "good_frames",
 	    &stats->rx_frames, "Good frames");
@@ -1857,8 +1857,8 @@ alc_sysctl_node(struct alc_softc *sc)
 	    "Frames dropped due to address filtering");
 
 	/* Tx statistics. */
-	tree = SYSCTL_ADD_NODE(ctx, parent, OID_AUTO, "tx", CTLFLAG_RD,
-	    NULL, "Tx MAC statistics");
+	tree = SYSCTL_ADD_NODE(ctx, parent, OID_AUTO, "tx",
+	    CTLFLAG_RD | CTLFLAG_MPSAFE, NULL, "Tx MAC statistics");
 	child = SYSCTL_CHILDREN(tree);
 	ALC_SYSCTL_STAT_ADD32(ctx, child, "good_frames",
 	    &stats->tx_frames, "Good frames");
@@ -4593,12 +4593,22 @@ alc_rxvlan(struct alc_softc *sc)
 	CSR_WRITE_4(sc, ALC_MAC_CFG, reg);
 }
 
+static u_int
+alc_hash_maddr(void *arg, struct sockaddr_dl *sdl, u_int cnt)
+{
+	uint32_t *mchash = arg;
+	uint32_t crc;
+
+	crc = ether_crc32_be(LLADDR(sdl), ETHER_ADDR_LEN);
+	mchash[crc >> 31] |= 1 << ((crc >> 26) & 0x1f);
+
+	return (1);
+}
+
 static void
 alc_rxfilter(struct alc_softc *sc)
 {
 	struct ifnet *ifp;
-	struct ifmultiaddr *ifma;
-	uint32_t crc;
 	uint32_t mchash[2];
 	uint32_t rxcfg;
 
@@ -4621,15 +4631,7 @@ alc_rxfilter(struct alc_softc *sc)
 		goto chipit;
 	}
 
-	if_maddr_rlock(ifp);
-	TAILQ_FOREACH(ifma, &sc->alc_ifp->if_multiaddrs, ifma_link) {
-		if (ifma->ifma_addr->sa_family != AF_LINK)
-			continue;
-		crc = ether_crc32_be(LLADDR((struct sockaddr_dl *)
-		    ifma->ifma_addr), ETHER_ADDR_LEN);
-		mchash[crc >> 31] |= 1 << ((crc >> 26) & 0x1f);
-	}
-	if_maddr_runlock(ifp);
+	if_foreach_llmaddr(ifp, alc_hash_maddr, mchash);
 
 chipit:
 	CSR_WRITE_4(sc, ALC_MAR0, mchash[0]);
@@ -4670,9 +4672,9 @@ sysctl_hw_alc_int_mod(SYSCTL_HANDLER_ARGS)
 	    ALC_IM_TIMER_MIN, ALC_IM_TIMER_MAX));
 }
 
-#ifdef NETDUMP
+#ifdef DEBUGNET
 static void
-alc_netdump_init(struct ifnet *ifp, int *nrxr, int *ncl, int *clsize)
+alc_debugnet_init(struct ifnet *ifp, int *nrxr, int *ncl, int *clsize)
 {
 	struct alc_softc *sc;
 
@@ -4680,17 +4682,17 @@ alc_netdump_init(struct ifnet *ifp, int *nrxr, int *ncl, int *clsize)
 	KASSERT(sc->alc_buf_size <= MCLBYTES, ("incorrect cluster size"));
 
 	*nrxr = ALC_RX_RING_CNT;
-	*ncl = NETDUMP_MAX_IN_FLIGHT;
+	*ncl = DEBUGNET_MAX_IN_FLIGHT;
 	*clsize = MCLBYTES;
 }
 
 static void
-alc_netdump_event(struct ifnet *ifp __unused, enum netdump_ev event __unused)
+alc_debugnet_event(struct ifnet *ifp __unused, enum debugnet_ev event __unused)
 {
 }
 
 static int
-alc_netdump_transmit(struct ifnet *ifp, struct mbuf *m)
+alc_debugnet_transmit(struct ifnet *ifp, struct mbuf *m)
 {
 	struct alc_softc *sc;
 	int error;
@@ -4707,7 +4709,7 @@ alc_netdump_transmit(struct ifnet *ifp, struct mbuf *m)
 }
 
 static int
-alc_netdump_poll(struct ifnet *ifp, int count)
+alc_debugnet_poll(struct ifnet *ifp, int count)
 {
 	struct alc_softc *sc;
 
@@ -4719,4 +4721,4 @@ alc_netdump_poll(struct ifnet *ifp, int count)
 	alc_txeof(sc);
 	return (alc_rxintr(sc, count));
 }
-#endif /* NETDUMP */
+#endif /* DEBUGNET */

@@ -29,7 +29,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $FreeBSD: releng/12.0/sys/dev/rl/if_rlreg.h 306102 2016-09-21 14:15:15Z kevlo $
+ * $FreeBSD$
  */
 
 /*
@@ -999,6 +999,7 @@ struct rl_softc {
 #define	RT_DEVICEID_8138			0x8138
 #define	RT_DEVICEID_8139			0x8139
 #define	RT_DEVICEID_8169SC			0x8167
+#define	RT_DEVICEID_8161			0x8161
 #define	RT_DEVICEID_8168			0x8168
 #define	RT_DEVICEID_8169			0x8169
 #define	RT_DEVICEID_8100			0x8100
