@@ -847,6 +847,24 @@ pci_release_msi(device_t dev)
 
 
 int
+pci_msix_table_bar(device_t dev)
+{
+	pci_info *info = &((struct root_device_softc *)dev->root->softc)->pci_info;
+
+	uint8 capability_offset;
+	if (gPci->find_pci_capability(info->bus, info->device, info->function,
+			PCI_cap_id_msix, &capability_offset) != B_OK)
+		return -1;
+
+	uint32 table_value = gPci->read_pci_config(info->bus, info->device, info->function,
+		capability_offset + PCI_msix_table, 4);
+
+	uint32 bar = table_value & PCI_msix_bir_mask;
+	return PCIR_BAR(bar);
+}
+
+
+int
 pci_msix_count(device_t dev)
 {
 	pci_info *info;
