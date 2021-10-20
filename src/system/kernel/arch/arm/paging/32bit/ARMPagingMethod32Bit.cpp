@@ -45,7 +45,7 @@
 using ARMLargePhysicalPageMapper::PhysicalPageSlot;
 
 
-// #pragma mark - X86PagingMethod32Bit::PhysicalPageSlotPool
+// #pragma mark - ARMPagingMethod32Bit::PhysicalPageSlotPool
 
 struct ARMPagingMethod32Bit::PhysicalPageSlotPool
 	: ARMLargePhysicalPageMapper::PhysicalPageSlotPool {
@@ -273,13 +273,13 @@ status_t
 ARMPagingMethod32Bit::Init(kernel_args* args,
 	VMPhysicalPageMapper** _physicalPageMapper)
 {
-	TRACE("X86PagingMethod32Bit::Init(): entry\n");
+	TRACE("ARMPagingMethod32Bit::Init(): entry\n");
 
 	fKernelPhysicalPageDirectory = args->arch_args.phys_pgdir;
 	fKernelVirtualPageDirectory = (page_directory_entry*)
 		args->arch_args.vir_pgdir;
 
-#ifdef TRACE_X86_PAGING_METHOD_32_BIT
+#ifdef TRACE_ARM_PAGING_METHOD_32_BIT
 	TRACE("page dir: %p (physical: %#" B_PRIx32 ")\n",
 		fKernelVirtualPageDirectory, fKernelPhysicalPageDirectory);
 #endif
