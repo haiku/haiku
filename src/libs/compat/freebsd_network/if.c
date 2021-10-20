@@ -1262,6 +1262,38 @@ if_multiaddr_count(if_t ifp, int max)
 	return (count);
 }
 
+u_int
+if_llmaddr_count(if_t ifp)
+{
+	struct ifmultiaddr *ifma;
+	int count;
+
+	count = 0;
+	TAILQ_FOREACH(ifma, &ifp->if_multiaddrs, ifma_link) {
+		if (ifma->ifma_addr->sa_family == AF_LINK)
+			count++;
+	}
+
+	return (count);
+}
+
+u_int
+if_foreach_llmaddr(if_t ifp, iflladdr_cb_t cb, void *cb_arg)
+{
+	struct ifmultiaddr *ifma;
+	u_int count;
+
+	count = 0;
+	TAILQ_FOREACH(ifma, &ifp->if_multiaddrs, ifma_link) {
+		if (ifma->ifma_addr->sa_family != AF_LINK)
+			continue;
+		count += (*cb)(cb_arg, (struct sockaddr_dl *)ifma->ifma_addr,
+			count);
+	}
+
+	return (count);
+}
+
 struct mbuf *
 if_dequeue(if_t ifp)
 {

@@ -821,6 +821,16 @@ int if_setupmultiaddr(if_t ifp, void *mta, int *cnt, int max);
 int if_multiaddr_array(if_t ifp, void *mta, int *cnt, int max);
 int if_multiaddr_count(if_t ifp, int max);
 
+/*
+ * Traversing through interface address lists.
+ */
+struct sockaddr_dl;
+typedef u_int iflladdr_cb_t(void *, struct sockaddr_dl *, u_int);
+u_int if_foreach_lladdr(if_t, iflladdr_cb_t, void *);
+u_int if_foreach_llmaddr(if_t, iflladdr_cb_t, void *);
+u_int if_lladdr_count(if_t);
+u_int if_llmaddr_count(if_t);
+
 /* Functions */
 void if_setinitfn(if_t ifp, void (*)(void *));
 void if_setioctlfn(if_t ifp, int (*)(if_t, u_long, caddr_t));
