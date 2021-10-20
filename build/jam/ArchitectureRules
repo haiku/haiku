@@ -268,7 +268,7 @@ rule KernelArchitectureSetup architecture
 
 			HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 2880 ; # in kB
 			# offset in floppy image (>= sizeof(haiku_loader))
-			HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 320 ; # in kB
+			HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 384 ; # in kB
 
 			# nasm is required for target arch x86
 			if ! $(HAIKU_NASM) {
@@ -293,7 +293,7 @@ rule KernelArchitectureSetup architecture
 
 			HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 2880 ; # in kB
 			# offset in floppy image (>= sizeof(haiku_loader))
-			HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 320 ; # in kB
+			HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 384 ; # in kB
 
 			# x86_64 kernel source is under arch/x86.
 			HAIKU_KERNEL_ARCH_DIR = x86 ;
