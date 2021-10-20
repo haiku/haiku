@@ -8,22 +8,44 @@
 
 	.text
 
-/*	status_t arch_enter_kernel(struct kernel_args *kernelArgs,
+/*	status_t arch_enter_kernel(uint32_t ttbr, struct kernel_args *kernelArgs,
 		addr_t kernelEntry, addr_t kernelStackTop);
 
-	r0	- kernelArgs
-	r1	- kernelEntry
-	r2	- kernelStackTop
+	r0	- ttbr
+	r1	- kernelArgs
+	r2	- kernelEntry
+	r3	- kernelStackTop
 */
 FUNCTION(arch_enter_kernel):
 
-	// set the kernel stack
-	mov		sp,r2
+
+	mov		r5,r0
+	mov		r4,r2
 
 	// set up kernel _start args
-	//mov	r0,r0	// kernelArgs
-	mov		r4,r1
+	mov		r0,r1	// kernelArgs
 	mov		r1,#0	// currentCPU=0
+
+	// flush TLB
+	MCR p15, 0, r1, c8, c7, 0
+
+	// set TTBR0
+	MCR p15, 0, r5, c2, c0, 0
+
+	// flush TLB (again)
+	MCR p15, 0, r1, c8, c7, 0
+
+	// write DACR
+	mov r9, #0xffffffff
+	MCR p15, 0, r9, c3, c0, 0
+
+	// enable MMU
+	MRC p15, 0, r9, c1, c0, 0
+	orr r9, r9, #1
+	MCR p15, 0, r9, c1, c0, 0
+
+	// set the kernel stack
+	mov		sp,r3
 
 	// call the kernel
 	mov		pc,r4

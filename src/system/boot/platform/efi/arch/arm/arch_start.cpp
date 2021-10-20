@@ -11,7 +11,7 @@
 #include "efi_platform.h"
 
 
-extern "C" void arch_enter_kernel(struct kernel_args *kernelArgs,
+extern "C" void arch_enter_kernel(uint32_t ttbr, struct kernel_args *kernelArgs,
 	addr_t kernelEntry, addr_t kernelStackTop);
 
 // From arch_mmu.cpp
@@ -68,7 +68,7 @@ arch_start_kernel(addr_t kernelEntry)
 	}
 
 	// Generate page tables for use after ExitBootServices.
-	arch_mmu_generate_post_efi_page_tables(
+	uint32_t final_ttbr0 = arch_mmu_generate_post_efi_page_tables(
 		memory_map_size, memory_map, descriptor_size, descriptor_version);
 
 	// Attempt to fetch the memory map and exit boot services.
@@ -106,6 +106,11 @@ arch_start_kernel(addr_t kernelEntry)
 	//smp_boot_other_cpus(final_pml4, kernelEntry);
 
 	// Enter the kernel!
-	arch_enter_kernel(&gKernelArgs, kernelEntry,
+	dprintf("arch_enter_kernel(ttbr0: 0x%08x, kernelArgs: 0x%08x, "
+		"kernelEntry: 0x%08x, sp: 0x%08x)\n",
+		final_ttbr0, (uint32_t)&gKernelArgs, (uint32_t)&kernelEntry,
+		(uint32_t)(gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size));
+
+	arch_enter_kernel(final_ttbr0, &gKernelArgs, kernelEntry,
 		gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size);
 }
