@@ -40,6 +40,7 @@ PXAInterruptController::HandleInterrupt()
 }
 
 
+#if 0
 PXAInterruptController::PXAInterruptController(fdt_module_info *fdt, fdt_device_node node)
 	: InterruptController(fdt, node) {
 	fRegArea = fFDT->map_reg_range(node, 0, (void**)&fRegBase);
@@ -49,6 +50,7 @@ PXAInterruptController::PXAInterruptController(fdt_module_info *fdt, fdt_device_
 	fRegBase[PXA_ICMR] = 0;
 	fRegBase[PXA_ICMR2] = 0;
 }
+#endif
 
 #define PXA_TIMERS_INTERRUPT	7 /* OST_4_11 */
 
@@ -138,6 +140,7 @@ PXATimer::HandleInterrupt()
 }
 
 
+#if 0
 PXATimer::PXATimer(fdt_module_info *fdt, fdt_device_node node)
 	: HardwareTimer(fdt, node)
 {
@@ -152,3 +155,4 @@ PXATimer::PXATimer(fdt_module_info *fdt, fdt_device_node node)
 
 	install_io_interrupt_handler(PXA_TIMERS_INTERRUPT, &PXATimer::_InterruptWrapper, NULL, 0);
 }
+#endif

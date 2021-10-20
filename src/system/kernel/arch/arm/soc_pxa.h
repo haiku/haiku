@@ -14,14 +14,16 @@ public:
 	void DisableInterrupt(int irq);
 	void HandleInterrupt();
 
+#if 0
 	static status_t Init(fdt_module_info *fdt, fdt_device_node node, void *cookie) {
 		InterruptController *ic = new(std::nothrow) PXAInterruptController(fdt, node);
 		// XXX implement InitCheck() functionality
 		return ic != NULL ? B_OK : B_NO_MEMORY;
 	}
+#endif
 
 protected:
-	PXAInterruptController(fdt_module_info *fdt, fdt_device_node node);
+	//PXAInterruptController(fdt_module_info *fdt, fdt_device_node node);
 
 	area_id fRegArea;
 	uint32 *fRegBase;
@@ -34,14 +36,16 @@ public:
 	void Clear();
 	bigtime_t Time();
 
+#if 0
 	static status_t Init(fdt_module_info *fdt, fdt_device_node node, void *cookie) {
 		PXATimer *timer = new(std::nothrow) PXATimer(fdt, node);
 		// XXX implement InitCheck() functionality
 		return timer != NULL ? B_OK : B_NO_MEMORY;
 	}
+#endif
 
 protected:
-	PXATimer(fdt_module_info *fdt, fdt_device_node node);
+	//PXATimer(fdt_module_info *fdt, fdt_device_node node);
 
 	area_id fRegArea;
 	uint32 *fRegBase;

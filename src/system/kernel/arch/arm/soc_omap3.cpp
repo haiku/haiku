@@ -92,6 +92,7 @@ OMAP3InterruptController::SoftReset()
 }
 
 
+#if 0
 OMAP3InterruptController::OMAP3InterruptController(fdt_module_info *fdt, fdt_device_node node)
 	: InterruptController(fdt, node),
 	fNumPending(3)
@@ -105,6 +106,7 @@ OMAP3InterruptController::OMAP3InterruptController(fdt_module_info *fdt, fdt_dev
 	// Enable protection (MPU registers only available in privileged mode)
 	fRegBase[INTCPS_PROTECTION] |= 1;
 }
+#endif
 
 
 enum {
@@ -181,6 +183,7 @@ OMAP3Timer::Clear()
 }
 
 
+#if 0
 OMAP3Timer::OMAP3Timer(fdt_module_info *fdtModule, fdt_device_node node)
 	: HardwareTimer(fdtModule, node),
 	fSystemTime(0)
@@ -202,3 +205,4 @@ OMAP3Timer::OMAP3Timer(fdt_module_info *fdtModule, fdt_device_node node)
 
 	install_io_interrupt_handler(fInterrupt, &OMAP3Timer::_InterruptWrapper, this, 0);
 }
+#endif

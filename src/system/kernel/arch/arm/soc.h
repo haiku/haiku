@@ -21,6 +21,7 @@ public:
 	}
 
 protected:
+#if 0
 	InterruptController(fdt_module_info *fdtModule, fdt_device_node node)
 		: fFDT(fdtModule), fNode(node) {
 		if (sInstance) {
@@ -32,6 +33,7 @@ protected:
 	// Keep our node around as we might want to grab attributes from it
 	fdt_module_info *fFDT;
 	fdt_device_node fNode;
+#endif
 
 	static InterruptController *sInstance;
 };
@@ -50,6 +52,7 @@ public:
 	}
 
 protected:
+#if 0
 	HardwareTimer(fdt_module_info *fdtModule, fdt_device_node node)
 		: fFDT(fdtModule), fNode(node) {
 		if (sInstance) {
@@ -61,6 +64,7 @@ protected:
 	// Keep our node around as we might want to grab attributes from it
 	fdt_module_info *fFDT;
 	fdt_device_node fNode;
+#endif
 
 	static HardwareTimer *sInstance;
 };
