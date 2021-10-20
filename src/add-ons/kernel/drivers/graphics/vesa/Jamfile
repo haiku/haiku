@@ -10,6 +10,7 @@ UsePrivateKernelHeaders ;
 KernelAddon vesa :
 	device.cpp
 	driver.cpp
+	patch.cpp
 	vesa.cpp
 	vga.cpp
 	;
