@@ -14,8 +14,7 @@
 
 #include <SupportDefs.h>
 #include <arch/generic/debug_uart_8250.h>
-
-#include "debug_uart.h"
+#include <arch/generic/debug_uart.h>
 
 
 class ArchUART8250Omap : public DebugUART8250 {
