@@ -33,5 +33,6 @@ HaikuSubInclude vt612x ;
 # FreeBSD 13 drivers
 HaikuSubInclude atheros813x ;
 HaikuSubInclude broadcom570x ;
+HaikuSubInclude intel22x ;
 HaikuSubInclude ipro1000 ;
 HaikuSubInclude rtl81xx ;
