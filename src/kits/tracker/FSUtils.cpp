@@ -2416,7 +2416,7 @@ FSMakeOriginalName(char* name, BDirectory* destDir, const char* suffix)
 
 		strlcpy(root, name, sizeof(root));
 			// save root name
-		strlcat(name, suffix, B_FILE_NAME_LENGTH - 1);
+		strlcat(name, suffix, B_FILE_NAME_LENGTH);
 	}
 
 	strlcpy(copybase, name, sizeof(copybase));
@@ -2440,8 +2440,7 @@ FSMakeOriginalName(char* name, BDirectory* destDir, const char* suffix)
 		}
 	}
 
-	ASSERT((strlen(tempName) <= (B_FILE_NAME_LENGTH - 1)));
-	strcpy(name, tempName);
+	strlcpy(name, tempName, B_FILE_NAME_LENGTH);
 }
 
 
