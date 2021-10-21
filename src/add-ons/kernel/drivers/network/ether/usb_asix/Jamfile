@@ -1,0 +1,14 @@
+SubDir HAIKU_TOP src add-ons kernel drivers network ether usb_asix ;
+
+UsePrivateHeaders kernel net ;
+UsePrivateKernelHeaders ;
+
+KernelAddon usb_asix :
+	Driver.cpp
+	ASIXDevice.cpp
+	AX88172Device.cpp
+	AX88772Device.cpp
+	AX88178Device.cpp
+	Settings.cpp
+	MIIBus.cpp
+	;
