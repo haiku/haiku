@@ -131,8 +131,10 @@ connector_pick_atom_hpdid(uint32 connectorIndex)
 		uint32 targetReg = AVIVO_DC_GPIO_HPD_A;
 		if (info.dceMajor >= 13) {
 			ERROR("WARNING: CHECK NEW DCE mmDC_GPIO_HPD_A value!\n");
-			targetReg = CAR_mmDC_GPIO_HPD_A;
-		} else if (info.dceMajor >= 11)
+			targetReg = POL_mmDC_GPIO_HPD_A;
+		} else if (info.dceMajor >= 12)
+			targetReg = POL_mmDC_GPIO_HPD_A;
+		else if (info.dceMajor >= 11)
 			targetReg = CAR_mmDC_GPIO_HPD_A;
 		else if (info.dceMajor >= 10)
 			targetReg = VOL_mmDC_GPIO_HPD_A;

@@ -24,6 +24,7 @@
 #include "sea_reg.h"		// DCE 8
 #include "vol_reg.h"		// DCE 10
 #include "car_reg.h"		// DCE 11
+#include "pol_reg.h"		// DCE 12
 
 #include <Accelerant.h>
 #include <Drivers.h>
