@@ -676,7 +676,7 @@ HWInterface::_CopyToFront(uint8* src, uint32 srcBPR, int32 x, int32 y,
 				// copy
 				for (; y <= bottom; y++) {
 					// bytes is guaranteed to be multiple of 4
-					gfxcpy32(dst, src, bytes);
+					memcpy(dst, src, bytes);
 					dst += dstBPR;
 					src += srcBPR;
 				}
