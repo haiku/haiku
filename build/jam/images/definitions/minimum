@@ -189,7 +189,7 @@ SYSTEM_ADD_ONS_DRIVERS_MIDI = ;
 SYSTEM_ADD_ONS_DRIVERS_NET = [ FFilterByBuildFeatures
 	x86,x86_64 @{
 		3com
-		atheros813x ar81xx attansic_l1 attansic_l2
+		atheros813x atheros81xx attansic_l1 attansic_l2
 		broadcom440x broadcom570x
 		dec21xxx
 		emulex_oce

@@ -8,7 +8,7 @@
 #include <sys/bus.h>
 
 
-HAIKU_FBSD_DRIVER_GLUE(ar81xx, ale, pci)
+HAIKU_FBSD_DRIVER_GLUE(atheros81xx, ale, pci)
 
 extern driver_t *DRIVER_MODULE_NAME(ukphy, miibus);
 

@@ -11,7 +11,7 @@ HaikuSubInclude wb840 ;
 
 # FreeBSD 12 drivers
 HaikuSubInclude 3com ;
-HaikuSubInclude ar81xx ;
+HaikuSubInclude atheros81xx ;
 HaikuSubInclude attansic_l1 ;
 HaikuSubInclude attansic_l2 ;
 HaikuSubInclude broadcom440x ;

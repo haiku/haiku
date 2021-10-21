@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src add-ons kernel drivers network ether ar81xx ;
+SubDir HAIKU_TOP src add-ons kernel drivers network ether atheros81xx ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ]
 	: true ;
@@ -12,7 +12,7 @@ UseHeaders [ FDirName $(SUBDIR) ] : true ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) dev mii ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) dev ale ] ;
 
-KernelAddon ar81xx :
+KernelAddon atheros81xx :
 	glue.c
 	ukphy.c
 	ukphy_subr.c
