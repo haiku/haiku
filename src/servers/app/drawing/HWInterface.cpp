@@ -40,7 +40,7 @@ HWInterfaceListener::~HWInterfaceListener()
 // #pragma mark - HWInterface
 
 
-HWInterface::HWInterface(bool doubleBuffered, bool enableUpdateQueue)
+HWInterface::HWInterface()
 	:
 	MultiLocker("hw interface lock"),
 	fFloatingOverlaysLock("floating overlays lock"),
@@ -52,12 +52,10 @@ HWInterface::HWInterface(bool doubleBuffered, bool enableUpdateQueue)
 	fCursorObscured(false),
 	fHardwareCursorEnabled(false),
 	fCursorLocation(0, 0),
-	fDoubleBuffered(doubleBuffered),
 	fVGADevice(-1),
 	fUpdateExecutor(NULL),
 	fListeners(20)
 {
-	SetAsyncDoubleBuffered(doubleBuffered && enableUpdateQueue);
 }
 
 
@@ -304,13 +302,6 @@ HWInterface::SetAsyncDoubleBuffered(bool doubleBuffered)
 		RemoveListener(fUpdateExecutor.Get());
 		fUpdateExecutor.Unset();
 	}
-}
-
-
-bool
-HWInterface::IsDoubleBuffered() const
-{
-	return fDoubleBuffered;
 }
 
 

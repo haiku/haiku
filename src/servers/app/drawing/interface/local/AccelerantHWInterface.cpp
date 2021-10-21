@@ -688,8 +688,7 @@ AccelerantHWInterface::SetMode(const display_mode& mode)
 		|| fBackBuffer->Width() != fFrontBuffer->Width()
 		|| fBackBuffer->Height() != fFrontBuffer->Height()
 		|| fOffscreenBackBuffer
-		|| (fFrontBuffer->ColorSpace() == B_RGB32 && fBackBuffer.IsSet()
-			&& !HWInterface::IsDoubleBuffered())) {
+		|| (fFrontBuffer->ColorSpace() == B_RGB32 && fBackBuffer.IsSet())) {
 		// NOTE: backbuffer is always B_RGBA32, this simplifies the
 		// drawing backend implementation tremendously for the time
 		// being. The color space conversion is handled in CopyBackToFront()
@@ -699,7 +698,7 @@ AccelerantHWInterface::SetMode(const display_mode& mode)
 		// TODO: Above not true anymore for single buffered mode!!!
 		// -> fall back to double buffer for fDisplayMode.space != B_RGB32
 		// as intermediate solution...
-		bool doubleBuffered = HWInterface::IsDoubleBuffered();
+		bool doubleBuffered = false;
 		if ((fFrontBuffer->ColorSpace() != B_RGB32
 			&& fFrontBuffer->ColorSpace() != B_RGBA32)
 			|| fVGADevice >= 0 || fOffscreenBackBuffer)
