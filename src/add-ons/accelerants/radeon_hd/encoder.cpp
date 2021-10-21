@@ -1577,6 +1577,8 @@ transmitter_dig_setup(uint32 connectorIndex, uint32 pixelClock,
 							else
 								args.v5.ucPhyId = ATOM_PHY_ID_UNIPHYE;
 							break;
+						case ENCODER_OBJECT_ID_INTERNAL_UNIPHY3:
+							args.v5.ucPhyId = ATOM_PHY_ID_UNIPHYG;
 					}
 					if (isDP) {
 						args.v5.ucLaneNum = dpLaneCount;
