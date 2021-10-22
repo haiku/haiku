@@ -45,7 +45,7 @@ status_t
 VirtioQueue::Init()
 {
 	fDev->fRegs->queueSel = fId;
-	TRACE("queueNumMax: %d\n", fRegs->queueNumMax);
+	TRACE("queueNumMax: %d\n", fDev->fRegs->queueNumMax);
 	fQueueLen = fDev->fRegs->queueNumMax;
 	fDev->fRegs->queueNum = fQueueLen;
 	fLastUsed = 0;
