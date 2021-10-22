@@ -13,59 +13,70 @@
 extern console_module_info gFrameBufferConsoleModule;
 
 
-class Console : public ConsoleNode {
+class VideoTextConsole : public ConsoleNode {
 	public:
-		Console();
+		VideoTextConsole(addr_t framebuffer);
 
 		virtual ssize_t ReadAt(void *cookie, off_t pos, void *buffer,
 			size_t bufferSize);
 		virtual ssize_t WriteAt(void *cookie, off_t pos, const void *buffer,
 			size_t bufferSize);
+
+		virtual void	ClearScreen();
+		virtual int32	Width();
+		virtual int32	Height();
+		virtual void	SetCursor(int32 x, int32 y);
+		virtual void	SetCursorVisible(bool visible);
+		virtual void	SetColors(int32 foreground, int32 background);
+
+	private:
+		uint16 fColor = 0x0f00;
+		bool fShowCursor;
+		int32 fCursorX, fCursorY;
+		int32 fScreenWidth, fScreenHeight;
 };
-
-
-static uint16 sColor = 0x0f00;
-static bool sShowCursor;
-static int32 sCursorX, sCursorY;
-static int32 sScreenWidth, sScreenHeight;
-
-static Console sConsole;
-FILE *stdin, *stdout, *stderr;
 
 
 //	#pragma mark -
 
 
-Console::Console()
+VideoTextConsole::VideoTextConsole(addr_t framebuffer)
 	: ConsoleNode()
 {
+	frame_buffer_update(framebuffer, gKernelArgs.frame_buffer.width,
+		gKernelArgs.frame_buffer.height, gKernelArgs.frame_buffer.depth,
+		gKernelArgs.frame_buffer.bytes_per_row);
+	gFrameBufferConsoleModule.get_size(&fScreenWidth, &fScreenHeight);
+
+	SetCursorVisible(false);
+	ClearScreen();
 }
 
 
 ssize_t
-Console::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
+VideoTextConsole::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 {
 	return B_ERROR;
 }
 
 
 ssize_t
-Console::WriteAt(void *cookie, off_t /*pos*/, const void *buffer,
+VideoTextConsole::WriteAt(void *cookie, off_t /*pos*/, const void *buffer,
 	size_t bufferSize)
 {
 	const char *string = (const char *)buffer;
 	for (size_t i = 0; i < bufferSize; i++) {
 		const char c = string[i];
-		if (c == '\n' || sCursorX >= sScreenWidth) {
-			sCursorX = 0;
-			if (sCursorY == (sScreenHeight - 1)) {
+		if (c == '\n' || fCursorX >= fScreenWidth) {
+			fCursorX = 0;
+			if (fCursorY == (fScreenHeight - 1)) {
 				// Move the screen up and clear the bottom line.
-				gFrameBufferConsoleModule.blit(0, 1, sScreenWidth, 0,
-					0, sScreenHeight - 1);
-				gFrameBufferConsoleModule.fill_glyph(0, sCursorY, sScreenWidth,
-					1, ' ', sColor);
+				gFrameBufferConsoleModule.blit(0, 1, fScreenWidth, 0,
+					0, fScreenHeight - 1);
+				gFrameBufferConsoleModule.fill_glyph(0, fCursorY, fScreenWidth,
+					1, ' ', fColor);
 			} else {
-				sCursorY++;
+				fCursorY++;
 			}
 		}
 
@@ -75,86 +86,66 @@ Console::WriteAt(void *cookie, off_t /*pos*/, const void *buffer,
 				break;
 
 			default:
-				gFrameBufferConsoleModule.put_glyph(sCursorX, sCursorY, c, sColor);
+				gFrameBufferConsoleModule.put_glyph(fCursorX, fCursorY, c, fColor);
 				break;
 		}
-		sCursorX++;
+		fCursorX++;
 	}
 	return bufferSize;
 }
 
 
-//	#pragma mark -
-
-
 void
-console_clear_screen(void)
+VideoTextConsole::ClearScreen()
 {
-	gFrameBufferConsoleModule.clear(sColor);
+	gFrameBufferConsoleModule.clear(fColor);
 }
 
 
 int32
-console_width(void)
+VideoTextConsole::Width()
 {
-	return sScreenWidth;
+	return fScreenWidth;
 }
 
 
 int32
-console_height()
+VideoTextConsole::Height()
 {
-	return sScreenHeight;
+	return fScreenHeight;
 }
 
 
 void
-console_set_cursor(int32 x, int32 y)
+VideoTextConsole::SetCursor(int32 x, int32 y)
 {
-	sCursorX = x;
-	sCursorY = y;
-	if (sShowCursor)
-		console_show_cursor();
+	fCursorX = x;
+	fCursorY = y;
+	if (fShowCursor)
+		SetCursorVisible(true);
 }
 
 
 void
-console_show_cursor()
+VideoTextConsole::SetCursorVisible(bool visible)
 {
-	sShowCursor = true;
-	gFrameBufferConsoleModule.move_cursor(sCursorX, sCursorY);
+	fShowCursor = visible;
+	if (fShowCursor)
+		gFrameBufferConsoleModule.move_cursor(fCursorX, fCursorY);
+	else
+		gFrameBufferConsoleModule.move_cursor(-1, -1);
 }
 
 
 void
-console_hide_cursor()
+VideoTextConsole::SetColors(int32 foreground, int32 background)
 {
-	sShowCursor = false;
-	gFrameBufferConsoleModule.move_cursor(-1, -1);
+	fColor = (background & 0xf) << 4 | (foreground & 0xf);
 }
 
 
-void
-console_set_color(int32 foreground, int32 background)
-{
-	sColor = (background & 0xf) << 4 | (foreground & 0xf);
-}
-
-
-status_t
+ConsoleNode*
 video_text_console_init(addr_t frameBuffer)
 {
-	frame_buffer_update(frameBuffer, gKernelArgs.frame_buffer.width,
-		gKernelArgs.frame_buffer.height, gKernelArgs.frame_buffer.depth,
-		gKernelArgs.frame_buffer.bytes_per_row);
-	gFrameBufferConsoleModule.get_size(&sScreenWidth, &sScreenHeight);
-
-	console_hide_cursor();
-	console_clear_screen();
-
-	// enable stdio functionality
-	stdin = (FILE *)&sConsole;
-	stdout = stderr = (FILE *)&sConsole;
-
-	return B_OK;
+	return new VideoTextConsole(frameBuffer);
 }
