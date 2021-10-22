@@ -536,9 +536,9 @@ KeyboardProtocolHandler::_ReadReport(bigtime_t timeout, uint32 *cookie)
 			if (key->Array()) {
 				fCurrentKeys[i] = key->Data();
 			} else {
-				if (key->Data() == 1) 
+				if (key->Data() == 1)
 					fCurrentKeys[i] = key->UsageID();
-				else 
+				else
 					fCurrentKeys[i] = 0;
 			}
 		}

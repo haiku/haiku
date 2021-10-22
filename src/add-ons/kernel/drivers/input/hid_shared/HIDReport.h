@@ -53,7 +53,7 @@ public:
 
 		uint32 *				Usages();
 		uint32					CountUsages() { return fUsages.Count(); };
-		
+
 #ifndef USERLAND_HID
 		status_t				WaitForReport(bigtime_t timeout);
 		void					DoneProcessing();
@@ -77,7 +77,6 @@ private:
 		int32					fBusyCount;
 
 		Vector<uint32>			fUsages;
-		
 
 #ifndef USERLAND_HID
 		ConditionVariable		fConditionVariable;

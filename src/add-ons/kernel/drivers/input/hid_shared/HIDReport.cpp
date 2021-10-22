@@ -118,7 +118,6 @@ HIDReport::AddMainItem(global_item_state &globalState,
 
 	for (uint32 i = 0; i < globalState.report_count; i++) {
 		if (mainData.array_variable == 1) {
-			
 			if (i < localState.usage_stack_used)
 				usage = localState.usage_stack[i].u.extended;
 		}
@@ -219,7 +218,7 @@ HIDReport::Usages()
 {
 	if (fUsages.Count() > 0)
 		return &fUsages[0];
-	
+
 	return NULL;
 }
 

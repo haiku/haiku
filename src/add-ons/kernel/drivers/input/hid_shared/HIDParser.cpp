@@ -271,12 +271,12 @@ HIDParser::ParseReportDescriptor(const uint8 *reportDescriptor,
 						usage_value value;
 						value.is_extended = itemSize == sizeof(uint32);
 						value.u.extended = data;
-						
+
 						if (usageStack.PushBack(value) == B_NO_MEMORY) {
 							TRACE_ALWAYS("no memory when growing usages\n");
 							break;
 						}
-						
+
 						break;
 					}
 
@@ -552,10 +552,9 @@ HIDParser::_CalculateResolution(global_item_state *state)
 void
 HIDParser::_Reset()
 {
-	
 	for (int32 i = 0; i < fReports.Count(); i++)
 		delete fReports[i];
-	
+
 	fReports.MakeEmpty();
 
 	delete fRootCollection;
