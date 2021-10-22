@@ -264,7 +264,6 @@ local etcDir = [ FDirName $(HAIKU_TOP) data etc ] ;
 local etcFiles = inputrc profile ;
 etcFiles = $(etcFiles:G=etc) ;
 SEARCH on $(etcFiles) = $(etcDir) ;
-etcFiles += <etc>termcap ;
 AddFilesToHaikuImage system settings etc : $(etcFiles) ;
 
 local profileFiles = [ Glob $(etcDir)/profile.d : *.sh ] ;
