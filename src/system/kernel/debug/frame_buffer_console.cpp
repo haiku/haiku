@@ -24,6 +24,13 @@
 #include <vesa_info.h>
 
 #include <edid.h>
+#else
+#define mutex_lock(...)
+#define mutex_unlock(...)
+#undef set_ac
+#undef clear_ac
+#define set_ac()
+#define clear_ac()
 #endif
 
 #include "font.h"
