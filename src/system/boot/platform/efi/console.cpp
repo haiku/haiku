@@ -14,6 +14,7 @@
 
 #include <boot/stage2.h>
 #include <boot/platform.h>
+#include <boot/platform/generic/video.h>
 #include <efi/protocol/console-control.h>
 #include <util/kernel_cpp.h>
 
@@ -215,15 +216,24 @@ static void update_screen_size(void)
 status_t
 console_init(void)
 {
+#if 1
 	gConsoleNode = &sConsole;
 
 	update_screen_size();
 	console_hide_cursor();
 	console_clear_screen();
+#else
+	// FIXME: This does not work because we cannot initialize video before VFS, as it
+	// needs to read the driver settings before setting a mode; and also because the
+	// heap does not yet exist.
+	platform_init_video();
+	platform_switch_to_logo();
+	gConsoleNode = video_text_console_init(gKernelArgs.frame_buffer.physical_buffer.start);
+#endif
 
 	// enable stdio functionality
-	stdin = (FILE *)&sConsole;
-	stdout = stderr = (FILE *)&sConsole;
+	stdin = (FILE *)gConsoleNode;
+	stdout = stderr = (FILE *)gConsoleNode;
 
 	return B_OK;
 }
