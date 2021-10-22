@@ -27,6 +27,7 @@
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
 #include <GroupView.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
@@ -1170,9 +1171,6 @@ ProbeView::ProbeView(entry_ref* ref, const char* attribute,
 	fTypeView(NULL),
 	fLastSearch(NULL)
 {
-	BGroupLayout* layout = new BGroupLayout(B_VERTICAL, 0);
-	SetLayout(layout);
-	layout->SetInsets(-1, -1, -1, -1);
 	fEditor.SetTo(*ref, attribute);
 
 	int32 baseType = kHexBase;
@@ -1184,7 +1182,6 @@ ProbeView::ProbeView(entry_ref* ref, const char* attribute,
 
 	fHeaderView = new HeaderView(&fEditor.Ref(), fEditor);
 	fHeaderView->SetBase((base_type)baseType);
-	AddChild(fHeaderView);
 
 	fDataView = new DataView(fEditor);
 	fDataView->SetBase((base_type)baseType);
@@ -1192,7 +1189,14 @@ ProbeView::ProbeView(entry_ref* ref, const char* attribute,
 
 	fScrollView = new BScrollView("scroller", fDataView, B_WILL_DRAW, true,
 		true);
-	AddChild(fScrollView);
+
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.SetInsets(-1, -1, -1, -1)
+		.Add(fHeaderView)
+		.AddGroup(B_VERTICAL, 0)
+			.SetInsets(-1, 0, -1, -1)
+			.Add(fScrollView)
+		.End();
 
 	fDataView->UpdateScroller();
 }
