@@ -20,13 +20,6 @@ local kernelArchSources =
 	arch_uart_pl011.cpp
 ;
 
-local kernelDebugSources =
-	blue_screen.cpp
-	font.cpp
-	font_spleen.cpp
-	frame_buffer_console.cpp
-;
-
 local kernelGenericDriverSources =
 	debug_uart.cpp
 	debug_uart_8250.cpp
@@ -42,10 +35,6 @@ for platform in [ MultiBootSubDirSetup u-boot efi ] {
 			$(kernelArchSources)
 
 			arch_cpu.cpp
-
-			# Reuse a subset of kernel debugging.
-			kernel_stubs.cpp
-			$(kernelDebugSources)
 
 			$(librootGenericSources)
 			$(librootArchSources)
@@ -68,9 +57,6 @@ for platform in [ MultiBootSubDirSetup u-boot efi ] {
 
 		SEARCH on [ FGristFiles $(librootGenericSources) ]
 			= [ FDirName $(HAIKU_TOP) src system libroot posix string arch generic ] ;
-
-		SEARCH on [ FGristFiles $(kernelDebugSources) ]
-			= [ FDirName $(HAIKU_TOP) src system kernel debug ] ;
 	}
 }
 
