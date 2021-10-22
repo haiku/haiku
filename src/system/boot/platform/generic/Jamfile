@@ -9,6 +9,7 @@ local platform ;
 for platform in [ MultiBootSubDirSetup ] {
 	on $(platform) {
 		BootStaticLibrary boot_platform_generic_$(platform:G=) :
+			text_console.cpp
 			text_menu.cpp
 			video_blit.cpp
 			video_splash.cpp

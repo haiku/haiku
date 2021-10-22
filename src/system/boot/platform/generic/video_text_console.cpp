@@ -29,7 +29,7 @@ static bool sShowCursor;
 static int32 sCursorX, sCursorY;
 static int32 sScreenWidth, sScreenHeight;
 
-static Console sInput, sOutput;
+static Console sConsole;
 FILE *stdin, *stdout, *stderr;
 
 
@@ -153,8 +153,8 @@ video_text_console_init(addr_t frameBuffer)
 	console_clear_screen();
 
 	// enable stdio functionality
-	stdin = (FILE *)&sInput;
-	stdout = stderr = (FILE *)&sOutput;
+	stdin = (FILE *)&sConsole;
+	stdout = stderr = (FILE *)&sConsole;
 
 	return B_OK;
 }

@@ -89,6 +89,13 @@ class ConsoleNode : public Node {
 
 		virtual ssize_t Read(void *buffer, size_t bufferSize);
 		virtual ssize_t Write(const void *buffer, size_t bufferSize);
+
+		virtual void	ClearScreen() = 0;
+		virtual int32	Width() = 0;
+		virtual int32	Height() = 0;
+		virtual void	SetCursor(int32 x, int32 y) = 0;
+		virtual void	SetCursorVisible(bool visible) = 0;
+		virtual void	SetColors(int32 foreground, int32 background) = 0;
 };
 
 
