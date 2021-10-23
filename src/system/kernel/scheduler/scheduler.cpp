@@ -118,7 +118,7 @@ enqueue(Thread* thread, bool newOne)
 	bool rescheduleNeeded = threadData->ChooseCoreAndCPU(targetCore, targetCPU);
 
 	TRACE("enqueueing thread %ld with priority %ld on CPU %ld (core %ld)\n",
-		thread->id, threadPriority, targetCPU->fCPUNumber, targetCore->fCoreID);
+		thread->id, threadPriority, targetCPU->ID(), targetCore->ID());
 
 	threadData->Enqueue();
 
