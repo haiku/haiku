@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-CharacterMap	2410613018
+1	swedish	x-vnd.Haiku-CharacterMap	917523322
 Tirhuta	UnicodeBlocks		Tirhuta
 Miscellaneous mathematical symbols B	UnicodeBlocks		Diverse matematiska symboler B
 Latin extended E	UnicodeBlocks		Latin förlängd E
@@ -60,6 +60,7 @@ CJK unified ideographs extension C	UnicodeBlocks		CJK förenade ideografer förl
 Ancient Greek musical notation	UnicodeBlocks		Gammelgrekiska noter
 Thai	UnicodeBlocks		Thai
 Ethiopic supplement	UnicodeBlocks		Etiopiska utökningar
+Only show blocks contained in font	CharacterWindow		Visa bara block som finns i teckensnittet
 Chess symbols	UnicodeBlocks		Schacksymboler
 Yijing hexagram symbols	UnicodeBlocks		Yijing hexagramsymboler
 Ottoman Siyaq numbers	UnicodeBlocks		Osmanska Siyaq-nummer

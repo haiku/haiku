@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-MediaPlayer	1961774506
+1	swedish	x-vnd.Haiku-MediaPlayer	716811487
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Flytta post till Papperskorgen
 Close	MediaPlayer-PlaylistWindow		Stäng
 Volume of background clips	MediaPlayer-SettingsWindow		Volym för bakgrundsklipp
@@ -30,6 +30,7 @@ Open file…	MediaPlayer-Main		Öppna fil...
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Skala kontroller i fullskärmsläge
 View options	MediaPlayer-SettingsWindow		Visningsalternativ
 %d kHz	MediaPlayer-InfoWin		%d kHz
+Eject Device	MediaPlayer-Main		Mata ut enhet
 Full volume	MediaPlayer-SettingsWindow		Högsta volym
 <untitled>	PlaylistItem-title		<odöpt>
 Start media server	MediaPlayer-Main		Starta mediaserver

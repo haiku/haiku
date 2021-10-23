@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-MediaPlayer	1899012256
+1	german	x-vnd.Haiku-MediaPlayer	654049237
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Eintrag in den Papierkorb verschieben
 Close	MediaPlayer-PlaylistWindow		Schließen
 Volume of background clips	MediaPlayer-SettingsWindow		Wiedergabe im Hintergrund
@@ -29,6 +29,7 @@ Open file…	MediaPlayer-Main		Öffne Datei…
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Bedienelemente im Vollbildmodus vergrößern
 View options	MediaPlayer-SettingsWindow		Darstellung
 %d kHz	MediaPlayer-InfoWin		%d kHz
+Eject Device	MediaPlayer-Main		Disk auswerfen
 Full volume	MediaPlayer-SettingsWindow		Volle Lautstärke
 <untitled>	PlaylistItem-title		<unbenannt>
 Start media server	MediaPlayer-Main		Mediaserver starten

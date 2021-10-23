@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	3437352458
+1	swedish	x-vnd.Haiku-HaikuDepot	761125591
 Repository update error	LocalRepositoryUpdateProcess		Fel vid uppdatering av repositorie
 Network error	ServerHelper		Nätverksfel
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Ett fel inträffade vid uppdatering av repositoriet: %error%
@@ -8,6 +8,7 @@ Uninstalled	PackageListView		Avinstallera
 It was not possible to create the new user.	UserLoginWindow		Det gick inte att skapa den nya användaren.
 Available packages	MainWindow		Tillgängliga paket
 Create account	UserLoginWindow		Skapa konto
+Install %PackageTitle%	PackageManager		Installera %PackageTitle%
 OK	App		OK
 The response to the captcha was incorrect.	ServerHelper		Svaret på captchan var inkorrekt.
 Develop packages	MainWindow		Utvecklingspaket
@@ -123,6 +124,7 @@ Status	PackageListView		Status
 The password has been incorrectly repeated.	UserLoginWindow		Lösenordet upprepades felaktigt.
 Network transport error	ServerHelper		Nättransportfel
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		Lösenordet som du tidigare skrev för användaren [%Nickname%] är för närvarande inte giltigt. Användaren kommer att loggas ut från den här applikationen och du bör logga in igen med ditt uppdaterade lösenord.
+Uninstall %PackageTitle%	PackageManager		Avinstallera %PackageTitle%
 Update	RatePackageWindow		Uppdatera
 OK	ServerHelper		OK
 Language	UserLoginWindow		Språk
