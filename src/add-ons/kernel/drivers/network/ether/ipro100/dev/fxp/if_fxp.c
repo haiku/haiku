@@ -1734,7 +1734,12 @@ fxp_intr(void *xsc)
 		return;
 	}
 #endif
+#ifndef __HAIKU__
 	while ((statack = CSR_READ_1(sc, FXP_CSR_SCB_STATACK)) != 0) {
+#else
+	statack = (uint8_t)atomic_get((int32 *)&sc->sc_statack);
+	do {
+#endif
 		/*
 		 * It should not be possible to have all bits set; the
 		 * FXP_SCB_INTR_SWI bit always returns 0 on a read.  If
@@ -1752,7 +1757,11 @@ fxp_intr(void *xsc)
 		CSR_WRITE_1(sc, FXP_CSR_SCB_STATACK, statack);
 		if ((if_getdrvflags(ifp) & IFF_DRV_RUNNING) != 0)
 			fxp_intr_body(sc, ifp, statack, -1);
+#ifndef __HAIKU__
 	}
+#else
+	} while ((statack = CSR_READ_1(sc, FXP_CSR_SCB_STATACK)) != 0);
+#endif
 	FXP_UNLOCK(sc);
 }
 

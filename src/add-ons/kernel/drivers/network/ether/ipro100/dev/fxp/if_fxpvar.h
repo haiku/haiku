@@ -222,6 +222,9 @@ struct fxp_softc {
 	int if_flags;
 	uint8_t rfa_size;
 	uint32_t tx_cmd;
+#ifdef __HAIKU__
+	int32_t sc_statack;
+#endif
 	uint16_t eeprom[256];
 };
 
