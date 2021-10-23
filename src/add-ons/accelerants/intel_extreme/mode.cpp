@@ -48,23 +48,39 @@ get_color_space_format(const display_mode &mode, uint32 &colorMode,
 
 	switch (mode.space) {
 		case B_RGB32_LITTLE:
-			colorMode = DISPLAY_CONTROL_RGB32;
+			if (gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_LAKE)) {
+				colorMode = DISPLAY_CONTROL_RGB32_SKY;
+			} else {
+				colorMode = DISPLAY_CONTROL_RGB32;
+			}
 			bytesPerPixel = 4;
 			bitsPerPixel = 32;
 			break;
 		case B_RGB16_LITTLE:
-			colorMode = DISPLAY_CONTROL_RGB16;
+			if (gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_LAKE)) {
+				colorMode = DISPLAY_CONTROL_RGB16_SKY;
+			} else {
+				colorMode = DISPLAY_CONTROL_RGB16;
+			}
 			bytesPerPixel = 2;
 			bitsPerPixel = 16;
 			break;
 		case B_RGB15_LITTLE:
-			colorMode = DISPLAY_CONTROL_RGB15;
+			if (gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_LAKE)) {
+				colorMode = DISPLAY_CONTROL_RGB15_SKY;
+			} else {
+				colorMode = DISPLAY_CONTROL_RGB15;
+			}
 			bytesPerPixel = 2;
 			bitsPerPixel = 15;
 			break;
 		case B_CMAP8:
 		default:
-			colorMode = DISPLAY_CONTROL_CMAP8;
+			if (gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_LAKE)) {
+				colorMode = DISPLAY_CONTROL_CMAP8_SKY;
+			} else {
+				colorMode = DISPLAY_CONTROL_CMAP8;
+			}
 			bytesPerPixel = 1;
 			bitsPerPixel = 8;
 			break;
@@ -121,8 +137,10 @@ set_frame_buffer_registers(uint32 offset)
 		|| sharedInfo.device_type.InGroup(INTEL_GROUP_G4x)
 		|| sharedInfo.device_type.InGroup(INTEL_GROUP_ILK)
 		|| sharedInfo.device_type.InFamily(INTEL_FAMILY_SER5)
+		|| sharedInfo.device_type.InFamily(INTEL_FAMILY_LAKE)
 		|| sharedInfo.device_type.InFamily(INTEL_FAMILY_SOC0)) {
 		if (sharedInfo.device_type.InGroup(INTEL_GROUP_HAS)) {
+//			|| sharedInfo.device_type.InGroup(INTEL_GROUP_SKY)) {
 			write32(INTEL_DISPLAY_A_OFFSET_HAS + offset,
 				((uint32)mode.v_display_start << 16)
 					| (uint32)mode.h_display_start);
@@ -463,8 +481,13 @@ intel_set_display_mode(display_mode* mode)
 	// Always set both pipes, just in case
 	// TODO rework this when we get multiple head support with different
 	// resolutions
-	write32(INTEL_DISPLAY_A_BYTES_PER_ROW, bytesPerRow);
-	write32(INTEL_DISPLAY_B_BYTES_PER_ROW, bytesPerRow);
+	if (sharedInfo.device_type.InFamily(INTEL_FAMILY_LAKE)) {
+		write32(INTEL_DISPLAY_A_BYTES_PER_ROW, bytesPerRow >> 6);
+		write32(INTEL_DISPLAY_B_BYTES_PER_ROW, bytesPerRow >> 6);
+	} else {
+		write32(INTEL_DISPLAY_A_BYTES_PER_ROW, bytesPerRow);
+		write32(INTEL_DISPLAY_B_BYTES_PER_ROW, bytesPerRow);
+	}
 
 	// update shared info
 	sharedInfo.current_mode = target;

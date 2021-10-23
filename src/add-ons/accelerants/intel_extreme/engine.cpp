@@ -232,6 +232,11 @@ intel_wait_engine_idle(void)
 {
 	CALLED();
 
+	// Skylake acc engine not yet functional (stalls)
+	if (gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_LAKE)) {
+		return;
+	}
+
 	{
 		QueueCommands queue(gInfo->shared_info->primary_ring_buffer);
 		queue.PutFlush();

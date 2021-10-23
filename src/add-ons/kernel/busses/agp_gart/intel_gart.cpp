@@ -132,7 +132,7 @@ const struct supported_device {
 	{0x1904, 0x190a, INTEL_MODEL_SKYS, "Skylake GT1"},
 	{0x1904, 0x190b, INTEL_MODEL_SKY,  "Skylake GT1"},
 	{0x1904, 0x190e, INTEL_MODEL_SKYM, "Skylake GT1"},
-	{0x1904, 0x1912, INTEL_MODEL_SKY,  "Skylake GT2"},
+	{0x191f, 0x1912, INTEL_MODEL_SKY,  "Skylake GT2"}, // confirmed
 	{0x1904, 0x1916, INTEL_MODEL_SKYM, "Skylake GT2"},
 	{0x1904, 0x191a, INTEL_MODEL_SKYS, "Skylake GT2"},
 	{0x1904, 0x191b, INTEL_MODEL_SKY,  "Skylake GT2"},

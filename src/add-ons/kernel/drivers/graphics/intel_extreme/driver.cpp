@@ -105,6 +105,7 @@ const struct supported_device {
 	{0x0d26, INTEL_MODEL_HASM, "Haswell Mobile"},
 	{0x0a16, INTEL_MODEL_HASM, "Haswell Mobile"},
 
+	{0x1912, INTEL_MODEL_SKY,  "Skylake GT2"}, // testing..
 #if 0
 	// The driver does not make any attempt to handle this modern hardware.
 	// Better let VESA/UEFI do it.

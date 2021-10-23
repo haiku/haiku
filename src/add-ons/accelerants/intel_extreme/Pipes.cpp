@@ -38,12 +38,21 @@ void
 program_pipe_color_modes(uint32 colorMode)
 {
 	// All pipes get the same color mode
-	write32(INTEL_DISPLAY_A_CONTROL, (read32(INTEL_DISPLAY_A_CONTROL)
+	if (gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_LAKE)) {
+		write32(INTEL_DISPLAY_A_CONTROL, (read32(INTEL_DISPLAY_A_CONTROL)
+			& ~(DISPLAY_CONTROL_COLOR_MASK_SKY | DISPLAY_CONTROL_GAMMA))
+			| colorMode);
+		write32(INTEL_DISPLAY_B_CONTROL, (read32(INTEL_DISPLAY_B_CONTROL)
+			& ~(DISPLAY_CONTROL_COLOR_MASK_SKY | DISPLAY_CONTROL_GAMMA))
+			| colorMode);
+	} else {
+		write32(INTEL_DISPLAY_A_CONTROL, (read32(INTEL_DISPLAY_A_CONTROL)
 			& ~(DISPLAY_CONTROL_COLOR_MASK | DISPLAY_CONTROL_GAMMA))
-        | colorMode);
-	write32(INTEL_DISPLAY_B_CONTROL, (read32(INTEL_DISPLAY_B_CONTROL)
+			| colorMode);
+		write32(INTEL_DISPLAY_B_CONTROL, (read32(INTEL_DISPLAY_B_CONTROL)
 			& ~(DISPLAY_CONTROL_COLOR_MASK | DISPLAY_CONTROL_GAMMA))
-		| colorMode);
+			| colorMode);
+	}
 }
 
 
