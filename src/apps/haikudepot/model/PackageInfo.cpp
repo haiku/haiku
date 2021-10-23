@@ -455,7 +455,8 @@ PackageInfo::PackageInfo()
 	fDepotName(""),
 	fViewed(false),
 	fIsCollatingChanges(false),
-	fCollatedChanges(0)
+	fCollatedChanges(0),
+	fVersionCreateTimestamp(0)
 {
 }
 
@@ -486,7 +487,8 @@ PackageInfo::PackageInfo(const BPackageInfo& info)
 	fDepotName(""),
 	fViewed(false),
 	fIsCollatingChanges(false),
-	fCollatedChanges(0)
+	fCollatedChanges(0),
+	fVersionCreateTimestamp(0)
 {
 	BString publisherURL;
 	if (info.URLList().CountStrings() > 0)
@@ -533,7 +535,8 @@ PackageInfo::PackageInfo(const BString& name,
 	fDepotName(""),
 	fViewed(false),
 	fIsCollatingChanges(false),
-	fCollatedChanges(0)
+	fCollatedChanges(0),
+	fVersionCreateTimestamp(0)
 {
 }
 
@@ -566,7 +569,8 @@ PackageInfo::PackageInfo(const PackageInfo& other)
 	fDepotName(other.fDepotName),
 	fViewed(other.fViewed),
 	fIsCollatingChanges(false),
-	fCollatedChanges(0)
+	fCollatedChanges(0),
+	fVersionCreateTimestamp(other.fVersionCreateTimestamp)
 {
 }
 
@@ -599,6 +603,7 @@ PackageInfo::operator=(const PackageInfo& other)
 	fSize = other.fSize;
 	fDepotName = other.fDepotName;
 	fViewed = other.fViewed;
+	fVersionCreateTimestamp = other.fVersionCreateTimestamp;
 
 	return *this;
 }
@@ -628,7 +633,8 @@ PackageInfo::operator==(const PackageInfo& other) const
 		&& fArchitecture == other.fArchitecture
 		&& fLocalFilePath == other.fLocalFilePath
 		&& fFileName == other.fFileName
-		&& fSize == other.fSize;
+		&& fSize == other.fSize
+		&& fVersionCreateTimestamp == other.fVersionCreateTimestamp;
 }
 
 
@@ -1008,6 +1014,13 @@ PackageInfo::SetViewed()
 
 
 void
+PackageInfo::SetVersionCreateTimestamp(uint64 value)
+{
+	fVersionCreateTimestamp = value;
+}
+
+
+void
 PackageInfo::SetDepotName(const BString& depotName)
 {
 	if (fDepotName != depotName) {
@@ -1315,5 +1328,6 @@ const char* package_state_to_string(PackageState state)
 			return "PENDING";
 		default:
 			debugger("unknown package state");
+			return "???";
 	}
 }

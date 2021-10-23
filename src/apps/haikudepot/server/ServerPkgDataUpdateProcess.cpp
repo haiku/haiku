@@ -111,6 +111,9 @@ PackageFillingPkgListener::ConsumePackage(const PackageInfoRef& package,
 
 		if (!pkgVersion->PayloadLengthIsNull())
 			package->SetSize(pkgVersion->PayloadLength());
+
+		if (!pkgVersion->CreateTimestampIsNull())
+			package->SetVersionCreateTimestamp(pkgVersion->CreateTimestamp());
 	}
 
 	int32 countPkgCategories = pkg->CountPkgCategories();

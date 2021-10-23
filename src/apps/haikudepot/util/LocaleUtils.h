@@ -16,7 +16,9 @@ class LocaleUtils {
 
 public:
 	static	BCollator*		GetSharedCollator();
+
 	static	BString			TimestampToDateTimeString(uint64 millis);
+	static	BString			TimestampToDateString(uint64 millis);
 
 	static	BString			CreateTranslatedIAmMinimumAgeSlug(int minimumAge);
 
