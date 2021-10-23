@@ -4,7 +4,11 @@ UsePrivateHeaders kernel shared storage support ;
 UseBuildFeatureHeaders zlib ;
 UseBuildFeatureHeaders zstd ;
 
-DEFINES += _BOOT_MODE ZSTD_ENABLED ;
+DEFINES += _BOOT_MODE ;
+
+if [ FIsBuildFeatureEnabled zstd ] {
+	DEFINES += ZSTD_ENABLED ;
+}
 
 local kernelC++Header = [ FDirName $(HAIKU_TOP) headers private kernel util
 	kernel_cpp.h ] ;

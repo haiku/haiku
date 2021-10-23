@@ -304,6 +304,12 @@ for platform in [ MultiBootSubDirSetup ] {
 		local ldflags = $(HAIKU_BOOT_LDFLAGS) $(HAIKU_BOOT_$(platform:G=:U)_LDFLAGS) ;
 		ldflags ?= $(TARGET_BOOT_LDFLAGS) ;
 
+		# needed by tarfs, packagefs, and video_splash.cpp
+		local supportLibs = [ FGrist boot_zlib.a ] ;
+		if [ FIsBuildFeatureEnabled zstd ] {
+			supportLibs += boot_zstd.a ;
+		}
+
 		# efi loader needs to be shared.
 		if $(TARGET_BOOT_PLATFORM) = efi {
 			ldflags += -shared ;
@@ -332,11 +338,9 @@ for platform in [ MultiBootSubDirSetup ] {
 				boot_loader.a
 					# a second time, so undefined references in the file systems can be
 					# resolved
-
-				# needed by tarfs, packagefs, and video_splash.cpp
-				boot_zlib.a
-				boot_zstd.a
+				$(supportLibs)
 			]
+
 			# libroot functions needed by the stage2 boot loader
 			boot_libroot_$(platform:G=).o
 
