@@ -632,7 +632,7 @@ ARMVMTranslationMap32Bit::Query(addr_t va, phys_addr_t *_physical,
 	page_table_entry entry = pt[VADDR_TO_PTENT(va)];
 
 	if ((entry & ARM_PTE_TYPE_MASK) != 0)
-		*_physical = (entry & ARM_PTE_ADDRESS_MASK) | VADDR_TO_PGOFF(va);
+		*_physical = (entry & ARM_PTE_ADDRESS_MASK);
 
 #if 0 //IRA
 	// read in the page state flags
