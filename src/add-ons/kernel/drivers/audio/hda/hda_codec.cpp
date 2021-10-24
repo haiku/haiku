@@ -95,6 +95,8 @@ static const struct {
 		HDA_QUIRK_GPIO0 | HDA_QUIRK_OVREF50, 0},	// MacBook
 	{ 0x106b, 0x00a3, REALTEK_VENDORID, 0x0885,
 		HDA_QUIRK_GPIO0, 0},						// MacBook
+	{ 0x106b, 0x7200, CIRRUSLOGIC_VENDORID, 0x4208,
+		HDA_QUIRK_GPIO0, 0},						// MacBookAir 6,2
 	{ HDA_ALL, HDA_ALL, IDT_VENDORID, 0x76b2, HDA_QUIRK_GPIO0, 0},
 };
 
@@ -363,9 +365,8 @@ hda_codec_get_quirks(hda_codec* codec)
 {
 	codec->quirks = 0;
 
-	uint32 subSystemID = codec->controller->pci_info.u.h0.subsystem_id;
-	uint32 subSystemVendorID
-		= codec->controller->pci_info.u.h0.subsystem_vendor_id;
+	uint32 subSystemID = codec->subsystem_id & 0xffff;
+	uint32 subSystemVendorID = codec->subsystem_id >> 16;
 
 	for (uint32 i = 0;
 			i < (sizeof(kCodecQuirks) / sizeof(kCodecQuirks[0])); i++) {
@@ -1496,6 +1497,7 @@ hda_codec_new(hda_controller* controller, uint32 codecAddress)
 	struct {
 		uint32 device : 16;
 		uint32 vendor : 16;
+		uint32 subsystem : 32;
 		uint32 stepping : 8;
 		uint32 revision : 8;
 		uint32 minor : 4;
@@ -1507,13 +1509,14 @@ hda_codec_new(hda_controller* controller, uint32 codecAddress)
 		uint32 _reserved2 : 8;
 	} response;
 
-	corb_t verbs[3];
+	corb_t verbs[4];
 	verbs[0] = MAKE_VERB(codecAddress, 0, VID_GET_PARAMETER, PID_VENDOR_ID);
-	verbs[1] = MAKE_VERB(codecAddress, 0, VID_GET_PARAMETER, PID_REVISION_ID);
-	verbs[2] = MAKE_VERB(codecAddress, 0, VID_GET_PARAMETER,
+	verbs[1] = MAKE_VERB(codecAddress, 0, VID_GET_PARAMETER, PID_SUBSYSTEM_ID);
+	verbs[2] = MAKE_VERB(codecAddress, 0, VID_GET_PARAMETER, PID_REVISION_ID);
+	verbs[3] = MAKE_VERB(codecAddress, 0, VID_GET_PARAMETER,
 		PID_SUB_NODE_COUNT);
 
-	status = hda_send_verbs(codec, verbs, (uint32*)&response, 3);
+	status = hda_send_verbs(codec, verbs, (uint32*)&response, 4);
 	if (status != B_OK) {
 		ERROR("Failed to get vendor and revision parameters: %s\n",
 			strerror(status));
@@ -1521,6 +1524,7 @@ hda_codec_new(hda_controller* controller, uint32 codecAddress)
 	}
 
 	codec->vendor_id = response.vendor;
+	codec->subsystem_id = response.subsystem;
 	codec->product_id = response.device;
 	codec->stepping = response.stepping;
 	codec->revision = response.revision;
@@ -1528,29 +1532,30 @@ hda_codec_new(hda_controller* controller, uint32 codecAddress)
 	codec->major = response.major;
 	hda_codec_get_quirks(codec);
 
-	TRACE("Codec %" B_PRIu32 " Vendor: %04" B_PRIx32 " "
-		"Product: %04" B_PRIx32 ", "
-		"Revision: %" B_PRIu32 ".%" B_PRIu32 ".%" B_PRIu32 ".%" B_PRIu32 " "
-		"Quirks: %04" B_PRIx32 "\n",
-		codecAddress, response.vendor,
-		response.device,
-		response.major, response.minor, response.revision, response.stepping,
-		codec->quirks);
-
 	for (uint32 nodeID = response.start;
 			nodeID < response.start + response.count; nodeID++) {
-		uint32 groupType;
+		struct {
+			uint32 groupType;
+			uint32 subsystem;
+		} functionResponse;
 		verbs[0] = MAKE_VERB(codecAddress, nodeID, VID_GET_PARAMETER,
 			PID_FUNCTION_GROUP_TYPE);
+		verbs[1] = MAKE_VERB(codecAddress, nodeID, VID_GET_SUBSYSTEMID, 0);
 
-		if (hda_send_verbs(codec, verbs, &groupType, 1) != B_OK) {
+		if (hda_send_verbs(codec, verbs, (uint32*)&functionResponse, 2) != B_OK) {
 			ERROR("Failed to get function group type\n");
 			goto err;
 		}
 
-		if ((groupType & FUNCTION_GROUP_NODETYPE_MASK)
+		if ((functionResponse.groupType & FUNCTION_GROUP_NODETYPE_MASK)
 				== FUNCTION_GROUP_NODETYPE_AUDIO) {
 			// Found an Audio Function Group!
+			if (response.subsystem == 0 && functionResponse.subsystem != 0) {
+				// Update our subsystem, and re-check quirks for this codec
+				codec->subsystem_id = functionResponse.subsystem;
+				hda_codec_get_quirks(codec);
+			}
+
 			status_t status = hda_codec_new_audio_group(codec, nodeID);
 			if (status != B_OK) {
 				ERROR("Failed to setup new audio function group (%s)!\n",
@@ -1559,6 +1564,18 @@ hda_codec_new(hda_controller* controller, uint32 codecAddress)
 			}
 		}
 	}
+
+	TRACE("Codec %" B_PRIu32 " Vendor: %04" B_PRIx32 " "
+		"Product: %04" B_PRIx32 " "
+		"Subsystem: %08" B_PRIx32 ", "
+		"Revision: %" B_PRIu32 ".%" B_PRIu32 ".%" B_PRIu32 ".%" B_PRIu32 " "
+		"Quirks: %04" B_PRIx32 "\n",
+		codecAddress,
+		response.vendor,
+		response.device,
+		codec->subsystem_id,
+		response.major, response.minor, response.revision, response.stepping,
+		codec->quirks);
 
 	codec->unsol_response_thread = spawn_kernel_thread(
 		(status_t(*)(void*))hda_codec_switch_handler,

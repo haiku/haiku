@@ -143,6 +143,7 @@ enum pin_dev_type {
 
 /* Parameter IDs */
 #define PID_VENDOR_ID					0x00
+#define PID_SUBSYSTEM_ID				0x01
 #define PID_REVISION_ID					0x02
 #define PID_SUB_NODE_COUNT				0x04
 #define PID_FUNCTION_GROUP_TYPE			0x05
