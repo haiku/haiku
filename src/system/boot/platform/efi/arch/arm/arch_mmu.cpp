@@ -240,7 +240,7 @@ arch_mmu_allocate_page_tables(void)
 	if (platform_allocate_region((void **)&sPageDirectory,
 		ARM_MMU_L1_TABLE_SIZE + ALIGN_PAGEDIR + PAGE_TABLE_AREA_SIZE, 0, false) != B_OK)
 		panic("Failed to allocate page directory.");
-	sPageDirectory = (uint32*)(((uint32)sPageDirectory + ALIGN_PAGEDIR - 1) & ~(ALIGN_PAGEDIR-1));
+	sPageDirectory = (uint32 *)ROUNDUP((uint32)sPageDirectory, ALIGN_PAGEDIR);
 	memset(sPageDirectory, 0, ARM_MMU_L1_TABLE_SIZE);
 
 	sFirstPageTable = (uint32*)((uint32)sPageDirectory + ARM_MMU_L1_TABLE_SIZE);
