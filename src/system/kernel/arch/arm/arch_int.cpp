@@ -23,6 +23,7 @@
 #include <smp.h>
 #include <thread.h>
 #include <timer.h>
+#include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
 #include <util/kernel_cpp.h>
 #include <vm/vm.h>
@@ -343,6 +344,25 @@ arch_arm_irq(struct iframe *iframe)
 	InterruptController *ic = InterruptController::Get();
 	if (ic != NULL)
 		ic->HandleInterrupt();
+
+	Thread* thread = thread_get_current_thread();
+	cpu_status state = disable_interrupts();
+	if (thread->cpu->invoke_scheduler) {
+		SpinLocker schedulerLocker(thread->scheduler_lock);
+		scheduler_reschedule(B_THREAD_READY);
+		schedulerLocker.Unlock();
+		restore_interrupts(state);
+	} else if (thread->post_interrupt_callback != NULL) {
+		void (*callback)(void*) = thread->post_interrupt_callback;
+		void* data = thread->post_interrupt_data;
+
+		thread->post_interrupt_callback = NULL;
+		thread->post_interrupt_data = NULL;
+
+		restore_interrupts(state);
+
+		callback(data);
+	}
 }
 
 
