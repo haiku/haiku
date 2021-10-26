@@ -103,9 +103,9 @@ static const char* kPublicDomain = B_TRANSLATE_MARK("Public Domain");
 #endif
 #ifdef __i386__
 static const char* kIntel2xxxFirmware = B_TRANSLATE_MARK("Intel (2xxx firmware)");
-static const char* kIntelFirmware = B_TRANSLATE_MARK("Intel (firmware)");
+static const char* kIntelFirmware = B_TRANSLATE_MARK("Intel WiFi Firmware");
 static const char* kMarvellFirmware = B_TRANSLATE_MARK("Marvell (firmware)");
-static const char* kRalinkFirmware = B_TRANSLATE_MARK("Ralink (firmware)");
+static const char* kRalinkFirmware = B_TRANSLATE_MARK("Ralink WiFi Firmware");
 #endif
 
 
