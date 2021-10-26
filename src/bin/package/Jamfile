@@ -2,6 +2,10 @@ SubDir HAIKU_TOP src bin package ;
 
 UsePrivateHeaders kernel libroot shared storage support ;
 
+if [ FIsBuildFeatureEnabled zstd ] {
+	SubDirC++Flags -DZSTD_DEFAULT ;
+}
+
 BinCommand package :
 	command_add.cpp
 	command_checksum.cpp

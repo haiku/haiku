@@ -131,7 +131,11 @@ parse_compression_argument(const char* arg)
 {
 	if (arg == NULL) {
 		// Default compression method.
+#ifdef ZSTD_DEFAULT
+		return BPackageKit::BHPKG::B_HPKG_COMPRESSION_ZSTD;
+#else
 		return BPackageKit::BHPKG::B_HPKG_COMPRESSION_ZLIB;
+#endif
 	}
 
 	if (strcmp(arg, "zstd") == 0) {
