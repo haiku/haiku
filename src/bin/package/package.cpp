@@ -13,6 +13,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <package/hpkg/HPKGDefs.h>
+
 
 extern const char* __progname;
 const char* kCommandName = __progname;
@@ -61,7 +63,7 @@ static const char* kUsage =
 	"                 an option only for use in package building. It will cause\n"
 	"                 the package .self link to point to <path>, which is useful\n"
 	"                 to redirect a \"make install\". Only allowed with -b.\n"
-	"    -z         - Use Zstd compression.\n"
+	"    -z <type>  - Specify compression method to use.\n"
 	"    -q         - Be quiet (don't show any output except for errors).\n"
 	"    -v         - Be verbose (show more info about created package).\n"
 	"\n"
@@ -107,7 +109,7 @@ static const char* kUsage =
 	"\n"
 	"    -0 ... -9  - Use compression level 0 ... 9. 0 means no, 9 best compression.\n"
 	"                 Defaults to 9.\n"
-	"    -z         - Use Zstd compression.\n"
+	"    -z <type>  - Specify compression method to use.\n"
 	"    -q         - Be quiet (don't show any output except for errors).\n"
 	"    -v         - Be verbose (show more info about created package).\n"
 	"\n"
@@ -121,6 +123,25 @@ print_usage_and_exit(bool error)
 {
     fprintf(error ? stderr : stdout, kUsage, kCommandName);
     exit(error ? 1 : 0);
+}
+
+
+int32
+parse_compression_argument(const char* arg)
+{
+	if (arg == NULL) {
+		// Default compression method.
+		return BPackageKit::BHPKG::B_HPKG_COMPRESSION_ZLIB;
+	}
+
+	if (strcmp(arg, "zstd") == 0) {
+		return BPackageKit::BHPKG::B_HPKG_COMPRESSION_ZSTD;
+	} else if (strcmp(arg, "zlib") == 0) {
+		return BPackageKit::BHPKG::B_HPKG_COMPRESSION_ZLIB;
+	} else {
+		fprintf(stderr, "error: unknown compression method '%s'\n", arg);
+		exit(1);
+	}
 }
 
 
