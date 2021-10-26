@@ -7,6 +7,8 @@ USES_BE_API on <libbe_build>support_kit.o = true ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits support ] ;
 
+SubDirC++Flags -DZSTD_ENABLED ;
+
 BuildPlatformMergeObjectPIC <libbe_build>support_kit.o :
 	Archivable.cpp
 	BlockCache.cpp
@@ -26,4 +28,5 @@ BuildPlatformMergeObjectPIC <libbe_build>support_kit.o :
 	StringList.cpp
 	Url.cpp
 	ZlibCompressionAlgorithm.cpp
+	ZstdCompressionAlgorithm.cpp
 ;
