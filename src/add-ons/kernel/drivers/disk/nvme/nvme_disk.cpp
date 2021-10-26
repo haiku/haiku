@@ -256,7 +256,6 @@ nvme_disk_init_device(void* _info, void** _cookie)
 
 	uint8 irq = info->info.u.h0.interrupt_line;
 	if (sPCIx86Module != NULL) {
-#if 0
 		if (sPCIx86Module->get_msix_count(info->info.bus, info->info.device,
 				info->info.function)) {
 			uint8 msixVector = 0;
@@ -267,9 +266,7 @@ nvme_disk_init_device(void* _info, void** _cookie)
 				TRACE_ALWAYS("using MSI-X\n");
 				irq = msixVector;
 			}
-		} else
-#endif
-		if (sPCIx86Module->get_msi_count(info->info.bus,
+		} else if (sPCIx86Module->get_msi_count(info->info.bus,
 				info->info.device, info->info.function) >= 1) {
 			uint8 msiVector = 0;
 			if (sPCIx86Module->configure_msi(info->info.bus, info->info.device,
