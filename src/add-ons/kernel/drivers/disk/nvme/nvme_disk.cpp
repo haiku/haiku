@@ -244,52 +244,7 @@ nvme_disk_init_device(void* _info, void** _cookie)
 	TRACE("capacity: %" B_PRIu64 ", block_size %" B_PRIu32 "\n",
 		info->capacity, info->block_size);
 
-	// allocate qpairs
-	info->qpair_count = info->next_qpair = 0;
-	for (uint32 i = 0; i < NVME_MAX_QPAIRS && i < cstat.io_qpairs; i++) {
-		info->qpairs[i].qpair = nvme_ioqp_get(info->ctrlr,
-			(enum nvme_qprio)0, 0);
-		if (info->qpairs[i].qpair == NULL)
-			break;
-
-		info->qpair_count++;
-	}
-	if (info->qpair_count == 0) {
-		TRACE_ERROR("failed to allocate qpairs!\n");
-		nvme_ctrlr_close(info->ctrlr);
-		return B_NO_MEMORY;
-	}
-
-	// allocate DMA buffers
-	int buffers = info->qpair_count * 2;
-
-	dma_restrictions restrictions = {};
-	restrictions.alignment = B_PAGE_SIZE;
-		// Technically, the first and last segments in a transfer can be
-		// unaligned, and the rest only need to have sizes that are a multiple
-		// of the block size.
-	restrictions.max_segment_count = (NVME_MAX_SGL_DESCRIPTORS / 2);
-	restrictions.max_transfer_size = cstat.max_xfer_size;
-	info->max_io_blocks = cstat.max_xfer_size / nsstat.sector_size;
-
-	err = info->dma_resource.Init(restrictions, B_PAGE_SIZE, buffers, buffers);
-	if (err != 0) {
-		TRACE_ERROR("failed to initialize DMA resource!\n");
-		nvme_ctrlr_close(info->ctrlr);
-		return err;
-	}
-
-	info->dma_buffers_sem = create_sem(buffers, "nvme buffers sem");
-	if (info->dma_buffers_sem < 0) {
-		TRACE_ERROR("failed to create DMA buffers semaphore!\n");
-		nvme_ctrlr_close(info->ctrlr);
-		return info->dma_buffers_sem;
-	}
-
-	// set up rounded-write lock
-	rw_lock_init(&info->rounded_write_lock, "nvme rounded writes");
-
-	// set up interrupt
+	// set up interrupts
 	if (get_module(B_PCI_X86_MODULE_NAME, (module_info**)&sPCIx86Module)
 			!= B_OK) {
 		sPCIx86Module = NULL;
@@ -340,6 +295,51 @@ nvme_disk_init_device(void* _info, void** _cookie)
 		nvme_admin_set_feature(info->ctrlr, false, NVME_FEAT_INTERRUPT_COALESCING,
 			((microseconds / 100) << 8) | threshold, 0, NULL);
 	}
+
+	// allocate qpairs
+	info->qpair_count = info->next_qpair = 0;
+	for (uint32 i = 0; i < NVME_MAX_QPAIRS && i < cstat.io_qpairs; i++) {
+		info->qpairs[i].qpair = nvme_ioqp_get(info->ctrlr,
+			(enum nvme_qprio)0, 0);
+		if (info->qpairs[i].qpair == NULL)
+			break;
+
+		info->qpair_count++;
+	}
+	if (info->qpair_count == 0) {
+		TRACE_ERROR("failed to allocate qpairs!\n");
+		nvme_ctrlr_close(info->ctrlr);
+		return B_NO_MEMORY;
+	}
+
+	// allocate DMA buffers
+	int buffers = info->qpair_count * 2;
+
+	dma_restrictions restrictions = {};
+	restrictions.alignment = B_PAGE_SIZE;
+		// Technically, the first and last segments in a transfer can be
+		// unaligned, and the rest only need to have sizes that are a multiple
+		// of the block size.
+	restrictions.max_segment_count = (NVME_MAX_SGL_DESCRIPTORS / 2);
+	restrictions.max_transfer_size = cstat.max_xfer_size;
+	info->max_io_blocks = cstat.max_xfer_size / nsstat.sector_size;
+
+	err = info->dma_resource.Init(restrictions, B_PAGE_SIZE, buffers, buffers);
+	if (err != 0) {
+		TRACE_ERROR("failed to initialize DMA resource!\n");
+		nvme_ctrlr_close(info->ctrlr);
+		return err;
+	}
+
+	info->dma_buffers_sem = create_sem(buffers, "nvme buffers sem");
+	if (info->dma_buffers_sem < 0) {
+		TRACE_ERROR("failed to create DMA buffers semaphore!\n");
+		nvme_ctrlr_close(info->ctrlr);
+		return info->dma_buffers_sem;
+	}
+
+	// set up rounded-write lock
+	rw_lock_init(&info->rounded_write_lock, "nvme rounded writes");
 
 	*_cookie = info;
 	return B_OK;
