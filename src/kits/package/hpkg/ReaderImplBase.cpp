@@ -20,9 +20,7 @@
 #include <DataIO.h>
 
 #include <ZlibCompressionAlgorithm.h>
-#ifdef ZSTD_ENABLED
 #include <ZstdCompressionAlgorithm.h>
-#endif
 
 #include <package/hpkg/HPKGDefsPrivate.h>
 #include <package/hpkg/PackageFileHeapReader.h>
@@ -834,7 +832,6 @@ ReaderImplBase::InitHeapReader(uint32 compression, uint32 chunkSize,
 				return B_NO_MEMORY;
 			}
 			break;
-#ifdef ZSTD_ENABLED
 		case B_HPKG_COMPRESSION_ZSTD:
 			decompressionAlgorithm = DecompressionAlgorithmOwner::Create(
 				new(std::nothrow) BZstdCompressionAlgorithm,
@@ -846,7 +843,6 @@ ReaderImplBase::InitHeapReader(uint32 compression, uint32 chunkSize,
 				return B_NO_MEMORY;
 			}
 			break;
-#endif
 		default:
 			fErrorOutput->PrintError("Error: Invalid heap compression\n");
 			return B_BAD_DATA;
