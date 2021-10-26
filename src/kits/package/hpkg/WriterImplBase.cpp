@@ -310,7 +310,8 @@ WriterImplBase::InitHeapReader(size_t headerSize)
 			compressionAlgorithm = CompressionAlgorithmOwner::Create(
 				new(std::nothrow) BZlibCompressionAlgorithm,
 				new(std::nothrow) BZlibCompressionParameters(
-					fParameters.CompressionLevel()));
+					(fParameters.CompressionLevel() / float(B_HPKG_COMPRESSION_LEVEL_BEST))
+						* B_ZLIB_COMPRESSION_BEST));
 			compressionAlgorithmReference.SetTo(compressionAlgorithm, true);
 
 			decompressionAlgorithm = DecompressionAlgorithmOwner::Create(
@@ -331,7 +332,8 @@ WriterImplBase::InitHeapReader(size_t headerSize)
 			compressionAlgorithm = CompressionAlgorithmOwner::Create(
 				new(std::nothrow) BZstdCompressionAlgorithm,
 				new(std::nothrow) BZstdCompressionParameters(
-					fParameters.CompressionLevel()));
+					(fParameters.CompressionLevel() / float(B_HPKG_COMPRESSION_LEVEL_BEST))
+						* B_ZSTD_COMPRESSION_BEST));
 			compressionAlgorithmReference.SetTo(compressionAlgorithm, true);
 
 			decompressionAlgorithm = DecompressionAlgorithmOwner::Create(
