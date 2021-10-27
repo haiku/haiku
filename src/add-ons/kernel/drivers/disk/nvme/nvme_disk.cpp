@@ -71,7 +71,7 @@ static const uint8 kDriveIcon[] = {
 #define NVME_DISK_DEVICE_MODULE_NAME 	"drivers/disk/nvme_disk/device_v1"
 #define NVME_DISK_DEVICE_ID_GENERATOR	"nvme_disk/device_id"
 
-#define NVME_MAX_QPAIRS					(8)
+#define NVME_MAX_QPAIRS					(16)
 
 
 static device_manager_info* sDeviceManager;
@@ -89,18 +89,17 @@ typedef struct {
 	uint32					max_io_blocks;
 	status_t				media_status;
 
-	struct qpair_info {
-		struct nvme_qpair*	qpair;
-	}						qpairs[NVME_MAX_QPAIRS];
-	uint32					qpair_count;
-	uint32					next_qpair;
-
 	DMAResource				dma_resource;
 	sem_id					dma_buffers_sem;
 
 	rw_lock					rounded_write_lock;
 
 	ConditionVariable		interrupt;
+
+	struct qpair_info {
+		struct nvme_qpair*	qpair;
+	}						qpairs[NVME_MAX_QPAIRS];
+	uint32					qpair_count;
 } nvme_disk_driver_info;
 typedef nvme_disk_driver_info::qpair_info qpair_info;
 
@@ -274,8 +273,17 @@ nvme_disk_init_device(void* _info, void** _cookie)
 	}
 
 	// allocate qpairs
-	info->qpair_count = info->next_qpair = 0;
-	for (uint32 i = 0; i < NVME_MAX_QPAIRS && i < cstat.io_qpairs; i++) {
+	int32 try_qpairs = cstat.io_qpairs;
+	try_qpairs = min_c(try_qpairs, NVME_MAX_QPAIRS);
+	if (try_qpairs >= smp_get_num_cpus()) {
+		try_qpairs = smp_get_num_cpus();
+	} else {
+		// Find the highest number of qpairs that evenly divides the number of CPUs.
+		while ((smp_get_num_cpus() % try_qpairs) != 0)
+			try_qpairs--;
+	}
+	info->qpair_count = 0;
+	for (uint32 i = 0; i < try_qpairs; i++) {
 		info->qpairs[i].qpair = nvme_ioqp_get(info->ctrlr,
 			(enum nvme_qprio)0, 0);
 		if (info->qpairs[i].qpair == NULL)
@@ -287,6 +295,9 @@ nvme_disk_init_device(void* _info, void** _cookie)
 		TRACE_ERROR("failed to allocate qpairs!\n");
 		nvme_ctrlr_close(info->ctrlr);
 		return B_NO_MEMORY;
+	}
+	if (info->qpair_count != try_qpairs) {
+		TRACE_ALWAYS("warning: did not get expected number of qpairs\n");
 	}
 
 	// allocate DMA buffers
@@ -396,8 +407,7 @@ nvme_interrupt_handler(void* _info)
 static qpair_info*
 get_qpair(nvme_disk_driver_info* info)
 {
-	return &info->qpairs[atomic_add((int32*)&info->next_qpair, 1)
-		% info->qpair_count];
+	return &info->qpairs[smp_get_current_cpu() % info->qpair_count];
 }
 
 
