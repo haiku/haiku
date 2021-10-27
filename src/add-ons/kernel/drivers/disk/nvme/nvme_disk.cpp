@@ -209,6 +209,7 @@ nvme_disk_init_device(void* _info, void** _cookie)
 		nvme_ctrlr_close(info->ctrlr);
 		return B_ERROR;
 	}
+	TRACE_ALWAYS("namespace 0\n");
 
 	struct nvme_ns_stat nsstat;
 	err = nvme_ns_stat(info->ns, &nsstat);
@@ -219,10 +220,9 @@ nvme_disk_init_device(void* _info, void** _cookie)
 	}
 
 	// store capacity information
+	TRACE_ALWAYS("\tblock size: %" B_PRIuSIZE ", stripe size: %" B_PRIuSIZE "\n",
+		nsstat.sector_size, info->ns->stripe_size);
 	nvme_disk_set_capacity(info, nsstat.sectors, nsstat.sector_size);
-
-	TRACE("capacity: %" B_PRIu64 ", block_size %" B_PRIu32 "\n",
-		info->capacity, info->block_size);
 
 	// set up interrupts
 	if (get_module(B_PCI_X86_MODULE_NAME, (module_info**)&sPCIx86Module)
