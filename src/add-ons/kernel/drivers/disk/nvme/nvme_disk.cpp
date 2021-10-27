@@ -294,8 +294,8 @@ nvme_disk_init_device(void* _info, void** _cookie)
 
 	dma_restrictions restrictions = {};
 	restrictions.alignment = B_PAGE_SIZE;
-		// Technically, the first and last segments in a transfer can be
-		// unaligned, and the rest only need to have sizes that are a multiple
+		// Technically, the first and last segments in a transfer can be aligned
+		// only on 32-bits, and the rest only need to have sizes that are a multiple
 		// of the block size.
 	restrictions.max_segment_count = (NVME_MAX_SGL_DESCRIPTORS / 2);
 	restrictions.max_transfer_size = cstat.max_xfer_size;
@@ -701,7 +701,7 @@ nvme_disk_io(void* cookie, io_request* request)
 
 		entry = &nvme_request.iovecs[nvme_request.iovec_count - 1];
 		if (!bounceAll && ((entry->address % B_PAGE_SIZE) != 0
-				|| (entry->address & 0x3) != 0 || (entry->size % block_size) != 0))
+				|| (entry->size % block_size) != 0))
 			bounceAll = true;
 	}
 
