@@ -209,11 +209,13 @@ Pipe::ConfigureScalePos(display_mode* target)
 	if (gInfo->shared_info->device_type.Generation() <= 4) {
 		// This is "reserved" on G35 and GMA965, but needed on 945 (for which
 		// there is no public documentation), and I assume earlier devices as
-		// well. Note that the height and width are swapped when compared to
-		// the other registers.
+		// well.
+		//
+		// IMPORTANT WARNING: height and width are swapped when compared to the other registers!
+		// Be careful when editing this code and don't accidentally swap them!
 		write32(INTEL_DISPLAY_A_IMAGE_SIZE + fPipeOffset,
-			((uint32)(target->timing.h_display - 1) << 16)
-			| ((uint32)target->timing.v_display - 1));
+			((uint32)(target->timing.v_display - 1) << 16)
+			| ((uint32)target->timing.h_display - 1));
 	}
 }
 
