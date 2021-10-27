@@ -14,6 +14,7 @@
 #include <condition_variable.h>
 #include <AutoDeleter.h>
 #include <kernel.h>
+#include <smp.h>
 #include <util/AutoLock.h>
 
 #include <fs/devfs.h>
@@ -219,7 +220,7 @@ nvme_disk_init_device(void* _info, void** _cookie)
 	}
 
 	// store capacity information
-	TRACE_ALWAYS("\tblock size: %" B_PRIuSIZE ", stripe size: %" B_PRIuSIZE "\n",
+	TRACE_ALWAYS("\tblock size: %" B_PRIuSIZE ", stripe size: %" B_PRIu32 "\n",
 		nsstat.sector_size, info->ns->stripe_size);
 	nvme_disk_set_capacity(info, nsstat.sectors, nsstat.sector_size);
 
