@@ -179,9 +179,9 @@ limit_modes_for_gen3_lvds(display_mode* mode)
 	// display.
 	// FIXME do this only for that display. The whole display mode logic
 	// needs to be adjusted to know which display we're talking about.
-	if (gInfo->shared_info->panel_mode.timing.h_display < mode->timing.h_display)
+	if (gInfo->shared_info->panel_timing.h_display < mode->timing.h_display)
 		return false;
-	if (gInfo->shared_info->panel_mode.timing.v_display < mode->timing.v_display)
+	if (gInfo->shared_info->panel_timing.v_display < mode->timing.v_display)
 		return false;
 
 	return true;
@@ -230,9 +230,17 @@ create_mode_list(void)
 		if (gInfo->shared_info->device_type.Generation() < 4)
 			limitModes = limit_modes_for_gen3_lvds;
 
+		display_mode mode;
+		mode.timing = gInfo->shared_info->panel_timing;
+		mode.space = B_RGB32;
+		mode.virtual_width = mode.timing.h_display;
+		mode.virtual_height = mode.timing.v_display;
+		mode.h_display_start = 0;
+		mode.v_display_start = 0;
+		mode.flags = 0;
+
 		// TODO: support lower modes via scaling and windowing
-		gInfo->mode_list_area = create_display_modes("intel extreme modes",
-			NULL, &gInfo->shared_info->panel_mode, 1,
+		gInfo->mode_list_area = create_display_modes("intel extreme modes", NULL, &mode, 1,
 			supportedSpaces, colorSpaceCount, limitModes, &list, &count);
 	} else {
 		// Otherwise return the 'real' list of modes

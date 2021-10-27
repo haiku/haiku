@@ -17,7 +17,7 @@ public:
 virtual								~PanelFitter();
 
 		bool						IsEnabled();
-		void						Enable(const display_mode& mode);
+		void						Enable(const display_timing& timing);
 		void						Disable();
 
 private:

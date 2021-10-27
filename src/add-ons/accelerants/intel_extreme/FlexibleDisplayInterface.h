@@ -65,7 +65,7 @@ public:
 		FDIReceiver&				Receiver()
 										{ return fReceiver; };
 
-		status_t					Train(display_mode* target);
+		status_t					Train(display_timing* target);
 
 private:
 		status_t					_NormalTrain(uint32 lanes);

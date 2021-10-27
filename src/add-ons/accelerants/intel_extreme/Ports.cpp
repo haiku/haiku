@@ -363,13 +363,13 @@ AnalogPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	// Setup PanelFitter and Train FDI if it exists
 	PanelFitter* fitter = fPipe->PFT();
 	if (fitter != NULL)
-		fitter->Enable(*target);
+		fitter->Enable(target->timing);
 	FDILink* link = fPipe->FDI();
 	if (link != NULL)
-		link->Train(target);
+		link->Train(&target->timing);
 
 	pll_divisors divisors;
-	compute_pll_divisors(target, &divisors, false);
+	compute_pll_divisors(&target->timing, &divisors, false);
 
 	uint32 extraPLLFlags = 0;
 	if (gInfo->shared_info->device_type.Generation() >= 3)
@@ -561,7 +561,7 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	// For LVDS panels, we may need to set the timings according to the panel
 	// native video mode, and let the panel fitter do the scaling. But the
 	// place where the scaling happens varies accross generations of devices.
-	display_mode hardwareTarget;
+	display_timing hardwareTarget;
 	bool needsScaling = false;
 
 	// TODO figure out how it's done (or if we need to configure something at
@@ -570,25 +570,20 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 		&& gInfo->shared_info->device_type.Generation() >= 3
 		&& gInfo->shared_info->got_vbt) {
 		// Set vbios hardware panel mode as base
-		hardwareTarget = gInfo->shared_info->panel_mode;
+		hardwareTarget = gInfo->shared_info->panel_timing;
 
-		if (hardwareTarget.timing.h_display == target->timing.h_display
-				&& hardwareTarget.timing.v_display == target->timing.v_display) {
+		if (hardwareTarget.h_display == target->timing.h_display
+				&& hardwareTarget.v_display == target->timing.v_display) {
 			// We are setting the native video mode, nothing special to do
 			TRACE("Setting LVDS to native mode\n");
-			hardwareTarget = *target;
+			hardwareTarget = target->timing;
 		} else {
 			// We need to enable the panel fitter
 			TRACE("%s: hardware mode will actually be %dx%d\n", __func__,
-				hardwareTarget.timing.h_display, hardwareTarget.timing.v_display);
+				hardwareTarget.h_display, hardwareTarget.v_display);
 
-			hardwareTarget.space = target->space;
-			// retain requested virtual size
-			hardwareTarget.virtual_width = target->virtual_width;
-			hardwareTarget.virtual_height = target->virtual_height;
 			// FIXME we should also get the refresh frequency from the target
 			// mode, and then "sanitize" the resulting mode we made up.
-
 			needsScaling = true;
 		}
 	} else {
@@ -596,7 +591,7 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 			"generation, scaling may not work\n");
 		// We don't have VBT data, try to set the requested mode directly
 		// and hope for the best
-		hardwareTarget = *target;
+		hardwareTarget = target->timing;
 	}
 
 	// Setup PanelFitter and Train FDI if it exists
@@ -664,7 +659,7 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 
 	// Program pipe PLL's (using the hardware mode timings, since that's what
 	// the PLL is used for)
-	fPipe->ConfigureClocks(divisors, hardwareTarget.timing.pixel_clock,
+	fPipe->ConfigureClocks(divisors, hardwareTarget.pixel_clock,
 		extraPLLFlags);
 
 	if (gInfo->shared_info->device_type.Generation() != 4) {
@@ -799,13 +794,13 @@ DigitalPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	// Setup PanelFitter and Train FDI if it exists
 	PanelFitter* fitter = fPipe->PFT();
 	if (fitter != NULL)
-		fitter->Enable(*target);
+		fitter->Enable(target->timing);
 	FDILink* link = fPipe->FDI();
 	if (link != NULL)
-		link->Train(target);
+		link->Train(&target->timing);
 
 	pll_divisors divisors;
-	compute_pll_divisors(target, &divisors, false);
+	compute_pll_divisors(&target->timing, &divisors, false);
 
 	uint32 extraPLLFlags = 0;
 	if (gInfo->shared_info->device_type.Generation() >= 3)
@@ -1345,16 +1340,16 @@ DigitalDisplayInterface::SetDisplayMode(display_mode* target, uint32 colorMode)
 	// Setup PanelFitter and Train FDI if it exists
 	PanelFitter* fitter = fPipe->PFT();
 	if (fitter != NULL)
-		fitter->Enable(*target);
+		fitter->Enable(target->timing);
 	// Skip FDI if we have a CPU connected display
 	if (PortIndex() != INTEL_PORT_A) {
 		FDILink* link = fPipe->FDI();
 		if (link != NULL)
-			link->Train(target);
+			link->Train(&target->timing);
 	}
 
 	pll_divisors divisors;
-	compute_pll_divisors(target, &divisors, false);
+	compute_pll_divisors(&target->timing, &divisors, false);
 
 	uint32 extraPLLFlags = 0;
 	if (gInfo->shared_info->device_type.Generation() >= 3)

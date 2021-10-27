@@ -33,7 +33,7 @@ struct pll_limits {
 
 
 bool valid_pll_divisors(pll_divisors* divisors, pll_limits* limits);
-void compute_pll_divisors(display_mode* current, pll_divisors* divisors,
+void compute_pll_divisors(display_timing* current, pll_divisors* divisors,
 	bool isLVDS);
 
 void refclk_activate_ilk(bool hasPanel);

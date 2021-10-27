@@ -446,7 +446,7 @@ intel_extreme_init(intel_info &info)
 
 	// Pull VBIOS panel mode for later use
 	info.shared_info->got_vbt = get_lvds_mode_from_bios(
-		&info.shared_info->panel_mode);
+		&info.shared_info->panel_timing);
 
 	/* at least 855gm can't drive more than one head at time */
 	if (info.device_type.InFamily(INTEL_FAMILY_8xx))

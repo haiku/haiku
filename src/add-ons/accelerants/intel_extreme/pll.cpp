@@ -184,9 +184,9 @@ static pll_limits kLimitsPinLvds = {
 
 
 static bool
-lvds_dual_link(display_mode* current)
+lvds_dual_link(display_timing* current)
 {
-	float requestedPixelClock = current->timing.pixel_clock / 1000.0f;
+	float requestedPixelClock = current->pixel_clock / 1000.0f;
 	if (requestedPixelClock > 112.999)
 		return true;
 
@@ -215,7 +215,7 @@ valid_pll_divisors(pll_divisors* divisors, pll_limits* limits)
 
 
 static void
-compute_pll_p2(display_mode* current, pll_divisors* divisors,
+compute_pll_p2(display_timing* current, pll_divisors* divisors,
 	pll_limits* limits, bool isLVDS)
 {
 	if (isLVDS) {
@@ -227,7 +227,7 @@ compute_pll_p2(display_mode* current, pll_divisors* divisors,
 			divisors->p2 = limits->max.p2;
 		}
 	} else {
-		if (current->timing.pixel_clock < limits->dot_limit) {
+		if (current->pixel_clock < limits->dot_limit) {
 			// slow DAC timing
 			divisors->p2 = limits->max.p2;
 		} else {
@@ -269,9 +269,9 @@ compute_pll_p(pll_divisors* divisors)
 
 
 static void
-compute_dpll_g4x(display_mode* current, pll_divisors* divisors, bool isLVDS)
+compute_dpll_g4x(display_timing* current, pll_divisors* divisors, bool isLVDS)
 {
-	float requestedPixelClock = current->timing.pixel_clock / 1000.0f;
+	float requestedPixelClock = current->pixel_clock / 1000.0f;
 	float referenceClock
 		= gInfo->shared_info->pll_info.reference_frequency / 1000.0f;
 
@@ -363,9 +363,9 @@ compute_dpll_g4x(display_mode* current, pll_divisors* divisors, bool isLVDS)
 
 
 static void
-compute_dpll_9xx(display_mode* current, pll_divisors* divisors, bool isLVDS)
+compute_dpll_9xx(display_timing* current, pll_divisors* divisors, bool isLVDS)
 {
-	float requestedPixelClock = current->timing.pixel_clock / 1000.0f;
+	float requestedPixelClock = current->pixel_clock / 1000.0f;
 	float referenceClock
 		= gInfo->shared_info->pll_info.reference_frequency / 1000.0f;
 
@@ -447,7 +447,7 @@ compute_dpll_9xx(display_mode* current, pll_divisors* divisors, bool isLVDS)
 
 
 void
-compute_pll_divisors(display_mode* current, pll_divisors* divisors, bool isLVDS)
+compute_pll_divisors(display_timing* current, pll_divisors* divisors, bool isLVDS)
 {
 	if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_G4x)
 		|| (gInfo->shared_info->pch_info != INTEL_PCH_NONE)) {

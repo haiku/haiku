@@ -249,7 +249,7 @@ struct intel_shared_info {
 	uint32			mode_count;
 
 	display_mode	current_mode;		// pretty much a hack until per-display modes
-	display_mode	panel_mode;			// VBIOS VBT panel mode
+	display_timing	panel_timing;		// Hardware timings of the LVDS panel, extracted from BIOS
 	uint32			bytes_per_row;
 	uint32			bits_per_pixel;
 	uint32			dpms_mode;

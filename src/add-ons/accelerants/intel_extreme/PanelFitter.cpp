@@ -59,7 +59,7 @@ PanelFitter::IsEnabled()
 
 
 void
-PanelFitter::Enable(const display_mode& mode)
+PanelFitter::Enable(const display_timing& timing)
 {
 	_Enable(true);
 
@@ -69,7 +69,7 @@ PanelFitter::Enable(const display_mode& mode)
 	TRACE("%s: PCH_PANEL_FITTER_WINDOW_POS, 0x%" B_PRIx32 "\n", __func__, read32(fRegisterBase + PCH_PANEL_FITTER_WINDOW_POS));
 
 	// Window size _must_ be the last register programmed as it 'arms'/unlocks all the other ones..
-	write32(fRegisterBase + PCH_PANEL_FITTER_WINDOW_SIZE, (mode.timing.h_display << 16) | mode.timing.v_display);
+	write32(fRegisterBase + PCH_PANEL_FITTER_WINDOW_SIZE, (timing.h_display << 16) | timing.v_display);
 }
 
 
