@@ -127,7 +127,7 @@ KernelLd kernel_$(TARGET_ARCH) :
 
 	: $(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/kernel.ld
 	: -Bdynamic -export-dynamic -dynamic-linker /foo/bar
-	  $(TARGET_KERNEL_PIC_LINKFLAGS)
+	  $(TARGET_KERNEL_PIC_LINKFLAGS) --no-undefined
 	:
 ;
 
