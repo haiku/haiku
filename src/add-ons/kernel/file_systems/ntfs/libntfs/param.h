@@ -40,6 +40,13 @@ enum {
 };
 
 /*
+ *		Parameters for formatting
+ */
+
+		/* Up to Windows 10, the cluster size was limited to 64K */
+#define NTFS_MAX_CLUSTER_SIZE 2097152 /* Windows 10 Creators allows 2MB */
+
+/*
  *		Parameters for compression
  */
 
@@ -112,6 +119,9 @@ enum {
  *	having access control in the file system leads to fewer requests
  *	to the file system and fewer context switches.
  *
+ *	Irrespective of the selected mode, cacheing is always used
+ *	in read-only mounts
+ *
  *	Possible values for high level :
  *		1 : no cache, kernel control (recommended)
  *		4 : no cache, file system control
@@ -120,7 +130,7 @@ enum {
  *
  *	Possible values for low level :
  *		2 : no cache, kernel control
- *		3 : use kernel/fuse cache, kernel control  (recommended)
+ *		3 : use kernel/fuse cache, kernel control (recommended)
  *		5 : no cache, file system control
  *		6 : kernel/fuse cache, file system control (OpenIndiana only)
  *		8 : no cache, kernel control for ACLs
@@ -131,6 +141,7 @@ enum {
  *	of 6 is added in the mount report.
  */
 
+#define TIMEOUT_RO 600 /* Attribute time out for read-only mounts */
 #if defined(__sun) && defined(__SVR4)
 /*
  *	Access control by kernel is not implemented on OpenIndiana,
@@ -143,9 +154,10 @@ enum {
  *	Cacheing by kernel is buggy on Linux when access control is done
  *	by the file system, and also when using hard-linked files on
  *	the fuse high level interface.
+ *	Also ACL checks by recent kernels do not prove satisfactory.
  */
 #define HPERMSCONFIG 1
-#define LPERMSCONFIG 3 /* Use 9 when ACLs are supported by fuse kernel */
+#define LPERMSCONFIG 3
 #endif /* defined(__sun) && defined(__SVR4) */
 
 #endif /* defined _NTFS_PARAM_H */

@@ -5,7 +5,7 @@
  * Copyright (c) 2004-2005 Richard Russon
  * Copyright (c) 2004-2008 Szabolcs Szakacsits
  * Copyright (c)      2005 Yura Pakhuchiy
- * Copyright (c) 2014-2015 Jean-Pierre Andre
+ * Copyright (c) 2014-2018 Jean-Pierre Andre
  *
  * This program/include file is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published
@@ -172,6 +172,15 @@ int ntfs_mft_records_write(const ntfs_volume *vol, const MFT_REF mref,
 		cnt = vol->mftmirr_size - m;
 		if (cnt > count)
 			cnt = count;
+		if ((m + cnt) > vol->mftmirr_na->initialized_size >>
+				vol->mft_record_size_bits) {
+			errno = ESPIPE;
+			ntfs_log_perror("Trying to write non-allocated mftmirr"
+				" records (%lld > %lld)", (long long)m + cnt,
+				(long long)vol->mftmirr_na->initialized_size >>
+				vol->mft_record_size_bits);
+			return -1;
+		}
 		bmirr = ntfs_malloc(cnt * vol->mft_record_size);
 		if (!bmirr)
 			return -1;
@@ -210,11 +219,26 @@ int ntfs_mft_records_write(const ntfs_volume *vol, const MFT_REF mref,
 	return -1;
 }
 
+/*
+ *		Check the consistency of an MFT record
+ *
+ *	Make sure its general fields are safe, then examine all its
+ *	attributes and apply generic checks to them.
+ *	The attribute checks are skipped when a record is being read in
+ *	order to collect its sequence number for creating a new record.
+ *
+ *	Returns 0 if the checks are successful
+ *		-1 with errno = EIO otherwise
+ */
+
 int ntfs_mft_record_check(const ntfs_volume *vol, const MFT_REF mref, 
 			  MFT_RECORD *m)
 {			  
 	ATTR_RECORD *a;
+	ATTR_TYPES previous_type;
 	int ret = -1;
+	u32 offset;
+	s32 space;
 	
 	if (!ntfs_is_file_record(m->magic)) {
 		if (!NVolNoFixupWarn(vol))
@@ -231,12 +255,56 @@ int ntfs_mft_record_check(const ntfs_volume *vol, const MFT_REF mref,
 			       le32_to_cpu(m->bytes_allocated));
 		goto err_out;
 	}
-	
+	if (!NVolNoFixupWarn(vol)
+	    && (le32_to_cpu(m->bytes_in_use) > vol->mft_record_size)) {
+		ntfs_log_error("Record %llu has corrupt in-use size "
+			       "(%u > %u)\n", (unsigned long long)MREF(mref),
+			       (int)le32_to_cpu(m->bytes_in_use),
+			       (int)vol->mft_record_size);
+		goto err_out;
+	}
+	if (le16_to_cpu(m->attrs_offset) & 7) {
+		ntfs_log_error("Attributes badly aligned in record %llu\n",
+			       (unsigned long long)MREF(mref));
+		goto err_out;
+	}
+
 	a = (ATTR_RECORD *)((char *)m + le16_to_cpu(m->attrs_offset));
 	if (p2n(a) < p2n(m) || (char *)a > (char *)m + vol->mft_record_size) {
 		ntfs_log_error("Record %llu is corrupt\n",
 			       (unsigned long long)MREF(mref));
 		goto err_out;
+	}
+
+	if (!NVolNoFixupWarn(vol)) {
+		offset = le16_to_cpu(m->attrs_offset);
+		space = le32_to_cpu(m->bytes_in_use) - offset;
+		a = (ATTR_RECORD*)((char*)m + offset);
+		previous_type = AT_STANDARD_INFORMATION;
+		while ((space >= (s32)offsetof(ATTR_RECORD, resident_end))
+		    && (a->type != AT_END)
+		    && (le32_to_cpu(a->type) >= le32_to_cpu(previous_type))) {
+			if ((le32_to_cpu(a->length) <= (u32)space)
+			    && !(le32_to_cpu(a->length) & 7)) {
+				if (!ntfs_attr_inconsistent(a, mref)) {
+					previous_type = a->type;
+					offset += le32_to_cpu(a->length);
+					space -= le32_to_cpu(a->length);
+					a = (ATTR_RECORD*)((char*)m + offset);
+				} else
+					goto err_out;
+			} else {
+				ntfs_log_error("Corrupted MFT record %llu\n",
+				       (unsigned long long)MREF(mref));
+				goto err_out;
+			}
+		}
+			/* We are supposed to reach an AT_END */
+		if ((space < 4) || (a->type != AT_END)) {
+			ntfs_log_error("Bad end of MFT record %llu\n",
+				       (unsigned long long)MREF(mref));
+			goto err_out;
+		}
 	}
 	
 	ret = 0;
@@ -1389,16 +1457,27 @@ ntfs_inode *ntfs_mft_rec_alloc(ntfs_volume *vol, BOOL mft_data)
 			 */
 		if (ext_ni) {
 			/*
-			 * Make sure record 15 is a base extent and has
-			 * no extents.
-			 * Also make sure it has no name : a base inode with
-			 * no extents and no name cannot be in use.
-			 * Otherwise apply standard procedure.
+			 * Make sure record 15 is a base extent and it has
+			 * no name. A base inode with no name cannot be in use.
+			 * The test based on base_mft_record fails for
+			 * extents of MFT, so we need a special check.
+			 * If already used, apply standard procedure.
 			 */
    			if (!ext_ni->mrec->base_mft_record
-			    && !ext_ni->nr_extents)
+			    && !ext_ni->mrec->link_count)
 				forced_mft_data = TRUE;
 			ntfs_inode_close(ext_ni);
+			/* Double-check, in case it is used for MFT */
+			if (forced_mft_data && base_ni->nr_extents) {
+				int i;
+
+				for (i=0; i<base_ni->nr_extents; i++) {
+					if (base_ni->extent_nis[i]
+					    && (base_ni->extent_nis[i]->mft_no
+							== FILE_mft_data))
+						forced_mft_data = FALSE;
+   				}
+			}
 		}
 	}
 	if (forced_mft_data)

@@ -189,6 +189,13 @@ static ntfs_inode *ntfs_inode_real_open(ntfs_volume *vol, const MFT_REF mref)
 					" %lld", (long long)MREF(mref));
 		goto put_err_out;
 	}
+	lthle = ctx->attr->value_length;
+	if (le32_to_cpu(lthle) < offsetof(STANDARD_INFORMATION, owner_id)) {
+		ntfs_log_error("Corrupt STANDARD_INFORMATION in base"
+			" record %lld\n",
+			(long long)MREF(mref));
+		goto put_err_out;
+	}
 	std_info = (STANDARD_INFORMATION *)((u8 *)ctx->attr +
 			le16_to_cpu(ctx->attr->value_offset));
 	ni->flags = std_info->file_attributes;
@@ -196,10 +203,9 @@ static ntfs_inode *ntfs_inode_real_open(ntfs_volume *vol, const MFT_REF mref)
 	ni->last_data_change_time = std_info->last_data_change_time;
 	ni->last_mft_change_time = std_info->last_mft_change_time;
 	ni->last_access_time = std_info->last_access_time;
-  		/* JPA insert v3 extensions if present */
-                /* length may be seen as 72 (v1.x) or 96 (v3.x) */
-	lthle = ctx->attr->length;
-	if (le32_to_cpu(lthle) > sizeof(STANDARD_INFORMATION)) {
+		/* Insert v3 extensions if present */
+		/* length may be seen as 48 (v1.x) or 72 (v3.x) */
+	if (le32_to_cpu(lthle) >= offsetof(STANDARD_INFORMATION, v3_end)) {
 		set_nino_flag(ni, v3_Extensions);
 		ni->owner_id = std_info->owner_id;
 		ni->security_id = std_info->security_id;
@@ -225,9 +231,9 @@ static ntfs_inode *ntfs_inode_real_open(ntfs_volume *vol, const MFT_REF mref)
 	l = ntfs_get_attribute_value_length(ctx->attr);
 	if (!l)
 		goto put_err_out;
-	if (l > 0x40000) {
+	if ((u64)l > 0x40000) {
 		errno = EIO;
-		ntfs_log_perror("Too large attrlist attribute (%lld), inode "
+		ntfs_log_perror("Too large attrlist attribute (%llu), inode "
 				"%lld", (long long)l, (long long)MREF(mref));
 		goto put_err_out;
 	}
@@ -760,13 +766,13 @@ static int ntfs_inode_sync_standard_information(ntfs_inode *ni)
 
 		/* JPA update v3.x extensions, ensuring consistency */
 
-	lthle = ctx->attr->length;
+	lthle = ctx->attr->value_length;
 	lth = le32_to_cpu(lthle);
 	if (test_nino_flag(ni, v3_Extensions)
-	    && (lth <= sizeof(STANDARD_INFORMATION)))
+	    && (lth < offsetof(STANDARD_INFORMATION, v3_end)))
 		ntfs_log_error("bad sync of standard information\n");
 
-	if (lth > sizeof(STANDARD_INFORMATION)) {
+	if (lth >= offsetof(STANDARD_INFORMATION, v3_end)) {
 		std_info->owner_id = ni->owner_id;
 		std_info->security_id = ni->security_id;
 		std_info->quota_charged = ni->quota_charged;
@@ -837,7 +843,7 @@ static int ntfs_inode_sync_file_name(ntfs_inode *ni, ntfs_inode *dir_ni)
 			if (!err)
 				err = errno;
 			ntfs_log_perror("Failed to open inode %lld with index",
-				(long long)le64_to_cpu(fn->parent_directory));
+				(long long)MREF_LE(fn->parent_directory));
 			continue;
 		}
 		ictx = ntfs_index_ctx_get(index_ni, NTFS_INDEX_I30, 4);
@@ -1518,14 +1524,16 @@ int ntfs_inode_set_times(ntfs_inode *ni, const char *value, size_t size,
 	ntfs_attr_search_ctx *ctx;
 	STANDARD_INFORMATION *std_info;
 	FILE_NAME_ATTR *fn;
-	const u64 *times;
+	u64 times[4];
 	ntfs_time now;
 	int cnt;
 	int ret;
 
 	ret = -1;
 	if ((size >= 8) && !(flags & XATTR_CREATE)) {
-		times = (const u64*)value;
+		/* Copy, to avoid alignment issue encountered on ARM */
+		memcpy(times, value,
+			(size < sizeof(times) ? size : sizeof(times)));
 		now = ntfs_current_time();
 			/* update the standard information attribute */
 		ctx = ntfs_attr_get_search_ctx(ni, NULL);

@@ -1847,14 +1847,14 @@ static __inline__ int ntfs_win32_blksszget(struct ntfs_device *dev,int *argp)
 	return -1;
 }
 
-static int ntfs_device_win32_ioctl(struct ntfs_device *dev, int request,
-		void *argp)
+static int ntfs_device_win32_ioctl(struct ntfs_device *dev,
+		unsigned long request, void *argp)
 {
 #if defined(BLKGETSIZE) | defined(BLKGETSIZE64)
 	win32_fd *fd = (win32_fd *)dev->d_private;
 #endif
 
-	ntfs_log_trace("win32_ioctl(%d) called.\n", request);
+	ntfs_log_trace("win32_ioctl(0x%lx) called.\n", request);
 	switch (request) {
 #if defined(BLKGETSIZE)
 	case BLKGETSIZE:
@@ -1897,7 +1897,7 @@ static int ntfs_device_win32_ioctl(struct ntfs_device *dev, int request,
 		return 0;
 #endif
 	default:
-		ntfs_log_debug("unimplemented ioctl %d.\n", request);
+		ntfs_log_debug("unimplemented ioctl 0x%lx.\n", request);
 		errno = EOPNOTSUPP;
 		return -1;
 	}

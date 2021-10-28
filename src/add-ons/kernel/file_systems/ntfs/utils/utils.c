@@ -5,6 +5,7 @@
  * Copyright (c) 2003-2006 Anton Altaparmakov
  * Copyright (c) 2003 Lode Leroy
  * Copyright (c) 2005-2007 Yura Pakhuchiy
+ * Copyright (c) 2014      Jean-Pierre Andre
  *
  * A set of shared functions for ntfs utilities
  *
@@ -74,7 +75,7 @@
 #include "logging.h"
 #include "misc.h"
 
-const char *ntfs_bugs = "Developers' email address: "NTFS_DEV_LIST"\n";
+const char *ntfs_bugs = "Developers' email address: " NTFS_DEV_LIST "\n";
 const char *ntfs_gpl = "This program is free software, released under the GNU "
 	"General Public License\nand you are welcome to redistribute it under "
 	"certain conditions.  It comes with\nABSOLUTELY NO WARRANTY; for "
@@ -210,7 +211,7 @@ int utils_valid_device(const char *name, int force)
 	unsigned long mnt_flags = 0;
 	struct stat st;
 
-#ifdef __CYGWIN32__
+#if defined(HAVE_WINDOWS_H) | defined(__CYGWIN32__) 
 	/* FIXME: This doesn't work for Cygwin, so just return success. */
 	return 1;
 #endif
@@ -365,9 +366,13 @@ int utils_parse_size(const char *value, s64 *size, BOOL scale)
 	if (scale) {
 		switch (suffix[0]) {
 			case 't': case 'T': result *= 1000;
+				/* FALLTHRU */
 			case 'g': case 'G': result *= 1000;
+				/* FALLTHRU */
 			case 'm': case 'M': result *= 1000;
+				/* FALLTHRU */
 			case 'k': case 'K': result *= 1000;
+				/* FALLTHRU */
 			case '-': case 0:
 				break;
 			default:
@@ -421,7 +426,8 @@ int utils_parse_range(const char *string, s64 *start, s64 *finish, BOOL scale)
 	if (middle) {
 		if (middle[1] == 0) {
 			b = LONG_MAX;		// XXX ULLONG_MAX
-			ntfs_log_debug("Range has no end, defaulting to %lld.\n", b);
+			ntfs_log_debug("Range has no end, defaulting to "
+					"%lld.\n", (long long)b);
 		} else {
 			if (!utils_parse_size(middle+1, &b, scale))
 				return 0;
@@ -430,7 +436,8 @@ int utils_parse_range(const char *string, s64 *start, s64 *finish, BOOL scale)
 		b = a;
 	}
 
-	ntfs_log_debug("Range '%s' = %lld - %lld\n", string, a, b);
+	ntfs_log_debug("Range '%s' = %lld - %lld\n", string, (long long)a,
+			(long long)b);
 
 	*start  = a;
 	*finish = b;
@@ -459,11 +466,11 @@ ATTR_RECORD * find_attribute(const ATTR_TYPES type, ntfs_attr_search_ctx *ctx)
 	}
 
 	if (ntfs_attr_lookup(type, NULL, 0, 0, 0, NULL, 0, ctx) != 0) {
-		ntfs_log_debug("find_attribute didn't find an attribute of type: 0x%02x.\n", type);
+		ntfs_log_debug("find_attribute didn't find an attribute of type: 0x%02x.\n", le32_to_cpu(type));
 		return NULL;	/* None / no more of that type */
 	}
 
-	ntfs_log_debug("find_attribute found an attribute of type: 0x%02x.\n", type);
+	ntfs_log_debug("find_attribute found an attribute of type: 0x%02x.\n", le32_to_cpu(type));
 	return ctx->attr;
 }
 
@@ -500,9 +507,9 @@ ATTR_RECORD * find_first_attribute(const ATTR_TYPES type, MFT_RECORD *mft)
 	rec = find_attribute(type, ctx);
 	ntfs_attr_put_search_ctx(ctx);
 	if (rec)
-		ntfs_log_debug("find_first_attribute: found attr of type 0x%02x.\n", type);
+		ntfs_log_debug("find_first_attribute: found attr of type 0x%02x.\n", le32_to_cpu(type));
 	else
-		ntfs_log_debug("find_first_attribute: didn't find attr of type 0x%02x.\n", type);
+		ntfs_log_debug("find_first_attribute: didn't find attr of type 0x%02x.\n", le32_to_cpu(type));
 	return rec;
 }
 
@@ -660,7 +667,7 @@ int utils_attr_get_name(ntfs_volume *vol, ATTR_RECORD *attr, char *buffer, int b
 		}
 		len = snprintf(buffer, bufsize, "%s", name);
 	} else {
-		ntfs_log_error("Unknown attribute type 0x%02x\n", attr->type);
+		ntfs_log_error("Unknown attribute type 0x%02x\n", le32_to_cpu(attr->type));
 		len = snprintf(buffer, bufsize, "<UNKNOWN>");
 	}
 
@@ -678,7 +685,8 @@ int utils_attr_get_name(ntfs_volume *vol, ATTR_RECORD *attr, char *buffer, int b
 
 	name    = NULL;
 	namelen = attr->name_length;
-	if (ntfs_ucstombs((ntfschar *)((char *)attr + attr->name_offset),
+	if (ntfs_ucstombs((ntfschar *)((char *)attr
+					+ le16_to_cpu(attr->name_offset)),
 				namelen, &name, 0) < 0) {
 		ntfs_log_error("Couldn't translate attribute name to current "
 				"locale.\n");
@@ -813,7 +821,9 @@ int utils_mftrec_in_use(ntfs_volume *vol, MFT_REF mref)
 
 	bit  = 1 << (mref & 7);
 	byte = (mref >> 3) & (sizeof(buffer) - 1);
-	ntfs_log_debug("cluster = %lld, bmpmref = %lld, byte = %d, bit = %d, in use %d\n", mref, bmpmref, byte, bit, buffer[byte] & bit);
+	ntfs_log_debug("cluster = %lld, bmpmref = %lld, byte = %d, bit = %d, "
+			"in use %d\n", (long long) mref, (long long) bmpmref,
+			byte, bit, buffer[byte] & bit);
 
 	return (buffer[byte] & bit);
 }
@@ -1140,4 +1150,89 @@ int mft_next_record(struct mft_search_ctx *ctx)
 	return (ctx->inode == NULL);
 }
 
+#ifdef HAVE_WINDOWS_H
 
+/*
+ *		Translate formats for older Windows
+ *
+ *	Up to Windows XP, msvcrt.dll does not support long long format
+ *	specifications (%lld, %llx, etc). We have to translate them
+ *	to %I64.
+ */
+
+char *ntfs_utils_reformat(char *out, int sz, const char *fmt)
+{
+	const char *f;
+	char *p;
+	int i;
+	enum { F_INIT, F_PERCENT, F_FIRST } state;
+
+	i = 0;
+	f = fmt;
+	p = out;
+	state = F_INIT;
+	while (*f && ((i + 3) < sz)) {
+		switch (state) {
+		case F_INIT :
+			if (*f == '%')
+				state = F_PERCENT;
+			*p++ = *f++;
+			i++;
+			break;
+		case F_PERCENT :
+			if (*f == 'l') {
+				state = F_FIRST;
+				f++;
+			} else {
+				if (((*f < '0') || (*f > '9'))
+				    && (*f != '*') && (*f != '-'))
+					state = F_INIT;
+				*p++ = *f++;
+				i++;
+			}
+			break;
+		case F_FIRST :
+			if (*f == 'l') {
+				*p++ = 'I';
+				*p++ = '6';
+				*p++ = '4';
+				f++;
+				i += 3;
+			} else {
+				*p++ = 'l';
+				*p++ = *f++;
+				i += 2;
+			}
+			state = F_INIT;
+			break;
+		}
+	}
+	*p++ = 0;
+	return (out);
+}
+
+/*
+ *		Translate paths to files submitted from Windows
+ *
+ *	Translate Windows directory separators to Unix ones
+ *
+ *	Returns the translated path, to be freed by caller
+ *		NULL if there was an error, with errno set
+ */
+
+char *ntfs_utils_unix_path(const char *in)
+{
+	char *out;
+	int i;
+
+	out = strdup(in);
+	if (out) {
+		for (i=0; in[i]; i++)
+			if (in[i] == '\\')
+				out[i] = '/';
+	} else
+		errno = ENOMEM;
+	return (out);
+}
+
+#endif

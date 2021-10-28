@@ -3062,13 +3062,13 @@ BOOL ntfs_allowed_as_owner(struct SECURITY_CONTEXT *scx, ntfs_inode *ni)
 				free(oldattr);
 			}
 		}
-		allowed = FALSE;
-		if (gotowner) {
 /* TODO : use CAP_FOWNER process capability */
-			if (!processuid || (processuid == uid))
-				allowed = TRUE;
-			else
-				errno = EPERM;
+		if (gotowner
+		    && (!processuid || (processuid == uid)))
+			allowed = TRUE;
+		else {
+			allowed = FALSE;
+			errno = EPERM;
 		}
 	}
 	return (allowed);

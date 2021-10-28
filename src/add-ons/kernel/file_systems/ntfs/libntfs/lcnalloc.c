@@ -368,12 +368,14 @@ runlist *ntfs_cluster_alloc(ntfs_volume *vol, VCN start_vcn, s64 count,
 			/* Allocate the bitmap bit. */
 			*byte |= bit;
 			writeback = 1;
-			if (vol->free_clusters <= 0) 
-				ntfs_log_error("Non-positive free clusters "
-					       "(%lld)!\n",
+			if (NVolFreeSpaceKnown(vol)) {
+				if (vol->free_clusters <= 0)
+					ntfs_log_error("Non-positive free"
+					       " clusters (%lld)!\n",
 						(long long)vol->free_clusters);
-			else	
-				vol->free_clusters--; 
+				else	
+					vol->free_clusters--;
+			}
 			
 			/*
 			 * Coalesce with previous run if adjacent LCNs.
@@ -602,7 +604,8 @@ int ntfs_cluster_free_from_rl(ntfs_volume *vol, runlist *rl)
 	ret = 0;
 out:
 	vol->free_clusters += nr_freed; 
-	if (vol->free_clusters > vol->nr_clusters)
+	if (NVolFreeSpaceKnown(vol)
+	    && (vol->free_clusters > vol->nr_clusters))
 		ntfs_log_error("Too many free clusters (%lld > %lld)!",
 			       (long long)vol->free_clusters, 
 			       (long long)vol->nr_clusters);
