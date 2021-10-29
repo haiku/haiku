@@ -39,6 +39,10 @@
 #endif
 
 
+#define PAGEDIR_SIZE	ARM_MMU_L1_TABLE_SIZE
+#define PAGEDIR_ALIGN	(4 * B_PAGE_SIZE)
+
+
 ARMVMTranslationMap32Bit::ARMVMTranslationMap32Bit()
 	:
 	fPagingStructures(NULL)
@@ -97,7 +101,7 @@ ARMVMTranslationMap32Bit::Init(bool kernel)
 
 		// allocate the page directory
 		page_directory_entry* virtualPageDir = (page_directory_entry*)memalign(
-			B_PAGE_SIZE, B_PAGE_SIZE);
+			PAGEDIR_ALIGN, PAGEDIR_SIZE);
 		if (virtualPageDir == NULL)
 			return B_NO_MEMORY;
 
