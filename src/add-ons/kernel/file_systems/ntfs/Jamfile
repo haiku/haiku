@@ -11,6 +11,12 @@ SubDirC++Flags -DHAVE_CONFIG_H=1 ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) utils ] ;
 
 KernelAddon ntfs :
+	kernel_interface.cpp
+	lowntfs.c
+
+	DeviceOpener.cpp
+	#mime_ext_table.c
+
 	attrdef.c
 	sd.c
 	boot.c
@@ -20,7 +26,7 @@ KernelAddon ntfs :
 	libntfs.a
 	;
 
-SEARCH on [ FGristFiles mime_ext_table.c ]
+SEARCH on [ FGristFiles DeviceOpener.cpp mime_ext_table.c ]
 	+= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems shared ] ;
 
 SubInclude HAIKU_TOP src add-ons kernel file_systems ntfs libntfs ;

@@ -3,6 +3,33 @@
 #define	major(x) ((int)(0x00ff & ((x) >> 8)))
 #define	minor(x) ((int)(0xffff00ff & (x)))
 #define	makedev(maj,min) ((0xff00 & ((maj)<<8)) | (0xffff00ff & (min)))
+
+// override bool
+#define _WINDEF_H
+#ifndef __cplusplus
+#include <stdbool.h>
+#endif
+typedef bool BOOL;
+#ifndef __cplusplus
+#ifndef FALSE
+#define FALSE 0
+#endif
+#ifndef NO
+#define NO 0
+#endif
+#ifndef ZERO
+#define ZERO 0
+#endif
+#ifndef TRUE
+#define TRUE 1
+#endif
+#ifndef YES
+#define YES 1
+#endif
+#ifndef ONE
+#define ONE 1
+#endif
+#endif
 #endif
 
 /* config.h.  Generated from config.h.in by configure.  */
