@@ -54,7 +54,8 @@ is_mode_supported(display_mode* mode)
 {
 	vesa_mode* modes = gInfo->vesa_modes;
 
-	if (gInfo->shared_info->bios_type == kIntelBiosType) {
+	bios_type_enum type = gInfo->shared_info->bios_type;
+	if (type == kIntelBiosType || type == kAtomBiosType1 || type == kAtomBiosType2) {
 		// We know how to patch the BIOS, so we can set any mode we want
 		return true;
 	}
@@ -157,7 +158,8 @@ vesa_propose_display_mode(display_mode* target, const display_mode* low,
 		return B_OK;
 	}
 
-	if (gInfo->shared_info->bios_type == kIntelBiosType) {
+	bios_type_enum type = gInfo->shared_info->bios_type;
+	if (type == kIntelBiosType || type == kAtomBiosType1 || type == kAtomBiosType2) {
 		// The driver says it knows the BIOS type, and therefore how to patch it to apply custom
 		// modes. However, it only knows how to do so for 32bit modes.
 		// TODO: for nVidia there is actually an hardcoded list of possible modes (because no one
