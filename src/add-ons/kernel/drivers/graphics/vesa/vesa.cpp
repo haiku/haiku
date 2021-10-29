@@ -24,6 +24,12 @@
 #include "atombios.h"
 
 
+#define LINEAR_ADDRESS(segment, offset) \
+	        (((addr_t)(segment) << 4) + (addr_t)(offset))
+#define SEGMENTED_TO_LINEAR(segmented) \
+	        LINEAR_ADDRESS((addr_t)(segmented) >> 16, (addr_t)(segmented) & 0xffff)
+
+
 static bios_module_info* sBIOSModule;
 
 
@@ -194,17 +200,11 @@ vbe_to_system_dpms(uint8 vbeMode)
 
 
 static status_t
-vbe_get_dpms_capabilities(uint32& vbeMode, uint32& mode)
+vbe_get_dpms_capabilities(bios_state* state, uint32& vbeMode, uint32& mode)
 {
 	// we always return a valid mode
 	vbeMode = 0;
 	mode = B_DPMS_ON;
-
-	// Prepare BIOS environment
-	bios_state* state;
-	status_t status = vbe_call_prepare(&state);
-	if (status != B_OK)
-		return status;
 
 	bios_regs regs = {};
 	regs.eax = 0x4f10;
@@ -212,25 +212,21 @@ vbe_get_dpms_capabilities(uint32& vbeMode, uint32& mode)
 	regs.esi = 0;
 	regs.edi = 0;
 
-	status = sBIOSModule->interrupt(state, 0x10, &regs);
+	status_t status = sBIOSModule->interrupt(state, 0x10, &regs);
 	if (status != B_OK) {
 		dprintf(DEVICE_NAME ": vbe_get_dpms_capabilities(): BIOS failed: %s\n",
 			strerror(status));
-		goto out;
+		return status;
 	}
 
 	if ((regs.eax & 0xffff) != 0x4f) {
 		dprintf(DEVICE_NAME ": vbe_get_dpms_capabilities(): BIOS returned "
 			"0x%04" B_PRIx32 "\n", regs.eax & 0xffff);
-		status = B_ERROR;
-		goto out;
+		return B_ERROR;
 	}
 
 	vbeMode = regs.ebx >> 8;
 	mode = vbe_to_system_dpms(vbeMode);
-
-out:
-	vbe_call_finish(state);
 	return status;
 }
 
@@ -263,18 +259,33 @@ vbe_set_bits_per_gun(bios_state* state, vesa_info& info, uint8 bits)
 
 
 static status_t
-vbe_set_bits_per_gun(vesa_info& info, uint8 bits)
+vbe_get_vesa_info(bios_state* state, vesa_info& info)
 {
-	info.bits_per_gun = 6;
+	vbe_info_block* infoHeader = (vbe_info_block*)sBIOSModule->allocate_mem(state, 256);
+	phys_addr_t physicalAddress = sBIOSModule->physical_address(state, infoHeader);
 
-	bios_state* state;
-	status_t status = vbe_call_prepare(&state);
-	if (status != B_OK)
+	bios_regs regs = {};
+	regs.eax = 0x4f00;
+	regs.es  = physicalAddress >> 4;
+	regs.edi = physicalAddress - (regs.es << 4);
+
+	status_t status = sBIOSModule->interrupt(state, 0x10, &regs);
+	if (status != B_OK) {
+		dprintf(DEVICE_NAME ": vbe_get_vesa_info(): BIOS failed: %s\n",
+			strerror(status));
 		return status;
+	}
 
-	status = vbe_set_bits_per_gun(state, info, bits);
+	if ((regs.eax & 0xffff) != 0x4f) {
+		dprintf(DEVICE_NAME ": vbe_get_vesa_info(): BIOS returned "
+			"0x%04" B_PRIx32 "\n", regs.eax & 0xffff);
+		return B_ERROR;
+	}
 
-	vbe_call_finish(state);
+	info.shared_info->vram_size = infoHeader->total_memory * 65536;
+	strlcpy(info.shared_info->name, (char*)sBIOSModule->virtual_address(state,
+			SEGMENTED_TO_LINEAR(infoHeader->oem_string)), 32);
+
 	return status;
 }
 
@@ -284,15 +295,8 @@ vbe_set_bits_per_gun(vesa_info& info, uint8 bits)
  * manufacturer didn't allow.
  */
 static void
-vbe_identify_bios(vesa_shared_info* sharedInfo)
+vbe_identify_bios(bios_state* state, vesa_shared_info* sharedInfo)
 {
-	// TODO vbe_call_prepare/vbe_call_finish is a costly operation (loading and unloading the
-	// BIOS module all the time). We should try to do it less often.
-	bios_state* state;
-	status_t status = vbe_call_prepare(&state);
-	if (status != B_OK)
-		return;
-
 	// Get a pointer to the BIOS
 	const uintptr_t kBiosBase = 0xc0000;
 	uint8_t* bios = (uint8_t*)sBIOSModule->virtual_address(state, kBiosBase);
@@ -333,8 +337,6 @@ vbe_identify_bios(vesa_shared_info* sharedInfo)
 	} else {
 		dprintf(DEVICE_NAME ": unknown BIOS type, custom video modes will not be available\n");
 	}
-
-	vbe_call_finish(state);
 }
 
 
@@ -464,12 +466,19 @@ vesa_init(vesa_info& info)
 		memcpy(&sharedInfo.edid_info, edidInfo, sizeof(edid1_info));
 	}
 
-	vbe_identify_bios(&sharedInfo);
+	bios_state* state;
+	status_t status = vbe_call_prepare(&state);
+	if (status != B_OK)
+		return status;
 
-	vbe_get_dpms_capabilities(info.vbe_dpms_capabilities,
+	vbe_identify_bios(state, &sharedInfo);
+
+	vbe_get_dpms_capabilities(state, info.vbe_dpms_capabilities,
 		sharedInfo.dpms_capabilities);
 	if (bufferInfo->depth <= 8)
-		vbe_set_bits_per_gun(info, 8);
+		vbe_set_bits_per_gun(state, info, 8);
+
+	vbe_call_finish(state);
 
 	dprintf(DEVICE_NAME ": vesa_init() completed successfully!\n");
 	return B_OK;

@@ -52,6 +52,9 @@ struct vesa_shared_info {
 		// Atombios only: offset to the table of video modes in the bios, used for patching in
 		// extra video modes.
 	uint32			dpms_capabilities;
+
+	char			name[32];
+	uint32			vram_size;
 };
 
 //----------------- ioctl() interface ----------------
