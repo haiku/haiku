@@ -108,7 +108,7 @@ wait_for_clk(const i2c_bus *bus, bigtime_t timeout)
 			return B_OK;
 
 		if (system_time() - startTime > timeout) {
-			TRACE("%s: Timeout waiting on clock (r)\n");
+			TRACE("%s: Timeout waiting on clock (r)\n", __func__);
 			return B_TIMEOUT;
 		}
 
