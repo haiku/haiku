@@ -1318,10 +1318,8 @@ DigitalDisplayInterface::IsConnected()
 	TRACE("%s: %s Maximum Lanes: %" B_PRId8 "\n", __func__,
 		PortName(), fMaxLanes);
 
-	//since EDID is not correctly implemented yet for this connection type we'll do without it for now
-	//return HasEDID();
-	TRACE("%s: %s link detected\n", __func__, PortName());
-	return true;
+	//DDI and also its EDID do not work yet, we fail on purpose as a workaround for now
+	return HasEDID();
 }
 
 
