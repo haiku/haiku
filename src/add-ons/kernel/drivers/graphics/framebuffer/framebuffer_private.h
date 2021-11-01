@@ -3,8 +3,8 @@
  * Copyright 2016, Jessica Hamilton, jessica.l.hamilton@gmail.com.
  * Distributed under the terms of the MIT License.
  */
-#ifndef VESA_PRIVATE_H
-#define VESA_PRIVATE_H
+#ifndef FRAMEBUFFER_PRIVATE_H
+#define FRAMEBUFFER_PRIVATE_H
 
 
 #include <Drivers.h>
@@ -32,4 +32,4 @@ struct framebuffer_info {
 extern status_t framebuffer_init(framebuffer_info& info);
 extern void framebuffer_uninit(framebuffer_info& info);
 
-#endif	/* VESA_PRIVATE_H */
+#endif	/* FRAMEBUFFER_PRIVATE_H */
