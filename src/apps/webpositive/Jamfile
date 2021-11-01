@@ -70,10 +70,10 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		Application WebPositive :
 			$(sources)
 			:
+			bnetapi [ MultiArchDefaultGristFiles libnetservices.a libcolumnlistview.a ]
 			[ BuildFeatureAttribute webkit : libraries ]
 			[ TargetLibstdc++ ] localestub shared
-			[ MultiArchDefaultGristFiles libcolumnlistview.a ]
-			be network libnetservices.a tracker translation
+			be network tracker translation
 			:
 			WebPositive.rdef
 			;
