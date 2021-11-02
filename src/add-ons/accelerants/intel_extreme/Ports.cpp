@@ -291,18 +291,22 @@ Port::_SetI2CSignals(void* cookie, int clock, int data)
 		value = read32(ioRegister) & I2C_RESERVED;
 	}
 
+	// if we send clk or data, we always send low logic level;
+	// if we want to send high level, we actually receive and let the
+	// external pullup resistors create the high level on the bus.
+	value |= I2C_DATA_VALUE_MASK;  //sets data = 0, always latch
+	value |= I2C_CLOCK_VALUE_MASK; //sets clock = 0, always latch
+
 	if (data != 0)
 		value |= I2C_DATA_DIRECTION_MASK;
 	else {
-		value |= I2C_DATA_DIRECTION_MASK | I2C_DATA_DIRECTION_OUT
-			| I2C_DATA_VALUE_MASK;
+		value |= I2C_DATA_DIRECTION_MASK | I2C_DATA_DIRECTION_OUT;
 	}
 
 	if (clock != 0)
 		value |= I2C_CLOCK_DIRECTION_MASK;
 	else {
-		value |= I2C_CLOCK_DIRECTION_MASK | I2C_CLOCK_DIRECTION_OUT
-			| I2C_CLOCK_VALUE_MASK;
+		value |= I2C_CLOCK_DIRECTION_MASK | I2C_CLOCK_DIRECTION_OUT;
 	}
 
 	write32(ioRegister, value);
@@ -1142,10 +1146,12 @@ DisplayPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 		PanelFitter* fitter = fPipe->PFT();
 		if (fitter != NULL)
 			fitter->Enable(*target);
-		FDILink* link = fPipe->FDI();
-		if (link != NULL)
-			link->Train(target);
-
+		// skip FDI if it doesn't exist
+		if (gInfo->shared_info->device_type.Generation() <= 8) {
+			FDILink* link = fPipe->FDI();
+			if (link != NULL)
+				link->Train(target);
+		}
 		pll_divisors divisors;
 		compute_pll_divisors(target, &divisors, false);
 
@@ -1192,6 +1198,7 @@ EmbeddedDisplayPort::IsConnected()
 	TRACE("%s: %s PortRegister: 0x%" B_PRIxADDR "\n", __func__, PortName(),
 		portRegister);
 
+	// fixme: Skylake and up use eDP for a seperate active VGA converter chip sometimes.
 	if (!gInfo->shared_info->device_type.IsMobile()) {
 		TRACE("%s: skipping eDP on non-mobile GPU\n", __func__);
 		return false;
@@ -1249,7 +1256,17 @@ DigitalDisplayInterface::_PortRegister()
 addr_t
 DigitalDisplayInterface::_DDCRegister()
 {
-	// TODO: No idea, does DDI have DDC?
+	switch (PortIndex()) {
+		case INTEL_PORT_B:
+			return INTEL_I2C_IO_E;
+		case INTEL_PORT_C:
+			return INTEL_I2C_IO_D;
+		case INTEL_PORT_D:
+			return INTEL_I2C_IO_F;
+		default:
+			return 0;
+	}
+
 	return 0;
 }
 
@@ -1257,6 +1274,10 @@ DigitalDisplayInterface::_DDCRegister()
 status_t
 DigitalDisplayInterface::Power(bool enabled)
 {
+	if (fPipe == NULL) {
+		ERROR("%s: Setting power without assigned pipe!\n", __func__);
+		return B_ERROR;
+	}
 	TRACE("%s: %s DDI enabled: %s\n", __func__, PortName(),
 		enabled ? "true" : "false");
 
@@ -1282,11 +1303,6 @@ DigitalDisplayInterface::IsConnected()
 
 	if (portRegister == 0)
 		return false;
-
-	if ((read32(portRegister) & DDI_INIT_DISPLAY_DETECTED) == 0) {
-		TRACE("%s: %s link not detected\n", __func__, PortName());
-		return false;
-	}
 
 	// Probe a little port info.
 	if ((read32(DDI_BUF_CTL_A) & DDI_A_4_LANES) != 0) {
@@ -1318,7 +1334,6 @@ DigitalDisplayInterface::IsConnected()
 	TRACE("%s: %s Maximum Lanes: %" B_PRId8 "\n", __func__,
 		PortName(), fMaxLanes);
 
-	//DDI and also its EDID do not work yet, we fail on purpose as a workaround for now
 	return HasEDID();
 }
 
@@ -1339,11 +1354,14 @@ DigitalDisplayInterface::SetDisplayMode(display_mode* target, uint32 colorMode)
 	PanelFitter* fitter = fPipe->PFT();
 	if (fitter != NULL)
 		fitter->Enable(target->timing);
-	// Skip FDI if we have a CPU connected display
-	if (PortIndex() != INTEL_PORT_A) {
-		FDILink* link = fPipe->FDI();
-		if (link != NULL)
-			link->Train(&target->timing);
+	// skip FDI if it doesn't exist
+	if (gInfo->shared_info->device_type.Generation() <= 8) {
+		// Skip FDI if we have a CPU connected display
+		if (PortIndex() != INTEL_PORT_A) {
+			FDILink* link = fPipe->FDI();
+			if (link != NULL)
+				link->Train(&target->timing);
+		}
 	}
 
 	pll_divisors divisors;

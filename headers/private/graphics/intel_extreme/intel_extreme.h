@@ -847,7 +847,7 @@ struct intel_free_graphics_memory {
 
 #define SNB_DPLL_SEL					(0x7000 | REGS_SOUTH_SHARED)
 
-// i2c
+// i2c bit banging interface
 #define INTEL_I2C_IO_A					(0x5010 | REGS_SOUTH_SHARED)
 #define INTEL_I2C_IO_B					(0x5014 | REGS_SOUTH_SHARED)
 #define INTEL_I2C_IO_C					(0x5018 | REGS_SOUTH_SHARED)
@@ -856,6 +856,9 @@ struct intel_free_graphics_memory {
 #define INTEL_I2C_IO_F					(0x5024 | REGS_SOUTH_SHARED)
 #define INTEL_I2C_IO_G					(0x5028 | REGS_SOUTH_SHARED)
 #define INTEL_I2C_IO_H					(0x502c | REGS_SOUTH_SHARED)
+// i2c hardware controller
+#define INTEL_GMBUS0					(0x5100 | REGS_SOUTH_SHARED)
+#define INTEL_GMBUS4					(0x5110 | REGS_SOUTH_SHARED)
 
 #define I2C_CLOCK_DIRECTION_MASK		(1 << 0)
 #define I2C_CLOCK_DIRECTION_OUT			(1 << 1)
@@ -868,6 +871,15 @@ struct intel_free_graphics_memory {
 #define I2C_DATA_VALUE_OUT				(1 << 11)
 #define I2C_DATA_VALUE_IN				(1 << 12)
 #define I2C_RESERVED					((1 << 13) | (1 << 5))
+
+// gpu block clock gating disable bits
+#define INTEL_DSPCLK_GATE_D				(0x2020 | REGS_SOUTH_SHARED)
+#define PCH_GMBUSUNIT_CLK_GATE_DIS		(1UL << 31)
+#define INTEL_GEN9_CLKGATE_DIS_4		(0x653c | REGS_NORTH_SHARED)
+#define BXT_GMBUSUNIT_CLK_GATE_DIS		(1 << 14)
+
+// gpu power wells
+#define INTEL_PWR_WELL_CTL_2			(0x5404 | REGS_NORTH_SHARED)
 
 // TODO: on IronLake this is in the north shared block at 0x41000
 #define INTEL_VGA_DISPLAY_CONTROL		(0x1400 | REGS_NORTH_PLANE_CONTROL)

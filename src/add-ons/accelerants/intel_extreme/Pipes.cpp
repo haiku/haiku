@@ -76,7 +76,8 @@ Pipe::Pipe(pipe_index pipeIndex)
 	// IvyBridge: Analog + Digital Ports behind FDI (on northbridge)
 	// Haswell: Only VGA behind FDI (on northbridge)
 	// SkyLake: FDI gone. No more northbridge video.
-	if (gInfo->shared_info->pch_info != INTEL_PCH_NONE) {
+	if ((gInfo->shared_info->pch_info != INTEL_PCH_NONE) &&
+		(gInfo->shared_info->device_type.Generation() <= 8)) {
 		TRACE("%s: Pipe %s routed through FDI\n", __func__,
 			(pipeIndex == INTEL_PIPE_A) ? "A" : "B");
 

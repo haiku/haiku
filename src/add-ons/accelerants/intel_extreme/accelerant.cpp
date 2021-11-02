@@ -255,6 +255,21 @@ probe_ports()
 	bool foundDDI = false;
 
 	gInfo->port_count = 0;
+#if 0
+	// make sure I2C hardware controller is off (we use bit-banging)
+	if (gInfo->shared_info->device_type.Generation() >= 5) {
+		write32(INTEL_DSPCLK_GATE_D,
+			read32(INTEL_DSPCLK_GATE_D) | PCH_GMBUSUNIT_CLK_GATE_DIS);
+		read32(INTEL_DSPCLK_GATE_D);
+
+		write32(INTEL_GEN9_CLKGATE_DIS_4,
+			read32(INTEL_GEN9_CLKGATE_DIS_4) | BXT_GMBUSUNIT_CLK_GATE_DIS);
+		read32(INTEL_GEN9_CLKGATE_DIS_4);
+
+		write32(INTEL_GMBUS0, 0); //reset, idle
+		write32(INTEL_GMBUS4, 0); //block interrupts
+	}
+#endif
 
 	// Display Port
 	if (!gInfo->shared_info->device_type.HasDDI()) {
@@ -272,9 +287,9 @@ probe_ports()
 		}
 	}
 
-	// Digital Display Interface
+	// Digital Display Interface (for DP, HDMI and DVI)
 	if (gInfo->shared_info->device_type.HasDDI()) {
-		for (int i = INTEL_PORT_A; i <= INTEL_PORT_E; i++) {
+		for (int i = INTEL_PORT_B; i <= INTEL_PORT_D; i++) {
 			TRACE("Probing DDI %d\n", i);
 
 			Port* ddiPort
@@ -292,6 +307,7 @@ probe_ports()
 	}
 
 	// Ensure DP_A isn't already taken (or DDI)
+	// Please note that Skylake and up use eDP for a seperate active VGA converter chip.
 	TRACE("Probing eDP\n");
 	if (!has_connected_port((port_index)INTEL_PORT_A, INTEL_PORT_TYPE_ANY)) {
 		// also always try eDP, it'll also just fail if not applicable
@@ -304,64 +320,72 @@ probe_ports()
 			delete eDPPort;
 	}
 
-	for (int i = INTEL_PORT_B; i <= INTEL_PORT_D; i++) {
-		TRACE("Probing HDMI %d\n", i);
-		if (has_connected_port((port_index)i, INTEL_PORT_TYPE_ANY)) {
-			// Ensure port not already claimed by something like DDI
-			TRACE("Port already claimed\n");
-			continue;
-		}
+	if (!gInfo->shared_info->device_type.HasDDI()) {
+		for (int i = INTEL_PORT_B; i <= INTEL_PORT_D; i++) {
+			TRACE("Probing HDMI %d\n", i);
+			if (has_connected_port((port_index)i, INTEL_PORT_TYPE_ANY)) {
+				// Ensure port not already claimed by something like DDI
+				TRACE("Port already claimed\n");
+				continue;
+			}
 
-		Port* hdmiPort = new(std::nothrow) HDMIPort((port_index)i);
-		if (hdmiPort == NULL)
-			return B_NO_MEMORY;
-
-		if (hdmiPort->IsConnected())
-			gInfo->ports[gInfo->port_count++] = hdmiPort;
-		else
-			delete hdmiPort;
-	}
-
-	// always try the LVDS port, it'll simply fail if not applicable
-	TRACE("Probing LVDS\n");
-	Port* lvdsPort = new(std::nothrow) LVDSPort();
-	if (lvdsPort == NULL)
-		return B_NO_MEMORY;
-	if (lvdsPort->IsConnected()) {
-		foundLVDS = true;
-		gInfo->ports[gInfo->port_count++] = lvdsPort;
-		gInfo->head_mode |= HEAD_MODE_LVDS_PANEL;
-		gInfo->head_mode |= HEAD_MODE_B_DIGITAL;
-	} else
-		delete lvdsPort;
-
-	if (!has_connected_port(INTEL_PORT_ANY, INTEL_PORT_TYPE_ANY)) {
-		TRACE("Probing DVI\n");
-		// there's neither DisplayPort nor HDMI so far, assume DVI B
-		for (port_index index = INTEL_PORT_B; index <= INTEL_PORT_C;
-				index = (port_index)(index + 1)) {
-			Port* dviPort = new(std::nothrow) DigitalPort(index, "DVI");
-			if (dviPort == NULL)
+			Port* hdmiPort = new(std::nothrow) HDMIPort((port_index)i);
+			if (hdmiPort == NULL)
 				return B_NO_MEMORY;
 
-			if (dviPort->IsConnected()) {
-				gInfo->ports[gInfo->port_count++] = dviPort;
-				gInfo->head_mode |= HEAD_MODE_B_DIGITAL;
-			} else
-				delete dviPort;
+			if (hdmiPort->IsConnected())
+				gInfo->ports[gInfo->port_count++] = hdmiPort;
+			else
+				delete hdmiPort;
 		}
 	}
 
-	// then finally always try the analog port
-	TRACE("Probing Analog\n");
-	Port* analogPort = new(std::nothrow) AnalogPort();
-	if (analogPort == NULL)
-		return B_NO_MEMORY;
-	if (analogPort->IsConnected()) {
-		gInfo->ports[gInfo->port_count++] = analogPort;
-		gInfo->head_mode |= HEAD_MODE_A_ANALOG;
-	} else
-		delete analogPort;
+	// always try the LVDS port when chipset supports it, it'll simply fail if not applicable
+	if (!gInfo->shared_info->device_type.HasDDI()) {
+		TRACE("Probing LVDS\n");
+		Port* lvdsPort = new(std::nothrow) LVDSPort();
+		if (lvdsPort == NULL)
+			return B_NO_MEMORY;
+		if (lvdsPort->IsConnected()) {
+			foundLVDS = true;
+			gInfo->ports[gInfo->port_count++] = lvdsPort;
+			gInfo->head_mode |= HEAD_MODE_LVDS_PANEL;
+			gInfo->head_mode |= HEAD_MODE_B_DIGITAL;
+		} else
+			delete lvdsPort;
+	}
+
+	if (!gInfo->shared_info->device_type.HasDDI()) {
+		if (!has_connected_port(INTEL_PORT_ANY, INTEL_PORT_TYPE_ANY)) {
+			TRACE("Probing DVI\n");
+			// there's neither DisplayPort nor HDMI so far, assume DVI B
+			for (port_index index = INTEL_PORT_B; index <= INTEL_PORT_C;
+					index = (port_index)(index + 1)) {
+				Port* dviPort = new(std::nothrow) DigitalPort(index, "DVI");
+				if (dviPort == NULL)
+					return B_NO_MEMORY;
+
+				if (dviPort->IsConnected()) {
+					gInfo->ports[gInfo->port_count++] = dviPort;
+					gInfo->head_mode |= HEAD_MODE_B_DIGITAL;
+				} else
+					delete dviPort;
+			}
+		}
+	}
+
+	// then finally always try the analog port when chipsets supports it
+	if (gInfo->shared_info->device_type.Generation() <= 8) {
+		TRACE("Probing Analog\n");
+		Port* analogPort = new(std::nothrow) AnalogPort();
+		if (analogPort == NULL)
+			return B_NO_MEMORY;
+		if (analogPort->IsConnected()) {
+			gInfo->ports[gInfo->port_count++] = analogPort;
+			gInfo->head_mode |= HEAD_MODE_A_ANALOG;
+		} else
+			delete analogPort;
+	}
 
 	if (gInfo->port_count == 0)
 		return B_ERROR;
