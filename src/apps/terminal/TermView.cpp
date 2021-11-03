@@ -698,6 +698,9 @@ TermView::SetTermColor(uint index, rgb_color color, bool dynamic)
 			fTextBackColor = color;
 			SetLowColor(fTextBackColor);
 			break;
+		case 12:
+			fCursorBackColor = color;
+			break;
 		case 110:
 			fTextForeColor = PrefHandler::Default()->getRGB(
 								PREF_TEXT_FORE_COLOR);
@@ -706,6 +709,10 @@ TermView::SetTermColor(uint index, rgb_color color, bool dynamic)
 			fTextBackColor = PrefHandler::Default()->getRGB(
 								PREF_TEXT_BACK_COLOR);
 			SetLowColor(fTextBackColor);
+			break;
+		case 112:
+			fCursorBackColor = PrefHandler::Default()->getRGB(
+								PREF_CURSOR_BACK_COLOR);
 			break;
 		default:
 			break;
