@@ -16,9 +16,9 @@ extraction:
         - zip
         - less
         - zlib1g-dev
+        - libzstd-dev
         - xorriso
         - libtool
-        - mtools
         - gcc-multilib
         - python3
     after_prepare:
