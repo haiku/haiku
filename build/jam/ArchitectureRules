@@ -499,6 +499,27 @@ rule KernelArchitectureSetup architecture
 							HAIKU_BOOT_$(bootTarget:U)_CCFLAGS += -maccumulate-outgoing-args ;
 							HAIKU_BOOT_$(bootTarget:U)_C++FLAGS += -maccumulate-outgoing-args ;
 						}
+					case arm :
+						HAIKU_BOOT_$(bootTarget:U)_CCFLAGS += -mfloat-abi=soft ;
+						HAIKU_BOOT_$(bootTarget:U)_C++FLAGS += -mfloat-abi=soft ;
+
+						# Remove any previous -mfloat-abi=hard setting from compiler flags
+						local fixedBootCCFlags ;
+						local fixedBootC++Flags ;
+						for flag in $(HAIKU_BOOT_CCFLAGS) {
+							if $(flag) = "-mfloat-abi=hard" {
+								continue ;
+							}
+							fixedBootCCFlags += $(flag) ;
+						}
+						for flag in $(HAIKU_BOOT_C++FLAGS) {
+							if $(flag) = "-mfloat-abi=hard" {
+								continue ;
+							}
+							fixedBootC++Flags += $(flag) ;
+						}
+						HAIKU_BOOT_CCFLAGS = $(fixedBootCCFlags) ;
+						HAIKU_BOOT_C++FLAGS = $(fixedBootC++Flags) ;
 				}
 				HAIKU_BOOT_$(bootTarget:U)_LDFLAGS = -Bstatic -Bsymbolic
 					-nostdlib -znocombreloc -no-undefined ;
