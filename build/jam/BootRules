@@ -101,6 +101,7 @@ rule SetupBoot
 		# override regular CCFLAGS/C++FLAGS, as we don't want them
 		TARGET_CCFLAGS_$(TARGET_KERNEL_ARCH) on $(object) = ;
 		TARGET_C++FLAGS_$(TARGET_KERNEL_ARCH) on $(object) = ;
+		TARGET_ASFLAGS_$(TARGET_KERNEL_ARCH) on $(object) = ;
 
 		# override warning flags
 		TARGET_WARNING_CCFLAGS_$(TARGET_KERNEL_ARCH) on $(object)
