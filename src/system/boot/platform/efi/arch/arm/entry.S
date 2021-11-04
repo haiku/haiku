@@ -26,6 +26,20 @@ FUNCTION(arch_enter_kernel):
 	mov		r0,r1	// kernelArgs
 	mov		r1,#0	// currentCPU=0
 
+	// enable full access for coprocessors P10, P11
+	// by setting the required flags in Access Control Register
+	MRC p15, #0, r9, c1, c0, #2
+	orr r9, r9, #0x00f00000
+	MCR p15, #0, r9, c1, c0, #2
+
+	// flush prefetch buffer
+	mov r9, #0
+	MCR p15, #0, r9, c7, c5, #4
+
+	// enable FPU
+	mov r9, #0x40000000
+	FMXR FPEXC, r9
+
 	// flush TLB
 	MCR p15, 0, r1, c8, c7, 0
 
