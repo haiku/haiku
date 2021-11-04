@@ -78,9 +78,12 @@ if [ IsPackageAvailable gcc_syslibs_devel ] {
 				libgcc_eh.a: $(developLibDir)/libgcc_eh.a
 				libgcc-kernel.a: $(developLibDir)/libgcc-kernel.a
 				libgcc_eh-kernel.a: $(developLibDir)/libgcc_eh.a
+				libgcc-boot.a: $(developLibDir)/libgcc-boot.a
+				libgcc_eh-boot.a: $(developLibDir)/libgcc_eh-boot.a
 				libstdc++.a: $(developLibDir)/libstdc++.a
 				libsupc++.a: $(developLibDir)/libsupc++.a
 				libsupc++-kernel.a: $(developLibDir)/libsupc++-kernel.a
+				libsupc++-boot.a: $(developLibDir)/libsupc++-boot.a
 				c++-headers: $(developHeadersDir)/c++
 				gcc-headers: $(developHeadersDir)/gcc
 			;

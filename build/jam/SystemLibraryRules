@@ -134,6 +134,12 @@ rule TargetBootLibsupc++ asPath
 		if $(asPath) = true {
 			flags += path ;
 		}
+		if $(TARGET_PACKAGING_ARCH) = arm {
+			return [
+				BuildFeatureAttribute gcc_syslibs_devel
+					: libsupc++-boot.a : $(flags)
+			] ;
+		}
 		return [
 			BuildFeatureAttribute gcc_syslibs_devel
 				: libsupc++-kernel.a : $(flags)
@@ -245,6 +251,12 @@ rule TargetBootLibgcc architecture : asPath
 		local flags ;
 		if $(asPath) = true {
 			flags += path ;
+		}
+		if $(architecture) = arm {
+			return [
+				BuildFeatureAttribute QUALIFIED $(architecture):gcc_syslibs_devel
+					: libgcc-boot.a : $(flags)
+			] ;
 		}
 		return [
 			BuildFeatureAttribute QUALIFIED $(architecture):gcc_syslibs_devel
