@@ -2,12 +2,8 @@ SubDir HAIKU_TOP src system boot arch arm ;
 
 UsePrivateHeaders [ FDirName kernel platform $(TARGET_BOOT_PLATFORM) ] ;
 
-# These must be recompiled due to differing wchar lengths in EFI
-local librootArchSources =
-	arch_string.S
-;
-
 local librootGenericSources =
+	memcpy.c
 	memset.c
 ;
 
@@ -51,9 +47,6 @@ for platform in [ MultiBootSubDirSetup u-boot efi ] {
 
 		SEARCH on [ FGristFiles $(kernelGenericDriverSources) ]
 			= [ FDirName $(HAIKU_TOP) src system kernel arch generic ] ;
-
-		SEARCH on [ FGristFiles $(librootArchSources) ]
-			= [ FDirName $(HAIKU_TOP) src system libroot posix string arch $(TARGET_ARCH) ] ;
 
 		SEARCH on [ FGristFiles $(librootGenericSources) ]
 			= [ FDirName $(HAIKU_TOP) src system libroot posix string arch generic ] ;
