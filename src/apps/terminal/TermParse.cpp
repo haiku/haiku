@@ -1571,6 +1571,10 @@ TermParse::_ProcessOperatingSystemControls(uchar* params)
 			{
 				int32 offset = mode - 10;
 				int32 count = 0;
+				if (strcmp((char*)params, "?") == 0) {
+					fBuffer->GetColor(mode);
+					break;
+				}
 				char* p = strtok((char*)params, ";");
 				do {
 					if (gXColorsTable.LookUpColor(p, &colors[count]) != B_OK) {
