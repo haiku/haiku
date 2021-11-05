@@ -38,6 +38,10 @@ local libFDTSources =
 	fdt_strerror.c
 	fdt_sw.c
 	fdt_wip.c
+	fdt_addresses.c
+	fdt_check.c
+	fdt_empty_tree.c
+	fdt_overlay.c
 	;
 
 local platform ;

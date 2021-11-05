@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-2-Clause) */
 LIBFDT_1.2 {
 	global:
 		fdt_next_node;
@@ -8,6 +9,7 @@ LIBFDT_1.2 {
 		fdt_get_mem_rsv;
 		fdt_subnode_offset_namelen;
 		fdt_subnode_offset;
+		fdt_path_offset_namelen;
 		fdt_path_offset;
 		fdt_get_name;
 		fdt_get_property_namelen;
@@ -18,6 +20,7 @@ LIBFDT_1.2 {
 		fdt_get_alias_namelen;
 		fdt_get_alias;
 		fdt_get_path;
+                fdt_header_size;
 		fdt_supernode_atdepth_offset;
 		fdt_node_depth;
 		fdt_parent_offset;
@@ -48,7 +51,32 @@ LIBFDT_1.2 {
 		fdt_strerror;
 		fdt_offset_ptr;
 		fdt_next_tag;
-
+		fdt_appendprop;
+		fdt_create_empty_tree;
+		fdt_first_property_offset;
+		fdt_get_property_by_offset;
+		fdt_getprop_by_offset;
+		fdt_next_property_offset;
+		fdt_first_subnode;
+		fdt_next_subnode;
+		fdt_address_cells;
+		fdt_size_cells;
+		fdt_stringlist_contains;
+		fdt_stringlist_count;
+		fdt_stringlist_search;
+		fdt_stringlist_get;
+		fdt_resize;
+		fdt_overlay_apply;
+		fdt_get_string;
+		fdt_find_max_phandle;
+		fdt_generate_phandle;
+		fdt_check_full;
+		fdt_setprop_placeholder;
+		fdt_property_placeholder;
+		fdt_header_size_;
+		fdt_appendprop_addrrange;
+		fdt_setprop_inplace_namelen_partial;
+		fdt_create_with_flags;
 	local:
 		*;
 };

@@ -463,7 +463,15 @@ dtb_set_kernel_args()
 	// pack into proper location if the architecture cares
 	if (sDtbTable != NULL) {
 		#if defined(__ARM__) || defined(__riscv)
-		gKernelArgs.arch_args.fdt = kernel_args_malloc(sDtbSize);
+
+		// FDT needs to be 8-byte aligned for libfdt
+		// TODO: we need kernel_args_malloc with alignment!
+		#define FDT_ALIGNMENT	8
+		#define FDT_ALIGN(addr)	(((addr) + FDT_ALIGNMENT - 1) & ~(FDT_ALIGNMENT - 1))
+		gKernelArgs.arch_args.fdt
+			= (void*)FDT_ALIGN((addr_t)kernel_args_malloc(sDtbSize
+				+ FDT_ALIGNMENT - 1));
+
 		if (gKernelArgs.arch_args.fdt != NULL)
 			memcpy(gKernelArgs.arch_args.fdt, sDtbTable, sDtbSize);
 		else
