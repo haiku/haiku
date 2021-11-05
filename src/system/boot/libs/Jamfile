@@ -63,6 +63,8 @@ for platform in [ MultiBootSubDirSetup ] {
 
 		# tune build for smaller size
 		DEFINES += HUF_FORCE_DECOMPRESS_X1 ZSTD_FORCE_DECOMPRESS_SEQUENCES_SHORT ;
+		# prevent weak symbols
+		DEFINES += ZSTD_HAVE_WEAK_SYMBOLS=0 ;
 
 		BootStaticLibrary [ MultiBootGristFiles boot_zstd ] :
 			$(zstdCommonSources) $(zstdDecSources)
