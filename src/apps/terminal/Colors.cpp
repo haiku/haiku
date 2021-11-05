@@ -289,18 +289,33 @@ XColorsTable::LookUpColor(const char* name, rgb_color* color)
 	if (name == NULL || color == NULL)
 		return B_BAD_DATA;
 
-	// first check for 'rgb:xxx/xxx/xxx'-encoded color names
-	const char magic[5] = "rgb:";
-	if (strncasecmp(name, magic, sizeof(magic) - 1) == 0) {
-		int r = 0, g = 0, b = 0;
-		if (sscanf(&name[4], "%x/%x/%x", &r, &g, &b) == 3) {
-			color->set_to(0xFF & r, 0xFF & g, 0xFF & b);
+	size_t length = strlen(name);
+
+	// first check for 'rgb:xx/xx/xx' or '#xxxxxx'-encoded color names
+	u_int r = 0, g = 0, b = 0;
+	float c = 0, m = 0, y = 0, k = 0;
+	if ((length == 12 && sscanf(name, "rgb:%02x/%02x/%02x", &r, &g, &b) == 3)
+		|| (length == 7 && sscanf(name, "#%02x%02x%02x", &r, &g, &b) == 3)) {
+		color->set_to(r, g, b);
+		return B_OK;
+	// then check for 'rgb:xxxx/xxxx/xxxx' or '#xxxxxxxxxxxx'-encoded color names
+	} else if ((length == 18 && sscanf(name, "rgb:%04x/%04x/%04x", &r, &g, &b) == 3)
+		|| (length == 13 && sscanf(name, "#%04x%04x%04x", &r, &g, &b) == 3)) {
+		color->set_to(r >> 8, g >> 8, b >> 8);
+		return B_OK;
+	// then check for 'cmyk:c.c/m.m/y.y/k.k' or 'cmy:c.c/m.m/y.y'-encoded color names
+	} else if (sscanf(name, "cmyk:%f/%f/%f/%f", &c, &m, &y, &k) == 4
+		|| sscanf(name, "cmy:%f/%f/%f", &c, &m, &y) == 3) {
+		if (c >= 0 && m >= 0 && y >= 0 && k >= 0
+			&& c <= 1 && m <= 1 && y <= 1 && k <= 1) {
+			color->set_to((1 - c) * (1 - k) * 255,
+				(1 - m) * (1 - k) * 255,
+				(1 - y) * (1 - k) * 255);
 			return B_OK;
 		}
-		// else - let the chance lookup in rgb.txt table. Is it reasonable??
 	}
 
-	// for non-'rgb:xxx/xxx/xxx'-encoded - search the X11 rgb table
+	// then search the X11 rgb table
 	if (fTable == NULL) {
 		status_t result = _LoadXColorsTable();
 		if (result != B_OK)
