@@ -54,7 +54,7 @@ for platform in [ MultiBootSubDirSetup efi ] {
 		BootMergeObject boot_platform_efi_common.o :
 			$(platform_src)
 			: :
-			$(support_libs)
+			[ MultiBootGristFiles $(support_libs) ]
 			boot_platform_generic_efi.a
 		;
 

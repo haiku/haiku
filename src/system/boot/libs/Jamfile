@@ -29,6 +29,17 @@ local zstdDecSources =
 	huf_decompress.c zstd_ddict.c zstd_decompress.c zstd_decompress_block.c
 	;
 
+local libFDTSourceDirectory = [ FDirName $(HAIKU_TOP) src libs libfdt ] ;
+
+local libFDTSources =
+	fdt.c
+	fdt_ro.c
+	fdt_rw.c
+	fdt_strerror.c
+	fdt_sw.c
+	fdt_wip.c
+	;
+
 local platform ;
 for platform in [ MultiBootSubDirSetup ] {
 	on $(platform) {
@@ -58,5 +69,13 @@ for platform in [ MultiBootSubDirSetup ] {
 			;
 		Depends [ FGristFiles $(zstdCommonSources) $(zstdDecSources) ]
 			: [ BuildFeatureAttribute zstd : sources ] ;
+
+		# fdt
+		UseLibraryHeaders [ FDirName libfdt ] ;
+
+		BootStaticLibrary [ MultiBootGristFiles boot_fdt ] :
+			$(libFDTSources) ;
+
+		LOCATE on [ FGristFiles $(libFDTSources) ] = $(libFDTSourceDirectory) ;
 	}
 }
