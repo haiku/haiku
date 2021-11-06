@@ -88,6 +88,9 @@ init_common(int device, bool isClone)
 			return B_NO_MEMORY;
 		memset(gConnector[id], 0, sizeof(connector_info));
 
+		// Init a few things
+		gConnector[id]->router.ddcValid = false;
+		gConnector[id]->router.cdValid = false;
 		gConnector[id]->encoder.pll.id = ATOM_PPLL_INVALID;
 	}
 
