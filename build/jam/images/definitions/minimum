@@ -146,8 +146,10 @@ SYSTEM_ADD_ONS_ACCELERANTS = [ FFilterByBuildFeatures
 	framebuffer.accelerant
 	x86,x86_64 @{
 		vesa.accelerant
-	}@ # x86,x86_64,riscv64
+	}@ # x86,x86_64
 	riscv64 @{
+		# ati for qemu, radeon_hd for unmatched
+		ati.accelerant
 		radeon_hd.accelerant
 	}@ # riscv64
 ] ;
@@ -180,6 +182,8 @@ SYSTEM_ADD_ONS_DRIVERS_GRAPHICS = [ FFilterByBuildFeatures
 		vesa
 	}@ # x86,x86_64
 	riscv64 @{
+		# ati for qemu, radeon_hd for unmatched
+		ati
 		radeon_hd
 	}@ # riscv64
 ] ;
