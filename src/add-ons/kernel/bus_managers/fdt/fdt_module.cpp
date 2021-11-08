@@ -188,6 +188,11 @@ fdt_bus_init(device_node* node, void** cookie)
 {
 	TRACE("fdt_bus_init\n");
 
+	if (gFDT == NULL) {
+		TRACE("FDT is NULL!\n");
+		return B_DEVICE_NOT_FOUND;
+	}
+
 	ObjectDeleter<fdt_bus> bus(new(std::nothrow) fdt_bus());
 	if (!bus.IsSet())
 		return B_NO_MEMORY;
