@@ -32,6 +32,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			l64a.c
 			lcong48.c
 			lcong48_r.c
+			longlong.c
 			lrand48.c
 			lrand48_r.c
 			mrand48.c

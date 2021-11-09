@@ -22,6 +22,8 @@ for architectureObject in [ MultiArchSubDirSetup riscv64 ] {
 			time.cpp
 			thread.cpp
 
+			cachectl.cpp
+
 			generic_atomic.cpp
 			generic_stack_trace.cpp
 			generic_system_time_nsecs.cpp
